@@ -27,6 +27,7 @@ type CatalogResponse = {
   items: PublicSession[];
   facets?: Partial<CatalogFacets>;
 };
+type ActiveCatalogFilter = { key: string; label: string; onClear: () => void };
 
 const CATALOG_PAGE_LIMIT = 180;
 const MIN_DISPLAY_PRICE_RUB = 100;
@@ -35,20 +36,21 @@ const API_BASE_URL =
   'http://127.0.0.1:4000';
 
 export function CatalogPage() {
+  const initialParams = React.useMemo(() => new URLSearchParams(window.location.search), []);
   const [catalogSessions, setCatalogSessions] = React.useState<PublicSession[]>(() => publicData.sessions);
   const [catalogTotal, setCatalogTotal] = React.useState(() => publicData.sessions.length);
   const [catalogFacets, setCatalogFacets] = React.useState<Partial<CatalogFacets> | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [hasLoadedCatalog, setHasLoadedCatalog] = React.useState(false);
   const [loadError, setLoadError] = React.useState<string | null>(null);
-  const [query, setQuery] = React.useState(() => new URLSearchParams(window.location.search).get('q') || '');
-  const [city, setCity] = React.useState(() => new URLSearchParams(window.location.search).get('city') || 'all');
-  const [category, setCategory] = React.useState(() => new URLSearchParams(window.location.search).get('category') || 'all');
-  const [landing, setLanding] = React.useState(() => new URLSearchParams(window.location.search).get('landing') || 'all');
-  const [date, setDate] = React.useState<DateFilter>('all');
-  const [maxPrice, setMaxPrice] = React.useState('all');
-  const [sort, setSort] = React.useState<SortMode>('time');
-  const [mode, setMode] = React.useState<ViewMode>('cards');
+  const [query, setQuery] = React.useState(() => initialParams.get('q') || '');
+  const [city, setCity] = React.useState(() => initialParams.get('city') || 'all');
+  const [category, setCategory] = React.useState(() => initialParams.get('category') || 'all');
+  const [landing, setLanding] = React.useState(() => initialParams.get('landing') || 'all');
+  const [date, setDate] = React.useState<DateFilter>(() => parseDateFilter(initialParams.get('date')));
+  const [maxPrice, setMaxPrice] = React.useState(() => parseMaxPriceFilter(initialParams.get('maxPrice')));
+  const [sort, setSort] = React.useState<SortMode>(() => parseSortMode(initialParams.get('sort')));
+  const [mode, setMode] = React.useState<ViewMode>(() => parseViewMode(initialParams.get('view')));
 
   React.useEffect(() => {
     document.title = 'Каталог событий, экскурсий и билетов | Дайбилет';
@@ -100,6 +102,10 @@ export function CatalogPage() {
     };
   }, [category, city, date, landing, maxPrice, query, sort]);
 
+  React.useEffect(() => {
+    syncCatalogUrl({ query, city, category, landing, date, maxPrice, sort, mode });
+  }, [category, city, date, landing, maxPrice, mode, query, sort]);
+
   const sourceSessions = hasLoadedCatalog ? catalogSessions : publicData.sessions;
   const fallbackFacets = React.useMemo(() => buildCatalogFacets(publicData.sessions), []);
   const facets = catalogFacets || fallbackFacets;
@@ -135,6 +141,16 @@ export function CatalogPage() {
     setMaxPrice('all');
     setSort('time');
   };
+  const activeFilters: ActiveCatalogFilter[] = [
+    ...(query.trim() ? [{ key: 'query', label: `Поиск: ${query.trim()}`, onClear: () => setQuery('') }] : []),
+    ...(city !== 'all' ? [{ key: 'city', label: city, onClear: () => setCity('all') }] : []),
+    ...(category !== 'all' ? [{ key: 'category', label: category, onClear: () => setCategory('all') }] : []),
+    ...(landing !== 'all'
+      ? [{ key: 'landing', label: landings.find((item) => item.slug === landing)?.title || landing, onClear: () => setLanding('all') }]
+      : []),
+    ...(date !== 'all' ? [{ key: 'date', label: dateLabel(date), onClear: () => setDate('all') }] : []),
+    ...(maxPrice !== 'all' ? [{ key: 'maxPrice', label: `до ${formatNumber(Number(maxPrice))} ₽`, onClear: () => setMaxPrice('all') }] : []),
+  ];
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
@@ -179,7 +195,7 @@ export function CatalogPage() {
               setSort={setSort}
               mode={mode}
               setMode={setMode}
-              activeLabels={activeFilterLabels({ city, category, landing, date, maxPrice, query }, landings)}
+              activeFilters={activeFilters}
               reset={reset}
             />
 
@@ -349,7 +365,7 @@ function CatalogToolbar({
   setSort,
   mode,
   setMode,
-  activeLabels,
+  activeFilters,
   reset,
 }: {
   count: number;
@@ -360,7 +376,7 @@ function CatalogToolbar({
   setSort: (value: SortMode) => void;
   mode: ViewMode;
   setMode: (value: ViewMode) => void;
-  activeLabels: string[];
+  activeFilters: ActiveCatalogFilter[];
   reset: () => void;
 }) {
   return (
@@ -391,10 +407,18 @@ function CatalogToolbar({
         </div>
       </div>
 
-      {activeLabels.length ? (
+      {activeFilters.length ? (
         <div className="mt-4 flex flex-wrap gap-2">
-          {activeLabels.map((label) => (
-            <span key={label} className="rounded-full bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700">{label}</span>
+          {activeFilters.map((filter) => (
+            <button
+              key={filter.key}
+              type="button"
+              onClick={filter.onClear}
+              className="inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700 transition hover:bg-primary-100"
+            >
+              {filter.label}
+              <X className="h-3.5 w-3.5" />
+            </button>
           ))}
           <button type="button" onClick={reset} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200">Сбросить все</button>
         </div>
@@ -536,23 +560,63 @@ function isCatalogCityFacet(item: CatalogFacetItem) {
   return item.events >= 2;
 }
 
-function activeFilterLabels(filters: { city: string; category: string; landing: string; date: DateFilter; maxPrice: string; query: string }, landings: LandingFacet[]) {
-  const labels: string[] = [];
-  if (filters.query.trim()) labels.push(`Поиск: ${filters.query.trim()}`);
-  if (filters.city !== 'all') labels.push(filters.city);
-  if (filters.category !== 'all') labels.push(filters.category);
-  if (filters.landing !== 'all') labels.push(landings.find((item) => item.slug === filters.landing)?.title || filters.landing);
-  if (filters.date !== 'all') labels.push(dateLabel(filters.date));
-  if (filters.maxPrice !== 'all') labels.push(`до ${formatNumber(Number(filters.maxPrice))} ₽`);
-  return labels;
-}
-
 function dateLabel(value: DateFilter) {
   if (value === 'today') return 'Сегодня';
   if (value === 'tomorrow') return 'Завтра';
   if (value === 'weekend') return 'Выходные';
   if (value === 'evening') return 'Вечером';
   return 'Любая дата';
+}
+
+function parseDateFilter(value: string | null): DateFilter {
+  if (value === 'today' || value === 'tomorrow' || value === 'weekend' || value === 'evening') return value;
+  return 'all';
+}
+
+function parseSortMode(value: string | null): SortMode {
+  if (value === 'price' || value === 'popular') return value;
+  return 'time';
+}
+
+function parseViewMode(value: string | null): ViewMode {
+  if (value === 'table') return 'table';
+  return 'cards';
+}
+
+function parseMaxPriceFilter(value: string | null): string {
+  if (!value) return 'all';
+  const price = Number(value);
+  if (!Number.isFinite(price) || price < MIN_DISPLAY_PRICE_RUB) return 'all';
+  return String(Math.round(price));
+}
+
+function syncCatalogUrl(filters: {
+  query: string;
+  city: string;
+  category: string;
+  landing: string;
+  date: DateFilter;
+  maxPrice: string;
+  sort: SortMode;
+  mode: ViewMode;
+}) {
+  const params = new URLSearchParams();
+  const query = filters.query.trim();
+  if (query) params.set('q', query);
+  if (filters.city !== 'all') params.set('city', filters.city);
+  if (filters.category !== 'all') params.set('category', filters.category);
+  if (filters.landing !== 'all') params.set('landing', filters.landing);
+  if (filters.date !== 'all') params.set('date', filters.date);
+  if (filters.maxPrice !== 'all') params.set('maxPrice', filters.maxPrice);
+  if (filters.sort !== 'time') params.set('sort', filters.sort);
+  if (filters.mode !== 'cards') params.set('view', filters.mode);
+
+  const queryString = params.toString();
+  const nextUrl = `${window.location.pathname}${queryString ? `?${queryString}` : ''}${window.location.hash || ''}`;
+  const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash || ''}`;
+  if (nextUrl !== currentUrl) {
+    window.history.replaceState(null, '', nextUrl);
+  }
 }
 
 function pluralEvents(count: number): string {
