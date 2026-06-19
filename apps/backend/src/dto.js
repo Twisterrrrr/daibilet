@@ -1436,10 +1436,10 @@ export async function buildAdminLandingDetail(db, landingSlug) {
       cities: new Set(matched.map((event) => event.city).filter(Boolean)).size,
       priceFrom: prices.length ? Math.min(...prices) : null,
     },
-    events: matched.slice(0, 160).map((event) => mapLandingAdminEvent(event, manualRowFor(event), isAutoGroup(event))),
+    events: matched.slice(0, 160).map((event) => mapLandingAdminEvent(event, manualRowFor(event), isAutoGroup(event), rule)),
     excludedEvents: excluded
       .slice(0, 40)
-      .map((event) => mapLandingAdminEvent(event, manualRowFor(event), isAutoGroup(event))),
+      .map((event) => mapLandingAdminEvent(event, manualRowFor(event), isAutoGroup(event), rule)),
   };
 }
 
@@ -1474,7 +1474,7 @@ export async function buildAdminLandingEventCandidates(db, landingSlug, searchPa
       const groupIds = event.groupEventIds?.length ? event.groupEventIds : [event.id];
       const manualRow = groupIds.map((id) => manualByEventId.get(id)).find(Boolean) || null;
       const isAutoMatch = groupIds.some((id) => autoIds.has(id));
-      return mapLandingAdminEvent(event, manualRow, isAutoMatch);
+      return mapLandingAdminEvent(event, manualRow, isAutoMatch, rule);
     }),
   };
 }
@@ -3726,8 +3726,10 @@ function buildDefaultLandingBlocks(rule, matchedEvents) {
   return blocks;
 }
 
-function mapLandingAdminEvent(event, manualRow, isAutoMatch) {
+function mapLandingAdminEvent(event, manualRow, isAutoMatch, rule = null) {
   const manual = manualRow?.reasons || null;
+  const ruleExplanation = rule ? explainRuleMatch(event, rule) : { reasons: [], blockers: [] };
+  const manualStatus = manual?.manualStatus || null;
   return {
     id: event.id,
     groupEventIds: event.groupEventIds?.length ? event.groupEventIds : [event.id],
@@ -3741,8 +3743,15 @@ function mapLandingAdminEvent(event, manualRow, isAutoMatch) {
     category: event.sourceCategory,
     tags: event.tags || [],
     isAutoMatch,
-    manualStatus: manual?.manualStatus || null,
+    manualStatus,
     manualNote: manual?.note || null,
+    matchReasons: uniqueValues([
+      manualStatus === 'PINNED' ? 'ручное закрепление' : null,
+      manualStatus === 'EXCLUDED' ? 'ручное скрытие' : null,
+      manualStatus === 'REVIEW' ? 'ручной возврат к авто' : null,
+      ...ruleExplanation.reasons,
+    ].filter(Boolean)).slice(0, 10),
+    matchBlockers: ruleExplanation.blockers || [],
   };
 }
 
@@ -4744,30 +4753,68 @@ function buildPublicLandings(sessions) {
 }
 
 function matchesRule(event, rule) {
+  return explainRuleMatch(event, rule).matches;
+}
+
+function explainRuleMatch(event, rule) {
   const tags = event.tags || [];
-  const haystack = [event.title, event.venue, event.city, event.destination, event.sourceCategory, event.category, ...tags]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-  const contentHaystack = [event.title, event.sourceCategory, event.category, ...tags]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-  const keywordHaystack = rule.keywordScope === 'content' ? contentHaystack : haystack;
+  const keywordFields = keywordFieldsForEvent(event, tags, rule.keywordScope || 'full');
+  const fullKeywordFields = keywordFieldsForEvent(event, tags, 'full');
 
-  if (rule.city && !matchesRuleCity(event, rule.city)) return false;
-  if (rule.venue && event.venue !== rule.venue) return false;
-  if (rule.excludeTags && rule.excludeTags.some((tag) => tags.includes(tag))) return false;
-  if (rule.excludeKeywords && hasAnyKeyword(haystack, rule.excludeKeywords)) return false;
-  if (rule.requiredAnyTags && !rule.requiredAnyTags.some((tag) => tags.includes(tag))) return false;
-  if (rule.requiredAnyKeywords && !hasAnyKeyword(keywordHaystack, rule.requiredAnyKeywords)) return false;
-  if (rule.requiredKeywords && !rule.requiredKeywords.every((keyword) => keywordHaystack.includes(String(keyword).toLowerCase()))) return false;
-  if (rule.requiredKeywordGroups && !rule.requiredKeywordGroups.every((group) => hasAnyKeyword(keywordHaystack, group))) return false;
+  const reasons = [];
+  const blockers = [];
+  if (rule.city) {
+    if (matchesRuleCity(event, rule.city)) reasons.push(`город: ${rule.city}`);
+    else blockers.push(`другой город: ${event.city || event.destination || 'не указан'}`);
+  }
+  if (rule.venue) {
+    if (event.venue === rule.venue) reasons.push(`площадка: ${rule.venue}`);
+    else blockers.push(`другая площадка: ${event.venue || 'не указана'}`);
+  }
 
-  const hasTagSignal = rule.tags?.some((tag) => tags.includes(tag)) || false;
-  const hasKeywordSignal = rule.keywords ? hasAnyKeyword(keywordHaystack, rule.keywords) : false;
+  const excludedTag = rule.excludeTags?.find((tag) => tags.includes(tag));
+  if (excludedTag) blockers.push(`исключающий тег: ${excludedTag}`);
+  const excludedKeyword = firstKeywordMatch(fullKeywordFields, rule.excludeKeywords || []);
+  if (excludedKeyword) blockers.push(`исключающее слово(${excludedKeyword.field}): ${excludedKeyword.keyword}`);
+
+  const requiredAnyTag = rule.requiredAnyTags?.find((tag) => tags.includes(tag));
+  if (rule.requiredAnyTags?.length) {
+    if (requiredAnyTag) reasons.push(`обязательный тег: ${requiredAnyTag}`);
+    else blockers.push(`нет обязательного тега: ${rule.requiredAnyTags.join(' / ')}`);
+  }
+
+  const requiredAnyKeyword = firstKeywordMatch(keywordFields, rule.requiredAnyKeywords || []);
+  if (rule.requiredAnyKeywords?.length) {
+    if (requiredAnyKeyword) reasons.push(`обязательное слово(${requiredAnyKeyword.field}): ${requiredAnyKeyword.keyword}`);
+    else blockers.push(`нет обязательного слова: ${rule.requiredAnyKeywords.join(' / ')}`);
+  }
+
+  for (const keyword of rule.requiredKeywords || []) {
+    const found = firstKeywordMatch(keywordFields, [keyword]);
+    if (found) reasons.push(`обязательное слово(${found.field}): ${keyword}`);
+    else blockers.push(`нет обязательного слова: ${keyword}`);
+  }
+
+  for (const group of rule.requiredKeywordGroups || []) {
+    const found = firstKeywordMatch(keywordFields, group);
+    if (found) reasons.push(`группа(${found.field}): ${found.keyword}`);
+    else blockers.push(`нет слова из группы: ${group.join(' / ')}`);
+  }
+
+  if (blockers.length) {
+    return { matches: false, reasons: uniqueValues(reasons).slice(0, 10), blockers: uniqueValues(blockers).slice(0, 10) };
+  }
+
+  const tagSignals = (rule.tags || []).filter((tag) => tags.includes(tag));
+  const keywordSignals = matchingKeywordMatches(keywordFields, rule.keywords || []);
+  for (const tag of tagSignals.slice(0, 4)) reasons.push(`тег: ${tag}`);
+  for (const match of keywordSignals.slice(0, 4)) reasons.push(`слово(${match.field}): ${match.keyword}`);
+
+  const hasTagSignal = tagSignals.length > 0;
+  const hasKeywordSignal = keywordSignals.length > 0;
   const hasRequiredSignal = Boolean(rule.requiredAnyTags || rule.requiredAnyKeywords || rule.requiredKeywords || rule.requiredKeywordGroups);
-  return Boolean(hasTagSignal || hasKeywordSignal || hasRequiredSignal || rule.city || rule.venue);
+  const matches = Boolean(hasTagSignal || hasKeywordSignal || hasRequiredSignal || rule.city || rule.venue);
+  return { matches, reasons: uniqueValues(reasons).slice(0, 10), blockers: [] };
 }
 
 function matchesRuleCity(event, expectedCity) {
@@ -4775,8 +4822,47 @@ function matchesRuleCity(event, expectedCity) {
   return candidates.includes(String(expectedCity).toLowerCase());
 }
 
-function hasAnyKeyword(haystack, keywords) {
-  return keywords.some((keyword) => haystack.includes(String(keyword).toLowerCase()));
+function keywordFieldsForEvent(event, tags, scope = 'full') {
+  const fields = [
+    { field: 'title', value: event.title },
+    { field: 'category', value: event.category },
+    { field: 'sourceCategory', value: event.sourceCategory },
+    { field: 'tag', value: tags.join(' ') },
+  ];
+  if (scope !== 'content') {
+    fields.push(
+      { field: 'venue', value: event.venue },
+      { field: 'city', value: event.city },
+      { field: 'destination', value: event.destination },
+    );
+  }
+  return fields
+    .filter((item) => item.value)
+    .map((item) => ({ ...item, text: String(item.value).toLowerCase() }));
+}
+
+function firstKeywordMatch(fields, keywords) {
+  for (const keyword of keywords) {
+    const normalized = String(keyword).toLowerCase();
+    const field = fields.find((item) => item.text.includes(normalized));
+    if (field) return { keyword, field: field.field };
+  }
+  return null;
+}
+
+function matchingKeywordMatches(fields, keywords) {
+  const matches = [];
+  const seen = new Set();
+  for (const keyword of keywords) {
+    const normalized = String(keyword).toLowerCase();
+    const field = fields.find((item) => item.text.includes(normalized));
+    if (!field) continue;
+    const key = `${field.field}:${keyword}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    matches.push({ keyword, field: field.field });
+  }
+  return matches;
 }
 
 function reviewReasons(event) {

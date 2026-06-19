@@ -668,6 +668,20 @@ function LandingEventsEditorTable({
               <div className="mt-1 flex flex-wrap gap-1">
                 {(event.tags || []).slice(0, 3).map((tag) => <Badge key={tag} variant="outline">{tag}</Badge>)}
               </div>
+              {event.matchReasons?.length ? (
+                <div className="mt-1 flex flex-wrap gap-1">
+                  {event.matchReasons.slice(0, 4).map((reason) => (
+                    <Badge key={reason} variant="secondary" className="text-[10px]">
+                      {reason}
+                    </Badge>
+                  ))}
+                </div>
+              ) : null}
+              {event.matchBlockers?.length ? (
+                <div className="mt-1 text-[11px] text-destructive">
+                  {event.matchBlockers.slice(0, 2).join(' · ')}
+                </div>
+              ) : null}
             </td>
             <td className="px-4 py-3 align-top">
               <div className="text-sm">{event.city}</div>

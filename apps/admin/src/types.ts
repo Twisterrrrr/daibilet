@@ -233,6 +233,8 @@ export type AdminLandingEvent = {
   isAutoMatch: boolean;
   manualStatus?: 'PINNED' | 'EXCLUDED' | 'REVIEW' | null;
   manualNote?: string | null;
+  matchReasons?: string[];
+  matchBlockers?: string[];
 };
 
 export type AdminData = {

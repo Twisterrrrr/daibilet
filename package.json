@@ -21,6 +21,7 @@
     "tc:full-sync": "node scripts/tc-full-sync.js",
     "tc:orders": "node scripts/tc-sync-orders.js",
     "tc:city-routing": "node scripts/tc-city-routing-summary.js",
+    "landing:snapshot": "node scripts/landing-snapshot.mjs --write",
     "tep:import-fixtures": "node scripts/tep-import-fixtures.js",
     "tep:bridge": "node scripts/teplohod-fixture-bridge.js",
     "tep:fixture-bridge": "node scripts/teplohod-fixture-bridge.js",
