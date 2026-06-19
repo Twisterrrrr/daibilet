@@ -202,3 +202,17 @@
 - `apps/public/src/components/CatalogPage.tsx`: фильтры и группировка карточек.
 - `apps/admin/src/pages/EventsPage.tsx`: группировка, статус публикации, контент/media/SEO override.
 - `apps/admin/src/pages/ExternalOrdersPage.tsx`: лаконичность операционной таблицы и ручная работа с билетами.
+
+### Source Health + readiness codes, 2026-06-19
+
+Статус: принято после локальной DTO-проверки и сборки admin.
+
+Что сделано: `buildAdminSources` теперь отдает не только последний sync, а операционное здоровье источника: `lastSuccessAt`, `isStale`, `staleHours`, `consecutiveErrors`, `runningRuns`, `healthStatus` и `openIssues`. Sources UI показывает отдельные кнопки `Sync TC` и `Sync Teplohod`, grouped/raw counts, свежесть sync и явные проблемы вроде `STALE_SYNC_24H` или `TEP_BRIDGE_NOT_CONFIGURED`. Если backend недоступен, Sources больше не маскирует это fallback-таблицей, а показывает честный экран ошибки с повтором.
+
+Readiness событий переведен на backend-коды: `NO_FUTURE_SESSIONS`, `MISSING_PURCHASE_ENTRY`, `MISSING_PRICE`, `PRICE_TOO_LOW`, `MISSING_CATEGORY`, `MISSING_SUBCATEGORY`, `MISSING_VENUE`, `WEAK_DESCRIPTION`, `MISSING_IMAGE`. Старое поле `reasons` сохранено как человекочитаемый слой для таблицы, но фронт теперь может опираться на `readinessCodes` и `readinessIssues`.
+
+Проверка: `node --check apps/backend/src/dto.js`, `node --check apps/backend/src/server.js`, `npm.cmd --prefix apps/admin run typecheck`, `npm.cmd --prefix apps/admin run build`. Прямой DTO-запрос показал 2 источника, 530 grouped events, TC stale, Teplohod stale + bridge issue. Выборка событий вернула ожидаемые коды, включая `NO_FUTURE_SESSIONS` и `PRICE_TOO_LOW`.
+
+Главный риск: сейчас системная дата 2026-06-19, а часть TC-событий в базе заканчивается 2026-05-30, поэтому readiness массово подсветит отсутствие будущих сеансов. Это правильно для запуска, но перед продажами нужно прогнать свежий TC sync и поднять Teplohod bridge через `TEP_API_URL`.
+
+Следующий контрольный шаг: нормализовать ticket categories/prices как отдельный read-model, чтобы страница события показывала реальные категории билетов, а не только агрегированную `priceFrom`.

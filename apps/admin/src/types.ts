@@ -58,6 +58,12 @@ export type AdminEventRow = {
   tags: string[];
   landingHits: string[];
   reasons: string[];
+  readinessCodes?: string[];
+  readinessIssues?: Array<{
+    code: string;
+    label: string;
+    severity: 'low' | 'medium' | 'high' | string;
+  }>;
   moderationStatus?: 'DRAFT' | 'REVIEW' | 'READY' | 'PUBLISHED' | 'HIDDEN' | string;
   canPublish?: boolean;
   publishBlockers?: string[];
@@ -286,6 +292,7 @@ export type AdminSourceRow = {
   name: string;
   enabled: boolean;
   status: 'live' | 'paused' | 'incomplete' | 'error' | string;
+  healthStatus?: 'ok' | 'warning' | 'error' | 'paused' | string;
   purchaseReady: boolean;
   events: number;
   rawEvents?: number;
@@ -296,6 +303,16 @@ export type AdminSourceRow = {
   priceFrom?: number | null;
   sampleWidgetUrl?: string | null;
   sampleDeeplinkUrl?: string | null;
+  lastSuccessAt?: string | null;
+  isStale?: boolean;
+  staleHours?: number | null;
+  consecutiveErrors?: number;
+  runningRuns?: number;
+  openIssues?: Array<{
+    code: string;
+    label: string;
+    severity: 'low' | 'medium' | 'high' | string;
+  }>;
   lastSync?: {
     status?: string | null;
     mode?: string | null;
@@ -311,6 +328,9 @@ export type AdminSourcesPayload = {
   metrics: {
     sources: number;
     live: number;
+    healthy?: number;
+    stale?: number;
+    openIssues?: number;
     events: number;
     sessions: number;
   };

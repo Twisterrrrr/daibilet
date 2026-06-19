@@ -79,12 +79,16 @@ export function formatDateTime(value?: string | null): string {
 }
 
 export function problemLabels(event: AdminEventRow): string[] {
-  const labels = [...(event.reasons ?? [])];
+  const labels = event.readinessIssues?.length ? event.readinessIssues.map((issue) => issue.label) : [...(event.reasons ?? [])];
   if (!event.purchaseReady && !String(event.offerStatus || '').toLowerCase().includes('widget') && !labels.some((label) => label.toLowerCase().includes('виджет'))) labels.push('нет виджета');
   return Array.from(new Set(labels));
 }
 
 export function suggestedDetailTab(event: AdminEventRow): 'overview' | 'classification' | 'schedule' | 'media' {
+  const codes = new Set(event.readinessCodes ?? []);
+  if (codes.has('MISSING_IMAGE')) return 'media';
+  if (codes.has('MISSING_CATEGORY') || codes.has('MISSING_SUBCATEGORY')) return 'classification';
+  if (codes.has('NO_FUTURE_SESSIONS') || codes.has('MISSING_PRICE') || codes.has('PRICE_TOO_LOW') || codes.has('MISSING_PURCHASE_ENTRY')) return 'schedule';
   const issues = event.reasons ?? [];
   if (issues.some((issue) => issue.includes('изображ'))) return 'media';
   if (issues.some((issue) => issue.includes('подкатег') || issue.includes('катег'))) return 'classification';

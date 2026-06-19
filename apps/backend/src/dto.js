@@ -253,7 +253,11 @@ export async function buildAdminSources(db) {
       latest.mode as "lastSyncMode",
       latest."startedAt" as "lastSyncStartedAt",
       latest."finishedAt" as "lastSyncFinishedAt",
-      latest.error as "lastSyncError"
+      latest.error as "lastSyncError",
+      last_success."startedAt" as "lastSuccessStartedAt",
+      last_success."finishedAt" as "lastSuccessFinishedAt",
+      coalesce(sync_health."consecutiveErrors", 0)::int as "consecutiveErrors",
+      coalesce(sync_health."runningRuns", 0)::int as "runningRuns"
     from "Source" source
     left join "EventSourceLink" link on link."sourceId" = source.id
     left join "Event" event on event.id = link."eventId"
@@ -267,7 +271,35 @@ export async function buildAdminSources(db) {
       order by "startedAt" desc
       limit 1
     ) latest on true
-    group by source.id, grouped_events."groupedEvents", grouped_events."groupedVenues", grouped_events."groupedCities", latest.status, latest.mode, latest."startedAt", latest."finishedAt", latest.error
+    left join lateral (
+      select "startedAt", "finishedAt"
+      from "SourceSyncRun"
+      where "sourceId" = source.id and status::text = 'SUCCESS'
+      order by "startedAt" desc
+      limit 1
+    ) last_success on true
+    left join lateral (
+      select
+        count(*) filter (where status::text = 'FAILED')::int as "consecutiveErrors",
+        count(*) filter (where status::text = 'RUNNING')::int as "runningRuns"
+      from "SourceSyncRun"
+      where "sourceId" = source.id
+        and "startedAt" > coalesce(last_success."startedAt", timestamp '1970-01-01')
+    ) sync_health on true
+    group by
+      source.id,
+      grouped_events."groupedEvents",
+      grouped_events."groupedVenues",
+      grouped_events."groupedCities",
+      latest.status,
+      latest.mode,
+      latest."startedAt",
+      latest."finishedAt",
+      latest.error,
+      last_success."startedAt",
+      last_success."finishedAt",
+      sync_health."consecutiveErrors",
+      sync_health."runningRuns"
     order by source.code asc
   `);
 
@@ -281,12 +313,27 @@ export async function buildAdminSources(db) {
     );
     const groupedEventsCount = row.groupedEvents || row.rawEvents || 0;
     const status = !row.enabled ? 'paused' : groupedEventsCount > 0 && purchaseReady ? 'live' : groupedEventsCount > 0 ? 'incomplete' : 'error';
+    const lastSuccessAt = row.lastSuccessFinishedAt || row.lastSuccessStartedAt || null;
+    const openIssues = sourceHealthIssues({
+      sourceCode,
+      enabled: row.enabled,
+      status,
+      purchaseReady,
+      groupedEvents: groupedEventsCount,
+      lastSyncStatus: row.lastSyncStatus,
+      lastSyncError: row.lastSyncError,
+      lastSuccessAt,
+      consecutiveErrors: row.consecutiveErrors || 0,
+    });
+    const healthStatus = sourceHealthStatus(status, openIssues);
+    const staleHours = lastSuccessAt ? Math.max(0, Math.round((Date.now() - new Date(lastSuccessAt).getTime()) / 36_000) / 100) : null;
     return {
       id: row.id,
       code: row.code,
       name: row.name,
       enabled: row.enabled,
       status,
+      healthStatus,
       purchaseReady,
       events: groupedEventsCount,
       rawEvents: row.rawEvents || 0,
@@ -297,6 +344,12 @@ export async function buildAdminSources(db) {
       priceFrom: row.priceFrom || null,
       sampleWidgetUrl: row.sampleWidgetUrl || null,
       sampleDeeplinkUrl: row.sampleDeeplinkUrl || null,
+      lastSuccessAt,
+      isStale: openIssues.some((issue) => issue.code === 'STALE_SYNC_24H' || issue.code === 'NO_SUCCESSFUL_SYNC'),
+      staleHours,
+      consecutiveErrors: row.consecutiveErrors || 0,
+      runningRuns: row.runningRuns || 0,
+      openIssues,
       lastSync: row.lastSyncStartedAt
         ? {
             status: row.lastSyncStatus,
@@ -315,10 +368,40 @@ export async function buildAdminSources(db) {
     metrics: {
       sources: sources.length,
       live: sources.filter((source) => source.status === 'live').length,
+      healthy: sources.filter((source) => source.healthStatus === 'ok').length,
+      stale: sources.filter((source) => source.isStale).length,
+      openIssues: sources.reduce((sum, source) => sum + source.openIssues.length, 0),
       events: sources.reduce((sum, source) => sum + source.events, 0),
       sessions: sources.reduce((sum, source) => sum + source.sessions, 0),
     },
   };
+}
+
+function sourceHealthIssues(source) {
+  const issues = [];
+  const lastSuccessAt = source.lastSuccessAt ? new Date(source.lastSuccessAt) : null;
+  const lastSuccessTime = lastSuccessAt && Number.isFinite(lastSuccessAt.getTime()) ? lastSuccessAt.getTime() : null;
+  const hoursSinceSuccess = lastSuccessTime ? (Date.now() - lastSuccessTime) / 3_600_000 : null;
+
+  const add = (code, label, severity = 'medium') => issues.push({ code, label, severity });
+
+  if (!source.enabled) add('SOURCE_DISABLED', 'Источник выключен', 'medium');
+  if (!lastSuccessTime) add('NO_SUCCESSFUL_SYNC', 'Нет успешного sync', 'high');
+  else if (hoursSinceSuccess > 24) add('STALE_SYNC_24H', 'Sync старше 24 часов', 'high');
+  if (String(source.lastSyncStatus || '').toUpperCase() === 'FAILED') add('LAST_SYNC_FAILED', source.lastSyncError ? `Последний sync упал: ${source.lastSyncError}` : 'Последний sync упал', 'high');
+  if ((source.consecutiveErrors || 0) > 0) add('CONSECUTIVE_ERRORS', `${source.consecutiveErrors} ошибок sync подряд`, source.consecutiveErrors > 2 ? 'high' : 'medium');
+  if (!source.groupedEvents) add('NO_GROUPED_EVENTS', 'Нет карточек каталога', 'high');
+  if (source.groupedEvents > 0 && !source.purchaseReady) add('PURCHASE_NOT_READY', 'Покупка не готова', 'high');
+  if (source.sourceCode === 'TEPLOHOD' && !process.env.TEP_API_URL) add('TEP_BRIDGE_NOT_CONFIGURED', 'Не задан TEP_API_URL для bridge/API', 'high');
+
+  return issues;
+}
+
+function sourceHealthStatus(status, issues) {
+  if (status === 'paused') return 'paused';
+  if (issues.some((issue) => issue.severity === 'high')) return 'error';
+  if (issues.length) return 'warning';
+  return 'ok';
 }
 
 export async function buildAdminOrdersList(db, searchParams = new URLSearchParams()) {
@@ -3231,6 +3314,7 @@ async function eventRows(db, limit) {
         offer."deeplinkUrl" as "offerDeeplinkUrl",
         city.id as "cityId",
         city.slug as "citySlug",
+        min(session."startsAt") filter (where session."startsAt" >= now()) as "nextStartsAt",
         min(session."startsAt") as "startsAt",
         min(session."priceFromRub") filter (where session."priceFromRub" >= ${MIN_DISPLAY_PRICE_RUB}) as "sessionPriceFromRub",
         count(distinct session.id)::int as "slotCount",
@@ -3295,11 +3379,14 @@ async function eventRows(db, limit) {
     const destination = publicDestinationForCity(row);
     const priceFrom = displayPriceFrom(row.priceFromRub, row.sessionPriceFromRub, row.offerPriceRub);
     const purchase = purchaseInfo(row);
-    const normalizedRow = { ...row, priceFrom, purchaseReady: purchase.ready };
-    const reasons = reviewReasons(normalizedRow);
+    const normalizedRow = { ...row, startsAt: row.nextStartsAt || row.startsAt, priceFrom, purchaseReady: purchase.ready, hasImage: Boolean(row.overrideImageUrl || row.imageUrl) };
+    const readinessIssues = buildReadinessIssues(normalizedRow);
+    const reasons = readinessIssues.map((issue) => issue.label);
     const gate = publishGate(normalizedRow, reasons);
     const moderationStatus = row.overrideEditorStatus || row.status || 'REVIEW';
     const offerStatus = purchase.status;
+    const severity = readinessSeverity(readinessIssues);
+    const readiness = readinessIssues.length ? (severity === 'high' ? 'blocked' : 'review') : row.status === 'READY' ? 'ready' : 'review';
     return {
       id: row.id,
       slug: publicEventSlug(row.slug),
@@ -3335,12 +3422,12 @@ async function eventRows(db, limit) {
       purchaseProvider: purchase.provider,
       purchaseUrlSource: purchase.urlSource,
       eventType: String(row.kind || '').toLowerCase(),
-      startsAt: row.startsAt,
+      startsAt: row.nextStartsAt || row.startsAt,
       slotCount: row.slotCount || 0,
       ageLimit: row.ageLimit,
       priceFrom,
       vacant: row.ticketsVacant,
-      hasImage: Boolean(row.imageUrl),
+      hasImage: Boolean(row.overrideImageUrl || row.imageUrl),
       imageUrl: row.imageUrl,
       seoH1: row.seoH1,
       seoTitle: row.seoTitle,
@@ -3362,12 +3449,14 @@ async function eventRows(db, limit) {
       tags,
       landingHits: LANDING_RULES.filter((rule) => matchesRule({ ...row, tags }, rule)).map((rule) => rule.title).slice(0, 3),
       reasons,
+      readinessCodes: readinessIssues.map((issue) => issue.code),
+      readinessIssues,
       moderationStatus,
       canPublish: gate.blockers.length === 0,
       publishBlockers: gate.blockers,
       publishWarnings: gate.warnings,
-      severity: reasons.length > 2 ? 'high' : reasons.length ? 'medium' : 'low',
-      readiness: reasons.length ? (reasons.length > 2 ? 'blocked' : 'review') : row.status === 'READY' ? 'ready' : 'review',
+      severity,
+      readiness,
       offerStatus,
       status: reasons.length ? 'needs_review' : row.status === 'READY' ? 'ready' : 'needs_review',
     };
@@ -5026,25 +5115,68 @@ function matchingKeywordMatches(fields, keywords) {
   return matches;
 }
 
-function reviewReasons(event) {
-  const reasons = [];
-  if (!event.imageUrl) reasons.push('нет изображения');
-  if (event.priceFrom == null) reasons.push('проверить цену');
-  if (!event.startsAt && event.kind !== 'OPEN_DATE') reasons.push('нет даты');
-  if (!event.venue) reasons.push('нет площадки');
-  if (!event.city) reasons.push('не указан город');
-  if (event.venueKind === 'MEETING_POINT') reasons.push('точка встречи, не площадка');
-  if (event.category === 'Музеи и арт') reasons.push('проверить подтип музея/арт-пространства');
-  if (event.category === 'Развлечения') reasons.push('развлечения как сквозной признак');
-  if (event.category === 'Экскурсии' && !hasAnyTag(event.tags || [], ['Водные экскурсии', 'Пешеходная экскурсия', 'Автобусные туры', 'Дворы и парадные', 'Реки и каналы'])) {
-    reasons.push('уточнить подкатегорию экскурсии');
-  }
-  return reasons;
+const READINESS_ISSUE_META = {
+  NO_FUTURE_SESSIONS: { label: 'нет будущих сеансов', severity: 'high' },
+  MISSING_PURCHASE_ENTRY: { label: 'нет виджета/ссылки покупки', severity: 'high' },
+  MISSING_PRICE: { label: 'нет цены', severity: 'high' },
+  PRICE_TOO_LOW: { label: `цена ниже ${MIN_DISPLAY_PRICE_RUB} ₽`, severity: 'high' },
+  MISSING_CATEGORY: { label: 'не выбрана категория', severity: 'high' },
+  MISSING_SUBCATEGORY: { label: 'не выбрана подкатегория', severity: 'medium' },
+  MISSING_VENUE: { label: 'нет площадки', severity: 'high' },
+  WEAK_DESCRIPTION: { label: 'слабое описание', severity: 'medium' },
+  MISSING_IMAGE: { label: 'нет изображения', severity: 'medium' },
+};
+
+function buildReadinessIssues(event) {
+  const issues = [];
+  const add = (code, details = null) => {
+    const meta = READINESS_ISSUE_META[code];
+    if (!meta || issues.some((issue) => issue.code === code)) return;
+    issues.push({ code, label: details || meta.label, severity: meta.severity });
+  };
+
+  const rawPriceValues = [event.priceFromRub, event.offerPriceRub].filter((value) => Number.isFinite(value) && value > 0);
+  const hasOnlyLowPrice = event.priceFrom == null && rawPriceValues.some((value) => value < MIN_DISPLAY_PRICE_RUB);
+  const description = plainReadinessText(event.overrideDescription || event.description || event.overrideShortDescription || '');
+  const venue = plainReadinessText(event.venue || '');
+  const hasVenue = Boolean(event.venueId || (venue && !['не указано', 'не указан', 'unknown'].includes(venue.toLowerCase())));
+
+  if (!hasFutureSession(event)) add('NO_FUTURE_SESSIONS');
+  if (!event.purchaseReady) add('MISSING_PURCHASE_ENTRY');
+  if (event.priceFrom == null) add(hasOnlyLowPrice ? 'PRICE_TOO_LOW' : 'MISSING_PRICE');
+  else if (event.priceFrom < MIN_DISPLAY_PRICE_RUB) add('PRICE_TOO_LOW');
+  if (!event.categoryId && !event.category) add('MISSING_CATEGORY');
+  if (!event.primarySubcategoryId && !(event.subcategoryIds || []).length) add('MISSING_SUBCATEGORY');
+  if (!hasVenue) add('MISSING_VENUE');
+  if (description.length < 120) add('WEAK_DESCRIPTION');
+  if (!event.hasImage && !event.imageUrl && !event.overrideImageUrl) add('MISSING_IMAGE');
+
+  return issues;
 }
 
-function hasAnyTag(tags, expected) {
-  const set = new Set(tags);
-  return expected.some((tag) => set.has(tag));
+function readinessSeverity(issues) {
+  if (issues.some((issue) => issue.severity === 'high')) return 'high';
+  if (issues.some((issue) => issue.severity === 'medium')) return 'medium';
+  return 'low';
+}
+
+function hasFutureSession(event) {
+  const kind = String(event.kind || event.eventType || '').toUpperCase();
+  if (kind === 'OPEN_DATE') return true;
+  if (!event.startsAt) return false;
+  const startsAt = new Date(event.startsAt).getTime();
+  return Number.isFinite(startsAt) && startsAt >= Date.now() - 15 * 60 * 1000;
+}
+
+function plainReadinessText(value) {
+  return String(value || '')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&[a-z0-9#]+;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function formatDate(value) {

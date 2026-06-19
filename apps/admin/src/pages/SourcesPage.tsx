@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 import { DataTableShell, InfoNote, PageHeader, SourceBadge, StatusBadge } from '@/components/admin/primitives';
 import { Badge } from '@/components/ui/badge';
@@ -12,11 +12,23 @@ const API_BASE_URL =
   ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
   'http://127.0.0.1:4000';
 
+const SOURCE_SYNC_CONFIG = {
+  TICKETSCLOUD: {
+    label: 'Ticketscloud',
+    endpoint: '/api/admin/sources/ticketscloud/sync',
+  },
+  TEPLOHOD: {
+    label: 'Teplohod',
+    endpoint: '/api/v1/tep/sync',
+  },
+} as const;
+
 export function SourcesPage() {
   const [payload, setPayload] = React.useState<AdminSourcesPayload>(() => buildFallbackSourcesPayload());
   const [loading, setLoading] = React.useState(true);
-  const [syncing, setSyncing] = React.useState(false);
+  const [syncingSource, setSyncingSource] = React.useState<string | null>(null);
   const [notice, setNotice] = React.useState<string | null>(null);
+  const [backendError, setBackendError] = React.useState<string | null>(null);
 
   const loadSources = React.useCallback(async () => {
     setLoading(true);
@@ -24,9 +36,10 @@ export function SourcesPage() {
       const response = await fetch(`${API_BASE_URL}/api/admin/sources`, { cache: 'no-store' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       setPayload((await response.json()) as AdminSourcesPayload);
+      setBackendError(null);
       setNotice(null);
     } catch (error) {
-      setNotice(`Не удалось обновить источники из backend: ${error instanceof Error ? error.message : String(error)}`);
+      setBackendError(`Не удалось обновить источники из backend: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setLoading(false);
     }
@@ -36,19 +49,20 @@ export function SourcesPage() {
     void loadSources();
   }, [loadSources]);
 
-  const syncTeplohod = async () => {
-    setSyncing(true);
+  const syncSource = async (sourceCode: 'TICKETSCLOUD' | 'TEPLOHOD') => {
+    const config = sourceCode === 'TEPLOHOD' ? SOURCE_SYNC_CONFIG.TEPLOHOD : SOURCE_SYNC_CONFIG.TICKETSCLOUD;
+    setSyncingSource(sourceCode);
     setNotice(null);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/v1/tep/sync`, { method: 'POST' });
+      const response = await fetch(`${API_BASE_URL}${config.endpoint}`, { method: 'POST' });
       const body = await response.json().catch(() => null);
       if (!response.ok) throw new Error(body?.message || `HTTP ${response.status}`);
-      setNotice(`Teplohod sync завершен: ${formatNumber(body?.stats?.importedEvents ?? 0)} событий, ${formatNumber(body?.stats?.sessions ?? 0)} сеансов.`);
+      setNotice(`${config.label} sync завершен: ${formatSyncStats(body?.stats)}.`);
       await loadSources();
     } catch (error) {
-      setNotice(`Teplohod sync не прошел: ${error instanceof Error ? error.message : String(error)}`);
+      setNotice(`${config.label} sync не прошел: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
-      setSyncing(false);
+      setSyncingSource(null);
     }
   };
 
@@ -58,14 +72,21 @@ export function SourcesPage() {
         title="Источники"
         description="Состояние импорта, расписания и внешней покупки по билетным системам."
         actions={
-          <Button type="button" variant="outline" onClick={syncTeplohod} disabled={syncing}>
-            <RefreshCw className={`mr-2 h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
-            Синхронизировать Teplohod
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="outline" onClick={() => syncSource('TICKETSCLOUD')} disabled={Boolean(syncingSource)}>
+              <RefreshCw className={`mr-2 h-4 w-4 ${syncingSource === 'TICKETSCLOUD' ? 'animate-spin' : ''}`} />
+              Sync TC
+            </Button>
+            <Button type="button" variant="outline" onClick={() => syncSource('TEPLOHOD')} disabled={Boolean(syncingSource)}>
+              <RefreshCw className={`mr-2 h-4 w-4 ${syncingSource === 'TEPLOHOD' ? 'animate-spin' : ''}`} />
+              Sync Teplohod
+            </Button>
+          </div>
         }
         meta={
           <>
-            <StatusBadge status="live" label={`${formatNumber(payload.metrics.live)} активных`} />
+            <StatusBadge status="live" label={`${formatNumber(payload.metrics.healthy ?? payload.metrics.live)} здоровых`} />
+            {payload.metrics.stale ? <StatusBadge status="error" label={`${formatNumber(payload.metrics.stale)} stale`} /> : null}
             <span className="text-xs text-muted-foreground">
               {formatNumber(payload.metrics.events)} событий · {formatNumber(payload.metrics.sessions)} сеансов
             </span>
@@ -80,59 +101,79 @@ export function SourcesPage() {
         {notice ? <div className="mt-2 rounded-lg border border-border bg-surface-muted px-3 py-2 text-xs text-muted-foreground">{notice}</div> : null}
       </div>
 
-      <div className="mb-4 grid gap-3 lg:grid-cols-2">
-        {payload.sources.map((source) => (
-          <SourceSummaryCard key={`summary:${source.id}`} source={source} />
-        ))}
-      </div>
+      {backendError ? (
+        <Card className="border-destructive/30 bg-destructive/5 p-5">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="mt-0.5 h-5 w-5 text-destructive" />
+            <div>
+              <h2 className="text-sm font-semibold text-foreground">Backend недоступен</h2>
+              <p className="mt-1 text-sm text-muted-foreground">{backendError}</p>
+              <Button type="button" className="mt-4" variant="outline" onClick={() => loadSources()} disabled={loading}>
+                <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                Повторить
+              </Button>
+            </div>
+          </div>
+        </Card>
+      ) : (
+        <>
+          <div className="mb-4 grid gap-3 lg:grid-cols-2">
+            {payload.sources.map((source) => (
+              <SourceSummaryCard key={`summary:${source.id}`} source={source} />
+            ))}
+          </div>
 
-      <DataTableShell
-        loading={loading}
-        columns={['Источник', 'Статус', 'Каталог', 'Расписание', 'Покупка', 'Последний sync']}
-        empty={!payload.sources.length ? <div className="p-6 text-sm text-muted-foreground">Источники пока не загружены.</div> : null}
-      >
-        {payload.sources.map((source) => (
-          <tr key={source.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
-            <td className="px-4 py-3 align-top">
-              <SourceBadge source={sourceBadge(source.code)} />
-              <div className="mt-2 font-medium text-foreground">{source.name}</div>
-              <div className="mt-1 text-xs text-muted-foreground">{source.code}</div>
-            </td>
-            <td className="px-4 py-3 align-top">
-              <StatusBadge status={sourceStatus(source.status)} label={source.status} />
-              <div className="mt-2 text-xs text-muted-foreground">{source.enabled ? 'enabled' : 'disabled'}</div>
-            </td>
-            <td className="px-4 py-3 align-top text-sm">
-              <MetricLine label="событий" value={source.events} />
-              <MetricLine label="импортных записей" value={source.rawEvents ?? source.events} />
-              <MetricLine label="городов" value={source.cities} />
-              <MetricLine label="площадок" value={source.venues} />
-            </td>
-            <td className="px-4 py-3 align-top text-sm">
-              <MetricLine label="сеансов" value={source.sessions} />
-              <MetricLine label="офферов" value={source.offers} />
-              <div className="mt-1 text-xs text-muted-foreground">{formatMoney(source.priceFrom)}</div>
-            </td>
-            <td className="px-4 py-3 align-top">
-              <StatusBadge status={source.purchaseReady ? 'live' : 'incomplete'} label={source.purchaseReady ? 'готова' : 'проверить'} />
-              <div className="mt-2 max-w-[220px] truncate text-xs text-muted-foreground">
-                {source.sampleWidgetUrl || source.sampleDeeplinkUrl || (source.code === 'TEPLOHOD' ? 'teplohod widget.js' : 'нет ссылки')}
-              </div>
-            </td>
-            <td className="px-4 py-3 align-top text-sm">
-              {source.lastSync ? (
-                <>
-                  <StatusBadge status={sourceStatus(source.lastSync.status || '')} label={source.lastSync.status || 'sync'} />
-                  <div className="mt-2 text-xs text-muted-foreground">{formatDateTime(source.lastSync.finishedAt || source.lastSync.startedAt)}</div>
-                  <div className="mt-1 max-w-[240px] truncate text-xs text-muted-foreground">{source.lastSync.mode}</div>
-                </>
-              ) : (
-                <span className="text-xs text-muted-foreground">sync не найден</span>
-              )}
-            </td>
-          </tr>
-        ))}
-      </DataTableShell>
+          <DataTableShell
+            loading={loading}
+            columns={['Источник', 'Здоровье', 'Каталог', 'Расписание', 'Покупка', 'Последний sync']}
+            empty={!payload.sources.length ? <div className="p-6 text-sm text-muted-foreground">Источники пока не загружены.</div> : null}
+          >
+            {payload.sources.map((source) => (
+              <tr key={source.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
+                <td className="px-4 py-3 align-top">
+                  <SourceBadge source={sourceBadge(source.code)} />
+                  <div className="mt-2 font-medium text-foreground">{source.name}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">{source.code}</div>
+                </td>
+                <td className="px-4 py-3 align-top">
+                  <StatusBadge status={sourceHealthBadge(source.healthStatus || source.status)} label={sourceHealthLabel(source.healthStatus || source.status)} />
+                  <div className="mt-2 text-xs text-muted-foreground">{source.enabled ? 'enabled' : 'disabled'}</div>
+                  <IssueBadges issues={source.openIssues} limit={3} />
+                </td>
+                <td className="px-4 py-3 align-top text-sm">
+                  <MetricLine label="событий" value={source.events} />
+                  <MetricLine label="импортных записей" value={source.rawEvents ?? source.events} />
+                  <MetricLine label="городов" value={source.cities} />
+                  <MetricLine label="площадок" value={source.venues} />
+                </td>
+                <td className="px-4 py-3 align-top text-sm">
+                  <MetricLine label="сеансов" value={source.sessions} />
+                  <MetricLine label="офферов" value={source.offers} />
+                  <div className="mt-1 text-xs text-muted-foreground">{formatMoney(source.priceFrom)}</div>
+                </td>
+                <td className="px-4 py-3 align-top">
+                  <StatusBadge status={source.purchaseReady ? 'live' : 'incomplete'} label={source.purchaseReady ? 'готова' : 'проверить'} />
+                  <div className="mt-2 max-w-[220px] truncate text-xs text-muted-foreground">
+                    {source.sampleWidgetUrl || source.sampleDeeplinkUrl || (source.code === 'TEPLOHOD' ? 'teplohod widget.js' : 'нет ссылки')}
+                  </div>
+                </td>
+                <td className="px-4 py-3 align-top text-sm">
+                  {source.lastSync ? (
+                    <>
+                      <StatusBadge status={sourceStatus(source.lastSync.status || '')} label={source.lastSync.status || 'sync'} />
+                      <div className="mt-2 text-xs text-muted-foreground">{formatDateTime(source.lastSync.finishedAt || source.lastSync.startedAt)}</div>
+                      <div className="mt-1 max-w-[240px] truncate text-xs text-muted-foreground">{source.lastSync.mode}</div>
+                      <div className="mt-1 text-xs text-muted-foreground">успешный: {source.lastSuccessAt ? formatDateTime(source.lastSuccessAt) : 'нет'}</div>
+                    </>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">sync не найден</span>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </DataTableShell>
+        </>
+      )}
     </div>
   );
 }
@@ -151,7 +192,7 @@ function SourceSummaryCard({ source }: { source: AdminSourceRow }) {
               : 'gRPC импорт Ticketscloud. Повторяющиеся события считаются одной карточкой, слоты остаются в расписании.'}
           </p>
         </div>
-        <StatusBadge status={sourceStatus(source.status)} label={source.status} />
+        <StatusBadge status={sourceHealthBadge(source.healthStatus || source.status)} label={sourceHealthLabel(source.healthStatus || source.status)} />
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-2">
@@ -160,11 +201,19 @@ function SourceSummaryCard({ source }: { source: AdminSourceRow }) {
         <SourceCardMetric label="площадок" value={source.venues} />
       </div>
 
+      <div className="mt-3 grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
+        <span>успешный sync: {source.lastSuccessAt ? formatDateTime(source.lastSuccessAt) : 'нет'}</span>
+        <span>ошибок подряд: {formatNumber(source.consecutiveErrors ?? 0)}</span>
+        <span>{source.isStale ? `stale ${formatNumber(source.staleHours)} ч` : 'sync свежий'}</span>
+      </div>
+
       <div className="mt-3 flex flex-wrap gap-2">
         <Badge variant="outline">импорт: {formatNumber(source.rawEvents ?? source.events)}</Badge>
         <Badge variant="outline">{source.purchaseReady ? 'покупка готова' : 'покупку проверить'}</Badge>
         {isTeplohod ? <Badge variant="outline">widget.js</Badge> : <Badge variant="outline">TC widget</Badge>}
       </div>
+
+      <IssueBadges issues={source.openIssues} limit={4} />
     </Card>
   );
 }
@@ -176,6 +225,32 @@ function SourceCardMetric({ label, value }: { label: string; value: number }) {
       <div className="text-xs text-muted-foreground">{label}</div>
     </div>
   );
+}
+
+function IssueBadges({ issues, limit = 3 }: { issues?: AdminSourceRow['openIssues']; limit?: number }) {
+  if (!issues?.length) return null;
+  const visible = issues.slice(0, limit);
+  const hidden = Math.max(0, issues.length - visible.length);
+  return (
+    <div className="mt-2 flex flex-wrap gap-1.5">
+      {visible.map((issue) => (
+        <Badge key={issue.code} variant="outline" className={issue.severity === 'high' ? 'border-amber-300 bg-amber-50 text-amber-900' : ''}>
+          {issue.label}
+        </Badge>
+      ))}
+      {hidden ? <Badge variant="outline">+{hidden}</Badge> : null}
+    </div>
+  );
+}
+
+function formatSyncStats(stats?: Record<string, unknown> | null): string {
+  const events = Number(stats?.importedEvents ?? stats?.events ?? stats?.createdEvents ?? 0);
+  const sessions = Number(stats?.sessions ?? stats?.importedSessions ?? 0);
+  const offers = Number(stats?.offers ?? stats?.importedOffers ?? 0);
+  const parts = [`${formatNumber(events)} событий`];
+  if (sessions) parts.push(`${formatNumber(sessions)} сеансов`);
+  if (offers) parts.push(`${formatNumber(offers)} офферов`);
+  return parts.join(', ');
 }
 
 function MetricLine({ label, value }: { label: string; value: number }) {
@@ -200,6 +275,23 @@ function sourceStatus(status: string): 'live' | 'paused' | 'incomplete' | 'error
   if (normalized.includes('paused')) return 'paused';
   if (normalized.includes('error') || normalized.includes('fail') || normalized.includes('blocked')) return 'error';
   return 'incomplete';
+}
+
+function sourceHealthBadge(status: string): 'live' | 'paused' | 'incomplete' | 'error' {
+  const normalized = status.toLowerCase();
+  if (normalized === 'ok' || normalized === 'live') return 'live';
+  if (normalized === 'paused') return 'paused';
+  if (normalized === 'error') return 'error';
+  return 'incomplete';
+}
+
+function sourceHealthLabel(status: string): string {
+  const normalized = status.toLowerCase();
+  if (normalized === 'ok') return 'здоров';
+  if (normalized === 'warning') return 'есть вопросы';
+  if (normalized === 'error') return 'ошибка';
+  if (normalized === 'paused') return 'пауза';
+  return status;
 }
 
 function buildFallbackSourcesPayload(): AdminSourcesPayload {
