@@ -1378,7 +1378,17 @@ export async function buildAdminLandingDetail(db, landingSlug) {
   const autoIds = new Set(autoMatches.map((event) => event.id));
   const pinnedIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'PINNED').map((row) => row.eventId));
   const excludedIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'EXCLUDED').map((row) => row.eventId));
-  const matched = events.filter((event) => (autoIds.has(event.id) || pinnedIds.has(event.id)) && !excludedIds.has(event.id));
+  const reviewIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'REVIEW').map((row) => row.eventId));
+  const groupedEvents = groupAdminEventRows(events);
+  const groupIdsFor = (event) => (event.groupEventIds?.length ? event.groupEventIds : [event.id]);
+  const manualRowFor = (event) => groupIdsFor(event).map((id) => manualByEventId.get(id)).find(Boolean) || null;
+  const isAutoGroup = (event) => groupIdsFor(event).some((id) => autoIds.has(id));
+  const isPinnedGroup = (event) => groupIdsFor(event).some((id) => pinnedIds.has(id));
+  const isExcludedGroup = (event) => groupIdsFor(event).some((id) => excludedIds.has(id));
+  const isReviewGroup = (event) => groupIdsFor(event).some((id) => reviewIds.has(id));
+  const autoMatchedGroups = groupedEvents.filter(isAutoGroup);
+  const matched = groupedEvents.filter((event) => (isAutoGroup(event) || isPinnedGroup(event)) && !isExcludedGroup(event));
+  const excluded = groupedEvents.filter(isExcludedGroup);
   const prices = matched.map((event) => event.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const blockRows = landing
     ? (await db.query(
@@ -1417,20 +1427,55 @@ export async function buildAdminLandingDetail(db, landingSlug) {
     blocks,
     seo: mapLandingSeo(landing, rule),
     metrics: {
-      autoEvents: autoMatches.length,
+      autoEvents: autoMatchedGroups.length,
       effectiveEvents: matched.length,
-      pinnedEvents: pinnedIds.size,
-      excludedEvents: excludedIds.size,
-      reviewEvents: manualRows.filter((row) => row.reasons?.manualStatus === 'REVIEW').length,
+      pinnedEvents: groupedEvents.filter(isPinnedGroup).length,
+      excludedEvents: excluded.length,
+      reviewEvents: groupedEvents.filter(isReviewGroup).length,
       venues: new Set(matched.map((event) => event.venue).filter(Boolean)).size,
       cities: new Set(matched.map((event) => event.city).filter(Boolean)).size,
       priceFrom: prices.length ? Math.min(...prices) : null,
     },
-    events: matched.slice(0, 160).map((event) => mapLandingAdminEvent(event, manualByEventId.get(event.id), autoIds.has(event.id))),
-    excludedEvents: events
-      .filter((event) => excludedIds.has(event.id))
+    events: matched.slice(0, 160).map((event) => mapLandingAdminEvent(event, manualRowFor(event), isAutoGroup(event))),
+    excludedEvents: excluded
       .slice(0, 40)
-      .map((event) => mapLandingAdminEvent(event, manualByEventId.get(event.id), autoIds.has(event.id))),
+      .map((event) => mapLandingAdminEvent(event, manualRowFor(event), isAutoGroup(event))),
+  };
+}
+
+export async function buildAdminLandingEventCandidates(db, landingSlug, searchParams = new URLSearchParams()) {
+  const rule = LANDING_RULES.find((item) => item.slug === landingSlug);
+  if (!rule) return null;
+
+  const query = String(searchParams.get('q') || '').trim().toLowerCase();
+  const limit = clampNumber(searchParams.get('limit'), 1, 50, 12);
+  const [events, landingResult] = await Promise.all([
+    eventRows(db, 10000),
+    db.query('select id from "Landing" where slug = $1 limit 1', [landingSlug]),
+  ]);
+  const landing = landingResult.rows[0] || null;
+  const manualRows = landing
+    ? (await db.query('select "eventId", score, reasons from "LandingMatch" where "landingId" = $1', [landing.id])).rows
+    : [];
+  const manualByEventId = new Map(manualRows.map((row) => [row.eventId, row]));
+  const autoIds = new Set(events.filter((event) => matchesRule(event, rule)).map((event) => event.id));
+  const groupedEvents = groupAdminEventRows(events);
+  const filtered = groupedEvents.filter((event) => {
+    if (!query) return false;
+    return landingEventSearchText(event).includes(query);
+  });
+
+  return {
+    generatedAt: new Date().toISOString(),
+    slug: rule.slug,
+    query,
+    total: filtered.length,
+    rows: filtered.slice(0, limit).map((event) => {
+      const groupIds = event.groupEventIds?.length ? event.groupEventIds : [event.id];
+      const manualRow = groupIds.map((id) => manualByEventId.get(id)).find(Boolean) || null;
+      const isAutoMatch = groupIds.some((id) => autoIds.has(id));
+      return mapLandingAdminEvent(event, manualRow, isAutoMatch);
+    }),
   };
 }
 
@@ -1514,26 +1559,29 @@ export async function updateAdminLandingMatch(db, landingSlug, eventId, payload)
   const status = normalizeManualMatchStatus(payload?.status);
   const note = normalizeNullableString(payload?.note);
   const score = status === 'PINNED' ? 1000 : status === 'EXCLUDED' ? -1000 : 0;
-  await db.query(
-    `
-      insert into "LandingMatch" ("landingId", "eventId", score, reasons)
-      values ($1, $2, $3, $4::jsonb)
-      on conflict ("landingId", "eventId") do update set
-        score = excluded.score,
-        reasons = excluded.reasons
-    `,
-    [
-      landingId,
-      eventId,
-      score,
-      JSON.stringify({
-        manualStatus: status,
-        note,
-        source: 'admin',
-        updatedAt: new Date().toISOString(),
-      }),
-    ],
-  );
+  const eventIds = uniqueValues([eventId, ...normalizeStringArray(payload?.eventIds || payload?.groupEventIds)]).slice(0, 100);
+  for (const targetEventId of eventIds) {
+    await db.query(
+      `
+        insert into "LandingMatch" ("landingId", "eventId", score, reasons)
+        values ($1, $2, $3, $4::jsonb)
+        on conflict ("landingId", "eventId") do update set
+          score = excluded.score,
+          reasons = excluded.reasons
+      `,
+      [
+        landingId,
+        targetEventId,
+        score,
+        JSON.stringify({
+          manualStatus: status,
+          note,
+          source: 'admin',
+          updatedAt: new Date().toISOString(),
+        }),
+      ],
+    );
+  }
   return buildAdminLandingDetail(db, landingSlug);
 }
 
@@ -3682,6 +3730,7 @@ function mapLandingAdminEvent(event, manualRow, isAutoMatch) {
   const manual = manualRow?.reasons || null;
   return {
     id: event.id,
+    groupEventIds: event.groupEventIds?.length ? event.groupEventIds : [event.id],
     slug: event.slug,
     title: event.title,
     city: event.city,
@@ -3695,6 +3744,24 @@ function mapLandingAdminEvent(event, manualRow, isAutoMatch) {
     manualStatus: manual?.manualStatus || null,
     manualNote: manual?.note || null,
   };
+}
+
+function landingEventSearchText(event) {
+  return [
+    event.title,
+    event.id,
+    event.city,
+    event.destination,
+    event.venue,
+    event.sourceCategory,
+    event.proposedCategory,
+    event.sourceCode,
+    event.source,
+    ...(event.tags || []),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
 }
 
 function mapOverrideRow(row) {

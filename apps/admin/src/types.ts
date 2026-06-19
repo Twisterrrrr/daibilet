@@ -125,8 +125,12 @@ export type AdminLandingRow = {
   city?: string | null;
   venue?: string | null;
   keywords?: string[];
+  keywordScope?: string;
+  requiredAnyKeywords?: string[];
+  requiredKeywordGroups?: string[][];
   requiredTags?: string[];
   excludedTags?: string[];
+  excludedKeywords?: string[];
   priceFrom?: number | null;
   seo?: {
     h1?: string | null;
@@ -158,8 +162,12 @@ export type AdminLandingDetail = {
     city?: string | null;
     venue?: string | null;
     keywords: string[];
+    keywordScope?: string;
+    requiredAnyKeywords?: string[];
+    requiredKeywordGroups?: string[][];
     requiredTags: string[];
     excludedTags: string[];
+    excludedKeywords?: string[];
   };
   landing: {
     id?: string | null;
@@ -212,6 +220,7 @@ export type AdminLandingDetail = {
 
 export type AdminLandingEvent = {
   id: string;
+  groupEventIds?: string[];
   slug?: string | null;
   title: string;
   city: string;

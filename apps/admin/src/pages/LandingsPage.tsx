@@ -24,6 +24,14 @@ type LandingsResponse = {
   };
 };
 
+type LandingCandidatesResponse = {
+  generatedAt: string;
+  slug: string;
+  query: string;
+  total: number;
+  rows: AdminLandingEvent[];
+};
+
 function localResponse(): LandingsResponse {
   return {
     generatedAt: adminData.generatedAt,
@@ -438,26 +446,52 @@ function LandingDetailEditor({
   onChanged: () => void;
 }) {
   const [query, setQuery] = React.useState('');
+  const [candidateQuery, setCandidateQuery] = React.useState('');
+  const [candidateRows, setCandidateRows] = React.useState<AdminLandingEvent[]>([]);
+  const [isCandidateLoading, setIsCandidateLoading] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
 
   React.useEffect(() => {
     setQuery('');
+    setCandidateQuery('');
+    setCandidateRows([]);
   }, [detail?.slug]);
 
-  const updateMatch = async (eventId: string, manualStatus: 'PINNED' | 'EXCLUDED' | 'REVIEW') => {
+  const updateMatch = async (event: AdminLandingEvent, manualStatus: 'PINNED' | 'EXCLUDED' | 'REVIEW') => {
     if (!detail) return;
     setIsSaving(true);
     try {
-      await fetch(`${API_BASE_URL}/api/admin/landings/${encodeURIComponent(detail.slug)}/matches/${encodeURIComponent(eventId)}`, {
+      await fetch(`${API_BASE_URL}/api/admin/landings/${encodeURIComponent(detail.slug)}/matches/${encodeURIComponent(event.id)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: manualStatus }),
+        body: JSON.stringify({ status: manualStatus, groupEventIds: event.groupEventIds || [event.id] }),
       });
       onChanged();
     } finally {
       setIsSaving(false);
     }
   };
+
+  const searchCandidates = React.useCallback(async () => {
+    if (!detail) return;
+    const normalized = candidateQuery.trim();
+    if (normalized.length < 2) {
+      setCandidateRows([]);
+      return;
+    }
+    setIsCandidateLoading(true);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/admin/landings/${encodeURIComponent(detail.slug)}/candidates?q=${encodeURIComponent(normalized)}&limit=12`,
+        { cache: 'no-store' },
+      );
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = (await response.json()) as LandingCandidatesResponse;
+      setCandidateRows(data.rows || []);
+    } finally {
+      setIsCandidateLoading(false);
+    }
+  }, [candidateQuery, detail]);
 
   const normalized = query.trim().toLowerCase();
   const visibleEvents = (detail?.events || []).filter((event) => {
@@ -497,8 +531,15 @@ function LandingDetailEditor({
               <div className="mb-2 text-xs font-medium text-muted-foreground">Rule</div>
               <div className="flex flex-wrap gap-1.5">
                 {(detail.rule.keywords || []).map((item) => <Badge key={`kw:${item}`} variant="outline">kw: {item}</Badge>)}
+                {(detail.rule.requiredAnyKeywords || []).map((item) => <Badge key={`reqkw:${item}`} variant="secondary">обяз.: {item}</Badge>)}
+                {(detail.rule.requiredKeywordGroups || []).map((group, index) => (
+                  <Badge key={`group:${index}:${group.join('|')}`} variant="secondary">
+                    группа: {group.join(' / ')}
+                  </Badge>
+                ))}
                 {(detail.rule.requiredTags || []).map((item) => <Badge key={`tag:${item}`} variant="secondary">tag: {item}</Badge>)}
                 {(detail.rule.excludedTags || []).map((item) => <Badge key={`ex:${item}`} variant="outline">exclude: {item}</Badge>)}
+                {(detail.rule.excludedKeywords || []).map((item) => <Badge key={`exkw:${item}`} variant="outline">искл.: {item}</Badge>)}
               </div>
             </div>
             <div className="rounded-lg border border-border bg-secondary/20 p-3">
@@ -510,15 +551,55 @@ function LandingDetailEditor({
 
           <LandingBlocksPreview blocks={detail.blocks || []} />
 
+          <section className="mb-4 rounded-lg border border-border bg-card p-3">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <div className="text-sm font-semibold">Добавить событие в лендинг</div>
+                <div className="mt-1 text-xs text-muted-foreground">Поиск идет по всему каталогу. Закрепление применяется ко всем слотам одной карточки.</div>
+              </div>
+              {isCandidateLoading ? (
+                <Badge variant="outline" className="gap-1">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  поиск
+                </Badge>
+              ) : null}
+            </div>
+            <div className="mb-3 flex flex-wrap gap-2">
+              <Input
+                value={candidateQuery}
+                onChange={(event) => setCandidateQuery(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') void searchCandidates();
+                }}
+                placeholder="Название, город, площадка, тег..."
+                className="h-9 min-w-[260px] flex-1"
+              />
+              <button
+                type="button"
+                onClick={() => void searchCandidates()}
+                disabled={isCandidateLoading || candidateQuery.trim().length < 2}
+                className="inline-flex h-9 items-center gap-2 rounded-md bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-60"
+              >
+                {isCandidateLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Search className="h-3.5 w-3.5" />}
+                Найти
+              </button>
+            </div>
+            {candidateRows.length ? (
+              <LandingEventsEditorTable title="Найденные события" events={candidateRows} onUpdate={updateMatch} />
+            ) : (
+              <InfoNote>Введите минимум два символа и найдите событие, которое нужно закрепить в посадочной.</InfoNote>
+            )}
+          </section>
+
           <div className="mb-4">
-            <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search inside landing events..." className="h-9" />
+            <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск внутри текущего списка лендинга..." className="h-9" />
           </div>
 
-          <LandingEventsEditorTable title="Effective events" events={visibleEvents} onUpdate={updateMatch} />
+          <LandingEventsEditorTable title="События в лендинге" events={visibleEvents} onUpdate={updateMatch} />
 
           {detail.excludedEvents.length ? (
             <div className="mt-4">
-              <LandingEventsEditorTable title="Excluded events" events={detail.excludedEvents} onUpdate={updateMatch} />
+              <LandingEventsEditorTable title="Скрытые события" events={detail.excludedEvents} onUpdate={updateMatch} />
             </div>
           ) : null}
         </>
@@ -571,17 +652,19 @@ function LandingEventsEditorTable({
 }: {
   title: string;
   events: AdminLandingEvent[];
-  onUpdate: (eventId: string, status: 'PINNED' | 'EXCLUDED' | 'REVIEW') => void;
+  onUpdate: (event: AdminLandingEvent, status: 'PINNED' | 'EXCLUDED' | 'REVIEW') => void;
 }) {
   return (
     <section>
       <div className="mb-2 text-sm font-semibold">{title}</div>
-      <DataTableShell columns={['Event', 'City / venue', 'Date', 'Price', 'Match']}>
+      <DataTableShell columns={['Событие', 'Город / площадка', 'Дата', 'Цена', 'Включение']}>
         {events.map((event) => (
           <tr key={`${title}:${event.id}`} className="border-b border-border last:border-0">
             <td className="min-w-[280px] px-4 py-3 align-top">
               <div className="font-medium">{event.title}</div>
-              <div className="mt-1 font-mono text-[11px] text-muted-foreground">{event.id}</div>
+              <div className="mt-1 font-mono text-[11px] text-muted-foreground">
+                {event.groupEventIds?.length && event.groupEventIds.length > 1 ? `${event.groupEventIds.length} слотов` : event.id}
+              </div>
               <div className="mt-1 flex flex-wrap gap-1">
                 {(event.tags || []).slice(0, 3).map((tag) => <Badge key={tag} variant="outline">{tag}</Badge>)}
               </div>
@@ -595,20 +678,20 @@ function LandingEventsEditorTable({
             <td className="px-4 py-3 align-top">
               <div className="flex flex-wrap gap-1">
                 {event.isAutoMatch ? <Badge variant="outline">auto</Badge> : null}
-                {event.manualStatus ? <Badge variant="secondary">{event.manualStatus}</Badge> : null}
+                {event.manualStatus ? <Badge variant="secondary">{manualMatchLabel(event.manualStatus)}</Badge> : null}
               </div>
               <div className="mt-2 flex flex-wrap gap-1">
-                <button type="button" onClick={() => onUpdate(event.id, 'PINNED')} className="inline-flex h-7 items-center gap-1 rounded border border-border px-2 text-[11px] hover:bg-secondary">
+                <button type="button" onClick={() => onUpdate(event, 'PINNED')} className="inline-flex h-7 items-center gap-1 rounded border border-border px-2 text-[11px] hover:bg-secondary">
                   <Pin className="h-3 w-3" />
-                  pin
+                  Закрепить
                 </button>
-                <button type="button" onClick={() => onUpdate(event.id, 'EXCLUDED')} className="inline-flex h-7 items-center gap-1 rounded border border-border px-2 text-[11px] hover:bg-secondary">
+                <button type="button" onClick={() => onUpdate(event, 'EXCLUDED')} className="inline-flex h-7 items-center gap-1 rounded border border-border px-2 text-[11px] hover:bg-secondary">
                   <EyeOff className="h-3 w-3" />
-                  exclude
+                  Скрыть
                 </button>
-                <button type="button" onClick={() => onUpdate(event.id, 'REVIEW')} className="inline-flex h-7 items-center gap-1 rounded border border-border px-2 text-[11px] hover:bg-secondary">
+                <button type="button" onClick={() => onUpdate(event, 'REVIEW')} className="inline-flex h-7 items-center gap-1 rounded border border-border px-2 text-[11px] hover:bg-secondary">
                   <RotateCcw className="h-3 w-3" />
-                  review
+                  Авто
                 </button>
               </div>
             </td>
@@ -616,12 +699,19 @@ function LandingEventsEditorTable({
         ))}
         {!events.length ? (
           <tr>
-            <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">No events in this view</td>
+            <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">В этом списке пока нет событий</td>
           </tr>
         ) : null}
       </DataTableShell>
     </section>
   );
+}
+
+function manualMatchLabel(status: AdminLandingEvent['manualStatus']) {
+  if (status === 'PINNED') return 'закреплено';
+  if (status === 'EXCLUDED') return 'скрыто';
+  if (status === 'REVIEW') return 'авто';
+  return '';
 }
 
 function RuleBox(props: { title: string; items: string[]; empty: string }) {

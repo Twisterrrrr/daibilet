@@ -10,8 +10,9 @@ import {
   buildAdminBuyersList,
   buildAdminCitiesList,
   buildAdminEventDetail,
-  buildAdminLandingDetail,
   buildAdminEventsList,
+  buildAdminLandingDetail,
+  buildAdminLandingEventCandidates,
   buildAdminOrderEventCandidates,
   buildAdminOrderDetail,
   buildAdminOrdersList,
@@ -212,6 +213,12 @@ createServer(async (request, response) => {
 
     if (route === 'GET /api/admin/cities') {
       sendJson(response, await buildAdminCitiesList(db));
+      return;
+    }
+
+    const landingCandidatesMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/admin\/landings\/([^/]+)\/candidates$/) : null;
+    if (landingCandidatesMatch) {
+      sendJson(response, await buildAdminLandingEventCandidates(db, decodeURIComponent(landingCandidatesMatch[1]), url.searchParams));
       return;
     }
 
