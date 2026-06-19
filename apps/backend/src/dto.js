@@ -23,6 +23,8 @@ const LANDING_RULES = [
     chips: ['теплоход', 'катер', 'причалы'],
     tags: ['Водные экскурсии', 'Реки и каналы', 'На теплоходе', 'Водная экскурсия', 'На катере', 'Теплоходные экскурсии'],
     keywords: ['теплоход', 'катер', 'река', 'канал', 'причал'],
+    keywordScope: 'content',
+    excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал', 'мастер-класс', 'квест', 'концерт', 'вечеринк', 'дискотек'],
   },
   {
     slug: 'bridges-night',
@@ -31,7 +33,10 @@ const LANDING_RULES = [
     chips: ['ночные', 'мосты', 'теплоход'],
     city: 'Санкт-Петербург',
     tags: ['Разводные мосты', 'Ночные'],
-    keywords: ['мост', 'ночн'],
+    keywords: ['мост', 'развод', 'ночн', 'нева', 'теплоход', 'катер'],
+    keywordScope: 'content',
+    requiredAnyKeywords: ['мост', 'развод'],
+    excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал'],
   },
   {
     slug: 'new-year',
@@ -47,15 +52,23 @@ const LANDING_RULES = [
     city: 'Москва',
     chips: ['ужин', 'Москва-река', 'вечер'],
     tags: ['На теплоходе', 'Водная экскурсия'],
-    keywords: ['ужин', 'фуршет', 'банкет', 'ресторан'],
+    keywords: ['ужин', 'фуршет', 'банкет', 'ресторан', 'теплоход', 'москва-река', 'речн', 'корабл', 'яхт'],
+    keywordScope: 'content',
+    requiredKeywordGroups: [
+      ['ужин', 'фуршет', 'банкет'],
+      ['теплоход', 'москва-река', 'речн', 'корабл', 'яхт'],
+    ],
+    excludeKeywords: ['автобус', 'пешеход', 'мастер-класс'],
   },
   {
     slug: 'bus-sightseeing',
     title: 'Автобусные обзорные экскурсии',
     subtitle: 'Городские маршруты и обзорные программы',
     chips: ['автобус', 'обзорная', 'город'],
-    keywords: ['автобус', 'обзорн'],
+    keywords: ['автобус', 'автобусн', 'обзорн', 'сити тур', 'city tour'],
+    requiredAnyKeywords: ['автобус', 'автобусн'],
     excludeTags: ['Водные экскурсии', 'На теплоходе', 'На катере', 'Реки и каналы'],
+    excludeKeywords: ['теплоход', 'катер', 'лодк', 'корабл', 'причал', 'река', 'канал', 'нева', 'мост', 'пешеход', 'пешком'],
   },
   {
     slug: 'standup',
@@ -1290,8 +1303,12 @@ export async function buildAdminLandingsList(db) {
       city: rule.city || null,
       venue: rule.venue || null,
       keywords: rule.keywords || [],
+      keywordScope: rule.keywordScope || 'full',
+      requiredAnyKeywords: rule.requiredAnyKeywords || [],
+      requiredKeywordGroups: rule.requiredKeywordGroups || [],
       requiredTags: rule.tags || [],
       excludedTags: rule.excludeTags || [],
+      excludedKeywords: rule.excludeKeywords || [],
       priceFrom: prices.length ? Math.min(...prices) : null,
       seo: {
         h1: saved?.seoH1 || null,
@@ -1389,8 +1406,12 @@ export async function buildAdminLandingDetail(db, landingSlug) {
       city: rule.city || null,
       venue: rule.venue || null,
       keywords: rule.keywords || [],
+      keywordScope: rule.keywordScope || 'full',
+      requiredAnyKeywords: rule.requiredAnyKeywords || [],
+      requiredKeywordGroups: rule.requiredKeywordGroups || [],
       requiredTags: rule.tags || [],
       excludedTags: rule.excludeTags || [],
+      excludedKeywords: rule.excludeKeywords || [],
     },
     landing: mapLandingRecord(landing, rule),
     blocks,
@@ -4657,17 +4678,38 @@ function buildPublicLandings(sessions) {
 
 function matchesRule(event, rule) {
   const tags = event.tags || [];
-  const haystack = [event.title, event.venue, event.city, event.sourceCategory, event.category, ...tags]
+  const haystack = [event.title, event.venue, event.city, event.destination, event.sourceCategory, event.category, ...tags]
     .filter(Boolean)
     .join(' ')
     .toLowerCase();
+  const contentHaystack = [event.title, event.sourceCategory, event.category, ...tags]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  const keywordHaystack = rule.keywordScope === 'content' ? contentHaystack : haystack;
 
-  if (rule.city && event.city !== rule.city) return false;
+  if (rule.city && !matchesRuleCity(event, rule.city)) return false;
   if (rule.venue && event.venue !== rule.venue) return false;
-  if (rule.tags && !rule.tags.some((tag) => tags.includes(tag))) return false;
   if (rule.excludeTags && rule.excludeTags.some((tag) => tags.includes(tag))) return false;
-  if (rule.keywords && !rule.keywords.some((keyword) => haystack.includes(keyword.toLowerCase()))) return false;
-  return Boolean(rule.tags || rule.keywords || rule.city || rule.venue);
+  if (rule.excludeKeywords && hasAnyKeyword(haystack, rule.excludeKeywords)) return false;
+  if (rule.requiredAnyTags && !rule.requiredAnyTags.some((tag) => tags.includes(tag))) return false;
+  if (rule.requiredAnyKeywords && !hasAnyKeyword(keywordHaystack, rule.requiredAnyKeywords)) return false;
+  if (rule.requiredKeywords && !rule.requiredKeywords.every((keyword) => keywordHaystack.includes(String(keyword).toLowerCase()))) return false;
+  if (rule.requiredKeywordGroups && !rule.requiredKeywordGroups.every((group) => hasAnyKeyword(keywordHaystack, group))) return false;
+
+  const hasTagSignal = rule.tags?.some((tag) => tags.includes(tag)) || false;
+  const hasKeywordSignal = rule.keywords ? hasAnyKeyword(keywordHaystack, rule.keywords) : false;
+  const hasRequiredSignal = Boolean(rule.requiredAnyTags || rule.requiredAnyKeywords || rule.requiredKeywords || rule.requiredKeywordGroups);
+  return Boolean(hasTagSignal || hasKeywordSignal || hasRequiredSignal || rule.city || rule.venue);
+}
+
+function matchesRuleCity(event, expectedCity) {
+  const candidates = [event.city, event.destination].filter(Boolean).map((value) => String(value).toLowerCase());
+  return candidates.includes(String(expectedCity).toLowerCase());
+}
+
+function hasAnyKeyword(haystack, keywords) {
+  return keywords.some((keyword) => haystack.includes(String(keyword).toLowerCase()));
 }
 
 function reviewReasons(event) {
