@@ -28,6 +28,7 @@
     "public:data": "node scripts/build-public-prototype-data.js",
     "public:serve": "npm.cmd --prefix apps/public run dev",
     "public:build": "npm.cmd --prefix apps/public run build",
+    "public:perf": "node scripts/public-performance-snapshot.mjs",
     "admin:data": "node scripts/build-admin-prototype-data.js",
     "admin:serve": "npm.cmd --prefix apps/admin run dev",
     "admin:dev": "npm.cmd --prefix apps/admin run dev",

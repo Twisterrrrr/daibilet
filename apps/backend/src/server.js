@@ -47,6 +47,7 @@ const db = createDb(rootDir);
 
 const jsonCache = new Map();
 const PUBLIC_RESPONSE_CACHE_MS = 5 * 60 * 1000;
+const MAX_PUBLIC_RESPONSE_CACHE_ENTRIES = 80;
 const publicResponseCache = new Map();
 
 function loadRootEnv(projectRoot) {
@@ -111,7 +112,14 @@ createServer(async (request, response) => {
 
     if (route === 'GET /api/public/events') {
       if (url.searchParams.get('refresh') === '1') publicResponseCache.clear();
-      sendJson(response, await withDataFallback(() => buildCatalogSessions(db, url.searchParams), 'apps/public/data.js', 'PUBLIC_DATA', (payload) => filterSessions(payload.sessions || [], url.searchParams)));
+      const catalogCacheKey = `events:${url.searchParams.toString()}`;
+      const catalogPayload =
+        url.searchParams.get('refresh') === '1'
+          ? await withDataFallback(() => buildCatalogSessions(db, url.searchParams), 'apps/public/data.js', 'PUBLIC_DATA', (payload) => filterSessions(payload.sessions || [], url.searchParams))
+          : await withPublicResponseCache(catalogCacheKey, () =>
+              withDataFallback(() => buildCatalogSessions(db, url.searchParams), 'apps/public/data.js', 'PUBLIC_DATA', (payload) => filterSessions(payload.sessions || [], url.searchParams)),
+            );
+      sendJson(response, catalogPayload);
       return;
     }
 
@@ -160,9 +168,7 @@ createServer(async (request, response) => {
 
     if (route === 'POST /api/v1/tep/sync') {
       const result = await runTeplohodSync();
-      publicResponseCache.clear();
-      clearPublicDataCaches();
-      warmPublicCaches('teplohod sync');
+      invalidatePublicCaches('teplohod sync', { warm: true });
       sendJson(response, result);
       return;
     }
@@ -230,21 +236,22 @@ createServer(async (request, response) => {
 
     const landingUpdateMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/landings\/([^/]+)$/) : null;
     if (landingUpdateMatch) {
-      sendJson(response, await updateAdminLanding(db, decodeURIComponent(landingUpdateMatch[1]), await readJsonBody(request)));
+      const result = await updateAdminLanding(db, decodeURIComponent(landingUpdateMatch[1]), await readJsonBody(request));
+      invalidatePublicCaches('landing update');
+      sendJson(response, result);
       return;
     }
 
     const landingMatchUpdateMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/landings\/([^/]+)\/matches\/([^/]+)$/) : null;
     if (landingMatchUpdateMatch) {
-      sendJson(
-        response,
-        await updateAdminLandingMatch(
-          db,
-          decodeURIComponent(landingMatchUpdateMatch[1]),
-          decodeURIComponent(landingMatchUpdateMatch[2]),
-          await readJsonBody(request),
-        ),
+      const result = await updateAdminLandingMatch(
+        db,
+        decodeURIComponent(landingMatchUpdateMatch[1]),
+        decodeURIComponent(landingMatchUpdateMatch[2]),
+        await readJsonBody(request),
       );
+      invalidatePublicCaches('landing match update');
+      sendJson(response, result);
       return;
     }
 
@@ -266,7 +273,9 @@ createServer(async (request, response) => {
 
     const venueUpdateMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/venues\/([^/]+)$/) : null;
     if (venueUpdateMatch) {
-      sendJson(response, await updateAdminVenue(db, decodeURIComponent(venueUpdateMatch[1]), await readJsonBody(request)));
+      const result = await updateAdminVenue(db, decodeURIComponent(venueUpdateMatch[1]), await readJsonBody(request));
+      invalidatePublicCaches('venue update');
+      sendJson(response, result);
       return;
     }
 
@@ -278,20 +287,26 @@ createServer(async (request, response) => {
 
     const eventOverrideMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/override$/) : null;
     if (eventOverrideMatch) {
-      sendJson(response, await updateAdminEventOverride(db, decodeURIComponent(eventOverrideMatch[1]), await readJsonBody(request)));
+      const result = await updateAdminEventOverride(db, decodeURIComponent(eventOverrideMatch[1]), await readJsonBody(request));
+      invalidatePublicCaches('event override update');
+      sendJson(response, result);
       return;
     }
 
     const eventModerationMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/moderation$/) : null;
     if (eventModerationMatch) {
       const body = await readJsonBody(request);
-      sendJson(response, await updateAdminEventOverride(db, decodeURIComponent(eventModerationMatch[1]), { editorStatus: body.editorStatus }));
+      const result = await updateAdminEventOverride(db, decodeURIComponent(eventModerationMatch[1]), { editorStatus: body.editorStatus });
+      invalidatePublicCaches('event moderation update');
+      sendJson(response, result);
       return;
     }
 
     const eventTaxonomyMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/taxonomy$/) : null;
     if (eventTaxonomyMatch) {
-      sendJson(response, await updateAdminEventTaxonomy(db, decodeURIComponent(eventTaxonomyMatch[1]), await readJsonBody(request)));
+      const result = await updateAdminEventTaxonomy(db, decodeURIComponent(eventTaxonomyMatch[1]), await readJsonBody(request));
+      invalidatePublicCaches('event taxonomy update');
+      sendJson(response, result);
       return;
     }
 
@@ -331,6 +346,12 @@ function warmPublicCaches(reason) {
     .catch((error) => {
       console.warn(`Public cache warm failed after ${reason}: ${error instanceof Error ? error.message : String(error)}`);
     });
+}
+
+function invalidatePublicCaches(reason, options = {}) {
+  publicResponseCache.clear();
+  clearPublicDataCaches();
+  if (options.warm) warmPublicCaches(reason);
 }
 
 async function readJson(relativePath) {
@@ -378,7 +399,16 @@ async function withPublicResponseCache(key, factory) {
     expiresAt: now + PUBLIC_RESPONSE_CACHE_MS,
     payload,
   });
+  trimPublicResponseCache();
   return payload;
+}
+
+function trimPublicResponseCache() {
+  if (publicResponseCache.size <= MAX_PUBLIC_RESPONSE_CACHE_ENTRIES) return;
+  const overflow = publicResponseCache.size - MAX_PUBLIC_RESPONSE_CACHE_ENTRIES;
+  for (const key of Array.from(publicResponseCache.keys()).slice(0, overflow)) {
+    publicResponseCache.delete(key);
+  }
 }
 
 async function readJsonBody(request) {

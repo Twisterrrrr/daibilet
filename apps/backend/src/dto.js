@@ -2375,7 +2375,7 @@ export async function buildPublicStats(db) {
       [MIN_DISPLAY_PRICE_RUB],
     ),
     db.stats(),
-    destinationRows(db),
+    destinationSummaryRowsFast(db),
   ]);
 
   const row = result.rows[0] || {};
@@ -3865,6 +3865,152 @@ async function destinationRows(db) {
       categories: Array.from(bucket.categories.entries())
         .map(([name, events]) => ({ name, events }))
         .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')),
+    }))
+    .filter((bucket) => bucket.events >= 2)
+    .sort(destinationSort);
+}
+
+async function destinationSummaryRowsFast(db) {
+  const result = await db.query(
+    `
+      with primary_offer as (
+        select distinct on ("eventId")
+          "eventId",
+          "sourceCode",
+          "priceRub",
+          "widgetUrl",
+          "deeplinkUrl"
+        from "EventOffer"
+        where active = true
+        order by "eventId", ("priceRub" >= $1) desc nulls last, "priceRub" asc nulls last
+      ),
+      event_base as (
+        select
+          e.id,
+          coalesce(source.name, source.code::text, primary_offer."sourceCode"::text, '') as "sourceLabel",
+          e.title,
+          city.id as "cityId",
+          city.title as city,
+          city.slug as "citySlug",
+          city."isDestination" as "cityIsDestination",
+          region.id as "regionId",
+          region.slug as "regionSlug",
+          region.title as "regionTitle",
+          venue.id as "venueId",
+          venue.title as venue,
+          min(session."startsAt") as "startsAt",
+          min(e."priceFromRub") filter (where e."priceFromRub" >= $1) as "eventPriceFromRub",
+          min(session."priceFromRub") filter (where session."priceFromRub" >= $1) as "sessionPriceFromRub",
+          min(primary_offer."priceRub") filter (where primary_offer."priceRub" >= $1) as "offerPriceRub",
+          bool_or(
+            primary_offer."widgetUrl" is not null
+            or primary_offer."deeplinkUrl" is not null
+            or (
+              coalesce(source.code::text, primary_offer."sourceCode"::text, '') in ('TICKETSCLOUD', 'TEPLOHOD')
+              and source_link."externalId" is not null
+            )
+          ) as "purchaseReady"
+        from "Event" e
+        left join "City" city on city.id = e."primaryCityId"
+        left join "Region" region on region.id = city."regionId"
+        left join "Venue" venue on venue.id = e."venueId"
+        left join "EventSourceLink" source_link on source_link."eventId" = e.id
+        left join "Source" source on source.id = source_link."sourceId"
+        left join "EventSession" session on session."eventId" = e.id
+        left join primary_offer on primary_offer."eventId" = e.id
+        group by
+          e.id,
+          source.name,
+          source.code,
+          source_link."externalId",
+          primary_offer."sourceCode",
+          city.id,
+          city.title,
+          city.slug,
+          city."isDestination",
+          region.id,
+          region.slug,
+          region.title,
+          venue.id,
+          venue.title
+      ),
+      normalized as (
+        select
+          *,
+          (
+            select min(price)
+            from (values ("eventPriceFromRub"), ("sessionPriceFromRub"), ("offerPriceRub")) as prices(price)
+            where price is not null and price >= $1
+          ) as "priceFrom"
+        from event_base
+      ),
+      saleable as (
+        select
+          *,
+          concat_ws(
+            '|',
+            lower(regexp_replace(trim(coalesce("sourceLabel", '')), '\\s+', ' ', 'g')),
+            lower(regexp_replace(trim(coalesce(title, '')), '\\s+', ' ', 'g')),
+            lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
+            lower(regexp_replace(trim(coalesce("venueId", venue, '')), '\\s+', ' ', 'g'))
+          ) as "groupKey"
+        from normalized
+        where "startsAt" is not null
+          and "priceFrom" >= $1
+          and "purchaseReady" = true
+      ),
+      ranked as (
+        select
+          *,
+          row_number() over (partition by "groupKey" order by "startsAt" asc nulls last, title asc) as rank
+        from saleable
+      )
+      select
+        "groupKey",
+        "cityId",
+        city,
+        "citySlug",
+        "cityIsDestination",
+        "regionId",
+        "regionSlug",
+        "regionTitle",
+        "venueId"
+      from ranked
+      where rank = 1
+    `,
+    [MIN_DISPLAY_PRICE_RUB],
+  );
+
+  const buckets = new Map();
+  for (const row of result.rows) {
+    const destination = publicDestinationForCity(row);
+    if (!destination.name || destination.name === 'Не указан') continue;
+    if (!buckets.has(destination.name)) {
+      buckets.set(destination.name, {
+        id: destination.id,
+        slug: destination.slug,
+        sourceSlug: destination.sourceSlug,
+        name: destination.name,
+        type: destination.type,
+        events: 0,
+        venueIds: new Set(),
+      });
+    }
+
+    const bucket = buckets.get(destination.name);
+    bucket.events += 1;
+    if (row.venueId) bucket.venueIds.add(row.venueId);
+  }
+
+  return Array.from(buckets.values())
+    .map((bucket) => ({
+      id: bucket.id,
+      slug: bucket.slug,
+      sourceSlug: bucket.sourceSlug,
+      name: bucket.name,
+      type: bucket.type,
+      events: bucket.events,
+      venues: bucket.venueIds.size,
     }))
     .filter((bucket) => bucket.events >= 2)
     .sort(destinationSort);
