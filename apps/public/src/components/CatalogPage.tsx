@@ -29,7 +29,7 @@ type CatalogResponse = {
 };
 type ActiveCatalogFilter = { key: string; label: string; onClear: () => void };
 
-const CATALOG_PAGE_LIMIT = 180;
+const CATALOG_PAGE_LIMIT = 60;
 const MIN_DISPLAY_PRICE_RUB = 100;
 const API_BASE_URL =
   ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
@@ -37,8 +37,9 @@ const API_BASE_URL =
 
 export function CatalogPage() {
   const initialParams = React.useMemo(() => new URLSearchParams(window.location.search), []);
-  const [catalogSessions, setCatalogSessions] = React.useState<PublicSession[]>(() => publicData.sessions);
-  const [catalogTotal, setCatalogTotal] = React.useState(() => publicData.sessions.length);
+  const [catalogSessions, setCatalogSessions] = React.useState<PublicSession[]>(() => publicData.sessions.slice(0, CATALOG_PAGE_LIMIT));
+  const [catalogTotal, setCatalogTotal] = React.useState(() => publicData.stats.events || publicData.sessions.length);
+  const [catalogOffset, setCatalogOffset] = React.useState(0);
   const [catalogFacets, setCatalogFacets] = React.useState<Partial<CatalogFacets> | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [hasLoadedCatalog, setHasLoadedCatalog] = React.useState(false);
@@ -59,7 +60,7 @@ export function CatalogPage() {
 
   React.useEffect(() => {
     const controller = new AbortController();
-    const params = new URLSearchParams({ limit: String(CATALOG_PAGE_LIMIT), sort });
+    const params = new URLSearchParams({ limit: String(CATALOG_PAGE_LIMIT), offset: String(catalogOffset), sort });
     if (query.trim()) params.set('q', query.trim());
     if (city !== 'all') params.set('city', city);
     if (category !== 'all') params.set('category', category);
@@ -79,7 +80,8 @@ export function CatalogPage() {
         return response.json() as Promise<CatalogResponse>;
       })
       .then((payload) => {
-        setCatalogSessions(Array.isArray(payload.items) ? payload.items : []);
+        const items = Array.isArray(payload.items) ? payload.items : [];
+        setCatalogSessions((current) => (catalogOffset > 0 ? mergeCatalogSessions(current, items) : items));
         setCatalogTotal(payload.total || payload.items?.length || 0);
         setCatalogFacets(payload.facets || null);
         setHasLoadedCatalog(true);
@@ -100,13 +102,13 @@ export function CatalogPage() {
       window.clearTimeout(debounce);
       window.clearTimeout(timeout);
     };
-  }, [category, city, date, landing, maxPrice, query, sort]);
+  }, [catalogOffset, category, city, date, landing, maxPrice, query, sort]);
 
   React.useEffect(() => {
     syncCatalogUrl({ query, city, category, landing, date, maxPrice, sort, mode });
   }, [category, city, date, landing, maxPrice, mode, query, sort]);
 
-  const sourceSessions = hasLoadedCatalog ? catalogSessions : publicData.sessions;
+  const sourceSessions = hasLoadedCatalog ? catalogSessions : publicData.sessions.slice(0, CATALOG_PAGE_LIMIT);
   const fallbackFacets = React.useMemo(() => buildCatalogFacets(publicData.sessions), []);
   const facets = catalogFacets || fallbackFacets;
   const rawCities = facets.cities?.length ? facets.cities : fallbackFacets.cities;
@@ -132,6 +134,34 @@ export function CatalogPage() {
   const visibleSessions = sourceSessions;
   const selectedCity = cities.find((item) => item.name === city);
 
+  const setQueryFilter = (value: string) => {
+    setQuery(value);
+    setCatalogOffset(0);
+  };
+  const setCityFilter = (value: string) => {
+    setCity(value);
+    setCatalogOffset(0);
+  };
+  const setCategoryFilter = (value: string) => {
+    setCategory(value);
+    setCatalogOffset(0);
+  };
+  const setLandingFilter = (value: string) => {
+    setLanding(value);
+    setCatalogOffset(0);
+  };
+  const setDateFilter = (value: DateFilter) => {
+    setDate(value);
+    setCatalogOffset(0);
+  };
+  const setMaxPriceFilter = (value: string) => {
+    setMaxPrice(value);
+    setCatalogOffset(0);
+  };
+  const setSortFilter = (value: SortMode) => {
+    setSort(value);
+    setCatalogOffset(0);
+  };
   const reset = () => {
     setQuery('');
     setCity('all');
@@ -140,16 +170,17 @@ export function CatalogPage() {
     setDate('all');
     setMaxPrice('all');
     setSort('time');
+    setCatalogOffset(0);
   };
   const activeFilters: ActiveCatalogFilter[] = [
-    ...(query.trim() ? [{ key: 'query', label: `Поиск: ${query.trim()}`, onClear: () => setQuery('') }] : []),
-    ...(city !== 'all' ? [{ key: 'city', label: city, onClear: () => setCity('all') }] : []),
-    ...(category !== 'all' ? [{ key: 'category', label: category, onClear: () => setCategory('all') }] : []),
+    ...(query.trim() ? [{ key: 'query', label: `Поиск: ${query.trim()}`, onClear: () => setQueryFilter('') }] : []),
+    ...(city !== 'all' ? [{ key: 'city', label: city, onClear: () => setCityFilter('all') }] : []),
+    ...(category !== 'all' ? [{ key: 'category', label: category, onClear: () => setCategoryFilter('all') }] : []),
     ...(landing !== 'all'
-      ? [{ key: 'landing', label: landings.find((item) => item.slug === landing)?.title || landing, onClear: () => setLanding('all') }]
+      ? [{ key: 'landing', label: landings.find((item) => item.slug === landing)?.title || landing, onClear: () => setLandingFilter('all') }]
       : []),
-    ...(date !== 'all' ? [{ key: 'date', label: dateLabel(date), onClear: () => setDate('all') }] : []),
-    ...(maxPrice !== 'all' ? [{ key: 'maxPrice', label: `до ${formatNumber(Number(maxPrice))} ₽`, onClear: () => setMaxPrice('all') }] : []),
+    ...(date !== 'all' ? [{ key: 'date', label: dateLabel(date), onClear: () => setDateFilter('all') }] : []),
+    ...(maxPrice !== 'all' ? [{ key: 'maxPrice', label: `до ${formatNumber(Number(maxPrice))} ₽`, onClear: () => setMaxPriceFilter('all') }] : []),
   ];
 
   return (
@@ -157,9 +188,9 @@ export function CatalogPage() {
       <Header
         cityLabel={selectedCity?.name || 'Все города'}
         search={query}
-        onSearch={setQuery}
+        onSearch={setQueryFilter}
         onSection={(section) => navigateFromCatalog(section)}
-        onDestination={setCity}
+        onDestination={setCityFilter}
       />
       <main>
         <CatalogHero total={catalogTotal || publicData.stats.events || sourceSessions.length} />
@@ -167,20 +198,20 @@ export function CatalogPage() {
         <section className="container-page -mt-8 pb-12 pt-0">
           <CatalogFilters
             query={query}
-            setQuery={setQuery}
+            setQuery={setQueryFilter}
             city={city}
-            setCity={setCity}
+            setCity={setCityFilter}
             cities={cities}
             category={category}
-            setCategory={setCategory}
+            setCategory={setCategoryFilter}
             categories={categories}
             landing={landing}
-            setLanding={setLanding}
+            setLanding={setLandingFilter}
             landings={landings}
             date={date}
-            setDate={setDate}
+            setDate={setDateFilter}
             maxPrice={maxPrice}
-            setMaxPrice={setMaxPrice}
+            setMaxPrice={setMaxPriceFilter}
             priceSteps={priceSteps}
             reset={reset}
           />
@@ -192,16 +223,22 @@ export function CatalogPage() {
               isLoading={isLoading}
               loadError={loadError}
               sort={sort}
-              setSort={setSort}
+              setSort={setSortFilter}
               mode={mode}
               setMode={setMode}
               activeFilters={activeFilters}
               reset={reset}
             />
 
-            <QuickTags tags={tags} category={category} setCategory={setCategory} />
+            <QuickTags tags={tags} category={category} setCategory={setCategoryFilter} />
 
             {mode === 'cards' ? <CatalogGrid sessions={visibleSessions} /> : <CatalogTable sessions={visibleSessions} />}
+            <CatalogPagination
+              total={catalogTotal}
+              shown={visibleSessions.length}
+              isLoading={isLoading}
+              onLoadMore={() => setCatalogOffset(visibleSessions.length)}
+            />
           </div>
         </section>
       </main>
@@ -446,7 +483,7 @@ function CatalogGrid({ sessions }: { sessions: PublicSession[] }) {
   if (!sessions.length) return <EmptyCatalog />;
   return (
     <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-      {sessions.slice(0, 120).map((session) => (
+      {sessions.map((session) => (
         <EventCard key={session.id} event={session} compact />
       ))}
     </div>
@@ -470,7 +507,7 @@ function CatalogTable({ sessions }: { sessions: PublicSession[] }) {
           </tr>
         </thead>
         <tbody>
-          {sessions.slice(0, 180).map((session) => (
+          {sessions.map((session) => (
             <tr key={session.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
               <td className="whitespace-nowrap px-4 py-3 align-top">
                 <div className="font-medium text-slate-900">{session.dateLabel}</div>
@@ -503,6 +540,36 @@ function CatalogTable({ sessions }: { sessions: PublicSession[] }) {
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+function CatalogPagination({
+  total,
+  shown,
+  isLoading,
+  onLoadMore,
+}: {
+  total: number;
+  shown: number;
+  isLoading: boolean;
+  onLoadMore: () => void;
+}) {
+  if (shown <= 0 || shown >= total) return null;
+  const remaining = Math.max(total - shown, 0);
+  return (
+    <div className="mt-8 flex flex-col items-center gap-3 text-center">
+      <p className="text-sm font-medium text-slate-500">
+        Показано {formatNumber(shown)} из {formatNumber(total)}
+      </p>
+      <button
+        type="button"
+        onClick={onLoadMore}
+        disabled={isLoading}
+        className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-wait disabled:bg-slate-300"
+      >
+        {isLoading ? 'Загружаем...' : `Показать еще ${formatNumber(Math.min(CATALOG_PAGE_LIMIT, remaining))}`}
+      </button>
     </div>
   );
 }
@@ -552,6 +619,17 @@ function buildPriceSteps(sessions: PublicSession[]) {
   const max = prices.at(-1) || 0;
   const candidates = [500, 1000, 1500, 2000, 3000, 5000].filter((price) => price <= max);
   return candidates.length ? candidates : [1000, 2000, 3000];
+}
+
+function mergeCatalogSessions(current: PublicSession[], next: PublicSession[]) {
+  const seen = new Set<string>();
+  const merged: PublicSession[] = [];
+  for (const session of [...current, ...next]) {
+    if (seen.has(session.id)) continue;
+    seen.add(session.id);
+    merged.push(session);
+  }
+  return merged;
 }
 
 function isCatalogCityFacet(item: CatalogFacetItem) {
