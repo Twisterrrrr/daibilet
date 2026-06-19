@@ -52,11 +52,13 @@ const LANDING_RULES = [
     city: 'Москва',
     chips: ['ужин', 'Москва-река', 'вечер'],
     tags: ['На теплоходе', 'Водная экскурсия'],
-    keywords: ['ужин', 'фуршет', 'банкет', 'ресторан', 'теплоход', 'москва-река', 'речн', 'корабл', 'яхт'],
+    keywords: ['ужин', 'обед', 'ланч', 'бранч', 'завтрак', 'фуршет', 'банкет', 'ресторан', 'теплоход', 'москва-река', 'речн', 'корабл', 'яхт', 'судн'],
     keywordScope: 'content',
+    requiredTitleKeywordGroups: [
+      ['ужин', 'обед', 'ланч', 'бранч', 'завтрак', 'фуршет', 'банкет', 'ресторан'],
+    ],
     requiredKeywordGroups: [
-      ['ужин', 'фуршет', 'банкет'],
-      ['теплоход', 'москва-река', 'речн', 'корабл', 'яхт'],
+      ['теплоход', 'москва-река', 'речн', 'корабл', 'яхт', 'судн'],
     ],
     excludeKeywords: ['автобус', 'пешеход', 'мастер-класс'],
   },
@@ -66,9 +68,15 @@ const LANDING_RULES = [
     subtitle: 'Городские маршруты и обзорные программы',
     chips: ['автобус', 'обзорная', 'город'],
     keywords: ['автобус', 'автобусн', 'обзорн', 'сити тур', 'city tour'],
-    requiredAnyKeywords: ['автобус', 'автобусн'],
+    requiredTitleKeywordGroups: [
+      ['обзорн', 'экскурс', 'двухэтажн', 'hop on', 'city tour', 'сити тур'],
+    ],
+    requiredKeywordGroups: [
+      ['автобус', 'автобусн', 'двухэтажн', 'hop on', 'city tour', 'сити тур'],
+      ['обзорн', 'экскурс', 'hop on', 'city tour', 'сити тур'],
+    ],
     excludeTags: ['Водные экскурсии', 'На теплоходе', 'На катере', 'Реки и каналы'],
-    excludeKeywords: ['теплоход', 'катер', 'лодк', 'корабл', 'причал', 'река', 'канал', 'нева', 'мост', 'пешеход', 'пешком'],
+    excludeKeywords: ['теплоход', 'катер', 'лодк', 'корабл', 'причал', 'река', 'канал', 'нева', 'мост', 'пешеход', 'пешком', 'фест', 'фестиваль'],
   },
   {
     slug: 'standup',
@@ -4941,6 +4949,13 @@ function explainRuleMatch(event, rule) {
     else blockers.push(`нет обязательного слова: ${keyword}`);
   }
 
+  const titleKeywordFields = keywordFields.filter((field) => field.field === 'title');
+  for (const group of rule.requiredTitleKeywordGroups || []) {
+    const found = firstKeywordMatch(titleKeywordFields, group);
+    if (found) reasons.push(`группа(title): ${found.keyword}`);
+    else blockers.push(`нет слова в названии: ${group.join(' / ')}`);
+  }
+
   for (const group of rule.requiredKeywordGroups || []) {
     const found = firstKeywordMatch(keywordFields, group);
     if (found) reasons.push(`группа(${found.field}): ${found.keyword}`);
@@ -4958,7 +4973,7 @@ function explainRuleMatch(event, rule) {
 
   const hasTagSignal = tagSignals.length > 0;
   const hasKeywordSignal = keywordSignals.length > 0;
-  const hasRequiredSignal = Boolean(rule.requiredAnyTags || rule.requiredAnyKeywords || rule.requiredKeywords || rule.requiredKeywordGroups);
+  const hasRequiredSignal = Boolean(rule.requiredAnyTags || rule.requiredAnyKeywords || rule.requiredKeywords || rule.requiredTitleKeywordGroups || rule.requiredKeywordGroups);
   const matches = Boolean(hasTagSignal || hasKeywordSignal || hasRequiredSignal || rule.city || rule.venue);
   return { matches, reasons: uniqueValues(reasons).slice(0, 10), blockers: [] };
 }
