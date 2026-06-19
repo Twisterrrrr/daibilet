@@ -901,9 +901,9 @@ function mapAdminOrderRow(row) {
   const buyer = normalizeBuyerSnapshot(row.buyerSnapshot);
   const tickets = Array.isArray(row.tickets) ? row.tickets.map(mapAdminOrderTicket) : [];
   const problemStatus = isProblemOrderStatus(row.status);
-  const activeOrder = !isCanceledOrderStatus(row.status);
-  const hasUnlinkedTickets = activeOrder && tickets.some((ticket) => !ticket.eventId || !ticket.eventTitle);
-  const missingArtifact = activeOrder && tickets.length === 0;
+  const shouldExpectTicket = shouldExpectOrderTicket(row.status);
+  const hasUnlinkedTickets = shouldExpectTicket && tickets.some((ticket) => !ticket.eventId || !ticket.eventTitle);
+  const missingArtifact = shouldExpectTicket && tickets.length === 0;
   const sourceCode = String(row.sourceCode || '').toUpperCase();
   const eventTitles = Array.from(new Set(tickets.map((ticket) => ticket.eventTitle).filter(Boolean)));
   const snapshotEventTitle = firstString(row.buyerSnapshot?.sourceEventTitle, row.buyerSnapshot?.eventTitle);
@@ -1132,6 +1132,15 @@ function isRefundStatus(status) {
 function isProblemOrderStatus(status) {
   const value = String(status || '').toLowerCase();
   return ['fail', 'error', 'reject'].some((token) => value.includes(token));
+}
+
+function shouldExpectOrderTicket(status) {
+  const value = String(status || '').toLowerCase();
+  if (!value || isCanceledOrderStatus(value) || isRefundStatus(value)) return false;
+  return (
+    isConfirmedOrderStatus(value) ||
+    ['issued', 'ticketed', 'generated', 'delivered', 'voucher'].some((token) => value.includes(token))
+  );
 }
 
 function orderStatusTone(status) {
