@@ -1,0 +1,3237 @@
+{
+  "endpoint": "simple.ticketscloud.com:443",
+  "requestedAt": "2026-05-30T11:27:26.233Z",
+  "request": {
+    "status": "PUBLIC"
+  },
+  "count": 5,
+  "events": [
+    {
+      "tags": [
+        "592841f8515e35002dead94a"
+      ],
+      "artists": [],
+      "sets": [
+        {
+          "rules": [
+            {
+              "id": "6a19df0cb307e7196d5fe4fc",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1785524400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1786129200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "101000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe4fd",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1783710000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1784314800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "97000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe4fe",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1780686000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1781290800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "92000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe4ff",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1787943600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1788548400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "105000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe500",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1782500400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1783105200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "95000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe502",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1781290800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1781895600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "93000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe503",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1787338800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1787943600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "104000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe504",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1790362800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1790442000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "110000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe505",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1781895600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1782500400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "94000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe506",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1786129200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1786734000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "102000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe507",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1784919600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1785524400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "99000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe508",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1788548400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1789153200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "106000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe509",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1789153200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1789758000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "107000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe50a",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1786734000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1787338800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "103000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe50b",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1780081200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1780686000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "91000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe50c",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1783105200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1783710000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "96000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe50d",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1784314800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1784919600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "98000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe50e",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1789758000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1790362800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "108000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "6a19d8d712e9bf300aaa998f",
+          "name": "Танцпол",
+          "description": "«Танцпол» (входной билет). Без фотосесии и без места за столиками.",
+          "pos": 0,
+          "sector": "6a1972e65295b722b75e8269",
+          "withSeats": false,
+          "amount": 200,
+          "amountVacant": 200
+        },
+        {
+          "rules": [
+            {
+              "id": "6a19df0cb307e7196d5fe510",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1786129200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1786734000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "173000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe511",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1788548400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1789153200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "182000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe512",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1781290800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1781895600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "156000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe513",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1789758000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1790362800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "186000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe514",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1789153200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1789758000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "184000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe515",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1783105200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1783710000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "163000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe516",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1784314800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1784919600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "167000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe517",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1780081200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1780686000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "152000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe518",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1784919600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1785524400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "169000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe519",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1786734000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1787338800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "175000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe51a",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1783710000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1784314800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "165000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe51b",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1787943600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1788548400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "179000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe51d",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1780686000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1781290800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "154000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe51e",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1787338800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1787943600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "177000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe51f",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1790362800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1790442000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "190000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe520",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1782500400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1783105200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "161000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe521",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1785524400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1786129200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "171000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0cb307e7196d5fe522",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1781895600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1782500400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "158000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "6a19d90112e9bf300aaa9997",
+          "name": "Танцпол + фото с артистом",
+          "description": "«Meet & Greet» (билет + фото с артистом). Танцпол, фотосессия с артистом на личный телефон гостя.",
+          "pos": 0,
+          "sector": "6a1972e65295b722b75e826a",
+          "withSeats": false,
+          "amount": 100,
+          "amountVacant": 100
+        },
+        {
+          "rules": [
+            {
+              "id": "6a19df0db307e7196d5fe524",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1780081200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1780686000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "234000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe525",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1789153200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1789758000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "289000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe526",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1781895600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1782500400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "245000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe527",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1785524400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1786129200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "267000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe528",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1790362800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1790442000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "300000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe529",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1787338800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1787943600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "278000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe52a",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1780686000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1781290800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "237000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe52b",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1787943600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1788548400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "282000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe52c",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1784314800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1784919600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "259000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe52d",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1783105200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1783710000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "252000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe52e",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1781290800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1781895600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "241000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe52f",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1783710000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1784314800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "256000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe530",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1782500400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1783105200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "248000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe531",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1786734000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1787338800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "274000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe532",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1788548400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1789153200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "285000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe534",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1789758000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1790362800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "293000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe535",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1784919600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1785524400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "263000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe536",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1786129200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1786734000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "271000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "6a19dac5fb65a3d2d7ceb90c",
+          "name": "Стол 14, 1 этаж",
+          "description": "Входной билет + фото/автограф сессия с артистом после концерта. С местом за столиком!",
+          "pos": 0,
+          "sector": "6a1972e65295b722b75e8267",
+          "withSeats": true,
+          "amount": 4,
+          "amountVacant": 4
+        },
+        {
+          "rules": [
+            {
+              "id": "6a19df0db307e7196d5fe538",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1780081200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1780686000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "234000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe539",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1789153200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1789758000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "289000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe53a",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1781895600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1782500400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "245000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe53b",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1785524400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1786129200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "267000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe53c",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1790362800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1790442000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "300000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe53d",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1787338800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1787943600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "278000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe53e",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1780686000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1781290800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "237000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe53f",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1787943600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1788548400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "282000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe540",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1784314800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1784919600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "259000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe541",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1783105200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1783710000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "252000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe542",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1781290800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1781895600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "241000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe543",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1783710000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1784314800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "256000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe544",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1782500400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1783105200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "248000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe545",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1786734000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1787338800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "274000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe546",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1788548400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1789153200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "285000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe548",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1789758000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1790362800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "293000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe549",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1784919600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1785524400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "263000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe54a",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1786129200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1786734000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "271000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "6a19db11144875469d246b42",
+          "name": "Стол 10, 1 этаж",
+          "description": "Входной билет + фото/автограф сессия с артистом после концерта. С местом за столиком!",
+          "pos": 0,
+          "sector": "6a1972e65295b722b75e8267",
+          "withSeats": true,
+          "amount": 4,
+          "amountVacant": 4
+        },
+        {
+          "rules": [
+            {
+              "id": "6a19df0db307e7196d5fe54c",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1787338800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1787943600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "234000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe54d",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1788548400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1789153200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "239000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe54e",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1784314800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1784919600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "221000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe54f",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1780686000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1781290800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "205000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe550",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1783710000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1784314800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "218000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe551",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1782500400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1783105200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "213000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe552",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1789758000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1790362800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "245000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe553",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1781290800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1781895600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "208000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe554",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1784919600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1785524400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "224000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe555",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1786129200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1786734000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "229000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe556",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1780081200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1780686000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "203000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe557",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1790362800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1790442000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "250000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe558",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1787943600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1788548400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "237000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe559",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1785524400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1786129200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "226000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe55b",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1789153200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1789758000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "242000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe55c",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1781895600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1782500400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "211000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe55d",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1783105200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1783710000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "216000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0db307e7196d5fe55e",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1786734000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1787338800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "232000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "6a19dca4fb65a3d2d7ceb943",
+          "name": "Стол 2, 2 этаж (зона VIP)",
+          "description": "Входной билет + фото/автограф сессия с артистом после концерта. С местом за столиком!",
+          "pos": 0,
+          "sector": "6a1972e65295b722b75e8268",
+          "withSeats": true,
+          "amount": 5,
+          "amountVacant": 5
+        },
+        {
+          "rules": [
+            {
+              "id": "6a19df0eb307e7196d5fe560",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1787338800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1787943600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "234000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe561",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1788548400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1789153200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "239000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe562",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1784314800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1784919600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "221000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe563",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1780686000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1781290800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "205000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe564",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1783710000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1784314800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "218000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe565",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1782500400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1783105200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "213000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe566",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1789758000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1790362800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "245000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe567",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1781290800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1781895600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "208000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe568",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1784919600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1785524400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "224000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe569",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1786129200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1786734000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "229000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe56a",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1780081200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1780686000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "203000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe56b",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1790362800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1790442000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "250000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe56c",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1787943600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1788548400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "237000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe56d",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1785524400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1786129200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "226000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe56f",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1789153200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1789758000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "242000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe570",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1781895600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1782500400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "211000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe571",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1783105200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1783710000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "216000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe572",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1786734000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1787338800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "232000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "6a19dd1c0cf07249dba85f56",
+          "name": "Стол 4, 2 этаж (зона VIP)",
+          "description": "Входной билет + фото/автограф сессия с артистом после концерта. С местом за столиком!",
+          "pos": 0,
+          "sector": "6a1972e65295b722b75e8268",
+          "withSeats": true,
+          "amount": 5,
+          "amountVacant": 5
+        },
+        {
+          "rules": [
+            {
+              "id": "6a19df0eb307e7196d5fe574",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1789153200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1789758000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "224000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe575",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1787338800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1787943600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "217000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe576",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1781895600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1782500400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "198000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe577",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1787943600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1788548400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "219000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe578",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1783710000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1784314800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "205000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe579",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1782500400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1783105200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "201000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe57a",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1780081200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1780686000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "192000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe57b",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1780686000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1781290800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "194000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe57c",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1786129200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1786734000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "213000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe57d",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1789758000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1790362800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "226000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe57e",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1783105200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1783710000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "203000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe57f",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1784314800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1784919600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "207000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe580",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1784919600",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1785524400",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "209000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe582",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1781290800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1781895600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "196000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe583",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1788548400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1789153200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "222000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe584",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1786734000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1787338800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "215000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe585",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1790362800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1790442000",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "230000"
+              },
+              "types": "simple"
+            },
+            {
+              "id": "6a19df0eb307e7196d5fe586",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1785524400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1786129200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "211000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "6a19ddad57f993e23a7424b0",
+          "name": "Стол 7, 2 этаж (зона VIP)",
+          "description": "Входной билет с местом за столиком! Фото/автограф сессия с артистом после концерта. ",
+          "pos": 0,
+          "sector": "6a1972e65295b722b75e8268",
+          "withSeats": true,
+          "amount": 4,
+          "amountVacant": 4
+        }
+      ],
+      "mods": [],
+      "id": "6a19d8c1fcadfda1cdc86f4f",
+      "meta": "",
+      "name": "Нурминский: сольный концерт | Челябинск | 26 сентября | Club Ozz",
+      "description": "26 сентября клуб «Ozz» станет эпицентром уличной культуры. Нурминский с большим сольником в Челябинске!  Легенда жанра и голос районов исполнит хиты: «Мент на меня газует», «Валим на гелике», «Белый пятисотый», а также многие другие! <br><br>Никакой фальши. Живой звук! И пацанский рэп в лучшем его проявлении. Клуб «Ozz», ул. Энтузиастов, 11, Челябинск.",
+      "status": "PUBLIC",
+      "org": "5c85c6744ab3cb000cc2a9e3",
+      "venue": "59b2b4afd35286001aaf1ad2",
+      "map": "6a1972e65295b722b75e8266",
+      "lifetime": {
+        "start": {
+          "seconds": "1790434800",
+          "nanos": 0
+        },
+        "finish": {
+          "seconds": "1790442000",
+          "nanos": 0
+        }
+      },
+      "category": "592841f8515e35002dead938",
+      "ageRating": "12",
+      "media": {
+        "cover": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-05/6a19d8be144875469d246ab0.jpg",
+        "coverSmall": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-05/6a19d8b4d440e08ea89715c3.jpg",
+        "coverOriginal": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-05/6a19d8c0144875469d246ab1.jpg"
+      },
+      "openDate": false,
+      "ticketsAmount": 322,
+      "ticketsAmountVacant": 322,
+      "smartTickets": "NONE",
+      "additional": null,
+      "deal": {
+        "id": "6a19e0a669603c9f1d943afa",
+        "org": {
+          "units": 85,
+          "nanos": 0
+        },
+        "agent": {
+          "units": 15,
+          "nanos": 0
+        },
+        "extra": {
+          "units": 10,
+          "nanos": 0
+        }
+      },
+      "commissions": "deal",
+      "legalRu": {
+        "id": "5c85bd7f4ab3cb000cc2a8b9",
+        "type": "IP",
+        "name": "ИП Туктамышев Марат Рафхатович",
+        "inn": "166013758379",
+        "address": "г Казань",
+        "ogrnip": "318169000166508",
+        "ogrns": "ogrnip",
+        "ip": "IP_USN",
+        "taxes": "ip",
+        "nds": false,
+        "_nds": "nds",
+        "vatRate": "VAT_0",
+        "_vatRate": "vatRate"
+      },
+      "legal": "legalRu"
+    },
+    {
+      "tags": [
+        "592841f8515e35002dead941",
+        "592841f8515e35002dead94b",
+        "67da90f7b90981d8b12d105a",
+        "696019a3082d4287b009d87a",
+        "67da90fe7c98cec8ad007111"
+      ],
+      "artists": [],
+      "sets": [
+        {
+          "rules": [
+            {
+              "id": "69e7d1b7133ca4d490f8b9c3",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1776632400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1782494100",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "330000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "69e7d1b7133ca4d490f8b9c4",
+          "name": "Партер",
+          "description": "",
+          "pos": 0,
+          "sector": "68f9f3314ecd675f8da9d53a",
+          "withSeats": true,
+          "amount": 17,
+          "amountVacant": 16
+        },
+        {
+          "rules": [
+            {
+              "id": "69e7d1e6c38d0428c7267d82",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1776632400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1782494100",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "300000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "69e7d1e6c38d0428c7267d83",
+          "name": "Партер",
+          "description": "",
+          "pos": 0,
+          "sector": "68f9f3314ecd675f8da9d53a",
+          "withSeats": true,
+          "amount": 25,
+          "amountVacant": 25
+        },
+        {
+          "rules": [
+            {
+              "id": "69e7d239c38d0428c7267d8d",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1776632400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1782494100",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "270000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "69e7d239c38d0428c7267d8e",
+          "name": "Партер",
+          "description": "",
+          "pos": 0,
+          "sector": "68f9f3314ecd675f8da9d53a",
+          "withSeats": true,
+          "amount": 21,
+          "amountVacant": 21
+        },
+        {
+          "rules": [
+            {
+              "id": "69e7d29469d4216c8c88712d",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1776632400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1782494100",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "240000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "69e7d29469d4216c8c88712e",
+          "name": "Партер",
+          "description": "",
+          "pos": 0,
+          "sector": "68f9f3314ecd675f8da9d53a",
+          "withSeats": true,
+          "amount": 40,
+          "amountVacant": 38
+        },
+        {
+          "rules": [
+            {
+              "id": "69e7d32f6ea4b0bce11355f5",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1776632400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1782494100",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "210000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "69e7d32f6ea4b0bce11355f6",
+          "name": "Партер",
+          "description": "",
+          "pos": 0,
+          "sector": "68f9f3314ecd675f8da9d53a",
+          "withSeats": true,
+          "amount": 41,
+          "amountVacant": 41
+        },
+        {
+          "rules": [
+            {
+              "id": "69e7d3a983b1b435da4ddb9a",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1776632400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1782494100",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "160000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "69e7d3a983b1b435da4ddb9b",
+          "name": "Партер",
+          "description": "",
+          "pos": 0,
+          "sector": "68f9f3314ecd675f8da9d53a",
+          "withSeats": true,
+          "amount": 34,
+          "amountVacant": 34
+        },
+        {
+          "rules": [
+            {
+              "id": "69e7d4046a6278376cbd19a5",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1776632400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1782494100",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "130000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "69e7d4046a6278376cbd19a6",
+          "name": "Партер",
+          "description": "",
+          "pos": 0,
+          "sector": "68f9f3314ecd675f8da9d53a",
+          "withSeats": true,
+          "amount": 21,
+          "amountVacant": 21
+        }
+      ],
+      "mods": [],
+      "id": "69e7d161376c6a7105cf6631",
+      "meta": "",
+      "name": "Волшебные миры Миядзаки. Музыкальное шоу с мультимедийным видеорядом",
+      "description": "Легендарный японский режиссёр-аниматор Хаяо Миядзаки подарил нам красочную вселенную, в которой живут удивительные персонажи. Здесь всё одушевлено и всё взаимосвязано. Вам вполне может встретиться добрый дух леса, живущий в ветвях деревьев. Или ехидный котобус и рыбка, которая хочет жить на суше. <br> <br>Принцессы и ведьмы, парящий недосягаемый остров, сказочные здания, подводный и небесный миры — творческое пространство Миядзаки невероятно красиво! И там звучит чудесная музыка японского композитора Дзё Хисаиси, которая сопровождает героев и погружает зрителей в атмосферу незабываемых историй. <br> <br>Режиссёр учит зрителей искать прекрасное в мелочах, бережно обращаться с природой, смело встречать лихие повороты судьбы, с умом подходить к достижениям науки и техники, увлечённо изучать реальный мир и верить в силу воображения. <br><br>Музыканты, солисты проекта \"Luminis Artis\", Марина Шиганова (скрипка) и Дмитрий Максименко (фортепиано) проведут вас в этот удивительный мир, а любимые кадры из мультфильмов органично дополнят музыкальную часть действия.",
+      "status": "PUBLIC",
+      "org": "67901ea5a7792d8651465ced",
+      "venue": "63429ede137b2e27807b9e20",
+      "map": "68f9f3304ecd675f8da9d539",
+      "lifetime": {
+        "start": {
+          "seconds": "1782489600",
+          "nanos": 0
+        },
+        "finish": {
+          "seconds": "1782494100",
+          "nanos": 0
+        }
+      },
+      "category": "592841f8515e35002dead938",
+      "ageRating": "0",
+      "media": {
+        "cover": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-04/69e7d15f0886fcd32841c282.jpg",
+        "coverSmall": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-04/69e7d15d133ca4d490f8b911.jpg",
+        "coverOriginal": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-04/69e7d160f008961500f45816.jpg"
+      },
+      "openDate": false,
+      "ticketsAmount": 199,
+      "ticketsAmountVacant": 196,
+      "smartTickets": "NONE",
+      "additional": null,
+      "deal": {
+        "id": "69e7d52c2a7389be21cbe86b",
+        "org": {
+          "units": 85,
+          "nanos": 0
+        },
+        "agent": {
+          "units": 15,
+          "nanos": 0
+        },
+        "extra": {
+          "units": 10,
+          "nanos": 0
+        }
+      },
+      "commissions": "deal",
+      "legalRu": {
+        "id": "67901d62a2f5710052fe03a7",
+        "type": "IP",
+        "name": "ИП Шиганова Марина Дмитриевна",
+        "inn": "772092916239",
+        "address": "г Москва, Маёвки Первой аллея, д 11 к 1, кв 16",
+        "ogrnip": "324774600751067",
+        "ogrns": "ogrnip",
+        "ip": "IP_NPD",
+        "taxes": "ip",
+        "nds": false,
+        "_nds": "nds",
+        "vatRate": "VAT_0",
+        "_vatRate": "vatRate"
+      },
+      "legal": "legalRu"
+    },
+    {
+      "tags": [
+        "592841f8515e35002dead961",
+        "592841f8515e35002dead95d",
+        "592841f8515e35002dead963",
+        "592841f8515e35002dead95b"
+      ],
+      "artists": [],
+      "sets": [
+        {
+          "rules": [
+            {
+              "id": "69df822b7c4d0fb06a796705",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1776114000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1792780800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "120000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "69df822b7c4d0fb06a796706",
+          "name": "Партер",
+          "description": "",
+          "pos": 0,
+          "sector": "66b635d17a605cfde8af3827",
+          "withSeats": true,
+          "amount": 21,
+          "amountVacant": 21
+        },
+        {
+          "rules": [
+            {
+              "id": "69df824ed529cb5b007d95f7",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1776114000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1792780800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "70000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "69df824ed529cb5b007d95f8",
+          "name": "Партер",
+          "description": "",
+          "pos": 0,
+          "sector": "66b635d17a605cfde8af3827",
+          "withSeats": true,
+          "amount": 12,
+          "amountVacant": 12
+        },
+        {
+          "rules": [
+            {
+              "id": "69df8281773f150c560a6e3c",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1776114000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1792780800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "50000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "69df8281773f150c560a6e3d",
+          "name": "Партер",
+          "description": "",
+          "pos": 0,
+          "sector": "66b635d17a605cfde8af3827",
+          "withSeats": true,
+          "amount": 9,
+          "amountVacant": 9
+        },
+        {
+          "rules": [
+            {
+              "id": "69e09a49d8cd32ea44b2c676",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1776200400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1792780800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "170000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "69e09a4ad8cd32ea44b2c677",
+          "name": "Партер",
+          "description": "",
+          "pos": 0,
+          "sector": "66b635d17a605cfde8af3827",
+          "withSeats": true,
+          "amount": 21,
+          "amountVacant": 21
+        },
+        {
+          "rules": [
+            {
+              "id": "69e09baef7e09f5981b99d5f",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1776200400",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1792780800",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "200000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "69e09baef7e09f5981b99d60",
+          "name": "Партер",
+          "description": "",
+          "pos": 0,
+          "sector": "66b635d17a605cfde8af3827",
+          "withSeats": true,
+          "amount": 21,
+          "amountVacant": 21
+        }
+      ],
+      "mods": [],
+      "id": "69df81c1b2b56d4ef0ed769d",
+      "meta": "",
+      "name": "Горе от ума",
+      "description": "«Горе от ума» –  Все мы немного Чацкие! Задаемся вопросом - «А судьи кто?», верим, что добро побеждает зло, и что нашей искренней любви будут рады.<br> <br>«Чуть свет – уж на ногах! и я у ваших ног.» - полный восторга Чацкий врывается в размеренную жизнь Софьи и дома Фамусовых. Он полон любви, возвращается на родину, чтобы обрести счастье, но обнаруживает, что его не ждали.<br> <br>Полон досады и разочарования он не сдерживает своих суждений о местном обществе и нравах -<br> <br>«Душа здесь у меня каким-то горем сжата,<br>И в многолюдстве я потерян, сам не свой.<br>Нет! недоволен я Москвой.»<br> <br>Спектакль \"Горе от ума\" в постановке Николая Черкасова является истинным триумфом интеллектуального театра. Эта работа не только воссоздает мир Грибоедова, но и предлагает зрителям глубокий анализ общественных явлений и человеческих отношений, актуальных в любую эпоху.<br> <br>Николай Черкасов, выпускник ГИТИСа, ученик Б.А. Покровского и лауреат награды \"Соотечественник года\", вложил в эту постановку всю глубину своего понимания искусства, создавая не просто спектакль, а многоуровневое исследование человеческой натуры.<br> <br>\"Горе от ума\" в этой интерпретации — это вызов зрителю, приглашение к размышлению и погружению в бесконечный мир идей и эмоций, где каждое слово и каждый жест обретают новый смысл\".<br> <br>Пред-премьерные показы имели огромный успех в доказательство тому, что классика может и должна быть интересна современному человеку. Театр Черкасова это та самая классика, о которой вы мечтали!",
+      "status": "PUBLIC",
+      "org": "65b794ccd094f1691d553d5e",
+      "venue": "5a159b08d35286001a228685",
+      "map": "66b635d17a605cfde8af3826",
+      "lifetime": {
+        "start": {
+          "seconds": "1792771200",
+          "nanos": 0
+        },
+        "finish": {
+          "seconds": "1792780800",
+          "nanos": 0
+        }
+      },
+      "category": "592841f8515e35002dead95a",
+      "ageRating": "12",
+      "media": {
+        "cover": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-04/69df81c1773f150c560a6dec.jpg",
+        "coverSmall": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-04/69df81c1d529cb5b007d95be.jpg",
+        "coverOriginal": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-04/69df81c1d529cb5b007d95bf.jpg"
+      },
+      "openDate": false,
+      "ticketsAmount": 84,
+      "ticketsAmountVacant": 84,
+      "smartTickets": "NONE",
+      "additional": null,
+      "deal": {
+        "id": "69e91ba796439e7fc8766647",
+        "org": {
+          "units": 85,
+          "nanos": 0
+        },
+        "agent": {
+          "units": 15,
+          "nanos": 0
+        },
+        "extra": {
+          "units": 10,
+          "nanos": 0
+        }
+      },
+      "commissions": "deal",
+      "legalRu": {
+        "id": "65b79288ed93b8050f3a5ac9",
+        "type": "LTD",
+        "name": "АНО \"ТЕАТР-МАСТЕРСКАЯ ПОД РУКОВОДСТВОМ НИКОЛАЯ ЧЕРКАСОВА\"",
+        "inn": "5038185374",
+        "address": "Московская обл, г Пушкино, мкр Дзержинец, д 28, кв 93",
+        "ogrn": "1235000156930",
+        "ogrns": "ogrn",
+        "ltd": "LTD_USN",
+        "taxes": "ltd",
+        "nds": false,
+        "_nds": "nds",
+        "vatRate": "VAT_0",
+        "_vatRate": "vatRate"
+      },
+      "legal": "legalRu"
+    },
+    {
+      "tags": [
+        "592841f8515e35002dead95b",
+        "592841f8515e35002dead963",
+        "592841f8515e35002dead961",
+        "592841f8515e35002dead95d"
+      ],
+      "artists": [],
+      "sets": [
+        {
+          "rules": [
+            {
+              "id": "69df7d525d54321c646b6b8c",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1776114000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1780599600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "90000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "69df7d525d54321c646b6b8d",
+          "name": "Партер",
+          "description": "",
+          "pos": 0,
+          "sector": "69d681fa8a1f8421dc206219",
+          "withSeats": true,
+          "amount": 2,
+          "amountVacant": 0
+        },
+        {
+          "rules": [
+            {
+              "id": "69df7d705d54321c646b6b93",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1776114000",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1780599600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "70000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "69df7d705d54321c646b6b94",
+          "name": "Партер",
+          "description": "",
+          "pos": 0,
+          "sector": "69d681fa8a1f8421dc206219",
+          "withSeats": true,
+          "amount": 3,
+          "amountVacant": 0
+        },
+        {
+          "rules": [
+            {
+              "id": "6a098ca1978231c54025f095",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1778878800",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1780599600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "150000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "6a098ca1978231c54025f096",
+          "name": "Партер",
+          "description": "",
+          "pos": 0,
+          "sector": "69d681fa8a1f8421dc206219",
+          "withSeats": true,
+          "amount": 4,
+          "amountVacant": 2
+        },
+        {
+          "rules": [
+            {
+              "id": "6a119d3cc1910113ac127212",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1779397200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1780599600",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "120000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "6a119d3cc1910113ac127213",
+          "name": "Партер",
+          "description": "",
+          "pos": 0,
+          "sector": "69d681fa8a1f8421dc206219",
+          "withSeats": true,
+          "amount": 1,
+          "amountVacant": 0
+        }
+      ],
+      "mods": [],
+      "id": "69df7cbc6e12285a0fc50543",
+      "meta": "",
+      "name": "Идиот",
+      "description": "Сцена — не просто место действия, а гигантское зеркало, в котором с треском раскалывается человеческая душа. Театр Черкасова представляет свою версию вечного романа — «Идиота» — в строгой и мощной классической интерпретации.<br><br>В центре трагической бури — князь Лев Николаевич Мышкин, «положительно прекрасный человек», возвращающийся в холодный, расчетливый Петербург после долгого лечения в Швейцарии. Его искренность, наивная мудрость и всепрощение становятся катализатором страстей, обнажающих язвы общества. Две женщины, словно роковые полюса, определяют его судьбу: порочная и страдающая Настасья Филипповна, в глазах которой — вызов всему миру, и чистая, но гордая Аглая Епанчина.<br><br>В классической интерпретации театра Черкасова акцент смещен на глубину психологических противостояний, монологи-исповеди и неумолимую логику рока.<br><br>Это спектакль о столкновении святости и порока, сострадания и гордыни, истинного чувства и социальной маски. О том, как хрупка и обречена красота в мире, где правят цинизм и корысть. О жертвенной любви, которая не спасает, но навеки меняет всех, кого коснется.",
+      "status": "PUBLIC",
+      "org": "65b794ccd094f1691d553d5e",
+      "venue": "60544791baf4ecf3107006cb",
+      "map": "69d681f98a1f8421dc206218",
+      "lifetime": {
+        "start": {
+          "seconds": "1780588800",
+          "nanos": 0
+        },
+        "finish": {
+          "seconds": "1780599600",
+          "nanos": 0
+        }
+      },
+      "category": "592841f8515e35002dead95a",
+      "ageRating": "16",
+      "media": {
+        "cover": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-04/69df7e065d54321c646b6ba9.jpg",
+        "coverSmall": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-04/69df7e06d529cb5b007d923d.jpg",
+        "coverOriginal": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-04/69df7e06a3ef03b6b0d9ae9a.jpg"
+      },
+      "openDate": false,
+      "ticketsAmount": 10,
+      "ticketsAmountVacant": 2,
+      "smartTickets": "NONE",
+      "additional": null,
+      "deal": {
+        "id": "69e91ba796439e7fc8766645",
+        "org": {
+          "units": 85,
+          "nanos": 0
+        },
+        "agent": {
+          "units": 15,
+          "nanos": 0
+        },
+        "extra": {
+          "units": 10,
+          "nanos": 0
+        }
+      },
+      "commissions": "deal",
+      "legalRu": {
+        "id": "65b79288ed93b8050f3a5ac9",
+        "type": "LTD",
+        "name": "АНО \"ТЕАТР-МАСТЕРСКАЯ ПОД РУКОВОДСТВОМ НИКОЛАЯ ЧЕРКАСОВА\"",
+        "inn": "5038185374",
+        "address": "Московская обл, г Пушкино, мкр Дзержинец, д 28, кв 93",
+        "ogrn": "1235000156930",
+        "ogrns": "ogrn",
+        "ltd": "LTD_USN",
+        "taxes": "ltd",
+        "nds": false,
+        "_nds": "nds",
+        "vatRate": "VAT_0",
+        "_vatRate": "vatRate"
+      },
+      "legal": "legalRu"
+    },
+    {
+      "tags": [
+        "592841f8515e35002dead93b"
+      ],
+      "artists": [],
+      "sets": [
+        {
+          "rules": [
+            {
+              "id": "69bbd985de184be71c0b5c5c",
+              "type": "SIMPLE",
+              "lifetime": {
+                "start": {
+                  "seconds": "1773781200",
+                  "nanos": 0
+                },
+                "finish": {
+                  "seconds": "1780855200",
+                  "nanos": 0
+                }
+              },
+              "simple": {
+                "price": "100000"
+              },
+              "types": "simple"
+            }
+          ],
+          "id": "69bbd985de184be71c0b5c5d",
+          "name": "входной",
+          "description": "",
+          "pos": 1,
+          "sector": "",
+          "withSeats": false,
+          "amount": 50,
+          "amountVacant": 50
+        }
+      ],
+      "mods": [],
+      "id": "69bbd98304642bce63535478",
+      "meta": "",
+      "name": "Дмитрий Дубров Plotnik82 и Алла Лужецкая / Ейск",
+      "description": "Дмитрий Дубров (ex-Plotnik82) и флейтистка Алла Лужецкая (ex-Fleur) впервые выступят в ЕЙСКЕ с большим сольным концертом<br><br>7 июня / 19:00<br>Паб \"Чердак\", ул. Мира 122<br><br>Дмитрий Дубров - автор и исполнитель, лауреат Грушинского фестиваля, ведущий YouTube канала \"Уговорил\", участник множества музыкальных проектов. Его песню \"Смерть глотает блесну\" в своё время исполнили звёзды отечественного рока: АнимациЯ, Алиса, 25/17.<br><br>Алла Лужецкая - флейтистка, чьё мастерство и обаяние украшают любой музыкальный проект. В прошлом, музыкант легендарной группы \"Fleur\".",
+      "status": "PUBLIC",
+      "org": "691c66a3c0321d706cd9446c",
+      "venue": "69bbd96a1558ba406b863c0e",
+      "map": "",
+      "lifetime": {
+        "start": {
+          "seconds": "1780848000",
+          "nanos": 0
+        },
+        "finish": {
+          "seconds": "1780855200",
+          "nanos": 0
+        }
+      },
+      "category": "592841f8515e35002dead938",
+      "ageRating": "18",
+      "media": {
+        "cover": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-03/69bbd983de184be71c0b5c54.jpg",
+        "coverSmall": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-03/69bbd98304642bce63535474.jpg",
+        "coverOriginal": "https://ticketscloud-prod.storage.yandexcloud.net:443/production/image/2026-03/69bbd9832cd6a2e85a139622.jpg"
+      },
+      "openDate": false,
+      "ticketsAmount": 50,
+      "ticketsAmountVacant": 50,
+      "smartTickets": "NONE",
+      "additional": null,
+      "deal": {
+        "id": "69bbdcb32cd6a2e85a139ba7",
+        "org": {
+          "units": 85,
+          "nanos": 0
+        },
+        "agent": {
+          "units": 15,
+          "nanos": 0
+        },
+        "extra": {
+          "units": 10,
+          "nanos": 0
+        }
+      },
+      "commissions": "deal",
+      "legalRu": {
+        "id": "691c65c55c3ce114b7277656",
+        "type": "IP",
+        "name": "ИП Дубров Дмитрий Сергеевич",
+        "inn": "770180189050",
+        "address": "Донецкая Народная респ, г Горловка, ул Пушкинская, д 24, кв 9",
+        "ogrnip": "325930100089036",
+        "ogrns": "ogrnip",
+        "ip": "IP_USN",
+        "taxes": "ip",
+        "nds": false,
+        "_nds": "nds",
+        "vatRate": "VAT_0",
+        "_vatRate": "vatRate"
+      },
+      "legal": "legalRu"
+    }
+  ]
+}

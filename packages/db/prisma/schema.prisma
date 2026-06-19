@@ -1,0 +1,587 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum SourceCode {
+  TICKETSCLOUD
+  TEPLOHOD
+  MANUAL
+}
+
+enum EventKind {
+  SINGLE
+  RECURRING
+  OPEN_DATE
+}
+
+enum PublishStatus {
+  DRAFT
+  REVIEW
+  READY
+  PUBLISHED
+  HIDDEN
+}
+
+enum VenueKind {
+  VENUE
+  MUSEUM_ART_SPACE
+  THEATER
+  CONCERT_HALL
+  CLUB_BAR_RESTAURANT
+  PIER
+  MEETING_POINT
+  OUTDOOR_LOCATION
+  SPORT_ACTIVITY_SPACE
+  ATTRACTION
+  ONLINE
+  OTHER
+}
+
+enum VenuePageStatus {
+  NONE
+  CANDIDATE
+  PUBLISHED
+  HIDDEN
+}
+
+enum LandingType {
+  CITY
+  MULTI_CITY
+}
+
+enum LandingBlockType {
+  HERO
+  TRUST_BADGES
+  VALUE_PROPS
+  QUICK_FILTERS
+  FEATURED_VARIANTS
+  SCHEDULE_PREVIEW
+  CITY_GRID
+  CATEGORY_CHIPS
+  INFO_ICONS
+  STORY
+  HIGHLIGHTS
+  ITINERARY
+  PRICING
+  FAQ
+  REVIEWS
+  COMPARISON
+  RELATED_LANDINGS
+  RELATED_COLLECTIONS
+  RELATED_ARTICLES
+  CTA_BANNER
+  SEO_TEXT
+  RAW_RICH_TEXT
+}
+
+enum CanonicalMode {
+  SELF
+  CUSTOM
+  CANONICAL_LANDING
+  NOINDEX
+}
+
+enum SeoEntityType {
+  EVENT
+  VENUE
+  CITY
+  REGION
+  LANDING
+  ARTICLE
+  COLLECTION
+}
+
+enum ArticleStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  HIDDEN
+}
+
+enum SyncStatus {
+  RUNNING
+  SUCCESS
+  FAILED
+}
+
+model Source {
+  id        String   @id @default(cuid())
+  code      SourceCode @unique
+  name      String
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  syncRuns SourceSyncRun[]
+  rawRecords RawImportRecord[]
+  eventLinks EventSourceLink[]
+  orderLinks ExternalOrder[]
+}
+
+model SourceSyncRun {
+  id        String     @id @default(cuid())
+  sourceId  String
+  status    SyncStatus @default(RUNNING)
+  mode      String
+  startedAt DateTime   @default(now())
+  finishedAt DateTime?
+  stats     Json?
+  error     String?
+
+  source Source @relation(fields: [sourceId], references: [id])
+}
+
+model RawImportRecord {
+  id          String   @id @default(cuid())
+  sourceId    String
+  entityType  String
+  externalId  String
+  payload     Json
+  payloadHash String?
+  importedAt  DateTime @default(now())
+
+  source Source @relation(fields: [sourceId], references: [id])
+
+  @@unique([sourceId, entityType, externalId])
+}
+
+model Event {
+  id              String        @id @default(cuid())
+  title           String
+  slug            String        @unique
+  description     String?
+  kind            EventKind
+  status          PublishStatus @default(REVIEW)
+  sourceStatus    String?
+  ageLimit        String?
+  imageUrl        String?
+  seoH1           String?
+  seoTitle        String?
+  seoDescription  String?
+  canonicalPath   String?
+  isIndexable     Boolean       @default(true)
+  priceFromRub    Int?
+  ticketsVacant   Int?
+  primaryCityId   String?
+  venueId         String?
+  categoryId      String?
+  primarySubcategoryId String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  primaryCity City? @relation(fields: [primaryCityId], references: [id])
+  venue       Venue? @relation(fields: [venueId], references: [id])
+  category    Category? @relation(fields: [categoryId], references: [id])
+  primarySubcategory Subcategory? @relation(fields: [primarySubcategoryId], references: [id])
+
+  sessions      EventSession[]
+  offers        EventOffer[]
+  sourceLinks   EventSourceLink[]
+  subcategories EventSubcategory[]
+  tags          EventTag[]
+  qualityIssues QualityIssue[]
+  landingMatches LandingMatch[]
+  override      EventOverride?
+
+  @@index([status])
+  @@index([primaryCityId])
+  @@index([venueId])
+  @@index([categoryId])
+}
+
+model EventOverride {
+  id              String         @id @default(cuid())
+  eventId         String         @unique
+  title           String?
+  description     String?
+  shortDescription String?
+  imageUrl        String?
+  seoH1           String?
+  seoTitle        String?
+  seoDescription  String?
+  canonicalPath   String?
+  isIndexable     Boolean?
+  editorStatus    PublishStatus?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+model EventSourceLink {
+  id          String @id @default(cuid())
+  eventId     String
+  sourceId    String
+  externalId  String
+  metaExternalId String?
+  sourceUrl   String?
+  rawRecordId String?
+  updatedAt   DateTime @updatedAt
+
+  event  Event @relation(fields: [eventId], references: [id])
+  source Source @relation(fields: [sourceId], references: [id])
+
+  @@unique([sourceId, externalId])
+  @@index([eventId])
+  @@index([sourceId, metaExternalId])
+}
+
+model EventSession {
+  id           String   @id @default(cuid())
+  eventId      String
+  startsAt     DateTime?
+  endsAt       DateTime?
+  sourceStatus String?
+  priceFromRub Int?
+  ticketsVacant Int?
+  externalId   String?
+
+  event Event @relation(fields: [eventId], references: [id])
+
+  @@index([eventId, startsAt])
+  @@index([startsAt])
+  @@index([externalId])
+}
+
+model EventOffer {
+  id          String     @id @default(cuid())
+  eventId     String
+  sourceCode  SourceCode
+  title       String?
+  priceRub    Int?
+  widgetUrl   String?
+  deeplinkUrl String?
+  payload     Json?
+  active      Boolean    @default(true)
+
+  event Event @relation(fields: [eventId], references: [id])
+
+  @@index([eventId, active, priceRub])
+  @@index([sourceCode])
+}
+
+model Category {
+  id       String @id @default(cuid())
+  slug     String @unique
+  title    String
+  position Int    @default(0)
+
+  events Event[]
+  subcategories Subcategory[]
+}
+
+model Subcategory {
+  id         String @id @default(cuid())
+  categoryId String
+  slug       String @unique
+  title      String
+  position   Int    @default(0)
+
+  category Category @relation(fields: [categoryId], references: [id])
+  primaryEvents Event[]
+  events EventSubcategory[]
+}
+
+model EventSubcategory {
+  eventId       String
+  subcategoryId String
+  isPrimary     Boolean @default(false)
+
+  event Event @relation(fields: [eventId], references: [id])
+  subcategory Subcategory @relation(fields: [subcategoryId], references: [id])
+
+  @@id([eventId, subcategoryId])
+  @@index([subcategoryId])
+}
+
+model Tag {
+  id    String @id @default(cuid())
+  slug  String @unique
+  title String
+
+  events EventTag[]
+}
+
+model EventTag {
+  eventId String
+  tagId   String
+
+  event Event @relation(fields: [eventId], references: [id])
+  tag   Tag   @relation(fields: [tagId], references: [id])
+
+  @@id([eventId, tagId])
+  @@index([tagId])
+}
+
+model Region {
+  id    String @id @default(cuid())
+  slug  String @unique
+  title String
+
+  cities City[]
+}
+
+model City {
+  id       String @id @default(cuid())
+  regionId String?
+  slug     String @unique
+  title    String
+  sourceTitle String?
+  introTitle String?
+  introText  String?
+  heroImageUrl String?
+  seoH1 String?
+  seoTitle String?
+  seoDescription String?
+  canonicalPath String?
+  isDestination Boolean @default(false)
+
+  region Region? @relation(fields: [regionId], references: [id])
+  venues Venue[]
+  events Event[]
+  landings Landing[]
+  articles Article[]
+}
+
+model Venue {
+  id          String          @id @default(cuid())
+  slug        String          @unique
+  title       String
+  description String?
+  shortDescription String?
+  heroImageUrl String?
+  seoH1 String?
+  seoTitle String?
+  seoDescription String?
+  canonicalPath String?
+  isIndexable Boolean @default(true)
+  cityId      String?
+  address     String?
+  latitude    Float?
+  longitude   Float?
+  kind        VenueKind       @default(OTHER)
+  pageStatus  VenuePageStatus @default(NONE)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  city City? @relation(fields: [cityId], references: [id])
+  events Event[]
+  aliases VenueAlias[]
+}
+
+model VenueAlias {
+  id       String @id @default(cuid())
+  venueId  String
+  sourceCode SourceCode
+  externalId String?
+  title    String
+  address  String?
+
+  venue Venue @relation(fields: [venueId], references: [id])
+}
+
+model Landing {
+  id          String        @id @default(cuid())
+  type        LandingType   @default(MULTI_CITY)
+  slug        String        @unique
+  title       String
+  subtitle    String?
+  description String?
+  status      PublishStatus @default(REVIEW)
+  cityId      String?
+  themeId     String?
+  rules       Json
+
+  heroTitle       String?
+  heroSubtitle    String?
+  heroBadge       String?
+  heroImageUrl    String?
+  heroMobileImageUrl String?
+  templateType    String?
+  layoutVariant   String?
+  surfaceVariant  String?
+
+  seoH1           String?
+  seoTitle        String?
+  seoDescription  String?
+  ogImageUrl      String?
+  canonicalMode   CanonicalMode @default(SELF)
+  canonicalUrl    String?
+  canonicalLandingId String?
+  isIndexable     Boolean @default(false)
+  isActive        Boolean @default(true)
+  publishedAt     DateTime?
+  sortOrder       Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  city    City? @relation(fields: [cityId], references: [id])
+  theme   LandingTheme? @relation(fields: [themeId], references: [id])
+  matches LandingMatch[]
+  blocks  LandingContentBlock[]
+  relatedLinks LandingRelatedLink[]
+
+  @@index([type, isActive, isIndexable])
+  @@index([cityId, slug])
+}
+
+model LandingMatch {
+  landingId String
+  eventId   String
+  score     Int     @default(0)
+  reasons   Json?
+
+  landing Landing @relation(fields: [landingId], references: [id])
+  event   Event   @relation(fields: [eventId], references: [id])
+
+  @@id([landingId, eventId])
+}
+
+model LandingTheme {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  subtitle    String?
+  defaultHeroTitle String?
+  defaultHeroBody  String?
+  defaultSeoTitle  String?
+  defaultSeoDescription String?
+  coverImageUrl String?
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  landings Landing[]
+}
+
+model LandingContentBlock {
+  id          String           @id @default(cuid())
+  landingId   String
+  type        LandingBlockType
+  variant     String?
+  title       String?
+  subtitle    String?
+  eyebrow     String?
+  body        String?
+  richTextJson Json?
+  payload     Json?
+  assetUrl    String?
+  mobileAssetUrl String?
+  isEnabled   Boolean @default(true)
+  sortOrder   Int @default(0)
+  visibilityRules Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  landing Landing @relation(fields: [landingId], references: [id], onDelete: Cascade)
+
+  @@index([landingId, sortOrder])
+}
+
+model LandingRelatedLink {
+  id        String @id @default(cuid())
+  landingId String
+  title     String
+  href      String
+  kind      String
+  sortOrder Int @default(0)
+
+  landing Landing @relation(fields: [landingId], references: [id], onDelete: Cascade)
+
+  @@index([landingId, sortOrder])
+}
+
+model Article {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  status      ArticleStatus @default(DRAFT)
+  title       String
+  excerpt     String?
+  content     String?
+  coverImageUrl String?
+  cityId      String?
+  seoH1       String?
+  seoTitle    String?
+  seoDescription String?
+  canonicalPath String?
+  isIndexable Boolean @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  city City? @relation(fields: [cityId], references: [id])
+
+  @@index([status, isIndexable, publishedAt])
+}
+
+model SeoMeta {
+  id          String        @id @default(cuid())
+  entityType  SeoEntityType
+  entityId    String
+  title       String?
+  description String?
+  h1          String?
+  canonicalUrl String?
+  robots      String?
+  ogTitle     String?
+  ogDescription String?
+  ogImageUrl  String?
+  updatedAt   DateTime @updatedAt
+
+  @@unique([entityType, entityId])
+}
+
+model ExternalOrder {
+  id              String     @id @default(cuid())
+  sourceId        String
+  externalOrderId String
+  publicCode      String?    @unique
+  status          String
+  buyerSnapshot   Json?
+  purchasedAt     DateTime?
+  updatedAt       DateTime   @updatedAt
+
+  source Source @relation(fields: [sourceId], references: [id])
+  tickets ExternalTicket[]
+
+  @@unique([sourceId, externalOrderId])
+  @@index([status])
+  @@index([purchasedAt])
+  @@index([updatedAt])
+}
+
+model ExternalTicket {
+  id               String @id @default(cuid())
+  externalOrderId  String
+  externalTicketId String
+  status           String
+  eventId          String?
+  sessionId        String?
+  origin           String @default("source")
+
+  order ExternalOrder @relation(fields: [externalOrderId], references: [id])
+
+  @@index([externalOrderId])
+  @@index([externalTicketId])
+  @@index([eventId])
+  @@index([sessionId])
+  @@index([origin])
+}
+
+model QualityIssue {
+  id        String   @id @default(cuid())
+  eventId   String
+  code      String
+  severity  String
+  message   String
+  createdAt DateTime @default(now())
+  resolvedAt DateTime?
+
+  event Event @relation(fields: [eventId], references: [id])
+}

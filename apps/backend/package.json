@@ -1,0 +1,14 @@
+{
+  "name": "@daibilet/backend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node src/server.js",
+    "start": "node src/server.js",
+    "tep:fixture-bridge": "node ../../scripts/teplohod-fixture-bridge.js"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

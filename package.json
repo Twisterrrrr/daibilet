@@ -1,0 +1,43 @@
+{
+  "name": "tours",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "backend:serve": "npm.cmd --prefix apps/backend run dev",
+    "backend:dev": "npm.cmd --prefix apps/backend run dev",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "db:validate": "npm.cmd --prefix packages/db run db:validate",
+    "db:migrate": "npm.cmd --prefix packages/db run db:migrate",
+    "db:generate": "npm.cmd --prefix packages/db run db:generate",
+    "db:seed:tc-sql": "node scripts/db-build-tc-seed-sql.js",
+    "tc:events": "node scripts/tc-sample-events.js",
+    "tc:catalog": "node scripts/tc-sample-catalog.js",
+    "tc:count": "node scripts/tc-count-events.js",
+    "tc:full-sync": "node scripts/tc-full-sync.js",
+    "tc:orders": "node scripts/tc-sync-orders.js",
+    "tc:city-routing": "node scripts/tc-city-routing-summary.js",
+    "tep:import-fixtures": "node scripts/tep-import-fixtures.js",
+    "tep:bridge": "node scripts/teplohod-fixture-bridge.js",
+    "tep:fixture-bridge": "node scripts/teplohod-fixture-bridge.js",
+    "public:data": "node scripts/build-public-prototype-data.js",
+    "public:serve": "npm.cmd --prefix apps/public run dev",
+    "public:build": "npm.cmd --prefix apps/public run build",
+    "admin:data": "node scripts/build-admin-prototype-data.js",
+    "admin:serve": "npm.cmd --prefix apps/admin run dev",
+    "admin:dev": "npm.cmd --prefix apps/admin run dev",
+    "admin:build": "npm.cmd --prefix apps/admin run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.4",
+    "@grpc/proto-loader": "^0.8.1",
+    "dotenv": "^17.4.2"
+  }
+}
