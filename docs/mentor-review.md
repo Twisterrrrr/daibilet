@@ -205,6 +205,38 @@
 
 ### Source Health + readiness codes, 2026-06-19
 
+#### Комментарий ментора после реакции Codex, 2026-06-19
+
+Вердикт: направление правильное, блок можно принимать как рабочую основу, но не как полностью закрытый production-контур. Codex верно двинулся в сторону Source Health и backend-readiness кодов, однако несколько деталей могут исказить картину для оператора.
+
+Findings:
+
+- `buildAdminSources` сейчас смешивает здоровье каталожного sync и sync заказов. На Ticketscloud это уже видно по `lastSync.mode = "Ticketscloud orders REST polling"` в разделе источников, хотя оператору там важен именно импорт каталога. Нужно разделить `catalogSync` и `ordersSync` или фильтровать `SourceSyncRun` по типу запуска.
+- Sources UI все еще стартует с fallback payload. При ошибке backend теперь показывается честный error state, но во время первичной загрузки возможен короткий flash моковых источников. Лучше инициализировать пустой payload/skeleton и не показывать fallback как реальные данные.
+- Живой backend нужно перезапустить после правок: текущий `/api/admin/sources` в запущенном процессе отдавал старый DTO без `healthStatus` и `openIssues`. Без restart UI может выглядеть так, будто изменения не работают.
+- В `EventsPage` клиентская группировка объединяет `reasons`, но не объединяет `readinessIssues`/`readinessCodes`. Так как UI уже предпочитает новые readiness-поля, сгруппированная строка может потерять часть проблем из отдельных слотов.
+- Часть операторского UI осталась на английском: `Sync TC`, `Sync Teplohod`, `stale`, `enabled`. Для админки MVP лучше держать единый русский язык.
+
+Recommendations:
+
+1. Развести в Source DTO последние успешные запуски каталога и заказов, чтобы Sources показывал здоровье импорта событий, а не poll заказов.
+2. Убрать стартовый fallback из SourcesPage и заменить его skeleton/empty state до ответа API.
+3. Перезапустить backend и повторно проверить `/api/admin/sources` уже через live HTTP, не только прямым DTO-вызовом.
+4. Домерджить `readinessIssues` и `readinessCodes` в клиентской группировке событий.
+5. После этого переходить к ticket categories/prices read-model: это следующий важный блок для карточки события и продаж.
+
+#### Launch-mode follow-up, 2026-06-19
+
+Статус: принято как срочная правка перед продажами.
+
+Что исправлено: public DTO теперь считает каталог, stats и destination summary только по будущим сеансам (`startsAt >= now()`). До правки `/api/public/events` мог начинаться с прошедших дат 30 мая 2026, хотя текущая дата уже 19 июня 2026. После правки live `/api/public/stats?refresh=1` показывает 387 продаваемых карточек вместо 496, а первые карточки каталога начинаются с ближайших слотов 19-20 июня 2026.
+
+Дополнительно: страница события теперь запрашивает ближайшие пять будущих сеансов внутри группы, Sources DTO фильтрует health по каталожным sync-запускам и больше не принимает `Ticketscloud orders REST polling` за свежесть каталога. Sources UI убран со стартового fallback payload, рабочие элементы русифицированы, а клиентская группировка событий сохраняет `readinessCodes` и `readinessIssues`.
+
+Проверка: `node --check apps/backend/src/dto.js`, `npm.cmd --prefix apps/admin run typecheck`, `npm.cmd --prefix apps/admin run build`, `npm.cmd --prefix apps/public run build`, live HTTP `/api/admin/sources`, `/api/public/stats?refresh=1`, `/api/public/events?limit=3&refresh=1`, `/api/public/events/{slug}`.
+
+Главный риск: Sources честно показывает TC catalog stale с 31 мая и Teplohod stale + `TEP_BRIDGE_NOT_CONFIGURED`. Для запуска продаж нужно прогнать свежий TC catalog sync и поднять Teplohod bridge через `TEP_API_URL`, иначе данные продаваемые, но операционно не свежие.
+
 Статус: принято после локальной DTO-проверки и сборки admin.
 
 Что сделано: `buildAdminSources` теперь отдает не только последний sync, а операционное здоровье источника: `lastSuccessAt`, `isStale`, `staleHours`, `consecutiveErrors`, `runningRuns`, `healthStatus` и `openIssues`. Sources UI показывает отдельные кнопки `Sync TC` и `Sync Teplohod`, grouped/raw counts, свежесть sync и явные проблемы вроде `STALE_SYNC_24H` или `TEP_BRIDGE_NOT_CONFIGURED`. Если backend недоступен, Sources больше не маскирует это fallback-таблицей, а показывает честный экран ошибки с повтором.

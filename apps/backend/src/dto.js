@@ -268,13 +268,14 @@ export async function buildAdminSources(db) {
       select status, mode, "startedAt", "finishedAt", error
       from "SourceSyncRun"
       where "sourceId" = source.id
+        and coalesce(mode, '') !~* 'orders|order|polling'
       order by "startedAt" desc
       limit 1
     ) latest on true
     left join lateral (
       select "startedAt", "finishedAt"
       from "SourceSyncRun"
-      where "sourceId" = source.id and status::text = 'SUCCESS'
+      where "sourceId" = source.id and status::text = 'SUCCESS' and coalesce(mode, '') !~* 'orders|order|polling'
       order by "startedAt" desc
       limit 1
     ) last_success on true
@@ -284,6 +285,7 @@ export async function buildAdminSources(db) {
         count(*) filter (where status::text = 'RUNNING')::int as "runningRuns"
       from "SourceSyncRun"
       where "sourceId" = source.id
+        and coalesce(mode, '') !~* 'orders|order|polling'
         and "startedAt" > coalesce(last_success."startedAt", timestamp '1970-01-01')
     ) sync_health on true
     group by
@@ -2405,9 +2407,9 @@ export async function buildPublicStats(db) {
             coalesce(e.title, '') as title,
             coalesce(city.title, '') as city,
             coalesce(e."venueId", venue.title, '') as venue_key,
-            min(session."startsAt") as starts_at,
+            min(session."startsAt") filter (where session."startsAt" >= now()) as starts_at,
             min(e."priceFromRub") filter (where e."priceFromRub" >= $1) as event_price,
-            min(session."priceFromRub") filter (where session."priceFromRub" >= $1) as session_price,
+            min(session."priceFromRub") filter (where session."startsAt" >= now() and session."priceFromRub" >= $1) as session_price,
             min(primary_offer."priceRub") filter (where primary_offer."priceRub" >= $1) as offer_price,
             bool_or(
               primary_offer."widgetUrl" is not null
@@ -2960,6 +2962,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
           limit 1
         ) session_offer on true
         where session."eventId" = any($1)
+          and (session."startsAt" is null or session."startsAt" >= now())
         order by session."startsAt" asc nulls last
         limit 5
       `,
@@ -3995,9 +3998,9 @@ async function destinationSummaryRowsFast(db) {
           region.title as "regionTitle",
           venue.id as "venueId",
           venue.title as venue,
-          min(session."startsAt") as "startsAt",
+          min(session."startsAt") filter (where session."startsAt" >= now()) as "startsAt",
           min(e."priceFromRub") filter (where e."priceFromRub" >= $1) as "eventPriceFromRub",
-          min(session."priceFromRub") filter (where session."priceFromRub" >= $1) as "sessionPriceFromRub",
+          min(session."priceFromRub") filter (where session."startsAt" >= now() and session."priceFromRub" >= $1) as "sessionPriceFromRub",
           min(primary_offer."priceRub") filter (where primary_offer."priceRub" >= $1) as "offerPriceRub",
           bool_or(
             primary_offer."widgetUrl" is not null
@@ -4320,9 +4323,9 @@ async function publicCatalogSessionsFast(db) {
           primary_offer."priceRub" as "offerPriceRub",
           primary_offer."widgetUrl" as "offerWidgetUrl",
           primary_offer."deeplinkUrl" as "offerDeeplinkUrl",
-          min(session."startsAt") as "startsAt",
-          min(session."priceFromRub") filter (where session."priceFromRub" >= $1) as "sessionPriceFromRub",
-          count(distinct session.id)::int as "slotCount",
+          min(session."startsAt") filter (where session."startsAt" >= now()) as "startsAt",
+          min(session."priceFromRub") filter (where session."startsAt" >= now() and session."priceFromRub" >= $1) as "sessionPriceFromRub",
+          count(distinct session.id) filter (where session."startsAt" >= now())::int as "slotCount",
           coalesce(array_remove(array_agg(distinct tag.title), null), '{}') as tags
         from "Event" e
         left join "Category" cat on cat.id = e."categoryId"

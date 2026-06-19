@@ -134,6 +134,8 @@ function groupAdminRows(events: AdminEventRow[]): AdminEventRow[] {
         landingHits: [...(event.landingHits || [])],
         tags: [...(event.tags || [])],
         reasons: [...(event.reasons || [])],
+        readinessCodes: [...(event.readinessCodes || [])],
+        readinessIssues: [...(event.readinessIssues || [])],
       });
       continue;
     }
@@ -149,6 +151,8 @@ function groupAdminRows(events: AdminEventRow[]): AdminEventRow[] {
     current.landingHits = Array.from(new Set([...(current.landingHits || []), ...(event.landingHits || [])]));
     current.tags = Array.from(new Set([...(current.tags || []), ...(event.tags || [])]));
     current.reasons = Array.from(new Set([...(current.reasons || []), ...(event.reasons || [])]));
+    current.readinessCodes = Array.from(new Set([...(current.readinessCodes || []), ...(event.readinessCodes || [])]));
+    current.readinessIssues = mergeReadinessIssues(current.readinessIssues, event.readinessIssues);
     current.priceFrom = priceCandidates.length ? Math.min(...priceCandidates) : null;
     current.vacant = vacantCandidates.length ? vacantCandidates.reduce((sum, value) => sum + value, 0) : null;
     current.hasImage = current.hasImage || event.hasImage;
@@ -185,6 +189,15 @@ function groupAdminRows(events: AdminEventRow[]): AdminEventRow[] {
     const rightTime = right.startsAt ? new Date(right.startsAt).getTime() : Number.POSITIVE_INFINITY;
     return leftTime - rightTime || left.title.localeCompare(right.title, 'ru');
   });
+}
+
+function mergeReadinessIssues(left?: AdminEventRow['readinessIssues'], right?: AdminEventRow['readinessIssues']) {
+  const byCode = new Map<string, NonNullable<AdminEventRow['readinessIssues']>[number]>();
+  for (const issue of [...(left || []), ...(right || [])]) {
+    if (!issue?.code || byCode.has(issue.code)) continue;
+    byCode.set(issue.code, issue);
+  }
+  return Array.from(byCode.values());
 }
 
 function worstReadiness(left: AdminEventRow['readiness'], right: AdminEventRow['readiness']) {

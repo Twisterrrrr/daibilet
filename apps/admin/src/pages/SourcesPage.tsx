@@ -5,12 +5,26 @@ import { DataTableShell, InfoNote, PageHeader, SourceBadge, StatusBadge } from '
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { adminData, formatDateTime, formatMoney, formatNumber } from '@/data';
+import { formatDateTime, formatMoney, formatNumber } from '@/data';
 import type { AdminSourceRow, AdminSourcesPayload } from '@/types';
 
 const API_BASE_URL =
   ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
   'http://127.0.0.1:4000';
+
+const EMPTY_SOURCES_PAYLOAD: AdminSourcesPayload = {
+  generatedAt: new Date().toISOString(),
+  sources: [],
+  metrics: {
+    sources: 0,
+    live: 0,
+    healthy: 0,
+    stale: 0,
+    openIssues: 0,
+    events: 0,
+    sessions: 0,
+  },
+};
 
 const SOURCE_SYNC_CONFIG = {
   TICKETSCLOUD: {
@@ -24,7 +38,7 @@ const SOURCE_SYNC_CONFIG = {
 } as const;
 
 export function SourcesPage() {
-  const [payload, setPayload] = React.useState<AdminSourcesPayload>(() => buildFallbackSourcesPayload());
+  const [payload, setPayload] = React.useState<AdminSourcesPayload>(() => EMPTY_SOURCES_PAYLOAD);
   const [loading, setLoading] = React.useState(true);
   const [syncingSource, setSyncingSource] = React.useState<string | null>(null);
   const [notice, setNotice] = React.useState<string | null>(null);
@@ -75,18 +89,18 @@ export function SourcesPage() {
           <div className="flex flex-wrap gap-2">
             <Button type="button" variant="outline" onClick={() => syncSource('TICKETSCLOUD')} disabled={Boolean(syncingSource)}>
               <RefreshCw className={`mr-2 h-4 w-4 ${syncingSource === 'TICKETSCLOUD' ? 'animate-spin' : ''}`} />
-              Sync TC
+              Синхронизировать TC
             </Button>
             <Button type="button" variant="outline" onClick={() => syncSource('TEPLOHOD')} disabled={Boolean(syncingSource)}>
               <RefreshCw className={`mr-2 h-4 w-4 ${syncingSource === 'TEPLOHOD' ? 'animate-spin' : ''}`} />
-              Sync Teplohod
+              Синхронизировать Teplohod
             </Button>
           </div>
         }
         meta={
           <>
             <StatusBadge status="live" label={`${formatNumber(payload.metrics.healthy ?? payload.metrics.live)} здоровых`} />
-            {payload.metrics.stale ? <StatusBadge status="error" label={`${formatNumber(payload.metrics.stale)} stale`} /> : null}
+            {payload.metrics.stale ? <StatusBadge status="error" label={`${formatNumber(payload.metrics.stale)} устарело`} /> : null}
             <span className="text-xs text-muted-foreground">
               {formatNumber(payload.metrics.events)} событий · {formatNumber(payload.metrics.sessions)} сеансов
             </span>
@@ -137,7 +151,7 @@ export function SourcesPage() {
                 </td>
                 <td className="px-4 py-3 align-top">
                   <StatusBadge status={sourceHealthBadge(source.healthStatus || source.status)} label={sourceHealthLabel(source.healthStatus || source.status)} />
-                  <div className="mt-2 text-xs text-muted-foreground">{source.enabled ? 'enabled' : 'disabled'}</div>
+                  <div className="mt-2 text-xs text-muted-foreground">{source.enabled ? 'включен' : 'выключен'}</div>
                   <IssueBadges issues={source.openIssues} limit={3} />
                 </td>
                 <td className="px-4 py-3 align-top text-sm">
@@ -204,7 +218,7 @@ function SourceSummaryCard({ source }: { source: AdminSourceRow }) {
       <div className="mt-3 grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
         <span>успешный sync: {source.lastSuccessAt ? formatDateTime(source.lastSuccessAt) : 'нет'}</span>
         <span>ошибок подряд: {formatNumber(source.consecutiveErrors ?? 0)}</span>
-        <span>{source.isStale ? `stale ${formatNumber(source.staleHours)} ч` : 'sync свежий'}</span>
+        <span>{source.isStale ? `устарело ${formatNumber(source.staleHours)} ч` : 'импорт свежий'}</span>
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
@@ -292,51 +306,4 @@ function sourceHealthLabel(status: string): string {
   if (normalized === 'error') return 'ошибка';
   if (normalized === 'paused') return 'пауза';
   return status;
-}
-
-function buildFallbackSourcesPayload(): AdminSourcesPayload {
-  const rows = adminData.eventRows;
-  const grouped = new Map<string, AdminSourceRow>();
-
-  for (const row of rows) {
-    const code = row.offerSourceCode || row.source || 'TICKETSCLOUD';
-    const current =
-      grouped.get(code) ||
-      ({
-        id: code,
-        code,
-        name: code === 'TEPLOHOD' ? 'Teplohod.info' : code === 'TICKETSCLOUD' ? 'Ticketscloud' : code,
-        enabled: true,
-        status: 'incomplete',
-        purchaseReady: false,
-        events: 0,
-        rawEvents: 0,
-        venues: 0,
-        cities: 0,
-        sessions: 0,
-        offers: 0,
-      } satisfies AdminSourceRow);
-    current.events += 1;
-    current.rawEvents = (current.rawEvents ?? 0) + (row.groupedEventsCount || 1);
-    current.sessions += row.slotCount || 0;
-    current.offers += row.offerPriceRub ? 1 : 0;
-    current.purchaseReady = current.purchaseReady || Boolean(row.offerWidgetUrl || row.offerDeeplinkUrl || code === 'TEPLOHOD');
-    grouped.set(code, current);
-  }
-
-  const sources = Array.from(grouped.values()).map((source) => ({
-    ...source,
-    status: source.events > 0 && source.purchaseReady ? 'live' : 'incomplete',
-  }));
-
-  return {
-    generatedAt: adminData.generatedAt,
-    sources,
-    metrics: {
-      sources: sources.length,
-      live: sources.filter((source) => source.status === 'live').length,
-      events: sources.reduce((sum, source) => sum + source.events, 0),
-      sessions: sources.reduce((sum, source) => sum + source.sessions, 0),
-    },
-  };
 }
