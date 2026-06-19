@@ -101,18 +101,20 @@ createServer(async (request, response) => {
     }
 
     if (route === 'GET /api/public/home') {
+      if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public home refresh');
       sendJson(response, await withDataFallback(() => buildPublicHome(db), 'apps/public/data.js', 'PUBLIC_DATA'));
       return;
     }
 
     if (route === 'GET /api/public/stats') {
+      if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public stats refresh');
       sendJson(response, await buildPublicStats(db));
       return;
     }
 
     if (route === 'GET /api/public/events') {
       if (url.searchParams.get('refresh') === '1') publicResponseCache.clear();
-      const catalogCacheKey = `events:${url.searchParams.toString()}`;
+      const catalogCacheKey = `events:${canonicalSearchParams(url.searchParams, ['refresh'])}`;
       const catalogPayload =
         url.searchParams.get('refresh') === '1'
           ? await withDataFallback(() => buildCatalogSessions(db, url.searchParams), 'apps/public/data.js', 'PUBLIC_DATA', (payload) => filterSessions(payload.sessions || [], url.searchParams))
@@ -169,6 +171,13 @@ createServer(async (request, response) => {
     if (route === 'POST /api/v1/tep/sync') {
       const result = await runTeplohodSync();
       invalidatePublicCaches('teplohod sync', { warm: true });
+      sendJson(response, result);
+      return;
+    }
+
+    if (route === 'POST /api/v1/tc/sync' || route === 'POST /api/admin/sources/ticketscloud/sync') {
+      const result = await runTicketscloudCatalogSync();
+      invalidatePublicCaches('ticketscloud catalog sync', { warm: true });
       sendJson(response, result);
       return;
     }
@@ -556,6 +565,17 @@ function clampNumber(value, min, max, fallback) {
   return Math.min(max, Math.max(min, Math.trunc(parsed)));
 }
 
+function canonicalSearchParams(searchParams, excludeKeys = []) {
+  const excluded = new Set(excludeKeys);
+  const pairs = [];
+  for (const [key, value] of searchParams.entries()) {
+    if (excluded.has(key)) continue;
+    pairs.push([key, value]);
+  }
+  pairs.sort(([aKey, aValue], [bKey, bValue]) => aKey.localeCompare(bKey) || aValue.localeCompare(bValue));
+  return new URLSearchParams(pairs).toString();
+}
+
 function runTeplohodSync() {
   return new Promise((resolve, reject) => {
     const startedAt = new Date().toISOString();
@@ -597,6 +617,46 @@ function runTeplohodSync() {
         startedAt,
         finishedAt: new Date().toISOString(),
         stats,
+        output: stdout.trim(),
+      });
+    });
+  });
+}
+
+function runTicketscloudCatalogSync() {
+  return new Promise((resolve, reject) => {
+    const startedAt = new Date().toISOString();
+    const child = spawn(process.execPath, [path.join(rootDir, 'scripts', 'tc-full-sync.js')], {
+      cwd: rootDir,
+      env: process.env,
+      windowsHide: true,
+    });
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on('error', reject);
+    child.on('close', async (code) => {
+      if (code !== 0) {
+        const error = new Error(stderr || stdout || `Ticketscloud catalog sync failed with exit code ${code}`);
+        error.statusCode = 500;
+        reject(error);
+        return;
+      }
+
+      const summary = await readJsonFileIfExists('data/ticketscloud/summary.public.json');
+      resolve({
+        ok: true,
+        source: 'TICKETSCLOUD',
+        mode: 'catalog',
+        startedAt,
+        finishedAt: new Date().toISOString(),
+        stats: summary?.counts || parseLastJsonObject(stdout)?.counts || parseLastJsonObject(stdout),
         output: stdout.trim(),
       });
     });
@@ -657,6 +717,27 @@ function runTicketscloudOrdersSync(searchParams = new URLSearchParams()) {
       });
     });
   });
+}
+
+function parseLastJsonObject(text) {
+  const source = String(text || '').trim();
+  if (!source) return null;
+  for (let index = source.lastIndexOf('{'); index >= 0; index = source.lastIndexOf('{', index - 1)) {
+    try {
+      return JSON.parse(source.slice(index));
+    } catch {
+      // Keep scanning earlier braces in stdout; progress logs may contain text before JSON.
+    }
+  }
+  return null;
+}
+
+async function readJsonFileIfExists(relativePath) {
+  try {
+    return JSON.parse(await readFile(path.join(rootDir, relativePath), 'utf8'));
+  } catch {
+    return null;
+  }
 }
 
 function appendCliArg(args, key, value) {

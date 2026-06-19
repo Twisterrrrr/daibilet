@@ -121,6 +121,20 @@
 
 Следующий контрольный шаг: пройти руками маршруты `главная -> каталог -> карточка -> покупка`, `главная -> города -> страница города -> карточка`, `подвал -> privacy/legal` в браузере.
 
+### Public performance mentor follow-up, 2026-06-19
+
+Статус: принято с одним открытым warning.
+
+Что сделано: добавлен backend route `POST /api/v1/tc/sync` и алиас `/api/admin/sources/ticketscloud/sync`, который запускает существующий `tc-full-sync.js`, после завершения сбрасывает public caches и прогревает главную. Cache key для `/api/public/events` теперь строится из канонически отсортированных query params, поэтому одинаковые фильтры в разном порядке попадают в один cache entry.
+
+Также `npm run public:perf` расширен HTTP-замерами `/api/public/stats`, `/api/public/home`, `/api/public/events` с бюджетами. Snapshot теперь работает как контрольная панель: stats cold < 300 ms, catalog warm < 100 ms, home cold желательно < 1000 ms.
+
+Результат HTTP snapshot: stats cold 270 ms — ok, catalog warm 9 ms — ok, home cold 2209 ms — warn.
+
+Главный риск: `/api/public/home` cold все еще строит полноценный public catalog, чтобы отдать главную. За счет startup/sync warm-up покупатель обычно должен видеть warm path, но технический долг остается.
+
+Следующий контрольный шаг: выделить отдельный home DTO, который не строит весь каталог: быстрые stats, легкий список направлений, 60-120 ближайших сгруппированных карточек и отдельные landing counts.
+
 ## Текущая оценка
 
 Оценка состояния MVP: 7/10.
