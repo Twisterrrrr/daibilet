@@ -3,21 +3,20 @@ import { Compass } from 'lucide-react';
 import { publicData } from '@/data';
 
 const catalogLinks = [
-  { label: 'Экскурсии', href: '/#events' },
-  { label: 'Музеи и арт', href: '/#events' },
-  { label: 'Мероприятия', href: '/#events' },
+  { label: 'Экскурсии', href: '/events?category=Экскурсии' },
+  { label: 'Музеи и арт', href: '/events?category=Музеи+и+арт' },
+  { label: 'Мероприятия', href: '/events?category=Мероприятия' },
+  { label: 'Активный отдых', href: '/events?category=Активный+отдых' },
+  { label: 'Развлечения', href: '/events?category=Развлечения' },
   { label: 'Речные прогулки', href: '/landings/river-walks' },
   { label: 'Автобусные экскурсии', href: '/landings/bus-sightseeing' },
-  { label: 'Новый год', href: '/landings/new-year' },
 ];
 
 const companyLinks = [
-  { label: 'О сервисе', href: '/#top' },
-  { label: 'Стать партнером', href: '/#partner' },
+  { label: 'О сервисе', href: '/' },
   { label: 'Подборки', href: '/#landings' },
   { label: 'Города', href: '/cities' },
   { label: 'Мои заказы', href: '/my-orders' },
-  { label: 'Статьи', href: '/blog' },
   { label: 'Помощь', href: 'mailto:hello@daibilet.ru' },
 ];
 
@@ -69,7 +68,6 @@ export function Footer() {
             <div className="flex flex-wrap gap-x-5 gap-y-1 sm:justify-end">
               <a href="/privacy" className="hover:text-slate-600">Политика конфиденциальности</a>
               <a href="/legal" className="hover:text-slate-600">Правовая информация</a>
-              <a href="/offer" className="hover:text-slate-600">Оферта для партнеров</a>
             </div>
           </div>
         </div>

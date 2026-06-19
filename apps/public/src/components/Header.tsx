@@ -4,12 +4,12 @@ import { ChevronDown, Compass, Heart, HelpCircle, MapPin, Menu, Search, X } from
 import { publicData } from '@/data';
 
 const navigation = [
-  { label: 'Экскурсии', section: 'events' },
-  { label: 'Музеи и Арт', section: 'events' },
-  { label: 'Мероприятия', section: 'events' },
+  { label: 'Экскурсии', href: '/events?category=Экскурсии' },
+  { label: 'Музеи и арт', href: '/events?category=Музеи+и+арт' },
+  { label: 'Мероприятия', href: '/events?category=Мероприятия' },
+  { label: 'Активный отдых', href: '/events?category=Активный+отдых' },
   { label: 'Подборки', section: 'landings' },
   { label: 'Города', section: 'cities' },
-  { label: 'Статьи', section: 'blog' },
   { label: 'Мои заказы', section: 'orders' },
 ];
 
@@ -24,8 +24,13 @@ type HeaderProps = {
 export function Header({ cityLabel, search, onSearch, onSection, onDestination }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
-  const go = (section: string) => {
+  const go = (itemOrSection: string | { section?: string; href?: string }) => {
     setMobileOpen(false);
+    if (typeof itemOrSection !== 'string' && itemOrSection.href) {
+      window.location.href = itemOrSection.href;
+      return;
+    }
+    const section = typeof itemOrSection === 'string' ? itemOrSection : itemOrSection.section || 'top';
     if (section === 'orders') {
       window.location.href = '/my-orders';
       return;
@@ -48,7 +53,7 @@ export function Header({ cityLabel, search, onSearch, onSection, onDestination }
             <button
               key={item.label}
               type="button"
-              onClick={() => go(item.section)}
+              onClick={() => go(item)}
               className="shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
             >
               {item.label}
@@ -103,7 +108,7 @@ export function Header({ cityLabel, search, onSearch, onSection, onDestination }
               <button
                 key={item.label}
                 type="button"
-                onClick={() => go(item.section)}
+                onClick={() => go(item)}
                 className="block w-full whitespace-nowrap rounded-lg px-3 py-2.5 text-left text-base font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
               >
                 {item.label}
