@@ -1,4 +1,4 @@
-# Daibilet MVP Mentor Review
+﻿# Daibilet MVP Mentor Review
 
 Этот документ фиксирует независимую проверку MVP перед первыми продажами.
 Роль ментора: архитектор-тимлид. Он не пишет код вместо основного исполнителя, а ищет риски запуска, слабые места UX, ошибки в данных и места, где код может выглядеть рабочим, но ломать продажный сценарий.
@@ -284,8 +284,9 @@ Readiness событий переведен на backend-коды: `NO_FUTURE_SE
 
 Что сделано: public/admin сборки отвязаны от абсолютных путей `D:\coding\SPBBOATS`, root npm scripts переведены с Windows-only `npm.cmd` на кроссплатформенный `npm`, добавлены локальные lock-файлы для `apps/public` и `apps/admin`. Backend получил Basic Auth для `/api/admin/*`, `/api/v1/tc/*`, `/api/v1/tep/*` и `/api/db/*`; public API остается открытым.
 
-Проверка: `node --check apps/backend/src/server.js`, `npm run public:build`, `npm run admin:build`. Дополнительно поднят backend на порту `4011` с `DAIBILET_REQUIRE_ADMIN_AUTH=1`, `ADMIN_EMAIL=admin@dabilet.ru`, `ADMIN_PASSWORD=admin123`: `/api/admin/sources` без auth вернул `401`, с auth вернул `200`, `/api/public/stats` вернул `200`.
+Проверка: `node --check apps/backend/src/server.js`, `npm run public:build`, `npm run admin:build`. Дополнительно поднят backend на порту `4011` с `DAIBILET_REQUIRE_ADMIN_AUTH=1`, `ADMIN_EMAIL=admin@daibilet.ru`, `ADMIN_PASSWORD=admin123`: `/api/admin/sources` без auth вернул `401`, с auth вернул `200`, `/api/public/stats` вернул `200`.
 
 Документы: добавлены `docs/deploy-timeweb.md`, `deploy/systemd/daibilet-api.service`, `deploy/nginx/daibilet.conf.example`, обновлен `.env.example`.
 
-Остаточный риск: admin login написан как `admin@dabilet.ru`, это отличается от бренда `daibilet.ru`. Перед выкладкой нужно подтвердить, что это не опечатка. Teplohod production sync нужно проверять уже с сервера `213.171.7.16`, потому что именно этот IP whitelist.
+Остаточный риск: Teplohod production sync нужно проверять уже с сервера `213.171.7.16`, потому что именно этот IP whitelist.
+

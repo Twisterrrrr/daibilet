@@ -1,4 +1,4 @@
-# Deploy: Timeweb Cloud MVP
+﻿# Deploy: Timeweb Cloud MVP
 
 Дата: 2026-06-20.
 
@@ -12,9 +12,7 @@
 - Public: `https://daibilet.ru`.
 - Admin: `https://admin.daibilet.ru`.
 - API: `https://api.daibilet.ru`.
-- Временный admin login: `admin@dabilet.ru`.
-
-Перед запуском нужно подтвердить spelling admin login: `admin@dabilet.ru` отличается от домена `daibilet.ru`.
+- Временный admin login: `admin@daibilet.ru`.
 
 ## Что не затираем
 
@@ -60,7 +58,7 @@ PORT=4000
 DATABASE_URL=postgresql://...
 
 DAIBILET_REQUIRE_ADMIN_AUTH=1
-ADMIN_EMAIL=admin@dabilet.ru
+ADMIN_EMAIL=admin@daibilet.ru
 ADMIN_PASSWORD=...
 # или лучше:
 # ADMIN_PASSWORD_HASH=sha256:<hex>
@@ -96,6 +94,18 @@ node -e "console.log('sha256:' + require('node:crypto').createHash('sha256').upd
 ```
 
 ## Install/build
+
+После первого `git clone` можно деплоить одной командой:
+
+```bash
+cd /opt/daibilet
+chmod +x deploy/scripts/deploy-from-git.sh
+deploy/scripts/deploy-from-git.sh
+```
+
+Скрипт делает `git pull`, ставит зависимости, применяет миграции, собирает public/admin, копирует `dist` в `/var/www/daibilet/*`, рестартует `daibilet-api` и проверяет `/api/health`.
+
+Ручной вариант ниже оставлен как fallback:
 
 ```bash
 cd /opt/daibilet
@@ -163,7 +173,7 @@ Backend тоже защищает `/api/admin/*`, `/api/v1/tc/*`, `/api/v1/tep/*
 ```bash
 apt-get update
 apt-get install -y apache2-utils
-htpasswd -bc /etc/nginx/.htpasswd-daibilet-admin admin@dabilet.ru '<password>'
+htpasswd -bc /etc/nginx/.htpasswd-daibilet-admin admin@daibilet.ru '<password>'
 cp deploy/nginx/daibilet.conf.example /etc/nginx/sites-available/daibilet.conf
 ln -s /etc/nginx/sites-available/daibilet.conf /etc/nginx/sites-enabled/daibilet.conf
 nginx -t
@@ -178,8 +188,8 @@ systemctl reload nginx
 
 ```bash
 curl https://api.daibilet.ru/api/health
-curl -u "admin@dabilet.ru:<password>" -X POST https://admin.daibilet.ru/api/v1/tc/sync
-curl -u "admin@dabilet.ru:<password>" -X POST https://admin.daibilet.ru/api/v1/tep/sync
+curl -u "admin@daibilet.ru:<password>" -X POST https://admin.daibilet.ru/api/v1/tc/sync
+curl -u "admin@daibilet.ru:<password>" -X POST https://admin.daibilet.ru/api/v1/tep/sync
 curl "https://api.daibilet.ru/api/public/stats?refresh=1"
 ```
 
@@ -196,3 +206,4 @@ Teplohod лучше проверять именно на сервере `213.171
 - `api.daibilet.ru/api/admin/dashboard` без auth возвращает `401`.
 - Sources показывает TC и Teplohod, last sync, counts, ошибки.
 - Orders/Buyers не показывают моковые данные.
+
