@@ -1,28 +1,25 @@
 # Public
 
-Vite React public-каталог на данных Ticketscloud full sync.
+Vite React public-каталог Дайбилета: главная, каталог, страницы событий, городов, площадок, лендингов и покупок.
 
-## Что перенесено из старого frontend
-
-- Tailwind config и `globals.css`.
-- Header-композиция: sticky topbar, логотип, навигация, город, поиск, иконки.
-- `container-page`, `btn-primary`, `btn-secondary`, `card` utility layer.
-- EventCard-паттерн: image area, gradient overlay, бейджи, цена, город, теги, hover-scale.
-- Landing-card и quick-buy table паттерны.
-
-## Запуск
+## Локальный запуск
 
 ```bash
-npm.cmd run public:data
-npm.cmd run public:build
-npm.cmd run public:serve
+npm --prefix apps/public install
+npm run public:serve
 ```
 
 URL:
 
 ```text
-http://127.0.0.1:5173
+http://127.0.0.1:5178
 ```
 
-`public:serve` сейчас запускает preview из `dist`, потому что dev-режим через внешний Vite toolchain нестабилен в этой локальной связке. Для текущего визуального просмотра preview надежнее.
+## Проверка
 
+```bash
+npm --prefix apps/public run typecheck
+npm run public:build
+```
+
+В production public собирается со значением `VITE_DAIBILET_API_URL=https://api.daibilet.ru`.

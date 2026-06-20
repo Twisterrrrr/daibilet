@@ -1,5 +1,6 @@
 import { createServer } from 'node:http';
 import { spawn } from 'node:child_process';
+import { createHash, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
@@ -44,6 +45,12 @@ const rootDir = path.resolve(dirname, '..', '..', '..');
 loadRootEnv(rootDir);
 const port = Number(process.env.PORT || 4000);
 const db = createDb(rootDir);
+const adminAuth = {
+  email: process.env.ADMIN_EMAIL || process.env.ADMIN_USER || '',
+  password: process.env.ADMIN_PASSWORD || '',
+  passwordHash: process.env.ADMIN_PASSWORD_SHA256 || process.env.ADMIN_PASSWORD_HASH || '',
+  realm: process.env.ADMIN_AUTH_REALM || 'Daibilet admin',
+};
 
 const jsonCache = new Map();
 const PUBLIC_RESPONSE_CACHE_MS = 5 * 60 * 1000;
@@ -76,6 +83,11 @@ createServer(async (request, response) => {
 
     const url = new URL(request.url || '/', `http://${request.headers.host || '127.0.0.1'}`);
     const route = `${request.method} ${url.pathname}`;
+
+    if (isProtectedPath(url.pathname) && !isAuthorizedAdminRequest(request)) {
+      sendAuthRequired(response);
+      return;
+    }
 
     if (route === 'GET /api/health') {
       sendJson(response, {
@@ -745,12 +757,80 @@ function appendCliArg(args, key, value) {
   args.push(`--${key}=${value}`);
 }
 
+function isProtectedPath(pathname) {
+  return (
+    pathname === '/api/db/stats' ||
+    pathname === '/api/db/events' ||
+    pathname.startsWith('/api/admin') ||
+    pathname.startsWith('/api/v1/tc') ||
+    pathname.startsWith('/api/v1/tep')
+  );
+}
+
+function isAdminAuthConfigured() {
+  return Boolean(adminAuth.email && (adminAuth.password || adminAuth.passwordHash));
+}
+
+function isAdminAuthRequired() {
+  return process.env.NODE_ENV === 'production' || process.env.DAIBILET_REQUIRE_ADMIN_AUTH === '1';
+}
+
+function isAuthorizedAdminRequest(request) {
+  if (!isAdminAuthConfigured()) return !isAdminAuthRequired();
+
+  const header = String(request.headers.authorization || '');
+  if (!header.startsWith('Basic ')) return false;
+
+  let decoded = '';
+  try {
+    decoded = Buffer.from(header.slice('Basic '.length), 'base64').toString('utf8');
+  } catch {
+    return false;
+  }
+
+  const separatorIndex = decoded.indexOf(':');
+  if (separatorIndex <= 0) return false;
+
+  const email = decoded.slice(0, separatorIndex);
+  const password = decoded.slice(separatorIndex + 1);
+  if (!safeEqualString(email, adminAuth.email)) return false;
+
+  if (adminAuth.passwordHash) {
+    const actualHash = createHash('sha256').update(password).digest('hex');
+    return safeEqualString(actualHash, normalizeSha256Hash(adminAuth.passwordHash));
+  }
+
+  return safeEqualString(password, adminAuth.password);
+}
+
+function normalizeSha256Hash(value) {
+  return String(value || '').trim().replace(/^sha256:/i, '').toLowerCase();
+}
+
+function safeEqualString(actual, expected) {
+  const actualDigest = createHash('sha256').update(String(actual)).digest();
+  const expectedDigest = createHash('sha256').update(String(expected)).digest();
+  return timingSafeEqual(actualDigest, expectedDigest);
+}
+
+function sendAuthRequired(response) {
+  response.writeHead(401, {
+    'access-control-allow-origin': '*',
+    'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
+    'access-control-allow-headers': 'content-type, authorization',
+    'www-authenticate': `Basic realm="${adminAuth.realm}", charset="UTF-8"`,
+    'content-type': 'application/json; charset=utf-8',
+    'cache-control': 'no-store',
+  });
+  response.end(JSON.stringify({ error: 'admin_auth_required' }));
+}
+
 function sendJson(response, payload, statusCode = 200) {
   const body = JSON.stringify(payload);
   response.writeHead(statusCode, {
     'access-control-allow-origin': '*',
     'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
-    'access-control-allow-headers': 'content-type',
+    'access-control-allow-headers': 'content-type, authorization',
     'content-type': 'application/json; charset=utf-8',
     'cache-control': 'no-store',
   });
@@ -761,7 +841,7 @@ function sendEmpty(response, statusCode) {
   response.writeHead(statusCode, {
     'access-control-allow-origin': '*',
     'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
-    'access-control-allow-headers': 'content-type',
+    'access-control-allow-headers': 'content-type, authorization',
   });
   response.end();
 }

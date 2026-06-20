@@ -2,11 +2,11 @@
 
 Local Postgres runs through Docker Compose.
 
-```powershell
+```bash
 docker compose up -d postgres
-$env:DATABASE_URL="postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet"
-npm.cmd --prefix packages/db run db:validate
-npm.cmd --prefix packages/db run db:migrate
+export DATABASE_URL="postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet"
+npm --prefix packages/db run db:validate
+npm --prefix packages/db run db:migrate
 ```
 
 The schema intentionally keeps only the MVP contour:

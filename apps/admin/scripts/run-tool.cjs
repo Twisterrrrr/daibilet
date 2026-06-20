@@ -3,14 +3,13 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const appDir = path.resolve(__dirname, '..');
-const oldBin = 'D:\\coding\\SPBBOATS\\packages\\frontend-admin-v4\\node_modules\\.bin';
+const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 
 function run(command, args) {
-  const executable = path.join(oldBin, command);
-  const line = `& '${executable}' ${args.join(' ')}`;
-  const result = spawnSync('powershell.exe', ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', line], {
+  const result = spawnSync(npm, ['exec', '--', command, ...args], {
     cwd: appDir,
     stdio: 'inherit',
+    shell: true,
   });
   if (result.error) {
     console.error(result.error.message);
@@ -22,15 +21,15 @@ function run(command, args) {
 const task = process.argv[2];
 
 if (task === 'typecheck') {
-  run('tsc.cmd', ['--noEmit', '-p', 'tsconfig.json']);
+  run('tsc', ['--noEmit', '-p', 'tsconfig.json']);
 } else if (task === 'build') {
-  run('tsc.cmd', ['--noEmit', '-p', 'tsconfig.json']);
-  run('vite.cmd', ['build', '--configLoader', 'runner']);
+  run('tsc', ['--noEmit', '-p', 'tsconfig.json']);
+  run('vite', ['build']);
   fs.copyFileSync(path.join(appDir, 'data.js'), path.join(appDir, 'dist', 'data.js'));
 } else if (task === 'dev') {
-  run('vite.cmd', ['--host', '127.0.0.1', '--port', '5176', '--configLoader', 'runner']);
+  run('vite', ['--host', '127.0.0.1', '--port', '5176']);
 } else if (task === 'preview') {
-  run('vite.cmd', ['preview', '--host', '127.0.0.1', '--port', '5176']);
+  run('vite', ['preview', '--host', '127.0.0.1', '--port', '5176']);
 } else {
   console.error(`Unknown admin task: ${task}`);
   process.exit(1);

@@ -1,10 +1,11 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
-import react from 'D:/coding/SPBBOATS/packages/frontend-admin-v4/node_modules/@vitejs/plugin-react/dist/index.js';
+import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export default {
+export default defineConfig({
   plugins: [react()],
   cacheDir: './.vite',
   resolve: {
@@ -15,4 +16,4 @@ export default {
   server: {
     port: 5173,
   },
-};
+});

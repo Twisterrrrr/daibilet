@@ -1,0 +1,14 @@
+[Unit]
+Description=Daibilet API
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/daibilet
+EnvironmentFile=/opt/daibilet/.env
+ExecStart=/usr/bin/env node apps/backend/src/server.js
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

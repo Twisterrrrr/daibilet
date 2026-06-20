@@ -616,7 +616,7 @@ function buildPriceSteps(sessions: PublicSession[]) {
     .map((session) => session.priceFrom)
     .filter((price): price is number => Number.isFinite(price) && Number(price) >= MIN_DISPLAY_PRICE_RUB)
     .sort((a, b) => a - b);
-  const max = prices.at(-1) || 0;
+  const max = prices[prices.length - 1] || 0;
   const candidates = [500, 1000, 1500, 2000, 3000, 5000].filter((price) => price <= max);
   return candidates.length ? candidates : [1000, 2000, 3000];
 }

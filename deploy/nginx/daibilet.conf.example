@@ -1,0 +1,93 @@
+# Daibilet nginx template.
+# SSL certificates can be managed by Timeweb/certbot. This file shows routing only.
+
+upstream daibilet_api {
+    server 127.0.0.1:4000;
+    keepalive 32;
+}
+
+server {
+    listen 80;
+    server_name daibilet.ru www.daibilet.ru;
+
+    root /var/www/daibilet/public;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://daibilet_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+server {
+    listen 80;
+    server_name api.daibilet.ru;
+
+    location = /api/health {
+        proxy_pass http://daibilet_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location ^~ /api/public/ {
+        proxy_pass http://daibilet_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location ~ ^/api/(admin|db|v1/(tc|tep)) {
+        auth_basic "Daibilet admin";
+        auth_basic_user_file /etc/nginx/.htpasswd-daibilet-admin;
+
+        proxy_pass http://daibilet_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Authorization $http_authorization;
+    }
+
+    location / {
+        return 404;
+    }
+}
+
+server {
+    listen 80;
+    server_name admin.daibilet.ru;
+
+    auth_basic "Daibilet admin";
+    auth_basic_user_file /etc/nginx/.htpasswd-daibilet-admin;
+
+    root /var/www/daibilet/admin;
+    index index.html;
+
+    location /api/ {
+        proxy_pass http://daibilet_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Authorization $http_authorization;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
