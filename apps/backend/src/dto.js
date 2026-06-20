@@ -4411,7 +4411,15 @@ async function publicCatalogSessionsFast(db) {
           min("priceFrom")::int as "priceFrom",
           nullif(sum(coalesce("ticketsVacant", 0)), 0)::int as vacant,
           jsonb_agg(
-            jsonb_build_object('eventId', id, 'startsAt', "startsAt")
+            jsonb_build_object(
+              'eventId', id,
+              'startsAt', "startsAt",
+              'externalId', "externalId",
+              'sourceCode', "sourceCode",
+              'offerSourceCode', "offerSourceCode",
+              'offerWidgetUrl', "offerWidgetUrl",
+              'offerDeeplinkUrl', "offerDeeplinkUrl"
+            )
             order by "startsAt" asc nulls last
           ) as "upcomingSlots"
         from ranked
@@ -4474,13 +4482,22 @@ function mapGroupedPublicSession(row) {
   const upcomingSlots = (Array.isArray(row.upcomingSlots) ? row.upcomingSlots : [])
     .filter((slot) => slot?.startsAt)
     .slice(0, 8)
-    .map((slot) => ({
-      eventId: slot.eventId,
-      startsAt: slot.startsAt,
-      dateLabel: formatDate(slot.startsAt),
-      timeLabel: formatTime(slot.startsAt),
-      purchaseUrl,
-    }));
+    .map((slot) => {
+      const slotPurchase = purchaseInfo({
+        sourceCode: slot.sourceCode || row.sourceCode,
+        offerSourceCode: slot.offerSourceCode || row.offerSourceCode || row.sourceCode,
+        offerWidgetUrl: slot.offerWidgetUrl,
+        offerDeeplinkUrl: slot.offerDeeplinkUrl,
+        externalId: slot.externalId || row.externalId,
+      });
+      return {
+        eventId: slot.eventId,
+        startsAt: slot.startsAt,
+        dateLabel: formatDate(slot.startsAt),
+        timeLabel: formatTime(slot.startsAt),
+        purchaseUrl: slotPurchase.url || purchaseUrl,
+      };
+    });
 
   const session = {
     id: row.id,
@@ -4760,6 +4777,7 @@ function mapPublicSession(row) {
       startsAt: slot.startsAt,
       dateLabel: slot.dateLabel,
       timeLabel: slot.timeLabel,
+      purchaseUrl: slot.purchaseUrl,
     })),
     landingSlugs: LANDING_RULES.filter((rule) => matchesRule(row, rule)).map((rule) => rule.slug),
     title: row.override?.title || row.title,

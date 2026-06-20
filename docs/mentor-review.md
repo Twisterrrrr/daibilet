@@ -248,3 +248,15 @@ Readiness событий переведен на backend-коды: `NO_FUTURE_SE
 Главный риск: сейчас системная дата 2026-06-19, а часть TC-событий в базе заканчивается 2026-05-30, поэтому readiness массово подсветит отсутствие будущих сеансов. Это правильно для запуска, но перед продажами нужно прогнать свежий TC sync и поднять Teplohod bridge через `TEP_API_URL`.
 
 Следующий контрольный шаг: нормализовать ticket categories/prices как отдельный read-model, чтобы страница события показывала реальные категории билетов, а не только агрегированную `priceFrom`.
+
+#### Launch-mode follow-up, 2026-06-20
+
+Статус: принято как продажный hotfix.
+
+Что сделано: прогнан свежий `tc:full-sync` через живой gRPC Ticketscloud, получено 6506 PUBLIC-записей, 162 площадки, 49 городов и 6363 оффера. SQL seed пересобран и применен к Postgres. Source Health после рестарта backend показывает `TICKETSCLOUD` в статусе `ok`, `lastSuccessAt = 2026-06-20T04:22:49.972Z`, без открытых проблем.
+
+Отдельно закрыт критичный риск каталога: grouped public card теперь строит `purchaseUrl` для каждого слота по его собственному `externalId`, а не по representative event. Проверка live API: в одной карточке `Обзорная экскурсия + Петропавловская крепость` первые четыре слота имеют разные TC `event` params: `69c3e2d8d85d086f7562122a`, `69c3e2dad85d086f75621237`, `69c3e2dbd85d086f75621244`, `69c3e2dcd85d086f75621251`.
+
+Проверка: `node --check apps/backend/src/dto.js`, `node --check scripts/tc-full-sync.js`, `node --check scripts/db-build-tc-seed-sql.js`, live HTTP `/api/admin/sources`, `/api/public/stats?refresh=1`, `/api/public/events?limit=1&refresh=1`.
+
+Остаточный риск: `TEPLOHOD` честно остается красным: `STALE_SYNC_24H` + `TEP_BRIDGE_NOT_CONFIGURED`. Для локального запуска нужен fixture bridge и `TEP_API_URL`, для боевого запуска логичнее российский сервер с белым IP, как и планируется.

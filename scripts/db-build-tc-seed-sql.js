@@ -150,7 +150,7 @@ insertRows("Category", ["id", "slug", "title", "position"], CATEGORIES.map(([cat
 insertRows("City", ["id", "slug", "title", "sourceTitle", "isDestination"], [...cities.values()], ["slug"]);
 insertRows("Venue", ["id", "slug", "title", "description", "cityId", "address", "latitude", "longitude", "kind", "pageStatus", "createdAt", "updatedAt"], [...venues.values()].map((row) => ({ ...row, createdAt: now, updatedAt: now })), ["slug"]);
 insertRows("Tag", ["id", "slug", "title"], [...tags.values()], ["slug"]);
-insertRows("Event", ["id", "title", "slug", "description", "kind", "status", "sourceStatus", "ageLimit", "imageUrl", "priceFromRub", "ticketsVacant", "primaryCityId", "venueId", "categoryId", "createdAt", "updatedAt"], [...events.values()].map((row) => ({ ...row, createdAt: now, updatedAt: now })), ["slug"]);
+insertRows("Event", ["id", "title", "slug", "description", "kind", "status", "sourceStatus", "ageLimit", "imageUrl", "priceFromRub", "ticketsVacant", "primaryCityId", "venueId", "categoryId", "createdAt", "updatedAt"], [...events.values()].map((row) => ({ ...row, createdAt: now, updatedAt: now })), ["id"]);
 insertRows("EventSourceLink", ["id", "eventId", "sourceId", "externalId", "metaExternalId", "updatedAt"], sourceLinks.map((row) => ({ ...row, updatedAt: now })), ["sourceId", "externalId"]);
 insertRows("EventSession", ["id", "eventId", "startsAt", "endsAt", "sourceStatus", "priceFromRub", "ticketsVacant", "externalId"], sessions, ["id"]);
 insertRows("EventOffer", ["id", "eventId", "sourceCode", "title", "priceRub", "payload", "active"], offers, ["id"]);

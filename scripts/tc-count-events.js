@@ -11,11 +11,11 @@ const outDir = path.join(rootDir, "data", "samples");
 const outPath = path.join(outDir, "ticketscloud-events-count.sample.json");
 
 const endpoint = process.env.TICKETSCLOUD_GRPC_ENDPOINT || "simple.ticketscloud.com:443";
-const token = process.env.TICKETSCLOUD_API_TOKEN || process.env.TICKETSCLOUD_API_KEY;
+const token = process.env.TICKETSCLOUD_API_TOKEN || process.env.TICKETSCLOUD_API_KEY || process.env.TC_API_TOKEN;
 const timeoutMs = Number(process.env.TICKETSCLOUD_COUNT_TIMEOUT_MS || 180000);
 
 if (!token) {
-  console.error("Missing TICKETSCLOUD_API_TOKEN in .env");
+  console.error("Missing Ticketscloud token: set TICKETSCLOUD_API_TOKEN, TICKETSCLOUD_API_KEY, or TC_API_TOKEN");
   process.exit(1);
 }
 
