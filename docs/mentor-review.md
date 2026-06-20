@@ -260,3 +260,15 @@ Readiness событий переведен на backend-коды: `NO_FUTURE_SE
 Проверка: `node --check apps/backend/src/dto.js`, `node --check scripts/tc-full-sync.js`, `node --check scripts/db-build-tc-seed-sql.js`, live HTTP `/api/admin/sources`, `/api/public/stats?refresh=1`, `/api/public/events?limit=1&refresh=1`.
 
 Остаточный риск: `TEPLOHOD` честно остается красным: `STALE_SYNC_24H` + `TEP_BRIDGE_NOT_CONFIGURED`. Для локального запуска нужен fixture bridge и `TEP_API_URL`, для боевого запуска логичнее российский сервер с белым IP, как и планируется.
+
+#### Teplohod local bridge follow-up, 2026-06-20
+
+Статус: принято как локальный запусковый контур до переезда на российский сервер.
+
+Что сделано: поднят `tep:fixture-bridge` на `http://127.0.0.1:8787/v1`, в локальный `.env` добавлен `TEP_API_URL=http://127.0.0.1:8787/v1`, backend перезапущен и прогнан `POST /api/v1/tep/sync`. Импорт прошел в режиме `api`: 186 source events, 18 cities, 14401 sessions, 697 offers, 1938 tags, 186 venues.
+
+Проверка: `GET /api/admin/sources` показывает `TEPLOHOD` в статусе `ok`, без `STALE_SYNC_24H` и без `TEP_BRIDGE_NOT_CONFIGURED`. В public catalog Teplohod участвует в выдаче, пример карточки: `Кремлевская обзорная речная прогулка по центру Москвы от причала «Новоспасский мост»`, provider `TEPLOHOD`, purchase URL `https://teplohod.info/event/1112`.
+
+Дополнительная проверка карточки события: `/api/public/events/kremlevskaya-obzornaya-rechnaya-progulka-po-centru-moskvy-ot-prichala-novospasskii-most-1112` отдает `widgetPayload` с `tepEventId = 1112`, ближайшие сеансы `purchaseReady = true`, а `ticketPrices` содержит реальные категории билетов Teplohod с ценами 350, 490, 590, 790, 1290 рублей.
+
+Остаточный риск: это все еще локальный fixture bridge, а не прямой белый IP Teplohod. Для первой боевой продажи нужно повторить тот же sync на российском сервере, где `TEP_API_URL` будет указывать на реальный доступный API/bridge.
