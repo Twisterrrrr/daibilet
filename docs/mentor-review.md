@@ -272,3 +272,9 @@ Readiness событий переведен на backend-коды: `NO_FUTURE_SE
 Дополнительная проверка карточки события: `/api/public/events/kremlevskaya-obzornaya-rechnaya-progulka-po-centru-moskvy-ot-prichala-novospasskii-most-1112` отдает `widgetPayload` с `tepEventId = 1112`, ближайшие сеансы `purchaseReady = true`, а `ticketPrices` содержит реальные категории билетов Teplohod с ценами 350, 490, 590, 790, 1290 рублей.
 
 Остаточный риск: это все еще локальный fixture bridge, а не прямой белый IP Teplohod. Для первой боевой продажи нужно повторить тот же sync на российском сервере, где `TEP_API_URL` будет указывать на реальный доступный API/bridge.
+
+#### QA/deploy checklist, 2026-06-20
+
+Статус: подготовлен общий лист допуска к первым продажам: `docs/launch-qa-and-deploy.md`.
+
+Менторская оценка: документ правильно удерживает фокус на launch-critical вещах: источники, покупка через виджеты, public smoke, admin smoke, API smoke, минимальная защита админки, домены, env и Git/CI/CD. Новые продуктовые фичи до прохождения этого списка не добавлять, кроме исправления блокеров.
