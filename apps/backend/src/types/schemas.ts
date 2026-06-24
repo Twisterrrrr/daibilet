@@ -1,9 +1,13 @@
 import { z } from 'zod';
 
 const optionalString = z.string().trim().min(1).optional();
-const nullableString = z.string().trim().min(1).nullable().optional();
+const nullableString = z.preprocess(
+  (value) => (typeof value === 'string' ? value.trim() || null : value),
+  z.string().nullable().optional(),
+);
 const optionalFlag = z.coerce.number().int().min(0).max(1).optional();
 const idList = z.array(z.string().trim().min(1)).max(100).optional();
+const publishStatus = z.enum(['DRAFT', 'REVIEW', 'READY', 'PUBLISHED', 'HIDDEN']);
 
 export const paginationQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(200).optional(),
@@ -70,7 +74,7 @@ export const eventOverridePayloadSchema = z.object({
   seoDescription: nullableString,
   canonicalPath: nullableString,
   isIndexable: z.boolean().nullable().optional(),
-  editorStatus: nullableString,
+  editorStatus: publishStatus.nullable().optional(),
 });
 
 export const landingMatchPayloadSchema = z.object({

@@ -146,6 +146,33 @@ Smoke 2026-06-24:
 - `GET /api/public/events?limit=9999` вернул `400 validation_error`;
 - legacy `PORT=4027 node apps/backend/src/server.js` поднялся и `GET /api/health` вернул `200`.
 
+## Phase 2.3: event override write route
+
+Цель: перенести следующий admin write-route, который напрямую влияет на public SEO и контент карточки события.
+
+Что сделано:
+
+- добавлен `src/admin-events-handler.ts`;
+- `PATCH /api/admin/events/:id/override` теперь обрабатывается в TS entrypoint до legacy handler;
+- body валидируется через `eventOverridePayloadSchema`;
+- пустые строки в nullable override-полях превращаются в `null`, что сохраняет поведение очистки override из UI;
+- `editorStatus` ограничен publish-статусами `DRAFT`, `REVIEW`, `READY`, `PUBLISHED`, `HIDDEN`;
+- после записи вызывается тот же `invalidatePublicCaches('event override update')`, что и в legacy route.
+
+Важно: production `node src/server.js` все еще идет через legacy route. Новый event override route активен только в `server-entry.ts`.
+
+Smoke 2026-06-24:
+
+- `npm run backend:typecheck` - ok;
+- `node --check apps/backend/src/server.js` - ok;
+- schema smoke: `{ title: '  ', seoTitle: '  SEO  ' }` парсится как `{ title: null, seoTitle: 'SEO' }`;
+- `PORT=4030 DAIBILET_REQUIRE_ADMIN_AUTH=1 ADMIN_EMAIL=admin@daibilet.ru ADMIN_PASSWORD=admin123 npm --prefix apps/backend run dev:ts` поднял TS entrypoint;
+- `GET /api/health` вернул `200`;
+- `PATCH /api/admin/events/evt_1/override` без auth вернул `401 admin_auth_required`;
+- тот же `PATCH` с auth, но `editorStatus='BROKEN'`, вернул `400 validation_error`;
+- тот же `PATCH` с auth и битым JSON body вернул `400 validation_error`;
+- legacy `PORT=4031 node apps/backend/src/server.js` поднялся и `GET /api/health` вернул `200`.
+
 ## Phase 3: dto.js decomposition
 
 Разрезать `dto.js` на 5-7 модулей:

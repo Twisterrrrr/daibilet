@@ -328,3 +328,15 @@ Follow-up: добавлены `routing.ts` и `validation.ts` как bridge дл
 
 Следующий контрольный шаг: переносить следующий write-route с похожей формой, лучше `PATCH /api/admin/events/:id/override`, потому что там уже есть zod-схема и это напрямую влияет на SEO/контент карточек.
 
+#### Event override TS route, 2026-06-24
+
+Статус: принято как полезный SEO/admin-срез.
+
+Что сделано: `PATCH /api/admin/events/:id/override` вынесен в typed route handler `admin-events-handler.ts`. Payload валидируется до legacy DTO, пустые строки становятся `null`, а `editorStatus` ограничен допустимыми publish-статусами. После успешной записи route сбрасывает public cache, чтобы карточка события и SEO-данные не зависали в старом состоянии.
+
+Проверка: `npm run backend:typecheck`, `node --check apps/backend/src/server.js`, schema smoke для очистки пустой строки, TS smoke с auth: health `200`, override без auth `401`, плохой `editorStatus` `400 validation_error`, malformed JSON `400 validation_error`, legacy health `200`.
+
+Менторская оценка: шаг принят. Codex не полез в SQL/DTO, но уже закрыл самый частый класс ошибок для контентных правок: мусорный payload, случайный статус и некорректная очистка поля. Это именно тот уровень строгости, который нужен до разрезания `dto.js`.
+
+Следующий контрольный шаг: либо перенести `PATCH /api/admin/events/:id/moderation` рядом с override, либо начать выделять `admin-events.dto.ts`, если хотим двигаться к декомпозиции `dto.js`.
+
