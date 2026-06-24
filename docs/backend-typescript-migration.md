@@ -47,6 +47,15 @@
    - body parsing.
 4. Оставить route map прежним, чтобы не менять поведение.
 
+Первый slice Phase 2:
+
+- `src/env.ts` - typed `.env` loader + zod schema;
+- `src/auth.ts` - Basic Auth config/checks + protected path predicate;
+- `src/http.ts` - JSON/empty/auth responses, request URL, body parsing;
+- `src/db.ts` - typed equivalent of current `db.js`.
+
+Важно: production runtime пока остается на `server.js` + `db.js`. Новые TS-модули будут подключаться следующим шагом через `server.ts` или точечную замену helper-импортов после smoke.
+
 ## Phase 3: dto.js decomposition
 
 Разрезать `dto.js` на 5-7 модулей:
@@ -89,4 +98,3 @@ Fastify/Nest имеет смысл после того, как:
 - есть хотя бы минимальные tests/snapshots.
 
 До этого framework migration даст больше движения, чем результата.
-
