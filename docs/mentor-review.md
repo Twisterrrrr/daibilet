@@ -290,3 +290,17 @@ Readiness событий переведен на backend-коды: `NO_FUTURE_SE
 
 Остаточный риск: Teplohod production sync нужно проверять уже с сервера `213.171.7.16`, потому что именно этот IP whitelist.
 
+#### Backend TypeScript foundation, 2026-06-24
+
+Статус: принято как безопасная инженерная ветка, не влияющая на launch `main`.
+
+Что сделано: создана ветка `backend-ts-foundation`, добавлены TypeScript-инфраструктура backend, DTO-типы, zod-схемы, typed `env/auth/http/db` модули и параллельный `server-entry.ts`. Старый `server.js` теперь экспортирует `handleRequest` и `startServer`, но при прямом запуске продолжает работать как раньше.
+
+Проверка: `npm run backend:typecheck`, `node --check apps/backend/src/server.js`, smoke `PORT=4022 npm --prefix apps/backend run dev:ts` + `/api/health = 200`, smoke legacy `PORT=4023 node apps/backend/src/server.js` + `/api/health = 200`.
+
+Менторская оценка: направление верное. Codex не переписал весь backend одним рывком, а сделал мост: можно сравнивать TS entrypoint и legacy entrypoint, не ломая деплой. Это правильная техника для монолита с большим `dto.js`.
+
+Остаточный риск: новые TS-модули пока почти не участвуют в реальном route handling, поэтому польза в основном инфраструктурная. Следующий обязательный шаг - подключить typed validation/route context к новым или безопасным маршрутам и только затем резать `dto.js` на доменные модули.
+
+Follow-up: добавлены `routing.ts` и `validation.ts` как bridge для следующего server split. Это не меняет runtime, но задает правильную форму будущих маршрутов: `RouteContext` + zod-валидация query/body + единый `validation_error`.
+

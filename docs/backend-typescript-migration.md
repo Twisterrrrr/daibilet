@@ -68,6 +68,23 @@ Smoke 2026-06-24:
 
 Локальный warm cache во время smoke может падать, если Postgres `127.0.0.1:5437` не поднят. Это не блокирует проверку entrypoint, но для сравнения public/admin routes нужно поднимать DB.
 
+Второй slice Phase 2:
+
+- `src/routing.ts` - typed `RouteContext`, `matchPath`, `isRoute`;
+- `src/validation.ts` - zod helpers для query/body payload и единая `validation_error` форма.
+
+Эти модули пока не подключены к legacy `server.js`. Их задача - дать безопасный API для следующего шага: выносить маршруты по одному и сразу заменять raw `URLSearchParams`/payload на typed validation.
+
+Пример будущего маршрута:
+
+```ts
+const context = createRouteContext(request, response);
+if (isRoute(context, 'GET /api/public/events')) {
+  const query = parseSearchParams(publicCatalogQuerySchema, context.searchParams);
+  sendJson(response, await buildCatalogSessions(db, query));
+}
+```
+
 ## Phase 3: dto.js decomposition
 
 Разрезать `dto.js` на 5-7 модулей:
