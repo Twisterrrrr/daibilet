@@ -316,3 +316,15 @@ Follow-up: добавлены `routing.ts` и `validation.ts` как bridge дл
 
 Остаточный риск: POST/PATCH body validation пока намеренно не включена, чтобы не съесть request stream до legacy handler. Следующий контрольный шаг - переносить по одному write route в TS-обработчик целиком, начиная с наименее рискованных admin payload: landing match или event override.
 
+#### First TS write route, 2026-06-24
+
+Статус: принято как аккуратный перенос одного admin write-сценария.
+
+Что сделано: `PATCH /api/admin/landings/:slug/matches/:eventId` вынесен в typed route handler `admin-landings-handler.ts`. Body валидируется zod-схемой, включая `groupEventIds/eventIds`, поэтому ручное закрепление/скрытие продолжает работать на сгруппированной карточке, а не на одном слоте. TS entrypoint теперь сам проверяет Basic Auth перед typed route handlers и после успешной записи вызывает public cache invalidation.
+
+Проверка: `npm run backend:typecheck`, `node --check apps/backend/src/server.js`, TS smoke с включенной auth: health `200`, PATCH без auth `401`, PATCH с плохим body `400 validation_error`, malformed JSON body `400 validation_error`, bad public query `400 validation_error`, legacy health `200`.
+
+Менторская оценка: шаг можно принимать. Самый важный риск был не в SQL, а в обходе auth и потере `groupEventIds`; оба закрыты до коммита. Хорошо, что доменная функция `updateAdminLandingMatch` пока оставлена legacy: это держит размер изменения маленьким.
+
+Следующий контрольный шаг: переносить следующий write-route с похожей формой, лучше `PATCH /api/admin/events/:id/override`, потому что там уже есть zod-схема и это напрямую влияет на SEO/контент карточек.
+

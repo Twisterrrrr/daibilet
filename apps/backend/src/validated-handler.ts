@@ -1,5 +1,7 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { sendJson } from './http.js';
+import type { AdminAuthConfig } from './auth.js';
+import { isAuthorizedAdminRequest, isProtectedPath } from './auth.js';
+import { sendAuthRequired, sendJson } from './http.js';
 import { createRouteContext, type RouteContext } from './routing.js';
 import {
   adminEventsQuerySchema,
@@ -12,12 +14,31 @@ import {
 import { isRequestValidationError, parseSearchParams } from './validation.js';
 
 export type AsyncRequestHandler = (request: IncomingMessage, response: ServerResponse) => void | Promise<void>;
+export type TypedRouteHandler = (context: RouteContext) => boolean | Promise<boolean>;
 
-export function createValidatedHandler(legacyHandler: AsyncRequestHandler): AsyncRequestHandler {
+export interface ValidatedHandlerOptions {
+  adminAuth?: AdminAuthConfig;
+  routeHandlers?: TypedRouteHandler[];
+}
+
+export function createValidatedHandler(
+  legacyHandler: AsyncRequestHandler,
+  options: ValidatedHandlerOptions = {},
+): AsyncRequestHandler {
   return async (request, response) => {
     try {
       const context = createRouteContext(request, response);
+      if (options.adminAuth && isProtectedPath(context.pathname) && !isAuthorizedAdminRequest(request, options.adminAuth)) {
+        sendAuthRequired(response, options.adminAuth);
+        return;
+      }
+
       validateSafeRouteQuery(context);
+
+      for (const routeHandler of options.routeHandlers || []) {
+        if (await routeHandler(context)) return;
+      }
+
       await legacyHandler(request, response);
     } catch (error) {
       if (response.writableEnded) return;

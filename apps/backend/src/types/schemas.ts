@@ -3,6 +3,7 @@ import { z } from 'zod';
 const optionalString = z.string().trim().min(1).optional();
 const nullableString = z.string().trim().min(1).nullable().optional();
 const optionalFlag = z.coerce.number().int().min(0).max(1).optional();
+const idList = z.array(z.string().trim().min(1)).max(100).optional();
 
 export const paginationQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(200).optional(),
@@ -73,8 +74,10 @@ export const eventOverridePayloadSchema = z.object({
 });
 
 export const landingMatchPayloadSchema = z.object({
-  status: z.enum(['AUTO', 'PINNED', 'EXCLUDED', 'REVIEW']),
+  status: z.enum(['PINNED', 'EXCLUDED', 'REVIEW']),
   note: nullableString,
+  eventIds: idList,
+  groupEventIds: idList,
 });
 
 export const orderTicketPayloadSchema = z.object({

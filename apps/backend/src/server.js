@@ -44,7 +44,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(dirname, '..', '..', '..');
 loadRootEnv(rootDir);
 const port = Number(process.env.PORT || 4000);
-const db = createDb(rootDir);
+export const db = createDb(rootDir);
 const adminAuth = {
   email: process.env.ADMIN_EMAIL || process.env.ADMIN_USER || '',
   password: process.env.ADMIN_PASSWORD || '',
@@ -385,7 +385,7 @@ function warmPublicCaches(reason) {
     });
 }
 
-function invalidatePublicCaches(reason, options = {}) {
+export function invalidatePublicCaches(reason, options = {}) {
   publicResponseCache.clear();
   clearPublicDataCaches();
   if (options.warm) warmPublicCaches(reason);

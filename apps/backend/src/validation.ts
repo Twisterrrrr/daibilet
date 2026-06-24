@@ -13,13 +13,15 @@ export interface ValidationErrorDto {
 export class RequestValidationError extends Error {
   readonly issues: ValidationErrorDto['issues'];
 
-  constructor(error: z.ZodError) {
+  constructor(error: z.ZodError | ValidationErrorDto['issues']) {
     super('Request validation failed');
     this.name = 'RequestValidationError';
-    this.issues = error.issues.map((issue) => ({
-      path: issue.path.join('.'),
-      message: issue.message,
-    }));
+    this.issues = Array.isArray(error)
+      ? error
+      : error.issues.map((issue) => ({
+          path: issue.path.join('.'),
+          message: issue.message,
+        }));
   }
 
   toDto(): ValidationErrorDto {
@@ -46,7 +48,12 @@ export async function parseJsonBody<Schema extends z.ZodType>(
   schema: Schema,
   request: IncomingMessage,
 ): Promise<z.infer<Schema>> {
-  const payload = await readJsonBody<unknown>(request);
+  let payload: unknown;
+  try {
+    payload = await readJsonBody<unknown>(request);
+  } catch {
+    throw new RequestValidationError([{ path: 'body', message: 'Invalid JSON body' }]);
+  }
   return parseWithSchema(schema, payload);
 }
 
@@ -59,4 +66,3 @@ export function parseWithSchema<Schema extends z.ZodType>(schema: Schema, payloa
 export function isRequestValidationError(error: unknown): error is RequestValidationError {
   return error instanceof RequestValidationError;
 }
-

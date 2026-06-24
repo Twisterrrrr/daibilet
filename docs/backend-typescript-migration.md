@@ -119,6 +119,33 @@ Smoke 2026-06-24:
 
 Во время smoke локальный warm cache падал с `ECONNREFUSED 127.0.0.1:5437`, потому что Postgres не был поднят. Это не блокирует проверку entrypoint/validation, но для route-by-route сравнения нужна поднятая БД.
 
+## Phase 2.2: first TS write route
+
+Цель: перенести первый write-route в TS entrypoint целиком, чтобы body validation стала runtime-поведением, а не только подготовленной схемой.
+
+Что сделано:
+
+- добавлен `src/admin-landings-handler.ts`;
+- `PATCH /api/admin/landings/:slug/matches/:eventId` теперь обрабатывается в TS entrypoint до legacy handler;
+- TS entrypoint проверяет Basic Auth для protected routes до typed route handlers;
+- body валидируется через `landingMatchPayloadSchema`;
+- payload сохраняет `eventIds`/`groupEventIds`, чтобы ручное действие применялось ко всей группе слотов, а не к одному source-event;
+- после записи вызывается тот же `invalidatePublicCaches('landing match update')`, что и в legacy route.
+
+Важно: production `node src/server.js` все еще идет через legacy route. Новый write-route активен в `server-entry.ts`, чтобы можно было сравнивать поведение без риска для launch `main`.
+
+Smoke 2026-06-24:
+
+- `npm run backend:typecheck` - ok;
+- `node --check apps/backend/src/server.js` - ok;
+- `PORT=4026 DAIBILET_REQUIRE_ADMIN_AUTH=1 ADMIN_EMAIL=admin@daibilet.ru ADMIN_PASSWORD=admin123 npm --prefix apps/backend run dev:ts` поднял TS entrypoint;
+- `GET /api/health` вернул `200`;
+- `PATCH /api/admin/landings/river-walks/matches/evt_1` без auth вернул `401 admin_auth_required`;
+- тот же `PATCH` с auth, но без `status`, вернул `400 validation_error`;
+- тот же `PATCH` с auth и битым JSON body вернул `400 validation_error`;
+- `GET /api/public/events?limit=9999` вернул `400 validation_error`;
+- legacy `PORT=4027 node apps/backend/src/server.js` поднялся и `GET /api/health` вернул `200`.
+
 ## Phase 3: dto.js decomposition
 
 Разрезать `dto.js` на 5-7 модулей:
