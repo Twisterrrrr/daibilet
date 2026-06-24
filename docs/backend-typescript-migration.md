@@ -53,8 +53,20 @@
 - `src/auth.ts` - Basic Auth config/checks + protected path predicate;
 - `src/http.ts` - JSON/empty/auth responses, request URL, body parsing;
 - `src/db.ts` - typed equivalent of current `db.js`.
+- `src/server-entry.ts` - parallel TS entrypoint that starts the existing `server.js` request handler.
 
-Важно: production runtime пока остается на `server.js` + `db.js`. Новые TS-модули будут подключаться следующим шагом через `server.ts` или точечную замену helper-импортов после smoke.
+Важно: production runtime пока остается на `server.js` + `db.js`. `server-entry.ts` нужен для smoke и постепенного сравнения поведения, а не для немедленного переключения production.
+
+Smoke 2026-06-24:
+
+- `npm run backend:typecheck` - ok;
+- `node --check apps/backend/src/server.js` - ok;
+- `PORT=4022 npm --prefix apps/backend run dev:ts` поднял сервер;
+- `GET http://127.0.0.1:4022/api/health` вернул `200`.
+- `PORT=4023 node apps/backend/src/server.js` поднял legacy entrypoint;
+- `GET http://127.0.0.1:4023/api/health` вернул `200`.
+
+Локальный warm cache во время smoke может падать, если Postgres `127.0.0.1:5437` не поднят. Это не блокирует проверку entrypoint, но для сравнения public/admin routes нужно поднимать DB.
 
 ## Phase 3: dto.js decomposition
 

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node src/server.js",
     "start": "node src/server.js",
-    "dev:ts": "tsx src/server.ts",
+    "dev:ts": "tsx src/server-entry.ts",
     "typecheck": "tsc --noEmit",
     "tep:fixture-bridge": "node ../../scripts/teplohod-fixture-bridge.js"
   },

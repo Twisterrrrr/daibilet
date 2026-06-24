@@ -4,7 +4,7 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { createDb } from './db.js';
 import {
   buildAdminDashboard,
@@ -74,7 +74,7 @@ function loadRootEnv(projectRoot) {
   }
 }
 
-createServer(async (request, response) => {
+export async function handleRequest(request, response) {
   try {
     if (request.method === 'OPTIONS') {
       sendEmpty(response, 204);
@@ -352,10 +352,25 @@ createServer(async (request, response) => {
       500,
     );
   }
-}).listen(port, '127.0.0.1', () => {
-  console.log(`Daibilet backend listening on http://127.0.0.1:${port}`);
-  warmPublicCaches('startup');
-});
+}
+
+export function startServer(options = {}) {
+  const host = options.host || '127.0.0.1';
+  const serverPort = Number(options.port || port);
+  return createServer(handleRequest).listen(serverPort, host, () => {
+    console.log(`Daibilet backend listening on http://${host}:${serverPort}`);
+    warmPublicCaches('startup');
+  });
+}
+
+if (isMainModule()) {
+  startServer();
+}
+
+function isMainModule() {
+  const entry = process.argv[1];
+  return Boolean(entry && import.meta.url === pathToFileURL(entry).href);
+}
 
 function warmPublicCaches(reason) {
   const startedAt = Date.now();
