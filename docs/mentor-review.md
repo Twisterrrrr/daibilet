@@ -304,3 +304,15 @@ Readiness событий переведен на backend-коды: `NO_FUTURE_SE
 
 Follow-up: добавлены `routing.ts` и `validation.ts` как bridge для следующего server split. Это не меняет runtime, но задает правильную форму будущих маршрутов: `RouteContext` + zod-валидация query/body + единый `validation_error`.
 
+#### Backend validated entrypoint, 2026-06-24
+
+Статус: принято как первый runtime-шаг TS-ветки.
+
+Что сделано: `server-entry.ts` теперь запускает legacy `handleRequest` через `createValidatedHandler`, который проверяет query-параметры безопасных GET-маршрутов до передачи в старый обработчик. Production `server.js` не переключен: прямой `node apps/backend/src/server.js` продолжает использовать legacy handler без новой обертки.
+
+Проверка: `npm run backend:typecheck`, `node --check apps/backend/src/server.js`, TS smoke `/api/health = 200`, invalid catalog query `limit=9999 -> 400 validation_error`, legacy smoke `/api/health = 200`.
+
+Менторская оценка: шаг правильный, потому что TypeScript начал работать в реальном входе запроса, но с контролируемым blast radius. Важно, что схема была сверена с фактическим public/admin UI: public sort принимает `time|price|popular`, admin orders принимает `provider/view/page`, а не только старые поля.
+
+Остаточный риск: POST/PATCH body validation пока намеренно не включена, чтобы не съесть request stream до legacy handler. Следующий контрольный шаг - переносить по одному write route в TS-обработчик целиком, начиная с наименее рискованных admin payload: landing match или event override.
+

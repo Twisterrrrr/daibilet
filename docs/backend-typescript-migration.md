@@ -85,6 +85,40 @@ if (isRoute(context, 'GET /api/public/events')) {
 }
 ```
 
+## Phase 2.1: validated TS entrypoint
+
+Цель: начать использовать TypeScript в реальном request flow, но не менять production-поведение legacy `server.js`.
+
+Что сделано:
+
+- добавлен `src/validated-handler.ts`;
+- `server-entry.ts` запускает legacy `handleRequest` через TS-обертку;
+- `server.js` получил опциональный `startServer({ handler })`, но прямой запуск `node src/server.js` по-прежнему использует старый handler;
+- включена zod-валидация query-параметров для безопасных GET-маршрутов:
+  - `GET /api/public/events`;
+  - `GET /api/public/orders`;
+  - `GET /api/admin/events`;
+  - `GET /api/admin/orders`;
+  - `GET /api/admin/venues`;
+  - `GET /api/admin/buyers`;
+  - `GET /api/admin/order-event-candidates`;
+  - `GET /api/admin/landings`;
+  - `GET /api/admin/landings/:slug/candidates`.
+
+Ограничение: body validation для POST/PATCH пока не подключаем к legacy handler, потому что чтение body в TS-обертке потребит stream до старого обработчика. Это нужно делать уже при переносе конкретного route.
+
+Smoke 2026-06-24:
+
+- `npm run backend:typecheck` - ok;
+- `node --check apps/backend/src/server.js` - ok;
+- `PORT=4024 npm --prefix apps/backend run dev:ts` поднял TS entrypoint;
+- `GET http://127.0.0.1:4024/api/health` вернул `200`;
+- `GET http://127.0.0.1:4024/api/public/events?limit=9999` вернул `400 validation_error`;
+- `PORT=4025 node apps/backend/src/server.js` поднял legacy entrypoint;
+- `GET http://127.0.0.1:4025/api/health` вернул `200`.
+
+Во время smoke локальный warm cache падал с `ECONNREFUSED 127.0.0.1:5437`, потому что Postgres не был поднят. Это не блокирует проверку entrypoint/validation, но для route-by-route сравнения нужна поднятая БД.
+
 ## Phase 3: dto.js decomposition
 
 Разрезать `dto.js` на 5-7 модулей:

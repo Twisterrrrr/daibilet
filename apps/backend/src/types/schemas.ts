@@ -2,10 +2,12 @@ import { z } from 'zod';
 
 const optionalString = z.string().trim().min(1).optional();
 const nullableString = z.string().trim().min(1).nullable().optional();
+const optionalFlag = z.coerce.number().int().min(0).max(1).optional();
 
 export const paginationQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(200).optional(),
   offset: z.coerce.number().int().min(0).optional(),
+  page: z.coerce.number().int().min(1).optional(),
 });
 
 export const publicCatalogQuerySchema = paginationQuerySchema.extend({
@@ -17,9 +19,10 @@ export const publicCatalogQuerySchema = paginationQuerySchema.extend({
   date: optionalString,
   from: optionalString,
   to: optionalString,
-  sort: z.enum(['popular', 'departing_soon', 'price_asc', 'price_desc']).optional(),
+  sort: z.enum(['time', 'price', 'popular', 'departing_soon', 'price_asc', 'price_desc']).optional(),
+  view: z.enum(['cards', 'table']).optional(),
   priceMax: z.coerce.number().int().min(0).optional(),
-  refresh: z.coerce.number().int().min(0).max(1).optional(),
+  refresh: optionalFlag,
 });
 
 export const adminEventsQuerySchema = paginationQuerySchema.extend({
@@ -30,13 +33,30 @@ export const adminEventsQuerySchema = paginationQuerySchema.extend({
   category: optionalString,
   landing: optionalString,
   status: optionalString,
+  view: optionalString,
+  refresh: optionalFlag,
 });
 
 export const adminOrdersQuerySchema = paginationQuerySchema.extend({
   q: optionalString,
+  provider: optionalString,
   source: optionalString,
   status: optionalString,
-  attention: z.coerce.number().int().min(0).max(1).optional(),
+  view: optionalString,
+  attention: optionalFlag,
+  refresh: optionalFlag,
+});
+
+export const lookupQuerySchema = z.object({
+  lookup: optionalString,
+});
+
+export const searchQuerySchema = paginationQuerySchema.extend({
+  q: optionalString,
+  source: optionalString,
+  city: optionalString,
+  category: optionalString,
+  refresh: optionalFlag,
 });
 
 export const eventOverridePayloadSchema = z.object({
@@ -70,7 +90,8 @@ export const orderTicketPayloadSchema = z.object({
 export type PublicCatalogQuery = z.infer<typeof publicCatalogQuerySchema>;
 export type AdminEventsQuery = z.infer<typeof adminEventsQuerySchema>;
 export type AdminOrdersQuery = z.infer<typeof adminOrdersQuerySchema>;
+export type LookupQuery = z.infer<typeof lookupQuerySchema>;
+export type SearchQuery = z.infer<typeof searchQuerySchema>;
 export type EventOverridePayload = z.infer<typeof eventOverridePayloadSchema>;
 export type LandingMatchPayload = z.infer<typeof landingMatchPayloadSchema>;
 export type OrderTicketPayload = z.infer<typeof orderTicketPayloadSchema>;
-

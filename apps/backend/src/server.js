@@ -357,7 +357,8 @@ export async function handleRequest(request, response) {
 export function startServer(options = {}) {
   const host = options.host || '127.0.0.1';
   const serverPort = Number(options.port || port);
-  return createServer(handleRequest).listen(serverPort, host, () => {
+  const requestHandler = options.handler || handleRequest;
+  return createServer(requestHandler).listen(serverPort, host, () => {
     console.log(`Daibilet backend listening on http://${host}:${serverPort}`);
     warmPublicCaches('startup');
   });
