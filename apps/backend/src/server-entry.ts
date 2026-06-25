@@ -1,9 +1,10 @@
 import type { Server } from 'node:http';
 import { createAdminEventsRouteHandler } from './admin-events-handler.js';
 import { createAdminLandingsRouteHandler } from './admin-landings-handler.js';
+import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
 import { createAdminAuthConfig } from './auth.js';
 import { readBackendEnv } from './env.js';
-import { updateAdminEventOverride, updateAdminLandingMatch } from './dto.js';
+import { updateAdminEventOverride, updateAdminLandingMatch, upsertAdminOrderTicket } from './dto.js';
 import { db, handleRequest, invalidatePublicCaches, startServer } from './server.js';
 import { createValidatedHandler } from './validated-handler.js';
 
@@ -16,6 +17,10 @@ const server = startServer({
   handler: createValidatedHandler(handleRequest, {
     adminAuth,
     routeHandlers: [
+      createAdminOrdersRouteHandler({
+        db,
+        upsertAdminOrderTicket,
+      }),
       createAdminEventsRouteHandler({
         db,
         updateAdminEventOverride,

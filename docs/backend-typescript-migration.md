@@ -199,6 +199,27 @@ Smoke 2026-06-25:
 - тот же `PATCH` с auth, но `editorStatus='BROKEN'`, вернул `400 validation_error`;
 - успешный `PATCH` с `editorStatus='PUBLISHED'` записал статус в `EventOverride`, затем запись откатана к исходному состоянию.
 
+## Phase 2.5: order ticket write route
+
+Цель: перенести launch-critical route ручного добавления/обновления билета в заказе, потому что оператору нужно быстро вписывать реальные номера билетов и статусы.
+
+Что сделано:
+
+- добавлен `src/admin-orders-handler.ts`;
+- `POST /api/admin/orders/:id/tickets` обрабатывается в TS entrypoint до legacy handler;
+- `orderTicketPayloadSchema` расширена под реальный UI payload: `externalTicketId`, `number`, `ticketNumber`, `ticketId`, `eventId`, `sessionId`, `status`, `ticketStatus`;
+- typed handler сохраняет legacy-доменные ошибки `ticket_number_required` и `order_not_found`, а `validated-handler.ts` теперь отдает `error.statusCode` как настоящий HTTP status.
+
+Smoke 2026-06-25:
+
+- `npm run backend:typecheck` - ok;
+- `node --check apps/backend/src/server.js` - ok;
+- `PORT=4034 DAIBILET_REQUIRE_ADMIN_AUTH=1 ADMIN_EMAIL=admin@daibilet.ru ADMIN_PASSWORD=admin123 npm --prefix apps/backend run dev:ts` поднял TS entrypoint;
+- `POST /api/admin/orders/extord_tc_698b97b8114fe9ea0d071479/tickets` без auth вернул `401 admin_auth_required`;
+- тот же `POST` с auth, но без номера билета, вернул `400 ticket_number_required`;
+- `POST /api/admin/orders/not-a-real-order/tickets` с auth вернул `404 order_not_found`;
+- успешный `POST` создал `ExternalTicket` с `origin='manual'`, затем тестовый билет удален и `ExternalOrder.updatedAt` восстановлен.
+
 ## Phase 3: dto.js decomposition
 
 Разрезать `dto.js` на 5-7 модулей:

@@ -90,9 +90,15 @@ export const landingMatchPayloadSchema = z.object({
 
 export const orderTicketPayloadSchema = z.object({
   id: optionalString,
+  ticketId: optionalString,
+  externalTicketId: nullableString,
+  number: nullableString,
   sourceTicketId: nullableString,
   ticketNumber: nullableString,
-  status: z.string().trim().min(1),
+  status: optionalString,
+  ticketStatus: optionalString,
+  eventId: nullableString,
+  sessionId: nullableString,
   title: nullableString,
   priceRub: z.coerce.number().int().min(0).nullable().optional(),
   holderName: nullableString,

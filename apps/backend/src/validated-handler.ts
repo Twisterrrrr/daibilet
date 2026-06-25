@@ -53,6 +53,13 @@ export function createValidatedHandler(
         return;
       }
 
+      const statusCode = errorStatusCode(error);
+      if (statusCode) {
+        const message = error instanceof Error ? error.message : String(error);
+        sendJson(response, { error: message }, { statusCode });
+        return;
+      }
+
       sendJson(
         response,
         {
@@ -63,6 +70,13 @@ export function createValidatedHandler(
       );
     }
   };
+}
+
+function errorStatusCode(error: unknown): number | null {
+  if (!error || typeof error !== 'object') return null;
+  const value = (error as { statusCode?: unknown }).statusCode;
+  if (typeof value !== 'number' || !Number.isInteger(value)) return null;
+  return value >= 400 && value <= 599 ? value : null;
 }
 
 function validateSafeRouteQuery(context: RouteContext): void {

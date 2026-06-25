@@ -352,3 +352,15 @@ Follow-up: добавлены `routing.ts` и `validation.ts` как bridge дл
 
 Следующий контрольный шаг: начинать декомпозицию `dto.js` с `admin-events.dto.ts` или `readiness.ts`, потому что route shell уже достаточно подготовлен.
 
+#### Order ticket TS route, 2026-06-25
+
+Статус: принято как launch-critical операционный срез.
+
+Что сделано: `POST /api/admin/orders/:id/tickets` вынесен в typed route handler `admin-orders-handler.ts`. Схема payload расширена под фактический UI (`externalTicketId`, `eventId`, `sessionId`, `status`), а typed error handling начал уважать `statusCode` доменных ошибок legacy DTO.
+
+Проверка: на живой БД тестовый билет был создан в заказе `extord_tc_698b97b8114fe9ea0d071479` с `origin=manual`, после чего строка `ExternalTicket` удалена, а `ExternalOrder.updatedAt` восстановлен. Также проверены no auth `401`, отсутствие номера `400 ticket_number_required`, несуществующий заказ `404 order_not_found`.
+
+Менторская оценка: блок принят. Это важнее ранней декомпозиции `dto.js`, потому что напрямую закрывает ручную операционную работу с заказами перед первыми продажами. Хорошо, что error handling стал точнее: оператор и фронт больше не получат `500` там, где проблема пользовательская.
+
+Следующий контрольный шаг: после этого уже можно возвращаться к декомпозиции `dto.js`, начиная с `orders.dto.ts` или `admin-events.dto.ts`; route shell для самых важных write-сценариев готов.
+
