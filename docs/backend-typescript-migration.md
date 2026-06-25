@@ -222,6 +222,8 @@ Smoke 2026-06-25:
 
 ## Phase 3: dto.js decomposition
 
+Перед началом декомпозиции зафиксирован legacy-аудит: [`legacy-schema-audit.md`](legacy-schema-audit.md). Главный вывод: не копировать большой SPBBOATS `schema.prisma`, а перенести его зрелые инварианты - `Event -> Session -> Offer -> ProviderLink`, readiness codes с backend и landing blocks/filter engine.
+
 Разрезать `dto.js` на 5-7 модулей:
 
 - `sources.dto.ts`;
@@ -233,6 +235,8 @@ Smoke 2026-06-25:
 - `readiness.ts`.
 
 Каждый модуль должен экспортировать typed функции и использовать контракты из `src/types`.
+
+Перед массовым переносом read-models в Prisma нужно сделать маленький Prisma bridge в `packages/db` и additive-решение для source identity на уровне session/offer. Иначе TS просто типизирует текущую DTO-сложность, но не устранит причину: TC slot сейчас местами ведет себя как отдельный `Event`, хотя доменно это `EventSession`.
 
 ## Phase 4: validation and tests
 

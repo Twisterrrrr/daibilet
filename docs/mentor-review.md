@@ -364,3 +364,13 @@ Follow-up: добавлены `routing.ts` и `validation.ts` как bridge дл
 
 Следующий контрольный шаг: после этого уже можно возвращаться к декомпозиции `dto.js`, начиная с `orders.dto.ts` или `admin-events.dto.ts`; route shell для самых важных write-сценариев готов.
 
+#### Legacy schema audit before DTO split, 2026-06-25
+
+Статус: принято как архитектурная развилка перед Prisma/DTO-переходом.
+
+Что сделано: просмотрены SPBBOATS legacy Prisma schema, catalog foundation fragment и ключевые документы по events/sessions, ingestion, checkout, landings и Admin V4 imported sales. Вывод зафиксирован в [`legacy-schema-audit.md`](legacy-schema-audit.md): копировать большой legacy-монолит нельзя, но нужно перенести его доменные инварианты.
+
+Менторская оценка: правильный следующий шаг - не просто типизировать текущий `dto.js`, а убрать причину сложности. Для этого модель должна закрепить `Event -> Session -> Offer -> ProviderLink`: карточка события, слоты времени, билетные категории/цены и внешние идентификаторы не должны жить в одном объекте или в эвристике UI.
+
+Следующий контрольный шаг: сделать маленький Prisma bridge и additive source identity для session/offer, затем уже резать `dto.js` на `sources`, `admin-events`, `orders`, `landings`, `public-catalog`, `public-pages`, `readiness`.
+
