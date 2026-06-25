@@ -374,3 +374,15 @@ Follow-up: добавлены `routing.ts` и `validation.ts` как bridge дл
 
 Следующий контрольный шаг: сделать маленький Prisma bridge и additive source identity для session/offer, затем уже резать `dto.js` на `sources`, `admin-events`, `orders`, `landings`, `public-catalog`, `public-pages`, `readiness`.
 
+#### Prisma bridge, 2026-06-25
+
+Статус: принято как безопасная DB-опора перед переносом DTO.
+
+Что сделано: в `packages/db` добавлен runtime client singleton поверх Prisma 7 + `@prisma/adapter-pg`, `db:typecheck` и `db:smoke`. Root scripts также получили `db:typecheck` и `db:smoke`, чтобы проверка запускалась одной командой из монорепы.
+
+Проверка: `npm --prefix packages/db run db:typecheck` прошел. `npm --prefix packages/db run db:smoke` на живой БД вернул 8761 событий, 22976 сеансов, 9111 офферов, 248 площадок, 59 городов, 5 лендингов, 13 внешних заказов и 0 билетов.
+
+Менторская оценка: шаг маленький, но правильный. Теперь можно переносить read-models на Prisma постепенно, не включая большой рефакторинг `dto.js` и не меняя API shape.
+
+Следующий контрольный шаг: additive source identity для `Session`/`Offer` (`ProviderLink` как предпочтительный вариант), затем `public-catalog.dto.ts` или `admin-events.dto.ts`.
+

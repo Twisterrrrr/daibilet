@@ -16,6 +16,8 @@
     "db:validate": "npm --prefix packages/db run db:validate",
     "db:migrate": "npm --prefix packages/db run db:migrate",
     "db:generate": "npm --prefix packages/db run db:generate",
+    "db:typecheck": "npm --prefix packages/db run db:typecheck",
+    "db:smoke": "npm --prefix packages/db run db:smoke",
     "db:seed:tc-sql": "node scripts/db-build-tc-seed-sql.js",
     "tc:events": "node scripts/tc-sample-events.js",
     "tc:catalog": "node scripts/tc-sample-catalog.js",

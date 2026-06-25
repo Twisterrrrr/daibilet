@@ -238,6 +238,13 @@ Smoke 2026-06-25:
 
 Перед массовым переносом read-models в Prisma нужно сделать маленький Prisma bridge в `packages/db` и additive-решение для source identity на уровне session/offer. Иначе TS просто типизирует текущую DTO-сложность, но не устранит причину: TC slot сейчас местами ведет себя как отдельный `Event`, хотя доменно это `EventSession`.
 
+Prisma bridge, 2026-06-25:
+
+- добавлен `packages/db/src/client.ts` с singleton `PrismaClient` + `PrismaPg` adapter;
+- добавлен `packages/db/scripts/smoke.ts`;
+- добавлены scripts `db:typecheck` и `db:smoke` в root/package db;
+- smoke на живой БД вернул: 8761 events, 22976 sessions, 9111 offers, 248 venues, 59 cities, 5 landings, 13 externalOrders, 0 externalTickets.
+
 ## Phase 4: validation and tests
 
 Добавить runtime-валидацию на входе:
