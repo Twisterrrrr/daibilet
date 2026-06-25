@@ -340,3 +340,15 @@ Follow-up: добавлены `routing.ts` и `validation.ts` как bridge дл
 
 Следующий контрольный шаг: либо перенести `PATCH /api/admin/events/:id/moderation` рядом с override, либо начать выделять `admin-events.dto.ts`, если хотим двигаться к декомпозиции `dto.js`.
 
+#### Live DB smoke + event moderation TS route, 2026-06-25
+
+Статус: принято как закрытие первого реального TS write-контура.
+
+Что сделано: после включения локальной БД проверены реальные записи через TS entrypoint: event override и landing match успешно записали данные в Postgres и были откатаны к исходному состоянию. Затем `PATCH /api/admin/events/:id/moderation` добавлен в `admin-events-handler.ts` рядом с override и также прошел write/rollback smoke.
+
+Проверка: БД доступна, объем каталога 8761 событий. Override smoke записал `seoTitle`, landing match smoke записал `manualStatus=PINNED`, moderation smoke записал `editorStatus=PUBLISHED`; все три проверки восстановили исходные записи. Auth/validation также проверены: no auth `401`, плохой статус `400 validation_error`.
+
+Менторская оценка: блок принят. Теперь TS entrypoint покрывает не только чтение query и искусственные ошибки, а реальные admin write-сценарии с БД, auth и cache invalidation. Важно, что smoke не оставил тестовых данных.
+
+Следующий контрольный шаг: начинать декомпозицию `dto.js` с `admin-events.dto.ts` или `readiness.ts`, потому что route shell уже достаточно подготовлен.
+

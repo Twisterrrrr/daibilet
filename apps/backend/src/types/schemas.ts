@@ -77,6 +77,10 @@ export const eventOverridePayloadSchema = z.object({
   editorStatus: publishStatus.nullable().optional(),
 });
 
+export const eventModerationPayloadSchema = z.object({
+  editorStatus: publishStatus,
+});
+
 export const landingMatchPayloadSchema = z.object({
   status: z.enum(['PINNED', 'EXCLUDED', 'REVIEW']),
   note: nullableString,
@@ -100,5 +104,6 @@ export type AdminOrdersQuery = z.infer<typeof adminOrdersQuerySchema>;
 export type LookupQuery = z.infer<typeof lookupQuerySchema>;
 export type SearchQuery = z.infer<typeof searchQuerySchema>;
 export type EventOverridePayload = z.infer<typeof eventOverridePayloadSchema>;
+export type EventModerationPayload = z.infer<typeof eventModerationPayloadSchema>;
 export type LandingMatchPayload = z.infer<typeof landingMatchPayloadSchema>;
 export type OrderTicketPayload = z.infer<typeof orderTicketPayloadSchema>;
