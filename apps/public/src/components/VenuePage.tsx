@@ -5,6 +5,7 @@ import { EventCard } from '@/components/EventCard';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { formatMoney, formatNumber } from '@/data';
+import { formatStreetAddress } from '@/lib/address';
 import { eventHref } from '@/routes';
 import type { PublicSession, PublicVenue, PublicVenuePage } from '@/types';
 
@@ -81,7 +82,7 @@ export function VenuePage({ slug }: VenuePageProps) {
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
-      <Header cityLabel={venue?.city || 'Дайбилет'} search="" onSearch={() => undefined} onSection={(section) => navigateHome(section)} />
+      <Header cityLabel={venue?.city || 'Дайбилет'} onSection={(section) => navigateHome(section)} searchCity={venue?.city} />
 
       <main>
         {isLoading ? (
@@ -144,7 +145,7 @@ export function VenuePage({ slug }: VenuePageProps) {
                   <h3 className="text-sm font-semibold text-slate-950">Кратко</h3>
                   <dl className="mt-4 grid gap-3 text-sm">
                     <InfoRow label="Город" value={venue.city} />
-                    <InfoRow label="Адрес" value={venue.address || 'Адрес уточняется'} />
+                    <InfoRow label="Адрес" value={venueStreetLabel(venue)} />
                     <InfoRow label="Тип" value={kindLabel(venue.type)} />
                     <InfoRow label="Событий" value={formatNumber(payload.stats.events)} />
                     <InfoRow label="Цена" value={formatMoney(payload.stats.priceFrom)} />
@@ -204,7 +205,7 @@ function VenueHero({ venue, stats }: { venue: PublicVenue; stats: PublicVenuePag
           <div className="mt-6 flex flex-wrap gap-3">
             <StatChip icon={<CalendarDays className="h-4 w-4" />} label={`${formatNumber(stats.events)} событий`} />
             <StatChip icon={<Ticket className="h-4 w-4" />} label={formatMoney(stats.priceFrom)} />
-            <StatChip icon={<MapPin className="h-4 w-4" />} label={venue.address || 'Адрес уточняется'} />
+            <StatChip icon={<MapPin className="h-4 w-4" />} label={venueStreetLabel(venue)} />
           </div>
         </div>
         <div className="aspect-[4/3] overflow-hidden rounded-xl border border-white/10 bg-white/10">
@@ -235,6 +236,7 @@ function VenueHubSections({
   const categories = Object.entries(venue.categories || {}).sort((a, b) => b[1] - a[1]);
   const nextSessions = sessions.slice(0, 3);
   const hasMap = Boolean(venue.latitude && venue.longitude);
+  const streetAddress = formatStreetAddress(venue.address, { city: venue.city });
 
   return (
     <div className="border-b border-slate-100 bg-white">
@@ -260,7 +262,7 @@ function VenueHubSections({
         <section className="grid gap-4 md:grid-cols-3">
           <InfoCard title="О месте" text={venue.shortDescription || venue.description || `${venue.name} — место в ${venue.city}. Здесь собраны ближайшие события, доступные сеансы и ссылки на покупку у билетного оператора.`} />
           <InfoCard title="Как выбрать" text={categories.length ? `Сначала выберите направление: ${categories.slice(0, 3).map(([name]) => name).join(', ')}. Затем сравните дату, цену и остаток мест в таблице.` : 'Выберите ближайший сеанс в расписании и перейдите к покупке через виджет билетной системы.'} />
-          <InfoCard title="Как посетить" text={venue.address ? `Адрес: ${venue.address}. ${hasMap ? 'Можно открыть точку на карте и построить маршрут.' : 'Координаты пока не указаны, адрес лучше проверить перед посещением.'}` : 'Адрес пока уточняется поставщиком. Перед покупкой проверьте детали в карточке события.'} />
+          <InfoCard title="Как посетить" text={streetAddress ? `Адрес: ${streetAddress}. ${hasMap ? 'Можно открыть точку на карте и построить маршрут.' : 'Координаты пока не указаны, адрес лучше проверить перед посещением.'}` : 'Адрес пока уточняется поставщиком. Перед покупкой проверьте детали в карточке события.'} />
         </section>
 
         {categories.length || nextSessions.length ? (
@@ -541,7 +543,7 @@ function groupVenueSessions(sessions: PublicSession[]): VenueEventGroup[] {
         representative,
         sessions: sortedSessions,
         priceFrom: prices.length ? Math.min(...prices) : null,
-        vacant: vacantValues.length ? Math.min(...vacantValues) : null,
+        vacant: Number.isFinite(representative.vacant) ? representative.vacant : vacantValues.length ? Math.min(...vacantValues) : null,
         firstStartsAt: representative.startsAt,
       };
     })
@@ -601,6 +603,11 @@ function StatChip({ icon, label }: { icon: React.ReactNode; label: string }) {
       {label}
     </span>
   );
+}
+
+function venueStreetLabel(venue: PublicVenue): string {
+  const street = formatStreetAddress(venue.address, { city: venue.city });
+  return street || 'Адрес уточняется';
 }
 
 function kindLabel(kind?: string | null) {

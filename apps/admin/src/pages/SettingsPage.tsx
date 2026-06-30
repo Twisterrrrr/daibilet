@@ -61,7 +61,7 @@ export function SettingsPage() {
 
           <div className="grid gap-2 sm:grid-cols-2">
             <Row icon={Clock} label="Ticketscloud" value="token + gRPC/API; full sync вручную" />
-            <Row icon={Clock} label="Teplohod.info" value="API / fixture bridge; sync вручную из Sources" />
+            <Row icon={Clock} label="Teplohod.info" value="API с белого IP (токен не нужен); sync из Sources" />
             <Row icon={Download} label="Окно ре-импорта" value="последние 90 дней / все активные события" />
             <Row icon={Download} label="Override-данные" value="сохраняются поверх импортных фактов" />
           </div>

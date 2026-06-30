@@ -68,7 +68,8 @@ TICKETSCLOUD_WIDGET_TOKEN=...
 TICKETSCLOUD_GRPC_ENDPOINT=simple.ticketscloud.com:443
 TICKETSCLOUD_WIDGET_BASE_URL=https://ticketscloud.org/v1/widgets/common
 
-TEP_API_URL=...
+TEP_API_URL=https://api.teplohod.info/v1
+# Teplohod: токен не нужен, доступ по белому IP сервера (213.171.7.16 в allowlist)
 TEP_WIDGET_ID=14208
 TEP_WIDGET_BASE_URL=https://teplohod.info
 ```

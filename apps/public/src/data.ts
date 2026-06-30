@@ -1,83 +1,160 @@
-import type { PublicData } from '@/types';
+import type { PublicData, PublicDestination, PublicLanding, PublicSession } from '@/types';
 import { eventSlug } from '@/routes';
 
 type PublicStatsPayload = Pick<PublicData, 'generatedAt' | 'stats'>;
+type PublicDestinationsPayload = { generatedAt: string; destinations: PublicDestination[] };
+type PublicHomePreviewPayload = {
+  generatedAt: string;
+  sessions: PublicSession[];
+  landings: PublicLanding[];
+};
 
 const PUBLIC_STATS_STORAGE_KEY = 'daibilet:public-stats';
+const PUBLIC_DESTINATIONS_STORAGE_KEY = 'daibilet:public-destinations';
+const PUBLIC_HOME_PREVIEW_STORAGE_KEY = 'daibilet:public-home-preview';
+
 const API_BASE_URL =
   ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
   'http://127.0.0.1:4000';
+
 const cachedStats = readCachedPublicStats();
+const cachedDestinations = readCachedDestinations();
+const cachedHomePreview = readCachedHomePreview();
 
 export const publicData: PublicData = window.PUBLIC_DATA ?? {
-  generatedAt: cachedStats?.generatedAt ?? new Date().toISOString(),
+  generatedAt: cachedStats?.generatedAt || cachedDestinations?.generatedAt || cachedHomePreview?.generatedAt || new Date().toISOString(),
   stats: cachedStats?.stats ?? { events: 0, destinations: 0, venues: 0, landings: 0 },
-  destinations: [],
-  landings: [],
-  sessions: [],
+  destinations: cachedDestinations?.destinations ?? [],
+  landings: cachedHomePreview?.landings ?? [],
+  sessions: normalizeSessions(cachedHomePreview?.sessions ?? []),
   venues: [],
 };
 
-export async function hydratePublicStats(timeoutMs = 1000): Promise<boolean> {
+/** Быстрый слой: счётчики + города (кэш или лёгкие API). */
+export async function hydratePublicShell(timeoutMs = 2500): Promise<boolean> {
+  const [statsUpdated, destinationsUpdated] = await Promise.all([
+    hydratePublicStats(timeoutMs),
+    hydratePublicDestinations(timeoutMs),
+  ]);
+  return statsUpdated || destinationsUpdated;
+}
+
+export async function hydratePublicStats(timeoutMs = 2500): Promise<boolean> {
   try {
-    const payload = await fetchPublicStats(`${API_BASE_URL}/api/public/stats`, timeoutMs);
+    const payload = await fetchPublicJson<PublicStatsPayload>(`${API_BASE_URL}/api/public/stats`, timeoutMs);
     if (payload?.stats) {
-      publicData.generatedAt = payload.generatedAt || new Date().toISOString();
+      publicData.generatedAt = payload.generatedAt || publicData.generatedAt;
       publicData.stats = normalizeStats(payload.stats);
       writeCachedPublicStats({ generatedAt: publicData.generatedAt, stats: publicData.stats });
       return true;
     }
   } catch {
-    // Cached stats are good enough for the first paint while the full catalog hydrates.
+    // Cached stats are good enough for the first paint.
   }
 
   return false;
 }
 
-export async function hydratePublicData(): Promise<boolean> {
+export async function hydratePublicDestinations(timeoutMs = 2500): Promise<boolean> {
   try {
-    const remoteData = await fetchPublicJson(`${API_BASE_URL}/api/public/home`, 12000);
-    if (remoteData) {
-      assignPublicData(remoteData);
+    const payload = await fetchPublicJson<PublicDestinationsPayload>(`${API_BASE_URL}/api/public/destinations`, timeoutMs);
+    if (Array.isArray(payload?.destinations)) {
+      publicData.generatedAt = payload.generatedAt || publicData.generatedAt;
+      publicData.destinations = payload.destinations;
+      if (publicData.stats.destinations !== payload.destinations.length) {
+        publicData.stats = {
+          ...publicData.stats,
+          destinations: payload.destinations.length,
+        };
+      }
+      writeCachedDestinations({ generatedAt: publicData.generatedAt, destinations: payload.destinations });
+      writeCachedPublicStats({ generatedAt: publicData.generatedAt, stats: publicData.stats });
       return true;
     }
   } catch {
-    // Fall through to the local static dataset.
-  }
-
-  if (publicData.sessions.length > 0) return false;
-
-  try {
-    const staticData = await fetchStaticData();
-    if (staticData) {
-      assignPublicData(staticData, { preserveStats: publicData.stats.events > 0 });
-      return true;
-    }
-  } catch {
-    // Local prototypes still render an empty shell when both API and data.js are unavailable.
+    // Keep destinations from localStorage if the request fails.
   }
 
   return false;
+}
+
+/** Превью для главной: сессии + подборки без тяжёлого /home. */
+export async function hydratePublicHomePreview(timeoutMs = 8000): Promise<boolean> {
+  try {
+    const payload = await fetchPublicJson<PublicHomePreviewPayload>(`${API_BASE_URL}/api/public/home/preview`, timeoutMs);
+    if (payload?.sessions) {
+      publicData.generatedAt = payload.generatedAt || publicData.generatedAt;
+      publicData.sessions = normalizeSessions(payload.sessions);
+      publicData.landings = payload.landings || publicData.landings;
+      if (publicData.stats.landings !== publicData.landings.length) {
+        publicData.stats = {
+          ...publicData.stats,
+          landings: publicData.landings.length,
+        };
+      }
+      writeCachedHomePreview({
+        generatedAt: publicData.generatedAt,
+        sessions: publicData.sessions,
+        landings: publicData.landings,
+      });
+      writeCachedPublicStats({ generatedAt: publicData.generatedAt, stats: publicData.stats });
+      return true;
+    }
+  } catch {
+    if (publicData.sessions.length > 0) return false;
+    const staticData = await fetchStaticData();
+    if (staticData) {
+      assignPublicData(staticData, { preserveStats: true, preserveDestinations: true });
+      return true;
+    }
+  }
+
+  return false;
+}
+
+/** @deprecated Используйте hydratePublicShell + hydratePublicHomePreview */
+export async function hydratePublicData(): Promise<boolean> {
+  const shell = await hydratePublicShell();
+  const preview = await hydratePublicHomePreview();
+  return shell || preview;
+}
+
+function normalizeSessions(sessions: PublicSession[]): PublicSession[] {
+  return sessions.map((session) => ({
+    ...session,
+    slug: eventSlug(session),
+  }));
 }
 
 function normalizePublicData(data: PublicData): PublicData {
   return {
     ...data,
     stats: normalizeStats(data.stats),
-    sessions: data.sessions.map((session) => ({
-      ...session,
-      slug: eventSlug(session),
-    })),
+    sessions: normalizeSessions(data.sessions),
   };
 }
 
-function assignPublicData(data: PublicData, options: { preserveStats?: boolean } = {}) {
+function assignPublicData(
+  data: PublicData,
+  options: { preserveStats?: boolean; preserveDestinations?: boolean } = {},
+) {
   const normalized = normalizePublicData(data);
   Object.assign(publicData, {
     ...normalized,
     stats: options.preserveStats ? publicData.stats : normalized.stats,
+    destinations: options.preserveDestinations ? publicData.destinations : normalized.destinations,
   });
   writeCachedPublicStats({ generatedAt: publicData.generatedAt, stats: publicData.stats });
+  if (publicData.destinations.length) {
+    writeCachedDestinations({ generatedAt: publicData.generatedAt, destinations: publicData.destinations });
+  }
+  if (publicData.sessions.length) {
+    writeCachedHomePreview({
+      generatedAt: publicData.generatedAt,
+      sessions: publicData.sessions,
+      landings: publicData.landings,
+    });
+  }
 }
 
 function normalizeStats(stats: PublicData['stats']): PublicData['stats'] {
@@ -89,27 +166,14 @@ function normalizeStats(stats: PublicData['stats']): PublicData['stats'] {
   };
 }
 
-async function fetchPublicJson(url: string, timeoutMs: number): Promise<PublicData | null> {
+async function fetchPublicJson<T>(url: string, timeoutMs: number): Promise<T | null> {
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     const response = await fetch(url, { cache: 'no-store', signal: controller.signal });
     if (!response.ok) return null;
-    return (await response.json()) as PublicData;
-  } finally {
-    window.clearTimeout(timeout);
-  }
-}
-
-async function fetchPublicStats(url: string, timeoutMs: number): Promise<PublicStatsPayload | null> {
-  const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    const response = await fetch(url, { cache: 'no-store', signal: controller.signal });
-    if (!response.ok) return null;
-    return (await response.json()) as PublicStatsPayload;
+    return (await response.json()) as T;
   } finally {
     window.clearTimeout(timeout);
   }
@@ -146,6 +210,53 @@ function writeCachedPublicStats(payload: PublicStatsPayload) {
   }
 }
 
+function readCachedDestinations(): PublicDestinationsPayload | null {
+  try {
+    const raw = window.localStorage.getItem(PUBLIC_DESTINATIONS_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PublicDestinationsPayload;
+    if (!Array.isArray(parsed?.destinations)) return null;
+    return {
+      generatedAt: parsed.generatedAt || new Date().toISOString(),
+      destinations: parsed.destinations,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writeCachedDestinations(payload: PublicDestinationsPayload) {
+  try {
+    window.localStorage.setItem(PUBLIC_DESTINATIONS_STORAGE_KEY, JSON.stringify(payload));
+  } catch {
+    // Ignore storage errors.
+  }
+}
+
+function readCachedHomePreview(): PublicHomePreviewPayload | null {
+  try {
+    const raw = window.localStorage.getItem(PUBLIC_HOME_PREVIEW_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PublicHomePreviewPayload;
+    if (!Array.isArray(parsed?.sessions)) return null;
+    return {
+      generatedAt: parsed.generatedAt || new Date().toISOString(),
+      sessions: parsed.sessions,
+      landings: Array.isArray(parsed.landings) ? parsed.landings : [],
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writeCachedHomePreview(payload: PublicHomePreviewPayload) {
+  try {
+    window.localStorage.setItem(PUBLIC_HOME_PREVIEW_STORAGE_KEY, JSON.stringify(payload));
+  } catch {
+    // Ignore storage errors.
+  }
+}
+
 export function formatNumber(value?: number | null): string {
   return new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(value || 0);
 }
@@ -166,5 +277,6 @@ export function formatDate(value?: string | null): string {
     month: 'short',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: 'Europe/Moscow',
   }).format(date);
 }

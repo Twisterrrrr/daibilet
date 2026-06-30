@@ -1,40 +1,54 @@
 import * as React from 'react';
-import { ChevronDown, Compass, Heart, HelpCircle, MapPin, Menu, Search, X } from 'lucide-react';
+import { ChevronDown, CircleUser, Compass, HelpCircle, MapPin, Menu, Search, X } from 'lucide-react';
 
 import { publicData } from '@/data';
+import { useUserAuthOptional } from '@/hooks/useUserAuth';
+import { HeaderSearch } from '@/components/HeaderSearch';
 
 const navigation = [
-  { label: 'Экскурсии', href: '/events?category=Экскурсии' },
-  { label: 'Музеи и арт', href: '/events?category=Музеи+и+арт' },
-  { label: 'Мероприятия', href: '/events?category=Мероприятия' },
-  { label: 'Активный отдых', href: '/events?category=Активный+отдых' },
-  { label: 'Подборки', section: 'landings' },
-  { label: 'Города', section: 'cities' },
-  { label: 'Мои заказы', section: 'orders' },
+  { label: 'Каталог', href: '/events' },
+  { label: 'Подборки', href: '/podborki' },
+  { label: 'Города', href: '/cities' },
 ];
 
 type HeaderProps = {
   cityLabel: string;
-  search: string;
-  onSearch: (value: string) => void;
   onSection: (section: string) => void;
   onDestination?: (value: string) => void;
+  searchQuery?: string;
+  searchCity?: string;
 };
 
-export function Header({ cityLabel, search, onSearch, onSection, onDestination }: HeaderProps) {
+export function Header({ cityLabel, onSection, onDestination, searchQuery, searchCity }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [userMenuOpen, setUserMenuOpen] = React.useState(false);
+  const auth = useUserAuthOptional();
+  const userMenuRef = React.useRef<HTMLDivElement>(null);
+  const [authMounted, setAuthMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setAuthMounted(true);
+  }, []);
+
+  React.useEffect(() => {
+    if (!userMenuOpen) return;
+    const close = (event: MouseEvent) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) setUserMenuOpen(false);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [userMenuOpen]);
+
+  const isLoggedIn = authMounted && Boolean(auth?.isLoggedIn);
 
   const go = (itemOrSection: string | { section?: string; href?: string }) => {
     setMobileOpen(false);
+    setUserMenuOpen(false);
     if (typeof itemOrSection !== 'string' && itemOrSection.href) {
       window.location.href = itemOrSection.href;
       return;
     }
     const section = typeof itemOrSection === 'string' ? itemOrSection : itemOrSection.section || 'top';
-    if (section === 'orders') {
-      window.location.href = '/my-orders';
-      return;
-    }
     onSection(section);
   };
 
@@ -64,22 +78,22 @@ export function Header({ cityLabel, search, onSearch, onSection, onDestination }
         <div className="flex min-w-0 items-center gap-1 sm:gap-2">
           <HeaderCitySelect label={cityLabel} onDestination={onDestination} onOpenDestinations={() => go('destinations')} />
 
-          <label className="hidden h-10 min-w-[200px] items-center gap-2 rounded-lg bg-slate-50 px-3 ring-1 ring-slate-200 focus-within:bg-white focus-within:ring-primary-300 xl:flex">
-            <Search className="h-4 w-4 flex-shrink-0 text-slate-400" />
-            <input
-              value={search}
-              onChange={(event) => onSearch(event.target.value)}
-              placeholder="Поиск"
-              className="min-w-0 flex-1 bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
-            />
+          <label className="hidden h-10 min-w-[200px] items-center rounded-lg bg-slate-50 px-3 ring-1 ring-slate-200 focus-within:bg-white focus-within:ring-primary-300 xl:flex">
+            <HeaderSearch className="min-w-0 flex-1 py-2" initialQuery={searchQuery} cityFilter={searchCity || (cityLabel !== 'Все города' ? cityLabel : undefined)} />
           </label>
 
-          <button className="relative hidden items-center justify-center rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-rose-500 sm:inline-flex" type="button" title="Избранное">
-            <Heart className="h-5 w-5" />
-          </button>
-          <a className="hidden items-center justify-center rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 sm:inline-flex" href="mailto:hello@daibilet.ru" title="Помощь">
+          <a className="hidden items-center justify-center rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 sm:inline-flex" href="/help" title="Помощь">
             <HelpCircle className="h-5 w-5" />
           </a>
+
+          <HeaderUserMenu
+            ref={userMenuRef}
+            auth={auth}
+            isLoggedIn={isLoggedIn}
+            open={userMenuOpen}
+            onToggle={() => setUserMenuOpen((value) => !value)}
+            onClose={() => setUserMenuOpen(false)}
+          />
 
           <button
             type="button"
@@ -95,13 +109,12 @@ export function Header({ cityLabel, search, onSearch, onSection, onDestination }
       {mobileOpen ? (
         <div className="border-t border-slate-200 bg-white md:hidden">
           <div className="container-page space-y-1 py-3">
-            <label className="mb-3 flex h-11 items-center gap-2 rounded-lg bg-slate-50 px-3 ring-1 ring-slate-200 focus-within:bg-white focus-within:ring-primary-300">
-              <Search className="h-4 w-4 flex-shrink-0 text-slate-400" />
-              <input
-                value={search}
-                onChange={(event) => onSearch(event.target.value)}
+            <label className="mb-3 flex h-11 items-center rounded-lg bg-slate-50 px-3 ring-1 ring-slate-200 focus-within:bg-white focus-within:ring-primary-300">
+              <HeaderSearch
+                className="min-w-0 flex-1 py-2"
                 placeholder="Поиск события, площадки или города"
-                className="min-w-0 flex-1 bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                initialQuery={searchQuery}
+                cityFilter={searchCity || (cityLabel !== 'Все города' ? cityLabel : undefined)}
               />
             </label>
             {navigation.map((item) => (
@@ -122,10 +135,125 @@ export function Header({ cityLabel, search, onSearch, onSection, onDestination }
               <MapPin className="h-5 w-5" />
               {cityLabel}
             </button>
+            <HeaderUserMobile auth={auth} isLoggedIn={isLoggedIn} onNavigate={() => setMobileOpen(false)} />
           </div>
         </div>
       ) : null}
     </header>
+  );
+}
+
+const HeaderUserMenu = React.forwardRef<
+  HTMLDivElement,
+  {
+    auth: ReturnType<typeof useUserAuthOptional>;
+    isLoggedIn: boolean;
+    open: boolean;
+    onToggle: () => void;
+    onClose: () => void;
+  }
+>(function HeaderUserMenu({ auth, isLoggedIn, open, onToggle, onClose }, ref) {
+  return (
+    <div ref={ref} className="relative hidden sm:block">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="relative flex items-center justify-center rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-600"
+        title={isLoggedIn ? auth?.user?.name || 'Мои покупки' : 'Проверить заказ'}
+        aria-label={isLoggedIn ? 'Личный кабинет' : 'Проверить заказ'}
+      >
+        <CircleUser className="h-5 w-5" />
+        {isLoggedIn ? <span className="absolute bottom-1 right-1 h-2 w-2 rounded-full bg-primary-500 ring-2 ring-white" /> : null}
+      </button>
+      {open ? (
+        <div className="absolute right-0 z-50 mt-1 w-56 rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
+          {isLoggedIn && auth?.user?.name ? (
+            <div className="border-b border-slate-100 px-3 py-2 text-sm font-medium text-slate-900">{auth.user.name}</div>
+          ) : null}
+          <a href="/my-orders" onClick={onClose} className="block px-3 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50">
+            Проверить заказ
+          </a>
+          {isLoggedIn ? (
+            <>
+              <a href="/account/purchases" onClick={onClose} className="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50">
+                Мои покупки
+              </a>
+              <button
+                type="button"
+                onClick={async () => {
+                  await auth?.logout();
+                  onClose();
+                  window.location.href = '/';
+                }}
+                className="block w-full px-3 py-2 text-left text-sm text-slate-600 hover:bg-slate-50"
+              >
+                Выйти
+              </button>
+            </>
+          ) : (
+            <div className="border-t border-slate-100 px-3 py-2">
+              <a
+                href="/login?returnUrl=/account/purchases"
+                onClick={onClose}
+                className="block text-xs leading-5 text-slate-500 hover:text-primary-700"
+              >
+                Войти — сохранить историю покупок на email
+              </a>
+            </div>
+          )}
+        </div>
+      ) : null}
+    </div>
+  );
+});
+
+function HeaderUserMobile({
+  auth,
+  isLoggedIn,
+  onNavigate,
+}: {
+  auth: ReturnType<typeof useUserAuthOptional>;
+  isLoggedIn: boolean;
+  onNavigate: () => void;
+}) {
+  return (
+    <div className="space-y-1 border-t border-slate-100 pt-3">
+      <a
+        href="/my-orders"
+        onClick={onNavigate}
+        className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-base font-medium text-slate-900 hover:bg-slate-100"
+      >
+        <CircleUser className="h-5 w-5 text-primary-600" />
+        Проверить заказ
+      </a>
+      {isLoggedIn ? (
+        <>
+          {auth?.user?.name ? <div className="px-3 text-sm text-slate-500">{auth.user.name}</div> : null}
+          <a href="/account/purchases" onClick={onNavigate} className="block rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-100">
+            Мои покупки
+          </a>
+          <button
+            type="button"
+            onClick={async () => {
+              await auth?.logout();
+              onNavigate();
+              window.location.href = '/';
+            }}
+            className="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-rose-600 hover:bg-rose-50"
+          >
+            Выйти
+          </button>
+        </>
+      ) : (
+        <a
+          href="/login?returnUrl=/account/purchases"
+          onClick={onNavigate}
+          className="block rounded-lg px-3 py-2 text-sm text-slate-500 hover:text-primary-700"
+        >
+          Войти — история покупок на email
+        </a>
+      )}
+    </div>
   );
 }
 

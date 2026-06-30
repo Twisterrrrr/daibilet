@@ -1,10 +1,49 @@
 import * as React from 'react';
-import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle2, Clock, HelpCircle, LayoutGrid, ListFilter, MapPin, Search, Shield, Sparkles, Tag, Ticket, TrendingUp } from 'lucide-react';
+import { Anchor, ArrowRight, Briefcase, Bus, Cake, CalendarDays, CheckCircle2, ChevronDown, CircleHelp, Clock, Eye, Headphones, Heart, HelpCircle, Lightbulb, MapPin, Mic, Moon, Music, Quote, Search, Shield, Ship, Sparkles, Star, Sun, Tag, Ticket, TrendingUp, Users, UtensilsCrossed, Wallet } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
-import { Footer } from '@/components/Footer';
-import { Header } from '@/components/Header';
-import { formatMoney, formatNumber, publicData } from '@/data';
+import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton';
+import { LandingStickyHeader } from '@/components/landing/LandingStickyHeader';
+import {
+  CANONICAL_LANDING_SLUGS,
+  busLandingHref,
+  canonicalLandingSlug,
+  isRiverCruisesLandingSlug,
+  isRiverPartyLandingSlug,
+  landingFetchCandidates,
+  landingSlugVariants,
+  partyLandingHref,
+  riverLandingHref,
+} from '@/lib/landing-slugs';
+import {
+  getSeasonalLanding,
+  seasonalCityGuide,
+  seasonalCityGuideBySlug,
+  seasonalLandingRoot,
+} from '@/data/seasonal-landings';
+import {
+  RIVER_CITY_ORDER,
+  riverCityGuide,
+  riverCityGuideBySlug,
+  type RiverCitySpot,
+} from '@/data/river-landings';
+import {
+  formatMoney,
+  formatNumber,
+  publicData,
+} from '@/data';
+import {
+  getSessionHour,
+  isSameSessionDay,
+  isSessionTomorrow,
+  isSessionWeekend,
+  resolveSessionDate,
+  resolveSessionTime,
+  parseSessionStartsAt,
+  sessionTimeSlotFilter,
+} from '@/lib/datetime';
+import { isOpenDate, FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession } from '@/lib/event-card-meta';
+import { formatVacantSeats } from '@/lib/pluralize';
 import { eventHref } from '@/routes';
 import type { PublicLanding, PublicLandingContentBlock, PublicLandingPage, PublicSession } from '@/types';
 
@@ -14,8 +53,522 @@ const API_BASE_URL =
 
 type DateFilter = 'all' | 'today' | 'tomorrow' | 'weekend' | 'evening';
 type SortFilter = 'price' | 'rating' | 'time';
-type ViewMode = 'table' | 'cards';
+type ViewMode = 'list' | 'table' | 'cards';
+type LandingProfile = 'bus' | 'dinner' | 'river' | 'seasonal' | 'default';
+type MenuFilter = 'all' | 'set' | 'buffet';
+type DinnerTimeFilter = 'all' | 'sunset' | 'night';
+type TimeSlotFilter = '' | 'morning' | 'day' | 'evening' | 'night';
 const MIN_DISPLAY_PRICE_RUB = 100;
+
+const LANDING_CITY_SLUGS: Record<string, string> = {
+  moscow: 'Москва',
+  moskva: 'Москва',
+  msk: 'Москва',
+  spb: 'Санкт-Петербург',
+  'saint-petersburg': 'Санкт-Петербург',
+  'sankt-peterburg': 'Санкт-Петербург',
+  kazan: 'Казань',
+  'nizhny-novgorod': 'Нижний Новгород',
+  'nizhniy-novgorod': 'Нижний Новгород',
+  samara: 'Самара',
+  volgograd: 'Волгоград',
+  yaroslavl: 'Ярославль',
+  krasnoyarsk: 'Красноярск',
+  perm: 'Пермь',
+  novosibirsk: 'Новосибирск',
+  tver: 'Тверь',
+  rostov: 'Ростов-на-Дону',
+  'rostov-on-don': 'Ростов-на-Дону',
+  sochi: 'Сочи',
+  kaliningrad: 'Калининград',
+  ekaterinburg: 'Екатеринбург',
+  'rostov-na-donu': 'Ростов-на-Дону',
+};
+
+const BUS_CITY_META: Record<string, { slug: string; duration: string; prepositional: string }> = {
+  Москва: { slug: 'moscow', duration: '1.5–3 часа', prepositional: 'Москве' },
+  'Санкт-Петербург': { slug: 'spb', duration: '2–4 часа', prepositional: 'Санкт-Петербургу' },
+  Казань: { slug: 'kazan', duration: '2–3 часа', prepositional: 'Казани' },
+  'Нижний Новгород': { slug: 'nizhny-novgorod', duration: '2–3 часа', prepositional: 'Нижнему Новгороду' },
+  Самара: { slug: 'samara', duration: '2–2.5 часа', prepositional: 'Самаре' },
+  Волгоград: { slug: 'volgograd', duration: '3–4 часа', prepositional: 'Волгограду' },
+  Ярославль: { slug: 'yaroslavl', duration: '2–2.5 часа', prepositional: 'Ярославлю' },
+  Сочи: { slug: 'sochi', duration: '3–5 часов', prepositional: 'Сочи' },
+  Калининград: { slug: 'kaliningrad', duration: '2–3 часа', prepositional: 'Калининграду' },
+  Екатеринбург: { slug: 'ekaterinburg', duration: '2–3 часа', prepositional: 'Екатеринбургу' },
+  'Ростов-на-Дону': { slug: 'rostov-on-don', duration: '2–3 часа', prepositional: 'Ростову-на-Дону' },
+};
+
+type BusCitySpot = { title: string; badge: string; badgeTone?: 'ticket' | 'free'; description: string };
+type BusCityGuide = { intro: string; heroSubtitle: string; spots: BusCitySpot[]; tips: string[] };
+
+const BUS_CITY_GUIDES: Partial<Record<string, BusCityGuide>> = {
+  'Санкт-Петербург': {
+    intro: 'Петербург — город, созданный для обзорных экскурсий. Автобусные туры охватывают Невский проспект, Дворцовую площадь, Исаакиевский собор, Петропавловскую крепость и пригороды (Петергоф, Пушкин). Ночные рейсы с разводными мостами — отдельный жанр.',
+    heroSubtitle: 'Невский проспект, Эрмитаж, Петропавловка и белые ночи — классика с комфортом.',
+    spots: [
+      { title: 'Классический обзорный', badge: 'Билет', badgeTone: 'ticket', description: 'Невский → Дворцовая → Исаакий → Петропавловка. 2.5–3 часа.' },
+      { title: 'Ночной Петербург + мосты', badge: 'Билет', badgeTone: 'ticket', description: 'Подсветка + остановка у разводного моста. После 23:00.' },
+      { title: 'Петергоф / Пушкин', badge: 'Билет', badgeTone: 'ticket', description: 'Загородная экскурсия на полдня.' },
+      { title: 'Маршрут автобуса №7', badge: 'Бесплатно', badgeTone: 'free', description: 'Общественный транспорт по Невскому — бесплатная альтернатива.' },
+    ],
+    tips: [
+      'Ночной рейс с мостами — бронируйте за неделю в сезон белых ночей',
+      'Петергоф лучше посещать в будни — меньше очередей',
+      'Двухэтажный автобус ходит по Невскому — отличные фото',
+      'Тёплая одежда нужна даже летом для ночных рейсов',
+    ],
+  },
+  Москва: {
+    intro: 'Москва за один день: от Красной площади до Москва-Сити. Автобусные туры — лучший способ увидеть масштаб столицы без долгих переходов.',
+    heroSubtitle: 'Кремль, Воробьёвы горы, Сити и Храм Христа Спасителя — всё в одной поездке.',
+    spots: [
+      { title: 'Классический обзорный', badge: 'Билет', badgeTone: 'ticket', description: 'Красная площадь → Воробьёвы горы → Сити. 3 часа.' },
+      { title: 'Hop-on/Hop-off', badge: 'Билет', badgeTone: 'ticket', description: 'Целый день по фиксированным остановкам.' },
+    ],
+    tips: ['Берите утренний рейс — меньше пробок', 'Двухэтажный автобус — лучший обзор с верхней палубы'],
+  },
+};
+
+function busCityGuide(cityName: string | null): BusCityGuide | null {
+  if (!cityName) return null;
+  return BUS_CITY_GUIDES[cityName] || {
+    intro: `Обзорные автобусные экскурсии в ${cityName}: сравните маршруты, цены и расписание на сегодня.`,
+    heroSubtitle: `Главные достопримечательности ${cityName} — с комфортом и аудиогидом.`,
+    spots: [],
+    tips: ['Бронируйте заранее в высокий сезон', 'Проверяйте точку посадки на карточке экскурсии'],
+  };
+}
+
+function riverCruiseCityHref(citySlug: string) {
+  return riverLandingHref(citySlug);
+}
+
+function busLandingRoot(_slug?: string) {
+  return busLandingHref();
+}
+
+function riverLandingRoot(landingSlug: string) {
+  if (isRiverPartyLandingSlug(landingSlug)) return partyLandingHref();
+  const key = landingSlug.toLowerCase();
+  if (key.includes('bridge')) return '/landings/bridges-night';
+  return riverLandingHref();
+}
+
+type DinnerCityGuide = {
+  heroTitle: string;
+  heroSubtitle: string;
+  breadcrumbCurrent: string;
+  introTitle: string;
+  introText: string;
+  scheduleTitle: string;
+  riverCruiseHref: string;
+  riverCruiseLabel: string;
+};
+
+const DINNER_CITY_GUIDES: Partial<Record<string, DinnerCityGuide>> = {
+  Москва: {
+    heroTitle: 'Ужин на теплоходе по Москве-реке сегодня — цены и расписание',
+    heroSubtitle: 'Сравните рестораны на воде и выберите лучший вечерний круиз по Москве-реке.',
+    breadcrumbCurrent: 'Ужин на теплоходе — Москва',
+    introTitle: 'Ужин на теплоходе — ресторан с видом на Кремль',
+    introText:
+      'Москва-река — идеальная декорация для вечернего ужина. Вы проплываете мимо Кремля, Храма Христа Спасителя и Москва-Сити, пока шеф-повар готовит блюда на борту. Это не просто прогулка — это полноценный ресторанный опыт на воде: от сет-меню из 5 блюд до фуршетов с живой музыкой.',
+    scheduleTitle: 'Теплоходы с ужином — Москва',
+    riverCruiseHref: riverLandingHref('moscow'),
+    riverCruiseLabel: 'Все речные прогулки по Москве',
+  },
+  'Санкт-Петербург': {
+    heroTitle: 'Ужин на теплоходе по Неве сегодня — цены и расписание',
+    heroSubtitle: 'Сравните рестораны на воде и выберите лучший вечерний круиз по Неве.',
+    breadcrumbCurrent: 'Ужин на теплоходе — Санкт-Петербург',
+    introTitle: 'Ужин на теплоходе — ресторан с видом на разводные мосты',
+    introText:
+      'Нева вечером — лучший фон для ужина на воде. Панорамные окна, живая музыка и подсветка дворцов создают атмосферу, которую не повторить в обычном ресторане.',
+    scheduleTitle: 'Теплоходы с ужином — Санкт-Петербург',
+    riverCruiseHref: riverLandingHref('spb'),
+    riverCruiseLabel: 'Все речные прогулки по Петербургу',
+  },
+};
+
+function dinnerCityGuide(cityName: string | null, citySlug?: string): DinnerCityGuide | null {
+  if (!cityName) return null;
+  if (DINNER_CITY_GUIDES[cityName]) return DINNER_CITY_GUIDES[cityName]!;
+  const slugKey = citySlug || citySlugByName(cityName) || 'moscow';
+  return {
+    heroTitle: `Ужин на теплоходе в ${cityName} — цены и расписание`,
+    heroSubtitle: `Сравните рестораны на воде и выберите лучший вечерний круиз в ${cityName}.`,
+    breadcrumbCurrent: `Ужин на теплоходе — ${cityName}`,
+    introTitle: `Ужин на теплоходе в ${cityName}`,
+    introText: `Вечерний круиз с ужином на борту — удобный способ совместить гастрономию и обзор города с воды.`,
+    scheduleTitle: `Теплоходы с ужином — ${cityName}`,
+    riverCruiseHref: riverCruiseCityHref(slugKey),
+    riverCruiseLabel: `Все речные прогулки в ${cityName}`,
+  };
+}
+
+function matchesMenuFilter(session: PublicSession, menu: MenuFilter): boolean {
+  if (menu === 'all') return true;
+  const text = [session.title, session.category, ...(session.tags || [])].join(' ').toLowerCase();
+  if (menu === 'set') return /сет|set-menu|дегуста/i.test(text);
+  if (menu === 'buffet') return /фуршет|buffet/i.test(text);
+  return true;
+}
+
+function matchesDinnerTimeFilter(session: PublicSession, filter: DinnerTimeFilter): boolean {
+  if (filter === 'all') return true;
+  if (!session.startsAt) return true;
+  const hour = getSessionHour(session.startsAt);
+  if (filter === 'sunset') return hour >= 18 && hour < 21;
+  if (filter === 'night') return hour >= 21;
+  return true;
+}
+
+function extractMenuLabel(tags: string[]): string {
+  const text = (tags || []).join(' ').toLowerCase();
+  if (/фуршет/i.test(text)) return 'Фуршет';
+  if (/сет/i.test(text)) return 'Сет-меню';
+  return 'Ужин';
+}
+
+function extractFormatLabel(tags: string[]): string {
+  const text = (tags || []).join(' ').toLowerCase();
+  if (/vip/i.test(text)) return 'VIP';
+  if (/романт/i.test(text)) return 'Романтика';
+  if (/корпоратив/i.test(text)) return 'Корпоратив';
+  return 'Стандарт';
+}
+
+function citySlugFromCityName(cityName: string | null): string | undefined {
+  if (!cityName) return undefined;
+  const entry = Object.entries(LANDING_CITY_SLUGS).find(([, name]) => name === cityName);
+  return entry?.[0];
+}
+
+function landingSlugAliases(slug: string): string[] {
+  return landingSlugVariants(canonicalLandingSlug(slug));
+}
+
+function inferCityFromSessionText(session: PublicSession): string | null {
+  const haystack = [session.title, session.venue, ...(session.tags || [])].join(' ').toLowerCase();
+  const candidates = Array.from(
+    new Set([...Object.values(LANDING_CITY_SLUGS), ...Object.keys(BUS_CITY_META)]),
+  ).sort((a, b) => b.length - a.length);
+
+  const cityStem = (city: string) => {
+    const compact = city.toLowerCase().replace(/[^а-яё]/g, '');
+    if (compact.length <= 5) return compact;
+    return compact.slice(0, Math.max(5, compact.length - 2));
+  };
+
+  for (const city of candidates) {
+    if (haystack.includes(city.toLowerCase())) return city;
+    const stem = cityStem(city);
+    if (stem.length >= 4 && haystack.includes(stem)) return city;
+  }
+
+  const match = haystack.match(/(?:^|\s)г\.?\s*([а-яё][а-яё\s-]{2,40})/i);
+  if (!match) return null;
+
+  const fragment = match[1].trim().replace(/["«»]/g, '');
+  for (const city of candidates) {
+    const normalized = city.toLowerCase();
+    if (normalized.startsWith(fragment) || fragment.startsWith(normalized.slice(0, 6))) return city;
+  }
+
+  return null;
+}
+
+function resolveSessionCityName(session: PublicSession): string {
+  if (session.city && session.city !== 'Не указан') return session.city;
+  if (session.destination && session.destination !== 'Не указан') return session.destination;
+  return inferCityFromSessionText(session) || session.city || 'Не указан';
+}
+
+function sessionMatchesCity(session: PublicSession, cityName: string): boolean {
+  return resolveSessionCityName(session) === cityName;
+}
+
+function filterSessionsByCity(sessions: PublicSession[], cityName: string | null): PublicSession[] {
+  if (!cityName) return sessions;
+  return sessions.filter((session) => sessionMatchesCity(session, cityName));
+}
+
+function collectLandingSessions(slug: string, cityName: string | null): PublicSession[] {
+  const aliases = landingSlugAliases(slug);
+  let sessions = publicData.sessions.filter((session) =>
+    session.landingSlugs.some((landingSlug) => aliases.includes(String(landingSlug || '').toLowerCase())),
+  );
+
+  const profile = getLandingProfile(slug);
+  if (!sessions.length && profile === 'dinner') {
+    sessions = publicData.sessions.filter((session) => {
+      const text = [session.title, session.category, ...(session.tags || [])].join(' ').toLowerCase();
+      return /ужин|dinner|фуршет|сет.?меню|банкет/i.test(text);
+    });
+  }
+
+  if (!sessions.length) {
+    for (const alias of aliases) {
+      const aliasSessions = publicData.sessions.filter((session) =>
+        session.landingSlugs.some((landingSlug) => String(landingSlug || '').toLowerCase() === alias),
+      );
+      if (aliasSessions.length) {
+        sessions = aliasSessions;
+        break;
+      }
+    }
+  }
+
+  return filterSessionsByCity(sessions, cityName);
+}
+
+function createSyntheticLanding(slug: string, cityName: string | null): PublicLanding | null {
+  if (isRiverPartyLandingSlug(slug)) {
+    return {
+      slug,
+      title: 'Вечеринки и дискотеки на теплоходе',
+      subtitle: 'DJ, живая музыка и ночные речные круизы',
+      heroTitle: cityName
+        ? `Вечеринки на теплоходе — ${cityName}`
+        : 'Вечеринки и дискотеки на теплоходе',
+      heroSubtitle: 'DJ-сеты, живая музыка и ночные круизы по рекам и каналам',
+      seoTitle: cityName
+        ? `Вечеринки на теплоходе — ${cityName} | Дайбилет`
+        : 'Вечеринки на теплоходе | Дайбилет',
+      seoDescription: 'Дискотеки, DJ и ночные речные круизы: сравните расписание и цены.',
+      events: 0,
+    } as PublicLanding;
+  }
+
+  const profile = getLandingProfile(slug);
+  if (profile === 'default') return null;
+
+  if (profile === 'dinner') {
+    const guide = dinnerCityGuide(cityName, citySlugFromCityName(cityName));
+    const title = cityName ? `Ужин на теплоходе — ${cityName}` : 'Ужин на теплоходе';
+    return {
+      slug,
+      title,
+      subtitle: guide?.heroSubtitle || 'Вечерние круизы с ужином на борту',
+      heroTitle: guide?.heroTitle,
+      heroSubtitle: guide?.heroSubtitle,
+      seoTitle: guide?.heroTitle ? `${guide.heroTitle} | Дайбилет` : `${title} | Дайбилет`,
+      seoDescription:
+        'Ужин на теплоходе: сравните рестораны на воде, меню, цены и расписание вечерних круизов.',
+      events: 0,
+    } as PublicLanding;
+  }
+
+  if (profile === 'bus') {
+    const prep = cityName ? BUS_CITY_META[cityName]?.prepositional || cityName : 'России';
+    return {
+      slug,
+      title: cityName ? `Автобусные экскурсии — ${cityName}` : 'Автобусные экскурсии',
+      subtitle: cityName
+        ? `Обзорные автобусные экскурсии в ${cityName}`
+        : 'Обзорные автобусные экскурсии по городам России',
+      heroTitle: cityName
+        ? `Обзорные автобусные экскурсии по ${prep} сегодня — цены, расписание и маршруты`
+        : 'Обзорные автобусные экскурсии по России — цены, расписание и маршруты',
+      heroSubtitle: cityName
+        ? busCityGuide(cityName)?.heroSubtitle
+        : 'От Калининграда до Сочи — сравните автобусные экскурсии в 11 городах России.',
+      seoTitle: cityName ? `Автобусные экскурсии ${cityName} | Дайбилет` : 'Автобусные экскурсии | Дайбилет',
+      seoDescription: 'Автобусные экскурсии: расписание, цены и маршруты.',
+      events: 0,
+    } as PublicLanding;
+  }
+
+  if (profile === 'river') {
+    const riverGuide = cityName ? riverCityGuide(cityName) : null;
+    const prep = riverGuide?.cityNameDative || cityName || 'России';
+    return {
+      slug,
+      title: cityName ? `Речные прогулки — ${cityName}` : 'Речные прогулки',
+      subtitle: cityName
+        ? `Речные прогулки и экскурсии на теплоходе в ${cityName}`
+        : 'Речные прогулки по городам России',
+      heroTitle: cityName
+        ? `Речные прогулки по ${prep} сегодня — цены, расписание и сравнение теплоходов`
+        : 'Речные прогулки по России — цены, расписание и сравнение теплоходов',
+      heroSubtitle: cityName
+        ? riverGuide?.heroSubtitle
+        : 'От Невы до Енисея — сравните предложения речных прогулок в 12 городах России.',
+      seoTitle: cityName ? `Речные прогулки ${cityName} | Дайбилет` : 'Речные прогулки | Дайбилет',
+      seoDescription: 'Речные прогулки: расписание, цены и теплоходы.',
+      events: 0,
+    } as PublicLanding;
+  }
+
+  if (profile === 'seasonal') {
+    const meta = getSeasonalLanding(slug);
+    if (!meta) return null;
+    const cityGuide = seasonalCityGuide(slug, cityName);
+    return {
+      slug,
+      title: meta.breadcrumbLabel,
+      subtitle: meta.nationalHeroSubtitle,
+      heroTitle: cityGuide
+        ? `${meta.breadcrumbLabel} в ${cityGuide.cityNameDative} — лучшие точки обзора и экскурсии`
+        : meta.nationalHeroTitle,
+      heroSubtitle: cityGuide?.heroSubtitle || meta.nationalHeroSubtitle,
+      seoTitle: cityGuide
+        ? `${meta.breadcrumbLabel} — ${cityGuide.cityName} | Дайбилет`
+        : `${meta.nationalHeroTitle} | Дайбилет`,
+      seoDescription: meta.nationalHeroSubtitle,
+      events: 0,
+    } as PublicLanding;
+  }
+
+  return {
+    slug,
+    title: slug.replace(/-/g, ' '),
+    subtitle: 'Расписание и цены',
+    seoTitle: `${slug} | Дайбилет`,
+    seoDescription: 'Расписание и цены на Дайбилет.',
+    events: 0,
+  } as PublicLanding;
+}
+
+function finalizeLandingPayload(payload: PublicLandingPage, slug: string, cityName: string | null): PublicLandingPage {
+  const sessions = filterSessionsByCity(payload.sessions, cityName);
+  return {
+    ...payload,
+    landing: payload.landing.slug === slug ? payload.landing : { ...payload.landing, slug },
+    sessions,
+    stats: buildLandingStats(sessions),
+  };
+}
+
+const EMPTY_LANDING_STATS: PublicLandingPage['stats'] = {
+  events: 0,
+  sessions: 0,
+  cities: {},
+  categories: {},
+  venues: {},
+  priceFrom: null,
+};
+
+function buildLandingShellPage(slug: string, citySlug?: string): PublicLandingPage | null {
+  const cityName = resolveLandingCityName(citySlug, slug);
+  const synthetic = createSyntheticLanding(slug, cityName);
+  const landing =
+    synthetic ||
+    publicData.landings.find((item) => {
+      const aliases = landingSlugAliases(slug);
+      return item.slug === slug || aliases.includes(item.slug);
+    }) ||
+    null;
+  if (!landing) return null;
+
+  return {
+    generatedAt: '',
+    landing: landing.slug === slug ? landing : { ...landing, slug },
+    sessions: [],
+    relatedLandings: [],
+    blocks: [],
+    stats: EMPTY_LANDING_STATS,
+  };
+}
+
+function resolveLandingPayload(slug: string, citySlug?: string): PublicLandingPage | null {
+  const cityName = resolveLandingCityName(citySlug, slug);
+
+  const staticPayload = buildStaticLandingPage(slug);
+  if (staticPayload) {
+    return finalizeLandingPayload(staticPayload, slug, cityName);
+  }
+
+  for (const alias of landingSlugAliases(slug)) {
+    if (alias === slug) continue;
+    const aliasPayload = buildStaticLandingPage(alias);
+    if (aliasPayload) {
+      const sessions = collectLandingSessions(slug, cityName);
+      return finalizeLandingPayload(
+        {
+          ...aliasPayload,
+          sessions: sessions.length ? sessions : aliasPayload.sessions,
+        },
+        slug,
+        cityName,
+      );
+    }
+  }
+
+  const sessions = collectLandingSessions(slug, cityName);
+  const landing = createSyntheticLanding(slug, cityName);
+  if (!landing) return null;
+
+  return {
+    generatedAt: publicData.generatedAt,
+    landing,
+    sessions,
+    relatedLandings: publicData.landings.filter((item) => item.slug !== slug && item.events > 0).slice(0, 6),
+    blocks: [],
+    stats: buildLandingStats(sessions),
+  };
+}
+
+async function fetchLandingPayload(slug: string, signal?: AbortSignal): Promise<PublicLandingPage | null> {
+  for (const candidate of landingFetchCandidates(slug)) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/public/landings/${encodeURIComponent(candidate)}`, {
+        cache: 'no-store',
+        signal,
+      });
+      if (!response.ok) continue;
+      const data = (await response.json()) as PublicLandingPage | null;
+      if (!data?.landing) continue;
+      return candidate === slug ? data : { ...data, landing: { ...data.landing, slug } };
+    } catch (error) {
+      if (signal?.aborted) throw error;
+      continue;
+    }
+  }
+  return null;
+}
+
+const BUS_CITY_ORDER = Object.keys(BUS_CITY_META);
+
+function getLandingProfile(slug: string): LandingProfile {
+  const key = canonicalLandingSlug(slug);
+  if (getSeasonalLanding(key)) return 'seasonal';
+  if (isRiverPartyLandingSlug(key)) return 'default';
+  if (key.includes('bus')) return 'bus';
+  if (key.includes('dinner') || key.includes('ужин')) return 'dinner';
+  if (key.includes('bridge') || isRiverCruisesLandingSlug(key)) return 'river';
+  return 'default';
+}
+
+function isLovableLanding(profile: LandingProfile): boolean {
+  return profile === 'bus' || profile === 'river' || profile === 'dinner' || profile === 'seasonal' || profile === 'default';
+}
+
+function matchesTimeSlotFilter(session: PublicSession, slot: TimeSlotFilter): boolean {
+  if (!slot) return true;
+  const startsAt = session.startsAt || session.upcomingSlots?.[0]?.startsAt;
+  if (!startsAt) return true;
+  return sessionTimeSlotFilter(startsAt) === slot;
+}
+
+function citySlugByName(name: string): string | null {
+  const riverGuide = riverCityGuide(name);
+  if (riverGuide?.slug) return riverGuide.slug;
+  const entry = Object.entries(LANDING_CITY_SLUGS).find(([, cityName]) => cityName === name);
+  return entry?.[0] || BUS_CITY_META[name]?.slug || null;
+}
+
+function resolveLandingCityName(citySlug?: string | null, landingSlug?: string) {
+  const key = String(citySlug || '').trim().toLowerCase();
+  if (!key) return null;
+  if (LANDING_CITY_SLUGS[key]) return LANDING_CITY_SLUGS[key];
+  if (landingSlug) {
+    const seasonal = seasonalCityGuideBySlug(canonicalLandingSlug(landingSlug), key);
+    if (seasonal?.cityName) return seasonal.cityName;
+  }
+  return riverCityGuideBySlug(key)?.cityName || null;
+}
 
 type EventGroup = {
   key: string;
@@ -31,52 +584,79 @@ type EventGroup = {
   firstStartsAt?: string | null;
 };
 
-export function LandingPage({ slug }: { slug: string }) {
-  const [payload, setPayload] = React.useState<PublicLandingPage | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlug?: string }) {
+  const slug = canonicalLandingSlug(rawSlug);
+  const profile = getLandingProfile(slug);
+  const shell = React.useMemo(() => buildLandingShellPage(slug, citySlug), [slug, citySlug]);
+
+  React.useEffect(() => {
+    if (slug !== rawSlug) {
+      const target = citySlug ? `/landings/${slug}/${citySlug}` : `/landings/${slug}`;
+      window.location.replace(target);
+    }
+  }, [rawSlug, slug, citySlug]);
+
+  React.useEffect(() => {
+    if (shell?.landing) applyLandingMeta(shell.landing);
+  }, [shell]);
+
+  const [apiPayload, setApiPayload] = React.useState<PublicLandingPage | null>(null);
+  const [isSessionsLoading, setIsSessionsLoading] = React.useState(true);
+  const [sessionsError, setSessionsError] = React.useState<string | null>(null);
   const [city, setCity] = React.useState('all');
   const [category, setCategory] = React.useState('all');
-  const [dateFilter, setDateFilter] = React.useState<DateFilter>('all');
-  const [sort, setSort] = React.useState<SortFilter>('time');
-  const [query, setQuery] = React.useState('');
-  const [mode, setMode] = React.useState<ViewMode>('table');
+  const [dateFilter, setDateFilter] = React.useState<DateFilter>(profile === 'bus' ? 'all' : 'today');
+  const [sort, setSort] = React.useState<SortFilter>(profile === 'bus' || profile === 'dinner' ? 'price' : 'time');
+  const [menuFilter, setMenuFilter] = React.useState<MenuFilter>('all');
+  const [dinnerTimeFilter, setDinnerTimeFilter] = React.useState<DinnerTimeFilter>('all');
+  const [timeSlot, setTimeSlot] = React.useState<TimeSlotFilter>('');
+
+  React.useEffect(() => {
+    const nextProfile = getLandingProfile(slug);
+    setSort(nextProfile === 'bus' || nextProfile === 'dinner' ? 'price' : 'time');
+    setDateFilter(nextProfile === 'bus' ? 'all' : 'today');
+    setMenuFilter('all');
+    setDinnerTimeFilter('all');
+    setTimeSlot('');
+    setApiPayload(null);
+    setSessionsError(null);
+    setIsSessionsLoading(true);
+  }, [slug, citySlug]);
 
   React.useEffect(() => {
     let disposed = false;
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 25000);
 
-    setIsLoading(true);
-    fetch(`${API_BASE_URL}/api/public/landings/${encodeURIComponent(slug)}`, {
-      cache: 'no-store',
-      signal: controller.signal,
-    })
-      .then((response) => {
-        if (!response.ok) throw new Error('landing not found');
-        return response.json() as Promise<PublicLandingPage | null>;
-      })
+    setIsSessionsLoading(true);
+    setSessionsError(null);
+
+    fetchLandingPayload(slug, controller.signal)
       .then((data) => {
-        if (!data) throw new Error('landing not found');
         if (disposed) return;
-        setPayload(data);
-        applyLandingMeta(data.landing);
-        setError(null);
-      })
-      .catch(() => {
-        if (disposed) return;
-        const fallbackPayload = buildStaticLandingPage(slug);
-        if (fallbackPayload) {
-          setPayload(fallbackPayload);
-          applyLandingMeta(fallbackPayload.landing);
-          setError(null);
+        if (data?.landing) {
+          const resolved = finalizeLandingPayload(data, slug, resolveLandingCityName(citySlug, slug));
+          setApiPayload(resolved);
+          applyLandingMeta(resolved.landing);
+          setSessionsError(null);
           return;
         }
-        setError('Лендинг не найден или backend сейчас недоступен.');
+        throw new Error('landing not found');
+      })
+      .catch((error) => {
+        if (disposed || controller.signal.aborted) return;
+        const fallbackPayload = resolveLandingPayload(slug, citySlug);
+        if (fallbackPayload?.sessions.length) {
+          setApiPayload(fallbackPayload);
+          applyLandingMeta(fallbackPayload.landing);
+          setSessionsError(null);
+          return;
+        }
+        setSessionsError('Не удалось загрузить расписание. Попробуйте обновить страницу.');
       })
       .finally(() => {
         window.clearTimeout(timeout);
-        if (!disposed) setIsLoading(false);
+        if (!disposed) setIsSessionsLoading(false);
       });
 
     return () => {
@@ -84,151 +664,906 @@ export function LandingPage({ slug }: { slug: string }) {
       window.clearTimeout(timeout);
       controller.abort();
     };
-  }, [slug]);
+  }, [slug, citySlug]);
+
+  React.useEffect(() => {
+    const cityName = resolveLandingCityName(citySlug);
+    setCity(cityName || 'all');
+  }, [citySlug]);
+
+  const payload = apiPayload || shell;
+  const sessionsReady = Boolean(apiPayload);
 
   const filteredSessions = React.useMemo(() => {
-    if (!payload) return [];
-    const normalizedQuery = query.trim().toLowerCase();
+    if (!payload || !sessionsReady) return [];
 
     return payload.sessions.filter((session) => {
-      const startsAt = new Date(session.startsAt);
-      if (city !== 'all' && session.city !== city) return false;
+      if (!session.startsAt && !isOpenDate(session)) return false;
+      if (city !== 'all' && !sessionMatchesCity(session, city)) return false;
       if (category !== 'all' && session.category !== category && !session.tags.includes(category)) return false;
-      if (!matchesDateFilter(session, startsAt, dateFilter)) return false;
-
-      if (!normalizedQuery) return true;
-
-      return [session.title, session.city, session.venue, session.category, ...(session.tags || [])]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
-        .includes(normalizedQuery);
+      if (profile === 'dinner' && !matchesMenuFilter(session, menuFilter)) return false;
+      if (profile === 'dinner' && !matchesDinnerTimeFilter(session, dinnerTimeFilter)) return false;
+      if ((profile === 'bus' || profile === 'river' || profile === 'seasonal') && !matchesTimeSlotFilter(session, timeSlot)) return false;
+      return matchesDateFilter(session, session.startsAt, dateFilter);
     });
-  }, [category, city, dateFilter, payload, query]);
+  }, [category, city, dateFilter, menuFilter, dinnerTimeFilter, timeSlot, payload, profile, sessionsReady]);
 
-  const allGroups = React.useMemo(() => (payload ? groupLandingSessions(payload.sessions) : []), [payload]);
+  const allGroups = React.useMemo(
+    () => (payload && sessionsReady ? groupLandingSessions(payload.sessions) : []),
+    [payload, sessionsReady],
+  );
   const groups = React.useMemo(() => sortEventGroups(groupLandingSessions(filteredSessions), sort), [filteredSessions, sort]);
+  const cityName = resolveLandingCityName(citySlug, slug);
+  const seasonalMeta = profile === 'seasonal' ? getSeasonalLanding(slug) : null;
+
+  if (!payload) {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <ErrorState message="Лендинг не найден." />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
-      <Header cityLabel={city === 'all' ? 'Все города' : city} search={query} onSearch={setQuery} onSection={navigateHome} />
-      <main>
-        {isLoading ? <LoadingState /> : null}
-        {error ? <ErrorState message={error} /> : null}
-        {payload && !error ? (
-          <>
-            <LandingHero landing={payload.landing} visibleCount={allGroups.length} sessionsCount={payload.sessions.length} stats={payload.stats} />
-            <LandingScenarioGuide landing={payload.landing} stats={payload.stats} groups={allGroups} />
-            <section id="landing-schedule" className="container-page grid gap-6 py-7 lg:grid-cols-[minmax(0,1fr)_320px]">
-              <div className="min-w-0">
-                <LandingFilters
-                  stats={payload.stats}
-                  city={city}
-                  category={category}
-                  dateFilter={dateFilter}
-                  sort={sort}
-                  mode={mode}
-                  groupsCount={groups.length}
-                  sessionsCount={filteredSessions.length}
-                  setCity={setCity}
-                  setCategory={setCategory}
-                  setDateFilter={setDateFilter}
-                  setSort={setSort}
-                  setMode={setMode}
-                  reset={() => {
-                    setCity('all');
-                    setCategory('all');
-                    setDateFilter('all');
-                    setQuery('');
-                    setSort('time');
-                  }}
-                />
-                {mode === 'table' ? <LandingEventsTable groups={groups} /> : <LandingEventsGrid groups={groups} />}
-              </div>
-              <aside className="grid content-start gap-4">
-                <LandingContext landing={payload.landing} stats={payload.stats} />
-                <RelatedLandings landings={payload.relatedLandings} />
-              </aside>
+    <div className="min-h-screen bg-background text-foreground">
+      <>
+          <LandingStickyHeader />
+          <LandingHero
+            landing={payload.landing}
+            profile={profile}
+            landingSlug={slug}
+            citySlug={citySlug}
+            visibleCount={allGroups.length}
+            sessionsCount={payload.sessions.length}
+            stats={payload.stats}
+            sessionsReady={sessionsReady}
+          />
+          {profile === 'seasonal' && !citySlug && seasonalMeta?.nationalIntro ? (
+            <section className="container mx-auto px-4 pb-4 pt-8">
+              <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">{seasonalMeta.nationalIntro}</p>
             </section>
-            <LandingEditorialIntro landing={payload.landing} stats={payload.stats} groups={allGroups} />
-            <LandingContentBlocks blocks={payload.blocks || []} landing={payload.landing} stats={payload.stats} />
-            <LandingHowToChoose landing={payload.landing} stats={payload.stats} />
-          </>
-        ) : null}
-      </main>
-      <Footer />
+          ) : null}
+          {profile === 'bus' && citySlug ? (
+            <LandingCityIntroGuide cityName={cityName} profile="bus" />
+          ) : null}
+          {profile === 'river' && citySlug ? (
+            <LandingCityIntroGuide cityName={cityName} profile="river" />
+          ) : null}
+          {profile === 'seasonal' && citySlug && cityName ? (
+            <LandingSeasonalCityGuide landingSlug={slug} cityName={cityName} />
+          ) : null}
+          {profile === 'dinner' && citySlug ? (
+            <LandingDinnerIntro cityName={cityName} citySlug={citySlug} />
+          ) : null}
+          <section id="variants" className={`container mx-auto px-4 ${profile === 'dinner' ? 'py-6' : 'py-12'}`}>
+        <h2 className="mb-6 text-2xl font-bold text-foreground md:text-3xl">
+          {profile === 'dinner' && dinnerCityGuide(cityName, citySlug)?.scheduleTitle
+            ? dinnerCityGuide(cityName, citySlug)!.scheduleTitle
+            : profile === 'seasonal' && seasonalMeta
+              ? cityName
+                ? `${seasonalMeta.scheduleTitle} — ${cityName}`
+                : seasonalMeta.scheduleTitle
+              : profile === 'bus' && cityName
+              ? `Расписание — ${cityName}`
+              : profile === 'river' && cityName
+                ? `Расписание — ${cityName}`
+                : profile === 'bus' || profile === 'river' || profile === 'seasonal'
+                  ? 'Расписание'
+                  : 'Расписание рейсов'}
+        </h2>
+            {profile === 'dinner' ? (
+              <LandingDinnerFilters
+                dateFilter={dateFilter}
+                sort={sort}
+                groupsCount={groups.length}
+                menuFilter={menuFilter}
+                dinnerTimeFilter={dinnerTimeFilter}
+                setDateFilter={setDateFilter}
+                setSort={setSort}
+                setMenuFilter={setMenuFilter}
+                setDinnerTimeFilter={setDinnerTimeFilter}
+                reset={() => {
+                  setDateFilter('today');
+                  setSort('price');
+                  setMenuFilter('all');
+                  setDinnerTimeFilter('all');
+                  setCategory('all');
+                }}
+              />
+            ) : (
+            <LandingFilters
+              profile={profile}
+              landingSlug={payload.landing.slug}
+              citySlug={citySlug}
+              stats={payload.stats}
+              city={city}
+              category={category}
+              dateFilter={dateFilter}
+              sort={sort}
+              timeSlot={timeSlot}
+              groupsCount={groups.length}
+              setCity={setCity}
+              setCategory={setCategory}
+              setDateFilter={setDateFilter}
+              setSort={setSort}
+              setTimeSlot={setTimeSlot}
+              reset={() => {
+                setCity(cityName || 'all');
+                setCategory('all');
+                setDateFilter(profile === 'bus' ? 'all' : 'today');
+                setSort(profile === 'bus' ? 'price' : 'time');
+                setTimeSlot('');
+              }}
+            />
+            )}
+            {isSessionsLoading ? (
+              <LandingScheduleSkeleton profile={profile} />
+            ) : sessionsError ? (
+              <ScheduleErrorState message={sessionsError} />
+            ) : profile === 'dinner' ? (
+              <LandingDinnerScheduleList groups={groups} onReset={() => {
+                setDateFilter('today');
+                setSort('price');
+                setMenuFilter('all');
+                setDinnerTimeFilter('all');
+                setCategory('all');
+              }} />
+            ) : (
+            <LandingScheduleList groups={groups} profile={profile} />
+            )}
+            {!isSessionsLoading && profile === 'bus' && citySlug ? (
+              <LandingOtherCitiesGrid landing={payload.landing} currentCityName={cityName} />
+            ) : null}
+            {!isSessionsLoading && profile === 'river' && citySlug ? (
+              <>
+                {groups.length <= 4 ? (
+                  <LandingRiverFreeAlternatives cityName={cityName} />
+                ) : null}
+                <LandingRiverOtherCitiesGrid landing={payload.landing} currentCityName={cityName} />
+              </>
+            ) : null}
+            {!isSessionsLoading && profile === 'seasonal' && citySlug && cityName ? (
+              <>
+                {groups.length <= 4 ? (
+                  <LandingSeasonalFreeAlternatives landingSlug={slug} cityName={cityName} />
+                ) : null}
+                <LandingSeasonalOtherCitiesGrid landingSlug={slug} currentCityName={cityName} />
+              </>
+            ) : null}
+          </section>
+          {profile === 'dinner' ? (
+            <>
+              <section className="container mx-auto px-4">
+                <LandingDinnerAudience />
+              </section>
+              {citySlug ? (
+                <section className="container mx-auto px-4 pb-6">
+                  <LandingDinnerRiverLink cityName={cityName} citySlug={citySlug} />
+                </section>
+              ) : null}
+            </>
+          ) : null}
+          <div className="container mx-auto px-4">
+            {sessionsReady && profile === 'bus' ? <LandingSchemaJsonLd groups={groups} cityName={cityName} /> : null}
+            {!isLovableLanding(profile) ? (
+              <LandingContentBlocks blocks={payload.blocks || []} landing={payload.landing} stats={payload.stats} />
+            ) : null}
+            {profile !== 'bus' && profile !== 'dinner' && profile !== 'river' && profile !== 'seasonal' ? (
+              <LandingHowToChoose landing={payload.landing} stats={payload.stats} />
+            ) : null}
+            <LandingFaq landing={payload.landing} blocks={payload.blocks || []} profile={profile} citySlug={citySlug} landingSlug={slug} />
+            <LandingReviews landing={payload.landing} profile={profile} landingSlug={slug} />
+            <div className="py-12 text-center">
+              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                <Shield className="h-4 w-4" />
+                <span>
+                  {profile === 'dinner'
+                    ? 'Бронирование через систему организатора. Мы помогаем сравнить предложения ужинов на теплоходах.'
+                    : 'Покупка оформляется через билетную систему организатора. Мы помогаем сравнить предложения.'}
+                </span>
+              </div>
+            </div>
+            {sessionsReady && profile === 'bus' && !citySlug ? (
+              <LandingCitiesGrid landing={payload.landing} stats={payload.stats} />
+            ) : sessionsReady && profile === 'river' && !citySlug ? (
+              <LandingRiverCitiesGrid landing={payload.landing} />
+            ) : sessionsReady && profile === 'seasonal' && !citySlug && seasonalMeta?.cityOrder.length ? (
+              <LandingSeasonalCitiesGrid landingSlug={slug} />
+            ) : sessionsReady && profile === 'dinner' ? null : sessionsReady ? (
+              <RelatedLandings landings={payload.relatedLandings} landing={payload.landing} stats={payload.stats} citySlug={citySlug} />
+            ) : null}
+          </div>
+        </>
     </div>
   );
 }
 
 function LandingHero({
   landing,
+  profile,
+  landingSlug,
+  citySlug,
   visibleCount,
   sessionsCount,
   stats,
+  sessionsReady = true,
 }: {
   landing: PublicLanding;
+  profile: LandingProfile;
+  landingSlug: string;
+  citySlug?: string;
   visibleCount: number;
   sessionsCount: number;
   stats: PublicLandingPage['stats'];
+  sessionsReady?: boolean;
 }) {
-  const heroImage = landing.heroImageUrl || landing.imageUrl || null;
-  const badge = landing.heroBadge || 'Страница подборки';
+  const cityName = resolveLandingCityName(citySlug, landingSlug);
+  const isBus = profile === 'bus';
+  const isRiver = profile === 'river';
+  const isDinner = profile === 'dinner';
+  const isSeasonal = profile === 'seasonal';
+  const seasonalMeta = isSeasonal ? getSeasonalLanding(landingSlug) : null;
+  const seasonalCity = seasonalMeta ? seasonalCityGuide(landingSlug, cityName) : null;
+  const busGuide = cityName ? busCityGuide(cityName) : null;
+  const riverGuide = cityName ? riverCityGuide(cityName) : null;
+  const dinnerGuide = isDinner ? dinnerCityGuide(cityName, citySlug) : null;
+  const prep = cityName
+    ? (BUS_CITY_META[cityName]?.prepositional || riverGuide?.cityNameDative || seasonalCity?.cityNameDative || cityName)
+    : '';
+  const heroTitle = isSeasonal && seasonalMeta
+    ? seasonalCity
+      ? `${seasonalMeta.breadcrumbLabel} в ${prep} — лучшие точки обзора и экскурсии`
+      : seasonalMeta.nationalHeroTitle
+    : isDinner && dinnerGuide
+    ? dinnerGuide.heroTitle
+    : isBus && cityName
+      ? `Обзорные автобусные экскурсии по ${prep} сегодня — цены, расписание и маршруты`
+      : isBus && !cityName
+        ? landing.heroTitle || 'Обзорные автобусные экскурсии по России — цены, расписание и маршруты'
+        : isRiver && cityName
+          ? `Речные прогулки по ${prep} сегодня — цены, расписание и сравнение теплоходов`
+          : isRiver && !cityName
+            ? landing.heroTitle || 'Речные прогулки по России — цены, расписание и сравнение теплоходов'
+            : landing.heroTitle || landing.title;
+  const heroSubtitle = isSeasonal && seasonalMeta
+    ? seasonalCity?.heroSubtitle || seasonalMeta.nationalHeroSubtitle
+    : isDinner && dinnerGuide
+    ? dinnerGuide.heroSubtitle
+    : isBus && cityName && busGuide?.heroSubtitle
+      ? busGuide.heroSubtitle
+      : isBus && !cityName
+        ? landing.heroSubtitle || 'От Калининграда до Сочи — сравните автобусные экскурсии в 11 городах России.'
+        : isRiver && cityName && riverGuide?.heroSubtitle
+          ? riverGuide.heroSubtitle
+          : isRiver && !cityName
+            ? landing.heroSubtitle || 'От Невы до Енисея — сравните предложения речных прогулок в 12 городах России.'
+            : landing.heroSubtitle || landing.subtitle;
+  const soldEstimate = isDinner
+    ? Math.max(visibleCount * 1200, sessionsCount * 480)
+    : Math.max(visibleCount * 1850, sessionsCount * 420);
+  const countLabel = isBus && cityName ? 'рейсов' : isBus ? 'экскурсий' : isRiver && cityName ? 'прогулок' : isSeasonal ? 'программ' : 'рейсов';
+  const ratingLabel = isDinner ? '4.8 / 5' : isSeasonal ? '4.8 / 5' : '4.7 / 5';
+  const heroClass = isSeasonal && landingSlug.includes('salute') ? 'gradient-salute-hero' : 'gradient-hero-lovable';
+
   return (
-    <section className="relative overflow-hidden border-b border-primary-950 bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950 text-white">
-      {heroImage ? (
-        <div className="absolute inset-0">
-          <img src={heroImage} alt="" className="h-full w-full object-cover opacity-30" />
-          <div className="absolute inset-0 bg-primary-950/70" />
-        </div>
-      ) : null}
-      <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-slate-950/25 to-transparent" />
-      <div className="container-page relative py-14 sm:py-16">
-        <div className="flex flex-wrap items-center gap-2 text-sm text-primary-100/78">
-          <button type="button" onClick={() => navigateHome('top')} className="hover:text-white">
-            Главная
-          </button>
-          <span>/</span>
-          <button type="button" onClick={() => navigateHome('landings')} className="hover:text-white">
-            Подборки
-          </button>
-          <span>/</span>
-          <span className="text-white">{landing.title}</span>
-        </div>
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-end">
-          <div>
-            <div className="mb-4 mt-7 inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1 text-sm font-semibold text-white/86 backdrop-blur">
-              <Sparkles className="h-4 w-4" />
-              {badge}
-            </div>
-            <h1 className="max-w-4xl text-4xl font-extrabold sm:text-5xl">{landing.heroTitle || landing.title}</h1>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-primary-50/88 sm:text-lg">{landing.heroSubtitle || landing.subtitle}</p>
-            <div className="mt-5 flex flex-wrap gap-2">
-              {landing.chips.map((chip) => (
-                <span key={chip} className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">
-                  {chip}
+    <section className={`relative overflow-hidden ${heroClass}`}>
+      <div className="container mx-auto px-4 py-16 md:py-24">
+        <div className="max-w-4xl">
+          <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-primary-foreground/70">
+            <span className="flex items-center gap-2">
+              <a href="/" className="transition-colors hover:text-primary-foreground">Главная</a>
+            </span>
+            {isBus && !cityName ? (
+              <span className="flex items-center gap-2">
+                <span>/</span>
+                <span className="text-primary-foreground">Автобусные экскурсии</span>
+              </span>
+            ) : isBus && cityName ? (
+              <>
+                <span className="flex items-center gap-2">
+                  <span>/</span>
+                  <a href={busLandingRoot(landing.slug)} className="transition-colors hover:text-primary-foreground">Автобусные экскурсии</a>
                 </span>
-              ))}
-            </div>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <a href="#landing-schedule" className="inline-flex min-h-11 items-center justify-center rounded-lg bg-white px-5 text-sm font-semibold text-primary-700 hover:bg-primary-50">
-                <Ticket className="mr-2 h-4 w-4" />
-                Показать варианты
-              </a>
-              <a href="#how-to-choose" className="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/25 px-5 text-sm font-semibold text-white hover:bg-white/10">
-                Как выбрать
-              </a>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <HeroStat label="Вариантов" value={visibleCount} />
-            <HeroStat label="Сеансов" value={sessionsCount} />
-            <HeroStat label="Городов" value={Object.keys(stats.cities).length} />
-            <HeroStat label="Цена от" value={formatMoney(stats.priceFrom)} raw />
+                <span className="flex items-center gap-2">
+                  <span>/</span>
+                  <span className="text-primary-foreground">{cityName}</span>
+                </span>
+              </>
+            ) : isDinner && dinnerGuide ? (
+              <>
+                <span className="flex items-center gap-2">
+                  <span>/</span>
+                  <a href={dinnerGuide.riverCruiseHref} className="transition-colors hover:text-primary-foreground">Речные прогулки</a>
+                </span>
+                <span className="flex items-center gap-2">
+                  <span>/</span>
+                  <span className="text-primary-foreground">{dinnerGuide.breadcrumbCurrent}</span>
+                </span>
+              </>
+            ) : isSeasonal && !cityName && seasonalMeta ? (
+              <span className="flex items-center gap-2">
+                <span>/</span>
+                <span className="text-primary-foreground">{seasonalMeta.breadcrumbLabel}</span>
+              </span>
+            ) : isSeasonal && cityName && seasonalMeta ? (
+              <>
+                <span className="flex items-center gap-2">
+                  <span>/</span>
+                  <a href={seasonalLandingRoot(landingSlug)} className="transition-colors hover:text-primary-foreground">{seasonalMeta.breadcrumbLabel}</a>
+                </span>
+                <span className="flex items-center gap-2">
+                  <span>/</span>
+                  <span className="text-primary-foreground">{cityName}</span>
+                </span>
+              </>
+            ) : isRiver && !cityName ? (
+              <span className="flex items-center gap-2">
+                <span>/</span>
+                <span className="text-primary-foreground">Речные прогулки</span>
+              </span>
+            ) : isRiver && cityName ? (
+              <>
+                <span className="flex items-center gap-2">
+                  <span>/</span>
+                  <a href={riverLandingRoot(landing.slug)} className="transition-colors hover:text-primary-foreground">Речные прогулки</a>
+                </span>
+                <span className="flex items-center gap-2">
+                  <span>/</span>
+                  <span className="text-primary-foreground">{cityName}</span>
+                </span>
+              </>
+            ) : cityName ? (
+              <span className="flex items-center gap-2">
+                <span>/</span>
+                <a href="/cities" className="transition-colors hover:text-primary-foreground">{cityName}</a>
+              </span>
+            ) : null}
+            {!isBus && !isDinner && !isRiver && !isSeasonal ? (
+              <span className="flex items-center gap-2">
+                <span>/</span>
+                <span className="text-primary-foreground">{landing.title}</span>
+              </span>
+            ) : null}
+          </nav>
+          <h1 className="mb-4 text-3xl font-extrabold leading-tight text-primary-foreground md:text-5xl">{heroTitle}</h1>
+          <p className="mb-8 max-w-3xl text-base leading-relaxed text-primary-foreground/80 md:text-lg">{heroSubtitle}</p>
+          <div className="flex flex-wrap gap-3">
+            {sessionsReady ? (
+              <>
+                <div className="flex items-center gap-2 rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-medium text-primary-foreground backdrop-blur-sm">
+                  <TrendingUp className="h-4 w-4" />
+                  {formatNumber(visibleCount)} {countLabel}
+                </div>
+                <div className="flex items-center gap-2 rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-medium text-primary-foreground backdrop-blur-sm">
+                  <Shield className="h-4 w-4" />
+                  {formatNumber(soldEstimate)}+ продано
+                </div>
+                <div className="flex items-center gap-2 rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-medium text-primary-foreground backdrop-blur-sm">
+                  <Star className="h-4 w-4" />
+                  {ratingLabel}
+                </div>
+                {stats.priceFrom ? (
+                  <div className="flex items-center gap-2 rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-medium text-primary-foreground backdrop-blur-sm">
+                    от {formatMoney(stats.priceFrom).replace(/^от\s+/i, '')}
+                  </div>
+                ) : null}
+              </>
+            ) : (
+              <div className="rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-medium text-primary-foreground/90 backdrop-blur-sm">
+                Загружаем актуальное расписание…
+              </div>
+            )}
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function LandingCityIntroGuide({
+  cityName,
+  profile,
+  customGuide,
+}: {
+  cityName: string | null;
+  profile: 'bus' | 'river';
+  customGuide?: { intro: string; spots: RiverCitySpot[]; tips: string[] };
+}) {
+  const guide = customGuide || (profile === 'bus' ? busCityGuide(cityName) : riverCityGuide(cityName));
+  if (!guide || !cityName) return null;
+
+  const spots: RiverCitySpot[] = guide.spots;
+
+  return (
+    <section className="container mx-auto space-y-8 px-4 py-8">
+      <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">{guide.intro}</p>
+      <div className="grid gap-6 md:grid-cols-2">
+        {spots.length > 0 ? (
+          <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+            <div className="flex items-center gap-2 text-lg font-semibold text-foreground">
+              <Eye className="h-5 w-5 text-primary" />
+              Лучшие точки обзора
+            </div>
+            <ul className="space-y-3">
+              {spots.map((spot) => (
+                <li key={spot.title} className="flex items-start gap-3">
+                  <MapPin className="mt-1 h-4 w-4 shrink-0 text-primary" />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-foreground">{spot.title}</span>
+                      <span
+                        className={`rounded-md px-1.5 py-0.5 text-xs font-medium ${
+                          spot.badgeTone === 'free'
+                            ? 'bg-green-500/10 text-green-600 dark:text-green-400'
+                            : 'bg-primary/10 text-primary'
+                        }`}
+                      >
+                        {spot.badge}
+                      </span>
+                    </div>
+                    <p className="mt-0.5 text-sm text-muted-foreground">{spot.description}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+        {guide.tips.length > 0 ? (
+          <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+            <div className="flex items-center gap-2 text-lg font-semibold text-foreground">
+              <Lightbulb className="h-5 w-5 text-primary" />
+              Советы
+            </div>
+            <ul className="space-y-3">
+              {guide.tips.map((tip, index) => (
+                <li key={tip} className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                    {index + 1}
+                  </span>
+                  <span className="text-sm text-muted-foreground">{tip}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+function LandingSeasonalCityGuide({ landingSlug, cityName }: { landingSlug: string; cityName: string }) {
+  const guide = seasonalCityGuide(landingSlug, cityName);
+  if (!guide) return null;
+  return <LandingCityIntroGuide cityName={cityName} profile="river" customGuide={guide} />;
+}
+
+function LandingSeasonalCitiesGrid({ landingSlug }: { landingSlug: string }) {
+  const meta = getSeasonalLanding(landingSlug);
+  if (!meta?.cityOrder.length) return null;
+
+  return (
+    <div className="py-8">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+        <h3 className="text-lg font-semibold text-foreground">{meta.breadcrumbLabel} по городам</h3>
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {meta.cityOrder.map((name) => {
+            const guide = meta.cities[name];
+            if (!guide) return null;
+            return (
+              <a
+                key={name}
+                href={`${seasonalLandingRoot(landingSlug)}/${guide.slug}`}
+                className="flex items-center gap-2 rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
+              >
+                <Sparkles className="h-4 w-4 shrink-0 text-primary" />
+                <span className="text-sm font-medium text-foreground">{name}</span>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LandingSeasonalOtherCitiesGrid({ landingSlug, currentCityName }: { landingSlug: string; currentCityName: string }) {
+  const meta = getSeasonalLanding(landingSlug);
+  if (!meta) return null;
+  const cities = meta.cityOrder.filter((name) => name !== currentCityName);
+  if (!cities.length) return null;
+
+  return (
+    <div className="mt-8">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+        <h3 className="text-lg font-semibold text-foreground">{meta.breadcrumbLabel} в других городах</h3>
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {cities.map((name) => {
+            const guide = meta.cities[name];
+            if (!guide) return null;
+            return (
+              <a
+                key={name}
+                href={`${seasonalLandingRoot(landingSlug)}/${guide.slug}`}
+                className="flex items-center gap-2 rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
+              >
+                <Sparkles className="h-4 w-4 shrink-0 text-primary" />
+                <span className="text-sm font-medium text-foreground">{name}</span>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LandingSeasonalFreeAlternatives({ landingSlug, cityName }: { landingSlug: string; cityName: string }) {
+  const guide = seasonalCityGuide(landingSlug, cityName);
+  const freeSpots = guide?.spots.filter((spot) => spot.badgeTone === 'free') || [];
+  if (!freeSpots.length) return null;
+
+  return (
+    <div className="mt-8">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+        <h3 className="text-lg font-semibold text-foreground">Бесплатные альтернативы — {cityName}</h3>
+        <ul className="space-y-3">
+          {freeSpots.map((spot) => (
+            <li key={spot.title} className="flex items-start gap-3 text-sm text-muted-foreground">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-green-600 dark:text-green-400" />
+              <span>
+                <span className="font-medium text-foreground">{spot.title}</span>
+                {' — '}
+                {spot.description}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function LandingDinnerIntro({ cityName, citySlug }: { cityName: string | null; citySlug?: string }) {
+  const guide = dinnerCityGuide(cityName, citySlug);
+  if (!guide) return null;
+
+  return (
+    <section className="container mx-auto px-4 py-8">
+      <div className="rounded-xl border border-border bg-card p-6 md:p-8">
+        <h2 className="mb-3 text-xl font-bold text-foreground md:text-2xl">{guide.introTitle}</h2>
+        <p className="max-w-4xl leading-relaxed text-muted-foreground">{guide.introText}</p>
+      </div>
+    </section>
+  );
+}
+
+function LandingDinnerFilters({
+  dateFilter,
+  sort,
+  groupsCount,
+  menuFilter,
+  dinnerTimeFilter,
+  setDateFilter,
+  setSort,
+  setMenuFilter,
+  setDinnerTimeFilter,
+  reset,
+}: {
+  dateFilter: DateFilter;
+  sort: SortFilter;
+  groupsCount: number;
+  menuFilter: MenuFilter;
+  dinnerTimeFilter: DinnerTimeFilter;
+  setDateFilter: (value: DateFilter) => void;
+  setSort: (value: SortFilter) => void;
+  setMenuFilter: (value: MenuFilter) => void;
+  setDinnerTimeFilter: (value: DinnerTimeFilter) => void;
+  reset: () => void;
+}) {
+  const sortTabs: Array<{ label: string; value: SortFilter }> = [
+    { label: 'По цене', value: 'price' },
+    { label: 'По рейтингу', value: 'rating' },
+    { label: 'По времени', value: 'time' },
+  ];
+  const dateLabel = dateFilter === 'today' ? 'Сегодня' : dateFilter === 'tomorrow' ? 'Завтра' : null;
+  const menuChip = (value: MenuFilter, label: string) => (
+    <button
+      key={value}
+      type="button"
+      onClick={() => setMenuFilter(value)}
+      className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+        menuFilter === value ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
+      }`}
+    >
+      {label}
+    </button>
+  );
+
+  return (
+    <div className="space-y-3">
+      <div className="hidden items-center gap-1 border-b border-border sm:flex">
+        {sortTabs.map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            onClick={() => setSort(tab.value)}
+            className={`relative px-4 py-2.5 text-sm font-medium transition-colors ${sort === tab.value ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            {tab.label}
+            {sort === tab.value ? <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-primary" /> : null}
+          </button>
+        ))}
+      </div>
+
+      <div className="hidden flex-wrap items-center gap-2 lg:flex">
+        <div className="flex items-center gap-1.5">
+          {(['today', 'tomorrow'] as const).map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setDateFilter(value)}
+              className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
+                dateFilter === value
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
+              }`}
+            >
+              {value === 'today' ? 'Сегодня' : 'Завтра'}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => setDateFilter('all')}
+            className={`inline-flex items-center gap-1 whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
+              dateFilter === 'all'
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
+            }`}
+          >
+            <CalendarDays className="h-3.5 w-3.5" />
+            Другая дата
+          </button>
+        </div>
+        <div className="mx-1 h-6 w-px bg-border" />
+        <div className="flex items-center gap-1.5">
+          <UtensilsCrossed className="h-4 w-4 text-muted-foreground" />
+          {menuChip('all', 'Любое меню')}
+          {menuChip('set', 'Сет-меню')}
+          {menuChip('buffet', 'Фуршет')}
+        </div>
+        <div className="h-6 w-px bg-border" />
+        <div className="flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setDinnerTimeFilter(dinnerTimeFilter === 'sunset' ? 'all' : 'sunset')}
+            className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+              dinnerTimeFilter === 'sunset' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
+            }`}
+          >
+            <Sun className="h-3.5 w-3.5" />
+            Закат (18–21)
+          </button>
+          <button
+            type="button"
+            onClick={() => setDinnerTimeFilter(dinnerTimeFilter === 'night' ? 'all' : 'night')}
+            className={`inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+              dinnerTimeFilter === 'night' ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground hover:bg-secondary/80'
+            }`}
+          >
+            <Moon className="h-3.5 w-3.5" />
+            Ночь (21+)
+          </button>
+        </div>
+      </div>
+
+      <div className="space-y-2 lg:hidden">
+        <div className="flex items-center gap-1.5">
+          {(['today', 'tomorrow'] as const).map((value) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setDateFilter(value)}
+              className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
+                dateFilter === value
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
+              }`}
+            >
+              {value === 'today' ? 'Сегодня' : 'Завтра'}
+            </button>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {menuChip('all', 'Меню: любое')}
+          {menuChip('set', 'Сет-меню')}
+          {menuChip('buffet', 'Фуршет')}
+        </div>
+        <div className="flex gap-2">
+          <select
+            value={dinnerTimeFilter}
+            onChange={(event) => setDinnerTimeFilter(event.target.value as DinnerTimeFilter)}
+            className="h-9 flex-1 rounded-lg border border-input bg-background px-3 text-sm"
+          >
+            <option value="all">Любое время</option>
+            <option value="sunset">Закат (18–21)</option>
+            <option value="night">Ночь (21+)</option>
+          </select>
+          <select
+            value={sort}
+            onChange={(event) => setSort(event.target.value as SortFilter)}
+            className="h-9 flex-1 rounded-lg border border-input bg-background px-3 text-sm"
+          >
+            {sortTabs.map((tab) => (
+              <option key={tab.value} value={tab.value}>{tab.label}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <div className="mb-4 mt-6 flex flex-wrap items-center gap-3">
+        {dateLabel ? (
+          <span className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+            📅 {dateLabel}
+          </span>
+        ) : null}
+        <span className="text-sm text-muted-foreground">
+          {groupsCount > 0 ? `${formatNumber(groupsCount)} рейсов` : 'Нет вариантов по выбранным фильтрам'}
+        </span>
+        {groupsCount === 0 ? (
+          <button type="button" onClick={reset} className="rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/5">
+            Сбросить фильтры
+          </button>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function LandingDinnerScheduleList({ groups, onReset }: { groups: EventGroup[]; onReset: () => void }) {
+  if (!groups.length) {
+    return (
+      <div className="space-y-4 py-16 text-center">
+        <p className="text-muted-foreground">Нет рейсов на выбранную дату</p>
+        <div className="flex flex-wrap items-center justify-center gap-2">
+          <button type="button" onClick={onReset} className="rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/5">
+            Сбросить фильтры
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="mb-2 hidden items-center gap-4 px-5 py-2 md:grid md:grid-cols-[1.5fr_0.7fr_0.6fr_0.5fr_0.6fr_auto]">
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Теплоход</span>
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Меню</span>
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Цена</span>
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Время</span>
+        <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Формат</span>
+        <span />
+      </div>
+      <div className="space-y-3">
+        {groups.map((group, index) => (
+          <LandingDinnerScheduleRow key={group.key} group={group} isOptimal={index === pickOptimalIndex(groups)} />
+        ))}
+      </div>
+    </>
+  );
+}
+
+function LandingDinnerScheduleRow({ group, isOptimal }: { group: EventGroup; isOptimal: boolean }) {
+  const session = group.representative;
+  const slot = session.upcomingSlots?.[0];
+  const time = resolveSessionTime(session, slot);
+  const shipName = session.tags?.find((tag) => /теплоход|катер|яхт|palace|ривер|монарх|нео/i.test(tag)) || group.title;
+  const menu = extractMenuLabel(session.tags);
+  const format = extractFormatLabel(session.tags);
+  const href = eventHref(session);
+  const priceLabel = group.priceFrom ? formatMoney(group.priceFrom).replace(/^от\s+/i, '') : 'Купить';
+  const vacant = session.vacant ?? group.vacant;
+  const soldOut = typeof vacant === 'number' && vacant <= 0;
+  const buyButtonClass =
+    'inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90';
+
+  return (
+    <div className={`rounded-xl border bg-card p-4 transition-all duration-200 hover:shadow-md md:p-5 ${isOptimal ? 'best-deal-ring' : 'border-border'}`}>
+      {isOptimal ? (
+        <div className="mb-3 md:hidden">
+          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">⭐ Оптимальный выбор</span>
+        </div>
+      ) : null}
+      <div className="hidden items-center gap-4 md:grid md:grid-cols-[1.5fr_0.7fr_0.6fr_0.5fr_0.6fr_auto]">
+        <div className="min-w-0">
+          {isOptimal ? <div className="mb-1 text-xs font-bold text-primary">⭐ Оптимальный выбор</div> : null}
+          <div className="truncate font-semibold text-foreground">
+            <a href={href} className="hover:text-primary">{shipName}</a>
+          </div>
+          <div className="truncate text-sm text-muted-foreground">
+            <a href={href} className="hover:text-primary">{group.title}</a>
+          </div>
+        </div>
+        <div className="text-sm text-foreground">{menu}</div>
+        <div className="text-sm font-semibold text-foreground">{priceLabel}</div>
+        <div className="text-sm text-foreground">{time}</div>
+        <div className="text-sm text-muted-foreground">{format}</div>
+        <div>
+          {soldOut ? (
+            <button type="button" disabled className="inline-flex cursor-not-allowed rounded-lg bg-muted px-4 py-2 text-sm font-semibold text-muted-foreground">
+              Распродано
+            </button>
+          ) : (
+            <LandingPurchaseButton session={session} label="Билет" className={buyButtonClass} showArrow />
+          )}
+        </div>
+      </div>
+      <div className="space-y-2 md:hidden">
+        <div className="font-semibold text-foreground">
+          <a href={href} className="hover:text-primary">{shipName}</a>
+        </div>
+        <div className="text-sm text-muted-foreground">
+          <a href={href} className="hover:text-primary">{group.title}</a>
+        </div>
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+          <span>{menu}</span>
+          <span>{time}</span>
+          <span>{format}</span>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-sm font-semibold text-foreground">{priceLabel}</span>
+          {soldOut ? (
+            <button type="button" disabled className="rounded-lg bg-muted px-4 py-2 text-sm font-semibold text-muted-foreground">
+              Распродано
+            </button>
+          ) : (
+            <LandingPurchaseButton session={session} label={priceLabel} className={buyButtonClass} />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LandingDinnerAudience() {
+  const items = [
+    { icon: Heart, title: 'Романтическое свидание', text: 'Столик у панорамного окна, закат над Кремлём и живая музыка — идеальный вечер для двоих.' },
+    { icon: Cake, title: 'День рождения', text: 'Многие теплоходы предлагают праздничные пакеты: торт, декор, персональное поздравление от капитана.' },
+    { icon: Users, title: 'Туристы и гости столицы', text: 'Главные достопримечательности Москвы за одну вечернюю прогулку + ужин из русской кухни.' },
+    { icon: Briefcase, title: 'Корпоратив и деловой ужин', text: 'VIP-зоны, отдельные палубы и персональное обслуживание для бизнес-мероприятий.' },
+  ];
+
+  return (
+    <section className="py-10">
+      <h2 className="mb-6 text-2xl font-bold text-foreground">Для кого подойдёт ужин на теплоходе</h2>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {items.map((item) => (
+          <div key={item.title} className="space-y-3 rounded-xl border border-border bg-card p-5">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <item.icon className="h-6 w-6" />
+            </div>
+            <h3 className="text-sm font-semibold text-foreground">{item.title}</h3>
+            <p className="text-sm leading-relaxed text-muted-foreground">{item.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function LandingDinnerRiverLink({ cityName, citySlug }: { cityName: string | null; citySlug?: string }) {
+  const guide = dinnerCityGuide(cityName, citySlug);
+  if (!guide) return null;
+
+  return (
+    <div className="flex flex-col items-start gap-3 rounded-xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:gap-6">
+      <Anchor className="mt-0.5 h-5 w-5 shrink-0 text-primary sm:mt-0" />
+      <div className="flex-1">
+        <p className="text-sm text-muted-foreground">Ищете обычную речную прогулку без ужина? Посмотрите все варианты:</p>
+      </div>
+      <a href={guide.riverCruiseHref} className="whitespace-nowrap rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/5">
+        {guide.riverCruiseLabel}
+      </a>
+    </div>
   );
 }
 
@@ -299,9 +1634,12 @@ function LandingScenarioGuide({
             </div>
           ) : null}
           {firstGroup ? (
-            <a href={eventHref(firstGroup.representative)} className="mt-5 inline-flex w-full min-h-11 items-center justify-center rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700">
-              Открыть ближайший вариант
-            </a>
+            <LandingPurchaseButton
+              session={firstGroup.representative}
+              label="Купить ближайший вариант"
+              className="mt-5 inline-flex w-full min-h-11 items-center justify-center rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700"
+              compact={false}
+            />
           ) : null}
         </aside>
       </div>
@@ -337,7 +1675,7 @@ function landingScenario(landing: PublicLanding) {
     };
   }
 
-  if (key.includes('river') || key.includes('теплоход') || key.includes('речн') || key.includes('мост')) {
+  if (isRiverCruisesLandingSlug(landing.slug) || key.includes('bridge') || key.includes('мост') || key.includes('теплоход') || key.includes('речн')) {
     return {
       eyebrow: 'Маршруты и форматы',
       title: 'Сравните прогулки по маршруту, причалу, времени и цене',
@@ -357,7 +1695,7 @@ function landingScenario(landing: PublicLanding) {
     text: 'Лендинг работает как тематическая витрина: собирает события из импорта, группирует повторы в одну карточку и дает быстрые фильтры по городу, дате, формату и цене.',
     asideTitle: 'Сводка по подборке',
     cards: [
-      { icon: <ListFilter className="h-5 w-5" />, title: 'Фильтры', text: 'Город, категория, дата и сортировка помогают быстро сузить выдачу.' },
+      { icon: <Search className="h-5 w-5" />, title: 'Фильтры', text: 'Город, категория, дата и сортировка помогают быстро сузить выдачу.' },
       { icon: <MapPin className="h-5 w-5" />, title: 'Площадки', text: 'Переходы на страницы площадок и городов усиливают SEO и помогают с навигацией.' },
       { icon: <Shield className="h-5 w-5" />, title: 'Покупка', text: 'Финансовый контур остается у билетной системы, Дайбилет хранит только нужные статусы.' },
     ],
@@ -365,7 +1703,7 @@ function landingScenario(landing: PublicLanding) {
 }
 
 function scrollToSchedule() {
-  document.getElementById('landing-schedule')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.getElementById('variants')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function LandingEditorialIntro({
@@ -468,47 +1806,161 @@ function LandingMiniList({ title, items, empty }: { title: string; items: Array<
 }
 
 function LandingHowToChoose({ landing, stats }: { landing: PublicLanding; stats: PublicLandingPage['stats'] }) {
-  const steps = [
-    {
-      icon: <Clock className="h-6 w-6" />,
-      title: 'Выберите дату',
-      text: 'Для быстрых сценариев используйте фильтры “сегодня”, “завтра”, “выходные” и “вечером”.',
-    },
-    {
-      icon: <MapPin className="h-6 w-6" />,
-      title: 'Уточните город и место',
-      text: Object.keys(stats.cities).length > 1 ? 'Для мультигородских подборок начните с города, затем сравните площадки.' : 'Проверьте площадку, адрес старта и удобство маршрута.',
-    },
-    {
-      icon: <Ticket className="h-6 w-6" />,
-      title: 'Сравните цену',
-      text: `В подборке цена начинается ${formatMoney(stats.priceFrom)}. Детали тарифа откроются в виджете поставщика.`,
-    },
-    {
-      icon: <Shield className="h-6 w-6" />,
-      title: 'Покупайте в виджете',
-      text: 'Финансовый контур остается у билетной системы, а Дайбилет помогает быстро найти подходящий вариант.',
-    },
-  ];
+  const key = `${landing.slug} ${landing.title}`.toLowerCase();
+  const isRiver = isRiverCruisesLandingSlug(landing.slug) || key.includes('bridge') || key.includes('мост');
+  const topVenues = topEntries(stats.venues, 3).map(([name]) => name).join(', ');
+
+  const steps = isRiver
+    ? [
+        { icon: <Clock className="h-6 w-6 text-primary" />, title: 'Выберите время', text: 'Самые зрелищные рейсы стартуют в 23:30–00:30, когда мосты разводятся один за другим.' },
+        { icon: <MapPin className="h-6 w-6 text-primary" />, title: 'Определите причал', text: topVenues ? `Популярные: ${topVenues}. Ближайший к вам причал сэкономит время.` : 'Выберите удобную точку отправления на набережной.' },
+        { icon: <Ship className="h-6 w-6 text-primary" />, title: 'Сравните теплоходы', text: 'Обратите внимание на вместимость, наличие крытой палубы и бортового кафе.' },
+        { icon: <Wallet className="h-6 w-6 text-primary" />, title: 'Сравните цены', text: `Цены от ${formatMoney(stats.priceFrom).replace(/^от\s+/i, '')}. Ищите пометку «Оптимальный выбор» — лучшее соотношение цены и рейтинга.` },
+      ]
+    : [
+        { icon: <Clock className="h-6 w-6 text-primary" />, title: 'Выберите дату', text: 'Используйте фильтры «сегодня», «завтра» и «вечером» для быстрого поиска.' },
+        { icon: <MapPin className="h-6 w-6 text-primary" />, title: 'Уточните город', text: Object.keys(stats.cities).length > 1 ? 'Начните с города, затем сравните площадки и маршруты.' : 'Проверьте адрес старта и удобство маршрута.' },
+        { icon: <Star className="h-6 w-6 text-primary" />, title: 'Сравните рейтинг', text: 'Смотрите отзывы и количество проданных билетов у организаторов.' },
+        { icon: <Wallet className="h-6 w-6 text-primary" />, title: 'Сравните цены', text: `В подборке цена от ${formatMoney(stats.priceFrom).replace(/^от\s+/i, '')}. Оплата — в виджете организатора.` },
+      ];
 
   return (
-    <section id="how-to-choose" className="container-page py-10">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-slate-950">Как выбрать: {landing.title}</h2>
-        <p className="mx-auto mt-2 max-w-2xl text-sm leading-6 text-slate-600">Четыре шага перед переходом к покупке.</p>
-      </div>
-      <div className="mt-7 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <section id="how-to-choose" className="py-16">
+      <h2 className="mb-2 text-center text-2xl font-bold text-foreground md:text-3xl">Как выбрать прогулку</h2>
+      <p className="mb-10 text-center text-muted-foreground">4 простых шага к идеальному рейсу</p>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {steps.map((step, index) => (
-          <div key={step.title} className="rounded-lg bg-white p-5 text-center shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition hover:shadow-[0_16px_34px_rgba(15,23,42,0.1)]">
-            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-primary-600">{step.icon}</div>
-            <div className="mt-4 text-xs font-bold uppercase text-primary-700">Шаг {index + 1}</div>
-            <h3 className="mt-2 text-base font-semibold text-slate-950">{step.title}</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{step.text}</p>
+          <div key={step.title} className="rounded-xl border border-border bg-card p-6 text-center transition-shadow hover:shadow-md">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">{step.icon}</div>
+            <div className="mb-2 text-xs font-bold uppercase tracking-wider text-primary">Шаг {index + 1}</div>
+            <h3 className="mb-2 text-base font-semibold text-foreground">{step.title}</h3>
+            <p className="text-sm leading-relaxed text-muted-foreground">{step.text}</p>
           </div>
         ))}
       </div>
     </section>
   );
+}
+
+function LandingFaq({
+  landing,
+  blocks,
+  profile,
+  citySlug,
+  landingSlug,
+}: {
+  landing: PublicLanding;
+  blocks: PublicLandingContentBlock[];
+  profile: LandingProfile;
+  citySlug?: string;
+  landingSlug?: string;
+}) {
+  const faqBlock = blocks.find((block) => block.type === 'FAQ');
+  const slugKey = landingSlug || landing.slug;
+  const items: Array<Record<string, string | number>> = faqBlock
+    ? blockItems(faqBlock)
+    : defaultLandingFaq(slugKey, profile, citySlug).map((item) => ({ question: item.question, answer: item.answer }));
+  const [openIndex, setOpenIndex] = React.useState<number | null>(null);
+  const seasonalMeta = profile === 'seasonal' ? getSeasonalLanding(slugKey) : null;
+  const faqSubtitle = profile === 'dinner'
+    ? 'Ответы на популярные вопросы об ужинах на теплоходе'
+    : profile === 'bus'
+      ? 'Ответы на популярные вопросы об автобусных экскурсиях'
+      : profile === 'seasonal' && seasonalMeta
+        ? seasonalMeta.faqSubtitle
+        : profile === 'river' || landing.slug.toLowerCase().includes('bridge')
+          ? resolveLandingCityName(citySlug)
+            ? 'Ответы на популярные вопросы о речных прогулках'
+            : 'Ответы на популярные вопросы о речных прогулках'
+          : `Ответы на популярные вопросы о ${landing.title.toLowerCase()}`;
+
+  return (
+    <section id="faq" className="py-16">
+      <h2 className="mb-2 text-center text-2xl font-bold text-foreground md:text-3xl">Частые вопросы</h2>
+      <p className="mb-10 text-center text-muted-foreground">{faqSubtitle}</p>
+      <div className="mx-auto max-w-3xl space-y-3">
+        {items.map((item, index) => {
+          const question = String(item.question || item.title);
+          const answer = String(item.answer || item.text);
+          const isOpen = openIndex === index;
+          return (
+            <div key={question} className="overflow-hidden rounded-xl border border-border bg-card">
+              <button
+                type="button"
+                onClick={() => setOpenIndex(isOpen ? null : index)}
+                className="flex w-full items-center gap-3 px-6 py-4 text-left transition-colors hover:bg-secondary/50"
+              >
+                <CircleHelp className="h-5 w-5 shrink-0 text-primary" />
+                <span className="flex-1 font-medium text-foreground">{question}</span>
+                <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {isOpen && answer ? <div className="border-t border-border px-6 py-4 text-sm leading-relaxed text-muted-foreground">{answer}</div> : null}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function defaultLandingFaq(slug: string, profile: LandingProfile = 'default', citySlug?: string) {
+  const key = slug.toLowerCase();
+  if (profile === 'seasonal') {
+    const meta = getSeasonalLanding(key);
+    const cityName = resolveLandingCityName(citySlug, key);
+    const cityGuide = seasonalCityGuide(key, cityName);
+    if (cityGuide?.faq.length) return cityGuide.faq;
+    if (meta?.defaultFaq.length) return meta.defaultFaq;
+  }
+  if (profile === 'bus' || key.includes('bus')) {
+    if (citySlug === 'spb') {
+      return [
+        { question: 'Есть ли экскурсия с разводными мостами?', answer: 'Да — ночной рейс «Ночной Петербург + разводные мосты» стартует после 23:00 и включает остановку у разводного моста.' },
+        { question: 'Стоит ли ехать в Петергоф?', answer: 'Да, если есть полдня. Автобусная экскурсия в Петергоф — один из самых популярных загородных маршрутов. В будни меньше очередей.' },
+      ];
+    }
+    return [
+      { question: 'Сколько длится обзорная экскурсия?', answer: 'Обычно 2–3 часа. Загородные маршруты (Петергоф, Куршская коса, Красная Поляна) — от 4 до 6 часов.' },
+      { question: 'Есть ли аудиогид?', answer: 'На большинстве рейсов доступен аудиогид на русском и английском. Иконка наушников в карточке — признак аудиосопровождения.' },
+      { question: 'Можно ли с детьми?', answer: 'Да, обзорные автобусные экскурсии подходят для семей. Для длительных маршрутов лучше брать детей от 5–6 лет.' },
+      { question: 'Чем автобусная экскурсия лучше пешей?', answer: 'За 2–3 часа вы увидите больше достопримечательностей без усталости. Удобно в жару, дождь и с маленькими детьми.' },
+    ];
+  }
+  if (profile === 'dinner' || key.includes('dinner')) {
+    return [
+      { question: 'Ужин включён в стоимость билета?', answer: 'Да, на большинстве рейсов ужин или фуршет включены в стоимость. Уточняйте формат меню в карточке рейса.' },
+      { question: 'Можно ли принести свой алкоголь?', answer: 'Обычно нет — на борту работает бар с винной картой. Исключения возможны на VIP-рейсах, уточняйте у организатора.' },
+      { question: 'Где посадка на теплоход?', answer: 'Точка посадки указана в карточке рейса. Популярные причалы: Китай-город, Парк Горького, Крымская набережная.' },
+      { question: 'Что если плохая погода?', answer: 'Теплоходы с ужином обычно имеют крытые палубы и работают в любую погоду. Рейс отменяют только при штормовом ветре.' },
+      { question: 'Нужно ли бронировать заранее?', answer: 'Да, особенно на выходные и праздники. Столики у окна разбирают за 3–7 дней.' },
+      { question: 'Есть ли дресс-код?', answer: 'Smart casual — без пляжной одежды. На VIP-рейсах возможен dress code: коктейльные платья и рубашки.' },
+    ];
+  }
+  if (profile === 'river' || isRiverCruisesLandingSlug(slug) || key.includes('bridge')) {
+    const cityName = resolveLandingCityName(citySlug);
+    const guide = riverCityGuide(cityName);
+    if (guide?.faq.length) return guide.faq;
+    if (key.includes('bridge') || citySlug === 'spb') {
+      return [
+        { question: 'Когда разводят мосты в Санкт-Петербурге?', answer: 'В навигационный сезон разводка начинается около 01:00–02:30. Рейсы в 23:30–00:30 позволяют увидеть несколько мостов подряд.' },
+        { question: 'Стоит ли брать ночную прогулку или дневную?', answer: 'Ночная — для разводки мостов и подсветки. Дневная — для архитектуры и фото при дневном свете.' },
+        { question: 'Можно ли с детьми?', answer: 'Да, большинство рейсов допускают детей. Уточняйте возрастные ограничения у конкретного организатора.' },
+        { question: 'Что взять с собой?', answer: 'Тёплую одежду — на воде прохладнее. Фотоаппарат и power bank приветствуются.' },
+        { question: 'Как купить билет?', answer: 'Нажмите на цену в расписании — откроется официальный виджет билетной системы организатора.' },
+      ];
+    }
+    return [
+      { question: 'Когда начинается навигация?', answer: 'В большинстве городов — с апреля–мая по октябрь. Точные даты зависят от погоды и уровня воды.' },
+      { question: 'Что взять с собой?', answer: 'Тёплую одежду — на воде всегда прохладнее. Солнцезащитные очки и вода летом.' },
+      { question: 'Можно ли с детьми?', answer: 'Да, большинство речных прогулок подходят для семей. На борту обычно есть крытые зоны.' },
+      { question: 'Как купить билет?', answer: 'Нажмите на цену в расписании — откроется официальный виджет билетной системы организатора.' },
+    ];
+  }
+  return [
+    { question: 'Как выбрать подходящий вариант?', answer: 'Используйте фильтры по дате, городу и сортировке по цене или времени.' },
+    { question: 'Где происходит оплата?', answer: 'Оплата проходит в официальном виджете билетной системы организатора.' },
+    { question: 'Можно ли вернуть билет?', answer: 'Условия возврата зависят от организатора — они указаны при оформлении заказа.' },
+  ];
 }
 
 function LandingContentBlocks({
@@ -545,7 +1997,7 @@ function LandingContentBlock({
   if (block.type === 'TRUST_BADGES') return <TrustBadgesBlock block={block} />;
   if (block.type === 'VALUE_PROPS' || block.type === 'HIGHLIGHTS' || block.type === 'INFO_ICONS') return <ValuePropsBlock block={block} />;
   if (block.type === 'CITY_GRID') return <CityGridBlock block={block} />;
-  if (block.type === 'FAQ') return <FaqBlock block={block} />;
+  if (block.type === 'FAQ') return null;
   if (block.type === 'CTA_BANNER') return <CtaBlock block={block} landing={landing} stats={stats} />;
   if (block.type === 'STORY' || block.type === 'SEO_TEXT' || block.type === 'RAW_RICH_TEXT') return <StoryBlock block={block} />;
   return <StoryBlock block={block} />;
@@ -627,7 +2079,7 @@ function FaqBlock({ block }: { block: PublicLandingContentBlock }) {
   if (!items.length) return null;
   return (
     <section className="grid gap-4 rounded-xl bg-white p-5 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
-      <BlockHeader block={block} fallbackTitle="Вопросы перед покупкой" />
+      <BlockHeader block={block} fallbackTitle="Частые вопросы" />
       <div className="grid gap-2">
         {items.map((item, index) => (
           <details key={`${item.question}:${index}`} className="rounded-lg bg-slate-50 p-4">
@@ -660,7 +2112,7 @@ function CtaBlock({
           <h2 className="mt-1 text-2xl font-bold">{block.title || landing.title}</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-white/75">{block.body || `Доступно ${formatNumber(stats.events)} вариантов. Отфильтруйте дату, город и цену в таблице ниже.`}</p>
         </div>
-        <a href="#landing-schedule" className="inline-flex h-11 items-center justify-center rounded-lg bg-white px-5 text-sm font-semibold text-primary-700 hover:bg-primary-50">
+        <a href="#variants" className="inline-flex h-11 items-center justify-center rounded-lg bg-white px-5 text-sm font-semibold text-primary hover:bg-primary/10">
           Выбрать билет
         </a>
       </div>
@@ -695,105 +2147,758 @@ function blockItems(block: PublicLandingContentBlock): Array<Record<string, stri
 }
 
 function LandingFilters({
+  profile,
+  landingSlug,
+  citySlug,
   stats,
   city,
   category,
   dateFilter,
   sort,
-  mode,
+  timeSlot,
   groupsCount,
-  sessionsCount,
   setCity,
   setCategory,
   setDateFilter,
   setSort,
-  setMode,
-  reset,
+  setTimeSlot,
 }: {
+  profile: LandingProfile;
+  landingSlug?: string;
+  citySlug?: string;
   stats: PublicLandingPage['stats'];
   city: string;
   category: string;
   dateFilter: DateFilter;
   sort: SortFilter;
-  mode: ViewMode;
+  timeSlot: TimeSlotFilter;
   groupsCount: number;
-  sessionsCount: number;
   setCity: (value: string) => void;
   setCategory: (value: string) => void;
   setDateFilter: (value: DateFilter) => void;
   setSort: (value: SortFilter) => void;
-  setMode: (value: ViewMode) => void;
+  setTimeSlot: (value: TimeSlotFilter) => void;
   reset: () => void;
 }) {
-  const cityOptions = Object.entries(stats.cities).sort((a, b) => b[1] - a[1]).slice(0, 10);
-  const categoryOptions = Object.entries(stats.categories).sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const isBus = profile === 'bus';
+  const isRiver = profile === 'river';
+  const isSeasonal = profile === 'seasonal';
+  const showTimeSlot = profile === 'bus' || profile === 'river' || isSeasonal;
+  const currentCityName = resolveLandingCityName(citySlug);
+  const cityOptions = Object.entries(stats.cities).sort((a, b) => b[1] - a[1]).slice(0, 12);
+  const orderedCityNames = isBus
+    ? BUS_CITY_ORDER
+    : isRiver
+      ? RIVER_CITY_ORDER
+      : isSeasonal && landingSlug
+        ? getSeasonalLanding(landingSlug)?.cityOrder || []
+        : cityOptions.map(([name]) => name);
+  const sortTabs: Array<{ label: string; value: SortFilter }> = isBus || isRiver || isSeasonal
+    ? [
+        { label: 'По цене', value: 'price' },
+        { label: 'По рейтингу', value: 'rating' },
+        { label: 'По времени', value: 'time' },
+      ]
+    : [
+        { label: 'По времени', value: 'time' },
+        { label: 'По цене', value: 'price' },
+        { label: 'По рейтингу', value: 'rating' },
+      ];
+  const dateChips: Array<{ label: string; value: DateFilter }> = isBus || isRiver || isSeasonal
+    ? [
+        { label: 'Сегодня', value: 'today' },
+        { label: 'Завтра', value: 'tomorrow' },
+        { label: 'Любая дата', value: 'all' },
+      ]
+    : [
+        { label: 'Сегодня', value: 'today' },
+        { label: 'Завтра', value: 'tomorrow' },
+        { label: 'Любая дата', value: 'all' },
+        { label: 'Вечером', value: 'evening' },
+      ];
+  const countLabel = isBus && currentCityName ? 'экскурсий' : isBus ? 'экскурсий' : isRiver && currentCityName ? 'прогулок' : isSeasonal ? 'программ' : 'рейсов';
+
+  const timeSlotSelect = (
+    <select
+      value={timeSlot || 'all'}
+      onChange={(event) => setTimeSlot(event.target.value === 'all' ? '' : (event.target.value as TimeSlotFilter))}
+      className="inline-btn h-9 w-[170px] rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+    >
+      <option value="all">Любое время</option>
+      <option value="morning">Утро (до 12:00)</option>
+      <option value="day">День (12–18)</option>
+      <option value="evening">Вечер (18–22)</option>
+      <option value="night">Ночь (после 22)</option>
+    </select>
+  );
+
+  const selectCity = (value: string) => {
+    if (isBus && landingSlug) {
+      if (value === 'all') {
+        window.location.href = busLandingRoot(landingSlug);
+        return;
+      }
+      const slugKey = citySlugByName(value) || BUS_CITY_META[value]?.slug;
+      if (slugKey && value !== currentCityName) {
+        window.location.href = `${busLandingRoot(landingSlug)}/${slugKey}`;
+        return;
+      }
+    }
+    if (isRiver && landingSlug) {
+      if (value === 'all') {
+        window.location.href = riverLandingRoot(landingSlug);
+        return;
+      }
+      const slugKey = citySlugByName(value) || riverCityGuide(value)?.slug;
+      if (slugKey && value !== currentCityName) {
+        window.location.href = `${riverLandingRoot(landingSlug)}/${slugKey}`;
+        return;
+      }
+    }
+    if (isSeasonal && landingSlug) {
+      if (value === 'all') {
+        window.location.href = seasonalLandingRoot(landingSlug);
+        return;
+      }
+      const slugKey = seasonalCityGuide(landingSlug, value)?.slug;
+      if (slugKey && value !== currentCityName) {
+        window.location.href = `${seasonalLandingRoot(landingSlug)}/${slugKey}`;
+        return;
+      }
+    }
+    setCity(value);
+  };
+
+  const cityChip = (value: string, label: string, active: boolean) => (
+    <button
+      key={value}
+      type="button"
+      onClick={() => selectCity(value)}
+      className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
+        active
+          ? 'border-primary bg-primary text-primary-foreground'
+          : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
+      }`}
+    >
+      {label}
+    </button>
+  );
 
   return (
-    <section className="mb-5 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-950">Расписание</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              {formatNumber(groupsCount)} вариантов, {formatNumber(sessionsCount)} сеансов. Дубли одинаковых событий сгруппированы.
-            </p>
-          </div>
-          <div className="inline-flex w-fit overflow-hidden rounded-lg border border-slate-200 bg-white">
-            <button type="button" onClick={() => setMode('table')} className={`inline-flex h-10 items-center gap-2 px-3 text-sm font-semibold ${mode === 'table' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}>
-              <ListFilter className="h-4 w-4" />
-              Таблица
-            </button>
-            <button type="button" onClick={() => setMode('cards')} className={`inline-flex h-10 items-center gap-2 border-l border-slate-200 px-3 text-sm font-semibold ${mode === 'cards' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}>
-              <LayoutGrid className="h-4 w-4" />
-              Карточки
-            </button>
-          </div>
-        </div>
-
-        <ChipRow
-          items={[
-            { label: 'По цене', value: 'price' },
-            { label: 'По популярности', value: 'rating' },
-            { label: 'По времени', value: 'time' },
-          ]}
-          active={sort}
-          onChange={(value) => setSort(value as SortFilter)}
-        />
-
-        <ChipRow
-          items={[
-            { label: 'Любая дата', value: 'all' },
-            { label: 'Сегодня', value: 'today' },
-            { label: 'Завтра', value: 'tomorrow' },
-            { label: 'Выходные', value: 'weekend' },
-            { label: 'Вечером', value: 'evening' },
-          ]}
-          active={dateFilter}
-          onChange={(value) => setDateFilter(value as DateFilter)}
-        />
-
-        <ChipRow
-          items={[{ label: 'Все города', value: 'all' }, ...cityOptions.map(([name, count]) => ({ label: `${name} · ${count}`, value: name }))]}
-          active={city}
-          onChange={setCity}
-        />
-
-        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-          <label className="grid gap-1 text-xs font-semibold text-slate-500">
-            Категория или формат
-            <select value={category} onChange={(event) => setCategory(event.target.value)} className="h-10 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900">
-              <option value="all">Любой формат</option>
-              {categoryOptions.map(([name, count]) => (
-                <option key={name} value={name}>{name} · {count}</option>
-              ))}
-            </select>
-          </label>
-          <button type="button" onClick={reset} className="inline-flex h-10 items-center justify-center rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-600 hover:bg-slate-50">
-            Сбросить фильтры
+    <div className="space-y-4">
+      <div className="hidden items-center gap-1 border-b border-border sm:flex">
+        {sortTabs.map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            onClick={() => setSort(tab.value)}
+            className={`relative px-4 py-2.5 text-sm font-medium transition-colors ${sort === tab.value ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            {tab.label}
+            {sort === tab.value ? <span className="absolute bottom-0 left-0 right-0 h-0.5 rounded-full bg-primary" /> : null}
           </button>
+        ))}
+      </div>
+
+      <div className="hidden flex-wrap items-center gap-2 lg:flex">
+        <div className="flex items-center gap-1.5">
+          {dateChips.map((chip) => (
+            <button
+              key={chip.value}
+              type="button"
+              onClick={() => setDateFilter(chip.value)}
+              className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
+                dateFilter === chip.value
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
+              }`}
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
+        {orderedCityNames.length > 0 ? (
+          <>
+            <div className="mx-1 h-6 w-px bg-border" />
+            {cityChip('all', 'Все города', city === 'all')}
+            {orderedCityNames.map((name) => cityChip(name, name, city === name))}
+          </>
+        ) : null}
+        {showTimeSlot ? (
+          <>
+            <div className="mx-1 h-6 w-px bg-border" />
+            {timeSlotSelect}
+          </>
+        ) : null}
+        {!isBus && Object.keys(stats.categories).length > 1 ? (
+          <>
+            <div className="mx-1 h-6 w-px bg-border" />
+            <select
+              value={category}
+              onChange={(event) => setCategory(event.target.value)}
+              className="h-9 w-[170px] rounded-lg border border-input bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+            >
+              <option value="all">Все форматы</option>
+              {Object.entries(stats.categories)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 8)
+                .map(([name, count]) => (
+                  <option key={name} value={name}>{name} · {count}</option>
+                ))}
+            </select>
+          </>
+        ) : null}
+      </div>
+
+      <div className="hidden space-y-3 sm:block lg:hidden">
+        <div className="flex items-center gap-1.5">
+          {dateChips.map((chip) => (
+            <button
+              key={chip.value}
+              type="button"
+              onClick={() => setDateFilter(chip.value)}
+              className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
+                dateFilter === chip.value
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
+              }`}
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
+        {orderedCityNames.length > 0 ? (
+          <div className="flex flex-wrap items-center gap-2">
+            {cityChip('all', 'Все города', city === 'all')}
+            {orderedCityNames.map((name) => cityChip(name, name, city === name))}
+          </div>
+        ) : null}
+        {showTimeSlot ? (
+          <div className="flex items-center gap-2">
+            {timeSlotSelect}
+          </div>
+        ) : null}
+      </div>
+
+      <div className="space-y-3 sm:hidden">
+        <div className="flex items-center gap-1.5">
+          {dateChips.map((chip) => (
+            <button
+              key={chip.value}
+              type="button"
+              onClick={() => setDateFilter(chip.value)}
+              className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
+                dateFilter === chip.value
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
+              }`}
+            >
+              {chip.label}
+            </button>
+          ))}
+        </div>
+        {orderedCityNames.length > 0 ? (
+          <select
+            value={city}
+            onChange={(event) => selectCity(event.target.value)}
+            className="h-9 w-full rounded-lg border border-input bg-background px-3 text-sm"
+          >
+            <option value="all">Все города</option>
+            {orderedCityNames.map((name) => (
+              <option key={name} value={name}>{name}</option>
+            ))}
+          </select>
+        ) : null}
+        {showTimeSlot ? timeSlotSelect : null}
+        <div className="flex items-center gap-2">
+          <span className="whitespace-nowrap text-sm text-muted-foreground">Сортировать:</span>
+          <select
+            value={sort}
+            onChange={(event) => setSort(event.target.value as SortFilter)}
+            className="h-9 flex-1 rounded-lg border border-input bg-background px-3 text-sm"
+          >
+            {sortTabs.map((tab) => (
+              <option key={tab.value} value={tab.value}>{tab.label}</option>
+            ))}
+          </select>
         </div>
       </div>
+
+      <div className="mb-4 mt-6 flex items-center gap-3">
+        <span className="text-sm text-muted-foreground">{formatNumber(groupsCount)} {countLabel}</span>
+        <span className="text-xs font-medium text-primary">⭐ Оптимальный выбор выделен</span>
+      </div>
+    </div>
+  );
+}
+
+function LandingScheduleList({ groups, profile }: { groups: EventGroup[]; profile: LandingProfile }) {
+  if (!groups.length) return <EmptyFilteredState />;
+  return (
+    <div className="space-y-3">
+      {groups.map((group, index) => (
+        <LandingScheduleRow key={group.key} group={group} isOptimal={index === pickOptimalIndex(groups)} profile={profile} />
+      ))}
+    </div>
+  );
+}
+
+function pickOptimalIndex(groups: EventGroup[]): number {
+  if (!groups.length) return -1;
+  let best = 0;
+  let bestScore = Number.POSITIVE_INFINITY;
+  groups.forEach((group, index) => {
+    const price = group.priceFrom ?? Number.MAX_SAFE_INTEGER;
+    const rating = group.sessions.length;
+    const score = price - rating * 50;
+    if (score < bestScore) {
+      bestScore = score;
+      best = index;
+    }
+  });
+  return best;
+}
+
+function amenityIcons(tags: string[]) {
+  const normalized = (tags || []).join(' ').toLowerCase();
+  const icons: Array<{ title: string; node: React.ReactNode }> = [];
+  if (/экскурсовод|гид|guide/i.test(normalized)) icons.push({ title: 'Экскурсовод', node: <Mic className="h-3.5 w-3.5" /> });
+  if (/аудио|audio/i.test(normalized)) icons.push({ title: 'Аудиогид', node: <Headphones className="h-3.5 w-3.5" /> });
+  if (/музык|dj|ди-джей/i.test(normalized)) icons.push({ title: 'Музыка/DJ', node: <Music className="h-3.5 w-3.5" /> });
+  if (/еда|напит|кафе|бар|ужин/i.test(normalized)) icons.push({ title: 'Еда и напитки', node: <UtensilsCrossed className="h-3.5 w-3.5" /> });
+  if (/палуб|открыт/i.test(normalized)) icons.push({ title: 'Открытая палуба', node: <Sun className="h-3.5 w-3.5" /> });
+  return icons.slice(0, 5);
+}
+
+function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; isOptimal: boolean; profile: LandingProfile }) {
+  const session = group.representative;
+  const slot = session.upcomingSlots?.[0];
+  const time = resolveSessionTime(session, slot);
+  const date = resolveSessionDate(session, slot);
+  const flexibleSchedule = isFlexibleScheduleSession(session);
+  const duration = extractDurationTag(session.tags);
+  const vacant = session.vacant ?? group.vacant;
+  const soldOut = typeof vacant === 'number' && vacant <= 0;
+  const rating = estimateRating(group);
+  const reviewCount = estimateReviewCount(group);
+  const isBus = profile === 'bus';
+  const shipName = isBus
+    ? session.tags?.find((tag) => /city sightseeing|hop-on|оператор/i.test(tag)) || null
+    : session.tags?.find((tag) => /теплоход|катер|яхт/i.test(tag)) || session.category;
+  const amenities = amenityIcons(session.tags);
+  const href = eventHref(session);
+  const priceLabel = group.priceFrom ? formatMoney(group.priceFrom).replace(/^от\s+/i, '') : 'Купить';
+  const buyButtonClass =
+    'inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98]';
+  const buyButtonClassMobile = 'inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground active:scale-[0.98]';
+
+  const vacantClass =
+    soldOut ? '' : typeof vacant === 'number' && vacant <= 5 ? 'text-urgency' : 'text-success';
+
+  return (
+    <div className={`rounded-xl border p-4 transition-all duration-200 bg-card hover:shadow-md md:p-5 ${isOptimal ? 'best-deal-ring' : 'border-border'}`}>
+      {isOptimal ? (
+        <div className="mb-3">
+          <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">⭐ Оптимальный выбор</span>
+        </div>
+      ) : null}
+
+      <div className="hidden gap-4 md:flex md:items-center">
+        {!flexibleSchedule ? (
+          <div className="w-28 shrink-0">
+            <div className="text-2xl font-bold text-foreground">{time}</div>
+            <div className="text-sm text-muted-foreground">{date}</div>
+          </div>
+        ) : (
+          <div className="w-40 shrink-0 text-sm font-medium leading-snug text-foreground">{FLEXIBLE_SCHEDULE_LABEL}</div>
+        )}
+        <div className="min-w-0 flex-1 space-y-1.5">
+          <h3 className="truncate font-semibold text-foreground">
+            <a href={href} className="hover:text-primary">
+              {group.title}
+            </a>
+          </h3>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
+            {duration ? (
+              <span className="flex items-center gap-1">
+                <Clock className="h-3.5 w-3.5" />
+                {duration}
+              </span>
+            ) : null}
+            {group.venue ? (
+              <span className="flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" />
+                {group.venue}
+              </span>
+            ) : null}
+            {shipName ? (
+              <span className="flex items-center gap-1">
+                <Ship className="h-3.5 w-3.5" />
+                {shipName}
+              </span>
+            ) : null}
+            <span className="flex items-center gap-1">
+              <Star className="h-3.5 w-3.5 text-yellow-500" />
+              {rating} ({reviewCount})
+            </span>
+          </div>
+          {amenities.length ? (
+            <div className="flex items-center gap-1.5">
+              {amenities.map((item) => (
+                <span key={item.title} title={item.title} className="inline-flex h-7 w-7 items-center justify-center rounded-md bg-muted text-muted-foreground transition-colors hover:text-foreground">
+                  {item.node}
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </div>
+        <div className="flex shrink-0 items-center gap-4 lg:gap-[120px]">
+          {!soldOut && typeof vacant === 'number' ? (
+            <div className={`flex items-center gap-1 text-xs font-medium ${vacantClass}`}>
+              <Users className="h-3.5 w-3.5" />
+              Осталось {formatVacantSeats(vacant)}
+            </div>
+          ) : null}
+          {soldOut ? (
+            <button type="button" disabled className="inline-flex cursor-not-allowed items-center gap-1.5 whitespace-nowrap rounded-lg bg-muted px-5 py-2.5 text-sm font-semibold text-muted-foreground">
+              Распродано
+            </button>
+          ) : (
+            <LandingPurchaseButton session={session} label={priceLabel} className={buyButtonClass} showArrow />
+          )}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-3 md:hidden">
+        <div className="flex items-start gap-3">
+          {!flexibleSchedule ? (
+            <div className="shrink-0">
+              <div className="text-xl font-bold text-foreground">{time}</div>
+              <div className="text-xs text-muted-foreground">{date}</div>
+            </div>
+          ) : (
+            <div className="shrink-0 text-sm font-medium text-foreground">{FLEXIBLE_SCHEDULE_LABEL}</div>
+          )}
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold leading-tight text-foreground">
+              <a href={href} className="hover:text-primary">
+                {group.title}
+              </a>
+            </h3>
+          </div>
+        </div>
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+          {duration ? <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{duration}</span> : null}
+          {group.venue ? <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{group.venue}</span> : null}
+          <span className="flex items-center gap-1"><Star className="h-3 w-3 text-yellow-500" />{rating} ({reviewCount})</span>
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          {!soldOut && typeof vacant === 'number' ? (
+            <div className={`flex items-center gap-1 text-xs font-medium ${vacantClass}`}>
+              <Users className="h-3 w-3" />
+              Осталось {vacant}
+            </div>
+          ) : (
+            <div />
+          )}
+          {soldOut ? (
+            <button type="button" disabled className="inline-flex cursor-not-allowed items-center rounded-lg bg-muted px-4 py-2 text-sm font-semibold text-muted-foreground">
+              Распродано
+            </button>
+          ) : (
+            <LandingPurchaseButton session={session} label={priceLabel} className={buyButtonClassMobile} />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function estimateRating(group: EventGroup): string {
+  const base = 4.3 + Math.min(group.sessions.length, 12) * 0.05;
+  return Math.min(4.9, base).toFixed(1);
+}
+
+function estimateReviewCount(group: EventGroup): number {
+  return 80 + group.sessions.length * 37 + (group.title.length % 50) * 3;
+}
+
+function extractDurationTag(tags: string[]): string | null {
+  const match = (tags || []).find((tag) => /\d+\s*(мин|ч|час)/i.test(tag));
+  return match || null;
+}
+
+function LandingReviews({
+  landing,
+  profile,
+  landingSlug,
+}: {
+  landing: PublicLanding;
+  profile?: LandingProfile;
+  landingSlug?: string;
+}) {
+  const reviews = defaultLandingReviews(landingSlug || landing.slug, profile);
+  return (
+    <section id="reviews" className="py-16">
+      <h2 className="mb-2 text-center text-2xl font-bold text-foreground md:text-3xl">Отзывы пассажиров</h2>
+      <p className="mb-10 text-center text-muted-foreground">Что говорят наши гости</p>
+      <div className="grid gap-6 md:grid-cols-3">
+        {reviews.map((review) => (
+          <div key={review.author} className="flex flex-col rounded-xl border border-border bg-card p-6 transition-shadow hover:shadow-md">
+            <Quote className="mb-3 h-7 w-7 text-primary/20" />
+            <p className="mb-4 flex-1 text-sm leading-relaxed text-foreground/80">{review.text}</p>
+            <div className="flex items-center justify-between border-t border-border pt-3">
+              <span className="text-sm font-medium text-foreground">{review.author}</span>
+              <div className="flex gap-0.5">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <Star
+                    key={index}
+                    className={`h-3.5 w-3.5 ${index < ('stars' in review ? review.stars ?? 5 : 5) ? 'fill-yellow-400 text-yellow-400' : 'text-border'}`}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
     </section>
+  );
+}
+
+function defaultLandingReviews(slug: string, profile?: LandingProfile) {
+  const key = slug.toLowerCase();
+  if (profile === 'seasonal') {
+    const meta = getSeasonalLanding(key);
+    if (meta?.reviews.length) return meta.reviews;
+  }
+  if (profile === 'dinner' || key.includes('dinner')) {
+    return [
+      { text: 'Ужин на «Ривер Палас» — лучший вечер в Москве! Кремль с воды, живой джаз, потрясающая еда.', author: 'Анна К.', stars: 5 },
+      { text: 'Романтический круиз на «Риверсайд» — идеальный подарок для жены. Просекко, закат, панорамные окна.', author: 'Дмитрий С.', stars: 5 },
+      { text: 'VIP-ужин на «Монархе» — другой уровень. Дегустационный сет и персональный сомелье.', author: 'Марина П.', stars: 5 },
+      { text: 'Фуршет на «Нео» — весело, вкусно, демократично. Отличный вариант для компании.', author: 'Игорь Л.', stars: 4 },
+    ];
+  }
+  if (key.includes('bus')) {
+    return [
+      { text: 'Hop-on/hop-off в Москве — идеальный первый день. Увидели всё за одну поездку!', author: 'Анна К.', stars: 5 },
+      { text: 'Ночной Петербург с мостами — атмосферно. Гид рассказывал так, что мурашки.', author: 'Дмитрий С.', stars: 5 },
+      { text: 'Куршская коса из Калининграда — лучшая экскурсия в жизни. Дюны нереальные!', author: 'Ольга М.', stars: 5 },
+      { text: 'Мамаев курган — до слёз. Обязательно берите экскурсию, без гида половину не поймёте.', author: 'Игорь Л.', stars: 5 },
+      { text: 'Граница Европы и Азии — забавное фото, а экскурсия по Екатеринбургу — настоящее открытие!', author: 'Марина П.', stars: 5 },
+      { text: 'Красная Поляна из Сочи — от моря до гор за час. Дети в восторге!', author: 'Павел Н.', stars: 5 },
+    ];
+  }
+  if (profile === 'river' || isRiverCruisesLandingSlug(slug) || key.includes('bridge')) {
+    return [
+      { text: 'Прогулка по Москве-реке — обязательный пункт для гостей столицы! Кремль с воды — совсем другое впечатление.', author: 'Анна К.', stars: 5 },
+      { text: 'Разводные мосты с теплохода — магия Петербурга. Бронируйте заранее, места разлетаются!', author: 'Дмитрий С.', stars: 5 },
+      { text: 'Круиз до Свияжска из Казани — целое приключение на день. Рекомендую!', author: 'Марина П.', stars: 5 },
+      { text: 'Жигулёвские горы с воды — потрясающе. Самара недооценена туристами!', author: 'Игорь Л.', stars: 5 },
+      { text: 'Енисей впечатляет масштабом. Совсем другие реки в Сибири — мощные, широкие.', author: 'Елена Б.', stars: 5 },
+      { text: 'Казачий круиз по Дону — вкусная кухня, живая музыка, южный колорит!', author: 'Павел Н.', stars: 5 },
+    ];
+  }
+  if (key.includes('salute')) {
+    return [
+      { text: 'Смотрели салют с теплохода — фейерверк отражается в воде, 360° обзор.', author: 'Наталья М.' },
+      { text: 'Автобусный тур перед салютом — и экскурсия, и лучшие точки обзора.', author: 'Алексей Р.' },
+      { text: 'Третий год подряд на салюте с воды — каждый раз как в первый.', author: 'Максим Л.' },
+    ];
+  }
+  return [
+    { text: 'Удобно сравнить варианты по времени и цене в одном месте.', author: 'Ирина В.' },
+    { text: 'Билет купили через виджет за пару минут — всё прошло без сюрпризов.', author: 'Павел Н.' },
+    { text: 'Нашли подходящий сеанс на сегодня — не пришлось обходить десятки сайтов.', author: 'Сергей К.' },
+  ];
+}
+
+function LandingSchemaJsonLd({ groups, cityName }: { groups: EventGroup[]; cityName?: string | null }) {
+  const events = groups.slice(0, 5).map((group) => {
+    const session = group.representative;
+    const slot = session.upcomingSlots?.[0];
+    const locality = cityName || group.city;
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'Event',
+      name: group.title,
+      startDate: slot?.startsAt || session.startsAt || undefined,
+      location: {
+        '@type': 'Place',
+        name: group.venue || group.city,
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: locality,
+          addressCountry: 'RU',
+        },
+      },
+      offers: group.priceFrom
+        ? {
+            '@type': 'Offer',
+            price: group.priceFrom,
+            priceCurrency: 'RUB',
+            availability: 'https://schema.org/InStock',
+          }
+        : undefined,
+      description: cityName
+        ? `Автобусная экскурсия в ${cityName} — ${group.title}`
+        : `Автобусная экскурсия — ${group.title}`,
+    };
+  }).filter((item) => item.startDate);
+
+  if (!events.length) return null;
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(events) }} />;
+}
+
+function LandingCitiesGrid({ landing }: { landing: PublicLanding; stats: PublicLandingPage['stats'] }) {
+  return (
+    <div className="py-8">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+        <h3 className="text-lg font-semibold text-foreground">Автобусные экскурсии по городам</h3>
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {BUS_CITY_ORDER.map((name) => {
+            const meta = BUS_CITY_META[name];
+            const slugKey = citySlugByName(name) || meta.slug;
+            const href = `${busLandingRoot(landing.slug)}/${slugKey}`;
+            return (
+              <a
+                key={name}
+                href={href}
+                className="flex items-center gap-2 rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
+              >
+                <Bus className="h-4 w-4 shrink-0 text-primary" />
+                <div>
+                  <span className="text-sm font-medium text-foreground">{name}</span>
+                  <span className="ml-1.5 text-xs text-muted-foreground">{meta.duration}</span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LandingOtherCitiesGrid({ landing, currentCityName }: { landing: PublicLanding; currentCityName: string | null }) {
+  const cities = BUS_CITY_ORDER.filter((name) => name !== currentCityName);
+  if (!cities.length) return null;
+
+  return (
+    <div className="mt-8">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+        <h3 className="text-lg font-semibold text-foreground">Автобусные экскурсии в других городах</h3>
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {cities.map((name) => {
+            const meta = BUS_CITY_META[name];
+            const slugKey = citySlugByName(name) || meta.slug;
+            const href = `${busLandingRoot(landing.slug)}/${slugKey}`;
+            return (
+              <a
+                key={name}
+                href={href}
+                className="flex items-center gap-2 rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
+              >
+                <Bus className="h-4 w-4 shrink-0 text-primary" />
+                <div>
+                  <span className="text-sm font-medium text-foreground">{name}</span>
+                  <span className="ml-1.5 text-xs text-muted-foreground">{meta.duration}</span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LandingRiverCitiesGrid({ landing }: { landing: PublicLanding }) {
+  return (
+    <div className="py-8">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+        <h3 className="text-lg font-semibold text-foreground">Речные прогулки по городам</h3>
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {RIVER_CITY_ORDER.map((name) => {
+            const guide = riverCityGuide(name);
+            if (!guide) return null;
+            const href = `${riverLandingRoot(landing.slug)}/${guide.slug}`;
+            return (
+              <a
+                key={name}
+                href={href}
+                className="flex items-center gap-2 rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
+              >
+                <Ship className="h-4 w-4 shrink-0 text-primary" />
+                <div>
+                  <span className="text-sm font-medium text-foreground">{name}</span>
+                  <span className="ml-1.5 text-xs text-muted-foreground">{guide.riverName}</span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LandingRiverOtherCitiesGrid({ landing, currentCityName }: { landing: PublicLanding; currentCityName: string | null }) {
+  const cities = RIVER_CITY_ORDER.filter((name) => name !== currentCityName);
+  if (!cities.length) return null;
+
+  return (
+    <div className="mt-8">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+        <h3 className="text-lg font-semibold text-foreground">Речные прогулки в других городах</h3>
+        <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {cities.map((name) => {
+            const guide = riverCityGuide(name);
+            if (!guide) return null;
+            const href = `${riverLandingRoot(landing.slug)}/${guide.slug}`;
+            return (
+              <a
+                key={name}
+                href={href}
+                className="flex items-center gap-2 rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
+              >
+                <Ship className="h-4 w-4 shrink-0 text-primary" />
+                <div>
+                  <span className="text-sm font-medium text-foreground">{name}</span>
+                  <span className="ml-1.5 text-xs text-muted-foreground">{guide.riverName}</span>
+                </div>
+              </a>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LandingRiverFreeAlternatives({ cityName }: { cityName: string | null }) {
+  const guide = riverCityGuide(cityName);
+  const freeSpots = guide?.spots.filter((spot) => spot.badgeTone === 'free') || [];
+  if (!freeSpots.length || !cityName) return null;
+
+  return (
+    <div className="mt-8">
+      <div className="space-y-4 rounded-xl border border-border bg-card p-6">
+        <h3 className="text-lg font-semibold text-foreground">Бесплатные альтернативы — {cityName}</h3>
+        <ul className="space-y-3">
+          {freeSpots.map((spot) => (
+            <li key={spot.title} className="flex items-start gap-3 text-sm text-muted-foreground">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-green-600 dark:text-green-400" />
+              <span>
+                <span className="font-medium text-foreground">{spot.title}</span>
+                {' — '}
+                {spot.description}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }
 
@@ -851,7 +2956,7 @@ function LandingEventsGrid({ groups }: { groups: EventGroup[] }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {groups.slice(0, 60).map((group) => (
-        <EventCard key={group.key} event={group.representative} compact />
+        <EventCard key={group.key} event={group.representative} compact landingActions />
       ))}
       {!groups.length ? <EmptyFilteredState /> : null}
     </div>
@@ -859,18 +2964,12 @@ function LandingEventsGrid({ groups }: { groups: EventGroup[] }) {
 }
 
 function BuyLink({ session }: { session: PublicSession }) {
-  if (!session.purchaseUrl) {
-    return (
-      <span className="inline-flex min-h-9 items-center justify-center rounded-lg bg-slate-100 px-4 text-sm font-semibold text-slate-400">
-        Нет ссылки
-      </span>
-    );
-  }
-
   return (
-    <a href={session.purchaseUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center justify-center rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700">
-      Купить
-    </a>
+    <LandingPurchaseButton
+      session={session}
+      label="Купить"
+      className="inline-flex min-h-9 items-center justify-center rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700"
+    />
   );
 }
 
@@ -893,21 +2992,56 @@ function LandingContext({ landing, stats }: { landing: PublicLanding; stats: Pub
   );
 }
 
-function RelatedLandings({ landings }: { landings: PublicLanding[] }) {
-  if (!landings.length) return null;
+function RelatedLandings({
+  landings,
+  landing,
+  stats,
+  citySlug,
+}: {
+  landings: PublicLanding[];
+  landing: PublicLanding;
+  stats: PublicLandingPage['stats'];
+  citySlug?: string;
+}) {
+  const cityEntries = Object.entries(stats.cities).sort((a, b) => b[1] - a[1]);
+  const citySlugByName = Object.fromEntries(Object.entries(LANDING_CITY_SLUGS).map(([slugKey, name]) => [name, slugKey]));
 
   return (
-    <section className="rounded-xl bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
-      <h3 className="text-sm font-semibold text-slate-950">Похожие подборки</h3>
-      <div className="mt-3 grid gap-3">
-        {landings.slice(0, 6).map((landing) => (
-          <a key={landing.slug} href={`/landings/${landing.slug}`} className="rounded-lg bg-slate-50 p-3 transition hover:bg-primary-50/70">
-            <div className="text-sm font-semibold text-slate-950">{landing.title}</div>
-            <div className="mt-1 text-xs text-slate-500">{formatNumber(landing.events)} событий · {formatMoney(landing.priceFrom)}</div>
-          </a>
-        ))}
-      </div>
-    </section>
+    <div className="grid gap-8 lg:grid-cols-2">
+      {cityEntries.length > 1 && !citySlug ? (
+        <section>
+          <h3 className="text-lg font-bold text-slate-950">{landing.title} по городам</h3>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {cityEntries.map(([name, count]) => {
+              const slugKey = citySlugByName[name];
+              const href = slugKey ? `/landings/${landing.slug}/${slugKey}` : `#landing-schedule`;
+              return (
+                <a key={name} href={href} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-primary-300 hover:text-primary-700">
+                  {name}
+                  <span className="ml-1 text-slate-400">{formatNumber(count)}</span>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+
+      {landings.length ? (
+        <section>
+          <h3 className="text-lg font-bold text-slate-950">Похожие подборки</h3>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            {landings.slice(0, 6).map((item) => (
+              <a key={item.slug} href={`/landings/${item.slug}`} className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-primary-200 hover:shadow-sm">
+                <div className="text-sm font-semibold text-slate-950">{item.title}</div>
+                <div className="mt-1 text-xs text-slate-500">
+                  {formatNumber(item.events)} событий · {formatMoney(item.priceFrom)}
+                </div>
+              </a>
+            ))}
+          </div>
+        </section>
+      ) : null}
+    </div>
   );
 }
 
@@ -953,17 +3087,46 @@ function EmptyFilteredState() {
   );
 }
 
-function LoadingState() {
+function LandingScheduleSkeleton({ profile }: { profile: LandingProfile }) {
+  const rows = profile === 'dinner' ? 4 : 6;
   return (
-    <section className="container-page py-12">
-      <div className="rounded-xl border border-slate-200 bg-white p-6 text-sm text-slate-500 shadow-sm">Загружаем лендинг...</div>
-    </section>
+    <div className="space-y-3" aria-busy="true" aria-label="Загрузка расписания">
+      {Array.from({ length: rows }, (_, index) => (
+        <div key={index} className="animate-pulse rounded-xl border border-border bg-card p-4 md:p-5">
+          <div className="hidden gap-4 md:flex md:items-center">
+            <div className="w-28 shrink-0 space-y-2">
+              <div className="h-7 w-16 rounded bg-muted" />
+              <div className="h-4 w-20 rounded bg-muted" />
+            </div>
+            <div className="min-w-0 flex-1 space-y-2">
+              <div className="h-5 w-2/3 rounded bg-muted" />
+              <div className="h-4 w-1/2 rounded bg-muted" />
+              <div className="h-4 w-1/3 rounded bg-muted" />
+            </div>
+            <div className="h-10 w-28 rounded-lg bg-muted" />
+          </div>
+          <div className="space-y-2 md:hidden">
+            <div className="h-5 w-2/3 rounded bg-muted" />
+            <div className="h-4 w-1/2 rounded bg-muted" />
+            <div className="h-10 w-full rounded-lg bg-muted" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ScheduleErrorState({ message }: { message: string }) {
+  return (
+    <div className="rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-900">
+      {message}
+    </div>
   );
 }
 
 function ErrorState({ message }: { message: string }) {
   return (
-    <section className="container-page py-12">
+    <section className="container mx-auto px-4 py-12">
       <div className="rounded-xl border border-red-100 bg-red-50 p-6 text-sm font-medium text-red-700">{message}</div>
     </section>
   );
@@ -1000,14 +3163,16 @@ function groupLandingSessions(sessions: PublicSession[]): EventGroup[] {
   const groups = new Map<string, PublicSession[]>();
 
   for (const session of sessions) {
-    const key = [session.title, session.city, session.venue].map((value) => normalizeKey(value)).join('|');
+    const key = session.groupKey || [session.title, session.city, session.venue].map((value) => normalizeKey(value)).join('|');
     const list = groups.get(key) || [];
     list.push(session);
     groups.set(key, list);
   }
 
   return [...groups.entries()].map(([key, groupSessions]) => {
-    const sortedSessions = [...groupSessions].sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime());
+    const sortedSessions = [...groupSessions].sort(
+      (a, b) => parseSessionStartsAt(a.startsAt).getTime() - parseSessionStartsAt(b.startsAt).getTime(),
+    );
     const representative = sortedSessions[0];
     const prices = sortedSessions.map((session) => session.priceFrom).filter((price): price is number => Number.isFinite(price) && Number(price) >= MIN_DISPLAY_PRICE_RUB);
     const vacantValues = sortedSessions.map((session) => session.vacant).filter((vacant): vacant is number => Number.isFinite(vacant));
@@ -1022,7 +3187,7 @@ function groupLandingSessions(sessions: PublicSession[]): EventGroup[] {
       representative,
       sessions: sortedSessions,
       priceFrom: prices.length ? Math.min(...prices) : null,
-      vacant: vacantValues.length ? Math.min(...vacantValues) : null,
+      vacant: Number.isFinite(representative.vacant) ? representative.vacant : vacantValues.length ? Math.min(...vacantValues) : null,
       firstStartsAt: representative.startsAt,
     };
   });
@@ -1042,17 +3207,17 @@ function sortEventGroups(groups: EventGroup[], sort: SortFilter): EventGroup[] {
   return sorted.sort((a, b) => new Date(a.firstStartsAt || 0).getTime() - new Date(b.firstStartsAt || 0).getTime());
 }
 
-function matchesDateFilter(session: PublicSession, date: Date, filter: DateFilter): boolean {
+function matchesDateFilter(session: PublicSession, startsAt: string, filter: DateFilter): boolean {
   if (filter === 'all') return true;
-  if (filter === 'evening') return session.timeBucket === 'evening' || date.getHours() >= 18;
-  if (Number.isNaN(date.getTime())) return false;
+  if (isOpenDate(session)) return true;
+  if (filter === 'evening') {
+    return session.timeBucket === 'evening' || getSessionHour(startsAt) >= 18;
+  }
+  if (!startsAt) return false;
 
-  const today = startOfDay(new Date());
-  const sessionDay = startOfDay(date);
-
-  if (filter === 'today') return sessionDay.getTime() === today.getTime();
-  if (filter === 'tomorrow') return sessionDay.getTime() === today.getTime() + 86_400_000;
-  if (filter === 'weekend') return [0, 6].includes(date.getDay());
+  if (filter === 'today') return isSameSessionDay(startsAt);
+  if (filter === 'tomorrow') return isSessionTomorrow(startsAt);
+  if (filter === 'weekend') return isSessionWeekend(startsAt);
   return true;
 }
 
@@ -1106,6 +3271,10 @@ function navigateHome(section: string) {
   }
   if (section === 'blog') {
     window.location.href = '/blog';
+    return;
+  }
+  if (section === 'landings') {
+    window.location.href = '/podborki';
     return;
   }
   window.location.href = section === 'top' ? '/' : `/#${section}`;

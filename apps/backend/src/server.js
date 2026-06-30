@@ -24,14 +24,21 @@ import {
   buildAdminVenuesList,
   buildCatalogSessions,
   buildPublicBuyerOrders,
+  buildAccountPurchases,
+  buildAccountOrderDetail,
   buildPublicCityPage,
   buildPublicEventPage,
   buildPublicLandingPage,
   buildPublicLandingPageManaged,
   buildPublicVenuePage,
   buildPublicHome,
+  buildPublicHomePreview,
+  buildPublicDestinations,
   buildPublicStats,
+  buildPublicSearch,
+  buildPublicPromoBlocks,
   clearPublicDataCaches,
+  runLandingAudit,
   updateAdminEventOverride,
   updateAdminEventTaxonomy,
   upsertAdminOrderTicket,
@@ -39,6 +46,19 @@ import {
   updateAdminLandingMatch,
   updateAdminVenue,
 } from './dto.js';
+import {
+  assertAuthRateLimit,
+  authenticateAccessToken,
+  buildClearRefreshCookie,
+  buildRefreshCookie,
+  loginSiteUser,
+  logoutSiteUser,
+  parseBearerToken,
+  parseCookies,
+  refreshSiteUserSession,
+  registerSiteUser,
+  requireSiteUserFromRequest,
+} from './user-auth.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const rootDir = path.resolve(dirname, '..', '..', '..');
@@ -51,6 +71,9 @@ const adminAuth = {
   passwordHash: process.env.ADMIN_PASSWORD_SHA256 || process.env.ADMIN_PASSWORD_HASH || '',
   realm: process.env.ADMIN_AUTH_REALM || 'Daibilet admin',
 };
+
+const TEP_AUTO_SYNC_INTERVAL_MS = Number(process.env.TEP_AUTO_SYNC_INTERVAL_MS || 6 * 60 * 60 * 1000);
+let tepAutoSyncInFlight = false;
 
 const jsonCache = new Map();
 const PUBLIC_RESPONSE_CACHE_MS = 5 * 60 * 1000;
@@ -124,8 +147,23 @@ createServer(async (request, response) => {
       return;
     }
 
+    if (route === 'GET /api/public/destinations') {
+      if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public destinations refresh');
+      sendJson(response, await withPublicResponseCache('destinations', () => buildPublicDestinations(db)));
+      return;
+    }
+
+    if (route === 'GET /api/public/home/preview') {
+      if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public home preview refresh');
+      sendJson(response, await withPublicResponseCache('home:preview', () => buildPublicHomePreview(db)));
+      return;
+    }
+
     if (route === 'GET /api/public/events') {
-      if (url.searchParams.get('refresh') === '1') publicResponseCache.clear();
+      if (url.searchParams.get('refresh') === '1') {
+        publicResponseCache.clear();
+        clearPublicDataCaches();
+      }
       const catalogCacheKey = `events:${canonicalSearchParams(url.searchParams, ['refresh'])}`;
       const catalogPayload =
         url.searchParams.get('refresh') === '1'
@@ -137,8 +175,112 @@ createServer(async (request, response) => {
       return;
     }
 
+    if (route === 'GET /api/public/search') {
+      sendJson(response, await withPublicResponseCache(`search:${canonicalSearchParams(url.searchParams)}`, () => buildPublicSearch(db, url.searchParams)));
+      return;
+    }
+
+    if (route === 'GET /api/public/promo-blocks') {
+      sendJson(response, await withPublicResponseCache(`promo-blocks:${canonicalSearchParams(url.searchParams)}`, () => buildPublicPromoBlocks(db, url.searchParams)));
+      return;
+    }
+
     if (route === 'GET /api/public/orders') {
       sendJson(response, await buildPublicBuyerOrders(db, url.searchParams));
+      return;
+    }
+
+    if (route === 'POST /api/user/auth/register') {
+      try {
+        const clientIp = String(request.headers['x-real-ip'] || request.socket.remoteAddress || 'unknown');
+        assertAuthRateLimit(`register:${clientIp}`, 10);
+        const body = await readJsonBody(request);
+        const tokens = await registerSiteUser(db, body);
+        sendJson(response, { accessToken: tokens.accessToken }, 201, {
+          'Set-Cookie': buildRefreshCookie(tokens.refreshToken),
+        });
+      } catch (error) {
+        sendJson(response, { error: error.message || 'register_failed' }, error.statusCode || 400);
+      }
+      return;
+    }
+
+    if (route === 'POST /api/user/auth/login') {
+      try {
+        const clientIp = String(request.headers['x-real-ip'] || request.socket.remoteAddress || 'unknown');
+        assertAuthRateLimit(`login:${clientIp}`, 20);
+        const body = await readJsonBody(request);
+        const tokens = await loginSiteUser(db, body?.email, body?.password);
+        sendJson(response, { accessToken: tokens.accessToken }, 200, {
+          'Set-Cookie': buildRefreshCookie(tokens.refreshToken),
+        });
+      } catch (error) {
+        sendJson(response, { error: error.message || 'login_failed' }, error.statusCode || 401);
+      }
+      return;
+    }
+
+    if (route === 'POST /api/user/auth/refresh') {
+      try {
+        const cookies = parseCookies(request);
+        const refreshToken = cookies.user_refresh_token || (await readJsonBody(request))?.refreshToken;
+        if (!refreshToken) {
+          sendJson(response, { accessToken: null }, 200);
+          return;
+        }
+        const tokens = await refreshSiteUserSession(db, refreshToken);
+        sendJson(response, { accessToken: tokens.accessToken }, 200, {
+          'Set-Cookie': buildRefreshCookie(tokens.refreshToken),
+        });
+      } catch (error) {
+        sendJson(response, { error: error.message || 'refresh_failed', accessToken: null }, error.statusCode || 401, {
+          'Set-Cookie': buildClearRefreshCookie(),
+        });
+      }
+      return;
+    }
+
+    if (route === 'POST /api/user/auth/logout') {
+      try {
+        const token = parseBearerToken(request);
+        const payload = token ? authenticateAccessToken(token) : null;
+        if (payload?.sub) await logoutSiteUser(db, payload.sub);
+        sendJson(response, { ok: true }, 200, { 'Set-Cookie': buildClearRefreshCookie() });
+      } catch {
+        sendJson(response, { ok: true }, 200, { 'Set-Cookie': buildClearRefreshCookie() });
+      }
+      return;
+    }
+
+    if (route === 'GET /api/user/auth/me') {
+      try {
+        const user = await requireSiteUserFromRequest(db, request);
+        sendJson(response, user);
+      } catch (error) {
+        sendJson(response, { error: error.message || 'unauthorized' }, error.statusCode || 401);
+      }
+      return;
+    }
+
+    if (route === 'GET /api/account/purchases') {
+      try {
+        const user = await requireSiteUserFromRequest(db, request);
+        sendJson(response, await buildAccountPurchases(db, user.email, url.searchParams));
+      } catch (error) {
+        sendJson(response, { error: error.message || 'unauthorized' }, error.statusCode || 401);
+      }
+      return;
+    }
+
+    const accountOrderMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/account\/orders\/([^/]+)$/) : null;
+    if (accountOrderMatch) {
+      try {
+        const user = await requireSiteUserFromRequest(db, request);
+        const detail = await buildAccountOrderDetail(db, user.email, decodeURIComponent(accountOrderMatch[1]));
+        sendJson(response, detail || { error: 'order_not_found' }, detail ? 200 : 404);
+      } catch (error) {
+        sendJson(response, { error: error.message || 'unauthorized' }, error.statusCode || 401);
+      }
       return;
     }
 
@@ -159,7 +301,7 @@ createServer(async (request, response) => {
     const publicLandingMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/landings\/([^/]+)$/) : null;
     if (publicLandingMatch) {
       const landingSlug = decodeURIComponent(publicLandingMatch[1]);
-      sendJson(response, await withPublicResponseCache(`landing:${landingSlug}`, () => buildPublicLandingPageManaged(db, landingSlug)));
+      sendJson(response, await withPublicResponseCache(`landing:${landingSlug}`, () => buildPublicLandingPageWithFallback(db, landingSlug)));
       return;
     }
 
@@ -183,7 +325,8 @@ createServer(async (request, response) => {
     if (route === 'POST /api/v1/tep/sync') {
       const result = await runTeplohodSync();
       invalidatePublicCaches('teplohod sync', { warm: true });
-      sendJson(response, result);
+      const landingAudit = await runLandingAudit(db, rootDir);
+      sendJson(response, { ...result, landingAudit });
       return;
     }
 
@@ -355,14 +498,64 @@ createServer(async (request, response) => {
 }).listen(port, '127.0.0.1', () => {
   console.log(`Daibilet backend listening on http://127.0.0.1:${port}`);
   warmPublicCaches('startup');
+  scheduleTeplohodAutoSync();
 });
+
+function scheduleTeplohodAutoSync() {
+  if (!Number.isFinite(TEP_AUTO_SYNC_INTERVAL_MS) || TEP_AUTO_SYNC_INTERVAL_MS < 60_000) {
+    return;
+  }
+
+  const run = async (reason) => {
+    if (tepAutoSyncInFlight) {
+      console.log(`Teplohod auto-sync skipped (${reason}): previous run still active`);
+      return;
+    }
+
+    tepAutoSyncInFlight = true;
+    const startedAt = Date.now();
+    try {
+      console.log(`Teplohod auto-sync started (${reason})`);
+      const result = await runTeplohodSync();
+      invalidatePublicCaches('teplohod auto-sync', { warm: true });
+      const landingAudit = await runLandingAudit(db, rootDir);
+      const elapsed = Date.now() - startedAt;
+      console.log(
+        `Teplohod auto-sync finished in ${elapsed}ms: imported=${result.stats?.importedEvents ?? '?'}, sessions=${result.stats?.sessions ?? '?'}, openDate=${result.stats?.openDateEvents ?? '?'}, audit=${landingAudit?.summary?.failed ?? 0} failed`,
+      );
+    } catch (error) {
+      console.warn(
+        `Teplohod auto-sync failed (${reason}): ${error instanceof Error ? error.message : String(error)}`,
+      );
+    } finally {
+      tepAutoSyncInFlight = false;
+    }
+  };
+
+  const firstDelayMs = Math.min(120_000, TEP_AUTO_SYNC_INTERVAL_MS);
+  setTimeout(() => {
+    void run('startup-delay');
+  }, firstDelayMs);
+  setInterval(() => {
+    void run('interval');
+  }, TEP_AUTO_SYNC_INTERVAL_MS);
+  console.log(`Teplohod auto-sync enabled: every ${Math.round(TEP_AUTO_SYNC_INTERVAL_MS / 60000)} min, first run in ${Math.round(firstDelayMs / 1000)}s`);
+}
+
+async function buildPublicLandingPageWithFallback(db, landingSlug) {
+  const managed = await buildPublicLandingPageManaged(db, landingSlug);
+  if (managed) return managed;
+  return buildPublicLandingPage(db, landingSlug);
+}
 
 function warmPublicCaches(reason) {
   const startedAt = Date.now();
-  void buildPublicHome(db)
-    .then((payload) => {
+  void Promise.all([buildPublicDestinations(db), buildPublicHomePreview(db), buildPublicStats(db)])
+    .then(([destinations, preview, stats]) => {
       const elapsed = Date.now() - startedAt;
-      console.log(`Public cache warmed after ${reason}: ${payload?.stats?.events || 0} events in ${elapsed}ms`);
+      console.log(
+        `Public cache warmed after ${reason}: ${stats?.stats?.events || preview?.sessions?.length || 0} events, ${destinations?.destinations?.length || 0} destinations in ${elapsed}ms`,
+      );
     })
     .catch((error) => {
       console.warn(`Public cache warm failed after ${reason}: ${error instanceof Error ? error.message : String(error)}`);
@@ -625,7 +818,7 @@ function runTeplohodSync() {
       resolve({
         ok: true,
         source: 'TEPLOHOD',
-        mode: process.env.TEP_API_URL ? 'api' : 'fixtures',
+        mode: process.env.TEP_API_URL ? (process.env.TEP_API_URL.includes('127.0.0.1') || process.env.TEP_API_URL.includes('localhost') ? 'fixtures-bridge' : 'api-ip') : 'fixtures',
         startedAt,
         finishedAt: new Date().toISOString(),
         stats,
@@ -825,14 +1018,16 @@ function sendAuthRequired(response) {
   response.end(JSON.stringify({ error: 'admin_auth_required' }));
 }
 
-function sendJson(response, payload, statusCode = 200) {
+function sendJson(response, payload, statusCode = 200, extraHeaders = {}) {
   const body = JSON.stringify(payload);
   response.writeHead(statusCode, {
     'access-control-allow-origin': '*',
     'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
     'access-control-allow-headers': 'content-type, authorization',
+    'access-control-allow-credentials': 'true',
     'content-type': 'application/json; charset=utf-8',
     'cache-control': 'no-store',
+    ...extraHeaders,
   });
   response.end(body);
 }

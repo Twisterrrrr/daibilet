@@ -39,6 +39,8 @@ const TEP_WIDGET_CSS = `
 }
 `;
 
+let widgetScriptPromise: Promise<void> | null = null;
+
 function normalizeTeplohodEventId(value?: string | number | null) {
   const raw = String(value ?? '').trim();
   if (!raw) return null;
@@ -46,14 +48,23 @@ function normalizeTeplohodEventId(value?: string | number | null) {
   return match ? match[1] : raw;
 }
 
-function reloadTeplohodWidgetScript() {
-  document.querySelectorAll('script[data-daibilet-teplohod-widget="true"]').forEach((script) => script.remove());
+function ensureTeplohodWidgetScript() {
+  if (typeof document === 'undefined') return Promise.resolve();
+  if (document.querySelector('script[data-daibilet-teplohod-widget="true"]')) {
+    return widgetScriptPromise || Promise.resolve();
+  }
 
-  const script = document.createElement('script');
-  script.src = TEP_WIDGET_SCRIPT_URL;
-  script.defer = true;
-  script.dataset.daibiletTeplohodWidget = 'true';
-  document.body.appendChild(script);
+  widgetScriptPromise = new Promise<void>((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = TEP_WIDGET_SCRIPT_URL;
+    script.defer = true;
+    script.dataset.daibiletTeplohodWidget = 'true';
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('teplohod widget script failed'));
+    document.body.appendChild(script);
+  });
+
+  return widgetScriptPromise;
 }
 
 export function TeplohodWidgetEmbed({
@@ -66,33 +77,16 @@ export function TeplohodWidgetEmbed({
   tepWidgetId?: string | number | null;
 }) {
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const [hidden, setHidden] = React.useState(false);
   const eventId = normalizeTeplohodEventId(tepEventId ?? externalEventId);
 
   React.useEffect(() => {
     if (!eventId || !containerRef.current) return;
-
-    const container = containerRef.current;
-    setHidden(false);
-    const timer = window.setTimeout(reloadTeplohodWidgetScript, 100);
-    const observer = new MutationObserver(() => {
-      const deleted = container.querySelector('#deleted-block');
-      const closed = container.querySelector('.ti-tickets-event-tickets-buy-closed');
-      if (deleted || closed) {
-        setHidden(true);
-        observer.disconnect();
-      }
+    void ensureTeplohodWidgetScript().catch(() => {
+      // Widget script errors are surfaced by the empty container; avoid crashing the page.
     });
-
-    observer.observe(container, { childList: true, subtree: true });
-
-    return () => {
-      window.clearTimeout(timer);
-      observer.disconnect();
-    };
   }, [eventId]);
 
-  if (!eventId || hidden) return null;
+  if (!eventId) return null;
 
   return (
     <div className="mt-4" id="teplohod-widget">
@@ -104,7 +98,7 @@ export function TeplohodWidgetEmbed({
         data-id={String(tepWidgetId || DEFAULT_TEP_WIDGET_ID)}
         data-event-id={eventId}
       />
-      <p className="mt-2 text-xs leading-5 text-white/55">Покупка откроется в виджете Teplohod.info.</p>
+      <p className="mt-2 text-xs leading-5 text-slate-500">Выберите дату и категорию билета в виджете Teplohod.info.</p>
     </div>
   );
 }
@@ -112,6 +106,7 @@ export function TeplohodWidgetEmbed({
 export function getTeplohodWidgetIds(event: {
   externalId?: string | number | null;
   widgetProvider?: string | null;
+  purchaseUrl?: string | null;
   widgetPayload?: {
     provider?: string | null;
     tepEventId?: string | number | null;
@@ -119,13 +114,81 @@ export function getTeplohodWidgetIds(event: {
   } | null;
 }) {
   const provider = String(event.widgetProvider || event.widgetPayload?.provider || '').toUpperCase();
-  if (!provider.includes('TEPLOHOD')) return null;
+  const purchaseUrl = String(event.purchaseUrl || '').toLowerCase();
+  const isTeplohod = provider.includes('TEPLOHOD') || provider.includes('TEP') || purchaseUrl.includes('teplohod.info');
+  if (!isTeplohod) return null;
 
-  const tepEventId = normalizeTeplohodEventId(event.widgetPayload?.tepEventId ?? event.externalId);
+  const tepEventId =
+    normalizeTeplohodEventId(event.widgetPayload?.tepEventId ?? event.externalId) ||
+    normalizeTeplohodEventId(purchaseUrl.match(/teplohod\.info\/event\/(\d+)/i)?.[1]);
   if (!tepEventId) return null;
 
   return {
     tepEventId,
     tepWidgetId: event.widgetPayload?.tepWidgetId || DEFAULT_TEP_WIDGET_ID,
   };
+}
+
+export function getTeplohodWidgetIdsFromSession(session: {
+  id?: string | null;
+  purchaseProvider?: string | null;
+  offerSourceCode?: string | null;
+  purchaseUrl?: string | null;
+  widgetUrl?: string | null;
+}) {
+  const purchaseUrl = session.widgetUrl || session.purchaseUrl || null;
+  const fromId = String(session.id || '').match(/^evt_tep_(\d+)$/i)?.[1];
+  return getTeplohodWidgetIds({
+    externalId: fromId,
+    widgetProvider: session.purchaseProvider || session.offerSourceCode,
+    purchaseUrl,
+  });
+}
+
+export function TeplohodWidgetButton({
+  tepEventId,
+  tepWidgetId,
+  label,
+  disabled = false,
+  className = 'inline-flex min-h-10 items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition hover:bg-primary/90',
+}: {
+  tepEventId: string | number;
+  tepWidgetId?: string | number | null;
+  label: string;
+  disabled?: boolean;
+  className?: string;
+}) {
+  const containerId = React.useId().replace(/:/g, '');
+
+  const openWidget = () => {
+    const tryClick = (attempt = 0) => {
+      const button = document.querySelector<HTMLElement>(`#${containerId} .ti-tickets-event-tickets-buy`);
+      if (button) {
+        button.click();
+        return;
+      }
+      if (attempt < 24) window.setTimeout(() => tryClick(attempt + 1), 150);
+    };
+
+    void ensureTeplohodWidgetScript().finally(() => window.setTimeout(() => tryClick(), 100));
+  };
+
+  if (disabled) {
+    return (
+      <button type="button" disabled className={className}>
+        {label}
+      </button>
+    );
+  }
+
+  return (
+    <>
+      <div id={containerId} className="pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0" aria-hidden="true">
+        <TeplohodWidgetEmbed tepEventId={tepEventId} tepWidgetId={tepWidgetId} />
+      </div>
+      <button type="button" className={className} onClick={openWidget}>
+        {label}
+      </button>
+    </>
+  );
 }

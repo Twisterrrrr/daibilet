@@ -7,22 +7,34 @@ import {
   MapPin,
   Search,
   Ship,
-  Star,
   Ticket,
   TrendingUp,
   UtensilsCrossed,
 } from 'lucide-react';
 
+import { AccountPurchasesPage } from '@/components/AccountPurchasesPage';
 import { BuyerOrdersPage } from '@/components/BuyerOrdersPage';
 import { CatalogPage } from '@/components/CatalogPage';
+import { CitiesCatalogPage } from '@/components/CitiesCatalogPage';
+import { CityCard } from '@/components/CityCard';
 import { CityPage } from '@/components/CityPage';
 import { EventCard } from '@/components/EventCard';
 import { EventPage } from '@/components/EventPage';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { HelpPage } from '@/components/HelpPage';
+import { AboutPage } from '@/components/AboutPage';
+import { LandingsCatalogPage } from '@/components/LandingsCatalogPage';
+import { LoginPage } from '@/components/LoginPage';
 import { LandingPage } from '@/components/LandingPage';
 import { VenuePage } from '@/components/VenuePage';
 import { formatMoney, formatNumber, publicData } from '@/data';
+import { resolveCityCardImage } from '@/lib/city-images';
+import { landingPageHref } from '@/lib/landing-slugs';
+import { isEventSessionToday } from '@/lib/event-card-meta';
+import { API_BASE_URL } from '@/lib/api-base';
+import { persistDestination, resolveStoredDestination } from '@/lib/selected-city';
+import { cityHref, citySlug } from '@/routes';
 import type { PublicDestination, PublicLanding, PublicSession } from '@/types';
 
 type PublicView = 'home' | 'events' | 'landings' | 'destinations';
@@ -33,13 +45,17 @@ const categoryMeta = [
   { title: 'Мероприятия', description: 'Концерты, театр, шоу и стендап', filter: 'Мероприятия', icon: Ticket },
   { title: 'Активный отдых', description: 'Спорт, активности и необычные форматы', filter: 'Активный отдых', icon: TrendingUp },
 ];
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
 
 export function App({ dataVersion = 0 }: { dataVersion?: number }) {
   if (window.location.pathname === '/cities' || window.location.pathname === '/cities/') return <CitiesCatalogPage />;
+  if (window.location.pathname === '/podborki' || window.location.pathname === '/podborki/') return <LandingsCatalogPage />;
   if (window.location.pathname === '/my-orders' || window.location.pathname === '/my-orders/') return <BuyerOrdersPage />;
+  if (window.location.pathname === '/login' || window.location.pathname === '/login/') return <LoginPage />;
+  if (window.location.pathname === '/account/purchases' || window.location.pathname === '/account/purchases/') {
+    return <AccountPurchasesPage />;
+  }
+  if (window.location.pathname === '/about' || window.location.pathname === '/about/') return <AboutPage />;
+  if (window.location.pathname === '/help' || window.location.pathname === '/help/') return <HelpPage />;
   if (window.location.pathname === '/blog' || window.location.pathname === '/blog/') return <StaticInfoPage kind="blog" />;
   if (window.location.pathname === '/privacy' || window.location.pathname === '/privacy/') return <StaticInfoPage kind="privacy" />;
   if (window.location.pathname === '/legal' || window.location.pathname === '/legal/') return <StaticInfoPage kind="legal" />;
@@ -51,6 +67,10 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
   const cityPageMatch = window.location.pathname.match(/^\/cities\/([^/]+)\/?$/);
   if (cityPageMatch) return <CityPage slug={decodeURIComponent(cityPageMatch[1])} />;
 
+  const landingCityMatch = window.location.pathname.match(/^\/landings\/([^/]+)\/([^/]+)\/?$/);
+  if (landingCityMatch) {
+    return <LandingPage slug={decodeURIComponent(landingCityMatch[1])} citySlug={decodeURIComponent(landingCityMatch[2])} />;
+  }
   const landingPageMatch = window.location.pathname.match(/^\/landings\/([^/]+)\/?$/);
   if (landingPageMatch) return <LandingPage slug={decodeURIComponent(landingPageMatch[1])} />;
 
@@ -60,30 +80,26 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
   if (eventPageMatch) return <EventPage slug={decodeURIComponent(eventPageMatch[1])} />;
 
   const [view, setView] = React.useState<PublicView>('home');
-  const [query, setQuery] = React.useState('');
-  const [destination, setDestination] = React.useState('all');
+  const [destination, setDestinationState] = React.useState(() => resolveStoredDestination());
   const [landing, setLanding] = React.useState('all');
   const [category, setCategory] = React.useState('all');
+
+  const setDestination = React.useCallback((value: string) => {
+    setDestinationState(value);
+    persistDestination(value);
+  }, []);
 
   const selectedDestination = destination === 'all' ? null : publicData.destinations.find((item) => item.name === destination);
   const selectedCityName = selectedDestination?.type === 'city' ? selectedDestination.name : null;
 
   const filteredSessions = React.useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-
     return publicData.sessions.filter((event) => {
       if (destination !== 'all' && event.destination !== destination && event.city !== destination) return false;
       if (landing !== 'all' && !event.landingSlugs.includes(landing)) return false;
-      if (category !== 'all' && event.category !== category && !event.tags.some((tag) => tag.toLowerCase().includes(category.toLowerCase()))) return false;
-
-      if (normalizedQuery) {
-        const haystack = [event.title, event.city, event.venue, event.category, ...event.tags].join(' ').toLowerCase();
-        if (!haystack.includes(normalizedQuery)) return false;
-      }
-
+      if (category !== 'all' && event.category !== category && !(event.subcategories || []).includes(category) && !event.tags.some((tag) => tag.toLowerCase().includes(category.toLowerCase()))) return false;
       return true;
     });
-  }, [category, dataVersion, destination, landing, query]);
+  }, [category, dataVersion, destination, landing]);
 
   const popularEvents = React.useMemo(
     () => uniqueByImage(filteredSessions.filter((event) => event.imageUrl), 8).concat(uniqueByImage(filteredSessions, 8)).slice(0, 8),
@@ -101,6 +117,17 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
     [filteredSessions],
   );
 
+  const todayEvents = React.useMemo(
+    () =>
+      uniqueByImage(
+        [...filteredSessions]
+          .filter(isEventSessionToday)
+          .sort((a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime()),
+        8,
+      ),
+    [filteredSessions],
+  );
+
   const topDestinations = React.useMemo(() => [...publicData.destinations].sort((a, b) => b.events - a.events).slice(0, 5), [dataVersion]);
   const popularTags = React.useMemo(() => buildPopularTags(publicData.sessions, 18), [dataVersion]);
 
@@ -112,7 +139,10 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
     }
 
     if (section === 'events') {
-      window.location.href = '/events';
+      const params = new URLSearchParams();
+      if (destination !== 'all') params.set('city', destination);
+      const suffix = params.toString();
+      window.location.href = suffix ? `/events?${suffix}` : '/events';
       return;
     }
     if (section === 'cities') {
@@ -127,7 +157,10 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
       window.location.href = '/my-orders';
       return;
     }
-    if (section === 'landings') setView('landings');
+    if (section === 'landings') {
+      window.location.href = '/podborki';
+      return;
+    }
     if (section === 'destinations') setView('destinations');
 
     requestAnimationFrame(() => document.getElementById(section)?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
@@ -137,7 +170,6 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
     setDestination('all');
     setLanding('all');
     setCategory('all');
-    setQuery('');
     setView('home');
   };
 
@@ -145,10 +177,9 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
     <div className="min-h-screen bg-white text-slate-900">
       <Header
         cityLabel={selectedDestination?.name || 'Все города'}
-        search={query}
-        onSearch={setQuery}
         onSection={showSection}
         onDestination={setDestination}
+        searchCity={destination !== 'all' ? destination : undefined}
       />
 
       <main>
@@ -158,11 +189,24 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
           totalCities={publicData.destinations.filter((item) => item.type === 'city').length}
           totalVenues={publicData.stats.venues}
           destination={destination}
+          selectedCityName={selectedCityName}
           setDestination={setDestination}
           topDestinations={topDestinations}
           onOpenEvents={() => showSection('events')}
           onReset={resetFilters}
         />
+
+        {(view === 'home' || view === 'events') && todayEvents.length > 0 ? (
+          <EventsSection
+            title={selectedCityName ? `Сегодня в ${cityToPrepositional(selectedCityName)}` : 'Сегодня'}
+            subtitle="Сеансы, которые ещё можно успеть посетить"
+            events={todayEvents}
+            topDestinations={topDestinations}
+            destination={destination}
+            onDestination={setDestination}
+            onReset={resetFilters}
+          />
+        ) : null}
 
         {(view === 'home' || view === 'events') && (
           <>
@@ -190,23 +234,11 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
         )}
 
         {(view === 'home' || view === 'landings') && (
-          <PromoSection
-            landings={publicData.landings}
-            onLanding={(slug) => {
-              setLanding(slug);
-              showSection('events');
-            }}
-          />
+          <PromoSection landings={publicData.landings} cityFilter={destination !== 'all' ? destination : undefined} />
         )}
 
         {(view === 'home' || view === 'destinations') && (
-          <CitiesSection
-            destinations={publicData.destinations}
-            onDestination={(name) => {
-              setDestination(name);
-              showSection('events');
-            }}
-          />
+          <CitiesSection destinations={publicData.destinations} />
         )}
 
         <CategoriesSection
@@ -217,9 +249,7 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
             showSection('events');
           }}
           onTag={(value) => {
-            setQuery(value);
-            setView('events');
-            showSection('events');
+            window.location.href = `/events?q=${encodeURIComponent(value)}`;
           }}
         />
 
@@ -229,170 +259,6 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
       <Footer />
     </div>
   );
-}
-
-function CitiesCatalogPage() {
-  const [query, setQuery] = React.useState('');
-  const [type, setType] = React.useState<'all' | 'city' | 'region'>('all');
-  const [destinations, setDestinations] = React.useState<PublicDestination[]>(() => publicData.destinations);
-  const [isLoading, setIsLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 15000);
-    fetch(`${API_BASE_URL}/api/public/home`, { cache: 'no-store', signal: controller.signal })
-      .then(async (response) => {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return (await response.json()) as { destinations?: PublicDestination[] };
-      })
-      .then((payload) => {
-        if (Array.isArray(payload.destinations)) setDestinations(payload.destinations);
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        window.clearTimeout(timeout);
-        if (!controller.signal.aborted) setIsLoading(false);
-      });
-
-    return () => {
-      window.clearTimeout(timeout);
-      controller.abort();
-    };
-  }, []);
-
-  const cities = React.useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    return destinations
-      .filter((item) => type === 'all' || item.type === type)
-      .filter((item) => !normalized || item.name.toLowerCase().includes(normalized))
-      .sort((a, b) => b.events - a.events || b.venues - a.venues || itemSortName(a).localeCompare(itemSortName(b), 'ru'));
-  }, [destinations, query, type]);
-  const totalEvents = cities.reduce((sum, item) => sum + item.events, 0);
-  const totalVenues = cities.reduce((sum, item) => sum + item.venues, 0);
-
-  const goSection = (section: string) => {
-    if (section === 'top') window.location.href = '/';
-    else if (section === 'events') window.location.href = '/events';
-    else if (section === 'orders') window.location.href = '/my-orders';
-    else if (section === 'landings') window.location.href = '/#landings';
-    else if (section === 'blog') window.location.href = '/blog';
-    else if (section === 'cities' || section === 'destinations') window.location.href = '/cities';
-    else window.location.href = `/#${section}`;
-  };
-
-  return (
-    <div className="min-h-screen bg-white text-slate-900">
-      <Header cityLabel="Все города" search={query} onSearch={setQuery} onSection={goSection} />
-      <main>
-        <section className="bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950 text-white">
-          <div className="container-page py-14 sm:py-16">
-            <div className="flex flex-wrap items-center gap-2 text-sm text-primary-100/78">
-              <a href="/" className="hover:text-white">Главная</a>
-              <span>/</span>
-              <span className="text-white">Города</span>
-            </div>
-            <div className="mt-6 grid gap-7 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-end">
-              <div>
-                <div className="inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1 text-sm font-semibold text-white/86">
-                  <MapPin className="h-4 w-4" />
-                  Каталог городов
-                </div>
-                <h1 className="mt-4 max-w-4xl text-4xl font-extrabold sm:text-5xl">Города и регионы Дайбилет</h1>
-                <p className="mt-4 max-w-3xl text-base leading-7 text-primary-50/88 sm:text-lg">
-                  Выберите город, чтобы открыть страницу с событиями, площадками, подборками и быстрым каталогом по датам.
-                </p>
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <CityCatalogStat label="городов" value={formatNumber(destinations.filter((item) => item.type === 'city').length)} />
-                <CityCatalogStat label="событий" value={formatNumber(totalEvents)} />
-                <CityCatalogStat label="площадок" value={formatNumber(totalVenues)} />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="container-page py-8">
-          <div className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-            <label className="flex h-11 min-w-0 items-center gap-2 rounded-lg bg-slate-50 px-3 ring-1 ring-slate-200 focus-within:bg-white focus-within:ring-primary-300">
-              <Search className="h-4 w-4 shrink-0 text-slate-400" />
-              <input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Найти город или область"
-                className="min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-slate-400"
-              />
-            </label>
-            <div className="flex flex-wrap gap-2">
-              {[
-                ['all', 'Все'],
-                ['city', 'Города'],
-                ['region', 'Регионы'],
-              ].map(([value, label]) => (
-                <button
-                  key={value}
-                  type="button"
-                  onClick={() => setType(value as typeof type)}
-                  className={`min-h-10 rounded-lg px-4 text-sm font-semibold ${type === value ? 'bg-primary-600 text-white' : 'border border-slate-200 bg-white text-slate-600 hover:border-primary-300 hover:text-primary-700'}`}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {cities.map((city) => (
-              <a key={`${city.type}:${city.name}`} href={city.slug ? `/cities/${city.slug}` : `/events?city=${encodeURIComponent(city.name)}`} className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition hover:border-primary-200 hover:bg-primary-50/35">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <div className="text-lg font-bold text-slate-950">{city.name}</div>
-                    <div className="mt-1 text-xs font-semibold uppercase text-slate-400">{city.type === 'region' ? 'регион' : 'город'}</div>
-                  </div>
-                  <ArrowRight className="mt-1 h-5 w-5 text-slate-300" />
-                </div>
-                <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
-                  <div className="rounded-lg bg-slate-50 p-3">
-                    <div className="font-bold text-slate-950">{formatNumber(city.events)}</div>
-                    <div className="text-slate-500">событий</div>
-                  </div>
-                  <div className="rounded-lg bg-slate-50 p-3">
-                    <div className="font-bold text-slate-950">{formatNumber(city.venues)}</div>
-                    <div className="text-slate-500">площадок</div>
-                  </div>
-                </div>
-                {city.categories.length ? (
-                  <div className="mt-4 flex flex-wrap gap-1.5">
-                    {city.categories.slice(0, 3).map((category) => (
-                      <span key={category.name} className="rounded-full bg-primary-50 px-2.5 py-1 text-xs font-semibold text-primary-700">
-                        {category.name}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
-              </a>
-            ))}
-          </div>
-
-          {isLoading && !cities.length ? <div className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-8 text-center text-slate-500">Загружаем города...</div> : null}
-          {!isLoading && !cities.length ? <div className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-8 text-center text-slate-500">Ничего не найдено.</div> : null}
-        </section>
-      </main>
-      <Footer />
-    </div>
-  );
-}
-
-function CityCatalogStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg border border-white/12 bg-white/10 p-4 text-center backdrop-blur-sm">
-      <div className="text-2xl font-extrabold text-white">{value}</div>
-      <div className="text-xs font-medium text-white/62">{label}</div>
-    </div>
-  );
-}
-
-function itemSortName(item: PublicDestination) {
-  return item.name;
 }
 
 function StaticInfoPage({ kind }: { kind: 'blog' | 'privacy' | 'legal' | 'offer' }) {
@@ -438,7 +304,7 @@ function StaticInfoPage({ kind }: { kind: 'blog' | 'privacy' | 'legal' | 'offer'
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
-      <Header cityLabel="Все города" search="" onSearch={() => undefined} onSection={goSection} />
+      <Header cityLabel="Все города" onSection={goSection} />
       <main className="container-page py-16">
         <a href="/" className="text-sm font-semibold text-primary-700 hover:text-primary-800">Главная</a>
         <h1 className="mt-4 text-4xl font-extrabold text-slate-950">{meta.title}</h1>
@@ -459,6 +325,7 @@ function HomeHero({
   totalCities,
   totalVenues,
   destination,
+  selectedCityName,
   setDestination,
   topDestinations,
   onOpenEvents,
@@ -469,6 +336,7 @@ function HomeHero({
   totalCities: number;
   totalVenues: number;
   destination: string;
+  selectedCityName?: string | null;
   setDestination: (value: string) => void;
   topDestinations: PublicDestination[];
   onOpenEvents: () => void;
@@ -488,13 +356,24 @@ function HomeHero({
       <div className="container-page relative py-16 sm:py-24">
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
-            Билеты на экскурсии, музеи{' '}
-            <span className="block text-primary-300">и мероприятия</span>
+            {selectedCityName ? (
+              <>
+                Экскурсии и билеты
+                <span className="block text-primary-300">в {cityToPrepositional(selectedCityName)}</span>
+              </>
+            ) : (
+              <>
+                Билеты на экскурсии, музеи
+                <span className="block text-primary-300">и мероприятия</span>
+              </>
+            )}
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-lg leading-8 text-slate-300">
             {isCatalogLoading
               ? 'Загружаем каталог городов, событий и площадок. Покупка завершится в виджете билетной системы.'
-              : `${formatCount(displayEvents, ['событие', 'события', 'событий'])} и ${formatCount(totalVenues, ['площадка', 'площадки', 'площадок'])} в ${formatCount(totalCities, ['городе', 'городах', 'городах'])}. Выбирайте город, тему и формат, а покупку завершайте в виджете билетной системы.`}
+              : selectedCityName
+                ? `${formatCount(visibleCount, ['событие', 'события', 'событий'])} в каталоге ${cityToGenitive(selectedCityName)}. Выбирайте формат и время — покупку завершите в виджете билетной системы.`
+                : `${formatCount(displayEvents, ['событие', 'события', 'событий'])} и ${formatCount(totalVenues, ['площадка', 'площадки', 'площадок'])} в ${formatCount(totalCities, ['городе', 'городах', 'городах'])}. Выбирайте город, тему и формат, а покупку завершайте в виджете билетной системы.`}
           </p>
 
           <div className="mx-auto mt-8 max-w-xl">
@@ -707,29 +586,68 @@ function EventsSection({
   );
 }
 
-function PromoSection({ landings, onLanding }: { landings: PublicLanding[]; onLanding: (slug: string) => void }) {
-  const featured = landings.filter((landing) => landing.events > 0).slice(0, 6);
+function PromoSection({ landings, cityFilter }: { landings: PublicLanding[]; cityFilter?: string }) {
+  type PromoCard = PublicLanding & { href?: string };
+  const fallback = React.useMemo(() => landings.filter((landing) => landing.events > 0).slice(0, 6), [landings]);
+  const [featured, setFeatured] = React.useState<PromoCard[]>(fallback);
+
+  React.useEffect(() => {
+    setFeatured(fallback);
+  }, [fallback]);
+
+  React.useEffect(() => {
+    const params = new URLSearchParams();
+    if (cityFilter) params.set('city', cityFilter);
+    const suffix = params.toString() ? `?${params.toString()}` : '';
+
+    fetch(`${API_BASE_URL}/api/public/promo-blocks${suffix}`)
+      .then((response) => (response.ok ? response.json() : null))
+      .then((payload: { items?: Array<{ slug: string; title: string; subtitle: string; events: number; priceFrom?: number | null; href: string }> } | null) => {
+        if (!payload?.items?.length) return;
+        setFeatured(
+          payload.items.map((item) => ({
+            slug: item.slug,
+            title: item.title,
+            subtitle: item.subtitle,
+            chips: [],
+            events: item.events,
+            venues: 0,
+            priceFrom: item.priceFrom,
+            strength: item.events >= 20 ? 'ready' : 'seed',
+            href: item.href,
+          })),
+        );
+      })
+      .catch(() => undefined);
+  }, [cityFilter]);
+
   if (!featured.length) return null;
 
   return (
     <section id="landings" className="py-12 sm:py-16">
       <div className="container-page">
-        <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Сезонные предложения</h2>
-        <p className="mt-1 text-slate-500">Лучшие события и экскурсии сезона, собранные в быстрые подборки</p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl">Сезонные предложения</h2>
+            <p className="mt-1 text-slate-500">Лучшие события и экскурсии сезона, собранные в быстрые подборки</p>
+          </div>
+          <a href="/podborki" className="inline-flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-800">
+            Все подборки <ArrowRight className="h-4 w-4" />
+          </a>
+        </div>
         <div className="mt-6 grid grid-cols-1 gap-3 min-[361px]:grid-cols-2 md:grid-cols-3">
           {featured.map((landing, index) => (
-            <button
+            <a
               key={landing.slug}
-              type="button"
-              onClick={() => onLanding(landing.slug)}
+              href={landing.href || landingPageHref(landing.slug)}
               className={`group relative overflow-hidden rounded-xl p-5 text-left text-white shadow-lg transition-transform hover:scale-[1.02] sm:p-6 ${promoGradient(index)}`}
             >
-              {index % 3 === 0 ? <Ship className="mb-3 h-8 w-8 opacity-80" /> : index % 3 === 1 ? <CalendarDays className="mb-3 h-8 w-8 opacity-80" /> : <UtensilsCrossed className="mb-3 h-8 w-8 opacity-80" />}
+              {promoBlockIcon(landing.slug, index)}
               <h3 className="text-lg font-bold">{landing.title}</h3>
               <p className="mt-1 text-sm text-white/80">{landing.subtitle}</p>
               <div className="mt-4 text-sm font-semibold">{pluralEvents(landing.events)} · {formatMoney(landing.priceFrom)}</div>
               <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-white/10 transition-transform group-hover:scale-150" />
-            </button>
+            </a>
           ))}
         </div>
       </div>
@@ -737,13 +655,7 @@ function PromoSection({ landings, onLanding }: { landings: PublicLanding[]; onLa
   );
 }
 
-function CitiesSection({
-  destinations,
-  onDestination,
-}: {
-  destinations: PublicDestination[];
-  onDestination: (name: string) => void;
-}) {
+function CitiesSection({ destinations }: { destinations: PublicDestination[] }) {
   const cities = destinations.filter((item) => item.type === 'city').slice(0, Math.ceil(destinations.length / 2));
   if (!cities.length) return null;
 
@@ -759,41 +671,22 @@ function CitiesSection({
             Все города →
           </a>
         </div>
-        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6">
+        <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
           {cities.map((city) => (
-            <CityCard key={city.name} city={city} onClick={() => onDestination(city.name)} />
+            <CityCard
+              key={city.name}
+              slug={citySlug(city)}
+              name={city.name}
+              eventCount={city.events}
+              venueCount={city.venues}
+              description=""
+              href={cityHref(city)}
+              imageUrl={resolveCityCardImage(city)}
+            />
           ))}
         </div>
       </div>
     </section>
-  );
-}
-
-function CityCard({ city, onClick }: { city: PublicDestination; onClick: () => void }) {
-  const content = (
-    <div className="card group relative flex h-48 flex-col justify-end overflow-hidden bg-gradient-to-br from-primary-800 to-primary-950 transition-transform hover:scale-[1.02]">
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
-      <div className="relative p-5">
-        <h3 className="text-xl font-bold text-white">{city.name}</h3>
-        <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span className="flex items-center gap-1.5 text-sm font-medium text-emerald-300">
-            <TrendingUp className="h-3.5 w-3.5 text-emerald-400" />
-            {pluralEvents(city.events)}
-          </span>
-          {city.venues > 0 ? <span className="text-sm text-white/60">{formatNumber(city.venues)} площадок</span> : null}
-        </div>
-      </div>
-    </div>
-  );
-
-  if (city.slug) {
-    return <a href={`/cities/${city.slug}`}>{content}</a>;
-  }
-
-  return (
-    <button type="button" onClick={onClick} className="text-left">
-      {content}
-    </button>
   );
 }
 
@@ -859,6 +752,7 @@ function SocialProof() {
   const totalEvents = publicData.stats.events;
   const totalVenues = publicData.stats.venues;
   const totalCities = publicData.stats.destinations;
+  const activeLandings = publicData.landings.filter((landing) => landing.events > 0).length;
 
   return (
     <section className="py-16 sm:py-20">
@@ -867,7 +761,7 @@ function SocialProof() {
           <ProofItem icon={Ticket} value={`${formatNumber(totalEvents)}+`} label="событий и сеансов в каталоге" color="primary" />
           <ProofItem icon={Landmark} value={`${formatNumber(totalVenues)}+`} label="площадок и музеев" color="emerald" />
           <ProofItem icon={MapPin} value={formatNumber(totalCities)} label="городов и регионов" color="amber" />
-          <ProofItem icon={Star} value="4.8" label="целевой рейтинг витрины" color="purple" />
+          <ProofItem icon={Ship} value={String(activeLandings)} label="тематических подборок" color="purple" />
         </div>
       </div>
     </section>
@@ -990,6 +884,30 @@ function cityToPrepositional(city: string): string {
   };
 
   return dictionary[normalized] || normalized;
+}
+
+function cityToGenitive(city: string): string {
+  const normalized = city.trim();
+  const dictionary: Record<string, string> = {
+    Москва: 'Москвы',
+    'Санкт-Петербург': 'Санкт-Петербурга',
+    Казань: 'Казани',
+    Сочи: 'Сочи',
+    Калининград: 'Калининграда',
+  };
+
+  return dictionary[normalized] || normalized;
+}
+
+function promoBlockIcon(slug: string, index: number) {
+  const key = String(slug || '').toLowerCase();
+  if (key.includes('bridge')) return <Landmark className="mb-3 h-8 w-8 opacity-80" />;
+  if (key.includes('dinner') || key.includes('ужин')) return <UtensilsCrossed className="mb-3 h-8 w-8 opacity-80" />;
+  if (key.includes('party') || key.includes('disco')) return <CalendarDays className="mb-3 h-8 w-8 opacity-80" />;
+  if (key.includes('bus')) return <MapPin className="mb-3 h-8 w-8 opacity-80" />;
+  if (index % 3 === 0) return <Ship className="mb-3 h-8 w-8 opacity-80" />;
+  if (index % 3 === 1) return <CalendarDays className="mb-3 h-8 w-8 opacity-80" />;
+  return <UtensilsCrossed className="mb-3 h-8 w-8 opacity-80" />;
 }
 
 function promoGradient(index: number): string {

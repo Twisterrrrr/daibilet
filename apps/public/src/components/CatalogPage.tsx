@@ -1,22 +1,26 @@
 import * as React from 'react';
-import { Grid3X3, ListFilter, Search, SlidersHorizontal, Tag, X } from 'lucide-react';
+import { Grid3X3, List, Search, SlidersHorizontal, Table2, Tag, X } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
+import { EventCardHorizontal } from '@/components/EventCardHorizontal';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { formatMoney, formatNumber, publicData } from '@/data';
+import { collectCatalogLabels } from '@/lib/catalog-labels';
 import { eventHref } from '@/routes';
 import type { PublicLanding, PublicSession } from '@/types';
 
 type DateFilter = 'all' | 'today' | 'tomorrow' | 'weekend' | 'evening';
 type SortMode = 'time' | 'price' | 'popular';
-type ViewMode = 'cards' | 'table';
+type ViewMode = 'cards' | 'list' | 'table';
+const VIEW_MODE_STORAGE_KEY = 'catalog:viewMode';
 type CatalogFacetItem = { name: string; events: number };
 type LandingFacet = Pick<PublicLanding, 'slug' | 'title' | 'events'>;
 type CatalogFacets = {
   cities: CatalogFacetItem[];
   categories: CatalogFacetItem[];
-  tags: CatalogFacetItem[];
+  subcategories: CatalogFacetItem[];
+  tags?: CatalogFacetItem[];
   landings: LandingFacet[];
   priceSteps: number[];
 };
@@ -51,7 +55,19 @@ export function CatalogPage() {
   const [date, setDate] = React.useState<DateFilter>(() => parseDateFilter(initialParams.get('date')));
   const [maxPrice, setMaxPrice] = React.useState(() => parseMaxPriceFilter(initialParams.get('maxPrice')));
   const [sort, setSort] = React.useState<SortMode>(() => parseSortMode(initialParams.get('sort')));
-  const [mode, setMode] = React.useState<ViewMode>(() => parseViewMode(initialParams.get('view')));
+  const [mode, setModeState] = React.useState<ViewMode>(() => {
+    const fromUrl = initialParams.get('view');
+    if (fromUrl) return parseViewMode(fromUrl);
+    return readStoredViewMode() || 'cards';
+  });
+  const setMode = React.useCallback((value: ViewMode) => {
+    setModeState(value);
+    try {
+      localStorage.setItem(VIEW_MODE_STORAGE_KEY, value);
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
 
   React.useEffect(() => {
     document.title = 'Каталог событий, экскурсий и билетов | Дайбилет';
@@ -122,9 +138,12 @@ export function CatalogPage() {
     () => (facets.categories?.length ? facets.categories : fallbackFacets.categories).map((item) => [item.name, item.events]),
     [facets.categories, fallbackFacets.categories],
   );
-  const tags = React.useMemo<Array<[string, number]>>(
-    () => (facets.tags?.length ? facets.tags : fallbackFacets.tags).slice(0, 16).map((item) => [item.name, item.events]),
-    [facets.tags, fallbackFacets.tags],
+  const subcategories = React.useMemo<Array<[string, number]>>(
+    () =>
+      (facets.subcategories?.length ? facets.subcategories : fallbackFacets.subcategories)
+        .slice(0, 16)
+        .map((item) => [item.name, item.events]),
+    [facets.subcategories, fallbackFacets.subcategories],
   );
   const landings = React.useMemo<LandingFacet[]>(() => {
     const source = facets.landings?.length ? facets.landings : publicData.landings.filter((item) => item.events > 0);
@@ -187,8 +206,8 @@ export function CatalogPage() {
     <div className="min-h-screen bg-white text-slate-900">
       <Header
         cityLabel={selectedCity?.name || 'Все города'}
-        search={query}
-        onSearch={setQueryFilter}
+        searchQuery={query}
+        searchCity={city !== 'all' ? city : undefined}
         onSection={(section) => navigateFromCatalog(section)}
         onDestination={setCityFilter}
       />
@@ -230,9 +249,9 @@ export function CatalogPage() {
               reset={reset}
             />
 
-            <QuickTags tags={tags} category={category} setCategory={setCategoryFilter} />
+            <QuickTags tags={subcategories} category={category} setCategory={setCategoryFilter} />
 
-            {mode === 'cards' ? <CatalogGrid sessions={visibleSessions} /> : <CatalogTable sessions={visibleSessions} />}
+            <CatalogView sessions={visibleSessions} mode={mode} />
             <CatalogPagination
               total={catalogTotal}
               shown={visibleSessions.length}
@@ -308,30 +327,38 @@ function CatalogFilters({
   priceSteps: number[];
   reset: () => void;
 }) {
-  return (
-    <section className="rounded-2xl bg-white p-3 shadow-[0_18px_50px_rgba(15,23,42,0.13)] sm:p-4">
-      <div className="grid gap-3 lg:grid-cols-[minmax(280px,1.45fr)_repeat(4,minmax(150px,1fr))]">
-        <label className="relative block lg:col-span-1">
-          <span className="sr-only">Поиск</span>
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <input
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Название, место, тег"
-            className="h-12 w-full rounded-xl bg-slate-50 px-10 text-sm font-medium text-slate-900 outline-none ring-1 ring-slate-200 transition focus:bg-white focus:ring-2 focus:ring-primary-200"
-          />
-          {query ? (
-            <button
-              type="button"
-              onClick={() => setQuery('')}
-              className="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-              aria-label="Очистить поиск"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          ) : null}
-        </label>
+  const hasActiveFilters =
+    Boolean(query.trim()) ||
+    city !== 'all' ||
+    category !== 'all' ||
+    landing !== 'all' ||
+    date !== 'all' ||
+    maxPrice !== 'all';
 
+  return (
+    <section className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_18px_50px_rgba(15,23,42,0.08)] sm:p-5">
+      <label className="relative block">
+        <span className="sr-only">Поиск</span>
+        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <input
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Название, место или событие"
+          className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-10 text-sm text-slate-900 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-2 focus:ring-primary-100"
+        />
+        {query ? (
+          <button
+            type="button"
+            onClick={() => setQuery('')}
+            className="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+            aria-label="Очистить поиск"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        ) : null}
+      </label>
+
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <SelectFilter label="Город" value={city} onChange={setCity}>
           <option value="all">Все города</option>
           {cities.map((item) => (
@@ -359,24 +386,45 @@ function CatalogFilters({
             <option key={price} value={String(price)}>до {formatNumber(price)} ₽</option>
           ))}
         </SelectFilter>
+      </div>
 
-        <div className="flex flex-wrap items-center gap-2 lg:col-span-5">
-          {[
-            ['all', 'Любая дата'],
-            ['today', 'Сегодня'],
-            ['tomorrow', 'Завтра'],
-            ['weekend', 'Выходные'],
-            ['evening', 'Вечером'],
-          ].map(([value, label]) => (
-            <button key={value} type="button" onClick={() => setDate(value as DateFilter)} className={`rounded-full px-3.5 py-2 text-xs font-semibold transition ${date === value ? 'bg-primary-600 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
-              {label}
-            </button>
-          ))}
-          <button type="button" onClick={reset} className="ml-auto inline-flex items-center gap-1 rounded-full px-3.5 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-100 hover:text-primary-700">
-            <X className="h-3.5 w-3.5" />
-            Сбросить
-          </button>
+      <div className="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0 flex-1">
+          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Когда</p>
+          <div className="flex flex-wrap gap-2">
+            {[
+              ['all', 'Любая дата'],
+              ['today', 'Сегодня'],
+              ['tomorrow', 'Завтра'],
+              ['weekend', 'Выходные'],
+              ['evening', 'Вечером'],
+            ].map(([value, label]) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setDate(value as DateFilter)}
+                className={`rounded-full px-3.5 py-2 text-xs font-semibold transition ${
+                  date === value
+                    ? 'bg-primary-600 text-white shadow-sm'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
+
+        {hasActiveFilters ? (
+          <button
+            type="button"
+            onClick={reset}
+            className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-primary-700 sm:mt-6"
+          >
+            <X className="h-3.5 w-3.5" />
+            Сбросить фильтры
+          </button>
+        ) : null}
       </div>
     </section>
   );
@@ -384,9 +432,13 @@ function CatalogFilters({
 
 function SelectFilter({ label, value, onChange, children }: { label: string; value: string; onChange: (value: string) => void; children: React.ReactNode }) {
   return (
-    <label className="grid gap-1.5 text-xs font-semibold text-slate-500">
-      {label}
-      <select value={value} onChange={(event) => onChange(event.target.value)} className="h-12 rounded-xl bg-slate-50 px-3 text-sm font-semibold text-slate-800 outline-none ring-1 ring-slate-200 transition focus:bg-white focus:ring-2 focus:ring-primary-200">
+    <label className="block min-w-0">
+      <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-400">{label}</span>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="h-11 w-full min-w-0 truncate rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-medium text-slate-800 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-2 focus:ring-primary-100"
+      >
         {children}
       </select>
     </label>
@@ -432,13 +484,32 @@ function CatalogToolbar({
             <option value="popular">По числу сеансов</option>
           </select>
           <div className="inline-flex overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
-            <button type="button" onClick={() => setMode('cards')} className={`inline-flex h-11 items-center gap-2 px-3 text-sm font-semibold ${mode === 'cards' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}>
+            <button
+              type="button"
+              title="Карточки"
+              aria-label="Карточки"
+              onClick={() => setMode('cards')}
+              className={`inline-flex h-11 w-11 items-center justify-center ${mode === 'cards' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}
+            >
               <Grid3X3 className="h-4 w-4" />
-              Карточки
             </button>
-            <button type="button" onClick={() => setMode('table')} className={`inline-flex h-11 items-center gap-2 px-3 text-sm font-semibold ${mode === 'table' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}>
-              <ListFilter className="h-4 w-4" />
-              Таблица
+            <button
+              type="button"
+              title="Список"
+              aria-label="Список"
+              onClick={() => setMode('list')}
+              className={`inline-flex h-11 w-11 items-center justify-center border-l border-slate-200 ${mode === 'list' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}
+            >
+              <List className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              title="Таблица"
+              aria-label="Таблица"
+              onClick={() => setMode('table')}
+              className={`inline-flex h-11 w-11 items-center justify-center border-l border-slate-200 ${mode === 'table' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}
+            >
+              <Table2 className="h-4 w-4" />
             </button>
           </div>
         </div>
@@ -479,12 +550,29 @@ function QuickTags({ tags, category, setCategory }: { tags: Array<[string, numbe
   );
 }
 
+function CatalogView({ mode, sessions }: { mode: ViewMode; sessions: PublicSession[] }) {
+  if (mode === 'list') return <CatalogList sessions={sessions} />;
+  if (mode === 'table') return <CatalogTable sessions={sessions} />;
+  return <CatalogGrid sessions={sessions} />;
+}
+
 function CatalogGrid({ sessions }: { sessions: PublicSession[] }) {
   if (!sessions.length) return <EmptyCatalog />;
   return (
     <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
       {sessions.map((session) => (
         <EventCard key={session.id} event={session} compact />
+      ))}
+    </div>
+  );
+}
+
+function CatalogList({ sessions }: { sessions: PublicSession[] }) {
+  if (!sessions.length) return <EmptyCatalog />;
+  return (
+    <div className="space-y-3">
+      {sessions.map((session) => (
+        <EventCardHorizontal key={session.id} event={session} />
       ))}
     </div>
   );
@@ -512,29 +600,48 @@ function CatalogTable({ sessions }: { sessions: PublicSession[] }) {
               <td className="whitespace-nowrap px-4 py-3 align-top">
                 <div className="font-medium text-slate-900">{session.dateLabel}</div>
                 <div className="text-xs text-slate-500">{session.timeLabel}</div>
-                {(session.sessionCount || 0) > 1 ? <div className="mt-1 text-xs font-semibold text-primary-700">{formatNumber(session.sessionCount)} сеансов</div> : null}
+                {(session.sessionCount || 0) > 1 ? (
+                  <div className="mt-1 text-xs font-semibold text-primary-700">{formatNumber(session.sessionCount)} сеансов</div>
+                ) : null}
               </td>
               <td className="min-w-[300px] px-4 py-3 align-top">
-                <a href={eventHref(session)} className="font-medium text-slate-950 hover:text-primary-700">{session.title}</a>
-                <div className="mt-1 text-xs text-slate-500">{session.tags.slice(0, 2).join(' · ')}</div>
+                <a href={eventHref(session)} className="font-medium text-slate-950 hover:text-primary-700">
+                  {session.title}
+                </a>
+                <div className="mt-1 text-xs text-slate-500">{collectCatalogLabels(session).join(' · ')}</div>
               </td>
               <td className="px-4 py-3 align-top">
                 {session.citySlug ? (
                   <a href={`/cities/${session.citySlug}`} className="font-medium text-slate-700 hover:text-primary-700">
                     {session.destinationType === 'region' ? session.destination : session.city}
                   </a>
+                ) : session.destinationType === 'region' ? (
+                  session.destination
                 ) : (
-                  session.destinationType === 'region' ? session.destination : session.city
+                  session.city
                 )}
-                {session.destinationType === 'region' && session.city ? <div className="mt-1 text-xs text-slate-500">{session.city}</div> : null}
+                {session.destinationType === 'region' && session.city ? (
+                  <div className="mt-1 text-xs text-slate-500">{session.city}</div>
+                ) : null}
               </td>
               <td className="max-w-[240px] px-4 py-3 align-top text-slate-600">
-                {session.venueSlug ? <a href={`/venues/${session.venueSlug}`} className="hover:text-primary-700">{session.venue}</a> : session.venue}
+                {session.venueSlug ? (
+                  <a href={`/venues/${session.venueSlug}`} className="hover:text-primary-700">
+                    {session.venue}
+                  </a>
+                ) : (
+                  session.venue
+                )}
               </td>
               <td className="px-4 py-3 align-top text-slate-600">{session.category}</td>
               <td className="whitespace-nowrap px-4 py-3 align-top font-semibold text-slate-950">{formatMoney(session.priceFrom)}</td>
               <td className="px-4 py-3 align-top">
-                <a href={eventHref(session)} className="inline-flex min-h-9 items-center justify-center rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700">Открыть</a>
+                <a
+                  href={eventHref(session)}
+                  className="inline-flex min-h-9 items-center justify-center rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700"
+                >
+                  Открыть
+                </a>
               </td>
             </tr>
           ))}
@@ -600,8 +707,8 @@ function buildCatalogFacets(sessions: PublicSession[]): CatalogFacets {
   return {
     cities: countBy(sessions.map((session) => session.destination || session.city)).map(([name, events]) => ({ name, events })),
     categories: countBy(sessions.map((session) => session.category)).map(([name, events]) => ({ name, events })),
-    tags: countBy(sessions.flatMap((session) => session.tags || []))
-      .filter(([tag]) => tag.length <= 32)
+    subcategories: countBy(sessions.flatMap((session) => collectCatalogLabels(session, 8)))
+      .filter(([name]) => name.length <= 32)
       .slice(0, 24)
       .map(([name, events]) => ({ name, events })),
     landings: publicData.landings
@@ -656,7 +763,19 @@ function parseSortMode(value: string | null): SortMode {
   return 'time';
 }
 
+function readStoredViewMode(): ViewMode | null {
+  try {
+    const stored = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
+    if (stored === 'cards' || stored === 'list' || stored === 'table') return stored;
+    if (stored === 'grid') return 'cards';
+  } catch {
+    // ignore storage errors
+  }
+  return null;
+}
+
 function parseViewMode(value: string | null): ViewMode {
+  if (value === 'list') return 'list';
   if (value === 'table') return 'table';
   return 'cards';
 }
@@ -721,6 +840,10 @@ function navigateFromCatalog(section: string) {
   }
   if (section === 'blog') {
     window.location.href = '/blog';
+    return;
+  }
+  if (section === 'landings') {
+    window.location.href = '/podborki';
     return;
   }
   window.location.href = `/#${section}`;

@@ -2,7 +2,8 @@ import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { App } from '@/App';
-import { hydratePublicData, hydratePublicStats } from '@/data';
+import { hydratePublicHomePreview, hydratePublicShell } from '@/data';
+import { UserAuthProvider } from '@/hooks/useUserAuth';
 import './globals.css';
 
 function Root() {
@@ -10,9 +11,12 @@ function Root() {
 
   useEffect(() => {
     let cancelled = false;
-    void hydratePublicData().then((updated) => {
-      if (!cancelled && updated) refresh((version) => version + 1);
-    });
+    const bump = () => {
+      if (!cancelled) refresh((version) => version + 1);
+    };
+
+    void hydratePublicShell().then(bump);
+    void hydratePublicHomePreview().then(bump);
 
     return () => {
       cancelled = true;
@@ -21,11 +25,11 @@ function Root() {
 
   return (
     <StrictMode>
-      <App dataVersion={dataVersion} />
+      <UserAuthProvider>
+        <App dataVersion={dataVersion} />
+      </UserAuthProvider>
     </StrictMode>
   );
 }
 
-void hydratePublicStats().finally(() => {
-  createRoot(document.getElementById('root')!).render(<Root />);
-});
+createRoot(document.getElementById('root')!).render(<Root />);

@@ -189,32 +189,35 @@ Base URL:
 
 - `https://api.teplohod.info/v1`
 
-Доступ к API Teplohod.info выполняется по User-Agent и/или белому IP. Наш IP уже должен быть добавлен на стороне Teplohod.info.
+Доступ к API Teplohod.info для полного каталога — по **белому IP** сервера (allowlist на стороне Teplohod). **Токен/API key для импорта не нужен.**
 
-Исключение: вызов `GET /events?compact`, то есть список событий без расписания, доступен без авторизации.
+Опционально может использоваться `User-Agent`, если это указано в договорённости с Teplohod.
 
-Для локальной разработки это означает:
+Исключение: `GET /events?compact` (без расписания) доступен без ограничений по IP.
+
+Для локальной разработки:
 
 - прямые запросы с локальной машины могут не проходить, если локальный IP не в allowlist;
-- для реального импорта нужен запуск из среды с разрешенным IP;
-- парсер и нормализацию лучше разрабатывать на fixture-ответах;
-- в админке полезно явно показывать ошибку доступа: `source_unreachable_or_ip_not_allowed`.
+- для разработки парсера используйте fixture-ответы или `npm run tep:fixture-bridge` + `TEP_API_URL=http://127.0.0.1:8787/v1`;
+- боевой импорт и auto-sync — только с сервера `213.171.7.16` (или другого IP из allowlist);
+- в админке при 403 показывать: `source_unreachable_or_ip_not_allowed`.
 
 Рекомендуемые переменные окружения:
 
 ```env
-TEPLOHOD_BASE_URL=
-TEPLOHOD_USER_AGENT=
-TEPLOHOD_ALLOWED_IP_MODE=true
+TEP_API_URL=https://api.teplohod.info/v1
+TEP_USER_AGENT=Daibilet/1.0
+TEP_WIDGET_ID=14208
+TEP_WIDGET_BASE_URL=https://teplohod.info
 ```
 
-Если у Teplohod.info дополнительно есть ключ, логин, секрет подписи или партнерский идентификатор, добавить:
+Локально (без allowlist):
 
 ```env
-TEPLOHOD_PARTNER_ID=
-TEPLOHOD_API_KEY=
-TEPLOHOD_WEBHOOK_SECRET=
+TEP_API_URL=http://127.0.0.1:8787/v1
 ```
+
+Переменные `TEPLOHOD_API_KEY` / `TEPLOHOD_PARTNER_ID` в нашем импорте **не используются** — только если Teplohod добавит отдельные методы с ключом.
 
 ### Методы каталога
 

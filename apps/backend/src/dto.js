@@ -5,26 +5,108 @@ import { fileURLToPath } from 'node:url';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
+const CATALOG_TAG_DISPLAY_LIMIT = 4;
+
+function orderedEventTagsSql(eventIdSql = 'e.id') {
+  return `(
+    select coalesce(array_agg(title order by priority, title), '{}')
+    from (
+      select distinct tag.title,
+        case
+          when tag.title in (
+            'Речные прогулки', 'Экскурсии', 'Водные экскурсии', 'Автобусные туры',
+            'Автобусные экскурсии', 'Смотровые площадки', 'Банкеты', 'Разводные мосты', 'Ночные'
+          ) then 1
+          when tag.title ~* '^(Теплоход|Площадка):' then 2
+          when tag.title ~ '^\\d+\\s*(минут|мин\\.?|час|часа|часов)\\s*$' then 3
+          else 4
+        end as priority
+      from "EventTag" event_tag_ordered
+      join "Tag" tag on tag.id = event_tag_ordered."tagId"
+      where event_tag_ordered."eventId" = ${eventIdSql}
+    ) ordered_tags
+  )`;
+}
+
+function sliceCatalogTags(tags, limit = CATALOG_TAG_DISPLAY_LIMIT) {
+  return (tags || []).slice(0, limit);
+}
+const CITY_CARD_IMAGE_ALIASES = {
+  moskva: 'moscow',
+  'sankt-peterburg': 'saint-petersburg',
+  'nizhniy-novgorod': 'nizhny-novgorod',
+  'velikiy-novgorod': 'veliky-novgorod',
+};
+const CITY_CARD_IMAGE_SLUGS = new Set([
+  'saint-petersburg',
+  'moscow',
+  'kazan',
+  'kaliningrad',
+  'vladivostok',
+  'vologda',
+  'irkutsk',
+  'perm',
+  'samara',
+  'sochi',
+  'ekaterinburg',
+  'nizhny-novgorod',
+  'novosibirsk',
+  'krasnodar',
+  'suzdal',
+  'veliky-novgorod',
+  'voronezh',
+  'yaroslavl',
+  'krasnoyarsk',
+  'omsk',
+]);
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const CITY_ROUTING = loadCityRouting();
 const STANDALONE_CITY_NAMES = new Set(CITY_ROUTING.standaloneCities || []);
 const CITY_TO_REGION = new Map(Object.entries(CITY_ROUTING.cityToRegion || {}));
 let publicHomeCache = null;
+let publicDestinationsCache = null;
+let publicHomePreviewCache = null;
+const PUBLIC_HOME_PREVIEW_LIMIT = 96;
 let publicEventRowsCache = null;
 let publicCatalogCache = null;
 let publicEventRowsBuildPromise = null;
 let publicCatalogBuildPromise = null;
 
+const LANDING_SLUG_ALIASES = {
+  'river-cruises': ['river-walks', 'river-cruise', 'river'],
+  'river-party': ['party-boat', 'river-disco', 'boat-party'],
+  'bridges-night': ['razvodnye-mosty', 'bridges', 'spb-bridges-night'],
+  'bus-tours': ['bus-sightseeing', 'bus'],
+};
+
 const LANDING_RULES = [
   {
-    slug: 'river-walks',
+    slug: 'river-cruises',
     title: 'Речные прогулки',
     subtitle: 'Теплоходы, катера, реки и каналы',
     chips: ['теплоход', 'катер', 'причалы'],
-    tags: ['Водные экскурсии', 'Реки и каналы', 'На теплоходе', 'Водная экскурсия', 'На катере', 'Теплоходные экскурсии'],
-    keywords: ['теплоход', 'катер', 'река', 'канал', 'причал'],
+    tags: ['Водные экскурсии', 'Реки и каналы', 'На теплоходе', 'Водная экскурсия', 'На катере', 'Теплоходные экскурсии', 'Речные прогулки'],
+    keywords: ['теплоход', 'катер', 'река', 'речн', 'канал', 'причал', 'прогулк'],
     keywordScope: 'content',
+    requiredAnySubcategories: ['Водные экскурсии', 'Речные прогулки'],
     excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал', 'мастер-класс', 'квест', 'концерт', 'вечеринк', 'дискотек'],
+  },
+  {
+    slug: 'river-party',
+    title: 'Вечеринки и дискотеки на теплоходе',
+    subtitle: 'DJ, живая музыка и ночные речные круизы',
+    chips: ['дискотека', 'DJ', 'вечеринка', 'ночь'],
+    tags: ['Дискотека', 'Живая музыка', 'Вечеринка'],
+    keywords: ['дискотек', 'вечеринк', 'ди-джей', 'dj', 'музыкальн', 'круиз', 'теплоход', 'речн', 'катер', 'нева'],
+    keywordScope: 'content',
+    requiredTitleKeywordGroups: [
+      ['дискотек', 'вечеринк', 'ди-джей', 'dj', 'концерт', 'музыкальн'],
+    ],
+    requiredKeywordGroups: [
+      ['теплоход', 'речн', 'катер', 'корабл', 'яхт', 'причал', 'канал', 'нева', 'круиз'],
+    ],
+    excludeKeywords: ['автобус', 'автобусн', 'пешеход'],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory'],
   },
   {
     slug: 'bridges-night',
@@ -37,6 +119,8 @@ const LANDING_RULES = [
     keywordScope: 'content',
     requiredAnyKeywords: ['мост', 'развод'],
     excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал'],
+    minStartsAtHour: 22,
+    includeStartsAtHourUntil: 6,
   },
   {
     slug: 'new-year',
@@ -63,11 +147,24 @@ const LANDING_RULES = [
     excludeKeywords: ['автобус', 'пешеход', 'мастер-класс'],
   },
   {
-    slug: 'bus-sightseeing',
+    slug: 'salute-9-may',
+    title: 'Салют 9 мая',
+    subtitle: 'Лучшие точки обзора и экскурсии к Дню Победы',
+    chips: ['9 мая', 'салют', 'праздник'],
+    keywords: ['салют', 'фейерверк', 'день победы', 'праздничн', 'побед'],
+    requiredAnyKeywords: ['салют', 'фейерверк'],
+    keywordScope: 'content',
+    excludeKeywords: ['новогод', 'ёлка', 'елка', 'рождеств'],
+  },
+  {
+    slug: 'bus-tours',
     title: 'Автобусные обзорные экскурсии',
     subtitle: 'Городские маршруты и обзорные программы',
     chips: ['автобус', 'обзорная', 'город'],
+    tags: ['Автобусные туры', 'Автобусные экскурсии'],
     keywords: ['автобус', 'автобусн', 'обзорн', 'сити тур', 'city tour'],
+    requiredAnySubcategories: ['Автобусные туры', 'Автобусные экскурсии'],
+    requiredAnyVenueKeywords: ['туристическ', 'city sightseeing', 'hop on', 'hop-off', 'hop off'],
     requiredTitleKeywordGroups: [
       ['обзорн', 'экскурс', 'двухэтажн', 'hop on', 'city tour', 'сити тур'],
     ],
@@ -77,6 +174,7 @@ const LANDING_RULES = [
     ],
     excludeTags: ['Водные экскурсии', 'На теплоходе', 'На катере', 'Реки и каналы'],
     excludeKeywords: ['теплоход', 'катер', 'лодк', 'корабл', 'причал', 'река', 'канал', 'нева', 'мост', 'пешеход', 'пешком', 'фест', 'фестиваль'],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory'],
   },
   {
     slug: 'standup',
@@ -105,6 +203,8 @@ const CATEGORY_SUBTITLE = new Map([
 
 export function clearPublicDataCaches() {
   publicHomeCache = null;
+  publicDestinationsCache = null;
+  publicHomePreviewCache = null;
   publicEventRowsCache = null;
   publicCatalogCache = null;
   publicEventRowsBuildPromise = null;
@@ -187,7 +287,7 @@ function buildLaunchMetrics(events) {
 }
 
 function isSaleableEventForPublic(event) {
-  return Boolean(event.startsAt && event.purchaseReady && Number.isFinite(event.priceFrom) && event.priceFrom >= MIN_DISPLAY_PRICE_RUB);
+  return Boolean((event.startsAt || isOpenDateCatalogRow(event)) && event.purchaseReady && Number.isFinite(event.priceFrom) && event.priceFrom >= MIN_DISPLAY_PRICE_RUB);
 }
 
 export async function buildAdminCitiesList(db) {
@@ -394,7 +494,9 @@ function sourceHealthIssues(source) {
   if ((source.consecutiveErrors || 0) > 0) add('CONSECUTIVE_ERRORS', `${source.consecutiveErrors} ошибок sync подряд`, source.consecutiveErrors > 2 ? 'high' : 'medium');
   if (!source.groupedEvents) add('NO_GROUPED_EVENTS', 'Нет карточек каталога', 'high');
   if (source.groupedEvents > 0 && !source.purchaseReady) add('PURCHASE_NOT_READY', 'Покупка не готова', 'high');
-  if (source.sourceCode === 'TEPLOHOD' && !process.env.TEP_API_URL) add('TEP_BRIDGE_NOT_CONFIGURED', 'Не задан TEP_API_URL для bridge/API', 'high');
+  if (source.sourceCode === 'TEPLOHOD' && !process.env.TEP_API_URL) {
+    add('TEP_API_NOT_CONFIGURED', 'Не задан TEP_API_URL (импорт с сервера с белым IP, токен не нужен)', 'high');
+  }
 
   return issues;
 }
@@ -598,6 +700,130 @@ export async function buildPublicBuyerOrders(db, searchParams = new URLSearchPar
       active: matched.filter((order) => !order.isFinal).length,
     },
   };
+}
+
+const ACCOUNT_ORDER_EMAIL_FILTER = `
+  lower(trim(coalesce(ext_order."buyerSnapshot"->>'email', ''))) = $1
+  or lower(trim(coalesce(ext_order."buyerSnapshot"->>'customerEmail', ''))) = $1
+  or lower(trim(coalesce(ext_order."buyerSnapshot"->'buyer'->>'email', ''))) = $1
+  or lower(trim(coalesce(ext_order."buyerSnapshot"->'customer'->>'email', ''))) = $1
+`;
+
+const ACCOUNT_ORDER_SELECT = `
+  select
+    ext_order.id,
+    ext_order."externalOrderId",
+    ext_order."publicCode",
+    ext_order.status,
+    ext_order."buyerSnapshot",
+    ext_order."purchasedAt",
+    ext_order."updatedAt",
+    source.code::text as "sourceCode",
+    source.name as "sourceName",
+    count(ticket.id)::int as "ticketCount",
+    count(ticket.id) filter (where ticket."eventId" is null)::int as "unlinkedTickets",
+    coalesce(
+      jsonb_agg(
+        jsonb_build_object(
+          'id', ticket.id,
+          'externalTicketId', ticket."externalTicketId",
+          'status', ticket.status,
+          'origin', ticket.origin,
+          'eventId', ticket."eventId",
+          'sessionId', ticket."sessionId",
+          'eventTitle', event.title,
+          'eventSlug', event.slug,
+          'startsAt', session."startsAt"
+        )
+      ) filter (where ticket.id is not null),
+      '[]'::jsonb
+    ) as tickets
+  from "ExternalOrder" ext_order
+  join "Source" source on source.id = ext_order."sourceId"
+  left join "ExternalTicket" ticket on ticket."externalOrderId" = ext_order.id
+  left join "Event" event on event.id = ticket."eventId"
+  left join "EventSession" session on session.id = ticket."sessionId"
+`;
+
+function mapAccountBuyerOrder(order) {
+  const base = mapPublicBuyerOrder(order);
+  return {
+    ...base,
+    buyer: {
+      name: order.buyer.name || null,
+      email: order.buyer.email || null,
+      phone: order.buyer.phone || null,
+    },
+  };
+}
+
+function orderMatchesAccountEmail(order, email) {
+  return normalizeLookup(order.buyer.email) === normalizeLookup(email);
+}
+
+export async function buildAccountPurchases(db, userEmail, searchParams = new URLSearchParams()) {
+  const email = normalizeLookup(userEmail);
+  const limit = clampNumber(searchParams.get('limit'), 1, 50, 10);
+  const page = clampNumber(searchParams.get('page'), 1, 1000, 1);
+  const offset = (page - 1) * limit;
+
+  if (!email || !email.includes('@')) {
+    return {
+      generatedAt: new Date().toISOString(),
+      page,
+      pages: 1,
+      limit,
+      total: 0,
+      rows: [],
+      metrics: { orders: 0, tickets: 0, active: 0 },
+    };
+  }
+
+  const countResult = await db.query(
+    `
+      select count(*)::int as total
+      from "ExternalOrder" ext_order
+      where ${ACCOUNT_ORDER_EMAIL_FILTER}
+    `,
+    [email],
+  );
+  const total = Number(countResult.rows[0]?.total || 0);
+  const pages = Math.max(1, Math.ceil(total / limit));
+
+  const result = await db.query(
+    `
+      ${ACCOUNT_ORDER_SELECT}
+      where ${ACCOUNT_ORDER_EMAIL_FILTER}
+      group by ext_order.id, source.id
+      order by coalesce(ext_order."purchasedAt", ext_order."updatedAt") desc
+      limit $2 offset $3
+    `,
+    [email, limit, offset],
+  );
+
+  const rows = result.rows.map(mapAdminOrderRow).filter((order) => orderMatchesAccountEmail(order, email)).map(mapAccountBuyerOrder);
+
+  return {
+    generatedAt: new Date().toISOString(),
+    page,
+    pages,
+    limit,
+    total,
+    rows,
+    metrics: {
+      orders: total,
+      tickets: rows.reduce((sum, order) => sum + order.ticketCount, 0),
+      active: rows.filter((order) => !order.isFinal).length,
+    },
+  };
+}
+
+export async function buildAccountOrderDetail(db, userEmail, orderId) {
+  const email = normalizeLookup(userEmail);
+  const order = await buildAdminOrderDetail(db, orderId);
+  if (!order) return null;
+  if (!orderMatchesAccountEmail(order, email)) return null;
+  return mapAccountBuyerOrder(order);
 }
 
 export async function buildAdminBuyersList(db, searchParams = new URLSearchParams()) {
@@ -2203,7 +2429,7 @@ export async function buildAdminEventDetail(db, eventId) {
   const sessions = sessionsResult.rows.map((row) => ({
     id: row.id,
     eventId: row.eventId,
-    startsAt: row.startsAt,
+    startsAt: normalizeStartsAt(row.startsAt),
     endsAt: row.endsAt,
     sourceStatus: row.sourceStatus,
     priceFrom: row.priceFromRub,
@@ -2385,6 +2611,73 @@ export async function buildPublicHome(db) {
   return payload;
 }
 
+export async function buildPublicDestinations(db) {
+  const now = Date.now();
+  if (publicDestinationsCache && publicDestinationsCache.expiresAt > now) {
+    return publicDestinationsCache.payload;
+  }
+
+  if (publicHomeCache && publicHomeCache.expiresAt > now) {
+    const payload = {
+      generatedAt: publicHomeCache.payload.generatedAt,
+      destinations: publicHomeCache.payload.destinations,
+    };
+    publicDestinationsCache = {
+      expiresAt: publicHomeCache.expiresAt,
+      payload,
+    };
+    return payload;
+  }
+
+  const destinations = await destinationRows(db);
+  const payload = {
+    generatedAt: new Date().toISOString(),
+    destinations,
+  };
+
+  publicDestinationsCache = {
+    expiresAt: now + PUBLIC_CATALOG_CACHE_MS,
+    payload,
+  };
+
+  return payload;
+}
+
+export async function buildPublicHomePreview(db) {
+  const now = Date.now();
+  if (publicHomePreviewCache && publicHomePreviewCache.expiresAt > now) {
+    return publicHomePreviewCache.payload;
+  }
+
+  if (publicHomeCache && publicHomeCache.expiresAt > now) {
+    const home = publicHomeCache.payload;
+    const payload = {
+      generatedAt: home.generatedAt,
+      sessions: home.sessions.slice(0, PUBLIC_HOME_PREVIEW_LIMIT),
+      landings: home.landings,
+    };
+    publicHomePreviewCache = {
+      expiresAt: publicHomeCache.expiresAt,
+      payload,
+    };
+    return payload;
+  }
+
+  const catalogSessions = await publicCatalogSessions(db);
+  const payload = {
+    generatedAt: new Date().toISOString(),
+    sessions: catalogSessions.slice(0, PUBLIC_HOME_PREVIEW_LIMIT),
+    landings: buildPublicLandings(catalogSessions),
+  };
+
+  publicHomePreviewCache = {
+    expiresAt: now + PUBLIC_CATALOG_CACHE_MS,
+    payload,
+  };
+
+  return payload;
+}
+
 export async function buildPublicStats(db) {
   const [result, stats, destinations] = await Promise.all([
     db.query(
@@ -2483,6 +2776,162 @@ export async function buildPublicStats(db) {
   };
 }
 
+export async function buildPublicSearch(db, searchParams) {
+  const q = String(searchParams.get('q') || '').trim().toLowerCase();
+  if (q.length < 2) {
+    return { generatedAt: new Date().toISOString(), query: q, items: [] };
+  }
+
+  const cityFilter = String(searchParams.get('city') || '').trim().toLowerCase();
+  const [sessions, destinations] = await Promise.all([publicCatalogSessions(db), destinationRows(db)]);
+
+  let scopedSessions = sessions;
+  if (cityFilter && cityFilter !== 'all') {
+    scopedSessions = sessions.filter((session) => {
+      const cityName = String(session.city || '').toLowerCase();
+      const destination = String(session.destination || '').toLowerCase();
+      const citySlug = String(session.citySlug || session.sourceCitySlug || '').toLowerCase();
+      return cityName === cityFilter || destination === cityFilter || cityName.includes(cityFilter) || citySlug === cityFilter;
+    });
+  }
+
+  const items = [];
+  const seen = new Set();
+  const pushItem = (item, key) => {
+    if (seen.has(key)) return;
+    seen.add(key);
+    items.push(item);
+  };
+
+  for (const session of scopedSessions) {
+    if (items.length >= 8) break;
+    const haystack = [
+      session.title,
+      session.city,
+      session.destination,
+      session.venue,
+      session.category,
+      ...(session.tags || []),
+      ...(session.subcategories || []),
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    if (!haystack.includes(q)) continue;
+    pushItem(
+      {
+        type: 'event',
+        label: session.title,
+        sublabel: [session.city, session.venue].filter(Boolean).join(' · '),
+        href: `/events/${session.slug}`,
+        imageUrl: session.imageUrl || null,
+      },
+      `event:${session.groupKey || session.id}`,
+    );
+  }
+
+  if (items.length < 8) {
+    for (const dest of destinations) {
+      if (items.length >= 8) break;
+      const name = String(dest.name || '').toLowerCase();
+      const slug = String(dest.slug || '').toLowerCase();
+      if (!name.includes(q) && !slug.includes(q)) continue;
+      if (dest.type !== 'city' || !dest.slug) continue;
+      pushItem(
+        {
+          type: 'city',
+          label: dest.name,
+          sublabel: `${dest.events} событий`,
+          href: `/cities/${dest.slug}`,
+          imageUrl: resolveCityCardImageFromSlug(dest.slug),
+        },
+        `city:${dest.slug}`,
+      );
+    }
+  }
+
+  if (items.length < 8) {
+    const landings = buildPublicLandings(sessions).filter((landing) => landing.events > 0);
+    for (const landing of landings) {
+      if (items.length >= 8) break;
+      const label = `${landing.title} ${landing.subtitle}`.toLowerCase();
+      if (!label.includes(q) && !landing.slug.includes(q)) continue;
+      pushItem(
+        {
+          type: 'landing',
+          label: landing.title,
+          sublabel: landing.subtitle,
+          href: `/landings/${landing.slug}`,
+          imageUrl: landing.imageUrl || null,
+        },
+        `landing:${landing.slug}`,
+      );
+    }
+  }
+
+  return { generatedAt: new Date().toISOString(), query: q, items: items.slice(0, 8) };
+}
+
+const PROMO_LANDING_ORDER = [
+  'bridges-night',
+  'moscow-dinner-boat',
+  'river-party',
+  'salute-9-may',
+  'new-year',
+  'bus-tours',
+  'river-cruises',
+  'standup',
+  'planetarium',
+];
+
+const PROMO_CITY_LANDING_BOOSTS = {
+  'sankt-peterburg': ['bridges-night'],
+  'saint-petersburg': ['bridges-night'],
+  'санкт-петербург': ['bridges-night'],
+  'spb': ['bridges-night'],
+  'moscow': ['moscow-dinner-boat'],
+  'moskva': ['moscow-dinner-boat'],
+  'москва': ['moscow-dinner-boat'],
+};
+
+export async function buildPublicPromoBlocks(db, searchParams) {
+  const cityFilter = String(searchParams.get('city') || '').trim().toLowerCase();
+  const sessions = await publicCatalogSessions(db);
+  const scopedSessions =
+    cityFilter && cityFilter !== 'all'
+      ? sessions.filter((session) => {
+          const cityName = String(session.city || '').toLowerCase();
+          const destination = String(session.destination || '').toLowerCase();
+          const citySlug = String(session.citySlug || session.sourceCitySlug || '').toLowerCase();
+          return cityName === cityFilter || destination === cityFilter || citySlug === cityFilter;
+        })
+      : sessions;
+
+  const landings = sortPromoLandings(
+    buildPublicLandings(scopedSessions).filter((landing) => landing.events > 0),
+    cityFilter,
+  ).slice(0, 6);
+
+  return {
+    generatedAt: new Date().toISOString(),
+    items: landings.map((landing, index) => ({
+      slug: landing.slug,
+      title: landing.title,
+      subtitle: landing.subtitle,
+      events: landing.events,
+      priceFrom: landing.priceFrom,
+      href: `/landings/${landing.slug}`,
+      gradientIndex: index,
+    })),
+  };
+}
+
+function resolveCityCardImageFromSlug(slug) {
+  const imageSlug = CITY_CARD_IMAGE_ALIASES[slug] || slug;
+  if (!CITY_CARD_IMAGE_SLUGS.has(imageSlug)) return null;
+  return `/images/cities/${imageSlug}.png`;
+}
+
 export async function buildCatalogSessions(db, searchParams) {
   const limit = clampNumber(searchParams.get('limit'), 1, 240, 120);
   const offset = clampNumber(searchParams.get('offset'), 0, 100000, 0);
@@ -2501,7 +2950,7 @@ export async function buildCatalogSessions(db, searchParams) {
   const rows = sessions.filter((session) => {
     if (destination && destination !== 'all' && session.destination !== destination) return false;
     if (city && city !== 'all' && session.city !== city && session.destination !== city) return false;
-    if (category && category !== 'all' && session.category !== category && !(session.tags || []).includes(category)) return false;
+    if (category && category !== 'all' && session.category !== category && !pickCatalogSubcategories(session).includes(category)) return false;
     if (landing && landing !== 'all' && !(session.landingSlugs || []).includes(landing)) return false;
     if (date && date !== 'all' && !matchesCatalogDate(session, date)) return false;
     if (Number.isFinite(maxPrice) && maxPrice > 0 && (!session.priceFrom || session.priceFrom > maxPrice)) return false;
@@ -2524,7 +2973,7 @@ function buildCatalogFacets(sessions) {
       .map(([name, events]) => ({ name, events })),
     categories: countCatalogValues(sessions.map((session) => session.category))
       .map(([name, events]) => ({ name, events })),
-    tags: countCatalogValues(sessions.flatMap((session) => session.tags || []))
+    subcategories: countCatalogValues(sessions.flatMap((session) => pickCatalogSubcategories(session, 8)))
       .filter(([name]) => name.length <= 32)
       .slice(0, 24)
       .map(([name, events]) => ({ name, events })),
@@ -2553,8 +3002,10 @@ function sortCatalogSessions(sessions, sort) {
 }
 
 function compareSessionTime(a, b) {
-  const aTime = a.startsAt ? new Date(a.startsAt).getTime() : Number.POSITIVE_INFINITY;
-  const bTime = b.startsAt ? new Date(b.startsAt).getTime() : Number.POSITIVE_INFINITY;
+  const aOpen = isOpenDateCatalogRow(a) && !a.startsAt;
+  const bOpen = isOpenDateCatalogRow(b) && !b.startsAt;
+  const aTime = aOpen ? Number.MAX_SAFE_INTEGER - 1 : a.startsAt ? new Date(a.startsAt).getTime() : Number.POSITIVE_INFINITY;
+  const bTime = bOpen ? Number.MAX_SAFE_INTEGER - 1 : b.startsAt ? new Date(b.startsAt).getTime() : Number.POSITIVE_INFINITY;
   return aTime - bTime || String(a.title || '').localeCompare(String(b.title || ''), 'ru');
 }
 
@@ -2702,11 +3153,11 @@ export async function buildPublicCityPage(db, citySlugOrId) {
 }
 
 export async function buildPublicLandingPage(db, landingSlug) {
-  const rule = LANDING_RULES.find((item) => item.slug === landingSlug);
+  const rule = resolveLandingRule(landingSlug);
   if (!rule) return null;
 
   const catalogSessions = await publicCatalogSessions(db);
-  const sessions = catalogSessions.filter((session) => (session.landingSlugs || []).includes(rule.slug)).slice(0, 240);
+  const sessions = filterSessionsForLandingRule(catalogSessions, rule);
   const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const cities = countBy(sessions.map((event) => event.destination || event.city).filter(Boolean));
   const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
@@ -2742,7 +3193,7 @@ export async function buildPublicLandingPage(db, landingSlug) {
 }
 
 export async function buildPublicLandingPageManaged(db, landingSlug) {
-  const rule = LANDING_RULES.find((item) => item.slug === landingSlug);
+  const rule = resolveLandingRule(landingSlug);
   if (!rule) return null;
 
   const [catalogSessions, landingResult] = await Promise.all([
@@ -2791,13 +3242,19 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
     .filter((session) => {
       const ids = sessionGroupIds(session);
       if (ids.some((id) => excludedIds.has(id))) return false;
-      return (session.landingSlugs || []).includes(rule.slug) || ids.some((id) => pinnedIds.has(id));
+      if (ids.some((id) => pinnedIds.has(id))) return true;
+      return sessionMatchesLandingSlug(session, rule.slug) && sessionMatchesLandingSchedule(session, rule);
     })
     .slice(0, 240)
-    .map((session) => ({
-      ...session,
-      manualLandingStatus: sessionGroupIds(session).map((id) => manualByEventId.get(id)?.reasons?.manualStatus).find(Boolean) || null,
-    }));
+    .map((session) => {
+      const pinned = sessionGroupIds(session).some((id) => pinnedIds.has(id));
+      const scheduled = pinned ? session : applyLandingScheduleToSession(session, rule);
+      return {
+        ...(scheduled || session),
+        manualLandingStatus: sessionGroupIds(session).map((id) => manualByEventId.get(id)?.reasons?.manualStatus).find(Boolean) || null,
+      };
+    })
+    .filter((session) => sessionMatchesLandingSlug(session, rule.slug) || session.manualLandingStatus === 'PINNED');
   const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const cities = countBy(sessions.map((event) => event.destination || event.city).filter(Boolean));
   const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
@@ -2839,7 +3296,8 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
 }
 
 export async function buildPublicEventPage(db, eventSlugOrId) {
-  const resolvedEventId = await resolvePublicEventId(db, eventSlugOrId);
+  const catalogSessions = await publicCatalogSessions(db);
+  const resolvedEventId = await resolvePublicEventId(db, eventSlugOrId, catalogSessions);
   const eventLocator = resolvedEventId || eventSlugOrId;
   const eventResult = await db.query(
     `
@@ -2881,7 +3339,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
         override."seoH1" as "overrideSeoH1",
         override."seoTitle" as "overrideSeoTitle",
         override."seoDescription" as "overrideSeoDescription",
-        coalesce(array_remove(array_agg(distinct tag.title), null), '{}') as tags
+        ${orderedEventTagsSql('e.id')} as tags
       from "Event" e
       left join "Category" cat on cat.id = e."categoryId"
       left join "City" city on city.id = e."primaryCityId"
@@ -2890,8 +3348,6 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       left join "EventSourceLink" source_link on source_link."eventId" = e.id
       left join "Source" source on source.id = source_link."sourceId"
       left join "EventOverride" override on override."eventId" = e.id
-      left join "EventTag" event_tag on event_tag."eventId" = e.id
-      left join "Tag" tag on tag.id = event_tag."tagId"
       where e.id = $1 or e.slug = $1
       group by e.id, cat.title, city.id, city.title, city.slug, city."isDestination", region.id, region.slug, region.title, venue.id, venue.slug, venue.title, venue.address, venue.kind, source.code, source.name, source_link."externalId", override.id
       limit 1
@@ -2902,7 +3358,6 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   if (!event) return null;
   const eventDestination = publicDestinationForCity(event);
 
-  const catalogSessions = await publicCatalogSessions(db);
   const requestedSlug = publicEventSlug(eventSlugOrId);
   const targetPublicSession = catalogSessions.find((session) =>
     session.id === event.id ||
@@ -2971,25 +3426,30 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     db.query(
       `
         select
-          min(id)::text as id,
-          null::text as "eventId",
-          "sourceCode",
-          coalesce(nullif(title, ''), 'Ticketscloud widget') as title,
-          "priceRub",
-          max("widgetUrl") as "widgetUrl",
-          max("deeplinkUrl") as "deeplinkUrl",
-          bool_or(active) as active
-        from "EventOffer"
-        where "eventId" = any($1)
-          and active is not false
-          and "priceRub" >= $2
-        group by "sourceCode", coalesce(nullif(title, ''), 'Ticketscloud widget'), "priceRub"
-        order by active desc, "priceRub" asc nulls last
-        limit 12
+          offer.id,
+          offer."eventId",
+          offer."sourceCode",
+          coalesce(nullif(offer.title, ''), 'Ticketscloud widget') as title,
+          offer."priceRub",
+          offer."widgetUrl",
+          offer."deeplinkUrl",
+          offer.active,
+          (offer.payload->>'sortOrder')::int as "sortOrder"
+        from "EventOffer" offer
+        where offer."eventId" = any($1)
+          and offer.active is not false
+          and offer."priceRub" >= $2
+        order by
+          case when offer."sourceCode"::text = 'TEPLOHOD' then coalesce((offer.payload->>'sortOrder')::int, 9999) else 9999 end,
+          offer."priceRub" asc nulls last,
+          offer.id asc
+        limit 24
       `,
       [groupEventIds, MIN_DISPLAY_PRICE_RUB],
     ),
   ]);
+
+  const publicOffers = dedupePublicOffers(offersResult.rows).slice(0, 12);
 
   const primaryOfferByEventId = primaryOfferMap(
     sessionsResult.rows
@@ -3004,13 +3464,13 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       }))
       .filter((offer) => offer.sourceCode || offer.priceRub != null || offer.widgetUrl || offer.deeplinkUrl),
   );
-  const primaryOffer = primaryOfferByEventId.get(representativeRow.id) || offersResult.rows.find((offer) => offer.active) || offersResult.rows[0] || null;
+  const primaryOffer = primaryOfferByEventId.get(representativeRow.id) || publicOffers.find((offer) => offer.active) || publicOffers[0] || null;
   const totalSessionCount = targetPublicSession?.sessionCount || sessionsResult.rows.length;
   const eventPriceFrom = displayPriceFrom(
     targetPublicSession?.priceFrom,
     event.priceFromRub,
     ...sessionsResult.rows.map((session) => session.priceFromRub),
-    ...offersResult.rows.map((offer) => offer.priceRub),
+    ...publicOffers.map((offer) => offer.priceRub),
   );
   const fallbackWidgetUrl = buildProviderWidgetUrl(representativeRow.externalId ? representativeRow : { ...event, externalId: event.externalId, offerSourceCode: primaryOffer?.sourceCode });
   const purchase = purchaseInfo({
@@ -3088,14 +3548,19 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       offerDeeplinkUrl: sessionOffer?.deeplinkUrl || sourceRow?.offerDeeplinkUrl,
       externalId: sessionExternalId,
     });
+    const schedule = publicSessionScheduleLabels({
+      startsAt: session.startsAt,
+      kind: event.kind,
+      sourceStatus: session.sourceStatus,
+    });
     return {
       id: session.id,
       eventId: session.eventId,
-      startsAt: session.startsAt,
+      startsAt: schedule.startsAt || null,
       endsAt: session.endsAt,
-      dateLabel: formatDate(session.startsAt),
-      timeLabel: formatTime(session.startsAt),
-      timeBucket: timeBucket(session.startsAt),
+      dateLabel: schedule.dateLabel,
+      timeLabel: schedule.timeLabel,
+      timeBucket: schedule.timeBucket,
       sourceStatus: session.sourceStatus,
       priceFrom: displayPriceFrom(session.priceFromRub, baseEvent.priceFrom),
       vacant: session.ticketsVacant,
@@ -3104,19 +3569,42 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       purchaseUrlSource: sessionPurchase.urlSource,
     };
   });
-  const ticketPrices = buildPublicTicketPrices(offersResult.rows, sessions, baseEvent);
-  const related = catalogSessions
-    .filter((session) => !sessionGroupIds(session).some((id) => groupEventIds.includes(id)))
-    .filter((session) => session.cityId === event.cityId || session.category === event.category)
-    .slice(0, 12);
-  const priceValues = [baseEvent.priceFrom, ...sessions.map((session) => session.priceFrom)].filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
-  const vacantValues = sessions.map((session) => session.vacant).filter((value) => Number.isFinite(value));
+  const widgetOnlySessions = sessions.length === 0
+    && String(event.sourceCode || '').toUpperCase().includes('TEPLOHOD')
+    && purchase.ready
+    ? [{
+        id: `widget_tep_${event.id}`,
+        eventId: event.id,
+        startsAt: null,
+        endsAt: null,
+        dateLabel: 'В виджете',
+        timeLabel: 'Выберите время',
+        timeBucket: 'day',
+        sourceStatus: 'widget',
+        priceFrom: baseEvent.priceFrom,
+        vacant: baseEvent.vacant,
+        purchaseUrl,
+        purchaseReady: purchase.ready,
+        purchaseUrlSource: purchase.urlSource,
+      }]
+    : [];
+  const publicSessions = sessions.length ? sessions : widgetOnlySessions;
+  const ticketPrices = buildPublicTicketPrices(publicOffers, publicSessions, baseEvent);
+  const related = [];
+  for (const session of catalogSessions) {
+    if (related.length >= 12) break;
+    if (sessionGroupIds(session).some((id) => groupEventIds.includes(id))) continue;
+    if (session.cityId !== event.cityId && session.category !== event.category) continue;
+    related.push(session);
+  }
+  const priceValues = [baseEvent.priceFrom, ...publicSessions.map((session) => session.priceFrom)].filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
+  const vacantValues = publicSessions.map((session) => session.vacant).filter((value) => Number.isFinite(value));
 
   return {
     generatedAt: new Date().toISOString(),
     event: baseEvent,
-    sessions,
-    offers: offersResult.rows.map((offer) => ({
+    sessions: publicSessions,
+    offers: publicOffers.map((offer) => ({
       id: offer.id,
       sourceCode: offer.sourceCode,
       title: offer.title,
@@ -3141,9 +3629,42 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   };
 }
 
+function readOfferSortOrder(value) {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function dedupePublicOffers(rows) {
+  const unique = new Map();
+  for (const row of rows || []) {
+    const key = `${String(row.sourceCode || '')}|${normalizeGroupPart(row.title)}|${row.priceRub}`;
+    const sortOrder = readOfferSortOrder(row.sortOrder);
+    const existing = unique.get(key);
+    if (!existing) {
+      unique.set(key, row);
+      continue;
+    }
+    const existingOrder = readOfferSortOrder(existing.sortOrder) ?? 9999;
+    const nextOrder = sortOrder ?? 9999;
+    if (nextOrder < existingOrder) unique.set(key, row);
+  }
+
+  return Array.from(unique.values()).sort((a, b) => {
+    const aIsTep = String(a.sourceCode || '').toUpperCase().includes('TEPLOHOD');
+    const bIsTep = String(b.sourceCode || '').toUpperCase().includes('TEPLOHOD');
+    if (aIsTep || bIsTep) {
+      const aOrder = readOfferSortOrder(a.sortOrder) ?? 9999;
+      const bOrder = readOfferSortOrder(b.sortOrder) ?? 9999;
+      return aOrder - bOrder || Number(a.priceRub || 0) - Number(b.priceRub || 0);
+    }
+    return Number(a.priceRub || 0) - Number(b.priceRub || 0) || String(a.title || '').localeCompare(String(b.title || ''), 'ru');
+  });
+}
+
 function buildPublicTicketPrices(offers, sessions, event) {
   const rows = [];
   const eventTitleKey = normalizeGroupPart(event.title);
+  const isTeplohod = String(event.sourceCode || event.offerSourceCode || '').toUpperCase().includes('TEPLOHOD');
 
   for (const offer of offers || []) {
     if (offer.active === false || !Number.isFinite(offer.priceRub) || offer.priceRub < MIN_DISPLAY_PRICE_RUB) continue;
@@ -3156,6 +3677,7 @@ function buildPublicTicketPrices(offers, sessions, event) {
       description: 'Покупка открывается в виджете билетной системы.',
       purchaseUrl: offer.widgetUrl || offer.deeplinkUrl || event.purchaseUrl || null,
       kind: 'offer',
+      sortOrder: readOfferSortOrder(offer.sortOrder),
     });
   }
 
@@ -3194,7 +3716,14 @@ function buildPublicTicketPrices(offers, sessions, event) {
   }
 
   return Array.from(unique.values())
-    .sort((a, b) => a.priceRub - b.priceRub || String(a.title).localeCompare(String(b.title), 'ru'))
+    .sort((a, b) => {
+      if (isTeplohod) {
+        const aOrder = readOfferSortOrder(a.sortOrder) ?? 9999;
+        const bOrder = readOfferSortOrder(b.sortOrder) ?? 9999;
+        return aOrder - bOrder || a.priceRub - b.priceRub;
+      }
+      return a.priceRub - b.priceRub || String(a.title).localeCompare(String(b.title), 'ru');
+    })
     .slice(0, 8);
 }
 
@@ -3321,8 +3850,13 @@ async function eventRows(db, limit) {
         min(session."startsAt") as "startsAt",
         min(session."priceFromRub") filter (where session."priceFromRub" >= ${MIN_DISPLAY_PRICE_RUB}) as "sessionPriceFromRub",
         count(distinct session.id)::int as "slotCount",
-        coalesce(array_remove(array_agg(distinct tag.title), null), '{}') as tags,
-        coalesce(array_remove(array_agg(distinct tag.id), null), '{}') as "tagIds",
+        ${orderedEventTagsSql('e.id')} as tags,
+        coalesce((
+          select array_agg(tag.id order by tag.title)
+          from "EventTag" event_tag_ids
+          join "Tag" tag on tag.id = event_tag_ids."tagId"
+          where event_tag_ids."eventId" = e.id
+        ), '{}') as "tagIds",
         coalesce(array_remove(array_agg(distinct event_subcategory."subcategoryId"), null), '{}') as "subcategoryIds"
       from "Event" e
       left join "Category" cat on cat.id = e."categoryId"
@@ -3345,8 +3879,6 @@ async function eventRows(db, limit) {
         order by ("priceRub" >= ${MIN_DISPLAY_PRICE_RUB}) desc nulls last, "priceRub" asc nulls last
         limit 1
       ) offer on true
-      left join "EventTag" event_tag on event_tag."eventId" = e.id
-      left join "Tag" tag on tag.id = event_tag."tagId"
       left join "EventSubcategory" event_subcategory on event_subcategory."eventId" = e.id
       group by
         e.id,
@@ -3987,8 +4519,11 @@ async function destinationSummaryRowsFast(db) {
       event_base as (
         select
           e.id,
+          source.code as "sourceCode",
           coalesce(source.name, source.code::text, primary_offer."sourceCode"::text, '') as "sourceLabel",
           e.title,
+          e.kind,
+          e."sourceStatus",
           city.id as "cityId",
           city.title as city,
           city.slug as "citySlug",
@@ -4055,9 +4590,14 @@ async function destinationSummaryRowsFast(db) {
             lower(regexp_replace(trim(coalesce("venueId", venue, '')), '\\s+', ' ', 'g'))
           ) as "groupKey"
         from normalized
-        where "startsAt" is not null
-          and "priceFrom" >= $1
+        where "priceFrom" >= $1
           and "purchaseReady" = true
+          and (
+            "startsAt" is not null
+            or kind = 'OPEN_DATE'
+            or "sourceStatus" = 'open_date'
+            or "sourceCode" = 'TEPLOHOD'
+          )
       ),
       ranked as (
         select
@@ -4164,19 +4704,43 @@ function publicDestinationFromSession(session) {
   };
 }
 
+const CITY_SLUG_CANONICAL = {
+  moscow: 'moskva',
+  moskva: 'moskva',
+  'saint-petersburg': 'sankt-peterburg',
+  'sankt-peterburg': 'sankt-peterburg',
+  'nizhny-novgorod': 'nizhniy-novgorod',
+  'nizhniy-novgorod': 'nizhniy-novgorod',
+  'veliky-novgorod': 'velikiy-novgorod',
+  'velikiy-novgorod': 'velikiy-novgorod',
+  rostov: 'rostov-na-donu',
+  'rostov-on-don': 'rostov-na-donu',
+  'rostov-na-donu': 'rostov-na-donu',
+};
+
+function canonicalCitySlug(value) {
+  const slug = publicCitySlug(value) || String(value || '').trim().toLowerCase();
+  return CITY_SLUG_CANONICAL[slug] || slug;
+}
+
 function matchesPublicDestinationPage(session, citySlugOrId, requestedSlug) {
   const destination = publicDestinationFromSession(session);
+  const requested = canonicalCitySlug(requestedSlug);
   if (destination.type === 'region') {
-    return destination.id === citySlugOrId || destination.sourceSlug === citySlugOrId || destination.slug === requestedSlug;
+    return (
+      destination.id === citySlugOrId ||
+      canonicalCitySlug(destination.sourceSlug) === requested ||
+      canonicalCitySlug(destination.slug) === requested
+    );
   }
 
   return (
     session.cityId === citySlugOrId ||
-    session.sourceCitySlug === citySlugOrId ||
+    canonicalCitySlug(session.sourceCitySlug) === requested ||
     destination.id === citySlugOrId ||
-    destination.sourceSlug === citySlugOrId ||
-    destination.slug === requestedSlug ||
-    publicCitySlug(session.city) === requestedSlug
+    canonicalCitySlug(destination.sourceSlug) === requested ||
+    canonicalCitySlug(destination.slug) === requested ||
+    canonicalCitySlug(session.city) === requested
   );
 }
 
@@ -4300,7 +4864,9 @@ async function publicCatalogSessionsFast(db) {
           source.name as "sourceName",
           coalesce(source.name, source.code::text, primary_offer."sourceCode"::text, '') as "sourceLabel",
           e.title,
+          e.description,
           e.kind,
+          e."sourceStatus",
           e."imageUrl",
           e."priceFromRub",
           e."ticketsVacant",
@@ -4308,6 +4874,7 @@ async function publicCatalogSessionsFast(db) {
           city.id as "cityId",
           city.title as city,
           city.slug as "citySlug",
+          city."heroImageUrl" as "cityHeroImageUrl",
           city."isDestination" as "cityIsDestination",
           region.id as "regionId",
           region.slug as "regionSlug",
@@ -4315,8 +4882,11 @@ async function publicCatalogSessionsFast(db) {
           venue.id as "venueId",
           venue.slug as "venueSlug",
           venue.title as venue,
+          venue."heroImageUrl" as "venueHeroImageUrl",
           venue.kind as "venueKind",
           override.title as "overrideTitle",
+          override.description as "overrideDescription",
+          override."shortDescription" as "overrideShortDescription",
           override."imageUrl" as "overrideImageUrl",
           primary_offer."sourceCode" as "offerSourceCode",
           primary_offer.title as "offerTitle",
@@ -4326,7 +4896,20 @@ async function publicCatalogSessionsFast(db) {
           min(session."startsAt") filter (where session."startsAt" >= now()) as "startsAt",
           min(session."priceFromRub") filter (where session."startsAt" >= now() and session."priceFromRub" >= $1) as "sessionPriceFromRub",
           count(distinct session.id) filter (where session."startsAt" >= now())::int as "slotCount",
-          coalesce(array_remove(array_agg(distinct tag.title), null), '{}') as tags
+          ${orderedEventTagsSql('e.id')} as tags,
+          (
+            select coalesce(array_agg(distinct title), '{}')
+            from (
+              select sc.title
+              from "EventSubcategory" es
+              join "Subcategory" sc on sc.id = es."subcategoryId"
+              where es."eventId" = e.id
+              union
+              select sc.title
+              from "Subcategory" sc
+              where sc.id = e."primarySubcategoryId"
+            ) subcats
+          ) as subcategories
         from "Event" e
         left join "Category" cat on cat.id = e."categoryId"
         left join "City" city on city.id = e."primaryCityId"
@@ -4337,8 +4920,6 @@ async function publicCatalogSessionsFast(db) {
         left join "EventOverride" override on override."eventId" = e.id
         left join "EventSession" session on session."eventId" = e.id
         left join primary_offer on primary_offer."eventId" = e.id
-        left join "EventTag" event_tag on event_tag."eventId" = e.id
-        left join "Tag" tag on tag.id = event_tag."tagId"
         group by
           e.id,
           source_link."externalId",
@@ -4349,6 +4930,7 @@ async function publicCatalogSessionsFast(db) {
           city.id,
           city.title,
           city.slug,
+          city."heroImageUrl",
           city."isDestination",
           region.id,
           region.slug,
@@ -4356,6 +4938,7 @@ async function publicCatalogSessionsFast(db) {
           venue.id,
           venue.slug,
           venue.title,
+          venue."heroImageUrl",
           venue.kind,
           primary_offer."sourceCode",
           primary_offer.title,
@@ -4392,14 +4975,24 @@ async function publicCatalogSessionsFast(db) {
             lower(regexp_replace(trim(coalesce("venueId", venue, '')), '\\s+', ' ', 'g'))
           ) as "groupKey"
         from normalized
-        where "startsAt" is not null
-          and "priceFrom" >= $1
+        where "priceFrom" >= $1
           and "purchaseReady" = true
+          and (
+            "startsAt" is not null
+            or kind = 'OPEN_DATE'
+            or "sourceStatus" = 'open_date'
+            or "sourceCode" = 'TEPLOHOD'
+          )
       ),
       ranked as (
         select
           *,
-          row_number() over (partition by "groupKey" order by "startsAt" asc nulls last, title asc) as rank
+          row_number() over (
+            partition by "groupKey"
+            order by case when kind = 'OPEN_DATE' or "sourceStatus" = 'open_date' then 1 else 0 end desc,
+              "startsAt" asc nulls last,
+              title asc
+          ) as rank
         from saleable
       ),
       grouped as (
@@ -4433,12 +5026,16 @@ async function publicCatalogSessionsFast(db) {
         rep."sourceName",
         rep."sourceLabel",
         rep.title,
+        rep.description,
+        rep."overrideDescription",
+        rep."overrideShortDescription",
         rep.kind,
         rep."imageUrl",
         rep.category,
         rep."cityId",
         rep.city,
         rep."citySlug",
+        rep."cityHeroImageUrl",
         rep."cityIsDestination",
         rep."regionId",
         rep."regionSlug",
@@ -4446,6 +5043,7 @@ async function publicCatalogSessionsFast(db) {
         rep."venueId",
         rep."venueSlug",
         rep.venue,
+        rep."venueHeroImageUrl",
         rep."venueKind",
         rep."overrideTitle",
         rep."overrideImageUrl",
@@ -4454,14 +5052,17 @@ async function publicCatalogSessionsFast(db) {
         rep."offerPriceRub",
         rep."offerWidgetUrl",
         rep."offerDeeplinkUrl",
+        rep.kind,
+        rep."sourceStatus",
         rep."startsAt",
         rep.tags,
+        rep.subcategories,
         grouped."groupKey",
         grouped."groupEventIds",
         grouped."groupedEventsCount",
         grouped."sessionCount",
         grouped."priceFrom",
-        grouped.vacant,
+        rep."ticketsVacant" as vacant,
         grouped."upcomingSlots"
       from grouped
       join ranked rep on rep."groupKey" = grouped."groupKey" and rep.rank = 1
@@ -4473,9 +5074,132 @@ async function publicCatalogSessionsFast(db) {
   return result.rows.map(mapGroupedPublicSession);
 }
 
+function publicListDescription(row) {
+  return (
+    cleanImportedDescription(row.overrideDescription || row.description) ||
+    cleanImportedDescription(row.overrideShortDescription)
+  );
+}
+
+function isOpenDateCatalogRow(row) {
+  const kind = String(row?.kind || '').toUpperCase();
+  const sourceStatus = String(row?.sourceStatus || '').toLowerCase();
+  return kind === 'OPEN_DATE' || sourceStatus === 'open_date';
+}
+
+function publicSessionScheduleLabels(row) {
+  if (!isOpenDateCatalogRow(row)) {
+    return {
+      startsAt: normalizeStartsAt(row.startsAt) || '',
+      dateLabel: formatDate(row.startsAt),
+      timeLabel: formatTime(row.startsAt),
+      timeBucket: timeBucket(row.startsAt),
+    };
+  }
+
+  return {
+    startsAt: '',
+    dateLabel: 'Открытая дата',
+    timeLabel: 'В виджете',
+    timeBucket: 'day',
+  };
+}
+
+function buildLandingRuleEvent(row, tags, destination, category) {
+  return {
+    title: row.overrideTitle || row.title,
+    category: category || 'unknown',
+    sourceCategory: category || 'unknown',
+    venue: row.venue || 'Не указано',
+    city: row.city || 'Не указан',
+    destination: destination?.name || row.city || 'Не указан',
+    tags,
+    subcategories: pickCatalogSubcategories({
+      subcategories: uniqueValues((row.subcategories || []).filter(Boolean)),
+      tags,
+      category: category || 'unknown',
+    }),
+  };
+}
+
+function resolvePublicSessionImageUrl(row) {
+  if (row.overrideImageUrl) return row.overrideImageUrl;
+  if (row.imageUrl) return row.imageUrl;
+  if (row.venueHeroImageUrl) return row.venueHeroImageUrl;
+  if (row.cityHeroImageUrl) return row.cityHeroImageUrl;
+
+  const slug = row.citySlug || row.sourceCitySlug;
+  if (!slug) return null;
+
+  const imageSlug = CITY_CARD_IMAGE_ALIASES[slug] || slug;
+  if (!CITY_CARD_IMAGE_SLUGS.has(imageSlug)) return null;
+  return `/images/cities/${imageSlug}.png`;
+}
+
+const KNOWN_SESSION_CITIES = [
+  'Нижний Новгород',
+  'Санкт-Петербург',
+  'Ростов-на-Дону',
+  'Екатеринбург',
+  'Красноярск',
+  'Новосибирск',
+  'Калининград',
+  'Москва',
+  'Казань',
+  'Самара',
+  'Волгоград',
+  'Ярославль',
+  'Владимир',
+  'Пермь',
+  'Тверь',
+  'Сочи',
+  'Тула',
+].sort((a, b) => b.length - a.length);
+
+function cityNameStem(city) {
+  const compact = city.toLowerCase().replace(/[^а-яё]/g, '');
+  if (!compact) return '';
+  if (compact.length <= 5) return compact;
+  return compact.slice(0, Math.max(5, compact.length - 2));
+}
+
+function inferCityNameFromText(...parts) {
+  const haystack = parts
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+  if (!haystack) return null;
+
+  for (const city of KNOWN_SESSION_CITIES) {
+    const needle = city.toLowerCase();
+    if (haystack.includes(needle)) return city;
+    const stem = cityNameStem(city);
+    if (stem.length >= 4 && haystack.includes(stem)) return city;
+  }
+
+  const match = haystack.match(/(?:^|\s)г\.?\s*([а-яё][а-яё\s-]{2,40})/i);
+  if (!match) return null;
+
+  const fragment = match[1].trim().replace(/["«»]/g, '');
+  for (const city of KNOWN_SESSION_CITIES) {
+    const normalized = city.toLowerCase();
+    if (normalized.startsWith(fragment) || fragment.startsWith(normalized.slice(0, 6))) return city;
+  }
+
+  return null;
+}
+
+function resolvePublicSessionCity(row) {
+  const raw = cleanDisplayName(row.city);
+  if (raw && raw !== 'Не указан') return raw;
+  return inferCityNameFromText(row.title, row.venue, row.venueAddress, ...(row.tags || [])) || raw || 'Не указан';
+}
+
 function mapGroupedPublicSession(row) {
   const tags = row.tags || [];
-  const destination = publicDestinationForCity(row);
+  const cityName = resolvePublicSessionCity(row);
+  const destination = publicDestinationForCity({ ...row, city: cityName });
   const fallbackWidgetUrl = buildProviderWidgetUrl(row);
   const purchase = purchaseInfo(row);
   const purchaseUrl = purchase.url || fallbackWidgetUrl;
@@ -4492,13 +5216,15 @@ function mapGroupedPublicSession(row) {
       });
       return {
         eventId: slot.eventId,
-        startsAt: slot.startsAt,
+        startsAt: normalizeStartsAt(slot.startsAt),
         dateLabel: formatDate(slot.startsAt),
         timeLabel: formatTime(slot.startsAt),
         purchaseUrl: slotPurchase.url || purchaseUrl,
       };
     });
 
+  const schedule = publicSessionScheduleLabels(row);
+  const ruleEvent = buildLandingRuleEvent({ ...row, city: cityName }, tags, destination, row.category || 'unknown');
   const session = {
     id: row.id,
     slug: publicEventSlug(row.slug),
@@ -4512,7 +5238,7 @@ function mapGroupedPublicSession(row) {
     cityId: row.cityId,
     citySlug: destination.slug,
     sourceCitySlug: row.citySlug,
-    city: row.city || 'Не указан',
+    city: cityName,
     destination: destination.name,
     destinationType: destination.type,
     venueId: row.venueId,
@@ -4530,19 +5256,23 @@ function mapGroupedPublicSession(row) {
     purchaseUrlSource: purchase.urlSource,
     category: row.category || 'unknown',
     sourceCategory: row.category || 'unknown',
-    tags: tags.slice(0, 4),
-    startsAt: row.startsAt,
-    dateLabel: formatDate(row.startsAt),
-    timeLabel: formatTime(row.startsAt),
-    timeBucket: timeBucket(row.startsAt),
+    kind: row.kind || null,
+    sourceStatus: row.sourceStatus || null,
+    subcategories: ruleEvent.subcategories,
+    tags: sliceCatalogTags(tags),
+    startsAt: schedule.startsAt || '',
+    dateLabel: schedule.dateLabel,
+    timeLabel: schedule.timeLabel,
+    timeBucket: schedule.timeBucket,
     priceFrom: row.priceFrom,
     vacant: row.vacant,
-    imageUrl: row.overrideImageUrl || row.imageUrl || null,
+    imageUrl: resolvePublicSessionImageUrl(row),
+    description: publicListDescription(row),
   };
 
   return {
     ...session,
-    landingSlugs: LANDING_RULES.filter((rule) => matchesRule(session, rule)).map((rule) => rule.slug),
+    landingSlugs: resolveLandingSlugsForSession(ruleEvent, { startsAt: row.startsAt, upcomingSlots }),
   };
 }
 
@@ -4594,6 +5324,7 @@ async function publicEventRowsLean(db, limit) {
         source.name as "sourceName",
         e.title,
         e.kind,
+        e."sourceStatus",
         e."imageUrl",
         e."priceFromRub",
         e."ticketsVacant",
@@ -4619,7 +5350,7 @@ async function publicEventRowsLean(db, limit) {
         min(session."startsAt") as "startsAt",
         min(session."priceFromRub") filter (where session."priceFromRub" >= ${MIN_DISPLAY_PRICE_RUB}) as "sessionPriceFromRub",
         count(distinct session.id)::int as "slotCount",
-        coalesce(array_remove(array_agg(distinct tag.title), null), '{}') as tags
+        ${orderedEventTagsSql('e.id')} as tags
       from "Event" e
       left join "Category" cat on cat.id = e."categoryId"
       left join "City" city on city.id = e."primaryCityId"
@@ -4641,8 +5372,6 @@ async function publicEventRowsLean(db, limit) {
         order by ("priceRub" >= ${MIN_DISPLAY_PRICE_RUB}) desc nulls last, "priceRub" asc nulls last
         limit 1
       ) offer on true
-      left join "EventTag" event_tag on event_tag."eventId" = e.id
-      left join "Tag" tag on tag.id = event_tag."tagId"
       group by
         e.id,
         source_link."externalId",
@@ -4666,7 +5395,12 @@ async function publicEventRowsLean(db, limit) {
         offer."priceRub",
         offer."widgetUrl",
         offer."deeplinkUrl"
-      having min(session."startsAt") is not null
+      having (
+        min(session."startsAt") is not null
+        or e.kind = 'OPEN_DATE'
+        or e."sourceStatus" = 'open_date'
+        or source.code = 'TEPLOHOD'
+      )
       order by min(session."startsAt") asc nulls last
       limit $1
     `,
@@ -4709,7 +5443,9 @@ async function publicEventRowsLean(db, limit) {
         purchaseProvider: purchase.provider,
         purchaseUrlSource: purchase.urlSource,
         eventType: String(row.kind || '').toLowerCase(),
-        startsAt: row.startsAt,
+        kind: row.kind || null,
+        sourceStatus: row.sourceStatus || null,
+        startsAt: normalizeStartsAt(row.startsAt),
         slotCount: row.slotCount || 0,
         priceFrom,
         vacant: row.ticketsVacant,
@@ -4722,12 +5458,15 @@ async function publicEventRowsLean(db, limit) {
         tags,
       };
     })
-    .filter((row) => row.startsAt && row.purchaseReady && Number.isFinite(row.priceFrom) && row.priceFrom >= MIN_DISPLAY_PRICE_RUB);
+    .filter((row) => (row.startsAt || isOpenDateCatalogRow(row)) && row.purchaseReady && Number.isFinite(row.priceFrom) && row.priceFrom >= MIN_DISPLAY_PRICE_RUB);
 }
 
 function matchesCatalogDate(session, dateFilter) {
+  if (dateFilter === 'all') return true;
+  if (isOpenDateCatalogRow(session)) return dateFilter === 'today' || dateFilter === 'tomorrow' || dateFilter === 'weekend';
+
   const startsAt = new Date(session.startsAt);
-  if (!Number.isFinite(startsAt.getTime())) return dateFilter === 'all';
+  if (!Number.isFinite(startsAt.getTime())) return false;
 
   const today = startOfLocalDay(new Date());
   const eventDay = startOfLocalDay(startsAt);
@@ -4752,12 +5491,28 @@ function mapPublicSession(row) {
   const fallbackWidgetUrl = buildProviderWidgetUrl(row);
   const purchase = purchaseInfo(row);
   const purchaseUrl = purchase.url || fallbackWidgetUrl;
+  const tags = row.tags || [];
+  const ruleEvent = buildLandingRuleEvent(
+    {
+      ...row,
+      overrideTitle: row.override?.title,
+      title: row.title,
+      venue: row.venue,
+      city: row.city,
+      category: row.sourceCategory,
+      subcategories: row.subcategories,
+    },
+    tags,
+    { name: row.destination || row.city },
+    row.sourceCategory,
+  );
+  const schedule = publicSessionScheduleLabels(row);
   const upcomingSlots = Array.isArray(row.upcomingSlots) && row.upcomingSlots.length
     ? row.upcomingSlots
     : row.startsAt
       ? [{
           eventId: row.id,
-          startsAt: row.startsAt,
+          startsAt: normalizeStartsAt(row.startsAt),
           dateLabel: formatDate(row.startsAt),
           timeLabel: formatTime(row.startsAt),
           purchaseUrl,
@@ -4774,12 +5529,12 @@ function mapPublicSession(row) {
     sessionCount: row.sessionCount || row.slotCount || upcomingSlots.length || 1,
     upcomingSlots: upcomingSlots.slice(0, 8).map((slot) => ({
       eventId: slot.eventId,
-      startsAt: slot.startsAt,
-      dateLabel: slot.dateLabel,
-      timeLabel: slot.timeLabel,
+      startsAt: normalizeStartsAt(slot.startsAt),
+      dateLabel: slot.dateLabel || formatDate(slot.startsAt),
+      timeLabel: slot.timeLabel || formatTime(slot.startsAt),
       purchaseUrl: slot.purchaseUrl,
     })),
-    landingSlugs: LANDING_RULES.filter((rule) => matchesRule(row, rule)).map((rule) => rule.slug),
+    landingSlugs: resolveLandingSlugsForSession(ruleEvent, { startsAt: row.startsAt, upcomingSlots }),
     title: row.override?.title || row.title,
     cityId: row.cityId,
     citySlug: row.citySlug,
@@ -4800,14 +5555,17 @@ function mapPublicSession(row) {
     purchaseProvider: purchase.provider,
     purchaseUrlSource: purchase.urlSource,
     category: row.sourceCategory,
-    tags: row.tags.slice(0, 4),
-    startsAt: row.startsAt,
-    dateLabel: formatDate(row.startsAt),
-    timeLabel: formatTime(row.startsAt),
-    timeBucket: timeBucket(row.startsAt),
+    kind: row.kind || null,
+    sourceStatus: row.sourceStatus || null,
+    subcategories: ruleEvent.subcategories,
+    tags: sliceCatalogTags(tags),
+    startsAt: schedule.startsAt || '',
+    dateLabel: schedule.dateLabel,
+    timeLabel: schedule.timeLabel,
+    timeBucket: schedule.timeBucket,
     priceFrom: row.priceFrom,
     vacant: row.vacant,
-    imageUrl: row.override?.imageUrl || row.imageUrl || null,
+    imageUrl: resolvePublicSessionImageUrl(row),
   };
 }
 
@@ -4906,7 +5664,7 @@ async function publicVenuesForSessions(db, sessions, limit) {
     }));
 }
 
-async function resolvePublicEventId(db, eventSlugOrId) {
+async function resolvePublicEventId(db, eventSlugOrId, catalogSessions = null) {
   const value = String(eventSlugOrId || '').trim();
   if (!value) return null;
   const direct = await db.query('select id from "Event" where id = $1 or slug = $1 limit 1', [value]);
@@ -4919,9 +5677,18 @@ async function resolvePublicEventId(db, eventSlugOrId) {
     if (suffixResult.rows[0]?.id) return suffixResult.rows[0].id;
   }
 
-  const candidates = await db.query('select id, slug from "Event" order by "updatedAt" desc limit 20000');
-  const matched = candidates.rows.find((row) => publicEventSlug(row.slug) === value);
-  return matched?.id || null;
+  const requestedSlug = publicEventSlug(value);
+  const sessions = catalogSessions || (await publicCatalogSessions(db));
+  const fromCatalog = sessions.find(
+    (session) =>
+      session.id === value ||
+      session.slug === requestedSlug ||
+      session.sourceSlug === value ||
+      publicEventSlug(session.sourceSlug) === requestedSlug,
+  );
+  if (fromCatalog?.id) return fromCatalog.id;
+
+  return null;
 }
 
 function countBy(values) {
@@ -5000,7 +5767,7 @@ function buildLandingRows(events) {
 
 function buildPublicLandings(sessions) {
   return LANDING_RULES.map((rule) => {
-    const matched = sessions.filter((session) => session.landingSlugs.includes(rule.slug));
+    const matched = sessions.filter((session) => sessionMatchesLandingSlug(session, rule.slug));
     const prices = matched.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
     return {
       slug: rule.slug,
@@ -5016,14 +5783,148 @@ function buildPublicLandings(sessions) {
   });
 }
 
+function resolveLandingRule(landingSlug) {
+  const key = String(landingSlug || '').trim().toLowerCase();
+  const direct = LANDING_RULES.find((item) => item.slug === key);
+  if (direct) return direct;
+  return (
+    LANDING_RULES.find((item) => (LANDING_SLUG_ALIASES[item.slug] || []).includes(key)) || null
+  );
+}
+
+function sessionMatchesLandingSlug(session, canonicalSlug) {
+  const slugs = new Set([canonicalSlug, ...(LANDING_SLUG_ALIASES[canonicalSlug] || [])]);
+  return (session.landingSlugs || []).some((value) => slugs.has(String(value || '').toLowerCase()));
+}
+
+function sortPromoLandings(landings, cityFilter = '') {
+  const cityKey = String(cityFilter || '').trim().toLowerCase();
+  const boosts = PROMO_CITY_LANDING_BOOSTS[cityKey] || [];
+
+  return [...landings].sort((a, b) => {
+    const aBoost = boosts.indexOf(a.slug);
+    const bBoost = boosts.indexOf(b.slug);
+    if (aBoost !== -1 || bBoost !== -1) {
+      if (aBoost === -1) return 1;
+      if (bBoost === -1) return -1;
+      if (aBoost !== bBoost) return aBoost - bBoost;
+    }
+
+    const aOrder = PROMO_LANDING_ORDER.indexOf(a.slug);
+    const bOrder = PROMO_LANDING_ORDER.indexOf(b.slug);
+    const aRank = aOrder === -1 ? 1000 : aOrder;
+    const bRank = bOrder === -1 ? 1000 : bOrder;
+    if (aRank !== bRank) return aRank - bRank;
+    return b.events - a.events;
+  });
+}
+
+function collectSessionSlots(session) {
+  if (Array.isArray(session.upcomingSlots) && session.upcomingSlots.length) {
+    return session.upcomingSlots.filter((slot) => slot?.startsAt);
+  }
+  if (session.startsAt) {
+    return [{
+      eventId: session.id,
+      startsAt: session.startsAt,
+      dateLabel: session.dateLabel,
+      timeLabel: session.timeLabel,
+      purchaseUrl: session.purchaseUrl,
+    }];
+  }
+  return [];
+}
+
+function moscowHourFromStartsAt(value) {
+  const date = parseSessionStartsAt(value);
+  if (!Number.isFinite(date.getTime())) return Number.NaN;
+  const hourPart = new Intl.DateTimeFormat('en-GB', {
+    timeZone: SITE_TIME_ZONE,
+    hour: 'numeric',
+    hour12: false,
+  }).formatToParts(date).find((part) => part.type === 'hour');
+  return Number(hourPart?.value);
+}
+
+function slotMatchesMinHour(startsAt, minHour, includeStartsAtHourUntil = 0) {
+  const hour = moscowHourFromStartsAt(startsAt);
+  if (!Number.isFinite(hour)) return false;
+  if (hour >= minHour) return true;
+  return includeStartsAtHourUntil > 0 && hour < includeStartsAtHourUntil;
+}
+
+function sessionMatchesLandingSchedule(session, rule) {
+  if (rule.minStartsAtHour == null) return true;
+  const until = rule.includeStartsAtHourUntil ?? 0;
+  return collectSessionSlots(session).some((slot) => slotMatchesMinHour(slot.startsAt, rule.minStartsAtHour, until));
+}
+
+function applyLandingScheduleToSession(session, rule) {
+  if (rule.minStartsAtHour == null) return session;
+  const until = rule.includeStartsAtHourUntil ?? 0;
+  const slots = collectSessionSlots(session)
+    .filter((slot) => slotMatchesMinHour(slot.startsAt, rule.minStartsAtHour, until))
+    .map((slot) => ({
+      eventId: slot.eventId || session.id,
+      startsAt: normalizeStartsAt(slot.startsAt),
+      dateLabel: slot.dateLabel || formatDate(slot.startsAt),
+      timeLabel: slot.timeLabel || formatTime(slot.startsAt),
+      purchaseUrl: slot.purchaseUrl || session.purchaseUrl,
+    }));
+  if (!slots.length) return null;
+
+  const primary = slots[0];
+  return {
+    ...session,
+    upcomingSlots: slots.slice(0, 8),
+    startsAt: primary.startsAt,
+    dateLabel: primary.dateLabel,
+    timeLabel: primary.timeLabel,
+    timeBucket: timeBucket(primary.startsAt),
+    sessionCount: slots.length,
+  };
+}
+
+function filterSessionsForLandingRule(sessions, rule) {
+  return sessions
+    .filter((session) => sessionMatchesLandingSlug(session, rule.slug) && sessionMatchesLandingSchedule(session, rule))
+    .map((session) => applyLandingScheduleToSession(session, rule))
+    .filter(Boolean)
+    .slice(0, 240);
+}
+
+function resolveLandingSlugsForSession(ruleEvent, sessionDraft, rules = LANDING_RULES) {
+  return rules
+    .filter((rule) => matchesRule(ruleEvent, rule) && sessionMatchesLandingSchedule(sessionDraft, rule))
+    .map((rule) => rule.slug);
+}
+
 function matchesRule(event, rule) {
   return explainRuleMatch(event, rule).matches;
+}
+
+function landingRequiredSignalsSatisfied(rule, keywordFields) {
+  if (rule.requiredAnyKeywords?.length && !firstKeywordMatch(keywordFields, rule.requiredAnyKeywords)) return false;
+
+  const titleKeywordFields = keywordFields.filter((field) => field.field === 'title');
+  for (const group of rule.requiredTitleKeywordGroups || []) {
+    if (!firstKeywordMatch(titleKeywordFields, group)) return false;
+  }
+
+  for (const group of rule.requiredKeywordGroups || []) {
+    if (!firstKeywordMatch(keywordFields, group)) return false;
+  }
+
+  return true;
 }
 
 function explainRuleMatch(event, rule) {
   const tags = event.tags || [];
   const keywordFields = keywordFieldsForEvent(event, tags, rule.keywordScope || 'full');
   const fullKeywordFields = keywordFieldsForEvent(event, tags, 'full');
+  const excludeKeywordFields = rule.excludeKeywordFields?.length
+    ? fullKeywordFields.filter((field) => rule.excludeKeywordFields.includes(field.field))
+    : fullKeywordFields;
 
   const reasons = [];
   const blockers = [];
@@ -5038,8 +5939,15 @@ function explainRuleMatch(event, rule) {
 
   const excludedTag = rule.excludeTags?.find((tag) => tags.includes(tag));
   if (excludedTag) blockers.push(`исключающий тег: ${excludedTag}`);
-  const excludedKeyword = firstKeywordMatch(fullKeywordFields, rule.excludeKeywords || []);
+  const excludedKeyword = firstKeywordMatch(excludeKeywordFields, rule.excludeKeywords || []);
   if (excludedKeyword) blockers.push(`исключающее слово(${excludedKeyword.field}): ${excludedKeyword.keyword}`);
+
+  if (!blockers.length) {
+    const fastMatchReasons = collectFastLandingMatchReasons(event, rule, tags);
+    if (fastMatchReasons.length && landingRequiredSignalsSatisfied(rule, keywordFields)) {
+      return { matches: true, reasons: uniqueValues([...reasons, ...fastMatchReasons]).slice(0, 10), blockers: [] };
+    }
+  }
 
   const requiredAnyTag = rule.requiredAnyTags?.find((tag) => tags.includes(tag));
   if (rule.requiredAnyTags?.length) {
@@ -5088,6 +5996,36 @@ function explainRuleMatch(event, rule) {
   return { matches, reasons: uniqueValues(reasons).slice(0, 10), blockers: [] };
 }
 
+function collectFastLandingMatchReasons(event, rule, tags) {
+  const reasons = [];
+
+  if (rule.requiredAnySubcategories?.length) {
+    const subcategories = uniqueValues([
+      ...(event.subcategories || []),
+      ...pickCatalogSubcategories({
+        subcategories: event.subcategories || [],
+        tags,
+        category: event.category || event.sourceCategory || '',
+      }),
+    ]);
+    const hit = rule.requiredAnySubcategories.find((label) => subcategories.includes(label));
+    if (hit) reasons.push(`подкатегория: ${hit}`);
+  }
+
+  if (!reasons.length && rule.requiredAnyVenueKeywords?.length && event.venue) {
+    const venue = String(event.venue).toLowerCase();
+    const hit = rule.requiredAnyVenueKeywords.find((keyword) => venue.includes(String(keyword).toLowerCase()));
+    if (hit) reasons.push(`площадка: ${hit}`);
+  }
+
+  if (!reasons.length && rule.tags?.length) {
+    const hit = rule.tags.find((tag) => tags.includes(tag));
+    if (hit) reasons.push(`тег: ${hit}`);
+  }
+
+  return reasons;
+}
+
 function matchesRuleCity(event, expectedCity) {
   const candidates = [event.city, event.destination].filter(Boolean).map((value) => String(value).toLowerCase());
   return candidates.includes(String(expectedCity).toLowerCase());
@@ -5105,6 +6043,7 @@ function keywordFieldsForEvent(event, tags, scope = 'full') {
       { field: 'venue', value: event.venue },
       { field: 'city', value: event.city },
       { field: 'destination', value: event.destination },
+      { field: 'subcategory', value: (event.subcategories || []).join(' ') },
     );
   }
   return fields
@@ -5200,20 +6139,136 @@ function plainReadinessText(value) {
     .trim();
 }
 
+const SITE_TIME_ZONE = 'Europe/Moscow';
+
+const UTILITY_CATALOG_TAG_RE =
+  /^(wc|туалет|кондиционер|аудиосистема|аудиогид|wi-?fi|бар|кафе|кафе-бар|парковка|гардероб|кондиционирование)$/i;
+const DURATION_CATALOG_TAG_RE = /^\d+\s*(минут|мин\.?|час|часа|часов)\s*$/i;
+const VESSEL_CATALOG_TAG_RE = /^(теплоход|катер|яхт|судно|лодк)\s*:/i;
+const VENUE_PLACE_CATALOG_TAG_RE = /^площадка\s*:/i;
+const VENUE_POLICY_CATALOG_TAG_RE = /^(можно|нельзя|разрешено|запрещено)(?:\s|$)/i;
+
+function isUtilityCatalogTag(tag) {
+  const value = String(tag || '').trim();
+  if (!value) return true;
+  const lower = value.toLowerCase();
+  if (UTILITY_CATALOG_TAG_RE.test(lower)) return true;
+  if (DURATION_CATALOG_TAG_RE.test(lower)) return true;
+  if (VESSEL_CATALOG_TAG_RE.test(lower)) return true;
+  if (VENUE_PLACE_CATALOG_TAG_RE.test(lower)) return true;
+  if (/^причал\b/i.test(lower)) return true;
+  if (value.length > 42) return true;
+  return false;
+}
+
+function isVenuePolicyCatalogTag(tag) {
+  const lower = String(tag || '').trim().toLowerCase();
+  if (!lower) return true;
+  if (VENUE_POLICY_CATALOG_TAG_RE.test(lower)) return true;
+  if (/отдельн/i.test(lower) && /столик/i.test(lower)) return true;
+  if (/коляск/i.test(lower)) return true;
+  if (/велосипед/i.test(lower)) return true;
+  if (/животн/i.test(lower)) return true;
+  if (/сво[ейё]м?\s+алкогол/i.test(lower)) return true;
+  if (/сво[ейё]й?\s+ед/i.test(lower)) return true;
+  return false;
+}
+
+function isAmenityCatalogTag(tag) {
+  const lower = String(tag || '').trim().toLowerCase();
+  if (!lower) return false;
+  if (/^(ресторан[-\s]?бар|отопление|экскурсовод|аудиогид)$/i.test(lower)) return true;
+  if (/тё?плые?\s+плед/i.test(lower)) return true;
+  if (/^панорамн/i.test(lower)) return true;
+  if (/детск(ие|ая)\s+стуль/i.test(lower)) return true;
+  if (/^с\s+(обедом|ужином|питанием)/i.test(lower)) return true;
+  if (/^ледовый\s+класс/i.test(lower)) return true;
+  return false;
+}
+
+function isCatalogSubcategoryLabel(label, category) {
+  const value = String(label || '').trim();
+  if (!value || isUtilityCatalogTag(value) || isVenuePolicyCatalogTag(value) || isAmenityCatalogTag(value)) return false;
+  if (category && value.toLowerCase() === String(category).toLowerCase()) return false;
+  return true;
+}
+
+function pickCatalogSubcategories(session, limit = 4) {
+  const category = session.category || session.sourceCategory || '';
+  const labels = [];
+  const seen = new Set();
+
+  for (const label of session.subcategories || []) {
+    const value = String(label || '').trim();
+    if (!isCatalogSubcategoryLabel(value, category) || seen.has(value)) continue;
+    seen.add(value);
+    labels.push(value);
+    if (labels.length >= limit) return labels;
+  }
+
+  for (const tag of session.tags || []) {
+    const value = String(tag || '').trim();
+    if (!isCatalogSubcategoryLabel(value, category) || seen.has(value)) continue;
+    seen.add(value);
+    labels.push(value);
+    if (labels.length >= limit) break;
+  }
+
+  return labels;
+}
+
+function parseSessionStartsAt(value) {
+  if (value instanceof Date) return value;
+  const raw = String(value || '').trim();
+  if (!raw) return new Date(NaN);
+  if (/[zZ]$/.test(raw) || /[+-]\d{2}(:\d{2}|\d{2})$/.test(raw)) {
+    return new Date(raw.replace(/([+-]\d{2})(\d{2})$/, '$1:$2'));
+  }
+  if (/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/.test(raw)) {
+    return new Date(`${raw.replace(' ', 'T')}Z`);
+  }
+  return new Date(raw);
+}
+
+function normalizeStartsAt(value) {
+  const date = parseSessionStartsAt(value);
+  if (!Number.isFinite(date.getTime())) return null;
+  return date.toISOString();
+}
+
 function formatDate(value) {
-  const date = new Date(value);
+  const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return '';
-  return new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short', weekday: 'short' }).format(date);
+  return new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'short',
+    weekday: 'short',
+    timeZone: SITE_TIME_ZONE,
+  }).format(date);
 }
 
 function formatTime(value) {
-  const date = new Date(value);
+  const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return '';
-  return new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit' }).format(date);
+  return new Intl.DateTimeFormat('ru-RU', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: SITE_TIME_ZONE,
+  }).format(date);
 }
 
 function timeBucket(value) {
-  const hour = new Date(value).getHours();
+  const date = parseSessionStartsAt(value);
+  if (!Number.isFinite(date.getTime())) return 'night';
+  const hour = Number(
+    new Intl.DateTimeFormat('en-GB', {
+      hour: 'numeric',
+      hour12: false,
+      timeZone: SITE_TIME_ZONE,
+    })
+      .formatToParts(date)
+      .find((part) => part.type === 'hour')?.value ?? 0,
+  );
   if (hour >= 6 && hour < 12) return 'morning';
   if (hour >= 12 && hour < 17) return 'day';
   if (hour >= 17 && hour < 23) return 'evening';
@@ -5224,4 +6279,136 @@ function clampNumber(value, min, max, fallback) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return fallback;
   return Math.min(max, Math.max(min, Math.trunc(parsed)));
+}
+
+const DEFAULT_LANDING_AUDIT_EXPECTATIONS = {
+  'bus-tours': ['653', '661', '738', '769', '783', '1130', '1210', '1300', '1433'],
+  'new-year': ['1049', '1050'],
+};
+
+function loadLandingAuditExpectations(rootDir) {
+  const filePath = path.join(rootDir, 'data', 'teplohod', 'landing-expectations.json');
+  try {
+    const parsed = JSON.parse(readFileSync(filePath, 'utf8'));
+    if (parsed && typeof parsed === 'object') return parsed;
+  } catch {
+    // Use built-in expectations when file is missing.
+  }
+  return DEFAULT_LANDING_AUDIT_EXPECTATIONS;
+}
+
+export async function runLandingAudit(db, rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..', '..')) {
+  const expectations = loadLandingAuditExpectations(rootDir);
+  const catalogSessions = await publicCatalogSessions(db, true);
+  const catalogById = new Map(catalogSessions.map((session) => [session.id, session]));
+  const checkedAt = new Date().toISOString();
+  const items = [];
+  const issues = [];
+
+  for (const [landingSlug, externalIds] of Object.entries(expectations)) {
+    const rule = LANDING_RULES.find((item) => item.slug === landingSlug);
+    if (!rule) {
+      issues.push({ landingSlug, code: 'UNKNOWN_LANDING', message: `Лендинг ${landingSlug} не найден` });
+      continue;
+    }
+
+    for (const externalId of externalIds) {
+      const eventId = `evt_tep_${externalId}`;
+      const auditRow = await fetchLandingAuditEventRow(db, eventId);
+      const catalogSession = catalogById.get(eventId);
+      const matchEvent = auditRow
+        ? {
+            title: auditRow.title,
+            category: auditRow.category,
+            sourceCategory: auditRow.category,
+            venue: auditRow.venue,
+            city: auditRow.city,
+            tags: auditRow.tags || [],
+            subcategories: pickCatalogSubcategories({
+              subcategories: auditRow.subcategories || [],
+              tags: auditRow.tags || [],
+              category: auditRow.category || '',
+            }),
+          }
+        : null;
+      const ruleMatch = matchEvent ? explainRuleMatch(matchEvent, rule) : { matches: false, reasons: [], blockers: ['событие не найдено в БД'] };
+      const inCatalog = Boolean(catalogSession);
+      const onLanding = catalogSession?.landingSlugs?.includes(landingSlug) || false;
+      const futureSessions = Number(auditRow?.futureSessionCount || 0);
+      const blockers = [];
+
+      if (!auditRow) blockers.push('нет в БД');
+      if (auditRow && futureSessions === 0) blockers.push('нет будущих сеансов');
+      if (auditRow && !inCatalog) blockers.push('нет в публичном каталоге');
+      if (auditRow && inCatalog && !onLanding) blockers.push(`не на лендинге ${landingSlug}`);
+      if (auditRow && !ruleMatch.matches) blockers.push(...(ruleMatch.blockers || []));
+
+      const ok = blockers.length === 0;
+      const item = {
+        landingSlug,
+        externalId: String(externalId),
+        eventId,
+        title: auditRow?.title || null,
+        ok,
+        inCatalog,
+        onLanding,
+        futureSessions,
+        landingSlugs: catalogSession?.landingSlugs || [],
+        matchReasons: ruleMatch.reasons || [],
+        blockers: uniqueValues(blockers).slice(0, 10),
+      };
+      items.push(item);
+      if (!ok) issues.push({ ...item, code: 'LANDING_AUDIT_FAIL' });
+    }
+  }
+
+  return {
+    checkedAt,
+    summary: {
+      total: items.length,
+      ok: items.filter((item) => item.ok).length,
+      failed: items.filter((item) => !item.ok).length,
+    },
+    items,
+    issues,
+  };
+}
+
+async function fetchLandingAuditEventRow(db, eventId) {
+  const result = await db.query(
+    `
+      select
+        e.id,
+        e.title,
+        e.status,
+        cat.title as category,
+        city.title as city,
+        venue.title as venue,
+        count(session.id) filter (where session."startsAt" >= now())::int as "futureSessionCount",
+        min(session."startsAt") filter (where session."startsAt" >= now()) as "nextStartsAt",
+        ${orderedEventTagsSql('e.id')} as tags,
+        (
+          select coalesce(array_agg(distinct title), '{}')
+          from (
+            select sc.title
+            from "EventSubcategory" es
+            join "Subcategory" sc on sc.id = es."subcategoryId"
+            where es."eventId" = e.id
+            union
+            select sc.title
+            from "Subcategory" sc
+            where sc.id = e."primarySubcategoryId"
+          ) subcats
+        ) as subcategories
+      from "Event" e
+      left join "Category" cat on cat.id = e."categoryId"
+      left join "City" city on city.id = e."primaryCityId"
+      left join "Venue" venue on venue.id = e."venueId"
+      left join "EventSession" session on session."eventId" = e.id
+      where e.id = $1
+      group by e.id, cat.title, city.title, venue.title
+    `,
+    [eventId],
+  );
+  return result.rows[0] || null;
 }
