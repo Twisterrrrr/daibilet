@@ -15,7 +15,7 @@ let publicCatalogCache = null;
 let publicEventRowsBuildPromise = null;
 let publicCatalogBuildPromise = null;
 
-const LANDING_RULES = [
+export const LANDING_RULES = [
   {
     slug: 'river-walks',
     title: 'Речные прогулки',
@@ -4473,7 +4473,7 @@ async function publicCatalogSessionsFast(db) {
   return result.rows.map(mapGroupedPublicSession);
 }
 
-function mapGroupedPublicSession(row) {
+export function mapGroupedPublicSession(row) {
   const tags = row.tags || [];
   const destination = publicDestinationForCity(row);
   const fallbackWidgetUrl = buildProviderWidgetUrl(row);

@@ -56,6 +56,7 @@ const jsonCache = new Map();
 const PUBLIC_RESPONSE_CACHE_MS = 5 * 60 * 1000;
 const MAX_PUBLIC_RESPONSE_CACHE_ENTRIES = 80;
 const publicResponseCache = new Map();
+const publicCacheInvalidators = new Set();
 
 function loadRootEnv(projectRoot) {
   try {
@@ -388,7 +389,19 @@ function warmPublicCaches(reason) {
 export function invalidatePublicCaches(reason, options = {}) {
   publicResponseCache.clear();
   clearPublicDataCaches();
+  for (const invalidator of publicCacheInvalidators) {
+    try {
+      invalidator(reason, options);
+    } catch (error) {
+      console.warn(`Public cache invalidator failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
   if (options.warm) warmPublicCaches(reason);
+}
+
+export function registerPublicCacheInvalidator(invalidator) {
+  publicCacheInvalidators.add(invalidator);
+  return () => publicCacheInvalidators.delete(invalidator);
 }
 
 async function readJson(relativePath) {

@@ -398,3 +398,15 @@ Follow-up: добавлены `routing.ts` и `validation.ts` как bridge дл
 
 Следующий контрольный шаг: небольшой read-helper/repository для provider identity и первый DTO-slice, где уйдет ручной join/эвристика source id.
 
+#### First Prisma public catalog DTO, 2026-06-30
+
+Статус: принято как opt-in read path, production default не переключен.
+
+Что сделано: добавлены typed `provider-links.repository.ts`, `public-catalog.dto.ts` и route handler для `GET /api/public/events`. Prisma SQL выбирает EVENT identity через `ProviderLink` с compatibility fallback на `EventSourceLink`; фильтры, facets, сортировка, pagination и cache вынесены в TypeScript. Включение только через `DAIBILET_TS_PUBLIC_CATALOG=1` в TS entrypoint.
+
+Проверка: backend typecheck прошел. `backend:catalog:parity` сравнил legacy и Prisma DTO для time, price/maxPrice, category и search: total, первые ids и facets совпали. HTTP parity дал одинаковые 324 карточки и первые ids; cold Prisma path около 2.0-2.2 s, warm 4-7 ms. Provider identity helper вернул реальный Teplohod OFFER `ticket.id=3850`, parent event `370`. Cache smoke подтвердил listener: warm catalog 6 ms, после `GET /api/public/home?refresh=1` следующий catalog снова cold около 2.0 s.
+
+Менторская оценка: граница выбрана правильно - Prisma взял read-model, а API shape не изменился. Важное исправление: zod schema теперь принимает фактический UI-параметр `maxPrice`. Cache invalidation объединен через listener в `server.js`: sync и ручные правки сбрасывают оба read path. Флаг остается выключенным по умолчанию для контролируемого rollout, а не из-за stale-data риска.
+
+Следующий контрольный шаг: включить Prisma catalog по умолчанию в TS entrypoint после короткого soak, затем вынести legacy mapper/landing rules в typed modules.
+

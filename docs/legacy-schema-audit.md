@@ -241,6 +241,8 @@ DTO после этого станет проще: группировка ост
 - `public-pages.dto.ts`;
 - `readiness.ts`.
 
+Статус 2026-06-30: первый slice создан в `public-catalog.dto.ts`. Prisma read-model использует `ProviderLink` для EVENT identity с fallback на `EventSourceLink`; parity с legacy DTO закреплен отдельным npm-script. Полное удаление legacy catalog path пока не выполнялось.
+
 ### Шаг 5. Next.js public
 
 После стабилизации public DTO:

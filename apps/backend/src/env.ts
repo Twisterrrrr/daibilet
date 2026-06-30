@@ -7,6 +7,7 @@ export const backendEnvSchema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535).default(4000),
   DATABASE_URL: z.string().min(1).optional(),
   DAIBILET_REQUIRE_ADMIN_AUTH: z.string().optional(),
+  DAIBILET_TS_PUBLIC_CATALOG: z.string().optional(),
   ADMIN_EMAIL: z.string().min(1).optional(),
   ADMIN_USER: z.string().min(1).optional(),
   ADMIN_PASSWORD: z.string().optional(),
@@ -70,4 +71,3 @@ export function resolveAdminPasswordHash(
 ): string {
   return env.ADMIN_PASSWORD_SHA256 || env.ADMIN_PASSWORD_HASH || '';
 }
-

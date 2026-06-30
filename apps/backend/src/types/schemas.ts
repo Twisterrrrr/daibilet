@@ -17,6 +17,7 @@ export const paginationQuerySchema = z.object({
 
 export const publicCatalogQuerySchema = paginationQuerySchema.extend({
   q: optionalString,
+  destination: optionalString,
   city: optionalString,
   category: optionalString,
   tag: optionalString,
@@ -26,6 +27,7 @@ export const publicCatalogQuerySchema = paginationQuerySchema.extend({
   to: optionalString,
   sort: z.enum(['time', 'price', 'popular', 'departing_soon', 'price_asc', 'price_desc']).optional(),
   view: z.enum(['cards', 'table']).optional(),
+  maxPrice: z.coerce.number().int().min(0).optional(),
   priceMax: z.coerce.number().int().min(0).optional(),
   refresh: optionalFlag,
 });

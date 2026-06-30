@@ -8,6 +8,7 @@
     "start": "node src/server.js",
     "dev:ts": "tsx src/server-entry.ts",
     "typecheck": "tsc --noEmit",
+    "catalog:parity": "tsx scripts/public-catalog-parity.ts",
     "tep:fixture-bridge": "node ../../scripts/teplohod-fixture-bridge.js"
   },
   "engines": {

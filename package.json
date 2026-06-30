@@ -11,6 +11,7 @@
     "backend:dev": "npm --prefix apps/backend run dev",
     "backend:dev:ts": "npm --prefix apps/backend run dev:ts",
     "backend:typecheck": "npm --prefix apps/backend run typecheck",
+    "backend:catalog:parity": "npm --prefix apps/backend run catalog:parity",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:validate": "npm --prefix packages/db run db:validate",

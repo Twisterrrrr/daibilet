@@ -255,6 +255,20 @@ ProviderLink additive layer, 2026-06-25:
 - `migrate status` показывает 9 миграций и `Database schema is up to date`;
 - smoke теперь проверяет `providerLinks`.
 
+First Prisma public catalog slice, 2026-06-30:
+
+- добавлен `provider-links.repository.ts` для typed lookup внешних identity;
+- добавлен `public-catalog.dto.ts`: Prisma raw read-model + typed filters/facets/sort/pagination/cache;
+- source event identity читается из `ProviderLink`, `EventSourceLink` остается fallback;
+- `public-catalog-handler.ts` подключает новый DTO в TS entrypoint по флагу `DAIBILET_TS_PUBLIC_CATALOG=1`;
+- query schema синхронизирована с public UI: добавлены `maxPrice` и `destination`, `priceMax` оставлен как alias;
+- TS entrypoint регистрирует `clearPublicCatalogDtoCache` через общий `registerPublicCacheInvalidator`, поэтому sync/manual writes сбрасывают legacy и Prisma cache вместе;
+- добавлен `npm run backend:catalog:parity` для сравнения legacy и Prisma DTO;
+- parity прошел для time, price/maxPrice, category и search: total, первые ids и facets совпали;
+- HTTP smoke: cold Prisma path около 2.0-2.2 s, warm path 4-7 ms, 324 сгруппированные карточки.
+
+Флаг пока выключен по умолчанию только для контролируемого rollout и parity-наблюдения. Cache invalidation уже объединен между legacy и Prisma path.
+
 ## Phase 4: validation and tests
 
 Добавить runtime-валидацию на входе:
