@@ -1,50 +1,16 @@
 import { Prisma, prisma } from '../../../packages/db/src/client.ts';
-import { LANDING_RULES, mapGroupedPublicSession } from './dto.js';
+import { findLandingRule } from './landing-rules.js';
+import {
+  mapGroupedPublicSession,
+  type PublicCatalogMappingRow,
+} from './public-catalog.mapper.js';
 import type { PublicCatalogDto, PublicSessionDto } from './types/public.js';
 import type { PublicCatalogQuery } from './types/schemas.js';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
 
-interface PublicCatalogRow {
-  id: string;
-  slug: string;
-  externalId: string | null;
-  sourceCode: string | null;
-  sourceName: string | null;
-  sourceLabel: string;
-  title: string;
-  kind: string;
-  imageUrl: string | null;
-  category: string | null;
-  cityId: string | null;
-  city: string | null;
-  citySlug: string | null;
-  cityIsDestination: boolean | null;
-  regionId: string | null;
-  regionSlug: string | null;
-  regionTitle: string | null;
-  venueId: string | null;
-  venueSlug: string | null;
-  venue: string | null;
-  venueKind: string | null;
-  overrideTitle: string | null;
-  overrideImageUrl: string | null;
-  offerSourceCode: string | null;
-  offerTitle: string | null;
-  offerPriceRub: number | null;
-  offerWidgetUrl: string | null;
-  offerDeeplinkUrl: string | null;
-  startsAt: Date;
-  tags: string[];
-  groupKey: string;
-  groupEventIds: string[];
-  groupedEventsCount: number;
-  sessionCount: number;
-  priceFrom: number;
-  vacant: number | null;
-  upcomingSlots: unknown;
-}
+type PublicCatalogRow = PublicCatalogMappingRow;
 
 interface CatalogCache {
   expiresAt: number;
@@ -135,6 +101,18 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         from "EventSourceLink" link
       ) identity
       order by identity."eventId", identity.priority, identity."updatedAt" desc
+    ),
+    session_identity as (
+      select distinct on (link."sessionId")
+        link."sessionId",
+        link."sourceId",
+        link."externalId" as "providerSessionId",
+        nullif(link."externalParentId", '') as "providerEventId",
+        link."sourceUrl"
+      from "ProviderLink" link
+      where link."entityKind" = 'SESSION'
+        and link."sessionId" is not null
+      order by link."sessionId", link."updatedAt" desc, link.id desc
     ),
     primary_offer as (
       select distinct on (offer."eventId")
@@ -269,20 +247,51 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         count(*)::int as "groupedEventsCount",
         sum(coalesce("slotCount", 0))::int as "sessionCount",
         min("priceFrom")::int as "priceFrom",
-        nullif(sum(coalesce("ticketsVacant", 0)), 0)::int as vacant,
+        nullif(sum(coalesce("ticketsVacant", 0)), 0)::int as vacant
+      from ranked
+      group by "groupKey"
+    ),
+    slot_candidates as (
+      select
+        ranked."groupKey",
+        session.id,
+        session."eventId",
+        session."startsAt",
+        coalesce(session_identity."providerSessionId", session."externalId") as "providerSessionId",
+        coalesce(session_identity."providerEventId", ranked."externalId") as "providerEventId",
+        coalesce(session_source.code, ranked."sourceCode") as "sourceCode",
+        ranked."offerSourceCode",
+        ranked."offerWidgetUrl",
+        ranked."offerDeeplinkUrl",
+        row_number() over (
+          partition by ranked."groupKey"
+          order by session."startsAt" asc, session.id asc
+        ) as "slotRank"
+      from ranked
+      join "EventSession" session on session."eventId" = ranked.id
+      left join session_identity on session_identity."sessionId" = session.id
+      left join "Source" session_source on session_source.id = session_identity."sourceId"
+      where session."startsAt" >= now()
+    ),
+    grouped_slots as (
+      select
+        "groupKey",
+        count(*)::int as "sessionCount",
         jsonb_agg(
           jsonb_build_object(
-            'eventId', id,
+            'id', id,
+            'eventId', "eventId",
             'startsAt', "startsAt",
-            'externalId', "externalId",
+            'providerSessionId', "providerSessionId",
+            'providerEventId', "providerEventId",
             'sourceCode', "sourceCode",
             'offerSourceCode', "offerSourceCode",
             'offerWidgetUrl', "offerWidgetUrl",
             'offerDeeplinkUrl', "offerDeeplinkUrl"
           )
-          order by "startsAt" asc nulls last
-        ) as "upcomingSlots"
-      from ranked
+          order by "startsAt" asc, id asc
+        ) filter (where "slotRank" <= 8) as "upcomingSlots"
+      from slot_candidates
       group by "groupKey"
     )
     select
@@ -319,28 +328,21 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
       grouped."groupKey",
       grouped."groupEventIds",
       grouped."groupedEventsCount",
-      grouped."sessionCount",
+      coalesce(grouped_slots."sessionCount", grouped."sessionCount") as "sessionCount",
       grouped."priceFrom",
       grouped.vacant,
-      grouped."upcomingSlots"
+      coalesce(grouped_slots."upcomingSlots", '[]'::jsonb) as "upcomingSlots"
     from grouped
     join ranked representative
       on representative."groupKey" = grouped."groupKey"
      and representative.rank = 1
+    left join grouped_slots on grouped_slots."groupKey" = grouped."groupKey"
     order by representative."startsAt" asc nulls last, representative.title asc
   `);
 }
 
 function mapPublicCatalogRow(row: PublicCatalogRow): PublicSessionDto {
-  const mapped = mapGroupedPublicSession(row) as PublicSessionDto;
-  return {
-    ...mapped,
-    startsAt: toIsoString(mapped.startsAt),
-    upcomingSlots: (mapped.upcomingSlots || []).map((slot) => ({
-      ...slot,
-      startsAt: toIsoString(slot.startsAt),
-    })),
-  };
+  return mapGroupedPublicSession(row);
 }
 
 function matchesCatalogQuery(session: PublicSessionDto, query: PublicCatalogQuery): boolean {
@@ -383,7 +385,7 @@ function buildCatalogFacets(sessions: PublicSessionDto[]): PublicCatalogDto['fac
       .map(([name, events]) => ({ name, events })),
     landings: countCatalogValues(sessions.flatMap((session) => session.landingSlugs))
       .map(([slug, events]) => {
-        const rule = (LANDING_RULES as Array<{ slug: string; title: string }>).find((item) => item.slug === slug);
+        const rule = findLandingRule(slug);
         return { slug, title: rule?.title || humanizeSlug(slug), events };
       }),
     priceSteps: buildCatalogPriceSteps(sessions),
@@ -474,10 +476,4 @@ function humanizeSlug(slug: string): string {
 function clampNumber(value: number | undefined, min: number, max: number, fallback: number): number {
   if (!Number.isFinite(value)) return fallback;
   return Math.min(max, Math.max(min, Math.trunc(Number(value))));
-}
-
-function toIsoString(value: string | Date): string {
-  if (value instanceof Date) return value.toISOString();
-  const date = new Date(value);
-  return Number.isFinite(date.getTime()) ? date.toISOString() : '';
 }

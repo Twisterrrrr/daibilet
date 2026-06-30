@@ -43,4 +43,26 @@ for (const queryString of cases) {
   console.log(`${queryString}: ${typed.total} items, parity ok`);
 }
 
+const sessionCatalog = await buildPublicCatalogDto(parseSearchParams(
+  publicCatalogQuerySchema,
+  new URLSearchParams('limit=200&sort=time'),
+));
+const sessionIds = [...new Set(
+  sessionCatalog.items.flatMap((item) => item.upcomingSlots || []).map((slot) => slot.id).filter(Boolean),
+)];
+assert.ok(sessionIds.length > 0, 'typed catalog must expose real EventSession ids');
+
+const linkedSessions = await db.query(
+  `
+    select count(*)::int as count
+    from "ProviderLink"
+    where "entityKind" = 'SESSION'
+      and "sessionId" = any($1::text[])
+  `,
+  [sessionIds],
+);
+const linkedSessionCount = Number((linkedSessions.rows[0] as { count?: unknown } | undefined)?.count || 0);
+assert.ok(linkedSessionCount > 0, 'catalog slots must resolve ProviderLink SESSION identities');
+console.log(`SESSION identities: ${linkedSessionCount}/${sessionIds.length} catalog slots linked`);
+
 process.exit(0);

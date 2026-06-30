@@ -269,6 +269,17 @@ First Prisma public catalog slice, 2026-06-30:
 
 Флаг пока выключен по умолчанию только для контролируемого rollout и parity-наблюдения. Cache invalidation уже объединен между legacy и Prisma path.
 
+Provider session identity and typed catalog mapping, 2026-06-30:
+
+- Prisma catalog теперь строит `upcomingSlots` из реальных `EventSession`, а не из representative event rows;
+- для каждого слота читается `ProviderLink` с `entityKind=SESSION`;
+- Ticketscloud получает `externalId` конкретного сеанса, Teplohod получает `externalParentId` события для своего widget contract;
+- `landing-rules.ts` содержит типизированные правила и matcher, `public-catalog.mapper.ts` содержит mapper карточки и provider purchase routing;
+- `public-catalog.dto.ts` больше не импортирует `LANDING_RULES` и `mapGroupedPublicSession` из `dto.js`;
+- legacy-копии пока остаются внутри `dto.js` для прямого Node entrypoint и будут удалены после переключения production runtime на TS build/runner;
+- добавлены 4 unit tests для landing constraints и session identity TC/Teplohod;
+- catalog parity сохранился для time, price/maxPrice, category и search; 941 из 941 слотов проверенной выборки связаны с `ProviderLink SESSION`.
+
 ## Phase 4: validation and tests
 
 Добавить runtime-валидацию на входе:

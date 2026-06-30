@@ -410,3 +410,15 @@ Follow-up: добавлены `routing.ts` и `validation.ts` как bridge дл
 
 Следующий контрольный шаг: включить Prisma catalog по умолчанию в TS entrypoint после короткого soak, затем вынести legacy mapper/landing rules в typed modules.
 
+#### ProviderLink SESSION and typed catalog mapping, 2026-06-30
+
+Статус: принято как второй Prisma catalog slice.
+
+Что сделано: временные слоты каталога теперь строятся из `EventSession` и резолвят provider identity через `ProviderLink SESSION`. Ticketscloud использует session external id, Teplohod - parent event id. Правила лендингов и mapper публичной карточки вынесены в отдельные TypeScript-модули; новый catalog path больше не зависит от mapper/rules монолитного `dto.js`.
+
+Проверка: backend typecheck, 4 unit tests, DB smoke и catalog parity прошли. На живой БД 941 из 941 слотов первых 200 карточек получили `ProviderLink SESSION`; totals, ids и facets совпали с legacy для time, price/maxPrice, category и search.
+
+Менторская оценка: граница стала заметно чище - SQL отвечает за read-model и provider identity, mapper за API shape, landing rules за классификацию. Legacy-копии в `dto.js` допустимы только как временный compatibility layer; удалять их нужно вместе с переключением production runtime, а не отдельным рискованным коммитом.
+
+Следующий контрольный шаг: вынести public event detail на Prisma и использовать те же session identities для расписания и widget payload, затем провести soak и включить TS public catalog по умолчанию.
+
