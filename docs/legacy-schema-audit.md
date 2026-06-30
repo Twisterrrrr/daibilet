@@ -215,6 +215,8 @@ Legacy большой, но его актуальный product contract пря�
 
 Предпочтение: `ProviderLink`, потому что он повторяет удачную foundation-идею и не привязан к одному провайдеру.
 
+Статус 2026-06-25: выбран и реализован `ProviderLink` как additive слой поверх текущей схемы. Он уже поддерживает `EVENT`, `SESSION`, `OFFER`, `VENUE`, а существующие данные backfill'нуты из `EventSourceLink`, `EventSession.externalId`, `EventOffer.payload` и `VenueAlias`.
+
 ### Шаг 3. TC import materializer
 
 Переделать TC импорт так, чтобы:

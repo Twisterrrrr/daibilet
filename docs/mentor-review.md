@@ -386,3 +386,15 @@ Follow-up: добавлены `routing.ts` и `validation.ts` как bridge дл
 
 Следующий контрольный шаг: additive source identity для `Session`/`Offer` (`ProviderLink` как предпочтительный вариант), затем `public-catalog.dto.ts` или `admin-events.dto.ts`.
 
+#### ProviderLink source identity, 2026-06-25
+
+Статус: принято как правильный доменный слой перед упрощением DTO.
+
+Что сделано: добавлена модель `ProviderLink` с `ProviderEntityKind = EVENT | SESSION | OFFER | VENUE`, FK на соответствующую сущность и unique key `(sourceId, entityKind, externalId, externalParentId)`. Старый `EventSourceLink` оставлен для совместимости. Добавлена backfill-миграция из текущих MVP-таблиц.
+
+Проверка: `migrate deploy` применил backfill и корректировку Teplohod offer identity, `migrate status` показывает 9 миграций и актуальную схему. `ProviderLink` содержит 40901 строк: 8761 EVENT, 22976 SESSION, 9111 OFFER, 53 VENUE. Количество OFFER links точно совпадает с активными офферами: TC 8414, Teplohod 697; битых targets нет. `npm run db:validate`, `npm run db:typecheck`, `npm run db:smoke` прошли. Отдельно все 9 миграций успешно развернуты в чистую временную БД, target constraint проверен, smoke-БД удалена.
+
+Менторская оценка: это тот слой, которого не хватало между raw import и DTO. Теперь TC/Teplohod ids можно резолвить на нужном уровне, а не угадывать по `EventSourceLink` и JSON payload. Следующий риск - не начать сразу переписывать весь импорт; правильнее сначала подключить read path/DTO к `ProviderLink`, затем уже материализатор TC.
+
+Следующий контрольный шаг: небольшой read-helper/repository для provider identity и первый DTO-slice, где уйдет ручной join/эвристика source id.
+

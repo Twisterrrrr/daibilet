@@ -13,6 +13,7 @@ npm --prefix packages/db run db:smoke
 The schema intentionally keeps only the MVP contour:
 
 - imported sources and raw records;
+- provider links for source-owned event, session, offer and venue identities;
 - catalog events, sessions, offers;
 - categories, subcategories, tags;
 - cities, regions, venues;
@@ -35,3 +36,5 @@ const events = await prisma.event.count();
 ```
 
 `db:smoke` verifies the client against the live database by reading counts for events, sessions, offers, venues, cities, landings, external orders and tickets.
+
+`ProviderLink` is the additive source identity layer. `EventSourceLink` remains during the migration, but new import/read-model work should prefer `ProviderLink` when it needs to resolve a provider-owned event, session, offer or venue id.

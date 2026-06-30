@@ -109,6 +109,13 @@ enum SyncStatus {
   FAILED
 }
 
+enum ProviderEntityKind {
+  EVENT
+  SESSION
+  OFFER
+  VENUE
+}
+
 model Source {
   id        String   @id @default(cuid())
   code      SourceCode @unique
@@ -120,6 +127,7 @@ model Source {
   syncRuns SourceSyncRun[]
   rawRecords RawImportRecord[]
   eventLinks EventSourceLink[]
+  providerLinks ProviderLink[]
   orderLinks ExternalOrder[]
 }
 
@@ -182,6 +190,7 @@ model Event {
   sessions      EventSession[]
   offers        EventOffer[]
   sourceLinks   EventSourceLink[]
+  providerLinks ProviderLink[]
   subcategories EventSubcategory[]
   tags          EventTag[]
   qualityIssues QualityIssue[]
@@ -242,6 +251,7 @@ model EventSession {
   externalId   String?
 
   event Event @relation(fields: [eventId], references: [id])
+  providerLinks ProviderLink[]
 
   @@index([eventId, startsAt])
   @@index([startsAt])
@@ -260,9 +270,40 @@ model EventOffer {
   active      Boolean    @default(true)
 
   event Event @relation(fields: [eventId], references: [id])
+  providerLinks ProviderLink[]
 
   @@index([eventId, active, priceRub])
   @@index([sourceCode])
+}
+
+model ProviderLink {
+  id               String             @id @default(cuid())
+  sourceId         String
+  entityKind       ProviderEntityKind
+  eventId          String?
+  sessionId        String?
+  offerId          String?
+  venueId          String?
+  externalId       String
+  externalParentId String             @default("")
+  sourceUrl        String?
+  rawRecordId      String?
+  payload          Json?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  source  Source        @relation(fields: [sourceId], references: [id])
+  event   Event?        @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  session EventSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  offer   EventOffer?   @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  venue   Venue?        @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceId, entityKind, externalId, externalParentId])
+  @@index([eventId])
+  @@index([sessionId])
+  @@index([offerId])
+  @@index([venueId])
+  @@index([sourceId, entityKind])
 }
 
 model Category {
@@ -372,6 +413,7 @@ model Venue {
   city City? @relation(fields: [cityId], references: [id])
   events Event[]
   aliases VenueAlias[]
+  providerLinks ProviderLink[]
 }
 
 model VenueAlias {

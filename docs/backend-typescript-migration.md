@@ -245,6 +245,16 @@ Prisma bridge, 2026-06-25:
 - добавлены scripts `db:typecheck` и `db:smoke` в root/package db;
 - smoke на живой БД вернул: 8761 events, 22976 sessions, 9111 offers, 248 venues, 59 cities, 5 landings, 13 externalOrders, 0 externalTickets.
 
+ProviderLink additive layer, 2026-06-25:
+
+- добавлен enum `ProviderEntityKind` и модель `ProviderLink` для `EVENT`, `SESSION`, `OFFER`, `VENUE`;
+- старый `EventSourceLink` остается как compatibility layer;
+- добавлены миграции `20260625173000_provider_links` и `20260625174500_provider_links_backfill`;
+- backfill и корректировка Teplohod offer identity заполнили 40901 provider links: 8761 EVENT, 22976 SESSION, 9111 OFFER, 53 VENUE;
+- миграция `20260630113000_provider_offer_identity_fix` закрепила `ticket.id` как внешний id билетной категории Teplohod, а `eventId` как parent id;
+- `migrate status` показывает 9 миграций и `Database schema is up to date`;
+- smoke теперь проверяет `providerLinks`.
+
 ## Phase 4: validation and tests
 
 Добавить runtime-валидацию на входе:
