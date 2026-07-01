@@ -322,6 +322,18 @@ Prisma public city read-model, 2026-07-01:
 
 Остаточный performance-риск: первый typed `/api/public/destinations` ждет холодную сборку общего catalog read-model около 5 секунд. После прогрева city detail строится примерно за 120 ms. Перед включением флага по умолчанию нужно либо прогревать typed catalog при startup, либо материализовать легкий destination summary.
 
+Prisma public venue read-model, 2026-07-01:
+
+- добавлен отдельный `public-venue.dto.ts` для нового каталога `GET /api/public/venues` и существующей страницы `GET /api/public/venues/:slug`;
+- каталог содержит 189 уникальных площадок с реальными сгруппированными public events; временные слоты не увеличивают счетчик площадки;
+- detail сохраняет текущую семантику модерации: `HIDDEN` недоступен, `CANDIDATE` и `NONE` пока открываются, а `pageStatus` явно возвращается клиенту;
+- расписание площадки строится из общего Prisma catalog read-model, related venues читаются отдельным Prisma-запросом по городу;
+- ручные SEO-поля имеют приоритет, для пустых `seoH1`, title, description и canonical path создаются безопасные fallback-значения;
+- route включается независимо через `DAIBILET_TS_PUBLIC_VENUE=1`, venue cache подключен к общему invalidator;
+- venue parity прошел для `CANDIDATE` и простой локации `NONE`; live HTTP smoke подтвердил 189 площадок, detail 33 ms после catalog warmup и warm cache около 7 ms.
+
+Новый backend-каталог площадок готов, но отдельный public route `/venues` еще нужно подключить в React после стабилизации backend read path. До массовой индексации администратор должен перевести готовые страницы из `CANDIDATE` в `PUBLISHED`.
+
 ## Phase 4: validation and tests
 
 Добавить runtime-валидацию на входе:

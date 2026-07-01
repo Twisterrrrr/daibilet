@@ -458,3 +458,15 @@ Follow-up: добавлены `routing.ts` и `validation.ts` как bridge дл
 
 Следующий контрольный шаг: перенести venue catalog/detail отдельным Prisma DTO. После этого сделать один performance-проход по catalog/city/venue startup warmup и только затем переключать public read paths по умолчанию.
 
+#### Prisma public venue read-model, 2026-07-01
+
+Статус: принято как отдельный venue slice с явной границей между локацией и опубликованной страницей.
+
+Что сделано: `public-venue.dto.ts` переносит detail на Prisma и добавляет backend-каталог `/api/public/venues`. Счетчик каталога основан на сгруппированных карточках, а не на сырых слотах. `pageStatus` сохраняется как операционный сигнал; `HIDDEN` закрыт. Для пустых SEO-полей добавлены fallback H1, title, description и canonical. Общий контракт вынесен в `types/public.ts`.
+
+Проверка: 189 уникальных площадок сопоставлены с catalog event counts. Detail parity прошел для `CANDIDATE` и `NONE`, включая sessions, related venues и stats. Typecheck, 7 unit tests, city/catalog parity и HTTP smoke прошли. На площадке с 27 карточками все session ids уникальны; detail 33 ms, warm cache 7 ms после прогрева каталога.
+
+Менторская оценка: блок принят. Хорошо, что backend уже различает состояние страницы и факт существования локации, но не вводит преждевременную жесткую фильтрацию: сейчас в БД нет ни одной `PUBLISHED` площадки. Перед SEO-запуском нужен короткий moderation pass, иначе кандидаты останутся индексируемыми по legacy-поведению.
+
+Следующий контрольный шаг: performance pass для единого Prisma catalog warmup и подключение React-каталога `/venues`. После этого можно включать TS catalog, event, city и venue flags как единый production read stack.
+

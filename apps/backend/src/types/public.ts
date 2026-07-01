@@ -233,6 +233,11 @@ export interface PublicVenuePageDto extends ApiEnvelope {
   };
 }
 
+export interface PublicVenuesDto extends ApiEnvelope {
+  total: number;
+  venues: PublicVenueDto[];
+}
+
 export interface PublicLandingPageDto extends ApiEnvelope {
   landing: PublicLandingDto;
   sessions: PublicSessionDto[];

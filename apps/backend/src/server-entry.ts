@@ -11,6 +11,8 @@ import { buildPublicCityDto, buildPublicDestinationsDto, clearPublicCityDtoCache
 import { createPublicCityRouteHandler } from './public-city-handler.js';
 import { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto.js';
 import { createPublicEventRouteHandler } from './public-event-handler.js';
+import { buildPublicVenueDto, buildPublicVenuesDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
+import { createPublicVenueRouteHandler } from './public-venue-handler.js';
 import {
   db,
   handleRequest,
@@ -27,6 +29,7 @@ registerPublicCacheInvalidator(() => {
   clearPublicCatalogDtoCache();
   clearPublicCityDtoCache();
   clearPublicEventDtoCache();
+  clearPublicVenueDtoCache();
 });
 const server = startServer({
   host,
@@ -46,6 +49,11 @@ const server = startServer({
       createPublicEventRouteHandler({
         enabled: env.DAIBILET_TS_PUBLIC_EVENT === '1',
         buildPublicEvent: buildPublicEventDto,
+      }),
+      createPublicVenueRouteHandler({
+        enabled: env.DAIBILET_TS_PUBLIC_VENUE === '1',
+        buildVenues: buildPublicVenuesDto,
+        buildVenue: buildPublicVenueDto,
       }),
       createAdminOrdersRouteHandler({
         db,
