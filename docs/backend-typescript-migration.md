@@ -310,6 +310,18 @@ Prisma public event detail, 2026-07-01:
 - подборки и лендинги не объединяются: подборка управляет составом карточек, лендинг содержит тематическую выдачу и контентные блоки;
 - блог и внешние отзывы добавляются позже отдельными сущностями, без расширения `Event` универсальными JSON-полями.
 
+Prisma public city read-model, 2026-07-01:
+
+- добавлен `public-city.dto.ts` для `GET /api/public/destinations` и `GET /api/public/cities/:slug`;
+- каталог направлений строится из сгруппированных public events: 22 самостоятельных города и 4 региональных агрегата, всего 26 направлений с двумя и более событиями;
+- небольшие города сохраняют текущий routing в область, включая страницу `Московская область`, а canonical aliases `moscow -> moskva` и `saint-petersburg -> sankt-peterburg` работают на typed route;
+- площадки городской страницы читаются через Prisma отдельно от будущего каталога площадок; их raw event count сохранен для parity с legacy;
+- SEO-поля из `City` имеют приоритет, при их отсутствии DTO строит безопасный title, description и canonical path;
+- route включается независимо через `DAIBILET_TS_PUBLIC_CITY=1`, общий invalidator сбрасывает catalog, event и city caches;
+- city parity совпал с legacy для полного каталога направлений, Москвы и Московской области; live HTTP smoke подтвердил 154 события и 24 площадки Москвы, 2 события и 1 площадку области.
+
+Остаточный performance-риск: первый typed `/api/public/destinations` ждет холодную сборку общего catalog read-model около 5 секунд. После прогрева city detail строится примерно за 120 ms. Перед включением флага по умолчанию нужно либо прогревать typed catalog при startup, либо материализовать легкий destination summary.
+
 ## Phase 4: validation and tests
 
 Добавить runtime-валидацию на входе:

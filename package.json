@@ -14,6 +14,7 @@
     "backend:test:ts": "npm --prefix apps/backend run test:ts",
     "backend:catalog:parity": "npm --prefix apps/backend run catalog:parity",
     "backend:event:parity": "npm --prefix apps/backend run event:parity",
+    "backend:city:parity": "npm --prefix apps/backend run city:parity",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:validate": "npm --prefix packages/db run db:validate",

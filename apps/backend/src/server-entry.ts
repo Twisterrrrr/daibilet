@@ -7,6 +7,8 @@ import { readBackendEnv } from './env.js';
 import { updateAdminEventOverride, updateAdminLandingMatch, upsertAdminOrderTicket } from './dto.js';
 import { buildPublicCatalogDto, clearPublicCatalogDtoCache } from './public-catalog.dto.js';
 import { createPublicCatalogRouteHandler } from './public-catalog-handler.js';
+import { buildPublicCityDto, buildPublicDestinationsDto, clearPublicCityDtoCache } from './public-city.dto.js';
+import { createPublicCityRouteHandler } from './public-city-handler.js';
 import { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto.js';
 import { createPublicEventRouteHandler } from './public-event-handler.js';
 import {
@@ -23,6 +25,7 @@ const host = '127.0.0.1';
 const adminAuth = createAdminAuthConfig(env);
 registerPublicCacheInvalidator(() => {
   clearPublicCatalogDtoCache();
+  clearPublicCityDtoCache();
   clearPublicEventDtoCache();
 });
 const server = startServer({
@@ -34,6 +37,11 @@ const server = startServer({
       createPublicCatalogRouteHandler({
         enabled: env.DAIBILET_TS_PUBLIC_CATALOG === '1',
         buildPublicCatalog: buildPublicCatalogDto,
+      }),
+      createPublicCityRouteHandler({
+        enabled: env.DAIBILET_TS_PUBLIC_CITY === '1',
+        buildDestinations: buildPublicDestinationsDto,
+        buildCity: buildPublicCityDto,
       }),
       createPublicEventRouteHandler({
         enabled: env.DAIBILET_TS_PUBLIC_EVENT === '1',
