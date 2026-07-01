@@ -19,7 +19,7 @@ const landingRules = [
     tags: ["Дворы и парадные", "Экскурсия по парадным", "Экскурсия по коммуналкам", "Экскурсия по дворам", "Интерьерная"],
   },
   {
-    slug: "river-walks",
+    slug: "river-cruises",
     title: "Речные прогулки",
     subtitle: "Теплоходы, катера, реки и каналы",
     chips: ["теплоход", "катер", "причалы"],
@@ -39,6 +39,15 @@ const landingRules = [
     subtitle: "Елки, шоу, концерты и праздничные программы",
     chips: ["декабрь", "детям", "шоу"],
     keywords: ["новогод", "новый год", "елка", "ёлка", "рождество"],
+  },
+  {
+    slug: "salute-9-may",
+    title: "Салют 9 мая",
+    subtitle: "Лучшие точки обзора и экскурсии к Дню Победы",
+    chips: ["9 мая", "салют", "праздник"],
+    keywords: ["салют", "фейерверк", "день победы", "праздничн", "побед"],
+    requiredAnyKeywords: ["салют", "фейерверк"],
+    excludeKeywords: ["новогод", "ёлка", "елка", "рождеств"],
   },
   {
     slug: "standup",
@@ -64,7 +73,7 @@ const landingRules = [
     keywords: ["ужин", "фуршет", "банкет", "ресторан"],
   },
   {
-    slug: "bus-sightseeing",
+    slug: "bus-tours",
     title: "Автобусные обзорные экскурсии",
     subtitle: "Широкий спрос, пока мало inventory",
     chips: ["автобус", "обзорная", "город"],
@@ -108,7 +117,10 @@ const landings = landingRules.map((rule) => {
   };
 });
 
-const sessions = selectSessions(catalog, 180).map((event) => ({
+const sessions = selectSessions(catalog, 180).map((event) => {
+  const allTags = (event.tags || []).map((tag) => tag.name).filter(Boolean);
+  const category = event.category?.name || "Событие";
+  return {
   id: event.externalId,
   landingSlugs: landingRules.filter((rule) => matchesRule(event, rule)).map((rule) => rule.slug),
   title: cleanTitle(event.title),
@@ -117,8 +129,9 @@ const sessions = selectSessions(catalog, 180).map((event) => ({
   destinationType: getDestination(event.venue?.city?.name).type,
   venue: event.venue?.name || "Не указано",
   venueKind: event.venue?.typeGuess || "other",
-  category: event.category?.name || "Событие",
-  tags: (event.tags || []).map((tag) => tag.name).filter(Boolean).slice(0, 4),
+  category,
+  subcategories: deriveCatalogSubcategories(allTags, category),
+  tags: allTags.slice(0, 4),
   startsAt: event.startsAt,
   dateLabel: formatDate(event.startsAt),
   timeLabel: formatTime(event.startsAt),
@@ -126,7 +139,8 @@ const sessions = selectSessions(catalog, 180).map((event) => ({
   priceFrom: event.priceFrom,
   vacant: event.ticketsAmountVacant,
   imageUrl: event.imageUrl,
-}));
+};
+});
 
 const venues = summary.topVenues.slice(0, 36).map((venue) => ({
   id: venue.id,
@@ -180,24 +194,83 @@ function selectSessions(events, limit) {
     .slice(0, limit);
 }
 
+const SITE_TIME_ZONE = "Europe/Moscow";
+
+function parseSessionStartsAt(value) {
+  if (value instanceof Date) return value;
+  const raw = String(value || "").trim();
+  if (!raw) return new Date(NaN);
+  if (/[zZ]$/.test(raw) || /[+-]\d{2}(:\d{2}|\d{2})$/.test(raw)) {
+    return new Date(raw.replace(/([+-]\d{2})(\d{2})$/, "$1:$2"));
+  }
+  if (/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/.test(raw)) {
+    return new Date(`${raw.replace(" ", "T")}Z`);
+  }
+  return new Date(raw);
+}
+
 function formatDate(value) {
-  const date = new Date(value);
+  const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return "";
-  return new Intl.DateTimeFormat("ru-RU", { day: "numeric", month: "short", weekday: "short" }).format(date);
+  return new Intl.DateTimeFormat("ru-RU", {
+    day: "numeric",
+    month: "short",
+    weekday: "short",
+    timeZone: SITE_TIME_ZONE,
+  }).format(date);
 }
 
 function formatTime(value) {
-  const date = new Date(value);
+  const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return "";
-  return new Intl.DateTimeFormat("ru-RU", { hour: "2-digit", minute: "2-digit" }).format(date);
+  return new Intl.DateTimeFormat("ru-RU", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: SITE_TIME_ZONE,
+  }).format(date);
 }
 
 function timeBucket(value) {
-  const hour = new Date(value).getHours();
+  const date = parseSessionStartsAt(value);
+  if (!Number.isFinite(date.getTime())) return "night";
+  const hour = Number(
+    new Intl.DateTimeFormat("en-GB", {
+      hour: "numeric",
+      hour12: false,
+      timeZone: SITE_TIME_ZONE,
+    })
+      .formatToParts(date)
+      .find((part) => part.type === "hour")?.value ?? 0,
+  );
   if (hour >= 6 && hour < 12) return "morning";
   if (hour >= 12 && hour < 17) return "day";
   if (hour >= 17 && hour < 23) return "evening";
   return "night";
+}
+
+function isUtilityCatalogTag(tag) {
+  const value = String(tag || "").trim();
+  if (!value) return true;
+  const lower = value.toLowerCase();
+  if (/^(wc|туалет|кондиционер|аудиосистема|аудиогид|wi-?fi|бар|кафе|парковка)$/.test(lower)) return true;
+  if (/^\d+\s*(минут|мин\.?|час|часа|часов)\b/i.test(lower)) return true;
+  if (/^(теплоход|катер|яхт|судно|лодк)\s*:/i.test(lower)) return true;
+  if (/^причал\b/i.test(lower)) return true;
+  if (value.length > 42) return true;
+  return false;
+}
+
+function deriveCatalogSubcategories(tags, category) {
+  return tags
+    .filter((tag) => {
+      const lower = String(tag || '').toLowerCase();
+      if (isUtilityCatalogTag(tag)) return false;
+      if (/^(можно|нельзя|разрешено|запрещено)(?:\s|$)/i.test(lower)) return false;
+      if (/коляск|велосипед|животн|сво[ейё]м?\s+алкогол|сво[ейё]й?\s+ед/i.test(lower)) return false;
+      if (/отдельн/i.test(lower) && /столик/i.test(lower)) return false;
+      return tag.toLowerCase() !== String(category || '').toLowerCase();
+    })
+    .slice(0, 3);
 }
 
 function cleanTitle(title) {

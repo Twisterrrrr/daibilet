@@ -2,6 +2,7 @@ import { Prisma, prisma } from '../../../packages/db/src/client.ts';
 import { findLandingRule } from './landing-rules.js';
 import {
   mapGroupedPublicSession,
+  pickCatalogSubcategories,
   type PublicCatalogMappingRow,
 } from './public-catalog.mapper.js';
 import type { PublicCatalogDto, PublicSessionDto } from './types/public.js';
@@ -135,7 +136,9 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         source.name as "sourceName",
         coalesce(source.name, source.code::text, primary_offer."sourceCode"::text, '') as "sourceLabel",
         event.title,
+        event.description,
         event.kind,
+        event."sourceStatus",
         event."imageUrl",
         event."priceFromRub",
         event."ticketsVacant",
@@ -143,6 +146,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         city.id as "cityId",
         city.title as city,
         city.slug as "citySlug",
+        city."heroImageUrl" as "cityHeroImageUrl",
         city."isDestination" as "cityIsDestination",
         region.id as "regionId",
         region.slug as "regionSlug",
@@ -150,8 +154,11 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         venue.id as "venueId",
         venue.slug as "venueSlug",
         venue.title as venue,
+        venue."heroImageUrl" as "venueHeroImageUrl",
         venue.kind as "venueKind",
         override.title as "overrideTitle",
+        override.description as "overrideDescription",
+        override."shortDescription" as "overrideShortDescription",
         override."imageUrl" as "overrideImageUrl",
         primary_offer."sourceCode" as "offerSourceCode",
         primary_offer.title as "offerTitle",
@@ -164,7 +171,37 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
             and session."priceFromRub" >= ${MIN_DISPLAY_PRICE_RUB}
         ) as "sessionPriceFromRub",
         count(distinct session.id) filter (where session."startsAt" >= now())::int as "slotCount",
-        coalesce(array_remove(array_agg(distinct tag.title), null), '{}') as tags
+        (
+          select coalesce(array_agg(title order by priority, title), '{}')
+          from (
+            select distinct ordered_tag.title,
+              case
+                when ordered_tag.title in (
+                  'Речные прогулки', 'Экскурсии', 'Водные экскурсии', 'Автобусные туры',
+                  'Автобусные экскурсии', 'Смотровые площадки', 'Банкеты', 'Разводные мосты', 'Ночные'
+                ) then 1
+                when ordered_tag.title ~* '^(Теплоход|Площадка):' then 2
+                when ordered_tag.title ~ '^\\d+\\s*(минут|мин\\.?|час|часа|часов)\\s*$' then 3
+                else 4
+              end as priority
+            from "EventTag" ordered_event_tag
+            join "Tag" ordered_tag on ordered_tag.id = ordered_event_tag."tagId"
+            where ordered_event_tag."eventId" = event.id
+          ) ordered_tags
+        ) as tags,
+        (
+          select coalesce(array_agg(distinct subcategory_title), '{}')
+          from (
+            select subcategory.title as subcategory_title
+            from "EventSubcategory" event_subcategory
+            join "Subcategory" subcategory on subcategory.id = event_subcategory."subcategoryId"
+            where event_subcategory."eventId" = event.id
+            union
+            select subcategory.title
+            from "Subcategory" subcategory
+            where subcategory.id = event."primarySubcategoryId"
+          ) event_subcategories
+        ) as subcategories
       from "Event" event
       left join "Category" category on category.id = event."categoryId"
       left join "City" city on city.id = event."primaryCityId"
@@ -175,8 +212,6 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
       left join "EventOverride" override on override."eventId" = event.id
       left join "EventSession" session on session."eventId" = event.id
       left join primary_offer on primary_offer."eventId" = event.id
-      left join "EventTag" event_tag on event_tag."eventId" = event.id
-      left join "Tag" tag on tag.id = event_tag."tagId"
       group by
         event.id,
         identity."externalId",
@@ -187,6 +222,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         city.id,
         city.title,
         city.slug,
+        city."heroImageUrl",
         city."isDestination",
         region.id,
         region.slug,
@@ -194,6 +230,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         venue.id,
         venue.slug,
         venue.title,
+        venue."heroImageUrl",
         venue.kind,
         primary_offer."sourceCode",
         primary_offer.title,
@@ -230,14 +267,24 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
           lower(regexp_replace(trim(coalesce("venueId", venue, '')), '\\s+', ' ', 'g'))
         ) as "groupKey"
       from normalized
-      where "startsAt" is not null
-        and "priceFrom" >= ${MIN_DISPLAY_PRICE_RUB}
+      where "priceFrom" >= ${MIN_DISPLAY_PRICE_RUB}
         and "purchaseReady" = true
+        and (
+          "startsAt" is not null
+          or kind = 'OPEN_DATE'
+          or "sourceStatus" = 'open_date'
+          or "sourceCode" = 'TEPLOHOD'
+        )
     ),
     ranked as (
       select
         *,
-        row_number() over (partition by "groupKey" order by "startsAt" asc nulls last, title asc) as rank
+        row_number() over (
+          partition by "groupKey"
+          order by case when kind = 'OPEN_DATE' or "sourceStatus" = 'open_date' then 1 else 0 end desc,
+            "startsAt" asc nulls last,
+            title asc
+        ) as rank
       from saleable
     ),
     grouped as (
@@ -302,12 +349,15 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
       representative."sourceName",
       representative."sourceLabel",
       representative.title,
+      representative.description,
       representative.kind,
+      representative."sourceStatus",
       representative."imageUrl",
       representative.category,
       representative."cityId",
       representative.city,
       representative."citySlug",
+      representative."cityHeroImageUrl",
       representative."cityIsDestination",
       representative."regionId",
       representative."regionSlug",
@@ -315,8 +365,11 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
       representative."venueId",
       representative."venueSlug",
       representative.venue,
+      representative."venueHeroImageUrl",
       representative."venueKind",
       representative."overrideTitle",
+      representative."overrideDescription",
+      representative."overrideShortDescription",
       representative."overrideImageUrl",
       representative."offerSourceCode",
       representative."offerTitle",
@@ -325,6 +378,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
       representative."offerDeeplinkUrl",
       representative."startsAt",
       representative.tags,
+      representative.subcategories,
       grouped."groupKey",
       grouped."groupEventIds",
       grouped."groupedEventsCount",
@@ -353,7 +407,8 @@ function matchesCatalogQuery(session: PublicSessionDto, query: PublicCatalogQuer
     query.category &&
     query.category !== 'all' &&
     session.category !== query.category &&
-    !session.tags.includes(query.category)
+    !session.tags.includes(query.category) &&
+    !(session.subcategories || []).includes(query.category)
   ) return false;
   if (query.tag && query.tag !== 'all' && !session.tags.includes(query.tag)) return false;
   if (query.landing && query.landing !== 'all' && !session.landingSlugs.includes(query.landing)) return false;
@@ -365,7 +420,7 @@ function matchesCatalogQuery(session: PublicSessionDto, query: PublicCatalogQuer
 
   const search = query.q?.trim().toLowerCase();
   if (!search) return true;
-  return [session.title, session.city, session.destination, session.venue, session.category, ...session.tags]
+  return [session.title, session.city, session.destination, session.venue, session.category, ...(session.subcategories || []), ...session.tags]
     .filter(Boolean)
     .join(' ')
     .toLowerCase()
@@ -379,7 +434,7 @@ function buildCatalogFacets(sessions: PublicSessionDto[]): PublicCatalogDto['fac
       .map(([name, events]) => ({ name, events })),
     categories: countCatalogValues(sessions.map((session) => session.category))
       .map(([name, events]) => ({ name, events })),
-    tags: countCatalogValues(sessions.flatMap((session) => session.tags))
+    subcategories: countCatalogValues(sessions.flatMap((session) => pickCatalogSubcategories(session, 8)))
       .filter(([name]) => name.length <= 32)
       .slice(0, 24)
       .map(([name, events]) => ({ name, events })),
@@ -413,8 +468,10 @@ function comparePrice(left: PublicSessionDto, right: PublicSessionDto): number {
 }
 
 function compareSessionTime(left: PublicSessionDto, right: PublicSessionDto): number {
-  const leftTime = new Date(left.startsAt).getTime();
-  const rightTime = new Date(right.startsAt).getTime();
+  const leftOpen = isOpenDateSession(left) && !left.startsAt;
+  const rightOpen = isOpenDateSession(right) && !right.startsAt;
+  const leftTime = leftOpen ? Number.MAX_SAFE_INTEGER - 1 : left.startsAt ? new Date(left.startsAt).getTime() : Number.POSITIVE_INFINITY;
+  const rightTime = rightOpen ? Number.MAX_SAFE_INTEGER - 1 : right.startsAt ? new Date(right.startsAt).getTime() : Number.POSITIVE_INFINITY;
   return leftTime - rightTime || left.title.localeCompare(right.title, 'ru');
 }
 
@@ -438,8 +495,12 @@ function buildCatalogPriceSteps(sessions: PublicSessionDto[]): number[] {
 }
 
 function matchesCatalogDate(session: PublicSessionDto, dateFilter: string): boolean {
+  if (dateFilter === 'all') return true;
+  if (isOpenDateSession(session)) {
+    return dateFilter === 'today' || dateFilter === 'tomorrow' || dateFilter === 'weekend';
+  }
   const startsAt = new Date(session.startsAt);
-  if (!Number.isFinite(startsAt.getTime())) return dateFilter === 'all';
+  if (!Number.isFinite(startsAt.getTime())) return false;
 
   const today = startOfLocalDay(new Date());
   const eventDay = startOfLocalDay(startsAt);
@@ -454,11 +515,16 @@ function matchesCatalogDate(session: PublicSessionDto, dateFilter: string): bool
 
 function matchesDateRange(startsAt: string, from?: string, to?: string): boolean {
   const timestamp = new Date(startsAt).getTime();
-  if (!Number.isFinite(timestamp)) return false;
+  if (!Number.isFinite(timestamp)) return !from && !to;
 
   const fromTime = from ? new Date(from).getTime() : Number.NEGATIVE_INFINITY;
   const toTime = to ? new Date(to).getTime() : Number.POSITIVE_INFINITY;
   return (!Number.isFinite(fromTime) || timestamp >= fromTime) && (!Number.isFinite(toTime) || timestamp <= toTime);
+}
+
+function isOpenDateSession(session: PublicSessionDto): boolean {
+  return String(session.kind || '').toUpperCase() === 'OPEN_DATE' ||
+    String(session.sourceStatus || '').toLowerCase() === 'open_date';
 }
 
 function startOfLocalDay(date: Date): Date {

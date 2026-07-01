@@ -7,7 +7,7 @@ import {
 } from './landing-rules.js';
 
 test('matches a focused river landing and rejects unrelated transport', () => {
-  const river = findLandingRule('river-walks');
+  const river = findLandingRule('river-cruises');
   assert.ok(river);
   assert.equal(matchesLandingRule({
     title: 'Прогулка на теплоходе по Неве',
@@ -37,4 +37,36 @@ test('keeps city and venue landing constraints strict', () => {
       .includes('planetarium'),
     true,
   );
+});
+
+test('applies canonical subcategory rules and Moscow-time schedule', () => {
+  assert.equal(matchingLandingSlugs({
+    title: 'Обзорная экскурсия по городу',
+    subcategories: ['Автобусные экскурсии'],
+    city: 'Москва',
+    venue: 'Туристический автобус',
+  }).includes('bus-tours'), true);
+
+  const nightCandidate = {
+    title: 'Прогулка к разводным мостам',
+    city: 'Санкт-Петербург',
+    tags: ['Разводные мосты'],
+  };
+  assert.equal(matchingLandingSlugs({
+    ...nightCandidate,
+    startsAt: '2026-07-10T19:30:00.000Z',
+  }).includes('bridges-night'), true);
+  assert.equal(matchingLandingSlugs({
+    ...nightCandidate,
+    startsAt: '2026-07-10T12:00:00.000Z',
+  }).includes('bridges-night'), false);
+
+  const busByVenue = matchingLandingSlugs({
+    title: 'Жизнь и чудеса Матроны Московской',
+    category: 'Экскурсии',
+    venue: 'YUTONG 6122',
+    tags: ['Теплоход: YUTONG 6122'],
+  });
+  assert.equal(busByVenue.includes('bus-tours'), true);
+  assert.equal(busByVenue.includes('river-cruises'), false);
 });

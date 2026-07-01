@@ -280,6 +280,19 @@ Provider session identity and typed catalog mapping, 2026-06-30:
 - добавлены 4 unit tests для landing constraints и session identity TC/Teplohod;
 - catalog parity сохранился для time, price/maxPrice, category и search; 941 из 941 слотов проверенной выборки связаны с `ProviderLink SESSION`.
 
+Cursor MVP integration, 2026-07-01:
+
+- объединена ветка `feat/lovable-landings` (`c4f3b4b`) с `backend-ts-foundation`;
+- сохранён полный public refresh: Lovable landings, catalog/cities/search, TC/Teplohod widgets, buyer account и статические страницы;
+- Prisma catalog синхронизирован с новой open-date семантикой: 447 карточек в legacy и TS paths;
+- TS landing rules получили canonical slugs `river-cruises`, `river-party`, `bus-tours`, `salute-9-may`, подкатегорийные сигналы и фильтр ночного расписания;
+- hero stats теперь учитывает open-date события и совпадает с каталогом;
+- buyer auth переведён на HMAC-SHA256, production требует `USER_JWT_SECRET`, credentialed CORS ограничен доменами Дайбилет;
+- применена миграция `20260629150000_site_user`;
+- browser smoke подтвердил главную, каталог, лендинг и login/account без console errors;
+- landing audit учитывает open-date события и проходит 11 из 11 контрольных Teplohod cases;
+- parity: 447 total, 935 из 935 проверенных catalog slots имеют `ProviderLink SESSION`.
+
 ## Phase 4: validation and tests
 
 Добавить runtime-валидацию на входе:

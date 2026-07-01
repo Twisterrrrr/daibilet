@@ -422,3 +422,15 @@ Follow-up: добавлены `routing.ts` и `validation.ts` как bridge дл
 
 Следующий контрольный шаг: вынести public event detail на Prisma и использовать те же session identities для расписания и widget payload, затем провести soak и включить TS public catalog по умолчанию.
 
+#### Cursor MVP integration, 2026-07-01
+
+Статус: принято после ручного объединения и regression smoke.
+
+Что сделано: ветка Cursor `feat/lovable-landings` объединена с TypeScript foundation. Взяты public refresh, Lovable landing templates, города/поиск, buyer account, виджеты TC/Teplohod и исправления Teplohod import. Конфликтующие `dto.js`/`server.js` объединены без потери typed route shell и `ProviderLink` read path.
+
+Дополнительные исправления: TS-каталог получил open-date события и новые landing rules; hero/catalog согласованы на 447 карточках; служебные теги удалены из популярных тем; JWT заменён на HMAC, CORS исправлен для credentialed auth; устранена browser timeout typing ошибка в HeaderSearch.
+
+Проверка: backend typecheck, 6 unit tests, catalog parity, DB validate/typecheck/smoke, public/admin production builds и browser smoke прошли. Landing audit проходит 11 из 11 контрольных Teplohod cases, включая open-date автобусные события. Buyer flow register -> refresh -> me -> logout -> login проверен на локальной БД, тестовые пользователи удалены. Остаточный performance-риск: public bundle около 594 kB minified и требует route-level code splitting после launch-critical backend slices.
+
+Менторская оценка: изменения Cursor учтены без отката архитектуры. Следующий приоритет остаётся прежним: Prisma public event detail и единый session/widget resolver, затем включение TS catalog по умолчанию.
+

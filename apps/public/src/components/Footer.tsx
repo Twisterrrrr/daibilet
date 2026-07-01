@@ -1,6 +1,7 @@
 import { Compass } from 'lucide-react';
 
 import { publicData } from '@/data';
+import { cityHref } from '@/routes';
 
 const catalogLinks = [
   { label: 'Экскурсии', href: '/events?category=Экскурсии' },
@@ -8,16 +9,18 @@ const catalogLinks = [
   { label: 'Мероприятия', href: '/events?category=Мероприятия' },
   { label: 'Активный отдых', href: '/events?category=Активный+отдых' },
   { label: 'Развлечения', href: '/events?category=Развлечения' },
-  { label: 'Речные прогулки', href: '/landings/river-walks' },
-  { label: 'Автобусные экскурсии', href: '/landings/bus-sightseeing' },
+  { label: 'Речные прогулки', href: '/landings/river-cruises' },
+  { label: 'Вечеринки на теплоходе', href: '/landings/river-party' },
+  { label: 'Автобусные экскурсии', href: '/landings/bus-tours' },
+  { label: 'Салют 9 мая', href: '/landings/salute-9-may' },
 ];
 
 const companyLinks = [
-  { label: 'О сервисе', href: '/' },
-  { label: 'Подборки', href: '/#landings' },
+  { label: 'О сервисе', href: '/about' },
+  { label: 'Подборки', href: '/podborki' },
   { label: 'Города', href: '/cities' },
-  { label: 'Мои заказы', href: '/my-orders' },
-  { label: 'Помощь', href: 'mailto:hello@daibilet.ru' },
+  { label: 'Проверить заказ', href: '/my-orders' },
+  { label: 'Помощь', href: '/help' },
 ];
 
 export function Footer() {
@@ -27,7 +30,7 @@ export function Footer() {
     .slice(0, 8)
     .map((city) => ({
       label: city.name,
-      href: city.slug ? `/cities/${city.slug}` : `/#destinations`,
+      href: cityHref(city),
     }));
 
   return (

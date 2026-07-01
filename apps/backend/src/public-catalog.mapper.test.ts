@@ -54,6 +54,19 @@ test('uses ProviderLink SESSION parent identity for a Teplohod slot', () => {
   assert.equal(result.upcomingSlots?.[0]?.purchaseUrl, 'https://teplohod.info/event/14');
 });
 
+test('keeps open-date events saleable without a fake schedule', () => {
+  const result = mapGroupedPublicSession(catalogRow({
+    kind: 'OPEN_DATE',
+    sourceStatus: 'open_date',
+    startsAt: null,
+    upcomingSlots: [],
+  }));
+
+  assert.equal(result.startsAt, '');
+  assert.equal(result.dateLabel, 'Открытая дата');
+  assert.equal(result.timeLabel, 'В виджете');
+});
+
 function catalogRow(overrides: Partial<PublicCatalogMappingRow>): PublicCatalogMappingRow {
   return {
     id: 'event-local-1',
@@ -63,12 +76,15 @@ function catalogRow(overrides: Partial<PublicCatalogMappingRow>): PublicCatalogM
     sourceName: 'Ticketscloud',
     sourceLabel: 'Ticketscloud',
     title: 'Тестовая речная прогулка',
+    description: null,
     kind: 'RECURRING',
+    sourceStatus: null,
     imageUrl: null,
     category: 'Экскурсии',
     cityId: 'city-spb',
     city: 'Санкт-Петербург',
     citySlug: 'sankt-peterburg',
+    cityHeroImageUrl: null,
     cityIsDestination: true,
     regionId: null,
     regionSlug: null,
@@ -76,8 +92,11 @@ function catalogRow(overrides: Partial<PublicCatalogMappingRow>): PublicCatalogM
     venueId: 'venue-1',
     venueSlug: 'prichal-1',
     venue: 'Причал 1',
+    venueHeroImageUrl: null,
     venueKind: 'PIER',
     overrideTitle: null,
+    overrideDescription: null,
+    overrideShortDescription: null,
     overrideImageUrl: null,
     offerSourceCode: 'TICKETSCLOUD',
     offerTitle: null,
@@ -86,6 +105,7 @@ function catalogRow(overrides: Partial<PublicCatalogMappingRow>): PublicCatalogM
     offerDeeplinkUrl: null,
     startsAt: '2026-07-10T12:00:00.000Z',
     tags: ['Водные экскурсии'],
+    subcategories: ['Водные экскурсии'],
     groupKey: 'ticketscloud|test-event|spb|venue-1',
     groupEventIds: ['event-local-1'],
     groupedEventsCount: 1,

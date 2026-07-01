@@ -19,8 +19,8 @@ export function BuyerOrdersPage() {
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    document.title = 'Мои заказы | Дайбилет';
-    upsertMeta('description', 'Проверка заказов и статусов билетов Дайбилет по номеру заказа, email или телефону.');
+    document.title = 'Проверить заказ | Дайбилет';
+    upsertMeta('description', 'Проверка статуса заказа и билета по номеру из письма-подтверждения. Регистрация не требуется.');
   }, []);
 
   React.useEffect(() => {
@@ -71,38 +71,38 @@ export function BuyerOrdersPage() {
     if (section === 'top') window.location.href = '/';
     else if (section === 'events') window.location.href = '/events';
     else if (section === 'cities' || section === 'destinations') window.location.href = '/cities';
-    else if (section === 'landings') window.location.href = '/#landings';
+    else if (section === 'landings') window.location.href = '/podborki';
     else if (section === 'blog') window.location.href = '/blog';
     else window.location.href = `/#${section}`;
   };
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
-      <Header cityLabel="Все города" search="" onSearch={() => undefined} onSection={goSection} />
+      <Header cityLabel="Все города" onSection={goSection} />
       <main>
         <section className="bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950 text-white">
           <div className="container-page py-12 sm:py-16">
             <div className="flex flex-wrap items-center gap-2 text-sm text-primary-100/78">
               <a href="/" className="hover:text-white">Главная</a>
               <span>/</span>
-              <span className="text-white">Мои заказы</span>
+              <span className="text-white">Проверить заказ</span>
             </div>
             <div className="mt-6 grid gap-7 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-end">
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1 text-sm font-semibold text-white/86">
                   <Receipt className="h-4 w-4" />
-                  Покупки и билеты
+                  Статус покупки
                 </div>
-                <h1 className="mt-4 max-w-4xl text-4xl font-extrabold sm:text-5xl">Мои заказы</h1>
+                <h1 className="mt-4 max-w-4xl text-4xl font-extrabold sm:text-5xl">Проверить заказ</h1>
                 <p className="mt-4 max-w-3xl text-base leading-7 text-primary-50/88 sm:text-lg">
-                  Найдите заказ по номеру, email, телефону или номеру билета. Покупка и оплата остаются в билетной системе, а здесь мы показываем полученный статус.
+                  Введите номер заказа из письма после покупки в виджете. Оплата проходит в билетной системе — здесь только статус и билеты.
                 </p>
               </div>
               <div className="rounded-xl bg-white/10 p-5 backdrop-blur-sm">
                 <div className="flex items-start gap-3">
                   <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-200" />
                   <p className="text-sm leading-6 text-white/78">
-                    Без регистрации на MVP: данные ищутся только по введенному идентификатору. Контакты в ответе маскируются.
+                    Регистрация не нужна. Покупка через виджет работает без входа на Дайбилет.
                   </p>
                 </div>
               </div>
@@ -117,7 +117,7 @@ export function BuyerOrdersPage() {
               <input
                 value={lookup}
                 onChange={(event) => setLookup(event.target.value)}
-                placeholder="Номер заказа, email, телефон или билет"
+                placeholder="Номер заказа из письма"
                 className="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-slate-400"
               />
             </label>
@@ -133,14 +133,22 @@ export function BuyerOrdersPage() {
 
           <div className="mt-4 flex flex-wrap gap-3 text-sm text-slate-500">
             <span className="inline-flex items-center gap-1.5">
-              <Mail className="h-4 w-4 text-slate-400" />
-              Подойдет email, указанный при покупке
+              <Ticket className="h-4 w-4 text-slate-400" />
+              Лучше всего — номер заказа из email-подтверждения
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <Ticket className="h-4 w-4 text-slate-400" />
-              Можно искать по номеру заказа или билета
+              <Mail className="h-4 w-4 text-slate-400" />
+              Также можно email или телефон покупателя
             </span>
           </div>
+
+          <p className="mt-4 text-sm text-slate-500">
+            Покупаете часто?{' '}
+            <a href="/login?returnUrl=/account/purchases" className="font-medium text-primary-700 hover:text-primary-800">
+              Войдите
+            </a>
+            , чтобы видеть все заказы на вашем email без повторного поиска.
+          </p>
 
           {error ? <Notice tone="error" title="Не удалось найти заказ" text={error} /> : null}
           {!submittedLookup && !error ? <StartState /> : null}
@@ -172,6 +180,10 @@ export function BuyerOrdersPage() {
       <Footer />
     </div>
   );
+}
+
+export function BuyerOrderCard({ order }: { order: PublicBuyerOrder }) {
+  return <OrderCard order={order} />;
 }
 
 function OrderCard({ order }: { order: PublicBuyerOrder }) {
@@ -264,12 +276,16 @@ function StartState() {
   return (
     <div className="mt-8 rounded-2xl bg-slate-50 p-8 text-center">
       <Receipt className="mx-auto h-10 w-10 text-slate-300" />
-      <h2 className="mt-3 text-xl font-bold text-slate-950">Введите данные заказа</h2>
+      <h2 className="mt-3 text-xl font-bold text-slate-950">Введите номер заказа</h2>
       <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-slate-500">
-        Мы покажем только те заказы, которые уже получены от билетной системы.
+        Код приходит на email после покупки в виджете Ticketscloud или Teplohod. Мы покажем статус, когда заказ синхронизируется с билетной системой.
       </p>
     </div>
   );
+}
+
+export function BuyerOrdersEmptyState({ lookup }: { lookup: string }) {
+  return <EmptyState lookup={lookup} />;
 }
 
 function EmptyState({ lookup }: { lookup: string }) {

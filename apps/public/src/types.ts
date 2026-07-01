@@ -87,6 +87,9 @@ export type PublicSession = {
   purchaseProvider?: 'TICKETSCLOUD' | 'TEPLOHOD' | string | null;
   purchaseUrlSource?: 'offer' | 'fallback' | string | null;
   category: string;
+  kind?: string | null;
+  sourceStatus?: string | null;
+  subcategories?: string[];
   tags: string[];
   startsAt: string;
   dateLabel: string;
@@ -95,6 +98,7 @@ export type PublicSession = {
   priceFrom?: number | null;
   vacant?: number | null;
   imageUrl?: string | null;
+  description?: string | null;
   manualLandingStatus?: string | null;
 };
 
@@ -265,6 +269,7 @@ export type PublicEventPage = {
     description?: string | null;
     purchaseUrl?: string | null;
     kind?: 'offer' | 'session' | 'fallback';
+    sortOrder?: number | null;
   }>;
   related: PublicSession[];
   landings: Array<Pick<PublicLanding, 'slug' | 'title' | 'subtitle' | 'chips'>>;

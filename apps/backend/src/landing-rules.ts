@@ -12,11 +12,16 @@ export interface LandingRule {
   keywordScope?: LandingKeywordScope;
   excludeTags?: string[];
   excludeKeywords?: string[];
+  excludeKeywordFields?: string[];
   requiredAnyTags?: string[];
   requiredAnyKeywords?: string[];
+  requiredAnySubcategories?: string[];
+  requiredAnyVenueKeywords?: string[];
   requiredKeywords?: string[];
   requiredTitleKeywordGroups?: string[][];
   requiredKeywordGroups?: string[][];
+  minStartsAtHour?: number;
+  includeStartsAtHourUntil?: number;
 }
 
 export interface LandingMatchCandidate {
@@ -24,9 +29,12 @@ export interface LandingMatchCandidate {
   category?: string | null;
   sourceCategory?: string | null;
   tags?: string[] | null;
+  subcategories?: string[] | null;
   venue?: string | null;
   city?: string | null;
   destination?: string | null;
+  startsAt?: string | Date | null;
+  upcomingSlots?: Array<{ startsAt?: string | Date | null }> | null;
 }
 
 export interface LandingMatchExplanation {
@@ -47,14 +55,32 @@ interface KeywordMatch {
 
 export const LANDING_RULES: LandingRule[] = [
   {
-    slug: 'river-walks',
+    slug: 'river-cruises',
     title: 'Речные прогулки',
     subtitle: 'Теплоходы, катера, реки и каналы',
     chips: ['теплоход', 'катер', 'причалы'],
-    tags: ['Водные экскурсии', 'Реки и каналы', 'На теплоходе', 'Водная экскурсия', 'На катере', 'Теплоходные экскурсии'],
-    keywords: ['теплоход', 'катер', 'река', 'канал', 'причал'],
+    tags: ['Водные экскурсии', 'Реки и каналы', 'На теплоходе', 'Водная экскурсия', 'На катере', 'Теплоходные экскурсии', 'Речные прогулки'],
+    keywords: ['теплоход', 'катер', 'река', 'речн', 'канал', 'причал', 'прогулк'],
     keywordScope: 'content',
+    requiredAnySubcategories: ['Водные экскурсии', 'Речные прогулки'],
     excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал', 'мастер-класс', 'квест', 'концерт', 'вечеринк', 'дискотек'],
+  },
+  {
+    slug: 'river-party',
+    title: 'Вечеринки и дискотеки на теплоходе',
+    subtitle: 'DJ, живая музыка и ночные речные круизы',
+    chips: ['дискотека', 'DJ', 'вечеринка', 'ночь'],
+    tags: ['Дискотека', 'Живая музыка', 'Вечеринка'],
+    keywords: ['дискотек', 'вечеринк', 'ди-джей', 'dj', 'музыкальн', 'круиз', 'теплоход', 'речн', 'катер', 'нева'],
+    keywordScope: 'content',
+    requiredTitleKeywordGroups: [
+      ['дискотек', 'вечеринк', 'ди-джей', 'dj', 'концерт', 'музыкальн'],
+    ],
+    requiredKeywordGroups: [
+      ['теплоход', 'речн', 'катер', 'корабл', 'яхт', 'причал', 'канал', 'нева', 'круиз'],
+    ],
+    excludeKeywords: ['автобус', 'автобусн', 'пешеход'],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory'],
   },
   {
     slug: 'bridges-night',
@@ -67,6 +93,8 @@ export const LANDING_RULES: LandingRule[] = [
     keywordScope: 'content',
     requiredAnyKeywords: ['мост', 'развод'],
     excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал'],
+    minStartsAtHour: 22,
+    includeStartsAtHourUntil: 6,
   },
   {
     slug: 'new-year',
@@ -93,20 +121,34 @@ export const LANDING_RULES: LandingRule[] = [
     excludeKeywords: ['автобус', 'пешеход', 'мастер-класс'],
   },
   {
-    slug: 'bus-sightseeing',
+    slug: 'salute-9-may',
+    title: 'Салют 9 мая',
+    subtitle: 'Лучшие точки обзора и экскурсии к Дню Победы',
+    chips: ['9 мая', 'салют', 'праздник'],
+    keywords: ['салют', 'фейерверк', 'день победы', 'праздничн', 'побед'],
+    requiredAnyKeywords: ['салют', 'фейерверк'],
+    keywordScope: 'content',
+    excludeKeywords: ['новогод', 'ёлка', 'елка', 'рождеств'],
+  },
+  {
+    slug: 'bus-tours',
     title: 'Автобусные обзорные экскурсии',
     subtitle: 'Городские маршруты и обзорные программы',
     chips: ['автобус', 'обзорная', 'город'],
+    tags: ['Автобусные туры', 'Автобусные экскурсии'],
     keywords: ['автобус', 'автобусн', 'обзорн', 'сити тур', 'city tour'],
+    requiredAnySubcategories: ['Автобусные туры', 'Автобусные экскурсии'],
+    requiredAnyVenueKeywords: ['туристическ', 'yutong', 'city sightseeing', 'hop on', 'hop-off', 'hop off'],
     requiredTitleKeywordGroups: [
       ['обзорн', 'экскурс', 'двухэтажн', 'hop on', 'city tour', 'сити тур'],
     ],
     requiredKeywordGroups: [
-      ['автобус', 'автобусн', 'двухэтажн', 'hop on', 'city tour', 'сити тур'],
+      ['автобус', 'автобусн', 'двухэтажн', 'туристическ', 'yutong', 'hop on', 'city tour', 'сити тур'],
       ['обзорн', 'экскурс', 'hop on', 'city tour', 'сити тур'],
     ],
     excludeTags: ['Водные экскурсии', 'На теплоходе', 'На катере', 'Реки и каналы'],
     excludeKeywords: ['теплоход', 'катер', 'лодк', 'корабл', 'причал', 'река', 'канал', 'нева', 'мост', 'пешеход', 'пешком', 'фест', 'фестиваль'],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory'],
   },
   {
     slug: 'standup',
@@ -130,7 +172,9 @@ export function findLandingRule(slug: string): LandingRule | undefined {
 }
 
 export function matchingLandingSlugs(candidate: LandingMatchCandidate): string[] {
-  return LANDING_RULES.filter((rule) => matchesLandingRule(candidate, rule)).map((rule) => rule.slug);
+  return LANDING_RULES
+    .filter((rule) => matchesLandingRule(candidate, rule) && matchesLandingSchedule(candidate, rule))
+    .map((rule) => rule.slug);
 }
 
 export function matchesLandingRule(candidate: LandingMatchCandidate, rule: LandingRule): boolean {
@@ -144,6 +188,9 @@ export function explainLandingRuleMatch(
   const tags = candidate.tags || [];
   const keywordFields = keywordFieldsForCandidate(candidate, tags, rule.keywordScope || 'full');
   const fullKeywordFields = keywordFieldsForCandidate(candidate, tags, 'full');
+  const excludeKeywordFields = rule.excludeKeywordFields?.length
+    ? fullKeywordFields.filter((field) => rule.excludeKeywordFields?.includes(field.field))
+    : fullKeywordFields;
   const reasons: string[] = [];
   const blockers: string[] = [];
 
@@ -158,8 +205,20 @@ export function explainLandingRuleMatch(
 
   const excludedTag = rule.excludeTags?.find((tag) => tags.includes(tag));
   if (excludedTag) blockers.push(`исключающий тег: ${excludedTag}`);
-  const excludedKeyword = firstKeywordMatch(fullKeywordFields, rule.excludeKeywords || []);
+  const excludedKeyword = firstKeywordMatch(excludeKeywordFields, rule.excludeKeywords || []);
   if (excludedKeyword) blockers.push(`исключающее слово(${excludedKeyword.field}): ${excludedKeyword.keyword}`);
+
+  if (!blockers.length) {
+    const fastMatchReasons = collectFastLandingMatchReasons(candidate, rule, tags);
+    const hasVenueSignal = fastMatchReasons.some((reason) => reason.startsWith('площадка:'));
+    if (fastMatchReasons.length && landingRequiredSignalsSatisfied(rule, keywordFields, hasVenueSignal)) {
+      return {
+        matches: true,
+        reasons: uniqueValues([...reasons, ...fastMatchReasons]).slice(0, 10),
+        blockers: [],
+      };
+    }
+  }
 
   const requiredAnyTag = rule.requiredAnyTags?.find((tag) => tags.includes(tag));
   if (rule.requiredAnyTags?.length) {
@@ -235,18 +294,93 @@ function keywordFieldsForCandidate(
     { field: 'title', value: candidate.title },
     { field: 'category', value: candidate.category },
     { field: 'sourceCategory', value: candidate.sourceCategory },
-    { field: 'tag', value: tags.join(' ') },
+    { field: 'tag', value: landingKeywordTags(tags).join(' ') },
   ];
   if (scope !== 'content') {
     fields.push(
       { field: 'venue', value: candidate.venue },
       { field: 'city', value: candidate.city },
       { field: 'destination', value: candidate.destination },
+      { field: 'subcategory', value: (candidate.subcategories || []).join(' ') },
     );
   }
   return fields
     .filter((item): item is { field: string; value: string } => Boolean(item.value))
     .map((item) => ({ field: item.field, text: item.value.toLowerCase() }));
+}
+
+function collectFastLandingMatchReasons(
+  candidate: LandingMatchCandidate,
+  rule: LandingRule,
+  tags: string[],
+): string[] {
+  const reasons: string[] = [];
+  if (rule.requiredAnySubcategories?.length) {
+    const subcategories = uniqueValues([...(candidate.subcategories || []), ...tags]);
+    const hit = rule.requiredAnySubcategories.find((label) => subcategories.includes(label));
+    if (hit) reasons.push(`подкатегория: ${hit}`);
+  }
+  if (!reasons.length && rule.requiredAnyVenueKeywords?.length) {
+    const venue = [candidate.venue, ...tags].filter(Boolean).join(' ').toLowerCase();
+    const hit = rule.requiredAnyVenueKeywords.find((keyword) => venue.includes(keyword.toLowerCase()));
+    if (hit) reasons.push(`площадка: ${hit}`);
+  }
+  if (!reasons.length && rule.tags?.length) {
+    const hit = rule.tags.find((tag) => tags.includes(tag));
+    if (hit) reasons.push(`тег: ${hit}`);
+  }
+  return reasons;
+}
+
+function landingKeywordTags(tags: string[]): string[] {
+  return tags.filter((tag) => {
+    const value = tag.trim();
+    return Boolean(value) && !/^(Теплоход|Площадка):/i.test(value) &&
+      !/^\d+\s*(минут|мин\.?|час|часа|часов)\s*$/i.test(value);
+  });
+}
+
+function landingRequiredSignalsSatisfied(
+  rule: LandingRule,
+  keywordFields: KeywordField[],
+  allowVenueTitleOverride = false,
+): boolean {
+  if (rule.requiredAnyKeywords?.length && !firstKeywordMatch(keywordFields, rule.requiredAnyKeywords)) return false;
+  const titleFields = keywordFields.filter((field) => field.field === 'title');
+  if (!allowVenueTitleOverride) {
+    for (const group of rule.requiredTitleKeywordGroups || []) {
+      if (!firstKeywordMatch(titleFields, group)) return false;
+    }
+  }
+  for (const group of rule.requiredKeywordGroups || []) {
+    if (!firstKeywordMatch(keywordFields, group)) return false;
+  }
+  return true;
+}
+
+function matchesLandingSchedule(candidate: LandingMatchCandidate, rule: LandingRule): boolean {
+  if (rule.minStartsAtHour == null) return true;
+  const startsAtValues = [
+    ...(candidate.upcomingSlots || []).map((slot) => slot.startsAt),
+    candidate.startsAt,
+  ].filter((value): value is string | Date => Boolean(value));
+  return startsAtValues.some((value) => {
+    const hour = moscowHour(value);
+    if (!Number.isFinite(hour)) return false;
+    if (hour >= Number(rule.minStartsAtHour)) return true;
+    return Number(rule.includeStartsAtHourUntil || 0) > 0 && hour < Number(rule.includeStartsAtHourUntil);
+  });
+}
+
+function moscowHour(value: string | Date): number {
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return Number.NaN;
+  const hourPart = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'Europe/Moscow',
+    hour: 'numeric',
+    hour12: false,
+  }).formatToParts(date).find((part) => part.type === 'hour');
+  return Number(hourPart?.value);
 }
 
 function firstKeywordMatch(fields: KeywordField[], keywords: string[]): KeywordMatch | null {

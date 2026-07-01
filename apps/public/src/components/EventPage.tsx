@@ -1,11 +1,22 @@
 import * as React from 'react';
-import { ArrowLeft, CalendarDays, MapPin, Ticket } from 'lucide-react';
+import { Calendar, ChevronRight, Clock, MapPin, Shield, Users } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { TeplohodWidgetEmbed, getTeplohodWidgetIds } from '@/components/TeplohodWidget';
-import { formatMoney, formatNumber, publicData } from '@/data';
+import {
+  TcSessionSlot,
+  TcWidgetButton,
+  extractTcEventIdFromSession,
+  getTcWidgetIds,
+} from '@/components/TcWidget';
+import { formatStreetAddress } from '@/lib/address';
+import { FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession } from '@/lib/event-card-meta';
+import { formatVacantSeats } from '@/lib/pluralize';
+import { landingPageHref } from '@/lib/landing-slugs';
+import { formatNumber, publicData } from '@/data';
+import { readCachedEventPage, writeCachedEventPage } from '@/lib/event-page-cache';
 import { eventHref, eventSlug } from '@/routes';
 import type { PublicEvent, PublicEventPage, PublicSession } from '@/types';
 
@@ -15,16 +26,25 @@ const API_BASE_URL =
 const MIN_DISPLAY_PRICE_RUB = 100;
 
 export function EventPage({ slug }: { slug: string }) {
-  const [payload, setPayload] = React.useState<PublicEventPage | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [payload, setPayload] = React.useState<PublicEventPage | null>(() => readCachedEventPage(slug));
+  const [isLoading, setIsLoading] = React.useState(() => !readCachedEventPage(slug));
   const [error, setError] = React.useState<string | null>(null);
-  const [query, setQuery] = React.useState('');
 
   React.useEffect(() => {
     let isDisposed = false;
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 12000);
-    setIsLoading(true);
+    const cached = readCachedEventPage(slug);
+
+    if (cached) {
+      setPayload(cached);
+      applyEventMeta(cached.event);
+      replaceOpaqueEventUrl(cached.event);
+      setError(null);
+      setIsLoading(false);
+    } else {
+      setIsLoading(true);
+    }
 
     fetch(`${API_BASE_URL}/api/public/events/${encodeURIComponent(slug)}`, {
       cache: 'no-store',
@@ -37,6 +57,7 @@ export function EventPage({ slug }: { slug: string }) {
       .then((data) => {
         if (!data) throw new Error('event not found');
         if (isDisposed) return;
+        writeCachedEventPage(slug, data);
         setPayload(data);
         applyEventMeta(data.event);
         replaceOpaqueEventUrl(data.event);
@@ -69,7 +90,7 @@ export function EventPage({ slug }: { slug: string }) {
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
-      <Header cityLabel={payload?.event.city || 'Все города'} search={query} onSearch={setQuery} onSection={navigateHome} />
+      <Header cityLabel={payload?.event.city || 'Все города'} onSection={navigateHome} searchCity={payload?.event.city} />
       <main>
         {isLoading ? (
           <section className="container-page py-12">
@@ -84,18 +105,25 @@ export function EventPage({ slug }: { slug: string }) {
         {payload && !error ? (
           <>
             <EventHero payload={payload} />
-            <section className="container-page grid gap-6 py-7 lg:grid-cols-[minmax(0,1fr)_320px]">
-              <div className="min-w-0">
-                <EventDescription event={payload.event} />
-                <TicketPrices payload={payload} />
-                <ScheduleTable payload={payload} />
-                <RelatedEvents payload={payload} />
+            <div className="container-page py-8">
+              <div className="grid gap-8 lg:grid-cols-3">
+                <div className="space-y-8 lg:col-span-2">
+                  <EventDescription event={payload.event} />
+                  <QuickInfo event={payload.event} />
+                  <EventTags event={payload.event} />
+                  <div className="lg:hidden" id="buy-card">
+                    <BuyCard payload={payload} />
+                  </div>
+                  <LandingLinks payload={payload} />
+                </div>
+                <div className="hidden lg:col-span-1 lg:block">
+                  <div className="sticky top-20" id="buy-card-desktop">
+                    <BuyCard payload={payload} />
+                  </div>
+                </div>
               </div>
-              <aside className="grid content-start gap-4">
-                <EventFacts event={payload.event} />
-                <LandingLinks payload={payload} />
-              </aside>
-            </section>
+            </div>
+            <RelatedEventsSection payload={payload} />
           </>
         ) : null}
       </main>
@@ -223,155 +251,585 @@ function EventHero({ payload }: { payload: PublicEventPage }) {
   const { event, stats } = payload;
   const ageLimit = formatAgeLimit(event.ageLimit);
   const price = stats.priceFrom ?? event.priceFrom;
+  const priceLabel = formatPriceRub(price);
+  const [hasImageError, setHasImageError] = React.useState(false);
+  const heroImage = String(event.imageUrl || '').trim();
+  const nextSession = payload.sessions.find((session) => {
+    if (!session.startsAt) return false;
+    const date = new Date(session.startsAt);
+    return !Number.isNaN(date.getTime()) && date > new Date();
+  }) || payload.sessions[0];
 
   return (
-    <section className="border-b border-slate-200 bg-slate-950 text-white">
-      <div className="container-page grid gap-8 py-9 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-end lg:py-12">
-        <div>
-          <button type="button" onClick={() => navigateHome('events')} className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-white/70 hover:text-white">
-            <ArrowLeft className="h-4 w-4" />
-            К каталогу
-          </button>
-          <div className="mb-4 flex flex-wrap gap-2">
-            <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">{event.category}</span>
-            {ageLimit ? <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/80">{ageLimit}</span> : null}
+    <div className="relative">
+      <div className="min-h-[calc(100vh-6rem)] overflow-hidden bg-slate-900 sm:min-h-0 sm:h-80 lg:h-[420px]">
+        {heroImage && !hasImageError ? (
+          <img
+            src={heroImage}
+            alt={event.title}
+            className="absolute inset-0 h-full w-full object-cover object-top opacity-80 lg:object-[center_30%]"
+            loading="eager"
+            decoding="async"
+            onError={() => setHasImageError(true)}
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600 to-primary-900">
+            <span className="text-8xl opacity-30">🎭</span>
           </div>
-          <h1 className="max-w-4xl text-3xl font-bold tracking-tight sm:text-5xl">{event.seoH1 || event.title}</h1>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {event.citySlug ? (
-              <a href={`/cities/${event.citySlug}`} className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm font-semibold text-white/85 transition hover:bg-white/18 hover:text-white">
-                <MapPin className="h-4 w-4" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
+      </div>
+
+      <div className="container-page absolute inset-x-0 bottom-0 pb-6 sm:pb-8">
+        <nav className="mb-3 flex flex-wrap items-center gap-1.5 text-sm text-white/70">
+          <a href="/events" className="transition hover:text-white">
+            Каталог
+          </a>
+          <ChevronRight className="h-3.5 w-3.5" />
+          {event.citySlug ? (
+            <>
+              <a href={`/cities/${event.citySlug}`} className="transition hover:text-white">
                 {eventDestinationLabel(event)}
               </a>
-            ) : null}
-            {event.venueSlug ? (
-              <a href={`/venues/${event.venueSlug}`} className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-sm font-semibold text-white/85 transition hover:bg-white/18 hover:text-white">
-                <CalendarDays className="h-4 w-4" />
-                {event.venue}
-              </a>
+              <ChevronRight className="h-3.5 w-3.5" />
+            </>
+          ) : null}
+          <span className="text-white/90">{event.category}</span>
+        </nav>
+
+        <div className="flex items-end justify-between gap-4">
+          <div className="max-w-3xl">
+            <div className="flex flex-wrap gap-1.5">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                {event.category}
+              </span>
+              {ageLimit ? (
+                <span className="inline-flex items-center rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium text-white/90 backdrop-blur-sm">
+                  {ageLimit}
+                </span>
+              ) : null}
+            </div>
+            <h1 className="mt-2 text-2xl font-bold leading-tight text-white sm:text-3xl lg:text-4xl">
+              {event.seoH1 || event.title}
+            </h1>
+
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-white/80">
+              {ageLimit ? (
+                <span className="flex items-center gap-1.5">
+                  <Users className="h-4 w-4" />
+                  {ageLimit}
+                </span>
+              ) : null}
+              {event.venue ? (
+                <span className="flex items-center gap-1.5">
+                  <MapPin className="h-4 w-4" />
+                  {event.venue}
+                </span>
+              ) : null}
+              {nextSession ? (
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="h-4 w-4" />
+                  {isFlexibleScheduleSession(nextSession) || !nextSession.startsAt
+                    ? 'Ближайший рейс — в виджете'
+                    : `Ближайший: ${[nextSession.dateLabel, nextSession.timeLabel].filter(Boolean).join(', ')}`}
+                </span>
+              ) : null}
+            </div>
+
+            {priceLabel ? (
+              <div className="mt-4 sm:hidden">
+                <HeroBuyButton payload={payload} priceLabel={priceLabel} wide />
+              </div>
             ) : null}
           </div>
-        </div>
-        <div className="rounded-xl bg-white/10 p-4">
-          <div className="text-sm text-white/60">Билеты</div>
-          <div className="mt-1 text-3xl font-bold">{formatMoney(price)}</div>
-          <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
-            <div className="rounded-lg bg-white/10 p-3">
-              <div className="text-xl font-bold">{formatNumber(event.sessionCount || stats.sessions)}</div>
-              <div className="text-white/60">сеансов</div>
+
+          {priceLabel ? (
+            <div className="hidden sm:block">
+              <HeroBuyButton payload={payload} priceLabel={priceLabel} />
             </div>
-            <div className="rounded-lg bg-white/10 p-3">
-              <div className="text-xl font-bold">{stats.vacant == null ? '-' : formatNumber(stats.vacant)}</div>
-              <div className="text-white/60">мест</div>
-            </div>
-          </div>
-          <BuyLink event={event} url={event.purchaseUrl} label="Купить билет" wide mode="embed" />
+          ) : null}
         </div>
       </div>
-    </section>
+    </div>
   );
+}
+
+function HeroBuyButton({
+  payload,
+  priceLabel,
+  wide = false,
+}: {
+  payload: PublicEventPage;
+  priceLabel: string;
+  wide?: boolean;
+}) {
+  const { event, sessions } = payload;
+  const label = `Купить билет — от ${priceLabel}`;
+  const teplohod = getTeplohodWidgetIds(event);
+  const ticketscloud = getTcWidgetIds(event);
+  const primaryOffer = payload.offers.find((offer) => offer.active !== false) || payload.offers[0] || null;
+  const tcEventId = ticketscloud?.tcEventId || extractTcEventIdFromSession(sessions[0] || {}) || null;
+  const purchaseUrl =
+    primaryOffer?.widgetUrl ||
+    primaryOffer?.deeplinkUrl ||
+    event.purchaseUrl ||
+    sessions[0]?.purchaseUrl ||
+    null;
+  const isTcWidget = Boolean(ticketscloud && tcEventId);
+  const isTepWidget = Boolean(teplohod);
+
+  if (isTcWidget && tcEventId) {
+    return <TcWidgetButton tcEventId={tcEventId} purchaseUrl={purchaseUrl} label={label} wide={wide} variant="hero" />;
+  }
+
+  if (isTepWidget) {
+    return (
+      <button
+        type="button"
+        onClick={() => openTeplohodWidget()}
+        className={`inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-base font-semibold text-white shadow-md shadow-amber-700/30 transition hover:bg-amber-600 active:bg-amber-700 sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`}
+      >
+        {label}
+      </button>
+    );
+  }
+
+  if (purchaseUrl) {
+    return (
+      <a
+        href={purchaseUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-base font-semibold text-white shadow-md shadow-amber-700/30 transition hover:bg-amber-600 active:bg-amber-700 sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`}
+      >
+        {label}
+      </a>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={scrollToBuyCard}
+      className={`inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-base font-semibold text-white shadow-md shadow-amber-700/30 transition hover:bg-amber-600 active:bg-amber-700 sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function scrollToBuyCard() {
+  const el = document.getElementById('buy-card') || document.getElementById('buy-card-desktop');
+  el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function openTeplohodWidget() {
+  scrollToBuyCard();
+
+  const tryClick = (attempt = 0) => {
+    const button = document.querySelector<HTMLElement>('#teplohod-widget .ti-tickets-event-tickets-buy');
+    if (button) {
+      button.click();
+      return;
+    }
+    if (attempt < 24) window.setTimeout(() => tryClick(attempt + 1), 150);
+  };
+
+  window.setTimeout(() => tryClick(), 250);
 }
 
 function EventDescription({ event }: { event: PublicEvent }) {
-  const description = cleanDisplayText(event.description);
+  const description = String(event.description || '').trim();
   if (!description) return null;
+  const hasHtml = /<[a-z][\s\S]*>/i.test(description);
+  const textClassName = 'mt-4 max-w-none text-sm leading-7 text-slate-600';
+  const paragraphClassName = 'm-0';
 
   return (
-    <section className="mb-5 rounded-xl bg-white p-5 shadow-[0_10px_30px_rgba(15,23,42,0.07)]">
-      <h2 className="text-lg font-semibold text-slate-950">О событии</h2>
-      <p className="mt-3 whitespace-pre-line text-sm leading-7 text-slate-600">{description}</p>
-    </section>
+    <div>
+      <h2 className="text-lg font-bold text-slate-900">О событии</h2>
+      {hasHtml ? (
+        <div
+          className={`${textClassName} [&_li+li]:mt-2 [&_p+p]:mt-5 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5`}
+          dangerouslySetInnerHTML={{ __html: sanitizeEventHtml(description) }}
+        />
+      ) : (
+        <div className={`${textClassName} space-y-5`}>
+          {splitDescriptionParagraphs(description).map((paragraph, index) => (
+            <p key={index} className={paragraphClassName}>
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 
-function TicketPrices({ payload }: { payload: PublicEventPage }) {
-  const prices = buildTicketPriceRows(payload);
-  if (!prices.length) return null;
+function splitDescriptionParagraphs(text: string): string[] {
+  const normalized = text.replace(/\r\n?/g, '\n').trim();
+  const byBlankLine = normalized
+    .split(/\n\s*\n+/)
+    .map((part) => cleanDisplayText(part))
+    .filter(Boolean);
+  if (byBlankLine.length > 1) return byBlankLine;
+
+  const byLine = normalized
+    .split(/\n+/)
+    .map((part) => cleanDisplayText(part))
+    .filter(Boolean);
+  if (byLine.length > 1) return byLine;
+
+  const single = cleanDisplayText(normalized);
+  return single ? [single] : [];
+}
+
+function QuickInfo({ event }: { event: PublicEvent }) {
+  const rawAddress = event.venueAddress || event.venue;
+  const address = rawAddress ? formatStreetAddress(rawAddress, { city: event.city }) : '';
+  const ageLimit = formatAgeLimit(event.ageLimit);
+  if (!address && !ageLimit) return null;
 
   return (
-    <section className="mb-5 rounded-xl bg-white p-5 shadow-[0_10px_30px_rgba(15,23,42,0.07)]">
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-slate-950">Билеты и цены</h2>
-          <p className="text-sm text-slate-500">Показываем доступные категории от поставщика. Финальная покупка и наличие открываются в виджете.</p>
-        </div>
-        {payload.stats.priceFrom ? <div className="text-sm font-semibold text-primary-700">{formatMoney(payload.stats.priceFrom)}</div> : null}
-      </div>
-      <div className="mt-4 grid gap-2">
-        {prices.map((price) => (
-          <div key={price.key} className="grid gap-3 rounded-lg bg-slate-50 px-3 py-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
-            <div className="min-w-0">
-              <div className="text-sm font-medium text-slate-900">{price.title}</div>
-              <div className="mt-0.5 text-xs leading-5 text-slate-500">
-                {[price.description, price.source].filter(Boolean).join(' · ')}
-              </div>
-            </div>
-            <div className="flex shrink-0 items-center justify-between gap-3 sm:justify-end">
-              <div className="text-sm font-semibold text-slate-950">{formatMoney(price.priceRub)}</div>
-              {price.purchaseUrl ? <BuyLink event={payload.event} url={price.purchaseUrl} label="Выбрать" mode="anchor" /> : null}
+    <>
+      <div className="space-y-2 sm:hidden">
+        {address ? (
+          <div className="flex items-center gap-2 text-sm text-slate-700">
+            <MapPin className="h-4 w-4 text-primary-500" />
+            <div>
+              <span className="text-xs text-slate-500">Адрес</span>
+              <p className="text-sm font-medium text-slate-900">{address}</p>
             </div>
           </div>
-        ))}
+        ) : null}
+        {ageLimit ? (
+          <div className="flex items-center gap-2 text-sm text-slate-700">
+            <Users className="h-4 w-4 text-primary-500" />
+            <div>
+              <span className="text-xs text-slate-500">Возраст</span>
+              <p className="text-sm font-medium text-slate-900">{ageLimit}</p>
+            </div>
+          </div>
+        ) : null}
       </div>
-    </section>
+
+      <div className="hidden gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-3">
+        {address ? (
+          <div className="rounded-xl border border-slate-200 bg-white p-3.5">
+            <MapPin className="h-5 w-5 text-primary-500" />
+            <p className="mt-1.5 text-xs text-slate-500">Адрес</p>
+            <p className="line-clamp-2 text-sm font-medium text-slate-900">{address}</p>
+          </div>
+        ) : null}
+        {event.citySlug ? (
+          <a href={`/cities/${event.citySlug}`} className="rounded-xl border border-slate-200 bg-white p-3.5 transition hover:border-primary-200 hover:bg-primary-50/40">
+            <Clock className="h-5 w-5 text-primary-500" />
+            <p className="mt-1.5 text-xs text-slate-500">Город</p>
+            <p className="text-sm font-medium text-slate-900">{eventDestinationLabel(event)}</p>
+          </a>
+        ) : null}
+        {ageLimit ? (
+          <div className="rounded-xl border border-slate-200 bg-white p-3.5">
+            <Users className="h-5 w-5 text-primary-500" />
+            <p className="mt-1.5 text-xs text-slate-500">Возраст</p>
+            <p className="text-sm font-medium text-slate-900">{ageLimit}</p>
+          </div>
+        ) : null}
+      </div>
+    </>
   );
 }
 
-function buildTicketPriceRows(payload: PublicEventPage) {
+function EventTags({ event }: { event: PublicEvent }) {
+  if (!event.tags.length) return null;
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {event.tags.map((tag) => (
+        <span
+          key={tag}
+          className="rounded-full border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-medium text-slate-600"
+        >
+          {tag}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function BuyCard({ payload }: { payload: PublicEventPage }) {
+  const { event, sessions } = payload;
+  const teplohod = getTeplohodWidgetIds(event);
+  const ticketscloud = getTcWidgetIds(event);
+  const primaryOffer = payload.offers.find((offer) => offer.active !== false) || payload.offers[0] || null;
+  const priceRange = getTicketPriceRange(payload);
+  const ticketCategories = buildGroupedTicketCategories(payload);
+  const visibleSessions = sessions.slice(0, 5);
+  const tcEventId = ticketscloud?.tcEventId || extractTcEventIdFromSession(sessions[0] || {}) || null;
+  const offerSource = primaryOffer?.sourceCode || event.purchaseProvider || event.sourceCode;
+  const purchaseUrl =
+    primaryOffer?.widgetUrl ||
+    primaryOffer?.deeplinkUrl ||
+    event.purchaseUrl ||
+    sessions[0]?.purchaseUrl ||
+    null;
+  const isTcWidget = Boolean(ticketscloud && tcEventId);
+  const isTepWidget = Boolean(teplohod);
+
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/50">
+      {priceRange ? (
+        <div className="flex items-baseline gap-2">
+          <span className="text-3xl font-bold text-slate-900">{formatBuyCardPrice(priceRange)}</span>
+          <span className="text-sm text-slate-400">/ чел.</span>
+        </div>
+      ) : (
+        <p className="text-lg font-semibold text-slate-600">Цена уточняется</p>
+      )}
+
+      {ticketCategories.length > 0 ? (
+        <div className="mt-5">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Категории билетов</h3>
+          <ul className="mt-2.5 space-y-2">
+            {ticketCategories.map((row) => (
+              <li key={row.key}>
+                <div className="flex items-start justify-between gap-3 text-sm">
+                  <div className="min-w-0 flex-1">
+                    <span className="font-medium text-slate-800">{row.name}</span>
+                    {row.description ? (
+                      <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{row.description}</p>
+                    ) : null}
+                  </div>
+                  <span className="shrink-0 font-medium text-slate-900">{formatCategoryPrice(row.minPrice, row.maxPrice)}</span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {visibleSessions.length > 0 ? (
+        <div className="mt-5">
+          <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            <Calendar className="h-3.5 w-3.5" />
+            Ближайшие сеансы
+          </h3>
+          {isTcWidget && !isTepWidget ? (
+            <p className="mt-1 text-[11px] text-slate-400">Нажмите на сеанс для покупки</p>
+          ) : null}
+          <div className="mt-2.5 space-y-1.5">
+            {visibleSessions.map((session) =>
+              isTcWidget && !isTepWidget && tcEventId ? (
+                <TcSessionSlot key={session.id} tcEventId={tcEventId} session={session} />
+              ) : (
+                <StaticSessionRow key={session.id} session={session} />
+              ),
+            )}
+          </div>
+        </div>
+      ) : null}
+
+      <div className="mt-5">
+        {isTepWidget && teplohod ? (
+          <TeplohodWidgetEmbed tepEventId={teplohod.tepEventId} tepWidgetId={teplohod.tepWidgetId} />
+        ) : isTcWidget && tcEventId ? (
+          <TcWidgetButton tcEventId={tcEventId} purchaseUrl={purchaseUrl} label="Купить билет" wide />
+        ) : purchaseUrl ? (
+          <a
+            href={purchaseUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-medium text-white transition hover:bg-primary-700"
+          >
+            Купить билет
+          </a>
+        ) : (
+          <button
+            type="button"
+            disabled
+            className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-slate-200 px-6 py-3.5 text-base font-medium text-slate-400"
+          >
+            Билеты недоступны
+          </button>
+        )}
+      </div>
+
+      <div className="mt-4 flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2">
+        <Shield className="h-4 w-4 text-emerald-500" />
+        <span className="text-xs text-slate-500">
+          Безопасная оплата через{' '}
+          {isTepWidget || String(offerSource || '').toUpperCase().includes('TEPLOHOD')
+            ? 'teplohod.info'
+            : isTcWidget || String(offerSource || '').toUpperCase().includes('TC')
+              ? 'Ticketscloud'
+              : 'Дайбилет'}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function StaticSessionRow({
+  session,
+}: {
+  session: PublicEventPage['sessions'][number];
+}) {
+  const flexibleSchedule = isFlexibleScheduleSession(session);
+  const weekday = session.dateLabel?.split(',')[0]?.trim() || '—';
+
+  return (
+    <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2.5">
+      <div className="flex items-center gap-3">
+        {!flexibleSchedule ? (
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-100 text-xs font-bold text-primary-700">
+            {weekday}
+          </div>
+        ) : null}
+        <div>
+          <p className="text-sm font-medium text-slate-900">
+            {flexibleSchedule ? FLEXIBLE_SCHEDULE_LABEL : session.dateLabel || '—'}
+          </p>
+          {session.timeLabel && !flexibleSchedule ? (
+            <p className="text-xs text-slate-500">{session.timeLabel}</p>
+          ) : null}
+        </div>
+      </div>
+      {typeof session.vacant === 'number' && session.vacant > 0 ? (
+        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-600">{formatVacantSeats(session.vacant)}</span>
+      ) : session.vacant === 0 ? (
+        <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-500">Распродано</span>
+      ) : null}
+    </div>
+  );
+}
+
+function buildGroupedTicketCategories(payload: PublicEventPage) {
+  const preserveWidgetOrder = isTeplohodTicketSource(payload);
+  const order: string[] = [];
+  const groups = new Map<string, { key: string; name: string; description: string | null; minPrice: number; maxPrice: number }>();
+
+  for (const item of collectRawTicketPrices(payload)) {
+    const { name, description } = parseTicketCategory(item);
+    const key = `${name}|${description || ''}`.toLowerCase().replace(/\s+/g, ' ');
+    const existing = groups.get(key);
+    if (!existing) {
+      order.push(key);
+      groups.set(key, { key, name, description, minPrice: item.priceRub, maxPrice: item.priceRub });
+      continue;
+    }
+    existing.minPrice = Math.min(existing.minPrice, item.priceRub);
+    existing.maxPrice = Math.max(existing.maxPrice, item.priceRub);
+  }
+
+  const rows = order.map((key) => groups.get(key)!);
+  if (preserveWidgetOrder) return rows;
+
+  return rows.sort((a, b) => a.minPrice - b.minPrice || a.name.localeCompare(b.name, 'ru'));
+}
+
+function isTeplohodTicketSource(payload: PublicEventPage) {
+  const source = String(
+    payload.event.purchaseProvider || payload.event.sourceCode || payload.offers[0]?.sourceCode || '',
+  ).toUpperCase();
+  return source.includes('TEPLOHOD');
+}
+
+function parseTicketCategory(item: { title: string; description?: string | null; priceRub: number }) {
+  const parts = splitTitlePartsWithoutWeekdays(item.title);
+  const name = parts[0] || 'Билет';
+  const parsedDescription = parts.length > 1 ? parts.slice(1).join(', ') : null;
+  const apiDescription = cleanDisplayText(item.description);
+  const description =
+    parsedDescription || (apiDescription && !isGenericTicketDescription(apiDescription) ? apiDescription : null);
+
+  return { name, description };
+}
+
+function isGenericTicketDescription(value?: string | null) {
+  const text = cleanDisplayText(value).toLowerCase();
+  if (!text) return true;
+  if (text.includes('покупка открывается в виджете')) return true;
+  if (text.includes('уточняется в виджете')) return true;
+  if (text.includes('минимальная доступная цена')) return true;
+  return false;
+}
+
+function collectRawTicketPrices(payload: PublicEventPage) {
   if (Array.isArray(payload.ticketPrices) && payload.ticketPrices.length) {
     return payload.ticketPrices
       .filter((price) => typeof price.priceRub === 'number' && price.priceRub >= MIN_DISPLAY_PRICE_RUB)
       .map((price) => ({
-        key: price.key,
-        title: price.title,
-        priceRub: price.priceRub,
-        source: price.source || null,
-        description: price.description || null,
-        purchaseUrl: price.purchaseUrl || payload.event.purchaseUrl || null,
+        title: cleanDisplayText(price.title) || 'Билет',
+        description: cleanDisplayText(price.description) || null,
+        priceRub: price.priceRub as number,
+        sortOrder: price.sortOrder ?? null,
       }));
   }
 
-  const eventTitle = normalizeTextKey(payload.event.title);
-  const rows = payload.offers
+  const eventTitleKey = cleanDisplayText(payload.event.title).toLowerCase().replace(/\s+/g, ' ');
+  return payload.offers
     .filter((offer) => offer.active !== false && typeof offer.priceRub === 'number' && offer.priceRub >= MIN_DISPLAY_PRICE_RUB)
-    .map((offer) => {
+    .map((offer, index) => {
       const rawTitle = cleanDisplayText(offer.title) || '';
-      const title = normalizeTicketTitle(rawTitle, eventTitle);
-      return {
-        key: `${title}:${offer.priceRub}:${offer.sourceCode}`,
-        title,
-        priceRub: offer.priceRub,
-        source: sourceLabel(offer.sourceCode),
-        description: 'Покупка открывается в виджете билетной системы.',
-        purchaseUrl: offer.widgetUrl || offer.deeplinkUrl || payload.event.purchaseUrl || null,
-      };
+      const titleKey = rawTitle.toLowerCase().replace(/\s+/g, ' ');
+      const title =
+        !titleKey || titleKey === eventTitleKey || titleKey === 'widget' || titleKey.includes('ticketscloud widget')
+          ? 'Билет'
+          : rawTitle;
+      return { title, description: null, priceRub: offer.priceRub as number, sortOrder: index };
     });
-
-  if (!rows.length && payload.stats.priceFrom) {
-    rows.push({
-      key: `fallback:${payload.stats.priceFrom}`,
-      title: 'Билет',
-      priceRub: payload.stats.priceFrom,
-      source: null,
-      description: 'Точная категория билета уточняется в виджете поставщика.',
-      purchaseUrl: payload.event.purchaseUrl || null,
-    });
-  }
-
-  const unique = new Map<string, (typeof rows)[number]>();
-  for (const row of rows) {
-    const key = `${normalizeTextKey(row.title)}:${row.priceRub}`;
-    if (!unique.has(key)) unique.set(key, row);
-  }
-
-  return Array.from(unique.values()).sort((a, b) => (a.priceRub || 0) - (b.priceRub || 0)).slice(0, 8);
 }
 
-function normalizeTicketTitle(rawTitle: string, eventTitleKey: string) {
-  const titleKey = normalizeTextKey(rawTitle);
-  if (!titleKey || titleKey === eventTitleKey) return 'Билет';
-  if (titleKey === 'widget' || titleKey.includes('ticketscloud widget')) return 'Билет';
-  return rawTitle;
+function splitTitlePartsWithoutWeekdays(title: string) {
+  const parts = title.split(',').map((part) => part.trim()).filter(Boolean);
+  const weekdayToken = /^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)$/iu;
+  const weekdayRange = /^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)(?:\s*[,—–\-]\s*(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС))+$/iu;
+
+  while (parts.length > 1) {
+    const last = parts[parts.length - 1];
+    if (weekdayToken.test(last) || weekdayRange.test(last)) {
+      parts.pop();
+      continue;
+    }
+    break;
+  }
+
+  return parts;
+}
+
+function formatCategoryPrice(minPrice: number, maxPrice: number) {
+  if (minPrice === maxPrice) return formatPriceRub(minPrice);
+  return `${formatPriceRub(minPrice)} – ${formatPriceRub(maxPrice)}`;
+}
+
+function getTicketPriceRange(payload: PublicEventPage): { min: number; max: number } | null {
+  const values: number[] = [];
+
+  if (Array.isArray(payload.ticketPrices) && payload.ticketPrices.length) {
+    for (const price of payload.ticketPrices) {
+      if (typeof price.priceRub === 'number' && price.priceRub >= MIN_DISPLAY_PRICE_RUB) values.push(price.priceRub);
+    }
+  } else {
+    for (const offer of payload.offers) {
+      if (offer.active !== false && typeof offer.priceRub === 'number' && offer.priceRub >= MIN_DISPLAY_PRICE_RUB) {
+        values.push(offer.priceRub);
+      }
+    }
+    if (typeof payload.stats.priceFrom === 'number' && payload.stats.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
+      values.push(payload.stats.priceFrom);
+    }
+    if (typeof payload.event.priceFrom === 'number' && payload.event.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
+      values.push(payload.event.priceFrom);
+    }
+  }
+
+  if (!values.length) return null;
+  return { min: Math.min(...values), max: Math.max(...values) };
+}
+
+function formatBuyCardPrice(range: { min: number; max: number }) {
+  if (range.min === range.max) return `от ${formatPriceRub(range.min)}`;
+  return `${formatPriceRub(range.min)} – ${formatPriceRub(range.max)}`;
 }
 
 function sourceLabel(sourceCode?: string | null) {
@@ -386,6 +844,11 @@ function formatAgeLimit(value?: string | null) {
   if (!text) return null;
   if (/^\d+$/.test(text)) return `${text}+`;
   return text;
+}
+
+function formatPriceRub(value?: number | null) {
+  if (!value || value <= 0) return null;
+  return `${formatNumber(Math.round(value))} ₽`;
 }
 
 function eventDestinationLabel(event: PublicEvent) {
@@ -410,96 +873,23 @@ function cleanDisplayText(value?: string | null) {
     .trim();
 }
 
-function normalizeTextKey(value?: string | null) {
-  return cleanDisplayText(value).toLowerCase().replace(/\s+/g, ' ');
-}
-
-function ScheduleTable({ payload }: { payload: PublicEventPage }) {
-  const visibleSessions = payload.sessions.slice(0, 5);
-  const totalSessions = payload.stats.sessions || payload.sessions.length;
-  const hiddenCount = Math.max(0, totalSessions - visibleSessions.length);
-
-  return (
-    <section className="rounded-xl bg-white shadow-[0_10px_30px_rgba(15,23,42,0.07)]">
-      <div className="border-b border-slate-100 p-4">
-        <h2 className="text-lg font-semibold text-slate-950">Ближайшие сеансы</h2>
-        <p className="mt-1 text-sm text-slate-500">Показываем ближайшие пять. Остальные даты и время доступны в виджете билетной системы.</p>
-      </div>
-      <div className="overflow-auto">
-        <table className="w-full min-w-[760px] border-collapse text-sm">
-          <thead>
-            <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase text-slate-500">
-              <th className="px-4 py-3 font-semibold">Дата</th>
-              <th className="px-4 py-3 font-semibold">Время</th>
-              <th className="px-4 py-3 font-semibold">Цена</th>
-              <th className="px-4 py-3 font-semibold">Места</th>
-              <th className="px-4 py-3" />
-            </tr>
-          </thead>
-          <tbody>
-            {visibleSessions.map((session) => (
-              <tr key={session.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
-                <td className="px-4 py-3 font-medium text-slate-950">{session.dateLabel || 'Открытая дата'}</td>
-                <td className="px-4 py-3 text-slate-600">{session.timeLabel || '-'}</td>
-                <td className="px-4 py-3 font-semibold text-slate-950">{formatMoney(session.priceFrom ?? payload.event.priceFrom)}</td>
-                <td className="px-4 py-3 text-slate-600">{session.vacant ?? '-'}</td>
-                <td className="px-4 py-3">
-                  <BuyLink event={payload.event} url={session.purchaseUrl || payload.event.purchaseUrl} label="Купить" mode="anchor" />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        {!payload.sessions.length ? <div className="p-6 text-sm text-slate-500">Расписание пока не загружено.</div> : null}
-        {hiddenCount > 0 ? (
-          <div className="border-t border-slate-100 p-4 text-sm text-slate-500">
-            Еще {formatNumber(hiddenCount)} сеансов доступны после перехода к покупке.
-          </div>
-        ) : null}
-      </div>
-    </section>
-  );
-}
-
-function EventFacts({ event }: { event: PublicEvent }) {
-  return (
-    <section className="rounded-xl bg-white p-4 shadow-[0_10px_30px_rgba(15,23,42,0.07)]">
-      <h3 className="text-sm font-semibold text-slate-950">Где проходит</h3>
-      <div className="mt-3 grid gap-3 text-sm">
-        {event.citySlug ? (
-          <a href={`/cities/${event.citySlug}`} className="flex items-start gap-2 rounded-lg bg-slate-50 p-3 hover:bg-primary-50">
-            <MapPin className="mt-0.5 h-4 w-4 text-primary-600" />
-            <span>
-              {eventDestinationLabel(event)}
-              {event.destinationType === 'region' && event.city ? <span className="block text-xs text-slate-500">{event.city}</span> : null}
-            </span>
-          </a>
-        ) : null}
-        {event.venueSlug ? (
-          <a href={`/venues/${event.venueSlug}`} className="flex items-start gap-2 rounded-lg bg-slate-50 p-3 hover:bg-primary-50">
-            <CalendarDays className="mt-0.5 h-4 w-4 text-primary-600" />
-            <span>{event.venue}{event.venueAddress ? ` · ${event.venueAddress}` : ''}</span>
-          </a>
-        ) : null}
-      </div>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {event.tags.slice(0, 8).map((tag) => (
-          <span key={tag} className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-700">{tag}</span>
-        ))}
-      </div>
-    </section>
-  );
+function sanitizeEventHtml(html: string) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/\son\w+="[^"]*"/gi, '')
+    .replace(/\son\w+='[^']*'/gi, '');
 }
 
 function LandingLinks({ payload }: { payload: PublicEventPage }) {
   if (!payload.landings.length) return null;
 
   return (
-    <section className="rounded-xl bg-white p-4 shadow-[0_10px_30px_rgba(15,23,42,0.07)]">
-      <h3 className="text-sm font-semibold text-slate-950">Подборки</h3>
-      <div className="mt-3 grid gap-3">
+    <section>
+      <h2 className="text-lg font-bold text-slate-900">Подборки</h2>
+      <div className="mt-3 grid gap-3 sm:grid-cols-2">
         {payload.landings.map((landing) => (
-          <a key={landing.slug} href={`/landings/${landing.slug}`} className="rounded-lg bg-slate-50 p-3 transition hover:bg-primary-50/70">
+          <a key={landing.slug} href={landingPageHref(landing.slug)} className="rounded-xl border border-slate-200 bg-white p-3.5 transition hover:border-primary-200 hover:bg-primary-50/40">
             <div className="text-sm font-semibold text-slate-950">{landing.title}</div>
             <div className="mt-1 text-xs text-slate-500">{landing.subtitle}</div>
           </a>
@@ -509,61 +899,20 @@ function LandingLinks({ payload }: { payload: PublicEventPage }) {
   );
 }
 
-function RelatedEvents({ payload }: { payload: PublicEventPage }) {
+function RelatedEventsSection({ payload }: { payload: PublicEventPage }) {
   if (!payload.related.length) return null;
 
   return (
-    <section className="mt-6">
-      <h2 className="text-lg font-semibold text-slate-950">Похожие события</h2>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {payload.related.slice(0, 6).map((event) => (
-          <EventCard key={`${event.id}:${event.startsAt}`} event={event} compact />
-        ))}
+    <section className="border-t border-slate-100 bg-slate-50 py-12">
+      <div className="container-page">
+        <h2 className="text-xl font-bold text-slate-900">Похожие события в {payload.event.city}</h2>
+        <div className="mt-6 grid grid-cols-1 gap-4 min-[361px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+          {payload.related.slice(0, 8).map((event) => (
+            <EventCard key={`${event.id}:${event.startsAt}`} event={event} compact />
+          ))}
+        </div>
       </div>
     </section>
-  );
-}
-
-function BuyLink({
-  event,
-  url,
-  label,
-  wide = false,
-  mode = 'link',
-}: {
-  event?: PublicEvent;
-  url?: string | null;
-  label: string;
-  wide?: boolean;
-  mode?: 'link' | 'anchor' | 'embed';
-}) {
-  const teplohod = event ? getTeplohodWidgetIds(event) : null;
-  if (teplohod && mode === 'embed') {
-    return <TeplohodWidgetEmbed tepEventId={teplohod.tepEventId} tepWidgetId={teplohod.tepWidgetId} />;
-  }
-
-  if (teplohod && mode === 'anchor') {
-    return (
-      <a href="#teplohod-widget" className={`${wide ? 'mt-4 w-full' : ''} inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700`}>
-        <Ticket className="h-4 w-4" />
-        {label}
-      </a>
-    );
-  }
-
-  if (!url) {
-    return (
-      <span className={`mt-4 inline-flex min-h-10 items-center justify-center rounded-lg bg-white/10 px-4 text-sm font-semibold text-white/50 ${wide ? 'w-full' : ''}`}>
-        Нет ссылки
-      </span>
-    );
-  }
-
-  return (
-    <a href={url} target="_blank" rel="noreferrer" className={`${wide ? 'mt-4 w-full' : ''} inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700`}>
-      <Ticket className="h-4 w-4" />
-      {label}
-    </a>
   );
 }
 
@@ -601,6 +950,10 @@ function navigateHome(section: string) {
   }
   if (section === 'blog') {
     window.location.href = '/blog';
+    return;
+  }
+  if (section === 'landings') {
+    window.location.href = '/podborki';
     return;
   }
   window.location.href = section === 'top' ? '/' : `/#${section}`;

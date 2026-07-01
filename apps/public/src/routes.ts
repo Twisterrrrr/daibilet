@@ -1,6 +1,18 @@
 import type { PublicEvent, PublicSession } from '@/types';
 
 type EventRouteSource = Pick<PublicSession, 'id' | 'slug' | 'sourceSlug' | 'title'> | Pick<PublicEvent, 'id' | 'slug' | 'sourceSlug' | 'title'>;
+type CityRouteSource = { slug?: string | null; sourceSlug?: string | null; name: string };
+
+const CITY_SLUG_ALIASES: Record<string, string> = {
+  moskva: 'moscow',
+  msk: 'moscow',
+  spb: 'saint-petersburg',
+  'sankt-peterburg': 'saint-petersburg',
+  'nizhniy-novgorod': 'nizhny-novgorod',
+  'velikiy-novgorod': 'veliky-novgorod',
+  'rostov-na-donu': 'rostov-on-don',
+  rostov: 'rostov-on-don',
+};
 
 const CYRILLIC_MAP: Record<string, string> = {
   а: 'a',
@@ -40,6 +52,21 @@ const CYRILLIC_MAP: Record<string, string> = {
 
 export function eventHref(event: EventRouteSource): string {
   return `/events/${eventSlug(event)}`;
+}
+
+export function citySlug(city: CityRouteSource): string {
+  for (const candidate of [city.slug, city.sourceSlug]) {
+    const normalized = normalizeSlug(candidate);
+    if (normalized && !isOpaqueId(normalized)) return normalized;
+  }
+
+  const fromName = normalizeSlug(city.name);
+  if (!fromName) return 'city';
+  return CITY_SLUG_ALIASES[fromName] || fromName;
+}
+
+export function cityHref(city: CityRouteSource): string {
+  return `/cities/${citySlug(city)}`;
 }
 
 export function eventSlug(event: EventRouteSource): string {

@@ -17,7 +17,10 @@ import { EventCard } from '@/components/EventCard';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { formatMoney, formatNumber } from '@/data';
+import { resolveCityImage } from '@/lib/city-images';
+import { landingPageHref } from '@/lib/landing-slugs';
 import { eventHref } from '@/routes';
+import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
 import type { PublicCity, PublicCityPage, PublicLanding, PublicSession, PublicVenue } from '@/types';
 
 const API_BASE_URL =
@@ -25,50 +28,6 @@ const API_BASE_URL =
   'http://127.0.0.1:4000';
 
 type ViewMode = 'cards' | 'table';
-
-type CityGuide = {
-  brief: string;
-  mustSee: Array<{ name: string; desc: string }>;
-};
-
-const CITY_GUIDES: Record<string, CityGuide> = {
-  'sankt-peterburg': {
-    brief:
-      'Культурная столица России с дворцами, музеями, каналами, разводными мостами и сильной афишей на каждый день. Здесь удобно собрать поездку вокруг прогулки по воде, музея, театра или авторской экскурсии по историческим кварталам.',
-    mustSee: [
-      { name: 'Эрмитаж', desc: 'Главный музейный маршрут города и одна из самых сильных точек для первого знакомства с Петербургом.' },
-      { name: 'Петропавловская крепость', desc: 'Историческое ядро города на Заячьем острове, собор и прогулки с видом на Неву.' },
-      { name: 'Дворцовая площадь', desc: 'Парадный центр Петербурга рядом с Зимним дворцом, аркой Главного штаба и Невским проспектом.' },
-      { name: 'Исаакиевский собор', desc: 'Монументальный собор, колоннада и один из самых узнаваемых видов на центр города.' },
-      { name: 'Спас на Крови', desc: 'Храм с мозаиками и яркой архитектурой у канала Грибоедова.' },
-      { name: 'Петергоф', desc: 'Дворцово-парковый ансамбль с фонтанами, сезонными маршрутами и загородными экскурсиями.' },
-    ],
-  },
-  'saint-petersburg': {
-    brief:
-      'Культурная столица России с дворцами, музеями, каналами, разводными мостами и сильной афишей на каждый день. Здесь удобно собрать поездку вокруг прогулки по воде, музея, театра или авторской экскурсии по историческим кварталам.',
-    mustSee: [
-      { name: 'Эрмитаж', desc: 'Главный музейный маршрут города и одна из самых сильных точек для первого знакомства с Петербургом.' },
-      { name: 'Петропавловская крепость', desc: 'Историческое ядро города на Заячьем острове, собор и прогулки с видом на Неву.' },
-      { name: 'Дворцовая площадь', desc: 'Парадный центр Петербурга рядом с Зимним дворцом, аркой Главного штаба и Невским проспектом.' },
-      { name: 'Исаакиевский собор', desc: 'Монументальный собор, колоннада и один из самых узнаваемых видов на центр города.' },
-      { name: 'Спас на Крови', desc: 'Храм с мозаиками и яркой архитектурой у канала Грибоедова.' },
-      { name: 'Петергоф', desc: 'Дворцово-парковый ансамбль с фонтанами, сезонными маршрутами и загородными экскурсиями.' },
-    ],
-  },
-  moscow: {
-    brief:
-      'Москва собирает в одном городе музеи, театры, прогулки по реке, обзорные маршруты и крупные городские события. Удобнее всего выбирать формат по дате, району и времени начала.',
-    mustSee: [
-      { name: 'Кремль и Красная площадь', desc: 'Главный исторический ансамбль столицы и точка старта для обзорных маршрутов.' },
-      { name: 'Третьяковская галерея', desc: 'Классический музей русского искусства и сильная программа временных выставок.' },
-      { name: 'Большой театр', desc: 'Одна из главных сцен страны для балета, оперы и театральной афиши.' },
-      { name: 'Парк Зарядье', desc: 'Современное городское пространство рядом с Кремлем и набережной.' },
-      { name: 'ВДНХ', desc: 'Большой выставочный и прогулочный комплекс с музеями, павильонами и сезонными событиями.' },
-      { name: 'Москва-Сити', desc: 'Деловой центр со смотровыми площадками и вечерними маршрутами.' },
-    ],
-  },
-};
 
 export function CityPage({ slug }: { slug: string }) {
   const [payload, setPayload] = React.useState<PublicCityPage | null>(null);
@@ -129,7 +88,7 @@ export function CityPage({ slug }: { slug: string }) {
 
   return (
     <div className="min-h-screen bg-white text-slate-900">
-      <Header cityLabel={city?.name || 'Дайбилет'} search="" onSearch={() => undefined} onSection={(section) => navigateHome(section)} />
+      <Header cityLabel={city?.name || 'Дайбилет'} onSection={(section) => navigateHome(section)} searchCity={city?.name} />
 
       <main>
         {isLoading ? <CityLoadingState /> : null}
@@ -147,7 +106,7 @@ export function CityPage({ slug }: { slug: string }) {
 
         {city && payload ? (
           <>
-            <CityHero city={city} stats={payload.stats} categories={categories} guide={guide} />
+            <CityHero city={city} stats={payload.stats} guide={guide} />
             <PopularDirections city={city} landings={payload.landings} categories={categories} />
             <MustSeeSection city={city} guide={guide} categories={categories} venues={payload.venues} />
             <CategoryTiles categories={categories} onSelect={(value) => {
@@ -199,18 +158,37 @@ export function CityPage({ slug }: { slug: string }) {
 function CityHero({
   city,
   stats,
-  categories,
   guide,
 }: {
   city: PublicCity;
   stats: PublicCityPage['stats'];
-  categories: Array<[string, number]>;
-  guide: CityGuide | null;
+  guide: CityInfoEntry | null;
 }) {
+  const [hasImageError, setHasImageError] = React.useState(false);
+  const heroImage = resolveCityImage({
+    slug: city.slug,
+    sourceSlug: city.sourceSlug,
+    name: city.name,
+  });
+  const showImage = Boolean(heroImage && !hasImageError);
   const cityIn = cityInPrepositional(city);
+
   return (
-    <section className="relative overflow-hidden border-b border-primary-950 bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950 text-white">
-      <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-slate-950/30 to-transparent" />
+    <section className="relative min-h-[320px] overflow-hidden border-b border-primary-950 text-white sm:min-h-[380px]">
+      {showImage ? (
+        <div className="absolute inset-0 overflow-hidden">
+          <img
+            src={heroImage || ''}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover object-center lg:object-[center_75%]"
+            onError={() => setHasImageError(true)}
+          />
+        </div>
+      ) : (
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950" />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/50 to-slate-950/25" />
+      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950/55 to-transparent" />
       <div className="container-page relative py-14 sm:py-16">
         <div className="flex items-center gap-2 text-sm text-primary-100/80">
           <button type="button" onClick={() => navigateHome('top')} className="hover:text-white">
@@ -221,7 +199,7 @@ function CityHero({
         </div>
         <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(0,1fr)_330px] lg:items-end">
           <div>
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1 text-sm font-semibold text-white/86 backdrop-blur">
+            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1 text-sm font-semibold text-white/86">
               <MapPin className="h-4 w-4" />
               {city.type === 'region' ? 'Страница направления' : 'Страница города'}
             </div>
@@ -242,8 +220,6 @@ function CityHero({
           <div className="grid grid-cols-2 gap-3">
             <HeroStat label="Событий" value={formatNumber(stats.events)} />
             <HeroStat label="Площадок" value={formatNumber(stats.venues)} />
-            <HeroStat label="Категорий" value={formatNumber(stats.categories || categories.length)} />
-            <HeroStat label="Цена от" value={formatMoney(stats.priceFrom)} />
           </div>
         </div>
       </div>
@@ -285,7 +261,7 @@ function PopularDirections({ city, landings, categories }: { city: PublicCity; l
       key: landing.slug,
       title: landing.title,
       subtitle: landing.subtitle,
-      href: `/landings/${landing.slug}`,
+      href: landingPageHref(landing.slug),
       count: landing.events,
     })),
     ...categories.slice(0, Math.max(0, 6 - landings.length)).map(([name, count]) => ({
@@ -329,7 +305,7 @@ function MustSeeSection({
   venues,
 }: {
   city: PublicCity;
-  guide: CityGuide | null;
+  guide: CityInfoEntry | null;
   categories: Array<[string, number]>;
   venues: PublicVenue[];
 }) {
@@ -633,7 +609,7 @@ function CityGuideAside({
           <h3 className="text-sm font-semibold text-slate-950">Подборки</h3>
           <div className="mt-3 grid gap-3">
             {landings.slice(0, 6).map((landing) => (
-              <a key={landing.slug} href={`/landings/${landing.slug}`} className="rounded-lg bg-slate-50 p-3 transition hover:bg-primary-50/70">
+              <a key={landing.slug} href={landingPageHref(landing.slug)} className="rounded-lg bg-slate-50 p-3 transition hover:bg-primary-50/70">
                 <div className="text-sm font-semibold text-slate-950">{landing.title}</div>
                 <div className="mt-1 text-xs text-slate-500">{formatNumber(landing.events)} событий · {formatMoney(landing.priceFrom)}</div>
               </a>
@@ -656,7 +632,7 @@ function HubFact({ label, value }: { label: string; value: string }) {
 
 function HeroStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg bg-white/12 p-4 backdrop-blur">
+    <div className="rounded-lg bg-white/12 p-4">
       <div className="text-xs font-medium uppercase text-white/60">{label}</div>
       <div className="mt-1 text-xl font-bold text-white">{value}</div>
     </div>
@@ -684,7 +660,7 @@ function EmptyState() {
 }
 
 function cityGuideFor(city: PublicCity) {
-  return CITY_GUIDES[city.slug] || (city.sourceSlug ? CITY_GUIDES[city.sourceSlug] : null) || null;
+  return resolveCityInfo(city.slug, city.sourceSlug);
 }
 
 function buildFallbackMustSee(city: PublicCity, categories: Array<[string, number]>, venues: PublicVenue[]) {
@@ -785,6 +761,10 @@ function navigateHome(section: string) {
   }
   if (section === 'blog') {
     window.location.href = '/blog';
+    return;
+  }
+  if (section === 'landings') {
+    window.location.href = '/podborki';
     return;
   }
   window.location.href = `/#${section}`;

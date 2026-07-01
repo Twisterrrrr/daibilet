@@ -26,12 +26,15 @@ export interface PublicCatalogMappingRow {
   sourceName: string | null;
   sourceLabel: string;
   title: string;
+  description: string | null;
   kind: string;
+  sourceStatus: string | null;
   imageUrl: string | null;
   category: string | null;
   cityId: string | null;
   city: string | null;
   citySlug: string | null;
+  cityHeroImageUrl: string | null;
   cityIsDestination: boolean | null;
   regionId: string | null;
   regionSlug: string | null;
@@ -39,16 +42,20 @@ export interface PublicCatalogMappingRow {
   venueId: string | null;
   venueSlug: string | null;
   venue: string | null;
+  venueHeroImageUrl: string | null;
   venueKind: string | null;
   overrideTitle: string | null;
+  overrideDescription: string | null;
+  overrideShortDescription: string | null;
   overrideImageUrl: string | null;
   offerSourceCode: string | null;
   offerTitle: string | null;
   offerPriceRub: number | null;
   offerWidgetUrl: string | null;
   offerDeeplinkUrl: string | null;
-  startsAt: string | Date;
+  startsAt: string | Date | null;
   tags: string[];
+  subcategories: string[];
   groupKey: string;
   groupEventIds: string[];
   groupedEventsCount: number;
@@ -83,10 +90,32 @@ const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
 const cityRouting = loadCityRouting();
 const standaloneCityNames = new Set(cityRouting.standaloneCities || []);
 const cityToRegion = new Map(Object.entries(cityRouting.cityToRegion || {}));
+const cityImageAliases: Record<string, string> = {
+  moskva: 'moscow',
+  'sankt-peterburg': 'saint-petersburg',
+  'nizhniy-novgorod': 'nizhny-novgorod',
+  'velikiy-novgorod': 'veliky-novgorod',
+};
+const cityImageSlugs = new Set([
+  'saint-petersburg', 'moscow', 'kazan', 'kaliningrad', 'vladivostok', 'vologda', 'irkutsk',
+  'perm', 'samara', 'sochi', 'ekaterinburg', 'nizhny-novgorod', 'novosibirsk', 'krasnodar',
+  'suzdal', 'veliky-novgorod', 'voronezh', 'yaroslavl', 'krasnoyarsk', 'omsk',
+]);
+const knownSessionCities = [
+  'Нижний Новгород', 'Санкт-Петербург', 'Ростов-на-Дону', 'Екатеринбург', 'Красноярск',
+  'Новосибирск', 'Калининград', 'Москва', 'Казань', 'Самара', 'Волгоград', 'Ярославль',
+  'Владимир', 'Пермь', 'Тверь', 'Сочи', 'Тула',
+].sort((left, right) => right.length - left.length);
 
 export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSessionDto {
   const tags = row.tags || [];
-  const destination = publicDestinationForCity(row);
+  const subcategories = pickCatalogSubcategories({
+    category: row.category,
+    subcategories: row.subcategories,
+    tags,
+  });
+  const cityName = resolvePublicSessionCity(row);
+  const destination = publicDestinationForCity({ ...row, city: cityName });
   const fallbackWidgetUrl = buildProviderWidgetUrl(row);
   const purchase = purchaseInfo(row);
   const purchaseUrl = purchase.url || fallbackWidgetUrl;
@@ -118,7 +147,8 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
       };
     });
 
-  const startsAt = toIsoString(row.startsAt);
+  const openDate = isOpenDateCatalogRow(row);
+  const startsAt = openDate || !row.startsAt ? '' : toIsoString(row.startsAt);
   const session: PublicSessionDto = {
     id: row.id,
     slug: publicSlug(row.slug),
@@ -133,7 +163,7 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
     cityId: row.cityId,
     citySlug: destination.slug,
     sourceCitySlug: row.citySlug,
-    city: row.city || 'Не указан',
+    city: cityName,
     destination: destination.name,
     destinationType: destination.type,
     venueId: row.venueId,
@@ -150,26 +180,81 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
     purchaseProvider: purchase.provider,
     purchaseUrlSource: purchase.urlSource,
     category: row.category || 'unknown',
+    subcategories,
     tags: tags.slice(0, 4),
+    kind: row.kind || null,
+    sourceStatus: row.sourceStatus || null,
+    description: cleanImportedDescription(row.overrideDescription || row.description || row.overrideShortDescription),
     startsAt,
-    dateLabel: formatDate(startsAt),
-    timeLabel: formatTime(startsAt),
-    timeBucket: timeBucket(startsAt),
+    dateLabel: openDate ? 'Открытая дата' : formatDate(startsAt),
+    timeLabel: openDate ? 'В виджете' : formatTime(startsAt),
+    timeBucket: openDate ? 'day' : timeBucket(startsAt),
     priceFrom: row.priceFrom,
     vacant: row.vacant,
-    imageUrl: row.overrideImageUrl || row.imageUrl,
+    imageUrl: resolvePublicSessionImageUrl(row),
   };
 
   session.landingSlugs = matchingLandingSlugs({
     title: session.title,
     category: session.category,
     sourceCategory: session.category,
-    tags: session.tags,
+    tags,
+    subcategories,
     venue: session.venue,
     city: session.city,
     destination: session.destination,
+    startsAt: session.startsAt,
+    upcomingSlots,
   });
   return session;
+}
+
+export function pickCatalogSubcategories(
+  session: { category?: string | null; sourceCategory?: string | null; subcategories?: string[]; tags?: string[] },
+  limit = 4,
+): string[] {
+  const category = session.category || session.sourceCategory || '';
+  const labels: string[] = [];
+  const seen = new Set<string>();
+  for (const label of [...(session.subcategories || []), ...(session.tags || [])]) {
+    const value = String(label || '').trim();
+    if (!isCatalogSubcategoryLabel(value, category) || seen.has(value)) continue;
+    seen.add(value);
+    labels.push(value);
+    if (labels.length >= limit) break;
+  }
+  return labels;
+}
+
+function isCatalogSubcategoryLabel(label: string, category: string): boolean {
+  if (!label || isUtilityCatalogTag(label) || isVenuePolicyCatalogTag(label) || isAmenityCatalogTag(label)) return false;
+  return !category || label.toLowerCase() !== category.toLowerCase();
+}
+
+function isUtilityCatalogTag(tag: string): boolean {
+  const value = tag.trim();
+  const lower = value.toLowerCase();
+  if (!value) return true;
+  if (/^(wc|туалет|кондиционер|аудиосистема|аудиогид|wi-?fi|бар|кафе|кафе-бар|парковка|гардероб|кондиционирование)$/i.test(lower)) return true;
+  if (/^\d+\s*(минут|мин\.?|час|часа|часов)\s*$/i.test(lower)) return true;
+  if (/^(теплоход|катер|яхт|судно|лодк)\s*:/i.test(lower)) return true;
+  if (/^площадка\s*:/i.test(lower) || /^причал\b/i.test(lower)) return true;
+  return value.length > 42;
+}
+
+function isVenuePolicyCatalogTag(tag: string): boolean {
+  const lower = tag.trim().toLowerCase();
+  if (!lower) return true;
+  if (/^(можно|нельзя|разрешено|запрещено)(?:\s|$)/i.test(lower)) return true;
+  return (/отдельн/i.test(lower) && /столик/i.test(lower)) ||
+    /коляск|велосипед|животн|сво[ейё]м?\s+алкогол|сво[ейё]й?\s+ед/i.test(lower);
+}
+
+function isAmenityCatalogTag(tag: string): boolean {
+  const lower = tag.trim().toLowerCase();
+  if (!lower) return false;
+  return /^(ресторан[-\s]?бар|отопление|экскурсовод|аудиогид)$/i.test(lower) ||
+    /тё?плые?\s+плед|^панорамн|детск(ие|ая)\s+стуль|^с\s+(обедом|ужином|питанием)|^ледовый\s+класс/i.test(lower);
 }
 
 function loadCityRouting(): CityRoutingConfig {
@@ -215,6 +300,49 @@ function publicDestinationForCity(row: PublicCatalogMappingRow): PublicDestinati
     name: cityName,
     type: 'city',
   };
+}
+
+function resolvePublicSessionCity(row: PublicCatalogMappingRow): string {
+  const city = cleanDisplayName(row.city);
+  if (city && city !== 'Не указан') return city;
+  const haystack = [row.title, row.venue, ...(row.tags || [])].filter(Boolean).join(' ').toLowerCase();
+  for (const candidate of knownSessionCities) {
+    const normalized = candidate.toLowerCase();
+    if (haystack.includes(normalized) || haystack.includes(cityNameStem(candidate))) return candidate;
+  }
+  return city || 'Не указан';
+}
+
+function cityNameStem(city: string): string {
+  const compact = city.toLowerCase().replace(/[^а-яё]/g, '');
+  if (compact.length <= 5) return compact;
+  return compact.slice(0, Math.max(5, compact.length - 2));
+}
+
+function isOpenDateCatalogRow(row: Pick<PublicCatalogMappingRow, 'kind' | 'sourceStatus'>): boolean {
+  return row.kind.toUpperCase() === 'OPEN_DATE' || String(row.sourceStatus || '').toLowerCase() === 'open_date';
+}
+
+function resolvePublicSessionImageUrl(row: PublicCatalogMappingRow): string | null {
+  if (row.overrideImageUrl) return row.overrideImageUrl;
+  if (row.imageUrl) return row.imageUrl;
+  if (row.venueHeroImageUrl) return row.venueHeroImageUrl;
+  if (row.cityHeroImageUrl) return row.cityHeroImageUrl;
+  const slug = row.citySlug;
+  if (!slug) return null;
+  const imageSlug = cityImageAliases[slug] || slug;
+  return cityImageSlugs.has(imageSlug) ? `/images/cities/${imageSlug}.png` : null;
+}
+
+function cleanImportedDescription(value?: string | null): string | null {
+  const cleaned = String(value || '')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return cleaned || null;
 }
 
 function purchaseInfo(row: {

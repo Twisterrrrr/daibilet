@@ -68,7 +68,11 @@ export interface PublicSessionDto extends PurchaseFields {
   offerTitle?: string | null;
   offerSourceCode?: string | null;
   category: string;
+  subcategories?: string[];
   tags: string[];
+  kind?: string | null;
+  sourceStatus?: string | null;
+  description?: string | null;
   startsAt: string;
   dateLabel: string;
   timeLabel: string;
@@ -89,7 +93,8 @@ export interface PublicCatalogDto extends ApiEnvelope {
   facets: {
     cities: FacetCount[];
     categories: FacetCount[];
-    tags: FacetCount[];
+    subcategories: FacetCount[];
+    tags?: FacetCount[];
     landings: Array<{ slug: string; title: string; events: number }>;
     priceSteps: number[];
   };
@@ -234,4 +239,3 @@ export interface PublicHomeDto extends ApiEnvelope {
   venues: PublicVenueDto[];
   landings: PublicLandingDto[];
 }
-
