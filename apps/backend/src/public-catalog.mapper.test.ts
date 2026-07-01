@@ -4,6 +4,7 @@ import {
   mapGroupedPublicSession,
   type PublicCatalogMappingRow,
 } from './public-catalog.mapper.js';
+import { prismaWallTimeToIso } from './public-datetime.js';
 
 const originalToken = process.env.TICKETSCLOUD_WIDGET_TOKEN;
 
@@ -65,6 +66,12 @@ test('keeps open-date events saleable without a fake schedule', () => {
   assert.equal(result.startsAt, '');
   assert.equal(result.dateLabel, 'Открытая дата');
   assert.equal(result.timeLabel, 'В виджете');
+});
+
+test('converts imported Moscow wall time to the real UTC instant', () => {
+  const prismaTimestamp = new Date('2026-07-10T16:30:00.000Z');
+
+  assert.equal(prismaWallTimeToIso(prismaTimestamp), '2026-07-10T13:30:00.000Z');
 });
 
 function catalogRow(overrides: Partial<PublicCatalogMappingRow>): PublicCatalogMappingRow {

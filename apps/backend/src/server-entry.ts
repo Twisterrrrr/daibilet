@@ -7,6 +7,8 @@ import { readBackendEnv } from './env.js';
 import { updateAdminEventOverride, updateAdminLandingMatch, upsertAdminOrderTicket } from './dto.js';
 import { buildPublicCatalogDto, clearPublicCatalogDtoCache } from './public-catalog.dto.js';
 import { createPublicCatalogRouteHandler } from './public-catalog-handler.js';
+import { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto.js';
+import { createPublicEventRouteHandler } from './public-event-handler.js';
 import {
   db,
   handleRequest,
@@ -19,7 +21,10 @@ import { createValidatedHandler } from './validated-handler.js';
 const env = readBackendEnv();
 const host = '127.0.0.1';
 const adminAuth = createAdminAuthConfig(env);
-registerPublicCacheInvalidator(() => clearPublicCatalogDtoCache());
+registerPublicCacheInvalidator(() => {
+  clearPublicCatalogDtoCache();
+  clearPublicEventDtoCache();
+});
 const server = startServer({
   host,
   port: env.PORT,
@@ -29,6 +34,10 @@ const server = startServer({
       createPublicCatalogRouteHandler({
         enabled: env.DAIBILET_TS_PUBLIC_CATALOG === '1',
         buildPublicCatalog: buildPublicCatalogDto,
+      }),
+      createPublicEventRouteHandler({
+        enabled: env.DAIBILET_TS_PUBLIC_EVENT === '1',
+        buildPublicEvent: buildPublicEventDto,
       }),
       createAdminOrdersRouteHandler({
         db,

@@ -119,7 +119,7 @@ export const LANDING_RULES = [
     keywordScope: 'content',
     requiredAnyKeywords: ['мост', 'развод'],
     excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал'],
-    minStartsAtHour: 22,
+    minStartsAtHour: 20,
     includeStartsAtHourUntil: 6,
   },
   {

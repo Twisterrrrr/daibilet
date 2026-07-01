@@ -141,6 +141,7 @@ export interface PublicEventDto extends SeoFields, PurchaseFields {
   imageUrl?: string | null;
   category: string;
   tags: string[];
+  subcategories?: string[];
   city: string;
   cityId?: string | null;
   citySlug?: string | null;
@@ -164,16 +165,23 @@ export interface PublicEventDto extends SeoFields, PurchaseFields {
 
 export interface PublicEventPageDto extends ApiEnvelope {
   event: PublicEventDto;
-  sessions: Array<DateTimeSlot & PurchaseFields & {
+  sessions: Array<Omit<DateTimeSlot, 'startsAt'> & PurchaseFields & {
     id: string;
     eventId: string;
+    startsAt: string | null;
     priceFrom?: number | null;
     vacant?: number | null;
     sourceStatus?: string | null;
   }>;
   offers: PublicOfferDto[];
   ticketPrices?: PublicTicketPriceDto[];
-  relatedEvents?: PublicSessionDto[];
+  related: PublicSessionDto[];
+  landings: Array<Pick<PublicLandingDto, 'slug' | 'title' | 'subtitle' | 'chips'>>;
+  stats: {
+    sessions: number;
+    priceFrom?: number | null;
+    vacant?: number | null;
+  };
 }
 
 export interface PublicOfferDto extends PurchaseFields {
@@ -185,12 +193,17 @@ export interface PublicOfferDto extends PurchaseFields {
 }
 
 export interface PublicTicketPriceDto {
-  id?: string;
+  key: string;
   title: string;
   priceRub: number;
   oldPriceRub?: number | null;
+  source?: string | null;
   sourceCode?: string | null;
   sourceTicketId?: string | null;
+  description?: string | null;
+  purchaseUrl?: string | null;
+  kind?: 'offer' | 'session' | 'fallback';
+  sortOrder?: number | null;
 }
 
 export interface PublicCityPageDto extends ApiEnvelope {

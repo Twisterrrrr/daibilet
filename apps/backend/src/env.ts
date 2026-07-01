@@ -8,6 +8,7 @@ export const backendEnvSchema = z.object({
   DATABASE_URL: z.string().min(1).optional(),
   DAIBILET_REQUIRE_ADMIN_AUTH: z.string().optional(),
   DAIBILET_TS_PUBLIC_CATALOG: z.string().optional(),
+  DAIBILET_TS_PUBLIC_EVENT: z.string().optional(),
   ADMIN_EMAIL: z.string().min(1).optional(),
   ADMIN_USER: z.string().min(1).optional(),
   ADMIN_PASSWORD: z.string().optional(),

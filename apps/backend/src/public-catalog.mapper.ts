@@ -2,7 +2,14 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { matchingLandingSlugs } from './landing-rules.js';
-import type { DestinationType, PurchaseMode, PurchaseProvider, PurchaseUrlSource, TimeBucket } from './types/common.js';
+import {
+  buildProviderWidgetUrl,
+  providerForSource,
+  purchaseInfo,
+  resolveSessionPurchaseExternalId,
+} from './provider-purchase.js';
+import { prismaWallTimeToIso } from './public-datetime.js';
+import type { DestinationType, TimeBucket } from './types/common.js';
 import type { PublicSessionDto } from './types/public.js';
 
 export interface PublicCatalogSlotRow {
@@ -78,14 +85,6 @@ interface PublicDestination {
   type: DestinationType;
 }
 
-interface PurchaseInfo {
-  ready: boolean;
-  mode: PurchaseMode | null;
-  provider: PurchaseProvider | null;
-  urlSource: PurchaseUrlSource | null;
-  url: string | null;
-}
-
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const cityRouting = loadCityRouting();
 const standaloneCityNames = new Set(cityRouting.standaloneCities || []);
@@ -124,10 +123,12 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
     .slice(0, 8)
     .map((slot) => {
       const sourceCode = slot.sourceCode || slot.offerSourceCode || row.sourceCode || row.offerSourceCode;
-      const provider = providerForSource(sourceCode);
-      const slotExternalId = provider === 'TEPLOHOD'
-        ? slot.providerEventId || row.externalId
-        : slot.providerSessionId || slot.externalId || slot.providerEventId || row.externalId;
+      const slotExternalId = resolveSessionPurchaseExternalId({
+        sourceCode,
+        providerSessionId: slot.providerSessionId || slot.externalId,
+        providerEventId: slot.providerEventId,
+        fallbackEventId: row.externalId,
+      });
       const slotPurchase = purchaseInfo({
         sourceCode,
         offerSourceCode: slot.offerSourceCode || row.offerSourceCode,
@@ -345,64 +346,6 @@ function cleanImportedDescription(value?: string | null): string | null {
   return cleaned || null;
 }
 
-function purchaseInfo(row: {
-  sourceCode?: string | null | undefined;
-  offerSourceCode?: string | null | undefined;
-  offerWidgetUrl?: string | null | undefined;
-  offerDeeplinkUrl?: string | null | undefined;
-  externalId?: string | null | undefined;
-}): PurchaseInfo {
-  const sourceCode = row.sourceCode || row.offerSourceCode;
-  const provider = providerForSource(sourceCode);
-  const explicitUrl = row.offerWidgetUrl || row.offerDeeplinkUrl || null;
-  const fallbackUrl = buildProviderWidgetUrl({ ...row, offerSourceCode: sourceCode });
-  const url = explicitUrl || fallbackUrl || null;
-  return {
-    ready: Boolean(url),
-    mode: provider ? 'widget' : url ? 'redirect' : null,
-    provider,
-    urlSource: explicitUrl ? 'offer' : fallbackUrl ? 'fallback' : null,
-    url,
-  };
-}
-
-function buildProviderWidgetUrl(row: {
-  sourceCode?: string | null | undefined;
-  offerSourceCode?: string | null | undefined;
-  offerDeeplinkUrl?: string | null | undefined;
-  externalId?: string | null | undefined;
-}): string | null {
-  const provider = providerForSource(row.sourceCode || row.offerSourceCode);
-  if (provider === 'TEPLOHOD') {
-    return row.offerDeeplinkUrl || buildTeplohodUrl(row.externalId);
-  }
-  if (provider === 'TICKETSCLOUD') return buildTicketscloudWidgetUrl(row.externalId);
-  return null;
-}
-
-function providerForSource(sourceCode?: string | null): PurchaseProvider | null {
-  const normalized = String(sourceCode || '').toUpperCase();
-  if (normalized.includes('TEPLOHOD')) return 'TEPLOHOD';
-  if (normalized.includes('TC') || normalized.includes('TICKETSCLOUD')) return 'TICKETSCLOUD';
-  return null;
-}
-
-function buildTicketscloudWidgetUrl(eventExternalId?: string | null): string | null {
-  const token = process.env.TICKETSCLOUD_WIDGET_TOKEN || process.env.TC_WIDGET_TOKEN;
-  if (!token || !eventExternalId) return null;
-  const normalizedToken = token.startsWith('r:') ? token : `r:${token}`;
-  const url = new URL(process.env.TICKETSCLOUD_WIDGET_BASE_URL || 'https://ticketscloud.org/v1/widgets/common');
-  url.searchParams.set('token', normalizedToken);
-  url.searchParams.set('event', eventExternalId);
-  return url.toString();
-}
-
-function buildTeplohodUrl(eventExternalId?: string | null): string | null {
-  if (!eventExternalId) return null;
-  const baseUrl = process.env.TEP_WIDGET_BASE_URL || 'https://teplohod.info';
-  return `${baseUrl.replace(/\/+$/, '')}/event/${encodeURIComponent(eventExternalId)}`;
-}
-
 function parseUpcomingSlots(value: unknown): PublicCatalogSlotRow[] {
   if (!Array.isArray(value)) return [];
   return value.filter((slot): slot is PublicCatalogSlotRow => Boolean(slot && typeof slot === 'object'));
@@ -439,7 +382,7 @@ function timeBucket(value: string | Date): TimeBucket {
 }
 
 function toIsoString(value: string | Date): string {
-  if (value instanceof Date) return value.toISOString();
+  if (value instanceof Date) return prismaWallTimeToIso(value) || '';
   const date = new Date(value);
   return Number.isFinite(date.getTime()) ? date.toISOString() : '';
 }

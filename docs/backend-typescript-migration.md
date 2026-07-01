@@ -293,6 +293,23 @@ Cursor MVP integration, 2026-07-01:
 - landing audit учитывает open-date события и проходит 11 из 11 контрольных Teplohod cases;
 - parity: 447 total, 935 из 935 проверенных catalog slots имеют `ProviderLink SESSION`.
 
+Prisma public event detail, 2026-07-01:
+
+- добавлен `public-event.dto.ts`: страница события собирается через Prisma из `Event`, `EventSession`, `EventOffer` и `ProviderLink`;
+- одинаковые события провайдера остаются одной карточкой с ближайшими пятью сеансами, а не отдельными страницами по каждому времени;
+- билетные категории и цены читаются из offer-уровня, цены ниже 100 рублей не попадают в публичную витрину;
+- единый `provider-purchase.ts` использует identity сеанса для Ticketscloud и parent event identity для Teplohod;
+- импортированное описание очищается от HTML, SEO override и ссылки на город/площадку сохраняют текущий public contract;
+- новый route `GET /api/public/events/:slug` включается флагом `DAIBILET_TS_PUBLIC_EVENT=1`, legacy path остается fallback для контролируемого rollout;
+- время `TIMESTAMP WITHOUT TIME ZONE` приводится из московского wall time к UTC в `public-datetime.ts`;
+- event parity прошел для Ticketscloud, Teplohod с расписанием и Teplohod с открытой датой; catalog parity сохранился для 445 карточек и 916 session identities.
+
+Границы следующих public read-models:
+
+- каталог городов и каталог площадок остаются отдельными сущностями и маршрутами;
+- подборки и лендинги не объединяются: подборка управляет составом карточек, лендинг содержит тематическую выдачу и контентные блоки;
+- блог и внешние отзывы добавляются позже отдельными сущностями, без расширения `Event` универсальными JSON-полями.
+
 ## Phase 4: validation and tests
 
 Добавить runtime-валидацию на входе:

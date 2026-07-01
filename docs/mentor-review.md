@@ -434,3 +434,15 @@ Follow-up: добавлены `routing.ts` и `validation.ts` как bridge дл
 
 Менторская оценка: изменения Cursor учтены без отката архитектуры. Следующий приоритет остаётся прежним: Prisma public event detail и единый session/widget resolver, затем включение TS catalog по умолчанию.
 
+#### Prisma public event detail, 2026-07-01
+
+Статус: принято как третий Prisma read slice, production default пока не переключен.
+
+Что сделано: `public-event.dto.ts` собирает страницу события из Prisma-моделей `Event -> EventSession -> EventOffer -> ProviderLink`. Общий `provider-purchase.ts` закрепляет разные provider contracts: Ticketscloud покупается по identity конкретного сеанса, Teplohod открывает виджет по parent event identity. DTO отдает не больше пяти ближайших сеансов, нормализованные билетные категории, очищенное от HTML описание, SEO override, связанные события и лендинги. Route включается независимо через `DAIBILET_TS_PUBLIC_EVENT=1`.
+
+Проверка: backend typecheck и 7 unit tests прошли. Event parity совпал с legacy для Ticketscloud, Teplohod с расписанием и Teplohod с открытой датой. Catalog parity прошел на 445 карточках; 916 из 916 слотов имеют session identity. Landing audit прошел 11 из 11, DB smoke подтвердил 8761 событие, 22976 сеансов, 9111 offers и 40901 provider links.
+
+Менторская оценка: блок принят. Сильная сторона решения в том, что event page и catalog используют один resolver provider identity, поэтому переход на Prisma не расходится с реальным widget flow. Отдельная коррекция московского wall time закрыла скрытый сдвиг расписания на три часа. Границы городов, площадок, подборок и лендингов зафиксированы отдельно и не раздувают DTO события.
+
+Следующий контрольный шаг: провести HTTP smoke с обоими TS-флагами, затем после короткого soak включить Prisma catalog/event path по умолчанию. После этого переносить `public-pages` по одной сущности: сначала города, затем площадки; collections и landings держать раздельными.
+

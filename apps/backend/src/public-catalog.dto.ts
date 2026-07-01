@@ -46,7 +46,7 @@ export async function buildPublicCatalogDto(query: PublicCatalogQuery): Promise<
   };
 }
 
-async function getPublicCatalogSessions(forceRefresh: boolean): Promise<PublicSessionDto[]> {
+export async function getPublicCatalogSessions(forceRefresh = false): Promise<PublicSessionDto[]> {
   const now = Date.now();
   if (!forceRefresh && catalogCache && catalogCache.expiresAt > now) return catalogCache.sessions;
   if (!forceRefresh && catalogBuildPromise) return catalogBuildPromise;
