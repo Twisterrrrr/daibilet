@@ -28,6 +28,7 @@ import { LandingsCatalogPage } from '@/components/LandingsCatalogPage';
 import { LoginPage } from '@/components/LoginPage';
 import { LandingPage } from '@/components/LandingPage';
 import { VenuePage } from '@/components/VenuePage';
+import { VenuesCatalogPage } from '@/components/VenuesCatalogPage';
 import { formatMoney, formatNumber, publicData } from '@/data';
 import { resolveCityCardImage } from '@/lib/city-images';
 import { collectCatalogLabels } from '@/lib/catalog-labels';
@@ -49,6 +50,7 @@ const categoryMeta = [
 
 export function App({ dataVersion = 0 }: { dataVersion?: number }) {
   if (window.location.pathname === '/cities' || window.location.pathname === '/cities/') return <CitiesCatalogPage />;
+  if (window.location.pathname === '/venues' || window.location.pathname === '/venues/') return <VenuesCatalogPage />;
   if (window.location.pathname === '/podborki' || window.location.pathname === '/podborki/') return <LandingsCatalogPage />;
   if (window.location.pathname === '/my-orders' || window.location.pathname === '/my-orders/') return <BuyerOrdersPage />;
   if (window.location.pathname === '/login' || window.location.pathname === '/login/') return <LoginPage />;

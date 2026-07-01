@@ -470,3 +470,15 @@ Follow-up: добавлены `routing.ts` и `validation.ts` как bridge дл
 
 Следующий контрольный шаг: performance pass для единого Prisma catalog warmup и подключение React-каталога `/venues`. После этого можно включать TS catalog, event, city и venue flags как единый production read stack.
 
+#### Typed public warmup and `/venues`, 2026-07-01
+
+Статус: принято как production-readiness блок перед деплоем.
+
+Что сделано: общий warmup прогревает Prisma catalog, destinations и venues до открытия порта. Production service переключен на TS entrypoint, deploy устанавливает backend dependencies. Все четыре typed public routes включены в `.env.example`. В public появился отдельный каталог площадок `/venues` с верхними фильтрами и стабильным переходом на detail.
+
+Проверка: 9 backend unit tests, catalog/event/city/venue parity, landing audit 11 из 11, public build, Git Bash syntax check и browser smoke прошли. После prewarm destinations отвечают 35/1 ms, venues 20/5 ms, Москва 38/9 ms. Mobile 390x844 не имеет горизонтального overflow. Console errors отсутствуют.
+
+Найдено browser smoke: related venues наследовали raw legacy counts и показывали до 1662 «событий». Исправлено на grouped public event counts, parity test теперь проверяет эти значения независимо от legacy.
+
+Менторская оценка: блок принят. Теперь production TS stack не только типизирован, но и действительно запускается systemd-конфигурацией. Forced cold refresh каталога около 4.9 s остается техническим долгом, однако prelisten warmup убирает его из первого пользовательского запроса. Следующий приоритет перед продажами: production deploy, health/smoke TC и Teplohod widget на белом IP, затем только launch-blocking исправления.
+

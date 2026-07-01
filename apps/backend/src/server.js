@@ -80,6 +80,7 @@ const PUBLIC_RESPONSE_CACHE_MS = 5 * 60 * 1000;
 const MAX_PUBLIC_RESPONSE_CACHE_ENTRIES = 80;
 const publicResponseCache = new Map();
 const publicCacheInvalidators = new Set();
+const publicCacheWarmers = new Set();
 
 function loadRootEnv(projectRoot) {
   try {
@@ -502,11 +503,19 @@ export function startServer(options = {}) {
   const host = options.host || '127.0.0.1';
   const serverPort = Number(options.port || port);
   const requestHandler = options.handler || handleRequest;
-  return createServer(requestHandler).listen(serverPort, host, () => {
+  const server = createServer(requestHandler);
+  const listen = () => server.listen(serverPort, host, () => {
     console.log(`Daibilet backend listening on http://${host}:${serverPort}`);
-    warmPublicCaches('startup');
+    if (!options.prewarmBeforeListen) void warmPublicCaches('startup');
     scheduleTeplohodAutoSync();
   });
+  if (options.prewarmBeforeListen) {
+    console.log('Warming public caches before listen...');
+    void warmPublicCaches('startup').finally(listen);
+  } else {
+    listen();
+  }
+  return server;
 }
 
 if (isMainModule()) {
@@ -565,18 +574,25 @@ async function buildPublicLandingPageWithFallback(db, landingSlug) {
   return buildPublicLandingPage(db, landingSlug);
 }
 
-function warmPublicCaches(reason) {
+export async function warmPublicCaches(reason) {
   const startedAt = Date.now();
-  void Promise.all([buildPublicDestinations(db), buildPublicHomePreview(db), buildPublicStats(db)])
-    .then(([destinations, preview, stats]) => {
+  try {
+    const [legacy, typed] = await Promise.all([
+      Promise.all([buildPublicDestinations(db), buildPublicHomePreview(db), buildPublicStats(db)]),
+      Promise.all([...publicCacheWarmers].map((warmer) => Promise.resolve().then(() => warmer(reason)))),
+    ]);
+    const [destinations, preview, stats] = legacy;
       const elapsed = Date.now() - startedAt;
+      const typedSummary = typed.filter(Boolean).map((item) =>
+        `${item.events || 0} typed events in ${item.elapsedMs || elapsed}ms`).join(', ');
       console.log(
-        `Public cache warmed after ${reason}: ${stats?.stats?.events || preview?.sessions?.length || 0} events, ${destinations?.destinations?.length || 0} destinations in ${elapsed}ms`,
+        `Public cache warmed after ${reason}: ${stats?.stats?.events || preview?.sessions?.length || 0} events, ${destinations?.destinations?.length || 0} destinations in ${elapsed}ms${typedSummary ? `; ${typedSummary}` : ''}`,
       );
-    })
-    .catch((error) => {
-      console.warn(`Public cache warm failed after ${reason}: ${error instanceof Error ? error.message : String(error)}`);
-    });
+    return { elapsedMs: elapsed, typed };
+  } catch (error) {
+    console.warn(`Public cache warm failed after ${reason}: ${error instanceof Error ? error.message : String(error)}`);
+    return null;
+  }
 }
 
 export function invalidatePublicCaches(reason, options = {}) {
@@ -589,12 +605,17 @@ export function invalidatePublicCaches(reason, options = {}) {
       console.warn(`Public cache invalidator failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
-  if (options.warm) warmPublicCaches(reason);
+  if (options.warm) void warmPublicCaches(reason);
 }
 
 export function registerPublicCacheInvalidator(invalidator) {
   publicCacheInvalidators.add(invalidator);
   return () => publicCacheInvalidators.delete(invalidator);
+}
+
+export function registerPublicCacheWarmer(warmer) {
+  publicCacheWarmers.add(warmer);
+  return () => publicCacheWarmers.delete(warmer);
 }
 
 async function readJson(relativePath) {

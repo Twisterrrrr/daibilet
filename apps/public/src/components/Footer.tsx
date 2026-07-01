@@ -19,6 +19,7 @@ const companyLinks = [
   { label: 'О сервисе', href: '/about' },
   { label: 'Подборки', href: '/podborki' },
   { label: 'Города', href: '/cities' },
+  { label: 'Площадки', href: '/venues' },
   { label: 'Проверить заказ', href: '/my-orders' },
   { label: 'Помощь', href: '/help' },
 ];

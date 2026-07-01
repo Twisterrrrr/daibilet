@@ -20,6 +20,7 @@ git checkout main
 git pull --ff-only origin main
 
 npm install
+npm --prefix apps/backend ci
 npm --prefix apps/public ci
 npm --prefix apps/admin ci
 

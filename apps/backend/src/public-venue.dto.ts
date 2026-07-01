@@ -78,7 +78,7 @@ export async function buildPublicVenueDto(
   const prices = sessions
     .map((session) => session.priceFrom)
     .filter((price): price is number => Number.isFinite(price) && Number(price) >= MIN_DISPLAY_PRICE_RUB);
-  const relatedVenues = await publicRelatedVenues(venue.id, venue.city?.title || null, 6);
+  const relatedVenues = await publicRelatedVenues(venue.id, venue.city?.title || null, catalogSessions, 6);
   const payload: PublicVenuePageDto = {
     generatedAt: new Date().toISOString(),
     venue: mapVenue(venue, sessions.length, categories, false),
@@ -97,25 +97,31 @@ export async function buildPublicVenueDto(
 async function publicRelatedVenues(
   venueId: string,
   city: string | null,
+  catalogSessions: PublicSessionDto[],
   limit: number,
 ): Promise<PublicVenueDto[]> {
   if (!city) return [];
+  const eventCounts = countSessionsByVenue(catalogSessions);
+  const venueIds = [...new Set(
+    catalogSessions
+      .filter((session) => session.venueId && session.venueId !== venueId && session.city === city)
+      .map((session) => session.venueId)
+      .filter(isDefined),
+  )];
+  if (!venueIds.length) return [];
   const venues = await prisma.venue.findMany({
     where: {
-      id: { not: venueId },
+      id: { in: venueIds },
       city: { title: city },
       pageStatus: { not: 'HIDDEN' },
-      events: { some: {} },
     },
-    include: {
-      city: true,
-      _count: { select: { events: true } },
-    },
+    include: { city: true },
   });
   return venues
-    .sort((left, right) => right._count.events - left._count.events || left.title.localeCompare(right.title, 'ru'))
+    .sort((left, right) =>
+      (eventCounts.get(right.id) || 0) - (eventCounts.get(left.id) || 0) || left.title.localeCompare(right.title, 'ru'))
     .slice(0, limit)
-    .map((venue) => mapVenue(venue, venue._count.events, {}, true));
+    .map((venue) => mapVenue(venue, eventCounts.get(venue.id) || 0, {}, true));
 }
 
 function mapVenue(
@@ -188,4 +194,8 @@ function countBy(values: string[]): Record<string, number> {
     result[value] = (result[value] || 0) + 1;
     return result;
   }, {});
+}
+
+function isDefined<T>(value: T | null | undefined): value is T {
+  return value != null;
 }

@@ -58,7 +58,10 @@ for (const venue of selected) {
   assert.ok(typed.venue.seoTitle, `${venue.title}: seo title`);
   assert.ok(typed.venue.seoDescription, `${venue.title}: seo description`);
   assert.deepEqual(typed.sessions.map(sessionCore), legacy.sessions.map(sessionCore), `${venue.title}: sessions`);
-  assert.deepEqual(typed.relatedVenues.map(relatedCore), legacy.relatedVenues.map(relatedCore), `${venue.title}: related`);
+  assert.equal(new Set(typed.relatedVenues.map((item) => item.id)).size, typed.relatedVenues.length, `${venue.title}: related unique`);
+  for (const related of typed.relatedVenues) {
+    assert.equal(related.events, expectedCounts.get(related.id), `${related.name}: related grouped count`);
+  }
   assert.deepEqual(typed.stats, legacy.stats, `${venue.title}: stats`);
   console.log(`${venue.pageStatus}: ${venue.title}, ${typed.sessions.length} events, parity ok`);
 }
@@ -94,19 +97,6 @@ function sessionCore(value: any) {
     title: value.title,
     startsAt: value.startsAt,
     priceFrom: value.priceFrom,
-  };
-}
-
-function relatedCore(value: any) {
-  return {
-    id: value.id,
-    slug: value.slug,
-    name: value.name,
-    city: value.city,
-    address: value.address,
-    type: value.type,
-    events: value.events,
-    categories: value.categories,
   };
 }
 

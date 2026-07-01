@@ -72,6 +72,30 @@ const httpScenarios = [
     warmBudgetMs: 100,
     summarize: summarizeCatalog,
   },
+  {
+    name: 'HTTP destinations after prewarm',
+    path: '/api/public/destinations',
+    warmPath: '/api/public/destinations',
+    coldBudgetMs: 100,
+    warmBudgetMs: 100,
+    summarize: (payload) => `${payload.destinations?.length || 0} направлений`,
+  },
+  {
+    name: 'HTTP venues after prewarm',
+    path: '/api/public/venues',
+    warmPath: '/api/public/venues',
+    coldBudgetMs: 100,
+    warmBudgetMs: 100,
+    summarize: (payload) => `${payload.total || payload.venues?.length || 0} площадок`,
+  },
+  {
+    name: 'HTTP Moscow city page after prewarm',
+    path: '/api/public/cities/moskva',
+    warmPath: '/api/public/cities/moskva',
+    coldBudgetMs: 150,
+    warmBudgetMs: 100,
+    summarize: (payload) => `${payload.stats?.events || 0} событий, ${payload.stats?.venues || 0} площадок`,
+  },
 ];
 
 const rows = [];
@@ -125,6 +149,8 @@ const output = [
   '',
   '- HTTP stats cold должен быть меньше 300 ms.',
   '- HTTP catalog warm должен быть меньше 100 ms.',
+  '- HTTP destinations и venues после startup prewarm должны быть меньше 100 ms.',
+  '- HTTP city detail после startup prewarm должен быть меньше 150 ms на первом запросе и 100 ms на повторном.',
   '- HTTP home cold желательно держать ниже 1000 ms; если выше, ускорять buildPublicHome.',
   '- Если DTO cold catalog снова выше 3000 ms, переносить фильтры глубже в SQL.',
   '- Для production добавить HTTP/CDN cache policy отдельно от локального backend cache.',

@@ -234,3 +234,26 @@
 Мы на этапе `pre-launch hardening`: данные и источники уже ожили, теперь нужно пройти smoke public/admin, закрыть только блокеры и перенести контур на сервер.
 
 Следующий рабочий шаг Codex: подготовить минимальный production deploy plan/scripts после выбора Git remote и схемы доменов.
+
+## Typed Public Stack
+
+Production API должен запускаться через `apps/backend/src/server-entry.ts`, а не legacy `server.js`. В `/opt/daibilet/.env` обязательны:
+
+```env
+DAIBILET_TS_PUBLIC_CATALOG=1
+DAIBILET_TS_PUBLIC_EVENT=1
+DAIBILET_TS_PUBLIC_CITY=1
+DAIBILET_TS_PUBLIC_VENUE=1
+DAIBILET_PUBLIC_PREWARM_BEFORE_LISTEN=1
+```
+
+`deploy/systemd/daibilet-api.service` уже использует `npm --prefix apps/backend run start:ts`, а `deploy/scripts/deploy-from-git.sh` устанавливает backend dependencies. После рестарта дождаться строки `Daibilet backend listening`; она появляется только после завершения prewarm.
+
+Launch smoke после deploy:
+
+- `/api/health` возвращает `200`;
+- `/api/public/events?limit=12&sort=time` возвращает сгруппированный каталог;
+- `/api/public/destinations` возвращает 26 направлений;
+- `/api/public/venues` возвращает площадки с grouped event counts;
+- `/cities/moskva`, `/venues` и одна detail-площадка открываются без console errors;
+- кнопка покупки TC открывает TC widget, кнопка Teplohod открывает его widget на сервере с белым IP.

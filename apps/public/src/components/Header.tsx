@@ -9,6 +9,7 @@ const navigation = [
   { label: 'Каталог', href: '/events' },
   { label: 'Подборки', href: '/podborki' },
   { label: 'Города', href: '/cities' },
+  { label: 'Площадки', href: '/venues' },
 ];
 
 type HeaderProps = {

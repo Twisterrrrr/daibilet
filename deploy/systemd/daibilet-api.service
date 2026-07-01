@@ -6,7 +6,7 @@ After=network.target
 Type=simple
 WorkingDirectory=/opt/daibilet
 EnvironmentFile=/opt/daibilet/.env
-ExecStart=/usr/bin/env node apps/backend/src/server.js
+ExecStart=/usr/bin/env npm --prefix apps/backend run start:ts
 Restart=always
 RestartSec=5
 

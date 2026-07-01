@@ -334,6 +334,20 @@ Prisma public venue read-model, 2026-07-01:
 
 Новый backend-каталог площадок готов, но отдельный public route `/venues` еще нужно подключить в React после стабилизации backend read path. До массовой индексации администратор должен перевести готовые страницы из `CANDIDATE` в `PUBLISHED`.
 
+Typed public stack warmup and venue catalog, 2026-07-01:
+
+- добавлен `public-warmup.ts`: catalog Prisma read-model строится один раз, после него прогреваются destinations и venues;
+- `DAIBILET_PUBLIC_PREWARM_BEFORE_LISTEN=1` откладывает открытие HTTP-порта до завершения legacy и typed warmup, поэтому первый покупатель не попадает в cold path;
+- `.env.example` включает catalog, event, city и venue TS routes как единый проверенный stack;
+- production systemd переведен с legacy `node apps/backend/src/server.js` на `npm --prefix apps/backend run start:ts`;
+- deploy script устанавливает backend dependencies через `npm --prefix apps/backend ci`;
+- добавлены 2 unit tests warmup orchestration, всего backend TS suite содержит 9 тестов;
+- добавлен React-каталог `/venues` с верхними фильтрами по поиску, городу и типу, сортировкой и переходом на detail;
+- related venues теперь считают сгруппированные карточки, а не raw provider slots: browser smoke убрал значения 1662/898 и вернул реальные 16/13/10;
+- performance snapshot после prewarm: destinations 35/1 ms, venues 20/5 ms, Moscow city 38/9 ms; forced cold catalog остается warning около 4.9 s, warm 16 ms.
+
+Browser smoke прошел на desktop и viewport 390x844: 189 площадок, фильтр `Douglas` возвращает одну карточку, переход открывает detail, горизонтального overflow и console errors нет.
+
 ## Phase 4: validation and tests
 
 Добавить runtime-валидацию на входе:
