@@ -2,8 +2,10 @@ import { createHash, randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { normalizePublicVenueRecord } from './venue-normalize.js';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
+const PUBLIC_DESTINATION_MIN_EVENTS = 1;
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
 const CATALOG_TAG_DISPLAY_LIMIT = 4;
 
@@ -36,6 +38,8 @@ const CITY_CARD_IMAGE_ALIASES = {
   'sankt-peterburg': 'saint-petersburg',
   'nizhniy-novgorod': 'nizhny-novgorod',
   'velikiy-novgorod': 'veliky-novgorod',
+  'rostov-na-donu': 'rostov-on-don',
+  rostov: 'rostov-on-don',
 };
 const CITY_CARD_IMAGE_SLUGS = new Set([
   'saint-petersburg',
@@ -58,11 +62,41 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'yaroslavl',
   'krasnoyarsk',
   'omsk',
+  'chelyabinsk',
+  'rostov-on-don',
+  'saratov',
+  'tula',
+  'tver',
+  'tyumen',
+  'ufa',
+  'ulan-ude',
+  'ryazan',
+  'stavropol',
+  'tomsk',
+  'ulyanovsk',
+  'izhevsk',
+  'orel',
+  'orenburg',
+  'penza',
+  'volgograd',
+  'sortavala',
 ]);
 const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const CITY_ROUTING = loadCityRouting();
 const STANDALONE_CITY_NAMES = new Set(CITY_ROUTING.standaloneCities || []);
 const CITY_TO_REGION = new Map(Object.entries(CITY_ROUTING.cityToRegion || {}));
+
+function isPublicRegionName(name) {
+  const clean = cleanDisplayName(name);
+  if (!clean || clean === 'Не указан') return false;
+  if (STANDALONE_CITY_NAMES.has(clean)) return false;
+  return /(?:область|край|республика|округ)$/iu.test(clean);
+}
+
+const PUBLIC_REGION_NAMES = new Set([
+  ...(CITY_ROUTING.publicRegions || []),
+  ...Object.values(CITY_ROUTING.cityToRegion || {}).filter((name) => isPublicRegionName(name)),
+]);
 let publicHomeCache = null;
 let publicDestinationsCache = null;
 let publicHomePreviewCache = null;
@@ -1101,7 +1135,7 @@ export async function buildAdminOrderEventCandidates(db, searchParams = new URLS
         slug: publicEventSlug(row.slug),
         title: row.title,
         city: row.city,
-        venue: row.venue,
+        venue: formatPublicVenueTitle(row.venue),
         category: row.category,
         sourceCode: row.sourceCode,
         sourceName: row.sourceName,
@@ -2173,6 +2207,8 @@ function groupPublicEventRows(events) {
           dateLabel: formatDate(event.startsAt),
           timeLabel: formatTime(event.startsAt),
           purchaseUrl: event.offerWidgetUrl || event.offerDeeplinkUrl || buildProviderWidgetUrl(event),
+          sourceStatus: event.sourceStatus || null,
+          vacant: event.vacant ?? null,
         }
       : null;
     const current = groups.get(key);
@@ -2202,12 +2238,13 @@ function groupPublicEventRows(events) {
     if (event.imageUrl && !current.imageUrl) current.imageUrl = event.imageUrl;
     if (event.override?.imageUrl && !current.override?.imageUrl) current.override = { ...(current.override || {}), imageUrl: event.override.imageUrl };
 
-    if (event.startsAt && (!current.startsAt || new Date(event.startsAt) < new Date(current.startsAt))) {
+    if (event.startsAt && shouldPromoteGroupedRepresentative(current, event)) {
       current.startsAt = event.startsAt;
       current.id = event.id;
       current.slug = event.slug;
       current.sourceSlug = event.sourceSlug;
       current.externalId = event.externalId;
+      current.sourceStatus = event.sourceStatus;
       current.offerSourceCode = event.offerSourceCode;
       current.offerTitle = event.offerTitle;
       current.offerWidgetUrl = event.offerWidgetUrl;
@@ -2232,12 +2269,253 @@ function adminEventGroupKey(event) {
     normalizeGroupPart(event.source),
     normalizeGroupPart(event.title),
     normalizeGroupPart(event.city),
-    normalizeGroupPart(event.venueId || event.venue),
+    normalizeGroupPart(formatPublicVenueTitle(event.venue) || event.venue),
   ].join('|');
 }
 
 function publicEventGroupKey(event) {
-  return adminEventGroupKey(event);
+  const city = resolvePublicSessionCity(event);
+  const venue = formatPublicVenueTitle(event.venue) || event.venue;
+  return [
+    normalizeGroupPart(event.sourceLabel || event.source || event.sourceCode || event.sourceName),
+    normalizeGroupPart(event.overrideTitle || event.title),
+    normalizeGroupPart(city),
+    normalizeGroupPart(venue),
+  ].join('|');
+}
+
+function regroupMappedPublicCatalogSessions(sessions) {
+  const groups = new Map();
+
+  for (const session of sessions) {
+    const key = session.groupKey;
+    if (!key) {
+      groups.set(`id:${session.id}`, session);
+      continue;
+    }
+
+    const slotFromSession = session.startsAt
+      ? {
+          eventId: session.id,
+          startsAt: session.startsAt,
+          dateLabel: session.dateLabel,
+          timeLabel: session.timeLabel,
+          purchaseUrl: session.purchaseUrl,
+          sourceStatus: session.sourceStatus || null,
+          purchaseReady: session.purchaseReady,
+          vacant: session.vacant ?? null,
+        }
+      : null;
+    const current = groups.get(key);
+
+    if (!current) {
+      groups.set(key, {
+        ...session,
+        groupEventIds: uniqueValues(session.groupEventIds || [session.id]),
+        groupedEventsCount: session.groupedEventsCount || 1,
+        sessionCount: session.sessionCount || (slotFromSession ? 1 : 0),
+        upcomingSlots: uniqueSlots(
+          (session.upcomingSlots || []).concat(slotFromSession ? [slotFromSession] : []),
+        ),
+      });
+      continue;
+    }
+
+    current.groupEventIds = uniqueValues(current.groupEventIds.concat(session.groupEventIds || [session.id]));
+    current.groupedEventsCount = current.groupEventIds.length;
+    current.sessionCount = (current.sessionCount || 0) + (session.sessionCount || (slotFromSession ? 1 : 0));
+    current.upcomingSlots = uniqueSlots(
+      (current.upcomingSlots || []).concat(session.upcomingSlots || []).concat(slotFromSession ? [slotFromSession] : []),
+    );
+    current.priceFrom = minNullableNumber([current.priceFrom, session.priceFrom]);
+    current.vacant = sumNullableNumbers([current.vacant, session.vacant]);
+    current.tags = uniqueValues((current.tags || []).concat(session.tags || []));
+    if (session.manualLandingStatus === 'PINNED') current.manualLandingStatus = 'PINNED';
+
+    if (shouldPromoteGroupedRepresentative(current, session)) {
+      const merged = {
+        groupKey: key,
+        groupEventIds: current.groupEventIds,
+        groupedEventsCount: current.groupedEventsCount,
+        sessionCount: current.sessionCount,
+        upcomingSlots: current.upcomingSlots,
+        priceFrom: current.priceFrom,
+        vacant: current.vacant,
+        tags: current.tags,
+        manualLandingStatus: current.manualLandingStatus,
+      };
+      Object.assign(current, session, merged);
+    }
+  }
+
+  return Array.from(groups.values())
+    .map((session) => ({
+      ...session,
+      groupedEventsCount: session.groupEventIds?.length || session.groupedEventsCount || 1,
+      sessionCount: session.sessionCount || session.upcomingSlots?.length || 1,
+      upcomingSlots: uniqueSlots(session.upcomingSlots || []).sort(
+        (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime(),
+      ),
+    }))
+    .sort((a, b) => {
+      const aTime = a.startsAt ? new Date(a.startsAt).getTime() : Number.POSITIVE_INFINITY;
+      const bTime = b.startsAt ? new Date(b.startsAt).getTime() : Number.POSITIVE_INFINITY;
+      return aTime - bTime || String(a.title).localeCompare(String(b.title), 'ru');
+    });
+}
+
+const KNOWN_PIER_ADDRESS_PATTERNS = [
+  { key: 'sinopskaya-10', test: (text) => /синопск/.test(text) && /\b10\b/.test(text) },
+  { key: 'fontanka-53', test: (text) => /фонтанк/.test(text) && /\b53\b/.test(text) },
+];
+
+function sessionWidgetProvider(session) {
+  const code = String(session.offerSourceCode || session.purchaseProvider || session.sourceCode || '').toUpperCase();
+  if (code.includes('TEPLOHOD')) return 'TEPLOHOD';
+  if (code.includes('TICKETSCLOUD') || code === 'TC') return 'TICKETSCLOUD';
+  const url = String(session.purchaseUrl || '').toLowerCase();
+  if (url.includes('teplohod.info')) return 'TEPLOHOD';
+  if (url.includes('ticketscloud')) return 'TICKETSCLOUD';
+  const groupKey = String(session.groupKey || '').toLowerCase();
+  if (groupKey.startsWith('teplohod')) return 'TEPLOHOD';
+  if (groupKey.startsWith('ticketscloud')) return 'TICKETSCLOUD';
+  return null;
+}
+
+function isWidgetProviderSession(session) {
+  return sessionWidgetProvider(session) != null;
+}
+
+function canonicalSessionPierKey(session) {
+  const text = normalizeVenueTextKey(`${session.venue || ''} ${session.venueAddress || ''}`);
+  if (!text) return null;
+
+  for (const pattern of KNOWN_PIER_ADDRESS_PATTERNS) {
+    if (pattern.test(text)) return pattern.key;
+  }
+
+  if (/причал|набереж/.test(text)) {
+    const addressKey = canonicalVenueAddressKey(session.venue, session.venueAddress);
+    if (addressKey.length >= 8) return `pier|${addressKey}`;
+  }
+
+  return null;
+}
+
+function normalizeCrossSourceTourTitle(title) {
+  let text = String(title || '')
+    .toLowerCase()
+    .replace(/[«»"'“”]/g, ' ')
+    .replace(
+      /^(?:(?:обзорная|ночная|утренняя|авторская|детская|вечерняя)\s+)?(?:экскурсия|развлекательно\s*-\s*познавательная\s+программа)\s+/i,
+      '',
+    )
+    .replace(/\s+с\s+гидом\b/g, '')
+    .replace(/,\s*или\s+.+/g, '')
+    .replace(/\s+\d+\+\s*$/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  return normalizeVenueTextKey(text);
+}
+
+function crossSourceTitlesMatch(leftTitle, rightTitle) {
+  const left = normalizeCrossSourceTourTitle(leftTitle);
+  const right = normalizeCrossSourceTourTitle(rightTitle);
+  if (!left || !right) return false;
+  if (left === right) return true;
+  if (left.includes(right) || right.includes(left)) return true;
+
+  const leftTokens = new Set(left.split(' ').filter((token) => token.length > 3));
+  const rightTokens = new Set(right.split(' ').filter((token) => token.length > 3));
+  if (!leftTokens.size || !rightTokens.size) return false;
+
+  let overlap = 0;
+  for (const token of leftTokens) {
+    if (rightTokens.has(token)) overlap += 1;
+  }
+
+  const minSize = Math.min(leftTokens.size, rightTokens.size);
+  return overlap >= 2 && overlap / minSize >= 0.6;
+}
+
+function crossSourceProviderScore(session) {
+  let score = 0;
+  if (sessionWidgetProvider(session) === 'TEPLOHOD') score += 100;
+  if (sessionWidgetProvider(session) === 'TICKETSCLOUD') score += 10;
+  if (session.purchaseReady !== false) score += 50;
+  if ((session.upcomingSlots || []).length > 0) score += 5;
+  if (session.imageUrl) score += 3;
+  if (session.manualLandingStatus === 'PINNED') score += 1000;
+  if (!isPublicSessionPurchaseBlocked(session)) score += 20;
+  return score;
+}
+
+function preferCrossSourceRepresentative(current, candidate) {
+  return crossSourceProviderScore(candidate) > crossSourceProviderScore(current);
+}
+
+function publicCrossSourceCatalogKey(session) {
+  const city = normalizeGroupPart(resolvePublicSessionCity(session));
+  const pier = canonicalSessionPierKey(session) || normalizeGroupPart(session.venue);
+  const title = normalizeCrossSourceTourTitle(session.title);
+  return `${city}|${pier}|${title}`;
+}
+
+function mergeCrossSourceSessions(current, candidate) {
+  const winner = preferCrossSourceRepresentative(current, candidate) ? candidate : current;
+  const mergedGroupEventIds = uniqueValues(
+    sessionGroupIds(current).concat(sessionGroupIds(candidate)),
+  );
+
+  return {
+    ...winner,
+    groupKey: publicCrossSourceCatalogKey(winner),
+    groupEventIds: mergedGroupEventIds,
+    groupedEventsCount: mergedGroupEventIds.length,
+    priceFrom: minNullableNumber([current.priceFrom, candidate.priceFrom]),
+    vacant: sumNullableNumbers([current.vacant, candidate.vacant]),
+    manualLandingStatus:
+      current.manualLandingStatus === 'PINNED' || candidate.manualLandingStatus === 'PINNED' ? 'PINNED' : null,
+  };
+}
+
+function dedupeCrossSourceCatalogSessions(sessions) {
+  const passthrough = [];
+  const pierSessions = [];
+
+  for (const session of sessions || []) {
+    if (isWidgetProviderSession(session) && canonicalSessionPierKey(session)) {
+      pierSessions.push(session);
+    } else {
+      passthrough.push(session);
+    }
+  }
+
+  const used = new Set();
+  const merged = [];
+
+  for (let index = 0; index < pierSessions.length; index += 1) {
+    if (used.has(index)) continue;
+
+    let current = pierSessions[index];
+    used.add(index);
+    const pierKey = canonicalSessionPierKey(current);
+
+    for (let otherIndex = index + 1; otherIndex < pierSessions.length; otherIndex += 1) {
+      if (used.has(otherIndex)) continue;
+      const other = pierSessions[otherIndex];
+      if (canonicalSessionPierKey(other) !== pierKey) continue;
+      if (sessionWidgetProvider(current) === sessionWidgetProvider(other)) continue;
+      if (!crossSourceTitlesMatch(current.title, other.title)) continue;
+      current = mergeCrossSourceSessions(current, other);
+      used.add(otherIndex);
+    }
+
+    merged.push(current);
+  }
+
+  return passthrough.concat(merged);
 }
 
 function uniqueSlots(slots) {
@@ -2666,7 +2944,7 @@ export async function buildPublicHomePreview(db) {
   const catalogSessions = await publicCatalogSessions(db);
   const payload = {
     generatedAt: new Date().toISOString(),
-    sessions: catalogSessions.slice(0, PUBLIC_HOME_PREVIEW_LIMIT),
+    sessions: catalogSessions.filter(sessionHasCoverImage).slice(0, PUBLIC_HOME_PREVIEW_LIMIT),
     landings: buildPublicLandings(catalogSessions),
   };
 
@@ -2942,18 +3220,29 @@ export async function buildCatalogSessions(db, searchParams) {
   const landing = searchParams.get('landing');
   const date = searchParams.get('date');
   const sort = searchParams.get('sort') || 'time';
-  const maxPrice = Number(searchParams.get('maxPrice'));
+  const maxPriceRaw = searchParams.get('maxPrice');
+  const minPriceRaw = searchParams.get('minPrice');
+  const maxPrice = maxPriceRaw != null && String(maxPriceRaw).trim() !== '' ? Number(maxPriceRaw) : NaN;
+  const minPrice = minPriceRaw != null && String(minPriceRaw).trim() !== '' ? Number(minPriceRaw) : NaN;
+  const dateFrom = String(searchParams.get('dateFrom') || '').trim();
+  const dateTo = String(searchParams.get('dateTo') || '').trim();
+  const ageMaxRaw = searchParams.get('ageMax');
+  const ageMax = ageMaxRaw != null && String(ageMaxRaw).trim() !== '' ? Number(ageMaxRaw) : NaN;
   const forceRefresh = searchParams.get('refresh') === '1';
 
   const sessions = await publicCatalogSessions(db, forceRefresh);
-  const facets = buildCatalogFacets(sessions);
-  const rows = sessions.filter((session) => {
+  const coverSessions = sessions.filter(sessionHasCoverImage);
+  const facets = buildCatalogFacets(coverSessions);
+  const rows = coverSessions.filter((session) => {
     if (destination && destination !== 'all' && session.destination !== destination) return false;
     if (city && city !== 'all' && session.city !== city && session.destination !== city) return false;
     if (category && category !== 'all' && session.category !== category && !pickCatalogSubcategories(session).includes(category)) return false;
     if (landing && landing !== 'all' && !(session.landingSlugs || []).includes(landing)) return false;
-    if (date && date !== 'all' && !matchesCatalogDate(session, date)) return false;
-    if (Number.isFinite(maxPrice) && maxPrice > 0 && (!session.priceFrom || session.priceFrom > maxPrice)) return false;
+    if (dateFrom || dateTo) {
+      if (!matchesCatalogDateRange(session, dateFrom, dateTo)) return false;
+    } else if (date && date !== 'all' && !matchesCatalogDate(session, date)) return false;
+    if (!matchesCatalogPrice(session, minPrice, maxPrice)) return false;
+    if (Number.isFinite(ageMax) && ageMax >= 0 && !matchesCatalogAgeLimit(session, ageMax)) return false;
     if (!query) return true;
     return [session.title, session.city, session.destination, session.venue, session.category, ...(session.tags || [])]
       .filter(Boolean)
@@ -2963,13 +3252,14 @@ export async function buildCatalogSessions(db, searchParams) {
     });
 
   const sorted = sortCatalogSessions(rows, sort);
-  return { total: sorted.length, offset, limit, items: sorted.slice(offset, offset + limit), facets };
+  const arranged = sort === 'price' || sort === 'time' ? sorted : spreadCatalogSessionsByCoverImage(sorted);
+  return { total: arranged.length, offset, limit, items: arranged.slice(offset, offset + limit), facets };
 }
 
 function buildCatalogFacets(sessions) {
   return {
     cities: countCatalogValues(sessions.map((session) => session.destination || session.city))
-      .filter(([name, events]) => name && name !== 'Не указан' && events >= 2)
+      .filter(([name, events]) => name && name !== 'Не указан' && events >= PUBLIC_DESTINATION_MIN_EVENTS)
       .map(([name, events]) => ({ name, events })),
     categories: countCatalogValues(sessions.map((session) => session.category))
       .map(([name, events]) => ({ name, events })),
@@ -2984,6 +3274,67 @@ function buildCatalogFacets(sessions) {
       }),
     priceSteps: buildCatalogPriceSteps(sessions),
   };
+}
+
+export function sessionHasCoverImage(session) {
+  const url = String(session?.imageUrl || '').trim();
+  if (!url) return false;
+  if (url.startsWith('/images/cities/')) return false;
+  return true;
+}
+
+function normalizePublicSessionImageKey(imageUrl) {
+  const raw = String(imageUrl || '').trim();
+  if (!raw) return null;
+
+  let pathname = raw;
+  let hostname = '';
+  try {
+    const parsed = new URL(raw, 'https://daibilet.ru');
+    pathname = parsed.pathname;
+    hostname = parsed.hostname.toLowerCase();
+  } catch {
+    pathname = raw.split('?')[0]?.split('#')[0] || raw;
+  }
+
+  const normalizedPath = pathname.replace(/\/$/, '').toLowerCase();
+  const file = normalizedPath.split('/').filter(Boolean).pop() || '';
+  if (file && /\.(jpe?g|png|webp|gif|avif|bmp|svg)$/i.test(file)) {
+    if (/^[a-f0-9-]{16,}$/i.test(file.replace(/\.[^.]+$/, '')) || file.length >= 16) {
+      return `img:${file}`;
+    }
+    if (hostname) return `img:${hostname}/${file}`;
+  }
+
+  if (hostname) return `${hostname}${normalizedPath}`;
+  return normalizedPath || null;
+}
+
+export function spreadCatalogSessionsByCoverImage(sessions) {
+  if (!Array.isArray(sessions) || sessions.length <= 1) return sessions;
+
+  const pool = [...sessions];
+  const result = [];
+
+  while (pool.length > 0) {
+    const lastKey = result.length ? normalizePublicSessionImageKey(result[result.length - 1]?.imageUrl) : null;
+    let pickIndex = 0;
+
+    if (lastKey) {
+      const firstKey = normalizePublicSessionImageKey(pool[0]?.imageUrl);
+      if (firstKey && firstKey === lastKey) {
+        const alternateIndex = pool.findIndex((session) => {
+          const key = normalizePublicSessionImageKey(session.imageUrl);
+          return !key || key !== lastKey;
+        });
+        if (alternateIndex > 0) pickIndex = alternateIndex;
+      }
+    }
+
+    result.push(pool.splice(pickIndex, 1)[0]);
+  }
+
+  return result;
 }
 
 function sortCatalogSessions(sessions, sort) {
@@ -3037,73 +3388,104 @@ function humanizeSlug(slug) {
 }
 
 export async function buildPublicVenuePage(db, venueSlugOrId) {
-  const venueResult = await db.query(
-    `
-      select
-        venue.id,
-        venue.slug,
-        venue.title,
-        venue.description,
-        venue."shortDescription",
-        venue."heroImageUrl",
-        venue."seoH1",
-        venue."seoTitle",
-        venue."seoDescription",
-        venue."canonicalPath",
-        venue."isIndexable",
-        venue.address,
-        venue.latitude,
-        venue.longitude,
-        venue.kind,
-        venue."pageStatus",
-        city.title as city
-      from "Venue" venue
-      left join "City" city on city.id = venue."cityId"
-      where venue.slug = $1 or venue.id = $1
-      limit 1
-    `,
-    [venueSlugOrId],
-  );
-
-  const venue = venueResult.rows[0];
+  const venue = await resolvePublicVenueRow(db, venueSlugOrId);
   if (!venue || venue.pageStatus === 'HIDDEN') return null;
 
-  const [catalogSessions, relatedVenues] = await Promise.all([
+  const [catalogSessions, hubRows] = await Promise.all([
     publicCatalogSessions(db),
-    publicRelatedVenues(db, venue.id, venue.city, 6),
+    publicVenueHubRows(db, 500, { requireEvents: false }),
   ]);
-  const sessions = catalogSessions.filter((session) => session.venueId === venue.id).slice(0, 120);
+  const venueHeroImageFallbacks = buildActiveVenueEventCounts(catalogSessions).heroImageFallbacks;
+  const mergedGroup = findMergedVenueGroup(hubRows, venue.id);
+  const venueIds = mergedGroup?.mergedVenueIds || [venue.id];
+  const sessions = catalogSessions.filter((session) => venueIds.includes(session.venueId)).slice(0, 120);
+  if (!sessions.length) return null;
+  const canonicalVenue =
+    mergedGroup && mergedGroup.id !== venue.id ? (await resolvePublicVenueRow(db, mergedGroup.id)) || venue : venue;
+  const relatedVenues = await publicRelatedVenues(db, venue.id, venue.city, 6, hubRows);
+  if (
+    !isPublicVenueHub(
+      {
+        title: canonicalVenue.title,
+        name: canonicalVenue.title,
+        kind: canonicalVenue.kind,
+        pageStatus: canonicalVenue.pageStatus,
+        address: canonicalVenue.address,
+        events: sessions.length,
+      },
+      { requireEvents: false },
+    )
+  ) {
+    return null;
+  }
   const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
+  const routeCount = new Set(sessions.map((session) => session.groupKey || session.id).filter(Boolean)).size || sessions.length;
+  const displayName = formatPublicVenueTitle(canonicalVenue.title);
+  const normalizedVenue = applyPublicVenueNormalization({
+    name: displayName,
+    title: displayName,
+    address: mergedGroup?.address || canonicalVenue.address,
+    city: canonicalVenue.city || 'Не указан',
+  });
+  const waterEvents = sessions.filter(isWaterCatalogSession).length;
+  const busEvents = sessions.filter(isBusCatalogSession).length;
+  const resolvedType = resolvePublicVenueKind(canonicalVenue.kind, canonicalVenue.title, canonicalVenue.address, {
+    shortDescription: mergedGroup?.shortDescription || canonicalVenue.shortDescription,
+    description: canonicalVenue.description,
+    waterEvents,
+    busEvents,
+    totalEvents: sessions.length,
+  });
+  const hasDescription = Boolean(String(canonicalVenue.description || mergedGroup?.shortDescription || canonicalVenue.shortDescription || '').trim());
+  const hasAddress = Boolean(String(normalizedVenue.address || '').trim());
+  const hasHeroImage = Boolean(resolveVenueHeroImageUrl(
+    {
+      id: canonicalVenue.id,
+      heroImageUrl: mergedGroup?.heroImageUrl || canonicalVenue.heroImageUrl,
+      mergedVenueIds: venueIds,
+    },
+    venueHeroImageFallbacks,
+  ));
+  const weakVenuePage = routeCount < 3 || (!hasDescription && !hasHeroImage) || !hasAddress;
+  const isIndexable = canonicalVenue.isIndexable !== false && !weakVenuePage;
 
   return {
     generatedAt: new Date().toISOString(),
     venue: {
-      id: venue.id,
-      slug: venue.slug,
-      name: venue.title,
-      title: venue.title,
-      city: venue.city || 'Не указан',
-      address: venue.address,
-      latitude: venue.latitude,
-      longitude: venue.longitude,
-      type: String(venue.kind || 'OTHER').toLowerCase(),
-      pageStatus: venue.pageStatus,
-      description: venue.description,
-      shortDescription: venue.shortDescription,
-      heroImageUrl: venue.heroImageUrl,
-      seoH1: venue.seoH1,
-      seoTitle: venue.seoTitle,
-      seoDescription: venue.seoDescription,
-      canonicalPath: venue.canonicalPath,
-      isIndexable: venue.isIndexable,
-      events: sessions.length,
+      id: canonicalVenue.id,
+      slug: canonicalVenue.slug,
+      name: normalizedVenue.name,
+      title: normalizedVenue.name,
+      city: normalizedVenue.city || 'Не указан',
+      address: normalizedVenue.address,
+      latitude: canonicalVenue.latitude,
+      longitude: canonicalVenue.longitude,
+      type: resolvedType,
+      template: publicVenuePageTemplate(resolvedType),
+      pageStatus: canonicalVenue.pageStatus,
+      description: canonicalVenue.description,
+      shortDescription: mergedGroup?.shortDescription || canonicalVenue.shortDescription,
+      heroImageUrl: resolveVenueHeroImageUrl(
+        {
+          id: canonicalVenue.id,
+          heroImageUrl: mergedGroup?.heroImageUrl || canonicalVenue.heroImageUrl,
+          mergedVenueIds: venueIds,
+        },
+        venueHeroImageFallbacks,
+      ),
+      seoH1: canonicalVenue.seoH1,
+      seoTitle: canonicalVenue.seoTitle,
+      seoDescription: canonicalVenue.seoDescription,
+      canonicalPath: canonicalVenue.canonicalPath,
+      isIndexable,
+      events: routeCount,
       categories,
     },
     sessions,
     relatedVenues,
     stats: {
-      events: sessions.length,
+      events: routeCount,
       categories: Object.keys(categories).length,
       priceFrom: prices.length ? Math.min(...prices) : null,
     },
@@ -3392,6 +3774,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
           session."priceFromRub",
           session."ticketsVacant",
           session."externalId",
+          session_event."sourceStatus" as "eventSourceStatus",
           session_source_link."externalId" as "eventExternalId",
           session_source.code as "eventSourceCode",
           session_offer."sourceCode" as "offerSourceCode",
@@ -3401,6 +3784,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
           session_offer."deeplinkUrl" as "offerDeeplinkUrl",
           session_offer.active as "offerActive"
         from "EventSession" session
+        left join "Event" session_event on session_event.id = session."eventId"
         left join "EventSourceLink" session_source_link on session_source_link."eventId" = session."eventId"
         left join "Source" session_source on session_source.id = session_source_link."sourceId"
         left join lateral (
@@ -3440,16 +3824,16 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
           and offer.active is not false
           and offer."priceRub" >= $2
         order by
-          case when offer."sourceCode"::text = 'TEPLOHOD' then coalesce((offer.payload->>'sortOrder')::int, 9999) else 9999 end,
+          coalesce((offer.payload->>'sortOrder')::int, 9999),
           offer."priceRub" asc nulls last,
           offer.id asc
-        limit 24
+        limit 32
       `,
       [groupEventIds, MIN_DISPLAY_PRICE_RUB],
     ),
   ]);
 
-  const publicOffers = dedupePublicOffers(offersResult.rows).slice(0, 12);
+  const publicOffers = preferNamedTicketOffers(dedupePublicOffers(offersResult.rows)).slice(0, 32);
 
   const primaryOfferByEventId = primaryOfferMap(
     sessionsResult.rows
@@ -3550,6 +3934,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     });
     const schedule = publicSessionScheduleLabels({
       startsAt: session.startsAt,
+      endsAt: session.endsAt,
       kind: event.kind,
       sourceStatus: session.sourceStatus,
     });
@@ -3562,6 +3947,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       timeLabel: schedule.timeLabel,
       timeBucket: schedule.timeBucket,
       sourceStatus: session.sourceStatus,
+      eventSourceStatus: session.eventSourceStatus,
       priceFrom: displayPriceFrom(session.priceFromRub, baseEvent.priceFrom),
       vacant: session.ticketsVacant,
       purchaseUrl: sessionPurchase.url,
@@ -3589,6 +3975,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       }]
     : [];
   const publicSessions = sessions.length ? sessions : widgetOnlySessions;
+  applyEventPrimaryPurchase(baseEvent, publicSessions, event.sourceCode || primaryOffer?.sourceCode);
   const ticketPrices = buildPublicTicketPrices(publicOffers, publicSessions, baseEvent);
   const related = [];
   for (const session of catalogSessions) {
@@ -3612,6 +3999,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       widgetUrl: offer.widgetUrl,
       deeplinkUrl: offer.deeplinkUrl,
       active: offer.active,
+      sortOrder: readOfferSortOrder(offer.sortOrder),
     })),
     ticketPrices,
     related,
@@ -3634,6 +4022,17 @@ function readOfferSortOrder(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
+function preferNamedTicketOffers(rows) {
+  const list = rows || [];
+  const named = list.filter((row) => !isGenericTcOfferTitle(row.title));
+  return named.length ? named : list;
+}
+
+function isGenericTcOfferTitle(title) {
+  const key = normalizeGroupPart(title);
+  return !key || key === 'widget' || key.includes('ticketscloud widget');
+}
+
 function dedupePublicOffers(rows) {
   const unique = new Map();
   for (const row of rows || []) {
@@ -3650,14 +4049,9 @@ function dedupePublicOffers(rows) {
   }
 
   return Array.from(unique.values()).sort((a, b) => {
-    const aIsTep = String(a.sourceCode || '').toUpperCase().includes('TEPLOHOD');
-    const bIsTep = String(b.sourceCode || '').toUpperCase().includes('TEPLOHOD');
-    if (aIsTep || bIsTep) {
-      const aOrder = readOfferSortOrder(a.sortOrder) ?? 9999;
-      const bOrder = readOfferSortOrder(b.sortOrder) ?? 9999;
-      return aOrder - bOrder || Number(a.priceRub || 0) - Number(b.priceRub || 0);
-    }
-    return Number(a.priceRub || 0) - Number(b.priceRub || 0) || String(a.title || '').localeCompare(String(b.title || ''), 'ru');
+    const aOrder = readOfferSortOrder(a.sortOrder) ?? 9999;
+    const bOrder = readOfferSortOrder(b.sortOrder) ?? 9999;
+    return aOrder - bOrder || Number(a.priceRub || 0) - Number(b.priceRub || 0) || String(a.title || '').localeCompare(String(b.title || ''), 'ru');
   });
 }
 
@@ -3666,7 +4060,7 @@ function buildPublicTicketPrices(offers, sessions, event) {
   const eventTitleKey = normalizeGroupPart(event.title);
   const isTeplohod = String(event.sourceCode || event.offerSourceCode || '').toUpperCase().includes('TEPLOHOD');
 
-  for (const offer of offers || []) {
+  for (const offer of preferNamedTicketOffers(offers || [])) {
     if (offer.active === false || !Number.isFinite(offer.priceRub) || offer.priceRub < MIN_DISPLAY_PRICE_RUB) continue;
     const title = normalizePublicTicketTitle(offer.title, eventTitleKey);
     rows.push({
@@ -3717,14 +4111,11 @@ function buildPublicTicketPrices(offers, sessions, event) {
 
   return Array.from(unique.values())
     .sort((a, b) => {
-      if (isTeplohod) {
-        const aOrder = readOfferSortOrder(a.sortOrder) ?? 9999;
-        const bOrder = readOfferSortOrder(b.sortOrder) ?? 9999;
-        return aOrder - bOrder || a.priceRub - b.priceRub;
-      }
-      return a.priceRub - b.priceRub || String(a.title).localeCompare(String(b.title), 'ru');
+      const aOrder = readOfferSortOrder(a.sortOrder) ?? 9999;
+      const bOrder = readOfferSortOrder(b.sortOrder) ?? 9999;
+      return aOrder - bOrder || a.priceRub - b.priceRub || String(a.title).localeCompare(String(b.title), 'ru');
     })
-    .slice(0, 8);
+    .slice(0, 32);
 }
 
 function normalizePublicTicketTitle(rawTitle, eventTitleKey) {
@@ -3753,6 +4144,62 @@ function providerWidgetProvider(sourceCode) {
   if (normalized.includes('TEPLOHOD')) return 'TEPLOHOD';
   if (normalized.includes('TC') || normalized.includes('TICKETSCLOUD')) return 'TICKETSCLOUD';
   return null;
+}
+
+function extractTcExternalIdFromPurchaseUrl(url) {
+  if (!url) return null;
+  const match = String(url).match(/[?&]event=([^&]+)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+function isPublicSessionPurchaseBlocked(session) {
+  const statuses = [session.sourceStatus, session.eventSourceStatus].map((value) => String(value || '').toLowerCase());
+  if (statuses.some((status) => ['paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden'].includes(status))) {
+    return true;
+  }
+  if (session.purchaseReady === false) return true;
+  if (session.vacant === 0) return true;
+  return false;
+}
+
+function shouldPromoteGroupedRepresentative(current, candidate) {
+  if (!candidate?.startsAt) return false;
+  const currentBlocked = isPublicSessionPurchaseBlocked(current);
+  const candidateBlocked = isPublicSessionPurchaseBlocked(candidate);
+  if (currentBlocked && !candidateBlocked) return true;
+  if (!currentBlocked && candidateBlocked) return false;
+  if (!current.startsAt) return true;
+  return new Date(candidate.startsAt) < new Date(current.startsAt);
+}
+
+function pickPrimaryPurchasableSession(sessions) {
+  for (const session of sessions || []) {
+    if (isPublicSessionPurchaseBlocked(session)) continue;
+    if (!extractTcExternalIdFromPurchaseUrl(session.purchaseUrl)) continue;
+    return session;
+  }
+  return sessions?.[0] || null;
+}
+
+function applyEventPrimaryPurchase(baseEvent, sessions, sourceCode) {
+  const primarySession = pickPrimaryPurchasableSession(sessions);
+  if (!primarySession?.purchaseUrl) return baseEvent;
+
+  const tcEventId = extractTcExternalIdFromPurchaseUrl(primarySession.purchaseUrl);
+  if (!tcEventId) return baseEvent;
+
+  baseEvent.purchaseUrl = primarySession.purchaseUrl;
+  baseEvent.widgetUrl = primarySession.purchaseUrl;
+  if (providerWidgetProvider(sourceCode) === 'TICKETSCLOUD') {
+    baseEvent.externalId = tcEventId;
+    baseEvent.widgetPayload = {
+      ...(baseEvent.widgetPayload || {}),
+      provider: 'TICKETSCLOUD',
+      tcEventId,
+    };
+  }
+
+  return baseEvent;
 }
 
 function buildProviderWidgetPayload(row) {
@@ -3943,7 +4390,7 @@ async function eventRows(db, limit) {
       sourceCitySlug: row.citySlug,
       destination: destination.name,
       destinationType: destination.type,
-      venue: row.venue || 'Не указано',
+      venue: formatPublicVenueTitle(row.venue) || 'Не указано',
       venueId: row.venueId,
       venueSlug: row.venueSlug,
       venueKind: row.venueKind || 'OTHER',
@@ -4124,6 +4571,312 @@ function normalizeNullableString(value) {
   if (value == null) return null;
   const text = String(value).trim();
   return text ? text : null;
+}
+
+function formatPublicVenueTitle(value) {
+  if (value == null) return value;
+  return String(value)
+    .replace(/\s*\(\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\s*\)\s*$/u, '')
+    .trim();
+}
+
+function applyPublicVenueNormalization(row = {}) {
+  const normalized = normalizePublicVenueRecord({
+    id: row.id,
+    title: row.name || row.title,
+    name: row.name || row.title,
+    address: row.address,
+    city: row.city,
+  });
+  return {
+    ...row,
+    name: normalized.title,
+    title: normalized.title,
+    address: normalized.address,
+    city: normalized.city || row.city,
+  };
+}
+
+function normalizeVenueTextKey(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/[^a-z0-9а-я]+/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function venueTitleLooksLikeAddress(name) {
+  const text = String(name || '').toLowerCase();
+  return /(?:\bul\.|\bпр\.|\bпер\.|наб\.|,\s*с\.|,\s*д\.|,\s*дом\b|район,|область,|республик)/i.test(text);
+}
+
+function canonicalVenueAddressKey(name, address) {
+  let text = normalizeVenueTextKey(`${formatPublicVenueTitle(name) || ''} ${address || ''}`);
+  text = text
+    .replace(/(?:^|\s)причал(?:\s|$)/g, ' ')
+    .replace(/(?:^|\s)наб(?:\s|$)/g, ' набережная ')
+    .replace(/(?:^|\s)ул(?:\s|$)/g, ' улица ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  return text;
+}
+
+function normalizePublicVenueMergeKey(name, city, address) {
+  const title = normalizeVenueTextKey(formatPublicVenueTitle(name));
+  const cityKey = normalizeVenueTextKey(city || 'не указан');
+
+  if (/причал/i.test(`${name || ''} ${address || ''}`)) {
+    return `pier|${cityKey}|${title}`;
+  }
+
+  if (hasBusLikeText(name, address)) {
+    return `bus|${cityKey}|${title}`;
+  }
+
+  if (venueTitleLooksLikeAddress(name)) {
+    return `geo|${title}`;
+  }
+
+  const addressKey = canonicalVenueAddressKey(name, address);
+  if (addressKey.length >= 10) {
+    return `addr|${cityKey}|${addressKey}`;
+  }
+
+  return `city|${cityKey}|${title}`;
+}
+
+function capitalizeLocality(value) {
+  const text = String(value || '').trim();
+  if (!text) return text;
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function routeCityToPublicDisplayName(cityName) {
+  const clean = canonicalizePublicCityName(cityName) || cleanDisplayName(cityName);
+  if (!clean || clean === 'Не указан') return clean;
+  if (STANDALONE_CITY_NAMES.has(clean)) return clean;
+  const mapped = CITY_TO_REGION.get(clean);
+  if (mapped) return mapped;
+  return clean;
+}
+
+function isAllowedPublicDestination(destination) {
+  if (!destination?.name || destination.name === 'Не указан') return false;
+  if (destination.type === 'city') return STANDALONE_CITY_NAMES.has(destination.name);
+  if (destination.type === 'region') return PUBLIC_REGION_NAMES.has(destination.name) || isPublicRegionName(destination.name);
+  return false;
+}
+
+function buildPublicDestinationRecord(row, mappedName) {
+  if (STANDALONE_CITY_NAMES.has(mappedName)) {
+    const slug = publicCitySlug(mappedName);
+    return {
+      id: row.cityId || `city_${slug}`,
+      slug,
+      sourceSlug: row.citySlug || slug,
+      name: mappedName,
+      type: 'city',
+    };
+  }
+
+  const slug = publicCitySlug(mappedName);
+  return {
+    id: row.regionId || `region_${slug}`,
+    slug,
+    sourceSlug: row.regionSlug || slug,
+    name: mappedName,
+    type: 'region',
+  };
+}
+
+/** Обрезки названий: regex «с.» ошибочно съедал начальную «с» у слов (Синопской → Инопской). */
+const CITY_BOGUS_ALIASES = new Map([
+  ['анкт-петербург', 'Санкт-Петербург'],
+  ['инопской', 'Санкт-Петербург'],
+  ['инопская', 'Санкт-Петербург'],
+  ['пуск', 'Санкт-Петербург'],
+  ['плетни', 'Санкт-Петербург'],
+  ['оляной', 'Санкт-Петербург'],
+  ['аунд', 'Санкт-Петербург'],
+  ['основское', 'Сосновское'],
+  ['ветланская', 'Владивосток'],
+  ['тромынский', 'Москва'],
+  ['партаковская', 'Москва'],
+  ['тороны', 'Москва'],
+  ['ити', 'Владивосток'],
+  ['алиха', 'Казань'],
+  ['ерова', 'Самара'],
+  ['цена', 'Нижний Новгород'],
+  ['вобода', 'Самара'],
+  ['оветская', 'Самара'],
+  ['троителей', 'Тольятти'],
+  ['троение', 'Тольятти'],
+]);
+
+function canonicalizePublicCityName(value) {
+  const raw = cleanDisplayName(value);
+  if (!raw || raw === 'Не указан') return null;
+  const alias = CITY_BOGUS_ALIASES.get(normalizeVenueTextKey(raw));
+  return alias || raw;
+}
+
+function haystackIncludesCityToken(haystack, cityName) {
+  const token = normalizeVenueTextKey(cityName);
+  if (!token) return false;
+  const normalizedHaystack = normalizeVenueTextKey(haystack);
+  return ` ${normalizedHaystack} `.includes(` ${token} `);
+}
+
+function inferVenueLocalityLabel(name, address) {
+  const text = `${name || ''} ${address || ''}`.toLowerCase();
+  // Только «с.» с точкой — иначе «синопской» превращается в «инопской».
+  const villageMatch = text.match(/(?:^|[,\s])с\.(\s*)([а-яё][а-яё-]{2,40})/);
+  if (villageMatch) return capitalizeLocality(villageMatch[2]);
+  const regionMatch = text.match(/республик[аи]\s+[а-яё][а-яё\s-]{2,40}/i);
+  if (regionMatch) return capitalizeLocality(regionMatch[0]);
+  if (text.includes('хакас')) return 'Республика Хакасия';
+  return null;
+}
+
+function venueLocationContradictsCity(name, address, dbCity) {
+  const db = normalizeVenueTextKey(dbCity);
+  if (!db || db === 'не указан') return false;
+  const haystack = `${name || ''} ${address || ''}`.toLowerCase();
+  if (haystack.includes('хакас') && !['абакан', 'хакас', 'черногор', 'минусин', 'ефрем'].some((part) => db.includes(part))) {
+    return true;
+  }
+  if (CITY_BOGUS_ALIASES.has(db)) return true;
+  const locality = inferVenueLocalityLabel(name, address);
+  if (locality && !haystackIncludesCityToken(haystack, dbCity) && normalizeVenueTextKey(locality) !== db) {
+    return true;
+  }
+  const inferred = inferCityNameFromText(name, address);
+  if (inferred && normalizeVenueTextKey(inferred) !== db && !haystackIncludesCityToken(haystack, dbCity)) {
+    return true;
+  }
+  return false;
+}
+
+function resolvePublicVenueCity(row) {
+  const dbCity = cleanDisplayName(row.city);
+  const name = row.name || row.title || '';
+  const address = row.address || '';
+  const inferred = inferCityNameFromText(name, address);
+  const canonicalDb = canonicalizePublicCityName(dbCity);
+
+  if (inferred) return routeCityToPublicDisplayName(inferred);
+  if (canonicalDb) return routeCityToPublicDisplayName(canonicalDb);
+  if (dbCity && dbCity !== 'Не указан') return routeCityToPublicDisplayName(dbCity);
+  const locality = inferVenueLocalityLabel(name, address);
+  return locality ? routeCityToPublicDisplayName(locality) : 'Не указан';
+}
+
+function venueRowMergeScore(row) {
+  let score = (Number(row.events) || 0) * 1000;
+  if (row.heroImageUrl) score += 500;
+  if (String(row.pageStatus || '').toUpperCase() === 'PUBLISHED') score += 200;
+  if (row.address) score += 50;
+  if (row.shortDescription) score += 25;
+  return score;
+}
+
+function mergePublicVenueHubRows(rows) {
+  const groups = new Map();
+
+  for (const row of rows) {
+    const key = normalizePublicVenueMergeKey(row.name || row.title, row.city, row.address);
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(row);
+  }
+
+  const merged = [];
+  for (const items of groups.values()) {
+    if (items.length === 1) {
+      merged.push({ ...items[0], mergedVenueIds: [items[0].id] });
+      continue;
+    }
+
+    const sorted = [...items].sort((a, b) => venueRowMergeScore(b) - venueRowMergeScore(a));
+    const primary = sorted[0];
+    merged.push({
+      ...primary,
+      city: resolvePublicVenueCity(primary),
+      events: items.reduce((sum, item) => sum + (Number(item.events) || 0), 0),
+      waterEvents: items.reduce((sum, item) => sum + (Number(item.waterEvents) || 0), 0),
+      busEvents: items.reduce((sum, item) => sum + (Number(item.busEvents) || 0), 0),
+      heroImageUrl: sorted.find((item) => item.heroImageUrl)?.heroImageUrl || primary.heroImageUrl,
+      shortDescription: sorted.find((item) => item.shortDescription)?.shortDescription || primary.shortDescription,
+      description: sorted.find((item) => item.description)?.description || primary.description,
+      address: sorted.find((item) => item.address)?.address || primary.address,
+      mergedVenueIds: items.map((item) => item.id),
+    });
+  }
+
+  return merged.sort((a, b) => (b.events - a.events) || String(a.name || '').localeCompare(String(b.name || ''), 'ru'));
+}
+
+function findMergedVenueGroup(rows, venueId) {
+  if (!venueId) return null;
+  return rows.find((row) => row.id === venueId || (row.mergedVenueIds || []).includes(venueId)) || null;
+}
+
+function venueGroupsOverlap(a, b) {
+  const left = new Set(a?.mergedVenueIds || (a?.id ? [a.id] : []));
+  return (b?.mergedVenueIds || (b?.id ? [b.id] : [])).some((id) => left.has(id));
+}
+
+async function publicVenueHubRows(db, limit = 500, options = {}) {
+  const [rows, sessions] = await Promise.all([venueRows(db, limit), publicCatalogSessions(db)]);
+  const { activeCounts, waterCounts, busCounts, heroImageFallbacks } = buildActiveVenueEventCounts(sessions);
+  const enriched = rows.map((row) => ({
+    ...row,
+    events: activeCounts.get(row.id) || 0,
+    waterEvents: waterCounts.get(row.id) || 0,
+    busEvents: busCounts.get(row.id) || 0,
+    heroImageUrl: resolveVenueHeroImageUrl(row, heroImageFallbacks),
+  }));
+  return mergePublicVenueHubRows(enriched.filter((row) => isPublicVenueHub(row, options)));
+}
+
+const PUBLIC_VENUE_ROW_SELECT = `
+  select
+    venue.id,
+    venue.slug,
+    venue.title,
+    venue.description,
+    venue."shortDescription",
+    venue."heroImageUrl",
+    venue."seoH1",
+    venue."seoTitle",
+    venue."seoDescription",
+    venue."canonicalPath",
+    venue."isIndexable",
+    venue.address,
+    venue.latitude,
+    venue.longitude,
+    venue.kind,
+    venue."pageStatus",
+    city.title as city
+  from "Venue" venue
+  left join "City" city on city.id = venue."cityId"
+`;
+
+async function resolvePublicVenueRow(db, venueSlugOrId) {
+  const value = String(venueSlugOrId || '').trim();
+  if (!value) return null;
+
+  let result = await db.query(`${PUBLIC_VENUE_ROW_SELECT} where venue.slug = $1 or venue.id = $1 limit 1`, [value]);
+  if (result.rows[0]) return result.rows[0];
+
+  const suffixMatch = value.match(/(?:^|-)([a-f0-9]{20,})$/i);
+  if (suffixMatch) {
+    const suffix = suffixMatch[1];
+    result = await db.query(`${PUBLIC_VENUE_ROW_SELECT} where venue.id = $1 or venue.id = $2 limit 1`, [`venue_${suffix}`, suffix]);
+    if (result.rows[0]) return result.rows[0];
+  }
+
+  return null;
 }
 
 function cleanImportedDescription(value) {
@@ -4428,15 +5181,19 @@ async function venueRows(db, limit) {
         venue.slug,
         venue.title as name,
         venue."shortDescription",
+        venue.description,
         venue."heroImageUrl",
         city.title as city,
         venue.address,
         venue.kind,
         venue."pageStatus",
-        count(event.id)::int as events
+        count(event.id)::int as events,
+        count(event.id) filter (where ${PUBLIC_WATER_EVENT_SQL})::int as "waterEvents"
       from "Venue" venue
       left join "City" city on city.id = venue."cityId"
       left join "Event" event on event."venueId" = venue.id
+      left join "Category" cat on cat.id = event."categoryId"
+      left join "Subcategory" sub on sub.id = event."primarySubcategoryId"
       group by venue.id, city.title
       order by events desc, venue.title asc
       limit $1
@@ -4444,19 +5201,410 @@ async function venueRows(db, limit) {
     [limit],
   );
 
-  return result.rows.map((row) => ({
-    id: row.id,
-    slug: row.slug,
-    name: row.name,
-    city: row.city || 'Не указан',
-    address: row.address,
+  return result.rows.map((row) => {
+    const name = formatPublicVenueTitle(row.name);
+    const mapped = {
+      id: row.id,
+      slug: row.slug,
+      name,
+      city: row.city || 'Не указан',
+      address: row.address,
+      shortDescription: row.shortDescription,
+      heroImageUrl: row.heroImageUrl,
+      proposedKind: String(row.kind || 'OTHER').toLowerCase(),
+      kind: String(row.kind || 'OTHER').toUpperCase(),
+      pageStatus: String(row.pageStatus || 'NONE').toLowerCase(),
+      reason: row.pageStatus === 'CANDIDATE' ? 'кандидат на public-страницу' : 'пока только локация',
+      events: row.events,
+      waterEvents: row.waterEvents,
+    };
+    mapped.city = resolvePublicVenueCity(mapped);
+    return applyPublicVenueNormalization(mapped);
+  });
+}
+
+const PUBLIC_VENUE_HUB_EXCLUDED_KINDS = new Set(['MEETING_POINT', 'ONLINE']);
+
+const INSTITUTION_VENUE_KINDS = new Set(['MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'BAR']);
+
+function normalizeVenueKindValue(value) {
+  return String(value || 'OTHER')
+    .trim()
+    .toUpperCase()
+    .replace(/-/g, '_');
+}
+
+function publicVenuePageTemplate(kind) {
+  const normalized = normalizeVenueKindValue(kind);
+  return INSTITUTION_VENUE_KINDS.has(normalized) ? 'institution' : 'location';
+}
+
+function isMeetingPointLikeRow(row) {
+  const resolved = resolvePublicVenueKindFromRow(row);
+  if (resolved === 'bus') return false;
+  if (resolved === 'meeting_point') return true;
+  const name = `${row.name || row.title || ''} ${row.address || ''}`.toLowerCase();
+  return /место сбора|место встречи|точка сбора|точка встречи|площадка:|^метро | у метро |у метро |около метро|у памятник|памятник|\bпам\.|\bу пам\b|пл\.\s*у\s*пам/u.test(name);
+}
+
+function venueNameAddressText(name, address) {
+  return `${name || ''} ${address || ''}`.toLowerCase();
+}
+
+const PUBLIC_WATER_EVENT_TEXT_RE =
+  /водн|речн|теплоход|катер|яхт|корабл|судн|лодк|канал|круиз|развод.*мост|мост.*развод|прогулк/i;
+
+const PUBLIC_WATER_EVENT_SQL = `
+  (
+    coalesce(cat.title, '') ~* 'водн|речн|теплоход|катер'
+    or coalesce(sub.title, '') ~* 'водн|речн|теплоход|катер'
+    or coalesce(event.title, '') ~* 'теплоход|катер|яхт|корабл|судн|лодк|речн|река|канал|круиз|развод.*мост|мост.*развод|прогулк'
+    or exists (
+      select 1
+      from "EventTag" event_tag
+      join "Tag" tag on tag.id = event_tag."tagId"
+      where event_tag."eventId" = event.id
+        and tag.title ~* 'водн|речн|теплоход|катер|яхт|корабл'
+    )
+    or exists (
+      select 1
+      from "EventOffer" event_offer
+      where event_offer."eventId" = event.id
+        and event_offer.active = true
+        and event_offer."sourceCode"::text = 'TEPLOHOD'
+    )
+  )
+`;
+
+function isWaterCatalogSession(session) {
+  if (!session) return false;
+  if (String(session.sourceCode || '').toUpperCase().includes('TEPLOHOD')) return true;
+  const text = [session.category, session.title, ...(session.tags || []), session.sourceCode].filter(Boolean).join(' ').toLowerCase();
+  return PUBLIC_WATER_EVENT_TEXT_RE.test(text);
+}
+
+function hasWaterOnlyEvents(waterEvents, totalEvents) {
+  const water = Number(waterEvents || 0);
+  const total = Number(totalEvents || 0);
+  return total > 0 && water >= total;
+}
+
+const PUBLIC_BUS_EVENT_TEXT_RE =
+  /автобус|автобусн|hop[\s-]?on|hop[\s-]?off|city[\s-]?sightseeing|city[\s-]?tour|сити[\s-]?тур|двухэтажн|садись[\s-]?руляй/i;
+
+function isBusCatalogSession(session) {
+  if (!session) return false;
+  const text = [session.category, session.title, ...(session.tags || []), ...(session.subcategories || [])]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  return PUBLIC_BUS_EVENT_TEXT_RE.test(text);
+}
+
+function hasBusOnlyEvents(busEvents, totalEvents) {
+  const bus = Number(busEvents || 0);
+  const total = Number(totalEvents || 0);
+  return total > 0 && bus >= total;
+}
+
+function hasBusLikeText(name, address) {
+  const text = venueNameAddressText(name, address);
+  if (
+    /автобус|bus[\s-]?stop|авт\.?\s*остан|автобусн(?:ая|ой)?\s+останов|остановк.*автобус|hop[\s-]?on|hop[\s-]?off|city[\s-]?sightseeing|city[\s-]?tour|сити[\s-]?тур|двухэтажн|маршрут.*автобус|садись[\s-]?руляй|^автобус$/i.test(
+      text,
+    )
+  ) {
+    return true;
+  }
+  if (/\bсектор\s*[«"'][A-ZBCАВСЕ]/i.test(text)) {
+    if (/причал|пристань|набереж|речн|канал|фонтанк|мойк|нев|мост|устьин|китай/i.test(text)) return false;
+    return true;
+  }
+  return false;
+}
+
+function isTransportVehicleVenueName(name) {
+  const text = String(name || '').trim();
+  if (!text) return false;
+  if (/^yutong\b|^маз\b|^паз\b|^hyundai\b|^mercedes\b|^volvo\b|^man\b|^ikarus\b/i.test(text)) return true;
+  if (/^[a-zа-яё][a-zа-яё\s-]{0,20}\d{3,5}$/i.test(text) && text.length <= 28) return true;
+  return false;
+}
+
+function isJunkPublicVenueRow(row) {
+  const name = String(row?.name || row?.title || '').trim();
+  const address = String(row?.address || '').trim();
+  const text = venueNameAddressText(name, address);
+
+  if (isTransportVehicleVenueName(name)) return true;
+  if (/^на парковке\b|парковк.*турист|турист.*транспорт|парковка.*(?:трц|торгов|молл)/i.test(text)) {
+    if (Number(row?.busEvents || 0) <= 0) return true;
+  }
+  if (/^wc\b|^туалет\b|^кондиционер\b/i.test(name)) return true;
+
+  const resolved = resolvePublicVenueKindFromRow(row);
+  if (resolved === 'meeting_point') return true;
+
+  return false;
+}
+
+function buildActiveVenueEventCounts(sessions) {
+  const activeCounts = new Map();
+  const waterCounts = new Map();
+  const busCounts = new Map();
+  const heroImageFallbacks = new Map();
+  const seen = new Map();
+
+  for (const session of sessions || []) {
+    if (!session?.venueId) continue;
+    if (!seen.has(session.venueId)) seen.set(session.venueId, new Set());
+    const keys = seen.get(session.venueId);
+    const key = session.groupKey || session.id;
+    if (!key || keys.has(key)) continue;
+    keys.add(key);
+    activeCounts.set(session.venueId, (activeCounts.get(session.venueId) || 0) + 1);
+    if (isWaterCatalogSession(session)) {
+      waterCounts.set(session.venueId, (waterCounts.get(session.venueId) || 0) + 1);
+    }
+    if (isBusCatalogSession(session)) {
+      busCounts.set(session.venueId, (busCounts.get(session.venueId) || 0) + 1);
+    }
+    if (!heroImageFallbacks.has(session.venueId)) {
+      const imageUrl = pickRealPublicImageUrl(session.imageUrl);
+      if (imageUrl) heroImageFallbacks.set(session.venueId, imageUrl);
+    }
+  }
+
+  return { activeCounts, waterCounts, busCounts, heroImageFallbacks };
+}
+
+function pickRealPublicImageUrl(value) {
+  const url = String(value || '').trim();
+  if (!url) return null;
+  if (url.startsWith('/images/cities/')) return null;
+  return /^https?:\/\//i.test(url) ? url : null;
+}
+
+function resolveVenueHeroImageUrl(row, heroImageFallbacks = null) {
+  const stored = pickRealPublicImageUrl(row?.heroImageUrl);
+  if (stored) return stored;
+
+  const venueIds = row?.mergedVenueIds || (row?.id ? [row.id] : []);
+  for (const venueId of venueIds) {
+    const fallback = heroImageFallbacks?.get(venueId);
+    if (fallback) return fallback;
+  }
+
+  return row?.heroImageUrl || null;
+}
+
+function hasPierLikeText(name, address) {
+  const text = venueNameAddressText(name, address);
+  if (/смотров(?:ая|ой|ую|ые)\s+площадк/i.test(text)) return false;
+  if (/причал|пристань/i.test(text)) return true;
+  if (/речн(?:ой|ая|ого|ые)?\s+(?:вокзал|порт)/i.test(text)) return true;
+  return false;
+}
+
+function isViewingPlatformLikeVenue(name, address, shortDescription, description) {
+  const text = [name, address, shortDescription, description].filter(Boolean).join(' ');
+  return /смотров(?:ая|ой|ую|ые)\s+площадк|smotrovaya|viewing platform|observation deck/i.test(text);
+}
+
+function isBarLikeFromText(text) {
+  const t = String(text || '').trim().toLowerCase();
+  if (!t) return false;
+  if (/(?:^|[\s«"'(\[]|-)(?:бар|паб)(?:[\s"'»)\],!.]|$)/u.test(t)) return true;
+  if (/\bpub\b|(?:^|[\s-])bar(?:[\s.-]|$)|-bar\b|\bbar\b|barrock|music\s*bar|lounge[\s-]?bar|bar$/iu.test(t)) return true;
+  if (/концертный бар|рок-бар|коктейльн(?:ый|ого) бар|музыкальн(?:ый|ого) бар|ночной бар/iu.test(t)) return true;
+  return false;
+}
+
+function isClubRestaurantLikeFromText(text) {
+  const t = String(text || '').trim().toLowerCase();
+  if (!t || isBarLikeFromText(t)) return false;
+  if (
+    /ресторан|кафе|гастроном|пивной ресторан|ресторан-клуб|музыкальн(?:ый|ого) ресторан|баварск|грузинск|хачапури|хинкали|гостеприимств|oktoberfest|пивоварен/iu.test(
+      t,
+    )
+  ) {
+    return true;
+  }
+  if (
+    /ночной клуб|музыкальн(?:ый|ого) клуб|концертный клуб|клубный ресторан|арт-пространств[^\n]{0,48}клуб|клуб[^\n]{0,24}арт-пространств|(?:^|[\s«"'(\[]|-)(?:клуб)(?:[\s"'»)\],!.]|$)/u.test(
+      t,
+    )
+  ) {
+    return true;
+  }
+  return /\bclub\b/i.test(t) && !/concert hall|concert-hall/i.test(t);
+}
+
+function inferBarOrClubFromContent(name, address, shortDescription, description) {
+  const content = [name, address, shortDescription, description].filter(Boolean).join(' ');
+  if (isBarLikeVenue(name, address) || isBarLikeFromText(content)) return 'bar';
+  if (isClubRestaurantLikeFromText(content)) return 'club_bar_restaurant';
+  return null;
+}
+
+function isBarLikeVenue(name, address) {
+  const nameText = String(name || '').trim().toLowerCase();
+  if (!nameText) return false;
+  if (/(?:^|[\s«"'(\[]|-)(?:бар|паб)(?:[\s"'»)\],!.]|$)/u.test(nameText)) return true;
+  return /\bpub\b|(?:^|[\s-])bar(?:[\s.-]|$)|-bar\b|\bbar\b|barrock|music\s*bar|lounge[\s-]?bar|bar$/iu.test(nameText);
+}
+
+function inferPublicVenueKindFromName(name, address) {
+  const text = venueNameAddressText(name, address);
+  if (/\bпам\.|памятник|\bу пам\b|пл\.\s*у\s*пам|место сбора|точка сбора|^метро\b|\bу метро\b/i.test(text)) return 'meeting_point';
+  if (/смотров(?:ая|ой|ую|ые)\s+площадк/i.test(text)) return 'museum_art_space';
+  if (hasBusLikeText(name, address)) return 'bus';
+  if (/причал|пристань/i.test(text)) return 'pier';
+  if (/речн(?:ой|ая|ого|ые)?\s+(?:вокзал|порт)/i.test(text)) return 'pier';
+  if (/турбаз|база отдыха|глэмпинг/i.test(text)) return 'outdoor_location';
+  if (/театр|teatr/i.test(text)) return 'theater';
+  if (/музей|галере|выстав/i.test(text)) return 'museum_art_space';
+  if (isBarLikeVenue(name, address)) return 'bar';
+  if (/банкет|\bзал\b|hall|концерт|филармони|дворец/i.test(text)) return 'concert_hall';
+  if (/клуб|\bclub\b|ресторан|кафе/i.test(text)) return 'club_bar_restaurant';
+  if (/стадион|арена|спорт|каток/i.test(text)) return 'sport_activity_space';
+  if (/\bпарк\b|сквер/i.test(text)) return 'outdoor_location';
+  return 'venue';
+}
+
+function canonicalStoredVenueKind(storedKind) {
+  const stored = normalizeVenueKindValue(storedKind).toLowerCase();
+  if (stored === 'pier_water' || stored === 'pier') return 'pier';
+  return stored;
+}
+
+function resolvePublicVenueKind(storedKind, name, address, options = {}) {
+  const stored = canonicalStoredVenueKind(storedKind);
+  const inferred = inferPublicVenueKindFromName(name, address);
+  const { shortDescription, description, waterEvents = 0, busEvents = 0, totalEvents = 0 } = options;
+  const text = venueNameAddressText(name, address);
+  const busByEvents =
+    hasBusOnlyEvents(busEvents, totalEvents) && !/teplohod|теплоход|причал|пристань/i.test(text);
+
+  if (inferred === 'bus' || hasBusLikeText(name, address) || busByEvents) {
+    return 'bus';
+  }
+
+  if (inferred === 'meeting_point' || stored === 'meeting_point') return 'meeting_point';
+
+  const barOrClub = inferBarOrClubFromContent(name, address, shortDescription, description);
+  if (barOrClub) return barOrClub;
+
+  if (isViewingPlatformLikeVenue(name, address, shortDescription, description)) {
+    return 'museum_art_space';
+  }
+
+  if (INSTITUTION_VENUE_KINDS.has(normalizeVenueKindValue(storedKind))) {
+    return stored;
+  }
+
+  if (
+    stored === 'pier' ||
+    hasPierLikeText(name, address) ||
+    inferred === 'pier' ||
+    (hasWaterOnlyEvents(waterEvents, totalEvents) && !isViewingPlatformLikeVenue(name, address, shortDescription, description))
+  ) {
+    return 'pier';
+  }
+
+  if (stored === 'other' || stored === 'venue') {
+    return inferred;
+  }
+
+  if (stored === 'theater' && inferred !== 'theater') {
+    return inferred;
+  }
+
+  return stored;
+}
+
+function resolvePublicVenueKindFromRow(row) {
+  return resolvePublicVenueKind(row.kind || row.proposedKind, row.name || row.title, row.address, {
     shortDescription: row.shortDescription,
-    heroImageUrl: row.heroImageUrl,
-    proposedKind: String(row.kind || 'OTHER').toLowerCase(),
-    pageStatus: String(row.pageStatus || 'NONE').toLowerCase(),
-    reason: row.pageStatus === 'CANDIDATE' ? 'кандидат на public-страницу' : 'пока только локация',
-    events: row.events,
-  }));
+    description: row.description,
+    waterEvents: Number(row.waterEvents || 0),
+    busEvents: Number(row.busEvents || 0),
+    totalEvents: Number(row.events || 0),
+  });
+}
+
+function isPublicVenueHub(row, options = {}) {
+  const requireEvents = options.requireEvents !== false;
+  if (!row) return false;
+  const kind = normalizeVenueKindValue(row.kind || row.proposedKind);
+  if (PUBLIC_VENUE_HUB_EXCLUDED_KINDS.has(kind)) return false;
+  if (isMeetingPointLikeRow(row)) return false;
+  if (isJunkPublicVenueRow(row)) return false;
+  if (String(row.pageStatus || '').toUpperCase() === 'HIDDEN') return false;
+  if (requireEvents && Number(row.events) <= 0) return false;
+  return true;
+}
+
+function mapPublicVenueListItem(row) {
+  const normalized = applyPublicVenueNormalization(row);
+  const type = resolvePublicVenueKindFromRow(normalized);
+  return {
+    id: normalized.id,
+    slug: normalized.slug,
+    name: normalized.name,
+    city: normalized.city,
+    address: normalized.address,
+    type,
+    template: publicVenuePageTemplate(type),
+    pageStatus: normalized.pageStatus,
+    shortDescription: normalized.shortDescription,
+    heroImageUrl: normalized.heroImageUrl,
+    events: normalized.events,
+    categories: {},
+  };
+}
+
+export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchParams()) {
+  const limit = clampNumber(searchParams.get('limit'), 1, 500, 240);
+  const query = String(searchParams.get('q') || '').trim().toLowerCase();
+  const cityFilter = String(searchParams.get('city') || '').trim().toLowerCase();
+  const typeFilter = String(searchParams.get('type') || '').trim().toLowerCase();
+  const familyFilter = String(searchParams.get('family') || '').trim().toLowerCase();
+  const rows = await publicVenueHubRows(db, 500);
+  const venues = rows
+    .filter((row) => {
+      if (!query) return true;
+      return [row.name, row.city, row.address, row.proposedKind].filter(Boolean).join(' ').toLowerCase().includes(query);
+    })
+    .filter((row) => {
+      if (!cityFilter) return true;
+      const citySlug = publicCitySlug(row.city || '');
+      return citySlug === cityFilter || String(row.city || '').toLowerCase().includes(cityFilter);
+    })
+    .filter((row) => {
+      if (!typeFilter) return true;
+      return resolvePublicVenueKindFromRow(row) === typeFilter;
+    })
+    .filter((row) => {
+      if (!familyFilter) return true;
+      const template = publicVenuePageTemplate(resolvePublicVenueKindFromRow(row));
+      return template === familyFilter;
+    })
+    .slice(0, limit)
+    .map(mapPublicVenueListItem);
+
+  const cities = countBy(venues.map((venue) => venue.city).filter(Boolean));
+  const types = countBy(venues.map((venue) => venue.type).filter(Boolean));
+  return {
+    generatedAt: new Date().toISOString(),
+    total: venues.length,
+    venues,
+    stats: {
+      venues: venues.length,
+      cities,
+      types,
+    },
+  };
 }
 
 async function destinationRows(db) {
@@ -4498,7 +5646,8 @@ async function destinationRows(db) {
         .map(([name, events]) => ({ name, events }))
         .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')),
     }))
-    .filter((bucket) => bucket.events >= 2)
+    .filter((bucket) => bucket.events >= PUBLIC_DESTINATION_MIN_EVENTS)
+    .filter(isAllowedPublicDestination)
     .sort(destinationSort);
 }
 
@@ -4587,7 +5736,7 @@ async function destinationSummaryRowsFast(db) {
             lower(regexp_replace(trim(coalesce("sourceLabel", '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(title, '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
-            lower(regexp_replace(trim(coalesce("venueId", venue, '')), '\\s+', ' ', 'g'))
+            lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
           ) as "groupKey"
         from normalized
         where "priceFrom" >= $1
@@ -4652,48 +5801,40 @@ async function destinationSummaryRowsFast(db) {
       events: bucket.events,
       venues: bucket.venueIds.size,
     }))
-    .filter((bucket) => bucket.events >= 2)
+    .filter((bucket) => bucket.events >= PUBLIC_DESTINATION_MIN_EVENTS)
+    .filter(isAllowedPublicDestination)
     .sort(destinationSort);
 }
 
 function publicDestinationForCity(row) {
   const cityName = cleanDisplayName(row.city) || 'Не указан';
+
+  if (STANDALONE_CITY_NAMES.has(cityName)) {
+    return buildPublicDestinationRecord(row, cityName);
+  }
+
+  if (isPublicRegionName(cityName)) {
+    return buildPublicDestinationRecord(row, cityName);
+  }
+
   const mappedRegion = CITY_TO_REGION.get(cityName);
-  if (mappedRegion && !STANDALONE_CITY_NAMES.has(cityName)) {
-    const slug = publicCitySlug(mappedRegion);
-    return {
-      id: row.regionId || `region_${slug}`,
-      slug,
-      sourceSlug: row.regionSlug || slug,
-      name: mappedRegion,
-      type: 'region',
-    };
+  if (mappedRegion) {
+    return buildPublicDestinationRecord(row, mappedRegion);
   }
 
   if (row.cityIsDestination === false && row.regionTitle) {
-    const slug = publicCitySlug(row.regionTitle);
-    return {
-      id: row.regionId || `region_${slug}`,
-      slug,
-      sourceSlug: row.regionSlug || slug,
-      name: row.regionTitle,
-      type: 'region',
-    };
+    return buildPublicDestinationRecord(row, row.regionTitle);
   }
 
-  const slug = publicCitySlug(cityName);
-  return {
-    id: row.cityId || `city_${slug}`,
-    slug,
-    sourceSlug: row.citySlug || slug,
-    name: cityName,
-    type: 'city',
-  };
+  const routed = routeCityToPublicDisplayName(cityName);
+  return buildPublicDestinationRecord(row, routed);
 }
 
 function publicDestinationFromSession(session) {
   const name = cleanDisplayName(session.destination) || cleanDisplayName(session.city) || 'Не указан';
-  const type = session.destinationType === 'region' ? 'region' : 'city';
+  let type = session.destinationType === 'region' ? 'region' : 'city';
+  if (type === 'city' && isPublicRegionName(name)) type = 'region';
+  if (type === 'region' && STANDALONE_CITY_NAMES.has(name)) type = 'city';
   const slug = publicCitySlug(name);
   return {
     id: type === 'region' ? `region_${slug}` : session.cityId || `city_${slug}`,
@@ -4841,7 +5982,8 @@ async function publicCatalogSessions(db, forceRefresh = false) {
 }
 
 async function publicCatalogSessionsFast(db) {
-  const result = await db.query(
+  const [result, pinnedResult] = await Promise.all([
+    db.query(
     `
       with primary_offer as (
         select distinct on ("eventId")
@@ -4867,6 +6009,7 @@ async function publicCatalogSessionsFast(db) {
           e.description,
           e.kind,
           e."sourceStatus",
+          e."ageLimit",
           e."imageUrl",
           e."priceFromRub",
           e."ticketsVacant",
@@ -4882,6 +6025,7 @@ async function publicCatalogSessionsFast(db) {
           venue.id as "venueId",
           venue.slug as "venueSlug",
           venue.title as venue,
+          venue.address as "venueAddress",
           venue."heroImageUrl" as "venueHeroImageUrl",
           venue.kind as "venueKind",
           override.title as "overrideTitle",
@@ -4938,6 +6082,7 @@ async function publicCatalogSessionsFast(db) {
           venue.id,
           venue.slug,
           venue.title,
+          venue.address,
           venue."heroImageUrl",
           venue.kind,
           primary_offer."sourceCode",
@@ -4972,7 +6117,7 @@ async function publicCatalogSessionsFast(db) {
             lower(regexp_replace(trim(coalesce("sourceLabel", '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(title, '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
-            lower(regexp_replace(trim(coalesce("venueId", venue, '')), '\\s+', ' ', 'g'))
+            lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
           ) as "groupKey"
         from normalized
         where "priceFrom" >= $1
@@ -4989,7 +6134,8 @@ async function publicCatalogSessionsFast(db) {
           *,
           row_number() over (
             partition by "groupKey"
-            order by case when kind = 'OPEN_DATE' or "sourceStatus" = 'open_date' then 1 else 0 end desc,
+            order by case when lower(coalesce("sourceStatus", '')) in ('paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden') then 1 else 0 end,
+              case when kind = 'OPEN_DATE' or "sourceStatus" = 'open_date' then 1 else 0 end desc,
               "startsAt" asc nulls last,
               title asc
           ) as rank
@@ -5009,11 +6155,14 @@ async function publicCatalogSessionsFast(db) {
               'startsAt', "startsAt",
               'externalId', "externalId",
               'sourceCode', "sourceCode",
+              'sourceStatus', "sourceStatus",
               'offerSourceCode', "offerSourceCode",
               'offerWidgetUrl', "offerWidgetUrl",
-              'offerDeeplinkUrl', "offerDeeplinkUrl"
+              'offerDeeplinkUrl', "offerDeeplinkUrl",
+              'vacant', "ticketsVacant"
             )
-            order by "startsAt" asc nulls last
+            order by case when lower(coalesce("sourceStatus", '')) in ('paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden') then 1 else 0 end,
+              "startsAt" asc nulls last
           ) as "upcomingSlots"
         from ranked
         group by "groupKey"
@@ -5043,6 +6192,7 @@ async function publicCatalogSessionsFast(db) {
         rep."venueId",
         rep."venueSlug",
         rep.venue,
+        rep."venueAddress",
         rep."venueHeroImageUrl",
         rep."venueKind",
         rep."overrideTitle",
@@ -5054,6 +6204,7 @@ async function publicCatalogSessionsFast(db) {
         rep."offerDeeplinkUrl",
         rep.kind,
         rep."sourceStatus",
+        rep."ageLimit",
         rep."startsAt",
         rep.tags,
         rep.subcategories,
@@ -5069,9 +6220,17 @@ async function publicCatalogSessionsFast(db) {
       order by rep."startsAt" asc nulls last, rep.title asc
     `,
     [MIN_DISPLAY_PRICE_RUB],
-  );
+  ),
+    db.query(`
+      select distinct "eventId"
+      from "LandingMatch"
+      where coalesce(reasons->>'manualStatus', '') = 'PINNED'
+    `),
+  ]);
 
-  return result.rows.map(mapGroupedPublicSession);
+  const pinnedEventIds = new Set(pinnedResult.rows.map((row) => row.eventId));
+  const sessions = result.rows.map((row) => mapGroupedPublicSession(row, pinnedEventIds));
+  return dedupeCrossSourceCatalogSessions(regroupMappedPublicCatalogSessions(sessions));
 }
 
 function publicListDescription(row) {
@@ -5087,8 +6246,25 @@ function isOpenDateCatalogRow(row) {
   return kind === 'OPEN_DATE' || sourceStatus === 'open_date';
 }
 
+function isWideLifetimeSession(startsAt, endsAt) {
+  if (!startsAt || !endsAt) return false;
+  const startMs = Date.parse(String(startsAt));
+  const endMs = Date.parse(String(endsAt));
+  if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) return false;
+  return endMs - startMs >= 36 * 60 * 60 * 1000;
+}
+
 function publicSessionScheduleLabels(row) {
   if (!isOpenDateCatalogRow(row)) {
+    if (isWideLifetimeSession(row.startsAt, row.endsAt)) {
+      return {
+        startsAt: '',
+        dateLabel: 'Даты в виджете',
+        timeLabel: 'При покупке',
+        timeBucket: 'day',
+      };
+    }
+
     return {
       startsAt: normalizeStartsAt(row.startsAt) || '',
       dateLabel: formatDate(row.startsAt),
@@ -5110,7 +6286,7 @@ function buildLandingRuleEvent(row, tags, destination, category) {
     title: row.overrideTitle || row.title,
     category: category || 'unknown',
     sourceCategory: category || 'unknown',
-    venue: row.venue || 'Не указано',
+    venue: formatPublicVenueTitle(row.venue) || 'Не указано',
     city: row.city || 'Не указан',
     destination: destination?.name || row.city || 'Не указан',
     tags,
@@ -5191,18 +6367,25 @@ function inferCityNameFromText(...parts) {
 }
 
 function resolvePublicSessionCity(row) {
+  const inferred = inferCityNameFromText(row.title, row.venue, row.venueAddress, ...(row.tags || []));
   const raw = cleanDisplayName(row.city);
-  if (raw && raw !== 'Не указан') return raw;
-  return inferCityNameFromText(row.title, row.venue, row.venueAddress, ...(row.tags || [])) || raw || 'Не указан';
+  const canonical = canonicalizePublicCityName(raw);
+
+  if (inferred) return routeCityToPublicDisplayName(inferred);
+  if (canonical) return routeCityToPublicDisplayName(canonical);
+  if (raw && raw !== 'Не указан') return routeCityToPublicDisplayName(raw);
+  return routeCityToPublicDisplayName(inferred || raw || 'Не указан');
 }
 
-function mapGroupedPublicSession(row) {
+function mapGroupedPublicSession(row, pinnedEventIds = new Set()) {
   const tags = row.tags || [];
   const cityName = resolvePublicSessionCity(row);
   const destination = publicDestinationForCity({ ...row, city: cityName });
   const fallbackWidgetUrl = buildProviderWidgetUrl(row);
   const purchase = purchaseInfo(row);
   const purchaseUrl = purchase.url || fallbackWidgetUrl;
+  const groupEventIds = (row.groupEventIds || [row.id]).slice(0, 12);
+  const manualLandingStatus = groupEventIds.some((id) => pinnedEventIds.has(id)) ? 'PINNED' : null;
   const upcomingSlots = (Array.isArray(row.upcomingSlots) ? row.upcomingSlots : [])
     .filter((slot) => slot?.startsAt)
     .slice(0, 8)
@@ -5220,6 +6403,9 @@ function mapGroupedPublicSession(row) {
         dateLabel: formatDate(slot.startsAt),
         timeLabel: formatTime(slot.startsAt),
         purchaseUrl: slotPurchase.url || purchaseUrl,
+        sourceStatus: slot.sourceStatus || row.sourceStatus || null,
+        purchaseReady: slotPurchase.ready,
+        vacant: slot.vacant ?? row.vacant ?? null,
       };
     });
 
@@ -5229,8 +6415,8 @@ function mapGroupedPublicSession(row) {
     id: row.id,
     slug: publicEventSlug(row.slug),
     sourceSlug: row.slug,
-    groupKey: row.groupKey,
-    groupEventIds: (row.groupEventIds || [row.id]).slice(0, 12),
+    groupKey: publicEventGroupKey({ ...row, city: cityName }),
+    groupEventIds,
     groupedEventsCount: row.groupedEventsCount || 1,
     sessionCount: row.sessionCount || upcomingSlots.length || 1,
     upcomingSlots,
@@ -5243,7 +6429,8 @@ function mapGroupedPublicSession(row) {
     destinationType: destination.type,
     venueId: row.venueId,
     venueSlug: row.venueSlug,
-    venue: row.venue || 'Не указано',
+    venue: formatPublicVenueTitle(row.venue) || 'Не указано',
+    venueAddress: row.venueAddress || null,
     venueKind: row.venueKind || 'OTHER',
     offerTitle: row.offerTitle,
     offerSourceCode: row.offerSourceCode,
@@ -5266,6 +6453,7 @@ function mapGroupedPublicSession(row) {
     timeBucket: schedule.timeBucket,
     priceFrom: row.priceFrom,
     vacant: row.vacant,
+    ageLimit: row.ageLimit ?? null,
     imageUrl: resolvePublicSessionImageUrl(row),
     description: publicListDescription(row),
   };
@@ -5273,6 +6461,7 @@ function mapGroupedPublicSession(row) {
   return {
     ...session,
     landingSlugs: resolveLandingSlugsForSession(ruleEvent, { startsAt: row.startsAt, upcomingSlots }),
+    manualLandingStatus,
   };
 }
 
@@ -5429,7 +6618,7 @@ async function publicEventRowsLean(db, limit) {
         sourceCitySlug: row.citySlug,
         destination: destination.name,
         destinationType: destination.type,
-        venue: row.venue || 'Не указано',
+        venue: formatPublicVenueTitle(row.venue) || 'Не указано',
         venueId: row.venueId,
         venueSlug: row.venueSlug,
         venueKind: row.venueKind || 'OTHER',
@@ -5459,6 +6648,45 @@ async function publicEventRowsLean(db, limit) {
       };
     })
     .filter((row) => (row.startsAt || isOpenDateCatalogRow(row)) && row.purchaseReady && Number.isFinite(row.priceFrom) && row.priceFrom >= MIN_DISPLAY_PRICE_RUB);
+}
+
+function parseCatalogAgeLimit(value) {
+  if (value == null || value === '') return null;
+  const match = String(value).match(/\d+/);
+  if (!match) return null;
+  const age = Number(match[0]);
+  return Number.isFinite(age) ? age : null;
+}
+
+function matchesCatalogAgeLimit(session, ageMax) {
+  const limit = parseCatalogAgeLimit(session.ageLimit);
+  if (limit == null) return true;
+  return limit <= ageMax;
+}
+
+function matchesCatalogDateRange(session, dateFrom, dateTo) {
+  const from = dateFrom ? startOfLocalDay(new Date(dateFrom)) : null;
+  const to = dateTo ? startOfLocalDay(new Date(dateTo)) : null;
+  if (!from && !to) return true;
+  if (isOpenDateCatalogRow(session)) return true;
+
+  const startsAt = new Date(session.startsAt);
+  if (!Number.isFinite(startsAt.getTime())) return false;
+  const eventDay = startOfLocalDay(startsAt);
+  if (from && eventDay < from) return false;
+  if (to && eventDay > to) return false;
+  return true;
+}
+
+function matchesCatalogPrice(session, minPrice, maxPrice) {
+  const price = session.priceFrom;
+  const min = Number(minPrice);
+  const max = Number(maxPrice);
+  const wantsFree = Number.isFinite(min) && min === 0 && Number.isFinite(max) && max === 0;
+  if (wantsFree) return !Number.isFinite(price) || price <= 0;
+  if (Number.isFinite(min) && min > 0 && (!Number.isFinite(price) || price < min)) return false;
+  if (Number.isFinite(max) && max > 0 && (!Number.isFinite(price) || price > max)) return false;
+  return true;
 }
 
 function matchesCatalogDate(session, dateFilter) {
@@ -5497,7 +6725,7 @@ function mapPublicSession(row) {
       ...row,
       overrideTitle: row.override?.title,
       title: row.title,
-      venue: row.venue,
+      venue: formatPublicVenueTitle(row.venue),
       city: row.city,
       category: row.sourceCategory,
       subcategories: row.subcategories,
@@ -5543,7 +6771,8 @@ function mapPublicSession(row) {
     destinationType: row.destinationType || 'city',
     venueId: row.venueId,
     venueSlug: row.venueSlug,
-    venue: row.venue,
+    venue: formatPublicVenueTitle(row.venue),
+    venueAddress: row.venueAddress || null,
     venueKind: row.venueKind,
     offerTitle: row.offerTitle,
     offerSourceCode: row.offerSourceCode,
@@ -5574,7 +6803,7 @@ function buildTicketscloudWidgetUrl(eventExternalId) {
   if (!token || !eventExternalId) return null;
 
   const normalizedToken = token.startsWith('r:') ? token : `r:${token}`;
-  const url = new URL(process.env.TICKETSCLOUD_WIDGET_BASE_URL || 'https://ticketscloud.org/v1/widgets/common');
+  const url = new URL(process.env.TICKETSCLOUD_WIDGET_BASE_URL || 'https://ticketscloud.com/v1/widgets/common');
   url.searchParams.set('token', normalizedToken);
   url.searchParams.set('event', eventExternalId);
   return url.toString();
@@ -5587,81 +6816,34 @@ function buildTeplohodUrl(eventExternalId) {
 }
 
 async function publicVenues(db, limit) {
-  const rows = await venueRows(db, limit);
-  return rows.map((row) => ({
-    id: row.id,
-    slug: row.slug,
-    name: row.name,
-    city: row.city,
-    address: row.address,
-    type: row.proposedKind,
-    pageStatus: row.pageStatus,
-    shortDescription: row.shortDescription,
-    heroImageUrl: row.heroImageUrl,
-    events: row.events,
-    categories: {},
-  }));
+  return (await publicVenueHubRows(db, 500)).slice(0, limit).map(mapPublicVenueListItem);
 }
 
-async function publicRelatedVenues(db, venueId, city, limit) {
+async function publicRelatedVenues(db, venueId, city, limit, hubRows = null) {
   if (!city) return [];
-  const rows = await venueRows(db, 500);
+  const rows = hubRows || (await publicVenueHubRows(db, 500));
+  const current = findMergedVenueGroup(rows, venueId);
   return rows
-    .filter((row) => row.id !== venueId && row.city === city && row.events > 0)
+    .filter((row) => row.city === city && isPublicVenueHub(row) && !venueGroupsOverlap(current, row))
     .slice(0, limit)
-    .map((row) => ({
-      id: row.id,
-      slug: row.slug,
-      name: row.name,
-      city: row.city,
-      address: row.address,
-      type: row.proposedKind,
-      events: row.events,
-      categories: {},
-    }));
+    .map(mapPublicVenueListItem);
 }
 
 async function publicVenuesForCity(db, city, limit) {
   if (!city) return [];
-  const rows = await venueRows(db, 500);
-  return rows
-    .filter((row) => row.city === city && row.events > 0)
+  return (await publicVenueHubRows(db, 500))
+    .filter((row) => row.city === city)
     .slice(0, limit)
-    .map((row) => ({
-      id: row.id,
-      slug: row.slug,
-      name: row.name,
-      city: row.city,
-      address: row.address,
-      type: row.proposedKind,
-      pageStatus: row.pageStatus,
-      shortDescription: row.shortDescription,
-      heroImageUrl: row.heroImageUrl,
-      events: row.events,
-      categories: {},
-    }));
+    .map(mapPublicVenueListItem);
 }
 
 async function publicVenuesForSessions(db, sessions, limit) {
   const venueIds = new Set(sessions.map((session) => session.venueId).filter(Boolean));
   if (!venueIds.size) return [];
-  const rows = await venueRows(db, 500);
-  return rows
-    .filter((row) => venueIds.has(row.id) && row.events > 0)
+  return (await publicVenueHubRows(db, 500))
+    .filter((row) => (row.mergedVenueIds || [row.id]).some((id) => venueIds.has(id)))
     .slice(0, limit)
-    .map((row) => ({
-      id: row.id,
-      slug: row.slug,
-      name: row.name,
-      city: row.city,
-      address: row.address,
-      type: row.proposedKind,
-      pageStatus: row.pageStatus,
-      shortDescription: row.shortDescription,
-      heroImageUrl: row.heroImageUrl,
-      events: row.events,
-      categories: {},
-    }));
+    .map(mapPublicVenueListItem);
 }
 
 async function resolvePublicEventId(db, eventSlugOrId, catalogSessions = null) {
@@ -6141,6 +7323,22 @@ function plainReadinessText(value) {
 
 const SITE_TIME_ZONE = 'Europe/Moscow';
 
+const PUBLIC_CATALOG_CATEGORIES = new Set([
+  'экскурсии',
+  'музеи и арт',
+  'мероприятия',
+  'активный отдых',
+  'развлечения',
+]);
+
+function isCrossCategoryCatalogTag(tag, category) {
+  const tagNorm = String(tag || '').trim().toLowerCase();
+  const categoryNorm = String(category || '').trim().toLowerCase();
+  if (!tagNorm || !categoryNorm) return false;
+  if (tagNorm === categoryNorm) return false;
+  return PUBLIC_CATALOG_CATEGORIES.has(tagNorm);
+}
+
 const UTILITY_CATALOG_TAG_RE =
   /^(wc|туалет|кондиционер|аудиосистема|аудиогид|wi-?fi|бар|кафе|кафе-бар|парковка|гардероб|кондиционирование)$/i;
 const DURATION_CATALOG_TAG_RE = /^\d+\s*(минут|мин\.?|час|часа|часов)\s*$/i;
@@ -6189,6 +7387,7 @@ function isAmenityCatalogTag(tag) {
 function isCatalogSubcategoryLabel(label, category) {
   const value = String(label || '').trim();
   if (!value || isUtilityCatalogTag(value) || isVenuePolicyCatalogTag(value) || isAmenityCatalogTag(value)) return false;
+  if (isCrossCategoryCatalogTag(value, category)) return false;
   if (category && value.toLowerCase() === String(category).toLowerCase()) return false;
   return true;
 }

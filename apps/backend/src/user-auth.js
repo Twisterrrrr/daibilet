@@ -1,4 +1,4 @@
-import { createHash, randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, randomBytes, scrypt, timingSafeEqual } from 'node:crypto';
 import { promisify } from 'node:util';
 
 const scryptAsync = promisify(scrypt);
@@ -35,8 +35,8 @@ function signJwt(payload, expiresInSec) {
   const header = base64UrlEncode(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
   const now = Math.floor(Date.now() / 1000);
   const body = base64UrlEncode(JSON.stringify({ ...payload, iat: now, exp: now + expiresInSec }));
-  const signature = createHash('sha256')
-    .update(`${header}.${body}.${JWT_SECRET}`)
+  const signature = createHmac('sha256', JWT_SECRET)
+    .update(`${header}.${body}`)
     .digest('base64url');
   return `${header}.${body}.${signature}`;
 }
@@ -46,8 +46,8 @@ function verifyJwt(token) {
   if (parts.length !== 3) return null;
 
   const [header, body, signature] = parts;
-  const expected = createHash('sha256')
-    .update(`${header}.${body}.${JWT_SECRET}`)
+  const expected = createHmac('sha256', JWT_SECRET)
+    .update(`${header}.${body}`)
     .digest('base64url');
 
   const actualBuffer = Buffer.from(signature);
@@ -117,13 +117,17 @@ export function parseCookies(request) {
 }
 
 export function buildRefreshCookie(refreshToken) {
-  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-  return `user_refresh_token=${encodeURIComponent(refreshToken)}; HttpOnly; Path=/; Max-Age=${REFRESH_TTL_SEC}; SameSite=Lax${secure}`;
+  const isProd = process.env.NODE_ENV === 'production';
+  const secure = isProd ? '; Secure' : '';
+  const sameSite = isProd ? '; SameSite=None' : '; SameSite=Lax';
+  return `user_refresh_token=${encodeURIComponent(refreshToken)}; HttpOnly; Path=/; Max-Age=${REFRESH_TTL_SEC}${sameSite}${secure}`;
 }
 
 export function buildClearRefreshCookie() {
-  const secure = process.env.NODE_ENV === 'production' ? '; Secure' : '';
-  return `user_refresh_token=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax${secure}`;
+  const isProd = process.env.NODE_ENV === 'production';
+  const secure = isProd ? '; Secure' : '';
+  const sameSite = isProd ? '; SameSite=None' : '; SameSite=Lax';
+  return `user_refresh_token=; HttpOnly; Path=/; Max-Age=0${sameSite}${secure}`;
 }
 
 export function authenticateAccessToken(token) {

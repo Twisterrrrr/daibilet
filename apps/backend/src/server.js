@@ -23,6 +23,8 @@ import {
   buildAdminVenueDetail,
   buildAdminVenuesList,
   buildCatalogSessions,
+  sessionHasCoverImage,
+  spreadCatalogSessionsByCoverImage,
   buildPublicBuyerOrders,
   buildAccountPurchases,
   buildAccountOrderDetail,
@@ -31,6 +33,7 @@ import {
   buildPublicLandingPage,
   buildPublicLandingPageManaged,
   buildPublicVenuePage,
+  buildPublicVenuesCatalog,
   buildPublicHome,
   buildPublicHomePreview,
   buildPublicDestinations,
@@ -79,6 +82,54 @@ const jsonCache = new Map();
 const PUBLIC_RESPONSE_CACHE_MS = 5 * 60 * 1000;
 const MAX_PUBLIC_RESPONSE_CACHE_ENTRIES = 80;
 const publicResponseCache = new Map();
+let activeCorsRequest = null;
+
+function getAllowedOrigins() {
+  const raw =
+    process.env.PUBLIC_CORS_ORIGINS ||
+    'https://daibilet.ru,https://www.daibilet.ru,http://localhost:5173,http://127.0.0.1:5173';
+  return raw
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+function routeNeedsCredentials(request) {
+  if (!request?.url) return false;
+  const pathname = new URL(request.url, 'http://127.0.0.1').pathname;
+  return pathname.startsWith('/api/auth/') || pathname.startsWith('/api/account/');
+}
+
+function buildCorsHeaders(request, { credentials = false } = {}) {
+  const origin = String(request?.headers?.origin || '').trim();
+  const allowed = getAllowedOrigins();
+  const base = {
+    'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
+    'access-control-allow-headers': 'content-type, authorization',
+  };
+
+  if (credentials && origin && allowed.includes(origin)) {
+    return {
+      ...base,
+      'access-control-allow-origin': origin,
+      'access-control-allow-credentials': 'true',
+      vary: 'Origin',
+    };
+  }
+
+  if (origin && allowed.includes(origin)) {
+    return {
+      ...base,
+      'access-control-allow-origin': origin,
+      vary: 'Origin',
+    };
+  }
+
+  return {
+    ...base,
+    'access-control-allow-origin': '*',
+  };
+}
 
 function loadRootEnv(projectRoot) {
   try {
@@ -98,6 +149,7 @@ function loadRootEnv(projectRoot) {
 }
 
 createServer(async (request, response) => {
+  activeCorsRequest = request;
   try {
     if (request.method === 'OPTIONS') {
       sendEmpty(response, 204);
@@ -150,6 +202,15 @@ createServer(async (request, response) => {
     if (route === 'GET /api/public/destinations') {
       if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public destinations refresh');
       sendJson(response, await withPublicResponseCache('destinations', () => buildPublicDestinations(db)));
+      return;
+    }
+
+    if (route === 'GET /api/public/venues') {
+      if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public venues refresh');
+      sendJson(
+        response,
+        await withPublicResponseCache(`venues:${canonicalSearchParams(url.searchParams)}`, () => buildPublicVenuesCatalog(db, url.searchParams)),
+      );
       return;
     }
 
@@ -494,6 +555,8 @@ createServer(async (request, response) => {
       },
       500,
     );
+  } finally {
+    activeCorsRequest = null;
   }
 }).listen(port, '127.0.0.1', () => {
   console.log(`Daibilet backend listening on http://127.0.0.1:${port}`);
@@ -645,15 +708,23 @@ function filterSessions(sessions, searchParams) {
   const date = searchParams.get('date');
   const sort = searchParams.get('sort') || 'time';
   const maxPrice = Number(searchParams.get('maxPrice'));
+  const minPrice = Number(searchParams.get('minPrice'));
+  const dateFrom = String(searchParams.get('dateFrom') || '').trim();
+  const dateTo = String(searchParams.get('dateTo') || '').trim();
+  const ageMax = Number(searchParams.get('ageMax'));
   const facets = buildFallbackFacets(sessions);
 
   const rows = sessions.filter((session) => {
+    if (!sessionHasCoverImage(session)) return false;
     if (destination && destination !== 'all' && session.destination !== destination) return false;
     if (city && city !== 'all' && session.city !== city && session.destination !== city) return false;
     if (category && category !== 'all' && session.category !== category && !(session.tags || []).includes(category)) return false;
     if (landing && landing !== 'all' && !(session.landingSlugs || []).includes(landing)) return false;
-    if (date && date !== 'all' && !matchesSessionDate(session, date)) return false;
-    if (Number.isFinite(maxPrice) && maxPrice > 0 && (!session.priceFrom || session.priceFrom > maxPrice)) return false;
+    if (dateFrom || dateTo) {
+      if (!matchesFallbackCatalogDateRange(session, dateFrom, dateTo)) return false;
+    } else if (date && date !== 'all' && !matchesSessionDate(session, date)) return false;
+    if (!matchesFallbackCatalogPrice(session, minPrice, maxPrice)) return false;
+    if (Number.isFinite(ageMax) && ageMax >= 0 && !matchesFallbackCatalogAgeLimit(session, ageMax)) return false;
     if (!query) return true;
     const haystack = [
       session.title,
@@ -670,11 +741,12 @@ function filterSessions(sessions, searchParams) {
   });
 
   const sorted = sortPublicSessions(rows, sort);
+  const arranged = sort === 'price' || sort === 'time' ? sorted : spreadCatalogSessionsByCoverImage(sorted);
   return {
-    total: sorted.length,
+    total: arranged.length,
     offset,
     limit,
-    items: sorted.slice(offset, offset + limit),
+    items: arranged.slice(offset, offset + limit),
     facets,
   };
 }
@@ -739,6 +811,38 @@ function humanizeSlug(slug) {
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ');
+}
+
+function matchesFallbackCatalogAgeLimit(session, ageMax) {
+  const raw = session.ageLimit;
+  if (raw == null || raw === '') return true;
+  const match = String(raw).match(/\d+/);
+  if (!match) return true;
+  const limit = Number(match[0]);
+  return Number.isFinite(limit) ? limit <= ageMax : true;
+}
+
+function matchesFallbackCatalogDateRange(session, dateFrom, dateTo) {
+  const from = dateFrom ? startOfLocalDay(new Date(dateFrom)) : null;
+  const to = dateTo ? startOfLocalDay(new Date(dateTo)) : null;
+  if (!from && !to) return true;
+  const startsAt = new Date(session.startsAt);
+  if (!Number.isFinite(startsAt.getTime())) return true;
+  const eventDay = startOfLocalDay(startsAt);
+  if (from && eventDay < from) return false;
+  if (to && eventDay > to) return false;
+  return true;
+}
+
+function matchesFallbackCatalogPrice(session, minPrice, maxPrice) {
+  const price = session.priceFrom;
+  const min = Number(minPrice);
+  const max = Number(maxPrice);
+  const wantsFree = minPrice === 0 && maxPrice === 0;
+  if (wantsFree) return !Number.isFinite(price) || price <= 0;
+  if (Number.isFinite(min) && min > 0 && (!Number.isFinite(price) || price < min)) return false;
+  if (Number.isFinite(max) && max > 0 && (!Number.isFinite(price) || price > max)) return false;
+  return true;
 }
 
 function matchesSessionDate(session, dateFilter) {
@@ -1007,10 +1111,9 @@ function safeEqualString(actual, expected) {
 }
 
 function sendAuthRequired(response) {
+  const cors = buildCorsHeaders(activeCorsRequest, { credentials: routeNeedsCredentials(activeCorsRequest) });
   response.writeHead(401, {
-    'access-control-allow-origin': '*',
-    'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
-    'access-control-allow-headers': 'content-type, authorization',
+    ...cors,
     'www-authenticate': `Basic realm="${adminAuth.realm}", charset="UTF-8"`,
     'content-type': 'application/json; charset=utf-8',
     'cache-control': 'no-store',
@@ -1020,11 +1123,9 @@ function sendAuthRequired(response) {
 
 function sendJson(response, payload, statusCode = 200, extraHeaders = {}) {
   const body = JSON.stringify(payload);
+  const cors = buildCorsHeaders(activeCorsRequest, { credentials: routeNeedsCredentials(activeCorsRequest) });
   response.writeHead(statusCode, {
-    'access-control-allow-origin': '*',
-    'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
-    'access-control-allow-headers': 'content-type, authorization',
-    'access-control-allow-credentials': 'true',
+    ...cors,
     'content-type': 'application/json; charset=utf-8',
     'cache-control': 'no-store',
     ...extraHeaders,
@@ -1033,10 +1134,7 @@ function sendJson(response, payload, statusCode = 200, extraHeaders = {}) {
 }
 
 function sendEmpty(response, statusCode) {
-  response.writeHead(statusCode, {
-    'access-control-allow-origin': '*',
-    'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
-    'access-control-allow-headers': 'content-type, authorization',
-  });
+  const cors = buildCorsHeaders(activeCorsRequest, { credentials: routeNeedsCredentials(activeCorsRequest) });
+  response.writeHead(statusCode, cors);
   response.end();
 }

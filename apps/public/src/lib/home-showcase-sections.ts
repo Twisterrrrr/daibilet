@@ -1,0 +1,137 @@
+import { parseSessionStartsAt } from '@/lib/datetime';
+import { normalizeSessionImageKey, sessionHasCoverImage, spreadCatalogSessionsByCoverImage, spreadSessionsForGrid } from '@/lib/session-cover-image';
+import type { PublicSession } from '@/types';
+
+export const HOME_SHOWCASE_LIMIT = 8;
+export const HOME_POPULAR_LIMIT = 6;
+
+type HomePickState = {
+  seenIds: Set<string>;
+  seenTitles: Set<string>;
+  seenImages: Set<string>;
+};
+
+function isFeaturedEvent(event: PublicSession): boolean {
+  return event.manualLandingStatus === 'PINNED';
+}
+
+function popularScore(event: PublicSession): number {
+  let score = (event.sessionCount || 1) * 1000;
+  if (isFeaturedEvent(event)) score += 1_000_000;
+  if (Number.isFinite(event.priceFrom) && event.priceFrom! > 0) {
+    score += Math.max(0, 5000 - event.priceFrom!);
+  }
+  return score;
+}
+
+function sessionDedupeKey(event: PublicSession): string {
+  const groupKey = String(event.groupKey || '').trim().toLowerCase();
+  if (groupKey) return `group:${groupKey}`;
+  return `title:${event.title.trim().toLowerCase()}`;
+}
+
+function createPickState(seed?: Partial<HomePickState>): HomePickState {
+  return {
+    seenIds: new Set(seed?.seenIds),
+    seenTitles: new Set(seed?.seenTitles),
+    seenImages: new Set(seed?.seenImages),
+  };
+}
+
+function takeUnique(events: PublicSession[], max: number, state: HomePickState): PublicSession[] {
+  const result: PublicSession[] = [];
+  for (const event of events) {
+    if (!sessionHasCoverImage(event)) continue;
+    if (state.seenIds.has(event.id) || state.seenTitles.has(sessionDedupeKey(event))) continue;
+    const imageKey = normalizeSessionImageKey(event.imageUrl);
+    if (imageKey && state.seenImages.has(imageKey)) continue;
+
+    state.seenIds.add(event.id);
+    state.seenTitles.add(sessionDedupeKey(event));
+    if (imageKey) state.seenImages.add(imageKey);
+    result.push(event);
+    if (result.length >= max) break;
+  }
+  return result;
+}
+
+function isWithinNextDays(event: PublicSession, days: number): boolean {
+  const isos = [event.startsAt, ...(event.upcomingSlots || []).map((slot) => slot.startsAt)].filter(Boolean) as string[];
+  const now = Date.now();
+  const horizon = now + days * 24 * 60 * 60 * 1000;
+  return isos.some((iso) => {
+    const time = parseSessionStartsAt(iso).getTime();
+    return Number.isFinite(time) && time >= now - 60_000 && time <= horizon;
+  });
+}
+
+export function buildEditorsPickEvents(
+  sessions: PublicSession[],
+  limit = HOME_SHOWCASE_LIMIT,
+  state = createPickState(),
+): PublicSession[] {
+  const pinned = sessions.filter(isFeaturedEvent);
+  const pool =
+    pinned.length > 0
+      ? [...pinned].sort((a, b) => popularScore(b) - popularScore(a))
+      : [...sessions].sort((a, b) => popularScore(b) - popularScore(a));
+  return takeUnique(pool, limit, state);
+}
+
+export function buildThisWeekEvents(
+  sessions: PublicSession[],
+  limit = HOME_SHOWCASE_LIMIT,
+  state = createPickState(),
+): PublicSession[] {
+  const candidates = [...sessions]
+    .filter((event) => !state.seenIds.has(event.id) && isWithinNextDays(event, 7))
+    .sort((a, b) => parseSessionStartsAt(a.startsAt).getTime() - parseSessionStartsAt(b.startsAt).getTime());
+  return takeUnique(candidates, limit, state);
+}
+
+export function buildPopularEvents(
+  sessions: PublicSession[],
+  limit = HOME_POPULAR_LIMIT,
+  state = createPickState(),
+): PublicSession[] {
+  const candidates = [...sessions]
+    .filter((event) => !state.seenIds.has(event.id))
+    .sort((a, b) => popularScore(b) - popularScore(a));
+  return takeUnique(candidates, limit, state);
+}
+
+export function buildHomeShowcaseBundles(sessions: PublicSession[]) {
+  const state = createPickState();
+  const editorsPick = spreadCatalogSessionsByCoverImage(
+    buildEditorsPickEvents(sessions, HOME_SHOWCASE_LIMIT, state),
+  );
+  const thisWeek = spreadCatalogSessionsByCoverImage(
+    buildThisWeekEvents(sessions, HOME_SHOWCASE_LIMIT, state),
+  );
+  const popular = spreadSessionsForGrid(buildPopularEvents(sessions, HOME_POPULAR_LIMIT, state), 3);
+  return { editorsPick, thisWeek, popular };
+}
+
+export function isEditorsPickEvent(event: PublicSession): boolean {
+  return isFeaturedEvent(event);
+}
+
+function recommendBadgeBucket(eventId: string): number {
+  let hash = 0;
+  for (let i = 0; i < eventId.length; i += 1) {
+    hash = (hash * 31 + eventId.charCodeAt(i)) >>> 0;
+  }
+  return hash % 10;
+}
+
+/** Бейдж «Рекомендуем» — примерно 1 карточка из 10 среди сильных кандидатов. */
+export function isRecommendBadgeEvent(event: PublicSession): boolean {
+  if (recommendBadgeBucket(event.id) !== 0) return false;
+  if (isFeaturedEvent(event)) return true;
+  return (event.sessionCount || 0) >= 8 && event.landingSlugs.length > 0;
+}
+
+export function isHitEvent(event: PublicSession): boolean {
+  if (isRecommendBadgeEvent(event)) return false;
+  return (event.sessionCount || 0) >= 4 || event.landingSlugs.length > 0;
+}

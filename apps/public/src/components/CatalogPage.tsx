@@ -1,13 +1,20 @@
 import * as React from 'react';
-import { Grid3X3, List, Search, SlidersHorizontal, Table2, Tag, X } from 'lucide-react';
+import { ArrowUpDown, ChevronDown, Grid3X3, List, Search, SlidersHorizontal, Star, Table2, X } from 'lucide-react';
 
+import { CatalogAdvancedFiltersPanel } from '@/components/CatalogAdvancedFiltersPanel';
 import { EventCard } from '@/components/EventCard';
 import { EventCardHorizontal } from '@/components/EventCardHorizontal';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { formatMoney, formatNumber, publicData } from '@/data';
+import { API_BASE_URL } from '@/lib/api-base';
 import { collectCatalogLabels } from '@/lib/catalog-labels';
+import { applyCatalogPreset, catalogPresetMatches, CATALOG_PRESETS } from '@/lib/catalog-presets';
+import { AGE_FILTER_OPTIONS } from '@/components/CatalogAdvancedFiltersPanel';
 import { eventHref } from '@/routes';
+import { formatShowcaseSessionDate, resolvePseudoRating } from '@/lib/event-card-meta';
+import { resolveEventCardDestinationLabel } from '@/lib/event-location';
+import { arrangeCatalogSessions } from '@/lib/session-cover-image';
 import type { PublicLanding, PublicSession } from '@/types';
 
 type DateFilter = 'all' | 'today' | 'tomorrow' | 'weekend' | 'evening';
@@ -33,11 +40,37 @@ type CatalogResponse = {
 };
 type ActiveCatalogFilter = { key: string; label: string; onClear: () => void };
 
+const DATE_OPTIONS: Array<[DateFilter, string]> = [
+  ['all', 'Любая дата'],
+  ['today', 'Сегодня'],
+  ['tomorrow', 'Завтра'],
+  ['weekend', 'Выходные'],
+  ['evening', 'Вечером'],
+];
+
+const SORT_OPTIONS: Array<[SortMode, string]> = [
+  ['popular', 'Популярное'],
+  ['time', 'Скоро'],
+  ['price', 'Дешевле'],
+];
+
+const CATEGORY_EMOJI: Record<string, string> = {
+  Экскурсии: '🚶',
+  Музеи: '🏛',
+  Мероприятия: '🎭',
+  'Активный отдых': '⚡',
+  Выставки: '🖼',
+  Театры: '🎪',
+  Концерты: '🎵',
+  Детям: '🧒',
+};
+
+function categoryEmoji(name: string): string {
+  return CATEGORY_EMOJI[name] || '🎫';
+}
+
 const CATALOG_PAGE_LIMIT = 60;
 const MIN_DISPLAY_PRICE_RUB = 100;
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
 
 export function CatalogPage() {
   const initialParams = React.useMemo(() => new URLSearchParams(window.location.search), []);
@@ -53,13 +86,18 @@ export function CatalogPage() {
   const [category, setCategory] = React.useState(() => initialParams.get('category') || 'all');
   const [landing, setLanding] = React.useState(() => initialParams.get('landing') || 'all');
   const [date, setDate] = React.useState<DateFilter>(() => parseDateFilter(initialParams.get('date')));
+  const [dateFrom, setDateFrom] = React.useState(() => initialParams.get('dateFrom') || '');
+  const [dateTo, setDateTo] = React.useState(() => initialParams.get('dateTo') || '');
+  const [minPrice, setMinPrice] = React.useState(() => parseMinPriceFilter(initialParams.get('minPrice')));
   const [maxPrice, setMaxPrice] = React.useState(() => parseMaxPriceFilter(initialParams.get('maxPrice')));
+  const [ageMax, setAgeMax] = React.useState(() => parseAgeMaxFilter(initialParams.get('ageMax')));
   const [sort, setSort] = React.useState<SortMode>(() => parseSortMode(initialParams.get('sort')));
   const [mode, setModeState] = React.useState<ViewMode>(() => {
     const fromUrl = initialParams.get('view');
     if (fromUrl) return parseViewMode(fromUrl);
     return readStoredViewMode() || 'cards';
   });
+  const [filtersOpen, setFiltersOpen] = React.useState(false);
   const setMode = React.useCallback((value: ViewMode) => {
     setModeState(value);
     try {
@@ -70,7 +108,7 @@ export function CatalogPage() {
   }, []);
 
   React.useEffect(() => {
-    document.title = 'Каталог событий, экскурсий и билетов | Дайбилет';
+    document.title = 'События, экскурсии и билеты | Дайбилет';
     upsertMeta('description', 'Полный каталог событий Дайбилет: фильтры по городу, дате, категории, цене, площадке и подборкам.');
   }, []);
 
@@ -81,11 +119,16 @@ export function CatalogPage() {
     if (city !== 'all') params.set('city', city);
     if (category !== 'all') params.set('category', category);
     if (landing !== 'all') params.set('landing', landing);
-    if (date !== 'all') params.set('date', date);
+    if (dateFrom) params.set('dateFrom', dateFrom);
+    else if (date !== 'all') params.set('date', date);
+    if (dateTo) params.set('dateTo', dateTo);
+    if (minPrice !== 'all') params.set('minPrice', minPrice);
     if (maxPrice !== 'all') params.set('maxPrice', maxPrice);
+    if (ageMax >= 0) params.set('ageMax', String(ageMax));
 
     const debounce = window.setTimeout(() => setIsLoading(true), 120);
     const timeout = window.setTimeout(() => controller.abort(), 25000);
+    setLoadError(null);
 
     fetch(`${API_BASE_URL}/api/public/events?${params.toString()}`, {
       cache: 'no-store',
@@ -118,11 +161,11 @@ export function CatalogPage() {
       window.clearTimeout(debounce);
       window.clearTimeout(timeout);
     };
-  }, [catalogOffset, category, city, date, landing, maxPrice, query, sort]);
+  }, [ageMax, catalogOffset, category, city, date, dateFrom, dateTo, landing, maxPrice, minPrice, query, sort]);
 
   React.useEffect(() => {
-    syncCatalogUrl({ query, city, category, landing, date, maxPrice, sort, mode });
-  }, [category, city, date, landing, maxPrice, mode, query, sort]);
+    syncCatalogUrl({ query, city, category, landing, date, dateFrom, dateTo, minPrice, maxPrice, ageMax, sort, mode });
+  }, [ageMax, category, city, date, dateFrom, dateTo, landing, maxPrice, minPrice, mode, query, sort]);
 
   const sourceSessions = hasLoadedCatalog ? catalogSessions : publicData.sessions.slice(0, CATALOG_PAGE_LIMIT);
   const fallbackFacets = React.useMemo(() => buildCatalogFacets(publicData.sessions), []);
@@ -138,19 +181,14 @@ export function CatalogPage() {
     () => (facets.categories?.length ? facets.categories : fallbackFacets.categories).map((item) => [item.name, item.events]),
     [facets.categories, fallbackFacets.categories],
   );
-  const subcategories = React.useMemo<Array<[string, number]>>(
-    () =>
-      (facets.subcategories?.length ? facets.subcategories : fallbackFacets.subcategories)
-        .slice(0, 16)
-        .map((item) => [item.name, item.events]),
-    [facets.subcategories, fallbackFacets.subcategories],
-  );
   const landings = React.useMemo<LandingFacet[]>(() => {
     const source = facets.landings?.length ? facets.landings : publicData.landings.filter((item) => item.events > 0);
     return source.slice(0, 18);
   }, [facets.landings]);
-  const priceSteps = facets.priceSteps?.length ? facets.priceSteps : fallbackFacets.priceSteps;
-  const visibleSessions = sourceSessions;
+  const visibleSessions = React.useMemo(
+    () => (hasLoadedCatalog ? sourceSessions : arrangeCatalogSessions(sourceSessions, sort)),
+    [hasLoadedCatalog, sort, sourceSessions],
+  );
   const selectedCity = cities.find((item) => item.name === city);
 
   const setQueryFilter = (value: string) => {
@@ -171,10 +209,30 @@ export function CatalogPage() {
   };
   const setDateFilter = (value: DateFilter) => {
     setDate(value);
+    setDateFrom('');
+    setDateTo('');
+    setCatalogOffset(0);
+  };
+  const setDateFromFilter = (value: string) => {
+    setDateFrom(value);
+    setDate('all');
+    setCatalogOffset(0);
+  };
+  const setDateToFilter = (value: string) => {
+    setDateTo(value);
+    setDate('all');
+    setCatalogOffset(0);
+  };
+  const setMinPriceFilter = (value: string) => {
+    setMinPrice(value);
     setCatalogOffset(0);
   };
   const setMaxPriceFilter = (value: string) => {
     setMaxPrice(value);
+    setCatalogOffset(0);
+  };
+  const setAgeMaxFilter = (value: number) => {
+    setAgeMax(value);
     setCatalogOffset(0);
   };
   const setSortFilter = (value: SortMode) => {
@@ -187,10 +245,46 @@ export function CatalogPage() {
     setCategory('all');
     setLanding('all');
     setDate('all');
+    setDateFrom('');
+    setDateTo('');
+    setMinPrice('all');
     setMaxPrice('all');
-    setSort('time');
+    setAgeMax(-1);
+    setSort('popular');
     setCatalogOffset(0);
   };
+
+  const applyPreset = (slug: (typeof CATALOG_PRESETS)[number]['slug'], active: boolean) => {
+    const patch = applyCatalogPreset(slug, active);
+    if ('date' in patch && patch.date) setDateFilter(patch.date);
+    else if ('date' in patch) setDateFilter('all');
+    if ('dateFrom' in patch) setDateFromFilter(patch.dateFrom || '');
+    if ('dateTo' in patch) setDateToFilter(patch.dateTo || '');
+    if ('minPrice' in patch && patch.minPrice) setMinPriceFilter(patch.minPrice);
+    else if ('minPrice' in patch) setMinPriceFilter('all');
+    if ('maxPrice' in patch && patch.maxPrice) setMaxPriceFilter(patch.maxPrice);
+    else if ('maxPrice' in patch) setMaxPriceFilter('all');
+    if ('sort' in patch && patch.sort) setSortFilter(patch.sort);
+    if ('ageMax' in patch && patch.ageMax != null) setAgeMaxFilter(patch.ageMax);
+  };
+
+  const advancedCount =
+    (dateFrom || dateTo ? 1 : 0) +
+    (minPrice !== 'all' || maxPrice !== 'all' ? 1 : 0) +
+    (ageMax >= 0 ? 1 : 0) +
+    (landing !== 'all' ? 1 : 0);
+
+  const onAdvancedChange = React.useCallback((patch: Partial<{ dateFrom: string; dateTo: string; minPrice: string; maxPrice: string; ageMax: number; landing: string }>) => {
+    if ('dateFrom' in patch) setDateFromFilter(patch.dateFrom || '');
+    if ('dateTo' in patch) setDateToFilter(patch.dateTo || '');
+    if ('minPrice' in patch) setMinPriceFilter(patch.minPrice || 'all');
+    if ('maxPrice' in patch) setMaxPriceFilter(patch.maxPrice || 'all');
+    if ('ageMax' in patch && patch.ageMax != null) setAgeMaxFilter(patch.ageMax);
+    if ('landing' in patch) setLandingFilter(patch.landing || 'all');
+  }, []);
+
+  const ageMaxLabel = ageMax >= 0 ? AGE_FILTER_OPTIONS.find((item) => item.value === ageMax)?.label : null;
+
   const activeFilters: ActiveCatalogFilter[] = [
     ...(query.trim() ? [{ key: 'query', label: `Поиск: ${query.trim()}`, onClear: () => setQueryFilter('') }] : []),
     ...(city !== 'all' ? [{ key: 'city', label: city, onClear: () => setCityFilter('all') }] : []),
@@ -199,11 +293,26 @@ export function CatalogPage() {
       ? [{ key: 'landing', label: landings.find((item) => item.slug === landing)?.title || landing, onClear: () => setLandingFilter('all') }]
       : []),
     ...(date !== 'all' ? [{ key: 'date', label: dateLabel(date), onClear: () => setDateFilter('all') }] : []),
-    ...(maxPrice !== 'all' ? [{ key: 'maxPrice', label: `до ${formatNumber(Number(maxPrice))} ₽`, onClear: () => setMaxPriceFilter('all') }] : []),
+    ...(dateFrom || dateTo
+      ? [{
+          key: 'dateRange',
+          label: `${dateFrom || '…'} – ${dateTo || '…'}`,
+          onClear: () => {
+            setDateFromFilter('');
+            setDateToFilter('');
+          },
+        }]
+      : []),
+    ...(minPrice !== 'all' ? [{ key: 'minPrice', label: `от ${formatNumber(Number(minPrice))} ₽`, onClear: () => setMinPriceFilter('all') }] : []),
+    ...(maxPrice !== 'all'
+      ? [{ key: 'maxPrice', label: maxPrice === '0' ? 'Бесплатно' : `до ${formatNumber(Number(maxPrice))} ₽`, onClear: () => setMaxPriceFilter('all') }]
+      : []),
+    ...(ageMax >= 0 && ageMaxLabel ? [{ key: 'ageMax', label: `до ${ageMaxLabel}`, onClear: () => setAgeMaxFilter(-1) }] : []),
+    ...(sort !== 'popular' ? [{ key: 'sort', label: SORT_OPTIONS.find(([value]) => value === sort)?.[1] || sort, onClear: () => setSortFilter('popular') }] : []),
   ];
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <Header
         cityLabel={selectedCity?.name || 'Все города'}
         searchQuery={query}
@@ -211,355 +320,394 @@ export function CatalogPage() {
         onSection={(section) => navigateFromCatalog(section)}
         onDestination={setCityFilter}
       />
-      <main>
-        <CatalogHero total={catalogTotal || publicData.stats.events || sourceSessions.length} />
+      <main className="pb-12">
+        <div className="container-page py-6 sm:py-10">
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h1 className="font-display text-2xl font-bold text-slate-900 sm:text-3xl">Каталог событий</h1>
+              <p className="mt-1 text-sm text-slate-500 sm:text-base">
+                Найдите то, что нравится — экскурсии, музеи и события по всей России
+              </p>
+            </div>
+            <div className="text-sm text-slate-500">
+              Найдено{' '}
+              <span className="text-lg font-bold text-slate-900">{formatNumber(catalogTotal || visibleSessions.length)}</span>{' '}
+              событий
+            </div>
+          </div>
 
-        <section className="container-page -mt-8 pb-12 pt-0">
-          <CatalogFilters
+          {activeFilters.length > 0 ? <ActiveFiltersRow activeFilters={activeFilters} reset={reset} /> : null}
+
+          <CatalogToolbarSticky
             query={query}
             setQuery={setQueryFilter}
             city={city}
             setCity={setCityFilter}
             cities={cities}
-            category={category}
-            setCategory={setCategoryFilter}
-            categories={categories}
             landing={landing}
             setLanding={setLandingFilter}
             landings={landings}
-            date={date}
-            setDate={setDateFilter}
+            dateFrom={dateFrom}
+            dateTo={dateTo}
+            minPrice={minPrice}
             maxPrice={maxPrice}
-            setMaxPrice={setMaxPriceFilter}
-            priceSteps={priceSteps}
-            reset={reset}
+            ageMax={ageMax}
+            onAdvancedChange={onAdvancedChange}
+            category={category}
+            setCategory={setCategoryFilter}
+            categories={categories}
+            sort={sort}
+            setSort={setSortFilter}
+            mode={mode}
+            setMode={setMode}
+            filtersOpen={filtersOpen}
+            setFiltersOpen={setFiltersOpen}
+            advancedCount={advancedCount}
+            onApplyPreset={applyPreset}
+            presetSnapshot={{ date, minPrice, maxPrice, sort }}
+            onReset={reset}
           />
 
-          <div className="mt-5 min-w-0">
-            <CatalogToolbar
-              count={catalogTotal || visibleSessions.length}
-              shown={visibleSessions.length}
-              isLoading={isLoading}
-              loadError={loadError}
-              sort={sort}
-              setSort={setSortFilter}
-              mode={mode}
-              setMode={setMode}
-              activeFilters={activeFilters}
-              reset={reset}
-            />
+          <CatalogResultsMeta
+            shown={visibleSessions.length}
+            total={catalogTotal || visibleSessions.length}
+            isLoading={isLoading}
+            loadError={loadError}
+            mode={mode}
+          />
 
-            <QuickTags tags={subcategories} category={category} setCategory={setCategoryFilter} />
-
-            <CatalogView sessions={visibleSessions} mode={mode} />
-            <CatalogPagination
-              total={catalogTotal}
-              shown={visibleSessions.length}
-              isLoading={isLoading}
-              onLoadMore={() => setCatalogOffset(visibleSessions.length)}
-            />
-          </div>
-        </section>
+          <CatalogView sessions={visibleSessions} mode={mode} sort={sort} onSortChange={setSortFilter} />
+          <CatalogPagination
+            total={catalogTotal}
+            shown={visibleSessions.length}
+            isLoading={isLoading}
+            onLoadMore={() => setCatalogOffset(visibleSessions.length)}
+          />
+        </div>
       </main>
       <Footer />
     </div>
   );
 }
 
-function CatalogHero({ total }: { total: number }) {
+function ActiveFiltersRow({ activeFilters, reset }: { activeFilters: ActiveCatalogFilter[]; reset: () => void }) {
   return (
-    <section className="bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950 text-white">
-      <div className="container-page pb-16 pt-12 sm:pb-20 sm:pt-14">
-        <div className="flex flex-wrap items-center gap-2 text-sm text-primary-100/78">
-          <a href="/" className="hover:text-white">Главная</a>
-          <span>/</span>
-          <span className="text-white">Каталог</span>
-        </div>
-        <div className="mt-6 max-w-4xl">
-          <div className="inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1 text-sm font-semibold text-white/86">
-            <SlidersHorizontal className="h-4 w-4" />
-            Каталог событий
-          </div>
-          <h1 className="mt-4 text-4xl font-extrabold sm:text-5xl">События, экскурсии, музеи и билеты</h1>
-          <p className="mt-4 max-w-3xl text-base leading-7 text-primary-50/88 sm:text-lg">
-            {total > 0 ? `${pluralEvents(total)} в каталоге Дайбилет: выбирайте город, дату, формат отдыха и сразу переходите к покупке у билетного партнера.` : 'Каталог Дайбилет: выбирайте город, дату, формат отдыха и сразу переходите к покупке у билетного партнера.'}
-          </p>
-        </div>
-      </div>
-    </section>
+    <div
+      className="mb-4 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"
+      role="region"
+      aria-label="Активные фильтры"
+    >
+      <span className="inline-flex items-center gap-1.5 pl-1 pr-1 text-xs font-bold uppercase tracking-wider text-slate-500">
+        <SlidersHorizontal aria-hidden className="h-3.5 w-3.5" />
+        Активно · {activeFilters.length}
+      </span>
+      {activeFilters.map((filter) => (
+        <button
+          key={filter.key}
+          type="button"
+          onClick={filter.onClear}
+          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary-700 ring-1 ring-primary/20 hover:bg-primary/20"
+        >
+          {filter.label}
+          <X className="h-3 w-3" />
+        </button>
+      ))}
+      <button
+        type="button"
+        onClick={reset}
+        className="ml-auto inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
+      >
+        <X className="h-3.5 w-3.5" /> Сбросить фильтры
+      </button>
+    </div>
   );
 }
 
-function CatalogFilters({
+function CatalogToolbarSticky({
   query,
   setQuery,
   city,
   setCity,
   cities,
+  landing,
+  landings,
+  dateFrom,
+  dateTo,
+  minPrice,
+  maxPrice,
+  ageMax,
+  onAdvancedChange,
   category,
   setCategory,
   categories,
-  landing,
-  setLanding,
-  landings,
-  date,
-  setDate,
-  maxPrice,
-  setMaxPrice,
-  priceSteps,
-  reset,
+  sort,
+  setSort,
+  mode,
+  setMode,
+  filtersOpen,
+  setFiltersOpen,
+  advancedCount,
+  onApplyPreset,
+  presetSnapshot,
+  onReset,
 }: {
   query: string;
   setQuery: (value: string) => void;
   city: string;
   setCity: (value: string) => void;
   cities: Array<{ name: string; events: number }>;
-  category: string;
-  setCategory: (value: string) => void;
-  categories: Array<[string, number]>;
   landing: string;
   setLanding: (value: string) => void;
   landings: LandingFacet[];
-  date: DateFilter;
-  setDate: (value: DateFilter) => void;
+  dateFrom: string;
+  dateTo: string;
+  minPrice: string;
   maxPrice: string;
-  setMaxPrice: (value: string) => void;
-  priceSteps: number[];
-  reset: () => void;
+  ageMax: number;
+  onAdvancedChange: (patch: Partial<{ dateFrom: string; dateTo: string; minPrice: string; maxPrice: string; ageMax: number; landing: string }>) => void;
+  category: string;
+  setCategory: (value: string) => void;
+  categories: Array<[string, number]>;
+  sort: SortMode;
+  setSort: (value: SortMode) => void;
+  mode: ViewMode;
+  setMode: (value: ViewMode) => void;
+  filtersOpen: boolean;
+  setFiltersOpen: (value: boolean) => void;
+  advancedCount: number;
+  onApplyPreset: (slug: (typeof CATALOG_PRESETS)[number]['slug'], active: boolean) => void;
+  presetSnapshot: { date: DateFilter; minPrice: string; maxPrice: string; sort: SortMode };
+  onReset: () => void;
 }) {
-  const hasActiveFilters =
-    Boolean(query.trim()) ||
-    city !== 'all' ||
-    category !== 'all' ||
-    landing !== 'all' ||
-    date !== 'all' ||
-    maxPrice !== 'all';
-
   return (
-    <section className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_18px_50px_rgba(15,23,42,0.08)] sm:p-5">
-      <label className="relative block">
-        <span className="sr-only">Поиск</span>
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-        <input
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Название, место или событие"
-          className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-10 text-sm text-slate-900 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-2 focus:ring-primary-100"
-        />
-        {query ? (
-          <button
-            type="button"
-            onClick={() => setQuery('')}
-            className="absolute right-2 top-1/2 inline-flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-            aria-label="Очистить поиск"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        ) : null}
-      </label>
+    <div className="catalog-toolbar-sticky -mx-4 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6">
+      <div className="space-y-3">
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <label className="relative flex flex-1 items-center">
+            <span className="sr-only">Поиск по событиям</span>
+            <Search aria-hidden className="pointer-events-none absolute left-3 h-4 w-4 text-slate-400" />
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Название, место или артист"
+              aria-label="Поиск по событиям"
+              className="h-11 w-full rounded-xl bg-slate-50 pl-10 pr-9 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-primary/60"
+            />
+            {query ? (
+              <button
+                type="button"
+                aria-label="Очистить поиск"
+                onClick={() => setQuery('')}
+                className="absolute right-2 grid h-6 w-6 place-items-center rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-700"
+              >
+                <X aria-hidden className="h-3.5 w-3.5" />
+              </button>
+            ) : null}
+          </label>
 
-      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <SelectFilter label="Город" value={city} onChange={setCity}>
-          <option value="all">Все города</option>
-          {cities.map((item) => (
-            <option key={item.name} value={item.name}>{item.name} · {item.events}</option>
-          ))}
-        </SelectFilter>
+          <div className="relative sm:w-52">
+            <label htmlFor="catalog-city" className="sr-only">
+              Город
+            </label>
+            <select
+              id="catalog-city"
+              value={city}
+              onChange={(event) => setCity(event.target.value)}
+              className="h-11 w-full appearance-none rounded-xl bg-slate-50 pl-4 pr-9 text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/60"
+            >
+              <option value="all">Все города</option>
+              {cities.map((item) => (
+                <option key={item.name} value={item.name}>
+                  {item.name}
+                </option>
+              ))}
+            </select>
+            <ChevronDown aria-hidden className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          </div>
+        </div>
 
-        <SelectFilter label="Категория" value={category} onChange={setCategory}>
-          <option value="all">Все категории</option>
-          {categories.map(([name, count]) => (
-            <option key={name} value={name}>{name} · {count}</option>
-          ))}
-        </SelectFilter>
-
-        <SelectFilter label="Подборка" value={landing} onChange={setLanding}>
-          <option value="all">Все подборки</option>
-          {landings.map((item) => (
-            <option key={item.slug} value={item.slug}>{item.title} · {item.events}</option>
-          ))}
-        </SelectFilter>
-
-        <SelectFilter label="Цена до" value={maxPrice} onChange={setMaxPrice}>
-          <option value="all">Любая цена</option>
-          {priceSteps.map((price) => (
-            <option key={price} value={String(price)}>до {formatNumber(price)} ₽</option>
-          ))}
-        </SelectFilter>
-      </div>
-
-      <div className="mt-4 flex flex-col gap-3 border-t border-slate-100 pt-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0 flex-1">
-          <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Когда</p>
-          <div className="flex flex-wrap gap-2">
-            {[
-              ['all', 'Любая дата'],
-              ['today', 'Сегодня'],
-              ['tomorrow', 'Завтра'],
-              ['weekend', 'Выходные'],
-              ['evening', 'Вечером'],
-            ].map(([value, label]) => (
+        <div className="flex flex-wrap items-center gap-2">
+          <div role="radiogroup" aria-label="Сортировка" className="inline-flex rounded-xl bg-slate-100 p-1">
+            {SORT_OPTIONS.map(([value, label]) => (
               <button
                 key={value}
                 type="button"
-                onClick={() => setDate(value as DateFilter)}
-                className={`rounded-full px-3.5 py-2 text-xs font-semibold transition ${
-                  date === value
-                    ? 'bg-primary-600 text-white shadow-sm'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                role="radio"
+                aria-checked={sort === value}
+                onClick={() => setSort(value)}
+                className={`h-9 rounded-lg px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
+                  sort === value ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {label}
               </button>
             ))}
           </div>
-        </div>
 
-        {hasActiveFilters ? (
-          <button
-            type="button"
-            onClick={reset}
-            className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-primary-700 sm:mt-6"
-          >
-            <X className="h-3.5 w-3.5" />
-            Сбросить фильтры
-          </button>
-        ) : null}
-      </div>
-    </section>
-  );
-}
-
-function SelectFilter({ label, value, onChange, children }: { label: string; value: string; onChange: (value: string) => void; children: React.ReactNode }) {
-  return (
-    <label className="block min-w-0">
-      <span className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-400">{label}</span>
-      <select
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        className="h-11 w-full min-w-0 truncate rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm font-medium text-slate-800 outline-none transition focus:border-primary-300 focus:bg-white focus:ring-2 focus:ring-primary-100"
-      >
-        {children}
-      </select>
-    </label>
-  );
-}
-
-function CatalogToolbar({
-  count,
-  shown,
-  isLoading,
-  loadError,
-  sort,
-  setSort,
-  mode,
-  setMode,
-  activeFilters,
-  reset,
-}: {
-  count: number;
-  shown: number;
-  isLoading: boolean;
-  loadError: string | null;
-  sort: SortMode;
-  setSort: (value: SortMode) => void;
-  mode: ViewMode;
-  setMode: (value: ViewMode) => void;
-  activeFilters: ActiveCatalogFilter[];
-  reset: () => void;
-}) {
-  return (
-    <section className="mb-5">
-      <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-        <div>
-          <h2 className="text-2xl font-extrabold text-slate-950">{pluralEvents(count)}</h2>
-          {isLoading ? <p className="mt-1 text-xs font-semibold text-primary-700">Обновляем выдачу...</p> : null}
-          {loadError ? <p className="mt-1 text-xs font-semibold text-amber-700">API каталога не ответил: показываем локальный набор.</p> : null}
-          <p className="mt-1 text-sm text-slate-500">Показано {formatNumber(shown)}</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <select value={sort} onChange={(event) => setSort(event.target.value as SortMode)} className="h-11 rounded-xl bg-white px-3 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200">
-            <option value="time">Сначала ближайшие</option>
-            <option value="price">Сначала дешевле</option>
-            <option value="popular">По числу сеансов</option>
-          </select>
-          <div className="inline-flex overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+          <div className="ml-auto flex items-center gap-2">
             <button
               type="button"
-              title="Карточки"
-              aria-label="Карточки"
-              onClick={() => setMode('cards')}
-              className={`inline-flex h-11 w-11 items-center justify-center ${mode === 'cards' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}
+              onClick={() => setFiltersOpen(!filtersOpen)}
+              aria-expanded={filtersOpen}
+              aria-controls="advanced-filters-panel"
+              className={`relative inline-flex h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 ${
+                filtersOpen || advancedCount > 0
+                  ? 'bg-primary-600 text-white hover:bg-primary-700'
+                  : 'bg-slate-900 text-white hover:bg-slate-800'
+              }`}
             >
-              <Grid3X3 className="h-4 w-4" />
+              <SlidersHorizontal aria-hidden className="h-4 w-4" />
+              <span className="hidden sm:inline">Фильтры</span>
+              {advancedCount > 0 ? (
+                <span aria-hidden className="grid min-w-5 place-items-center rounded-full bg-white/25 px-1.5 text-xs">
+                  {advancedCount}
+                </span>
+              ) : null}
             </button>
-            <button
-              type="button"
-              title="Список"
-              aria-label="Список"
-              onClick={() => setMode('list')}
-              className={`inline-flex h-11 w-11 items-center justify-center border-l border-slate-200 ${mode === 'list' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}
-            >
-              <List className="h-4 w-4" />
-            </button>
-            <button
-              type="button"
-              title="Таблица"
-              aria-label="Таблица"
-              onClick={() => setMode('table')}
-              className={`inline-flex h-11 w-11 items-center justify-center border-l border-slate-200 ${mode === 'table' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}
-            >
-              <Table2 className="h-4 w-4" />
-            </button>
+
+            <div className="hidden overflow-hidden rounded-xl bg-slate-100 p-1 md:flex" role="radiogroup" aria-label="Вид списка">
+              <button
+                type="button"
+                onClick={() => setMode('cards')}
+                aria-label="Карточки"
+                className={`grid h-9 w-9 place-items-center rounded-lg transition ${
+                  mode === 'cards' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <Grid3X3 className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('list')}
+                aria-label="Список"
+                className={`grid h-9 w-9 place-items-center rounded-lg transition ${
+                  mode === 'list' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <List className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('table')}
+                aria-label="Таблица"
+                className={`grid h-9 w-9 place-items-center rounded-lg transition ${
+                  mode === 'table' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                <Table2 className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {activeFilters.length ? (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {activeFilters.map((filter) => (
+        {filtersOpen ? (
+          <CatalogAdvancedFiltersPanel
+            filters={{ dateFrom, dateTo, minPrice, maxPrice, ageMax, landing }}
+            landings={landings}
+            onChange={onAdvancedChange}
+            onClose={() => setFiltersOpen(false)}
+            onReset={onReset}
+          />
+        ) : null}
+
+        <div className="-mx-4 px-4 sm:mx-0 sm:px-0">
+          <div className="horizontal-snap-row flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <button
-              key={filter.key}
               type="button"
-              onClick={filter.onClear}
-              className="inline-flex items-center gap-1.5 rounded-full bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700 transition hover:bg-primary-100"
+              onClick={() => setCategory('all')}
+              className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition ${
+                category === 'all' ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+              }`}
             >
-              {filter.label}
-              <X className="h-3.5 w-3.5" />
+              <span className="mr-1">✨</span>
+              Все
             </button>
-          ))}
-          <button type="button" onClick={reset} className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-200">Сбросить все</button>
+            {categories.map(([name, count]) => (
+              <button
+                key={name}
+                type="button"
+                onClick={() => setCategory(category === name ? 'all' : name)}
+                className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition ${
+                  category === name ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <span className="mr-1">{categoryEmoji(name)}</span>
+                {name}
+                <span className={category === name ? 'ml-1 text-white/70' : 'ml-1 text-slate-400'}>{formatNumber(count)}</span>
+              </button>
+            ))}
+          </div>
         </div>
-      ) : null}
-    </section>
-  );
-}
 
-function QuickTags({ tags, category, setCategory }: { tags: Array<[string, number]>; category: string; setCategory: (value: string) => void }) {
-  if (!tags.length) return null;
-  return (
-    <div className="mb-5 flex flex-wrap gap-2">
-      {tags.map(([tag, count]) => (
-        <button key={tag} type="button" onClick={() => setCategory(category === tag ? 'all' : tag)} className={`inline-flex items-center gap-1 rounded-full px-3.5 py-2 text-xs font-semibold shadow-sm transition ${category === tag ? 'bg-primary-600 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-100 hover:bg-primary-50 hover:text-primary-700'}`}>
-          <Tag className="h-3.5 w-3.5" />
-          {tag}
-          <span className={category === tag ? 'text-white/70' : 'text-slate-400'}>{formatNumber(count)}</span>
-        </button>
-      ))}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium uppercase tracking-wide text-slate-400">Подборки:</span>
+          {CATALOG_PRESETS.map((preset) => {
+            const active = catalogPresetMatches(preset.slug, presetSnapshot);
+            return (
+              <button
+                key={preset.slug}
+                type="button"
+                onClick={() => onApplyPreset(preset.slug, active)}
+                className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                  active ? 'bg-primary/10 text-primary-700 ring-1 ring-primary/30' : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                {preset.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
 
-function CatalogView({ mode, sessions }: { mode: ViewMode; sessions: PublicSession[] }) {
+function CatalogResultsMeta({
+  shown,
+  total,
+  isLoading,
+  loadError,
+  mode,
+}: {
+  shown: number;
+  total: number;
+  isLoading: boolean;
+  loadError: string | null;
+  mode: ViewMode;
+}) {
+  const modeLabel = mode === 'table' ? 'Таблица' : mode === 'list' ? 'Список' : 'Карточки';
+  return (
+    <div className="mb-4 mt-6 text-sm text-slate-500">
+      {isLoading ? <p className="text-xs font-semibold text-primary-700">Обновляем выдачу...</p> : null}
+      {loadError ? <p className="text-xs font-semibold text-amber-700">API каталога не ответил: показываем локальный набор.</p> : null}
+      <p>
+        Показано {formatNumber(shown)} из {formatNumber(total)} · {modeLabel}
+      </p>
+    </div>
+  );
+}
+
+function CatalogView({
+  mode,
+  sessions,
+  sort,
+  onSortChange,
+}: {
+  mode: ViewMode;
+  sessions: PublicSession[];
+  sort: SortMode;
+  onSortChange: (value: SortMode) => void;
+}) {
   if (mode === 'list') return <CatalogList sessions={sessions} />;
-  if (mode === 'table') return <CatalogTable sessions={sessions} />;
+  if (mode === 'table') return <CatalogTable sessions={sessions} sort={sort} onSortChange={onSortChange} />;
   return <CatalogGrid sessions={sessions} />;
 }
 
 function CatalogGrid({ sessions }: { sessions: PublicSession[] }) {
   if (!sessions.length) return <EmptyCatalog />;
   return (
-    <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {sessions.map((session) => (
         <EventCard key={session.id} event={session} compact />
       ))}
@@ -578,76 +726,127 @@ function CatalogList({ sessions }: { sessions: PublicSession[] }) {
   );
 }
 
-function CatalogTable({ sessions }: { sessions: PublicSession[] }) {
-  if (!sessions.length) return <EmptyCatalog />;
+function CatalogTable({
+  sessions,
+  sort,
+  onSortChange,
+}: {
+  sessions: PublicSession[];
+  sort: SortMode;
+  onSortChange: (value: SortMode) => void;
+}) {
+  const [titleSort, setTitleSort] = React.useState<'asc' | 'desc' | null>(null);
+
+  React.useEffect(() => {
+    setTitleSort(null);
+  }, [sort]);
+
+  const rows = React.useMemo(() => {
+    if (!titleSort) return sessions;
+    return [...sessions].sort((a, b) => {
+      const cmp = a.title.localeCompare(b.title, 'ru');
+      return titleSort === 'asc' ? cmp : -cmp;
+    });
+  }, [sessions, titleSort]);
+
+  const selectApiSort = (value: SortMode) => {
+    setTitleSort(null);
+    onSortChange(value);
+  };
+
+  const toggleTitleSort = () => {
+    setTitleSort((current) => (current === 'asc' ? 'desc' : 'asc'));
+  };
+
+  if (!rows.length) return <EmptyCatalog />;
+
   return (
     <div className="overflow-auto rounded-lg border border-slate-200 bg-white shadow-sm">
       <table className="w-full min-w-[980px] border-collapse text-sm">
         <thead>
           <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase text-slate-500">
-            <th className="px-4 py-3 font-semibold">Дата</th>
-            <th className="px-4 py-3 font-semibold">Событие</th>
-            <th className="px-4 py-3 font-semibold">Город</th>
-            <th className="px-4 py-3 font-semibold">Площадка</th>
+            <SortableTableHeader label="Событие" active={titleSort !== null} onClick={toggleTitleSort} />
             <th className="px-4 py-3 font-semibold">Категория</th>
-            <th className="px-4 py-3 font-semibold">Цена</th>
+            <th className="px-4 py-3 font-semibold">Город</th>
+            <SortableTableHeader label="Дата" active={sort === 'time' && titleSort === null} onClick={() => selectApiSort('time')} />
+            <SortableTableHeader label="Цена" active={sort === 'price' && titleSort === null} onClick={() => selectApiSort('price')} />
+            <SortableTableHeader label="Рейтинг" active={sort === 'popular' && titleSort === null} onClick={() => selectApiSort('popular')} />
             <th className="px-4 py-3" />
           </tr>
         </thead>
         <tbody>
-          {sessions.map((session) => (
-            <tr key={session.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
-              <td className="whitespace-nowrap px-4 py-3 align-top">
-                <div className="font-medium text-slate-900">{session.dateLabel}</div>
-                <div className="text-xs text-slate-500">{session.timeLabel}</div>
-                {(session.sessionCount || 0) > 1 ? (
-                  <div className="mt-1 text-xs font-semibold text-primary-700">{formatNumber(session.sessionCount)} сеансов</div>
-                ) : null}
-              </td>
-              <td className="min-w-[300px] px-4 py-3 align-top">
-                <a href={eventHref(session)} className="font-medium text-slate-950 hover:text-primary-700">
-                  {session.title}
-                </a>
-                <div className="mt-1 text-xs text-slate-500">{collectCatalogLabels(session).join(' · ')}</div>
-              </td>
-              <td className="px-4 py-3 align-top">
-                {session.citySlug ? (
-                  <a href={`/cities/${session.citySlug}`} className="font-medium text-slate-700 hover:text-primary-700">
-                    {session.destinationType === 'region' ? session.destination : session.city}
+          {rows.map((session) => {
+            const rating = resolvePseudoRating(session.groupKey || session.id);
+            const reviewCount = Math.max(session.sessionCount || 1, 1) * 37 + (session.id.charCodeAt(0) % 90);
+            const cityLabel = resolveEventCardDestinationLabel(session);
+            return (
+              <tr key={session.id} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
+                <td className="min-w-[280px] px-4 py-3 align-top">
+                  <a href={eventHref(session)} className="font-semibold text-slate-950 hover:text-primary-700">
+                    {session.title}
                   </a>
-                ) : session.destinationType === 'region' ? (
-                  session.destination
-                ) : (
-                  session.city
-                )}
-                {session.destinationType === 'region' && session.city ? (
-                  <div className="mt-1 text-xs text-slate-500">{session.city}</div>
-                ) : null}
-              </td>
-              <td className="max-w-[240px] px-4 py-3 align-top text-slate-600">
-                {session.venueSlug ? (
-                  <a href={`/venues/${session.venueSlug}`} className="hover:text-primary-700">
-                    {session.venue}
+                  {session.venue ? <div className="mt-1 text-xs text-slate-500">{session.venue}</div> : null}
+                </td>
+                <td className="px-4 py-3 align-top text-slate-600">{session.category || '—'}</td>
+                <td className="px-4 py-3 align-top text-slate-600">
+                  {session.citySlug ? (
+                    <a href={`/cities/${session.citySlug}`} className="hover:text-primary-700">
+                      {cityLabel}
+                    </a>
+                  ) : (
+                    cityLabel || '—'
+                  )}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 align-top text-slate-700">
+                  {formatShowcaseSessionDate(session)}
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 align-top font-semibold text-slate-950">{formatMoney(session.priceFrom)}</td>
+                <td className="whitespace-nowrap px-4 py-3 align-top">
+                  <span className="inline-flex items-center gap-1 text-slate-700">
+                    <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                    <span className="font-medium">{rating.toFixed(1)}</span>
+                    <span className="text-xs text-slate-400">({formatNumber(reviewCount)})</span>
+                  </span>
+                </td>
+                <td className="px-4 py-3 align-top">
+                  <a
+                    href={eventHref(session)}
+                    className="inline-flex min-h-9 items-center justify-center rounded-full bg-slate-900 px-4 text-sm font-semibold text-white hover:bg-slate-800"
+                  >
+                    Купить
                   </a>
-                ) : (
-                  session.venue
-                )}
-              </td>
-              <td className="px-4 py-3 align-top text-slate-600">{session.category}</td>
-              <td className="whitespace-nowrap px-4 py-3 align-top font-semibold text-slate-950">{formatMoney(session.priceFrom)}</td>
-              <td className="px-4 py-3 align-top">
-                <a
-                  href={eventHref(session)}
-                  className="inline-flex min-h-9 items-center justify-center rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700"
-                >
-                  Открыть
-                </a>
-              </td>
-            </tr>
-          ))}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
+  );
+}
+
+function SortableTableHeader({
+  label,
+  active,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <th className="px-4 py-3 font-semibold">
+      <button
+        type="button"
+        onClick={onClick}
+        className={`inline-flex items-center gap-1 transition hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
+          active ? 'text-slate-900' : 'text-slate-500'
+        }`}
+      >
+        {label}
+        <ArrowUpDown className={`h-3.5 w-3.5 ${active ? 'text-primary-600' : 'opacity-60'}`} />
+      </button>
+    </th>
   );
 }
 
@@ -673,7 +872,7 @@ function CatalogPagination({
         type="button"
         onClick={onLoadMore}
         disabled={isLoading}
-        className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-950 px-5 text-sm font-semibold text-white transition hover:bg-primary-700 disabled:cursor-wait disabled:bg-slate-300"
+        className="inline-flex min-h-10 items-center justify-center rounded-full bg-primary-600 px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 disabled:cursor-wait disabled:bg-slate-300"
       >
         {isLoading ? 'Загружаем...' : `Показать еще ${formatNumber(Math.min(CATALOG_PAGE_LIMIT, remaining))}`}
       </button>
@@ -742,7 +941,7 @@ function mergeCatalogSessions(current: PublicSession[], next: PublicSession[]) {
 function isCatalogCityFacet(item: CatalogFacetItem) {
   const name = String(item.name || '').trim().toLowerCase();
   if (!name || name === 'не указан') return false;
-  return item.events >= 2;
+  return item.events >= 1;
 }
 
 function dateLabel(value: DateFilter) {
@@ -759,8 +958,8 @@ function parseDateFilter(value: string | null): DateFilter {
 }
 
 function parseSortMode(value: string | null): SortMode {
-  if (value === 'price' || value === 'popular') return value;
-  return 'time';
+  if (value === 'price' || value === 'time') return value;
+  return 'popular';
 }
 
 function readStoredViewMode(): ViewMode | null {
@@ -783,8 +982,24 @@ function parseViewMode(value: string | null): ViewMode {
 function parseMaxPriceFilter(value: string | null): string {
   if (!value) return 'all';
   const price = Number(value);
-  if (!Number.isFinite(price) || price < MIN_DISPLAY_PRICE_RUB) return 'all';
+  if (!Number.isFinite(price) || price < 0) return 'all';
+  if (price === 0) return '0';
+  if (price < MIN_DISPLAY_PRICE_RUB) return 'all';
   return String(Math.round(price));
+}
+
+function parseMinPriceFilter(value: string | null): string {
+  if (!value) return 'all';
+  const price = Number(value);
+  if (!Number.isFinite(price) || price < 0) return 'all';
+  return String(Math.round(price));
+}
+
+function parseAgeMaxFilter(value: string | null): number {
+  if (!value) return -1;
+  const age = Number(value);
+  if (!Number.isFinite(age) || age < 0) return -1;
+  return Math.round(age);
 }
 
 function syncCatalogUrl(filters: {
@@ -793,7 +1008,11 @@ function syncCatalogUrl(filters: {
   category: string;
   landing: string;
   date: DateFilter;
+  dateFrom: string;
+  dateTo: string;
+  minPrice: string;
   maxPrice: string;
+  ageMax: number;
   sort: SortMode;
   mode: ViewMode;
 }) {
@@ -803,9 +1022,13 @@ function syncCatalogUrl(filters: {
   if (filters.city !== 'all') params.set('city', filters.city);
   if (filters.category !== 'all') params.set('category', filters.category);
   if (filters.landing !== 'all') params.set('landing', filters.landing);
-  if (filters.date !== 'all') params.set('date', filters.date);
+  if (filters.dateFrom) params.set('dateFrom', filters.dateFrom);
+  else if (filters.date !== 'all') params.set('date', filters.date);
+  if (filters.dateTo) params.set('dateTo', filters.dateTo);
+  if (filters.minPrice !== 'all') params.set('minPrice', filters.minPrice);
   if (filters.maxPrice !== 'all') params.set('maxPrice', filters.maxPrice);
-  if (filters.sort !== 'time') params.set('sort', filters.sort);
+  if (filters.ageMax >= 0) params.set('ageMax', String(filters.ageMax));
+  if (filters.sort !== 'popular') params.set('sort', filters.sort);
   if (filters.mode !== 'cards') params.set('view', filters.mode);
 
   const queryString = params.toString();
@@ -814,15 +1037,6 @@ function syncCatalogUrl(filters: {
   if (nextUrl !== currentUrl) {
     window.history.replaceState(null, '', nextUrl);
   }
-}
-
-function pluralEvents(count: number): string {
-  const mod10 = count % 10;
-  const mod100 = count % 100;
-  if (mod100 >= 11 && mod100 <= 19) return `${formatNumber(count)} событий`;
-  if (mod10 === 1) return `${formatNumber(count)} событие`;
-  if (mod10 >= 2 && mod10 <= 4) return `${formatNumber(count)} события`;
-  return `${formatNumber(count)} событий`;
 }
 
 function navigateFromCatalog(section: string) {

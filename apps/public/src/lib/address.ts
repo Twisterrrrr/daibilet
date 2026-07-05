@@ -11,6 +11,13 @@ const COUNTRY_TOKENS = new Set([
   'российская федерация',
 ]);
 
+const SETTLEMENT_PREFIX_RE = /^(?:д|дер|с|село|п|пос)\.?\s+/iu;
+const HOUSE_NUMBER_RE = /^(?:д\.?|дом)\s*(\d[\p{L}\d\-/]*)/iu;
+const STREET_MARKERS_RE =
+  /(?:^|[\s,.-])(?:улиц(?:а|ы|u|e)?|ул\.|просп(?:ект)?|пр-?т|пр\.|пер(?:\.|еулок)?|площ(?:адь|и)?|наб(?:\.|ереж(?:ная)?)?|шоссе|бульвар|б-?р\.|линия|проезд|туп(?:\.|ик)?|str\.|st\.)(?:[\s,.]|$)|(?:переулок|проспект|набережная|бульвар|площадь|шоссе)/iu;
+const REGION_SUFFIX_RE = /\s+[\p{L}][\p{L}\d-]*\s+(?:обл\.|область|край|респ\.|республика)(?:,\s*)?$/iu;
+const ONLY_REGION_RE = /^[\p{L}][\p{L}\d-]*\s+(?:обл\.|область|край|респ\.|республика)$/iu;
+
 function normalizeAddressToken(value: string): string {
   return value
     .trim()
@@ -28,11 +35,102 @@ function isCountry(part: string): boolean {
   return COUNTRY_TOKENS.has(normalizeAddressToken(part));
 }
 
+function isRegionPart(part: string): boolean {
+  return REGION_SUFFIX_RE.test(part.trim()) || ONLY_REGION_RE.test(part.trim());
+}
+
+function isOnlyRegionPart(part: string): boolean {
+  if (isHouseNumberPart(part)) return false;
+  return ONLY_REGION_RE.test(cleanAddressPart(part));
+}
+
+function cleanAddressPart(part: string): string {
+  return part.trim().replace(REGION_SUFFIX_RE, '').trim();
+}
+
+function isHouseNumberPart(part: string): boolean {
+  return HOUSE_NUMBER_RE.test(cleanAddressPart(part));
+}
+
 function looksLikeStreetPart(part: string): boolean {
-  return (
-    /\d/.test(part) ||
-    /(?:^|[\s,])(?:наб\.?|ул\.?|пр\.?|пр-?т|пер\.?|б-?р\.?|ш\.?|просп\.?|набереж(?:ная)?|пл\.?|площад(?:ь|и)|линия|аллея|проезд|туп\.?|str\.?|st\.?)(?:[\s,]|$)/i.test(part)
-  );
+  const text = cleanAddressPart(part);
+  if (isHouseNumberPart(text)) return true;
+  if (STREET_MARKERS_RE.test(text)) return true;
+  return /\d/.test(text);
+}
+
+function looksLikeInstitutionName(part: string): boolean {
+  return INSTITUTION_NAME_RE.test(cleanAddressPart(part));
+}
+
+function isBareStreetNamePart(part: string, city?: string | null): boolean {
+  const text = cleanAddressPart(part);
+  if (!text || isPostalCode(text) || isCountry(text) || isCityPart(text, city) || isRegionPart(text)) {
+    return false;
+  }
+  if (looksLikeInstitutionName(text)) return false;
+  if (isHouseNumberPart(text) || SETTLEMENT_PREFIX_RE.test(text) || STREET_MARKERS_RE.test(text)) {
+    return false;
+  }
+  if (/\d/.test(text)) return false;
+  return text.length >= 2 && text.length <= 60;
+}
+
+function looksLikeHouseNumberToken(part: string): boolean {
+  const text = cleanAddressPart(part);
+  if (isHouseNumberPart(text)) return true;
+  if (/^\d[\p{L}\d\-/]*(?:\s*,?\s*лит(?:ера)?\.?\s*[\p{L}\d]+)?/iu.test(text)) return true;
+  if (/^лит(?:ера)?\.?\s*[\p{L}\d]+/iu.test(text)) return true;
+  return false;
+}
+
+function formatBareStreetLine(parts: string[], city?: string | null): string | null {
+  const cleaned = parts.map((part) => cleanAddressPart(part)).filter(Boolean);
+  if (cleaned.length < 2) return null;
+  const [first, second, ...rest] = cleaned;
+  if (isBareStreetNamePart(first, city) && looksLikeHouseNumberToken(second)) {
+    const tail = [second, ...rest].join(', ');
+    return `ул. ${first}, ${tail}`;
+  }
+  return null;
+}
+
+function isBareSettlementPart(part: string, city?: string | null): boolean {
+  const text = cleanAddressPart(part);
+  if (!text || isPostalCode(text) || isCountry(text) || isCityPart(text, city) || isRegionPart(text)) {
+    return false;
+  }
+  if (isHouseNumberPart(text)) return false;
+  if (SETTLEMENT_PREFIX_RE.test(text)) return true;
+  if (STREET_MARKERS_RE.test(text)) return false;
+  if (/\d/.test(text)) return false;
+  return text.length >= 2 && text.length <= 40;
+}
+
+function formatSettlementPart(part: string): string {
+  const text = cleanAddressPart(part);
+  const prefixed = text.match(/^(?:д|дер|с|село|п|пос)\.?\s+(.+)$/iu);
+  if (prefixed) return `д.${prefixed[1].trim()}`;
+  return `д.${text}`;
+}
+
+function formatHousePart(part: string): string {
+  const text = cleanAddressPart(part);
+  const match = text.match(HOUSE_NUMBER_RE);
+  if (match) return `д. ${match[1]}`;
+  return text;
+}
+
+function composeSettlementAddress(parts: string[], city?: string | null): string | null {
+  const cleaned = parts.map((part) => cleanAddressPart(part)).filter(Boolean);
+  if (cleaned.length < 2) return null;
+
+  const [first, second] = cleaned;
+  if (isBareSettlementPart(first, city) && isHouseNumberPart(second)) {
+    return `${formatSettlementPart(first)}, ${formatHousePart(second)}`;
+  }
+
+  return null;
 }
 
 function isCityPart(part: string, city?: string | null): boolean {
@@ -40,7 +138,30 @@ function isCityPart(part: string, city?: string | null): boolean {
   const normalized = normalizeAddressToken(part);
   const cityNorm = normalizeAddressToken(city);
   if (!cityNorm) return false;
-  return normalized === cityNorm || normalized.includes(cityNorm) || cityNorm.includes(normalized);
+  if (STREET_MARKERS_RE.test(part) || looksLikeHouseNumberToken(part)) return false;
+  if (normalized === cityNorm) return true;
+  if (normalized === `г ${cityNorm}` || normalized === `город ${cityNorm}`) return true;
+  return false;
+}
+
+const INLINE_STREET_RE =
+  /^([\p{L}][\p{L}\s-]{1,40}?)\s+(\d[\p{L}\d\-/]*(?:\s*лит(?:ера)?\.?\s*[\p{L}\d]+)?)$/iu;
+const INSTITUTION_NAME_RE =
+  /(?:музе|заповедник|усадьб|театр|галере|дворец|кремл|собор|храм|филармон|экспозици|кинотеатр|манеж|цирк)/iu;
+
+function capitalizeWord(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return trimmed;
+  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+}
+
+function formatInlineStreetAddress(value: string): string | null {
+  const match = value.trim().match(INLINE_STREET_RE);
+  if (!match) return null;
+  const street = capitalizeWord(match[1]);
+  const house = match[2];
+  if (STREET_MARKERS_RE.test(street)) return `${street}, ${house}`;
+  return `ул. ${street}, ${house}`;
 }
 
 function stripTrailingMeta(parts: string[], city?: string | null): string[] {
@@ -48,7 +169,7 @@ function stripTrailingMeta(parts: string[], city?: string | null): string[] {
 
   while (result.length > 1) {
     const last = result[result.length - 1];
-    if (isPostalCode(last) || isCountry(last) || isCityPart(last, city)) {
+    if (isPostalCode(last) || isCountry(last) || isCityPart(last, city) || isOnlyRegionPart(last)) {
       result.pop();
       continue;
     }
@@ -60,10 +181,29 @@ function stripTrailingMeta(parts: string[], city?: string | null): string[] {
   }
 
   while (result.length > 1 && !looksLikeStreetPart(result[0]) && looksLikeStreetPart(result[1])) {
+    const first = cleanAddressPart(result[0]);
+    const second = cleanAddressPart(result[1]);
+    if (isBareSettlementPart(first, city) && isHouseNumberPart(second)) {
+      break;
+    }
+    if (isBareStreetNamePart(first, city) && looksLikeHouseNumberToken(second)) {
+      break;
+    }
     result.shift();
   }
 
-  return result.filter((part) => !isPostalCode(part) && !isCountry(part) && !isCityPart(part, city));
+  return result.filter(
+    (part) => !isPostalCode(part) && !isCountry(part) && !isCityPart(part, city) && !isOnlyRegionPart(part),
+  );
+}
+
+function stripInstitutionPrefix(parts: string[], city?: string | null): string[] {
+  if (parts.length < 2) return parts;
+  const [first, ...rest] = parts.map((part) => cleanAddressPart(part)).filter(Boolean);
+  if (!looksLikeInstitutionName(first)) return parts;
+  const street = rest.filter(Boolean).join(', ');
+  if (!street || (!STREET_MARKERS_RE.test(street) && !/\d/.test(street))) return parts;
+  return street.split(',').map((part) => part.trim()).filter(Boolean);
 }
 
 export function formatStreetAddress(
@@ -79,11 +219,26 @@ export function formatStreetAddress(
     .map((part) => part.trim())
     .filter(Boolean);
 
-  if (parts.length <= 1) return trimmed;
+  const withoutInstitution = stripInstitutionPrefix(parts, options?.city);
 
-  const cleaned = stripTrailingMeta(parts, options?.city);
-  const result = cleaned.join(', ').trim();
+  if (withoutInstitution.length <= 1) {
+    return formatInlineStreetAddress(trimmed) || trimmed;
+  }
+
+  const cleaned = stripTrailingMeta(withoutInstitution, options?.city);
+  const settlementLine = composeSettlementAddress(cleaned, options?.city);
+  if (settlementLine) return settlementLine;
+
+  const bareStreetLine = formatBareStreetLine(cleaned, options?.city);
+  if (bareStreetLine) return bareStreetLine;
+
+  const result = cleaned.map((part) => cleanAddressPart(part)).filter(Boolean).join(', ').trim();
   return result || trimmed;
+}
+
+/** Адрес с населённым пунктом и номером дома: «д.Турыгино, д. 280». */
+export function isRuralSettlementAddress(value: string): boolean {
+  return /^д\.[^,]+,\s*д\.\s*\d+/iu.test(String(value || '').trim());
 }
 
 export function shortenAddressToStreet(

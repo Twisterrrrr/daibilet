@@ -16,8 +16,11 @@ import {
 import { EventCard } from '@/components/EventCard';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { SessionBuyButton } from '@/components/TcWidget';
 import { formatMoney, formatNumber } from '@/data';
+import { collectPopularTags } from '@/lib/catalog-tags';
 import { resolveCityImage } from '@/lib/city-images';
+import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { landingPageHref } from '@/lib/landing-slugs';
 import { eventHref } from '@/routes';
 import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
@@ -81,7 +84,10 @@ export function CityPage({ slug }: { slug: string }) {
 
   const city = payload?.city;
   const categories = city ? Object.entries(city.categories).sort((a, b) => b[1] - a[1]) : [];
-  const popularTags = React.useMemo(() => (payload ? topTags(payload.sessions, 12) : []), [payload]);
+  const popularTags = React.useMemo(
+    () => (payload ? collectPopularTags(payload.sessions, 12).map(({ name, events }) => ({ name, count: events })) : []),
+    [payload],
+  );
   const guide = city ? cityGuideFor(city) : null;
   const recommended = payload ? rankRecommended(payload.sessions).slice(0, 6) : [];
   const moreEvents = payload ? rankRecommended(payload.sessions).slice(6, 30) : [];
@@ -172,6 +178,11 @@ function CityHero({
   });
   const showImage = Boolean(heroImage && !hasImageError);
   const cityIn = cityInPrepositional(city);
+  const heroFocus = resolveCityImageObjectPosition({
+    slug: city.slug,
+    sourceSlug: city.sourceSlug,
+    name: city.name,
+  });
 
   return (
     <section className="relative min-h-[320px] overflow-hidden border-b border-primary-950 text-white sm:min-h-[380px]">
@@ -180,7 +191,8 @@ function CityHero({
           <img
             src={heroImage || ''}
             alt=""
-            className="absolute inset-0 h-full w-full object-cover object-center lg:object-[center_75%]"
+            style={{ objectPosition: heroFocus }}
+            className="absolute inset-0 h-full w-full object-cover"
             onError={() => setHasImageError(true)}
           />
         </div>
@@ -385,10 +397,17 @@ function VenueHighlights({ city, venues }: { city: PublicCity; venues: PublicVen
         {venues.slice(0, 6).map((venue) => (
           <a key={venue.id} href={`/venues/${venue.slug || venue.id}`} className="rounded-lg bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition hover:bg-primary-50/60 hover:shadow-[0_16px_34px_rgba(15,23,42,0.1)]">
             <div className="font-semibold text-slate-950">{venue.name}</div>
-            <div className="mt-2 flex items-center gap-1 text-sm text-slate-500">
-              <MapPin className="h-4 w-4" />
-              {pluralEvents(venue.events)}
-            </div>
+            {venue.address ? (
+              <div className="mt-2 flex items-start gap-1 text-sm text-slate-500">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                <span className="line-clamp-2">{venue.address}</span>
+              </div>
+            ) : (
+              <div className="mt-2 flex items-center gap-1 text-sm text-slate-500">
+                <MapPin className="h-4 w-4" />
+                {pluralEvents(venue.events)}
+              </div>
+            )}
           </a>
         ))}
       </div>
@@ -475,7 +494,7 @@ function CityCatalogHeader({
   return (
     <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h2 className="text-2xl font-bold text-slate-950">Каталог событий {cityIn}</h2>
+        <h2 className="text-2xl font-bold text-slate-950">События {cityIn}</h2>
         <p className="mt-1 text-sm leading-6 text-slate-600">
           {pluralEvents(count)} после выбранных фильтров. Для повторяющихся событий карточка объединяет ближайшие слоты.
         </p>
@@ -640,19 +659,7 @@ function HeroStat({ label, value }: { label: string; value: string }) {
 }
 
 function BuyLink({ session }: { session: PublicSession }) {
-  if (!session.purchaseUrl) {
-    return (
-      <span className="inline-flex min-h-9 items-center justify-center rounded-lg bg-slate-100 px-4 text-sm font-semibold text-slate-400">
-        Нет ссылки
-      </span>
-    );
-  }
-
-  return (
-    <a href={session.purchaseUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center justify-center rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700">
-      Купить
-    </a>
-  );
+  return <SessionBuyButton session={session} />;
 }
 
 function EmptyState() {
@@ -691,21 +698,6 @@ function sessionQualityScore(session: PublicSession) {
   if (session.tags.length) score += 1;
   if ((session.sessionCount || 0) > 1) score += 1;
   return score;
-}
-
-function topTags(sessions: PublicSession[], limit: number) {
-  const counts = new Map<string, number>();
-  for (const session of sessions) {
-    for (const tag of session.tags || []) {
-      const clean = tag.trim();
-      if (!clean || clean.length < 3) continue;
-      counts.set(clean, (counts.get(clean) || 0) + 1);
-    }
-  }
-  return Array.from(counts.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, limit)
-    .map(([name, count]) => ({ name, count }));
 }
 
 function pluralEvents(n: number): string {

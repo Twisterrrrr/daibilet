@@ -19,6 +19,7 @@
     "tc:catalog": "node scripts/tc-sample-catalog.js",
     "tc:count": "node scripts/tc-count-events.js",
     "tc:full-sync": "node scripts/tc-full-sync.js",
+    "sync:full": "node scripts/run-full-sync.js",
     "tc:orders": "node scripts/tc-sync-orders.js",
     "tc:city-routing": "node scripts/tc-city-routing-summary.js",
     "landing:snapshot": "node scripts/landing-snapshot.mjs --write",

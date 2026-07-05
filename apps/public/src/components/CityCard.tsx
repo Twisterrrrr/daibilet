@@ -2,6 +2,7 @@ import { ArrowRight, Landmark, MapPin } from 'lucide-react';
 import * as React from 'react';
 
 import { CITY_CARD_ASPECT_CLASS, cityCardTitleClass } from '@/lib/city-card-styles';
+import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import type { CityCardRegion } from '@/lib/cityRegionHub';
 
 function pluralEvents(n: number): string {
@@ -45,37 +46,41 @@ export function CityCard({
 }) {
   const [hasImageError, setHasImageError] = React.useState(false);
   const showImage = Boolean(imageUrl && !hasImageError);
+  const imageFocus = resolveCityImageObjectPosition({ slug, name });
 
   return (
     <div className="flex flex-col">
       <a href={href} className="card group relative block overflow-hidden">
-        <div className={`relative flex ${CITY_CARD_ASPECT_CLASS} flex-col justify-end overflow-hidden`}>
+        <div className={`relative ${CITY_CARD_ASPECT_CLASS} overflow-hidden`}>
           {showImage ? (
             <img
               src={imageUrl || ''}
               alt=""
               loading="lazy"
               onError={() => setHasImageError(true)}
+              style={{ objectPosition: imageFocus }}
               className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-primary-700 to-primary-900" />
           )}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-          <div className="relative p-4 sm:p-5">
-            <h3 className={cityCardTitleClass(large ? 'large' : 'compact')}>{name}</h3>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10" />
+          <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
+            <h3 className={`${cityCardTitleClass(large ? 'large' : 'compact')} line-clamp-2`}>{name}</h3>
             {description ? <p className="mt-1 line-clamp-2 text-sm text-white/70">{description}</p> : null}
-            <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/80">
-            <span className="flex items-center gap-1.5">
-              <MapPin className="h-4 w-4" />
-              {eventCount > 0 ? pluralEvents(eventCount) : 'Скоро появятся события'}
-            </span>
-            {venueCount != null && venueCount > 0 ? (
+            <div className="mt-1.5 flex flex-col gap-0.5 text-xs text-white/85 sm:text-sm">
               <span className="flex items-center gap-1.5">
-                <Landmark className="h-3.5 w-3.5" />
-                {pluralVenues(venueCount)}
+                <MapPin className="h-3.5 w-3.5 shrink-0" />
+                <span className="truncate">
+                  {eventCount > 0 ? pluralEvents(eventCount) : 'Скоро появятся события'}
+                </span>
               </span>
-            ) : null}
+              {venueCount != null && venueCount > 0 ? (
+                <span className="flex items-center gap-1.5">
+                  <Landmark className="h-3.5 w-3.5 shrink-0" />
+                  <span className="truncate">{pluralVenues(venueCount)}</span>
+                </span>
+              ) : null}
             </div>
           </div>
         </div>

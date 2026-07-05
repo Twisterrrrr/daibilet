@@ -261,6 +261,25 @@ export function formatNumber(value?: number | null): string {
   return new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(value || 0);
 }
 
+/** Округление метрик hero до ближайших 10 (1–4 → 10). */
+export function roundStatToTen(value?: number | null): number {
+  const count = Math.max(0, Math.round(value || 0));
+  if (count === 0) return 0;
+  const rounded = Math.round(count / 10) * 10;
+  return rounded > 0 ? rounded : 10;
+}
+
+/** Для блоков метрик: «+» только при достаточно больших числах, чтобы не показывать «1+». */
+export function formatStatCount(value?: number | null, plusThreshold = 500): string {
+  const count = Math.max(0, Math.round(value || 0));
+  if (count >= plusThreshold) return `${formatNumber(count)}+`;
+  return formatNumber(count);
+}
+
+export function isMeaningfulStatCount(value?: number | null, min = 10): boolean {
+  return Math.round(value || 0) >= min;
+}
+
 export function formatMoney(value?: number | null): string {
   if (!value || value <= 0) return '-';
   return `от ${formatNumber(Math.round(value))} ₽`;

@@ -331,39 +331,66 @@ async function upsertVenue(client, event, place, cityId) {
   const slug = slugify(`${venueTitle}-${externalPlaceId}`);
   const latitude = floatOrNull(place.lat);
   const longitude = floatOrNull(place.lng);
-  const result = await client.query(
+  const venueId = `venue_tep_${externalPlaceId}`;
+  const params = [
+    venueId,
+    slug,
+    venueTitle,
+    place.description || null,
+    cleanTitle(event.place) || null,
+    firstImage(event.images),
+    cityId,
+    place.address || null,
+    latitude,
+    longitude,
+  ];
+
+  const existing = await client.query(
     `
-      insert into "Venue" (id, slug, title, description, "shortDescription", "heroImageUrl", "cityId", address, latitude, longitude, kind, "pageStatus", "createdAt", "updatedAt")
-      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'PIER', 'CANDIDATE', now(), now())
-      on conflict (slug) do update set
-        title = excluded.title,
-        description = coalesce(excluded.description, "Venue".description),
-        "shortDescription" = coalesce(excluded."shortDescription", "Venue"."shortDescription"),
-        "heroImageUrl" = coalesce("Venue"."heroImageUrl", excluded."heroImageUrl"),
-        "cityId" = excluded."cityId",
-        address = excluded.address,
-        latitude = excluded.latitude,
-        longitude = excluded.longitude,
-        kind = excluded.kind,
-        "pageStatus" = case when "Venue"."pageStatus" = 'PUBLISHED' then "Venue"."pageStatus" else excluded."pageStatus" end,
-        "updatedAt" = now()
-      returning id
+      select id
+      from "Venue"
+      where id = $1 or slug = $2
+      limit 1
     `,
-    [
-      `venue_tep_${externalPlaceId}`,
-      slug,
-      venueTitle,
-      place.description || null,
-      cleanTitle(event.place) || null,
-      firstImage(event.images),
-      cityId,
-      place.address || null,
-      latitude,
-      longitude,
-    ],
+    [venueId, slug],
   );
 
-  const venueId = result.rows[0].id;
+  let resolvedVenueId = existing.rows[0]?.id || venueId;
+
+  if (existing.rows.length) {
+    await client.query(
+      `
+        update "Venue"
+        set
+          slug = $2,
+          title = $3,
+          description = coalesce($4, description),
+          "shortDescription" = coalesce($5, "shortDescription"),
+          "heroImageUrl" = coalesce("heroImageUrl", $6),
+          "cityId" = $7,
+          address = $8,
+          latitude = $9,
+          longitude = $10,
+          kind = 'PIER',
+          "pageStatus" = case when "pageStatus" = 'PUBLISHED' then "pageStatus" else 'CANDIDATE' end,
+          "updatedAt" = now()
+        where id = $1
+      `,
+      [resolvedVenueId, ...params.slice(1)],
+    );
+  } else {
+    const result = await client.query(
+      `
+        insert into "Venue" (id, slug, title, description, "shortDescription", "heroImageUrl", "cityId", address, latitude, longitude, kind, "pageStatus", "createdAt", "updatedAt")
+        values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, 'PIER', 'CANDIDATE', now(), now())
+        returning id
+      `,
+      params,
+    );
+    resolvedVenueId = result.rows[0].id;
+  }
+
+  const venueIdForAlias = resolvedVenueId;
   await client.query(
     `
       insert into "VenueAlias" (id, "venueId", "sourceCode", "externalId", title, address)
@@ -373,9 +400,9 @@ async function upsertVenue(client, event, place, cityId) {
         title = excluded.title,
         address = excluded.address
     `,
-    [`venue_alias_tep_${externalPlaceId}`, venueId, String(externalPlaceId), venueTitle, place.address || null],
+    [`venue_alias_tep_${externalPlaceId}`, resolvedVenueId, String(externalPlaceId), venueTitle, place.address || null],
   );
-  return venueId;
+  return resolvedVenueId;
 }
 
 async function upsertEvent(client, event) {
@@ -386,8 +413,9 @@ async function upsertEvent(client, event) {
         "primaryCityId", "venueId", "categoryId", "primarySubcategoryId", "createdAt", "updatedAt"
       )
       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, now(), now())
-      on conflict (slug) do update set
+      on conflict (id) do update set
         title = excluded.title,
+        slug = excluded.slug,
         description = excluded.description,
         kind = excluded.kind,
         status = excluded.status,
@@ -478,30 +506,44 @@ async function upsertTag(client, title) {
 }
 
 function resolveTaxonomy(sourceEvent) {
-  if (isBusTourEvent(sourceEvent)) {
-    return { categoryId: "cat_excursions", subcategoryId: "sub_excursions_bus" };
-  }
   if (isWaterEvent(sourceEvent)) {
     return { categoryId: "cat_excursions", subcategoryId: "sub_excursions_water" };
+  }
+  if (isBusTourEvent(sourceEvent)) {
+    return { categoryId: "cat_excursions", subcategoryId: "sub_excursions_bus" };
   }
   const defaultTaxonomy = CATEGORY_MAP.get(sourceEvent.category) || CATEGORY_MAP.get("Речные прогулки");
   return defaultTaxonomy;
 }
 
 function isBusTourEvent(event) {
+  if (event.category === "Речные прогулки") return false;
+
+  const primaryHaystack = [event.title, event.place, event.category]
+    .map((value) => String(value || ""))
+    .join(" ")
+    .toLowerCase();
+  if (/теплоход|катер|яхт|причал|пароход|судно|речн|круиз|река|волга|нева|канал|прогулк/.test(primaryHaystack)) {
+    return false;
+  }
+
   const haystack = [event.title, event.place, stripHtml(event.description), event.category]
     .map((value) => String(value || ""))
     .join(" ")
     .toLowerCase();
-  if (/автобус|hop[\s-]?on|hop[\s-]?off|двухэтажн|city tour|citysightseeing|city sightseeing|сити[\s-]?тур|yutong|mercedes|hyundai/.test(haystack)) {
+  const haystackWithoutTransitDirections = haystack
+    .replace(/маршруты?\s+автобуса[^.;]*/gi, " ")
+    .replace(/автобуса:\s*[\d,\s]+/gi, " ")
+    .replace(/на\s+автобус(?:е|а)\s+до[^.;]*/gi, " ");
+
+  if (/автобус|hop[\s-]?on|hop[\s-]?off|двухэтажн|city tour|citysightseeing|city sightseeing|сити[\s-]?тур|yutong|mercedes|hyundai/.test(haystackWithoutTransitDirections)) {
     return true;
   }
-  if (/туристическ(?:ий|ого)?\s+транспорт/.test(haystack)) return true;
+  if (/туристическ(?:ий|ого)?\s+транспорт/.test(haystackWithoutTransitDirections)) return true;
   return false;
 }
 
 function isWaterEvent(event) {
-  if (isBusTourEvent(event)) return false;
   if (event.category === "Речные прогулки") return true;
   const haystack = [event.place, event.title, stripHtml(event.description), event.category]
     .map((value) => String(value || ""))

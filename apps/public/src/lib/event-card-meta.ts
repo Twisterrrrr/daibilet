@@ -87,6 +87,54 @@ export function resolvePseudoRating(seed: string): number {
   return Math.round((4 + step / 10) * 10) / 10;
 }
 
+export function formatShowcaseSessionDate(event: PublicSession): string {
+  if (isOpenDate(event)) return 'Открытая дата';
+  const d = parseSessionStartsAt(event.startsAt);
+  if (Number.isNaN(d.getTime())) {
+    return [event.dateLabel, event.timeLabel].filter(Boolean).join(' · ') || '—';
+  }
+  const day = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short', timeZone: 'Europe/Moscow' })
+    .format(d)
+    .replace(/\./g, '')
+    .replace(/\s*г\.?$/i, '');
+  const weekday = new Intl.DateTimeFormat('ru-RU', { weekday: 'short', timeZone: 'Europe/Moscow' })
+    .format(d)
+    .replace(/\./g, '');
+  const time = formatSessionTime(event.startsAt, event.timeLabel);
+  return time ? `${day} · ${weekday} · ${time}` : `${day} · ${weekday}`;
+}
+
+/** Короткая дата для узких карточек в горизонтальной ленте */
+export function formatShowcaseSessionDateCompact(event: PublicSession): string {
+  if (isOpenDate(event)) return 'Открытая дата';
+  const d = parseSessionStartsAt(event.startsAt);
+  if (Number.isNaN(d.getTime())) {
+    return [event.dateLabel, event.timeLabel].filter(Boolean).join(' · ') || '—';
+  }
+  const day = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short', timeZone: 'Europe/Moscow' })
+    .format(d)
+    .replace(/\./g, '')
+    .replace(/\s*г\.?$/i, '');
+  const time = formatSessionTime(event.startsAt, event.timeLabel);
+  return time ? `${day} · ${time}` : day;
+}
+
+export function formatShowcasePriceLabel(priceFrom?: number | null): string {
+  if (!priceFrom || priceFrom < MIN_DISPLAY_PRICE_RUB) return 'Бесплатно';
+  return `от ${formatPriceRub(priceFrom)} ₽`;
+}
+
+export function resolveAgeBadge(tags: string[], ageLimit?: string | null): string | null {
+  const fromLimit = String(ageLimit || '').match(/\b(\d{1,2})\+\b/);
+  if (fromLimit) return `${fromLimit[1]}+`;
+
+  for (const tag of tags) {
+    const match = String(tag).match(/\b(\d{1,2})\+\b/);
+    if (match) return `${match[1]}+`;
+  }
+  return null;
+}
+
 export function isOpenDate(event: PublicSession): boolean {
   const kind = String((event as { kind?: string | null }).kind || '').toUpperCase();
   const sourceStatus = String((event as { sourceStatus?: string | null }).sourceStatus || '').toLowerCase();
@@ -109,5 +157,5 @@ export function isFlexibleScheduleSession(session: {
   const sourceStatus = String(session.sourceStatus || '').toLowerCase();
   if (sourceStatus === 'widget' || sourceStatus === 'open_date') return true;
   const label = `${session.dateLabel || ''} ${session.timeLabel || ''}`.toLowerCase();
-  return label.includes('виджет') || label.includes('выберите время');
+  return label.includes('виджет') || label.includes('выберите время') || label.includes('при покупке');
 }

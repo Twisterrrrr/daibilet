@@ -58,13 +58,16 @@ export type PublicSession = {
   groupEventIds?: string[];
   groupedEventsCount?: number;
   sessionCount?: number;
-  upcomingSlots?: Array<{
-    eventId?: string | null;
-    startsAt: string;
-    dateLabel: string;
-    timeLabel: string;
-    purchaseUrl?: string | null;
-  }>;
+    upcomingSlots?: Array<{
+      eventId?: string | null;
+      startsAt: string;
+      dateLabel: string;
+      timeLabel: string;
+      purchaseUrl?: string | null;
+      sourceStatus?: string | null;
+      purchaseReady?: boolean;
+      vacant?: number | null;
+    }>;
   landingSlugs: string[];
   title: string;
   cityId?: string | null;
@@ -76,6 +79,7 @@ export type PublicSession = {
   venueId?: string | null;
   venueSlug?: string | null;
   venue: string;
+  venueAddress?: string | null;
   venueKind: string;
   offerTitle?: string | null;
   offerSourceCode?: string | null;
@@ -97,6 +101,7 @@ export type PublicSession = {
   timeBucket: 'morning' | 'day' | 'evening' | 'night';
   priceFrom?: number | null;
   vacant?: number | null;
+  ageLimit?: string | null;
   imageUrl?: string | null;
   description?: string | null;
   manualLandingStatus?: string | null;
@@ -112,6 +117,7 @@ export type PublicVenue = {
   latitude?: number | null;
   longitude?: number | null;
   type: string;
+  template?: 'institution' | 'location';
   pageStatus?: string | null;
   description?: string | null;
   shortDescription?: string | null;
@@ -260,6 +266,7 @@ export type PublicEventPage = {
     widgetUrl?: string | null;
     deeplinkUrl?: string | null;
     active: boolean;
+    sortOrder?: number | null;
   }>;
   ticketPrices?: Array<{
     key: string;

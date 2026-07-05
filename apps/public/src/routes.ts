@@ -2,6 +2,7 @@ import type { PublicEvent, PublicSession } from '@/types';
 
 type EventRouteSource = Pick<PublicSession, 'id' | 'slug' | 'sourceSlug' | 'title'> | Pick<PublicEvent, 'id' | 'slug' | 'sourceSlug' | 'title'>;
 type CityRouteSource = { slug?: string | null; sourceSlug?: string | null; name: string };
+type VenueRouteSource = { id: string; slug?: string | null; name: string; type?: string | null };
 
 const CITY_SLUG_ALIASES: Record<string, string> = {
   moskva: 'moscow',
@@ -67,6 +68,27 @@ export function citySlug(city: CityRouteSource): string {
 
 export function cityHref(city: CityRouteSource): string {
   return `/cities/${citySlug(city)}`;
+}
+
+export function venueSlug(venue: VenueRouteSource): string {
+  const rawSlug = String(venue.slug || '').trim();
+  if (rawSlug) return rawSlug;
+
+  const fromName = normalizeSlug(venue.name);
+  if (fromName && !isOpaqueId(fromName)) return `${fromName}-${normalizeSlug(venue.id) || venue.id}`;
+
+  return normalizeSlug(venue.id) || venue.id;
+}
+
+import { venuePageTemplate } from '@/lib/venue-meta';
+
+export function venueHref(venue: VenueRouteSource): string {
+  const basePath = venuePageTemplate(venue.type) === 'location' ? '/locations' : '/venues';
+  return `${basePath}/${encodeURIComponent(venueSlug(venue))}`;
+}
+
+export function venueCatalogHref(template: 'institution' | 'location' = 'institution'): string {
+  return template === 'location' ? '/locations' : '/venues';
 }
 
 export function eventSlug(event: EventRouteSource): string {

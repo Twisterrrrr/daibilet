@@ -308,18 +308,25 @@ function timestampToIso(timestamp) {
 }
 
 function guessVenueType(venue, category, tags, event) {
-  const text = [venue.name, venue.description, venue.address, category.name, event.name, ...tags.map((tag) => tag.name)]
+  const venueText = [venue.name, venue.description, venue.address].filter(Boolean).join(" ").toLowerCase();
+  const contextText = [category.name, event.name, ...tags.map((tag) => tag.name)]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
 
-  if (matches(text, ["театр", "teatr"])) return "theater";
-  if (matches(text, ["музей", "галере", "выстав"])) return "museum_art";
-  if (matches(text, ["клуб", "club", "бар", "ресторан", "cafe", "кафе"])) return "club_restaurant";
-  if (matches(text, ["концерт", "филармони", "зал", "дом музыки", "дк ", "дворец культуры"])) return "concert_hall";
-  if (matches(text, ["причал", "набереж", "теплоход", "катер", "канал", "река"])) return "pier_water";
-  if (matches(text, ["стадион", "арена", "спорт", "каток", "скалодром", "парк"])) return "sport_outdoor";
-  if (matches(text, ["онлайн", "online"])) return "online";
+  if (matches(venueText, ["театр", "teatr"])) return "theater";
+  if (matches(venueText, ["музей", "галере", "выстав"])) return "museum_art";
+  if (matches(venueText, ["клуб", "club", "бар", "ресторан", "cafe", "кафе", "банкет"])) return "club_restaurant";
+  if (matches(venueText, ["концерт", "филармони", " зал", "зал ", "hall", "дом музыки", "дк ", "дворец культуры"])) return "concert_hall";
+  if (/причал/i.test(venueText)) return "pier_water";
+  if (matches(venueText, ["памятник", "пам.", "у пам", "метро", "место сбора", "точка сбора", "площ."])) return "generic_location";
+
+  if (matches(contextText, ["театр", "teatr"])) return "theater";
+  if (matches(contextText, ["музей", "галере", "выстав"])) return "museum_art";
+  if (matches(contextText, ["клуб", "club", "бар", "ресторан", "cafe", "кафе"])) return "club_restaurant";
+  if (matches(contextText, ["концерт", "филармони", "зал", "дом музыки", "дк ", "дворец культуры"])) return "concert_hall";
+  if (matches(contextText, ["стадион", "арена", "спорт", "каток", "скалодром", "парк"])) return "sport_outdoor";
+  if (matches(contextText, ["онлайн", "online"])) return "online";
   return "generic_location";
 }
 

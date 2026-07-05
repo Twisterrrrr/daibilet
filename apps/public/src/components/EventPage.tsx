@@ -8,10 +8,15 @@ import { TeplohodWidgetEmbed, getTeplohodWidgetIds } from '@/components/Teplohod
 import {
   TcSessionSlot,
   TcWidgetButton,
+  expandSessionPurchaseVariants,
   extractTcEventIdFromSession,
-  getTcWidgetIds,
+  listPurchasableSessionVariants,
+  pickPurchasableTcSession,
+  pickRepresentativeSession,
+  resolveTcPurchaseTarget,
 } from '@/components/TcWidget';
 import { formatStreetAddress } from '@/lib/address';
+import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
 import { FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession } from '@/lib/event-card-meta';
 import { formatVacantSeats } from '@/lib/pluralize';
 import { landingPageHref } from '@/lib/landing-slugs';
@@ -225,7 +230,7 @@ function sessionToPublicEvent(session: PublicSession): PublicEvent {
     venueId: session.venueId,
     venueSlug: session.venueSlug,
     venue: session.venue,
-    venueAddress: null,
+    venueAddress: session.venueAddress ?? null,
     venueKind: session.venueKind,
     ageLimit: null,
     priceFrom: session.priceFrom,
@@ -250,15 +255,21 @@ function sessionToPublicEvent(session: PublicSession): PublicEvent {
 function EventHero({ payload }: { payload: PublicEventPage }) {
   const { event, stats } = payload;
   const ageLimit = formatAgeLimit(event.ageLimit);
-  const price = stats.priceFrom ?? event.priceFrom;
-  const priceLabel = formatPriceRub(price);
+  const priceRange = getTicketPriceRange(payload);
+  const priceLabel = priceRange ? formatBuyCardPrice(priceRange) : formatPriceRub(stats.priceFrom ?? event.priceFrom);
+  const locationLabel = resolveEventCardLocationLabel(event);
   const [hasImageError, setHasImageError] = React.useState(false);
   const heroImage = String(event.imageUrl || '').trim();
-  const nextSession = payload.sessions.find((session) => {
-    if (!session.startsAt) return false;
-    const date = new Date(session.startsAt);
-    return !Number.isNaN(date.getTime()) && date > new Date();
-  }) || payload.sessions[0];
+  const nextSession =
+    pickPurchasableTcSession(
+      payload.sessions.flatMap((session) => expandSessionPurchaseVariants(session)).filter((session) => {
+        if (!session.startsAt) return true;
+        const date = new Date(session.startsAt);
+        return !Number.isNaN(date.getTime()) && date > new Date();
+      }),
+    ) ||
+    pickRepresentativeSession(payload.sessions) ||
+    payload.sessions[0];
 
   return (
     <div className="relative">
@@ -283,13 +294,13 @@ function EventHero({ payload }: { payload: PublicEventPage }) {
       <div className="container-page absolute inset-x-0 bottom-0 pb-6 sm:pb-8">
         <nav className="mb-3 flex flex-wrap items-center gap-1.5 text-sm text-white/70">
           <a href="/events" className="transition hover:text-white">
-            Каталог
+            События
           </a>
           <ChevronRight className="h-3.5 w-3.5" />
           {event.citySlug ? (
             <>
               <a href={`/cities/${event.citySlug}`} className="transition hover:text-white">
-                {eventDestinationLabel(event)}
+                {resolveEventCardDestinationLabel(event)}
               </a>
               <ChevronRight className="h-3.5 w-3.5" />
             </>
@@ -320,10 +331,10 @@ function EventHero({ payload }: { payload: PublicEventPage }) {
                   {ageLimit}
                 </span>
               ) : null}
-              {event.venue ? (
+              {locationLabel ? (
                 <span className="flex items-center gap-1.5">
                   <MapPin className="h-4 w-4" />
-                  {event.venue}
+                  {locationLabel}
                 </span>
               ) : null}
               {nextSession ? (
@@ -366,20 +377,21 @@ function HeroBuyButton({
   const { event, sessions } = payload;
   const label = `Купить билет — от ${priceLabel}`;
   const teplohod = getTeplohodWidgetIds(event);
-  const ticketscloud = getTcWidgetIds(event);
   const primaryOffer = payload.offers.find((offer) => offer.active !== false) || payload.offers[0] || null;
-  const tcEventId = ticketscloud?.tcEventId || extractTcEventIdFromSession(sessions[0] || {}) || null;
-  const purchaseUrl =
-    primaryOffer?.widgetUrl ||
-    primaryOffer?.deeplinkUrl ||
-    event.purchaseUrl ||
-    sessions[0]?.purchaseUrl ||
-    null;
-  const isTcWidget = Boolean(ticketscloud && tcEventId);
+  const { tcEventId, purchaseUrl, isTcWidget, purchaseTargets } = resolveTcPurchaseTarget(event, sessions, primaryOffer);
   const isTepWidget = Boolean(teplohod);
 
   if (isTcWidget && tcEventId) {
-    return <TcWidgetButton tcEventId={tcEventId} purchaseUrl={purchaseUrl} label={label} wide={wide} variant="hero" />;
+    return (
+      <TcWidgetButton
+        tcEventId={tcEventId}
+        purchaseUrl={purchaseUrl}
+        purchaseTargets={purchaseTargets}
+        label={label}
+        wide={wide}
+        variant="hero"
+      />
+    );
   }
 
   if (isTepWidget) {
@@ -485,8 +497,7 @@ function splitDescriptionParagraphs(text: string): string[] {
 }
 
 function QuickInfo({ event }: { event: PublicEvent }) {
-  const rawAddress = event.venueAddress || event.venue;
-  const address = rawAddress ? formatStreetAddress(rawAddress, { city: event.city }) : '';
+  const address = resolveEventCardLocationLabel(event);
   const ageLimit = formatAgeLimit(event.ageLimit);
   if (!address && !ageLimit) return null;
 
@@ -525,7 +536,7 @@ function QuickInfo({ event }: { event: PublicEvent }) {
           <a href={`/cities/${event.citySlug}`} className="rounded-xl border border-slate-200 bg-white p-3.5 transition hover:border-primary-200 hover:bg-primary-50/40">
             <Clock className="h-5 w-5 text-primary-500" />
             <p className="mt-1.5 text-xs text-slate-500">Город</p>
-            <p className="text-sm font-medium text-slate-900">{eventDestinationLabel(event)}</p>
+            <p className="text-sm font-medium text-slate-900">{resolveEventCardDestinationLabel(event)}</p>
           </a>
         ) : null}
         {ageLimit ? (
@@ -560,20 +571,12 @@ function EventTags({ event }: { event: PublicEvent }) {
 function BuyCard({ payload }: { payload: PublicEventPage }) {
   const { event, sessions } = payload;
   const teplohod = getTeplohodWidgetIds(event);
-  const ticketscloud = getTcWidgetIds(event);
   const primaryOffer = payload.offers.find((offer) => offer.active !== false) || payload.offers[0] || null;
   const priceRange = getTicketPriceRange(payload);
   const ticketCategories = buildGroupedTicketCategories(payload);
-  const visibleSessions = sessions.slice(0, 5);
-  const tcEventId = ticketscloud?.tcEventId || extractTcEventIdFromSession(sessions[0] || {}) || null;
+  const visibleSessions = listPurchasableSessionVariants(sessions).slice(0, 5);
+  const { tcEventId, purchaseUrl, isTcWidget, purchaseTargets } = resolveTcPurchaseTarget(event, sessions, primaryOffer);
   const offerSource = primaryOffer?.sourceCode || event.purchaseProvider || event.sourceCode;
-  const purchaseUrl =
-    primaryOffer?.widgetUrl ||
-    primaryOffer?.deeplinkUrl ||
-    event.purchaseUrl ||
-    sessions[0]?.purchaseUrl ||
-    null;
-  const isTcWidget = Boolean(ticketscloud && tcEventId);
   const isTepWidget = Boolean(teplohod);
 
   return (
@@ -606,6 +609,8 @@ function BuyCard({ payload }: { payload: PublicEventPage }) {
             ))}
           </ul>
         </div>
+      ) : priceRange && priceRange.min !== priceRange.max ? (
+        <p className="mt-3 text-sm text-slate-500">Полный список категорий — в виджете при покупке.</p>
       ) : null}
 
       {visibleSessions.length > 0 ? (
@@ -619,8 +624,8 @@ function BuyCard({ payload }: { payload: PublicEventPage }) {
           ) : null}
           <div className="mt-2.5 space-y-1.5">
             {visibleSessions.map((session) =>
-              isTcWidget && !isTepWidget && tcEventId ? (
-                <TcSessionSlot key={session.id} tcEventId={tcEventId} session={session} />
+              isTcWidget && !isTepWidget ? (
+                <TcSessionSlot key={session.id} tcEventId={extractTcEventIdFromSession(session) || tcEventId || ''} session={session} />
               ) : (
                 <StaticSessionRow key={session.id} session={session} />
               ),
@@ -633,7 +638,13 @@ function BuyCard({ payload }: { payload: PublicEventPage }) {
         {isTepWidget && teplohod ? (
           <TeplohodWidgetEmbed tepEventId={teplohod.tepEventId} tepWidgetId={teplohod.tepWidgetId} />
         ) : isTcWidget && tcEventId ? (
-          <TcWidgetButton tcEventId={tcEventId} purchaseUrl={purchaseUrl} label="Купить билет" wide />
+          <TcWidgetButton
+            tcEventId={tcEventId}
+            purchaseUrl={purchaseUrl}
+            purchaseTargets={purchaseTargets}
+            label="Купить билет"
+            wide
+          />
         ) : purchaseUrl ? (
           <a
             href={purchaseUrl}
@@ -704,34 +715,29 @@ function StaticSessionRow({
 }
 
 function buildGroupedTicketCategories(payload: PublicEventPage) {
-  const preserveWidgetOrder = isTeplohodTicketSource(payload);
   const order: string[] = [];
+  const groupSortOrder = new Map<string, number>();
   const groups = new Map<string, { key: string; name: string; description: string | null; minPrice: number; maxPrice: number }>();
 
   for (const item of collectRawTicketPrices(payload)) {
     const { name, description } = parseTicketCategory(item);
     const key = `${name}|${description || ''}`.toLowerCase().replace(/\s+/g, ' ');
+    const itemOrder = item.sortOrder ?? 9999;
     const existing = groups.get(key);
     if (!existing) {
       order.push(key);
       groups.set(key, { key, name, description, minPrice: item.priceRub, maxPrice: item.priceRub });
+      groupSortOrder.set(key, itemOrder);
       continue;
     }
     existing.minPrice = Math.min(existing.minPrice, item.priceRub);
     existing.maxPrice = Math.max(existing.maxPrice, item.priceRub);
+    groupSortOrder.set(key, Math.min(groupSortOrder.get(key) ?? 9999, itemOrder));
   }
 
-  const rows = order.map((key) => groups.get(key)!);
-  if (preserveWidgetOrder) return rows;
-
-  return rows.sort((a, b) => a.minPrice - b.minPrice || a.name.localeCompare(b.name, 'ru'));
-}
-
-function isTeplohodTicketSource(payload: PublicEventPage) {
-  const source = String(
-    payload.event.purchaseProvider || payload.event.sourceCode || payload.offers[0]?.sourceCode || '',
-  ).toUpperCase();
-  return source.includes('TEPLOHOD');
+  return order
+    .map((key) => groups.get(key)!)
+    .sort((a, b) => (groupSortOrder.get(a.key) ?? 9999) - (groupSortOrder.get(b.key) ?? 9999));
 }
 
 function parseTicketCategory(item: { title: string; description?: string | null; priceRub: number }) {
@@ -776,8 +782,10 @@ function collectRawTicketPrices(payload: PublicEventPage) {
         !titleKey || titleKey === eventTitleKey || titleKey === 'widget' || titleKey.includes('ticketscloud widget')
           ? 'Билет'
           : rawTitle;
-      return { title, description: null, priceRub: offer.priceRub as number, sortOrder: index };
-    });
+      const sortOrder = typeof offer.sortOrder === 'number' ? offer.sortOrder : index;
+      return { title, description: null, priceRub: offer.priceRub as number, sortOrder };
+    })
+    .sort((a, b) => (a.sortOrder ?? 9999) - (b.sortOrder ?? 9999));
 }
 
 function splitTitlePartsWithoutWeekdays(title: string) {
@@ -849,11 +857,6 @@ function formatAgeLimit(value?: string | null) {
 function formatPriceRub(value?: number | null) {
   if (!value || value <= 0) return null;
   return `${formatNumber(Math.round(value))} ₽`;
-}
-
-function eventDestinationLabel(event: PublicEvent) {
-  if (event.destinationType === 'region' && event.destination) return event.destination;
-  return event.city;
 }
 
 function cleanDisplayText(value?: string | null) {

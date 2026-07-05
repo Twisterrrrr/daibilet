@@ -42,7 +42,7 @@ export function AboutPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <Header cityLabel="Все города" onSection={navigateFromAbout} />
 
       <section className="bg-gradient-to-b from-primary-50 to-white py-12 md:py-16">

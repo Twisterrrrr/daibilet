@@ -1,15 +1,35 @@
 import * as React from 'react';
-import { ChevronDown, CircleUser, Compass, HelpCircle, MapPin, Menu, Search, X } from 'lucide-react';
+import { Heart, HelpCircle, LogIn, Menu, User, X } from 'lucide-react';
 
+import { CityPicker } from '@/components/CityPicker';
 import { publicData } from '@/data';
 import { useUserAuthOptional } from '@/hooks/useUserAuth';
-import { HeaderSearch } from '@/components/HeaderSearch';
+import {
+  FAVORITES_CHANGED_EVENT,
+  readFavoriteIds,
+  resolveFavoriteSessions,
+  toggleFavoriteId,
+} from '@/lib/favorites';
+import { formatPriceRub } from '@/lib/event-card-meta';
+import { persistDestination } from '@/lib/selected-city';
+import { cityHref, eventHref } from '@/routes';
+import type { PublicSession } from '@/types';
 
-const navigation = [
-  { label: 'Каталог', href: '/events' },
-  { label: 'Подборки', href: '/podborki' },
+const NAV_LINKS = [
+  { label: 'События', href: '/events' },
   { label: 'Города', href: '/cities' },
-];
+  { label: 'Площадки', href: '/venues' },
+  { label: 'Локации', href: '/locations' },
+  { label: 'Подборки', href: '/podborki' },
+  { label: 'Блог', href: '/blog' },
+] as const;
+
+function isNavActive(href: string): boolean {
+  const path = window.location.pathname.replace(/\/$/, '') || '/';
+  const normalized = href.replace(/\/$/, '') || '/';
+  if (normalized === '/') return path === '/';
+  return path === normalized || path.startsWith(`${normalized}/`);
+}
 
 type HeaderProps = {
   cityLabel: string;
@@ -19,8 +39,9 @@ type HeaderProps = {
   searchCity?: string;
 };
 
-export function Header({ cityLabel, onSection, onDestination, searchQuery, searchCity }: HeaderProps) {
+export function Header({ cityLabel, onSection, onDestination }: HeaderProps) {
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [favoritesOpen, setFavoritesOpen] = React.useState(false);
   const [userMenuOpen, setUserMenuOpen] = React.useState(false);
   const auth = useUserAuthOptional();
   const userMenuRef = React.useRef<HTMLDivElement>(null);
@@ -39,145 +60,285 @@ export function Header({ cityLabel, onSection, onDestination, searchQuery, searc
     return () => document.removeEventListener('mousedown', close);
   }, [userMenuOpen]);
 
+  React.useEffect(() => {
+    if (!mobileOpen && !favoritesOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [favoritesOpen, mobileOpen]);
+
   const isLoggedIn = authMounted && Boolean(auth?.isLoggedIn);
 
-  const go = (itemOrSection: string | { section?: string; href?: string }) => {
+  const goHome = () => {
     setMobileOpen(false);
+    onSection('top');
+  };
+
+  const navigate = (href: string) => {
+    setMobileOpen(false);
+    setFavoritesOpen(false);
     setUserMenuOpen(false);
-    if (typeof itemOrSection !== 'string' && itemOrSection.href) {
-      window.location.href = itemOrSection.href;
-      return;
-    }
-    const section = typeof itemOrSection === 'string' ? itemOrSection : itemOrSection.section || 'top';
-    onSection(section);
+    window.location.href = href;
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
-      <nav className="container-page flex h-16 min-w-0 items-center justify-between gap-2">
-        <button type="button" onClick={() => go('top')} className="flex flex-shrink-0 items-center gap-2">
-          <Compass className="h-7 w-7 text-primary-600" />
-          <span className="text-xl font-bold text-slate-900">
-            Дай<span className="text-primary-600">билет</span>
-          </span>
-        </button>
-
-        <div className="hidden min-w-0 flex-nowrap items-center gap-0.5 overflow-x-auto md:flex [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {navigation.map((item) => (
+    <>
+      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur-md supports-[padding:max(0px)]:pt-[env(safe-area-inset-top)]">
+        <div className="container-page flex items-center justify-between gap-3 py-3 md:py-4">
+          <div className="flex min-w-0 items-center gap-3 lg:gap-6">
             <button
-              key={item.label}
               type="button"
-              onClick={() => go(item)}
-              className="shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+              aria-label="Открыть меню"
+              onClick={() => setMobileOpen(true)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 md:hidden"
             >
-              {item.label}
+              <Menu className="h-5 w-5" />
             </button>
-          ))}
-        </div>
 
-        <div className="flex min-w-0 items-center gap-1 sm:gap-2">
-          <HeaderCitySelect label={cityLabel} onDestination={onDestination} onOpenDestinations={() => go('destinations')} />
+            <button type="button" onClick={goHome} className="font-display text-xl font-bold tracking-tight text-primary-600 sm:text-2xl">
+              Дайбилет
+            </button>
 
-          <label className="hidden h-10 min-w-[200px] items-center rounded-lg bg-slate-50 px-3 ring-1 ring-slate-200 focus-within:bg-white focus-within:ring-primary-300 xl:flex">
-            <HeaderSearch className="min-w-0 flex-1 py-2" initialQuery={searchQuery} cityFilter={searchCity || (cityLabel !== 'Все города' ? cityLabel : undefined)} />
-          </label>
+            <HeaderCitySelector cityLabel={cityLabel} onDestination={onDestination} onNavigate={navigate} />
+          </div>
 
-          <a className="hidden items-center justify-center rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 sm:inline-flex" href="/help" title="Помощь">
-            <HelpCircle className="h-5 w-5" />
-          </a>
-
-          <HeaderUserMenu
-            ref={userMenuRef}
-            auth={auth}
-            isLoggedIn={isLoggedIn}
-            open={userMenuOpen}
-            onToggle={() => setUserMenuOpen((value) => !value)}
-            onClose={() => setUserMenuOpen(false)}
-          />
-
-          <button
-            type="button"
-            onClick={() => setMobileOpen((value) => !value)}
-            className="inline-flex items-center justify-center rounded-lg p-2 text-slate-600 hover:bg-slate-100 md:hidden"
-            aria-label="Меню"
-          >
-            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
-        </div>
-      </nav>
-
-      {mobileOpen ? (
-        <div className="border-t border-slate-200 bg-white md:hidden">
-          <div className="container-page space-y-1 py-3">
-            <label className="mb-3 flex h-11 items-center rounded-lg bg-slate-50 px-3 ring-1 ring-slate-200 focus-within:bg-white focus-within:ring-primary-300">
-              <HeaderSearch
-                className="min-w-0 flex-1 py-2"
-                placeholder="Поиск события, площадки или города"
-                initialQuery={searchQuery}
-                cityFilter={searchCity || (cityLabel !== 'Все города' ? cityLabel : undefined)}
-              />
-            </label>
-            {navigation.map((item) => (
+          <nav aria-label="Основная навигация" className="hidden items-center gap-1 md:flex">
+            {NAV_LINKS.map((item) => (
               <button
-                key={item.label}
+                key={item.href}
                 type="button"
-                onClick={() => go(item)}
-                className="block w-full whitespace-nowrap rounded-lg px-3 py-2.5 text-left text-base font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                onClick={() => navigate(item.href)}
+                className={
+                  isNavActive(item.href)
+                    ? 'rounded-full bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary-600'
+                    : 'rounded-full px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100'
+                }
               >
                 {item.label}
               </button>
             ))}
+          </nav>
+
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+            <HeaderAuthControls
+              ref={userMenuRef}
+              auth={auth}
+              isLoggedIn={isLoggedIn}
+              userMenuOpen={userMenuOpen}
+              onToggleUserMenu={() => setUserMenuOpen((value) => !value)}
+              onCloseUserMenu={() => setUserMenuOpen(false)}
+              onNavigate={navigate}
+            />
+
+            <a
+              href="/help"
+              title="Помощь и FAQ"
+              aria-label="Помощь и FAQ"
+              className="hidden h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 sm:inline-flex"
+            >
+              <HelpCircle className="h-5 w-5" />
+            </a>
+
             <button
               type="button"
-              onClick={() => go('destinations')}
-              className="flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-base font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+              aria-label="Избранное"
+              onClick={() => setFavoritesOpen(true)}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800 lg:hidden"
             >
-              <MapPin className="h-5 w-5" />
-              {cityLabel}
+              <Heart className="h-5 w-5" />
             </button>
-            <HeaderUserMobile auth={auth} isLoggedIn={isLoggedIn} onNavigate={() => setMobileOpen(false)} />
+            <button
+              type="button"
+              onClick={() => setFavoritesOpen(true)}
+              className="hidden items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 lg:inline-flex"
+            >
+              <Heart className="h-4 w-4" />
+              Избранное
+            </button>
           </div>
         </div>
-      ) : null}
-    </header>
+      </header>
+
+      {mobileOpen ? <MobileNavSheet cityLabel={cityLabel} isLoggedIn={isLoggedIn} auth={auth} onClose={() => setMobileOpen(false)} onNavigate={navigate} onDestination={onDestination} /> : null}
+      {favoritesOpen ? <FavoritesPanel onClose={() => setFavoritesOpen(false)} onNavigate={navigate} /> : null}
+    </>
   );
 }
 
-const HeaderUserMenu = React.forwardRef<
+function HeaderCitySelector({
+  cityLabel,
+  onDestination,
+  onNavigate,
+  compact = false,
+}: {
+  cityLabel: string;
+  onDestination?: (value: string) => void;
+  onNavigate: (href: string) => void;
+  compact?: boolean;
+}) {
+  const value = cityLabel === 'Все города' ? 'all' : cityLabel;
+
+  const selectCity = (name: string) => {
+    if (onDestination) {
+      onDestination(name);
+      return;
+    }
+    if (name === 'all') {
+      persistDestination('all');
+      return;
+    }
+    persistDestination(name);
+    const city = publicData.destinations.find((item) => item.name === name);
+    if (city) onNavigate(cityHref(city));
+  };
+
+  return (
+    <CityPicker
+      value={value}
+      onChange={selectCity}
+      allLabel="Все города"
+      variant={compact ? 'compact' : 'header'}
+      className={compact ? 'w-full' : 'hidden lg:block'}
+    />
+  );
+}
+
+const HeaderAuthControls = React.forwardRef<
   HTMLDivElement,
   {
     auth: ReturnType<typeof useUserAuthOptional>;
     isLoggedIn: boolean;
-    open: boolean;
-    onToggle: () => void;
-    onClose: () => void;
+    userMenuOpen: boolean;
+    onToggleUserMenu: () => void;
+    onCloseUserMenu: () => void;
+    onNavigate: (href: string) => void;
   }
->(function HeaderUserMenu({ auth, isLoggedIn, open, onToggle, onClose }, ref) {
+>(function HeaderAuthControls({ auth, isLoggedIn, userMenuOpen, onToggleUserMenu, onCloseUserMenu, onNavigate }, ref) {
+  if (isLoggedIn) {
+    return (
+      <div ref={ref} className="relative">
+        <button
+          type="button"
+          aria-label="Личный кабинет"
+          onClick={onToggleUserMenu}
+          className="hidden h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 md:inline-flex lg:hidden"
+        >
+          <User className="h-5 w-5" />
+        </button>
+        <button
+          type="button"
+          onClick={onToggleUserMenu}
+          className="hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 lg:inline-flex"
+        >
+          <User className="h-4 w-4" />
+          {auth?.user?.name || 'Кабинет'}
+        </button>
+        {userMenuOpen ? (
+          <div className="absolute right-0 z-50 mt-1 w-56 rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
+            {auth?.user?.name ? <div className="border-b border-slate-100 px-3 py-2 text-sm font-medium text-slate-900">{auth.user.name}</div> : null}
+            <button type="button" onClick={() => onNavigate('/account/purchases')} className="block w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
+              Мои покупки
+            </button>
+            <button type="button" onClick={() => onNavigate('/my-orders')} className="block w-full px-3 py-2 text-left text-sm text-slate-700 hover:bg-slate-50">
+              Проверить заказ
+            </button>
+            <button
+              type="button"
+              onClick={async () => {
+                await auth?.logout();
+                onCloseUserMenu();
+                window.location.href = '/';
+              }}
+              className="block w-full px-3 py-2 text-left text-sm text-slate-600 hover:bg-slate-50"
+            >
+              Выйти
+            </button>
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
   return (
-    <div ref={ref} className="relative hidden sm:block">
+    <>
       <button
         type="button"
-        onClick={onToggle}
-        className="relative flex items-center justify-center rounded-lg p-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-primary-600"
-        title={isLoggedIn ? auth?.user?.name || 'Мои покупки' : 'Проверить заказ'}
-        aria-label={isLoggedIn ? 'Личный кабинет' : 'Проверить заказ'}
+        aria-label="Войти"
+        onClick={() => onNavigate('/login?returnUrl=/account/purchases')}
+        className="hidden h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 md:inline-flex lg:hidden"
       >
-        <CircleUser className="h-5 w-5" />
-        {isLoggedIn ? <span className="absolute bottom-1 right-1 h-2 w-2 rounded-full bg-primary-500 ring-2 ring-white" /> : null}
+        <User className="h-5 w-5" />
       </button>
-      {open ? (
-        <div className="absolute right-0 z-50 mt-1 w-56 rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
-          {isLoggedIn && auth?.user?.name ? (
-            <div className="border-b border-slate-100 px-3 py-2 text-sm font-medium text-slate-900">{auth.user.name}</div>
-          ) : null}
-          <a href="/my-orders" onClick={onClose} className="block px-3 py-2 text-sm font-medium text-slate-900 hover:bg-slate-50">
-            Проверить заказ
-          </a>
+      <button
+        type="button"
+        onClick={() => onNavigate('/login?returnUrl=/account/purchases')}
+        className="hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 lg:inline-flex"
+      >
+        <LogIn className="h-4 w-4" />
+        Войти
+      </button>
+    </>
+  );
+});
+
+function MobileNavSheet({
+  cityLabel,
+  isLoggedIn,
+  auth,
+  onClose,
+  onNavigate,
+  onDestination,
+}: {
+  cityLabel: string;
+  isLoggedIn: boolean;
+  auth: ReturnType<typeof useUserAuthOptional>;
+  onClose: () => void;
+  onNavigate: (href: string) => void;
+  onDestination?: (value: string) => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-[60] md:hidden">
+      <button type="button" aria-label="Закрыть меню" className="absolute inset-0 bg-slate-900/40" onClick={onClose} />
+      <aside className="relative flex h-full w-72 max-w-[85vw] flex-col bg-white shadow-xl">
+        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
+          <span className="font-display text-xl font-bold text-primary-600">Дайбилет</span>
+          <button type="button" aria-label="Закрыть" onClick={onClose} className="rounded-full p-2 text-slate-500 hover:bg-slate-100">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <nav aria-label="Мобильная навигация" className="flex-1 overflow-y-auto p-2">
+          {NAV_LINKS.map((item) => (
+            <button
+              key={item.href}
+              type="button"
+              onClick={() => onNavigate(item.href)}
+              className={`block w-full rounded-lg px-4 py-3 text-left text-base font-medium ${
+                isNavActive(item.href) ? 'bg-primary/10 font-semibold text-primary-600' : 'text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              {item.label}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => onNavigate('/help')}
+            className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100"
+          >
+            <HelpCircle className="h-4 w-4" />
+            Помощь и FAQ
+          </button>
+          <div className="my-2 border-t border-slate-200" />
+          <HeaderCitySelector cityLabel={cityLabel} onDestination={onDestination} onNavigate={onNavigate} compact />
+          <div className="my-2 border-t border-slate-200" />
           {isLoggedIn ? (
             <>
-              <a href="/account/purchases" onClick={onClose} className="block px-3 py-2 text-sm text-slate-600 hover:bg-slate-50">
+              {auth?.user?.name ? <div className="px-4 py-2 text-sm text-slate-500">{auth.user.name}</div> : null}
+              <button type="button" onClick={() => onNavigate('/account/purchases')} className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100">
+                <User className="h-4 w-4" />
                 Мои покупки
-              </a>
+              </button>
               <button
                 type="button"
                 onClick={async () => {
@@ -185,174 +346,119 @@ const HeaderUserMenu = React.forwardRef<
                   onClose();
                   window.location.href = '/';
                 }}
-                className="block w-full px-3 py-2 text-left text-sm text-slate-600 hover:bg-slate-50"
+                className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-rose-600 hover:bg-rose-50"
               >
                 Выйти
               </button>
             </>
           ) : (
-            <div className="border-t border-slate-100 px-3 py-2">
-              <a
-                href="/login?returnUrl=/account/purchases"
-                onClick={onClose}
-                className="block text-xs leading-5 text-slate-500 hover:text-primary-700"
-              >
-                Войти — сохранить историю покупок на email
-              </a>
-            </div>
+            <button
+              type="button"
+              onClick={() => onNavigate('/login?returnUrl=/account/purchases')}
+              className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100"
+            >
+              <User className="h-4 w-4" />
+              Войти
+            </button>
           )}
-        </div>
-      ) : null}
-    </div>
-  );
-});
-
-function HeaderUserMobile({
-  auth,
-  isLoggedIn,
-  onNavigate,
-}: {
-  auth: ReturnType<typeof useUserAuthOptional>;
-  isLoggedIn: boolean;
-  onNavigate: () => void;
-}) {
-  return (
-    <div className="space-y-1 border-t border-slate-100 pt-3">
-      <a
-        href="/my-orders"
-        onClick={onNavigate}
-        className="flex items-center gap-2 rounded-lg px-3 py-2.5 text-base font-medium text-slate-900 hover:bg-slate-100"
-      >
-        <CircleUser className="h-5 w-5 text-primary-600" />
-        Проверить заказ
-      </a>
-      {isLoggedIn ? (
-        <>
-          {auth?.user?.name ? <div className="px-3 text-sm text-slate-500">{auth.user.name}</div> : null}
-          <a href="/account/purchases" onClick={onNavigate} className="block rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-100">
-            Мои покупки
-          </a>
-          <button
-            type="button"
-            onClick={async () => {
-              await auth?.logout();
-              onNavigate();
-              window.location.href = '/';
-            }}
-            className="block w-full rounded-lg px-3 py-2 text-left text-sm font-medium text-rose-600 hover:bg-rose-50"
-          >
-            Выйти
-          </button>
-        </>
-      ) : (
-        <a
-          href="/login?returnUrl=/account/purchases"
-          onClick={onNavigate}
-          className="block rounded-lg px-3 py-2 text-sm text-slate-500 hover:text-primary-700"
-        >
-          Войти — история покупок на email
-        </a>
-      )}
+        </nav>
+      </aside>
     </div>
   );
 }
 
-function HeaderCitySelect({
-  label,
-  onDestination,
-  onOpenDestinations,
-}: {
-  label: string;
-  onDestination?: (value: string) => void;
-  onOpenDestinations: () => void;
-}) {
-  const [open, setOpen] = React.useState(false);
-  const [search, setSearch] = React.useState('');
-  const rootRef = React.useRef<HTMLDivElement>(null);
+function FavoritesPanel({ onClose, onNavigate }: { onClose: () => void; onNavigate: (href: string) => void }) {
+  const [favoriteIds, setFavoriteIds] = React.useState(() => readFavoriteIds());
+  const [sessions, setSessions] = React.useState<PublicSession[]>(() =>
+    resolveFavoriteSessions(readFavoriteIds(), publicData.sessions),
+  );
 
   React.useEffect(() => {
-    const close = (event: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(event.target as Node)) setOpen(false);
+    const sync = () => {
+      const ids = readFavoriteIds();
+      setFavoriteIds(ids);
+      setSessions(resolveFavoriteSessions(ids, publicData.sessions));
     };
-    document.addEventListener('mousedown', close);
-    return () => document.removeEventListener('mousedown', close);
+    sync();
+    window.addEventListener(FAVORITES_CHANGED_EVENT, sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener(FAVORITES_CHANGED_EVENT, sync);
+      window.removeEventListener('storage', sync);
+    };
   }, []);
 
-  const cities = React.useMemo(() => {
-    const normalized = search.trim().toLowerCase();
-    const items = publicData.destinations.filter((item) => item.type === 'city');
-    if (!normalized) return items.sort((a, b) => b.events - a.events).slice(0, 8);
-    return items.filter((city) => city.name.toLowerCase().includes(normalized)).slice(0, 8);
-  }, [search]);
-
-  if (!onDestination) {
-    return (
-      <button
-        type="button"
-        onClick={onOpenDestinations}
-        className="hidden items-center gap-1 rounded-lg px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-800 lg:flex"
-      >
-        <MapPin className="h-4 w-4 text-primary-500" />
-        <span className="max-w-[120px] truncate">{label}</span>
-      </button>
-    );
-  }
+  const removeFavorite = (id: string) => {
+    toggleFavoriteId(id);
+  };
 
   return (
-    <div ref={rootRef} className="relative hidden md:block">
-      <button
-        type="button"
-        onClick={() => setOpen((value) => !value)}
-        className="flex items-center gap-1 rounded-lg px-3 py-2 text-sm text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-800"
-      >
-        <MapPin className="h-4 w-4 text-primary-500" />
-        <span className="max-w-[120px] truncate">{label}</span>
-        <ChevronDown className={`h-3 w-3 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`} />
-      </button>
+    <div className="fixed inset-0 z-[60]">
+      <button type="button" aria-label="Закрыть избранное" className="absolute inset-0 bg-slate-900/40" onClick={onClose} />
+      <aside className="absolute right-0 flex h-full w-80 max-w-[90vw] flex-col bg-white p-6 shadow-xl sm:w-96">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display flex items-center gap-2 text-lg font-bold text-slate-900">
+            <Heart className="h-4 w-4 text-rose-500" />
+            Избранное
+            {favoriteIds.size ? (
+              <span className="rounded-full bg-rose-50 px-2 py-0.5 text-xs font-semibold text-rose-600">{favoriteIds.size}</span>
+            ) : null}
+          </h2>
+          <button type="button" aria-label="Закрыть" onClick={onClose} className="rounded-full p-2 text-slate-500 hover:bg-slate-100">
+            <X className="h-5 w-5" />
+          </button>
+        </div>
 
-      {open ? (
-        <div className="absolute right-0 z-50 mt-1 w-64 rounded-xl border border-slate-200 bg-white shadow-lg">
-          <div className="border-b border-slate-100 p-2">
-            <div className="flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2">
-              <Search className="h-4 w-4 flex-shrink-0 text-slate-400" />
-              <input
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder="Поиск города..."
-                className="min-w-0 flex-1 bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
-                autoFocus
-              />
-            </div>
-          </div>
-          <div className="max-h-56 overflow-y-auto py-1">
+        {sessions.length ? (
+          <ul className="mt-4 flex-1 space-y-3 overflow-y-auto pr-1">
+            {sessions.map((session) => (
+              <li key={session.groupKey || session.id} className="flex gap-3 rounded-xl border border-slate-200 p-3">
+                <a href={eventHref(session)} onClick={() => onClose()} className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                  {session.imageUrl ? (
+                    <img src={session.imageUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-lg">🎫</div>
+                  )}
+                </a>
+                <div className="min-w-0 flex-1">
+                  <a
+                    href={eventHref(session)}
+                    onClick={() => onClose()}
+                    className="line-clamp-2 text-sm font-semibold text-slate-900 hover:text-primary-700"
+                  >
+                    {session.title}
+                  </a>
+                  <p className="mt-1 truncate text-xs text-slate-500">{session.city || 'Город не указан'}</p>
+                  <p className="mt-1 text-xs font-semibold text-slate-800">
+                    {session.priceFrom ? `от ${formatPriceRub(session.priceFrom)} ₽` : 'Цена уточняется'}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  aria-label="Убрать из избранного"
+                  onClick={() => removeFavorite(session.id)}
+                  className="shrink-0 self-start rounded-full p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-500"
+                >
+                  <Heart className="h-4 w-4 fill-rose-500 text-rose-500" />
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="mt-6 flex flex-1 flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-center text-sm text-slate-500">
+            <Heart className="mx-auto mb-2 h-6 w-6 text-slate-300" />
+            <p className="font-medium text-slate-700">Пока пусто</p>
+            <p className="mt-1">Отмечайте события сердечком на карточках — они появятся здесь. Список хранится в браузере на этом устройстве.</p>
             <button
               type="button"
-              onClick={() => {
-                onDestination('all');
-                setOpen(false);
-              }}
-              className="flex w-full items-center gap-2 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              onClick={() => onNavigate('/events')}
+              className="mt-4 inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2 text-xs font-semibold text-white hover:bg-primary-700"
             >
-              Все города
+              Перейти к событиям
             </button>
-            {cities.map((city) => (
-              <button
-                key={city.name}
-                type="button"
-                onClick={() => {
-                  onDestination(city.name);
-                  setOpen(false);
-                }}
-                className="flex w-full items-center justify-between gap-2 px-3 py-2 text-sm text-slate-600 hover:bg-slate-50"
-              >
-                <span className="truncate">{city.name}</span>
-                <span className="shrink-0 text-xs text-slate-400">{city.events}</span>
-              </button>
-            ))}
-            {cities.length === 0 ? <p className="px-3 py-4 text-center text-sm text-slate-500">Ничего не найдено</p> : null}
           </div>
-        </div>
-      ) : null}
+        )}
+      </aside>
     </div>
   );
 }

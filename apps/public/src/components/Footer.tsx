@@ -12,13 +12,13 @@ const catalogLinks = [
   { label: 'Речные прогулки', href: '/landings/river-cruises' },
   { label: 'Вечеринки на теплоходе', href: '/landings/river-party' },
   { label: 'Автобусные экскурсии', href: '/landings/bus-tours' },
-  { label: 'Салют 9 мая', href: '/landings/salute-9-may' },
 ];
 
 const companyLinks = [
   { label: 'О сервисе', href: '/about' },
   { label: 'Подборки', href: '/podborki' },
   { label: 'Города', href: '/cities' },
+  { label: 'Площадки', href: '/venues' },
   { label: 'Проверить заказ', href: '/my-orders' },
   { label: 'Помощь', href: '/help' },
 ];
@@ -57,7 +57,7 @@ export function Footer() {
             </div>
           </div>
 
-          <FooterColumn title="Каталог" links={catalogLinks} />
+          <FooterColumn title="События" links={catalogLinks} />
           <FooterColumn title="Города" links={cityLinks} />
           <FooterColumn title="Компания" links={companyLinks} />
         </div>
@@ -66,7 +66,7 @@ export function Footer() {
           <div className="flex flex-col gap-4 text-sm text-slate-400 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-slate-900">&copy; {new Date().getFullYear()} Дайбилет</p>
-              <p className="mt-1">Агрегатор событий. Финансовый контур остается на стороне билетных систем.</p>
+              <p className="mt-1">Агрегатор экскурсий и мероприятий в РФ</p>
             </div>
             <div className="flex flex-wrap gap-x-5 gap-y-1 sm:justify-end">
               <a href="/privacy" className="hover:text-slate-600">Политика конфиденциальности</a>

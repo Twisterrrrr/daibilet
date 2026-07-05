@@ -77,12 +77,12 @@ export function CitiesCatalogPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <Header cityLabel="Все города" onSection={goSection} />
       <main className="container-page py-10">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Города</h1>
+            <h1 className="font-display text-3xl font-bold text-slate-900">Города</h1>
             <p className="mt-2 text-lg text-slate-500">Выберите город — найдём лучшие экскурсии, музеи и мероприятия</p>
           </div>
           <div className="flex flex-shrink-0 items-center gap-2">

@@ -39,8 +39,22 @@ function stripHtml(value) {
 }
 
 function isBusTourEvent(event) {
+  if (event.category === 'Речные прогулки') return false;
+
+  const primaryHaystack = [event.title, event.place, event.category].join(' ').toLowerCase();
+  if (/теплоход|катер|яхт|причал|пароход|судно|речн|круиз|река|волга|нева|канал|прогулк/.test(primaryHaystack)) {
+    return false;
+  }
+
   const haystack = [event.title, event.place, stripHtml(event.description), event.category].join(' ').toLowerCase();
-  return /автобус|hop[\s-]?on|hop[\s-]?off|двухэтажн|city tour|citysightseeing|сити[\s-]?тур|yutong|mercedes|hyundai|туристическ(?:ий|ого)?\s+транспорт/.test(haystack);
+  const haystackWithoutTransitDirections = haystack
+    .replace(/маршруты?\s+автобуса[^.;]*/gi, ' ')
+    .replace(/автобуса:\s*[\d,\s]+/gi, ' ')
+    .replace(/на\s+автобус(?:е|а)\s+до[^.;]*/gi, ' ');
+
+  return /автобус|hop[\s-]?on|hop[\s-]?off|двухэтажн|city tour|citysightseeing|сити[\s-]?тур|yutong|mercedes|hyundai|туристическ(?:ий|ого)?\s+транспорт/.test(
+    haystackWithoutTransitDirections,
+  );
 }
 
 function isWaterEvent(event) {
