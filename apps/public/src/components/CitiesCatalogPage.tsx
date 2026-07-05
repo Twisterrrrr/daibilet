@@ -4,9 +4,10 @@ import { ArrowDownAZ, ArrowUpAZ, Hash } from 'lucide-react';
 import { CityCard } from '@/components/CityCard';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { RegionDestinationLink } from '@/components/RegionDestinationLink';
 import { resolveCityBrief } from '@/lib/cityInfo';
 import { resolveCityCardImage } from '@/lib/city-images';
-import { resolveCityRegion } from '@/lib/cityRegionHub';
+import { filterOrphanRegions, resolveCityRegion } from '@/lib/cityRegionHub';
 import { cityHref, citySlug } from '@/routes';
 import { publicData } from '@/data';
 import type { PublicDestination } from '@/types';
@@ -67,6 +68,21 @@ export function CitiesCatalogPage() {
     });
   }, [destinations, query, sortMode]);
 
+  const regions = React.useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    const filtered = destinations
+      .filter((item) => item.type === 'region' && item.events > 0)
+      .filter((item) => !normalized || item.name.toLowerCase().includes(normalized));
+
+    return [...filtered].sort((a, b) => {
+      if (sortMode === 'events') return b.events - a.events || a.name.localeCompare(b.name, 'ru');
+      const cmp = a.name.localeCompare(b.name, 'ru');
+      return sortMode === 'asc' ? cmp : -cmp;
+    });
+  }, [destinations, query, sortMode]);
+
+  const orphanRegions = React.useMemo(() => filterOrphanRegions(regions, cities), [regions, cities]);
+
   const goSection = (section: string) => {
     if (section === 'top') window.location.href = '/';
     else if (section === 'events') window.location.href = '/events';
@@ -83,7 +99,14 @@ export function CitiesCatalogPage() {
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="font-display text-3xl font-bold text-slate-900">Города</h1>
-            <p className="mt-2 text-lg text-slate-500">Выберите город — найдём лучшие экскурсии, музеи и мероприятия</p>
+            <p className="mt-2 text-lg text-slate-500">
+              {cities.length > 0 ? `${cities.length} ${pluralCitiesLabel(cities.length)}` : 'Города'}
+              {orphanRegions.length > 0
+                ? ` и ${orphanRegions.length} ${pluralRegionsLabel(orphanRegions.length)} с событиями вне областных центров`
+                : ''}
+              {' — '}
+              экскурсии, музеи и мероприятия
+            </p>
           </div>
           <div className="flex flex-shrink-0 items-center gap-2">
             <span className="text-sm text-slate-500">Сортировка:</span>
@@ -131,7 +154,7 @@ export function CitiesCatalogPage() {
           </div>
         ) : null}
 
-        {!isLoading && !cities.length ? (
+        {!isLoading && !cities.length && !orphanRegions.length ? (
           <div className="rounded-xl border border-dashed border-slate-300 py-20 text-center">
             <p className="text-lg text-slate-400">Ничего не найдено</p>
             <p className="mt-1 text-sm text-slate-400">Попробуйте изменить поисковый запрос</p>
@@ -159,10 +182,44 @@ export function CitiesCatalogPage() {
             })}
           </div>
         ) : null}
+
+        {orphanRegions.length > 0 ? (
+          <section className="mt-12 border-t border-slate-200 pt-10">
+            <div className="mb-5">
+              <h2 className="font-display text-xl font-bold text-slate-900 sm:text-2xl">Области и направления</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                События в городах без отдельной карточки — курорты, пригороды и малые населённые пункты
+              </p>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {orphanRegions.map((region) => (
+                <RegionDestinationLink key={`region:${region.slug || region.name}`} region={region} />
+              ))}
+            </div>
+          </section>
+        ) : null}
       </main>
       <Footer />
     </div>
   );
+}
+
+function pluralCitiesLabel(count: number): string {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod100 >= 11 && mod100 <= 19) return 'городов';
+  if (mod10 === 1) return 'город';
+  if (mod10 >= 2 && mod10 <= 4) return 'города';
+  return 'городов';
+}
+
+function pluralRegionsLabel(count: number): string {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod100 >= 11 && mod100 <= 19) return 'направлений';
+  if (mod10 === 1) return 'направление';
+  if (mod10 >= 2 && mod10 <= 4) return 'направления';
+  return 'направлений';
 }
 
 function upsertMeta(name: string, content: string) {

@@ -51,7 +51,6 @@ import {
   HERO_QUICK_CHIPS,
   HOME_FORMAT_TILES,
   HOME_TRUST_ITEMS,
-  POPULAR_CITY_NAMES,
 } from '@/lib/home-scenarios';
 import { landingPageHref } from '@/lib/landing-slugs';
 import { venuePageTemplate } from '@/lib/venue-meta';
@@ -932,14 +931,14 @@ function PromoSection({ landings, cityFilter }: { landings: PublicLanding[]; cit
 }
 
 function CitiesSection({ destinations }: { destinations: PublicDestination[] }) {
-  const cities = React.useMemo(() => {
-    const all = destinations.filter((item) => item.type === 'city');
-    const byName = new Map(all.map((city) => [city.name, city]));
-    const popularSet = new Set<string>(POPULAR_CITY_NAMES);
-    const ordered = POPULAR_CITY_NAMES.map((name) => byName.get(name)).filter(Boolean) as PublicDestination[];
-    const rest = all.filter((city) => !popularSet.has(city.name)).sort((a, b) => b.events - a.events);
-    return [...ordered, ...rest].slice(0, 8);
-  }, [destinations]);
+  const cities = React.useMemo(
+    () =>
+      destinations
+        .filter((item) => item.type === 'city')
+        .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru'))
+        .slice(0, 8),
+    [destinations],
+  );
 
   if (!cities.length) return null;
 

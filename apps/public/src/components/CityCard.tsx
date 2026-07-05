@@ -1,6 +1,7 @@
-import { ArrowRight, Landmark, MapPin } from 'lucide-react';
+import { Landmark, MapPin } from 'lucide-react';
 import * as React from 'react';
 
+import { RegionDestinationLink } from '@/components/RegionDestinationLink';
 import { CITY_CARD_ASPECT_CLASS, cityCardTitleClass } from '@/lib/city-card-styles';
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import type { CityCardRegion } from '@/lib/cityRegionHub';
@@ -87,14 +88,10 @@ export function CityCard({
       </a>
 
       {region && region.eventCount > 0 ? (
-        <a
-          href={`/cities/${region.slug}`}
-          className="mt-2 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm shadow-sm transition-all hover:border-primary-300 hover:shadow-md"
-        >
-          <span className="truncate font-medium text-slate-700">+ {region.name}</span>
-          <span className="shrink-0 text-slate-400">{pluralEvents(region.eventCount)}</span>
-          <ArrowRight className="ml-auto h-3.5 w-3.5 shrink-0 text-slate-400" />
-        </a>
+        <RegionDestinationLink
+          region={{ slug: region.slug, name: region.name, events: region.eventCount }}
+          className="mt-2"
+        />
       ) : null}
     </div>
   );
