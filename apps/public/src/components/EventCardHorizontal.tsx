@@ -6,11 +6,13 @@ import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from 
 import { EventFavoriteButton } from '@/components/EventFavoriteButton';
 import { EventImageBadges } from '@/lib/event-card-badges';
 import {
+  collectDisplaySlotLabels,
   collectDisplaySlotTimes,
-  formatNextSession,
+  formatEventNextSession,
   formatListDescription,
   formatPriceRub,
   getDepartingSoonMinutes,
+  hasMultipleCatalogSlots,
   isEventSessionToday,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
@@ -32,17 +34,23 @@ export function EventCardHorizontal({ event }: EventCardHorizontalProps) {
   const highlights = collectCatalogLabels(event).slice(0, 3);
   const openDate = isOpenDate(event);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(event.startsAt);
-  const nextSessionLabel = openDate ? null : formatNextSession(event.startsAt);
+  const nextSessionLabel = openDate ? null : formatEventNextSession(event);
   const isToday = isEventSessionToday(event);
-  const displaySlots = collectDisplaySlotTimes(event, { todayOnly: isToday });
-  const showSlotPills = isToday && displaySlots.length > 0;
+  const multipleSlots = hasMultipleCatalogSlots(event);
+  const displaySlotLabels = multipleSlots ? collectDisplaySlotLabels(event) : [];
+  const displaySlots = collectDisplaySlotTimes(event, { todayOnly: isToday && !multipleSlots });
+  const showSlotPills = multipleSlots
+    ? displaySlotLabels.length > 1
+    : isToday && displaySlots.length > 0;
   const sessionMetaLabel = openDate
     ? null
-    : isToday && displaySlots.length > 0
-      ? displaySlots.length === 1
-        ? `Сегодня, ${displaySlots[0]}`
-        : 'Сегодня'
-      : nextSessionLabel;
+    : multipleSlots && displaySlotLabels.length > 1
+      ? `${displaySlotLabels.length} ближайших даты`
+      : isToday && displaySlots.length > 0
+        ? displaySlots.length === 1
+          ? `Сегодня, ${displaySlots[0]}`
+          : 'Сегодня'
+        : nextSessionLabel;
   const descriptionText = formatListDescription(event.description);
   const pseudoRating = resolvePseudoRating(event.groupKey || event.id);
   const locationLabel = resolveEventCardLocationLabel(event);
@@ -137,12 +145,12 @@ export function EventCardHorizontal({ event }: EventCardHorizontalProps) {
 
         {showSlotPills ? (
           <div className="mt-2 flex flex-wrap gap-2">
-            {displaySlots.map((time) => (
+            {(multipleSlots ? displaySlotLabels : displaySlots).map((label) => (
               <span
-                key={time}
+                key={label}
                 className="inline-flex h-[30px] min-h-[30px] shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-xs leading-none text-slate-800"
               >
-                {time}
+                {label}
               </span>
             ))}
           </div>

@@ -8,9 +8,12 @@ import { InstitutionList } from '@/components/InstitutionListRow';
 import { formatNumber } from '@/data';
 import { API_BASE_URL } from '@/lib/api-base';
 import {
+  readCachedInstitutionVenues,
+  writeCachedInstitutionVenues,
+} from '@/lib/venues-catalog-cache';
+import {
   INSTITUTION_CATALOG_TYPE_OPTIONS,
   normalizeVenueKind,
-  venuePageTemplate,
   venueTypeLabel,
 } from '@/lib/venue-meta';
 import { venueCatalogHref, venueHref } from '@/routes';
@@ -33,8 +36,8 @@ export function VenuesCatalogPage() {
   const [typeFilter, setTypeFilter] = React.useState('all');
   const [sortMode, setSortMode] = React.useState<SortMode>('events');
   const [viewMode, setViewMode] = React.useState<ViewMode>(() => readStoredViewMode());
-  const [venues, setVenues] = React.useState<PublicVenue[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [venues, setVenues] = React.useState<PublicVenue[]>(() => readCachedInstitutionVenues() || []);
+  const [isLoading, setIsLoading] = React.useState(() => !readCachedInstitutionVenues()?.length);
 
   const setViewModePersisted = React.useCallback((value: ViewMode) => {
     setViewMode(value);
@@ -56,15 +59,16 @@ export function VenuesCatalogPage() {
   React.useEffect(() => {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 15000);
-    fetch(`${API_BASE_URL}/api/public/venues?limit=500`, { cache: 'no-store', signal: controller.signal })
+
+    fetch(`${API_BASE_URL}/api/public/venues?limit=500&family=institution`, { cache: 'default', signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as { venues?: PublicVenue[] };
       })
       .then((payload) => {
-        if (Array.isArray(payload.venues)) {
-          setVenues(payload.venues.filter((venue) => venuePageTemplate(venue.type) === 'institution'));
-        }
+        if (!Array.isArray(payload.venues)) return;
+        setVenues(payload.venues);
+        writeCachedInstitutionVenues(payload.venues);
       })
       .catch(() => undefined)
       .finally(() => {
@@ -149,8 +153,13 @@ export function VenuesCatalogPage() {
       <section className="border-b border-slate-200 bg-gradient-to-br from-sky-500 via-primary-600 to-indigo-700 text-white">
         <div className="container-page py-10 md:py-14">
           <p className="text-sm font-semibold uppercase tracking-wider text-white/70">
-            {venues.length} площадок · {cityCount}{' '}
-            {cityCount === 1 ? 'город' : cityCount >= 2 && cityCount <= 4 ? 'города' : 'городов'}
+            {venues.length ? `${formatNumber(venues.length)} площадок` : isLoading ? 'Загружаем площадки…' : '0 площадок'}
+            {cityCount ? (
+              <>
+                {' '}
+                · {cityCount} {cityCount === 1 ? 'город' : cityCount >= 2 && cityCount <= 4 ? 'города' : 'городов'}
+              </>
+            ) : null}
           </p>
           <h1 className="mt-2 font-display text-3xl font-extrabold sm:text-4xl md:text-5xl">
             Площадки: музеи, галереи, театры и арт-пространства
@@ -197,7 +206,7 @@ export function VenuesCatalogPage() {
         </div>
       </section>
 
-      <div className="sticky top-16 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <div className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="container-page flex items-center gap-3 py-3">
           <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <button
@@ -272,12 +281,12 @@ export function VenuesCatalogPage() {
         </div>
 
         {isLoading && !filteredVenues.length ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center text-slate-500">
-            <p className="text-lg font-semibold text-slate-700">Площадки загружаются…</p>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div key={index} className="h-56 animate-pulse rounded-2xl bg-slate-100" />
+            ))}
           </div>
-        ) : null}
-
-        {!isLoading && filteredVenues.length > 0 ? (
+        ) : filteredVenues.length > 0 ? (
           viewMode === 'list' ? (
             <InstitutionList venues={filteredVenues} hrefFor={venueHref} />
           ) : (

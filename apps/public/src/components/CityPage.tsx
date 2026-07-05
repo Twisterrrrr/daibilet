@@ -24,6 +24,11 @@ import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { landingPageHref } from '@/lib/landing-slugs';
 import { eventHref } from '@/routes';
 import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
+import {
+  buildCityPageShell,
+  readCachedCityPage,
+  writeCachedCityPage,
+} from '@/lib/city-page-cache';
 import type { PublicCity, PublicCityPage, PublicLanding, PublicSession, PublicVenue } from '@/types';
 
 const API_BASE_URL =
@@ -33,8 +38,8 @@ const API_BASE_URL =
 type ViewMode = 'cards' | 'table';
 
 export function CityPage({ slug }: { slug: string }) {
-  const [payload, setPayload] = React.useState<PublicCityPage | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [payload, setPayload] = React.useState<PublicCityPage | null>(() => readCachedCityPage(slug) || buildCityPageShell(slug));
+  const [contentReady, setContentReady] = React.useState(() => Boolean(readCachedCityPage(slug)?.sessions?.length));
   const [error, setError] = React.useState<string | null>(null);
   const [category, setCategory] = React.useState('all');
   const [tag, setTag] = React.useState('all');
@@ -43,9 +48,17 @@ export function CityPage({ slug }: { slug: string }) {
   React.useEffect(() => {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 25000);
-    setIsLoading(true);
+    const cached = readCachedCityPage(slug);
+    if (!cached?.sessions?.length) {
+      const shell = buildCityPageShell(slug);
+      if (shell) {
+        setPayload(shell);
+        setContentReady(false);
+      }
+    }
+
     fetch(`${API_BASE_URL}/api/public/cities/${encodeURIComponent(slug)}`, {
-      cache: 'no-store',
+      cache: 'default',
       signal: controller.signal,
     })
       .then(async (response) => {
@@ -55,16 +68,19 @@ export function CityPage({ slug }: { slug: string }) {
       .then((data) => {
         if (!data) throw new Error('Город не найден');
         setPayload(data);
+        setContentReady(true);
         setError(null);
+        writeCachedCityPage(slug, data);
         applyCityMeta(data);
       })
       .catch((requestError) => {
         if (controller.signal.aborted) return;
-        setError(requestError instanceof Error ? requestError.message : String(requestError));
+        if (!cached && !buildCityPageShell(slug)) {
+          setError(requestError instanceof Error ? requestError.message : String(requestError));
+        }
       })
       .finally(() => {
         window.clearTimeout(timeout);
-        if (!controller.signal.aborted) setIsLoading(false);
       });
 
     return () => {
@@ -97,9 +113,9 @@ export function CityPage({ slug }: { slug: string }) {
       <Header cityLabel={city?.name || 'Дайбилет'} onSection={(section) => navigateHome(section)} searchCity={city?.name} />
 
       <main>
-        {isLoading ? <CityLoadingState /> : null}
+        {!payload && !error ? <CityLoadingState /> : null}
 
-        {!isLoading && error ? (
+        {error && !payload?.city ? (
           <div className="container-page py-16">
             <button type="button" className="btn-secondary" onClick={() => navigateHome('top')}>
               <ArrowLeft className="h-4 w-4" />
@@ -113,44 +129,60 @@ export function CityPage({ slug }: { slug: string }) {
         {city && payload ? (
           <>
             <CityHero city={city} stats={payload.stats} guide={guide} />
-            <PopularDirections city={city} landings={payload.landings} categories={categories} />
-            <MustSeeSection city={city} guide={guide} categories={categories} venues={payload.venues} />
-            <CategoryTiles categories={categories} onSelect={(value) => {
-              setCategory(value);
-              setTag('all');
-              scrollToSchedule();
-            }} />
-            <VenueHighlights city={city} venues={payload.venues} />
-            <PopularTags tags={popularTags} active={tag} onSelect={(value) => {
-              setTag(value);
-              setCategory('all');
-              scrollToSchedule();
-            }} />
-            <RecommendedEvents city={city} sessions={recommended} />
-            <MoreEvents sessions={moreEvents} />
+            {contentReady ? (
+              <>
+                <PopularDirections city={city} landings={payload.landings} categories={categories} />
+                <MustSeeSection city={city} guide={guide} categories={categories} venues={payload.venues} />
+                <CategoryTiles categories={categories} onSelect={(value) => {
+                  setCategory(value);
+                  setTag('all');
+                  scrollToSchedule();
+                }} />
+                <VenueHighlights city={city} venues={payload.venues} />
+                <PopularTags tags={popularTags} active={tag} onSelect={(value) => {
+                  setTag(value);
+                  setCategory('all');
+                  scrollToSchedule();
+                }} />
+                <RecommendedEvents city={city} sessions={recommended} />
+                <MoreEvents sessions={moreEvents} />
+              </>
+            ) : (
+              <CityContentLoadingState />
+            )}
 
             <section id="city-schedule" className="container-page grid gap-6 py-8 lg:grid-cols-[minmax(0,1fr)_320px]">
               <div className="min-w-0">
                 <CityCatalogHeader city={city} count={sessions.length} mode={mode} setMode={setMode} />
-                <CategoryFilter
-                  categories={categories}
-                  active={category}
-                  total={payload.sessions.length}
-                  activeTag={tag}
-                  onCategory={(value) => {
-                    setCategory(value);
-                    setTag('all');
-                  }}
-                  onReset={() => {
-                    setCategory('all');
-                    setTag('all');
-                  }}
-                />
-                {mode === 'table' ? <CityEventsTable sessions={sessions} /> : <CityEventsGrid sessions={sessions} />}
+                {contentReady ? (
+                  <>
+                    <CategoryFilter
+                      categories={categories}
+                      active={category}
+                      total={payload.sessions.length}
+                      activeTag={tag}
+                      onCategory={(value) => {
+                        setCategory(value);
+                        setTag('all');
+                      }}
+                      onReset={() => {
+                        setCategory('all');
+                        setTag('all');
+                      }}
+                    />
+                    {mode === 'table' ? <CityEventsTable sessions={sessions} /> : <CityEventsGrid sessions={sessions} />}
+                  </>
+                ) : (
+                  <CityScheduleLoadingState />
+                )}
               </div>
 
               <aside className="grid content-start gap-4">
-                <CityGuideAside city={city} stats={payload.stats} categories={categories} landings={payload.landings} />
+                {contentReady ? (
+                  <CityGuideAside city={city} stats={payload.stats} categories={categories} landings={payload.landings} />
+                ) : (
+                  <div className="h-64 rounded-xl bg-slate-50" />
+                )}
               </aside>
             </section>
           </>
@@ -236,6 +268,29 @@ function CityHero({
         </div>
       </div>
     </section>
+  );
+}
+
+function CityContentLoadingState() {
+  return (
+    <section className="container-page py-10">
+      <div className="h-6 w-64 rounded bg-slate-100" />
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div key={index} className="h-32 rounded-lg bg-slate-50" />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function CityScheduleLoadingState() {
+  return (
+    <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <div key={index} className="h-72 rounded-xl bg-slate-50" />
+      ))}
+    </div>
   );
 }
 

@@ -15,6 +15,7 @@ import { eventHref } from '@/routes';
 import { formatShowcaseSessionDate, resolvePseudoRating } from '@/lib/event-card-meta';
 import { resolveEventCardDestinationLabel } from '@/lib/event-location';
 import { arrangeCatalogSessions } from '@/lib/session-cover-image';
+import { readCachedCatalogPage, writeCachedCatalogPage } from '@/lib/catalog-page-cache';
 import type { PublicLanding, PublicSession } from '@/types';
 
 type DateFilter = 'all' | 'today' | 'tomorrow' | 'weekend' | 'evening';
@@ -72,14 +73,49 @@ function categoryEmoji(name: string): string {
 const CATALOG_PAGE_LIMIT = 60;
 const MIN_DISPLAY_PRICE_RUB = 100;
 
+function isDefaultCatalogQuery(params: {
+  catalogOffset: number;
+  query: string;
+  city: string;
+  category: string;
+  landing: string;
+  date: DateFilter;
+  dateFrom: string;
+  dateTo: string;
+  minPrice: string;
+  maxPrice: string;
+  ageMax: number;
+  sort: SortMode;
+}) {
+  return (
+    params.catalogOffset === 0 &&
+    !params.query.trim() &&
+    params.city === 'all' &&
+    params.category === 'all' &&
+    params.landing === 'all' &&
+    params.date === 'all' &&
+    !params.dateFrom &&
+    !params.dateTo &&
+    params.minPrice === 'all' &&
+    params.maxPrice === 'all' &&
+    params.ageMax < 0 &&
+    params.sort === 'popular'
+  );
+}
+
 export function CatalogPage() {
   const initialParams = React.useMemo(() => new URLSearchParams(window.location.search), []);
-  const [catalogSessions, setCatalogSessions] = React.useState<PublicSession[]>(() => publicData.sessions.slice(0, CATALOG_PAGE_LIMIT));
-  const [catalogTotal, setCatalogTotal] = React.useState(() => publicData.stats.events || publicData.sessions.length);
+  const cachedCatalog = React.useMemo(() => readCachedCatalogPage(), []);
+  const [catalogSessions, setCatalogSessions] = React.useState<PublicSession[]>(
+    () => cachedCatalog?.items || publicData.sessions.slice(0, CATALOG_PAGE_LIMIT),
+  );
+  const [catalogTotal, setCatalogTotal] = React.useState(
+    () => cachedCatalog?.total || publicData.stats.events || publicData.sessions.length,
+  );
   const [catalogOffset, setCatalogOffset] = React.useState(0);
-  const [catalogFacets, setCatalogFacets] = React.useState<Partial<CatalogFacets> | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [hasLoadedCatalog, setHasLoadedCatalog] = React.useState(false);
+  const [catalogFacets, setCatalogFacets] = React.useState<Partial<CatalogFacets> | null>(() => cachedCatalog?.facets || null);
+  const [isLoading, setIsLoading] = React.useState(() => !cachedCatalog && publicData.sessions.length === 0);
+  const [hasLoadedCatalog, setHasLoadedCatalog] = React.useState(() => Boolean(cachedCatalog?.items?.length));
   const [loadError, setLoadError] = React.useState<string | null>(null);
   const [query, setQuery] = React.useState(() => initialParams.get('q') || '');
   const [city, setCity] = React.useState(() => initialParams.get('city') || 'all');
@@ -126,12 +162,13 @@ export function CatalogPage() {
     if (maxPrice !== 'all') params.set('maxPrice', maxPrice);
     if (ageMax >= 0) params.set('ageMax', String(ageMax));
 
-    const debounce = window.setTimeout(() => setIsLoading(true), 120);
+    const hasVisibleData = catalogSessions.length > 0;
+    const debounce = hasVisibleData ? null : window.setTimeout(() => setIsLoading(true), 120);
     const timeout = window.setTimeout(() => controller.abort(), 25000);
     setLoadError(null);
 
     fetch(`${API_BASE_URL}/api/public/events?${params.toString()}`, {
-      cache: 'no-store',
+      cache: 'default',
       signal: controller.signal,
     })
       .then((response) => {
@@ -145,20 +182,38 @@ export function CatalogPage() {
         setCatalogFacets(payload.facets || null);
         setHasLoadedCatalog(true);
         setLoadError(null);
+        if (
+          isDefaultCatalogQuery({
+            catalogOffset,
+            query,
+            city,
+            category,
+            landing,
+            date,
+            dateFrom,
+            dateTo,
+            minPrice,
+            maxPrice,
+            ageMax,
+            sort,
+          })
+        ) {
+          writeCachedCatalogPage(payload);
+        }
       })
       .catch((error) => {
         if (controller.signal.aborted) return;
         setLoadError(error instanceof Error ? error.message : String(error));
       })
       .finally(() => {
-        window.clearTimeout(debounce);
+        if (debounce != null) window.clearTimeout(debounce);
         window.clearTimeout(timeout);
         if (!controller.signal.aborted) setIsLoading(false);
       });
 
     return () => {
       controller.abort();
-      window.clearTimeout(debounce);
+      if (debounce != null) window.clearTimeout(debounce);
       window.clearTimeout(timeout);
     };
   }, [ageMax, catalogOffset, category, city, date, dateFrom, dateTo, landing, maxPrice, minPrice, query, sort]);

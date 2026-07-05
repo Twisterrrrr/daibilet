@@ -62,7 +62,10 @@ export function resolveEventCardLocationLabel(session: EventCardLocationInput): 
 export function abbreviateRegionName(name: string): string {
   const trimmed = String(name || '').trim();
   if (!trimmed) return trimmed;
-  return trimmed.replace(/\s+область$/iu, ' обл.').replace(/\s+республика$/iu, ' респ.');
+  return trimmed
+    .replace(/\s+область$/iu, ' обл.')
+    .replace(/\s+республика$/iu, ' респ.')
+    .replace(/\s+край$/iu, ' край');
 }
 
 /** Город/регион в meta карточки: для областных событий — «Раменское, Московская обл.». */

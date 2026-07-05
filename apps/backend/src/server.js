@@ -41,6 +41,7 @@ import {
   buildPublicSearch,
   buildPublicPromoBlocks,
   clearPublicDataCaches,
+  warmPublicCatalogCache,
   runLandingAudit,
   updateAdminEventOverride,
   updateAdminEventTaxonomy,
@@ -80,6 +81,7 @@ let tepAutoSyncInFlight = false;
 
 const jsonCache = new Map();
 const PUBLIC_RESPONSE_CACHE_MS = 5 * 60 * 1000;
+const PUBLIC_HTTP_CACHE_CONTROL = 'public, max-age=60, stale-while-revalidate=300';
 const MAX_PUBLIC_RESPONSE_CACHE_ENTRIES = 80;
 const publicResponseCache = new Map();
 let activeCorsRequest = null;
@@ -195,19 +197,19 @@ createServer(async (request, response) => {
 
     if (route === 'GET /api/public/stats') {
       if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public stats refresh');
-      sendJson(response, await buildPublicStats(db));
+      sendPublicJson(response, await buildPublicStats(db));
       return;
     }
 
     if (route === 'GET /api/public/destinations') {
       if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public destinations refresh');
-      sendJson(response, await withPublicResponseCache('destinations', () => buildPublicDestinations(db)));
+      sendPublicJson(response, await withPublicResponseCache('destinations', () => buildPublicDestinations(db)));
       return;
     }
 
     if (route === 'GET /api/public/venues') {
       if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public venues refresh');
-      sendJson(
+      sendPublicJson(
         response,
         await withPublicResponseCache(`venues:${canonicalSearchParams(url.searchParams)}`, () => buildPublicVenuesCatalog(db, url.searchParams)),
       );
@@ -216,7 +218,7 @@ createServer(async (request, response) => {
 
     if (route === 'GET /api/public/home/preview') {
       if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public home preview refresh');
-      sendJson(response, await withPublicResponseCache('home:preview', () => buildPublicHomePreview(db)));
+      sendPublicJson(response, await withPublicResponseCache('home:preview', () => buildPublicHomePreview(db)));
       return;
     }
 
@@ -232,17 +234,18 @@ createServer(async (request, response) => {
           : await withPublicResponseCache(catalogCacheKey, () =>
               withDataFallback(() => buildCatalogSessions(db, url.searchParams), 'apps/public/data.js', 'PUBLIC_DATA', (payload) => filterSessions(payload.sessions || [], url.searchParams)),
             );
-      sendJson(response, catalogPayload);
+      if (url.searchParams.get('refresh') === '1') sendJson(response, catalogPayload);
+      else sendPublicJson(response, catalogPayload);
       return;
     }
 
     if (route === 'GET /api/public/search') {
-      sendJson(response, await withPublicResponseCache(`search:${canonicalSearchParams(url.searchParams)}`, () => buildPublicSearch(db, url.searchParams)));
+      sendPublicJson(response, await withPublicResponseCache(`search:${canonicalSearchParams(url.searchParams)}`, () => buildPublicSearch(db, url.searchParams)));
       return;
     }
 
     if (route === 'GET /api/public/promo-blocks') {
-      sendJson(response, await withPublicResponseCache(`promo-blocks:${canonicalSearchParams(url.searchParams)}`, () => buildPublicPromoBlocks(db, url.searchParams)));
+      sendPublicJson(response, await withPublicResponseCache(`promo-blocks:${canonicalSearchParams(url.searchParams)}`, () => buildPublicPromoBlocks(db, url.searchParams)));
       return;
     }
 
@@ -348,28 +351,28 @@ createServer(async (request, response) => {
     const publicVenueMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/venues\/([^/]+)$/) : null;
     if (publicVenueMatch) {
       const venueSlug = decodeURIComponent(publicVenueMatch[1]);
-      sendJson(response, await withPublicResponseCache(`venue:${venueSlug}`, () => buildPublicVenuePage(db, venueSlug)));
+      sendPublicJson(response, await withPublicResponseCache(`venue:${venueSlug}`, () => buildPublicVenuePage(db, venueSlug)));
       return;
     }
 
     const publicCityMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/cities\/([^/]+)$/) : null;
     if (publicCityMatch) {
       const citySlug = decodeURIComponent(publicCityMatch[1]);
-      sendJson(response, await withPublicResponseCache(`city:${citySlug}`, () => buildPublicCityPage(db, citySlug)));
+      sendPublicJson(response, await withPublicResponseCache(`city:${citySlug}`, () => buildPublicCityPage(db, citySlug)));
       return;
     }
 
     const publicLandingMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/landings\/([^/]+)$/) : null;
     if (publicLandingMatch) {
       const landingSlug = decodeURIComponent(publicLandingMatch[1]);
-      sendJson(response, await withPublicResponseCache(`landing:${landingSlug}`, () => buildPublicLandingPageWithFallback(db, landingSlug)));
+      sendPublicJson(response, await withPublicResponseCache(`landing:${landingSlug}`, () => buildPublicLandingPageWithFallback(db, landingSlug)));
       return;
     }
 
     const publicEventMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/events\/([^/]+)$/) : null;
     if (publicEventMatch) {
       const eventSlug = decodeURIComponent(publicEventMatch[1]);
-      sendJson(response, await withPublicResponseCache(`event:${eventSlug}`, () => buildPublicEventPage(db, eventSlug)));
+      sendPublicJson(response, await withPublicResponseCache(`event:${eventSlug}`, () => buildPublicEventPage(db, eventSlug)));
       return;
     }
 
@@ -613,8 +616,21 @@ async function buildPublicLandingPageWithFallback(db, landingSlug) {
 
 function warmPublicCaches(reason) {
   const startedAt = Date.now();
-  void Promise.all([buildPublicDestinations(db), buildPublicHomePreview(db), buildPublicStats(db)])
-    .then(([destinations, preview, stats]) => {
+  void Promise.all([
+    buildPublicDestinations(db),
+    buildPublicHomePreview(db),
+    buildPublicStats(db),
+    warmPublicCatalogCache(db),
+  ])
+    .then(async ([destinations, preview, stats]) => {
+      await Promise.all([
+        withPublicResponseCache('venues:family=institution&limit=500', () =>
+          buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'institution', limit: '500' })),
+        ),
+        withPublicResponseCache('venues:family=location&limit=500', () =>
+          buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'location', limit: '500' })),
+        ),
+      ]);
       const elapsed = Date.now() - startedAt;
       console.log(
         `Public cache warmed after ${reason}: ${stats?.stats?.events || preview?.sessions?.length || 0} events, ${destinations?.destinations?.length || 0} destinations in ${elapsed}ms`,
@@ -1131,6 +1147,13 @@ function sendJson(response, payload, statusCode = 200, extraHeaders = {}) {
     ...extraHeaders,
   });
   response.end(body);
+}
+
+function sendPublicJson(response, payload, statusCode = 200, extraHeaders = {}) {
+  sendJson(response, payload, statusCode, {
+    'cache-control': PUBLIC_HTTP_CACHE_CONTROL,
+    ...extraHeaders,
+  });
 }
 
 function sendEmpty(response, statusCode) {

@@ -99,6 +99,7 @@ export type PublicSession = {
   dateLabel: string;
   timeLabel: string;
   timeBucket: 'morning' | 'day' | 'evening' | 'night';
+  timeZone?: string | null;
   priceFrom?: number | null;
   vacant?: number | null;
   ageLimit?: string | null;

@@ -97,54 +97,21 @@ export function CitiesCatalogPage() {
       <Header cityLabel="Все города" onSection={goSection} />
       <main className="container-page py-10">
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h1 className="font-display text-3xl font-bold text-slate-900">Города</h1>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-between gap-3">
+              <h1 className="font-display text-3xl font-bold text-slate-900">Города</h1>
+              <div className="shrink-0 sm:hidden">
+                <CitiesSortControls sortMode={sortMode} onSortModeChange={setSortMode} compact />
+              </div>
+            </div>
             <p className="mt-2 text-lg text-slate-500">
               {cities.length > 0 ? `${cities.length} ${pluralCitiesLabel(cities.length)}` : 'Города'}
-              {orphanRegions.length > 0
-                ? ` и ${orphanRegions.length} ${pluralRegionsLabel(orphanRegions.length)} с событиями вне областных центров`
-                : ''}
-              {' — '}
-              экскурсии, музеи и мероприятия
+              {' — экскурсии, музеи и мероприятия по всей территории России'}
             </p>
           </div>
-          <div className="flex flex-shrink-0 items-center gap-2">
+          <div className="hidden shrink-0 sm:flex sm:items-center sm:gap-2">
             <span className="text-sm text-slate-500">Сортировка:</span>
-            <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 shadow-sm">
-              <button
-                type="button"
-                onClick={() => setSortMode('events')}
-                className={`inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                  sortMode === 'events' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-50'
-                }`}
-                title="По количеству событий"
-              >
-                <Hash className="h-4 w-4" />
-                <span className="sr-only sm:not-sr-only">По событиям</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setSortMode('asc')}
-                className={`inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                  sortMode === 'asc' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-50'
-                }`}
-                title="По алфавиту А–Я"
-              >
-                <ArrowDownAZ className="h-4 w-4" />
-                <span className="sr-only sm:not-sr-only">А–Я</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setSortMode('desc')}
-                className={`inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors ${
-                  sortMode === 'desc' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-50'
-                }`}
-                title="По алфавиту Я–А"
-              >
-                <ArrowUpAZ className="h-4 w-4" />
-                <span className="sr-only sm:not-sr-only">Я–А</span>
-              </button>
-            </div>
+            <CitiesSortControls sortMode={sortMode} onSortModeChange={setSortMode} />
           </div>
         </div>
 
@@ -204,6 +171,56 @@ export function CitiesCatalogPage() {
   );
 }
 
+function CitiesSortControls({
+  sortMode,
+  onSortModeChange,
+  compact = false,
+}: {
+  sortMode: SortMode;
+  onSortModeChange: (mode: SortMode) => void;
+  compact?: boolean;
+}) {
+  const buttonClass = compact ? 'px-2 py-2' : 'px-3 py-2';
+
+  return (
+    <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 shadow-sm">
+      <button
+        type="button"
+        onClick={() => onSortModeChange('events')}
+        className={`inline-flex items-center gap-1.5 rounded-md ${buttonClass} text-sm font-medium transition-colors ${
+          sortMode === 'events' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-50'
+        }`}
+        title="По количеству событий"
+      >
+        <Hash className="h-4 w-4" />
+        <span className="sr-only">По событиям</span>
+      </button>
+      <button
+        type="button"
+        onClick={() => onSortModeChange('asc')}
+        className={`inline-flex items-center gap-1.5 rounded-md ${buttonClass} text-sm font-medium transition-colors ${
+          sortMode === 'asc' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-50'
+        }`}
+        title="По алфавиту А–Я"
+      >
+        <ArrowDownAZ className="h-4 w-4" />
+        <span className="sr-only">А–Я</span>
+      </button>
+      <button
+        type="button"
+        onClick={() => onSortModeChange('desc')}
+        className={`inline-flex items-center gap-1.5 rounded-md ${buttonClass} text-sm font-medium transition-colors ${
+          sortMode === 'desc' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-50'
+        }`}
+        title="По алфавиту Я–А"
+      >
+        <ArrowUpAZ className="h-4 w-4" />
+        <span className="sr-only">Я–А</span>
+      </button>
+    </div>
+  );
+}
+
 function pluralCitiesLabel(count: number): string {
   const mod10 = count % 10;
   const mod100 = count % 100;
@@ -211,15 +228,6 @@ function pluralCitiesLabel(count: number): string {
   if (mod10 === 1) return 'город';
   if (mod10 >= 2 && mod10 <= 4) return 'города';
   return 'городов';
-}
-
-function pluralRegionsLabel(count: number): string {
-  const mod10 = count % 10;
-  const mod100 = count % 100;
-  if (mod100 >= 11 && mod100 <= 19) return 'направлений';
-  if (mod10 === 1) return 'направление';
-  if (mod10 >= 2 && mod10 <= 4) return 'направления';
-  return 'направлений';
 }
 
 function upsertMeta(name: string, content: string) {

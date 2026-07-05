@@ -2,7 +2,15 @@ import { createHash, randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { normalizePublicVenueRecord } from './venue-normalize.js';
+import { normalizePublicVenueRecord, formatBusLocationDisplayName, formatPierLocationDisplayName } from './venue-normalize.js';
+import {
+  resolveCityTimeZone,
+  resolveSessionTimeZone,
+  diffLocalDays,
+  isLocalWeekend,
+  localHourFromInstant,
+  DEFAULT_CITY_TIME_ZONE,
+} from './city-timezone.js';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_DESTINATION_MIN_EVENTS = 1;
@@ -105,6 +113,8 @@ let publicEventRowsCache = null;
 let publicCatalogCache = null;
 let publicEventRowsBuildPromise = null;
 let publicCatalogBuildPromise = null;
+let publicVenueHubCache = null;
+let publicVenueCatalogLists = null;
 
 const LANDING_SLUG_ALIASES = {
   'river-cruises': ['river-walks', 'river-cruise', 'river'],
@@ -243,6 +253,31 @@ export function clearPublicDataCaches() {
   publicCatalogCache = null;
   publicEventRowsBuildPromise = null;
   publicCatalogBuildPromise = null;
+  publicVenueHubCache = null;
+  publicVenueCatalogLists = null;
+}
+
+/** Прогрев тяжёлого каталога и индекса городов (вызывается при старте API). */
+export async function warmPublicCatalogCache(db) {
+  await publicCatalogSessions(db);
+  const rows = await publicVenueHubRows(db, 500);
+  publicVenueCatalogLists = {
+    expiresAt: Date.now() + PUBLIC_CATALOG_CACHE_MS,
+    institution: [],
+    location: [],
+  };
+  for (const row of rows) {
+    const item = mapPublicVenueListItem(row);
+    if (item.template === 'institution') publicVenueCatalogLists.institution.push(item);
+    else publicVenueCatalogLists.location.push(item);
+  }
+}
+
+function warmVenueCatalogList(family) {
+  if (!publicVenueCatalogLists || publicVenueCatalogLists.expiresAt <= Date.now()) return null;
+  if (family === 'institution') return publicVenueCatalogLists.institution;
+  if (family === 'location') return publicVenueCatalogLists.location;
+  return null;
 }
 
 function loadCityRouting() {
@@ -2200,12 +2235,13 @@ function groupPublicEventRows(events) {
 
   for (const event of events) {
     const key = publicEventGroupKey(event);
+    const eventTimeZone = resolveCityTimeZone(event.city, event.destination);
     const slot = event.startsAt
       ? {
           eventId: event.id,
           startsAt: event.startsAt,
-          dateLabel: formatDate(event.startsAt),
-          timeLabel: formatTime(event.startsAt),
+          dateLabel: formatDate(event.startsAt, eventTimeZone),
+          timeLabel: formatTime(event.startsAt, eventTimeZone),
           purchaseUrl: event.offerWidgetUrl || event.offerDeeplinkUrl || buildProviderWidgetUrl(event),
           sourceStatus: event.sourceStatus || null,
           vacant: event.vacant ?? null,
@@ -2276,9 +2312,16 @@ function adminEventGroupKey(event) {
 function publicEventGroupKey(event) {
   const city = resolvePublicSessionCity(event);
   const venue = formatPublicVenueTitle(event.venue) || event.venue;
+  const rawTitle = event.overrideTitle || event.title;
+  const normalizedTitle = normalizeCatalogGroupTitle(rawTitle);
+  let titleForKey = normalizedTitle;
+  if (!titleForKey || isDateLikeCatalogTitle(rawTitle)) {
+    const venueTitle = formatPublicVenueTitle(event.venue) || String(event.venue || '').trim();
+    titleForKey = venueTitle || rawTitle;
+  }
   return [
     normalizeGroupPart(event.sourceLabel || event.source || event.sourceCode || event.sourceName),
-    normalizeGroupPart(event.overrideTitle || event.title),
+    normalizeGroupPart(titleForKey),
     normalizeGroupPart(city),
     normalizeGroupPart(venue),
   ].join('|');
@@ -2330,6 +2373,7 @@ function regroupMappedPublicCatalogSessions(sessions) {
     current.priceFrom = minNullableNumber([current.priceFrom, session.priceFrom]);
     current.vacant = sumNullableNumbers([current.vacant, session.vacant]);
     current.tags = uniqueValues((current.tags || []).concat(session.tags || []));
+    current.title = mergeCatalogDisplayTitle(current.title, session.title, current.venue || session.venue);
     if (session.manualLandingStatus === 'PINNED') current.manualLandingStatus = 'PINNED';
 
     if (shouldPromoteGroupedRepresentative(current, session)) {
@@ -2351,6 +2395,7 @@ function regroupMappedPublicCatalogSessions(sessions) {
   return Array.from(groups.values())
     .map((session) => ({
       ...session,
+      title: resolveCatalogDisplayTitle(session.title, session.venue),
       groupedEventsCount: session.groupEventIds?.length || session.groupedEventsCount || 1,
       sessionCount: session.sessionCount || session.upcomingSlots?.length || 1,
       upcomingSlots: uniqueSlots(session.upcomingSlots || []).sort(
@@ -2555,6 +2600,73 @@ function normalizeGroupPart(value) {
     .trim()
     .toLowerCase()
     .replace(/\s+/g, ' ');
+}
+
+function isDateLikeCatalogTitle(title) {
+  const text = String(title || '').trim();
+  if (!text) return true;
+  if (/^\d{1,2}[./]\d{1,2}(?:[./]\d{2,4})?/u.test(text)) return true;
+  if (/^\d{1,2}:\d{2}/u.test(text)) return true;
+  return false;
+}
+
+/** Убирает дату/время/город из заголовка TC-событий для группировки карточек каталога. */
+function normalizeCatalogGroupTitle(rawTitle) {
+  let text = String(rawTitle || '').replace(/\s+/g, ' ').trim();
+  if (!text) return '';
+
+  text = text
+    .replace(
+      /^\d{1,2}[./]\d{1,2}(?:[./]\d{2,4})?(?:\s*(?:,\s*|\s+в\s+))?\d{1,2}:\d{2}(?:\s*(?:\([^)]{2,40}\))?)?(?:\s*[-–—]\s*)?/iu,
+      '',
+    )
+    .trim();
+  text = text.replace(/\s*\([^)]{2,40}\)\s*$/u, '').trim();
+  text = text.replace(/^\d{1,2}[./]\d{1,2}(?:[./]\d{2,4})?(?:\s*,\s*)?/u, '').trim();
+
+  return text;
+}
+
+function resolveCatalogDisplayTitle(rawTitle, venue) {
+  const normalized = normalizeCatalogGroupTitle(rawTitle);
+  if (normalized.length >= 3 && !isDateLikeCatalogTitle(normalized)) return normalized;
+
+  const cleanRaw = String(rawTitle || '').replace(/\s+/g, ' ').trim();
+  if (cleanRaw && !isDateLikeCatalogTitle(cleanRaw)) return cleanRaw;
+
+  const venueTitle = formatPublicVenueTitle(venue) || String(venue || '').trim();
+  if (venueTitle && venueTitle !== 'Не указано') return venueTitle;
+
+  return cleanRaw || 'Событие';
+}
+
+function mergeCatalogDisplayTitle(currentTitle, candidateTitle, venue) {
+  const candidates = [currentTitle, candidateTitle].filter(Boolean);
+  for (const raw of candidates) {
+    const normalized = normalizeCatalogGroupTitle(raw);
+    if (normalized.length >= 3 && !isDateLikeCatalogTitle(normalized)) return normalized;
+  }
+  for (const raw of candidates) {
+    if (raw && !isDateLikeCatalogTitle(raw)) return String(raw).trim();
+  }
+  return resolveCatalogDisplayTitle(candidates[0], venue);
+}
+
+function catalogGroupTitleSqlExpression(column = 'title') {
+  return `regexp_replace(
+    regexp_replace(
+      regexp_replace(
+        trim(coalesce(${column}, '')),
+        '^\\\\d{1,2}[./]\\\\d{1,2}(?:[./]\\\\d{2,4})?(?:\\\\s*(?:,\\\\s*|\\\\s+в\\\\s+))?\\\\d{1,2}:\\\\d{2}.*',
+        '',
+        'i'
+      ),
+      '\\\\s*\\\\([^)]+\\\\)\\\\s*$',
+      '',
+      'g'
+    ),
+    '\\\\s+', ' ', 'g'
+  )`;
 }
 
 function uniqueValues(values) {
@@ -3232,7 +3344,10 @@ export async function buildCatalogSessions(db, searchParams) {
 
   const sessions = await publicCatalogSessions(db, forceRefresh);
   const coverSessions = sessions.filter(sessionHasCoverImage);
-  const facets = buildCatalogFacets(coverSessions);
+  const facets =
+    !forceRefresh && publicCatalogCache?.catalogFacets
+      ? publicCatalogCache.catalogFacets
+      : buildCatalogFacets(coverSessions);
   const rows = coverSessions.filter((session) => {
     if (destination && destination !== 'all' && session.destination !== destination) return false;
     if (city && city !== 'all' && session.city !== city && session.destination !== city) return false;
@@ -3398,8 +3513,10 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
   const venueHeroImageFallbacks = buildActiveVenueEventCounts(catalogSessions).heroImageFallbacks;
   const mergedGroup = findMergedVenueGroup(hubRows, venue.id);
   const venueIds = mergedGroup?.mergedVenueIds || [venue.id];
-  const sessions = catalogSessions.filter((session) => venueIds.includes(session.venueId)).slice(0, 120);
+  const sessions = lookupVenueCatalogSessions(venueIds, catalogSessions).slice(0, 120);
   if (!sessions.length) return null;
+  const waterEvents = sessions.filter(isWaterCatalogSession).length;
+  const busEvents = sessions.filter(isBusCatalogSession).length;
   const canonicalVenue =
     mergedGroup && mergedGroup.id !== venue.id ? (await resolvePublicVenueRow(db, mergedGroup.id)) || venue : venue;
   const relatedVenues = await publicRelatedVenues(db, venue.id, venue.city, 6, hubRows);
@@ -3412,6 +3529,9 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
         pageStatus: canonicalVenue.pageStatus,
         address: canonicalVenue.address,
         events: sessions.length,
+        busEvents,
+        waterEvents,
+        totalEvents: sessions.length,
       },
       { requireEvents: false },
     )
@@ -3421,21 +3541,26 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
   const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
   const routeCount = new Set(sessions.map((session) => session.groupKey || session.id).filter(Boolean)).size || sessions.length;
-  const displayName = formatPublicVenueTitle(canonicalVenue.title);
-  const normalizedVenue = applyPublicVenueNormalization({
-    name: displayName,
-    title: displayName,
-    address: mergedGroup?.address || canonicalVenue.address,
-    city: canonicalVenue.city || 'Не указан',
-  });
-  const waterEvents = sessions.filter(isWaterCatalogSession).length;
-  const busEvents = sessions.filter(isBusCatalogSession).length;
   const resolvedType = resolvePublicVenueKind(canonicalVenue.kind, canonicalVenue.title, canonicalVenue.address, {
     shortDescription: mergedGroup?.shortDescription || canonicalVenue.shortDescription,
     description: canonicalVenue.description,
     waterEvents,
     busEvents,
     totalEvents: sessions.length,
+  });
+  const displayName = applyPublicVenueDisplayName(
+    {
+      name: formatPublicVenueTitle(canonicalVenue.title),
+      address: mergedGroup?.address || canonicalVenue.address,
+      city: canonicalVenue.city || 'Не указан',
+    },
+    resolvedType,
+  );
+  const normalizedVenue = applyPublicVenueNormalization({
+    name: displayName,
+    title: displayName,
+    address: mergedGroup?.address || canonicalVenue.address,
+    city: canonicalVenue.city || 'Не указан',
   });
   const hasDescription = Boolean(String(canonicalVenue.description || mergedGroup?.shortDescription || canonicalVenue.shortDescription || '').trim());
   const hasAddress = Boolean(String(normalizedVenue.address || '').trim());
@@ -3494,13 +3619,16 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
 
 export async function buildPublicCityPage(db, citySlugOrId) {
   const requestedSlug = String(citySlugOrId || '').toLowerCase();
-  const catalogSessions = await publicCatalogSessions(db);
-  const matchedSessions = catalogSessions.filter((session) => matchesPublicDestinationPage(session, citySlugOrId, requestedSlug));
+  const [catalogSessions, venueHubRows] = await Promise.all([
+    publicCatalogSessions(db),
+    publicVenueHubRows(db, 500),
+  ]);
+  const matchedSessions = lookupDestinationCatalogSessions(citySlugOrId, requestedSlug, catalogSessions);
   if (!matchedSessions.length) return null;
 
   const destination = publicDestinationFromSession(matchedSessions[0]);
   const sessions = matchedSessions.slice(0, 160);
-  const cityVenues = await publicVenuesForSessions(db, sessions, 24);
+  const cityVenues = publicVenuesForSessionsFromHub(sessions, venueHubRows, 24);
   const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
   const landings = buildPublicLandings(sessions).filter((landing) => landing.events > 0);
@@ -3741,12 +3869,15 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   const eventDestination = publicDestinationForCity(event);
 
   const requestedSlug = publicEventSlug(eventSlugOrId);
-  const targetPublicSession = catalogSessions.find((session) =>
-    session.id === event.id ||
-    session.sourceSlug === event.slug ||
-    session.slug === requestedSlug ||
-    sessionGroupIds(session).includes(event.id)
-  );
+  const targetPublicSession =
+    lookupCatalogSessionBySlug(eventSlugOrId, catalogSessions) ||
+    catalogSessions.find(
+      (session) =>
+        session.id === event.id ||
+        session.sourceSlug === event.slug ||
+        session.slug === requestedSlug ||
+        sessionGroupIds(session).includes(event.id),
+    );
   const fallbackPublicRow = {
     ...event,
     source: event.sourceName || publicSourceLabel(event.sourceCode) || 'Источник',
@@ -3894,6 +4025,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     sourceCitySlug: event.citySourceSlug,
     destination: eventDestination.name,
     destinationType: eventDestination.type,
+    timeZone: resolveCityTimeZone(event.city, eventDestination.name),
     venueId: event.venueId,
     venueSlug: event.venueSlug,
     venue: event.venue || 'Не указано',
@@ -3937,6 +4069,8 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       endsAt: session.endsAt,
       kind: event.kind,
       sourceStatus: session.sourceStatus,
+      city: event.city,
+      destination: eventDestination.name,
     });
     return {
       id: session.id,
@@ -3946,6 +4080,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       dateLabel: schedule.dateLabel,
       timeLabel: schedule.timeLabel,
       timeBucket: schedule.timeBucket,
+      timeZone: schedule.timeZone,
       sourceStatus: session.sourceStatus,
       eventSourceStatus: session.eventSourceStatus,
       priceFrom: displayPriceFrom(session.priceFromRub, baseEvent.priceFrom),
@@ -3977,13 +4112,24 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   const publicSessions = sessions.length ? sessions : widgetOnlySessions;
   applyEventPrimaryPurchase(baseEvent, publicSessions, event.sourceCode || primaryOffer?.sourceCode);
   const ticketPrices = buildPublicTicketPrices(publicOffers, publicSessions, baseEvent);
-  const related = [];
-  for (const session of catalogSessions) {
-    if (related.length >= 12) break;
-    if (sessionGroupIds(session).some((id) => groupEventIds.includes(id))) continue;
-    if (session.cityId !== event.cityId && session.category !== event.category) continue;
-    related.push(session);
-  }
+  const relatedCandidates = catalogSessions.filter((session) => {
+    if (sessionGroupIds(session).some((id) => groupEventIds.includes(id))) return false;
+    if (event.cityId && session.cityId) return session.cityId === event.cityId;
+    return normalizeGroupPart(session.city) === normalizeGroupPart(event.city);
+  });
+  relatedCandidates.sort((left, right) => {
+    const score = (session) => {
+      let value = 0;
+      if (session.category === event.category) value += 2;
+      if (session.venueKind && session.venueKind === event.venueKind) value += 1;
+      if (session.venueId && session.venueId === event.venueId) value += 3;
+      return value;
+    };
+    const byScore = score(right) - score(left);
+    if (byScore !== 0) return byScore;
+    return String(left.startsAt || '').localeCompare(String(right.startsAt || ''));
+  });
+  const related = relatedCandidates.slice(0, 12);
   const priceValues = [baseEvent.priceFrom, ...publicSessions.map((session) => session.priceFrom)].filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const vacantValues = publicSessions.map((session) => session.vacant).filter((value) => Number.isFinite(value));
 
@@ -4580,6 +4726,30 @@ function formatPublicVenueTitle(value) {
     .trim();
 }
 
+function isVenueHallSuffix(suffix) {
+  const key = normalizeVenueTextKey(suffix);
+  if (!key) return true;
+  if (
+    /^(основной|малый|большой|маленький|верхний|нижний|концертный|выставочный|камерный|банкетный|театральный|красный|черный|белый|синий|зеленый|vip)(\s+зал)?$/.test(
+      key,
+    )
+  ) {
+    return true;
+  }
+  if (/^зал(\s+[a-zа-яё0-9\-]+)?$/i.test(key)) return true;
+  return false;
+}
+
+function canonicalVenueMergeTitle(name) {
+  let title = String(formatPublicVenueTitle(name) || '').trim();
+  if (!title) return title;
+
+  const segments = title.split(/\s*\|\s*/).map((part) => part.trim()).filter(Boolean);
+  if (segments.length <= 1) return title;
+  if (segments.slice(1).every((part) => isVenueHallSuffix(part))) return segments[0];
+  return title;
+}
+
 function applyPublicVenueNormalization(row = {}) {
   const normalized = normalizePublicVenueRecord({
     id: row.id,
@@ -4612,7 +4782,7 @@ function venueTitleLooksLikeAddress(name) {
 }
 
 function canonicalVenueAddressKey(name, address) {
-  let text = normalizeVenueTextKey(`${formatPublicVenueTitle(name) || ''} ${address || ''}`);
+  let text = normalizeVenueTextKey(`${canonicalVenueMergeTitle(name) || formatPublicVenueTitle(name) || ''} ${address || ''}`);
   text = text
     .replace(/(?:^|\s)причал(?:\s|$)/g, ' ')
     .replace(/(?:^|\s)наб(?:\s|$)/g, ' набережная ')
@@ -4623,7 +4793,7 @@ function canonicalVenueAddressKey(name, address) {
 }
 
 function normalizePublicVenueMergeKey(name, city, address) {
-  const title = normalizeVenueTextKey(formatPublicVenueTitle(name));
+  const title = normalizeVenueTextKey(canonicalVenueMergeTitle(name));
   const cityKey = normalizeVenueTextKey(city || 'не указан');
 
   if (/причал/i.test(`${name || ''} ${address || ''}`)) {
@@ -4793,14 +4963,19 @@ function mergePublicVenueHubRows(rows) {
   const merged = [];
   for (const items of groups.values()) {
     if (items.length === 1) {
-      merged.push({ ...items[0], mergedVenueIds: [items[0].id] });
+      const only = items[0];
+      const canonicalName = canonicalVenueMergeTitle(only.name || only.title) || only.name;
+      merged.push({ ...only, name: canonicalName, title: canonicalName, mergedVenueIds: [only.id] });
       continue;
     }
 
     const sorted = [...items].sort((a, b) => venueRowMergeScore(b) - venueRowMergeScore(a));
     const primary = sorted[0];
+    const canonicalName = canonicalVenueMergeTitle(primary.name || primary.title) || primary.name;
     merged.push({
       ...primary,
+      name: canonicalName,
+      title: canonicalName,
       city: resolvePublicVenueCity(primary),
       events: items.reduce((sum, item) => sum + (Number(item.events) || 0), 0),
       waterEvents: items.reduce((sum, item) => sum + (Number(item.waterEvents) || 0), 0),
@@ -4827,6 +5002,12 @@ function venueGroupsOverlap(a, b) {
 }
 
 async function publicVenueHubRows(db, limit = 500, options = {}) {
+  const now = Date.now();
+  const cacheKey = `${limit}:${options.requireEvents === false ? 'all' : 'hub'}`;
+  if (publicVenueHubCache?.cacheKey === cacheKey && publicVenueHubCache.expiresAt > now) {
+    return publicVenueHubCache.rows;
+  }
+
   const [rows, sessions] = await Promise.all([venueRows(db, limit), publicCatalogSessions(db)]);
   const { activeCounts, waterCounts, busCounts, heroImageFallbacks } = buildActiveVenueEventCounts(sessions);
   const enriched = rows.map((row) => ({
@@ -4836,7 +5017,25 @@ async function publicVenueHubRows(db, limit = 500, options = {}) {
     busEvents: busCounts.get(row.id) || 0,
     heroImageUrl: resolveVenueHeroImageUrl(row, heroImageFallbacks),
   }));
-  return mergePublicVenueHubRows(enriched.filter((row) => isPublicVenueHub(row, options)));
+  const merged = mergePublicVenueHubRows(enriched.filter((row) => isPublicVenueHub(row, options)));
+  publicVenueHubCache = {
+    cacheKey,
+    expiresAt: now + PUBLIC_CATALOG_CACHE_MS,
+    rows: merged,
+  };
+  if (!publicVenueCatalogLists || publicVenueCatalogLists.expiresAt <= now) {
+    publicVenueCatalogLists = {
+      expiresAt: now + PUBLIC_CATALOG_CACHE_MS,
+      institution: [],
+      location: [],
+    };
+    for (const row of merged) {
+      const item = mapPublicVenueListItem(row);
+      if (item.template === 'institution') publicVenueCatalogLists.institution.push(item);
+      else publicVenueCatalogLists.location.push(item);
+    }
+  }
+  return merged;
 }
 
 const PUBLIC_VENUE_ROW_SELECT = `
@@ -5307,6 +5506,10 @@ function hasBusOnlyEvents(busEvents, totalEvents) {
   return total > 0 && bus >= total;
 }
 
+function hasActiveBusCatalogEvents(busEvents) {
+  return Number(busEvents || 0) > 0;
+}
+
 function hasBusLikeText(name, address) {
   const text = venueNameAddressText(name, address);
   if (
@@ -5343,7 +5546,7 @@ function isJunkPublicVenueRow(row) {
   if (/^wc\b|^туалет\b|^кондиционер\b/i.test(name)) return true;
 
   const resolved = resolvePublicVenueKindFromRow(row);
-  if (resolved === 'meeting_point') return true;
+  if (resolved === 'meeting_point' && !hasActiveBusCatalogEvents(row?.busEvents)) return true;
 
   return false;
 }
@@ -5483,10 +5686,11 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
   const inferred = inferPublicVenueKindFromName(name, address);
   const { shortDescription, description, waterEvents = 0, busEvents = 0, totalEvents = 0 } = options;
   const text = venueNameAddressText(name, address);
-  const busByEvents =
+  const busByAllEvents =
     hasBusOnlyEvents(busEvents, totalEvents) && !/teplohod|теплоход|причал|пристань/i.test(text);
+  const busByCatalogEvents = hasActiveBusCatalogEvents(busEvents);
 
-  if (inferred === 'bus' || hasBusLikeText(name, address) || busByEvents) {
+  if (inferred === 'bus' || hasBusLikeText(name, address) || busByAllEvents || busByCatalogEvents) {
     return 'bus';
   }
 
@@ -5537,7 +5741,9 @@ function isPublicVenueHub(row, options = {}) {
   const requireEvents = options.requireEvents !== false;
   if (!row) return false;
   const kind = normalizeVenueKindValue(row.kind || row.proposedKind);
-  if (PUBLIC_VENUE_HUB_EXCLUDED_KINDS.has(kind)) return false;
+  if (PUBLIC_VENUE_HUB_EXCLUDED_KINDS.has(kind)) {
+    if (!(kind === 'MEETING_POINT' && hasActiveBusCatalogEvents(row.busEvents))) return false;
+  }
   if (isMeetingPointLikeRow(row)) return false;
   if (isJunkPublicVenueRow(row)) return false;
   if (String(row.pageStatus || '').toUpperCase() === 'HIDDEN') return false;
@@ -5545,13 +5751,21 @@ function isPublicVenueHub(row, options = {}) {
   return true;
 }
 
+function applyPublicVenueDisplayName(row, type) {
+  const name = row.name || row.title;
+  if (type === 'bus') return formatBusLocationDisplayName(name, row.address, row.city);
+  if (type === 'pier') return formatPierLocationDisplayName(name, row.address, row.city);
+  return name;
+}
+
 function mapPublicVenueListItem(row) {
   const normalized = applyPublicVenueNormalization(row);
   const type = resolvePublicVenueKindFromRow(normalized);
+  const name = applyPublicVenueDisplayName(normalized, type);
   return {
     id: normalized.id,
     slug: normalized.slug,
-    name: normalized.name,
+    name,
     city: normalized.city,
     address: normalized.address,
     type,
@@ -5570,6 +5784,26 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   const cityFilter = String(searchParams.get('city') || '').trim().toLowerCase();
   const typeFilter = String(searchParams.get('type') || '').trim().toLowerCase();
   const familyFilter = String(searchParams.get('family') || '').trim().toLowerCase();
+
+  if (!query && !cityFilter && !typeFilter && familyFilter) {
+    const warmList = warmVenueCatalogList(familyFilter);
+    if (warmList) {
+      const venues = warmList.slice(0, limit);
+      const cities = countBy(venues.map((venue) => venue.city).filter(Boolean));
+      const types = countBy(venues.map((venue) => venue.type).filter(Boolean));
+      return {
+        generatedAt: new Date().toISOString(),
+        total: venues.length,
+        venues,
+        stats: {
+          venues: venues.length,
+          cities,
+          types,
+        },
+      };
+    }
+  }
+
   const rows = await publicVenueHubRows(db, 500);
   const venues = rows
     .filter((row) => {
@@ -5734,7 +5968,10 @@ async function destinationSummaryRowsFast(db) {
           concat_ws(
             '|',
             lower(regexp_replace(trim(coalesce("sourceLabel", '')), '\\s+', ' ', 'g')),
-            lower(regexp_replace(trim(coalesce(title, '')), '\\s+', ' ', 'g')),
+            lower(regexp_replace(trim(coalesce(
+              nullif(trim(${catalogGroupTitleSqlExpression('title')}), ''),
+              trim(coalesce(venue, ''))
+            )), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
           ) as "groupKey"
@@ -5864,6 +6101,152 @@ function canonicalCitySlug(value) {
   return CITY_SLUG_CANONICAL[slug] || slug;
 }
 
+function destinationSessionIndexKeys(session) {
+  const destination = publicDestinationFromSession(session);
+  const keys = new Set();
+  const add = (value) => {
+    const normalized = String(value || '').trim();
+    if (!normalized) return;
+    keys.add(normalized.toLowerCase());
+    const canonical = canonicalCitySlug(normalized);
+    if (canonical) keys.add(canonical.toLowerCase());
+  };
+
+  add(destination.id);
+  add(destination.slug);
+  add(destination.sourceSlug);
+  add(destination.name);
+  add(session.cityId);
+  add(session.sourceCitySlug);
+  add(session.city);
+
+  return keys;
+}
+
+function buildDestinationSessionIndex(sessions) {
+  const index = new Map();
+  for (const session of sessions) {
+    for (const key of destinationSessionIndexKeys(session)) {
+      if (!index.has(key)) index.set(key, []);
+      index.get(key).push(session);
+    }
+  }
+  return index;
+}
+
+function buildVenueSessionIndex(sessions) {
+  const index = new Map();
+  const add = (key, session) => {
+    if (!key) return;
+    const normalized = String(key).toLowerCase();
+    if (!index.has(normalized)) index.set(normalized, []);
+    index.get(normalized).push(session);
+  };
+
+  for (const session of sessions) {
+    add(session.venueId, session);
+    add(session.venueSlug, session);
+    if (session.venueSlug) add(canonicalCitySlug(session.venueSlug), session);
+  }
+
+  return index;
+}
+
+function buildCatalogSlugIndex(sessions) {
+  const index = new Map();
+  const add = (key, session) => {
+    if (!key) return;
+    const normalized = String(key).toLowerCase();
+    if (!index.has(normalized)) index.set(normalized, session);
+  };
+
+  for (const session of sessions) {
+    add(session.id, session);
+    add(session.slug, session);
+    add(session.sourceSlug, session);
+    if (session.sourceSlug) add(publicEventSlug(session.sourceSlug), session);
+    if (session.slug) add(publicEventSlug(session.slug), session);
+    for (const eventId of session.groupEventIds || []) add(eventId, session);
+  }
+
+  return index;
+}
+
+function lookupVenueCatalogSessions(venueIds, catalogSessions) {
+  if (!venueIds?.length) return [];
+
+  const index = publicCatalogCache?.venueIndex;
+  if (index) {
+    const seen = new Set();
+    const result = [];
+    for (const venueId of venueIds) {
+      for (const session of index.get(String(venueId).toLowerCase()) || []) {
+        if (seen.has(session.id)) continue;
+        seen.add(session.id);
+        result.push(session);
+      }
+    }
+    if (result.length) {
+      return result.sort((a, b) => {
+        const aTime = Date.parse(a.startsAt || '') || Number.POSITIVE_INFINITY;
+        const bTime = Date.parse(b.startsAt || '') || Number.POSITIVE_INFINITY;
+        return aTime - bTime || String(a.title || '').localeCompare(String(b.title || ''), 'ru');
+      });
+    }
+  }
+
+  const idSet = new Set(venueIds);
+  return catalogSessions.filter((session) => idSet.has(session.venueId));
+}
+
+function lookupCatalogSessionBySlug(slugOrId, catalogSessions = null) {
+  const value = String(slugOrId || '').trim();
+  if (!value) return null;
+
+  const requestedSlug = publicEventSlug(value);
+  const keys = [value, requestedSlug].filter(Boolean).map((key) => String(key).toLowerCase());
+  const index = publicCatalogCache?.slugIndex;
+  if (index) {
+    for (const key of keys) {
+      const hit = index.get(key);
+      if (hit) return hit;
+    }
+  }
+
+  const sessions = catalogSessions || publicCatalogCache?.sessions || [];
+  return (
+    sessions.find(
+      (session) =>
+        session.id === value ||
+        session.slug === requestedSlug ||
+        session.sourceSlug === value ||
+        publicEventSlug(session.sourceSlug) === requestedSlug ||
+        (session.groupEventIds || []).includes(value),
+    ) || null
+  );
+}
+
+function lookupDestinationCatalogSessions(citySlugOrId, requestedSlug, catalogSessions) {
+  const index = publicCatalogCache?.destinationIndex;
+  if (index) {
+    for (const key of [requestedSlug, String(citySlugOrId || '').toLowerCase(), canonicalCitySlug(citySlugOrId)].filter(Boolean)) {
+      const hit = index.get(String(key).toLowerCase());
+      if (hit?.length) return hit;
+    }
+  }
+
+  return catalogSessions.filter((session) => matchesPublicDestinationPage(session, citySlugOrId, requestedSlug));
+}
+
+function publicVenuesForSessionsFromHub(sessions, hubRows, limit) {
+  const venueIds = new Set(sessions.map((session) => session.venueId).filter(Boolean));
+  if (!venueIds.size) return [];
+  return hubRows
+    .filter((row) => (row.mergedVenueIds || [row.id]).some((id) => venueIds.has(id)))
+    .slice(0, limit)
+    .map(mapPublicVenueListItem);
+}
+
 function matchesPublicDestinationPage(session, citySlugOrId, requestedSlug) {
   const destination = publicDestinationFromSession(session);
   const requested = canonicalCitySlug(requestedSlug);
@@ -5968,6 +6351,10 @@ async function publicCatalogSessions(db, forceRefresh = false) {
     publicCatalogCache = {
       expiresAt: Date.now() + PUBLIC_CATALOG_CACHE_MS,
       sessions: rows,
+      destinationIndex: buildDestinationSessionIndex(rows),
+      venueIndex: buildVenueSessionIndex(rows),
+      slugIndex: buildCatalogSlugIndex(rows),
+      catalogFacets: buildCatalogFacets(rows.filter(sessionHasCoverImage)),
     };
 
     return rows;
@@ -6115,7 +6502,10 @@ async function publicCatalogSessionsFast(db) {
           concat_ws(
             '|',
             lower(regexp_replace(trim(coalesce("sourceLabel", '')), '\\s+', ' ', 'g')),
-            lower(regexp_replace(trim(coalesce(title, '')), '\\s+', ' ', 'g')),
+            lower(regexp_replace(trim(coalesce(
+              nullif(trim(${catalogGroupTitleSqlExpression('title')}), ''),
+              trim(coalesce(venue, ''))
+            )), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
           ) as "groupKey"
@@ -6255,6 +6645,7 @@ function isWideLifetimeSession(startsAt, endsAt) {
 }
 
 function publicSessionScheduleLabels(row) {
+  const timeZone = resolveCityTimeZone(row.city, row.destination);
   if (!isOpenDateCatalogRow(row)) {
     if (isWideLifetimeSession(row.startsAt, row.endsAt)) {
       return {
@@ -6262,14 +6653,16 @@ function publicSessionScheduleLabels(row) {
         dateLabel: 'Даты в виджете',
         timeLabel: 'При покупке',
         timeBucket: 'day',
+        timeZone,
       };
     }
 
     return {
       startsAt: normalizeStartsAt(row.startsAt) || '',
-      dateLabel: formatDate(row.startsAt),
-      timeLabel: formatTime(row.startsAt),
-      timeBucket: timeBucket(row.startsAt),
+      dateLabel: formatDate(row.startsAt, timeZone),
+      timeLabel: formatTime(row.startsAt, timeZone),
+      timeBucket: timeBucket(row.startsAt, timeZone),
+      timeZone,
     };
   }
 
@@ -6278,6 +6671,7 @@ function publicSessionScheduleLabels(row) {
     dateLabel: 'Открытая дата',
     timeLabel: 'В виджете',
     timeBucket: 'day',
+    timeZone,
   };
 }
 
@@ -6366,6 +6760,18 @@ function inferCityNameFromText(...parts) {
   return null;
 }
 
+function resolvePublicSessionDisplayCity(row) {
+  const raw = cleanDisplayName(row.city);
+  const canonical = canonicalizePublicCityName(raw);
+  if (canonical && canonical !== 'Не указан') return canonical;
+
+  const inferred = inferCityNameFromText(row.title, row.venue, row.venueAddress, ...(row.tags || []));
+  if (inferred) return canonicalizePublicCityName(inferred) || inferred;
+
+  if (raw && raw !== 'Не указан') return raw;
+  return 'Не указан';
+}
+
 function resolvePublicSessionCity(row) {
   const inferred = inferCityNameFromText(row.title, row.venue, row.venueAddress, ...(row.tags || []));
   const raw = cleanDisplayName(row.city);
@@ -6379,16 +6785,19 @@ function resolvePublicSessionCity(row) {
 
 function mapGroupedPublicSession(row, pinnedEventIds = new Set()) {
   const tags = row.tags || [];
-  const cityName = resolvePublicSessionCity(row);
-  const destination = publicDestinationForCity({ ...row, city: cityName });
+  const displayCity = resolvePublicSessionDisplayCity(row);
+  const groupCity = resolvePublicSessionCity(row);
+  const destination = publicDestinationForCity({ ...row, city: row.city || displayCity });
   const fallbackWidgetUrl = buildProviderWidgetUrl(row);
   const purchase = purchaseInfo(row);
   const purchaseUrl = purchase.url || fallbackWidgetUrl;
   const groupEventIds = (row.groupEventIds || [row.id]).slice(0, 12);
   const manualLandingStatus = groupEventIds.some((id) => pinnedEventIds.has(id)) ? 'PINNED' : null;
+  const schedule = publicSessionScheduleLabels(row);
+  const timeZone = schedule.timeZone || resolveCityTimeZone(displayCity, destination?.name);
   const upcomingSlots = (Array.isArray(row.upcomingSlots) ? row.upcomingSlots : [])
     .filter((slot) => slot?.startsAt)
-    .slice(0, 8)
+    .slice(0, 12)
     .map((slot) => {
       const slotPurchase = purchaseInfo({
         sourceCode: slot.sourceCode || row.sourceCode,
@@ -6400,8 +6809,8 @@ function mapGroupedPublicSession(row, pinnedEventIds = new Set()) {
       return {
         eventId: slot.eventId,
         startsAt: normalizeStartsAt(slot.startsAt),
-        dateLabel: formatDate(slot.startsAt),
-        timeLabel: formatTime(slot.startsAt),
+        dateLabel: formatDate(slot.startsAt, timeZone),
+        timeLabel: formatTime(slot.startsAt, timeZone),
         purchaseUrl: slotPurchase.url || purchaseUrl,
         sourceStatus: slot.sourceStatus || row.sourceStatus || null,
         purchaseReady: slotPurchase.ready,
@@ -6409,22 +6818,21 @@ function mapGroupedPublicSession(row, pinnedEventIds = new Set()) {
       };
     });
 
-  const schedule = publicSessionScheduleLabels(row);
-  const ruleEvent = buildLandingRuleEvent({ ...row, city: cityName }, tags, destination, row.category || 'unknown');
+  const ruleEvent = buildLandingRuleEvent({ ...row, city: displayCity }, tags, destination, row.category || 'unknown');
   const session = {
     id: row.id,
     slug: publicEventSlug(row.slug),
     sourceSlug: row.slug,
-    groupKey: publicEventGroupKey({ ...row, city: cityName }),
+    groupKey: publicEventGroupKey({ ...row, city: groupCity }),
     groupEventIds,
     groupedEventsCount: row.groupedEventsCount || 1,
     sessionCount: row.sessionCount || upcomingSlots.length || 1,
     upcomingSlots,
-    title: row.overrideTitle || row.title,
+    title: resolveCatalogDisplayTitle(row.overrideTitle || row.title, row.venue),
     cityId: row.cityId,
     citySlug: destination.slug,
     sourceCitySlug: row.citySlug,
-    city: cityName,
+    city: displayCity,
     destination: destination.name,
     destinationType: destination.type,
     venueId: row.venueId,
@@ -6451,6 +6859,7 @@ function mapGroupedPublicSession(row, pinnedEventIds = new Set()) {
     dateLabel: schedule.dateLabel,
     timeLabel: schedule.timeLabel,
     timeBucket: schedule.timeBucket,
+    timeZone,
     priceFrom: row.priceFrom,
     vacant: row.vacant,
     ageLimit: row.ageLimit ?? null,
@@ -6696,16 +7105,13 @@ function matchesCatalogDate(session, dateFilter) {
   const startsAt = new Date(session.startsAt);
   if (!Number.isFinite(startsAt.getTime())) return false;
 
-  const today = startOfLocalDay(new Date());
-  const eventDay = startOfLocalDay(startsAt);
-  const diffDays = Math.round((eventDay.getTime() - today.getTime()) / 86400000);
+  const timeZone = session.timeZone || resolveSessionTimeZone(session);
+  const diffDays = diffLocalDays(startsAt, new Date(), timeZone);
+  if (diffDays == null) return false;
 
   if (dateFilter === 'today') return diffDays === 0;
   if (dateFilter === 'tomorrow') return diffDays === 1;
-  if (dateFilter === 'weekend') {
-    const day = startsAt.getDay();
-    return day === 0 || day === 6;
-  }
+  if (dateFilter === 'weekend') return isLocalWeekend(startsAt, timeZone);
   if (dateFilter === 'evening') return session.timeBucket === 'evening' || session.timeBucket === 'night';
 
   return true;
@@ -6735,14 +7141,15 @@ function mapPublicSession(row) {
     row.sourceCategory,
   );
   const schedule = publicSessionScheduleLabels(row);
+  const timeZone = schedule.timeZone || resolveCityTimeZone(row.city, row.destination);
   const upcomingSlots = Array.isArray(row.upcomingSlots) && row.upcomingSlots.length
     ? row.upcomingSlots
     : row.startsAt
       ? [{
           eventId: row.id,
           startsAt: normalizeStartsAt(row.startsAt),
-          dateLabel: formatDate(row.startsAt),
-          timeLabel: formatTime(row.startsAt),
+          dateLabel: formatDate(row.startsAt, timeZone),
+          timeLabel: formatTime(row.startsAt, timeZone),
           purchaseUrl,
         }]
       : [];
@@ -6758,8 +7165,8 @@ function mapPublicSession(row) {
     upcomingSlots: upcomingSlots.slice(0, 8).map((slot) => ({
       eventId: slot.eventId,
       startsAt: normalizeStartsAt(slot.startsAt),
-      dateLabel: slot.dateLabel || formatDate(slot.startsAt),
-      timeLabel: slot.timeLabel || formatTime(slot.startsAt),
+      dateLabel: slot.dateLabel || formatDate(slot.startsAt, timeZone),
+      timeLabel: slot.timeLabel || formatTime(slot.startsAt, timeZone),
       purchaseUrl: slot.purchaseUrl,
     })),
     landingSlugs: resolveLandingSlugsForSession(ruleEvent, { startsAt: row.startsAt, upcomingSlots }),
@@ -6792,6 +7199,7 @@ function mapPublicSession(row) {
     dateLabel: schedule.dateLabel,
     timeLabel: schedule.timeLabel,
     timeBucket: schedule.timeBucket,
+    timeZone,
     priceFrom: row.priceFrom,
     vacant: row.vacant,
     imageUrl: resolvePublicSessionImageUrl(row),
@@ -6823,8 +7231,10 @@ async function publicRelatedVenues(db, venueId, city, limit, hubRows = null) {
   if (!city) return [];
   const rows = hubRows || (await publicVenueHubRows(db, 500));
   const current = findMergedVenueGroup(rows, venueId);
+  const currentTemplate = publicVenuePageTemplate(resolvePublicVenueKindFromRow(current || {}));
   return rows
     .filter((row) => row.city === city && isPublicVenueHub(row) && !venueGroupsOverlap(current, row))
+    .filter((row) => publicVenuePageTemplate(resolvePublicVenueKindFromRow(row)) === currentTemplate)
     .slice(0, limit)
     .map(mapPublicVenueListItem);
 }
@@ -6860,14 +7270,7 @@ async function resolvePublicEventId(db, eventSlugOrId, catalogSessions = null) {
   }
 
   const requestedSlug = publicEventSlug(value);
-  const sessions = catalogSessions || (await publicCatalogSessions(db));
-  const fromCatalog = sessions.find(
-    (session) =>
-      session.id === value ||
-      session.slug === requestedSlug ||
-      session.sourceSlug === value ||
-      publicEventSlug(session.sourceSlug) === requestedSlug,
-  );
+  const fromCatalog = lookupCatalogSessionBySlug(value, catalogSessions);
   if (fromCatalog?.id) return fromCatalog.id;
 
   return null;
@@ -7017,19 +7420,12 @@ function collectSessionSlots(session) {
   return [];
 }
 
-function moscowHourFromStartsAt(value) {
-  const date = parseSessionStartsAt(value);
-  if (!Number.isFinite(date.getTime())) return Number.NaN;
-  const hourPart = new Intl.DateTimeFormat('en-GB', {
-    timeZone: SITE_TIME_ZONE,
-    hour: 'numeric',
-    hour12: false,
-  }).formatToParts(date).find((part) => part.type === 'hour');
-  return Number(hourPart?.value);
+function moscowHourFromStartsAt(value, timeZone = DEFAULT_CITY_TIME_ZONE) {
+  return localHourFromInstant(value, timeZone);
 }
 
-function slotMatchesMinHour(startsAt, minHour, includeStartsAtHourUntil = 0) {
-  const hour = moscowHourFromStartsAt(startsAt);
+function slotMatchesMinHour(startsAt, minHour, includeStartsAtHourUntil = 0, timeZone = DEFAULT_CITY_TIME_ZONE) {
+  const hour = moscowHourFromStartsAt(startsAt, timeZone);
   if (!Number.isFinite(hour)) return false;
   if (hour >= minHour) return true;
   return includeStartsAtHourUntil > 0 && hour < includeStartsAtHourUntil;
@@ -7038,19 +7434,21 @@ function slotMatchesMinHour(startsAt, minHour, includeStartsAtHourUntil = 0) {
 function sessionMatchesLandingSchedule(session, rule) {
   if (rule.minStartsAtHour == null) return true;
   const until = rule.includeStartsAtHourUntil ?? 0;
-  return collectSessionSlots(session).some((slot) => slotMatchesMinHour(slot.startsAt, rule.minStartsAtHour, until));
+  const timeZone = session.timeZone || resolveSessionTimeZone(session);
+  return collectSessionSlots(session).some((slot) => slotMatchesMinHour(slot.startsAt, rule.minStartsAtHour, until, timeZone));
 }
 
 function applyLandingScheduleToSession(session, rule) {
   if (rule.minStartsAtHour == null) return session;
   const until = rule.includeStartsAtHourUntil ?? 0;
+  const timeZone = session.timeZone || resolveSessionTimeZone(session);
   const slots = collectSessionSlots(session)
-    .filter((slot) => slotMatchesMinHour(slot.startsAt, rule.minStartsAtHour, until))
+    .filter((slot) => slotMatchesMinHour(slot.startsAt, rule.minStartsAtHour, until, timeZone))
     .map((slot) => ({
       eventId: slot.eventId || session.id,
       startsAt: normalizeStartsAt(slot.startsAt),
-      dateLabel: slot.dateLabel || formatDate(slot.startsAt),
-      timeLabel: slot.timeLabel || formatTime(slot.startsAt),
+      dateLabel: slot.dateLabel || formatDate(slot.startsAt, timeZone),
+      timeLabel: slot.timeLabel || formatTime(slot.startsAt, timeZone),
       purchaseUrl: slot.purchaseUrl || session.purchaseUrl,
     }));
   if (!slots.length) return null;
@@ -7062,7 +7460,7 @@ function applyLandingScheduleToSession(session, rule) {
     startsAt: primary.startsAt,
     dateLabel: primary.dateLabel,
     timeLabel: primary.timeLabel,
-    timeBucket: timeBucket(primary.startsAt),
+    timeBucket: timeBucket(primary.startsAt, timeZone),
     sessionCount: slots.length,
   };
 }
@@ -7435,39 +7833,31 @@ function normalizeStartsAt(value) {
   return date.toISOString();
 }
 
-function formatDate(value) {
+function formatDate(value, timeZone = SITE_TIME_ZONE) {
   const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return '';
   return new Intl.DateTimeFormat('ru-RU', {
     day: 'numeric',
     month: 'short',
     weekday: 'short',
-    timeZone: SITE_TIME_ZONE,
+    timeZone,
   }).format(date);
 }
 
-function formatTime(value) {
+function formatTime(value, timeZone = SITE_TIME_ZONE) {
   const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return '';
   return new Intl.DateTimeFormat('ru-RU', {
     hour: '2-digit',
     minute: '2-digit',
-    timeZone: SITE_TIME_ZONE,
+    timeZone,
   }).format(date);
 }
 
-function timeBucket(value) {
+function timeBucket(value, timeZone = SITE_TIME_ZONE) {
   const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return 'night';
-  const hour = Number(
-    new Intl.DateTimeFormat('en-GB', {
-      hour: 'numeric',
-      hour12: false,
-      timeZone: SITE_TIME_ZONE,
-    })
-      .formatToParts(date)
-      .find((part) => part.type === 'hour')?.value ?? 0,
-  );
+  const hour = localHourFromInstant(date, timeZone);
   if (hour >= 6 && hour < 12) return 'morning';
   if (hour >= 12 && hour < 17) return 'day';
   if (hour >= 17 && hour < 23) return 'evening';

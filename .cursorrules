@@ -1,0 +1,47 @@
+# Дайбилет — правила для Cursor Agent
+
+Перед началом задачи прочитай **[docs/Project.md](./docs/Project.md)** — там актуальная архитектура, деплой, perf и план миграции на Prisma Client (§12).
+
+## Краткий контекст
+
+- **Monorepo:** `apps/backend` (Node HTTP API), `apps/public`, `apps/admin`, `packages/db` (Prisma schema).
+- **Prod:** `213.171.7.16`, код `/opt/daibilet`, public `/var/www/daibilet/public`.
+- **Runtime БД:** `pg.Pool` в `apps/backend/src/db.js` + сырой SQL в `dto.js` (~8000 строк).
+- **Prisma:** только schema + migrations (`packages/db/prisma/`). Client в runtime — **целевое состояние**, см. Project.md §12.6–12.8.
+
+## Где что менять
+
+| Задача | Файлы |
+|--------|-------|
+| Public API / каталог | `apps/backend/src/dto.js`, `server.js` |
+| Admin CRUD (новый код) | `repositories/` + `services/admin/` (не расширять `dto.js` без необходимости) |
+| Prisma schema | `packages/db/prisma/schema.prisma` → `npm run db:migrate` |
+| Public UI | `apps/public/src/` |
+| Admin UI | `apps/admin/src/` |
+| Деплой | `docs/deploy-timeweb.md` |
+| Прогресс / решения | `docs/Tasktracker.md`, `docs/Diary.md` |
+
+## Prisma и репозитории
+
+- Новый admin-доступ к БД — через **репозиторий** + Prisma Client, не через новый `db.query` в `dto.js`.
+- Примеры под конкретные эндпоинты: **Project.md §12.6–12.7** (taxonomy, cities, venues, override, orders, sources).
+- Public catalog / тяжёлые aggregate — `$queryRaw` или snapshot table; не переписывать на `findMany` без perf-проверки.
+- После изменения schema: `npm run db:validate`, `db:generate`.
+
+## Стиль изменений
+
+- Минимальный diff; не рефакторить несвязанный код.
+- Секреты только в `.env`, не коммитить.
+- Коммиты и push — **только по явному запросу** пользователя.
+- UI-тексты на русском.
+- Обновлять `Project.md` при архитектурных изменениях; статус задач — `Tasktracker.md`.
+
+## Документация
+
+| Файл | Назначение |
+|------|------------|
+| [docs/Project.md](./docs/Project.md) | Архитектура, Prisma plan, репозитории |
+| [docs/Tasktracker.md](./docs/Tasktracker.md) | Статус задач |
+| [docs/Diary.md](./docs/Diary.md) | Технические решения |
+| [docs/qa.md](./docs/qa.md) | Открытые вопросы |
+| [docs/deploy-timeweb.md](./docs/deploy-timeweb.md) | Деплой |

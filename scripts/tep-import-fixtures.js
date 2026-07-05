@@ -2,12 +2,16 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 const { createRequire } = require("module");
+const { pathToFileURL } = require("url");
 
 const rootDir = path.resolve(__dirname, "..");
 loadRootEnv(rootDir);
 
 const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
 const { Pool } = requireFromDbPackage("pg");
+
+let resolveCityTimeZone = () => "Europe/Moscow";
+let wallClockInTimeZoneToUtc = () => null;
 
 const fixturesDir = path.resolve(process.env.TEP_FIXTURES_DIR || path.join(rootDir, "data", "teplohod", "fixtures"));
 const eventsPath = path.join(fixturesDir, "events-compact.json");
@@ -27,6 +31,10 @@ const CATEGORY_MAP = new Map([
 ]);
 
 async function main() {
+  const cityTz = await import(pathToFileURL(path.join(rootDir, "apps/backend/src/city-timezone.js")).href);
+  resolveCityTimeZone = cityTz.resolveCityTimeZone;
+  wallClockInTimeZoneToUtc = cityTz.wallClockInTimeZoneToUtc;
+
   const startedAt = new Date();
   const { events, cities } = await loadTeplohodSnapshot();
   const manifest = fs.existsSync(manifestPath) ? readJson(manifestPath) : {};
@@ -183,7 +191,7 @@ async function main() {
       }
 
       for (const eventTime of eventTimes) {
-        const startsAt = parseTeplohodDate(eventTime.datetime);
+        const startsAt = parseTeplohodDate(eventTime.datetime, cityName);
         const ticketsVacant = intOrNull(eventTime.available_tickets);
         await client.query(
           `
@@ -707,9 +715,15 @@ function intOrNull(input) {
   return Math.trunc(value);
 }
 
-function parseTeplohodDate(value) {
+function parseTeplohodDate(value, cityName) {
   if (!value) return null;
   const normalized = String(value).replace(/([+-]\d{2})(\d{2})$/, "$1:$2");
+  const wallMatch = normalized.match(/^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2}(?::\d{2})?)/);
+  if (wallMatch && cityName) {
+    const timeZone = resolveCityTimeZone(cityName);
+    const iso = wallClockInTimeZoneToUtc(`${wallMatch[1]}T${wallMatch[2]}`, timeZone);
+    if (iso) return iso;
+  }
   const date = new Date(normalized);
   return Number.isFinite(date.getTime()) ? date.toISOString() : null;
 }

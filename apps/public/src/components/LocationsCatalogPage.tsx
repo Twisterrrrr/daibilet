@@ -6,7 +6,11 @@ import { Header } from '@/components/Header';
 import { LocationCard } from '@/components/LocationCard';
 import { formatNumber } from '@/data';
 import { API_BASE_URL } from '@/lib/api-base';
-import { LOCATION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, venuePageTemplate, venueTypeLabel } from '@/lib/venue-meta';
+import {
+  readCachedLocationVenues,
+  writeCachedLocationVenues,
+} from '@/lib/venues-catalog-cache';
+import { LOCATION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
 import { venueCatalogHref, venueHref } from '@/routes';
 import type { PublicVenue } from '@/types';
 
@@ -14,8 +18,8 @@ export function LocationsCatalogPage() {
   const [query, setQuery] = React.useState('');
   const [cityFilter, setCityFilter] = React.useState('all');
   const [typeFilter, setTypeFilter] = React.useState('all');
-  const [venues, setVenues] = React.useState<PublicVenue[]>([]);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [venues, setVenues] = React.useState<PublicVenue[]>(() => readCachedLocationVenues() || []);
+  const [isLoading, setIsLoading] = React.useState(() => !readCachedLocationVenues()?.length);
 
   React.useEffect(() => {
     document.title = 'Локации: причалы, парки и точки старта экскурсий | Дайбилет';
@@ -28,15 +32,15 @@ export function LocationsCatalogPage() {
   React.useEffect(() => {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 15000);
-    fetch(`${API_BASE_URL}/api/public/venues?limit=500`, { cache: 'no-store', signal: controller.signal })
+    fetch(`${API_BASE_URL}/api/public/venues?limit=500&family=location`, { cache: 'default', signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as { venues?: PublicVenue[] };
       })
       .then((payload) => {
-        if (Array.isArray(payload.venues)) {
-          setVenues(payload.venues.filter((venue) => venuePageTemplate(venue.type) === 'location'));
-        }
+        if (!Array.isArray(payload.venues)) return;
+        setVenues(payload.venues);
+        writeCachedLocationVenues(payload.venues);
       })
       .catch(() => undefined)
       .finally(() => {
@@ -149,7 +153,7 @@ export function LocationsCatalogPage() {
         </div>
       </section>
 
-      <div className="sticky top-16 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <div className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="container-page flex gap-2 overflow-x-auto py-3">
           <button
             type="button"
@@ -193,12 +197,12 @@ export function LocationsCatalogPage() {
         </div>
 
         {isLoading && !filteredVenues.length ? (
-          <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center text-slate-500">
-            <p className="text-lg font-semibold text-slate-700">Локации загружаются…</p>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="h-32 animate-pulse rounded-2xl bg-slate-100" />
+            ))}
           </div>
-        ) : null}
-
-        {!isLoading && filteredVenues.length > 0 ? (
+        ) : filteredVenues.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {filteredVenues.map((venue) => (
               <LocationCard key={venue.id} venue={venue} href={venueHref(venue)} />

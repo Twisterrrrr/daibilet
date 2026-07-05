@@ -278,6 +278,175 @@ function cityContradictsAddress(city, title, address) {
   return false;
 }
 
+function isGenericBusVenueTitle(name) {
+  const key = normalizeKey(name);
+  if (!key) return true;
+  if (key === 'автобус') return true;
+  if (/^(?:точка|место)\s+(?:сбора|встречи)/.test(key)) return true;
+  if (/^площадка$/.test(key)) return true;
+  return false;
+}
+
+function isBusVenueTitleLikelyTourName(name, address) {
+  const text = String(name || '').trim();
+  if (!text || venueTitleLooksLikeAddress(text)) return false;
+  if (looksLikeInstitutionName(text)) return false;
+  if (
+    STREET_MARKER_RE.test(text) ||
+    /(?:^|\s)м\.(?:\s|$)|\bметро\b|пам\.|площад|пл\.|станци|вокзал|\bфорт\b|берег|набереж|парковк/i.test(text)
+  ) {
+    return false;
+  }
+  const addr = String(address || '').trim();
+  return addr.length >= 6 && text.length <= 80;
+}
+
+function isGenericPierReferenceAddress(value) {
+  const text = normalizeKey(value);
+  return (
+    !text ||
+    text === 'причал' ||
+    text === 'пристань' ||
+    text === 'площадка на набережной' ||
+    text === 'локация на набережной' ||
+    text === 'открытая локация'
+  );
+}
+
+function isPierLikeVenueText(name, address) {
+  const text = `${name || ''} ${address || ''}`.toLowerCase();
+  return /(?:^|\s)причал(?:\s|$)|(?:^|\s)пристань(?:\s|$)|набереж|наб\.|\bреки\b|\bрека\b|\bканал/i.test(text);
+}
+
+function venueTitleLooksLikeEmbankmentAddress(name) {
+  const text = String(name || '').trim();
+  if (!text) return false;
+  if (/^(?:причал|пристань)\b/i.test(text)) return false;
+  if (looksLikeNamedLandmark(text)) return false;
+  return (
+    /(?:^|\s)(?:наб\.|набереж|набережная|реки|река|канал|пр\.|ул\.|улиц)/i.test(text) ||
+    /\d[\p{L}\d\-/]*(?:\s*лит(?:ера)?\.?\s*[\p{L}\d]+)?$/iu.test(text)
+  );
+}
+
+function looksLikeNamedLandmark(title) {
+  return /(?:^|\s)(?:мост|угол|площадь|сквер|памятник|парк|дворец|крепость|собор|театр|музей|спуск|набережная\s+[\p{L}]+(?:\s+[\p{L}]+){0,2}\s+и\s+[\p{L}])/iu.test(
+    String(title || ''),
+  );
+}
+
+function stripPierPrefixFromAddress(address) {
+  return String(address || '')
+    .trim()
+    .replace(/^при(?:чал|стан(?:ь|и)?)(?:\s+(?:на|у|около))?\s+/iu, '')
+    .trim();
+}
+
+function hasDescriptivePierTitle(title) {
+  const text = String(title || '').trim();
+  return /^при(?:чал|стан(?:ь|и)?)\s+(?:(?:на|у|около)\s+(?!б(?:\.|\b))|«|")/iu.test(text);
+}
+
+function shouldUsePierAddressDisplayName(name, address) {
+  const title = formatPublicVenueTitle(name);
+  if (!address) return false;
+  if (hasDescriptivePierTitle(title)) return false;
+  if (/^при(?:чал|стан(?:ь|и)?)\b/i.test(title) && /\d/.test(title)) {
+    const locationPart = stripPierPrefixFromTitle(title);
+    if (venueTitleLooksLikeEmbankmentAddress(locationPart)) return true;
+  }
+  if (pierTitlesEquivalent(title, address)) return true;
+  if (venueTitleLooksLikeEmbankmentAddress(title)) return true;
+  const stripped = stripPierPrefixFromTitle(title);
+  return /^причал\b/i.test(title) && !/\d/.test(title) && stripped.length < 5;
+}
+
+function normalizePierVenueAddress(address, city) {
+  let text = normalizePublicVenueAddress(address, city);
+  if (!text) return text;
+  const stripped = stripPierPrefixFromAddress(text);
+  if (stripped && stripped !== text) {
+    text = normalizePublicVenueAddress(stripped, city) || stripped;
+  }
+  return text;
+}
+
+function normalizeComparableStreet(value) {
+  return normalizeKey(value)
+    .replace(/\bнабережная\b/g, 'наб')
+    .replace(/\bнаб\b/g, 'наб')
+    .replace(/\bулица\b/g, 'ул')
+    .replace(/\bпроспект\b/g, 'пр')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function addressAlreadyContainsTitleStreet(title, address) {
+  const titleNorm = normalizeComparableStreet(title);
+  const addrNorm = normalizeComparableStreet(address);
+  if (!titleNorm || !addrNorm || titleNorm.length < 6) return false;
+  if (addrNorm.includes(titleNorm)) return true;
+  const titleCore = titleNorm.replace(/^(?:причал|пристань)\s+/u, '').trim();
+  return titleCore.length >= 6 && addrNorm.includes(titleCore);
+}
+
+function isIncompleteVenueAddress(address, title) {
+  const addr = String(address || '').trim();
+  if (!addr || isPlusCodeAddress(addr)) return true;
+  if (/^\d[\p{L}\d\-/]*$/u.test(addr)) return true;
+  if (addr.length < 8) return true;
+  if (addressAlreadyContainsTitleStreet(title, addr)) return false;
+  return false;
+}
+
+function stripPierPrefixFromTitle(name) {
+  return String(name || '')
+    .trim()
+    .replace(/^причал(?:\s+(?:на|у|около))?\s+/iu, '')
+    .replace(/^пристань(?:\s+(?:на|у|около))?\s+/iu, '')
+    .trim();
+}
+
+function pierTitlesEquivalent(name, address) {
+  const titleNorm = normalizeComparableStreet(stripPierPrefixFromTitle(name));
+  const addrNorm = normalizeComparableStreet(address);
+  if (!titleNorm || !addrNorm) return false;
+  if (titleNorm === addrNorm) return true;
+  if (addrNorm.includes(titleNorm) && titleNorm.length >= 8 && /\d/.test(titleNorm)) {
+    return true;
+  }
+  return false;
+}
+
+export function formatPierLocationDisplayName(name, address, city) {
+  const normalizedAddress = normalizePierVenueAddress(address, city);
+  const shortAddress = normalizedAddress || String(address || '').trim() || null;
+  const title = formatPublicVenueTitle(name);
+
+  if (!shouldUsePierAddressDisplayName(title, shortAddress)) {
+    return title;
+  }
+
+  return shortAddress ? `Причал — ${shortAddress}` : 'Причал';
+}
+
+export function formatBusLocationDisplayName(name, address, city) {
+  const normalizedAddress = normalizePublicVenueAddress(address, city);
+  const shortAddress = normalizedAddress || String(address || '').trim() || null;
+  const shouldRename =
+    isGenericBusVenueTitle(name) || isBusVenueTitleLikelyTourName(name, address) || String(name || '').length > 72;
+
+  if (!shouldRename) {
+    return formatPublicVenueTitle(name);
+  }
+
+  if (shortAddress) {
+    return `Место посадки — ${shortAddress}`;
+  }
+
+  return 'Место посадки';
+}
+
 export function normalizePublicVenueRecord(input = {}) {
   const override = findOverride(input);
   let title = String(input.title || input.name || '').trim();
@@ -296,7 +465,7 @@ export function normalizePublicVenueRecord(input = {}) {
     }
   }
 
-  if (venueTitleLooksLikeAddress(title) && address) {
+  if (venueTitleLooksLikeAddress(title) && address && isIncompleteVenueAddress(address, title)) {
     const merged = `${title}, ${address}`;
     const reSplit = splitAddressFromTitle(merged);
     if (reSplit.addressFromTitle) {
@@ -323,7 +492,8 @@ export function normalizePublicVenueRecord(input = {}) {
     if (
       refStreet &&
       !isGenericReferenceAddress(refStreet) &&
-      (!address || isPlusCodeAddress(address) || isGenericReferenceAddress(address) || address.length < 8 || venueTitleLooksLikeAddress(input.title || input.name))
+      !isGenericPierReferenceAddress(refStreet) &&
+      (!address || isPlusCodeAddress(address) || isGenericReferenceAddress(address) || isIncompleteVenueAddress(address, title))
     ) {
       address = refStreet;
     }
@@ -335,6 +505,9 @@ export function normalizePublicVenueRecord(input = {}) {
   }
 
   address = normalizePublicVenueAddress(address, city);
+  if (isPierLikeVenueText(title, address)) {
+    address = normalizePierVenueAddress(address, city);
+  }
 
   if (override?.title) title = override.title;
   if (override?.address) address = override.address;

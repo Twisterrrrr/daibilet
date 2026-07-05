@@ -10,7 +10,8 @@ type CachedEventPage = {
 
 export function readCachedEventPage(slug: string): PublicEventPage | null {
   try {
-    const raw = window.sessionStorage.getItem(`${EVENT_PAGE_CACHE_PREFIX}${slug}`);
+    const key = `${EVENT_PAGE_CACHE_PREFIX}${slug}`;
+    const raw = window.localStorage.getItem(key) || window.sessionStorage.getItem(key);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as CachedEventPage;
     if (!parsed?.payload?.event) return null;
@@ -24,8 +25,10 @@ export function readCachedEventPage(slug: string): PublicEventPage | null {
 export function writeCachedEventPage(slug: string, payload: PublicEventPage) {
   try {
     const entry: CachedEventPage = { savedAt: Date.now(), payload };
-    window.sessionStorage.setItem(`${EVENT_PAGE_CACHE_PREFIX}${slug}`, JSON.stringify(entry));
+    const serialized = JSON.stringify(entry);
+    window.localStorage.setItem(`${EVENT_PAGE_CACHE_PREFIX}${slug}`, serialized);
+    window.sessionStorage.setItem(`${EVENT_PAGE_CACHE_PREFIX}${slug}`, serialized);
   } catch {
-    // sessionStorage quota or private mode — ignore
+    // storage quota or private mode — ignore
   }
 }

@@ -5,6 +5,7 @@ import {
   isSessionTomorrow,
   isSessionWeekend,
   parseSessionStartsAt,
+  resolveSessionTimeZoneForSession,
 } from '@/lib/datetime';
 import { spreadCatalogSessionsByCoverImage } from '@/lib/session-cover-image';
 import type { PublicSession } from '@/types';
@@ -24,15 +25,16 @@ export type HomeNowTab = {
 const TAB_LIMIT = 8;
 const MIN_PRIMARY_EVENTS = 1;
 
-type SlotFilter = (iso: string) => boolean;
+type SlotFilter = (iso: string, timeZone: string) => boolean;
 
 function collectStartIsos(event: PublicSession): string[] {
   return [event.startsAt, ...(event.upcomingSlots || []).map((slot) => slot.startsAt)].filter(Boolean) as string[];
 }
 
 function collectMatchingSlots(event: PublicSession, slotFilter: SlotFilter): string[] {
+  const timeZone = resolveSessionTimeZoneForSession(event);
   return collectStartIsos(event)
-    .filter((iso) => slotFilter(iso))
+    .filter((iso) => slotFilter(iso, timeZone))
     .sort((a, b) => parseSessionStartsAt(a).getTime() - parseSessionStartsAt(b).getTime());
 }
 
@@ -40,7 +42,7 @@ function eventMatchesSlotFilter(event: PublicSession, slotFilter: SlotFilter): b
   return collectMatchingSlots(event, slotFilter).length > 0;
 }
 
-function isSlotUpcoming(iso: string): boolean {
+function isSlotUpcoming(iso: string, _timeZone: string): boolean {
   const time = parseSessionStartsAt(iso).getTime();
   return Number.isFinite(time) && time >= Date.now() - 60_000;
 }
@@ -48,12 +50,13 @@ function isSlotUpcoming(iso: string): boolean {
 function withTabDisplaySlot(event: PublicSession, slotFilter: SlotFilter): PublicSession {
   const matchingSlot = collectMatchingSlots(event, slotFilter)[0];
   if (!matchingSlot || matchingSlot === event.startsAt) return event;
+  const timeZone = resolveSessionTimeZoneForSession(event);
 
   return {
     ...event,
     startsAt: matchingSlot,
-    timeLabel: formatSessionTime(matchingSlot, event.timeLabel),
-    dateLabel: formatSessionDate(matchingSlot, event.dateLabel),
+    timeLabel: formatSessionTime(matchingSlot, event.timeLabel, timeZone),
+    dateLabel: formatSessionDate(matchingSlot, event.dateLabel, timeZone),
   };
 }
 
@@ -134,7 +137,7 @@ export function buildHomeNowTabs(sessions: PublicSession[], options: BuildHomeNo
       label: 'Сегодня',
       title: `Сегодня${inCity}`,
       subtitle: 'Сеансы, которые ещё можно успеть',
-      slotFilter: isSessionToday,
+      slotFilter: (iso, timeZone) => isSessionToday(iso, timeZone),
       catalogQuery: { date: 'today', sort: 'time' },
       fallbackTitle: cityName ? `Популярное${inCity}` : 'Популярное в ближайшие дни',
       fallbackSubtitle: 'Рекомендуем начать с этих событий',
@@ -144,7 +147,7 @@ export function buildHomeNowTabs(sessions: PublicSession[], options: BuildHomeNo
       label: 'Завтра',
       title: `Завтра${inCity}`,
       subtitle: 'Удобно спланировать заранее',
-      slotFilter: isSessionTomorrow,
+      slotFilter: (iso, timeZone) => isSessionTomorrow(iso, timeZone),
       catalogQuery: { date: 'tomorrow', sort: 'time' },
       fallbackTitle: cityName ? `Рекомендуем${inCity}` : 'Рекомендуем в ближайшие дни',
       fallbackSubtitle: 'Лучшие предложения из каталога',
@@ -154,7 +157,7 @@ export function buildHomeNowTabs(sessions: PublicSession[], options: BuildHomeNo
       label: 'На выходных',
       title: `На выходных${inCity}`,
       subtitle: 'Сб и вс — семейные и вечерние форматы',
-      slotFilter: isSessionWeekend,
+      slotFilter: (iso, timeZone) => isSessionWeekend(iso, timeZone),
       catalogQuery: { date: 'weekend', sort: 'popular' },
       fallbackTitle: 'Лучшие предложения сезона',
       fallbackSubtitle: 'Подборка по популярности',

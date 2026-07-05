@@ -2,7 +2,8 @@ import * as React from 'react';
 import { createPortal } from 'react-dom';
 import { Check, ChevronDown, MapPin } from 'lucide-react';
 
-import { publicData } from '@/data';
+import { hydratePublicDestinations, publicData, PUBLIC_DESTINATIONS_UPDATED_EVENT } from '@/data';
+import type { PublicDestination } from '@/types';
 
 type CityPickerVariant = 'hero' | 'header' | 'compact';
 
@@ -14,7 +15,13 @@ type CityPickerProps = {
   className?: string;
 };
 
-const MENU_MAX_HEIGHT = 288;
+const MENU_MAX_HEIGHT = 360;
+
+function pickCityDestinations(): PublicDestination[] {
+  return publicData.destinations
+    .filter((item) => item.type === 'city')
+    .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru'));
+}
 
 export function CityPicker({
   value,
@@ -25,13 +32,28 @@ export function CityPicker({
 }: CityPickerProps) {
   const [open, setOpen] = React.useState(false);
   const [menuStyle, setMenuStyle] = React.useState<React.CSSProperties>({ visibility: 'hidden' });
+  const [cities, setCities] = React.useState<PublicDestination[]>(pickCityDestinations);
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const menuRef = React.useRef<HTMLDivElement>(null);
 
-  const cities = React.useMemo(
-    () => publicData.destinations.filter((item) => item.type === 'city').sort((a, b) => b.events - a.events),
-    [],
-  );
+  const refreshCities = React.useCallback(() => {
+    setCities(pickCityDestinations());
+  }, []);
+
+  React.useEffect(() => {
+    refreshCities();
+    const onUpdate = () => refreshCities();
+    window.addEventListener(PUBLIC_DESTINATIONS_UPDATED_EVENT, onUpdate);
+    return () => window.removeEventListener(PUBLIC_DESTINATIONS_UPDATED_EVENT, onUpdate);
+  }, [refreshCities]);
+
+  React.useEffect(() => {
+    if (!open) return;
+    if (cities.length >= 8) return;
+    void hydratePublicDestinations().then((updated) => {
+      if (updated) refreshCities();
+    });
+  }, [open, cities.length, refreshCities]);
 
   const selectedLabel = value === 'all' ? allLabel : value;
   const isAllSelected = value === 'all';
@@ -101,6 +123,7 @@ export function CityPicker({
   const toggleOpen = () => {
     setOpen((current) => {
       if (current) return false;
+      refreshCities();
       setMenuStyle({ visibility: 'hidden' });
       return true;
     });
@@ -118,11 +141,11 @@ export function CityPicker({
         <div
           ref={menuRef}
           style={menuStyle}
-          className="z-[120] overflow-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
+          className="z-[120] overflow-y-auto overflow-x-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
           role="listbox"
           aria-label="Города"
         >
-          <ul className="max-h-full overflow-y-auto">
+          <ul>
             <li>
               <button
                 type="button"

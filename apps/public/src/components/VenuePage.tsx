@@ -26,6 +26,12 @@ import { eventHref } from '@/routes';
 import {
   venuePageTemplate,
 } from '@/lib/venue-meta';
+import {
+  buildVenuePageShell,
+  consumeVenuePagePrefetch,
+  readCachedVenuePage,
+  writeCachedVenuePage,
+} from '@/lib/venue-page-cache';
 import type { PublicVenue, PublicVenuePage } from '@/types';
 
 type VenuePageProps = {
@@ -33,8 +39,10 @@ type VenuePageProps = {
 };
 
 export function VenuePage({ slug }: VenuePageProps) {
-  const [payload, setPayload] = React.useState<PublicVenuePage | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [payload, setPayload] = React.useState<PublicVenuePage | null>(
+    () => readCachedVenuePage(slug) || buildVenuePageShell(slug),
+  );
+  const [contentReady, setContentReady] = React.useState(() => Boolean(readCachedVenuePage(slug)?.sessions?.length));
   const [error, setError] = React.useState<string | null>(null);
   const [category, setCategory] = React.useState('all');
   const [dateFilter, setDateFilter] = React.useState<VenueDateFilter>('smart');
@@ -42,30 +50,50 @@ export function VenuePage({ slug }: VenuePageProps) {
 
   React.useEffect(() => {
     const controller = new AbortController();
-    setIsLoading(true);
-    fetch(`${API_BASE_URL}/api/public/venues/${encodeURIComponent(slug)}`, {
-      cache: 'no-store',
-      signal: controller.signal,
-    })
-      .then(async (response) => {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return (await response.json()) as PublicVenuePage | null;
-      })
+    const timeout = window.setTimeout(() => controller.abort(), 25000);
+    const cached = readCachedVenuePage(slug);
+    if (!cached?.sessions?.length) {
+      const shell = buildVenuePageShell(slug);
+      if (shell) {
+        setPayload((current) => (current?.sessions?.length ? current : shell));
+        setContentReady(false);
+      }
+    }
+
+    const prefetched = consumeVenuePagePrefetch(slug);
+    const request = prefetched
+      ? prefetched
+      : fetch(`${API_BASE_URL}/api/public/venues/${encodeURIComponent(slug)}`, {
+          cache: 'default',
+          signal: controller.signal,
+        }).then(async (response) => {
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return (await response.json()) as PublicVenuePage | null;
+        });
+
+    request
       .then((data) => {
         if (!data) throw new Error('Страница не найдена');
         setPayload(data);
+        setContentReady(true);
         setError(null);
+        writeCachedVenuePage(slug, data);
         applyVenueMeta(data);
       })
       .catch((requestError) => {
         if (controller.signal.aborted) return;
-        setError(requestError instanceof Error ? requestError.message : String(requestError));
+        if (!cached && !buildVenuePageShell(slug)) {
+          setError(requestError instanceof Error ? requestError.message : String(requestError));
+        }
       })
       .finally(() => {
-        if (!controller.signal.aborted) setIsLoading(false);
+        window.clearTimeout(timeout);
       });
 
-    return () => controller.abort();
+    return () => {
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
   }, [slug]);
 
   const baseSessions = React.useMemo(() => {
@@ -100,11 +128,11 @@ export function VenuePage({ slug }: VenuePageProps) {
       <Header cityLabel={venue?.city || 'Дайбилет'} onSection={(section) => navigateHome(section)} searchCity={venue?.city} />
 
       <main>
-        {isLoading ? (
+        {!payload && !error ? (
           <div className="container-page py-16 text-sm text-slate-500">Загружаем страницу...</div>
         ) : null}
 
-        {!isLoading && error ? (
+        {!payload && !contentReady && error ? (
           <div className="container-page py-16">
             <button type="button" className="btn-secondary" onClick={() => navigateHome('top')}>
               <ArrowLeft className="h-4 w-4" />
@@ -121,19 +149,20 @@ export function VenuePage({ slug }: VenuePageProps) {
               <LocationVenueLayout
                 venue={venue}
                 stats={payload.stats}
-                sessions={payload.sessions}
-                routeGroups={allRouteGroups}
-                relatedVenues={payload.relatedVenues}
+                sessions={contentReady ? payload.sessions : []}
+                routeGroups={contentReady ? allRouteGroups : []}
+                relatedVenues={contentReady ? payload.relatedVenues : []}
               />
             ) : isInstitutionPage ? (
               <InstitutionVenueLayout
                 venue={venue}
                 stats={payload.stats}
-                sessions={payload.sessions}
-                relatedVenues={payload.relatedVenues}
+                sessions={contentReady ? payload.sessions : []}
+                relatedVenues={contentReady ? payload.relatedVenues : []}
               />
             ) : null}
 
+            {contentReady ? (
             <section id="venue-program" className={`container-page py-8 ${useLovableLayout ? '' : 'grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]'}`}>
               <div className={useLovableLayout ? 'rounded-2xl border border-slate-200 bg-white p-6' : ''}>
                 <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -196,6 +225,13 @@ export function VenuePage({ slug }: VenuePageProps) {
                 </aside>
               ) : null}
             </section>
+            ) : (
+              <div className="container-page py-8">
+                <div className="rounded-2xl border border-slate-200 bg-white p-8 text-sm text-slate-500">
+                  Загружаем расписание и билеты…
+                </div>
+              </div>
+            )}
           </>
         ) : null}
       </main>

@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { SITE_TIME_ZONE, formatSessionTime } from '@/lib/datetime';
+import { formatSessionTime, parseSessionStartsAt, resolveSessionTimeZoneForSession } from '@/lib/datetime';
 import { FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession } from '@/lib/event-card-meta';
 import { formatVacantSeats } from '@/lib/pluralize';
 
@@ -548,14 +548,27 @@ function formatSessionLabels(session: {
   startsAt?: string | null;
   dateLabel?: string;
   timeLabel?: string;
+  city?: string | null;
+  destination?: string | null;
+  timeZone?: string | null;
 }) {
+  if (session.dateLabel && session.timeLabel) {
+    const commaIndex = session.dateLabel.indexOf(',');
+    return {
+      weekday: commaIndex >= 0 ? session.dateLabel.slice(0, commaIndex).trim() : session.dateLabel.trim(),
+      date: commaIndex >= 0 ? session.dateLabel.slice(commaIndex + 1).trim() : session.dateLabel.trim(),
+      time: session.timeLabel,
+    };
+  }
+
   if (session.startsAt) {
-    const d = new Date(session.startsAt);
+    const timeZone = resolveSessionTimeZoneForSession(session);
+    const d = parseSessionStartsAt(session.startsAt);
     if (!Number.isNaN(d.getTime())) {
       return {
-        weekday: d.toLocaleDateString('ru-RU', { weekday: 'short', timeZone: SITE_TIME_ZONE }),
-        date: d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', timeZone: SITE_TIME_ZONE }),
-        time: formatSessionTime(session.startsAt),
+        weekday: d.toLocaleDateString('ru-RU', { weekday: 'short', timeZone }),
+        date: d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', timeZone }),
+        time: formatSessionTime(session.startsAt, session.timeLabel, timeZone),
       };
     }
   }

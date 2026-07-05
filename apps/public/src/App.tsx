@@ -14,15 +14,13 @@ import {
 
 import { AccountPurchasesPage } from '@/components/AccountPurchasesPage';
 import { BuyerOrdersPage } from '@/components/BuyerOrdersPage';
-import { CatalogPage } from '@/components/CatalogPage';
 import { CitiesCatalogPage } from '@/components/CitiesCatalogPage';
 import { CityCard } from '@/components/CityCard';
 import { CityPicker } from '@/components/CityPicker';
+import { HomeHeroBackground } from '@/components/HomeHeroBackground';
 import { LocationsCatalogPage } from '@/components/LocationsCatalogPage';
 import { VenuesCatalogPage } from '@/components/VenuesCatalogPage';
-import { CityPage } from '@/components/CityPage';
 import { EventCard } from '@/components/EventCard';
-import { EventPage } from '@/components/EventPage';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { HelpPage } from '@/components/HelpPage';
@@ -30,8 +28,6 @@ import { AboutPage } from '@/components/AboutPage';
 import { BlogPage } from '@/components/BlogPage';
 import { LandingsCatalogPage } from '@/components/LandingsCatalogPage';
 import { LoginPage } from '@/components/LoginPage';
-import { LandingPage } from '@/components/LandingPage';
-import { VenuePage } from '@/components/VenuePage';
 import { InstitutionCard } from '@/components/InstitutionCard';
 import {
   formatMoney,
@@ -55,6 +51,7 @@ import {
 import { landingPageHref } from '@/lib/landing-slugs';
 import { venuePageTemplate } from '@/lib/venue-meta';
 import { API_BASE_URL } from '@/lib/api-base';
+import { readCachedInstitutionVenues, writeCachedInstitutionVenues } from '@/lib/venues-catalog-cache';
 import { persistDestination, resolveStoredDestination } from '@/lib/selected-city';
 import { cityHref, citySlug, venueHref } from '@/routes';
 import type { PublicDestination, PublicLanding, PublicSession, PublicVenue } from '@/types';
@@ -65,6 +62,26 @@ const HERO_DATE_OPTIONS: Array<{ value: string; label: string }> = [
   { value: 'tomorrow', label: 'Завтра' },
   { value: 'weekend', label: 'Выходные' },
 ];
+
+const CatalogPage = React.lazy(() => import('@/components/CatalogPage').then((module) => ({ default: module.CatalogPage })));
+const CityPage = React.lazy(() => import('@/components/CityPage').then((module) => ({ default: module.CityPage })));
+const EventPage = React.lazy(() => import('@/components/EventPage').then((module) => ({ default: module.EventPage })));
+const LandingPage = React.lazy(() => import('@/components/LandingPage').then((module) => ({ default: module.LandingPage })));
+const VenuePage = React.lazy(() => import('@/components/VenuePage').then((module) => ({ default: module.VenuePage })));
+
+function PageSuspense({ children }: { children: React.ReactNode }) {
+  return (
+    <React.Suspense
+      fallback={
+        <div className="min-h-screen bg-white text-slate-900">
+          <div className="container-page py-16 text-sm text-slate-500">Загружаем страницу...</div>
+        </div>
+      }
+    >
+      {children}
+    </React.Suspense>
+  );
+}
 
 export function App({ dataVersion = 0 }: { dataVersion?: number }) {
   if (window.location.pathname === '/cities' || window.location.pathname === '/cities/') return <CitiesCatalogPage />;
@@ -86,25 +103,65 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
   if (window.location.pathname === '/offer' || window.location.pathname === '/offer/') return <StaticInfoPage kind="offer" />;
 
   const venuePageMatch = window.location.pathname.match(/^\/venues\/([^/]+)\/?$/);
-  if (venuePageMatch) return <VenuePage slug={decodeURIComponent(venuePageMatch[1])} />;
+  if (venuePageMatch) {
+    return (
+      <PageSuspense>
+        <VenuePage slug={decodeURIComponent(venuePageMatch[1])} />
+      </PageSuspense>
+    );
+  }
 
   const locationPageMatch = window.location.pathname.match(/^\/locations\/([^/]+)\/?$/);
-  if (locationPageMatch) return <VenuePage slug={decodeURIComponent(locationPageMatch[1])} />;
+  if (locationPageMatch) {
+    return (
+      <PageSuspense>
+        <VenuePage slug={decodeURIComponent(locationPageMatch[1])} />
+      </PageSuspense>
+    );
+  }
 
   const cityPageMatch = window.location.pathname.match(/^\/cities\/([^/]+)\/?$/);
-  if (cityPageMatch) return <CityPage slug={decodeURIComponent(cityPageMatch[1])} />;
+  if (cityPageMatch) {
+    return (
+      <PageSuspense>
+        <CityPage slug={decodeURIComponent(cityPageMatch[1])} />
+      </PageSuspense>
+    );
+  }
 
   const landingCityMatch = window.location.pathname.match(/^\/landings\/([^/]+)\/([^/]+)\/?$/);
   if (landingCityMatch) {
-    return <LandingPage slug={decodeURIComponent(landingCityMatch[1])} citySlug={decodeURIComponent(landingCityMatch[2])} />;
+    return (
+      <PageSuspense>
+        <LandingPage slug={decodeURIComponent(landingCityMatch[1])} citySlug={decodeURIComponent(landingCityMatch[2])} />
+      </PageSuspense>
+    );
   }
   const landingPageMatch = window.location.pathname.match(/^\/landings\/([^/]+)\/?$/);
-  if (landingPageMatch) return <LandingPage slug={decodeURIComponent(landingPageMatch[1])} />;
+  if (landingPageMatch) {
+    return (
+      <PageSuspense>
+        <LandingPage slug={decodeURIComponent(landingPageMatch[1])} />
+      </PageSuspense>
+    );
+  }
 
-  if (window.location.pathname === '/events' || window.location.pathname === '/events/') return <CatalogPage />;
+  if (window.location.pathname === '/events' || window.location.pathname === '/events/') {
+    return (
+      <PageSuspense>
+        <CatalogPage />
+      </PageSuspense>
+    );
+  }
 
   const eventPageMatch = window.location.pathname.match(/^\/events\/([^/]+)\/?$/);
-  if (eventPageMatch) return <EventPage slug={decodeURIComponent(eventPageMatch[1])} />;
+  if (eventPageMatch) {
+    return (
+      <PageSuspense>
+        <EventPage slug={decodeURIComponent(eventPageMatch[1])} />
+      </PageSuspense>
+    );
+  }
 
   const [destination, setDestinationState] = React.useState(() => resolveStoredDestination());
   const [heroQuery, setHeroQuery] = React.useState('');
@@ -327,18 +384,10 @@ function HomeHero({
   onOpenCatalog: (extra?: Record<string, string>) => void;
 }) {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-sky-500 via-primary-600 to-slate-900">
-      <div className="pointer-events-none absolute -left-20 -top-20 h-80 w-80 rounded-full bg-sky-400/40 blur-3xl" />
-      <div className="pointer-events-none absolute -right-20 top-40 h-96 w-96 rounded-full bg-primary/35 blur-3xl" />
-      <div
-        className="pointer-events-none absolute inset-0 opacity-[0.08]"
-        style={{
-          backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
-          backgroundSize: '32px 32px',
-        }}
-      />
+    <section className="relative overflow-hidden bg-slate-900">
+      <HomeHeroBackground />
       <div className="container-page relative pb-12 pt-12 sm:pb-16 sm:pt-16">
-        <div className="mx-auto max-w-3xl text-center">
+        <div className="mx-auto max-w-3xl text-center drop-shadow-[0_2px_14px_rgba(15,23,42,0.55)]">
           <HomeHeroStats
             dataVersion={dataVersion}
             selectedCityName={selectedCityName}
@@ -667,26 +716,32 @@ function HomeFormatSection() {
 }
 
 function HomeVenuesSection() {
-  const [venues, setVenues] = React.useState<PublicVenue[]>([]);
+  const pickHomeVenues = React.useCallback((list: PublicVenue[] | null | undefined) => {
+    if (!list?.length) return [];
+    return list
+      .filter((venue) => venuePageTemplate(venue.type) === 'institution' && venue.events >= 3 && venue.address)
+      .sort((a, b) => b.events - a.events)
+      .slice(0, 8);
+  }, []);
+
+  const [venues, setVenues] = React.useState<PublicVenue[]>(() => pickHomeVenues(readCachedInstitutionVenues()));
+  const [isLoading, setIsLoading] = React.useState(() => !readCachedInstitutionVenues()?.length);
 
   React.useEffect(() => {
     const controller = new AbortController();
-    fetch(`${API_BASE_URL}/api/public/venues?limit=500`, { cache: 'no-store', signal: controller.signal })
+    fetch(`${API_BASE_URL}/api/public/venues?limit=8&family=institution`, { cache: 'default', signal: controller.signal })
       .then(async (response) => (response.ok ? ((await response.json()) as { venues?: PublicVenue[] }) : null))
       .then((payload) => {
         if (!payload?.venues) return;
-        setVenues(
-          payload.venues
-            .filter((venue) => venuePageTemplate(venue.type) === 'institution' && venue.events >= 3 && venue.address)
-            .sort((a, b) => b.events - a.events)
-            .slice(0, 8),
-        );
+        writeCachedInstitutionVenues(payload.venues);
+        setVenues(pickHomeVenues(payload.venues));
       })
-      .catch(() => undefined);
+      .catch(() => undefined)
+      .finally(() => {
+        if (!controller.signal.aborted) setIsLoading(false);
+      });
     return () => controller.abort();
-  }, []);
-
-  if (!venues.length) return null;
+  }, [pickHomeVenues]);
 
   return (
     <section id="venues" className="border-t border-slate-100 py-12 sm:py-16">
@@ -702,11 +757,19 @@ function HomeVenuesSection() {
             Все площадки <ArrowRight className="h-4 w-4" />
           </a>
         </div>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {venues.map((venue) => (
-            <InstitutionCard key={venue.id} venue={venue} href={venueHref(venue)} />
-          ))}
-        </div>
+        {isLoading && !venues.length ? (
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div key={index} className="h-48 animate-pulse rounded-xl bg-slate-100" />
+            ))}
+          </div>
+        ) : venues.length ? (
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {venues.map((venue) => (
+              <InstitutionCard key={venue.id} venue={venue} href={venueHref(venue)} />
+            ))}
+          </div>
+        ) : null}
       </div>
     </section>
   );

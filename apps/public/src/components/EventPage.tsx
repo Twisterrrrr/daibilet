@@ -31,8 +31,12 @@ const API_BASE_URL =
 const MIN_DISPLAY_PRICE_RUB = 100;
 
 export function EventPage({ slug }: { slug: string }) {
-  const [payload, setPayload] = React.useState<PublicEventPage | null>(() => readCachedEventPage(slug));
-  const [isLoading, setIsLoading] = React.useState(() => !readCachedEventPage(slug));
+  const [payload, setPayload] = React.useState<PublicEventPage | null>(
+    () => readCachedEventPage(slug) || buildStaticEventPage(slug),
+  );
+  const [isLoading, setIsLoading] = React.useState(
+    () => !readCachedEventPage(slug) && !buildStaticEventPage(slug),
+  );
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
@@ -40,11 +44,12 @@ export function EventPage({ slug }: { slug: string }) {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 12000);
     const cached = readCachedEventPage(slug);
+    const shell = cached || buildStaticEventPage(slug);
 
-    if (cached) {
-      setPayload(cached);
-      applyEventMeta(cached.event);
-      replaceOpaqueEventUrl(cached.event);
+    if (shell) {
+      setPayload(shell);
+      applyEventMeta(shell.event);
+      replaceOpaqueEventUrl(shell.event);
       setError(null);
       setIsLoading(false);
     } else {
@@ -52,7 +57,7 @@ export function EventPage({ slug }: { slug: string }) {
     }
 
     fetch(`${API_BASE_URL}/api/public/events/${encodeURIComponent(slug)}`, {
-      cache: 'no-store',
+      cache: 'default',
       signal: controller.signal,
     })
       .then((response) => {
@@ -79,7 +84,9 @@ export function EventPage({ slug }: { slug: string }) {
           return;
         }
 
-        setError('Событие не найдено или backend сейчас недоступен.');
+        if (!shell) {
+          setError('Событие не найдено или backend сейчас недоступен.');
+        }
       })
       .finally(() => {
         window.clearTimeout(timeout);
@@ -97,12 +104,12 @@ export function EventPage({ slug }: { slug: string }) {
     <div className="min-h-screen bg-white text-slate-900">
       <Header cityLabel={payload?.event.city || 'Все города'} onSection={navigateHome} searchCity={payload?.event.city} />
       <main>
-        {isLoading ? (
+        {isLoading && !payload ? (
           <section className="container-page py-12">
             <div className="rounded-xl border border-slate-200 p-6 text-sm text-slate-500">Загружаем событие...</div>
           </section>
         ) : null}
-        {error ? (
+        {error && !payload ? (
           <section className="container-page py-12">
             <div className="rounded-xl border border-red-100 bg-red-50 p-6 text-sm font-medium text-red-700">{error}</div>
           </section>

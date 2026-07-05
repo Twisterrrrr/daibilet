@@ -4,6 +4,9 @@
  *   node scripts/apply-venue-manual-content.js --user-batch2
  *   node scripts/apply-venue-manual-content.js --dry-run --user-batch2
  *   node scripts/apply-venue-manual-content.js --user-batch4
+ *   node scripts/apply-venue-manual-content.js --user-batch5
+ *   node scripts/apply-venue-manual-content.js --user-batch6
+ *   node scripts/apply-venue-manual-content.js --user-batch7
  */
 const fs = require('fs');
 const path = require('path');
@@ -15,12 +18,18 @@ const userBatchPath = path.join(__dirname, 'data', 'venue-content-user-batch.jso
 const userBatch2Path = path.join(__dirname, 'data', 'venue-content-user-batch2.json');
 const userBatch3Path = path.join(__dirname, 'data', 'venue-content-user-batch3.json');
 const userBatch4Path = path.join(__dirname, 'data', 'venue-content-user-batch4.json');
+const userBatch5Path = path.join(__dirname, 'data', 'venue-content-user-batch5.json');
+const userBatch6Path = path.join(__dirname, 'data', 'venue-content-user-batch6.json');
+const userBatch7Path = path.join(__dirname, 'data', 'venue-content-user-batch7.json');
 const userCorrectionsPath = path.join(__dirname, 'data', 'venue-content-user-corrections.json');
 const dryRun = process.argv.includes('--dry-run');
 const onlyUserBatch = process.argv.includes('--user-batch');
 const onlyUserBatch2 = process.argv.includes('--user-batch2');
 const onlyUserBatch3 = process.argv.includes('--user-batch3');
 const onlyUserBatch4 = process.argv.includes('--user-batch4');
+const onlyUserBatch5 = process.argv.includes('--user-batch5');
+const onlyUserBatch6 = process.argv.includes('--user-batch6');
+const onlyUserBatch7 = process.argv.includes('--user-batch7');
 const onlyUserCorrections = process.argv.includes('--user-corrections');
 
 function loadEnv() {
@@ -76,6 +85,9 @@ if (
   !fs.existsSync(userBatch2Path) &&
   !fs.existsSync(userBatch3Path) &&
   !fs.existsSync(userBatch4Path) &&
+  !fs.existsSync(userBatch5Path) &&
+  !fs.existsSync(userBatch6Path) &&
+  !fs.existsSync(userBatch7Path) &&
   !fs.existsSync(userCorrectionsPath)
 ) {
   console.error('Missing venue content files');
@@ -90,22 +102,31 @@ function loadEntries(filePath) {
 
 const entries = onlyUserCorrections
   ? loadEntries(userCorrectionsPath)
-  : onlyUserBatch4
-    ? loadEntries(userBatch4Path)
-    : onlyUserBatch3
-      ? loadEntries(userBatch3Path)
-      : onlyUserBatch2
-        ? loadEntries(userBatch2Path)
-        : onlyUserBatch
-          ? loadEntries(userBatchPath)
-          : [
-              ...loadEntries(manualPath),
-              ...loadEntries(userBatchPath),
-              ...loadEntries(userBatch2Path),
-              ...loadEntries(userBatch3Path),
-              ...loadEntries(userBatch4Path),
-              ...loadEntries(userCorrectionsPath),
-            ];
+  : onlyUserBatch7
+    ? loadEntries(userBatch7Path)
+    : onlyUserBatch6
+      ? loadEntries(userBatch6Path)
+      : onlyUserBatch5
+        ? loadEntries(userBatch5Path)
+        : onlyUserBatch4
+          ? loadEntries(userBatch4Path)
+          : onlyUserBatch3
+            ? loadEntries(userBatch3Path)
+            : onlyUserBatch2
+              ? loadEntries(userBatch2Path)
+              : onlyUserBatch
+                ? loadEntries(userBatchPath)
+                : [
+                    ...loadEntries(manualPath),
+                    ...loadEntries(userBatchPath),
+                    ...loadEntries(userBatch2Path),
+                    ...loadEntries(userBatch3Path),
+                    ...loadEntries(userBatch4Path),
+                    ...loadEntries(userBatch5Path),
+                    ...loadEntries(userBatch6Path),
+                    ...loadEntries(userBatch7Path),
+                    ...loadEntries(userCorrectionsPath),
+                  ];
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL || 'postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet',

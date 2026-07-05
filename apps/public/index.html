@@ -4,6 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Дайбилет — экскурсии, музеи и события</title>
+    <script>
+      (function () {
+        var match = location.pathname.match(/^\/(locations|venues)\/([^/]+)\/?$/);
+        if (!match) return;
+        var slug = decodeURIComponent(match[2]);
+        window.__DAIBILET_VENUE_PREFETCH__ = {
+          slug: slug,
+          promise: fetch('/api/public/venues/' + encodeURIComponent(slug), { credentials: 'same-origin' })
+            .then(function (response) {
+              return response.ok ? response.json() : null;
+            })
+            .catch(function () {
+              return null;
+            }),
+        };
+      })();
+    </script>
     <script defer src="https://ticketscloud.com/static/scripts/widget/tcwidget.js"></script>
   </head>
   <body>

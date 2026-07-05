@@ -85,7 +85,7 @@ export function Header({ cityLabel, onSection, onDestination }: HeaderProps) {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur-md supports-[padding:max(0px)]:pt-[env(safe-area-inset-top)]">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur-md pt-[env(safe-area-inset-top,0px)]">
         <div className="container-page flex items-center justify-between gap-3 py-3 md:py-4">
           <div className="flex min-w-0 items-center gap-3 lg:gap-6">
             <button
@@ -160,6 +160,7 @@ export function Header({ cityLabel, onSection, onDestination }: HeaderProps) {
           </div>
         </div>
       </header>
+      <div aria-hidden="true" className="site-header-spacer" />
 
       {mobileOpen ? <MobileNavSheet cityLabel={cityLabel} isLoggedIn={isLoggedIn} auth={auth} onClose={() => setMobileOpen(false)} onNavigate={navigate} onDestination={onDestination} /> : null}
       {favoritesOpen ? <FavoritesPanel onClose={() => setFavoritesOpen(false)} onNavigate={navigate} /> : null}

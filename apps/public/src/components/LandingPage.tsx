@@ -2,6 +2,8 @@ import * as React from 'react';
 import { Anchor, ArrowRight, Briefcase, Bus, Cake, CalendarDays, CheckCircle2, ChevronDown, CircleHelp, Clock, Eye, Headphones, Heart, HelpCircle, Lightbulb, MapPin, Mic, Moon, Music, Quote, Search, Shield, Ship, Sparkles, Star, Sun, Tag, Ticket, TrendingUp, Users, UtensilsCrossed, Wallet } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
+import { Footer } from '@/components/Footer';
+import { Header } from '@/components/Header';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton';
 import { LandingStickyHeader } from '@/components/landing/LandingStickyHeader';
 import {
@@ -39,12 +41,14 @@ import {
   isSessionWeekend,
   resolveSessionDate,
   resolveSessionTime,
+  resolveSessionTimeZoneForSession,
   parseSessionStartsAt,
   sessionTimeSlotFilter,
 } from '@/lib/datetime';
 import { isOpenDate, FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession } from '@/lib/event-card-meta';
 import { formatVacantSeats } from '@/lib/pluralize';
 import { eventHref } from '@/routes';
+import { readCachedLandingPage, writeCachedLandingPage } from '@/lib/landing-page-cache';
 import type { PublicLanding, PublicLandingContentBlock, PublicLandingPage, PublicSession } from '@/types';
 
 const API_BASE_URL =
@@ -218,7 +222,7 @@ function matchesMenuFilter(session: PublicSession, menu: MenuFilter): boolean {
 function matchesDinnerTimeFilter(session: PublicSession, filter: DinnerTimeFilter): boolean {
   if (filter === 'all') return true;
   if (!session.startsAt) return true;
-  const hour = getSessionHour(session.startsAt);
+  const hour = getSessionHour(session.startsAt, resolveSessionTimeZoneForSession(session));
   if (filter === 'sunset') return hour >= 18 && hour < 21;
   if (filter === 'night') return hour >= 21;
   return true;
@@ -514,7 +518,7 @@ async function fetchLandingPayload(slug: string, signal?: AbortSignal): Promise<
   for (const candidate of landingFetchCandidates(slug)) {
     try {
       const response = await fetch(`${API_BASE_URL}/api/public/landings/${encodeURIComponent(candidate)}`, {
-        cache: 'no-store',
+        cache: 'default',
         signal,
       });
       if (!response.ok) continue;
@@ -549,7 +553,7 @@ function matchesTimeSlotFilter(session: PublicSession, slot: TimeSlotFilter): bo
   if (!slot) return true;
   const startsAt = session.startsAt || session.upcomingSlots?.[0]?.startsAt;
   if (!startsAt) return true;
-  return sessionTimeSlotFilter(startsAt) === slot;
+  return sessionTimeSlotFilter(startsAt, resolveSessionTimeZoneForSession(session)) === slot;
 }
 
 function citySlugByName(name: string): string | null {
@@ -588,6 +592,10 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
   const slug = canonicalLandingSlug(rawSlug);
   const profile = getLandingProfile(slug);
   const shell = React.useMemo(() => buildLandingShellPage(slug, citySlug), [slug, citySlug]);
+  const initialCachedPayload = React.useMemo(
+    () => readCachedLandingPage(slug, citySlug),
+    [slug, citySlug],
+  );
 
   React.useEffect(() => {
     if (slug !== rawSlug) {
@@ -600,8 +608,8 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
     if (shell?.landing) applyLandingMeta(shell.landing);
   }, [shell]);
 
-  const [apiPayload, setApiPayload] = React.useState<PublicLandingPage | null>(null);
-  const [isSessionsLoading, setIsSessionsLoading] = React.useState(true);
+  const [apiPayload, setApiPayload] = React.useState<PublicLandingPage | null>(() => initialCachedPayload);
+  const [isSessionsLoading, setIsSessionsLoading] = React.useState(() => !initialCachedPayload?.sessions?.length);
   const [sessionsError, setSessionsError] = React.useState<string | null>(null);
   const [city, setCity] = React.useState('all');
   const [category, setCategory] = React.useState('all');
@@ -618,17 +626,17 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
     setMenuFilter('all');
     setDinnerTimeFilter('all');
     setTimeSlot('');
-    setApiPayload(null);
+    setApiPayload(initialCachedPayload);
     setSessionsError(null);
-    setIsSessionsLoading(true);
-  }, [slug, citySlug]);
+    setIsSessionsLoading(!initialCachedPayload?.sessions?.length);
+  }, [slug, citySlug, initialCachedPayload]);
 
   React.useEffect(() => {
     let disposed = false;
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 25000);
 
-    setIsSessionsLoading(true);
+    setIsSessionsLoading(!readCachedLandingPage(slug, citySlug)?.sessions?.length);
     setSessionsError(null);
 
     fetchLandingPayload(slug, controller.signal)
@@ -638,6 +646,7 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
           const resolved = finalizeLandingPayload(data, slug, resolveLandingCityName(citySlug, slug));
           setApiPayload(resolved);
           applyLandingMeta(resolved.landing);
+          writeCachedLandingPage(slug, resolved, citySlug);
           setSessionsError(null);
           return;
         }
@@ -699,13 +708,16 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
   if (!payload) {
     return (
       <div className="min-h-screen bg-background text-foreground">
+        <Header cityLabel="Все города" onSection={navigateHome} />
         <ErrorState message="Лендинг не найден." />
+        <Footer />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <Header cityLabel={cityName || 'Все города'} onSection={navigateHome} searchCity={cityName || undefined} />
       <>
           <LandingStickyHeader />
           <LandingHero
@@ -873,6 +885,7 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
               <RelatedLandings landings={payload.relatedLandings} landing={payload.landing} stats={payload.stats} citySlug={citySlug} />
             ) : null}
           </div>
+          <Footer />
         </>
     </div>
   );
@@ -3210,14 +3223,15 @@ function sortEventGroups(groups: EventGroup[], sort: SortFilter): EventGroup[] {
 function matchesDateFilter(session: PublicSession, startsAt: string, filter: DateFilter): boolean {
   if (filter === 'all') return true;
   if (isOpenDate(session)) return true;
+  const timeZone = resolveSessionTimeZoneForSession(session);
   if (filter === 'evening') {
-    return session.timeBucket === 'evening' || getSessionHour(startsAt) >= 18;
+    return session.timeBucket === 'evening' || getSessionHour(startsAt, timeZone) >= 18;
   }
   if (!startsAt) return false;
 
-  if (filter === 'today') return isSameSessionDay(startsAt);
-  if (filter === 'tomorrow') return isSessionTomorrow(startsAt);
-  if (filter === 'weekend') return isSessionWeekend(startsAt);
+  if (filter === 'today') return isSameSessionDay(startsAt, new Date(), timeZone);
+  if (filter === 'tomorrow') return isSessionTomorrow(startsAt, timeZone);
+  if (filter === 'weekend') return isSessionWeekend(startsAt, timeZone);
   return true;
 }
 
@@ -3267,6 +3281,10 @@ function navigateHome(section: string) {
   }
   if (section === 'cities' || section === 'destinations') {
     window.location.href = '/cities';
+    return;
+  }
+  if (section === 'orders') {
+    window.location.href = '/my-orders';
     return;
   }
   if (section === 'blog') {

@@ -154,7 +154,7 @@ export function InstitutionVenueLayout({
         </div>
       </section>
 
-      <nav className="sticky top-16 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <nav className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="container-page flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {[
             ['#venue-program', 'Афиша и билеты'],
