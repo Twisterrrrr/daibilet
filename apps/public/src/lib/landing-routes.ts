@@ -1,4 +1,4 @@
-import { canonicalLandingSlug, CANONICAL_LANDING_SLUGS } from '@/lib/landing-slugs';
+import { canonicalLandingSlug, CANONICAL_LANDING_SLUGS } from '@/lib/landing-constants';
 
 /** Мультилендинги: /rechnye-progulki/{city}/ */
 export const LANDING_CATEGORY_PATH_BY_SLUG: Record<string, string> = {

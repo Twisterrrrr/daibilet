@@ -1,4 +1,5 @@
 import type { RiverCitySpot } from '@/data/river-landings';
+import { landingCategoryHref } from '@/lib/landing-routes';
 
 export type SeasonalCityGuide = {
   slug: string;
@@ -95,7 +96,7 @@ export const SEASONAL_LANDINGS: Record<string, SeasonalLandingMeta> = {
         ],
       },
       'Санкт-Петербург': {
-        slug: 'spb',
+        slug: 'saint-petersburg',
         cityName: 'Санкт-Петербург',
         cityNameDative: 'Санкт-Петербургу',
         heroSubtitle: 'Фейерверк над Невой, Петропавловская крепость и белые ночи — незабываемое зрелище с воды.',
@@ -197,5 +198,5 @@ export function seasonalCityGuideBySlug(landingSlug: string, citySlug?: string |
 }
 
 export function seasonalLandingRoot(slug: string) {
-  return `/landings/${slug}`;
+  return landingCategoryHref(slug);
 }

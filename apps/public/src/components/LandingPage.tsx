@@ -13,11 +13,14 @@ import {
   isBridgesNightLandingSlug,
   isRiverCruisesLandingSlug,
   isRiverPartyLandingSlug,
+  landingCategoryHref,
   landingFetchCandidates,
+  landingPageHref,
   landingSlugVariants,
   partyLandingHref,
   riverLandingHref,
 } from '@/lib/landing-slugs';
+import { normalizeCitySlug } from '@/lib/landing-routes';
 import { resolveLandingCopy, shouldUseLandingCopy } from '@/lib/landing-copy';
 import { applyLandingSeoMeta, resolveLandingSeo, useLandingTodayReference } from '@/lib/landing-seo';
 import { BRIDGES_LANDING } from '@/data/bridges-landing';
@@ -96,7 +99,7 @@ const LANDING_CITY_SLUGS: Record<string, string> = {
 
 const BUS_CITY_META: Record<string, { slug: string; duration: string; prepositional: string }> = {
   Москва: { slug: 'moscow', duration: '1.5–3 часа', prepositional: 'Москве' },
-  'Санкт-Петербург': { slug: 'spb', duration: '2–4 часа', prepositional: 'Санкт-Петербургу' },
+  'Санкт-Петербург': { slug: 'saint-petersburg', duration: '2–4 часа', prepositional: 'Санкт-Петербургу' },
   Казань: { slug: 'kazan', duration: '2–3 часа', prepositional: 'Казани' },
   'Нижний Новгород': { slug: 'nizhny-novgorod', duration: '2–3 часа', prepositional: 'Нижнему Новгороду' },
   Самара: { slug: 'samara', duration: '2–2.5 часа', prepositional: 'Самаре' },
@@ -159,8 +162,7 @@ function busLandingRoot(_slug?: string) {
 
 function riverLandingRoot(landingSlug: string) {
   if (isRiverPartyLandingSlug(landingSlug)) return partyLandingHref();
-  const key = landingSlug.toLowerCase();
-  if (key.includes('bridge')) return '/landings/bridges-night';
+  if (isBridgesNightLandingSlug(landingSlug)) return landingCategoryHref(CANONICAL_LANDING_SLUGS.bridges);
   return riverLandingHref();
 }
 
@@ -195,7 +197,7 @@ const DINNER_CITY_GUIDES: Partial<Record<string, DinnerCityGuide>> = {
     introText:
       'Нева вечером — лучший фон для ужина на воде. Панорамные окна, живая музыка и подсветка дворцов создают атмосферу, которую не повторить в обычном ресторане.',
     scheduleTitle: 'Теплоходы с ужином — Санкт-Петербург',
-    riverCruiseHref: riverLandingHref('spb'),
+    riverCruiseHref: riverLandingHref('saint-petersburg'),
     riverCruiseLabel: 'Все речные прогулки по Петербургу',
   },
 };
@@ -608,8 +610,10 @@ function matchesTimeSlotFilter(session: PublicSession, slot: TimeSlotFilter): bo
 function citySlugByName(name: string): string | null {
   const riverGuide = riverCityGuide(name);
   if (riverGuide?.slug) return riverGuide.slug;
+  const busMeta = BUS_CITY_META[name]?.slug;
+  if (busMeta) return busMeta;
   const entry = Object.entries(LANDING_CITY_SLUGS).find(([, cityName]) => cityName === name);
-  return entry?.[0] || BUS_CITY_META[name]?.slug || null;
+  return normalizeCitySlug(entry?.[0] || null);
 }
 
 function resolveLandingCityName(citySlug?: string | null, landingSlug?: string) {
@@ -649,8 +653,7 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
 
   React.useEffect(() => {
     if (slug !== rawSlug) {
-      const target = citySlug ? `/landings/${slug}/${citySlug}` : `/landings/${slug}`;
-      window.location.replace(target);
+      window.location.replace(landingCategoryHref(slug, citySlug));
     }
   }, [rawSlug, slug, citySlug]);
 
@@ -1239,7 +1242,7 @@ function LandingSeasonalCitiesGrid({ landingSlug }: { landingSlug: string }) {
             return (
               <a
                 key={name}
-                href={`${seasonalLandingRoot(landingSlug)}/${guide.slug}`}
+                href={landingCategoryHref(landingSlug, guide.slug)}
                 className="flex items-center gap-2 rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
               >
                 <Sparkles className="h-4 w-4 shrink-0 text-primary" />
@@ -1270,7 +1273,7 @@ function LandingSeasonalOtherCitiesGrid({ landingSlug, currentCityName }: { land
             return (
               <a
                 key={name}
-                href={`${seasonalLandingRoot(landingSlug)}/${guide.slug}`}
+                href={landingCategoryHref(landingSlug, guide.slug)}
                 className="flex items-center gap-2 rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
               >
                 <Sparkles className="h-4 w-4 shrink-0 text-primary" />
@@ -2002,7 +2005,7 @@ function defaultLandingFaq(slug: string, profile: LandingProfile = 'default', ci
     if (meta?.defaultFaq.length) return meta.defaultFaq;
   }
   if (profile === 'bus' || key.includes('bus')) {
-    if (citySlug === 'spb') {
+    if (normalizeCitySlug(citySlug) === 'saint-petersburg') {
       return [
         { question: 'Есть ли экскурсия с разводными мостами?', answer: 'Да — ночной рейс «Ночной Петербург + разводные мосты» стартует после 23:00 и включает остановку у разводного моста.' },
         { question: 'Стоит ли ехать в Петергоф?', answer: 'Да, если есть полдня. Автобусная экскурсия в Петергоф — один из самых популярных загородных маршрутов. В будни меньше очередей.' },
@@ -2029,7 +2032,7 @@ function defaultLandingFaq(slug: string, profile: LandingProfile = 'default', ci
     const cityName = resolveLandingCityName(citySlug);
     const guide = riverCityGuide(cityName);
     if (guide?.faq.length) return guide.faq;
-    if (key.includes('bridge') || citySlug === 'spb') {
+    if (key.includes('bridge') || normalizeCitySlug(citySlug) === 'saint-petersburg') {
       return [
         { question: 'Когда разводят мосты в Санкт-Петербурге?', answer: 'В навигационный сезон разводка начинается около 01:00–02:30. Рейсы в 23:30–00:30 позволяют увидеть несколько мостов подряд.' },
         { question: 'Стоит ли брать ночную прогулку или дневную?', answer: 'Ночная — для разводки мостов и подсветки. Дневная — для архитектуры и фото при дневном свете.' },
@@ -2369,7 +2372,7 @@ function LandingFilters({
       }
       const slugKey = citySlugByName(value) || BUS_CITY_META[value]?.slug;
       if (slugKey && value !== currentCityName) {
-        window.location.href = `${busLandingRoot(landingSlug)}/${slugKey}`;
+        window.location.href = busLandingHref(slugKey);
         return;
       }
     }
@@ -2380,7 +2383,7 @@ function LandingFilters({
       }
       const slugKey = citySlugByName(value) || riverCityGuide(value)?.slug;
       if (slugKey && value !== currentCityName) {
-        window.location.href = `${riverLandingRoot(landingSlug)}/${slugKey}`;
+        window.location.href = riverLandingHref(slugKey);
         return;
       }
     }
@@ -2391,7 +2394,7 @@ function LandingFilters({
       }
       const slugKey = seasonalCityGuide(landingSlug, value)?.slug;
       if (slugKey && value !== currentCityName) {
-        window.location.href = `${seasonalLandingRoot(landingSlug)}/${slugKey}`;
+        window.location.href = landingCategoryHref(landingSlug, slugKey);
         return;
       }
     }
@@ -2895,7 +2898,7 @@ function LandingCitiesGrid({ landing }: { landing: PublicLanding; stats: PublicL
           {BUS_CITY_ORDER.map((name) => {
             const meta = BUS_CITY_META[name];
             const slugKey = citySlugByName(name) || meta.slug;
-            const href = `${busLandingRoot(landing.slug)}/${slugKey}`;
+            const href = busLandingHref(slugKey);
             return (
               <a
                 key={name}
@@ -2928,7 +2931,7 @@ function LandingOtherCitiesGrid({ landing, currentCityName }: { landing: PublicL
           {cities.map((name) => {
             const meta = BUS_CITY_META[name];
             const slugKey = citySlugByName(name) || meta.slug;
-            const href = `${busLandingRoot(landing.slug)}/${slugKey}`;
+            const href = busLandingHref(slugKey);
             return (
               <a
                 key={name}
@@ -2958,7 +2961,7 @@ function LandingRiverCitiesGrid({ landing }: { landing: PublicLanding }) {
           {RIVER_CITY_ORDER.map((name) => {
             const guide = riverCityGuide(name);
             if (!guide) return null;
-            const href = `${riverLandingRoot(landing.slug)}/${guide.slug}`;
+            const href = riverLandingHref(guide.slug);
             return (
               <a
                 key={name}
@@ -2991,7 +2994,7 @@ function LandingRiverOtherCitiesGrid({ landing, currentCityName }: { landing: Pu
           {cities.map((name) => {
             const guide = riverCityGuide(name);
             if (!guide) return null;
-            const href = `${riverLandingRoot(landing.slug)}/${guide.slug}`;
+            const href = riverLandingHref(guide.slug);
             return (
               <a
                 key={name}
@@ -3140,7 +3143,9 @@ function RelatedLandings({
   citySlug?: string;
 }) {
   const cityEntries = Object.entries(stats.cities).sort((a, b) => b[1] - a[1]);
-  const citySlugByName = Object.fromEntries(Object.entries(LANDING_CITY_SLUGS).map(([slugKey, name]) => [name, slugKey]));
+  const citySlugByName = Object.fromEntries(
+    Object.entries(LANDING_CITY_SLUGS).map(([slugKey, name]) => [name, normalizeCitySlug(slugKey) || slugKey]),
+  );
 
   return (
     <div className="grid gap-8 lg:grid-cols-2">
@@ -3150,7 +3155,7 @@ function RelatedLandings({
           <div className="mt-4 flex flex-wrap gap-2">
             {cityEntries.map(([name, count]) => {
               const slugKey = citySlugByName[name];
-              const href = slugKey ? `/landings/${landing.slug}/${slugKey}` : `#landing-schedule`;
+              const href = slugKey ? landingCategoryHref(landing.slug, slugKey) : `#landing-schedule`;
               return (
                 <a key={name} href={href} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-primary-300 hover:text-primary-700">
                   {name}
@@ -3167,7 +3172,7 @@ function RelatedLandings({
           <h3 className="text-lg font-bold text-slate-950">Похожие подборки</h3>
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
             {landings.slice(0, 6).map((item) => (
-              <a key={item.slug} href={`/landings/${item.slug}`} className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-primary-200 hover:shadow-sm">
+              <a key={item.slug} href={landingPageHref(item.slug)} className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-primary-200 hover:shadow-sm">
                 <div className="text-sm font-semibold text-slate-950">{item.title}</div>
                 <div className="mt-1 text-xs text-slate-500">
                   {formatNumber(item.events)} событий · {formatMoney(item.priceFrom)}

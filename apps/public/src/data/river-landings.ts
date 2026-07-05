@@ -1,3 +1,6 @@
+import { CANONICAL_LANDING_SLUGS } from '@/lib/landing-constants';
+import { landingCategoryHref } from '@/lib/landing-routes';
+
 export type RiverCitySpot = {
   title: string;
   badge: string;
@@ -52,7 +55,7 @@ export const RIVER_CITY_GUIDES: Record<string, RiverCityGuide> = {
     ],
   },
   'Санкт-Петербург': {
-    slug: 'spb',
+    slug: 'saint-petersburg',
     cityName: 'Санкт-Петербург',
     cityNameDative: 'Санкт-Петербургу',
     riverName: 'Нева и каналы',
@@ -280,8 +283,9 @@ export const RIVER_CITY_ORDER = [
 export const RIVER_SLUG_ALIASES: Record<string, string> = {
   msk: 'moscow',
   moscow: 'moscow',
-  spb: 'spb',
-  'saint-petersburg': 'spb',
+  spb: 'saint-petersburg',
+  'saint-petersburg': 'saint-petersburg',
+  'sankt-peterburg': 'saint-petersburg',
   rostov: 'rostov-on-don',
   'rostov-on-don': 'rostov-on-don',
 };
@@ -300,9 +304,9 @@ export function riverCityGuideBySlug(citySlug?: string | null): RiverCityGuide |
 
 export function riverLandingRoot(slug: string) {
   const key = slug.toLowerCase();
-  if (key.includes('bridge')) return '/landings/bridges-night';
+  if (key.includes('bridge')) return landingCategoryHref(CANONICAL_LANDING_SLUGS.bridges);
   if (key.includes('party') || key === 'party-boat' || key === 'river-disco' || key === 'boat-party') {
-    return '/landings/river-party';
+    return landingCategoryHref(CANONICAL_LANDING_SLUGS.party);
   }
-  return `/landings/river-cruises`;
+  return landingCategoryHref(CANONICAL_LANDING_SLUGS.river);
 }
