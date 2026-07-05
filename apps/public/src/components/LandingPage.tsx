@@ -4,6 +4,7 @@ import { Anchor, ArrowRight, Briefcase, Bus, Cake, CalendarDays, CheckCircle2, C
 import { EventCard } from '@/components/EventCard';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { BridgesLandingGuide } from '@/components/landing/BridgesLandingGuide';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton';
 import { LandingStickyHeader } from '@/components/landing/LandingStickyHeader';
 import {
@@ -367,7 +368,7 @@ function createSyntheticLanding(slug: string, cityName: string | null): PublicLa
     return {
       slug,
       title: BRIDGES_LANDING.heroTitle,
-      subtitle: 'Ночные прогулки по Неве и каналам',
+      subtitle: 'Разводные мосты — ночные прогулки по Неве и каналам',
       heroTitle: BRIDGES_LANDING.heroTitle,
       heroSubtitle: BRIDGES_LANDING.heroSubtitle,
       city: 'Санкт-Петербург',
@@ -789,6 +790,7 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
               <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">{seasonalMeta.nationalIntro}</p>
             </section>
           ) : null}
+          {profile === 'bridges' ? <BridgesLandingGuide /> : null}
           {profile === 'bridges' && landingCopy?.body ? (
             <section className="container mx-auto px-4 pb-4 pt-8">
               <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">{landingCopy.body}</p>
@@ -1011,7 +1013,17 @@ function LandingHero({
   const soldEstimate = isDinner
     ? Math.max(visibleCount * 1200, sessionsCount * 480)
     : Math.max(visibleCount * 1850, sessionsCount * 420);
-  const countLabel = isBus && cityName ? 'рейсов' : isBus ? 'экскурсий' : isRiver && cityName ? 'прогулок' : isSeasonal ? 'программ' : 'рейсов';
+  const countLabel = isBridges
+    ? 'прогулок'
+    : isBus && cityName
+      ? 'рейсов'
+      : isBus
+        ? 'экскурсий'
+        : isRiver && cityName
+          ? 'прогулок'
+          : isSeasonal
+            ? 'программ'
+            : 'событий';
   const ratingLabel = isDinner ? '4.8 / 5' : isSeasonal ? '4.8 / 5' : '4.7 / 5';
   const heroClass = isBridges
     ? 'gradient-bridges-hero'
@@ -1071,10 +1083,18 @@ function LandingHero({
                 </span>
               </>
             ) : isBridges ? (
-              <span className="flex items-center gap-2">
-                <span>/</span>
-                <span className="text-primary-foreground">{BRIDGES_LANDING.breadcrumbLabel}</span>
-              </span>
+              <>
+                <span className="flex items-center gap-2">
+                  <span>/</span>
+                  <a href="/cities/saint-petersburg" className="transition-colors hover:text-primary-foreground">
+                    {BRIDGES_LANDING.cityName}
+                  </a>
+                </span>
+                <span className="flex items-center gap-2">
+                  <span>/</span>
+                  <span className="text-primary-foreground">{BRIDGES_LANDING.breadcrumbLabel}</span>
+                </span>
+              </>
             ) : isRiver && !cityName ? (
               <span className="flex items-center gap-2">
                 <span>/</span>
