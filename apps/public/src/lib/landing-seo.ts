@@ -30,6 +30,12 @@ export type LandingSeoInput = {
 
 export type LandingSeo = {
   h1: string;
+  /** Текст до «сегодня, …» — для разметки hero. */
+  h1Lead: string;
+  /** «сегодня, 5 июля» — не переносить отдельно от слова «сегодня». */
+  h1Today: string;
+  /** «: цены, расписание…» */
+  h1Tail: string;
   title: string;
   description: string;
 };
@@ -58,9 +64,27 @@ function pricePhrase(price?: number | null): string {
   return `от ${value} рублей. `;
 }
 
-function withTodayDate(base: string, short: string, suffix: string): string {
+function buildH1Parts(base: string, short: string, suffix: string) {
   const cleaned = base.replace(/\s*сегодня[^:]*$/i, '').trim();
-  return `${cleaned} сегодня, ${short}: ${suffix}`;
+  const h1Lead = `${cleaned} `;
+  const h1Today = `сегодня, ${short}`;
+  const h1Tail = `: ${suffix}`;
+  return {
+    h1Lead,
+    h1Today,
+    h1Tail,
+    h1: `${h1Lead}${h1Today}${h1Tail}`,
+  };
+}
+
+function seoResult(
+  base: string,
+  short: string,
+  suffix: string,
+  title: string,
+  description: string,
+): LandingSeo {
+  return { ...buildH1Parts(base, short, suffix), title, description };
 }
 
 export function resolveLandingSeo(input: LandingSeoInput): LandingSeo {
@@ -75,64 +99,52 @@ export function resolveLandingSeo(input: LandingSeoInput): LandingSeo {
 
   if (profile === 'river') {
     if (cityName) {
-      const h1 = withTodayDate(
+      return seoResult(
         `Речные прогулки по ${prep}`,
         short,
         'цены, расписание и сравнение теплоходов',
-      );
-      return {
-        h1,
-        title: `Речные прогулки по ${prep} сегодня — купить билеты на теплоход, расписание на ${full}`,
-        description:
-          `Актуальное расписание и билеты на речные прогулки по ${prep} на сегодня. ` +
+        `Речные прогулки по ${prep} сегодня — купить билеты на теплоход, расписание на ${full}`,
+        `Актуальное расписание и билеты на речные прогулки по ${prep} на сегодня. ` +
           eventsPhrase(events, 'маршрутов') +
           pricePhrase(priceFrom) +
           'Сравнение теплоходов, круизы с ужином и ночные рейсы. Покупайте онлайн на Дайбилет!',
-      };
+      );
     }
-    const h1 = withTodayDate('Речные прогулки по России', short, 'цены, расписание и сравнение теплоходов');
-    return {
-      h1,
-      title: `Речные прогулки по России сегодня — купить билеты на теплоход, расписание на ${full}`,
-      description:
-        'Актуальное расписание речных прогулок по городам России на сегодня. ' +
+    return seoResult(
+      'Речные прогулки по России',
+      short,
+      'цены, расписание и сравнение теплоходов',
+      `Речные прогулки по России сегодня — купить билеты на теплоход, расписание на ${full}`,
+      'Актуальное расписание речных прогулок по городам России на сегодня. ' +
         eventsPhrase(events, 'маршрутов') +
         pricePhrase(priceFrom) +
         'Сравнение теплоходов в 12 городах. Покупайте онлайн на Дайбилет!',
-    };
+    );
   }
 
   if (profile === 'bus') {
     if (cityName) {
-      const h1 = withTodayDate(
+      return seoResult(
         `Обзорные автобусные экскурсии по ${prep}`,
         short,
         'цены, расписание и маршруты',
-      );
-      return {
-        h1,
-        title: `Автобусные экскурсии ${cityName} сегодня — купить билеты, расписание на ${full}`,
-        description:
-          `Актуальное расписание автобусных экскурсий по ${prep} на сегодня. ` +
+        `Автобусные экскурсии ${cityName} сегодня — купить билеты, расписание на ${full}`,
+        `Актуальное расписание автобусных экскурсий по ${prep} на сегодня. ` +
           eventsPhrase(events, 'маршрутов') +
           pricePhrase(priceFrom) +
           'Обзорные туры, Hop-On Hop-Off и двухэтажные автобусы. Покупайте онлайн на Дайбилет!',
-      };
+      );
     }
-    const h1 = withTodayDate(
+    return seoResult(
       'Обзорные автобусные экскурсии по России',
       short,
       'цены, расписание и маршруты',
-    );
-    return {
-      h1,
-      title: `Автобусные экскурсии по России сегодня — купить билеты, расписание на ${full}`,
-      description:
-        'Актуальное расписание автобусных экскурсий в городах России на сегодня. ' +
+      `Автобусные экскурсии по России сегодня — купить билеты, расписание на ${full}`,
+      'Актуальное расписание автобусных экскурсий в городах России на сегодня. ' +
         eventsPhrase(events, 'маршрутов') +
         pricePhrase(priceFrom) +
         'Сравнение обзорных туров в 11 городах. Покупайте онлайн на Дайбилет!',
-    };
+    );
   }
 
   if (profile === 'dinner') {
@@ -147,29 +159,29 @@ export function resolveLandingSeo(input: LandingSeoInput): LandingSeo {
         ? `Ужин на теплоходе по ${riverLabel}`
         : `Ужин на теплоходе в ${cityName}`
       : 'Ужин на теплоходе';
-    const h1 = withTodayDate(h1Base, short, 'цены и расписание');
-    return {
-      h1,
-      title: `Ужин на теплоходе ${cityName ? `— ${cityName}` : 'в Москве'} сегодня — забронировать круиз, расписание на ${full}`,
-      description:
-        `Актуальное расписание ужинов на теплоходе ${cityName ? `в ${cityName}` : 'в Москве'} на сегодня. ` +
+    return seoResult(
+      h1Base,
+      short,
+      'цены и расписание',
+      `Ужин на теплоходе ${cityName ? `— ${cityName}` : 'в Москве'} сегодня — забронировать круиз, расписание на ${full}`,
+      `Актуальное расписание ужинов на теплоходе ${cityName ? `в ${cityName}` : 'в Москве'} на сегодня. ` +
         eventsPhrase(events, 'программ') +
         pricePhrase(priceFrom) +
         'Сет-меню, фуршеты и вечерние круизы с видом на город. Покупайте онлайн на Дайбилет!',
-    };
+    );
   }
 
   if (profile === 'bridges' || isBridgesNightLandingSlug(slug)) {
-    const h1 = withTodayDate('Ночные мосты Санкт-Петербурга', short, 'расписание рейсов и цены');
-    return {
-      h1,
-      title: `Ночные мосты Санкт-Петербурга сегодня — купить билеты на теплоход, расписание на ${full}`,
-      description:
-        'Актуальное расписание ночных прогулок к разводным мостам Санкт-Петербурга на сегодня. ' +
+    return seoResult(
+      'Ночные мосты Санкт-Петербурга',
+      short,
+      'расписание рейсов и цены',
+      `Ночные мосты Санкт-Петербурга сегодня — купить билеты на теплоход, расписание на ${full}`,
+      'Актуальное расписание ночных прогулок к разводным мостам Санкт-Петербурга на сегодня. ' +
         eventsPhrase(events, 'рейсов') +
         pricePhrase(priceFrom) +
         'Сравнение теплоходов, маршруты по Неве и каналам. Покупайте онлайн на Дайбилет!',
-    };
+    );
   }
 
   if (profile === 'seasonal') {
@@ -177,41 +189,41 @@ export function resolveLandingSeo(input: LandingSeoInput): LandingSeo {
     const label = meta?.breadcrumbLabel || input.landingTitle;
     if (cityName && meta) {
       const cityPrepSeasonal = input.cityPrep || cityName;
-      const h1 = withTodayDate(`${label} в ${cityPrepSeasonal}`, short, 'точки обзора и экскурсии');
-      return {
-        h1,
-        title: `${label} — ${cityName} сегодня: купить билеты, афиша на ${full}`,
-        description:
-          `Актуальная афиша программ «${label}» в ${cityName} на сегодня. ` +
+      return seoResult(
+        `${label} в ${cityPrepSeasonal}`,
+        short,
+        'точки обзора и экскурсии',
+        `${label} — ${cityName} сегодня: купить билеты, афиша на ${full}`,
+        `Актуальная афиша программ «${label}» в ${cityName} на сегодня. ` +
           eventsPhrase(events, 'программ') +
           pricePhrase(priceFrom) +
           'Лучшие точки обзора и экскурсии. Покупайте онлайн на Дайбилет!',
-      };
+      );
     }
-    const h1 = withTodayDate(label, short, 'лучшие точки обзора и экскурсии');
-    return {
-      h1,
-      title: `${label} сегодня — купить билеты, афиша на ${full}`,
-      description:
-        `Актуальная афиша «${label}» на сегодня. ` +
+    return seoResult(
+      label,
+      short,
+      'лучшие точки обзора и экскурсии',
+      `${label} сегодня — купить билеты, афиша на ${full}`,
+      `Актуальная афиша «${label}» на сегодня. ` +
         eventsPhrase(events, 'программ') +
         pricePhrase(priceFrom) +
         'Сравнение экскурсий и точек обзора в городах России. Покупайте онлайн на Дайбилет!',
-    };
+    );
   }
 
   if (isRiverPartyLandingSlug(slug)) {
     const topic = cityName ? `Вечеринки на теплоходе — ${cityName}` : 'Вечеринки и дискотеки на теплоходе';
-    const h1 = withTodayDate(topic, short, 'DJ, расписание и цены');
-    return {
-      h1,
-      title: `${topic} сегодня — купить билеты, расписание на ${full}`,
-      description:
-        `Актуальное расписание вечеринок и дискотек на теплоходе${cityName ? ` в ${cityName}` : ''} на сегодня. ` +
+    return seoResult(
+      topic,
+      short,
+      'DJ, расписание и цены',
+      `${topic} сегодня — купить билеты, расписание на ${full}`,
+      `Актуальное расписание вечеринок и дискотек на теплоходе${cityName ? ` в ${cityName}` : ''} на сегодня. ` +
         eventsPhrase(events, 'рейсов') +
         pricePhrase(priceFrom) +
         'DJ-сеты, живая музыка и ночные круизы. Покупайте онлайн на Дайбилет!',
-    };
+    );
   }
 
   const defaultTopics: Record<string, { countUnit: string; extras: string }> = {
@@ -227,17 +239,17 @@ export function resolveLandingSeo(input: LandingSeoInput): LandingSeo {
   const topic = input.landingTitle.trim() || slug.replace(/-/g, ' ');
   const defaults = defaultTopics[slug] || { countUnit: 'событий', extras: 'расписание и цены' };
   const citySuffix = cityName && !topic.toLowerCase().includes(cityName.toLowerCase()) ? ` — ${cityName}` : '';
-  const h1 = withTodayDate(`${topic}${citySuffix}`, short, 'афиша, цены и билеты');
 
-  return {
-    h1,
-    title: `${topic}${citySuffix} сегодня — купить билеты, афиша на ${full}`,
-    description:
-      `Актуальная афиша «${topic}»${cityName ? ` в ${cityName}` : ''} на сегодня. ` +
+  return seoResult(
+    `${topic}${citySuffix}`,
+    short,
+    'афиша, цены и билеты',
+    `${topic}${citySuffix} сегодня — купить билеты, афиша на ${full}`,
+    `Актуальная афиша «${topic}»${cityName ? ` в ${cityName}` : ''} на сегодня. ` +
       eventsPhrase(events, defaults.countUnit) +
       pricePhrase(priceFrom) +
       `${defaults.extras}. Покупайте онлайн на Дайбилет!`,
-  };
+  );
 }
 
 /** Обновляет document.title и meta description по динамическому SEO-шаблону. */

@@ -992,9 +992,9 @@ function LandingHero({
   const dinnerGuide = isDinner ? dinnerCityGuide(cityName, citySlug) : null;
   const landingCopy = resolveLandingCopy(landingSlug);
   const useCopy = shouldUseLandingCopy(landingSlug, profile, citySlug);
-  const heroTitle = resolveLandingSeo(
+  const landingSeo = resolveLandingSeo(
     buildLandingSeoInput(landing, landingSlug, profile, citySlug, stats, todayReference),
-  ).h1;
+  );
   const heroSubtitle = isBridges
     ? BRIDGES_LANDING.heroSubtitle
     : useCopy && landingCopy?.lead
@@ -1108,7 +1108,11 @@ function LandingHero({
               </span>
             ) : null}
           </nav>
-          <h1 className="mb-4 text-3xl font-extrabold leading-tight text-primary-foreground md:text-5xl">{heroTitle}</h1>
+          <h1 className="mb-4 text-3xl font-extrabold leading-tight text-primary-foreground md:text-5xl">
+            {landingSeo.h1Lead}
+            <span className="whitespace-nowrap">{landingSeo.h1Today}</span>
+            {landingSeo.h1Tail}
+          </h1>
           <p className="mb-8 max-w-3xl text-base leading-relaxed text-primary-foreground/80 md:text-lg">{heroSubtitle}</p>
           <div className="flex flex-wrap gap-3">
             {sessionsReady ? (
