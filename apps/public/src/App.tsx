@@ -26,6 +26,7 @@ import { Header } from '@/components/Header';
 import { HelpPage } from '@/components/HelpPage';
 import { AboutPage } from '@/components/AboutPage';
 import { BlogPage } from '@/components/BlogPage';
+import { LegalTrustPage, OfferTrustPage, PrivacyTrustPage, RequisitesTrustPage } from '@/components/trust/TrustPages';
 import { LandingsCatalogPage } from '@/components/LandingsCatalogPage';
 import { LoginPage } from '@/components/LoginPage';
 import { InstitutionCard } from '@/components/InstitutionCard';
@@ -98,9 +99,10 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
   if (window.location.pathname === '/about' || window.location.pathname === '/about/') return <AboutPage />;
   if (window.location.pathname === '/help' || window.location.pathname === '/help/') return <HelpPage />;
   if (window.location.pathname === '/blog' || window.location.pathname === '/blog/') return <BlogPage />;
-  if (window.location.pathname === '/privacy' || window.location.pathname === '/privacy/') return <StaticInfoPage kind="privacy" />;
-  if (window.location.pathname === '/legal' || window.location.pathname === '/legal/') return <StaticInfoPage kind="legal" />;
-  if (window.location.pathname === '/offer' || window.location.pathname === '/offer/') return <StaticInfoPage kind="offer" />;
+  if (window.location.pathname === '/privacy' || window.location.pathname === '/privacy/') return <PrivacyTrustPage />;
+  if (window.location.pathname === '/legal' || window.location.pathname === '/legal/') return <LegalTrustPage />;
+  if (window.location.pathname === '/offer' || window.location.pathname === '/offer/') return <OfferTrustPage />;
+  if (window.location.pathname === '/requisites' || window.location.pathname === '/requisites/') return <RequisitesTrustPage />;
 
   const venuePageMatch = window.location.pathname.match(/^\/venues\/([^/]+)\/?$/);
   if (venuePageMatch) {
@@ -287,9 +289,9 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
 
         <HomeFormatSection />
 
-        <PromoSection landings={publicData.landings} cityFilter={destination !== 'all' ? destination : undefined} />
-
         <HomeVenuesSection />
+
+        <PromoSection landings={publicData.landings} cityFilter={destination !== 'all' ? destination : undefined} />
 
         <HomeBlogSection />
 
@@ -302,34 +304,13 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
   );
 }
 
-function StaticInfoPage({ kind }: { kind: 'blog' | 'privacy' | 'legal' | 'offer' }) {
+function StaticInfoPage({ kind }: { kind: 'blog' }) {
   const meta = {
     blog: {
       title: 'Статьи',
       paragraphs: [
         'Скоро здесь появятся городские гиды, подборки по датам, маршруты, советы перед покупкой и ссылки на события из каталога.',
         'Пока все актуальные предложения собраны в каталоге, городских страницах и тематических подборках.',
-      ],
-    },
-    privacy: {
-      title: 'Политика конфиденциальности',
-      paragraphs: [
-        'Дайбилет хранит только данные, которые помогают найти заказ, проверить статус билета и обработать обращение покупателя. Оплата, кассовые чеки и платежные данные остаются на стороне билетной системы.',
-        'Если пользователь обращается за помощью, мы можем использовать номер заказа, контакт, название события, дату сеанса и статус билета. Для удаления или уточнения данных можно написать на hello@daibilet.ru.',
-      ],
-    },
-    legal: {
-      title: 'Правовая информация',
-      paragraphs: [
-        'Дайбилет работает как информационный агрегатор событий и помогает перейти к покупке у билетного партнера. Финансовый контур, прием оплаты, оформление чеков, правила возврата и итоговые условия покупки определяются билетной системой или организатором.',
-        'Мы стремимся поддерживать актуальность каталога, но расписание, наличие мест, тарифы и возрастные ограничения нужно проверять в виджете или интерфейсе партнера перед оплатой.',
-      ],
-    },
-    offer: {
-      title: 'Оферта для партнеров',
-      paragraphs: [
-        'Для подключения событий к Дайбилет можно написать на hello@daibilet.ru. На первом этапе мы работаем через импорт каталога и виджеты покупки билетных систем.',
-        'Партнерский кабинет и расширенные инструменты поставщика будут добавлены после запуска основного каталога и первых продаж.',
       ],
     },
   }[kind];

@@ -675,12 +675,12 @@ function BuyCard({ payload }: { payload: PublicEventPage }) {
       <div className="mt-4 flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2">
         <Shield className="h-4 w-4 text-emerald-500" />
         <span className="text-xs text-slate-500">
-          Безопасная оплата через{' '}
+          Безопасная оплата в виджете{' '}
           {isTepWidget || String(offerSource || '').toUpperCase().includes('TEPLOHOD')
             ? 'teplohod.info'
             : isTcWidget || String(offerSource || '').toUpperCase().includes('TC')
               ? 'Ticketscloud'
-              : 'Дайбилет'}
+              : 'билетной системы организатора'}
         </span>
       </div>
     </div>

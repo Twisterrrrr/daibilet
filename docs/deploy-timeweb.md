@@ -21,7 +21,8 @@
 Рекомендуемые директории:
 
 - `/opt/daibilet` - код приложения.
-- `/var/www/daibilet/public` - собранный public.
+- `/var/www/daibilet/public` - собранный public (prod, `daibilet.ru`).
+- `/var/www/daibilet/staging` - pre-release public (`staging.daibilet.ru`).
 - `/var/www/daibilet/admin` - собранная admin.
 - `/var/backups/daibilet` - архив старой версии перед переключением.
 
@@ -167,7 +168,28 @@ systemctl status daibilet-api
 
 Backend тоже защищает `/api/admin/*`, `/api/v1/tc/*`, `/api/v1/tep/*`, `/api/db/*`, поэтому даже прямой доступ к `api.daibilet.ru/api/admin/...` должен получить `401`.
 
-Шаблон nginx лежит в `deploy/nginx/daibilet.conf.example`.
+Шаблон nginx лежит в `deploy/nginx/daibilet.conf.example`, блок staging — в `deploy/nginx/staging.daibilet.ru.conf.snippet`.
+
+### Staging (pre-release)
+
+- URL: `https://staging.daibilet.ru`
+- Static root: `/var/www/daibilet/staging` (не `/var/www/daibilet/public`)
+- API: тот же backend, что и prod (`/api/` → `127.0.0.1:4000`)
+- `X-Robots-Tag: noindex` — не индексировать pre-release
+
+Деплой только фронта на staging:
+
+```bash
+cd /opt/daibilet
+chmod +x deploy/scripts/deploy-staging-public.sh
+BRANCH=feat/lovable-landings deploy/scripts/deploy-staging-public.sh
+```
+
+После смены `root` в nginx:
+
+```bash
+nginx -t && systemctl reload nginx
+```
 
 Для временного basic auth:
 

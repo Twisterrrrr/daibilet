@@ -77,13 +77,17 @@ function loadOverrideMap() {
   return overrideByKey;
 }
 
-function findOverride(input = {}) {
+export function findVenueOverride(input = {}) {
   const overrides = loadOverrideMap();
   const keys = [input.id, input.title, input.name].filter(Boolean).map(normalizeKey);
   for (const key of keys) {
     if (overrides.has(key)) return overrides.get(key);
   }
   return null;
+}
+
+function findOverride(input = {}) {
+  return findVenueOverride(input);
 }
 
 function capitalizeWord(value) {

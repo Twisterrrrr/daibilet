@@ -2,7 +2,12 @@ import { createHash, randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { normalizePublicVenueRecord, formatBusLocationDisplayName, formatPierLocationDisplayName } from './venue-normalize.js';
+import {
+  normalizePublicVenueRecord,
+  formatBusLocationDisplayName,
+  formatPierLocationDisplayName,
+  findVenueOverride,
+} from './venue-normalize.js';
 import {
   resolveCityTimeZone,
   resolveSessionTimeZone,
@@ -5601,12 +5606,19 @@ function resolveVenueHeroImageUrl(row, heroImageFallbacks = null) {
   return row?.heroImageUrl || null;
 }
 
-function hasPierLikeText(name, address) {
+function hasStrongPierLocationText(name, address) {
   const text = venueNameAddressText(name, address);
   if (/смотров(?:ая|ой|ую|ые)\s+площадк/i.test(text)) return false;
-  if (/причал|пристань/i.test(text)) return true;
+  if (/пассажирск(?:ий|ого|ая|ые)\s+терминал/i.test(text)) return true;
+  if (/морск(?:ой|ого|ая|ые)\s+вокзал/i.test(text)) return true;
   if (/речн(?:ой|ая|ого|ые)?\s+(?:вокзал|порт)/i.test(text)) return true;
+  if (/причал|пристань/i.test(text)) return true;
+  if (/набереж/i.test(text) && /(?:терминал|вокзал|порт)/i.test(text)) return true;
   return false;
+}
+
+function hasPierLikeText(name, address) {
+  return hasStrongPierLocationText(name, address);
 }
 
 function isViewingPlatformLikeVenue(name, address, shortDescription, description) {
@@ -5662,8 +5674,7 @@ function inferPublicVenueKindFromName(name, address) {
   if (/\bпам\.|памятник|\bу пам\b|пл\.\s*у\s*пам|место сбора|точка сбора|^метро\b|\bу метро\b/i.test(text)) return 'meeting_point';
   if (/смотров(?:ая|ой|ую|ые)\s+площадк/i.test(text)) return 'museum_art_space';
   if (hasBusLikeText(name, address)) return 'bus';
-  if (/причал|пристань/i.test(text)) return 'pier';
-  if (/речн(?:ой|ая|ого|ые)?\s+(?:вокзал|порт)/i.test(text)) return 'pier';
+  if (hasStrongPierLocationText(name, address)) return 'pier';
   if (/турбаз|база отдыха|глэмпинг/i.test(text)) return 'outdoor_location';
   if (/театр|teatr/i.test(text)) return 'theater';
   if (/музей|галере|выстав/i.test(text)) return 'museum_art_space';
@@ -5703,17 +5714,18 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
     return 'museum_art_space';
   }
 
-  if (INSTITUTION_VENUE_KINDS.has(normalizeVenueKindValue(storedKind))) {
-    return stored;
-  }
-
   if (
     stored === 'pier' ||
+    hasStrongPierLocationText(name, address) ||
     hasPierLikeText(name, address) ||
     inferred === 'pier' ||
     (hasWaterOnlyEvents(waterEvents, totalEvents) && !isViewingPlatformLikeVenue(name, address, shortDescription, description))
   ) {
     return 'pier';
+  }
+
+  if (INSTITUTION_VENUE_KINDS.has(normalizeVenueKindValue(storedKind))) {
+    return stored;
   }
 
   if (stored === 'other' || stored === 'venue') {
@@ -5728,7 +5740,13 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
 }
 
 function resolvePublicVenueKindFromRow(row) {
-  return resolvePublicVenueKind(row.kind || row.proposedKind, row.name || row.title, row.address, {
+  const override = findVenueOverride({
+    id: row.id,
+    title: row.name || row.title,
+    name: row.name || row.title,
+  });
+  const storedKind = override?.kind || row.kind || row.proposedKind;
+  return resolvePublicVenueKind(storedKind, row.name || row.title, row.address, {
     shortDescription: row.shortDescription,
     description: row.description,
     waterEvents: Number(row.waterEvents || 0),

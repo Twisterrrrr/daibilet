@@ -8,6 +8,7 @@ import { formatMoney, formatNumber, publicData } from '@/data';
 import { buildCatalogPresetHref, buildCatalogTagHref } from '@/lib/catalog-links';
 import { CATALOG_PRESET_EMOJI, CATALOG_PRESET_HINT, CATALOG_PRESETS } from '@/lib/catalog-presets';
 import { collectPopularTags } from '@/lib/catalog-tags';
+import { resolveLandingCardImage } from '@/lib/landing-images';
 import { landingPageHref } from '@/lib/landing-slugs';
 import type { PublicLanding } from '@/types';
 
@@ -27,7 +28,7 @@ export function LandingsCatalogPage() {
     document.title = 'Подборки — тематические коллекции событий | Дайбилет';
     upsertMeta(
       'description',
-      'Готовые подборки на вечер, выходные и бюджет, тематические направления и популярные теги — с переходом в каталог с нужными фильтрами.',
+      'Готовые подборки на вечер, выходные и бюджет, популярные запросы и теги — с переходом в каталог с нужными фильтрами.',
     );
   }, []);
 
@@ -79,10 +80,10 @@ export function LandingsCatalogPage() {
           <section className="mt-12">
             <h2 className="font-display flex items-center gap-2 text-xl font-bold text-slate-900">
               <Sparkles className="h-5 w-5 text-primary" />
-              Направления
+              Популярные запросы
             </h2>
             <p className="mt-1 text-sm text-slate-500">
-              Тематические хабы: круизы, экскурсии, вечеринки, сезонные программы. У каждого — версии по городам.
+              Речные прогулки, развод мостов, стендап, автобусные экскурсии и сезонные программы — с версиями по городам.
             </p>
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {landings.map((landing) => (
@@ -92,7 +93,7 @@ export function LandingsCatalogPage() {
           </section>
         ) : (
           <section className="mt-12 rounded-2xl border border-dashed border-slate-300 bg-white py-12 text-center">
-            <p className="text-lg text-slate-500">Тематические направления скоро появятся</p>
+            <p className="text-lg text-slate-500">Популярные запросы скоро появятся</p>
             <p className="mt-1 text-sm text-slate-400">Пока доступны быстрые фильтры и теги ниже</p>
           </section>
         )}
@@ -100,7 +101,7 @@ export function LandingsCatalogPage() {
         {tags.length ? (
           <section className="mt-12">
             <h2 className="font-display text-xl font-bold text-slate-900">По тегам</h2>
-            <p className="mt-1 text-sm text-slate-500">Популярные запросы — откроют каталог с поиском по тегу</p>
+            <p className="mt-1 text-sm text-slate-500">Уточните тему — откроется каталог с фильтром по тегу</p>
             <div className="mt-4 flex flex-wrap gap-2">
               {tags.map((tag) => (
                 <a
@@ -133,7 +134,7 @@ export function LandingsCatalogPage() {
 
 function LandingDirectionCard({ landing }: { landing: PublicLanding }) {
   const emoji = LANDING_EMOJI[landing.slug] || '✨';
-  const imageUrl = landing.heroImageUrl || landing.imageUrl || null;
+  const imageUrl = resolveLandingCardImage(landing.slug, landing.imageUrl, landing.heroImageUrl);
 
   return (
     <a

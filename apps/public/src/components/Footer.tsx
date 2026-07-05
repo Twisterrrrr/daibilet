@@ -16,11 +16,12 @@ const catalogLinks = [
 
 const companyLinks = [
   { label: 'О сервисе', href: '/about' },
-  { label: 'Подборки', href: '/podborki' },
-  { label: 'Города', href: '/cities' },
   { label: 'Площадки', href: '/venues' },
-  { label: 'Проверить заказ', href: '/my-orders' },
+  { label: 'Локации', href: '/locations' },
+  { label: 'Подборки', href: '/podborki' },
+  { label: 'Блог', href: '/blog' },
   { label: 'Помощь', href: '/help' },
+  { label: 'Проверить заказ', href: '/my-orders' },
 ];
 
 export function Footer() {
@@ -45,14 +46,13 @@ export function Footer() {
               </span>
             </a>
             <p className="mt-3 text-sm leading-6 text-slate-500">
-              Билеты на экскурсии, музеи и мероприятия по городам России. Покупка проходит в виджетах билетных систем.
+              Билеты на экскурсии, музеи и мероприятия по городам России.
+              <br />
+              Выбирайте на Дайбилете — покупайте в виджете организатора.
             </p>
             <div className="mt-4 space-y-1.5 text-base font-medium leading-none text-slate-800">
-              <a href="mailto:hello@daibilet.ru" className="block transition-colors hover:text-primary-600">
-                hello@daibilet.ru
-              </a>
-              <a href="https://daibilet.ru" className="block transition-colors hover:text-primary-600">
-                daibilet.ru
+              <a href="mailto:info@daibilet.ru" className="block transition-colors hover:text-primary-600">
+                info@daibilet.ru
               </a>
             </div>
           </div>
@@ -63,14 +63,30 @@ export function Footer() {
         </div>
 
         <div className="mt-10 border-t border-slate-200 pt-6">
-          <div className="flex flex-col gap-4 text-sm text-slate-400 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <p className="text-slate-900">&copy; {new Date().getFullYear()} Дайбилет</p>
-              <p className="mt-1">Агрегатор экскурсий и мероприятий в РФ</p>
+              <p className="text-sm text-slate-900">&copy; {new Date().getFullYear()} Дайбилет</p>
             </div>
-            <div className="flex flex-wrap gap-x-5 gap-y-1 sm:justify-end">
-              <a href="/privacy" className="hover:text-slate-600">Политика конфиденциальности</a>
-              <a href="/legal" className="hover:text-slate-600">Правовая информация</a>
+            <div className="flex flex-col gap-2 text-right sm:ml-auto">
+              <div className="flex flex-wrap justify-end gap-x-4 gap-y-1 sm:gap-x-6">
+                <a href="/privacy#user-agreement" className="text-sm text-slate-400 hover:text-slate-600">
+                  Пользовательское соглашение
+                </a>
+                <a href="/privacy#privacy-policy" className="text-sm text-slate-400 hover:text-slate-600">
+                  Политика конфиденциальности
+                </a>
+                <a href="/offer" className="text-sm text-slate-400 hover:text-slate-600">
+                  Договор-оферта (для партнёров)
+                </a>
+              </div>
+              <div className="flex flex-wrap justify-end gap-x-4 gap-y-1 sm:gap-x-6">
+                <a href="/legal#refunds" className="text-sm text-slate-400 hover:text-slate-600">
+                  Правила возврата
+                </a>
+                <a href="/legal#rightsholders" className="text-sm text-slate-400 hover:text-slate-600">
+                  Правообладателям
+                </a>
+              </div>
             </div>
           </div>
         </div>
