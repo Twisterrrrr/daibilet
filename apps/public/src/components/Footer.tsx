@@ -48,7 +48,7 @@ export function Footer() {
             <p className="mt-3 text-sm leading-6 text-slate-500">
               Билеты на экскурсии, музеи и мероприятия по городам России.
               <br />
-              Выбирайте на Дайбилете — покупайте в виджете организатора.
+              Покупайте онлайн, посещайте лучшее!
             </p>
             <div className="mt-4 space-y-1.5 text-base font-medium leading-none text-slate-800">
               <a href="mailto:info@daibilet.ru" className="block transition-colors hover:text-primary-600">

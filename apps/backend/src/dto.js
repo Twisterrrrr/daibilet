@@ -124,8 +124,13 @@ let publicVenueCatalogLists = null;
 const LANDING_SLUG_ALIASES = {
   'river-cruises': ['river-walks', 'river-cruise', 'river'],
   'river-party': ['party-boat', 'river-disco', 'boat-party'],
-  'bridges-night': ['razvodnye-mosty', 'bridges', 'spb-bridges-night'],
+  'bridges-night': ['razvodnye-mosty', 'bridges', 'spb-bridges-night', 'bridges_night', 'night-bridges'],
   'bus-tours': ['bus-sightseeing', 'bus'],
+  'spb-yards': ['spb-paradnye', 'yards-spb', 'dory-paradnye'],
+  'family-kids': ['kids-family', 'detyam'],
+  'concerts-genre': ['concerts', 'concerts-genres'],
+  'moscow-museums': ['moscow-museums-workshops'],
+  'active-sport': ['active-extreme', 'autosport'],
 };
 
 const LANDING_RULES = [
@@ -138,7 +143,7 @@ const LANDING_RULES = [
     keywords: ['теплоход', 'катер', 'река', 'речн', 'канал', 'причал', 'прогулк'],
     keywordScope: 'content',
     requiredAnySubcategories: ['Водные экскурсии', 'Речные прогулки'],
-    excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал', 'мастер-класс', 'квест', 'концерт', 'вечеринк', 'дискотек'],
+    excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал', 'мастер-класс', 'квест', 'концерт', 'вечеринк', 'дискотек', 'церк', 'храм', 'кирх', 'орган', 'музыкальн'],
   },
   {
     slug: 'river-party',
@@ -239,6 +244,65 @@ const LANDING_RULES = [
     subtitle: 'Мультимедийные шоу и концерты',
     chips: ['шоу', 'концерты', 'СПб'],
     venue: 'Планетарий 1',
+  },
+  {
+    slug: 'spb-yards',
+    title: 'Дворы, парадные и коммуналки',
+    subtitle: 'Авторские прогулки по скрытому Петербургу',
+    city: 'Санкт-Петербург',
+    chips: ['парадные', 'коммуналки', 'дворы'],
+    tags: ['Дворы и парадные', 'Экскурсия по парадным', 'Экскурсия по коммуналкам', 'Экскурсия по дворам', 'Интерьерная'],
+    requiredAnySubcategories: ['Дворы и парадные', 'Экскурсия по парадным', 'Экскурсия по коммуналкам', 'Экскурсия по дворам', 'Интерьерная'],
+    excludeTags: ['Водные экскурсии', 'На теплоходе', 'На катере', 'Реки и каналы'],
+    excludeKeywords: ['автобус', 'автобусн', 'теплоход', 'катер', 'речн', 'нева', 'канал', 'причал'],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory'],
+  },
+  {
+    slug: 'family-kids',
+    title: 'Детям и семьям',
+    subtitle: 'Ёлки, цирк, шоу и анимация для детей',
+    chips: ['детям', 'семья', 'цирк'],
+    tags: ['Детям', 'Детская анимация', 'Шоу для детей', 'Цирк', 'Детское шоу'],
+    requiredAnySubcategories: ['Детям', 'Детская анимация', 'Шоу для детей'],
+    keywords: ['детск', 'семейн', 'цирк', 'анимац', 'для детей', 'ёлк', 'елк'],
+    keywordScope: 'content',
+    excludeKeywords: ['18+', 'stand up', 'стендап', 'комеди', 'юмор'],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory'],
+  },
+  {
+    slug: 'concerts-genre',
+    title: 'Концерты',
+    subtitle: 'Рок, джаз, классика, эстрада и живые выступления',
+    chips: ['рок', 'джаз', 'классика'],
+    tags: ['Рок', 'Джаз', 'Классика', 'Поп', 'Эстрада', 'Металл', 'Альтернатива', 'Электронная музыка', 'Хип-хоп', 'Орган', 'Симфоническая музыка', 'Инди'],
+    keywords: ['концерт', 'live', 'симфон', 'оркестр', 'филармон'],
+    keywordScope: 'content',
+    excludeTags: ['Юмор', 'Stand up', 'Комедия', 'Импровизация', 'TV комики'],
+    excludeKeywords: ['стендап', 'stand up', 'комеди', 'юмор', 'импров'],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'subcategory'],
+  },
+  {
+    slug: 'moscow-museums',
+    title: 'Музеи и мастер-классы в Москве',
+    subtitle: 'Выставки, экскурсии и творческие занятия',
+    city: 'Москва',
+    chips: ['музеи', 'мастер-класс', 'творчество'],
+    tags: ['Музеи', 'Мастер-класс', 'Мастер-классы', 'Выставки', 'Искусство', 'Творчество'],
+    requiredAnySubcategories: ['Музеи', 'Мастер-класс', 'Мастер-классы', 'Выставки'],
+    keywords: ['мастер-класс', 'музе', 'выставк', 'эмаль'],
+    keywordScope: 'content',
+    excludeKeywords: ['автобус', 'автобусн', 'теплоход', 'речн'],
+    excludeKeywordFields: ['title', 'venue', 'subcategory'],
+  },
+  {
+    slug: 'active-sport',
+    title: 'Активный отдых и автоспорт',
+    subtitle: 'Дрифт, гонки и активные развлечения',
+    chips: ['дрифт', 'автоспорт', 'активный'],
+    tags: ['Автоспорт', 'Дрифт', 'Активный отдых'],
+    requiredAnySubcategories: ['Автоспорт', 'Дрифт', 'Активный отдых'],
+    keywords: ['дрифт', 'автоспорт', 'картинг', 'гонк', 'формул'],
+    keywordScope: 'content',
   },
 ];
 
@@ -3268,44 +3332,54 @@ export async function buildPublicSearch(db, searchParams) {
 }
 
 const PROMO_LANDING_ORDER = [
+  'spb-yards',
   'bridges-night',
   'moscow-dinner-boat',
+  'moscow-museums',
   'river-party',
+  'concerts-genre',
   'salute-9-may',
+  'family-kids',
   'new-year',
   'bus-tours',
   'river-cruises',
   'standup',
   'planetarium',
+  'active-sport',
 ];
 
 const PROMO_CITY_LANDING_BOOSTS = {
-  'sankt-peterburg': ['bridges-night'],
-  'saint-petersburg': ['bridges-night'],
-  'санкт-петербург': ['bridges-night'],
-  'spb': ['bridges-night'],
-  'moscow': ['moscow-dinner-boat'],
-  'moskva': ['moscow-dinner-boat'],
-  'москва': ['moscow-dinner-boat'],
+  'sankt-peterburg': ['spb-yards', 'bridges-night'],
+  'saint-petersburg': ['spb-yards', 'bridges-night'],
+  'санкт-петербург': ['spb-yards', 'bridges-night'],
+  'spb': ['spb-yards', 'bridges-night'],
+  'moscow': ['moscow-dinner-boat', 'moscow-museums'],
+  'moskva': ['moscow-dinner-boat', 'moscow-museums'],
+  'москва': ['moscow-dinner-boat', 'moscow-museums'],
 };
+
+function scopePublicCatalogSessions(sessions, cityFilter) {
+  const key = String(cityFilter || '').trim().toLowerCase();
+  if (!key || key === 'all') return sessions;
+  return sessions.filter((session) => {
+    const cityName = String(session.city || '').toLowerCase();
+    const destination = String(session.destination || '').toLowerCase();
+    const citySlug = String(session.citySlug || session.sourceCitySlug || '').toLowerCase();
+    return cityName === key || destination === key || citySlug === key;
+  });
+}
+
+function buildSortedPublicLandings(sessions, cityFilter = '') {
+  return sortPromoLandings(
+    buildPublicLandings(sessions).filter((landing) => landing.events > 0),
+    cityFilter,
+  );
+}
 
 export async function buildPublicPromoBlocks(db, searchParams) {
   const cityFilter = String(searchParams.get('city') || '').trim().toLowerCase();
   const sessions = await publicCatalogSessions(db);
-  const scopedSessions =
-    cityFilter && cityFilter !== 'all'
-      ? sessions.filter((session) => {
-          const cityName = String(session.city || '').toLowerCase();
-          const destination = String(session.destination || '').toLowerCase();
-          const citySlug = String(session.citySlug || session.sourceCitySlug || '').toLowerCase();
-          return cityName === cityFilter || destination === cityFilter || citySlug === cityFilter;
-        })
-      : sessions;
-
-  const landings = sortPromoLandings(
-    buildPublicLandings(scopedSessions).filter((landing) => landing.events > 0),
-    cityFilter,
-  ).slice(0, 6);
+  const landings = buildSortedPublicLandings(scopePublicCatalogSessions(sessions, cityFilter), cityFilter).slice(0, 6);
 
   return {
     generatedAt: new Date().toISOString(),
@@ -3317,6 +3391,24 @@ export async function buildPublicPromoBlocks(db, searchParams) {
       priceFrom: landing.priceFrom,
       href: `/landings/${landing.slug}`,
       gradientIndex: index,
+    })),
+  };
+}
+
+export async function buildPublicLandingsCatalog(db, searchParams) {
+  const cityFilter = String(searchParams.get('city') || '').trim().toLowerCase();
+  const sessions = await publicCatalogSessions(db);
+  const landings = buildSortedPublicLandings(scopePublicCatalogSessions(sessions, cityFilter), cityFilter);
+
+  return {
+    generatedAt: new Date().toISOString(),
+    city: cityFilter || 'all',
+    items: landings.map((landing) => ({
+      slug: landing.slug,
+      title: landing.title,
+      subtitle: landing.subtitle,
+      events: landing.events,
+      priceFrom: landing.priceFrom,
     })),
   };
 }
@@ -3684,6 +3776,7 @@ export async function buildPublicLandingPage(db, landingSlug) {
       slug: rule.slug,
       title: rule.title,
       subtitle: rule.subtitle,
+      city: rule.city || null,
       chips: rule.chips || [],
       events: sessions.length,
       venues: Object.keys(venues).length,
@@ -3784,6 +3877,7 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
       type: landingTypeForRule(rule),
       title: landing.title,
       subtitle: landing.subtitle,
+      city: rule.city || null,
       chips: rule.chips || [],
       events: sessions.length,
       venues: Object.keys(venues).length,
@@ -7387,7 +7481,7 @@ function buildPublicLandings(sessions) {
 }
 
 function resolveLandingRule(landingSlug) {
-  const key = String(landingSlug || '').trim().toLowerCase();
+  const key = String(landingSlug || '').trim().toLowerCase().replace(/_/g, '-');
   const direct = LANDING_RULES.find((item) => item.slug === key);
   if (direct) return direct;
   return (
@@ -7540,6 +7634,13 @@ function explainRuleMatch(event, rule) {
   const excludedKeyword = firstKeywordMatch(excludeKeywordFields, rule.excludeKeywords || []);
   if (excludedKeyword) blockers.push(`исключающее слово(${excludedKeyword.field}): ${excludedKeyword.keyword}`);
 
+  if (rule.requiredAnySubcategories?.length) {
+    const subcategories = eventSubcategoriesForLanding(event, tags);
+    const hit = rule.requiredAnySubcategories.find((label) => subcategories.includes(label));
+    if (hit) reasons.push(`подкатегория: ${hit}`);
+    else blockers.push(`нет подкатегории: ${rule.requiredAnySubcategories.join(' / ')}`);
+  }
+
   if (!blockers.length) {
     const fastMatchReasons = collectFastLandingMatchReasons(event, rule, tags);
     if (fastMatchReasons.length && landingRequiredSignalsSatisfied(rule, keywordFields)) {
@@ -7590,22 +7691,27 @@ function explainRuleMatch(event, rule) {
   const hasTagSignal = tagSignals.length > 0;
   const hasKeywordSignal = keywordSignals.length > 0;
   const hasRequiredSignal = Boolean(rule.requiredAnyTags || rule.requiredAnyKeywords || rule.requiredKeywords || rule.requiredTitleKeywordGroups || rule.requiredKeywordGroups);
-  const matches = Boolean(hasTagSignal || hasKeywordSignal || hasRequiredSignal || rule.city || rule.venue);
+  const venueMatched = rule.venue ? event.venue === rule.venue : false;
+  const matches = Boolean(hasTagSignal || hasKeywordSignal || hasRequiredSignal || venueMatched);
   return { matches, reasons: uniqueValues(reasons).slice(0, 10), blockers: [] };
+}
+
+function eventSubcategoriesForLanding(event, tags) {
+  return uniqueValues([
+    ...(event.subcategories || []),
+    ...pickCatalogSubcategories({
+      subcategories: event.subcategories || [],
+      tags,
+      category: event.category || event.sourceCategory || '',
+    }),
+  ]);
 }
 
 function collectFastLandingMatchReasons(event, rule, tags) {
   const reasons = [];
 
   if (rule.requiredAnySubcategories?.length) {
-    const subcategories = uniqueValues([
-      ...(event.subcategories || []),
-      ...pickCatalogSubcategories({
-        subcategories: event.subcategories || [],
-        tags,
-        category: event.category || event.sourceCategory || '',
-      }),
-    ]);
+    const subcategories = eventSubcategoriesForLanding(event, tags);
     const hit = rule.requiredAnySubcategories.find((label) => subcategories.includes(label));
     if (hit) reasons.push(`подкатегория: ${hit}`);
   }

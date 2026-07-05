@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Anchor, ArrowRight, Briefcase, Bus, Cake, CalendarDays, CheckCircle2, ChevronDown, CircleHelp, Clock, Eye, Headphones, Heart, HelpCircle, Lightbulb, MapPin, Mic, Moon, Music, Quote, Search, Shield, Ship, Sparkles, Star, Sun, Tag, Ticket, TrendingUp, Users, UtensilsCrossed, Wallet } from 'lucide-react';
+import { Anchor, ArrowRight, Briefcase, Bus, Cake, CalendarDays, CheckCircle2, ChevronDown, Clock, Eye, Headphones, Heart, HelpCircle, Lightbulb, MapPin, Mic, Moon, Music, Quote, Search, Shield, Ship, Sparkles, Star, Sun, Tag, Ticket, TrendingUp, Users, UtensilsCrossed, Wallet } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
 import { Footer } from '@/components/Footer';
@@ -10,6 +10,7 @@ import {
   CANONICAL_LANDING_SLUGS,
   busLandingHref,
   canonicalLandingSlug,
+  isBridgesNightLandingSlug,
   isRiverCruisesLandingSlug,
   isRiverPartyLandingSlug,
   landingFetchCandidates,
@@ -17,6 +18,9 @@ import {
   partyLandingHref,
   riverLandingHref,
 } from '@/lib/landing-slugs';
+import { resolveLandingCopy, shouldUseLandingCopy } from '@/lib/landing-copy';
+import { applyLandingSeoMeta, resolveLandingSeo, useLandingTodayReference } from '@/lib/landing-seo';
+import { BRIDGES_LANDING } from '@/data/bridges-landing';
 import {
   getSeasonalLanding,
   seasonalCityGuide,
@@ -35,6 +39,7 @@ import {
   publicData,
 } from '@/data';
 import {
+  collectSessionStartsAtTimes,
   getSessionHour,
   isSameSessionDay,
   isSessionTomorrow,
@@ -43,7 +48,7 @@ import {
   resolveSessionTime,
   resolveSessionTimeZoneForSession,
   parseSessionStartsAt,
-  sessionTimeSlotFilter,
+  sessionMatchesTimeSlot,
 } from '@/lib/datetime';
 import { isOpenDate, FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession } from '@/lib/event-card-meta';
 import { formatVacantSeats } from '@/lib/pluralize';
@@ -58,7 +63,7 @@ const API_BASE_URL =
 type DateFilter = 'all' | 'today' | 'tomorrow' | 'weekend' | 'evening';
 type SortFilter = 'price' | 'rating' | 'time';
 type ViewMode = 'list' | 'table' | 'cards';
-type LandingProfile = 'bus' | 'dinner' | 'river' | 'seasonal' | 'default';
+type LandingProfile = 'bus' | 'dinner' | 'river' | 'seasonal' | 'bridges' | 'default';
 type MenuFilter = 'all' | 'set' | 'buffet';
 type DinnerTimeFilter = 'all' | 'sunset' | 'night';
 type TimeSlotFilter = '' | 'morning' | 'day' | 'evening' | 'night';
@@ -243,6 +248,37 @@ function extractFormatLabel(tags: string[]): string {
   return 'Стандарт';
 }
 
+function resolveLandingCityPrep(cityName: string | null, profile: LandingProfile, landingSlug: string): string | null {
+  if (!cityName) return profile === 'bus' || profile === 'river' ? 'России' : null;
+  if (profile === 'bus') return BUS_CITY_META[cityName]?.prepositional || cityName;
+  if (profile === 'river') return riverCityGuide(cityName)?.cityNameDative || cityName;
+  if (profile === 'seasonal') {
+    return seasonalCityGuide(landingSlug, cityName)?.cityNameDative || cityName;
+  }
+  return cityName;
+}
+
+function buildLandingSeoInput(
+  landing: PublicLanding,
+  slug: string,
+  profile: LandingProfile,
+  citySlug: string | undefined,
+  stats: PublicLandingPage['stats'] | undefined,
+  referenceDate: Date,
+): Parameters<typeof resolveLandingSeo>[0] {
+  const cityName = resolveLandingCityName(citySlug, slug);
+  return {
+    slug,
+    profile,
+    landingTitle: landing.title,
+    cityName,
+    cityPrep: resolveLandingCityPrep(cityName, profile, slug),
+    stats,
+    landingEvents: landing.events,
+    referenceDate,
+  };
+}
+
 function citySlugFromCityName(cityName: string | null): string | undefined {
   if (!cityName) return undefined;
   const entry = Object.entries(LANDING_CITY_SLUGS).find(([, name]) => name === cityName);
@@ -328,6 +364,20 @@ function collectLandingSessions(slug: string, cityName: string | null): PublicSe
 }
 
 function createSyntheticLanding(slug: string, cityName: string | null): PublicLanding | null {
+  if (isBridgesNightLandingSlug(slug)) {
+    return {
+      slug,
+      title: BRIDGES_LANDING.heroTitle,
+      subtitle: 'Ночные прогулки по Неве и каналам',
+      heroTitle: BRIDGES_LANDING.heroTitle,
+      heroSubtitle: BRIDGES_LANDING.heroSubtitle,
+      city: 'Санкт-Петербург',
+      seoTitle: `${BRIDGES_LANDING.heroTitle} | Дайбилет`,
+      seoDescription: BRIDGES_LANDING.heroSubtitle,
+      events: 0,
+    } as PublicLanding;
+  }
+
   if (isRiverPartyLandingSlug(slug)) {
     return {
       slug,
@@ -336,7 +386,7 @@ function createSyntheticLanding(slug: string, cityName: string | null): PublicLa
       heroTitle: cityName
         ? `Вечеринки на теплоходе — ${cityName}`
         : 'Вечеринки и дискотеки на теплоходе',
-      heroSubtitle: 'DJ-сеты, живая музыка и ночные круизы по рекам и каналам',
+      heroSubtitle: resolveLandingCopy(slug)?.lead || 'DJ-сеты, живая музыка и ночные круизы по рекам и каналам',
       seoTitle: cityName
         ? `Вечеринки на теплоходе — ${cityName} | Дайбилет`
         : 'Вечеринки на теплоходе | Дайбилет',
@@ -537,23 +587,22 @@ const BUS_CITY_ORDER = Object.keys(BUS_CITY_META);
 
 function getLandingProfile(slug: string): LandingProfile {
   const key = canonicalLandingSlug(slug);
+  if (isBridgesNightLandingSlug(key)) return 'bridges';
   if (getSeasonalLanding(key)) return 'seasonal';
   if (isRiverPartyLandingSlug(key)) return 'default';
   if (key.includes('bus')) return 'bus';
   if (key.includes('dinner') || key.includes('ужин')) return 'dinner';
-  if (key.includes('bridge') || isRiverCruisesLandingSlug(key)) return 'river';
+  if (isRiverCruisesLandingSlug(key)) return 'river';
   return 'default';
 }
 
 function isLovableLanding(profile: LandingProfile): boolean {
-  return profile === 'bus' || profile === 'river' || profile === 'dinner' || profile === 'seasonal' || profile === 'default';
+  return profile === 'bus' || profile === 'river' || profile === 'dinner' || profile === 'seasonal' || profile === 'bridges' || profile === 'default';
 }
 
 function matchesTimeSlotFilter(session: PublicSession, slot: TimeSlotFilter): boolean {
   if (!slot) return true;
-  const startsAt = session.startsAt || session.upcomingSlots?.[0]?.startsAt;
-  if (!startsAt) return true;
-  return sessionTimeSlotFilter(startsAt, resolveSessionTimeZoneForSession(session)) === slot;
+  return sessionMatchesTimeSlot(session, slot);
 }
 
 function citySlugByName(name: string): string | null {
@@ -591,6 +640,7 @@ type EventGroup = {
 export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlug?: string }) {
   const slug = canonicalLandingSlug(rawSlug);
   const profile = getLandingProfile(slug);
+  const todayReference = useLandingTodayReference();
   const shell = React.useMemo(() => buildLandingShellPage(slug, citySlug), [slug, citySlug]);
   const initialCachedPayload = React.useMemo(
     () => readCachedLandingPage(slug, citySlug),
@@ -604,16 +654,12 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
     }
   }, [rawSlug, slug, citySlug]);
 
-  React.useEffect(() => {
-    if (shell?.landing) applyLandingMeta(shell.landing);
-  }, [shell]);
-
   const [apiPayload, setApiPayload] = React.useState<PublicLandingPage | null>(() => initialCachedPayload);
   const [isSessionsLoading, setIsSessionsLoading] = React.useState(() => !initialCachedPayload?.sessions?.length);
   const [sessionsError, setSessionsError] = React.useState<string | null>(null);
   const [city, setCity] = React.useState('all');
   const [category, setCategory] = React.useState('all');
-  const [dateFilter, setDateFilter] = React.useState<DateFilter>(profile === 'bus' ? 'all' : 'today');
+  const [dateFilter, setDateFilter] = React.useState<DateFilter>(defaultLandingDateFilter(profile));
   const [sort, setSort] = React.useState<SortFilter>(profile === 'bus' || profile === 'dinner' ? 'price' : 'time');
   const [menuFilter, setMenuFilter] = React.useState<MenuFilter>('all');
   const [dinnerTimeFilter, setDinnerTimeFilter] = React.useState<DinnerTimeFilter>('all');
@@ -622,7 +668,7 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
   React.useEffect(() => {
     const nextProfile = getLandingProfile(slug);
     setSort(nextProfile === 'bus' || nextProfile === 'dinner' ? 'price' : 'time');
-    setDateFilter(nextProfile === 'bus' ? 'all' : 'today');
+    setDateFilter(defaultLandingDateFilter(nextProfile));
     setMenuFilter('all');
     setDinnerTimeFilter('all');
     setTimeSlot('');
@@ -645,7 +691,6 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
         if (data?.landing) {
           const resolved = finalizeLandingPayload(data, slug, resolveLandingCityName(citySlug, slug));
           setApiPayload(resolved);
-          applyLandingMeta(resolved.landing);
           writeCachedLandingPage(slug, resolved, citySlug);
           setSessionsError(null);
           return;
@@ -657,7 +702,6 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
         const fallbackPayload = resolveLandingPayload(slug, citySlug);
         if (fallbackPayload?.sessions.length) {
           setApiPayload(fallbackPayload);
-          applyLandingMeta(fallbackPayload.landing);
           setSessionsError(null);
           return;
         }
@@ -683,6 +727,13 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
   const payload = apiPayload || shell;
   const sessionsReady = Boolean(apiPayload);
 
+  React.useEffect(() => {
+    if (!payload?.landing) return;
+    applyLandingSeoMeta(
+      buildLandingSeoInput(payload.landing, slug, profile, citySlug, payload.stats, todayReference),
+    );
+  }, [payload?.landing, payload?.stats, slug, profile, citySlug, todayReference]);
+
   const filteredSessions = React.useMemo(() => {
     if (!payload || !sessionsReady) return [];
 
@@ -692,8 +743,8 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
       if (category !== 'all' && session.category !== category && !session.tags.includes(category)) return false;
       if (profile === 'dinner' && !matchesMenuFilter(session, menuFilter)) return false;
       if (profile === 'dinner' && !matchesDinnerTimeFilter(session, dinnerTimeFilter)) return false;
-      if ((profile === 'bus' || profile === 'river' || profile === 'seasonal') && !matchesTimeSlotFilter(session, timeSlot)) return false;
-      return matchesDateFilter(session, session.startsAt, dateFilter);
+      if ((profile === 'bus' || profile === 'river' || profile === 'seasonal' || profile === 'bridges') && !matchesTimeSlotFilter(session, timeSlot)) return false;
+      return matchesDateFilter(session, dateFilter);
     });
   }, [category, city, dateFilter, menuFilter, dinnerTimeFilter, timeSlot, payload, profile, sessionsReady]);
 
@@ -704,6 +755,8 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
   const groups = React.useMemo(() => sortEventGroups(groupLandingSessions(filteredSessions), sort), [filteredSessions, sort]);
   const cityName = resolveLandingCityName(citySlug, slug);
   const seasonalMeta = profile === 'seasonal' ? getSeasonalLanding(slug) : null;
+  const landingCopy = resolveLandingCopy(slug);
+  const useLandingCopy = shouldUseLandingCopy(slug, profile, citySlug);
 
   if (!payload) {
     return (
@@ -729,10 +782,21 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
             sessionsCount={payload.sessions.length}
             stats={payload.stats}
             sessionsReady={sessionsReady}
+            todayReference={todayReference}
           />
           {profile === 'seasonal' && !citySlug && seasonalMeta?.nationalIntro ? (
             <section className="container mx-auto px-4 pb-4 pt-8">
               <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">{seasonalMeta.nationalIntro}</p>
+            </section>
+          ) : null}
+          {profile === 'bridges' && landingCopy?.body ? (
+            <section className="container mx-auto px-4 pb-4 pt-8">
+              <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">{landingCopy.body}</p>
+            </section>
+          ) : null}
+          {useLandingCopy && landingCopy?.body ? (
+            <section className="container mx-auto px-4 pb-4 pt-8">
+              <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">{landingCopy.body}</p>
             </section>
           ) : null}
           {profile === 'bus' && citySlug ? (
@@ -744,7 +808,7 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
           {profile === 'seasonal' && citySlug && cityName ? (
             <LandingSeasonalCityGuide landingSlug={slug} cityName={cityName} />
           ) : null}
-          {profile === 'dinner' && citySlug ? (
+          {profile === 'dinner' && citySlug && !useLandingCopy ? (
             <LandingDinnerIntro cityName={cityName} citySlug={citySlug} />
           ) : null}
           <section id="variants" className={`container mx-auto px-4 ${profile === 'dinner' ? 'py-6' : 'py-12'}`}>
@@ -755,6 +819,8 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
               ? cityName
                 ? `${seasonalMeta.scheduleTitle} — ${cityName}`
                 : seasonalMeta.scheduleTitle
+              : profile === 'bridges'
+                ? BRIDGES_LANDING.scheduleTitle
               : profile === 'bus' && cityName
               ? `Расписание — ${cityName}`
               : profile === 'river' && cityName
@@ -775,7 +841,7 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
                 setMenuFilter={setMenuFilter}
                 setDinnerTimeFilter={setDinnerTimeFilter}
                 reset={() => {
-                  setDateFilter('today');
+                  setDateFilter('all');
                   setSort('price');
                   setMenuFilter('all');
                   setDinnerTimeFilter('all');
@@ -786,6 +852,7 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
             <LandingFilters
               profile={profile}
               landingSlug={payload.landing.slug}
+              landingCity={payload.landing.city}
               citySlug={citySlug}
               stats={payload.stats}
               city={city}
@@ -802,7 +869,7 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
               reset={() => {
                 setCity(cityName || 'all');
                 setCategory('all');
-                setDateFilter(profile === 'bus' ? 'all' : 'today');
+                setDateFilter(defaultLandingDateFilter(profile));
                 setSort(profile === 'bus' ? 'price' : 'time');
                 setTimeSlot('');
               }}
@@ -860,8 +927,8 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
             {!isLovableLanding(profile) ? (
               <LandingContentBlocks blocks={payload.blocks || []} landing={payload.landing} stats={payload.stats} />
             ) : null}
-            {profile !== 'bus' && profile !== 'dinner' && profile !== 'river' && profile !== 'seasonal' ? (
-              <LandingHowToChoose landing={payload.landing} stats={payload.stats} />
+            {profile === 'default' || profile === 'bridges' ? (
+              <LandingHowToChoose landing={payload.landing} stats={payload.stats} profile={profile} />
             ) : null}
             <LandingFaq landing={payload.landing} blocks={payload.blocks || []} profile={profile} citySlug={citySlug} landingSlug={slug} />
             <LandingReviews landing={payload.landing} profile={profile} landingSlug={slug} />
@@ -900,6 +967,7 @@ function LandingHero({
   sessionsCount,
   stats,
   sessionsReady = true,
+  todayReference,
 }: {
   landing: PublicLanding;
   profile: LandingProfile;
@@ -909,36 +977,29 @@ function LandingHero({
   sessionsCount: number;
   stats: PublicLandingPage['stats'];
   sessionsReady?: boolean;
+  todayReference: Date;
 }) {
   const cityName = resolveLandingCityName(citySlug, landingSlug);
   const isBus = profile === 'bus';
   const isRiver = profile === 'river';
   const isDinner = profile === 'dinner';
   const isSeasonal = profile === 'seasonal';
+  const isBridges = profile === 'bridges';
   const seasonalMeta = isSeasonal ? getSeasonalLanding(landingSlug) : null;
   const seasonalCity = seasonalMeta ? seasonalCityGuide(landingSlug, cityName) : null;
   const busGuide = cityName ? busCityGuide(cityName) : null;
   const riverGuide = cityName ? riverCityGuide(cityName) : null;
   const dinnerGuide = isDinner ? dinnerCityGuide(cityName, citySlug) : null;
-  const prep = cityName
-    ? (BUS_CITY_META[cityName]?.prepositional || riverGuide?.cityNameDative || seasonalCity?.cityNameDative || cityName)
-    : '';
-  const heroTitle = isSeasonal && seasonalMeta
-    ? seasonalCity
-      ? `${seasonalMeta.breadcrumbLabel} в ${prep} — лучшие точки обзора и экскурсии`
-      : seasonalMeta.nationalHeroTitle
-    : isDinner && dinnerGuide
-    ? dinnerGuide.heroTitle
-    : isBus && cityName
-      ? `Обзорные автобусные экскурсии по ${prep} сегодня — цены, расписание и маршруты`
-      : isBus && !cityName
-        ? landing.heroTitle || 'Обзорные автобусные экскурсии по России — цены, расписание и маршруты'
-        : isRiver && cityName
-          ? `Речные прогулки по ${prep} сегодня — цены, расписание и сравнение теплоходов`
-          : isRiver && !cityName
-            ? landing.heroTitle || 'Речные прогулки по России — цены, расписание и сравнение теплоходов'
-            : landing.heroTitle || landing.title;
-  const heroSubtitle = isSeasonal && seasonalMeta
+  const landingCopy = resolveLandingCopy(landingSlug);
+  const useCopy = shouldUseLandingCopy(landingSlug, profile, citySlug);
+  const heroTitle = resolveLandingSeo(
+    buildLandingSeoInput(landing, landingSlug, profile, citySlug, stats, todayReference),
+  ).h1;
+  const heroSubtitle = isBridges
+    ? BRIDGES_LANDING.heroSubtitle
+    : useCopy && landingCopy?.lead
+    ? landingCopy.lead
+    : isSeasonal && seasonalMeta
     ? seasonalCity?.heroSubtitle || seasonalMeta.nationalHeroSubtitle
     : isDinner && dinnerGuide
     ? dinnerGuide.heroSubtitle
@@ -956,7 +1017,11 @@ function LandingHero({
     : Math.max(visibleCount * 1850, sessionsCount * 420);
   const countLabel = isBus && cityName ? 'рейсов' : isBus ? 'экскурсий' : isRiver && cityName ? 'прогулок' : isSeasonal ? 'программ' : 'рейсов';
   const ratingLabel = isDinner ? '4.8 / 5' : isSeasonal ? '4.8 / 5' : '4.7 / 5';
-  const heroClass = isSeasonal && landingSlug.includes('salute') ? 'gradient-salute-hero' : 'gradient-hero-lovable';
+  const heroClass = isBridges
+    ? 'gradient-bridges-hero'
+    : isSeasonal && landingSlug.includes('salute')
+      ? 'gradient-salute-hero'
+      : 'gradient-hero-lovable';
 
   return (
     <section className={`relative overflow-hidden ${heroClass}`}>
@@ -1009,6 +1074,11 @@ function LandingHero({
                   <span className="text-primary-foreground">{cityName}</span>
                 </span>
               </>
+            ) : isBridges ? (
+              <span className="flex items-center gap-2">
+                <span>/</span>
+                <span className="text-primary-foreground">{BRIDGES_LANDING.breadcrumbLabel}</span>
+              </span>
             ) : isRiver && !cityName ? (
               <span className="flex items-center gap-2">
                 <span>/</span>
@@ -1031,7 +1101,7 @@ function LandingHero({
                 <a href="/cities" className="transition-colors hover:text-primary-foreground">{cityName}</a>
               </span>
             ) : null}
-            {!isBus && !isDinner && !isRiver && !isSeasonal ? (
+            {!isBus && !isDinner && !isRiver && !isSeasonal && !isBridges ? (
               <span className="flex items-center gap-2">
                 <span>/</span>
                 <span className="text-primary-foreground">{landing.title}</span>
@@ -1818,9 +1888,9 @@ function LandingMiniList({ title, items, empty }: { title: string; items: Array<
   );
 }
 
-function LandingHowToChoose({ landing, stats }: { landing: PublicLanding; stats: PublicLandingPage['stats'] }) {
+function LandingHowToChoose({ landing, stats, profile = 'default' }: { landing: PublicLanding; stats: PublicLandingPage['stats']; profile?: LandingProfile }) {
   const key = `${landing.slug} ${landing.title}`.toLowerCase();
-  const isRiver = isRiverCruisesLandingSlug(landing.slug) || key.includes('bridge') || key.includes('мост');
+  const isRiver = profile === 'bridges' || isRiverCruisesLandingSlug(landing.slug) || key.includes('bridge') || key.includes('мост');
   const topVenues = topEntries(stats.venues, 3).map(([name]) => name).join(', ');
 
   const steps = isRiver
@@ -1873,12 +1943,13 @@ function LandingFaq({
   const items: Array<Record<string, string | number>> = faqBlock
     ? blockItems(faqBlock)
     : defaultLandingFaq(slugKey, profile, citySlug).map((item) => ({ question: item.question, answer: item.answer }));
-  const [openIndex, setOpenIndex] = React.useState<number | null>(null);
   const seasonalMeta = profile === 'seasonal' ? getSeasonalLanding(slugKey) : null;
   const faqSubtitle = profile === 'dinner'
     ? 'Ответы на популярные вопросы об ужинах на теплоходе'
     : profile === 'bus'
       ? 'Ответы на популярные вопросы об автобусных экскурсиях'
+      : profile === 'bridges'
+        ? BRIDGES_LANDING.faqSubtitle
       : profile === 'seasonal' && seasonalMeta
         ? seasonalMeta.faqSubtitle
         : profile === 'river' || landing.slug.toLowerCase().includes('bridge')
@@ -1889,26 +1960,26 @@ function LandingFaq({
 
   return (
     <section id="faq" className="py-16">
-      <h2 className="mb-2 text-center text-2xl font-bold text-foreground md:text-3xl">Частые вопросы</h2>
-      <p className="mb-10 text-center text-muted-foreground">{faqSubtitle}</p>
-      <div className="mx-auto max-w-3xl space-y-3">
+      <h2 className="mb-2 text-center text-2xl font-bold text-slate-900 md:text-3xl">Частые вопросы</h2>
+      <p className="mb-10 text-center text-slate-600">{faqSubtitle}</p>
+      <div className="mx-auto max-w-3xl space-y-2">
         {items.map((item, index) => {
           const question = String(item.question || item.title);
           const answer = String(item.answer || item.text);
-          const isOpen = openIndex === index;
           return (
-            <div key={question} className="overflow-hidden rounded-xl border border-border bg-card">
-              <button
-                type="button"
-                onClick={() => setOpenIndex(isOpen ? null : index)}
-                className="flex w-full items-center gap-3 px-6 py-4 text-left transition-colors hover:bg-secondary/50"
-              >
-                <CircleHelp className="h-5 w-5 shrink-0 text-primary" />
-                <span className="flex-1 font-medium text-foreground">{question}</span>
-                <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
-              </button>
-              {isOpen && answer ? <div className="border-t border-border px-6 py-4 text-sm leading-relaxed text-muted-foreground">{answer}</div> : null}
-            </div>
+            <details
+              key={`${question}:${index}`}
+              className="group rounded-xl border border-slate-200 bg-white transition-colors hover:border-slate-300"
+            >
+              <summary className="flex cursor-pointer list-none select-none items-center justify-between p-4">
+                <span className="flex items-center gap-2 pr-4 text-sm font-medium text-slate-900">
+                  <HelpCircle className="h-4 w-4 shrink-0 text-primary-600" />
+                  {question}
+                </span>
+                <ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180" />
+              </summary>
+              {answer ? <div className="px-4 pb-4 text-sm leading-relaxed text-slate-600">{answer}</div> : null}
+            </details>
           );
         })}
       </div>
@@ -1918,6 +1989,7 @@ function LandingFaq({
 
 function defaultLandingFaq(slug: string, profile: LandingProfile = 'default', citySlug?: string) {
   const key = slug.toLowerCase();
+  if (profile === 'bridges') return BRIDGES_LANDING.faq;
   if (profile === 'seasonal') {
     const meta = getSeasonalLanding(key);
     const cityName = resolveLandingCityName(citySlug, key);
@@ -1967,6 +2039,41 @@ function defaultLandingFaq(slug: string, profile: LandingProfile = 'default', ci
       { question: 'Что взять с собой?', answer: 'Тёплую одежду — на воде всегда прохладнее. Солнцезащитные очки и вода летом.' },
       { question: 'Можно ли с детьми?', answer: 'Да, большинство речных прогулок подходят для семей. На борту обычно есть крытые зоны.' },
       { question: 'Как купить билет?', answer: 'Нажмите на цену в расписании — откроется официальный виджет билетной системы организатора.' },
+    ];
+  }
+  if (key.includes('yard') || key.includes('paradn') || key === 'spb-yards') {
+    return [
+      { question: 'Чем отличаются парадные, дворы и коммуналки?', answer: 'Парадные — исторические входные группы домов, дворы — закрытые дворы-колодцы, коммуналки — квартиры с общими зонами. Маршруты часто комбинируют несколько форматов.' },
+      { question: 'Нужна ли специальная обувь?', answer: 'Удобная обувь для пешей прогулки 1,5–2,5 часа. В некоторых домах могут попросить надеть бахилы — их обычно выдают на месте.' },
+      { question: 'Можно ли с детьми?', answer: 'Да, многие маршруты рассчитаны на семейную аудиторию. Уточняйте возрастные ограничения в карточке события.' },
+      { question: 'Как купить билет?', answer: 'Выберите дату и время в расписании — покупка откроется в виджете билетной системы организатора.' },
+    ];
+  }
+  if (key.includes('family') || key.includes('kids') || key.includes('detyam')) {
+    return [
+      { question: 'С какого возраста подходят детские шоу?', answer: 'Зависит от программы — возраст указан в карточке события или на странице организатора.' },
+      { question: 'Чем отличается от новогодних программ?', answer: 'Эта подборка шире: цирк, анимация, детские спектакли и семейные шоу круглый год, не только в декабре.' },
+      { question: 'Нужны ли взрослые билеты?', answer: 'Обычно да — детский билет сопровождается взрослым. Точные правила — в виджете при покупке.' },
+    ];
+  }
+  if (key.includes('concert')) {
+    return [
+      { question: 'Чем эта подборка отличается от стендапа?', answer: 'Здесь — музыкальные концерты: рок, джаз, классика, эстрада. Стендап и комедия — в отдельной подборке.' },
+      { question: 'Можно ли выбрать жанр?', answer: 'Используйте фильтр «Формат» и сортировку по дате или цене, чтобы сузить выдачу.' },
+      { question: 'Где проходит оплата?', answer: 'В официальном виджете билетной системы организатора после выбора сеанса.' },
+    ];
+  }
+  if (key.includes('moscow-museum') || key === 'moscow-museums') {
+    return [
+      { question: 'Это только один музей?', answer: 'Подборка собирает мастер-классы и музейные программы в Москве — прежде всего студии и выставочные форматы.' },
+      { question: 'Нужна ли подготовка для мастер-класса?', answer: 'Обычно нет — материалы предоставляет организатор. Одежду, которую не жалко испачкать, лучше уточнить в описании.' },
+      { question: 'Как купить билет?', answer: 'Выберите сеанс в расписании — оплата в виджете организатора.' },
+    ];
+  }
+  if (key.includes('active') || key.includes('sport') || key.includes('autosport')) {
+    return [
+      { question: 'Нужны ли права для участия?', answer: 'Для зрителей — нет. Для заездов и master-class drive уточняйте требования у организатора в карточке события.' },
+      { question: 'Можно ли с детьми?', answer: 'Зависит от формата — на автоспортивных событиях часто есть возрастные ограничения из соображений безопасности.' },
     ];
   }
   return [
@@ -2162,6 +2269,7 @@ function blockItems(block: PublicLandingContentBlock): Array<Record<string, stri
 function LandingFilters({
   profile,
   landingSlug,
+  landingCity,
   citySlug,
   stats,
   city,
@@ -2178,6 +2286,7 @@ function LandingFilters({
 }: {
   profile: LandingProfile;
   landingSlug?: string;
+  landingCity?: string | null;
   citySlug?: string;
   stats: PublicLandingPage['stats'];
   city: string;
@@ -2195,8 +2304,9 @@ function LandingFilters({
 }) {
   const isBus = profile === 'bus';
   const isRiver = profile === 'river';
+  const isBridges = profile === 'bridges';
   const isSeasonal = profile === 'seasonal';
-  const showTimeSlot = profile === 'bus' || profile === 'river' || isSeasonal;
+  const showTimeSlot = profile === 'bus' || profile === 'river' || isSeasonal || isBridges;
   const currentCityName = resolveLandingCityName(citySlug);
   const cityOptions = Object.entries(stats.cities).sort((a, b) => b[1] - a[1]).slice(0, 12);
   const orderedCityNames = isBus
@@ -2204,8 +2314,16 @@ function LandingFilters({
     : isRiver
       ? RIVER_CITY_ORDER
       : isSeasonal && landingSlug
-        ? getSeasonalLanding(landingSlug)?.cityOrder || []
+        ? resolveSeasonalCityNames(landingSlug, cityOptions)
         : cityOptions.map(([name]) => name);
+  const meaningfulCityCount = Object.keys(stats.cities).filter(
+    (name) => name && !/^не указан$/i.test(name.trim()),
+  ).length;
+  const showCityFilter = isBridges
+    ? false
+    : isBus || isRiver || isSeasonal
+    ? orderedCityNames.length > 1
+    : !landingCity && meaningfulCityCount > 1;
   const sortTabs: Array<{ label: string; value: SortFilter }> = isBus || isRiver || isSeasonal
     ? [
         { label: 'По цене', value: 'price' },
@@ -2217,18 +2335,12 @@ function LandingFilters({
         { label: 'По цене', value: 'price' },
         { label: 'По рейтингу', value: 'rating' },
       ];
-  const dateChips: Array<{ label: string; value: DateFilter }> = isBus || isRiver || isSeasonal
-    ? [
-        { label: 'Сегодня', value: 'today' },
-        { label: 'Завтра', value: 'tomorrow' },
-        { label: 'Любая дата', value: 'all' },
-      ]
-    : [
-        { label: 'Сегодня', value: 'today' },
-        { label: 'Завтра', value: 'tomorrow' },
-        { label: 'Любая дата', value: 'all' },
-        { label: 'Вечером', value: 'evening' },
-      ];
+  const dateChips: Array<{ label: string; value: DateFilter }> = [
+    { label: 'Сегодня', value: 'today' },
+    { label: 'Завтра', value: 'tomorrow' },
+    { label: 'Любая дата', value: 'all' },
+    ...(isSeasonal || isBus || isRiver ? [] : [{ label: 'Вечером', value: 'evening' as DateFilter }]),
+  ];
   const countLabel = isBus && currentCityName ? 'экскурсий' : isBus ? 'экскурсий' : isRiver && currentCityName ? 'прогулок' : isSeasonal ? 'программ' : 'рейсов';
 
   const timeSlotSelect = (
@@ -2314,25 +2426,27 @@ function LandingFilters({
       </div>
 
       <div className="hidden flex-wrap items-center gap-2 lg:flex">
-        <div className="flex items-center gap-1.5">
-          {dateChips.map((chip) => (
-            <button
-              key={chip.value}
-              type="button"
-              onClick={() => setDateFilter(chip.value)}
-              className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
-                dateFilter === chip.value
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
-              }`}
-            >
-              {chip.label}
-            </button>
-          ))}
-        </div>
-        {orderedCityNames.length > 0 ? (
+        {dateChips.length > 0 ? (
+          <div className="flex items-center gap-1.5">
+            {dateChips.map((chip) => (
+              <button
+                key={chip.value}
+                type="button"
+                onClick={() => setDateFilter(chip.value)}
+                className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
+                  dateFilter === chip.value
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
+                }`}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+        {showCityFilter ? (
           <>
-            <div className="mx-1 h-6 w-px bg-border" />
+            {dateChips.length > 0 ? <div className="mx-1 h-6 w-px bg-border" /> : null}
             {cityChip('all', 'Все города', city === 'all')}
             {orderedCityNames.map((name) => cityChip(name, name, city === name))}
           </>
@@ -2364,23 +2478,25 @@ function LandingFilters({
       </div>
 
       <div className="hidden space-y-3 sm:block lg:hidden">
-        <div className="flex items-center gap-1.5">
-          {dateChips.map((chip) => (
-            <button
-              key={chip.value}
-              type="button"
-              onClick={() => setDateFilter(chip.value)}
-              className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
-                dateFilter === chip.value
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
-              }`}
-            >
-              {chip.label}
-            </button>
-          ))}
-        </div>
-        {orderedCityNames.length > 0 ? (
+        {dateChips.length > 0 ? (
+          <div className="flex items-center gap-1.5">
+            {dateChips.map((chip) => (
+              <button
+                key={chip.value}
+                type="button"
+                onClick={() => setDateFilter(chip.value)}
+                className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
+                  dateFilter === chip.value
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
+                }`}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+        {showCityFilter ? (
           <div className="flex flex-wrap items-center gap-2">
             {cityChip('all', 'Все города', city === 'all')}
             {orderedCityNames.map((name) => cityChip(name, name, city === name))}
@@ -2394,23 +2510,25 @@ function LandingFilters({
       </div>
 
       <div className="space-y-3 sm:hidden">
-        <div className="flex items-center gap-1.5">
-          {dateChips.map((chip) => (
-            <button
-              key={chip.value}
-              type="button"
-              onClick={() => setDateFilter(chip.value)}
-              className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
-                dateFilter === chip.value
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
-              }`}
-            >
-              {chip.label}
-            </button>
-          ))}
-        </div>
-        {orderedCityNames.length > 0 ? (
+        {dateChips.length > 0 ? (
+          <div className="flex items-center gap-1.5">
+            {dateChips.map((chip) => (
+              <button
+                key={chip.value}
+                type="button"
+                onClick={() => setDateFilter(chip.value)}
+                className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
+                  dateFilter === chip.value
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
+                }`}
+              >
+                {chip.label}
+              </button>
+            ))}
+          </div>
+        ) : null}
+        {showCityFilter ? (
           <select
             value={city}
             onChange={(event) => selectCity(event.target.value)}
@@ -2680,6 +2798,7 @@ function LandingReviews({
 
 function defaultLandingReviews(slug: string, profile?: LandingProfile) {
   const key = slug.toLowerCase();
+  if (profile === 'bridges') return BRIDGES_LANDING.reviews;
   if (profile === 'seasonal') {
     const meta = getSeasonalLanding(key);
     if (meta?.reviews.length) return meta.reviews;
@@ -3220,19 +3339,39 @@ function sortEventGroups(groups: EventGroup[], sort: SortFilter): EventGroup[] {
   return sorted.sort((a, b) => new Date(a.firstStartsAt || 0).getTime() - new Date(b.firstStartsAt || 0).getTime());
 }
 
-function matchesDateFilter(session: PublicSession, startsAt: string, filter: DateFilter): boolean {
+function defaultLandingDateFilter(_profile: LandingProfile): DateFilter {
+  return 'all';
+}
+
+function resolveSeasonalCityNames(landingSlug: string, cityOptions: Array<[string, number]>): string[] {
+  const order = getSeasonalLanding(landingSlug)?.cityOrder || [];
+  if (order.length) return order;
+  return cityOptions
+    .map(([name]) => name)
+    .filter((name) => name && !/^не указан$/i.test(name.trim()));
+}
+
+function matchesDateFilter(session: PublicSession, filter: DateFilter): boolean {
   if (filter === 'all') return true;
   if (isOpenDate(session)) return true;
   const timeZone = resolveSessionTimeZoneForSession(session);
-  if (filter === 'evening') {
-    return session.timeBucket === 'evening' || getSessionHour(startsAt, timeZone) >= 18;
-  }
-  if (!startsAt) return false;
+  const times = collectSessionStartsAtTimes(session);
+  if (!times.length) return false;
 
-  if (filter === 'today') return isSameSessionDay(startsAt, new Date(), timeZone);
-  if (filter === 'tomorrow') return isSessionTomorrow(startsAt, timeZone);
-  if (filter === 'weekend') return isSessionWeekend(startsAt, timeZone);
-  return true;
+  if (filter === 'evening') {
+    return (
+      session.timeBucket === 'evening' ||
+      session.timeBucket === 'night' ||
+      times.some((startsAt) => getSessionHour(startsAt, timeZone) >= 18)
+    );
+  }
+
+  return times.some((startsAt) => {
+    if (filter === 'today') return isSameSessionDay(startsAt, new Date(), timeZone);
+    if (filter === 'tomorrow') return isSessionTomorrow(startsAt, timeZone);
+    if (filter === 'weekend') return isSessionWeekend(startsAt, timeZone);
+    return true;
+  });
 }
 
 function startOfDay(date: Date): Date {
@@ -3256,22 +3395,6 @@ function topEntries(values: Record<string, number>, limit: number): Array<[strin
 
 function normalizeKey(value: string): string {
   return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
-}
-
-function applyLandingMeta(landing: PublicLanding) {
-  document.title = landing.seoTitle || `${landing.title} | Дайбилет`;
-  setMeta('description', landing.seoDescription || landing.subtitle);
-  setMeta('robots', 'index,follow');
-}
-
-function setMeta(name: string, content: string) {
-  let element = document.querySelector(`meta[name="${name}"]`);
-  if (!element) {
-    element = document.createElement('meta');
-    element.setAttribute('name', name);
-    document.head.appendChild(element);
-  }
-  element.setAttribute('content', content);
 }
 
 function navigateHome(section: string) {

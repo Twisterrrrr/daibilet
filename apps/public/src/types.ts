@@ -12,6 +12,7 @@ export type PublicDestination = {
 export type PublicLanding = {
   slug: string;
   type?: 'CITY' | 'MULTI_CITY' | string;
+  city?: string | null;
   title: string;
   subtitle: string;
   chips: string[];

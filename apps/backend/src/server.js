@@ -40,6 +40,7 @@ import {
   buildPublicStats,
   buildPublicSearch,
   buildPublicPromoBlocks,
+  buildPublicLandingsCatalog,
   clearPublicDataCaches,
   warmPublicCatalogCache,
   runLandingAudit,
@@ -246,6 +247,11 @@ createServer(async (request, response) => {
 
     if (route === 'GET /api/public/promo-blocks') {
       sendPublicJson(response, await withPublicResponseCache(`promo-blocks:${canonicalSearchParams(url.searchParams)}`, () => buildPublicPromoBlocks(db, url.searchParams)));
+      return;
+    }
+
+    if (route === 'GET /api/public/landings-catalog') {
+      sendPublicJson(response, await withPublicResponseCache(`landings-catalog:${canonicalSearchParams(url.searchParams)}`, () => buildPublicLandingsCatalog(db, url.searchParams)));
       return;
     }
 

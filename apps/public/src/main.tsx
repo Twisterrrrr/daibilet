@@ -6,11 +6,6 @@ import { hydratePublicHomePreview, hydratePublicDestinations, hydratePublicShell
 import { UserAuthProvider } from '@/hooks/useUserAuth';
 import './globals.css';
 
-const isHomeRoute = () => {
-  const path = window.location.pathname.replace(/\/+$/, '') || '/';
-  return path === '/';
-};
-
 if (/^\/(locations|venues)\//.test(window.location.pathname)) {
   void import('@/components/VenuePage');
 }
@@ -24,7 +19,10 @@ function Root() {
       if (!cancelled) refresh((version) => version + 1);
     };
 
-    if (isHomeRoute()) {
+    const path = window.location.pathname.replace(/\/+$/, '') || '/';
+    const needsHomePreview = path === '/' || path === '/podborki';
+
+    if (needsHomePreview) {
       void hydratePublicShell().then(bump);
       void hydratePublicHomePreview().then(bump);
     } else {

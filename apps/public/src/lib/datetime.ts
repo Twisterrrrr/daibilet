@@ -90,6 +90,41 @@ export function formatSessionDate(
   }).format(date);
 }
 
+/** «5 июля» и «5 июля 2026» для SEO-заголовков лендингов (Europe/Moscow по умолчанию). */
+export function formatLandingTodayParts(
+  reference: Date = new Date(),
+  timeZone: string = SITE_TIME_ZONE,
+): { short: string; full: string } {
+  const short = new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    timeZone,
+  }).format(reference);
+  const full = new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone,
+  }).format(reference);
+  return { short, full };
+}
+
+export function msUntilNextMidnight(timeZone: string = SITE_TIME_ZONE): number {
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric',
+    hour12: false,
+  }).formatToParts(now);
+  const hour = Number(parts.find((part) => part.type === 'hour')?.value ?? 0);
+  const minute = Number(parts.find((part) => part.type === 'minute')?.value ?? 0);
+  const second = Number(parts.find((part) => part.type === 'second')?.value ?? 0);
+  const elapsedMs = (hour * 3600 + minute * 60 + second) * 1000;
+  return Math.max(24 * 3600 * 1000 - elapsedMs + 1000, 60_000);
+}
+
 export function isSameSessionDay(
   startsAt: string,
   reference: Date = new Date(),
@@ -130,10 +165,39 @@ export function isSessionWeekend(startsAt: string, timeZone: string = SITE_TIME_
 
 export function sessionTimeSlotFilter(startsAt: string, timeZone: string = SITE_TIME_ZONE): 'morning' | 'day' | 'evening' | 'night' {
   const hour = getSessionHour(startsAt, timeZone);
+  if (hour < 6) return 'night';
   if (hour < 12) return 'morning';
   if (hour < 18) return 'day';
   if (hour < 22) return 'evening';
   return 'night';
+}
+
+export function collectSessionStartsAtTimes(session: {
+  startsAt?: string | null;
+  upcomingSlots?: Array<{ startsAt?: string | null }> | null;
+}): string[] {
+  const times: string[] = [];
+  for (const slot of session.upcomingSlots || []) {
+    if (slot?.startsAt) times.push(slot.startsAt);
+  }
+  if (session.startsAt) times.push(session.startsAt);
+  return [...new Set(times)];
+}
+
+export function sessionMatchesTimeSlot(
+  session: {
+    startsAt?: string | null;
+    upcomingSlots?: Array<{ startsAt?: string | null }> | null;
+    city?: string | null;
+    destination?: string | null;
+    timeZone?: string | null;
+  },
+  slot: 'morning' | 'day' | 'evening' | 'night',
+): boolean {
+  const timeZone = resolveSessionTimeZone(session);
+  const times = collectSessionStartsAtTimes(session);
+  if (!times.length) return true;
+  return times.some((startsAt) => sessionTimeSlotFilter(startsAt, timeZone) === slot);
 }
 
 export function sessionTimeCategory(startsAt: string, timeZone: string = SITE_TIME_ZONE): 'morning' | 'day' | 'evening' | 'night' {

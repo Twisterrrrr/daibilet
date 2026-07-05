@@ -90,7 +90,9 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
   if (window.location.pathname === '/locations' || window.location.pathname === '/locations/') {
     return <LocationsCatalogPage />;
   }
-  if (window.location.pathname === '/podborki' || window.location.pathname === '/podborki/') return <LandingsCatalogPage />;
+  if (window.location.pathname === '/podborki' || window.location.pathname === '/podborki/') {
+    return <LandingsCatalogPage dataVersion={dataVersion} />;
+  }
   if (window.location.pathname === '/my-orders' || window.location.pathname === '/my-orders/') return <BuyerOrdersPage />;
   if (window.location.pathname === '/login' || window.location.pathname === '/login/') return <LoginPage />;
   if (window.location.pathname === '/account/purchases' || window.location.pathname === '/account/purchases/') {
@@ -947,8 +949,8 @@ function PromoSection({ landings, cityFilter }: { landings: PublicLanding[]; cit
       <div className="container-page">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Сезонные предложения</h2>
-            <p className="mt-1 text-sm text-slate-500">Лучшие события и экскурсии сезона, собранные в быстрые подборки</p>
+            <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Тематические подборки</h2>
+            <p className="mt-1 text-sm text-slate-500">Готовые списки под настроение и повод — от прогулок до концертов</p>
           </div>
           <a href="/podborki" className="inline-flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-800">
             Все подборки <ArrowRight className="h-4 w-4" />
@@ -1032,6 +1034,7 @@ function promoBlockIcon(slug: string, index: number) {
   if (key.includes('dinner') || key.includes('ужин')) return <UtensilsCrossed className="mb-3 h-8 w-8 opacity-80" />;
   if (key.includes('party') || key.includes('disco')) return <CalendarDays className="mb-3 h-8 w-8 opacity-80" />;
   if (key.includes('bus')) return <MapPin className="mb-3 h-8 w-8 opacity-80" />;
+  if (key.includes('concert')) return <CalendarDays className="mb-3 h-8 w-8 opacity-80" />;
   if (index % 3 === 0) return <Ship className="mb-3 h-8 w-8 opacity-80" />;
   if (index % 3 === 1) return <CalendarDays className="mb-3 h-8 w-8 opacity-80" />;
   return <UtensilsCrossed className="mb-3 h-8 w-8 opacity-80" />;

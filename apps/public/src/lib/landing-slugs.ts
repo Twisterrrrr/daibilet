@@ -15,11 +15,17 @@ export const LANDING_SLUG_REDIRECTS: Record<string, string> = {
   'river-disco': CANONICAL_LANDING_SLUGS.party,
   'razvodnye-mosty': CANONICAL_LANDING_SLUGS.bridges,
   'spb-bridges-night': CANONICAL_LANDING_SLUGS.bridges,
+  bridges_night: CANONICAL_LANDING_SLUGS.bridges,
+  'night-bridges': CANONICAL_LANDING_SLUGS.bridges,
 };
 
 export function canonicalLandingSlug(slug: string): string {
-  const key = String(slug || '').trim().toLowerCase();
+  const key = String(slug || '').trim().toLowerCase().replace(/_/g, '-');
   return LANDING_SLUG_REDIRECTS[key] || key;
+}
+
+export function isBridgesNightLandingSlug(slug: string): boolean {
+  return canonicalLandingSlug(slug) === CANONICAL_LANDING_SLUGS.bridges;
 }
 
 export function isRiverCruisesLandingSlug(slug: string): boolean {
