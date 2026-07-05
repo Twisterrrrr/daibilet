@@ -3320,7 +3320,7 @@ export async function buildPublicSearch(db, searchParams) {
           type: 'landing',
           label: landing.title,
           sublabel: landing.subtitle,
-          href: `/landings/${landing.slug}`,
+          href: publicLandingHref(landing.slug),
           imageUrl: landing.imageUrl || null,
         },
         `landing:${landing.slug}`,
@@ -3347,6 +3347,96 @@ const PROMO_LANDING_ORDER = [
   'planetarium',
   'active-sport',
 ];
+
+const PUBLIC_LANDING_CATEGORY_PATH = new Map([
+  ['river-cruises', 'rechnye-progulki'],
+  ['bus-tours', 'avtobusnye-ekskursii'],
+  ['river-party', 'vecherinki-na-teplohode'],
+  ['standup', 'stendap-i-yumor'],
+  ['family-kids', 'detyam-i-semyam'],
+  ['concerts-genre', 'kontserty'],
+  ['active-sport', 'aktivnyj-otdyh'],
+  ['new-year', 'novyj-god'],
+  ['salute-9-may', 'salut-9-maya'],
+]);
+
+const PUBLIC_CITY_LANDING_PATH = new Map([
+  ['bridges-night', 'night-bridges'],
+  ['spb-yards', 'spb-yards'],
+  ['moscow-dinner-boat', 'dinner-boat'],
+  ['moscow-museums', 'moscow-museums'],
+  ['planetarium', 'planetarium'],
+]);
+
+const PUBLIC_MULTI_CITY_LANDINGS = new Set(['river-cruises', 'bus-tours', 'river-party', 'salute-9-may', 'new-year']);
+const PUBLIC_CITY_SCOPED_LANDINGS = new Set(PUBLIC_CITY_LANDING_PATH.keys());
+const PUBLIC_DEFAULT_CITY_BY_LANDING = new Map([
+  ['bridges-night', 'saint-petersburg'],
+  ['spb-yards', 'saint-petersburg'],
+  ['moscow-dinner-boat', 'moscow'],
+  ['moscow-museums', 'moscow'],
+  ['planetarium', 'saint-petersburg'],
+]);
+
+/** Канон города в публичном URL (СПб — полное saint-petersburg). */
+const PUBLIC_CITY_PATH_SEGMENT = new Map([
+  ['moscow', 'moscow'],
+  ['moskva', 'moscow'],
+  ['msk', 'moscow'],
+  ['saint-petersburg', 'saint-petersburg'],
+  ['sankt-peterburg', 'saint-petersburg'],
+  ['spb', 'saint-petersburg'],
+  ['peterburg', 'saint-petersburg'],
+  ['kazan', 'kazan'],
+  ['nizhny-novgorod', 'nizhny-novgorod'],
+  ['nizhniy-novgorod', 'nizhny-novgorod'],
+  ['samara', 'samara'],
+  ['sochi', 'sochi'],
+  ['kaliningrad', 'kaliningrad'],
+  ['ekaterinburg', 'ekaterinburg'],
+  ['rostov-on-don', 'rostov-on-don'],
+  ['rostov-na-donu', 'rostov-on-don'],
+  ['rostov', 'rostov-on-don'],
+]);
+
+function publicCityPathSegment(slug) {
+  const key = String(slug || '').trim().toLowerCase();
+  if (!key) return '';
+  if (PUBLIC_CITY_PATH_SEGMENT.has(key)) return PUBLIC_CITY_PATH_SEGMENT.get(key);
+  const canonical = canonicalCitySlug(key);
+  if (PUBLIC_CITY_PATH_SEGMENT.has(canonical)) return PUBLIC_CITY_PATH_SEGMENT.get(canonical);
+  if (canonical === 'sankt-peterburg') return 'saint-petersburg';
+  if (canonical === 'moskva') return 'moscow';
+  return canonical || key;
+}
+
+function publicLandingHref(slug, citySlug = null) {
+  if (PUBLIC_CITY_SCOPED_LANDINGS.has(slug)) {
+    const city = PUBLIC_DEFAULT_CITY_BY_LANDING.get(slug) || citySlug;
+    const citySegment = publicCityPathSegment(city);
+    const topic = PUBLIC_CITY_LANDING_PATH.get(slug) || slug;
+    return `/${citySegment}/${topic}/`;
+  }
+
+  const categoryPath = PUBLIC_LANDING_CATEGORY_PATH.get(slug) || slug;
+  if (citySlug && PUBLIC_MULTI_CITY_LANDINGS.has(slug)) {
+    const segment = publicCityPathSegment(citySlug);
+    return `/${categoryPath}/${segment}/`;
+  }
+  return `/${categoryPath}/`;
+}
+
+function resolvePromoCitySlug(cityFilter) {
+  const key = String(cityFilter || '').trim().toLowerCase();
+  if (!key || key === 'all') return null;
+  if (PUBLIC_CITY_PATH_SEGMENT.has(key)) return publicCityPathSegment(key);
+  const canonical = canonicalCitySlug(key);
+  if (PUBLIC_CITY_PATH_SEGMENT.has(canonical)) return publicCityPathSegment(canonical);
+  if (key.includes('моск')) return 'moscow';
+  if (key.includes('петерб') || key.includes('spb')) return 'saint-petersburg';
+  if (key.includes('казан')) return 'kazan';
+  return null;
+}
 
 const PROMO_CITY_LANDING_BOOSTS = {
   'sankt-peterburg': ['spb-yards', 'bridges-night'],
@@ -3389,7 +3479,7 @@ export async function buildPublicPromoBlocks(db, searchParams) {
       subtitle: landing.subtitle,
       events: landing.events,
       priceFrom: landing.priceFrom,
-      href: `/landings/${landing.slug}`,
+      href: publicLandingHref(landing.slug, resolvePromoCitySlug(cityFilter)),
       gradientIndex: index,
     })),
   };

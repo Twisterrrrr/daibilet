@@ -49,6 +49,7 @@ import {
   HOME_FORMAT_TILES,
   HOME_TRUST_ITEMS,
 } from '@/lib/home-scenarios';
+import { resolveLegacyLandingRedirect, resolveLandingRouteFromLocation } from '@/lib/landing-routes';
 import { landingPageHref } from '@/lib/landing-slugs';
 import { venuePageTemplate } from '@/lib/venue-meta';
 import { API_BASE_URL } from '@/lib/api-base';
@@ -133,19 +134,20 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
     );
   }
 
-  const landingCityMatch = window.location.pathname.match(/^\/landings\/([^/]+)\/([^/]+)\/?$/);
-  if (landingCityMatch) {
-    return (
-      <PageSuspense>
-        <LandingPage slug={decodeURIComponent(landingCityMatch[1])} citySlug={decodeURIComponent(landingCityMatch[2])} />
-      </PageSuspense>
-    );
+  const legacyLandingRedirect = resolveLegacyLandingRedirect(window.location.pathname);
+  if (legacyLandingRedirect) {
+    window.location.replace(legacyLandingRedirect);
+    return null;
   }
-  const landingPageMatch = window.location.pathname.match(/^\/landings\/([^/]+)\/?$/);
-  if (landingPageMatch) {
+
+  const categoryLandingRoute = resolveLandingRouteFromLocation(window.location.pathname);
+  if (categoryLandingRoute) {
     return (
       <PageSuspense>
-        <LandingPage slug={decodeURIComponent(landingPageMatch[1])} />
+        <LandingPage
+          slug={categoryLandingRoute.landingSlug}
+          citySlug={categoryLandingRoute.citySlug}
+        />
       </PageSuspense>
     );
   }

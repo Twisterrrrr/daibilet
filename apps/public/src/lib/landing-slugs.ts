@@ -64,22 +64,10 @@ export function landingSlugVariants(slug: string): string[] {
   return [...variants];
 }
 
-export function busLandingHref(citySlug?: string) {
-  const root = `/landings/${CANONICAL_LANDING_SLUGS.bus}`;
-  return citySlug ? `${root}/${citySlug}` : root;
-}
-
-export function riverLandingHref(citySlug?: string) {
-  const root = `/landings/${CANONICAL_LANDING_SLUGS.river}`;
-  return citySlug ? `${root}/${citySlug}` : root;
-}
-
-export function partyLandingHref(citySlug?: string) {
-  const root = `/landings/${CANONICAL_LANDING_SLUGS.party}`;
-  return citySlug ? `${root}/${citySlug}` : root;
-}
-
-/** Публичный URL тематической подборки (как в legacy PromoBlock.href → /landings/...). */
-export function landingPageHref(slug: string): string {
-  return `/landings/${canonicalLandingSlug(slug)}`;
-}
+export {
+  busLandingHref,
+  landingCategoryHref,
+  landingPageHref,
+  partyLandingHref,
+  riverLandingHref,
+} from '@/lib/landing-routes';

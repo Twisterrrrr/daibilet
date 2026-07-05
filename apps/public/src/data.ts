@@ -1,4 +1,5 @@
 import type { PublicData, PublicDestination, PublicLanding, PublicSession } from '@/types';
+import { API_BASE_URL } from '@/lib/api-base';
 import { eventSlug } from '@/routes';
 
 type PublicStatsPayload = Pick<PublicData, 'generatedAt' | 'stats'>;
@@ -14,10 +15,6 @@ const PUBLIC_DESTINATIONS_STORAGE_KEY = 'daibilet:public-destinations';
 const PUBLIC_HOME_PREVIEW_STORAGE_KEY = 'daibilet:public-home-preview';
 
 export const PUBLIC_DESTINATIONS_UPDATED_EVENT = 'daibilet:destinations-updated';
-
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
 
 const cachedStats = readCachedPublicStats();
 const cachedDestinations = readCachedDestinations();
