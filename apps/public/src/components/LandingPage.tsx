@@ -824,13 +824,9 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
                 : seasonalMeta.scheduleTitle
               : profile === 'bridges'
                 ? BRIDGES_LANDING.scheduleTitle
-              : profile === 'bus' && cityName
-              ? `Расписание — ${cityName}`
-              : profile === 'river' && cityName
-                ? `Расписание — ${cityName}`
-                : profile === 'bus' || profile === 'river' || profile === 'seasonal'
-                  ? 'Расписание'
-                  : 'Расписание рейсов'}
+              : cityName
+                ? `Расписание событий — ${cityName}`
+                : 'Расписание событий'}
         </h2>
             {profile === 'dinner' ? (
               <LandingDinnerFilters
