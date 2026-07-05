@@ -31,7 +31,7 @@ export function HeaderSearch({
   const [open, setOpen] = React.useState(false);
   const [activeIndex, setActiveIndex] = React.useState(-1);
   const rootRef = React.useRef<HTMLDivElement>(null);
-  const debounceRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const debounceRef = React.useRef<number | null>(null);
 
   React.useEffect(() => {
     setQuery(initialQuery);
