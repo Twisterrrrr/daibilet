@@ -59,10 +59,7 @@ import { eventHref } from '@/routes';
 import { readCachedLandingPage, writeCachedLandingPage } from '@/lib/landing-page-cache';
 import type { PublicLanding, PublicLandingContentBlock, PublicLandingPage, PublicSession } from '@/types';
 
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
-
+import { API_BASE_URL } from '@/lib/api-base';
 type DateFilter = 'all' | 'today' | 'tomorrow' | 'weekend' | 'evening';
 type SortFilter = 'price' | 'rating' | 'time';
 type ViewMode = 'list' | 'table' | 'cards';
