@@ -9,7 +9,7 @@ function yandexMapsLink(lat: number, lng: number) {
 export function BridgesLandingGuide() {
   return (
     <div className="space-y-12 pb-4 pt-8">
-      <section className="container mx-auto px-4">
+    <section id="bridges-routes" className="container mx-auto px-4">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-start">
           <div>
             <h2 className="mb-3 text-2xl font-bold text-foreground md:text-3xl">Маршруты прогулок</h2>

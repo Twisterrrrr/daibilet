@@ -26,6 +26,9 @@ export type LandingSeoInput = {
   landingEvents?: number;
   referenceDate?: Date;
   timeZone?: string;
+  canonicalPath?: string | null;
+  faqItems?: Array<{ question: string; answer: string }>;
+  breadcrumbItems?: Array<{ name: string; path: string }>;
 };
 
 export type LandingSeo = {
@@ -173,14 +176,14 @@ export function resolveLandingSeo(input: LandingSeoInput): LandingSeo {
 
   if (profile === 'bridges' || isBridgesNightLandingSlug(slug)) {
     return seoResult(
-      'Разводные мосты Санкт-Петербурга',
+      'Разводные мосты в Санкт-Петербурге: ночные экскурсии и билеты',
       short,
-      'расписание прогулок и цены',
+      'сравнение рейсов, причалов и цены',
       `Разводные мосты Санкт-Петербурга сегодня — купить билеты на теплоход, расписание на ${full}`,
-      'Актуальное расписание ночных прогулок к разводным мостам Санкт-Петербурга на сегодня. ' +
+      'Сравните ночные рейсы к разводным мостам Санкт-Петербурга: время, причал, маршрут и цена. ' +
         eventsPhrase(events, 'прогулок') +
         pricePhrase(priceFrom) +
-        'Сравнение теплоходов, маршруты по Неве и каналам. Покупайте онлайн на Дайбилет!',
+        'Ближайшие отправления, карта причалов и советы перед поездкой. Покупайте на Дайбилет!',
     );
   }
 
@@ -252,20 +255,77 @@ export function resolveLandingSeo(input: LandingSeoInput): LandingSeo {
   );
 }
 
-/** Обновляет document.title и meta description по динамическому SEO-шаблону. */
+/** Обновляет document.title, meta, canonical и JSON-LD. */
 export function applyLandingSeoMeta(input: LandingSeoInput): LandingSeo {
   const seo = resolveLandingSeo(input);
   document.title = seo.title;
   setMetaTag('description', seo.description);
   setMetaTag('robots', 'index,follow');
+  setMetaTag('og:title', seo.title);
+  setMetaTag('og:description', seo.description);
+  if (input.canonicalPath) {
+    setMetaTag('og:url', absoluteUrl(input.canonicalPath));
+    setLinkTag('canonical', absoluteUrl(input.canonicalPath));
+  }
+  if (input.breadcrumbItems?.length) {
+    setJsonLd('daibilet-breadcrumb', {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: input.breadcrumbItems.map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: item.name,
+        item: absoluteUrl(item.path),
+      })),
+    });
+  }
+  if (input.faqItems?.length) {
+    setJsonLd('daibilet-faq', {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: input.faqItems.map((item) => ({
+        '@type': 'Question',
+        name: item.question,
+        acceptedAnswer: { '@type': 'Answer', text: item.answer },
+      })),
+    });
+  }
   return seo;
 }
 
+function absoluteUrl(path: string): string {
+  if (/^https?:\/\//i.test(path)) return path;
+  if (typeof window === 'undefined') return path;
+  return `${window.location.origin}${path.startsWith('/') ? path : `/${path}`}`;
+}
+
+function setLinkTag(rel: string, href: string) {
+  let element = document.querySelector(`link[rel="${rel}"]`);
+  if (!element) {
+    element = document.createElement('link');
+    element.setAttribute('rel', rel);
+    document.head.appendChild(element);
+  }
+  element.setAttribute('href', href);
+}
+
+function setJsonLd(id: string, payload: Record<string, unknown>) {
+  let element = document.getElementById(id) as HTMLScriptElement | null;
+  if (!element) {
+    element = document.createElement('script');
+    element.id = id;
+    element.type = 'application/ld+json';
+    document.head.appendChild(element);
+  }
+  element.textContent = JSON.stringify(payload);
+}
+
 function setMetaTag(name: string, content: string) {
-  let element = document.querySelector(`meta[name="${name}"]`);
+  const attr = name.startsWith('og:') || name.startsWith('twitter:') ? 'property' : 'name';
+  let element = document.querySelector(`meta[${attr}="${name}"]`);
   if (!element) {
     element = document.createElement('meta');
-    element.setAttribute('name', name);
+    element.setAttribute(attr, name);
     document.head.appendChild(element);
   }
   element.setAttribute('content', content);

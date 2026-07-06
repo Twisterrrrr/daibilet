@@ -5,6 +5,14 @@ import { EventCard } from '@/components/EventCard';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { BridgesLandingGuide } from '@/components/landing/BridgesLandingGuide';
+import {
+  BridgesComparisonTable,
+  BridgesFeaturedSection,
+  BridgesHeroActions,
+  BridgesMobileStickyCta,
+  BridgesScenarioPicker,
+  BridgesTonightTips,
+} from '@/components/landing/BridgesLandingSelling';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton';
 import { LandingStickyHeader } from '@/components/landing/LandingStickyHeader';
 import {
@@ -21,6 +29,12 @@ import {
   partyLandingHref,
   riverLandingHref,
 } from '@/lib/landing-slugs';
+import {
+  filterUpcomingBridgeGroups,
+  mapBridgesGroups,
+  pickComparisonRows,
+  pickFeaturedBridgesRows,
+} from '@/lib/bridges-session-utils';
 import { normalizeCitySlug } from '@/lib/landing-routes';
 import { resolveLandingCopy, shouldUseLandingCopy } from '@/lib/landing-copy';
 import { applyLandingSeoMeta, resolveLandingSeo, useLandingTodayReference } from '@/lib/landing-seo';
@@ -665,6 +679,15 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
   const [menuFilter, setMenuFilter] = React.useState<MenuFilter>('all');
   const [dinnerTimeFilter, setDinnerTimeFilter] = React.useState<DinnerTimeFilter>('all');
   const [timeSlot, setTimeSlot] = React.useState<TimeSlotFilter>('');
+  const [mobileCtaVisible, setMobileCtaVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    if (profile !== 'bridges') return;
+    const onScroll = () => setMobileCtaVisible(window.scrollY > 420);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [profile]);
 
   React.useEffect(() => {
     const nextProfile = getLandingProfile(slug);
@@ -730,9 +753,20 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
 
   React.useEffect(() => {
     if (!payload?.landing) return;
-    applyLandingSeoMeta(
-      buildLandingSeoInput(payload.landing, slug, profile, citySlug, payload.stats, todayReference),
-    );
+    const canonicalPath = landingCategoryHref(slug, citySlug);
+    applyLandingSeoMeta({
+      ...buildLandingSeoInput(payload.landing, slug, profile, citySlug, payload.stats, todayReference),
+      canonicalPath,
+      breadcrumbItems:
+        profile === 'bridges'
+          ? [
+              { name: 'Главная', path: '/' },
+              { name: 'Санкт-Петербург', path: '/cities/saint-petersburg' },
+              { name: 'Разводные мосты', path: canonicalPath },
+            ]
+          : undefined,
+      faqItems: profile === 'bridges' ? BRIDGES_LANDING.faq : undefined,
+    });
   }, [payload?.landing, payload?.stats, slug, profile, citySlug, todayReference]);
 
   const filteredSessions = React.useMemo(() => {
@@ -755,6 +789,21 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
   );
   const groups = React.useMemo(() => sortEventGroups(groupLandingSessions(filteredSessions), sort), [filteredSessions, sort]);
   const cityName = resolveLandingCityName(citySlug, slug);
+  const bridgesRows = React.useMemo(() => {
+    if (profile !== 'bridges' || !sessionsReady) return [];
+    const upcoming = filterUpcomingBridgeGroups(allGroups);
+    return mapBridgesGroups(upcoming.length ? upcoming : allGroups);
+  }, [allGroups, profile, sessionsReady]);
+  const bridgesFeatured = React.useMemo(() => pickFeaturedBridgesRows(bridgesRows), [bridgesRows]);
+  const bridgesComparison = React.useMemo(() => pickComparisonRows(bridgesRows), [bridgesRows]);
+
+  const scrollToSchedule = React.useCallback((hint?: string) => {
+    if (hint === 'budget') setSort('price');
+    if (hint === 'classic' || hint === 'scenic') setSort('time');
+    window.setTimeout(() => {
+      document.getElementById('variants')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 0);
+  }, []);
   const seasonalMeta = profile === 'seasonal' ? getSeasonalLanding(slug) : null;
   const landingCopy = resolveLandingCopy(slug);
   const useLandingCopy = shouldUseLandingCopy(slug, profile, citySlug);
@@ -770,7 +819,7 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className={`min-h-screen bg-background text-foreground ${profile === 'bridges' ? 'pb-20 md:pb-0' : ''}`}>
       <Header cityLabel={cityName || 'Все города'} onSection={navigateHome} searchCity={cityName || undefined} />
       <>
           <LandingStickyHeader />
@@ -784,19 +833,48 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
             stats={payload.stats}
             sessionsReady={sessionsReady}
             todayReference={todayReference}
+            bridgesHeroActions={
+              profile === 'bridges' ? (
+                <BridgesHeroActions
+                  priceFrom={payload.stats.priceFrom ?? null}
+                  onPickTour={() => scrollToSchedule()}
+                  onCompare={() => document.getElementById('bridges-compare')?.scrollIntoView({ behavior: 'smooth' })}
+                  quickFilters={{
+                    onToday: () => {
+                      setDateFilter('today');
+                      setTimeSlot('night');
+                      scrollToSchedule();
+                    },
+                    onTomorrow: () => {
+                      setDateFilter('tomorrow');
+                      setTimeSlot('night');
+                      scrollToSchedule();
+                    },
+                    onWeekend: () => {
+                      setDateFilter('weekend');
+                      setTimeSlot('night');
+                      scrollToSchedule();
+                    },
+                    onWithGuide: () => scrollToSchedule('classic'),
+                    onOpenDeck: () => scrollToSchedule('scenic'),
+                  }}
+                />
+              ) : undefined
+            }
           />
+          {profile === 'bridges' ? <BridgesTonightTips /> : null}
+          {profile === 'bridges' ? (
+            <BridgesFeaturedSection rows={bridgesFeatured} loading={isSessionsLoading} />
+          ) : null}
+          {profile === 'bridges' ? <BridgesScenarioPicker onScrollToSchedule={scrollToSchedule} /> : null}
+          {profile === 'bridges' ? <BridgesComparisonTable rows={bridgesComparison} /> : null}
+          {profile === 'bridges' ? <BridgesLandingGuide /> : null}
           {profile === 'seasonal' && !citySlug && seasonalMeta?.nationalIntro ? (
             <section className="container mx-auto px-4 pb-4 pt-8">
               <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">{seasonalMeta.nationalIntro}</p>
             </section>
           ) : null}
-          {profile === 'bridges' ? <BridgesLandingGuide /> : null}
-          {profile === 'bridges' && landingCopy?.body ? (
-            <section className="container mx-auto px-4 pb-4 pt-8">
-              <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">{landingCopy.body}</p>
-            </section>
-          ) : null}
-          {useLandingCopy && landingCopy?.body ? (
+          {useLandingCopy && landingCopy?.body && profile !== 'bridges' ? (
             <section className="container mx-auto px-4 pb-4 pt-8">
               <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">{landingCopy.body}</p>
             </section>
@@ -822,7 +900,7 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
                 ? `${seasonalMeta.scheduleTitle} — ${cityName}`
                 : seasonalMeta.scheduleTitle
               : profile === 'bridges'
-                ? BRIDGES_LANDING.scheduleTitle
+                ? 'Все билеты на разводные мосты'
               : cityName
                 ? `Расписание событий — ${cityName}`
                 : 'Расписание событий'}
@@ -950,6 +1028,9 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
               <RelatedLandings landings={payload.relatedLandings} landing={payload.landing} stats={payload.stats} citySlug={citySlug} />
             ) : null}
           </div>
+          {profile === 'bridges' ? (
+            <BridgesMobileStickyCta priceFrom={payload.stats.priceFrom ?? null} visible={mobileCtaVisible} />
+          ) : null}
           <Footer />
         </>
     </div>
@@ -966,6 +1047,7 @@ function LandingHero({
   stats,
   sessionsReady = true,
   todayReference,
+  bridgesHeroActions,
 }: {
   landing: PublicLanding;
   profile: LandingProfile;
@@ -976,6 +1058,7 @@ function LandingHero({
   stats: PublicLandingPage['stats'];
   sessionsReady?: boolean;
   todayReference: Date;
+  bridgesHeroActions?: React.ReactNode;
 }) {
   const cityName = resolveLandingCityName(citySlug, landingSlug);
   const isBus = profile === 'bus';
@@ -1130,7 +1213,8 @@ function LandingHero({
             {landingSeo.h1Tail}
           </h1>
           <p className="mb-8 max-w-3xl text-base leading-relaxed text-primary-foreground/80 md:text-lg">{heroSubtitle}</p>
-          <div className="flex flex-wrap gap-3">
+          {bridgesHeroActions}
+          <div className={`flex flex-wrap gap-3 ${bridgesHeroActions ? 'mt-6' : ''}`}>
             {sessionsReady ? (
               <>
                 <div className="flex items-center gap-2 rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-medium text-primary-foreground backdrop-blur-sm">

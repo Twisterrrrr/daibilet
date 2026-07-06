@@ -4,6 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Дайбилет — экскурсии, музеи и события</title>
+    <meta name="description" content="Билеты на экскурсии, музеи, речные прогулки и события в городах России. Сравнение цен и расписания на Дайбилет." />
+    <script>
+      (function () {
+        var path = location.pathname.replace(/\/+$/, '') || '/';
+        if (path === '/saint-petersburg/night-bridges') {
+          document.title = 'Разводные мосты Санкт-Петербурга — билеты на теплоход | Дайбилет';
+          var desc = document.querySelector('meta[name="description"]');
+          if (desc) {
+            desc.setAttribute(
+              'content',
+              'Сравните ночные рейсы к разводным мостам Санкт-Петербурга: время, причал, маршрут и цена. Ближайшие отправления и советы перед поездкой.',
+            );
+          }
+        }
+      })();
+    </script>
     <script>
       (function () {
         var match = location.pathname.match(/^\/(locations|venues)\/([^/]+)\/?$/);
