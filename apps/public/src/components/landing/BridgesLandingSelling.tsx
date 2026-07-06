@@ -1,87 +1,219 @@
 import { ArrowRight, Clock, Compass, Heart, MapPin, Sparkles, Star, Wallet } from 'lucide-react';
+import * as React from 'react';
 
 import { BRIDGES_LANDING } from '@/data/bridges-landing';
-import { formatMoney } from '@/data';
+import { formatMoneyRange, formatNumber } from '@/data';
 import type { BridgesScheduleRow } from '@/lib/bridges-session-utils';
 
-type BridgesQuickFilters = {
-  onToday: () => void;
-  onTomorrow: () => void;
-  onWeekend: () => void;
-  onWithGuide: () => void;
-  onOpenDeck: () => void;
-};
+const PALACE_BRIDGE_LIFT_HOUR = 1;
+const PALACE_BRIDGE_LIFT_MINUTE = 10;
+const NAVIGATION_SEASON_START_MONTH = 3;
+const NAVIGATION_SEASON_END_MONTH = 10;
 
-export function BridgesHeroActions({
-  priceFrom,
-  onPickTour,
-  onCompare,
-  quickFilters,
-}: {
-  priceFrom: number | null;
-  onPickTour: () => void;
-  onCompare: () => void;
-  quickFilters: BridgesQuickFilters;
-}) {
+function isBridgeNavigationSeason(date: Date): boolean {
+  const month = date.getMonth();
+  return month >= NAVIGATION_SEASON_START_MONTH && month <= NAVIGATION_SEASON_END_MONTH;
+}
+
+function getNextPalaceBridgeLift(from = new Date()): Date | null {
+  if (!isBridgeNavigationSeason(from)) return null;
+
+  const next = new Date(from);
+  next.setHours(PALACE_BRIDGE_LIFT_HOUR, PALACE_BRIDGE_LIFT_MINUTE, 0, 0);
+  if (from.getTime() >= next.getTime()) {
+    next.setDate(next.getDate() + 1);
+  }
+  if (!isBridgeNavigationSeason(next)) return null;
+  return next;
+}
+
+function usePalaceBridgeCountdown() {
+  const [state, setState] = React.useState({ hours: 0, minutes: 0, inSeason: true });
+
+  React.useEffect(() => {
+    const tick = () => {
+      const next = getNextPalaceBridgeLift();
+      if (!next) {
+        setState({ hours: 0, minutes: 0, inSeason: false });
+        return;
+      }
+      const diff = Math.max(0, next.getTime() - Date.now());
+      const totalMinutes = Math.floor(diff / 60_000);
+      setState({
+        hours: Math.floor(totalMinutes / 60),
+        minutes: totalMinutes % 60,
+        inSeason: true,
+      });
+    };
+
+    tick();
+    const id = window.setInterval(tick, 30_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  return state;
+}
+
+function BridgesCountdownCard({ hours, minutes, inSeason }: { hours: number; minutes: number; inSeason: boolean }) {
   return (
-    <div className="mt-6 space-y-4">
-      <div className="flex flex-wrap gap-3">
-        <button type="button" onClick={onPickTour} className="inline-btn rounded-lg bg-white px-6 py-3 text-sm font-semibold text-primary shadow-sm hover:bg-primary-50">
-          Выбрать рейс
-        </button>
-        <button
-          type="button"
-          onClick={onCompare}
-          className="inline-btn rounded-lg border border-primary-foreground/30 bg-primary-foreground/10 px-6 py-3 text-sm font-semibold text-primary-foreground backdrop-blur-sm hover:bg-primary-foreground/20"
-        >
-          Сравнить маршруты
-        </button>
-        {priceFrom ? (
-          <span className="inline-flex items-center rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-medium text-primary-foreground backdrop-blur-sm">
-            от {formatMoney(priceFrom).replace(/^от\s+/i, '')}
-          </span>
-        ) : null}
+    <div className="flex items-center gap-4 rounded-2xl border border-primary-foreground/20 bg-primary-foreground/10 px-5 py-4 shadow-lg backdrop-blur-md">
+      <div className="grid h-11 w-11 place-items-center rounded-xl bg-primary-foreground/15 text-primary-foreground">
+        <Clock className="h-5 w-5" />
       </div>
-      <div className="flex flex-wrap gap-2">
-        {[
-          { label: 'Сегодня', action: quickFilters.onToday },
-          { label: 'Завтра', action: quickFilters.onTomorrow },
-          { label: 'Выходные', action: quickFilters.onWeekend },
-          { label: 'С гидом', action: quickFilters.onWithGuide },
-          { label: 'Открытая палуба', action: quickFilters.onOpenDeck },
-        ].map((chip) => (
-          <button
-            key={chip.label}
-            type="button"
-            onClick={chip.action}
-            className="rounded-full border border-primary-foreground/25 bg-primary-foreground/10 px-3 py-1.5 text-xs font-medium text-primary-foreground backdrop-blur-sm hover:bg-primary-foreground/20"
-          >
-            {chip.label}
-          </button>
-        ))}
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-wider text-primary-foreground/60">До разводки Дворцового</p>
+        <p className="mt-0.5 text-2xl font-semibold tabular-nums text-primary-foreground">
+          {inSeason ? `${hours}ч ${String(minutes).padStart(2, '0')}м` : 'вне сезона'}
+        </p>
       </div>
     </div>
   );
 }
 
+export function BridgesHeroBlock({
+  priceFrom,
+  priceTo,
+  visibleCount,
+  soldEstimate,
+  sessionsReady,
+  onPickTour,
+  onViewSchedule,
+}: {
+  priceFrom: number | null;
+  priceTo?: number | null;
+  visibleCount: number;
+  soldEstimate: number;
+  sessionsReady: boolean;
+  onPickTour: () => void;
+  onViewSchedule: () => void;
+}) {
+  const countdown = usePalaceBridgeCountdown();
+  const priceLabel = priceFrom ? formatMoneyRange(priceFrom, priceTo) : null;
+
+  return (
+    <div className="space-y-0">
+      <div className="grid gap-4 md:grid-cols-[auto_1fr_auto] md:items-center">
+        <BridgesCountdownCard hours={countdown.hours} minutes={countdown.minutes} inSeason={countdown.inSeason} />
+        <div className="hidden h-px bg-gradient-to-r from-primary-foreground/25 to-transparent md:block" aria-hidden />
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={onPickTour}
+            className="inline-btn inline-flex items-center gap-2 rounded-full bridges-cta-gradient px-6 py-3 text-sm font-semibold text-white transition hover:brightness-105"
+          >
+            {priceLabel ? `Выбрать рейс · ${priceLabel}` : 'Выбрать рейс'}
+            <ArrowRight className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={onViewSchedule}
+            className="inline-btn rounded-full border border-primary-foreground/25 px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary-foreground/10"
+          >
+            Смотреть график разводки
+          </button>
+        </div>
+      </div>
+
+      <dl className="mt-12 grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-6 md:grid-cols-4">
+        {sessionsReady ? (
+          <>
+            {[
+              { value: formatNumber(visibleCount), label: 'рейсов ночью' },
+              { value: `${formatNumber(soldEstimate)}+`, label: 'билетов продано' },
+              { value: '4.7', label: 'средний рейтинг' },
+              { value: priceLabel || '—', label: 'диапазон цен' },
+            ].map((item) => (
+              <div key={item.label}>
+                <dt className="text-2xl font-semibold tracking-tight text-primary-foreground md:text-3xl">{item.value}</dt>
+                <dd className="mt-1 text-xs uppercase tracking-wider text-primary-foreground/60">{item.label}</dd>
+              </div>
+            ))}
+          </>
+        ) : (
+          <p className="col-span-full text-sm text-primary-foreground/80">Загружаем актуальное расписание…</p>
+        )}
+      </dl>
+    </div>
+  );
+}
+
+export function BridgesScheduleStrip() {
+  return (
+    <section id="bridges-lift-schedule" className="scroll-mt-24 border-y border-border/60 bg-card/40">
+      <div className="container-page py-10 md:py-14">
+        <div className="mb-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[oklch(0.72_0.17_55)]">График разводки</p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">Когда мосты откроются сегодня</h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{BRIDGES_LANDING.liftScheduleNote}</p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+          {BRIDGES_LANDING.liftSchedule.map((bridge) => {
+            const isHero = bridge.shortName === 'Дворцовый';
+            return (
+              <div
+                key={bridge.shortName}
+                className={`rounded-2xl border p-5 transition ${
+                  isHero ? 'border-primary/50 bg-primary/5 shadow-gold' : 'border-border bg-card'
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="text-sm font-medium text-foreground">{bridge.shortName}</div>
+                  {isHero ? (
+                    <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
+                      Главное
+                    </span>
+                  ) : null}
+                </div>
+                <div className="mt-4 flex items-baseline gap-2">
+                  <div className="text-3xl font-semibold tabular-nums text-foreground">{bridge.lift}</div>
+                  <div className="text-xs text-muted-foreground">развод</div>
+                </div>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  сведение в <span className="tabular-nums text-foreground/80">{bridge.lower}</span>
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function BridgesTonightTips() {
   const tips = [
-    'Берите тёплую одежду — на воде холоднее',
-    'Приходите на причал за 20–30 минут',
-    'Рейсы 23:30–00:30 успевают к разводке Дворцового',
-    'Бронируйте заранее в сезон белых ночей',
-    'После 02:00 проверьте, на какой берег вернётесь',
+    { id: 'warm' as const, text: 'Берите тёплую одежду — на воде холоднее' },
+    { id: 'pier' as const, text: 'Приходите на причал за 20–30 минут' },
+    { id: 'book' as const, text: 'Бронируйте заранее в сезон белых ночей' },
+    { id: 'shore' as const, text: 'Проверьте в описании рейса, на какой берег вернётесь после разводки' },
   ];
 
   return (
-    <section className="container mx-auto px-4 pt-6">
-      <div className="rounded-xl border border-amber-200/80 bg-amber-50/90 p-4 md:p-5">
-        <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-amber-900">Что важно знать ночью</h2>
-        <ul className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+    <section className="container-page py-10 md:py-14">
+      <div className="mb-8">
+        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[oklch(0.72_0.17_55)]">Советы</p>
+        <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">Что важно знать ночью</h2>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+          Мелочи, которые делают ночную прогулку комфортнее и безопаснее.
+        </p>
+      </div>
+      <div className="rounded-2xl border border-[oklch(0.72_0.17_55/0.2)] bg-[oklch(0.72_0.17_55/0.05)] p-6 md:p-8">
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:grid-rows-2 sm:gap-x-6 sm:gap-y-4">
           {tips.map((tip) => (
-            <li key={tip} className="flex items-start gap-2 text-sm text-amber-950/90">
-              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-              {tip}
+            <li
+              key={tip.id}
+              className={`flex items-start gap-3 text-sm text-foreground/90 ${
+                tip.id === 'warm'
+                  ? 'sm:col-start-1 sm:row-start-1'
+                  : tip.id === 'pier'
+                    ? 'sm:col-start-2 sm:row-start-1'
+                    : tip.id === 'book'
+                      ? 'sm:col-start-2 sm:row-start-2'
+                      : 'sm:col-start-1 sm:row-start-2'
+              }`}
+            >
+              <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[oklch(0.72_0.17_55)]" />
+              {tip.text}
             </li>
           ))}
         </ul>
@@ -119,7 +251,7 @@ const SCENARIOS = [
 
 export function BridgesScenarioPicker({ onScrollToSchedule }: { onScrollToSchedule: (hint?: string) => void }) {
   return (
-    <section id="bridges-scenarios" className="container mx-auto px-4 py-10">
+    <section id="bridges-scenarios" className="container-page py-10">
       <h2 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">Какой рейс выбрать?</h2>
       <p className="mb-6 max-w-2xl text-muted-foreground">Не все ночные прогулки одинаковы — выберите сценарий, затем сравните конкретные рейсы в расписании.</p>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -177,7 +309,9 @@ function BridgesFeaturedCard({ row, label }: { row: BridgesScheduleRow; label?: 
         </div>
       ) : null}
       <div className="mt-4 flex items-center justify-between gap-3">
-        <span className="text-lg font-bold text-foreground">{row.priceFrom ? formatMoney(row.priceFrom) : 'Цена в карточке'}</span>
+        <span className="text-lg font-bold text-foreground">
+          {row.priceFrom ? formatMoneyRange(row.priceFrom, row.priceTo) : 'Цена в карточке'}
+        </span>
         <a href={row.href} className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:text-primary/80">
           Выбрать дату
           <ArrowRight className="h-4 w-4" />
@@ -196,8 +330,8 @@ export function BridgesFeaturedSection({
 }) {
   if (loading) {
     return (
-      <section id="bridges-featured" className="container mx-auto px-4 py-8">
-        <h2 className="mb-4 text-2xl font-bold text-foreground">Ближайшие рейсы</h2>
+      <section id="bridges-featured" className="container-page py-8">
+        <h2 className="mb-4 text-2xl font-bold text-foreground">Популярные рейсы</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-40 animate-pulse rounded-xl bg-muted" />
@@ -209,28 +343,21 @@ export function BridgesFeaturedSection({
 
   if (!rows.length) return null;
 
-  const cheapest = [...rows].sort((a, b) => (a.priceFrom ?? 99999) - (b.priceFrom ?? 99999))[0];
-  const best = [...rows].sort((a, b) => a.score - b.score)[0];
-  const featured = rows.slice(0, 5);
-
   return (
-    <section id="bridges-featured" className="container mx-auto px-4 py-8">
+    <section id="bridges-featured" className="container-page py-8">
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-foreground md:text-3xl">Ближайшие рейсы</h2>
-          <p className="mt-1 text-muted-foreground">Лучшие варианты для быстрого выбора — полный каталог ниже.</p>
+          <h2 className="text-2xl font-bold text-foreground md:text-3xl">Популярные рейсы</h2>
+          <p className="mt-1 text-muted-foreground">Проверенные варианты для быстрого выбора — полный каталог ниже.</p>
         </div>
         <a href="#variants" className="text-sm font-semibold text-primary hover:text-primary/80">
           Все билеты →
         </a>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {featured.map((row) => {
-          let label: string | undefined;
-          if (cheapest && row.key === cheapest.key) label = 'Самый бюджетный';
-          else if (best && row.key === best.key) label = 'Лучший для первого раза';
-          return <BridgesFeaturedCard key={row.key} row={row} label={label} />;
-        })}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
+        {rows.map((row) => (
+          <BridgesFeaturedCard key={row.key} row={row} />
+        ))}
       </div>
     </section>
   );
@@ -240,7 +367,7 @@ export function BridgesComparisonTable({ rows }: { rows: BridgesScheduleRow[] })
   if (rows.length < 2) return null;
 
   return (
-    <section id="bridges-compare" className="container mx-auto px-4 py-8">
+    <section id="bridges-compare" className="container-page py-8">
       <h2 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">Сравнение маршрутов</h2>
       <p className="mb-6 text-muted-foreground">Сопоставьте время, длительность, причал и цену перед покупкой.</p>
       <div className="overflow-x-auto rounded-xl border border-border">
@@ -267,7 +394,9 @@ export function BridgesComparisonTable({ rows }: { rows: BridgesScheduleRow[] })
                 <td className="px-4 py-3 text-muted-foreground">{row.duration || '—'}</td>
                 <td className="px-4 py-3 text-muted-foreground">{row.bridgeHint || '—'}</td>
                 <td className="px-4 py-3 text-muted-foreground">{row.venue || '—'}</td>
-                <td className="px-4 py-3 font-semibold text-foreground">{row.priceFrom ? formatMoney(row.priceFrom) : '—'}</td>
+                <td className="px-4 py-3 font-semibold text-foreground">
+                  {row.priceFrom ? formatMoneyRange(row.priceFrom, row.priceTo) : '—'}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -277,7 +406,15 @@ export function BridgesComparisonTable({ rows }: { rows: BridgesScheduleRow[] })
   );
 }
 
-export function BridgesMobileStickyCta({ priceFrom, visible }: { priceFrom: number | null; visible: boolean }) {
+export function BridgesMobileStickyCta({
+  priceFrom,
+  priceTo,
+  visible,
+}: {
+  priceFrom: number | null;
+  priceTo?: number | null;
+  visible: boolean;
+}) {
   if (!visible) return null;
 
   return (
@@ -287,7 +424,7 @@ export function BridgesMobileStickyCta({ priceFrom, visible }: { priceFrom: numb
         className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
       >
         <Star className="h-4 w-4" />
-        {priceFrom ? `Показать рейсы от ${formatMoney(priceFrom).replace(/^от\s+/i, '')}` : 'Выбрать рейс'}
+        {priceFrom ? `Показать рейсы ${formatMoneyRange(priceFrom, priceTo)}` : 'Выбрать рейс'}
       </a>
     </div>
   );

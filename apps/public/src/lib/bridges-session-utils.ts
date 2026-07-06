@@ -1,4 +1,6 @@
 import { FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession, isOpenDate } from '@/lib/event-card-meta';
+import { BRIDGES_POPULAR_MATCHERS, BRIDGES_TOUR_META } from '@/data/bridges-landing';
+import { resolvePseudoRating } from '@/lib/event-card-meta';
 import {
   parseSessionStartsAt,
   resolveSessionDate,
@@ -12,6 +14,7 @@ export type BridgesScheduleRow = {
   title: string;
   venue: string;
   priceFrom: number | null;
+  priceTo: number | null;
   timeLabel: string;
   dateLabel: string;
   duration: string | null;
@@ -29,10 +32,81 @@ export type BridgesEventGroup = {
   representative: PublicSession;
   sessions: PublicSession[];
   priceFrom?: number | null;
+  priceTo?: number | null;
   firstStartsAt?: string | null;
 };
 
-function extractDuration(tags: string[]): string | null {
+export type BridgesRouteKind = 'neva' | 'canals' | 'mixed';
+
+export type BridgesFeatureTag = 'warm' | 'blankets' | 'bar' | 'disco' | 'guide';
+
+const OFF_NEVA_PIER_PATTERN =
+  /фонтанк|мойк|карповк|крюков|обводн|грибоедов|наб\.?\s*реки\s+фонтанк|наб\.?\s*реки\s+мойк|наб\.?\s*реки\s+карповк|наб\.?\s*фонтанк|наб\.?\s*мойк|петроградск/i;
+
+/** Рейсы по Большой Неве — даже если в описании упоминаются каналы или «Петроградская сторона». */
+const NEVA_ROUTE_OVERRIDES = [/дискотека\s+под\s+разводн/i];
+
+export function resolveBridgesTourMeta(title: string) {
+  return BRIDGES_TOUR_META.find((item) => item.match(title)) ?? null;
+}
+
+export function resolveBridgesRating(title: string, fallbackKey = title): number {
+  const meta = resolveBridgesTourMeta(title);
+  if (meta) return meta.rating;
+  return resolvePseudoRating(fallbackKey);
+}
+
+export function resolveBridgesDisplayTitle(title: string): string {
+  return resolveBridgesTourMeta(title)?.displayTitle ?? title;
+}
+
+export function classifyBridgesRoute(
+  title: string,
+  tags: string[],
+  venue = '',
+  description = '',
+): BridgesRouteKind {
+  if (NEVA_ROUTE_OVERRIDES.some((pattern) => pattern.test(title))) return 'neva';
+
+  const fullText = [title, venue, description, ...(tags || [])].join(' ').toLowerCase();
+  // Старт с каналов/малых рек — по названию, причалу и тегам (не по описанию маршрута).
+  const pierText = [title, venue, ...(tags || [])].join(' ').toLowerCase();
+
+  if (/залив/i.test(fullText)) return 'mixed';
+  if (OFF_NEVA_PIER_PATTERN.test(pierText)) return 'canals';
+  return 'neva';
+}
+
+export function extractBridgeNames(title: string, tags: string[]): string[] {
+  const known = ['Дворцовый', 'Троицкий', 'Литейный', 'Большеохтинский', 'Биржевой', 'Александра Невского'];
+  const text = [title, ...(tags || [])].join(' ');
+  const found = known.filter((bridge) => text.toLowerCase().includes(bridge.toLowerCase().slice(0, 6)));
+  if (found.length) return [...new Set(found)].slice(0, 5);
+
+  const count = title.match(/(\d+)\s*развод/i) || title.match(/(\d+)\s*мост/i);
+  if (count) {
+    const n = Number(count[1]);
+    if (n >= 5) return ['Дворцовый', 'Троицкий', 'Литейный', 'Большеохтинский'];
+    if (n >= 3) return ['Дворцовый', 'Троицкий', 'Биржевой'];
+  }
+  return ['Дворцовый', 'Троицкий'];
+}
+
+export function extractBridgesFeatureTags(title: string, tags: string[]): BridgesFeatureTag[] {
+  const text = [title, ...(tags || [])].join(' ').toLowerCase();
+  const result: BridgesFeatureTag[] = [];
+  if (/тёпл|тепл|закрыт|салон|панорам/i.test(text)) result.push('warm');
+  if (/плед/i.test(text)) result.push('blankets');
+  if (/бар|чай|напит/i.test(text)) result.push('bar');
+  if (/дискотек|dj/i.test(text)) result.push('disco');
+  if (/гид|экскурсовод/i.test(text)) result.push('guide');
+  return result.slice(0, 4);
+}
+
+function extractDuration(title: string, tags: string[]): string | null {
+  if (/пять\s+разводных\s+мостов|5\s+разводных/i.test(title)) {
+    return '120 мин';
+  }
   return (tags || []).find((tag) => /\d+\s*(мин|ч|час)/i.test(tag)) || null;
 }
 
@@ -70,18 +144,28 @@ export function mapBridgesGroups(groups: BridgesEventGroup[]): BridgesScheduleRo
     const flexible = isFlexibleScheduleSession(session);
     return {
       key: group.key,
-      title: group.title,
+      title: resolveBridgesDisplayTitle(group.title),
       venue: group.venue,
       priceFrom: group.priceFrom ?? null,
+      priceTo: group.priceTo ?? group.priceFrom ?? null,
       timeLabel: flexible ? FLEXIBLE_SCHEDULE_LABEL : resolveSessionTime(session, slot),
       dateLabel: flexible ? '' : resolveSessionDate(session, slot),
-      duration: extractDuration(session.tags),
+      duration: extractDuration(group.title, session.tags),
       bridgeHint: extractBridgeHint(group.title, session.tags),
       href: eventHref(session),
       badges: sessionBadges(session),
       score: groupScore(group),
     };
   });
+}
+
+export function pickPopularBridgesRows(rows: BridgesScheduleRow[]): BridgesScheduleRow[] {
+  const picked: BridgesScheduleRow[] = [];
+  for (const matcher of BRIDGES_POPULAR_MATCHERS) {
+    const match = rows.find((row) => matcher(row.title) && !picked.some((item) => item.key === row.key));
+    if (match) picked.push(match);
+  }
+  return picked;
 }
 
 export function pickFeaturedBridgesRows(rows: BridgesScheduleRow[], limit = 5): BridgesScheduleRow[] {

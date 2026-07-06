@@ -187,6 +187,7 @@ export type PublicLandingPage = {
     categories: Record<string, number>;
     venues: Record<string, number>;
     priceFrom?: number | null;
+    priceTo?: number | null;
   };
 };
 

@@ -163,6 +163,18 @@ export function formatShowcasePriceLabel(priceFrom?: number | null): string {
   return `от ${formatPriceRub(priceFrom)} ₽`;
 }
 
+export function collectSessionPrices(sessions: Array<{ priceFrom?: number | null }>): number[] {
+  return sessions
+    .map((session) => session.priceFrom)
+    .filter((price): price is number => typeof price === 'number' && Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
+}
+
+export function resolveSessionPriceRange(sessions: Array<{ priceFrom?: number | null }>) {
+  const prices = collectSessionPrices(sessions);
+  if (!prices.length) return { priceFrom: null as number | null, priceTo: null as number | null };
+  return { priceFrom: Math.min(...prices), priceTo: Math.max(...prices) };
+}
+
 export function resolveAgeBadge(tags: string[], ageLimit?: string | null): string | null {
   const fromLimit = String(ageLimit || '').match(/\b(\d{1,2})\+\b/);
   if (fromLimit) return `${fromLimit[1]}+`;

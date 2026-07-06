@@ -1,15 +1,30 @@
-import { Anchor, Clock, MapPin, Ship, Thermometer } from 'lucide-react';
+import { MapPin, Ship } from 'lucide-react';
 
 import { BRIDGES_LANDING } from '@/data/bridges-landing';
 
-function yandexMapsLink(lat: number, lng: number) {
-  return `https://yandex.ru/maps/?pt=${lng},${lat}&z=16&l=map`;
+export function BridgesShipChecklist() {
+  return (
+    <section className="container-page py-10 md:py-12">
+      <div className="mb-6 flex items-center gap-2">
+        <Ship className="h-5 w-5 text-primary" />
+        <h2 className="text-2xl font-bold text-foreground">На что смотреть при выборе теплохода</h2>
+      </div>
+      <div className="grid gap-4 md:grid-cols-2">
+        {BRIDGES_LANDING.shipChecklist.map((item) => (
+          <div key={item.title} className="rounded-xl border border-border bg-card p-5">
+            <h3 className="mb-2 font-semibold text-foreground">{item.title}</h3>
+            <p className="text-sm leading-relaxed text-muted-foreground">{item.text}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 export function BridgesLandingGuide() {
   return (
     <div className="space-y-12 pb-4 pt-8">
-    <section id="bridges-routes" className="container mx-auto px-4">
+      <section id="bridges-routes" className="container-page">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:items-start">
           <div>
             <h2 className="mb-3 text-2xl font-bold text-foreground md:text-3xl">Маршруты прогулок</h2>
@@ -54,12 +69,24 @@ export function BridgesLandingGuide() {
                 <circle cx="330" cy="152" r="8" fill="#fbbf24" />
                 <circle cx="70" cy="218" r="7" fill="#34d399" />
                 <circle cx="360" cy="150" r="7" fill="#34d399" />
-                <text x="205" y="150" fill="#f8fafc" fontSize="11" textAnchor="middle">Дворцовый</text>
-                <text x="285" y="140" fill="#f8fafc" fontSize="11" textAnchor="middle">Троицкий</text>
-                <text x="330" y="134" fill="#f8fafc" fontSize="11" textAnchor="middle">Литейный</text>
-                <text x="52" y="238" fill="#86efac" fontSize="11">Старт</text>
-                <text x="318" y="172" fill="#86efac" fontSize="11">Финиш</text>
-                <text x="120" y="108" fill="#93c5fd" fontSize="10">Каналы</text>
+                <text x="205" y="150" fill="#f8fafc" fontSize="11" textAnchor="middle">
+                  Дворцовый
+                </text>
+                <text x="285" y="140" fill="#f8fafc" fontSize="11" textAnchor="middle">
+                  Троицкий
+                </text>
+                <text x="330" y="134" fill="#f8fafc" fontSize="11" textAnchor="middle">
+                  Литейный
+                </text>
+                <text x="52" y="238" fill="#86efac" fontSize="11">
+                  Старт
+                </text>
+                <text x="318" y="172" fill="#86efac" fontSize="11">
+                  Финиш
+                </text>
+                <text x="120" y="108" fill="#93c5fd" fontSize="10">
+                  Каналы
+                </text>
                 <text x="200" y="280" fill="#94a3b8" fontSize="11" textAnchor="middle">
                   Большая Нева · разводка ≈ 01:10–02:00
                 </text>
@@ -70,83 +97,6 @@ export function BridgesLandingGuide() {
             </p>
           </div>
         </div>
-      </section>
-
-      <section className="container mx-auto px-4">
-        <div className="rounded-xl border border-border bg-card p-6 md:p-8">
-          <div className="mb-4 flex items-center gap-2">
-            <Clock className="h-5 w-5 text-primary" />
-            <h2 className="text-2xl font-bold text-foreground">Расписание разводки мостов</h2>
-          </div>
-          <p className="mb-6 max-w-3xl text-sm leading-relaxed text-muted-foreground">{BRIDGES_LANDING.liftScheduleNote}</p>
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[520px] text-left text-sm">
-              <thead>
-                <tr className="border-b border-border text-muted-foreground">
-                  <th className="px-3 py-2 font-medium">Мост</th>
-                  <th className="px-3 py-2 font-medium">Развод</th>
-                  <th className="px-3 py-2 font-medium">Сведение</th>
-                </tr>
-              </thead>
-              <tbody>
-                {BRIDGES_LANDING.liftSchedule.map((row) => (
-                  <tr key={row.shortName} className="border-b border-border/70 last:border-0">
-                    <td className="px-3 py-3 font-medium text-foreground">
-                      {row.name}
-                      {row.note ? <span className="mt-1 block text-xs font-normal text-primary">{row.note}</span> : null}
-                    </td>
-                    <td className="px-3 py-3 text-foreground">{row.lift}</td>
-                    <td className="px-3 py-3 text-muted-foreground">{row.lower}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <section className="container mx-auto px-4">
-        <div className="mb-6 flex items-center gap-2">
-          <Ship className="h-5 w-5 text-primary" />
-          <h2 className="text-2xl font-bold text-foreground">На что смотреть при выборе теплохода</h2>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          {BRIDGES_LANDING.shipChecklist.map((item) => (
-            <div key={item.title} className="rounded-xl border border-border bg-card p-5">
-              <h3 className="mb-2 font-semibold text-foreground">{item.title}</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">{item.text}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="container mx-auto px-4">
-        <div className="mb-6 flex items-center gap-2">
-          <Anchor className="h-5 w-5 text-primary" />
-          <h2 className="text-2xl font-bold text-foreground">Где садиться на теплоход</h2>
-        </div>
-        <div className="grid gap-4 lg:grid-cols-3">
-          {BRIDGES_LANDING.piers.map((pier) => (
-            <article key={pier.name} className="rounded-xl border border-border bg-card p-5">
-              <h3 className="mb-1 font-semibold text-foreground">{pier.name}</h3>
-              <p className="mb-2 text-sm text-primary">{pier.landmark}</p>
-              <p className="mb-4 text-sm leading-relaxed text-muted-foreground">{pier.hint}</p>
-              <a
-                href={yandexMapsLink(pier.coords.lat, pier.coords.lng)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-primary/80"
-              >
-                <MapPin className="h-4 w-4" />
-                Открыть на карте
-              </a>
-            </article>
-          ))}
-        </div>
-        <p className="mt-4 flex items-start gap-2 text-sm text-muted-foreground">
-          <Thermometer className="mt-0.5 h-4 w-4 shrink-0" />
-          Ночью на причале много туристов — приходите заранее, держите под рукой билет и номер судна из подтверждения.
-        </p>
       </section>
     </div>
   );

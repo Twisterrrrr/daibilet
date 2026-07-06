@@ -285,6 +285,14 @@ export function formatMoney(value?: number | null): string {
   return `от ${formatNumber(Math.round(value))} ₽`;
 }
 
+export function formatMoneyRange(from?: number | null, to?: number | null): string {
+  if (!from || from <= 0) return '—';
+  const min = Math.round(from);
+  const max = to && to > 0 ? Math.round(to) : min;
+  if (max > min) return `от ${formatNumber(min)} до ${formatNumber(max)} ₽`;
+  return `от ${formatNumber(min)} ₽`;
+}
+
 export function formatDate(value?: string | null, timeZone = 'Europe/Moscow'): string {
   if (!value) return 'открытая дата';
 
