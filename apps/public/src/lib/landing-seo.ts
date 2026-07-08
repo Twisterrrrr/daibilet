@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { getSeasonalLanding } from '@/data/seasonal-landings';
+import { formatBridgesSeoDescription, formatBridgesSeoTitle } from '@/lib/bridges-seo';
 import { canonicalLandingSlug, isBridgesNightLandingSlug, isRiverPartyLandingSlug } from '@/lib/landing-slugs';
 import type { LandingProfileKind } from '@/lib/landing-copy';
 import {
@@ -13,6 +14,7 @@ export type LandingSeoStats = {
   events?: number;
   sessions?: number;
   priceFrom?: number | null;
+  priceTo?: number | null;
 };
 
 export type LandingSeoInput = {
@@ -29,6 +31,8 @@ export type LandingSeoInput = {
   canonicalPath?: string | null;
   faqItems?: Array<{ question: string; answer: string }>;
   breadcrumbItems?: Array<{ name: string; path: string }>;
+  /** Дополнительные JSON-LD блоки (Product, Event и т.д.). */
+  jsonLdExtras?: Array<Record<string, unknown>>;
 };
 
 export type LandingSeo = {
@@ -175,16 +179,17 @@ export function resolveLandingSeo(input: LandingSeoInput): LandingSeo {
   }
 
   if (profile === 'bridges' || isBridgesNightLandingSlug(slug)) {
-    return seoResult(
+    const priceFrom = input.stats?.priceFrom ?? null;
+    const h1 = buildH1Parts(
       'Разводные мосты в Санкт-Петербурге',
       short,
       'сравнение рейсов, билеты и цены',
-      `Разводные мосты Санкт-Петербурга сегодня — купить билеты на теплоход, расписание на ${full}`,
-      'Сравните ночные рейсы к разводным мостам Санкт-Петербурга: время, причал, маршрут и цена. ' +
-        eventsPhrase(events, 'прогулок') +
-        pricePhrase(priceFrom) +
-        'Ближайшие отправления, карта причалов и советы перед поездкой. Покупайте на Дайбилет!',
     );
+    return {
+      ...h1,
+      title: formatBridgesSeoTitle(priceFrom),
+      description: formatBridgesSeoDescription(events, priceFrom, full),
+    };
   }
 
   if (profile === 'seasonal') {
@@ -286,11 +291,18 @@ export function applyLandingSeoMeta(input: LandingSeoInput): LandingSeo {
       mainEntity: input.faqItems.map((item) => ({
         '@type': 'Question',
         name: item.question,
-        acceptedAnswer: { '@type': 'Answer', text: item.answer },
+        acceptedAnswer: { '@type': 'Answer', text: stripHtmlForSchema(item.answer) },
       })),
     });
   }
+  (input.jsonLdExtras || []).forEach((block, index) => {
+    setJsonLd(`daibilet-ld-extra-${index}`, block);
+  });
   return seo;
+}
+
+function stripHtmlForSchema(value: string): string {
+  return value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 
 function absoluteUrl(path: string): string {

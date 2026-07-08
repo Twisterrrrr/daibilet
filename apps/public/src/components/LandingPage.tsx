@@ -37,6 +37,8 @@ import {
 import { normalizeCitySlug } from '@/lib/landing-routes';
 import { resolveLandingCopy, shouldUseLandingCopy } from '@/lib/landing-copy';
 import { applyLandingSeoMeta, resolveLandingSeo, useLandingTodayReference } from '@/lib/landing-seo';
+import { buildBridgesProductJsonLd } from '@/lib/bridges-seo';
+import { formatLandingTodayIso, formatLandingTodayLong } from '@/lib/datetime';
 import { BRIDGES_LANDING } from '@/data/bridges-landing';
 import {
   getSeasonalLanding,
@@ -754,8 +756,10 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
   React.useEffect(() => {
     if (!payload?.landing) return;
     const canonicalPath = landingCategoryHref(slug, citySlug);
+    const seoInput = buildLandingSeoInput(payload.landing, slug, profile, citySlug, payload.stats, todayReference);
+    const seo = resolveLandingSeo(seoInput);
     applyLandingSeoMeta({
-      ...buildLandingSeoInput(payload.landing, slug, profile, citySlug, payload.stats, todayReference),
+      ...seoInput,
       canonicalPath,
       breadcrumbItems:
         profile === 'bridges'
@@ -766,6 +770,21 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
             ]
           : undefined,
       faqItems: profile === 'bridges' ? BRIDGES_LANDING.faq : undefined,
+      jsonLdExtras:
+        profile === 'bridges'
+          ? [
+              buildBridgesProductJsonLd({
+                canonicalUrl:
+                  typeof window !== 'undefined'
+                    ? `${window.location.origin}${canonicalPath.startsWith('/') ? canonicalPath : `/${canonicalPath}`}`
+                    : `https://daibilet.ru${canonicalPath.startsWith('/') ? canonicalPath : `/${canonicalPath}`}`,
+                priceFrom: payload.stats?.priceFrom ?? null,
+                priceTo: payload.stats?.priceTo ?? null,
+                offerCount: payload.stats?.events ?? 0,
+                description: seo.description,
+              }),
+            ]
+          : undefined,
     });
   }, [payload?.landing, payload?.stats, slug, profile, citySlug, todayReference]);
 
@@ -875,7 +894,11 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
         {profile === 'bridges' ? (
           <div className="mb-8">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[oklch(0.72_0.17_55)]">Рейсы сегодня</p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">Ночные прогулки к разводке</h2>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+              <time dateTime={formatLandingTodayIso(todayReference)}>
+                Расписание рейсов на сегодня, {formatLandingTodayLong(todayReference)}
+              </time>
+            </h2>
             <p className="mt-2 max-w-2xl text-muted-foreground">
               Все рейсы проходят под Дворцовым и Троицким. Сравните маршрут, причал и теплоход.
             </p>

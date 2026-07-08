@@ -5,16 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Дайбилет — экскурсии, музеи и события</title>
     <meta name="description" content="Билеты на экскурсии, музеи, речные прогулки и события в городах России. Сравнение цен и расписания на Дайбилет." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#2563eb" />
     <script>
       (function () {
         var path = location.pathname.replace(/\/+$/, '') || '/';
-        if (path === '/saint-petersburg/night-bridges') {
-          document.title = 'Разводные мосты Санкт-Петербурга — билеты на теплоход | Дайбилет';
+        if (/^\/saint-petersburg\/night-bridges$/.test(path)) {
+          document.title = 'Разводные мосты СПб: ночные экскурсии и билеты от 1100₽';
           var desc = document.querySelector('meta[name="description"]');
           if (desc) {
             desc.setAttribute(
               'content',
-              'Сравните ночные рейсы к разводным мостам Санкт-Петербурга: время, причал, маршрут и цена. Ближайшие отправления и советы перед поездкой.',
+              'Сравните 10+ ночных прогулок к разводным мостам СПб на одном сайте! Цены от 1100 руб., актуальное расписание на сегодня. Покупка билетов онлайн за 2 минуты.',
             );
           }
         }

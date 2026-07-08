@@ -109,6 +109,33 @@ export function formatLandingTodayParts(
   return { short, full };
 }
 
+/** «8 июля 2026 года» для видимого текста расписания. */
+export function formatLandingTodayLong(
+  reference: Date = new Date(),
+  timeZone: string = SITE_TIME_ZONE,
+): string {
+  const formatted = new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone,
+  }).format(reference);
+  return `${formatted.replace(/\s*г\.?\s*$/i, '')} года`;
+}
+
+/** ISO-дата для атрибута `<time datetime>`. */
+export function formatLandingTodayIso(
+  reference: Date = new Date(),
+  timeZone: string = SITE_TIME_ZONE,
+): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone,
+  }).format(reference);
+}
+
 export function msUntilNextMidnight(timeZone: string = SITE_TIME_ZONE): number {
   const now = new Date();
   const parts = new Intl.DateTimeFormat('en-US', {
