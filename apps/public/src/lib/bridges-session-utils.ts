@@ -8,11 +8,14 @@ import {
 } from '@/lib/datetime';
 import { eventHref } from '@/routes';
 import type { PublicSession } from '@/types';
+import { formatStreetAddress } from '@/lib/address';
+import { formatPublicVenueTitle } from '@/lib/venue-meta';
 
 export type BridgesScheduleRow = {
   key: string;
   title: string;
   venue: string;
+  pierLabel: string;
   nevaBank: string;
   priceFrom: number | null;
   priceTo: number | null;
@@ -66,6 +69,52 @@ export function resolveNevaBankLabel(venue: string, title = ''): string {
   const text = `${venue} ${title}`.toLowerCase();
   if (/карповк|университетск/i.test(text)) return 'Правый берег';
   return 'Левый берег';
+}
+
+function extractPierHouseNumber(text: string): string | null {
+  const cleaned = text.replace(/\([^)]*\)/g, ' ').replace(/\s+/g, ' ').trim();
+  const afterComma = cleaned.match(/,\s*(?:д\.?\s*)?(\d[\d\-/]*(?:\s*лит\.?\s*[\p{L}\d]+)?)/iu);
+  if (afterComma) return afterComma[1].replace(/\s+/g, '');
+  const afterNab = cleaned.match(/(?:наб\.?|набережная)\s*,?\s*(\d[\d\-/]*)/iu);
+  if (afterNab) return afterNab[1];
+  const trailing = cleaned.match(/(\d[\d\-/]*)\s*$/u);
+  return trailing ? trailing[1] : null;
+}
+
+/** Короткий адрес причала для таблицы сравнения: улица и дом. */
+export function formatBridgesComparisonPier(
+  venue: string,
+  venueAddress?: string | null,
+  city = 'Санкт-Петербург',
+): string {
+  const name = formatPublicVenueTitle(venue);
+  const address = formatStreetAddress(venueAddress, { city }) || formatStreetAddress(name, { city }) || name;
+  const combined = `${name} ${address}`.toLowerCase();
+
+  if (/карповк/i.test(combined)) {
+    return 'наб.реки Карповки (Льва Толстого, 6-8)';
+  }
+
+  const house = extractPierHouseNumber(address) || extractPierHouseNumber(name);
+  if (/университетск/i.test(combined) && house) return `Университетская, ${house}`;
+  if (/фонтанк/i.test(combined) && house) return `Фонтанки, ${house}`;
+  if (/мойк/i.test(combined) && house) return `Мойки, ${house}`;
+  if (/адмиралтейск/i.test(combined) && house) return `Адмиралтейская, ${house}`;
+  if (/английск/i.test(combined) && house) return `Английская, ${house}`;
+  if (/синопск/i.test(combined) && house) return `Синопская, ${house}`;
+  if (/дворцов/i.test(combined) && house) return `Дворцовая, ${house}`;
+  if (/сенатск/i.test(combined) && house) return `Сенатская, ${house}`;
+
+  if (house) {
+    const street = address
+      .replace(/,\s*\d[\d\-/]*.*$/u, '')
+      .replace(/^(?:наб(?:ережная)?\.?\s+реки\s+|набережная\s+реки\s+)/iu, '')
+      .replace(/\s+наб(?:ережная)?\.?$/iu, '')
+      .trim();
+    if (street && street.length <= 40) return `${street}, ${house}`;
+  }
+
+  return address || name;
 }
 
 export function classifyBridgesRoute(
@@ -154,6 +203,11 @@ export function mapBridgesGroups(groups: BridgesEventGroup[]): BridgesScheduleRo
       key: group.key,
       title: resolveBridgesDisplayTitle(group.title),
       venue: group.venue,
+      pierLabel: formatBridgesComparisonPier(
+        group.venue,
+        session.venueAddress,
+        session.city,
+      ),
       nevaBank: resolveNevaBankLabel(group.venue, group.title),
       priceFrom: group.priceFrom ?? null,
       priceTo: group.priceTo ?? group.priceFrom ?? null,

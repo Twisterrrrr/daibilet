@@ -395,7 +395,7 @@ export function BridgesComparisonTable({ rows }: { rows: BridgesScheduleRow[] })
                 <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">{row.duration || '—'}</td>
                 <td className="whitespace-nowrap px-4 py-3 text-foreground">{row.nevaBank}</td>
                 <td className="px-4 py-3 text-muted-foreground">{row.bridgeHint || '—'}</td>
-                <td className="px-4 py-3 text-muted-foreground">{row.venue || '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{row.pierLabel || row.venue || '—'}</td>
                 <td className="whitespace-nowrap px-4 py-3 font-semibold text-foreground">
                   {row.priceFrom ? formatMoneyRange(row.priceFrom, row.priceTo) : '—'}
                 </td>
