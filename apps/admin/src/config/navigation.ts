@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import {
   BarChart3,
+  BookOpen,
   Building2,
   CalendarDays,
   Download,
@@ -45,6 +46,7 @@ export const NAV_ZONES: NavZone[] = [
       { id: 'venues', title: 'Площадки', path: '/venues', icon: Building2 },
       { id: 'cities', title: 'Города', path: '/cities', icon: MapPin },
       { id: 'landings', title: 'Лендинги', path: '/landings', icon: LayoutTemplate },
+      { id: 'articles', title: 'Блог', path: '/articles', icon: BookOpen },
     ],
   },
   {

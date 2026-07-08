@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Calendar, ChevronRight, Clock, MapPin, Shield, Users } from 'lucide-react';
+import { Calendar, ChevronRight, MapPin, Shield, Users } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
 import { Footer } from '@/components/Footer';
@@ -16,16 +16,22 @@ import {
   resolveTcPurchaseTarget,
 } from '@/components/TcWidget';
 import { formatStreetAddress } from '@/lib/address';
-import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
+import {
+  resolveEventCardDestinationLabel,
+  resolveEventAddressLabel,
+  resolveEventCardLocationLabel,
+  resolveEventVenueDisplayLabel,
+} from '@/lib/event-location';
 import { FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession } from '@/lib/event-card-meta';
 import { formatVacantSeats } from '@/lib/pluralize';
-import { landingPageHref } from '@/lib/landing-slugs';
 import { formatNumber, publicData } from '@/data';
 import { readCachedEventPage, writeCachedEventPage } from '@/lib/event-page-cache';
-import { eventHref, eventSlug } from '@/routes';
+import { cityHref, eventHref, eventSlug, venueHref } from '@/routes';
 import type { PublicEvent, PublicEventPage, PublicSession } from '@/types';
 
-import { API_BASE_URL } from '@/lib/api-base';const MIN_DISPLAY_PRICE_RUB = 100;
+import { API_BASE_URL } from '@/lib/api-base';
+
+const MIN_DISPLAY_PRICE_RUB = 100;
 
 export function EventPage({ slug }: { slug: string }) {
   const [payload, setPayload] = React.useState<PublicEventPage | null>(
@@ -123,7 +129,6 @@ export function EventPage({ slug }: { slug: string }) {
                   <div className="lg:hidden" id="buy-card">
                     <BuyCard payload={payload} />
                   </div>
-                  <LandingLinks payload={payload} />
                 </div>
                 <div className="hidden lg:col-span-1 lg:block">
                   <div className="sticky top-20" id="buy-card-desktop">
@@ -261,7 +266,10 @@ function EventHero({ payload }: { payload: PublicEventPage }) {
   const ageLimit = formatAgeLimit(event.ageLimit);
   const priceRange = getTicketPriceRange(payload);
   const priceLabel = priceRange ? formatBuyCardPrice(priceRange) : formatPriceRub(stats.priceFrom ?? event.priceFrom);
-  const locationLabel = resolveEventCardLocationLabel(event);
+  const locationLabel = resolveEventAddressLabel(event) || resolveEventVenueDisplayLabel(event) || resolveEventCardLocationLabel(event);
+  const venuePageHref = resolveEventVenueHref(event);
+  const venueBreadcrumbLabel = resolveEventVenueDisplayLabel(event);
+  const cityPageHref = resolveEventCityHref(event);
   const [hasImageError, setHasImageError] = React.useState(false);
   const heroImage = String(event.imageUrl || '').trim();
   const nextSession =
@@ -303,8 +311,16 @@ function EventHero({ payload }: { payload: PublicEventPage }) {
           <ChevronRight className="h-3.5 w-3.5" />
           {event.citySlug ? (
             <>
-              <a href={`/cities/${event.citySlug}`} className="transition hover:text-white">
+              <a href={cityPageHref || `/cities/${event.citySlug}`} className="transition hover:text-white">
                 {resolveEventCardDestinationLabel(event)}
+              </a>
+              <ChevronRight className="h-3.5 w-3.5" />
+            </>
+          ) : null}
+          {venuePageHref && venueBreadcrumbLabel ? (
+            <>
+              <a href={venuePageHref} className="transition hover:text-white">
+                {venueBreadcrumbLabel}
               </a>
               <ChevronRight className="h-3.5 w-3.5" />
             </>
@@ -338,7 +354,17 @@ function EventHero({ payload }: { payload: PublicEventPage }) {
               {locationLabel ? (
                 <span className="flex items-center gap-1.5">
                   <MapPin className="h-4 w-4" />
-                  {locationLabel}
+                  {venuePageHref ? (
+                    <a href={venuePageHref} className="underline decoration-white/30 underline-offset-2 transition hover:text-white">
+                      {locationLabel}
+                    </a>
+                  ) : cityPageHref ? (
+                    <a href={cityPageHref} className="underline decoration-white/30 underline-offset-2 transition hover:text-white">
+                      {locationLabel}
+                    </a>
+                  ) : (
+                    locationLabel
+                  )}
                 </span>
               ) : null}
               {nextSession ? (
@@ -501,57 +527,50 @@ function splitDescriptionParagraphs(text: string): string[] {
 }
 
 function QuickInfo({ event }: { event: PublicEvent }) {
-  const address = resolveEventCardLocationLabel(event);
+  const address = resolveEventAddressLabel(event);
+  const venueTitle = resolveEventVenueDisplayLabel(event);
   const ageLimit = formatAgeLimit(event.ageLimit);
-  if (!address && !ageLimit) return null;
+  const venuePageHref = resolveEventVenueHref(event);
+  const showVenue = Boolean(venueTitle && venuePageHref && address && venueTitle.trim().toLowerCase() !== address.trim().toLowerCase());
+  if (!address && !showVenue && !ageLimit) return null;
+
+  const addressNode = address ? (
+    venuePageHref && showVenue ? (
+      <a href={venuePageHref} className="text-sm font-medium text-slate-900 transition hover:text-primary-700">
+        {address}
+      </a>
+    ) : (
+      <p className="text-sm font-medium text-slate-900">{address}</p>
+    )
+  ) : null;
 
   return (
-    <>
-      <div className="space-y-2 sm:hidden">
-        {address ? (
-          <div className="flex items-center gap-2 text-sm text-slate-700">
-            <MapPin className="h-4 w-4 text-primary-500" />
-            <div>
-              <span className="text-xs text-slate-500">Адрес</span>
-              <p className="text-sm font-medium text-slate-900">{address}</p>
-            </div>
-          </div>
-        ) : null}
-        {ageLimit ? (
-          <div className="flex items-center gap-2 text-sm text-slate-700">
-            <Users className="h-4 w-4 text-primary-500" />
-            <div>
-              <span className="text-xs text-slate-500">Возраст</span>
-              <p className="text-sm font-medium text-slate-900">{ageLimit}</p>
-            </div>
-          </div>
-        ) : null}
-      </div>
-
-      <div className="hidden gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-3">
-        {address ? (
-          <div className="rounded-xl border border-slate-200 bg-white p-3.5">
-            <MapPin className="h-5 w-5 text-primary-500" />
-            <p className="mt-1.5 text-xs text-slate-500">Адрес</p>
-            <p className="line-clamp-2 text-sm font-medium text-slate-900">{address}</p>
-          </div>
-        ) : null}
-        {event.citySlug ? (
-          <a href={`/cities/${event.citySlug}`} className="rounded-xl border border-slate-200 bg-white p-3.5 transition hover:border-primary-200 hover:bg-primary-50/40">
-            <Clock className="h-5 w-5 text-primary-500" />
-            <p className="mt-1.5 text-xs text-slate-500">Город</p>
-            <p className="text-sm font-medium text-slate-900">{resolveEventCardDestinationLabel(event)}</p>
-          </a>
-        ) : null}
-        {ageLimit ? (
-          <div className="rounded-xl border border-slate-200 bg-white p-3.5">
-            <Users className="h-5 w-5 text-primary-500" />
-            <p className="mt-1.5 text-xs text-slate-500">Возраст</p>
-            <p className="text-sm font-medium text-slate-900">{ageLimit}</p>
-          </div>
-        ) : null}
-      </div>
-    </>
+    <div className="grid gap-3 sm:grid-cols-2">
+      {address ? (
+        <div className="rounded-xl border border-slate-200 bg-white p-3.5">
+          <MapPin className="h-5 w-5 text-primary-500" />
+          <p className="mt-1.5 text-xs text-slate-500">Адрес</p>
+          <div className="line-clamp-3">{addressNode}</div>
+        </div>
+      ) : null}
+      {showVenue ? (
+        <a
+          href={venuePageHref!}
+          className="rounded-xl border border-slate-200 bg-white p-3.5 transition hover:border-primary-200 hover:bg-primary-50/40"
+        >
+          <MapPin className="h-5 w-5 text-primary-500" />
+          <p className="mt-1.5 text-xs text-slate-500">Площадка</p>
+          <p className="line-clamp-2 text-sm font-medium text-slate-900">{venueTitle}</p>
+        </a>
+      ) : null}
+      {ageLimit ? (
+        <div className="rounded-xl border border-slate-200 bg-white p-3.5">
+          <Users className="h-5 w-5 text-primary-500" />
+          <p className="mt-1.5 text-xs text-slate-500">Возраст</p>
+          <p className="text-sm font-medium text-slate-900">{ageLimit}</p>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -888,22 +907,32 @@ function sanitizeEventHtml(html: string) {
     .replace(/\son\w+='[^']*'/gi, '');
 }
 
-function LandingLinks({ payload }: { payload: PublicEventPage }) {
-  if (!payload.landings.length) return null;
+function resolveEventCityHref(event: PublicEvent): string | null {
+  if (!event.citySlug && !event.city) return null;
+  return cityHref({
+    slug: event.citySlug,
+    sourceSlug: event.sourceCitySlug,
+    name: event.city,
+  });
+}
 
-  return (
-    <section>
-      <h2 className="text-lg font-bold text-slate-900">Подборки</h2>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        {payload.landings.map((landing) => (
-          <a key={landing.slug} href={landingPageHref(landing.slug)} className="rounded-xl border border-slate-200 bg-white p-3.5 transition hover:border-primary-200 hover:bg-primary-50/40">
-            <div className="text-sm font-semibold text-slate-950">{landing.title}</div>
-            <div className="mt-1 text-xs text-slate-500">{landing.subtitle}</div>
-          </a>
-        ))}
-      </div>
-    </section>
-  );
+function resolveEventVenueHref(event: PublicEvent): string | null {
+  if (event.institutionVenueSlug || event.institutionVenueId) {
+    return venueHref({
+      id: event.institutionVenueId || event.institutionVenueSlug || event.id,
+      slug: event.institutionVenueSlug,
+      name: event.institutionVenue || event.venue,
+      type: event.venueKind,
+    });
+  }
+  if (!event.venue?.trim()) return null;
+  if (!event.venueSlug && !event.venueId) return null;
+  return venueHref({
+    id: event.venueId || event.venueSlug || event.id,
+    slug: event.venueSlug,
+    name: event.venue,
+    type: event.venueKind,
+  });
 }
 
 function RelatedEventsSection({ payload }: { payload: PublicEventPage }) {

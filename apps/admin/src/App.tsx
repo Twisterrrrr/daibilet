@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 
 import { AdminShell } from '@/components/admin/AdminShell';
+import { ArticlesPage } from '@/pages/ArticlesPage';
 import { BuyersPage } from '@/pages/BuyersPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { EventsPage } from '@/pages/EventsPage';
@@ -23,6 +24,7 @@ export function App() {
         <Route path="venues" element={<VenuesPage />} />
         <Route path="cities" element={<SimplePage title="Города" description="Городские и региональные карточки каталога." kind="cities" />} />
         <Route path="landings" element={<LandingsPage />} />
+        <Route path="articles" element={<ArticlesPage />} />
         <Route path="sources" element={<SourcesPage />} />
         <Route path="mapping-inbox" element={<MappingInboxPage />} />
         <Route path="sync-health" element={<SourcesPage />} />

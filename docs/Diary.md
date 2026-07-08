@@ -2,6 +2,57 @@
 
 ---
 
+## 2026-07-09
+
+### Наблюдения
+
+- Спринт 1–2 недели: institution relink (топ аудита), publish CANDIDATE, блог, лёгкий `/stats`.
+- На prod institution relink уже был выполнен ранее (`relinked: 0`); 18 institution в `PUBLISHED`.
+- `/api/public/stats` после precomputed cache: **~5 ms** warm (было ~600 ms).
+- Скрипты на prod требуют `NODE_PATH=/opt/daibilet/packages/db/node_modules` для `require('pg')`.
+
+### Решения
+
+- **Stats:** `publicStatsCache` в `dto.js`, счётчик events из `publicCatalogSessions` (groupKey), HTTP cache через `withPublicResponseCache('stats')`.
+- **Блог:** `GET /api/public/articles`, `GET /api/public/articles/:slug`, admin CRUD; public `BlogArticlePage`, admin `ArticlesPage`; `seed-blog-articles.js` — 4 статьи.
+- **Venues list:** fallback `shortDescription` из `description` в `mapPublicVenueListItem`; backfill 174 venues.
+- **Institution:** расширен `INSTITUTIONS` (Исаакий, Петергоф, Русский музей, Юсуповский, Мариинский, Спас на Крови, Кунсткамера и др.); auto-publish при apply.
+- Ссылки на главной `/blog#slug` → `/blog/:slug`.
+- Batch10: последние 33 institution без описания.
+
+### Проблемы
+
+- Prisma/NextJS redesign — отдельная задача Codex, не в этом спринте.
+- Cold catalog ~8 s — snapshot/MV всё ещё в backlog.
+
+---
+
+## 2026-07-08
+
+### Наблюдения
+
+- Квесты Ticketscloud часто привязаны к `MEETING_POINT` с адресом вместо institution; в заголовке часто есть «квест по Пушкинскому музею / зоопарку / Третьяковке».
+- Аудит institution-context: ~9710 meeting point/адрес; ~4768 с учреждением в заголовке; relink скриптом покрыл 1229 (7 учреждений в `INSTITUTIONS`).
+- В каталоге `/venues` API отдаёт `city`, но list view показывал только улицу — `formatStreetAddress` вырезает город.
+- Длинные сессии агента тормозят из-за контекста (SSH, JSON-аудиты, summary), не из-за регрессии API.
+
+### Решения
+
+- `scripts/create-institution-venues.js` — создание institution + relink + hide meeting points; fix порядка `promoteVenueIds` до regex.
+- `event-venue-context.js` + поля `institutionVenue*` в API и на EventPage.
+- EventPage: адрес отдельно от площадки, убран «Смотрите также».
+- Batch8 описаний venues (123 шт.) → 219 без описания.
+- InstitutionListRow: город в строке; группировка по городам при «Все города».
+- Handoff: [agent-handoff-2026-07-08.md](./agent-handoff-2026-07-08.md).
+
+### Проблемы
+
+- ~3263 события с institution в заголовке без карточки в БД — нужно расширять `INSTITUTIONS`.
+- Эрмитаж в БД с kind `CONCERT_HALL` (исторический мусор).
+- Workspace `DAIBILET` vs код в `daibilet-repo` — путаница путей.
+
+---
+
 ## 2026-07-05
 
 ### Наблюдения

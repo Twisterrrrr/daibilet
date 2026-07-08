@@ -5,14 +5,91 @@ import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { SectionPageHero } from '@/components/PageBreadcrumbs';
 import { BLOG_POSTS } from '@/data/blog-posts';
+import { API_BASE_URL } from '@/lib/api-base';
+
+type BlogCard = {
+  slug: string;
+  title: string;
+  excerpt: string;
+  city?: string | null;
+  coverImageUrl: string;
+  publishedAt?: string | null;
+  readMin?: number;
+  tag?: string;
+};
+
+function formatPublishedAt(value?: string | null, fallback = ''): string {
+  if (!value) return fallback;
+  try {
+    return new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(value));
+  } catch {
+    return fallback;
+  }
+}
+
+function estimateReadMin(text: string): number {
+  const words = text.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(3, Math.round(words / 180));
+}
+
+function staticCards(): BlogCard[] {
+  return BLOG_POSTS.map((post) => ({
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    city: post.city,
+    coverImageUrl: post.imageUrl,
+    publishedAt: null,
+    readMin: post.readMin,
+    tag: post.tag,
+  }));
+}
 
 export function BlogPage() {
+  const [posts, setPosts] = React.useState<BlogCard[]>(staticCards);
+
   React.useEffect(() => {
     document.title = 'Блог — гайды и советы о событиях | Дайбилет';
     upsertMeta(
       'description',
       'Гайды по концертам, театру и городским прогулкам. Как выбрать билет, куда пойти с детьми, что смотреть на этой неделе.',
     );
+  }, []);
+
+  React.useEffect(() => {
+    const controller = new AbortController();
+    fetch(`${API_BASE_URL}/api/public/articles`, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return (await response.json()) as {
+          articles?: Array<{
+            slug: string;
+            title: string;
+            excerpt?: string | null;
+            city?: string | null;
+            coverImageUrl?: string | null;
+            publishedAt?: string | null;
+          }>;
+        };
+      })
+      .then((payload) => {
+        if (!Array.isArray(payload.articles) || !payload.articles.length) return;
+        setPosts(
+          payload.articles.map((article) => ({
+            slug: article.slug,
+            title: article.title,
+            excerpt: article.excerpt || '',
+            city: article.city,
+            coverImageUrl: article.coverImageUrl || '/images/blog/concert.jpg',
+            publishedAt: article.publishedAt,
+            readMin: estimateReadMin(article.excerpt || article.title),
+            tag: 'Гид',
+          })),
+        );
+      })
+      .catch(() => undefined);
+
+    return () => controller.abort();
   }, []);
 
   return (
@@ -34,7 +111,7 @@ export function BlogPage() {
 
       <main className="container-page py-10 sm:py-12">
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {BLOG_POSTS.map((post) => (
+          {posts.map((post) => (
             <BlogPostCard key={post.slug} post={post} />
           ))}
         </div>
@@ -53,16 +130,22 @@ export function BlogPage() {
   );
 }
 
-function BlogPostCard({ post }: { post: (typeof BLOG_POSTS)[number] }) {
+function BlogPostCard({ post }: { post: BlogCard }) {
   const [imageFailed, setImageFailed] = React.useState(false);
+  const staticPost = BLOG_POSTS.find((item) => item.slug === post.slug);
+  const dateLabel = formatPublishedAt(post.publishedAt, staticPost?.date || '');
+  const tag = post.tag || staticPost?.tag || 'Гид';
 
   return (
-    <article className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md">
+    <a
+      href={`/blog/${post.slug}`}
+      className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md"
+    >
       <div className="relative aspect-[16/9] overflow-hidden bg-slate-200">
         {!imageFailed ? (
           <img
-            src={post.imageUrl}
-            alt={post.imageAlt}
+            src={post.coverImageUrl}
+            alt=""
             loading="lazy"
             width={960}
             height={540}
@@ -75,7 +158,7 @@ function BlogPostCard({ post }: { post: (typeof BLOG_POSTS)[number] }) {
         <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
         <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-center gap-2 p-3">
           <span className="inline-flex rounded-full bg-white/95 px-2.5 py-0.5 text-xs font-semibold text-slate-900 shadow-sm">
-            {post.tag}
+            {tag}
           </span>
           {post.city ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-black/50 px-2.5 py-0.5 text-xs font-semibold text-white ring-1 ring-white/20 backdrop-blur">
@@ -89,14 +172,14 @@ function BlogPostCard({ post }: { post: (typeof BLOG_POSTS)[number] }) {
         <h2 className="font-display text-lg font-bold text-slate-900 group-hover:text-primary-700">{post.title}</h2>
         <p className="mt-2 text-sm leading-6 text-slate-600">{post.excerpt}</p>
         <div className="mt-4 flex items-center justify-between text-xs text-slate-400">
-          <span>{post.date}</span>
+          <span>{dateLabel}</span>
           <span className="inline-flex items-center gap-1">
             <Clock className="h-3.5 w-3.5" aria-hidden />
-            {post.readMin} мин
+            {post.readMin || staticPost?.readMin || 5} мин
           </span>
         </div>
       </div>
-    </article>
+    </a>
   );
 }
 

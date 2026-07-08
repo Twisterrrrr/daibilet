@@ -26,6 +26,7 @@ import { Header } from '@/components/Header';
 import { HelpPage } from '@/components/HelpPage';
 import { AboutPage } from '@/components/AboutPage';
 import { BlogPage } from '@/components/BlogPage';
+import { BlogArticlePage } from '@/components/BlogArticlePage';
 import { LegalTrustPage, OfferTrustPage, PrivacyTrustPage, RequisitesTrustPage } from '@/components/trust/TrustPages';
 import { LandingsCatalogPage } from '@/components/LandingsCatalogPage';
 import { LoginPage } from '@/components/LoginPage';
@@ -102,6 +103,11 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
   if (window.location.pathname === '/about' || window.location.pathname === '/about/') return <AboutPage />;
   if (window.location.pathname === '/help' || window.location.pathname === '/help/') return <HelpPage />;
   if (window.location.pathname === '/blog' || window.location.pathname === '/blog/') return <BlogPage />;
+
+  const blogArticleMatch = window.location.pathname.match(/^\/blog\/([^/]+)\/?$/);
+  if (blogArticleMatch) {
+    return <BlogArticlePage slug={decodeURIComponent(blogArticleMatch[1])} />;
+  }
   if (window.location.pathname === '/privacy' || window.location.pathname === '/privacy/') return <PrivacyTrustPage />;
   if (window.location.pathname === '/legal' || window.location.pathname === '/legal/') return <LegalTrustPage />;
   if (window.location.pathname === '/offer' || window.location.pathname === '/offer/') return <OfferTrustPage />;
@@ -782,7 +788,7 @@ function HomeBlogSection() {
 
         <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
           <a
-            href={`/blog#${featured.slug}`}
+            href={`/blog/${featured.slug}`}
             className="group relative min-h-[240px] overflow-hidden rounded-2xl bg-slate-900 text-white shadow-lg sm:min-h-[280px]"
           >
             <img
@@ -804,7 +810,7 @@ function HomeBlogSection() {
             {rest.slice(0, 3).map((post) => (
               <a
                 key={post.slug}
-                href={`/blog#${post.slug}`}
+                href={`/blog/${post.slug}`}
                 className="group flex gap-4 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-primary/30 hover:shadow-md"
               >
                 <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-200">

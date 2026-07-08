@@ -1,4 +1,5 @@
 import { formatStreetAddress, isRuralSettlementAddress } from '@/lib/address';
+import { resolveEventInstitutionLabel } from '@/lib/event-venue-context';
 import { formatPublicVenueTitle, isMeetingPointLike } from '@/lib/venue-meta';
 import type { PublicSession } from '@/types';
 
@@ -16,7 +17,16 @@ function isGenericVenueLabel(value: string): boolean {
   return text.length <= 3;
 }
 
+function normalizeComparableLabel(value: string): string {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+}
+
 type EventCardLocationInput = {
+  title?: string | null;
+  institutionVenue?: string | null;
   city?: string | null;
   destination?: string | null;
   destinationType?: PublicSession['destinationType'] | string | null;
@@ -56,6 +66,52 @@ export function resolveEventCardLocationLabel(session: EventCardLocationInput): 
   }
 
   return address || venueName || '';
+}
+
+/** Физический адрес для блока «Адрес» на странице события. */
+export function resolveEventAddressLabel(session: EventCardLocationInput): string {
+  const venueName = formatPublicVenueTitle(session.venue);
+  const address = formatStreetAddress(session.venueAddress, { city: session.city });
+
+  if (address && normalizeComparableLabel(address) !== normalizeComparableLabel(venueName)) {
+    return address;
+  }
+
+  if (venueName && looksLikeStreet(venueName)) {
+    return formatStreetAddress(venueName, { city: session.city }) || venueName;
+  }
+
+  return address || '';
+}
+
+/** Название площадки для ссылок и карточек: null, если в поле venue лежит адрес или служебная подпись. */
+export function resolveEventVenueDisplayLabel(session: EventCardLocationInput): string | null {
+  const institutionLabel = resolveEventInstitutionLabel(session);
+  const venueName = formatPublicVenueTitle(session.venue);
+  const address = formatStreetAddress(session.venueAddress, { city: session.city });
+  const meetingPoint = isMeetingPointLike({
+    type: session.venueKind,
+    name: venueName,
+    address: session.venueAddress || address,
+  });
+  const venueIsAddressLike =
+    !venueName ||
+    isGenericVenueLabel(venueName) ||
+    looksLikeStreet(venueName) ||
+    (address && normalizeComparableLabel(venueName) === normalizeComparableLabel(address)) ||
+    (meetingPoint && Boolean(address));
+
+  if (institutionLabel && venueIsAddressLike) return institutionLabel;
+
+  if (!venueName || isGenericVenueLabel(venueName)) return institutionLabel || null;
+
+  if (looksLikeStreet(venueName)) return institutionLabel || null;
+  if (address && normalizeComparableLabel(venueName) === normalizeComparableLabel(address)) {
+    return institutionLabel || null;
+  }
+  if (meetingPoint && address) return institutionLabel || null;
+
+  return venueName;
 }
 
 /** Сокращённое название региона для карточки: «Московская область» → «Московская обл.». */

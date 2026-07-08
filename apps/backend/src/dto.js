@@ -16,6 +16,11 @@ import {
   localHourFromInstant,
   DEFAULT_CITY_TIME_ZONE,
 } from './city-timezone.js';
+import {
+  resolveContextInstitutionForEvent,
+  resolveContextInstitutionFromTitle,
+  shouldResolveInstitutionFromTitle,
+} from './event-venue-context.js';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_DESTINATION_MIN_EVENTS = 1;
@@ -116,6 +121,7 @@ let publicHomePreviewCache = null;
 const PUBLIC_HOME_PREVIEW_LIMIT = 96;
 let publicEventRowsCache = null;
 let publicCatalogCache = null;
+let publicStatsCache = null;
 let publicEventRowsBuildPromise = null;
 let publicCatalogBuildPromise = null;
 let publicVenueHubCache = null;
@@ -320,6 +326,7 @@ export function clearPublicDataCaches() {
   publicHomePreviewCache = null;
   publicEventRowsCache = null;
   publicCatalogCache = null;
+  publicStatsCache = null;
   publicEventRowsBuildPromise = null;
   publicCatalogBuildPromise = null;
   publicVenueHubCache = null;
@@ -3138,101 +3145,35 @@ export async function buildPublicHomePreview(db) {
 }
 
 export async function buildPublicStats(db) {
-  const [result, stats, destinations] = await Promise.all([
-    db.query(
-      `
-        with primary_offer as (
-          select distinct on ("eventId")
-            "eventId",
-            "sourceCode",
-            "priceRub",
-            "widgetUrl",
-            "deeplinkUrl"
-          from "EventOffer"
-          where active = true
-          order by "eventId", ("priceRub" >= $1) desc nulls last, "priceRub" asc nulls last
-        ),
-        raw_events as (
-          select
-            e.id,
-            coalesce(source.name, source.code::text, primary_offer."sourceCode"::text, '') as source_label,
-            coalesce(e.title, '') as title,
-            coalesce(city.title, '') as city,
-            coalesce(e."venueId", venue.title, '') as venue_key,
-            min(session."startsAt") filter (where session."startsAt" >= now()) as starts_at,
-            min(e."priceFromRub") filter (where e."priceFromRub" >= $1) as event_price,
-            min(session."priceFromRub") filter (where session."startsAt" >= now() and session."priceFromRub" >= $1) as session_price,
-            min(primary_offer."priceRub") filter (where primary_offer."priceRub" >= $1) as offer_price,
-            bool_or(
-              primary_offer."widgetUrl" is not null
-              or primary_offer."deeplinkUrl" is not null
-              or (
-                coalesce(source.code::text, primary_offer."sourceCode"::text, '') in ('TICKETSCLOUD', 'TEPLOHOD')
-                and source_link."externalId" is not null
-              )
-            ) as purchase_ready
-          from "Event" e
-          left join "City" city on city.id = e."primaryCityId"
-          left join "Venue" venue on venue.id = e."venueId"
-          left join "EventSourceLink" source_link on source_link."eventId" = e.id
-          left join "Source" source on source.id = source_link."sourceId"
-          left join "EventSession" session on session."eventId" = e.id
-          left join primary_offer on primary_offer."eventId" = e.id
-          group by
-            e.id,
-            source.name,
-            source.code,
-            source_link."externalId",
-            primary_offer."sourceCode",
-            city.title,
-            e."venueId",
-            venue.title
-        ),
-        normalized_events as (
-          select
-            *,
-            (
-              select min(price)
-              from (values (event_price), (session_price), (offer_price)) as prices(price)
-              where price is not null
-            ) as price_from
-          from raw_events
-        ),
-        grouped_events as (
-          select
-            lower(regexp_replace(source_label, '\\s+', ' ', 'g')) as source_key,
-            lower(regexp_replace(title, '\\s+', ' ', 'g')) as title_key,
-            lower(regexp_replace(city, '\\s+', ' ', 'g')) as city_key,
-            lower(regexp_replace(venue_key, '\\s+', ' ', 'g')) as venue_group_key
-          from normalized_events
-          where starts_at is not null
-            and price_from >= $1
-            and purchase_ready = true
-          group by
-            lower(regexp_replace(source_label, '\\s+', ' ', 'g')),
-            lower(regexp_replace(title, '\\s+', ' ', 'g')),
-            lower(regexp_replace(city, '\\s+', ' ', 'g')),
-            lower(regexp_replace(venue_key, '\\s+', ' ', 'g'))
-        )
-        select count(*)::int as events
-        from grouped_events
-      `,
-      [MIN_DISPLAY_PRICE_RUB],
-    ),
-    db.stats(),
+  const now = Date.now();
+  if (publicStatsCache && publicStatsCache.expiresAt > now) {
+    return publicStatsCache.payload;
+  }
+
+  const [sessions, destinations, stats] = await Promise.all([
+    publicCatalogSessions(db),
     destinationSummaryRowsFast(db),
+    db.stats(),
   ]);
 
-  const row = result.rows[0] || {};
-  return {
+  const saleableGroups = new Set();
+  for (const session of sessions) {
+    if (session.purchaseReady === false) continue;
+    saleableGroups.add(session.groupKey || session.id);
+  }
+
+  const payload = {
     generatedAt: new Date().toISOString(),
     stats: {
-      events: row.events || 0,
+      events: saleableGroups.size,
       destinations: destinations.length,
       venues: stats.venues || 0,
       landings: LANDING_RULES.length,
     },
   };
+
+  publicStatsCache = { expiresAt: now + PUBLIC_CATALOG_CACHE_MS, payload };
+  return payload;
 }
 
 export async function buildPublicSearch(db, searchParams) {
@@ -4238,6 +4179,17 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     canonicalPath: event.canonicalPath || `/events/${publicEventSlug(representativeRow.sourceSlug || representativeRow.slug || event.slug)}`,
     isIndexable: event.isIndexable,
   };
+  const institutionContext = await resolveContextInstitutionForEvent(db, {
+    title: baseEvent.title,
+    cityId: event.cityId,
+    venue: event.venue,
+    venueKind: event.venueKind,
+  });
+  if (institutionContext) {
+    baseEvent.institutionVenue = institutionContext.displayName;
+    baseEvent.institutionVenueId = institutionContext.id;
+    baseEvent.institutionVenueSlug = institutionContext.slug;
+  }
   const sessions = sessionsResult.rows.map((session) => {
     const sessionOffer = primaryOfferByEventId.get(session.eventId) || primaryOffer;
     const sourceRow = targetPublicSession && sessionGroupIds(targetPublicSession).includes(session.eventId) ? targetPublicSession : null;
@@ -5964,6 +5916,10 @@ function mapPublicVenueListItem(row) {
   const normalized = applyPublicVenueNormalization(row);
   const type = resolvePublicVenueKindFromRow(normalized);
   const name = applyPublicVenueDisplayName(normalized, type);
+  const shortDescription =
+    String(normalized.shortDescription || '').trim() ||
+    String(normalized.description || '').trim().slice(0, 220) ||
+    null;
   return {
     id: normalized.id,
     slug: normalized.slug,
@@ -5973,7 +5929,7 @@ function mapPublicVenueListItem(row) {
     type,
     template: publicVenuePageTemplate(type),
     pageStatus: normalized.pageStatus,
-    shortDescription: normalized.shortDescription,
+    shortDescription,
     heroImageUrl: normalized.heroImageUrl,
     events: normalized.events,
     categories: {},
@@ -7021,6 +6977,9 @@ function mapGroupedPublicSession(row, pinnedEventIds = new Set()) {
     });
 
   const ruleEvent = buildLandingRuleEvent({ ...row, city: displayCity }, tags, destination, row.category || 'unknown');
+  const institutionContext = shouldResolveInstitutionFromTitle({ venueKind: row.venueKind, venue: row.venue })
+    ? resolveContextInstitutionFromTitle(row.overrideTitle || row.title)
+    : null;
   const session = {
     id: row.id,
     slug: publicEventSlug(row.slug),
@@ -7042,6 +7001,7 @@ function mapGroupedPublicSession(row, pinnedEventIds = new Set()) {
     venue: formatPublicVenueTitle(row.venue) || 'Не указано',
     venueAddress: row.venueAddress || null,
     venueKind: row.venueKind || 'OTHER',
+    institutionVenue: institutionContext?.displayName || null,
     offerTitle: row.offerTitle,
     offerSourceCode: row.offerSourceCode,
     purchaseUrl,
@@ -8214,4 +8174,272 @@ async function fetchLandingAuditEventRow(db, eventId) {
     [eventId],
   );
   return result.rows[0] || null;
+}
+
+function mapPublicArticleRow(row) {
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    excerpt: row.excerpt || null,
+    coverImageUrl: row.coverImageUrl || null,
+    city: row.city || null,
+    citySlug: row.citySlug || null,
+    publishedAt: row.publishedAt ? new Date(row.publishedAt).toISOString() : null,
+    isIndexable: row.isIndexable !== false,
+    seoTitle: row.seoTitle || row.title,
+    seoDescription: row.seoDescription || row.excerpt || null,
+  };
+}
+
+function mapPublicArticleDetail(row) {
+  return {
+    ...mapPublicArticleRow(row),
+    content: row.content || '',
+    seoH1: row.seoH1 || row.title,
+    canonicalPath: row.canonicalPath || `/blog/${row.slug}`,
+  };
+}
+
+export async function buildPublicArticlesList(db) {
+  const { rows } = await db.query(`
+    select
+      a.id,
+      a.slug,
+      a.title,
+      a.excerpt,
+      a."coverImageUrl",
+      a."publishedAt",
+      a."isIndexable",
+      a."seoTitle",
+      a."seoDescription",
+      c.title as city,
+      c.slug as "citySlug"
+    from "Article" a
+    left join "City" c on c.id = a."cityId"
+    where a.status = 'PUBLISHED'
+      and coalesce(a."isIndexable", true) = true
+    order by a."publishedAt" desc nulls last, a."updatedAt" desc
+  `);
+  return {
+    generatedAt: new Date().toISOString(),
+    total: rows.length,
+    articles: rows.map(mapPublicArticleRow),
+  };
+}
+
+export async function buildPublicArticlePage(db, slug) {
+  const { rows } = await db.query(
+    `
+      select
+        a.id,
+        a.slug,
+        a.title,
+        a.excerpt,
+        a.content,
+        a."coverImageUrl",
+        a."publishedAt",
+        a."isIndexable",
+        a."seoH1",
+        a."seoTitle",
+        a."seoDescription",
+        a."canonicalPath",
+        c.title as city,
+        c.slug as "citySlug"
+      from "Article" a
+      left join "City" c on c.id = a."cityId"
+      where a.slug = $1
+        and a.status = 'PUBLISHED'
+      limit 1
+    `,
+    [slug],
+  );
+  if (!rows[0]) return null;
+  return {
+    generatedAt: new Date().toISOString(),
+    article: mapPublicArticleDetail(rows[0]),
+  };
+}
+
+export async function buildAdminArticlesList(db) {
+  const { rows } = await db.query(`
+    select
+      a.id,
+      a.slug,
+      a.status::text as status,
+      a.title,
+      a.excerpt,
+      a."coverImageUrl",
+      a."publishedAt",
+      a."isIndexable",
+      a."updatedAt",
+      c.title as city
+    from "Article" a
+    left join "City" c on c.id = a."cityId"
+    order by a."updatedAt" desc
+  `);
+  return {
+    generatedAt: new Date().toISOString(),
+    total: rows.length,
+    rows: rows.map((row) => ({
+      id: row.id,
+      slug: row.slug,
+      status: String(row.status || 'DRAFT').toLowerCase(),
+      title: row.title,
+      excerpt: row.excerpt || '',
+      coverImageUrl: row.coverImageUrl || null,
+      city: row.city || null,
+      publishedAt: row.publishedAt ? new Date(row.publishedAt).toISOString() : null,
+      isIndexable: row.isIndexable !== false,
+      updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
+    })),
+  };
+}
+
+export async function buildAdminArticleDetail(db, articleId) {
+  const { rows } = await db.query(
+    `
+      select
+        a.*,
+        c.title as city,
+        c.slug as "citySlug"
+      from "Article" a
+      left join "City" c on c.id = a."cityId"
+      where a.id = $1
+      limit 1
+    `,
+    [articleId],
+  );
+  const row = rows[0];
+  if (!row) return null;
+  return {
+    id: row.id,
+    slug: row.slug,
+    status: String(row.status || 'DRAFT').toLowerCase(),
+    title: row.title,
+    excerpt: row.excerpt || '',
+    content: row.content || '',
+    coverImageUrl: row.coverImageUrl || null,
+    cityId: row.cityId || null,
+    city: row.city || null,
+    citySlug: row.citySlug || null,
+    seoH1: row.seoH1 || null,
+    seoTitle: row.seoTitle || null,
+    seoDescription: row.seoDescription || null,
+    canonicalPath: row.canonicalPath || null,
+    isIndexable: row.isIndexable !== false,
+    publishedAt: row.publishedAt ? new Date(row.publishedAt).toISOString() : null,
+    updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
+  };
+}
+
+function normalizeArticleStatus(value) {
+  const normalized = String(value || 'DRAFT').trim().toUpperCase();
+  const allowed = new Set(['DRAFT', 'REVIEW', 'PUBLISHED', 'HIDDEN']);
+  return allowed.has(normalized) ? normalized : 'DRAFT';
+}
+
+export async function upsertAdminArticle(db, articleId, payload = {}) {
+  const current = articleId ? await buildAdminArticleDetail(db, articleId) : null;
+  const title = String(payload.title || current?.title || '').trim();
+  if (!title) throw new Error('title_required');
+
+  const slug =
+    String(payload.slug || current?.slug || title)
+      .trim()
+      .toLowerCase()
+      .replace(/ё/g, 'e')
+      .replace(/[^a-z0-9а-я]+/gi, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 120) || 'article';
+
+  const status = normalizeArticleStatus(payload.status || current?.status);
+  const excerpt = payload.excerpt ?? current?.excerpt ?? null;
+  const content = payload.content ?? current?.content ?? null;
+  const coverImageUrl = payload.coverImageUrl ?? current?.coverImageUrl ?? null;
+  const cityId = payload.cityId ?? current?.cityId ?? null;
+  const seoH1 = payload.seoH1 ?? current?.seoH1 ?? null;
+  const seoTitle = payload.seoTitle ?? current?.seoTitle ?? title;
+  const seoDescription = payload.seoDescription ?? current?.seoDescription ?? excerpt;
+  const canonicalPath = payload.canonicalPath ?? current?.canonicalPath ?? `/blog/${slug}`;
+  const isIndexable = payload.isIndexable ?? current?.isIndexable ?? status === 'PUBLISHED';
+  const publishedAt =
+    status === 'PUBLISHED'
+      ? payload.publishedAt || current?.publishedAt || new Date().toISOString()
+      : payload.publishedAt ?? current?.publishedAt ?? null;
+
+  if (current) {
+    const { rows } = await db.query(
+      `
+        update "Article"
+        set
+          slug = $2,
+          status = $3::"ArticleStatus",
+          title = $4,
+          excerpt = $5,
+          content = $6,
+          "coverImageUrl" = $7,
+          "cityId" = $8,
+          "seoH1" = $9,
+          "seoTitle" = $10,
+          "seoDescription" = $11,
+          "canonicalPath" = $12,
+          "isIndexable" = $13,
+          "publishedAt" = $14,
+          "updatedAt" = now()
+        where id = $1
+        returning id
+      `,
+      [
+        current.id,
+        slug,
+        status,
+        title,
+        excerpt,
+        content,
+        coverImageUrl,
+        cityId,
+        seoH1,
+        seoTitle,
+        seoDescription,
+        canonicalPath,
+        isIndexable,
+        publishedAt,
+      ],
+    );
+    return buildAdminArticleDetail(db, rows[0].id);
+  }
+
+  const id = `article_${randomUUID().replace(/-/g, '').slice(0, 24)}`;
+  await db.query(
+    `
+      insert into "Article" (
+        id, slug, status, title, excerpt, content, "coverImageUrl", "cityId",
+        "seoH1", "seoTitle", "seoDescription", "canonicalPath", "isIndexable",
+        "publishedAt", "createdAt", "updatedAt"
+      )
+      values (
+        $1, $2, $3::"ArticleStatus", $4, $5, $6, $7, $8,
+        $9, $10, $11, $12, $13,
+        $14, now(), now()
+      )
+    `,
+    [
+      id,
+      slug,
+      status,
+      title,
+      excerpt,
+      content,
+      coverImageUrl,
+      cityId,
+      seoH1,
+      seoTitle,
+      seoDescription,
+      canonicalPath,
+      isIndexable,
+      publishedAt,
+    ],
+  );
+  return buildAdminArticleDetail(db, id);
 }

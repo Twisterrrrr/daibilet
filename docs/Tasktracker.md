@@ -1,6 +1,6 @@
 # Tasktracker — Дайбилет
 
-Обновлено: **2026-07-05**. Источник требований: [Project.md](./Project.md).
+Обновлено: **2026-07-09**. Источник требований: [Project.md](./Project.md). Handoff: [agent-handoff-2026-07-08.md](./agent-handoff-2026-07-08.md).
 
 Легенда: ✅ Готово · 🔄 В работе · ⏳ Запланировано · ❌ Отменено
 
@@ -31,9 +31,17 @@
 | ✅ | TZ: локальное время города | city-timezone.js, datetime.ts |
 | ✅ | Merge Stage StandUp Club | canonicalVenueMergeTitle + override |
 | ✅ | EventOverride batch ~1700 описаний | apply-event-manual-content.js |
-| ⏳ | Ускорить `/api/public/stats` | ~600ms warm |
+| ✅ | Ускорить `/api/public/stats` | precomputed cache, prod warm ~5 ms |
 | ⏳ | Prisma Client фаза 0–1 (bootstrap + admin CRUD) | см. Project.md §12 |
 | ⏳ | 16 Teplohod-событий без описания (Москва) | тексты не были в batch |
+| ✅ | Institution-площадки (зоопарк, Третьяковки, Кремль, ВДНХ) | create-institution-venues.js на prod |
+| ✅ | Relink квестов meeting point → institution | 1229 событий, 7 учреждений |
+| ✅ | EventPage: адрес vs площадка, institution из заголовка | event-venue-context.js |
+| ✅ | Venues catalog list: город + группировка по городам | InstitutionListRow.tsx |
+| ✅ | Расширить INSTITUTIONS + relink оставшихся ~3500 квестов | +999 relink (Исаакий, Петропавловка, Петергоф…) |
+| ✅ | Publish institution venues CANDIDATE → PUBLISHED | 18 площадок, isIndexable=true |
+| ✅ | 141 institution: описания batch9–10 | apply-venue-manual-content + shortDescription backfill |
+| ✅ | Блог vertical slice | API + public `/blog/:slug` + admin `/articles`, seed 4 статьи |
 
 ---
 
@@ -58,7 +66,7 @@
 | ⏳ | CDN edge cache | Cloudflare / nginx proxy_cache |
 | ⏳ | Meilisearch / FTS | поиск >2 символов |
 | ⏳ | SPB Boats extraction | spbboats-mvp-extraction-plan.md |
-| ⏳ | Blog/articles CMS | schema есть, UI минимален |
+| ✅ | Blog/articles CMS | API + admin ArticlesPage + public BlogArticlePage |
 
 ---
 
@@ -79,7 +87,7 @@
 |---------|-------------------|------|
 | `/api/public/venues?family=institution` | ~3 ms | <50 ms ✅ |
 | `/api/public/cities/:slug` | ~10 ms | <100 ms ✅ |
-| `/api/public/stats` | ~600 ms | <200 ms |
+| `/api/public/stats` | ~5 ms | <200 ms ✅ |
 | Cold catalog после refresh | ~8 s | <1 s |
 | HTML TTFB daibilet.ru | ~50 ms | <200 ms ✅ |
 

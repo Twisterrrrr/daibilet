@@ -221,6 +221,9 @@ export type PublicEvent = {
   venue: string;
   venueAddress?: string | null;
   venueKind: string;
+  institutionVenue?: string | null;
+  institutionVenueId?: string | null;
+  institutionVenueSlug?: string | null;
   ageLimit?: string | null;
   priceFrom?: number | null;
   vacant?: number | null;

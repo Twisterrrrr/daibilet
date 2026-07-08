@@ -6,7 +6,9 @@
  *   node scripts/apply-venue-manual-content.js --user-batch4
  *   node scripts/apply-venue-manual-content.js --user-batch5
  *   node scripts/apply-venue-manual-content.js --user-batch6
- *   node scripts/apply-venue-manual-content.js --user-batch7
+ *   node scripts/apply-venue-manual-content.js --user-batch8
+ *   node scripts/apply-venue-manual-content.js --user-batch9
+ *   node scripts/apply-venue-manual-content.js --user-batch10
  */
 const fs = require('fs');
 const path = require('path');
@@ -21,6 +23,9 @@ const userBatch4Path = path.join(__dirname, 'data', 'venue-content-user-batch4.j
 const userBatch5Path = path.join(__dirname, 'data', 'venue-content-user-batch5.json');
 const userBatch6Path = path.join(__dirname, 'data', 'venue-content-user-batch6.json');
 const userBatch7Path = path.join(__dirname, 'data', 'venue-content-user-batch7.json');
+const userBatch8Path = path.join(__dirname, 'data', 'venue-content-user-batch8.json');
+const userBatch9Path = path.join(__dirname, 'data', 'venue-content-user-batch9.json');
+const userBatch10Path = path.join(__dirname, 'data', 'venue-content-user-batch10.json');
 const userCorrectionsPath = path.join(__dirname, 'data', 'venue-content-user-corrections.json');
 const dryRun = process.argv.includes('--dry-run');
 const onlyUserBatch = process.argv.includes('--user-batch');
@@ -30,6 +35,9 @@ const onlyUserBatch4 = process.argv.includes('--user-batch4');
 const onlyUserBatch5 = process.argv.includes('--user-batch5');
 const onlyUserBatch6 = process.argv.includes('--user-batch6');
 const onlyUserBatch7 = process.argv.includes('--user-batch7');
+const onlyUserBatch8 = process.argv.includes('--user-batch8');
+const onlyUserBatch9 = process.argv.includes('--user-batch9');
+const onlyUserBatch10 = process.argv.includes('--user-batch10');
 const onlyUserCorrections = process.argv.includes('--user-corrections');
 
 function loadEnv() {
@@ -88,6 +96,9 @@ if (
   !fs.existsSync(userBatch5Path) &&
   !fs.existsSync(userBatch6Path) &&
   !fs.existsSync(userBatch7Path) &&
+  !fs.existsSync(userBatch8Path) &&
+  !fs.existsSync(userBatch9Path) &&
+  !fs.existsSync(userBatch10Path) &&
   !fs.existsSync(userCorrectionsPath)
 ) {
   console.error('Missing venue content files');
@@ -102,7 +113,13 @@ function loadEntries(filePath) {
 
 const entries = onlyUserCorrections
   ? loadEntries(userCorrectionsPath)
-  : onlyUserBatch7
+  : onlyUserBatch10
+    ? loadEntries(userBatch10Path)
+    : onlyUserBatch9
+      ? loadEntries(userBatch9Path)
+      : onlyUserBatch8
+        ? loadEntries(userBatch8Path)
+        : onlyUserBatch7
     ? loadEntries(userBatch7Path)
     : onlyUserBatch6
       ? loadEntries(userBatch6Path)
@@ -125,6 +142,7 @@ const entries = onlyUserCorrections
                     ...loadEntries(userBatch5Path),
                     ...loadEntries(userBatch6Path),
                     ...loadEntries(userBatch7Path),
+                    ...loadEntries(userBatch8Path),
                     ...loadEntries(userCorrectionsPath),
                   ];
 
@@ -160,7 +178,6 @@ async function main() {
     select v.id, v.title, c.title as city, v.address
     from "Venue" v
     left join "City" c on c.id = v."cityId"
-    where v.kind in ('MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT')
   `);
 
   const byKey = new Map();

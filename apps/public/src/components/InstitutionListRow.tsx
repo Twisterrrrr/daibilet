@@ -11,7 +11,7 @@ export function InstitutionListRow({
   venue: Pick<PublicVenue, 'name' | 'city' | 'events' | 'type' | 'address'>;
   href: string;
 }) {
-  const street = formatStreetAddress(venue.address, { city: venue.city }) || venue.city;
+  const street = formatStreetAddress(venue.address, { city: venue.city });
   const typeLabel = venueTypeLabel(venue.type);
 
   return (
@@ -21,10 +21,16 @@ export function InstitutionListRow({
     >
       <div className="min-w-0 flex-1">
         <div className="font-semibold text-slate-900 group-hover:text-primary-600">{venue.name}</div>
-        <div className="mt-0.5 flex items-start gap-1.5 text-sm text-slate-500">
-          <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
-          <span className="line-clamp-2">{street}</span>
-        </div>
+        {venue.city || street ? (
+          <div className="mt-0.5 flex items-start gap-1.5 text-sm text-slate-500">
+            <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden />
+            <span className="line-clamp-2">
+              {venue.city ? <span className="font-medium text-slate-600">{venue.city}</span> : null}
+              {venue.city && street ? <span className="text-slate-400"> · </span> : null}
+              {street ? <span>{street}</span> : null}
+            </span>
+          </div>
+        ) : null}
       </div>
 
       <div className="hidden shrink-0 text-right sm:block">

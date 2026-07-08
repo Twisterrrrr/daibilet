@@ -41,6 +41,11 @@ import {
   buildPublicSearch,
   buildPublicPromoBlocks,
   buildPublicLandingsCatalog,
+  buildPublicArticlesList,
+  buildPublicArticlePage,
+  buildAdminArticlesList,
+  buildAdminArticleDetail,
+  upsertAdminArticle,
   clearPublicDataCaches,
   warmPublicCatalogCache,
   runLandingAudit,
@@ -198,7 +203,20 @@ createServer(async (request, response) => {
 
     if (route === 'GET /api/public/stats') {
       if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public stats refresh');
-      sendPublicJson(response, await buildPublicStats(db));
+      sendPublicJson(response, await withPublicResponseCache('stats', () => buildPublicStats(db)));
+      return;
+    }
+
+    if (route === 'GET /api/public/articles') {
+      sendPublicJson(response, await withPublicResponseCache('articles:list', () => buildPublicArticlesList(db)));
+      return;
+    }
+
+    const publicArticleMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/articles\/([^/]+)$/) : null;
+    if (publicArticleMatch) {
+      const articleSlug = decodeURIComponent(publicArticleMatch[1]);
+      const payload = await withPublicResponseCache(`articles:${articleSlug}`, () => buildPublicArticlePage(db, articleSlug));
+      sendPublicJson(response, payload || { error: 'article_not_found' }, payload ? 200 : 404);
       return;
     }
 
@@ -509,6 +527,33 @@ createServer(async (request, response) => {
     if (venueUpdateMatch) {
       const result = await updateAdminVenue(db, decodeURIComponent(venueUpdateMatch[1]), await readJsonBody(request));
       invalidatePublicCaches('venue update');
+      sendJson(response, result);
+      return;
+    }
+
+    if (route === 'GET /api/admin/articles') {
+      sendJson(response, await buildAdminArticlesList(db));
+      return;
+    }
+
+    if (route === 'POST /api/admin/articles') {
+      const result = await upsertAdminArticle(db, null, await readJsonBody(request));
+      invalidatePublicCaches('article create');
+      sendJson(response, result, 201);
+      return;
+    }
+
+    const articleDetailMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/admin\/articles\/([^/]+)$/) : null;
+    if (articleDetailMatch) {
+      const detail = await buildAdminArticleDetail(db, decodeURIComponent(articleDetailMatch[1]));
+      sendJson(response, detail || { error: 'article_not_found' }, detail ? 200 : 404);
+      return;
+    }
+
+    const articleUpdateMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/articles\/([^/]+)$/) : null;
+    if (articleUpdateMatch) {
+      const result = await upsertAdminArticle(db, decodeURIComponent(articleUpdateMatch[1]), await readJsonBody(request));
+      invalidatePublicCaches('article update');
       sendJson(response, result);
       return;
     }
