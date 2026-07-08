@@ -2,6 +2,7 @@ import * as React from 'react';
 import { Heart, HelpCircle, LogIn, Menu, User, X } from 'lucide-react';
 
 import { CityPicker } from '@/components/CityPicker';
+import { DaibiletLogo } from '@/components/Logo';
 import { publicData } from '@/data';
 import { useUserAuthOptional } from '@/hooks/useUserAuth';
 import {
@@ -97,8 +98,8 @@ export function Header({ cityLabel, onSection, onDestination }: HeaderProps) {
               <Menu className="h-5 w-5" />
             </button>
 
-            <button type="button" onClick={goHome} className="font-display text-xl font-bold tracking-tight text-primary-600 sm:text-2xl">
-              Дайбилет
+            <button type="button" onClick={goHome} className="shrink-0">
+              <DaibiletLogo />
             </button>
 
             <HeaderCitySelector cityLabel={cityLabel} onDestination={onDestination} onNavigate={navigate} />
@@ -304,7 +305,7 @@ function MobileNavSheet({
       <button type="button" aria-label="Закрыть меню" className="absolute inset-0 bg-slate-900/40" onClick={onClose} />
       <aside className="relative flex h-full w-72 max-w-[85vw] flex-col bg-white shadow-xl">
         <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
-          <span className="font-display text-xl font-bold text-primary-600">Дайбилет</span>
+          <DaibiletLogo iconClassName="h-7 w-7 shrink-0" textClassName="text-xl" />
           <button type="button" aria-label="Закрыть" onClick={onClose} className="rounded-full p-2 text-slate-500 hover:bg-slate-100">
             <X className="h-5 w-5" />
           </button>
