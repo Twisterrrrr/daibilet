@@ -1221,9 +1221,21 @@ function LandingHero({
             ) : null}
           </nav>
           <h1 className={`mb-5 font-semibold leading-tight tracking-tight text-primary-foreground ${isBridges ? 'max-w-4xl text-3xl md:text-4xl lg:text-5xl' : 'mb-4 text-3xl font-extrabold md:text-5xl'}`}>
-            {landingSeo.h1Lead}
-            <span className="whitespace-nowrap">{landingSeo.h1Today}</span>
-            {landingSeo.h1Tail}
+            {isBridges ? (
+              <>
+                <span className="block">{landingSeo.h1Lead.trim()}</span>
+                <span className="mt-1 block text-[0.92em] md:mt-0 md:inline md:text-inherit">
+                  {landingSeo.h1Today}
+                  {landingSeo.h1Tail}
+                </span>
+              </>
+            ) : (
+              <>
+                {landingSeo.h1Lead}
+                <span className="whitespace-nowrap">{landingSeo.h1Today}</span>
+                {landingSeo.h1Tail}
+              </>
+            )}
           </h1>
           <p className={`${isBridges ? 'mb-10 max-w-2xl text-lg leading-relaxed text-primary-foreground/75' : 'mb-8 max-w-3xl text-base leading-relaxed text-primary-foreground/80 md:text-lg'}`}>{heroSubtitle}</p>
           {bridgesHeroActions}
