@@ -1,7 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Дайбилет">
   <circle cx="24" cy="24" r="21" fill="#fff"/>
   <circle cx="24" cy="24" r="21" fill="none" stroke="#4A7FD4" stroke-width="3"/>
-  <path d="M24 11.5 33.5 24 24 36.5 14.5 24Z" fill="#fff" stroke="#4A7FD4" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M24 15v18M15 24h18" stroke="#4A7FD4" stroke-width="2" stroke-linecap="round"/>
-  <circle cx="24" cy="24" r="2.2" fill="#4A7FD4"/>
+  <path d="M14 16h20a2 2 0 0 1 2 2v3.6a3 3 0 0 0 0 6V30a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2v-3.4a3 3 0 0 0 0-6V18a2 2 0 0 1 2-2z" fill="#F5B014" stroke="#4A7FD4" stroke-width="1.8" stroke-linejoin="round"/>
+  <path d="M17 22h14M17 26.5h9" stroke="#4A7FD4" stroke-width="2" stroke-linecap="round"/>
 </svg>

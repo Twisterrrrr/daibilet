@@ -3,6 +3,7 @@ import * as React from 'react';
 /** Фирменный синий логотипа (как на макете). */
 export const DAIBILET_LOGO_BLUE = '#4A7FD4';
 export const DAIBILET_LOGO_DARK = '#0F172A';
+export const DAIBILET_LOGO_YELLOW = '#F5B014';
 
 export function DaibiletLogoMark({ className = 'h-8 w-8' }: { className?: string }) {
   return (
@@ -15,19 +16,18 @@ export function DaibiletLogoMark({ className = 'h-8 w-8' }: { className?: string
       <circle cx="24" cy="24" r="21" fill="#fff" />
       <circle cx="24" cy="24" r="21" fill="none" stroke={DAIBILET_LOGO_BLUE} strokeWidth="3" />
       <path
-        d="M24 11.5 33.5 24 24 36.5 14.5 24Z"
-        fill="#fff"
+        d="M14 16h20a2 2 0 0 1 2 2v3.6a3 3 0 0 0 0 6V30a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2v-3.4a3 3 0 0 0 0-6V18a2 2 0 0 1 2-2z"
+        fill={DAIBILET_LOGO_YELLOW}
         stroke={DAIBILET_LOGO_BLUE}
-        strokeWidth="2.5"
+        strokeWidth="1.8"
         strokeLinejoin="round"
       />
       <path
-        d="M24 15v18M15 24h18"
+        d="M17 22h14M17 26.5h9"
         stroke={DAIBILET_LOGO_BLUE}
         strokeWidth="2"
         strokeLinecap="round"
       />
-      <circle cx="24" cy="24" r="2.2" fill={DAIBILET_LOGO_BLUE} />
     </svg>
   );
 }
