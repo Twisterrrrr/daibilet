@@ -13,21 +13,20 @@ export function DaibiletLogoMark({ className = 'h-8 w-8' }: { className?: string
       className={className}
       aria-hidden
     >
-      <circle cx="24" cy="24" r="21" fill="#fff" />
-      <circle cx="24" cy="24" r="21" fill="none" stroke={DAIBILET_LOGO_BLUE} strokeWidth="3" />
+      <rect width="48" height="48" rx="11" fill={DAIBILET_LOGO_BLUE} />
       <path
-        d="M14 16h20a2 2 0 0 1 2 2v3.6a3 3 0 0 0 0 6V30a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2v-3.4a3 3 0 0 0 0-6V18a2 2 0 0 1 2-2z"
-        fill={DAIBILET_LOGO_YELLOW}
-        stroke={DAIBILET_LOGO_BLUE}
-        strokeWidth="1.8"
-        strokeLinejoin="round"
+        d="M14 16h20a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2V18a2 2 0 0 1 2-2z"
+        fill="#fff"
+        opacity="0.95"
       />
       <path
-        d="M17 22h14M17 26.5h9"
+        d="M16 22h16M16 27h11"
         stroke={DAIBILET_LOGO_BLUE}
-        strokeWidth="2"
+        strokeWidth="2.2"
         strokeLinecap="round"
+        fill="none"
       />
+      <circle cx="33" cy="30" r="3.5" fill={DAIBILET_LOGO_YELLOW} />
     </svg>
   );
 }
