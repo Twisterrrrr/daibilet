@@ -13,7 +13,7 @@ export type BridgesScheduleRow = {
   key: string;
   title: string;
   venue: string;
-  nevaBank: string | null;
+  nevaBank: string;
   priceFrom: number | null;
   priceTo: number | null;
   timeLabel: string;
@@ -61,15 +61,11 @@ export function resolveBridgesDisplayTitle(title: string): string {
   return resolveBridgesTourMeta(title)?.displayTitle ?? title;
 }
 
-/** Берег Невы / стартовая сторона для сравнения причалов. */
-export function resolveNevaBankLabel(venue: string, title = ''): string | null {
+/** Берег Невы для сравнения причалов. */
+export function resolveNevaBankLabel(venue: string, title = ''): string {
   const text = `${venue} ${title}`.toLowerCase();
-  if (/фонтанк|мойк|карповк|крюков|грибоедов|обводн|канал/i.test(text)) return 'Каналы';
-  if (/петроград|кронверк|приморск/i.test(text)) return 'Петроградская сторона';
-  if (/василеостров|в\.?\s*о\.?|биржев|макарова|морской\s+фасад|северн/i.test(text)) return 'Правый берег';
-  if (/дворцов|адмиралтей|сенатск|английск|казанск|наб\.?\s*реки\s+нев|университетск/i.test(text)) return 'Левый берег';
-  if (/наб\.|причал|пристан/i.test(text)) return 'Левый берег';
-  return null;
+  if (/карповк|университетск/i.test(text)) return 'Правый берег';
+  return 'Левый берег';
 }
 
 export function classifyBridgesRoute(

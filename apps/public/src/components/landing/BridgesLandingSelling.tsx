@@ -369,45 +369,40 @@ export function BridgesComparisonTable({ rows }: { rows: BridgesScheduleRow[] })
   return (
     <section id="bridges-compare" className="container-page py-8">
       <h2 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">Сравнение маршрутов</h2>
-      <p className="mb-6 text-muted-foreground">Время, берег Невы, причал и цена в одном месте.</p>
-      <div className="grid gap-3 md:grid-cols-2">
-        {rows.map((row) => (
-          <article key={row.key} className="rounded-xl border border-border bg-card p-4">
-            <h3 className="text-base font-semibold leading-snug text-foreground">
-              <a href={row.href} className="hover:text-[oklch(0.55_0.17_55)]">
-                {row.title}
-              </a>
-            </h3>
-            <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-              <div>
-                <dt className="text-xs text-muted-foreground">Время</dt>
-                <dd className="font-medium text-foreground">{row.timeLabel || '—'}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">Длительность</dt>
-                <dd className="text-foreground">{row.duration || '—'}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">Берег</dt>
-                <dd className="text-foreground">{row.nevaBank || '—'}</dd>
-              </div>
-              <div>
-                <dt className="text-xs text-muted-foreground">Мосты</dt>
-                <dd className="text-foreground">{row.bridgeHint || '—'}</dd>
-              </div>
-              <div className="col-span-2">
-                <dt className="text-xs text-muted-foreground">Причал</dt>
-                <dd className="text-foreground">{row.venue || '—'}</dd>
-              </div>
-              <div className="col-span-2 border-t border-border/60 pt-2">
-                <dt className="text-xs text-muted-foreground">Цена</dt>
-                <dd className="text-lg font-semibold tabular-nums text-foreground">
+      <p className="mb-6 text-muted-foreground">Сопоставьте время, берег Невы, причал и цену перед покупкой.</p>
+      <div className="overflow-x-auto rounded-xl border border-border">
+        <table className="w-full min-w-[720px] text-left text-sm">
+          <thead className="bg-muted/50 text-muted-foreground">
+            <tr>
+              <th className="px-4 py-3 font-medium">Рейс</th>
+              <th className="px-4 py-3 font-medium">Время</th>
+              <th className="px-4 py-3 font-medium">Длительность</th>
+              <th className="px-4 py-3 font-medium">Берег</th>
+              <th className="px-4 py-3 font-medium">Мосты</th>
+              <th className="px-4 py-3 font-medium">Причал</th>
+              <th className="px-4 py-3 font-medium">Цена</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.key} className="border-t border-border">
+                <td className="max-w-[220px] px-4 py-3 font-medium text-foreground">
+                  <a href={row.href} className="hover:text-[oklch(0.55_0.17_55)]">
+                    {row.title}
+                  </a>
+                </td>
+                <td className="whitespace-nowrap px-4 py-3 text-foreground">{row.timeLabel || '—'}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">{row.duration || '—'}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-foreground">{row.nevaBank}</td>
+                <td className="px-4 py-3 text-muted-foreground">{row.bridgeHint || '—'}</td>
+                <td className="px-4 py-3 text-muted-foreground">{row.venue || '—'}</td>
+                <td className="whitespace-nowrap px-4 py-3 font-semibold text-foreground">
                   {row.priceFrom ? formatMoneyRange(row.priceFrom, row.priceTo) : '—'}
-                </dd>
-              </div>
-            </dl>
-          </article>
-        ))}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </section>
   );
