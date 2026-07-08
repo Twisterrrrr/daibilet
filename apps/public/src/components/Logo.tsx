@@ -44,7 +44,7 @@ export function DaibiletLogo({
           className={`font-display text-xl font-bold tracking-tight sm:text-2xl ${textClassName}`}
         >
           <span style={{ color: DAIBILET_LOGO_DARK }}>Дай</span>
-          <span style={{ color: DAIBILET_LOGO_BLUE }}>билет</span>
+          <span style={{ color: DAIBILET_LOGO_YELLOW }}>билет</span>
         </span>
       ) : null}
     </span>
