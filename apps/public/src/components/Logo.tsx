@@ -5,6 +5,9 @@ export const DAIBILET_LOGO_BLUE = '#4A7FD4';
 export const DAIBILET_LOGO_DARK = '#0F172A';
 export const DAIBILET_LOGO_YELLOW = '#F5B014';
 
+const TICKET_PATH =
+  'M11 15h26a2 2 0 0 1 2 2v3.2a2.8 2.8 0 0 0 0 5.6V28a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2v-3.2a2.8 2.8 0 0 0 0-5.6V17a2 2 0 0 1 2-2z';
+
 export function DaibiletLogoMark({ className = 'h-8 w-8' }: { className?: string }) {
   return (
     <svg
@@ -13,20 +16,9 @@ export function DaibiletLogoMark({ className = 'h-8 w-8' }: { className?: string
       className={className}
       aria-hidden
     >
-      <rect width="48" height="48" rx="11" fill={DAIBILET_LOGO_BLUE} />
-      <path
-        d="M14 16h20a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2V18a2 2 0 0 1 2-2z"
-        fill="#fff"
-        opacity="0.95"
-      />
-      <path
-        d="M16 22h16M16 27h11"
-        stroke={DAIBILET_LOGO_BLUE}
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <circle cx="33" cy="30" r="3.5" fill={DAIBILET_LOGO_YELLOW} />
+      <g transform="rotate(45 24 24)">
+        <path d={TICKET_PATH} fill={DAIBILET_LOGO_YELLOW} />
+      </g>
     </svg>
   );
 }
