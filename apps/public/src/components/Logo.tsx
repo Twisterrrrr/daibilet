@@ -1,5 +1,9 @@
 import * as React from 'react';
 
+/** Фирменный синий логотипа (как на макете). */
+export const DAIBILET_LOGO_BLUE = '#4A7FD4';
+export const DAIBILET_LOGO_DARK = '#0F172A';
+
 export function DaibiletLogoMark({ className = 'h-8 w-8' }: { className?: string }) {
   return (
     <svg
@@ -8,20 +12,22 @@ export function DaibiletLogoMark({ className = 'h-8 w-8' }: { className?: string
       className={className}
       aria-hidden
     >
-      <rect width="48" height="48" rx="11" fill="#2563eb" />
+      <circle cx="24" cy="24" r="21" fill="#fff" />
+      <circle cx="24" cy="24" r="21" fill="none" stroke={DAIBILET_LOGO_BLUE} strokeWidth="3" />
       <path
-        d="M14 16h20a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H14a2 2 0 0 1-2-2V18a2 2 0 0 1 2-2z"
+        d="M24 11.5 33.5 24 24 36.5 14.5 24Z"
         fill="#fff"
-        opacity="0.95"
+        stroke={DAIBILET_LOGO_BLUE}
+        strokeWidth="2.5"
+        strokeLinejoin="round"
       />
       <path
-        d="M16 22h16M16 27h11"
-        stroke="#2563eb"
-        strokeWidth="2.2"
+        d="M24 15v18M15 24h18"
+        stroke={DAIBILET_LOGO_BLUE}
+        strokeWidth="2"
         strokeLinecap="round"
-        fill="none"
       />
-      <circle cx="33" cy="30" r="3.5" fill="#f59e0b" />
+      <circle cx="24" cy="24" r="2.2" fill={DAIBILET_LOGO_BLUE} />
     </svg>
   );
 }
@@ -40,13 +46,14 @@ export function DaibiletLogo({
   showText = true,
 }: DaibiletLogoProps) {
   return (
-    <span className={`inline-flex items-center gap-2 ${className}`}>
+    <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <DaibiletLogoMark className={iconClassName} />
       {showText ? (
         <span
-          className={`font-display text-xl font-bold tracking-tight text-slate-950 sm:text-2xl ${textClassName}`}
+          className={`font-display text-xl font-bold tracking-tight sm:text-2xl ${textClassName}`}
         >
-          Дайбилет
+          <span style={{ color: DAIBILET_LOGO_DARK }}>Дай</span>
+          <span style={{ color: DAIBILET_LOGO_BLUE }}>билет</span>
         </span>
       ) : null}
     </span>
