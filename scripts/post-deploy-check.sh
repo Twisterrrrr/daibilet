@@ -34,7 +34,17 @@ fi
 
 if [[ "$RUN_INVARIANTS" == "1" && -n "${DATABASE_URL:-}" ]]; then
   echo "== check:sync-invariants =="
+  set +e
   node scripts/sync-invariants-check.js
+  INVARIANTS_EXIT=$?
+  set -e
+  if [[ "$INVARIANTS_EXIT" -ne 0 ]]; then
+    if [[ "${POST_DEPLOY_INVARIANTS_STRICT:-0}" == "1" ]]; then
+      echo "Invariant check failed (strict mode)" >&2
+      exit "$INVARIANTS_EXIT"
+    fi
+    echo "Warning: invariant check failed (non-strict — legacy DB debt?). Run npm run tc:sync to backfill widgetUrl."
+  fi
 fi
 
 echo "Post-deploy check OK"

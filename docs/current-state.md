@@ -30,7 +30,8 @@ GitHub Actions: `.github/workflows/ci.yml` — validate, test, build на PR/pus
 
 ## Ops backlog
 
-- [ ] `git push` + staging deploy коммитов A–D
+- [x] `git push` + staging deploy @ `56672cd`
+- [ ] `npm run tc:sync` на сервере (backfill widgetUrl)
 - [ ] Nightly cron на сервере
 - [ ] Отдельная staging БД
 - [ ] Browser smoke (ручной)

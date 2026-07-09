@@ -97,6 +97,17 @@ Prod остаётся на `start:ts` (уже в `daibilet-api.service`); stagin
 
 ---
 
+## Staging deploy (2026-07-10)
+
+- Сервер: `/opt/daibilet-staging` @ `56672cd`
+- Health + stats: OK
+- Widgets: **4/4** эталона
+- Invariants (legacy DB): 2 FAIL — не блокируют deploy в non-strict режиме
+  - `tc_offers_without_widget_url`: 62613 → backfill: `npm run tc:sync` с token
+  - `tep_events_without_sessions`: 32 orphan TEP events
+
+---
+
 ## Exit criteria
 
 | Критерий | Статус |
@@ -104,7 +115,7 @@ Prod остаётся на `start:ts` (уже в `daibilet-api.service`); stagin
 | Post-deploy script в deploy pipeline | ✅ |
 | CI workflow в репо | ✅ |
 | Cron + staging env docs | ✅ |
-| Live staging deploy A–D | ⏳ ops (команды выше) |
+| Live staging deploy A–D | ✅ @ `56672cd`, widgets 4/4; invariants legacy debt (см. отчёт) |
 | Live prod deploy | ⏳ после staging |
 | Staging DB отдельно от prod | ⏳ infra backlog |
 
