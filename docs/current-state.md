@@ -1,48 +1,51 @@
 # Текущее состояние Daibilet
 
-Дата: **2026-07-10** (checkpoint после prod deploy)  
+Дата: **2026-07-10** (после фазы A)  
 Ветка: **`integrate/mvp-launch`**  
-Детальный аудит: **[checkpoint-2026-07-10-mvp-launch.md](./checkpoint-2026-07-10-mvp-launch.md)**
+Checkpoint: **[checkpoint-2026-07-10-mvp-launch.md](./checkpoint-2026-07-10-mvp-launch.md)**
 
 ## Продуктовый режим
 
 MVP **widget-first**: покупка через Ticketscloud / Teplohod.info.  
 **Не в runtime:** YooKassa, внутренний checkout, ЛК поставщика, trip planner.
 
-## Деплой (актуально)
+## Фазы (виджеты + импорт)
 
-| Контур | Код | API | Домен | Коммит (сервер) |
-|--------|-----|-----|-------|-----------------|
-| **Prod** | `/opt/daibilet` | `:4000` | daibilet.ru | `4cee7a7` |
-| **Staging** | `/opt/daibilet-staging` | `:4001` | staging.daibilet.ru | `4cee7a7`+ |
-| **GitHub** | — | — | — | `6df849f` |
+| Фаза | Статус | Документ |
+|------|--------|----------|
+| A — данные → виджет (API) | ✅ | [phases/phase-a-widget-readiness.md](./phases/phase-a-widget-readiness.md) |
+| B — импорт sync → БД | ⏳ | — |
+| C — целостность данных | ⏳ | — |
+| D — deploy / parity | ⏳ | — |
 
-Prod hotfix до merge: stash `pre-integrate-deploy-20260709` на сервере.
+## Деплой
+
+| Контур | API | Домен | Примечание |
+|--------|-----|-------|------------|
+| **Prod** | `:4000` | daibilet.ru | hotfix CORS @ `e72c912` |
+| **Staging** | `:4001` | staging.daibilet.ru | noindex, shared DB |
 
 ## Архитектура (кратко)
 
-- **Prisma** — schema, migrations, smoke; **runtime API** — `dto.js` + pg SQL
-- **TS foundation** — parallel (`server-entry.ts`, typed handlers); prod = `server.js`
-- **ProviderLink** — в схеме и тестах
-- **2386** events, **1057** venues на API
+- **Prisma** — schema, migrations; **runtime API** — `dto.js` + pg SQL
+- **2386** events, **1057** venues (prod stats)
+- Widget API check: `npm run check:widgets` — **4/4 эталона OK** (prod + staging)
 
-## Следующие шаги
+## Следующий шаг
 
-1. Browser widget smoke (TC + Teplohod)
-2. Prod pull `6df849f`, deploy через fixed script
-3. SEO + launch checklist
-4. Решение по staging БД (shared vs separate)
+**Фаза B:** TC import в один sync, ProviderLink после импорта.
 
 ## Команды проверки
 
 ```bash
-npm run db:validate && npm run db:generate && npm run db:typecheck
-npm run backend:typecheck && npm run backend:test:ts
+npm run check:widgets
+npm run db:validate && npm run backend:test:ts
 npm run public:build && npm run admin:build
 ```
 
 ## Документы
 
-- [checkpoint-2026-07-10-mvp-launch.md](./checkpoint-2026-07-10-mvp-launch.md) — аудит точки
+- [phases/README.md](./phases/README.md) — дорожная карта фаз
+- [widget-data-contract.md](./widget-data-contract.md) — контракт полей виджета
+- [widget-etalon-slugs.md](./widget-etalon-slugs.md) — эталоны для регрессии
 - [decision-log.md](./decision-log.md)
-- [launch-qa-and-deploy.md](./launch-qa-and-deploy.md)

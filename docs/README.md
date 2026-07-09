@@ -16,6 +16,15 @@
 |----------|----------|
 | **[checkpoint-2026-07-10-mvp-launch.md](./checkpoint-2026-07-10-mvp-launch.md)** | **Аудит точки:** prod deploy, JS vs Prisma, риски, handoff Codex |
 
+## Фазы: виджеты + импорт
+
+| Документ | Описание |
+|----------|----------|
+| [phases/README.md](./phases/README.md) | Дорожная карта фаз A–D |
+| [phases/phase-a-widget-readiness.md](./phases/phase-a-widget-readiness.md) | **Фаза A (закрыта):** API-проверка виджетов |
+| [widget-data-contract.md](./widget-data-contract.md) | Контракт полей TC/TEP для виджета |
+| [widget-etalon-slugs.md](./widget-etalon-slugs.md) | Эталонные slug + `check:widgets` |
+
 ## Архитектура и миграции
 
 | Документ | Описание |

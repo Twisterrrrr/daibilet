@@ -113,6 +113,16 @@
 
 ---
 
+## 2026-07-10 — Фаза A: автопроверка виджетов через API
+
+**Решение:** Эталонные slug + `npm run check:widgets` проверяют `widgetPayload`, `purchaseUrl`, `purchaseReady` на prod/staging до browser smoke.
+
+**Почему:** Приоритет — открытие виджетов и корректная передача ID, а не продажи. API-check дешевле и воспроизводимее ручного клика.
+
+**Статус:** Активно. Browser smoke — ручной чеклист в `widget-data-contract.md`. Импорт sync→БД — фаза B.
+
+---
+
 ## Шаблон новой записи
 
 ```markdown
