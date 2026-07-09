@@ -94,7 +94,7 @@ export function isMeetingPointLike(input: {
   const kind = normalizeVenueKind(input.type);
   if (kind === 'meeting_point') return true;
   const name = `${input.name || input.title || ''} ${input.address || ''}`.toLowerCase();
-  return /место сбора|место встречи|точка сбора|точка встречи|площадка:|^метро | у метро |у метро |около метро|у памятник|памятник|\bпам\.|у пам\.|\bу пам\b|пл\.\s*у пам/u.test(name);
+  return /место сбора|место встречи|точка сбора|точка встречи|площадка:|^метро\b|^м\.(?:\s|«|"|')|\bм\.\s*(?:«|[а-яё])|\bу метро\b|около метро|у памятник|памятник|\bпам\.|у пам\.|\bу пам\b|пл\.\s*у пам/u.test(name);
 }
 
 export function isCatalogVenueType(type?: string | null): boolean {
@@ -125,6 +125,43 @@ export function institutionFamilyLabel(): string {
 
 export function locationFamilyLabel(): string {
   return 'Локации';
+}
+
+const WEAK_VENUE_LEAD_RE = /^(легенда|описание|текст|n\/a|нет|—|-)$/i;
+
+export function isWeakVenueLeadText(value?: string | null): boolean {
+  const text = String(value || '').replace(/\s+/g, ' ').trim();
+  if (!text) return true;
+  if (text.length < 24) return true;
+  if (WEAK_VENUE_LEAD_RE.test(text)) return true;
+  return false;
+}
+
+export function isTruncatedVenueLeadText(value?: string | null): boolean {
+  return /\.\.\.$/.test(String(value || '').replace(/\s+/g, ' ').trim());
+}
+
+export function resolveLocationVenueCopy(venue: {
+  name?: string | null;
+  city?: string | null;
+  description?: string | null;
+  shortDescription?: string | null;
+}) {
+  const description = String(venue.description || '').replace(/\s+/g, ' ').trim();
+  const shortDescription = String(venue.shortDescription || '').replace(/\s+/g, ' ').trim();
+  const fullDescription =
+    description || (!isWeakVenueLeadText(shortDescription) ? shortDescription : '');
+  const heroLead =
+    !isWeakVenueLeadText(shortDescription) && !isTruncatedVenueLeadText(shortDescription)
+      ? shortDescription
+      : fullDescription;
+  const fallback = `Локация «${venue.name || 'точка отправления'}» в ${venue.city || 'городе'}. Адрес и время отправления уточняйте в карточке события перед покупкой.`;
+
+  return {
+    fullDescription: fullDescription || fallback,
+    heroLead: heroLead || fallback,
+    howToFind: fullDescription || fallback,
+  };
 }
 
 export const LOCATION_TYPE_EMOJI: Record<string, string> = {

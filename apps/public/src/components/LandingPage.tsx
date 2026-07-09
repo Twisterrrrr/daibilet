@@ -13,6 +13,7 @@ import {
   BridgesTonightTips,
 } from '@/components/landing/BridgesLandingSelling';
 import { BridgesScheduleSection } from '@/components/landing/BridgesScheduleSection';
+import { LandingCityLocations } from '@/components/landing/LandingCityLocations';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton';
 import { LandingStickyHeader } from '@/components/landing/LandingStickyHeader';
 import {
@@ -34,7 +35,7 @@ import {
   mapBridgesGroups,
   pickComparisonRows,
 } from '@/lib/bridges-session-utils';
-import { normalizeCitySlug } from '@/lib/landing-routes';
+import { normalizeCitySlug, resolveConcertGenreTag } from '@/lib/landing-routes';
 import { resolveLandingCopy, shouldUseLandingCopy } from '@/lib/landing-copy';
 import { applyLandingSeoMeta, resolveLandingSeo, useLandingTodayReference } from '@/lib/landing-seo';
 import { buildBridgesProductJsonLd } from '@/lib/bridges-seo';
@@ -71,7 +72,7 @@ import {
 } from '@/lib/datetime';
 import { isOpenDate, FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession, resolveSessionPriceRange } from '@/lib/event-card-meta';
 import { formatVacantSeats } from '@/lib/pluralize';
-import { eventHref } from '@/routes';
+import { eventHref, sessionVenueHref } from '@/routes';
 import { readCachedLandingPage, writeCachedLandingPage } from '@/lib/landing-page-cache';
 import type { PublicLanding, PublicLandingContentBlock, PublicLandingPage, PublicSession } from '@/types';
 
@@ -600,6 +601,18 @@ async function fetchLandingPayload(slug: string, signal?: AbortSignal): Promise<
 
 const BUS_CITY_ORDER = Object.keys(BUS_CITY_META);
 
+function readLandingGenreFromUrl(): string {
+  const params = new URLSearchParams(window.location.search);
+  const genre = resolveConcertGenreTag(params.get('genre') || params.get('tag'));
+  return genre || 'all';
+}
+
+function isConcertsGenreLanding(slug: string): boolean {
+  return canonicalLandingSlug(slug) === 'concerts-genre';
+}
+
+const CONCERT_GENRE_CHIP_TAGS = ['Джаз', 'Рок', 'Классика'] as const;
+
 function getLandingProfile(slug: string): LandingProfile {
   const key = canonicalLandingSlug(slug);
   if (isBridgesNightLandingSlug(key)) return 'bridges';
@@ -675,7 +688,7 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
   const [isSessionsLoading, setIsSessionsLoading] = React.useState(() => !initialCachedPayload?.sessions?.length);
   const [sessionsError, setSessionsError] = React.useState<string | null>(null);
   const [city, setCity] = React.useState('all');
-  const [category, setCategory] = React.useState('all');
+  const [category, setCategory] = React.useState(() => readLandingGenreFromUrl());
   const [dateFilter, setDateFilter] = React.useState<DateFilter>(defaultLandingDateFilter(profile));
   const [sort, setSort] = React.useState<SortFilter>(profile === 'bus' || profile === 'dinner' ? 'price' : 'time');
   const [menuFilter, setMenuFilter] = React.useState<MenuFilter>('all');
@@ -698,6 +711,7 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
     setMenuFilter('all');
     setDinnerTimeFilter('all');
     setTimeSlot('');
+    setCategory(readLandingGenreFromUrl());
     setApiPayload(initialCachedPayload);
     setSessionsError(null);
     setIsSessionsLoading(!initialCachedPayload?.sessions?.length);
@@ -749,6 +763,17 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
     const cityName = resolveLandingCityName(citySlug);
     setCity(cityName || 'all');
   }, [citySlug]);
+
+  React.useEffect(() => {
+    if (!isConcertsGenreLanding(slug)) return;
+    const url = new URL(window.location.href);
+    if (category === 'all') url.searchParams.delete('genre');
+    else url.searchParams.set('genre', category);
+    const next = `${url.pathname}${url.search}`;
+    if (`${window.location.pathname}${window.location.search}` !== next) {
+      window.history.replaceState({}, '', next);
+    }
+  }, [category, slug]);
 
   const payload = apiPayload || shell;
   const sessionsReady = Boolean(apiPayload);
@@ -869,12 +894,12 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
           {profile === 'bridges' ? <BridgesScheduleStrip /> : null}
           {profile === 'bridges' ? <BridgesTonightTips /> : null}
           {profile === 'seasonal' && !citySlug && seasonalMeta?.nationalIntro ? (
-            <section className="container mx-auto px-4 pb-4 pt-8">
+            <section className="container-page pb-4 pt-8">
               <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">{seasonalMeta.nationalIntro}</p>
             </section>
           ) : null}
           {useLandingCopy && landingCopy?.body && profile !== 'bridges' ? (
-            <section className="container mx-auto px-4 pb-4 pt-8">
+            <section className="container-page pb-4 pt-8">
               <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">{landingCopy.body}</p>
             </section>
           ) : null}
@@ -890,7 +915,7 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
           {profile === 'dinner' && citySlug && !useLandingCopy ? (
             <LandingDinnerIntro cityName={cityName} citySlug={citySlug} />
           ) : null}
-          <section id="variants" className={`${profile === 'bridges' ? 'container-page scroll-mt-24' : 'container mx-auto px-4'} ${profile === 'dinner' ? 'py-6' : profile === 'bridges' ? 'py-10 md:py-12' : 'py-12'}`}>
+          <section id="variants" className={`container-page scroll-mt-24 ${profile === 'dinner' ? 'py-6' : profile === 'bridges' ? 'py-10 md:py-12' : 'py-12'}`}>
         {profile === 'bridges' ? (
           <div className="mb-8">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[oklch(0.72_0.17_55)]">Рейсы сегодня</p>
@@ -979,14 +1004,18 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
             ) : (
             <LandingScheduleList groups={groups} profile={profile} />
             )}
-            {!isSessionsLoading && profile === 'bus' && citySlug ? (
-              <LandingOtherCitiesGrid landing={payload.landing} currentCityName={cityName} />
+            {!isSessionsLoading && profile === 'bus' && citySlug && cityName ? (
+              <>
+                <LandingCityLocations cityName={cityName} profile="bus" />
+                <LandingOtherCitiesGrid landing={payload.landing} currentCityName={cityName} />
+              </>
             ) : null}
-            {!isSessionsLoading && profile === 'river' && citySlug ? (
+            {!isSessionsLoading && profile === 'river' && citySlug && cityName ? (
               <>
                 {groups.length <= 4 ? (
                   <LandingRiverFreeAlternatives cityName={cityName} />
                 ) : null}
+                <LandingCityLocations cityName={cityName} profile="river" />
                 <LandingRiverOtherCitiesGrid landing={payload.landing} currentCityName={cityName} />
               </>
             ) : null}
@@ -1001,17 +1030,17 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
           </section>
           {profile === 'dinner' ? (
             <>
-              <section className="container mx-auto px-4">
+              <section className="container-page">
                 <LandingDinnerAudience />
               </section>
               {citySlug ? (
-                <section className="container mx-auto px-4 pb-6">
+                <section className="container-page pb-6">
                   <LandingDinnerRiverLink cityName={cityName} citySlug={citySlug} />
                 </section>
               ) : null}
             </>
           ) : null}
-          <div className={profile === 'bridges' ? 'container-page' : 'container mx-auto px-4'}>
+          <div className="container-page">
             {sessionsReady && profile === 'bus' ? <LandingSchemaJsonLd groups={groups} cityName={cityName} /> : null}
             {!isLovableLanding(profile) ? (
               <LandingContentBlocks blocks={payload.blocks || []} landing={payload.landing} stats={payload.stats} />
@@ -1152,7 +1181,7 @@ function LandingHero({
           />
         </div>
       ) : null}
-      <div className={`relative ${isBridges ? 'container-page' : 'container mx-auto px-4'} ${isBridges ? 'pb-16 pt-10 md:pt-14' : 'py-16 md:py-24'}`}>
+      <div className={`relative container-page ${isBridges ? 'pb-16 pt-10 md:pt-14' : 'py-16 md:py-24'}`}>
         <div className={isBridges ? 'max-w-5xl' : 'max-w-4xl'}>
           <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-primary-foreground/70">
             <span className="flex items-center gap-2">
@@ -1312,7 +1341,7 @@ function LandingCityIntroGuide({
   const spots: RiverCitySpot[] = guide.spots;
 
   return (
-    <section className="container mx-auto space-y-8 px-4 py-8">
+    <section className="container-page space-y-8 py-8">
       <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">{guide.intro}</p>
       <div className="grid gap-6 md:grid-cols-2">
         {spots.length > 0 ? (
@@ -1465,7 +1494,7 @@ function LandingDinnerIntro({ cityName, citySlug }: { cityName: string | null; c
   if (!guide) return null;
 
   return (
-    <section className="container mx-auto px-4 py-8">
+    <section className="container-page py-8">
       <div className="rounded-xl border border-border bg-card p-6 md:p-8">
         <h2 className="mb-3 text-xl font-bold text-foreground md:text-2xl">{guide.introTitle}</h2>
         <p className="max-w-4xl leading-relaxed text-muted-foreground">{guide.introText}</p>
@@ -2464,9 +2493,9 @@ function LandingFilters({
   const currentCityName = resolveLandingCityName(citySlug);
   const cityOptions = Object.entries(stats.cities).sort((a, b) => b[1] - a[1]).slice(0, 12);
   const orderedCityNames = isBus
-    ? BUS_CITY_ORDER
+    ? filterCityOrderByStats(BUS_CITY_ORDER, stats.cities)
     : isRiver
-      ? RIVER_CITY_ORDER
+      ? filterCityOrderByStats(RIVER_CITY_ORDER, stats.cities)
       : isSeasonal && landingSlug
         ? resolveSeasonalCityNames(landingSlug, cityOptions)
         : cityOptions.map(([name]) => name);
@@ -2548,6 +2577,29 @@ function LandingFilters({
     setCity(value);
   };
 
+  const isConcerts = landingSlug ? isConcertsGenreLanding(landingSlug) : false;
+  const genreChip = (value: string, label: string, active: boolean) => (
+    <button
+      key={value}
+      type="button"
+      onClick={() => setCategory(value)}
+      className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
+        active
+          ? 'border-primary bg-primary text-primary-foreground'
+          : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
+      }`}
+    >
+      {label}
+    </button>
+  );
+  const genreChipRow = isConcerts ? (
+    <>
+      <div className="mx-1 h-6 w-px bg-border" />
+      {genreChip('all', 'Все жанры', category === 'all')}
+      {CONCERT_GENRE_CHIP_TAGS.map((tag) => genreChip(tag, tag, category === tag))}
+    </>
+  ) : null;
+
   const cityChip = (value: string, label: string, active: boolean) => (
     <button
       key={value}
@@ -2611,7 +2663,8 @@ function LandingFilters({
             {timeSlotSelect}
           </>
         ) : null}
-        {!isBus && Object.keys(stats.categories).length > 1 ? (
+        {genreChipRow}
+        {!isBus && !isConcerts && Object.keys(stats.categories).length > 1 ? (
           <>
             <div className="mx-1 h-6 w-px bg-border" />
             <select
@@ -3224,7 +3277,16 @@ function LandingEventsTable({ groups }: { groups: EventGroup[] }) {
                 {group.representative.citySlug ? <a href={`/cities/${group.representative.citySlug}`} className="font-medium text-slate-700 hover:text-primary-700">{group.city}</a> : group.city}
               </td>
               <td className="max-w-[240px] px-4 py-3 align-top text-slate-600">
-                {group.representative.venueSlug ? <a href={`/venues/${group.representative.venueSlug}`} className="hover:text-primary-700">{group.venue}</a> : group.venue}
+                {(() => {
+                  const venueLink = sessionVenueHref(group.representative);
+                  return venueLink ? (
+                    <a href={venueLink} className="hover:text-primary-700">
+                      {group.venue}
+                    </a>
+                  ) : (
+                    group.venue
+                  );
+                })()}
               </td>
               <td className="px-4 py-3 align-top font-semibold text-slate-950">{formatMoney(group.priceFrom)}</td>
               <td className="px-4 py-3 align-top text-slate-600">{group.vacant ?? '-'}</td>
@@ -3414,7 +3476,7 @@ function ScheduleErrorState({ message }: { message: string }) {
 
 function ErrorState({ message }: { message: string }) {
   return (
-    <section className="container mx-auto px-4 py-12">
+    <section className="container-page py-12">
       <div className="rounded-xl border border-red-100 bg-red-50 p-6 text-sm font-medium text-red-700">{message}</div>
     </section>
   );
@@ -3501,9 +3563,19 @@ function defaultLandingDateFilter(_profile: LandingProfile): DateFilter {
   return 'all';
 }
 
+function filterCityOrderByStats(order: string[], cities: Record<string, number>): string[] {
+  const withEvents = new Set(
+    Object.entries(cities)
+      .filter(([, count]) => count > 0)
+      .map(([name]) => name),
+  );
+  return order.filter((name) => withEvents.has(name));
+}
+
 function resolveSeasonalCityNames(landingSlug: string, cityOptions: Array<[string, number]>): string[] {
+  const withEvents = new Set(cityOptions.filter(([, count]) => count > 0).map(([name]) => name));
   const order = getSeasonalLanding(landingSlug)?.cityOrder || [];
-  if (order.length) return order;
+  if (order.length) return order.filter((name) => withEvents.has(name));
   return cityOptions
     .map(([name]) => name)
     .filter((name) => name && !/^не указан$/i.test(name.trim()));

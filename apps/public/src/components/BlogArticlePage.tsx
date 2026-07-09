@@ -1,10 +1,14 @@
 import * as React from 'react';
-import { ArrowLeft, BookOpen, Clock, MapPin } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
-import { SectionPageHero } from '@/components/PageBreadcrumbs';
+import { BlogArticleHero } from '@/components/BlogArticleHero';
+import { renderBlogArticleContent } from '@/components/BlogArticleContent';
 import { API_BASE_URL } from '@/lib/api-base';
+import { applyBlogArticleSeo, cleanupBlogArticleSeo } from '@/lib/blog-seo';
+import { resolveBlogCityHref } from '@/lib/blog-article-city';
+import { cleanupBlogPageOverlays } from '@/lib/blog-navigate';
 import { BLOG_POSTS } from '@/data/blog-posts';
 
 type PublicArticle = {
@@ -14,9 +18,11 @@ type PublicArticle = {
   content?: string | null;
   coverImageUrl?: string | null;
   city?: string | null;
+  citySlug?: string | null;
   publishedAt?: string | null;
   seoTitle?: string | null;
   seoDescription?: string | null;
+  canonicalPath?: string | null;
 };
 
 function formatPublishedAt(value?: string | null): string {
@@ -33,55 +39,14 @@ function estimateReadMin(content?: string | null): number {
   return Math.max(3, Math.round(words / 180));
 }
 
-function renderContent(content: string) {
-  return content
-    .split(/\n{2,}/)
-    .map((block) => block.trim())
-    .filter(Boolean)
-    .map((block, index) => {
-      if (block.startsWith('**') && block.endsWith('**')) {
-        return (
-          <h2 key={index} className="mt-8 text-xl font-semibold text-slate-900">
-            {block.replace(/^\*\*|\*\*$/g, '')}
-          </h2>
-        );
-      }
-      if (/^\d+\.\s/.test(block)) {
-        const items = block.split('\n').filter(Boolean);
-        return (
-          <ol key={index} className="mt-4 list-decimal space-y-2 pl-5 text-slate-700">
-            {items.map((item, itemIndex) => (
-              <li key={itemIndex} className="leading-7">
-                {item.replace(/^\d+\.\s*/, '').replace(/\*\*(.*?)\*\*/g, '$1')}
-              </li>
-            ))}
-          </ol>
-        );
-      }
-      if (block.startsWith('- ')) {
-        const items = block.split('\n').filter(Boolean);
-        return (
-          <ul key={index} className="mt-4 list-disc space-y-2 pl-5 text-slate-700">
-            {items.map((item, itemIndex) => (
-              <li key={itemIndex} className="leading-7">
-                {item.replace(/^- /, '')}
-              </li>
-            ))}
-          </ul>
-        );
-      }
-      return (
-        <p key={index} className="mt-4 text-base leading-8 text-slate-700">
-          {block.replace(/\*\*(.*?)\*\*/g, '$1')}
-        </p>
-      );
-    });
-}
-
 export function BlogArticlePage({ slug }: { slug: string }) {
   const [article, setArticle] = React.useState<PublicArticle | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
   const [notFound, setNotFound] = React.useState(false);
+
+  React.useEffect(() => {
+    cleanupBlogPageOverlays();
+  }, []);
 
   React.useEffect(() => {
     const controller = new AbortController();
@@ -111,6 +76,7 @@ export function BlogArticlePage({ slug }: { slug: string }) {
             content: fallback.excerpt,
             coverImageUrl: fallback.imageUrl,
             city: fallback.city,
+            citySlug: fallback.citySlug,
           });
         } else {
           setNotFound(true);
@@ -125,8 +91,28 @@ export function BlogArticlePage({ slug }: { slug: string }) {
 
   React.useEffect(() => {
     if (!article) return;
-    document.title = `${article.seoTitle || article.title} | Блог Дайбилет`;
-    upsertMeta('description', article.seoDescription || article.excerpt || article.title);
+
+    const seoTitle = article.seoTitle || `${article.title} | Блог Дайбилет`;
+    const seoDescription = article.seoDescription || article.excerpt || article.title;
+    const canonicalPath = article.canonicalPath || `/blog/${article.slug}`;
+
+    applyBlogArticleSeo({
+      title: seoTitle,
+      description: seoDescription,
+      canonicalPath,
+      coverImageUrl: article.coverImageUrl,
+      publishedAt: article.publishedAt,
+      breadcrumbs: [
+        { name: 'Главная', path: '/' },
+        { name: 'Блог', path: '/blog' },
+        ...(article.city && resolveBlogCityHref(article.city, article.citySlug)
+          ? [{ name: article.city, path: resolveBlogCityHref(article.city, article.citySlug)! }]
+          : []),
+        { name: article.title, path: canonicalPath },
+      ],
+    });
+
+    return () => cleanupBlogArticleSeo();
   }, [article]);
 
   if (isLoading) {
@@ -155,61 +141,51 @@ export function BlogArticlePage({ slug }: { slug: string }) {
 
   const readMin = estimateReadMin(article.content);
   const publishedLabel = formatPublishedAt(article.publishedAt);
+  const cityHref = resolveBlogCityHref(article.city, article.citySlug);
+  const breadcrumbs = [
+    { label: 'Главная', href: '/' },
+    { label: 'Блог', href: '/blog' },
+    ...(article.city && cityHref ? [{ label: article.city, href: cityHref }] : []),
+    { label: article.title },
+  ];
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
-      <Header cityLabel="Все города" onSection={navigateFromBlog} />
+      <Header cityLabel={article.city || 'Все города'} onSection={navigateFromBlog} />
 
-      <SectionPageHero
-        breadcrumbs={[
-          { label: 'Главная', href: '/' },
-          { label: 'Блог', href: '/blog' },
-          { label: article.title },
-        ]}
-        gradientClass="from-amber-500 via-rose-500 to-primary-700"
-        eyebrow={
-          <p className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wider text-white/85">
-            <BookOpen className="h-4 w-4" />
-            Блог Дайбилет
-          </p>
-        }
+      <BlogArticleHero
+        breadcrumbs={breadcrumbs}
         title={article.title}
-        description={article.excerpt || undefined}
+        description={article.excerpt}
+        coverImageUrl={article.coverImageUrl}
+        publishedLabel={publishedLabel}
+        readMin={readMin}
+        city={article.city}
+        cityHref={cityHref}
       />
 
-      <main className="container-page py-10 sm:py-12">
-        <div className="mx-auto max-w-3xl">
-          <div className="mb-8 flex flex-wrap items-center gap-4 text-sm text-slate-500">
-            {publishedLabel ? <span>{publishedLabel}</span> : null}
-            <span className="inline-flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              {readMin} мин чтения
-            </span>
-            {article.city ? (
-              <span className="inline-flex items-center gap-1">
-                <MapPin className="h-4 w-4" />
-                {article.city}
-              </span>
-            ) : null}
-          </div>
+      <main className="container-page relative z-10 py-10 sm:py-14">
+        <article className="rounded-2xl border border-slate-200/90 bg-white px-6 py-8 shadow-sm sm:px-10 sm:py-10 lg:px-12 lg:py-12">
+          {renderBlogArticleContent(article.content || article.excerpt || '', article.coverImageUrl)}
+        </article>
 
-          {article.coverImageUrl ? (
-            <div className="mb-8 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-              <img src={article.coverImageUrl} alt="" className="aspect-[16/9] w-full object-cover" loading="lazy" />
-            </div>
-          ) : null}
-
-          <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            {renderContent(article.content || article.excerpt || '')}
-          </article>
-
-          <div className="mt-8">
-            <a href="/blog" className="inline-flex items-center gap-2 text-sm font-medium text-primary-600 hover:text-primary-700">
+        <footer className="mt-10 flex flex-col gap-4 border-t border-slate-200/80 pt-8 sm:flex-row sm:items-center sm:justify-between">
+            <a
+              href="/blog"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-primary-600 transition hover:text-primary-700"
+            >
               <ArrowLeft className="h-4 w-4" />
-              Все статьи
+              Все статьи блога
             </a>
-          </div>
-        </div>
+            {cityHref && article.city ? (
+              <a
+                href={cityHref}
+                className="text-sm text-slate-500 transition hover:text-slate-800"
+              >
+                Афиша {article.city} →
+              </a>
+            ) : null}
+          </footer>
       </main>
 
       <Footer />
@@ -223,14 +199,4 @@ function navigateFromBlog(section: string) {
   else if (section === 'blog') window.location.href = '/blog';
   else if (section === 'venues') window.location.href = '/venues';
   else window.location.href = '/';
-}
-
-function upsertMeta(name: string, content: string) {
-  let element = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
-  if (!element) {
-    element = document.createElement('meta');
-    element.name = name;
-    document.head.appendChild(element);
-  }
-  element.content = content;
 }

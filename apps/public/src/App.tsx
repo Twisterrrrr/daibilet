@@ -394,7 +394,7 @@ function HomeHero({
               </>
             ) : (
               <>
-                Экскурсии, музеи и события
+                Экскурсии, музеи и мероприятия
                 <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
                   в городах России
                 </span>

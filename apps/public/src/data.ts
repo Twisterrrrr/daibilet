@@ -282,15 +282,15 @@ export function isMeaningfulStatCount(value?: number | null, min = 10): boolean 
 
 export function formatMoney(value?: number | null): string {
   if (!value || value <= 0) return '-';
-  return `от ${formatNumber(Math.round(value))} ₽`;
+  return `от ${formatNumber(Math.round(value))}\u00a0₽`;
 }
 
 export function formatMoneyRange(from?: number | null, to?: number | null): string {
   if (!from || from <= 0) return '—';
   const min = Math.round(from);
   const max = to && to > 0 ? Math.round(to) : min;
-  if (max > min) return `от ${formatNumber(min)} до ${formatNumber(max)} ₽`;
-  return `от ${formatNumber(min)} ₽`;
+  if (max > min) return `от ${formatNumber(min)} до ${formatNumber(max)}\u00a0₽`;
+  return `от ${formatNumber(min)}\u00a0₽`;
 }
 
 export function formatDate(value?: string | null, timeZone = 'Europe/Moscow'): string {

@@ -133,7 +133,7 @@ export function CityPicker({
     variant === 'hero'
       ? 'relative h-11 w-full rounded-xl bg-slate-50 pl-10 pr-8 text-left text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/25'
       : variant === 'compact'
-        ? 'relative flex w-full items-center gap-2 rounded-lg px-4 py-3 pr-10 text-left text-base font-medium text-slate-700 hover:bg-slate-100'
+        ? 'relative flex w-full items-center gap-2 rounded-lg py-3 pl-10 pr-10 text-left text-base font-medium text-slate-700 hover:bg-slate-100'
         : 'inline-flex items-center gap-1 rounded-full px-2 py-1 text-sm font-medium text-slate-600 transition hover:bg-slate-100';
 
   const menu = open

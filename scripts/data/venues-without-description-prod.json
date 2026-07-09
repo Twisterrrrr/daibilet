@@ -1,0 +1,1759 @@
+{
+  "generatedAt": "2026-07-08T20:37:32.722Z",
+  "total": 1025,
+  "withoutDescription": 219,
+  "items": [
+    {
+      "id": "venue_65f1b0a8a471ea32e7a902c4",
+      "name": "Причал на наб. реки Фонтанки, 71 (59.926449, 30.328948)",
+      "city": "Санкт-Петербург",
+      "address": "Причал на наб. реки Фонтанки, 71",
+      "events": 643,
+      "type": "PIER"
+    },
+    {
+      "id": "venue_672f34b6ebf4808956f1474a",
+      "name": "ГМИИ им Пушкина",
+      "city": "Москва",
+      "address": "Волхонка, 12",
+      "events": 316,
+      "type": "MUSEUM_ART_SPACE"
+    },
+    {
+      "id": "venue_69baa00eeae326c0bd3e5222",
+      "name": "Причал \"По рекам-каналам\" на наб. реки Карповки у памятника медикам",
+      "city": "Санкт-Петербург",
+      "address": "наб. Pеки Карповки, у памятника медикам",
+      "events": 142,
+      "type": "PIER"
+    },
+    {
+      "id": "venue_65367dd04235988deba6c215",
+      "name": "Высотка на Котельнической набережной",
+      "city": "Москва",
+      "address": "Котельническая набережная 1/15кА, Москва, Россия, 109240",
+      "events": 4,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_5970708b515e3500191ce1c2",
+      "name": "Центральный дворец культуры города Белебея",
+      "city": "Белебей",
+      "address": "ул. им. Амирова, 10 А",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6204b120c21ae5231ab837fb",
+      "name": "Клуб Music Bar Jigger Pony",
+      "city": "Благовещенск (Амурская область)",
+      "address": "ул. 50 лет Октября, 61.",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_69495de0e952630a0e9f5208",
+      "name": "Лисий ДК",
+      "city": "Брянск",
+      "address": "Калинина, 117",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_63899dd178d0cd8e461e78bc",
+      "name": "ДК “Юбилейный”",
+      "city": "Бузулук",
+      "address": "3 микрорайон, д. 17а",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6629e1f90b13df74caee4eeb",
+      "name": "Stand Up Club by Edwin Group",
+      "city": "Владивосток",
+      "address": "ул. Светланская, 72 кор 16, Владивосток, Приморский край, Россия, 690001",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_60626bef3827312e3f2c979d",
+      "name": "Rocksin Club",
+      "city": "Волгодонск",
+      "address": "ул. Ленинградская, 3Е",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_6509bad99b189a4bdc248056",
+      "name": "Palazzo",
+      "city": "Воронеж",
+      "address": "Московский просп., 9",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_57a080ef9cb5385b5bed1b65",
+      "name": "Воронежский государственный театр оперы и балета",
+      "city": "Воронеж",
+      "address": "площадь Ленина, 7",
+      "events": 1,
+      "type": "THEATER"
+    },
+    {
+      "id": "venue_587d052c515e350015bfcd6f",
+      "name": "ДКЖ им. Карла Маркса",
+      "city": "Воронеж",
+      "address": "ул. Никитинская, д.1",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6943eec5aaaac59e3ebb2d03",
+      "name": "Клуб \"АУРА\"",
+      "city": "Воронеж",
+      "address": "пр. Революции, 56, Воронеж, Воронежская обл., Россия, 394036",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_5c3cc02067fc0b000fa9031a",
+      "name": "Ледовый дворец спорта «Юбилейный»",
+      "city": "Воронеж",
+      "address": "ул. Карла Маркса, 116",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_6984857b082c735785f6aecb",
+      "name": "Паб Мама Анархия",
+      "city": "Воронеж",
+      "address": "Плехановская улица, 48",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_63c5befb5664464e4e8a721a",
+      "name": "ZONA BIKE",
+      "city": "Выборг",
+      "address": "улица Ильинская, 7, Выборг",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_582c7604d3528600181307a7",
+      "name": "ГДКиС \"Мир\"",
+      "city": "Домодедово",
+      "address": "Каширское шоссе, дом 100А",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6a22b64f09085b9f90548667",
+      "name": "ДаДа",
+      "city": "Дубна (Московская область)",
+      "address": "ул. Макаренко д.36",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_61058268e44661d576ad6aa5",
+      "name": "WILD CLUB",
+      "city": "Егорьевск",
+      "address": "Александра Невского ул. 1 Б",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_6a158f2b35eeca321dcdc63d",
+      "name": "AZIMUT Аэропорт Отель",
+      "city": "Екатеринбург",
+      "address": "улица Бахчиванджи, 55А",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_655b57684fe6077eeab182b3",
+      "name": "Le Bourg 1905",
+      "city": "Екатеринбург",
+      "address": "Вайнера, 9, Центральный Универмаг \"Пассаж, Екатеринбург, Свердловская обл., 620014",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6493f98d1e8eee4dd69318a5",
+      "name": "WAREHOUSE",
+      "city": "Екатеринбург",
+      "address": "Добролюбова 3В",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_68b6720276375a837a195b6b",
+      "name": "Конгресс-отель",
+      "city": "Екатеринбург",
+      "address": "Улица Бебеля, 59 Заречный м-н, Верх-Исетский район, Екатеринбург, 620034",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_5e0f618ecfb1be2535dd1dea",
+      "name": "Концерт-холл \"Свобода\"",
+      "city": "Екатеринбург",
+      "address": "ул. Черкасская, 12",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6106ae308bd5751808e75989",
+      "name": "Корчма \"Пристанище\"",
+      "city": "Екатеринбург",
+      "address": "улица Бебеля, 124",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6392d8675dd0960831d6cc98",
+      "name": "Культурно-досуговый центр «Дружба»",
+      "city": "Екатеринбург",
+      "address": "ул. Академика Бардина, 21б",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_69ce61cbda2cf85a00abb80d",
+      "name": "Музейный комплекс Верхняя Пышма",
+      "city": "Екатеринбург",
+      "address": "UMMC Museum Complex, ул. Александра Козицына, 2А, Верхняя Пышма, Свердловская обл., Россия, 624091",
+      "events": 1,
+      "type": "MUSEUM_ART_SPACE"
+    },
+    {
+      "id": "venue_6a2001883f970b9635e7a42f",
+      "name": "Курорт Завидово",
+      "city": "Завидово",
+      "address": "Тверская область, Конаковский муниципальный округ, деревня Вараксино, Тверской бульвар, 12",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_5df8e26646c150d57724c398",
+      "name": "Дом культуры МИЭТ",
+      "city": "Зеленоград",
+      "address": "пл. Шокина, 1, стр.2, Зеленоград, Москва, Россия, 124498",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_5f79ecbfc0e894360a3d9f5d",
+      "name": "Музей Филинов и Сов \"Филосовия\"",
+      "city": "Зеленоградск",
+      "address": "Зеленоградск, ул.Тургенева 9в",
+      "events": 1,
+      "type": "MUSEUM_ART_SPACE"
+    },
+    {
+      "id": "venue_64c9267be8c73b509c228504",
+      "name": "NOBEL concert hall",
+      "city": "Ижевск",
+      "address": "Воткинское шоссе 170",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6a15b04306e61f2cce3b3c8c",
+      "name": "Отель Звезда",
+      "city": "Иркутск",
+      "address": "ул. Ядринцева, 1",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_643279d5afd1ffd3c6b24ef7",
+      "name": "Сопрано",
+      "city": "Иркутск",
+      "address": "Култукская ул., 99",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_63033fd80ec572453e0d899f",
+      "name": "ЦСИ \"Огонь\"",
+      "city": "Иркутск",
+      "address": "Иркутск, Марата, 11",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_5d5274251f64843845631dba",
+      "name": "The FOX-Паб",
+      "city": "Йошкар-Ола",
+      "address": "улица Воинов-Интернационалистов, 18",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_56af72c29cb53845e8bf5f6f",
+      "name": "ДК им. ХХХ-летия Победы",
+      "city": "Йошкар-Ола",
+      "address": "Первомайская ул., 109",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_tep_1210",
+      "name": "Место отправления Teplohod",
+      "city": "Казань",
+      "address": null,
+      "events": 1,
+      "type": "PIER"
+    },
+    {
+      "id": "venue_692891e841df799c88b9e931",
+      "name": "аэропорт Храброво",
+      "city": "Калининград",
+      "address": "аэропорт Храброво",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_5af567a7515e35001da78af3",
+      "name": "Дворец Культуры КТЗ",
+      "city": "Калуга",
+      "address": "Московская улица, 212",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6905a77e99296baee8e65dd9",
+      "name": "SOBRANIE LOUNGE BAR",
+      "city": "Киров (Кировская область)",
+      "address": "ул. Пристанская, 1Б",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_58aa24a1515e35001546b75d",
+      "name": "The Rock Bar",
+      "city": "Краснодар",
+      "address": "ул. Горького, 104",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_638f346c1eac7f1283e1f413",
+      "name": "КРОП Арена",
+      "city": "Краснодар",
+      "address": "ул. Путевая, 5/1",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_69a45a33165aa66df71e306c",
+      "name": "База отдыха «Зов Предков»",
+      "city": "Красноярск",
+      "address": "Улица 70 лет Октября, 12, с. Ефремкино, Ширинский район, Республика Хакасия",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_694ec766565515e217c34742",
+      "name": "Стендап-клуб Хэдлайнер",
+      "city": "Красноярск",
+      "address": "Молокова 56",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_613ef6881cfa24db6a836395",
+      "name": "Дворец Культуры",
+      "city": "Красный Сулин",
+      "address": "г. Красный Сулин, ул. Культуры,1",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_5b2266a7515e35001fecc236",
+      "name": "​Центр Культуры и Досуга",
+      "city": "Куровское",
+      "address": "Вокзальная улица, 7",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_674f1077e172585981f25d62",
+      "name": "Underground",
+      "city": "Липецк",
+      "address": "ул. Белянского с7",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_684af4945dcd79a8559f0e34",
+      "name": "Пляж санатория \"Мечта\"",
+      "city": "Липецк",
+      "address": "Капитанщино, Липецкая область, Россия",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_690341027421b16319714e1e",
+      "name": "\"Квартира с видом\"",
+      "city": "Москва",
+      "address": "Большая татарская, 5",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_698bace91d0f60c8124016ca",
+      "name": "Atlas",
+      "city": "Москва",
+      "address": "Столярный переулок д 3 к17",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_61c7478db9bfd750434ae646",
+      "name": "Atmosphere",
+      "city": "Москва",
+      "address": "Шмитовский пр., 32А, стр. 1",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_63985a2fcae029a4d9184fee",
+      "name": "BASE",
+      "city": "Москва",
+      "address": "ул. Орджоникидзе, 11с1",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_65b792f78894baa69b92b0dc",
+      "name": "Black Loft (by Bolshevik Loft)",
+      "city": "Москва",
+      "address": "Ленинградский проспект 15 стр 1",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6863e4f5f21530c9c9a44182",
+      "name": "DEX",
+      "city": "Москва",
+      "address": "Шарикоподшипниковская ул., 13, с32",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_68406a8efd2b30ee7ce47b68",
+      "name": "ECLIPSE MOON",
+      "city": "Москва",
+      "address": "Переведеновский пер., д. 17, корп. 1, Москва, Россия, 105082",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6a4b70c81a8d9918f406d302",
+      "name": "Jamaa",
+      "city": "Москва",
+      "address": "1-ый Красногвардейский 21/2",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_68b8507ea44b779b35d7beb3",
+      "name": "Live Stars",
+      "city": "Москва",
+      "address": "Москва, Берсеневский переулок, дом 5, стр. 2",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_58b69bf1515e3500159b31aa",
+      "name": "MEZZO FORTE CLUB",
+      "city": "Москва",
+      "address": "Москва, метро \"ВДНХ\", Ул. 1-я Останкинская стр. 53, (Торговый Центр)",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_59b520e0515e350019b8de2a",
+      "name": "Moscow Raceway",
+      "city": "Москва",
+      "address": "Шелудьково",
+      "events": 1,
+      "type": "SPORT_ACTIVITY_SPACE"
+    },
+    {
+      "id": "venue_65bbbb2b357ff28836bd9ebd",
+      "name": "PRAVDA ЛЕТО",
+      "city": "Москва",
+      "address": "Варшавское шоссе, 26с12",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_59e5df33d35286001beeaeda",
+      "name": "Soho Rooms",
+      "city": "Москва",
+      "address": "Саввинская наб., д. 12, стр. 8",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_6a22b2c3df8634edd303afca",
+      "name": "The Hole",
+      "city": "Москва",
+      "address": "ул. Маросейка, 2/15с1",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6623c60d0b3f696aa5792300",
+      "name": "VK Музыка Летом",
+      "city": "Москва",
+      "address": "Шмитовский пр-д, 32а",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6a30283da1aa76a62c3177ea",
+      "name": "Банковский переулок 2/5",
+      "city": "Москва",
+      "address": "м. Тургеневская, Чистые Пруды, Сретенский бульвар",
+      "events": 1,
+      "type": "MUSEUM_ART_SPACE"
+    },
+    {
+      "id": "venue_69b96b65e754987b371dbe07",
+      "name": "ВК Стадиум",
+      "city": "Москва",
+      "address": "Ленинградский пр-т, д. 80, стр. 17",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6a47b47484bce9a476f74c94",
+      "name": "Веранда Китайского Летчика Джао Да",
+      "city": "Москва",
+      "address": "Лубянский проезд, 25, стр. 1",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_64b51897c24fb942a78793eb",
+      "name": "Встреча на улице, у выхода из метро «Смоленская» Арбатско-Покровской линии",
+      "city": "Москва",
+      "address": "Встреча на улице, у выхода из метро «Смоленская» Арбатско-Покровской линии",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_643d817bd6b254106575ffff",
+      "name": "Встреча — на улице у выхода №2 м.Чистые пруды",
+      "city": "Москва",
+      "address": "Встреча — на улице у выхода №2 м.Чистые пруды",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_6997eb0d137bc92705d801bc",
+      "name": "Глэмпинг «Просто COSMOS»",
+      "city": "Москва",
+      "address": "Калужская область, Малоярославецкий район, деревня Самсыкино, улица Прудовая 22.",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_65785bb3a13352f37cd5095c",
+      "name": "Гостиница Измайлово «Бета»",
+      "city": "Москва",
+      "address": "Измайловское ш., 71, корпус 2Б",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_6468e0edce28fce3d3d2c369",
+      "name": "Графит",
+      "city": "Москва",
+      "address": "Электродная 2с32",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_68d426d97e7f0d207661e5d7",
+      "name": "ДК «Юность»",
+      "city": "Москва",
+      "address": "110А, Березняки, Московская обл., Россия, 141357. Т",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_69ef938ef119058e001c8aca",
+      "name": "Дача Бородино",
+      "city": "Москва",
+      "address": "Московская область, Можайский муниципальный округ, д. Семёновское, 6",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_64c1754ccfd9eebe1300378f",
+      "name": "Дмитровский р-он Подмосковья",
+      "city": "Москва",
+      "address": "Дмитровский р-он Подмосковья",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_57602c369cb5383aa0f99ac5",
+      "name": "Дом Союзов",
+      "city": "Москва",
+      "address": "125009, Москва, ул. Большая Дмитровка, 1",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_5d4c94a63eebe79526dc0076",
+      "name": "Донская площадь, 1-3",
+      "city": "Москва",
+      "address": "Донская площадь, 1-3",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_6a34253f25615467e064ade2",
+      "name": "Институт МИЭТ",
+      "city": "Москва",
+      "address": "Москва, площадь Шокина, 1",
+      "events": 1,
+      "type": "MUSEUM_ART_SPACE"
+    },
+    {
+      "id": "venue_6752eb88417c76a8dc3ef2ef",
+      "name": "КЗ Измайлово малый зал",
+      "city": "Москва",
+      "address": "Москва, Измайловское шоссе, д.71, корп.5",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_699969fa9b2b7599baf0055e",
+      "name": "КЛУБ \"ИСИДА\"",
+      "city": "Москва",
+      "address": "Набережная Тараса Шевченко 23А сектор С  2 этаж",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_651c25e22683921a5e7b8252",
+      "name": "Концертный зал «Москва»",
+      "city": "Москва",
+      "address": "Москва, проспект Андропова, 1",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_5d70b8362fa47e82de5e7773",
+      "name": "Креативное пространство LovelyLOFT",
+      "city": "Москва",
+      "address": "Большая Семеновская улица, 42с6",
+      "events": 1,
+      "type": "SPORT_ACTIVITY_SPACE"
+    },
+    {
+      "id": "venue_6a3afc5ee5cc3a74b1ffc905",
+      "name": "Культ Гараж",
+      "city": "Москва",
+      "address": "ул. Ивана Франко, вл. 2",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_647f14d0b583497e00682c07",
+      "name": "Лабораторный корпус Главного ботанического сада им. Н. В. Цицина РАН",
+      "city": "Москва",
+      "address": "Москва, ул. Ботаническая, д. 4, стр. 1 (м. «Владыкино»).",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_6471c4705f88ee32794e6a52",
+      "name": "Лебединое озеро",
+      "city": "Москва",
+      "address": "ул. Крымский Вал, 9, стр. 22, Москва, Россия, 119049",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_5a82c349519f7b001c929cdd",
+      "name": "Москва",
+      "city": "Москва",
+      "address": "Центр Москвы",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6257358d23891713a3cceb56",
+      "name": "Никольская, 15",
+      "city": "Москва",
+      "address": "Никольская, 15",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_644a33eb813950e190f4a8f8",
+      "name": "Отель Метрополь",
+      "city": "Москва",
+      "address": "ул. Театральный пр-д, 2",
+      "events": 1,
+      "type": "THEATER"
+    },
+    {
+      "id": "venue_57bf24849cb5384a6e8fd49b",
+      "name": "Парк киноприключений \"Мастер Панин\"",
+      "city": "Москва",
+      "address": "2-й Сетуньский проезд, д. 3 стр. 1",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_5cd1bf3d079a40000c1e0639",
+      "name": "Петровский путевой дворец",
+      "city": "Москва",
+      "address": "Москва, Ленинградский пр-т, 40 / 40, Leningradsky prospect, Moscou",
+      "events": 1,
+      "type": "MUSEUM_ART_SPACE"
+    },
+    {
+      "id": "venue_6857c51ed6f99f614adda2c8",
+      "name": "Проходная МГТУ",
+      "city": "Москва",
+      "address": "2-я Бауманская улица 5 с.12",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_65532010f827f709ca156104",
+      "name": "Ресторан «Сенполия»",
+      "city": "Москва",
+      "address": "ул. Житная, 10",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_64759f515af2290af4248178",
+      "name": "Сад Шредера",
+      "city": "Москва",
+      "address": "Сад Шредера",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_58206229515e3500168592ca",
+      "name": "Сандуновские бани",
+      "city": "Москва",
+      "address": "Неглинная, 14, стр. 3-7",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_6a3cfd661ba82c0b7b173751",
+      "name": "Сбор у входа в кинотеатр \"Художественный\"",
+      "city": "Москва",
+      "address": "м Арбатская",
+      "events": 1,
+      "type": "THEATER"
+    },
+    {
+      "id": "venue_647cd271cd421b640bb2a4c1",
+      "name": "Северный речной вокзал, Теплоход \"Союз\"",
+      "city": "Москва",
+      "address": "Северный речной вокзал",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_69dd1a2f926f26722c56cdbd",
+      "name": "Теплоход \"РИО1\"",
+      "city": "Москва",
+      "address": "Северный речной вокзал, причал №1",
+      "events": 1,
+      "type": "PIER"
+    },
+    {
+      "id": "venue_69cfde40c357828876af70a8",
+      "name": "Теплоход \"Светоч\"",
+      "city": "Москва",
+      "address": "Набережная и причал будут известны позже, всем купившим билеты будет сделана рассылка.",
+      "events": 1,
+      "type": "PIER"
+    },
+    {
+      "id": "venue_69e88ecf9ebd6a3e2437c4c2",
+      "name": "Теплоход РИО-1 2026",
+      "city": "Москва",
+      "address": "пр-д Досфлота, 16к1 (Причал Захарково)",
+      "events": 1,
+      "type": "PIER"
+    },
+    {
+      "id": "venue_63022db55c3532b64ea4012e",
+      "name": "У входа в Манеж",
+      "city": "Москва",
+      "address": "У входа в Манеж",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_6a302150fbfeb8d1107a573e",
+      "name": "Фонтан-ротонда «Наталья и Александр»",
+      "city": "Москва",
+      "address": "м. Арбатская, Пушкинская",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_572b3ea79cb5384b3c3a262a",
+      "name": "Фрунзенская",
+      "city": "Москва",
+      "address": "Комсомольский проспект, 28",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_693ee7c2057272585f617f04",
+      "name": "Цирк шапито \"FantastiC\"",
+      "city": "Москва",
+      "address": "пгт Боброво, ул. Крымская 33/1",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_6a0c6419ad6bf0ef3288c265",
+      "name": "г. Черноголовка",
+      "city": "Москва",
+      "address": "Встреча возле памятника отцам-основателям",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_66212f8077bdbd90241d0c55",
+      "name": "м. ВДНХ",
+      "city": "Москва",
+      "address": "у выхода №5",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_67f680712b0a0e187ed0f2c8",
+      "name": "м. Маяковская, Баррикадная",
+      "city": "Москва",
+      "address": "Садовая-Кудринская ул. 15, стр.1,",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_61e09ae3c8cf14cf5a7f8d95",
+      "name": "метро Аннино",
+      "city": "Москва",
+      "address": "Аннино",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_67da93abe57d2588613f3d3c",
+      "name": "метро Ботанический сад",
+      "city": "Москва",
+      "address": "метро Ботанический сад",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_62c705e486c05a292f94aec3",
+      "name": "Клуб Опера",
+      "city": "Набережные Челны",
+      "address": "Московский просп., 140, БЦ Форт Диалог, этаж 2",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_69bbfe1f2ee525bbfd1dab84",
+      "name": "клуб МОЁТ",
+      "city": "Нефтекамск",
+      "address": "ул. Парковая, 12",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_610a549405c3967cf581df24",
+      "name": "ALCATRAZ",
+      "city": "Нижний Новгород",
+      "address": "улица Почаинская, 21Б",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_62fe35971ce66b113f7f180a",
+      "name": "Alcatraz Bar",
+      "city": "Нижний Новгород",
+      "address": "ул. Почаинская, 17С",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_5c7038ef7500ae000ca8bf9c",
+      "name": "Cargo Cult",
+      "city": "Нижний Новгород",
+      "address": "Почаинская ул., 17ж",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_64241d418e3ee3fe39bde55e",
+      "name": "NENAVIST'",
+      "city": "Нижний Новгород",
+      "address": "Нижневолжская набережная 19к1",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_615f295433028f964a77ffe2",
+      "name": "NENAVIST'",
+      "city": "Нижний Новгород",
+      "address": "Нижневолжская набережная, 19к1",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_698f02c22c3b4bb469e98598",
+      "name": "Premio",
+      "city": "Нижний Новгород",
+      "address": "ул. Нижне-Волжская наб., д.1В",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_68f0ffd1ee91f4903e41cac0",
+      "name": "StandUp NN",
+      "city": "Нижний Новгород",
+      "address": "Рождественская, 10",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_5c94e42ac4927c000bdb8c34",
+      "name": "Автодром Нижегородское Кольцо",
+      "city": "Нижний Новгород",
+      "address": "Нижегородская область, Богородский район, зона Нижегородское кольцо, 1",
+      "events": 1,
+      "type": "SPORT_ACTIVITY_SPACE"
+    },
+    {
+      "id": "venue_5bd835ffaa230a000b033af3",
+      "name": "Дворец спорта \"Нагорный\"",
+      "city": "Нижний Новгород",
+      "address": "проспект Гагарина, 29",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_655ee8c3e0565283ae27fd10",
+      "name": "Руки ВВерх! Бар",
+      "city": "Нижний Новгород",
+      "address": "Нижневолжская наб., 23",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_68cc0923d0557378f31c7ea4",
+      "name": "КДЦ Рондо",
+      "city": "Новое Девяткино",
+      "address": "Школьная ул., 6",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6279fa8d6863ceb704c90ba6",
+      "name": "Три толстяка",
+      "city": "Новокузнецк",
+      "address": "ул. Народная, 9а",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_61a623319fffadc2c896e13b",
+      "name": "Честная пивоварня Домна",
+      "city": "Новокузнецк",
+      "address": "просп. Строителей, 82А",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_66752c508c757187b96f13f1",
+      "name": "Гоночный трек STROKER",
+      "city": "Новосибирск",
+      "address": "поселок садовый,орц нордмолл",
+      "events": 1,
+      "type": "SPORT_ACTIVITY_SPACE"
+    },
+    {
+      "id": "venue_67e7a67aa7e7cf04813e1372",
+      "name": "Клуб FASOLЬ",
+      "city": "Новосибирск",
+      "address": "ТЦ \"Горский\", 5 этаж, ул. Немировича-Данченко, 142, Новосибирск, Новосибирская обл., Россия, 630087",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_6011fb14a9733791f8aae4f6",
+      "name": "Лофт-парк \"Подземка\" (зал \"Особенный\")",
+      "city": "Новосибирск",
+      "address": "Красный проспект, (161Б)",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_66a53013f4b1980787e3c686",
+      "name": "Новосибирская специальная музыкальная школа",
+      "city": "Новосибирск",
+      "address": "Комсомольский проспект 20",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_57837d3c9cb53852e7c26aec",
+      "name": "Дом Ученых",
+      "city": "Обнинск",
+      "address": "пр-т Ленина, д.129",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_68bdbe0321235acdf40609e2",
+      "name": "Rock Club",
+      "city": "Омск",
+      "address": "ул. Лермонтова, 63",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_5c3660143a60af000c0ff597",
+      "name": "ГЦНТ Дворец им. Малунцева",
+      "city": "Омск",
+      "address": "пр. Мира, 58",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_68931d82f0c72ec268ee98f6",
+      "name": "Ресторан Пеликан",
+      "city": "Омск",
+      "address": "Иртышская Набережная, 12",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_614b4da1a5ea9e968b02b51d",
+      "name": "Long Way Bar",
+      "city": "Оренбург",
+      "address": "Ул. Кирова, 31",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_5daaf73759e939205a06fde4",
+      "name": "ДК Россия",
+      "city": "Оренбург",
+      "address": "Проспект Победы 140",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_605c3bfcce3646107a63a1d8",
+      "name": "Live Pub",
+      "city": "Орехово-Зуево",
+      "address": "ул. Ленина, 20, Орехово-Зуево, Московская обл., Россия, 142600",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_56c196839cb5384142f20f1d",
+      "name": "Киноконцертный Зал Пенза",
+      "city": "Пенза",
+      "address": "ул. Бакунина 147",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_697393a9e30a3649216c43af",
+      "name": "“VL Кино” (Высшая лига)",
+      "city": "Пенза",
+      "address": "ул. Московская, 37, Пенза, Пензенская обл., Россия, 440000",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6a05ec8bb4f0c4ae9990d48b",
+      "name": "АМАКС Премьер-отель",
+      "city": "Пермь",
+      "address": "ул. Монастырская, 43",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_69f04d546ab14033e4823efe",
+      "name": "Парма Валлей",
+      "city": "Пермь",
+      "address": "Гувашер, Пермский край, Россия",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_5c7d0808a5c32c000b8cac6c",
+      "name": "Ресторан Кама",
+      "city": "Пермь",
+      "address": "ул. Сибирская, 25",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_582c46d4d352860016126adf",
+      "name": "Центр Городской Культуры",
+      "city": "Пермь",
+      "address": "ул. Пушкина, 15, Пермь, Пермский край, Россия, 614045",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_632c49ef58796b61d00011b0",
+      "name": "МУК ДК им Лепсе",
+      "city": "Подольск",
+      "address": "Революционный проспект 27",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_61c9d4d4c308674d1dbc39a9",
+      "name": "Pod3emka Club",
+      "city": "Ростов-на-Дону",
+      "address": "пер. Сельмаш. 3",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_69e9d42751b5074117d2ddee",
+      "name": "Volna Bar",
+      "city": "Ростов-на-Дону",
+      "address": "Береговая ул., 10",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_5a6f0298515e35001daaca2b",
+      "name": "ДК \"Ростсельмаш\"",
+      "city": "Ростов-на-Дону",
+      "address": "пр. Сельмаш, 3",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_5804e7849cb538780c12249b",
+      "name": "Клуб \"МЁД\"",
+      "city": "Ростов-на-Дону",
+      "address": "Красноармейская, 157",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_694bf4d9073f37b53c4db88f",
+      "name": "Ресторан Две Рульки",
+      "city": "Ростов-на-Дону",
+      "address": "пр. космонавтов, 27в",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_6a3bcdfe843a0f756ab0dbd3",
+      "name": "Центр креативных индустрий",
+      "city": "Ростов-на-Дону",
+      "address": "121, Большая Садовая улица, Ростов-на-Дону",
+      "events": 1,
+      "type": "THEATER"
+    },
+    {
+      "id": "venue_585946a5d3528600152c3b69",
+      "name": "ДК \"Вымпел\"",
+      "city": "Рыбинск",
+      "address": "Кораблестроителей, 6",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_64ff04be0484c768b118509b",
+      "name": "Art Club Площадка",
+      "city": "Рязань",
+      "address": "Заводской проезд, 1",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_6479a8125698963a6bcbb8bf",
+      "name": "КЗ Сигнал",
+      "city": "Самара",
+      "address": "ул. Лесная 23, корпус 2",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_564daddb9cb53871ecc5db29",
+      "name": "Окружной Дом Офицеров",
+      "city": "Самара",
+      "address": "ул. Шостаковича, д.7",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_65c1d1f760a88120286305b1",
+      "name": "СКК \"Дворец Спорта имени Владимира Высоцкого\"",
+      "city": "Самара",
+      "address": "Молодогвардейская ул., 222",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_680941341b9f07a13a2daf65",
+      "name": "Склон",
+      "city": "Самара",
+      "address": "Рябиновая ул., 6, село Малая Царевщина",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_5f497fb21ff352e2ffa13b77",
+      "name": "Art Lab Medovarus",
+      "city": "Санкт-Петербург",
+      "address": "Мучной пер. д5",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_66a616f5aeab507e0f84a9c9",
+      "name": "BASE",
+      "city": "Санкт-Петербург",
+      "address": "Кондратьевский проспект, 44",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_691ca652237a0cb9f621b719",
+      "name": "Cookforia Дыбенко",
+      "city": "Санкт-Петербург",
+      "address": "ул. Дыбенко, 8к1",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_691c9e4c88983941ca237df1",
+      "name": "Cookforia Московский",
+      "city": "Санкт-Петербург",
+      "address": "Московский пр, 183-185",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_6a33f3839fa9118f762cb1b2",
+      "name": "FORTNIGHT",
+      "city": "Санкт-Петербург",
+      "address": "2VRG+54 Кронштадтский район, Санкт-Петербург, Россия",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_6a45707adc665c7c2fbed4c4",
+      "name": "SAVANA",
+      "city": "Санкт-Петербург",
+      "address": "Приморский 72 , Питерлэнд",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_5e4c19a341fa1815019d222e",
+      "name": "Union",
+      "city": "Санкт-Петербург",
+      "address": "Литейный 55",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_607ee846c016751ef91ea51c",
+      "name": "Автодром \"Игора Драйв\"",
+      "city": "Санкт-Петербург",
+      "address": "Ленинградская обл., Приозерский р-н, Сосновское сельское поселение, Дер. Новожилово, Приозерское ш. д.3, к.2",
+      "events": 1,
+      "type": "SPORT_ACTIVITY_SPACE"
+    },
+    {
+      "id": "venue_6a149f1ceb1725530513edcc",
+      "name": "В гостях у Астхик",
+      "city": "Санкт-Петербург",
+      "address": "Жуковского 59-61, кв. 11",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_596cd724d35286001a812dff",
+      "name": "Выборгский Дворец Культуры",
+      "city": "Санкт-Петербург",
+      "address": "ул. Комиссара Смирнова, 15",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_691c24a665fe7fa4103dd158",
+      "name": "Гостиница \"Октябрьская\"",
+      "city": "Санкт-Петербург",
+      "address": "Лиговский проспект 10",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_67c879e2c7cd0013e01b3e4f",
+      "name": "Дацан интерьерная экскурсия",
+      "city": "Санкт-Петербург",
+      "address": "Приморский пр-т д 91",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_69f44a7ef6431c02b00c8419",
+      "name": "Дворец Кваренги (Freedom)",
+      "city": "Санкт-Петербург",
+      "address": "Казанская ул., 7",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_569f95119cb53844145e9b7f",
+      "name": "Дворец искусств Ленинградской области (ДК Горького) /// Palace of Arts of the Leningrad region (DK A.M.Gorky)",
+      "city": "Санкт-Петербург",
+      "address": "пл. Стачек, д.4 /// Stachek square, 4",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6721eb8c9a1cefd59d089222",
+      "name": "Дом Народного Творчества",
+      "city": "Санкт-Петербург",
+      "address": "Прилукская ул., 37",
+      "events": 1,
+      "type": "THEATER"
+    },
+    {
+      "id": "venue_5654ee5d9cb53824ad74bec4",
+      "name": "Дом офицеров Западного военного округа",
+      "city": "Санкт-Петербург",
+      "address": "Литейный проспект, д. 20",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_5c2a5b620b9253000c1daefc",
+      "name": "Ионотека",
+      "city": "Санкт-Петербург",
+      "address": "Лиговский 50 корпус 16",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_69e108a0ca607ce900489954",
+      "name": "Клуб А2",
+      "city": "Санкт-Петербург",
+      "address": "пр. Медиков, 3",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_6a1d2bd4a60aea8b2c68fdff",
+      "name": "Мюзик Холл Дворца Кваренги",
+      "city": "Санкт-Петербург",
+      "address": "Казанская ул., 7",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_64e7916ebfa192ec54efea0f",
+      "name": "Особняк Брусницыных",
+      "city": "Санкт-Петербург",
+      "address": "Кожевенная линия д.27",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_6a426d66c14f2ecf937378a8",
+      "name": "Причал у Новой Голландии",
+      "city": "Санкт-Петербург",
+      "address": "Набережная реки Мойки 120",
+      "events": 1,
+      "type": "PIER"
+    },
+    {
+      "id": "venue_6494563a11c674e1d1ca1295",
+      "name": "Ресторан \"Крыша 18\"",
+      "city": "Санкт-Петербург",
+      "address": "Петроградская набережная, 18",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_64aeaff3c346f98f2bd814d6",
+      "name": "Российская национальная библиотека",
+      "city": "Санкт-Петербург",
+      "address": "Московский проспект, 165, корп. 2",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_6a4b858921d4fca102f90789",
+      "name": "Русское географическое общество",
+      "city": "Санкт-Петербург",
+      "address": "переулок Гривцова, 10",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_55a91e6a9cb5385a9a691ed9",
+      "name": "СК \"Юбилейный\"",
+      "city": "Санкт-Петербург",
+      "address": "Добролюбова, 18",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_59f4b4c6515e35001ad8b0e6",
+      "name": "Театральная долина",
+      "city": "Санкт-Петербург",
+      "address": "13-я линия В.О., д.70, 2 этаж",
+      "events": 1,
+      "type": "THEATER"
+    },
+    {
+      "id": "venue_66d9bbb0defcce74c58fbac4",
+      "name": "SUMMER JAM",
+      "city": "Саранск",
+      "address": "ул. Васенко, 9, Саранск, Респ. Мордовия, Россия, 430001",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_61ea78b2104878bc76e0a40e",
+      "name": "Дворец культуры и искусств МГУ им. Н.П. Огарёва",
+      "city": "Саранск",
+      "address": "ул. Полежаева, 44,  к3",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_56d0ab669cb5384d9563f8d0",
+      "name": "Machine Head",
+      "city": "Саратов",
+      "address": "Октябрьская, 43",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6a3bfa50dcb6d750ca5bdbdb",
+      "name": "Концертный зал \"Слово жизни\"",
+      "city": "Саратов",
+      "address": "Чернышевского 88",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6952fcae1b43a9cf40b6b8fe",
+      "name": "Балаган 38",
+      "city": "Севастополь",
+      "address": "проспект Октябрьской Революции, 38/7",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6a25901082ff4dd32a612a51",
+      "name": "Santa Barbara Bar",
+      "city": "Симферополь",
+      "address": "Екатерининская улица 28",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_5c1a60b91f51ea000b0b9d82",
+      "name": "Дворец культуры профсоюзов",
+      "city": "Симферополь",
+      "address": "Киевская, 115",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_60a0346937a97ab255f89913",
+      "name": "Ресторан Паруса",
+      "city": "Сочи",
+      "address": "ул. Черноморская, 11к2",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_689ccff60914713af51002ef",
+      "name": "музей Н.А. Островского",
+      "city": "Сочи",
+      "address": "Адрес: Сочи, ул. Корчагина, 4",
+      "events": 1,
+      "type": "MUSEUM_ART_SPACE"
+    },
+    {
+      "id": "venue_5d4062e112cd536e27b41c19",
+      "name": "Rock Bar by Abrikos Inc.",
+      "city": "Ставрополь",
+      "address": "ул. Пирогова, 63Б",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_693ab1b1af349b1c0aa2d88e",
+      "name": "Концерт ХОЛЛ",
+      "city": "Ставрополь",
+      "address": "Серова 462а",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_66d5f9aa444d964799015478",
+      "name": "Ставропольский городской дом культуры",
+      "city": "Ставрополь",
+      "address": "пр. Октябрьской Революции, 4",
+      "events": 1,
+      "type": "THEATER"
+    },
+    {
+      "id": "venue_62829d8fa751f350176b34e8",
+      "name": "РестоБар «БОЛЬШОЙ»",
+      "city": "Стерлитамак",
+      "address": "ул. Некрасова, 1Б",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_67cf11d17ce379b6beeae018",
+      "name": "Клуб \"Маяковский\"",
+      "city": "Сыктывкар",
+      "address": "ул. Куратова, 73/6",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_69941f5b6a63098a4494f695",
+      "name": "Синдикат",
+      "city": "Сыктывкар",
+      "address": "Сыктывкар, ул.Первомайская д.92",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6a450fe7c3233eb72af259a0",
+      "name": "Бар \"BQ\"",
+      "city": "Тольятти",
+      "address": "15, Лесопарковое шоссе, Тольятти, Самарская область",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_678e7946f5f375dda0dac305",
+      "name": "ДК Тольяттиазот",
+      "city": "Тольятти",
+      "address": "ул. Коммунистическая, 12, Тольятти, Самарская обл., Россия, 445012",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_61c56d959670fb0437e2e773",
+      "name": "Рок-бар Варяг",
+      "city": "Томск",
+      "address": "просп. Ленина, д. 104",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_6751bcf5823a4dc1df4c179c",
+      "name": "MINI by Concert Hall",
+      "city": "Тула",
+      "address": "наб. Дрейера, 54",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_587e0801515e350017c0e7e8",
+      "name": "Глав клуб \t",
+      "city": "Тюмень",
+      "address": "ул. Максима Горького, 44/3",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_5dcd94b300d13d83bc579d39",
+      "name": "ДК Нефтяник",
+      "city": "Тюмень",
+      "address": "ул. Осипенко, 1",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_588f14a0515e350018392700",
+      "name": "Дворец Культуры \"Железнодорожник\"",
+      "city": "Тюмень",
+      "address": "ул. Первомайская, 55",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6a3155287ed89673f663764e",
+      "name": "Своя набережная",
+      "city": "Тюмень",
+      "address": "г. Тюмень, улица Госпаровская 5 строение 5",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_66a8744a02f0ecd221dcc477",
+      "name": "Цоколь",
+      "city": "Тюмень",
+      "address": "ул. 50 лет ВЛКСМ, 63",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_69c92dab3da3b1667fd40db3",
+      "name": "Бар 41",
+      "city": "Улан-Удэ",
+      "address": "ул. Банзарова, 41",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_687f980c249f577aba5186ea",
+      "name": "Дворец Книги",
+      "city": "Ульяновск",
+      "address": "Карамзина пер., 3/2, Ульяновск, Ульяновская обл., Россия, 432000",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_5e5a5c03535e078a31defb5b",
+      "name": "Арт-квадрат",
+      "city": "Уфа",
+      "address": "Чернышевского 88",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_5a2017f6515e35001b5e4191",
+      "name": "Башкирская государственная филармония имени Хусаина Ахметова",
+      "city": "Уфа",
+      "address": "ул. Гоголя, д. 58",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6050a29ab5dbc5a2904b47ed",
+      "name": "Гостиница «Президент отель»",
+      "city": "Уфа",
+      "address": "ул. Авроры, 2",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_58a2dd23d352860016d39503",
+      "name": "МБУ «Городской дворец культуры» ГО г. Уфы РБ",
+      "city": "Уфа",
+      "address": "проспект Октября, 137",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_630cd1d095cfa4cf019cf8be",
+      "name": "Руки Вверх Бар",
+      "city": "Ухта",
+      "address": "пр. Ленина, 40а, Ухта, Респ. Коми, Россия, 169300",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_6a15ad4554c32959d2727a5d",
+      "name": "Дом культуры для молодежи и населения",
+      "city": "Хабаровск",
+      "address": "ул. Световая, 9",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_5d704da2a635e24b586651f0",
+      "name": "SK BAR клуб",
+      "city": "Чебоксары",
+      "address": "улица Карла Маркса, 47",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_698f0f0a50bfae850de6e02f",
+      "name": "Малахит",
+      "city": "Челябинск",
+      "address": "ул. Труда, 153",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_6a06b73e6f8e9c633866e7f4",
+      "name": "Эвент-Холл Маркштадт",
+      "city": "Челябинск",
+      "address": "ул. Карла Маркса, 131",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_609a44a7def9ddd10220f528",
+      "name": "Цирк шапито \"FantastiC\"",
+      "city": "Чехов (Московская область)",
+      "address": "улица Полиграфистов, 30.",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_6a33b6ae67448d9cadaa6d0f",
+      "name": "Мол Бар",
+      "city": "Чита",
+      "address": "ул. Бабушкина, 104",
+      "events": 1,
+      "type": "CLUB_BAR_RESTAURANT"
+    },
+    {
+      "id": "venue_6a47622fb86b870e166a4408",
+      "name": "Муниципальное бюджетное учреждение культуры \"Районный дом народного творчества\"",
+      "city": "Яранск",
+      "address": "ул. Карла Маркса, 22",
+      "events": 1,
+      "type": "CONCERT_HALL"
+    },
+    {
+      "id": "venue_6a27dac6bb647d78f2fcc043",
+      "name": "Цирк шапито \"Маска\" за автовокзалом",
+      "city": "Яровое",
+      "address": "ул. Кулундинская, 54Б",
+      "events": 1,
+      "type": "MEETING_POINT"
+    },
+    {
+      "id": "venue_tep_1130",
+      "name": "Место отправления Teplohod",
+      "city": "Ярославль",
+      "address": null,
+      "events": 1,
+      "type": "PIER"
+    }
+  ]
+}

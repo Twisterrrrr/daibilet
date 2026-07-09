@@ -14,10 +14,19 @@ import { LOCATION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, venueTypeLabel } fro
 import { venueCatalogHref, venueHref } from '@/routes';
 import type { PublicVenue } from '@/types';
 
+type SortMode = 'events' | 'asc' | 'desc';
+
+const SORT_OPTIONS: Array<[SortMode, string]> = [
+  ['events', 'По афише'],
+  ['asc', 'А–Я'],
+  ['desc', 'Я–А'],
+];
+
 export function LocationsCatalogPage() {
   const [query, setQuery] = React.useState('');
   const [cityFilter, setCityFilter] = React.useState('all');
   const [typeFilter, setTypeFilter] = React.useState('all');
+  const [sortMode, setSortMode] = React.useState<SortMode>('events');
   const [venues, setVenues] = React.useState<PublicVenue[]>(() => readCachedLocationVenues() || []);
   const [isLoading, setIsLoading] = React.useState(() => !readCachedLocationVenues()?.length);
 
@@ -77,7 +86,7 @@ export function LocationsCatalogPage() {
 
   const filteredVenues = React.useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    return venues.filter((venue) => {
+    const filtered = venues.filter((venue) => {
       if (cityFilter !== 'all' && venue.city !== cityFilter) return false;
       if (typeFilter !== 'all' && normalizeVenueKind(venue.type) !== typeFilter) return false;
       if (!normalized) return true;
@@ -87,7 +96,13 @@ export function LocationsCatalogPage() {
         .toLowerCase()
         .includes(normalized);
     });
-  }, [venues, query, cityFilter, typeFilter]);
+
+    return [...filtered].sort((left, right) => {
+      if (sortMode === 'events') return right.events - left.events || left.name.localeCompare(right.name, 'ru');
+      if (sortMode === 'desc') return right.name.localeCompare(left.name, 'ru');
+      return left.name.localeCompare(right.name, 'ru');
+    });
+  }, [venues, query, cityFilter, typeFilter, sortMode]);
 
   const goSection = (section: string) => {
     if (section === 'top') window.location.href = '/';
@@ -186,14 +201,27 @@ export function LocationsCatalogPage() {
       </div>
 
       <div className="container-page py-8">
-        <div className="mb-4 flex items-baseline justify-between gap-3">
+        <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
           <h2 className="text-lg font-semibold text-slate-900">
             Найдено: {formatNumber(filteredVenues.length)}
             {!isLoading && venues.length ? <span className="font-normal text-slate-500"> из {formatNumber(venues.length)}</span> : null}
           </h2>
-          <a href={venueCatalogHref('institution')} className="text-sm font-semibold text-primary-600 hover:underline">
-            Площадки: музеи и театры →
-          </a>
+          <div className="flex flex-wrap items-center gap-3">
+            <select
+              value={sortMode}
+              onChange={(event) => setSortMode(event.target.value as SortMode)}
+              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none"
+            >
+              {SORT_OPTIONS.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </select>
+            <a href={venueCatalogHref('institution')} className="text-sm font-semibold text-primary-600 hover:underline">
+              Площадки: музеи и театры →
+            </a>
+          </div>
         </div>
 
         {isLoading && !filteredVenues.length ? (
@@ -205,7 +233,7 @@ export function LocationsCatalogPage() {
         ) : filteredVenues.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {filteredVenues.map((venue) => (
-              <LocationCard key={venue.id} venue={venue} href={venueHref(venue)} />
+              <LocationCard key={venue.id} venue={venue} href={venueHref(venue)} nextSlot={venue.nextSlot} />
             ))}
           </div>
         ) : null}

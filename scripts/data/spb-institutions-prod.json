@@ -1,0 +1,452 @@
+[
+  {
+    "id": "venue_696e1409f945800c9283c1e9",
+    "title": "Музей Матрешки",
+    "kind": "MUSEUM_ART_SPACE",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Набережная Лейтенанта Шмидта, дом 33",
+    "events": 1088
+  },
+  {
+    "id": "venue_683e8e0935b8fc7a60f565d3",
+    "title": "Музей Гарри Поттера",
+    "kind": "MUSEUM_ART_SPACE",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Санкт-Петербург, ул. Думская, 4 ТЦ \"Перинные ряды\"",
+    "events": 990
+  },
+  {
+    "id": "venue_5b30cfdd519f7b001a12d8be",
+    "title": "Планетарий 1",
+    "kind": "MUSEUM_ART_SPACE",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "наб. Обводного канала, 74Ц",
+    "events": 445
+  },
+  {
+    "id": "venue_61263f19632b9de5b2a7e27e",
+    "title": "POPRAVKA BAR",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Лиговский проспект, 50 литера Ц",
+    "events": 338
+  },
+  {
+    "id": "venue_5c9b99e362f03f000c48bd3d",
+    "title": "Государственный Эрмитаж",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Дворцовая набережная, 34",
+    "events": 164
+  },
+  {
+    "id": "venue_6632afe40771167d49f4b56c",
+    "title": "Замок на Невском",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Невский проспект 74 -76( 4 этаж)",
+    "events": 94
+  },
+  {
+    "id": "venue_69e9bfc4ad9392868aa5ff62",
+    "title": "Петропавловская крепость. Алексеевский равелин (внутренняя территория, ближе к пляжу со стороны Кронверкского пролива)",
+    "kind": "MUSEUM_ART_SPACE",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Санкт-Петербург, территория Петропавловская крепость, дом 3У. Площадка расположена в западной части Заячьего острова",
+    "events": 62
+  },
+  {
+    "id": "venue_6009628f4511049dd531795d",
+    "title": "Особняк Половцова",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Большая Морская, 52",
+    "events": 38
+  },
+  {
+    "id": "venue_634e87fa44a952d6bee18b2e",
+    "title": "Театр \" Курт\"",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Санкт Петербург Чайковского дом 16 ( вход со двора)",
+    "events": 27
+  },
+  {
+    "id": "venue_677bcb87660c1cf849227b83",
+    "title": "Ателье \"Благородная Гниль\"",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Кадетская линия 5к2 Д",
+    "events": 25
+  },
+  {
+    "id": "venue_59dbb6e1515e35001c9546b0",
+    "title": "Дом Шрёдера",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Петроградская наб, дом 32.",
+    "events": 23
+  },
+  {
+    "id": "venue_688a364c4653f82b8cdd3734",
+    "title": "Музей Карла Буллы",
+    "kind": "MUSEUM_ART_SPACE",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Невский проспект 54",
+    "events": 23
+  },
+  {
+    "id": "venue_69d6989a70a3e5c717a370ec",
+    "title": "Особняк Мясникова",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "ул. Восстания, 45",
+    "events": 21
+  },
+  {
+    "id": "venue_61016d64ad609c06affcd90a",
+    "title": "HOMIE Bar",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Литейный проспект, 17-19",
+    "events": 20
+  },
+  {
+    "id": "venue_5dbb038b181410abd3cc7996",
+    "title": "Оранжерея Таврического сада",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "ул Шпалерная, 43",
+    "events": 20
+  },
+  {
+    "id": "venue_683a29c7faf11ad0ef1c3038",
+    "title": "Музей ностальгии",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Невский 88 (пом. 12-Н), через 2 арки 2 раза налево 1 этаж",
+    "events": 18
+  },
+  {
+    "id": "venue_67349b857b2bd9374cf392bf",
+    "title": "Groodki",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Невский 96",
+    "events": 17
+  },
+  {
+    "id": "venue_67f399e52279d865258cb6b0",
+    "title": "Английская набережная 54 (Пассажирский терминал)",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Английская набережная 54",
+    "events": 17
+  },
+  {
+    "id": "venue_617ee7732217973cbcec9ddc",
+    "title": "Музыкальный салон «Классика без границ»",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Казанская ул, 7 литера В, оф. 208",
+    "events": 14
+  },
+  {
+    "id": "venue_6a3ac7bcef18f6620a0490f5",
+    "title": "Гастропаб 357",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "наб Макарова 22",
+    "events": 12
+  },
+  {
+    "id": "venue_55803c199cb5381698a52608",
+    "title": "Концертный зал \"Санкт-Петербург\"///St.Petersburg Hall",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Пироговская наб., д.5, к.2 /// Pirogovskaya Emb., 5/2",
+    "events": 10
+  },
+  {
+    "id": "venue_665433d79147484c839a91d4",
+    "title": "Место встречи на Путь Раскольникова",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Санкт-Петербург, Сенная площадь, 13, на улице",
+    "events": 10
+  },
+  {
+    "id": "venue_55803eb59cb5381698a567fc",
+    "title": "Театрально-концертный комплекс \"Карнавал\"///CARNIVAL CONCERT HALL (Anichkov Palace)",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Невский пр., 39 Д///Nevsky Prospekt 39 D",
+    "events": 10
+  },
+  {
+    "id": "venue_57c9d5ca9cb5383c457c9cc5",
+    "title": "Концертный зал Яани Кирик",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "ул. Декабристов, 54А",
+    "events": 8
+  },
+  {
+    "id": "venue_69f05c42ff6c821d5991fb53",
+    "title": "Особняк Матильды Кшесинской",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "ул. Куйбышева, 2-4",
+    "events": 8
+  },
+  {
+    "id": "venue_5f3ad1d9c92577404c01b24e",
+    "title": "The Right Place",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Шведский пер. д.2",
+    "events": 7
+  },
+  {
+    "id": "venue_636df94f91184a1b12f92b5b",
+    "title": "Театр Поколений",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Курляндская улица, дом 49",
+    "events": 7
+  },
+  {
+    "id": "venue_69461843272439d25642e13c",
+    "title": "Театр \"Лицедеи\"",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Литейный пр, 14",
+    "events": 6
+  },
+  {
+    "id": "venue_66857e951f171ce2dc6db470",
+    "title": "Дом ученых им. Горького",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Дворцовая набережная, 26",
+    "events": 5
+  },
+  {
+    "id": "venue_6930909cfc27bb700696490f",
+    "title": "Евгенич на Рубинштейна",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "ул. Рубинштейна, 9/3литА",
+    "events": 5
+  },
+  {
+    "id": "venue_69c25c58fa057f5e3485a33c",
+    "title": "Лаунж-бар «Половина тебя» Невский",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Невский пр., 81",
+    "events": 5
+  },
+  {
+    "id": "venue_5f9be67b5eda629cf3bd2ec0",
+    "title": "Особняк И. Мясникова",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Восстания, 45",
+    "events": 5
+  },
+  {
+    "id": "venue_68dbc0aba5b9883ef15a1b34",
+    "title": "Театр «Резонанс»",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "народная 4а",
+    "events": 5
+  },
+  {
+    "id": "venue_58514012515e3500152bca1c",
+    "title": "\"Колизей\"",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "проспект Невский 100",
+    "events": 4
+  },
+  {
+    "id": "venue_67ee41199b2acd8e8289fc76",
+    "title": "ZOCCOLO 2.0",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Лиговский проспект 50 лит П",
+    "events": 4
+  },
+  {
+    "id": "venue_68c6ae79d5b98d58ded70411",
+    "title": "Большой петергофский дворец",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Санкт-Петербург, Петергоф, Разводная улица, 2",
+    "events": 4
+  },
+  {
+    "id": "venue_635ce8252e3dac21bc857db5",
+    "title": "Культурное пространство \"Где бабуля\"",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Санкт- Петербург, ул. Средняя Подьяческая,15",
+    "events": 4
+  },
+  {
+    "id": "venue_6501b9e177b2ac4cf3abbeea",
+    "title": "Культурный центр «Сердце»",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Лиговский проспект 50, корпус 16",
+    "events": 4
+  },
+  {
+    "id": "venue_67af2b9adcff81acc6018e5d",
+    "title": "МТС Live Холл Санкт-Петербург",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "набережная Обводного канала, 118",
+    "events": 4
+  },
+  {
+    "id": "venue_56e179c39cb538637fb8a2e4",
+    "title": "Особняк А.А. Половцова (Дом Архитектора)",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Большая Морская ул. 52",
+    "events": 4
+  },
+  {
+    "id": "venue_6a3ac31080a74fb7228f8f85",
+    "title": "Феромон Гражданка",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Гражданский пр. 119",
+    "events": 4
+  },
+  {
+    "id": "venue_553664969cb538325f4a59c1",
+    "title": "Эрмитажный театр///Imperial Hermitage theatre",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Дворцовая наб., 34///Dvortsovaya Emb., 34",
+    "events": 4
+  },
+  {
+    "id": "venue_61a8de0173a1c1f513f59abe",
+    "title": "\"Театр Монплезир\"",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "ул. Большая Подьяческая. 14",
+    "events": 3
+  },
+  {
+    "id": "venue_688b2d00234bd9a7b7efc6e2",
+    "title": "OSSI",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "ул. Радищева, 25",
+    "events": 3
+  },
+  {
+    "id": "venue_6256ac167af77b5a35b5274a",
+    "title": "Ласточка (малый зал)",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Транспортный пер., 10А",
+    "events": 3
+  },
+  {
+    "id": "venue_5bc4567597a630000ce38d64",
+    "title": "Музей Бенуа на Васильевском",
+    "kind": "MUSEUM_ART_SPACE",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Васильевский остров, 3-я линия, дом 20, кв. 8",
+    "events": 3
+  },
+  {
+    "id": "venue_6148546ac0a4bd7a6b44f179",
+    "title": "Театр \"ТОК\"",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "ул. Садовая д. 8/7",
+    "events": 3
+  },
+  {
+    "id": "venue_56c487689cb5381d14f20bef",
+    "title": "Aurora Concert Hall",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Пироговская наб., 5/2",
+    "events": 2
+  },
+  {
+    "id": "venue_5c74125bfbafc9000bd444b5",
+    "title": "MONEY HONEY",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "ул. Садовая 28/30 корп. 13",
+    "events": 2
+  },
+  {
+    "id": "venue_5cf52957389e06000d0f1ef3",
+    "title": "Roof Place",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Кожевенная линия 30",
+    "events": 2
+  }
+]

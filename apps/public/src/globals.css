@@ -138,6 +138,10 @@
     @apply rounded-full bg-slate-300;
   }
 
+  .blog-article-prose > :first-child {
+    margin-top: 0;
+  }
+
   .horizontal-snap-track {
     @apply flex w-max flex-nowrap gap-4 snap-x snap-mandatory;
   }

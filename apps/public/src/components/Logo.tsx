@@ -17,7 +17,8 @@ export function DaibiletLogoMark({ className = 'h-8 w-8' }: { className?: string
       aria-hidden
     >
       <g transform="rotate(45 24 24)">
-        <path d={TICKET_PATH} fill={DAIBILET_LOGO_YELLOW} />
+        <path d={TICKET_PATH} fill={DAIBILET_LOGO_BLUE} />
+        <circle cx="24" cy="24" r="2.4" fill="#fff" />
       </g>
     </svg>
   );
@@ -33,18 +34,16 @@ type DaibiletLogoProps = {
 export function DaibiletLogo({
   className = '',
   textClassName = '',
-  iconClassName = 'h-8 w-8 shrink-0 sm:h-9 sm:w-9',
   showText = true,
 }: DaibiletLogoProps) {
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      <DaibiletLogoMark className={iconClassName} />
       {showText ? (
         <span
           className={`font-display text-xl font-bold tracking-tight sm:text-2xl ${textClassName}`}
         >
           <span style={{ color: DAIBILET_LOGO_DARK }}>Дай</span>
-          <span style={{ color: DAIBILET_LOGO_YELLOW }}>билет</span>
+          <span style={{ color: DAIBILET_LOGO_BLUE }}>билет</span>
         </span>
       ) : null}
     </span>

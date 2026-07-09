@@ -22,7 +22,7 @@ import { collectPopularTags } from '@/lib/catalog-tags';
 import { resolveCityImage } from '@/lib/city-images';
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { landingPageHref } from '@/lib/landing-slugs';
-import { eventHref } from '@/routes';
+import { eventHref, sessionVenueHref, venueHref } from '@/routes';
 import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
 import {
   buildCityPageShell,
@@ -85,6 +85,11 @@ export function CityPage({ slug }: { slug: string }) {
       controller.abort();
     };
   }, [slug]);
+
+  React.useEffect(() => {
+    if (!contentReady) return;
+    if (window.location.hash === '#city-schedule') scrollToSchedule();
+  }, [contentReady, slug]);
 
   const sessions = React.useMemo(() => {
     if (!payload) return [];
@@ -432,22 +437,33 @@ function CategoryTiles({ categories, onSelect }: { categories: Array<[string, nu
 function VenueHighlights({ city, venues }: { city: PublicCity; venues: PublicVenue[] }) {
   if (!venues.length) return null;
   const cityIn = cityInPrepositional(city);
+  const institutions = venues.filter((venue) => venue.template !== 'location');
+  const locations = venues.filter((venue) => venue.template === 'location');
+  const featured = [...institutions, ...locations].slice(0, 6);
+
   return (
     <section className="container-page py-10">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-950">Площадки и точки интереса</h2>
+          <h2 className="text-2xl font-bold text-slate-950">Площадки и локации</h2>
           <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
-            Места, откуда стартуют экскурсии, проходят мероприятия и формируются городские маршруты {cityIn}.
+            Музеи, театры, причалы и точки старта экскурсий {cityIn}.
           </p>
         </div>
-        <a href="#city-schedule" className="text-sm font-semibold text-primary-700 hover:text-primary-800">
-          Смотреть афишу
-        </a>
+        <div className="flex flex-wrap gap-3 text-sm font-semibold">
+          <a href="#city-schedule" className="text-primary-700 hover:text-primary-800">
+            Смотреть афишу
+          </a>
+          {locations.length ? (
+            <a href="/locations" className="text-primary-700 hover:text-primary-800">
+              Все локации →
+            </a>
+          ) : null}
+        </div>
       </div>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {venues.slice(0, 6).map((venue) => (
-          <a key={venue.id} href={`/venues/${venue.slug || venue.id}`} className="rounded-lg bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition hover:bg-primary-50/60 hover:shadow-[0_16px_34px_rgba(15,23,42,0.1)]">
+        {featured.map((venue) => (
+          <a key={venue.id} href={venueHref(venue)} className="rounded-lg bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition hover:bg-primary-50/60 hover:shadow-[0_16px_34px_rgba(15,23,42,0.1)]">
             <div className="font-semibold text-slate-950">{venue.name}</div>
             {venue.address ? (
               <div className="mt-2 flex items-start gap-1 text-sm text-slate-500">
@@ -630,7 +646,16 @@ function CityEventsTable({ sessions }: { sessions: PublicSession[] }) {
                 <div className="mt-1 text-xs text-slate-500">{session.tags.slice(0, 2).join(' · ')}</div>
               </td>
               <td className="max-w-[240px] px-4 py-3 text-slate-600">
-                {session.venueSlug ? <a className="font-medium text-primary-600 hover:text-primary-700" href={`/venues/${session.venueSlug}`}>{session.venue}</a> : session.venue}
+                {(() => {
+                  const venueLink = sessionVenueHref(session);
+                  return venueLink ? (
+                    <a className="font-medium text-primary-600 hover:text-primary-700" href={venueLink}>
+                      {session.venue}
+                    </a>
+                  ) : (
+                    session.venue
+                  );
+                })()}
               </td>
               <td className="px-4 py-3 text-slate-600">{session.category}</td>
               <td className="whitespace-nowrap px-4 py-3 font-semibold text-slate-950">{formatMoney(session.priceFrom)}</td>

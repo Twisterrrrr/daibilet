@@ -11,7 +11,6 @@ import {
   SessionBuyButton,
 } from '@/components/TcWidget';
 import { formatMoney, formatNumber } from '@/data';
-import { API_BASE_URL } from '@/lib/api-base';
 import { formatStreetAddress } from '@/lib/address';
 import {
   buildVenueDateOptions,
@@ -27,11 +26,11 @@ import {
   venuePageTemplate,
 } from '@/lib/venue-meta';
 import {
-  buildVenuePageShell,
   consumeVenuePagePrefetch,
   readCachedVenuePage,
   writeCachedVenuePage,
 } from '@/lib/venue-page-cache';
+import { applyVenueSeo } from '@/lib/venue-seo';
 import type { PublicVenue, PublicVenuePage } from '@/types';
 
 type VenuePageProps = {
@@ -40,7 +39,7 @@ type VenuePageProps = {
 
 export function VenuePage({ slug }: VenuePageProps) {
   const [payload, setPayload] = React.useState<PublicVenuePage | null>(
-    () => readCachedVenuePage(slug) || buildVenuePageShell(slug),
+    () => readCachedVenuePage(slug),
   );
   const [contentReady, setContentReady] = React.useState(() => Boolean(readCachedVenuePage(slug)?.sessions?.length));
   const [error, setError] = React.useState<string | null>(null);
@@ -52,39 +51,51 @@ export function VenuePage({ slug }: VenuePageProps) {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 25000);
     const cached = readCachedVenuePage(slug);
-    if (!cached?.sessions?.length) {
-      const shell = buildVenuePageShell(slug);
-      if (shell) {
-        setPayload((current) => (current?.sessions?.length ? current : shell));
-        setContentReady(false);
-      }
+    if (cached?.sessions?.length) {
+      setPayload(cached);
+      setContentReady(true);
     }
 
     const prefetched = consumeVenuePagePrefetch(slug);
-    const request = prefetched
-      ? prefetched
-      : fetch(`${API_BASE_URL}/api/public/venues/${encodeURIComponent(slug)}`, {
+    const request: Promise<PublicVenuePage> = prefetched
+      ? prefetched.then((data) => {
+          if (!data?.venue) throw new Error('Страница не найдена');
+          return data;
+        })
+      : fetch(`/api/public/venues/${encodeURIComponent(slug)}`, {
           cache: 'default',
           signal: controller.signal,
         }).then(async (response) => {
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          return (await response.json()) as PublicVenuePage | null;
+          const data = (await response.json()) as PublicVenuePage | { error?: string } | null;
+          if (!data || !('venue' in data)) throw new Error('Страница не найдена');
+          return data;
         });
 
     request
       .then((data) => {
-        if (!data) throw new Error('Страница не найдена');
         setPayload(data);
         setContentReady(true);
         setError(null);
         writeCachedVenuePage(slug, data);
-        applyVenueMeta(data);
+        applyVenueSeo(data);
+        const canonicalPath = data.venue.canonicalPath;
+        if (canonicalPath && window.location.pathname !== canonicalPath) {
+          window.history.replaceState(null, '', canonicalPath);
+        }
       })
       .catch((requestError) => {
         if (controller.signal.aborted) return;
-        if (!cached && !buildVenuePageShell(slug)) {
-          setError(requestError instanceof Error ? requestError.message : String(requestError));
+        const cachedPage = readCachedVenuePage(slug);
+        if (cachedPage?.sessions?.length) {
+          setPayload(cachedPage);
+          setContentReady(true);
+          setError(null);
+          return;
         }
+        setPayload(null);
+        setContentReady(false);
+        setError(requestError instanceof Error ? requestError.message : 'Страница не найдена');
       })
       .finally(() => {
         window.clearTimeout(timeout);
@@ -143,7 +154,7 @@ export function VenuePage({ slug }: VenuePageProps) {
           </div>
         ) : null}
 
-        {venue && payload ? (
+        {venue && payload && contentReady ? (
           <>
             {isLocationPage ? (
               <LocationVenueLayout
@@ -420,21 +431,4 @@ function navigateHome(section: string) {
     return;
   }
   window.location.href = `/#${section}`;
-}
-
-function applyVenueMeta(payload: PublicVenuePage) {
-  const venue = payload.venue;
-  document.title = venue.seoTitle || `${venue.name}: афиша и билеты | Дайбилет`;
-  upsertMeta('description', venue.seoDescription || venue.shortDescription || venue.description || `${venue.name}: события, расписание и билеты.`);
-  upsertMeta('robots', venue.isIndexable === false ? 'noindex, nofollow' : 'index, follow');
-}
-
-function upsertMeta(name: string, content: string) {
-  let element = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
-  if (!element) {
-    element = document.createElement('meta');
-    element.name = name;
-    document.head.appendChild(element);
-  }
-  element.content = content;
 }

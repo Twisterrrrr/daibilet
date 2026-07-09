@@ -1,4 +1,5 @@
 import type { PublicEvent, PublicSession } from '@/types';
+import { venuePageTemplate } from '@/lib/venue-meta';
 
 type EventRouteSource = Pick<PublicSession, 'id' | 'slug' | 'sourceSlug' | 'title'> | Pick<PublicEvent, 'id' | 'slug' | 'sourceSlug' | 'title'>;
 type CityRouteSource = { slug?: string | null; sourceSlug?: string | null; name: string };
@@ -70,21 +71,61 @@ export function cityHref(city: CityRouteSource): string {
   return `/cities/${citySlug(city)}`;
 }
 
-export function venueSlug(venue: VenueRouteSource): string {
-  const rawSlug = String(venue.slug || '').trim();
-  if (rawSlug) return rawSlug;
-
-  const fromName = normalizeSlug(venue.name);
-  if (fromName && !isOpaqueId(fromName)) return `${fromName}-${normalizeSlug(venue.id) || venue.id}`;
-
-  return normalizeSlug(venue.id) || venue.id;
+/** Афиша города — расписание событий на странице CityPage. */
+export function cityEventsHref(city: CityRouteSource): string {
+  return `${cityHref(city)}#city-schedule`;
 }
 
-import { venuePageTemplate } from '@/lib/venue-meta';
+function stripOpaqueVenueIdSuffix(slug: string): string {
+  const match = String(slug || '').match(/(?:^|[-_])([a-f0-9]{20,})$/i);
+  if (!match) return slug;
+  const suffix = match[1].toLowerCase();
+  const trimmed = String(slug || '').replace(new RegExp(`[-_]${suffix}$`, 'i'), '');
+  return trimmed || slug;
+}
+
+function dedupeVenueSlugSuffix(slug: string): string {
+  const parts = slug.split('-').filter(Boolean);
+  if (parts.length < 2) return slug;
+  if (parts[parts.length - 1] === parts[parts.length - 2]) {
+    return parts.slice(0, -1).join('-');
+  }
+  return slug;
+}
+
+export function venueSlug(venue: VenueRouteSource): string {
+  const rawSlug = String(venue.slug || '').trim();
+  if (rawSlug) {
+    const normalized = dedupeVenueSlugSuffix(stripOpaqueVenueIdSuffix(normalizeSlug(rawSlug)));
+    if (normalized && !isOpaqueId(normalized)) return normalized;
+  }
+
+  const fromName = normalizeSlug(venue.name);
+  const idPart = String(venue.id || '').replace(/^venue_/, '');
+  const idSlug = normalizeSlug(idPart) || idPart;
+  if (fromName) {
+    if (fromName.endsWith(`-${idSlug}`)) return dedupeVenueSlugSuffix(fromName);
+    return dedupeVenueSlugSuffix(`${fromName}-${idSlug}`);
+  }
+
+  return dedupeVenueSlugSuffix(idSlug);
+}
 
 export function venueHref(venue: VenueRouteSource): string {
   const basePath = venuePageTemplate(venue.type) === 'location' ? '/locations' : '/venues';
-  return `${basePath}/${encodeURIComponent(venueSlug(venue))}`;
+  return `${basePath}/${venueSlug(venue)}`;
+}
+
+export function sessionVenueHref(
+  session: Pick<PublicSession, 'venueId' | 'venueSlug' | 'venue' | 'venueKind'>,
+): string | null {
+  if (!session.venueSlug && !session.venueId) return null;
+  return venueHref({
+    id: session.venueId || session.venueSlug || '',
+    slug: session.venueSlug,
+    name: session.venue,
+    type: session.venueKind,
+  });
 }
 
 export function venueCatalogHref(template: 'institution' | 'location' = 'institution'): string {

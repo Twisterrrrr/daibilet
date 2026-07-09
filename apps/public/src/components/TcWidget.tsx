@@ -3,6 +3,7 @@ import * as React from 'react';
 import { formatSessionTime, parseSessionStartsAt, resolveSessionTimeZoneForSession } from '@/lib/datetime';
 import { FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession } from '@/lib/event-card-meta';
 import { formatVacantSeats } from '@/lib/pluralize';
+import { getTeplohodWidgetIdsFromSession, TeplohodWidgetButton } from '@/components/TeplohodWidget';
 
 const TC_WIDGET_SCRIPT_URL = 'https://ticketscloud.com/static/scripts/widget/tcwidget.js';
 const TC_WIDGET_TOKEN_FROM_ENV =
@@ -305,12 +306,30 @@ export function extractTcEventIdFromSession(session: {
   eventId?: string | null;
   purchaseUrl?: string | null;
 }) {
-  const fromUrl = session.purchaseUrl?.match(/[?&]event=([^&]+)/)?.[1];
-  if (fromUrl) return decodeURIComponent(fromUrl);
+  const purchaseUrl = String(session.purchaseUrl || '');
+  const fromTcQuery = purchaseUrl.match(/[?&]event=([^&]+)/)?.[1];
+  if (fromTcQuery) return decodeURIComponent(fromTcQuery);
+
+  const fromTepPath = purchaseUrl.match(/teplohod\.info\/event\/(\d+)/i)?.[1];
+  if (fromTepPath) return fromTepPath;
+
+  const fromTepId = String(session.eventId || session.id || '').match(/^evt_tep_(\d+)$/i)?.[1];
+  if (fromTepId) return fromTepId;
 
   const raw = String(session.eventId || session.id || '').trim();
   const match = raw.match(/^(?:evt_|sess_)?([a-f0-9]+)$/i);
   return match ? match[1] : raw || null;
+}
+
+function isTeplohodPurchaseSession(session: {
+  purchaseProvider?: string | null;
+  offerSourceCode?: string | null;
+  purchaseUrl?: string | null;
+  widgetUrl?: string | null;
+}): boolean {
+  const purchaseUrl = String(session.purchaseUrl || session.widgetUrl || '');
+  const provider = String(session.purchaseProvider || session.offerSourceCode || '').toUpperCase();
+  return provider.includes('TEPLOHOD') || provider.includes('TEP') || purchaseUrl.includes('teplohod.info');
 }
 
 export function isSessionPurchaseBlocked(session: {
@@ -319,12 +338,18 @@ export function isSessionPurchaseBlocked(session: {
   purchaseReady?: boolean;
   vacant?: number | null;
   purchaseUrl?: string | null;
+  widgetUrl?: string | null;
+  purchaseProvider?: string | null;
+  offerSourceCode?: string | null;
 }): boolean {
   const statuses = [session.sourceStatus, session.eventSourceStatus].map((value) => String(value || '').toLowerCase());
   if (statuses.some((status) => ['paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden'].includes(status))) {
     return true;
   }
   if (session.purchaseReady === false) return true;
+  if (isTeplohodPurchaseSession(session) && Boolean(session.purchaseUrl || session.widgetUrl)) {
+    return false;
+  }
   if (session.vacant === 0) return true;
   if (!session.purchaseUrl && session.purchaseReady !== true) return true;
   return false;
@@ -414,7 +439,16 @@ export function pickRepresentativeSession<
 >(sessions: T[]): T | null {
   if (!sessions.length) return null;
   const expanded = sessions.flatMap((session) => expandSessionPurchaseVariants(session));
-  return pickPurchasableTcSession(expanded) || expanded[0] || sessions[0];
+  const ranked = [...expanded].sort((a, b) => {
+    const aBlocked = isSessionPurchaseBlocked(a) ? 1 : 0;
+    const bBlocked = isSessionPurchaseBlocked(b) ? 1 : 0;
+    if (aBlocked !== bBlocked) return aBlocked - bBlocked;
+    const aVacant = Number.isFinite(Number(a.vacant)) ? Number(a.vacant) : -1;
+    const bVacant = Number.isFinite(Number(b.vacant)) ? Number(b.vacant) : -1;
+    if (aVacant !== bVacant) return bVacant - aVacant;
+    return compareSessionsByStartsAt(a, b);
+  });
+  return pickPurchasableTcSession(ranked) || ranked[0] || sessions[0];
 }
 
 export function listPurchasableSessionVariants<
@@ -850,22 +884,19 @@ export function SessionBuyButton({
   const representative = pickRepresentativeSession([session]) || session;
   const purchaseUrl =
     representative.purchaseUrl || session.purchaseUrl || session.widgetUrl || session.deeplinkUrl || null;
-  const targets =
-    purchaseTargets ||
-    buildTcPurchaseTargets(variants);
+  const targets = purchaseTargets || buildTcPurchaseTargets(variants);
   const primaryTarget = targets[0] || null;
   const tcEventId = primaryTarget?.tcEventId || extractTcEventIdFromSession(representative);
-  const provider = String(session.purchaseProvider || '').toUpperCase();
-  const isTc = provider.includes('TC') || provider.includes('TICKETSCLOUD') || isTcPurchaseUrl(purchaseUrl);
+  const provider = String(session.purchaseProvider || representative.purchaseProvider || '').toUpperCase();
+  const isTc = provider.includes('TICKETSCLOUD') || provider === 'TC' || isTcPurchaseUrl(purchaseUrl);
   const widgetToken = resolveTcWidgetToken(primaryTarget?.purchaseUrl || purchaseUrl);
-
-  if (!purchaseUrl) {
-    return (
-      <span className="inline-flex min-h-9 items-center justify-center rounded-lg bg-slate-100 px-4 text-sm font-semibold text-slate-400">
-        Нет ссылки
-      </span>
-    );
-  }
+  const teplohod = getTeplohodWidgetIdsFromSession({
+    id: representative.eventId || representative.id || session.eventId || session.id,
+    purchaseProvider: session.purchaseProvider || representative.purchaseProvider,
+    offerSourceCode: (session as { offerSourceCode?: string | null }).offerSourceCode,
+    purchaseUrl,
+    widgetUrl: session.widgetUrl || representative.widgetUrl,
+  });
 
   if (isTc && tcEventId && widgetToken) {
     return (
@@ -877,6 +908,25 @@ export function SessionBuyButton({
         compact
         className={className}
       />
+    );
+  }
+
+  if (teplohod?.tepEventId) {
+    return (
+      <TeplohodWidgetButton
+        tepEventId={teplohod.tepEventId}
+        tepWidgetId={teplohod.tepWidgetId}
+        label={label}
+        className={className}
+      />
+    );
+  }
+
+  if (!purchaseUrl) {
+    return (
+      <span className="inline-flex min-h-9 items-center justify-center rounded-lg bg-slate-100 px-4 text-sm font-semibold text-slate-400">
+        Недоступно
+      </span>
     );
   }
 

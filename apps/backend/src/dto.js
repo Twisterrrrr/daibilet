@@ -149,7 +149,7 @@ const LANDING_RULES = [
     keywords: ['теплоход', 'катер', 'река', 'речн', 'канал', 'причал', 'прогулк'],
     keywordScope: 'content',
     requiredAnySubcategories: ['Водные экскурсии', 'Речные прогулки'],
-    excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал', 'мастер-класс', 'квест', 'концерт', 'вечеринк', 'дискотек', 'церк', 'храм', 'кирх', 'орган', 'музыкальн'],
+    excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал', 'мастер-класс', 'квест', 'концерт', 'вечеринк', 'дискотек', 'церк', 'храм', 'кирх', 'орган', 'музыкальн', 'аренда', 'чартер'],
   },
   {
     slug: 'river-party',
@@ -157,13 +157,13 @@ const LANDING_RULES = [
     subtitle: 'DJ, живая музыка и ночные речные круизы',
     chips: ['дискотека', 'DJ', 'вечеринка', 'ночь'],
     tags: ['Дискотека', 'Живая музыка', 'Вечеринка'],
-    keywords: ['дискотек', 'вечеринк', 'ди-джей', 'dj', 'музыкальн', 'круиз', 'теплоход', 'речн', 'катер', 'нева'],
+    keywords: ['дискотек', 'вечеринк', 'ди-джей', 'dj', 'музыкальн', 'круиз', 'теплоход', 'речн', 'катере', 'нева'],
     keywordScope: 'content',
     requiredTitleKeywordGroups: [
       ['дискотек', 'вечеринк', 'ди-джей', 'dj', 'концерт', 'музыкальн'],
     ],
     requiredKeywordGroups: [
-      ['теплоход', 'речн', 'катер', 'корабл', 'яхт', 'причал', 'канал', 'нева', 'круиз'],
+      ['теплоход', 'теплоходн', 'речн', 'катере', 'катера', 'корабл', 'яхт', 'причал', 'канал', 'нева', 'круиз'],
     ],
     excludeKeywords: ['автобус', 'автобусн', 'пешеход'],
     excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory'],
@@ -2066,10 +2066,22 @@ export async function buildAdminTaxonomy(db) {
 export async function buildAdminVenuesList(db, searchParams) {
   const limit = clampNumber(searchParams.get('limit'), 1, 500, 120);
   const query = String(searchParams.get('q') || '').trim().toLowerCase();
+  const familyFilter = String(searchParams.get('family') || '').trim().toLowerCase();
   const rows = await venueRows(db, 500);
   const filtered = rows.filter((venue) => {
-    if (!query) return true;
-    return [venue.name, venue.city, venue.address, venue.proposedKind, venue.pageStatus].filter(Boolean).join(' ').toLowerCase().includes(query);
+    if (query) {
+      const haystack = [venue.name, venue.city, venue.address, venue.proposedKind, venue.pageStatus]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+      if (!haystack.includes(query)) return false;
+    }
+    if (!familyFilter) return true;
+    const kind = normalizeVenueKindValue(venue.kind || venue.proposedKind);
+    const isInstitution = INSTITUTION_VENUE_KINDS.has(kind);
+    if (familyFilter === 'institution') return isInstitution;
+    if (familyFilter === 'location') return !isInstitution;
+    return true;
   });
 
   return {
@@ -2507,8 +2519,8 @@ function isWidgetProviderSession(session) {
   return sessionWidgetProvider(session) != null;
 }
 
-function canonicalSessionPierKey(session) {
-  const text = normalizeVenueTextKey(`${session.venue || ''} ${session.venueAddress || ''}`);
+function canonicalPierLocationKey(name, address) {
+  const text = normalizeVenueTextKey(`${name || ''} ${address || ''}`);
   if (!text) return null;
 
   for (const pattern of KNOWN_PIER_ADDRESS_PATTERNS) {
@@ -2516,11 +2528,15 @@ function canonicalSessionPierKey(session) {
   }
 
   if (/причал|набереж/.test(text)) {
-    const addressKey = canonicalVenueAddressKey(session.venue, session.venueAddress);
+    const addressKey = canonicalVenueAddressKey(name, address);
     if (addressKey.length >= 8) return `pier|${addressKey}`;
   }
 
   return null;
+}
+
+function canonicalSessionPierKey(session) {
+  return canonicalPierLocationKey(session.venue, session.venueAddress);
 }
 
 function normalizeCrossSourceTourTitle(title) {
@@ -3641,29 +3657,45 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
   const venueHeroImageFallbacks = buildActiveVenueEventCounts(catalogSessions).heroImageFallbacks;
   const mergedGroup = findMergedVenueGroup(hubRows, venue.id);
   const venueIds = mergedGroup?.mergedVenueIds || [venue.id];
-  const sessions = lookupVenueCatalogSessions(venueIds, catalogSessions).slice(0, 120);
-  if (!sessions.length) return null;
+  const venueContexts = collectVenueSessionLookupContexts(venue, mergedGroup);
+  const sessions = lookupVenueCatalogSessions(venueIds, catalogSessions, venueContexts).slice(0, 120);
+  if (!sessions.length) {
+    const hasProfile =
+      Boolean(String(venue.address || '').trim()) &&
+      Boolean(String(venue.description || venue.shortDescription || '').trim());
+    const status = String(venue.pageStatus || '').toUpperCase();
+    const isLocationPage = publicVenuePageTemplate(resolvePublicVenueKindFromRow(venue)) === 'location';
+    if (!(isLocationPage && hasProfile && status !== 'NONE' && status !== 'HIDDEN')) {
+      return null;
+    }
+  }
   const waterEvents = sessions.filter(isWaterCatalogSession).length;
   const busEvents = sessions.filter(isBusCatalogSession).length;
   const canonicalVenue =
     mergedGroup && mergedGroup.id !== venue.id ? (await resolvePublicVenueRow(db, mergedGroup.id)) || venue : venue;
   const relatedVenues = await publicRelatedVenues(db, venue.id, venue.city, 6, hubRows);
-  if (
-    !isPublicVenueHub(
-      {
-        title: canonicalVenue.title,
-        name: canonicalVenue.title,
-        kind: canonicalVenue.kind,
-        pageStatus: canonicalVenue.pageStatus,
-        address: canonicalVenue.address,
-        events: sessions.length,
-        busEvents,
-        waterEvents,
-        totalEvents: sessions.length,
-      },
-      { requireEvents: false },
-    )
-  ) {
+  const hubGateRow = {
+    title: canonicalVenue.title,
+    name: canonicalVenue.title,
+    kind: canonicalVenue.kind,
+    pageStatus: canonicalVenue.pageStatus,
+    address: canonicalVenue.address,
+    description: canonicalVenue.description,
+    shortDescription: canonicalVenue.shortDescription,
+    events: sessions.length,
+    busEvents,
+    waterEvents,
+    totalEvents: sessions.length,
+  };
+  const inPublicHub = isPublicVenueHub(hubGateRow, { requireEvents: false });
+  const curatedMeetingPointPage =
+    !inPublicHub &&
+    resolvePublicVenueKindFromRow(hubGateRow) === 'meeting_point' &&
+    Boolean(String(canonicalVenue.address || '').trim()) &&
+    Boolean(String(canonicalVenue.description || canonicalVenue.shortDescription || '').trim()) &&
+    sessions.length > 0 &&
+    !['NONE', 'HIDDEN'].includes(String(canonicalVenue.pageStatus || '').toUpperCase());
+  if (!inPublicHub && !curatedMeetingPointPage) {
     return null;
   }
   const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
@@ -3700,25 +3732,32 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
     },
     venueHeroImageFallbacks,
   ));
-  const weakVenuePage = routeCount < 3 || (!hasDescription && !hasHeroImage) || !hasAddress;
+  const pageTemplate = publicVenuePageTemplate(resolvedType);
+  const sessionCount = sessions.length;
+  const weakVenuePage =
+    pageTemplate === 'location'
+      ? !hasAddress || (!hasDescription && !hasHeroImage) || sessionCount < 1
+      : routeCount < 3 || (!hasDescription && !hasHeroImage) || !hasAddress;
   const isIndexable = canonicalVenue.isIndexable !== false && !weakVenuePage;
+
+  const venueCoordinates = resolvePublicVenueCoordinates(canonicalVenue, { resolvedType });
 
   return {
     generatedAt: new Date().toISOString(),
     venue: {
       id: canonicalVenue.id,
-      slug: canonicalVenue.slug,
+      slug: publicVenueSlug(canonicalVenue.slug, normalizedVenue.name, canonicalVenue.id),
       name: normalizedVenue.name,
       title: normalizedVenue.name,
       city: normalizedVenue.city || 'Не указан',
       address: normalizedVenue.address,
-      latitude: canonicalVenue.latitude,
-      longitude: canonicalVenue.longitude,
+      latitude: venueCoordinates?.latitude ?? null,
+      longitude: venueCoordinates?.longitude ?? null,
       type: resolvedType,
       template: publicVenuePageTemplate(resolvedType),
       pageStatus: canonicalVenue.pageStatus,
-      description: canonicalVenue.description,
-      shortDescription: mergedGroup?.shortDescription || canonicalVenue.shortDescription,
+      description: pickPublicVenueDescriptionText(canonicalVenue.shortDescription, canonicalVenue.description),
+      shortDescription: pickPublicVenueLeadText(canonicalVenue.shortDescription, canonicalVenue.description),
       heroImageUrl: resolveVenueHeroImageUrl(
         {
           id: canonicalVenue.id,
@@ -3730,7 +3769,7 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
       seoH1: canonicalVenue.seoH1,
       seoTitle: canonicalVenue.seoTitle,
       seoDescription: canonicalVenue.seoDescription,
-      canonicalPath: canonicalVenue.canonicalPath,
+      canonicalPath: canonicalVenue.canonicalPath || `/${publicVenuePageTemplate(resolvedType) === 'location' ? 'locations' : 'venues'}/${publicVenueSlug(canonicalVenue.slug, normalizedVenue.name, canonicalVenue.id)}`,
       isIndexable,
       events: routeCount,
       categories,
@@ -3936,10 +3975,13 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
 }
 
 export async function buildPublicEventPage(db, eventSlugOrId) {
-  const catalogSessions = await publicCatalogSessions(db);
-  const resolvedEventId = await resolvePublicEventId(db, eventSlugOrId, catalogSessions);
-  const eventLocator = resolvedEventId || eventSlugOrId;
-  const eventResult = await db.query(
+  const cachedCatalogSessions = publicCatalogCache?.sessions || null;
+  let catalogSessions = cachedCatalogSessions;
+  let resolvedEventId = await resolvePublicEventId(db, eventSlugOrId, catalogSessions);
+  let targetPublicSession = lookupCatalogSessionBySlug(eventSlugOrId, catalogSessions);
+
+  const loadEventRow = async (eventLocator) => {
+    const eventResult = await db.query(
     `
       select
         e.id,
@@ -3993,21 +4035,36 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       limit 1
     `,
       [eventLocator],
-  );
-  const event = eventResult.rows[0];
+    );
+    const row = eventResult.rows[0];
+    if (!row) return null;
+    if (String(row.status || '').toUpperCase() === 'HIDDEN') return null;
+    return row;
+  };
+
+  let event = await loadEventRow(resolvedEventId || eventSlugOrId);
+  if (!event) {
+    catalogSessions = await publicCatalogSessions(db);
+    resolvedEventId = await resolvePublicEventId(db, eventSlugOrId, catalogSessions);
+    targetPublicSession = lookupCatalogSessionBySlug(eventSlugOrId, catalogSessions);
+    event = resolvedEventId ? await loadEventRow(resolvedEventId) : null;
+  }
+
   if (!event) return null;
   const eventDestination = publicDestinationForCity(event);
 
   const requestedSlug = publicEventSlug(eventSlugOrId);
-  const targetPublicSession =
-    lookupCatalogSessionBySlug(eventSlugOrId, catalogSessions) ||
-    catalogSessions.find(
-      (session) =>
-        session.id === event.id ||
-        session.sourceSlug === event.slug ||
-        session.slug === requestedSlug ||
-        sessionGroupIds(session).includes(event.id),
-    );
+  if (!targetPublicSession && catalogSessions?.length) {
+    targetPublicSession =
+      lookupCatalogSessionBySlug(eventSlugOrId, catalogSessions) ||
+      catalogSessions.find(
+        (session) =>
+          session.id === event.id ||
+          session.sourceSlug === event.slug ||
+          session.slug === requestedSlug ||
+          sessionGroupIds(session).includes(event.id),
+      );
+  }
   const fallbackPublicRow = {
     ...event,
     source: event.sourceName || publicSourceLabel(event.sourceCode) || 'Источник',
@@ -4445,6 +4502,15 @@ function isPublicSessionPurchaseBlocked(session) {
     return true;
   }
   if (session.purchaseReady === false) return true;
+  const purchaseUrl = session.purchaseUrl || session.widgetUrl || session.offerWidgetUrl || null;
+  const provider = String(session.purchaseProvider || session.offerSourceCode || session.sourceCode || '').toUpperCase();
+  if (
+    (provider.includes('TEPLOHOD') || provider.includes('TEP') || String(purchaseUrl).includes('teplohod.info')) &&
+    session.purchaseReady !== false &&
+    purchaseUrl
+  ) {
+    return false;
+  }
   if (session.vacant === 0) return true;
   return false;
 }
@@ -4867,6 +4933,147 @@ function formatPublicVenueTitle(value) {
     .trim();
 }
 
+function isValidVenueCoordinatePair(latitude, longitude) {
+  return Number.isFinite(latitude) && Number.isFinite(longitude) && Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180;
+}
+
+function extractEmbeddedVenueCoordinates(...parts) {
+  const text = parts.filter(Boolean).join(' ');
+
+  const parenMatch = text.match(/\(\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*\)/u);
+  if (parenMatch) {
+    const latitude = Number(parenMatch[1]);
+    const longitude = Number(parenMatch[2]);
+    if (isValidVenueCoordinatePair(latitude, longitude)) return { latitude, longitude };
+  }
+
+  const decimalSlugMatch = text.match(/(?:^|[-_/])(-?\d{1,2}\.\d{3,})[-_/](-?\d{1,3}\.\d{3,})(?:[-_/]|$)/u);
+  if (decimalSlugMatch) {
+    const latitude = Number(decimalSlugMatch[1]);
+    const longitude = Number(decimalSlugMatch[2]);
+    if (isValidVenueCoordinatePair(latitude, longitude)) return { latitude, longitude };
+  }
+
+  const dashedSlugMatch = text.match(/(?:^|[-_/])(\d{1,2})-(\d{4,7})-(\d{1,3})-(\d{4,7})(?:[-_/]|$)/u);
+  if (dashedSlugMatch) {
+    const latitude = Number(`${dashedSlugMatch[1]}.${dashedSlugMatch[2]}`);
+    const longitude = Number(`${dashedSlugMatch[3]}.${dashedSlugMatch[4]}`);
+    if (isValidVenueCoordinatePair(latitude, longitude)) return { latitude, longitude };
+  }
+
+  return null;
+}
+
+export function resolvePublicVenueCoordinates(venue = {}, options = {}) {
+  const embedded = extractEmbeddedVenueCoordinates(venue.title, venue.name, venue.slug, venue.address);
+  if (embedded) return embedded;
+
+  const kind = options.resolvedType || venue.type || venue.kind;
+  const override = lookupLocationDescriptionCoordinates(
+    venue.slug,
+    venue.title || venue.name,
+    venue.id,
+  );
+  let latitude = override?.latitude ?? Number(venue.latitude);
+  let longitude = override?.longitude ?? Number(venue.longitude);
+  if (!isValidVenueCoordinatePair(latitude, longitude)) return null;
+
+  if (isPierVenueKind(kind) && !override) {
+    return adjustPierCoordinatesToWater(latitude, longitude, venue);
+  }
+
+  return { latitude, longitude };
+}
+
+let locationDescriptionCoordinatesCache = null;
+
+function getLocationDescriptionCoordinatesMap() {
+  if (locationDescriptionCoordinatesCache) return locationDescriptionCoordinatesCache;
+  const map = new Map();
+  try {
+    const filePath = path.resolve(
+      path.dirname(fileURLToPath(import.meta.url)),
+      '../../../scripts/data/location-descriptions.json',
+    );
+    const items = JSON.parse(readFileSync(filePath, 'utf8'));
+    for (const item of items) {
+      if (typeof item.latitude !== 'number' || typeof item.longitude !== 'number') continue;
+      const slug = String(item.slug || '').trim().toLowerCase();
+      if (!slug) continue;
+      const coords = { latitude: item.latitude, longitude: item.longitude };
+      map.set(slug, coords);
+      const shortSlug = slug.replace(/-[a-f0-9]{20,}$/i, '');
+      if (shortSlug !== slug) map.set(shortSlug, coords);
+    }
+  } catch {
+    // optional curated overrides
+  }
+  locationDescriptionCoordinatesCache = map;
+  return map;
+}
+
+function lookupLocationDescriptionCoordinates(slug, title, id) {
+  const candidates = [];
+  const add = (value) => {
+    const key = String(value || '').trim().toLowerCase();
+    if (!key) return;
+    candidates.push(key);
+    const transliterated = publicCitySlug(key);
+    if (transliterated && transliterated !== key) candidates.push(transliterated);
+    const deduped = dedupeVenueSlugSuffix(transliterated || key);
+    if (deduped && !candidates.includes(deduped)) candidates.push(deduped);
+  };
+
+  add(slug);
+  add(publicVenueSlug(slug, title, id));
+
+  const map = getLocationDescriptionCoordinatesMap();
+  for (const value of candidates) {
+    if (map.has(value)) return map.get(value);
+    const withoutHash = value.replace(/-[a-f0-9]{20,}$/i, '');
+    if (map.has(withoutHash)) return map.get(withoutHash);
+    for (const [key, coords] of map) {
+      if (value.startsWith(`${key}-`) || key.startsWith(`${value}-`)) return coords;
+    }
+  }
+  return null;
+}
+
+export function isPierVenueKind(kindOrType) {
+  const key = String(kindOrType || '')
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, '_');
+  return key === 'pier' || key === 'pier_water';
+}
+
+function detectPierWaterOffset(venue = {}) {
+  const city = String(venue.city || '').toLowerCase();
+  const text = `${venue.address || ''} ${venue.title || ''} ${venue.name || ''}`.toLowerCase();
+  if (city.includes('петербург') || text.includes('санкт-петербург') || text.includes('спб')) {
+    return { dLat: -0.00094, dLng: 0.00116 };
+  }
+  if (city.includes('москва') || text.includes('москва')) {
+    return { dLat: -0.00072, dLng: 0.00042 };
+  }
+  if (city.includes('казан') || text.includes('казань')) {
+    return { dLat: -0.00055, dLng: 0.00035 };
+  }
+  if (/наб(?:ережн)?|причал|речн/i.test(text)) {
+    return { dLat: -0.00065, dLng: 0.0005 };
+  }
+  return null;
+}
+
+function adjustPierCoordinatesToWater(latitude, longitude, venue = {}) {
+  const offset = detectPierWaterOffset(venue);
+  if (!offset) return { latitude, longitude };
+  return {
+    latitude: latitude + offset.dLat,
+    longitude: longitude + offset.dLng,
+  };
+}
+
 function isVenueHallSuffix(suffix) {
   const key = normalizeVenueTextKey(suffix);
   if (!key) return true;
@@ -4937,7 +5144,9 @@ function normalizePublicVenueMergeKey(name, city, address) {
   const title = normalizeVenueTextKey(canonicalVenueMergeTitle(name));
   const cityKey = normalizeVenueTextKey(city || 'не указан');
 
-  if (/причал/i.test(`${name || ''} ${address || ''}`)) {
+  if (/причал|набереж/i.test(`${name || ''} ${address || ''}`)) {
+    const pierKey = canonicalPierLocationKey(name, address);
+    if (pierKey) return `pier|${cityKey}|${pierKey}`;
     return `pier|${cityKey}|${title}`;
   }
 
@@ -5150,13 +5359,14 @@ async function publicVenueHubRows(db, limit = 500, options = {}) {
   }
 
   const [rows, sessions] = await Promise.all([venueRows(db, limit), publicCatalogSessions(db)]);
-  const { activeCounts, waterCounts, busCounts, heroImageFallbacks } = buildActiveVenueEventCounts(sessions);
+  const { activeCounts, waterCounts, busCounts, heroImageFallbacks, nextSessionStartsAt } = buildActiveVenueEventCounts(sessions);
   const enriched = rows.map((row) => ({
     ...row,
     events: activeCounts.get(row.id) || 0,
     waterEvents: waterCounts.get(row.id) || 0,
     busEvents: busCounts.get(row.id) || 0,
     heroImageUrl: resolveVenueHeroImageUrl(row, heroImageFallbacks),
+    nextSessionStartsAt: nextSessionStartsAt.get(row.id) || null,
   }));
   const merged = mergePublicVenueHubRows(enriched.filter((row) => isPublicVenueHub(row, options)));
   publicVenueHubCache = {
@@ -5165,15 +5375,17 @@ async function publicVenueHubRows(db, limit = 500, options = {}) {
     rows: merged,
   };
   if (!publicVenueCatalogLists || publicVenueCatalogLists.expiresAt <= now) {
-    publicVenueCatalogLists = {
-      expiresAt: now + PUBLIC_CATALOG_CACHE_MS,
-      institution: [],
-      location: [],
-    };
-    for (const row of merged) {
-      const item = mapPublicVenueListItem(row);
-      if (item.template === 'institution') publicVenueCatalogLists.institution.push(item);
-      else publicVenueCatalogLists.location.push(item);
+    if (options.requireEvents !== false) {
+      publicVenueCatalogLists = {
+        expiresAt: now + PUBLIC_CATALOG_CACHE_MS,
+        institution: [],
+        location: [],
+      };
+      for (const row of merged) {
+        const item = mapPublicVenueListItem(row);
+        if (item.template === 'institution') publicVenueCatalogLists.institution.push(item);
+        else publicVenueCatalogLists.location.push(item);
+      }
     }
   }
   return merged;
@@ -5206,14 +5418,62 @@ async function resolvePublicVenueRow(db, venueSlugOrId) {
   const value = String(venueSlugOrId || '').trim();
   if (!value) return null;
 
-  let result = await db.query(`${PUBLIC_VENUE_ROW_SELECT} where venue.slug = $1 or venue.id = $1 limit 1`, [value]);
-  if (result.rows[0]) return result.rows[0];
-
-  const suffixMatch = value.match(/(?:^|-)([a-f0-9]{20,})$/i);
-  if (suffixMatch) {
-    const suffix = suffixMatch[1];
-    result = await db.query(`${PUBLIC_VENUE_ROW_SELECT} where venue.id = $1 or venue.id = $2 limit 1`, [`venue_${suffix}`, suffix]);
+  const candidates = new Set([value]);
+  try {
+    candidates.add(decodeURIComponent(value));
+  } catch {
+    // ignore malformed URI sequences
+  }
+  candidates.add(publicCitySlug(value));
+  candidates.add(stripOpaqueVenueIdSuffix(publicCitySlug(value)));
+  for (const candidate of [...candidates]) {
+    const result = await db.query(`${PUBLIC_VENUE_ROW_SELECT} where venue.slug = $1 or venue.id = $1 limit 1`, [candidate]);
     if (result.rows[0]) return result.rows[0];
+  }
+
+  const suffix = extractOpaqueIdSuffix(value);
+  if (suffix) {
+    const suffixResult = await db.query(`${PUBLIC_VENUE_ROW_SELECT} where venue.id = $1 or venue.id = $2 limit 1`, [`venue_${suffix}`, suffix]);
+    if (suffixResult.rows[0]) return suffixResult.rows[0];
+  }
+
+  return resolvePublicVenueRowByComputedSlug(db, value);
+}
+
+function normalizePublicVenueSlugKey(value) {
+  return dedupeVenueSlugSuffix(stripOpaqueVenueIdSuffix(publicCitySlug(value) || value));
+}
+
+async function resolvePublicVenueRowByComputedSlug(db, requestedSlug) {
+  const normalized = normalizePublicVenueSlugKey(requestedSlug);
+  if (!normalized) return null;
+
+  const numericSuffix = normalized.match(/-(\d+)$/);
+  if (numericSuffix) {
+    for (const venueId of [`venue_tep_${numericSuffix[1]}`, `venue_${numericSuffix[1]}`]) {
+      const result = await db.query(`${PUBLIC_VENUE_ROW_SELECT} where venue.id = $1 limit 1`, [venueId]);
+      const row = result.rows[0];
+      if (row && publicVenueSlug(row.slug, row.title, row.id) === normalized) return row;
+    }
+  }
+
+  const prefixResult = await db.query(
+    `${PUBLIC_VENUE_ROW_SELECT}
+     where venue.slug = $1
+        or venue.slug like $2
+     order by length(venue.slug) asc
+     limit 24`,
+    [normalized, `${normalized}-%`],
+  );
+  for (const row of prefixResult.rows) {
+    if (publicVenueSlug(row.slug, row.title, row.id) === normalized) return row;
+  }
+
+  const cyrillicResult = await db.query(
+    `${PUBLIC_VENUE_ROW_SELECT} where venue.slug ~ '[А-Яа-яЁё]' order by venue."updatedAt" desc nulls last limit 1200`,
+  );
+  for (const row of cyrillicResult.rows) {
+    if (publicVenueSlug(row.slug, row.title, row.id) === normalized) return row;
   }
 
   return null;
@@ -5236,6 +5496,39 @@ function cleanImportedDescription(value) {
     .replace(/[ \t]{2,}/g, ' ')
     .trim();
   return text ? text : null;
+}
+
+function isWeakVenueLeadText(value) {
+  const text = String(cleanImportedDescription(value) || '').trim();
+  if (!text) return true;
+  if (text.length < 24) return true;
+  if (/^(легенда|описание|текст|n\/a|нет|—|-)$/i.test(text)) return true;
+  return false;
+}
+
+function pickPublicVenueDescriptionText(shortDescription, description) {
+  const full = cleanImportedDescription(description);
+  if (full) return full;
+  const short = cleanImportedDescription(shortDescription);
+  if (short && !isWeakVenueLeadText(short)) return short;
+  return null;
+}
+
+function truncateVenueLeadText(text, maxLength = 220) {
+  const value = String(text || '').trim();
+  if (value.length <= maxLength) return value;
+  const slice = value.slice(0, maxLength - 1).trimEnd();
+  const lastSpace = slice.lastIndexOf(' ');
+  const clipped = lastSpace > Math.floor(maxLength * 0.55) ? slice.slice(0, lastSpace) : slice;
+  return `${clipped}...`;
+}
+
+function pickPublicVenueLeadText(shortDescription, description) {
+  const full = cleanImportedDescription(description);
+  const short = cleanImportedDescription(shortDescription);
+  if (short && !isWeakVenueLeadText(short)) return short;
+  if (!full) return null;
+  return truncateVenueLeadText(full);
 }
 
 function normalizePublishStatus(value, fallback = 'REVIEW') {
@@ -5574,9 +5867,17 @@ function normalizeVenueKindValue(value) {
     .replace(/-/g, '_');
 }
 
-function publicVenuePageTemplate(kind) {
+export function publicVenuePageTemplate(kind) {
   const normalized = normalizeVenueKindValue(kind);
   return INSTITUTION_VENUE_KINDS.has(normalized) ? 'institution' : 'location';
+}
+
+const MEETING_POINT_TEXT_RE =
+  /место сбора|место встречи|точка сбора|точка встречи|площадка:|^метро\b|^м\.(?:\s|«|"|')|\bм\.\s*(?:«|[а-яё])|\bу метро\b|около метро|у памятник|памятник|\bпам\.|\bу пам\b|пл\.\s*у\s*пам/iu;
+
+function hasMeetingPointSignals(name, address, shortDescription, description) {
+  const text = `${venueNameAddressText(name, address)} ${shortDescription || ''} ${description || ''}`.toLowerCase();
+  return MEETING_POINT_TEXT_RE.test(text);
 }
 
 function isMeetingPointLikeRow(row) {
@@ -5584,7 +5885,7 @@ function isMeetingPointLikeRow(row) {
   if (resolved === 'bus') return false;
   if (resolved === 'meeting_point') return true;
   const name = `${row.name || row.title || ''} ${row.address || ''}`.toLowerCase();
-  return /место сбора|место встречи|точка сбора|точка встречи|площадка:|^метро | у метро |у метро |около метро|у памятник|памятник|\bпам\.|\bу пам\b|пл\.\s*у\s*пам/u.test(name);
+  return MEETING_POINT_TEXT_RE.test(name);
 }
 
 function venueNameAddressText(name, address) {
@@ -5697,7 +5998,9 @@ function buildActiveVenueEventCounts(sessions) {
   const waterCounts = new Map();
   const busCounts = new Map();
   const heroImageFallbacks = new Map();
+  const nextSessionStartsAt = new Map();
   const seen = new Map();
+  const now = Date.now();
 
   for (const session of sessions || []) {
     if (!session?.venueId) continue;
@@ -5717,9 +6020,16 @@ function buildActiveVenueEventCounts(sessions) {
       const imageUrl = pickRealPublicImageUrl(session.imageUrl);
       if (imageUrl) heroImageFallbacks.set(session.venueId, imageUrl);
     }
+    if (session.startsAt) {
+      const at = parseSessionStartsAt(session.startsAt).getTime();
+      if (Number.isFinite(at) && at >= now - 30 * 60 * 1000) {
+        const previous = nextSessionStartsAt.get(session.venueId);
+        if (!previous || at < previous) nextSessionStartsAt.set(session.venueId, session.startsAt);
+      }
+    }
   }
 
-  return { activeCounts, waterCounts, busCounts, heroImageFallbacks };
+  return { activeCounts, waterCounts, busCounts, heroImageFallbacks, nextSessionStartsAt };
 }
 
 function pickRealPublicImageUrl(value) {
@@ -5807,7 +6117,7 @@ function isBarLikeVenue(name, address) {
 
 function inferPublicVenueKindFromName(name, address) {
   const text = venueNameAddressText(name, address);
-  if (/\bпам\.|памятник|\bу пам\b|пл\.\s*у\s*пам|место сбора|точка сбора|^метро\b|\bу метро\b/i.test(text)) return 'meeting_point';
+  if (MEETING_POINT_TEXT_RE.test(text)) return 'meeting_point';
   if (/смотров(?:ая|ой|ую|ые)\s+площадк/i.test(text)) return 'museum_art_space';
   if (hasBusLikeText(name, address)) return 'bus';
   if (hasStrongPierLocationText(name, address)) return 'pier';
@@ -5841,7 +6151,13 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
     return 'bus';
   }
 
-  if (inferred === 'meeting_point' || stored === 'meeting_point') return 'meeting_point';
+  if (
+    inferred === 'meeting_point' ||
+    stored === 'meeting_point' ||
+    hasMeetingPointSignals(name, address, shortDescription, description)
+  ) {
+    return 'meeting_point';
+  }
 
   const barOrClub = inferBarOrClubFromContent(name, address, shortDescription, description);
   if (barOrClub) return barOrClub;
@@ -5916,13 +6232,10 @@ function mapPublicVenueListItem(row) {
   const normalized = applyPublicVenueNormalization(row);
   const type = resolvePublicVenueKindFromRow(normalized);
   const name = applyPublicVenueDisplayName(normalized, type);
-  const shortDescription =
-    String(normalized.shortDescription || '').trim() ||
-    String(normalized.description || '').trim().slice(0, 220) ||
-    null;
+  const shortDescription = pickPublicVenueLeadText(normalized.shortDescription, normalized.description);
   return {
     id: normalized.id,
-    slug: normalized.slug,
+    slug: publicVenueSlug(normalized.slug, name, normalized.id),
     name,
     city: normalized.city,
     address: normalized.address,
@@ -5933,6 +6246,7 @@ function mapPublicVenueListItem(row) {
     heroImageUrl: normalized.heroImageUrl,
     events: normalized.events,
     categories: {},
+    nextSlot: normalized.nextSessionStartsAt ? formatTime(normalized.nextSessionStartsAt) : null,
   };
 }
 
@@ -6094,6 +6408,7 @@ async function destinationSummaryRowsFast(db) {
         left join "Source" source on source.id = source_link."sourceId"
         left join "EventSession" session on session."eventId" = e.id
         left join primary_offer on primary_offer."eventId" = e.id
+        where e.status not in ('HIDDEN', 'DRAFT')
         group by
           e.id,
           source.name,
@@ -6136,6 +6451,7 @@ async function destinationSummaryRowsFast(db) {
         from normalized
         where "priceFrom" >= $1
           and "purchaseReady" = true
+          and lower(coalesce("sourceStatus", '')) not in ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden')
           and (
             "startsAt" is not null
             or kind = 'OPEN_DATE'
@@ -6305,6 +6621,8 @@ function buildVenueSessionIndex(sessions) {
     add(session.venueId, session);
     add(session.venueSlug, session);
     if (session.venueSlug) add(canonicalCitySlug(session.venueSlug), session);
+    const pierKey = canonicalSessionPierKey(session);
+    if (pierKey) add(`pier:${pierKey}`, session);
   }
 
   return index;
@@ -6330,31 +6648,69 @@ function buildCatalogSlugIndex(sessions) {
   return index;
 }
 
-function lookupVenueCatalogSessions(venueIds, catalogSessions) {
-  if (!venueIds?.length) return [];
+function collectVenueSessionLookupContexts(venue, mergedGroup) {
+  const contexts = [];
+  const seen = new Set();
+  const add = (row) => {
+    if (!row) return;
+    const key = `${row.name || row.title || ''}|${row.address || ''}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+    contexts.push(row);
+  };
 
+  add(venue);
+  add(mergedGroup);
+  return contexts;
+}
+
+function pierKeysForVenueContexts(venueContexts = []) {
+  const keys = new Set();
+  for (const context of venueContexts) {
+    const pierKey = canonicalPierLocationKey(context.name || context.title, context.address);
+    if (pierKey) keys.add(pierKey);
+  }
+  return keys;
+}
+
+function sortVenueCatalogSessions(sessions) {
+  return sessions.sort((a, b) => {
+    const aTime = Date.parse(a.startsAt || '') || Number.POSITIVE_INFINITY;
+    const bTime = Date.parse(b.startsAt || '') || Number.POSITIVE_INFINITY;
+    return aTime - bTime || String(a.title || '').localeCompare(String(b.title || ''), 'ru');
+  });
+}
+
+function lookupVenueCatalogSessions(venueIds, catalogSessions, venueContexts = []) {
+  if (!venueIds?.length && !venueContexts.length) return [];
+
+  const pierKeys = pierKeysForVenueContexts(venueContexts);
   const index = publicCatalogCache?.venueIndex;
   if (index) {
     const seen = new Set();
     const result = [];
-    for (const venueId of venueIds) {
-      for (const session of index.get(String(venueId).toLowerCase()) || []) {
-        if (seen.has(session.id)) continue;
-        seen.add(session.id);
-        result.push(session);
-      }
+    const collect = (session) => {
+      if (!session || seen.has(session.id)) return;
+      seen.add(session.id);
+      result.push(session);
+    };
+
+    for (const venueId of venueIds || []) {
+      for (const session of index.get(String(venueId).toLowerCase()) || []) collect(session);
     }
-    if (result.length) {
-      return result.sort((a, b) => {
-        const aTime = Date.parse(a.startsAt || '') || Number.POSITIVE_INFINITY;
-        const bTime = Date.parse(b.startsAt || '') || Number.POSITIVE_INFINITY;
-        return aTime - bTime || String(a.title || '').localeCompare(String(b.title || ''), 'ru');
-      });
+    for (const pierKey of pierKeys) {
+      for (const session of index.get(`pier:${pierKey}`) || []) collect(session);
     }
+    if (result.length) return sortVenueCatalogSessions(result);
   }
 
-  const idSet = new Set(venueIds);
-  return catalogSessions.filter((session) => idSet.has(session.venueId));
+  const idSet = new Set(venueIds || []);
+  const matched = catalogSessions.filter((session) => {
+    if (idSet.has(session.venueId)) return true;
+    const pierKey = canonicalSessionPierKey(session);
+    return pierKey && pierKeys.has(pierKey);
+  });
+  return sortVenueCatalogSessions(matched);
 }
 
 function lookupCatalogSessionBySlug(slugOrId, catalogSessions = null) {
@@ -6609,6 +6965,7 @@ async function publicCatalogSessionsFast(db) {
         left join "EventOverride" override on override."eventId" = e.id
         left join "EventSession" session on session."eventId" = e.id
         left join primary_offer on primary_offer."eventId" = e.id
+        where e.status not in ('HIDDEN', 'DRAFT')
         group by
           e.id,
           source_link."externalId",
@@ -6670,6 +7027,7 @@ async function publicCatalogSessionsFast(db) {
         from normalized
         where "priceFrom" >= $1
           and "purchaseReady" = true
+          and lower(coalesce("sourceStatus", '')) not in ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden')
           and (
             "startsAt" is not null
             or kind = 'OPEN_DATE'
@@ -6997,7 +7355,7 @@ function mapGroupedPublicSession(row, pinnedEventIds = new Set()) {
     destination: destination.name,
     destinationType: destination.type,
     venueId: row.venueId,
-    venueSlug: row.venueSlug,
+    venueSlug: row.venueId ? publicVenueSlug(row.venueSlug, row.venue, row.venueId) : row.venueSlug,
     venue: formatPublicVenueTitle(row.venue) || 'Не указано',
     venueAddress: row.venueAddress || null,
     venueKind: row.venueKind || 'OTHER',
@@ -7372,7 +7730,7 @@ function buildTicketscloudWidgetUrl(eventExternalId) {
   const token = process.env.TICKETSCLOUD_WIDGET_TOKEN || process.env.TC_WIDGET_TOKEN;
   if (!token || !eventExternalId) return null;
 
-  const normalizedToken = token.startsWith('r:') ? token : `r:${token}`;
+  const normalizedToken = token.startsWith('r:') ? token.slice(2) : token;
   const url = new URL(process.env.TICKETSCLOUD_WIDGET_BASE_URL || 'https://ticketscloud.com/v1/widgets/common');
   url.searchParams.set('token', normalizedToken);
   url.searchParams.set('event', eventExternalId);
@@ -7424,6 +7782,13 @@ async function resolvePublicEventId(db, eventSlugOrId, catalogSessions = null) {
   const direct = await db.query('select id from "Event" where id = $1 or slug = $1 limit 1', [value]);
   if (direct.rows[0]?.id) return direct.rows[0].id;
 
+  const tcPrefixMatch = value.match(/^tc-([a-f0-9]{24})-/i);
+  if (tcPrefixMatch) {
+    const tcId = tcPrefixMatch[1];
+    const tcResult = await db.query('select id from "Event" where id = $1 or id = $2 limit 1', [tcId, `evt_${tcId}`]);
+    if (tcResult.rows[0]?.id) return tcResult.rows[0].id;
+  }
+
   const suffixMatch = value.match(/(?:^|-)([a-f0-9]{20,})$/i);
   if (suffixMatch) {
     const suffix = suffixMatch[1];
@@ -7447,6 +7812,48 @@ function countBy(values) {
 
 function publicEventSlug(value) {
   return publicCitySlug(value);
+}
+
+function extractOpaqueIdSuffix(value) {
+  const match = String(value || '').match(/(?:^|[-_])([a-f0-9]{20,})$/i);
+  return match ? match[1].toLowerCase() : null;
+}
+
+function stripOpaqueVenueIdSuffix(slug) {
+  const suffix = extractOpaqueIdSuffix(slug);
+  if (!suffix) return slug;
+  const trimmed = String(slug || '').replace(new RegExp(`[-_]${suffix}$`, 'i'), '');
+  return trimmed || slug;
+}
+
+function dedupeVenueSlugSuffix(slug) {
+  const parts = String(slug || '')
+    .split('-')
+    .filter(Boolean);
+  if (parts.length < 2) return slug;
+  if (parts[parts.length - 1] === parts[parts.length - 2]) {
+    return parts.slice(0, -1).join('-');
+  }
+  return slug;
+}
+
+function buildPublicVenueSlug(title, id) {
+  const titleSlug = publicCitySlug(title) || 'venue';
+  const rawId = String(id || '').replace(/^venue_/, '');
+  const idSlug = publicCitySlug(rawId) || rawId;
+  if (!idSlug) return dedupeVenueSlugSuffix(titleSlug);
+  if (titleSlug.endsWith(`-${idSlug}`)) return dedupeVenueSlugSuffix(titleSlug);
+  return dedupeVenueSlugSuffix(`${titleSlug}-${idSlug}`);
+}
+
+export function publicVenueSlug(slug, title, id) {
+  const raw = String(slug || '').trim();
+  const normalized = publicCitySlug(raw);
+  if (normalized && !/^[a-f0-9]{20,}$/i.test(normalized)) {
+    return dedupeVenueSlugSuffix(stripOpaqueVenueIdSuffix(normalized));
+  }
+  if (title && id) return buildPublicVenueSlug(title, id);
+  return dedupeVenueSlugSuffix(stripOpaqueVenueIdSuffix(normalized || raw));
 }
 
 function publicCitySlug(value) {
@@ -7805,10 +8212,28 @@ function keywordFieldsForEvent(event, tags, scope = 'full') {
     .map((item) => ({ ...item, text: String(item.value).toLowerCase() }));
 }
 
+const CYRILLIC_WORD_CHAR = /[a-z0-9а-яё]/i;
+
+/** Подстрока с границей слова слева — «катер» не матчится внутри «екатеринбург». */
+function keywordOccursInText(text, keyword) {
+  const haystack = String(text || '').toLowerCase();
+  const needle = String(keyword || '').toLowerCase();
+  if (!haystack || !needle) return false;
+
+  let from = 0;
+  while (from <= haystack.length - needle.length) {
+    const index = haystack.indexOf(needle, from);
+    if (index === -1) return false;
+    const before = index === 0 ? '' : haystack[index - 1];
+    if (!before || !CYRILLIC_WORD_CHAR.test(before)) return true;
+    from = index + 1;
+  }
+  return false;
+}
+
 function firstKeywordMatch(fields, keywords) {
   for (const keyword of keywords) {
-    const normalized = String(keyword).toLowerCase();
-    const field = fields.find((item) => item.text.includes(normalized));
+    const field = fields.find((item) => keywordOccursInText(item.text, keyword));
     if (field) return { keyword, field: field.field };
   }
   return null;
@@ -7818,8 +8243,7 @@ function matchingKeywordMatches(fields, keywords) {
   const matches = [];
   const seen = new Set();
   for (const keyword of keywords) {
-    const normalized = String(keyword).toLowerCase();
-    const field = fields.find((item) => item.text.includes(normalized));
+    const field = fields.find((item) => keywordOccursInText(item.text, keyword));
     if (!field) continue;
     const key = `${field.field}:${keyword}`;
     if (seen.has(key)) continue;

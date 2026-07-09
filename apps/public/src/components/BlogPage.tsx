@@ -6,12 +6,15 @@ import { Header } from '@/components/Header';
 import { SectionPageHero } from '@/components/PageBreadcrumbs';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import { API_BASE_URL } from '@/lib/api-base';
+import { resolveBlogCityHref } from '@/lib/blog-article-city';
+import { blogCoverUrl } from '@/lib/blog-cover';
 
 type BlogCard = {
   slug: string;
   title: string;
   excerpt: string;
   city?: string | null;
+  citySlug?: string | null;
   coverImageUrl: string;
   publishedAt?: string | null;
   readMin?: number;
@@ -38,6 +41,7 @@ function staticCards(): BlogCard[] {
     title: post.title,
     excerpt: post.excerpt,
     city: post.city,
+    citySlug: post.citySlug,
     coverImageUrl: post.imageUrl,
     publishedAt: null,
     readMin: post.readMin,
@@ -67,6 +71,7 @@ export function BlogPage() {
             title: string;
             excerpt?: string | null;
             city?: string | null;
+            citySlug?: string | null;
             coverImageUrl?: string | null;
             publishedAt?: string | null;
           }>;
@@ -75,16 +80,20 @@ export function BlogPage() {
       .then((payload) => {
         if (!Array.isArray(payload.articles) || !payload.articles.length) return;
         setPosts(
-          payload.articles.map((article) => ({
-            slug: article.slug,
-            title: article.title,
-            excerpt: article.excerpt || '',
-            city: article.city,
-            coverImageUrl: article.coverImageUrl || '/images/blog/concert.jpg',
-            publishedAt: article.publishedAt,
-            readMin: estimateReadMin(article.excerpt || article.title),
-            tag: 'Гид',
-          })),
+          payload.articles.map((article) => {
+            const staticPost = BLOG_POSTS.find((item) => item.slug === article.slug);
+            return {
+              slug: article.slug,
+              title: article.title,
+              excerpt: article.excerpt || '',
+              city: article.city,
+              citySlug: article.citySlug,
+              coverImageUrl: article.coverImageUrl || blogCoverUrl(article.slug),
+              publishedAt: article.publishedAt,
+              readMin: estimateReadMin(article.excerpt || article.title),
+              tag: staticPost?.tag || (article.city ? 'Город' : 'Гид'),
+            };
+          }),
         );
       })
       .catch(() => undefined);
@@ -135,6 +144,7 @@ function BlogPostCard({ post }: { post: BlogCard }) {
   const staticPost = BLOG_POSTS.find((item) => item.slug === post.slug);
   const dateLabel = formatPublishedAt(post.publishedAt, staticPost?.date || '');
   const tag = post.tag || staticPost?.tag || 'Гид';
+  const cityHref = resolveBlogCityHref(post.city, post.citySlug);
 
   return (
     <a
@@ -160,7 +170,28 @@ function BlogPostCard({ post }: { post: BlogCard }) {
           <span className="inline-flex rounded-full bg-white/95 px-2.5 py-0.5 text-xs font-semibold text-slate-900 shadow-sm">
             {tag}
           </span>
-          {post.city ? (
+          {post.city && cityHref ? (
+            <span
+              role="link"
+              tabIndex={0}
+              className="inline-flex items-center gap-1 rounded-full bg-black/50 px-2.5 py-0.5 text-xs font-semibold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-black/65"
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                window.location.href = cityHref;
+              }}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  window.location.href = cityHref;
+                }
+              }}
+            >
+              <MapPin className="h-3 w-3" aria-hidden />
+              {post.city}
+            </span>
+          ) : post.city ? (
             <span className="inline-flex items-center gap-1 rounded-full bg-black/50 px-2.5 py-0.5 text-xs font-semibold text-white ring-1 ring-white/20 backdrop-blur">
               <MapPin className="h-3 w-3" aria-hidden />
               {post.city}

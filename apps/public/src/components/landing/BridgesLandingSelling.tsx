@@ -118,13 +118,17 @@ export function BridgesHeroBlock({
         {sessionsReady ? (
           <>
             {[
-              { value: formatNumber(visibleCount), label: 'рейсов ночью' },
-              { value: `${formatNumber(soldEstimate)}+`, label: 'билетов продано' },
-              { value: '4.7', label: 'средний рейтинг' },
-              { value: priceLabel || '—', label: 'диапазон цен' },
+              { value: formatNumber(visibleCount), label: 'рейсов ночью', nowrap: false },
+              { value: `${formatNumber(soldEstimate)}+`, label: 'билетов продано', nowrap: false },
+              { value: '4.7', label: 'средний рейтинг', nowrap: false },
+              { value: priceLabel || '—', label: 'диапазон цен', nowrap: true },
             ].map((item) => (
               <div key={item.label}>
-                <dt className="text-2xl font-semibold tracking-tight text-primary-foreground md:text-3xl">{item.value}</dt>
+                <dt
+                  className={`text-2xl font-semibold tracking-tight text-primary-foreground md:text-3xl${item.nowrap ? ' whitespace-nowrap' : ''}`}
+                >
+                  {item.value}
+                </dt>
                 <dd className="mt-1 text-xs uppercase tracking-wider text-primary-foreground/60">{item.label}</dd>
               </div>
             ))}

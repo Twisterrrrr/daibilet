@@ -17,6 +17,7 @@
 | Admin CRUD (новый код) | `repositories/` + `services/admin/` (не расширять `dto.js` без необходимости) |
 | Prisma schema | `packages/db/prisma/schema.prisma` → `npm run db:migrate` |
 | Public UI | `apps/public/src/` |
+| Блог (статьи, обложки) | `.cursor/rules/blog-articles.mdc`, `scripts/data/blog-*.js`, `apps/public/public/images/blog/` |
 | Admin UI | `apps/admin/src/` |
 | Деплой | `docs/deploy-timeweb.md` |
 | Прогресс / решения | `docs/Tasktracker.md`, `docs/Diary.md` |

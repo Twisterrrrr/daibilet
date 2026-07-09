@@ -1,6 +1,6 @@
 import type { PublicVenuePage } from '@/types';
 
-const CACHE_PREFIX = 'daibilet:venue-page:';
+const CACHE_PREFIX = 'daibilet:venue-page:v2:';
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
 type CachedVenuePage = {

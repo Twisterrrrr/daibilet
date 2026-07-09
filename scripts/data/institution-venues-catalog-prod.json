@@ -1,0 +1,209 @@
+[
+  {
+    "id": "venue_tep_92",
+    "title": "Кремлёвская набережная 1/4",
+    "kind": "PIER",
+    "pageStatus": "CANDIDATE",
+    "city": "Казань",
+    "address": "Кремлевская наб., 1, Казань, Респ. Татарстан, Россия, 420111",
+    "events": 5
+  },
+  {
+    "id": "venue_60451c795d312eeff1cfea0a",
+    "title": "Клуб \"Эрмитаж\"",
+    "kind": "CLUB_BAR_RESTAURANT",
+    "pageStatus": "NONE",
+    "city": "Красноярск",
+    "address": "ул. Сурикова, 12/6",
+    "events": 1
+  },
+  {
+    "id": "venue_inst_91f213c54f1a3013563d956d",
+    "title": "Московский зоопарк",
+    "kind": "MUSEUM_ART_SPACE",
+    "pageStatus": "CANDIDATE",
+    "city": "Москва",
+    "address": "ул. Большая Грузинская, 1",
+    "events": 441
+  },
+  {
+    "id": "venue_6a1fd5158bd71b8ae77e127c",
+    "title": "Третьяковская галерея",
+    "kind": "MUSEUM_ART_SPACE",
+    "pageStatus": "CANDIDATE",
+    "city": "Москва",
+    "address": "Лаврушинский переулок, 10",
+    "events": 378
+  },
+  {
+    "id": "venue_672f34b6ebf4808956f1474a",
+    "title": "ГМИИ им Пушкина",
+    "kind": "MUSEUM_ART_SPACE",
+    "pageStatus": "CANDIDATE",
+    "city": "Москва",
+    "address": "Волхонка, 12",
+    "events": 316
+  },
+  {
+    "id": "venue_inst_8528bec7a5fcff57ae659039",
+    "title": "Новая Третьяковская галерея",
+    "kind": "MUSEUM_ART_SPACE",
+    "pageStatus": "CANDIDATE",
+    "city": "Москва",
+    "address": "Крымский Вал, 10",
+    "events": 315
+  },
+  {
+    "id": "venue_60508fa06f80350cd3d8b1a4",
+    "title": "Памятник Пушкину, Пушкинская площадь",
+    "kind": "MEETING_POINT",
+    "pageStatus": "NONE",
+    "city": "Москва",
+    "address": "м. Пушкинская",
+    "events": 7
+  },
+  {
+    "id": "venue_5532304f9cb5387c401d984f",
+    "title": "Сад Эрмитаж",
+    "kind": "MEETING_POINT",
+    "pageStatus": "NONE",
+    "city": "Москва",
+    "address": "ул. Каретный Ряд, дом.3",
+    "events": 4
+  },
+  {
+    "id": "venue_tep_29",
+    "title": "Третьяковский сектор «A»",
+    "kind": "PIER",
+    "pageStatus": "CANDIDATE",
+    "city": "Москва",
+    "address": "Россия, Москва, Третьяковский мост",
+    "events": 3
+  },
+  {
+    "id": "venue_63332076aef7ae36f1820154",
+    "title": "Международный аэропорт Шереметьево. Терминал С",
+    "kind": "MEETING_POINT",
+    "pageStatus": "NONE",
+    "city": "Москва",
+    "address": "Шереметьевское ш., Химки, Москва, Россия, 141425",
+    "events": 2
+  },
+  {
+    "id": "venue_tep_44",
+    "title": "Третьяковский сектор «B»",
+    "kind": "PIER",
+    "pageStatus": "CANDIDATE",
+    "city": "Москва",
+    "address": "Лужков Мост, Москва, Россия, 119017",
+    "events": 1
+  },
+  {
+    "id": "venue_66212f8077bdbd90241d0c55",
+    "title": "м. ВДНХ",
+    "kind": "MEETING_POINT",
+    "pageStatus": "NONE",
+    "city": "Москва",
+    "address": "у выхода №5",
+    "events": 1
+  },
+  {
+    "id": "venue_inst_716732e78bcd8af81f3a0643",
+    "title": "ВДНХ",
+    "kind": "ATTRACTION",
+    "pageStatus": "CANDIDATE",
+    "city": "Москва",
+    "address": "проспект Мира, 119",
+    "events": 0
+  },
+  {
+    "id": "venue_inst_aacfc02ecfbdb00bf2af4b37",
+    "title": "Московский Кремль",
+    "kind": "ATTRACTION",
+    "pageStatus": "CANDIDATE",
+    "city": "Москва",
+    "address": "Кремль, Москва",
+    "events": 0
+  },
+  {
+    "id": "venue_6378fe5e0da5f4b4892938e5",
+    "title": "Нижегородская Государственная Академическая Филармония, Кремлевский концертный зал",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Нижний Новгород",
+    "address": "Кремль, корпус 2",
+    "events": 2
+  },
+  {
+    "id": "venue_tep_783",
+    "title": "Площадь Минина и Пожарского (у Дмитриевской башни Кремля)",
+    "kind": "PIER",
+    "pageStatus": "CANDIDATE",
+    "city": "Нижний Новгород",
+    "address": null,
+    "events": 1
+  },
+  {
+    "id": "venue_65ac4f7b0595d88baa43e0be",
+    "title": "ДМ Царскосельский",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Пушкин",
+    "address": "г. Пушкин, ул. Магазейная, д. 42А",
+    "events": 1
+  },
+  {
+    "id": "venue_63f0404ba5f7d83ec6ae736a",
+    "title": "\"Синий Пушкин\" бар Шнурова",
+    "kind": "CLUB_BAR_RESTAURANT",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Жуковского д.3",
+    "events": 189
+  },
+  {
+    "id": "venue_5c9b99e362f03f000c48bd3d",
+    "title": "Государственный Эрмитаж",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Дворцовая набережная, 34",
+    "events": 164
+  },
+  {
+    "id": "venue_69e9bfc4ad9392868aa5ff62",
+    "title": "Петропавловская крепость. Алексеевский равелин (внутренняя территория, ближе к пляжу со стороны Кронверкского пролива)",
+    "kind": "MUSEUM_ART_SPACE",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Санкт-Петербург, территория Петропавловская крепость, дом 3У. Площадка расположена в западной части Заячьего острова",
+    "events": 62
+  },
+  {
+    "id": "venue_68c6ae79d5b98d58ded70411",
+    "title": "Большой петергофский дворец",
+    "kind": "CONCERT_HALL",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Санкт-Петербург, Петергоф, Разводная улица, 2",
+    "events": 4
+  },
+  {
+    "id": "venue_553664969cb538325f4a59c1",
+    "title": "Эрмитажный театр///Imperial Hermitage theatre",
+    "kind": "THEATER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": "Дворцовая наб., 34///Dvortsovaya Emb., 34",
+    "events": 4
+  },
+  {
+    "id": "venue_tep_769",
+    "title": "Исаакиевская пл.",
+    "kind": "PIER",
+    "pageStatus": "CANDIDATE",
+    "city": "Санкт-Петербург",
+    "address": null,
+    "events": 1
+  }
+]

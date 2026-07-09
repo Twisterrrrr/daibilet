@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 
 import { InstitutionCard } from '@/components/InstitutionCard';
+import { OsmMapEmbed } from '@/components/OsmMapEmbed';
 import { formatMoney, formatNumber } from '@/data';
 import { formatStreetAddress } from '@/lib/address';
 import { institutionTypeEmoji, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
@@ -56,7 +57,6 @@ export function InstitutionVenueLayout({
     `${venue.name} — ${typeLabel.toLowerCase()} в ${venue.city}. Афиша, билеты и ближайшие сеансы.`;
   const categories = Object.entries(venue.categories || {}).sort((a, b) => b[1] - a[1]);
   const nextSessions = sessions.slice(0, 4);
-  const mapEmbedSrc = hasMap ? buildOsmEmbedUrl(venue.latitude!, venue.longitude!) : null;
 
   const heroGradient = isTheatre
     ? 'bg-gradient-to-r from-rose-900/95 via-slate-900/80 to-slate-900/50'
@@ -274,11 +274,14 @@ export function InstitutionVenueLayout({
               ) : null}
             </div>
 
-            {hasMap && mapEmbedSrc ? (
+            {hasMap ? (
               <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-                <div className="relative h-48 w-full">
-                  <iframe title={`Карта: ${venue.name}`} src={mapEmbedSrc} className="h-full w-full border-0" loading="lazy" />
-                </div>
+                <OsmMapEmbed
+                  lat={venue.latitude!}
+                  lng={venue.longitude!}
+                  title={`Карта: ${venue.name}`}
+                  className="relative h-48 w-full"
+                />
                 <div className="flex flex-wrap gap-2 p-3">
                   <a
                     href={`https://yandex.ru/maps/?pt=${venue.longitude},${venue.latitude}&z=17&l=map`}
@@ -328,9 +331,4 @@ export function InstitutionVenueLayout({
       </div>
     </div>
   );
-}
-
-function buildOsmEmbedUrl(lat: number, lng: number): string {
-  const bbox = `${lng - 0.005},${lat - 0.003},${lng + 0.005},${lat + 0.003}`;
-  return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`;
 }

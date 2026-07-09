@@ -4,6 +4,16 @@ import { formatStreetAddress } from '@/lib/address';
 import { pluralEvents, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
 import type { PublicVenue } from '@/types';
 
+const TYPE_GRADIENT: Record<string, string> = {
+  pier: 'from-sky-500 via-cyan-600 to-indigo-700',
+  pier_water: 'from-sky-500 via-cyan-600 to-indigo-700',
+  bus: 'from-amber-600 via-orange-600 to-rose-700',
+  outdoor_location: 'from-emerald-600 via-green-700 to-emerald-950',
+  attraction: 'from-violet-600 via-purple-700 to-indigo-800',
+  sport_activity_space: 'from-orange-600 via-red-600 to-rose-800',
+  venue: 'from-indigo-600 via-primary-600 to-indigo-800',
+};
+
 export function LocationCard({
   venue,
   href,
@@ -15,6 +25,7 @@ export function LocationCard({
 }) {
   const TypeIcon = venueTypeIcon(venue.type);
   const typeLabel = venueTypeLabel(venue.type);
+  const gradient = TYPE_GRADIENT[venue.type] || 'from-sky-500 via-primary-600 to-indigo-600';
   const street = formatStreetAddress(venue.address, { city: venue.city }) || venue.city;
 
   return (
@@ -22,7 +33,9 @@ export function LocationCard({
       href={href}
       className="group flex items-stretch overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg"
     >
-      <div className="relative flex w-24 shrink-0 flex-col items-center justify-center bg-gradient-to-br from-sky-500 via-primary-600 to-indigo-600 p-3 text-white sm:w-28">
+      <div
+        className={`relative flex w-24 shrink-0 flex-col items-center justify-center bg-gradient-to-br p-3 text-white sm:w-28 ${gradient}`}
+      >
         <TypeIcon className="h-8 w-8" />
         <div className="mt-2 text-center text-[10px] font-semibold uppercase tracking-wider opacity-90">{typeLabel}</div>
       </div>

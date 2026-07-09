@@ -127,7 +127,7 @@ export async function findInstitutionVenueInCity(db, cityId, context) {
       select id, title, slug, kind, address
       from "Venue"
       where "cityId" = $1
-        and kind = any($2::text[])
+        and kind = any($2::"VenueKind"[])
         and coalesce("pageStatus"::text, 'PUBLISHED') <> 'HIDDEN'
         and title ~* $3
       order by

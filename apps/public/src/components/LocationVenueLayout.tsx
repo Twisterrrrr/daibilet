@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 
 import { LocationCard } from '@/components/LocationCard';
+import { OsmMapEmbed } from '@/components/OsmMapEmbed';
 import {
   buildTcPurchaseTargets,
   expandSessionPurchaseVariants,
@@ -23,7 +24,7 @@ import {
 import { formatMoney, formatNumber } from '@/data';
 import { formatStreetAddress } from '@/lib/address';
 import type { VenueEventGroup } from '@/lib/venue-program';
-import { normalizeVenueKind, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
+import { normalizeVenueKind, resolveLocationVenueCopy, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/routes';
 import type { PublicSession, PublicVenue, PublicVenuePage } from '@/types';
 
@@ -50,14 +51,7 @@ export function LocationVenueLayout({
   const TypeIcon = venueTypeIcon(venue.type);
   const typeLabel = venueTypeLabel(venue.type);
   const routeCount = routeGroups.length || stats.events;
-  const howToFind =
-    venue.shortDescription ||
-    venue.description ||
-    `Локация «${venue.name}» в ${venue.city}. Адрес и время отправления уточняйте в карточке события перед покупкой.`;
-
-  const mapEmbedSrc = hasMap
-    ? buildOsmEmbedUrl(venue.latitude!, venue.longitude!)
-    : null;
+  const { fullDescription, heroLead } = resolveLocationVenueCopy(venue);
 
   return (
     <div className="bg-slate-50">
@@ -76,37 +70,41 @@ export function LocationVenueLayout({
       </div>
 
       {isPier ? (
-        <section className="relative overflow-hidden bg-slate-900 text-white">
-          <div className="absolute inset-0">
-            {venue.heroImageUrl ? (
-              <img src={venue.heroImageUrl} alt="" className="h-full w-full object-cover opacity-40" />
-            ) : (
-              <div className="h-full w-full bg-gradient-to-br from-sky-800 to-slate-950" />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-r from-sky-900/90 via-slate-900/70 to-slate-900/40" />
-          </div>
-          <div className="container-page relative py-12">
-            <div className="flex flex-wrap gap-2">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
-                <Anchor className="h-3.5 w-3.5" /> Причал
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-400 px-3 py-1 text-xs font-bold text-sky-950">
-                <Waves className="h-3.5 w-3.5" /> {formatNumber(routeCount)} {routeCount === 1 ? 'маршрут' : routeCount >= 2 && routeCount <= 4 ? 'маршрута' : 'маршрутов'}
-              </span>
+        <>
+          <section className="relative overflow-hidden bg-slate-900 text-white">
+            <div className="absolute inset-0">
+              {venue.heroImageUrl ? (
+                <img src={venue.heroImageUrl} alt="" className="h-full w-full object-cover opacity-40" />
+              ) : (
+                <div className="h-full w-full bg-gradient-to-br from-sky-800 to-slate-950" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-r from-sky-900/90 via-slate-900/70 to-slate-900/40" />
             </div>
-            <h1 className="mt-4 font-display text-3xl font-extrabold sm:text-4xl md:text-5xl">{title}</h1>
-            <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-white/85">
-              {streetAddress ? (
-                <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4" /> {streetAddress}
+            <div className="container-page relative py-12">
+              <div className="flex flex-wrap gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
+                  <Anchor className="h-3.5 w-3.5" /> Причал
                 </span>
-              ) : null}
-              <span className="inline-flex items-center gap-1.5">
-                <Ticket className="h-4 w-4" /> от {formatMoney(stats.priceFrom)}
-              </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-sky-400 px-3 py-1 text-xs font-bold text-sky-950">
+                  <Waves className="h-3.5 w-3.5" /> {formatNumber(routeCount)} {routeCount === 1 ? 'маршрут' : routeCount >= 2 && routeCount <= 4 ? 'маршрута' : 'маршрутов'}
+                </span>
+              </div>
+              <h1 className="mt-4 font-display text-3xl font-extrabold sm:text-4xl md:text-5xl">{title}</h1>
+              {heroLead ? <p className="mt-3 max-w-3xl text-sm text-white/85 sm:text-base">{heroLead}</p> : null}
+              <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-white/85">
+                {streetAddress ? (
+                  <span className="inline-flex items-center gap-1.5">
+                    <MapPin className="h-4 w-4" /> {streetAddress}
+                  </span>
+                ) : null}
+                <span className="inline-flex items-center gap-1.5">
+                  <Ticket className="h-4 w-4" /> от {formatMoney(stats.priceFrom)}
+                </span>
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+          {hasMap ? <LocationMapStrip venue={venue} /> : null}
+        </>
       ) : isBus ? (
         <section className="relative overflow-hidden bg-slate-900 text-white">
           <div className="absolute inset-0">
@@ -125,7 +123,7 @@ export function LocationVenueLayout({
               <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">{venue.city}</span>
             </div>
             <h1 className="mt-4 font-display text-3xl font-extrabold sm:text-4xl md:text-5xl">{title}</h1>
-            <p className="mt-3 max-w-2xl text-white/85">{howToFind}</p>
+            <p className="mt-3 max-w-2xl text-white/85">{heroLead}</p>
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
               <span className="inline-flex items-center gap-1.5">
                 <Ticket className="h-4 w-4" /> {formatNumber(stats.events)} {isBus ? 'рейсов' : 'событий'}
@@ -139,7 +137,8 @@ export function LocationVenueLayout({
           </div>
         </section>
       ) : isPark ? (
-        <section className="relative overflow-hidden bg-emerald-900 text-white">
+        <>
+          <section className="relative overflow-hidden bg-emerald-900 text-white">
           <div className="absolute inset-0">
             {venue.heroImageUrl ? (
               <img src={venue.heroImageUrl} alt="" className="h-full w-full object-cover opacity-60" />
@@ -156,7 +155,7 @@ export function LocationVenueLayout({
               <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">{venue.city}</span>
             </div>
             <h1 className="mt-4 font-display text-3xl font-extrabold sm:text-4xl md:text-5xl">{title}</h1>
-            <p className="mt-3 max-w-2xl text-white/85">{howToFind}</p>
+            <p className="mt-3 max-w-2xl text-white/85">{heroLead}</p>
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
               <span className="inline-flex items-center gap-1.5">
                 <Ticket className="h-4 w-4" /> {formatNumber(stats.events)} событий
@@ -169,6 +168,8 @@ export function LocationVenueLayout({
             </div>
           </div>
         </section>
+          {hasMap ? <LocationMapStrip venue={venue} /> : null}
+        </>
       ) : (
         <section className="border-b border-slate-200 bg-white">
           <div className="container-page px-0 sm:px-6 lg:px-8">
@@ -210,8 +211,13 @@ export function LocationVenueLayout({
 
               <div className="relative overflow-hidden bg-slate-100 lg:rounded-r-3xl">
                 <div className="relative aspect-[16/10] lg:aspect-auto lg:h-[520px]">
-                  {mapEmbedSrc ? (
-                    <iframe title={`Карта: ${venue.name}`} src={mapEmbedSrc} className="h-full w-full border-0" loading="lazy" />
+                  {hasMap ? (
+                    <OsmMapEmbed
+                      lat={venue.latitude!}
+                      lng={venue.longitude!}
+                      title={`Карта: ${venue.name}`}
+                      className="h-full w-full"
+                    />
                   ) : (
                     <div className="flex h-full flex-col items-center justify-center gap-3 bg-slate-200 p-8 text-center text-slate-600">
                       <MapPin className="h-10 w-10 text-slate-400" />
@@ -291,8 +297,8 @@ export function LocationVenueLayout({
           ) : null}
 
           <section className="rounded-2xl border border-slate-200 bg-white p-6">
-            <h2 className="text-xl font-bold text-slate-900">Как найти</h2>
-            <p className="mt-2 text-sm text-slate-600">{howToFind}</p>
+            <h2 className="text-xl font-bold text-slate-900">О локации</h2>
+            <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-slate-600">{fullDescription}</p>
             {streetAddress ? (
               <div className="mt-5 flex items-start gap-3 rounded-xl border border-slate-100 bg-slate-50 p-3">
                 <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-600 text-xs font-bold text-white">
@@ -347,32 +353,6 @@ export function LocationVenueLayout({
               </div>
             </div>
           </section>
-
-          {(isPier || isPark) && hasMap && mapEmbedSrc ? (
-            <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
-              <div className="relative h-80 w-full">
-                <iframe title={`Карта: ${venue.name}`} src={mapEmbedSrc} className="h-full w-full border-0" loading="lazy" />
-              </div>
-              <div className="flex flex-wrap gap-2 p-4">
-                <a
-                  href={`https://yandex.ru/maps/?pt=${venue.longitude},${venue.latitude}&z=17&l=map`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-600"
-                >
-                  <Navigation className="h-4 w-4" /> Яндекс.Карты
-                </a>
-                <a
-                  href={`https://www.google.com/maps/dir/?api=1&destination=${venue.latitude},${venue.longitude}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-slate-200 hover:bg-slate-50"
-                >
-                  <Car className="h-4 w-4" /> Построить маршрут
-                </a>
-              </div>
-            </section>
-          ) : null}
 
           <details className="group rounded-2xl border border-slate-200 bg-white">
             <summary className="flex cursor-pointer list-none items-center justify-between p-5">
@@ -460,7 +440,39 @@ function collectTodayTimeSlots(sessions: PublicSession[]): string[] {
   return [...slots].sort((a, b) => a.localeCompare(b, 'ru'));
 }
 
-function buildOsmEmbedUrl(lat: number, lng: number): string {
-  const bbox = `${lng - 0.005},${lat - 0.003},${lng + 0.005},${lat + 0.003}`;
-  return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`;
+function LocationMapStrip({ venue }: { venue: PublicVenue }) {
+  if (!venue.latitude || !venue.longitude) return null;
+
+  return (
+    <section className="border-b border-slate-200 bg-white">
+      <div className="container-page py-0">
+        <div className="overflow-hidden rounded-none border-y border-slate-200 sm:rounded-2xl sm:border sm:my-4">
+          <OsmMapEmbed
+            lat={venue.latitude}
+            lng={venue.longitude}
+            title={`Карта: ${venue.name}`}
+            className="relative h-64 w-full sm:h-80"
+          />
+          <div className="flex flex-wrap gap-2 p-4">
+            <a
+              href={`https://yandex.ru/maps/?pt=${venue.longitude},${venue.latitude}&z=17&l=map`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-600"
+            >
+              <Navigation className="h-4 w-4" /> Яндекс.Карты
+            </a>
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=${venue.latitude},${venue.longitude}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-slate-200 hover:bg-slate-50"
+            >
+              <Car className="h-4 w-4" /> Построить маршрут
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }

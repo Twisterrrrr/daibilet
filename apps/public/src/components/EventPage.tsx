@@ -11,6 +11,7 @@ import {
   expandSessionPurchaseVariants,
   extractTcEventIdFromSession,
   listPurchasableSessionVariants,
+  normalizeTcPurchaseUrl,
   pickPurchasableTcSession,
   pickRepresentativeSession,
   resolveTcPurchaseTarget,
@@ -45,7 +46,7 @@ export function EventPage({ slug }: { slug: string }) {
   React.useEffect(() => {
     let isDisposed = false;
     const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 12000);
+    const timeout = window.setTimeout(() => controller.abort(), 25000);
     const cached = readCachedEventPage(slug);
     const shell = cached || buildStaticEventPage(slug);
 
@@ -437,9 +438,10 @@ function HeroBuyButton({
   }
 
   if (purchaseUrl) {
+    const href = normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl;
     return (
       <a
-        href={purchaseUrl}
+        href={href}
         target="_blank"
         rel="noopener noreferrer"
         className={`inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-base font-semibold text-white shadow-md shadow-amber-700/30 transition hover:bg-amber-600 active:bg-amber-700 sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`}
@@ -670,7 +672,7 @@ function BuyCard({ payload }: { payload: PublicEventPage }) {
           />
         ) : purchaseUrl ? (
           <a
-            href={purchaseUrl}
+            href={normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-medium text-white transition hover:bg-primary-700"

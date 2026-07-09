@@ -46,6 +46,8 @@ import {
   buildAdminArticlesList,
   buildAdminArticleDetail,
   upsertAdminArticle,
+  publicVenueSlug,
+  publicVenuePageTemplate,
   clearPublicDataCaches,
   warmPublicCatalogCache,
   runLandingAudit,
@@ -56,6 +58,11 @@ import {
   updateAdminLandingMatch,
   updateAdminVenue,
 } from './dto.js';
+import {
+  buildSocialPreviewForPath,
+  isSocialPreviewAgent,
+  renderSocialPreviewHtml,
+} from './social-preview.js';
 import {
   assertAuthRateLimit,
   authenticateAccessToken,
@@ -204,6 +211,28 @@ createServer(async (request, response) => {
     if (route === 'GET /api/public/stats') {
       if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public stats refresh');
       sendPublicJson(response, await withPublicResponseCache('stats', () => buildPublicStats(db)));
+      return;
+    }
+
+    if (route === 'GET /api/public/social-preview') {
+      const previewPath = String(url.searchParams.get('path') || '').trim();
+      const meta = await buildSocialPreviewForPath(db, previewPath, {
+        buildPublicVenuePage,
+        buildPublicEventPage,
+        buildPublicArticlePage,
+        buildPublicCityPage,
+        publicVenueSlug,
+        publicVenuePageTemplate,
+      });
+      const html = renderSocialPreviewHtml(meta || undefined, {
+        redirectPath: meta?.redirectPath || meta?.url || previewPath,
+      });
+      response.writeHead(200, {
+        'content-type': 'text/html; charset=utf-8',
+        'cache-control': 'public, max-age=300, stale-while-revalidate=600',
+        ...buildCorsHeaders(request),
+      });
+      response.end(html);
       return;
     }
 
@@ -375,7 +404,8 @@ createServer(async (request, response) => {
     const publicVenueMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/venues\/([^/]+)$/) : null;
     if (publicVenueMatch) {
       const venueSlug = decodeURIComponent(publicVenueMatch[1]);
-      sendPublicJson(response, await withPublicResponseCache(`venue:${venueSlug}`, () => buildPublicVenuePage(db, venueSlug)));
+      const payload = await withPublicResponseCache(`venue:${venueSlug}`, () => buildPublicVenuePage(db, venueSlug));
+      sendPublicJson(response, payload || { error: 'venue_not_found' }, payload ? 200 : 404);
       return;
     }
 

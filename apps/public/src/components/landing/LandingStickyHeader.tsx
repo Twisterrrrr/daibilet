@@ -14,7 +14,7 @@ export function LandingStickyHeader() {
 
   return (
     <header className="fixed inset-x-0 top-[calc(var(--site-header-height)+env(safe-area-inset-top,0px))] z-40 border-b border-border bg-background/95 shadow-sm backdrop-blur-md">
-      <div className="container mx-auto flex h-14 items-center justify-between px-4">
+      <div className="container-page flex h-14 items-center justify-between">
         <a href="/" className="flex items-center gap-2">
           <DaibiletLogo iconClassName="h-7 w-7 shrink-0" textClassName="text-sm sm:text-base" />
         </a>

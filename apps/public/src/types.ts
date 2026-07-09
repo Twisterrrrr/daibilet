@@ -131,6 +131,7 @@ export type PublicVenue = {
   isIndexable?: boolean | null;
   events: number;
   categories: Record<string, number>;
+  nextSlot?: string | null;
 };
 
 export type PublicVenuePage = {

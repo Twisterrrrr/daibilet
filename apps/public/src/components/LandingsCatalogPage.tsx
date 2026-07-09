@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ArrowRight, ChevronRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
 import { CityPicker } from '@/components/CityPicker';
 import { Footer } from '@/components/Footer';
@@ -8,7 +8,7 @@ import { SectionPageHero } from '@/components/PageBreadcrumbs';
 import { formatMoney, formatNumber, publicData } from '@/data';
 import { API_BASE_URL } from '@/lib/api-base';
 import { buildCatalogPresetHref, buildCatalogTagHref } from '@/lib/catalog-links';
-import { CATALOG_PRESET_EMOJI, CATALOG_PRESET_HINT, CATALOG_PRESETS } from '@/lib/catalog-presets';
+import { CATALOG_PRESET_EMOJI, CATALOG_PRESETS } from '@/lib/catalog-presets';
 import { collectPopularTags } from '@/lib/catalog-tags';
 import { resolveLandingCardImage } from '@/lib/landing-images';
 import { landingPageHref } from '@/lib/landing-slugs';
@@ -110,22 +110,18 @@ export function LandingsCatalogPage({ dataVersion = 0 }: { dataVersion?: number 
 
       <main className="container-page py-10 sm:py-12">
         <section>
-          <h2 className="font-display text-xl font-bold text-slate-900">По моменту</h2>
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <h2 className="font-display text-xl font-bold text-slate-900">Быстрые подборки</h2>
+          <div className="mt-3 flex flex-nowrap gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {CATALOG_PRESETS.map((preset) => (
               <a
                 key={preset.slug}
                 href={buildCatalogPresetHref(preset.slug)}
-                className="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
+                className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:border-primary/40 hover:bg-primary/5 hover:text-primary-700"
               >
-                <div className="flex items-start justify-between gap-3">
-                  <span className="text-3xl" aria-hidden>
-                    {CATALOG_PRESET_EMOJI[preset.slug]}
-                  </span>
-                  <ChevronRight className="h-5 w-5 shrink-0 text-slate-300 transition group-hover:translate-x-1 group-hover:text-primary" />
-                </div>
-                <h3 className="mt-3 text-lg font-bold text-slate-900 group-hover:text-primary-700">{preset.label}</h3>
-                <p className="mt-1 text-sm text-slate-500">{CATALOG_PRESET_HINT[preset.slug]}</p>
+                <span className="text-base leading-none" aria-hidden>
+                  {CATALOG_PRESET_EMOJI[preset.slug]}
+                </span>
+                {preset.label}
               </a>
             ))}
           </div>
