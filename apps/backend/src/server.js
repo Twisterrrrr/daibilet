@@ -114,7 +114,7 @@ function getAllowedOrigins() {
 function routeNeedsCredentials(request) {
   if (!request?.url) return false;
   const pathname = new URL(request.url, 'http://127.0.0.1').pathname;
-  return pathname.startsWith('/api/auth/') || pathname.startsWith('/api/account/');
+  return pathname.startsWith('/api/auth/') || pathname.startsWith('/api/account/') || pathname.startsWith('/api/user/auth/');
 }
 
 function buildCorsHeaders(request, { credentials = false } = {}) {
