@@ -16,22 +16,27 @@ import {
 import { EventCard } from '@/components/EventCard';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { SessionBuyButton } from '@/components/TcWidget';
 import { formatMoney, formatNumber } from '@/data';
+import { collectPopularTags } from '@/lib/catalog-tags';
 import { resolveCityImage } from '@/lib/city-images';
+import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { landingPageHref } from '@/lib/landing-slugs';
-import { eventHref } from '@/routes';
+import { eventHref, sessionVenueHref, venueHref } from '@/routes';
 import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
+import {
+  buildCityPageShell,
+  readCachedCityPage,
+  writeCachedCityPage,
+} from '@/lib/city-page-cache';
+import { API_BASE_URL } from '@/lib/api-base';
 import type { PublicCity, PublicCityPage, PublicLanding, PublicSession, PublicVenue } from '@/types';
-
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
 
 type ViewMode = 'cards' | 'table';
 
 export function CityPage({ slug }: { slug: string }) {
-  const [payload, setPayload] = React.useState<PublicCityPage | null>(null);
-  const [isLoading, setIsLoading] = React.useState(true);
+  const [payload, setPayload] = React.useState<PublicCityPage | null>(() => readCachedCityPage(slug) || buildCityPageShell(slug));
+  const [contentReady, setContentReady] = React.useState(() => Boolean(readCachedCityPage(slug)?.sessions?.length));
   const [error, setError] = React.useState<string | null>(null);
   const [category, setCategory] = React.useState('all');
   const [tag, setTag] = React.useState('all');
@@ -40,9 +45,17 @@ export function CityPage({ slug }: { slug: string }) {
   React.useEffect(() => {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 25000);
-    setIsLoading(true);
+    const cached = readCachedCityPage(slug);
+    if (!cached?.sessions?.length) {
+      const shell = buildCityPageShell(slug);
+      if (shell) {
+        setPayload(shell);
+        setContentReady(false);
+      }
+    }
+
     fetch(`${API_BASE_URL}/api/public/cities/${encodeURIComponent(slug)}`, {
-      cache: 'no-store',
+      cache: 'default',
       signal: controller.signal,
     })
       .then(async (response) => {
@@ -52,16 +65,19 @@ export function CityPage({ slug }: { slug: string }) {
       .then((data) => {
         if (!data) throw new Error('Город не найден');
         setPayload(data);
+        setContentReady(true);
         setError(null);
+        writeCachedCityPage(slug, data);
         applyCityMeta(data);
       })
       .catch((requestError) => {
         if (controller.signal.aborted) return;
-        setError(requestError instanceof Error ? requestError.message : String(requestError));
+        if (!cached && !buildCityPageShell(slug)) {
+          setError(requestError instanceof Error ? requestError.message : String(requestError));
+        }
       })
       .finally(() => {
         window.clearTimeout(timeout);
-        if (!controller.signal.aborted) setIsLoading(false);
       });
 
     return () => {
@@ -69,6 +85,11 @@ export function CityPage({ slug }: { slug: string }) {
       controller.abort();
     };
   }, [slug]);
+
+  React.useEffect(() => {
+    if (!contentReady) return;
+    if (window.location.hash === '#city-schedule') scrollToSchedule();
+  }, [contentReady, slug]);
 
   const sessions = React.useMemo(() => {
     if (!payload) return [];
@@ -81,7 +102,10 @@ export function CityPage({ slug }: { slug: string }) {
 
   const city = payload?.city;
   const categories = city ? Object.entries(city.categories).sort((a, b) => b[1] - a[1]) : [];
-  const popularTags = React.useMemo(() => (payload ? topTags(payload.sessions, 12) : []), [payload]);
+  const popularTags = React.useMemo(
+    () => (payload ? collectPopularTags(payload.sessions, 12).map(({ name, events }) => ({ name, count: events })) : []),
+    [payload],
+  );
   const guide = city ? cityGuideFor(city) : null;
   const recommended = payload ? rankRecommended(payload.sessions).slice(0, 6) : [];
   const moreEvents = payload ? rankRecommended(payload.sessions).slice(6, 30) : [];
@@ -91,9 +115,9 @@ export function CityPage({ slug }: { slug: string }) {
       <Header cityLabel={city?.name || 'Дайбилет'} onSection={(section) => navigateHome(section)} searchCity={city?.name} />
 
       <main>
-        {isLoading ? <CityLoadingState /> : null}
+        {!payload && !error ? <CityLoadingState /> : null}
 
-        {!isLoading && error ? (
+        {error && !payload?.city ? (
           <div className="container-page py-16">
             <button type="button" className="btn-secondary" onClick={() => navigateHome('top')}>
               <ArrowLeft className="h-4 w-4" />
@@ -107,44 +131,60 @@ export function CityPage({ slug }: { slug: string }) {
         {city && payload ? (
           <>
             <CityHero city={city} stats={payload.stats} guide={guide} />
-            <PopularDirections city={city} landings={payload.landings} categories={categories} />
-            <MustSeeSection city={city} guide={guide} categories={categories} venues={payload.venues} />
-            <CategoryTiles categories={categories} onSelect={(value) => {
-              setCategory(value);
-              setTag('all');
-              scrollToSchedule();
-            }} />
-            <VenueHighlights city={city} venues={payload.venues} />
-            <PopularTags tags={popularTags} active={tag} onSelect={(value) => {
-              setTag(value);
-              setCategory('all');
-              scrollToSchedule();
-            }} />
-            <RecommendedEvents city={city} sessions={recommended} />
-            <MoreEvents sessions={moreEvents} />
+            {contentReady ? (
+              <>
+                <PopularDirections city={city} landings={payload.landings} categories={categories} />
+                <MustSeeSection city={city} guide={guide} categories={categories} venues={payload.venues} />
+                <CategoryTiles categories={categories} onSelect={(value) => {
+                  setCategory(value);
+                  setTag('all');
+                  scrollToSchedule();
+                }} />
+                <VenueHighlights city={city} venues={payload.venues} />
+                <PopularTags tags={popularTags} active={tag} onSelect={(value) => {
+                  setTag(value);
+                  setCategory('all');
+                  scrollToSchedule();
+                }} />
+                <RecommendedEvents city={city} sessions={recommended} />
+                <MoreEvents sessions={moreEvents} />
+              </>
+            ) : (
+              <CityContentLoadingState />
+            )}
 
             <section id="city-schedule" className="container-page grid gap-6 py-8 lg:grid-cols-[minmax(0,1fr)_320px]">
               <div className="min-w-0">
                 <CityCatalogHeader city={city} count={sessions.length} mode={mode} setMode={setMode} />
-                <CategoryFilter
-                  categories={categories}
-                  active={category}
-                  total={payload.sessions.length}
-                  activeTag={tag}
-                  onCategory={(value) => {
-                    setCategory(value);
-                    setTag('all');
-                  }}
-                  onReset={() => {
-                    setCategory('all');
-                    setTag('all');
-                  }}
-                />
-                {mode === 'table' ? <CityEventsTable sessions={sessions} /> : <CityEventsGrid sessions={sessions} />}
+                {contentReady ? (
+                  <>
+                    <CategoryFilter
+                      categories={categories}
+                      active={category}
+                      total={payload.sessions.length}
+                      activeTag={tag}
+                      onCategory={(value) => {
+                        setCategory(value);
+                        setTag('all');
+                      }}
+                      onReset={() => {
+                        setCategory('all');
+                        setTag('all');
+                      }}
+                    />
+                    {mode === 'table' ? <CityEventsTable sessions={sessions} /> : <CityEventsGrid sessions={sessions} />}
+                  </>
+                ) : (
+                  <CityScheduleLoadingState />
+                )}
               </div>
 
               <aside className="grid content-start gap-4">
-                <CityGuideAside city={city} stats={payload.stats} categories={categories} landings={payload.landings} />
+                {contentReady ? (
+                  <CityGuideAside city={city} stats={payload.stats} categories={categories} landings={payload.landings} />
+                ) : (
+                  <div className="h-64 rounded-xl bg-slate-50" />
+                )}
               </aside>
             </section>
           </>
@@ -172,6 +212,11 @@ function CityHero({
   });
   const showImage = Boolean(heroImage && !hasImageError);
   const cityIn = cityInPrepositional(city);
+  const heroFocus = resolveCityImageObjectPosition({
+    slug: city.slug,
+    sourceSlug: city.sourceSlug,
+    name: city.name,
+  });
 
   return (
     <section className="relative min-h-[320px] overflow-hidden border-b border-primary-950 text-white sm:min-h-[380px]">
@@ -180,7 +225,8 @@ function CityHero({
           <img
             src={heroImage || ''}
             alt=""
-            className="absolute inset-0 h-full w-full object-cover object-center lg:object-[center_75%]"
+            style={{ objectPosition: heroFocus }}
+            className="absolute inset-0 h-full w-full object-cover"
             onError={() => setHasImageError(true)}
           />
         </div>
@@ -224,6 +270,29 @@ function CityHero({
         </div>
       </div>
     </section>
+  );
+}
+
+function CityContentLoadingState() {
+  return (
+    <section className="container-page py-10">
+      <div className="h-6 w-64 rounded bg-slate-100" />
+      <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: 6 }).map((_, index) => (
+          <div key={index} className="h-32 rounded-lg bg-slate-50" />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function CityScheduleLoadingState() {
+  return (
+    <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <div key={index} className="h-72 rounded-xl bg-slate-50" />
+      ))}
+    </div>
   );
 }
 
@@ -368,27 +437,45 @@ function CategoryTiles({ categories, onSelect }: { categories: Array<[string, nu
 function VenueHighlights({ city, venues }: { city: PublicCity; venues: PublicVenue[] }) {
   if (!venues.length) return null;
   const cityIn = cityInPrepositional(city);
+  const institutions = venues.filter((venue) => venue.template !== 'location');
+  const locations = venues.filter((venue) => venue.template === 'location');
+  const featured = [...institutions, ...locations].slice(0, 6);
+
   return (
     <section className="container-page py-10">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-950">Площадки и точки интереса</h2>
+          <h2 className="text-2xl font-bold text-slate-950">Площадки и локации</h2>
           <p className="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
-            Места, откуда стартуют экскурсии, проходят мероприятия и формируются городские маршруты {cityIn}.
+            Музеи, театры, причалы и точки старта экскурсий {cityIn}.
           </p>
         </div>
-        <a href="#city-schedule" className="text-sm font-semibold text-primary-700 hover:text-primary-800">
-          Смотреть афишу
-        </a>
+        <div className="flex flex-wrap gap-3 text-sm font-semibold">
+          <a href="#city-schedule" className="text-primary-700 hover:text-primary-800">
+            Смотреть афишу
+          </a>
+          {locations.length ? (
+            <a href="/locations" className="text-primary-700 hover:text-primary-800">
+              Все локации →
+            </a>
+          ) : null}
+        </div>
       </div>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {venues.slice(0, 6).map((venue) => (
-          <a key={venue.id} href={`/venues/${venue.slug || venue.id}`} className="rounded-lg bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition hover:bg-primary-50/60 hover:shadow-[0_16px_34px_rgba(15,23,42,0.1)]">
+        {featured.map((venue) => (
+          <a key={venue.id} href={venueHref(venue)} className="rounded-lg bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition hover:bg-primary-50/60 hover:shadow-[0_16px_34px_rgba(15,23,42,0.1)]">
             <div className="font-semibold text-slate-950">{venue.name}</div>
-            <div className="mt-2 flex items-center gap-1 text-sm text-slate-500">
-              <MapPin className="h-4 w-4" />
-              {pluralEvents(venue.events)}
-            </div>
+            {venue.address ? (
+              <div className="mt-2 flex items-start gap-1 text-sm text-slate-500">
+                <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                <span className="line-clamp-2">{venue.address}</span>
+              </div>
+            ) : (
+              <div className="mt-2 flex items-center gap-1 text-sm text-slate-500">
+                <MapPin className="h-4 w-4" />
+                {pluralEvents(venue.events)}
+              </div>
+            )}
           </a>
         ))}
       </div>
@@ -475,7 +562,7 @@ function CityCatalogHeader({
   return (
     <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h2 className="text-2xl font-bold text-slate-950">Каталог событий {cityIn}</h2>
+        <h2 className="text-2xl font-bold text-slate-950">События {cityIn}</h2>
         <p className="mt-1 text-sm leading-6 text-slate-600">
           {pluralEvents(count)} после выбранных фильтров. Для повторяющихся событий карточка объединяет ближайшие слоты.
         </p>
@@ -559,7 +646,16 @@ function CityEventsTable({ sessions }: { sessions: PublicSession[] }) {
                 <div className="mt-1 text-xs text-slate-500">{session.tags.slice(0, 2).join(' · ')}</div>
               </td>
               <td className="max-w-[240px] px-4 py-3 text-slate-600">
-                {session.venueSlug ? <a className="font-medium text-primary-600 hover:text-primary-700" href={`/venues/${session.venueSlug}`}>{session.venue}</a> : session.venue}
+                {(() => {
+                  const venueLink = sessionVenueHref(session);
+                  return venueLink ? (
+                    <a className="font-medium text-primary-600 hover:text-primary-700" href={venueLink}>
+                      {session.venue}
+                    </a>
+                  ) : (
+                    session.venue
+                  );
+                })()}
               </td>
               <td className="px-4 py-3 text-slate-600">{session.category}</td>
               <td className="whitespace-nowrap px-4 py-3 font-semibold text-slate-950">{formatMoney(session.priceFrom)}</td>
@@ -640,19 +736,7 @@ function HeroStat({ label, value }: { label: string; value: string }) {
 }
 
 function BuyLink({ session }: { session: PublicSession }) {
-  if (!session.purchaseUrl) {
-    return (
-      <span className="inline-flex min-h-9 items-center justify-center rounded-lg bg-slate-100 px-4 text-sm font-semibold text-slate-400">
-        Нет ссылки
-      </span>
-    );
-  }
-
-  return (
-    <a href={session.purchaseUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center justify-center rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700">
-      Купить
-    </a>
-  );
+  return <SessionBuyButton session={session} />;
 }
 
 function EmptyState() {
@@ -691,21 +775,6 @@ function sessionQualityScore(session: PublicSession) {
   if (session.tags.length) score += 1;
   if ((session.sessionCount || 0) > 1) score += 1;
   return score;
-}
-
-function topTags(sessions: PublicSession[], limit: number) {
-  const counts = new Map<string, number>();
-  for (const session of sessions) {
-    for (const tag of session.tags || []) {
-      const clean = tag.trim();
-      if (!clean || clean.length < 3) continue;
-      counts.set(clean, (counts.get(clean) || 0) + 1);
-    }
-  }
-  return Array.from(counts.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, limit)
-    .map(([name, count]) => ({ name, count }));
 }
 
 function pluralEvents(n: number): string {

@@ -4,6 +4,42 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Дайбилет — экскурсии, музеи и события</title>
+    <meta name="description" content="Билеты на экскурсии, музеи, речные прогулки и события в городах России. Сравнение цен и расписания на Дайбилет." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#4A7FD4" />
+    <script>
+      (function () {
+        var path = location.pathname.replace(/\/+$/, '') || '/';
+        if (/^\/saint-petersburg\/night-bridges$/.test(path)) {
+          document.title = 'Разводные мосты СПб: ночные экскурсии и билеты от 1100₽';
+          var desc = document.querySelector('meta[name="description"]');
+          if (desc) {
+            desc.setAttribute(
+              'content',
+              'Сравните 10+ ночных прогулок к разводным мостам СПб на одном сайте! Цены от 1100 руб., актуальное расписание на сегодня. Покупка билетов онлайн за 2 минуты.',
+            );
+          }
+        }
+      })();
+    </script>
+    <script>
+      (function () {
+        var match = location.pathname.match(/^\/(locations|venues)\/([^/]+)\/?$/);
+        if (!match) return;
+        var slug = decodeURIComponent(match[2]);
+        window.__DAIBILET_VENUE_PREFETCH__ = {
+          slug: slug,
+          promise: fetch('/api/public/venues/' + encodeURIComponent(slug), { credentials: 'same-origin' })
+            .then(function (response) {
+              return response.ok ? response.json() : null;
+            })
+            .catch(function () {
+              return null;
+            }),
+        };
+      })();
+    </script>
     <script defer src="https://ticketscloud.com/static/scripts/widget/tcwidget.js"></script>
   </head>
   <body>

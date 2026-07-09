@@ -38,7 +38,7 @@ export function HelpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(helpFaqJsonLd()) }} />
       <Header cityLabel="Все города" onSection={navigateFromHelp} />
 

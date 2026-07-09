@@ -1,198 +1,335 @@
 import * as React from 'react';
-import { ArrowDownAZ, ArrowUpAZ, Building2, CalendarDays, MapPin, Search } from 'lucide-react';
+import { ChevronRight, Grid3X3, List, Search } from 'lucide-react';
 
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { InstitutionCard } from '@/components/InstitutionCard';
+import { InstitutionList } from '@/components/InstitutionListRow';
+import { formatNumber } from '@/data';
 import { API_BASE_URL } from '@/lib/api-base';
+import {
+  readCachedInstitutionVenues,
+  writeCachedInstitutionVenues,
+} from '@/lib/venues-catalog-cache';
+import {
+  INSTITUTION_CATALOG_TYPE_OPTIONS,
+  normalizeVenueKind,
+  venueTypeLabel,
+} from '@/lib/venue-meta';
+import { venueCatalogHref, venueHref } from '@/routes';
 import type { PublicVenue } from '@/types';
 
 type SortMode = 'events' | 'asc' | 'desc';
+type ViewMode = 'cards' | 'list';
+
+const VENUES_VIEW_MODE_KEY = 'daibilet:venues-view-mode';
+
+const SORT_OPTIONS: Array<[SortMode, string]> = [
+  ['events', 'По афише'],
+  ['asc', 'А–Я'],
+  ['desc', 'Я–А'],
+];
 
 export function VenuesCatalogPage() {
-  const [venues, setVenues] = React.useState<PublicVenue[]>([]);
   const [query, setQuery] = React.useState('');
-  const [city, setCity] = React.useState('all');
-  const [kind, setKind] = React.useState('all');
+  const [cityFilter, setCityFilter] = React.useState('all');
+  const [typeFilter, setTypeFilter] = React.useState('all');
   const [sortMode, setSortMode] = React.useState<SortMode>('events');
-  const [visible, setVisible] = React.useState(48);
-  const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const [viewMode, setViewMode] = React.useState<ViewMode>(() => readStoredViewMode());
+  const [venues, setVenues] = React.useState<PublicVenue[]>(() => readCachedInstitutionVenues() || []);
+  const [isLoading, setIsLoading] = React.useState(() => !readCachedInstitutionVenues()?.length);
+
+  const setViewModePersisted = React.useCallback((value: ViewMode) => {
+    setViewMode(value);
+    try {
+      localStorage.setItem(VENUES_VIEW_MODE_KEY, value);
+    } catch {
+      // ignore storage errors
+    }
+  }, []);
 
   React.useEffect(() => {
-    document.title = 'Площадки России: афиша и билеты | Дайбилет';
-    upsertMeta('description', 'Театры, музеи, концертные залы, причалы и другие площадки. Афиша, ближайшие события, цены и билеты.');
+    document.title = 'Площадки: музеи, галереи и театры — билеты онлайн | Дайбилет';
+    upsertMeta(
+      'description',
+      'Каталог площадок Дайбилет: музеи, галереи, театры и арт-пространства. Актуальная афиша и электронные билеты.',
+    );
   }, []);
 
   React.useEffect(() => {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 15000);
-    fetch(`${API_BASE_URL}/api/public/venues`, { cache: 'no-store', signal: controller.signal })
+
+    fetch(`${API_BASE_URL}/api/public/venues?limit=500&family=institution`, { cache: 'default', signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as { venues?: PublicVenue[] };
       })
       .then((payload) => {
-        setVenues(Array.isArray(payload.venues) ? payload.venues : []);
-        setError(null);
+        if (!Array.isArray(payload.venues)) return;
+        setVenues(payload.venues);
+        writeCachedInstitutionVenues(payload.venues);
       })
-      .catch((requestError) => {
-        if (!controller.signal.aborted) setError(requestError instanceof Error ? requestError.message : String(requestError));
-      })
+      .catch(() => undefined)
       .finally(() => {
         window.clearTimeout(timeout);
         if (!controller.signal.aborted) setIsLoading(false);
       });
+
     return () => {
       window.clearTimeout(timeout);
       controller.abort();
     };
   }, []);
 
-  const cities = React.useMemo(() => uniqueSorted(venues.map((venue) => venue.city).filter((value) => value !== 'Не указан')), [venues]);
-  const kinds = React.useMemo(() => uniqueSorted(venues.map((venue) => venue.type)), [venues]);
-  const filtered = React.useMemo(() => {
+  const cityOptions = React.useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const venue of venues) {
+      if (!venue.city || venue.city === 'Не указан') continue;
+      counts.set(venue.city, (counts.get(venue.city) || 0) + 1);
+    }
+    return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'));
+  }, [venues]);
+
+  const typeOptions = React.useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const venue of venues) {
+      const key = normalizeVenueKind(venue.type);
+      counts.set(key, (counts.get(key) || 0) + 1);
+    }
+    return INSTITUTION_CATALOG_TYPE_OPTIONS.filter((option) => counts.has(option.value)).map((option) => ({
+      ...option,
+      count: counts.get(option.value) || 0,
+    }));
+  }, [venues]);
+
+  const filteredVenues = React.useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    const rows = venues.filter((venue) => {
-      if (city !== 'all' && venue.city !== city) return false;
-      if (kind !== 'all' && venue.type !== kind) return false;
+    const list = venues.filter((venue) => {
+      if (cityFilter !== 'all' && venue.city !== cityFilter) return false;
+      if (typeFilter !== 'all' && normalizeVenueKind(venue.type) !== typeFilter) return false;
       if (!normalized) return true;
-      return [venue.name, venue.city, venue.address, kindLabel(venue.type)]
+      return [venue.name, venue.city, venue.address, venue.shortDescription, venueTypeLabel(venue.type)]
         .filter(Boolean)
         .join(' ')
         .toLowerCase()
         .includes(normalized);
     });
-    return [...rows].sort((left, right) => {
-      if (sortMode === 'events') return right.events - left.events || left.name.localeCompare(right.name, 'ru');
-      const comparison = left.name.localeCompare(right.name, 'ru');
-      return sortMode === 'asc' ? comparison : -comparison;
-    });
-  }, [city, kind, query, sortMode, venues]);
 
-  React.useEffect(() => setVisible(48), [city, kind, query, sortMode]);
+    return [...list].sort((a, b) => {
+      if (sortMode === 'events') return b.events - a.events || a.name.localeCompare(b.name, 'ru');
+      const cmp = a.name.localeCompare(b.name, 'ru');
+      return sortMode === 'asc' ? cmp : -cmp;
+    });
+  }, [venues, query, cityFilter, typeFilter, sortMode]);
 
   const goSection = (section: string) => {
     if (section === 'top') window.location.href = '/';
     else if (section === 'events') window.location.href = '/events';
-    else if (section === 'destinations' || section === 'cities') window.location.href = '/cities';
     else if (section === 'orders') window.location.href = '/my-orders';
+    else if (section === 'blog') window.location.href = '/blog';
+    else if (section === 'cities' || section === 'destinations') window.location.href = '/cities';
+    else if (section === 'venues') window.location.href = '/venues';
+    else if (section === 'locations') window.location.href = '/locations';
     else window.location.href = `/#${section}`;
   };
 
+  const cityCount = cityOptions.length;
+
   return (
-    <div className="min-h-screen bg-white text-slate-900">
-      <Header cityLabel={city === 'all' ? 'Все города' : city} onSection={goSection} searchCity={city === 'all' ? undefined : city} />
-      <main>
-        <section className="border-b border-slate-200 bg-slate-50">
-          <div className="container-page py-10 sm:py-12">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-slate-950">Площадки</h1>
-                <p className="mt-2 max-w-3xl text-base leading-7 text-slate-600">
-                  Театры, музеи, концертные залы, причалы и места встреч с актуальной афишей.
-                </p>
-              </div>
-              <div className="text-sm text-slate-500">{formatVenues(filtered.length)}</div>
-            </div>
-          </div>
-        </section>
+    <div className="min-h-screen bg-slate-50">
+      <Header cityLabel="Все города" onSection={goSection} searchQuery={query} searchCity={cityFilter !== 'all' ? cityFilter : undefined} />
 
-        <section className="sticky top-16 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
-          <div className="container-page grid gap-3 py-4 lg:grid-cols-[minmax(260px,1fr)_220px_220px_auto]">
-            <label className="flex h-11 min-w-0 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 focus-within:border-primary-400">
-              <Search className="h-4 w-4 shrink-0 text-slate-400" />
-              <input value={query} onChange={(event) => setQuery(event.target.value)} className="min-w-0 flex-1 border-0 bg-transparent text-sm outline-none" placeholder="Название, адрес или город" />
-            </label>
-            <select value={city} onChange={(event) => setCity(event.target.value)} className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700">
+      <div className="border-b border-slate-200 bg-white">
+        <div className="container-page flex items-center gap-1.5 py-3 text-sm text-slate-500">
+          <a href="/" className="hover:text-primary-600">
+            Главная
+          </a>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <span className="text-slate-900">Площадки</span>
+        </div>
+      </div>
+
+      <section className="border-b border-slate-200 bg-gradient-to-br from-sky-500 via-primary-600 to-indigo-700 text-white">
+        <div className="container-page py-10 md:py-14">
+          <p className="text-sm font-semibold uppercase tracking-wider text-white/70">
+            {venues.length ? `${formatNumber(venues.length)} площадок` : isLoading ? 'Загружаем площадки…' : '0 площадок'}
+            {cityCount ? (
+              <>
+                {' '}
+                · {cityCount} {cityCount === 1 ? 'город' : cityCount >= 2 && cityCount <= 4 ? 'города' : 'городов'}
+              </>
+            ) : null}
+          </p>
+          <h1 className="mt-2 font-display text-3xl font-extrabold sm:text-4xl md:text-5xl">
+            Площадки: музеи, галереи, театры и арт-пространства
+          </h1>
+          <p className="mt-3 max-w-2xl text-white/85">
+            Постоянные экспозиции, временные выставки, вечерние программы. Электронные билеты без очередей.
+          </p>
+
+          <div className="mt-6 flex flex-col gap-3 rounded-2xl bg-white p-3 text-slate-900 shadow-lg sm:flex-row">
+            <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">
+              <Search className="h-4 w-4 text-slate-400" />
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Название или район"
+                className="w-full bg-transparent py-2.5 text-sm outline-none placeholder:text-slate-400"
+              />
+            </div>
+            <select
+              value={cityFilter}
+              onChange={(event) => setCityFilter(event.target.value)}
+              className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none"
+            >
               <option value="all">Все города</option>
-              {cities.map((value) => <option key={value} value={value}>{value}</option>)}
+              {cityOptions.map(([city, count]) => (
+                <option key={city} value={city}>
+                  {city} ({count})
+                </option>
+              ))}
             </select>
-            <select value={kind} onChange={(event) => setKind(event.target.value)} className="h-11 rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-700">
-              <option value="all">Все типы</option>
-              {kinds.map((value) => <option key={value} value={value}>{kindLabel(value)}</option>)}
+            <select
+              value={sortMode}
+              onChange={(event) => setSortMode(event.target.value as SortMode)}
+              className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none"
+            >
+              {SORT_OPTIONS.map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
             </select>
-            <div className="inline-flex h-11 rounded-lg border border-slate-200 bg-white p-0.5">
-              <SortButton active={sortMode === 'events'} label="По событиям" onClick={() => setSortMode('events')} icon={<CalendarDays className="h-4 w-4" />} />
-              <SortButton active={sortMode === 'asc'} label="А-Я" onClick={() => setSortMode('asc')} icon={<ArrowDownAZ className="h-4 w-4" />} />
-              <SortButton active={sortMode === 'desc'} label="Я-А" onClick={() => setSortMode('desc')} icon={<ArrowUpAZ className="h-4 w-4" />} />
-            </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="container-page py-8">
-          {isLoading ? <div className="py-20 text-center text-slate-500">Загружаем площадки...</div> : null}
-          {!isLoading && error ? <div className="py-20 text-center text-rose-600">Не удалось загрузить площадки: {error}</div> : null}
-          {!isLoading && !error && !filtered.length ? <div className="py-20 text-center text-slate-500">Площадки не найдены</div> : null}
+      <div className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div className="container-page flex items-center gap-3 py-3">
+          <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <button
+              type="button"
+              onClick={() => setTypeFilter('all')}
+              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                typeFilter === 'all' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              }`}
+            >
+              <span>✨</span>
+              Все места
+            </button>
+            {typeOptions.map((option) => {
+              const active = typeFilter === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => setTypeFilter(active ? 'all' : option.value)}
+                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                    active ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  }`}
+                >
+                  <span>{option.emoji}</span>
+                  {option.label}
+                  <span className="text-xs opacity-75">({option.count})</span>
+                </button>
+              );
+            })}
+          </div>
 
-          {filtered.length ? (
-            <div className="grid gap-px overflow-hidden rounded-lg border border-slate-200 bg-slate-200 sm:grid-cols-2 xl:grid-cols-3">
-              {filtered.slice(0, visible).map((venue) => (
-                <a key={venue.id} href={`/venues/${venue.slug || venue.id}`} className="group flex min-h-44 flex-col bg-white p-5 transition-colors hover:bg-primary-50/40">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-500 group-hover:bg-primary-100 group-hover:text-primary-700">
-                      <Building2 className="h-5 w-5" />
-                    </div>
-                    <span className="text-sm font-semibold text-primary-700">{formatEvents(venue.events)}</span>
-                  </div>
-                  <h2 className="mt-4 line-clamp-2 text-lg font-semibold text-slate-950">{venue.name}</h2>
-                  <div className="mt-auto pt-4 text-sm text-slate-500">
-                    <div className="flex items-center gap-2"><MapPin className="h-4 w-4 shrink-0" /><span className="truncate">{venue.city}</span></div>
-                    <div className="mt-1.5 truncate text-xs text-slate-400">{venue.address || kindLabel(venue.type)}</div>
-                  </div>
-                </a>
+          <div className="flex shrink-0 overflow-hidden rounded-xl bg-slate-100 p-1" role="radiogroup" aria-label="Вид каталога">
+            <button
+              type="button"
+              role="radio"
+              aria-checked={viewMode === 'cards'}
+              aria-label="Карточки"
+              onClick={() => setViewModePersisted('cards')}
+              className={`grid h-9 w-9 place-items-center rounded-lg transition ${
+                viewMode === 'cards' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <Grid3X3 className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              role="radio"
+              aria-checked={viewMode === 'list'}
+              aria-label="Список"
+              onClick={() => setViewModePersisted('list')}
+              className={`grid h-9 w-9 place-items-center rounded-lg transition ${
+                viewMode === 'list' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <List className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div className="container-page py-8">
+        <div className="mb-4 flex items-baseline justify-between gap-3">
+          <h2 className="text-lg font-semibold text-slate-900">
+            Найдено: {formatNumber(filteredVenues.length)}
+            {!isLoading && venues.length ? (
+              <span className="font-normal text-slate-500"> из {formatNumber(venues.length)}</span>
+            ) : null}
+          </h2>
+          <a href={venueCatalogHref('location')} className="text-sm font-semibold text-primary-600 hover:underline">
+            Локации: причалы, парки, точки старта →
+          </a>
+        </div>
+
+        {isLoading && !filteredVenues.length ? (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {Array.from({ length: 8 }).map((_, index) => (
+              <div key={index} className="h-56 animate-pulse rounded-2xl bg-slate-100" />
+            ))}
+          </div>
+        ) : filteredVenues.length > 0 ? (
+          viewMode === 'list' ? (
+            <InstitutionList venues={filteredVenues} hrefFor={venueHref} />
+          ) : (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {filteredVenues.map((venue) => (
+                <InstitutionCard key={venue.id} venue={venue} href={venueHref(venue)} />
               ))}
             </div>
-          ) : null}
+          )
+        ) : null}
 
-          {visible < filtered.length ? (
-            <div className="mt-8 text-center">
-              <button type="button" className="btn-secondary" onClick={() => setVisible((value) => value + 48)}>Показать ещё</button>
-            </div>
-          ) : null}
-        </section>
-      </main>
+        {!isLoading && !filteredVenues.length ? (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center text-slate-500">
+            <p className="text-lg font-semibold text-slate-700">Ничего не нашли</p>
+            <p className="mt-1 text-sm">Попробуйте убрать фильтры или сменить город.</p>
+          </div>
+        ) : null}
+
+        <div className="prose prose-slate mt-12 max-w-3xl">
+          <h2 className="text-xl font-bold text-slate-900">Площадки в каталоге</h2>
+          <p className="text-sm leading-7 text-slate-600">
+            На Дайбилет собраны музеи, галереи, театры, концертные залы и клубы с актуальной афишей и покупкой через
+            билетные системы организаторов. Причалы и точки отправления речных прогулок — в разделе{' '}
+            <a href="/locations" className="font-semibold text-primary-600 no-underline hover:underline">
+              Локации
+            </a>
+            .
+          </p>
+        </div>
+      </div>
+
       <Footer />
     </div>
   );
 }
 
-function SortButton({ active, label, icon, onClick }: { active: boolean; label: string; icon: React.ReactNode; onClick: () => void }) {
-  return (
-    <button type="button" onClick={onClick} title={label} aria-label={label} className={`inline-flex h-10 w-10 items-center justify-center rounded-md transition-colors ${active ? 'bg-slate-900 text-white' : 'text-slate-500 hover:bg-slate-100'}`}>
-      {icon}
-    </button>
-  );
-}
-
-function uniqueSorted(values: string[]): string[] {
-  return [...new Set(values.filter(Boolean))].sort((left, right) => left.localeCompare(right, 'ru'));
-}
-
-function kindLabel(value: string): string {
-  const labels: Record<string, string> = {
-    venue: 'Площадка', museum_art_space: 'Музей и арт-пространство', theater: 'Театр', concert_hall: 'Концертный зал',
-    club_bar_restaurant: 'Клуб, бар или ресторан', pier: 'Причал', meeting_point: 'Место встречи',
-    outdoor_location: 'Открытая локация', sport_activity_space: 'Спортивная площадка', attraction: 'Достопримечательность', online: 'Онлайн', other: 'Другое',
-  };
-  return labels[value] || 'Площадка';
-}
-
-function formatEvents(value: number): string {
-  const mod10 = value % 10;
-  const mod100 = value % 100;
-  if (mod100 >= 11 && mod100 <= 19) return `${value} событий`;
-  if (mod10 === 1) return `${value} событие`;
-  if (mod10 >= 2 && mod10 <= 4) return `${value} события`;
-  return `${value} событий`;
-}
-
-function formatVenues(value: number): string {
-  const mod10 = value % 10;
-  const mod100 = value % 100;
-  if (mod100 >= 11 && mod100 <= 19) return `${value} площадок`;
-  if (mod10 === 1) return `${value} площадка`;
-  if (mod10 >= 2 && mod10 <= 4) return `${value} площадки`;
-  return `${value} площадок`;
+function readStoredViewMode(): ViewMode {
+  try {
+    const stored = localStorage.getItem(VENUES_VIEW_MODE_KEY);
+    return stored === 'list' ? 'list' : 'cards';
+  } catch {
+    return 'cards';
+  }
 }
 
 function upsertMeta(name: string, content: string) {

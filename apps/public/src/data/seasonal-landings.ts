@@ -1,4 +1,5 @@
 import type { RiverCitySpot } from '@/data/river-landings';
+import { landingCategoryHref } from '@/lib/landing-routes';
 
 export type SeasonalCityGuide = {
   slug: string;
@@ -95,7 +96,7 @@ export const SEASONAL_LANDINGS: Record<string, SeasonalLandingMeta> = {
         ],
       },
       'Санкт-Петербург': {
-        slug: 'spb',
+        slug: 'saint-petersburg',
         cityName: 'Санкт-Петербург',
         cityNameDative: 'Санкт-Петербургу',
         heroSubtitle: 'Фейерверк над Невой, Петропавловская крепость и белые ночи — незабываемое зрелище с воды.',
@@ -158,9 +159,10 @@ export const SEASONAL_LANDINGS: Record<string, SeasonalLandingMeta> = {
     kind: 'seasonal',
     breadcrumbLabel: 'Новый год',
     nationalHeroTitle: 'Отмечаем Новый год — ёлки, шоу и праздничные программы',
-    nationalHeroSubtitle: 'Ёлки, концерты, шоу и семейные программы — сравните предложения в городах России.',
+    nationalHeroSubtitle:
+      'Ваш главный гид по созданию праздничного настроения и планированию зимних каникул. Страница необходима всем, кто хочет заранее и без суеты забронировать лучшие места на самые дефицитные январские события.',
     nationalIntro:
-      'Новогодний сезон — короткое окно высокого спроса. Бронируйте ёлки и шоу заранее: лучшие слоты разбирают за 2–4 недели.',
+      'Подборка включает всю палитру зимнего волшебства: от главных ёлок страны для детей и новогодних мюзиклов до праздничных ночных банкетов, рождественских концертов классической музыки и тематических экскурсий по украшенным иллюминацией городам. Встречайте праздники ярко и сказочно.',
     scheduleTitle: 'Новогодние программы',
     faqSubtitle: 'Ответы на популярные вопросы о новогодних мероприятиях',
     defaultFaq: [
@@ -196,5 +198,5 @@ export function seasonalCityGuideBySlug(landingSlug: string, citySlug?: string |
 }
 
 export function seasonalLandingRoot(slug: string) {
-  return `/landings/${slug}`;
+  return landingCategoryHref(slug);
 }

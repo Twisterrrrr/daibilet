@@ -66,7 +66,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white text-slate-900">
+    <div className="min-h-screen bg-slate-50 text-slate-900">
       <Header cityLabel="Все города" onSection={goSection} />
       <main className="container-page py-16">
         <div className="mx-auto max-w-sm">

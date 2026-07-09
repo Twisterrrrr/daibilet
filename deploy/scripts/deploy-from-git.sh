@@ -5,6 +5,7 @@ APP_DIR="${APP_DIR:-/opt/daibilet}"
 PUBLIC_DIR="${PUBLIC_DIR:-/var/www/daibilet/public}"
 ADMIN_DIR="${ADMIN_DIR:-/var/www/daibilet/admin}"
 SERVICE_NAME="${SERVICE_NAME:-daibilet-api}"
+BRANCH="${BRANCH:-integrate/mvp-launch}"
 
 cd "$APP_DIR"
 
@@ -15,17 +16,18 @@ if [[ -f ".env" ]]; then
   set +a
 fi
 
-git fetch origin main
-git checkout main
-git pull --ff-only origin main
+git fetch origin "$BRANCH"
+git checkout "$BRANCH"
+git pull --ff-only "origin/$BRANCH"
 
 npm install
+npm --prefix packages/db ci
 npm --prefix apps/backend ci
 npm --prefix apps/public ci
 npm --prefix apps/admin ci
 
 npm run db:generate
-npm run db:migrate
+npm run db:deploy
 
 PUBLIC_API_URL="${PUBLIC_API_URL:-https://api.daibilet.ru}"
 PUBLIC_SITE_URL="${PUBLIC_SITE_URL:-https://daibilet.ru}"

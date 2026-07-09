@@ -144,6 +144,7 @@ function detailToRow(detail: AdminVenueDetail, previous?: AdminVenueRow): AdminV
 
 export function VenuesPage() {
   const [query, setQuery] = React.useState('');
+  const [familyFilter, setFamilyFilter] = React.useState<'all' | 'institution' | 'location'>('all');
   const [payload, setPayload] = React.useState<VenuesListResponse>(() => buildLocalResponse());
   const [isLoading, setIsLoading] = React.useState(false);
   const [loadError, setLoadError] = React.useState<string | null>(null);
@@ -158,6 +159,7 @@ export function VenuesPage() {
     const controller = new AbortController();
     const params = new URLSearchParams({ limit: '160' });
     if (query.trim()) params.set('q', query.trim());
+    if (familyFilter !== 'all') params.set('family', familyFilter);
     setIsLoading(true);
 
     fetch(`${API_BASE_URL}/api/admin/venues?${params.toString()}`, {
@@ -182,7 +184,7 @@ export function VenuesPage() {
       });
 
     return () => controller.abort();
-  }, [query]);
+  }, [query, familyFilter]);
 
   React.useEffect(() => {
     setDraft(emptyDraft(venueDetail));
@@ -251,6 +253,23 @@ export function VenuesPage() {
         <div className="relative min-w-[280px] flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск по площадке, городу, адресу или типу" className="pl-9" />
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          {([
+            ['all', 'Все'],
+            ['institution', 'Площадки'],
+            ['location', 'Локации'],
+          ] as const).map(([value, label]) => (
+            <Button
+              key={value}
+              type="button"
+              size="sm"
+              variant={familyFilter === value ? 'default' : 'outline'}
+              onClick={() => setFamilyFilter(value)}
+            >
+              {label}
+            </Button>
+          ))}
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}

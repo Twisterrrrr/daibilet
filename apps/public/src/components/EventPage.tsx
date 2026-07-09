@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Calendar, ChevronRight, Clock, MapPin, Shield, Users } from 'lucide-react';
+import { Calendar, ChevronRight, MapPin, Shield, Users } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
 import { Footer } from '@/components/Footer';
@@ -8,38 +8,52 @@ import { TeplohodWidgetEmbed, getTeplohodWidgetIds } from '@/components/Teplohod
 import {
   TcSessionSlot,
   TcWidgetButton,
+  expandSessionPurchaseVariants,
   extractTcEventIdFromSession,
-  getTcWidgetIds,
+  listPurchasableSessionVariants,
+  normalizeTcPurchaseUrl,
+  pickPurchasableTcSession,
+  pickRepresentativeSession,
+  resolveTcPurchaseTarget,
 } from '@/components/TcWidget';
 import { formatStreetAddress } from '@/lib/address';
+import {
+  resolveEventCardDestinationLabel,
+  resolveEventAddressLabel,
+  resolveEventCardLocationLabel,
+  resolveEventVenueDisplayLabel,
+} from '@/lib/event-location';
 import { FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession } from '@/lib/event-card-meta';
 import { formatVacantSeats } from '@/lib/pluralize';
-import { landingPageHref } from '@/lib/landing-slugs';
 import { formatNumber, publicData } from '@/data';
 import { readCachedEventPage, writeCachedEventPage } from '@/lib/event-page-cache';
-import { eventHref, eventSlug } from '@/routes';
+import { cityHref, eventHref, eventSlug, venueHref } from '@/routes';
 import type { PublicEvent, PublicEventPage, PublicSession } from '@/types';
 
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
+import { API_BASE_URL } from '@/lib/api-base';
+
 const MIN_DISPLAY_PRICE_RUB = 100;
 
 export function EventPage({ slug }: { slug: string }) {
-  const [payload, setPayload] = React.useState<PublicEventPage | null>(() => readCachedEventPage(slug));
-  const [isLoading, setIsLoading] = React.useState(() => !readCachedEventPage(slug));
+  const [payload, setPayload] = React.useState<PublicEventPage | null>(
+    () => readCachedEventPage(slug) || buildStaticEventPage(slug),
+  );
+  const [isLoading, setIsLoading] = React.useState(
+    () => !readCachedEventPage(slug) && !buildStaticEventPage(slug),
+  );
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     let isDisposed = false;
     const controller = new AbortController();
-    const timeout = window.setTimeout(() => controller.abort(), 12000);
+    const timeout = window.setTimeout(() => controller.abort(), 25000);
     const cached = readCachedEventPage(slug);
+    const shell = cached || buildStaticEventPage(slug);
 
-    if (cached) {
-      setPayload(cached);
-      applyEventMeta(cached.event);
-      replaceOpaqueEventUrl(cached.event);
+    if (shell) {
+      setPayload(shell);
+      applyEventMeta(shell.event);
+      replaceOpaqueEventUrl(shell.event);
       setError(null);
       setIsLoading(false);
     } else {
@@ -47,7 +61,7 @@ export function EventPage({ slug }: { slug: string }) {
     }
 
     fetch(`${API_BASE_URL}/api/public/events/${encodeURIComponent(slug)}`, {
-      cache: 'no-store',
+      cache: 'default',
       signal: controller.signal,
     })
       .then((response) => {
@@ -74,7 +88,9 @@ export function EventPage({ slug }: { slug: string }) {
           return;
         }
 
-        setError('Событие не найдено или backend сейчас недоступен.');
+        if (!shell) {
+          setError('Событие не найдено или backend сейчас недоступен.');
+        }
       })
       .finally(() => {
         window.clearTimeout(timeout);
@@ -92,12 +108,12 @@ export function EventPage({ slug }: { slug: string }) {
     <div className="min-h-screen bg-white text-slate-900">
       <Header cityLabel={payload?.event.city || 'Все города'} onSection={navigateHome} searchCity={payload?.event.city} />
       <main>
-        {isLoading ? (
+        {isLoading && !payload ? (
           <section className="container-page py-12">
             <div className="rounded-xl border border-slate-200 p-6 text-sm text-slate-500">Загружаем событие...</div>
           </section>
         ) : null}
-        {error ? (
+        {error && !payload ? (
           <section className="container-page py-12">
             <div className="rounded-xl border border-red-100 bg-red-50 p-6 text-sm font-medium text-red-700">{error}</div>
           </section>
@@ -114,7 +130,6 @@ export function EventPage({ slug }: { slug: string }) {
                   <div className="lg:hidden" id="buy-card">
                     <BuyCard payload={payload} />
                   </div>
-                  <LandingLinks payload={payload} />
                 </div>
                 <div className="hidden lg:col-span-1 lg:block">
                   <div className="sticky top-20" id="buy-card-desktop">
@@ -225,7 +240,7 @@ function sessionToPublicEvent(session: PublicSession): PublicEvent {
     venueId: session.venueId,
     venueSlug: session.venueSlug,
     venue: session.venue,
-    venueAddress: null,
+    venueAddress: session.venueAddress ?? null,
     venueKind: session.venueKind,
     ageLimit: null,
     priceFrom: session.priceFrom,
@@ -250,15 +265,24 @@ function sessionToPublicEvent(session: PublicSession): PublicEvent {
 function EventHero({ payload }: { payload: PublicEventPage }) {
   const { event, stats } = payload;
   const ageLimit = formatAgeLimit(event.ageLimit);
-  const price = stats.priceFrom ?? event.priceFrom;
-  const priceLabel = formatPriceRub(price);
+  const priceRange = getTicketPriceRange(payload);
+  const priceLabel = priceRange ? formatBuyCardPrice(priceRange) : formatPriceRub(stats.priceFrom ?? event.priceFrom);
+  const locationLabel = resolveEventAddressLabel(event) || resolveEventVenueDisplayLabel(event) || resolveEventCardLocationLabel(event);
+  const venuePageHref = resolveEventVenueHref(event);
+  const venueBreadcrumbLabel = resolveEventVenueDisplayLabel(event);
+  const cityPageHref = resolveEventCityHref(event);
   const [hasImageError, setHasImageError] = React.useState(false);
   const heroImage = String(event.imageUrl || '').trim();
-  const nextSession = payload.sessions.find((session) => {
-    if (!session.startsAt) return false;
-    const date = new Date(session.startsAt);
-    return !Number.isNaN(date.getTime()) && date > new Date();
-  }) || payload.sessions[0];
+  const nextSession =
+    pickPurchasableTcSession(
+      payload.sessions.flatMap((session) => expandSessionPurchaseVariants(session)).filter((session) => {
+        if (!session.startsAt) return true;
+        const date = new Date(session.startsAt);
+        return !Number.isNaN(date.getTime()) && date > new Date();
+      }),
+    ) ||
+    pickRepresentativeSession(payload.sessions) ||
+    payload.sessions[0];
 
   return (
     <div className="relative">
@@ -283,13 +307,21 @@ function EventHero({ payload }: { payload: PublicEventPage }) {
       <div className="container-page absolute inset-x-0 bottom-0 pb-6 sm:pb-8">
         <nav className="mb-3 flex flex-wrap items-center gap-1.5 text-sm text-white/70">
           <a href="/events" className="transition hover:text-white">
-            Каталог
+            События
           </a>
           <ChevronRight className="h-3.5 w-3.5" />
           {event.citySlug ? (
             <>
-              <a href={`/cities/${event.citySlug}`} className="transition hover:text-white">
-                {eventDestinationLabel(event)}
+              <a href={cityPageHref || `/cities/${event.citySlug}`} className="transition hover:text-white">
+                {resolveEventCardDestinationLabel(event)}
+              </a>
+              <ChevronRight className="h-3.5 w-3.5" />
+            </>
+          ) : null}
+          {venuePageHref && venueBreadcrumbLabel ? (
+            <>
+              <a href={venuePageHref} className="transition hover:text-white">
+                {venueBreadcrumbLabel}
               </a>
               <ChevronRight className="h-3.5 w-3.5" />
             </>
@@ -320,10 +352,20 @@ function EventHero({ payload }: { payload: PublicEventPage }) {
                   {ageLimit}
                 </span>
               ) : null}
-              {event.venue ? (
+              {locationLabel ? (
                 <span className="flex items-center gap-1.5">
                   <MapPin className="h-4 w-4" />
-                  {event.venue}
+                  {venuePageHref ? (
+                    <a href={venuePageHref} className="underline decoration-white/30 underline-offset-2 transition hover:text-white">
+                      {locationLabel}
+                    </a>
+                  ) : cityPageHref ? (
+                    <a href={cityPageHref} className="underline decoration-white/30 underline-offset-2 transition hover:text-white">
+                      {locationLabel}
+                    </a>
+                  ) : (
+                    locationLabel
+                  )}
                 </span>
               ) : null}
               {nextSession ? (
@@ -366,20 +408,21 @@ function HeroBuyButton({
   const { event, sessions } = payload;
   const label = `Купить билет — от ${priceLabel}`;
   const teplohod = getTeplohodWidgetIds(event);
-  const ticketscloud = getTcWidgetIds(event);
   const primaryOffer = payload.offers.find((offer) => offer.active !== false) || payload.offers[0] || null;
-  const tcEventId = ticketscloud?.tcEventId || extractTcEventIdFromSession(sessions[0] || {}) || null;
-  const purchaseUrl =
-    primaryOffer?.widgetUrl ||
-    primaryOffer?.deeplinkUrl ||
-    event.purchaseUrl ||
-    sessions[0]?.purchaseUrl ||
-    null;
-  const isTcWidget = Boolean(ticketscloud && tcEventId);
+  const { tcEventId, purchaseUrl, isTcWidget, purchaseTargets } = resolveTcPurchaseTarget(event, sessions, primaryOffer);
   const isTepWidget = Boolean(teplohod);
 
   if (isTcWidget && tcEventId) {
-    return <TcWidgetButton tcEventId={tcEventId} purchaseUrl={purchaseUrl} label={label} wide={wide} variant="hero" />;
+    return (
+      <TcWidgetButton
+        tcEventId={tcEventId}
+        purchaseUrl={purchaseUrl}
+        purchaseTargets={purchaseTargets}
+        label={label}
+        wide={wide}
+        variant="hero"
+      />
+    );
   }
 
   if (isTepWidget) {
@@ -395,9 +438,10 @@ function HeroBuyButton({
   }
 
   if (purchaseUrl) {
+    const href = normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl;
     return (
       <a
-        href={purchaseUrl}
+        href={href}
         target="_blank"
         rel="noopener noreferrer"
         className={`inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-base font-semibold text-white shadow-md shadow-amber-700/30 transition hover:bg-amber-600 active:bg-amber-700 sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`}
@@ -485,58 +529,50 @@ function splitDescriptionParagraphs(text: string): string[] {
 }
 
 function QuickInfo({ event }: { event: PublicEvent }) {
-  const rawAddress = event.venueAddress || event.venue;
-  const address = rawAddress ? formatStreetAddress(rawAddress, { city: event.city }) : '';
+  const address = resolveEventAddressLabel(event);
+  const venueTitle = resolveEventVenueDisplayLabel(event);
   const ageLimit = formatAgeLimit(event.ageLimit);
-  if (!address && !ageLimit) return null;
+  const venuePageHref = resolveEventVenueHref(event);
+  const showVenue = Boolean(venueTitle && venuePageHref && address && venueTitle.trim().toLowerCase() !== address.trim().toLowerCase());
+  if (!address && !showVenue && !ageLimit) return null;
+
+  const addressNode = address ? (
+    venuePageHref && showVenue ? (
+      <a href={venuePageHref} className="text-sm font-medium text-slate-900 transition hover:text-primary-700">
+        {address}
+      </a>
+    ) : (
+      <p className="text-sm font-medium text-slate-900">{address}</p>
+    )
+  ) : null;
 
   return (
-    <>
-      <div className="space-y-2 sm:hidden">
-        {address ? (
-          <div className="flex items-center gap-2 text-sm text-slate-700">
-            <MapPin className="h-4 w-4 text-primary-500" />
-            <div>
-              <span className="text-xs text-slate-500">Адрес</span>
-              <p className="text-sm font-medium text-slate-900">{address}</p>
-            </div>
-          </div>
-        ) : null}
-        {ageLimit ? (
-          <div className="flex items-center gap-2 text-sm text-slate-700">
-            <Users className="h-4 w-4 text-primary-500" />
-            <div>
-              <span className="text-xs text-slate-500">Возраст</span>
-              <p className="text-sm font-medium text-slate-900">{ageLimit}</p>
-            </div>
-          </div>
-        ) : null}
-      </div>
-
-      <div className="hidden gap-3 sm:grid sm:grid-cols-2 lg:grid-cols-3">
-        {address ? (
-          <div className="rounded-xl border border-slate-200 bg-white p-3.5">
-            <MapPin className="h-5 w-5 text-primary-500" />
-            <p className="mt-1.5 text-xs text-slate-500">Адрес</p>
-            <p className="line-clamp-2 text-sm font-medium text-slate-900">{address}</p>
-          </div>
-        ) : null}
-        {event.citySlug ? (
-          <a href={`/cities/${event.citySlug}`} className="rounded-xl border border-slate-200 bg-white p-3.5 transition hover:border-primary-200 hover:bg-primary-50/40">
-            <Clock className="h-5 w-5 text-primary-500" />
-            <p className="mt-1.5 text-xs text-slate-500">Город</p>
-            <p className="text-sm font-medium text-slate-900">{eventDestinationLabel(event)}</p>
-          </a>
-        ) : null}
-        {ageLimit ? (
-          <div className="rounded-xl border border-slate-200 bg-white p-3.5">
-            <Users className="h-5 w-5 text-primary-500" />
-            <p className="mt-1.5 text-xs text-slate-500">Возраст</p>
-            <p className="text-sm font-medium text-slate-900">{ageLimit}</p>
-          </div>
-        ) : null}
-      </div>
-    </>
+    <div className="grid gap-3 sm:grid-cols-2">
+      {address ? (
+        <div className="rounded-xl border border-slate-200 bg-white p-3.5">
+          <MapPin className="h-5 w-5 text-primary-500" />
+          <p className="mt-1.5 text-xs text-slate-500">Адрес</p>
+          <div className="line-clamp-3">{addressNode}</div>
+        </div>
+      ) : null}
+      {showVenue ? (
+        <a
+          href={venuePageHref!}
+          className="rounded-xl border border-slate-200 bg-white p-3.5 transition hover:border-primary-200 hover:bg-primary-50/40"
+        >
+          <MapPin className="h-5 w-5 text-primary-500" />
+          <p className="mt-1.5 text-xs text-slate-500">Площадка</p>
+          <p className="line-clamp-2 text-sm font-medium text-slate-900">{venueTitle}</p>
+        </a>
+      ) : null}
+      {ageLimit ? (
+        <div className="rounded-xl border border-slate-200 bg-white p-3.5">
+          <Users className="h-5 w-5 text-primary-500" />
+          <p className="mt-1.5 text-xs text-slate-500">Возраст</p>
+          <p className="text-sm font-medium text-slate-900">{ageLimit}</p>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -560,20 +596,12 @@ function EventTags({ event }: { event: PublicEvent }) {
 function BuyCard({ payload }: { payload: PublicEventPage }) {
   const { event, sessions } = payload;
   const teplohod = getTeplohodWidgetIds(event);
-  const ticketscloud = getTcWidgetIds(event);
   const primaryOffer = payload.offers.find((offer) => offer.active !== false) || payload.offers[0] || null;
   const priceRange = getTicketPriceRange(payload);
   const ticketCategories = buildGroupedTicketCategories(payload);
-  const visibleSessions = sessions.slice(0, 5);
-  const tcEventId = ticketscloud?.tcEventId || extractTcEventIdFromSession(sessions[0] || {}) || null;
+  const visibleSessions = listPurchasableSessionVariants(sessions).slice(0, 5);
+  const { tcEventId, purchaseUrl, isTcWidget, purchaseTargets } = resolveTcPurchaseTarget(event, sessions, primaryOffer);
   const offerSource = primaryOffer?.sourceCode || event.purchaseProvider || event.sourceCode;
-  const purchaseUrl =
-    primaryOffer?.widgetUrl ||
-    primaryOffer?.deeplinkUrl ||
-    event.purchaseUrl ||
-    sessions[0]?.purchaseUrl ||
-    null;
-  const isTcWidget = Boolean(ticketscloud && tcEventId);
   const isTepWidget = Boolean(teplohod);
 
   return (
@@ -606,6 +634,8 @@ function BuyCard({ payload }: { payload: PublicEventPage }) {
             ))}
           </ul>
         </div>
+      ) : priceRange && priceRange.min !== priceRange.max ? (
+        <p className="mt-3 text-sm text-slate-500">Полный список категорий — в виджете при покупке.</p>
       ) : null}
 
       {visibleSessions.length > 0 ? (
@@ -619,8 +649,8 @@ function BuyCard({ payload }: { payload: PublicEventPage }) {
           ) : null}
           <div className="mt-2.5 space-y-1.5">
             {visibleSessions.map((session) =>
-              isTcWidget && !isTepWidget && tcEventId ? (
-                <TcSessionSlot key={session.id} tcEventId={tcEventId} session={session} />
+              isTcWidget && !isTepWidget ? (
+                <TcSessionSlot key={session.id} tcEventId={extractTcEventIdFromSession(session) || tcEventId || ''} session={session} />
               ) : (
                 <StaticSessionRow key={session.id} session={session} />
               ),
@@ -633,10 +663,16 @@ function BuyCard({ payload }: { payload: PublicEventPage }) {
         {isTepWidget && teplohod ? (
           <TeplohodWidgetEmbed tepEventId={teplohod.tepEventId} tepWidgetId={teplohod.tepWidgetId} />
         ) : isTcWidget && tcEventId ? (
-          <TcWidgetButton tcEventId={tcEventId} purchaseUrl={purchaseUrl} label="Купить билет" wide />
+          <TcWidgetButton
+            tcEventId={tcEventId}
+            purchaseUrl={purchaseUrl}
+            purchaseTargets={purchaseTargets}
+            label="Купить билет"
+            wide
+          />
         ) : purchaseUrl ? (
           <a
-            href={purchaseUrl}
+            href={normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-medium text-white transition hover:bg-primary-700"
@@ -657,12 +693,12 @@ function BuyCard({ payload }: { payload: PublicEventPage }) {
       <div className="mt-4 flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2">
         <Shield className="h-4 w-4 text-emerald-500" />
         <span className="text-xs text-slate-500">
-          Безопасная оплата через{' '}
+          Безопасная оплата в виджете{' '}
           {isTepWidget || String(offerSource || '').toUpperCase().includes('TEPLOHOD')
             ? 'teplohod.info'
             : isTcWidget || String(offerSource || '').toUpperCase().includes('TC')
               ? 'Ticketscloud'
-              : 'Дайбилет'}
+              : 'билетной системы организатора'}
         </span>
       </div>
     </div>
@@ -704,34 +740,29 @@ function StaticSessionRow({
 }
 
 function buildGroupedTicketCategories(payload: PublicEventPage) {
-  const preserveWidgetOrder = isTeplohodTicketSource(payload);
   const order: string[] = [];
+  const groupSortOrder = new Map<string, number>();
   const groups = new Map<string, { key: string; name: string; description: string | null; minPrice: number; maxPrice: number }>();
 
   for (const item of collectRawTicketPrices(payload)) {
     const { name, description } = parseTicketCategory(item);
     const key = `${name}|${description || ''}`.toLowerCase().replace(/\s+/g, ' ');
+    const itemOrder = item.sortOrder ?? 9999;
     const existing = groups.get(key);
     if (!existing) {
       order.push(key);
       groups.set(key, { key, name, description, minPrice: item.priceRub, maxPrice: item.priceRub });
+      groupSortOrder.set(key, itemOrder);
       continue;
     }
     existing.minPrice = Math.min(existing.minPrice, item.priceRub);
     existing.maxPrice = Math.max(existing.maxPrice, item.priceRub);
+    groupSortOrder.set(key, Math.min(groupSortOrder.get(key) ?? 9999, itemOrder));
   }
 
-  const rows = order.map((key) => groups.get(key)!);
-  if (preserveWidgetOrder) return rows;
-
-  return rows.sort((a, b) => a.minPrice - b.minPrice || a.name.localeCompare(b.name, 'ru'));
-}
-
-function isTeplohodTicketSource(payload: PublicEventPage) {
-  const source = String(
-    payload.event.purchaseProvider || payload.event.sourceCode || payload.offers[0]?.sourceCode || '',
-  ).toUpperCase();
-  return source.includes('TEPLOHOD');
+  return order
+    .map((key) => groups.get(key)!)
+    .sort((a, b) => (groupSortOrder.get(a.key) ?? 9999) - (groupSortOrder.get(b.key) ?? 9999));
 }
 
 function parseTicketCategory(item: { title: string; description?: string | null; priceRub: number }) {
@@ -776,8 +807,10 @@ function collectRawTicketPrices(payload: PublicEventPage) {
         !titleKey || titleKey === eventTitleKey || titleKey === 'widget' || titleKey.includes('ticketscloud widget')
           ? 'Билет'
           : rawTitle;
-      return { title, description: null, priceRub: offer.priceRub as number, sortOrder: index };
-    });
+      const sortOrder = typeof offer.sortOrder === 'number' ? offer.sortOrder : index;
+      return { title, description: null, priceRub: offer.priceRub as number, sortOrder };
+    })
+    .sort((a, b) => (a.sortOrder ?? 9999) - (b.sortOrder ?? 9999));
 }
 
 function splitTitlePartsWithoutWeekdays(title: string) {
@@ -851,11 +884,6 @@ function formatPriceRub(value?: number | null) {
   return `${formatNumber(Math.round(value))} ₽`;
 }
 
-function eventDestinationLabel(event: PublicEvent) {
-  if (event.destinationType === 'region' && event.destination) return event.destination;
-  return event.city;
-}
-
 function cleanDisplayText(value?: string | null) {
   return String(value || '')
     .replace(/<\s*br\s*\/?>/gi, '\n')
@@ -881,22 +909,32 @@ function sanitizeEventHtml(html: string) {
     .replace(/\son\w+='[^']*'/gi, '');
 }
 
-function LandingLinks({ payload }: { payload: PublicEventPage }) {
-  if (!payload.landings.length) return null;
+function resolveEventCityHref(event: PublicEvent): string | null {
+  if (!event.citySlug && !event.city) return null;
+  return cityHref({
+    slug: event.citySlug,
+    sourceSlug: event.sourceCitySlug,
+    name: event.city,
+  });
+}
 
-  return (
-    <section>
-      <h2 className="text-lg font-bold text-slate-900">Подборки</h2>
-      <div className="mt-3 grid gap-3 sm:grid-cols-2">
-        {payload.landings.map((landing) => (
-          <a key={landing.slug} href={landingPageHref(landing.slug)} className="rounded-xl border border-slate-200 bg-white p-3.5 transition hover:border-primary-200 hover:bg-primary-50/40">
-            <div className="text-sm font-semibold text-slate-950">{landing.title}</div>
-            <div className="mt-1 text-xs text-slate-500">{landing.subtitle}</div>
-          </a>
-        ))}
-      </div>
-    </section>
-  );
+function resolveEventVenueHref(event: PublicEvent): string | null {
+  if (event.institutionVenueSlug || event.institutionVenueId) {
+    return venueHref({
+      id: event.institutionVenueId || event.institutionVenueSlug || event.id,
+      slug: event.institutionVenueSlug,
+      name: event.institutionVenue || event.venue,
+      type: event.venueKind,
+    });
+  }
+  if (!event.venue?.trim()) return null;
+  if (!event.venueSlug && !event.venueId) return null;
+  return venueHref({
+    id: event.venueId || event.venueSlug || event.id,
+    slug: event.venueSlug,
+    name: event.venue,
+    type: event.venueKind,
+  });
 }
 
 function RelatedEventsSection({ payload }: { payload: PublicEventPage }) {

@@ -20,6 +20,7 @@
     "db:down": "docker compose down",
     "db:validate": "npm --prefix packages/db run db:validate",
     "db:migrate": "npm --prefix packages/db run db:migrate",
+    "db:deploy": "npm --prefix packages/db run db:deploy",
     "db:generate": "npm --prefix packages/db run db:generate",
     "db:typecheck": "npm --prefix packages/db run db:typecheck",
     "db:smoke": "npm --prefix packages/db run db:smoke",

@@ -1,20 +1,23 @@
 import * as React from 'react';
-import { Award, Clock, Flame, MapPin, Star, Ticket } from 'lucide-react';
+import { Clock, MapPin, Star, Ticket } from 'lucide-react';
 
 import { collectCatalogLabels } from '@/lib/catalog-labels';
+import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
+import { EventFavoriteButton } from '@/components/EventFavoriteButton';
+import { EventImageBadges } from '@/lib/event-card-badges';
 import {
+  collectDisplaySlotLabels,
   collectDisplaySlotTimes,
-  formatNextSession,
+  formatEventNextSession,
   formatListDescription,
   formatPriceRub,
   getDepartingSoonMinutes,
+  hasMultipleCatalogSlots,
   isEventSessionToday,
   isOpenDate,
-  LOW_TICKETS_THRESHOLD,
   MIN_DISPLAY_PRICE_RUB,
   resolvePseudoRating,
 } from '@/lib/event-card-meta';
-import { formatVacantSeats } from '@/lib/pluralize';
 import { eventHref } from '@/routes';
 import type { PublicSession } from '@/types';
 
@@ -27,32 +30,38 @@ export function EventCardHorizontal({ event }: EventCardHorizontalProps) {
   const showImage = Boolean(event.imageUrl && !hasImageError);
   const detailsHref = eventHref(event);
   const hasPrice = typeof event.priceFrom === 'number' && event.priceFrom >= MIN_DISPLAY_PRICE_RUB;
-  const showLowTickets =
-    typeof event.vacant === 'number' && event.vacant > 0 && event.vacant <= LOW_TICKETS_THRESHOLD;
-  const isOptimalChoice = event.landingSlugs.length > 0;
-  const destinationLabel = event.destinationType === 'region' && event.destination ? event.destination : event.city;
+  const destinationLabel = resolveEventCardDestinationLabel(event);
   const highlights = collectCatalogLabels(event).slice(0, 3);
   const openDate = isOpenDate(event);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(event.startsAt);
-  const nextSessionLabel = openDate ? null : formatNextSession(event.startsAt);
+  const nextSessionLabel = openDate ? null : formatEventNextSession(event);
   const isToday = isEventSessionToday(event);
-  const displaySlots = collectDisplaySlotTimes(event, { todayOnly: isToday });
-  const showSlotPills = isToday && displaySlots.length > 0;
+  const multipleSlots = hasMultipleCatalogSlots(event);
+  const displaySlotLabels = multipleSlots ? collectDisplaySlotLabels(event) : [];
+  const displaySlots = collectDisplaySlotTimes(event, { todayOnly: isToday && !multipleSlots });
+  const showSlotPills = multipleSlots
+    ? displaySlotLabels.length > 1
+    : isToday && displaySlots.length > 0;
   const sessionMetaLabel = openDate
     ? null
-    : isToday && displaySlots.length > 0
-      ? displaySlots.length === 1
-        ? `Сегодня, ${displaySlots[0]}`
-        : 'Сегодня'
-      : nextSessionLabel;
+    : multipleSlots && displaySlotLabels.length > 1
+      ? `${displaySlotLabels.length} ближайших даты`
+      : isToday && displaySlots.length > 0
+        ? displaySlots.length === 1
+          ? `Сегодня, ${displaySlots[0]}`
+          : 'Сегодня'
+        : nextSessionLabel;
   const descriptionText = formatListDescription(event.description);
-  const pseudoRating = resolvePseudoRating(event.id);
+  const pseudoRating = resolvePseudoRating(event.groupKey || event.id);
+  const locationLabel = resolveEventCardLocationLabel(event);
 
   return (
-    <a
-      href={detailsHref}
-      className="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200/60 sm:flex-row"
-    >
+    <div className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200/60 sm:flex-row">
+      <a
+        href={detailsHref}
+        className="absolute inset-0 z-[1] rounded-xl"
+        aria-label={`Событие: ${event.title}`}
+      />
       <div className="relative aspect-video w-full shrink-0 bg-slate-100 sm:min-w-[20rem] sm:w-80">
         <div
           className={`absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle_at_top,_#e5e7eb,_#f3f4f6)] transition-opacity duration-300 ${
@@ -74,57 +83,48 @@ export function EventCardHorizontal({ event }: EventCardHorizontalProps) {
           />
         ) : null}
 
-        <div className="absolute left-2 top-2 flex flex-col gap-1 sm:left-3 sm:top-3">
-          {isOptimalChoice ? (
-            <span className="flex items-center gap-1 rounded-full bg-amber-400/95 px-2 py-0.5 text-[10px] font-semibold text-amber-950 shadow-sm backdrop-blur-sm sm:text-xs">
-              <Award className="h-3 w-3" />
-              Рекомендуем
-            </span>
-          ) : null}
-          {showLowTickets ? (
-            <span className="flex items-center gap-1 rounded-full bg-red-500/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur-sm sm:text-xs">
-              <Flame className="h-3 w-3" />
-              {formatVacantSeats(event.vacant ?? 0)}
-            </span>
-          ) : null}
-        </div>
+        <EventImageBadges event={event} rail recommendVariant="compact" />
 
-        {openDate ? (
-          <span className="absolute bottom-2 left-2 rounded-full bg-emerald-500/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur-sm sm:text-xs">
-            Открытая дата
-          </span>
-        ) : departingSoonMinutes ? (
-          <span className="absolute bottom-2 left-2 flex animate-pulse items-center gap-1 rounded-full bg-orange-500/90 px-2 py-0.5 text-[10px] font-semibold text-white shadow-sm backdrop-blur-sm sm:text-xs">
-            <Clock className="h-3 w-3" />
-            Через {departingSoonMinutes} мин
+        {hasPrice ? (
+          <span className="absolute bottom-2 right-2 rounded-full bg-primary-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm sm:bottom-3 sm:right-3 sm:px-4 sm:py-2 sm:text-sm">
+            от {formatPriceRub(event.priceFrom)} ₽
           </span>
         ) : null}
+
+        <EventFavoriteButton eventId={event.id} className="right-2 top-2 sm:right-3 sm:top-3" />
       </div>
 
-      <div className="ml-2.5 flex flex-1 flex-col justify-between p-3 pl-5 sm:pb-4 sm:pl-7 sm:pr-4 sm:pt-4">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="line-clamp-2 flex-1 text-sm font-semibold leading-snug text-slate-900 transition-colors group-hover:text-primary-600 sm:text-lg">
-            {event.title}
-          </h3>
+      <div className="ml-2.5 flex flex-1 flex-col justify-between p-3 pl-5 text-left sm:pb-4 sm:pl-7 sm:pr-4 sm:pt-4">
+        <div className="flex flex-wrap items-center justify-start gap-x-3 gap-y-1 text-[10px] text-slate-500 sm:text-xs">
+          <span className="inline-flex shrink-0 items-center gap-0.5">
+            <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+            <span className="font-medium text-slate-700">{pseudoRating.toFixed(1)}</span>
+          </span>
+          {event.category ? <span className="font-normal text-slate-600">{event.category}</span> : null}
           {destinationLabel ? (
-            <span className="ml-2 flex shrink-0 items-center gap-0.5 text-[10px] text-slate-500 sm:text-xs">
+            <span className="inline-flex min-w-0 items-center gap-0.5 text-slate-500">
               <MapPin className="h-3 w-3 shrink-0" />
               <span className="truncate">{destinationLabel}</span>
             </span>
           ) : null}
         </div>
 
-        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[10px] text-slate-500 sm:text-xs">
-          <span className="flex shrink-0 items-center gap-0.5">
-            <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-            <span className="font-medium text-slate-700">{pseudoRating.toFixed(1)}</span>
-          </span>
+        <h3 className="mt-2 line-clamp-2 text-sm font-semibold leading-snug text-slate-900 transition-colors group-hover:text-primary-600 sm:text-lg">
+          {event.title}
+        </h3>
+
+        <div className="mt-2 flex flex-wrap items-center justify-start gap-x-3 gap-y-0.5 text-[10px] text-slate-500 sm:text-xs">
           {openDate ? (
             <span className="font-medium text-emerald-600">Билет с открытой датой</span>
+          ) : departingSoonMinutes ? (
+            <span className="inline-flex animate-pulse items-center gap-1 font-medium text-orange-600">
+              <Clock className="h-3 w-3" />
+              Через {departingSoonMinutes} мин
+            </span>
           ) : sessionMetaLabel ? (
             <span className="font-medium text-primary-600">{sessionMetaLabel}</span>
           ) : null}
-          {event.venue ? <span className="line-clamp-1">{event.venue}</span> : null}
+          {locationLabel ? <span className="line-clamp-1">{locationLabel}</span> : null}
         </div>
 
         {highlights.length > 0 ? (
@@ -145,12 +145,12 @@ export function EventCardHorizontal({ event }: EventCardHorizontalProps) {
 
         {showSlotPills ? (
           <div className="mt-2 flex flex-wrap gap-2">
-            {displaySlots.map((time) => (
+            {(multipleSlots ? displaySlotLabels : displaySlots).map((label) => (
               <span
-                key={time}
+                key={label}
                 className="inline-flex h-[30px] min-h-[30px] shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-xs leading-none text-slate-800"
               >
-                {time}
+                {label}
               </span>
             ))}
           </div>
@@ -170,6 +170,6 @@ export function EventCardHorizontal({ event }: EventCardHorizontalProps) {
           )}
         </div>
       </div>
-    </a>
+    </div>
   );
 }

@@ -1,4 +1,5 @@
 import type { PublicData, PublicDestination, PublicLanding, PublicSession } from '@/types';
+import { API_BASE_URL } from '@/lib/api-base';
 import { eventSlug } from '@/routes';
 
 type PublicStatsPayload = Pick<PublicData, 'generatedAt' | 'stats'>;
@@ -13,9 +14,7 @@ const PUBLIC_STATS_STORAGE_KEY = 'daibilet:public-stats';
 const PUBLIC_DESTINATIONS_STORAGE_KEY = 'daibilet:public-destinations';
 const PUBLIC_HOME_PREVIEW_STORAGE_KEY = 'daibilet:public-home-preview';
 
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
+export const PUBLIC_DESTINATIONS_UPDATED_EVENT = 'daibilet:destinations-updated';
 
 const cachedStats = readCachedPublicStats();
 const cachedDestinations = readCachedDestinations();
@@ -69,6 +68,7 @@ export async function hydratePublicDestinations(timeoutMs = 2500): Promise<boole
       }
       writeCachedDestinations({ generatedAt: publicData.generatedAt, destinations: payload.destinations });
       writeCachedPublicStats({ generatedAt: publicData.generatedAt, stats: publicData.stats });
+      window.dispatchEvent(new CustomEvent(PUBLIC_DESTINATIONS_UPDATED_EVENT));
       return true;
     }
   } catch {
@@ -261,12 +261,39 @@ export function formatNumber(value?: number | null): string {
   return new Intl.NumberFormat('ru-RU', { maximumFractionDigits: 0 }).format(value || 0);
 }
 
-export function formatMoney(value?: number | null): string {
-  if (!value || value <= 0) return '-';
-  return `от ${formatNumber(Math.round(value))} ₽`;
+/** Округление метрик hero до ближайших 10 (1–4 → 10). */
+export function roundStatToTen(value?: number | null): number {
+  const count = Math.max(0, Math.round(value || 0));
+  if (count === 0) return 0;
+  const rounded = Math.round(count / 10) * 10;
+  return rounded > 0 ? rounded : 10;
 }
 
-export function formatDate(value?: string | null): string {
+/** Для блоков метрик: «+» только при достаточно больших числах, чтобы не показывать «1+». */
+export function formatStatCount(value?: number | null, plusThreshold = 500): string {
+  const count = Math.max(0, Math.round(value || 0));
+  if (count >= plusThreshold) return `${formatNumber(count)}+`;
+  return formatNumber(count);
+}
+
+export function isMeaningfulStatCount(value?: number | null, min = 10): boolean {
+  return Math.round(value || 0) >= min;
+}
+
+export function formatMoney(value?: number | null): string {
+  if (!value || value <= 0) return '-';
+  return `от ${formatNumber(Math.round(value))}\u00a0₽`;
+}
+
+export function formatMoneyRange(from?: number | null, to?: number | null): string {
+  if (!from || from <= 0) return '—';
+  const min = Math.round(from);
+  const max = to && to > 0 ? Math.round(to) : min;
+  if (max > min) return `от ${formatNumber(min)} до ${formatNumber(max)}\u00a0₽`;
+  return `от ${formatNumber(min)}\u00a0₽`;
+}
+
+export function formatDate(value?: string | null, timeZone = 'Europe/Moscow'): string {
   if (!value) return 'открытая дата';
 
   const date = new Date(value);
@@ -277,6 +304,6 @@ export function formatDate(value?: string | null): string {
     month: 'short',
     hour: '2-digit',
     minute: '2-digit',
-    timeZone: 'Europe/Moscow',
+    timeZone,
   }).format(date);
 }

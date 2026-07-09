@@ -25,6 +25,14 @@
 - `/var/www/daibilet/admin` - собранная admin.
 - `/var/backups/daibilet` - архив старой версии перед переключением.
 
+## Staging
+
+Отдельный контур для smoke перед prod:
+
+- Код: `/opt/daibilet-staging`
+- Документация: [deploy-staging.md](./deploy-staging.md)
+- Скрипт: `deploy/scripts/deploy-staging.sh`
+
 ## GitHub
 
 Новый репозиторий: `https://github.com/Twisterrrrr/daibilet.git`.

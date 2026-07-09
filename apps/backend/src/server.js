@@ -23,6 +23,8 @@ import {
   buildAdminVenueDetail,
   buildAdminVenuesList,
   buildCatalogSessions,
+  sessionHasCoverImage,
+  spreadCatalogSessionsByCoverImage,
   buildPublicBuyerOrders,
   buildAccountPurchases,
   buildAccountOrderDetail,
@@ -31,13 +33,23 @@ import {
   buildPublicLandingPage,
   buildPublicLandingPageManaged,
   buildPublicVenuePage,
+  buildPublicVenuesCatalog,
   buildPublicHome,
   buildPublicHomePreview,
   buildPublicDestinations,
   buildPublicStats,
   buildPublicSearch,
   buildPublicPromoBlocks,
+  buildPublicLandingsCatalog,
+  buildPublicArticlesList,
+  buildPublicArticlePage,
+  buildAdminArticlesList,
+  buildAdminArticleDetail,
+  upsertAdminArticle,
+  publicVenueSlug,
+  publicVenuePageTemplate,
   clearPublicDataCaches,
+  warmPublicCatalogCache,
   runLandingAudit,
   updateAdminEventOverride,
   updateAdminEventTaxonomy,
@@ -46,6 +58,11 @@ import {
   updateAdminLandingMatch,
   updateAdminVenue,
 } from './dto.js';
+import {
+  buildSocialPreviewForPath,
+  isSocialPreviewAgent,
+  renderSocialPreviewHtml,
+} from './social-preview.js';
 import {
   assertAuthRateLimit,
   authenticateAccessToken,
@@ -77,10 +94,59 @@ let tepAutoSyncInFlight = false;
 
 const jsonCache = new Map();
 const PUBLIC_RESPONSE_CACHE_MS = 5 * 60 * 1000;
+const PUBLIC_HTTP_CACHE_CONTROL = 'public, max-age=60, stale-while-revalidate=300';
 const MAX_PUBLIC_RESPONSE_CACHE_ENTRIES = 80;
 const publicResponseCache = new Map();
 const publicCacheInvalidators = new Set();
 const publicCacheWarmers = new Set();
+let activeCorsRequest = null;
+
+function getAllowedOrigins() {
+  const raw =
+    process.env.PUBLIC_CORS_ORIGINS ||
+    'https://daibilet.ru,https://www.daibilet.ru,http://localhost:5173,http://127.0.0.1:5173';
+  return raw
+    .split(',')
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+function routeNeedsCredentials(request) {
+  if (!request?.url) return false;
+  const pathname = new URL(request.url, 'http://127.0.0.1').pathname;
+  return pathname.startsWith('/api/auth/') || pathname.startsWith('/api/account/');
+}
+
+function buildCorsHeaders(request, { credentials = false } = {}) {
+  const origin = String(request?.headers?.origin || '').trim();
+  const allowed = getAllowedOrigins();
+  const base = {
+    'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
+    'access-control-allow-headers': 'content-type, authorization',
+  };
+
+  if (credentials && origin && allowed.includes(origin)) {
+    return {
+      ...base,
+      'access-control-allow-origin': origin,
+      'access-control-allow-credentials': 'true',
+      vary: 'Origin',
+    };
+  }
+
+  if (origin && allowed.includes(origin)) {
+    return {
+      ...base,
+      'access-control-allow-origin': origin,
+      vary: 'Origin',
+    };
+  }
+
+  return {
+    ...base,
+    'access-control-allow-origin': '*',
+  };
+}
 
 function loadRootEnv(projectRoot) {
   try {
@@ -100,6 +166,7 @@ function loadRootEnv(projectRoot) {
 }
 
 export async function handleRequest(request, response) {
+  activeCorsRequest = request;
   try {
     if (request.method === 'OPTIONS') {
       sendEmpty(response, 204);
@@ -145,19 +212,63 @@ export async function handleRequest(request, response) {
 
     if (route === 'GET /api/public/stats') {
       if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public stats refresh');
-      sendJson(response, await buildPublicStats(db));
+      sendPublicJson(response, await withPublicResponseCache('stats', () => buildPublicStats(db)));
+      return;
+    }
+
+    if (route === 'GET /api/public/social-preview') {
+      const previewPath = String(url.searchParams.get('path') || '').trim();
+      const meta = await buildSocialPreviewForPath(db, previewPath, {
+        buildPublicVenuePage,
+        buildPublicEventPage,
+        buildPublicArticlePage,
+        buildPublicCityPage,
+        publicVenueSlug,
+        publicVenuePageTemplate,
+      });
+      const html = renderSocialPreviewHtml(meta || undefined, {
+        redirectPath: meta?.redirectPath || meta?.url || previewPath,
+      });
+      response.writeHead(200, {
+        'content-type': 'text/html; charset=utf-8',
+        'cache-control': 'public, max-age=300, stale-while-revalidate=600',
+        ...buildCorsHeaders(request),
+      });
+      response.end(html);
+      return;
+    }
+
+    if (route === 'GET /api/public/articles') {
+      sendPublicJson(response, await withPublicResponseCache('articles:list', () => buildPublicArticlesList(db)));
+      return;
+    }
+
+    const publicArticleMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/articles\/([^/]+)$/) : null;
+    if (publicArticleMatch) {
+      const articleSlug = decodeURIComponent(publicArticleMatch[1]);
+      const payload = await withPublicResponseCache(`articles:${articleSlug}`, () => buildPublicArticlePage(db, articleSlug));
+      sendPublicJson(response, payload || { error: 'article_not_found' }, payload ? 200 : 404);
       return;
     }
 
     if (route === 'GET /api/public/destinations') {
       if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public destinations refresh');
-      sendJson(response, await withPublicResponseCache('destinations', () => buildPublicDestinations(db)));
+      sendPublicJson(response, await withPublicResponseCache('destinations', () => buildPublicDestinations(db)));
+      return;
+    }
+
+    if (route === 'GET /api/public/venues') {
+      if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public venues refresh');
+      sendPublicJson(
+        response,
+        await withPublicResponseCache(`venues:${canonicalSearchParams(url.searchParams)}`, () => buildPublicVenuesCatalog(db, url.searchParams)),
+      );
       return;
     }
 
     if (route === 'GET /api/public/home/preview') {
       if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public home preview refresh');
-      sendJson(response, await withPublicResponseCache('home:preview', () => buildPublicHomePreview(db)));
+      sendPublicJson(response, await withPublicResponseCache('home:preview', () => buildPublicHomePreview(db)));
       return;
     }
 
@@ -173,17 +284,23 @@ export async function handleRequest(request, response) {
           : await withPublicResponseCache(catalogCacheKey, () =>
               withDataFallback(() => buildCatalogSessions(db, url.searchParams), 'apps/public/data.js', 'PUBLIC_DATA', (payload) => filterSessions(payload.sessions || [], url.searchParams)),
             );
-      sendJson(response, catalogPayload);
+      if (url.searchParams.get('refresh') === '1') sendJson(response, catalogPayload);
+      else sendPublicJson(response, catalogPayload);
       return;
     }
 
     if (route === 'GET /api/public/search') {
-      sendJson(response, await withPublicResponseCache(`search:${canonicalSearchParams(url.searchParams)}`, () => buildPublicSearch(db, url.searchParams)));
+      sendPublicJson(response, await withPublicResponseCache(`search:${canonicalSearchParams(url.searchParams)}`, () => buildPublicSearch(db, url.searchParams)));
       return;
     }
 
     if (route === 'GET /api/public/promo-blocks') {
-      sendJson(response, await withPublicResponseCache(`promo-blocks:${canonicalSearchParams(url.searchParams)}`, () => buildPublicPromoBlocks(db, url.searchParams)));
+      sendPublicJson(response, await withPublicResponseCache(`promo-blocks:${canonicalSearchParams(url.searchParams)}`, () => buildPublicPromoBlocks(db, url.searchParams)));
+      return;
+    }
+
+    if (route === 'GET /api/public/landings-catalog') {
+      sendPublicJson(response, await withPublicResponseCache(`landings-catalog:${canonicalSearchParams(url.searchParams)}`, () => buildPublicLandingsCatalog(db, url.searchParams)));
       return;
     }
 
@@ -289,28 +406,29 @@ export async function handleRequest(request, response) {
     const publicVenueMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/venues\/([^/]+)$/) : null;
     if (publicVenueMatch) {
       const venueSlug = decodeURIComponent(publicVenueMatch[1]);
-      sendJson(response, await withPublicResponseCache(`venue:${venueSlug}`, () => buildPublicVenuePage(db, venueSlug)));
+      const payload = await withPublicResponseCache(`venue:${venueSlug}`, () => buildPublicVenuePage(db, venueSlug));
+      sendPublicJson(response, payload || { error: 'venue_not_found' }, payload ? 200 : 404);
       return;
     }
 
     const publicCityMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/cities\/([^/]+)$/) : null;
     if (publicCityMatch) {
       const citySlug = decodeURIComponent(publicCityMatch[1]);
-      sendJson(response, await withPublicResponseCache(`city:${citySlug}`, () => buildPublicCityPage(db, citySlug)));
+      sendPublicJson(response, await withPublicResponseCache(`city:${citySlug}`, () => buildPublicCityPage(db, citySlug)));
       return;
     }
 
     const publicLandingMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/landings\/([^/]+)$/) : null;
     if (publicLandingMatch) {
       const landingSlug = decodeURIComponent(publicLandingMatch[1]);
-      sendJson(response, await withPublicResponseCache(`landing:${landingSlug}`, () => buildPublicLandingPageWithFallback(db, landingSlug)));
+      sendPublicJson(response, await withPublicResponseCache(`landing:${landingSlug}`, () => buildPublicLandingPageWithFallback(db, landingSlug)));
       return;
     }
 
     const publicEventMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/events\/([^/]+)$/) : null;
     if (publicEventMatch) {
       const eventSlug = decodeURIComponent(publicEventMatch[1]);
-      sendJson(response, await withPublicResponseCache(`event:${eventSlug}`, () => buildPublicEventPage(db, eventSlug)));
+      sendPublicJson(response, await withPublicResponseCache(`event:${eventSlug}`, () => buildPublicEventPage(db, eventSlug)));
       return;
     }
 
@@ -445,6 +563,33 @@ export async function handleRequest(request, response) {
       return;
     }
 
+    if (route === 'GET /api/admin/articles') {
+      sendJson(response, await buildAdminArticlesList(db));
+      return;
+    }
+
+    if (route === 'POST /api/admin/articles') {
+      const result = await upsertAdminArticle(db, null, await readJsonBody(request));
+      invalidatePublicCaches('article create');
+      sendJson(response, result, 201);
+      return;
+    }
+
+    const articleDetailMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/admin\/articles\/([^/]+)$/) : null;
+    if (articleDetailMatch) {
+      const detail = await buildAdminArticleDetail(db, decodeURIComponent(articleDetailMatch[1]));
+      sendJson(response, detail || { error: 'article_not_found' }, detail ? 200 : 404);
+      return;
+    }
+
+    const articleUpdateMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/articles\/([^/]+)$/) : null;
+    if (articleUpdateMatch) {
+      const result = await upsertAdminArticle(db, decodeURIComponent(articleUpdateMatch[1]), await readJsonBody(request));
+      invalidatePublicCaches('article update');
+      sendJson(response, result);
+      return;
+    }
+
     const eventDetailMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)$/) : null;
     if (eventDetailMatch) {
       sendJson(response, await buildAdminEventDetail(db, decodeURIComponent(eventDetailMatch[1])));
@@ -496,6 +641,8 @@ export async function handleRequest(request, response) {
       },
       500,
     );
+  } finally {
+    activeCorsRequest = null;
   }
 }
 
@@ -577,17 +724,29 @@ async function buildPublicLandingPageWithFallback(db, landingSlug) {
 export async function warmPublicCaches(reason) {
   const startedAt = Date.now();
   try {
-    const [legacy, typed] = await Promise.all([
-      Promise.all([buildPublicDestinations(db), buildPublicHomePreview(db), buildPublicStats(db)]),
+    const [[destinations, preview, stats], typed] = await Promise.all([
+      Promise.all([
+        buildPublicDestinations(db),
+        buildPublicHomePreview(db),
+        buildPublicStats(db),
+        warmPublicCatalogCache(db),
+      ]),
       Promise.all([...publicCacheWarmers].map((warmer) => Promise.resolve().then(() => warmer(reason)))),
     ]);
-    const [destinations, preview, stats] = legacy;
-      const elapsed = Date.now() - startedAt;
-      const typedSummary = typed.filter(Boolean).map((item) =>
-        `${item.events || 0} typed events in ${item.elapsedMs || elapsed}ms`).join(', ');
-      console.log(
-        `Public cache warmed after ${reason}: ${stats?.stats?.events || preview?.sessions?.length || 0} events, ${destinations?.destinations?.length || 0} destinations in ${elapsed}ms${typedSummary ? `; ${typedSummary}` : ''}`,
-      );
+    await Promise.all([
+      withPublicResponseCache('venues:family=institution&limit=500', () =>
+        buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'institution', limit: '500' })),
+      ),
+      withPublicResponseCache('venues:family=location&limit=500', () =>
+        buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'location', limit: '500' })),
+      ),
+    ]);
+    const elapsed = Date.now() - startedAt;
+    const typedSummary = typed.filter(Boolean).map((item) =>
+      `${item.events || 0} typed events in ${item.elapsedMs || elapsed}ms`).join(', ');
+    console.log(
+      `Public cache warmed after ${reason}: ${stats?.stats?.events || preview?.sessions?.length || 0} events, ${destinations?.destinations?.length || 0} destinations in ${elapsed}ms${typedSummary ? `; ${typedSummary}` : ''}`,
+    );
     return { elapsedMs: elapsed, typed };
   } catch (error) {
     console.warn(`Public cache warm failed after ${reason}: ${error instanceof Error ? error.message : String(error)}`);
@@ -695,15 +854,23 @@ function filterSessions(sessions, searchParams) {
   const date = searchParams.get('date');
   const sort = searchParams.get('sort') || 'time';
   const maxPrice = Number(searchParams.get('maxPrice'));
+  const minPrice = Number(searchParams.get('minPrice'));
+  const dateFrom = String(searchParams.get('dateFrom') || '').trim();
+  const dateTo = String(searchParams.get('dateTo') || '').trim();
+  const ageMax = Number(searchParams.get('ageMax'));
   const facets = buildFallbackFacets(sessions);
 
   const rows = sessions.filter((session) => {
+    if (!sessionHasCoverImage(session)) return false;
     if (destination && destination !== 'all' && session.destination !== destination) return false;
     if (city && city !== 'all' && session.city !== city && session.destination !== city) return false;
     if (category && category !== 'all' && session.category !== category && !(session.tags || []).includes(category)) return false;
     if (landing && landing !== 'all' && !(session.landingSlugs || []).includes(landing)) return false;
-    if (date && date !== 'all' && !matchesSessionDate(session, date)) return false;
-    if (Number.isFinite(maxPrice) && maxPrice > 0 && (!session.priceFrom || session.priceFrom > maxPrice)) return false;
+    if (dateFrom || dateTo) {
+      if (!matchesFallbackCatalogDateRange(session, dateFrom, dateTo)) return false;
+    } else if (date && date !== 'all' && !matchesSessionDate(session, date)) return false;
+    if (!matchesFallbackCatalogPrice(session, minPrice, maxPrice)) return false;
+    if (Number.isFinite(ageMax) && ageMax >= 0 && !matchesFallbackCatalogAgeLimit(session, ageMax)) return false;
     if (!query) return true;
     const haystack = [
       session.title,
@@ -720,11 +887,12 @@ function filterSessions(sessions, searchParams) {
   });
 
   const sorted = sortPublicSessions(rows, sort);
+  const arranged = sort === 'price' || sort === 'time' ? sorted : spreadCatalogSessionsByCoverImage(sorted);
   return {
-    total: sorted.length,
+    total: arranged.length,
     offset,
     limit,
-    items: sorted.slice(offset, offset + limit),
+    items: arranged.slice(offset, offset + limit),
     facets,
   };
 }
@@ -789,6 +957,38 @@ function humanizeSlug(slug) {
     .filter(Boolean)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ');
+}
+
+function matchesFallbackCatalogAgeLimit(session, ageMax) {
+  const raw = session.ageLimit;
+  if (raw == null || raw === '') return true;
+  const match = String(raw).match(/\d+/);
+  if (!match) return true;
+  const limit = Number(match[0]);
+  return Number.isFinite(limit) ? limit <= ageMax : true;
+}
+
+function matchesFallbackCatalogDateRange(session, dateFrom, dateTo) {
+  const from = dateFrom ? startOfLocalDay(new Date(dateFrom)) : null;
+  const to = dateTo ? startOfLocalDay(new Date(dateTo)) : null;
+  if (!from && !to) return true;
+  const startsAt = new Date(session.startsAt);
+  if (!Number.isFinite(startsAt.getTime())) return true;
+  const eventDay = startOfLocalDay(startsAt);
+  if (from && eventDay < from) return false;
+  if (to && eventDay > to) return false;
+  return true;
+}
+
+function matchesFallbackCatalogPrice(session, minPrice, maxPrice) {
+  const price = session.priceFrom;
+  const min = Number(minPrice);
+  const max = Number(maxPrice);
+  const wantsFree = minPrice === 0 && maxPrice === 0;
+  if (wantsFree) return !Number.isFinite(price) || price <= 0;
+  if (Number.isFinite(min) && min > 0 && (!Number.isFinite(price) || price < min)) return false;
+  if (Number.isFinite(max) && max > 0 && (!Number.isFinite(price) || price > max)) return false;
+  return true;
 }
 
 function matchesSessionDate(session, dateFilter) {
@@ -1057,10 +1257,9 @@ function safeEqualString(actual, expected) {
 }
 
 function sendAuthRequired(response) {
+  const cors = buildCorsHeaders(activeCorsRequest, { credentials: routeNeedsCredentials(activeCorsRequest) });
   response.writeHead(401, {
-    ...corsHeaders(response, false),
-    'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
-    'access-control-allow-headers': 'content-type, authorization',
+    ...cors,
     'www-authenticate': `Basic realm="${adminAuth.realm}", charset="UTF-8"`,
     'content-type': 'application/json; charset=utf-8',
     'cache-control': 'no-store',
@@ -1070,10 +1269,9 @@ function sendAuthRequired(response) {
 
 function sendJson(response, payload, statusCode = 200, extraHeaders = {}) {
   const body = JSON.stringify(payload);
+  const cors = buildCorsHeaders(activeCorsRequest, { credentials: routeNeedsCredentials(activeCorsRequest) });
   response.writeHead(statusCode, {
-    ...corsHeaders(response, true),
-    'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
-    'access-control-allow-headers': 'content-type, authorization',
+    ...cors,
     'content-type': 'application/json; charset=utf-8',
     'cache-control': 'no-store',
     ...extraHeaders,
@@ -1081,35 +1279,15 @@ function sendJson(response, payload, statusCode = 200, extraHeaders = {}) {
   response.end(body);
 }
 
-function sendEmpty(response, statusCode) {
-  response.writeHead(statusCode, {
-    ...corsHeaders(response, true),
-    'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
-    'access-control-allow-headers': 'content-type, authorization',
+function sendPublicJson(response, payload, statusCode = 200, extraHeaders = {}) {
+  sendJson(response, payload, statusCode, {
+    'cache-control': PUBLIC_HTTP_CACHE_CONTROL,
+    ...extraHeaders,
   });
-  response.end();
 }
 
-function corsHeaders(response, allowCredentials) {
-  const origin = String(response.req?.headers?.origin || '').trim();
-  if (!origin) return { 'access-control-allow-origin': '*' };
-
-  const configured = [
-    'https://daibilet.ru',
-    'https://www.daibilet.ru',
-    'https://admin.daibilet.ru',
-    ...String(process.env.PUBLIC_CORS_ORIGINS || '')
-    .split(',')
-    .map((value) => value.trim())
-    .filter(Boolean),
-  ];
-  const localOrigin = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(origin);
-  const allowed = configured.includes(origin) || localOrigin;
-  if (!allowed) return { 'access-control-allow-origin': 'null', vary: 'Origin' };
-
-  return {
-    'access-control-allow-origin': origin,
-    ...(allowCredentials ? { 'access-control-allow-credentials': 'true' } : {}),
-    vary: 'Origin',
-  };
+function sendEmpty(response, statusCode) {
+  const cors = buildCorsHeaders(activeCorsRequest, { credentials: routeNeedsCredentials(activeCorsRequest) });
+  response.writeHead(statusCode, cors);
+  response.end();
 }
