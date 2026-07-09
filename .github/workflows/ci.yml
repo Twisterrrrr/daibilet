@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [integrate/mvp-launch, main, master]
+  pull_request:
+    branches: [integrate/mvp-launch, main, master]
+
+jobs:
+  validate-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install workspace packages
+        run: |
+          npm --prefix packages/db ci
+          npm --prefix apps/backend ci
+          npm --prefix apps/public ci
+          npm --prefix apps/admin ci
+
+      - name: Prisma validate and generate
+        run: |
+          npm run db:validate
+          npm run db:generate
+          npm run db:typecheck
+
+      - name: Backend typecheck and unit tests
+        run: |
+          npm run backend:typecheck
+          npm run backend:test:ts
+
+      - name: Frontend production builds
+        env:
+          NODE_ENV: development
+          VITE_DAIBILET_API_URL: https://daibilet.ru
+          VITE_TEP_WIDGET_ID: "14208"
+        run: |
+          npm run public:build
+          npm run admin:build
+
+      - name: Syntax check deploy and import scripts
+        run: |
+          node --check scripts/tc-import-catalog.js
+          node --check scripts/sync-invariants-check.js
+          node --check scripts/lib/provider-link-sync.js
+          node --check scripts/lib/event-import-guard.js
+          bash -n deploy/scripts/deploy-from-git.sh
+          bash -n deploy/scripts/deploy-staging.sh
+          bash -n scripts/post-deploy-check.sh
+          bash -n scripts/run-parity-check.sh

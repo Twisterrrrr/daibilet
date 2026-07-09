@@ -63,7 +63,24 @@ chmod +x deploy/scripts/deploy-staging.sh
 BRANCH=integrate/mvp-launch ./deploy/scripts/deploy-staging.sh
 ```
 
-Скрипт: `git pull`, `npm install`, migrations, build public+admin, rsync static, restart `daibilet-api-staging`.
+Скрипт: `git pull`, `npm install`, migrations, build public+admin, rsync static, restart `daibilet-api-staging`, **post-deploy-check** (health, stats, widgets, invariants).
+
+## Post-deploy (фаза D)
+
+```bash
+POST_DEPLOY_PUBLIC_BASE=https://staging.daibilet.ru PORT=4001 npm run check:post-deploy
+npm run check:sync-invariants
+npm run check:widgets -- --base https://staging.daibilet.ru
+```
+
+Parity typed vs legacy (нужен `DATABASE_URL`, опционально `start:ts` + `DAIBILET_TS_*`):
+
+```bash
+npm run check:parity
+```
+
+Env template: `deploy/env/staging.env.example`  
+Nightly cron: `deploy/cron/README.md`
 
 ## Systemd
 
@@ -89,6 +106,7 @@ nginx -t && systemctl reload nginx
 
 ## Smoke staging
 
+- [ ] `npm run check:post-deploy` (или автоматически из deploy-staging.sh)
 - [ ] `curl http://127.0.0.1:4001/api/health`
 - [ ] `https://staging.daibilet.ru/` — главная
 - [ ] `/events`, event detail, city, venue, landing

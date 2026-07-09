@@ -56,5 +56,10 @@ rsync -a --delete apps/admin/dist/ "$ADMIN_DIR/"
 systemctl restart "$SERVICE_NAME"
 systemctl reload nginx
 
-curl -fsS http://127.0.0.1:4000/api/health >/dev/null
+sleep 2
+POST_DEPLOY_PUBLIC_BASE="${PUBLIC_SITE_URL:-https://daibilet.ru}" \
+POST_DEPLOY_INVARIANTS=1 \
+PORT=4000 \
+bash scripts/post-deploy-check.sh
+
 echo "Daibilet deploy complete"

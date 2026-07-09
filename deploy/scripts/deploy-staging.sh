@@ -64,5 +64,10 @@ else
 fi
 
 STAGING_PORT="${PORT:-4001}"
-curl -fsS "http://127.0.0.1:${STAGING_PORT}/api/health" >/dev/null
+sleep 2
+POST_DEPLOY_PUBLIC_BASE="${PUBLIC_SITE_URL:-https://staging.daibilet.ru}" \
+POST_DEPLOY_INVARIANTS=1 \
+PORT="$STAGING_PORT" \
+bash scripts/post-deploy-check.sh
+
 echo "Staging deploy complete → $PUBLIC_SITE_URL (branch: $BRANCH)"

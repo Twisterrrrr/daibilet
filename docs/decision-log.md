@@ -143,6 +143,16 @@
 
 ---
 
+## 2026-07-10 — Фаза D: post-deploy checks и CI
+
+**Решение:** `post-deploy-check.sh` в deploy pipeline; GitHub Actions CI; nightly cron template; optional staging `start:ts` для parity.
+
+**Почему:** Фазы A–C дали инструменты проверки — фаза D встраивает их в deploy и регрессию без ручного чеклиста.
+
+**Статус:** Активно. Live deploy на сервер — ops по phase-d-deploy-parity.md.
+
+---
+
 ## Шаблон новой записи
 
 ```markdown

@@ -8,19 +8,16 @@
 | **A** | Цепочка данные → виджет (API + эталоны) | ✅ Закрыта | [phase-a-widget-readiness.md](./phase-a-widget-readiness.md) |
 | **B** | Импорт sync → БД (TC + TEP, ProviderLink) | ✅ Закрыта | [phase-b-import-sync.md](./phase-b-import-sync.md) |
 | **C** | Целостность данных (инварианты, guards) | ✅ Закрыта | [phase-c-data-integrity.md](./phase-c-data-integrity.md) |
-| **D** | Deploy / parity / CI | ⏳ Следующая | — |
+| **D** | Deploy / parity / CI | ✅ Закрыта | [phase-d-deploy-parity.md](./phase-d-deploy-parity.md) |
 
-## Команды по фазам
+## Команды
 
 ```bash
-# Фаза A
-npm run check:widgets
-npm run check:widgets -- --base https://staging.daibilet.ru
-
-# Фаза C — после sync
+# После deploy
+npm run check:post-deploy
 npm run check:sync-invariants
+npm run check:widgets
 
-# Фаза B (после merge)
-npm run tc:sync
-npm run tep:sync
+# Parity (staging + DATABASE_URL)
+npm run check:parity
 ```
