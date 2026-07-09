@@ -10,6 +10,12 @@
 4. **[deploy-timeweb.md](./deploy-timeweb.md)** — prod на Timeweb
 5. **[deploy-staging.md](./deploy-staging.md)** — staging `/opt/daibilet-staging`
 
+## Checkpoint / аудит
+
+| Документ | Описание |
+|----------|----------|
+| **[checkpoint-2026-07-10-mvp-launch.md](./checkpoint-2026-07-10-mvp-launch.md)** | **Аудит точки:** prod deploy, JS vs Prisma, риски, handoff Codex |
+
 ## Архитектура и миграции
 
 | Документ | Описание |

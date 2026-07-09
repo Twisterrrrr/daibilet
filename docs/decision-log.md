@@ -86,7 +86,19 @@
 
 **Почему:** Lovable-ветка богата UI, но откатывает TS/ProviderLink foundation.
 
-**Статус:** В работе (`integrate/mvp-launch`).
+**Статус:** Завершена интеграция; prod deploy 2026-07-10.
+
+---
+
+## 2026-07-10 — Prod deploy integrate/mvp-launch
+
+**Решение:** Prod `/opt/daibilet` переведён на `integrate/mvp-launch` (@ `4cee7a7`). Staging на `/opt/daibilet-staging`. Локальные prod hotfix сохранены в git stash.
+
+**Почему:** Закрыть интеграцию foundation + lovable UI, не затирая ProviderLink/Prisma migrations.
+
+**Runtime:** Prod по-прежнему `node apps/backend/src/server.js`, не `server-entry.ts`.
+
+**Статус:** Deploy выполнен, browser widget smoke — вручную. GitHub @ `6df849f`, prod сервер отстаёт на 1 commit.
 
 ---
 

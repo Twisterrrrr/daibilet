@@ -31,7 +31,7 @@ npm --prefix apps/admin ci
 npm run db:generate
 npm run db:deploy
 
-PUBLIC_API_URL="${PUBLIC_API_URL:-https://api.daibilet.ru}"
+PUBLIC_API_URL="${PUBLIC_API_URL:-https://staging.daibilet.ru}"
 PUBLIC_SITE_URL="${PUBLIC_SITE_URL:-https://staging.daibilet.ru}"
 ADMIN_API_URL="${ADMIN_API_URL:-/api}"
 TEP_WIDGET_ID="${TEP_WIDGET_ID:-14208}"
