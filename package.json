@@ -32,6 +32,7 @@
     "tc:import": "node scripts/tc-import-catalog.js",
     "tc:sync": "node scripts/tc-full-sync.js && node scripts/tc-import-catalog.js",
     "check:widgets": "node scripts/widget-readiness-check.mjs",
+    "check:sync-invariants": "node scripts/sync-invariants-check.js",
     "tc:orders": "node scripts/tc-sync-orders.js",
     "tc:city-routing": "node scripts/tc-city-routing-summary.js",
     "landing:snapshot": "node scripts/landing-snapshot.mjs --write",

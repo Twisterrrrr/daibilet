@@ -1,38 +1,33 @@
 # Текущее состояние Daibilet
 
-Дата: **2026-07-10** (после фазы B)  
+Дата: **2026-07-10** (после фазы C)  
 Ветка: **`integrate/mvp-launch`**
 
-## Фазы (виджеты + импорт)
+## Фазы
 
 | Фаза | Статус | Документ |
 |------|--------|----------|
-| A — данные → виджет (API) | ✅ | [phases/phase-a-widget-readiness.md](./phases/phase-a-widget-readiness.md) |
-| B — импорт sync → БД | ✅ | [phases/phase-b-import-sync.md](./phases/phase-b-import-sync.md) |
-| C — целостность данных | ⏳ | — |
+| A — виджет API | ✅ | [phase-a-widget-readiness.md](./phases/phase-a-widget-readiness.md) |
+| B — import sync → БД | ✅ | [phase-b-import-sync.md](./phases/phase-b-import-sync.md) |
+| C — целостность данных | ✅ | [phase-c-data-integrity.md](./phases/phase-c-data-integrity.md) |
 | D — deploy / parity | ⏳ | — |
 
-## Импорт (фаза B)
-
-| Источник | Команда / API | БД |
-|----------|---------------|-----|
-| **TC** | `npm run tc:sync`, `POST /api/v1/tc/sync` | upsert + ProviderLink |
-| **TEP** | `npm run tep:sync`, `POST /api/v1/tep/sync` | replace sessions + ProviderLink |
-
-## Проверки
+## Проверки (полный цикл)
 
 ```bash
+npm run tc:sync
+npm run check:sync-invariants
 npm run check:widgets
-npm run tc:import      # нужен catalog.public.json + DATABASE_URL
-npm run backend:test:ts
+
+npm run tep:sync
+npm run check:sync-invariants
 ```
 
 ## Следующий шаг
 
-**Фаза C:** инварианты после sync, мониторинг `missingFromCatalog`.
+**Фаза D:** deploy на staging/prod, nightly cron инвариантов, parity typed handlers.
 
 ## Документы
 
+- [import-guards.md](./import-guards.md)
 - [phases/README.md](./phases/README.md)
-- [widget-data-contract.md](./widget-data-contract.md)
-- [ticketscloud-import.md](./ticketscloud-import.md)

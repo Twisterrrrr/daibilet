@@ -133,6 +133,16 @@
 
 ---
 
+## 2026-07-10 — Фаза C: инварианты и import guards
+
+**Решение:** `check:sync-invariants` после sync; Event upsert сохраняет `slug` и `status` при HIDDEN/EventOverride.
+
+**Почему:** Без автопроверки рассинхрон source links и widget URL остаётся незамеченным; import не должен снимать модерацию admin.
+
+**Статус:** Активно. Prod baseline — после deploy. Staging DB split — фаза D.
+
+---
+
 ## Шаблон новой записи
 
 ```markdown

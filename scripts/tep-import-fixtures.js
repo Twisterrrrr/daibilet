@@ -9,6 +9,7 @@ loadRootEnv(rootDir);
 const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
 const { Pool } = requireFromDbPackage("pg");
 const { syncProviderLinksForSource } = require("./lib/provider-link-sync");
+const { EVENT_UPSERT_STATUS, EVENT_UPSERT_SLUG } = require("./lib/event-import-guard");
 
 const fixturesDir = path.resolve(process.env.TEP_FIXTURES_DIR || path.join(rootDir, "data", "teplohod", "fixtures"));
 const eventsPath = path.join(fixturesDir, "events-compact.json");
@@ -419,11 +420,12 @@ async function upsertEvent(client, event) {
         "primaryCityId", "venueId", "categoryId", "primarySubcategoryId", "createdAt", "updatedAt"
       )
       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, now(), now())
-      on conflict (slug) do update set
+      on conflict (id) do update set
         title = excluded.title,
+        ${EVENT_UPSERT_SLUG},
         description = excluded.description,
         kind = excluded.kind,
-        status = excluded.status,
+        ${EVENT_UPSERT_STATUS},
         "sourceStatus" = excluded."sourceStatus",
         "imageUrl" = excluded."imageUrl",
         "priceFromRub" = excluded."priceFromRub",

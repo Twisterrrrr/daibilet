@@ -7,6 +7,7 @@ const rootDir = path.resolve(__dirname, "..");
 loadRootEnv(rootDir);
 
 const { syncProviderLinksForSource } = require("./lib/provider-link-sync");
+const { EVENT_UPSERT_STATUS, EVENT_UPSERT_SLUG } = require("./lib/event-import-guard");
 
 const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
 const { Pool } = requireFromDbPackage("pg");
@@ -254,10 +255,10 @@ async function importCatalogEvent(client, event, summary) {
       values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, now(), now())
       on conflict (id) do update set
         title = excluded.title,
-        slug = excluded.slug,
+        ${EVENT_UPSERT_SLUG},
         description = excluded.description,
         kind = excluded.kind,
-        status = excluded.status,
+        ${EVENT_UPSERT_STATUS},
         "sourceStatus" = excluded."sourceStatus",
         "ageLimit" = excluded."ageLimit",
         "imageUrl" = excluded."imageUrl",
