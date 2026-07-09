@@ -6,8 +6,8 @@
 | Фаза | Фокус | Статус | Отчёт |
 |------|-------|--------|-------|
 | **A** | Цепочка данные → виджет (API + эталоны) | ✅ Закрыта | [phase-a-widget-readiness.md](./phase-a-widget-readiness.md) |
-| **B** | Импорт sync → БД (TC + TEP, ProviderLink) | ⏳ Следующая | — |
-| **C** | Целостность данных (diff, инварианты) | ⏳ | — |
+| **B** | Импорт sync → БД (TC + TEP, ProviderLink) | ✅ Закрыта | [phase-b-import-sync.md](./phase-b-import-sync.md) |
+| **C** | Целостность данных (diff, инварианты) | ⏳ Следующая | — |
 | **D** | Наблюдаемость, deploy, parity | ⏳ | — |
 
 ## Команды по фазам

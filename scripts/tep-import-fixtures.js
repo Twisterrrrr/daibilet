@@ -8,6 +8,7 @@ loadRootEnv(rootDir);
 
 const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
 const { Pool } = requireFromDbPackage("pg");
+const { syncProviderLinksForSource } = require("./lib/provider-link-sync");
 
 const fixturesDir = path.resolve(process.env.TEP_FIXTURES_DIR || path.join(rootDir, "data", "teplohod", "fixtures"));
 const eventsPath = path.join(fixturesDir, "events-compact.json");
@@ -44,12 +45,22 @@ async function main() {
     venues: 0,
     openDateEvents: 0,
     withoutEventTimes: 0,
+    missingFromCatalog: 0,
+    providerLinks: 0,
   };
+  const importedExternalIds = new Set();
 
   try {
     await client.query("BEGIN");
     await ensureSource(client);
     await ensureSubcategories(client);
+
+    const beforeResult = await client.query(
+      `select count(*)::int as count from "EventSourceLink" where "sourceId" = $1`,
+      [TEPL0HOD_SOURCE_ID],
+    );
+    stats.eventsBefore = beforeResult.rows[0]?.count ?? 0;
+
     await client.query(
       `
         insert into "SourceSyncRun" (id, "sourceId", status, mode, "startedAt", stats)
@@ -75,6 +86,7 @@ async function main() {
 
     for (const sourceEvent of events) {
       const externalId = String(sourceEvent.id);
+      importedExternalIds.add(externalId);
       const places = Array.isArray(sourceEvent.eventPlaces) ? sourceEvent.eventPlaces : [];
       const primaryPlace = places[0] || {};
       const cityName =
@@ -239,6 +251,27 @@ async function main() {
         }
       }
     }
+
+    const missingResult = await client.query(
+      `
+        select count(*)::int as count
+        from "EventSourceLink"
+        where "sourceId" = $1
+          and "externalId" <> all($2::text[])
+      `,
+      [TEPL0HOD_SOURCE_ID, [...importedExternalIds]],
+    );
+    stats.missingFromCatalog = missingResult.rows[0]?.count ?? 0;
+
+    const providerLinkStats = await syncProviderLinksForSource(client, TEPL0HOD_SOURCE_ID);
+    stats.providerLinks = providerLinkStats.total;
+
+    const afterResult = await client.query(
+      `select count(*)::int as count from "EventSourceLink" where "sourceId" = $1`,
+      [TEPL0HOD_SOURCE_ID],
+    );
+    stats.eventsAfter = afterResult.rows[0]?.count ?? 0;
+    stats.durationMs = Date.now() - startedAt.getTime();
 
     await client.query(
       `

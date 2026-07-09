@@ -132,6 +132,30 @@ v2.Simple.Events(EventsRequest) returns (stream Event)
 npm run tc:full-sync
 ```
 
+## Import в БД (фаза B)
+
+После full sync JSON импортируется в PostgreSQL:
+
+```bash
+npm run tc:import    # только upsert из catalog.public.json
+npm run tc:sync      # full-sync + import
+```
+
+Admin API (один вызов):
+
+```text
+POST /api/v1/tc/sync
+POST /api/admin/sources/ticketscloud/sync
+```
+
+Цепочка: gRPC fetch → `data/ticketscloud/catalog.public.json` → `tc-import-catalog.js` → `ProviderLink` sync → invalidate public cache.
+
+Требуется `DATABASE_URL` и `TICKETSCLOUD_WIDGET_TOKEN` (для `EventOffer.widgetUrl`).
+
+Stats: `SourceSyncRun` — `eventsBefore`, `eventsAfter`, `missingFromCatalog`, `providerLinks`. Подробнее: [phases/phase-b-import-sync.md](./phases/phase-b-import-sync.md).
+
+---
+
 Последний full sync `PUBLIC` сохранил:
 
 - каталог: `data/ticketscloud/catalog.public.json`;

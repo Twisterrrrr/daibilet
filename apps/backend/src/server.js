@@ -1104,14 +1104,69 @@ function runTicketscloudCatalogSync() {
         return;
       }
 
-      const summary = await readJsonFileIfExists('data/ticketscloud/summary.public.json');
+      const fetchSummary = await readJsonFileIfExists('data/ticketscloud/summary.public.json');
+      let importResult;
+      try {
+        importResult = await runTicketscloudCatalogImport();
+      } catch (error) {
+        error.statusCode = error.statusCode || 500;
+        reject(error);
+        return;
+      }
+
       resolve({
         ok: true,
         source: 'TICKETSCLOUD',
-        mode: 'catalog',
+        mode: 'catalog+import',
         startedAt,
         finishedAt: new Date().toISOString(),
-        stats: summary?.counts || parseLastJsonObject(stdout)?.counts || parseLastJsonObject(stdout),
+        fetch: {
+          stats: fetchSummary?.counts || parseLastJsonObject(stdout)?.counts || parseLastJsonObject(stdout),
+          output: stdout.trim(),
+        },
+        import: importResult,
+        stats: importResult.stats || fetchSummary?.counts || null,
+        output: [stdout.trim(), importResult.output].filter(Boolean).join('\n\n--- import ---\n\n'),
+      });
+    });
+  });
+}
+
+function runTicketscloudCatalogImport() {
+  return new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [path.join(rootDir, 'scripts', 'tc-import-catalog.js')], {
+      cwd: rootDir,
+      env: process.env,
+      windowsHide: true,
+    });
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on('error', reject);
+    child.on('close', (code) => {
+      if (code !== 0) {
+        const error = new Error(stderr || stdout || `Ticketscloud catalog import failed with exit code ${code}`);
+        error.statusCode = 500;
+        reject(error);
+        return;
+      }
+
+      let stats = null;
+      try {
+        stats = parseLastJsonObject(stdout);
+      } catch {
+        stats = null;
+      }
+
+      resolve({
+        ok: true,
+        stats,
         output: stdout.trim(),
       });
     });

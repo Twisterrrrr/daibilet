@@ -22,6 +22,7 @@
 |----------|----------|
 | [phases/README.md](./phases/README.md) | Дорожная карта фаз A–D |
 | [phases/phase-a-widget-readiness.md](./phases/phase-a-widget-readiness.md) | **Фаза A (закрыта):** API-проверка виджетов |
+| [phases/phase-b-import-sync.md](./phases/phase-b-import-sync.md) | **Фаза B (закрыта):** sync → БД, ProviderLink |
 | [widget-data-contract.md](./widget-data-contract.md) | Контракт полей TC/TEP для виджета |
 | [widget-etalon-slugs.md](./widget-etalon-slugs.md) | Эталонные slug + `check:widgets` |
 

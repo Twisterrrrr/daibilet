@@ -123,6 +123,16 @@
 
 ---
 
+## 2026-07-10 — Фаза B: sync → PostgreSQL одним вызовом
+
+**Решение:** `tc-import-catalog.js` после `tc-full-sync`; `POST /api/v1/tc/sync` = fetch + upsert + `ProviderLink`. TEP import дополнен `syncProviderLinksForSource` и diff stats.
+
+**Почему:** Admin sync TC раньше писал только JSON — каталог на сайте не обновлялся. Единый pipeline снижает риск рассинхрона widget URL и БД.
+
+**Статус:** Активно. Live smoke на prod — после deploy. Инварианты — фаза C.
+
+---
+
 ## Шаблон новой записи
 
 ```markdown
