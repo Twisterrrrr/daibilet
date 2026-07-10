@@ -14,13 +14,15 @@
 
 | Документ | Описание |
 |----------|----------|
-| **[checkpoint-2026-07-10-mvp-launch.md](./checkpoint-2026-07-10-mvp-launch.md)** | **Аудит точки:** prod deploy, JS vs Prisma, риски, handoff Codex |
+| **[audit-2026-07-10-stack-state.md](./audit-2026-07-10-stack-state.md)** | **Аудит стека:** Vite vs Next, Prisma vs dto.js, prod flags, рекомендации Phase F |
+| **[checkpoint-2026-07-10-mvp-launch.md](./checkpoint-2026-07-10-mvp-launch.md)** | Checkpoint MVP launch, handoff Codex |
 
 ## Фазы: виджеты + импорт
 
 | Документ | Описание |
 |----------|----------|
-| [phases/README.md](./phases/README.md) | Дорожная карта фаз A–D |
+| [phases/README.md](./phases/README.md) | Дорожная карта фаз A–E |
+| [phases/phase-e-prisma-runtime.md](./phases/phase-e-prisma-runtime.md) | **Фаза E (закрыта):** TS flags, parity, staging DB |
 | [phases/phase-a-widget-readiness.md](./phases/phase-a-widget-readiness.md) | **Фаза A (закрыта):** API-проверка виджетов |
 | [phases/phase-b-import-sync.md](./phases/phase-b-import-sync.md) | **Фаза B (закрыта):** sync → БД, ProviderLink |
 | [phases/phase-c-data-integrity.md](./phases/phase-c-data-integrity.md) | **Фаза C (закрыта):** инварианты, import guards |

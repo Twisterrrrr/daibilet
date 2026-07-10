@@ -2,7 +2,9 @@
 
 **Дата старта:** 2026-07-10  
 **Ветка:** `integrate/mvp-launch`  
-**Статус:** ✅ E5 complete — staging DB split, prod admin flags on
+**Статус:** ✅ Фаза E закрыта (2026-07-10)
+
+**Аудит:** [audit-2026-07-10-stack-state.md](../audit-2026-07-10-stack-state.md)
 
 **Codex `codex/phase2-foundation`:** отложен до внедрения финконтура (YooKassa) и ЛК поставщика; точечный перенос schema/contracts после стабильного MVP.
 

@@ -153,6 +153,26 @@
 
 ---
 
+## 2026-07-10 — Фаза E закрыта: typed rollout, не full rewrite
+
+**Решение:** Prod/staging на `start:ts` со всеми `DAIBILET_TS_*`. Public read через typed DTO с parity; city/venue/admin read частично делегируют в `dto.js`. Staging DB отделена (`5438`). Codex `phase2-foundation` отложен до финконтура.
+
+**Почему:** Контролируемый rollout без big-bang; legacy остаётся rollback и source of truth для сложной venue/admin логики.
+
+**Статус:** Активно. Аудит: [audit-2026-07-10-stack-state.md](./audit-2026-07-10-stack-state.md).
+
+---
+
+## 2026-07-10 — Frontend остаётся Vite SPA (не Next.js)
+
+**Решение:** `apps/public` и `apps/admin` — Vite 6 + React 19 CSR. Next.js не в scope MVP.
+
+**Почему:** Текущий deploy (static + nginx + API) работает; миграция на Next.js не даёт ROI до стабилизации backend и SEO-требований.
+
+**Статус:** Активно. Пересмотреть в Phase F при необходимости SSR/prerender.
+
+---
+
 ## Шаблон новой записи
 
 ```markdown

@@ -1,9 +1,12 @@
 # Текущее состояние Daibilet
 
-Дата: **2026-07-10** (после фазы D — дорожная карта A–D закрыта)  
+Дата: **2026-07-10** (после фазы E — Prisma runtime rollout)  
 Ветка: **`integrate/mvp-launch`**
 
-## Фазы A–D
+> **Аудит стека:** [audit-2026-07-10-stack-state.md](./audit-2026-07-10-stack-state.md)  
+> Кратко: **Vite/React SPA + Node `start:ts` + Prisma schema**, public read typed с parity; **не Next.js**, **не 100% Prisma Client**.
+
+## Фазы A–E
 
 | Фаза | Статус | Документ |
 |------|--------|----------|
@@ -11,6 +14,13 @@
 | B — import sync → БД | ✅ | [phase-b-import-sync.md](./phases/phase-b-import-sync.md) |
 | C — целостность данных | ✅ | [phase-c-data-integrity.md](./phases/phase-c-data-integrity.md) |
 | D — deploy / CI / parity | ✅ | [phase-d-deploy-parity.md](./phases/phase-d-deploy-parity.md) |
+| E — Prisma runtime rollout | ✅ | [phase-e-prisma-runtime.md](./phases/phase-e-prisma-runtime.md) |
+
+## Prod runtime (2026-07-10)
+
+- API: `start:ts`, все `DAIBILET_TS_PUBLIC_*` + `DAIBILET_TS_ADMIN_*` = 1
+- DB prod: `127.0.0.1:5437/daibilet`
+- DB staging: `127.0.0.1:5438/daibilet_staging` (snapshot prod)
 
 ## Deploy
 
@@ -20,23 +30,27 @@
 
 # Prod
 ./deploy/scripts/deploy-from-git.sh
+
+# Staging DB refresh (E5)
+STAGING_POSTGRES_PASSWORD=... bash deploy/scripts/restore-staging-db.sh
 ```
 
-Post-deploy: `npm run check:post-deploy` (встроен в deploy scripts).
+Post-deploy: `npm run check:post-deploy` · Parity: `npm run check:parity`
 
 ## CI
 
 GitHub Actions: `.github/workflows/ci.yml` — validate, test, build на PR/push.
 
-## Ops backlog
+## Ops backlog (Phase F)
 
-- [x] `git push` + staging deploy @ `56672cd`
-- [ ] `npm run tc:sync` на сервере (backfill widgetUrl)
-- [ ] Nightly cron на сервере
-- [ ] Отдельная staging БД
+- [ ] `npm run tc:sync` на prod (backfill widgetUrl)
+- [ ] Nightly cron: parity + widgets + invariants
 - [ ] Browser smoke (ручной)
+- [ ] Venue/city Prisma-native (убрать делегаты dto.js)
+- [ ] Admin dashboard/sources на Prisma read
 
 ## Документы
 
+- [audit-2026-07-10-stack-state.md](./audit-2026-07-10-stack-state.md)
 - [phases/README.md](./phases/README.md)
 - [deploy-staging.md](./deploy-staging.md)
