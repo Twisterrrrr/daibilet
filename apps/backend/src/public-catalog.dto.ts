@@ -11,6 +11,22 @@ import type { PublicCatalogQuery } from './types/schemas.js';
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
 
+/** Keep in sync with catalogGroupTitleSqlExpression() in dto.js */
+const CATALOG_GROUP_TITLE_SQL = `regexp_replace(
+  regexp_replace(
+    regexp_replace(
+      trim(coalesce(title, '')),
+      '^\\\\d{1,2}[./]\\\\d{1,2}(?:[./]\\\\d{2,4})?(?:\\\\s*(?:,\\\\s*|\\\\s+в\\\\s+))?\\\\d{1,2}:\\\\d{2}.*',
+      '',
+      'i'
+    ),
+    '\\\\s*\\\\([^)]+\\\\)\\\\s*$',
+    '',
+    'g'
+  ),
+  '\\\\s+', ' ', 'g'
+)`;
+
 type PublicCatalogRow = PublicCatalogMappingRow;
 
 interface CatalogCache {
@@ -269,13 +285,17 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         concat_ws(
           '|',
           lower(regexp_replace(trim(coalesce("sourceLabel", '')), '\\s+', ' ', 'g')),
-          lower(regexp_replace(trim(coalesce(title, '')), '\\s+', ' ', 'g')),
+          lower(regexp_replace(trim(coalesce(
+            nullif(trim(${Prisma.raw(CATALOG_GROUP_TITLE_SQL)}), ''),
+            trim(coalesce(venue, ''))
+          )), '\\s+', ' ', 'g')),
           lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
-          lower(regexp_replace(trim(coalesce("venueId", venue, '')), '\\s+', ' ', 'g'))
+          lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
         ) as "groupKey"
       from normalized
       where "priceFrom" >= ${MIN_DISPLAY_PRICE_RUB}
         and "purchaseReady" = true
+        and lower(coalesce("sourceStatus", '')) not in ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden')
         and (
           "startsAt" is not null
           or kind = 'OPEN_DATE'

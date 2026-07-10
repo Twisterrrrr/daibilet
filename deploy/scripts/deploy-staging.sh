@@ -24,7 +24,10 @@ git pull --ff-only origin "$BRANCH"
 
 npm install
 npm --prefix packages/db ci
-npm --prefix apps/backend ci
+(
+  export NODE_ENV="${BUILD_NODE_ENV:-development}"
+  cd apps/backend && npm ci
+)
 npm --prefix apps/public ci
 npm --prefix apps/admin ci
 
