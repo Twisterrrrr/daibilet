@@ -2,7 +2,7 @@ import { prisma } from '@daibilet/db';
 import type { PublicCatalogDto, PublicSessionDto, PublicStatsDto } from '@daibilet/contracts';
 
 const CACHE_MS = 5 * 60 * 1000;
-const MIN_DISPLAY_PRICE_RUB = 100;
+export const MIN_DISPLAY_PRICE_RUB = 100;
 const SITE_TIME_ZONE = 'Europe/Moscow';
 
 type CatalogQuery = {
@@ -444,7 +444,7 @@ function purchaseUrlForEvent(event: EventRow, sessionExternalId?: string | null,
   return event.offers[0]?.widgetUrl || event.offers[0]?.deeplinkUrl || buildProviderWidgetUrl(source.code, externalId);
 }
 
-function buildProviderWidgetUrl(sourceCode?: string | null, externalId?: string | null): string | null {
+export function buildProviderWidgetUrl(sourceCode?: string | null, externalId?: string | null): string | null {
   const provider = providerForSource(sourceCode);
   if (provider === 'TEPLOHOD') {
     if (!externalId) return null;
@@ -463,7 +463,7 @@ function buildProviderWidgetUrl(sourceCode?: string | null, externalId?: string 
   return null;
 }
 
-function providerForSource(sourceCode?: string | null): 'TICKETSCLOUD' | 'TEPLOHOD' | null {
+export function providerForSource(sourceCode?: string | null): 'TICKETSCLOUD' | 'TEPLOHOD' | null {
   const value = String(sourceCode || '').toUpperCase();
   if (value.includes('TEPLOHOD')) return 'TEPLOHOD';
   if (value.includes('TC') || value.includes('TICKETSCLOUD')) return 'TICKETSCLOUD';
@@ -588,7 +588,7 @@ function landingSlugsForEvent(input: { title: string; category: string; tags: st
   return [...new Set(slugs)];
 }
 
-function landingTitle(slug: string): string {
+export function landingTitle(slug: string): string {
   const titles: Record<string, string> = {
     'river-cruises': 'Речные прогулки',
     'bus-tours': 'Автобусные экскурсии',
@@ -602,7 +602,7 @@ function isOpenDate(event: EventRow): boolean {
   return event.kind === 'OPEN_DATE' || event.sourceStatus === 'open_date';
 }
 
-function formatDate(value: string): string {
+export function formatDate(value: string): string {
   if (!value) return 'Открытая дата';
   return new Intl.DateTimeFormat('ru-RU', {
     day: 'numeric',
@@ -611,7 +611,7 @@ function formatDate(value: string): string {
   }).format(new Date(value));
 }
 
-function formatTime(value: string): string {
+export function formatTime(value: string): string {
   if (!value) return 'В виджете';
   return new Intl.DateTimeFormat('ru-RU', {
     hour: '2-digit',
@@ -620,7 +620,7 @@ function formatTime(value: string): string {
   }).format(new Date(value));
 }
 
-function timeBucket(value: string): PublicSessionDto['timeBucket'] {
+export function timeBucket(value: string): PublicSessionDto['timeBucket'] {
   if (!value) return 'day';
   const hour = Number(new Intl.DateTimeFormat('ru-RU', {
     hour: '2-digit',
@@ -633,7 +633,7 @@ function timeBucket(value: string): PublicSessionDto['timeBucket'] {
   return 'night';
 }
 
-function publicSlug(value: string): string {
+export function publicSlug(value: string): string {
   return String(value || '')
     .trim()
     .toLowerCase()
@@ -641,7 +641,7 @@ function publicSlug(value: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
-function cleanText(value: string): string {
+export function cleanText(value: string): string {
   return value.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 }
 

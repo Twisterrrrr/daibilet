@@ -35,7 +35,10 @@
   - server metadata/JSON-LD для событий, городов, площадок и лендингов.
 - Первые public API сняты с backend bridge и читают Prisma прямо в Next:
   - `/api/public/stats`;
-  - `/api/public/events`.
+  - `/api/public/events`;
+  - `/api/public/home/preview`;
+  - `/api/public/events/:slug`.
+- Страница события в нормальном пути больше не ждет backend bridge: Next DTO отдает событие, город/площадку, до 5 ближайших слотов, ticket prices от 100 ₽, widget payload TC/Teplohod и похожие события.
 - Admin sources отделяет catalog sync от orders sync.
 - Admin routes переведены на lazy loading: основные страницы админки собираются отдельными чанками, warning Vite по 500 KB снят.
 - Readiness codes заведены на backend-стороне.
