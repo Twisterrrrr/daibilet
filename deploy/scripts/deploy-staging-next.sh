@@ -76,4 +76,4 @@ WEB_BASE_URL="${PUBLIC_SITE_URL:-https://staging.daibilet.ru}" \
 LEGACY_BASE_URL="http://127.0.0.1:${STAGING_PORT}" \
 pnpm backend:next:parity 2>/dev/null || echo "Note: run backend:next:parity manually with DATABASE_URL"
 
-echo "F3 staging deploy complete → $PUBLIC_SITE_URL (branch: $BRANCH, Next :$WEB_PORT, API :$STAGING_PORT)"
+echo "F3 staging deploy complete → ${PUBLIC_SITE_URL:-https://staging.daibilet.ru} (branch: $BRANCH, Next :$WEB_PORT, API :$STAGING_PORT)"
