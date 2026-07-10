@@ -4051,6 +4051,9 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   }
 
   if (!event) return null;
+  if (!catalogSessions) {
+    catalogSessions = await publicCatalogSessions(db);
+  }
   const eventDestination = publicDestinationForCity(event);
 
   const requestedSlug = publicEventSlug(eventSlugOrId);
