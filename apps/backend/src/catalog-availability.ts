@@ -39,6 +39,17 @@ export function hasUpcomingOrOpenSchedule(row: CatalogScheduleRow): boolean {
   return Number.isFinite(startMs) && startMs >= Date.now();
 }
 
+export function isWideLifetimeSession(
+  startsAt?: string | Date | null,
+  endsAt?: string | Date | null,
+): boolean {
+  if (!startsAt || !endsAt) return false;
+  const startMs = Date.parse(String(startsAt));
+  const endMs = Date.parse(String(endsAt));
+  if (!Number.isFinite(startMs) || !Number.isFinite(endMs) || endMs <= startMs) return false;
+  return endMs - startMs >= 36 * 60 * 60 * 1000;
+}
+
 export function isSaleableForPublicCatalog(
   row: CatalogSaleableRow,
   minPrice = MIN_DISPLAY_PRICE_RUB,

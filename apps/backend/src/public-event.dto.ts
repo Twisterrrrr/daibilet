@@ -2,6 +2,7 @@ import { Prisma, prisma } from '../../../packages/db/src/client.ts';
 import {
   isOpenDateCatalogRow,
   isSaleableForPublicCatalog,
+  isWideLifetimeSession,
 } from './catalog-availability.js';
 import { findLandingRule, matchingLandingSlugs } from './landing-rules.js';
 import {
@@ -373,15 +374,16 @@ function mapSession(
     externalId,
   });
   const openDate = requestedEvent.kind === 'OPEN_DATE' || session.sourceStatus?.toLowerCase() === 'open_date';
-  const startsAt = openDate ? null : prismaWallTimeToIso(session.startsAt);
+  const wideLifetime = isWideLifetimeSession(session.startsAt, session.endsAt);
+  const startsAt = openDate || wideLifetime ? null : prismaWallTimeToIso(session.startsAt);
   return {
     id: session.id,
     eventId: session.eventId,
     startsAt,
     endsAt: prismaWallTimeToIso(session.endsAt),
-    dateLabel: openDate ? 'Открытая дата' : formatDate(session.startsAt),
-    timeLabel: openDate ? 'В виджете' : formatTime(session.startsAt),
-    timeBucket: openDate ? 'day' : timeBucket(session.startsAt),
+    dateLabel: openDate ? 'Открытая дата' : wideLifetime ? 'Даты в виджете' : formatDate(session.startsAt),
+    timeLabel: openDate ? 'В виджете' : wideLifetime ? 'При покупке' : formatTime(session.startsAt),
+    timeBucket: openDate || wideLifetime ? 'day' : timeBucket(session.startsAt),
     sourceStatus: session.sourceStatus,
     priceFrom: displayPriceFrom(session.priceFromRub, offer?.priceRub),
     vacant: session.ticketsVacant,
