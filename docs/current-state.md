@@ -30,6 +30,7 @@
 - Событие доменно считается карточкой, а временной слот - `EventSession`.
 - Public catalog группирует слоты и не должен показывать один слот как отдельное событие.
 - Admin sources отделяет catalog sync от orders sync.
+- Admin routes переведены на lazy loading: основные страницы админки собираются отдельными чанками, warning Vite по 500 KB снят.
 - Readiness codes заведены на backend-стороне.
 - Buyer account и "Мои покупки" заведены в MVP-логике.
 - External orders остаются зеркалом покупок через виджеты.
@@ -198,6 +199,7 @@ pnpm db:validate
 pnpm db:typecheck
 pnpm backend:typecheck
 pnpm --filter @daibilet/admin typecheck
+pnpm --filter @daibilet/admin build
 pnpm backend:test:ts
 ```
 
