@@ -34,7 +34,7 @@
 - `catalog-availability.ts` — общие правила saleability (schedule + widget + price)
 - Prisma DTO синхронизированы с legacy fix (без TEPLOHOD blanket, active sessions)
 
-### E2 — Staging typed stack
+### E2 — Staging typed stack 🔄
 ```bash
 # /opt/daibilet-staging/.env
 DAIBILET_TS_PUBLIC_CATALOG=1
@@ -44,7 +44,8 @@ DAIBILET_TS_PUBLIC_VENUE=1
 DAIBILET_PUBLIC_PREWARM_BEFORE_LISTEN=1
 ```
 - systemd: `start:ts` (см. `deploy/systemd/daibilet-api-staging-ts.service.example`)
-- `npm run check:parity`
+- **Статус 2026-07-10:** staging на `start:ts` + flags ✅, health OK ✅
+- `npm run check:parity` — catalog **2542 legacy vs 2561 typed** (gap ~19, dedupe ported; pinned/mapper delta остаётся)
 - `POST_DEPLOY_PUBLIC_BASE=https://staging.daibilet.ru npm run check:post-deploy`
 
 ### E3 — Prod flags (по одному, после green staging)
