@@ -75,8 +75,25 @@ export async function buildPublicVenueDto(
   if (forceRefresh) pageCache.delete(cacheKey);
 
   const payload = (await buildPublicVenuePage(getLegacyDb(), venueSlugOrId)) as PublicVenuePageDto | null;
-  pageCache.set(cacheKey, { expiresAt: Date.now() + PUBLIC_VENUE_CACHE_MS, payload });
-  return payload;
+  const normalized = payload ? withTypedVenueSeoFallbacks(payload) : null;
+  pageCache.set(cacheKey, { expiresAt: Date.now() + PUBLIC_VENUE_CACHE_MS, payload: normalized });
+  return normalized;
+}
+
+function withTypedVenueSeoFallbacks(payload: PublicVenuePageDto): PublicVenuePageDto {
+  const venue = payload.venue;
+  const cityLabel = venue.city && venue.city !== 'Не указан' ? ` в городе ${venue.city}` : '';
+  return {
+    ...payload,
+    venue: {
+      ...venue,
+      seoH1: venue.seoH1 || venue.title,
+      seoTitle: venue.seoTitle || `${venue.title}: события и билеты | Дайбилет`,
+      seoDescription: venue.seoDescription ||
+        `${venue.title}${cityLabel}: афиша событий, ближайшие даты, цены и билеты.`,
+      canonicalPath: venue.canonicalPath || `/venues/${venue.slug}`,
+    },
+  };
 }
 
 function mapVenue(
