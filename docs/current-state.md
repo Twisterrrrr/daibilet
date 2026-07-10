@@ -15,11 +15,11 @@
 | **F** — Next monorepo + SSR | ✅ F2 / 🔄 F3 | [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md) |
 | **G** — Phase 2 finance runtime | ⏳ | [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md) |
 
-## Next (`feat/next-monorepo`) — F3 cutover in progress
+## Next (`feat/next-monorepo`) — F3 staging ✅ / prod ⏳
 
-- `apps/web`: F2 ✅ — SSR/ISR public, widgets, parity
-- F3 deploy artifacts: `deploy-staging-next.sh`, nginx Next snippet, systemd web service
-- Smoke: `scripts/launch-staging-smoke-next.sh`
+- **Staging:** https://staging.daibilet.ru — Next `:3000`, API `:4001`, SSR smoke OK
+- Deploy: `deploy-staging-next.sh`, `pnpm launch:staging-smoke-next`
+- **Prod cutover** — следующий шаг
 
 ## Codex (`codex/phase2-foundation`)
 
