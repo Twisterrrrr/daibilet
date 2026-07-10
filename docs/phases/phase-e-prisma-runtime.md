@@ -2,7 +2,7 @@
 
 **Дата старта:** 2026-07-10  
 **Ветка:** `integrate/mvp-launch`  
-**Статус:** 🔄 E4 — admin read rollout
+**Статус:** 🔄 E5 — staging DB split + admin prod flags
 
 **Codex `codex/phase2-foundation`:** отложен до внедрения финконтура (YooKassa) и ЛК поставщика; точечный перенос schema/contracts после стабильного MVP.
 
@@ -53,15 +53,20 @@ DAIBILET_PUBLIC_PREWARM_BEFORE_LISTEN=1
 ### E3 — Prod flags ✅
 **2026-07-10:** prod на `start:ts`, все `DAIBILET_TS_PUBLIC_*=1`, parity 4/4 + widgets 4/4.
 
-### E4 — Admin read 🔄
-- `admin-events.dto.ts` — list + detail (typed entry, legacy delegate)
-- `admin-orders.dto.ts` — orders list
-- Флаги: `DAIBILET_TS_ADMIN_EVENTS`, `DAIBILET_TS_ADMIN_ORDERS`
-- Parity: `admin-events-parity.ts`, `admin-orders-parity.ts`
+### E4 — Admin read ✅
+- `admin-events.dto.ts`, `admin-orders.dto.ts` + parity scripts
+- Staging: `DAIBILET_TS_ADMIN_EVENTS=1`, `DAIBILET_TS_ADMIN_ORDERS=1`
 
-### E5 — Отдельная staging DB (до активного admin write migration)
-- `pg_dump` prod → restore staging
-- `pnpm db:deploy` + smoke
+### E5 — Отдельная staging DB 🔄
+```bash
+# на сервере, из /opt/daibilet-staging
+STAGING_POSTGRES_PASSWORD=... bash deploy/scripts/restore-staging-db.sh
+systemctl restart daibilet-api-staging
+npm run check:parity
+```
+- Prod DB: `127.0.0.1:5437/daibilet`
+- Staging DB: `127.0.0.1:5438/daibilet_staging` (`deploy/docker-compose.staging-db.yml`)
+- Скрипт: `deploy/scripts/restore-staging-db.sh`
 
 ---
 
@@ -81,7 +86,9 @@ npm run check:post-deploy
 - [x] Staging: все `DAIBILET_TS_PUBLIC_*=1`, parity 4/4 green
 - [x] Prod: все public flags on, parity 4/4
 - [x] Документирован rollback: flags=0 → instant legacy path
-- [ ] Admin read slice в репо + parity green
+- [x] Admin read slice в репо + parity green
+- [ ] Staging на отдельной БД (5438), restore script
+- [ ] Prod admin flags on
 
 ---
 
