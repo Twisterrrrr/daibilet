@@ -478,7 +478,7 @@ function buildTicketPrices(
 ): PublicTicketPriceDto[] {
   const rows: PublicTicketPriceDto[] = [];
   const eventTitleKey = normalizeGroupPart(event.title);
-  for (const offer of offers) {
+  for (const offer of preferNamedTicketOffers(offers)) {
     if (!Number.isFinite(offer.priceRub) || Number(offer.priceRub) < MIN_DISPLAY_PRICE_RUB) continue;
     rows.push({
       key: `offer:${offer.id}:${normalizeTicketTitle(offer.title, eventTitleKey)}:${offer.priceRub}`,
@@ -489,7 +489,7 @@ function buildTicketPrices(
       description: 'Покупка открывается в виджете билетной системы.',
       purchaseUrl: offer.widgetUrl || offer.deeplinkUrl || event.purchaseUrl || null,
       kind: 'offer',
-      sortOrder: offer.sortOrder ?? 0,
+      sortOrder: offer.sortOrder ?? null,
     });
   }
   const offerPrices = new Set(rows.map((row) => row.priceRub));
@@ -524,11 +524,11 @@ function buildTicketPrices(
     const current = unique.get(key);
     if (!current || (row.kind === 'offer' && current.kind !== 'offer')) unique.set(key, row);
   }
-  const teplohod = providerForSource(event.sourceCode) === 'TEPLOHOD';
-  return [...unique.values()].sort((left, right) => teplohod
-    ? (left.sortOrder ?? 9999) - (right.sortOrder ?? 9999) || left.priceRub - right.priceRub
-    : left.priceRub - right.priceRub || left.title.localeCompare(right.title, 'ru'))
-    .slice(0, 8);
+  return [...unique.values()].sort((left, right) => {
+    const leftOrder = left.sortOrder ?? 9999;
+    const rightOrder = right.sortOrder ?? 9999;
+    return leftOrder - rightOrder || left.priceRub - right.priceRub || left.title.localeCompare(right.title, 'ru');
+  }).slice(0, 32);
 }
 
 function relatedSessions(
