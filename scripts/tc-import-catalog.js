@@ -173,33 +173,37 @@ async function importCatalogEvent(client, event, summary) {
     event.imageUrl && (priceFromRub || priceFromRub === 0) && (event.startsAt || kind === "OPEN_DATE") ? "READY" : "REVIEW";
   const widgetUrl = buildTicketscloudWidgetUrl(externalId);
 
+  let resolvedCityId = cityId;
   if (cityId && city.name) {
-    await client.query(
+    const citySlug = slugify(city.name);
+    const cityResult = await client.query(
       `
         insert into "City" (id, slug, title, "sourceTitle", "isDestination")
         values ($1, $2, $3, $3, true)
-        on conflict (id) do update set
-          slug = "City".slug,
+        on conflict (slug) do update set
           title = excluded.title,
           "sourceTitle" = coalesce("City"."sourceTitle", excluded."sourceTitle"),
           "isDestination" = true
+        returning id
       `,
-      [cityId, slugify(city.name), city.name],
+      [cityId, citySlug, city.name],
     );
+    resolvedCityId = cityResult.rows[0]?.id || cityId;
     rowStats.city = true;
   }
 
+  let resolvedVenueId = venueId;
   if (venueId) {
     const venueEvents =
       summary?.topVenues?.find((item) => item.id === venue.id)?.events || 0;
-    await client.query(
+    const venueSlug = slugify(`${venue.name || "venue"}-${venue.id}`);
+    const venueResult = await client.query(
       `
         insert into "Venue" (
           id, slug, title, description, "cityId", address, latitude, longitude, kind, "pageStatus", "createdAt", "updatedAt"
         )
         values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, now(), now())
-        on conflict (id) do update set
-          slug = "Venue".slug,
+        on conflict (slug) do update set
           title = excluded.title,
           description = coalesce(excluded.description, "Venue".description),
           "cityId" = excluded."cityId",
@@ -209,13 +213,14 @@ async function importCatalogEvent(client, event, summary) {
           kind = excluded.kind,
           "pageStatus" = case when "Venue"."pageStatus" = 'PUBLISHED' then "Venue"."pageStatus" else excluded."pageStatus" end,
           "updatedAt" = now()
+        returning id
       `,
       [
         venueId,
-        slugify(`${venue.name || "venue"}-${venue.id}`),
+        venueSlug,
         venue.name || "Площадка без названия",
         venue.description || null,
-        cityId,
+        resolvedCityId,
         venue.address || null,
         venue.coordinates?.latitude ?? null,
         venue.coordinates?.longitude ?? null,
@@ -223,6 +228,7 @@ async function importCatalogEvent(client, event, summary) {
         venuePageStatus(venue.typeGuess, venueEvents),
       ],
     );
+    resolvedVenueId = venueResult.rows[0]?.id || venueId;
     rowStats.venue = true;
   }
 
@@ -276,8 +282,8 @@ async function importCatalogEvent(client, event, summary) {
       event.imageUrl || null,
       priceFromRub,
       ticketsVacant,
-      cityId,
-      venueId,
+      resolvedCityId,
+      resolvedVenueId,
       categoryId,
     ],
   );
