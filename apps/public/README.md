@@ -5,8 +5,8 @@ Vite React public-каталог Дайбилета: главная, катал�
 ## Локальный запуск
 
 ```bash
-npm --prefix apps/public install
-npm run public:serve
+pnpm install
+pnpm dev:public
 ```
 
 URL:
@@ -18,8 +18,8 @@ http://127.0.0.1:5178
 ## Проверка
 
 ```bash
-npm --prefix apps/public run typecheck
-npm run public:build
+pnpm --filter @daibilet/public typecheck
+pnpm public:build
 ```
 
 В production public собирается со значением `VITE_DAIBILET_API_URL=https://api.daibilet.ru`.

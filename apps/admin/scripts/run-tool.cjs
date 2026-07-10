@@ -3,10 +3,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const appDir = path.resolve(__dirname, '..');
-const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
+const pnpm = process.platform === 'win32' ? 'pnpm.cmd' : 'pnpm';
 
 function run(command, args) {
-  const result = spawnSync(npm, ['exec', '--', command, ...args], {
+  const result = spawnSync(pnpm, ['exec', command, ...args], {
     cwd: appDir,
     stdio: 'inherit',
     shell: true,

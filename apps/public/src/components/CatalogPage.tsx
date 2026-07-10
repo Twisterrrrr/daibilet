@@ -1,4 +1,5 @@
 import * as React from 'react';
+import type { PublicCatalogDto } from '@daibilet/contracts';
 import { Grid3X3, List, Search, SlidersHorizontal, Table2, Tag, X } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
@@ -24,12 +25,9 @@ type CatalogFacets = {
   landings: LandingFacet[];
   priceSteps: number[];
 };
-type CatalogResponse = {
-  total: number;
-  offset: number;
-  limit: number;
+type CatalogResponse = Pick<PublicCatalogDto, 'total' | 'offset' | 'limit'> & {
   items: PublicSession[];
-  facets?: Partial<CatalogFacets>;
+  facets?: Partial<PublicCatalogDto['facets']>;
 };
 type ActiveCatalogFilter = { key: string; label: string; onClear: () => void };
 

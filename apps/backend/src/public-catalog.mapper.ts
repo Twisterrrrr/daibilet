@@ -77,7 +77,17 @@ interface CityRoutingConfig {
   cityToRegion?: Record<string, string>;
 }
 
-interface PublicDestination {
+export interface PublicDestinationSourceRow {
+  cityId: string | null;
+  city: string | null;
+  citySlug: string | null;
+  cityIsDestination: boolean | null;
+  regionId: string | null;
+  regionSlug: string | null;
+  regionTitle: string | null;
+}
+
+export interface PublicDestination {
   id: string;
   slug: string;
   sourceSlug: string;
@@ -268,7 +278,7 @@ function loadCityRouting(): CityRoutingConfig {
   }
 }
 
-function publicDestinationForCity(row: PublicCatalogMappingRow): PublicDestination {
+export function publicDestinationForCity(row: PublicDestinationSourceRow): PublicDestination {
   const cityName = cleanDisplayName(row.city) || 'Не указан';
   const mappedRegion = cityToRegion.get(cityName);
   if (mappedRegion && !standaloneCityNames.has(cityName)) {

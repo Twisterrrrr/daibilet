@@ -51,7 +51,6 @@ export function SourcesPage() {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       setPayload((await response.json()) as AdminSourcesPayload);
       setBackendError(null);
-      setNotice(null);
     } catch (error) {
       setBackendError(`Не удалось обновить источники из backend: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
@@ -99,7 +98,7 @@ export function SourcesPage() {
         }
         meta={
           <>
-            <StatusBadge status="live" label={`${formatNumber(payload.metrics.healthy ?? payload.metrics.live)} здоровых`} />
+            <StatusBadge status="live" label={`${formatNumber(payload.metrics.healthy)} здоровых`} />
             {payload.metrics.stale ? <StatusBadge status="error" label={`${formatNumber(payload.metrics.stale)} устарело`} /> : null}
             <span className="text-xs text-muted-foreground">
               {formatNumber(payload.metrics.events)} событий · {formatNumber(payload.metrics.sessions)} сеансов
@@ -110,7 +109,7 @@ export function SourcesPage() {
 
       <div className="mb-4">
         <InfoNote>
-          В колонке "событий" считаем наши сгруппированные карточки. Сырые записи Ticketscloud и Teplohod остаются видны отдельно как импортные записи и сеансы.
+          В строке "событий" считаем наши сгруппированные карточки. События источника до группировки и временные сеансы показаны отдельно.
         </InfoNote>
         {notice ? <div className="mt-2 rounded-lg border border-border bg-surface-muted px-3 py-2 text-xs text-muted-foreground">{notice}</div> : null}
       </div>
@@ -145,39 +144,40 @@ export function SourcesPage() {
             {payload.sources.map((source) => (
               <tr key={source.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
                 <td className="px-4 py-3 align-top">
-                  <SourceBadge source={sourceBadge(source.code)} />
-                  <div className="mt-2 font-medium text-foreground">{source.name}</div>
-                  <div className="mt-1 text-xs text-muted-foreground">{source.code}</div>
+                  <SourceBadge source={sourceBadge(source.sourceCode)} />
+                  <div className="mt-2 font-medium text-foreground">{source.label}</div>
+                  <div className="mt-1 text-xs text-muted-foreground">{source.sourceCode}</div>
                 </td>
                 <td className="px-4 py-3 align-top">
-                  <StatusBadge status={sourceHealthBadge(source.healthStatus || source.status)} label={sourceHealthLabel(source.healthStatus || source.status)} />
+                  <StatusBadge status={sourceHealthBadge(source.health.status)} label={sourceHealthLabel(source.health.status)} />
                   <div className="mt-2 text-xs text-muted-foreground">{source.enabled ? 'включен' : 'выключен'}</div>
-                  <IssueBadges issues={source.openIssues} limit={3} />
+                  <IssueBadges issues={source.health.openIssues} limit={3} />
                 </td>
                 <td className="px-4 py-3 align-top text-sm">
-                  <MetricLine label="событий" value={source.events} />
-                  <MetricLine label="импортных записей" value={source.rawEvents ?? source.events} />
-                  <MetricLine label="городов" value={source.cities} />
-                  <MetricLine label="площадок" value={source.venues} />
+                  <MetricLine label="событий" value={source.counts.groupedEvents} />
+                  <MetricLine label="событий источника" value={source.counts.sourceEvents} />
+                  <MetricLine label="городов" value={source.counts.cities} />
+                  <MetricLine label="площадок" value={source.counts.venues} />
                 </td>
                 <td className="px-4 py-3 align-top text-sm">
-                  <MetricLine label="сеансов" value={source.sessions} />
-                  <MetricLine label="офферов" value={source.offers} />
-                  <div className="mt-1 text-xs text-muted-foreground">{formatMoney(source.priceFrom)}</div>
+                  <MetricLine label="сеансов" value={source.counts.sessions} />
+                  <MetricLine label="офферов" value={source.counts.offers} />
+                  <div className="mt-1 text-xs text-muted-foreground">{formatMoney(source.purchase.priceFromRub)}</div>
                 </td>
                 <td className="px-4 py-3 align-top">
-                  <StatusBadge status={source.purchaseReady ? 'live' : 'incomplete'} label={source.purchaseReady ? 'готова' : 'проверить'} />
+                  <StatusBadge status={source.purchase.ready ? 'live' : 'incomplete'} label={source.purchase.ready ? 'готова' : 'проверить'} />
                   <div className="mt-2 max-w-[220px] truncate text-xs text-muted-foreground">
-                    {source.sampleWidgetUrl || source.sampleDeeplinkUrl || (source.code === 'TEPLOHOD' ? 'teplohod widget.js' : 'нет ссылки')}
+                    {source.purchase.sampleWidgetUrl || source.purchase.sampleDeeplinkUrl || (source.sourceCode === 'TEPLOHOD' ? 'teplohod widget.js' : 'нет ссылки')}
                   </div>
                 </td>
                 <td className="px-4 py-3 align-top text-sm">
-                  {source.lastSync ? (
+                  {source.catalogSync ? (
                     <>
-                      <StatusBadge status={sourceStatus(source.lastSync.status || '')} label={source.lastSync.status || 'sync'} />
-                      <div className="mt-2 text-xs text-muted-foreground">{formatDateTime(source.lastSync.finishedAt || source.lastSync.startedAt)}</div>
-                      <div className="mt-1 max-w-[240px] truncate text-xs text-muted-foreground">{source.lastSync.mode}</div>
-                      <div className="mt-1 text-xs text-muted-foreground">успешный: {source.lastSuccessAt ? formatDateTime(source.lastSuccessAt) : 'нет'}</div>
+                      <StatusBadge status={sourceStatus(source.catalogSync.status)} label={source.catalogSync.status} />
+                      <div className="mt-2 text-xs text-muted-foreground">{formatDateTime(source.catalogSync.finishedAt || source.catalogSync.startedAt)}</div>
+                      <div className="mt-1 max-w-[240px] truncate text-xs text-muted-foreground">каталог: {source.catalogSync.mode}</div>
+                      <div className="mt-1 text-xs text-muted-foreground">успешный: {source.health.lastSuccessAt ? formatDateTime(source.health.lastSuccessAt) : 'нет'}</div>
+                      {source.ordersSync ? <div className="mt-1 text-xs text-muted-foreground">заказы: {source.ordersSync.status}</div> : null}
                     </>
                   ) : (
                     <span className="text-xs text-muted-foreground">sync не найден</span>
@@ -193,41 +193,41 @@ export function SourcesPage() {
 }
 
 function SourceSummaryCard({ source }: { source: AdminSourceRow }) {
-  const isTeplohod = sourceBadge(source.code) === 'teplohod';
+  const isTeplohod = sourceBadge(source.sourceCode) === 'teplohod';
   return (
     <Card className="border-border p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <SourceBadge source={sourceBadge(source.code)} />
-          <h2 className="mt-3 text-base font-semibold text-foreground">{source.name}</h2>
+          <SourceBadge source={sourceBadge(source.sourceCode)} />
+          <h2 className="mt-3 text-base font-semibold text-foreground">{source.label}</h2>
           <p className="mt-1 text-xs leading-5 text-muted-foreground">
             {isTeplohod
               ? 'API + внешний виджет Teplohod.info. Расписание импортируется как слоты внутри карточки события.'
               : 'gRPC импорт Ticketscloud. Повторяющиеся события считаются одной карточкой, слоты остаются в расписании.'}
           </p>
         </div>
-        <StatusBadge status={sourceHealthBadge(source.healthStatus || source.status)} label={sourceHealthLabel(source.healthStatus || source.status)} />
+        <StatusBadge status={sourceHealthBadge(source.health.status)} label={sourceHealthLabel(source.health.status)} />
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <SourceCardMetric label="карточек" value={source.events} />
-        <SourceCardMetric label="сеансов" value={source.sessions} />
-        <SourceCardMetric label="площадок" value={source.venues} />
+        <SourceCardMetric label="карточек" value={source.counts.groupedEvents} />
+        <SourceCardMetric label="сеансов" value={source.counts.sessions} />
+        <SourceCardMetric label="площадок" value={source.counts.venues} />
       </div>
 
       <div className="mt-3 grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
-        <span>успешный sync: {source.lastSuccessAt ? formatDateTime(source.lastSuccessAt) : 'нет'}</span>
-        <span>ошибок подряд: {formatNumber(source.consecutiveErrors ?? 0)}</span>
-        <span>{source.isStale ? `устарело ${formatNumber(source.staleHours)} ч` : 'импорт свежий'}</span>
+        <span>успешный sync: {source.health.lastSuccessAt ? formatDateTime(source.health.lastSuccessAt) : 'нет'}</span>
+        <span>ошибок подряд: {formatNumber(source.health.consecutiveErrors)}</span>
+        <span>{!source.enabled ? 'источник на паузе' : source.health.isStale ? `устарело ${formatNumber(source.health.staleHours)} ч` : 'импорт свежий'}</span>
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
-        <Badge variant="outline">импорт: {formatNumber(source.rawEvents ?? source.events)}</Badge>
-        <Badge variant="outline">{source.purchaseReady ? 'покупка готова' : 'покупку проверить'}</Badge>
+        <Badge variant="outline">событий источника: {formatNumber(source.counts.sourceEvents)}</Badge>
+        <Badge variant="outline">{source.purchase.ready ? 'покупка готова' : 'покупку проверить'}</Badge>
         {isTeplohod ? <Badge variant="outline">widget.js</Badge> : <Badge variant="outline">TC widget</Badge>}
       </div>
 
-      <IssueBadges issues={source.openIssues} limit={4} />
+      <IssueBadges issues={source.health.openIssues} limit={4} />
     </Card>
   );
 }
@@ -241,7 +241,7 @@ function SourceCardMetric({ label, value }: { label: string; value: number }) {
   );
 }
 
-function IssueBadges({ issues, limit = 3 }: { issues?: AdminSourceRow['openIssues']; limit?: number }) {
+function IssueBadges({ issues, limit = 3 }: { issues?: AdminSourceRow['health']['openIssues']; limit?: number }) {
   if (!issues?.length) return null;
   const visible = issues.slice(0, limit);
   const hidden = Math.max(0, issues.length - visible.length);

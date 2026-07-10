@@ -19,13 +19,18 @@ git fetch origin main
 git checkout main
 git pull --ff-only origin main
 
-npm install
-npm --prefix apps/backend ci
-npm --prefix apps/public ci
-npm --prefix apps/admin ci
+if ! command -v pnpm >/dev/null 2>&1; then
+  corepack enable
+  corepack prepare pnpm@11.7.0 --activate
+fi
 
-npm run db:generate
-npm run db:migrate
+pnpm install --frozen-lockfile
+pnpm db:generate
+pnpm db:deploy
+pnpm typecheck
+pnpm test
+pnpm test:integration
+pnpm --filter @daibilet/backend build
 
 PUBLIC_API_URL="${PUBLIC_API_URL:-https://api.daibilet.ru}"
 PUBLIC_SITE_URL="${PUBLIC_SITE_URL:-https://daibilet.ru}"
@@ -34,11 +39,11 @@ TEP_WIDGET_ID="${TEP_WIDGET_ID:-14208}"
 
 VITE_DAIBILET_API_URL="$PUBLIC_API_URL" \
 VITE_TEP_WIDGET_ID="$TEP_WIDGET_ID" \
-npm run public:build
+pnpm --filter @daibilet/public build
 
 VITE_DAIBILET_API_URL="$ADMIN_API_URL" \
 VITE_DAIBILET_PUBLIC_URL="$PUBLIC_SITE_URL" \
-npm run admin:build
+pnpm --filter @daibilet/admin build
 
 mkdir -p "$PUBLIC_DIR" "$ADMIN_DIR"
 rsync -a --delete apps/public/dist/ "$PUBLIC_DIR/"

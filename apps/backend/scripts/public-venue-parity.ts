@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { prisma } from '../../../packages/db/src/client.ts';
+import { prisma } from '@daibilet/db';
 import { buildPublicVenuePage, clearPublicDataCaches } from '../src/dto.js';
 import { createDb } from '../src/db.js';
 import { clearPublicCatalogDtoCache, getPublicCatalogSessions } from '../src/public-catalog.dto.js';

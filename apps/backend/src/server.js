@@ -524,7 +524,11 @@ if (isMainModule()) {
 
 function isMainModule() {
   const entry = process.argv[1];
-  return Boolean(entry && import.meta.url === pathToFileURL(entry).href);
+  return Boolean(
+    entry &&
+    path.basename(fileURLToPath(import.meta.url)) === 'server.js' &&
+    import.meta.url === pathToFileURL(entry).href
+  );
 }
 
 function scheduleTeplohodAutoSync() {

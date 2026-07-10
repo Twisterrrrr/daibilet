@@ -28,6 +28,7 @@ data/*.log
 .codex/
 .agents/
 .codex-screenshots/
+/daibilet/
 
 # Generated supplier snapshots and local SQL dumps
 data/ticketscloud/*.json

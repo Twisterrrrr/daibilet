@@ -4,6 +4,7 @@ import type { DbClient, QueryResult } from './types/db.js';
 
 interface PgPool {
   query<Row = Record<string, unknown>>(text: string, params?: readonly unknown[]): Promise<QueryResult<Row>>;
+  end(): Promise<void>;
 }
 
 interface PgModule {
@@ -83,8 +84,14 @@ export function createDb(rootDir: string): DbClient {
   };
 }
 
+export async function disconnectDb(): Promise<void> {
+  if (!pool) return;
+  const current = pool;
+  pool = undefined;
+  await current.end();
+}
+
 function getPool(): PgPool {
   if (!pool) throw new Error('Database pool is not initialized');
   return pool;
 }
-

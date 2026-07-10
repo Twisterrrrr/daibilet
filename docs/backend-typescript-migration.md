@@ -348,6 +348,27 @@ Typed public stack warmup and venue catalog, 2026-07-01:
 
 Browser smoke прошел на desktop и viewport 390x844: 189 площадок, фильтр `Douglas` возвращает одну карточку, переход открывает detail, горизонтального overflow и console errors нет.
 
+Monorepo foundation and typed Source Health, 2026-07-02:
+
+- корень переведен на единый pnpm workspace с пакетами `@daibilet/db`, `@daibilet/contracts` и `@daibilet/config`;
+- production backend собирается через tsup в `apps/backend/dist/server-entry.js`, systemd больше не запускает source-файлы через `tsx` или npm;
+- `GET /api/admin/sources` перехвачен typed handler и строится через Prisma DTO, legacy `buildAdminSources` остается только временным fallback для старого entrypoint;
+- catalog sync и orders polling разделены в контракте и выбираются независимыми окнами истории, поэтому частые опросы заказов не скрывают состояние импорта каталога;
+- counts учитывают `EventSourceLink` и `ProviderLink EVENT`, а временные слоты остаются сеансами и не увеличивают число сгруппированных карточек;
+- admin Sources и Dashboard используют `@daibilet/contracts/source`; прототипный fallback источников из `data.js` удален;
+- live parity с legacy: 2 источника, 601 сгруппированная карточка и 22 976 сеансов; production HTTP smoke подтвердил отдельные TC catalog/orders sync;
+- TS suite содержит 14 unit-тестов и PostgreSQL integration test, включая source stale/error, purchase readiness, SQL counts и разделение sync-контуров.
+
+Typed Dashboard and public home/stats, 2026-07-02:
+
+- `GET /api/admin/dashboard` перехвачен typed handler и строится из SQL/Prisma read-model с launch metrics, без fallback на `data.js` в Dashboard UI;
+- dashboard cache сбрасывается общим public invalidator и прогревается после sync/manual writes вместе с public read stack;
+- `GET /api/public/stats`, `GET /api/public/home` и `GET /api/public/home/preview` вынесены в `public-home.dto.ts` и включаются флагом `DAIBILET_TS_PUBLIC_HOME=1`;
+- hero stats больше не тянет весь public home: счетчик событий строится по saleable grouped cards и совпадает с typed catalog `total`;
+- `stats.destinations` использует те же правила city/region routing, что и каталог: малые города вроде Раменского попадают в область, направления с одним событием не считаются отдельной посадочной;
+- smoke на production bundle после mentor-fix: `/api/public/stats?refresh=1` сбрасывает общий public cache, следующий `/api/public/events?limit=1` подтвердил `stats.events=424` и `catalog.total=424`; warm `/api/public/home` 123 ms, `/api/public/home/preview` 45 ms, `destinations=26`, `venues=248`;
+- backend TS suite содержит 21 unit-тест и 2 PostgreSQL integration tests, включая public home stats, refresh invalidation, warmup orchestration, source health и dashboard parity.
+
 ## Phase 4: validation and tests
 
 Добавить runtime-валидацию на входе:

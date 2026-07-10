@@ -1,4 +1,5 @@
 import * as React from 'react';
+import type { AdminDashboardDto, AdminDashboardLaunchMetrics, AdminDashboardMetrics } from '@daibilet/contracts/admin';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -21,8 +22,8 @@ import { PageHeader, SourceBadge, StatusBadge } from '@/components/admin/primiti
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { adminData, formatNumber } from '@/data';
-import type { AdminData, AdminSourceRow } from '@/types';
+import { formatNumber } from '@/data';
+import type { AdminSourceRow } from '@/types';
 
 const API_BASE_URL =
   ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
@@ -35,29 +36,60 @@ type OrderMetrics = {
   failedIntegration: number;
 };
 
+const EMPTY_DASHBOARD_METRICS: AdminDashboardMetrics = {
+  events: 0,
+  sourceEvents: 0,
+  readyEvents: 0,
+  reviewEvents: 0,
+  blockedEvents: 0,
+  sources: 0,
+  venues: 0,
+  cities: 0,
+  categories: 0,
+  tags: 0,
+  landingRules: 0,
+  destinations: 0,
+  orders: 0,
+  launch: emptyLaunchMetrics(),
+};
+
 export function DashboardPage() {
   const [sources, setSources] = React.useState<AdminSourceRow[]>([]);
   const [orderMetrics, setOrderMetrics] = React.useState<OrderMetrics>({ imported: 0, confirmed: 0, processing: 0, failedIntegration: 0 });
-  const [dashboardMetrics, setDashboardMetrics] = React.useState<AdminData['metrics']>(adminData.metrics);
-  const sourceRows = sources.length ? sources : fallbackSourceRows();
-  const sourceEvents = sources.length ? sources.reduce((sum, source) => sum + source.events, 0) : 0;
-  const liveSources = sourceRows.filter((source) => source.status === 'live').length;
-  const sessions = sourceRows.reduce((sum, source) => sum + source.sessions, 0);
-  const launch = dashboardMetrics.launch || adminData.metrics.launch || fallbackLaunchMetrics();
-  const events = sourceEvents || launch.groupedEvents || dashboardMetrics.events || adminData.metrics.events;
-  const landingHits = launch.landingMatched || adminData.eventRows.filter((event) => event.landingHits.length > 0).length;
-  const venues = sourceRows.length ? sourceRows.reduce((sum, source) => sum + source.venues, 0) : dashboardMetrics.venues || adminData.metrics.venues;
+  const [dashboardMetrics, setDashboardMetrics] = React.useState<AdminDashboardMetrics>(EMPTY_DASHBOARD_METRICS);
+  const [dashboardError, setDashboardError] = React.useState(false);
+  const [sourcesError, setSourcesError] = React.useState(false);
+  const [ordersError, setOrdersError] = React.useState(false);
+  const sourceRows = sources;
+  const sourceEvents = sources.reduce((sum, source) => sum + source.counts.groupedEvents, 0);
+  const liveSources = sourceRows.filter((source) => source.catalogState === 'live').length;
+  const sessions = sourceRows.reduce((sum, source) => sum + source.counts.sessions, 0);
+  const launch = dashboardMetrics.launch || emptyLaunchMetrics();
+  const events = sourceRows.length ? sourceEvents : dashboardMetrics.events;
+  const landingHits = launch.landingMatched;
+  const venues = sourceRows.length ? sourceRows.reduce((sum, source) => sum + source.counts.venues, 0) : dashboardMetrics.venues;
+  const unavailableSections = [
+    dashboardError ? 'метрики каталога' : null,
+    sourcesError ? 'источники' : null,
+    ordersError ? 'заказы' : null,
+  ].filter((value): value is string => Boolean(value));
 
   React.useEffect(() => {
     const controller = new AbortController();
     fetch(`${API_BASE_URL}/api/admin/dashboard`, { cache: 'no-store', signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return (await response.json()) as Pick<AdminData, 'metrics'>;
+        return (await response.json()) as AdminDashboardDto;
       })
-      .then((payload) => setDashboardMetrics(payload.metrics || adminData.metrics))
+      .then((payload) => {
+        setDashboardMetrics(payload.metrics || EMPTY_DASHBOARD_METRICS);
+        setDashboardError(false);
+      })
       .catch(() => {
-        if (!controller.signal.aborted) setDashboardMetrics(adminData.metrics);
+        if (!controller.signal.aborted) {
+          setDashboardMetrics(EMPTY_DASHBOARD_METRICS);
+          setDashboardError(true);
+        }
       });
 
     return () => controller.abort();
@@ -70,9 +102,15 @@ export function DashboardPage() {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as { sources?: AdminSourceRow[] };
       })
-      .then((payload) => setSources(payload.sources || []))
+      .then((payload) => {
+        setSources(payload.sources || []);
+        setSourcesError(false);
+      })
       .catch(() => {
-        if (!controller.signal.aborted) setSources([]);
+        if (!controller.signal.aborted) {
+          setSources([]);
+          setSourcesError(true);
+        }
       });
 
     return () => controller.abort();
@@ -85,16 +123,20 @@ export function DashboardPage() {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as { metrics?: Partial<OrderMetrics> };
       })
-      .then((payload) =>
+      .then((payload) => {
         setOrderMetrics({
           imported: payload.metrics?.imported ?? 0,
           confirmed: payload.metrics?.confirmed ?? 0,
           processing: payload.metrics?.processing ?? 0,
           failedIntegration: payload.metrics?.failedIntegration ?? 0,
-        }),
-      )
+        });
+        setOrdersError(false);
+      })
       .catch(() => {
-        if (!controller.signal.aborted) setOrderMetrics({ imported: 0, confirmed: 0, processing: 0, failedIntegration: 0 });
+        if (!controller.signal.aborted) {
+          setOrderMetrics({ imported: 0, confirmed: 0, processing: 0, failedIntegration: 0 });
+          setOrdersError(true);
+        }
       });
 
     return () => controller.abort();
@@ -133,6 +175,13 @@ export function DashboardPage() {
         }
       />
 
+      {unavailableSections.length ? (
+        <div role="alert" className="mb-4 flex items-center gap-2 rounded-md bg-destructive/5 px-3 py-2 text-sm text-destructive">
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          Backend не отдал: {unavailableSections.join(', ')}. Значения этих разделов не подменяются моками.
+        </div>
+      ) : null}
+
       <div className="mb-4 grid gap-3 md:grid-cols-4">
         <TopMetric label="Можно продавать" value={launch.readyForSales} tone="success" to="/events" />
         <TopMetric label="Карточек событий" value={events} tone="default" to="/events" />
@@ -153,10 +202,10 @@ export function DashboardPage() {
 
         <Block title="Двигатель SEO-трафика" icon={Megaphone} href="/landings" hrefLabel="К лендингам">
           <div className="grid grid-cols-2 gap-2">
-            <Metric icon={Megaphone} label="Лендингов" value={dashboardMetrics.landingRules || adminData.metrics.landingRules} tone="info" to="/landings" />
+            <Metric icon={Megaphone} label="Лендингов" value={dashboardMetrics.landingRules} tone="info" to="/landings" />
             <Metric icon={Layers} label="Событий в выборках" value={landingHits} tone="success" to="/events?view=landing_match" />
             <Metric icon={Building2} label="Хабы площадок" value={venues} to="/venues" />
-            <Metric icon={MapPin} label="Городов/регионов" value={dashboardMetrics.destinations || adminData.metrics.destinations} to="/cities" />
+            <Metric icon={MapPin} label="Городов/регионов" value={dashboardMetrics.destinations} to="/cities" />
           </div>
         </Block>
 
@@ -164,16 +213,16 @@ export function DashboardPage() {
           <div className="space-y-2">
             {sourceRows.map((source) => (
               <ImportRow
-                key={source.code}
-                source={source.name}
-                status={source.status}
-                mode={`${formatNumber(source.events)} карточек · ${formatNumber(source.sessions)} сеансов`}
-                live={source.status === 'live'}
+                key={source.sourceCode}
+                source={source.label}
+                status={source.catalogState}
+                mode={`${formatNumber(source.counts.groupedEvents)} карточек · ${formatNumber(source.counts.sessions)} сеансов`}
+                live={source.catalogState === 'live'}
               />
             ))}
             <div className="grid grid-cols-2 gap-2 pt-1">
-              <Metric icon={Layers} label="Категорий" value={adminData.importJob.categories} to="/taxonomy" />
-              <Metric icon={MapPin} label="Городов" value={adminData.importJob.cities} to="/cities" />
+              <Metric icon={Layers} label="Категорий" value={dashboardMetrics.categories} to="/taxonomy" />
+              <Metric icon={MapPin} label="Городов" value={dashboardMetrics.destinations} to="/cities" />
             </div>
           </div>
         </Block>
@@ -258,7 +307,7 @@ function Block({
   );
 }
 
-type LaunchMetrics = NonNullable<(typeof adminData.metrics)['launch']>;
+type LaunchMetrics = AdminDashboardLaunchMetrics;
 
 function LaunchReadiness({ metrics }: { metrics: LaunchMetrics }) {
   const total = Math.max(0, metrics.groupedEvents || 0);
@@ -298,18 +347,16 @@ function TopMetric({ label, value, tone, to }: { label: string; value: number; t
   );
 }
 
-function fallbackLaunchMetrics(): LaunchMetrics {
-  const events = adminData.eventRows || [];
-  const readyForSales = events.filter((event) => event.purchaseReady && event.priceFrom != null && event.priceFrom >= 100 && event.startsAt).length;
+function emptyLaunchMetrics(): LaunchMetrics {
   return {
-    groupedEvents: adminData.metrics.events || events.length,
-    readyForSales,
-    readyForSeo: adminData.metrics.readyEvents || 0,
-    needsAttention: adminData.metrics.reviewEvents || 0,
-    priceBlocked: events.filter((event) => event.priceFrom == null).length,
-    purchaseBlocked: events.filter((event) => !event.purchaseReady && !String(event.offerStatus || '').toLowerCase().includes('widget')).length,
-    noImage: events.filter((event) => !event.hasImage).length,
-    landingMatched: events.filter((event) => event.landingHits.length > 0).length,
+    groupedEvents: 0,
+    readyForSales: 0,
+    readyForSeo: 0,
+    needsAttention: 0,
+    priceBlocked: 0,
+    purchaseBlocked: 0,
+    noImage: 0,
+    landingMatched: 0,
   };
 }
 
@@ -358,30 +405,4 @@ function ImportRow({ source, status, mode, live }: { source: string; status: str
       {live ? <StatusBadge status="live" label={status} /> : <StatusBadge status="incomplete" label={status} />}
     </div>
   );
-}
-
-function fallbackSourceRows(): AdminSourceRow[] {
-  const grouped = new Map<string, AdminSourceRow>();
-  for (const event of adminData.eventRows) {
-    const code = String(event.sourceCode || event.offerSourceCode || event.source || 'TICKETSCLOUD').toUpperCase().includes('TEPLOHOD') ? 'TEPLOHOD' : 'TICKETSCLOUD';
-    const current =
-      grouped.get(code) ||
-      ({
-        id: code,
-        code,
-        name: code === 'TEPLOHOD' ? 'Teplohod.info' : 'Ticketscloud',
-        enabled: true,
-        status: 'live',
-        purchaseReady: true,
-        events: 0,
-        venues: 0,
-        cities: 0,
-        sessions: 0,
-        offers: 0,
-      } satisfies AdminSourceRow);
-    current.events += 1;
-    current.sessions += event.slotCount || 1;
-    grouped.set(code, current);
-  }
-  return Array.from(grouped.values());
 }

@@ -1,4 +1,4 @@
-import { prisma } from '../../../packages/db/src/client.ts';
+import { prisma } from '@daibilet/db';
 import { getPublicCatalogSessions } from './public-catalog.dto.js';
 import type {
   PublicSessionDto,

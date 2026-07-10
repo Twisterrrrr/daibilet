@@ -7,6 +7,7 @@ export const backendEnvSchema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535).default(4000),
   DATABASE_URL: z.string().min(1).optional(),
   DAIBILET_REQUIRE_ADMIN_AUTH: z.string().optional(),
+  DAIBILET_TS_PUBLIC_HOME: z.string().optional(),
   DAIBILET_TS_PUBLIC_CATALOG: z.string().optional(),
   DAIBILET_TS_PUBLIC_EVENT: z.string().optional(),
   DAIBILET_TS_PUBLIC_CITY: z.string().optional(),

@@ -1,4 +1,4 @@
-import { prisma } from '../../../packages/db/src/client.ts';
+import { prisma } from '@daibilet/db';
 import { LANDING_RULES } from './landing-rules.js';
 import { getPublicCatalogSessions } from './public-catalog.dto.js';
 import type {

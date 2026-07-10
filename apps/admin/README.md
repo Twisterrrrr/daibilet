@@ -5,8 +5,8 @@ Vite React админка для операционной работы с кат
 ## Локальный запуск
 
 ```bash
-npm --prefix apps/admin install
-npm run admin:serve
+pnpm install
+pnpm dev:admin
 ```
 
 URL:
@@ -18,8 +18,8 @@ http://127.0.0.1:5176
 ## Проверка
 
 ```bash
-npm --prefix apps/admin run typecheck
-npm run admin:build
+pnpm --filter @daibilet/admin typecheck
+pnpm admin:build
 ```
 
 В production админка собирается со значением `VITE_DAIBILET_API_URL=/api`, чтобы запросы шли через `admin.daibilet.ru/api` и попадали под basic auth.

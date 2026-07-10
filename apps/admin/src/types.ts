@@ -1,3 +1,10 @@
+import type { AdminDashboardMetrics } from '@daibilet/contracts/admin';
+
+export type {
+  AdminSourceDto as AdminSourceRow,
+  AdminSourcesDto as AdminSourcesPayload,
+} from '@daibilet/contracts/source';
+
 export type AdminEventRow = {
   id: string;
   slug?: string | null;
@@ -256,24 +263,7 @@ export type AdminData = {
     tags: number;
     metaEvents: number;
   };
-  metrics: {
-    events: number;
-    readyEvents: number;
-    reviewEvents: number;
-    venues: number;
-    landingRules: number;
-    destinations: number;
-    launch?: {
-      groupedEvents: number;
-      readyForSales: number;
-      readyForSeo: number;
-      needsAttention: number;
-      priceBlocked: number;
-      purchaseBlocked: number;
-      noImage: number;
-      landingMatched: number;
-    };
-  };
+  metrics: AdminDashboardMetrics;
   eventRows: AdminEventRow[];
   mappingRows: Array<{ source: string; target: string; subcategory: string; mode: string; events: number }>;
   venueRows: AdminVenueRow[];
@@ -284,56 +274,6 @@ export type AdminData = {
   }>;
   destinationRows: Array<{ name: string; type: 'city' | 'region'; events: number; venues: number; cities?: Array<{ name: string; events: number }> }>;
   landingRows: AdminLandingRow[];
-};
-
-export type AdminSourceRow = {
-  id: string;
-  code: string;
-  name: string;
-  enabled: boolean;
-  status: 'live' | 'paused' | 'incomplete' | 'error' | string;
-  healthStatus?: 'ok' | 'warning' | 'error' | 'paused' | string;
-  purchaseReady: boolean;
-  events: number;
-  rawEvents?: number;
-  venues: number;
-  cities: number;
-  sessions: number;
-  offers: number;
-  priceFrom?: number | null;
-  sampleWidgetUrl?: string | null;
-  sampleDeeplinkUrl?: string | null;
-  lastSuccessAt?: string | null;
-  isStale?: boolean;
-  staleHours?: number | null;
-  consecutiveErrors?: number;
-  runningRuns?: number;
-  openIssues?: Array<{
-    code: string;
-    label: string;
-    severity: 'low' | 'medium' | 'high' | string;
-  }>;
-  lastSync?: {
-    status?: string | null;
-    mode?: string | null;
-    startedAt?: string | null;
-    finishedAt?: string | null;
-    error?: string | null;
-  } | null;
-};
-
-export type AdminSourcesPayload = {
-  generatedAt: string;
-  sources: AdminSourceRow[];
-  metrics: {
-    sources: number;
-    live: number;
-    healthy?: number;
-    stale?: number;
-    openIssues?: number;
-    events: number;
-    sessions: number;
-  };
 };
 
 declare global {

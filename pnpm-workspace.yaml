@@ -1,0 +1,18 @@
+packages:
+  - apps/*
+  - packages/*
+
+engineStrict: true
+nodeVersion: 22.20.0
+
+catalog:
+  '@prisma/adapter-pg': 7.8.0
+  '@prisma/client': 7.8.0
+  pg: 8.22.0
+  prisma: 7.8.0
+
+allowBuilds:
+  '@prisma/engines': true
+  esbuild: true
+  prisma: true
+  protobufjs: true

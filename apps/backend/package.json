@@ -4,12 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "node src/server.js",
-    "start": "node src/server.js",
-    "start:ts": "tsx src/server-entry.ts",
+    "dev": "tsx src/server-entry.ts",
+    "dev:legacy": "node src/server.js",
+    "build": "tsup --config tsup.config.ts",
+    "start": "node dist/server-entry.js",
+    "start:ts": "node dist/server-entry.js",
     "dev:ts": "tsx src/server-entry.ts",
     "typecheck": "tsc --noEmit",
-    "test:ts": "tsx --test src/landing-rules.test.ts src/public-catalog.mapper.test.ts src/public-warmup.test.ts",
+    "test:ts": "tsx --test src/admin-dashboard.dto.test.ts src/admin-sources.dto.test.ts src/event-change-request-payload.test.ts src/event-change-request-state.test.ts src/landing-rules.test.ts src/public-catalog.mapper.test.ts src/public-home.dto.test.ts src/public-home-handler.test.ts src/public-warmup.test.ts",
+    "test:integration": "tsx --test src/admin-dashboard.integration.test.ts src/admin-sources.integration.test.ts",
     "catalog:parity": "tsx scripts/public-catalog-parity.ts",
     "event:parity": "tsx scripts/public-event-parity.ts",
     "city:parity": "tsx scripts/public-city-parity.ts",
@@ -17,13 +20,20 @@
     "tep:fixture-bridge": "node ../../scripts/teplohod-fixture-bridge.js"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.13.0 <23"
   },
   "dependencies": {
+    "@daibilet/contracts": "workspace:*",
+    "@daibilet/db": "workspace:*",
+    "@prisma/adapter-pg": "catalog:",
+    "@prisma/client": "catalog:",
+    "pg": "catalog:",
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@daibilet/config": "workspace:*",
     "@types/node": "^26.0.0",
+    "tsup": "^8.5.1",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3"
   }

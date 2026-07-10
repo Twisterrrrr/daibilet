@@ -1,17 +1,7 @@
 {
+  "extends": "@daibilet/config/node.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2022"],
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "useUnknownInCatchVariables": true,
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
-    "types": ["node"],
-    "skipLibCheck": true
+    "noEmit": true
   },
   "include": ["src/**/*.ts", "scripts/**/*.ts"],
   "exclude": ["node_modules"]

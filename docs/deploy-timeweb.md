@@ -110,15 +110,16 @@ deploy/scripts/deploy-from-git.sh
 
 ```bash
 cd /opt/daibilet
-npm install
-npm --prefix apps/public ci
-npm --prefix apps/admin ci
+pnpm install --frozen-lockfile
 
-npm run db:generate
-npm run db:migrate
+pnpm db:generate
+pnpm db:deploy
+pnpm typecheck
+pnpm test
+pnpm --filter @daibilet/backend build
 
-VITE_DAIBILET_API_URL=https://api.daibilet.ru VITE_TEP_WIDGET_ID=14208 npm run public:build
-VITE_DAIBILET_API_URL=/api VITE_DAIBILET_PUBLIC_URL=https://daibilet.ru npm run admin:build
+VITE_DAIBILET_API_URL=https://api.daibilet.ru VITE_TEP_WIDGET_ID=14208 pnpm --filter @daibilet/public build
+VITE_DAIBILET_API_URL=/api VITE_DAIBILET_PUBLIC_URL=https://daibilet.ru pnpm --filter @daibilet/admin build
 
 mkdir -p /var/www/daibilet/public /var/www/daibilet/admin
 rsync -a --delete apps/public/dist/ /var/www/daibilet/public/
@@ -138,7 +139,7 @@ After=network.target
 Type=simple
 WorkingDirectory=/opt/daibilet
 EnvironmentFile=/opt/daibilet/.env
-ExecStart=/usr/bin/env node apps/backend/src/server.js
+ExecStart=/usr/bin/env node /opt/daibilet/apps/backend/dist/server-entry.js
 Restart=always
 RestartSec=5
 
@@ -207,4 +208,3 @@ Teplohod лучше проверять именно на сервере `213.171
 - `api.daibilet.ru/api/admin/dashboard` без auth возвращает `401`.
 - Sources показывает TC и Teplohod, last sync, counts, ошибки.
 - Orders/Buyers не показывают моковые данные.
-

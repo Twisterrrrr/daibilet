@@ -1,4 +1,4 @@
-import { Prisma, prisma } from '../../../packages/db/src/client.ts';
+import { Prisma, prisma } from '@daibilet/db';
 import { findLandingRule, matchingLandingSlugs } from './landing-rules.js';
 import {
   buildProviderWidgetPayload,

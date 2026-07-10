@@ -1,3 +1,4 @@
+import type { AdminDashboardDto } from '@daibilet/contracts/admin';
 import type { AdminData, AdminEventRow } from '@/types';
 
 export const adminData: AdminData = window.ADMIN_DATA ?? {
@@ -15,11 +16,18 @@ export const adminData: AdminData = window.ADMIN_DATA ?? {
   },
   metrics: {
     events: 0,
+    sourceEvents: 0,
     readyEvents: 0,
     reviewEvents: 0,
+    blockedEvents: 0,
+    sources: 0,
     venues: 0,
+    cities: 0,
+    categories: 0,
+    tags: 0,
     landingRules: 0,
     destinations: 0,
+    orders: 0,
     launch: {
       groupedEvents: 0,
       readyForSales: 0,
@@ -47,8 +55,9 @@ export async function hydrateAdminData(): Promise<void> {
   try {
     const response = await fetch(`${baseUrl}/api/admin/dashboard`, { cache: 'no-store', signal: controller.signal });
     if (!response.ok) return;
-    const remoteData = (await response.json()) as AdminData;
-    Object.assign(adminData, remoteData);
+    const remoteData = (await response.json()) as AdminDashboardDto;
+    adminData.generatedAt = remoteData.generatedAt;
+    adminData.metrics = remoteData.metrics;
   } catch {
     // Admin remains usable from apps/admin/data.js while the local API is offline.
   } finally {
