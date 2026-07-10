@@ -15,11 +15,17 @@
 | **F** — Next monorepo + SSR | ✅ F2 / 🔄 F3 | [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md) |
 | **G** — Phase 2 finance runtime | ⏳ | [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md) |
 
-## Next (`feat/next-monorepo`) — готов к F3 cutover
+## Next (`feat/next-monorepo`) — F3 cutover in progress
 
-- `apps/web`: SSR catalog/event/city/venue, **landings ISR**, **catalog filters**, **TC/Teplohod widgets**
-- Parity: `pnpm backend:next:parity`
-- Build: `pnpm web:build` ✅
+- `apps/web`: F2 ✅ — SSR/ISR public, widgets, parity
+- F3 deploy artifacts: `deploy-staging-next.sh`, nginx Next snippet, systemd web service
+- Smoke: `scripts/launch-staging-smoke-next.sh`
+
+## Codex (`codex/phase2-foundation`)
+
+- Phase 2 schema (~66 models), event change requests, admin queue
+- **Не интегрировать** Next/proxy из Codex — cherry-pick **после F3**
+- План: [codex-cherry-pick-plan.md](./codex-cherry-pick-plan.md)
 
 ## Prod (widget MVP — до cutover F3)
 
@@ -42,9 +48,9 @@ STAGING_POSTGRES_PASSWORD=... bash deploy/scripts/restore-staging-db.sh
 
 ## Ops backlog
 
-- [ ] F3: staging nginx → Next, smoke, prod cutover ([checklist](./phases/phase-f3-cutover-checklist.md))
+- [ ] F3: staging deploy + smoke ([checklist](./phases/phase-f3-cutover-checklist.md))
+- [ ] Post-F3: cherry-pick Codex Phase 2 schema + event change requests
 - [ ] `tc:sync` widgetUrl backfill на prod
-- [ ] Codex: `codex/phase2-finance-next` от F1
 
 ## Документы
 

@@ -163,6 +163,16 @@
 
 ---
 
+## 2026-07-10 — Codex split: phase2-foundation, cherry-pick после F3
+
+**Решение:** Codex = ветка **`codex/phase2-foundation`** (не `phase2-finance-next`). Unrelated history — **no wholesale merge**. Canonical public Next = **`apps/web`**. Cherry-pick после F3: Phase 2 schema, event change requests, admin contracts. **Не мержить** Codex Next в `apps/public` + proxy bridge.
+
+**Почему:** Два конкурирующих Next-подхода (Path A proxy vs Path B full-stack). F3 cutover не должен блокироваться на merge Codex.
+
+**Статус:** Активно. [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md), [codex-cherry-pick-plan.md](./codex-cherry-pick-plan.md).
+
+---
+
 ## 2026-07-10 — F2 закрыт: landings ISR, catalog filters, widgets
 
 **Решение:** Завершён F2 public SSR: landings (`/podborki` + SEO paths) с ISR/SSG, SSR-фильтры каталога (city/date/sort/q), client widgets TC/Teplohod на event page, `backend:next:parity`.
@@ -189,7 +199,7 @@
 
 **Почему:** Vite CSR + lazy load 60 — поисковики получают мало контента без JS. Path B из аудита — целевое решение.
 
-**Codex:** параллельно `codex/phase2-finance-next` — Phase 2 schema + supplier admin read, **без** YooKassa runtime.
+**Codex:** параллельно **`codex/phase2-foundation`** — Phase 2 schema + event change requests; cherry-pick **после F3**, **без** YooKassa runtime и **без** Codex Next/proxy.
 
 **Статус:** Активно. F2 ✅. [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md). Ветка `feat/next-monorepo`.
 

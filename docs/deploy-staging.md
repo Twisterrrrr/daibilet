@@ -125,3 +125,32 @@ nginx -t && systemctl reload nginx
 4. DNS/upstream switch по [deploy-timeweb.md](./deploy-timeweb.md)
 
 **Не переключать `daibilet.ru` без staging smoke.**
+
+---
+
+## F3: Next.js public (`feat/next-monorepo`)
+
+Legacy SPA deploy выше — **до cutover**. После F3:
+
+```bash
+cd /opt/daibilet-staging
+git checkout feat/next-monorepo
+BRANCH=feat/next-monorepo ./deploy/scripts/deploy-staging-next.sh
+```
+
+Один раз:
+
+```bash
+cp deploy/systemd/daibilet-web-staging.service /etc/systemd/system/
+systemctl enable --now daibilet-web-staging
+# nginx: deploy/nginx/staging-next.conf.snippet
+```
+
+Smoke:
+
+```bash
+pnpm launch:staging-smoke-next
+pnpm backend:next:parity
+```
+
+Чеклист: [phases/phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md)

@@ -1,36 +1,82 @@
 # F3 — Cutover public на Next.js
 
-**Предусловие:** F2 exit ✅ (SSR каталог, event/city/venue, landings ISR, parity scripts).
+**Предусловие:** F2 exit ✅  
+**Canonical app:** `apps/web` (не Codex `apps/public` + proxy)
 
 ---
 
-## Staging
+## Staging (первый шаг)
 
-1. **Deploy** `apps/web` на staging (`pnpm web:build`, `deploy/scripts/start-web.sh`).
-2. **nginx** — public routes на Next `:3000`, legacy API `:4000` для sync/admin.
-3. **Env:** `DATABASE_URL`, `NEXT_PUBLIC_TC_WIDGET_TOKEN`, `NEXT_PUBLIC_TEP_WIDGET_ID`.
-4. **Smoke:**
-   - `pnpm backend:next:parity` (DTO + optional `WEB_BASE_URL`/`LEGACY_BASE_URL`)
-   - `pnpm launch:staging-smoke` / `pnpm check:post-deploy`
-   - View Source: `/events`, `/events/[slug]`, `/rechnye-progulki/moscow/`, `/podborki`
-   - Widget click: TC + Teplohod на event page
-5. **301:** `/landings/*` → canonical landing URLs (middleware).
+### 1. Server prep (один раз)
+
+```bash
+ssh root@213.171.7.16
+cd /opt/daibilet-staging
+git fetch origin feat/next-monorepo
+git checkout feat/next-monorepo
+
+# systemd Next
+cp deploy/systemd/daibilet-web-staging.service /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable daibilet-web-staging
+
+# nginx: заменить staging block на deploy/nginx/staging-next.conf.snippet
+nginx -t && systemctl reload nginx
+```
+
+### 2. Env (дополнить `.env`)
+
+```env
+DAIBILET_WEB_PORT=3000
+NEXT_PUBLIC_TC_WIDGET_TOKEN=...   # = TICKETSCLOUD_WIDGET_TOKEN
+NEXT_PUBLIC_TEP_WIDGET_ID=14208
+DATABASE_URL=postgresql://...@127.0.0.1:5438/daibilet_staging
+```
+
+### 3. Deploy
+
+```bash
+chmod +x deploy/scripts/deploy-staging-next.sh
+BRANCH=feat/next-monorepo ./deploy/scripts/deploy-staging-next.sh
+```
+
+### 4. Smoke
+
+```bash
+bash scripts/launch-staging-smoke-next.sh
+pnpm backend:next:parity
+# WEB_BASE_URL=https://staging.daibilet.ru LEGACY_BASE_URL=http://127.0.0.1:4001
+```
+
+**View Source:** `/events`, `/events/[slug]`, `/rechnye-progulki/moscow/`, `/podborki` — контент в HTML.  
+**Widgets:** TC + Teplohod click на event page.  
+**301:** `/landings/*` → canonical (middleware).
 
 ---
 
-## Prod cutover
+## Prod cutover (после staging green)
 
-1. Snapshot prod nginx + rollback plan (Vite `apps/public` на прежнем порту).
-2. Переключить public routes на Next; оставить legacy backend для writes/sync.
-3. `pnpm check:parity` + post-deploy checks.
-4. Мониторинг 24–48ч: 404, widget errors, crawl errors.
+1. Snapshot nginx + rollback: Vite static на `/var/www/daibilet/public`
+2. `daibilet-web.service` (prod) по аналогии staging
+3. Public routes → Next `:3000`; API `:4000` для sync/admin
+4. `pnpm check:parity` + post-deploy
+5. Мониторинг 24–48ч
+
+**Rollback:** nginx → static SPA, stop `daibilet-web`, restart API only.
+
+---
+
+## После F3 — Codex integration
+
+Cherry-pick **не в F3:** schema + event change requests + admin contracts.  
+См. [codex-cherry-pick-plan.md](../codex-cherry-pick-plan.md).
 
 ---
 
 ## Deprecate
 
-- Archive `apps/public` (Vite) после стабильного cutover.
-- Документировать в `docs/decision-log.md`.
+- Archive `apps/public` Vite после стабильного prod cutover
+- Запись в [decision-log.md](../decision-log.md)
 
 ---
 
@@ -38,4 +84,5 @@
 
 - Admin Next (`F4`)
 - Retire `dto.js` (`F5`)
-- Codex Phase 2 finance runtime
+- Codex Next/proxy merge
+- Phase 2 finance runtime (`Phase G`)

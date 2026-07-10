@@ -28,7 +28,8 @@
 | [phases/phase-e-prisma-runtime.md](./phases/phase-e-prisma-runtime.md) | **Фаза E (закрыта):** TS flags, parity, staging DB |
 | [phases/phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md) | **Фаза F:** Next full-stack, SEO SSR (F2 ✅) |
 | [phases/phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md) | **F3:** cutover staging/prod |
-| [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md) | **Codex:** Phase 2 finance в Next monorepo |
+| [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md) | **Codex:** `codex/phase2-foundation`, cherry-pick после F3 |
+| [codex-cherry-pick-plan.md](./codex-cherry-pick-plan.md) | План cherry-pick Codex → `feat/next-monorepo` |
 | [phases/phase-a-widget-readiness.md](./phases/phase-a-widget-readiness.md) | **Фаза A (закрыта):** API-проверка виджетов |
 | [phases/phase-b-import-sync.md](./phases/phase-b-import-sync.md) | **Фаза B (закрыта):** sync → БД, ProviderLink |
 | [phases/phase-c-data-integrity.md](./phases/phase-c-data-integrity.md) | **Фаза C (закрыта):** инварианты, import guards |

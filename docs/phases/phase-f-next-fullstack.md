@@ -2,8 +2,8 @@
 
 **Дата старта:** 2026-07-10  
 **Ветка Cursor:** `integrate/mvp-launch` → `feat/next-monorepo`  
-**Ветка Codex:** `codex/phase2-finance-next` (от `feat/next-monorepo` после F1)  
-**Статус:** ✅ F2 done → **F3** cutover next (`feat/next-monorepo`)
+**Ветка Codex:** `codex/phase2-foundation` (Phase 2 backend; **не** merge Next/proxy)  
+**Статус:** ✅ F2 done → **F3** cutover (`feat/next-monorepo`)
 
 **F2 read path:** Prisma напрямую в Server Components и Route Handlers (full-stack), без proxy fetch к legacy backend.
 
@@ -60,7 +60,7 @@ daibilet/
 | Кто | Ветка | Scope |
 |-----|-------|-------|
 | **Cursor** | `feat/next-monorepo` | F1–F4: Next shell, public SSR, Prisma read, deploy, parity |
-| **Codex** | `codex/phase2-finance-next` | Phase 2: Supplier, Checkout schema, YooKassa *foundation*, admin supplier read — **feature-flagged off** |
+| **Codex** | `codex/phase2-foundation` | Phase 2 schema, event change requests, supplier foundation — cherry-pick **после F3**, без Codex Next/proxy |
 | **Prod** | `integrate/mvp-launch` | Стабильный widget MVP до cutover F3 |
 
 Codex **не мержит** в prod до review. Cherry-pick только после parity.
@@ -106,6 +106,11 @@ Handoff для Codex: [codex-phase2-next-handoff.md](../codex-phase2-next-handof
 
 См. [phase-f3-cutover-checklist.md](./phase-f3-cutover-checklist.md)
 
+- [x] Deploy artifacts: `deploy-staging-next.sh`, systemd, nginx snippet, smoke script
+- [ ] Staging deploy + smoke on server
+- [ ] Prod cutover + rollback plan
+- [ ] Post-F3: Codex cherry-pick ([plan](../codex-cherry-pick-plan.md))
+
 ### F4 — Admin + worker (2–3 нед)
 
 - [ ] Admin route group `(admin)` в Next, Basic Auth middleware
@@ -123,7 +128,7 @@ Handoff для Codex: [codex-phase2-next-handoff.md](../codex-phase2-next-handof
 
 ## Phase 2 (Codex) — вне runtime F
 
-Codex готовит в `codex/phase2-finance-next`:
+Codex продолжает в `codex/phase2-foundation`; интеграция в Cursor — [codex-cherry-pick-plan.md](../codex-cherry-pick-plan.md) **после F3**.
 
 - Prisma models: Supplier, CheckoutOrder, Payment, FiscalReceipt, …
 - Migrations **additive only**

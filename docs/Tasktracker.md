@@ -1,6 +1,6 @@
 # Tasktracker — Daibilet
 
-Обновлено: **2026-07-10**. Источник: [Project.md](./Project.md), [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md).
+Обновлено: **2026-07-10**. Источник: [Project.md](./Project.md), [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md).
 
 ---
 
@@ -39,13 +39,31 @@
 
 | Задача | Приоритет | Статус |
 |--------|-----------|--------|
-| Staging deploy apps/web | Критический | ⏳ |
-| nginx public → Next :3000 | Критический | ⏳ |
-| Staging smoke (parity HTTP, widgets, View Source) | Критический | ⏳ |
+| systemd `daibilet-web-staging` | Критический | ✅ artifact |
+| nginx `staging-next.conf.snippet` | Критический | ✅ artifact |
+| `deploy-staging-next.sh` | Критический | ✅ artifact |
+| `launch-staging-smoke-next.sh` | Высокий | ✅ artifact |
+| Staging deploy на сервере | Критический | ⏳ ops |
+| Staging smoke green | Критический | ⏳ ops |
 | Prod cutover + rollback plan | Критический | ⏳ |
-| Deprecate apps/public Vite | Высокий | ⏳ |
+| Deprecate apps/public Vite | Высокий | ⏳ после prod |
 
 Чеклист: [phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md).
+
+---
+
+## Codex integration (после F3) ⏳
+
+| Задача | Приоритет | Статус |
+|--------|-----------|--------|
+| Cherry-pick Phase 2 schema migrations | Критический | ⏳ после F3 |
+| Cherry-pick Event Change Requests (backend) | Высокий | ⏳ после F3 |
+| Merge `packages/contracts/src/admin.ts` | Высокий | ⏳ после F3 |
+| Admin EventChangeRequestsPage (Vite) | Средний | ⏳ после F3 |
+| **Не мержить** Codex Next/proxy (`5b18225`) | — | 🚫 |
+
+План: [codex-cherry-pick-plan.md](./codex-cherry-pick-plan.md).  
+Ветка Codex: **`codex/phase2-foundation`** (не `phase2-finance-next`).
 
 ---
 
@@ -72,7 +90,8 @@
 
 | Задача | Приоритет | Статус |
 |--------|-----------|--------|
-| codex/phase2-finance-next schema foundation | Средний | 🔄 |
+| Codex ветка `codex/phase2-foundation` — Phase 2 backend | Средний | 🔄 (Codex) |
+| Cherry-pick на `feat/next-monorepo` | Высокий | ⏳ **после F3** |
 | Phase G finance runtime | Низкий | ⏳ после F5 |
 
 ---

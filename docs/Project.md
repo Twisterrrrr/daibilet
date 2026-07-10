@@ -45,6 +45,15 @@ packages/config   — shared tsconfig/eslint
 
 ---
 
+## Codex integration (post-F3)
+
+Cherry-pick из **`codex/phase2-foundation`**: schema, event change requests, admin contracts.  
+**Не мержить** Codex Next/proxy — canonical **`apps/web`**.
+
+См. [codex-phase2-next-handoff.md](./docs/codex-phase2-next-handoff.md), [codex-cherry-pick-plan.md](./docs/codex-cherry-pick-plan.md).
+
+---
+
 ## Этапы F
 
 | Этап | Статус | Exit criteria |

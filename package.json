@@ -52,6 +52,7 @@
     "check:parity": "bash scripts/run-parity-check.sh",
     "launch:widgeturl-stats": "node scripts/launch-widgeturl-stats.js",
     "launch:staging-smoke": "bash scripts/launch-staging-smoke.sh",
+    "launch:staging-smoke-next": "bash scripts/launch-staging-smoke-next.sh",
     "tc:orders": "node scripts/tc-sync-orders.js",
     "tc:city-routing": "node scripts/tc-city-routing-summary.js",
     "landing:snapshot": "node scripts/landing-snapshot.mjs --write",

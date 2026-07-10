@@ -4,6 +4,29 @@
 
 ---
 
+## 2026-07-10 — Codex audit + split стратегия + старт F3
+
+### Наблюдения
+
+- На GitHub **нет** ветки `codex/phase2-finance-next`; Codex работает в **`codex/phase2-foundation`** (`229ad3b`, unrelated history с `feat/next-monorepo`).
+- Codex сделал Phase 2 schema (~66 models), Event Change Requests, admin queue — **ценно для cherry-pick**.
+- Codex также перевёл **`apps/public` на Next с proxy** на `:4000` (`5b18225`) — **конфликтует** с Path B (`apps/web`, full-stack read).
+- Cursor F2 complete: `apps/web`, 36 landing SSG paths, parity script.
+
+### Решения
+
+- **Canonical public Next:** только `apps/web` на `feat/next-monorepo`. Codex Next/proxy **не мержить**.
+- **Интеграция Codex:** cherry-pick schema + event change requests + admin contracts **после F3 cutover** ([codex-cherry-pick-plan.md](./codex-cherry-pick-plan.md)).
+- Handoff обновлён: [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md).
+- F3 артефакты: `deploy-staging-next.sh`, `daibilet-web-staging.service`, `staging-next.conf.snippet`, `launch-staging-smoke-next.sh`.
+
+### Проблемы
+
+- Wholesale merge `codex/phase2-foundation` → guaranteed conflicts (schema, Next app location, lockfile).
+- F3 server-side deploy требует ops на staging (213.171.7.16) — локально только scripts/docs.
+
+---
+
 ## 2026-07-10 — F2 закрыт: landings ISR, filters, widgets, parity
 
 ### Наблюдения
