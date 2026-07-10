@@ -154,3 +154,109 @@ export interface AdminTaxonomyDto {
   subcategories: Array<{ id: string; slug: string; title: string; categoryId: string }>;
   tags: Array<{ id: string; slug: string; title: string }>;
 }
+
+export interface AdminEventChangeRequestActorDto {
+  id: string;
+  email: string;
+  name?: string | null;
+}
+
+export interface AdminEventChangeRequestEventDto {
+  id: string;
+  title: string;
+  slug: string;
+  status: string;
+  managementMode: string;
+  scheduleLocked: boolean;
+  updatedAt: string;
+}
+
+export interface AdminEventChangeRequestSupplierDto {
+  id: string;
+  title: string;
+  slug: string;
+  status: string;
+}
+
+export interface AdminEventChangeRequestActionsDto {
+  canApprove: boolean;
+  canReject: boolean;
+  canApply: boolean;
+}
+
+export interface AdminEventChangeRequestRowDto {
+  id: string;
+  eventId?: string | null;
+  supplierId?: string | null;
+  type: string;
+  status: string;
+  title?: string | null;
+  summary?: string | null;
+  adminComment?: string | null;
+  payloadKeys: string[];
+  submittedAt?: string | null;
+  reviewedAt?: string | null;
+  appliedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  event?: AdminEventChangeRequestEventDto | null;
+  supplier?: AdminEventChangeRequestSupplierDto | null;
+  createdBy?: AdminEventChangeRequestActorDto | null;
+  reviewedBy?: AdminEventChangeRequestActorDto | null;
+  actions: AdminEventChangeRequestActionsDto;
+}
+
+export interface AdminEventChangeRequestsListDto {
+  generatedAt: string;
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+  filters: {
+    status?: string | null;
+    type?: string | null;
+    supplierId?: string | null;
+    eventId?: string | null;
+    q?: string | null;
+  };
+  facets: {
+    statuses: Record<string, number>;
+    types: Record<string, number>;
+  };
+  items: AdminEventChangeRequestRowDto[];
+}
+
+export interface AdminEventChangeRequestDiffItemDto {
+  path: string;
+  label: string;
+  currentValue?: unknown;
+  proposedValue?: unknown;
+  changeType: 'added' | 'changed' | 'removed' | 'unchanged';
+}
+
+export interface AdminEventChangeRequestPayloadPreviewSectionDto {
+  id: string;
+  title: string;
+  kind: string;
+  value: unknown;
+}
+
+export interface AdminEventChangeRequestDetailDto extends AdminEventChangeRequestRowDto {
+  payloadPreview: {
+    baseSnapshot?: Record<string, unknown> | null;
+    sections: AdminEventChangeRequestPayloadPreviewSectionDto[];
+  };
+  diff: {
+    items: AdminEventChangeRequestDiffItemDto[];
+    warnings: string[];
+  };
+}
+
+export interface AdminEventChangeRequestActionDto {
+  requestId: string;
+  status: string;
+  reviewedAt?: string | null;
+  appliedAt?: string | null;
+  logAction?: string | null;
+  noOp?: boolean;
+}

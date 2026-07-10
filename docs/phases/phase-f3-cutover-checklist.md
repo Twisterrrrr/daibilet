@@ -62,15 +62,17 @@ nginx -t && systemctl reload nginx
 
 ---
 
-## Prod cutover (после staging green)
+## Prod cutover (после staging green) ✅ 2026-07-10
 
-1. Snapshot nginx + rollback: Vite static на `/var/www/daibilet/public`
-2. `daibilet-web.service` (prod) по аналогии staging
-3. Public routes → Next `:3000`; API `:4000` для sync/admin
-4. `pnpm check:parity` + post-deploy
+1. Snapshot nginx + rollback: `/var/backups/daibilet/pre-next-*` (`snapshot-prod-rollback.sh`)
+2. `daibilet-web.service` → Next **:3001** (staging остаётся :3000)
+3. nginx `daibilet.ru` → Next :3001; API `:4000` для sync/admin
+4. Smoke: `pnpm launch:prod-smoke-next` (SSR via nginx ✅)
 5. Мониторинг 24–48ч
 
-**Rollback:** nginx → static SPA, stop `daibilet-web`, restart API only.
+**Rollback:** `rollback-prod-vite.sh` → static SPA, stop `daibilet-web`.
+
+Детали: [phase-f3-prod-rollback.md](./phase-f3-prod-rollback.md).
 
 ---
 

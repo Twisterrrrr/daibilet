@@ -1,7 +1,11 @@
 import type { Server } from 'node:http';
+import { buildAdminEventChangeRequestDetailDto, buildAdminEventChangeRequestsDto } from './admin-event-change-requests.dto.js';
+import { createAdminEventChangeRequestsRouteHandler } from './admin-event-change-requests-handler.js';
 import { createAdminEventsRouteHandler } from './admin-events-handler.js';
 import { createAdminEventsReadRouteHandler } from './admin-events-read-handler.js';
 import { buildAdminEventDetailDto, buildAdminEventsListDto } from './admin-events.dto.js';
+import { applyApprovedEventChangeRequest } from './event-change-request-applier.js';
+import { reviewEventChangeRequest } from './event-change-request-review.js';
 import { createAdminLandingsRouteHandler } from './admin-landings-handler.js';
 import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
 import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler.js';
@@ -99,6 +103,13 @@ const server = startServer({
       createAdminLandingsRouteHandler({
         db,
         updateAdminLandingMatch,
+        invalidatePublicCaches,
+      }),
+      createAdminEventChangeRequestsRouteHandler({
+        buildEventChangeRequests: buildAdminEventChangeRequestsDto,
+        buildEventChangeRequestDetail: buildAdminEventChangeRequestDetailDto,
+        reviewEventChangeRequest,
+        applyEventChangeRequest: applyApprovedEventChangeRequest,
         invalidatePublicCaches,
       }),
     ],

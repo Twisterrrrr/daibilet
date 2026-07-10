@@ -35,7 +35,7 @@
 
 ---
 
-## F3 — Cutover public 🔄
+## F3 — Cutover public ✅
 
 | Задача | Приоритет | Статус |
 |--------|-----------|--------|
@@ -46,21 +46,24 @@
 | Staging deploy на сервере | Критический | ✅ 2026-07-10 |
 | nginx → Next :3000 | Критический | ✅ patch-staging-next.py |
 | Staging smoke green | Критический | ✅ auto (widgets — manual) |
-| Prod cutover + rollback plan | Критический | ⏳ |
-| Deprecate apps/public Vite | Высокий | ⏳ после prod |
+| Prod cutover + rollback plan | Критический | ✅ 2026-07-10 |
+| Prod nginx → Next :3001 | Критический | ✅ patch-prod-next.py |
+| Prod smoke (SSR via nginx) | Критический | ✅ (parity optional WARN) |
+| Deprecate apps/public Vite | Высокий | ⏳ после мониторинга 24–48ч |
 
 Чеклист: [phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md).
 
 ---
 
-## Codex integration (после F3) ⏳
+## Codex integration (Post-F3) 🔄
 
 | Задача | Приоритет | Статус |
 |--------|-----------|--------|
-| Cherry-pick Phase 2 schema migrations | Критический | ⏳ после F3 |
-| Cherry-pick Event Change Requests (backend) | Высокий | ⏳ после F3 |
-| Merge `packages/contracts/src/admin.ts` | Высокий | ⏳ после F3 |
-| Admin EventChangeRequestsPage (Vite) | Средний | ⏳ после F3 |
+| Cherry-pick Phase 2 schema migrations | Критический | ✅ checkout Codex |
+| Cherry-pick Event Change Requests (backend) | Высокий | ✅ wired server-entry |
+| Merge `packages/contracts/src/admin.ts` | Высокий | ✅ |
+| Admin EventChangeRequestsPage (Vite) | Средний | ✅ за `VITE_DAIBILET_EVENT_CHANGE_REQUESTS=1` |
+| `pnpm db:deploy` staging + prod | Критический | ⏳ |
 | **Не мержить** Codex Next/proxy (`5b18225`) | — | 🚫 |
 
 План: [codex-cherry-pick-plan.md](./codex-cherry-pick-plan.md).  
@@ -92,7 +95,7 @@
 | Задача | Приоритет | Статус |
 |--------|-----------|--------|
 | Codex ветка `codex/phase2-foundation` — Phase 2 backend | Средний | 🔄 (Codex) |
-| Cherry-pick на `feat/next-monorepo` | Высокий | ⏳ **после F3** |
+| Cherry-pick на `feat/next-monorepo` | Высокий | 🔄 schema + ECR landed |
 | Phase G finance runtime | Низкий | ⏳ после F5 |
 
 ---

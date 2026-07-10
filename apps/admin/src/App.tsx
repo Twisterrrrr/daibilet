@@ -4,6 +4,7 @@ import { AdminShell } from '@/components/admin/AdminShell';
 import { ArticlesPage } from '@/pages/ArticlesPage';
 import { BuyersPage } from '@/pages/BuyersPage';
 import { DashboardPage } from '@/pages/DashboardPage';
+import { EventChangeRequestsPage } from '@/pages/EventChangeRequestsPage';
 import { EventsPage } from '@/pages/EventsPage';
 import { ExternalOrdersPage } from '@/pages/ExternalOrdersPage';
 import { LandingsPage } from '@/pages/LandingsPage';
@@ -19,6 +20,9 @@ export function App() {
       <Route element={<AdminShell />}>
         <Route index element={<DashboardPage />} />
         <Route path="events" element={<EventsPage />} />
+        {(import.meta.env.VITE_DAIBILET_EVENT_CHANGE_REQUESTS === '1') ? (
+          <Route path="change-requests" element={<EventChangeRequestsPage />} />
+        ) : null}
         <Route path="orders" element={<ExternalOrdersPage />} />
         <Route path="buyers" element={<BuyersPage />} />
         <Route path="venues" element={<VenuesPage />} />

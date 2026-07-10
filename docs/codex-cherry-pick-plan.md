@@ -1,6 +1,6 @@
 # Cherry-pick plan: Codex → feat/next-monorepo
 
-**Статус:** ⏳ после F3 cutover  
+**Статус:** 🔄 slice 1–4 landed (2026-07-10); `db:deploy` pending  
 **Источник:** `origin/codex/phase2-foundation` @ `229ad3b`  
 **Цель:** Phase 2 schema + event change requests + admin contracts **без** Codex Next/proxy
 
@@ -8,9 +8,9 @@
 
 ## Предусловия
 
-- [ ] F3 staging smoke green (`deploy/scripts/deploy-staging-next.sh`)
-- [ ] `feat/next-monorepo` = prod/staging public canonical
-- [ ] Backup staging DB `5438`
+- [x] F3 staging smoke green (`deploy/scripts/deploy-staging-next.sh`)
+- [x] `feat/next-monorepo` = prod/staging public canonical
+- [ ] Backup staging DB `5438` перед `db:deploy`
 
 ---
 

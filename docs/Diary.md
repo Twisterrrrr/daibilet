@@ -105,3 +105,27 @@
 ### Проблемы
 
 - Prod остаётся на Vite до F3 cutover.
+
+---
+
+## 2026-07-10 — F3 prod cutover + Post-F3 cherry-pick (slice 1–4)
+
+### Наблюдения
+
+- Prod Next на **:3001** (staging :3000) — один хост, разные порты.
+- Snapshot rollback: `/var/backups/daibilet/pre-next-20260710-185139`.
+- `next build` OOM на 3.8GB RAM — workaround: остановить staging Next на время build.
+- Smoke: SSR через nginx ✅; локальный `:3001` health может флапать при restart systemd.
+- Codex cherry-pick: 4 migrations + schema 29→66 models, ECR backend + admin contracts + Vite page.
+
+### Решения
+
+- Prod nginx patched (`patch-prod-next.py`), `daibilet-web` enabled.
+- Cherry-pick через `git checkout origin/codex/phase2-foundation -- <paths>` (не wholesale merge).
+- Admin UI за `VITE_DAIBILET_EVENT_CHANGE_REQUESTS=1`; API routes wired в `server-entry.ts`.
+- Codex Next/proxy (`5b18225`) по-прежнему **skip**.
+
+### Проблемы
+
+- `pnpm db:deploy` на staging/prod ещё не выполнен — нужен backup `5438`/`5437`.
+- `backend:test:ts` не включает ECR tests — запускать отдельно `tsx --test src/event-change-request-*.test.ts`.
