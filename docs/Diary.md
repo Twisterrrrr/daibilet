@@ -151,3 +151,25 @@
 
 - Полный UI parity (landings block renderer, catalog advanced filters, auth/favorites) — следующие slices.
 - `/images/cities/*.png` — static assets на nginx, не в repo; fallback emoji + `heroImageUrl` из API.
+
+---
+
+## 2026-07-11 — Next UI polish (slice 3): event page hero + sticky buy
+
+### Наблюдения
+
+- После slice 1–2 event page оставалась на упрощённом `PurchaseWidget`: без hero, без sticky buy card, без списка сеансов.
+- Vite `EventPage.tsx` — эталон: full-bleed hero, breadcrumbs, mobile CTA, buy card с категориями/сеансами, TC slot-клики, Teplohod embed.
+
+### Решения
+
+- `EventHero` + `EventBuyCard` в `EventPage.client.tsx`; описание/теги — `EventPageSections.tsx`.
+- Утилиты: `event-page-utils.ts` (цены, возраст, HTML описание), `event-purchase.ts` (TC targets, purchasable sessions).
+- `TcWidget.client.tsx`: `TcSessionSlot`, hero/default `TcWidgetButton`, session rows.
+- `TeplohodWidget.client.tsx`: embed с `#teplohod-widget`, CSS override, hero scroll+click.
+- Layout `/events/[slug]`: hero → 2-col (content + sticky `top-20`) → related events.
+
+### Проблемы
+
+- Slice 4 (landings block renderer) и slice 5 (auth/help/legal) — следующие.
+- QuickInfo на event page упрощён vs Vite (без event-location resolver) — достаточно для functional parity.

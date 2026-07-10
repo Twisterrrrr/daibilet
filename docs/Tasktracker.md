@@ -1,6 +1,6 @@
 # Tasktracker — Daibilet
 
-Обновлено: **2026-07-10**. Источник: [Project.md](./Project.md), [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md).
+Обновлено: **2026-07-11**. Источник: [Project.md](./Project.md), [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md).
 
 ---
 
@@ -51,6 +51,7 @@
 | Prod smoke (SSR via nginx) | Критический | ✅ (parity optional WARN) |
 | **Next UI polish** (design system, header, home) | Высокий | ✅ slice 1 |
 | **Next catalog filters** (advanced, presets, limit) | Высокий | ✅ slice 2 |
+| **Next event page** (hero, sessions, sticky buy) | Высокий | ✅ slice 3 |
 | Deprecate apps/public Vite | Высокий | ⏳ после мониторинга 24–48ч |
 
 Чеклист: [phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md).

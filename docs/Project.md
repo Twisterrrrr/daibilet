@@ -1,6 +1,6 @@
 # Project — Daibilet (Next full-stack migration)
 
-**Обновлено:** 2026-07-10  
+**Обновлено:** 2026-07-11  
 **Ветка migration:** `feat/next-monorepo`  
 **Prod (до F3):** `integrate/mvp-launch` + Vite SPA
 
@@ -35,7 +35,7 @@ packages/config   — shared tsconfig/eslint
 |-------|--------|------------|
 | `/` | SSR dynamic | home + top cities |
 | `/events` | SSR dynamic | каталог, filters GET, pagination |
-| `/events/[slug]` | SSR dynamic | event + PurchaseWidget (client) |
+| `/events/[slug]` | SSR dynamic | event hero + sticky buy card (TC/Teplohod widgets) |
 | `/cities`, `/cities/[slug]` | SSR dynamic | |
 | `/venues`, `/venues/[slug]` | SSR dynamic | |
 | `/locations`, `/locations/[slug]` | SSR dynamic | |
