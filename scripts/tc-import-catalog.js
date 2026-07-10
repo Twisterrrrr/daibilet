@@ -226,6 +226,7 @@ async function importCatalogEvent(client, event, summary) {
     rowStats.venue = true;
   }
 
+  const tagLinks = [];
   for (const tag of event.tags || []) {
     if (!tag.id || !tag.name) continue;
     const tagId = id("tag", tag.id);
@@ -233,19 +234,11 @@ async function importCatalogEvent(client, event, summary) {
       `
         insert into "Tag" (id, slug, title)
         values ($1, $2, $3)
-        on conflict (slug) do update set title = excluded.title
+        on conflict (id) do update set title = excluded.title
       `,
       [tagId, slugify(`${tag.name}-${tag.id}`), tag.name],
     );
-    await client.query(
-      `
-        insert into "EventTag" ("eventId", "tagId")
-        values ($1, $2)
-        on conflict ("eventId", "tagId") do nothing
-      `,
-      [eventId, tagId],
-    );
-    rowStats.tags += 1;
+    tagLinks.push({ eventId, tagId });
   }
 
   await client.query(
@@ -288,6 +281,18 @@ async function importCatalogEvent(client, event, summary) {
       categoryId,
     ],
   );
+
+  for (const link of tagLinks) {
+    await client.query(
+      `
+        insert into "EventTag" ("eventId", "tagId")
+        values ($1, $2)
+        on conflict ("eventId", "tagId") do nothing
+      `,
+      [link.eventId, link.tagId],
+    );
+    rowStats.tags += 1;
+  }
 
   const payloadText = JSON.stringify(event.raw || event);
   await client.query(
