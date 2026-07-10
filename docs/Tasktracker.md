@@ -63,7 +63,7 @@
 | Cherry-pick Event Change Requests (backend) | Высокий | ✅ wired server-entry |
 | Merge `packages/contracts/src/admin.ts` | Высокий | ✅ |
 | Admin EventChangeRequestsPage (Vite) | Средний | ✅ за `VITE_DAIBILET_EVENT_CHANGE_REQUESTS=1` |
-| `pnpm db:deploy` staging + prod | Критический | ⏳ |
+| `pnpm db:deploy` staging + prod | Критический | ✅ staging 4 migrations; prod already current |
 | **Не мержить** Codex Next/proxy (`5b18225`) | — | 🚫 |
 
 План: [codex-cherry-pick-plan.md](./codex-cherry-pick-plan.md).  
