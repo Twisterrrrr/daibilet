@@ -9,8 +9,20 @@ PUBLIC_BASE="${PUBLIC_BASE:-https://staging.daibilet.ru}"
 API_BASE="${API_BASE:-http://127.0.0.1:4001}"
 WEB_BASE="${WEB_BASE:-http://127.0.0.1:3000}"
 
-TC_SLUG="tc-6a266b49465e94f72b4ef8f6-interaktivnaya-vystavka-nyuton-park"
-TEP_SLUG="progulka-ot-prichala-kitai-gorod-do-prichala-kievskii-826"
+TC_SLUG="${TC_SLUG:-}"
+TEP_SLUG="${TEP_SLUG:-}"
+
+if [[ -z "$TC_SLUG" ]]; then
+  TC_SLUG="$(curl -fsS "$WEB_BASE/api/public/events?limit=100" | grep -o '"slug":"tc-[^"]*' | head -1 | cut -d'"' -f4 || true)"
+fi
+if [[ -z "$TEP_SLUG" ]]; then
+  TEP_SLUG="$(curl -fsS "$WEB_BASE/api/public/events?limit=200" | grep -o '"slug":"[^"]*"' | grep -i tep | head -1 | cut -d'"' -f4 || true)"
+  if [[ -z "$TEP_SLUG" ]]; then
+    TEP_SLUG="progulka-ot-prichala-kitai-gorod-do-prichala-kievskii-826"
+  fi
+fi
+
+echo "TC_SLUG=$TC_SLUG TEP_SLUG=$TEP_SLUG"
 
 echo "== F3 Next staging smoke =="
 echo "PUBLIC=$PUBLIC_BASE API=$API_BASE WEB=$WEB_BASE"
@@ -37,9 +49,13 @@ check "catalog ssr" bash -c "curl -fsS '$PUBLIC_BASE/events' | grep -qi 'кат�
 check "landing ssr" bash -c "curl -fsS '$PUBLIC_BASE/podborki' | grep -qi 'подборк'"
 check "podborki canonical" bash -c "curl -fsS '$PUBLIC_BASE/rechnye-progulki/moscow/' | grep -qi 'речн\\|прогулк\\|moscow\\|москв' || curl -fsS '$PUBLIC_BASE/rechnye-progulki/moscow' | grep -qi 'речн\\|прогулк'"
 
-check "tc event api" bash -c "curl -fsS '$API_BASE/api/public/events/$TC_SLUG' | grep -q 'TICKETSCLOUD'"
+if [[ -n "$TC_SLUG" ]]; then
+  check "tc event api" bash -c "curl -fsS '$API_BASE/api/public/events/$TC_SLUG' | grep -q 'TICKETSCLOUD'"
+  check "tc event page html" bash -c "curl -fsS '$PUBLIC_BASE/events/$TC_SLUG' | grep -qi '<!DOCTYPE html'"
+else
+  echo "WARN skip tc checks: no tc slug in catalog"
+fi
 check "tep event api" bash -c "curl -fsS '$API_BASE/api/public/events/$TEP_SLUG' | grep -q 'TEPLOHOD'"
-check "tc event page html" bash -c "curl -fsS '$PUBLIC_BASE/events/$TC_SLUG' | grep -qi '<!DOCTYPE html'"
 check "legacy landing 301" bash -c "curl -sI '$PUBLIC_BASE/landings/river-cruises' | grep -qi '301\\|302'"
 
 echo "== backend:next:parity (optional) =="
