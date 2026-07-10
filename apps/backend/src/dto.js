@@ -5360,7 +5360,7 @@ function venueGroupsOverlap(a, b) {
   return (b?.mergedVenueIds || (b?.id ? [b.id] : [])).some((id) => left.has(id));
 }
 
-async function publicVenueHubRows(db, limit = 500, options = {}) {
+export async function publicVenueHubRows(db, limit = 500, options = {}) {
   const now = Date.now();
   const cacheKey = `${limit}:${options.requireEvents === false ? 'all' : 'hub'}`;
   if (publicVenueHubCache?.cacheKey === cacheKey && publicVenueHubCache.expiresAt > now) {
@@ -6322,8 +6322,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   };
 }
 
-async function destinationRows(db) {
-  const sessions = await publicCatalogSessions(db);
+export function buildPublicDestinationRowsFromSessions(sessions) {
   const buckets = new Map();
 
   for (const session of sessions) {
@@ -6364,6 +6363,11 @@ async function destinationRows(db) {
     .filter((bucket) => bucket.events >= PUBLIC_DESTINATION_MIN_EVENTS)
     .filter(isAllowedPublicDestination)
     .sort(destinationSort);
+}
+
+async function destinationRows(db) {
+  const sessions = await publicCatalogSessions(db);
+  return buildPublicDestinationRowsFromSessions(sessions);
 }
 
 async function destinationSummaryRowsFast(db) {
@@ -6558,7 +6562,7 @@ function publicDestinationForCity(row) {
   return buildPublicDestinationRecord(row, routed);
 }
 
-function publicDestinationFromSession(session) {
+export function publicDestinationFromSession(session) {
   const name = cleanDisplayName(session.destination) || cleanDisplayName(session.city) || 'Не указан';
   let type = session.destinationType === 'region' ? 'region' : 'city';
   if (type === 'city' && isPublicRegionName(name)) type = 'region';
@@ -6757,7 +6761,7 @@ function lookupCatalogSessionBySlug(slugOrId, catalogSessions = null) {
   );
 }
 
-function lookupDestinationCatalogSessions(citySlugOrId, requestedSlug, catalogSessions) {
+export function lookupDestinationCatalogSessions(citySlugOrId, requestedSlug, catalogSessions) {
   const index = publicCatalogCache?.destinationIndex;
   if (index) {
     for (const key of [requestedSlug, String(citySlugOrId || '').toLowerCase(), canonicalCitySlug(citySlugOrId)].filter(Boolean)) {
@@ -6769,7 +6773,7 @@ function lookupDestinationCatalogSessions(citySlugOrId, requestedSlug, catalogSe
   return catalogSessions.filter((session) => matchesPublicDestinationPage(session, citySlugOrId, requestedSlug));
 }
 
-function publicVenuesForSessionsFromHub(sessions, hubRows, limit) {
+export function publicVenuesForSessionsFromHub(sessions, hubRows, limit) {
   const venueIds = new Set(sessions.map((session) => session.venueId).filter(Boolean));
   if (!venueIds.size) return [];
   return hubRows
@@ -6831,7 +6835,7 @@ function destinationSortGroup(name, type) {
   return groups[name] || `90-${type}-${name}`;
 }
 
-function destinationPrepositional(destination) {
+export function destinationPrepositional(destination) {
   const bySlug = {
     'sankt-peterburg': 'в Санкт-Петербурге',
     'saint-petersburg': 'в Санкт-Петербурге',
@@ -7985,7 +7989,7 @@ function buildLandingRows(events) {
   });
 }
 
-function buildPublicLandings(sessions) {
+export function buildPublicLandings(sessions) {
   return LANDING_RULES.map((rule) => {
     const matched = sessions.filter((session) => sessionMatchesLandingSlug(session, rule.slug));
     const prices = matched.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
