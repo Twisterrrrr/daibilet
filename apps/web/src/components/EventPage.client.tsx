@@ -33,9 +33,11 @@ type EventSession = PublicEventPageDto['sessions'][number] & {
 };
 
 export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
-  const { event, sessions } = payload;
+  const { event } = payload;
+  const sessions = payload.sessions ?? [];
+  const offers = payload.offers ?? [];
   const teplohod = getTeplohodWidgetIds(event);
-  const primaryOffer = payload.offers.find((offer) => offer.active !== false) || payload.offers[0] || null;
+  const primaryOffer = offers.find((offer) => offer.active !== false) || offers[0] || null;
   const priceRange = getTicketPriceRange(payload);
   const ticketCategories = buildGroupedTicketCategories(payload);
   const visibleSessions = listPurchasableSessionVariants(sessions as EventSession[]).slice(0, 5);
@@ -195,10 +197,12 @@ export function EventHeroBuyButton({
   priceLabel: string;
   wide?: boolean;
 }) {
-  const { event, sessions } = payload;
+  const { event } = payload;
+  const sessions = payload.sessions ?? [];
+  const offers = payload.offers ?? [];
   const label = `Купить билет — от ${priceLabel}`;
   const teplohod = getTeplohodWidgetIds(event);
-  const primaryOffer = payload.offers.find((offer) => offer.active !== false) || payload.offers[0] || null;
+  const primaryOffer = offers.find((offer) => offer.active !== false) || offers[0] || null;
   const { tcEventId, purchaseUrl, isTcWidget, purchaseTargets } = resolveTcPurchaseTarget(
     event,
     sessions,
@@ -265,7 +269,7 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
   const priceLabel = priceRange ? formatBuyCardPrice(priceRange) : formatPriceRub(stats.priceFrom ?? event.priceFrom) || '';
   const [hasImageError, setHasImageError] = useState(false);
   const heroImage = String(event.imageUrl || '').trim();
-  const nextSession = pickRepresentativeSession(payload.sessions as EventSession[]);
+  const nextSession = pickRepresentativeSession((payload.sessions ?? []) as EventSession[]);
   const cityLink = event.citySlug || event.city ? cityHref({ name: event.city, slug: event.citySlug, sourceSlug: event.sourceCitySlug }) : null;
   const venueLink = event.venue
     ? venueHref({ id: event.venueId || event.venueSlug || event.venue, slug: event.venueSlug, name: event.venue, type: event.venueKind })

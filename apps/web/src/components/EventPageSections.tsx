@@ -51,7 +51,9 @@ export function EventQuickInfo({ event }: { event: PublicEventDto }) {
 }
 
 export function EventTags({ event }: { event: PublicEventDto }) {
-  const tags = [...(event.tags || []), ...(event.subcategories || [])].filter(Boolean).slice(0, 12);
+  const rawTags = Array.isArray(event.tags) ? event.tags : [];
+  const rawSubcategories = Array.isArray(event.subcategories) ? event.subcategories : [];
+  const tags = [...rawTags, ...rawSubcategories].filter(Boolean).slice(0, 12);
   if (!tags.length) return null;
 
   return (

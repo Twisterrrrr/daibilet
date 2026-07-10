@@ -54,7 +54,7 @@ export function getTicketPriceRange(payload: PublicEventPageDto): { min: number;
     }
   }
 
-  for (const session of payload.sessions) {
+  for (const session of payload.sessions ?? []) {
     if (typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
       values.push(session.priceFrom);
     }

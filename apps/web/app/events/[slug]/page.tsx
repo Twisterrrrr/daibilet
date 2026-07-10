@@ -6,6 +6,7 @@ import { EventBuyCard, EventHero } from '@/components/EventPage.client';
 import { EventDescription, EventQuickInfo, EventTags } from '@/components/EventPageSections';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
+import { toEventPageClientPayload } from '@/lib/event-page-client-props';
 import { eventHref } from '@/lib/routes';
 import { buildPublicEventDto } from '@daibilet/backend/public-read';
 
@@ -41,10 +42,11 @@ export default async function EventDetailPage({ params }: PageProps) {
   if (!payload?.event) notFound();
 
   const { event, related } = payload;
+  const clientPayload = toEventPageClientPayload(payload);
 
   return (
     <SiteLayout>
-      <EventHero payload={payload} />
+      <EventHero payload={clientPayload} />
 
       <div className="container-page py-8">
         <div className="grid gap-8 lg:grid-cols-3">
@@ -52,20 +54,17 @@ export default async function EventDetailPage({ params }: PageProps) {
             <EventDescription event={event} />
             <EventQuickInfo event={event} />
             <EventTags event={event} />
-            <div className="lg:hidden" id="buy-card">
-              <EventBuyCard payload={payload} />
-            </div>
           </div>
 
-          <div className="hidden lg:col-span-1 lg:block">
-            <div className="sticky top-20" id="buy-card-desktop">
-              <EventBuyCard payload={payload} />
+          <div className="lg:col-span-1">
+            <div className="lg:sticky lg:top-20" id="buy-card">
+              <EventBuyCard payload={clientPayload} />
             </div>
           </div>
         </div>
       </div>
 
-      {related.length ? (
+      {related?.length ? (
         <section className="border-t border-slate-200 bg-slate-50 py-12">
           <div className="container-page">
             <h2 className="text-2xl font-bold text-slate-900">Похожие события</h2>
