@@ -6900,7 +6900,38 @@ async function publicCatalogSessionsFast(db) {
   const [result, pinnedResult] = await Promise.all([
     db.query(
     `
-      with primary_offer as (
+      with event_identity as (
+        select distinct on (identity."eventId")
+          identity."eventId",
+          identity."sourceId",
+          identity."externalId",
+          identity."sourceUrl"
+        from (
+          select
+            link."eventId",
+            link."sourceId",
+            link."externalId",
+            link."sourceUrl",
+            link."updatedAt",
+            0 as priority
+          from "ProviderLink" link
+          where link."entityKind" = 'EVENT'
+            and link."eventId" is not null
+
+          union all
+
+          select
+            link."eventId",
+            link."sourceId",
+            link."externalId",
+            link."sourceUrl",
+            link."updatedAt",
+            1 as priority
+          from "EventSourceLink" link
+        ) identity
+        order by identity."eventId", identity.priority, identity."updatedAt" desc
+      ),
+      primary_offer as (
         select distinct on ("eventId")
           "eventId",
           "sourceCode",
@@ -6916,7 +6947,7 @@ async function publicCatalogSessionsFast(db) {
         select
           e.id,
           e.slug,
-          source_link."externalId",
+          identity."externalId",
           source.code as "sourceCode",
           source.name as "sourceName",
           coalesce(source.name, source.code::text, primary_offer."sourceCode"::text, '') as "sourceLabel",
@@ -6974,15 +7005,15 @@ async function publicCatalogSessionsFast(db) {
         left join "City" city on city.id = e."primaryCityId"
         left join "Region" region on region.id = city."regionId"
         left join "Venue" venue on venue.id = e."venueId"
-        left join "EventSourceLink" source_link on source_link."eventId" = e.id
-        left join "Source" source on source.id = source_link."sourceId"
+        left join event_identity identity on identity."eventId" = e.id
+        left join "Source" source on source.id = identity."sourceId"
         left join "EventOverride" override on override."eventId" = e.id
         left join "EventSession" session on session."eventId" = e.id
         left join primary_offer on primary_offer."eventId" = e.id
         where e.status not in ('HIDDEN', 'DRAFT')
         group by
           e.id,
-          source_link."externalId",
+          identity."externalId",
           source.code,
           source.name,
           override.id,
