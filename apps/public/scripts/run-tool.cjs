@@ -18,18 +18,29 @@ function run(command, args) {
   if (result.status !== 0) process.exit(result.status || 1);
 }
 
+function copyFallbackData() {
+  const source = path.join(appDir, 'data.js');
+  const targetDir = path.join(appDir, 'public');
+  const target = path.join(targetDir, 'data.js');
+  if (!fs.existsSync(source)) return;
+  fs.mkdirSync(targetDir, { recursive: true });
+  fs.copyFileSync(source, target);
+}
+
 const task = process.argv[2];
 
 if (task === 'typecheck') {
+  run('next', ['typegen']);
   run('tsc', ['--noEmit', '-p', 'tsconfig.json']);
 } else if (task === 'build') {
-  run('tsc', ['--noEmit', '-p', 'tsconfig.json']);
-  run('vite', ['build']);
-  fs.copyFileSync(path.join(appDir, 'data.js'), path.join(appDir, 'dist', 'data.js'));
+  copyFallbackData();
+  run('next', ['build']);
 } else if (task === 'dev') {
-  run('vite', ['--host', '127.0.0.1', '--port', process.env.PUBLIC_PORT || '5178']);
+  copyFallbackData();
+  run('next', ['dev', '--hostname', '127.0.0.1', '--port', process.env.PUBLIC_PORT || '5178']);
 } else if (task === 'preview') {
-  run('vite', ['preview', '--host', '127.0.0.1', '--port', process.env.PUBLIC_PORT || '5178']);
+  copyFallbackData();
+  run('next', ['start', '--hostname', '127.0.0.1', '--port', process.env.PUBLIC_PORT || '5178']);
 } else {
   console.error(`Unknown public task: ${task}`);
   process.exit(1);

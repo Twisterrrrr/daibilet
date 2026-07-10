@@ -4,16 +4,14 @@ import { ArrowRight, CheckCircle2, Clock3, HelpCircle, Loader2, Mail, Receipt, S
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { formatNumber } from '@/data';
+import { API_BASE_URL } from '@/lib/api-base';
 import type { PublicBuyerOrder, PublicBuyerOrdersPayload } from '@/types';
 
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
 const STORAGE_KEY = 'daibilet:last-order-lookup';
 
 export function BuyerOrdersPage() {
-  const [lookup, setLookup] = React.useState(() => window.localStorage.getItem(STORAGE_KEY) || '');
-  const [submittedLookup, setSubmittedLookup] = React.useState(() => window.localStorage.getItem(STORAGE_KEY) || '');
+  const [lookup, setLookup] = React.useState(readStoredLookup);
+  const [submittedLookup, setSubmittedLookup] = React.useState(readStoredLookup);
   const [payload, setPayload] = React.useState<PublicBuyerOrdersPayload | null>(null);
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
@@ -180,6 +178,15 @@ export function BuyerOrdersPage() {
       <Footer />
     </div>
   );
+}
+
+function readStoredLookup(): string {
+  if (typeof window === 'undefined') return '';
+  try {
+    return window.localStorage.getItem(STORAGE_KEY) || '';
+  } catch {
+    return '';
+  }
 }
 
 export function BuyerOrderCard({ order }: { order: PublicBuyerOrder }) {

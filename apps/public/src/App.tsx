@@ -40,6 +40,11 @@ import { cityHref, citySlug } from '@/routes';
 import type { PublicDestination, PublicLanding, PublicSession } from '@/types';
 
 type PublicView = 'home' | 'events' | 'landings' | 'destinations';
+type AppProps = {
+  dataVersion?: number;
+  routePath?: string;
+  routeSearch?: string;
+};
 
 const categoryMeta = [
   { title: 'Экскурсии', description: 'Пешие, автобусные и водные маршруты', filter: 'Экскурсии', icon: MapPin },
@@ -48,38 +53,39 @@ const categoryMeta = [
   { title: 'Активный отдых', description: 'Спорт, активности и необычные форматы', filter: 'Активный отдых', icon: TrendingUp },
 ];
 
-export function App({ dataVersion = 0 }: { dataVersion?: number }) {
-  if (window.location.pathname === '/cities' || window.location.pathname === '/cities/') return <CitiesCatalogPage />;
-  if (window.location.pathname === '/venues' || window.location.pathname === '/venues/') return <VenuesCatalogPage />;
-  if (window.location.pathname === '/podborki' || window.location.pathname === '/podborki/') return <LandingsCatalogPage />;
-  if (window.location.pathname === '/my-orders' || window.location.pathname === '/my-orders/') return <BuyerOrdersPage />;
-  if (window.location.pathname === '/login' || window.location.pathname === '/login/') return <LoginPage />;
-  if (window.location.pathname === '/account/purchases' || window.location.pathname === '/account/purchases/') {
+export function App({ dataVersion = 0, routePath, routeSearch = '' }: AppProps) {
+  const pathname = normalizeRoutePath(routePath ?? getBrowserPathname());
+  if (pathname === '/cities') return <CitiesCatalogPage />;
+  if (pathname === '/venues') return <VenuesCatalogPage />;
+  if (pathname === '/podborki') return <LandingsCatalogPage />;
+  if (pathname === '/my-orders') return <BuyerOrdersPage />;
+  if (pathname === '/login') return <LoginPage routeSearch={routeSearch} />;
+  if (pathname === '/account/purchases') {
     return <AccountPurchasesPage />;
   }
-  if (window.location.pathname === '/about' || window.location.pathname === '/about/') return <AboutPage />;
-  if (window.location.pathname === '/help' || window.location.pathname === '/help/') return <HelpPage />;
-  if (window.location.pathname === '/blog' || window.location.pathname === '/blog/') return <StaticInfoPage kind="blog" />;
-  if (window.location.pathname === '/privacy' || window.location.pathname === '/privacy/') return <StaticInfoPage kind="privacy" />;
-  if (window.location.pathname === '/legal' || window.location.pathname === '/legal/') return <StaticInfoPage kind="legal" />;
-  if (window.location.pathname === '/offer' || window.location.pathname === '/offer/') return <StaticInfoPage kind="offer" />;
+  if (pathname === '/about') return <AboutPage />;
+  if (pathname === '/help') return <HelpPage />;
+  if (pathname === '/blog') return <StaticInfoPage kind="blog" />;
+  if (pathname === '/privacy') return <StaticInfoPage kind="privacy" />;
+  if (pathname === '/legal') return <StaticInfoPage kind="legal" />;
+  if (pathname === '/offer') return <StaticInfoPage kind="offer" />;
 
-  const venuePageMatch = window.location.pathname.match(/^\/venues\/([^/]+)\/?$/);
+  const venuePageMatch = pathname.match(/^\/venues\/([^/]+)$/);
   if (venuePageMatch) return <VenuePage slug={decodeURIComponent(venuePageMatch[1])} />;
 
-  const cityPageMatch = window.location.pathname.match(/^\/cities\/([^/]+)\/?$/);
+  const cityPageMatch = pathname.match(/^\/cities\/([^/]+)$/);
   if (cityPageMatch) return <CityPage slug={decodeURIComponent(cityPageMatch[1])} />;
 
-  const landingCityMatch = window.location.pathname.match(/^\/landings\/([^/]+)\/([^/]+)\/?$/);
+  const landingCityMatch = pathname.match(/^\/landings\/([^/]+)\/([^/]+)$/);
   if (landingCityMatch) {
     return <LandingPage slug={decodeURIComponent(landingCityMatch[1])} citySlug={decodeURIComponent(landingCityMatch[2])} />;
   }
-  const landingPageMatch = window.location.pathname.match(/^\/landings\/([^/]+)\/?$/);
+  const landingPageMatch = pathname.match(/^\/landings\/([^/]+)$/);
   if (landingPageMatch) return <LandingPage slug={decodeURIComponent(landingPageMatch[1])} />;
 
-  if (window.location.pathname === '/events' || window.location.pathname === '/events/') return <CatalogPage />;
+  if (pathname === '/events') return <CatalogPage initialSearch={routeSearch} />;
 
-  const eventPageMatch = window.location.pathname.match(/^\/events\/([^/]+)\/?$/);
+  const eventPageMatch = pathname.match(/^\/events\/([^/]+)$/);
   if (eventPageMatch) return <EventPage slug={decodeURIComponent(eventPageMatch[1])} />;
 
   const [view, setView] = React.useState<PublicView>('home');
@@ -842,6 +848,15 @@ function uniqueByImage(events: PublicSession[], max: number): PublicSession[] {
   }
 
   return result;
+}
+
+function getBrowserPathname(): string {
+  return typeof window === 'undefined' ? '/' : window.location.pathname;
+}
+
+function normalizeRoutePath(pathname: string): string {
+  const normalized = pathname.startsWith('/') ? pathname : `/${pathname}`;
+  return normalized.length > 1 ? normalized.replace(/\/+$/, '') : normalized;
 }
 
 function buildPopularTags(events: PublicSession[], limit: number): Array<{ name: string; events: number }> {

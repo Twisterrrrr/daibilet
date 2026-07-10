@@ -1,5 +1,6 @@
 import type { PublicData, PublicDestination, PublicLanding, PublicSession } from '@/types';
 import { eventSlug } from '@/routes';
+import { API_BASE_URL } from '@/lib/api-base';
 
 type PublicStatsPayload = Pick<PublicData, 'generatedAt' | 'stats'>;
 type PublicDestinationsPayload = { generatedAt: string; destinations: PublicDestination[] };
@@ -13,15 +14,11 @@ const PUBLIC_STATS_STORAGE_KEY = 'daibilet:public-stats';
 const PUBLIC_DESTINATIONS_STORAGE_KEY = 'daibilet:public-destinations';
 const PUBLIC_HOME_PREVIEW_STORAGE_KEY = 'daibilet:public-home-preview';
 
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
+const cachedStats = isBrowser() ? readCachedPublicStats() : null;
+const cachedDestinations = isBrowser() ? readCachedDestinations() : null;
+const cachedHomePreview = isBrowser() ? readCachedHomePreview() : null;
 
-const cachedStats = readCachedPublicStats();
-const cachedDestinations = readCachedDestinations();
-const cachedHomePreview = readCachedHomePreview();
-
-export const publicData: PublicData = window.PUBLIC_DATA ?? {
+export const publicData: PublicData = readInjectedPublicData() ?? {
   generatedAt: cachedStats?.generatedAt || cachedDestinations?.generatedAt || cachedHomePreview?.generatedAt || new Date().toISOString(),
   stats: cachedStats?.stats ?? { events: 0, destinations: 0, venues: 0, landings: 0 },
   destinations: cachedDestinations?.destinations ?? [],
@@ -168,14 +165,14 @@ function normalizeStats(stats: PublicData['stats']): PublicData['stats'] {
 
 async function fetchPublicJson<T>(url: string, timeoutMs: number): Promise<T | null> {
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), timeoutMs);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     const response = await fetch(url, { cache: 'no-store', signal: controller.signal });
     if (!response.ok) return null;
     return (await response.json()) as T;
   } finally {
-    window.clearTimeout(timeout);
+    clearTimeout(timeout);
   }
 }
 
@@ -191,6 +188,7 @@ async function fetchStaticData(): Promise<PublicData | null> {
 }
 
 function readCachedPublicStats(): PublicStatsPayload | null {
+  if (!isBrowser()) return null;
   try {
     const raw = window.localStorage.getItem(PUBLIC_STATS_STORAGE_KEY);
     if (!raw) return null;
@@ -203,6 +201,7 @@ function readCachedPublicStats(): PublicStatsPayload | null {
 }
 
 function writeCachedPublicStats(payload: PublicStatsPayload) {
+  if (!isBrowser()) return;
   try {
     window.localStorage.setItem(PUBLIC_STATS_STORAGE_KEY, JSON.stringify(payload));
   } catch {
@@ -211,6 +210,7 @@ function writeCachedPublicStats(payload: PublicStatsPayload) {
 }
 
 function readCachedDestinations(): PublicDestinationsPayload | null {
+  if (!isBrowser()) return null;
   try {
     const raw = window.localStorage.getItem(PUBLIC_DESTINATIONS_STORAGE_KEY);
     if (!raw) return null;
@@ -226,6 +226,7 @@ function readCachedDestinations(): PublicDestinationsPayload | null {
 }
 
 function writeCachedDestinations(payload: PublicDestinationsPayload) {
+  if (!isBrowser()) return;
   try {
     window.localStorage.setItem(PUBLIC_DESTINATIONS_STORAGE_KEY, JSON.stringify(payload));
   } catch {
@@ -234,6 +235,7 @@ function writeCachedDestinations(payload: PublicDestinationsPayload) {
 }
 
 function readCachedHomePreview(): PublicHomePreviewPayload | null {
+  if (!isBrowser()) return null;
   try {
     const raw = window.localStorage.getItem(PUBLIC_HOME_PREVIEW_STORAGE_KEY);
     if (!raw) return null;
@@ -250,11 +252,21 @@ function readCachedHomePreview(): PublicHomePreviewPayload | null {
 }
 
 function writeCachedHomePreview(payload: PublicHomePreviewPayload) {
+  if (!isBrowser()) return;
   try {
     window.localStorage.setItem(PUBLIC_HOME_PREVIEW_STORAGE_KEY, JSON.stringify(payload));
   } catch {
     // Ignore storage errors.
   }
+}
+
+function isBrowser(): boolean {
+  return typeof window !== 'undefined';
+}
+
+function readInjectedPublicData(): PublicData | undefined {
+  if (!isBrowser()) return undefined;
+  return (window as Window & { PUBLIC_DATA?: PublicData }).PUBLIC_DATA;
 }
 
 export function formatNumber(value?: number | null): string {

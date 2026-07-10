@@ -9,6 +9,7 @@ type CachedEventPage = {
 };
 
 export function readCachedEventPage(slug: string): PublicEventPage | null {
+  if (typeof window === 'undefined') return null;
   try {
     const raw = window.sessionStorage.getItem(`${EVENT_PAGE_CACHE_PREFIX}${slug}`);
     if (!raw) return null;
@@ -22,6 +23,7 @@ export function readCachedEventPage(slug: string): PublicEventPage | null {
 }
 
 export function writeCachedEventPage(slug: string, payload: PublicEventPage) {
+  if (typeof window === 'undefined') return;
   try {
     const entry: CachedEventPage = { savedAt: Date.now(), payload };
     window.sessionStorage.setItem(`${EVENT_PAGE_CACHE_PREFIX}${slug}`, JSON.stringify(entry));

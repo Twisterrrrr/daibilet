@@ -10,8 +10,12 @@ node_modules/
 # Build output
 dist/
 **/dist/
+.next/
+**/.next/
 .vite/
 **/.vite/
+*.tsbuildinfo
+apps/public/public/data.js
 
 # Generated code
 packages/db/src/generated/

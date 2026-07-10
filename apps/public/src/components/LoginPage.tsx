@@ -5,13 +5,13 @@ import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { useUserAuth } from '@/hooks/useUserAuth';
 
-function resolveReturnUrl() {
-  const params = new URLSearchParams(window.location.search);
+function resolveReturnUrl(search = getBrowserSearch()) {
+  const params = new URLSearchParams(search);
   const value = params.get('returnUrl') || '/account/purchases';
   return value.startsWith('/') ? value : '/account/purchases';
 }
 
-export function LoginPage() {
+export function LoginPage({ routeSearch }: { routeSearch?: string } = {}) {
   const { login, register, isLoggedIn, isLoading: authLoading } = useUserAuth();
   const [mode, setMode] = React.useState<'login' | 'register'>('login');
   const [email, setEmail] = React.useState('');
@@ -26,9 +26,9 @@ export function LoginPage() {
 
   React.useEffect(() => {
     if (!authLoading && isLoggedIn) {
-      window.location.href = resolveReturnUrl();
+      window.location.href = resolveReturnUrl(routeSearch);
     }
-  }, [authLoading, isLoggedIn]);
+  }, [authLoading, isLoggedIn, routeSearch]);
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -40,7 +40,7 @@ export function LoginPage() {
       } else {
         await register(email, password, name);
       }
-      window.location.href = resolveReturnUrl();
+      window.location.href = resolveReturnUrl(routeSearch);
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : 'Ошибка входа');
     } finally {
@@ -163,4 +163,8 @@ export function LoginPage() {
       <Footer />
     </div>
   );
+}
+
+function getBrowserSearch(): string {
+  return typeof window === 'undefined' ? '' : window.location.search;
 }

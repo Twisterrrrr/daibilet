@@ -12,6 +12,7 @@ import {
   getTcWidgetIds,
 } from '@/components/TcWidget';
 import { formatStreetAddress } from '@/lib/address';
+import { API_BASE_URL } from '@/lib/api-base';
 import { FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession } from '@/lib/event-card-meta';
 import { formatVacantSeats } from '@/lib/pluralize';
 import { landingPageHref } from '@/lib/landing-slugs';
@@ -20,9 +21,6 @@ import { readCachedEventPage, writeCachedEventPage } from '@/lib/event-page-cach
 import { eventHref, eventSlug } from '@/routes';
 import type { PublicEvent, PublicEventPage, PublicSession } from '@/types';
 
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
 const MIN_DISPLAY_PRICE_RUB = 100;
 
 export function EventPage({ slug }: { slug: string }) {

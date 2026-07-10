@@ -7,13 +7,10 @@ import { Header } from '@/components/Header';
 import { resolveCityBrief } from '@/lib/cityInfo';
 import { resolveCityCardImage } from '@/lib/city-images';
 import { resolveCityRegion } from '@/lib/cityRegionHub';
+import { API_BASE_URL } from '@/lib/api-base';
 import { cityHref, citySlug } from '@/routes';
 import { publicData } from '@/data';
 import type { PublicDestination } from '@/types';
-
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
 
 type SortMode = 'events' | 'asc' | 'desc';
 

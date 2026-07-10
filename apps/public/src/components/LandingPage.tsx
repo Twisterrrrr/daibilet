@@ -42,14 +42,11 @@ import {
   parseSessionStartsAt,
   sessionTimeSlotFilter,
 } from '@/lib/datetime';
+import { API_BASE_URL } from '@/lib/api-base';
 import { isOpenDate, FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession } from '@/lib/event-card-meta';
 import { formatVacantSeats } from '@/lib/pluralize';
 import { eventHref } from '@/routes';
 import type { PublicLanding, PublicLandingContentBlock, PublicLandingPage, PublicSession } from '@/types';
-
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
 
 type DateFilter = 'all' | 'today' | 'tomorrow' | 'weekend' | 'evening';
 type SortFilter = 'price' | 'rating' | 'time';

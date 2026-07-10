@@ -3,6 +3,7 @@ import { publicData } from '@/data';
 export const SELECTED_CITY_STORAGE_KEY = 'daibilet:selected-city';
 
 export function resolveStoredDestination(): string {
+  if (typeof window === 'undefined') return 'all';
   const params = new URLSearchParams(window.location.search);
   const fromUrl = params.get('city')?.trim();
   if (fromUrl) {
@@ -26,6 +27,7 @@ export function resolveStoredDestination(): string {
 }
 
 export function persistDestination(destination: string) {
+  if (typeof window === 'undefined') return;
   const params = new URLSearchParams(window.location.search);
 
   try {

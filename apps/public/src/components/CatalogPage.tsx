@@ -7,6 +7,7 @@ import { EventCardHorizontal } from '@/components/EventCardHorizontal';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { formatMoney, formatNumber, publicData } from '@/data';
+import { API_BASE_URL } from '@/lib/api-base';
 import { collectCatalogLabels } from '@/lib/catalog-labels';
 import { eventHref } from '@/routes';
 import type { PublicLanding, PublicSession } from '@/types';
@@ -33,12 +34,9 @@ type ActiveCatalogFilter = { key: string; label: string; onClear: () => void };
 
 const CATALOG_PAGE_LIMIT = 60;
 const MIN_DISPLAY_PRICE_RUB = 100;
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
 
-export function CatalogPage() {
-  const initialParams = React.useMemo(() => new URLSearchParams(window.location.search), []);
+export function CatalogPage({ initialSearch }: { initialSearch?: string } = {}) {
+  const initialParams = React.useMemo(() => new URLSearchParams(initialSearch ?? getBrowserSearch()), [initialSearch]);
   const [catalogSessions, setCatalogSessions] = React.useState<PublicSession[]>(() => publicData.sessions.slice(0, CATALOG_PAGE_LIMIT));
   const [catalogTotal, setCatalogTotal] = React.useState(() => publicData.stats.events || publicData.sessions.length);
   const [catalogOffset, setCatalogOffset] = React.useState(0);
@@ -61,6 +59,7 @@ export function CatalogPage() {
   const setMode = React.useCallback((value: ViewMode) => {
     setModeState(value);
     try {
+      if (typeof window === 'undefined') return;
       localStorage.setItem(VIEW_MODE_STORAGE_KEY, value);
     } catch {
       // ignore storage errors
@@ -762,6 +761,7 @@ function parseSortMode(value: string | null): SortMode {
 }
 
 function readStoredViewMode(): ViewMode | null {
+  if (typeof window === 'undefined') return null;
   try {
     const stored = localStorage.getItem(VIEW_MODE_STORAGE_KEY);
     if (stored === 'cards' || stored === 'list' || stored === 'table') return stored;
@@ -795,6 +795,7 @@ function syncCatalogUrl(filters: {
   sort: SortMode;
   mode: ViewMode;
 }) {
+  if (typeof window === 'undefined') return;
   const params = new URLSearchParams();
   const query = filters.query.trim();
   if (query) params.set('q', query);
@@ -812,6 +813,10 @@ function syncCatalogUrl(filters: {
   if (nextUrl !== currentUrl) {
     window.history.replaceState(null, '', nextUrl);
   }
+}
+
+function getBrowserSearch(): string {
+  return typeof window === 'undefined' ? '' : window.location.search;
 }
 
 function pluralEvents(count: number): string {

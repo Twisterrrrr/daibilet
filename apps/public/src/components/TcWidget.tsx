@@ -1,14 +1,12 @@
 import * as React from 'react';
 
+import { TC_WIDGET_TOKEN } from '@/lib/api-base';
 import { SITE_TIME_ZONE, formatSessionTime } from '@/lib/datetime';
 import { FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession } from '@/lib/event-card-meta';
 import { formatVacantSeats } from '@/lib/pluralize';
 
 const TC_WIDGET_SCRIPT_URL = 'https://ticketscloud.com/static/scripts/widget/tcwidget.js';
-const TC_WIDGET_TOKEN_FROM_ENV =
-  ((import.meta as ImportMeta & { env?: { VITE_TC_WIDGET_TOKEN?: string } }).env?.VITE_TC_WIDGET_TOKEN as
-    | string
-    | undefined) || '';
+const TC_WIDGET_TOKEN_FROM_ENV = TC_WIDGET_TOKEN;
 
 export function extractTcWidgetTokenFromPurchaseUrl(purchaseUrl?: string | null): string {
   if (!purchaseUrl) return '';

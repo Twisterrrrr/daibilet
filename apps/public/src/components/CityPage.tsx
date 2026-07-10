@@ -17,15 +17,12 @@ import { EventCard } from '@/components/EventCard';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { formatMoney, formatNumber } from '@/data';
+import { API_BASE_URL } from '@/lib/api-base';
 import { resolveCityImage } from '@/lib/city-images';
 import { landingPageHref } from '@/lib/landing-slugs';
 import { eventHref } from '@/routes';
 import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
 import type { PublicCity, PublicCityPage, PublicLanding, PublicSession, PublicVenue } from '@/types';
-
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
 
 type ViewMode = 'cards' | 'table';
 

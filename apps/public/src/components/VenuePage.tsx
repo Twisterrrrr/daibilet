@@ -5,13 +5,11 @@ import { EventCard } from '@/components/EventCard';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { formatMoney, formatNumber } from '@/data';
+import { API_BASE_URL } from '@/lib/api-base';
 import { formatStreetAddress } from '@/lib/address';
 import { eventHref } from '@/routes';
 import type { PublicSession, PublicVenue, PublicVenuePage } from '@/types';
 
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
 const MIN_DISPLAY_PRICE_RUB = 100;
 
 type VenuePageProps = {
