@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { EventCard } from '@/components/EventCard';
+import { PurchaseWidget } from '@/components/PurchaseWidget.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { formatPriceFrom } from '@/lib/format';
@@ -83,6 +84,9 @@ export default async function EventDetailPage({ params }: PageProps) {
           <aside className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
             <p className="text-2xl font-bold text-slate-900">{formatPriceFrom(event.priceFrom)}</p>
             <p className="mt-2 text-sm text-slate-600">{event.category}</p>
+            <div className="mt-6">
+              <PurchaseWidget event={event} sessions={sessions} />
+            </div>
             {event.citySlug || event.city ? (
               <Link href={cityHref({ name: event.city, slug: event.citySlug, sourceSlug: event.sourceCitySlug })} className="mt-4 inline-block text-sm font-semibold text-primary hover:underline">
                 Афиша {event.city}

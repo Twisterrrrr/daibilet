@@ -163,13 +163,23 @@
 
 ---
 
+## 2026-07-10 — F2 закрыт: landings ISR, catalog filters, widgets
+
+**Решение:** Завершён F2 public SSR: landings (`/podborki` + SEO paths) с ISR/SSG, SSR-фильтры каталога (city/date/sort/q), client widgets TC/Teplohod на event page, `backend:next:parity`.
+
+**Почему:** Exit criteria F2 — indexable HTML без JS + parity с legacy перед F3 cutover.
+
+**Статус:** Активно. Следующий шаг — F3 ([phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md)).
+
+---
+
 ## 2026-07-10 — Frontend остаётся Vite SPA (не Next.js)
 
 **Решение:** `apps/public` и `apps/admin` — Vite 6 + React 19 CSR. Next.js не в scope MVP.
 
 **Почему:** Текущий deploy (static + nginx + API) работает; миграция на Next.js не даёт ROI до стабилизации backend и SEO-требований.
 
-**Статус:** Активно. Пересмотреть в Phase F при необходимости SSR/prerender.
+**Статус:** Заменено Path B — Vite deprecated после F3 cutover.
 
 ---
 
@@ -181,7 +191,7 @@
 
 **Codex:** параллельно `codex/phase2-finance-next` — Phase 2 schema + supplier admin read, **без** YooKassa runtime.
 
-**Статус:** Активно. [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md). Ветка `feat/next-monorepo`.
+**Статус:** Активно. F2 ✅. [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md). Ветка `feat/next-monorepo`.
 
 ---
 
@@ -191,7 +201,7 @@
 
 **Почему:** Один раз попыхтим с porting DTO — дальше проще: нет dual HTTP hop, единый type graph, проще cutover и retire `dto.js`.
 
-**Статус:** Активно. F1 shell на `feat/next-monorepo`.
+**Статус:** Активно. F2 ✅ на `feat/next-monorepo`.
 
 ---
 

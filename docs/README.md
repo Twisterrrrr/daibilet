@@ -5,7 +5,10 @@
 ## С чего начать
 
 1. **[current-state.md](./current-state.md)** — текущее состояние, ветки, блокеры
-2. **[decision-log.md](./decision-log.md)** — зафиксированные решения
+2. **[Project.md](./Project.md)** — архитектура и этапы F
+3. **[Tasktracker.md](./Tasktracker.md)** — прогресс задач
+4. **[Diary.md](./Diary.md)** — технический дневник
+5. **[decision-log.md](./decision-log.md)** — зафиксированные решения
 3. **[launch-qa-and-deploy.md](./launch-qa-and-deploy.md)** — smoke перед продажами
 4. **[deploy-timeweb.md](./deploy-timeweb.md)** — prod на Timeweb
 5. **[deploy-staging.md](./deploy-staging.md)** — staging `/opt/daibilet-staging`
@@ -23,7 +26,8 @@
 |----------|----------|
 | [phases/README.md](./phases/README.md) | Дорожная карта фаз A–E |
 | [phases/phase-e-prisma-runtime.md](./phases/phase-e-prisma-runtime.md) | **Фаза E (закрыта):** TS flags, parity, staging DB |
-| [phases/phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md) | **Фаза F:** Next full-stack, SEO SSR |
+| [phases/phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md) | **Фаза F:** Next full-stack, SEO SSR (F2 ✅) |
+| [phases/phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md) | **F3:** cutover staging/prod |
 | [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md) | **Codex:** Phase 2 finance в Next monorepo |
 | [phases/phase-a-widget-readiness.md](./phases/phase-a-widget-readiness.md) | **Фаза A (закрыта):** API-проверка виджетов |
 | [phases/phase-b-import-sync.md](./phases/phase-b-import-sync.md) | **Фаза B (закрыта):** sync → БД, ProviderLink |

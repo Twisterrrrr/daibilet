@@ -14,3 +14,8 @@ export {
   buildPublicVenuesDto,
   clearPublicVenueDtoCache,
 } from './public-venue.dto.js';
+export {
+  buildPublicLandingPageDto,
+  buildPublicLandingsCatalogDto,
+  clearPublicLandingDtoCache,
+} from './public-landing.dto.js';

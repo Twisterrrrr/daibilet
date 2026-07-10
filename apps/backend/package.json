@@ -20,6 +20,7 @@
     "event:parity": "tsx scripts/public-event-parity.ts",
     "city:parity": "tsx scripts/public-city-parity.ts",
     "venue:parity": "tsx scripts/public-venue-parity.ts",
+    "next:parity": "tsx scripts/next-public-parity.ts",
     "admin-events:parity": "tsx scripts/admin-events-parity.ts",
     "admin-orders:parity": "tsx scripts/admin-orders-parity.ts",
     "tep:fixture-bridge": "node ../../scripts/teplohod-fixture-bridge.js"

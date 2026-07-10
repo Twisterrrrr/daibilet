@@ -3,7 +3,7 @@
 **Дата старта:** 2026-07-10  
 **Ветка Cursor:** `integrate/mvp-launch` → `feat/next-monorepo`  
 **Ветка Codex:** `codex/phase2-finance-next` (от `feat/next-monorepo` после F1)  
-**Статус:** 🔄 F2 in progress (`feat/next-monorepo`)
+**Статус:** ✅ F2 done → **F3** cutover next (`feat/next-monorepo`)
 
 **F2 read path:** Prisma напрямую в Server Components и Route Handlers (full-stack), без proxy fetch к legacy backend.
 
@@ -82,16 +82,18 @@ Handoff для Codex: [codex-phase2-next-handoff.md](../codex-phase2-next-handof
 
 **Exit:** `apps/web` builds, подключается к staging DB.
 
-### F2 — Public SSR (2–3 нед) 🔄
+### F2 — Public SSR (2–3 нед) ✅
 
 - [x] **Каталог** `/events` — SSR page 1 (limit=100), crawlable `?page=`
 - [x] **Event** `/events/[slug]` — SSR + `generateMetadata`
 - [x] **City** `/cities/[slug]` — SSR + `/cities` index
 - [x] **Venue/location** `/venues/[slug]`, `/locations/[slug]` — SSR + indexes
-- [ ] **Landings** top slugs — SSG или ISR
-- [x] Route Handlers `/api/public/events|events/[slug]|cities/[slug]|venues/[slug]`
+- [x] **Landings** `/podborki`, SEO paths — ISR (`revalidate=3600`) + top slugs SSG
+- [x] Route Handlers `/api/public/events|events/[slug]|cities/[slug]|venues/[slug]|landings/*`
 - [x] Prisma read via `@daibilet/backend/public-read` (no HTTP proxy)
-- [ ] Parity scripts against legacy on staging
+- [x] **Catalog filters SSR** — city, date, sort, q (GET form)
+- [x] **Widgets** — TC/Teplohod client enhancement на event page
+- [x] Parity: `pnpm backend:next:parity` (+ optional HTTP staging compare)
 
 **SEO exit:** View Source содержит карточки + title/description без JS.
 
@@ -100,12 +102,9 @@ Handoff для Codex: [codex-phase2-next-handoff.md](../codex-phase2-next-handof
 - «Показать ещё» / `?page=2` — crawlable links, не только JS
 - Selector **100 / 200 / 300** — **первая SSR-порция всегда 100** (default)
 
-### F3 — Cutover public (1 нед)
+### F3 — Cutover public (1 нед) 🔄
 
-- [ ] nginx → Next на staging
-- [ ] Smoke: widgets, post-deploy, parity
-- [ ] Prod cutover public routes
-- [ ] Deprecate `apps/public` Vite (archive)
+См. [phase-f3-cutover-checklist.md](./phase-f3-cutover-checklist.md)
 
 ### F4 — Admin + worker (2–3 нед)
 

@@ -28,6 +28,7 @@
     "backend:event:parity": "pnpm --filter @daibilet/backend event:parity",
     "backend:city:parity": "pnpm --filter @daibilet/backend city:parity",
     "backend:venue:parity": "pnpm --filter @daibilet/backend venue:parity",
+    "backend:next:parity": "pnpm --filter @daibilet/backend next:parity",
     "backend:admin-events:parity": "pnpm --filter @daibilet/backend admin-events:parity",
     "backend:admin-orders:parity": "pnpm --filter @daibilet/backend admin-orders:parity",
     "db:up": "docker compose up -d postgres",

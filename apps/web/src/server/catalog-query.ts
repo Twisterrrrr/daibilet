@@ -28,7 +28,12 @@ export function parseCatalogPageQuery(
   input: Record<string, string | string[] | undefined> | URLSearchParams,
 ): CatalogPageQuery {
   const raw = searchParamsToRecord(input);
-  const parsed = publicCatalogQuerySchema.parse(raw);
+  const prepared = {
+    ...raw,
+    from: raw.from || raw.dateFrom,
+    to: raw.to || raw.dateTo,
+  };
+  const parsed = publicCatalogQuerySchema.parse(prepared);
   const page = Math.max(1, Number.parseInt(raw.page || '1', 10) || 1);
   const userLimit = parsed.limit && isCatalogPageSize(parsed.limit) ? parsed.limit : undefined;
 
@@ -53,7 +58,12 @@ export function parseCatalogApiQuery(
   input: Record<string, string | string[] | undefined> | URLSearchParams,
 ): PublicCatalogQuery {
   const raw = searchParamsToRecord(input);
-  const parsed = publicCatalogQuerySchema.parse(raw);
+  const prepared = {
+    ...raw,
+    from: raw.from || raw.dateFrom,
+    to: raw.to || raw.dateTo,
+  };
+  const parsed = publicCatalogQuerySchema.parse(prepared);
   const limit = parsed.limit
     ? Math.min(Math.max(parsed.limit, 1), CATALOG_PAGE_SIZE_MAX)
     : CATALOG_PAGE_SIZE_DEFAULT;
