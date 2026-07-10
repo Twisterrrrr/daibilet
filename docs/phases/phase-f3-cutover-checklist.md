@@ -45,7 +45,15 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-staging-next.sh
 ```bash
 bash scripts/launch-staging-smoke-next.sh
 pnpm backend:next:parity
-# WEB_BASE_URL=https://staging.daibilet.ru LEGACY_BASE_URL=http://127.0.0.1:4001
+```
+
+**Staging status (2026-07-10):** ✅ deploy + nginx Next proxy + automated smoke (manual: widget click).
+
+### 5. Nginx patch (один раз)
+
+```bash
+python3 deploy/nginx/patch-staging-next.py
+nginx -t && systemctl reload nginx
 ```
 
 **View Source:** `/events`, `/events/[slug]`, `/rechnye-progulki/moscow/`, `/podborki` — контент в HTML.  

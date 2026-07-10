@@ -31,17 +31,16 @@ check "api health" curl -fsS "$API_BASE/api/health" >/dev/null
 check "next health" curl -fsS "$WEB_BASE/api/health" >/dev/null
 check "public health via nginx" curl -fsS "$PUBLIC_BASE/api/health" >/dev/null
 
-# SSR: content in HTML without JS bundle requirement
-check "home ssr" curl -fsS "$PUBLIC_BASE/" | grep -qi 'дайбилет\|события\|events'
-check "catalog ssr" curl -fsS "$PUBLIC_BASE/events" | grep -qi 'каталог\|событ'
-check "landing ssr" curl -fsS "$PUBLIC_BASE/podborki" | grep -qi 'подборк'
-check "podborki canonical" curl -fsS "$PUBLIC_BASE/rechnye-progulki/moscow/" | grep -qi 'речн\|прогулк\|moscow\|москв' || \
-  curl -fsS "$PUBLIC_BASE/rechnye-progulki/moscow" | grep -qi 'речн\|прогулк'
+# SSR: pipelines must run inside check() — pipefail + set -e otherwise exits early
+check "home ssr" bash -c "curl -fsS '$PUBLIC_BASE/' | grep -qi 'дайбилет\\|события\\|events'"
+check "catalog ssr" bash -c "curl -fsS '$PUBLIC_BASE/events' | grep -qi 'каталог\\|событ'"
+check "landing ssr" bash -c "curl -fsS '$PUBLIC_BASE/podborki' | grep -qi 'подборк'"
+check "podborki canonical" bash -c "curl -fsS '$PUBLIC_BASE/rechnye-progulki/moscow/' | grep -qi 'речн\\|прогулк\\|moscow\\|москв' || curl -fsS '$PUBLIC_BASE/rechnye-progulki/moscow' | grep -qi 'речн\\|прогулк'"
 
-check "tc event api" curl -fsS "$API_BASE/api/public/events/$TC_SLUG" | grep -q 'TICKETSCLOUD'
-check "tep event api" curl -fsS "$API_BASE/api/public/events/$TEP_SLUG" | grep -q 'TEPLOHOD'
-check "tc event page html" curl -fsS "$PUBLIC_BASE/events/$TC_SLUG" | grep -qi '<!DOCTYPE html'
-check "legacy landing 301" curl -sI "$PUBLIC_BASE/landings/river-cruises" | grep -qi '301\|302'
+check "tc event api" bash -c "curl -fsS '$API_BASE/api/public/events/$TC_SLUG' | grep -q 'TICKETSCLOUD'"
+check "tep event api" bash -c "curl -fsS '$API_BASE/api/public/events/$TEP_SLUG' | grep -q 'TEPLOHOD'"
+check "tc event page html" bash -c "curl -fsS '$PUBLIC_BASE/events/$TC_SLUG' | grep -qi '<!DOCTYPE html'"
+check "legacy landing 301" bash -c "curl -sI '$PUBLIC_BASE/landings/river-cruises' | grep -qi '301\\|302'"
 
 echo "== backend:next:parity (optional) =="
 WEB_BASE_URL="$PUBLIC_BASE" LEGACY_BASE_URL="$API_BASE" pnpm backend:next:parity 2>/dev/null || echo "WARN parity skipped (DB/env)"

@@ -4,6 +4,28 @@
 
 ---
 
+## 2026-07-10 — F3 staging cutover выполнен
+
+### Наблюдения
+
+- Staging сервер был на `integrate/mvp-launch` + Node 20; для F3: Node 22, pnpm, checkout `feat/next-monorepo`.
+- `start-web.sh` в systemd пересобирал Next при каждом start — заменён на `start-web-prod.sh`.
+- nginx `/api/` → `:4001` (legacy), `/` → Next `:3000`.
+- Smoke script падал из-за `pipefail` + pipeline вне `check()` — исправлено.
+
+### Решения
+
+- Deploy: `deploy-staging-next.sh`, `patch-staging-next.py`, `daibilet-web-staging.service`.
+- Staging URL: https://staging.daibilet.ru — SSR catalog/landings в HTML.
+- Prod cutover — следующий шаг (rollback plan нужен).
+
+### Проблемы
+
+- `/api/health` через nginx = backend (by design); Next health на `:3000` отдельно.
+- Widget click — manual smoke.
+
+---
+
 ## 2026-07-10 — Codex audit + split стратегия + старт F3
 
 ### Наблюдения

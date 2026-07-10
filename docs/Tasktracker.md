@@ -43,8 +43,9 @@
 | nginx `staging-next.conf.snippet` | Критический | ✅ artifact |
 | `deploy-staging-next.sh` | Критический | ✅ artifact |
 | `launch-staging-smoke-next.sh` | Высокий | ✅ artifact |
-| Staging deploy на сервере | Критический | ⏳ ops |
-| Staging smoke green | Критический | ⏳ ops |
+| Staging deploy на сервере | Критический | ✅ 2026-07-10 |
+| nginx → Next :3000 | Критический | ✅ patch-staging-next.py |
+| Staging smoke green | Критический | ✅ auto (widgets — manual) |
 | Prod cutover + rollback plan | Критический | ⏳ |
 | Deprecate apps/public Vite | Высокий | ⏳ после prod |
 
