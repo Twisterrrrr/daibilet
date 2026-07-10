@@ -12,9 +12,11 @@ import {
 } from './dto.js';
 import { createDb } from './db.js';
 import { getPublicCatalogSessions } from './public-catalog.dto.js';
+import type { DestinationType } from './types/common.js';
 import type {
   PublicCityPageDto,
   PublicDestinationDto,
+  PublicLandingDto,
   PublicSessionDto,
 } from './types/public.js';
 
@@ -91,7 +93,11 @@ export async function buildPublicCityDto(
     getPublicCatalogSessions(forceRefresh),
     publicVenueHubRows(getLegacyDb(), 500),
   ]);
-  const matchedSessions = lookupDestinationCatalogSessions(citySlugOrId, requestedSlug, catalogSessions);
+  const matchedSessions = lookupDestinationCatalogSessions(
+    citySlugOrId,
+    requestedSlug,
+    catalogSessions,
+  ) as PublicSessionDto[];
   if (!matchedSessions.length) {
     pageCache.set(cacheKey, { expiresAt: Date.now() + PUBLIC_CITY_CACHE_MS, payload: null });
     return null;
@@ -101,10 +107,12 @@ export async function buildPublicCityDto(
   const sessions = matchedSessions.slice(0, 160);
   const venues = publicVenuesForSessionsFromHub(sessions, venueHubRows, 24);
   const prices = sessions
-    .map((session) => session.priceFrom)
-    .filter((price): price is number => Number.isFinite(price) && Number(price) >= MIN_DISPLAY_PRICE_RUB);
-  const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
-  const landings = buildPublicLandings(sessions).filter((landing) => landing.events > 0);
+    .map((session: PublicSessionDto) => session.priceFrom)
+    .filter((price: number | null | undefined): price is number =>
+      Number.isFinite(price) && Number(price) >= MIN_DISPLAY_PRICE_RUB,
+    );
+  const categories = countBy(sessions.map((event: PublicSessionDto) => event.category).filter(Boolean));
+  const landings = (buildPublicLandings(sessions) as PublicLandingDto[]).filter((landing) => landing.events > 0);
   const entityLabel = destinationPrepositional(destination);
   const cityRecord = destination.type === 'city' && sessions[0]?.cityId
     ? await prisma.city.findUnique({ where: { id: sessions[0].cityId } })
@@ -118,7 +126,7 @@ export async function buildPublicCityDto(
       sourceSlug: destination.sourceSlug,
       name: destination.name,
       title: destination.name,
-      type: destination.type,
+      type: destination.type as DestinationType,
       isDestination: true,
       events: sessions.length,
       venues: venues.length,

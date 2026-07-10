@@ -3,7 +3,7 @@
 **Дата старта:** 2026-07-10  
 **Ветка Cursor:** `integrate/mvp-launch` → `feat/next-monorepo`  
 **Ветка Codex:** `codex/phase2-finance-next` (от `feat/next-monorepo` после F1)  
-**Статус:** 🔄 F1 in progress (`feat/next-monorepo`)
+**Статус:** 🔄 F2 in progress (`feat/next-monorepo`)
 
 **F2 read path:** Prisma напрямую в Server Components и Route Handlers (full-stack), без proxy fetch к legacy backend.
 
@@ -82,14 +82,15 @@ Handoff для Codex: [codex-phase2-next-handoff.md](../codex-phase2-next-handof
 
 **Exit:** `apps/web` builds, подключается к staging DB.
 
-### F2 — Public SSR (2–3 нед)
+### F2 — Public SSR (2–3 нед) 🔄
 
-- [ ] **Каталог** `/events` — SSR page 1 (limit=100), facets server-side
-- [ ] **Event** `/events/[slug]` — SSR + `generateMetadata`
-- [ ] **City** `/cities/[slug]` — SSR
-- [ ] **Venue/location** `/venues/[slug]`, `/locations/[slug]` — SSR
+- [x] **Каталог** `/events` — SSR page 1 (limit=100), crawlable `?page=`
+- [x] **Event** `/events/[slug]` — SSR + `generateMetadata`
+- [x] **City** `/cities/[slug]` — SSR + `/cities` index
+- [x] **Venue/location** `/venues/[slug]`, `/locations/[slug]` — SSR + indexes
 - [ ] **Landings** top slugs — SSG или ISR
-- [ ] Route Handlers + Server Components: **Prisma read** (port `public-*.dto.ts`, не fetch к legacy API)
+- [x] Route Handlers `/api/public/events|events/[slug]|cities/[slug]|venues/[slug]`
+- [x] Prisma read via `@daibilet/backend/public-read` (no HTTP proxy)
 - [ ] Parity scripts against legacy on staging
 
 **SEO exit:** View Source содержит карточки + title/description без JS.

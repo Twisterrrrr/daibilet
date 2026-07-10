@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: 224 82% 52%;
+  --primary-foreground: 0 0% 100%;
+}
+
+body {
+  @apply bg-white text-slate-900 antialiased;
+}
+
+.container-page {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6;
+}
+
+.card-link {
+  @apply block overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-primary/30 hover:shadow-md;
+}

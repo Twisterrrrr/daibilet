@@ -1,5 +1,3 @@
-import { loadRootEnv } from './load-root-env';
-
-loadRootEnv();
+import '@/lib/env';
 
 export { prisma, Prisma, disconnectPrisma, databaseUrl } from '@daibilet/db';

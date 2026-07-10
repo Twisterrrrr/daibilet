@@ -87,6 +87,12 @@ importers:
       '@daibilet/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@daibilet/db':
+        specifier: workspace:*
+        version: link:../../packages/db
+      pg:
+        specifier: ^8.13.0
+        version: 8.22.0
       zod:
         specifier: ^4.4.3
         version: 4.4.3
@@ -94,6 +100,9 @@ importers:
       '@types/node':
         specifier: ^26.0.0
         version: 26.1.1
+      '@types/pg':
+        specifier: ^8.11.0
+        version: 8.20.0
       tsx:
         specifier: ^4.22.4
         version: 4.23.0
@@ -143,6 +152,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@daibilet/backend':
+        specifier: workspace:*
+        version: link:../backend
       '@daibilet/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
@@ -174,6 +186,15 @@ importers:
       '@types/react-dom':
         specifier: ^19.0.0
         version: 19.2.3(@types/react@19.2.17)
+      autoprefixer:
+        specifier: ^10.4.0
+        version: 10.5.2(postcss@8.5.16)
+      postcss:
+        specifier: ^8.4.0
+        version: 8.5.16
+      tailwindcss:
+        specifier: ^3.4.0
+        version: 3.4.19(tsx@4.23.0)
       typescript:
         specifier: ^6.0.3
         version: 6.0.3

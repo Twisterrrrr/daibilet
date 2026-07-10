@@ -67,11 +67,11 @@ function withTypedVenueSeoFallbacks(payload: PublicVenuePageDto): PublicVenuePag
     ...payload,
     venue: {
       ...venue,
-      seoH1: venue.seoH1 || venue.title,
-      seoTitle: venue.seoTitle || `${venue.title}: события и билеты | Дайбилет`,
-      seoDescription: venue.seoDescription ||
-        `${venue.title}${cityLabel}: афиша событий, ближайшие даты, цены и билеты.`,
-      canonicalPath: venue.canonicalPath || `/venues/${venue.slug}`,
+      seoH1: venue.seoH1 ?? venue.title ?? venue.name,
+      seoTitle: venue.seoTitle ?? `${venue.title || venue.name}: события и билеты | Дайбилет`,
+      seoDescription: venue.seoDescription ??
+        `${venue.title || venue.name}${cityLabel}: афиша событий, ближайшие даты, цены и билеты.`,
+      canonicalPath: venue.canonicalPath ?? `/venues/${venue.slug}`,
     },
   };
 }
