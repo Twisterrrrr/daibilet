@@ -36,6 +36,7 @@ export interface PublicCatalogMappingRow {
   description: string | null;
   kind: string;
   sourceStatus: string | null;
+  ageLimit?: string | null;
   imageUrl: string | null;
   category: string | null;
   cityId: string | null;
@@ -185,6 +186,7 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
     tags: tags.slice(0, 4),
     kind: row.kind || null,
     sourceStatus: row.sourceStatus || null,
+    ageLimit: row.ageLimit ?? null,
     description: cleanImportedDescription(row.overrideDescription || row.description || row.overrideShortDescription),
     startsAt,
     dateLabel: openDate ? 'Открытая дата' : formatDate(startsAt),

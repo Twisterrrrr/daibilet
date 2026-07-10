@@ -432,8 +432,9 @@ function matchesCatalogQuery(session: PublicSessionDto, query: PublicCatalogQuer
   if (query.date && query.date !== 'all' && !matchesCatalogDate(session, query.date)) return false;
 
   const maxPrice = query.maxPrice ?? query.priceMax;
-  if (maxPrice && (!session.priceFrom || session.priceFrom > maxPrice)) return false;
-  if (!matchesDateRange(session.startsAt, query.from, query.to)) return false;
+  if (!matchesCatalogPrice(session, query.minPrice, maxPrice)) return false;
+  if (query.ageMax != null && query.ageMax >= 0 && !matchesCatalogAgeLimit(session, query.ageMax)) return false;
+  if (!matchesDateRange(session.startsAt, query.from, query.to, session)) return false;
 
   const search = query.q?.trim().toLowerCase();
   if (!search) return true;
@@ -530,7 +531,40 @@ function matchesCatalogDate(session: PublicSessionDto, dateFilter: string): bool
   return true;
 }
 
-function matchesDateRange(startsAt: string, from?: string, to?: string): boolean {
+function matchesCatalogPrice(
+  session: PublicSessionDto,
+  minPrice?: number,
+  maxPrice?: number,
+): boolean {
+  const price = session.priceFrom;
+  const wantsFree = minPrice === 0 && maxPrice === 0;
+  if (wantsFree) return !Number.isFinite(price) || Number(price) <= 0;
+  if (minPrice != null && minPrice > 0 && (!Number.isFinite(price) || Number(price) < minPrice)) return false;
+  if (maxPrice != null && maxPrice > 0 && (!Number.isFinite(price) || Number(price) > maxPrice)) return false;
+  return true;
+}
+
+function parseCatalogAgeLimit(value?: string | null): number | null {
+  if (!value) return null;
+  const match = String(value).match(/\d+/);
+  if (!match) return null;
+  const age = Number(match[0]);
+  return Number.isFinite(age) ? age : null;
+}
+
+function matchesCatalogAgeLimit(session: PublicSessionDto, ageMax: number): boolean {
+  const limit = parseCatalogAgeLimit(session.ageLimit);
+  if (limit == null) return true;
+  return limit <= ageMax;
+}
+
+function matchesDateRange(
+  startsAt: string,
+  from?: string,
+  to?: string,
+  session?: PublicSessionDto,
+): boolean {
+  if (session && isOpenDateSession(session)) return true;
   const timestamp = new Date(startsAt).getTime();
   if (!Number.isFinite(timestamp)) return !from && !to;
 

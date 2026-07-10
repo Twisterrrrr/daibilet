@@ -77,6 +77,7 @@ export interface PublicSessionDto extends PurchaseFields {
   tags: string[];
   kind?: string | null;
   sourceStatus?: string | null;
+  ageLimit?: string | null;
   description?: string | null;
   startsAt: string;
   dateLabel: string;
