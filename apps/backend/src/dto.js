@@ -7363,7 +7363,7 @@ function resolvePublicSessionCity(row) {
   return routeCityToPublicDisplayName(inferred || raw || 'Не указан');
 }
 
-function mapGroupedPublicSession(row, pinnedEventIds = new Set()) {
+export function mapGroupedPublicSession(row, pinnedEventIds = new Set()) {
   const tags = row.tags || [];
   const displayCity = resolvePublicSessionDisplayCity(row);
   const groupCity = resolvePublicSessionCity(row);

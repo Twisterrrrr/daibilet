@@ -1,8 +1,12 @@
 import { Prisma, prisma } from '../../../packages/db/src/client.ts';
-import { dedupeCrossSourceCatalogSessions, regroupMappedPublicCatalogSessions } from './dto.js';
+import {
+  dedupeCrossSourceCatalogSessions,
+  mapGroupedPublicSession,
+  regroupMappedPublicCatalogSessions,
+  sessionHasCoverImage,
+} from './dto.js';
 import { findLandingRule } from './landing-rules.js';
 import {
-  mapGroupedPublicSession,
   pickCatalogSubcategories,
   type PublicCatalogMappingRow,
 } from './public-catalog.mapper.js';
@@ -45,8 +49,9 @@ export function clearPublicCatalogDtoCache(): void {
 
 export async function buildPublicCatalogDto(query: PublicCatalogQuery): Promise<PublicCatalogDto> {
   const sessions = await getPublicCatalogSessions(query.refresh === 1);
-  const facets = buildCatalogFacets(sessions);
-  const filtered = sessions.filter((session) => matchesCatalogQuery(session, query));
+  const coverSessions = sessions.filter(sessionHasCoverImage);
+  const facets = buildCatalogFacets(coverSessions);
+  const filtered = coverSessions.filter((session) => matchesCatalogQuery(session, query));
   const sorted = sortCatalogSessions(filtered, query.sort || 'time');
   const limit = clampNumber(query.limit, 1, 240, 120);
   const offset = clampNumber(query.offset, 0, 100000, 0);
@@ -70,9 +75,11 @@ export async function getPublicCatalogSessions(forceRefresh = false): Promise<Pu
 
   if (forceRefresh) clearPublicCatalogDtoCache();
 
-  const buildPromise = loadPublicCatalogRows().then((rows) => {
+  const buildPromise = Promise.all([loadPublicCatalogRows(), loadPinnedEventIds()]).then(([rows, pinnedEventIds]) => {
     const sessions = dedupeCrossSourceCatalogSessions(
-      regroupMappedPublicCatalogSessions(rows.map(mapPublicCatalogRow)),
+      regroupMappedPublicCatalogSessions(
+        rows.map((row) => mapGroupedPublicSession(row, pinnedEventIds)),
+      ),
     );
     catalogCache = {
       expiresAt: Date.now() + PUBLIC_CATALOG_CACHE_MS,
@@ -87,6 +94,15 @@ export async function getPublicCatalogSessions(forceRefresh = false): Promise<Pu
   } finally {
     if (catalogBuildPromise === buildPromise) catalogBuildPromise = null;
   }
+}
+
+async function loadPinnedEventIds(): Promise<Set<string>> {
+  const rows = await prisma.$queryRaw<Array<{ eventId: string }>>(Prisma.sql`
+    select distinct "eventId"
+    from "LandingMatch"
+    where coalesce(reasons->>'manualStatus', '') = 'PINNED'
+  `);
+  return new Set(rows.map((row) => row.eventId));
 }
 
 async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
@@ -158,6 +174,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         event.description,
         event.kind,
         event."sourceStatus",
+        event."ageLimit",
         event."imageUrl",
         event."priceFromRub",
         event."ticketsVacant",
@@ -173,6 +190,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         venue.id as "venueId",
         venue.slug as "venueSlug",
         venue.title as venue,
+        venue.address as "venueAddress",
         venue."heroImageUrl" as "venueHeroImageUrl",
         venue.kind as "venueKind",
         override.title as "overrideTitle",
@@ -249,6 +267,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         venue.id,
         venue.slug,
         venue.title,
+        venue.address,
         venue."heroImageUrl",
         venue.kind,
         primary_offer."sourceCode",
@@ -360,6 +379,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
             'startsAt', "startsAt",
             'providerSessionId', "providerSessionId",
             'providerEventId', "providerEventId",
+            'externalId', "providerSessionId",
             'sourceCode', "sourceCode",
             'offerSourceCode', "offerSourceCode",
             'offerWidgetUrl', "offerWidgetUrl",
@@ -381,6 +401,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
       representative.description,
       representative.kind,
       representative."sourceStatus",
+      representative."ageLimit",
       representative."imageUrl",
       representative.category,
       representative."cityId",
@@ -394,6 +415,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
       representative."venueId",
       representative."venueSlug",
       representative.venue,
+      representative."venueAddress",
       representative."venueHeroImageUrl",
       representative."venueKind",
       representative."overrideTitle",
@@ -424,10 +446,6 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
   `);
 }
 
-function mapPublicCatalogRow(row: PublicCatalogRow): PublicSessionDto {
-  return mapGroupedPublicSession(row);
-}
-
 function matchesCatalogQuery(session: PublicSessionDto, query: PublicCatalogQuery): boolean {
   const destination = query.destination;
   if (destination && destination !== 'all' && session.destination !== destination) return false;
@@ -436,8 +454,7 @@ function matchesCatalogQuery(session: PublicSessionDto, query: PublicCatalogQuer
     query.category &&
     query.category !== 'all' &&
     session.category !== query.category &&
-    !session.tags.includes(query.category) &&
-    !(session.subcategories || []).includes(query.category)
+    !pickCatalogSubcategories(session).includes(query.category)
   ) return false;
   if (query.tag && query.tag !== 'all' && !session.tags.includes(query.tag)) return false;
   if (query.landing && query.landing !== 'all' && !session.landingSlugs.includes(query.landing)) return false;
@@ -459,7 +476,7 @@ function matchesCatalogQuery(session: PublicSessionDto, query: PublicCatalogQuer
 function buildCatalogFacets(sessions: PublicSessionDto[]): PublicCatalogDto['facets'] {
   return {
     cities: countCatalogValues(sessions.map((session) => session.destination || session.city))
-      .filter(([name, events]) => name !== 'Не указан' && events >= 2)
+      .filter(([name, events]) => name !== 'Не указан' && events >= 1)
       .map(([name, events]) => ({ name, events })),
     categories: countCatalogValues(sessions.map((session) => session.category))
       .map(([name, events]) => ({ name, events })),
