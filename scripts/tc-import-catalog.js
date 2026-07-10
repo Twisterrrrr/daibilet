@@ -197,13 +197,15 @@ async function importCatalogEvent(client, event, summary) {
     const venueEvents =
       summary?.topVenues?.find((item) => item.id === venue.id)?.events || 0;
     const venueSlug = slugify(`${venue.name || "venue"}-${venue.id}`);
+    const existingBySlug = await client.query(`select id from "Venue" where slug = $1 limit 1`, [venueSlug]);
+    const targetVenueId = existingBySlug.rows[0]?.id || venueId;
     const venueResult = await client.query(
       `
         insert into "Venue" (
           id, slug, title, description, "cityId", address, latitude, longitude, kind, "pageStatus", "createdAt", "updatedAt"
         )
         values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, now(), now())
-        on conflict (slug) do update set
+        on conflict (id) do update set
           title = excluded.title,
           description = coalesce(excluded.description, "Venue".description),
           "cityId" = excluded."cityId",
@@ -216,7 +218,7 @@ async function importCatalogEvent(client, event, summary) {
         returning id
       `,
       [
-        venueId,
+        targetVenueId,
         venueSlug,
         venue.name || "Площадка без названия",
         venue.description || null,
@@ -228,7 +230,7 @@ async function importCatalogEvent(client, event, summary) {
         venuePageStatus(venue.typeGuess, venueEvents),
       ],
     );
-    resolvedVenueId = venueResult.rows[0]?.id || venueId;
+    resolvedVenueId = venueResult.rows[0]?.id || targetVenueId;
     rowStats.venue = true;
   }
 
