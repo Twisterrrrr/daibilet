@@ -27,6 +27,7 @@
 ## Legacy и внешний опыт
 
 - [SPBBOATS extraction plan](spbboats-mvp-extraction-plan.md) - что взять из legacy и что не тащить.
+- [SPBBOATS Next/Prisma extraction](spbboats-next-prisma-extraction.md) - повторный аудит legacy после решения идти в full-stack Next.js + Prisma.
 - [Legacy schema audit](legacy-schema-audit.md) - сравнение старой большой схемы и нового MVP.
 - [Legacy public inventory](legacy-public-inventory.md) - старый public как библиотека UX/SEO.
 - [Codex vs SPBBOATS decision](codex-vs-spbboats-decision.md) - почему идем тоньше legacy.

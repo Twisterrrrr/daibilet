@@ -2,6 +2,28 @@
 
 Этот файл фиксирует решения, которые влияют на архитектуру, запуск и дальнейшие фазы. Новые решения добавляем сверху или в конец с датой.
 
+## 2026-07-10: SPBBOATS becomes a contract donor for Next.js + Prisma, not a codebase to copy
+
+Решение:
+
+- использовать SPBBOATS как источник доменных контрактов, DTO-подходов и SEO/readiness правил;
+- не переносить legacy-монолит, Nest-контроллеры, несколько админок, очереди и полный finance/supplier runtime целиком;
+- зафиксировать extraction в [SPBBOATS Next/Prisma extraction](spbboats-next-prisma-extraction.md);
+- считать текущую схему Daibilet правильным тонким ядром: 2009 строк, 66 моделей, 55 enum против 4201 строки, 120 моделей, 116 enum в legacy;
+- добавить `Collection` позже как отдельную сущность от `Landing`, а не смешивать подборки и посадочные.
+
+Причина:
+
+- после решения идти в full-stack Next.js + Prisma нужно иметь единый ответ, что именно забираем из SPBBOATS;
+- в legacy много сильных инвариантов: event/session/offer, landing composition, publish-gate, SEO audit, checkout idempotency, supplier ledger;
+- прямое копирование снова приведет к тяжелому проекту, от которого мы специально уходили.
+
+Следствие:
+
+- ближайший public-перенос идет через Next SEO routes и Prisma-backed read models;
+- Phase 2 runtime начинается только после state machines, STUB checkout и smoke;
+- Cursor/другие агенты получают явные границы, которые нельзя перетирать при интеграции UI.
+
 ## 2026-07-10: Event change requests get an admin read/review API before supplier UI
 
 Решение:

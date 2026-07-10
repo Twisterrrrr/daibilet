@@ -41,6 +41,10 @@
   - внутренний checkout;
   - YooKassa payment/fiscal receipt foundation;
   - trip planner и единый ваучер.
+- Проведен повторный аудит SPBBOATS под Next.js + Prisma:
+  - legacy схема: 4201 строк, 120 моделей, 116 enum;
+  - текущая схема Daibilet: 2009 строк, 66 моделей, 55 enum;
+  - зафиксировано, что SPBBOATS используем как донор контрактов, а не как кодовую базу для копирования.
 - Начата Phase 2.0 после исследования SPBBOATS:
   - fulfillment/refund/idempotency contracts;
   - supplier legal/bank/report/document contracts;
