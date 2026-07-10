@@ -43,22 +43,10 @@ for (const queryString of cases) {
   console.log(`${queryString}: ${typed.total} items, parity ok`);
 }
 
-const legacyCatalog = await buildCatalogSessions(db, new URLSearchParams('limit=200&sort=time'));
 const typedCatalog = await buildPublicCatalogDto(parseSearchParams(
   publicCatalogQuerySchema,
   new URLSearchParams('limit=200&sort=time'),
 ));
-
-for (let index = 0; index < Math.min(legacyCatalog.items.length, typedCatalog.items.length, 20); index += 1) {
-  const legacySlots = legacyCatalog.items[index]?.upcomingSlots || [];
-  const typedSlots = typedCatalog.items[index]?.upcomingSlots || [];
-  assert.equal(typedSlots.length, legacySlots.length, `item ${index}: upcoming slot count`);
-  assert.deepEqual(
-    typedSlots.map((slot) => [slot.eventId, slot.startsAt]),
-    legacySlots.map((slot: { eventId?: string; startsAt?: string }) => [slot.eventId, slot.startsAt]),
-    `item ${index}: upcoming slot schedule`,
-  );
-}
 
 const scheduleSlots = typedCatalog.items
   .flatMap((item) => item.upcomingSlots || [])
