@@ -49,6 +49,7 @@
 | Prod cutover + rollback plan | Критический | ✅ 2026-07-10 |
 | Prod nginx → Next :3001 | Критический | ✅ patch-prod-next.py |
 | Prod smoke (SSR via nginx) | Критический | ✅ (parity optional WARN) |
+| **Next UI polish** (design system, header, home) | Высокий | 🔄 slice 1 |
 | Deprecate apps/public Vite | Высокий | ⏳ после мониторинга 24–48ч |
 
 Чеклист: [phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md).

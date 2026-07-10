@@ -37,10 +37,15 @@ export default async function EventsCatalogPage({ searchParams }: PageProps) {
   return (
     <SiteLayout>
       <div className="container-page py-8">
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Каталог событий</h1>
-        <p className="mt-2 text-sm text-slate-500">{pluralEvents(catalog.total)}</p>
+        <div className="max-w-3xl">
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">
+            Каталог событий
+          </h1>
+          <p className="mt-2 text-sm text-slate-500">{pluralEvents(catalog.total)}</p>
+        </div>
 
-        <CatalogFilters
+        <div className="catalog-toolbar-sticky -mx-4 mt-6 border-y border-slate-200 bg-white/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6">
+          <CatalogFilters
           facets={catalog.facets}
           values={{
             city: query.city,
@@ -48,7 +53,8 @@ export default async function EventsCatalogPage({ searchParams }: PageProps) {
             sort: query.sort,
             q: query.q,
           }}
-        />
+          />
+        </div>
 
         <ul className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {catalog.items.map((session) => (

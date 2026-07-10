@@ -1,0 +1,101 @@
+import Link from 'next/link';
+import { Compass } from 'lucide-react';
+
+import type { PublicDestinationDto } from '@daibilet/contracts/public';
+import { cityHref } from '@/lib/routes';
+import { landingCategoryHref } from '@/lib/landing-routes';
+import { CANONICAL_LANDING_SLUGS } from '@/lib/landing-constants';
+
+const catalogLinks = [
+  { label: 'Экскурсии', href: '/events?category=Экскурсии' },
+  { label: 'Музеи и арт', href: '/events?category=Музеи+и+арт' },
+  { label: 'Мероприятия', href: '/events?category=Мероприятия' },
+  { label: 'Активный отдых', href: '/events?category=Активный+отдых' },
+  { label: 'Развлечения', href: '/events?category=Развлечения' },
+  { label: 'Речные прогулки', href: landingCategoryHref(CANONICAL_LANDING_SLUGS.river) },
+  { label: 'Автобусные экскурсии', href: landingCategoryHref(CANONICAL_LANDING_SLUGS.bus) },
+];
+
+const companyLinks = [
+  { label: 'Площадки', href: '/venues' },
+  { label: 'Локации', href: '/locations' },
+  { label: 'Подборки', href: '/podborki' },
+  { label: 'Проверить заказ', href: '/my-orders' },
+];
+
+type SiteFooterProps = {
+  destinations: PublicDestinationDto[];
+};
+
+export function SiteFooter({ destinations }: SiteFooterProps) {
+  const cityLinks = destinations
+    .filter((item) => item.type === 'city')
+    .sort((a, b) => b.events - a.events)
+    .slice(0, 8)
+    .map((city) => ({
+      label: city.name,
+      href: cityHref(city),
+    }));
+
+  return (
+    <footer className="border-t border-slate-200 bg-slate-50">
+      <div className="container-page py-12">
+        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+          <div className="col-span-2 md:col-span-1">
+            <Link href="/" className="flex items-center gap-2">
+              <Compass className="h-6 w-6 text-primary-600" />
+              <span className="text-lg font-bold text-slate-900">
+                Дай<span className="text-primary-600">билет</span>
+              </span>
+            </Link>
+            <p className="mt-3 text-sm leading-6 text-slate-500">
+              Билеты на экскурсии, музеи и мероприятия по городам России.
+              Покупайте онлайн, посещайте лучшее!
+            </p>
+            <div className="mt-4 text-base font-medium text-slate-800">
+              <a href="mailto:info@daibilet.ru" className="transition-colors hover:text-primary-600">
+                info@daibilet.ru
+              </a>
+            </div>
+          </div>
+
+          <FooterColumn title="События" links={catalogLinks} />
+          <FooterColumn title="Города" links={cityLinks} />
+          <FooterColumn title="Компания" links={companyLinks} />
+        </div>
+
+        <div className="mt-10 border-t border-slate-200 pt-6">
+          <p className="text-sm text-slate-900">&copy; {new Date().getFullYear()} Дайбилет</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function FooterColumn({
+  title,
+  links,
+}: {
+  title: string;
+  links: Array<{ label: string; href: string }>;
+}) {
+  if (!links.length) return null;
+
+  return (
+    <div>
+      <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
+      <ul className="mt-3 space-y-2">
+        {links.map((link) => (
+          <li key={`${title}:${link.label}`}>
+            <Link
+              href={link.href}
+              className="text-sm text-slate-500 transition-colors hover:text-primary-600"
+            >
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}

@@ -129,3 +129,25 @@
 
 - `pnpm db:deploy` на staging/prod ещё не выполнен — нужен backup `5438`/`5437`.
 - `backend:test:ts` не включает ECR tests — запускать отдельно `tsx --test src/event-change-request-*.test.ts`.
+
+---
+
+## 2026-07-10 — Next UI polish (slice 1): design system + shell + home
+
+### Наблюдения
+
+- F3 data path готов, но Next выглядел «голым»: 3 nav-ссылки, минимальный footer, простые карточки.
+- Vite public содержит полный design system (~290 строк CSS) и Header/Footer с 7 разделами.
+
+### Решения
+
+- Порт `globals.css` + tailwind tokens из `apps/public`.
+- Header: fixed blur, mobile sheet, полная nav (events/cities/venues/locations/podborki).
+- Footer: 4 колонки (события, города, компания), email.
+- Home: gradient hero + поиск, популярные события, city cards, format tiles, trust block.
+- EventCard: рейтинг, price pill, hover, category chip.
+
+### Проблемы
+
+- Полный UI parity (landings block renderer, catalog advanced filters, auth/favorites) — следующие slices.
+- `/images/cities/*.png` — static assets на nginx, не в repo; fallback emoji + `heroImageUrl` из API.
