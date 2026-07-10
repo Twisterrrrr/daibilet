@@ -173,3 +173,23 @@
 
 - Slice 4 (landings block renderer) и slice 5 (auth/help/legal) — следующие.
 - QuickInfo на event page упрощён vs Vite (без event-location resolver) — достаточно для functional parity.
+
+---
+
+## 2026-07-11 — Next UI polish (slice 4): landings content blocks
+
+### Наблюдения
+
+- Backend (`dto.js`) уже отдаёт `blocks` (DB `LandingContentBlock` или `buildDefaultLandingBlocks`).
+- Next `LandingPageView` показывал только заголовок + карточки событий — без trust/value/city grid/FAQ.
+
+### Решения
+
+- `LandingContentBlocks` + `LandingFaqSection` — порт типов блоков из Vite.
+- Типизация `PublicLandingPageDto.blocks` → `LandingContentBlockDto[]`.
+- Секция событий `#variants` для CTA anchor.
+
+### Проблемы
+
+- Полный landing parity (hero sticky, filters, bridges/dinner profiles) — отдельно, не slice 4.
+- Slice 5: auth/pages (`/help`, `/blog`, legal).

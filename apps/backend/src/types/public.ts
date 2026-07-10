@@ -8,6 +8,7 @@ import type {
   SeoFields,
   TimeBucket,
 } from './common.js';
+import type { LandingContentBlockDto } from './landing.js';
 
 export interface PublicStatsDto extends ApiEnvelope {
   events: number;
@@ -243,7 +244,7 @@ export interface PublicLandingPageDto extends ApiEnvelope {
   landing: PublicLandingDto;
   sessions: PublicSessionDto[];
   relatedLandings: PublicLandingDto[];
-  blocks?: unknown[];
+  blocks?: LandingContentBlockDto[];
   stats: {
     events: number;
     sessions: number;

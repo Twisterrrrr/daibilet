@@ -52,6 +52,7 @@
 | **Next UI polish** (design system, header, home) | Высокий | ✅ slice 1 |
 | **Next catalog filters** (advanced, presets, limit) | Высокий | ✅ slice 2 |
 | **Next event page** (hero, sessions, sticky buy) | Высокий | ✅ slice 3 |
+| **Next landings block renderer** (TRUST/VALUE/CITY/FAQ/CTA) | Высокий | ✅ slice 4 |
 | Deprecate apps/public Vite | Высокий | ⏳ после мониторинга 24–48ч |
 
 Чеклист: [phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md).
