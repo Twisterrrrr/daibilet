@@ -37,6 +37,74 @@ test('serves admin event change request list with filters', async () => {
   assert.equal(JSON.parse(response.body).total, 1);
 });
 
+test('serves admin event change request detail', async () => {
+  let capturedRequestId: string | null = null;
+  const response = createMockResponse();
+  const handler = createAdminEventChangeRequestsRouteHandler(createDeps({
+    async buildEventChangeRequestDetail(requestId) {
+      capturedRequestId = requestId;
+      return {
+        id: requestId,
+        eventId: 'evt_1',
+        supplierId: null,
+        type: 'CONTENT_UPDATE',
+        status: 'SUBMITTED',
+        title: 'Update content',
+        summary: null,
+        adminComment: null,
+        payloadKeys: ['title'],
+        submittedAt: null,
+        reviewedAt: null,
+        appliedAt: null,
+        createdAt: '2026-08-01T09:00:00.000Z',
+        updatedAt: '2026-08-01T10:00:00.000Z',
+        event: null,
+        supplier: null,
+        createdBy: null,
+        reviewedBy: null,
+        actions: { canApprove: true, canReject: true, canApply: false },
+        payloadPreview: {
+          baseSnapshot: null,
+          sections: [{ id: 'title', title: 'Название', kind: 'string', value: 'New title' }],
+        },
+        diff: {
+          items: [{ path: 'content.title', label: 'Название', currentValue: 'Old', proposedValue: 'New', changeType: 'changed' }],
+          warnings: [],
+        },
+      };
+    },
+  }));
+
+  const handled = await handler(createRouteContext({
+    method: 'GET',
+    pathname: '/api/admin/event-change-requests/cr_1',
+    response,
+  }));
+
+  assert.equal(handled, true);
+  assert.equal(capturedRequestId, 'cr_1');
+  assert.equal(JSON.parse(response.body).id, 'cr_1');
+});
+
+test('returns 404 for missing admin event change request detail', async () => {
+  const response = createMockResponse();
+  const handler = createAdminEventChangeRequestsRouteHandler(createDeps({
+    async buildEventChangeRequestDetail() {
+      return null;
+    },
+  }));
+
+  const handled = await handler(createRouteContext({
+    method: 'GET',
+    pathname: '/api/admin/event-change-requests/missing',
+    response,
+  }));
+
+  assert.equal(handled, true);
+  assert.equal(response.statusCode, 404);
+  assert.equal(JSON.parse(response.body).error, 'event_change_request_not_found');
+});
+
 test('approves event change request through admin route', async () => {
   let reviewed: { requestId: string; action: string; adminComment?: string | null | undefined } | null = null;
   const response = createMockResponse();
@@ -154,6 +222,9 @@ function createDeps(
   return {
     async buildEventChangeRequests() {
       throw new Error('buildEventChangeRequests should not be called');
+    },
+    async buildEventChangeRequestDetail() {
+      throw new Error('buildEventChangeRequestDetail should not be called');
     },
     async reviewEventChangeRequest() {
       throw new Error('reviewEventChangeRequest should not be called');

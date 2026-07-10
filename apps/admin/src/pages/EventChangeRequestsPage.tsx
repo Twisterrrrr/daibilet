@@ -1,8 +1,10 @@
 import * as React from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { CheckCircle2, ClipboardCheck, Loader2, RefreshCcw, Search, Send, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ClipboardCheck, Eye, FileJson, Loader2, RefreshCcw, Search, Send, XCircle } from 'lucide-react';
 
 import type {
+  AdminEventChangeRequestDetailDto,
+  AdminEventChangeRequestDiffItemDto,
   AdminEventChangeRequestRowDto,
   AdminEventChangeRequestsListDto,
 } from '@daibilet/contracts/admin';
@@ -11,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { formatNumber } from '@/data';
 
 const API_BASE_URL =
@@ -28,6 +31,10 @@ export function EventChangeRequestsPage() {
   const [actionError, setActionError] = React.useState<string | null>(null);
   const [actingId, setActingId] = React.useState<string | null>(null);
   const [reloadTick, setReloadTick] = React.useState(0);
+  const [selectedRequestId, setSelectedRequestId] = React.useState<string | null>(null);
+  const [detail, setDetail] = React.useState<AdminEventChangeRequestDetailDto | null>(null);
+  const [detailLoading, setDetailLoading] = React.useState(false);
+  const [detailError, setDetailError] = React.useState<string | null>(null);
 
   const status = params.get('status') ?? 'all';
   const type = params.get('type') ?? 'all';
@@ -56,6 +63,32 @@ export function EventChangeRequestsPage() {
   );
 
   const refresh = React.useCallback(() => setReloadTick((value) => value + 1), []);
+
+  const loadDetail = React.useCallback((requestId: string) => {
+    setDetailLoading(true);
+    setDetailError(null);
+    fetch(`${API_BASE_URL}/api/admin/event-change-requests/${encodeURIComponent(requestId)}`, { cache: 'no-store' })
+      .then(async (response) => {
+        const body = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
+        return body as AdminEventChangeRequestDetailDto;
+      })
+      .then((data) => setDetail(data))
+      .catch((error) => {
+        setDetail(null);
+        setDetailError(error instanceof Error ? error.message : String(error));
+      })
+      .finally(() => setDetailLoading(false));
+  }, []);
+
+  const openDetail = React.useCallback(
+    (request: AdminEventChangeRequestRowDto) => {
+      setSelectedRequestId(request.id);
+      setDetail(null);
+      loadDetail(request.id);
+    },
+    [loadDetail],
+  );
 
   React.useEffect(() => {
     const controller = new AbortController();
@@ -110,10 +143,13 @@ export function EventChangeRequestsPage() {
           return body;
         })
         .then(() => refresh())
+        .then(() => {
+          if (selectedRequestId === request.id) loadDetail(request.id);
+        })
         .catch((error) => setActionError(error instanceof Error ? error.message : String(error)))
         .finally(() => setActingId(null));
     },
-    [refresh],
+    [loadDetail, refresh, selectedRequestId],
   );
 
   const quickFilters = React.useMemo(() => buildQuickFilters(payload), [payload]);
@@ -230,6 +266,14 @@ export function EventChangeRequestsPage() {
                 <Button
                   variant="outline"
                   size="sm"
+                  onClick={() => openDetail(request)}
+                >
+                  <Eye className="mr-1.5 h-3.5 w-3.5" />
+                  Открыть
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
                   disabled={!request.actions.canApprove || actingId !== null}
                   onClick={() => runAction(request, 'approve')}
                 >
@@ -260,6 +304,22 @@ export function EventChangeRequestsPage() {
         ))}
       </DataTableShell>
 
+      <RequestDetailSheet
+        open={Boolean(selectedRequestId)}
+        detail={detail}
+        loading={detailLoading}
+        error={detailError}
+        actingId={actingId}
+        onRefresh={() => selectedRequestId && loadDetail(selectedRequestId)}
+        onOpenChange={(open) => {
+          if (open) return;
+          setSelectedRequestId(null);
+          setDetail(null);
+          setDetailError(null);
+        }}
+        onAction={runAction}
+      />
+
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
         <span>
           Показано {formatNumber(offset + 1)}-{formatNumber(offset + payload.items.length)} из {formatNumber(payload.total)}
@@ -275,6 +335,211 @@ export function EventChangeRequestsPage() {
       </div>
     </div>
   );
+}
+
+function RequestDetailSheet({
+  open,
+  detail,
+  loading,
+  error,
+  actingId,
+  onRefresh,
+  onOpenChange,
+  onAction,
+}: {
+  open: boolean;
+  detail: AdminEventChangeRequestDetailDto | null;
+  loading: boolean;
+  error: string | null;
+  actingId: string | null;
+  onRefresh: () => void;
+  onOpenChange: (open: boolean) => void;
+  onAction: (request: AdminEventChangeRequestRowDto, action: ActionName) => void;
+}) {
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="flex w-[min(980px,96vw)] flex-col overflow-y-auto sm:max-w-[980px]">
+        <div className="pr-8">
+          {loading ? (
+            <div className="flex items-center gap-2 py-10 text-sm text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Загружаем заявку...
+            </div>
+          ) : error ? (
+            <Card className="border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">
+              {error}
+            </Card>
+          ) : detail ? (
+            <>
+              <div className="flex flex-wrap items-center gap-2">
+                <StatusBadge status={statusTone(detail.status)} label={requestStatusLabel(detail.status)} />
+                <Badge variant="outline">{requestTypeLabel(detail.type)}</Badge>
+                {detail.event?.scheduleLocked ? <Badge variant="outline">расписание закрыто</Badge> : null}
+              </div>
+              <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+                <div className="min-w-0">
+                  <h2 className="text-xl font-semibold leading-snug">{detail.title || detail.event?.title || requestTypeLabel(detail.type)}</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {detail.event?.title || 'Новое событие'} · {detail.supplier?.title || 'поставщик не указан'}
+                  </p>
+                  <div className="mt-2 font-mono text-[11px] text-muted-foreground">{detail.id}</div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" onClick={onRefresh}>
+                    <RefreshCcw className="mr-2 h-4 w-4" />
+                    Обновить
+                  </Button>
+                  <Button variant="outline" size="sm" disabled={!detail.actions.canApprove || actingId !== null} onClick={() => onAction(detail, 'approve')}>
+                    {actingId === `${detail.id}:approve` ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="mr-1.5 h-3.5 w-3.5" />}
+                    Одобрить
+                  </Button>
+                  <Button variant="outline" size="sm" disabled={!detail.actions.canReject || actingId !== null} onClick={() => onAction(detail, 'reject')}>
+                    {actingId === `${detail.id}:reject` ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <XCircle className="mr-1.5 h-3.5 w-3.5" />}
+                    Отклонить
+                  </Button>
+                  <Button variant="default" size="sm" disabled={!detail.actions.canApply || actingId !== null} onClick={() => onAction(detail, 'apply')}>
+                    {actingId === `${detail.id}:apply` ? <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" /> : <Send className="mr-1.5 h-3.5 w-3.5" />}
+                    Применить
+                  </Button>
+                </div>
+              </div>
+
+              {detail.diff.warnings.length ? (
+                <div className="mt-5 space-y-2">
+                  {detail.diff.warnings.map((warning) => (
+                    <div key={warning} className="flex items-start gap-2 rounded-md border border-warning/30 bg-warning/10 p-3 text-xs text-warning-foreground">
+                      <AlertTriangle className="mt-0.5 h-3.5 w-3.5" />
+                      <span>{warning}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
+              <Card className="mt-5 border-border p-4">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <h3 className="text-sm font-semibold">Что изменится</h3>
+                  <Badge variant="outline">{formatNumber(detail.diff.items.length)} полей</Badge>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border text-left text-xs uppercase text-muted-foreground">
+                        <th className="py-2 pr-3 font-medium">Поле</th>
+                        <th className="px-3 py-2 font-medium">Сейчас</th>
+                        <th className="px-3 py-2 font-medium">Будет</th>
+                        <th className="py-2 pl-3 font-medium">Тип</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {detail.diff.items.map((item) => (
+                        <tr key={item.path} className="border-b border-border last:border-0">
+                          <td className="min-w-[180px] py-3 pr-3 align-top">
+                            <div className="font-medium text-foreground">{item.label}</div>
+                            <div className="mt-1 font-mono text-[11px] text-muted-foreground">{item.path}</div>
+                          </td>
+                          <td className="max-w-[280px] px-3 py-3 align-top text-xs text-muted-foreground">
+                            <DiffValue value={item.currentValue} />
+                          </td>
+                          <td className="max-w-[280px] px-3 py-3 align-top text-xs text-foreground">
+                            <DiffValue value={item.proposedValue} />
+                          </td>
+                          <td className="py-3 pl-3 align-top">
+                            <ChangeTypeBadge item={item} />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                {!detail.diff.items.length ? (
+                  <div className="rounded-md bg-secondary p-4 text-sm text-muted-foreground">Для этой заявки нет вычисленного diff. Проверь payload preview ниже.</div>
+                ) : null}
+              </Card>
+
+              <div className="mt-5 grid gap-4 lg:grid-cols-[300px_minmax(0,1fr)]">
+                <Card className="border-border p-4">
+                  <h3 className="text-sm font-semibold">Контекст</h3>
+                  <dl className="mt-3 space-y-2 text-sm">
+                    <DetailTerm label="Событие" value={detail.event?.title || 'Новое событие'} />
+                    <DetailTerm label="Slug" value={detail.event?.slug || '-'} mono />
+                    <DetailTerm label="Поставщик" value={detail.supplier?.title || '-'} />
+                    <DetailTerm label="Создал" value={detail.createdBy?.email || '-'} />
+                    <DetailTerm label="Проверил" value={detail.reviewedBy?.email || '-'} />
+                    <DetailTerm label="Создано" value={formatDateTime(detail.createdAt)} />
+                    <DetailTerm label="Обновлено" value={formatDateTime(detail.updatedAt)} />
+                  </dl>
+                </Card>
+
+                <Card className="border-border p-4">
+                  <div className="mb-3 flex items-center gap-2">
+                    <FileJson className="h-4 w-4 text-muted-foreground" />
+                    <h3 className="text-sm font-semibold">Payload preview</h3>
+                  </div>
+                  {detail.payloadPreview.baseSnapshot ? (
+                    <PayloadBlock title="Base snapshot" value={detail.payloadPreview.baseSnapshot} />
+                  ) : null}
+                  <div className="mt-3 space-y-3">
+                    {detail.payloadPreview.sections.map((section) => (
+                      <PayloadBlock key={section.id} title={section.title} value={section.value} />
+                    ))}
+                    {!detail.payloadPreview.sections.length ? (
+                      <div className="rounded-md bg-secondary p-4 text-sm text-muted-foreground">Payload пустой.</div>
+                    ) : null}
+                  </div>
+                </Card>
+              </div>
+            </>
+          ) : null}
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function DetailTerm({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
+  return (
+    <div className="grid gap-1">
+      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dd className={mono ? 'break-all font-mono text-xs text-foreground' : 'text-foreground'}>{value}</dd>
+    </div>
+  );
+}
+
+function PayloadBlock({ title, value }: { title: string; value: unknown }) {
+  return (
+    <div>
+      <div className="mb-1 text-xs font-medium text-muted-foreground">{title}</div>
+      <pre className="max-h-72 overflow-auto rounded-md bg-secondary p-3 text-xs leading-relaxed text-foreground">
+        {formatJson(value)}
+      </pre>
+    </div>
+  );
+}
+
+function DiffValue({ value }: { value: unknown }) {
+  if (value === null || value === undefined || value === '') return <span className="text-muted-foreground">-</span>;
+  if (typeof value === 'object') {
+    return <pre className="max-h-36 overflow-auto whitespace-pre-wrap rounded-md bg-secondary p-2">{formatJson(value)}</pre>;
+  }
+  return <span className="whitespace-pre-wrap">{String(value)}</span>;
+}
+
+function ChangeTypeBadge({ item }: { item: AdminEventChangeRequestDiffItemDto }) {
+  const labels: Record<AdminEventChangeRequestDiffItemDto['changeType'], string> = {
+    added: 'добавлено',
+    changed: 'изменено',
+    removed: 'удалено',
+    unchanged: 'без изменений',
+  };
+  const className =
+    item.changeType === 'added'
+      ? 'border-success/20 bg-success/10 text-success'
+      : item.changeType === 'removed'
+        ? 'border-destructive/20 bg-destructive/10 text-destructive'
+        : item.changeType === 'unchanged'
+          ? 'border-border text-muted-foreground'
+          : 'border-info/20 bg-info/10 text-info';
+  return <Badge variant="outline" className={className}>{labels[item.changeType]}</Badge>;
 }
 
 function RequestsEmptyState() {
@@ -393,4 +658,12 @@ function formatDateTime(value?: string | null) {
     hour: '2-digit',
     minute: '2-digit',
   }).format(date);
+}
+
+function formatJson(value: unknown) {
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return String(value);
+  }
 }

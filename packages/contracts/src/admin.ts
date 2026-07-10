@@ -226,6 +226,32 @@ export interface AdminEventChangeRequestsListDto {
   items: AdminEventChangeRequestRowDto[];
 }
 
+export interface AdminEventChangeRequestDiffItemDto {
+  path: string;
+  label: string;
+  currentValue?: unknown;
+  proposedValue?: unknown;
+  changeType: 'added' | 'changed' | 'removed' | 'unchanged';
+}
+
+export interface AdminEventChangeRequestPayloadPreviewSectionDto {
+  id: string;
+  title: string;
+  kind: string;
+  value: unknown;
+}
+
+export interface AdminEventChangeRequestDetailDto extends AdminEventChangeRequestRowDto {
+  payloadPreview: {
+    baseSnapshot?: Record<string, unknown> | null;
+    sections: AdminEventChangeRequestPayloadPreviewSectionDto[];
+  };
+  diff: {
+    items: AdminEventChangeRequestDiffItemDto[];
+    warnings: string[];
+  };
+}
+
 export interface AdminEventChangeRequestActionDto {
   requestId: string;
   status: string;

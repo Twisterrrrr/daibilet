@@ -181,12 +181,13 @@ packages/contracts/src/admin.ts
 
 - `GET /api/admin/event-change-requests` возвращает список заявок с фильтрами по статусу, типу, поставщику, событию и поиску;
 - строки содержат событие, поставщика, автора, ревьюера, статус, тип, доступные действия и `payloadKeys`, но не сырой payload;
+- `GET /api/admin/event-change-requests/:id` возвращает detail DTO с payload preview, warning-блоком и вычисленным diff "сейчас / будет";
 - `POST /api/admin/event-change-requests/:id/approve` переводит submitted-заявку в approved и пишет audit log;
 - `POST /api/admin/event-change-requests/:id/reject` требует комментарий администратора и пишет audit log;
 - `POST /api/admin/event-change-requests/:id/apply` применяет approved payload через transactional applier и прогревает public cache.
-- в admin добавлена страница `/change-requests` с фильтрами, таблицей заявок и кнопками approve/reject/apply.
+- в admin добавлена страница `/change-requests` с фильтрами, таблицей заявок, drawer/diff и кнопками approve/reject/apply.
 
-Граница: это базовый операторский UI. Полный detail/diff экран с просмотром сырого payload и сравнением полей еще следующий слой.
+Граница: drawer показывает preview и computed diff. Полноценный редактор payload и field-by-field merge пока не включены.
 
 ## Последние проверки
 
@@ -200,7 +201,7 @@ pnpm --filter @daibilet/admin typecheck
 pnpm backend:test:ts
 ```
 
-`backend:test:ts`: 73 теста прошло.
+`backend:test:ts`: 76 тестов прошло.
 
 ## Ближайшие шаги
 

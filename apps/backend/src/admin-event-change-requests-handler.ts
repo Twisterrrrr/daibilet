@@ -1,5 +1,6 @@
 import type {
   AdminEventChangeRequestActionDto,
+  AdminEventChangeRequestDetailDto,
   AdminEventChangeRequestsListDto,
 } from '@daibilet/contracts/admin';
 import { z } from 'zod';
@@ -15,6 +16,10 @@ export type BuildAdminEventChangeRequests = (
   query: AdminEventChangeRequestsQuery,
 ) => Promise<AdminEventChangeRequestsListDto>;
 
+export type BuildAdminEventChangeRequestDetail = (
+  requestId: string,
+) => Promise<AdminEventChangeRequestDetailDto | null>;
+
 export type ApplyEventChangeRequest = (
   input: ApplyEventChangeRequestInput,
 ) => Promise<ApplyEventChangeRequestResult>;
@@ -25,6 +30,7 @@ export type ReviewEventChangeRequest = (
 
 export interface AdminEventChangeRequestsHandlerDependencies {
   buildEventChangeRequests: BuildAdminEventChangeRequests;
+  buildEventChangeRequestDetail: BuildAdminEventChangeRequestDetail;
   reviewEventChangeRequest: ReviewEventChangeRequest;
   applyEventChangeRequest: ApplyEventChangeRequest;
   invalidatePublicCaches: (reason: string, options?: { warm?: boolean }) => void;
@@ -53,6 +59,7 @@ export function createAdminEventChangeRequestsRouteHandler(
 ): TypedRouteHandler {
   return async (context: RouteContext) => {
     if (await handleList(context, deps)) return true;
+    if (await handleDetail(context, deps)) return true;
     if (await handleApprove(context, deps)) return true;
     if (await handleReject(context, deps)) return true;
     return handleApply(context, deps);
@@ -67,6 +74,24 @@ async function handleList(
 
   const query = parseSearchParams(listQuerySchema, context.searchParams);
   sendJson(context.response, await deps.buildEventChangeRequests(query));
+  return true;
+}
+
+async function handleDetail(
+  context: RouteContext,
+  deps: AdminEventChangeRequestsHandlerDependencies,
+): Promise<boolean> {
+  if (context.method !== 'GET') return false;
+  const requestId = matchDetailPath(context);
+  if (!requestId) return false;
+
+  const detail = await deps.buildEventChangeRequestDetail(requestId);
+  if (!detail) {
+    sendJson(context.response, { error: 'event_change_request_not_found' }, { statusCode: 404 });
+    return true;
+  }
+
+  sendJson(context.response, detail);
   return true;
 }
 
@@ -123,5 +148,10 @@ function matchActionPath(context: RouteContext, action: 'approve' | 'reject' | '
     context.pathname,
     new RegExp(`^/api/admin/event-change-requests/([^/]+)/${action}$`),
   );
+  return match?.[0] || null;
+}
+
+function matchDetailPath(context: RouteContext): string | null {
+  const match = matchPath(context.pathname, /^\/api\/admin\/event-change-requests\/([^/]+)$/);
   return match?.[0] || null;
 }

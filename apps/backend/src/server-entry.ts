@@ -1,7 +1,7 @@
 import type { Server } from 'node:http';
 import { buildAdminDashboardDto, clearAdminDashboardDtoCache } from './admin-dashboard.dto.js';
 import { createAdminDashboardRouteHandler } from './admin-dashboard-handler.js';
-import { buildAdminEventChangeRequestsDto } from './admin-event-change-requests.dto.js';
+import { buildAdminEventChangeRequestDetailDto, buildAdminEventChangeRequestsDto } from './admin-event-change-requests.dto.js';
 import { createAdminEventChangeRequestsRouteHandler } from './admin-event-change-requests-handler.js';
 import { createAdminEventsRouteHandler } from './admin-events-handler.js';
 import { createAdminLandingsRouteHandler } from './admin-landings-handler.js';
@@ -112,6 +112,7 @@ const server = startServer({
       }),
       createAdminEventChangeRequestsRouteHandler({
         buildEventChangeRequests: buildAdminEventChangeRequestsDto,
+        buildEventChangeRequestDetail: buildAdminEventChangeRequestDetailDto,
         reviewEventChangeRequest,
         applyEventChangeRequest: applyApprovedEventChangeRequest,
         invalidatePublicCaches,

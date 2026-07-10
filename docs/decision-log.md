@@ -7,21 +7,22 @@
 Решение:
 
 - добавить `GET /api/admin/event-change-requests` для управляемого списка заявок;
+- добавить `GET /api/admin/event-change-requests/:id` для detail/diff просмотра;
 - показывать админке безопасный DTO: событие, поставщик, автор, ревьюер, статус, тип, доступные действия и `payloadKeys`, но не сырой payload;
 - добавить `POST /api/admin/event-change-requests/:id/approve` и `/reject` как review-слой с audit log;
 - оставить `POST /api/admin/event-change-requests/:id/apply` отдельным шагом после approve;
-- добавить страницу админки `/change-requests` с таблицей, фильтрами и действиями;
+- добавить страницу админки `/change-requests` с таблицей, фильтрами, detail drawer и действиями;
 - описать DTO в `packages/contracts/src/admin.ts`, чтобы admin UI и backend не разъехались.
 
 Причина:
 
 - до полноценного ЛК поставщика оператору нужен контроль заявок из админки;
 - approve/reject и apply нельзя смешивать: review принимает человек, apply пишет данные и сбрасывает public cache;
-- UI не должен получать сырой payload без отдельного detail/diff экрана.
+- список не должен получать сырой payload, а detail должен показывать не просто JSON, а понятное "сейчас / будет".
 
 Следствие:
 
-- следующий шаг в admin UI: detail drawer с diff/payload preview;
+- следующий шаг в admin UI: при необходимости добавить field-by-field merge/editor поверх уже готового detail DTO;
 - финконтур/YooKassa по-прежнему не включается этим решением;
 - supplier self-service остается будущим слоем поверх уже проверенного backend workflow.
 

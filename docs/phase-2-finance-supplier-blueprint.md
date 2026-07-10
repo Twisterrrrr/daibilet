@@ -310,12 +310,13 @@ Implemented admin moderation/read API slice 2026-07-10:
 
 - `GET /api/admin/event-change-requests` lists requests with status/type/supplier/event/search filters, pagination and facets;
 - rows expose safe admin DTO fields and `payloadKeys`, not raw `payload`;
+- `GET /api/admin/event-change-requests/:id` exposes payload preview, warnings and computed "current/proposed" diff;
 - `POST /api/admin/event-change-requests/:id/approve` and `/reject` review submitted requests and write `EventChangeLog`;
 - reject requires an admin comment;
 - `POST /api/admin/event-change-requests/:id/apply` stays a separate system/apply step and invalidates public caches;
 - contracts live in `packages/contracts/src/admin.ts`, so admin UI can be wired without retyping backend shapes;
-- admin UI page `/change-requests` lists requests, filters by status/type/search and exposes approve/reject/apply actions;
-- raw payload diff/editor is intentionally deferred to a dedicated detail screen.
+- admin UI page `/change-requests` lists requests, filters by status/type/search, opens a detail drawer and exposes approve/reject/apply actions;
+- raw payload editing and manual field-level merge are intentionally deferred.
 
 ### Phase 2.2: admin supplier control plane
 
