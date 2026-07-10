@@ -165,12 +165,12 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         primary_offer."priceRub" as "offerPriceRub",
         primary_offer."widgetUrl" as "offerWidgetUrl",
         primary_offer."deeplinkUrl" as "offerDeeplinkUrl",
-        min(session."startsAt") filter (where session."startsAt" >= now()) as "startsAt",
+        min(session."startsAt") filter (where coalesce(session."endsAt", session."startsAt") >= now()) as "startsAt",
         min(session."priceFromRub") filter (
-          where session."startsAt" >= now()
+          where coalesce(session."endsAt", session."startsAt") >= now()
             and session."priceFromRub" >= ${MIN_DISPLAY_PRICE_RUB}
         ) as "sessionPriceFromRub",
-        count(distinct session.id) filter (where session."startsAt" >= now())::int as "slotCount",
+        count(distinct session.id) filter (where coalesce(session."endsAt", session."startsAt") >= now())::int as "slotCount",
         (
           select coalesce(array_agg(title order by priority, title), '{}')
           from (
@@ -247,11 +247,18 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
           where price is not null and price >= ${MIN_DISPLAY_PRICE_RUB}
         ) as "priceFrom",
         (
-          "offerWidgetUrl" is not null
-          or "offerDeeplinkUrl" is not null
-          or (
-            coalesce("sourceCode"::text, "offerSourceCode"::text, '') in ('TICKETSCLOUD', 'TEPLOHOD')
-            and "externalId" is not null
+          (
+            "offerWidgetUrl" is not null
+            or "offerDeeplinkUrl" is not null
+            or (
+              coalesce("sourceCode"::text, "offerSourceCode"::text, '') in ('TICKETSCLOUD', 'TEPLOHOD')
+              and "externalId" is not null
+            )
+          )
+          and (
+            coalesce("slotCount", 0) > 0
+            or kind = 'OPEN_DATE'
+            or "sourceStatus" = 'open_date'
           )
         ) as "purchaseReady"
       from event_base
@@ -273,7 +280,6 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
           "startsAt" is not null
           or kind = 'OPEN_DATE'
           or "sourceStatus" = 'open_date'
-          or "sourceCode" = 'TEPLOHOD'
         )
     ),
     ranked as (
@@ -318,7 +324,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
       join "EventSession" session on session."eventId" = ranked.id
       left join session_identity on session_identity."sessionId" = session.id
       left join "Source" session_source on session_source.id = session_identity."sourceId"
-      where session."startsAt" >= now()
+      where coalesce(session."endsAt", session."startsAt") >= now()
     ),
     grouped_slots as (
       select

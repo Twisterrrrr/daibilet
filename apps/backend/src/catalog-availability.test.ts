@@ -1,0 +1,37 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import {
+  hasUpcomingOrOpenSchedule,
+  isOpenDateCatalogRow,
+  isSaleableForPublicCatalog,
+} from './catalog-availability.js';
+
+test('isOpenDateCatalogRow accepts OPEN_DATE kind and open_date status', () => {
+  assert.equal(isOpenDateCatalogRow({ kind: 'OPEN_DATE' }), true);
+  assert.equal(isOpenDateCatalogRow({ sourceStatus: 'open_date' }), true);
+  assert.equal(isOpenDateCatalogRow({ kind: 'SINGLE' }), false);
+});
+
+test('hasUpcomingOrOpenSchedule rejects past TEP rows without schedule', () => {
+  const past = new Date(Date.now() - 60_000).toISOString();
+  assert.equal(hasUpcomingOrOpenSchedule({ kind: 'SINGLE', startsAt: past }), false);
+  assert.equal(hasUpcomingOrOpenSchedule({ kind: 'SINGLE', startsAt: null }), false);
+});
+
+test('hasUpcomingOrOpenSchedule accepts running session via endsAt', () => {
+  const started = new Date(Date.now() - 3_600_000).toISOString();
+  const ends = new Date(Date.now() + 3_600_000).toISOString();
+  assert.equal(hasUpcomingOrOpenSchedule({ kind: 'RECURRING', startsAt: started, endsAt: ends }), true);
+});
+
+test('isSaleableForPublicCatalog requires widget-ready schedule and price', () => {
+  const future = new Date(Date.now() + 3_600_000).toISOString();
+  assert.equal(
+    isSaleableForPublicCatalog({ kind: 'SINGLE', startsAt: future, purchaseReady: true, priceFrom: 500 }),
+    true,
+  );
+  assert.equal(
+    isSaleableForPublicCatalog({ kind: 'SINGLE', startsAt: future, purchaseReady: false, priceFrom: 500 }),
+    false,
+  );
+});

@@ -1,4 +1,8 @@
 import { Prisma, prisma } from '../../../packages/db/src/client.ts';
+import {
+  isOpenDateCatalogRow,
+  isSaleableForPublicCatalog,
+} from './catalog-availability.js';
 import { findLandingRule, matchingLandingSlugs } from './landing-rules.js';
 import {
   buildProviderWidgetPayload,
@@ -136,11 +140,15 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
   if (!eventsById.has(requestedEvent.id)) eventsById.set(requestedEvent.id, requestedEvent);
   const representative = eventsById.get(targetCatalogSession?.id || '') || requestedEvent;
 
+  const now = new Date();
   const [sessionRows, offerRows] = await Promise.all([
     prisma.eventSession.findMany({
       where: {
         eventId: { in: groupEventIds },
-        OR: [{ startsAt: null }, { startsAt: { gte: new Date() } }],
+        OR: [
+          { endsAt: { gte: now } },
+          { startsAt: { gte: now } },
+        ],
       },
       include: sessionInclude,
       orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
@@ -276,6 +284,17 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
   const vacantValues = sessions.map((session) => session.vacant)
     .filter((value): value is number => Number.isFinite(value));
 
+  if (!isSaleableForPublicCatalog({
+    kind: requestedEvent.kind,
+    sourceStatus: requestedEvent.sourceStatus,
+    startsAt: sessions.find((session) => session.startsAt)?.startsAt || null,
+    endsAt: sessions.find((session) => session.endsAt)?.endsAt || null,
+    purchaseReady: event.purchaseReady,
+    priceFrom: event.priceFrom,
+  })) {
+    return null;
+  }
+
   return {
     generatedAt: new Date().toISOString(),
     event,
@@ -380,7 +399,13 @@ function buildWidgetOnlySessions(
   purchaseUrl: string | null,
   catalogSession?: PublicSessionDto,
 ): PublicEventSession[] {
-  if (sessions.length || providerForSource(sourceCode) !== 'TEPLOHOD' || !purchase.ready) return [];
+  if (
+    sessions.length ||
+    !isOpenDateCatalogRow({ kind: event.kind, sourceStatus: event.sourceStatus }) ||
+    !purchase.ready
+  ) {
+    return [];
+  }
   return [{
     id: `widget_tep_${event.id}`,
     eventId: event.id,
