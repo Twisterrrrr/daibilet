@@ -431,7 +431,7 @@ function buildLaunchMetrics(events) {
   };
 }
 
-function isSaleableEventForPublic(event) {
+export function isSaleableEventForPublic(event) {
   return Boolean(hasUpcomingOrOpenSchedule(event) && event.purchaseReady && Number.isFinite(event.priceFrom) && event.priceFrom >= MIN_DISPLAY_PRICE_RUB);
 }
 
