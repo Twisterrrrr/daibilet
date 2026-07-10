@@ -173,6 +173,18 @@
 
 ---
 
+## 2026-07-10 — Path B: Next full-stack monorepo (SEO)
+
+**Решение:** Миграция на Next.js App Router (`apps/web`) + pnpm monorepo + Prisma. SSR для indexable страниц (catalog, event, city, venue, landings). Не откладывать SEO ради стабильности SPA.
+
+**Почему:** Vite CSR + lazy load 60 — поисковики получают мало контента без JS. Path B из аудита — целевое решение.
+
+**Codex:** параллельно `codex/phase2-finance-next` — Phase 2 schema + supplier admin read, **без** YooKassa runtime.
+
+**Статус:** Активно. [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md).
+
+---
+
 ## Шаблон новой записи
 
 ```markdown

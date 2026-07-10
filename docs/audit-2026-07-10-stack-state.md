@@ -30,11 +30,9 @@
 
 **Next.js в репозитории отсутствует** (нет `next` в dependencies, нет `app/` / `pages/` router).
 
-### Рекомендации (frontend)
+### Рекомендации (frontend) — superseded 2026-07-10
 
-1. **Не мигрировать на Next.js до стабилизации backend** — смена SSR/SSG добавит риск для SEO и deploy без выигрыша на текущем объёме SPA.
-2. Если понадобится SSR для SEO — точечно: landing/city/event meta уже через API + client; рассмотреть **prerender** или **edge HTML** для top-N URL, не big-bang Next.
-3. Держать `PUBLIC_API_URL` / `API_BASE_URL` явными в build env (staging vs prod).
+~~Не мигрировать на Next.js до стабилизации backend~~ → **Path B утверждён**, см. [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md).
 
 ---
 

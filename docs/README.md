@@ -23,6 +23,8 @@
 |----------|----------|
 | [phases/README.md](./phases/README.md) | Дорожная карта фаз A–E |
 | [phases/phase-e-prisma-runtime.md](./phases/phase-e-prisma-runtime.md) | **Фаза E (закрыта):** TS flags, parity, staging DB |
+| [phases/phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md) | **Фаза F:** Next full-stack, SEO SSR |
+| [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md) | **Codex:** Phase 2 finance в Next monorepo |
 | [phases/phase-a-widget-readiness.md](./phases/phase-a-widget-readiness.md) | **Фаза A (закрыта):** API-проверка виджетов |
 | [phases/phase-b-import-sync.md](./phases/phase-b-import-sync.md) | **Фаза B (закрыта):** sync → БД, ProviderLink |
 | [phases/phase-c-data-integrity.md](./phases/phase-c-data-integrity.md) | **Фаза C (закрыта):** инварианты, import guards |

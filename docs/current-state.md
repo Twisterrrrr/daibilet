@@ -1,56 +1,48 @@
 # Текущее состояние Daibilet
 
-Дата: **2026-07-10** (после фазы E — Prisma runtime rollout)  
-Ветка: **`integrate/mvp-launch`**
+Дата: **2026-07-10** (фаза E закрыта → старт F Path B)  
+Ветка prod: **`integrate/mvp-launch`**  
+Ветка migration: **`feat/next-monorepo`** (создаётся в F1)
 
-> **Аудит стека:** [audit-2026-07-10-stack-state.md](./audit-2026-07-10-stack-state.md)  
-> Кратко: **Vite/React SPA + Node `start:ts` + Prisma schema**, public read typed с parity; **не Next.js**, **не 100% Prisma Client**.
+> **Стратегия:** [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md) — Next full-stack + SSR для SEO.  
+> **Codex:** [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md) — Phase 2 finance foundation в новом monorepo.
 
-## Фазы A–E
+## Фазы A–F
 
 | Фаза | Статус | Документ |
 |------|--------|----------|
-| A — виджет API | ✅ | [phase-a-widget-readiness.md](./phases/phase-a-widget-readiness.md) |
-| B — import sync → БД | ✅ | [phase-b-import-sync.md](./phases/phase-b-import-sync.md) |
-| C — целостность данных | ✅ | [phase-c-data-integrity.md](./phases/phase-c-data-integrity.md) |
-| D — deploy / CI / parity | ✅ | [phase-d-deploy-parity.md](./phases/phase-d-deploy-parity.md) |
-| E — Prisma runtime rollout | ✅ | [phase-e-prisma-runtime.md](./phases/phase-e-prisma-runtime.md) |
+| A–E | ✅ | [phases/README.md](./phases/README.md) |
+| **F** — Next monorepo + SSR | 🔄 F1 | [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md) |
+| **G** — Phase 2 finance runtime | ⏳ | [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md) |
 
-## Prod runtime (2026-07-10)
+## Prod (widget MVP — до cutover F3)
 
-- API: `start:ts`, все `DAIBILET_TS_PUBLIC_*` + `DAIBILET_TS_ADMIN_*` = 1
-- DB prod: `127.0.0.1:5437/daibilet`
-- DB staging: `127.0.0.1:5438/daibilet_staging` (snapshot prod)
+- API: `start:ts`, все `DAIBILET_TS_*=1`
+- Frontend: **Vite SPA** (временно, до F3)
+- DB prod: `5437/daibilet` · staging: `5438/daibilet_staging`
+
+## SEO (мотивация F)
+
+CSR-каталог и lazy load **не подходят** для индексации. F2: SSR page 1 каталога (120), event/city/venue `generateMetadata`.
 
 ## Deploy
 
 ```bash
-# Staging
-./deploy/scripts/deploy-staging.sh
-
-# Prod
+# Текущий prod (до Next cutover)
 ./deploy/scripts/deploy-from-git.sh
 
-# Staging DB refresh (E5)
+# Staging DB refresh
 STAGING_POSTGRES_PASSWORD=... bash deploy/scripts/restore-staging-db.sh
 ```
 
-Post-deploy: `npm run check:post-deploy` · Parity: `npm run check:parity`
+## Ops backlog
 
-## CI
-
-GitHub Actions: `.github/workflows/ci.yml` — validate, test, build на PR/push.
-
-## Ops backlog (Phase F)
-
-- [ ] `npm run tc:sync` на prod (backfill widgetUrl)
-- [ ] Nightly cron: parity + widgets + invariants
-- [ ] Browser smoke (ручной)
-- [ ] Venue/city Prisma-native (убрать делегаты dto.js)
-- [ ] Admin dashboard/sources на Prisma read
+- [ ] F1: `apps/web` Next shell + pnpm
+- [ ] F2: public SSR routes + parity
+- [ ] `tc:sync` widgetUrl backfill на prod
+- [ ] Codex: `codex/phase2-finance-next` от F1
 
 ## Документы
 
 - [audit-2026-07-10-stack-state.md](./audit-2026-07-10-stack-state.md)
-- [phases/README.md](./phases/README.md)
-- [deploy-staging.md](./deploy-staging.md)
+- [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md)
