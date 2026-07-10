@@ -8451,7 +8451,7 @@ function isCatalogSubcategoryLabel(label, category) {
   return true;
 }
 
-function pickCatalogSubcategories(session, limit = 4) {
+export function pickCatalogSubcategories(session, limit = 4) {
   const category = session.category || session.sourceCategory || '';
   const labels = [];
   const seen = new Set();

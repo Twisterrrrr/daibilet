@@ -2,14 +2,12 @@ import { Prisma, prisma } from '../../../packages/db/src/client.ts';
 import {
   dedupeCrossSourceCatalogSessions,
   mapGroupedPublicSession,
+  pickCatalogSubcategories,
   regroupMappedPublicCatalogSessions,
   sessionHasCoverImage,
 } from './dto.js';
 import { findLandingRule } from './landing-rules.js';
-import {
-  pickCatalogSubcategories,
-  type PublicCatalogMappingRow,
-} from './public-catalog.mapper.js';
+import type { PublicCatalogMappingRow } from './public-catalog.mapper.js';
 import type { PublicCatalogDto, PublicSessionDto } from './types/public.js';
 import type { PublicCatalogQuery } from './types/schemas.js';
 
