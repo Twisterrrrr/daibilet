@@ -130,7 +130,12 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
   );
 
   const requestedEvent = await resolveEvent(eventSlugOrId, targetCatalogSession);
-  if (!requestedEvent) return null;
+  if (!requestedEvent) {
+    if (process.env.DAIBILET_DEBUG_EVENT === '1') {
+      console.error('event resolve failed', eventSlugOrId, Boolean(targetCatalogSession));
+    }
+    return null;
+  }
   const groupEventIds = targetCatalogSession?.groupEventIds?.length
     ? targetCatalogSession.groupEventIds
     : [requestedEvent.id];
@@ -296,6 +301,16 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     purchaseReady: event.purchaseReady,
     priceFrom: event.priceFrom,
   })) {
+    if (process.env.DAIBILET_DEBUG_EVENT === '1') {
+      console.error('event saleability rejected', eventSlugOrId, {
+        kind: requestedEvent.kind,
+        sourceStatus: requestedEvent.sourceStatus,
+        startsAt: sessions.find((session) => session.startsAt)?.startsAt || null,
+        purchaseReady: event.purchaseReady,
+        priceFrom: event.priceFrom,
+        sessions: sessions.length,
+      });
+    }
     return null;
   }
 
