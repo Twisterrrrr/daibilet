@@ -35,6 +35,8 @@
     "check:sync-invariants": "node scripts/sync-invariants-check.js",
     "check:post-deploy": "bash scripts/post-deploy-check.sh",
     "check:parity": "bash scripts/run-parity-check.sh",
+    "launch:widgeturl-stats": "node scripts/launch-widgeturl-stats.js",
+    "launch:staging-smoke": "bash scripts/launch-staging-smoke.sh",
     "tc:orders": "node scripts/tc-sync-orders.js",
     "tc:city-routing": "node scripts/tc-city-routing-summary.js",
     "landing:snapshot": "node scripts/landing-snapshot.mjs --write",
