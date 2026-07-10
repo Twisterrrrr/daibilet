@@ -1,4 +1,8 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { prisma } from '../../../packages/db/src/client.ts';
+import { buildPublicVenuePage } from './dto.js';
+import { createDb } from './db.js';
 import { getPublicCatalogSessions } from './public-catalog.dto.js';
 import type {
   PublicSessionDto,
@@ -7,7 +11,8 @@ import type {
   PublicVenuesDto,
 } from './types/public.js';
 
-const MIN_DISPLAY_PRICE_RUB = 100;
+const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+
 const PUBLIC_VENUE_CACHE_MS = 5 * 60 * 1000;
 
 interface CachedPayload<T> {
@@ -18,6 +23,12 @@ interface CachedPayload<T> {
 const pageCache = new Map<string, CachedPayload<PublicVenuePageDto | null>>();
 let venuesCache: CachedPayload<PublicVenuesDto> | null = null;
 let venuesBuild: Promise<PublicVenuesDto> | null = null;
+let legacyDb: ReturnType<typeof createDb> | null = null;
+
+function getLegacyDb() {
+  if (!legacyDb) legacyDb = createDb(projectRoot);
+  return legacyDb;
+}
 
 export function clearPublicVenueDtoCache(): void {
   pageCache.clear();
@@ -63,65 +74,9 @@ export async function buildPublicVenueDto(
   if (!forceRefresh && cached && cached.expiresAt > Date.now()) return cached.payload;
   if (forceRefresh) pageCache.delete(cacheKey);
 
-  const venue = await prisma.venue.findFirst({
-    where: { OR: [{ slug: venueSlugOrId }, { id: venueSlugOrId }] },
-    include: { city: true },
-  });
-  if (!venue || venue.pageStatus === 'HIDDEN') {
-    pageCache.set(cacheKey, { expiresAt: Date.now() + PUBLIC_VENUE_CACHE_MS, payload: null });
-    return null;
-  }
-
-  const catalogSessions = await getPublicCatalogSessions(forceRefresh);
-  const sessions = catalogSessions.filter((session) => session.venueId === venue.id).slice(0, 120);
-  const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
-  const prices = sessions
-    .map((session) => session.priceFrom)
-    .filter((price): price is number => Number.isFinite(price) && Number(price) >= MIN_DISPLAY_PRICE_RUB);
-  const relatedVenues = await publicRelatedVenues(venue.id, venue.city?.title || null, catalogSessions, 6);
-  const payload: PublicVenuePageDto = {
-    generatedAt: new Date().toISOString(),
-    venue: mapVenue(venue, sessions.length, categories, false),
-    sessions,
-    relatedVenues,
-    stats: {
-      events: sessions.length,
-      categories: Object.keys(categories).length,
-      priceFrom: prices.length ? Math.min(...prices) : null,
-    },
-  };
+  const payload = (await buildPublicVenuePage(getLegacyDb(), venueSlugOrId)) as PublicVenuePageDto | null;
   pageCache.set(cacheKey, { expiresAt: Date.now() + PUBLIC_VENUE_CACHE_MS, payload });
   return payload;
-}
-
-async function publicRelatedVenues(
-  venueId: string,
-  city: string | null,
-  catalogSessions: PublicSessionDto[],
-  limit: number,
-): Promise<PublicVenueDto[]> {
-  if (!city) return [];
-  const eventCounts = countSessionsByVenue(catalogSessions);
-  const venueIds = [...new Set(
-    catalogSessions
-      .filter((session) => session.venueId && session.venueId !== venueId && session.city === city)
-      .map((session) => session.venueId)
-      .filter(isDefined),
-  )];
-  if (!venueIds.length) return [];
-  const venues = await prisma.venue.findMany({
-    where: {
-      id: { in: venueIds },
-      city: { title: city },
-      pageStatus: { not: 'HIDDEN' },
-    },
-    include: { city: true },
-  });
-  return venues
-    .sort((left, right) =>
-      (eventCounts.get(right.id) || 0) - (eventCounts.get(left.id) || 0) || left.title.localeCompare(right.title, 'ru'))
-    .slice(0, limit)
-    .map((venue) => mapVenue(venue, eventCounts.get(venue.id) || 0, {}, true));
 }
 
 function mapVenue(
@@ -189,13 +144,3 @@ function countSessionsByVenue(sessions: PublicSessionDto[]): Map<string, number>
   return counts;
 }
 
-function countBy(values: string[]): Record<string, number> {
-  return values.reduce<Record<string, number>>((result, value) => {
-    result[value] = (result[value] || 0) + 1;
-    return result;
-  }, {});
-}
-
-function isDefined<T>(value: T | null | undefined): value is T {
-  return value != null;
-}
