@@ -195,6 +195,16 @@
 
 ---
 
+## 2026-07-10 — Catalog page sizes: 100 / 200 / 300
+
+**Решение:** Public catalog default limit **100**, max **300**, UI selector **100 / 200 / 300**. SSR page 1 всегда рендерит default (100), независимо от selector.
+
+**Почему:** Круглые порции, ×1.67 к текущим 60, вписываются в perf budget (~8 KB JSON на 100). Константы в `@daibilet/contracts/catalog`.
+
+**Статус:** Активно.
+
+---
+
 ## Шаблон новой записи
 
 ```markdown

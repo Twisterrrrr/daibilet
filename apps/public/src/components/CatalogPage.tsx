@@ -70,7 +70,9 @@ function categoryEmoji(name: string): string {
   return CATEGORY_EMOJI[name] || '🎫';
 }
 
-const CATALOG_PAGE_LIMIT = 60;
+const CATALOG_PAGE_SIZES = [100, 200, 300] as const;
+type CatalogPageSize = (typeof CATALOG_PAGE_SIZES)[number];
+const CATALOG_PAGE_SIZE_DEFAULT: CatalogPageSize = 100;
 const MIN_DISPLAY_PRICE_RUB = 100;
 
 function isDefaultCatalogQuery(params: {
@@ -107,7 +109,7 @@ export function CatalogPage() {
   const initialParams = React.useMemo(() => new URLSearchParams(window.location.search), []);
   const cachedCatalog = React.useMemo(() => readCachedCatalogPage(), []);
   const [catalogSessions, setCatalogSessions] = React.useState<PublicSession[]>(
-    () => cachedCatalog?.items || publicData.sessions.slice(0, CATALOG_PAGE_LIMIT),
+    () => cachedCatalog?.items || publicData.sessions.slice(0, CATALOG_PAGE_SIZE_DEFAULT),
   );
   const [catalogTotal, setCatalogTotal] = React.useState(
     () => cachedCatalog?.total || publicData.stats.events || publicData.sessions.length,
@@ -128,6 +130,7 @@ export function CatalogPage() {
   const [maxPrice, setMaxPrice] = React.useState(() => parseMaxPriceFilter(initialParams.get('maxPrice')));
   const [ageMax, setAgeMax] = React.useState(() => parseAgeMaxFilter(initialParams.get('ageMax')));
   const [sort, setSort] = React.useState<SortMode>(() => parseSortMode(initialParams.get('sort')));
+  const [pageLimit, setPageLimit] = React.useState<CatalogPageSize>(() => parsePageLimit(initialParams.get('limit')));
   const [mode, setModeState] = React.useState<ViewMode>(() => {
     const fromUrl = initialParams.get('view');
     if (fromUrl) return parseViewMode(fromUrl);
@@ -150,7 +153,7 @@ export function CatalogPage() {
 
   React.useEffect(() => {
     const controller = new AbortController();
-    const params = new URLSearchParams({ limit: String(CATALOG_PAGE_LIMIT), offset: String(catalogOffset), sort });
+    const params = new URLSearchParams({ limit: String(pageLimit), offset: String(catalogOffset), sort });
     if (query.trim()) params.set('q', query.trim());
     if (city !== 'all') params.set('city', city);
     if (category !== 'all') params.set('category', category);
@@ -216,13 +219,13 @@ export function CatalogPage() {
       if (debounce != null) window.clearTimeout(debounce);
       window.clearTimeout(timeout);
     };
-  }, [ageMax, catalogOffset, category, city, date, dateFrom, dateTo, landing, maxPrice, minPrice, query, sort]);
+  }, [ageMax, catalogOffset, category, city, date, dateFrom, dateTo, landing, maxPrice, minPrice, pageLimit, query, sort]);
 
   React.useEffect(() => {
-    syncCatalogUrl({ query, city, category, landing, date, dateFrom, dateTo, minPrice, maxPrice, ageMax, sort, mode });
-  }, [ageMax, category, city, date, dateFrom, dateTo, landing, maxPrice, minPrice, mode, query, sort]);
+    syncCatalogUrl({ query, city, category, landing, date, dateFrom, dateTo, minPrice, maxPrice, ageMax, sort, mode, pageLimit });
+  }, [ageMax, category, city, date, dateFrom, dateTo, landing, maxPrice, minPrice, mode, pageLimit, query, sort]);
 
-  const sourceSessions = hasLoadedCatalog ? catalogSessions : publicData.sessions.slice(0, CATALOG_PAGE_LIMIT);
+  const sourceSessions = hasLoadedCatalog ? catalogSessions : publicData.sessions.slice(0, pageLimit);
   const fallbackFacets = React.useMemo(() => buildCatalogFacets(publicData.sessions), []);
   const facets = catalogFacets || fallbackFacets;
   const rawCities = facets.cities?.length ? facets.cities : fallbackFacets.cities;
@@ -292,6 +295,10 @@ export function CatalogPage() {
   };
   const setSortFilter = (value: SortMode) => {
     setSort(value);
+    setCatalogOffset(0);
+  };
+  const setPageLimitFilter = (value: CatalogPageSize) => {
+    setPageLimit(value);
     setCatalogOffset(0);
   };
   const reset = () => {
@@ -413,6 +420,8 @@ export function CatalogPage() {
             categories={categories}
             sort={sort}
             setSort={setSortFilter}
+            pageLimit={pageLimit}
+            setPageLimit={setPageLimitFilter}
             mode={mode}
             setMode={setMode}
             filtersOpen={filtersOpen}
@@ -435,6 +444,7 @@ export function CatalogPage() {
           <CatalogPagination
             total={catalogTotal}
             shown={visibleSessions.length}
+            pageLimit={pageLimit}
             isLoading={isLoading}
             onLoadMore={() => setCatalogOffset(visibleSessions.length)}
           />
@@ -497,6 +507,8 @@ function CatalogToolbarSticky({
   categories,
   sort,
   setSort,
+  pageLimit,
+  setPageLimit,
   mode,
   setMode,
   filtersOpen,
@@ -525,6 +537,8 @@ function CatalogToolbarSticky({
   categories: Array<[string, number]>;
   sort: SortMode;
   setSort: (value: SortMode) => void;
+  pageLimit: CatalogPageSize;
+  setPageLimit: (value: CatalogPageSize) => void;
   mode: ViewMode;
   setMode: (value: ViewMode) => void;
   filtersOpen: boolean;
@@ -601,6 +615,25 @@ function CatalogToolbarSticky({
           </div>
 
           <div className="ml-auto flex items-center gap-2">
+            <div className="relative hidden sm:block">
+              <label htmlFor="catalog-page-size" className="sr-only">
+                Карточек на странице
+              </label>
+              <select
+                id="catalog-page-size"
+                value={pageLimit}
+                onChange={(event) => setPageLimit(Number(event.target.value) as CatalogPageSize)}
+                className="h-10 appearance-none rounded-xl bg-slate-100 pl-3 pr-8 text-sm font-semibold text-slate-700 outline-none transition hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-primary/60"
+              >
+                {CATALOG_PAGE_SIZES.map((size) => (
+                  <option key={size} value={size}>
+                    {size} на странице
+                  </option>
+                ))}
+              </select>
+              <ChevronDown aria-hidden className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            </div>
+
             <button
               type="button"
               onClick={() => setFiltersOpen(!filtersOpen)}
@@ -908,11 +941,13 @@ function SortableTableHeader({
 function CatalogPagination({
   total,
   shown,
+  pageLimit,
   isLoading,
   onLoadMore,
 }: {
   total: number;
   shown: number;
+  pageLimit: number;
   isLoading: boolean;
   onLoadMore: () => void;
 }) {
@@ -929,7 +964,7 @@ function CatalogPagination({
         disabled={isLoading}
         className="inline-flex min-h-10 items-center justify-center rounded-full bg-primary-600 px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 disabled:cursor-wait disabled:bg-slate-300"
       >
-        {isLoading ? 'Загружаем...' : `Показать еще ${formatNumber(Math.min(CATALOG_PAGE_LIMIT, remaining))}`}
+        {isLoading ? 'Загружаем...' : `Показать еще ${formatNumber(Math.min(pageLimit, remaining))}`}
       </button>
     </div>
   );
@@ -1057,6 +1092,12 @@ function parseAgeMaxFilter(value: string | null): number {
   return Math.round(age);
 }
 
+function parsePageLimit(value: string | null): CatalogPageSize {
+  const parsed = Number(value);
+  if (CATALOG_PAGE_SIZES.includes(parsed as CatalogPageSize)) return parsed as CatalogPageSize;
+  return CATALOG_PAGE_SIZE_DEFAULT;
+}
+
 function syncCatalogUrl(filters: {
   query: string;
   city: string;
@@ -1070,6 +1111,7 @@ function syncCatalogUrl(filters: {
   ageMax: number;
   sort: SortMode;
   mode: ViewMode;
+  pageLimit: CatalogPageSize;
 }) {
   const params = new URLSearchParams();
   const query = filters.query.trim();
@@ -1084,6 +1126,7 @@ function syncCatalogUrl(filters: {
   if (filters.maxPrice !== 'all') params.set('maxPrice', filters.maxPrice);
   if (filters.ageMax >= 0) params.set('ageMax', String(filters.ageMax));
   if (filters.sort !== 'popular') params.set('sort', filters.sort);
+  if (filters.pageLimit !== CATALOG_PAGE_SIZE_DEFAULT) params.set('limit', String(filters.pageLimit));
   if (filters.mode !== 'cards') params.set('view', filters.mode);
 
   const queryString = params.toString();

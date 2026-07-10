@@ -844,7 +844,7 @@ async function readJsonBody(request) {
 }
 
 function filterSessions(sessions, searchParams) {
-  const limit = clampNumber(searchParams.get('limit'), 1, 240, 120);
+  const limit = clampNumber(searchParams.get('limit'), 1, 300, 100);
   const offset = clampNumber(searchParams.get('offset'), 0, 100000, 0);
   const query = String(searchParams.get('q') || '').trim().toLowerCase();
   const destination = searchParams.get('destination');

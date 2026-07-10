@@ -10,7 +10,7 @@ const idList = z.array(z.string().trim().min(1)).max(100).optional();
 const publishStatus = z.enum(['DRAFT', 'REVIEW', 'READY', 'PUBLISHED', 'HIDDEN']);
 
 export const paginationQuerySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(200).optional(),
+  limit: z.coerce.number().int().min(1).max(300).optional(),
   offset: z.coerce.number().int().min(0).optional(),
   page: z.coerce.number().int().min(1).optional(),
 });

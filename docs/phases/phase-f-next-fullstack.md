@@ -29,7 +29,7 @@
 |-------------------------|--------------|
 | `/events` — контент после JS + fetch | SSR первой страницы каталога в HTML |
 | `/events/:slug`, `/cities/*`, `/venues/*` — meta в client | `generateMetadata` + server fetch |
-| Lazy load 60 — бот видит мало | SSR **N** карточек (120 default), «ещё» — enhancement |
+| Lazy load 60 — бот видит мало | SSR **100** карточек (default), selector **100/200/300**, «ещё» — enhancement |
 | Нет crawlable pagination | URL `?page=` / `<link rel="next">` |
 
 **Правило:** всё с `index,follow` рендерится на сервере. Client-only — только buyer account, admin auth flows.
@@ -84,7 +84,7 @@ Handoff для Codex: [codex-phase2-next-handoff.md](../codex-phase2-next-handof
 
 ### F2 — Public SSR (2–3 нед)
 
-- [ ] **Каталог** `/events` — SSR page 1 (limit=120), facets server-side
+- [ ] **Каталог** `/events` — SSR page 1 (limit=100), facets server-side
 - [ ] **Event** `/events/[slug]` — SSR + `generateMetadata`
 - [ ] **City** `/cities/[slug]` — SSR
 - [ ] **Venue/location** `/venues/[slug]`, `/locations/[slug]` — SSR
@@ -95,9 +95,9 @@ Handoff для Codex: [codex-phase2-next-handoff.md](../codex-phase2-next-handof
 **SEO exit:** View Source содержит карточки + title/description без JS.
 
 **Catalog pagination:**
-- SSR: page 1 (120 items) в HTML
+- SSR: page 1 (**100** items default) в HTML
 - «Показать ещё» / `?page=2` — crawlable links, не только JS
-- Опционально: selector 60/120/200 — **первая порция всегда в SSR**
+- Selector **100 / 200 / 300** — **первая SSR-порция всегда 100** (default)
 
 ### F3 — Cutover public (1 нед)
 

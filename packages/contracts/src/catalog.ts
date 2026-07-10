@@ -1,0 +1,12 @@
+/** Public catalog page sizes (SSR default + UI selector). */
+export const CATALOG_PAGE_SIZES = [100, 200, 300] as const;
+
+export type CatalogPageSize = (typeof CATALOG_PAGE_SIZES)[number];
+
+export const CATALOG_PAGE_SIZE_DEFAULT: CatalogPageSize = 100;
+
+export const CATALOG_PAGE_SIZE_MAX: CatalogPageSize = 300;
+
+export function isCatalogPageSize(value: number): value is CatalogPageSize {
+  return (CATALOG_PAGE_SIZES as readonly number[]).includes(value);
+}

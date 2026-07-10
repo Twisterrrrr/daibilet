@@ -23,7 +23,7 @@
 
 ## SEO (мотивация F)
 
-CSR-каталог и lazy load **не подходят** для индексации. F2: SSR page 1 каталога (120), event/city/venue `generateMetadata`.
+CSR-каталог и lazy load **не подходят** для индексации. F2: SSR page 1 каталога (**100**, selector 100/200/300), event/city/venue `generateMetadata`.
 
 ## Deploy
 

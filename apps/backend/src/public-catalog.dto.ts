@@ -1,3 +1,4 @@
+import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZE_MAX } from '@daibilet/contracts/catalog';
 import { Prisma, prisma } from '../../../packages/db/src/client.ts';
 import {
   dedupeCrossSourceCatalogSessions,
@@ -51,7 +52,7 @@ export async function buildPublicCatalogDto(query: PublicCatalogQuery): Promise<
   const facets = buildCatalogFacets(coverSessions);
   const filtered = coverSessions.filter((session) => matchesCatalogQuery(session, query));
   const sorted = sortCatalogSessions(filtered, query.sort || 'time');
-  const limit = clampNumber(query.limit, 1, 240, 120);
+  const limit = clampNumber(query.limit, 1, CATALOG_PAGE_SIZE_MAX, CATALOG_PAGE_SIZE_DEFAULT);
   const offset = clampNumber(query.offset, 0, 100000, 0);
   const items = sorted.slice(offset, offset + limit);
 
