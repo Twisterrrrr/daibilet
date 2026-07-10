@@ -32,7 +32,7 @@ Daibilet переводится в full-stack monorepo на Next.js + Prisma.
   - дочерние sitemaps `/sitemaps/static`, `/sitemaps/events`, `/sitemaps/cities`, `/sitemaps/venues`, `/sitemaps/landings`;
   - entity-aware metadata для событий, городов, площадок и лендингов;
   - JSON-LD для breadcrumbs, событий и площадок.
-- `/api/public/stats`, `/api/public/events`, `/api/public/home/preview` и `/api/public/events/:slug` переведены на Prisma-backed Next route handlers; общий backend bridge остается fallback для остальных API.
+- `/api/public/stats`, `/api/public/events`, `/api/public/home/preview`, `/api/public/events/:slug`, `/api/public/destinations`, `/api/public/cities/:slug`, `/api/public/venues`, `/api/public/venues/:slug` и `/api/public/landings/:slug` переведены на Prisma-backed Next route handlers; общий backend bridge остается fallback для остальных API.
 
 ## Почему proxy bridge нужен
 
@@ -82,6 +82,7 @@ Daibilet переводится в full-stack monorepo на Next.js + Prisma.
    - `/api/public/venues`
    - `/api/public/venues/:slug`
    - `/api/public/landings/:slug`
+   - статус: базовый Prisma-backed срез готов; города/площадки/лендинги строятся поверх общего сгруппированного catalog read-model.
 
 6. Buyer account:
    - `/api/user/auth/*`

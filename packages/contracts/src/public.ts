@@ -46,6 +46,10 @@ export interface PublicLandingDto extends SeoFields {
   heroSubtitle?: string | null;
   heroBadge?: string | null;
   heroImageUrl?: string | null;
+  heroMobileImageUrl?: string | null;
+  templateType?: string | null;
+  layoutVariant?: string | null;
+  surfaceVariant?: string | null;
   strength: 'ready' | 'seed' | 'empty';
 }
 

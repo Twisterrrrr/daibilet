@@ -9,7 +9,7 @@
 - добавить в `apps/public` настоящие Next SEO routes: `robots.txt`, `/sitemap.xml`, `/sitemaps/*`;
 - перенести metadata для событий, городов, площадок и лендингов в server-side `generateMetadata`;
 - добавить JSON-LD для breadcrumbs, событий и площадок;
-- перевести `/api/public/stats`, `/api/public/events`, `/api/public/home/preview` и `/api/public/events/:slug` на Prisma-backed Next route handlers;
+- перевести `/api/public/stats`, `/api/public/events`, `/api/public/home/preview`, `/api/public/events/:slug`, `/api/public/destinations`, `/api/public/cities/:slug`, `/api/public/venues`, `/api/public/venues/:slug` и `/api/public/landings/:slug` на Prisma-backed Next route handlers;
 - оставить catch-all backend bridge для остальных `/api/*`, чтобы не ломать buyer/admin/source/order API.
 
 Причина:
@@ -20,10 +20,11 @@
 
 Следствие:
 
-- следующие public API для переноса: city/venue/landing page DTO;
+- следующие public API для переноса: buyer account/order lookup и оставшиеся public utility routes, если они еще идут через bridge;
 - catalog Next handler уже группирует provider slots в event cards, но требует дальнейшего паритета с backend DTO и performance snapshot;
 - event detail Next handler отдает 5 ближайших слотов, ticket prices от 100 ₽, город/площадку, provider widget payload и related;
-- dev/prod smoke должен проверять `/robots.txt`, `/sitemap.xml`, `/sitemaps/events`, `/api/public/stats`, `/api/public/events`, `/api/public/home/preview`, `/api/public/events/:slug` и metadata на странице события.
+- city/venue/landing hub handlers строятся поверх общего сгруппированного catalog read-model, поэтому hub-страницы не плодят слоты как отдельные события;
+- dev/prod smoke должен проверять `/robots.txt`, `/sitemap.xml`, `/sitemaps/events`, `/api/public/stats`, `/api/public/events`, `/api/public/home/preview`, `/api/public/events/:slug`, `/api/public/destinations`, `/api/public/cities/:slug`, `/api/public/venues/:slug`, `/api/public/landings/:slug` и metadata на странице события.
 
 ## 2026-07-10: SPBBOATS becomes a contract donor for Next.js + Prisma, not a codebase to copy
 

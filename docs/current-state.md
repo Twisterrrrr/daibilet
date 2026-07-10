@@ -37,8 +37,13 @@
   - `/api/public/stats`;
   - `/api/public/events`;
   - `/api/public/home/preview`;
-  - `/api/public/events/:slug`.
+  - `/api/public/events/:slug`;
+  - `/api/public/destinations`;
+  - `/api/public/cities` и `/api/public/cities/:slug`;
+  - `/api/public/venues` и `/api/public/venues/:slug`;
+  - `/api/public/landings/:slug`.
 - Страница события в нормальном пути больше не ждет backend bridge: Next DTO отдает событие, город/площадку, до 5 ближайших слотов, ticket prices от 100 ₽, widget payload TC/Teplohod и похожие события.
+- SEO-хабы городов, площадок и лендингов строятся поверх того же сгруппированного catalog read-model, поэтому временные слоты TC/Teplohod не превращаются в отдельные карточки на hub-страницах.
 - Admin sources отделяет catalog sync от orders sync.
 - Admin routes переведены на lazy loading: основные страницы админки собираются отдельными чанками, warning Vite по 500 KB снят.
 - Readiness codes заведены на backend-стороне.
