@@ -432,7 +432,7 @@ function buildLaunchMetrics(events) {
 }
 
 function isSaleableEventForPublic(event) {
-  return Boolean((event.startsAt || isOpenDateCatalogRow(event)) && event.purchaseReady && Number.isFinite(event.priceFrom) && event.priceFrom >= MIN_DISPLAY_PRICE_RUB);
+  return Boolean(hasUpcomingOrOpenSchedule(event) && event.purchaseReady && Number.isFinite(event.priceFrom) && event.priceFrom >= MIN_DISPLAY_PRICE_RUB);
 }
 
 export async function buildAdminCitiesList(db) {
@@ -1138,7 +1138,7 @@ export async function buildAdminOrderEventCandidates(db, searchParams = new URLS
           source.code::text as "sourceCode",
           source.name as "sourceName",
           category.title as category,
-          min(session."startsAt") filter (where session."startsAt" >= now()) as "upcomingStartsAt",
+          min(session."startsAt") filter (where coalesce(session."endsAt", session."startsAt") >= now()) as "upcomingStartsAt",
           min(session."startsAt") as "firstStartsAt",
           count(distinct session.id)::int as "sessionCount",
           min(session."priceFromRub") filter (where session."priceFromRub" >= $3)::int as "sessionPriceFrom",
@@ -4119,7 +4119,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
           limit 1
         ) session_offer on true
         where session."eventId" = any($1)
-          and (session."startsAt" is null or session."startsAt" >= now())
+          and coalesce(session."endsAt", session."startsAt") >= now()
         order by session."startsAt" asc nulls last
         limit 5
       `,
@@ -4289,7 +4289,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     };
   });
   const widgetOnlySessions = sessions.length === 0
-    && String(event.sourceCode || '').toUpperCase().includes('TEPLOHOD')
+    && isOpenDateCatalogRow({ kind: event.kind, sourceStatus: event.sourceStatus })
     && purchase.ready
     ? [{
         id: `widget_tep_${event.id}`,
@@ -4330,6 +4330,11 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   const related = relatedCandidates.slice(0, 12);
   const priceValues = [baseEvent.priceFrom, ...publicSessions.map((session) => session.priceFrom)].filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const vacantValues = publicSessions.map((session) => session.vacant).filter((value) => Number.isFinite(value));
+
+  if (!isSaleableEventForPublic({ ...baseEvent, kind: event.kind, sourceStatus: event.sourceStatus, startsAt: publicSessions.find((session) => session.startsAt)?.startsAt || null,
+      endsAt: publicSessions.find((session) => session.endsAt)?.endsAt || null })) {
+    return null;
+  }
 
   return {
     generatedAt: new Date().toISOString(),
@@ -4498,6 +4503,7 @@ function extractTcExternalIdFromPurchaseUrl(url) {
 
 function isPublicSessionPurchaseBlocked(session) {
   const statuses = [session.sourceStatus, session.eventSourceStatus].map((value) => String(value || '').toLowerCase());
+  if (!session.startsAt && !isOpenDateCatalogRow(session)) return true;
   if (statuses.some((status) => ['paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden'].includes(status))) {
     return true;
   }
@@ -4646,7 +4652,7 @@ async function eventRows(db, limit) {
         offer."deeplinkUrl" as "offerDeeplinkUrl",
         city.id as "cityId",
         city.slug as "citySlug",
-        min(session."startsAt") filter (where session."startsAt" >= now()) as "nextStartsAt",
+        min(session."startsAt") filter (where coalesce(session."endsAt", session."startsAt") >= now()) as "nextStartsAt",
         min(session."startsAt") as "startsAt",
         min(session."priceFromRub") filter (where session."priceFromRub" >= ${MIN_DISPLAY_PRICE_RUB}) as "sessionPriceFromRub",
         count(distinct session.id)::int as "slotCount",
@@ -6388,9 +6394,10 @@ async function destinationSummaryRowsFast(db) {
           region.title as "regionTitle",
           venue.id as "venueId",
           venue.title as venue,
-          min(session."startsAt") filter (where session."startsAt" >= now()) as "startsAt",
+          min(session."startsAt") filter (where coalesce(session."endsAt", session."startsAt") >= now()) as "startsAt",
+          count(distinct session.id) filter (where coalesce(session."endsAt", session."startsAt") >= now())::int as "slotCount",
           min(e."priceFromRub") filter (where e."priceFromRub" >= $1) as "eventPriceFromRub",
-          min(session."priceFromRub") filter (where session."startsAt" >= now() and session."priceFromRub" >= $1) as "sessionPriceFromRub",
+          min(session."priceFromRub") filter (where coalesce(session."endsAt", session."startsAt") >= now() and session."priceFromRub" >= $1) as "sessionPriceFromRub",
           min(primary_offer."priceRub") filter (where primary_offer."priceRub" >= $1) as "offerPriceRub",
           bool_or(
             primary_offer."widgetUrl" is not null
@@ -6399,7 +6406,7 @@ async function destinationSummaryRowsFast(db) {
               coalesce(source.code::text, primary_offer."sourceCode"::text, '') in ('TICKETSCLOUD', 'TEPLOHOD')
               and source_link."externalId" is not null
             )
-          ) as "purchaseReady"
+          ) as "widgetReady"
         from "Event" e
         left join "City" city on city.id = e."primaryCityId"
         left join "Region" region on region.id = city."regionId"
@@ -6432,7 +6439,15 @@ async function destinationSummaryRowsFast(db) {
             select min(price)
             from (values ("eventPriceFromRub"), ("sessionPriceFromRub"), ("offerPriceRub")) as prices(price)
             where price is not null and price >= $1
-          ) as "priceFrom"
+          ) as "priceFrom",
+          (
+            "widgetReady"
+            and (
+              coalesce("slotCount", 0) > 0
+              or kind = 'OPEN_DATE'
+              or "sourceStatus" = 'open_date'
+            )
+          ) as "purchaseReady"
         from event_base
       ),
       saleable as (
@@ -6456,7 +6471,6 @@ async function destinationSummaryRowsFast(db) {
             "startsAt" is not null
             or kind = 'OPEN_DATE'
             or "sourceStatus" = 'open_date'
-            or "sourceCode" = 'TEPLOHOD'
           )
       ),
       ranked as (
@@ -6938,9 +6952,9 @@ async function publicCatalogSessionsFast(db) {
           primary_offer."priceRub" as "offerPriceRub",
           primary_offer."widgetUrl" as "offerWidgetUrl",
           primary_offer."deeplinkUrl" as "offerDeeplinkUrl",
-          min(session."startsAt") filter (where session."startsAt" >= now()) as "startsAt",
-          min(session."priceFromRub") filter (where session."startsAt" >= now() and session."priceFromRub" >= $1) as "sessionPriceFromRub",
-          count(distinct session.id) filter (where session."startsAt" >= now())::int as "slotCount",
+          min(session."startsAt") filter (where coalesce(session."endsAt", session."startsAt") >= now()) as "startsAt",
+          min(session."priceFromRub") filter (where coalesce(session."endsAt", session."startsAt") >= now() and session."priceFromRub" >= $1) as "sessionPriceFromRub",
+          count(distinct session.id) filter (where coalesce(session."endsAt", session."startsAt") >= now())::int as "slotCount",
           ${orderedEventTagsSql('e.id')} as tags,
           (
             select coalesce(array_agg(distinct title), '{}')
@@ -7002,11 +7016,18 @@ async function publicCatalogSessionsFast(db) {
             where price is not null and price >= $1
           ) as "priceFrom",
           (
-            "offerWidgetUrl" is not null
-            or "offerDeeplinkUrl" is not null
-            or (
-              coalesce("sourceCode"::text, "offerSourceCode"::text, '') in ('TICKETSCLOUD', 'TEPLOHOD')
-              and "externalId" is not null
+            (
+              "offerWidgetUrl" is not null
+              or "offerDeeplinkUrl" is not null
+              or (
+                coalesce("sourceCode"::text, "offerSourceCode"::text, '') in ('TICKETSCLOUD', 'TEPLOHOD')
+                and "externalId" is not null
+              )
+            )
+            and (
+              coalesce("slotCount", 0) > 0
+              or kind = 'OPEN_DATE'
+              or "sourceStatus" = 'open_date'
             )
           ) as "purchaseReady"
         from event_base
@@ -7032,7 +7053,6 @@ async function publicCatalogSessionsFast(db) {
             "startsAt" is not null
             or kind = 'OPEN_DATE'
             or "sourceStatus" = 'open_date'
-            or "sourceCode" = 'TEPLOHOD'
           )
       ),
       ranked as (
@@ -7150,6 +7170,19 @@ function isOpenDateCatalogRow(row) {
   const kind = String(row?.kind || '').toUpperCase();
   const sourceStatus = String(row?.sourceStatus || '').toLowerCase();
   return kind === 'OPEN_DATE' || sourceStatus === 'open_date';
+}
+
+function hasUpcomingOrOpenSchedule(row = {}) {
+  if (isOpenDateCatalogRow(row)) return true;
+  const endsAt = row?.endsAt;
+  if (endsAt) {
+    const endMs = Date.parse(String(endsAt));
+    if (Number.isFinite(endMs) && endMs >= Date.now()) return true;
+  }
+  const startsAt = row?.startsAt;
+  if (!startsAt) return false;
+  const startMs = Date.parse(String(startsAt));
+  return Number.isFinite(startMs) && startMs >= Date.now();
 }
 
 function isWideLifetimeSession(startsAt, endsAt) {
@@ -7514,10 +7547,9 @@ async function publicEventRowsLean(db, limit) {
         offer."widgetUrl",
         offer."deeplinkUrl"
       having (
-        min(session."startsAt") is not null
+        min(session."startsAt") filter (where coalesce(session."endsAt", session."startsAt") >= now()) is not null
         or e.kind = 'OPEN_DATE'
         or e."sourceStatus" = 'open_date'
-        or source.code = 'TEPLOHOD'
       )
       order by min(session."startsAt") asc nulls last
       limit $1
@@ -7576,7 +7608,7 @@ async function publicEventRowsLean(db, limit) {
         tags,
       };
     })
-    .filter((row) => (row.startsAt || isOpenDateCatalogRow(row)) && row.purchaseReady && Number.isFinite(row.priceFrom) && row.priceFrom >= MIN_DISPLAY_PRICE_RUB);
+    .filter((row) => hasUpcomingOrOpenSchedule(row) && row.purchaseReady && Number.isFinite(row.priceFrom) && row.priceFrom >= MIN_DISPLAY_PRICE_RUB);
 }
 
 function parseCatalogAgeLimit(value) {
@@ -8571,8 +8603,8 @@ async function fetchLandingAuditEventRow(db, eventId) {
         cat.title as category,
         city.title as city,
         venue.title as venue,
-        count(session.id) filter (where session."startsAt" >= now())::int as "futureSessionCount",
-        min(session."startsAt") filter (where session."startsAt" >= now()) as "nextStartsAt",
+        count(session.id) filter (where coalesce(session."endsAt", session."startsAt") >= now())::int as "futureSessionCount",
+        min(session."startsAt") filter (where coalesce(session."endsAt", session."startsAt") >= now()) as "nextStartsAt",
         ${orderedEventTagsSql('e.id')} as tags,
         (
           select coalesce(array_agg(distinct title), '{}')
