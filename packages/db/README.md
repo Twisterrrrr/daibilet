@@ -125,4 +125,10 @@ The schema contracts are now backed by pure TypeScript domain guards before HTTP
 - Server-owned create fields (`supplierId`, `purchaseFlow`, `managementMode`) must be derived by API/applier context, not accepted from supplier JSON.
 - Recurring schedule apply requires generated sessions until a dedicated recurrence expansion service exists.
 
-These guards do not apply migrations or enable supplier self-service by themselves. They are the safety layer for the next transactional applier/API routes.
+The first transactional applier is also present:
+
+- `apps/backend/src/event-change-request-applier.ts` applies approved existing-event requests in one Prisma transaction.
+- It writes `EventOverride`, `Event`, `EventSession`, `EventOffer`, `EventChangeRequest` and `EventChangeLog` as needed.
+- `POST /api/admin/event-change-requests/:id/apply` exposes the admin-only apply action through the typed backend entrypoint.
+
+These guards and the applier do not apply migrations or enable supplier self-service by themselves. They are the safety layer for the next admin/supplier moderation screens.

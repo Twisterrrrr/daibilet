@@ -145,6 +145,25 @@ Mentor follow-up 2026-07-10:
 - Schedule date-times require timezone, schedule timezone must be valid IANA, duplicate sessions compare by actual instant, and offer updates require explicit `UPSERT_LIST` or `REPLACE_ALL`.
 - Recurring schedule apply requires generated sessions until the recurrence expansion layer exists.
 
+Добавлен третий Phase 2.1 transactional apply слой:
+
+```text
+apps/backend/src/event-change-request-applier.ts
+apps/backend/src/event-change-request-applier.test.ts
+apps/backend/src/admin-event-change-requests-handler.ts
+apps/backend/src/admin-event-change-requests-handler.test.ts
+```
+
+Он применяет approved `EventChangeRequest` для существующих событий в одной Prisma transaction: проверяет state transition, валидирует payload в `apply` mode, сверяет `baseSnapshot.eventUpdatedAt`, пишет `EventOverride`/`Event`/`EventSession`/`EventOffer`, обновляет статус заявки на `APPLIED` и создает `EventChangeLog`.
+
+Граница текущего apply слоя:
+
+- `CREATE` заявок пока не применяется, только валидируется как draft/apply contract;
+- `contentBlocks` и `gallery` пока возвращают controlled unsupported error, пока не подключено хранилище блоков/медиа;
+- `RECURRING` schedule требует уже generated sessions;
+- route включен как admin-only `POST /api/admin/event-change-requests/:id/apply`;
+- после успешного apply сбрасывается public cache.
+
 ## Последние проверки
 
 На 2026-07-10 прошли:
@@ -157,7 +176,7 @@ pnpm backend:typecheck
 pnpm backend:test:ts
 ```
 
-`backend:test:ts`: 57 тестов прошло.
+`backend:test:ts`: 64 теста прошло.
 
 ## Ближайшие шаги
 

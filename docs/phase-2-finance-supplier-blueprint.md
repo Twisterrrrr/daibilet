@@ -295,6 +295,17 @@ Mentor follow-up 2026-07-10:
 - `OFFER_UPDATE` requires explicit operation semantics: `UPSERT_LIST` or `REPLACE_ALL`;
 - offer lists reject duplicate ids/titles, invalid old price, and invalid weekday mask.
 
+Implemented transactional apply slice 2026-07-10:
+
+- `event-change-request-applier` applies approved existing-event requests inside one Prisma transaction;
+- apply checks state transition, payload apply-mode validation and `baseSnapshot.eventUpdatedAt`;
+- content/media/SEO writes go through `EventOverride` where possible, preserving imported source fields;
+- schedule apply replaces `EventSession` rows for manual/unlocked events and clears open-date/session conflicts;
+- offer apply supports `UPSERT_LIST` and `REPLACE_ALL`; replace-all archives active offers before creating manual offers;
+- request status is updated to `APPLIED` and `EventChangeLog` is written in the same transaction;
+- admin route: `POST /api/admin/event-change-requests/:id/apply`;
+- current exclusions: `CREATE` apply, contentBlocks storage, gallery storage and recurrence expansion service.
+
 ### Phase 2.2: admin supplier control plane
 
 - suppliers list/detail;

@@ -2,6 +2,28 @@
 
 Этот файл фиксирует решения, которые влияют на архитектуру, запуск и дальнейшие фазы. Новые решения добавляем сверху или в конец с датой.
 
+## 2026-07-10: Approved event changes apply through one transactional backend layer
+
+Решение:
+
+- approved `EventChangeRequest` для существующих событий применяются через `event-change-request-applier`;
+- apply всегда идет через Prisma transaction;
+- request status, domain writes и `EventChangeLog` пишутся вместе;
+- content/media/SEO сохраняются через `EventOverride`, чтобы не затирать imported source fields;
+- admin endpoint для применения: `POST /api/admin/event-change-requests/:id/apply`;
+- `CREATE`, contentBlocks, gallery и recurrence expansion пока не включены в apply.
+
+Причина:
+
+- перед ЛК поставщика нужен безопасный backend path от заявки до фактической карточки;
+- нельзя давать UI кнопку approve/apply, пока запись в событие, аудит и cache invalidation разнесены по разным местам;
+- текущий MVP должен сохранить widget-first продажи, поэтому apply не включает финконтур.
+
+Следствие:
+
+- следующий шаг: admin read/API для списка заявок и approve/reject/apply действий;
+- затем supplier draft routes и controlled `CREATE` apply.
+
 ## 2026-07-10: Event change payload has draft/apply validation boundary
 
 Решение:
@@ -23,7 +45,7 @@
 
 Следствие:
 
-- Следующий backend шаг: transactional applier, который вызывает validation в `apply` mode, пишет `Event`, `EventSession`, `EventOffer` и `EventChangeLog` вместе.
+- Transactional applier реализован отдельным следующим решением; следующий backend шаг теперь admin moderation/read API для заявок.
 - Internal checkout/YooKassa runtime по-прежнему не включается этим решением.
 
 ## 2026-07-09: Phase 2 начинается с contracts/state, а не с немедленного YooKassa runtime

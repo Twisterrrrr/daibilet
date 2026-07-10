@@ -1,12 +1,14 @@
 import type { Server } from 'node:http';
 import { buildAdminDashboardDto, clearAdminDashboardDtoCache } from './admin-dashboard.dto.js';
 import { createAdminDashboardRouteHandler } from './admin-dashboard-handler.js';
+import { createAdminEventChangeRequestsRouteHandler } from './admin-event-change-requests-handler.js';
 import { createAdminEventsRouteHandler } from './admin-events-handler.js';
 import { createAdminLandingsRouteHandler } from './admin-landings-handler.js';
 import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
 import { buildAdminSourcesDto } from './admin-sources.dto.js';
 import { createAdminSourcesRouteHandler } from './admin-sources-handler.js';
 import { createAdminAuthConfig } from './auth.js';
+import { applyApprovedEventChangeRequest } from './event-change-request-applier.js';
 import { readBackendEnv } from './env.js';
 import { updateAdminEventOverride, updateAdminLandingMatch, upsertAdminOrderTicket } from './dto.js';
 import { buildPublicCatalogDto, clearPublicCatalogDtoCache, getPublicCatalogSessions } from './public-catalog.dto.js';
@@ -105,6 +107,10 @@ const server = startServer({
       createAdminOrdersRouteHandler({
         db,
         upsertAdminOrderTicket,
+      }),
+      createAdminEventChangeRequestsRouteHandler({
+        applyEventChangeRequest: applyApprovedEventChangeRequest,
+        invalidatePublicCaches,
       }),
       createAdminSourcesRouteHandler({
         buildSources: buildAdminSourcesDto,

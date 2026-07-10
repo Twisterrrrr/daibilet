@@ -412,7 +412,7 @@ export function assertEventChangeRequestPayload(
   type: EventChangeRequestType,
   payload: unknown,
   options: EventChangeRequestPayloadValidationOptions = {},
-): unknown {
+): EventChangeRequestPayload {
   const result = validateEventChangeRequestPayload(type, payload, options);
   if (result.ok) return result.payload;
   throw new EventChangeRequestPayloadValidationError(result.issues);
