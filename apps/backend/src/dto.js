@@ -6859,7 +6859,7 @@ async function publicSessions(db, limit) {
   return rows.slice(0, limit);
 }
 
-async function publicCatalogSessions(db, forceRefresh = false) {
+export async function publicCatalogSessions(db, forceRefresh = false) {
   const now = Date.now();
   if (!forceRefresh && publicCatalogCache && publicCatalogCache.expiresAt > now) {
     return publicCatalogCache.sessions;

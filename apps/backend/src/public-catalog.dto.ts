@@ -249,6 +249,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
       left join "EventOverride" override on override."eventId" = event.id
       left join "EventSession" session on session."eventId" = event.id
       left join primary_offer on primary_offer."eventId" = event.id
+      where event.status not in ('HIDDEN', 'DRAFT')
       group by
         event.id,
         identity."externalId",
@@ -329,7 +330,8 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         *,
         row_number() over (
           partition by "groupKey"
-          order by case when kind = 'OPEN_DATE' or "sourceStatus" = 'open_date' then 1 else 0 end desc,
+          order by case when lower(coalesce("sourceStatus", '')) in ('paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden') then 1 else 0 end,
+            case when kind = 'OPEN_DATE' or "sourceStatus" = 'open_date' then 1 else 0 end desc,
             "startsAt" asc nulls last,
             title asc
         ) as rank
@@ -342,52 +344,23 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         count(*)::int as "groupedEventsCount",
         sum(coalesce("slotCount", 0))::int as "sessionCount",
         min("priceFrom")::int as "priceFrom",
-        nullif(sum(coalesce("ticketsVacant", 0)), 0)::int as vacant
-      from ranked
-      group by "groupKey"
-    ),
-    slot_candidates as (
-      select
-        ranked."groupKey",
-        session.id,
-        session."eventId",
-        session."startsAt",
-        coalesce(session_identity."providerSessionId", session."externalId") as "providerSessionId",
-        coalesce(session_identity."providerEventId", ranked."externalId") as "providerEventId",
-        coalesce(session_source.code, ranked."sourceCode") as "sourceCode",
-        ranked."offerSourceCode",
-        ranked."offerWidgetUrl",
-        ranked."offerDeeplinkUrl",
-        row_number() over (
-          partition by ranked."groupKey"
-          order by session."startsAt" asc, session.id asc
-        ) as "slotRank"
-      from ranked
-      join "EventSession" session on session."eventId" = ranked.id
-      left join session_identity on session_identity."sessionId" = session.id
-      left join "Source" session_source on session_source.id = session_identity."sourceId"
-      where coalesce(session."endsAt", session."startsAt") >= now()
-    ),
-    grouped_slots as (
-      select
-        "groupKey",
-        count(*)::int as "sessionCount",
+        nullif(sum(coalesce("ticketsVacant", 0)), 0)::int as vacant,
         jsonb_agg(
           jsonb_build_object(
-            'id', id,
-            'eventId', "eventId",
+            'eventId', id,
             'startsAt', "startsAt",
-            'providerSessionId', "providerSessionId",
-            'providerEventId', "providerEventId",
-            'externalId', "providerSessionId",
+            'externalId', "externalId",
             'sourceCode', "sourceCode",
+            'sourceStatus', "sourceStatus",
             'offerSourceCode', "offerSourceCode",
             'offerWidgetUrl', "offerWidgetUrl",
-            'offerDeeplinkUrl', "offerDeeplinkUrl"
+            'offerDeeplinkUrl', "offerDeeplinkUrl",
+            'vacant', "ticketsVacant"
           )
-          order by "startsAt" asc, id asc
-        ) filter (where "slotRank" <= 8) as "upcomingSlots"
-      from slot_candidates
+          order by case when lower(coalesce("sourceStatus", '')) in ('paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden') then 1 else 0 end,
+            "startsAt" asc nulls last
+        ) as "upcomingSlots"
+      from ranked
       group by "groupKey"
     )
     select
@@ -433,15 +406,14 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
       grouped."groupKey",
       grouped."groupEventIds",
       grouped."groupedEventsCount",
-      coalesce(grouped_slots."sessionCount", grouped."sessionCount") as "sessionCount",
+      grouped."sessionCount",
       grouped."priceFrom",
-      grouped.vacant,
-      coalesce(grouped_slots."upcomingSlots", '[]'::jsonb) as "upcomingSlots"
+      representative."ticketsVacant" as vacant,
+      grouped."upcomingSlots"
     from grouped
     join ranked representative
       on representative."groupKey" = grouped."groupKey"
      and representative.rank = 1
-    left join grouped_slots on grouped_slots."groupKey" = grouped."groupKey"
     order by representative."startsAt" asc nulls last, representative.title asc
   `);
 }
