@@ -2,6 +2,29 @@
 
 Этот файл фиксирует решения, которые влияют на архитектуру, запуск и дальнейшие фазы. Новые решения добавляем сверху или в конец с датой.
 
+## 2026-07-10: Event change requests get an admin read/review API before supplier UI
+
+Решение:
+
+- добавить `GET /api/admin/event-change-requests` для управляемого списка заявок;
+- показывать админке безопасный DTO: событие, поставщик, автор, ревьюер, статус, тип, доступные действия и `payloadKeys`, но не сырой payload;
+- добавить `POST /api/admin/event-change-requests/:id/approve` и `/reject` как review-слой с audit log;
+- оставить `POST /api/admin/event-change-requests/:id/apply` отдельным шагом после approve;
+- добавить страницу админки `/change-requests` с таблицей, фильтрами и действиями;
+- описать DTO в `packages/contracts/src/admin.ts`, чтобы admin UI и backend не разъехались.
+
+Причина:
+
+- до полноценного ЛК поставщика оператору нужен контроль заявок из админки;
+- approve/reject и apply нельзя смешивать: review принимает человек, apply пишет данные и сбрасывает public cache;
+- UI не должен получать сырой payload без отдельного detail/diff экрана.
+
+Следствие:
+
+- следующий шаг в admin UI: detail drawer с diff/payload preview;
+- финконтур/YooKassa по-прежнему не включается этим решением;
+- supplier self-service остается будущим слоем поверх уже проверенного backend workflow.
+
 ## 2026-07-10: Approved event changes apply through one transactional backend layer
 
 Решение:

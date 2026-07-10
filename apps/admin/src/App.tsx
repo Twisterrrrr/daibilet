@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import { AdminShell } from '@/components/admin/AdminShell';
 import { BuyersPage } from '@/pages/BuyersPage';
 import { DashboardPage } from '@/pages/DashboardPage';
+import { EventChangeRequestsPage } from '@/pages/EventChangeRequestsPage';
 import { EventsPage } from '@/pages/EventsPage';
 import { ExternalOrdersPage } from '@/pages/ExternalOrdersPage';
 import { LandingsPage } from '@/pages/LandingsPage';
@@ -18,6 +19,7 @@ export function App() {
       <Route element={<AdminShell />}>
         <Route index element={<DashboardPage />} />
         <Route path="events" element={<EventsPage />} />
+        <Route path="change-requests" element={<EventChangeRequestsPage />} />
         <Route path="orders" element={<ExternalOrdersPage />} />
         <Route path="buyers" element={<BuyersPage />} />
         <Route path="venues" element={<VenuesPage />} />

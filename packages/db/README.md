@@ -129,6 +129,10 @@ The first transactional applier is also present:
 
 - `apps/backend/src/event-change-request-applier.ts` applies approved existing-event requests in one Prisma transaction.
 - It writes `EventOverride`, `Event`, `EventSession`, `EventOffer`, `EventChangeRequest` and `EventChangeLog` as needed.
-- `POST /api/admin/event-change-requests/:id/apply` exposes the admin-only apply action through the typed backend entrypoint.
+- `apps/backend/src/admin-event-change-requests.dto.ts` exposes a safe admin list DTO with filters, facets, available actions and `payloadKeys`.
+- `apps/backend/src/event-change-request-review.ts` handles approve/reject review transitions and audit logging.
+- `GET /api/admin/event-change-requests` lists requests for admin moderation.
+- `POST /api/admin/event-change-requests/:id/approve`, `/reject` and `/apply` expose admin review/apply actions through the typed backend entrypoint.
+- `apps/admin/src/pages/EventChangeRequestsPage.tsx` provides the first operator UI for the request queue.
 
 These guards and the applier do not apply migrations or enable supplier self-service by themselves. They are the safety layer for the next admin/supplier moderation screens.

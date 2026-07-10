@@ -3,6 +3,7 @@ import {
   BarChart3,
   Building2,
   CalendarDays,
+  ClipboardCheck,
   Download,
   FileText,
   Inbox,
@@ -34,6 +35,7 @@ export const NAV_ZONES: NavZone[] = [
     items: [
       { id: 'dashboard', title: 'Дашборд', path: '/', icon: LayoutDashboard, end: true },
       { id: 'events', title: 'События', path: '/events', icon: CalendarDays },
+      { id: 'change-requests', title: 'Заявки', path: '/change-requests', icon: ClipboardCheck },
       { id: 'orders', title: 'Заказы', path: '/orders', icon: Receipt },
       { id: 'buyers', title: 'Покупатели', path: '/buyers', icon: UserRound },
     ],

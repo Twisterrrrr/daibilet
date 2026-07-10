@@ -6,7 +6,7 @@
 
 Мы строим легкий монорепозиторий Daibilet поверх Prisma, TypeScript и pnpm workspace. Текущий MVP остается widget-first: покупка идет через Ticketscloud и Teplohod.info, финансовый контур и чеки пока не проходят через Daibilet.
 
-Рабочая ветка Codex: `backend-ts-foundation`.
+Рабочая ветка Codex: `codex/phase2-foundation`.
 
 ## Главный этап
 
@@ -164,19 +164,43 @@ apps/backend/src/admin-event-change-requests-handler.test.ts
 - route включен как admin-only `POST /api/admin/event-change-requests/:id/apply`;
 - после успешного apply сбрасывается public cache.
 
+Добавлен четвертый Phase 2.1 admin read/API слой:
+
+```text
+apps/backend/src/admin-event-change-requests.dto.ts
+apps/backend/src/admin-event-change-requests.dto.test.ts
+apps/backend/src/admin-event-change-requests-handler.ts
+apps/backend/src/admin-event-change-requests-handler.test.ts
+apps/backend/src/event-change-request-review.ts
+apps/backend/src/event-change-request-review.test.ts
+apps/admin/src/pages/EventChangeRequestsPage.tsx
+packages/contracts/src/admin.ts
+```
+
+Он делает `EventChangeRequest` управляемым из админки:
+
+- `GET /api/admin/event-change-requests` возвращает список заявок с фильтрами по статусу, типу, поставщику, событию и поиску;
+- строки содержат событие, поставщика, автора, ревьюера, статус, тип, доступные действия и `payloadKeys`, но не сырой payload;
+- `POST /api/admin/event-change-requests/:id/approve` переводит submitted-заявку в approved и пишет audit log;
+- `POST /api/admin/event-change-requests/:id/reject` требует комментарий администратора и пишет audit log;
+- `POST /api/admin/event-change-requests/:id/apply` применяет approved payload через transactional applier и прогревает public cache.
+- в admin добавлена страница `/change-requests` с фильтрами, таблицей заявок и кнопками approve/reject/apply.
+
+Граница: это базовый операторский UI. Полный detail/diff экран с просмотром сырого payload и сравнением полей еще следующий слой.
+
 ## Последние проверки
 
 На 2026-07-10 прошли:
 
 ```bash
 pnpm db:validate
-pnpm db:generate
 pnpm db:typecheck
 pnpm backend:typecheck
+pnpm --filter @daibilet/admin typecheck
 pnpm backend:test:ts
 ```
 
-`backend:test:ts`: 64 теста прошло.
+`backend:test:ts`: 73 теста прошло.
 
 ## Ближайшие шаги
 

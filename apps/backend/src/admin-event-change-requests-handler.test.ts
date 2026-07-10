@@ -1,13 +1,105 @@
 import assert from 'node:assert/strict';
+import { Readable } from 'node:stream';
 import test from 'node:test';
-import { createAdminEventChangeRequestsRouteHandler } from './admin-event-change-requests-handler.js';
+import {
+  createAdminEventChangeRequestsRouteHandler,
+  type AdminEventChangeRequestsHandlerDependencies,
+} from './admin-event-change-requests-handler.js';
 import type { RouteContext } from './routing.js';
+
+test('serves admin event change request list with filters', async () => {
+  let capturedStatus: string | null | undefined;
+  const response = createMockResponse();
+  const handler = createAdminEventChangeRequestsRouteHandler(createDeps({
+    async buildEventChangeRequests(query) {
+      capturedStatus = query.status;
+      return {
+        generatedAt: '2026-08-01T12:00:00.000Z',
+        total: 1,
+        limit: 50,
+        offset: 0,
+        hasMore: false,
+        filters: { status: query.status ?? null, type: null, supplierId: null, eventId: null, q: null },
+        facets: { statuses: { SUBMITTED: 1 }, types: { CONTENT_UPDATE: 1 } },
+        items: [],
+      };
+    },
+  }));
+
+  const handled = await handler(createRouteContext({
+    method: 'GET',
+    pathname: '/api/admin/event-change-requests?status=SUBMITTED',
+    response,
+  }));
+
+  assert.equal(handled, true);
+  assert.equal(capturedStatus, 'SUBMITTED');
+  assert.equal(JSON.parse(response.body).total, 1);
+});
+
+test('approves event change request through admin route', async () => {
+  let reviewed: { requestId: string; action: string; adminComment?: string | null | undefined } | null = null;
+  const response = createMockResponse();
+  const handler = createAdminEventChangeRequestsRouteHandler(createDeps({
+    async reviewEventChangeRequest(input) {
+      reviewed = input;
+      return {
+        requestId: input.requestId,
+        status: 'APPROVED',
+        reviewedAt: '2026-08-01T12:00:00.000Z',
+        logAction: 'APPROVED',
+      };
+    },
+  }));
+
+  const handled = await handler(createRouteContext({
+    method: 'POST',
+    pathname: '/api/admin/event-change-requests/cr_1/approve',
+    body: { adminComment: 'Looks good' },
+    response,
+  }));
+
+  assert.equal(handled, true);
+  assert.deepEqual(reviewed, {
+    requestId: 'cr_1',
+    action: 'approve',
+    adminComment: 'Looks good',
+  });
+  assert.equal(JSON.parse(response.body).status, 'APPROVED');
+});
+
+test('rejects event change request through admin route', async () => {
+  let reviewedAction: string | null = null;
+  const response = createMockResponse();
+  const handler = createAdminEventChangeRequestsRouteHandler(createDeps({
+    async reviewEventChangeRequest(input) {
+      reviewedAction = input.action;
+      return {
+        requestId: input.requestId,
+        status: 'REJECTED',
+        reviewedAt: '2026-08-01T12:00:00.000Z',
+        logAction: 'REJECTED',
+      };
+    },
+  }));
+
+  const handled = await handler(createRouteContext({
+    method: 'POST',
+    pathname: '/api/admin/event-change-requests/cr_1/reject',
+    body: { adminComment: 'Need better schedule' },
+    response,
+  }));
+
+  assert.equal(handled, true);
+  assert.equal(reviewedAction, 'reject');
+  assert.equal(JSON.parse(response.body).status, 'REJECTED');
+});
 
 test('applies approved event change request through admin route', async () => {
   let appliedRequestId: string | null = null;
   let invalidationReason: string | null = null;
   const response = createMockResponse();
-  const handler = createAdminEventChangeRequestsRouteHandler({
+  const handler = createAdminEventChangeRequestsRouteHandler(createDeps({
     async applyEventChangeRequest(input) {
       appliedRequestId = input.requestId;
       return {
@@ -21,7 +113,7 @@ test('applies approved event change request through admin route', async () => {
     invalidatePublicCaches(reason) {
       invalidationReason = reason;
     },
-  });
+  }));
 
   const handled = await handler(createRouteContext({
     method: 'POST',
@@ -44,14 +136,7 @@ test('applies approved event change request through admin route', async () => {
 
 test('ignores unrelated routes', async () => {
   const response = createMockResponse();
-  const handler = createAdminEventChangeRequestsRouteHandler({
-    async applyEventChangeRequest() {
-      throw new Error('should not be called');
-    },
-    invalidatePublicCaches() {
-      throw new Error('should not be called');
-    },
-  });
+  const handler = createAdminEventChangeRequestsRouteHandler(createDeps());
 
   const handled = await handler(createRouteContext({
     method: 'GET',
@@ -63,19 +148,41 @@ test('ignores unrelated routes', async () => {
   assert.equal(response.body, '');
 });
 
+function createDeps(
+  overrides: Partial<AdminEventChangeRequestsHandlerDependencies> = {},
+): AdminEventChangeRequestsHandlerDependencies {
+  return {
+    async buildEventChangeRequests() {
+      throw new Error('buildEventChangeRequests should not be called');
+    },
+    async reviewEventChangeRequest() {
+      throw new Error('reviewEventChangeRequest should not be called');
+    },
+    async applyEventChangeRequest() {
+      throw new Error('applyEventChangeRequest should not be called');
+    },
+    invalidatePublicCaches() {
+      throw new Error('invalidatePublicCaches should not be called');
+    },
+    ...overrides,
+  };
+}
+
 function createRouteContext(input: {
   method: string;
   pathname: string;
   response: MockResponse;
+  body?: unknown;
 }): RouteContext {
   const url = new URL(input.pathname, 'http://127.0.0.1');
+  const requestBody = input.body === undefined ? '' : JSON.stringify(input.body);
   return {
-    request: {} as RouteContext['request'],
+    request: Readable.from(requestBody ? [Buffer.from(requestBody)] : []) as RouteContext['request'],
     response: input.response as unknown as RouteContext['response'],
     url,
-    pathname: input.pathname,
+    pathname: url.pathname,
     method: input.method,
-    route: `${input.method} ${input.pathname}`,
+    route: `${input.method} ${url.pathname}`,
     searchParams: url.searchParams,
   };
 }
