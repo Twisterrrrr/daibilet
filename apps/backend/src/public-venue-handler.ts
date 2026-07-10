@@ -5,7 +5,7 @@ import type { TypedRouteHandler } from './validated-handler.js';
 
 export interface PublicVenueHandlerDependencies {
   enabled: boolean;
-  buildVenues: (forceRefresh?: boolean) => Promise<PublicVenuesDto>;
+  buildVenues: (searchParams: URLSearchParams, forceRefresh?: boolean) => Promise<PublicVenuesDto>;
   buildVenue: (slugOrId: string, forceRefresh?: boolean) => Promise<PublicVenuePageDto | null>;
 }
 
@@ -16,7 +16,7 @@ export function createPublicVenueRouteHandler(
     if (!deps.enabled || context.method !== 'GET') return false;
     const forceRefresh = context.searchParams.get('refresh') === '1';
     if (context.pathname === '/api/public/venues') {
-      sendJson(context.response, await deps.buildVenues(forceRefresh));
+      sendJson(context.response, await deps.buildVenues(context.searchParams, forceRefresh));
       return true;
     }
     const match = matchPath(context.pathname, /^\/api\/public\/venues\/([^/]+)$/);

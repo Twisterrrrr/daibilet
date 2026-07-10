@@ -2,39 +2,46 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { prisma } from '../../../packages/db/src/client.ts';
-import { buildPublicVenuePage, clearPublicDataCaches } from '../src/dto.js';
+import { buildPublicVenuePage, buildPublicVenuesCatalog, clearPublicDataCaches } from '../src/dto.js';
 import { createDb } from '../src/db.js';
-import { clearPublicCatalogDtoCache, getPublicCatalogSessions } from '../src/public-catalog.dto.js';
+import { clearPublicCatalogDtoCache } from '../src/public-catalog.dto.js';
 import {
   buildPublicVenueDto,
   buildPublicVenuesDto,
   clearPublicVenueDtoCache,
+  venueCatalogCore,
 } from '../src/public-venue.dto.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(dirname, '../../..');
 const db = createDb(projectRoot);
 
+const catalogCases = [
+  'limit=500&family=institution',
+  'limit=500&family=location',
+];
+
 clearPublicDataCaches();
 clearPublicCatalogDtoCache();
 clearPublicVenueDtoCache();
 
-const catalog = await getPublicCatalogSessions(true);
-const expectedCounts = new Map<string, number>();
-for (const session of catalog) {
-  if (!session.venueId) continue;
-  expectedCounts.set(session.venueId, (expectedCounts.get(session.venueId) || 0) + 1);
+for (const queryString of catalogCases) {
+  const searchParams = new URLSearchParams(queryString);
+  const [legacy, typed] = await Promise.all([
+    buildPublicVenuesCatalog(db, searchParams),
+    buildPublicVenuesDto(searchParams, true),
+  ]);
+  assert.equal(typed.total, legacy.total, `${queryString}: total`);
+  assert.deepEqual(
+    typed.venues.map(venueCatalogCore),
+    legacy.venues.map(venueCatalogCore),
+    `${queryString}: venues`,
+  );
+  const withImages = typed.venues.filter((venue) => venue.heroImageUrl).length;
+  console.log(`${queryString}: ${typed.total} venues, ${withImages} with images, parity ok`);
 }
 
-const venueList = await buildPublicVenuesDto(true);
-assert.equal(venueList.total, venueList.venues.length, 'venue list total');
-assert.equal(new Set(venueList.venues.map((venue) => venue.id)).size, venueList.total, 'venue list unique ids');
-for (const venue of venueList.venues) {
-  assert.equal(venue.events, expectedCounts.get(venue.id), `${venue.name}: grouped event count`);
-  assert.ok(venue.events > 0, `${venue.name}: visible venue has events`);
-}
-console.log(`${venueList.total} public venues, grouped counts ok`);
-
+const venueList = await buildPublicVenuesDto(new URLSearchParams('limit=500&family=institution'), true);
 const venueIds = venueList.venues.map((venue) => venue.id);
 const samples = await prisma.venue.findMany({
   where: { id: { in: venueIds }, pageStatus: { in: ['CANDIDATE', 'NONE'] } },
@@ -59,16 +66,30 @@ for (const venue of selected) {
   assert.ok(typed.venue.seoDescription, `${venue.title}: seo description`);
   assert.deepEqual(typed.sessions.map(sessionCore), legacy.sessions.map(sessionCore), `${venue.title}: sessions`);
   assert.equal(new Set(typed.relatedVenues.map((item) => item.id)).size, typed.relatedVenues.length, `${venue.title}: related unique`);
-  for (const related of typed.relatedVenues) {
-    assert.equal(related.events, expectedCounts.get(related.id), `${related.name}: related grouped count`);
-  }
   assert.deepEqual(typed.stats, legacy.stats, `${venue.title}: stats`);
   console.log(`${venue.pageStatus}: ${venue.title}, ${typed.sessions.length} events, parity ok`);
 }
 
 process.exit(0);
 
-function venueCore(value: any) {
+function venueCore(value: {
+  id: string;
+  slug: string;
+  name: string;
+  title: string;
+  city: string;
+  address: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  type: string;
+  pageStatus: string;
+  description: string | null;
+  shortDescription: string | null;
+  heroImageUrl: string | null;
+  isIndexable: boolean;
+  events: number;
+  categories: Record<string, number>;
+}) {
   return {
     id: value.id,
     slug: value.slug,
@@ -89,7 +110,14 @@ function venueCore(value: any) {
   };
 }
 
-function sessionCore(value: any) {
+function sessionCore(value: {
+  id: string;
+  slug: string;
+  groupEventIds?: string[];
+  title: string;
+  startsAt: string | null;
+  priceFrom: number | null;
+}) {
   return {
     id: value.id,
     slug: value.slug,

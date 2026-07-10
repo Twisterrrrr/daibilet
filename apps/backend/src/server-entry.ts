@@ -51,7 +51,7 @@ registerPublicCacheWarmer(createPublicReadStackWarmer({
   flags: publicFlags,
   getCatalogSessions: getPublicCatalogSessions,
   buildDestinations: buildPublicDestinationsDto,
-  buildVenues: buildPublicVenuesDto,
+  buildVenues: () => buildPublicVenuesDto(new URLSearchParams({ family: 'institution', limit: '500' })),
 }));
 const server = startServer({
   host,
