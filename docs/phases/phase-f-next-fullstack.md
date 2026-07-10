@@ -3,7 +3,9 @@
 **Дата старта:** 2026-07-10  
 **Ветка Cursor:** `integrate/mvp-launch` → `feat/next-monorepo`  
 **Ветка Codex:** `codex/phase2-finance-next` (от `feat/next-monorepo` после F1)  
-**Статус:** 🔄 Планирование / F1
+**Статус:** 🔄 F1 in progress (`feat/next-monorepo`)
+
+**F2 read path:** Prisma напрямую в Server Components и Route Handlers (full-stack), без proxy fetch к legacy backend.
 
 ---
 
@@ -71,11 +73,12 @@ Handoff для Codex: [codex-phase2-next-handoff.md](../codex-phase2-next-handof
 
 ### F1 — Monorepo shell (1–2 нед) 🔄
 
-- [ ] `pnpm-workspace.yaml`, `apps/web` Next 15 + Tailwind
-- [ ] Перенос `packages/db` без изменения schema
-- [ ] `packages/contracts` — public + admin types из `apps/backend/src/types`
-- [ ] Health route, env loader, deploy stub
-- [ ] CI: `pnpm build`, typecheck
+- [x] `pnpm-workspace.yaml`, `apps/web` Next 15
+- [x] `packages/contracts`, `packages/config` (from Codex reference)
+- [x] `packages/db` exports для workspace import
+- [x] Health route `/api/health`, root `.env` loader
+- [x] Deploy stub `deploy/scripts/start-web.sh`
+- [x] CI: `pnpm build`, typecheck on `feat/next-monorepo`
 
 **Exit:** `apps/web` builds, подключается к staging DB.
 
@@ -86,7 +89,7 @@ Handoff для Codex: [codex-phase2-next-handoff.md](../codex-phase2-next-handof
 - [ ] **City** `/cities/[slug]` — SSR
 - [ ] **Venue/location** `/venues/[slug]`, `/locations/[slug]` — SSR
 - [ ] **Landings** top slugs — SSG или ISR
-- [ ] Route Handlers: thin wrapper над Prisma DTO (port from `public-*.dto.ts`)
+- [ ] Route Handlers + Server Components: **Prisma read** (port `public-*.dto.ts`, не fetch к legacy API)
 - [ ] Parity scripts against legacy on staging
 
 **SEO exit:** View Source содержит карточки + title/description без JS.

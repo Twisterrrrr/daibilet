@@ -181,7 +181,17 @@
 
 **Codex:** параллельно `codex/phase2-finance-next` — Phase 2 schema + supplier admin read, **без** YooKassa runtime.
 
-**Статус:** Активно. [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md).
+**Статус:** Активно. [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md). Ветка `feat/next-monorepo`.
+
+---
+
+## 2026-07-10 — F2: full-stack read (Prisma в Next, не proxy)
+
+**Решение:** Public SSR и Route Handlers читают через Prisma/`public-*.dto.ts` port в `apps/web`, без промежуточного fetch к `apps/backend`. Legacy backend остаётся для sync/writes/admin до F4/F5.
+
+**Почему:** Один раз попыхтим с porting DTO — дальше проще: нет dual HTTP hop, единый type graph, проще cutover и retire `dto.js`.
+
+**Статус:** Активно. F1 shell на `feat/next-monorepo`.
 
 ---
 
