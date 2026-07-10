@@ -8491,13 +8491,13 @@ function parseSessionStartsAt(value) {
   return new Date(raw);
 }
 
-function normalizeStartsAt(value) {
+export function normalizeStartsAt(value) {
   const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return null;
   return date.toISOString();
 }
 
-function formatDate(value, timeZone = SITE_TIME_ZONE) {
+export function formatDate(value, timeZone = SITE_TIME_ZONE) {
   const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return '';
   return new Intl.DateTimeFormat('ru-RU', {
@@ -8508,7 +8508,7 @@ function formatDate(value, timeZone = SITE_TIME_ZONE) {
   }).format(date);
 }
 
-function formatTime(value, timeZone = SITE_TIME_ZONE) {
+export function formatTime(value, timeZone = SITE_TIME_ZONE) {
   const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return '';
   return new Intl.DateTimeFormat('ru-RU', {
@@ -8518,7 +8518,7 @@ function formatTime(value, timeZone = SITE_TIME_ZONE) {
   }).format(date);
 }
 
-function timeBucket(value, timeZone = SITE_TIME_ZONE) {
+export function timeBucket(value, timeZone = SITE_TIME_ZONE) {
   const date = parseSessionStartsAt(value);
   if (!Number.isFinite(date.getTime())) return 'night';
   const hour = localHourFromInstant(date, timeZone);

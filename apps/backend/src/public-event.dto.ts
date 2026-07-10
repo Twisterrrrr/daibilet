@@ -3,7 +3,7 @@ import {
   isOpenDateCatalogRow,
   isWideLifetimeSession,
 } from './catalog-availability.js';
-import { dedupePublicOffers, isSaleableEventForPublic, preferNamedTicketOffers } from './dto.js';
+import { dedupePublicOffers, formatDate, formatTime, isSaleableEventForPublic, normalizeStartsAt, preferNamedTicketOffers, timeBucket } from './dto.js';
 import { findLandingRule, matchingLandingSlugs } from './landing-rules.js';
 import {
   buildProviderWidgetPayload,
@@ -12,7 +12,6 @@ import {
   purchaseInfo,
   resolveSessionPurchaseExternalId,
 } from './provider-purchase.js';
-import { prismaWallTimeToIso, prismaWallTimeToUtc } from './public-datetime.js';
 import { getPublicCatalogSessions } from './public-catalog.dto.js';
 import { pickCatalogSubcategories } from './public-catalog.mapper.js';
 import type {
@@ -25,7 +24,6 @@ import type {
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_EVENT_CACHE_MS = 5 * 60 * 1000;
-const SITE_TIME_ZONE = 'Europe/Moscow';
 
 const eventInclude = {
   primaryCity: { include: { region: true } },
@@ -378,12 +376,12 @@ function mapSession(
   });
   const openDate = requestedEvent.kind === 'OPEN_DATE' || session.sourceStatus?.toLowerCase() === 'open_date';
   const wideLifetime = isWideLifetimeSession(session.startsAt, session.endsAt);
-  const startsAt = openDate || wideLifetime ? null : prismaWallTimeToIso(session.startsAt);
+  const startsAt = openDate || wideLifetime ? null : normalizeStartsAt(session.startsAt);
   return {
     id: session.id,
     eventId: session.eventId,
     startsAt,
-    endsAt: prismaWallTimeToIso(session.endsAt),
+    endsAt: normalizeStartsAt(session.endsAt),
     dateLabel: openDate ? 'Открытая дата' : wideLifetime ? 'Даты в виджете' : formatDate(session.startsAt),
     timeLabel: openDate ? 'В виджете' : wideLifetime ? 'При покупке' : formatTime(session.startsAt),
     timeBucket: openDate || wideLifetime ? 'day' : timeBucket(session.startsAt),
@@ -647,35 +645,6 @@ function publicSlug(value: string): string {
   };
   return String(value || '').trim().toLowerCase().split('').map((character) => letters[character] ?? character)
     .join('').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').replace(/-{2,}/g, '-');
-}
-
-function formatDate(value?: Date | string | null): string {
-  const date = value instanceof Date ? prismaWallTimeToUtc(value) : new Date(value || '');
-  if (!Number.isFinite(date.getTime())) return '';
-  return new Intl.DateTimeFormat('ru-RU', {
-    day: 'numeric', month: 'short', weekday: 'short', timeZone: SITE_TIME_ZONE,
-  }).format(date);
-}
-
-function formatTime(value?: Date | string | null): string {
-  const date = value instanceof Date ? prismaWallTimeToUtc(value) : new Date(value || '');
-  if (!Number.isFinite(date.getTime())) return '';
-  return new Intl.DateTimeFormat('ru-RU', {
-    hour: '2-digit', minute: '2-digit', timeZone: SITE_TIME_ZONE,
-  }).format(date);
-}
-
-function timeBucket(value?: Date | string | null): 'morning' | 'day' | 'evening' | 'night' {
-  const date = value instanceof Date ? prismaWallTimeToUtc(value) : new Date(value || '');
-  if (!Number.isFinite(date.getTime())) return 'day';
-  const hourPart = new Intl.DateTimeFormat('en-GB', {
-    timeZone: SITE_TIME_ZONE, hour: 'numeric', hour12: false,
-  }).formatToParts(date).find((part) => part.type === 'hour');
-  const hour = Number(hourPart?.value);
-  if (hour >= 6 && hour < 12) return 'morning';
-  if (hour >= 12 && hour < 17) return 'day';
-  if (hour >= 17 && hour < 23) return 'evening';
-  return 'night';
 }
 
 function isDefined<T>(value: T | null | undefined): value is T {
