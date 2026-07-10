@@ -2,6 +2,28 @@
 
 Этот файл фиксирует решения, которые влияют на архитектуру, запуск и дальнейшие фазы. Новые решения добавляем сверху или в конец с датой.
 
+## 2026-07-10: Public SEO foundation and first Prisma-backed Next API routes
+
+Решение:
+
+- добавить в `apps/public` настоящие Next SEO routes: `robots.txt`, `/sitemap.xml`, `/sitemaps/*`;
+- перенести metadata для событий, городов, площадок и лендингов в server-side `generateMetadata`;
+- добавить JSON-LD для breadcrumbs, событий и площадок;
+- перевести `/api/public/stats` и `/api/public/events` на Prisma-backed Next route handlers;
+- оставить catch-all backend bridge для остальных `/api/*`, чтобы не ломать buyer/admin/source/order API.
+
+Причина:
+
+- public должен становиться SEO-болидом сейчас, а не после запуска;
+- hero stats и catalog API не должны ждать legacy backend bridge;
+- перенос должен быть по срезам, без одномоментного переписывания `dto.js`.
+
+Следствие:
+
+- следующие public API для переноса: `/api/public/home/preview`, `/api/public/events/:slug`, city/venue/landing page DTO;
+- catalog Next handler уже группирует provider slots в event cards, но требует дальнейшего паритета с backend DTO и performance snapshot;
+- dev/prod smoke должен проверять `/robots.txt`, `/sitemap.xml`, `/sitemaps/events`, `/api/public/stats`, `/api/public/events` и metadata на странице события.
+
 ## 2026-07-10: SPBBOATS becomes a contract donor for Next.js + Prisma, not a codebase to copy
 
 Решение:

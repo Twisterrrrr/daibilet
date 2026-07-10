@@ -145,6 +145,9 @@ importers:
       '@daibilet/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@daibilet/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       clsx:
         specifier: ^2.1.0
         version: 2.1.1

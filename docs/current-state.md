@@ -29,6 +29,13 @@
 - ProviderLink как единый слой identity для provider `EVENT`, `SESSION`, `OFFER`, `VENUE`.
 - Событие доменно считается карточкой, а временной слот - `EventSession`.
 - Public catalog группирует слоты и не должен показывать один слот как отдельное событие.
+- Public Next SEO foundation готов:
+  - `robots.txt`;
+  - sitemap index и дочерние sitemaps;
+  - server metadata/JSON-LD для событий, городов, площадок и лендингов.
+- Первые public API сняты с backend bridge и читают Prisma прямо в Next:
+  - `/api/public/stats`;
+  - `/api/public/events`.
 - Admin sources отделяет catalog sync от orders sync.
 - Admin routes переведены на lazy loading: основные страницы админки собираются отдельными чанками, warning Vite по 500 KB снят.
 - Readiness codes заведены на backend-стороне.

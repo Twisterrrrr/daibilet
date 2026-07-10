@@ -2,6 +2,7 @@
   "extends": "@daibilet/config/react.json",
   "compilerOptions": {
     "allowJs": false,
+    "allowImportingTsExtensions": true,
     "baseUrl": ".",
     "jsx": "preserve",
     "incremental": true,

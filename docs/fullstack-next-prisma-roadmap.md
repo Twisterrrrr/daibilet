@@ -26,6 +26,13 @@ Daibilet переводится в full-stack monorepo на Next.js + Prisma.
 - Public frontend по умолчанию вызывает `/api/*`, а не `http://127.0.0.1:4000`.
 - Старые env-переменные `VITE_*` временно поддерживаются, новые публичные env - `NEXT_PUBLIC_*`.
 - `data.js` fallback теперь копируется в `apps/public/public/data.js`.
+- Добавлен Public SEO foundation в Next:
+  - `robots.txt`;
+  - sitemap index `/sitemap.xml`;
+  - дочерние sitemaps `/sitemaps/static`, `/sitemaps/events`, `/sitemaps/cities`, `/sitemaps/venues`, `/sitemaps/landings`;
+  - entity-aware metadata для событий, городов, площадок и лендингов;
+  - JSON-LD для breadcrumbs, событий и площадок.
+- `/api/public/stats` и `/api/public/events` переведены на Prisma-backed Next route handlers; общий backend bridge остается fallback для остальных API.
 
 ## Почему proxy bridge нужен
 
@@ -52,6 +59,7 @@ Daibilet переводится в full-stack monorepo на Next.js + Prisma.
 1. Public stats:
    - `/api/public/stats`
    - самый легкий endpoint, важен для hero и первого экрана.
+   - статус: готово в Next route handler.
 
 2. Public home preview:
    - `/api/public/home/preview`
@@ -60,6 +68,7 @@ Daibilet переводится в full-stack monorepo на Next.js + Prisma.
 3. Public catalog:
    - `/api/public/events`
    - обязательно с server-side filters, pagination, grouping events by real event card, not provider slot.
+   - статус: готово как первый Prisma-backed read-model в Next; нужна следующая оптимизация/паритет с backend DTO.
 
 4. Event detail:
    - `/api/public/events/:slug`
