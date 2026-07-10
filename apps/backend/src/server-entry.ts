@@ -1,7 +1,11 @@
 import type { Server } from 'node:http';
 import { createAdminEventsRouteHandler } from './admin-events-handler.js';
+import { createAdminEventsReadRouteHandler } from './admin-events-read-handler.js';
+import { buildAdminEventDetailDto, buildAdminEventsListDto } from './admin-events.dto.js';
 import { createAdminLandingsRouteHandler } from './admin-landings-handler.js';
 import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
+import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler.js';
+import { buildAdminOrdersListDto } from './admin-orders.dto.js';
 import { createAdminAuthConfig } from './auth.js';
 import { readBackendEnv } from './env.js';
 import { updateAdminEventOverride, updateAdminLandingMatch, upsertAdminOrderTicket } from './dto.js';
@@ -32,6 +36,10 @@ const publicFlags = {
   city: env.DAIBILET_TS_PUBLIC_CITY === '1',
   event: env.DAIBILET_TS_PUBLIC_EVENT === '1',
   venue: env.DAIBILET_TS_PUBLIC_VENUE === '1',
+};
+const adminFlags = {
+  events: env.DAIBILET_TS_ADMIN_EVENTS === '1',
+  orders: env.DAIBILET_TS_ADMIN_ORDERS === '1',
 };
 registerPublicCacheInvalidator(() => {
   clearPublicCatalogDtoCache();
@@ -69,6 +77,15 @@ const server = startServer({
         enabled: publicFlags.venue,
         buildVenues: buildPublicVenuesDto,
         buildVenue: buildPublicVenueDto,
+      }),
+      createAdminOrdersReadRouteHandler({
+        enabled: adminFlags.orders,
+        buildOrdersList: buildAdminOrdersListDto,
+      }),
+      createAdminEventsReadRouteHandler({
+        enabled: adminFlags.events,
+        buildEventsList: buildAdminEventsListDto,
+        buildEventDetail: buildAdminEventDetailDto,
       }),
       createAdminOrdersRouteHandler({
         db,

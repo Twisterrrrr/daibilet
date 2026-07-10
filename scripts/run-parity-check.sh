@@ -22,4 +22,6 @@ npm run backend:catalog:parity
 npm run backend:event:parity
 npm run backend:city:parity
 npm run backend:venue:parity
+npm run backend:admin-events:parity
+npm run backend:admin-orders:parity
 echo "Parity checks OK"

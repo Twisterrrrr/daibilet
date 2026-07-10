@@ -16,6 +16,8 @@
     "backend:event:parity": "npm --prefix apps/backend run event:parity",
     "backend:city:parity": "npm --prefix apps/backend run city:parity",
     "backend:venue:parity": "npm --prefix apps/backend run venue:parity",
+    "backend:admin-events:parity": "npm --prefix apps/backend run admin-events:parity",
+    "backend:admin-orders:parity": "npm --prefix apps/backend run admin-orders:parity",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:validate": "npm --prefix packages/db run db:validate",
