@@ -43,26 +43,40 @@ for (const queryString of cases) {
   console.log(`${queryString}: ${typed.total} items, parity ok`);
 }
 
-const sessionCatalog = await buildPublicCatalogDto(parseSearchParams(
+const legacyCatalog = await buildCatalogSessions(db, new URLSearchParams('limit=200&sort=time'));
+const typedCatalog = await buildPublicCatalogDto(parseSearchParams(
   publicCatalogQuerySchema,
   new URLSearchParams('limit=200&sort=time'),
 ));
-const sessionIds = [...new Set(
-  sessionCatalog.items.flatMap((item) => item.upcomingSlots || []).map((slot) => slot.id).filter(Boolean),
-)];
-assert.ok(sessionIds.length > 0, 'typed catalog must expose real EventSession ids');
 
-const linkedSessions = await db.query(
+for (let index = 0; index < Math.min(legacyCatalog.items.length, typedCatalog.items.length, 20); index += 1) {
+  const legacySlots = legacyCatalog.items[index]?.upcomingSlots || [];
+  const typedSlots = typedCatalog.items[index]?.upcomingSlots || [];
+  assert.equal(typedSlots.length, legacySlots.length, `item ${index}: upcoming slot count`);
+  assert.deepEqual(
+    typedSlots.map((slot) => [slot.eventId, slot.startsAt]),
+    legacySlots.map((slot: { eventId?: string; startsAt?: string }) => [slot.eventId, slot.startsAt]),
+    `item ${index}: upcoming slot schedule`,
+  );
+}
+
+const scheduleSlots = typedCatalog.items
+  .flatMap((item) => item.upcomingSlots || [])
+  .filter((slot) => slot.eventId && slot.startsAt);
+assert.ok(scheduleSlots.length > 0, 'typed catalog must expose purchasable upcoming slots');
+
+const eventIds = [...new Set(typedCatalog.items.map((item) => item.id))];
+const linkedEvents = await db.query(
   `
     select count(*)::int as count
     from "ProviderLink"
-    where "entityKind" = 'SESSION'
-      and "sessionId" = any($1::text[])
+    where "entityKind" = 'EVENT'
+      and "eventId" = any($1::text[])
   `,
-  [sessionIds],
+  [eventIds],
 );
-const linkedSessionCount = Number((linkedSessions.rows[0] as { count?: unknown } | undefined)?.count || 0);
-assert.ok(linkedSessionCount > 0, 'catalog slots must resolve ProviderLink SESSION identities');
-console.log(`SESSION identities: ${linkedSessionCount}/${sessionIds.length} catalog slots linked`);
+const linkedEventCount = Number((linkedEvents.rows[0] as { count?: unknown } | undefined)?.count || 0);
+assert.ok(linkedEventCount > 0, 'catalog items must resolve ProviderLink EVENT identities');
+console.log(`EVENT identities: ${linkedEventCount}/${eventIds.length} catalog items linked`);
 
 process.exit(0);
