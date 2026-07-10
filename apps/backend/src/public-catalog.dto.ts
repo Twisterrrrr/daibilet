@@ -1,4 +1,5 @@
 import { Prisma, prisma } from '../../../packages/db/src/client.ts';
+import { dedupeCrossSourceCatalogSessions, regroupMappedPublicCatalogSessions } from './dto.js';
 import { findLandingRule } from './landing-rules.js';
 import {
   mapGroupedPublicSession,
@@ -70,7 +71,9 @@ export async function getPublicCatalogSessions(forceRefresh = false): Promise<Pu
   if (forceRefresh) clearPublicCatalogDtoCache();
 
   const buildPromise = loadPublicCatalogRows().then((rows) => {
-    const sessions = rows.map(mapPublicCatalogRow);
+    const sessions = dedupeCrossSourceCatalogSessions(
+      regroupMappedPublicCatalogSessions(rows.map(mapPublicCatalogRow)),
+    );
     catalogCache = {
       expiresAt: Date.now() + PUBLIC_CATALOG_CACHE_MS,
       sessions,

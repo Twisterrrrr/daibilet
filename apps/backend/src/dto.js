@@ -2415,7 +2415,7 @@ function publicEventGroupKey(event) {
   ].join('|');
 }
 
-function regroupMappedPublicCatalogSessions(sessions) {
+export function regroupMappedPublicCatalogSessions(sessions) {
   const groups = new Map();
 
   for (const session of sessions) {
@@ -2617,7 +2617,7 @@ function mergeCrossSourceSessions(current, candidate) {
   };
 }
 
-function dedupeCrossSourceCatalogSessions(sessions) {
+export function dedupeCrossSourceCatalogSessions(sessions) {
   const passthrough = [];
   const pierSessions = [];
 
