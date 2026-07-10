@@ -4374,7 +4374,7 @@ function readOfferSortOrder(value) {
   return Number.isFinite(parsed) ? parsed : null;
 }
 
-function preferNamedTicketOffers(rows) {
+export function preferNamedTicketOffers(rows) {
   const list = rows || [];
   const named = list.filter((row) => !isGenericTcOfferTitle(row.title));
   return named.length ? named : list;
@@ -4385,7 +4385,7 @@ function isGenericTcOfferTitle(title) {
   return !key || key === 'widget' || key.includes('ticketscloud widget');
 }
 
-function dedupePublicOffers(rows) {
+export function dedupePublicOffers(rows) {
   const unique = new Map();
   for (const row of rows || []) {
     const key = `${String(row.sourceCode || '')}|${normalizeGroupPart(row.title)}|${row.priceRub}`;

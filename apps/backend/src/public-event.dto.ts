@@ -4,6 +4,7 @@ import {
   isSaleableForPublicCatalog,
   isWideLifetimeSession,
 } from './catalog-availability.js';
+import { dedupePublicOffers, preferNamedTicketOffers } from './dto.js';
 import { findLandingRule, matchingLandingSlugs } from './landing-rules.js';
 import {
   buildProviderWidgetPayload,
@@ -163,11 +164,13 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
       },
       include: offerInclude,
       orderBy: [{ priceRub: 'asc' }, { id: 'asc' }],
-      take: 24,
+      take: 32,
     }),
   ]);
 
-  const offers = dedupeOffers(offerRows).slice(0, 12);
+  const offers = preferNamedTicketOffers(
+    dedupePublicOffers(offerRows.map(mapOfferRecord)),
+  ).slice(0, 32) as MappedOffer[];
   const primaryOffers = primaryOfferMap(offers);
   const representativeOffer = primaryOffers.get(representative.id) || offers[0] || null;
   const requestedIdentity = eventIdentity(requestedEvent);
@@ -444,32 +447,20 @@ function eventIdentity(event: EventRecord): EventIdentity {
   };
 }
 
-function dedupeOffers(offers: OfferRecord[]): MappedOffer[] {
-  const unique = new Map<string, MappedOffer>();
-  for (const offer of offers) {
-    const sourceLink = offer.providerLinks[0];
-    const mapped: MappedOffer = {
-      id: offer.id,
-      eventId: offer.eventId,
-      sourceCode: offer.sourceCode,
-      title: offer.title || 'Ticketscloud widget',
-      priceRub: offer.priceRub,
-      widgetUrl: offer.widgetUrl,
-      deeplinkUrl: offer.deeplinkUrl,
-      active: offer.active,
-      sortOrder: offerSortOrder(offer.payload),
-      sourceTicketId: sourceLink?.externalId || null,
-    };
-    const key = `${mapped.sourceCode}|${normalizeGroupPart(mapped.title)}|${mapped.priceRub}`;
-    const current = unique.get(key);
-    if (!current || (mapped.sortOrder ?? 9999) < (current.sortOrder ?? 9999)) unique.set(key, mapped);
-  }
-  return [...unique.values()].sort((left, right) => {
-    if (providerForSource(left.sourceCode) === 'TEPLOHOD' || providerForSource(right.sourceCode) === 'TEPLOHOD') {
-      return (left.sortOrder ?? 9999) - (right.sortOrder ?? 9999) || Number(left.priceRub || 0) - Number(right.priceRub || 0);
-    }
-    return Number(left.priceRub || 0) - Number(right.priceRub || 0) || String(left.title).localeCompare(String(right.title), 'ru');
-  });
+function mapOfferRecord(offer: OfferRecord): MappedOffer {
+  const sourceLink = offer.providerLinks[0];
+  return {
+    id: offer.id,
+    eventId: offer.eventId,
+    sourceCode: offer.sourceCode,
+    title: offer.title || 'Ticketscloud widget',
+    priceRub: offer.priceRub,
+    widgetUrl: offer.widgetUrl,
+    deeplinkUrl: offer.deeplinkUrl,
+    active: offer.active,
+    sortOrder: offerSortOrder(offer.payload),
+    sourceTicketId: sourceLink?.externalId || null,
+  };
 }
 
 function primaryOfferMap(offers: MappedOffer[]): Map<string, MappedOffer> {
