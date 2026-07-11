@@ -29,9 +29,10 @@ type CatalogToolbarProps = {
   values: CatalogFilterValues;
   viewMode: CatalogViewMode;
   onViewModeChange: (mode: CatalogViewMode) => void;
+  disabled?: boolean;
 };
 
-export function CatalogToolbar({ facets, values, viewMode, onViewModeChange }: CatalogToolbarProps) {
+export function CatalogToolbar({ facets, values, viewMode, onViewModeChange, disabled = false }: CatalogToolbarProps) {
   const router = useRouter();
   const filters = useMemo(() => catalogFiltersFromQuery(values), [values]);
   const [filtersOpen, setFiltersOpen] = useState(countAdvancedFilters(filters) > 0);
@@ -163,7 +164,8 @@ export function CatalogToolbar({ facets, values, viewMode, onViewModeChange }: C
 
             <button
               type="submit"
-              className="btn-primary inline-btn h-10 px-4 text-sm"
+              disabled={disabled}
+              className="btn-primary inline-btn h-10 px-4 text-sm disabled:opacity-60"
             >
               Найти
             </button>

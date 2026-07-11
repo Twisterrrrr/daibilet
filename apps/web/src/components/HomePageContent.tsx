@@ -18,12 +18,7 @@ import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import '@/lib/env';
-import {
-  buildPublicCatalogDto,
-  buildPublicDestinationsDto,
-  buildPublicLandingsCatalogDto,
-  buildPublicVenuesDto,
-} from '@daibilet/backend/public-read';
+import { getHomePageData } from '@/server/cached-home-data';
 import { formatMoney, pluralEvents } from '@/lib/format';
 import { buildHomeShowcaseBundles } from '@/lib/home-showcase-sections';
 import { buildHomeNowTabs } from '@/lib/home-now-section';
@@ -57,12 +52,7 @@ function promoBlockIcon(slug: string, index: number) {
 }
 
 export async function HomePageContent() {
-  const [destinationsPayload, catalogPayload, landingsCatalog, venuesPayload] = await Promise.all([
-    buildPublicDestinationsDto(),
-    buildPublicCatalogDto({ limit: 300, sort: 'popular' }),
-    buildPublicLandingsCatalogDto(new URLSearchParams()),
-    buildPublicVenuesDto(new URLSearchParams({ family: 'institution', limit: '500' })),
-  ]);
+  const { destinationsPayload, catalogPayload, landingsCatalog, venuesPayload } = await getHomePageData();
 
   const destinations = destinationsPayload.destinations;
   const cities = destinations.filter((item) => item.type === 'city');
