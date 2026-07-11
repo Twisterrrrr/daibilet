@@ -13,6 +13,7 @@ const NAV_LINKS = [
   { label: 'Площадки', href: '/venues' },
   { label: 'Локации', href: '/locations' },
   { label: 'Подборки', href: '/podborki' },
+  { label: 'Блог', href: '/blog' },
 ] as const;
 
 function isNavActive(pathname: string, href: string): boolean {
