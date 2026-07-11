@@ -7,6 +7,7 @@ API_SERVICE_NAME="${API_SERVICE_NAME:-${SERVICE_NAME:-daibilet-api}}"
 PUBLIC_SERVICE_NAME="${PUBLIC_SERVICE_NAME:-daibilet-public}"
 PUBLIC_APP_FILTER="${PUBLIC_APP_FILTER:-@daibilet/public}"
 PUBLIC_STATS_PATH="${PUBLIC_STATS_PATH:-/api/public/stats}"
+RUN_LAUNCH_SMOKE="${RUN_LAUNCH_SMOKE:-0}"
 GIT_BRANCH="${GIT_BRANCH:-main}"
 
 cd "$APP_DIR"
@@ -75,4 +76,17 @@ wait_for_url() {
 
 wait_for_url "http://127.0.0.1:${API_PORT}/api/health"
 wait_for_url "http://127.0.0.1:${PUBLIC_PORT}${PUBLIC_STATS_PATH}"
+
+if [[ "$RUN_LAUNCH_SMOKE" == "1" ]]; then
+  smoke_args=(
+    --public-url "http://127.0.0.1:${PUBLIC_PORT}"
+    --api-url "http://127.0.0.1:${API_PORT}"
+    --admin-url "http://127.0.0.1:${API_PORT}"
+  )
+  if [[ -z "${ADMIN_PASSWORD:-}" && -z "${SMOKE_ADMIN_PASSWORD:-}" ]]; then
+    smoke_args+=(--skip-admin)
+  fi
+  pnpm smoke:launch -- "${smoke_args[@]}"
+fi
+
 echo "Daibilet deploy complete"

@@ -64,6 +64,7 @@ NODE_ENV=production
 PORT=4000
 PUBLIC_PORT=3000
 PUBLIC_APP_FILTER=@daibilet/public
+RUN_LAUNCH_SMOKE=0
 DATABASE_URL=postgresql://...
 DAIBILET_BACKEND_API_URL=http://127.0.0.1:4000
 DAIBILET_SITE_URL=https://daibilet.ru
@@ -119,7 +120,7 @@ chmod +x deploy/scripts/deploy-from-git.sh
 deploy/scripts/deploy-from-git.sh
 ```
 
-Скрипт делает `git pull` из `GIT_BRANCH` (`main` по умолчанию), ставит зависимости, применяет миграции, собирает выбранный Next public target через `PUBLIC_APP_FILTER` и admin, копирует только `apps/admin/dist` в `/var/www/daibilet/admin`, рестартует `daibilet-api` и `daibilet-public`, затем проверяет backend health и public stats.
+Скрипт делает `git pull` из `GIT_BRANCH` (`main` по умолчанию), ставит зависимости, применяет миграции, собирает выбранный Next public target через `PUBLIC_APP_FILTER` и admin, копирует только `apps/admin/dist` в `/var/www/daibilet/admin`, рестартует `daibilet-api` и `daibilet-public`, затем проверяет backend health и public stats. Если поставить `RUN_LAUNCH_SMOKE=1`, после рестарта дополнительно запускается `pnpm smoke:launch` по локальным service URL.
 
 Ручной вариант ниже оставлен как fallback:
 
@@ -248,3 +249,16 @@ Teplohod лучше проверять именно на сервере `213.171
 - `api.daibilet.ru/api/admin/dashboard` без auth возвращает `401`.
 - Sources показывает TC и Teplohod, last sync, counts, ошибки.
 - Orders/Buyers не показывают моковые данные.
+
+Автоматический вариант:
+
+```bash
+PUBLIC_BASE_URL=https://daibilet.ru \
+API_BASE_URL=https://api.daibilet.ru \
+ADMIN_BASE_URL=https://admin.daibilet.ru \
+ADMIN_EMAIL=admin@daibilet.ru \
+ADMIN_PASSWORD='<password>' \
+pnpm smoke:launch
+```
+
+Подробнее: [Launch Smoke Runbook](launch-smoke-runbook.md).

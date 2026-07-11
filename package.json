@@ -53,6 +53,7 @@
     "public:serve": "pnpm --filter @daibilet/public dev",
     "public:build": "pnpm --filter @daibilet/public build",
     "public:perf": "node scripts/public-performance-snapshot.mjs",
+    "smoke:launch": "node scripts/launch-smoke.mjs",
     "admin:data": "node scripts/build-admin-prototype-data.js",
     "admin:serve": "pnpm --filter @daibilet/admin dev",
     "admin:dev": "pnpm --filter @daibilet/admin dev",

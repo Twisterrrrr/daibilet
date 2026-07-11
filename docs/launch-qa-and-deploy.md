@@ -167,6 +167,19 @@
 - public home cold: желательно до 1000 ms, допустимо временно до 2000 ms перед первым запуском;
 - ошибки backend не маскируются моками в admin.
 
+Автоматизированный smoke:
+
+```bash
+PUBLIC_BASE_URL=https://daibilet.ru \
+API_BASE_URL=https://api.daibilet.ru \
+ADMIN_BASE_URL=https://admin.daibilet.ru \
+ADMIN_EMAIL=admin@daibilet.ru \
+ADMIN_PASSWORD='<password>' \
+pnpm smoke:launch
+```
+
+Подробный runbook: [Launch Smoke Runbook](launch-smoke-runbook.md).
+
 ## Деплой: Что Нужно От Владельца
 
 1. Сервер в РФ.
