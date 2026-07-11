@@ -18,6 +18,10 @@ test('hasUpcomingOrOpenSchedule rejects past TEP rows without schedule', () => {
   assert.equal(hasUpcomingOrOpenSchedule({ kind: 'SINGLE', startsAt: null }), false);
 });
 
+test('hasUpcomingOrOpenSchedule accepts widget-only purchase rows', () => {
+  assert.equal(hasUpcomingOrOpenSchedule({ kind: 'RECURRING', sourceStatus: 'widget', startsAt: null }), true);
+});
+
 test('hasUpcomingOrOpenSchedule accepts running session via endsAt', () => {
   const started = new Date(Date.now() - 3_600_000).toISOString();
   const ends = new Date(Date.now() + 3_600_000).toISOString();

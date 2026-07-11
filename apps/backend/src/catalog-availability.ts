@@ -60,6 +60,7 @@ export function isFutureSlotStart(
 }
 
 export function hasUpcomingOrOpenSchedule(row: CatalogScheduleRow): boolean {
+  if (String(row?.sourceStatus || '').toLowerCase() === 'widget') return true;
   if (isOpenDateCatalogRow(row)) return true;
 
   const now = Date.now();

@@ -298,9 +298,12 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     .filter((value): value is number => Number.isFinite(value));
 
   const scheduleSource = sessionRows[0] || sessions[0] || targetCatalogSession;
+  const scheduleSourceStatus = scheduleSource && 'sourceStatus' in scheduleSource
+    ? scheduleSource.sourceStatus
+    : requestedEvent.sourceStatus;
   if (!isSaleableEventForPublic({
     kind: requestedEvent.kind,
-    sourceStatus: requestedEvent.sourceStatus,
+    sourceStatus: scheduleSourceStatus,
     startsAt: scheduleSource && 'startsAt' in scheduleSource ? scheduleSource.startsAt : null,
     endsAt: sessionRows[0]?.endsAt || sessions.find((session) => session.endsAt)?.endsAt || null,
     purchaseReady: event.purchaseReady,
@@ -343,6 +346,16 @@ async function resolveEvent(
   if (catalogSession?.id) {
     const catalogEvent = await prisma.event.findUnique({ where: { id: catalogSession.id }, include: eventInclude });
     if (catalogEvent) return catalogEvent;
+  }
+
+  const tcPrefixMatch = eventSlugOrId.match(/^tc-([a-f0-9]{24})-/i);
+  if (tcPrefixMatch) {
+    const tcId = tcPrefixMatch[1];
+    const tcEvent = await prisma.event.findFirst({
+      where: { OR: [{ id: tcId }, { id: `evt_${tcId}` }] },
+      include: eventInclude,
+    });
+    if (tcEvent) return tcEvent;
   }
 
   const suffix = eventSlugOrId.match(/(?:^|-)([a-f0-9]{20,})$/i)?.[1];
@@ -414,11 +427,9 @@ function buildWidgetOnlySessions(
   purchaseUrl: string | null,
   catalogSession?: PublicSessionDto,
 ): PublicEventSession[] {
-  if (
-    sessions.length ||
-    !isOpenDateCatalogRow({ kind: event.kind, sourceStatus: event.sourceStatus }) ||
-    !purchase.ready
-  ) {
+  const widgetSchedule = isOpenDateCatalogRow({ kind: event.kind, sourceStatus: event.sourceStatus })
+    || providerForSource(sourceCode) === 'TICKETSCLOUD';
+  if (sessions.length || !widgetSchedule || !purchase.ready) {
     return [];
   }
   return [{

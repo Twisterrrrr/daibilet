@@ -4306,7 +4306,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     };
   });
   const widgetOnlySessions = sessions.length === 0
-    && isOpenDateCatalogRow({ kind: event.kind, sourceStatus: event.sourceStatus })
+    && (isOpenDateCatalogRow({ kind: event.kind, sourceStatus: event.sourceStatus }) || purchase.provider === 'TICKETSCLOUD')
     && purchase.ready
     ? [{
         id: `widget_tep_${event.id}`,
@@ -4348,7 +4348,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
   const priceValues = [baseEvent.priceFrom, ...publicSessions.map((session) => session.priceFrom)].filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const vacantValues = publicSessions.map((session) => session.vacant).filter((value) => Number.isFinite(value));
 
-  if (!isSaleableEventForPublic({ ...baseEvent, kind: event.kind, sourceStatus: event.sourceStatus, startsAt: publicSessions.find((session) => session.startsAt)?.startsAt || null,
+  if (!isSaleableEventForPublic({ ...baseEvent, kind: event.kind, sourceStatus: publicSessions.find((session) => session.sourceStatus === 'widget')?.sourceStatus || event.sourceStatus, startsAt: publicSessions.find((session) => session.startsAt)?.startsAt || null,
       endsAt: publicSessions.find((session) => session.endsAt)?.endsAt || null })) {
     return null;
   }
@@ -7317,6 +7317,7 @@ function isOpenDateCatalogRow(row) {
 }
 
 function hasUpcomingOrOpenSchedule(row = {}) {
+  if (String(row?.sourceStatus || '').toLowerCase() === 'widget') return true;
   if (isOpenDateCatalogRow(row)) return true;
 
   const now = Date.now();
