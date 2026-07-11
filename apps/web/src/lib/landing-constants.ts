@@ -23,6 +23,35 @@ export function canonicalLandingSlug(slug: string): string {
   return LANDING_SLUG_REDIRECTS[key] || key;
 }
 
+export function isBridgesNightLandingSlug(slug: string): boolean {
+  return canonicalLandingSlug(slug) === CANONICAL_LANDING_SLUGS.bridges;
+}
+
+export function isRiverCruisesLandingSlug(slug: string): boolean {
+  const key = canonicalLandingSlug(slug);
+  return key === CANONICAL_LANDING_SLUGS.river || ['river', 'river-walks', 'river-cruise'].includes(key);
+}
+
+export function isRiverPartyLandingSlug(slug: string): boolean {
+  const key = canonicalLandingSlug(slug);
+  return key === CANONICAL_LANDING_SLUGS.party || ['party-boat', 'river-disco', 'boat-party'].includes(key);
+}
+
+export function landingSlugVariants(slug: string): string[] {
+  const canonical = canonicalLandingSlug(slug);
+  const variants = new Set<string>([canonical, slug.toLowerCase()]);
+  for (const [legacy, target] of Object.entries(LANDING_SLUG_REDIRECTS)) {
+    if (target === canonical) variants.add(legacy);
+  }
+  if (isRiverCruisesLandingSlug(canonical)) {
+    ['river', 'river-walks', 'river-cruise'].forEach((item) => variants.add(item));
+  }
+  if (canonical.includes('bus')) {
+    ['bus', 'bus-sightseeing'].forEach((item) => variants.add(item));
+  }
+  return [...variants];
+}
+
 export function landingFetchCandidates(slug: string): string[] {
   const canonical = canonicalLandingSlug(slug);
   const candidates = new Set<string>([canonical]);

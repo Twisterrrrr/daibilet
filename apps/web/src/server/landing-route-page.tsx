@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { LandingPageView } from '@/components/LandingPageView';
+import { LandingPageView } from '@/components/LandingPageView.client';
+import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
 import { landingCategoryHref, resolveLandingRouteFromLocation } from '@/lib/landing-routes';
@@ -58,5 +59,14 @@ export async function LandingRoutePage({
   const genre = readSearchParam(searchParams, 'genre') || readSearchParam(searchParams, 'tag');
   const finalized = finalizeLandingPayload(payload, slug, route.citySlug, genre);
 
-  return <LandingPageView payload={finalized} />;
+  return (
+    <SiteLayout>
+      <LandingPageView
+        slug={slug}
+        citySlug={route.citySlug}
+        initialPayload={finalized}
+        genre={genre}
+      />
+    </SiteLayout>
+  );
 }

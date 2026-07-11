@@ -258,6 +258,7 @@ export interface PublicLandingPageDto extends ApiEnvelope {
     categories: Record<string, number>;
     venues: Record<string, number>;
     priceFrom?: number | null;
+    priceTo?: number | null;
   };
 }
 

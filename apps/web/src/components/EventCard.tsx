@@ -5,6 +5,7 @@ import { Clock, MapPin, Star, Ticket } from 'lucide-react';
 import { useState } from 'react';
 
 import { EventFavoriteButton } from '@/components/EventFavoriteButton.client';
+import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 import { collectCatalogLabels } from '@/lib/catalog-labels';
 import { EventImageBadges } from '@/lib/event-card-badges';
@@ -12,6 +13,7 @@ import {
   collectDisplaySlotLabels,
   collectDisplaySlotTimes,
   formatEventNextSession,
+  formatPriceRub,
   formatShowcasePriceLabel,
   formatShowcaseSessionDate,
   formatShowcaseSessionDateCompact,
@@ -31,6 +33,7 @@ type EventCardProps = {
   compact?: boolean;
   showcaseRail?: boolean;
   editorsPickBadge?: boolean;
+  landingActions?: boolean;
 };
 
 export function EventCard({
@@ -38,6 +41,7 @@ export function EventCard({
   compact = false,
   showcaseRail = false,
   editorsPickBadge = false,
+  landingActions = false,
 }: EventCardProps) {
   if (showcaseRail || editorsPickBadge) {
     return <ShowcaseEventCard session={session} rail={showcaseRail} editorsPickBadge={editorsPickBadge} />;
@@ -71,10 +75,15 @@ export function EventCard({
   const showSoonBadge = !hasPrice && !openDate && !departingSoonMinutes;
   const priceLabel = formatMoneyRange(session.priceFrom, session.priceTo);
 
-  return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-slate-200/60">
-      <Link href={href} className="absolute inset-0 z-[1] rounded-xl" aria-label={`Событие: ${session.title}`} />
+  const cardClassName =
+    'group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-slate-200/60';
+
+  const cardBody = (
+    <>
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100">
+        {landingActions ? (
+          <Link href={href} className="absolute inset-0 z-[1] rounded-t-xl" aria-label={`Страница события: ${session.title}`} />
+        ) : null}
         {!showImage ? (
           <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
             <div className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-300/80 bg-white/60 shadow-sm">
@@ -172,13 +181,34 @@ export function EventCard({
         ) : null}
 
         <div className="mt-auto flex items-center justify-between gap-2 pt-3">
-          <span className="text-sm font-semibold text-slate-900">{priceLabel}</span>
-          <span className="flex items-center gap-1 text-[10px] font-medium text-primary-600 sm:text-xs">
-            <Ticket className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-            Подробнее →
-          </span>
+          {landingActions ? (
+            <LandingPurchaseButton
+              session={session}
+              label={hasPrice ? `Купить от ${formatPriceRub(session.priceFrom)} ₽` : 'Купить'}
+              className="relative z-[2] inline-flex w-full items-center justify-center rounded-lg bg-primary-600 px-3 py-2 text-xs font-semibold text-white hover:bg-primary-700 sm:text-sm"
+            />
+          ) : (
+            <>
+              <span className="text-sm font-semibold text-slate-900">{priceLabel}</span>
+              <span className="flex items-center gap-1 text-[10px] font-medium text-primary-600 sm:text-xs">
+                <Ticket className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                Подробнее →
+              </span>
+            </>
+          )}
         </div>
       </div>
+    </>
+  );
+
+  if (landingActions) {
+    return <article className={`relative ${cardClassName}`}>{cardBody}</article>;
+  }
+
+  return (
+    <article className={`relative ${cardClassName}`}>
+      <Link href={href} className="absolute inset-0 z-[1] rounded-xl" aria-label={`Событие: ${session.title}`} />
+      {cardBody}
     </article>
   );
 }

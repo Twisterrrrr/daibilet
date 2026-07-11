@@ -270,6 +270,18 @@ export function landingPageHref(slug: string, citySlug?: string) {
   return landingCategoryHref(slug, citySlug);
 }
 
+export function busLandingHref(citySlug?: string) {
+  return landingCategoryHref(CANONICAL_LANDING_SLUGS.bus, citySlug);
+}
+
+export function riverLandingHref(citySlug?: string) {
+  return landingCategoryHref(CANONICAL_LANDING_SLUGS.river, citySlug);
+}
+
+export function partyLandingHref(citySlug?: string) {
+  return landingCategoryHref(CANONICAL_LANDING_SLUGS.party, citySlug);
+}
+
 /** Теги жанров на лендинге «Концерты» (совпадают с EventTag.title). */
 const CONCERT_GENRE_TAGS = ['Рок', 'Джаз', 'Классика', 'Поп', 'Эстрада', 'Металл', 'Орган'] as const;
 
