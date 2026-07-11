@@ -22,7 +22,7 @@ import {
 } from '@/lib/event-card-meta';
 import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
 import { formatMoneyRange } from '@/lib/format';
-import { eventHref } from '@/lib/routes';
+import { eventHref, sessionVenueHref } from '@/lib/routes';
 
 export function EventCardHorizontal({ session }: { session: PublicSessionDto }) {
   const [hasImageError, setHasImageError] = useState(false);
@@ -108,7 +108,19 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
           ) : sessionMetaLabel ? (
             <span className="font-medium text-primary-600">{sessionMetaLabel}</span>
           ) : null}
-          {locationLabel ? <span className="line-clamp-1">{locationLabel}</span> : null}
+          {locationLabel ? (
+            sessionVenueHref(session) ? (
+              <Link
+                href={sessionVenueHref(session)!}
+                className="relative z-[2] line-clamp-1 hover:text-primary-600"
+                onClick={(event) => event.stopPropagation()}
+              >
+                {locationLabel}
+              </Link>
+            ) : (
+              <span className="line-clamp-1">{locationLabel}</span>
+            )
+          ) : null}
         </div>
 
         {highlights.length > 0 ? (
