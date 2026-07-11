@@ -8,8 +8,9 @@ import '@/lib/env';
 import { formatPriceFrom, pluralEvents } from '@/lib/format';
 import { buildPublicCityDto } from '@daibilet/backend/public-read';
 import { venueHref } from '@/lib/routes';
+import { PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = PUBLIC_PAGE_REVALIDATE;
 
 type PageProps = {
   params: Promise<{ slug: string }>;

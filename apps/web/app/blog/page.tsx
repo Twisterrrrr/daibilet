@@ -4,6 +4,7 @@ import { BlogListView } from '@/components/BlogListView';
 import '@/lib/env';
 import { mergeBlogCards } from '@/lib/blog-utils';
 import { buildPublicArticlesListDto } from '@daibilet/backend/public-read';
+import { PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
 
 export const metadata: Metadata = {
   title: 'Блог — гайды и советы о событиях | Дайбилет',
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
     'Гайды по концертам, театру и городским прогулкам. Как выбрать билет, куда пойти с детьми, что смотреть на этой неделе.',
 };
 
-export const dynamic = 'force-dynamic';
+export const revalidate = PUBLIC_PAGE_REVALIDATE;
 
 export default async function BlogPage() {
   let posts = mergeBlogCards(null);

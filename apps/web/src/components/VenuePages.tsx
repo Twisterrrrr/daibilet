@@ -9,8 +9,6 @@ import { formatPriceFrom, pluralEvents } from '@/lib/format';
 import { buildPublicVenueDto, buildPublicVenuesDto } from '@daibilet/backend/public-read';
 import { venueHref } from '@/lib/routes';
 
-export const dynamic = 'force-dynamic';
-
 type PageProps = {
   params: Promise<{ slug: string }>;
   family: 'institution' | 'location';
