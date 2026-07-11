@@ -183,6 +183,7 @@
 3. Секреты и env.
    - `DATABASE_URL`.
    - `PUBLIC_PORT`.
+   - `PUBLIC_APP_FILTER` (`@daibilet/public` сейчас, `@daibilet/web` после принятия Cursor public).
    - `DAIBILET_BACKEND_API_URL`.
    - `DAIBILET_SITE_URL`.
    - `TICKETSCLOUD_API_TOKEN` или `TC_API_TOKEN`.
@@ -245,13 +246,14 @@
 
 ## Full-Stack Next Public Stack
 
-Production public запускается как отдельный Next service, а не как static `dist`. Backend остается интеграционным сервисом для sync, admin, health и provider API.
+Production public запускается как отдельный Next service, а не как static `dist`. Backend остается интеграционным сервисом для sync, admin, health и provider API. Конкретное Next-приложение выбирает `PUBLIC_APP_FILTER`: текущий default `@daibilet/public`, целевой быстрый путь Cursor - `@daibilet/web`.
 
 В `/opt/daibilet/.env` обязательны:
 
 ```env
 PORT=4000
 PUBLIC_PORT=3000
+PUBLIC_APP_FILTER=@daibilet/public
 DAIBILET_BACKEND_API_URL=http://127.0.0.1:4000
 DAIBILET_SITE_URL=https://daibilet.ru
 NEXT_PUBLIC_DAIBILET_API_URL=

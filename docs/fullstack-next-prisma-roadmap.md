@@ -8,7 +8,9 @@ Daibilet переводится в full-stack monorepo на Next.js + Prisma.
 
 Целевая структура:
 
-- `apps/public` - Next.js App Router: public, SEO pages, buyer account, public API route handlers.
+- production public Next app выбирается через `PUBLIC_APP_FILTER`: текущий default `@daibilet/public`, целевой быстрый путь Cursor - `@daibilet/web` после приемки его ветки.
+- `apps/public` - текущий Next.js App Router/reference public: SEO pages, buyer account, public API route handlers.
+- `apps/web` - будущий канонический public target, если Cursor-ветка пройдет smoke и заменит `apps/public`.
 - `apps/admin` - пока Vite React admin, позже можно перенести в Next route group или отдельное Next-приложение.
 - `apps/backend` - временный legacy/compat backend для тяжелых sync, старых DTO и административных API до переноса.
 - `packages/db` - единый Prisma schema/client/migrations.
@@ -19,7 +21,7 @@ Daibilet переводится в full-stack monorepo на Next.js + Prisma.
 
 ## Что уже сделано
 
-- `apps/public` переведен с Vite на Next.js App Router.
+- `apps/public` переведен с Vite на Next.js App Router и остается рабочим default target до приемки `apps/web`.
 - Сохранены текущие публичные URL через `app/[[...path]]/page.tsx`.
 - Добавлен базовый `metadata` слой для public.
 - Добавлен same-origin API bridge: `app/api/[[...path]]/route.ts`.
@@ -32,7 +34,7 @@ Daibilet переводится в full-stack monorepo на Next.js + Prisma.
   - дочерние sitemaps `/sitemaps/static`, `/sitemaps/events`, `/sitemaps/cities`, `/sitemaps/venues`, `/sitemaps/landings`;
   - entity-aware metadata для событий, городов, площадок и лендингов;
   - JSON-LD для breadcrumbs, событий и площадок.
-- `/api/public/stats`, `/api/public/events`, `/api/public/home/preview`, `/api/public/events/:slug`, `/api/public/destinations`, `/api/public/cities/:slug`, `/api/public/venues`, `/api/public/venues/:slug`, `/api/public/landings/:slug`, `/api/public/orders` и `/api/account/purchases` переведены на Prisma-backed Next route handlers; общий backend bridge остается fallback для остальных API.
+- `/api/public/stats`, `/api/public/events`, `/api/public/home/preview`, `/api/public/events/:slug`, `/api/public/destinations`, `/api/public/cities/:slug`, `/api/public/venues`, `/api/public/venues/:slug`, `/api/public/landings/:slug`, `/api/public/orders` и `/api/account/purchases` переведены на Prisma-backed Next route handlers в текущем public target; общий backend bridge остается fallback для остальных API.
 
 ## Почему proxy bridge нужен
 

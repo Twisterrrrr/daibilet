@@ -24,7 +24,7 @@
 - `/var/www/daibilet/admin` - собранная admin.
 - `/var/backups/daibilet` - архив старой версии перед переключением.
 
-Public больше не выкладывается как static `dist`: `daibilet.ru` обслуживает Next.js server из `/opt/daibilet/apps/public`.
+Public больше не выкладывается как static `dist`: `daibilet.ru` обслуживает Next.js server. Текущий default target - `@daibilet/public`; когда Cursor доведет `apps/web`, production target переключается через `PUBLIC_APP_FILTER=@daibilet/web`.
 
 ## GitHub
 
@@ -63,6 +63,7 @@ export GIT_BRANCH=integrate/mvp-launch
 NODE_ENV=production
 PORT=4000
 PUBLIC_PORT=3000
+PUBLIC_APP_FILTER=@daibilet/public
 DATABASE_URL=postgresql://...
 DAIBILET_BACKEND_API_URL=http://127.0.0.1:4000
 DAIBILET_SITE_URL=https://daibilet.ru
@@ -88,6 +89,7 @@ Build-time env для фронтов:
 
 ```bash
 # Public Next build
+# После перехода на apps/web: PUBLIC_APP_FILTER=@daibilet/web
 # В production оставляем пустым, чтобы public ходил в same-origin /api на daibilet.ru.
 NEXT_PUBLIC_DAIBILET_API_URL=
 NEXT_PUBLIC_SITE_URL=https://daibilet.ru
@@ -117,7 +119,7 @@ chmod +x deploy/scripts/deploy-from-git.sh
 deploy/scripts/deploy-from-git.sh
 ```
 
-Скрипт делает `git pull` из `GIT_BRANCH` (`main` по умолчанию), ставит зависимости, применяет миграции, собирает public Next/admin, копирует только `apps/admin/dist` в `/var/www/daibilet/admin`, рестартует `daibilet-api` и `daibilet-public`, затем проверяет backend health и public stats.
+Скрипт делает `git pull` из `GIT_BRANCH` (`main` по умолчанию), ставит зависимости, применяет миграции, собирает выбранный Next public target через `PUBLIC_APP_FILTER` и admin, копирует только `apps/admin/dist` в `/var/www/daibilet/admin`, рестартует `daibilet-api` и `daibilet-public`, затем проверяет backend health и public stats.
 
 Ручной вариант ниже оставлен как fallback:
 
@@ -131,7 +133,8 @@ pnpm typecheck
 pnpm test
 pnpm --filter @daibilet/backend build
 
-NEXT_PUBLIC_DAIBILET_API_URL= NEXT_PUBLIC_SITE_URL=https://daibilet.ru NEXT_PUBLIC_TEP_WIDGET_ID=14208 pnpm --filter @daibilet/public build
+PUBLIC_APP_FILTER=@daibilet/public
+NEXT_PUBLIC_DAIBILET_API_URL= NEXT_PUBLIC_SITE_URL=https://daibilet.ru NEXT_PUBLIC_TEP_WIDGET_ID=14208 pnpm --filter "$PUBLIC_APP_FILTER" build
 VITE_DAIBILET_API_URL=/api VITE_DAIBILET_PUBLIC_URL=https://daibilet.ru pnpm --filter @daibilet/admin build
 
 mkdir -p /var/www/daibilet/admin
@@ -172,7 +175,7 @@ Type=simple
 WorkingDirectory=/opt/daibilet
 EnvironmentFile=/opt/daibilet/.env
 Environment=NODE_ENV=production
-ExecStart=/usr/bin/env sh -lc 'PUBLIC_PORT="${PUBLIC_PORT:-3000}" pnpm --filter @daibilet/public preview'
+ExecStart=/usr/bin/env sh -lc 'PUBLIC_PORT="${PUBLIC_PORT:-3000}" pnpm --filter "${PUBLIC_APP_FILTER:-@daibilet/public}" preview'
 Restart=always
 RestartSec=5
 

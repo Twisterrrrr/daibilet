@@ -5,6 +5,8 @@ APP_DIR="${APP_DIR:-/opt/daibilet}"
 ADMIN_DIR="${ADMIN_DIR:-/var/www/daibilet/admin}"
 API_SERVICE_NAME="${API_SERVICE_NAME:-${SERVICE_NAME:-daibilet-api}}"
 PUBLIC_SERVICE_NAME="${PUBLIC_SERVICE_NAME:-daibilet-public}"
+PUBLIC_APP_FILTER="${PUBLIC_APP_FILTER:-@daibilet/public}"
+PUBLIC_STATS_PATH="${PUBLIC_STATS_PATH:-/api/public/stats}"
 GIT_BRANCH="${GIT_BRANCH:-main}"
 
 cd "$APP_DIR"
@@ -41,7 +43,7 @@ NEXT_PUBLIC_DAIBILET_API_URL="${NEXT_PUBLIC_DAIBILET_API_URL:-}" \
 NEXT_PUBLIC_SITE_URL="$PUBLIC_SITE_URL" \
 NEXT_PUBLIC_TEP_WIDGET_ID="$TEP_WIDGET_ID" \
 NEXT_PUBLIC_TC_WIDGET_TOKEN="${NEXT_PUBLIC_TC_WIDGET_TOKEN:-${TICKETSCLOUD_WIDGET_TOKEN:-${TC_WIDGET_TOKEN:-}}}" \
-pnpm --filter @daibilet/public build
+pnpm --filter "$PUBLIC_APP_FILTER" build
 
 VITE_DAIBILET_API_URL="$ADMIN_API_URL" \
 VITE_DAIBILET_PUBLIC_URL="$PUBLIC_SITE_URL" \
@@ -72,5 +74,5 @@ wait_for_url() {
 }
 
 wait_for_url "http://127.0.0.1:${API_PORT}/api/health"
-wait_for_url "http://127.0.0.1:${PUBLIC_PORT}/api/public/stats"
+wait_for_url "http://127.0.0.1:${PUBLIC_PORT}${PUBLIC_STATS_PATH}"
 echo "Daibilet deploy complete"

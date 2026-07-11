@@ -22,7 +22,8 @@
 
 ## Что готово
 
-- Монорепо: `apps/public`, `apps/admin`, `apps/backend`, `packages/db`, `packages/contracts`, `packages/config`.
+- Монорепо: `apps/public`, `apps/admin`, `apps/backend`, `packages/db`, `packages/contracts`, `packages/config`; `apps/web` ожидается из Cursor-ветки как возможный новый production public.
+- Production public target теперь не должен быть зашит в deploy: используется `PUBLIC_APP_FILTER` (`@daibilet/public` сейчас, `@daibilet/web` после приемки Cursor public).
 - Prisma schema и shared Prisma client в `packages/db`.
 - Backend TypeScript foundation и typed entrypoint.
 - Typed public DTO/read-models для ключевых public-контуров.

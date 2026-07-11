@@ -2,11 +2,12 @@
 
 Этот файл фиксирует решения, которые влияют на архитектуру, запуск и дальнейшие фазы. Новые решения добавляем сверху или в конец с датой.
 
-## 2026-07-11: Production public runs as a Next server
+## 2026-07-11: Production public runs as a configurable Next server
 
 Решение:
 
-- запускать `apps/public` в production как отдельный Next service `daibilet-public`, а не копировать static `apps/public/dist`;
+- запускать production public как отдельный Next service `daibilet-public`, а не копировать static `dist`;
+- выбирать конкретное Next-приложение через `PUBLIC_APP_FILTER`: сейчас default `@daibilet/public`, после готовности Cursor-ветки можно переключить на `@daibilet/web`;
 - проксировать `daibilet.ru` и `www.daibilet.ru` в Next public server `127.0.0.1:3000`;
 - проксировать `api.daibilet.ru/api/public/*` в Next public server, чтобы smoke и внешние public API попадали в Prisma-backed handlers;
 - оставить backend `daibilet-api` для health, admin, sync, provider integrations и legacy bridge paths;
@@ -20,7 +21,7 @@
 
 Следствие:
 
-- deploy теперь собирает public через `pnpm --filter @daibilet/public build`, не копирует public `dist`, рестартует `daibilet-public` и проверяет `/api/public/stats` на Next service;
+- deploy теперь собирает public через `pnpm --filter "$PUBLIC_APP_FILTER" build`, не копирует public `dist`, рестартует `daibilet-public` и проверяет `/api/public/stats` на Next service;
 - production `.env` должен содержать `PUBLIC_PORT`, `DAIBILET_BACKEND_API_URL`, `DAIBILET_SITE_URL`, `NEXT_PUBLIC_SITE_URL` и пустой `NEXT_PUBLIC_DAIBILET_API_URL`;
 - любые новые public SEO/API routes нужно добавлять в Next сначала, а backend bridge использовать только как переходный слой.
 

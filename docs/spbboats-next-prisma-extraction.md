@@ -72,7 +72,7 @@ SPBBOATS - донор контрактов, не кодовая база для 
 
 Решение для Daibilet:
 
-- public остается `apps/public` на Next App Router;
+- production public target выбирается через `PUBLIC_APP_FILTER`: текущий default `@daibilet/public`, после приемки Cursor-ветки можно переключить на `@daibilet/web`;
 - старый backend bridge временный;
 - indexable маршруты должны постепенно стать Prisma-backed route handlers/server components;
 - `/landings/:slug` не должен быть SEO-основой для широких посадочных. Для больших запросов нужны корневые URL: `/river-cruises`, `/bus-tours`, `/salute-9-may`; городские варианты - `/cities/:citySlug/:landingSlug` или согласованный человекочитаемый маршрут.
