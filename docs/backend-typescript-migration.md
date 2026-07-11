@@ -107,6 +107,12 @@ if (isRoute(context, 'GET /api/public/events')) {
 
 Ограничение: body validation для POST/PATCH пока не подключаем к legacy handler, потому что чтение body в TS-обертке потребит stream до старого обработчика. Это нужно делать уже при переносе конкретного route.
 
+Примечание 2026-07-11:
+
+- public buyer lookup больше не должен зависеть от legacy handler в штатном public runtime;
+- `GET /api/public/orders` и `GET /api/account/purchases` перенесены в `apps/public` как Next route handlers поверх Prisma;
+- `GET /api/user/auth/*` пока остается за backend bridge, потому что там живет текущая логика refresh-cookie и выдачи JWT.
+
 Smoke 2026-06-24:
 
 - `npm run backend:typecheck` - ok;

@@ -32,7 +32,7 @@ Daibilet переводится в full-stack monorepo на Next.js + Prisma.
   - дочерние sitemaps `/sitemaps/static`, `/sitemaps/events`, `/sitemaps/cities`, `/sitemaps/venues`, `/sitemaps/landings`;
   - entity-aware metadata для событий, городов, площадок и лендингов;
   - JSON-LD для breadcrumbs, событий и площадок.
-- `/api/public/stats`, `/api/public/events`, `/api/public/home/preview`, `/api/public/events/:slug`, `/api/public/destinations`, `/api/public/cities/:slug`, `/api/public/venues`, `/api/public/venues/:slug` и `/api/public/landings/:slug` переведены на Prisma-backed Next route handlers; общий backend bridge остается fallback для остальных API.
+- `/api/public/stats`, `/api/public/events`, `/api/public/home/preview`, `/api/public/events/:slug`, `/api/public/destinations`, `/api/public/cities/:slug`, `/api/public/venues`, `/api/public/venues/:slug`, `/api/public/landings/:slug`, `/api/public/orders` и `/api/account/purchases` переведены на Prisma-backed Next route handlers; общий backend bridge остается fallback для остальных API.
 
 ## Почему proxy bridge нужен
 
@@ -88,6 +88,7 @@ Daibilet переводится в full-stack monorepo на Next.js + Prisma.
    - `/api/user/auth/*`
    - `/api/account/purchases`
    - `/api/public/orders`
+   - статус: lookup заказов и авторизованные покупки готовы в Next + Prisma; auth endpoints (`login/register/refresh/logout/me`) пока остаются за backend bridge, чтобы не ломать текущую выдачу refresh-cookie.
 
 7. Admin and supplier:
    - сначала оставить на backend;
@@ -113,6 +114,16 @@ Prisma уже должен оставаться единой точкой дос
 - event page показывает площадку, город, 5 ближайших слотов, цены и категории билетов;
 - buyer account/order lookup работает;
 - smoke тесты проходят на staging.
+
+Smoke 2026-07-11 по buyer account:
+
+- `GET /api/public/orders?lookup=abc` - `200`, `lookupRequired=true`;
+- `GET /api/public/orders?lookup=9699597` - `200`, найден внешний TC-заказ по короткому публичному номеру;
+- `GET /api/account/purchases` без token - `401`;
+- `GET /api/account/purchases?page=1&limit=5` с временным dev access-token - `200`.
+- Перед smoke локально применены миграции `20260709210000_marketplace_phase_foundation`, `20260709223000_phase2_commerce_supplier_contracts`, `20260710110000_phase2_event_management_buyer_account`; на сервере `pnpm db:deploy` должен идти до запуска Next.
+- Privacy guard: unauthenticated order lookup не ищет по email/телефону; account purchases подтягивает email-linked заказы только после `emailVerifiedAt`, иначе только явно привязанные `siteUserId`.
+- Launch guard: эти route handlers работают только при запущенном Next server для `apps/public`; старый static `dist` deploy не выполнит Next API routes.
 
 Не делаем до первых продаж:
 
