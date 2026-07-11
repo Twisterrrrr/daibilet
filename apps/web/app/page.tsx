@@ -8,7 +8,7 @@ import { HomeHeroSearch } from '@/components/HomeHeroSearch.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { buildPublicCatalogDto, buildPublicDestinationsDto } from '@daibilet/backend/public-read';
-import { formatNumber, pluralEvents } from '@/lib/format';
+import { formatNumber, pluralCities, pluralEvents } from '@/lib/format';
 import { HOME_FORMAT_TILES, HOME_TRUST_ITEMS } from '@/lib/home-scenarios';
 
 export const metadata: Metadata = {
@@ -24,11 +24,9 @@ export default async function HomePage() {
     buildPublicCatalogDto({ limit: 8, sort: 'popular' }),
   ]);
 
-  const topCities = destinationsPayload.destinations
-    .filter((item) => item.type === 'city')
-    .sort((a, b) => b.events - a.events)
-    .slice(0, 8);
-
+  const cities = destinationsPayload.destinations.filter((item) => item.type === 'city');
+  const topCities = [...cities].sort((a, b) => b.events - a.events).slice(0, 8);
+  const cityCount = cities.length;
   const totalEvents = destinationsPayload.destinations.reduce((sum, item) => sum + item.events, 0);
 
   return (
@@ -114,7 +112,7 @@ export default async function HomePage() {
             ))}
           </ul>
           <p className="mt-6 text-sm text-slate-500">
-            {topCities.length ? `${topCities.length}+ городов · ${pluralEvents(totalEvents)}` : null}
+            {cityCount ? `${pluralCities(cityCount)} · ${pluralEvents(totalEvents)}` : null}
           </p>
         </div>
       </section>

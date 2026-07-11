@@ -17,3 +17,12 @@ export function pluralEvents(count: number): string {
   if (mod10 >= 2 && mod10 <= 4) return `${formatNumber(count)} события`;
   return `${formatNumber(count)} событий`;
 }
+
+export function pluralCities(count: number): string {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod100 >= 11 && mod100 <= 19) return `${formatNumber(count)} городов`;
+  if (mod10 === 1) return `${formatNumber(count)} город`;
+  if (mod10 >= 2 && mod10 <= 4) return `${formatNumber(count)} города`;
+  return `${formatNumber(count)} городов`;
+}
