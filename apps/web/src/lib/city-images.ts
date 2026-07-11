@@ -21,17 +21,49 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'moscow',
   'kazan',
   'kaliningrad',
+  'vladivostok',
+  'vologda',
+  'irkutsk',
+  'perm',
+  'samara',
   'sochi',
   'ekaterinburg',
   'nizhny-novgorod',
   'novosibirsk',
   'krasnodar',
-  'vladivostok',
+  'suzdal',
+  'veliky-novgorod',
+  'voronezh',
+  'yaroslavl',
+  'krasnoyarsk',
+  'omsk',
+  'chelyabinsk',
+  'rostov-on-don',
+  'saratov',
+  'tula',
+  'tver',
+  'tyumen',
+  'ufa',
+  'ulan-ude',
+  'ryazan',
+  'stavropol',
+  'tomsk',
+  'ulyanovsk',
+  'izhevsk',
+  'orel',
+  'orenburg',
+  'penza',
+  'volgograd',
+  'sortavala',
 ]);
+
+function isUsableRemoteImage(url: string): boolean {
+  return /^https?:\/\//i.test(url) && !url.startsWith('/images/cities/');
+}
 
 export function resolveCityCardImage(city: CityImageSource): string | null {
   const fromApi = city.heroImageUrl?.trim();
-  if (fromApi) return fromApi;
+  if (fromApi && isUsableRemoteImage(fromApi)) return fromApi;
 
   const slug = citySlug(city);
   const imageSlug = CITY_CARD_IMAGE_ALIASES[slug] || slug;

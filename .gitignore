@@ -12,6 +12,7 @@ dist/
 **/dist/
 .vite/
 **/.vite/
+apps/web/public/images/
 
 # Generated code
 packages/db/src/generated/
