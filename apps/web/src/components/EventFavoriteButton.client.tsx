@@ -48,3 +48,31 @@ export function EventFavoriteButton({ eventId, className = '' }: { eventId: stri
     </button>
   );
 }
+
+const CARD_BADGE_CLASS =
+  'inline-flex w-fit items-center rounded-full px-2 py-0.5 text-[10px] font-semibold leading-none shadow-sm backdrop-blur-sm sm:px-2.5 sm:py-1 sm:text-[11px]';
+
+export function EventCardBadge({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return <span className={`${CARD_BADGE_CLASS} ${className}`}>{children}</span>;
+}
+
+export function EditorsPickBadge({
+  className = '',
+  label = 'Выбор редакции',
+}: {
+  className?: string;
+  compact?: boolean;
+  label?: string;
+}) {
+  return (
+    <EventCardBadge className={`gradient-gold text-amber-950 shadow-gold ${className}`} aria-label={label}>
+      {label}
+    </EventCardBadge>
+  );
+}

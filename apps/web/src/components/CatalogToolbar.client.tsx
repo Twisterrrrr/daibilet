@@ -2,13 +2,15 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
+import { ChevronDown, Search, SlidersHorizontal } from 'lucide-react';
 import { FormEvent, useMemo, useState } from 'react';
+
+import { CatalogAdvancedFiltersPanel } from '@/components/CatalogAdvancedFiltersPanel.client';
+import { ViewModeToggle } from '@/components/CatalogResults.client';
 
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
 import { CATALOG_PAGE_SIZES } from '@daibilet/contracts/catalog';
 import {
-  AGE_FILTER_OPTIONS,
   buildCatalogHref,
   CATALOG_SORT_OPTIONS,
   catalogFiltersFromQuery,
@@ -20,13 +22,16 @@ import {
   catalogPresetMatches,
   CATALOG_PRESETS,
 } from '@/lib/catalog-presets';
+import { categoryEmoji, type CatalogViewMode } from '@/lib/catalog-view-mode';
 
 type CatalogToolbarProps = {
   facets: PublicCatalogDto['facets'];
   values: CatalogFilterValues;
+  viewMode: CatalogViewMode;
+  onViewModeChange: (mode: CatalogViewMode) => void;
 };
 
-export function CatalogToolbar({ facets, values }: CatalogToolbarProps) {
+export function CatalogToolbar({ facets, values, viewMode, onViewModeChange }: CatalogToolbarProps) {
   const router = useRouter();
   const filters = useMemo(() => catalogFiltersFromQuery(values), [values]);
   const [filtersOpen, setFiltersOpen] = useState(countAdvancedFilters(filters) > 0);
@@ -156,107 +161,93 @@ export function CatalogToolbar({ facets, values }: CatalogToolbarProps) {
               ) : null}
             </button>
 
-            <button type="submit" className="btn-primary inline-btn h-10 px-4 text-sm">
+            <button
+              type="submit"
+              className="btn-primary inline-btn h-10 px-4 text-sm"
+            >
               Найти
             </button>
+
+            <ViewModeToggle mode={viewMode} onChange={onViewModeChange} />
           </div>
         </div>
 
         {filtersOpen ? (
-          <div
-            id="advanced-filters-panel"
-            className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
-          >
-            <div className="grid grid-cols-1 divide-y divide-slate-200 md:grid-cols-2 md:divide-x md:divide-y-0 lg:grid-cols-4">
-              <AdvancedField title="Категория">
-                <select name="category" defaultValue={filters.category || 'all'} className={selectCls}>
-                  <option value="all">Все категории</option>
-                  {facets.categories.map((item) => (
-                    <option key={item.name} value={item.name}>
-                      {item.name} ({item.events})
-                    </option>
-                  ))}
-                </select>
-              </AdvancedField>
-
-              <AdvancedField title="Подборка">
-                <select name="landing" defaultValue={filters.landing || 'all'} className={selectCls}>
-                  <option value="all">Все подборки</option>
-                  {facets.landings.slice(0, 24).map((item) => (
-                    <option key={item.slug} value={item.slug}>
-                      {item.title} ({item.events})
-                    </option>
-                  ))}
-                </select>
-              </AdvancedField>
-
-              <AdvancedField title="Дата">
-                <select name="date" defaultValue={filters.date || 'all'} className={selectCls}>
-                  <option value="all">Любая дата</option>
-                  <option value="today">Сегодня</option>
-                  <option value="tomorrow">Завтра</option>
-                  <option value="weekend">На выходных</option>
-                  <option value="evening">Вечером</option>
-                </select>
-                <div className="mt-2 grid grid-cols-2 gap-2">
-                  <input type="date" name="from" defaultValue={filters.from || ''} className={inputCls} aria-label="Дата с" />
-                  <input type="date" name="to" defaultValue={filters.to || ''} className={inputCls} aria-label="Дата по" />
-                </div>
-              </AdvancedField>
-
-              <AdvancedField title="Цена и возраст">
-                <div className="grid grid-cols-2 gap-2">
-                  <input
-                    type="number"
-                    name="minPrice"
-                    min={0}
-                    step={100}
-                    defaultValue={filters.minPrice ?? ''}
-                    placeholder="от"
-                    className={inputCls}
-                    aria-label="Цена от"
-                  />
-                  <input
-                    type="number"
-                    name="maxPrice"
-                    min={0}
-                    step={100}
-                    defaultValue={filters.maxPrice ?? ''}
-                    placeholder="до"
-                    className={inputCls}
-                    aria-label="Цена до"
-                  />
-                </div>
-                <select
-                  name="ageMax"
-                  defaultValue={filters.ageMax != null && filters.ageMax >= 0 ? String(filters.ageMax) : '-1'}
-                  className={`${selectCls} mt-2`}
-                >
-                  {AGE_FILTER_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-                {facets.priceSteps.length ? (
-                  <div className="mt-2 flex flex-wrap gap-1.5">
-                    {facets.priceSteps.map((step) => (
-                      <button
-                        key={step}
-                        type="button"
-                        onClick={() => navigate({ ...filters, maxPrice: step, minPrice: undefined })}
-                        className="inline-btn rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 hover:border-slate-300 hover:bg-slate-50"
-                      >
-                        до {step} ₽
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-              </AdvancedField>
-            </div>
-          </div>
+          <CatalogAdvancedFiltersPanel
+            filters={{
+              dateFrom: filters.from || '',
+              dateTo: filters.to || '',
+              minPrice: filters.minPrice != null ? String(filters.minPrice) : 'all',
+              maxPrice: filters.maxPrice != null ? String(filters.maxPrice) : 'all',
+              ageMax: filters.ageMax != null && filters.ageMax >= 0 ? filters.ageMax : -1,
+              landing: filters.landing || 'all',
+            }}
+            landings={facets.landings}
+            onChange={(patch) => {
+              navigate({
+                ...filters,
+                from: patch.dateFrom !== undefined ? patch.dateFrom || undefined : filters.from,
+                to: patch.dateTo !== undefined ? patch.dateTo || undefined : filters.to,
+                minPrice:
+                  patch.minPrice !== undefined
+                    ? patch.minPrice === 'all'
+                      ? undefined
+                      : Number(patch.minPrice)
+                    : filters.minPrice,
+                maxPrice:
+                  patch.maxPrice !== undefined
+                    ? patch.maxPrice === 'all'
+                      ? undefined
+                      : Number(patch.maxPrice)
+                    : filters.maxPrice,
+                ageMax: patch.ageMax !== undefined ? (patch.ageMax >= 0 ? patch.ageMax : undefined) : filters.ageMax,
+                landing:
+                  patch.landing !== undefined
+                    ? patch.landing === 'all'
+                      ? undefined
+                      : patch.landing
+                    : filters.landing,
+              });
+            }}
+            onClose={() => setFiltersOpen(false)}
+            onReset={() => navigate({ sort: filters.sort, limit: filters.limit })}
+          />
         ) : null}
       </form>
+
+      <div className="-mx-4 px-4 sm:mx-0 sm:px-0">
+        <div className="horizontal-snap-row flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <Link
+            href={buildCatalogHref({ ...filters, category: undefined })}
+            className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition ${
+              !filters.category ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+            }`}
+          >
+            <span className="mr-1">✨</span>
+            Все
+          </Link>
+          {facets.categories.map((item) => (
+            <Link
+              key={item.name}
+              href={buildCatalogHref({
+                ...filters,
+                category: filters.category === item.name ? undefined : item.name,
+              })}
+              className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition ${
+                filters.category === item.name
+                  ? 'bg-slate-900 text-white'
+                  : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+              }`}
+            >
+              <span className="mr-1">{categoryEmoji(item.name)}</span>
+              {item.name}
+              <span className={filters.category === item.name ? 'ml-1 text-white/70' : 'ml-1 text-slate-400'}>
+                {item.events}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </div>
 
       <div className="horizontal-snap-row scrollbar-hide">
         <div className="flex w-max flex-nowrap gap-2">
@@ -282,19 +273,6 @@ export function CatalogToolbar({ facets, values }: CatalogToolbarProps) {
   );
 }
 
-function AdvancedField({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="p-4">
-      <div className="mb-2 text-[11px] font-bold uppercase tracking-wider text-slate-500">{title}</div>
-      {children}
-    </div>
-  );
-}
-
-const inputCls =
-  'inline-btn h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition hover:border-slate-300 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40';
-const selectCls =
-  'inline-btn h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition hover:border-slate-300 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40';
 
 function parseOptionalNumber(value: FormDataEntryValue | null): number | undefined {
   const raw = String(value ?? '').trim();

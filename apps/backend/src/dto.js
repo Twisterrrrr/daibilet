@@ -2472,6 +2472,7 @@ export function regroupMappedPublicCatalogSessions(sessions) {
       (current.upcomingSlots || []).concat(session.upcomingSlots || []).concat(slotFromSession ? [slotFromSession] : []),
     );
     current.priceFrom = minNullableNumber([current.priceFrom, session.priceFrom]);
+    current.priceTo = maxNullableNumber([current.priceTo, session.priceTo, session.priceFrom]);
     current.vacant = sumNullableNumbers([current.vacant, session.vacant]);
     current.tags = uniqueValues((current.tags || []).concat(session.tags || []));
     current.title = mergeCatalogDisplayTitle(current.title, session.title, current.venue || session.venue);
@@ -2485,6 +2486,7 @@ export function regroupMappedPublicCatalogSessions(sessions) {
         sessionCount: current.sessionCount,
         upcomingSlots: current.upcomingSlots,
         priceFrom: current.priceFrom,
+        priceTo: current.priceTo,
         vacant: current.vacant,
         tags: current.tags,
         manualLandingStatus: current.manualLandingStatus,
@@ -2624,6 +2626,7 @@ function mergeCrossSourceSessions(current, candidate) {
     groupEventIds: mergedGroupEventIds,
     groupedEventsCount: mergedGroupEventIds.length,
     priceFrom: minNullableNumber([current.priceFrom, candidate.priceFrom]),
+    priceTo: maxNullableNumber([current.priceTo, candidate.priceTo, current.priceFrom, candidate.priceFrom]),
     vacant: sumNullableNumbers([current.vacant, candidate.vacant]),
     manualLandingStatus:
       current.manualLandingStatus === 'PINNED' || candidate.manualLandingStatus === 'PINNED' ? 'PINNED' : null,
@@ -2776,6 +2779,11 @@ function catalogGroupTitleSqlExpression(column = 'title') {
 
 function uniqueValues(values) {
   return Array.from(new Set(values.filter(Boolean)));
+}
+
+function maxNullableNumber(values) {
+  const numbers = values.filter((value) => Number.isFinite(value) && value >= MIN_DISPLAY_PRICE_RUB);
+  return numbers.length ? Math.max(...numbers) : null;
 }
 
 function minNullableNumber(values) {

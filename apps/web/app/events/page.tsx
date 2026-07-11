@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 
-import { CatalogActiveFilters } from '@/components/CatalogActiveFilters';
-import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
-import { CatalogToolbar } from '@/components/CatalogToolbar.client';
-import { EventCard } from '@/components/EventCard';
+import { CatalogShell } from '@/components/CatalogShell.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { pluralEvents } from '@/lib/format';
@@ -60,40 +58,21 @@ export default async function EventsCatalogPage({ searchParams }: PageProps) {
           </h1>
           <p className="mt-2 text-sm text-slate-500">
             {pluralEvents(catalog.total)}
-            {catalog.items.length < catalog.total
-              ? ` · показано ${catalog.items.length}`
-              : ''}
+            {catalog.items.length < catalog.total ? ` · показано ${catalog.items.length}` : ''}
           </p>
         </div>
 
-        <div className="catalog-toolbar-sticky -mx-4 mt-6 border-b border-slate-200 bg-white/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6">
-          <CatalogToolbar facets={catalog.facets} values={filterValues} />
-          <CatalogActiveFilters values={filterValues} />
-        </div>
-
-        {catalog.items.length ? (
-          <ul className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-            {catalog.items.map((session) => (
-              <li key={`${session.id}-${session.startsAt}`}>
-                <EventCard session={session} />
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="mt-10 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
-            <p className="text-lg font-semibold text-slate-800">Ничего не найдено</p>
-            <p className="mt-2 text-sm text-slate-500">
-              Попробуйте изменить фильтры или сбросить поиск.
-            </p>
-          </div>
-        )}
-
-        <CatalogPaginationLinks
-          page={query.page}
-          total={catalog.total}
-          limit={catalog.limit}
-          searchParams={params}
-        />
+        <Suspense fallback={<div className="mt-8 text-sm text-slate-500">Загрузка каталога…</div>}>
+          <CatalogShell
+            facets={catalog.facets}
+            filterValues={filterValues}
+            items={catalog.items}
+            page={query.page}
+            total={catalog.total}
+            limit={catalog.limit}
+            searchParams={params}
+          />
+        </Suspense>
       </div>
     </SiteLayout>
   );

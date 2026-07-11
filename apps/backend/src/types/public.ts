@@ -80,6 +80,7 @@ export interface PublicSessionDto extends PurchaseFields {
   timeLabel: string;
   timeBucket: TimeBucket;
   priceFrom?: number | null;
+  priceTo?: number | null;
   vacant?: number | null;
   imageUrl?: string | null;
   manualLandingStatus?: string | null;

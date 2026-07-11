@@ -4,6 +4,14 @@ export function formatNumber(value: number): string {
   return value.toLocaleString('ru-RU');
 }
 
+export function formatMoneyRange(from?: number | null, to?: number | null): string {
+  if (!from || from < MIN_DISPLAY_PRICE_RUB) return 'Цена уточняется';
+  const min = Math.round(from);
+  const max = to && to >= MIN_DISPLAY_PRICE_RUB ? Math.round(to) : min;
+  if (max > min) return `${formatNumber(min)} – ${formatNumber(max)} ₽`;
+  return `${formatNumber(min)} ₽`;
+}
+
 export function formatPriceFrom(value?: number | null): string {
   if (typeof value !== 'number' || value < MIN_DISPLAY_PRICE_RUB) return 'Цена уточняется';
   return `от ${formatNumber(value)} ₽`;

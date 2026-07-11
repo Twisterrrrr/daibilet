@@ -30,6 +30,32 @@ function normalizeVenueKind(type?: string | null): string {
     .replace(/-/g, '_');
 }
 
+export function normalizeVenueKind(type?: string | null): string {
+  return String(type || 'other')
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, '_');
+}
+
+export function formatPublicVenueTitle(value?: string | null): string {
+  if (!value) return '';
+  return String(value)
+    .replace(/\s*\(\s*-?\d+(?:\.\d+)?\s*,\s*-?\d+(?:\.\d+)?\s*\)\s*$/u, '')
+    .trim();
+}
+
+export function isMeetingPointLike(input: {
+  type?: string | null;
+  name?: string | null;
+  title?: string | null;
+  address?: string | null;
+}): boolean {
+  const kind = normalizeVenueKind(input.type);
+  if (kind === 'meeting_point') return true;
+  const name = `${input.name || input.title || ''} ${input.address || ''}`.toLowerCase();
+  return /место сбора|место встречи|точка сбора|точка встречи|площадка:|^метро\b|^м\.(?:\s|«|"|')|\bм\.\s*(?:«|[а-яё])|\bу метро\b|около метро|у памятник|памятник|\bпам\.|у пам\.|\bу пам\b|пл\.\s*у пам/u.test(name);
+}
+
 export function venueTypeLabel(type?: string | null): string {
   const key = normalizeVenueKind(type);
   return VENUE_TYPE_LABELS[key] || VENUE_TYPE_LABELS.other;

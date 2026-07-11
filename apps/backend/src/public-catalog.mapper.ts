@@ -195,6 +195,7 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
     timeLabel: openDate ? 'В виджете' : formatTime(startsAt),
     timeBucket: openDate ? 'day' : timeBucket(startsAt),
     priceFrom: row.priceFrom,
+    priceTo: row.priceFrom,
     vacant: row.vacant,
     imageUrl: resolvePublicSessionImageUrl(row),
   };
