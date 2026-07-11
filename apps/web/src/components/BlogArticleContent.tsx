@@ -275,12 +275,17 @@ function BlogFigure({
   image: ParsedImageBlock;
   className?: string;
 }) {
+  const [hasImageError, setHasImageError] = React.useState(false);
+  if (hasImageError) return null;
+
   return (
     <figure className={className}>
       <img
         src={image.src}
         alt={image.alt}
         loading="lazy"
+        decoding="async"
+        onError={() => setHasImageError(true)}
         className="aspect-[4/3] w-full rounded-xl border border-slate-200/80 object-cover shadow-md"
       />
       {image.alt ? (
