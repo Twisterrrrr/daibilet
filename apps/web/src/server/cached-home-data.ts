@@ -8,16 +8,38 @@ import {
   buildPublicVenuesDto,
 } from '@daibilet/backend/public-read';
 
-export const getHomePageData = unstable_cache(
-  async () => {
-    const [destinationsPayload, catalogPayload, landingsCatalog, venuesPayload] = await Promise.all([
-      buildPublicDestinationsDto(),
-      buildPublicCatalogDto({ limit: 300, sort: 'popular' }),
-      buildPublicLandingsCatalogDto(new URLSearchParams()),
-      buildPublicVenuesDto(new URLSearchParams({ family: 'institution', limit: '500' })),
-    ]);
-    return { destinationsPayload, catalogPayload, landingsCatalog, venuesPayload };
-  },
-  ['home-page-data-v1'],
-  { revalidate: 300 },
+const REVALIDATE = 300;
+
+export const getHomeDestinations = unstable_cache(
+  () => buildPublicDestinationsDto(),
+  ['home-destinations-v1'],
+  { revalidate: REVALIDATE },
 );
+
+export const getHomeCatalog = unstable_cache(
+  () => buildPublicCatalogDto({ limit: 120, sort: 'popular' }),
+  ['home-catalog-v1'],
+  { revalidate: REVALIDATE },
+);
+
+export const getHomeLandings = unstable_cache(
+  () => buildPublicLandingsCatalogDto(new URLSearchParams()),
+  ['home-landings-v1'],
+  { revalidate: REVALIDATE },
+);
+
+export const getHomeVenues = unstable_cache(
+  () => buildPublicVenuesDto(new URLSearchParams({ family: 'institution', limit: '200' })),
+  ['home-venues-v1'],
+  { revalidate: REVALIDATE },
+);
+
+export async function getHomePageData() {
+  const [destinationsPayload, catalogPayload, landingsCatalog, venuesPayload] = await Promise.all([
+    getHomeDestinations(),
+    getHomeCatalog(),
+    getHomeLandings(),
+    getHomeVenues(),
+  ]);
+  return { destinationsPayload, catalogPayload, landingsCatalog, venuesPayload };
+}
