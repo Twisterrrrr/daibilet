@@ -35,6 +35,11 @@ export function citySlug(city: CityRouteSource): string {
   return normalizeSlug(city.name) || 'city';
 }
 
+/** Афиша города — расписание событий на странице CityPage. */
+export function cityEventsHref(city: CityRouteSource): string {
+  return `${cityHref(city)}#city-schedule`;
+}
+
 export function venueHref(venue: VenueRouteSource): string {
   const base = venuePageTemplate(venue.type) === 'location' ? '/locations' : '/venues';
   return `${base}/${venueSlug(venue)}`;

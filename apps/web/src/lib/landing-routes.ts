@@ -265,3 +265,42 @@ export function listLandingStaticParamsTwo(): Array<{ segment: string; segment2:
   }
   return paths;
 }
+
+/** Теги жанров на лендинге «Концерты» (совпадают с EventTag.title). */
+const CONCERT_GENRE_TAGS = ['Рок', 'Джаз', 'Классика', 'Поп', 'Эстрада', 'Металл', 'Орган'] as const;
+
+const CONCERT_GENRE_ALIASES: Record<string, (typeof CONCERT_GENRE_TAGS)[number]> = {
+  jazz: 'Джаз',
+  dzhaz: 'Джаз',
+  джаз: 'Джаз',
+  rock: 'Рок',
+  rok: 'Рок',
+  рок: 'Рок',
+  classic: 'Классика',
+  klassika: 'Классика',
+  классика: 'Классика',
+  pop: 'Поп',
+  estrada: 'Эстрада',
+  эстрада: 'Эстрада',
+  metal: 'Металл',
+  metall: 'Металл',
+  organ: 'Орган',
+};
+
+export function resolveConcertGenreTag(value?: string | null): string | null {
+  const raw = String(value || '').trim();
+  if (!raw) return null;
+  const alias = CONCERT_GENRE_ALIASES[raw.toLowerCase()];
+  if (alias) return alias;
+  const exact = CONCERT_GENRE_TAGS.find((tag) => tag.toLowerCase() === raw.toLowerCase());
+  return exact || null;
+}
+
+/** /kontserty/moscow/?genre=Джаз — лендинг концертов с городом и жанром. */
+export function concertsLandingHref(citySlug?: string | null, genre?: string | null): string {
+  const citySegment = citySlug ? cityPathSegment(citySlug) || citySlug : null;
+  const base = citySegment ? `/kontserty/${citySegment}/` : '/kontserty/';
+  const genreTag = resolveConcertGenreTag(genre);
+  if (!genreTag) return base;
+  return `${base}?genre=${encodeURIComponent(genreTag)}`;
+}

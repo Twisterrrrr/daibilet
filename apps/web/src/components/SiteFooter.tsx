@@ -17,6 +17,8 @@ const catalogLinks = [
 ];
 
 const companyLinks = [
+  { label: 'Блог', href: '/blog' },
+  { label: 'Помощь', href: '/help' },
   { label: 'Площадки', href: '/venues' },
   { label: 'Локации', href: '/locations' },
   { label: 'Подборки', href: '/podborki' },
@@ -65,7 +67,30 @@ export function SiteFooter({ destinations }: SiteFooterProps) {
         </div>
 
         <div className="mt-10 border-t border-slate-200 pt-6">
-          <p className="text-sm text-slate-900">&copy; {new Date().getFullYear()} Дайбилет</p>
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+            <p className="text-sm text-slate-900">&copy; {new Date().getFullYear()} Дайбилет</p>
+            <div className="flex flex-col gap-2 text-right sm:ml-auto">
+              <div className="flex flex-wrap justify-end gap-x-4 gap-y-1 sm:gap-x-6">
+                <Link href="/privacy#user-agreement" className="text-sm text-slate-400 hover:text-slate-600">
+                  Пользовательское соглашение
+                </Link>
+                <Link href="/privacy#privacy-policy" className="text-sm text-slate-400 hover:text-slate-600">
+                  Политика конфиденциальности
+                </Link>
+                <Link href="/offer" className="text-sm text-slate-400 hover:text-slate-600">
+                  Договор-оферта (для партнёров)
+                </Link>
+              </div>
+              <div className="flex flex-wrap justify-end gap-x-4 gap-y-1 sm:gap-x-6">
+                <Link href="/legal#refunds" className="text-sm text-slate-400 hover:text-slate-600">
+                  Правила возврата
+                </Link>
+                <Link href="/legal#rightsholders" className="text-sm text-slate-400 hover:text-slate-600">
+                  Правообладателям
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

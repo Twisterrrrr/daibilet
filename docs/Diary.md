@@ -4,6 +4,29 @@
 
 ---
 
+## 2026-07-11 — Slice 5: help, blog, legal, my-orders
+
+### Наблюдения
+
+- Slice 5 портирован из Vite `apps/public`: trust pages, FAQ `/help`, блог (static fallback + API), `/my-orders` lookup.
+- Codex (`codex/phase2-foundation`, `229ad3b`) продолжает Phase 2 backend: schema, Event Change Requests, docs по spbboats; коммит `5b18225` переводит **`apps/public` на Next + proxy** — конфликтует с Path B (`apps/web`).
+- Client-компоненты (`HelpPage`, `MyOrdersPage`) не могут импортировать async `SiteLayout` (тянет `pg` в client bundle).
+
+### Решения
+
+- Slice 5 — только `apps/web`, без merge Codex Next/proxy.
+- `SiteLayout`: try/catch при `buildPublicDestinationsDto` — build без локальной БД не падает.
+- `HelpPage` / `MyOrdersPage`: обёртка `SiteLayout` на server `page.tsx`, контент — в client view.
+- Добавлены `public-articles.dto`, `public-orders.dto`, API routes `/api/public/articles`, `/orders`.
+- Header: ссылка «Помощь»; footer: blog, help, legal links.
+
+### Проблемы
+
+- Локальный `pnpm web:build` без Postgres на `:5437` — static pages с пустым footer city block (на prod при build БД доступна).
+- Wholesale merge Codex по-прежнему невозможен (~429 files diff).
+
+---
+
 ## 2026-07-10 — F3 staging cutover выполнен
 
 ### Наблюдения
