@@ -12,7 +12,7 @@
 - TC slots: каждый слот в сгруппированной карточке ведет в свой TC `event`.
 - Teplohod event page: отдает `widgetPayload`, ближайшие сеансы и реальные категории билетов.
 - Admin: есть Sources, Events, Venues, Cities, Landings, Buyers, Orders.
-- Git: локальный репозиторий есть, remote пока не настроен.
+- Git: remote настроен, рабочие deploy-изменения ведем в отдельной ветке и переносим в launch-ветку через review.
 
 ## QA Вопросы К Владельцу
 
@@ -103,11 +103,12 @@
 ### Мои Покупки
 
 - Открыть страницу "Мои покупки".
-- Проверить поиск по телефону/email/номеру заказа.
+- Проверить публичный поиск только по точному номеру заказа или билета.
+- Проверить, что email/телефон не используются как публичный ключ поиска; покупки по email показываются только в авторизованном/проверенном аккаунте.
 - Проверить пустое состояние.
 - Проверить, что нет слова "внешние" для покупателя.
 
-Ожидаемый результат: покупатель видит человеческую страницу поиска покупки, без внутренних терминов.
+Ожидаемый результат: покупатель видит человеческую страницу поиска покупки, без внутренних терминов и без риска подобрать чужие заказы по email/телефону.
 
 ## Smoke Admin
 
@@ -150,13 +151,14 @@
 
 Проверить HTTP:
 
-- `GET /api/admin/sources`
-- `GET /api/public/stats?refresh=1`
-- `GET /api/public/events?limit=20&refresh=1`
-- `GET /api/public/events/{slug}`
-- `POST /api/v1/tep/sync`
-- `POST /api/admin/sources/ticketscloud/sync`
-- `POST /api/admin/orders/sync`
+- `GET https://admin.daibilet.ru/api/admin/sources`
+- `GET https://daibilet.ru/api/public/stats?refresh=1`
+- `GET https://daibilet.ru/api/public/events?limit=20&refresh=1`
+- `GET https://daibilet.ru/api/public/events/{slug}`
+- `GET https://api.daibilet.ru/api/public/stats?refresh=1`
+- `POST https://admin.daibilet.ru/api/v1/tep/sync`
+- `POST https://admin.daibilet.ru/api/admin/sources/ticketscloud/sync`
+- `POST https://admin.daibilet.ru/api/admin/orders/sync`
 
 Минимальные ожидания:
 
@@ -180,31 +182,37 @@
 
 3. Секреты и env.
    - `DATABASE_URL`.
+   - `PUBLIC_PORT`.
+   - `DAIBILET_BACKEND_API_URL`.
+   - `DAIBILET_SITE_URL`.
    - `TICKETSCLOUD_API_TOKEN` или `TC_API_TOKEN`.
    - `TICKETSCLOUD_WIDGET_TOKEN` или `TC_WIDGET_TOKEN`.
    - `TEP_API_URL` для боевого bridge/API.
    - `TEP_WIDGET_ID`.
    - `TEP_WIDGET_BASE_URL`.
+   - `NEXT_PUBLIC_SITE_URL`.
+   - `NEXT_PUBLIC_DAIBILET_API_URL` пустой в production, чтобы public ходил в same-origin `/api`.
+   - `NEXT_PUBLIC_TEP_WIDGET_ID`.
+   - `NEXT_PUBLIC_TC_WIDGET_TOKEN`.
    - `VITE_DAIBILET_API_URL`.
    - `VITE_DAIBILET_PUBLIC_URL`.
    - временный admin password/basic auth или IP allowlist.
 
 4. Git online.
-   - Нужен не "каталог", а приватный репозиторий.
-   - Можно использовать существующий `Twisterrrrr/daibilet_tickets`, если он будет основным.
-   - Либо создать чистый приватный `Twisterrrrr/daibilet` / `daibilet`.
-   - После этого локально подключить `origin` и пушить `main`.
+   - Основной репозиторий для нового MVP: `Twisterrrrr/daibilet`.
+   - Deploy script поддерживает `GIT_BRANCH`, поэтому на сервер можно выкатывать launch-ветку без ручного переключения.
+   - Перед заменой старого сайта не накатывать ветки поверх production автоматически: сначала review, затем fast-forward deploy выбранной ветки.
 
 5. CI/CD.
    - Для запуска за неделю лучше thin CI/CD:
      - GitHub Actions: typecheck/build.
      - Deploy job по SSH на сервер.
-     - На сервере: pull, install, build public/admin, restart backend.
+     - На сервере: pull, install, build public/admin, restart backend и public Next service.
    - Не надо сейчас городить Kubernetes или сложный Docker Swarm.
    - Docker нужен минимум для Postgres и, возможно, для backend после стабилизации.
 
 6. Доступы для проверки.
-   - тестовый пользователь/телефон/email для "Мои покупки";
+   - тестовый пользователь и точный номер заказа/билета для "Мои покупки";
    - тестовая/минимальная реальная покупка через TC;
    - тестовая/минимальная реальная покупка через Teplohod после белого IP;
    - контакт тестировщика, кто пройдет smoke.
@@ -231,29 +239,46 @@
 
 ## Текущий Этап
 
-Мы на этапе `pre-launch hardening`: данные и источники уже ожили, теперь нужно пройти smoke public/admin, закрыть только блокеры и перенести контур на сервер.
+Мы на этапе `pre-launch hardening`: данные и источники уже ожили, public переводится на production-ready Next runtime, дальше нужно пройти smoke public/admin и закрыть только блокеры.
 
-Следующий рабочий шаг Codex: подготовить минимальный production deploy plan/scripts после выбора Git remote и схемы доменов.
+Следующий рабочий шаг: выкатить выбранную ветку на сервер, проверить `daibilet-api` + `daibilet-public`, затем пройти smoke перед переключением старого сайта.
 
-## Typed Public Stack
+## Full-Stack Next Public Stack
 
-Production API должен запускаться через `apps/backend/src/server-entry.ts`, а не legacy `server.js`. В `/opt/daibilet/.env` обязательны:
+Production public запускается как отдельный Next service, а не как static `dist`. Backend остается интеграционным сервисом для sync, admin, health и provider API.
+
+В `/opt/daibilet/.env` обязательны:
 
 ```env
-DAIBILET_TS_PUBLIC_CATALOG=1
-DAIBILET_TS_PUBLIC_EVENT=1
-DAIBILET_TS_PUBLIC_CITY=1
-DAIBILET_TS_PUBLIC_VENUE=1
-DAIBILET_PUBLIC_PREWARM_BEFORE_LISTEN=1
+PORT=4000
+PUBLIC_PORT=3000
+DAIBILET_BACKEND_API_URL=http://127.0.0.1:4000
+DAIBILET_SITE_URL=https://daibilet.ru
+NEXT_PUBLIC_DAIBILET_API_URL=
+NEXT_PUBLIC_SITE_URL=https://daibilet.ru
+NEXT_PUBLIC_TEP_WIDGET_ID=14208
+NEXT_PUBLIC_TC_WIDGET_TOKEN=...
 ```
 
-`deploy/systemd/daibilet-api.service` уже использует `npm --prefix apps/backend run start:ts`, а `deploy/scripts/deploy-from-git.sh` устанавливает backend dependencies. После рестарта дождаться строки `Daibilet backend listening`; она появляется только после завершения prewarm.
+Systemd:
+
+- `daibilet-api.service` - backend для health, admin, sync и provider integrations;
+- `daibilet-public.service` - Next public server на `127.0.0.1:3000`.
+
+Nginx:
+
+- `daibilet.ru` проксирует весь сайт в `daibilet-public`;
+- `api.daibilet.ru/api/public/*` проксирует в `daibilet-public`;
+- `api.daibilet.ru/api/health`, `/api/admin/*`, `/api/v1/tc/*`, `/api/v1/tep/*` проксируются в `daibilet-api`;
+- `admin.daibilet.ru` отдает static admin и проксирует `/api/*` в backend.
 
 Launch smoke после deploy:
 
-- `/api/health` возвращает `200`;
-- `/api/public/events?limit=12&sort=time` возвращает сгруппированный каталог;
-- `/api/public/destinations` возвращает 26 направлений;
-- `/api/public/venues` возвращает площадки с grouped event counts;
+- `https://api.daibilet.ru/api/health` возвращает `200`;
+- `https://daibilet.ru/api/public/stats?refresh=1` возвращает счетчики без долгой паузы;
+- `https://daibilet.ru/api/public/events?limit=12&sort=time` возвращает сгруппированный каталог;
+- `https://daibilet.ru/api/public/destinations` возвращает направления;
+- `https://daibilet.ru/api/public/venues` возвращает площадки с grouped event counts;
+- `https://api.daibilet.ru/api/public/stats?refresh=1` тоже работает как public API alias;
 - `/cities/moskva`, `/venues` и одна detail-площадка открываются без console errors;
 - кнопка покупки TC открывает TC widget, кнопка Teplohod открывает его widget на сервере с белым IP.

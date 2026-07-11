@@ -21,9 +21,10 @@
 Рекомендуемые директории:
 
 - `/opt/daibilet` - код приложения.
-- `/var/www/daibilet/public` - собранный public.
 - `/var/www/daibilet/admin` - собранная admin.
 - `/var/backups/daibilet` - архив старой версии перед переключением.
+
+Public больше не выкладывается как static `dist`: `daibilet.ru` обслуживает Next.js server из `/opt/daibilet/apps/public`.
 
 ## GitHub
 
@@ -44,6 +45,12 @@ git clone https://github.com/Twisterrrrr/daibilet.git daibilet
 cd /opt/daibilet
 ```
 
+Для безопасного запуска можно держать production на выбранной launch-ветке:
+
+```bash
+export GIT_BRANCH=integrate/mvp-launch
+```
+
 Если сервер будет тянуть приватный репозиторий в будущем, лучше выпустить deploy key. Сейчас репозиторий публичный.
 
 ## Env
@@ -55,7 +62,10 @@ cd /opt/daibilet
 ```bash
 NODE_ENV=production
 PORT=4000
+PUBLIC_PORT=3000
 DATABASE_URL=postgresql://...
+DAIBILET_BACKEND_API_URL=http://127.0.0.1:4000
+DAIBILET_SITE_URL=https://daibilet.ru
 
 DAIBILET_REQUIRE_ADMIN_AUTH=1
 ADMIN_EMAIL=admin@daibilet.ru
@@ -77,11 +87,14 @@ TEP_WIDGET_BASE_URL=https://teplohod.info
 Build-time env для фронтов:
 
 ```bash
-# Public build
-VITE_DAIBILET_API_URL=https://api.daibilet.ru
-VITE_TEP_WIDGET_ID=14208
+# Public Next build
+# В production оставляем пустым, чтобы public ходил в same-origin /api на daibilet.ru.
+NEXT_PUBLIC_DAIBILET_API_URL=
+NEXT_PUBLIC_SITE_URL=https://daibilet.ru
+NEXT_PUBLIC_TEP_WIDGET_ID=14208
+NEXT_PUBLIC_TC_WIDGET_TOKEN=...
 
-# Admin build
+# Admin Vite build
 VITE_DAIBILET_API_URL=/api
 VITE_DAIBILET_PUBLIC_URL=https://daibilet.ru
 ```
@@ -104,7 +117,7 @@ chmod +x deploy/scripts/deploy-from-git.sh
 deploy/scripts/deploy-from-git.sh
 ```
 
-Скрипт делает `git pull`, ставит зависимости, применяет миграции, собирает public/admin, копирует `dist` в `/var/www/daibilet/*`, рестартует `daibilet-api` и проверяет `/api/health`.
+Скрипт делает `git pull` из `GIT_BRANCH` (`main` по умолчанию), ставит зависимости, применяет миграции, собирает public Next/admin, копирует только `apps/admin/dist` в `/var/www/daibilet/admin`, рестартует `daibilet-api` и `daibilet-public`, затем проверяет backend health и public stats.
 
 Ручной вариант ниже оставлен как fallback:
 
@@ -118,17 +131,16 @@ pnpm typecheck
 pnpm test
 pnpm --filter @daibilet/backend build
 
-VITE_DAIBILET_API_URL=https://api.daibilet.ru VITE_TEP_WIDGET_ID=14208 pnpm --filter @daibilet/public build
+NEXT_PUBLIC_DAIBILET_API_URL= NEXT_PUBLIC_SITE_URL=https://daibilet.ru NEXT_PUBLIC_TEP_WIDGET_ID=14208 pnpm --filter @daibilet/public build
 VITE_DAIBILET_API_URL=/api VITE_DAIBILET_PUBLIC_URL=https://daibilet.ru pnpm --filter @daibilet/admin build
 
-mkdir -p /var/www/daibilet/public /var/www/daibilet/admin
-rsync -a --delete apps/public/dist/ /var/www/daibilet/public/
+mkdir -p /var/www/daibilet/admin
 rsync -a --delete apps/admin/dist/ /var/www/daibilet/admin/
 ```
 
-## Backend service
+## Systemd services
 
-Systemd-шаблон:
+Backend service:
 
 ```ini
 [Unit]
@@ -147,23 +159,47 @@ RestartSec=5
 WantedBy=multi-user.target
 ```
 
+Public Next service:
+
+```ini
+[Unit]
+Description=Daibilet Public Next.js
+After=network.target daibilet-api.service
+Wants=daibilet-api.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/daibilet
+EnvironmentFile=/opt/daibilet/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/env sh -lc 'PUBLIC_PORT="${PUBLIC_PORT:-3000}" pnpm --filter @daibilet/public preview'
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
 Команды:
 
 ```bash
 cp deploy/systemd/daibilet-api.service /etc/systemd/system/daibilet-api.service
+cp deploy/systemd/daibilet-public.service /etc/systemd/system/daibilet-public.service
 systemctl daemon-reload
-systemctl enable --now daibilet-api
+systemctl enable --now daibilet-api daibilet-public
 systemctl status daibilet-api
+systemctl status daibilet-public
 ```
 
-Если systemd не видит Node из `nvm`, нужно заменить `ExecStart` на полный путь к node.
+Если systemd не видит Node/pnpm из `nvm`, нужно заменить `ExecStart` на полный путь к node/pnpm или добавить PATH override.
 
 ## Nginx routing
 
 Рекомендуемая схема:
 
-- `daibilet.ru` отдает `/var/www/daibilet/public`.
-- `api.daibilet.ru` проксирует только `/api/public/*` и `/api/health` наружу.
+- `daibilet.ru` проксирует весь сайт в Next public server `127.0.0.1:3000`.
+- `api.daibilet.ru/api/public/*` проксирует в Next public server, чтобы внешние smoke/API попадали в актуальные Prisma handlers.
+- `api.daibilet.ru/api/health`, `/api/admin/*`, `/api/v1/tc/*`, `/api/v1/tep/*` проксируются в backend `127.0.0.1:4000`.
 - `admin.daibilet.ru` отдает `/var/www/daibilet/admin` и проксирует `/api/*` на backend. Вся admin-зона дополнительно закрыта basic auth.
 
 Backend тоже защищает `/api/admin/*`, `/api/v1/tc/*`, `/api/v1/tep/*`, `/api/db/*`, поэтому даже прямой доступ к `api.daibilet.ru/api/admin/...` должен получить `401`.
@@ -192,6 +228,7 @@ systemctl reload nginx
 curl https://api.daibilet.ru/api/health
 curl -u "admin@daibilet.ru:<password>" -X POST https://admin.daibilet.ru/api/v1/tc/sync
 curl -u "admin@daibilet.ru:<password>" -X POST https://admin.daibilet.ru/api/v1/tep/sync
+curl "https://daibilet.ru/api/public/stats?refresh=1"
 curl "https://api.daibilet.ru/api/public/stats?refresh=1"
 ```
 

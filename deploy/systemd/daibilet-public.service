@@ -1,0 +1,16 @@
+[Unit]
+Description=Daibilet Public Next.js
+After=network.target daibilet-api.service
+Wants=daibilet-api.service
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/daibilet
+EnvironmentFile=/opt/daibilet/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/env sh -lc 'PUBLIC_PORT="${PUBLIC_PORT:-3000}" pnpm --filter @daibilet/public preview'
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
