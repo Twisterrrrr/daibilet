@@ -23,13 +23,6 @@ const VENUE_TYPE_LABELS: Record<string, string> = {
   other: 'Локация',
 };
 
-function normalizeVenueKind(type?: string | null): string {
-  return String(type || 'other')
-    .trim()
-    .toLowerCase()
-    .replace(/-/g, '_');
-}
-
 export function normalizeVenueKind(type?: string | null): string {
   return String(type || 'other')
     .trim()
