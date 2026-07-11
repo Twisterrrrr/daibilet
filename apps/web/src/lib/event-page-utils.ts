@@ -152,13 +152,49 @@ function isGenericTicketDescription(value?: string | null): boolean {
   return false;
 }
 
+function isTransportBoilerplate(value?: string | null): boolean {
+  const text = cleanDisplayText(value);
+  if (!text) return false;
+  return /перевозка\s+пас[-.\s]?в/i.test(text) && /\bТС\s*\d+/i.test(text);
+}
+
+/** Убирает юридический хвост TC («перевозка пас-в … ТС 123») и оставляет имя категории. */
+export function normalizeTicketCategoryLabel(raw?: string | null): string {
+  let text = cleanDisplayText(raw);
+  if (!text) return 'Билет';
+
+  const dashSplit = text.split(/\s[-–—]\s/);
+  if (dashSplit.length > 1) {
+    const head = dashSplit[0]?.trim() || '';
+    const tail = dashSplit.slice(1).join(' - ').trim();
+    if (head && (!tail || isTransportBoilerplate(tail))) return head;
+  }
+
+  text = text
+    .replace(/\s*[-–—]?\s*перевозка\s+пас[-.\s]?в\s+.+?\s+ТС\s*\d+\s*$/iu, '')
+    .trim();
+
+  const parts = splitTitlePartsWithoutWeekdays(text);
+  if (parts.length > 1) {
+    const tail = parts.slice(1).join(', ').trim();
+    if (!tail || isTransportBoilerplate(tail)) return parts[0] || 'Билет';
+  }
+
+  return text || 'Билет';
+}
+
 function parseTicketCategory(item: { title: string; description?: string | null; priceRub: number }) {
-  const parts = splitTitlePartsWithoutWeekdays(item.title);
-  const name = parts[0] || 'Билет';
-  const parsedDescription = parts.length > 1 ? parts.slice(1).join(', ') : null;
+  const name = normalizeTicketCategoryLabel(item.title);
+  const parts = splitTitlePartsWithoutWeekdays(cleanDisplayText(item.title) || '');
+  let parsedDescription = parts.length > 1 ? parts.slice(1).join(', ').trim() : null;
+  if (parsedDescription && (isTransportBoilerplate(parsedDescription) || isGenericTicketDescription(parsedDescription))) {
+    parsedDescription = null;
+  }
+
   const apiDescription = cleanDisplayText(item.description);
-  const description =
+  let description =
     parsedDescription || (apiDescription && !isGenericTicketDescription(apiDescription) ? apiDescription : null);
+  if (description && isTransportBoilerplate(description)) description = null;
 
   return { name, description };
 }
@@ -197,7 +233,7 @@ export function buildGroupedTicketCategories(payload: PublicEventPageDto): Ticke
 
   for (const item of collectRawTicketPrices(payload)) {
     const { name, description } = parseTicketCategory(item);
-    const key = `${name}|${description || ''}`.toLowerCase().replace(/\s+/g, ' ');
+    const key = name.toLowerCase().replace(/\s+/g, ' ');
     const itemOrder = item.sortOrder ?? 9999;
     const existing = groups.get(key);
     if (!existing) {

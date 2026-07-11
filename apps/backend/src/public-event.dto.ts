@@ -521,7 +521,12 @@ function buildTicketPrices(
   }
   const unique = new Map<string, PublicTicketPriceDto>();
   for (const row of rows) {
-    unique.set(row.key, row);
+    const labelKey = normalizeGroupPart(normalizeTicketCategoryLabel(row.title));
+    const mergeKey = `${labelKey}:${row.priceRub}`;
+    const current = unique.get(mergeKey);
+    if (!current || (row.kind === 'offer' && current.kind !== 'offer')) {
+      unique.set(mergeKey, row);
+    }
   }
   return [...unique.values()].sort((left, right) => {
     const leftOrder = left.sortOrder ?? 9999;
@@ -601,10 +606,10 @@ function displayPriceFrom(...values: Array<number | null | undefined>): number |
 }
 
 function normalizeTicketTitle(value: string | null | undefined, eventTitleKey: string): string {
-  const title = cleanImportedDescription(value) || '';
-  const key = normalizeGroupPart(title);
+  const raw = cleanImportedDescription(value) || '';
+  const key = normalizeGroupPart(raw);
   if (!key || key === eventTitleKey || key === 'widget' || key.includes('ticketscloud widget')) return 'Билет';
-  return title;
+  return normalizeTicketCategoryLabel(raw);
 }
 
 function sourceLabel(sourceCode: string): string | null {
@@ -664,18 +669,48 @@ function isGenericTicketDescription(value?: string | null): boolean {
   return false;
 }
 
+function isTransportBoilerplate(value?: string | null): boolean {
+  const text = cleanImportedDescription(value);
+  if (!text) return false;
+  return /перевозка\s+пас[-.\s]?в/i.test(text) && /\bТС\s*\d+/i.test(text);
+}
+
+function normalizeTicketCategoryLabel(raw?: string | null): string {
+  let text = cleanImportedDescription(raw);
+  if (!text) return 'Билет';
+
+  const dashSplit = text.split(/\s[-–—]\s/);
+  if (dashSplit.length > 1) {
+    const head = dashSplit[0]?.trim() || '';
+    const tail = dashSplit.slice(1).join(' - ').trim();
+    if (head && (!tail || isTransportBoilerplate(tail))) return head;
+  }
+
+  text = text
+    .replace(/\s*[-–—]?\s*перевозка\s+пас[-.\s]?в\s+.+?\s+ТС\s*\d+\s*$/iu, '')
+    .trim();
+
+  const parts = splitTitlePartsWithoutWeekdays(text);
+  if (parts.length > 1) {
+    const tail = parts.slice(1).join(', ').trim();
+    if (!tail || isTransportBoilerplate(tail)) return parts[0] || 'Билет';
+  }
+
+  return text || 'Билет';
+}
+
 function extractOfferPayloadDescription(payload: Prisma.JsonValue | null): string | null {
   if (!payload || Array.isArray(payload) || typeof payload !== 'object') return null;
   const record = payload as Record<string, unknown>;
   for (const key of ['description', 'comment', 'text']) {
     const direct = cleanImportedDescription(String(record[key] || ''));
-    if (direct && !isGenericTicketDescription(direct)) return direct;
+    if (direct && !isGenericTicketDescription(direct) && !isTransportBoilerplate(direct)) return direct;
   }
   const ticket = record.ticket;
   if (ticket && typeof ticket === 'object' && !Array.isArray(ticket)) {
     for (const key of ['description', 'comment', 'text']) {
       const nested = cleanImportedDescription(String((ticket as Record<string, unknown>)[key] || ''));
-      if (nested && !isGenericTicketDescription(nested)) return nested;
+      if (nested && !isGenericTicketDescription(nested) && !isTransportBoilerplate(nested)) return nested;
     }
   }
   return null;
@@ -687,7 +722,7 @@ function parseTitleSupplement(rawTitle: string | null | undefined, normalizedTit
   const parts = splitTitlePartsWithoutWeekdays(clean);
   if (parts.length <= 1) return null;
   const supplement = parts.slice(1).join(', ').trim();
-  if (!supplement || isGenericTicketDescription(supplement)) return null;
+  if (!supplement || isGenericTicketDescription(supplement) || isTransportBoilerplate(supplement)) return null;
   if (normalizeGroupPart(parts[0]) === normalizeGroupPart(normalizedTitle)) return supplement;
   if (normalizeGroupPart(clean) === normalizeGroupPart(normalizedTitle)) return supplement;
   return supplement;

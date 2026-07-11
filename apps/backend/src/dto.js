@@ -4456,7 +4456,10 @@ function buildPublicTicketPrices(offers, sessions, event) {
 
   const unique = new Map();
   for (const row of rows) {
-    unique.set(row.key, row);
+    const labelKey = normalizeGroupPart(normalizeTicketCategoryLabel(row.title));
+    const mergeKey = `${labelKey}:${row.priceRub}`;
+    const existing = unique.get(mergeKey);
+    if (!existing || (row.kind === 'offer' && existing.kind !== 'offer')) unique.set(mergeKey, row);
   }
 
   return Array.from(unique.values())
@@ -4494,17 +4497,47 @@ function isGenericPublicTicketDescription(value) {
   return false;
 }
 
+function isTransportBoilerplate(value) {
+  const text = cleanImportedDescription(value);
+  if (!text) return false;
+  return /перевозка\s+пас[-.\s]?в/i.test(text) && /\bТС\s*\d+/i.test(text);
+}
+
+function normalizeTicketCategoryLabel(raw) {
+  let text = cleanImportedDescription(raw);
+  if (!text) return 'Билет';
+
+  const dashSplit = text.split(/\s[-–—]\s/);
+  if (dashSplit.length > 1) {
+    const head = String(dashSplit[0] || '').trim();
+    const tail = dashSplit.slice(1).join(' - ').trim();
+    if (head && (!tail || isTransportBoilerplate(tail))) return head;
+  }
+
+  text = text
+    .replace(/\s*[-–—]?\s*перевозка\s+пас[-.\s]?в\s+.+?\s+ТС\s*\d+\s*$/iu, '')
+    .trim();
+
+  const parts = splitTitlePartsWithoutWeekdays(text);
+  if (parts.length > 1) {
+    const tail = parts.slice(1).join(', ').trim();
+    if (!tail || isTransportBoilerplate(tail)) return parts[0] || 'Билет';
+  }
+
+  return text || 'Билет';
+}
+
 function extractPublicOfferPayloadDescription(payload) {
   if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return null;
   for (const key of ['description', 'comment', 'text']) {
     const direct = cleanImportedDescription(payload[key]);
-    if (direct && !isGenericPublicTicketDescription(direct)) return direct;
+    if (direct && !isGenericPublicTicketDescription(direct) && !isTransportBoilerplate(direct)) return direct;
   }
   const ticket = payload.ticket;
   if (ticket && typeof ticket === 'object' && !Array.isArray(ticket)) {
     for (const key of ['description', 'comment', 'text']) {
       const nested = cleanImportedDescription(ticket[key]);
-      if (nested && !isGenericPublicTicketDescription(nested)) return nested;
+      if (nested && !isGenericPublicTicketDescription(nested) && !isTransportBoilerplate(nested)) return nested;
     }
   }
   return null;
@@ -4516,7 +4549,7 @@ function parsePublicTitleSupplement(rawTitle, normalizedTitle) {
   const parts = splitTitlePartsWithoutWeekdays(clean);
   if (parts.length <= 1) return null;
   const supplement = parts.slice(1).join(', ').trim();
-  if (!supplement || isGenericPublicTicketDescription(supplement)) return null;
+  if (!supplement || isGenericPublicTicketDescription(supplement) || isTransportBoilerplate(supplement)) return null;
   if (normalizeGroupPart(parts[0]) === normalizeGroupPart(normalizedTitle)) return supplement;
   if (normalizeGroupPart(clean) === normalizeGroupPart(normalizedTitle)) return supplement;
   return supplement;
@@ -4535,7 +4568,7 @@ function normalizePublicTicketTitle(rawTitle, eventTitleKey) {
   const titleKey = normalizeGroupPart(cleanTitle);
   if (!titleKey || titleKey === eventTitleKey) return 'Билет';
   if (titleKey === 'widget' || titleKey.includes('ticketscloud widget')) return 'Билет';
-  return cleanTitle;
+  return normalizeTicketCategoryLabel(cleanTitle);
 }
 
 function publicSourceLabel(sourceCode) {
