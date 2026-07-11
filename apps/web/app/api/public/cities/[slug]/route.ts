@@ -1,9 +1,8 @@
 import '@/lib/env';
 import { buildPublicCityDto } from '@daibilet/backend/public-read';
-import { PUBLIC_API_REVALIDATE } from '@/server/cache-config';
 import { publicJsonResponse } from '@/server/public-json-response';
 
-export const revalidate = PUBLIC_API_REVALIDATE;
+export const revalidate = 300;
 
 type RouteContext = { params: Promise<{ slug: string }> };
 

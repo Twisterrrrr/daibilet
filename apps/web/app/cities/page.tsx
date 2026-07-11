@@ -6,14 +6,13 @@ import '@/lib/env';
 import { pluralEvents } from '@/lib/format';
 import { cityHref } from '@/lib/routes';
 import { buildPublicDestinationsDto } from '@daibilet/backend/public-read';
-import { PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
 
 export const metadata: Metadata = {
   title: 'Города | Дайбилет',
   description: 'Афиша событий и экскурсий по городам России.',
 };
 
-export const revalidate = PUBLIC_PAGE_REVALIDATE;
+export const revalidate = 300;
 
 export default async function CitiesIndexPage() {
   const destinations = await buildPublicDestinationsDto();

@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 
 import { VenueListPage, generateVenueListMetadata } from '@/components/VenuePages';
-import { PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
 
 export async function generateMetadata(): Promise<Metadata> {
   return generateVenueListMetadata(
@@ -10,7 +9,7 @@ export async function generateMetadata(): Promise<Metadata> {
   );
 }
 
-export const revalidate = PUBLIC_PAGE_REVALIDATE;
+export const revalidate = 300;
 
 export default function VenuesIndexPage() {
   return VenueListPage({ family: 'institution', listPath: '/venues' });

@@ -5,9 +5,8 @@ import { BlogArticleView } from '@/components/BlogArticleView';
 import '@/lib/env';
 import { resolveStaticArticle } from '@/lib/blog-utils';
 import { buildPublicArticlePageDto } from '@daibilet/backend/public-read';
-import { PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
 
-export const revalidate = PUBLIC_PAGE_REVALIDATE;
+export const revalidate = 300;
 
 type PageProps = {
   params: Promise<{ slug: string }>;

@@ -1,9 +1,8 @@
 import '@/lib/env';
 import { parseCatalogApiQuery } from '@/server/catalog-query';
 import { buildPublicCatalogDto } from '@daibilet/backend/public-read';
-import { PUBLIC_API_REVALIDATE } from '@/server/cache-config';
 import { publicJsonResponse } from '@/server/public-json-response';
-export const revalidate = PUBLIC_API_REVALIDATE;
+export const revalidate = 300;
 
 export async function GET(request: Request) {
   const url = new URL(request.url);

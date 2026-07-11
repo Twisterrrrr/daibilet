@@ -1,7 +1,7 @@
-/** ISR for public HTML pages (seconds). */
+/** ISR interval (seconds). Use literal `300` in `export const revalidate` — Next.js requires a static value at build time. */
 export const PUBLIC_PAGE_REVALIDATE = 300;
 
-/** ISR for public read-only JSON API routes (seconds). */
+/** Same as PUBLIC_PAGE_REVALIDATE — for API route docs only. */
 export const PUBLIC_API_REVALIDATE = 300;
 
 /** Shared Cache-Control for CDN/nginx and browser. */
