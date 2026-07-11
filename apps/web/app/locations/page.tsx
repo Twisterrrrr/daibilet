@@ -4,13 +4,13 @@ import { VenueListPage, generateVenueListMetadata } from '@/components/VenuePage
 
 export async function generateMetadata(): Promise<Metadata> {
   return generateVenueListMetadata(
-    'Причалы и локации | Дайбилет',
-    'Причалы, теплоходы и локации с афишей речных прогулок и событий.',
+    'Локации: причалы, парки и точки старта экскурсий | Дайбилет',
+    'Куда приходить: причалы речных прогулок, парки, точки старта пеших экскурсий, автобусные остановки и встречи в аэропорту.',
   );
 }
 
 export const revalidate = 300;
 
 export default function LocationsIndexPage() {
-  return VenueListPage({ family: 'location', listPath: '/locations' });
+  return VenueListPage({ family: 'location' });
 }

@@ -4,13 +4,13 @@ import { VenueListPage, generateVenueListMetadata } from '@/components/VenuePage
 
 export async function generateMetadata(): Promise<Metadata> {
   return generateVenueListMetadata(
-    'Площадки и музеи | Дайбилет',
-    'Музеи, театры, концертные залы и культурные пространства с афишей событий.',
+    'Площадки: музеи, галереи и театры — билеты онлайн | Дайбилет',
+    'Каталог площадок Дайбилет: музеи, галереи, театры и арт-пространства. Актуальная афиша и электронные билеты.',
   );
 }
 
 export const revalidate = 300;
 
 export default function VenuesIndexPage() {
-  return VenueListPage({ family: 'institution', listPath: '/venues' });
+  return VenueListPage({ family: 'institution' });
 }

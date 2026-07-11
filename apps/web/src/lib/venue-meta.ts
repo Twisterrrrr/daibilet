@@ -121,3 +121,47 @@ export function institutionTypeEmoji(type?: string | null): string {
   };
   return map[key] || '✨';
 }
+
+export const CATALOG_TYPE_OPTIONS: Array<{ value: string; label: string; template: VenuePageTemplate }> = [
+  { value: 'museum_art_space', label: 'Музей / галерея', template: 'institution' },
+  { value: 'theater', label: 'Театр', template: 'institution' },
+  { value: 'concert_hall', label: 'Концертный зал', template: 'institution' },
+  { value: 'bar', label: 'Бар', template: 'institution' },
+  { value: 'club_bar_restaurant', label: 'Клуб / ресторан', template: 'institution' },
+  { value: 'pier', label: 'Причал', template: 'location' },
+  { value: 'bus', label: 'Автобусы', template: 'location' },
+  { value: 'venue', label: 'Площадка', template: 'location' },
+  { value: 'outdoor_location', label: 'Открытая локация', template: 'location' },
+  { value: 'sport_activity_space', label: 'Спорт / активность', template: 'location' },
+  { value: 'attraction', label: 'Достопримечательность', template: 'location' },
+  { value: 'other', label: 'Другое', template: 'location' },
+];
+
+export function locationTypeEmoji(type?: string | null): string {
+  const key = normalizeVenueKind(type);
+  const map: Record<string, string> = {
+    pier: '⚓',
+    pier_water: '⚓',
+    bus: '🚌',
+    venue: '📍',
+    outdoor_location: '🌳',
+    sport_activity_space: '⚡',
+    attraction: '🏛',
+    other: '📍',
+  };
+  return map[key] || '📍';
+}
+
+export const INSTITUTION_CATALOG_TYPE_OPTIONS = CATALOG_TYPE_OPTIONS.filter((option) => option.template === 'institution').map(
+  (option) => ({
+    ...option,
+    emoji: institutionTypeEmoji(option.value),
+  }),
+);
+
+export const LOCATION_CATALOG_TYPE_OPTIONS = CATALOG_TYPE_OPTIONS.filter((option) => option.template === 'location').map(
+  (option) => ({
+    ...option,
+    emoji: locationTypeEmoji(option.value),
+  }),
+);

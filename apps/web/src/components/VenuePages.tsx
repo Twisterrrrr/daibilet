@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { ChevronRight } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
+import { LocationsCatalogView } from '@/components/LocationsCatalogView.client';
+import { VenuesCatalogView } from '@/components/VenuesCatalogView.client';
 import { VenuePageView } from '@/components/VenuePageView.client';
-import { PageBreadcrumbBar, SectionPageHero } from '@/components/PageBreadcrumbs';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
-import { formatPriceFrom, pluralEvents } from '@/lib/format';
 import { buildPublicVenueDto, buildPublicVenuesDto } from '@daibilet/backend/public-read';
-import { cityHref, venueCatalogHref, venueHref } from '@/lib/routes';
-import { venuePageTemplate } from '@/lib/venue-meta';
+import { venueHref } from '@/lib/routes';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -37,53 +37,27 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
   };
 }
 
-export async function VenueListPage({ family, listPath }: Pick<PageProps, 'family' | 'listPath'>) {
+export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
   const params = new URLSearchParams({ family, limit: '500' });
   const payload = await buildPublicVenuesDto(params);
-  const title = family === 'location' ? 'Причалы и локации' : 'Площадки и музеи';
-  const description =
-    family === 'location'
-      ? 'Причалы, локации и точки отправления речных прогулок и экскурсий.'
-      : 'Музеи, театры, выставочные залы и другие площадки с афишей событий.';
-  const alternatePath = listPath === '/venues' ? '/locations' : '/venues';
-  const alternateLabel = listPath === '/venues' ? 'Причалы и локации' : 'Площадки и музеи';
+  const breadcrumbLabel = family === 'location' ? 'Локации' : 'Площадки';
 
   return (
     <SiteLayout>
-      <SectionPageHero
-        breadcrumbs={[
-          { label: 'Главная', href: '/' },
-          { label: title },
-        ]}
-        gradientClass="from-primary-800 via-primary-700 to-slate-900"
-        title={title}
-        description={description}
-      />
-      <div className="container-page py-8">
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {payload.venues.map((venue) => (
-            <li key={venue.id}>
-              <Link href={venueHref(venue)} className="card-link block p-4">
-                <h2 className="text-lg font-semibold text-slate-900">{venue.title || venue.name}</h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  {venue.city} · {pluralEvents(venue.events)}
-                </p>
-              </Link>
-            </li>
-          ))}
-        </ul>
-        <p className="mt-8 flex flex-wrap gap-4 text-sm text-slate-500">
-          <Link href={alternatePath} className="font-medium text-primary hover:underline">
-            {alternateLabel}
+      <div className="border-b border-slate-200 bg-white">
+        <div className="container-page flex items-center gap-1.5 py-3 text-sm text-slate-500">
+          <Link href="/" className="hover:text-primary-600">
+            Главная
           </Link>
-          <Link href="/cities" className="font-medium text-primary hover:underline">
-            Все города
-          </Link>
-          <Link href="/events" className="font-medium text-primary hover:underline">
-            Афиша событий
-          </Link>
-        </p>
+          <ChevronRight className="h-3.5 w-3.5" />
+          <span className="text-slate-900">{breadcrumbLabel}</span>
+        </div>
       </div>
+      {family === 'location' ? (
+        <LocationsCatalogView venues={payload.venues} />
+      ) : (
+        <VenuesCatalogView venues={payload.venues} />
+      )}
     </SiteLayout>
   );
 }
