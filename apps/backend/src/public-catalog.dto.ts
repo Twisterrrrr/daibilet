@@ -1,6 +1,10 @@
 import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZE_MAX } from '@daibilet/contracts/catalog';
 import { Prisma, prisma } from '../../../packages/db/src/client.ts';
 import {
+  ACTIVE_SESSION_SQL,
+  isSaleableForPublicCatalog,
+} from './catalog-availability.js';
+import {
   dedupeCrossSourceCatalogSessions,
   mapGroupedPublicSession,
   pickCatalogSubcategories,
@@ -75,9 +79,11 @@ export async function getPublicCatalogSessions(forceRefresh = false): Promise<Pu
   if (forceRefresh) clearPublicCatalogDtoCache();
 
   const buildPromise = Promise.all([loadPublicCatalogRows(), loadPinnedEventIds()]).then(([rows, pinnedEventIds]) => {
-    const sessions = dedupeCrossSourceCatalogSessions(
-      regroupMappedPublicCatalogSessions(
-        rows.map((row) => mapGroupedPublicSession(row, pinnedEventIds)),
+    const sessions = filterCatalogSessions(
+      dedupeCrossSourceCatalogSessions(
+        regroupMappedPublicCatalogSessions(
+          rows.map((row) => mapGroupedPublicSession(row, pinnedEventIds)),
+        ),
       ),
     );
     catalogCache = {
@@ -201,12 +207,12 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         primary_offer."priceRub" as "offerPriceRub",
         primary_offer."widgetUrl" as "offerWidgetUrl",
         primary_offer."deeplinkUrl" as "offerDeeplinkUrl",
-        min(session."startsAt") filter (where coalesce(session."endsAt", session."startsAt") >= now()) as "startsAt",
+        min(session."startsAt") filter (where ${Prisma.raw(ACTIVE_SESSION_SQL)}) as "startsAt",
         min(session."priceFromRub") filter (
-          where coalesce(session."endsAt", session."startsAt") >= now()
+          where ${Prisma.raw(ACTIVE_SESSION_SQL)}
             and session."priceFromRub" >= ${MIN_DISPLAY_PRICE_RUB}
         ) as "sessionPriceFromRub",
-        count(distinct session.id) filter (where coalesce(session."endsAt", session."startsAt") >= now())::int as "slotCount",
+        count(distinct session.id) filter (where ${Prisma.raw(ACTIVE_SESSION_SQL)})::int as "slotCount",
         (
           select coalesce(array_agg(title order by priority, title), '{}')
           from (
@@ -593,4 +599,16 @@ function humanizeSlug(slug: string): string {
 function clampNumber(value: number | undefined, min: number, max: number, fallback: number): number {
   if (!Number.isFinite(value)) return fallback;
   return Math.min(max, Math.max(min, Math.trunc(Number(value))));
+}
+
+function filterCatalogSessions(sessions: PublicSessionDto[]): PublicSessionDto[] {
+  return sessions.filter((session) =>
+    isSaleableForPublicCatalog({
+      kind: session.kind,
+      sourceStatus: session.sourceStatus,
+      startsAt: session.startsAt || session.upcomingSlots?.[0]?.startsAt || null,
+      purchaseReady: session.purchaseReady,
+      priceFrom: session.priceFrom,
+    }),
+  );
 }

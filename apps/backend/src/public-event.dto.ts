@@ -1,5 +1,6 @@
 import { Prisma, prisma } from '../../../packages/db/src/client.ts';
 import {
+  hasUpcomingOrOpenSchedule,
   isOpenDateCatalogRow,
   isWideLifetimeSession,
 } from './catalog-availability.js';
@@ -152,8 +153,18 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
       },
       include: sessionInclude,
       orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
-      take: 5,
-    }),
+      take: 12,
+    }).then((rows) =>
+      rows.filter((session) => {
+        const event = eventsById.get(session.eventId) || requestedEvent;
+        return hasUpcomingOrOpenSchedule({
+          kind: event.kind,
+          sourceStatus: session.sourceStatus,
+          startsAt: session.startsAt,
+          endsAt: session.endsAt,
+        });
+      }).slice(0, 5),
+    ),
     prisma.eventOffer.findMany({
       where: {
         eventId: { in: groupEventIds },

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { matchingLandingSlugs } from './landing-rules.js';
+import { isFutureSlotStart, isOpenDateCatalogRow } from './catalog-availability.js';
 import {
   buildProviderWidgetUrl,
   providerForSource,
@@ -121,6 +122,7 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
   const purchaseUrl = purchase.url || fallbackWidgetUrl;
   const upcomingSlots = parseUpcomingSlots(row.upcomingSlots)
     .filter(hasSlotStart)
+    .filter((slot) => isFutureSlotStart(slot.startsAt))
     .slice(0, 8)
     .map((slot) => {
       const sourceCode = slot.sourceCode || slot.offerSourceCode || row.sourceCode || row.offerSourceCode;
@@ -320,10 +322,6 @@ function cityNameStem(city: string): string {
   const compact = city.toLowerCase().replace(/[^а-яё]/g, '');
   if (compact.length <= 5) return compact;
   return compact.slice(0, Math.max(5, compact.length - 2));
-}
-
-function isOpenDateCatalogRow(row: Pick<PublicCatalogMappingRow, 'kind' | 'sourceStatus'>): boolean {
-  return row.kind.toUpperCase() === 'OPEN_DATE' || String(row.sourceStatus || '').toLowerCase() === 'open_date';
 }
 
 function resolvePublicSessionImageUrl(row: PublicCatalogMappingRow): string | null {

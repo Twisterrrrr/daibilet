@@ -13,7 +13,7 @@ test('isOpenDateCatalogRow accepts OPEN_DATE kind and open_date status', () => {
 });
 
 test('hasUpcomingOrOpenSchedule rejects past TEP rows without schedule', () => {
-  const past = new Date(Date.now() - 60_000).toISOString();
+  const past = new Date(Date.now() - 20 * 60_000).toISOString();
   assert.equal(hasUpcomingOrOpenSchedule({ kind: 'SINGLE', startsAt: past }), false);
   assert.equal(hasUpcomingOrOpenSchedule({ kind: 'SINGLE', startsAt: null }), false);
 });
@@ -22,6 +22,12 @@ test('hasUpcomingOrOpenSchedule accepts running session via endsAt', () => {
   const started = new Date(Date.now() - 3_600_000).toISOString();
   const ends = new Date(Date.now() + 3_600_000).toISOString();
   assert.equal(hasUpcomingOrOpenSchedule({ kind: 'RECURRING', startsAt: started, endsAt: ends }), true);
+});
+
+test('hasUpcomingOrOpenSchedule rejects stale wide-lifetime rows', () => {
+  const started = new Date(Date.now() - 400 * 24 * 3_600_000).toISOString();
+  const ends = new Date(Date.now() + 400 * 24 * 3_600_000).toISOString();
+  assert.equal(hasUpcomingOrOpenSchedule({ kind: 'SINGLE', startsAt: started, endsAt: ends }), false);
 });
 
 test('isSaleableForPublicCatalog requires widget-ready schedule and price', () => {
