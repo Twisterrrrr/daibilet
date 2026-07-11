@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 
 import { BlogArticleHero } from '@/components/BlogArticleHero';
-import { renderBlogArticleContent } from '@/components/BlogArticleContent';
+import { BlogArticleContent } from '@/components/BlogArticleContent';
 import { SiteLayout } from '@/components/SiteLayout';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import { resolveBlogCityHref } from '@/lib/blog-article-city';
@@ -37,7 +37,10 @@ export function BlogArticleView({ article }: { article: BlogArticleDto }) {
       />
 
       <article className="container-page max-w-3xl py-10 sm:py-12">
-        {renderBlogArticleContent(article.content || article.excerpt || '', article.coverImageUrl)}
+        <BlogArticleContent
+          content={article.content || article.excerpt || ''}
+          coverImageUrl={article.coverImageUrl}
+        />
       </article>
 
       <div className="container-page max-w-3xl pb-12">

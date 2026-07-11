@@ -557,3 +557,13 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
 
   return <div className="blog-article-prose">{nodes}</div>;
 }
+
+export function BlogArticleContent({
+  content,
+  coverImageUrl,
+}: {
+  content: string;
+  coverImageUrl?: string | null;
+}) {
+  return renderBlogArticleContent(content, coverImageUrl);
+}
