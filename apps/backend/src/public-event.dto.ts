@@ -80,6 +80,7 @@ interface MappedOffer extends PublicOfferDto {
   eventId: string;
   sortOrder: number | null;
   sourceTicketId: string | null;
+  payload: Prisma.JsonValue | null;
 }
 
 type PublicEventSession = PublicEventPageDto['sessions'][number];
@@ -301,7 +302,7 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     generatedAt: new Date().toISOString(),
     event,
     sessions,
-    offers: offers.map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, ...offer }) => offer),
+    offers: offers.map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, payload: _payload, ...offer }) => offer),
     ticketPrices,
     related,
     landings: landingSlugs.map(findLandingRule).filter(isDefined).map((rule) => ({
@@ -458,6 +459,7 @@ function mapOfferRecord(offer: OfferRecord): MappedOffer {
     active: offer.active,
     sortOrder: offerSortOrder(offer.payload),
     sourceTicketId: sourceLink?.externalId || null,
+    payload: offer.payload,
   };
 }
 
@@ -478,13 +480,14 @@ function buildTicketPrices(
   const eventTitleKey = normalizeGroupPart(event.title);
   for (const offer of preferNamedTicketOffers(offers)) {
     if (!Number.isFinite(offer.priceRub) || Number(offer.priceRub) < MIN_DISPLAY_PRICE_RUB) continue;
+    const title = normalizeTicketTitle(offer.title, eventTitleKey);
     rows.push({
-      key: `offer:${offer.id}:${normalizeTicketTitle(offer.title, eventTitleKey)}:${offer.priceRub}`,
-      title: normalizeTicketTitle(offer.title, eventTitleKey),
+      key: `offer:${offer.id}:${normalizeGroupPart(title)}:${offer.priceRub}`,
+      title,
       priceRub: Number(offer.priceRub),
       source: sourceLabel(offer.sourceCode),
       sourceTicketId: offer.sourceTicketId,
-      description: 'Покупка открывается в виджете билетной системы.',
+      description: resolveOfferTicketDescription(offer, title),
       purchaseUrl: offer.widgetUrl || offer.deeplinkUrl || event.purchaseUrl || null,
       kind: 'offer',
       sortOrder: offer.sortOrder ?? null,
@@ -494,11 +497,11 @@ function buildTicketPrices(
   for (const session of sessions) {
     if (!Number.isFinite(session.priceFrom) || Number(session.priceFrom) < MIN_DISPLAY_PRICE_RUB || offerPrices.has(Number(session.priceFrom))) continue;
     rows.push({
-      key: `session:${session.priceFrom}`,
+      key: `session:${session.id || session.priceFrom}:${session.priceFrom}`,
       title: 'Билет на отдельные сеансы',
       priceRub: Number(session.priceFrom),
       source: null,
-      description: 'Минимальная доступная цена среди ближайших дат.',
+      description: null,
       purchaseUrl: session.purchaseUrl || event.purchaseUrl || null,
       kind: 'session',
       sortOrder: null,
@@ -510,7 +513,7 @@ function buildTicketPrices(
       title: 'Билет',
       priceRub: Number(event.priceFrom),
       source: null,
-      description: 'Точная категория билета уточняется в виджете поставщика.',
+      description: null,
       purchaseUrl: event.purchaseUrl || null,
       kind: 'fallback',
       sortOrder: null,
@@ -518,9 +521,7 @@ function buildTicketPrices(
   }
   const unique = new Map<string, PublicTicketPriceDto>();
   for (const row of rows) {
-    const key = `${normalizeGroupPart(row.title)}:${row.priceRub}`;
-    const current = unique.get(key);
-    if (!current || (row.kind === 'offer' && current.kind !== 'offer')) unique.set(key, row);
+    unique.set(row.key, row);
   }
   return [...unique.values()].sort((left, right) => {
     const leftOrder = left.sortOrder ?? 9999;
@@ -635,6 +636,69 @@ function cleanImportedDescription(value?: string | null): string | null {
 
 function normalizeGroupPart(value: unknown): string {
   return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function splitTitlePartsWithoutWeekdays(title: string): string[] {
+  const parts = title.split(',').map((part) => part.trim()).filter(Boolean);
+  const weekdayToken = /^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)$/iu;
+  const weekdayRange = /^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)(?:\s*[,—–\-]\s*(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС))+$/iu;
+
+  while (parts.length > 1) {
+    const last = parts[parts.length - 1];
+    if (weekdayToken.test(last) || weekdayRange.test(last)) {
+      parts.pop();
+      continue;
+    }
+    break;
+  }
+
+  return parts;
+}
+
+function isGenericTicketDescription(value?: string | null): boolean {
+  const text = cleanImportedDescription(value)?.toLowerCase() || '';
+  if (!text) return true;
+  if (text.includes('покупка открывается в виджете')) return true;
+  if (text.includes('уточняется в виджете')) return true;
+  if (text.includes('минимальная доступная цена')) return true;
+  return false;
+}
+
+function extractOfferPayloadDescription(payload: Prisma.JsonValue | null): string | null {
+  if (!payload || Array.isArray(payload) || typeof payload !== 'object') return null;
+  const record = payload as Record<string, unknown>;
+  for (const key of ['description', 'comment', 'text']) {
+    const direct = cleanImportedDescription(String(record[key] || ''));
+    if (direct && !isGenericTicketDescription(direct)) return direct;
+  }
+  const ticket = record.ticket;
+  if (ticket && typeof ticket === 'object' && !Array.isArray(ticket)) {
+    for (const key of ['description', 'comment', 'text']) {
+      const nested = cleanImportedDescription(String((ticket as Record<string, unknown>)[key] || ''));
+      if (nested && !isGenericTicketDescription(nested)) return nested;
+    }
+  }
+  return null;
+}
+
+function parseTitleSupplement(rawTitle: string | null | undefined, normalizedTitle: string): string | null {
+  const clean = cleanImportedDescription(rawTitle);
+  if (!clean) return null;
+  const parts = splitTitlePartsWithoutWeekdays(clean);
+  if (parts.length <= 1) return null;
+  const supplement = parts.slice(1).join(', ').trim();
+  if (!supplement || isGenericTicketDescription(supplement)) return null;
+  if (normalizeGroupPart(parts[0]) === normalizeGroupPart(normalizedTitle)) return supplement;
+  if (normalizeGroupPart(clean) === normalizeGroupPart(normalizedTitle)) return supplement;
+  return supplement;
+}
+
+function resolveOfferTicketDescription(offer: MappedOffer, normalizedTitle: string): string | null {
+  const fromPayload = extractOfferPayloadDescription(offer.payload);
+  if (fromPayload) return fromPayload;
+  const fromTitle = parseTitleSupplement(offer.title, normalizedTitle);
+  if (fromTitle) return fromTitle;
+  return null;
 }
 
 function publicSlug(value: string): string {

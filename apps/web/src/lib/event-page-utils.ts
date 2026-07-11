@@ -48,9 +48,21 @@ export function formatPriceRub(value?: number | null): string | null {
 export function getTicketPriceRange(payload: PublicEventPageDto): { min: number; max: number } | null {
   const values: number[] = [];
 
-  if (Array.isArray(payload.ticketPrices)) {
+  if (Array.isArray(payload.ticketPrices) && payload.ticketPrices.length) {
     for (const item of payload.ticketPrices) {
       if (item.priceRub >= MIN_DISPLAY_PRICE_RUB) values.push(item.priceRub);
+    }
+  } else {
+    for (const offer of payload.offers ?? []) {
+      if (offer.active !== false && typeof offer.priceRub === 'number' && offer.priceRub >= MIN_DISPLAY_PRICE_RUB) {
+        values.push(offer.priceRub);
+      }
+    }
+    if (typeof payload.stats.priceFrom === 'number' && payload.stats.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
+      values.push(payload.stats.priceFrom);
+    }
+    if (typeof payload.event.priceFrom === 'number' && payload.event.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
+      values.push(payload.event.priceFrom);
     }
   }
 
@@ -58,13 +70,6 @@ export function getTicketPriceRange(payload: PublicEventPageDto): { min: number;
     if (typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
       values.push(session.priceFrom);
     }
-  }
-
-  if (typeof payload.stats.priceFrom === 'number' && payload.stats.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
-    values.push(payload.stats.priceFrom);
-  }
-  if (typeof payload.event.priceFrom === 'number' && payload.event.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
-    values.push(payload.event.priceFrom);
   }
 
   if (!values.length) return null;
@@ -114,28 +119,101 @@ export type TicketCategoryRow = {
   maxPrice: number;
 };
 
-export function buildGroupedTicketCategories(payload: PublicEventPageDto): TicketCategoryRow[] {
-  if (!Array.isArray(payload.ticketPrices) || !payload.ticketPrices.length) return [];
+type RawTicketPrice = {
+  title: string;
+  description: string | null;
+  priceRub: number;
+  sortOrder: number | null;
+};
 
+function splitTitlePartsWithoutWeekdays(title: string): string[] {
+  const parts = title.split(',').map((part) => part.trim()).filter(Boolean);
+  const weekdayToken = /^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)$/iu;
+  const weekdayRange = /^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)(?:\s*[,—–\-]\s*(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС))+$/iu;
+
+  while (parts.length > 1) {
+    const last = parts[parts.length - 1];
+    if (weekdayToken.test(last) || weekdayRange.test(last)) {
+      parts.pop();
+      continue;
+    }
+    break;
+  }
+
+  return parts;
+}
+
+function isGenericTicketDescription(value?: string | null): boolean {
+  const text = cleanDisplayText(value).toLowerCase();
+  if (!text) return true;
+  if (text.includes('покупка открывается в виджете')) return true;
+  if (text.includes('уточняется в виджете')) return true;
+  if (text.includes('минимальная доступная цена')) return true;
+  return false;
+}
+
+function parseTicketCategory(item: { title: string; description?: string | null; priceRub: number }) {
+  const parts = splitTitlePartsWithoutWeekdays(item.title);
+  const name = parts[0] || 'Билет';
+  const parsedDescription = parts.length > 1 ? parts.slice(1).join(', ') : null;
+  const apiDescription = cleanDisplayText(item.description);
+  const description =
+    parsedDescription || (apiDescription && !isGenericTicketDescription(apiDescription) ? apiDescription : null);
+
+  return { name, description };
+}
+
+function collectRawTicketPrices(payload: PublicEventPageDto): RawTicketPrice[] {
+  if (Array.isArray(payload.ticketPrices) && payload.ticketPrices.length) {
+    return payload.ticketPrices
+      .filter((price) => typeof price.priceRub === 'number' && price.priceRub >= MIN_DISPLAY_PRICE_RUB)
+      .map((price) => ({
+        title: cleanDisplayText(price.title) || 'Билет',
+        description: cleanDisplayText(price.description) || null,
+        priceRub: price.priceRub,
+        sortOrder: price.sortOrder ?? null,
+      }));
+  }
+
+  const eventTitleKey = cleanDisplayText(payload.event.title).toLowerCase().replace(/\s+/g, ' ');
+  return (payload.offers ?? [])
+    .filter((offer) => offer.active !== false && typeof offer.priceRub === 'number' && offer.priceRub >= MIN_DISPLAY_PRICE_RUB)
+    .map((offer, index) => {
+      const rawTitle = cleanDisplayText(offer.title) || '';
+      const titleKey = rawTitle.toLowerCase().replace(/\s+/g, ' ');
+      const title =
+        !titleKey || titleKey === eventTitleKey || titleKey === 'widget' || titleKey.includes('ticketscloud widget')
+          ? 'Билет'
+          : rawTitle;
+      return { title, description: null, priceRub: offer.priceRub as number, sortOrder: index };
+    })
+    .sort((a, b) => (a.sortOrder ?? 9999) - (b.sortOrder ?? 9999));
+}
+
+export function buildGroupedTicketCategories(payload: PublicEventPageDto): TicketCategoryRow[] {
   const order: string[] = [];
+  const groupSortOrder = new Map<string, number>();
   const groups = new Map<string, TicketCategoryRow>();
 
-  for (const item of payload.ticketPrices) {
-    if (item.priceRub < MIN_DISPLAY_PRICE_RUB) continue;
-    const name = item.title?.trim() || 'Билет';
-    const description = cleanDisplayText(item.description) || null;
-    const key = `${name}|${description || ''}`.toLowerCase();
+  for (const item of collectRawTicketPrices(payload)) {
+    const { name, description } = parseTicketCategory(item);
+    const key = `${name}|${description || ''}`.toLowerCase().replace(/\s+/g, ' ');
+    const itemOrder = item.sortOrder ?? 9999;
     const existing = groups.get(key);
     if (!existing) {
       order.push(key);
       groups.set(key, { key, name, description, minPrice: item.priceRub, maxPrice: item.priceRub });
+      groupSortOrder.set(key, itemOrder);
       continue;
     }
     existing.minPrice = Math.min(existing.minPrice, item.priceRub);
     existing.maxPrice = Math.max(existing.maxPrice, item.priceRub);
+    groupSortOrder.set(key, Math.min(groupSortOrder.get(key) ?? 9999, itemOrder));
   }
 
-  return order.map((key) => groups.get(key)!);
+  return order
+    .map((key) => groups.get(key)!)
+    .sort((a, b) => (groupSortOrder.get(a.key) ?? 9999) - (groupSortOrder.get(b.key) ?? 9999));
 }
 
 export function formatCategoryPrice(minPrice: number, maxPrice: number): string {

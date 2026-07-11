@@ -4139,6 +4139,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
           offer."widgetUrl",
           offer."deeplinkUrl",
           offer.active,
+          offer.payload,
           (offer.payload->>'sortOrder')::int as "sortOrder"
         from "EventOffer" offer
         where offer."eventId" = any($1)
@@ -4410,17 +4411,16 @@ export function dedupePublicOffers(rows) {
 function buildPublicTicketPrices(offers, sessions, event) {
   const rows = [];
   const eventTitleKey = normalizeGroupPart(event.title);
-  const isTeplohod = String(event.sourceCode || event.offerSourceCode || '').toUpperCase().includes('TEPLOHOD');
 
   for (const offer of preferNamedTicketOffers(offers || [])) {
     if (offer.active === false || !Number.isFinite(offer.priceRub) || offer.priceRub < MIN_DISPLAY_PRICE_RUB) continue;
     const title = normalizePublicTicketTitle(offer.title, eventTitleKey);
     rows.push({
-      key: `offer:${offer.id || offer.eventId}:${title}:${offer.priceRub}`,
+      key: `offer:${offer.id || offer.eventId}:${normalizeGroupPart(title)}:${offer.priceRub}`,
       title,
       priceRub: offer.priceRub,
       source: publicSourceLabel(offer.sourceCode),
-      description: 'Покупка открывается в виджете билетной системы.',
+      description: resolvePublicOfferTicketDescription(offer, title),
       purchaseUrl: offer.widgetUrl || offer.deeplinkUrl || event.purchaseUrl || null,
       kind: 'offer',
       sortOrder: readOfferSortOrder(offer.sortOrder),
@@ -4432,11 +4432,11 @@ function buildPublicTicketPrices(offers, sessions, event) {
     if (!Number.isFinite(session.priceFrom) || session.priceFrom < MIN_DISPLAY_PRICE_RUB) continue;
     if (offerPrices.has(session.priceFrom)) continue;
     rows.push({
-      key: `session:${session.priceFrom}`,
+      key: `session:${session.id || session.priceFrom}:${session.priceFrom}`,
       title: 'Билет на отдельные сеансы',
       priceRub: session.priceFrom,
       source: null,
-      description: 'Минимальная доступная цена среди ближайших дат.',
+      description: null,
       purchaseUrl: session.purchaseUrl || event.purchaseUrl || null,
       kind: 'session',
     });
@@ -4448,7 +4448,7 @@ function buildPublicTicketPrices(offers, sessions, event) {
       title: 'Билет',
       priceRub: event.priceFrom,
       source: null,
-      description: 'Точная категория билета уточняется в виджете поставщика.',
+      description: null,
       purchaseUrl: event.purchaseUrl || null,
       kind: 'fallback',
     });
@@ -4456,9 +4456,7 @@ function buildPublicTicketPrices(offers, sessions, event) {
 
   const unique = new Map();
   for (const row of rows) {
-    const key = `${normalizeGroupPart(row.title)}:${row.priceRub}`;
-    const existing = unique.get(key);
-    if (!existing || (row.kind === 'offer' && existing.kind !== 'offer')) unique.set(key, row);
+    unique.set(row.key, row);
   }
 
   return Array.from(unique.values())
@@ -4468,6 +4466,68 @@ function buildPublicTicketPrices(offers, sessions, event) {
       return aOrder - bOrder || a.priceRub - b.priceRub || String(a.title).localeCompare(String(b.title), 'ru');
     })
     .slice(0, 32);
+}
+
+function splitTitlePartsWithoutWeekdays(title) {
+  const parts = String(title || '').split(',').map((part) => part.trim()).filter(Boolean);
+  const weekdayToken = /^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)$/iu;
+  const weekdayRange = /^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)(?:\s*[,—–\-]\s*(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС))+$/iu;
+
+  while (parts.length > 1) {
+    const last = parts[parts.length - 1];
+    if (weekdayToken.test(last) || weekdayRange.test(last)) {
+      parts.pop();
+      continue;
+    }
+    break;
+  }
+
+  return parts;
+}
+
+function isGenericPublicTicketDescription(value) {
+  const text = String(cleanImportedDescription(value) || '').toLowerCase();
+  if (!text) return true;
+  if (text.includes('покупка открывается в виджете')) return true;
+  if (text.includes('уточняется в виджете')) return true;
+  if (text.includes('минимальная доступная цена')) return true;
+  return false;
+}
+
+function extractPublicOfferPayloadDescription(payload) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return null;
+  for (const key of ['description', 'comment', 'text']) {
+    const direct = cleanImportedDescription(payload[key]);
+    if (direct && !isGenericPublicTicketDescription(direct)) return direct;
+  }
+  const ticket = payload.ticket;
+  if (ticket && typeof ticket === 'object' && !Array.isArray(ticket)) {
+    for (const key of ['description', 'comment', 'text']) {
+      const nested = cleanImportedDescription(ticket[key]);
+      if (nested && !isGenericPublicTicketDescription(nested)) return nested;
+    }
+  }
+  return null;
+}
+
+function parsePublicTitleSupplement(rawTitle, normalizedTitle) {
+  const clean = cleanImportedDescription(rawTitle);
+  if (!clean) return null;
+  const parts = splitTitlePartsWithoutWeekdays(clean);
+  if (parts.length <= 1) return null;
+  const supplement = parts.slice(1).join(', ').trim();
+  if (!supplement || isGenericPublicTicketDescription(supplement)) return null;
+  if (normalizeGroupPart(parts[0]) === normalizeGroupPart(normalizedTitle)) return supplement;
+  if (normalizeGroupPart(clean) === normalizeGroupPart(normalizedTitle)) return supplement;
+  return supplement;
+}
+
+function resolvePublicOfferTicketDescription(offer, normalizedTitle) {
+  const fromPayload = extractPublicOfferPayloadDescription(offer.payload);
+  if (fromPayload) return fromPayload;
+  const fromTitle = parsePublicTitleSupplement(offer.title, normalizedTitle);
+  if (fromTitle) return fromTitle;
+  return null;
 }
 
 function normalizePublicTicketTitle(rawTitle, eventTitleKey) {
