@@ -1,6 +1,10 @@
 # Daibilet nginx template.
 # SSL certificates can be managed by Timeweb/certbot. This file shows routing only.
 
+# Public read API: ~60 req/min per IP, burst 15 (see patch-prod-nginx-ratelimit.py)
+limit_req_zone $binary_remote_addr zone=daibilet_public_api:10m rate=60r/m;
+limit_req_status 429;
+
 upstream daibilet_api {
     server 127.0.0.1:4000;
     keepalive 32;
@@ -15,6 +19,16 @@ server {
 
     location / {
         try_files $uri $uri/ /index.html;
+    }
+
+    location ^~ /api/public/ {
+        limit_req zone=daibilet_public_api burst=15 nodelay;
+        proxy_pass http://daibilet_api;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
     location /api/ {
@@ -41,6 +55,7 @@ server {
     }
 
     location ^~ /api/public/ {
+        limit_req zone=daibilet_public_api burst=15 nodelay;
         proxy_pass http://daibilet_api;
         proxy_http_version 1.1;
         proxy_set_header Host $host;

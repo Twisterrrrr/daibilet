@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { SiteLayout } from '@/components/SiteLayout';
+import { SectionPageHero } from '@/components/PageBreadcrumbs';
 import { formatPriceFrom, pluralEvents } from '@/lib/format';
 import { landingCategoryHref } from '@/lib/landing-routes';
 
@@ -21,23 +22,14 @@ export function LandingsCatalogView({
 }) {
   return (
     <SiteLayout>
+      <SectionPageHero
+        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Подборки' }]}
+        gradientClass="from-amber-700 via-primary-700 to-slate-900"
+        title="Подборки событий"
+        description="Тематические коллекции: речные прогулки, экскурсии, концерты и сезонные маршруты."
+      />
       <div className="container-page py-8">
-        <nav className="text-sm text-slate-500">
-          <Link href="/" className="hover:text-primary">
-            Главная
-          </Link>
-          <span className="mx-2">/</span>
-          <span>Подборки</span>
-        </nav>
-
-        <header className="mt-6">
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900">Подборки событий</h1>
-          <p className="mt-3 max-w-2xl text-base text-slate-600">
-            Тематические коллекции: речные прогулки, экскурсии, концерты и сезонные маршруты.
-          </p>
-        </header>
-
-        <form method="get" className="mt-6 flex flex-wrap items-end gap-3">
+        <form method="get" className="flex flex-wrap items-end gap-3">
           <label className="text-sm">
             <span className="mb-1 block font-medium text-slate-700">Город</span>
             <select
@@ -71,12 +63,21 @@ export function LandingsCatalogView({
                 <p className="mt-2 text-sm text-slate-600">{item.subtitle}</p>
                 <p className="mt-4 text-sm font-medium text-slate-700">
                   {pluralEvents(item.events)}
-                  {item.priceFrom ? ` · от ${formatPriceFrom(item.priceFrom)}` : ''}
+                  {item.priceFrom ? ` · ${formatPriceFrom(item.priceFrom)}` : ''}
                 </p>
               </Link>
             </li>
           ))}
         </ul>
+
+        <p className="mt-10 flex flex-wrap gap-4 text-sm">
+          <Link href="/events" className="font-medium text-primary hover:underline">
+            Полный каталог событий
+          </Link>
+          <Link href="/cities" className="font-medium text-primary hover:underline">
+            Города
+          </Link>
+        </p>
       </div>
     </SiteLayout>
   );

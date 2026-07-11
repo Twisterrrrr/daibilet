@@ -63,6 +63,22 @@ export function venuePageTemplate(type?: string | null): 'institution' | 'locati
   return 'institution';
 }
 
+export function venueCatalogHref(template: 'institution' | 'location' = 'institution'): string {
+  return template === 'location' ? '/locations' : '/venues';
+}
+
+export function sessionVenueHref(
+  session: Pick<PublicSessionDto, 'venueId' | 'venueSlug' | 'venue' | 'venueKind'>,
+): string | null {
+  if (!session.venueSlug && !session.venueId) return null;
+  return venueHref({
+    id: session.venueId || session.venueSlug || '',
+    slug: session.venueSlug,
+    name: session.venue,
+    type: session.venueKind,
+  });
+}
+
 function normalizeSlug(value?: string | null): string {
   return String(value || '')
     .trim()

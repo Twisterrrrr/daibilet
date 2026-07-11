@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
@@ -162,6 +163,21 @@ export function CatalogShell() {
           searchParams={searchParamsRecord}
         />
       ) : null}
+
+      <nav className="mt-10 flex flex-wrap gap-4 border-t border-slate-200 pt-8 text-sm text-slate-600">
+        <Link href="/cities" className="font-medium hover:text-primary">
+          Города
+        </Link>
+        <Link href="/venues" className="font-medium hover:text-primary">
+          Площадки
+        </Link>
+        <Link href="/locations" className="font-medium hover:text-primary">
+          Локации
+        </Link>
+        <Link href="/podborki" className="font-medium hover:text-primary">
+          Подборки
+        </Link>
+      </nav>
     </>
   );
 }

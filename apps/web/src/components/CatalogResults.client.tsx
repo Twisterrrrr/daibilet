@@ -13,7 +13,7 @@ import {
 import { formatShowcaseSessionDate } from '@/lib/event-card-meta';
 import { resolveEventCardDestinationLabel } from '@/lib/event-location';
 import { resolvePseudoRating } from '@/lib/event-card-meta';
-import { eventHref } from '@/lib/routes';
+import { eventHref, sessionVenueHref } from '@/lib/routes';
 import type { CatalogViewMode } from '@/lib/catalog-view-mode';
 
 type CatalogResultsProps = {
@@ -129,13 +129,22 @@ function CatalogTable({ items }: { items: PublicSessionDto[] }) {
             const rating = resolvePseudoRating(session.groupKey || session.id);
             const reviewCount = Math.max(session.sessionCount || 1, 1) * 37 + (session.id.charCodeAt(0) % 90);
             const cityLabel = resolveEventCardDestinationLabel(session);
+            const venueLink = sessionVenueHref(session);
             return (
               <tr key={`${session.id}-${session.startsAt}`} className="border-b border-slate-100 last:border-0 hover:bg-slate-50">
                 <td className="min-w-[280px] px-4 py-3 align-top">
                   <Link href={eventHref(session)} className="font-semibold text-slate-950 hover:text-primary-700">
                     {session.title}
                   </Link>
-                  {session.venue ? <div className="mt-1 text-xs text-slate-500">{session.venue}</div> : null}
+                  {session.venue ? (
+                    venueLink ? (
+                      <Link href={venueLink} className="mt-1 block text-xs text-slate-500 hover:text-primary-700">
+                        {session.venue}
+                      </Link>
+                    ) : (
+                      <div className="mt-1 text-xs text-slate-500">{session.venue}</div>
+                    )
+                  ) : null}
                 </td>
                 <td className="px-4 py-3 align-top text-slate-600">{session.category || '—'}</td>
                 <td className="px-4 py-3 align-top text-slate-600">

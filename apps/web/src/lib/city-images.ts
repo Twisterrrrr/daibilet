@@ -70,3 +70,8 @@ export function resolveCityCardImage(city: CityImageSource): string | null {
   if (!CITY_CARD_IMAGE_SLUGS.has(imageSlug)) return null;
   return `/images/cities/${imageSlug}.png`;
 }
+
+/** Hero / full-width city image (same sources as card). */
+export function resolveCityImage(city: CityImageSource): string | null {
+  return resolveCityCardImage(city);
+}

@@ -266,6 +266,10 @@ export function listLandingStaticParamsTwo(): Array<{ segment: string; segment2:
   return paths;
 }
 
+export function landingPageHref(slug: string, citySlug?: string) {
+  return landingCategoryHref(slug, citySlug);
+}
+
 /** Теги жанров на лендинге «Концерты» (совпадают с EventTag.title). */
 const CONCERT_GENRE_TAGS = ['Рок', 'Джаз', 'Классика', 'Поп', 'Эстрада', 'Металл', 'Орган'] as const;
 
