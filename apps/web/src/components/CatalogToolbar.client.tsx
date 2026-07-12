@@ -103,7 +103,16 @@ export function CatalogToolbar({ facets, values, viewMode, onViewModeChange, dis
             <select
               id="catalog-city"
               name="city"
-              defaultValue={filters.city || 'all'}
+              value={filters.city || 'all'}
+              onChange={(event) => {
+                const nextCity = event.target.value;
+                navigate({
+                  ...filters,
+                  q: qDraft.trim() || undefined,
+                  city: nextCity === 'all' ? undefined : nextCity,
+                  page: undefined,
+                });
+              }}
               className="h-11 w-full appearance-none rounded-xl bg-slate-50 pl-4 pr-9 text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/60"
             >
               <option value="all">Все города</option>
