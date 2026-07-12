@@ -38,10 +38,9 @@ for (const item of EVENTS) {
       select e.id, e.title
       from "Event" e
       where e.id = $1
-         or e."externalId" = $2
       limit 1
     `,
-    [eventId, item.externalId],
+    [eventId],
   );
 
   if (!rows.length) {
