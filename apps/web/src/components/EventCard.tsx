@@ -12,7 +12,6 @@ import { EventImageBadges } from '@/lib/event-card-badges';
 import {
   collectDisplaySlotLabels,
   collectDisplaySlotTimes,
-  formatCatalogNearestDatesLabel,
   formatEventNextSession,
   formatPriceRub,
   formatShowcasePriceLabel,
@@ -26,7 +25,7 @@ import {
   resolvePseudoRating,
 } from '@/lib/event-card-meta';
 import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
-import { formatMoneyRange } from '@/lib/format';
+import { formatMoneyRange, formatPriceFrom } from '@/lib/format';
 import { eventHref } from '@/lib/routes';
 
 type EventCardProps = {
@@ -65,7 +64,7 @@ export function EventCard({
   const sessionMetaLabel = openDate
     ? null
     : multipleSlots && displaySlotLabels.length > 1
-      ? formatCatalogNearestDatesLabel()
+      ? nextSessionLabel
       : isToday && displaySlots.length > 0
         ? displaySlots.length === 1
           ? `Сегодня, ${displaySlots[0]}`
@@ -74,7 +73,8 @@ export function EventCard({
   const pseudoRating = resolvePseudoRating(session.groupKey || session.id);
   const locationLabel = resolveEventCardLocationLabel(session);
   const showSoonBadge = !hasPrice && !openDate && !departingSoonMinutes;
-  const priceLabel = formatMoneyRange(session.priceFrom, session.priceTo);
+  const priceBadgeLabel = formatPriceFrom(session.priceFrom);
+  const priceFooterLabel = formatMoneyRange(session.priceFrom, session.priceTo);
 
   const cardClassName =
     'group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-slate-200/60';
@@ -108,8 +108,8 @@ export function EventCard({
 
         {hasPrice ? (
           <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3">
-            <span className="rounded-full bg-primary-600 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-white shadow-sm sm:px-4 sm:py-2 sm:text-sm">
-              {formatMoneyRange(session.priceFrom, session.priceTo)}
+            <span className="rounded-full bg-primary-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm sm:px-4 sm:py-2 sm:text-sm">
+              {priceBadgeLabel}
             </span>
           </div>
         ) : null}
@@ -190,7 +190,7 @@ export function EventCard({
             />
           ) : (
             <>
-              <span className="text-sm font-semibold text-slate-900">{priceLabel}</span>
+              <span className="text-sm font-semibold text-slate-900">{priceFooterLabel}</span>
               <span className="flex items-center gap-1 text-[10px] font-medium text-primary-600 sm:text-xs">
                 <Ticket className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                 Подробнее →

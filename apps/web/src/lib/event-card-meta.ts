@@ -38,10 +38,6 @@ export function collectDisplaySlotTimes(event: PublicSessionDto, options?: { tod
   return slots;
 }
 
-export function formatCatalogNearestDatesLabel(): string {
-  return `${CATALOG_DISPLAY_SLOT_LIMIT} ближайших дат`;
-}
-
 /** Подписи слотов «дата, время» для карточки каталога (несколько дат одного события). */
 export function collectDisplaySlotLabels(event: PublicSessionDto, limit = CATALOG_DISPLAY_SLOT_LIMIT): string[] {
   const seen = new Set<string>();

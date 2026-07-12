@@ -7236,6 +7236,7 @@ async function publicCatalogSessionsFast(db) {
           count(*)::int as "groupedEventsCount",
           sum(coalesce("slotCount", 0))::int as "sessionCount",
           min("priceFrom")::int as "priceFrom",
+          max("priceFrom")::int as "priceTo",
           nullif(sum(coalesce("ticketsVacant", 0)), 0)::int as vacant,
           jsonb_agg(
             jsonb_build_object(
@@ -7301,6 +7302,7 @@ async function publicCatalogSessionsFast(db) {
         grouped."groupedEventsCount",
         grouped."sessionCount",
         grouped."priceFrom",
+        grouped."priceTo",
         rep."ticketsVacant" as vacant,
         grouped."upcomingSlots"
       from grouped
@@ -7585,6 +7587,7 @@ export function mapGroupedPublicSession(row, pinnedEventIds = new Set()) {
     timeBucket: schedule.timeBucket,
     timeZone,
     priceFrom: row.priceFrom,
+    priceTo: row.priceTo ?? row.priceFrom,
     vacant: row.vacant,
     ageLimit: row.ageLimit ?? null,
     imageUrl: resolvePublicSessionImageUrl(row),
@@ -7924,6 +7927,7 @@ function mapPublicSession(row) {
     timeBucket: schedule.timeBucket,
     timeZone,
     priceFrom: row.priceFrom,
+    priceTo: row.priceTo ?? row.priceFrom,
     vacant: row.vacant,
     imageUrl: resolvePublicSessionImageUrl(row),
   };

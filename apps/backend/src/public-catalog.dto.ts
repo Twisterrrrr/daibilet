@@ -349,6 +349,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         count(*)::int as "groupedEventsCount",
         sum(coalesce("slotCount", 0))::int as "sessionCount",
         min("priceFrom")::int as "priceFrom",
+        max("priceFrom")::int as "priceTo",
         nullif(sum(coalesce("ticketsVacant", 0)), 0)::int as vacant,
         jsonb_agg(
           jsonb_build_object(
@@ -413,6 +414,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
       grouped."groupedEventsCount",
       grouped."sessionCount",
       grouped."priceFrom",
+      grouped."priceTo",
       representative."ticketsVacant" as vacant,
       grouped."upcomingSlots"
     from grouped

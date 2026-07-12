@@ -11,7 +11,6 @@ import { EventImageBadges } from '@/lib/event-card-badges';
 import {
   collectDisplaySlotLabels,
   collectDisplaySlotTimes,
-  formatCatalogNearestDatesLabel,
   formatEventNextSession,
   formatListDescription,
   getDepartingSoonMinutes,
@@ -22,7 +21,7 @@ import {
   resolvePseudoRating,
 } from '@/lib/event-card-meta';
 import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
-import { formatMoneyRange } from '@/lib/format';
+import { formatMoneyRange, formatPriceFrom } from '@/lib/format';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
 
 export function EventCardHorizontal({ session }: { session: PublicSessionDto }) {
@@ -42,7 +41,7 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
   const sessionMetaLabel = openDate
     ? null
     : multipleSlots && displaySlotLabels.length > 1
-      ? formatCatalogNearestDatesLabel()
+      ? nextSessionLabel
       : isToday && displaySlots.length > 0
         ? displaySlots.length === 1
           ? `Сегодня, ${displaySlots[0]}`
@@ -52,7 +51,8 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
   const pseudoRating = resolvePseudoRating(session.groupKey || session.id);
   const destinationLabel = resolveEventCardDestinationLabel(session);
   const locationLabel = resolveEventCardLocationLabel(session);
-  const priceLabel = formatMoneyRange(session.priceFrom, session.priceTo);
+  const priceBadgeLabel = formatPriceFrom(session.priceFrom);
+  const priceFooterLabel = formatMoneyRange(session.priceFrom, session.priceTo);
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200/60 sm:flex-row">
@@ -73,7 +73,7 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
         <EventImageBadges event={session} rail recommendVariant="compact" />
         {hasPrice ? (
           <span className="absolute bottom-2 right-2 rounded-full bg-primary-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm sm:bottom-3 sm:right-3">
-            {formatMoneyRange(session.priceFrom, session.priceTo)}
+            {priceBadgeLabel}
           </span>
         ) : null}
         <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
@@ -143,7 +143,7 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
             <Ticket className="h-3.5 w-3.5" />
             Подробнее →
           </span>
-          <span className="shrink-0 text-sm font-bold text-slate-900 sm:text-base">{priceLabel}</span>
+          <span className="shrink-0 text-sm font-bold text-slate-900 sm:text-base">{priceFooterLabel}</span>
         </div>
       </div>
     </article>

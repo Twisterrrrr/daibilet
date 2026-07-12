@@ -71,6 +71,7 @@ export interface PublicCatalogMappingRow {
   groupedEventsCount: number;
   sessionCount: number;
   priceFrom: number;
+  priceTo?: number | null;
   vacant: number | null;
   upcomingSlots: unknown;
 }
@@ -196,7 +197,7 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
     timeLabel: openDate ? 'В виджете' : formatTime(startsAt),
     timeBucket: openDate ? 'day' : timeBucket(startsAt),
     priceFrom: row.priceFrom,
-    priceTo: row.priceFrom,
+    priceTo: row.priceTo ?? row.priceFrom,
     vacant: row.vacant,
     imageUrl: resolvePublicSessionImageUrl(row),
   };
