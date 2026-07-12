@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { MapPin } from 'lucide-react';
+import { MapPin, Ticket } from 'lucide-react';
 import { useState } from 'react';
 
 import type { PublicVenueDto } from '@daibilet/contracts/public';
+import { formatStreetAddress } from '@/lib/address';
 import { pluralEvents } from '@/lib/format';
 import { venueTypeLabel } from '@/lib/venue-meta';
 
@@ -27,6 +28,7 @@ export function InstitutionCard({ venue, href }: { venue: PublicVenueDto; href: 
   const showImage = Boolean(venue.heroImageUrl && !hasImageError);
   const typeLabel = venueTypeLabel(venue.type);
   const gradient = TYPE_GRADIENT[venue.type] || 'from-slate-700 via-slate-800 to-slate-950';
+  const street = formatStreetAddress(venue.address, { city: venue.city });
   const category = topCategory(venue);
 
   return (
@@ -47,20 +49,45 @@ export function InstitutionCard({ venue, href }: { venue: PublicVenueDto; href: 
         ) : (
           <div className={`h-full w-full bg-gradient-to-br ${gradient}`} />
         )}
+
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-          <span className="rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-slate-700 backdrop-blur">{typeLabel}</span>
+          <span className="rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-slate-700 backdrop-blur">
+            {typeLabel}
+          </span>
         </div>
+
         <div className="absolute right-3 top-3 rounded-full bg-slate-900/80 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">
           {venue.events > 0 ? pluralEvents(venue.events) : 'Скоро'}
         </div>
       </div>
+
       <div className="flex flex-1 flex-col p-4">
         <h3 className="line-clamp-2 text-base font-semibold text-slate-900 group-hover:text-primary-600">{venue.name}</h3>
-        <div className="mt-2 flex items-center gap-1.5 text-sm text-slate-500">
-          <MapPin className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate">{venue.address || venue.city}</span>
+
+        <div className="mt-2 space-y-1 text-sm text-slate-500">
+          <div className="flex items-center gap-1.5">
+            <MapPin className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">{street || venue.city}</span>
+          </div>
         </div>
-        {category ? <p className="mt-3 text-xs text-slate-500">В афише: {category}</p> : null}
+
+        {venue.shortDescription ? (
+          <p className="mt-3 line-clamp-2 text-xs leading-relaxed text-slate-500">{venue.shortDescription}</p>
+        ) : null}
+        {category ? <p className={`text-xs text-slate-500 ${venue.shortDescription ? 'mt-2' : 'mt-3'}`}>В афише: {category}</p> : null}
+
+        <div className="mt-4 flex items-end justify-between border-t border-slate-100 pt-3">
+          <div>
+            <div className="text-xs text-slate-400">{venue.city}</div>
+            <div className="text-sm font-semibold text-slate-900">
+              {venue.events > 0 ? pluralEvents(venue.events) : 'Афиша скоро'}
+            </div>
+          </div>
+          <span className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white group-hover:bg-primary-600">
+            <Ticket className="h-3.5 w-3.5" />
+            Афиша
+          </span>
+        </div>
       </div>
     </Link>
   );
