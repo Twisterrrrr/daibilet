@@ -33,6 +33,9 @@ import { eventHref } from '@/lib/routes';
 const SLOT_CHIP_CLASS =
   'inline-btn inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-full bg-slate-100 px-2.5 text-[10px] font-medium leading-none text-slate-700';
 
+const SLOT_CHIP_PURCHASE_CLASS =
+  'transition hover:bg-primary/10 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
+
 const DETAILS_LINK_CLASS =
   'relative z-[2] inline-flex items-center gap-1 text-[10px] font-medium text-primary-600 transition hover:text-primary-700 sm:text-xs';
 
