@@ -11,6 +11,7 @@ import { EventImageBadges } from '@/lib/event-card-badges';
 import {
   collectDisplaySlotLabels,
   collectDisplaySlotTimes,
+  formatCatalogNearestDatesLabel,
   formatEventNextSession,
   formatListDescription,
   getDepartingSoonMinutes,
@@ -41,7 +42,7 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
   const sessionMetaLabel = openDate
     ? null
     : multipleSlots && displaySlotLabels.length > 1
-      ? `${displaySlotLabels.length} ближайших даты`
+      ? formatCatalogNearestDatesLabel()
       : isToday && displaySlots.length > 0
         ? displaySlots.length === 1
           ? `Сегодня, ${displaySlots[0]}`

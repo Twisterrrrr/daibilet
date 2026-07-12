@@ -4,6 +4,7 @@ import type { PublicSessionDto } from '@daibilet/contracts/public';
 
 export const LOW_TICKETS_THRESHOLD = 20;
 export const MIN_DISPLAY_PRICE_RUB = 100;
+export const CATALOG_DISPLAY_SLOT_LIMIT = 5;
 
 export function formatPriceRub(value?: number | null) {
   if (!value || value <= 0) return '—';
@@ -26,7 +27,7 @@ export function collectDisplaySlotTimes(event: PublicSessionDto, options?: { tod
     if (!time || seen.has(time)) continue;
     seen.add(time);
     slots.push(time);
-    if (slots.length >= 5) break;
+    if (slots.length >= CATALOG_DISPLAY_SLOT_LIMIT) break;
   }
 
   if (!slots.length && event.startsAt) {
@@ -37,8 +38,12 @@ export function collectDisplaySlotTimes(event: PublicSessionDto, options?: { tod
   return slots;
 }
 
+export function formatCatalogNearestDatesLabel(): string {
+  return `${CATALOG_DISPLAY_SLOT_LIMIT} ближайших дат`;
+}
+
 /** Подписи слотов «дата, время» для карточки каталога (несколько дат одного события). */
-export function collectDisplaySlotLabels(event: PublicSessionDto, limit = 5): string[] {
+export function collectDisplaySlotLabels(event: PublicSessionDto, limit = CATALOG_DISPLAY_SLOT_LIMIT): string[] {
   const seen = new Set<string>();
   const labels: string[] = [];
   const timeZone = resolveSessionTimeZoneForSession(event);

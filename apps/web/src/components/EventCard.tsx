@@ -12,6 +12,7 @@ import { EventImageBadges } from '@/lib/event-card-badges';
 import {
   collectDisplaySlotLabels,
   collectDisplaySlotTimes,
+  formatCatalogNearestDatesLabel,
   formatEventNextSession,
   formatPriceRub,
   formatShowcasePriceLabel,
@@ -64,7 +65,7 @@ export function EventCard({
   const sessionMetaLabel = openDate
     ? null
     : multipleSlots && displaySlotLabels.length > 1
-      ? `${displaySlotLabels.length} ближайших даты`
+      ? formatCatalogNearestDatesLabel()
       : isToday && displaySlots.length > 0
         ? displaySlots.length === 1
           ? `Сегодня, ${displaySlots[0]}`
