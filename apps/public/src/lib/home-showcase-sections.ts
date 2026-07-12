@@ -5,7 +5,7 @@ import type { PublicSession } from '@/types';
 export const HOME_SHOWCASE_LIMIT = 8;
 export const HOME_POPULAR_LIMIT = 6;
 
-type HomePickState = {
+export type HomePickState = {
   seenIds: Set<string>;
   seenTitles: Set<string>;
   seenImages: Set<string>;
@@ -30,7 +30,7 @@ function sessionDedupeKey(event: PublicSession): string {
   return `title:${event.title.trim().toLowerCase()}`;
 }
 
-function createPickState(seed?: Partial<HomePickState>): HomePickState {
+export function createHomePickState(seed?: Partial<HomePickState>): HomePickState {
   return {
     seenIds: new Set(seed?.seenIds),
     seenTitles: new Set(seed?.seenTitles),
@@ -68,7 +68,7 @@ function isWithinNextDays(event: PublicSession, days: number): boolean {
 export function buildEditorsPickEvents(
   sessions: PublicSession[],
   limit = HOME_SHOWCASE_LIMIT,
-  state = createPickState(),
+  state = createHomePickState(),
 ): PublicSession[] {
   const pinned = sessions.filter(isFeaturedEvent);
   const pool =
@@ -81,7 +81,7 @@ export function buildEditorsPickEvents(
 export function buildThisWeekEvents(
   sessions: PublicSession[],
   limit = HOME_SHOWCASE_LIMIT,
-  state = createPickState(),
+  state = createHomePickState(),
 ): PublicSession[] {
   const candidates = [...sessions]
     .filter((event) => !state.seenIds.has(event.id) && isWithinNextDays(event, 7))
@@ -92,7 +92,7 @@ export function buildThisWeekEvents(
 export function buildPopularEvents(
   sessions: PublicSession[],
   limit = HOME_POPULAR_LIMIT,
-  state = createPickState(),
+  state = createHomePickState(),
 ): PublicSession[] {
   const candidates = [...sessions]
     .filter((event) => !state.seenIds.has(event.id))
@@ -100,8 +100,7 @@ export function buildPopularEvents(
   return takeUnique(candidates, limit, state);
 }
 
-export function buildHomeShowcaseBundles(sessions: PublicSession[]) {
-  const state = createPickState();
+export function buildHomeShowcaseBundles(sessions: PublicSession[], state = createHomePickState()) {
   const editorsPick = spreadCatalogSessionsByCoverImage(
     buildEditorsPickEvents(sessions, HOME_SHOWCASE_LIMIT, state),
   );

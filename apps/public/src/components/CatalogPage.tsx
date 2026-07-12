@@ -549,7 +549,7 @@ function CatalogToolbarSticky({
   onReset: () => void;
 }) {
   return (
-    <div className="catalog-toolbar-sticky -mx-4 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6">
+    <div className="catalog-toolbar -mx-4 border-b border-slate-200 bg-white px-4 py-3 sm:-mx-6 sm:px-6">
       <div className="space-y-3">
         <div className="flex flex-col gap-2 sm:flex-row">
           <label className="relative flex flex-1 items-center">

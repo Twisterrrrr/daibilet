@@ -43,8 +43,8 @@ import { BLOG_POSTS } from '@/data/blog-posts';
 import { cityToPrepositional } from '@/lib/city-declension';
 import { filterSessionsWithCoverImage } from '@/lib/session-cover-image';
 import { resolveCityCardImage } from '@/lib/city-images';
-import { buildHomeShowcaseBundles } from '@/lib/home-showcase-sections';
-import { buildHomeNowTabs, pickDefaultHomeNowTab, type HomeNowTabKey } from '@/lib/home-now-section';
+import { buildHomePageSections } from '@/lib/home-page-sections';
+import { pickDefaultHomeNowTab, type HomeNowTabKey } from '@/lib/home-now-section';
 import {
   HERO_QUICK_CHIPS,
   HOME_FORMAT_TILES,
@@ -200,11 +200,11 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
     );
   }, [dataVersion, destination]);
 
-  const homeShowcase = React.useMemo(() => buildHomeShowcaseBundles(filteredSessions), [filteredSessions]);
-  const homeNowTabs = React.useMemo(
-    () => buildHomeNowTabs(filteredSessions, { cityName: selectedCityName }),
+  const homePageSections = React.useMemo(
+    () => buildHomePageSections(filteredSessions, { cityName: selectedCityName }),
     [filteredSessions, selectedCityName],
   );
+  const { editorsPick: homeEditorsPick, homeNowTabs, popular: homePopular } = homePageSections;
 
   const openCatalog = React.useCallback(
     (extra: Record<string, string> = {}) => {
@@ -276,9 +276,9 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
           onOpenCatalog={openCatalog}
         />
 
-        {homeShowcase.editorsPick.length > 0 ? (
+        {homeEditorsPick.length > 0 ? (
           <EditorsPickSection
-            events={homeShowcase.editorsPick}
+            events={homeEditorsPick}
             onOpenCatalog={() => openCatalog({ sort: 'popular' })}
           />
         ) : null}
@@ -289,9 +289,9 @@ export function App({ dataVersion = 0 }: { dataVersion?: number }) {
           <HomeNowSection tabs={homeNowTabs} onOpenCatalog={openCatalog} />
         ) : null}
 
-        {homeShowcase.popular.length > 0 ? (
+        {homePopular.length > 0 ? (
           <PopularNowSection
-            events={homeShowcase.popular}
+            events={homePopular}
             sparseCatalog={filteredSessions.length < 12}
             onOpenCatalog={() => openCatalog({ sort: 'popular' })}
           />

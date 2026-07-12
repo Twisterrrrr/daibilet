@@ -20,8 +20,7 @@ import { BLOG_POSTS } from '@/data/blog-posts';
 import '@/lib/env';
 import { getHomePageData } from '@/server/cached-home-data';
 import { formatMoney, pluralEvents } from '@/lib/format';
-import { buildHomeShowcaseBundles } from '@/lib/home-showcase-sections';
-import { buildHomeNowTabs } from '@/lib/home-now-section';
+import { buildHomePageSections } from '@/lib/home-page-sections';
 import { HOME_FORMAT_TILES, HOME_TRUST_ITEMS } from '@/lib/home-scenarios';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { venueHref } from '@/lib/routes';
@@ -62,8 +61,7 @@ export async function HomePageContent() {
   const totalVenues = venuesPayload.venues.length;
 
   const sessions = catalogPayload.items;
-  const homeShowcase = buildHomeShowcaseBundles(sessions);
-  const homeNowTabs = buildHomeNowTabs(sessions);
+  const { editorsPick, homeNowTabs, popular } = buildHomePageSections(sessions);
   const sparseCatalog = sessions.length < 12;
 
   const homeVenues = venuesPayload.venues
@@ -84,7 +82,7 @@ export async function HomePageContent() {
         title="Выбор редакции"
         subtitle="Закреплённые в подборках и сильные предложения с ближайшими датами"
         href="/events?sort=popular"
-        events={homeShowcase.editorsPick}
+        events={editorsPick}
         editorsPickBadge
       />
 
@@ -113,7 +111,7 @@ export async function HomePageContent() {
 
       {homeNowTabs.length ? <HomeNowSection tabs={homeNowTabs} /> : null}
 
-      {homeShowcase.popular.length ? (
+      {popular.length ? (
         <section className="py-12 sm:py-16">
           <div className="container-page">
             <div className="flex flex-wrap items-end justify-between gap-3">
@@ -130,7 +128,7 @@ export async function HomePageContent() {
               </Link>
             </div>
             <ul className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-              {homeShowcase.popular.map((session) => (
+              {popular.map((session) => (
                 <li key={session.id}>
                   <EventCard session={session} />
                 </li>

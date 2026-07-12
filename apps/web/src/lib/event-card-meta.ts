@@ -4,7 +4,21 @@ import type { PublicSessionDto } from '@daibilet/contracts/public';
 
 export const LOW_TICKETS_THRESHOLD = 20;
 export const MIN_DISPLAY_PRICE_RUB = 100;
-export const CATALOG_DISPLAY_SLOT_LIMIT = 5;
+export const CATALOG_DISPLAY_SLOT_LIMIT = 4;
+
+function collectUpcomingSlotRows(event: PublicSessionDto) {
+  const now = Date.now() - 60_000;
+  return [...(event.upcomingSlots || [])]
+    .filter((slot) => {
+      if (!slot.startsAt) return false;
+      const startMs = parseSessionStartsAt(slot.startsAt).getTime();
+      return Number.isFinite(startMs) && startMs >= now;
+    })
+    .sort(
+      (left, right) =>
+        parseSessionStartsAt(left.startsAt!).getTime() - parseSessionStartsAt(right.startsAt!).getTime(),
+    );
+}
 
 export function formatPriceRub(value?: number | null) {
   if (!value || value <= 0) return '—';
@@ -20,9 +34,11 @@ export function collectDisplaySlotTimes(event: PublicSessionDto, options?: { tod
   const seen = new Set<string>();
   const slots: string[] = [];
   const timeZone = resolveSessionTimeZoneForSession(event);
+  const slotRows = options?.todayOnly
+    ? collectUpcomingSlotRows(event).filter((slot) => slot.startsAt && isSessionToday(slot.startsAt, timeZone))
+    : collectUpcomingSlotRows(event);
 
-  for (const slot of event.upcomingSlots || []) {
-    if (options?.todayOnly && slot.startsAt && !isSessionToday(slot.startsAt, timeZone)) continue;
+  for (const slot of slotRows) {
     const time = formatSlotTime(event, slot.startsAt, slot.timeLabel);
     if (!time || seen.has(time)) continue;
     seen.add(time);
@@ -38,13 +54,13 @@ export function collectDisplaySlotTimes(event: PublicSessionDto, options?: { tod
   return slots;
 }
 
-/** Подписи слотов «дата, время» для карточки каталога (несколько дат одного события). */
+/** Подписи слотов «дата, время» — до 4 ближайших сеансов для карточки каталога. */
 export function collectDisplaySlotLabels(event: PublicSessionDto, limit = CATALOG_DISPLAY_SLOT_LIMIT): string[] {
   const seen = new Set<string>();
   const labels: string[] = [];
   const timeZone = resolveSessionTimeZoneForSession(event);
 
-  for (const slot of event.upcomingSlots || []) {
+  for (const slot of collectUpcomingSlotRows(event)) {
     const date = slot.dateLabel?.trim();
     const time = slot.timeLabel?.trim() || (slot.startsAt ? formatSessionTime(slot.startsAt, null, timeZone) : '');
     const label = date && time ? `${date}, ${time}` : date || time;

@@ -108,16 +108,8 @@
     @apply bg-primary-600 text-white;
   }
 
-  .catalog-toolbar-sticky {
-    position: sticky;
-    top: 3.75rem;
-    z-index: 30;
-  }
-
-  @media (min-width: 768px) {
-    .catalog-toolbar-sticky {
-      top: 4.25rem;
-    }
+  .catalog-toolbar {
+    @apply border-b border-slate-200 bg-white;
   }
 
   .catalog-chip {

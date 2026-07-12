@@ -7,7 +7,8 @@ import {
   parseSessionStartsAt,
   resolveSessionTimeZoneForSession,
 } from '@/lib/datetime';
-import { spreadCatalogSessionsByCoverImage } from '@/lib/session-cover-image';
+import { spreadCatalogSessionsByCoverImage, normalizeSessionImageKey, sessionHasCoverImage } from '@/lib/session-cover-image';
+import { createHomePickState, type HomePickState } from '@/lib/home-showcase-sections';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
 type PublicSession = PublicSessionDto;
@@ -75,15 +76,18 @@ function sessionDedupeKey(event: PublicSession): string {
   return `title:${event.title.trim().toLowerCase()}`;
 }
 
-function takeUnique(events: PublicSession[], max: number): PublicSession[] {
-  const seenIds = new Set<string>();
-  const seenTitles = new Set<string>();
+function takeUnique(events: PublicSession[], max: number, state: HomePickState): PublicSession[] {
   const result: PublicSession[] = [];
 
   for (const event of events) {
-    if (seenIds.has(event.id) || seenTitles.has(sessionDedupeKey(event))) continue;
-    seenIds.add(event.id);
-    seenTitles.add(sessionDedupeKey(event));
+    if (!sessionHasCoverImage(event)) continue;
+    if (state.seenIds.has(event.id) || state.seenTitles.has(sessionDedupeKey(event))) continue;
+    const imageKey = normalizeSessionImageKey(event.imageUrl);
+    if (imageKey && state.seenImages.has(imageKey)) continue;
+
+    state.seenIds.add(event.id);
+    state.seenTitles.add(sessionDedupeKey(event));
+    if (imageKey) state.seenImages.add(imageKey);
     result.push(event);
     if (result.length >= max) break;
   }
@@ -107,21 +111,23 @@ function sortByMatchingSlot(events: PublicSession[], slotFilter: SlotFilter): Pu
   });
 }
 
-function buildTabPool(sessions: PublicSession[], slotFilter: SlotFilter): PublicSession[] {
+function buildTabPool(sessions: PublicSession[], slotFilter: SlotFilter, state: HomePickState): PublicSession[] {
   const matched = sortByMatchingSlot(
     sessions.filter((event) => eventMatchesSlotFilter(event, slotFilter)),
     slotFilter,
   ).map((event) => withTabDisplaySlot(event, slotFilter));
 
-  return spreadCatalogSessionsByCoverImage(takeUnique(matched, TAB_LIMIT));
+  return spreadCatalogSessionsByCoverImage(takeUnique(matched, TAB_LIMIT, state));
 }
 
 type BuildHomeNowTabsOptions = {
   cityName?: string | null;
+  pickState?: HomePickState;
 };
 
 export function buildHomeNowTabs(sessions: PublicSession[], options: BuildHomeNowTabsOptions = {}): HomeNowTab[] {
   const cityName = options.cityName?.trim() || null;
+  const pickState = options.pickState ?? createHomePickState();
   const inCity = cityName ? ` в ${cityName}` : '';
 
   const tabDefs: Array<{
@@ -180,7 +186,7 @@ export function buildHomeNowTabs(sessions: PublicSession[], options: BuildHomeNo
 
   return tabDefs
     .map((def) => {
-      const primary = buildTabPool(sessions, def.slotFilter);
+      const primary = buildTabPool(sessions, def.slotFilter, pickState);
       const usedFallback = primary.length < MIN_PRIMARY_EVENTS;
       let events = primary;
 
@@ -190,7 +196,7 @@ export function buildHomeNowTabs(sessions: PublicSession[], options: BuildHomeNo
           const rotated = [...sessions.slice(offset), ...sessions.slice(0, offset)];
           fallbackByTab.set(
             def.key,
-            spreadCatalogSessionsByCoverImage(takeUnique(sortByPopular(rotated), TAB_LIMIT)),
+            spreadCatalogSessionsByCoverImage(takeUnique(sortByPopular(rotated), TAB_LIMIT, pickState)),
           );
         }
         events = fallbackByTab.get(def.key) || [];

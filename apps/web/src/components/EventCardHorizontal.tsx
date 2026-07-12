@@ -15,12 +15,9 @@ import { collectCatalogLabels } from '@/lib/catalog-labels';
 import { EventImageBadges } from '@/lib/event-card-badges';
 import {
   collectDisplaySlotLabels,
-  collectDisplaySlotTimes,
   formatEventNextSession,
   formatListDescription,
   getDepartingSoonMinutes,
-  hasMultipleCatalogSlots,
-  isEventSessionToday,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
   resolvePseudoRating,
@@ -44,20 +41,9 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
   const openDate = isOpenDate(session);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(session.startsAt);
   const nextSessionLabel = openDate ? null : formatEventNextSession(session);
-  const isToday = isEventSessionToday(session);
-  const multipleSlots = hasMultipleCatalogSlots(session);
-  const displaySlotLabels = multipleSlots ? collectDisplaySlotLabels(session) : [];
-  const displaySlots = collectDisplaySlotTimes(session, { todayOnly: isToday && !multipleSlots });
-  const showSlotPills = multipleSlots ? displaySlotLabels.length > 1 : isToday && displaySlots.length > 1;
-  const sessionMetaLabel = openDate
-    ? null
-    : multipleSlots && displaySlotLabels.length > 1
-      ? nextSessionLabel
-      : isToday && displaySlots.length > 0
-        ? displaySlots.length === 1
-          ? `Сегодня, ${displaySlots[0]}`
-          : 'Сегодня'
-        : nextSessionLabel;
+  const displaySlotLabels = collectDisplaySlotLabels(session);
+  const showSlotPills = displaySlotLabels.length > 0;
+  const sessionMetaLabel = openDate ? null : nextSessionLabel;
   const descriptionText = formatListDescription(session.description);
   const pseudoRating = resolvePseudoRating(session.groupKey || session.id);
   const destinationLabel = resolveEventCardDestinationLabel(session);
@@ -66,7 +52,6 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
   const priceFooterLabel = formatMoneyRange(session.priceFrom, session.priceTo);
   const { purchaseEnabled, teplohod, tcEventId, tcToken, tcTriggerRef, teplohodWrapperId, openPurchase } =
     useCatalogPurchase(session);
-  const metaOpensPurchase = purchaseEnabled && Boolean(sessionMetaLabel) && !showSlotPills;
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200/60 sm:flex-row">
@@ -121,18 +106,7 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
               Через {departingSoonMinutes} мин
             </span>
           ) : sessionMetaLabel ? (
-            metaOpensPurchase ? (
-              <CatalogPurchaseChip
-                session={session}
-                label={sessionMetaLabel}
-                className={`inline-flex font-medium text-primary-600 ${SLOT_CHIP_PURCHASE_CLASS}`}
-                onOpen={openPurchase}
-              >
-                {sessionMetaLabel}
-              </CatalogPurchaseChip>
-            ) : (
-              <span className="font-medium text-primary-600">{sessionMetaLabel}</span>
-            )
+            <span className="font-medium text-primary-600">{sessionMetaLabel}</span>
           ) : null}
           {locationLabel ? (
             sessionVenueHref(session) ? (
@@ -155,7 +129,7 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
         {descriptionText ? <p className="mt-2 line-clamp-3 text-[10px] text-slate-600 sm:text-xs">{descriptionText}</p> : null}
         {showSlotPills ? (
           <div className="mt-2 flex flex-wrap items-start gap-1.5">
-            {(multipleSlots ? displaySlotLabels : displaySlots).map((label) =>
+            {displaySlotLabels.map((label) =>
               purchaseEnabled ? (
                 <CatalogPurchaseChip
                   key={label}

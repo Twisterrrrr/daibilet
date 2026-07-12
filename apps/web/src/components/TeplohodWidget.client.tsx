@@ -74,12 +74,17 @@ type TeplohodWidgetPayload = {
 export function getTeplohodWidgetIds(event: {
   externalId?: string | number | null;
   widgetProvider?: string | null;
+  purchaseProvider?: string | null;
+  offerSourceCode?: string | null;
   purchaseUrl?: string | null;
+  widgetUrl?: string | null;
   widgetPayload?: TeplohodWidgetPayload | Record<string, unknown> | null;
 }) {
   const payload = event.widgetPayload as TeplohodWidgetPayload;
-  const provider = String(event.widgetProvider || payload?.provider || '').toUpperCase();
-  const purchaseUrl = String(event.purchaseUrl || '').toLowerCase();
+  const provider = String(
+    event.widgetProvider || event.purchaseProvider || event.offerSourceCode || payload?.provider || '',
+  ).toUpperCase();
+  const purchaseUrl = String(event.purchaseUrl || event.widgetUrl || '').toLowerCase();
   const isTeplohod = provider.includes('TEPLOHOD') || provider.includes('TEP') || purchaseUrl.includes('teplohod.info');
   if (!isTeplohod) return null;
 

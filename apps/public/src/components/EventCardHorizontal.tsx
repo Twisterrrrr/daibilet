@@ -7,13 +7,10 @@ import { EventFavoriteButton } from '@/components/EventFavoriteButton';
 import { EventImageBadges } from '@/lib/event-card-badges';
 import {
   collectDisplaySlotLabels,
-  collectDisplaySlotTimes,
   formatEventNextSession,
   formatListDescription,
   formatPriceRub,
   getDepartingSoonMinutes,
-  hasMultipleCatalogSlots,
-  isEventSessionToday,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
   resolvePseudoRating,
@@ -35,22 +32,9 @@ export function EventCardHorizontal({ event }: EventCardHorizontalProps) {
   const openDate = isOpenDate(event);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(event.startsAt);
   const nextSessionLabel = openDate ? null : formatEventNextSession(event);
-  const isToday = isEventSessionToday(event);
-  const multipleSlots = hasMultipleCatalogSlots(event);
-  const displaySlotLabels = multipleSlots ? collectDisplaySlotLabels(event) : [];
-  const displaySlots = collectDisplaySlotTimes(event, { todayOnly: isToday && !multipleSlots });
-  const showSlotPills = multipleSlots
-    ? displaySlotLabels.length > 1
-    : isToday && displaySlots.length > 0;
-  const sessionMetaLabel = openDate
-    ? null
-    : multipleSlots && displaySlotLabels.length > 1
-      ? `${displaySlotLabels.length} ближайших даты`
-      : isToday && displaySlots.length > 0
-        ? displaySlots.length === 1
-          ? `Сегодня, ${displaySlots[0]}`
-          : 'Сегодня'
-        : nextSessionLabel;
+  const displaySlotLabels = collectDisplaySlotLabels(event);
+  const showSlotPills = displaySlotLabels.length > 0;
+  const sessionMetaLabel = openDate ? null : nextSessionLabel;
   const descriptionText = formatListDescription(event.description);
   const pseudoRating = resolvePseudoRating(event.groupKey || event.id);
   const locationLabel = resolveEventCardLocationLabel(event);
@@ -145,7 +129,7 @@ export function EventCardHorizontal({ event }: EventCardHorizontalProps) {
 
         {showSlotPills ? (
           <div className="mt-2 flex flex-wrap gap-2">
-            {(multipleSlots ? displaySlotLabels : displaySlots).map((label) => (
+            {displaySlotLabels.map((label) => (
               <span
                 key={label}
                 className="inline-flex h-[30px] min-h-[30px] shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-3 text-xs leading-none text-slate-800"

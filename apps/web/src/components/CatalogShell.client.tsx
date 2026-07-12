@@ -132,7 +132,7 @@ export function CatalogShell() {
 
       <CatalogActiveFilters values={filterValues} />
 
-      <div className="catalog-toolbar-sticky -mx-4 mt-6 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6">
+      <div className="catalog-toolbar -mx-4 mt-6 border-b border-slate-200 bg-white px-4 py-3 sm:-mx-6 sm:px-6">
         <CatalogToolbar
           facets={facets}
           values={filterValues}

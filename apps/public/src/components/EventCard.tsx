@@ -8,15 +8,12 @@ import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButto
 import { EventImageBadges } from '@/lib/event-card-badges';
 import {
   collectDisplaySlotLabels,
-  collectDisplaySlotTimes,
   formatEventNextSession,
   formatPriceRub,
   formatShowcasePriceLabel,
   formatShowcaseSessionDate,
   formatShowcaseSessionDateCompact,
   getDepartingSoonMinutes,
-  hasMultipleCatalogSlots,
-  isEventSessionToday,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
   resolvePseudoRating,
@@ -57,22 +54,9 @@ export function EventCard({
   const openDate = isOpenDate(event);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(event.startsAt);
   const nextSessionLabel = openDate ? null : formatEventNextSession(event);
-  const isToday = isEventSessionToday(event);
-  const multipleSlots = hasMultipleCatalogSlots(event);
-  const displaySlotLabels = multipleSlots ? collectDisplaySlotLabels(event) : [];
-  const displaySlots = collectDisplaySlotTimes(event, { todayOnly: isToday && !multipleSlots });
-  const showSlotPills = multipleSlots
-    ? displaySlotLabels.length > 1
-    : isToday && displaySlots.length > 1;
-  const sessionMetaLabel = openDate
-    ? null
-    : multipleSlots && displaySlotLabels.length > 1
-      ? `${displaySlotLabels.length} ближайших даты`
-      : isToday && displaySlots.length > 0
-        ? displaySlots.length === 1
-          ? `Сегодня, ${displaySlots[0]}`
-          : 'Сегодня'
-        : nextSessionLabel;
+  const displaySlotLabels = collectDisplaySlotLabels(event);
+  const showSlotPills = displaySlotLabels.length > 0;
+  const sessionMetaLabel = openDate ? null : nextSessionLabel;
   const pseudoRating = resolvePseudoRating(event.groupKey || event.id);
   const locationLabel = resolveEventCardLocationLabel(event);
   const showSoonBadge = !hasPrice && !openDate && !departingSoonMinutes;
@@ -174,18 +158,18 @@ export function EventCard({
           </ul>
         ) : null}
 
-        <div className="mt-2 flex min-h-6 flex-wrap items-start gap-1.5">
-          {showSlotPills
-            ? (multipleSlots ? displaySlotLabels : displaySlots).map((label) => (
-                <span
-                  key={label}
-                  className="inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-2.5 text-[10px] font-medium leading-none text-slate-800"
-                >
-                  {label}
-                </span>
-              ))
-            : null}
-        </div>
+        {showSlotPills ? (
+          <div className="mt-2 flex flex-wrap items-start gap-1.5">
+            {displaySlotLabels.map((label) => (
+              <span
+                key={label}
+                className="inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-2.5 text-[10px] font-medium leading-none text-slate-800"
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+        ) : null}
 
         <div className="mt-auto flex items-center justify-between gap-2 pt-3">
           {landingActions ? (
