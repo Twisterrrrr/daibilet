@@ -671,7 +671,7 @@ function buildMergedPurchaseOptions(
         id: event.id,
         slug: publicSlug(event.slug),
         title,
-        description: buildPurchaseOptionDescription(event),
+        description: buildPurchaseOptionDescription(event) ?? null,
         priceFrom,
         externalId: identity.externalId,
         purchaseProvider: purchase.provider,
@@ -681,9 +681,9 @@ function buildMergedPurchaseOptions(
         purchaseReady: purchase.ready,
         purchaseMode: purchase.mode,
         purchaseUrlSource: purchase.urlSource,
-      } satisfies PublicPurchaseOptionDto;
+      } as PublicPurchaseOptionDto;
     })
-    .filter((option): option is PublicPurchaseOptionDto => Boolean(option))
+    .filter((option): option is PublicPurchaseOptionDto => option !== null)
     .sort((left, right) =>
       purchaseOptionSortKey(left.title) - purchaseOptionSortKey(right.title) ||
       left.priceFrom! - right.priceFrom! ||
