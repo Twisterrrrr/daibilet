@@ -1,8 +1,14 @@
 import type { Metadata } from 'next';
 
-import { LandingsCatalogView } from '@/components/LandingsCatalogView';
+import { LandingsCatalogView } from '@/components/LandingsCatalogView.client';
+import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
-import { buildPublicLandingsCatalogDto } from '@daibilet/backend/public-read';
+import { collectPopularTags } from '@/lib/catalog-tags';
+import {
+  buildPublicDestinationsDto,
+  buildPublicLandingsCatalogDto,
+  getPublicCatalogSessions,
+} from '@daibilet/backend/public-read';
 
 export const revalidate = 3600;
 
@@ -14,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Подборки — тематические коллекции событий | Дайбилет',
     description:
-      'Готовые подборки на вечер, выходные и сезон: речные прогулки, экскурсии, концерты и семейные маршруты.',
+      'Готовые подборки на вечер, выходные и бюджет, популярные запросы и теги — с переходом в каталог с нужными фильтрами.',
     alternates: { canonical: '/podborki' },
   };
 }
@@ -25,6 +31,25 @@ export default async function PodborkiCatalogPage({ searchParams }: PageProps) {
   const urlParams = new URLSearchParams();
   if (city && city !== 'all') urlParams.set('city', city);
 
-  const catalog = await buildPublicLandingsCatalogDto(urlParams);
-  return <LandingsCatalogView items={catalog.items} city={catalog.city} />;
+  const [catalog, destinationsPayload, sessions] = await Promise.all([
+    buildPublicLandingsCatalogDto(urlParams),
+    buildPublicDestinationsDto(),
+    getPublicCatalogSessions(),
+  ]);
+
+  const tags = collectPopularTags(sessions, 24);
+
+  return (
+    <SiteLayout>
+      <div className="min-h-screen bg-slate-50 text-slate-900">
+        <LandingsCatalogView
+          items={catalog.items}
+          city={catalog.city}
+          cities={destinationsPayload.destinations}
+          tags={tags}
+          totalEvents={sessions.length}
+        />
+      </div>
+    </SiteLayout>
+  );
 }
