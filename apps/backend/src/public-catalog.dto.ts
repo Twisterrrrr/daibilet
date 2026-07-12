@@ -212,6 +212,17 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
           where ${Prisma.raw(ACTIVE_SESSION_SQL)}
             and session."priceFromRub" >= ${MIN_DISPLAY_PRICE_RUB}
         ) as "sessionPriceFromRub",
+        max(session."priceFromRub") filter (
+          where ${Prisma.raw(ACTIVE_SESSION_SQL)}
+            and session."priceFromRub" >= ${MIN_DISPLAY_PRICE_RUB}
+        ) as "sessionPriceToRub",
+        (
+          select max(offer."priceRub")
+          from "EventOffer" offer
+          where offer."eventId" = event.id
+            and offer.active = true
+            and offer."priceRub" >= ${MIN_DISPLAY_PRICE_RUB}
+        ) as "offerPriceMaxRub",
         count(distinct session.id) filter (where ${Prisma.raw(ACTIVE_SESSION_SQL)})::int as "slotCount",
         (
           select coalesce(array_agg(title order by priority, title), '{}')
@@ -291,6 +302,13 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
           where price is not null and price >= ${MIN_DISPLAY_PRICE_RUB}
         ) as "priceFrom",
         (
+          select max(price)
+          from (
+            values ("priceFromRub"), ("sessionPriceFromRub"), ("sessionPriceToRub"), ("offerPriceRub"), ("offerPriceMaxRub")
+          ) as prices(price)
+          where price is not null and price >= ${MIN_DISPLAY_PRICE_RUB}
+        ) as "priceTo",
+        (
           (
             "offerWidgetUrl" is not null
             or "offerDeeplinkUrl" is not null
@@ -349,7 +367,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         count(*)::int as "groupedEventsCount",
         sum(coalesce("slotCount", 0))::int as "sessionCount",
         min("priceFrom")::int as "priceFrom",
-        max("priceFrom")::int as "priceTo",
+        max("priceTo")::int as "priceTo",
         nullif(sum(coalesce("ticketsVacant", 0)), 0)::int as vacant,
         jsonb_agg(
           jsonb_build_object(

@@ -106,7 +106,7 @@ function openTcPurchaseUrl(purchaseUrl?: string | null) {
   window.open(normalized, 'tc_widget', 'width=960,height=760,scrollbars=yes,resizable=yes');
 }
 
-async function openTcWidget(options: {
+export async function openTcWidget(options: {
   trigger: HTMLButtonElement | null;
   purchaseUrl?: string | null;
 }) {

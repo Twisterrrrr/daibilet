@@ -47,7 +47,7 @@ function normalizeTeplohodEventId(value?: string | number | null) {
   return match ? match[1] : raw;
 }
 
-function ensureTeplohodWidgetScript() {
+export function ensureTeplohodWidgetScript() {
   if (typeof document === 'undefined') return Promise.resolve();
   if (document.querySelector('script[data-daibilet-teplohod-widget="true"]')) {
     return widgetScriptPromise || Promise.resolve();
@@ -97,9 +97,11 @@ export function getTeplohodWidgetIds(event: {
 export function TeplohodWidgetEmbed({
   tepEventId,
   tepWidgetId,
+  wrapperId = 'teplohod-widget',
 }: {
   tepEventId: string | number;
   tepWidgetId?: string | number | null;
+  wrapperId?: string;
 }) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const eventId = normalizeTeplohodEventId(tepEventId);
@@ -112,7 +114,7 @@ export function TeplohodWidgetEmbed({
   if (!eventId) return null;
 
   return (
-    <div className="mt-4" id="teplohod-widget">
+    <div className="mt-4" id={wrapperId}>
       <style dangerouslySetInnerHTML={{ __html: TEP_WIDGET_CSS }} />
       <div
         ref={containerRef}
@@ -126,9 +128,9 @@ export function TeplohodWidgetEmbed({
   );
 }
 
-export function openTeplohodWidget() {
+export function openTeplohodWidget(wrapperId = 'teplohod-widget') {
   const tryClick = (attempt = 0) => {
-    const button = document.querySelector<HTMLElement>('#teplohod-widget .ti-tickets-event-tickets-buy');
+    const button = document.querySelector<HTMLElement>(`#${wrapperId} .ti-tickets-event-tickets-buy`);
     if (button) {
       button.click();
       return;

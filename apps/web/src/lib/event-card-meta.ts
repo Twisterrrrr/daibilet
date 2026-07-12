@@ -197,6 +197,42 @@ export function isOpenDate(event: PublicSessionDto): boolean {
 
 export const FLEXIBLE_SCHEDULE_LABEL = 'Билеты с открытой датой';
 
+export function resolvePurchaseSessionForSlot(
+  session: PublicSessionDto,
+  label: string,
+): PublicSessionDto {
+  const normalizedLabel = label.trim();
+  if (!normalizedLabel) return session;
+
+  for (const slot of session.upcomingSlots || []) {
+    const date = slot.dateLabel?.trim();
+    const time = slot.timeLabel?.trim() || '';
+    const full = date && time ? `${date}, ${time}` : date || time;
+    if (full === normalizedLabel || time === normalizedLabel) {
+      return {
+        ...session,
+        id: slot.eventId || session.id,
+        startsAt: slot.startsAt || session.startsAt,
+        dateLabel: slot.dateLabel || session.dateLabel,
+        timeLabel: slot.timeLabel || session.timeLabel,
+        purchaseUrl: slot.purchaseUrl || session.purchaseUrl,
+      };
+    }
+  }
+
+  return session;
+}
+
+export function canOpenCatalogPurchase(session: PublicSessionDto): boolean {
+  const purchaseUrl =
+    session.widgetUrl || session.purchaseUrl || session.deeplinkUrl || session.upcomingSlots?.[0]?.purchaseUrl;
+  if (!purchaseUrl) return false;
+  const provider = String(session.purchaseProvider || session.offerSourceCode || '').toUpperCase();
+  if (provider.includes('TEPLOHOD') || provider.includes('TEP') || purchaseUrl.includes('teplohod.info')) return true;
+  if (provider.includes('TC') || provider.includes('TICKETSCLOUD') || /ticketscloud/i.test(purchaseUrl)) return true;
+  return Boolean(purchaseUrl);
+}
+
 export function isFlexibleScheduleSession(session: {
   startsAt?: string | null;
   dateLabel?: string | null;

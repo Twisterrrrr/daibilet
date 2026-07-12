@@ -5,6 +5,11 @@ import { Clock, MapPin, Star, Ticket } from 'lucide-react';
 import { useState } from 'react';
 
 import { EventFavoriteButton } from '@/components/EventFavoriteButton.client';
+import {
+  CatalogPurchaseAnchors,
+  CatalogPurchaseChip,
+  useCatalogPurchase,
+} from '@/components/CatalogPurchaseTrigger.client';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 import { collectCatalogLabels } from '@/lib/catalog-labels';
@@ -75,6 +80,8 @@ export function EventCard({
   const showSoonBadge = !hasPrice && !openDate && !departingSoonMinutes;
   const priceBadgeLabel = formatPriceFrom(session.priceFrom);
   const priceFooterLabel = formatMoneyRange(session.priceFrom, session.priceTo);
+  const { purchaseEnabled, teplohod, tcEventId, tcToken, tcTriggerRef, teplohodWrapperId, openPurchase } =
+    useCatalogPurchase(session);
 
   const cardClassName =
     'group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-slate-200/60';
@@ -147,7 +154,18 @@ export function EventCard({
               Через {departingSoonMinutes} мин
             </span>
           ) : sessionMetaLabel ? (
-            <span className="font-medium text-primary-600">{sessionMetaLabel}</span>
+            purchaseEnabled ? (
+              <CatalogPurchaseChip
+                session={session}
+                label={sessionMetaLabel}
+                className="inline-flex font-medium text-primary-600 underline decoration-primary/30 underline-offset-2"
+                onOpen={openPurchase}
+              >
+                {sessionMetaLabel}
+              </CatalogPurchaseChip>
+            ) : (
+              <span className="font-medium text-primary-600">{sessionMetaLabel}</span>
+            )
           ) : (
             <span>
               {session.dateLabel}
@@ -171,14 +189,28 @@ export function EventCard({
         {showSlotPills ? (
           <div className="mt-2 flex flex-wrap gap-1.5">
             {(multipleSlots ? displaySlotLabels : displaySlots).map((label) => (
-              <span
+              <CatalogPurchaseChip
                 key={label}
+                session={session}
+                label={label}
                 className="inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-2.5 text-[10px] font-medium leading-none text-slate-800"
+                onOpen={openPurchase}
               >
                 {label}
-              </span>
+              </CatalogPurchaseChip>
             ))}
           </div>
+        ) : null}
+
+        {purchaseEnabled ? (
+          <CatalogPurchaseAnchors
+            session={session}
+            teplohod={teplohod}
+            teplohodWrapperId={teplohodWrapperId}
+            tcEventId={tcEventId}
+            tcToken={tcToken}
+            tcTriggerRef={tcTriggerRef}
+          />
         ) : null}
 
         <div className="mt-auto flex items-center justify-between gap-2 pt-3">
