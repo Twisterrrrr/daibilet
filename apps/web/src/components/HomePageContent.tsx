@@ -51,14 +51,15 @@ function promoBlockIcon(slug: string, index: number) {
 }
 
 export async function HomePageContent() {
-  const { destinationsPayload, catalogPayload, landingsCatalog, venuesPayload } = await getHomePageData();
+  const { destinationsPayload, catalogPayload, landingsCatalog, venuesPayload, statsPayload } =
+    await getHomePageData();
 
   const destinations = destinationsPayload.destinations;
   const cities = destinations.filter((item) => item.type === 'city');
   const topCities = [...cities].sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')).slice(0, 8);
-  const cityCount = cities.length;
-  const totalEvents = destinations.reduce((sum, item) => sum + item.events, 0);
-  const totalVenues = venuesPayload.venues.length;
+  const totalEvents = statsPayload.stats.events;
+  const totalVenues = statsPayload.stats.venues;
+  const cityCount = statsPayload.stats.destinations || cities.length;
 
   const sessions = catalogPayload.items;
   const { editorsPick, homeNowTabs, popular } = buildHomePageSections(sessions);

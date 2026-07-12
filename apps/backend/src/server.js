@@ -777,6 +777,15 @@ export function registerPublicCacheWarmer(warmer) {
   return () => publicCacheWarmers.delete(warmer);
 }
 
+registerPublicCacheInvalidator((reason, options = {}) => {
+  if (!options?.warm) return;
+  import('./revalidate-next-home.js')
+    .then(({ revalidateNextHome }) => revalidateNextHome(reason))
+    .catch((error) => {
+      console.warn(`Next home revalidate failed: ${error instanceof Error ? error.message : String(error)}`);
+    });
+});
+
 async function readJson(relativePath) {
   const absolutePath = path.join(rootDir, relativePath);
   const cached = jsonCache.get(absolutePath);
