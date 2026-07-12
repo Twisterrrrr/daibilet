@@ -640,7 +640,13 @@ function buildMergedPurchaseOptions(
   const mergeTitle = mergedCatalogTitle(requestedEvent);
   if (!mergeTitle) return [];
 
-  const peers = groupEvents.filter((event) => mergedCatalogTitle(event) === mergeTitle);
+  const peers = groupEvents.filter(
+    (event) =>
+      mergedCatalogTitle(event) === mergeTitle &&
+      event.primaryCityId === requestedEvent.primaryCityId,
+  );
+  if (peers.length < 2) return [];
+
   const offersByEventId = new Map<string, MappedOffer[]>();
   for (const offer of offers) {
     const bucket = offersByEventId.get(offer.eventId) || [];
