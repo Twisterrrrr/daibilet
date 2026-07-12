@@ -55,7 +55,7 @@ export const NAV_ZONES: NavZone[] = [
     items: [
       { id: 'sources', title: 'Источники', path: '/sources', icon: Download },
       { id: 'mapping', title: 'Маппинг', path: '/mapping-inbox', icon: Inbox },
-      { id: 'sync', title: 'Sync health', path: '/sync-health', icon: BarChart3 },
+      { id: 'sync', title: 'Состояние синхронизации', path: '/sync-health', icon: BarChart3 },
       { id: 'taxonomy', title: 'Категории и теги', path: '/taxonomy', icon: Tags },
       { id: 'audit', title: 'Журнал изменений', path: '/audit-log', icon: FileText },
       { id: 'settings', title: 'Настройки', path: '/settings', icon: Settings },
