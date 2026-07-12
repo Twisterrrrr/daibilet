@@ -112,6 +112,12 @@ node -e "console.log('sha256:' + require('node:crypto').createHash('sha256').upd
 
 ## Install/build
 
+Перед build полезно прогнать preflight:
+
+```bash
+pnpm preflight:deploy -- --env-file /opt/daibilet/.env
+```
+
 После первого `git clone` можно деплоить одной командой:
 
 ```bash
@@ -262,3 +268,5 @@ pnpm smoke:launch
 ```
 
 Подробнее: [Launch Smoke Runbook](launch-smoke-runbook.md).
+
+Preflight и admin readiness: [Deploy Preflight And Admin Readiness](deploy-preflight-readiness.md).

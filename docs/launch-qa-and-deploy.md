@@ -180,6 +180,15 @@ pnpm smoke:launch
 
 Подробный runbook: [Launch Smoke Runbook](launch-smoke-runbook.md).
 
+Перед smoke отдельно прогнать deploy/admin готовность:
+
+```bash
+pnpm preflight:deploy -- --env-file .env
+ADMIN_EMAIL=admin@daibilet.ru ADMIN_PASSWORD='<password>' pnpm readiness:admin
+```
+
+Подробно: [Deploy Preflight And Admin Readiness](deploy-preflight-readiness.md).
+
 ## Деплой: Что Нужно От Владельца
 
 1. Сервер в РФ.
