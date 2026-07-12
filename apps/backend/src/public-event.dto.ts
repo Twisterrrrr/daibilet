@@ -678,13 +678,13 @@ function buildPurchaseOptionDescription(event: EventRecord): string | null {
 function isAdultOrChildPurchaseOptionTitle(title: string): boolean {
   const normalized = normalizeGroupPart(title);
   if (!normalized) return false;
-  return /\bвзросл\w*/.test(normalized) || /\bдетск\w*/.test(normalized);
+  return normalized.includes('взросл') || normalized.includes('детск');
 }
 
 function purchaseOptionDisplayPriority(title: string): number {
   const normalized = normalizeGroupPart(title);
-  if (/\bвзросл\w*/.test(normalized)) return 0;
-  if (/\bдетск\w*/.test(normalized)) return 1;
+  if (normalized.includes('взросл')) return 0;
+  if (normalized.includes('детск')) return 1;
   return 100;
 }
 
