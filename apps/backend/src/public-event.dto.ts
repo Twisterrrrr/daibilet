@@ -520,7 +520,7 @@ function pickGroupPurchaseProvider(
   requestedEvent: EventRecord,
 ): PurchaseProvider | null {
   const fromCatalog = providerForSource(
-    catalogSession?.purchaseProvider || catalogSession?.offerSourceCode || catalogSession?.sourceCode,
+    catalogSession?.purchaseProvider || catalogSession?.offerSourceCode,
   );
   if (fromCatalog) return fromCatalog;
 
