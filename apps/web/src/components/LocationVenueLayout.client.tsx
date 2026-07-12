@@ -95,7 +95,7 @@ export function LocationVenueLayout({
                   </span>
                 ) : null}
                 <span className="inline-flex items-center gap-1.5">
-                  <Ticket className="h-4 w-4" /> от {formatMoney(stats.priceFrom)}
+                  <Ticket className="h-4 w-4" /> {formatMoney(stats.priceFrom)}
                 </span>
               </div>
             </div>
@@ -274,11 +274,8 @@ export function LocationVenueLayout({
                           ) : null}
                         </div>
                       </div>
-                      <div className="flex shrink-0 items-center gap-3">
-                        <div className="text-right">
-                          <div className="text-xs text-slate-400">от</div>
-                          <div className="text-lg font-bold text-slate-900">{formatMoney(group.priceFrom)}</div>
-                        </div>
+                      <div className="flex shrink-0 items-center gap-3 self-center sm:self-auto">
+                        <div className="text-lg font-bold leading-none text-slate-900">{formatMoney(group.priceFrom)}</div>
                         <a
                           href={eventHref(group.representative)}
                           className="inline-flex min-h-9 items-center justify-center rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white hover:bg-primary-700"
