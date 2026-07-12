@@ -10,6 +10,7 @@ const protoPath = path.join(protoDir, "service.proto");
 const outDir = path.join(rootDir, "data", "ticketscloud");
 const catalogPath = path.join(outDir, "catalog.public.json");
 const summaryPath = path.join(outDir, "summary.public.json");
+const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
 
 const endpoint = process.env.TICKETSCLOUD_GRPC_ENDPOINT || "simple.ticketscloud.com:443";
 const token = process.env.TICKETSCLOUD_API_TOKEN || process.env.TICKETSCLOUD_API_KEY || process.env.TC_API_TOKEN;
@@ -110,7 +111,7 @@ function normalizeEvent(event, dictionaries) {
     source: "ticketscloud",
     externalId: event.id,
     metaExternalId: event.meta || null,
-    title: event.name,
+    title: normalizeImportEventTitle(event.name),
     description: event.description,
     status: event.status,
     eventType: event.openDate ? "open_date" : event.meta ? "recurring" : "single",

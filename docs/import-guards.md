@@ -8,6 +8,13 @@
 - `priceFromRub`, `ticketsVacant`, `primaryCityId`, `venueId`, `categoryId`
 - sessions, offers, tags, ProviderLink
 
+### Нормализация `title` при import
+
+- `scripts/lib/event-title-normalize.js` — `normalizeImportEventTitle()`
+- Применяется в `tc-full-sync.js`, `tc-import-catalog.js`, `tep-import-fixtures.js`
+- Правило: пробелы сжимаются, **первая буква заглавная** (`ru-RU`)
+- Публичный каталог и страница события дополнительно используют `formatPublicEventTitle()` в backend
+
 ## Protected (не затираются при update)
 
 | Поле | Условие сохранения |

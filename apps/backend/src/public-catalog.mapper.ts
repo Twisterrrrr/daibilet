@@ -10,6 +10,7 @@ import {
   resolveSessionPurchaseExternalId,
 } from './provider-purchase.js';
 import { prismaWallTimeToIso } from './public-datetime.js';
+import { formatPublicEventTitle } from './event-title-normalize.ts';
 import type { DestinationType, TimeBucket } from './types/common.js';
 import type { PublicSessionDto } from './types/public.js';
 
@@ -163,7 +164,7 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
     sessionCount: row.sessionCount || upcomingSlots.length || 1,
     upcomingSlots,
     landingSlugs: [],
-    title: row.overrideTitle || row.title,
+    title: formatPublicEventTitle(row.overrideTitle || row.title),
     cityId: row.cityId,
     citySlug: destination.slug,
     sourceCitySlug: row.citySlug,

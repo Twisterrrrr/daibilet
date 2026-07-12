@@ -8,6 +8,7 @@ loadRootEnv(rootDir);
 
 const { syncProviderLinksForSource } = require("./lib/provider-link-sync");
 const { EVENT_UPSERT_STATUS, EVENT_UPSERT_SLUG } = require("./lib/event-import-guard");
+const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
 
 const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
 const { Pool } = requireFromDbPackage("pg");
@@ -274,7 +275,7 @@ async function importCatalogEvent(client, event, summary) {
     `,
     [
       eventId,
-      event.title || "Событие без названия",
+      normalizeImportEventTitle(event.title) || "Событие без названия",
       slugify(`${event.title || "event"}-${externalId}`),
       event.description || null,
       kind,

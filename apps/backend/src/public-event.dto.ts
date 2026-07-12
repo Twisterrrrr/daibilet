@@ -15,6 +15,7 @@ import {
 } from './provider-purchase.js';
 import { getPublicCatalogSessions } from './public-catalog.dto.js';
 import { pickCatalogSubcategories } from './public-catalog.mapper.js';
+import { formatPublicEventTitle } from './event-title-normalize.ts';
 import type {
   PublicEventDto,
   PublicEventPageDto,
@@ -227,7 +228,7 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     ...sessions.map((session) => session.priceFrom),
     ...offers.map((offer) => offer.priceRub),
   );
-  const title = requestedEvent.override?.title || requestedEvent.title;
+  const title = formatPublicEventTitle(requestedEvent.override?.title || requestedEvent.title);
   const landingSlugs = targetCatalogSession?.landingSlugs || matchingLandingSlugs({
     title,
     category: requestedEvent.category?.title || null,

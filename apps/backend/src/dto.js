@@ -21,6 +21,7 @@ import {
   resolveContextInstitutionFromTitle,
   shouldResolveInstitutionFromTitle,
 } from './event-venue-context.js';
+import { formatPublicEventTitle } from './event-title-normalize.ts';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const ACTIVE_SESSION_SQL = `(
@@ -2737,25 +2738,29 @@ function normalizeCatalogGroupTitle(rawTitle) {
 
 function resolveCatalogDisplayTitle(rawTitle, venue) {
   const normalized = normalizeCatalogGroupTitle(rawTitle);
-  if (normalized.length >= 3 && !isDateLikeCatalogTitle(normalized)) return normalized;
+  if (normalized.length >= 3 && !isDateLikeCatalogTitle(normalized)) {
+    return formatPublicEventTitle(normalized);
+  }
 
   const cleanRaw = String(rawTitle || '').replace(/\s+/g, ' ').trim();
-  if (cleanRaw && !isDateLikeCatalogTitle(cleanRaw)) return cleanRaw;
+  if (cleanRaw && !isDateLikeCatalogTitle(cleanRaw)) return formatPublicEventTitle(cleanRaw);
 
   const venueTitle = formatPublicVenueTitle(venue) || String(venue || '').trim();
-  if (venueTitle && venueTitle !== 'Не указано') return venueTitle;
+  if (venueTitle && venueTitle !== 'Не указано') return formatPublicEventTitle(venueTitle);
 
-  return cleanRaw || 'Событие';
+  return formatPublicEventTitle(cleanRaw || 'Событие');
 }
 
 function mergeCatalogDisplayTitle(currentTitle, candidateTitle, venue) {
   const candidates = [currentTitle, candidateTitle].filter(Boolean);
   for (const raw of candidates) {
     const normalized = normalizeCatalogGroupTitle(raw);
-    if (normalized.length >= 3 && !isDateLikeCatalogTitle(normalized)) return normalized;
+    if (normalized.length >= 3 && !isDateLikeCatalogTitle(normalized)) {
+      return formatPublicEventTitle(normalized);
+    }
   }
   for (const raw of candidates) {
-    if (raw && !isDateLikeCatalogTitle(raw)) return String(raw).trim();
+    if (raw && !isDateLikeCatalogTitle(raw)) return formatPublicEventTitle(String(raw).trim());
   }
   return resolveCatalogDisplayTitle(candidates[0], venue);
 }
@@ -4226,7 +4231,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     groupKey: targetGroupKey,
     groupEventIds,
     sessionCount: totalSessionCount,
-    title: event.overrideTitle || event.title,
+    title: formatPublicEventTitle(event.overrideTitle || event.title),
     description: cleanImportedDescription(event.overrideDescription || event.description),
     imageUrl: event.overrideImageUrl || event.imageUrl || null,
     category: event.category || 'События',

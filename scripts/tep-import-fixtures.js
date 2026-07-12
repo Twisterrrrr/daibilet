@@ -10,6 +10,7 @@ const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", 
 const { Pool } = requireFromDbPackage("pg");
 const { syncProviderLinksForSource } = require("./lib/provider-link-sync");
 const { EVENT_UPSERT_STATUS, EVENT_UPSERT_SLUG } = require("./lib/event-import-guard");
+const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
 
 const fixturesDir = path.resolve(process.env.TEP_FIXTURES_DIR || path.join(rootDir, "data", "teplohod", "fixtures"));
 const eventsPath = path.join(fixturesDir, "events-compact.json");
@@ -779,10 +780,12 @@ function teplohodPurchaseUrl(eventId) {
 }
 
 function cleanTitle(value) {
-  return String(value || "")
-    .replace(/\s+/g, " ")
-    .replace(/\s+([,.;:!?])/g, "$1")
-    .trim();
+  return normalizeImportEventTitle(
+    String(value || "")
+      .replace(/\s+/g, " ")
+      .replace(/\s+([,.;:!?])/g, "$1")
+      .trim(),
+  );
 }
 
 function slugify(input) {
