@@ -55,7 +55,7 @@ export function CitiesCatalogView({ destinations }: { destinations: PublicDestin
             </div>
           </div>
           <p className="mt-2 text-lg text-slate-500">
-            {cities.length > 0 ? `${cities.length} ${pluralCities(cities.length)}` : 'Города'}
+            {cities.length > 0 ? pluralCities(cities.length) : 'Города'}
             {' — экскурсии, музеи и мероприятия по всей территории России'}
           </p>
         </div>

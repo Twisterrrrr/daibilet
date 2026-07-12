@@ -200,7 +200,8 @@ export function EventHeroBuyButton({
   const { event } = payload;
   const sessions = payload.sessions ?? [];
   const offers = payload.offers ?? [];
-  const label = `Купить билет — от ${priceLabel}`;
+  const normalizedPrice = priceLabel.replace(/^от\s+/i, '').trim();
+  const label = normalizedPrice ? `Купить билет — от ${normalizedPrice}` : 'Купить билет';
   const teplohod = getTeplohodWidgetIds(event);
   const primaryOffer = offers.find((offer) => offer.active !== false) || offers[0] || null;
   const { tcEventId, purchaseUrl, isTcWidget, purchaseTargets } = resolveTcPurchaseTarget(
