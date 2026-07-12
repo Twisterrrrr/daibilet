@@ -736,9 +736,13 @@ async function hydrateCatalogUpcomingSlots(sessions: PublicSessionDto[]): Promis
       ...session,
       upcomingSlots: hydratedSlots,
       sessionCount: Math.max(session.sessionCount || 0, hydratedSlots.length),
-      startsAt: session.startsAt || hydratedSlots[0]?.startsAt || null,
-      dateLabel: session.dateLabel || hydratedSlots[0]?.dateLabel || session.dateLabel,
-      timeLabel: session.timeLabel || hydratedSlots[0]?.timeLabel || session.timeLabel,
+      ...(session.startsAt || !hydratedSlots[0]?.startsAt
+        ? {}
+        : {
+            startsAt: hydratedSlots[0].startsAt,
+            dateLabel: hydratedSlots[0].dateLabel,
+            timeLabel: hydratedSlots[0].timeLabel,
+          }),
     };
   });
 }
