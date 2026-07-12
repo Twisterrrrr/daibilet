@@ -169,6 +169,16 @@ export interface PublicEventDto extends SeoFields, PurchaseFields {
   sessionCount?: number;
 }
 
+export interface PublicPurchaseOptionDto extends PurchaseFields {
+  id: string;
+  slug: string;
+  title: string;
+  description?: string | null;
+  priceFrom?: number | null;
+  externalId?: string | null;
+  purchaseProvider?: import('./common.js').PurchaseProvider | null;
+}
+
 export interface PublicEventPageDto extends ApiEnvelope {
   event: PublicEventDto;
   sessions: Array<Omit<DateTimeSlot, 'startsAt'> & PurchaseFields & {
@@ -181,6 +191,7 @@ export interface PublicEventPageDto extends ApiEnvelope {
   }>;
   offers: PublicOfferDto[];
   ticketPrices?: PublicTicketPriceDto[];
+  purchaseOptions?: PublicPurchaseOptionDto[];
   related: PublicSessionDto[];
   landings: Array<Pick<PublicLandingDto, 'slug' | 'title' | 'subtitle' | 'chips'>>;
   stats: {

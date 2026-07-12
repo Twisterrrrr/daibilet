@@ -25,7 +25,7 @@ import {
 } from '@/lib/event-page-utils';
 import { cityHref, venueHref } from '@/lib/routes';
 import { getTeplohodWidgetIds, openTeplohodWidget, TeplohodWidgetEmbed } from '@/components/TeplohodWidget.client';
-import { normalizeTcPurchaseUrl, TcSessionSlot, TcWidgetButton } from '@/components/TcWidget.client';
+import { normalizeTcPurchaseUrl, TcOptionBuyButton, TcSessionSlot, TcWidgetButton } from '@/components/TcWidget.client';
 
 type EventSession = PublicEventPageDto['sessions'][number] & {
   dateLabel?: string | null;
@@ -40,6 +40,8 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
   const primaryOffer = offers.find((offer) => offer.active !== false) || offers[0] || null;
   const priceRange = getTicketPriceRange(payload);
   const ticketCategories = buildGroupedTicketCategories(payload);
+  const purchaseOptions = payload.purchaseOptions ?? [];
+  const showMultiPurchase = purchaseOptions.length >= 2;
   const visibleSessions = listPurchasableSessionVariants(sessions as EventSession[]).slice(0, 5);
   const { tcEventId, purchaseUrl, isTcWidget, purchaseTargets } = resolveTcPurchaseTarget(
     event,
@@ -60,7 +62,37 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
         <p className="text-lg font-semibold text-slate-600">Цена уточняется</p>
       )}
 
-      {ticketCategories.length > 0 ? (
+      {showMultiPurchase ? (
+        <div className="mt-5">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Варианты билетов</h3>
+          <ul className="mt-2.5 space-y-2">
+            {purchaseOptions.map((option) => (
+              <li
+                key={option.id}
+                className="flex items-start justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-3"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-slate-900">{option.title}</p>
+                  {option.description ? (
+                    <p className="mt-1 text-xs leading-relaxed text-slate-500">{option.description}</p>
+                  ) : null}
+                </div>
+                <div className="flex shrink-0 flex-col items-end gap-2">
+                  {typeof option.priceFrom === 'number' ? (
+                    <span className="text-sm font-bold text-slate-900">{formatPriceRub(option.priceFrom)} ₽</span>
+                  ) : null}
+                  {option.externalId ? (
+                    <TcOptionBuyButton
+                      tcEventId={String(option.externalId)}
+                      purchaseUrl={option.purchaseUrl || option.widgetUrl}
+                    />
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : ticketCategories.length > 0 ? (
         <div className="mt-5">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Категории билетов</h3>
           <ul className="mt-2.5 space-y-2">
@@ -85,7 +117,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
         <p className="mt-3 text-sm text-slate-500">Полный список категорий — в виджете при покупке.</p>
       ) : null}
 
-      {visibleSessions.length > 0 ? (
+      {!showMultiPurchase && visibleSessions.length > 0 ? (
         <div className="mt-5">
           <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
             <Calendar className="h-3.5 w-3.5" />
@@ -110,36 +142,42 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
         </div>
       ) : null}
 
-      <div className="mt-5">
-        {isTepWidget && teplohod ? (
-          <TeplohodWidgetEmbed tepEventId={teplohod.tepEventId} tepWidgetId={teplohod.tepWidgetId} />
-        ) : isTcWidget && tcEventId ? (
-          <TcWidgetButton
-            tcEventId={tcEventId}
-            purchaseUrl={purchaseUrl}
-            purchaseTargets={purchaseTargets}
-            label="Купить билет"
-            wide
-          />
-        ) : purchaseUrl ? (
-          <a
-            href={normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-medium text-white transition hover:bg-primary-700"
-          >
-            Купить билет
-          </a>
-        ) : (
-          <button
-            type="button"
-            disabled
-            className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-slate-200 px-6 py-3.5 text-base font-medium text-slate-400"
-          >
-            Билеты недоступны
-          </button>
-        )}
-      </div>
+      {!showMultiPurchase ? (
+        <div className="mt-5">
+          {isTepWidget && teplohod ? (
+            <TeplohodWidgetEmbed tepEventId={teplohod.tepEventId} tepWidgetId={teplohod.tepWidgetId} />
+          ) : isTcWidget && tcEventId ? (
+            <TcWidgetButton
+              tcEventId={tcEventId}
+              purchaseUrl={purchaseUrl}
+              purchaseTargets={purchaseTargets}
+              label="Купить билет"
+              wide
+            />
+          ) : purchaseUrl ? (
+            <a
+              href={normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-medium text-white transition hover:bg-primary-700"
+            >
+              Купить билет
+            </a>
+          ) : (
+            <button
+              type="button"
+              disabled
+              className="flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-slate-200 px-6 py-3.5 text-base font-medium text-slate-400"
+            >
+              Билеты недоступны
+            </button>
+          )}
+        </div>
+      ) : (
+        <p className="mt-5 text-xs leading-relaxed text-slate-500">
+          Выберите комплект и нажмите «Купить» напротив нужного варианта — откроется виджет Ticketscloud.
+        </p>
+      )}
 
       <div className="mt-4 flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2">
         <Shield className="h-4 w-4 text-emerald-500" />
@@ -202,6 +240,8 @@ export function EventHeroBuyButton({
   const offers = payload.offers ?? [];
   const normalizedPrice = priceLabel.replace(/^от\s+/i, '').trim();
   const label = normalizedPrice ? `Купить билет — от ${normalizedPrice}` : 'Купить билет';
+  const purchaseOptions = payload.purchaseOptions ?? [];
+  const showMultiPurchase = purchaseOptions.length >= 2;
   const teplohod = getTeplohodWidgetIds(event);
   const primaryOffer = offers.find((offer) => offer.active !== false) || offers[0] || null;
   const { tcEventId, purchaseUrl, isTcWidget, purchaseTargets } = resolveTcPurchaseTarget(
@@ -209,6 +249,18 @@ export function EventHeroBuyButton({
     sessions,
     primaryOffer,
   );
+
+  if (showMultiPurchase) {
+    return (
+      <button
+        type="button"
+        onClick={scrollToBuyCard}
+        className={`inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-base font-semibold text-white shadow-md shadow-amber-700/30 transition hover:bg-amber-600 active:bg-amber-700 sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`}
+      >
+        {label}
+      </button>
+    );
+  }
 
   if (isTcWidget && tcEventId) {
     return (

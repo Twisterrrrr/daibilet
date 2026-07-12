@@ -48,6 +48,14 @@ export function formatPriceRub(value?: number | null): string | null {
 export function getTicketPriceRange(payload: PublicEventPageDto): { min: number; max: number } | null {
   const values: number[] = [];
 
+  if (Array.isArray(payload.purchaseOptions) && payload.purchaseOptions.length) {
+    for (const option of payload.purchaseOptions) {
+      if (typeof option.priceFrom === 'number' && option.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
+        values.push(option.priceFrom);
+      }
+    }
+  }
+
   if (Array.isArray(payload.ticketPrices) && payload.ticketPrices.length) {
     for (const item of payload.ticketPrices) {
       if (item.priceRub >= MIN_DISPLAY_PRICE_RUB) values.push(item.priceRub);

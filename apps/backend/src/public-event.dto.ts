@@ -22,6 +22,7 @@ import type {
   PublicEventDto,
   PublicEventPageDto,
   PublicOfferDto,
+  PublicPurchaseOptionDto,
   PublicSessionDto,
   PublicTicketPriceDto,
 } from './types/public.js';
@@ -308,6 +309,7 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     isIndexable: requestedEvent.override?.isIndexable ?? requestedEvent.isIndexable,
   };
   const ticketPrices = buildTicketPrices(offers, sessions, event);
+  const purchaseOptions = buildMergedPurchaseOptions(groupEvents, offers, requestedEvent, eventPurchaseUrl);
   const related = relatedSessions(catalogSessions, groupEventIds, requestedEvent, 12);
   const priceValues = [event.priceFrom, ...sessions.map((session) => session.priceFrom)]
     .filter((value): value is number => Number.isFinite(value) && Number(value) >= MIN_DISPLAY_PRICE_RUB);
@@ -335,6 +337,7 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     sessions,
     offers: offers.map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, payload: _payload, ...offer }) => offer),
     ticketPrices,
+    purchaseOptions: purchaseOptions.length >= 2 ? purchaseOptions : undefined,
     related,
     landings: landingSlugs.map(findLandingRule).filter(isDefined).map((rule) => ({
       slug: rule.slug,
@@ -587,6 +590,107 @@ function dedupePublicEventSessionsByStartsAt(sessions: PublicEventSession[]): Pu
     const rightTime = right.startsAt ? new Date(right.startsAt).getTime() : Number.POSITIVE_INFINITY;
     return leftTime - rightTime || String(left.id).localeCompare(String(right.id));
   });
+}
+
+function mergedCatalogTitle(event: EventRecord): string | null {
+  return cleanImportedDescription(event.override?.title);
+}
+
+function isMultiProductMergedGroup(groupEvents: EventRecord[], requestedEvent: EventRecord): boolean {
+  const mergeTitle = mergedCatalogTitle(requestedEvent);
+  if (!mergeTitle || groupEvents.length < 2) return false;
+
+  const peers = groupEvents.filter((event) => mergedCatalogTitle(event) === mergeTitle);
+  if (peers.length < 2) return false;
+
+  const distinctTitles = new Set(
+    peers.map((event) => normalizeGroupPart(formatPublicEventTitle(event.title))).filter(Boolean),
+  );
+  return distinctTitles.size >= 2;
+}
+
+function buildPurchaseOptionDescription(event: EventRecord): string | null {
+  const raw = cleanImportedDescription(
+    event.override?.shortDescription || event.description || event.override?.description,
+  );
+  if (!raw) return null;
+
+  const lines = raw
+    .split(/\n+/)
+    .map((line) => line.replace(/^[-–—•*]\s*/, '').trim())
+    .filter(Boolean);
+  const snippet = lines.slice(0, 3).join(' · ');
+  if (!snippet) return null;
+  return snippet.length > 260 ? `${snippet.slice(0, 257).trim()}…` : snippet;
+}
+
+function purchaseOptionSortKey(title: string): number {
+  const match = title.match(/(\d+)/);
+  return match ? Number(match[1]) : 9999;
+}
+
+function buildMergedPurchaseOptions(
+  groupEvents: EventRecord[],
+  offers: MappedOffer[],
+  requestedEvent: EventRecord,
+  fallbackPurchaseUrl: string | null,
+): PublicPurchaseOptionDto[] {
+  if (!isMultiProductMergedGroup(groupEvents, requestedEvent)) return [];
+
+  const mergeTitle = mergedCatalogTitle(requestedEvent);
+  if (!mergeTitle) return [];
+
+  const peers = groupEvents.filter((event) => mergedCatalogTitle(event) === mergeTitle);
+  const offersByEventId = new Map<string, MappedOffer[]>();
+  for (const offer of offers) {
+    const bucket = offersByEventId.get(offer.eventId) || [];
+    bucket.push(offer);
+    offersByEventId.set(offer.eventId, bucket);
+  }
+
+  const options = peers
+    .map((event) => {
+      const identity = eventIdentity(event);
+      const title = formatPublicEventTitle(event.title);
+      const titleKey = normalizeGroupPart(title);
+      if (!titleKey || titleKey === normalizeGroupPart(mergeTitle)) return null;
+
+      const eventOffers = preferNamedTicketOffers(offersByEventId.get(event.id) || []);
+      const primaryOffer = eventOffers[0] || offersByEventId.get(event.id)?.[0] || null;
+      const purchase = purchaseInfo({
+        sourceCode: identity.sourceCode,
+        offerSourceCode: primaryOffer?.sourceCode,
+        offerWidgetUrl: primaryOffer?.widgetUrl,
+        offerDeeplinkUrl: primaryOffer?.deeplinkUrl,
+        externalId: identity.externalId,
+      });
+      const priceFrom = displayPriceFrom(primaryOffer?.priceRub, event.priceFromRub);
+      if (!priceFrom || !purchase.ready) return null;
+
+      return {
+        id: event.id,
+        slug: publicSlug(event.slug),
+        title,
+        description: buildPurchaseOptionDescription(event),
+        priceFrom,
+        externalId: identity.externalId,
+        purchaseProvider: purchase.provider,
+        purchaseUrl: purchase.url || fallbackPurchaseUrl,
+        widgetUrl: primaryOffer?.widgetUrl || purchase.url || fallbackPurchaseUrl,
+        deeplinkUrl: primaryOffer?.deeplinkUrl || null,
+        purchaseReady: purchase.ready,
+        purchaseMode: purchase.mode,
+        purchaseUrlSource: purchase.urlSource,
+      } satisfies PublicPurchaseOptionDto;
+    })
+    .filter((option): option is PublicPurchaseOptionDto => Boolean(option))
+    .sort((left, right) =>
+      purchaseOptionSortKey(left.title) - purchaseOptionSortKey(right.title) ||
+      left.priceFrom! - right.priceFrom! ||
+      left.title.localeCompare(right.title, 'ru'),
+    );
+
+  return options;
 }
 
 function buildTicketPrices(
