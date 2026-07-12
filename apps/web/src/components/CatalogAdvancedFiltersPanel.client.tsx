@@ -92,7 +92,7 @@ export function CatalogAdvancedFiltersPanel({
       id="advanced-filters-panel"
       role="region"
       aria-labelledby="advanced-filters-title"
-      className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+      className="catalog-advanced-filters overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
     >
       <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-5 py-3">
         <h3 id="advanced-filters-title" className="flex items-center gap-2 text-sm font-bold text-slate-900">

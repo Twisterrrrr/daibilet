@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ChevronDown, Search, SlidersHorizontal } from 'lucide-react';
-import { FormEvent, useMemo, useState } from 'react';
+import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 import { CatalogAdvancedFiltersPanel } from '@/components/CatalogAdvancedFiltersPanel.client';
 import { ViewModeToggle } from '@/components/CatalogResults.client';
@@ -36,7 +36,12 @@ export function CatalogToolbar({ facets, values, viewMode, onViewModeChange, dis
   const router = useRouter();
   const filters = useMemo(() => catalogFiltersFromQuery(values), [values]);
   const [filtersOpen, setFiltersOpen] = useState(countAdvancedFilters(filters) > 0);
+  const [qDraft, setQDraft] = useState(filters.q || '');
   const advancedCount = countAdvancedFilters(filters);
+
+  useEffect(() => {
+    setQDraft(filters.q || '');
+  }, [filters.q]);
 
   const navigate = (next: CatalogFilterValues) => {
     router.push(buildCatalogHref(next));
@@ -73,11 +78,22 @@ export function CatalogToolbar({ facets, values, viewMode, onViewModeChange, dis
             <input
               type="search"
               name="q"
-              defaultValue={filters.q || ''}
+              value={qDraft}
+              onChange={(event) => setQDraft(event.target.value)}
               placeholder="Название, место или артист"
               aria-label="Поиск по событиям"
               className="inline-btn h-11 w-full rounded-xl bg-slate-50 pl-10 pr-9 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-primary/60"
             />
+            {qDraft ? (
+              <button
+                type="button"
+                aria-label="Очистить поиск"
+                onClick={() => setQDraft('')}
+                className="inline-btn absolute right-2 grid h-6 w-6 place-items-center rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-700"
+              >
+                <X aria-hidden className="h-3.5 w-3.5" />
+              </button>
+            ) : null}
           </label>
 
           <div className="relative sm:w-52">
@@ -147,7 +163,8 @@ export function CatalogToolbar({ facets, values, viewMode, onViewModeChange, dis
               type="button"
               onClick={() => setFiltersOpen((open) => !open)}
               aria-expanded={filtersOpen}
-              className={`relative inline-flex h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
+              aria-controls="advanced-filters-panel"
+              className={`relative inline-btn inline-flex h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 ${
                 filtersOpen || advancedCount > 0
                   ? 'bg-primary-600 text-white hover:bg-primary-700'
                   : 'bg-slate-900 text-white hover:bg-slate-800'
@@ -173,49 +190,49 @@ export function CatalogToolbar({ facets, values, viewMode, onViewModeChange, dis
             <ViewModeToggle mode={viewMode} onChange={onViewModeChange} />
           </div>
         </div>
-
-        {filtersOpen ? (
-          <CatalogAdvancedFiltersPanel
-            filters={{
-              dateFrom: filters.from || '',
-              dateTo: filters.to || '',
-              minPrice: filters.minPrice != null ? String(filters.minPrice) : 'all',
-              maxPrice: filters.maxPrice != null ? String(filters.maxPrice) : 'all',
-              ageMax: filters.ageMax != null && filters.ageMax >= 0 ? filters.ageMax : -1,
-              landing: filters.landing || 'all',
-            }}
-            landings={facets.landings}
-            onChange={(patch) => {
-              navigate({
-                ...filters,
-                from: patch.dateFrom !== undefined ? patch.dateFrom || undefined : filters.from,
-                to: patch.dateTo !== undefined ? patch.dateTo || undefined : filters.to,
-                minPrice:
-                  patch.minPrice !== undefined
-                    ? patch.minPrice === 'all'
-                      ? undefined
-                      : Number(patch.minPrice)
-                    : filters.minPrice,
-                maxPrice:
-                  patch.maxPrice !== undefined
-                    ? patch.maxPrice === 'all'
-                      ? undefined
-                      : Number(patch.maxPrice)
-                    : filters.maxPrice,
-                ageMax: patch.ageMax !== undefined ? (patch.ageMax >= 0 ? patch.ageMax : undefined) : filters.ageMax,
-                landing:
-                  patch.landing !== undefined
-                    ? patch.landing === 'all'
-                      ? undefined
-                      : patch.landing
-                    : filters.landing,
-              });
-            }}
-            onClose={() => setFiltersOpen(false)}
-            onReset={() => navigate({ sort: filters.sort, limit: filters.limit })}
-          />
-        ) : null}
       </form>
+
+      {filtersOpen ? (
+        <CatalogAdvancedFiltersPanel
+          filters={{
+            dateFrom: filters.from || '',
+            dateTo: filters.to || '',
+            minPrice: filters.minPrice != null ? String(filters.minPrice) : 'all',
+            maxPrice: filters.maxPrice != null ? String(filters.maxPrice) : 'all',
+            ageMax: filters.ageMax != null && filters.ageMax >= 0 ? filters.ageMax : -1,
+            landing: filters.landing || 'all',
+          }}
+          landings={facets.landings}
+          onChange={(patch) => {
+            navigate({
+              ...filters,
+              from: patch.dateFrom !== undefined ? patch.dateFrom || undefined : filters.from,
+              to: patch.dateTo !== undefined ? patch.dateTo || undefined : filters.to,
+              minPrice:
+                patch.minPrice !== undefined
+                  ? patch.minPrice === 'all'
+                    ? undefined
+                    : Number(patch.minPrice)
+                  : filters.minPrice,
+              maxPrice:
+                patch.maxPrice !== undefined
+                  ? patch.maxPrice === 'all'
+                    ? undefined
+                    : Number(patch.maxPrice)
+                  : filters.maxPrice,
+              ageMax: patch.ageMax !== undefined ? (patch.ageMax >= 0 ? patch.ageMax : undefined) : filters.ageMax,
+              landing:
+                patch.landing !== undefined
+                  ? patch.landing === 'all'
+                    ? undefined
+                    : patch.landing
+                  : filters.landing,
+            });
+          }}
+          onClose={() => setFiltersOpen(false)}
+          onReset={() => navigate({ sort: filters.sort, limit: filters.limit })}
+        />
+      ) : null}
 
       <div className="-mx-4 px-4 sm:mx-0 sm:px-0">
         <div className="horizontal-snap-row flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -251,25 +268,25 @@ export function CatalogToolbar({ facets, values, viewMode, onViewModeChange, dis
         </div>
       </div>
 
-      <div className="horizontal-snap-row scrollbar-hide">
-        <div className="flex w-max flex-nowrap gap-2">
-          {CATALOG_PRESETS.map((preset) => {
-            const active = catalogPresetMatches(preset.slug, filters);
-            const href = buildCatalogHref(
-              active ? { sort: 'popular' } : buildCatalogPresetValues(preset.slug, false),
-            );
-            return (
-              <Link
-                key={preset.slug}
-                href={href}
-                className={`catalog-chip ${active ? 'catalog-chip-active' : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50'}`}
-              >
-                <span aria-hidden>{preset.emoji}</span>
-                {preset.label}
-              </Link>
-            );
-          })}
-        </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs font-medium uppercase tracking-wide text-slate-400">Подборки:</span>
+        {CATALOG_PRESETS.map((preset) => {
+          const active = catalogPresetMatches(preset.slug, filters);
+          const href = buildCatalogHref(
+            active ? { sort: 'popular' } : buildCatalogPresetValues(preset.slug, false),
+          );
+          return (
+            <Link
+              key={preset.slug}
+              href={href}
+              className={`inline-btn rounded-full px-3 py-1 text-xs font-medium transition ${
+                active ? 'bg-primary/10 text-primary-700 ring-1 ring-primary/30' : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              {preset.label}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

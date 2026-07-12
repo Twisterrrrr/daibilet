@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { X } from 'lucide-react';
+import { SlidersHorizontal, X } from 'lucide-react';
 
 import {
   AGE_FILTER_OPTIONS,
@@ -44,20 +44,28 @@ export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }
   if (!chips.length) return null;
 
   return (
-    <div className="mt-4 flex flex-wrap items-center gap-2">
+    <div
+      className="mb-4 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"
+      role="region"
+      aria-label="Активные фильтры"
+    >
+      <span className="inline-flex items-center gap-1.5 pl-1 pr-1 text-xs font-bold uppercase tracking-wider text-slate-500">
+        <SlidersHorizontal aria-hidden className="h-3.5 w-3.5" />
+        Активно · {chips.length}
+      </span>
       {chips.map((chip) => (
         <Link
           key={`${chip.key}:${chip.label}`}
           href={buildCatalogHref(clearCatalogFilterKey(values, chip.key))}
-          className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
+          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary-700 ring-1 ring-primary/20 transition hover:bg-primary/20"
         >
           {chip.label}
-          <X className="h-3.5 w-3.5" aria-hidden />
+          <X className="h-3 w-3" aria-hidden />
         </Link>
       ))}
       <Link
         href="/events"
-        className="ml-auto inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
+        className="ml-auto inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
       >
         <X className="h-3.5 w-3.5" aria-hidden />
         Сбросить фильтры

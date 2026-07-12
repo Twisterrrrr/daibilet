@@ -130,7 +130,9 @@ export function CatalogShell() {
         </p>
       </div>
 
-      <div className="catalog-toolbar-sticky -mx-4 mt-6 border-b border-slate-200 bg-white/95 px-4 py-4 backdrop-blur sm:-mx-6 sm:px-6">
+      <CatalogActiveFilters values={filterValues} />
+
+      <div className="catalog-toolbar-sticky -mx-4 mt-6 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur-md sm:-mx-6 sm:px-6">
         <CatalogToolbar
           facets={facets}
           values={filterValues}
@@ -138,7 +140,6 @@ export function CatalogShell() {
           onViewModeChange={setViewMode}
           disabled={loading && !catalog}
         />
-        <CatalogActiveFilters values={filterValues} />
       </div>
 
       {loading && !catalog ? (

@@ -82,6 +82,11 @@
     min-height: 44px;
   }
 
+  .catalog-advanced-filters button,
+  .catalog-advanced-filters select {
+    min-height: 0;
+  }
+
   .event-favorite-btn {
     min-height: 0;
     min-width: 0;
