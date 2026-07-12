@@ -93,8 +93,10 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
           ) : null}
         </div>
 
-        <h3 className="mt-2 line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-primary-600 sm:text-lg">
-          {session.title}
+        <h3 className="mt-2 line-clamp-2 text-sm font-semibold sm:text-lg">
+          <Link href={href} className="relative z-[2] text-slate-900 transition-colors hover:text-primary-600">
+            {session.title}
+          </Link>
         </h3>
 
         <div className="mt-2 flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-slate-500 sm:text-xs">
@@ -161,10 +163,13 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
         ) : null}
 
         <div className="mt-auto flex items-center justify-between gap-4 pt-3">
-          <span className="flex items-center gap-1 text-xs font-medium text-primary-600 sm:text-sm">
+          <Link
+            href={href}
+            className="relative z-[2] flex items-center gap-1 text-xs font-medium text-primary-600 transition hover:text-primary-700 sm:text-sm"
+          >
             <Ticket className="h-3.5 w-3.5" />
             Подробнее →
-          </span>
+          </Link>
           <span className="shrink-0 text-sm font-bold text-slate-900 sm:text-base">{priceFooterLabel}</span>
         </div>
       </div>

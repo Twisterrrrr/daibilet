@@ -33,8 +33,11 @@ import { eventHref } from '@/lib/routes';
 const SLOT_CHIP_CLASS =
   'inline-btn inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-full bg-slate-100 px-2.5 text-[10px] font-medium leading-none text-slate-700';
 
-const SLOT_CHIP_PURCHASE_CLASS =
-  'transition hover:bg-primary/10 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
+const DETAILS_LINK_CLASS =
+  'relative z-[2] inline-flex items-center gap-1 text-[10px] font-medium text-primary-600 transition hover:text-primary-700 sm:text-xs';
+
+const TITLE_LINK_CLASS =
+  'relative z-[2] line-clamp-2 text-sm font-semibold leading-relaxed text-slate-900 transition-colors hover:text-primary-600 sm:text-base';
 
 type EventCardProps = {
   session: PublicSessionDto;
@@ -114,7 +117,7 @@ export function EventCard({
         ) : null}
       </div>
 
-      <div className={`relative z-[2] flex flex-1 flex-col ${compact ? 'p-3' : 'p-3 sm:p-4'}`}>
+      <div className={`flex flex-1 flex-col ${compact ? 'p-3' : 'p-3 sm:p-4'}`}>
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-slate-500 sm:text-xs">
           <span className="inline-flex shrink-0 items-center gap-0.5">
             <Star className="h-3 w-3 fill-amber-400 text-amber-400 sm:h-3.5 sm:w-3.5" />
@@ -133,8 +136,10 @@ export function EventCard({
           ) : null}
         </div>
 
-        <h2 className="mt-2 line-clamp-2 text-sm font-semibold leading-relaxed text-slate-900 transition-colors group-hover:text-primary-600 sm:text-base">
-          {session.title}
+        <h2 className="mt-2">
+          <Link href={href} className={TITLE_LINK_CLASS}>
+            {session.title}
+          </Link>
         </h2>
 
         <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-slate-500 sm:gap-x-3 sm:text-xs">
@@ -210,10 +215,10 @@ export function EventCard({
           ) : (
             <>
               <span className="text-sm font-semibold text-slate-900">{priceFooterLabel}</span>
-              <span className="flex items-center gap-1 text-[10px] font-medium text-primary-600 sm:text-xs">
+              <Link href={href} className={DETAILS_LINK_CLASS}>
                 <Ticket className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                 Подробнее →
-              </span>
+              </Link>
             </>
           )}
         </div>
@@ -286,7 +291,7 @@ function ShowcaseEventCard({
         </div>
       </div>
 
-      <div className={`relative z-[2] flex min-h-0 flex-1 flex-col text-left ${rail ? 'gap-1.5 p-3' : 'gap-2 p-3 sm:p-4'}`}>
+      <div className={`flex min-h-0 flex-1 flex-col text-left ${rail ? 'gap-1.5 p-3' : 'gap-2 p-3 sm:p-4'}`}>
         {rail ? (
           <>
             <div className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-slate-500">
@@ -311,11 +316,13 @@ function ShowcaseEventCard({
           </div>
         )}
         <h3
-          className={`font-display font-bold leading-snug text-slate-900 group-hover:text-primary-600 ${
+          className={`font-display font-bold leading-snug ${
             rail ? 'line-clamp-3 text-sm' : 'line-clamp-2 text-sm sm:text-base'
           }`}
         >
-          {session.title}
+          <Link href={href} className={`${TITLE_LINK_CLASS} font-display font-bold`}>
+            {session.title}
+          </Link>
         </h3>
         {venueLine ? (
           <p className={`mt-auto text-slate-500 ${rail ? 'line-clamp-2 text-[11px] leading-snug' : 'truncate text-xs sm:text-sm'}`}>
