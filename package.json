@@ -54,6 +54,7 @@
     "public:build": "pnpm --filter @daibilet/public build",
     "public:perf": "node scripts/public-performance-snapshot.mjs",
     "smoke:launch": "node scripts/launch-smoke.mjs",
+    "acceptance:web": "node scripts/web-acceptance.mjs",
     "preflight:deploy": "node scripts/deploy-preflight.mjs",
     "readiness:admin": "node scripts/admin-readiness.mjs",
     "admin:data": "node scripts/build-admin-prototype-data.js",
