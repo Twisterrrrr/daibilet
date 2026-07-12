@@ -6,18 +6,25 @@ import {
 } from './catalog-availability.js';
 import {
   dedupeCrossSourceCatalogSessions,
+  formatDate,
+  formatTime,
   mapGroupedPublicSession,
   pickCatalogSubcategories,
   regroupMappedPublicCatalogSessions,
   sessionHasCoverImage,
+  timeBucket,
 } from './dto.js';
 import { findLandingRule } from './landing-rules.js';
+import { providerForSource } from './provider-purchase.js';
 import type { PublicCatalogMappingRow } from './public-catalog.mapper.js';
 import type { PublicCatalogDto, PublicSessionDto } from './types/public.js';
 import type { PublicCatalogQuery } from './types/schemas.js';
+import type { PurchaseProvider } from './types/common.js';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
+const CATALOG_CARD_SLOT_TARGET = 4;
+const CATALOG_HYDRATED_SLOT_LIMIT = 8;
 
 /** Keep in sync with catalogGroupTitleSqlExpression() in dto.js */
 const CATALOG_GROUP_TITLE_SQL = `regexp_replace(
@@ -78,11 +85,13 @@ export async function getPublicCatalogSessions(forceRefresh = false): Promise<Pu
 
   if (forceRefresh) clearPublicCatalogDtoCache();
 
-  const buildPromise = Promise.all([loadPublicCatalogRows(), loadPinnedEventIds()]).then(([rows, pinnedEventIds]) => {
+  const buildPromise = Promise.all([loadPublicCatalogRows(), loadPinnedEventIds()]).then(async ([rows, pinnedEventIds]) => {
     const sessions = filterCatalogSessions(
-      dedupeCrossSourceCatalogSessions(
-        regroupMappedPublicCatalogSessions(
-          rows.map((row) => mapGroupedPublicSession(row, pinnedEventIds)),
+      await hydrateCatalogUpcomingSlots(
+        dedupeCrossSourceCatalogSessions(
+          regroupMappedPublicCatalogSessions(
+            rows.map((row) => mapGroupedPublicSession(row, pinnedEventIds)),
+          ),
         ),
       ),
     );
@@ -631,4 +640,117 @@ function filterCatalogSessions(sessions: PublicSessionDto[]): PublicSessionDto[]
       priceFrom: session.priceFrom,
     }),
   );
+}
+
+async function hydrateCatalogUpcomingSlots(sessions: PublicSessionDto[]): Promise<PublicSessionDto[]> {
+  const targets = sessions.filter((session) => {
+    const provider = session.purchaseProvider;
+    if (provider !== 'TEPLOHOD' && provider !== 'TICKETSCLOUD') return false;
+    return (session.upcomingSlots?.length || 0) < CATALOG_CARD_SLOT_TARGET;
+  });
+  if (!targets.length) return sessions;
+
+  const targetIds = new Set(targets.map((session) => session.id));
+  const eventIds = [...new Set(
+    targets.flatMap((session) => (session.groupEventIds?.length ? session.groupEventIds : [session.id])),
+  )];
+
+  const [eventRows, sessionRows] = await Promise.all([
+    prisma.event.findMany({
+      where: { id: { in: eventIds } },
+      select: {
+        id: true,
+        providerLinks: {
+          where: { entityKind: 'EVENT' },
+          include: { source: true },
+          orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
+          take: 1,
+        },
+      },
+    }),
+    prisma.eventSession.findMany({
+      where: {
+        eventId: { in: eventIds },
+        OR: [
+          { endsAt: { gte: new Date() } },
+          { startsAt: { gte: new Date() } },
+        ],
+      },
+      select: {
+        id: true,
+        eventId: true,
+        startsAt: true,
+        endsAt: true,
+      },
+      orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
+    }),
+  ]);
+
+  const providerByEventId = new Map<string, PurchaseProvider | null>(
+    eventRows.map((event) => [
+      event.id,
+      providerForSource(event.providerLinks[0]?.source.code),
+    ]),
+  );
+
+  const rowsByEventId = new Map<string, typeof sessionRows>();
+  for (const row of sessionRows) {
+    if (!row.startsAt) continue;
+    const bucket = rowsByEventId.get(row.eventId) || [];
+    if (bucket.length >= CATALOG_HYDRATED_SLOT_LIMIT) continue;
+    bucket.push(row);
+    rowsByEventId.set(row.eventId, bucket);
+  }
+
+  return sessions.map((session) => {
+    if (!targetIds.has(session.id)) return session;
+
+    const provider = session.purchaseProvider;
+    const hydrationEventIds = pickHydrationEventIds(session, providerByEventId);
+    const hydratedSlots: NonNullable<PublicSessionDto['upcomingSlots']> = [];
+    const seenStartsAt = new Set<string>();
+
+    for (const eventId of hydrationEventIds) {
+      for (const row of rowsByEventId.get(eventId) || []) {
+        const startsAt = row.startsAt?.toISOString();
+        if (!startsAt || seenStartsAt.has(startsAt)) continue;
+        seenStartsAt.add(startsAt);
+        hydratedSlots.push({
+          id: row.id,
+          eventId: row.eventId,
+          startsAt,
+          endsAt: row.endsAt?.toISOString() || null,
+          dateLabel: formatDate(startsAt),
+          timeLabel: formatTime(startsAt),
+          timeBucket: timeBucket(startsAt),
+          purchaseUrl: session.purchaseUrl,
+        });
+        if (hydratedSlots.length >= CATALOG_HYDRATED_SLOT_LIMIT) break;
+      }
+      if (hydratedSlots.length >= CATALOG_HYDRATED_SLOT_LIMIT) break;
+    }
+
+    if (hydratedSlots.length <= (session.upcomingSlots?.length || 0)) return session;
+
+    return {
+      ...session,
+      upcomingSlots: hydratedSlots,
+      sessionCount: Math.max(session.sessionCount || 0, hydratedSlots.length),
+      startsAt: session.startsAt || hydratedSlots[0]?.startsAt || null,
+      dateLabel: session.dateLabel || hydratedSlots[0]?.dateLabel || session.dateLabel,
+      timeLabel: session.timeLabel || hydratedSlots[0]?.timeLabel || session.timeLabel,
+    };
+  });
+}
+
+function pickHydrationEventIds(
+  session: PublicSessionDto,
+  providerByEventId: Map<string, PurchaseProvider | null>,
+): string[] {
+  const provider = session.purchaseProvider;
+  const candidates = session.groupEventIds?.length ? session.groupEventIds : [session.id];
+  if (!provider) return [session.id];
+
+  const matching = candidates.filter((id) => providerByEventId.get(id) === provider);
+  return matching.length ? matching : [session.id];
 }
