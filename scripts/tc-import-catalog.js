@@ -9,6 +9,7 @@ loadRootEnv(rootDir);
 const { syncProviderLinksForSource } = require("./lib/provider-link-sync");
 const { EVENT_UPSERT_STATUS, EVENT_UPSERT_SLUG } = require("./lib/event-import-guard");
 const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
+const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/event-taxonomy");
 
 const requireFromDbPackage = createRequire(path.join(rootDir, "packages", "db", "package.json"));
 const { Pool } = requireFromDbPackage("pg");
@@ -166,7 +167,7 @@ async function importCatalogEvent(client, event, summary) {
   const city = venue.city || {};
   const cityId = city.id ? id("city", city.id) : null;
   const venueId = venue.id ? id("venue", venue.id) : null;
-  const categoryId = SOURCE_CATEGORY_TO_CATEGORY.get(event.category?.name) || "cat_events";
+  const categoryId = resolveCatalogCategoryId(event);
   const kind = eventKind(event.eventType);
   const priceFromRub = money(event.priceFrom);
   const ticketsVacant = intOrNull(event.ticketsAmountVacant);
@@ -488,6 +489,11 @@ function venuePageStatus(input, events) {
   if (input === "generic_location") return "NONE";
   if (events >= 5 || ["pier_water", "museum_art", "theater", "concert_hall"].includes(input)) return "CANDIDATE";
   return "NONE";
+}
+
+function resolveCatalogCategoryId(event) {
+  if (isDiscoOrPartyEvent(event)) return ENTERTAINMENT_DISCO_TAXONOMY.categoryId;
+  return SOURCE_CATEGORY_TO_CATEGORY.get(event.category?.name) || "cat_events";
 }
 
 function slugify(input) {

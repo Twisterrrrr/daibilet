@@ -33,3 +33,12 @@
 ```bash
 npm run check:sync-invariants
 ```
+
+## Таксономия: дискотеки и вечеринки
+
+События с «дискотека», «вечеринка», DJ и т.п. в названии/описании/тегах классифицируются как **Развлечения** (`cat_entertainment`), а не Экскурсии — даже если это теплоход.
+
+- `scripts/lib/event-taxonomy.js` — общая эвристика
+- `tep-import-fixtures.js`, `tc-import-catalog.js` — при import
+- `scripts/reclassify-disco-events.js` — разовая переклассификация уже импортированных событий
+

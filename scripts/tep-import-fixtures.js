@@ -11,6 +11,7 @@ const { Pool } = requireFromDbPackage("pg");
 const { syncProviderLinksForSource } = require("./lib/provider-link-sync");
 const { EVENT_UPSERT_STATUS, EVENT_UPSERT_SLUG } = require("./lib/event-import-guard");
 const { normalizeImportEventTitle } = require("./lib/event-title-normalize");
+const { ENTERTAINMENT_DISCO_TAXONOMY, isDiscoOrPartyEvent } = require("./lib/event-taxonomy");
 
 const fixturesDir = path.resolve(process.env.TEP_FIXTURES_DIR || path.join(rootDir, "data", "teplohod", "fixtures"));
 const eventsPath = path.join(fixturesDir, "events-compact.json");
@@ -514,6 +515,9 @@ async function upsertTag(client, title) {
 }
 
 function resolveTaxonomy(sourceEvent) {
+  if (isDiscoOrPartyEvent(sourceEvent)) {
+    return ENTERTAINMENT_DISCO_TAXONOMY;
+  }
   if (isBusTourEvent(sourceEvent)) {
     return { categoryId: "cat_excursions", subcategoryId: "sub_excursions_bus" };
   }
