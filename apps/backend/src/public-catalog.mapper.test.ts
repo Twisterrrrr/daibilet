@@ -35,6 +35,19 @@ test('uses ProviderLink SESSION identity for a Ticketscloud slot', () => {
   assert.equal(result.upcomingSlots?.[0]?.id, 'session-local-1');
 });
 
+test('skips teplohod placeholder image and falls back to venue hero', () => {
+  const result = mapGroupedPublicSession(catalogRow({
+    sourceCode: 'TEPLOHOD',
+    imageUrl: 'https://api.teplohod.info/v1/image?item=&dirtyAlias=placeHolder.gif',
+    venueHeroImageUrl: 'https://api.teplohod.info/v1/image?item=Event179&dirtyAlias=b82266d150-1.jpg',
+  }));
+
+  assert.equal(
+    result.imageUrl,
+    'https://api.teplohod.info/v1/image?item=Event179&dirtyAlias=b82266d150-1.jpg',
+  );
+});
+
 test('uses ProviderLink SESSION parent identity for a Teplohod slot', () => {
   const result = mapGroupedPublicSession(catalogRow({
     sourceCode: 'TEPLOHOD',

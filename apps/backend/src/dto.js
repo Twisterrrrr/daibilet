@@ -7415,10 +7415,13 @@ function buildLandingRuleEvent(row, tags, destination, category) {
 }
 
 function resolvePublicSessionImageUrl(row) {
-  if (row.overrideImageUrl) return row.overrideImageUrl;
-  if (row.imageUrl) return row.imageUrl;
-  if (row.venueHeroImageUrl) return row.venueHeroImageUrl;
-  if (row.cityHeroImageUrl) return row.cityHeroImageUrl;
+  const direct = pickFirstUsableEventImageUrl(
+    row.overrideImageUrl,
+    row.imageUrl,
+    row.venueHeroImageUrl,
+    row.cityHeroImageUrl,
+  );
+  if (direct) return direct;
 
   const slug = row.citySlug || row.sourceCitySlug;
   if (!slug) return null;
@@ -7426,6 +7429,22 @@ function resolvePublicSessionImageUrl(row) {
   const imageSlug = CITY_CARD_IMAGE_ALIASES[slug] || slug;
   if (!CITY_CARD_IMAGE_SLUGS.has(imageSlug)) return null;
   return `/images/cities/${imageSlug}.png`;
+}
+
+function isPlaceholderEventImageUrl(imageUrl) {
+  const raw = String(imageUrl || '').trim();
+  if (!raw) return true;
+  const lower = raw.toLowerCase();
+  if (lower.includes('placeholder.gif')) return true;
+  if (/api\.teplohod\.info\/v1\/image\?item=&/i.test(raw)) return true;
+  return false;
+}
+
+function pickFirstUsableEventImageUrl(...candidates) {
+  for (const candidate of candidates) {
+    if (candidate && !isPlaceholderEventImageUrl(candidate)) return candidate;
+  }
+  return null;
 }
 
 const KNOWN_SESSION_CITIES = [

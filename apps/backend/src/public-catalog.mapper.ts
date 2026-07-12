@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { matchingLandingSlugs } from './landing-rules.js';
 import { isFutureSlotStart, isOpenDateCatalogRow } from './catalog-availability.js';
+import { pickFirstUsableEventImageUrl } from './event-image-url.js';
 import {
   buildProviderWidgetUrl,
   providerForSource,
@@ -328,10 +329,9 @@ function cityNameStem(city: string): string {
 }
 
 function resolvePublicSessionImageUrl(row: PublicCatalogMappingRow): string | null {
-  if (row.overrideImageUrl) return row.overrideImageUrl;
-  if (row.imageUrl) return row.imageUrl;
-  if (row.venueHeroImageUrl) return row.venueHeroImageUrl;
-  if (row.cityHeroImageUrl) return row.cityHeroImageUrl;
+  const direct = pickFirstUsableEventImageUrl(row.overrideImageUrl, row.imageUrl, row.venueHeroImageUrl, row.cityHeroImageUrl);
+  if (direct) return direct;
+
   const slug = row.citySlug;
   if (!slug) return null;
   const imageSlug = cityImageAliases[slug] || slug;

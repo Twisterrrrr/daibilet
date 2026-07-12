@@ -685,7 +685,19 @@ function loadRootEnv(projectRoot) {
 }
 
 function firstImage(images) {
-  return Array.isArray(images) && images.length ? images[0] : null;
+  if (!Array.isArray(images)) return null;
+  for (const url of images) {
+    if (url && !isTeplohodPlaceholderImage(url)) return url;
+  }
+  return null;
+}
+
+function isTeplohodPlaceholderImage(imageUrl) {
+  const raw = String(imageUrl || '').trim().toLowerCase();
+  if (!raw) return true;
+  if (raw.includes('placeholder.gif')) return true;
+  if (/api\.teplohod\.info\/v1\/image\?item=&/.test(raw)) return true;
+  return false;
 }
 
 function money(input) {

@@ -14,6 +14,7 @@ import {
   resolveSessionPurchaseExternalId,
 } from './provider-purchase.js';
 import { getPublicCatalogSessions } from './public-catalog.dto.js';
+import { pickFirstUsableEventImageUrl } from './event-image-url.js';
 import { pickCatalogSubcategories } from './public-catalog.mapper.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
 import type {
@@ -254,7 +255,12 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     }),
     title,
     description: cleanImportedDescription(requestedEvent.override?.description || requestedEvent.description),
-    imageUrl: requestedEvent.override?.imageUrl || requestedEvent.imageUrl || requestedEvent.venue?.heroImageUrl || requestedEvent.primaryCity?.heroImageUrl || null,
+    imageUrl: pickFirstUsableEventImageUrl(
+      requestedEvent.override?.imageUrl,
+      requestedEvent.imageUrl,
+      requestedEvent.venue?.heroImageUrl,
+      requestedEvent.primaryCity?.heroImageUrl,
+    ),
     category: requestedEvent.category?.title || 'События',
     tags,
     subcategories,

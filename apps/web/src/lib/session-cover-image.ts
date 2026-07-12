@@ -2,11 +2,13 @@ import type { PublicSessionDto } from '@daibilet/contracts/public';
 
 type PublicSession = PublicSessionDto;
 
-/** Есть ли у события реальная обложка (не заглушка города). */
+/** Есть ли у события реальная обложка (не заглушка города / teplohod placeholder). */
 export function sessionHasCoverImage(session: Pick<PublicSession, 'imageUrl'>): boolean {
   const url = String(session.imageUrl || '').trim();
   if (!url) return false;
   if (url.startsWith('/images/cities/')) return false;
+  if (/placeholder\.gif/i.test(url)) return false;
+  if (/api\.teplohod\.info\/v1\/image\?item=&/i.test(url)) return false;
   return true;
 }
 
