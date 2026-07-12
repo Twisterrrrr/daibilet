@@ -52,7 +52,7 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
   const sessionMetaLabel = openDate
     ? null
     : multipleSlots && displaySlotLabels.length > 1
-      ? `${displaySlotLabels.length} ближайших даты`
+      ? nextSessionLabel
       : isToday && displaySlots.length > 0
         ? displaySlots.length === 1
           ? `Сегодня, ${displaySlots[0]}`
@@ -153,27 +153,27 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
           <p className="mt-1 line-clamp-1 text-[10px] text-slate-600 sm:text-xs">{highlights.join(' • ')}</p>
         ) : null}
         {descriptionText ? <p className="mt-2 line-clamp-3 text-[10px] text-slate-600 sm:text-xs">{descriptionText}</p> : null}
-        <div className="mt-2 flex min-h-6 flex-wrap items-start gap-1.5">
-          {showSlotPills
-            ? (multipleSlots ? displaySlotLabels : displaySlots).map((label) =>
-                purchaseEnabled ? (
-                  <CatalogPurchaseChip
-                    key={label}
-                    session={session}
-                    label={label}
-                    className={`${SLOT_CHIP_CLASS} ${SLOT_CHIP_PURCHASE_CLASS}`}
-                    onOpen={openPurchase}
-                  >
-                    {label}
-                  </CatalogPurchaseChip>
-                ) : (
-                  <span key={label} className={SLOT_CHIP_CLASS}>
-                    {label}
-                  </span>
-                ),
-              )
-            : null}
-        </div>
+        {showSlotPills ? (
+          <div className="mt-2 flex flex-wrap items-start gap-1.5">
+            {(multipleSlots ? displaySlotLabels : displaySlots).map((label) =>
+              purchaseEnabled ? (
+                <CatalogPurchaseChip
+                  key={label}
+                  session={session}
+                  label={label}
+                  className={`${SLOT_CHIP_CLASS} ${SLOT_CHIP_PURCHASE_CLASS}`}
+                  onOpen={openPurchase}
+                >
+                  {label}
+                </CatalogPurchaseChip>
+              ) : (
+                <span key={label} className={SLOT_CHIP_CLASS}>
+                  {label}
+                </span>
+              ),
+            )}
+          </div>
+        ) : null}
 
         {purchaseEnabled ? (
           <CatalogPurchaseAnchors
