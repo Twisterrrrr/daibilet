@@ -59,10 +59,6 @@ export function InstitutionCard({
             {typeLabel}
           </span>
         </div>
-
-        <div className="absolute right-3 top-3 rounded-full bg-slate-900/80 px-2.5 py-1 text-xs font-semibold text-white backdrop-blur">
-          {venue.events > 0 ? pluralEvents(venue.events) : 'Скоро'}
-        </div>
       </div>
 
       <div className="flex flex-1 flex-col p-4">
