@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 
 import { SiteFooter } from '@/components/SiteFooter';
 import { SiteHeader } from '@/components/SiteHeader.client';
+import { SelectedCityProvider } from '@/components/SelectedCityProvider.client';
 import { SiteProviders } from '@/components/SiteProviders.client';
 
 export async function SiteLayout({ children }: { children: React.ReactNode }) {
@@ -18,13 +19,15 @@ export async function SiteLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <SiteProviders>
-      <div className="flex min-h-screen flex-col bg-background">
-        <Suspense fallback={<div aria-hidden="true" className="site-header-spacer" />}>
-          <SiteHeader destinations={destinations} />
-        </Suspense>
-        <main className="flex-1">{children}</main>
-        <SiteFooter destinations={destinations} />
-      </div>
+      <Suspense fallback={<div aria-hidden="true" className="site-header-spacer" />}>
+        <SelectedCityProvider destinations={destinations}>
+          <div className="flex min-h-screen flex-col bg-background">
+            <SiteHeader destinations={destinations} />
+            <main className="flex-1">{children}</main>
+            <SiteFooter destinations={destinations} />
+          </div>
+        </SelectedCityProvider>
+      </Suspense>
     </SiteProviders>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { Heart, HelpCircle, LogIn, Menu, User, X } from 'lucide-react';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 
@@ -9,10 +9,9 @@ import { CityPicker } from '@/components/CityPicker.client';
 import { DaibiletLogo } from '@/components/DaibiletLogo';
 import { FavoritesPanel } from '@/components/FavoritesPanel.client';
 import { HeaderSearch } from '@/components/HeaderSearch.client';
+import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { useUserAuthOptional } from '@/hooks/useUserAuth';
-import { persistSelectedCity, resolveCityLabel } from '@/lib/selected-city';
-import { cityHref } from '@/lib/routes';
 
 const NAV_LINKS = [
   { label: 'События', href: '/events' },
@@ -36,7 +35,6 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
@@ -44,17 +42,17 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   const [authMounted, setAuthMounted] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const auth = useUserAuthOptional();
+  const selectedCity = useSelectedCityOptional();
 
   const urlCity = searchParams.get('city');
-  const [cityLabel, setCityLabel] = useState('Все города');
 
   useEffect(() => {
     setAuthMounted(true);
   }, []);
 
-  useEffect(() => {
-    setCityLabel(resolveCityLabel(destinations, urlCity));
-  }, [destinations, urlCity, pathname]);
+  const cityLabel = selectedCity?.cityLabel ?? 'Все города';
+  const cityValue = selectedCity?.cityValue ?? 'all';
+  const onCityChange = selectedCity?.setCity ?? (() => undefined);
 
   useEffect(() => {
     if (!userMenuOpen) return;
@@ -75,41 +73,8 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   }, [favoritesOpen, mobileOpen]);
 
   const isLoggedIn = authMounted && Boolean(auth?.isLoggedIn);
-  const cityValue = cityLabel === 'Все города' ? 'all' : cityLabel;
   const searchCityFilter = urlCity || (cityValue !== 'all' ? cityValue : undefined);
   const searchInitialQuery = pathname.startsWith('/events') ? searchParams.get('q') || '' : '';
-
-  const onCityChange = (name: string) => {
-    persistSelectedCity(name);
-    setCityLabel(name === 'all' ? 'Все города' : name);
-
-    if (name === 'all') {
-      if (pathname.startsWith('/events')) {
-        const params = new URLSearchParams(searchParams.toString());
-        params.delete('city');
-        const query = params.toString();
-        router.push(query ? `/events?${query}` : '/events');
-      } else {
-        router.push('/events');
-      }
-      return;
-    }
-
-    if (pathname === '/') {
-      router.push(`/events?city=${encodeURIComponent(name)}`);
-      return;
-    }
-
-    if (pathname.startsWith('/events')) {
-      const params = new URLSearchParams(searchParams.toString());
-      params.set('city', name);
-      router.push(`/events?${params.toString()}`);
-      return;
-    }
-
-    const city = destinations.find((item) => item.name === name);
-    router.push(city ? cityHref(city) : `/events?city=${encodeURIComponent(name)}`);
-  };
 
   return (
     <>

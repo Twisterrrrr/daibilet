@@ -1,11 +1,12 @@
 'use client';
 
 import { CalendarDays, Landmark, MapPin, Search, Ticket } from 'lucide-react';
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 import { CityPicker } from '@/components/CityPicker.client';
 import { HomeHeroBackground } from '@/components/HomeHeroBackground.client';
+import { useSelectedCity } from '@/components/SelectedCityProvider.client';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { buildCatalogHref } from '@/lib/catalog-url';
 import { cityToPrepositional } from '@/lib/city-declension';
@@ -19,7 +20,6 @@ import {
   roundStatToTen,
 } from '@/lib/format';
 import { HERO_QUICK_CHIPS } from '@/lib/home-scenarios';
-import { matchDestination } from '@/lib/selected-city';
 
 const HERO_DATE_OPTIONS = [
   { value: 'all', label: 'Любая дата' },
@@ -37,14 +37,10 @@ type HomeHeroProps = {
 
 export function HomeHero({ destinations, totalEvents, totalVenues, cityCount }: HomeHeroProps) {
   const router = useRouter();
-  const [destination, setDestination] = useState('all');
+  const { cityValue: destination, setCity: setDestination, selectedDestination } = useSelectedCity();
   const [heroQuery, setHeroQuery] = useState('');
   const [heroDate, setHeroDate] = useState('all');
 
-  const selectedDestination = useMemo(
-    () => (destination === 'all' ? null : matchDestination(destinations, destination)),
-    [destination, destinations],
-  );
   const selectedCityName = selectedDestination?.name || null;
 
   const openCatalog = (extra?: Record<string, string>) => {
