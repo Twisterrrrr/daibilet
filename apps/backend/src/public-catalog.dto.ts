@@ -23,7 +23,7 @@ const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
 const CATALOG_GROUP_TITLE_SQL = `regexp_replace(
   regexp_replace(
     regexp_replace(
-      trim(coalesce(title, '')),
+      trim(coalesce(nullif(trim("overrideTitle"), ''), title, '')),
       '^\\\\d{1,2}[./]\\\\d{1,2}(?:[./]\\\\d{2,4})?(?:\\\\s*(?:,\\\\s*|\\\\s+в\\\\s+))?\\\\d{1,2}:\\\\d{2}.*',
       '',
       'i'

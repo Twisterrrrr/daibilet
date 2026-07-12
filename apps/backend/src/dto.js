@@ -2765,7 +2765,9 @@ function mergeCatalogDisplayTitle(currentTitle, candidateTitle, venue) {
   return resolveCatalogDisplayTitle(candidates[0], venue);
 }
 
-function catalogGroupTitleSqlExpression(column = 'title') {
+const CATALOG_GROUP_TITLE_SOURCE_SQL = `coalesce(nullif(trim("overrideTitle"), ''), title)`;
+
+function catalogGroupTitleSqlExpression(column = CATALOG_GROUP_TITLE_SOURCE_SQL) {
   return `regexp_replace(
     regexp_replace(
       regexp_replace(
@@ -6509,6 +6511,7 @@ async function destinationSummaryRowsFast(db) {
           source.code as "sourceCode",
           coalesce(source.name, source.code::text, primary_offer."sourceCode"::text, '') as "sourceLabel",
           e.title,
+          override.title as "overrideTitle",
           e.kind,
           e."sourceStatus",
           city.id as "cityId",
@@ -6537,6 +6540,7 @@ async function destinationSummaryRowsFast(db) {
         left join "City" city on city.id = e."primaryCityId"
         left join "Region" region on region.id = city."regionId"
         left join "Venue" venue on venue.id = e."venueId"
+        left join "EventOverride" override on override."eventId" = e.id
         left join "EventSourceLink" source_link on source_link."eventId" = e.id
         left join "Source" source on source.id = source_link."sourceId"
         left join "EventSession" session on session."eventId" = e.id
@@ -6548,6 +6552,7 @@ async function destinationSummaryRowsFast(db) {
           source.code,
           source_link."externalId",
           primary_offer."sourceCode",
+          override.id,
           city.id,
           city.title,
           city.slug,
@@ -6583,7 +6588,7 @@ async function destinationSummaryRowsFast(db) {
             '|',
             lower(regexp_replace(trim(coalesce("sourceLabel", '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(
-              nullif(trim(${catalogGroupTitleSqlExpression('title')}), ''),
+              nullif(trim(${catalogGroupTitleSqlExpression()}), ''),
               trim(coalesce(venue, ''))
             )), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
@@ -7196,7 +7201,7 @@ async function publicCatalogSessionsFast(db) {
             '|',
             lower(regexp_replace(trim(coalesce("sourceLabel", '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(
-              nullif(trim(${catalogGroupTitleSqlExpression('title')}), ''),
+              nullif(trim(${catalogGroupTitleSqlExpression()}), ''),
               trim(coalesce(venue, ''))
             )), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
