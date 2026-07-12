@@ -145,7 +145,11 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
       {!showMultiPurchase ? (
         <div className="mt-5">
           {isTepWidget && teplohod ? (
-            <TeplohodWidgetEmbed tepEventId={teplohod.tepEventId} tepWidgetId={teplohod.tepWidgetId} />
+            <TeplohodWidgetEmbed
+              tepEventId={teplohod.tepEventId}
+              tepWidgetId={teplohod.tepWidgetId}
+              purchaseUrl={event.purchaseUrl || event.widgetUrl || purchaseUrl}
+            />
           ) : isTcWidget && tcEventId ? (
             <TcWidgetButton
               tcEventId={tcEventId}

@@ -95,6 +95,8 @@ export function CatalogPurchaseAnchors({
           tepEventId={teplohod.tepEventId}
           tepWidgetId={teplohod.tepWidgetId}
           wrapperId={teplohodWrapperId}
+          purchaseUrl={session.purchaseUrl || session.widgetUrl}
+          showFallbackButton={false}
         />
       ) : null}
       {tcEventId && tcToken ? (
