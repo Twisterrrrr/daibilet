@@ -8,7 +8,7 @@ Type=simple
 WorkingDirectory=/opt/daibilet
 EnvironmentFile=/opt/daibilet/.env
 Environment=NODE_ENV=production
-ExecStart=/usr/bin/env sh -lc 'PUBLIC_PORT="${PUBLIC_PORT:-3000}" pnpm --filter "${PUBLIC_APP_FILTER:-@daibilet/public}" preview'
+ExecStart=/usr/bin/env bash deploy/scripts/start-public.sh
 Restart=always
 RestartSec=5
 

@@ -27,9 +27,15 @@ function copyFallbackData() {
   fs.copyFileSync(source, target);
 }
 
+function removeTypecheckCache() {
+  const cacheFile = path.join(appDir, 'tsconfig.tsbuildinfo');
+  if (fs.existsSync(cacheFile)) fs.rmSync(cacheFile, { force: true });
+}
+
 const task = process.argv[2];
 
 if (task === 'typecheck') {
+  removeTypecheckCache();
   run('next', ['typegen']);
   run('tsc', ['--noEmit', '-p', 'tsconfig.json']);
 } else if (task === 'build') {

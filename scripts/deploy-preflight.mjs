@@ -55,6 +55,7 @@ function checkRequiredFiles() {
     'pnpm-workspace.yaml',
     'packages/db/prisma/schema.prisma',
     'deploy/scripts/deploy-from-git.sh',
+    'deploy/scripts/start-public.sh',
     'deploy/systemd/daibilet-api.service',
     'deploy/systemd/daibilet-public.service',
     'deploy/nginx/daibilet.conf.example',
@@ -113,17 +114,19 @@ function checkPublicTarget() {
   record(Boolean(target), `PUBLIC_APP_FILTER package exists: ${filter}`, target?.dir || '', 'Cursor apps/web must declare package name @daibilet/web before switching');
   if (!target) return;
   record(Boolean(target.scripts?.build), `${filter} has build script`);
-  record(Boolean(target.scripts?.preview), `${filter} has preview script`);
+  record(Boolean(target.scripts?.preview || target.scripts?.start), `${filter} has preview or start script`);
 }
 
 function checkDeployScripts() {
   const deployScript = readText('deploy/scripts/deploy-from-git.sh');
+  const startPublicScript = readText('deploy/scripts/start-public.sh');
   const publicService = readText('deploy/systemd/daibilet-public.service');
   const nginx = readText('deploy/nginx/daibilet.conf.example');
 
   record(deployScript.includes('PUBLIC_APP_FILTER'), 'deploy script uses PUBLIC_APP_FILTER');
   record(deployScript.includes('RUN_LAUNCH_SMOKE'), 'deploy script supports optional launch smoke');
-  record(publicService.includes('PUBLIC_APP_FILTER'), 'public systemd service uses PUBLIC_APP_FILTER');
+  record(startPublicScript.includes('PUBLIC_APP_FILTER'), 'public start helper uses PUBLIC_APP_FILTER');
+  record(publicService.includes('start-public.sh'), 'public systemd service uses start-public helper');
   record(nginx.includes('upstream daibilet_public'), 'nginx template has daibilet_public upstream');
   record(nginx.includes('server_name api.daibilet.ru'), 'nginx template has api.daibilet.ru server');
   record(nginx.includes('location ^~ /api/public/'), 'nginx routes /api/public/* separately');

@@ -63,7 +63,7 @@ await run('admin sources health', async () => {
     return ['error', 'blocked'].includes(String(status).toLowerCase()) || issues.length > 0;
   });
   if (problematic.length) {
-    context.sourceIssues = problematic.map((source) => source.code || source.name).join(', ');
+    context.sourceIssues = problematic.map(sourceLabel).join(', ');
   }
 });
 
@@ -189,6 +189,10 @@ function listFromPayload(payload, keys) {
     if (Array.isArray(payload?.[key])) return payload[key];
   }
   return [];
+}
+
+function sourceLabel(source) {
+  return source.label || source.name || source.sourceCode || source.code || source.id || 'unknown source';
 }
 
 function totalFromPayload(payload, list) {
