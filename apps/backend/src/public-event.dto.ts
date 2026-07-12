@@ -683,14 +683,32 @@ function buildMergedPurchaseOptions(
         purchaseUrlSource: purchase.urlSource,
       } as PublicPurchaseOptionDto;
     })
-    .filter((option): option is PublicPurchaseOptionDto => option !== null)
-    .sort((left, right) =>
-      purchaseOptionSortKey(left.title) - purchaseOptionSortKey(right.title) ||
-      left.priceFrom! - right.priceFrom! ||
-      left.title.localeCompare(right.title, 'ru'),
-    );
+    .filter((option): option is PublicPurchaseOptionDto => option !== null);
 
-  return options;
+  return dedupePurchaseOptionsByTitle(options);
+}
+
+function dedupePurchaseOptionsByTitle(options: PublicPurchaseOptionDto[]): PublicPurchaseOptionDto[] {
+  const byTitle = new Map<string, PublicPurchaseOptionDto>();
+  for (const option of options) {
+    const key = normalizeGroupPart(option.title);
+    const current = byTitle.get(key);
+    if (!current) {
+      byTitle.set(key, option);
+      continue;
+    }
+    const optionPrice = option.priceFrom ?? Number.POSITIVE_INFINITY;
+    const currentPrice = current.priceFrom ?? Number.POSITIVE_INFINITY;
+    if (optionPrice < currentPrice) {
+      byTitle.set(key, option);
+    }
+  }
+
+  return [...byTitle.values()].sort((left, right) =>
+    purchaseOptionSortKey(left.title) - purchaseOptionSortKey(right.title) ||
+    (left.priceFrom ?? 0) - (right.priceFrom ?? 0) ||
+    left.title.localeCompare(right.title, 'ru'),
+  );
 }
 
 function buildTicketPrices(
