@@ -29,6 +29,12 @@ import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from 
 import { formatMoneyRange, formatPriceFrom } from '@/lib/format';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
 
+const SLOT_CHIP_CLASS =
+  'inline-btn inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-full bg-slate-100 px-2.5 text-[10px] font-medium leading-none text-slate-700';
+
+const SLOT_CHIP_PURCHASE_CLASS =
+  'transition hover:bg-primary/10 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
+
 export function EventCardHorizontal({ session }: { session: PublicSessionDto }) {
   const [hasImageError, setHasImageError] = useState(false);
   const showImage = Boolean(session.imageUrl && !hasImageError);
@@ -42,11 +48,11 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
   const multipleSlots = hasMultipleCatalogSlots(session);
   const displaySlotLabels = multipleSlots ? collectDisplaySlotLabels(session) : [];
   const displaySlots = collectDisplaySlotTimes(session, { todayOnly: isToday && !multipleSlots });
-  const showSlotPills = multipleSlots ? displaySlotLabels.length > 1 : isToday && displaySlots.length > 0;
+  const showSlotPills = multipleSlots ? displaySlotLabels.length > 1 : isToday && displaySlots.length > 1;
   const sessionMetaLabel = openDate
     ? null
     : multipleSlots && displaySlotLabels.length > 1
-      ? nextSessionLabel
+      ? `${displaySlotLabels.length} ближайших даты`
       : isToday && displaySlots.length > 0
         ? displaySlots.length === 1
           ? `Сегодня, ${displaySlots[0]}`
@@ -60,6 +66,7 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
   const priceFooterLabel = formatMoneyRange(session.priceFrom, session.priceTo);
   const { purchaseEnabled, teplohod, tcEventId, tcToken, tcTriggerRef, teplohodWrapperId, openPurchase } =
     useCatalogPurchase(session);
+  const metaOpensPurchase = purchaseEnabled && Boolean(sessionMetaLabel) && !showSlotPills;
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200/60 sm:flex-row">
@@ -114,11 +121,11 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
               Через {departingSoonMinutes} мин
             </span>
           ) : sessionMetaLabel ? (
-            purchaseEnabled ? (
+            metaOpensPurchase ? (
               <CatalogPurchaseChip
                 session={session}
                 label={sessionMetaLabel}
-                className="inline-flex font-medium text-primary-600 underline decoration-primary/30 underline-offset-2"
+                className={`inline-flex font-medium text-primary-600 ${SLOT_CHIP_PURCHASE_CLASS}`}
                 onOpen={openPurchase}
               >
                 {sessionMetaLabel}
@@ -146,21 +153,27 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
           <p className="mt-1 line-clamp-1 text-[10px] text-slate-600 sm:text-xs">{highlights.join(' • ')}</p>
         ) : null}
         {descriptionText ? <p className="mt-2 line-clamp-3 text-[10px] text-slate-600 sm:text-xs">{descriptionText}</p> : null}
-        {showSlotPills ? (
-          <div className="mt-2 flex flex-wrap gap-2">
-            {(multipleSlots ? displaySlotLabels : displaySlots).map((label) => (
-              <CatalogPurchaseChip
-                key={label}
-                session={session}
-                label={label}
-                className="rounded-lg border border-slate-300 px-3 py-1 text-xs text-slate-800"
-                onOpen={openPurchase}
-              >
-                {label}
-              </CatalogPurchaseChip>
-            ))}
-          </div>
-        ) : null}
+        <div className="mt-2 flex min-h-6 flex-wrap items-start gap-1.5">
+          {showSlotPills
+            ? (multipleSlots ? displaySlotLabels : displaySlots).map((label) =>
+                purchaseEnabled ? (
+                  <CatalogPurchaseChip
+                    key={label}
+                    session={session}
+                    label={label}
+                    className={`${SLOT_CHIP_CLASS} ${SLOT_CHIP_PURCHASE_CLASS}`}
+                    onOpen={openPurchase}
+                  >
+                    {label}
+                  </CatalogPurchaseChip>
+                ) : (
+                  <span key={label} className={SLOT_CHIP_CLASS}>
+                    {label}
+                  </span>
+                ),
+              )
+            : null}
+        </div>
 
         {purchaseEnabled ? (
           <CatalogPurchaseAnchors

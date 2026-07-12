@@ -137,7 +137,7 @@ export function CatalogPurchaseChip({
       type="button"
       title="Купить билет на это время"
       aria-label={`Купить билет: ${label}`}
-      className={`relative z-[2] cursor-pointer transition hover:border-primary/40 hover:bg-primary/5 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${className || ''}`}
+      className={`inline-btn relative z-[2] ${className || ''}`}
       onClick={(event) => {
         stopCardNavigation(event);
         onOpen(label);

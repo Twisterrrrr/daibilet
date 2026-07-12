@@ -33,6 +33,12 @@ import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from 
 import { formatMoneyRange, formatPriceFrom } from '@/lib/format';
 import { eventHref } from '@/lib/routes';
 
+const SLOT_CHIP_CLASS =
+  'inline-btn inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-full bg-slate-100 px-2.5 text-[10px] font-medium leading-none text-slate-700';
+
+const SLOT_CHIP_PURCHASE_CLASS =
+  'transition hover:bg-primary/10 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
+
 type EventCardProps = {
   session: PublicSessionDto;
   compact?: boolean;
@@ -69,7 +75,7 @@ export function EventCard({
   const sessionMetaLabel = openDate
     ? null
     : multipleSlots && displaySlotLabels.length > 1
-      ? nextSessionLabel
+      ? `${displaySlotLabels.length} ближайших даты`
       : isToday && displaySlots.length > 0
         ? displaySlots.length === 1
           ? `Сегодня, ${displaySlots[0]}`
@@ -82,6 +88,7 @@ export function EventCard({
   const priceFooterLabel = formatMoneyRange(session.priceFrom, session.priceTo);
   const { purchaseEnabled, teplohod, tcEventId, tcToken, tcTriggerRef, teplohodWrapperId, openPurchase } =
     useCatalogPurchase(session);
+  const metaOpensPurchase = purchaseEnabled && Boolean(sessionMetaLabel) && !showSlotPills;
 
   const cardClassName =
     'group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-slate-200/60';
@@ -154,11 +161,11 @@ export function EventCard({
               Через {departingSoonMinutes} мин
             </span>
           ) : sessionMetaLabel ? (
-            purchaseEnabled ? (
+            metaOpensPurchase ? (
               <CatalogPurchaseChip
                 session={session}
                 label={sessionMetaLabel}
-                className="inline-flex font-medium text-primary-600 underline decoration-primary/30 underline-offset-2"
+                className={`inline-flex font-medium text-primary-600 ${SLOT_CHIP_PURCHASE_CLASS}`}
                 onOpen={openPurchase}
               >
                 {sessionMetaLabel}
@@ -186,21 +193,27 @@ export function EventCard({
           </ul>
         ) : null}
 
-        {showSlotPills ? (
-          <div className="mt-2 flex flex-wrap gap-1.5">
-            {(multipleSlots ? displaySlotLabels : displaySlots).map((label) => (
-              <CatalogPurchaseChip
-                key={label}
-                session={session}
-                label={label}
-                className="inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white px-2.5 text-[10px] font-medium leading-none text-slate-800"
-                onOpen={openPurchase}
-              >
-                {label}
-              </CatalogPurchaseChip>
-            ))}
-          </div>
-        ) : null}
+        <div className="mt-2 flex min-h-6 flex-wrap items-start gap-1.5">
+          {showSlotPills
+            ? (multipleSlots ? displaySlotLabels : displaySlots).map((label) =>
+                purchaseEnabled ? (
+                  <CatalogPurchaseChip
+                    key={label}
+                    session={session}
+                    label={label}
+                    className={`${SLOT_CHIP_CLASS} ${SLOT_CHIP_PURCHASE_CLASS}`}
+                    onOpen={openPurchase}
+                  >
+                    {label}
+                  </CatalogPurchaseChip>
+                ) : (
+                  <span key={label} className={SLOT_CHIP_CLASS}>
+                    {label}
+                  </span>
+                ),
+              )
+            : null}
+        </div>
 
         {purchaseEnabled ? (
           <CatalogPurchaseAnchors
