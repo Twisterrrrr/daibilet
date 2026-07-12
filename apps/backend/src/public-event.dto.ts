@@ -13,6 +13,7 @@ import {
   purchaseInfo,
   resolveSessionPurchaseExternalId,
 } from './provider-purchase.js';
+import type { PurchaseProvider } from './types/common.js';
 import { getPublicCatalogSessions } from './public-catalog.dto.js';
 import { pickFirstUsableEventImageUrl } from './event-image-url.js';
 import { pickCatalogSubcategories } from './public-catalog.mapper.js';
@@ -141,13 +142,20 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
   });
   const eventsById = new Map(groupEvents.map((event) => [event.id, event]));
   if (!eventsById.has(requestedEvent.id)) eventsById.set(requestedEvent.id, requestedEvent);
-  const representative = eventsById.get(targetCatalogSession?.id || '') || requestedEvent;
+  const purchaseProvider = pickGroupPurchaseProvider(targetCatalogSession, groupEvents, requestedEvent);
+  const purchaseGroupEventIds = filterGroupEventIdsByPurchaseProvider(
+    groupEventIds,
+    eventsById,
+    purchaseProvider,
+    requestedEvent.id,
+  );
+  const representative = eventsById.get(targetCatalogSession?.id || purchaseGroupEventIds[0] || '') || requestedEvent;
 
   const now = new Date();
   const [sessionRows, offerRows] = await Promise.all([
     prisma.eventSession.findMany({
       where: {
-        eventId: { in: groupEventIds },
+        eventId: { in: purchaseGroupEventIds },
         OR: [
           { endsAt: { gte: now } },
           { startsAt: { gte: now } },
@@ -169,7 +177,7 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     ),
     prisma.eventOffer.findMany({
       where: {
-        eventId: { in: groupEventIds },
+        eventId: { in: purchaseGroupEventIds },
         active: true,
         priceRub: { gte: MIN_DISPLAY_PRICE_RUB },
       },
@@ -215,7 +223,9 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     eventPurchaseUrl,
     targetCatalogSession,
   );
-  const sessions = publicSessions.length ? publicSessions : widgetOnlySessions;
+  const sessions = dedupePublicEventSessionsByStartsAt(
+    publicSessions.length ? publicSessions : widgetOnlySessions,
+  );
   const tags = orderedEventTags(requestedEvent);
   const subcategories = pickCatalogSubcategories({
     category: requestedEvent.category?.title || null,
@@ -498,6 +508,85 @@ function primaryOfferMap(offers: MappedOffer[]): Map<string, MappedOffer> {
     if (!result.has(offer.eventId)) result.set(offer.eventId, offer);
   }
   return result;
+}
+
+function purchaseProviderForEvent(event: EventRecord): PurchaseProvider | null {
+  return providerForSource(eventIdentity(event).sourceCode);
+}
+
+function pickGroupPurchaseProvider(
+  catalogSession: PublicSessionDto | undefined,
+  groupEvents: EventRecord[],
+  requestedEvent: EventRecord,
+): PurchaseProvider | null {
+  const fromCatalog = providerForSource(
+    catalogSession?.purchaseProvider || catalogSession?.offerSourceCode || catalogSession?.sourceCode,
+  );
+  if (fromCatalog) return fromCatalog;
+
+  const requestedProvider = purchaseProviderForEvent(requestedEvent);
+  if (requestedProvider) return requestedProvider;
+
+  for (const event of groupEvents) {
+    if (purchaseProviderForEvent(event) === 'TEPLOHOD') return 'TEPLOHOD';
+  }
+  for (const event of groupEvents) {
+    if (purchaseProviderForEvent(event) === 'TICKETSCLOUD') return 'TICKETSCLOUD';
+  }
+  return null;
+}
+
+function filterGroupEventIdsByPurchaseProvider(
+  groupEventIds: string[],
+  eventsById: Map<string, EventRecord>,
+  provider: PurchaseProvider | null,
+  requestedEventId: string,
+): string[] {
+  if (!provider || groupEventIds.length <= 1) {
+    return groupEventIds.includes(requestedEventId)
+      ? groupEventIds
+      : [requestedEventId, ...groupEventIds];
+  }
+
+  const filtered = groupEventIds.filter((id) => {
+    const event = eventsById.get(id);
+    if (!event) return id === requestedEventId;
+    return purchaseProviderForEvent(event) === provider;
+  });
+
+  if (!filtered.length) return [requestedEventId];
+  if (!filtered.includes(requestedEventId)) return [requestedEventId, ...filtered];
+  return filtered;
+}
+
+function scorePublicEventSession(session: PublicEventSession): number {
+  let score = 0;
+  if (session.purchaseReady !== false) score += 40;
+  if (typeof session.vacant === 'number') {
+    if (session.vacant > 0) score += 20 + Math.min(session.vacant, 180);
+    if (session.vacant === 0) score -= 30;
+  } else {
+    score += 5;
+  }
+  return score;
+}
+
+function dedupePublicEventSessionsByStartsAt(sessions: PublicEventSession[]): PublicEventSession[] {
+  const ranked = new Map<string, PublicEventSession>();
+
+  for (const session of sessions) {
+    const key = session.startsAt || session.id;
+    const current = ranked.get(key);
+    if (!current || scorePublicEventSession(session) > scorePublicEventSession(current)) {
+      ranked.set(key, session);
+    }
+  }
+
+  return [...ranked.values()].sort((left, right) => {
+    const leftTime = left.startsAt ? new Date(left.startsAt).getTime() : Number.POSITIVE_INFINITY;
+    const rightTime = right.startsAt ? new Date(right.startsAt).getTime() : Number.POSITIVE_INFINITY;
+    return leftTime - rightTime || String(left.id).localeCompare(String(right.id));
+  });
 }
 
 function buildTicketPrices(

@@ -7,7 +7,7 @@ import {
   openTcWidget,
   resolveTcWidgetToken,
 } from '@/components/TcWidget.client';
-import { ensureTeplohodWidgetScript, getTeplohodWidgetIds, TeplohodWidgetEmbed } from '@/components/TeplohodWidget.client';
+import { getTeplohodWidgetIds, openTeplohodPurchase, TeplohodWidgetEmbed } from '@/components/TeplohodWidget.client';
 import { extractTcEventIdFromSession } from '@/lib/event-purchase';
 import {
   canOpenCatalogPurchase,
@@ -37,15 +37,10 @@ export function useCatalogPurchase(session: PublicSessionDto) {
       const targetToken = resolveTcWidgetToken(target.purchaseUrl || session.purchaseUrl);
 
       if (targetTeplohod?.tepEventId) {
-        const tryClick = (attempt = 0) => {
-          const button = document.querySelector<HTMLElement>(`#${teplohodWrapperId} .ti-tickets-event-tickets-buy`);
-          if (button) {
-            button.click();
-            return;
-          }
-          if (attempt < 24) window.setTimeout(() => tryClick(attempt + 1), 150);
-        };
-        void ensureTeplohodWidgetScript().finally(() => window.setTimeout(() => tryClick(), 100));
+        openTeplohodPurchase({
+          wrapperId: teplohodWrapperId,
+          purchaseUrl: target.purchaseUrl || session.purchaseUrl || session.widgetUrl,
+        });
         return;
       }
 
@@ -91,7 +86,10 @@ export function CatalogPurchaseAnchors({
   if (!teplohod && !(tcEventId && tcToken)) return null;
 
   return (
-    <div className="pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0" aria-hidden="true">
+    <div
+      className="pointer-events-none fixed left-0 top-0 z-[-1] h-20 w-72 overflow-hidden opacity-0"
+      aria-hidden="true"
+    >
       {teplohod ? (
         <TeplohodWidgetEmbed
           tepEventId={teplohod.tepEventId}

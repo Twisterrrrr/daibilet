@@ -138,12 +138,29 @@ export function openTeplohodWidget(wrapperId = 'teplohod-widget') {
     const button = document.querySelector<HTMLElement>(`#${wrapperId} .ti-tickets-event-tickets-buy`);
     if (button) {
       button.click();
-      return;
+      return true;
     }
     if (attempt < 24) window.setTimeout(() => tryClick(attempt + 1), 150);
+    return false;
   };
 
   void ensureTeplohodWidgetScript().finally(() => window.setTimeout(() => tryClick(), 100));
+}
+
+export function openTeplohodPurchase(options: {
+  wrapperId?: string;
+  purchaseUrl?: string | null;
+}) {
+  const wrapperId = options.wrapperId || 'teplohod-widget';
+  void ensureTeplohodWidgetScript().finally(() => {
+    openTeplohodWidget(wrapperId);
+    window.setTimeout(() => {
+      const button = document.querySelector<HTMLElement>(`#${wrapperId} .ti-tickets-event-tickets-buy`);
+      if (!button && options.purchaseUrl) {
+        window.open(options.purchaseUrl, '_blank', 'noopener,noreferrer');
+      }
+    }, 3800);
+  });
 }
 
 export function TeplohodWidgetButton({
