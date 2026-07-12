@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Calendar as CalendarIcon, SlidersHorizontal, Users, Wallet, X } from 'lucide-react';
+import { Calendar as CalendarIcon, Users, Wallet, X } from 'lucide-react';
 
 import { formatNumber } from '@/lib/format';
 
@@ -25,12 +25,16 @@ export const AGE_FILTER_OPTIONS = [
 ] as const;
 
 const inputCls =
-  'h-10 w-full rounded-lg border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition hover:border-slate-300 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/40';
-const quickChipCls =
-  'rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60';
-const legendCls = 'mb-3 flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-500';
-const sectionCls = 'p-5 pt-6';
-const subLabelCls = 'mb-1 block text-[10px] font-semibold uppercase tracking-wide text-slate-400';
+  'h-9 w-full min-w-0 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-900 outline-none transition hover:border-slate-300 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30';
+const chipCls =
+  'inline-btn rounded-full border px-2.5 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50';
+const labelCls = 'mb-1.5 flex items-center gap-1 text-xs font-medium text-slate-600';
+
+function filterChip(active: boolean) {
+  return active
+    ? `${chipCls} border-primary bg-primary text-white`
+    : `${chipCls} border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50`;
+}
 
 export function CatalogAdvancedFiltersPanel({
   filters,
@@ -91,54 +95,43 @@ export function CatalogAdvancedFiltersPanel({
     <div
       id="advanced-filters-panel"
       role="region"
-      aria-labelledby="advanced-filters-title"
-      className="catalog-advanced-filters overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+      aria-label="Расширенные фильтры"
+      className="catalog-advanced-filters relative rounded-xl border border-slate-200 bg-white p-3 sm:p-4"
     >
-      <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-5 py-3">
-        <h3 id="advanced-filters-title" className="flex items-center gap-2 text-sm font-bold text-slate-900">
-          <SlidersHorizontal aria-hidden className="h-4 w-4 text-primary-600" />
-          Расширенные фильтры
-        </h3>
-        <button
-          ref={closeBtnRef}
-          type="button"
-          onClick={onClose}
-          className="grid h-8 w-8 place-items-center rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
-          aria-label="Закрыть панель фильтров"
-        >
-          <X aria-hidden className="h-4 w-4" />
-        </button>
-      </div>
+      <button
+        ref={closeBtnRef}
+        type="button"
+        onClick={onClose}
+        className="inline-btn absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+        aria-label="Закрыть панель фильтров"
+      >
+        <X aria-hidden className="h-3.5 w-3.5" />
+      </button>
 
-      <div className="grid grid-cols-1 divide-y divide-slate-200 md:grid-cols-3 md:divide-x md:divide-y-0">
-        <div className={sectionCls}>
-          <div className={legendCls}>
-            <CalendarIcon aria-hidden className="h-3.5 w-3.5" /> Дата события
+      <div className="grid gap-4 pr-8 lg:grid-cols-3 lg:gap-5">
+        <section>
+          <div className={labelCls}>
+            <CalendarIcon aria-hidden className="h-3.5 w-3.5 text-slate-400" />
+            Дата
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <label className="block">
-              <span className={subLabelCls}>с</span>
-              <input
-                type="date"
-                value={filters.dateFrom}
-                aria-label="Дата с"
-                onChange={(event) => onChange({ dateFrom: event.target.value })}
-                className={inputCls}
-              />
-            </label>
-            <label className="block">
-              <span className={subLabelCls}>по</span>
-              <input
-                type="date"
-                value={filters.dateTo}
-                min={filters.dateFrom || undefined}
-                aria-label="Дата по"
-                onChange={(event) => onChange({ dateTo: event.target.value })}
-                className={inputCls}
-              />
-            </label>
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              type="date"
+              value={filters.dateFrom}
+              aria-label="Дата с"
+              onChange={(event) => onChange({ dateFrom: event.target.value })}
+              className={inputCls}
+            />
+            <input
+              type="date"
+              value={filters.dateTo}
+              min={filters.dateFrom || undefined}
+              aria-label="Дата по"
+              onChange={(event) => onChange({ dateTo: event.target.value })}
+              className={inputCls}
+            />
           </div>
-          <div className="mt-3 flex flex-wrap gap-1.5">
+          <div className="mt-2 flex flex-wrap gap-1">
             {[
               { label: 'Сегодня', days: 0 },
               { label: 'Завтра', days: 1 },
@@ -154,47 +147,42 @@ export function CatalogAdvancedFiltersPanel({
                   to.setDate(today.getDate() + item.days);
                   setDateRange(isoDay(today), isoDay(to));
                 }}
-                className={quickChipCls}
+                className={filterChip(false)}
               >
                 {item.label}
               </button>
             ))}
           </div>
-        </div>
+        </section>
 
-        <div className={sectionCls}>
-          <div className={legendCls}>
-            <Wallet aria-hidden className="h-3.5 w-3.5" /> Цена, ₽
+        <section>
+          <div className={labelCls}>
+            <Wallet aria-hidden className="h-3.5 w-3.5 text-slate-400" />
+            Цена, ₽
           </div>
-          <div className="grid grid-cols-2 gap-3">
-            <label className="block">
-              <span className={subLabelCls}>от</span>
-              <input
-                type="number"
-                min={0}
-                step={100}
-                value={minDraft}
-                placeholder="0"
-                aria-label="Цена от, руб."
-                onChange={(event) => setMinDraft(event.target.value)}
-                className={inputCls}
-              />
-            </label>
-            <label className="block">
-              <span className={subLabelCls}>до</span>
-              <input
-                type="number"
-                min={0}
-                step={100}
-                value={maxDraft}
-                placeholder="∞"
-                aria-label="Цена до, руб."
-                onChange={(event) => setMaxDraft(event.target.value)}
-                className={inputCls}
-              />
-            </label>
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              type="number"
+              min={0}
+              step={100}
+              value={minDraft}
+              placeholder="от"
+              aria-label="Цена от, руб."
+              onChange={(event) => setMinDraft(event.target.value)}
+              className={inputCls}
+            />
+            <input
+              type="number"
+              min={0}
+              step={100}
+              value={maxDraft}
+              placeholder="до"
+              aria-label="Цена до, руб."
+              onChange={(event) => setMaxDraft(event.target.value)}
+              className={inputCls}
+            />
           </div>
-          <div className="mt-3 flex flex-wrap gap-1.5">
+          <div className="mt-2 flex flex-wrap gap-1">
             {[
               { label: 'Бесплатно', min: '0', max: '0' },
               { label: 'до 1000', min: '', max: '1000' },
@@ -208,83 +196,82 @@ export function CatalogAdvancedFiltersPanel({
                   setMinDraft(item.min);
                   setMaxDraft(item.max);
                 }}
-                className={quickChipCls}
+                className={filterChip(false)}
               >
                 {item.label}
               </button>
             ))}
           </div>
-        </div>
+        </section>
 
-        <div className={sectionCls}>
-          <div className={legendCls}>
-            <Users aria-hidden className="h-3.5 w-3.5" /> Возрастное ограничение
-          </div>
-          <div className="grid grid-cols-3 gap-1.5" role="radiogroup" aria-label="Возрастное ограничение">
-            <button
-              type="button"
-              role="radio"
-              aria-checked={filters.ageMax < 0}
-              onClick={() => onChange({ ageMax: -1 })}
-              className={`h-10 rounded-lg text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
-                filters.ageMax < 0 ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-              }`}
-            >
-              Любое
-            </button>
-            {AGE_FILTER_OPTIONS.map((option) => (
+        <section className="space-y-3">
+          <div>
+            <div className={labelCls}>
+              <Users aria-hidden className="h-3.5 w-3.5 text-slate-400" />
+              Возраст
+            </div>
+            <div className="flex flex-wrap gap-1" role="radiogroup" aria-label="Возрастное ограничение">
               <button
-                key={option.value}
                 type="button"
                 role="radio"
-                aria-checked={filters.ageMax === option.value}
-                onClick={() => onChange({ ageMax: option.value })}
-                className={`h-10 rounded-lg text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
-                  filters.ageMax === option.value ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                }`}
+                aria-checked={filters.ageMax < 0}
+                onClick={() => onChange({ ageMax: -1 })}
+                className={filterChip(filters.ageMax < 0)}
               >
-                до {option.label}
+                Любой
               </button>
-            ))}
+              {AGE_FILTER_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={filters.ageMax === option.value}
+                  onClick={() => onChange({ ageMax: option.value })}
+                  className={filterChip(filters.ageMax === option.value)}
+                >
+                  до {option.label}
+                </button>
+              ))}
+            </div>
           </div>
-          <p className="mt-3 text-[11px] leading-snug text-slate-400">
-            Покажем события, чей возрастной ценз не выше выбранного.
-          </p>
-        </div>
+
+          {landings.length ? (
+            <div>
+              <label htmlFor="catalog-advanced-landing" className={labelCls}>
+                Подборка
+              </label>
+              <select
+                id="catalog-advanced-landing"
+                value={filters.landing}
+                onChange={(event) => onChange({ landing: event.target.value })}
+                className={inputCls}
+              >
+                <option value="all">Все подборки</option>
+                {landings.map((item) => (
+                  <option key={item.slug} value={item.slug}>
+                    {item.title} · {formatNumber(item.events)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          ) : null}
+        </section>
       </div>
 
-      {landings.length ? (
-        <div className="border-t border-slate-200 px-5 py-4 pt-5">
-          <div className={legendCls}>Подборка</div>
-          <select
-            value={filters.landing}
-            onChange={(event) => onChange({ landing: event.target.value })}
-            className={`${inputCls} max-w-md`}
-          >
-            <option value="all">Все подборки</option>
-            {landings.map((item) => (
-              <option key={item.slug} value={item.slug}>
-                {item.title} · {formatNumber(item.events)}
-              </option>
-            ))}
-          </select>
-        </div>
-      ) : null}
-
-      <div className="flex items-center justify-between gap-2 border-t border-slate-200 bg-slate-50 px-5 py-3">
+      <div className="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
         <button
           type="button"
           onClick={onReset}
-          className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-white hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
+          className="inline-btn text-xs font-medium text-slate-500 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
         >
-          <X aria-hidden className="h-3.5 w-3.5" /> Сбросить всё
+          Сбросить
         </button>
         <button
           type="button"
           onClick={onClose}
-          className="rounded-full bg-primary-600 px-5 py-2 text-xs font-semibold text-white hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2"
+          className="inline-btn rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
         >
-          Применить
+          Готово
         </button>
       </div>
     </div>

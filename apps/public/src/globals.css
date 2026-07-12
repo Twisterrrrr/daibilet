@@ -87,6 +87,13 @@
     min-height: 44px;
   }
 
+  .catalog-advanced-filters button,
+  .catalog-advanced-filters select,
+  .catalog-advanced-filters input[type='date'],
+  .catalog-advanced-filters input[type='number'] {
+    min-height: 0;
+  }
+
   .event-favorite-btn {
     min-height: 0;
     min-width: 0;
