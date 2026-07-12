@@ -48,6 +48,8 @@ type EventCardProps = {
   showcaseRail?: boolean;
   editorsPickBadge?: boolean;
   landingActions?: boolean;
+  /** Скрыть скрытые anchor-виджеты (каталог-слоты) — на странице события в related. */
+  suppressPurchaseAnchors?: boolean;
 };
 
 export function EventCard({
@@ -56,6 +58,7 @@ export function EventCard({
   showcaseRail = false,
   editorsPickBadge = false,
   landingActions = false,
+  suppressPurchaseAnchors = false,
 }: EventCardProps) {
   if (showcaseRail || editorsPickBadge) {
     return <ShowcaseEventCard session={session} rail={showcaseRail} editorsPickBadge={editorsPickBadge} />;
@@ -178,7 +181,7 @@ export function EventCard({
         {showSlotPills ? (
           <div className="mt-2 flex flex-wrap items-start gap-1.5">
             {displaySlotLabels.map((label) =>
-              purchaseEnabled ? (
+              purchaseEnabled && !suppressPurchaseAnchors ? (
                 <CatalogPurchaseChip
                   key={label}
                   session={session}
@@ -197,7 +200,7 @@ export function EventCard({
           </div>
         ) : null}
 
-        {purchaseEnabled ? (
+        {purchaseEnabled && !suppressPurchaseAnchors ? (
           <CatalogPurchaseAnchors
             session={session}
             teplohod={teplohod}

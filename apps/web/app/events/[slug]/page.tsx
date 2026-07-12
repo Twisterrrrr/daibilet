@@ -71,7 +71,7 @@ export default async function EventDetailPage({ params }: PageProps) {
             <ul className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {related.slice(0, 6).map((session) => (
                 <li key={`${session.id}-${session.startsAt}`}>
-                  <EventCard session={session} />
+                  <EventCard session={session} suppressPurchaseAnchors />
                 </li>
               ))}
             </ul>
