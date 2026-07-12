@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   mapGroupedPublicSession,
+  pickCatalogSubcategories,
   type PublicCatalogMappingRow,
 } from './public-catalog.mapper.js';
 import { prismaWallTimeToIso } from './public-datetime.js';
@@ -85,6 +86,18 @@ test('converts imported Moscow wall time to the real UTC instant', () => {
   const prismaTimestamp = new Date('2026-07-10T16:30:00.000Z');
 
   assert.equal(prismaWallTimeToIso(prismaTimestamp), '2026-07-10T13:30:00.000Z');
+});
+
+test('drops bus subcategory labels from river cruise cards', () => {
+  const labels = pickCatalogSubcategories({
+    category: 'Экскурсии',
+    title: 'Речная прогулка «Доброе утро, Татарстан»',
+    venue: 'Речной порт Казань, ул. Девятаева 1',
+    subcategories: ['Автобусные экскурсии', 'Водные экскурсии', 'Автобусные туры'],
+    tags: [],
+  });
+
+  assert.deepEqual(labels, ['Водные экскурсии']);
 });
 
 function catalogRow(overrides: Partial<PublicCatalogMappingRow>): PublicCatalogMappingRow {

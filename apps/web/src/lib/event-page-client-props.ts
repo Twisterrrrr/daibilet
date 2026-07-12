@@ -9,6 +9,9 @@ export function toEventPageClientPayload(payload: PublicEventPageDto): PublicEve
       sessions: payload.sessions ?? [],
       offers: payload.offers ?? [],
       ticketPrices: payload.ticketPrices ?? [],
+      purchaseOptions: payload.purchaseOptions ?? [],
+      related: payload.related ?? [],
+      landings: payload.landings ?? [],
       stats: payload.stats ?? { sessions: 0 },
     }),
   ) as PublicEventPageDto;

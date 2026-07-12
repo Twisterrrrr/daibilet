@@ -73,6 +73,7 @@ export interface AdminEventOverrideDto extends SeoFields {
   shortDescription?: string | null;
   imageUrl?: string | null;
   editorStatus?: string | null;
+  mergeGroupKey?: string | null;
 }
 
 export interface AdminEventDetailDto extends AdminEventRowDto {

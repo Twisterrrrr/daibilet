@@ -633,11 +633,11 @@ function clampNumber(value: number | undefined, min: number, max: number, fallba
 function filterCatalogSessions(sessions: PublicSessionDto[]): PublicSessionDto[] {
   return sessions.filter((session) =>
     isSaleableForPublicCatalog({
-      kind: session.kind,
-      sourceStatus: session.sourceStatus,
+      kind: session.kind ?? null,
+      sourceStatus: session.sourceStatus ?? null,
       startsAt: session.startsAt || session.upcomingSlots?.[0]?.startsAt || null,
-      purchaseReady: session.purchaseReady,
-      priceFrom: session.priceFrom,
+      purchaseReady: session.purchaseReady ?? false,
+      priceFrom: session.priceFrom ?? null,
     }),
   );
 }
@@ -723,7 +723,7 @@ async function hydrateCatalogUpcomingSlots(sessions: PublicSessionDto[]): Promis
           dateLabel: formatDate(startsAt),
           timeLabel: formatTime(startsAt),
           timeBucket: timeBucket(startsAt),
-          purchaseUrl: session.purchaseUrl,
+          purchaseUrl: session.purchaseUrl ?? null,
         });
         if (hydratedSlots.length >= CATALOG_HYDRATED_SLOT_LIMIT) break;
       }

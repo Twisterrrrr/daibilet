@@ -42,6 +42,10 @@ check() {
 check "api health" curl -fsS "$API_BASE/api/health" >/dev/null
 check "next health" curl -fsS "$WEB_BASE/api/health" >/dev/null
 check "public health via nginx" curl -fsS "$PUBLIC_BASE/api/health" >/dev/null
+check "public stats" curl -fsS "$PUBLIC_BASE/api/public/stats" >/dev/null
+check "public destinations" curl -fsS "$PUBLIC_BASE/api/public/destinations" >/dev/null
+check "robots.txt" curl -fsS "$PUBLIC_BASE/robots.txt" | grep -qi 'sitemap'
+check "sitemap.xml" curl -fsS "$PUBLIC_BASE/sitemap.xml" | grep -qi '<urlset\|<sitemapindex'
 
 # SSR: pipelines must run inside check() — pipefail + set -e otherwise exits early
 check "home ssr" bash -c "curl -fsS '$PUBLIC_BASE/' | grep -qi 'дайбилет\\|события\\|events'"

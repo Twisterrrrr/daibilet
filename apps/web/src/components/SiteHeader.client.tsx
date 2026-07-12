@@ -8,6 +8,7 @@ import { forwardRef, useEffect, useRef, useState } from 'react';
 import { CityPicker } from '@/components/CityPicker.client';
 import { DaibiletLogo } from '@/components/DaibiletLogo';
 import { FavoritesPanel } from '@/components/FavoritesPanel.client';
+import { HeaderSearch } from '@/components/HeaderSearch.client';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { useUserAuthOptional } from '@/hooks/useUserAuth';
 import { persistSelectedCity, resolveCityLabel } from '@/lib/selected-city';
@@ -75,6 +76,8 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
 
   const isLoggedIn = authMounted && Boolean(auth?.isLoggedIn);
   const cityValue = cityLabel === 'Все города' ? 'all' : cityLabel;
+  const searchCityFilter = urlCity || (cityValue !== 'all' ? cityValue : undefined);
+  const searchInitialQuery = pathname.startsWith('/events') ? searchParams.get('q') || '' : '';
 
   const onCityChange = (name: string) => {
     persistSelectedCity(name);
@@ -155,6 +158,12 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
             })}
           </nav>
 
+          <HeaderSearch
+            cityFilter={searchCityFilter}
+            initialQuery={searchInitialQuery}
+            className="hidden min-w-0 flex-1 rounded-full border border-slate-200 bg-slate-50 py-2 lg:block xl:max-w-xs"
+          />
+
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             <HeaderAuthControls
               ref={userMenuRef}
@@ -203,6 +212,8 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
           destinations={destinations}
           isLoggedIn={isLoggedIn}
           auth={auth}
+          searchCityFilter={searchCityFilter}
+          searchInitialQuery={searchInitialQuery}
           onClose={() => setMobileOpen(false)}
           onCityChange={onCityChange}
         />
@@ -296,6 +307,8 @@ function MobileNavSheet({
   destinations,
   isLoggedIn,
   auth,
+  searchCityFilter,
+  searchInitialQuery,
   onClose,
   onCityChange,
 }: {
@@ -305,6 +318,8 @@ function MobileNavSheet({
   destinations: PublicDestinationDto[];
   isLoggedIn: boolean;
   auth: ReturnType<typeof useUserAuthOptional>;
+  searchCityFilter?: string;
+  searchInitialQuery?: string;
   onClose: () => void;
   onCityChange: (name: string) => void;
 }) {
@@ -317,6 +332,13 @@ function MobileNavSheet({
           <button type="button" aria-label="Закрыть" onClick={onClose} className="rounded-full p-2 text-slate-500 hover:bg-slate-100">
             <X className="h-5 w-5" />
           </button>
+        </div>
+        <div className="border-b border-slate-200 px-4 py-3">
+          <HeaderSearch
+            cityFilter={searchCityFilter}
+            initialQuery={searchInitialQuery}
+            className="rounded-xl border border-slate-200 bg-slate-50 py-2.5"
+          />
         </div>
         <nav aria-label="Мобильная навигация" className="flex-1 overflow-y-auto p-2">
           {NAV_LINKS.map((item) => (

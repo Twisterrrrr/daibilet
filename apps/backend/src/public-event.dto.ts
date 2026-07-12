@@ -143,20 +143,29 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
   });
   const eventsById = new Map(groupEvents.map((event) => [event.id, event]));
   if (!eventsById.has(requestedEvent.id)) eventsById.set(requestedEvent.id, requestedEvent);
-  const purchaseProvider = pickGroupPurchaseProvider(targetCatalogSession, groupEvents, requestedEvent);
+  const mergeGroupMembers = await loadMergeGroupMembers(requestedEvent);
+  for (const member of mergeGroupMembers) {
+    eventsById.set(member.id, member);
+  }
+  const mergedGroupEvents = [...eventsById.values()];
+  const purchaseProvider = pickGroupPurchaseProvider(targetCatalogSession, mergedGroupEvents, requestedEvent);
   const purchaseGroupEventIds = filterGroupEventIdsByPurchaseProvider(
     groupEventIds,
     eventsById,
     purchaseProvider,
     requestedEvent.id,
   );
+  const offerScopeEventIds = [...new Set([
+    ...purchaseGroupEventIds,
+    ...mergeGroupMembers.map((member) => member.id),
+  ])];
   const representative = eventsById.get(targetCatalogSession?.id || purchaseGroupEventIds[0] || '') || requestedEvent;
 
   const now = new Date();
   const [sessionRows, offerRows] = await Promise.all([
     prisma.eventSession.findMany({
       where: {
-        eventId: { in: purchaseGroupEventIds },
+        eventId: { in: offerScopeEventIds },
         OR: [
           { endsAt: { gte: now } },
           { startsAt: { gte: now } },
@@ -178,7 +187,7 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     ),
     prisma.eventOffer.findMany({
       where: {
-        eventId: { in: purchaseGroupEventIds },
+        eventId: { in: offerScopeEventIds },
         active: true,
         priceRub: { gte: MIN_DISPLAY_PRICE_RUB },
       },
@@ -232,6 +241,8 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     category: requestedEvent.category?.title || null,
     subcategories: eventSubcategories(requestedEvent),
     tags,
+    title: requestedEvent.override?.title || requestedEvent.title,
+    venue: requestedEvent.venue?.title || null,
   });
   const destination = eventDestination(requestedEvent, targetCatalogSession);
   const priceFrom = displayPriceFrom(
@@ -309,7 +320,7 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     isIndexable: requestedEvent.override?.isIndexable ?? requestedEvent.isIndexable,
   };
   const ticketPrices = buildTicketPrices(offers, sessions, event);
-  const purchaseOptions = buildMergedPurchaseOptions(groupEvents, offers, requestedEvent, eventPurchaseUrl);
+  const purchaseOptions = buildMergedPurchaseOptions(mergedGroupEvents, offers, requestedEvent, eventPurchaseUrl);
   const related = relatedSessions(catalogSessions, groupEventIds, requestedEvent, 12);
   const priceValues = [event.priceFrom, ...sessions.map((session) => session.priceFrom)]
     .filter((value): value is number => Number.isFinite(value) && Number(value) >= MIN_DISPLAY_PRICE_RUB);
@@ -337,7 +348,7 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     sessions,
     offers: offers.map(({ eventId: _eventId, sortOrder: _sortOrder, sourceTicketId: _sourceTicketId, payload: _payload, ...offer }) => offer),
     ticketPrices,
-    purchaseOptions: purchaseOptions.length >= 2 ? purchaseOptions : undefined,
+    ...(purchaseOptions.length >= 2 ? { purchaseOptions } : {}),
     related,
     landings: landingSlugs.map(findLandingRule).filter(isDefined).map((rule) => ({
       slug: rule.slug,
@@ -369,7 +380,7 @@ async function resolveEvent(
   }
 
   const tcPrefixMatch = eventSlugOrId.match(/^tc-([a-f0-9]{24})-/i);
-  if (tcPrefixMatch) {
+  if (tcPrefixMatch?.[1]) {
     const tcId = tcPrefixMatch[1];
     const tcEvent = await prisma.event.findFirst({
       where: { OR: [{ id: tcId }, { id: `evt_${tcId}` }] },
@@ -596,11 +607,48 @@ function mergedCatalogTitle(event: EventRecord): string | null {
   return cleanImportedDescription(event.override?.title);
 }
 
-function isMultiProductMergedGroup(groupEvents: EventRecord[], requestedEvent: EventRecord): boolean {
-  const mergeTitle = mergedCatalogTitle(requestedEvent);
-  if (!mergeTitle || groupEvents.length < 2) return false;
+function normalizeMergeGroupKey(value: string | null | undefined): string | null {
+  const raw = cleanImportedDescription(value)?.trim().toLowerCase();
+  if (!raw) return null;
+  const normalized = raw.replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '');
+  return normalized || null;
+}
 
-  const peers = groupEvents.filter((event) => mergedCatalogTitle(event) === mergeTitle);
+async function loadMergeGroupMembers(requestedEvent: EventRecord): Promise<EventRecord[]> {
+  const mergeGroupKey = normalizeMergeGroupKey(requestedEvent.override?.mergeGroupKey);
+  if (!mergeGroupKey) return [];
+
+  return prisma.event.findMany({
+    where: {
+      status: { notIn: ['HIDDEN', 'DRAFT'] },
+      primaryCityId: requestedEvent.primaryCityId,
+      override: { mergeGroupKey },
+    },
+    include: eventInclude,
+  });
+}
+
+function resolveMultiPurchasePeers(groupEvents: EventRecord[], requestedEvent: EventRecord): EventRecord[] {
+  const mergeGroupKey = normalizeMergeGroupKey(requestedEvent.override?.mergeGroupKey);
+  if (mergeGroupKey) {
+    return groupEvents.filter(
+      (event) =>
+        normalizeMergeGroupKey(event.override?.mergeGroupKey) === mergeGroupKey &&
+        event.primaryCityId === requestedEvent.primaryCityId,
+    );
+  }
+
+  const mergeTitle = mergedCatalogTitle(requestedEvent);
+  if (!mergeTitle) return [];
+
+  return groupEvents.filter(
+    (event) =>
+      mergedCatalogTitle(event) === mergeTitle &&
+      event.primaryCityId === requestedEvent.primaryCityId,
+  );
+}
+
+function isMultiProductMergedGroup(peers: EventRecord[]): boolean {
   if (peers.length < 2) return false;
 
   const distinctTitles = new Set(
@@ -635,17 +683,11 @@ function buildMergedPurchaseOptions(
   requestedEvent: EventRecord,
   fallbackPurchaseUrl: string | null,
 ): PublicPurchaseOptionDto[] {
-  if (!isMultiProductMergedGroup(groupEvents, requestedEvent)) return [];
+  const peers = resolveMultiPurchasePeers(groupEvents, requestedEvent);
+  if (!isMultiProductMergedGroup(peers)) return [];
 
+  const mergeGroupKey = normalizeMergeGroupKey(requestedEvent.override?.mergeGroupKey);
   const mergeTitle = mergedCatalogTitle(requestedEvent);
-  if (!mergeTitle) return [];
-
-  const peers = groupEvents.filter(
-    (event) =>
-      mergedCatalogTitle(event) === mergeTitle &&
-      event.primaryCityId === requestedEvent.primaryCityId,
-  );
-  if (peers.length < 2) return [];
 
   const offersByEventId = new Map<string, MappedOffer[]>();
   for (const offer of offers) {
@@ -659,7 +701,8 @@ function buildMergedPurchaseOptions(
       const identity = eventIdentity(event);
       const title = formatPublicEventTitle(event.title);
       const titleKey = normalizeGroupPart(title);
-      if (!titleKey || titleKey === normalizeGroupPart(mergeTitle)) return null;
+      if (!titleKey) return null;
+      if (!mergeGroupKey && mergeTitle && titleKey === normalizeGroupPart(mergeTitle)) return null;
 
       const eventOffers = preferNamedTicketOffers(offersByEventId.get(event.id) || []);
       const primaryOffer = eventOffers[0] || offersByEventId.get(event.id)?.[0] || null;
@@ -895,7 +938,8 @@ function splitTitlePartsWithoutWeekdays(title: string): string[] {
   const weekdayRange = /^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)(?:\s*[,—–\-]\s*(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС))+$/iu;
 
   while (parts.length > 1) {
-    const last = parts[parts.length - 1];
+    const last = parts.at(-1);
+    if (!last) break;
     if (weekdayToken.test(last) || weekdayRange.test(last)) {
       parts.pop();
       continue;

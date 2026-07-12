@@ -1384,6 +1384,7 @@ function ContentTab(props: { event: AdminEventRow; isSaving: boolean; saveError:
     title: event.override?.title || '',
     shortDescription: event.override?.shortDescription || '',
     description: event.override?.description || '',
+    mergeGroupKey: event.override?.mergeGroupKey || '',
   });
 
   React.useEffect(() => {
@@ -1391,8 +1392,9 @@ function ContentTab(props: { event: AdminEventRow; isSaving: boolean; saveError:
       title: event.override?.title || '',
       shortDescription: event.override?.shortDescription || '',
       description: event.override?.description || '',
+      mergeGroupKey: event.override?.mergeGroupKey || '',
     });
-  }, [event.id, event.override?.description, event.override?.shortDescription, event.override?.title]);
+  }, [event.id, event.override?.description, event.override?.mergeGroupKey, event.override?.shortDescription, event.override?.title]);
 
   return (
     <div className="mt-5 space-y-4">
@@ -1411,6 +1413,13 @@ function ContentTab(props: { event: AdminEventRow; isSaving: boolean; saveError:
         value={draft.description}
         onChange={(description) => setDraft((current) => ({ ...current, description }))}
         multiline
+      />
+      <EditableOverrideField
+        label="Ключ мультисобытия (mergeGroupKey)"
+        sourceValue="не задан"
+        value={draft.mergeGroupKey}
+        onChange={(mergeGroupKey) => setDraft((current) => ({ ...current, mergeGroupKey }))}
+        hint="Одинаковый ключ объединяет разные ticket-продукты на одной странице: описание, цена и кнопка «Купить» на каждый. Пример: harry-potter-spb"
       />
       <SavePanel isSaving={isSaving} error={saveError} onSave={() => onSave(draft)} />
     </div>
@@ -1513,7 +1522,7 @@ function SourceValue(props: { label: string; value?: string | null }) {
   );
 }
 
-function EditableOverrideField(props: { label: string; sourceValue?: string | null; value: string; onChange: (value: string) => void; multiline?: boolean }) {
+function EditableOverrideField(props: { label: string; sourceValue?: string | null; value: string; onChange: (value: string) => void; multiline?: boolean; hint?: string }) {
   return (
     <section className="rounded-lg border border-border p-4">
       <div className="flex items-center justify-between gap-3">
@@ -1521,6 +1530,7 @@ function EditableOverrideField(props: { label: string; sourceValue?: string | nu
         <Badge variant="outline">{props.value ? 'override' : 'source'}</Badge>
       </div>
       <div className="mt-3 line-clamp-3 text-xs text-muted-foreground">Source: {props.sourceValue || 'нет'}</div>
+      {props.hint ? <p className="mt-2 text-xs text-muted-foreground">{props.hint}</p> : null}
       {props.multiline ? (
         <textarea
           value={props.value}

@@ -225,6 +225,31 @@
 
 ---
 
+## 2026-07-13 — Defer `tc:sync` widgetUrl backfill на prod
+
+**Решение:** Не запускать полный `npm run tc:sync` на prod в рамках этапа 0. Оставить pipeline (фаза B) для staging и плановых maintenance windows; prod backfill — только при регрессии saleable events или перед включением nightly cron.
+
+**Почему:**
+
+1. **Saleable path закрыт:** `check:widgets` prod **4/4 OK** (2026-07-13) на эталонных TC/TEP slug — `purchaseReady`, `widgetPayload`, `purchaseUrl` в порядке; ProviderLink покрывает опубликованные события.
+2. **Долг не блокирует MVP:** ~62k offers без `widgetUrl` в audit — в основном исторический хвост / не-saleable; не влияет на CTA «Купить» на indexable карточках.
+3. **Риск maintenance:** prod `tc:sync` = длинный fetch + mass upsert; без окна возможны lock/contention и случайный сброс admin override (см. фаза C guards — но rollback дороже defer).
+
+**Критерии пересмотра (любой → запланировать sync):**
+
+- `check:widgets` prod FAIL на эталонах после deploy/import
+- `check:sync-invariants` prod: saleable event без ProviderLink / без widget URL
+- Новая массовая публикация TC-каталога без widget URL
+- Включение nightly `check:sync-invariants` + алерт (audit §151)
+
+**Пересмотр:** 2026-08-01 или при первом prod FAIL виджетов.
+
+**Follow-up 2026-07-13:** выполнен `npm run tc:sync` на prod (`213.171.7.16`): 17356 source events, 17082 offers с widgetUrl, 66535 ProviderLink, ~101s. `check:widgets` 4/4 OK после sync.
+
+**Статус:** Активно (defer снят для TC backfill; browser smoke 0.2 — отдельно).
+
+---
+
 ## Шаблон новой записи
 
 ```markdown

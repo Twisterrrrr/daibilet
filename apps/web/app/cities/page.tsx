@@ -16,13 +16,19 @@ export const metadata: Metadata = {
 export const revalidate = 300;
 
 export default async function CitiesIndexPage() {
-  const destinations = await buildPublicDestinationsDto();
+  let destinations: Awaited<ReturnType<typeof buildPublicDestinationsDto>>['destinations'] = [];
+  try {
+    const payload = await buildPublicDestinationsDto();
+    destinations = payload.destinations ?? [];
+  } catch {
+    destinations = [];
+  }
 
   return (
     <SiteLayout>
       <PageBreadcrumbBar items={[{ label: 'Главная', href: '/' }, { label: 'Города' }]} />
       <div className="container-page bg-slate-50 py-10">
-        <CitiesCatalogView destinations={destinations.destinations} />
+        <CitiesCatalogView destinations={destinations} />
       </div>
     </SiteLayout>
   );

@@ -602,10 +602,14 @@ model EventOverride {
   canonicalPath    String?
   isIndexable      Boolean?
   editorStatus     PublishStatus?
+  /// Admin-defined key to merge distinct ticket products into one multi-purchase hub page.
+  mergeGroupKey    String?
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 
   event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([mergeGroupKey])
 }
 
 model EventSourceLink {

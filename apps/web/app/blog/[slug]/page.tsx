@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { BlogArticleView } from '@/components/BlogArticleView';
 import '@/lib/env';
+import { buildBlogArticleJsonLd, buildBlogArticleMetadata } from '@/lib/blog-article-seo';
 import { resolveStaticArticle } from '@/lib/blog-utils';
 import { buildPublicArticlePageDto } from '@daibilet/backend/public-read';
 
@@ -17,18 +18,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const article = await loadArticle(decodeURIComponent(slug));
   if (!article) return { title: 'Статья не найдена | Дайбилет' };
 
-  return {
-    title: article.seoTitle || `${article.title} | Блог Дайбилет`,
-    description: article.seoDescription || article.excerpt || article.title,
-    alternates: {
-      canonical: article.canonicalPath || `/blog/${article.slug}`,
-    },
-    openGraph: {
-      title: article.seoTitle || article.title,
-      description: article.seoDescription || article.excerpt || undefined,
-      images: article.coverImageUrl ? [{ url: article.coverImageUrl }] : undefined,
-    },
-  };
+  return buildBlogArticleMetadata(article);
 }
 
 async function loadArticle(slug: string) {
@@ -46,5 +36,18 @@ export default async function BlogArticlePage({ params }: PageProps) {
   const article = await loadArticle(decodeURIComponent(slug));
   if (!article) notFound();
 
-  return <BlogArticleView article={article} />;
+  const jsonLdBlocks = buildBlogArticleJsonLd(article);
+
+  return (
+    <>
+      {jsonLdBlocks.map((block, index) => (
+        <script
+          key={`blog-jsonld-${index}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }}
+        />
+      ))}
+      <BlogArticleView article={article} />
+    </>
+  );
 }

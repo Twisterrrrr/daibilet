@@ -1,58 +1,170 @@
 # Текущее состояние Daibilet
 
-Дата: **2026-07-10** (F2 ✅ → старт F3 cutover)  
-Ветка prod: **`integrate/mvp-launch`**  
-Ветка migration: **`feat/next-monorepo`**
+**Обновлено:** 2026-07-13  
+**Ветка migration / prod Next:** `feat/next-monorepo`  
+**Prod:** `213.171.7.16` · Next `:3001` · legacy API `:4000` · admin Vite static
 
-> **Стратегия:** [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md) — Next full-stack + SSR для SEO.  
-> **Codex:** [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md) — Phase 2 finance foundation в новом monorepo.
+> Детальные чеклисты: [Tasktracker.md](./Tasktracker.md)  
+> Эталонные slug виджетов: [widget-etalon-slugs.md](./widget-etalon-slugs.md)
 
-## Фазы A–F
+---
 
-| Фаза | Статус | Документ |
-|------|--------|----------|
-| A–E | ✅ | [phases/README.md](./phases/README.md) |
-| **F** — Next monorepo + SSR | ✅ F2 / 🔄 F3 | [phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md) |
-| **G** — Phase 2 finance runtime | ⏳ | [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md) |
+## Сводка по этапам
 
-## Next (`feat/next-monorepo`) — F3 staging ✅ / prod ⏳
+| Этап | Фокус | Прогресс | Блокер закрытия |
+|------|--------|----------|-----------------|
+| **0** | Post-cutover hardening: smoke, widgets, admin, backfill | **~80%** 🔄 | Browser smoke + admin smoke |
+| **1** | Public parity: поиск, breadcrumbs, city FAQ/SEO | **~65%** 🔄 | event/city structured data |
+| **2** | SEO foundation: sitemap + SSR JSON-LD | **~10%** ⏳ | `robots.ts` / `sitemap.ts` ещё не в `apps/web` |
+| **3+** | Admin Next, dto retire, Phase G finance | ⏳ | После 0–2 |
 
-- **Staging:** https://staging.daibilet.ru — Next `:3000`, API `:4001`, SSR smoke OK
-- Deploy: `deploy-staging-next.sh`, `pnpm launch:staging-smoke-next`
-- **Prod cutover** — следующий шаг
+**Легенда статусов:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
 
-## Codex (`codex/phase2-foundation`)
+---
 
-- Phase 2 schema (~66 models), event change requests, admin queue
-- **Не интегрировать** Next/proxy из Codex — cherry-pick **после F3**
-- План: [codex-cherry-pick-plan.md](./codex-cherry-pick-plan.md)
+## Prod сейчас (2026-07-13)
 
-## Prod (widget MVP — до cutover F3)
+| Компонент | Статус | Примечание |
+|-----------|--------|------------|
+| nginx → Next public | ✅ | cutover 2026-07-10, rollback script есть |
+| `launch-prod-smoke-next.sh` (SSR curl) | ✅ | API health, catalog/landing HTML, TC/TEP API |
+| Browser widget smoke (4 эталона) | ⏳ | только manual hint в smoke-скрипте |
+| `check:widgets` prod API (4 slug) | ✅ | 2026-07-13, 4/4 OK |
+| Admin smoke `:4000` | ⏳ | нет формализованного чеклиста в CI |
+| `tc:sync` widgetUrl backfill prod | ✅ 2026-07-13 | 17082 offers с widgetUrl, check:widgets 4/4 |
+| `USER_JWT_SECRET` prod/staging | ✅ | login `/login` |
+| Backend typecheck | ✅ | `pnpm --filter @daibilet/backend typecheck` |
+| Admin build | ✅ | `@daibilet/contracts/admin` export + типы ECR page |
+| Web typecheck/build | ✅ | 52 routes, robots + sitemap dynamic |
+| `/api/public/stats` + `/destinations` | ✅ | Next route handlers |
+| `/api/public/search` | ✅ | HeaderSearch autocomplete |
+| `HeaderSearch` в SiteHeader | ✅ | desktop lg+ + mobile drawer |
+| `robots.ts` + `sitemap.ts` | ✅ | |
+| `pnpm deploy:preflight` | ✅ | `scripts/deploy-preflight.sh` |
+| Smoke: stats/destinations/robots/sitemap | ✅ | в `launch-staging-smoke-next.sh` |
 
-- Frontend: **Vite SPA** (временно)
-- DB prod: `5437/daibilet` · staging: `5438/daibilet_staging`
+| Мультисобытие `mergeGroupKey` | 🔄 | код в ветке, нужен `db:deploy` + deploy |
 
-## SEO (мотивация F)
+### Production-green gate (Codex audit 4d0fc7e → fix)
 
-CSR-каталог и lazy load **не подходят** для индексации. F2: SSR page 1 каталога (**100**, selector 100/200/300), event/city/venue `generateMetadata`.
+| Check | Статус |
+|-------|--------|
+| `pnpm --filter @daibilet/backend typecheck` | ✅ |
+| `pnpm --filter @tours/admin build` | ✅ |
+| `pnpm --filter @daibilet/web typecheck` | ✅ |
+| `pnpm --filter @daibilet/web build` | ✅ (без БД: empty fallbacks на home/cities/venues) |
+| Prisma validate + generate | ✅ |
+| `/api/public/stats`, `/destinations` | ✅ |
+| `/robots.txt`, `/sitemap.xml` | ✅ |
+| `pnpm deploy:preflight` | ✅ новый скрипт |
 
-## Deploy
+**Deploy:**
 
 ```bash
-# Текущий prod (до Next cutover)
-./deploy/scripts/deploy-from-git.sh
+# preflight (на сервере с DATABASE_URL)
+pnpm deploy:preflight
 
-# Staging DB refresh
-STAGING_POSTGRES_PASSWORD=... bash deploy/scripts/restore-staging-db.sh
+# prod Next
+BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
+NODE_OPTIONS='--max-old-space-size=1536' pnpm web:build   # при OOM
+
+# smoke
+PUBLIC_BASE=https://daibilet.ru API_BASE=http://127.0.0.1:4000 WEB_BASE=http://127.0.0.1:3001 \
+  bash scripts/launch-prod-smoke-next.sh
+
+# widgets API (авто)
+npm run check:widgets -- --base https://daibilet.ru
 ```
 
-## Ops backlog
+---
 
-- [ ] F3: staging deploy + smoke ([checklist](./phases/phase-f3-cutover-checklist.md))
-- [ ] Post-F3: cherry-pick Codex Phase 2 schema + event change requests
-- [ ] `tc:sync` widgetUrl backfill на prod
+## Этап 0 — что осталось закрыть
 
-## Документы
+### Browser smoke (4 slug из [widget-etalon-slugs.md](./widget-etalon-slugs.md))
 
-- [audit-2026-07-10-stack-state.md](./audit-2026-07-10-stack-state.md)
-- [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md)
+| Slug | Провайдер | API `check:widgets` | Browser «Купить» |
+|------|-----------|---------------------|------------------|
+| `tc-6a266b49465e94f72b4ef8f6-interaktivnaya-vystavka-nyuton-park` | TC | ✅ 2026-07-13 | ⏳ |
+| `tc-6a3582f0bbd948da83dece6e-kombo-kvest` | TC | ✅ 2026-07-13 | ⏳ |
+| `progulka-ot-prichala-kitai-gorod-do-prichala-kievskii-826` | Teplohod | ✅ 2026-07-13 | ⏳ |
+| `centralnaya-krugovaya-rechnaya-progulka-ot-parka-zaryade-ves-centr-za-chas-683` | Teplohod | ✅ 2026-07-13 | ⏳ |
+
+**Критерий OK:** hard refresh → «Купить» → модал TC / iframe Teplohod без console error.
+
+### Admin smoke (`http://127.0.0.1:4000` + static admin)
+
+| Проверка | Статус |
+|----------|--------|
+| Basic auth / realm login | ⏳ |
+| Sources: TC + Teplohod status visible | ⏳ |
+| Events: список + override save | ⏳ |
+| Orders: реальные ExternalOrder, не mock | ⏳ |
+| Sync trigger / last sync timestamp | ⏳ |
+
+### `tc:sync` backfill prod
+
+| Вариант | Статус | Условие |
+|---------|--------|---------|
+| **A.** Запустить `npm run tc:sync` на prod с token | ✅ 2026-07-13 | 17356 events, 17082 widgetUrl |
+| **B.** Осознанный defer | ✅ 2026-07-13 | до sync; см. [decision-log.md](./decision-log.md) |
+
+---
+
+## Этап 1 — gaps (после 0)
+
+| Задача | Статус | Где |
+|--------|--------|-----|
+| **HeaderSearch** в шапке Next | ✅ | `HeaderSearch.client.tsx` + `/api/public/search` |
+| **Event breadcrumbs** | ⏳ | `/events` ✅; `/events/[slug]` ⏳ |
+| **Event JSON-LD** (`Event`, `Offer`, `BreadcrumbList`) SSR | ⏳ | legacy `EventPageView.tsx` |
+| **City FAQ + SEO text** SSR | ⏳ | `CityPageView` без FAQ-блока |
+| **City JSON-LD** (`FAQPage`, `BreadcrumbList`) SSR | ⏳ | только client `document.title` |
+| `/about` | ⏳ | route отсутствует в `apps/web` |
+
+**Уже есть:** `generateMetadata` event/city, catalog breadcrumbs, `/help` + FAQ JSON-LD, landings JSON-LD (client).
+
+---
+
+## Этап 2 — старт (параллельно с хвостом 1)
+
+| Задача | Статус | Примечание |
+|--------|--------|------------|
+| `app/robots.ts` | ⏳ | |
+| `app/sitemap.ts` index | ⏳ | |
+| sitemap events / cities / venues | ⏳ | chunked, только indexable |
+| SSR JSON-LD event page | ⏳ | `<script type="application/ld+json">` в RSC |
+| SSR JSON-LD city page | ⏳ | FAQ + breadcrumbs |
+| canonical / www policy audit | ⏳ | nginx + metadata cross-check |
+
+Очередность: [spbboats-next-prisma-extraction.md § Step A](./spbboats-next-prisma-extraction.md).
+
+---
+
+## Архитектура (кратко)
+
+```
+apps/web     — Next 15 SSR/ISR (:3001 prod)
+apps/backend — server.js + dto.js sync/admin (:4000)
+apps/admin   — Vite SPA (static)
+packages/db  — Prisma
+```
+
+Read path: `@daibilet/backend/public-read` → `public-*.dto.ts` (+ частично dto.js).
+
+---
+
+## Немедленные next steps (приоритет)
+
+1. **Этап 0:** browser smoke 4 slug + admin smoke → отметить в Tasktracker.
+2. **Этап 1:** event/city breadcrumbs + JSON-LD SSR (один PR).
+3. **Deploy:** `pnpm deploy:preflight` + выкат HeaderSearch / multievent.
+
+---
+
+## Связанные документы
+
+- [Tasktracker.md](./Tasktracker.md) — чеклисты с ✅/🔄/⏳/🚫/⚠️
+- [Project.md](./Project.md) — архитектура F1–F5
+- [phases/phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md)
+- [seo-public-mvp.md](./seo-public-mvp.md)
+- [launch-qa-and-deploy.md](./launch-qa-and-deploy.md)

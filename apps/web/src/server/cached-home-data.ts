@@ -10,6 +10,13 @@ import {
 
 const REVALIDATE = 300;
 
+type HomePageData = {
+  destinationsPayload: Awaited<ReturnType<typeof buildPublicDestinationsDto>>;
+  catalogPayload: Awaited<ReturnType<typeof buildPublicCatalogDto>>;
+  landingsCatalog: Awaited<ReturnType<typeof buildPublicLandingsCatalogDto>>;
+  venuesPayload: Awaited<ReturnType<typeof buildPublicVenuesDto>>;
+};
+
 export const getHomeDestinations = unstable_cache(
   () => buildPublicDestinationsDto(),
   ['home-destinations-v1'],
@@ -34,12 +41,36 @@ export const getHomeVenues = unstable_cache(
   { revalidate: REVALIDATE },
 );
 
-export async function getHomePageData() {
-  const [destinationsPayload, catalogPayload, landingsCatalog, venuesPayload] = await Promise.all([
-    getHomeDestinations(),
-    getHomeCatalog(),
-    getHomeLandings(),
-    getHomeVenues(),
-  ]);
-  return { destinationsPayload, catalogPayload, landingsCatalog, venuesPayload };
+export async function getHomePageData(): Promise<HomePageData> {
+  try {
+    const [destinationsPayload, catalogPayload, landingsCatalog, venuesPayload] = await Promise.all([
+      getHomeDestinations(),
+      getHomeCatalog(),
+      getHomeLandings(),
+      getHomeVenues(),
+    ]);
+    return { destinationsPayload, catalogPayload, landingsCatalog, venuesPayload };
+  } catch {
+    const generatedAt = new Date().toISOString();
+    return {
+      destinationsPayload: { generatedAt, destinations: [] },
+      catalogPayload: {
+        generatedAt,
+        items: [],
+        total: 0,
+        limit: 120,
+        offset: 0,
+        hasMore: false,
+        facets: {
+          cities: [],
+          categories: [],
+          subcategories: [],
+          landings: [],
+          priceSteps: [],
+        },
+      },
+      landingsCatalog: { generatedAt, city: '', items: [] },
+      venuesPayload: { generatedAt, venues: [], total: 0 },
+    } as HomePageData;
+  }
 }

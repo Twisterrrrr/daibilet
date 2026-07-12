@@ -5,6 +5,7 @@ import { AlertTriangle, CheckCircle2, ClipboardCheck, Eye, FileJson, Loader2, Re
 import type {
   AdminEventChangeRequestDetailDto,
   AdminEventChangeRequestDiffItemDto,
+  AdminEventChangeRequestPayloadPreviewSectionDto,
   AdminEventChangeRequestRowDto,
   AdminEventChangeRequestsListDto,
 } from '@daibilet/contracts/admin';
@@ -217,7 +218,7 @@ export function EventChangeRequestsPage() {
         columns={['Заявка', 'Событие', 'Поставщик', 'Изменение', 'Статус', 'Payload', 'Действия']}
         empty={!loading && payload.items.length === 0 ? <RequestsEmptyState /> : null}
       >
-        {payload.items.map((request) => (
+        {payload.items.map((request: AdminEventChangeRequestRowDto) => (
           <tr key={request.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
             <td className="min-w-[210px] px-4 py-3 align-top">
               <div className="font-medium text-foreground">{request.title || requestTypeLabel(request.type)}</div>
@@ -251,7 +252,7 @@ export function EventChangeRequestsPage() {
             <td className="max-w-[260px] px-4 py-3 align-top">
               {request.payloadKeys.length ? (
                 <div className="flex flex-wrap gap-1.5">
-                  {request.payloadKeys.map((key) => (
+                  {request.payloadKeys.map((key: string) => (
                     <Badge key={key} variant="outline" className="font-mono text-[11px]">
                       {key}
                     </Badge>
@@ -406,7 +407,7 @@ function RequestDetailSheet({
 
               {detail.diff.warnings.length ? (
                 <div className="mt-5 space-y-2">
-                  {detail.diff.warnings.map((warning) => (
+                  {detail.diff.warnings.map((warning: string) => (
                     <div key={warning} className="flex items-start gap-2 rounded-md border border-warning/30 bg-warning/10 p-3 text-xs text-warning-foreground">
                       <AlertTriangle className="mt-0.5 h-3.5 w-3.5" />
                       <span>{warning}</span>
@@ -431,7 +432,7 @@ function RequestDetailSheet({
                       </tr>
                     </thead>
                     <tbody>
-                      {detail.diff.items.map((item) => (
+                      {detail.diff.items.map((item: AdminEventChangeRequestDiffItemDto) => (
                         <tr key={item.path} className="border-b border-border last:border-0">
                           <td className="min-w-[180px] py-3 pr-3 align-top">
                             <div className="font-medium text-foreground">{item.label}</div>
@@ -479,7 +480,7 @@ function RequestDetailSheet({
                     <PayloadBlock title="Base snapshot" value={detail.payloadPreview.baseSnapshot} />
                   ) : null}
                   <div className="mt-3 space-y-3">
-                    {detail.payloadPreview.sections.map((section) => (
+                    {detail.payloadPreview.sections.map((section: AdminEventChangeRequestPayloadPreviewSectionDto) => (
                       <PayloadBlock key={section.id} title={section.title} value={section.value} />
                     ))}
                     {!detail.payloadPreview.sections.length ? (

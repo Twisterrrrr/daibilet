@@ -1,5 +1,37 @@
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
+const WATER_CATALOG_HINT_RE =
+  /(водн(?:ые|ая)?\s+экскурси|речн(?:ая|ые)?|реч(?:ной|ная)\s+порт|теплоход|катер|яхт|лодк|причал|речные\s+прогулки)/i;
+const BUS_CATALOG_LABEL_RE = /автобус/i;
+
+type CatalogTransportHint = 'water' | 'bus';
+
+function resolveCatalogTransportHint(
+  session: Pick<PublicSessionDto, 'subcategories' | 'tags' | 'title' | 'venue'>,
+): CatalogTransportHint | null {
+  const haystack = [
+    session.title,
+    session.venue,
+    ...(session.subcategories || []),
+    ...(session.tags || []),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  if (WATER_CATALOG_HINT_RE.test(haystack)) return 'water';
+  if (BUS_CATALOG_LABEL_RE.test(haystack)) return 'bus';
+  return null;
+}
+
+function isConflictingTransportCatalogLabel(label: string, transport: CatalogTransportHint | null): boolean {
+  if (!transport) return false;
+  const lower = label.toLowerCase();
+  if (transport === 'water') return BUS_CATALOG_LABEL_RE.test(lower);
+  if (transport === 'bus') return WATER_CATALOG_HINT_RE.test(lower);
+  return false;
+}
+
 /** Служебные теги поставщиков — не показываем в каталоге. */
 const UTILITY_TAG_RE =
   /^(wc|туалет|кондиционер|аудиосистема|аудиогид|wi-?fi|бар|кафе|кафе-бар|парковка|гардероб|кондиционирование)$/i;
@@ -55,15 +87,17 @@ export function isCatalogSubcategoryLabel(tag: string, category?: string | null)
 
 /** Только подкатегории из taxonomy; если пусто — жанровые теги без правил площадки. */
 export function collectCatalogLabels(
-  session: Pick<PublicSessionDto, 'subcategories' | 'tags' | 'category'>,
+  session: Pick<PublicSessionDto, 'subcategories' | 'tags' | 'category' | 'title' | 'venue'>,
   limit = 3,
 ): string[] {
   const seen = new Set<string>();
   const labels: string[] = [];
+  const transport = resolveCatalogTransportHint(session);
 
   for (const label of session.subcategories || []) {
     const value = String(label || '').trim();
     if (!isCatalogSubcategoryLabel(value, session.category) || seen.has(value)) continue;
+    if (isConflictingTransportCatalogLabel(value, transport)) continue;
     seen.add(value);
     labels.push(value);
     if (labels.length >= limit) return labels;
@@ -72,6 +106,7 @@ export function collectCatalogLabels(
   for (const tag of session.tags || []) {
     const value = String(tag || '').trim();
     if (!isCatalogSubcategoryLabel(value, session.category) || seen.has(value)) continue;
+    if (isConflictingTransportCatalogLabel(value, transport)) continue;
     seen.add(value);
     labels.push(value);
     if (labels.length >= limit) break;

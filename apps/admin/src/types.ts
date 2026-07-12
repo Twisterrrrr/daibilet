@@ -54,6 +54,7 @@ export type AdminEventRow = {
     canonicalPath?: string | null;
     isIndexable?: boolean | null;
     editorStatus?: string | null;
+    mergeGroupKey?: string | null;
   };
   tags: string[];
   landingHits: string[];

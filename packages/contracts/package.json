@@ -8,7 +8,10 @@
       "types": "./src/index.ts",
       "default": "./src/index.ts"
     },
-    "./admin": "./src/admin.ts",
+    "./admin": {
+      "types": "./src/admin.ts",
+      "default": "./src/admin.ts"
+    },
     "./common": "./src/common.ts",
     "./db": "./src/db.ts",
     "./landing": "./src/landing.ts",

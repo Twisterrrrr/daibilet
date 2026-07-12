@@ -2999,7 +2999,8 @@ export async function updateAdminEventOverride(db, eventId, payload) {
         "seoDescription",
         "canonicalPath",
         "isIndexable",
-        "editorStatus"
+        "editorStatus",
+        "mergeGroupKey"
       from "EventOverride"
       where "eventId" = $1
     `,
@@ -3017,6 +3018,7 @@ export async function updateAdminEventOverride(db, eventId, payload) {
     canonicalPath: current.canonicalPath ?? null,
     isIndexable: current.isIndexable ?? null,
     editorStatus: current.editorStatus ?? null,
+    mergeGroupKey: current.mergeGroupKey ?? null,
     ...normalized,
   };
 
@@ -3035,9 +3037,10 @@ export async function updateAdminEventOverride(db, eventId, payload) {
         "canonicalPath",
         "isIndexable",
         "editorStatus",
+        "mergeGroupKey",
         "updatedAt"
       )
-      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, now())
+      values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, now())
       on conflict ("eventId") do update set
         title = excluded.title,
         description = excluded.description,
@@ -3049,6 +3052,7 @@ export async function updateAdminEventOverride(db, eventId, payload) {
         "canonicalPath" = excluded."canonicalPath",
         "isIndexable" = excluded."isIndexable",
         "editorStatus" = excluded."editorStatus",
+        "mergeGroupKey" = excluded."mergeGroupKey",
         "updatedAt" = now()
       returning
         title,
@@ -3060,7 +3064,8 @@ export async function updateAdminEventOverride(db, eventId, payload) {
         "seoDescription",
         "canonicalPath",
         "isIndexable",
-        "editorStatus"
+        "editorStatus",
+        "mergeGroupKey"
     `,
     [
       randomUUID(),
@@ -3075,6 +3080,7 @@ export async function updateAdminEventOverride(db, eventId, payload) {
       next.canonicalPath,
       next.isIndexable,
       next.editorStatus,
+      next.mergeGroupKey,
     ],
   );
 
@@ -4759,6 +4765,7 @@ async function eventRows(db, limit) {
         override."canonicalPath" as "overrideCanonicalPath",
         override."isIndexable" as "overrideIsIndexable",
         override."editorStatus" as "overrideEditorStatus",
+        override."mergeGroupKey" as "overrideMergeGroupKey",
         cat.title as category,
         city.title as city,
         city."isDestination" as "cityIsDestination",
@@ -4910,6 +4917,7 @@ async function eventRows(db, limit) {
         canonicalPath: row.overrideCanonicalPath,
         isIndexable: row.overrideIsIndexable,
         editorStatus: row.overrideEditorStatus,
+        mergeGroupKey: row.overrideMergeGroupKey,
       },
       tags,
       landingHits: LANDING_RULES.filter((rule) => matchesRule({ ...row, tags }, rule)).map((rule) => rule.title).slice(0, 3),
@@ -5015,6 +5023,19 @@ function normalizeOverridePayload(payload) {
     const value = normalizeNullableString(payload.editorStatus);
     const allowed = new Set(['DRAFT', 'REVIEW', 'READY', 'PUBLISHED', 'HIDDEN']);
     normalized.editorStatus = value && allowed.has(value) ? value : null;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(payload, 'mergeGroupKey')) {
+    const value = normalizeNullableString(payload.mergeGroupKey);
+    if (!value) {
+      normalized.mergeGroupKey = null;
+    } else {
+      const normalizedKey = value.trim().toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '');
+      if (!normalizedKey || normalizedKey.length > 64) {
+        throw new Error('mergeGroupKey must be 1-64 chars: a-z, 0-9, _ and -');
+      }
+      normalized.mergeGroupKey = normalizedKey;
+    }
   }
 
   return normalized;
@@ -5933,6 +5954,7 @@ function mapOverrideRow(row) {
     canonicalPath: row.canonicalPath,
     isIndexable: row.isIndexable,
     editorStatus: row.editorStatus,
+    mergeGroupKey: row.mergeGroupKey,
   };
 }
 
@@ -8553,6 +8575,34 @@ const PUBLIC_CATALOG_CATEGORIES = new Set([
   'развлечения',
 ]);
 
+const WATER_CATALOG_HINT_RE =
+  /(водн(?:ые|ая)?\s+экскурси|речн(?:ая|ые)?|реч(?:ной|ная)\s+порт|теплоход|катер|яхт|лодк|причал|речные\s+прогулки)/i;
+const BUS_CATALOG_LABEL_RE = /автобус/i;
+
+function resolveCatalogTransportHint(session = {}) {
+  const haystack = [
+    session.title,
+    session.venue,
+    ...(session.subcategories || []),
+    ...(session.tags || []),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  if (WATER_CATALOG_HINT_RE.test(haystack)) return 'water';
+  if (BUS_CATALOG_LABEL_RE.test(haystack)) return 'bus';
+  return null;
+}
+
+function isConflictingTransportCatalogLabel(label, transport) {
+  if (!transport) return false;
+  const lower = String(label || '').toLowerCase();
+  if (transport === 'water') return BUS_CATALOG_LABEL_RE.test(lower);
+  if (transport === 'bus') return WATER_CATALOG_HINT_RE.test(lower);
+  return false;
+}
+
 function isCrossCategoryCatalogTag(tag, category) {
   const tagNorm = String(tag || '').trim().toLowerCase();
   const categoryNorm = String(category || '').trim().toLowerCase();
@@ -8616,12 +8666,14 @@ function isCatalogSubcategoryLabel(label, category) {
 
 export function pickCatalogSubcategories(session, limit = 4) {
   const category = session.category || session.sourceCategory || '';
+  const transport = resolveCatalogTransportHint(session);
   const labels = [];
   const seen = new Set();
 
   for (const label of session.subcategories || []) {
     const value = String(label || '').trim();
     if (!isCatalogSubcategoryLabel(value, category) || seen.has(value)) continue;
+    if (isConflictingTransportCatalogLabel(value, transport)) continue;
     seen.add(value);
     labels.push(value);
     if (labels.length >= limit) return labels;
@@ -8630,6 +8682,7 @@ export function pickCatalogSubcategories(session, limit = 4) {
   for (const tag of session.tags || []) {
     const value = String(tag || '').trim();
     if (!isCatalogSubcategoryLabel(value, category) || seen.has(value)) continue;
+    if (isConflictingTransportCatalogLabel(value, transport)) continue;
     seen.add(value);
     labels.push(value);
     if (labels.length >= limit) break;

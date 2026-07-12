@@ -117,6 +117,8 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
     category: row.category,
     subcategories: row.subcategories,
     tags,
+    title: row.overrideTitle || row.title,
+    venue: row.venue,
   });
   const cityName = resolvePublicSessionCity(row);
   const destination = publicDestinationForCity({ ...row, city: cityName });
@@ -219,20 +221,61 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
 }
 
 export function pickCatalogSubcategories(
-  session: { category?: string | null; sourceCategory?: string | null; subcategories?: string[]; tags?: string[] },
+  session: {
+    category?: string | null;
+    sourceCategory?: string | null;
+    subcategories?: string[];
+    tags?: string[];
+    title?: string | null;
+    venue?: string | null;
+  },
   limit = 4,
 ): string[] {
   const category = session.category || session.sourceCategory || '';
+  const transport = resolveCatalogTransportHint(session);
   const labels: string[] = [];
   const seen = new Set<string>();
   for (const label of [...(session.subcategories || []), ...(session.tags || [])]) {
     const value = String(label || '').trim();
     if (!isCatalogSubcategoryLabel(value, category) || seen.has(value)) continue;
+    if (isConflictingTransportCatalogLabel(value, transport)) continue;
     seen.add(value);
     labels.push(value);
     if (labels.length >= limit) break;
   }
   return labels;
+}
+
+const WATER_CATALOG_HINT_RE =
+  /(водн(?:ые|ая)?\s+экскурси|речн(?:ая|ые)?|реч(?:ной|ная)\s+порт|теплоход|катер|яхт|лодк|причал|речные\s+прогулки)/i;
+const BUS_CATALOG_LABEL_RE = /автобус/i;
+
+type CatalogTransportHint = 'water' | 'bus';
+
+function resolveCatalogTransportHint(
+  session: { title?: string | null; venue?: string | null; subcategories?: string[]; tags?: string[] },
+): CatalogTransportHint | null {
+  const haystack = [
+    session.title,
+    session.venue,
+    ...(session.subcategories || []),
+    ...(session.tags || []),
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  if (WATER_CATALOG_HINT_RE.test(haystack)) return 'water';
+  if (BUS_CATALOG_LABEL_RE.test(haystack)) return 'bus';
+  return null;
+}
+
+function isConflictingTransportCatalogLabel(label: string, transport: CatalogTransportHint | null): boolean {
+  if (!transport) return false;
+  const lower = label.toLowerCase();
+  if (transport === 'water') return BUS_CATALOG_LABEL_RE.test(lower);
+  if (transport === 'bus') return WATER_CATALOG_HINT_RE.test(lower);
+  return false;
 }
 
 function isCatalogSubcategoryLabel(label: string, category: string): boolean {

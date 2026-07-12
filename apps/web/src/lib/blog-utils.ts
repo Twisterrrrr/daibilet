@@ -22,6 +22,7 @@ export type BlogArticleDto = {
   city?: string | null;
   citySlug?: string | null;
   publishedAt?: string | null;
+  isIndexable?: boolean;
   seoTitle?: string | null;
   seoDescription?: string | null;
   canonicalPath?: string | null;
@@ -89,6 +90,7 @@ export function resolveStaticArticle(slug: string): BlogArticleDto | null {
     seoTitle: `${post.title} | Блог Дайбилет`,
     seoDescription: post.excerpt,
     canonicalPath: `/blog/${post.slug}`,
+    isIndexable: true,
   };
 }
 

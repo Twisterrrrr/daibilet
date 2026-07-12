@@ -39,7 +39,13 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
 
 export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
   const params = new URLSearchParams({ family, limit: '500' });
-  const payload = await buildPublicVenuesDto(params);
+  let venues: Awaited<ReturnType<typeof buildPublicVenuesDto>>['venues'] = [];
+  try {
+    const payload = await buildPublicVenuesDto(params);
+    venues = payload.venues ?? [];
+  } catch {
+    venues = [];
+  }
   const breadcrumbLabel = family === 'location' ? 'Локации' : 'Площадки';
 
   return (
@@ -54,9 +60,9 @@ export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
         </div>
       </div>
       {family === 'location' ? (
-        <LocationsCatalogView venues={payload.venues} />
+        <LocationsCatalogView venues={venues} />
       ) : (
-        <VenuesCatalogView venues={payload.venues} />
+        <VenuesCatalogView venues={venues} />
       )}
     </SiteLayout>
   );
