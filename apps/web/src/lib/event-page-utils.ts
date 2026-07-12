@@ -134,14 +134,21 @@ type RawTicketPrice = {
   sortOrder: number | null;
 };
 
+function isWeekdaySchedulePart(value: string): boolean {
+  const text = value.trim();
+  if (!text) return false;
+  if (/^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)$/iu.test(text)) return true;
+  if (/^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)(?:\s*[,—–\-]\s*(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС))+$/iu.test(text)) return true;
+  if (/^ПТ\s*,?\s*СБ\s*[—–\-]\s*ВС$/iu.test(text)) return true;
+  return false;
+}
+
 function splitTitlePartsWithoutWeekdays(title: string): string[] {
   const parts = title.split(',').map((part) => part.trim()).filter(Boolean);
-  const weekdayToken = /^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)$/iu;
-  const weekdayRange = /^(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС)(?:\s*[,—–\-]\s*(?:ПН|ВТ|СР|ЧТ|ПТ|СБ|ВС))+$/iu;
 
   while (parts.length > 1) {
     const last = parts[parts.length - 1];
-    if (weekdayToken.test(last) || weekdayRange.test(last)) {
+    if (isWeekdaySchedulePart(last)) {
       parts.pop();
       continue;
     }
@@ -166,7 +173,7 @@ function isTransportBoilerplate(value?: string | null): boolean {
   return /перевозка\s+пас[-.\s]?в/i.test(text) && /\bТС\s*\d+/i.test(text);
 }
 
-/** Убирает юридический хвост TC («перевозка пас-в … ТС 123») и оставляет имя категории. */
+/** Убирает юридический хвост TC и расписание по дням недели, оставляет только имя категории. */
 export function normalizeTicketCategoryLabel(raw?: string | null): string {
   let text = cleanDisplayText(raw);
   if (!text) return 'Билет';
@@ -183,17 +190,35 @@ export function normalizeTicketCategoryLabel(raw?: string | null): string {
     .trim();
 
   const parts = splitTitlePartsWithoutWeekdays(text);
-  if (parts.length > 1) {
-    const tail = parts.slice(1).join(', ').trim();
-    if (!tail || isTransportBoilerplate(tail)) return parts[0] || 'Билет';
-  }
+  if (parts[0]?.trim()) return parts[0].trim();
 
   return text || 'Билет';
 }
 
+function isRedundantCategoryDescription(name: string, description: string | null): boolean {
+  if (!description) return true;
+  const nameNorm = name.toLowerCase().trim();
+  const descNorm = description.toLowerCase().trim();
+  if (!descNorm || descNorm === nameNorm) return true;
+  if (descNorm.startsWith(`${nameNorm},`)) return true;
+  return false;
+}
+
+function pickBetterCategoryDescription(
+  name: string,
+  current: string | null,
+  candidate: string | null,
+): string | null {
+  const options = [current, candidate].filter(
+    (value): value is string => Boolean(value) && !isRedundantCategoryDescription(name, value),
+  );
+  if (!options.length) return null;
+  return options.sort((left, right) => right.length - left.length)[0];
+}
+
 function parseTicketCategory(item: { title: string; description?: string | null; priceRub: number }) {
-  const name = normalizeTicketCategoryLabel(item.title);
   const parts = splitTitlePartsWithoutWeekdays(cleanDisplayText(item.title) || '');
+  const name = parts[0]?.trim() || normalizeTicketCategoryLabel(item.title);
   let parsedDescription = parts.length > 1 ? parts.slice(1).join(', ').trim() : null;
   if (parsedDescription && (isTransportBoilerplate(parsedDescription) || isGenericTicketDescription(parsedDescription))) {
     parsedDescription = null;
@@ -203,6 +228,7 @@ function parseTicketCategory(item: { title: string; description?: string | null;
   let description =
     parsedDescription || (apiDescription && !isGenericTicketDescription(apiDescription) ? apiDescription : null);
   if (description && isTransportBoilerplate(description)) description = null;
+  if (isRedundantCategoryDescription(name, description)) description = null;
 
   return { name, description };
 }
@@ -252,6 +278,7 @@ export function buildGroupedTicketCategories(payload: PublicEventPageDto): Ticke
     }
     existing.minPrice = Math.min(existing.minPrice, item.priceRub);
     existing.maxPrice = Math.max(existing.maxPrice, item.priceRub);
+    existing.description = pickBetterCategoryDescription(name, existing.description, description);
     groupSortOrder.set(key, Math.min(groupSortOrder.get(key) ?? 9999, itemOrder));
   }
 
