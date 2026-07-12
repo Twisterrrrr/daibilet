@@ -52,6 +52,8 @@
     "check:post-deploy": "bash scripts/post-deploy-check.sh",
     "check:parity": "bash scripts/run-parity-check.sh",
     "revalidate:home": "node scripts/revalidate-next-home.mjs",
+    "hp:merge": "node scripts/apply-harry-potter-catalog-merge.js",
+    "hp:enrich-combos": "node scripts/apply-harry-potter-combo-enrichment.js",
     "launch:widgeturl-stats": "node scripts/launch-widgeturl-stats.js",
     "launch:staging-smoke": "bash scripts/launch-staging-smoke.sh",
     "launch:staging-smoke-next": "bash scripts/launch-staging-smoke-next.sh",

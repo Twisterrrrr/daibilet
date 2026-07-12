@@ -9,8 +9,8 @@ const db = createDb(rootDir);
 const MERGE_TITLE = 'Музей Гарри Поттера';
 const MERGE_GROUP_KEY = 'harry-potter-spb';
 const VENUE_MATCH = `%${'гарри'}%${'поттер'}%`;
-/** Numbered ticket tiers split by supplier: «Комбо 1», «Комбо 6 семейное», etc. */
-const COMBO_TITLE_MATCH = `^комбо [0-9]`;
+/** Numbered ticket tiers split by supplier: «Комбо 1», «Комбо 6 семейное», «Все включено», «Комбо-квест», etc. */
+const COMBO_TITLE_MATCH = `(^комбо [0-9]|все включено|комбо[- ]?квест)`;
 
 const { rows: events } = await db.query(
   `
@@ -33,7 +33,10 @@ console.log(`Found ${events.length} Harry Potter ticket products to merge.`);
 
 let updated = 0;
 for (const event of events) {
-  const isCombo = /^комбо [0-9]/i.test(event.title.trim());
+  const isCombo =
+    /^комбо [0-9]/i.test(event.title.trim()) ||
+    /все включено/i.test(event.title) ||
+    /комбо[- ]?квест/i.test(event.title);
   await db.query(
     `
       insert into "EventOverride" ("id", "eventId", title, "mergeGroupKey", "updatedAt")

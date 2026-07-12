@@ -658,6 +658,9 @@ function isMultiProductMergedGroup(peers: EventRecord[]): boolean {
 }
 
 function buildPurchaseOptionDescription(event: EventRecord): string | null {
+  const title = formatPublicEventTitle(event.title);
+  if (isAdultOrChildPurchaseOptionTitle(title)) return null;
+
   const raw = cleanImportedDescription(
     event.override?.shortDescription || event.description || event.override?.description,
   );
@@ -670,6 +673,19 @@ function buildPurchaseOptionDescription(event: EventRecord): string | null {
   const snippet = lines.slice(0, 3).join(' · ');
   if (!snippet) return null;
   return snippet.length > 260 ? `${snippet.slice(0, 257).trim()}…` : snippet;
+}
+
+function isAdultOrChildPurchaseOptionTitle(title: string): boolean {
+  const normalized = normalizeGroupPart(title);
+  if (!normalized) return false;
+  return /\bвзросл\w*/.test(normalized) || /\bдетск\w*/.test(normalized);
+}
+
+function purchaseOptionDisplayPriority(title: string): number {
+  const normalized = normalizeGroupPart(title);
+  if (/\bвзросл\w*/.test(normalized)) return 0;
+  if (/\bдетск\w*/.test(normalized)) return 1;
+  return 100;
 }
 
 function purchaseOptionSortKey(title: string): number {
@@ -754,6 +770,7 @@ function dedupePurchaseOptionsByTitle(options: PublicPurchaseOptionDto[]): Publi
   }
 
   return [...byTitle.values()].sort((left, right) =>
+    purchaseOptionDisplayPriority(left.title) - purchaseOptionDisplayPriority(right.title) ||
     purchaseOptionSortKey(left.title) - purchaseOptionSortKey(right.title) ||
     (left.priceFrom ?? 0) - (right.priceFrom ?? 0) ||
     left.title.localeCompare(right.title, 'ru'),
