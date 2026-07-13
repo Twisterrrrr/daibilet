@@ -155,17 +155,29 @@ function openTcPurchaseUrl(purchaseUrl?: string | null) {
   window.open(normalized, 'tc_widget', 'width=960,height=760,scrollbars=yes,resizable=yes');
 }
 
-function isTcWidgetVisible() {
+function hasTcWidgetIframe() {
   if (typeof document === 'undefined') return false;
   return Boolean(
     document.querySelector('.tc-widget-frame_popup') ||
-      document.getElementById('tc-widget-overlay') ||
       document.querySelector('.tc-widget-container iframe') ||
       document.querySelector('iframe[src*="ticketscloud"]'),
   );
 }
 
-function waitForTcWidgetVisible(timeoutMs = 1400) {
+/** Overlay alone is the loading shell — do not treat it as a successful open. */
+function isTcWidgetVisible() {
+  return hasTcWidgetIframe();
+}
+
+function isTcWidgetStuckLoading() {
+  if (typeof document === 'undefined') return false;
+  if (hasTcWidgetIframe()) return false;
+  return Boolean(
+    document.getElementById('ticketscloud-loader') || document.getElementById('tc-widget-overlay'),
+  );
+}
+
+function waitForTcWidgetVisible(timeoutMs = 2800) {
   return new Promise<boolean>((resolve) => {
     if (isTcWidgetVisible()) {
       resolve(true);
@@ -224,9 +236,11 @@ export async function openTcWidget(options: {
   }
 
   if (options.trigger) {
+    // Drop a previous stuck loader before another click.
+    if (isTcWidgetStuckLoading()) dismissTcWidget();
     options.trigger.click();
-    const visible = await waitForTcWidgetVisible(1800);
-    if (!visible) {
+    const visible = await waitForTcWidgetVisible(3200);
+    if (!visible || isTcWidgetStuckLoading()) {
       dismissTcWidget();
       openTcPurchaseUrl(options.purchaseUrl);
     }

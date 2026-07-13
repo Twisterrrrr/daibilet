@@ -4,6 +4,43 @@
 
 ---
 
+## 2026-07-14 — TC widget infinite loader again
+
+### Наблюдения
+
+- После клика «Купить» Ticketscloud рисует `#tc-widget-overlay` + `#ticketscloud-loader` до iframe.
+- `isTcWidgetVisible` считал overlay успехом → fallback на `purchaseUrl` не срабатывал, loader крутился бесконечно.
+- TEP: `ensureTeplohodWidgetScript` мог resolve до появления `TI_Tickets.init`.
+
+### Решения
+
+- Visible = реальный iframe (не overlay/loader); stuck loading → dismiss + popup fallback.
+- Teplohod script wait до `TI_Tickets.init`.
+
+### Проблемы
+
+- iframe может появиться пустым и всё ещё крутиться — если повторится, добавить проверку contentDocument/timeout внутри iframe.
+
+---
+
+## 2026-07-14 — Catalog list description restored
+
+### Наблюдения
+
+- Lean list DTO убрал `description` вместе с widget URL / full slots; на `/events` горизонтальные карточки потеряли excerpt при том, что UI (`formatListDescription`) уже его ждал.
+- Основной perf-выигрыш был от виджетов в list HTML и hydrate page-only, не от самого текста описания.
+
+### Решения
+
+- `toPublicCatalogListItem` снова отдаёт `description` как plain-text excerpt (≤420 символов, без HTML).
+- `PublicCatalogListItemDto.description` возвращён в контракт; `EventCardHorizontal` типизирован под list DTO.
+
+### Проблемы
+
+- Полный HTML description в list по-прежнему не нужен (раздувает JSON); detail остаётся на event page.
+
+---
+
 ## 2026-07-14 — ChunkLoad после redeploy + harden deploy
 
 ### Наблюдения

@@ -128,7 +128,12 @@ export function getDepartingSoonMinutes(startsAt: string): number | null {
 
 export function formatListDescription(value?: string | null): string {
   if (!value) return '';
-  return value.replace(/\s+/g, ' ').trim();
+  return value
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 /** Стабильный псевдорейтинг 4.0–5.0 до появления реальных отзывов. */

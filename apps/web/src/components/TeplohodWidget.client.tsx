@@ -136,11 +136,38 @@ function waitForTeplohodFancyboxContent(timeoutMs = 5000) {
   });
 }
 
+function waitForTeplohodApi(timeoutMs = 8000) {
+  return new Promise<void>((resolve, reject) => {
+    const ready = () => Boolean((window as TeplohodWidgetWindow).TI_Tickets?.init);
+    if (ready()) {
+      resolve();
+      return;
+    }
+    const deadline = Date.now() + timeoutMs;
+    const tick = () => {
+      if (ready()) {
+        resolve();
+        return;
+      }
+      if (Date.now() > deadline) {
+        reject(new Error('teplohod widget not ready'));
+        return;
+      }
+      requestAnimationFrame(tick);
+    };
+    tick();
+  });
+}
+
 export function ensureTeplohodWidgetScript() {
   if (typeof document === 'undefined') return Promise.resolve();
 
-  if (document.querySelector('script[data-daibilet-teplohod-widget="true"]')) {
-    return widgetScriptPromise || Promise.resolve();
+  const existing = document.querySelector(
+    'script[data-daibilet-teplohod-widget="true"]',
+  ) as HTMLScriptElement | null;
+  if (existing) {
+    widgetScriptPromise = widgetScriptPromise || waitForTeplohodApi();
+    return widgetScriptPromise;
   }
 
   widgetScriptPromise = new Promise<void>((resolve, reject) => {
@@ -148,7 +175,9 @@ export function ensureTeplohodWidgetScript() {
     script.src = TEP_WIDGET_SCRIPT_URL;
     script.defer = true;
     script.dataset.daibiletTeplohodWidget = 'true';
-    script.onload = () => resolve();
+    script.onload = () => {
+      waitForTeplohodApi().then(resolve, reject);
+    };
     script.onerror = () => reject(new Error('teplohod widget script failed'));
     document.body.appendChild(script);
   });

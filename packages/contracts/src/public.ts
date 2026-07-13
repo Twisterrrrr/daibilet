@@ -92,7 +92,7 @@ export interface PublicSessionDto extends PurchaseFields {
   manualLandingStatus?: string | null;
 }
 
-/** Lean list card for catalog API responses (no description / heavy group fields). */
+/** Lean list card for catalog API responses (no widget URLs / full slot hydrate). */
 export interface PublicCatalogListItemDto extends PurchaseFields {
   id: string;
   slug?: string | null;
@@ -117,6 +117,8 @@ export interface PublicCatalogListItemDto extends PurchaseFields {
   kind?: string | null;
   sourceStatus?: string | null;
   ageLimit?: string | null;
+  /** Plain-text excerpt for list cards (not full HTML body). */
+  description?: string | null;
   startsAt: string;
   dateLabel: string;
   timeLabel: string;

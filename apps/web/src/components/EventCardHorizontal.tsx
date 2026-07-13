@@ -5,7 +5,7 @@ import { Clock, MapPin, Star, Ticket } from 'lucide-react';
 import { useState } from 'react';
 
 import { EventFavoriteButton } from '@/components/EventFavoriteButton.client';
-import type { PublicSessionDto } from '@daibilet/contracts/public';
+import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 import { collectCatalogLabels } from '@/lib/catalog-labels';
 import { EventImageBadges } from '@/lib/event-card-badges';
 import {
@@ -24,7 +24,7 @@ import { eventHref, sessionVenueHref } from '@/lib/routes';
 const SLOT_CHIP_CLASS =
   'inline-btn inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-full bg-slate-100 px-2.5 text-[10px] font-medium leading-none text-slate-700';
 
-export function EventCardHorizontal({ session }: { session: PublicSessionDto }) {
+export function EventCardHorizontal({ session }: { session: PublicSessionDto | PublicCatalogListItemDto }) {
   const [hasImageError, setHasImageError] = useState(false);
   const showImage = Boolean(session.imageUrl && !hasImageError);
   const href = eventHref(session);

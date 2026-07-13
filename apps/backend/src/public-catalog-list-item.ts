@@ -1,8 +1,10 @@
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 
 const LIST_SLOT_PREVIEW_LIMIT = 3;
+/** Enough for line-clamp-3 on catalog cards without shipping full HTML blobs. */
+const LIST_DESCRIPTION_MAX_CHARS = 420;
 
-/** Lean catalog card DTO: no widget URLs, no full upcomingSlots payload. */
+/** Lean catalog card DTO: no widget URLs, truncated slots; keeps list description excerpt. */
 export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalogListItemDto {
   const item: PublicCatalogListItemDto = {
     id: session.id,
@@ -43,5 +45,27 @@ export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalo
   if (session.purchaseMode != null) item.purchaseMode = session.purchaseMode;
   if (session.purchaseProvider != null) item.purchaseProvider = session.purchaseProvider;
 
+  const description = toListDescriptionExcerpt(session.description);
+  if (description) item.description = description;
+
   return item;
+}
+
+function toListDescriptionExcerpt(value?: string | null): string | null {
+  if (!value) return null;
+  const plain = value
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!plain) return null;
+  if (plain.length <= LIST_DESCRIPTION_MAX_CHARS) return plain;
+  return `${plain.slice(0, LIST_DESCRIPTION_MAX_CHARS - 1).trimEnd()}…`;
 }
