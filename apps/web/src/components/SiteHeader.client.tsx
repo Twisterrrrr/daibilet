@@ -100,7 +100,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               onChange={onCityChange}
               allLabel="Все города"
               variant="header"
-              className="hidden lg:block"
+              className="hidden shrink-0 lg:block"
             />
           </div>
 
@@ -152,18 +152,11 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
             <button
               type="button"
               aria-label="Избранное"
+              title="Избранное"
               onClick={() => setFavoritesOpen(true)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800 lg:hidden"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
             >
               <Heart className="h-5 w-5" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setFavoritesOpen(true)}
-              className="hidden items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 lg:inline-flex"
-            >
-              <Heart className="h-4 w-4" />
-              Избранное
             </button>
           </div>
         </div>
