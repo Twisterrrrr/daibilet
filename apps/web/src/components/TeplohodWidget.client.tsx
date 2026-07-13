@@ -104,14 +104,6 @@ function containerHasWidgetMarkup(container: HTMLElement | null) {
   return Boolean(container.querySelector('.ti-tickets-event-tickets-buy, .ti-tickets-widget, iframe'));
 }
 
-function dismissTeplohodFancybox() {
-  if (typeof document === 'undefined') return;
-  document.querySelector('.fancyboxtkt-container')?.remove();
-  document.querySelector('.fancyboxtkt-slide')?.remove();
-  document.querySelector('.fancyboxtkt-bg')?.remove();
-  document.body.classList.remove('fancyboxtkt-active');
-}
-
 function waitForTeplohodFancyboxContent(timeoutMs = 5000) {
   return new Promise<boolean>((resolve) => {
     const hasContent = () => {
