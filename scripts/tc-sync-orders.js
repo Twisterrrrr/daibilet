@@ -420,7 +420,9 @@ function normalizeEmail(value) {
 
 function normalizePhone(value) {
   if (!value) return null;
-  const digits = String(value).replace(/\D/g, "");
+  const text = String(value).trim();
+  if (/^[a-f0-9]{16,}$/i.test(text.replace(/\s/g, ""))) return null;
+  const digits = text.replace(/\D/g, "");
   if (digits.length < 10) return null;
   if (digits.length === 11 && digits.startsWith("8")) return `7${digits.slice(1)}`;
   if (digits.length === 10) return `7${digits}`;
