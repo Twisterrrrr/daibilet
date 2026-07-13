@@ -504,7 +504,7 @@ async function buildAdminLaunchMetricsCompact(db) {
             and "priceFrom" is not null
             and coalesce("imageUrl", '') <> ''
         )::int as "readyForSeo",
-        count(*) filter (where lower(status::text) in ('needs_review', 'needs-review'))::int as "needsAttention",
+        count(*) filter (where status = 'REVIEW')::int as "needsAttention",
         count(*) filter (where "priceFrom" is null)::int as "priceBlocked",
         count(*) filter (where "purchaseReady" = false)::int as "purchaseBlocked",
         count(*) filter (where coalesce("imageUrl", '') = '')::int as "noImage"
