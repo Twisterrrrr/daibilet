@@ -99,6 +99,43 @@ function containerHasWidgetMarkup(container: HTMLElement | null) {
   return Boolean(container.querySelector('.ti-tickets-event-tickets-buy, .ti-tickets-widget, iframe'));
 }
 
+function dismissTeplohodFancybox() {
+  if (typeof document === 'undefined') return;
+  document.querySelector('.fancyboxtkt-container')?.remove();
+  document.querySelector('.fancyboxtkt-slide')?.remove();
+  document.querySelector('.fancyboxtkt-bg')?.remove();
+  document.body.classList.remove('fancyboxtkt-active');
+}
+
+function waitForTeplohodFancyboxContent(timeoutMs = 5000) {
+  return new Promise<boolean>((resolve) => {
+    const hasContent = () => {
+      const frame = document.querySelector('.fancyboxtkt-container iframe, .fancyboxtkt-slide iframe');
+      return Boolean(frame);
+    };
+    if (hasContent()) {
+      resolve(true);
+      return;
+    }
+
+    const deadline = Date.now() + timeoutMs;
+    const observer = new MutationObserver(() => {
+      if (hasContent()) {
+        observer.disconnect();
+        resolve(true);
+      } else if (Date.now() >= deadline) {
+        observer.disconnect();
+        resolve(false);
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    window.setTimeout(() => {
+      observer.disconnect();
+      resolve(hasContent());
+    }, timeoutMs);
+  });
+}
+
 export function ensureTeplohodWidgetScript() {
   if (typeof document === 'undefined') return Promise.resolve();
 
@@ -273,15 +310,24 @@ export function openTeplohodPurchase(options: { wrapperId?: string; purchaseUrl?
 
   void ensureTeplohodWidgetScript()
     .then(() => bootstrapTeplohodWidgets())
-    .finally(() => {
+    .finally(async () => {
       openTeplohodWidget(wrapperId);
-      window.setTimeout(() => {
-        const button = document.querySelector<HTMLElement>(`#${wrapperId} .ti-tickets-event-tickets-buy`);
-        const fancyboxOpen = document.querySelector('.fancyboxtkt-container, .fancyboxtkt-slide');
-        if (!button && !fancyboxOpen && options.purchaseUrl) {
+      await new Promise((r) => window.setTimeout(r, 400));
+      const hasContent = await waitForTeplohodFancyboxContent(4500);
+      if (hasContent) return;
+
+      const button = document.querySelector<HTMLElement>(`#${wrapperId} .ti-tickets-event-tickets-buy`);
+      const fancyboxOpen = document.querySelector('.fancyboxtkt-container, .fancyboxtkt-slide');
+      if (!button && !fancyboxOpen && options.purchaseUrl) {
+        window.open(options.purchaseUrl, '_blank', 'noopener,noreferrer');
+        return;
+      }
+      if (fancyboxOpen && !hasContent) {
+        dismissTeplohodFancybox();
+        if (options.purchaseUrl) {
           window.open(options.purchaseUrl, '_blank', 'noopener,noreferrer');
         }
-      }, 3800);
+      }
     });
 }
 
@@ -310,7 +356,7 @@ export function TeplohodWidgetButton({
     <>
       <div
         id={containerId}
-        className="pointer-events-none fixed left-0 top-0 z-[-1] h-20 w-72 overflow-hidden opacity-0"
+        className="pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0"
         aria-hidden="true"
       >
         <TeplohodWidgetEmbed

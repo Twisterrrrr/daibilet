@@ -81,11 +81,58 @@ function isTcWidgetReady() {
   return Boolean(w.tcBuyTicketClickCallbackBinded || w.ticketsCloudWidget);
 }
 
+function waitForTcWidgetReady(timeoutMs = 8000) {
+  return new Promise<void>((resolve, reject) => {
+    if (isTcWidgetReady()) {
+      resolve();
+      return;
+    }
+
+    const deadline = Date.now() + timeoutMs;
+    const tick = () => {
+      if (isTcWidgetReady()) {
+        resolve();
+        return;
+      }
+      if (Date.now() > deadline) {
+        reject(new Error('tc widget not ready'));
+        return;
+      }
+      requestAnimationFrame(tick);
+    };
+    tick();
+  });
+}
+
 function ensureTcWidgetScript() {
   if (typeof document === 'undefined') return Promise.resolve();
-  if (isTcWidgetReady()) return Promise.resolve();
+
+  const waitLoaded = (script: HTMLScriptElement) =>
+    new Promise<void>((resolve, reject) => {
+      if (isTcWidgetReady()) {
+        resolve();
+        return;
+      }
+
+      const finish = () => waitForTcWidgetReady().then(resolve, reject);
+
+      if (document.readyState !== 'loading') {
+        void finish();
+        return;
+      }
+
+      script.addEventListener('load', () => void finish(), { once: true });
+      script.addEventListener('error', () => reject(new Error('tcwidget.js failed')), { once: true });
+    });
+
+  const existingScript = document.querySelector('script[src*="tcwidget.js"]') as HTMLScriptElement | null;
+  if (existingScript) {
+    widgetScriptPromise = widgetScriptPromise || waitLoaded(existingScript);
+    return widgetScriptPromise;
+  }
+
   if (document.querySelector('script[data-daibilet-tc-widget="true"]')) {
-    return widgetScriptPromise || Promise.resolve();
+    return widgetScriptPromise || waitForTcWidgetReady();
   }
 
   widgetScriptPromise = new Promise<void>((resolve, reject) => {
@@ -93,7 +140,9 @@ function ensureTcWidgetScript() {
     script.src = TC_WIDGET_SCRIPT_URL;
     script.defer = true;
     script.dataset.daibiletTcWidget = 'true';
-    script.onload = () => resolve();
+    script.onload = () => {
+      waitForTcWidgetReady().then(resolve, reject);
+    };
     script.onerror = () => reject(new Error('tcwidget.js failed'));
     document.body.appendChild(script);
   });
@@ -104,6 +153,63 @@ function openTcPurchaseUrl(purchaseUrl?: string | null) {
   const normalized = normalizeTcPurchaseUrl(purchaseUrl);
   if (!normalized) return;
   window.open(normalized, 'tc_widget', 'width=960,height=760,scrollbars=yes,resizable=yes');
+}
+
+function isTcWidgetVisible() {
+  if (typeof document === 'undefined') return false;
+  return Boolean(
+    document.querySelector('.tc-widget-frame_popup') ||
+      document.getElementById('tc-widget-overlay') ||
+      document.querySelector('.tc-widget-container iframe') ||
+      document.querySelector('iframe[src*="ticketscloud"]'),
+  );
+}
+
+function waitForTcWidgetVisible(timeoutMs = 1400) {
+  return new Promise<boolean>((resolve) => {
+    if (isTcWidgetVisible()) {
+      resolve(true);
+      return;
+    }
+
+    const deadline = Date.now() + timeoutMs;
+    const observer = new MutationObserver(() => {
+      if (isTcWidgetVisible()) {
+        observer.disconnect();
+        resolve(true);
+      } else if (Date.now() >= deadline) {
+        observer.disconnect();
+        resolve(false);
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+    window.setTimeout(() => {
+      observer.disconnect();
+      resolve(isTcWidgetVisible());
+    }, timeoutMs);
+  });
+}
+
+function dismissTcWidget() {
+  if (typeof document === 'undefined') return;
+
+  const iframe = document.querySelector<HTMLIFrameElement>('.tc-widget-frame_popup');
+  if (iframe?.classList.contains('tc-widget-frame_popup')) {
+    const popupShell = iframe.parentNode?.parentNode?.parentNode;
+    if (popupShell instanceof Element) popupShell.remove();
+  }
+
+  document.getElementById('tc-widget-overlay')?.remove();
+  document.getElementById('ticketscloud-loader')?.remove();
+
+  const body = document.body;
+  if (body.hasAttribute('data-overflow')) {
+    body.style.overflow = body.getAttribute('data-overflow') || '';
+    body.removeAttribute('data-overflow');
+  }
+
+  document.querySelectorAll('.tc-widget-container').forEach((node) => node.remove());
 }
 
 export async function openTcWidget(options: {
@@ -119,6 +225,11 @@ export async function openTcWidget(options: {
 
   if (options.trigger) {
     options.trigger.click();
+    const visible = await waitForTcWidgetVisible(1800);
+    if (!visible) {
+      dismissTcWidget();
+      openTcPurchaseUrl(options.purchaseUrl);
+    }
     return;
   }
 

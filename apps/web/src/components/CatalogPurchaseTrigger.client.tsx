@@ -87,7 +87,7 @@ export function CatalogPurchaseAnchors({
 
   return (
     <div
-      className="pointer-events-none fixed left-0 top-0 z-[-1] h-20 w-72 overflow-hidden opacity-0"
+      className="pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0"
       aria-hidden="true"
     >
       {teplohod ? (
