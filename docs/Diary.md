@@ -14,11 +14,12 @@
 ### Решения
 
 - Документы: Project/Tasktracker/Diary/current-state обновлены под контракты admin API и catalog perf rules.
-- Deploy: `feat/next-monorepo` → `deploy-prod-next.sh` + nginx www→apex patch.
+- Deploy: `feat/next-monorepo` @ `6175ad5` → prod (`deploy-prod-next.sh`); nginx www→apex 301 применён; Next matcher hotfix (static array).
 
 ### Проблемы
 
 - SQL LIMIT read-model (0.5.8) остаётся следующим perf-блоком после warm-cache wins.
+- На сервере перед pull был stash `pre-deploy-f59d52c` (локальные hotfix-файлы) — не потерять при необходимости.
 
 ---
 

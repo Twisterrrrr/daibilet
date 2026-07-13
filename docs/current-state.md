@@ -27,7 +27,7 @@
 | Компонент | Статус | Примечание |
 |-----------|--------|------------|
 | nginx → Next public | ✅ | cutover 2026-07-10 |
-| `www` → apex 301 | 🔄 | middleware + nginx patch; применить на сервере |
+| `www` → apex 301 | ✅ | nginx patch 2026-07-14 + Next middleware |
 | Admin list pagination (cities/landings/…) | ✅ | page envelopes + UI pager |
 | Compact dashboard metrics | ✅ | grouped catalog = public stats |
 | Catalog lean DTO / no list widgets | ✅ | hydrate page-only |
