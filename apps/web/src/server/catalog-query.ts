@@ -9,6 +9,26 @@ export interface CatalogPageQuery extends PublicCatalogQuery {
   page: number;
 }
 
+/** Stable cache key for catalog SSR / client skip-fetch alignment. */
+export function catalogQueryCacheKey(query: PublicCatalogQuery): string {
+  const normalized = {
+    q: query.q ?? '',
+    city: query.city ?? '',
+    category: query.category ?? '',
+    landing: query.landing ?? '',
+    date: query.date ?? '',
+    from: query.from ?? '',
+    to: query.to ?? '',
+    sort: query.sort ?? 'time',
+    limit: query.limit ?? CATALOG_PAGE_SIZE_DEFAULT,
+    offset: query.offset ?? 0,
+    minPrice: query.minPrice ?? '',
+    maxPrice: query.maxPrice ?? query.priceMax ?? '',
+    ageMax: query.ageMax ?? '',
+  };
+  return JSON.stringify(normalized);
+}
+
 export function searchParamsToRecord(
   input: Record<string, string | string[] | undefined> | URLSearchParams,
 ): Record<string, string> {

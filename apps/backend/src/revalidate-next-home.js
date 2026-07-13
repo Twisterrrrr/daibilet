@@ -17,8 +17,8 @@ export async function revalidateNextHome(reason = 'manual') {
       Authorization: `Bearer ${secret}`,
     },
     body: JSON.stringify({
-      tags: ['home-page'],
-      paths: ['/'],
+      tags: ['home-page', 'catalog-page'],
+      paths: ['/', '/events'],
     }),
   });
 

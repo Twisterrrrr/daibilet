@@ -17,13 +17,18 @@ import {
   storeCatalogViewMode,
   type CatalogViewMode,
 } from '@/lib/catalog-view-mode';
-import { parseCatalogPageQuery, searchParamsToRecord } from '@/server/catalog-query';
+import { parseCatalogPageQuery, searchParamsToRecord, catalogQueryCacheKey } from '@/server/catalog-query';
 
-export function CatalogShell() {
+type CatalogShellProps = {
+  initialCatalog?: PublicCatalogDto | null;
+  initialQueryKey?: string;
+};
+
+export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: CatalogShellProps) {
   const router = useRouter();
   const urlSearchParams = useSearchParams();
-  const [catalog, setCatalog] = useState<PublicCatalogDto | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [catalog, setCatalog] = useState<PublicCatalogDto | null>(initialCatalog);
+  const [loading, setLoading] = useState(!initialCatalog);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewModeState] = useState<CatalogViewMode>('cards');
 
@@ -39,6 +44,8 @@ export function CatalogShell() {
       return parseCatalogPageQuery({});
     }
   }, [searchParamsRecord]);
+
+  const queryKey = useMemo(() => catalogQueryCacheKey(query), [query]);
 
   const filterValues = useMemo(
     () =>
@@ -70,6 +77,13 @@ export function CatalogShell() {
   }, [urlSearchParams]);
 
   useEffect(() => {
+    if (initialQueryKey && queryKey === initialQueryKey && initialCatalog) {
+      setCatalog(initialCatalog);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     const controller = new AbortController();
     setLoading(true);
     setError(null);
@@ -91,7 +105,7 @@ export function CatalogShell() {
       });
 
     return () => controller.abort();
-  }, [urlSearchParams]);
+  }, [urlSearchParams, queryKey, initialQueryKey, initialCatalog]);
 
   const setViewMode = useCallback(
     (next: CatalogViewMode) => {

@@ -7,5 +7,8 @@ export const PUBLIC_API_REVALIDATE = 300;
 /** `unstable_cache` tag for home page data (stats, catalog slice, destinations). */
 export const HOME_PAGE_CACHE_TAG = 'home-page';
 
+/** `unstable_cache` tag for /events catalog SSR + API slices. */
+export const CATALOG_PAGE_CACHE_TAG = 'catalog-page';
+
 /** Shared Cache-Control for CDN/nginx and browser. */
 export const PUBLIC_CACHE_CONTROL = 'public, s-maxage=300, stale-while-revalidate=600';
