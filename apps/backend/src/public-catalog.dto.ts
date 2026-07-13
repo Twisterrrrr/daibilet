@@ -1,5 +1,6 @@
 import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZE_MAX } from '@daibilet/contracts/catalog';
-import { Prisma, prisma } from '@daibilet/db';
+import { prisma } from '@daibilet/db';
+import { raw, sql } from '@daibilet/db/sql';
 import {
   ACTIVE_SESSION_SQL,
   isSaleableForPublicCatalog,
@@ -112,7 +113,7 @@ export async function getPublicCatalogSessions(forceRefresh = false): Promise<Pu
 }
 
 async function loadPinnedEventIds(): Promise<Set<string>> {
-  const rows = await prisma.$queryRaw<Array<{ eventId: string }>>(Prisma.sql`
+  const rows = await prisma.$queryRaw<Array<{ eventId: string }>>(sql`
     select distinct "eventId"
     from "LandingMatch"
     where coalesce(reasons->>'manualStatus', '') = 'PINNED'
@@ -121,7 +122,7 @@ async function loadPinnedEventIds(): Promise<Set<string>> {
 }
 
 async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
-  return prisma.$queryRaw<PublicCatalogRow[]>(Prisma.sql`
+  return prisma.$queryRaw<PublicCatalogRow[]>(sql`
     with event_identity as (
       select distinct on (identity."eventId")
         identity."eventId",
@@ -218,13 +219,13 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         primary_offer."priceRub" as "offerPriceRub",
         primary_offer."widgetUrl" as "offerWidgetUrl",
         primary_offer."deeplinkUrl" as "offerDeeplinkUrl",
-        min(session."startsAt") filter (where ${Prisma.raw(ACTIVE_SESSION_SQL)}) as "startsAt",
+        min(session."startsAt") filter (where ${raw(ACTIVE_SESSION_SQL)}) as "startsAt",
         min(session."priceFromRub") filter (
-          where ${Prisma.raw(ACTIVE_SESSION_SQL)}
+          where ${raw(ACTIVE_SESSION_SQL)}
             and session."priceFromRub" >= ${MIN_DISPLAY_PRICE_RUB}
         ) as "sessionPriceFromRub",
         max(session."priceFromRub") filter (
-          where ${Prisma.raw(ACTIVE_SESSION_SQL)}
+          where ${raw(ACTIVE_SESSION_SQL)}
             and session."priceFromRub" >= ${MIN_DISPLAY_PRICE_RUB}
         ) as "sessionPriceToRub",
         (
@@ -234,7 +235,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
             and offer.active = true
             and offer."priceRub" >= ${MIN_DISPLAY_PRICE_RUB}
         ) as "offerPriceMaxRub",
-        count(distinct session.id) filter (where ${Prisma.raw(ACTIVE_SESSION_SQL)})::int as "slotCount",
+        count(distinct session.id) filter (where ${raw(ACTIVE_SESSION_SQL)})::int as "slotCount",
         (
           select coalesce(array_agg(title order by priority, title), '{}')
           from (
@@ -351,7 +352,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
             '|',
             lower(regexp_replace(trim(coalesce("sourceLabel", '')), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(
-              nullif(trim(${Prisma.raw(CATALOG_GROUP_TITLE_SQL)}), ''),
+              nullif(trim(${raw(CATALOG_GROUP_TITLE_SQL)}), ''),
               trim(coalesce(venue, ''))
             )), '\\s+', ' ', 'g')),
             lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),

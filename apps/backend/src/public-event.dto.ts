@@ -1,4 +1,5 @@
-import { Prisma, prisma } from '@daibilet/db';
+import type { Prisma } from '@daibilet/db';
+import { prisma } from '@daibilet/db';
 import {
   hasUpcomingOrOpenSchedule,
   isOpenDateCatalogRow,

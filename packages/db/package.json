@@ -7,6 +7,10 @@
     ".": {
       "types": "./src/client.ts",
       "default": "./src/client.ts"
+    },
+    "./sql": {
+      "types": "./src/sql.ts",
+      "default": "./src/sql.ts"
     }
   },
   "scripts": {

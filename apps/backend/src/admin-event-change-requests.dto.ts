@@ -1,4 +1,5 @@
-import { Prisma, prisma, type EventChangeRequestStatus, type EventChangeRequestType } from '@daibilet/db';
+import type { EventChangeRequestStatus, EventChangeRequestType, Prisma } from '@daibilet/db';
+import { prisma } from '@daibilet/db';
 import type {
   AdminEventChangeRequestDetailDto,
   AdminEventChangeRequestDiffItemDto,

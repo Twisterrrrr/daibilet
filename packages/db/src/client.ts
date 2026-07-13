@@ -27,6 +27,6 @@ export async function disconnectPrisma() {
   await prisma.$disconnect();
 }
 
-export { Prisma };
-export type { PrismaClient };
+export { PrismaClient } from './generated/prisma/client.ts';
+export type { Prisma } from './generated/prisma/client.ts';
 export * from './generated/prisma/enums.ts';
