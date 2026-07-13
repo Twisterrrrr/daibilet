@@ -1772,12 +1772,45 @@ function normalizeBuyerSnapshot(snapshot) {
   const payload = snapshot && typeof snapshot === 'object' ? snapshot : {};
   const customer = payload.customer && typeof payload.customer === 'object' ? payload.customer : {};
   const buyer = payload.buyer && typeof payload.buyer === 'object' ? payload.buyer : {};
+  const sourcePayload = payload.sourcePayload && typeof payload.sourcePayload === 'object' ? payload.sourcePayload : {};
+  const settingsCustomer =
+    (payload.settings && typeof payload.settings.customer === 'object' && payload.settings.customer) ||
+    (sourcePayload.settings && typeof sourcePayload.settings.customer === 'object' && sourcePayload.settings.customer) ||
+    {};
+  const rawPhone = firstString(
+    payload.phone,
+    payload.customerPhone,
+    buyer.phone,
+    customer.phone,
+    settingsCustomer.phone,
+    settingsCustomer.phone_number,
+  );
   return {
-    name: firstString(payload.name, payload.fullName, payload.customerName, buyer.name, customer.name, customer.fullName),
-    email: firstString(payload.email, payload.customerEmail, buyer.email, customer.email),
-    phone: firstString(payload.phone, payload.customerPhone, buyer.phone, customer.phone),
+    name: firstString(
+      payload.name,
+      payload.fullName,
+      payload.customerName,
+      buyer.name,
+      customer.name,
+      customer.fullName,
+      settingsCustomer.name,
+      settingsCustomer.full_name,
+    ),
+    email: firstString(
+      payload.email,
+      payload.customerEmail,
+      buyer.email,
+      customer.email,
+      settingsCustomer.email,
+    ),
+    phone: looksLikeDateTime(rawPhone) ? null : rawPhone,
     notes: firstString(payload.notes, payload.comment, buyer.notes, payload.code, payload.number, payload.source, payload.rawStatus),
   };
+}
+
+function looksLikeDateTime(value) {
+  const text = String(value || '').trim();
+  return /^\d{4}-\d{2}-\d{2}([ T]\d{2}:\d{2}(:\d{2})?)?/.test(text);
 }
 
 function normalizeLookup(value) {
