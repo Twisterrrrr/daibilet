@@ -23,6 +23,13 @@ git fetch origin "$BRANCH"
 git checkout "$BRANCH"
 git pull --ff-only origin "$BRANCH"
 
+# Re-exec after pull so post-build steps (cache clear / revalidate) match the
+# version on the branch — bash otherwise keeps running the pre-pull script body.
+if [[ "${DAIBILET_DEPLOY_REEXEC:-}" != "1" ]]; then
+  export DAIBILET_DEPLOY_REEXEC=1
+  exec bash "$APP_DIR/deploy/scripts/deploy-prod-next.sh" "$@"
+fi
+
 corepack enable 2>/dev/null || true
 corepack prepare pnpm@11.7.0 --activate 2>/dev/null || true
 
