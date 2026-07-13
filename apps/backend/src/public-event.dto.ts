@@ -320,7 +320,7 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     isIndexable: requestedEvent.override?.isIndexable ?? requestedEvent.isIndexable,
   };
   const ticketPrices = buildTicketPrices(offers, sessions, event);
-  const purchaseOptions = buildMergedPurchaseOptions(mergedGroupEvents, offers, requestedEvent, eventPurchaseUrl);
+  const purchaseOptions = await buildMergedPurchaseOptions(mergedGroupEvents, offers, requestedEvent, eventPurchaseUrl);
   const related = relatedSessions(catalogSessions, groupEventIds, requestedEvent, 12);
   const priceValues = [event.priceFrom, ...sessions.map((session) => session.priceFrom)]
     .filter((value): value is number => Number.isFinite(value) && Number(value) >= MIN_DISPLAY_PRICE_RUB);
@@ -693,17 +693,57 @@ function purchaseOptionSortKey(title: string): number {
   return match ? Number(match[1]) : 9999;
 }
 
-function buildMergedPurchaseOptions(
+async function loadEarliestUpcomingStartsAt(eventIds: string[]): Promise<Map<string, number>> {
+  if (!eventIds.length) return new Map();
+  const now = new Date();
+  const rows = await prisma.eventSession.findMany({
+    where: {
+      eventId: { in: eventIds },
+      OR: [{ endsAt: { gte: now } }, { startsAt: { gte: now } }],
+    },
+    select: { eventId: true, startsAt: true },
+    orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
+  });
+
+  const map = new Map<string, number>();
+  for (const row of rows) {
+    if (map.has(row.eventId) || !row.startsAt) continue;
+    map.set(row.eventId, row.startsAt.getTime());
+  }
+  return map;
+}
+
+function pickBetterPurchaseOption(
+  left: PublicPurchaseOptionDto,
+  right: PublicPurchaseOptionDto,
+  upcomingStartsAt: Map<string, number>,
+): PublicPurchaseOptionDto {
+  const leftStart = upcomingStartsAt.get(left.id);
+  const rightStart = upcomingStartsAt.get(right.id);
+  if (leftStart && !rightStart) return left;
+  if (rightStart && !leftStart) return right;
+  if (leftStart && rightStart && leftStart !== rightStart) {
+    return leftStart < rightStart ? left : right;
+  }
+
+  const leftPrice = left.priceFrom ?? Number.POSITIVE_INFINITY;
+  const rightPrice = right.priceFrom ?? Number.POSITIVE_INFINITY;
+  if (leftPrice !== rightPrice) return leftPrice < rightPrice ? left : right;
+  return left.title.localeCompare(right.title, 'ru') <= 0 ? left : right;
+}
+
+async function buildMergedPurchaseOptions(
   groupEvents: EventRecord[],
   offers: MappedOffer[],
   requestedEvent: EventRecord,
   fallbackPurchaseUrl: string | null,
-): PublicPurchaseOptionDto[] {
+): Promise<PublicPurchaseOptionDto[]> {
   const peers = resolveMultiPurchasePeers(groupEvents, requestedEvent);
   if (!isMultiProductMergedGroup(peers)) return [];
 
   const mergeGroupKey = normalizeMergeGroupKey(requestedEvent.override?.mergeGroupKey);
   const mergeTitle = mergedCatalogTitle(requestedEvent);
+  const upcomingStartsAt = await loadEarliestUpcomingStartsAt(peers.map((event) => event.id));
 
   const offersByEventId = new Map<string, MappedOffer[]>();
   for (const offer of offers) {
@@ -750,10 +790,13 @@ function buildMergedPurchaseOptions(
     })
     .filter((option): option is PublicPurchaseOptionDto => option !== null);
 
-  return dedupePurchaseOptionsByTitle(options);
+  return dedupePurchaseOptionsByTitle(options, upcomingStartsAt);
 }
 
-function dedupePurchaseOptionsByTitle(options: PublicPurchaseOptionDto[]): PublicPurchaseOptionDto[] {
+function dedupePurchaseOptionsByTitle(
+  options: PublicPurchaseOptionDto[],
+  upcomingStartsAt: Map<string, number> = new Map(),
+): PublicPurchaseOptionDto[] {
   const byTitle = new Map<string, PublicPurchaseOptionDto>();
   for (const option of options) {
     const key = normalizeGroupPart(option.title);
@@ -762,11 +805,7 @@ function dedupePurchaseOptionsByTitle(options: PublicPurchaseOptionDto[]): Publi
       byTitle.set(key, option);
       continue;
     }
-    const optionPrice = option.priceFrom ?? Number.POSITIVE_INFINITY;
-    const currentPrice = current.priceFrom ?? Number.POSITIVE_INFINITY;
-    if (optionPrice < currentPrice) {
-      byTitle.set(key, option);
-    }
+    byTitle.set(key, pickBetterPurchaseOption(current, option, upcomingStartsAt));
   }
 
   return [...byTitle.values()].sort((left, right) =>

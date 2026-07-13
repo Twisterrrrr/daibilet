@@ -33,20 +33,16 @@ console.log(`Found ${events.length} Harry Potter ticket products to merge.`);
 
 let updated = 0;
 for (const event of events) {
-  const isCombo =
-    /^комбо [0-9]/i.test(event.title.trim()) ||
-    /все включено/i.test(event.title) ||
-    /комбо[- ]?квест/i.test(event.title);
   await db.query(
     `
       insert into "EventOverride" ("id", "eventId", title, "mergeGroupKey", "updatedAt")
       values ($4, $1, $2, $3, now())
       on conflict ("eventId") do update set
-        title = case when excluded.title is not null then excluded.title else "EventOverride".title end,
+        title = excluded.title,
         "mergeGroupKey" = excluded."mergeGroupKey",
         "updatedAt" = now()
     `,
-    [event.id, isCombo ? MERGE_TITLE : null, MERGE_GROUP_KEY, randomUUID()],
+    [event.id, MERGE_TITLE, MERGE_GROUP_KEY, randomUUID()],
   );
   updated += 1;
   console.log(`  ${event.title}`);

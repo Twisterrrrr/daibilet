@@ -56,6 +56,7 @@ export interface PublicCatalogMappingRow {
   venueHeroImageUrl: string | null;
   venueKind: string | null;
   overrideTitle: string | null;
+  overrideMergeGroupKey: string | null;
   overrideDescription: string | null;
   overrideShortDescription: string | null;
   overrideImageUrl: string | null;

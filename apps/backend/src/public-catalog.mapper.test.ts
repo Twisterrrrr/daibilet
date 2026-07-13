@@ -128,6 +128,7 @@ function catalogRow(overrides: Partial<PublicCatalogMappingRow>): PublicCatalogM
     venueHeroImageUrl: null,
     venueKind: 'PIER',
     overrideTitle: null,
+    overrideMergeGroupKey: null,
     overrideDescription: null,
     overrideShortDescription: null,
     overrideImageUrl: null,

@@ -79,7 +79,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-2">
                   {typeof option.priceFrom === 'number' ? (
-                    <span className="text-sm font-bold text-slate-900">{formatPriceRub(option.priceFrom)} ₽</span>
+                    <span className="text-sm font-bold text-slate-900">{formatPriceRub(option.priceFrom)}</span>
                   ) : null}
                   {option.externalId ? (
                     <TcOptionBuyButton

@@ -208,6 +208,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
         venue."heroImageUrl" as "venueHeroImageUrl",
         venue.kind as "venueKind",
         override.title as "overrideTitle",
+        override."mergeGroupKey" as "overrideMergeGroupKey",
         override.description as "overrideDescription",
         override."shortDescription" as "overrideShortDescription",
         override."imageUrl" as "overrideImageUrl",
@@ -337,16 +338,25 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
     saleable as (
       select
         *,
-        concat_ws(
-          '|',
-          lower(regexp_replace(trim(coalesce("sourceLabel", '')), '\\s+', ' ', 'g')),
-          lower(regexp_replace(trim(coalesce(
-            nullif(trim(${Prisma.raw(CATALOG_GROUP_TITLE_SQL)}), ''),
-            trim(coalesce(venue, ''))
-          )), '\\s+', ' ', 'g')),
-          lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
-          lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
-        ) as "groupKey"
+        case
+          when nullif(trim("overrideMergeGroupKey"), '') is not null then concat_ws(
+            '|',
+            'merge',
+            lower(regexp_replace(trim("overrideMergeGroupKey"), '\\s+', ' ', 'g')),
+            lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
+            lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
+          )
+          else concat_ws(
+            '|',
+            lower(regexp_replace(trim(coalesce("sourceLabel", '')), '\\s+', ' ', 'g')),
+            lower(regexp_replace(trim(coalesce(
+              nullif(trim(${Prisma.raw(CATALOG_GROUP_TITLE_SQL)}), ''),
+              trim(coalesce(venue, ''))
+            )), '\\s+', ' ', 'g')),
+            lower(regexp_replace(trim(coalesce(city, '')), '\\s+', ' ', 'g')),
+            lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
+          )
+        end as "groupKey"
       from normalized
       where "priceFrom" >= ${MIN_DISPLAY_PRICE_RUB}
         and "purchaseReady" = true
