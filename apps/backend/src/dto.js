@@ -844,7 +844,6 @@ export async function deleteAdminOrder(db, orderKey) {
     throw error;
   }
   await db.query('update "CheckoutOrder" set "externalOrderId" = null where "externalOrderId" = $1', [order.id]).catch(() => undefined);
-  await db.query('update "RefundRequest" set "externalOrderId" = null where "externalOrderId" = $1', [order.id]).catch(() => undefined);
   await db.query('delete from "ExternalTicket" where "externalOrderId" = $1', [order.id]);
   await db.query('delete from "ExternalOrder" where id = $1', [order.id]);
   return { ok: true, deletedId: order.id };
