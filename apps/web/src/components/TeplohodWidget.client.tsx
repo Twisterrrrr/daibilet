@@ -36,6 +36,11 @@ const TEP_WIDGET_CSS = `
 .teplohod-info-wrapper .ti-tickets-event-tickets-buy-closed {
   display: none !important;
 }
+/* Keep Teplohod Fancybox above Next layout chrome */
+.fancyboxtkt-container,
+.fancyboxtkt-bg {
+  z-index: 100000 !important;
+}
 `;
 
 type TeplohodWidgetWindow = Window & {
@@ -210,6 +215,7 @@ export function getTeplohodWidgetIds(event: {
 
   const tepEventId =
     normalizeTeplohodEventId(payload?.tepEventId ?? event.externalId) ||
+    normalizeTeplohodEventId(purchaseUrl.match(/[?&]event_id=(\d+)/i)?.[1]) ||
     normalizeTeplohodEventId(purchaseUrl.match(/teplohod\.info\/event\/(\d+)/i)?.[1]);
   if (!tepEventId) return null;
 
@@ -219,45 +225,38 @@ export function getTeplohodWidgetIds(event: {
   };
 }
 
-function bindTeplohodBuyFallback(container: HTMLElement, purchaseUrl?: string | null) {
-  if (!purchaseUrl) return () => {};
-
-  const onClick = (event: Event) => {
-    const target = event.target;
-    if (!(target instanceof Element)) return;
-    const buyButton = target.closest('.ti-tickets-event-tickets-buy');
-    if (!buyButton || !container.contains(buyButton)) return;
-
-    // Fancybox sometimes mounts slower than 700ms; don't open broken fallback too early.
-    window.setTimeout(() => {
-      const fancyboxOpen = document.querySelector('.fancyboxtkt-container, .fancyboxtkt-slide, iframe.ti-tickets-event-tickets-buy-iframe');
-      if (!fancyboxOpen) {
-        window.open(purchaseUrl, '_blank', 'noopener,noreferrer');
-      }
-    }, 2500);
-  };
-
-  container.addEventListener('click', onClick, true);
-  return () => container.removeEventListener('click', onClick, true);
-}
-
 function resolveTeplohodCheckoutUrl(options: {
   purchaseUrl?: string | null;
   tepEventId?: string | number | null;
   tepWidgetId?: string | number | null;
 }) {
-  const eventId = normalizeTeplohodEventId(options.tepEventId);
-  const fromPurchase = String(options.purchaseUrl || '').match(/teplohod\.info\/event\/(\d+)/i)?.[1];
-  const resolvedEventId = eventId || fromPurchase || null;
-  if (!resolvedEventId) return options.purchaseUrl || null;
+  const eventId =
+    normalizeTeplohodEventId(options.tepEventId) ||
+    normalizeTeplohodEventId(String(options.purchaseUrl || '').match(/[?&]event_id=(\d+)/i)?.[1]) ||
+    normalizeTeplohodEventId(String(options.purchaseUrl || '').match(/teplohod\.info\/event\/(\d+)/i)?.[1]);
+  if (!eventId) return options.purchaseUrl || null;
 
   const widgetId = String(options.tepWidgetId || DEFAULT_TEP_WIDGET_ID).trim() || DEFAULT_TEP_WIDGET_ID;
   const url = new URL('https://account.teplohod.info/order/event-order');
   url.searchParams.set('widget_id', widgetId);
-  url.searchParams.set('event_id', resolvedEventId);
+  url.searchParams.set('event_id', eventId);
   return url.toString();
 }
 
+function isTeplohodFancyboxOpen() {
+  if (typeof document === 'undefined') return false;
+  return Boolean(
+    document.querySelector(
+      '.fancyboxtkt-container, .fancyboxtkt-slide, .fancyboxtkt-bg, iframe.ti-tickets-event-tickets-buy-iframe, body.fancyboxtkt-active',
+    ),
+  );
+}
+
+/**
+ * Do NOT auto-open account.teplohod in a new tab from the buy click —
+ * that kills the Fancybox modal UX. Fallback is a visible link only when
+ * the widget button never mounts.
+ */
 export function TeplohodWidgetEmbed({
   tepEventId,
   tepWidgetId,
@@ -281,32 +280,34 @@ export function TeplohodWidgetEmbed({
 
     let cancelled = false;
     const container = containerRef.current;
-    let removeFallbackListener = () => {};
+    let timeoutId = 0;
 
-    const waitForMarkup = (attempt = 0) => {
-      if (cancelled) return;
+    const observer = new MutationObserver(() => {
       if (containerHasWidgetMarkup(container)) {
         setNeedsFallback(false);
-        removeFallbackListener = bindTeplohodBuyFallback(container, checkoutUrl);
-        return;
       }
-      if (attempt >= 30) {
-        setNeedsFallback(true);
-        return;
-      }
-      window.setTimeout(() => waitForMarkup(attempt + 1), 250);
-    };
+    });
+    observer.observe(container, { childList: true, subtree: true });
 
     void ensureTeplohodWidgetScript()
       .then(() => bootstrapTeplohodWidgets())
-      .then(() => waitForMarkup())
+      .then(() => {
+        if (cancelled) return;
+        // Only show external checkout link if Teplohod never paints its buy button.
+        timeoutId = window.setTimeout(() => {
+          if (!cancelled && !containerHasWidgetMarkup(container)) {
+            setNeedsFallback(true);
+          }
+        }, 8000);
+      })
       .catch(() => {
         if (!cancelled) setNeedsFallback(true);
       });
 
     return () => {
       cancelled = true;
-      removeFallbackListener();
+      observer.disconnect();
+      if (timeoutId) window.clearTimeout(timeoutId);
     };
   }, [eventId, tepWidgetId, checkoutUrl]);
 
@@ -370,21 +371,13 @@ export function openTeplohodPurchase(options: {
     .then(() => bootstrapTeplohodWidgets())
     .finally(async () => {
       openTeplohodWidget(wrapperId);
-      await new Promise((r) => window.setTimeout(r, 400));
-      const hasContent = await waitForTeplohodFancyboxContent(4500);
-      if (hasContent) return;
+      const hasContent = await waitForTeplohodFancyboxContent(6000);
+      if (hasContent || isTeplohodFancyboxOpen()) return;
 
+      // Fancybox never appeared — last resort external checkout (not while modal is mounting).
       const button = document.querySelector<HTMLElement>(`#${wrapperId} .ti-tickets-event-tickets-buy`);
-      const fancyboxOpen = document.querySelector('.fancyboxtkt-container, .fancyboxtkt-slide');
-      if (!button && !fancyboxOpen && checkoutUrl) {
+      if (!button && checkoutUrl) {
         window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
-        return;
-      }
-      if (fancyboxOpen && !hasContent) {
-        dismissTeplohodFancybox();
-        if (checkoutUrl) {
-          window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
-        }
       }
     });
 }

@@ -4,6 +4,26 @@
 
 ---
 
+## 2026-07-14 — Teplohod fancybox killed by account fallback
+
+### Наблюдения
+
+- На event 554 (`…-za-1-chas-554`) виджет Teplohod рисует кнопку «Купить билеты» inline; выбор дат/категорий должен открываться в Fancybox-модалке.
+- Наш `bindTeplohodBuyFallback` через 2.5s открывал `account.teplohod.info` во вкладке, если Fancybox ещё не детектился — UX «не в модалке» + вторая кнопка fallback.
+- `openTeplohodPurchase` мог закрывать пустой Fancybox и тоже уводить во внешний checkout.
+
+### Решения
+
+- Убран auto-`window.open` с клика buy; fallback-ссылка только если кнопка Teplohod так и не смонтировалась (~8с).
+- `openTeplohodPurchase` больше не dismiss'ит Fancybox; внешний URL — last resort.
+- z-index для `.fancyboxtkt-*`; parse `event_id` из account checkout URL.
+
+### Проблемы
+
+- —
+
+---
+
 ## 2026-07-14 — TC widget infinite loader again
 
 ### Наблюдения
