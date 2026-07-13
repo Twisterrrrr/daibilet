@@ -124,9 +124,10 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
           </nav>
 
           <HeaderSearch
+            variant="overlay"
             cityFilter={searchCityFilter}
             initialQuery={searchInitialQuery}
-            className="hidden min-w-0 flex-1 rounded-full border border-slate-200 bg-slate-50 py-2 lg:block xl:max-w-xs"
+            className="hidden lg:inline-flex"
           />
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
@@ -300,6 +301,7 @@ function MobileNavSheet({
         </div>
         <div className="border-b border-slate-200 px-4 py-3">
           <HeaderSearch
+            variant="inline"
             cityFilter={searchCityFilter}
             initialQuery={searchInitialQuery}
             className="rounded-xl border border-slate-200 bg-slate-50 py-2.5"
