@@ -29,7 +29,7 @@ export function EventImageBadges({
   const hit = editorsPick
     ? (event.sessionCount || 0) >= 4 || (event.landingSlugs?.length || 0) > 0
     : isHitEvent(event);
-  const ageBadge = resolveAgeBadge(event.tags, event.ageLimit);
+  const ageBadge = resolveAgeBadge(event.tags || [], event.ageLimit);
   const maxSecondary = rail ? 2 : 4;
 
   const secondary: ReactNode[] = [];

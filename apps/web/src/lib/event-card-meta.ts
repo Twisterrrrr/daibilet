@@ -192,11 +192,11 @@ export function resolveSessionPriceRange(sessions: Array<{ priceFrom?: number | 
   return { priceFrom: Math.min(...prices), priceTo: Math.max(...prices) };
 }
 
-export function resolveAgeBadge(tags: string[], ageLimit?: string | null): string | null {
+export function resolveAgeBadge(tags?: string[] | null, ageLimit?: string | null): string | null {
   const fromLimit = String(ageLimit || '').match(/\b(\d{1,2})\+\b/);
   if (fromLimit) return `${fromLimit[1]}+`;
 
-  for (const tag of tags) {
+  for (const tag of tags || []) {
     const match = String(tag).match(/\b(\d{1,2})\+\b/);
     if (match) return `${match[1]}+`;
   }

@@ -73,7 +73,7 @@ function popularScore(event: PublicSession): number {
 function sessionDedupeKey(event: PublicSession): string {
   const groupKey = String(event.groupKey || '').trim().toLowerCase();
   if (groupKey) return `group:${groupKey}`;
-  return `title:${event.title.trim().toLowerCase()}`;
+  return `title:${String(event.title || '').trim().toLowerCase()}`;
 }
 
 function takeUnique(events: PublicSession[], max: number, state: HomePickState): PublicSession[] {

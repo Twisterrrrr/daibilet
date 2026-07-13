@@ -12,7 +12,7 @@ export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalo
     venue: session.venue,
     venueKind: session.venueKind,
     category: session.category,
-    tags: session.tags,
+    tags: session.tags || [],
     startsAt: session.startsAt,
     dateLabel: session.dateLabel,
     timeLabel: session.timeLabel,
