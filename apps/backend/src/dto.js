@@ -1632,12 +1632,13 @@ function mapAdminOrderRow(row) {
   };
 }
 
-function mapAdminOrderTicket(ticket) {
+function mapAdminOrderTicket(ticket, orderStatus = null, buyerSnapshot = null) {
+  const effectiveStatus = resolveTicketStatusForDisplay(ticket.status, orderStatus);
   return {
     id: ticket.id,
-    externalTicketId: ticket.externalTicketId,
+    externalTicketId: resolveTicketDisplayNumber(ticket, buyerSnapshot),
     status: ticket.status || 'unknown',
-    displayStatus: orderStatusLabel(ticket.status),
+    displayStatus: orderStatusLabel(effectiveStatus),
     origin: ticket.origin || 'source',
     eventId: ticket.eventId || null,
     sessionId: ticket.sessionId || null,
@@ -1645,6 +1646,32 @@ function mapAdminOrderTicket(ticket) {
     eventSlug: ticket.eventSlug || null,
     startsAt: ticket.startsAt || null,
   };
+}
+
+/** Ticketscloud often keeps paid seat tickets as "reserved"; for done orders show as issued. */
+function resolveTicketStatusForDisplay(ticketStatus, orderStatus) {
+  const ticket = String(ticketStatus || '').toLowerCase();
+  if (
+    isConfirmedOrderStatus(orderStatus) &&
+    ['reserved', 'hold', 'pending', 'open', 'new', 'created', 'processing'].some((token) => ticket.includes(token))
+  ) {
+    return 'issued';
+  }
+  return ticketStatus;
+}
+
+function resolveTicketDisplayNumber(ticket, buyerSnapshot) {
+  const payloadTickets =
+    (buyerSnapshot && (buyerSnapshot.sourcePayload?.tickets || buyerSnapshot.tickets)) || [];
+  const match = Array.isArray(payloadTickets)
+    ? payloadTickets.find((item) => String(item?.id || '') === String(ticket.externalTicketId || ''))
+    : null;
+  if (match) {
+    if (match.serial != null && match.number != null) return `${match.serial}-${match.number}`;
+    if (match.number != null) return String(match.number);
+    if (match.barcode) return String(match.barcode);
+  }
+  return ticket.externalTicketId || ticket.id;
 }
 
 function matchesPublicOrderLookup(order, lookup) {
@@ -1705,7 +1732,7 @@ function mapPublicBuyerOrder(order) {
       id: ticket.id,
       number: ticket.externalTicketId,
       status: ticket.status || 'unknown',
-      displayStatus: ticket.displayStatus || orderStatusLabel(ticket.status),
+      displayStatus: ticket.displayStatus || orderStatusLabel(resolveTicketStatusForDisplay(ticket.status, order.status)),
       eventTitle: ticket.eventTitle,
       eventUrl: ticket.eventSlug ? `/events/${publicEventSlug(ticket.eventSlug)}` : ticket.eventId ? `/events/${encodeURIComponent(ticket.eventId)}` : null,
       startsAt: ticket.startsAt,
