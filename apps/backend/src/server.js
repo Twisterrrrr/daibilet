@@ -20,6 +20,7 @@ import {
   archiveAdminOrder,
   unarchiveAdminOrder,
   archiveAdminOrdersBulk,
+  archiveStaleCancelledOrders,
   deleteAdminOrder,
   buildAdminLandingsList,
   buildAdminSources,
@@ -698,6 +699,7 @@ export function startServer(options = {}) {
     console.log(`Daibilet backend listening on http://${host}:${serverPort}`);
     if (!options.prewarmBeforeListen) void warmPublicCaches('startup');
     scheduleTeplohodAutoSync();
+    scheduleStaleOrderArchive();
   });
   if (options.prewarmBeforeListen) {
     console.log('Warming public caches before listen...');
@@ -756,6 +758,29 @@ function scheduleTeplohodAutoSync() {
     void run('interval');
   }, TEP_AUTO_SYNC_INTERVAL_MS);
   console.log(`Teplohod auto-sync enabled: every ${Math.round(TEP_AUTO_SYNC_INTERVAL_MS / 60000)} min, first run in ${Math.round(firstDelayMs / 1000)}s`);
+}
+
+const STALE_ORDER_ARCHIVE_INTERVAL_MS = 6 * 60 * 60 * 1000; // every 6 hours
+
+function scheduleStaleOrderArchive() {
+  const run = async (reason) => {
+    try {
+      const result = await archiveStaleCancelledOrders(db);
+      if (result.archived > 0) {
+        console.log(`Stale order archive (${reason}): moved ${result.archived} cancelled/deleted orders older than ${result.olderThanDays}d`);
+      }
+    } catch (error) {
+      console.warn(`Stale order archive failed (${reason}): ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
+
+  setTimeout(() => {
+    void run('startup');
+  }, 45_000);
+  setInterval(() => {
+    void run('interval');
+  }, STALE_ORDER_ARCHIVE_INTERVAL_MS);
+  console.log('Stale cancelled-order archive enabled: every 6h, threshold 30d');
 }
 
 async function buildPublicLandingPageWithFallback(db, landingSlug) {

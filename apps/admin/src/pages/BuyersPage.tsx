@@ -1,15 +1,14 @@
 import * as React from 'react';
 import { adminFetch } from '@/lib/admin-api';
 import { useSearchParams } from 'react-router-dom';
-import { AlertTriangle, Mail, Phone, Receipt, Search, Ticket, UserRound } from 'lucide-react';
+import { AlertTriangle, Archive, Mail, Phone, Receipt, Search, Ticket, UserRound } from 'lucide-react';
 
-import { DataTableShell, EmptyState, InfoNote, PageHeader, StatusBadge } from '@/components/admin/primitives';
+import { DataTableShell, EmptyState, InfoNote, PageHeader, QuickFilterBar, StatusBadge } from '@/components/admin/primitives';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { formatNumber } from '@/data';
-
 
 type BuyerStatusTone = 'draft' | 'ready' | 'live' | 'paused' | 'archived' | 'incomplete' | 'error';
 
@@ -41,6 +40,7 @@ type AdminBuyerRow = {
 
 type AdminBuyersPayload = {
   generatedAt: string;
+  view?: 'active' | 'archive';
   total: number;
   rows: AdminBuyerRow[];
   metrics: {
@@ -49,6 +49,8 @@ type AdminBuyersPayload = {
     orders: number;
     tickets: number;
     needsAttention: number;
+    archivedBuyers?: number;
+    archiveAfterDays?: number;
   };
 };
 
@@ -59,10 +61,11 @@ export function BuyersPage() {
   const [error, setError] = React.useState<string | null>(null);
 
   const q = params.get('q') || '';
+  const view = params.get('view') === 'archive' ? 'archive' : 'active';
 
   React.useEffect(() => {
     const controller = new AbortController();
-    const queryParams = new URLSearchParams({ limit: '160' });
+    const queryParams = new URLSearchParams({ limit: '160', view });
     if (q.trim()) queryParams.set('q', q.trim());
     setLoading(true);
 
@@ -89,7 +92,7 @@ export function BuyersPage() {
       });
 
     return () => controller.abort();
-  }, [q]);
+  }, [q, view]);
 
   const setQuery = (value: string) => {
     const next = new URLSearchParams(params);
@@ -98,6 +101,15 @@ export function BuyersPage() {
     setParams(next);
   };
 
+  const setView = (nextView: string) => {
+    const next = new URLSearchParams(params);
+    if (nextView === 'archive') next.set('view', 'archive');
+    else next.delete('view');
+    setParams(next);
+  };
+
+  const archiveAfterDays = payload.metrics.archiveAfterDays || 30;
+
   return (
     <div>
       <PageHeader
@@ -105,14 +117,15 @@ export function BuyersPage() {
         description="Сводка по людям из заказов: контакты, последние покупки, билеты и быстрый переход к заказам."
         meta={
           <>
-            <Badge variant="outline">MVP без регистрации</Badge>
             <Badge variant="outline">данные из заказов</Badge>
+            <Badge variant="outline">архив отменённых через {archiveAfterDays} дн.</Badge>
           </>
         }
       />
 
       <InfoNote>
-        Это не полноценный личный кабинет и не CRM. Пока здесь только операционная сводка по данным, которые пришли от билетных систем или были добавлены вручную в заказ.
+        Активный список строится только по незаархивированным заказам. Отменённые и удалённые заказы старше {archiveAfterDays} дней
+        уходят в архив автоматически — вместе с ними пропадают из активных и соответствующие покупатели.
       </InfoNote>
 
       <div className="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-5">
@@ -120,7 +133,23 @@ export function BuyersPage() {
         <MetricCard label="с контактами" value={payload.metrics.withContacts} icon={Mail} />
         <MetricCard label="заказов" value={payload.metrics.orders} icon={Receipt} />
         <MetricCard label="билетов" value={payload.metrics.tickets} icon={Ticket} />
-        <MetricCard label="требуют внимания" value={payload.metrics.needsAttention} icon={AlertTriangle} tone="warning" />
+        <MetricCard
+          label={view === 'archive' ? 'в архиве' : 'требуют внимания'}
+          value={view === 'archive' ? payload.metrics.buyers : payload.metrics.needsAttention}
+          icon={view === 'archive' ? Archive : AlertTriangle}
+          tone={view === 'archive' ? 'default' : 'warning'}
+        />
+      </div>
+
+      <div className="mt-4">
+        <QuickFilterBar
+          items={[
+            { id: 'active', label: 'Активные', count: view === 'active' ? payload.metrics.buyers : undefined },
+            { id: 'archive', label: 'Архив', count: payload.metrics.archivedBuyers },
+          ]}
+          activeId={view}
+          onChange={setView}
+        />
       </div>
 
       <div className="my-4 flex flex-wrap items-center justify-between gap-3">
@@ -136,7 +165,19 @@ export function BuyersPage() {
       <DataTableShell
         loading={loading}
         columns={['Покупатель', 'Контакты', 'Заказы', 'Последний заказ', 'События', 'Действия']}
-        empty={!loading && payload.rows.length === 0 ? <EmptyState icon={UserRound} title="Покупатели не найдены" description="Попробуйте изменить поиск или синхронизировать заказы." /> : null}
+        empty={
+          !loading && payload.rows.length === 0 ? (
+            <EmptyState
+              icon={view === 'archive' ? Archive : UserRound}
+              title={view === 'archive' ? 'Архив пуст' : 'Покупатели не найдены'}
+              description={
+                view === 'archive'
+                  ? 'Сюда попадут покупатели с отменёнными/удалёнными заказами после автоархивации.'
+                  : 'Попробуйте изменить поиск или синхронизировать заказы.'
+              }
+            />
+          ) : null
+        }
       >
         {payload.rows.map((buyer) => (
           <tr key={buyer.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
@@ -145,7 +186,9 @@ export function BuyersPage() {
               {buyer.notes ? <div className="mt-1 max-w-[220px] truncate text-xs text-muted-foreground">{buyer.notes}</div> : null}
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {buyer.providers.map((provider) => (
-                  <Badge key={provider} variant="outline">{provider}</Badge>
+                  <Badge key={provider} variant="outline">
+                    {provider}
+                  </Badge>
                 ))}
               </div>
             </td>
@@ -164,18 +207,24 @@ export function BuyersPage() {
             <td className="min-w-[180px] px-4 py-3 align-top text-sm">
               <div className="font-mono text-xs text-foreground">№{buyer.lastOrderNumber || '-'}</div>
               <div className="mt-1 text-xs text-muted-foreground">{formatDate(buyer.lastOrderAt)}</div>
-              {buyer.lastOrderStatusLabel ? <Badge variant="outline" className="mt-2">{buyer.lastOrderStatusLabel}</Badge> : null}
+              {buyer.lastOrderStatusLabel ? (
+                <Badge variant="outline" className="mt-2">
+                  {buyer.lastOrderStatusLabel}
+                </Badge>
+              ) : null}
             </td>
             <td className="min-w-[280px] px-4 py-3 align-top">
               <div className="space-y-1">
                 {buyer.eventTitles.slice(0, 3).map((title) => (
-                  <div key={title} className="line-clamp-1 text-sm text-foreground">{title}</div>
+                  <div key={title} className="line-clamp-1 text-sm text-foreground">
+                    {title}
+                  </div>
                 ))}
                 {!buyer.eventTitles.length ? <span className="text-xs text-muted-foreground">события не связаны</span> : null}
               </div>
             </td>
             <td className="px-4 py-3 align-top">
-              <Button variant="outline" size="sm" onClick={() => openOrders(buyer)}>
+              <Button variant="outline" size="sm" onClick={() => openOrders(buyer, view)}>
                 Заказы
               </Button>
             </td>
@@ -186,7 +235,17 @@ export function BuyersPage() {
   );
 }
 
-function MetricCard({ label, value, icon: Icon, tone = 'default' }: { label: string; value: number; icon: typeof Receipt; tone?: 'default' | 'warning' }) {
+function MetricCard({
+  label,
+  value,
+  icon: Icon,
+  tone = 'default',
+}: {
+  label: string;
+  value: number;
+  icon: typeof Receipt;
+  tone?: 'default' | 'warning';
+}) {
   return (
     <Card className="border-border p-4">
       <div className="flex items-center justify-between gap-3">
@@ -210,9 +269,13 @@ function ContactLine({ icon: Icon, value }: { icon: typeof Mail; value?: string 
   );
 }
 
-function openOrders(buyer: AdminBuyerRow) {
+function openOrders(buyer: AdminBuyerRow, view: 'active' | 'archive') {
   const lookup = buyer.email || buyer.phone || buyer.lastOrderNumber || buyer.lookup || '';
-  window.location.href = `/orders${lookup ? `?q=${encodeURIComponent(lookup)}` : ''}`;
+  const next = new URLSearchParams();
+  if (view === 'archive') next.set('view', 'archive');
+  if (lookup) next.set('q', lookup);
+  const query = next.toString();
+  window.location.href = `/orders${query ? `?${query}` : ''}`;
 }
 
 function normalizePayload(payload: AdminBuyersPayload): AdminBuyersPayload {
@@ -228,6 +291,7 @@ function normalizePayload(payload: AdminBuyersPayload): AdminBuyersPayload {
 function emptyPayload(): AdminBuyersPayload {
   return {
     generatedAt: new Date().toISOString(),
+    view: 'active',
     total: 0,
     rows: [],
     metrics: {
@@ -236,6 +300,8 @@ function emptyPayload(): AdminBuyersPayload {
       orders: 0,
       tickets: 0,
       needsAttention: 0,
+      archivedBuyers: 0,
+      archiveAfterDays: 30,
     },
   };
 }

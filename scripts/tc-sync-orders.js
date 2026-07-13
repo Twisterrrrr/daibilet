@@ -139,7 +139,7 @@ async function persistOrders(orders, refs, syncId, startedAt, options) {
         buyerEmailNormalized: normalizeEmail(snapshot.buyer?.email),
         buyerPhoneNormalized: normalizePhone(snapshot.buyer?.phone),
         publicCode: preferredProviderOrderNumber(order),
-        archivedAt: isArchivableTcStatus(status) ? new Date().toISOString() : null,
+        archivedAt: shouldAutoArchiveTcOrder(order, status) ? new Date().toISOString() : null,
       });
 
       await upsertRawOrder(client, externalOrderId, order, refs);
@@ -272,6 +272,18 @@ function preferredProviderOrderNumber(order) {
 function isArchivableTcStatus(status) {
   const value = String(status || "").toLowerCase();
   return ["cancel", "return", "refund", "reject", "expired", "deleted"].some((token) => value.includes(token));
+}
+
+const STALE_CANCELLED_ARCHIVE_DAYS = 30;
+
+function shouldAutoArchiveTcOrder(order, status) {
+  if (!isArchivableTcStatus(status)) return false;
+  const raw = order.done_at || order.created_at || order.expired_after || null;
+  if (!raw) return false;
+  const when = parseTcDate(raw);
+  if (!when) return false;
+  const ageMs = Date.now() - new Date(when).getTime();
+  return ageMs >= STALE_CANCELLED_ARCHIVE_DAYS * 24 * 60 * 60 * 1000;
 }
 
 async function upsertRawOrder(client, externalOrderId, order, refs) {

@@ -770,6 +770,8 @@ export async function buildAdminOrdersList(db, searchParams = new URLSearchParam
   const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
   const includeArchived = view === 'archive';
 
+  await archiveStaleCancelledOrders(db).catch(() => undefined);
+
   const result = await db.query(`
     select
       ext_order.id,
@@ -910,24 +912,41 @@ export async function unarchiveAdminOrder(db, orderKey) {
   return buildAdminOrderDetail(db, order.id);
 }
 
+const STALE_CANCELLED_ARCHIVE_DAYS = 30;
+
 export async function archiveAdminOrdersBulk(db, body = {}) {
   const statuses = Array.isArray(body.statuses) && body.statuses.length
     ? body.statuses.map((item) => String(item || '').toLowerCase()).filter(Boolean)
     : ['cancelled', 'canceled', 'expired', 'deleted', 'rejected', 'refunded'];
+  const olderThanDays = clampNumber(body.olderThanDays, 0, 3650, 0);
   const result = await db.query(
     `
       update "ExternalOrder"
       set "archivedAt" = now(), "updatedAt" = now()
       where "archivedAt" is null
         and lower(status) = any($1::text[])
+        and (
+          $2::int <= 0
+          or coalesce("purchasedAt", "updatedAt") <= now() - make_interval(days => $2)
+        )
       returning id
     `,
-    [statuses],
+    [statuses, olderThanDays],
   );
   return {
     archived: result.rows.length,
+    olderThanDays: olderThanDays || null,
     ids: result.rows.map((row) => row.id),
   };
+}
+
+/** Archive cancelled/deleted/expired orders older than N days (default 30). */
+export async function archiveStaleCancelledOrders(db, options = {}) {
+  const olderThanDays = clampNumber(options.olderThanDays, 1, 3650, STALE_CANCELLED_ARCHIVE_DAYS);
+  return archiveAdminOrdersBulk(db, {
+    olderThanDays,
+    statuses: options.statuses || ['cancelled', 'canceled', 'expired', 'deleted', 'rejected', 'refunded'],
+  });
 }
 
 export async function deleteAdminOrder(db, orderKey) {
@@ -1174,7 +1193,12 @@ export async function buildAccountOrderDetail(db, userEmail, orderId) {
 
 export async function buildAdminBuyersList(db, searchParams = new URLSearchParams()) {
   const q = String(searchParams.get('q') || '').trim().toLowerCase();
+  const view = String(searchParams.get('view') || 'active').toLowerCase();
+  const includeArchived = view === 'archive';
   const limit = clampNumber(searchParams.get('limit'), 1, 300, 120);
+
+  // Keep buyers list tidy: auto-archive cancelled/deleted orders older than 30 days.
+  await archiveStaleCancelledOrders(db).catch(() => undefined);
 
   const result = await db.query(`
     select
@@ -1184,6 +1208,7 @@ export async function buildAdminBuyersList(db, searchParams = new URLSearchParam
       ext_order.status,
       ext_order."buyerSnapshot",
       ext_order."purchasedAt",
+      ext_order."archivedAt",
       ext_order."updatedAt",
       source.code::text as "sourceCode",
       source.name as "sourceName",
@@ -1210,9 +1235,11 @@ export async function buildAdminBuyersList(db, searchParams = new URLSearchParam
     left join "ExternalTicket" ticket on ticket."externalOrderId" = ext_order.id
     left join "Event" event on event.id = ticket."eventId"
     left join "EventSession" session on session.id = ticket."sessionId"
+    where ($1::boolean and ext_order."archivedAt" is not null)
+       or (not $1::boolean and ext_order."archivedAt" is null)
     group by ext_order.id, source.id
     order by coalesce(ext_order."purchasedAt", ext_order."updatedAt") desc
-  `);
+  `, [includeArchived]);
 
   const groups = new Map();
   for (const order of result.rows.map(mapAdminOrderRow)) {
@@ -1273,8 +1300,20 @@ export async function buildAdminBuyersList(db, searchParams = new URLSearchParam
     amountRub: row.amountRub || null,
     displayName: row.name || row.email || row.phone || `Покупатель ${row.lastOrderNumber || ''}`.trim(),
     hasContact: Boolean(row.email || row.phone),
-    statusTone: row.needsAttention ? 'error' : row.activeOrders > 0 ? 'live' : 'archived',
-    statusLabel: row.needsAttention ? 'требует внимания' : row.activeOrders > 0 ? 'есть активные заказы' : 'только завершенные',
+    statusTone: includeArchived
+      ? 'archived'
+      : row.needsAttention
+        ? 'error'
+        : row.activeOrders > 0
+          ? 'live'
+          : 'archived',
+    statusLabel: includeArchived
+      ? 'в архиве'
+      : row.needsAttention
+        ? 'требует внимания'
+        : row.activeOrders > 0
+          ? 'есть активные заказы'
+          : 'только отменённые',
   }));
 
   const rows = allRows
@@ -1304,8 +1343,19 @@ export async function buildAdminBuyersList(db, searchParams = new URLSearchParam
     })
     .slice(0, limit);
 
+  const archivedBuyersCountResult = await db.query(`
+    select count(distinct coalesce(
+      nullif(lower(trim(coalesce("buyerEmailNormalized", "buyerSnapshot"->'buyer'->>'email', "buyerSnapshot"->>'email', ''))), ''),
+      nullif(regexp_replace(coalesce("buyerPhoneNormalized", "buyerSnapshot"->'buyer'->>'phone', ''), '\\D', '', 'g'), ''),
+      id
+    ))::int as total
+    from "ExternalOrder"
+    where "archivedAt" is not null
+  `).catch(() => ({ rows: [{ total: 0 }] }));
+
   return {
     generatedAt: new Date().toISOString(),
+    view: includeArchived ? 'archive' : 'active',
     total: allRows.length,
     rows,
     metrics: {
@@ -1314,6 +1364,8 @@ export async function buildAdminBuyersList(db, searchParams = new URLSearchParam
       orders: allRows.reduce((sum, buyer) => sum + buyer.orders, 0),
       tickets: allRows.reduce((sum, buyer) => sum + buyer.tickets, 0),
       needsAttention: allRows.filter((buyer) => buyer.needsAttention > 0).length,
+      archivedBuyers: Number(archivedBuyersCountResult.rows[0]?.total || 0),
+      archiveAfterDays: STALE_CANCELLED_ARCHIVE_DAYS,
     },
   };
 }
