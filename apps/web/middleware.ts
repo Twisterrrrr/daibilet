@@ -1,9 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-import { LANDING_CATEGORY_PATH_BY_SLUG, resolveLegacyLandingRedirect } from '@/lib/landing-routes';
-
-const OLD_LANDING_SLUGS = Object.keys(LANDING_CATEGORY_PATH_BY_SLUG);
+import { resolveLegacyLandingRedirect } from '@/lib/landing-routes';
 
 export function middleware(request: NextRequest) {
   const host = request.headers.get('host')?.toLowerCase() || '';
@@ -23,11 +21,28 @@ export function middleware(request: NextRequest) {
   return NextResponse.redirect(url, 301);
 }
 
+// Static matcher only — Next rejects spread/dynamic arrays in config.matcher.
 export const config = {
   matcher: [
     '/landings/:path*',
     '/:city/:category',
-    ...OLD_LANDING_SLUGS.map((slug) => `/${slug}`),
-    ...OLD_LANDING_SLUGS.map((slug) => `/${slug}/:city`),
+    '/river-cruises',
+    '/river-cruises/:city',
+    '/bus-tours',
+    '/bus-tours/:city',
+    '/river-party',
+    '/river-party/:city',
+    '/standup',
+    '/standup/:city',
+    '/family-kids',
+    '/family-kids/:city',
+    '/concerts-genre',
+    '/concerts-genre/:city',
+    '/active-sport',
+    '/active-sport/:city',
+    '/new-year',
+    '/new-year/:city',
+    '/salute-9-may',
+    '/salute-9-may/:city',
   ],
 };
