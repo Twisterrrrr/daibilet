@@ -1578,7 +1578,9 @@ export async function buildAdminOrderDetail(db, orderId) {
 
 function mapAdminOrderRow(row) {
   const buyer = normalizeBuyerSnapshot(row.buyerSnapshot);
-  const tickets = Array.isArray(row.tickets) ? row.tickets.map(mapAdminOrderTicket) : [];
+  const tickets = Array.isArray(row.tickets)
+    ? row.tickets.map((ticket) => mapAdminOrderTicket(ticket, row.status, row.buyerSnapshot))
+    : [];
   const problemStatus = isProblemOrderStatus(row.status);
   const shouldExpectTicket = shouldExpectOrderTicket(row.status);
   const hasUnlinkedTickets = shouldExpectTicket && tickets.some((ticket) => !ticket.eventId || !ticket.eventTitle);
