@@ -7,6 +7,10 @@ import {
 } from './public-catalog.mapper.js';
 import { prismaWallTimeToIso } from './public-datetime.js';
 
+function futureSlotIso(hoursFromNow = 48): string {
+  return new Date(Date.now() + hoursFromNow * 3_600_000).toISOString();
+}
+
 const originalToken = process.env.TICKETSCLOUD_WIDGET_TOKEN;
 
 test.before(() => {
@@ -23,7 +27,7 @@ test('uses ProviderLink SESSION identity for a Ticketscloud slot', () => {
     upcomingSlots: [{
       id: 'session-local-1',
       eventId: 'event-local-1',
-      startsAt: '2026-07-10T12:00:00.000Z',
+      startsAt: futureSlotIso(24),
       sourceCode: 'TICKETSCLOUD',
       providerSessionId: 'tc-session-42',
       providerEventId: 'tc-event-parent',
@@ -59,7 +63,7 @@ test('uses ProviderLink SESSION parent identity for a Teplohod slot', () => {
     upcomingSlots: [{
       id: 'session-local-2',
       eventId: 'event-local-2',
-      startsAt: '2026-07-10T13:00:00.000Z',
+      startsAt: futureSlotIso(25),
       sourceCode: 'TEPLOHOD',
       providerSessionId: 'schedule-7',
       providerEventId: '14',
@@ -137,7 +141,7 @@ function catalogRow(overrides: Partial<PublicCatalogMappingRow>): PublicCatalogM
     offerPriceRub: 1000,
     offerWidgetUrl: null,
     offerDeeplinkUrl: null,
-    startsAt: '2026-07-10T12:00:00.000Z',
+    startsAt: futureSlotIso(24),
     tags: ['Водные экскурсии'],
     subcategories: ['Водные экскурсии'],
     groupKey: 'ticketscloud|test-event|spb|venue-1',

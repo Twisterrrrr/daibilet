@@ -43,7 +43,7 @@ export function searchParamsToRecord(
   return result;
 }
 
-/** SSR catalog: page 1 always limit=100; crawlable ?page=N uses fixed 100-item chunks. */
+/** SSR catalog: page 1 uses user limit or default 50; crawlable ?page=N uses fixed chunks. */
 export function parseCatalogPageQuery(
   input: Record<string, string | string[] | undefined> | URLSearchParams,
 ): CatalogPageQuery {

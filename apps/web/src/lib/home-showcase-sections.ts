@@ -129,10 +129,10 @@ function recommendBadgeBucket(eventId: string): number {
 export function isRecommendBadgeEvent(event: PublicSession): boolean {
   if (recommendBadgeBucket(event.id) !== 0) return false;
   if (isFeaturedEvent(event)) return true;
-  return (event.sessionCount || 0) >= 8 && event.landingSlugs.length > 0;
+  return (event.sessionCount || 0) >= 8 && (event.landingSlugs?.length || 0) > 0;
 }
 
 export function isHitEvent(event: PublicSession): boolean {
   if (isRecommendBadgeEvent(event)) return false;
-  return (event.sessionCount || 0) >= 4 || event.landingSlugs.length > 0;
+  return (event.sessionCount || 0) >= 4 || (event.landingSlugs?.length || 0) > 0;
 }

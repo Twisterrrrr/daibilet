@@ -38,14 +38,11 @@ jobs:
       - name: Next web build
         run: pnpm web:build
 
-      - name: Frontend production builds (legacy Vite)
+      - name: Admin production build
         env:
           NODE_ENV: development
-          VITE_DAIBILET_API_URL: https://daibilet.ru
-          VITE_TEP_WIDGET_ID: "14208"
-        run: |
-          pnpm public:build
-          pnpm admin:build
+          VITE_DAIBILET_API_URL: /api
+        run: pnpm admin:build
 
       - name: Syntax check deploy and import scripts
         run: |

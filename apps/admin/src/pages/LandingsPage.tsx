@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { ADMIN_API_BASE } from '@/lib/admin-api';
 import { CalendarDays, EyeOff, LayoutTemplate, Loader2, MapPin, Pin, RotateCcw, Save, Search } from 'lucide-react';
 
 import { DataTableShell, InfoNote, PageHeader, StatusBadge } from '@/components/admin/primitives';
@@ -8,9 +9,7 @@ import { Input } from '@/components/ui/input';
 import { adminData, formatDateTime, formatMoney, formatNumber } from '@/data';
 import type { AdminLandingDetail, AdminLandingEvent, AdminLandingRow } from '@/types';
 
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
+const API_BASE_URL = ADMIN_API_BASE;
 
 type LandingsResponse = {
   generatedAt: string;

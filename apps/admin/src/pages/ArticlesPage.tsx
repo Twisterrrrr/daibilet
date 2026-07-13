@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { ADMIN_API_BASE } from '@/lib/admin-api';
 import { Loader2, Plus, Save } from 'lucide-react';
 
 import { DataTableShell, PageHeader, StatusBadge } from '@/components/admin/primitives';
@@ -7,9 +8,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
+const API_BASE_URL = ADMIN_API_BASE;
 
 type ArticleRow = {
   id: string;

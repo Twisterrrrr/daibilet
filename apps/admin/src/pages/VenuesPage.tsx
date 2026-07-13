@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { ADMIN_API_BASE } from '@/lib/admin-api';
 import { Building2, Globe2, Image, Loader2, MapPin, Save, Search, Ticket } from 'lucide-react';
 
 import { DataTableShell, PageHeader, StatusBadge } from '@/components/admin/primitives';
@@ -10,9 +11,7 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { adminData, formatDateTime, formatMoney, formatNumber } from '@/data';
 import type { AdminVenueDetail, AdminVenueRow } from '@/types';
 
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
+const API_BASE_URL = ADMIN_API_BASE;
 
 type VenuesListResponse = {
   generatedAt: string;

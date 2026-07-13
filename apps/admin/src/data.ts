@@ -1,3 +1,4 @@
+import { ADMIN_API_BASE } from '@/lib/admin-api';
 import type { AdminData, AdminEventRow } from '@/types';
 
 export const adminData: AdminData = window.ADMIN_DATA ?? {
@@ -40,12 +41,15 @@ export const adminData: AdminData = window.ADMIN_DATA ?? {
 };
 
 export async function hydrateAdminData(): Promise<void> {
-  const env = (import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env;
-  const baseUrl = env?.VITE_DAIBILET_API_URL || 'http://127.0.0.1:4000';
+  const baseUrl = ADMIN_API_BASE;
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 1500);
   try {
-    const response = await fetch(`${baseUrl}/api/admin/dashboard`, { cache: 'no-store', signal: controller.signal });
+    const response = await fetch(`${baseUrl}/api/admin/dashboard`, {
+      cache: 'no-store',
+      credentials: 'same-origin',
+      signal: controller.signal,
+    });
     if (!response.ok) return;
     const remoteData = (await response.json()) as AdminData;
     Object.assign(adminData, remoteData);

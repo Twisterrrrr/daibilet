@@ -27,7 +27,7 @@ export function EventImageBadges({
   const recommend = editorsPick || isRecommendBadgeEvent(event);
   const recommendLabel = editorsPick ? 'Выбор редакции' : 'Рекомендуем';
   const hit = editorsPick
-    ? (event.sessionCount || 0) >= 4 || event.landingSlugs.length > 0
+    ? (event.sessionCount || 0) >= 4 || (event.landingSlugs?.length || 0) > 0
     : isHitEvent(event);
   const ageBadge = resolveAgeBadge(event.tags, event.ageLimit);
   const maxSecondary = rail ? 2 : 4;

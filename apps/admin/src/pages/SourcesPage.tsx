@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { ADMIN_API_BASE } from '@/lib/admin-api';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 import { DataTableShell, InfoNote, PageHeader, SourceBadge, StatusBadge } from '@/components/admin/primitives';
@@ -8,9 +9,7 @@ import { Card } from '@/components/ui/card';
 import { formatDateTime, formatMoney, formatNumber } from '@/data';
 import type { AdminSourceRow, AdminSourcesPayload } from '@/types';
 
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
+const API_BASE_URL = ADMIN_API_BASE;
 
 const EMPTY_SOURCES_PAYLOAD: AdminSourcesPayload = {
   generatedAt: new Date().toISOString(),

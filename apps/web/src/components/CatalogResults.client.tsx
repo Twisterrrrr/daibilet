@@ -5,7 +5,7 @@ import { Star, Grid3X3, List, Table2 } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
 import { EventCardHorizontal } from '@/components/EventCardHorizontal';
-import type { PublicSessionDto } from '@daibilet/contracts/public';
+import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
 import {
   formatMoneyRange,
   formatNumber,
@@ -17,7 +17,7 @@ import { eventHref, sessionVenueHref } from '@/lib/routes';
 import type { CatalogViewMode } from '@/lib/catalog-view-mode';
 
 type CatalogResultsProps = {
-  items: PublicSessionDto[];
+  items: PublicCatalogListItemDto[];
   viewMode: CatalogViewMode;
   onViewModeChange: (mode: CatalogViewMode) => void;
 };
@@ -109,7 +109,7 @@ function ViewModeButton({
   );
 }
 
-function CatalogTable({ items }: { items: PublicSessionDto[] }) {
+function CatalogTable({ items }: { items: PublicCatalogListItemDto[] }) {
   return (
     <div className="mt-8 overflow-auto rounded-lg border border-slate-200 bg-white shadow-sm">
       <table className="w-full min-w-[980px] border-collapse text-sm">

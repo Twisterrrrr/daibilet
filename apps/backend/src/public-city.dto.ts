@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { prisma } from '../../../packages/db/src/client.ts';
+import { prisma } from '@daibilet/db';
 import {
   buildPublicDestinationRowsFromSessions,
   buildPublicLandings,

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { ADMIN_API_BASE } from '@/lib/admin-api';
 import { useSearchParams } from 'react-router-dom';
 import { AlertTriangle, CheckCircle2, Clock, Copy, Plus, Receipt, RefreshCcw, Search, Ticket } from 'lucide-react';
 
@@ -10,9 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { formatNumber } from '@/data';
 
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
+const API_BASE_URL = ADMIN_API_BASE;
 const PAGE_SIZE = 50;
 
 const QUICK_FILTER_LABELS: Record<string, string> = {

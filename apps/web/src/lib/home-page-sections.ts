@@ -7,9 +7,9 @@ import {
 } from '@/lib/home-showcase-sections';
 import { buildHomeNowTabs } from '@/lib/home-now-section';
 import { spreadCatalogSessionsByCoverImage, spreadSessionsForGrid } from '@/lib/session-cover-image';
-import type { PublicSessionDto } from '@daibilet/contracts/public';
+import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 
-type PublicSession = PublicSessionDto;
+type PublicSession = PublicSessionDto | PublicCatalogListItemDto;
 
 export type BuildHomePageSectionsOptions = {
   cityName?: string | null;

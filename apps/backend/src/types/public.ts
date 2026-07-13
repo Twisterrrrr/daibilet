@@ -54,7 +54,7 @@ export interface PublicSessionDto extends PurchaseFields {
   groupedEventsCount?: number;
   sessionCount?: number;
   upcomingSlots?: Array<DateTimeSlot & Pick<PurchaseFields, 'purchaseUrl'>>;
-  landingSlugs: string[];
+  landingSlugs?: string[];
   title: string;
   cityId?: string | null;
   citySlug?: string | null;
@@ -86,9 +86,43 @@ export interface PublicSessionDto extends PurchaseFields {
   manualLandingStatus?: string | null;
 }
 
+export interface PublicCatalogListItemDto extends PurchaseFields {
+  id: string;
+  slug?: string | null;
+  groupKey?: string | null;
+  groupedEventsCount?: number;
+  sessionCount?: number;
+  upcomingSlots?: Array<
+    Pick<DateTimeSlot, 'id' | 'eventId' | 'startsAt' | 'dateLabel' | 'timeLabel'> &
+      Pick<PurchaseFields, 'purchaseUrl'> & { vacant?: number | null }
+  >;
+  title: string;
+  citySlug?: string | null;
+  city: string;
+  destination: string;
+  destinationType: DestinationType;
+  venueSlug?: string | null;
+  venue: string;
+  venueKind: string;
+  category: string;
+  subcategories?: string[];
+  tags: string[];
+  kind?: string | null;
+  sourceStatus?: string | null;
+  ageLimit?: string | null;
+  startsAt: string;
+  dateLabel: string;
+  timeLabel: string;
+  timeBucket: TimeBucket;
+  priceFrom?: number | null;
+  priceTo?: number | null;
+  vacant?: number | null;
+  imageUrl?: string | null;
+}
+
 export interface PublicCatalogDto extends ApiEnvelope {
-  items: PublicSessionDto[];
-  sessions?: PublicSessionDto[];
+  items: PublicCatalogListItemDto[];
+  sessions?: PublicCatalogListItemDto[];
   total: number;
   limit: number;
   offset: number;

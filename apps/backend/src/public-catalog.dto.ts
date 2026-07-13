@@ -1,5 +1,5 @@
 import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZE_MAX } from '@daibilet/contracts/catalog';
-import { Prisma, prisma } from '../../../packages/db/src/client.ts';
+import { Prisma, prisma } from '@daibilet/db';
 import {
   ACTIVE_SESSION_SQL,
   isSaleableForPublicCatalog,
@@ -15,6 +15,7 @@ import {
   timeBucket,
 } from './dto.js';
 import { findLandingRule } from './landing-rules.js';
+import { toPublicCatalogListItem } from './public-catalog-list-item.js';
 import { providerForSource } from './provider-purchase.js';
 import type { PublicCatalogMappingRow } from './public-catalog.mapper.js';
 import type { PublicCatalogDto, PublicSessionDto } from './types/public.js';
@@ -65,7 +66,7 @@ export async function buildPublicCatalogDto(query: PublicCatalogQuery): Promise<
   const sorted = sortCatalogSessions(filtered, query.sort || 'time');
   const limit = clampNumber(query.limit, 1, CATALOG_PAGE_SIZE_MAX, CATALOG_PAGE_SIZE_DEFAULT);
   const offset = clampNumber(query.offset, 0, 100000, 0);
-  const items = sorted.slice(offset, offset + limit);
+  const items = sorted.slice(offset, offset + limit).map(toPublicCatalogListItem);
 
   return {
     generatedAt: new Date().toISOString(),
@@ -473,7 +474,7 @@ function matchesCatalogQuery(session: PublicSessionDto, query: PublicCatalogQuer
     !pickCatalogSubcategories(session).includes(query.category)
   ) return false;
   if (query.tag && query.tag !== 'all' && !session.tags.includes(query.tag)) return false;
-  if (query.landing && query.landing !== 'all' && !session.landingSlugs.includes(query.landing)) return false;
+  if (query.landing && query.landing !== 'all' && !(session.landingSlugs || []).includes(query.landing)) return false;
   if (query.date && query.date !== 'all' && !matchesCatalogDate(session, query.date)) return false;
 
   const maxPrice = query.maxPrice ?? query.priceMax;
@@ -501,7 +502,7 @@ function buildCatalogFacets(sessions: PublicSessionDto[]): PublicCatalogDto['fac
       .filter(([name]) => name.length <= 32)
       .slice(0, 24)
       .map(([name, events]) => ({ name, events })),
-    landings: countCatalogValues(sessions.flatMap((session) => session.landingSlugs))
+    landings: countCatalogValues(sessions.flatMap((session) => session.landingSlugs || []))
       .map(([slug, events]) => {
         const rule = findLandingRule(slug);
         return { slug, title: rule?.title || humanizeSlug(slug), events };

@@ -58,7 +58,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         from: query.from,
         to: query.to,
         sort: query.sort,
-        limit: query.limit as 100 | 200 | 300 | undefined,
+        limit: query.limit as 50 | 100 | 200 | 300 | undefined,
         minPrice: query.minPrice,
         maxPrice: query.maxPrice ?? query.priceMax,
         ageMax: query.ageMax,

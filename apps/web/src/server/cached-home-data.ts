@@ -32,8 +32,8 @@ export const getHomeDestinations = unstable_cache(
 );
 
 export const getHomeCatalog = unstable_cache(
-  () => buildPublicCatalogDto({ limit: 120, sort: 'popular' }),
-  ['home-catalog-v2'],
+  () => buildPublicCatalogDto({ limit: 50, sort: 'popular' }),
+  ['home-catalog-v3'],
   homeCacheOptions,
 );
 
@@ -56,40 +56,12 @@ export const getHomeStats = unstable_cache(
 );
 
 export async function getHomePageData(): Promise<HomePageData> {
-  try {
-    const [destinationsPayload, catalogPayload, landingsCatalog, venuesPayload, statsPayload] = await Promise.all([
-      getHomeDestinations(),
-      getHomeCatalog(),
-      getHomeLandings(),
-      getHomeVenues(),
-      getHomeStats(),
-    ]);
-    return { destinationsPayload, catalogPayload, landingsCatalog, venuesPayload, statsPayload };
-  } catch {
-    const generatedAt = new Date().toISOString();
-    return {
-      destinationsPayload: { generatedAt, destinations: [] },
-      catalogPayload: {
-        generatedAt,
-        items: [],
-        total: 0,
-        limit: 120,
-        offset: 0,
-        hasMore: false,
-        facets: {
-          cities: [],
-          categories: [],
-          subcategories: [],
-          landings: [],
-          priceSteps: [],
-        },
-      },
-      landingsCatalog: { generatedAt, city: '', items: [] },
-      venuesPayload: { generatedAt, venues: [], total: 0 },
-      statsPayload: {
-        generatedAt,
-        stats: { events: 0, destinations: 0, venues: 0, landings: 0 },
-      },
-    } as HomePageData;
-  }
+  const [destinationsPayload, catalogPayload, landingsCatalog, venuesPayload, statsPayload] = await Promise.all([
+    getHomeDestinations(),
+    getHomeCatalog(),
+    getHomeLandings(),
+    getHomeVenues(),
+    getHomeStats(),
+  ]);
+  return { destinationsPayload, catalogPayload, landingsCatalog, venuesPayload, statsPayload };
 }

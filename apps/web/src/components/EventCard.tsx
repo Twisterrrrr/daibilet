@@ -11,7 +11,7 @@ import {
   useCatalogPurchase,
 } from '@/components/CatalogPurchaseTrigger.client';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
-import type { PublicSessionDto } from '@daibilet/contracts/public';
+import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 import { collectCatalogLabels } from '@/lib/catalog-labels';
 import { EventImageBadges } from '@/lib/event-card-badges';
 import {
@@ -42,8 +42,10 @@ const DETAILS_LINK_CLASS =
 const TITLE_LINK_CLASS =
   'relative z-[2] line-clamp-4 text-sm font-semibold leading-relaxed text-slate-900 transition-colors hover:text-primary-600 sm:text-base';
 
+type CatalogCardSession = PublicSessionDto | PublicCatalogListItemDto;
+
 type EventCardProps = {
-  session: PublicSessionDto;
+  session: CatalogCardSession;
   compact?: boolean;
   showcaseRail?: boolean;
   editorsPickBadge?: boolean;
@@ -249,7 +251,7 @@ function ShowcaseEventCard({
   rail = false,
   editorsPickBadge = false,
 }: {
-  session: PublicSessionDto;
+  session: CatalogCardSession;
   rail?: boolean;
   editorsPickBadge?: boolean;
 }) {

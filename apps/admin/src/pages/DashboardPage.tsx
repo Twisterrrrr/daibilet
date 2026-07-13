@@ -17,6 +17,7 @@ import {
   Search,
 } from 'lucide-react';
 
+import { ADMIN_API_BASE } from '@/lib/admin-api';
 import { PageHeader, SourceBadge, StatusBadge } from '@/components/admin/primitives';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -24,9 +25,7 @@ import { Card } from '@/components/ui/card';
 import { adminData, formatNumber } from '@/data';
 import type { AdminData, AdminSourceRow } from '@/types';
 
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
+const API_BASE_URL = ADMIN_API_BASE;
 
 type OrderMetrics = {
   imported: number;

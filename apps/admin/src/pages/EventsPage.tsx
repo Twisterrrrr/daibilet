@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { ADMIN_API_BASE } from '@/lib/admin-api';
 import { useSearchParams } from 'react-router-dom';
 import { AlertTriangle, ArrowRight, CheckCircle2, ExternalLink, EyeOff, Image, Loader2, Save, Search, X } from 'lucide-react';
 
@@ -12,9 +13,7 @@ import type { AdminEventRow } from '@/types';
 
 const PAGE_SIZE = 80;
 const MIN_DISPLAY_PRICE_RUB = 100;
-const API_BASE_URL =
-  ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_API_URL?: string } }).env?.VITE_DAIBILET_API_URL as string | undefined) ||
-  'http://127.0.0.1:4000';
+const API_BASE_URL = ADMIN_API_BASE;
 const PUBLIC_BASE_URL =
   ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_PUBLIC_URL?: string } }).env?.VITE_DAIBILET_PUBLIC_URL as string | undefined) ||
   'http://127.0.0.1:5178';
