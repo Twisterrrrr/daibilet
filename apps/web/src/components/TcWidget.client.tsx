@@ -206,29 +206,6 @@ function waitForTcWidgetVisible(timeoutMs = 2500) {
   });
 }
 
-function dismissTcWidget() {
-  if (typeof document === 'undefined') return;
-
-  const iframe = document.querySelector<HTMLIFrameElement>('.tc-widget-frame_popup');
-  if (iframe?.classList.contains('tc-widget-frame_popup')) {
-    const popupShell = iframe.parentNode?.parentNode?.parentNode;
-    if (popupShell instanceof Element) popupShell.remove();
-  }
-
-  const overlay = document.getElementById('tc-widget-overlay');
-  if (overlay && overlay.tagName !== 'STYLE') overlay.remove();
-
-  // Never remove <style id="ticketscloud-loader"> — TC keeps it in <head> permanently.
-
-  const body = document.body;
-  if (body.hasAttribute('data-overflow')) {
-    body.style.overflow = body.getAttribute('data-overflow') || '';
-    body.removeAttribute('data-overflow');
-  }
-
-  document.querySelectorAll('.tc-widget-container').forEach((node) => node.remove());
-}
-
 /**
  * Match Vite: click the TC trigger and let tcwidget.js own the modal.
  * Only fall back to purchaseUrl popup if the vendor shell never appears.
