@@ -40,7 +40,7 @@ const DETAILS_LINK_CLASS =
   'relative z-[2] inline-flex items-center gap-1 text-[10px] font-medium text-primary-600 transition hover:text-primary-700 sm:text-xs';
 
 const TITLE_LINK_CLASS =
-  'relative z-[2] line-clamp-2 text-sm font-semibold leading-relaxed text-slate-900 transition-colors hover:text-primary-600 sm:text-base';
+  'relative z-[2] line-clamp-4 text-sm font-semibold leading-relaxed text-slate-900 transition-colors hover:text-primary-600 sm:text-base';
 
 type EventCardProps = {
   session: PublicSessionDto;
@@ -323,7 +323,7 @@ function ShowcaseEventCard({
         )}
         <h3
           className={`font-display font-bold leading-snug ${
-            rail ? 'line-clamp-3 text-sm' : 'line-clamp-2 text-sm sm:text-base'
+            rail ? 'line-clamp-4 text-sm' : 'line-clamp-4 text-sm sm:text-base'
           }`}
         >
           <Link href={href} className={`${TITLE_LINK_CLASS} font-display font-bold`}>

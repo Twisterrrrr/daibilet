@@ -93,7 +93,7 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
           ) : null}
         </div>
 
-        <h3 className="mt-2 line-clamp-2 text-sm font-semibold sm:text-lg">
+        <h3 className="mt-2 line-clamp-4 text-sm font-semibold sm:text-lg">
           <Link href={href} className="relative z-[2] text-slate-900 transition-colors hover:text-primary-600">
             {session.title}
           </Link>
