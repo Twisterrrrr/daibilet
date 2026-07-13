@@ -1,6 +1,6 @@
 # Текущее состояние Daibilet
 
-**Обновлено:** 2026-07-13  
+**Обновлено:** 2026-07-14  
 **Ветка migration / prod Next:** `feat/next-monorepo`  
 **Prod:** `213.171.7.16` · Next `:3001` · legacy API `:4000` · admin Vite static
 
@@ -13,35 +13,29 @@
 
 | Этап | Фокус | Прогресс | Блокер закрытия |
 |------|--------|----------|-----------------|
-| **0** | Post-cutover hardening: smoke, widgets, admin, backfill | **~80%** 🔄 | Browser smoke + admin smoke |
-| **1** | Public parity: поиск, breadcrumbs, city FAQ/SEO | **~65%** 🔄 | event/city structured data |
-| **2** | SEO foundation: sitemap + SSR JSON-LD | **~10%** ⏳ | `robots.ts` / `sitemap.ts` ещё не в `apps/web` |
+| **0** | Post-cutover hardening: smoke, widgets, admin, backfill | **~90%** 🔄 | Browser widget smoke + SQL catalog read-model (0.5.8) |
+| **1** | Public parity: поиск, breadcrumbs, city FAQ/SEO | **~70%** 🔄 | event/city structured data |
+| **2** | SEO foundation: sitemap + SSR JSON-LD | **~40%** 🔄 | title/og:url fixed; sitemap есть |
 | **3+** | Admin Next, dto retire, Phase G finance | ⏳ | После 0–2 |
 
 **Легенда статусов:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
 
 ---
 
-## Prod сейчас (2026-07-13)
+## Prod сейчас (2026-07-14)
 
 | Компонент | Статус | Примечание |
 |-----------|--------|------------|
-| nginx → Next public | ✅ | cutover 2026-07-10, rollback script есть |
-| `launch-prod-smoke-next.sh` (SSR curl) | ✅ | API health, catalog/landing HTML, TC/TEP API |
-| Browser widget smoke (4 эталона) | ⏳ | только manual hint в smoke-скрипте |
-| `check:widgets` prod API (4 slug) | ✅ | 2026-07-13, 4/4 OK |
-| Admin smoke `:4000` | ⏳ | нет формализованного чеклиста в CI |
-| `tc:sync` widgetUrl backfill prod | ✅ 2026-07-13 | 17082 offers с widgetUrl, check:widgets 4/4 |
-| `USER_JWT_SECRET` prod/staging | ✅ | login `/login` |
-| Backend typecheck | ✅ | `pnpm --filter @daibilet/backend typecheck` |
-| Admin build | ✅ | `@daibilet/contracts/admin` export + типы ECR page |
-| Web typecheck/build | ✅ | 52 routes, robots + sitemap dynamic |
-| `/api/public/stats` + `/destinations` | ✅ | Next route handlers |
-| `/api/public/search` | ✅ | HeaderSearch autocomplete |
-| `HeaderSearch` в SiteHeader | ✅ | desktop lg+ + mobile drawer |
-| `robots.ts` + `sitemap.ts` | ✅ | |
-| `pnpm deploy:preflight` | ✅ | `scripts/deploy-preflight.sh` |
-| Smoke: stats/destinations/robots/sitemap | ✅ | в `launch-staging-smoke-next.sh` |
+| nginx → Next public | ✅ | cutover 2026-07-10 |
+| `www` → apex 301 | 🔄 | middleware + nginx patch; применить на сервере |
+| Admin list pagination (cities/landings/…) | ✅ | page envelopes + UI pager |
+| Compact dashboard metrics | ✅ | grouped catalog = public stats |
+| Catalog lean DTO / no list widgets | ✅ | hydrate page-only |
+| City/landing SSR trim (≤48 lean) | ✅ | |
+| Teplohod account checkout fallback | ✅ | не teplohod.info/event 404 |
+| `/api/public/stats` warm after sync | ✅ | + key cities/landings revalidate |
+| Backend/admin/web typecheck | ✅ | |
+| `pnpm deploy:preflight` | ✅ | |
 
 | Мультисобытие `mergeGroupKey` | 🔄 | код в ветке, нужен `db:deploy` + deploy |
 

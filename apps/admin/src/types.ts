@@ -221,7 +221,15 @@ export type AdminLandingDetail = {
     cities: number;
     priceFrom?: number | null;
   };
+  page?: number;
+  pages?: number;
+  limit?: number;
+  total?: number;
   events: AdminLandingEvent[];
+  excludedPage?: number;
+  excludedPages?: number;
+  excludedLimit?: number;
+  excludedTotal?: number;
   excludedEvents: AdminLandingEvent[];
 };
 

@@ -40,6 +40,8 @@ export function useCatalogPurchase(session: PublicSessionDto) {
         openTeplohodPurchase({
           wrapperId: teplohodWrapperId,
           purchaseUrl: target.purchaseUrl || session.purchaseUrl || session.widgetUrl,
+          tepEventId: targetTeplohod.tepEventId,
+          tepWidgetId: targetTeplohod.tepWidgetId,
         });
         return;
       }

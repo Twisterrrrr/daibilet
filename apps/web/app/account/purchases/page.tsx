@@ -4,7 +4,7 @@ import { AccountPurchasesPageView } from '@/components/AccountPurchasesPage.clie
 import { SiteLayout } from '@/components/SiteLayout';
 
 export const metadata: Metadata = {
-  title: 'Мои покупки | Дайбилет',
+  title: 'Мои покупки',
   description: 'История покупок билетов на Дайбилет по email аккаунта.',
 };
 

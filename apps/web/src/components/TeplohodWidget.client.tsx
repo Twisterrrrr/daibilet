@@ -199,16 +199,34 @@ function bindTeplohodBuyFallback(container: HTMLElement, purchaseUrl?: string | 
     const buyButton = target.closest('.ti-tickets-event-tickets-buy');
     if (!buyButton || !container.contains(buyButton)) return;
 
+    // Fancybox sometimes mounts slower than 700ms; don't open broken fallback too early.
     window.setTimeout(() => {
-      const fancyboxOpen = document.querySelector('.fancyboxtkt-container, .fancyboxtkt-slide');
+      const fancyboxOpen = document.querySelector('.fancyboxtkt-container, .fancyboxtkt-slide, iframe.ti-tickets-event-tickets-buy-iframe');
       if (!fancyboxOpen) {
         window.open(purchaseUrl, '_blank', 'noopener,noreferrer');
       }
-    }, 700);
+    }, 2500);
   };
 
   container.addEventListener('click', onClick, true);
   return () => container.removeEventListener('click', onClick, true);
+}
+
+function resolveTeplohodCheckoutUrl(options: {
+  purchaseUrl?: string | null;
+  tepEventId?: string | number | null;
+  tepWidgetId?: string | number | null;
+}) {
+  const eventId = normalizeTeplohodEventId(options.tepEventId);
+  const fromPurchase = String(options.purchaseUrl || '').match(/teplohod\.info\/event\/(\d+)/i)?.[1];
+  const resolvedEventId = eventId || fromPurchase || null;
+  if (!resolvedEventId) return options.purchaseUrl || null;
+
+  const widgetId = String(options.tepWidgetId || DEFAULT_TEP_WIDGET_ID).trim() || DEFAULT_TEP_WIDGET_ID;
+  const url = new URL('https://account.teplohod.info/order/event-order');
+  url.searchParams.set('widget_id', widgetId);
+  url.searchParams.set('event_id', resolvedEventId);
+  return url.toString();
 }
 
 export function TeplohodWidgetEmbed({
@@ -227,6 +245,7 @@ export function TeplohodWidgetEmbed({
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [needsFallback, setNeedsFallback] = React.useState(false);
   const eventId = normalizeTeplohodEventId(tepEventId);
+  const checkoutUrl = resolveTeplohodCheckoutUrl({ purchaseUrl, tepEventId: eventId, tepWidgetId });
 
   React.useEffect(() => {
     if (!eventId || !containerRef.current) return;
@@ -239,7 +258,7 @@ export function TeplohodWidgetEmbed({
       if (cancelled) return;
       if (containerHasWidgetMarkup(container)) {
         setNeedsFallback(false);
-        removeFallbackListener = bindTeplohodBuyFallback(container, purchaseUrl);
+        removeFallbackListener = bindTeplohodBuyFallback(container, checkoutUrl);
         return;
       }
       if (attempt >= 30) {
@@ -260,7 +279,7 @@ export function TeplohodWidgetEmbed({
       cancelled = true;
       removeFallbackListener();
     };
-  }, [eventId, tepWidgetId, purchaseUrl]);
+  }, [eventId, tepWidgetId, checkoutUrl]);
 
   if (!eventId) return null;
 
@@ -274,9 +293,9 @@ export function TeplohodWidgetEmbed({
         data-id={String(tepWidgetId || DEFAULT_TEP_WIDGET_ID)}
         data-event-id={eventId}
       />
-      {needsFallback && showFallbackButton && purchaseUrl ? (
+      {needsFallback && showFallbackButton && checkoutUrl ? (
         <a
-          href={purchaseUrl}
+          href={checkoutUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-3 flex w-full items-center justify-center rounded-xl bg-primary-600 px-6 py-3.5 text-base font-medium text-white transition hover:bg-primary-700"
@@ -305,8 +324,18 @@ export function openTeplohodWidget(wrapperId = 'teplohod-widget') {
     .finally(() => window.setTimeout(() => tryClick(), 150));
 }
 
-export function openTeplohodPurchase(options: { wrapperId?: string; purchaseUrl?: string | null }) {
+export function openTeplohodPurchase(options: {
+  wrapperId?: string;
+  purchaseUrl?: string | null;
+  tepEventId?: string | number | null;
+  tepWidgetId?: string | number | null;
+}) {
   const wrapperId = options.wrapperId || 'teplohod-widget';
+  const checkoutUrl = resolveTeplohodCheckoutUrl({
+    purchaseUrl: options.purchaseUrl,
+    tepEventId: options.tepEventId,
+    tepWidgetId: options.tepWidgetId,
+  });
 
   void ensureTeplohodWidgetScript()
     .then(() => bootstrapTeplohodWidgets())
@@ -318,14 +347,14 @@ export function openTeplohodPurchase(options: { wrapperId?: string; purchaseUrl?
 
       const button = document.querySelector<HTMLElement>(`#${wrapperId} .ti-tickets-event-tickets-buy`);
       const fancyboxOpen = document.querySelector('.fancyboxtkt-container, .fancyboxtkt-slide');
-      if (!button && !fancyboxOpen && options.purchaseUrl) {
-        window.open(options.purchaseUrl, '_blank', 'noopener,noreferrer');
+      if (!button && !fancyboxOpen && checkoutUrl) {
+        window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
         return;
       }
       if (fancyboxOpen && !hasContent) {
         dismissTeplohodFancybox();
-        if (options.purchaseUrl) {
-          window.open(options.purchaseUrl, '_blank', 'noopener,noreferrer');
+        if (checkoutUrl) {
+          window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
         }
       }
     });
@@ -349,7 +378,12 @@ export function TeplohodWidgetButton({
   if (!eventId) return null;
 
   const handleClick = () => {
-    openTeplohodPurchase({ wrapperId: containerId, purchaseUrl });
+    openTeplohodPurchase({
+      wrapperId: containerId,
+      purchaseUrl,
+      tepEventId: eventId,
+      tepWidgetId,
+    });
   };
 
   return (

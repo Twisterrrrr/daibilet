@@ -30,8 +30,12 @@ export function providerForSource(sourceCode?: string | null): PurchaseProvider 
 export function purchaseInfo(input: ProviderPurchaseInput): ProviderPurchaseInfo {
   const sourceCode = input.sourceCode || input.offerSourceCode;
   const provider = providerForSource(sourceCode);
-  const explicitUrl = input.offerWidgetUrl || input.offerDeeplinkUrl || null;
   const fallbackUrl = buildProviderWidgetUrl({ ...input, offerSourceCode: sourceCode });
+  // Prefer rebuilt TEP checkout URL: stored offer deeplinks to teplohod.info/event/* currently 404.
+  const explicitUrl =
+    provider === 'TEPLOHOD'
+      ? null
+      : input.offerWidgetUrl || input.offerDeeplinkUrl || null;
   const url = explicitUrl || fallbackUrl || null;
   return {
     ready: Boolean(url),
@@ -45,7 +49,10 @@ export function purchaseInfo(input: ProviderPurchaseInput): ProviderPurchaseInfo
 export function buildProviderWidgetUrl(input: ProviderPurchaseInput): string | null {
   const provider = providerForSource(input.sourceCode || input.offerSourceCode);
   if (provider === 'TEPLOHOD') {
-    return input.offerDeeplinkUrl || buildTeplohodUrl(input.externalId);
+    const eventId =
+      normalizeTeplohodEventId(input.externalId) ||
+      extractTeplohodEventIdFromUrl(input.offerDeeplinkUrl || input.offerWidgetUrl);
+    return buildTeplohodUrl(eventId);
   }
   if (provider === 'TICKETSCLOUD') return buildTicketscloudWidgetUrl(input.externalId);
   return null;
@@ -89,13 +96,25 @@ function buildTicketscloudWidgetUrl(eventExternalId?: string | null): string | n
 
 function buildTeplohodUrl(eventExternalId?: string | null): string | null {
   if (!eventExternalId) return null;
-  const baseUrl = process.env.TEP_WIDGET_BASE_URL || 'https://teplohod.info';
-  return `${baseUrl.replace(/\/+$/, '')}/event/${encodeURIComponent(eventExternalId)}`;
+  const eventId = String(eventExternalId).replace(/^tep-/i, '').trim();
+  if (!/^\d+$/.test(eventId)) return null;
+  const widgetId = String(process.env.TEP_WIDGET_ID || '14208').trim() || '14208';
+  // teplohod.info/event/{id} currently returns "Ошибка!"; working checkout is account.teplohod.info.
+  const checkoutBase = (process.env.TEP_CHECKOUT_BASE_URL || 'https://account.teplohod.info').replace(/\/+$/, '');
+  const url = new URL(`${checkoutBase}/order/event-order`);
+  url.searchParams.set('widget_id', widgetId);
+  url.searchParams.set('event_id', eventId);
+  return url.toString();
 }
 
 function normalizeTeplohodEventId(value?: string | null): string | null {
   const raw = String(value || '').trim();
   if (!raw) return null;
   const match = raw.match(/(?:^tep-)?(\d+)$/i);
-  return match?.[1] || raw;
+  return match?.[1] || null;
+}
+
+function extractTeplohodEventIdFromUrl(url?: string | null): string | null {
+  const match = String(url || '').match(/(?:teplohod\.info\/event\/|event_id=)(\d+)/i);
+  return match?.[1] || null;
 }

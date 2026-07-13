@@ -42,7 +42,8 @@ export function DashboardPage() {
   const liveSources = sourceRows.filter((source) => source.status === 'live').length;
   const sessions = sourceRows.reduce((sum, source) => sum + source.sessions, 0);
   const launch = dashboardMetrics.launch || adminData.metrics.launch || fallbackLaunchMetrics();
-  const events = sourceEvents || launch.groupedEvents || dashboardMetrics.events || adminData.metrics.events;
+  // Prefer public catalog grouped count (dashboard/stats), not sum of source raw/group hybrids.
+  const events = launch.groupedEvents || dashboardMetrics.events || sourceEvents || adminData.metrics.events;
   const landingHits = launch.landingMatched || adminData.eventRows.filter((event) => event.landingHits.length > 0).length;
   const venues = sourceRows.length ? sourceRows.reduce((sum, source) => sum + source.venues, 0) : dashboardMetrics.venues || adminData.metrics.venues;
 

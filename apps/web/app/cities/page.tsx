@@ -7,7 +7,7 @@ import '@/lib/env';
 import { buildPublicDestinationsDto } from '@daibilet/backend/public-read';
 
 export const metadata: Metadata = {
-  title: 'Города России — экскурсии, музеи и мероприятия | Дайбилет',
+  title: 'Города России — экскурсии, музеи и мероприятия',
   description:
     'Выберите город для посещения. Билеты на экскурсии, музеи и мероприятия в Москве, Петербурге, Казани, Владимире, Ярославле и других городах.',
   alternates: { canonical: '/cities' },

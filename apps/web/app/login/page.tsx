@@ -5,7 +5,7 @@ import { LoginPageView } from '@/components/LoginPage.client';
 import { SiteLayout } from '@/components/SiteLayout';
 
 export const metadata: Metadata = {
-  title: 'Вход | Дайбилет',
+  title: 'Вход',
   description: 'Вход в личный кабинет Дайбилет для просмотра истории покупок.',
 };
 

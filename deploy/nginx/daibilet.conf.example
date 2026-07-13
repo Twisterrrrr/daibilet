@@ -10,9 +10,16 @@ upstream daibilet_api {
     keepalive 32;
 }
 
+# Force www → apex (HTTP)
 server {
     listen 80;
-    server_name daibilet.ru www.daibilet.ru;
+    server_name www.daibilet.ru;
+    return 301 https://daibilet.ru$request_uri;
+}
+
+server {
+    listen 80;
+    server_name daibilet.ru;
 
     root /var/www/daibilet/public;
     index index.html;

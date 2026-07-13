@@ -4,7 +4,13 @@ const nextConfig: NextConfig = {
   transpilePackages: ['@daibilet/backend', '@daibilet/db', '@daibilet/contracts'],
   serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'pg'],
   async redirects() {
-    return [{ source: '/my-orders', destination: '/account/purchases', permanent: true }];
+    return [
+      { source: '/my-orders', destination: '/account/purchases', permanent: true },
+      { source: '/river-cruises', destination: '/rechnye-progulki', permanent: true },
+      { source: '/river-cruises/:city', destination: '/rechnye-progulki/:city', permanent: true },
+      { source: '/bus-tours', destination: '/avtobusnye-ekskursii', permanent: true },
+      { source: '/bus-tours/:city', destination: '/avtobusnye-ekskursii/:city', permanent: true },
+    ];
   },
   webpack: (config) => {
     config.resolve.extensionAlias = {

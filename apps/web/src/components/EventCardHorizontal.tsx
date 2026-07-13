@@ -5,11 +5,6 @@ import { Clock, MapPin, Star, Ticket } from 'lucide-react';
 import { useState } from 'react';
 
 import { EventFavoriteButton } from '@/components/EventFavoriteButton.client';
-import {
-  CatalogPurchaseAnchors,
-  CatalogPurchaseChip,
-  useCatalogPurchase,
-} from '@/components/CatalogPurchaseTrigger.client';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 import { collectCatalogLabels } from '@/lib/catalog-labels';
 import { EventImageBadges } from '@/lib/event-card-badges';
@@ -29,9 +24,6 @@ import { eventHref, sessionVenueHref } from '@/lib/routes';
 const SLOT_CHIP_CLASS =
   'inline-btn inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-full bg-slate-100 px-2.5 text-[10px] font-medium leading-none text-slate-700';
 
-const SLOT_CHIP_PURCHASE_CLASS =
-  'transition hover:bg-primary/10 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
-
 export function EventCardHorizontal({ session }: { session: PublicSessionDto }) {
   const [hasImageError, setHasImageError] = useState(false);
   const showImage = Boolean(session.imageUrl && !hasImageError);
@@ -50,8 +42,6 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
   const locationLabel = resolveEventCardLocationLabel(session);
   const priceBadgeLabel = formatPriceFrom(session.priceFrom);
   const priceFooterLabel = formatMoneyRange(session.priceFrom, session.priceTo);
-  const { purchaseEnabled, teplohod, tcEventId, tcToken, tcTriggerRef, teplohodWrapperId, openPurchase } =
-    useCatalogPurchase(session);
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200/60 sm:flex-row">
@@ -131,35 +121,12 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto }) 
         {descriptionText ? <p className="mt-2 line-clamp-3 text-[10px] text-slate-600 sm:text-xs">{descriptionText}</p> : null}
         {showSlotPills ? (
           <div className="mt-2 flex flex-wrap items-start gap-1.5">
-            {displaySlotLabels.map((label) =>
-              purchaseEnabled ? (
-                <CatalogPurchaseChip
-                  key={label}
-                  session={session}
-                  label={label}
-                  className={`${SLOT_CHIP_CLASS} ${SLOT_CHIP_PURCHASE_CLASS}`}
-                  onOpen={openPurchase}
-                >
-                  {label}
-                </CatalogPurchaseChip>
-              ) : (
-                <span key={label} className={SLOT_CHIP_CLASS}>
-                  {label}
-                </span>
-              ),
-            )}
+            {displaySlotLabels.map((label) => (
+              <span key={label} className={SLOT_CHIP_CLASS}>
+                {label}
+              </span>
+            ))}
           </div>
-        ) : null}
-
-        {purchaseEnabled ? (
-          <CatalogPurchaseAnchors
-            session={session}
-            teplohod={teplohod}
-            teplohodWrapperId={teplohodWrapperId}
-            tcEventId={tcEventId}
-            tcToken={tcToken}
-            tcTriggerRef={tcTriggerRef}
-          />
         ) : null}
 
         <div className="mt-auto flex items-center justify-between gap-4 pt-3">

@@ -242,8 +242,14 @@ export function EventHeroBuyButton({
   const { event } = payload;
   const sessions = payload.sessions ?? [];
   const offers = payload.offers ?? [];
-  const normalizedPrice = priceLabel.replace(/^от\s+/i, '').trim();
-  const label = normalizedPrice ? `Купить билет — от ${normalizedPrice}` : 'Купить билет';
+  const trimmedPrice = priceLabel.trim();
+  const isFromPrice = /^от\s+/i.test(trimmedPrice);
+  const normalizedPrice = trimmedPrice.replace(/^от\s+/i, '').trim();
+  const label = normalizedPrice
+    ? isFromPrice
+      ? `Купить билет — от ${normalizedPrice}`
+      : `Купить билет — ${normalizedPrice}`
+    : 'Купить билет';
   const purchaseOptions = payload.purchaseOptions ?? [];
   const showMultiPurchase = purchaseOptions.length >= 2;
   const teplohod = getTeplohodWidgetIds(event);

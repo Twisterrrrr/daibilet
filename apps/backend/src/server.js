@@ -541,12 +541,12 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/admin/landings') {
-      sendJson(response, await buildAdminLandingsList(db));
+      sendJson(response, await buildAdminLandingsList(db, url.searchParams));
       return;
     }
 
     if (route === 'GET /api/admin/cities') {
-      sendJson(response, await buildAdminCitiesList(db));
+      sendJson(response, await buildAdminCitiesList(db, url.searchParams));
       return;
     }
 
@@ -558,7 +558,7 @@ export async function handleRequest(request, response) {
 
     const landingDetailMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/admin\/landings\/([^/]+)$/) : null;
     if (landingDetailMatch) {
-      sendJson(response, await buildAdminLandingDetail(db, decodeURIComponent(landingDetailMatch[1])));
+      sendJson(response, await buildAdminLandingDetail(db, decodeURIComponent(landingDetailMatch[1]), url.searchParams));
       return;
     }
 
@@ -807,6 +807,14 @@ export async function warmPublicCaches(reason) {
       ),
       withPublicResponseCache('venues:family=location&limit=500', () =>
         buildPublicVenuesCatalog(db, new URLSearchParams({ family: 'location', limit: '500' })),
+      ),
+      // Key SSR routes: top cities + landings after deploy/sync.
+      withPublicResponseCache('city:sankt-peterburg', () => buildPublicCityPage(db, 'sankt-peterburg').catch(() => null)),
+      withPublicResponseCache('city:moscow', () => buildPublicCityPage(db, 'moscow').catch(() => null)),
+      withPublicResponseCache('landing:river-cruises', () => buildPublicLandingPageWithFallback(db, 'river-cruises').catch(() => null)),
+      withPublicResponseCache('landing:bus-tours', () => buildPublicLandingPageWithFallback(db, 'bus-tours').catch(() => null)),
+      withPublicResponseCache('events:limit=50', () =>
+        buildCatalogSessions(db, new URLSearchParams({ limit: '50', sort: 'time' })).catch(() => null),
       ),
     ]);
     const elapsed = Date.now() - startedAt;

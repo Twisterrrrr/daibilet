@@ -44,7 +44,7 @@ import { cityToPrepositional } from '@/lib/city-declension';
 import { filterSessionsWithCoverImage } from '@/lib/session-cover-image';
 import { resolveCityCardImage } from '@/lib/city-images';
 import { buildHomePageSections } from '@/lib/home-page-sections';
-import { pickDefaultHomeNowTab, type HomeNowTabKey } from '@/lib/home-now-section';
+import { buildHomeNowTabs, pickDefaultHomeNowTab, type HomeNowTabKey } from '@/lib/home-now-section';
 import {
   HERO_QUICK_CHIPS,
   HOME_FORMAT_TILES,

@@ -4,7 +4,7 @@ import { RequisitesPageContent } from '@/components/trust/RequisitesPageContent'
 import { TrustPageShell } from '@/components/trust/TrustPageShell';
 
 export const metadata: Metadata = {
-  title: 'Реквизиты | Дайбилет',
+  title: 'Реквизиты',
   description: 'Реквизиты Дайбилет для заключения договоров и бухгалтерских документов',
 };
 

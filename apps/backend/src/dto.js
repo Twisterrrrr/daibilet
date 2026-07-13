@@ -22,6 +22,7 @@ import {
   shouldResolveInstitutionFromTitle,
 } from './event-venue-context.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
+import { toPublicCatalogListItem } from './public-catalog-list-item.ts';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const ACTIVE_SESSION_SQL = `(
@@ -386,143 +387,66 @@ export async function buildAdminDashboard(db) {
     buildAdminLaunchMetricsCompact(db),
   ]);
 
-  const categories = Number(categoryCountResult.rows[0]?.total || 0);
   const destinations = Number(destinationCountResult.rows[0]?.total || 0);
   const readyEvents = Number(launch.readyForSeo || 0);
 
+  // Compact contract only: generatedAt + metrics (no multi-MB row payloads).
   return {
     generatedAt: new Date().toISOString(),
-    importJob: {
-      source: 'Ticketscloud',
-      status: 'success',
-      mode: 'Postgres seed from TC full sync',
-      events: stats.events || 0,
-      categories,
-      venues: stats.venues || 0,
-      cities: stats.cities || 0,
-      tags: stats.tags || 0,
-      metaEvents: 0,
-    },
     metrics: {
       events: launch.groupedEvents,
       readyEvents,
       reviewEvents: Math.max(0, launch.groupedEvents - readyEvents),
       venues: stats.venues || 0,
+      categories: Number(categoryCountResult.rows[0]?.total || 0),
+      cities: stats.cities || 0,
+      tags: stats.tags || 0,
       landingRules: LANDING_RULES.length,
       destinations,
       launch,
     },
-    // Compact payload: pages load their own lists. Keep empty arrays for AdminData shape.
-    eventRows: [],
-    mappingRows: [],
-    venueRows: [],
-    duplicateCandidates: [],
-    destinationRows: [],
-    landingRows: [],
   };
 }
 
-/** Fast launch metrics without loading full event/venue/landing row payloads. */
+/** Launch metrics from the same public grouped catalog read-model as /api/public/stats. */
 async function buildAdminLaunchMetricsCompact(db) {
-  const result = await db.query(
-    `
-      with primary_offer as (
-        select distinct on ("eventId")
-          "eventId",
-          "priceRub",
-          "widgetUrl",
-          "deeplinkUrl"
-        from "EventOffer"
-        where active = true
-        order by "eventId", ("priceRub" >= $1) desc nulls last, "priceRub" asc nulls last
-      ),
-      event_stats as (
-        select
-          e.id,
-          e.status,
-          e.kind,
-          e."sourceStatus",
-          coalesce(nullif(trim(override."imageUrl"), ''), nullif(trim(e."imageUrl"), '')) as "imageUrl",
-          min(session."startsAt") filter (where ${ACTIVE_SESSION_SQL}) as "nextStartsAt",
-          count(distinct session.id) filter (where ${ACTIVE_SESSION_SQL})::int as "activeSlots",
-          e."priceFromRub" as "eventPriceFromRub",
-          min(session."priceFromRub") filter (where session."priceFromRub" >= $1) as "sessionPriceFromRub",
-          primary_offer."priceRub" as "offerPriceRub",
-          (
-            coalesce(nullif(trim(primary_offer."widgetUrl"), ''), nullif(trim(primary_offer."deeplinkUrl"), '')) is not null
-          ) as "widgetReady"
-        from "Event" e
-        left join "EventOverride" override on override."eventId" = e.id
-        left join "EventSession" session on session."eventId" = e.id
-        left join primary_offer on primary_offer."eventId" = e.id
-        where e.status not in ('HIDDEN', 'DRAFT')
-        group by
-          e.id,
-          override.id,
-          primary_offer."priceRub",
-          primary_offer."widgetUrl",
-          primary_offer."deeplinkUrl"
-      ),
-      normalized as (
-        select
-          id,
-          status,
-          kind,
-          "sourceStatus",
-          "imageUrl",
-          "nextStartsAt",
-          "activeSlots",
-          "widgetReady",
-          (
-            select min(price)
-            from (values ("eventPriceFromRub"), ("sessionPriceFromRub"), ("offerPriceRub")) as prices(price)
-            where price is not null and price >= $1
-          ) as "priceFrom",
-          (
-            "widgetReady"
-            and (
-              "activeSlots" > 0
-              or kind = 'OPEN_DATE'
-              or "sourceStatus" = 'open_date'
-            )
-          ) as "purchaseReady"
-        from event_stats
-      )
-      select
-        count(*)::int as "groupedEvents",
-        count(*) filter (
-          where "purchaseReady" = true
-            and "priceFrom" is not null
-            and (
-              "nextStartsAt" is not null
-              or kind = 'OPEN_DATE'
-              or "sourceStatus" = 'open_date'
-            )
-        )::int as "readyForSales",
-        count(*) filter (
-          where "purchaseReady" = true
-            and "priceFrom" is not null
-            and coalesce("imageUrl", '') <> ''
-        )::int as "readyForSeo",
-        count(*) filter (where status = 'REVIEW')::int as "needsAttention",
-        count(*) filter (where "priceFrom" is null)::int as "priceBlocked",
-        count(*) filter (where "purchaseReady" = false)::int as "purchaseBlocked",
-        count(*) filter (where coalesce("imageUrl", '') = '')::int as "noImage"
-      from normalized
-    `,
-    [MIN_DISPLAY_PRICE_RUB],
-  );
+  const sessions = await publicCatalogSessions(db);
+  const saleableGroups = new Set();
+  const readySalesGroups = new Set();
+  const readySeoGroups = new Set();
+  let landingMatched = 0;
+  let needsAttention = 0;
+  let priceBlocked = 0;
+  let purchaseBlocked = 0;
+  let noImage = 0;
 
-  const row = result.rows[0] || {};
+  for (const session of sessions) {
+    const key = session.groupKey || session.id;
+    if (session.purchaseReady === false) {
+      purchaseBlocked += 1;
+      needsAttention += 1;
+      continue;
+    }
+    saleableGroups.add(key);
+    if (session.priceFrom == null) priceBlocked += 1;
+    if (!session.imageUrl) noImage += 1;
+    if ((session.landingSlugs || []).length > 0) landingMatched += 1;
+    if (isSaleableEventForPublic(session)) {
+      readySalesGroups.add(key);
+      if (session.imageUrl) readySeoGroups.add(key);
+    }
+  }
+
   return {
-    groupedEvents: Number(row.groupedEvents || 0),
-    readyForSales: Number(row.readyForSales || 0),
-    readyForSeo: Number(row.readyForSeo || 0),
-    needsAttention: Number(row.needsAttention || 0),
-    priceBlocked: Number(row.priceBlocked || 0),
-    purchaseBlocked: Number(row.purchaseBlocked || 0),
-    noImage: Number(row.noImage || 0),
-    landingMatched: 0,
+    groupedEvents: saleableGroups.size,
+    readyForSales: readySalesGroups.size,
+    readyForSeo: readySeoGroups.size,
+    needsAttention,
+    priceBlocked,
+    purchaseBlocked,
+    noImage,
+    landingMatched,
+    source: 'public_catalog_groups',
   };
 }
 
@@ -543,19 +467,35 @@ export function isSaleableEventForPublic(event) {
   return Boolean(hasUpcomingOrOpenSchedule(event) && event.purchaseReady && Number.isFinite(event.priceFrom) && event.priceFrom >= MIN_DISPLAY_PRICE_RUB);
 }
 
-export async function buildAdminCitiesList(db) {
-  const rows = await destinationRows(db);
+export async function buildAdminCitiesList(db, searchParams = new URLSearchParams()) {
+  const limit = clampNumber(searchParams.get('limit'), 1, 200, 80);
+  const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
+  const query = String(searchParams.get('q') || '').trim().toLowerCase();
+  // Lightweight city/region rollup (no full publicCatalogSessions payload).
+  const allRows = await destinationSummaryRowsFast(db);
+  const filtered = query
+    ? allRows.filter((row) =>
+        [row.slug, row.sourceSlug, row.name, row.type].filter(Boolean).join(' ').toLowerCase().includes(query),
+      )
+    : allRows;
+  const total = filtered.length;
+  const pages = Math.max(1, Math.ceil(total / Math.max(1, limit)));
+  const safePage = Math.min(Math.max(1, page), pages);
+  const rows = filtered.slice((safePage - 1) * limit, safePage * limit);
 
   return {
     generatedAt: new Date().toISOString(),
-    total: rows.length,
+    page: safePage,
+    pages,
+    limit,
+    total,
     rows,
     metrics: {
-      destinations: rows.length,
-      cities: rows.filter((row) => row.type === 'city').length,
-      regions: rows.filter((row) => row.type === 'region').length,
-      events: rows.reduce((sum, row) => sum + (row.events || 0), 0),
-      venues: rows.reduce((sum, row) => sum + (row.venues || 0), 0),
+      destinations: allRows.length,
+      cities: allRows.filter((row) => row.type === 'city').length,
+      regions: allRows.filter((row) => row.type === 'region').length,
+      events: allRows.reduce((sum, row) => sum + (row.events || 0), 0),
+      venues: allRows.reduce((sum, row) => sum + (row.venues || 0), 0),
     },
   };
 }
@@ -761,6 +701,76 @@ function sourceHealthStatus(status, issues) {
   return 'ok';
 }
 
+async function queryAdminOrdersLean(db, { includeArchived }) {
+  const result = await db.query(
+    `
+      select
+        ext_order.id,
+        ext_order."externalOrderId",
+        ext_order."publicCode",
+        ext_order.status,
+        ext_order."buyerSnapshot",
+        ext_order."purchasedAt",
+        ext_order."archivedAt",
+        ext_order."updatedAt",
+        source.code::text as "sourceCode",
+        source.name as "sourceName",
+        coalesce(ticket_stats."ticketCount", 0)::int as "ticketCount",
+        coalesce(ticket_stats."unlinkedTickets", 0)::int as "unlinkedTickets",
+        coalesce(ticket_stats."eventTitles", '{}'::text[]) as "eventTitles",
+        ticket_stats."firstStartsAt",
+        '[]'::jsonb as tickets
+      from "ExternalOrder" ext_order
+      join "Source" source on source.id = ext_order."sourceId"
+      left join lateral (
+        select
+          count(*)::int as "ticketCount",
+          count(*) filter (where ticket."eventId" is null)::int as "unlinkedTickets",
+          coalesce(array_remove(array_agg(distinct event.title), null), '{}') as "eventTitles",
+          min(session."startsAt") as "firstStartsAt"
+        from "ExternalTicket" ticket
+        left join "Event" event on event.id = ticket."eventId"
+        left join "EventSession" session on session.id = ticket."sessionId"
+        where ticket."externalOrderId" = ext_order.id
+      ) ticket_stats on true
+      where ($1::boolean and ext_order."archivedAt" is not null)
+         or (not $1::boolean and ext_order."archivedAt" is null)
+      order by coalesce(ext_order."purchasedAt", ext_order."updatedAt") desc
+    `,
+    [includeArchived],
+  );
+  return result.rows.map(mapAdminOrderRow);
+}
+
+function matchesAdminOrderListFilters(order, { view, provider, status, q }) {
+  if (view === 'attention' && !order.needsAttention) return false;
+  if (view === 'missing_artifact' && order.artifactStatus !== 'missing') return false;
+  if (view === 'failed_integration' && !isProblemOrderStatus(order.status)) return false;
+  if (view === 'unlinked' && !(order.unlinkedTickets > 0)) return false;
+  if (view === 'pending_refunds' && !isRefundStatus(order.status)) return false;
+  if (view === 'archivable' && !order.canArchive) return false;
+  if (provider !== 'ALL' && order.sourceCode !== provider) return false;
+  if (status !== 'all' && String(order.status || '').toLowerCase() !== status) return false;
+  if (!q) return true;
+  const haystack = [
+    order.externalOrderId,
+    order.publicCode,
+    order.status,
+    order.sourceName,
+    order.sourceCode,
+    order.buyer.name,
+    order.buyer.phone,
+    order.buyer.email,
+    order.buyer.notes,
+    ...(order.eventTitles || []),
+    order.eventTitle,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+  return haystack.includes(q);
+}
+
 export async function buildAdminOrdersList(db, searchParams = new URLSearchParams()) {
   const q = String(searchParams.get('q') || '').trim().toLowerCase();
   const view = String(searchParams.get('view') || 'all');
@@ -772,82 +782,18 @@ export async function buildAdminOrdersList(db, searchParams = new URLSearchParam
 
   await archiveStaleCancelledOrders(db).catch(() => undefined);
 
-  const result = await db.query(`
-    select
-      ext_order.id,
-      ext_order."externalOrderId",
-      ext_order."publicCode",
-      ext_order.status,
-      ext_order."buyerSnapshot",
-      ext_order."purchasedAt",
-      ext_order."archivedAt",
-      ext_order."updatedAt",
-      source.code::text as "sourceCode",
-      source.name as "sourceName",
-      count(ticket.id)::int as "ticketCount",
-      count(ticket.id) filter (where ticket."eventId" is null)::int as "unlinkedTickets",
-      coalesce(
-        jsonb_agg(
-          jsonb_build_object(
-            'id', ticket.id,
-            'externalTicketId', ticket."externalTicketId",
-            'status', ticket.status,
-            'origin', ticket.origin,
-            'eventId', ticket."eventId",
-            'sessionId', ticket."sessionId",
-            'eventTitle', event.title,
-            'eventSlug', event.slug,
-            'startsAt', session."startsAt"
-          )
-        ) filter (where ticket.id is not null),
-        '[]'::jsonb
-      ) as tickets
-    from "ExternalOrder" ext_order
-    join "Source" source on source.id = ext_order."sourceId"
-    left join "ExternalTicket" ticket on ticket."externalOrderId" = ext_order.id
-    left join "Event" event on event.id = ticket."eventId"
-    left join "EventSession" session on session.id = ticket."sessionId"
-    where ($1::boolean and ext_order."archivedAt" is not null)
-       or (not $1::boolean and ext_order."archivedAt" is null)
-    group by ext_order.id, source.id
-    order by coalesce(ext_order."purchasedAt", ext_order."updatedAt") desc
-  `, [includeArchived]);
+  const [allRows, archiveCountResult, activeCountResult] = await Promise.all([
+    queryAdminOrdersLean(db, { includeArchived }),
+    db.query(`select count(*)::int as total from "ExternalOrder" where "archivedAt" is not null`),
+    db.query(`select count(*)::int as total from "ExternalOrder" where "archivedAt" is null`),
+  ]);
 
-  const allRows = result.rows.map(mapAdminOrderRow);
-  const rows = allRows.filter((order) => {
-    if (view === 'attention' && !order.needsAttention) return false;
-    if (view === 'missing_artifact' && order.artifactStatus !== 'missing') return false;
-    if (view === 'failed_integration' && !isProblemOrderStatus(order.status)) return false;
-    if (view === 'unlinked' && !order.tickets.some((ticket) => !ticket.eventId)) return false;
-    if (view === 'pending_refunds' && !isRefundStatus(order.status)) return false;
-    if (view === 'archivable' && !order.canArchive) return false;
-    if (provider !== 'ALL' && order.sourceCode !== provider) return false;
-    if (status !== 'all' && String(order.status || '').toLowerCase() !== status) return false;
-    if (!q) return true;
-    const haystack = [
-      order.externalOrderId,
-      order.publicCode,
-      order.status,
-      order.sourceName,
-      order.sourceCode,
-      order.buyer.name,
-      order.buyer.phone,
-      order.buyer.email,
-      order.buyer.notes,
-      ...order.tickets.flatMap((ticket) => [ticket.externalTicketId, ticket.status, ticket.eventTitle, ticket.eventId, ticket.sessionId]),
-    ]
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase();
-    return haystack.includes(q);
-  });
+  const rows = allRows.filter((order) => matchesAdminOrderListFilters(order, { view, provider, status, q }));
   const total = rows.length;
   const pages = Math.max(1, Math.ceil(total / limit));
   const safePage = Math.min(page, pages);
   const windowRows = rows.slice((safePage - 1) * limit, safePage * limit);
 
-  const archiveCountResult = await db.query(`select count(*)::int as total from "ExternalOrder" where "archivedAt" is not null`);
-  const activeCountResult = await db.query(`select count(*)::int as total from "ExternalOrder" where "archivedAt" is null`);
   const archiveCount = Number(archiveCountResult.rows[0]?.total || 0);
   const activeCount = Number(activeCountResult.rows[0]?.total || 0);
 
@@ -866,7 +812,7 @@ export async function buildAdminOrdersList(db, searchParams = new URLSearchParam
       { id: 'pending_refunds', count: allRows.filter((order) => isRefundStatus(order.status)).length },
       { id: 'missing_artifact', count: allRows.filter((order) => order.artifactStatus === 'missing').length },
       { id: 'failed_integration', count: allRows.filter((order) => isProblemOrderStatus(order.status)).length },
-      { id: 'unlinked', count: allRows.filter((order) => order.tickets.some((ticket) => !ticket.eventId)).length },
+      { id: 'unlinked', count: allRows.filter((order) => order.unlinkedTickets > 0).length },
       { id: 'archivable', count: allRows.filter((order) => order.canArchive).length },
       { id: 'archive', count: archiveCount },
     ],
@@ -876,7 +822,7 @@ export async function buildAdminOrdersList(db, searchParams = new URLSearchParam
       processing: allRows.filter((order) => isProcessingOrderStatus(order.status)).length,
       canceled: allRows.filter((order) => isCanceledOrderStatus(order.status)).length,
       archived: archiveCount,
-      tickets: allRows.reduce((sum, order) => sum + order.tickets.length, 0),
+      tickets: allRows.reduce((sum, order) => sum + (order.ticketCount || 0), 0),
       missingArtifacts: allRows.filter((order) => order.artifactStatus === 'missing').length,
       failedIntegration: allRows.filter((order) => isProblemOrderStatus(order.status)).length,
       needsAttention: allRows.filter((order) => order.needsAttention).length,
@@ -1195,54 +1141,14 @@ export async function buildAdminBuyersList(db, searchParams = new URLSearchParam
   const q = String(searchParams.get('q') || '').trim().toLowerCase();
   const view = String(searchParams.get('view') || 'active').toLowerCase();
   const includeArchived = view === 'archive';
-  const limit = clampNumber(searchParams.get('limit'), 1, 300, 120);
+  const limit = clampNumber(searchParams.get('limit'), 1, 300, 80);
+  const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
 
   // Keep buyers list tidy: auto-archive cancelled/deleted orders older than 30 days.
   await archiveStaleCancelledOrders(db).catch(() => undefined);
 
-  const result = await db.query(`
-    select
-      ext_order.id,
-      ext_order."externalOrderId",
-      ext_order."publicCode",
-      ext_order.status,
-      ext_order."buyerSnapshot",
-      ext_order."purchasedAt",
-      ext_order."archivedAt",
-      ext_order."updatedAt",
-      source.code::text as "sourceCode",
-      source.name as "sourceName",
-      count(ticket.id)::int as "ticketCount",
-      count(ticket.id) filter (where ticket."eventId" is null)::int as "unlinkedTickets",
-      coalesce(
-        jsonb_agg(
-          jsonb_build_object(
-            'id', ticket.id,
-            'externalTicketId', ticket."externalTicketId",
-            'status', ticket.status,
-            'origin', ticket.origin,
-            'eventId', ticket."eventId",
-            'sessionId', ticket."sessionId",
-            'eventTitle', event.title,
-            'eventSlug', event.slug,
-            'startsAt', session."startsAt"
-          )
-        ) filter (where ticket.id is not null),
-        '[]'::jsonb
-      ) as tickets
-    from "ExternalOrder" ext_order
-    join "Source" source on source.id = ext_order."sourceId"
-    left join "ExternalTicket" ticket on ticket."externalOrderId" = ext_order.id
-    left join "Event" event on event.id = ticket."eventId"
-    left join "EventSession" session on session.id = ticket."sessionId"
-    where ($1::boolean and ext_order."archivedAt" is not null)
-       or (not $1::boolean and ext_order."archivedAt" is null)
-    group by ext_order.id, source.id
-    order by coalesce(ext_order."purchasedAt", ext_order."updatedAt") desc
-  `, [includeArchived]);
-
   const groups = new Map();
-  for (const order of result.rows.map(mapAdminOrderRow)) {
+  for (const order of await queryAdminOrdersLean(db, { includeArchived })) {
     const buyerKey = adminBuyerKey(order);
     const current =
       groups.get(buyerKey) ||
@@ -1316,7 +1222,7 @@ export async function buildAdminBuyersList(db, searchParams = new URLSearchParam
           : 'только отменённые',
   }));
 
-  const rows = allRows
+  const filtered = allRows
     .filter((buyer) => {
       if (!q) return true;
       return [
@@ -1340,8 +1246,12 @@ export async function buildAdminBuyersList(db, searchParams = new URLSearchParam
       const aTime = a.lastOrderAt ? new Date(a.lastOrderAt).getTime() : 0;
       const bTime = b.lastOrderAt ? new Date(b.lastOrderAt).getTime() : 0;
       return bTime - aTime || String(a.displayName).localeCompare(String(b.displayName), 'ru');
-    })
-    .slice(0, limit);
+    });
+
+  const total = filtered.length;
+  const pages = Math.max(1, Math.ceil(total / limit));
+  const safePage = Math.min(page, pages);
+  const rows = filtered.slice((safePage - 1) * limit, safePage * limit);
 
   const archivedBuyersCountResult = await db.query(`
     select count(distinct coalesce(
@@ -1356,7 +1266,10 @@ export async function buildAdminBuyersList(db, searchParams = new URLSearchParam
   return {
     generatedAt: new Date().toISOString(),
     view: includeArchived ? 'archive' : 'active',
-    total: allRows.length,
+    page: safePage,
+    pages,
+    limit,
+    total,
     rows,
     metrics: {
       buyers: allRows.length,
@@ -1633,15 +1546,23 @@ function mapAdminOrderRow(row) {
   const tickets = Array.isArray(row.tickets)
     ? row.tickets.map((ticket) => mapAdminOrderTicket(ticket, row.status, row.buyerSnapshot))
     : [];
+  const ticketCount = Number(row.ticketCount || tickets.length || 0);
+  const unlinkedTickets = Number(row.unlinkedTickets || 0);
   const problemStatus = isProblemOrderStatus(row.status);
   const shouldExpectTicket = shouldExpectOrderTicket(row.status);
-  const hasUnlinkedTickets = shouldExpectTicket && tickets.some((ticket) => !ticket.eventId || !ticket.eventTitle);
-  const missingArtifact = shouldExpectTicket && tickets.length === 0;
+  const hasUnlinkedTickets =
+    shouldExpectTicket &&
+    (unlinkedTickets > 0 || tickets.some((ticket) => !ticket.eventId || !ticket.eventTitle));
+  const missingArtifact = shouldExpectTicket && ticketCount === 0;
   const sourceCode = String(row.sourceCode || '').toUpperCase();
-  const eventTitles = Array.from(new Set(tickets.map((ticket) => ticket.eventTitle).filter(Boolean)));
+  const eventTitlesFromRow = Array.isArray(row.eventTitles) ? row.eventTitles.filter(Boolean) : [];
+  const eventTitles = Array.from(
+    new Set(eventTitlesFromRow.length ? eventTitlesFromRow : tickets.map((ticket) => ticket.eventTitle).filter(Boolean)),
+  );
   const snapshotEventTitle = firstString(row.buyerSnapshot?.sourceEventTitle, row.buyerSnapshot?.eventTitle);
   const eventTitle = eventTitles[0] || snapshotEventTitle || null;
   const sessionDates = tickets.map((ticket) => ticket.startsAt).filter(Boolean).sort();
+  const eventDateLabel = row.firstStartsAt || sessionDates[0] || null;
 
   return {
     id: row.id,
@@ -1665,14 +1586,14 @@ function mapAdminOrderRow(row) {
     isArchived: Boolean(row.archivedAt),
     canArchive: !row.archivedAt && isArchivableOrderStatus(row.status),
     updatedAt: row.updatedAt || null,
-    ticketCount: Number(row.ticketCount || tickets.length || 0),
-    unlinkedTickets: Number(row.unlinkedTickets || 0),
+    ticketCount,
+    unlinkedTickets,
     eventTitle,
     eventTitles: eventTitles.length ? eventTitles : eventTitle ? [eventTitle] : [],
-    eventDateLabel: sessionDates[0] || null,
+    eventDateLabel,
     tickets,
     amountRub: extractOrderAmountRub(row.buyerSnapshot),
-    artifactStatus: missingArtifact ? 'missing' : tickets.length > 0 ? 'tickets' : 'not_required',
+    artifactStatus: missingArtifact ? 'missing' : ticketCount > 0 ? 'tickets' : 'not_required',
     refundRequestsCount: 0,
     hasPendingRefundRequests: isRefundStatus(row.status),
     needsAttention: problemStatus || missingArtifact || hasUnlinkedTickets,
@@ -1982,6 +1903,22 @@ function orderStatusLabel(status) {
   return status || 'неизвестно';
 }
 
+let adminGroupedEventsCache = { expiresAt: 0, events: null, sourceCount: 0 };
+
+async function getCachedAdminGroupedEvents(db) {
+  const now = Date.now();
+  if (adminGroupedEventsCache.items && now < adminGroupedEventsCache.expiresAt) {
+    return adminGroupedEventsCache;
+  }
+  const sourceEvents = await eventRows(db, 10000, { lean: true });
+  adminGroupedEventsCache = {
+    expiresAt: now + 60_000,
+    items: groupAdminEventRows(sourceEvents),
+    sourceCount: sourceEvents.length,
+  };
+  return adminGroupedEventsCache;
+}
+
 export async function buildAdminEventsList(db, searchParams) {
   const limit = clampNumber(searchParams.get('limit'), 1, 500, 80);
   const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
@@ -1991,8 +1928,8 @@ export async function buildAdminEventsList(db, searchParams) {
   const sourceFilter = String(searchParams.get('source') || 'all').toUpperCase();
   const readiness = searchParams.get('readiness') || 'all';
 
-  const sourceEvents = await eventRows(db, 10000);
-  const events = groupAdminEventRows(sourceEvents);
+  const cached = await getCachedAdminGroupedEvents(db);
+  const events = cached.items;
   const quickFilters = ['all', 'needs_attention', 'ready_publish', 'purchase_blocked', 'no_image', 'landing_match'].map((id) => ({
     id,
     count: events.filter((event) => matchesAdminQuickFilter(event, id)).length,
@@ -2042,15 +1979,20 @@ export async function buildAdminEventsList(db, searchParams) {
       readyEvents: events.filter((event) => event.readiness === 'ready').length,
       reviewEvents: events.filter((event) => event.readiness !== 'ready').length,
       landingRules: LANDING_RULES.length,
-      sourceEvents: sourceEvents.length,
+      sourceEvents: cached.sourceCount,
       groupedEvents: events.length,
     },
   };
 }
 
-export async function buildAdminLandingsList(db) {
-  const [events, savedResult] = await Promise.all([
-    eventRows(db, 10000),
+export async function buildAdminLandingsList(db, searchParams = new URLSearchParams()) {
+  const limit = clampNumber(searchParams.get('limit'), 1, 200, 80);
+  const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
+  const query = String(searchParams.get('q') || '').trim().toLowerCase();
+  const statusFilter = String(searchParams.get('status') || 'all').trim().toLowerCase();
+  // Reuse admin events cache. Still full-catalog match per rule (same perf class as events list).
+  const [cached, savedResult] = await Promise.all([
+    getCachedAdminGroupedEvents(db),
     db.query(
       `
         select
@@ -2078,9 +2020,10 @@ export async function buildAdminLandingsList(db) {
       [LANDING_RULES.map((rule) => rule.slug)],
     ),
   ]);
+  const events = cached.items;
   const savedBySlug = new Map(savedResult.rows.map((row) => [row.slug, row]));
   const matchedEventIds = new Set();
-  const rows = LANDING_RULES.map((rule) => {
+  const allRows = LANDING_RULES.map((rule) => {
     const saved = savedBySlug.get(rule.slug);
     const matched = events.filter((event) => matchesRule(event, rule));
     matched.forEach((event) => matchedEventIds.add(event.id));
@@ -2137,25 +2080,51 @@ export async function buildAdminLandingsList(db) {
     };
   });
 
+  const filtered = allRows.filter((row) => {
+    if (statusFilter !== 'all' && row.status !== statusFilter) return false;
+    if (!query) return true;
+    return [row.slug, row.title, row.subtitle, row.city, row.venue, ...(row.chips || []), ...(row.keywords || []), ...(row.requiredTags || [])]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase()
+      .includes(query);
+  });
+  const total = filtered.length;
+  const pages = Math.max(1, Math.ceil(total / Math.max(1, limit)));
+  const safePage = Math.min(Math.max(1, page), pages);
+  const rows = filtered.slice((safePage - 1) * limit, safePage * limit);
+
   return {
     generatedAt: new Date().toISOString(),
-    total: rows.length,
+    page: safePage,
+    pages,
+    limit,
+    total,
     rows,
     metrics: {
-      ready: rows.filter((row) => row.status === 'ready').length,
-      seed: rows.filter((row) => row.status === 'seed').length,
-      empty: rows.filter((row) => row.status === 'empty').length,
+      ready: allRows.filter((row) => row.status === 'ready').length,
+      seed: allRows.filter((row) => row.status === 'seed').length,
+      empty: allRows.filter((row) => row.status === 'empty').length,
       matchedEvents: matchedEventIds.size,
+      landingRules: LANDING_RULES.length,
+      sourceEvents: cached.sourceCount,
     },
   };
 }
 
-export async function buildAdminLandingDetail(db, landingSlug) {
+export async function buildAdminLandingDetail(db, landingSlug, searchParams = new URLSearchParams()) {
   const rule = LANDING_RULES.find((item) => item.slug === landingSlug);
   if (!rule) return null;
 
-  const [events, landingResult] = await Promise.all([
-    eventRows(db, 10000),
+  const eventsLimit = clampNumber(searchParams.get('limit'), 1, 200, 80);
+  const eventsPage = clampNumber(searchParams.get('page'), 1, 100000, 1);
+  const eventsQuery = String(searchParams.get('q') || '').trim().toLowerCase();
+  const excludedLimit = clampNumber(searchParams.get('excludedLimit'), 1, 200, 40);
+  const excludedPage = clampNumber(searchParams.get('excludedPage'), 1, 100000, 1);
+
+  // Perf note: still builds full grouped catalog then filters (same blocker as admin events list).
+  const [cached, landingResult] = await Promise.all([
+    getCachedAdminGroupedEvents(db),
     db.query(
       `
         select
@@ -2181,19 +2150,18 @@ export async function buildAdminLandingDetail(db, landingSlug) {
     ? (await db.query('select "eventId", score, reasons from "LandingMatch" where "landingId" = $1', [landing.id])).rows
     : [];
   const manualByEventId = new Map(manualRows.map((row) => [row.eventId, row]));
-  const autoMatches = events.filter((event) => matchesRule(event, rule));
-  const autoIds = new Set(autoMatches.map((event) => event.id));
+  const groupedEvents = cached.items;
+  const groupIdsFor = (event) => (event.groupEventIds?.length ? event.groupEventIds : [event.id]);
+  const autoMatchedGroups = groupedEvents.filter((event) => matchesRule(event, rule));
+  const autoIds = new Set(autoMatchedGroups.flatMap((event) => groupIdsFor(event)));
   const pinnedIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'PINNED').map((row) => row.eventId));
   const excludedIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'EXCLUDED').map((row) => row.eventId));
   const reviewIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'REVIEW').map((row) => row.eventId));
-  const groupedEvents = groupAdminEventRows(events);
-  const groupIdsFor = (event) => (event.groupEventIds?.length ? event.groupEventIds : [event.id]);
   const manualRowFor = (event) => groupIdsFor(event).map((id) => manualByEventId.get(id)).find(Boolean) || null;
   const isAutoGroup = (event) => groupIdsFor(event).some((id) => autoIds.has(id));
   const isPinnedGroup = (event) => groupIdsFor(event).some((id) => pinnedIds.has(id));
   const isExcludedGroup = (event) => groupIdsFor(event).some((id) => excludedIds.has(id));
   const isReviewGroup = (event) => groupIdsFor(event).some((id) => reviewIds.has(id));
-  const autoMatchedGroups = groupedEvents.filter(isAutoGroup);
   const matched = groupedEvents.filter((event) => (isAutoGroup(event) || isPinnedGroup(event)) && !isExcludedGroup(event));
   const excluded = groupedEvents.filter(isExcludedGroup);
   const prices = matched.map((event) => event.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
@@ -2211,6 +2179,25 @@ export async function buildAdminLandingDetail(db, landingSlug) {
       )).rows
     : [];
   const blocks = blockRows.length ? blockRows.map(mapLandingBlock) : buildDefaultLandingBlocks(rule, matched);
+
+  const filteredMatched = eventsQuery
+    ? matched.filter((event) =>
+        [event.title, event.city, event.venue, event.category, event.sourceCategory, ...(event.tags || [])]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase()
+          .includes(eventsQuery),
+      )
+    : matched;
+  const eventsTotal = filteredMatched.length;
+  const eventsPages = Math.max(1, Math.ceil(eventsTotal / Math.max(1, eventsLimit)));
+  const safeEventsPage = Math.min(Math.max(1, eventsPage), eventsPages);
+  const eventRowsPage = filteredMatched.slice((safeEventsPage - 1) * eventsLimit, safeEventsPage * eventsLimit);
+
+  const excludedTotal = excluded.length;
+  const excludedPages = Math.max(1, Math.ceil(excludedTotal / Math.max(1, excludedLimit)));
+  const safeExcludedPage = Math.min(Math.max(1, excludedPage), excludedPages);
+  const excludedRowsPage = excluded.slice((safeExcludedPage - 1) * excludedLimit, safeExcludedPage * excludedLimit);
 
   return {
     generatedAt: new Date().toISOString(),
@@ -2243,10 +2230,16 @@ export async function buildAdminLandingDetail(db, landingSlug) {
       cities: new Set(matched.map((event) => event.city).filter(Boolean)).size,
       priceFrom: prices.length ? Math.min(...prices) : null,
     },
-    events: matched.slice(0, 160).map((event) => mapLandingAdminEvent(event, manualRowFor(event), isAutoGroup(event), rule)),
-    excludedEvents: excluded
-      .slice(0, 40)
-      .map((event) => mapLandingAdminEvent(event, manualRowFor(event), isAutoGroup(event), rule)),
+    page: safeEventsPage,
+    pages: eventsPages,
+    limit: eventsLimit,
+    total: eventsTotal,
+    events: eventRowsPage.map((event) => mapLandingAdminEvent(event, manualRowFor(event), isAutoGroup(event), rule)),
+    excludedPage: safeExcludedPage,
+    excludedPages,
+    excludedLimit,
+    excludedTotal,
+    excludedEvents: excludedRowsPage.map((event) => mapLandingAdminEvent(event, manualRowFor(event), isAutoGroup(event), rule)),
   };
 }
 
@@ -2257,7 +2250,7 @@ export async function buildAdminLandingEventCandidates(db, landingSlug, searchPa
   const query = String(searchParams.get('q') || '').trim().toLowerCase();
   const limit = clampNumber(searchParams.get('limit'), 1, 50, 12);
   const [events, landingResult] = await Promise.all([
-    eventRows(db, 10000),
+    eventRows(db, 10000, { lean: true }),
     db.query('select id from "Landing" where slug = $1 limit 1', [landingSlug]),
   ]);
   const landing = landingResult.rows[0] || null;
@@ -2407,10 +2400,11 @@ export async function buildAdminTaxonomy(db) {
 }
 
 export async function buildAdminVenuesList(db, searchParams) {
-  const limit = clampNumber(searchParams.get('limit'), 1, 500, 120);
+  const limit = clampNumber(searchParams.get('limit'), 1, 200, 80);
+  const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
   const query = String(searchParams.get('q') || '').trim().toLowerCase();
   const familyFilter = String(searchParams.get('family') || '').trim().toLowerCase();
-  const rows = await venueRows(db, 500);
+  const rows = await venueRows(db, 2000, { lean: true });
   const filtered = rows.filter((venue) => {
     if (query) {
       const haystack = [venue.name, venue.city, venue.address, venue.proposedKind, venue.pageStatus]
@@ -2427,10 +2421,17 @@ export async function buildAdminVenuesList(db, searchParams) {
     return true;
   });
 
+  const total = filtered.length;
+  const pages = Math.max(1, Math.ceil(total / limit));
+  const safePage = Math.min(page, pages);
+
   return {
     generatedAt: new Date().toISOString(),
-    total: filtered.length,
-    rows: filtered.slice(0, limit),
+    page: safePage,
+    pages,
+    limit,
+    total,
+    rows: filtered.slice((safePage - 1) * limit, safePage * limit),
     metrics: {
       venues: rows.length,
       candidates: rows.filter((venue) => venue.pageStatus === 'candidate').length,
@@ -2673,7 +2674,7 @@ function groupPublicEventRows(events) {
           startsAt: event.startsAt,
           dateLabel: formatDate(event.startsAt, eventTimeZone),
           timeLabel: formatTime(event.startsAt, eventTimeZone),
-          purchaseUrl: event.offerWidgetUrl || event.offerDeeplinkUrl || buildProviderWidgetUrl(event),
+          purchaseUrl: purchaseInfo(event).url || buildProviderWidgetUrl(event),
           sourceStatus: event.sourceStatus || null,
           vacant: event.vacant ?? null,
         }
@@ -4286,16 +4287,20 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
       if (ids.some((id) => pinnedIds.has(id))) return true;
       return sessionMatchesLandingSlug(session, rule.slug) && sessionMatchesLandingSchedule(session, rule);
     })
-    .slice(0, 240)
+    .slice(0, 48)
     .map((session) => {
       const pinned = sessionGroupIds(session).some((id) => pinnedIds.has(id));
       const scheduled = pinned ? session : applyLandingScheduleToSession(session, rule);
-      return {
+      const base = {
         ...(scheduled || session),
         manualLandingStatus: sessionGroupIds(session).map((id) => manualByEventId.get(id)?.reasons?.manualStatus).find(Boolean) || null,
       };
-    })
-    .filter((session) => sessionMatchesLandingSlug(session, rule.slug) || session.manualLandingStatus === 'PINNED');
+      // Lean SSR card for landing grids (keeps purchaseProvider; strips widget URLs / heavy slots).
+      return {
+        ...toPublicCatalogListItem(base),
+        manualLandingStatus: base.manualLandingStatus,
+      };
+    });
   const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const cities = countBy(sessions.map((event) => event.destination || event.city).filter(Boolean));
   const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
@@ -4943,8 +4948,25 @@ function publicSourceLabel(sourceCode) {
 
 function buildProviderWidgetUrl(row) {
   const sourceCode = String(row?.sourceCode || row?.offerSourceCode || '').toUpperCase();
-  if (sourceCode.includes('TEPLOHOD')) return row?.offerDeeplinkUrl || row?.deeplinkUrl || (row?.externalId ? buildTeplohodUrl(row.externalId) : null);
+  if (sourceCode.includes('TEPLOHOD')) {
+    const eventId =
+      normalizeTeplohodExternalId(row?.externalId) ||
+      extractTeplohodEventIdFromUrl(row?.offerDeeplinkUrl || row?.deeplinkUrl || row?.offerWidgetUrl);
+    return eventId ? buildTeplohodUrl(eventId) : null;
+  }
   return buildTicketscloudWidgetUrl(row?.externalId);
+}
+
+function normalizeTeplohodExternalId(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return null;
+  const match = raw.match(/(?:^tep-)?(\d+)$/i);
+  return match ? match[1] : null;
+}
+
+function extractTeplohodEventIdFromUrl(url) {
+  const match = String(url || '').match(/(?:teplohod\.info\/event\/|event_id=)(\d+)/i);
+  return match ? match[1] : null;
 }
 
 function providerWidgetProvider(sourceCode) {
@@ -5059,7 +5081,8 @@ async function categoryRows(db) {
   return result.rows;
 }
 
-async function eventRows(db, limit) {
+async function eventRows(db, limit, options = {}) {
+  const lean = Boolean(options.lean);
   const result = await db.query(
     `
       select
@@ -5069,15 +5092,15 @@ async function eventRows(db, limit) {
         source.code as "sourceCode",
         source.name as "sourceName",
         e.title,
-        e.description,
+        ${lean ? 'null::text as description,' : 'e.description,'}
         e.kind,
         e.status,
         e."sourceStatus",
         e."ageLimit",
         e."imageUrl",
-        e."seoH1",
-        e."seoTitle",
-        e."seoDescription",
+        ${lean ? 'null::text as "seoH1",' : 'e."seoH1",'}
+        ${lean ? 'null::text as "seoTitle",' : 'e."seoTitle",'}
+        ${lean ? 'null::text as "seoDescription",' : 'e."seoDescription",'}
         e."canonicalPath",
         e."isIndexable",
         e."priceFromRub",
@@ -5085,12 +5108,12 @@ async function eventRows(db, limit) {
         e."categoryId",
         e."primarySubcategoryId",
         override.title as "overrideTitle",
-        override.description as "overrideDescription",
-        override."shortDescription" as "overrideShortDescription",
+        ${lean ? 'null::text as "overrideDescription",' : 'override.description as "overrideDescription",'}
+        ${lean ? 'null::text as "overrideShortDescription",' : 'override."shortDescription" as "overrideShortDescription",'}
         override."imageUrl" as "overrideImageUrl",
-        override."seoH1" as "overrideSeoH1",
-        override."seoTitle" as "overrideSeoTitle",
-        override."seoDescription" as "overrideSeoDescription",
+        ${lean ? 'null::text as "overrideSeoH1",' : 'override."seoH1" as "overrideSeoH1",'}
+        ${lean ? 'null::text as "overrideSeoTitle",' : 'override."seoTitle" as "overrideSeoTitle",'}
+        ${lean ? 'null::text as "overrideSeoDescription",' : 'override."seoDescription" as "overrideSeoDescription",'}
         override."canonicalPath" as "overrideCanonicalPath",
         override."isIndexable" as "overrideIsIndexable",
         override."editorStatus" as "overrideEditorStatus",
@@ -5268,8 +5291,9 @@ async function eventRows(db, limit) {
 function purchaseInfo(row = {}) {
   const sourceCode = row.sourceCode || row.offerSourceCode;
   const provider = providerWidgetProvider(sourceCode);
-  const explicitUrl = row.offerWidgetUrl || row.offerDeeplinkUrl || null;
   const fallbackUrl = buildProviderWidgetUrl({ ...row, offerSourceCode: sourceCode });
+  // Prefer rebuilt TEP checkout: stored teplohod.info/event/* deeplinks currently 404.
+  const explicitUrl = provider === 'TEPLOHOD' ? null : row.offerWidgetUrl || row.offerDeeplinkUrl || null;
   const url = explicitUrl || fallbackUrl || null;
   const mode = provider === 'TEPLOHOD' || provider === 'TICKETSCLOUD' ? 'widget' : url ? 'redirect' : null;
   const urlSource = explicitUrl ? 'offer' : fallbackUrl ? 'fallback' : null;
@@ -5297,7 +5321,7 @@ function adminOfferStatus(row) {
 
 async function eventRowsByIds(db, ids) {
   if (!ids.length) return [];
-  const rows = await eventRows(db, 10000);
+  const rows = await eventRows(db, 10000, { lean: true });
   const expected = new Set(ids);
   return rows.filter((row) => expected.has(row.id));
 }
@@ -6287,15 +6311,16 @@ function mapOverrideRow(row) {
   };
 }
 
-async function venueRows(db, limit) {
+async function venueRows(db, limit, options = {}) {
+  const lean = Boolean(options.lean);
   const result = await db.query(
     `
       select
         venue.id,
         venue.slug,
         venue.title as name,
-        venue."shortDescription",
-        venue.description,
+        ${lean ? 'null::text as "shortDescription",' : 'venue."shortDescription",'}
+        ${lean ? 'null::text as description,' : 'venue.description,'}
         venue."heroImageUrl",
         city.title as city,
         venue.address,
@@ -8316,8 +8341,15 @@ function buildTicketscloudWidgetUrl(eventExternalId) {
 
 function buildTeplohodUrl(eventExternalId) {
   if (!eventExternalId) return null;
-  const baseUrl = process.env.TEP_WIDGET_BASE_URL || 'https://teplohod.info';
-  return `${baseUrl.replace(/\/+$/, '')}/event/${encodeURIComponent(eventExternalId)}`;
+  const eventId = String(eventExternalId).replace(/^tep-/i, '').trim();
+  if (!/^\d+$/.test(eventId)) return null;
+  const widgetId = String(process.env.TEP_WIDGET_ID || '14208').trim() || '14208';
+  // teplohod.info/event/{id} currently returns "Ошибка!"; working checkout is account.teplohod.info.
+  const checkoutBase = (process.env.TEP_CHECKOUT_BASE_URL || 'https://account.teplohod.info').replace(/\/+$/, '');
+  const url = new URL(`${checkoutBase}/order/event-order`);
+  url.searchParams.set('widget_id', widgetId);
+  url.searchParams.set('event_id', eventId);
+  return url.toString();
 }
 
 async function publicVenues(db, limit) {
@@ -8616,7 +8648,7 @@ function filterSessionsForLandingRule(sessions, rule) {
     .filter((session) => sessionMatchesLandingSlug(session, rule.slug) && sessionMatchesLandingSchedule(session, rule))
     .map((session) => applyLandingScheduleToSession(session, rule))
     .filter(Boolean)
-    .slice(0, 240);
+    .slice(0, 48);
 }
 
 function resolveLandingSlugsForSession(ruleEvent, sessionDraft, rules = LANDING_RULES) {

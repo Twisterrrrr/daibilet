@@ -4,13 +4,17 @@ import { Suspense } from 'react';
 import { CatalogShell } from '@/components/CatalogShell.client';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { SiteLayout } from '@/components/SiteLayout';
+import { pageTitle, routeOpenGraph } from '@/lib/seo-meta';
 import { catalogQueryCacheKey, parseCatalogPageQuery } from '@/server/catalog-query';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 
 export const metadata: Metadata = {
-  title: 'События, экскурсии и билеты | Дайбилет',
+  title: pageTitle('События, экскурсии и билеты'),
   description: 'Полный каталог событий Дайбилет: фильтры по городу, дате, категории, цене и подборкам.',
   alternates: { canonical: '/events' },
+  openGraph: routeOpenGraph('/events', {
+    title: 'События, экскурсии и билеты',
+  }),
 };
 
 export const revalidate = 300;

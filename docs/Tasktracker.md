@@ -73,6 +73,11 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 0.5.3 | EventCard title + «Подробнее» links | Высокий | ✅ |
 | 0.5.4 | Catalog city filter instant apply | Средний | ✅ |
 | 0.5.5 | Мультисобытие `mergeGroupKey` + HP script | Средний | 🔄 код готов, deploy ⏳ |
+| 0.5.6 | Admin lists pagination / lean payloads (orders, buyers, events, venues) | Критический | ✅ 2026-07-13 deploy prod |
+| 0.5.7 | Admin cities/landings page envelopes + landing detail events pager + compact dashboard | Критический | ✅ 2026-07-14 |
+| 0.5.8 | Events/landings SQL read-model (no full grouped catalog before slice) | Высокий | ⏳ perf blocker |
+| 0.5.9 | Catalog quick wins: lean DTO, no widgets in list, hydrate page-only, unified metrics, www/SEO redirects, SSR trim, warmup | Критический | ✅ 2026-07-14 |
+| 0.5.10 | Teplohod checkout fallback → account.teplohod.info (не teplohod.info/event 404) | Высокий | ✅ 2026-07-14 |
 
 ---
 

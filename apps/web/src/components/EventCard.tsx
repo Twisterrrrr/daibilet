@@ -60,7 +60,7 @@ export function EventCard({
   showcaseRail = false,
   editorsPickBadge = false,
   landingActions = false,
-  suppressPurchaseAnchors = false,
+  suppressPurchaseAnchors = true,
 }: EventCardProps) {
   if (showcaseRail || editorsPickBadge) {
     return <ShowcaseEventCard session={session} rail={showcaseRail} editorsPickBadge={editorsPickBadge} />;
@@ -83,8 +83,9 @@ export function EventCard({
   const showSoonBadge = !hasPrice && !openDate && !departingSoonMinutes;
   const priceBadgeLabel = formatPriceFrom(session.priceFrom);
   const priceFooterLabel = formatMoneyRange(session.priceFrom, session.priceTo);
-  const { purchaseEnabled, teplohod, tcEventId, tcToken, tcTriggerRef, teplohodWrapperId, openPurchase } =
-    useCatalogPurchase(session);
+  const purchase = useCatalogPurchase(session);
+  // Catalog list: no hidden widget DOM. Purchase UX lives on event page / landing CTA.
+  const showPurchaseWidgets = landingActions && !suppressPurchaseAnchors && purchase.purchaseEnabled;
 
   const cardClassName =
     'group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-slate-200/60';
@@ -183,13 +184,13 @@ export function EventCard({
         {showSlotPills ? (
           <div className="mt-2 flex flex-wrap items-start gap-1.5">
             {displaySlotLabels.map((label) =>
-              purchaseEnabled && !suppressPurchaseAnchors ? (
+              showPurchaseWidgets ? (
                 <CatalogPurchaseChip
                   key={label}
                   session={session}
                   label={label}
                   className={`${SLOT_CHIP_CLASS} ${SLOT_CHIP_PURCHASE_CLASS}`}
-                  onOpen={openPurchase}
+                  onOpen={purchase.openPurchase}
                 >
                   {label}
                 </CatalogPurchaseChip>
@@ -202,14 +203,14 @@ export function EventCard({
           </div>
         ) : null}
 
-        {purchaseEnabled && !suppressPurchaseAnchors ? (
+        {showPurchaseWidgets ? (
           <CatalogPurchaseAnchors
             session={session}
-            teplohod={teplohod}
-            teplohodWrapperId={teplohodWrapperId}
-            tcEventId={tcEventId}
-            tcToken={tcToken}
-            tcTriggerRef={tcTriggerRef}
+            teplohod={purchase.teplohod}
+            teplohodWrapperId={purchase.teplohodWrapperId}
+            tcEventId={purchase.tcEventId}
+            tcToken={purchase.tcToken}
+            tcTriggerRef={purchase.tcTriggerRef}
           />
         ) : null}
 

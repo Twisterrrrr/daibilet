@@ -12,6 +12,9 @@ import type { AdminLandingDetail, AdminLandingEvent, AdminLandingRow } from '@/t
 
 type LandingsResponse = {
   generatedAt: string;
+  page?: number;
+  pages?: number;
+  limit?: number;
   total: number;
   rows: AdminLandingRow[];
   metrics: {
@@ -19,6 +22,8 @@ type LandingsResponse = {
     seed: number;
     empty: number;
     matchedEvents: number;
+    landingRules?: number;
+    sourceEvents?: number;
   };
 };
 
@@ -30,11 +35,17 @@ type LandingCandidatesResponse = {
   rows: AdminLandingEvent[];
 };
 
+const PAGE_SIZE = 80;
+const DETAIL_EVENTS_PAGE_SIZE = 80;
+
 function localResponse(): LandingsResponse {
   return {
     generatedAt: adminData.generatedAt,
+    page: 1,
+    pages: 1,
+    limit: PAGE_SIZE,
     total: adminData.landingRows.length,
-    rows: adminData.landingRows,
+    rows: adminData.landingRows.slice(0, PAGE_SIZE),
     metrics: {
       ready: adminData.landingRows.filter((row) => row.status === 'ready').length,
       seed: adminData.landingRows.filter((row) => row.status === 'seed').length,
@@ -47,17 +58,53 @@ function localResponse(): LandingsResponse {
 export function LandingsPage() {
   const [payload, setPayload] = React.useState<LandingsResponse>(() => localResponse());
   const [query, setQuery] = React.useState('');
+  const [debouncedQuery, setDebouncedQuery] = React.useState('');
   const [status, setStatus] = React.useState('all');
+  const [page, setPage] = React.useState(1);
   const [isLoading, setIsLoading] = React.useState(false);
   const [loadError, setLoadError] = React.useState<string | null>(null);
   const [selectedSlug, setSelectedSlug] = React.useState<string | null>(null);
   const [detail, setDetail] = React.useState<AdminLandingDetail | null>(null);
   const [isDetailLoading, setIsDetailLoading] = React.useState(false);
+  const [detailPage, setDetailPage] = React.useState(1);
+  const [detailQuery, setDetailQuery] = React.useState('');
+  const [debouncedDetailQuery, setDebouncedDetailQuery] = React.useState('');
+
+  React.useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedQuery(query.trim()), 250);
+    return () => window.clearTimeout(timer);
+  }, [query]);
+
+  React.useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedDetailQuery(detailQuery.trim()), 250);
+    return () => window.clearTimeout(timer);
+  }, [detailQuery]);
+
+  React.useEffect(() => {
+    setPage(1);
+  }, [debouncedQuery, status]);
+
+  React.useEffect(() => {
+    setDetailPage(1);
+    setDetailQuery('');
+    setDebouncedDetailQuery('');
+  }, [selectedSlug]);
+
+  React.useEffect(() => {
+    setDetailPage(1);
+  }, [debouncedDetailQuery]);
 
   const loadLandings = React.useCallback(() => {
     const controller = new AbortController();
     setIsLoading(true);
-    adminFetch(`/api/admin/landings`, { cache: 'no-store', signal: controller.signal })
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(PAGE_SIZE),
+      status,
+    });
+    if (debouncedQuery) params.set('q', debouncedQuery);
+
+    adminFetch(`/api/admin/landings?${params}`, { cache: 'no-store', signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as LandingsResponse;
@@ -76,54 +123,49 @@ export function LandingsPage() {
       });
 
     return () => controller.abort();
-  }, []);
+  }, [page, debouncedQuery, status]);
 
   React.useEffect(() => loadLandings(), [loadLandings]);
+
+  const loadDetail = React.useCallback(
+    (slug: string) => {
+      const controller = new AbortController();
+      setIsDetailLoading(true);
+      const params = new URLSearchParams({
+        page: String(detailPage),
+        limit: String(DETAIL_EVENTS_PAGE_SIZE),
+      });
+      if (debouncedDetailQuery) params.set('q', debouncedDetailQuery);
+
+      adminFetch(`/api/admin/landings/${encodeURIComponent(slug)}?${params}`, { cache: 'no-store', signal: controller.signal })
+        .then(async (response) => {
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return (await response.json()) as AdminLandingDetail;
+        })
+        .then(setDetail)
+        .catch(() => {
+          if (!controller.signal.aborted) setDetail(null);
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setIsDetailLoading(false);
+        });
+
+      return () => controller.abort();
+    },
+    [detailPage, debouncedDetailQuery],
+  );
 
   React.useEffect(() => {
     if (!selectedSlug) {
       setDetail(null);
       return;
     }
-    const controller = new AbortController();
-    setIsDetailLoading(true);
-    adminFetch(`/api/admin/landings/${encodeURIComponent(selectedSlug)}`, { cache: 'no-store', signal: controller.signal })
-      .then(async (response) => {
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return (await response.json()) as AdminLandingDetail;
-      })
-      .then(setDetail)
-      .catch(() => {
-        if (!controller.signal.aborted) setDetail(null);
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setIsDetailLoading(false);
-      });
+    return loadDetail(selectedSlug);
+  }, [selectedSlug, loadDetail]);
 
-    return () => controller.abort();
-  }, [selectedSlug]);
-
-  const rows = React.useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    return payload.rows.filter((landing) => {
-      if (status !== 'all' && landing.status !== status) return false;
-      if (!normalized) return true;
-      return [
-        landing.title,
-        landing.subtitle,
-        landing.slug,
-        landing.city,
-        landing.venue,
-        ...(landing.chips || []),
-        ...(landing.keywords || []),
-        ...(landing.requiredTags || []),
-      ]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
-        .includes(normalized);
-    });
-  }, [payload.rows, query, status]);
+  const rows = payload.rows;
+  const pages = payload.pages || Math.max(1, Math.ceil((payload.total || 0) / PAGE_SIZE));
+  const currentPage = payload.page || page;
 
   return (
     <div>
@@ -162,6 +204,7 @@ export function LandingsPage() {
           <option value="seed">Seed</option>
           <option value="empty">Empty</option>
         </select>
+        <div className="flex items-center text-xs text-muted-foreground">{formatNumber(payload.total)} найдено</div>
       </div>
 
       {loadError ? (
@@ -175,15 +218,16 @@ export function LandingsPage() {
           <LandingDetailEditor
             detail={detail}
             isLoading={isDetailLoading}
+            query={detailQuery}
+            onQueryChange={setDetailQuery}
+            eventsPage={detail?.page || detailPage}
+            eventsPages={detail?.pages || 1}
+            eventsTotal={detail?.total || detail?.events?.length || 0}
+            onEventsPageChange={setDetailPage}
             onClose={() => setSelectedSlug(null)}
             onChanged={() => {
               loadLandings();
-              if (selectedSlug) {
-                adminFetch(`/api/admin/landings/${encodeURIComponent(selectedSlug)}`, { cache: 'no-store' })
-                  .then((response) => response.json() as Promise<AdminLandingDetail>)
-                  .then(setDetail)
-                  .catch(() => undefined);
-              }
+              if (selectedSlug) loadDetail(selectedSlug);
             }}
           />
         ) : null}
@@ -230,6 +274,27 @@ export function LandingsPage() {
             </tr>
           ))}
         </DataTableShell>
+        <div className="flex items-center justify-end gap-2">
+          <button
+            type="button"
+            disabled={currentPage <= 1 || isLoading}
+            onClick={() => setPage(currentPage - 1)}
+            className="inline-flex h-8 items-center rounded-md border border-border px-3 text-xs font-semibold hover:bg-secondary disabled:opacity-50"
+          >
+            Назад
+          </button>
+          <div className="text-xs text-muted-foreground">
+            {currentPage} / {pages}
+          </div>
+          <button
+            type="button"
+            disabled={currentPage >= pages || isLoading}
+            onClick={() => setPage(currentPage + 1)}
+            className="inline-flex h-8 items-center rounded-md border border-border px-3 text-xs font-semibold hover:bg-secondary disabled:opacity-50"
+          >
+            Далее
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -435,22 +500,32 @@ function LandingRuleCard({ landing, onChanged, onOpen }: { landing: AdminLanding
 function LandingDetailEditor({
   detail,
   isLoading,
+  query,
+  onQueryChange,
+  eventsPage,
+  eventsPages,
+  eventsTotal,
+  onEventsPageChange,
   onClose,
   onChanged,
 }: {
   detail: AdminLandingDetail | null;
   isLoading: boolean;
+  query: string;
+  onQueryChange: (value: string) => void;
+  eventsPage: number;
+  eventsPages: number;
+  eventsTotal: number;
+  onEventsPageChange: (page: number) => void;
   onClose: () => void;
   onChanged: () => void;
 }) {
-  const [query, setQuery] = React.useState('');
   const [candidateQuery, setCandidateQuery] = React.useState('');
   const [candidateRows, setCandidateRows] = React.useState<AdminLandingEvent[]>([]);
   const [isCandidateLoading, setIsCandidateLoading] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
 
   React.useEffect(() => {
-    setQuery('');
     setCandidateQuery('');
     setCandidateRows([]);
   }, [detail?.slug]);
@@ -490,12 +565,6 @@ function LandingDetailEditor({
       setIsCandidateLoading(false);
     }
   }, [candidateQuery, detail]);
-
-  const normalized = query.trim().toLowerCase();
-  const visibleEvents = (detail?.events || []).filter((event) => {
-    if (!normalized) return true;
-    return [event.title, event.city, event.venue, event.category, ...(event.tags || [])].filter(Boolean).join(' ').toLowerCase().includes(normalized);
-  });
 
   return (
     <Card className="border-primary/30 p-4 shadow-sm">
@@ -589,15 +658,43 @@ function LandingDetailEditor({
             )}
           </section>
 
-          <div className="mb-4">
-            <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск внутри текущего списка лендинга..." className="h-9" />
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <Input value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Поиск событий в лендинге (server)..." className="h-9 min-w-[260px] flex-1" />
+            <div className="text-xs text-muted-foreground">{formatNumber(eventsTotal)} событий · стр. {eventsPage}/{eventsPages}</div>
           </div>
 
-          <LandingEventsEditorTable title="События в лендинге" events={visibleEvents} onUpdate={updateMatch} />
+          <LandingEventsEditorTable title="События в лендинге" events={detail.events || []} onUpdate={updateMatch} />
+
+          <div className="mt-3 flex items-center justify-end gap-2">
+            <button
+              type="button"
+              disabled={eventsPage <= 1 || isLoading}
+              onClick={() => onEventsPageChange(eventsPage - 1)}
+              className="inline-flex h-8 items-center rounded-md border border-border px-3 text-xs font-semibold hover:bg-secondary disabled:opacity-50"
+            >
+              Назад
+            </button>
+            <div className="text-xs text-muted-foreground">
+              {eventsPage} / {eventsPages}
+            </div>
+            <button
+              type="button"
+              disabled={eventsPage >= eventsPages || isLoading}
+              onClick={() => onEventsPageChange(eventsPage + 1)}
+              className="inline-flex h-8 items-center rounded-md border border-border px-3 text-xs font-semibold hover:bg-secondary disabled:opacity-50"
+            >
+              Далее
+            </button>
+          </div>
 
           {detail.excludedEvents.length ? (
             <div className="mt-4">
               <LandingEventsEditorTable title="Скрытые события" events={detail.excludedEvents} onUpdate={updateMatch} />
+              {detail.excludedTotal != null ? (
+                <div className="mt-2 text-xs text-muted-foreground">
+                  Скрыто всего: {formatNumber(detail.excludedTotal)} (стр. {detail.excludedPage || 1}/{detail.excludedPages || 1})
+                </div>
+              ) : null}
             </div>
           ) : null}
         </>

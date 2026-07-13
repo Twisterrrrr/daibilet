@@ -14,6 +14,9 @@ import type { AdminVenueDetail, AdminVenueRow } from '@/types';
 
 type VenuesListResponse = {
   generatedAt: string;
+  page?: number;
+  pages?: number;
+  limit?: number;
   total: number;
   rows: AdminVenueRow[];
   metrics: {
@@ -23,6 +26,8 @@ type VenuesListResponse = {
     withEvents: number;
   };
 };
+
+const PAGE_SIZE = 80;
 
 type VenueDraft = {
   title: string;
@@ -143,6 +148,7 @@ function detailToRow(detail: AdminVenueDetail, previous?: AdminVenueRow): AdminV
 export function VenuesPage() {
   const [query, setQuery] = React.useState('');
   const [familyFilter, setFamilyFilter] = React.useState<'all' | 'institution' | 'location'>('all');
+  const [page, setPage] = React.useState(1);
   const [payload, setPayload] = React.useState<VenuesListResponse>(() => buildLocalResponse());
   const [isLoading, setIsLoading] = React.useState(false);
   const [loadError, setLoadError] = React.useState<string | null>(null);
@@ -154,8 +160,12 @@ export function VenuesPage() {
   const [saveError, setSaveError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
+    setPage(1);
+  }, [query, familyFilter]);
+
+  React.useEffect(() => {
     const controller = new AbortController();
-    const params = new URLSearchParams({ limit: '160' });
+    const params = new URLSearchParams({ limit: String(PAGE_SIZE), page: String(page) });
     if (query.trim()) params.set('q', query.trim());
     if (familyFilter !== 'all') params.set('family', familyFilter);
     setIsLoading(true);
@@ -182,7 +192,10 @@ export function VenuesPage() {
       });
 
     return () => controller.abort();
-  }, [query, familyFilter]);
+  }, [query, familyFilter, page]);
+
+  const currentPage = payload.page || page;
+  const pages = payload.pages || Math.max(1, Math.ceil((payload.total || 0) / PAGE_SIZE));
 
   React.useEffect(() => {
     setDraft(emptyDraft(venueDetail));
@@ -307,6 +320,18 @@ export function VenuesPage() {
           </tr>
         ))}
       </DataTableShell>
+
+      <div className="mt-4 flex items-center justify-end gap-2">
+        <Button variant="outline" size="sm" disabled={currentPage <= 1 || isLoading} onClick={() => setPage(currentPage - 1)}>
+          Назад
+        </Button>
+        <span className="text-xs text-muted-foreground">
+          {currentPage} / {pages}
+        </span>
+        <Button variant="outline" size="sm" disabled={currentPage >= pages || isLoading} onClick={() => setPage(currentPage + 1)}>
+          Вперёд
+        </Button>
+      </div>
 
       <div className="hidden">
         {payload.rows.map((venue) => (

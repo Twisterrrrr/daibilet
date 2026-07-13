@@ -41,6 +41,9 @@ type AdminBuyerRow = {
 type AdminBuyersPayload = {
   generatedAt: string;
   view?: 'active' | 'archive';
+  page?: number;
+  pages?: number;
+  limit?: number;
   total: number;
   rows: AdminBuyerRow[];
   metrics: {
@@ -54,6 +57,8 @@ type AdminBuyersPayload = {
   };
 };
 
+const PAGE_SIZE = 80;
+
 export function BuyersPage() {
   const [params, setParams] = useSearchParams();
   const [payload, setPayload] = React.useState<AdminBuyersPayload>(() => emptyPayload());
@@ -62,10 +67,11 @@ export function BuyersPage() {
 
   const q = params.get('q') || '';
   const view = params.get('view') === 'archive' ? 'archive' : 'active';
+  const page = Math.max(1, Number(params.get('page') || '1') || 1);
 
   React.useEffect(() => {
     const controller = new AbortController();
-    const queryParams = new URLSearchParams({ limit: '160', view });
+    const queryParams = new URLSearchParams({ limit: String(PAGE_SIZE), view, page: String(page) });
     if (q.trim()) queryParams.set('q', q.trim());
     setLoading(true);
 
@@ -92,12 +98,13 @@ export function BuyersPage() {
       });
 
     return () => controller.abort();
-  }, [q, view]);
+  }, [q, view, page]);
 
   const setQuery = (value: string) => {
     const next = new URLSearchParams(params);
     if (value.trim()) next.set('q', value);
     else next.delete('q');
+    next.delete('page');
     setParams(next);
   };
 
@@ -105,10 +112,20 @@ export function BuyersPage() {
     const next = new URLSearchParams(params);
     if (nextView === 'archive') next.set('view', 'archive');
     else next.delete('view');
+    next.delete('page');
+    setParams(next);
+  };
+
+  const setPage = (nextPage: number) => {
+    const next = new URLSearchParams(params);
+    if (nextPage <= 1) next.delete('page');
+    else next.set('page', String(nextPage));
     setParams(next);
   };
 
   const archiveAfterDays = payload.metrics.archiveAfterDays || 30;
+  const currentPage = payload.page || page;
+  const pages = payload.pages || 1;
 
   return (
     <div>
@@ -157,7 +174,7 @@ export function BuyersPage() {
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input value={q} onChange={(event) => setQuery(event.target.value)} placeholder="Поиск по имени, email, телефону или заказу" className="pl-9" />
         </label>
-        <div className="text-xs text-muted-foreground">{formatNumber(payload.rows.length)} строк в выдаче</div>
+        <div className="text-xs text-muted-foreground">{formatNumber(payload.total)} покупателей · страница {currentPage}/{pages}</div>
       </div>
 
       {error ? <div className="mb-4 rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</div> : null}
@@ -231,6 +248,18 @@ export function BuyersPage() {
           </tr>
         ))}
       </DataTableShell>
+
+      <div className="mt-4 flex items-center justify-end gap-2">
+        <Button variant="outline" size="sm" disabled={currentPage <= 1 || loading} onClick={() => setPage(currentPage - 1)}>
+          Назад
+        </Button>
+        <span className="text-xs text-muted-foreground">
+          {currentPage} / {pages}
+        </span>
+        <Button variant="outline" size="sm" disabled={currentPage >= pages || loading} onClick={() => setPage(currentPage + 1)}>
+          Вперёд
+        </Button>
+      </div>
     </div>
   );
 }
@@ -292,6 +321,9 @@ function emptyPayload(): AdminBuyersPayload {
   return {
     generatedAt: new Date().toISOString(),
     view: 'active',
+    page: 1,
+    pages: 1,
+    limit: PAGE_SIZE,
     total: 0,
     rows: [],
     metrics: {

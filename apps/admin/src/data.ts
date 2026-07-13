@@ -49,8 +49,10 @@ export async function hydrateAdminData(): Promise<void> {
       signal: controller.signal,
     });
     if (!response.ok) return;
-    const remoteData = (await response.json()) as AdminData;
-    Object.assign(adminData, remoteData);
+    const remoteData = (await response.json()) as Partial<AdminData>;
+    if (remoteData.generatedAt) adminData.generatedAt = remoteData.generatedAt;
+    if (remoteData.metrics) adminData.metrics = { ...adminData.metrics, ...remoteData.metrics };
+    if (remoteData.importJob) adminData.importJob = remoteData.importJob;
   } catch {
     // Admin remains usable from apps/admin/data.js while the local API is offline.
   } finally {

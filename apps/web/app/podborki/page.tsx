@@ -18,7 +18,7 @@ type PageProps = {
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: 'Подборки — тематические коллекции событий | Дайбилет',
+    title: 'Подборки — тематические коллекции событий',
     description:
       'Готовые подборки на вечер, выходные и бюджет, популярные запросы и теги — с переходом в каталог с нужными фильтрами.',
     alternates: { canonical: '/podborki' },

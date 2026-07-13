@@ -12,6 +12,7 @@ import {
 } from './dto.js';
 import { createDb } from './db.js';
 import { getPublicCatalogSessions } from './public-catalog.dto.js';
+import { toPublicCatalogListItem } from './public-catalog-list-item.js';
 import type { DestinationType } from './types/common.js';
 import type {
   PublicCityPageDto,
@@ -22,6 +23,7 @@ import type {
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_CITY_CACHE_MS = 5 * 60 * 1000;
+const CITY_SSR_SESSION_LIMIT = 48;
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
 export interface PublicDestinationsDto {
@@ -60,7 +62,7 @@ export async function buildPublicDestinationsDto(
   if (!forceRefresh && destinationsBuild) return destinationsBuild;
 
   if (forceRefresh) clearPublicCityDtoCache();
-  const build = getPublicCatalogSessions(forceRefresh).then((sessions) => {
+  const build = getPublicCatalogSessions(forceRefresh, { hydrateSlots: false }).then((sessions) => {
     const payload = {
       generatedAt: new Date().toISOString(),
       destinations: buildPublicDestinationRowsFromSessions(sessions),
@@ -90,7 +92,7 @@ export async function buildPublicCityDto(
 
   const requestedSlug = String(citySlugOrId || '').toLowerCase();
   const [catalogSessions, venueHubRows] = await Promise.all([
-    getPublicCatalogSessions(forceRefresh),
+    getPublicCatalogSessions(forceRefresh, { hydrateSlots: false }),
     publicVenueHubRows(getLegacyDb(), 500),
   ]);
   const matchedSessions = lookupDestinationCatalogSessions(
@@ -104,18 +106,18 @@ export async function buildPublicCityDto(
   }
 
   const destination = publicDestinationFromSession(matchedSessions[0]);
-  const sessions = matchedSessions.slice(0, 160);
-  const venues = publicVenuesForSessionsFromHub(sessions, venueHubRows, 24);
-  const prices = sessions
+  const sessions = matchedSessions.slice(0, CITY_SSR_SESSION_LIMIT).map((session) => toPublicCatalogListItem(session));
+  const venues = publicVenuesForSessionsFromHub(matchedSessions.slice(0, CITY_SSR_SESSION_LIMIT), venueHubRows, 24);
+  const prices = matchedSessions
     .map((session: PublicSessionDto) => session.priceFrom)
     .filter((price: number | null | undefined): price is number =>
       Number.isFinite(price) && Number(price) >= MIN_DISPLAY_PRICE_RUB,
     );
-  const categories = countBy(sessions.map((event: PublicSessionDto) => event.category).filter(Boolean));
-  const landings = (buildPublicLandings(sessions) as PublicLandingDto[]).filter((landing) => landing.events > 0);
+  const categories = countBy(matchedSessions.map((event: PublicSessionDto) => event.category).filter(Boolean));
+  const landings = (buildPublicLandings(matchedSessions) as PublicLandingDto[]).filter((landing) => landing.events > 0);
   const entityLabel = destinationPrepositional(destination);
-  const cityRecord = destination.type === 'city' && sessions[0]?.cityId
-    ? await prisma.city.findUnique({ where: { id: sessions[0].cityId } })
+  const cityRecord = destination.type === 'city' && matchedSessions[0]?.cityId
+    ? await prisma.city.findUnique({ where: { id: matchedSessions[0].cityId } })
     : null;
 
   const payload: PublicCityPageDto = {
@@ -128,7 +130,7 @@ export async function buildPublicCityDto(
       title: destination.name,
       type: destination.type as DestinationType,
       isDestination: true,
-      events: sessions.length,
+      events: matchedSessions.length,
       venues: venues.length,
       categories,
       seoH1: cityRecord?.seoH1 || destination.name,
@@ -137,11 +139,11 @@ export async function buildPublicCityDto(
         `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`,
       canonicalPath: cityRecord?.canonicalPath || `/cities/${destination.slug}`,
     },
-    sessions,
+    sessions: sessions as PublicCityPageDto['sessions'],
     venues,
     landings,
     stats: {
-      events: sessions.length,
+      events: matchedSessions.length,
       venues: venues.length,
       categories: Object.keys(categories).length,
       priceFrom: prices.length ? Math.min(...prices) : null,

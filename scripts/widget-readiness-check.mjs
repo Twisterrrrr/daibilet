@@ -86,7 +86,9 @@ function checkTepEvent(event, sessions) {
   }
   const purchaseUrl = event.purchaseUrl || sessions[0]?.purchaseUrl;
   if (!purchaseUrl) issues.push("missing purchaseUrl");
-  else if (!/teplohod\.info\/event\/\d+/i.test(purchaseUrl)) issues.push("purchaseUrl not teplohod.info/event/");
+  else if (!/account\.teplohod\.info\/order\/event-order|teplohod\.info\/event\/\d+/i.test(purchaseUrl)) {
+    issues.push("purchaseUrl not teplohod checkout");
+  }
   if (event.purchaseReady === false) issues.push("purchaseReady=false");
   return issues;
 }

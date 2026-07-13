@@ -8,6 +8,7 @@ import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { toEventPageClientPayload } from '@/lib/event-page-client-props';
 import { eventHref } from '@/lib/routes';
+import { pageTitle, routeOpenGraph } from '@/lib/seo-meta';
 import { buildPublicEventDto } from '@daibilet/backend/public-read';
 
 export const revalidate = 300;
@@ -19,20 +20,21 @@ type PageProps = {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const payload = await buildPublicEventDto(decodeURIComponent(slug));
-  if (!payload?.event) return { title: 'Событие не найдено | Дайбилет' };
+  if (!payload?.event) return { title: pageTitle('Событие не найдено') };
 
   const event = payload.event;
+  const path = event.canonicalPath || eventHref(event);
   return {
-    title: event.seoTitle || `${event.title} | Дайбилет`,
+    title: pageTitle(event.seoTitle || event.title),
     description: event.seoDescription || event.description || `${event.title} — билеты на Дайбилет`,
     alternates: {
-      canonical: event.canonicalPath || eventHref(event),
+      canonical: path,
     },
-    openGraph: {
+    openGraph: routeOpenGraph(path, {
       title: event.seoTitle || event.title,
       description: event.seoDescription || event.description || undefined,
       images: event.imageUrl ? [{ url: event.imageUrl }] : undefined,
-    },
+    }),
   };
 }
 

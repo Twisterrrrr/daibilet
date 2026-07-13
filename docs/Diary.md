@@ -4,6 +4,109 @@
 
 ---
 
+## 2026-07-14 — Docs + commit + prod deploy (admin pagination + catalog perf)
+
+### Наблюдения
+
+- Worktree содержал админскую пагинацию, compact dashboard, catalog lean DTO, SEO redirects и Teplohod checkout fix — без пуша.
+- Одноразовые `scripts/inspect-*` / `probe-*` / `scrape-*` не входят в коммит.
+
+### Решения
+
+- Документы: Project/Tasktracker/Diary/current-state обновлены под контракты admin API и catalog perf rules.
+- Deploy: `feat/next-monorepo` → `deploy-prod-next.sh` + nginx www→apex patch.
+
+### Проблемы
+
+- SQL LIMIT read-model (0.5.8) остаётся следующим perf-блоком после warm-cache wins.
+
+---
+
+## 2026-07-14 — Catalog/perf + metrics + SEO redirects
+
+### Наблюдения
+
+- `/api/public/events?limit=50` собирал весь grouped catalog и hydratил upcomingSlots до тысячи карточек, потом slice.
+- В HTML `/events` в каждой карточке жили скрытые TC/Teplohod widget-блоки.
+- Dashboard launch metrics считал raw Event rows, public `/stats` — saleable groupKey.
+- SSR city/landing тащили 160–240 полных сессий (~1.7–2 МБ HTML).
+- `www.daibilet.ru` и старые `/river-cruises` не 301.
+
+### Решения
+
+- Catalog API: shared cache без full slot hydrate; hydrate только page slice; lean list DTO без widget URL.
+- Catalog cards: `suppressPurchaseAnchors` по умолчанию; horizontal без widget markup.
+- Dashboard launch metrics = public catalog groups (`source: public_catalog_groups`); UI предпочитает `launch.groupedEvents`.
+- City SSR ≤48 lean items; landing sessions ≤48 lean.
+- Middleware/next.config: www→apex + `/river-cruises`→`/rechnye-progulki`; `pageTitle`/`og:url` route-specific.
+- Warm/revalidate: stats, events page, SPB/MSK, river/bus landings.
+
+### Проблемы
+
+- Полный SQL LIMIT на группах (без in-memory filter catalog) всё ещё впереди — отдельно materialized PublicCatalogGroup.
+
+---
+
+### Наблюдения
+
+- Codex acceptance: не только client-side slice; API `page/limit/q` → `{ page, pages, limit, total, rows }`.
+- Gaps: cities без pager; landings list без page params; landing detail hard-cap `events.slice(0, 160)` без «Далее»; dashboard раньше ещё отдавал пустые `*Rows` массивы (и importJob).
+- Events/venues/buyers/orders уже имели envelope + UI pager, но events/venues всё ещё filter-after-full-load (не SQL OFFSET).
+
+### Решения
+
+- Cities: `destinationSummaryRowsFast` + `page/limit/q` + UI Назад/Далее.
+- Landings list/detail: page envelope; detail events paginated (`page/limit/q`); reuse `getCachedAdminGroupedEvents`.
+- Dashboard contract: только `generatedAt` + `metrics` (compact).
+- hydrateAdminData больше не затирает локальные row-fallback через `Object.assign` всего payload.
+
+### Проблемы
+
+- **Performance blocker (отдельный):** `buildAdminEventsList` / landings match всё ещё собирают полный grouped catalog в JS, потом slice. Нужен Prisma/SQL read-model с group+filter+page в БД.
+
+---
+
+## 2026-07-14 — Teplohod widget fallback → «Ошибка!»
+
+### Наблюдения
+
+- На дискотеке `event/1375` клик по виджету открывал fallback `https://teplohod.info/event/1375`, а публичные `/event/{id}` у Teplohod сейчас отдают 404 «Ошибка!».
+- Рабочий checkout: `https://account.teplohod.info/order/event-order?widget_id=14208&event_id=…` (тот же URL, что в fancybox `data-src`).
+- Fallback срабатывал через ~700 ms, если fancybox ещё не смонтировался.
+
+### Решения
+
+- `buildTeplohodUrl` / purchase URLs → account checkout + `widget_id`.
+- Игнор старых `offerDeeplinkUrl` на teplohod.info/event/* для TEP.
+- Клиент: `resolveTeplohodCheckoutUrl`, timeout fallback 2.5 s.
+
+### Проблемы
+
+- Публичные карточки на teplohod.info/event/* недоступны — зависимость от account checkout.
+
+---
+
+## 2026-07-13 — Admin lists: pagination / load
+
+### Наблюдения
+
+- Админские списки (orders/buyers/events/landings/venues) грузили почти всё в память: `eventRows(10000)` с полными `description`, у заказов — `jsonb_agg` всех билетов, пагинация была только в JS после полной выборки.
+- UI pager на Events/Orders уже был, на Buyers/Venues — нет; Landings тащили полный каталог ради счётчиков правил.
+
+### Решения
+
+- Orders/Buyers: lean SQL (counts + distinct titles без полного jsonb билетов); детали билетов — только в `GET /orders/:id`.
+- Events/Landings: `eventRows(..., { lean: true })` без description/SEO blob; кэш grouped events 60с для списка событий.
+- Venues/Buyers: page/limit в API + pager в UI.
+- Ответ списка заказов не тащит tickets payload — sheet и так подгружает detail.
+
+### Проблемы
+
+- Полная замена на SQL `LIMIT/OFFSET` для events после `groupAdminEventRows` ещё впереди: пока lean + cache, фильтры по-прежнему на сгруппированном наборе.
+- Поисковый q по номеру билета в списке заказов слабее (нет ticket ids в lean row) — детали по-прежнему в карточке заказа.
+
+---
+
 ## 2026-07-11 — Slice 5: help, blog, legal, my-orders
 
 ### Наблюдения

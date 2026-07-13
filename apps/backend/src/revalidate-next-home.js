@@ -18,7 +18,15 @@ export async function revalidateNextHome(reason = 'manual') {
     },
     body: JSON.stringify({
       tags: ['home-page', 'catalog-page'],
-      paths: ['/', '/events'],
+      paths: [
+        '/',
+        '/events',
+        '/cities/sankt-peterburg',
+        '/cities/moscow',
+        '/rechnye-progulki',
+        '/avtobusnye-ekskursii',
+        '/api/public/stats',
+      ],
     }),
   });
 

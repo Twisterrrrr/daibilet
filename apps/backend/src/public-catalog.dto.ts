@@ -59,15 +59,20 @@ export function clearPublicCatalogDtoCache(): void {
   catalogBuildPromise = null;
 }
 
+const LIST_SLOT_PREVIEW_LIMIT = 3;
+
 export async function buildPublicCatalogDto(query: PublicCatalogQuery): Promise<PublicCatalogDto> {
-  const sessions = await getPublicCatalogSessions(query.refresh === 1);
+  // Base catalog cache omits heavy slot hydration; hydrate only the requested page.
+  const sessions = await getPublicCatalogSessions(query.refresh === 1, { hydrateSlots: false });
   const coverSessions = sessions.filter(sessionHasCoverImage);
   const facets = buildCatalogFacets(coverSessions);
   const filtered = coverSessions.filter((session) => matchesCatalogQuery(session, query));
   const sorted = sortCatalogSessions(filtered, query.sort || 'time');
   const limit = clampNumber(query.limit, 1, CATALOG_PAGE_SIZE_MAX, CATALOG_PAGE_SIZE_DEFAULT);
   const offset = clampNumber(query.offset, 0, 100000, 0);
-  const items = sorted.slice(offset, offset + limit).map(toPublicCatalogListItem);
+  const pageRows = sorted.slice(offset, offset + limit);
+  const hydratedPage = await hydrateCatalogUpcomingSlots(pageRows, LIST_SLOT_PREVIEW_LIMIT);
+  const items = hydratedPage.map(toPublicCatalogListItem);
 
   return {
     generatedAt: new Date().toISOString(),
@@ -80,20 +85,28 @@ export async function buildPublicCatalogDto(query: PublicCatalogQuery): Promise<
   };
 }
 
-export async function getPublicCatalogSessions(forceRefresh = false): Promise<PublicSessionDto[]> {
+export async function getPublicCatalogSessions(
+  forceRefresh = false,
+  options: { hydrateSlots?: boolean } = {},
+): Promise<PublicSessionDto[]> {
+  const hydrateSlots = options.hydrateSlots !== false;
   const now = Date.now();
-  if (!forceRefresh && catalogCache && catalogCache.expiresAt > now) return catalogCache.sessions;
-  if (!forceRefresh && catalogBuildPromise) return catalogBuildPromise;
+  if (!forceRefresh && catalogCache && catalogCache.expiresAt > now) {
+    return hydrateSlots ? hydrateCatalogUpcomingSlots(catalogCache.sessions) : catalogCache.sessions;
+  }
+  if (!forceRefresh && catalogBuildPromise) {
+    const sessions = await catalogBuildPromise;
+    return hydrateSlots ? hydrateCatalogUpcomingSlots(sessions) : sessions;
+  }
 
   if (forceRefresh) clearPublicCatalogDtoCache();
 
   const buildPromise = Promise.all([loadPublicCatalogRows(), loadPinnedEventIds()]).then(async ([rows, pinnedEventIds]) => {
+    // Do not hydrate all slots into the shared cache — that made every limit=50 cold build pay for thousands of slots.
     const sessions = filterCatalogSessions(
-      await hydrateCatalogUpcomingSlots(
-        dedupeCrossSourceCatalogSessions(
-          regroupMappedPublicCatalogSessions(
-            rows.map((row) => mapGroupedPublicSession(row, pinnedEventIds)),
-          ),
+      dedupeCrossSourceCatalogSessions(
+        regroupMappedPublicCatalogSessions(
+          rows.map((row) => mapGroupedPublicSession(row, pinnedEventIds)),
         ),
       ),
     );
@@ -106,7 +119,8 @@ export async function getPublicCatalogSessions(forceRefresh = false): Promise<Pu
 
   catalogBuildPromise = buildPromise;
   try {
-    return await buildPromise;
+    const sessions = await buildPromise;
+    return hydrateSlots ? hydrateCatalogUpcomingSlots(sessions) : sessions;
   } finally {
     if (catalogBuildPromise === buildPromise) catalogBuildPromise = null;
   }
@@ -654,11 +668,15 @@ function filterCatalogSessions(sessions: PublicSessionDto[]): PublicSessionDto[]
   );
 }
 
-async function hydrateCatalogUpcomingSlots(sessions: PublicSessionDto[]): Promise<PublicSessionDto[]> {
+async function hydrateCatalogUpcomingSlots(
+  sessions: PublicSessionDto[],
+  slotLimit = CATALOG_HYDRATED_SLOT_LIMIT,
+): Promise<PublicSessionDto[]> {
+  const targetSlotCount = Math.min(CATALOG_CARD_SLOT_TARGET, Math.max(1, slotLimit));
   const targets = sessions.filter((session) => {
     const provider = session.purchaseProvider;
     if (provider !== 'TEPLOHOD' && provider !== 'TICKETSCLOUD') return false;
-    return (session.upcomingSlots?.length || 0) < CATALOG_CARD_SLOT_TARGET;
+    return (session.upcomingSlots?.length || 0) < targetSlotCount;
   });
   if (!targets.length) return sessions;
 
@@ -709,7 +727,7 @@ async function hydrateCatalogUpcomingSlots(sessions: PublicSessionDto[]): Promis
   for (const row of sessionRows) {
     if (!row.startsAt) continue;
     const bucket = rowsByEventId.get(row.eventId) || [];
-    if (bucket.length >= CATALOG_HYDRATED_SLOT_LIMIT) continue;
+    if (bucket.length >= slotLimit) continue;
     bucket.push(row);
     rowsByEventId.set(row.eventId, bucket);
   }
@@ -735,11 +753,12 @@ async function hydrateCatalogUpcomingSlots(sessions: PublicSessionDto[]): Promis
           dateLabel: formatDate(startsAt),
           timeLabel: formatTime(startsAt),
           timeBucket: timeBucket(startsAt),
+          // List consumers strip purchaseUrl; keep for event-level hydrate callers.
           purchaseUrl: session.purchaseUrl ?? null,
         });
-        if (hydratedSlots.length >= CATALOG_HYDRATED_SLOT_LIMIT) break;
+        if (hydratedSlots.length >= slotLimit) break;
       }
-      if (hydratedSlots.length >= CATALOG_HYDRATED_SLOT_LIMIT) break;
+      if (hydratedSlots.length >= slotLimit) break;
     }
 
     if (hydratedSlots.length <= (session.upcomingSlots?.length || 0)) return session;

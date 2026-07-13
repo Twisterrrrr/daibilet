@@ -70,7 +70,10 @@ test('uses ProviderLink SESSION parent identity for a Teplohod slot', () => {
     }],
   }));
 
-  assert.equal(result.upcomingSlots?.[0]?.purchaseUrl, 'https://teplohod.info/event/14');
+  assert.equal(
+    result.upcomingSlots?.[0]?.purchaseUrl,
+    'https://account.teplohod.info/order/event-order?widget_id=14208&event_id=14',
+  );
 });
 
 test('keeps open-date events saleable without a fake schedule', () => {

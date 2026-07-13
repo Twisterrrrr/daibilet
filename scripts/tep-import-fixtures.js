@@ -791,8 +791,14 @@ function cityFromText(value) {
 }
 
 function teplohodPurchaseUrl(eventId) {
-  const baseUrl = process.env.TEP_WIDGET_BASE_URL || "https://teplohod.info";
-  return `${baseUrl.replace(/\/+$/, "")}/event/${encodeURIComponent(eventId)}`;
+  const normalized = String(eventId || "").replace(/^tep-/i, "").trim();
+  if (!/^\d+$/.test(normalized)) return null;
+  const widgetId = String(process.env.TEP_WIDGET_ID || "14208").trim() || "14208";
+  const checkoutBase = (process.env.TEP_CHECKOUT_BASE_URL || "https://account.teplohod.info").replace(/\/+$/, "");
+  const url = new URL(`${checkoutBase}/order/event-order`);
+  url.searchParams.set("widget_id", widgetId);
+  url.searchParams.set("event_id", normalized);
+  return url.toString();
 }
 
 function cleanTitle(value) {

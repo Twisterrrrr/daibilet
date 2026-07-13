@@ -245,6 +245,26 @@ export function resolveLegacyLandingRedirect(pathname: string): string | null {
     return landingCategoryHref(landingSlug);
   }
 
+  // Old slug paths without /landings prefix, e.g. /river-cruises → /rechnye-progulki/
+  const bareCategory = normalized.match(/^\/([^/]+)$/i);
+  if (bareCategory) {
+    const segment = decodeURIComponent(bareCategory[1]).toLowerCase();
+    if (LANDING_CATEGORY_PATH_BY_SLUG[segment]) {
+      return landingCategoryHref(canonicalLandingSlug(segment));
+    }
+  }
+
+  const bareCategoryWithCity = normalized.match(/^\/([^/]+)\/([^/]+)$/i);
+  if (bareCategoryWithCity) {
+    const segment = decodeURIComponent(bareCategoryWithCity[1]).toLowerCase();
+    if (LANDING_CATEGORY_PATH_BY_SLUG[segment]) {
+      const citySlug =
+        normalizeCitySlug(decodeURIComponent(bareCategoryWithCity[2])) ||
+        decodeURIComponent(bareCategoryWithCity[2]).toLowerCase();
+      return landingCategoryHref(canonicalLandingSlug(segment), citySlug);
+    }
+  }
+
   return null;
 }
 

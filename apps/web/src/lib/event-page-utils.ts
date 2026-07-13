@@ -85,8 +85,11 @@ export function getTicketPriceRange(payload: PublicEventPageDto): { min: number;
 }
 
 export function formatBuyCardPrice(range: { min: number; max: number }): string {
-  if (range.min === range.max) return `от ${formatNumber(Math.round(range.min))} ₽`;
-  return `${formatNumber(Math.round(range.min))} – ${formatNumber(Math.round(range.max))} ₽`;
+  const min = Math.round(range.min);
+  const max = Math.round(range.max);
+  // Одна цена (одна категория / один тариф) — без «от».
+  if (min === max) return `${formatNumber(min)} ₽`;
+  return `${formatNumber(min)} – ${formatNumber(max)} ₽`;
 }
 
 export function cleanDisplayText(value?: string | null): string {

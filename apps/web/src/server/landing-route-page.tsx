@@ -6,6 +6,7 @@ import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
 import { landingCategoryHref, resolveLandingRouteFromLocation } from '@/lib/landing-routes';
+import { pageTitle, routeOpenGraph } from '@/lib/seo-meta';
 import { fetchLandingPageDto, finalizeLandingPayload } from '@/server/landing-page';
 
 export const revalidate = 3600;
@@ -21,24 +22,25 @@ function readSearchParam(params: SearchParams, key: string): string | undefined 
 
 export async function buildLandingMetadata(pathname: string): Promise<Metadata> {
   const route = resolveLandingRouteFromLocation(pathname);
-  if (!route) return { title: 'Подборка | Дайбилет' };
+  if (!route) return { title: pageTitle('Подборка') };
 
   const slug = canonicalLandingSlug(route.landingSlug);
   const payload = await fetchLandingPageDto(slug);
-  if (!payload?.landing) return { title: 'Подборка | Дайбилет' };
+  if (!payload?.landing) return { title: pageTitle('Подборка') };
 
   const landing = payload.landing;
+  const canonical = landingCategoryHref(slug, route.citySlug);
   return {
-    title: landing.seoTitle || `${landing.title} | Дайбилет`,
+    title: pageTitle(landing.seoTitle || landing.title),
     description: landing.seoDescription || landing.subtitle || undefined,
     alternates: {
-      canonical: landingCategoryHref(slug, route.citySlug),
+      canonical,
     },
-    openGraph: {
+    openGraph: routeOpenGraph(canonical, {
       title: landing.seoTitle || landing.title,
       description: landing.seoDescription || landing.subtitle || undefined,
       images: landing.imageUrl ? [{ url: landing.imageUrl }] : undefined,
-    },
+    }),
   };
 }
 
