@@ -3523,7 +3523,7 @@ function navigateHome(section: string) {
     return;
   }
   if (section === 'orders') {
-    window.location.href = '/my-orders';
+    window.location.href = '/account/purchases';
     return;
   }
   if (section === 'blog') {

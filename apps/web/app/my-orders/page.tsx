@@ -1,17 +1,6 @@
-import type { Metadata } from 'next';
+import { redirect } from 'next/navigation';
 
-import { MyOrdersPageView } from '@/components/MyOrdersPage.client';
-import { SiteLayout } from '@/components/SiteLayout';
-
-export const metadata: Metadata = {
-  title: 'Проверить заказ | Дайбилет',
-  description: 'Проверка статуса заказа и билета по номеру из письма-подтверждения. Регистрация не требуется.',
-};
-
-export default function MyOrdersPage() {
-  return (
-    <SiteLayout>
-      <MyOrdersPageView />
-    </SiteLayout>
-  );
+/** Guest lookup page removed — use account purchases. */
+export default function MyOrdersRedirectPage() {
+  redirect('/account/purchases');
 }

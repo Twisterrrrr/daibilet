@@ -22,7 +22,7 @@ const companyLinks = [
   { label: 'Площадки', href: '/venues' },
   { label: 'Локации', href: '/locations' },
   { label: 'Подборки', href: '/podborki' },
-  { label: 'Проверить заказ', href: '/my-orders' },
+  { label: 'Мои покупки', href: '/account/purchases' },
 ];
 
 type SiteFooterProps = {

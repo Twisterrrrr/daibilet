@@ -134,10 +134,11 @@ export function LoginPageView() {
         </p>
 
         <p className="mt-6 text-center text-sm text-slate-500">
-          Нужен один заказ без входа?{' '}
-          <Link href="/my-orders" className="font-medium text-primary-600 hover:text-primary-700">
-            Проверить по номеру
+          После входа заказы появятся в{' '}
+          <Link href="/account/purchases" className="font-medium text-primary-600 hover:text-primary-700">
+            Моих покупках
           </Link>
+          .
         </p>
       </div>
     </div>

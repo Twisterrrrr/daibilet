@@ -219,9 +219,6 @@ const HeaderAuthControls = forwardRef<
             <Link href="/account/purchases" onClick={onCloseUserMenu} className="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
               Мои покупки
             </Link>
-            <Link href="/my-orders" onClick={onCloseUserMenu} className="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
-              Проверить заказ
-            </Link>
             <button
               type="button"
               onClick={async () => {

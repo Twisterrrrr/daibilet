@@ -1,7 +1,5 @@
 'use client';
 
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import {
   Building2,
   CalendarCheck,
@@ -13,25 +11,11 @@ import {
   ShieldCheck,
   Ticket,
 } from 'lucide-react';
-import { FormEvent } from 'react';
 
 import { ContactForm } from '@/components/ContactForm';
 import { HELP_FAQ_CATEGORIES, type HelpFaqCategory } from '@/data/help-faq';
 
-const ORDER_LOOKUP_KEY = 'daibilet:last-order-lookup';
-
 export function HelpPageView() {
-  const router = useRouter();
-
-  const handleOrderLookup = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const code = new FormData(event.currentTarget).get('code');
-    const value = String(code || '').trim();
-    if (!value) return;
-    window.localStorage.setItem(ORDER_LOOKUP_KEY, value);
-    router.push('/my-orders');
-  };
-
   return (
     <>
       <section className="bg-gradient-to-b from-primary-50 to-white py-12 md:py-16">
@@ -49,7 +33,7 @@ export function HelpPageView() {
 
       <section className="container-page -mt-6 max-w-4xl md:-mt-8">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <QuickAction href="#check-order" icon={<Search className="h-5 w-5" />} title="Проверить заказ" subtitle="По коду или email" />
+          <QuickAction href="/account/purchases" icon={<Search className="h-5 w-5" />} title="Мои покупки" subtitle="История по email аккаунта" />
           <QuickAction href="#refunds" icon={<RotateCcw className="h-5 w-5" />} title="Оформить возврат" subtitle="Инструкция" />
           <QuickAction href="#contact" icon={<Mail className="h-5 w-5" />} title="Написать нам" subtitle="Форма обратной связи" />
         </div>
@@ -65,25 +49,16 @@ export function HelpPageView() {
 
       <section id="check-order" className="bg-slate-50 py-12">
         <div className="container-page max-w-xl text-center">
-          <h2 className="mb-2 text-xl font-bold text-slate-900">Проверить заказ</h2>
+          <h2 className="mb-2 text-xl font-bold text-slate-900">Мои покупки</h2>
           <p className="mb-6 text-sm text-slate-600">
-            Номер заказа из письма после покупки в виджете. Вход на сайт не нужен.
+            Войдите с email из письма-подтверждения — заказы появятся в личном кабинете.
           </p>
-          <form onSubmit={handleOrderLookup} className="mx-auto flex max-w-sm gap-2">
-            <input
-              type="text"
-              name="code"
-              placeholder="Номер заказа из письма"
-              className="flex-1 rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500"
-              required
-            />
-            <button
-              type="submit"
-              className="rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
-            >
-              Найти
-            </button>
-          </form>
+          <a
+            href="/account/purchases"
+            className="inline-flex rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700"
+          >
+            Перейти к покупкам
+          </a>
         </div>
       </section>
 
@@ -136,13 +111,13 @@ function FaqCategorySection({ category }: { category: HelpFaqCategory }) {
         {category.items.map((item, index) => (
           <details
             key={`${category.id}-${index}`}
-            className="group rounded-xl border border-slate-200 bg-white transition-colors hover:border-slate-300"
+            className="group rounded-xl border border-slate-200 bg-white open:shadow-sm"
           >
-            <summary className="flex cursor-pointer list-none select-none items-center justify-between p-4">
-              <span className="pr-4 text-sm font-medium text-slate-900">{item.q}</span>
-              <ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition-transform group-open:rotate-180" />
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold text-slate-900">
+              {item.q}
+              <ChevronDown className="h-4 w-4 shrink-0 text-slate-400 transition group-open:rotate-180" />
             </summary>
-            <div className="px-4 pb-4 text-sm leading-relaxed text-slate-600">{item.a}</div>
+            <div className="border-t border-slate-100 px-4 py-3 text-sm leading-6 text-slate-600">{item.a}</div>
           </details>
         ))}
       </div>

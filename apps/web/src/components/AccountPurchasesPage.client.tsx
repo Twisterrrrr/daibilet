@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, Loader2, LogOut, Receipt, Ticket } from 'lucide-react';
+import { Loader2, LogOut, Receipt, Ticket } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { BuyerOrderCard, BuyerOrdersEmptyState } from '@/components/BuyerOrderCard.client';
@@ -94,14 +94,9 @@ export function AccountPurchasesPageView() {
 
         {payload && payload.rows.length > 0 ? (
           <div>
-            <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-slate-950">{formatCount(payload.total, ['заказ', 'заказа', 'заказов'])}</h2>
-                <p className="mt-1 text-sm text-slate-500">Привязаны к email {user?.email}</p>
-              </div>
-              <Link href="/my-orders" className="inline-flex items-center gap-2 text-sm font-semibold text-primary-700 hover:text-primary-800">
-                Проверить по номеру <ArrowRight className="h-4 w-4" />
-              </Link>
+            <div className="mb-4">
+              <h2 className="text-2xl font-bold text-slate-950">{formatCount(payload.total, ['заказ', 'заказа', 'заказов'])}</h2>
+              <p className="mt-1 text-sm text-slate-500">Привязаны к email {user?.email}</p>
             </div>
 
             <div className="grid gap-4">
