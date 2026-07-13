@@ -26,7 +26,7 @@ export const publicCatalogQuerySchema = paginationQuerySchema.extend({
   from: optionalString,
   to: optionalString,
   sort: z.enum(['time', 'price', 'popular', 'departing_soon', 'price_asc', 'price_desc']).optional(),
-  view: z.enum(['cards', 'table']).optional(),
+  view: z.enum(['cards', 'list', 'table']).optional(),
   minPrice: z.coerce.number().int().min(0).optional(),
   maxPrice: z.coerce.number().int().min(0).optional(),
   priceMax: z.coerce.number().int().min(0).optional(),

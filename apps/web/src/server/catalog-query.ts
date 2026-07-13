@@ -43,16 +43,28 @@ export function searchParamsToRecord(
   return result;
 }
 
+/** UI-only query keys — must not fail catalog SSR/API validation. */
+const CATALOG_UI_QUERY_KEYS = new Set(['view']);
+
+function catalogQueryParams(raw: Record<string, string>): Record<string, string> {
+  const filtered: Record<string, string> = {};
+  for (const [key, value] of Object.entries(raw)) {
+    if (CATALOG_UI_QUERY_KEYS.has(key)) continue;
+    filtered[key] = value;
+  }
+  return {
+    ...filtered,
+    from: filtered.from || filtered.dateFrom,
+    to: filtered.to || filtered.dateTo,
+  };
+}
+
 /** SSR catalog: page 1 uses user limit or default 50; crawlable ?page=N uses fixed chunks. */
 export function parseCatalogPageQuery(
   input: Record<string, string | string[] | undefined> | URLSearchParams,
 ): CatalogPageQuery {
   const raw = searchParamsToRecord(input);
-  const prepared = {
-    ...raw,
-    from: raw.from || raw.dateFrom,
-    to: raw.to || raw.dateTo,
-  };
+  const prepared = catalogQueryParams(raw);
   const parsed = publicCatalogQuerySchema.parse(prepared);
   const page = Math.max(1, Number.parseInt(raw.page || '1', 10) || 1);
   const userLimit = parsed.limit && isCatalogPageSize(parsed.limit) ? parsed.limit : undefined;
@@ -78,11 +90,7 @@ export function parseCatalogApiQuery(
   input: Record<string, string | string[] | undefined> | URLSearchParams,
 ): PublicCatalogQuery {
   const raw = searchParamsToRecord(input);
-  const prepared = {
-    ...raw,
-    from: raw.from || raw.dateFrom,
-    to: raw.to || raw.dateTo,
-  };
+  const prepared = catalogQueryParams(raw);
   const parsed = publicCatalogQuerySchema.parse(prepared);
   const limit = parsed.limit
     ? Math.min(Math.max(parsed.limit, 1), CATALOG_PAGE_SIZE_MAX)

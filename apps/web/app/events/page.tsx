@@ -21,7 +21,12 @@ type PageProps = {
 
 export default async function EventsCatalogPage({ searchParams }: PageProps) {
   const raw = await searchParams;
-  const pageQuery = parseCatalogPageQuery(raw);
+  let pageQuery: ReturnType<typeof parseCatalogPageQuery>;
+  try {
+    pageQuery = parseCatalogPageQuery(raw);
+  } catch {
+    pageQuery = parseCatalogPageQuery({});
+  }
   let initialCatalog: Awaited<ReturnType<typeof getCachedCatalog>> | null = null;
 
   try {
