@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ADMIN_API_BASE } from '@/lib/admin-api';
+import { adminFetch } from '@/lib/admin-api';
 import { useSearchParams } from 'react-router-dom';
 import { AlertTriangle, CheckCircle2, Clock, Copy, Plus, Receipt, RefreshCcw, Search, Ticket } from 'lucide-react';
 
@@ -11,7 +11,6 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { formatNumber } from '@/data';
 
-const API_BASE_URL = ADMIN_API_BASE;
 const PAGE_SIZE = 50;
 
 const QUICK_FILTER_LABELS: Record<string, string> = {
@@ -156,7 +155,7 @@ export function ExternalOrdersPage() {
   const openOrder = React.useCallback((order: AdminOrderRow) => {
     setSelectedOrder(order);
     setTicketSaveError(null);
-    fetch(`${API_BASE_URL}/api/admin/orders/${encodeURIComponent(order.id)}`, { cache: 'no-store' })
+    adminFetch(`/api/admin/orders/${encodeURIComponent(order.id)}`, { cache: 'no-store' })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as AdminOrderRow;
@@ -169,7 +168,7 @@ export function ExternalOrdersPage() {
     (order: AdminOrderRow, patch: { id?: string; externalTicketId: string; status: string; eventId?: string | null; sessionId?: string | null }) => {
       setIsSavingTicket(true);
       setTicketSaveError(null);
-      return fetch(`${API_BASE_URL}/api/admin/orders/${encodeURIComponent(order.id)}/tickets`, {
+      return adminFetch(`/api/admin/orders/${encodeURIComponent(order.id)}/tickets`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(patch),
@@ -193,7 +192,7 @@ export function ExternalOrdersPage() {
 
   const syncTicketscloudOrders = React.useCallback(() => {
     setSyncing(true);
-    fetch(`${API_BASE_URL}/api/admin/orders/sync`, { method: 'POST' })
+    adminFetch(`/api/admin/orders/sync`, { method: 'POST' })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return response.json();
@@ -214,7 +213,7 @@ export function ExternalOrdersPage() {
     nextParams.set('limit', String(PAGE_SIZE));
     setLoading(true);
 
-    fetch(`${API_BASE_URL}/api/admin/orders?${nextParams.toString()}`, {
+    adminFetch(`/api/admin/orders?${nextParams.toString()}`, {
       cache: 'no-store',
       signal: controller.signal,
     })
@@ -501,7 +500,7 @@ function OrderDetailSheet({
       const nextParams = new URLSearchParams({ limit: '12' });
       if (eventQuery.trim()) nextParams.set('q', eventQuery.trim());
       setEventCandidatesLoading(true);
-      fetch(`${API_BASE_URL}/api/admin/order-event-candidates?${nextParams.toString()}`, {
+      adminFetch(`/api/admin/order-event-candidates?${nextParams.toString()}`, {
         cache: 'no-store',
         signal: controller.signal,
       })

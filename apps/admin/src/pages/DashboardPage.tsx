@@ -17,7 +17,7 @@ import {
   Search,
 } from 'lucide-react';
 
-import { ADMIN_API_BASE } from '@/lib/admin-api';
+import { adminFetch } from '@/lib/admin-api';
 import { PageHeader, SourceBadge, StatusBadge } from '@/components/admin/primitives';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,6 @@ import { Card } from '@/components/ui/card';
 import { adminData, formatNumber } from '@/data';
 import type { AdminData, AdminSourceRow } from '@/types';
 
-const API_BASE_URL = ADMIN_API_BASE;
 
 type OrderMetrics = {
   imported: number;
@@ -49,7 +48,7 @@ export function DashboardPage() {
 
   React.useEffect(() => {
     const controller = new AbortController();
-    fetch(`${API_BASE_URL}/api/admin/dashboard`, { cache: 'no-store', signal: controller.signal })
+    adminFetch(`/api/admin/dashboard`, { cache: 'no-store', signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as Pick<AdminData, 'metrics'>;
@@ -64,7 +63,7 @@ export function DashboardPage() {
 
   React.useEffect(() => {
     const controller = new AbortController();
-    fetch(`${API_BASE_URL}/api/admin/sources`, { cache: 'no-store', signal: controller.signal })
+    adminFetch(`/api/admin/sources`, { cache: 'no-store', signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as { sources?: AdminSourceRow[] };
@@ -79,7 +78,7 @@ export function DashboardPage() {
 
   React.useEffect(() => {
     const controller = new AbortController();
-    fetch(`${API_BASE_URL}/api/admin/orders?limit=1`, { cache: 'no-store', signal: controller.signal })
+    adminFetch(`/api/admin/orders?limit=1`, { cache: 'no-store', signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as { metrics?: Partial<OrderMetrics> };

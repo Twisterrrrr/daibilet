@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ADMIN_API_BASE } from '@/lib/admin-api';
+import { adminFetch } from '@/lib/admin-api';
 import { CalendarDays, EyeOff, LayoutTemplate, Loader2, MapPin, Pin, RotateCcw, Save, Search } from 'lucide-react';
 
 import { DataTableShell, InfoNote, PageHeader, StatusBadge } from '@/components/admin/primitives';
@@ -9,7 +9,6 @@ import { Input } from '@/components/ui/input';
 import { adminData, formatDateTime, formatMoney, formatNumber } from '@/data';
 import type { AdminLandingDetail, AdminLandingEvent, AdminLandingRow } from '@/types';
 
-const API_BASE_URL = ADMIN_API_BASE;
 
 type LandingsResponse = {
   generatedAt: string;
@@ -58,7 +57,7 @@ export function LandingsPage() {
   const loadLandings = React.useCallback(() => {
     const controller = new AbortController();
     setIsLoading(true);
-    fetch(`${API_BASE_URL}/api/admin/landings`, { cache: 'no-store', signal: controller.signal })
+    adminFetch(`/api/admin/landings`, { cache: 'no-store', signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as LandingsResponse;
@@ -88,7 +87,7 @@ export function LandingsPage() {
     }
     const controller = new AbortController();
     setIsDetailLoading(true);
-    fetch(`${API_BASE_URL}/api/admin/landings/${encodeURIComponent(selectedSlug)}`, { cache: 'no-store', signal: controller.signal })
+    adminFetch(`/api/admin/landings/${encodeURIComponent(selectedSlug)}`, { cache: 'no-store', signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as AdminLandingDetail;
@@ -180,7 +179,7 @@ export function LandingsPage() {
             onChanged={() => {
               loadLandings();
               if (selectedSlug) {
-                fetch(`${API_BASE_URL}/api/admin/landings/${encodeURIComponent(selectedSlug)}`, { cache: 'no-store' })
+                adminFetch(`/api/admin/landings/${encodeURIComponent(selectedSlug)}`, { cache: 'no-store' })
                   .then((response) => response.json() as Promise<AdminLandingDetail>)
                   .then(setDetail)
                   .catch(() => undefined);
@@ -278,7 +277,7 @@ function LandingRuleCard({ landing, onChanged, onOpen }: { landing: AdminLanding
   const saveLanding = async () => {
     setSaving(true);
     try {
-      await fetch(`${API_BASE_URL}/api/admin/landings/${encodeURIComponent(landing.slug)}`, {
+      await adminFetch(`/api/admin/landings/${encodeURIComponent(landing.slug)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
@@ -292,7 +291,7 @@ function LandingRuleCard({ landing, onChanged, onOpen }: { landing: AdminLanding
   const updateMatch = async (eventId: string, manualStatus: 'PINNED' | 'EXCLUDED' | 'REVIEW') => {
     setSaving(true);
     try {
-      await fetch(`${API_BASE_URL}/api/admin/landings/${encodeURIComponent(landing.slug)}/matches/${encodeURIComponent(eventId)}`, {
+      await adminFetch(`/api/admin/landings/${encodeURIComponent(landing.slug)}/matches/${encodeURIComponent(eventId)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: manualStatus }),
@@ -460,7 +459,7 @@ function LandingDetailEditor({
     if (!detail) return;
     setIsSaving(true);
     try {
-      await fetch(`${API_BASE_URL}/api/admin/landings/${encodeURIComponent(detail.slug)}/matches/${encodeURIComponent(event.id)}`, {
+      await adminFetch(`/api/admin/landings/${encodeURIComponent(detail.slug)}/matches/${encodeURIComponent(event.id)}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: manualStatus, groupEventIds: event.groupEventIds || [event.id] }),
@@ -480,8 +479,8 @@ function LandingDetailEditor({
     }
     setIsCandidateLoading(true);
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/api/admin/landings/${encodeURIComponent(detail.slug)}/candidates?q=${encodeURIComponent(normalized)}&limit=12`,
+      const response = await adminFetch(
+        `/api/admin/landings/${encodeURIComponent(detail.slug)}/candidates?q=${encodeURIComponent(normalized)}&limit=12`,
         { cache: 'no-store' },
       );
       if (!response.ok) throw new Error(`HTTP ${response.status}`);

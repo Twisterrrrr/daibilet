@@ -1,4 +1,4 @@
-import { ADMIN_API_BASE } from '@/lib/admin-api';
+import { adminFetch } from '@/lib/admin-api';
 import type { AdminData, AdminEventRow } from '@/types';
 
 export const adminData: AdminData = window.ADMIN_DATA ?? {
@@ -41,13 +41,11 @@ export const adminData: AdminData = window.ADMIN_DATA ?? {
 };
 
 export async function hydrateAdminData(): Promise<void> {
-  const baseUrl = ADMIN_API_BASE;
   const controller = new AbortController();
   const timeout = window.setTimeout(() => controller.abort(), 1500);
   try {
-    const response = await fetch(`${baseUrl}/api/admin/dashboard`, {
+    const response = await adminFetch('/api/admin/dashboard', {
       cache: 'no-store',
-      credentials: 'same-origin',
       signal: controller.signal,
     });
     if (!response.ok) return;

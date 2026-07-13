@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ADMIN_API_BASE } from '@/lib/admin-api';
+import { adminFetch } from '@/lib/admin-api';
 import { Loader2, Plus, Save } from 'lucide-react';
 
 import { DataTableShell, PageHeader, StatusBadge } from '@/components/admin/primitives';
@@ -8,7 +8,6 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 
-const API_BASE_URL = ADMIN_API_BASE;
 
 type ArticleRow = {
   id: string;
@@ -97,7 +96,7 @@ export function ArticlesPage() {
 
   const loadList = React.useCallback(() => {
     setIsLoading(true);
-    fetch(`${API_BASE_URL}/api/admin/articles`, { cache: 'no-store' })
+    adminFetch(`/api/admin/articles`, { cache: 'no-store' })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as { rows?: ArticleRow[] };
@@ -120,7 +119,7 @@ export function ArticlesPage() {
   const openEdit = async (id: string) => {
     setSelectedId(id);
     setError(null);
-    const response = await fetch(`${API_BASE_URL}/api/admin/articles/${encodeURIComponent(id)}`, { cache: 'no-store' });
+    const response = await adminFetch(`/api/admin/articles/${encodeURIComponent(id)}`, { cache: 'no-store' });
     if (!response.ok) {
       setError(`HTTP ${response.status}`);
       return;
@@ -134,8 +133,8 @@ export function ArticlesPage() {
     setError(null);
     try {
       const isNew = selectedId === 'new';
-      const response = await fetch(
-        isNew ? `${API_BASE_URL}/api/admin/articles` : `${API_BASE_URL}/api/admin/articles/${encodeURIComponent(selectedId || '')}`,
+      const response = await adminFetch(
+        isNew ? `/api/admin/articles` : `/api/admin/articles/${encodeURIComponent(selectedId || '')}`,
         {
           method: isNew ? 'POST' : 'PATCH',
           headers: { 'Content-Type': 'application/json' },

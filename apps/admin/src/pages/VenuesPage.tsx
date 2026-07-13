@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ADMIN_API_BASE } from '@/lib/admin-api';
+import { adminFetch } from '@/lib/admin-api';
 import { Building2, Globe2, Image, Loader2, MapPin, Save, Search, Ticket } from 'lucide-react';
 
 import { DataTableShell, PageHeader, StatusBadge } from '@/components/admin/primitives';
@@ -11,7 +11,6 @@ import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { adminData, formatDateTime, formatMoney, formatNumber } from '@/data';
 import type { AdminVenueDetail, AdminVenueRow } from '@/types';
 
-const API_BASE_URL = ADMIN_API_BASE;
 
 type VenuesListResponse = {
   generatedAt: string;
@@ -161,7 +160,7 @@ export function VenuesPage() {
     if (familyFilter !== 'all') params.set('family', familyFilter);
     setIsLoading(true);
 
-    fetch(`${API_BASE_URL}/api/admin/venues?${params.toString()}`, {
+    adminFetch(`/api/admin/venues?${params.toString()}`, {
       cache: 'no-store',
       signal: controller.signal,
     })
@@ -196,7 +195,7 @@ export function VenuesPage() {
     setIsDetailLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/venues/${encodeURIComponent(venue.id)}`, { cache: 'no-store' });
+      const response = await adminFetch(`/api/admin/venues/${encodeURIComponent(venue.id)}`, { cache: 'no-store' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const detail = (await response.json()) as AdminVenueDetail | null;
       if (!detail) throw new Error('Площадка не найдена');
@@ -215,7 +214,7 @@ export function VenuesPage() {
     setSaveError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/venues/${encodeURIComponent(venueDetail.id)}`, {
+      const response = await adminFetch(`/api/admin/venues/${encodeURIComponent(venueDetail.id)}`, {
         method: 'PATCH',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(draft),

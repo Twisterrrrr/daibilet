@@ -862,7 +862,8 @@ export async function buildPublicBuyerOrders(db, searchParams = new URLSearchPar
 }
 
 const ACCOUNT_ORDER_EMAIL_FILTER = `
-  lower(trim(coalesce(ext_order."buyerSnapshot"->>'email', ''))) = $1
+  lower(trim(coalesce(ext_order."buyerEmailNormalized", ''))) = $1
+  or lower(trim(coalesce(ext_order."buyerSnapshot"->>'email', ''))) = $1
   or lower(trim(coalesce(ext_order."buyerSnapshot"->>'customerEmail', ''))) = $1
   or lower(trim(coalesce(ext_order."buyerSnapshot"->'buyer'->>'email', ''))) = $1
   or lower(trim(coalesce(ext_order."buyerSnapshot"->'customer'->>'email', ''))) = $1

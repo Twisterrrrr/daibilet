@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ADMIN_API_BASE } from '@/lib/admin-api';
+import { adminFetch } from '@/lib/admin-api';
 import { Loader2 } from 'lucide-react';
 
 import { DataTableShell, PageHeader } from '@/components/admin/primitives';
@@ -7,7 +7,6 @@ import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { adminData, formatNumber } from '@/data';
 
-const API_BASE_URL = ADMIN_API_BASE;
 
 type AdminDestinationRow = {
   id?: string;
@@ -56,7 +55,7 @@ function CitiesPage({ title, description }: { title: string; description: string
     const controller = new AbortController();
     setIsLoading(true);
 
-    fetch(`${API_BASE_URL}/api/admin/cities`, { cache: 'no-store', signal: controller.signal })
+    adminFetch(`/api/admin/cities`, { cache: 'no-store', signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as CitiesPayload;

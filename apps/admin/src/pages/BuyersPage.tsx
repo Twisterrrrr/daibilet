@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ADMIN_API_BASE } from '@/lib/admin-api';
+import { adminFetch } from '@/lib/admin-api';
 import { useSearchParams } from 'react-router-dom';
 import { AlertTriangle, Mail, Phone, Receipt, Search, Ticket, UserRound } from 'lucide-react';
 
@@ -10,7 +10,6 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { formatNumber } from '@/data';
 
-const API_BASE_URL = ADMIN_API_BASE;
 
 type BuyerStatusTone = 'draft' | 'ready' | 'live' | 'paused' | 'archived' | 'incomplete' | 'error';
 
@@ -67,7 +66,7 @@ export function BuyersPage() {
     if (q.trim()) queryParams.set('q', q.trim());
     setLoading(true);
 
-    fetch(`${API_BASE_URL}/api/admin/buyers?${queryParams.toString()}`, {
+    adminFetch(`/api/admin/buyers?${queryParams.toString()}`, {
       cache: 'no-store',
       signal: controller.signal,
     })

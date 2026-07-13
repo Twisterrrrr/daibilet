@@ -136,6 +136,8 @@ async function persistOrders(orders, refs, syncId, startedAt, options) {
         status,
         purchasedAt: parseTcDate(order.done_at || order.created_at),
         buyerSnapshot: snapshot,
+        buyerEmailNormalized: normalizeEmail(snapshot.buyer?.email),
+        buyerPhoneNormalized: normalizePhone(snapshot.buyer?.phone),
       });
 
       await upsertRawOrder(client, externalOrderId, order, refs);
@@ -211,12 +213,14 @@ async function upsertExternalOrder(client, order) {
   const publicCode = order.publicCode || await allocatePublicOrderCode(client, SOURCE_ID, order.externalOrderId);
   const result = await client.query(
     `
-      insert into "ExternalOrder" (id, "sourceId", "externalOrderId", "publicCode", status, "buyerSnapshot", "purchasedAt", "updatedAt")
-      values ($1, $2, $3, $4, $5, $6::jsonb, $7, now())
+      insert into "ExternalOrder" (id, "sourceId", "externalOrderId", "publicCode", status, "buyerSnapshot", "buyerEmailNormalized", "buyerPhoneNormalized", "purchasedAt", "updatedAt")
+      values ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9, now())
       on conflict ("sourceId", "externalOrderId") do update set
         "publicCode" = coalesce("ExternalOrder"."publicCode", excluded."publicCode"),
         status = excluded.status,
         "buyerSnapshot" = excluded."buyerSnapshot",
+        "buyerEmailNormalized" = coalesce(excluded."buyerEmailNormalized", "ExternalOrder"."buyerEmailNormalized"),
+        "buyerPhoneNormalized" = coalesce(excluded."buyerPhoneNormalized", "ExternalOrder"."buyerPhoneNormalized"),
         "purchasedAt" = excluded."purchasedAt",
         "updatedAt" = excluded."updatedAt"
       returning id
@@ -228,6 +232,8 @@ async function upsertExternalOrder(client, order) {
       publicCode,
       order.status,
       JSON.stringify(order.buyerSnapshot),
+      order.buyerEmailNormalized || null,
+      order.buyerPhoneNormalized || null,
       order.purchasedAt,
     ],
   );
@@ -311,10 +317,29 @@ function buildBuyerSnapshot(order, refs) {
   const partnerRef = refs?.partners?.[order.vendor] || refs?.partners?.[order.org] || null;
   const buyer = {
     name: firstString(customer?.name, customer?.full_name, customFields.name, customFields.fio, vendorData?.name),
-    email: firstString(customer?.email, customFields.email, vendorData?.email),
-    phone: firstString(customer?.phone, customer?.phone_number, customFields.phone, customFields.tel, vendorData?.phone),
+    email: firstString(
+      customer?.email,
+      customFields.email,
+      customFields.mail,
+      customFields.e_mail,
+      vendorData?.email,
+      payment?.email,
+      payment?.customer_email,
+    ),
+    phone: firstString(
+      customer?.phone,
+      customer?.phone_number,
+      customFields.phone,
+      customFields.tel,
+      customFields.mobile,
+      vendorData?.phone,
+      payment?.phone,
+    ),
     notes: firstString(order.code, order.number != null ? `#${order.number}` : null),
   };
+
+  if (!buyer.email) buyer.email = extractEmailFromPayload(order);
+  if (!buyer.phone) buyer.phone = extractPhoneFromPayload(order);
 
   return {
     buyer,
@@ -379,6 +404,84 @@ function firstString(...values) {
     if (value == null) continue;
     const text = String(value).trim();
     if (text) return text;
+  }
+  return null;
+}
+
+const EMAIL_RE = /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i;
+
+function normalizeEmail(value) {
+  if (!value) return null;
+  const text = String(value).trim().toLowerCase();
+  if (!text || !text.includes("@")) return null;
+  const match = text.match(EMAIL_RE);
+  return match ? match[0].toLowerCase() : null;
+}
+
+function normalizePhone(value) {
+  if (!value) return null;
+  const digits = String(value).replace(/\D/g, "");
+  if (digits.length < 10) return null;
+  if (digits.length === 11 && digits.startsWith("8")) return `7${digits.slice(1)}`;
+  if (digits.length === 10) return `7${digits}`;
+  return digits;
+}
+
+function extractEmailFromPayload(value, depth = 0) {
+  if (depth > 8 || value == null) return null;
+  if (typeof value === "string") {
+    const match = value.match(EMAIL_RE);
+    return match ? match[0].toLowerCase() : null;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = extractEmailFromPayload(item, depth + 1);
+      if (found) return found;
+    }
+    return null;
+  }
+  if (typeof value === "object") {
+    for (const key of ["email", "customer_email", "buyer_email", "mail", "e-mail", "e_mail"]) {
+      const direct = normalizeEmail(value[key]);
+      if (direct) return direct;
+    }
+    for (const [key, nested] of Object.entries(value)) {
+      if (/email|mail/i.test(key)) {
+        const direct = normalizeEmail(nested);
+        if (direct) return direct;
+      }
+    }
+    for (const nested of Object.values(value)) {
+      const found = extractEmailFromPayload(nested, depth + 1);
+      if (found) return found;
+    }
+  }
+  return null;
+}
+
+function extractPhoneFromPayload(value, depth = 0) {
+  if (depth > 8 || value == null) return null;
+  if (typeof value === "string") {
+    const normalized = normalizePhone(value);
+    if (normalized) return value.trim();
+    return null;
+  }
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = extractPhoneFromPayload(item, depth + 1);
+      if (found) return found;
+    }
+    return null;
+  }
+  if (typeof value === "object") {
+    for (const key of ["phone", "phone_number", "mobile", "tel", "telephone"]) {
+      const direct = firstString(value[key]);
+      if (direct && normalizePhone(direct)) return direct;
+    }
+    for (const nested of Object.values(value)) {
+      const found = extractPhoneFromPayload(nested, depth + 1);
+      if (found) return found;
+    }
   }
   return null;
 }

@@ -42,7 +42,7 @@ pnpm db:deploy
 BUILD_NODE_ENV="${BUILD_NODE_ENV:-development}"
 (
   export NODE_ENV="$BUILD_NODE_ENV"
-  VITE_DAIBILET_API_URL="${VITE_DAIBILET_API_URL:-/api}" \
+  VITE_DAIBILET_API_URL="${VITE_DAIBILET_API_URL:-}" \
   VITE_DAIBILET_PUBLIC_URL="${PUBLIC_SITE_URL:-https://daibilet.ru}" \
   pnpm --filter @tours/admin build
 )

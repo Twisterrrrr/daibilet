@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ADMIN_API_BASE } from '@/lib/admin-api';
+import { adminFetch } from '@/lib/admin-api';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 
 import { DataTableShell, InfoNote, PageHeader, SourceBadge, StatusBadge } from '@/components/admin/primitives';
@@ -9,7 +9,6 @@ import { Card } from '@/components/ui/card';
 import { formatDateTime, formatMoney, formatNumber } from '@/data';
 import type { AdminSourceRow, AdminSourcesPayload } from '@/types';
 
-const API_BASE_URL = ADMIN_API_BASE;
 
 const EMPTY_SOURCES_PAYLOAD: AdminSourcesPayload = {
   generatedAt: new Date().toISOString(),
@@ -46,7 +45,7 @@ export function SourcesPage() {
   const loadSources = React.useCallback(async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/sources`, { cache: 'no-store' });
+      const response = await adminFetch(`/api/admin/sources`, { cache: 'no-store' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       setPayload((await response.json()) as AdminSourcesPayload);
       setBackendError(null);
@@ -67,7 +66,7 @@ export function SourcesPage() {
     setSyncingSource(sourceCode);
     setNotice(null);
     try {
-      const response = await fetch(`${API_BASE_URL}${config.endpoint}`, { method: 'POST' });
+      const response = await adminFetch(`${config.endpoint}`, { method: 'POST' });
       const body = await response.json().catch(() => null);
       if (!response.ok) throw new Error(body?.message || `HTTP ${response.status}`);
       setNotice(`${config.label} sync завершен: ${formatSyncStats(body?.stats)}.`);

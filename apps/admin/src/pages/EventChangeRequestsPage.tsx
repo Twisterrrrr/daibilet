@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ADMIN_API_BASE } from '@/lib/admin-api';
+import { adminFetch } from '@/lib/admin-api';
 import { useSearchParams } from 'react-router-dom';
 import { AlertTriangle, CheckCircle2, ClipboardCheck, Eye, FileJson, Loader2, RefreshCcw, Search, Send, XCircle } from 'lucide-react';
 
@@ -18,7 +18,6 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { formatNumber } from '@/data';
 
-const API_BASE_URL = ADMIN_API_BASE;
 const PAGE_SIZE = 50;
 
 type ActionName = 'approve' | 'reject' | 'apply';
@@ -67,7 +66,7 @@ export function EventChangeRequestsPage() {
   const loadDetail = React.useCallback((requestId: string) => {
     setDetailLoading(true);
     setDetailError(null);
-    fetch(`${API_BASE_URL}/api/admin/event-change-requests/${encodeURIComponent(requestId)}`, { cache: 'no-store' })
+    adminFetch(`/api/admin/event-change-requests/${encodeURIComponent(requestId)}`, { cache: 'no-store' })
       .then(async (response) => {
         const body = await response.json().catch(() => null);
         if (!response.ok) throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
@@ -100,7 +99,7 @@ export function EventChangeRequestsPage() {
     if (q.trim()) nextParams.set('q', q.trim());
 
     setLoading(true);
-    fetch(`${API_BASE_URL}/api/admin/event-change-requests?${nextParams.toString()}`, {
+    adminFetch(`/api/admin/event-change-requests?${nextParams.toString()}`, {
       cache: 'no-store',
       signal: controller.signal,
     })
@@ -132,7 +131,7 @@ export function EventChangeRequestsPage() {
 
       setActingId(`${request.id}:${action}`);
       setActionError(null);
-      fetch(`${API_BASE_URL}/api/admin/event-change-requests/${encodeURIComponent(request.id)}/${action}`, {
+      adminFetch(`/api/admin/event-change-requests/${encodeURIComponent(request.id)}/${action}`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: action === 'apply' ? undefined : JSON.stringify({ adminComment: adminComment?.trim() || undefined }),

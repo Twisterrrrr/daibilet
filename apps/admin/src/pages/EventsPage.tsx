@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ADMIN_API_BASE } from '@/lib/admin-api';
+import { adminFetch } from '@/lib/admin-api';
 import { useSearchParams } from 'react-router-dom';
 import { AlertTriangle, ArrowRight, CheckCircle2, ExternalLink, EyeOff, Image, Loader2, Save, Search, X } from 'lucide-react';
 
@@ -13,7 +13,6 @@ import type { AdminEventRow } from '@/types';
 
 const PAGE_SIZE = 80;
 const MIN_DISPLAY_PRICE_RUB = 100;
-const API_BASE_URL = ADMIN_API_BASE;
 const PUBLIC_BASE_URL =
   ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_PUBLIC_URL?: string } }).env?.VITE_DAIBILET_PUBLIC_URL as string | undefined) ||
   'http://127.0.0.1:5178';
@@ -400,7 +399,7 @@ export function EventsPage() {
     }));
     setIsLoading(true);
 
-    fetch(`${API_BASE_URL}/api/admin/events?${nextParams.toString()}`, {
+    adminFetch(`/api/admin/events?${nextParams.toString()}`, {
       cache: 'no-store',
       signal: controller.signal,
     })
@@ -426,7 +425,7 @@ export function EventsPage() {
 
   React.useEffect(() => {
     const controller = new AbortController();
-    fetch(`${API_BASE_URL}/api/admin/taxonomy`, { cache: 'no-store', signal: controller.signal })
+    adminFetch(`/api/admin/taxonomy`, { cache: 'no-store', signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as AdminTaxonomy;
@@ -449,7 +448,7 @@ export function EventsPage() {
     const controller = new AbortController();
     setIsDetailLoading(true);
 
-    fetch(`${API_BASE_URL}/api/admin/events/${encodeURIComponent(selectedEvent.id)}`, {
+    adminFetch(`/api/admin/events/${encodeURIComponent(selectedEvent.id)}`, {
       cache: 'no-store',
       signal: controller.signal,
     })
@@ -495,7 +494,7 @@ export function EventsPage() {
     setSaveError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/events/${encodeURIComponent(selectedEvent.id)}/override`, {
+      const response = await adminFetch(`/api/admin/events/${encodeURIComponent(selectedEvent.id)}/override`, {
         method: 'PATCH',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(patch),
@@ -525,7 +524,7 @@ export function EventsPage() {
     setSaveError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/events/${encodeURIComponent(selectedEvent.id)}/moderation`, {
+      const response = await adminFetch(`/api/admin/events/${encodeURIComponent(selectedEvent.id)}/moderation`, {
         method: 'PATCH',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ editorStatus }),
@@ -556,7 +555,7 @@ export function EventsPage() {
     setSaveError(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/events/${encodeURIComponent(selectedEvent.id)}/taxonomy`, {
+      const response = await adminFetch(`/api/admin/events/${encodeURIComponent(selectedEvent.id)}/taxonomy`, {
         method: 'PATCH',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(patch),
