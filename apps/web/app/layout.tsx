@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 
+import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery';
+
 import './globals.css';
 
 const SITE_URL = process.env.DAIBILET_SITE_URL || 'https://daibilet.ru';
@@ -74,7 +76,10 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
         />
       </head>
-      <body>{children}</body>
+      <body>
+        <ChunkLoadRecovery />
+        {children}
+      </body>
     </html>
   );
 }

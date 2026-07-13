@@ -51,17 +51,40 @@ rsync -a --delete apps/admin/dist/ "$ADMIN_DIR/"
 
 pnpm web:build
 
+# Stop web before clearing Next cache so workers don't serve half-deleted artifacts.
+if systemctl is-active --quiet "$WEB_SERVICE" 2>/dev/null; then
+  systemctl stop "$WEB_SERVICE"
+fi
+rm -rf apps/web/.next/cache
+echo "Cleared apps/web/.next/cache"
+
 if systemctl is-active --quiet "$API_SERVICE"; then
   systemctl restart "$API_SERVICE"
 fi
 
 if systemctl is-enabled --quiet "$WEB_SERVICE" 2>/dev/null; then
-  systemctl restart "$WEB_SERVICE"
+  systemctl start "$WEB_SERVICE"
 else
   echo "Warning: enable $WEB_SERVICE after first install"
 fi
 
 sleep 4
 curl -fsS "http://127.0.0.1:${WEB_PORT}/api/health" >/dev/null && echo "Next /api/health OK on :$WEB_PORT"
+
+# Bust ISR / unstable_cache after deploy (same tags/paths as backend revalidate-next-home).
+REVALIDATE_SECRET="${DAIBILET_NEXT_REVALIDATE_SECRET:-}"
+if [[ -z "$REVALIDATE_SECRET" && -f .env ]]; then
+  REVALIDATE_SECRET="$(grep -E '^DAIBILET_NEXT_REVALIDATE_SECRET=' .env | cut -d= -f2- | sed 's/^["'\'']//;s/["'\'']$//' || true)"
+fi
+if [[ -n "$REVALIDATE_SECRET" ]]; then
+  curl -fsS -X POST "http://127.0.0.1:${WEB_PORT}/api/internal/revalidate" \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer ${REVALIDATE_SECRET}" \
+    -d '{"tags":["home-page","catalog-page"],"paths":["/","/events","/cities/sankt-peterburg","/cities/moscow","/rechnye-progulki","/avtobusnye-ekskursii","/api/public/stats"]}' \
+    && echo "Post-deploy revalidate OK" \
+    || echo "Warning: post-deploy revalidate failed"
+else
+  echo "Warning: DAIBILET_NEXT_REVALIDATE_SECRET missing — skip revalidate"
+fi
 
 echo "F3 prod deploy complete → ${PUBLIC_SITE_URL:-https://daibilet.ru} (branch: $BRANCH, Next :$WEB_PORT)"
