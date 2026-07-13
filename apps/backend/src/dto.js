@@ -1405,7 +1405,13 @@ function mapAdminOrderRow(row) {
   return {
     id: row.id,
     externalOrderId: row.externalOrderId,
-    publicCode: row.publicCode || publicOrderCode(row.sourceCode || row.sourceName, row.externalOrderId || row.id),
+    publicCode: resolveBuyerFacingOrderNumber({
+      buyerSnapshot: row.buyerSnapshot,
+      buyer,
+      publicCode: row.publicCode || publicOrderCode(row.sourceCode || row.sourceName, row.externalOrderId || row.id),
+      externalOrderId: row.externalOrderId,
+    }),
+    buyerSnapshot: row.buyerSnapshot || null,
     status: row.status || 'unknown',
     displayStatus: orderStatusLabel(row.status),
     statusTone: orderStatusTone(row.status),
@@ -1483,7 +1489,7 @@ function mapPublicBuyerOrder(order) {
   const isFinal = isCanceledOrderStatus(order.status) || isConfirmedOrderStatus(order.status);
   return {
     id: order.id,
-    number: order.publicCode,
+    number: resolveBuyerFacingOrderNumber(order),
     sourceOrderId: order.externalOrderId,
     status: order.status,
     displayStatus: order.displayStatus,
@@ -1513,6 +1519,20 @@ function mapPublicBuyerOrder(order) {
       startsAt: ticket.startsAt,
     })),
   };
+}
+
+/** For external purchases show provider order number; hashed publicCode only as fallback. */
+function resolveBuyerFacingOrderNumber(order) {
+  const snap = order.buyerSnapshot && typeof order.buyerSnapshot === 'object' ? order.buyerSnapshot : {};
+  const notes = firstString(order.buyer?.notes, snap.buyer?.notes);
+  const fromNotes = notes && /^#?\d{4,}$/.test(String(notes).trim()) ? String(notes).trim().replace(/^#/, '') : null;
+  return firstString(
+    snap.number != null ? String(snap.number) : null,
+    snap.code,
+    fromNotes,
+    order.publicCode,
+    order.externalOrderId,
+  );
 }
 
 function publicOrderCode(source, externalOrderId) {

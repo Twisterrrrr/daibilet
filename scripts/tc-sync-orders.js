@@ -138,6 +138,7 @@ async function persistOrders(orders, refs, syncId, startedAt, options) {
         buyerSnapshot: snapshot,
         buyerEmailNormalized: normalizeEmail(snapshot.buyer?.email),
         buyerPhoneNormalized: normalizePhone(snapshot.buyer?.phone),
+        publicCode: preferredProviderOrderNumber(order),
       });
 
       await upsertRawOrder(client, externalOrderId, order, refs);
@@ -210,13 +211,23 @@ async function ensureSource(client) {
 }
 
 async function upsertExternalOrder(client, order) {
-  const publicCode = order.publicCode || await allocatePublicOrderCode(client, SOURCE_ID, order.externalOrderId);
+  let publicCode = order.publicCode || null;
+  if (publicCode) {
+    const conflict = await client.query(
+      'select 1 from "ExternalOrder" where "publicCode" = $1 and not ("sourceId" = $2 and "externalOrderId" = $3) limit 1',
+      [publicCode, SOURCE_ID, order.externalOrderId],
+    );
+    if (conflict.rows.length) publicCode = null;
+  }
+  if (!publicCode) {
+    publicCode = await allocatePublicOrderCode(client, SOURCE_ID, order.externalOrderId);
+  }
   const result = await client.query(
     `
       insert into "ExternalOrder" (id, "sourceId", "externalOrderId", "publicCode", status, "buyerSnapshot", "buyerEmailNormalized", "buyerPhoneNormalized", "purchasedAt", "updatedAt")
       values ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9, now())
       on conflict ("sourceId", "externalOrderId") do update set
-        "publicCode" = coalesce("ExternalOrder"."publicCode", excluded."publicCode"),
+        "publicCode" = coalesce(excluded."publicCode", "ExternalOrder"."publicCode"),
         status = excluded.status,
         "buyerSnapshot" = excluded."buyerSnapshot",
         "buyerEmailNormalized" = coalesce(excluded."buyerEmailNormalized", "ExternalOrder"."buyerEmailNormalized"),
@@ -238,6 +249,21 @@ async function upsertExternalOrder(client, order) {
     ],
   );
   return result.rows[0].id;
+}
+
+/** Prefer human-readable Ticketscloud order number over our hashed code. */
+function preferredProviderOrderNumber(order) {
+  const candidates = [order.number, order.code];
+  for (const value of candidates) {
+    if (value == null || value === "") continue;
+    const text = String(value).trim().replace(/^#/, "");
+    if (!text) continue;
+    // Skip UUID/hex ids — those stay as externalOrderId, not as customer-facing №.
+    if (/^[a-f0-9]{16,}$/i.test(text)) continue;
+    if (/^[0-9a-f]{8}-[0-9a-f-]{27,}$/i.test(text)) continue;
+    if (/^\d{4,}$/.test(text) || /^[A-Z0-9][-A-Z0-9]{3,}$/i.test(text)) return text;
+  }
+  return null;
 }
 
 async function upsertRawOrder(client, externalOrderId, order, refs) {
