@@ -4,6 +4,27 @@
 
 ---
 
+## 2026-07-14 — Root cause: TC style#ticketscloud-loader misdetected as spinner
+
+### Наблюдения
+
+- В `tcwidget.js` `#ticketscloud-loader` — это **`<style>` в `<head>`**, а не DOM-спиннер. После первого запуска он остаётся навсегда.
+- Next `openTcWidget` считал его «stuck loading», сносил overlay/`dismissTcWidget` и открывал popup — TC-модалка выглядела «не грузится».
+- Teplohod отдельно ломали auto-`window.open` на account (уже чинили); оставили Vite-подобный init + без агрессивного dismiss.
+
+### Решения
+
+- Visible = iframe **или** `div#tc-widget-overlay` (не STYLE).
+- Больше не удаляем `style#ticketscloud-loader`; не считаем его stuck.
+- `openTcWidget`: ensure + `ticketsCloudWidget.init` + click; popup fallback только если shell не появился ~4с.
+- Teplohod: `async` script + повторный `init` после paint.
+
+### Проблемы
+
+- —
+
+---
+
 ## 2026-07-14 — Teplohod fancybox killed by account fallback
 
 ### Наблюдения

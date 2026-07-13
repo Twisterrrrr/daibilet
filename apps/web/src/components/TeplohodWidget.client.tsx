@@ -170,7 +170,7 @@ export function ensureTeplohodWidgetScript() {
   widgetScriptPromise = new Promise<void>((resolve, reject) => {
     const script = document.createElement('script');
     script.src = TEP_WIDGET_SCRIPT_URL;
-    script.defer = true;
+    script.async = true;
     script.dataset.daibiletTeplohodWidget = 'true';
     script.onload = () => {
       waitForTeplohodApi().then(resolve, reject);
@@ -285,6 +285,10 @@ export function TeplohodWidgetEmbed({
       .then(() => bootstrapTeplohodWidgets())
       .then(() => {
         if (cancelled) return;
+        // Second init after paint — Teplohod sometimes skips empty containers on first pass.
+        window.requestAnimationFrame(() => {
+          if (!cancelled) void bootstrapTeplohodWidgets();
+        });
         // Only show external checkout link if Teplohod never paints its buy button.
         timeoutId = window.setTimeout(() => {
           if (!cancelled && !containerHasWidgetMarkup(container)) {

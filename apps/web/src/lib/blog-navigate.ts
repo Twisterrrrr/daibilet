@@ -14,7 +14,8 @@ export function handleBlogLinkClick(event: MouseEvent<HTMLAnchorElement>, href: 
 
 export function cleanupBlogPageOverlays() {
   document.getElementById('tc-widget-overlay')?.remove();
-  document.getElementById('ticketscloud-loader')?.remove();
+  document.getElementById('tc-widget-overlay')?.remove();
+  // Do not remove #ticketscloud-loader — in tcwidget.js it is a <style> in <head>, not the spinner DOM.
   document.querySelectorAll('.tc-widget-container').forEach((node) => node.remove());
   const body = document.body;
   if (body.hasAttribute('data-overflow')) {

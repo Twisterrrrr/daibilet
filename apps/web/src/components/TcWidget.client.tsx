@@ -115,30 +115,32 @@ function ensureTcWidgetScript() {
       }
 
       const finish = () => waitForTcWidgetReady().then(resolve, reject);
-
-      if (document.readyState !== 'loading') {
-        void finish();
-        return;
-      }
-
       script.addEventListener('load', () => void finish(), { once: true });
       script.addEventListener('error', () => reject(new Error('tcwidget.js failed')), { once: true });
+      // Script may already be evaluated (cached) before listeners attach.
+      window.requestAnimationFrame(() => {
+        if (isTcWidgetReady()) resolve();
+      });
     });
 
   const existingScript = document.querySelector('script[src*="tcwidget.js"]') as HTMLScriptElement | null;
   if (existingScript) {
     widgetScriptPromise = widgetScriptPromise || waitLoaded(existingScript);
-    return widgetScriptPromise;
+    return widgetScriptPromise.then(() => {
+      (window as TcWidgetWindow).ticketsCloudWidget?.init?.();
+    });
   }
 
   if (document.querySelector('script[data-daibilet-tc-widget="true"]')) {
-    return widgetScriptPromise || waitForTcWidgetReady();
+    return (widgetScriptPromise || waitForTcWidgetReady()).then(() => {
+      (window as TcWidgetWindow).ticketsCloudWidget?.init?.();
+    });
   }
 
   widgetScriptPromise = new Promise<void>((resolve, reject) => {
     const script = document.createElement('script');
     script.src = TC_WIDGET_SCRIPT_URL;
-    script.defer = true;
+    script.async = true;
     script.dataset.daibiletTcWidget = 'true';
     script.onload = () => {
       waitForTcWidgetReady().then(resolve, reject);
@@ -146,13 +148,23 @@ function ensureTcWidgetScript() {
     script.onerror = () => reject(new Error('tcwidget.js failed'));
     document.body.appendChild(script);
   });
-  return widgetScriptPromise;
+  return widgetScriptPromise.then(() => {
+    (window as TcWidgetWindow).ticketsCloudWidget?.init?.();
+  });
 }
 
 function openTcPurchaseUrl(purchaseUrl?: string | null) {
   const normalized = normalizeTcPurchaseUrl(purchaseUrl);
-  if (!normalized) return;
-  window.open(normalized, 'tc_widget', 'width=960,height=760,scrollbars=yes,resizable=yes');
+  if (!normalized) return false;
+  const popup = window.open(normalized, 'tc_widget', 'width=960,height=760,scrollbars=yes,resizable=yes');
+  return Boolean(popup);
+}
+
+/** Real overlay shell — NOT the permanent <style id="ticketscloud-loader"> in <head>. */
+function hasTcOverlayShell() {
+  if (typeof document === 'undefined') return false;
+  const overlay = document.getElementById('tc-widget-overlay');
+  return Boolean(overlay && overlay.tagName !== 'STYLE');
 }
 
 function hasTcWidgetIframe() {
@@ -164,20 +176,11 @@ function hasTcWidgetIframe() {
   );
 }
 
-/** Overlay alone is the loading shell — do not treat it as a successful open. */
 function isTcWidgetVisible() {
-  return hasTcWidgetIframe();
+  return hasTcWidgetIframe() || hasTcOverlayShell();
 }
 
-function isTcWidgetStuckLoading() {
-  if (typeof document === 'undefined') return false;
-  if (hasTcWidgetIframe()) return false;
-  return Boolean(
-    document.getElementById('ticketscloud-loader') || document.getElementById('tc-widget-overlay'),
-  );
-}
-
-function waitForTcWidgetVisible(timeoutMs = 2800) {
+function waitForTcWidgetVisible(timeoutMs = 2500) {
   return new Promise<boolean>((resolve) => {
     if (isTcWidgetVisible()) {
       resolve(true);
@@ -212,8 +215,10 @@ function dismissTcWidget() {
     if (popupShell instanceof Element) popupShell.remove();
   }
 
-  document.getElementById('tc-widget-overlay')?.remove();
-  document.getElementById('ticketscloud-loader')?.remove();
+  const overlay = document.getElementById('tc-widget-overlay');
+  if (overlay && overlay.tagName !== 'STYLE') overlay.remove();
+
+  // Never remove <style id="ticketscloud-loader"> — TC keeps it in <head> permanently.
 
   const body = document.body;
   if (body.hasAttribute('data-overflow')) {
@@ -224,6 +229,10 @@ function dismissTcWidget() {
   document.querySelectorAll('.tc-widget-container').forEach((node) => node.remove());
 }
 
+/**
+ * Match Vite: click the TC trigger and let tcwidget.js own the modal.
+ * Only fall back to purchaseUrl popup if the vendor shell never appears.
+ */
 export async function openTcWidget(options: {
   trigger: HTMLButtonElement | null;
   purchaseUrl?: string | null;
@@ -235,19 +244,16 @@ export async function openTcWidget(options: {
     return;
   }
 
-  if (options.trigger) {
-    // Drop a previous stuck loader before another click.
-    if (isTcWidgetStuckLoading()) dismissTcWidget();
-    options.trigger.click();
-    const visible = await waitForTcWidgetVisible(3200);
-    if (!visible || isTcWidgetStuckLoading()) {
-      dismissTcWidget();
-      openTcPurchaseUrl(options.purchaseUrl);
-    }
+  if (!options.trigger) {
+    openTcPurchaseUrl(options.purchaseUrl);
     return;
   }
 
-  openTcPurchaseUrl(options.purchaseUrl);
+  options.trigger.click();
+  const visible = await waitForTcWidgetVisible(4000);
+  if (!visible) {
+    openTcPurchaseUrl(options.purchaseUrl);
+  }
 }
 
 function formatSessionLabels(session: {
