@@ -42,7 +42,7 @@ export const adminData: AdminData = window.ADMIN_DATA ?? {
 
 export async function hydrateAdminData(): Promise<void> {
   const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 1500);
+  const timeout = window.setTimeout(() => controller.abort(), 8000);
   try {
     const response = await adminFetch('/api/admin/dashboard', {
       cache: 'no-store',

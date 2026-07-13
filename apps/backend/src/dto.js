@@ -379,18 +379,16 @@ function loadCityRouting() {
 }
 
 export async function buildAdminDashboard(db) {
-  const [stats, categories, events, venues, destinations] = await Promise.all([
+  const [stats, categoryCountResult, destinationCountResult, launch] = await Promise.all([
     db.stats(),
-    categoryRows(db),
-    eventRows(db, 10000),
-    venueRows(db, 90),
-    destinationRows(db),
+    db.query('select count(*)::int as total from "Category"'),
+    db.query('select count(*)::int as total from "City" where coalesce("isDestination", false) = true'),
+    buildAdminLaunchMetricsCompact(db),
   ]);
 
-  const landingRows = buildLandingRows(events);
-  const groupedEvents = groupAdminEventRows(events);
-  const readyEvents = groupedEvents.filter((event) => event.readiness === 'ready').length;
-  const launchMetrics = buildLaunchMetrics(groupedEvents);
+  const categories = Number(categoryCountResult.rows[0]?.total || 0);
+  const destinations = Number(destinationCountResult.rows[0]?.total || 0);
+  const readyEvents = Number(launch.readyForSeo || 0);
 
   return {
     generatedAt: new Date().toISOString(),
@@ -399,36 +397,132 @@ export async function buildAdminDashboard(db) {
       status: 'success',
       mode: 'Postgres seed from TC full sync',
       events: stats.events || 0,
-      categories: categories.length,
+      categories,
       venues: stats.venues || 0,
       cities: stats.cities || 0,
       tags: stats.tags || 0,
       metaEvents: 0,
     },
     metrics: {
-      events: groupedEvents.length,
+      events: launch.groupedEvents,
       readyEvents,
-      reviewEvents: Math.max(0, groupedEvents.length - readyEvents),
+      reviewEvents: Math.max(0, launch.groupedEvents - readyEvents),
       venues: stats.venues || 0,
-      landingRules: landingRows.length,
-      destinations: destinations.length,
-      launch: launchMetrics,
+      landingRules: LANDING_RULES.length,
+      destinations,
+      launch,
     },
-    eventRows: events,
-    mappingRows: categories.map((row) => {
-      const mapping = CATEGORY_SUBTITLE.get(row.source) || ['мероприятия', 'уточнить', 'review'];
-      return {
-        source: row.source,
-        target: mapping[0],
-        subcategory: mapping[1],
-        mode: mapping[2],
-        events: row.events,
-      };
-    }),
-    venueRows: venues,
+    // Compact payload: pages load their own lists. Keep empty arrays for AdminData shape.
+    eventRows: [],
+    mappingRows: [],
+    venueRows: [],
     duplicateCandidates: [],
-    destinationRows: destinations,
-    landingRows,
+    destinationRows: [],
+    landingRows: [],
+  };
+}
+
+/** Fast launch metrics without loading full event/venue/landing row payloads. */
+async function buildAdminLaunchMetricsCompact(db) {
+  const result = await db.query(
+    `
+      with primary_offer as (
+        select distinct on ("eventId")
+          "eventId",
+          "priceRub",
+          "widgetUrl",
+          "deeplinkUrl"
+        from "EventOffer"
+        where active = true
+        order by "eventId", ("priceRub" >= $1) desc nulls last, "priceRub" asc nulls last
+      ),
+      event_stats as (
+        select
+          e.id,
+          e.status,
+          e.kind,
+          e."sourceStatus",
+          coalesce(nullif(trim(override."imageUrl"), ''), nullif(trim(e."imageUrl"), '')) as "imageUrl",
+          min(session."startsAt") filter (where ${ACTIVE_SESSION_SQL}) as "nextStartsAt",
+          count(distinct session.id) filter (where ${ACTIVE_SESSION_SQL})::int as "activeSlots",
+          e."priceFromRub" as "eventPriceFromRub",
+          min(session."priceFromRub") filter (where session."priceFromRub" >= $1) as "sessionPriceFromRub",
+          primary_offer."priceRub" as "offerPriceRub",
+          (
+            coalesce(nullif(trim(primary_offer."widgetUrl"), ''), nullif(trim(primary_offer."deeplinkUrl"), '')) is not null
+          ) as "widgetReady"
+        from "Event" e
+        left join "EventOverride" override on override."eventId" = e.id
+        left join "EventSession" session on session."eventId" = e.id
+        left join primary_offer on primary_offer."eventId" = e.id
+        where e.status not in ('HIDDEN', 'DRAFT')
+        group by
+          e.id,
+          override.id,
+          primary_offer."priceRub",
+          primary_offer."widgetUrl",
+          primary_offer."deeplinkUrl"
+      ),
+      normalized as (
+        select
+          id,
+          status,
+          kind,
+          "sourceStatus",
+          "imageUrl",
+          "nextStartsAt",
+          "activeSlots",
+          "widgetReady",
+          (
+            select min(price)
+            from (values ("eventPriceFromRub"), ("sessionPriceFromRub"), ("offerPriceRub")) as prices(price)
+            where price is not null and price >= $1
+          ) as "priceFrom",
+          (
+            "widgetReady"
+            and (
+              "activeSlots" > 0
+              or kind = 'OPEN_DATE'
+              or "sourceStatus" = 'open_date'
+            )
+          ) as "purchaseReady"
+        from event_stats
+      )
+      select
+        count(*)::int as "groupedEvents",
+        count(*) filter (
+          where "purchaseReady" = true
+            and "priceFrom" is not null
+            and (
+              "nextStartsAt" is not null
+              or kind = 'OPEN_DATE'
+              or "sourceStatus" = 'open_date'
+            )
+        )::int as "readyForSales",
+        count(*) filter (
+          where "purchaseReady" = true
+            and "priceFrom" is not null
+            and coalesce("imageUrl", '') <> ''
+        )::int as "readyForSeo",
+        count(*) filter (where lower(status::text) in ('needs_review', 'needs-review'))::int as "needsAttention",
+        count(*) filter (where "priceFrom" is null)::int as "priceBlocked",
+        count(*) filter (where "purchaseReady" = false)::int as "purchaseBlocked",
+        count(*) filter (where coalesce("imageUrl", '') = '')::int as "noImage"
+      from normalized
+    `,
+    [MIN_DISPLAY_PRICE_RUB],
+  );
+
+  const row = result.rows[0] || {};
+  return {
+    groupedEvents: Number(row.groupedEvents || 0),
+    readyForSales: Number(row.readyForSales || 0),
+    readyForSeo: Number(row.readyForSeo || 0),
+    needsAttention: Number(row.needsAttention || 0),
+    priceBlocked: Number(row.priceBlocked || 0),
+    purchaseBlocked: Number(row.purchaseBlocked || 0),
+    noImage: Number(row.noImage || 0),
+    landingMatched: 0,
   };
 }
 
