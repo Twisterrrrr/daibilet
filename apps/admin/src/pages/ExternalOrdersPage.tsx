@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { adminFetch } from '@/lib/admin-api';
 import { useSearchParams } from 'react-router-dom';
-import { AlertTriangle, CheckCircle2, Clock, Copy, Plus, Receipt, RefreshCcw, Search, Ticket } from 'lucide-react';
+import { AlertTriangle, Archive, CheckCircle2, Clock, Copy, Plus, Receipt, RefreshCcw, Search, Ticket, Trash2 } from 'lucide-react';
 
 import { DataTableShell, EmptyState, InfoNote, PageHeader, QuickFilterBar, SourceBadge, StatusBadge } from '@/components/admin/primitives';
 import { Badge } from '@/components/ui/badge';
@@ -14,12 +14,14 @@ import { formatNumber } from '@/data';
 const PAGE_SIZE = 50;
 
 const QUICK_FILTER_LABELS: Record<string, string> = {
-  all: 'Все',
+  all: 'Активные',
   attention: 'Требуют внимания',
   pending_refunds: 'Возвраты',
   missing_artifact: 'Без билетов',
   failed_integration: 'Проблемы',
   unlinked: 'Без связи',
+  archivable: 'К архиву',
+  archive: 'Архив',
 };
 
 type OrderStatusTone = 'draft' | 'ready' | 'live' | 'paused' | 'archived' | 'incomplete' | 'error';
@@ -42,6 +44,9 @@ type AdminOrderRow = {
   };
   purchasedAt?: string | null;
   updatedAt?: string | null;
+  archivedAt?: string | null;
+  isArchived?: boolean;
+  canArchive?: boolean;
   ticketCount: number;
   unlinkedTickets: number;
   eventTitle?: string | null;
@@ -110,6 +115,7 @@ type AdminOrdersPayload = {
     missingArtifacts: number;
     failedIntegration: number;
     needsAttention: number;
+    archived?: number;
   };
 };
 
@@ -119,6 +125,8 @@ export function ExternalOrdersPage() {
   const [loading, setLoading] = React.useState(true);
   const [loadError, setLoadError] = React.useState<string | null>(null);
   const [syncing, setSyncing] = React.useState(false);
+  const [archivingBulk, setArchivingBulk] = React.useState(false);
+  const [actionBusyId, setActionBusyId] = React.useState<string | null>(null);
   const [reloadTick, setReloadTick] = React.useState(0);
   const [selectedOrder, setSelectedOrder] = React.useState<AdminOrderRow | null>(null);
   const [isSavingTicket, setIsSavingTicket] = React.useState(false);
@@ -207,6 +215,64 @@ export function ExternalOrdersPage() {
       .finally(() => setSyncing(false));
   }, [refresh]);
 
+  const archiveCancelledOrders = React.useCallback(() => {
+    setArchivingBulk(true);
+    adminFetch(`/api/admin/orders/archive`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ statuses: ['cancelled', 'canceled', 'expired', 'deleted', 'rejected', 'refunded'] }),
+    })
+      .then(async (response) => {
+        const body = await response.json().catch(() => null);
+        if (!response.ok) throw new Error(body?.error || `HTTP ${response.status}`);
+        setLoadError(null);
+        refresh();
+      })
+      .catch((error) => {
+        setLoadError(error instanceof Error ? `Архивация не прошла: ${error.message}` : String(error));
+      })
+      .finally(() => setArchivingBulk(false));
+  }, [refresh]);
+
+  const setOrderArchived = React.useCallback(
+    (order: AdminOrderRow, archive: boolean) => {
+      setActionBusyId(order.id);
+      adminFetch(`/api/admin/orders/${encodeURIComponent(order.id)}/${archive ? 'archive' : 'unarchive'}`, { method: 'POST' })
+        .then(async (response) => {
+          const body = await response.json().catch(() => null);
+          if (!response.ok) throw new Error(body?.error || body?.message || `HTTP ${response.status}`);
+          setLoadError(null);
+          if (selectedOrder?.id === order.id) setSelectedOrder(null);
+          refresh();
+        })
+        .catch((error) => {
+          setLoadError(error instanceof Error ? error.message : String(error));
+        })
+        .finally(() => setActionBusyId(null));
+    },
+    [refresh, selectedOrder?.id],
+  );
+
+  const deleteOrder = React.useCallback(
+    (order: AdminOrderRow) => {
+      if (!window.confirm(`Удалить заказ №${order.publicCode || order.externalOrderId} безвозвратно?`)) return;
+      setActionBusyId(order.id);
+      adminFetch(`/api/admin/orders/${encodeURIComponent(order.id)}`, { method: 'DELETE' })
+        .then(async (response) => {
+          const body = await response.json().catch(() => null);
+          if (!response.ok) throw new Error(body?.error || body?.message || `HTTP ${response.status}`);
+          setLoadError(null);
+          if (selectedOrder?.id === order.id) setSelectedOrder(null);
+          refresh();
+        })
+        .catch((error) => {
+          setLoadError(error instanceof Error ? error.message : String(error));
+        })
+        .finally(() => setActionBusyId(null));
+    },
+    [refresh, selectedOrder?.id],
+  );
+
   React.useEffect(() => {
     const controller = new AbortController();
     const nextParams = new URLSearchParams(params);
@@ -279,6 +345,10 @@ export function ExternalOrdersPage() {
               <RefreshCcw className="mr-2 h-4 w-4" />
               Обновить
             </Button>
+            <Button variant="outline" size="sm" onClick={archiveCancelledOrders} disabled={archivingBulk || view === 'archive'}>
+              <Archive className={`mr-2 h-4 w-4 ${archivingBulk ? 'animate-pulse' : ''}`} />
+              {archivingBulk ? 'Архивация...' : 'В архив отменённые'}
+            </Button>
             <Button variant="default" size="sm" onClick={syncTicketscloudOrders} disabled={syncing}>
               <RefreshCcw className={`mr-2 h-4 w-4 ${syncing ? 'animate-spin' : ''}`} />
               {syncing ? 'Синхронизация...' : 'Синхронизировать TC'}
@@ -288,7 +358,8 @@ export function ExternalOrdersPage() {
       />
 
       <InfoNote>
-        Для покупателя это будет раздел "Мои заказы". В админке оставляем рабочие поля: номер заказа, покупатель, событие, статус и билеты.
+        Активные заказы — рабочие. Отменённые, истёкшие и удалённые можно отправить в архив; из архива можно вернуть или удалить навсегда.
+        Повторная синхронизация TC снова подтянет отменённые из источника сразу в архив.
       </InfoNote>
 
       <div className="mt-4 grid grid-cols-2 gap-2 lg:grid-cols-4">
@@ -412,9 +483,43 @@ export function ExternalOrdersPage() {
                 </td>
               ) : null}
               <td className="px-4 py-3 align-top">
-                <Button variant="outline" size="sm" onClick={() => openOrder(order)}>
-                  Открыть
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" size="sm" onClick={() => openOrder(order)}>
+                    Открыть
+                  </Button>
+                  {order.isArchived || view === 'archive' ? (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={actionBusyId === order.id}
+                        onClick={() => setOrderArchived(order, false)}
+                      >
+                        Вернуть
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-destructive"
+                        disabled={actionBusyId === order.id}
+                        onClick={() => deleteOrder(order)}
+                      >
+                        <Trash2 className="mr-1 h-3.5 w-3.5" />
+                        Удалить
+                      </Button>
+                    </>
+                  ) : order.canArchive ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={actionBusyId === order.id}
+                      onClick={() => setOrderArchived(order, true)}
+                    >
+                      <Archive className="mr-1 h-3.5 w-3.5" />
+                      В архив
+                    </Button>
+                  ) : null}
+                </div>
               </td>
             </tr>
           ))}
@@ -760,6 +865,7 @@ function emptyPayload(params: URLSearchParams): AdminOrdersPayload {
       missingArtifacts: 0,
       failedIntegration: 0,
       needsAttention: 0,
+      archived: 0,
     },
   };
 }

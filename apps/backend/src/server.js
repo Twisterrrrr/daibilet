@@ -17,6 +17,10 @@ import {
   buildAdminOrderEventCandidates,
   buildAdminOrderDetail,
   buildAdminOrdersList,
+  archiveAdminOrder,
+  unarchiveAdminOrder,
+  archiveAdminOrdersBulk,
+  deleteAdminOrder,
   buildAdminLandingsList,
   buildAdminSources,
   buildAdminTaxonomy,
@@ -475,6 +479,45 @@ export async function handleRequest(request, response) {
 
     if (route === 'GET /api/admin/orders' || route === 'GET /api/admin/external-orders') {
       sendJson(response, await buildAdminOrdersList(db, url.searchParams));
+      return;
+    }
+
+    if (route === 'POST /api/admin/orders/archive') {
+      try {
+        sendJson(response, await archiveAdminOrdersBulk(db, await readJsonBody(request)));
+      } catch (error) {
+        sendJson(response, { error: error.message || 'archive_failed' }, error.statusCode || 400);
+      }
+      return;
+    }
+
+    const orderArchiveMatch = request.method === 'POST' ? url.pathname.match(/^\/api\/admin\/orders\/([^/]+)\/archive$/) : null;
+    if (orderArchiveMatch) {
+      try {
+        sendJson(response, await archiveAdminOrder(db, decodeURIComponent(orderArchiveMatch[1])));
+      } catch (error) {
+        sendJson(response, { error: error.message || 'archive_failed' }, error.statusCode || 400);
+      }
+      return;
+    }
+
+    const orderUnarchiveMatch = request.method === 'POST' ? url.pathname.match(/^\/api\/admin\/orders\/([^/]+)\/unarchive$/) : null;
+    if (orderUnarchiveMatch) {
+      try {
+        sendJson(response, await unarchiveAdminOrder(db, decodeURIComponent(orderUnarchiveMatch[1])));
+      } catch (error) {
+        sendJson(response, { error: error.message || 'unarchive_failed' }, error.statusCode || 400);
+      }
+      return;
+    }
+
+    const orderDeleteMatch = request.method === 'DELETE' ? url.pathname.match(/^\/api\/admin\/orders\/([^/]+)$/) : null;
+    if (orderDeleteMatch) {
+      try {
+        sendJson(response, await deleteAdminOrder(db, decodeURIComponent(orderDeleteMatch[1])));
+      } catch (error) {
+        sendJson(response, { error: error.message || 'delete_failed' }, error.statusCode || 400);
+      }
       return;
     }
 

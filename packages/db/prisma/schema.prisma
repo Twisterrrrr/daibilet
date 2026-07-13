@@ -1027,6 +1027,7 @@ model ExternalOrder {
   buyerPhoneNormalized String?
   linkedAt             DateTime?
   purchasedAt          DateTime?
+  archivedAt           DateTime?
   updatedAt            DateTime  @updatedAt
 
   source        Source           @relation(fields: [sourceId], references: [id])
@@ -1041,6 +1042,7 @@ model ExternalOrder {
   @@index([buyerPhoneNormalized])
   @@index([purchasedAt])
   @@index([updatedAt])
+  @@index([archivedAt])
 }
 
 model ExternalTicket {

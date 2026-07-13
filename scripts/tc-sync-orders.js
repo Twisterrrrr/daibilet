@@ -139,6 +139,7 @@ async function persistOrders(orders, refs, syncId, startedAt, options) {
         buyerEmailNormalized: normalizeEmail(snapshot.buyer?.email),
         buyerPhoneNormalized: normalizePhone(snapshot.buyer?.phone),
         publicCode: preferredProviderOrderNumber(order),
+        archivedAt: isArchivableTcStatus(status) ? new Date().toISOString() : null,
       });
 
       await upsertRawOrder(client, externalOrderId, order, refs);
@@ -224,8 +225,8 @@ async function upsertExternalOrder(client, order) {
   }
   const result = await client.query(
     `
-      insert into "ExternalOrder" (id, "sourceId", "externalOrderId", "publicCode", status, "buyerSnapshot", "buyerEmailNormalized", "buyerPhoneNormalized", "purchasedAt", "updatedAt")
-      values ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9, now())
+      insert into "ExternalOrder" (id, "sourceId", "externalOrderId", "publicCode", status, "buyerSnapshot", "buyerEmailNormalized", "buyerPhoneNormalized", "purchasedAt", "archivedAt", "updatedAt")
+      values ($1, $2, $3, $4, $5, $6::jsonb, $7, $8, $9, $10, now())
       on conflict ("sourceId", "externalOrderId") do update set
         "publicCode" = coalesce(excluded."publicCode", "ExternalOrder"."publicCode"),
         status = excluded.status,
@@ -233,6 +234,7 @@ async function upsertExternalOrder(client, order) {
         "buyerEmailNormalized" = coalesce(excluded."buyerEmailNormalized", "ExternalOrder"."buyerEmailNormalized"),
         "buyerPhoneNormalized" = coalesce(excluded."buyerPhoneNormalized", "ExternalOrder"."buyerPhoneNormalized"),
         "purchasedAt" = excluded."purchasedAt",
+        "archivedAt" = coalesce("ExternalOrder"."archivedAt", excluded."archivedAt"),
         "updatedAt" = excluded."updatedAt"
       returning id
     `,
@@ -246,6 +248,7 @@ async function upsertExternalOrder(client, order) {
       order.buyerEmailNormalized || null,
       order.buyerPhoneNormalized || null,
       order.purchasedAt,
+      order.archivedAt || null,
     ],
   );
   return result.rows[0].id;
@@ -264,6 +267,11 @@ function preferredProviderOrderNumber(order) {
     if (/^\d{4,}$/.test(text) || /^[A-Z0-9][-A-Z0-9]{3,}$/i.test(text)) return text;
   }
   return null;
+}
+
+function isArchivableTcStatus(status) {
+  const value = String(status || "").toLowerCase();
+  return ["cancel", "return", "refund", "reject", "expired", "deleted"].some((token) => value.includes(token));
 }
 
 async function upsertRawOrder(client, externalOrderId, order, refs) {

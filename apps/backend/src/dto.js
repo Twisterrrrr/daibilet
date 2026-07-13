@@ -674,6 +674,7 @@ export async function buildAdminOrdersList(db, searchParams = new URLSearchParam
   const status = String(searchParams.get('status') || 'all').toLowerCase();
   const limit = clampNumber(searchParams.get('limit'), 1, 100, 50);
   const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
+  const includeArchived = view === 'archive';
 
   const result = await db.query(`
     select
@@ -683,6 +684,7 @@ export async function buildAdminOrdersList(db, searchParams = new URLSearchParam
       ext_order.status,
       ext_order."buyerSnapshot",
       ext_order."purchasedAt",
+      ext_order."archivedAt",
       ext_order."updatedAt",
       source.code::text as "sourceCode",
       source.name as "sourceName",
@@ -709,9 +711,11 @@ export async function buildAdminOrdersList(db, searchParams = new URLSearchParam
     left join "ExternalTicket" ticket on ticket."externalOrderId" = ext_order.id
     left join "Event" event on event.id = ticket."eventId"
     left join "EventSession" session on session.id = ticket."sessionId"
+    where ($1::boolean and ext_order."archivedAt" is not null)
+       or (not $1::boolean and ext_order."archivedAt" is null)
     group by ext_order.id, source.id
     order by coalesce(ext_order."purchasedAt", ext_order."updatedAt") desc
-  `);
+  `, [includeArchived]);
 
   const allRows = result.rows.map(mapAdminOrderRow);
   const rows = allRows.filter((order) => {
@@ -720,6 +724,7 @@ export async function buildAdminOrdersList(db, searchParams = new URLSearchParam
     if (view === 'failed_integration' && !isProblemOrderStatus(order.status)) return false;
     if (view === 'unlinked' && !order.tickets.some((ticket) => !ticket.eventId)) return false;
     if (view === 'pending_refunds' && !isRefundStatus(order.status)) return false;
+    if (view === 'archivable' && !order.canArchive) return false;
     if (provider !== 'ALL' && order.sourceCode !== provider) return false;
     if (status !== 'all' && String(order.status || '').toLowerCase() !== status) return false;
     if (!q) return true;
@@ -745,6 +750,11 @@ export async function buildAdminOrdersList(db, searchParams = new URLSearchParam
   const safePage = Math.min(page, pages);
   const windowRows = rows.slice((safePage - 1) * limit, safePage * limit);
 
+  const archiveCountResult = await db.query(`select count(*)::int as total from "ExternalOrder" where "archivedAt" is not null`);
+  const activeCountResult = await db.query(`select count(*)::int as total from "ExternalOrder" where "archivedAt" is null`);
+  const archiveCount = Number(archiveCountResult.rows[0]?.total || 0);
+  const activeCount = Number(activeCountResult.rows[0]?.total || 0);
+
   return {
     generatedAt: new Date().toISOString(),
     page: safePage,
@@ -755,24 +765,104 @@ export async function buildAdminOrdersList(db, searchParams = new URLSearchParam
     sources: Array.from(new Set(allRows.map((order) => order.sourceCode).filter(Boolean))).sort(),
     statuses: Array.from(new Set(allRows.map((order) => order.status).filter(Boolean))).sort((a, b) => a.localeCompare(b, 'ru')),
     quickFilters: [
-      { id: 'all', count: allRows.length },
+      { id: 'all', count: includeArchived ? activeCount : allRows.length },
       { id: 'attention', count: allRows.filter((order) => order.needsAttention).length },
       { id: 'pending_refunds', count: allRows.filter((order) => isRefundStatus(order.status)).length },
       { id: 'missing_artifact', count: allRows.filter((order) => order.artifactStatus === 'missing').length },
       { id: 'failed_integration', count: allRows.filter((order) => isProblemOrderStatus(order.status)).length },
       { id: 'unlinked', count: allRows.filter((order) => order.tickets.some((ticket) => !ticket.eventId)).length },
+      { id: 'archivable', count: allRows.filter((order) => order.canArchive).length },
+      { id: 'archive', count: archiveCount },
     ],
     metrics: {
-      imported: allRows.length,
+      imported: includeArchived ? archiveCount : activeCount,
       confirmed: allRows.filter((order) => isConfirmedOrderStatus(order.status)).length,
       processing: allRows.filter((order) => isProcessingOrderStatus(order.status)).length,
       canceled: allRows.filter((order) => isCanceledOrderStatus(order.status)).length,
+      archived: archiveCount,
       tickets: allRows.reduce((sum, order) => sum + order.tickets.length, 0),
       missingArtifacts: allRows.filter((order) => order.artifactStatus === 'missing').length,
       failedIntegration: allRows.filter((order) => isProblemOrderStatus(order.status)).length,
       needsAttention: allRows.filter((order) => order.needsAttention).length,
     },
   };
+}
+
+export async function archiveAdminOrder(db, orderKey) {
+  const order = await findExternalOrderRow(db, orderKey);
+  if (!order) {
+    const error = new Error('order_not_found');
+    error.statusCode = 404;
+    throw error;
+  }
+  if (order.archivedAt) return buildAdminOrderDetail(db, order.id);
+  if (!isArchivableOrderStatus(order.status)) {
+    const error = new Error('order_not_archivable');
+    error.statusCode = 400;
+    throw error;
+  }
+  await db.query('update "ExternalOrder" set "archivedAt" = now(), "updatedAt" = now() where id = $1', [order.id]);
+  return buildAdminOrderDetail(db, order.id);
+}
+
+export async function unarchiveAdminOrder(db, orderKey) {
+  const order = await findExternalOrderRow(db, orderKey);
+  if (!order) {
+    const error = new Error('order_not_found');
+    error.statusCode = 404;
+    throw error;
+  }
+  await db.query('update "ExternalOrder" set "archivedAt" = null, "updatedAt" = now() where id = $1', [order.id]);
+  return buildAdminOrderDetail(db, order.id);
+}
+
+export async function archiveAdminOrdersBulk(db, body = {}) {
+  const statuses = Array.isArray(body.statuses) && body.statuses.length
+    ? body.statuses.map((item) => String(item || '').toLowerCase()).filter(Boolean)
+    : ['cancelled', 'canceled', 'expired', 'deleted', 'rejected', 'refunded'];
+  const result = await db.query(
+    `
+      update "ExternalOrder"
+      set "archivedAt" = now(), "updatedAt" = now()
+      where "archivedAt" is null
+        and lower(status) = any($1::text[])
+      returning id
+    `,
+    [statuses],
+  );
+  return {
+    archived: result.rows.length,
+    ids: result.rows.map((row) => row.id),
+  };
+}
+
+export async function deleteAdminOrder(db, orderKey) {
+  const order = await findExternalOrderRow(db, orderKey);
+  if (!order) {
+    const error = new Error('order_not_found');
+    error.statusCode = 404;
+    throw error;
+  }
+  await db.query('update "CheckoutOrder" set "externalOrderId" = null where "externalOrderId" = $1', [order.id]).catch(() => undefined);
+  await db.query('update "RefundRequest" set "externalOrderId" = null where "externalOrderId" = $1', [order.id]).catch(() => undefined);
+  await db.query('delete from "ExternalTicket" where "externalOrderId" = $1', [order.id]);
+  await db.query('delete from "ExternalOrder" where id = $1', [order.id]);
+  return { ok: true, deletedId: order.id };
+}
+
+async function findExternalOrderRow(db, orderKey) {
+  const key = String(orderKey || '').trim();
+  if (!key) return null;
+  const result = await db.query(
+    `
+      select id, status, "archivedAt"
+      from "ExternalOrder"
+      where id = $1 or "externalOrderId" = $1 or "publicCode" = $1
+      limit 1
+    `,
+    [key],
+  );
+  return result.rows[0] || null;
 }
 
 export async function buildPublicBuyerOrders(db, searchParams = new URLSearchParams()) {
@@ -862,11 +952,14 @@ export async function buildPublicBuyerOrders(db, searchParams = new URLSearchPar
 }
 
 const ACCOUNT_ORDER_EMAIL_FILTER = `
-  lower(trim(coalesce(ext_order."buyerEmailNormalized", ''))) = $1
-  or lower(trim(coalesce(ext_order."buyerSnapshot"->>'email', ''))) = $1
-  or lower(trim(coalesce(ext_order."buyerSnapshot"->>'customerEmail', ''))) = $1
-  or lower(trim(coalesce(ext_order."buyerSnapshot"->'buyer'->>'email', ''))) = $1
-  or lower(trim(coalesce(ext_order."buyerSnapshot"->'customer'->>'email', ''))) = $1
+  (
+    lower(trim(coalesce(ext_order."buyerEmailNormalized", ''))) = $1
+    or lower(trim(coalesce(ext_order."buyerSnapshot"->>'email', ''))) = $1
+    or lower(trim(coalesce(ext_order."buyerSnapshot"->>'customerEmail', ''))) = $1
+    or lower(trim(coalesce(ext_order."buyerSnapshot"->'buyer'->>'email', ''))) = $1
+    or lower(trim(coalesce(ext_order."buyerSnapshot"->'customer'->>'email', ''))) = $1
+  )
+  and ext_order."archivedAt" is null
 `;
 
 const ACCOUNT_ORDER_SELECT = `
@@ -1353,6 +1446,7 @@ export async function buildAdminOrderDetail(db, orderId) {
         ext_order.status,
         ext_order."buyerSnapshot",
         ext_order."purchasedAt",
+        ext_order."archivedAt",
         ext_order."updatedAt",
         source.code::text as "sourceCode",
         source.name as "sourceName",
@@ -1420,6 +1514,9 @@ function mapAdminOrderRow(row) {
     sourceLabel: sourceLabel(sourceCode),
     buyer,
     purchasedAt: row.purchasedAt || row.updatedAt || null,
+    archivedAt: row.archivedAt || null,
+    isArchived: Boolean(row.archivedAt),
+    canArchive: !row.archivedAt && isArchivableOrderStatus(row.status),
     updatedAt: row.updatedAt || null,
     ticketCount: Number(row.ticketCount || tickets.length || 0),
     unlinkedTickets: Number(row.unlinkedTickets || 0),
@@ -1633,7 +1730,11 @@ function isProcessingOrderStatus(status) {
 
 function isCanceledOrderStatus(status) {
   const value = String(status || '').toLowerCase();
-  return ['cancel', 'return', 'refund', 'reject', 'expired'].some((token) => value.includes(token));
+  return ['cancel', 'return', 'refund', 'reject', 'expired', 'deleted'].some((token) => value.includes(token));
+}
+
+function isArchivableOrderStatus(status) {
+  return isCanceledOrderStatus(status) || isRefundStatus(status) || String(status || '').toLowerCase().includes('deleted');
 }
 
 function isRefundStatus(status) {
