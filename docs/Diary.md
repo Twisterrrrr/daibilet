@@ -4,6 +4,24 @@
 
 ---
 
+## 2026-07-14 — Checkout via own iframe modal (TC + TEP)
+
+### Наблюдения
+
+- Вендорные tcwidget.js / Teplohod Fancybox нестабильны в Next (synthetic click, style#loader, fallback races).
+- Checkout URL обоих провайдеров **можно встраивать в iframe** (нет X-Frame-Options).
+
+### Решения
+
+- `CheckoutModal` + `CheckoutModalButton`: наша модалка с iframe на `ticketscloud.com/v1/widgets/common` и `account.teplohod.info/order/event-order`.
+- Event page / landing / catalog purchase CTA переведены на эту модалку — предсказуемый UX без зависимости от vendor DOM.
+
+### Проблемы
+
+- —
+
+---
+
 ## 2026-07-14 — Root cause: TC style#ticketscloud-loader misdetected as spinner
 
 ### Наблюдения

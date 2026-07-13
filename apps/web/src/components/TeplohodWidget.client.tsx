@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 
+import { CheckoutModalButton } from '@/components/CheckoutModal.client';
+
 const DEFAULT_TEP_WIDGET_ID = process.env.NEXT_PUBLIC_TEP_WIDGET_ID?.trim() || '14208';
 const TEP_WIDGET_SCRIPT_URL = 'https://api.teplohod.info/v1/widget/widget.js';
 
@@ -217,7 +219,7 @@ export function getTeplohodWidgetIds(event: {
   };
 }
 
-function resolveTeplohodCheckoutUrl(options: {
+export function resolveTeplohodCheckoutUrl(options: {
   purchaseUrl?: string | null;
   tepEventId?: string | number | null;
   tepWidgetId?: string | number | null;
@@ -391,37 +393,22 @@ export function TeplohodWidgetButton({
   className?: string;
   purchaseUrl?: string | null;
 }) {
-  const containerId = React.useId().replace(/:/g, '');
   const eventId = normalizeTeplohodEventId(tepEventId);
   if (!eventId) return null;
 
-  const handleClick = () => {
-    openTeplohodPurchase({
-      wrapperId: containerId,
-      purchaseUrl,
-      tepEventId: eventId,
-      tepWidgetId,
-    });
-  };
+  const checkoutUrl = resolveTeplohodCheckoutUrl({
+    purchaseUrl,
+    tepEventId: eventId,
+    tepWidgetId,
+  });
+  if (!checkoutUrl) return null;
 
   return (
-    <>
-      <div
-        id={containerId}
-        className="pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0"
-        aria-hidden="true"
-      >
-        <TeplohodWidgetEmbed
-          tepEventId={eventId}
-          tepWidgetId={tepWidgetId}
-          wrapperId={containerId}
-          purchaseUrl={purchaseUrl}
-          showFallbackButton={false}
-        />
-      </div>
-      <button type="button" onClick={handleClick} className={className}>
-        {label}
-      </button>
-    </>
+    <CheckoutModalButton
+      checkoutUrl={checkoutUrl}
+      label={label}
+      className={className}
+      title="Покупка билета — Teplohod.info"
+    />
   );
 }

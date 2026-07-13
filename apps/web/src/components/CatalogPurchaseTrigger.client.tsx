@@ -2,12 +2,9 @@
 
 import * as React from 'react';
 
-import {
-  getTcWidgetIds,
-  openTcWidget,
-  resolveTcWidgetToken,
-} from '@/components/TcWidget.client';
-import { getTeplohodWidgetIds, openTeplohodPurchase, TeplohodWidgetEmbed } from '@/components/TeplohodWidget.client';
+import { CheckoutModal } from '@/components/CheckoutModal.client';
+import { buildTcCheckoutUrl, getTcWidgetIds } from '@/components/TcWidget.client';
+import { getTeplohodWidgetIds, resolveTeplohodCheckoutUrl } from '@/components/TeplohodWidget.client';
 import { extractTcEventIdFromSession } from '@/lib/event-purchase';
 import {
   canOpenCatalogPurchase,
@@ -20,101 +17,66 @@ function stopCardNavigation(event: React.MouseEvent) {
   event.stopPropagation();
 }
 
+function resolveCheckoutUrl(session: PublicSessionDto): string | null {
+  const teplohod = getTeplohodWidgetIds(session);
+  if (teplohod?.tepEventId) {
+    return resolveTeplohodCheckoutUrl({
+      purchaseUrl: session.purchaseUrl || session.widgetUrl,
+      tepEventId: teplohod.tepEventId,
+      tepWidgetId: teplohod.tepWidgetId,
+    });
+  }
+
+  const tcEventId = extractTcEventIdFromSession(session) || getTcWidgetIds(session)?.tcEventId || '';
+  return buildTcCheckoutUrl({
+    tcEventId,
+    purchaseUrl: session.purchaseUrl || session.widgetUrl || session.deeplinkUrl,
+  });
+}
+
 export function useCatalogPurchase(session: PublicSessionDto) {
-  const tcTriggerRef = React.useRef<HTMLButtonElement | null>(null);
-  const teplohodWrapperId = React.useId().replace(/:/g, '');
   const purchaseEnabled = canOpenCatalogPurchase(session);
-  const teplohod = purchaseEnabled ? getTeplohodWidgetIds(session) : null;
-  const tcWidget = purchaseEnabled ? getTcWidgetIds(session) : null;
-  const tcEventId = extractTcEventIdFromSession(session) || tcWidget?.tcEventId || '';
-  const tcToken = resolveTcWidgetToken(session.purchaseUrl);
+  const [modalUrl, setModalUrl] = React.useState<string | null>(null);
+  const tcTriggerRef = React.useRef<HTMLButtonElement>(null);
 
   const openPurchase = React.useCallback(
     (slotLabel?: string) => {
       const target = slotLabel ? resolvePurchaseSessionForSlot(session, slotLabel) : session;
-      const targetTeplohod = getTeplohodWidgetIds(target);
-      const targetTcEventId = extractTcEventIdFromSession(target) || tcEventId;
-      const targetToken = resolveTcWidgetToken(target.purchaseUrl || session.purchaseUrl);
-
-      if (targetTeplohod?.tepEventId) {
-        openTeplohodPurchase({
-          wrapperId: teplohodWrapperId,
-          purchaseUrl: target.purchaseUrl || session.purchaseUrl || session.widgetUrl,
-          tepEventId: targetTeplohod.tepEventId,
-          tepWidgetId: targetTeplohod.tepWidgetId,
-        });
-        return;
-      }
-
-      if (targetTcEventId && targetToken) {
-        void openTcWidget({ trigger: tcTriggerRef.current, purchaseUrl: target.purchaseUrl || session.purchaseUrl });
-        return;
-      }
-
-      const fallbackUrl = target.purchaseUrl || session.purchaseUrl || session.widgetUrl || session.deeplinkUrl;
-      if (fallbackUrl) {
-        window.open(fallbackUrl, '_blank', 'noopener,noreferrer');
-      }
+      const url = resolveCheckoutUrl(target) || resolveCheckoutUrl(session);
+      if (url) setModalUrl(url);
     },
-    [session, tcEventId, teplohodWrapperId],
+    [session],
   );
 
   return {
     purchaseEnabled,
-    teplohod,
-    tcEventId,
-    tcToken,
-    tcTriggerRef,
-    teplohodWrapperId,
     openPurchase,
+    modalUrl,
+    closeModal: () => setModalUrl(null),
+    teplohod: purchaseEnabled ? getTeplohodWidgetIds(session) : null,
+    tcEventId: extractTcEventIdFromSession(session) || '',
+    tcToken: '',
+    tcTriggerRef,
+    teplohodWrapperId: '',
   };
 }
 
 export function CatalogPurchaseAnchors({
-  session,
-  teplohod,
-  teplohodWrapperId,
-  tcEventId,
-  tcToken,
-  tcTriggerRef,
+  modalUrl,
+  onClose,
 }: {
-  session: PublicSessionDto;
-  teplohod: ReturnType<typeof getTeplohodWidgetIds>;
-  teplohodWrapperId: string;
-  tcEventId: string;
-  tcToken: string;
-  tcTriggerRef: React.RefObject<HTMLButtonElement | null>;
+  modalUrl?: string | null;
+  onClose?: () => void;
+  // legacy unused props accepted for soft upgrade
+  session?: PublicSessionDto;
+  teplohod?: unknown;
+  teplohodWrapperId?: string;
+  tcEventId?: string;
+  tcToken?: string;
+  tcTriggerRef?: React.RefObject<HTMLButtonElement | null>;
 }) {
-  if (!teplohod && !(tcEventId && tcToken)) return null;
-
-  return (
-    <div
-      className="pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0"
-      aria-hidden="true"
-    >
-      {teplohod ? (
-        <TeplohodWidgetEmbed
-          tepEventId={teplohod.tepEventId}
-          tepWidgetId={teplohod.tepWidgetId}
-          wrapperId={teplohodWrapperId}
-          purchaseUrl={session.purchaseUrl || session.widgetUrl}
-          showFallbackButton={false}
-        />
-      ) : null}
-      {tcEventId && tcToken ? (
-        <button
-          ref={tcTriggerRef}
-          type="button"
-          data-tc-event={tcEventId}
-          data-tc-token={tcToken}
-          className="tc-widget-trigger"
-          tabIndex={-1}
-        >
-          {session.title}
-        </button>
-      ) : null}
-    </div>
-  );
+  if (!modalUrl || !onClose) return null;
+  return <CheckoutModal open={Boolean(modalUrl)} checkoutUrl={modalUrl} onClose={onClose} title="Покупка билета" />;
 }
 
 export function CatalogPurchaseChip({

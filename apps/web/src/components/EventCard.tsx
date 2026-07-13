@@ -204,14 +204,7 @@ export function EventCard({
         ) : null}
 
         {showPurchaseWidgets ? (
-          <CatalogPurchaseAnchors
-            session={session}
-            teplohod={purchase.teplohod}
-            teplohodWrapperId={purchase.teplohodWrapperId}
-            tcEventId={purchase.tcEventId}
-            tcToken={purchase.tcToken}
-            tcTriggerRef={purchase.tcTriggerRef}
-          />
+          <CatalogPurchaseAnchors modalUrl={purchase.modalUrl} onClose={purchase.closeModal} />
         ) : null}
 
         <div className="mt-auto flex items-center justify-between gap-2 pt-3">

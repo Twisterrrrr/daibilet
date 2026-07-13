@@ -24,7 +24,8 @@ import {
   scrollToBuyCard,
 } from '@/lib/event-page-utils';
 import { cityHref, venueHref } from '@/lib/routes';
-import { getTeplohodWidgetIds, openTeplohodWidget, TeplohodWidgetEmbed } from '@/components/TeplohodWidget.client';
+import { getTeplohodWidgetIds, resolveTeplohodCheckoutUrl } from '@/components/TeplohodWidget.client';
+import { CheckoutModalButton } from '@/components/CheckoutModal.client';
 import { normalizeTcPurchaseUrl, TcOptionBuyButton, TcSessionSlot, TcWidgetButton } from '@/components/TcWidget.client';
 
 type EventSession = PublicEventPageDto['sessions'][number] & {
@@ -145,11 +146,21 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
       {!showMultiPurchase ? (
         <div className="mt-5">
           {isTepWidget && teplohod ? (
-            <TeplohodWidgetEmbed
-              tepEventId={teplohod.tepEventId}
-              tepWidgetId={teplohod.tepWidgetId}
-              purchaseUrl={event.purchaseUrl || event.widgetUrl || purchaseUrl}
-            />
+            <div>
+              <CheckoutModalButton
+                checkoutUrl={resolveTeplohodCheckoutUrl({
+                  purchaseUrl: event.purchaseUrl || event.widgetUrl || purchaseUrl,
+                  tepEventId: teplohod.tepEventId,
+                  tepWidgetId: teplohod.tepWidgetId,
+                })}
+                label="Купить билет"
+                title="Покупка билета — Teplohod.info"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-medium text-white transition hover:bg-primary-700"
+              />
+              <p className="mt-2 text-xs leading-5 text-slate-500">
+                Выберите дату и категорию билета в окне Teplohod.info.
+              </p>
+            </div>
           ) : isTcWidget && tcEventId ? (
             <TcWidgetButton
               tcEventId={tcEventId}
@@ -286,17 +297,18 @@ export function EventHeroBuyButton({
   }
 
   if (teplohod) {
+    const checkoutUrl = resolveTeplohodCheckoutUrl({
+      purchaseUrl: event.purchaseUrl || event.widgetUrl || purchaseUrl,
+      tepEventId: teplohod.tepEventId,
+      tepWidgetId: teplohod.tepWidgetId,
+    });
     return (
-      <button
-        type="button"
-        onClick={() => {
-          scrollToBuyCard();
-          window.setTimeout(() => openTeplohodWidget(), 250);
-        }}
+      <CheckoutModalButton
+        checkoutUrl={checkoutUrl}
+        label={label}
+        title="Покупка билета — Teplohod.info"
         className={`inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-base font-semibold text-white shadow-md shadow-amber-700/30 transition hover:bg-amber-600 active:bg-amber-700 sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`}
-      >
-        {label}
-      </button>
+      />
     );
   }
 

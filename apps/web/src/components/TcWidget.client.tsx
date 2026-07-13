@@ -11,6 +11,7 @@ import {
   formatVacantSeats,
   isFlexibleScheduleSession,
 } from '@/lib/event-page-utils';
+import { CheckoutModalButton } from '@/components/CheckoutModal.client';
 
 const TC_WIDGET_SCRIPT_URL = 'https://ticketscloud.com/static/scripts/widget/tcwidget.js';
 const TC_WIDGET_TOKEN = process.env.NEXT_PUBLIC_TC_WIDGET_TOKEN?.trim() || '';
@@ -52,6 +53,23 @@ export function normalizeTcPurchaseUrl(purchaseUrl?: string | null): string | nu
   } catch {
     return purchaseUrl;
   }
+}
+
+export function buildTcCheckoutUrl(options: {
+  tcEventId?: string | null;
+  purchaseUrl?: string | null;
+}): string | null {
+  const fromPurchase = normalizeTcPurchaseUrl(options.purchaseUrl);
+  if (fromPurchase) return fromPurchase;
+
+  const eventId = String(options.tcEventId || '').trim();
+  const token = resolveTcWidgetToken(options.purchaseUrl);
+  if (!eventId || !token) return null;
+
+  const url = new URL('https://ticketscloud.com/v1/widgets/common');
+  url.searchParams.set('token', token);
+  url.searchParams.set('event', eventId);
+  return url.toString();
 }
 
 export function getTcWidgetIds(event: {
@@ -278,64 +296,43 @@ export function TcSessionSlot({
     purchaseUrl?: string | null;
   };
 }) {
-  const hiddenTriggerRef = React.useRef<HTMLButtonElement | null>(null);
   const eventId = String(extractTcEventIdFromSession(session) || tcEventId || '').trim();
-  const widgetToken = resolveTcWidgetToken(session.purchaseUrl);
+  const checkoutUrl = buildTcCheckoutUrl({ tcEventId: eventId, purchaseUrl: session.purchaseUrl });
   const fmt = formatSessionLabels(session);
   const vacant = session.vacant ?? 0;
   const flexibleSchedule = isFlexibleScheduleSession(session);
 
-  React.useEffect(() => {
-    if (!eventId || !widgetToken) return;
-    void ensureTcWidgetScript().catch(() => undefined);
-  }, [eventId, widgetToken]);
-
-  if (!eventId || !widgetToken) {
+  if (!checkoutUrl) {
     return <StaticSessionRow session={session} purchaseUrl={session.purchaseUrl} />;
   }
 
   return (
-    <>
-      <button
-        type="button"
-        className="tc-session-slot"
-        onClick={() => {
-          void openTcWidget({ trigger: hiddenTriggerRef.current, purchaseUrl: session.purchaseUrl });
-        }}
-      >
-        <div className="flex items-center gap-3">
-          {!flexibleSchedule ? (
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-xs text-slate-600">
-              {fmt.weekday}
-            </div>
-          ) : null}
-          <div className="text-left">
-            <p className="text-sm font-medium text-slate-800">
-              {flexibleSchedule ? FLEXIBLE_SCHEDULE_LABEL : fmt.date}
-            </p>
-            {fmt.time && !flexibleSchedule ? <p className="text-xs text-slate-400">{fmt.time}</p> : null}
+    <CheckoutModalButton
+      checkoutUrl={checkoutUrl}
+      title="Покупка билета — Ticketscloud"
+      className="tc-session-slot flex w-full items-center justify-between rounded-lg bg-slate-50 px-3 py-2.5 text-left transition hover:bg-slate-100"
+    >
+      <div className="flex items-center gap-3">
+        {!flexibleSchedule ? (
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-xs text-slate-600">
+            {fmt.weekday}
           </div>
+        ) : null}
+        <div className="text-left">
+          <p className="text-sm font-medium text-slate-800">
+            {flexibleSchedule ? FLEXIBLE_SCHEDULE_LABEL : fmt.date}
+          </p>
+          {fmt.time && !flexibleSchedule ? <p className="text-xs text-slate-400">{fmt.time}</p> : null}
         </div>
-        {vacant > 0 ? (
-          <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs text-emerald-600">
-            {formatVacantSeats(vacant)}
-          </span>
-        ) : (
-          <span className="shrink-0 rounded-full bg-red-50 px-2.5 py-1 text-xs text-red-500">Распродано</span>
-        )}
-      </button>
-      <button
-        ref={hiddenTriggerRef}
-        type="button"
-        data-tc-event={eventId}
-        data-tc-token={widgetToken}
-        className="tc-widget-trigger"
-        aria-hidden="true"
-        tabIndex={-1}
-      >
-        {fmt.date} {fmt.time}
-      </button>
-    </>
+      </div>
+      {vacant > 0 ? (
+        <span className="shrink-0 rounded-full bg-emerald-50 px-2.5 py-1 text-xs text-emerald-600">
+          {formatVacantSeats(vacant)}
+        </span>
+      ) : (
+        <span className="shrink-0 rounded-full bg-red-50 px-2.5 py-1 text-xs text-red-500">Распродано</span>
+      )}
+    </CheckoutModalButton>
   );
 }
 
@@ -399,7 +396,7 @@ function StaticSessionRow({
 export function TcWidgetButton({
   tcEventId,
   purchaseUrl,
-  purchaseTargets,
+  purchaseTargets: _purchaseTargets,
   label = 'Купить билет',
   wide = false,
   variant = 'default',
@@ -413,18 +410,8 @@ export function TcWidgetButton({
   variant?: 'default' | 'hero';
   className?: string;
 }) {
-  const hiddenButtonRef = React.useRef<HTMLButtonElement | null>(null);
   const eventId = String(tcEventId || '').trim();
-  const widgetToken = resolveTcWidgetToken(purchaseUrl);
-
-  React.useEffect(() => {
-    if (!eventId || !widgetToken) return;
-    void ensureTcWidgetScript().catch(() => undefined);
-  }, [eventId, widgetToken]);
-
-  const handleClick = () => {
-    void openTcWidget({ trigger: hiddenButtonRef.current, purchaseUrl });
-  };
+  const checkoutUrl = buildTcCheckoutUrl({ tcEventId: eventId, purchaseUrl });
 
   const fallbackLinkClass =
     variant === 'hero'
@@ -433,7 +420,7 @@ export function TcWidgetButton({
         ? 'flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-medium text-white transition hover:bg-primary-700'
         : 'inline-flex min-h-10 items-center justify-center rounded-xl bg-primary-600 px-6 py-3.5 text-base font-medium text-white transition hover:bg-primary-700';
 
-  if (!eventId || !widgetToken) {
+  if (!checkoutUrl) {
     if (purchaseUrl) {
       const href = normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl;
       return (
@@ -462,22 +449,12 @@ export function TcWidgetButton({
     `tc-buy-btn inline-flex min-h-10 items-center justify-center gap-2 ${colorClasses} ${sizeClasses} ${wide ? 'w-full' : ''}`;
 
   return (
-    <>
-      <button type="button" className={buttonClassName} onClick={handleClick}>
-        {label}
-      </button>
-      <button
-        ref={hiddenButtonRef}
-        type="button"
-        data-tc-event={eventId}
-        data-tc-token={widgetToken}
-        className="tc-widget-trigger"
-        aria-hidden="true"
-        tabIndex={-1}
-      >
-        {label}
-      </button>
-    </>
+    <CheckoutModalButton
+      checkoutUrl={checkoutUrl}
+      label={label}
+      className={buttonClassName}
+      title="Покупка билета — Ticketscloud"
+    />
   );
 }
 
@@ -492,20 +469,10 @@ export function TcOptionBuyButton({
   label?: string;
   className?: string;
 }) {
-  const hiddenTriggerRef = React.useRef<HTMLButtonElement | null>(null);
   const eventId = String(tcEventId || '').trim();
-  const widgetToken = resolveTcWidgetToken(purchaseUrl);
+  const checkoutUrl = buildTcCheckoutUrl({ tcEventId: eventId, purchaseUrl });
 
-  React.useEffect(() => {
-    if (!eventId || !widgetToken) return;
-    void ensureTcWidgetScript().catch(() => undefined);
-  }, [eventId, widgetToken]);
-
-  const handleClick = () => {
-    void openTcWidget({ trigger: hiddenTriggerRef.current, purchaseUrl });
-  };
-
-  if (!eventId || !widgetToken) {
+  if (!checkoutUrl) {
     if (!purchaseUrl) return null;
     const href = normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl;
     return (
@@ -513,7 +480,10 @@ export function TcOptionBuyButton({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className={className || 'inline-flex shrink-0 items-center justify-center rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-primary-700'}
+        className={
+          className ||
+          'inline-flex shrink-0 items-center justify-center rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-primary-700'
+        }
       >
         {label}
       </a>
@@ -521,28 +491,14 @@ export function TcOptionBuyButton({
   }
 
   return (
-    <>
-      <button
-        type="button"
-        onClick={handleClick}
-        className={
-          className ||
-          'inline-flex shrink-0 items-center justify-center rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-primary-700'
-        }
-      >
-        {label}
-      </button>
-      <button
-        ref={hiddenTriggerRef}
-        type="button"
-        data-tc-event={eventId}
-        data-tc-token={widgetToken}
-        className="tc-widget-trigger pointer-events-none fixed -left-[9999px] opacity-0"
-        aria-hidden="true"
-        tabIndex={-1}
-      >
-        {label}
-      </button>
-    </>
+    <CheckoutModalButton
+      checkoutUrl={checkoutUrl}
+      label={label}
+      title="Покупка билета — Ticketscloud"
+      className={
+        className ||
+        'inline-flex shrink-0 items-center justify-center rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-primary-700'
+      }
+    />
   );
 }
