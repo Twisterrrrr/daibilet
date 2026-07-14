@@ -388,9 +388,8 @@ export async function buildAdminDashboard(db) {
     getCachedAdminGroupedEvents(db),
   ]);
 
-  const events = cached.items;
   const launch = {
-    ...buildLaunchMetrics(events),
+    ...(cached.launch || buildLaunchMetrics(cached.items || [])),
     source: 'admin_event_groups',
   };
   const destinations = Number(destinationCountResult.rows[0]?.total || 0);
@@ -418,7 +417,7 @@ export async function buildAdminDashboard(db) {
 async function buildAdminLaunchMetricsCompact(db) {
   const cached = await getCachedAdminGroupedEvents(db);
   return {
-    ...buildLaunchMetrics(cached.items),
+    ...(cached.launch || buildLaunchMetrics(cached.items || [])),
     source: 'admin_event_groups',
   };
 }
@@ -1878,7 +1877,7 @@ function orderStatusLabel(status) {
   return status || 'неизвестно';
 }
 
-let adminGroupedEventsCache = { expiresAt: 0, staleUntil: 0, items: null, sourceCount: 0, builtAt: 0 };
+let adminGroupedEventsCache = { expiresAt: 0, staleUntil: 0, items: null, launch: null, sourceCount: 0, builtAt: 0 };
 let adminGroupedEventsBuildPromise = null;
 const ADMIN_GROUPED_EVENTS_TTL_MS = Number(process.env.ADMIN_GROUPED_EVENTS_TTL_MS || 5 * 60_000);
 const ADMIN_GROUPED_EVENTS_STALE_MS = Number(process.env.ADMIN_GROUPED_EVENTS_STALE_MS || 30 * 60_000);
@@ -1896,6 +1895,7 @@ function scheduleAdminGroupedEventsRebuild(db, reason = 'refresh') {
         expiresAt: now + Math.max(30_000, ADMIN_GROUPED_EVENTS_TTL_MS),
         staleUntil: now + Math.max(60_000, ADMIN_GROUPED_EVENTS_STALE_MS),
         items,
+        launch: buildLaunchMetrics(items),
         sourceCount: sourceEvents.length,
         builtAt: now,
       };
@@ -1943,7 +1943,7 @@ export function invalidateAdminGroupedEventsCache(db = null, reason = 'invalidat
       expiresAt: 0,
     };
   } else {
-    adminGroupedEventsCache = { expiresAt: 0, staleUntil: 0, items: null, sourceCount: 0, builtAt: 0 };
+    adminGroupedEventsCache = { expiresAt: 0, staleUntil: 0, items: null, launch: null, sourceCount: 0, builtAt: 0 };
   }
   if (db) {
     void scheduleAdminGroupedEventsRebuild(db, reason);
@@ -1969,9 +1969,23 @@ export async function buildAdminEventsList(db, searchParams) {
 
   const cached = await getCachedAdminGroupedEvents(db);
   const events = cached.items;
+  const launch = cached.launch || buildLaunchMetrics(events);
   const quickFilters = ['all', 'needs_attention', 'ready_publish', 'purchase_blocked', 'no_image', 'landing_match'].map((id) => ({
     id,
-    count: events.filter((event) => matchesAdminQuickFilter(event, id)).length,
+    count:
+      id === 'all'
+        ? events.length
+        : id === 'needs_attention'
+          ? launch.needsAttention
+          : id === 'ready_publish'
+            ? launch.readyForSeo
+            : id === 'purchase_blocked'
+              ? launch.purchaseBlocked
+              : id === 'no_image'
+                ? launch.noImage
+                : id === 'landing_match'
+                  ? launch.landingMatched
+                  : events.filter((event) => matchesAdminQuickFilter(event, id)).length,
   }));
 
   const rows = events.filter((event) => {
@@ -2015,13 +2029,13 @@ export async function buildAdminEventsList(db, searchParams) {
     quickFilters,
     metrics: {
       events: events.length,
-      readyEvents: events.filter((event) => event.readiness === 'ready' && event.canPublish !== false).length,
-      reviewEvents: events.filter((event) => event.readiness !== 'ready' || event.canPublish === false).length,
+      readyEvents: launch.readyForSeo,
+      reviewEvents: Math.max(0, events.length - launch.readyForSeo),
       landingRules: LANDING_RULES.length,
       sourceEvents: cached.sourceCount,
       groupedEvents: events.length,
       launch: {
-        ...buildLaunchMetrics(events),
+        ...launch,
         source: 'admin_event_groups',
       },
     },
