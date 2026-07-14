@@ -5110,8 +5110,6 @@ async function eventRows(db, limit, options = {}) {
         e."categoryId",
         e."primarySubcategoryId",
         override.title as "overrideTitle",
-        // Keep override text even in lean lists: Content/SEO tabs edit these fields.
-        // Nulling them made admin forms open empty and PATCH wipe existing overrides.
         override.description as "overrideDescription",
         override."shortDescription" as "overrideShortDescription",
         override."imageUrl" as "overrideImageUrl",
