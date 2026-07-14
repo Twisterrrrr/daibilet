@@ -102,6 +102,25 @@ export function getTeplohodWidgetIds(event: {
   };
 }
 
+export function getTeplohodWidgetIdsFromSession(session: {
+  id?: string | null;
+  purchaseProvider?: string | null;
+  offerSourceCode?: string | null;
+  purchaseUrl?: string | null;
+  widgetUrl?: string | null;
+}) {
+  const purchaseUrl = session.widgetUrl || session.purchaseUrl || null;
+  const fromId = String(session.id || '').match(/^evt_tep_(\d+)$/i)?.[1];
+  return getTeplohodWidgetIds({
+    externalId: fromId,
+    widgetProvider: session.purchaseProvider || session.offerSourceCode,
+    purchaseProvider: session.purchaseProvider,
+    offerSourceCode: session.offerSourceCode,
+    purchaseUrl,
+    widgetUrl: session.widgetUrl,
+  });
+}
+
 export function resolveTeplohodCheckoutUrl(options: {
   purchaseUrl?: string | null;
   tepEventId?: string | number | null;
