@@ -1878,30 +1878,84 @@ function orderStatusLabel(status) {
   return status || 'неизвестно';
 }
 
-let adminGroupedEventsCache = { expiresAt: 0, items: null, sourceCount: 0 };
+let adminGroupedEventsCache = { expiresAt: 0, staleUntil: 0, items: null, sourceCount: 0, builtAt: 0 };
 let adminGroupedEventsBuildPromise = null;
+const ADMIN_GROUPED_EVENTS_TTL_MS = Number(process.env.ADMIN_GROUPED_EVENTS_TTL_MS || 5 * 60_000);
+const ADMIN_GROUPED_EVENTS_STALE_MS = Number(process.env.ADMIN_GROUPED_EVENTS_STALE_MS || 30 * 60_000);
+
+function scheduleAdminGroupedEventsRebuild(db, reason = 'refresh') {
+  if (adminGroupedEventsBuildPromise) return adminGroupedEventsBuildPromise;
+
+  adminGroupedEventsBuildPromise = (async () => {
+    const startedAt = Date.now();
+    try {
+      const sourceEvents = await eventRows(db, null, { lean: true });
+      const items = groupAdminEventRows(sourceEvents);
+      const now = Date.now();
+      adminGroupedEventsCache = {
+        expiresAt: now + Math.max(30_000, ADMIN_GROUPED_EVENTS_TTL_MS),
+        staleUntil: now + Math.max(60_000, ADMIN_GROUPED_EVENTS_STALE_MS),
+        items,
+        sourceCount: sourceEvents.length,
+        builtAt: now,
+      };
+      console.log(
+        `Admin grouped events cache rebuilt (${reason}): ${sourceEvents.length} raw → ${items.length} groups in ${now - startedAt}ms`,
+      );
+      return adminGroupedEventsCache;
+    } finally {
+      adminGroupedEventsBuildPromise = null;
+    }
+  })().catch((error) => {
+    adminGroupedEventsBuildPromise = null;
+    console.warn(
+      `Admin grouped events cache rebuild failed (${reason}): ${error instanceof Error ? error.message : String(error)}`,
+    );
+    throw error;
+  });
+
+  return adminGroupedEventsBuildPromise;
+}
 
 async function getCachedAdminGroupedEvents(db) {
+  const now = Date.now();
+  const cached = adminGroupedEventsCache;
+
+  // Fresh hit — switching Events/Dashboard/Landings stays in-memory.
+  if (cached.items && now < cached.expiresAt) {
+    return cached;
+  }
+
+  // Stale-while-revalidate: serve previous catalog immediately, refresh in background.
+  if (cached.items && now < cached.staleUntil) {
+    void scheduleAdminGroupedEventsRebuild(db, 'swr');
+    return cached;
+  }
+
+  return scheduleAdminGroupedEventsRebuild(db, cached.items ? 'hard-expire' : 'cold');
+}
+
+/** Soft-invalidate: keep last payload for instant SWR responses while rebuild runs. */
+export function invalidateAdminGroupedEventsCache(db = null, reason = 'invalidate') {
+  if (adminGroupedEventsCache.items) {
+    adminGroupedEventsCache = {
+      ...adminGroupedEventsCache,
+      expiresAt: 0,
+    };
+  } else {
+    adminGroupedEventsCache = { expiresAt: 0, staleUntil: 0, items: null, sourceCount: 0, builtAt: 0 };
+  }
+  if (db) {
+    void scheduleAdminGroupedEventsRebuild(db, reason);
+  }
+}
+
+export async function warmAdminGroupedEventsCache(db, reason = 'warmup') {
   const now = Date.now();
   if (adminGroupedEventsCache.items && now < adminGroupedEventsCache.expiresAt) {
     return adminGroupedEventsCache;
   }
-  if (adminGroupedEventsBuildPromise) return adminGroupedEventsBuildPromise;
-
-  adminGroupedEventsBuildPromise = (async () => {
-    // Full catalog — no hard LIMIT. Truncation previously hid groups from admin Events.
-    const sourceEvents = await eventRows(db, null, { lean: true });
-    adminGroupedEventsCache = {
-      expiresAt: Date.now() + 60_000,
-      items: groupAdminEventRows(sourceEvents),
-      sourceCount: sourceEvents.length,
-    };
-    return adminGroupedEventsCache;
-  })().finally(() => {
-    adminGroupedEventsBuildPromise = null;
-  });
-
-  return adminGroupedEventsBuildPromise;
+  return scheduleAdminGroupedEventsRebuild(db, reason);
 }
 
 export async function buildAdminEventsList(db, searchParams) {
@@ -2581,6 +2635,7 @@ export async function updateAdminEventTaxonomy(db, eventId, payload) {
   }
 
   const event = (await eventRowsByIds(db, [eventId]))[0] || null;
+  invalidateAdminGroupedEventsCache(db, 'event taxonomy');
   return { eventId, event };
 }
 
@@ -3407,7 +3462,7 @@ export async function updateAdminEventOverride(db, eventId, payload) {
     ],
   );
 
-  adminGroupedEventsCache = { expiresAt: 0, items: null, sourceCount: 0 };
+  invalidateAdminGroupedEventsCache(db, 'event override');
 
   return {
     eventId,

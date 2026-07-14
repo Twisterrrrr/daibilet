@@ -4,7 +4,23 @@
 
 ---
 
-## 2026-07-14 — Admin catalog full load + metrics alignment
+## 2026-07-14 — Admin section switches: SWR cache
+
+### Наблюдения
+
+- Полный admin catalog cache (~25s cold) при TTL 60s заставлял Events/Dashboard/Landings снова ждать при каждом «протухании».
+
+### Решения
+
+- Stale-while-revalidate: fresh 5 мин, отдаём stale до 30 мин + фоновый rebuild.
+- Soft-invalidate на override/taxonomy/sync (не обнуляем payload).
+- Warm admin cache на старте API и после public warm.
+
+### Проблемы
+
+- Первый cold после hard-expire (>30 мин простоя) всё ещё дорогой — редкий кейс.
+
+---
 
 ### Наблюдения
 

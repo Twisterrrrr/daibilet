@@ -62,6 +62,8 @@ import {
   updateAdminLanding,
   updateAdminLandingMatch,
   updateAdminVenue,
+  warmAdminGroupedEventsCache,
+  invalidateAdminGroupedEventsCache,
 } from './dto.js';
 import {
   buildSocialPreviewForPath,
@@ -698,6 +700,10 @@ export function startServer(options = {}) {
   const listen = () => server.listen(serverPort, host, () => {
     console.log(`Daibilet backend listening on http://${host}:${serverPort}`);
     if (!options.prewarmBeforeListen) void warmPublicCaches('startup');
+    // Warm admin catalog in background so Dashboard/Events/Landings switches stay in-memory.
+    void warmAdminGroupedEventsCache(db, 'startup').catch((error) => {
+      console.warn(`Admin cache warm failed: ${error instanceof Error ? error.message : String(error)}`);
+    });
     scheduleTeplohodAutoSync();
     scheduleStaleOrderArchive();
   });
@@ -823,6 +829,10 @@ export async function warmPublicCaches(reason) {
     console.log(
       `Public cache warmed after ${reason}: ${stats?.stats?.events || preview?.sessions?.length || 0} events, ${destinations?.destinations?.length || 0} destinations in ${elapsed}ms${typedSummary ? `; ${typedSummary}` : ''}`,
     );
+    // Keep admin Events/Dashboard/Landings cold-start off the critical switch path.
+    void warmAdminGroupedEventsCache(db, `after:${reason}`).catch((error) => {
+      console.warn(`Admin cache warm failed after ${reason}: ${error instanceof Error ? error.message : String(error)}`);
+    });
     return { elapsedMs: elapsed, typed };
   } catch (error) {
     console.warn(`Public cache warm failed after ${reason}: ${error instanceof Error ? error.message : String(error)}`);
@@ -840,7 +850,11 @@ export function invalidatePublicCaches(reason, options = {}) {
       console.warn(`Public cache invalidator failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
-  if (options.warm) void warmPublicCaches(reason);
+  if (options.warm) {
+    // Soft-expire admin list so UI stays fast (SWR) while rebuild catches import changes.
+    invalidateAdminGroupedEventsCache(db, `public:${reason}`);
+    void warmPublicCaches(reason);
+  }
 }
 
 export function registerPublicCacheInvalidator(invalidator) {
