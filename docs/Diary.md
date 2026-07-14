@@ -4,21 +4,24 @@
 
 ---
 
-## 2026-07-14 — Admin section switches: SWR cache
+## 2026-07-14 — Admin section switches: SWR + landings/sources
 
 ### Наблюдения
 
 - Полный admin catalog cache (~25s cold) при TTL 60s заставлял Events/Dashboard/Landings снова ждать при каждом «протухании».
+- После SWR каталога: Events/Dashboard ~10–40 ms, но Landings ~700–800 ms (`matchesRule` × rules × ~3k) и Sources ~2.5 s (тяжёлый SQL).
 
 ### Решения
 
-- Stale-while-revalidate: fresh 5 мин, отдаём stale до 30 мин + фоновый rebuild.
-- Soft-invalidate на override/taxonomy/sync (не обнуляем payload).
-- Warm admin cache на старте API и после public warm.
+- Stale-while-revalidate каталога: fresh 5 мин, stale до 30 мин + фоновый rebuild; soft-invalidate; warm на startup.
+- Landings: memo `adminLandingsBaseCache` по `catalogBuiltAt` + fingerprint saved landings; invalidate на PATCH landing/match.
+- Sources: SWR fresh 2 мин / stale 10 мин; invalidate вместе с admin catalog.
+- Warm startup: после grouped cache прогреваем Landings list + Sources.
 
 ### Проблемы
 
-- Первый cold после hard-expire (>30 мин простоя) всё ещё дорогой — редкий кейс.
+- Первый cold после hard-expire всё ещё дорогой — редкий кейс.
+- До деплоя этого патча Landings/Sources на warm hit всё ещё медленные.
 
 ---
 

@@ -474,7 +474,58 @@ export async function buildAdminCitiesList(db, searchParams = new URLSearchParam
   };
 }
 
+let adminSourcesCache = { expiresAt: 0, staleUntil: 0, payload: null };
+let adminSourcesBuildPromise = null;
+const ADMIN_SOURCES_TTL_MS = Number(process.env.ADMIN_SOURCES_TTL_MS || 2 * 60_000);
+const ADMIN_SOURCES_STALE_MS = Number(process.env.ADMIN_SOURCES_STALE_MS || 10 * 60_000);
+
+export function invalidateAdminSourcesCache() {
+  if (adminSourcesCache.payload) {
+    adminSourcesCache = { ...adminSourcesCache, expiresAt: 0 };
+  } else {
+    adminSourcesCache = { expiresAt: 0, staleUntil: 0, payload: null };
+  }
+}
+
+function scheduleAdminSourcesRebuild(db, reason = 'refresh') {
+  if (adminSourcesBuildPromise) return adminSourcesBuildPromise;
+  adminSourcesBuildPromise = (async () => {
+    const startedAt = Date.now();
+    try {
+      const payload = await loadAdminSourcesUncached(db);
+      const now = Date.now();
+      adminSourcesCache = {
+        expiresAt: now + Math.max(15_000, ADMIN_SOURCES_TTL_MS),
+        staleUntil: now + Math.max(30_000, ADMIN_SOURCES_STALE_MS),
+        payload,
+      };
+      console.log(`Admin sources cache rebuilt (${reason}) in ${now - startedAt}ms`);
+      return payload;
+    } finally {
+      adminSourcesBuildPromise = null;
+    }
+  })().catch((error) => {
+    adminSourcesBuildPromise = null;
+    console.warn(`Admin sources cache rebuild failed (${reason}): ${error instanceof Error ? error.message : String(error)}`);
+    throw error;
+  });
+  return adminSourcesBuildPromise;
+}
+
 export async function buildAdminSources(db) {
+  const now = Date.now();
+  const cached = adminSourcesCache;
+  if (cached.payload && now < cached.expiresAt) {
+    return cached.payload;
+  }
+  if (cached.payload && now < cached.staleUntil) {
+    void scheduleAdminSourcesRebuild(db, 'swr');
+    return cached.payload;
+  }
+  return scheduleAdminSourcesRebuild(db, cached.payload ? 'hard-expire' : 'cold');
+}
+
+async function loadAdminSourcesUncached(db) {
   const result = await db.query(`
     with grouped_events as (
       select
@@ -645,6 +696,7 @@ export async function buildAdminSources(db) {
     },
   };
 }
+
 
 function sourceHealthIssues(source) {
   const issues = [];
@@ -1877,7 +1929,33 @@ function orderStatusLabel(status) {
   return status || 'неизвестно';
 }
 
-let adminGroupedEventsCache = { expiresAt: 0, staleUntil: 0, items: null, launch: null, sourceCount: 0, builtAt: 0 };
+let adminLandingsBaseCache = { catalogBuiltAt: -1, fingerprint: '', allRows: null, matchedEventIdsSize: 0 };
+
+function landingSavedFingerprint(rows) {
+  return rows
+    .map((row) =>
+      [
+        row.slug,
+        row.status,
+        row.title,
+        row.subtitle,
+        row.description,
+        row.pinnedEvents,
+        row.excludedEvents,
+        row.reviewEventsManual,
+        row.isIndexable,
+        row.seoH1,
+        row.seoTitle,
+        row.seoDescription,
+        row.canonicalUrl,
+      ].join(':'),
+    )
+    .join('|');
+}
+
+export function invalidateAdminLandingsBaseCache() {
+  adminLandingsBaseCache = { catalogBuiltAt: -1, fingerprint: '', allRows: null, matchedEventIdsSize: 0 };
+}
 let adminGroupedEventsBuildPromise = null;
 const ADMIN_GROUPED_EVENTS_TTL_MS = Number(process.env.ADMIN_GROUPED_EVENTS_TTL_MS || 5 * 60_000);
 const ADMIN_GROUPED_EVENTS_STALE_MS = Number(process.env.ADMIN_GROUPED_EVENTS_STALE_MS || 30 * 60_000);
@@ -1948,6 +2026,8 @@ export function invalidateAdminGroupedEventsCache(db = null, reason = 'invalidat
   if (db) {
     void scheduleAdminGroupedEventsRebuild(db, reason);
   }
+  invalidateAdminLandingsBaseCache();
+  invalidateAdminSourcesCache();
 }
 
 export async function warmAdminGroupedEventsCache(db, reason = 'warmup') {
@@ -2043,11 +2123,10 @@ export async function buildAdminEventsList(db, searchParams) {
 }
 
 export async function buildAdminLandingsList(db, searchParams = new URLSearchParams()) {
-  const limit = clampNumber(searchParams.get('limit'), 1, 200, 80);
-  const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
-  const query = String(searchParams.get('q') || '').trim().toLowerCase();
-  const statusFilter = String(searchParams.get('status') || 'all').trim().toLowerCase();
-  // Reuse admin events cache. Still full-catalog match per rule (same perf class as events list).
+  const limit = clampNumber(searchParams.get("limit"), 1, 200, 80);
+  const page = clampNumber(searchParams.get("page"), 1, 100000, 1);
+  const query = String(searchParams.get("q") || "").trim().toLowerCase();
+  const statusFilter = String(searchParams.get("status") || "all").trim().toLowerCase();
   const [cached, savedResult] = await Promise.all([
     getCachedAdminGroupedEvents(db),
     db.query(
@@ -2077,65 +2156,82 @@ export async function buildAdminLandingsList(db, searchParams = new URLSearchPar
       [LANDING_RULES.map((rule) => rule.slug)],
     ),
   ]);
-  const events = cached.items;
-  const savedBySlug = new Map(savedResult.rows.map((row) => [row.slug, row]));
-  const matchedEventIds = new Set();
-  const allRows = LANDING_RULES.map((rule) => {
-    const saved = savedBySlug.get(rule.slug);
-    const matched = events.filter((event) => matchesRule(event, rule));
-    matched.forEach((event) => matchedEventIds.add(event.id));
-    const prices = matched.map((event) => event.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
-    const readyEvents = matched.filter((event) => event.readiness === 'ready').length;
-    const blockedEvents = matched.filter((event) => event.readiness === 'blocked').length;
-    const venues = new Set(matched.map((event) => event.venue).filter(Boolean));
-    const cities = new Set(matched.map((event) => event.city).filter(Boolean));
 
-    return {
-      id: saved?.id || null,
-      slug: rule.slug,
-      title: saved?.title || rule.title,
-      subtitle: saved?.subtitle || rule.subtitle,
-      description: saved?.description || null,
-      chips: rule.chips || [],
-      status: saved ? String(saved.status || '').toLowerCase() : matched.length >= 20 ? 'ready' : matched.length > 0 ? 'seed' : 'empty',
-      events: matched.length,
-      readyEvents,
-      reviewEvents: Math.max(0, matched.length - readyEvents),
-      blockedEvents,
-      pinnedEvents: saved?.pinnedEvents || 0,
-      excludedEvents: saved?.excludedEvents || 0,
-      reviewEventsManual: saved?.reviewEventsManual || 0,
-      venues: venues.size,
-      cities: cities.size,
-      city: rule.city || null,
-      venue: rule.venue || null,
-      keywords: rule.keywords || [],
-      keywordScope: rule.keywordScope || 'full',
-      requiredAnyKeywords: rule.requiredAnyKeywords || [],
-      requiredKeywordGroups: rule.requiredKeywordGroups || [],
-      requiredTags: rule.tags || [],
-      excludedTags: rule.excludeTags || [],
-      excludedKeywords: rule.excludeKeywords || [],
-      priceFrom: prices.length ? Math.min(...prices) : null,
-      seo: {
-        h1: saved?.seoH1 || null,
-        title: saved?.seoTitle || null,
-        description: saved?.seoDescription || null,
-        canonicalUrl: saved?.canonicalUrl || null,
-        isIndexable: saved?.isIndexable ?? false,
-      },
-      sampleEvents: matched.slice(0, 6).map((event) => ({
-        id: event.id,
-        slug: event.slug,
-        title: event.title,
-        city: event.city,
-        venue: event.venue,
-        startsAt: event.startsAt,
-        priceFrom: event.priceFrom,
-        readiness: event.readiness,
-      })),
+  const fingerprint = landingSavedFingerprint(savedResult.rows);
+  let allRows = adminLandingsBaseCache.allRows;
+  let matchedEventIdsSize = adminLandingsBaseCache.matchedEventIdsSize || 0;
+  if (
+    !allRows ||
+    adminLandingsBaseCache.catalogBuiltAt !== cached.builtAt ||
+    adminLandingsBaseCache.fingerprint !== fingerprint
+  ) {
+    const events = cached.items;
+    const savedBySlug = new Map(savedResult.rows.map((row) => [row.slug, row]));
+    const matchedEventIds = new Set();
+    allRows = LANDING_RULES.map((rule) => {
+      const saved = savedBySlug.get(rule.slug);
+      const matched = events.filter((event) => matchesRule(event, rule));
+      matched.forEach((event) => matchedEventIds.add(event.id));
+      const prices = matched.map((event) => event.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
+      const readyEvents = matched.filter((event) => event.readiness === 'ready').length;
+      const blockedEvents = matched.filter((event) => event.readiness === 'blocked').length;
+      const venues = new Set(matched.map((event) => event.venue).filter(Boolean));
+      const cities = new Set(matched.map((event) => event.city).filter(Boolean));
+
+      return {
+        id: saved?.id || null,
+        slug: rule.slug,
+        title: saved?.title || rule.title,
+        subtitle: saved?.subtitle || rule.subtitle,
+        description: saved?.description || null,
+        chips: rule.chips || [],
+        status: saved ? String(saved.status || '').toLowerCase() : matched.length >= 20 ? 'ready' : matched.length > 0 ? 'seed' : 'empty',
+        events: matched.length,
+        readyEvents,
+        reviewEvents: Math.max(0, matched.length - readyEvents),
+        blockedEvents,
+        pinnedEvents: saved?.pinnedEvents || 0,
+        excludedEvents: saved?.excludedEvents || 0,
+        reviewEventsManual: saved?.reviewEventsManual || 0,
+        venues: venues.size,
+        cities: cities.size,
+        city: rule.city || null,
+        venue: rule.venue || null,
+        keywords: rule.keywords || [],
+        keywordScope: rule.keywordScope || 'full',
+        requiredAnyKeywords: rule.requiredAnyKeywords || [],
+        requiredKeywordGroups: rule.requiredKeywordGroups || [],
+        requiredTags: rule.tags || [],
+        excludedTags: rule.excludeTags || [],
+        excludedKeywords: rule.excludeKeywords || [],
+        priceFrom: prices.length ? Math.min(...prices) : null,
+        seo: {
+          h1: saved?.seoH1 || null,
+          title: saved?.seoTitle || null,
+          description: saved?.seoDescription || null,
+          canonicalUrl: saved?.canonicalUrl || null,
+          isIndexable: saved?.isIndexable ?? false,
+        },
+        sampleEvents: matched.slice(0, 6).map((event) => ({
+          id: event.id,
+          slug: event.slug,
+          title: event.title,
+          city: event.city,
+          venue: event.venue,
+          startsAt: event.startsAt,
+          priceFrom: event.priceFrom,
+          readiness: event.readiness,
+        })),
+      };
+    });
+    matchedEventIdsSize = matchedEventIds.size;
+    adminLandingsBaseCache = {
+      catalogBuiltAt: cached.builtAt || 0,
+      fingerprint,
+      allRows,
+      matchedEventIdsSize,
     };
-  });
+  }
 
   const filtered = allRows.filter((row) => {
     if (statusFilter !== 'all' && row.status !== statusFilter) return false;
@@ -2162,7 +2258,7 @@ export async function buildAdminLandingsList(db, searchParams = new URLSearchPar
       ready: allRows.filter((row) => row.status === 'ready').length,
       seed: allRows.filter((row) => row.status === 'seed').length,
       empty: allRows.filter((row) => row.status === 'empty').length,
-      matchedEvents: matchedEventIds.size,
+      matchedEvents: matchedEventIdsSize,
       landingRules: LANDING_RULES.length,
       sourceEvents: cached.sourceCount,
     },
@@ -2410,6 +2506,7 @@ export async function updateAdminLanding(db, landingSlug, payload) {
     ogDescription: seoDescription,
   });
 
+  invalidateAdminLandingsBaseCache();
   return buildAdminLandingDetail(db, landingSlug);
 }
 
@@ -2443,6 +2540,7 @@ export async function updateAdminLandingMatch(db, landingSlug, eventId, payload)
       ],
     );
   }
+  invalidateAdminLandingsBaseCache();
   return buildAdminLandingDetail(db, landingSlug);
 }
 

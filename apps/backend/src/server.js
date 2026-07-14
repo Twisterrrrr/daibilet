@@ -700,10 +700,17 @@ export function startServer(options = {}) {
   const listen = () => server.listen(serverPort, host, () => {
     console.log(`Daibilet backend listening on http://${host}:${serverPort}`);
     if (!options.prewarmBeforeListen) void warmPublicCaches('startup');
-    // Warm admin catalog in background so Dashboard/Events/Landings switches stay in-memory.
-    void warmAdminGroupedEventsCache(db, 'startup').catch((error) => {
-      console.warn(`Admin cache warm failed: ${error instanceof Error ? error.message : String(error)}`);
-    });
+    // Warm admin catalog + Landings/Sources so section switches stay in-memory.
+    void warmAdminGroupedEventsCache(db, 'startup')
+      .then(async () => {
+        await Promise.all([
+          buildAdminLandingsList(db, new URLSearchParams()),
+          buildAdminSources(db),
+        ]);
+      })
+      .catch((error) => {
+        console.warn(`Admin cache warm failed: ${error instanceof Error ? error.message : String(error)}`);
+      });
     scheduleTeplohodAutoSync();
     scheduleStaleOrderArchive();
   });
