@@ -2,6 +2,7 @@ import type { PublicEventDto } from '@daibilet/contracts/public';
 
 import {
   cleanDisplayText,
+  isDescriptionSectionHeading,
   sanitizeEventHtml,
   splitDescriptionParagraphs,
 } from '@/lib/event-page-utils';
@@ -21,9 +22,17 @@ export function EventDescription({ event }: { event: PublicEventDto }) {
         />
       ) : (
         <div className="mt-4 max-w-none space-y-5 text-sm leading-7 text-slate-600">
-          {splitDescriptionParagraphs(description).map((paragraph, index) => (
-            <p key={index}>{cleanDisplayText(paragraph)}</p>
-          ))}
+          {splitDescriptionParagraphs(description).map((paragraph, index) => {
+            const text = cleanDisplayText(paragraph);
+            if (isDescriptionSectionHeading(text)) {
+              return (
+                <h3 key={index} className="pt-1 text-base font-semibold text-slate-900">
+                  {text}
+                </h3>
+              );
+            }
+            return <p key={index}>{text}</p>;
+          })}
         </div>
       )}
     </div>

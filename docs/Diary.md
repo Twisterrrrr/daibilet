@@ -4,6 +4,26 @@
 
 ---
 
+## 2026-07-14 — Legacy widgets + description overrides + paragraphs
+
+### Наблюдения
+
+- Собственная iframe-модалка checkout — лишний велосипед; в legacy (`apps/public`) покупка шла через TC `data-tc-event` click и Teplohod embed + `.ti-tickets-event-tickets-buy`.
+- Override описания «не сохранялся»: lean `eventRows` обнулял `override.description` / SEO-тексты → ContentTab открывался пустым и PATCH затирал БД `null`.
+- Описания «полотенцем»: в Next `splitDescriptionParagraphs` не имел legacy fallback по одиночным `\n` (только blank lines), затем `cleanDisplayText` схлопывал всё в один абзац.
+
+### Решения
+
+- Purchase CTA снова на legacy-виджеты (без CheckoutModal в CTA).
+- Lean admin list снова отдаёт override text fields; после PATCH инвалидируем `adminGroupedEventsCache`.
+- `splitDescriptionParagraphs` как в legacy (+ soft-wrap join); заголовки разделов → `<h3>` по эвристике.
+
+### Проблемы
+
+- Source `e.description` в lean-списке по-прежнему null (тяжёлое поле) — в ContentTab подпись Source может быть пустой; override при этом читается/пишется корректно.
+
+---
+
 ## 2026-07-14 — Checkout via own iframe modal (TC + TEP)
 
 ### Наблюдения
@@ -18,7 +38,7 @@
 
 ### Проблемы
 
-- —
+- Подход отозван: вернулись к legacy vendor widgets (см. запись выше).
 
 ---
 

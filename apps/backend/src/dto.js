@@ -3414,6 +3414,8 @@ export async function updateAdminEventOverride(db, eventId, payload) {
     ],
   );
 
+  adminGroupedEventsCache = { expiresAt: 0, items: null, sourceCount: 0 };
+
   return {
     eventId,
     override: mapOverrideRow(result.rows[0]),
@@ -5108,12 +5110,14 @@ async function eventRows(db, limit, options = {}) {
         e."categoryId",
         e."primarySubcategoryId",
         override.title as "overrideTitle",
-        ${lean ? 'null::text as "overrideDescription",' : 'override.description as "overrideDescription",'}
-        ${lean ? 'null::text as "overrideShortDescription",' : 'override."shortDescription" as "overrideShortDescription",'}
+        // Keep override text even in lean lists: Content/SEO tabs edit these fields.
+        // Nulling them made admin forms open empty and PATCH wipe existing overrides.
+        override.description as "overrideDescription",
+        override."shortDescription" as "overrideShortDescription",
         override."imageUrl" as "overrideImageUrl",
-        ${lean ? 'null::text as "overrideSeoH1",' : 'override."seoH1" as "overrideSeoH1",'}
-        ${lean ? 'null::text as "overrideSeoTitle",' : 'override."seoTitle" as "overrideSeoTitle",'}
-        ${lean ? 'null::text as "overrideSeoDescription",' : 'override."seoDescription" as "overrideSeoDescription",'}
+        override."seoH1" as "overrideSeoH1",
+        override."seoTitle" as "overrideSeoTitle",
+        override."seoDescription" as "overrideSeoDescription",
         override."canonicalPath" as "overrideCanonicalPath",
         override."isIndexable" as "overrideIsIndexable",
         override."editorStatus" as "overrideEditorStatus",

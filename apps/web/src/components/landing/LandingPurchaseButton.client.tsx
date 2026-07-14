@@ -67,7 +67,6 @@ export function LandingPurchaseButton({
         tepWidgetId={teplohod.tepWidgetId}
         label={resolvedLabel}
         className={className}
-        purchaseUrl={purchaseUrl}
       />
     );
   }

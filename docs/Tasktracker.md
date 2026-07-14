@@ -50,7 +50,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 0.3.1 | Login (basic auth / realm) | Критический | ⏳ |
 | 0.3.2 | Dashboard metrics загружаются | Высокий | ⏳ |
 | 0.3.3 | Sources: TC + Teplohod, last sync | Критический | ⏳ |
-| 0.3.4 | Events: list + detail + override save | Высокий | ⏳ |
+| 0.3.4 | Events: list + detail + override save | Высокий | ✅ lean больше не null'ит override texts (2026-07-14) |
 | 0.3.5 | Orders: список реальных заказов (не mock) | Критический | ⏳ |
 | 0.3.6 | Event moderation / publish gate | Средний | ⏳ |
 | 0.3.7 | Зафиксировать результат в Diary / smoke log | Средний | ⏳ |

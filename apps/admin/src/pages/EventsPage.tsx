@@ -1419,7 +1419,18 @@ function ContentTab(props: { event: AdminEventRow; isSaving: boolean; saveError:
         onChange={(mergeGroupKey) => setDraft((current) => ({ ...current, mergeGroupKey }))}
         hint="Одинаковый ключ объединяет разные ticket-продукты на одной странице: описание, цена и кнопка «Купить» на каждый. Пример: harry-potter-spb"
       />
-      <SavePanel isSaving={isSaving} error={saveError} onSave={() => onSave(draft)} />
+      <SavePanel
+        isSaving={isSaving}
+        error={saveError}
+        onSave={() =>
+          onSave({
+            title: draft.title.trim() || null,
+            shortDescription: draft.shortDescription.trim() || null,
+            description: draft.description.trim() || null,
+            mergeGroupKey: draft.mergeGroupKey.trim() || null,
+          })
+        }
+      />
     </div>
   );
 }
@@ -1503,7 +1514,19 @@ function SeoTab(props: { event: AdminEventRow; isSaving: boolean; saveError: str
         multiline
       />
       <EditableOverrideField label="canonicalPath" sourceValue={event.canonicalPath || 'нет'} value={draft.canonicalPath} onChange={(canonicalPath) => setDraft((current) => ({ ...current, canonicalPath }))} />
-      <SavePanel isSaving={isSaving} error={saveError} onSave={() => onSave(draft)} />
+      <SavePanel
+        isSaving={isSaving}
+        error={saveError}
+        onSave={() =>
+          onSave({
+            seoH1: draft.seoH1.trim() || null,
+            seoTitle: draft.seoTitle.trim() || null,
+            seoDescription: draft.seoDescription.trim() || null,
+            canonicalPath: draft.canonicalPath.trim() || null,
+            isIndexable: draft.isIndexable,
+          })
+        }
+      />
     </div>
   );
 }
