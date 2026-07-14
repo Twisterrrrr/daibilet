@@ -4,6 +4,47 @@
 
 ---
 
+## 2026-07-14 — Admin catalog full load + metrics alignment
+
+### Наблюдения
+
+- `eventRows(..., 10000)` обрезал admin Events/Landings; dashboard брал saleable public groups → расхождение 2526 vs 1353.
+- Lean `description=null` давал ложный WEAK_DESCRIPTION почти на всём каталоге.
+- В cache declaration свойство было `events`, а код читал `.items` (после populate писалось `items` — хрупко).
+
+### Решения
+
+- Admin cache: полный `eventRows(null)`, single-flight promise, ключ `items`.
+- Dashboard launch metrics из того же `getCachedAdminGroupedEvents` (`source: admin_event_groups`).
+- Lean: `descriptionLength` для readiness; `eventRowsByIds` через `WHERE id = ANY(...)`.
+- Landing candidates переиспользуют cache.
+
+### Проблемы
+
+- Первый cold build admin cache на полном каталоге может быть медленным (~секунды); кэш 60с + single-flight.
+
+---
+
+## 2026-07-14 — Полный аудит админки (prod)
+
+### Наблюдения
+
+- В ходе аудита `GET /api/admin/events` и `/landings` отдавали **500** (`syntax error at or near "text"`): в lean `eventRows` SQL template случайно попали JS `//` комментарии после фикса override.
+- Admin events cache режет `eventRows(..., 10000)` → `sourceEvents=10000`, `groupedEvents=1353`, тогда как dashboard/public показывают **2526** групп; readiness-метрики списка (needs_attention **1352**) не совпадают с dashboard (**0**).
+- Stub-навигация: mapping / taxonomy / audit-log / settings; ECR API есть, UI в бандле выключен.
+- Override description в lean после фикса читается (пример `evt_tep_370`); source `e.description` в lean по-прежнему null.
+
+### Решения
+
+- Hotfix `ea27651`: убраны JS-комментарии из SQL; api restart на prod — Events/Landings снова 200.
+
+### Проблемы
+
+- Неполный admin-каталог из-за hard limit 10k — P0 к следующему фиксу.
+- Расхождение Dashboard vs Events metrics — P0/P1 для операционной достоверности.
+
+---
+
 ## 2026-07-14 — Legacy widgets + description overrides + paragraphs
 
 ### Наблюдения

@@ -380,13 +380,19 @@ function loadCityRouting() {
 }
 
 export async function buildAdminDashboard(db) {
-  const [stats, categoryCountResult, destinationCountResult, launch] = await Promise.all([
+  const [stats, categoryCountResult, destinationCountResult, cached] = await Promise.all([
     db.stats(),
     db.query('select count(*)::int as total from "Category"'),
     db.query('select count(*)::int as total from "City" where coalesce("isDestination", false) = true'),
-    buildAdminLaunchMetricsCompact(db),
+    // Same grouped catalog + readiness as /api/admin/events (not public saleable-only groups).
+    getCachedAdminGroupedEvents(db),
   ]);
 
+  const events = cached.items;
+  const launch = {
+    ...buildLaunchMetrics(events),
+    source: 'admin_event_groups',
+  };
   const destinations = Number(destinationCountResult.rows[0]?.total || 0);
   const readyEvents = Number(launch.readyForSeo || 0);
 
@@ -408,45 +414,12 @@ export async function buildAdminDashboard(db) {
   };
 }
 
-/** Launch metrics from the same public grouped catalog read-model as /api/public/stats. */
+/** Kept for compatibility; same source as Events list. */
 async function buildAdminLaunchMetricsCompact(db) {
-  const sessions = await publicCatalogSessions(db);
-  const saleableGroups = new Set();
-  const readySalesGroups = new Set();
-  const readySeoGroups = new Set();
-  let landingMatched = 0;
-  let needsAttention = 0;
-  let priceBlocked = 0;
-  let purchaseBlocked = 0;
-  let noImage = 0;
-
-  for (const session of sessions) {
-    const key = session.groupKey || session.id;
-    if (session.purchaseReady === false) {
-      purchaseBlocked += 1;
-      needsAttention += 1;
-      continue;
-    }
-    saleableGroups.add(key);
-    if (session.priceFrom == null) priceBlocked += 1;
-    if (!session.imageUrl) noImage += 1;
-    if ((session.landingSlugs || []).length > 0) landingMatched += 1;
-    if (isSaleableEventForPublic(session)) {
-      readySalesGroups.add(key);
-      if (session.imageUrl) readySeoGroups.add(key);
-    }
-  }
-
+  const cached = await getCachedAdminGroupedEvents(db);
   return {
-    groupedEvents: saleableGroups.size,
-    readyForSales: readySalesGroups.size,
-    readyForSeo: readySeoGroups.size,
-    needsAttention,
-    priceBlocked,
-    purchaseBlocked,
-    noImage,
-    landingMatched,
-    source: 'public_catalog_groups',
+    ...buildLaunchMetrics(cached.items),
+    source: 'admin_event_groups',
   };
 }
 
@@ -454,8 +427,10 @@ function buildLaunchMetrics(events) {
   return {
     groupedEvents: events.length,
     readyForSales: events.filter(isSaleableEventForPublic).length,
-    readyForSeo: events.filter((event) => event.readiness === 'ready').length,
-    needsAttention: events.filter((event) => event.status === 'needs_review').length,
+    readyForSeo: events.filter((event) => event.readiness === 'ready' && event.canPublish !== false).length,
+    needsAttention: events.filter(
+      (event) => event.status === 'needs_review' || event.readiness === 'review' || event.readiness === 'blocked',
+    ).length,
     priceBlocked: events.filter((event) => event.priceFrom == null).length,
     purchaseBlocked: events.filter((event) => !event.purchaseReady).length,
     noImage: events.filter((event) => !event.hasImage).length,
@@ -1903,20 +1878,30 @@ function orderStatusLabel(status) {
   return status || 'неизвестно';
 }
 
-let adminGroupedEventsCache = { expiresAt: 0, events: null, sourceCount: 0 };
+let adminGroupedEventsCache = { expiresAt: 0, items: null, sourceCount: 0 };
+let adminGroupedEventsBuildPromise = null;
 
 async function getCachedAdminGroupedEvents(db) {
   const now = Date.now();
   if (adminGroupedEventsCache.items && now < adminGroupedEventsCache.expiresAt) {
     return adminGroupedEventsCache;
   }
-  const sourceEvents = await eventRows(db, 10000, { lean: true });
-  adminGroupedEventsCache = {
-    expiresAt: now + 60_000,
-    items: groupAdminEventRows(sourceEvents),
-    sourceCount: sourceEvents.length,
-  };
-  return adminGroupedEventsCache;
+  if (adminGroupedEventsBuildPromise) return adminGroupedEventsBuildPromise;
+
+  adminGroupedEventsBuildPromise = (async () => {
+    // Full catalog — no hard LIMIT. Truncation previously hid groups from admin Events.
+    const sourceEvents = await eventRows(db, null, { lean: true });
+    adminGroupedEventsCache = {
+      expiresAt: Date.now() + 60_000,
+      items: groupAdminEventRows(sourceEvents),
+      sourceCount: sourceEvents.length,
+    };
+    return adminGroupedEventsCache;
+  })().finally(() => {
+    adminGroupedEventsBuildPromise = null;
+  });
+
+  return adminGroupedEventsBuildPromise;
 }
 
 export async function buildAdminEventsList(db, searchParams) {
@@ -1976,11 +1961,15 @@ export async function buildAdminEventsList(db, searchParams) {
     quickFilters,
     metrics: {
       events: events.length,
-      readyEvents: events.filter((event) => event.readiness === 'ready').length,
-      reviewEvents: events.filter((event) => event.readiness !== 'ready').length,
+      readyEvents: events.filter((event) => event.readiness === 'ready' && event.canPublish !== false).length,
+      reviewEvents: events.filter((event) => event.readiness !== 'ready' || event.canPublish === false).length,
       landingRules: LANDING_RULES.length,
       sourceEvents: cached.sourceCount,
       groupedEvents: events.length,
+      launch: {
+        ...buildLaunchMetrics(events),
+        source: 'admin_event_groups',
+      },
     },
   };
 }
@@ -2249,8 +2238,8 @@ export async function buildAdminLandingEventCandidates(db, landingSlug, searchPa
 
   const query = String(searchParams.get('q') || '').trim().toLowerCase();
   const limit = clampNumber(searchParams.get('limit'), 1, 50, 12);
-  const [events, landingResult] = await Promise.all([
-    eventRows(db, 10000, { lean: true }),
+  const [cached, landingResult] = await Promise.all([
+    getCachedAdminGroupedEvents(db),
     db.query('select id from "Landing" where slug = $1 limit 1', [landingSlug]),
   ]);
   const landing = landingResult.rows[0] || null;
@@ -2258,8 +2247,12 @@ export async function buildAdminLandingEventCandidates(db, landingSlug, searchPa
     ? (await db.query('select "eventId", score, reasons from "LandingMatch" where "landingId" = $1', [landing.id])).rows
     : [];
   const manualByEventId = new Map(manualRows.map((row) => [row.eventId, row]));
-  const autoIds = new Set(events.filter((event) => matchesRule(event, rule)).map((event) => event.id));
-  const groupedEvents = groupAdminEventRows(events);
+  const groupedEvents = cached.items;
+  const autoIds = new Set(
+    groupedEvents
+      .filter((event) => matchesRule(event, rule))
+      .flatMap((event) => (event.groupEventIds?.length ? event.groupEventIds : [event.id])),
+  );
   const filtered = groupedEvents.filter((event) => {
     if (!query) return false;
     return landingEventSearchText(event).includes(query);
@@ -5085,6 +5078,19 @@ async function categoryRows(db) {
 
 async function eventRows(db, limit, options = {}) {
   const lean = Boolean(options.lean);
+  const ids = Array.isArray(options.ids) ? options.ids.filter(Boolean) : null;
+  const params = [];
+  let whereSql = '';
+  if (ids?.length) {
+    params.push(ids);
+    whereSql = `where e.id = any($${params.length}::text[])`;
+  }
+  let limitSql = '';
+  if (Number.isFinite(limit) && limit > 0) {
+    params.push(Math.floor(limit));
+    limitSql = `limit $${params.length}`;
+  }
+
   const result = await db.query(
     `
       select
@@ -5095,6 +5101,7 @@ async function eventRows(db, limit, options = {}) {
         source.name as "sourceName",
         e.title,
         ${lean ? 'null::text as description,' : 'e.description,'}
+        length(trim(coalesce(e.description, '')))::int as "descriptionLength",
         e.kind,
         e.status,
         e."sourceStatus",
@@ -5171,6 +5178,7 @@ async function eventRows(db, limit, options = {}) {
         limit 1
       ) offer on true
       left join "EventSubcategory" event_subcategory on event_subcategory."eventId" = e.id
+      ${whereSql}
       group by
         e.id,
         source_link."externalId",
@@ -5195,9 +5203,9 @@ async function eventRows(db, limit, options = {}) {
         offer."widgetUrl",
         offer."deeplinkUrl"
       order by e.status asc, min(session."startsAt") asc nulls last
-      limit $1
+      ${limitSql}
     `,
-    [limit],
+    params,
   );
 
   return result.rows.map((row) => {
@@ -5323,17 +5331,18 @@ function adminOfferStatus(row) {
 
 async function eventRowsByIds(db, ids) {
   if (!ids.length) return [];
-  const rows = await eventRows(db, 10000, { lean: true });
-  const expected = new Set(ids);
-  return rows.filter((row) => expected.has(row.id));
+  const unique = Array.from(new Set(ids.filter(Boolean))).slice(0, 500);
+  return eventRows(db, null, { lean: true, ids: unique });
 }
 
 function matchesAdminQuickFilter(event, view) {
-  if (view === 'needs_attention') return event.status === 'needs_review';
-  if (view === 'ready_publish') return event.readiness === 'ready';
+  if (view === 'needs_attention') {
+    return event.status === 'needs_review' || event.readiness === 'review' || event.readiness === 'blocked';
+  }
+  if (view === 'ready_publish') return event.readiness === 'ready' && event.canPublish !== false;
   if (view === 'purchase_blocked') return !event.purchaseReady;
   if (view === 'no_image') return !event.hasImage;
-  if (view === 'landing_match') return event.landingHits.length > 0;
+  if (view === 'landing_match') return (event.landingHits || []).length > 0;
   return true;
 }
 
@@ -8887,6 +8896,7 @@ function buildReadinessIssues(event) {
   const rawPriceValues = [event.priceFromRub, event.offerPriceRub].filter((value) => Number.isFinite(value) && value > 0);
   const hasOnlyLowPrice = event.priceFrom == null && rawPriceValues.some((value) => value < MIN_DISPLAY_PRICE_RUB);
   const description = plainReadinessText(event.overrideDescription || event.description || event.overrideShortDescription || '');
+  const descriptionLength = Math.max(description.length, Number(event.descriptionLength) || 0);
   const venue = plainReadinessText(event.venue || '');
   const hasVenue = Boolean(event.venueId || (venue && !['не указано', 'не указан', 'unknown'].includes(venue.toLowerCase())));
 
@@ -8897,7 +8907,7 @@ function buildReadinessIssues(event) {
   if (!event.categoryId && !event.category) add('MISSING_CATEGORY');
   if (!event.primarySubcategoryId && !(event.subcategoryIds || []).length) add('MISSING_SUBCATEGORY');
   if (!hasVenue) add('MISSING_VENUE');
-  if (description.length < 120) add('WEAK_DESCRIPTION');
+  if (descriptionLength < 120) add('WEAK_DESCRIPTION');
   if (!event.hasImage && !event.imageUrl && !event.overrideImageUrl) add('MISSING_IMAGE');
 
   return issues;
