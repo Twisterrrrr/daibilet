@@ -21,7 +21,7 @@
 ### Проблемы
 
 - Первый cold после hard-expire всё ещё дорогой — редкий кейс.
-- До деплоя этого патча Landings/Sources на warm hit всё ещё медленные.
+- Hotfix после `dcada19`: при вставке landings-кэша пропал `let adminGroupedEventsCache` → warm падал с ReferenceError; восстановлено.
 
 ---
 

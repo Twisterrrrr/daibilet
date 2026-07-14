@@ -1956,6 +1956,8 @@ function landingSavedFingerprint(rows) {
 export function invalidateAdminLandingsBaseCache() {
   adminLandingsBaseCache = { catalogBuiltAt: -1, fingerprint: '', allRows: null, matchedEventIdsSize: 0 };
 }
+
+let adminGroupedEventsCache = { expiresAt: 0, staleUntil: 0, items: null, launch: null, sourceCount: 0, builtAt: 0 };
 let adminGroupedEventsBuildPromise = null;
 const ADMIN_GROUPED_EVENTS_TTL_MS = Number(process.env.ADMIN_GROUPED_EVENTS_TTL_MS || 5 * 60_000);
 const ADMIN_GROUPED_EVENTS_STALE_MS = Number(process.env.ADMIN_GROUPED_EVENTS_STALE_MS || 30 * 60_000);
