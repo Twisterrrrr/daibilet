@@ -95,6 +95,14 @@ export function useCatalogPurchase(session: PublicSessionDto) {
 }
 
 export function CatalogPurchaseAnchors({
+  teplohod,
+  teplohodEventId,
+  teplohodWrapperId,
+  tcEventId,
+  tcToken,
+  tcPurchaseUrl,
+  tcTriggerRef,
+}: {
   session?: PublicSessionDto;
   teplohod?: { tepEventId?: string | number | null; tepWidgetId?: string | number | null } | null;
   teplohodEventId?: string | null;
