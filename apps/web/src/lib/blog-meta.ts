@@ -36,6 +36,12 @@ const SLUG_META: Record<
     city?: string;
   }
 > = {
+  'fentezi-fest-bylinnyy-bereg': {
+    authorId: 'max',
+    articleType: 'column',
+    citySlug: 'regions',
+    city: 'Регионы',
+  },
   'open-air-festy-vyhodnoi-ru': {
     authorId: 'max',
     articleType: 'column',

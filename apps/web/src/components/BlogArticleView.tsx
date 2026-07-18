@@ -35,6 +35,7 @@ export function BlogArticleView({ article }: { article: BlogArticleDto }) {
           readMin={readMin}
           city={article.city}
           cityHref={cityLink}
+          authorName={article.authorName}
         />
 
         <main className="container-page relative z-10 py-10 sm:py-14">

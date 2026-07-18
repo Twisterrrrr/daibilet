@@ -45,7 +45,7 @@ Slug-набор **совпадает** со статикой 1:1 (заголов
 | 2 | `moskva-kvesty-escape-room` | Квесты и escape-room в Москве… | `/images/blog/moskva-kvesty-escape-room.jpg` | то же |
 | 3 | `myuzikly-teatr-novichok-msk-spb` | Мюзиклы и театр для новичка… | `/images/blog/myuzikly-teatr-novichok-msk-spb.jpg` | то же |
 | 4 | `moskva-vechernie-diskoteki-shou` | Вечерние дискотеки и танцевальные шоу… | `/images/blog/moskva-vechernie-diskoteki-shou.jpg` | то же |
-| 5 | `open-air-festy-vyhodnoi-ru` | Open-air выходного (колонка Макса) | `/images/blog/open-air-festy-vyhodnoi-ru.jpg` | MD + статика; upsert на деплое |
+| 5 | `fentezi-fest-bylinnyy-bereg` | Фэнтези Фест / Былинный Берег (колонка Макса) | `/images/blog/fentezi-fest-bylinnyy-bereg.jpg` | MD + статика; upsert на деплое; `open-air-festy-vyhodnoi-ru` → HIDDEN |
 
 **Источник контента:** `content/blog/{slug}.md`  
 **Карточки:** `apps/web` + `apps/public` `src/data/blog-posts.ts`  

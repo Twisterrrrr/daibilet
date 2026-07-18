@@ -21,20 +21,20 @@ export type BlogPost = {
 /** Обложки — уникальная статика на статью: /images/blog/{slug}.jpg */
 export const BLOG_POSTS: BlogPost[] = [
   {
-    slug: 'open-air-festy-vyhodnoi-ru',
-    title: 'Open-air выходного: песок, рёв моторов и честный чек',
+    slug: 'fentezi-fest-bylinnyy-bereg',
+    title: 'Фэнтези Фест и Былинный Берег: берег Волхова без фильтров',
     excerpt:
-      'Эй, кто на маршруте! Песчаный фест от 350 ₽ и Автодром Фест от 1000 ₽ — изнанка open-air выходного с лайфхаками.',
+      'Эй, кто на маршруте! Одна площадка у Захарьино — реконструкция и фэнтези open-air: цены от 300 ₽, кемпинг, грязь и честный вердикт.',
     date: '19 июля 2026',
     readMin: 2,
     tag: 'Колонка',
-    city: 'Санкт-Петербург',
-    citySlug: 'saint-petersburg',
+    city: 'Регионы',
+    citySlug: 'regions',
     authorId: 'max',
     authorName: 'Макс',
     articleType: 'column',
-    imageUrl: blogCoverUrl('open-air-festy-vyhodnoi-ru'),
-    imageAlt: 'Open-air фестиваль песчаных скульптур под летним солнцем',
+    imageUrl: blogCoverUrl('fentezi-fest-bylinnyy-bereg'),
+    imageAlt: 'Палаточный open-air на берегу реки на закате',
   },
   {
     slug: 'kak-vybrat-koncert',

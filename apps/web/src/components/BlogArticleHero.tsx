@@ -14,6 +14,8 @@ type BlogArticleHeroProps = {
   readMin?: number;
   city?: string | null;
   cityHref?: string | null;
+  /** Имя автора колонки (не тип «Колонка»). */
+  authorName?: string | null;
 };
 
 export function BlogArticleHero({
@@ -25,6 +27,7 @@ export function BlogArticleHero({
   readMin,
   city,
   cityHref,
+  authorName,
 }: BlogArticleHeroProps) {
   const [hasImageError, setHasImageError] = React.useState(false);
   const showImage = Boolean(coverImageUrl) && !hasImageError;
@@ -66,6 +69,7 @@ export function BlogArticleHero({
             <h1 className="font-display mt-2 max-w-4xl text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">{title}</h1>
             {description ? <p className="mt-3 max-w-2xl text-base text-white/85 sm:text-lg">{description}</p> : null}
             <div className="mt-5 flex flex-wrap items-center gap-4 text-sm text-white/70">
+              {authorName ? <span className="font-medium text-white/90">{authorName}</span> : null}
               {publishedLabel ? <span>{publishedLabel}</span> : null}
               {readMin ? (
                 <span className="inline-flex items-center gap-1">
