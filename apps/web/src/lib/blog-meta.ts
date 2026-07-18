@@ -49,7 +49,7 @@ const SLUG_META: Record<
     city: 'Санкт-Петербург',
   },
   'kak-vybrat-koncert': { authorId: 'editorial', articleType: 'gid' },
-  'kuda-poyti-s-detmi': { authorId: 'elena', articleType: 'gid' },
+  'kuda-poyti-s-detmi': { authorId: 'editorial', articleType: 'gid' },
   'spb-rooftop-guide': {
     authorId: 'editorial',
     articleType: 'gid',

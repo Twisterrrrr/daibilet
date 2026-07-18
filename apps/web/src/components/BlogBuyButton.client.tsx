@@ -84,10 +84,11 @@ function eventToSession(payload: PublicEventPageDto): PublicSessionDto | null {
       purchaseUrl: slot.purchaseUrl || purchaseUrl,
       vacant: slot.vacant,
     })),
-    startsAt: firstSession?.startsAt || null,
-    dateLabel: firstSession?.dateLabel || null,
-    timeLabel: firstSession?.timeLabel || null,
-  } as PublicSessionDto;
+    startsAt: firstSession?.startsAt || '',
+    dateLabel: firstSession?.dateLabel || '',
+    timeLabel: firstSession?.timeLabel || '',
+    timeBucket: firstSession?.timeBucket || 'day',
+  } as unknown as PublicSessionDto;
 }
 
 const BUTTON_CLASS =

@@ -90,6 +90,18 @@ npm run blog:sync-bodies
 
 Реестр и style guides (стиль письма, не аудио): [ai-journalists/README.md](./ai-journalists/README.md), JSON: [ai-journalists/personas.json](./ai-journalists/personas.json).
 
+**Формат общих (неавторских) статей «Редакция»:** [ai-journalists/00-editorial.md](./ai-journalists/00-editorial.md) — без приветствий персон, живое вступление, помощь в выборе, честные оговорки, вывод «кому какой вариант».
+
+### Rewrite редакционных гидов (2026-07-19)
+
+| Slug | Статус |
+|------|--------|
+| `spb-rooftop-guide` | Обновлён: крыши + мосты в одной статье |
+| `spb-razvod-mostov-kakoi-reis` | HIDDEN + 301 → `/blog/spb-rooftop-guide` |
+| `kuda-poyti-s-detmi` | Обновлён; author=`editorial` (не Елена) |
+| `chto-poslushat-jazz` | Обновлён под формат выбора формата |
+| `kak-vybrat-koncert` | Обновлён: места в зале |
+
 | authorId | Автор | Колонка | Когда брать |
 |----------|-------|---------|-------------|
 | `max` | Макс | «Изнанка маршрута» | Бюджет, активный тревел, open-air/фесты/экскурсии; референс формы Perito (см. [01-max.md](./ai-journalists/01-max.md)) |
@@ -97,6 +109,7 @@ npm run blog:sync-bodies
 | `elena` | Елена | «Спокойный маршрут» | Дети, быт, туалеты/еда/укачивание, семейные слоты |
 | `igor` | Игорь | «Место силы» | Байкал/Север/этно/легенды (без «акция/скидка») |
 | `artur` | Артур | «На вкус» | Рынки, стритфуд, специалитеты, гастро-маршрут |
+| `editorial` | Редакция | — | Общие гиды без персоны; см. [00-editorial.md](./ai-journalists/00-editorial.md) |
 
 **Правила**
 

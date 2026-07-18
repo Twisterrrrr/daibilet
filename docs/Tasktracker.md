@@ -7,6 +7,17 @@
 
 ---
 
+## Блог / контент (2026-07-19)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| B.1 | Формат «Редакция» (`docs/ai-journalists/00-editorial.md`) | Высокий | ✅ |
+| B.2 | Rewrite 4 гидов + SEO/ссылки/`[buy]` | Высокий | ✅ |
+| B.3 | Hide `spb-razvod-mostov-kakoi-reis` + 301 → rooftop | Средний | ✅ |
+| B.4 | Commit → deploy-prod-next → `blog:upsert` ×4+hide | Критический | 🔄 |
+
+---
+
 ## Этап 0 — Post-cutover hardening (закрыть первым)
 
 **Цель:** prod Next стабилен, покупка через виджеты проверена в браузере, admin операционен, data debt по TC осознан.

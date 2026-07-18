@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, permanentRedirect } from 'next/navigation';
 
 import { BlogArticleView } from '@/components/BlogArticleView';
 import '@/lib/env';
@@ -9,13 +9,22 @@ import { buildPublicArticlePageDto } from '@daibilet/backend/public-read';
 
 export const revalidate = 300;
 
+/** Старые slug → каноническая статья (объединения / переезды). */
+const BLOG_SLUG_REDIRECTS: Record<string, string> = {
+  'spb-razvod-mostov-kakoi-reis': '/blog/spb-rooftop-guide',
+};
+
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const article = await loadArticle(decodeURIComponent(slug));
+  const decoded = decodeURIComponent(slug);
+  if (BLOG_SLUG_REDIRECTS[decoded]) {
+    return { title: 'Переезд статьи' };
+  }
+  const article = await loadArticle(decoded);
   if (!article) return { title: 'Статья не найдена' };
 
   return buildBlogArticleMetadata(article);
@@ -33,7 +42,11 @@ async function loadArticle(slug: string) {
 
 export default async function BlogArticlePage({ params }: PageProps) {
   const { slug } = await params;
-  const article = await loadArticle(decodeURIComponent(slug));
+  const decoded = decodeURIComponent(slug);
+  const redirectTo = BLOG_SLUG_REDIRECTS[decoded];
+  if (redirectTo) permanentRedirect(redirectTo);
+
+  const article = await loadArticle(decoded);
   if (!article) notFound();
 
   const jsonLdBlocks = buildBlogArticleJsonLd(article);
