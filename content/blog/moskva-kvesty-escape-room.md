@@ -7,7 +7,7 @@ seoDescription: "Квесты в Москве: музейные маршруты
 seoH1: "Квесты и escape-room в Москве: как не ошибиться с форматом и ценой"
 citySlug: moscow
 tag: Город
-date: "19 июля 2026"
+date: "17 июля 2026"
 readMin: 8
 imageAlt: "Атмосфера квест-комнаты с загадками и тёплым светом"
 status: PUBLISHED
