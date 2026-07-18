@@ -4,6 +4,26 @@
 
 ---
 
+## 2026-07-19 — Колонка Макса: полный текст + `[buy]` shortcode
+
+### Наблюдения
+
+- Короткий черновик на `fentezi-fest-bylinnyy-bereg` (fe99420) отвергнут: нужен полный канон пользователя («Хей, читатели!» → «Мир лучше видеть своими глазами!»).
+- Нужна покупка из статьи без MDX: парсер shortcode как у `[CTA]` / `[image]`.
+
+### Решения
+
+- Перезаписан `content/blog/fentezi-fest-bylinnyy-bereg.md` полным текстом Макса; дубли (`*-volhov`, `bylinnyy-bereg-fentezi-fest`, `open-air-festy-vyhodnoi-ru`) → HIDDEN.
+- MVP `[buy slug="…" label="…"]` → `BlogBuyButton.client.tsx` → `LandingPurchaseButton` / fallback `/events/{slug}`.
+- Кнопки: `tc-6a08d60c3aa2e7a8469953dc-bylinnyi-bereg-2026`, `tc-6a0a1d4d69c61af2fb0eb202-fentezi-fest-2026`.
+- Канон Макса в `01-max.md` / `personas.json`: приветствие «Хей, читатели!», финал «Мир лучше видеть своими глазами!».
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-19 — Колонка Макса: rewrite → `fentezi-fest-bylinnyy-bereg`
 
 ### Наблюдения

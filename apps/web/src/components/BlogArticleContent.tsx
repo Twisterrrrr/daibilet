@@ -3,6 +3,7 @@
 import * as React from 'react';
 
 import { BlogArticleCta, parseCtaBlock } from '@/components/BlogArticleCta';
+import { BlogBuyButton, parseBuyBlock } from '@/components/BlogBuyButton.client';
 import { handleBlogLinkClick } from '@/lib/blog-navigate';
 
 const IMAGE_BLOCK_REGEX = /^\[image\s+side=(left|right)\s+src="([^"]+)"(?:\s+alt="([^"]*)")?\]$/i;
@@ -31,7 +32,8 @@ type ContentBlock =
   | { type: 'ol'; items: string[] }
   | { type: 'table'; lines: string[] }
   | { type: 'image'; image: ParsedImageBlock }
-  | { type: 'cta'; data: ReturnType<typeof parseCtaBlock> & object };
+  | { type: 'cta'; data: ReturnType<typeof parseCtaBlock> & object }
+  | { type: 'buy'; data: NonNullable<ReturnType<typeof parseBuyBlock>> };
 
 function renderInline(text: string, keyPrefix = ''): React.ReactNode[] {
   const nodes: React.ReactNode[] = [];
@@ -101,6 +103,7 @@ function isSpecialLine(line: string): boolean {
   const trimmed = line.trim();
   if (!trimmed) return true;
   if (parseCtaBlock(trimmed)) return true;
+  if (parseBuyBlock(trimmed)) return true;
   if (parseImageBlock(trimmed)) return true;
   if (isTableLine(trimmed)) return true;
   if (trimmed.startsWith('## ') || trimmed.startsWith('### ')) return true;
@@ -137,6 +140,14 @@ export function parseContentBlocks(content: string): ContentBlock[] {
     if (cta) {
       flushParagraph();
       blocks.push({ type: 'cta', data: cta });
+      index += 1;
+      continue;
+    }
+
+    const buy = parseBuyBlock(line);
+    if (buy) {
+      flushParagraph();
+      blocks.push({ type: 'buy', data: buy });
       index += 1;
       continue;
     }
@@ -477,6 +488,10 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
     switch (block.type) {
       case 'cta':
         nodes.push(<BlogArticleCta key={`cta-${index}`} {...block.data} />);
+        isLeadParagraph = false;
+        break;
+      case 'buy':
+        nodes.push(<BlogBuyButton key={`buy-${index}`} {...block.data} />);
         isLeadParagraph = false;
         break;
       case 'image':

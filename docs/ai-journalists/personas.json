@@ -8,7 +8,7 @@
     "fields": ["authorId", "authorName", "articleType"],
     "publicFilters": ["city", "author"],
     "greetingCanon": {
-      "max": "Эй, кто на маршруте!"
+      "max": "Хей, читатели!"
     }
   },
   "personas": [
@@ -21,9 +21,9 @@
       "register": "разговорный, короткие предложения, сленг, цены",
       "address": "ty-folk",
       "ctaTone": "soft",
-      "closingPhrase": "Путешествуйте. Оно того стоит",
-      "greetingPhrase": "Эй, кто на маршруте!",
-      "structure": "4-5 paragraphs, 1200-1800 chars",
+      "closingPhrase": "Мир лучше видеть своими глазами!",
+      "greetingPhrase": "Хей, читатели!",
+      "structure": "4-5 paragraphs base / longform when editorial provides full text",
       "style_prototypes": ["Антон Птушкин"],
       "editorial_reference": "https://perito.media/posts/ptushkin-balcans",
       "topics": ["Алтай", "Камчатка", "сплавы", "джип-туры", "open-air", "фесты", "выездные экскурсии", "молодёжный отдых"],
