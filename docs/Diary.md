@@ -803,4 +803,20 @@
 - Зеркало в `apps/admin/src/pages/EventsPage.tsx`; unit-тест `admin-group-readiness.test.ts` в `test:ts`.
 
 ### Проблемы
-- Нет (ожидается prod deploy API + admin static).
+- Prod deploy выполнен: API `daibilet-api` + admin static `/var/www/daibilet/admin` на `bb7fc9c`.
+- Health OK; unit-тест admin-group-readiness 4/4 на сервере.
+
+---
+
+## 2026-07-19 - Deploy: grouped readiness fix (API + admin)
+
+### Наблюдения
+- Задеплоен `bb7fc9c`: restart `daibilet-api`, Vite build admin → `/var/www/daibilet/admin`.
+- Без полного `deploy-prod-next.sh` (Next web не трогали).
+- Health `/api/health` OK; `admin-group-readiness.test.ts` 4/4 pass на prod.
+
+### Решения
+- Source of truth — backend grouping; admin static обновлён зеркалом UI.
+
+### Проблемы
+- Auto-stash на сервере после pull (untracked drop-ins уже в commit) — можно drop; не влияет на readiness.

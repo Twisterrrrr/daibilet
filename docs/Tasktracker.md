@@ -73,7 +73,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 0.7.1 | Backend finalizeGroupedAdminReadiness после group | Высокий | ✅ 2026-07-19 |
 | 0.7.2 | Admin UI mirror EventsPage | Высокий | ✅ 2026-07-19 |
 | 0.7.3 | Unit-тест admin-group-readiness + test:ts | Средний | ✅ 2026-07-19 |
-| 0.7.4 | Deploy API (+ admin static) prod | Высокий | 🔄 pending |
+| 0.7.4 | Deploy API (+ admin static) prod | Высокий | ✅ 2026-07-19 bb7fc9c |
 
 ### 0.6 CPU/RAM mitigation (prod 3.8Gi)
 
