@@ -1,3 +1,4 @@
+import { BLOG_ARTICLE_BODIES } from '@/data/blog-article-bodies';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import { blogCoverUrl } from '@/lib/blog-cover';
 
@@ -79,11 +80,12 @@ export function mergeBlogCards(
 export function resolveStaticArticle(slug: string): BlogArticleDto | null {
   const post = BLOG_POSTS.find((item) => item.slug === slug);
   if (!post) return null;
+  const body = BLOG_ARTICLE_BODIES[post.slug];
   return {
     slug: post.slug,
     title: post.title,
     excerpt: post.excerpt,
-    content: post.excerpt,
+    content: body || post.excerpt,
     coverImageUrl: post.imageUrl,
     city: post.city,
     citySlug: post.citySlug,

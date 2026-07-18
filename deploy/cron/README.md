@@ -49,3 +49,21 @@ crontab -e
 ```
 
 Требует `DATABASE_URL` и `DAIBILET_TS_*=1` + `start:ts`.
+
+## Prod: еженедельный дайджест блога (новые события → Article REVIEW)
+
+Черновик статьи **без auto-publish**. Редактор правит в Admin → Блог и публикует вручную.
+
+```bash
+chmod +x /opt/daibilet/deploy/cron/blog-weekly-digest.sh
+crontab -e
+```
+
+```
+0 7 * * 0 APP_DIR=/opt/daibilet /opt/daibilet/deploy/cron/blog-weekly-digest.sh >> /var/log/daibilet/blog-weekly-digest.log 2>&1
+```
+
+- Расписание: **воскресенье 07:00** (серверное время).
+- Скрипт: `node scripts/blog-weekly-digest.js` (slug `afisha-nedeli-YYYY-MM-DD`, status=`REVIEW`, `isIndexable=false`).
+- Лог: `/var/log/daibilet/blog-weekly-digest.log`
+- Ручной прогон: `cd /opt/daibilet && npm run blog:weekly-digest` (или `--dry-run`).

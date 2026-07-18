@@ -81,6 +81,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 0.5.10 | Teplohod checkout fallback → account.teplohod.info (не teplohod.info/event 404) | Высокий | ✅ 2026-07-14 |
 | 0.5.11 | Post-deploy: clear `.next/cache` + revalidate; ChunkLoadError → one reload | Высокий | ✅ 2026-07-14 |
 | 0.5.12 | Teplohod: restore TI_Tickets bootstrap on event page + landing `evt_tep_*` buy | Критический | ✅ 2026-07-18 deploy |
+| 0.5.13 | Яндекс.Метрика на `apps/web` (ID 106786540, не admin) | Высокий | ✅ код 2026-07-19; deploy ⏳ |
 
 ---
 
@@ -168,9 +169,10 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| 2.4.1 | 5 заголовков + план ([content-blog-plan.md](./content-blog-plan.md)) | Средний | ✅ 2026-07-19 |
-| 2.4.2 | Написать/опубликовать 5 статей | Высокий | ⏳ |
-| 2.4.3 | Weekly digest script → Article `review` + cron | Средний | ⏳ |
+| 2.4.0 | Инвентарь статей (статика + prod `Article`), запрет дублей | Высокий | ✅ 2026-07-19 |
+| 2.4.1 | 5 уникальных заголовков + план ([content-blog-plan.md](./content-blog-plan.md)) | Средний | ✅ 2026-07-19 (сверено с инвентарём) |
+| 2.4.2 | Написать/опубликовать 4 статьи (без «как купить»; без пересечения с 13) | Высокий | ✅ 2026-07-19 (контент+обложки+статика; upsert БД на деплое) |
+| 2.4.3 | Weekly digest script → Article `REVIEW` + cron | Средний | ✅ 2026-07-19 |
 
 ---
 

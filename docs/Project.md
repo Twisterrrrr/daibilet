@@ -1,6 +1,6 @@
 # Project — Daibilet (Next full-stack migration)
 
-**Обновлено:** 2026-07-14  
+**Обновлено:** 2026-07-19  
 **Ветка migration / prod:** `feat/next-monorepo`  
 **Prod:** Next `apps/web` `:3001` + legacy API `:4000` + Vite admin static
 
@@ -98,6 +98,7 @@ Cherry-pick из **`codex/phase2-foundation`**: schema, event change requests, a
 - **Prisma 7** — schema/migrations; runtime read через dto port
 - **Консистентность:** parity scripts; константы каталога в `@daibilet/contracts`
 - **SEO:** title template `%s | Дайбилет` без дублей; `og:url` route-specific (`seo-meta.ts`)
+- **Веб-аналитика:** Яндекс.Метрика только в `apps/web` (`YandexMetrika` + `next/script`, ID `NEXT_PUBLIC_YANDEX_METRIKA_ID` / default `106786540`); admin не подключаем
 - **Метрики событий:** единый источник — public grouped catalog (`groupKey`), не raw imported rows
 
 ---
@@ -113,7 +114,16 @@ pnpm backend:test:ts
 BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 ```
 
-Env для widgets: `NEXT_PUBLIC_TC_WIDGET_TOKEN`, `NEXT_PUBLIC_TEP_WIDGET_ID`.
+Env для widgets / analytics: `NEXT_PUBLIC_TC_WIDGET_TOKEN`, `NEXT_PUBLIC_TEP_WIDGET_ID`, `NEXT_PUBLIC_YANDEX_METRIKA_ID`.
+
+---
+
+## Блог / контент-ops
+
+- Карточки: `apps/web/src/data/blog-posts.ts` (+ зеркало в `apps/public`).
+- Тексты: `content/blog/*.md` → `npm run blog:sync-bodies` → `blog-article-bodies.ts` (SSR fallback); прод-источник — `Article` через `npm run blog:upsert`.
+- Еженедельный дайджест новых событий: `npm run blog:weekly-digest` → `Article` status=`REVIEW` (cron вс 07:00, см. `deploy/cron/README.md`). Без auto-publish.
+- План и антидубли: [content-blog-plan.md](./content-blog-plan.md).
 
 ---
 
@@ -121,5 +131,6 @@ Env для widgets: `NEXT_PUBLIC_TC_WIDGET_TOKEN`, `NEXT_PUBLIC_TEP_WIDGET_ID`.
 
 - [Tasktracker.md](./Tasktracker.md) — прогресс задач
 - [Diary.md](./Diary.md) — технический дневник
+- [content-blog-plan.md](./content-blog-plan.md) — контент-план блога
 - [decision-log.md](./decision-log.md) — архитектурные решения
 - [current-state.md](./current-state.md) — оперативный статус

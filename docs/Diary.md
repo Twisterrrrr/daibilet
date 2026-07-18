@@ -4,6 +4,68 @@
 
 ---
 
+## 2026-07-19 — 4 статьи блога + weekly digest
+
+### Наблюдения
+
+- Пятый заголовок («Как купить билет на Дайбилете») снят по решению продукта — лишний trust/help.
+- Прод читает статьи из `Article`; статика `blog-posts.ts` — карточки + SSR fallback; полный текст раньше в fallback сводился к excerpt.
+- Обложки эталонно лежат в `apps/public/public/images/blog/` и копируются в Next public.
+
+### Решения
+
+- Контент 4 статей в `content/blog/*.md`; sync тел → `blog-article-bodies.ts`; upsert → `npm run blog:upsert`.
+- Обложки сгенерированы (1536×1024), подключены по slug.
+- Weekly digest: `scripts/blog-weekly-digest.js` + `deploy/cron/blog-weekly-digest.sh` (вс 07:00), status=`REVIEW`, без auto-publish.
+- Документы: [content-blog-plan.md](./content-blog-plan.md), [deploy/cron/README.md](../deploy/cron/README.md).
+
+### Проблемы
+
+- Без деплоя и `blog:upsert` на prod полные тексты в БД не появятся (SSR fallback уже отдаёт bodies из статики).
+- Первый cron-прогон дайджеста нужно поставить вручную на сервере (`crontab`).
+
+---
+
+## 2026-07-19 — Инвентарь статей блога (антидубли)
+
+### Наблюдения
+
+- Два источника контента: статика `apps/web/src/data/blog-posts.ts` и prod `Article`.
+- Запрос к БД с prod: из `/opt/daibilet/apps/backend` + `NODE_PATH=…/node_modules` и `.cjs` (package `"type":"module"` ломает `require` в `.js`; `/tmp` + голый `pg` — нет).
+- Статика и БД: по **13** статей, одинаковые slug; заголовки в БД чуть длиннее SEO-варианты.
+- Уже закрыты: семья, концерты, джаз МСК, реки МСК/Казань, крыши/мосты/дворы/стендап/планетарий СПб, автобус МСК, эмаль, регионы.
+
+### Решения
+
+- Правило «не повторяться» зафиксировано в [content-blog-plan.md](./content-blog-plan.md): инвентарь обоих источников + 5 новых заголовков вне закрытых кластеров.
+- Temp `tmp-list-articles` после инвентаря удалён (локально и с prod).
+
+### Проблемы
+
+- При расхождении статика↔БД карточки/SEO могут «плыть» — перед публикацией новых статей сверять оба источника.
+
+---
+
+## 2026-07-19 — Яндекс.Метрика на публичном Next
+
+### Наблюдения
+
+- В `apps/web` не было GTM/GA/Метрики — только JSON-LD и виджеты TC/TEP.
+- Privacy/Legal уже упоминают Яндекс.Метрику как возможный инструмент аналитики.
+- Admin (`apps/admin`) — отдельное приложение; счётчик нужен только на daibilet.ru.
+
+### Решения
+
+- Клиентский `YandexMetrika` (`next/script` `afterInteractive`) + `<noscript>` pixel в root `layout.tsx`.
+- ID: `106786540` (override через `NEXT_PUBLIC_YANDEX_METRIKA_ID`), init: `ssr`, webvisor, clickmap, ecommerce `dataLayer`, accurateTrackBounce, trackLinks.
+- Паттерн env как у виджетов; в admin Метрику не ставим.
+
+### Проблемы
+
+- Хиты появятся в кабинете Метрики только после деплоя Next на prod; SPA-переходы App Router при `ssr:true` обычно ок, при сомнениях — проверить «онлайн» после клиентской навигации.
+
+---
+
 ## 2026-07-19 — Скрейпер liliabots.ru копирует афишу
 
 ### Наблюдения
