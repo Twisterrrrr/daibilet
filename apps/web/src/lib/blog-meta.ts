@@ -69,7 +69,7 @@ const SLUG_META: Record<
     city: 'Москва',
   },
   'spb-dvory-paradnye-kommunalki': {
-    authorId: 'anna',
+    authorId: 'editorial',
     articleType: 'gid',
     citySlug: 'saint-petersburg',
     city: 'Санкт-Петербург',
@@ -117,7 +117,7 @@ const SLUG_META: Record<
     city: 'Регионы',
   },
   'moskva-immersivnye-vystavki': {
-    authorId: 'anna',
+    authorId: 'editorial',
     articleType: 'gid',
     citySlug: 'moscow',
     city: 'Москва',

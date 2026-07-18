@@ -96,8 +96,8 @@ npm run blog:sync-bodies
 
 | Slug | Статус |
 |------|--------|
-| `spb-rooftop-guide` | Обновлён: крыши + мосты в одной статье |
-| `spb-razvod-mostov-kakoi-reis` | HIDDEN + 301 → `/blog/spb-rooftop-guide` |
+| `spb-rooftop-guide` | Крыши (+ мосты кратко); отдельная от мостов |
+| `spb-razvod-mostov-kakoi-reis` | PUBLISHED снова (отдельный гид по рейсам) |
 | `kuda-poyti-s-detmi` | Обновлён; author=`editorial` (не Елена) |
 | `chto-poslushat-jazz` | Обновлён под формат выбора формата |
 | `kak-vybrat-koncert` | Обновлён: места в зале |
