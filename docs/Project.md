@@ -127,15 +127,15 @@ Env для widgets / analytics: `NEXT_PUBLIC_TC_WIDGET_TOKEN`, `NEXT_PUBLIC_TEP_
 
 ### ИИ-колонки блога (2026-07-19)
 
-Пять вымышленных журналистов с voice bible по публичным style-прототипам (не impersonation):
+Пять вымышленных авторов **колонок-статей** (стиль письма / register, не «голос»/подкаст) по публичным style-прототипам (не impersonation):
 
 | authorId | Автор | Колонка |
 |----------|-------|---------|
-| `rodion-vetrov` | Родион Ветров | «Ветром и рублём» |
-| `aglaya-fontanskaya` | Аглая Фонтанская | «По эту сторону фасада» |
-| `mila-orlova` | Мила Орлова | «Семейный радиус» |
-| `tikhon-zarechny` | Тихон Заречный | «Заречье» |
-| `pavel-yuzhny` | Павел Южный | «Соль и дым» |
+| `max` | Макс | «Изнанка маршрута» |
+| `anna` | Анна | «Между эпохами» |
+| `elena` | Елена | «Спокойный маршрут» |
+| `igor` | Игорь | «Место силы» |
+| `artur` | Артур | «На вкус» |
 
 Документы: [ai-journalists/README.md](./ai-journalists/README.md), реестр [ai-journalists/personas.json](./ai-journalists/personas.json).
 
