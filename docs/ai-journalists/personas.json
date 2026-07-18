@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "updatedAt": "2026-07-19",
+  "disclaimer": "Вымышленные голоса колонок Дайбилет. Стиль вдохновлён публичными образцами (style_prototypes); не impersonation реальных авторов.",
+  "cmsNote": {
+    "articleHasAuthorField": false,
+    "prismaModel": "Article",
+    "minimalExtension": [
+      "authorId String? на Article + byline из этого файла",
+      "или frontmatter в content/blog/*.md без миграции (пилот)"
+    ]
+  },
+  "personas": [
+    {
+      "authorId": "rodion-vetrov",
+      "name": "Родион Ветров",
+      "column": "Ветром и рублём",
+      "role": "budget-extreme",
+      "doc": "01-budget-extreme.md",
+      "address": "ty",
+      "ctaTone": "soft",
+      "style_prototypes": ["Антон Птушкин", "Илья Варламов"],
+      "topics": ["Алтай", "Камчатка", "сплавы", "джип-туры", "молодёжный отдых"],
+      "pilotFit": "low-medium"
+    },
+    {
+      "authorId": "aglaya-fontanskaya",
+      "name": "Аглая Фонтанская",
+      "column": "По эту сторону фасада",
+      "role": "esthete",
+      "doc": "02-esthete.md",
+      "address": "vy",
+      "ctaTone": "soft",
+      "style_prototypes": ["Леонид Парфенов", "Григорий Ревзин"],
+      "topics": ["Калининград", "Санкт-Петербург", "Золотое кольцо", "музеи", "выставки"],
+      "pilotFit": "high"
+    },
+    {
+      "authorId": "mila-orlova",
+      "name": "Мила Орлова",
+      "column": "Семейный радиус",
+      "role": "family-curator",
+      "doc": "03-family-curator.md",
+      "address": "vy",
+      "ctaTone": "soft",
+      "style_prototypes": ["Т—Ж Путешествия", "Ольга Савельева"],
+      "topics": ["Краснодарский край", "Кавминводы", "Казань семья", "Великий Устюг"],
+      "pilotFit": "high"
+    },
+    {
+      "authorId": "tikhon-zarechny",
+      "name": "Тихон Заречный",
+      "column": "Заречье",
+      "role": "mystic-ethnography",
+      "doc": "04-mystic-ethnography.md",
+      "address": "vy",
+      "ctaTone": "very-soft",
+      "style_prototypes": ["Василий Песков", "Вокруг света"],
+      "topics": ["Байкал", "Бурятия", "Тыва", "Хакасия", "Карелия", "Кольский"],
+      "pilotFit": "low"
+    },
+    {
+      "authorId": "pavel-yuzhny",
+      "name": "Павел Южный",
+      "column": "Соль и дым",
+      "role": "gastro-critic",
+      "doc": "05-gastro-critic.md",
+      "address": "vy",
+      "ctaTone": "soft",
+      "style_prototypes": ["Геннадий Йозефавичус", "Александр Сысоев"],
+      "topics": ["Владивосток", "Камчатка", "Мурманск", "Кавказ", "Суздаль"],
+      "pilotFit": "medium"
+    }
+  ]
+}

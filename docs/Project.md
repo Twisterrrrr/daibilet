@@ -125,6 +125,27 @@ Env для widgets / analytics: `NEXT_PUBLIC_TC_WIDGET_TOKEN`, `NEXT_PUBLIC_TEP_
 - Еженедельный дайджест новых событий: `npm run blog:weekly-digest` → `Article` status=`REVIEW` (cron вс 07:00, см. `deploy/cron/README.md`). Без auto-publish.
 - План и антидубли: [content-blog-plan.md](./content-blog-plan.md).
 
+### ИИ-колонки блога (2026-07-19)
+
+Пять вымышленных журналистов с voice bible по публичным style-прототипам (не impersonation):
+
+| authorId | Автор | Колонка |
+|----------|-------|---------|
+| `rodion-vetrov` | Родион Ветров | «Ветром и рублём» |
+| `aglaya-fontanskaya` | Аглая Фонтанская | «По эту сторону фасада» |
+| `mila-orlova` | Мила Орлова | «Семейный радиус» |
+| `tikhon-zarechny` | Тихон Заречный | «Заречье» |
+| `pavel-yuzhny` | Павел Южный | «Соль и дым» |
+
+Документы: [ai-journalists/README.md](./ai-journalists/README.md), реестр [ai-journalists/personas.json](./ai-journalists/personas.json).
+
+**CMS:** у `Article` сейчас нет `author`. Минимальное расширение для пилота:
+
+1. Frontmatter в `content/blog/*.md` (`authorId`, `column`, `persona`) + byline в UI без миграции; **или**
+2. `authorId String?` на `Article` + чтение метаданных из `personas.json` / будущей таблицы `ArticleAuthor`.
+
+Код CMS не обязателен до первого материала; генерация опирается на docs + JSON.
+
 ---
 
 ## Связанные документы
@@ -132,5 +153,6 @@ Env для widgets / analytics: `NEXT_PUBLIC_TC_WIDGET_TOKEN`, `NEXT_PUBLIC_TEP_
 - [Tasktracker.md](./Tasktracker.md) — прогресс задач
 - [Diary.md](./Diary.md) — технический дневник
 - [content-blog-plan.md](./content-blog-plan.md) — контент-план блога
+- [ai-journalists/README.md](./ai-journalists/README.md) — ИИ-колонки / персоны
 - [decision-log.md](./decision-log.md) — архитектурные решения
 - [current-state.md](./current-state.md) — оперативный статус
