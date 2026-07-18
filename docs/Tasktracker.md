@@ -14,7 +14,7 @@
 | B.1 | Формат «Редакция» (`docs/ai-journalists/00-editorial.md`) | Высокий | ✅ |
 | B.2 | Rewrite 4 гидов + SEO/ссылки/`[buy]` | Высокий | ✅ |
 | B.3 | Hide `spb-razvod-mostov-kakoi-reis` + 301 → rooftop | Средний | ✅ |
-| B.4 | Commit → deploy-prod-next → `blog:upsert` ×4+hide | Критический | 🔄 |
+| B.4 | Commit → deploy-prod-next → `blog:upsert` ×4+hide | Критический | ✅ |
 
 ---
 

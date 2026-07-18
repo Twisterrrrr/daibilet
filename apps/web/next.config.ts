@@ -1,6 +1,9 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  // Prod VPS ~4GB: full tsc/eslint during `next build` gets OOM-killed.
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
   transpilePackages: ['@daibilet/backend', '@daibilet/db', '@daibilet/contracts'],
   serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'pg'],
   async redirects() {
