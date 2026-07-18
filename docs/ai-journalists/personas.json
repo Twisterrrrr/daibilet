@@ -3,12 +3,13 @@
   "updatedAt": "2026-07-19",
   "disclaimer": "Вымышленные авторы колонок-статей Дайбилет (текст, не аудио). Стиль письма / register вдохновлён публичными образцами (style_prototypes); не impersonation.",
   "cmsNote": {
-    "articleHasAuthorField": false,
+    "articleHasAuthorField": true,
     "prismaModel": "Article",
-    "minimalExtension": [
-      "authorId String? на Article + byline из этого файла",
-      "или frontmatter в content/blog/*.md без миграции (пилот)"
-    ]
+    "fields": ["authorId", "authorName", "articleType"],
+    "publicFilters": ["city", "author"],
+    "greetingCanon": {
+      "max": "Эй, кто на маршруте!"
+    }
   },
   "personas": [
     {
@@ -21,6 +22,7 @@
       "address": "ty-folk",
       "ctaTone": "soft",
       "closingPhrase": "Путешествуйте. Оно того стоит",
+      "greetingPhrase": "Эй, кто на маршруте!",
       "structure": "4-5 paragraphs, 1200-1800 chars",
       "style_prototypes": ["Антон Птушкин"],
       "editorial_reference": "https://perito.media/posts/ptushkin-balcans",

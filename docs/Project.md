@@ -139,10 +139,9 @@ Env для widgets / analytics: `NEXT_PUBLIC_TC_WIDGET_TOKEN`, `NEXT_PUBLIC_TEP_
 
 Документы: [ai-journalists/README.md](./ai-journalists/README.md), реестр [ai-journalists/personas.json](./ai-journalists/personas.json).
 
-**CMS:** у `Article` сейчас нет `author`. Минимальное расширение для пилота:
+**CMS:** у `Article` есть `authorId` / `authorName` / `articleType` (миграция `20260719140000_article_author_type`). Публичный `/blog` фильтрует по **городу** и **автору** (`?city=&author=`). Тип статьи хранится в БД для контент-плана, в UI не дублируется отдельным фильтром.
 
-1. Frontmatter в `content/blog/*.md` (`authorId`, `column`, `persona`) + byline в UI без миграции; **или**
-2. `authorId String?` на `Article` + чтение метаданных из `personas.json` / будущей таблицы `ArticleAuthor`.
+Канон приветствия Макса: **«Эй, кто на маршруте!»** (не «Касатики»).
 
 Код CMS не обязателен до первого материала; генерация опирается на docs + JSON.
 

@@ -221,10 +221,12 @@ await db.query(
   `
     insert into "Article" (
       id, slug, status, title, excerpt, content, "coverImageUrl", "cityId",
+      "authorId", "authorName", "articleType",
       "seoH1", "seoTitle", "seoDescription", "canonicalPath", "isIndexable",
       "publishedAt", "createdAt", "updatedAt"
     ) values (
       $1, $2, 'REVIEW'::"ArticleStatus", $3, $4, $5, $6, null,
+      'editorial', 'Редакция', 'digest',
       $3, $7, $4, $8, false,
       null, now(), now()
     )

@@ -44,12 +44,9 @@
 
 ## Связь с CMS
 
-Сейчас у `Article` (Prisma) **нет** поля `author`. Минимальное расширение (позже):
+Сейчас у `Article` есть `authorId` / `authorName` / `articleType`. Публичный `/blog`: фильтры **город** + **автор** (`?city=&author=`).
 
-- опция A: `authorId String?` + join к статическому `personas.json` / таблице `ArticleAuthor`;
-- опция B: frontmatter в `content/blog/*.md` + отображение byline на `/blog/[slug]` без миграции (быстрый пилот).
-
-См. предложение в [Project.md](../Project.md) § «ИИ-колонки блога».
+Канон Макса: приветствие **«Эй, кто на маршруте!»** (не «Касатики»).
 
 ## Пилот (рекомендация)
 

@@ -9486,6 +9486,9 @@ function mapPublicArticleRow(row) {
     coverImageUrl: row.coverImageUrl || null,
     city: row.city || null,
     citySlug: row.citySlug || null,
+    authorId: row.authorId || null,
+    authorName: row.authorName || null,
+    articleType: row.articleType || null,
     publishedAt: row.publishedAt ? new Date(row.publishedAt).toISOString() : null,
     isIndexable: row.isIndexable !== false,
     seoTitle: row.seoTitle || row.title,
@@ -9514,8 +9517,19 @@ export async function buildPublicArticlesList(db) {
       a."isIndexable",
       a."seoTitle",
       a."seoDescription",
-      c.title as city,
-      c.slug as "citySlug"
+      a."authorId",
+      a."authorName",
+      a."articleType",
+      case
+        when a.slug = 'afisha-regionalnye-goroda' then 'Регионы'
+        when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'Несколько городов'
+        else c.title
+      end as city,
+      case
+        when a.slug = 'afisha-regionalnye-goroda' then 'regions'
+        when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'multi'
+        else c.slug
+      end as "citySlug"
     from "Article" a
     left join "City" c on c.id = a."cityId"
     where a.status = 'PUBLISHED'
@@ -9545,8 +9559,19 @@ export async function buildPublicArticlePage(db, slug) {
         a."seoTitle",
         a."seoDescription",
         a."canonicalPath",
-        c.title as city,
-        c.slug as "citySlug"
+        a."authorId",
+        a."authorName",
+        a."articleType",
+        case
+          when a.slug = 'afisha-regionalnye-goroda' then 'Регионы'
+          when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'Несколько городов'
+          else c.title
+        end as city,
+        case
+          when a.slug = 'afisha-regionalnye-goroda' then 'regions'
+          when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'multi'
+          else c.slug
+        end as "citySlug"
       from "Article" a
       left join "City" c on c.id = a."cityId"
       where a.slug = $1
@@ -9624,6 +9649,9 @@ export async function buildAdminArticleDetail(db, articleId) {
     cityId: row.cityId || null,
     city: row.city || null,
     citySlug: row.citySlug || null,
+    authorId: row.authorId || null,
+    authorName: row.authorName || null,
+    articleType: row.articleType || null,
     seoH1: row.seoH1 || null,
     seoTitle: row.seoTitle || null,
     seoDescription: row.seoDescription || null,
@@ -9659,6 +9687,9 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
   const content = payload.content ?? current?.content ?? null;
   const coverImageUrl = payload.coverImageUrl ?? current?.coverImageUrl ?? null;
   const cityId = payload.cityId ?? current?.cityId ?? null;
+  const authorId = payload.authorId ?? current?.authorId ?? null;
+  const authorName = payload.authorName ?? current?.authorName ?? null;
+  const articleType = payload.articleType ?? current?.articleType ?? null;
   const seoH1 = payload.seoH1 ?? current?.seoH1 ?? null;
   const seoTitle = payload.seoTitle ?? current?.seoTitle ?? title;
   const seoDescription = payload.seoDescription ?? current?.seoDescription ?? excerpt;
@@ -9681,12 +9712,15 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
           content = $6,
           "coverImageUrl" = $7,
           "cityId" = $8,
-          "seoH1" = $9,
-          "seoTitle" = $10,
-          "seoDescription" = $11,
-          "canonicalPath" = $12,
-          "isIndexable" = $13,
-          "publishedAt" = $14,
+          "authorId" = $9,
+          "authorName" = $10,
+          "articleType" = $11,
+          "seoH1" = $12,
+          "seoTitle" = $13,
+          "seoDescription" = $14,
+          "canonicalPath" = $15,
+          "isIndexable" = $16,
+          "publishedAt" = $17,
           "updatedAt" = now()
         where id = $1
         returning id
@@ -9700,6 +9734,9 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
         content,
         coverImageUrl,
         cityId,
+        authorId,
+        authorName,
+        articleType,
         seoH1,
         seoTitle,
         seoDescription,
@@ -9716,13 +9753,15 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
     `
       insert into "Article" (
         id, slug, status, title, excerpt, content, "coverImageUrl", "cityId",
+        "authorId", "authorName", "articleType",
         "seoH1", "seoTitle", "seoDescription", "canonicalPath", "isIndexable",
         "publishedAt", "createdAt", "updatedAt"
       )
       values (
         $1, $2, $3::"ArticleStatus", $4, $5, $6, $7, $8,
-        $9, $10, $11, $12, $13,
-        $14, now(), now()
+        $9, $10, $11,
+        $12, $13, $14, $15, $16,
+        $17, now(), now()
       )
     `,
     [
@@ -9734,6 +9773,9 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
       content,
       coverImageUrl,
       cityId,
+      authorId,
+      authorName,
+      articleType,
       seoH1,
       seoTitle,
       seoDescription,

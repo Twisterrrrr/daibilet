@@ -957,6 +957,11 @@ model Article {
   content        String?
   coverImageUrl  String?
   cityId         String?
+  /// ИИ-автор / редакция: max|anna|elena|igor|artur|editorial
+  authorId       String?
+  authorName     String?
+  /// Тип материала: gid|column|digest|obzor
+  articleType    String?
   seoH1          String?
   seoTitle       String?
   seoDescription String?
@@ -969,6 +974,8 @@ model Article {
   city City? @relation(fields: [cityId], references: [id])
 
   @@index([status, isIndexable, publishedAt])
+  @@index([authorId])
+  @@index([articleType])
 }
 
 model SeoMeta {

@@ -1,0 +1,224 @@
+/** Метаданные фильтров блога: автор, тип, город (slug). */
+
+export const BLOG_AUTHOR_LABELS: Record<string, string> = {
+  max: 'Макс',
+  anna: 'Анна',
+  elena: 'Елена',
+  igor: 'Игорь',
+  artur: 'Артур',
+  editorial: 'Редакция',
+};
+
+export const BLOG_ARTICLE_TYPE_LABELS: Record<string, string> = {
+  gid: 'Гид',
+  column: 'Колонка',
+  digest: 'Дайджест',
+  obzor: 'Обзор',
+};
+
+export const BLOG_CITY_FILTER_LABELS: Record<string, string> = {
+  moscow: 'Москва',
+  'saint-petersburg': 'Санкт-Петербург',
+  kazan: 'Казань',
+  regions: 'Регионы',
+  multi: 'Несколько городов',
+};
+
+export type BlogArticleType = keyof typeof BLOG_ARTICLE_TYPE_LABELS;
+
+/** Канонические метаданные по slug (статика + backfill эвристики). */
+const SLUG_META: Record<
+  string,
+  {
+    authorId: string;
+    articleType: BlogArticleType;
+    citySlug?: string;
+    city?: string;
+  }
+> = {
+  'open-air-festy-vyhodnoi-ru': {
+    authorId: 'max',
+    articleType: 'column',
+    citySlug: 'saint-petersburg',
+    city: 'Санкт-Петербург',
+  },
+  'kak-vybrat-koncert': { authorId: 'editorial', articleType: 'gid' },
+  'kuda-poyti-s-detmi': { authorId: 'elena', articleType: 'gid' },
+  'spb-rooftop-guide': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'saint-petersburg',
+    city: 'Санкт-Петербург',
+  },
+  'chto-poslushat-jazz': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'moscow',
+    city: 'Москва',
+  },
+  'moskva-rechnye-progulki-zaryade': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'moscow',
+    city: 'Москва',
+  },
+  'spb-dvory-paradnye-kommunalki': {
+    authorId: 'anna',
+    articleType: 'gid',
+    citySlug: 'saint-petersburg',
+    city: 'Санкт-Петербург',
+  },
+  'spb-razvod-mostov-kakoi-reis': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'saint-petersburg',
+    city: 'Санкт-Петербург',
+  },
+  'spb-stendap-gid': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'saint-petersburg',
+    city: 'Санкт-Петербург',
+  },
+  'kazan-rechnye-progulki': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'kazan',
+    city: 'Казань',
+  },
+  'moskva-avtobusnaya-obzornaya': {
+    authorId: 'editorial',
+    articleType: 'obzor',
+    citySlug: 'moscow',
+    city: 'Москва',
+  },
+  'spb-planetarium-gid': {
+    authorId: 'elena',
+    articleType: 'gid',
+    citySlug: 'saint-petersburg',
+    city: 'Санкт-Петербург',
+  },
+  'moskva-master-klass-emal': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'moscow',
+    city: 'Москва',
+  },
+  'afisha-regionalnye-goroda': {
+    authorId: 'editorial',
+    articleType: 'obzor',
+    citySlug: 'regions',
+    city: 'Регионы',
+  },
+  'moskva-immersivnye-vystavki': {
+    authorId: 'anna',
+    articleType: 'gid',
+    citySlug: 'moscow',
+    city: 'Москва',
+  },
+  'moskva-kvesty-escape-room': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'moscow',
+    city: 'Москва',
+  },
+  'myuzikly-teatr-novichok-msk-spb': {
+    authorId: 'anna',
+    articleType: 'gid',
+    citySlug: 'multi',
+    city: 'Несколько городов',
+  },
+  'moskva-vechernie-diskoteki-shou': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'moscow',
+    city: 'Москва',
+  },
+};
+
+export function authorLabel(authorId?: string | null): string {
+  const id = String(authorId || 'editorial').trim().toLowerCase() || 'editorial';
+  return BLOG_AUTHOR_LABELS[id] || 'Редакция';
+}
+
+export function articleTypeLabel(type?: string | null): string {
+  const key = String(type || 'gid').trim().toLowerCase();
+  return BLOG_ARTICLE_TYPE_LABELS[key] || BLOG_ARTICLE_TYPE_LABELS.gid;
+}
+
+export function cityFilterLabel(citySlug?: string | null, cityName?: string | null): string {
+  const slug = String(citySlug || '').trim().toLowerCase();
+  if (slug && BLOG_CITY_FILTER_LABELS[slug]) return BLOG_CITY_FILTER_LABELS[slug];
+  if (cityName) return cityName;
+  return 'Без города';
+}
+
+export function resolveSlugBlogMeta(slug: string): {
+  authorId: string;
+  authorName: string;
+  articleType: BlogArticleType;
+  citySlug: string | null;
+  city: string | null;
+} {
+  const hit = SLUG_META[slug];
+  if (hit) {
+    return {
+      authorId: hit.authorId,
+      authorName: authorLabel(hit.authorId),
+      articleType: hit.articleType,
+      citySlug: hit.citySlug || null,
+      city: hit.city || null,
+    };
+  }
+
+  // Эвристики для новых slug без явной записи
+  const lower = slug.toLowerCase();
+  let articleType: BlogArticleType = 'gid';
+  if (lower.includes('afisha-nedeli') || lower.includes('digest')) articleType = 'digest';
+  else if (lower.includes('obzor') || lower.includes('obzorn')) articleType = 'obzor';
+  else if (lower.includes('column') || lower.includes('kolonka')) articleType = 'column';
+
+  let citySlug: string | null = null;
+  let city: string | null = null;
+  if (lower.startsWith('moskva-') || lower.includes('-msk')) {
+    citySlug = 'moscow';
+    city = 'Москва';
+  } else if (lower.startsWith('spb-') || lower.includes('-spb') || lower.includes('peterburg')) {
+    citySlug = 'saint-petersburg';
+    city = 'Санкт-Петербург';
+  } else if (lower.startsWith('kazan-')) {
+    citySlug = 'kazan';
+    city = 'Казань';
+  } else if (lower.includes('regional') || lower.includes('region')) {
+    citySlug = 'regions';
+    city = 'Регионы';
+  }
+
+  return {
+    authorId: 'editorial',
+    authorName: 'Редакция',
+    articleType,
+    citySlug,
+    city,
+  };
+}
+
+/** Нормализация citySlug для фильтра (в т.ч. pseudo-города regions/multi). */
+export function normalizeBlogCitySlug(
+  citySlug?: string | null,
+  cityName?: string | null,
+  fallbackSlug?: string | null,
+): string | null {
+  const raw = String(citySlug || fallbackSlug || '')
+    .trim()
+    .toLowerCase();
+  if (raw === 'spb' || raw === 'petersburg' || raw === 'sankt-peterburg') return 'saint-petersburg';
+  if (raw === 'msk') return 'moscow';
+  if (raw && (BLOG_CITY_FILTER_LABELS[raw] || raw.length > 1)) return raw;
+  const name = String(cityName || '').trim().toLowerCase();
+  if (name.includes('москв')) return 'moscow';
+  if (name.includes('петербург') || name.includes('санкт')) return 'saint-petersburg';
+  if (name.includes('казан')) return 'kazan';
+  if (name.includes('регион')) return 'regions';
+  return null;
+}

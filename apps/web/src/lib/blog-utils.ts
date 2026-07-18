@@ -1,6 +1,11 @@
 import { BLOG_ARTICLE_BODIES } from '@/data/blog-article-bodies';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import { blogCoverUrl } from '@/lib/blog-cover';
+import {
+  authorLabel,
+  normalizeBlogCitySlug,
+  resolveSlugBlogMeta,
+} from '@/lib/blog-meta';
 
 export type BlogCardDto = {
   slug: string;
@@ -12,6 +17,9 @@ export type BlogCardDto = {
   publishedAt?: string | null;
   readMin: number;
   tag: string;
+  authorId?: string | null;
+  authorName?: string | null;
+  articleType?: string | null;
 };
 
 export type BlogArticleDto = {
@@ -27,6 +35,9 @@ export type BlogArticleDto = {
   seoTitle?: string | null;
   seoDescription?: string | null;
   canonicalPath?: string | null;
+  authorId?: string | null;
+  authorName?: string | null;
+  articleType?: string | null;
 };
 
 export function estimateReadMin(text?: string | null): number {
@@ -34,18 +45,58 @@ export function estimateReadMin(text?: string | null): number {
   return Math.max(3, Math.round(words / 180));
 }
 
+function enrichCardFields(slug: string, partial: Partial<BlogCardDto>): Pick<
+  BlogCardDto,
+  'city' | 'citySlug' | 'authorId' | 'authorName' | 'articleType' | 'tag'
+> {
+  const meta = resolveSlugBlogMeta(slug);
+  const authorId = partial.authorId || meta.authorId;
+  const articleType = partial.articleType || meta.articleType;
+  const citySlug =
+    normalizeBlogCitySlug(partial.citySlug, partial.city, meta.citySlug) || meta.citySlug;
+  const city = partial.city || meta.city || null;
+  const tag =
+    partial.tag ||
+    (articleType === 'column'
+      ? 'Колонка'
+      : articleType === 'obzor'
+        ? 'Обзор'
+        : articleType === 'digest'
+          ? 'Дайджест'
+          : city
+            ? 'Город'
+            : 'Гид');
+
+  return {
+    city,
+    citySlug,
+    authorId,
+    authorName: partial.authorName || authorLabel(authorId),
+    articleType,
+    tag,
+  };
+}
+
 export function staticBlogCards(): BlogCardDto[] {
-  return BLOG_POSTS.map((post) => ({
-    slug: post.slug,
-    title: post.title,
-    excerpt: post.excerpt,
-    city: post.city,
-    citySlug: post.citySlug,
-    coverImageUrl: post.imageUrl,
-    publishedAt: null,
-    readMin: post.readMin,
-    tag: post.tag,
-  }));
+  return BLOG_POSTS.map((post) => {
+    const enriched = enrichCardFields(post.slug, {
+      city: post.city,
+      citySlug: post.citySlug,
+      authorId: post.authorId,
+      authorName: post.authorName,
+      articleType: post.articleType,
+      tag: post.tag,
+    });
+    return {
+      slug: post.slug,
+      title: post.title,
+      excerpt: post.excerpt,
+      coverImageUrl: post.imageUrl,
+      publishedAt: null,
+      readMin: post.readMin,
+      ...enriched,
+    };
+  });
 }
 
 export function mergeBlogCards(
@@ -57,22 +108,31 @@ export function mergeBlogCards(
     citySlug?: string | null;
     coverImageUrl?: string | null;
     publishedAt?: string | null;
+    authorId?: string | null;
+    authorName?: string | null;
+    articleType?: string | null;
   }> | null,
 ): BlogCardDto[] {
   if (!apiArticles?.length) return staticBlogCards();
 
   return apiArticles.map((article) => {
     const staticPost = BLOG_POSTS.find((item) => item.slug === article.slug);
+    const enriched = enrichCardFields(article.slug, {
+      city: article.city ?? staticPost?.city,
+      citySlug: article.citySlug ?? staticPost?.citySlug,
+      authorId: article.authorId ?? staticPost?.authorId,
+      authorName: article.authorName ?? staticPost?.authorName,
+      articleType: article.articleType ?? staticPost?.articleType,
+      tag: staticPost?.tag,
+    });
     return {
       slug: article.slug,
       title: article.title,
       excerpt: article.excerpt || staticPost?.excerpt || '',
-      city: article.city,
-      citySlug: article.citySlug,
       coverImageUrl: article.coverImageUrl || blogCoverUrl(article.slug),
       publishedAt: article.publishedAt,
       readMin: estimateReadMin(article.excerpt || article.title),
-      tag: staticPost?.tag || (article.city ? 'Город' : 'Гид'),
+      ...enriched,
     };
   });
 }
@@ -81,14 +141,25 @@ export function resolveStaticArticle(slug: string): BlogArticleDto | null {
   const post = BLOG_POSTS.find((item) => item.slug === slug);
   if (!post) return null;
   const body = BLOG_ARTICLE_BODIES[post.slug];
+  const enriched = enrichCardFields(post.slug, {
+    city: post.city,
+    citySlug: post.citySlug,
+    authorId: post.authorId,
+    authorName: post.authorName,
+    articleType: post.articleType,
+    tag: post.tag,
+  });
   return {
     slug: post.slug,
     title: post.title,
     excerpt: post.excerpt,
     content: body || post.excerpt,
     coverImageUrl: post.imageUrl,
-    city: post.city,
-    citySlug: post.citySlug,
+    city: enriched.city,
+    citySlug: enriched.citySlug,
+    authorId: enriched.authorId,
+    authorName: enriched.authorName,
+    articleType: enriched.articleType,
     seoTitle: `${post.title} | Блог Дайбилет`,
     seoDescription: post.excerpt,
     canonicalPath: `/blog/${post.slug}`,

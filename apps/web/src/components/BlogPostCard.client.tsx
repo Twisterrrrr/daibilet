@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { formatBlogPublishedAt } from '@/lib/blog-utils';
+import { authorLabel } from '@/lib/blog-meta';
 import { resolveBlogCityHref } from '@/lib/blog-article-city';
 
 export function BlogPostCard({ post }: { post: BlogCardDto }) {
@@ -52,7 +53,10 @@ export function BlogPostCard({ post }: { post: BlogCardDto }) {
       <div className="flex flex-1 flex-col p-5">
         <h2 className="text-lg font-bold leading-snug text-slate-900 group-hover:text-primary-700">{post.title}</h2>
         <p className="mt-2 line-clamp-3 flex-1 text-sm leading-relaxed text-slate-600">{post.excerpt}</p>
-        <div className="mt-4 flex items-center gap-3 text-xs text-slate-500">
+        <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-slate-500">
+          {post.authorName || post.authorId ? (
+            <span className="font-medium text-slate-600">{post.authorName || authorLabel(post.authorId)}</span>
+          ) : null}
           {dateLabel ? <span>{dateLabel}</span> : null}
           <span className="inline-flex items-center gap-1">
             <Clock className="h-3.5 w-3.5" />

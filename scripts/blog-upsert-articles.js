@@ -55,10 +55,26 @@ async function upsertArticle(article) {
   const canonicalPath = meta.canonicalPath || `/blog/${slug}`;
   const isIndexable = status === 'PUBLISHED';
   const cityId = await resolveCityId(meta.citySlug);
+  const authorId = meta.authorId || (meta.author === 'Макс' ? 'max' : null) || 'editorial';
+  const authorName =
+    meta.authorName || meta.author || meta.persona || (authorId === 'editorial' ? 'Редакция' : authorId);
+  const articleType = String(meta.articleType || meta.tag || 'gid')
+    .toLowerCase()
+    .replace('колонка', 'column')
+    .replace('гид', 'gid')
+    .replace('обзор', 'obzor')
+    .replace('дайджест', 'digest');
+  const normalizedType = ['gid', 'column', 'digest', 'obzor'].includes(articleType)
+    ? articleType
+    : meta.tag === 'Колонка'
+      ? 'column'
+      : 'gid';
   const publishedAt = status === 'PUBLISHED' ? new Date().toISOString() : null;
 
   if (dryRun) {
-    console.log(`[dry-run] ${slug} status=${status} city=${meta.citySlug || '-'} chars=${content.length}`);
+    console.log(
+      `[dry-run] ${slug} status=${status} city=${meta.citySlug || '-'} author=${authorId} type=${normalizedType} chars=${content.length}`,
+    );
     return;
   }
 
@@ -74,12 +90,15 @@ async function upsertArticle(article) {
           content = $5,
           "coverImageUrl" = $6,
           "cityId" = $7,
-          "seoH1" = $8,
-          "seoTitle" = $9,
-          "seoDescription" = $10,
-          "canonicalPath" = $11,
-          "isIndexable" = $12,
-          "publishedAt" = coalesce("publishedAt", $13::timestamptz),
+          "authorId" = $8,
+          "authorName" = $9,
+          "articleType" = $10,
+          "seoH1" = $11,
+          "seoTitle" = $12,
+          "seoDescription" = $13,
+          "canonicalPath" = $14,
+          "isIndexable" = $15,
+          "publishedAt" = coalesce("publishedAt", $16::timestamptz),
           "updatedAt" = now()
         where id = $1
       `,
@@ -91,6 +110,9 @@ async function upsertArticle(article) {
         content,
         coverImageUrl,
         cityId,
+        authorId,
+        authorName,
+        normalizedType,
         seoH1,
         seoTitle,
         seoDescription,
@@ -99,7 +121,7 @@ async function upsertArticle(article) {
         publishedAt,
       ],
     );
-    console.log(`updated ${slug} (${status})`);
+    console.log(`updated ${slug} (${status}) author=${authorId} type=${normalizedType}`);
     return;
   }
 
@@ -108,12 +130,14 @@ async function upsertArticle(article) {
     `
       insert into "Article" (
         id, slug, status, title, excerpt, content, "coverImageUrl", "cityId",
+        "authorId", "authorName", "articleType",
         "seoH1", "seoTitle", "seoDescription", "canonicalPath", "isIndexable",
         "publishedAt", "createdAt", "updatedAt"
       ) values (
         $1, $2, $3::"ArticleStatus", $4, $5, $6, $7, $8,
-        $9, $10, $11, $12, $13,
-        $14::timestamptz, now(), now()
+        $9, $10, $11,
+        $12, $13, $14, $15, $16,
+        $17::timestamptz, now(), now()
       )
     `,
     [
@@ -125,6 +149,9 @@ async function upsertArticle(article) {
       content,
       coverImageUrl,
       cityId,
+      authorId,
+      authorName,
+      normalizedType,
       seoH1,
       seoTitle,
       seoDescription,
@@ -133,7 +160,7 @@ async function upsertArticle(article) {
       publishedAt,
     ],
   );
-  console.log(`inserted ${slug} (${status})`);
+  console.log(`inserted ${slug} (${status}) author=${authorId} type=${normalizedType}`);
 }
 
 const articles = loadBlogMarkdownDir(contentDir).filter((a) => !onlySlug || a.slug === onlySlug);
