@@ -131,13 +131,19 @@ export function BlogListFiltered({
         </label>
 
         {hasActive ? (
-          <button
-            type="button"
-            onClick={resetFilters}
-            className="self-start text-sm font-medium text-primary-600 hover:text-primary-700 sm:mb-2.5"
-          >
-            Сбросить
-          </button>
+          <div className="flex flex-col gap-1.5 self-start sm:self-auto">
+            {/* Спейсер под высоту лейбла — «Сбросить» на одной линии с select */}
+            <span className="invisible select-none text-sm font-medium" aria-hidden>
+              Сбросить
+            </span>
+            <button
+              type="button"
+              onClick={resetFilters}
+              className="py-2.5 text-sm font-medium text-primary-600 hover:text-primary-700"
+            >
+              Сбросить
+            </button>
+          </div>
         ) : null}
       </div>
 
