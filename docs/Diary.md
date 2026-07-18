@@ -4,7 +4,27 @@
 
 ---
 
-## 2026-07-14 — Admin section switches: SWR + landings/sources
+## 2026-07-18 — Teplohod widget back on event pages + landings
+
+### Наблюдения
+
+- После `860c818` (restore legacy widgets) из `TeplohodWidget.client.tsx` пропал `bootstrapTeplohodWidgets()` / повторный `TI_Tickets.init`.
+- На `/events/[slug]` оставался пустой `.teplohod-info-wrapper` без кнопки — script грузился, но init после hydration не вызывался.
+- На лендингах lean DTO без `purchaseUrl`/`externalId`; `LandingPurchaseButton` звал `getTeplohodWidgetIds` без парсинга `evt_tep_*`.
+
+### Решения
+
+- Восстановлен bootstrap + wait на `TI_Tickets.init`, retry mount, fallback на `account.teplohod.info`.
+- Event buy card передаёт `purchaseUrl` в embed.
+- Лендинги: `getTeplohodWidgetIdsFromSession` + `resolveTeplohodCheckoutUrl` (ID из `evt_tep_*`).
+- Каталог `/events` по-прежнему без widget markup (`suppressPurchaseAnchors`).
+
+### Проблемы
+
+- —
+
+---
+
 
 ### Наблюдения
 

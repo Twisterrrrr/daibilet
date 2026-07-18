@@ -8,7 +8,7 @@ import {
   resolveTcWidgetToken,
 } from '@/components/TcWidget.client';
 import {
-  getTeplohodWidgetIds,
+  getTeplohodWidgetIdsFromSession,
   openTeplohodWidget,
   TeplohodWidgetEmbed,
 } from '@/components/TeplohodWidget.client';
@@ -29,7 +29,7 @@ export function useCatalogPurchase(session: PublicSessionDto) {
   const tcTriggerRef = React.useRef<HTMLButtonElement | null>(null);
   const teplohodWrapperId = React.useId().replace(/:/g, '');
   const teplohod = React.useMemo(
-    () => (purchaseEnabled ? getTeplohodWidgetIds(session) : null),
+    () => (purchaseEnabled ? getTeplohodWidgetIdsFromSession(session) : null),
     [purchaseEnabled, session],
   );
   const [teplohodEventId, setTeplohodEventId] = React.useState<string>(
@@ -53,7 +53,7 @@ export function useCatalogPurchase(session: PublicSessionDto) {
     (slotLabel?: string) => {
       const target = slotLabel ? resolvePurchaseSessionForSlot(session, slotLabel) : session;
       const targetPurchaseUrl = target.widgetUrl || target.purchaseUrl || target.deeplinkUrl || null;
-      const targetTeplohod = getTeplohodWidgetIds(target) || teplohod;
+      const targetTeplohod = getTeplohodWidgetIdsFromSession(target) || teplohod;
 
       if (targetTeplohod?.tepEventId) {
         setTeplohodEventId(String(targetTeplohod.tepEventId));

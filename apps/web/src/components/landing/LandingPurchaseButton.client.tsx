@@ -1,7 +1,11 @@
 'use client';
 
 import { TcWidgetButton, getTcWidgetIds } from '@/components/TcWidget.client';
-import { TeplohodWidgetButton, getTeplohodWidgetIds } from '@/components/TeplohodWidget.client';
+import {
+  TeplohodWidgetButton,
+  getTeplohodWidgetIdsFromSession,
+  resolveTeplohodCheckoutUrl,
+} from '@/components/TeplohodWidget.client';
 import { extractTcEventIdFromSession } from '@/lib/event-purchase';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
@@ -47,7 +51,13 @@ export function LandingPurchaseButton({
     widgetProvider: session.purchaseProvider || session.offerSourceCode,
     purchaseUrl: session.purchaseUrl,
   });
-  const teplohod = getTeplohodWidgetIds(session);
+  const teplohod = getTeplohodWidgetIdsFromSession(session);
+  const teplohodCheckoutUrl =
+    resolveTeplohodCheckoutUrl({
+      purchaseUrl,
+      tepEventId: teplohod?.tepEventId,
+      tepWidgetId: teplohod?.tepWidgetId,
+    }) || purchaseUrl;
 
   if (ticketscloud?.tcEventId && tcEventId) {
     return (
@@ -65,15 +75,16 @@ export function LandingPurchaseButton({
       <TeplohodWidgetButton
         tepEventId={teplohod.tepEventId}
         tepWidgetId={teplohod.tepWidgetId}
+        purchaseUrl={teplohodCheckoutUrl}
         label={resolvedLabel}
         className={className}
       />
     );
   }
 
-  if (purchaseUrl) {
+  if (teplohodCheckoutUrl) {
     return (
-      <a href={purchaseUrl} target="_blank" rel="noopener noreferrer" className={className}>
+      <a href={teplohodCheckoutUrl} target="_blank" rel="noopener noreferrer" className={className}>
         {resolvedLabel}
       </a>
     );
