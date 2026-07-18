@@ -16,7 +16,8 @@ import { HomeEventRail, HomeNowSection } from '@/components/HomeNowSection.clien
 import { HomeHero } from '@/components/HomeHero.client';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { SiteLayout } from '@/components/SiteLayout';
-import { BLOG_POSTS } from '@/data/blog-posts';
+import { mergeBlogCards } from '@/lib/blog-utils';
+import { buildPublicArticlesListDto } from '@daibilet/backend/public-read';
 import '@/lib/env';
 import { getHomePageData } from '@/server/cached-home-data';
 import { formatMoney, pluralEvents } from '@/lib/format';
@@ -71,7 +72,17 @@ export async function HomePageContent() {
     .slice(0, 8);
 
   const promoLandings = (landingsCatalog.items || []).filter((item) => item.events > 0).slice(0, 6);
-  const blogPosts = BLOG_POSTS;
+  let blogCards = mergeBlogCards(null);
+  try {
+    const articlesPayload = await buildPublicArticlesListDto();
+    blogCards = mergeBlogCards(articlesPayload?.articles);
+  } catch {
+    // fallback to static posts
+  }
+  const orderedBlog = blogCards.some((card) => card.publishedAt)
+    ? blogCards
+    : [...blogCards].reverse();
+  const blogPosts = orderedBlog.slice(0, 4);
   const [featuredBlog, ...restBlog] = blogPosts;
 
   return (
@@ -238,7 +249,7 @@ export async function HomePageContent() {
                 className="group relative min-h-[240px] overflow-hidden rounded-2xl bg-slate-900 text-white shadow-lg sm:min-h-[280px]"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={featuredBlog.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-80 transition duration-500 group-hover:scale-105" />
+                <img src={featuredBlog.coverImageUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-80 transition duration-500 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                 <div className="relative flex h-full flex-col justify-end p-6">
                   <span className="inline-flex w-fit rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">{featuredBlog.tag}</span>
@@ -255,7 +266,7 @@ export async function HomePageContent() {
                   >
                     <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-200">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={post.imageUrl} alt="" className="h-full w-full object-cover transition group-hover:scale-105" />
+                      <img src={post.coverImageUrl} alt="" className="h-full w-full object-cover transition group-hover:scale-105" />
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-semibold uppercase tracking-wide text-primary-600">{post.tag}</p>
