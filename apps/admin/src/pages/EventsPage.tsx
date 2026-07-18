@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { adminFetch } from '@/lib/admin-api';
 import { useSearchParams } from 'react-router-dom';
-import { AlertTriangle, ArrowRight, CheckCircle2, ExternalLink, EyeOff, Image, Loader2, Save, Search, X } from 'lucide-react';
+import { AlertTriangle, ArrowRight, ExternalLink, EyeOff, Image, Loader2, Save, Search, X } from 'lucide-react';
 
 import { DataTableShell, FilterBar, InfoNote, PageHeader, QuickFilterBar, SourceBadge, StatusBadge } from '@/components/admin/primitives';
 import { Badge } from '@/components/ui/badge';
@@ -98,11 +98,6 @@ function readinessBadge(event: AdminEventRow) {
   if (event.readiness === 'ready') return <StatusBadge status="live" label="готово" />;
   if (event.readiness === 'blocked') return <StatusBadge status="error" label="блокер" />;
   return <StatusBadge status="incomplete" label="доработать" />;
-}
-
-function eventStatus(event: AdminEventRow) {
-  if (event.status === 'ready') return <StatusBadge status="live" label="active" />;
-  return <StatusBadge status="incomplete" label="review" />;
 }
 
 function matchesQuickFilter(event: AdminEventRow, view: string) {
@@ -225,6 +220,14 @@ function purchaseSourceLabel(event: AdminEventRow) {
   if (event.purchaseUrlSource === 'offer') return 'offer';
   if (event.purchaseUrlSource === 'fallback') return 'fallback';
   return event.purchaseMode || 'widget';
+}
+
+function shortOfferLabel(event: AdminEventRow) {
+  if (!isPurchaseReady(event)) return 'нет виджета';
+  const source = sourceBadgeFromEvent(event);
+  if (source === 'ticketscloud') return 'TC';
+  if (source === 'teplohod') return 'TEP';
+  return 'виджет';
 }
 
 function sourceBadgeFromEvent(event: Pick<AdminEventRow, 'source' | 'sourceCode'>): 'ticketscloud' | 'teplohod' | 'manual' {
@@ -657,95 +660,60 @@ export function EventsPage() {
         </InfoNote>
       </div>
 
-      <DataTableShell columns={['Событие', 'Источник', 'Каталог', 'Город', 'Площадка', 'Расписание', 'Цена', 'Покупка', 'Проблемы', 'Статус', '']}>
+      <DataTableShell columns={['Событие', 'Источник', 'Каталог', 'Город', 'Площадка', 'Когда', 'Цена', 'Покупка', 'Проблемы', 'Статус', '']}>
         {rows.map((event) => {
           const problems = problemLabels(event);
           const groupedEventsCount = event.groupedEventsCount || event.groupEventIds?.length || 1;
           const slotCount = event.slotCount || groupedEventsCount;
+          const cityPrimary = String(event.destination || event.city || '').trim() || '—';
+          const citySecondaryRaw = String(event.city || '').trim();
+          const citySecondary =
+            citySecondaryRaw && citySecondaryRaw.toLowerCase() !== cityPrimary.toLowerCase() ? citySecondaryRaw : null;
           return (
             <tr key={event.id} className="border-b border-border last:border-0 hover:bg-secondary/40">
-              <td className="min-w-[320px] px-4 py-3 align-top">
-                <div className="font-medium text-foreground">{event.override?.title || event.title}</div>
-                <div className="mt-1 font-mono text-[11px] text-muted-foreground">{event.id}</div>
+              <td className="min-w-[240px] max-w-[360px] px-3 py-2 align-middle">
+                <div className="line-clamp-2 text-sm font-medium leading-snug text-foreground">{event.override?.title || event.title}</div>
                 {groupedEventsCount > 1 ? (
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    <Badge variant="outline" className="border-primary/25 bg-primary/5 text-[11px] text-primary">
-                      {formatNumber(groupedEventsCount)} импортных событий
-                    </Badge>
-                    <Badge variant="outline" className="text-[11px]">
-                      одна карточка
-                    </Badge>
-                  </div>
+                  <div className="mt-0.5 text-[11px] text-muted-foreground">{formatNumber(groupedEventsCount)} в группе</div>
                 ) : null}
-                {event.tags.length > 0 ? <div className="mt-1 line-clamp-1 text-xs text-muted-foreground">{event.tags.slice(0, 3).join(', ')}</div> : null}
               </td>
-              <td className="px-4 py-3 align-top">
+              <td className="whitespace-nowrap px-3 py-2 align-middle">
                 <SourceBadge source={sourceBadgeFromEvent(event)} />
-                <div className="mt-1 text-xs text-muted-foreground">{event.sourceCategory}</div>
               </td>
-              <td className="px-4 py-3 align-top">
-                <div className="text-sm font-medium">{event.proposedCategory}</div>
-                <div className="mt-1 flex flex-wrap gap-1">
-                  {event.landingHits.slice(0, 2).map((hit) => (
-                    <Badge key={hit} variant="outline" className="text-[11px]">
-                      {hit}
-                    </Badge>
-                  ))}
-                </div>
+              <td className="max-w-[160px] px-3 py-2 align-middle">
+                <div className="line-clamp-2 text-sm">{event.proposedCategory || '—'}</div>
               </td>
-              <td className="px-4 py-3 align-top">
-                <div className="text-sm">{event.destination}</div>
-                <div className="text-xs text-muted-foreground">{event.city}</div>
+              <td className="max-w-[140px] px-3 py-2 align-middle">
+                <div className="line-clamp-1 text-sm">{cityPrimary}</div>
+                {citySecondary ? <div className="line-clamp-1 text-[11px] text-muted-foreground">{citySecondary}</div> : null}
               </td>
-              <td className="min-w-[220px] px-4 py-3 align-top">
-                <div className="text-sm">{event.venue}</div>
-                <div className="text-xs text-muted-foreground">{event.venueKind}</div>
+              <td className="min-w-[160px] max-w-[220px] px-3 py-2 align-middle">
+                <div className="line-clamp-2 text-sm">{event.venue || '—'}</div>
               </td>
-              <td className="px-4 py-3 align-top">
+              <td className="whitespace-nowrap px-3 py-2 align-middle">
                 <div className="text-sm">{formatDateTime(event.startsAt)}</div>
-                <div className="mt-1 flex flex-wrap items-center gap-1">
-                  <Badge variant="outline" className="text-[11px]">
-                    {formatNumber(slotCount)} слотов
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">{event.eventType}</span>
-                </div>
+                {slotCount > 1 ? <div className="text-[11px] text-muted-foreground">{formatNumber(slotCount)} слотов</div> : null}
               </td>
-              <td className="px-4 py-3 align-top text-sm font-medium">{formatMoney(event.priceFrom)}</td>
-              <td className="px-4 py-3 align-top">
-                <div className="flex flex-col items-start gap-1.5">
-                  <StatusBadge status={isPurchaseReady(event) ? 'live' : 'incomplete'} label={event.offerStatus} />
-                  <Badge variant="outline" className="text-[11px]">
-                    {purchaseSourceLabel(event)}
-                  </Badge>
-                </div>
+              <td className="whitespace-nowrap px-3 py-2 align-middle text-sm font-medium">{formatMoney(event.priceFrom)}</td>
+              <td className="whitespace-nowrap px-3 py-2 align-middle">
+                <StatusBadge status={isPurchaseReady(event) ? 'live' : 'incomplete'} label={shortOfferLabel(event)} />
               </td>
-              <td className="max-w-[240px] px-4 py-3 align-top">
+              <td className="px-3 py-2 align-middle">
                 {problems.length === 0 ? (
-                  <span className="inline-flex items-center gap-1 text-xs text-success">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    нет
-                  </span>
+                  <span className="text-xs text-success">ок</span>
                 ) : (
-                  <div className="flex flex-wrap gap-1">
-                    {problems.slice(0, 3).map((problem) => (
-                      <Badge key={problem} variant="outline" className="gap-1 border-warning/30 bg-warning/10 text-warning-foreground">
-                        <AlertTriangle className="h-3 w-3" />
-                        {problem}
-                      </Badge>
-                    ))}
-                  </div>
+                  <Badge
+                    variant="outline"
+                    className="gap-1 border-warning/30 bg-warning/10 text-[11px] text-warning-foreground"
+                    title={problems.join(' · ')}
+                  >
+                    <AlertTriangle className="h-3 w-3" />
+                    {problems.length}
+                  </Badge>
                 )}
               </td>
-              <td className="px-4 py-3 align-top">
-                {readinessBadge(event)}
-                <div className="mt-1">{eventStatus(event)}</div>
-                <div className="mt-1">
-                  <Badge variant="outline" className="text-[11px]">
-                    {event.moderationStatus || event.override?.editorStatus || 'REVIEW'}
-                  </Badge>
-                </div>
-              </td>
-              <td className="px-4 py-3 align-top">
+              <td className="whitespace-nowrap px-3 py-2 align-middle">{readinessBadge(event)}</td>
+              <td className="px-3 py-2 align-middle">
                 <Button variant="ghost" size="sm" title={`Открыть карточку события`} onClick={() => openEvent(event)}>
                   <ArrowRight className="h-4 w-4" />
                 </Button>
