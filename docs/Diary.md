@@ -789,3 +789,18 @@
 - staging.daibilet.ru временно без API/DB до явного start контейнеров/units.
 - Rollback: `docker start` нужных контейнеров; `systemctl enable --now daibilet-*-staging`; убрать drop-ins / вернуть `TEP_AUTO_SYNC_*`.
 
+
+---
+
+## 2026-07-19 - Admin grouped readiness: future sibling clears NO_FUTURE_SESSIONS
+
+### Наблюдения
+- После группировки sibling-событий past-only слот с `NO_FUTURE_SESSIONS` красил всю карточку как blocked, даже если в группе есть future-сеанс.
+- Backend (`groupAdminEventRows` / `finalizeGroupedAdminReadiness`) — source of truth; Admin UI зеркалит ту же логику.
+
+### Решения
+- `finalizeGroupedAdminReadiness`: при `groupHasFutureSession` снимается только `NO_FUTURE_SESSIONS`; остальные high-issues остаются.
+- Зеркало в `apps/admin/src/pages/EventsPage.tsx`; unit-тест `admin-group-readiness.test.ts` в `test:ts`.
+
+### Проблемы
+- Нет (ожидается prod deploy API + admin static).

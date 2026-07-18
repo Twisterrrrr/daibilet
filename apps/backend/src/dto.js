@@ -2753,11 +2753,56 @@ export async function updateAdminEventTaxonomy(db, eventId, payload) {
   return { eventId, event };
 }
 
+function mergeReadinessIssues(left = [], right = []) {
+  const byCode = new Map();
+  for (const issue of [...(left || []), ...(right || [])]) {
+    if (!issue?.code || byCode.has(issue.code)) continue;
+    byCode.set(issue.code, issue);
+  }
+  return Array.from(byCode.values());
+}
+
+/**
+ * After sibling grouping: a future slot in the group clears NO_FUTURE_SESSIONS,
+ * so a past-only sibling cannot paint the whole card as blocked. Other high issues stay.
+ */
+export function finalizeGroupedAdminReadiness(group, groupHasFutureSession) {
+  const sourceIssues =
+    Array.isArray(group.readinessIssues) && group.readinessIssues.length
+      ? group.readinessIssues
+      : (group.readinessCodes || [])
+          .map((code) => {
+            const meta = READINESS_ISSUE_META[code];
+            return meta ? { code, label: meta.label, severity: meta.severity } : null;
+          })
+          .filter(Boolean);
+
+  const issues = groupHasFutureSession
+    ? sourceIssues.filter((issue) => issue.code !== 'NO_FUTURE_SESSIONS')
+    : sourceIssues.slice();
+
+  const reasons = issues.map((issue) => issue.label);
+  const severity = readinessSeverity(issues);
+  const readiness = issues.length ? (severity === 'high' ? 'blocked' : 'review') : 'ready';
+  const status = issues.length ? 'needs_review' : 'ready';
+
+  return {
+    ...group,
+    readinessIssues: issues,
+    readinessCodes: issues.map((issue) => issue.code),
+    reasons,
+    severity,
+    readiness,
+    status,
+  };
+}
+
 function groupAdminEventRows(events) {
   const groups = new Map();
 
   for (const event of events) {
     const key = adminEventGroupKey(event);
+    const eventHasFuture = hasFutureSession(event);
     const current = groups.get(key);
     if (!current) {
       groups.set(key, {
@@ -2769,6 +2814,9 @@ function groupAdminEventRows(events) {
         landingHits: [...(event.landingHits || [])],
         tags: [...(event.tags || [])],
         reasons: [...(event.reasons || [])],
+        readinessCodes: [...(event.readinessCodes || [])],
+        readinessIssues: [...(event.readinessIssues || [])],
+        _groupHasFutureSession: eventHasFuture,
       });
       continue;
     }
@@ -2779,6 +2827,8 @@ function groupAdminEventRows(events) {
     current.landingHits = uniqueValues(current.landingHits.concat(event.landingHits || []));
     current.tags = uniqueValues(current.tags.concat(event.tags || []));
     current.reasons = uniqueValues(current.reasons.concat(event.reasons || []));
+    current.readinessCodes = uniqueValues((current.readinessCodes || []).concat(event.readinessCodes || []));
+    current.readinessIssues = mergeReadinessIssues(current.readinessIssues, event.readinessIssues);
     current.publishBlockers = uniqueValues((current.publishBlockers || []).concat(event.publishBlockers || []));
     current.publishWarnings = uniqueValues((current.publishWarnings || []).concat(event.publishWarnings || []));
     current.canPublish = Boolean(current.canPublish && event.canPublish);
@@ -2792,6 +2842,7 @@ function groupAdminEventRows(events) {
     current.vacant = sumNullableNumbers([current.vacant, event.vacant]);
     current.priceFrom = minNullableNumber([current.priceFrom, event.priceFrom]);
     current.offerPriceRub = minNullableNumber([current.offerPriceRub, event.offerPriceRub]);
+    current._groupHasFutureSession = Boolean(current._groupHasFutureSession || eventHasFuture);
 
     if (event.startsAt && (!current.startsAt || new Date(event.startsAt) < new Date(current.startsAt))) {
       current.startsAt = event.startsAt;
@@ -2817,11 +2868,16 @@ function groupAdminEventRows(events) {
     }
   }
 
-  return Array.from(groups.values()).sort((a, b) => {
-    const aTime = a.startsAt ? new Date(a.startsAt).getTime() : Number.POSITIVE_INFINITY;
-    const bTime = b.startsAt ? new Date(b.startsAt).getTime() : Number.POSITIVE_INFINITY;
-    return aTime - bTime || String(a.title).localeCompare(String(b.title), 'ru');
-  });
+  return Array.from(groups.values())
+    .map((group) => {
+      const { _groupHasFutureSession, ...rest } = group;
+      return finalizeGroupedAdminReadiness(rest, Boolean(_groupHasFutureSession));
+    })
+    .sort((a, b) => {
+      const aTime = a.startsAt ? new Date(a.startsAt).getTime() : Number.POSITIVE_INFINITY;
+      const bTime = b.startsAt ? new Date(b.startsAt).getTime() : Number.POSITIVE_INFINITY;
+      return aTime - bTime || String(a.title).localeCompare(String(b.title), 'ru');
+    });
 }
 
 function groupPublicEventRows(events) {

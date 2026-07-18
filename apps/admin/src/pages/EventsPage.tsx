@@ -109,11 +109,56 @@ function matchesQuickFilter(event: AdminEventRow, view: string) {
   return true;
 }
 
+type GroupingAdminEventRow = AdminEventRow & { _groupHasFutureSession?: boolean };
+
+function hasFutureSessionRow(event: AdminEventRow) {
+  const kind = String(event.eventType || '').toUpperCase();
+  if (kind === 'OPEN_DATE') return true;
+  if (!event.startsAt) return false;
+  const startsAt = new Date(event.startsAt).getTime();
+  return Number.isFinite(startsAt) && startsAt >= Date.now() - 15 * 60 * 1000;
+}
+
+/** Future slot in group clears NO_FUTURE_SESSIONS; other high issues still block. */
+function finalizeGroupedAdminReadiness(group: AdminEventRow, groupHasFutureSession: boolean): AdminEventRow {
+  const sourceIssues = group.readinessIssues?.length
+    ? group.readinessIssues
+    : (group.readinessCodes || []).map((code) => ({
+        code,
+        label: code === 'NO_FUTURE_SESSIONS' ? 'нет будущих сеансов' : code,
+        severity: 'high' as const,
+      }));
+
+  const issues = groupHasFutureSession
+    ? sourceIssues.filter((issue) => issue.code !== 'NO_FUTURE_SESSIONS')
+    : [...sourceIssues];
+
+  const severityRank = { low: 0, medium: 1, high: 2 } as const;
+  const severity = issues.reduce<'low' | 'medium' | 'high'>((worst, issue) => {
+    const next = (issue.severity || 'low') as 'low' | 'medium' | 'high';
+    return severityRank[next] > severityRank[worst] ? next : worst;
+  }, 'low');
+
+  const readiness = issues.length ? (severity === 'high' ? 'blocked' : 'review') : 'ready';
+  const status = issues.length ? 'needs_review' : 'ready';
+
+  return {
+    ...group,
+    readinessIssues: issues,
+    readinessCodes: issues.map((issue) => issue.code),
+    reasons: issues.map((issue) => issue.label),
+    severity,
+    readiness,
+    status,
+  };
+}
+
 function groupAdminRows(events: AdminEventRow[]): AdminEventRow[] {
-  const groups = new Map<string, AdminEventRow>();
+  const groups = new Map<string, GroupingAdminEventRow>();
 
   for (const event of events) {
     const key = [event.source, event.title, event.city, event.venue].map((part) => String(part || '').trim().toLowerCase().replace(/\s+/g, ' ')).join('|');
+    const eventHasFuture = hasFutureSessionRow(event);
     const current = groups.get(key);
     if (!current) {
       groups.set(key, {
@@ -129,6 +174,7 @@ function groupAdminRows(events: AdminEventRow[]): AdminEventRow[] {
         reasons: [...(event.reasons || [])],
         readinessCodes: [...(event.readinessCodes || [])],
         readinessIssues: [...(event.readinessIssues || [])],
+        _groupHasFutureSession: eventHasFuture,
       });
       continue;
     }
@@ -149,6 +195,7 @@ function groupAdminRows(events: AdminEventRow[]): AdminEventRow[] {
     current.priceFrom = priceCandidates.length ? Math.min(...priceCandidates) : null;
     current.vacant = vacantCandidates.length ? vacantCandidates.reduce((sum, value) => sum + value, 0) : null;
     current.hasImage = current.hasImage || event.hasImage;
+    current._groupHasFutureSession = Boolean(current._groupHasFutureSession || eventHasFuture);
     const hadPurchaseReady = isPurchaseReady(current);
     const eventPurchaseReady = isPurchaseReady(event);
     current.purchaseReady = hadPurchaseReady || eventPurchaseReady;
@@ -177,11 +224,16 @@ function groupAdminRows(events: AdminEventRow[]): AdminEventRow[] {
     }
   }
 
-  return Array.from(groups.values()).sort((left, right) => {
-    const leftTime = left.startsAt ? new Date(left.startsAt).getTime() : Number.POSITIVE_INFINITY;
-    const rightTime = right.startsAt ? new Date(right.startsAt).getTime() : Number.POSITIVE_INFINITY;
-    return leftTime - rightTime || left.title.localeCompare(right.title, 'ru');
-  });
+  return Array.from(groups.values())
+    .map((group) => {
+      const { _groupHasFutureSession, ...rest } = group;
+      return finalizeGroupedAdminReadiness(rest, Boolean(_groupHasFutureSession));
+    })
+    .sort((left, right) => {
+      const leftTime = left.startsAt ? new Date(left.startsAt).getTime() : Number.POSITIVE_INFINITY;
+      const rightTime = right.startsAt ? new Date(right.startsAt).getTime() : Number.POSITIVE_INFINITY;
+      return leftTime - rightTime || left.title.localeCompare(right.title, 'ru');
+    });
 }
 
 function mergeReadinessIssues(left?: AdminEventRow['readinessIssues'], right?: AdminEventRow['readinessIssues']) {
