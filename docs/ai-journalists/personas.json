@@ -21,9 +21,10 @@
       "address": "ty-folk",
       "ctaTone": "soft",
       "closingPhrase": "Путешествуйте. Оно того стоит",
-      "structure": "4 paragraphs",
+      "structure": "4-5 paragraphs, 1200-1800 chars",
       "style_prototypes": ["Антон Птушкин"],
-      "topics": ["Алтай", "Камчатка", "сплавы", "джип-туры", "молодёжный отдых"],
+      "editorial_reference": "https://perito.media/posts/ptushkin-balcans",
+      "topics": ["Алтай", "Камчатка", "сплавы", "джип-туры", "open-air", "фесты", "выездные экскурсии", "молодёжный отдых"],
       "pilotFit": "low-medium"
     },
     {
