@@ -4,7 +4,23 @@
 
 ---
 
-## 2026-07-18 — Adaptive site header
+## 2026-07-18 — Full sync TC+TEP
+
+### Наблюдения
+
+- `tc:full-sync` на prod сохранил catalog; `tc-import-catalog` упал на `Event_slug_key` — `slugify(...).slice(0,120)` обрезал `externalId` у длинных title.
+- `tep:sync` завершился: 187 events / 18129 sessions / 18577 ProviderLink.
+
+### Решения
+
+- `buildEventSlug(title, externalId)` — suffix id всегда внутри 120 символов; повторный `tc:import` после фикса.
+
+### Проблемы
+
+- —
+
+---
+
 
 ### Наблюдения
 

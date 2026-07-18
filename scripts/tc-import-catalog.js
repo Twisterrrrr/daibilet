@@ -277,7 +277,7 @@ async function importCatalogEvent(client, event, summary) {
     [
       eventId,
       normalizeImportEventTitle(event.title) || "Событие без названия",
-      slugify(`${event.title || "event"}-${externalId}`),
+      buildEventSlug(event.title || "event", externalId),
       event.description || null,
       kind,
       status,
@@ -507,6 +507,14 @@ function slugify(input) {
       .replace(/^-+|-+$/g, "")
       .slice(0, 120) || "item"
   );
+}
+
+/** Keep externalId suffix inside 120-char slug budget (plain slugify can truncate it away). */
+function buildEventSlug(title, externalId) {
+  const idPart = slugify(externalId).slice(0, 40) || "event";
+  const maxTitle = Math.max(16, 120 - idPart.length - 1);
+  const titlePart = slugify(title || "event").slice(0, maxTitle) || "event";
+  return `${titlePart}-${idPart}`.slice(0, 120);
 }
 
 function sha256(value) {
