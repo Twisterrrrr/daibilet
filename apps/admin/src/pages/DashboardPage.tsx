@@ -110,7 +110,7 @@ export function DashboardPage() {
             <SourceBadge source="teplohod" />
             <Badge variant="outline" className="gap-1 border-success/30 bg-success/10 text-success">
               <CheckCircle2 className="h-3 w-3" />
-              Imported Sales MVP
+              MVP импорта продаж
             </Badge>
           </>
         }
@@ -165,7 +165,7 @@ export function DashboardPage() {
               <ImportRow
                 key={source.code}
                 source={source.name}
-                status={source.status}
+                status={importStatusLabel(source.healthStatus || source.status)}
                 mode={`${formatNumber(source.events)} карточек · ${formatNumber(source.sessions)} сеансов`}
                 live={source.status === 'live'}
               />
@@ -357,6 +357,16 @@ function ImportRow({ source, status, mode, live }: { source: string; status: str
       {live ? <StatusBadge status="live" label={status} /> : <StatusBadge status="incomplete" label={status} />}
     </div>
   );
+}
+
+function importStatusLabel(status?: string | null) {
+  const normalized = String(status || '').toLowerCase();
+  if (normalized === 'ok' || normalized === 'live') return 'в работе';
+  if (normalized === 'warning') return 'есть вопросы';
+  if (normalized === 'error') return 'ошибка';
+  if (normalized === 'paused') return 'пауза';
+  if (normalized === 'incomplete') return 'неполно';
+  return status || 'статус';
 }
 
 function fallbackSourceRows(): AdminSourceRow[] {

@@ -116,7 +116,7 @@ function CitiesPage({ title, description }: { title: string; description: string
             {isLoading ? (
               <Badge variant="outline" className="gap-1">
                 <Loader2 className="h-3 w-3 animate-spin" />
-                backend
+                загрузка
               </Badge>
             ) : null}
           </>
@@ -136,7 +136,7 @@ function CitiesPage({ title, description }: { title: string; description: string
         <div className="text-xs text-muted-foreground">{formatNumber(payload.total)} найдено</div>
       </div>
 
-      {loadError ? <div className="mb-4 rounded-lg border border-border bg-surface-muted px-3 py-2 text-xs text-muted-foreground">Backend fallback: {loadError}</div> : null}
+      {loadError ? <div className="mb-4 rounded-lg border border-border bg-surface-muted px-3 py-2 text-xs text-muted-foreground">Резерв API: {loadError}</div> : null}
 
       <DataTableShell columns={['Тип', 'Название', 'События', 'Площадки', 'Категории / состав']}>
         {payload.rows.map((destination) => (

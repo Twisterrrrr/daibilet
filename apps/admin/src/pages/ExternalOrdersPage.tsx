@@ -404,7 +404,7 @@ export function ExternalOrdersPage() {
             {loading ? 'загрузка...' : `${formatNumber(payload.total)} найдено`}
           </div>
         </div>
-        {loadError ? <div className="mt-2 rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning-foreground">Backend недоступен: {loadError}</div> : null}
+        {loadError ? <div className="mt-2 rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning-foreground">Сервер недоступен: {loadError}</div> : null}
       </Card>
 
       <div className="mt-4">

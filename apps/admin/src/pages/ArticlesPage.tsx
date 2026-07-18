@@ -80,10 +80,10 @@ function detailToDraft(detail: ArticleDetail): ArticleDraft {
 
 function articleStatusBadge(status: string) {
   const normalized = String(status || '').toLowerCase();
-  if (normalized === 'published') return <StatusBadge status="live" label="published" />;
-  if (normalized === 'review') return <StatusBadge status="ready" label="review" />;
-  if (normalized === 'hidden') return <StatusBadge status="archived" label="hidden" />;
-  return <StatusBadge status="draft" label={normalized || 'draft'} />;
+  if (normalized === 'published') return <StatusBadge status="live" label="опубликовано" />;
+  if (normalized === 'review') return <StatusBadge status="ready" label="на проверке" />;
+  if (normalized === 'hidden') return <StatusBadge status="archived" label="скрыто" />;
+  return <StatusBadge status="draft" label={normalized === 'draft' ? 'черновик' : normalized || 'черновик'} />;
 }
 
 export function ArticlesPage() {
@@ -199,7 +199,7 @@ export function ArticlesPage() {
             </label>
 
             <label className="block space-y-1 text-sm">
-              <span>Slug</span>
+              <span>ЧПУ (slug)</span>
               <Input value={draft.slug} onChange={(e) => setDraft((prev) => ({ ...prev, slug: e.target.value }))} placeholder="kak-vybrat-koncert" />
             </label>
 
@@ -242,12 +242,12 @@ export function ArticlesPage() {
             </label>
 
             <label className="block space-y-1 text-sm">
-              <span>SEO title</span>
+              <span>SEO-заголовок</span>
               <Input value={draft.seoTitle} onChange={(e) => setDraft((prev) => ({ ...prev, seoTitle: e.target.value }))} />
             </label>
 
             <label className="block space-y-1 text-sm">
-              <span>SEO description</span>
+              <span>SEO-описание</span>
               <textarea
                 className="min-h-16 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
                 value={draft.seoDescription}

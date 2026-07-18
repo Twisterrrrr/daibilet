@@ -203,7 +203,7 @@ export function EventChangeRequestsPage() {
             {loading ? 'загрузка...' : `${formatNumber(payload.items.length)} на странице`}
           </div>
         </div>
-        {loadError ? <div className="mt-2 rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning-foreground">Backend недоступен: {loadError}</div> : null}
+        {loadError ? <div className="mt-2 rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning-foreground">Сервер недоступен: {loadError}</div> : null}
         {actionError ? <div className="mt-2 rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-xs text-destructive">{actionError}</div> : null}
       </Card>
 
@@ -213,7 +213,7 @@ export function EventChangeRequestsPage() {
 
       <DataTableShell
         loading={loading}
-        columns={['Заявка', 'Событие', 'Поставщик', 'Изменение', 'Статус', 'Payload', 'Действия']}
+        columns={['Заявка', 'Событие', 'Поставщик', 'Изменение', 'Статус', 'Данные', 'Действия']}
         empty={!loading && payload.items.length === 0 ? <RequestsEmptyState /> : null}
       >
         {payload.items.map((request: AdminEventChangeRequestRowDto) => (
@@ -451,7 +451,7 @@ function RequestDetailSheet({
                   </table>
                 </div>
                 {!detail.diff.items.length ? (
-                  <div className="rounded-md bg-secondary p-4 text-sm text-muted-foreground">Для этой заявки нет вычисленного diff. Проверь payload preview ниже.</div>
+                  <div className="rounded-md bg-secondary p-4 text-sm text-muted-foreground">Для этой заявки нет вычисленного diff. Проверь превью данных ниже.</div>
                 ) : null}
               </Card>
 
@@ -460,7 +460,7 @@ function RequestDetailSheet({
                   <h3 className="text-sm font-semibold">Контекст</h3>
                   <dl className="mt-3 space-y-2 text-sm">
                     <DetailTerm label="Событие" value={detail.event?.title || 'Новое событие'} />
-                    <DetailTerm label="Slug" value={detail.event?.slug || '-'} mono />
+                    <DetailTerm label="ЧПУ" value={detail.event?.slug || '-'} mono />
                     <DetailTerm label="Поставщик" value={detail.supplier?.title || '-'} />
                     <DetailTerm label="Создал" value={detail.createdBy?.email || '-'} />
                     <DetailTerm label="Проверил" value={detail.reviewedBy?.email || '-'} />
@@ -472,17 +472,17 @@ function RequestDetailSheet({
                 <Card className="border-border p-4">
                   <div className="mb-3 flex items-center gap-2">
                     <FileJson className="h-4 w-4 text-muted-foreground" />
-                    <h3 className="text-sm font-semibold">Payload preview</h3>
+                    <h3 className="text-sm font-semibold">Превью данных</h3>
                   </div>
                   {detail.payloadPreview.baseSnapshot ? (
-                    <PayloadBlock title="Base snapshot" value={detail.payloadPreview.baseSnapshot} />
+                    <PayloadBlock title="Базовый снимок" value={detail.payloadPreview.baseSnapshot} />
                   ) : null}
                   <div className="mt-3 space-y-3">
                     {detail.payloadPreview.sections.map((section: AdminEventChangeRequestPayloadPreviewSectionDto) => (
                       <PayloadBlock key={section.id} title={section.title} value={section.value} />
                     ))}
                     {!detail.payloadPreview.sections.length ? (
-                      <div className="rounded-md bg-secondary p-4 text-sm text-muted-foreground">Payload пустой.</div>
+                      <div className="rounded-md bg-secondary p-4 text-sm text-muted-foreground">Данные пустые.</div>
                     ) : null}
                   </div>
                 </Card>

@@ -51,7 +51,7 @@ export function SourcesPage() {
       setBackendError(null);
       setNotice(null);
     } catch (error) {
-      setBackendError(`Не удалось обновить источники из backend: ${error instanceof Error ? error.message : String(error)}`);
+      setBackendError(`Не удалось обновить источники с сервера: ${error instanceof Error ? error.message : String(error)}`);
     } finally {
       setLoading(false);
     }
@@ -118,7 +118,7 @@ export function SourcesPage() {
           <div className="flex items-start gap-3">
             <AlertTriangle className="mt-0.5 h-5 w-5 text-destructive" />
             <div>
-              <h2 className="text-sm font-semibold text-foreground">Backend недоступен</h2>
+              <h2 className="text-sm font-semibold text-foreground">Сервер недоступен</h2>
               <p className="mt-1 text-sm text-muted-foreground">{backendError}</p>
               <Button type="button" className="mt-4" variant="outline" onClick={() => loadSources()} disabled={loading}>
                 <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
@@ -166,19 +166,19 @@ export function SourcesPage() {
                 <td className="px-4 py-3 align-top">
                   <StatusBadge status={source.purchaseReady ? 'live' : 'incomplete'} label={source.purchaseReady ? 'готова' : 'проверить'} />
                   <div className="mt-2 max-w-[220px] truncate text-xs text-muted-foreground">
-                    {source.sampleWidgetUrl || source.sampleDeeplinkUrl || (source.code === 'TEPLOHOD' ? 'teplohod widget.js' : 'нет ссылки')}
+                    {source.sampleWidgetUrl || source.sampleDeeplinkUrl || (source.code === 'TEPLOHOD' ? 'виджет Teplohod' : 'нет ссылки')}
                   </div>
                 </td>
                 <td className="px-4 py-3 align-top text-sm">
                   {source.lastSync ? (
                     <>
-                      <StatusBadge status={sourceStatus(source.lastSync.status || '')} label={source.lastSync.status || 'sync'} />
+                      <StatusBadge status={sourceStatus(source.lastSync.status || '')} label={syncStatusLabel(source.lastSync.status)} />
                       <div className="mt-2 text-xs text-muted-foreground">{formatDateTime(source.lastSync.finishedAt || source.lastSync.startedAt)}</div>
-                      <div className="mt-1 max-w-[240px] truncate text-xs text-muted-foreground">{source.lastSync.mode}</div>
+                      <div className="mt-1 max-w-[240px] truncate text-xs text-muted-foreground">{syncModeLabel(source.lastSync.mode)}</div>
                       <div className="mt-1 text-xs text-muted-foreground">успешный: {source.lastSuccessAt ? formatDateTime(source.lastSuccessAt) : 'нет'}</div>
                     </>
                   ) : (
-                    <span className="text-xs text-muted-foreground">sync не найден</span>
+                    <span className="text-xs text-muted-foreground">синхронизация не найдена</span>
                   )}
                 </td>
               </tr>
@@ -214,7 +214,7 @@ function SourceSummaryCard({ source }: { source: AdminSourceRow }) {
       </div>
 
       <div className="mt-3 grid gap-2 text-xs text-muted-foreground sm:grid-cols-3">
-        <span>успешный sync: {source.lastSuccessAt ? formatDateTime(source.lastSuccessAt) : 'нет'}</span>
+        <span>последний успех: {source.lastSuccessAt ? formatDateTime(source.lastSuccessAt) : 'нет'}</span>
         <span>ошибок подряд: {formatNumber(source.consecutiveErrors ?? 0)}</span>
         <span>{source.isStale ? `устарело ${formatNumber(source.staleHours)} ч` : 'импорт свежий'}</span>
       </div>
@@ -222,7 +222,7 @@ function SourceSummaryCard({ source }: { source: AdminSourceRow }) {
       <div className="mt-3 flex flex-wrap gap-2">
         <Badge variant="outline">импорт: {formatNumber(source.rawEvents ?? source.events)}</Badge>
         <Badge variant="outline">{source.purchaseReady ? 'покупка готова' : 'покупку проверить'}</Badge>
-        {isTeplohod ? <Badge variant="outline">widget.js</Badge> : <Badge variant="outline">TC widget</Badge>}
+        {isTeplohod ? <Badge variant="outline">виджет.js</Badge> : <Badge variant="outline">виджет TC</Badge>}
       </div>
 
       <IssueBadges issues={source.openIssues} limit={4} />
@@ -303,5 +303,24 @@ function sourceHealthLabel(status: string): string {
   if (normalized === 'warning') return 'есть вопросы';
   if (normalized === 'error') return 'ошибка';
   if (normalized === 'paused') return 'пауза';
+  if (normalized === 'live') return 'в работе';
   return status;
+}
+
+function syncStatusLabel(status?: string | null): string {
+  const normalized = String(status || '').toLowerCase();
+  if (normalized.includes('success') || normalized === 'ok' || normalized === 'live') return 'успех';
+  if (normalized.includes('run') || normalized.includes('progress')) return 'идёт';
+  if (normalized.includes('fail') || normalized.includes('error')) return 'ошибка';
+  if (normalized.includes('pause')) return 'пауза';
+  if (!normalized) return 'синхронизация';
+  return status || 'синхронизация';
+}
+
+function syncModeLabel(mode?: string | null): string {
+  const normalized = String(mode || '').toLowerCase();
+  if (normalized.includes('full')) return 'полный';
+  if (normalized.includes('incremental') || normalized.includes('delta')) return 'инкрементальный';
+  if (normalized.includes('manual')) return 'ручной';
+  return mode || '—';
 }

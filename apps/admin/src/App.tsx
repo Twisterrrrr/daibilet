@@ -33,7 +33,7 @@ export function App() {
         <Route path="mapping-inbox" element={<MappingInboxPage />} />
         <Route path="sync-health" element={<SourcesPage />} />
         <Route path="taxonomy" element={<MappingInboxPage />} />
-        <Route path="audit-log" element={<SimplePage title="Журнал изменений" description="Позже здесь появится audit log ручных правок." kind="audit" />} />
+        <Route path="audit-log" element={<SimplePage title="Журнал изменений" description="Позже здесь появится журнал ручных правок." kind="audit" />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

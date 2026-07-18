@@ -91,10 +91,10 @@ function normalizeStatus(status?: string | null) {
 
 function statusBadge(status?: string | null) {
   const normalized = normalizeStatus(status);
-  if (normalized === 'PUBLISHED' || status === 'published') return <StatusBadge status="live" label="published" />;
-  if (normalized === 'CANDIDATE' || status === 'candidate') return <StatusBadge status="incomplete" label="candidate" />;
-  if (normalized === 'HIDDEN' || status === 'hidden') return <StatusBadge status="error" label="hidden" />;
-  return <StatusBadge status="draft" label="location" />;
+  if (normalized === 'PUBLISHED' || status === 'published') return <StatusBadge status="live" label="опубликовано" />;
+  if (normalized === 'CANDIDATE' || status === 'candidate') return <StatusBadge status="incomplete" label="кандидат" />;
+  if (normalized === 'HIDDEN' || status === 'hidden') return <StatusBadge status="error" label="скрыто" />;
+  return <StatusBadge status="draft" label="локация" />;
 }
 
 function kindLabel(kind?: string | null) {
@@ -284,7 +284,7 @@ export function VenuesPage() {
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-          {loadError ? <span>fallback: {loadError}</span> : <span>{formatNumber(payload.total)} найдено</span>}
+          {loadError ? <span>резерв API: {loadError}</span> : <span>{formatNumber(payload.total)} найдено</span>}
         </div>
       </div>
 
@@ -477,14 +477,14 @@ function VenueSheet(props: {
                       <EditableField label="Короткое описание" value={draft.shortDescription} onChange={(shortDescription) => onDraftChange((current) => ({ ...current, shortDescription }))} multiline />
                       <EditableField label="Описание" value={draft.description} onChange={(description) => onDraftChange((current) => ({ ...current, description }))} multiline />
                       <div className="grid gap-3 md:grid-cols-2">
-                        <EditableField label="seoH1" value={draft.seoH1} onChange={(seoH1) => onDraftChange((current) => ({ ...current, seoH1 }))} />
-                        <EditableField label="canonicalPath" value={draft.canonicalPath} onChange={(canonicalPath) => onDraftChange((current) => ({ ...current, canonicalPath }))} />
+                        <EditableField label="SEO H1" value={draft.seoH1} onChange={(seoH1) => onDraftChange((current) => ({ ...current, seoH1 }))} />
+                        <EditableField label="Канонический путь" value={draft.canonicalPath} onChange={(canonicalPath) => onDraftChange((current) => ({ ...current, canonicalPath }))} />
                       </div>
-                      <EditableField label="seoTitle" value={draft.seoTitle} onChange={(seoTitle) => onDraftChange((current) => ({ ...current, seoTitle }))} />
-                      <EditableField label="seoDescription" value={draft.seoDescription} onChange={(seoDescription) => onDraftChange((current) => ({ ...current, seoDescription }))} multiline />
+                      <EditableField label="SEO title" value={draft.seoTitle} onChange={(seoTitle) => onDraftChange((current) => ({ ...current, seoTitle }))} />
+                      <EditableField label="SEO description" value={draft.seoDescription} onChange={(seoDescription) => onDraftChange((current) => ({ ...current, seoDescription }))} multiline />
                       <label className="inline-flex items-center gap-2 text-sm">
                         <input type="checkbox" checked={draft.isIndexable} onChange={(event) => onDraftChange((current) => ({ ...current, isIndexable: event.target.checked }))} />
-                        indexable
+                        индексировать
                       </label>
                     </div>
                   </section>
@@ -514,7 +514,7 @@ function VenueSheet(props: {
                   <section className="rounded-lg border border-border p-4">
                     <div className="flex items-center gap-2">
                       <Image className="h-4 w-4 text-muted-foreground" />
-                      <h3 className="text-sm font-semibold">Hero</h3>
+                      <h3 className="text-sm font-semibold">Обложка</h3>
                     </div>
                     <div className="mt-4 aspect-[4/3] overflow-hidden rounded-lg border border-border bg-secondary">
                       {imageUrl ? (
@@ -523,26 +523,26 @@ function VenueSheet(props: {
                         <div className="flex h-full items-center justify-center text-sm text-muted-foreground">изображение не задано</div>
                       )}
                     </div>
-                    <EditableField label="heroImageUrl" value={draft.heroImageUrl} onChange={(heroImageUrl) => onDraftChange((current) => ({ ...current, heroImageUrl }))} />
+                    <EditableField label="URL обложки" value={draft.heroImageUrl} onChange={(heroImageUrl) => onDraftChange((current) => ({ ...current, heroImageUrl }))} />
                   </section>
 
                   <section className="rounded-lg border border-border p-4">
-                    <h3 className="text-sm font-semibold">Public-ready чек</h3>
+                    <h3 className="text-sm font-semibold">Готовность к публикации</h3>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <Badge variant="outline" className={draft.title ? 'border-success/30 bg-success/10 text-success' : ''}>
-                        title
+                        название
                       </Badge>
                       <Badge variant="outline" className={draft.shortDescription ? 'border-success/30 bg-success/10 text-success' : ''}>
-                        short
+                        короткое описание
                       </Badge>
                       <Badge variant="outline" className={draft.seoTitle ? 'border-success/30 bg-success/10 text-success' : ''}>
-                        seoTitle
+                        SEO title
                       </Badge>
                       <Badge variant="outline" className={draft.canonicalPath ? 'border-success/30 bg-success/10 text-success' : ''}>
-                        canonical
+                        каноникал
                       </Badge>
                       <Badge variant="outline" className={draft.heroImageUrl ? 'border-success/30 bg-success/10 text-success' : ''}>
-                        hero
+                        обложка
                       </Badge>
                     </div>
                   </section>

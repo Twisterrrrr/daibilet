@@ -43,7 +43,7 @@ export function AppSidebar() {
           {!collapsed && (
             <div className="flex min-w-0 flex-col leading-tight">
               <span className="truncate text-sm font-semibold text-sidebar-foreground">Дайбилет</span>
-              <span className="truncate text-[11px] text-muted-foreground">Imported Sales Admin</span>
+              <span className="truncate text-[11px] text-muted-foreground">Админка продаж</span>
             </div>
           )}
         </div>

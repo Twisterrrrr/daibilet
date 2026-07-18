@@ -206,8 +206,8 @@ function worstSeverity(left: AdminEventRow['severity'], right: AdminEventRow['se
 function normalizeOfferStatus(event: AdminEventRow) {
   const value = String(event.offerStatus || '').toLowerCase();
   if (value.includes('widget')) return event.offerStatus;
-  if (sourceBadgeFromEvent(event) === 'ticketscloud' && value.includes('цен')) return 'TC widget';
-  if (sourceBadgeFromEvent(event) === 'teplohod' && value.includes('цен')) return 'Teplohod widget';
+  if (sourceBadgeFromEvent(event) === 'ticketscloud' && value.includes('цен')) return 'виджет TC';
+  if (sourceBadgeFromEvent(event) === 'teplohod' && value.includes('цен')) return 'виджет Теплоход';
   return event.offerStatus;
 }
 
@@ -217,9 +217,11 @@ function isPurchaseReady(event: AdminEventRow) {
 
 function purchaseSourceLabel(event: AdminEventRow) {
   if (!isPurchaseReady(event)) return 'проверить';
-  if (event.purchaseUrlSource === 'offer') return 'offer';
-  if (event.purchaseUrlSource === 'fallback') return 'fallback';
-  return event.purchaseMode || 'widget';
+  if (event.purchaseUrlSource === 'offer') return 'офер';
+  if (event.purchaseUrlSource === 'fallback') return 'запасной';
+  if (event.purchaseMode === 'widget') return 'виджет';
+  if (event.purchaseMode === 'redirect') return 'редирект';
+  return event.purchaseMode || 'виджет';
 }
 
 function shortOfferLabel(event: AdminEventRow) {
@@ -228,6 +230,16 @@ function shortOfferLabel(event: AdminEventRow) {
   if (source === 'ticketscloud') return 'TC';
   if (source === 'teplohod') return 'TEP';
   return 'виджет';
+}
+
+function sessionStatusLabel(status?: string | null) {
+  const normalized = String(status || '').toLowerCase();
+  if (normalized === 'ready') return 'готово';
+  if (normalized === 'review') return 'доработать';
+  if (normalized === 'blocked') return 'блокер';
+  if (normalized === 'error' || normalized === 'failed') return 'ошибка';
+  if (!normalized) return 'источник';
+  return status || 'источник';
 }
 
 function sourceBadgeFromEvent(event: Pick<AdminEventRow, 'source' | 'sourceCode'>): 'ticketscloud' | 'teplohod' | 'manual' {
@@ -583,17 +595,17 @@ export function EventsPage() {
     <div>
       <PageHeader
         title="События"
-        description="Рабочий стол импортного каталога: качество данных, типизация, offer/widget и попадание в SEO-выборки."
+        description="Рабочий стол импортного каталога: качество данных, типизация, офер/виджет и попадание в SEO-выборки."
         meta={
           <>
             <SourceBadge source="ticketscloud" />
             <SourceBadge source="teplohod" />
-            <Badge variant="outline">{formatNumber(payload.metrics.events)} imported</Badge>
-            <Badge variant="outline">{formatNumber(payload.metrics.reviewEvents)} need attention</Badge>
+            <Badge variant="outline">{formatNumber(payload.metrics.events)} импортировано</Badge>
+            <Badge variant="outline">{formatNumber(payload.metrics.reviewEvents)} требуют внимания</Badge>
             {isLoading ? (
               <Badge variant="outline" className="gap-1">
                 <Loader2 className="h-3 w-3 animate-spin" />
-                backend
+                загрузка
               </Badge>
             ) : null}
           </>
@@ -601,9 +613,9 @@ export function EventsPage() {
         actions={
           <>
             <Button variant="outline" size="sm" onClick={() => setPayload(buildLocalResponse(params))}>
-              Local fallback
+              Локальные данные
             </Button>
-            <Button size="sm">Run sync</Button>
+            <Button size="sm">Синхронизировать</Button>
           </>
         }
       />
@@ -612,7 +624,7 @@ export function EventsPage() {
         <MetricCard value={payload.metrics.events} label="Карточек событий" />
         <MetricCard value={payload.metrics.reviewEvents} label="Нужно внимание" />
         <MetricCard value={payload.metrics.readyEvents} label="Готово" />
-        <MetricCard value={payload.metrics.landingRules} label="Landing rules" />
+        <MetricCard value={payload.metrics.landingRules} label="Правила лендингов" />
       </div>
 
       <FilterBar>
@@ -654,9 +666,9 @@ export function EventsPage() {
 
       <div className="mb-4">
         <InfoNote>
-          Импортные поля остаются source-managed. Ручная модерация пишет override: контент, медиа, SEO и редакционный статус события.
+          Импортные поля управляются источником. Ручная модерация пишет переопределения: контент, медиа, SEO и редакционный статус события.
           <span className="ml-2">Одинаковые события от одного провайдера с тем же названием и площадкой сгруппированы в одну карточку.</span>
-          {loadError ? <span className="ml-2 text-warning-foreground">Backend fallback: {loadError}</span> : null}
+          {loadError ? <span className="ml-2 text-warning-foreground">Резерв API: {loadError}</span> : null}
         </InfoNote>
       </div>
 
@@ -999,14 +1011,14 @@ function ClassificationTab(props: {
   if (!taxonomy) {
     return (
       <div className="mt-5">
-        <InfoNote>Справочник taxonomy пока не загружен. Проверь backend `/api/admin/taxonomy`.</InfoNote>
+        <InfoNote>Справочник категорий пока не загружен. Проверь API `/api/admin/taxonomy`.</InfoNote>
       </div>
     );
   }
 
   return (
     <div className="mt-5 space-y-4">
-      <InfoNote>Ручная классификация влияет на каталог, лендинги и publish gate. Source-tags можно оставить, но спорные события лучше доводить основной подкатегорией.</InfoNote>
+      <InfoNote>Ручная классификация влияет на каталог, лендинги и публикацию. Теги источника можно оставить, но спорные события лучше доводить основной подкатегорией.</InfoNote>
 
       <section className="rounded-lg border border-border p-4">
         <h3 className="text-sm font-semibold">Категория и подкатегория</h3>
@@ -1115,7 +1127,7 @@ function ScheduleTab(props: { event: AdminEventRow; detail: AdminEventDetail | n
       <div className="grid gap-3 md:grid-cols-4">
         <MetricCard value={summary?.slots ?? sessions.length} label="Слотов" />
         <MetricCard value={summary?.vacant ?? event.vacant ?? 0} label="Остаток source" />
-        <MetricCard value={summary?.offers ?? 0} label="Offer-строк" />
+        <MetricCard value={summary?.offers ?? 0} label="Строк офера" />
         <div className="rounded-lg border border-border bg-card p-4">
           <div className="text-2xl font-semibold">{formatMoney(summary?.priceFrom ?? event.priceFrom)}</div>
           <div className="text-xs text-muted-foreground">Цена от</div>
@@ -1140,7 +1152,7 @@ function ScheduleTab(props: { event: AdminEventRow; detail: AdminEventDetail | n
                 <th className="px-4 py-3 font-medium">Статус</th>
                 <th className="px-4 py-3 font-medium">Цена</th>
                 <th className="px-4 py-3 font-medium">Остаток</th>
-                <th className="px-4 py-3 font-medium">External ID</th>
+                <th className="px-4 py-3 font-medium">Внешний ID</th>
               </tr>
             </thead>
             <tbody>
@@ -1148,7 +1160,10 @@ function ScheduleTab(props: { event: AdminEventRow; detail: AdminEventDetail | n
                 <tr key={session.id} className="border-t border-border">
                   <td className="px-4 py-3">{formatDateTime(session.startsAt)}</td>
                   <td className="px-4 py-3">
-                    <StatusBadge status={session.sourceStatus === 'ready' || session.sourceStatus === 'READY' ? 'live' : 'incomplete'} label={session.sourceStatus || 'source'} />
+                    <StatusBadge
+                      status={session.sourceStatus === 'ready' || session.sourceStatus === 'READY' ? 'live' : 'incomplete'}
+                      label={sessionStatusLabel(session.sourceStatus)}
+                    />
                   </td>
                   <td className="px-4 py-3 font-medium">{formatMoney(session.priceFrom)}</td>
                   <td className="px-4 py-3">{formatNumber(session.vacant)}</td>
@@ -1213,7 +1228,7 @@ function SalesTab(props: { event: AdminEventRow; detail: AdminEventDetail | null
 
         <section className="rounded-lg border border-border">
           <div className="border-b border-border px-4 py-3">
-            <h3 className="text-sm font-semibold">Offer / widget</h3>
+            <h3 className="text-sm font-semibold">Офер / виджет</h3>
           </div>
           <div className="divide-y divide-border">
             {offers.length ? (
@@ -1221,14 +1236,14 @@ function SalesTab(props: { event: AdminEventRow; detail: AdminEventDetail | null
                 <div key={offer.id} className="px-4 py-3 text-sm">
                   <div className="flex items-center justify-between gap-3">
                     <div className="font-medium">{offer.title || offer.sourceCode}</div>
-                    <StatusBadge status={offer.active ? 'live' : 'incomplete'} label={offer.active ? 'active' : 'inactive'} />
+                    <StatusBadge status={offer.active ? 'live' : 'incomplete'} label={offer.active ? 'активен' : 'неактивен'} />
                   </div>
                   <div className="mt-1 text-muted-foreground">{formatMoney(offer.priceRub)}</div>
                   <div className="mt-1 truncate font-mono text-xs text-muted-foreground">{offer.widgetUrl || offer.deeplinkUrl || 'нет ссылки'}</div>
                 </div>
               ))
             ) : (
-              <div className="px-4 py-6 text-sm text-muted-foreground">Offer-строки не найдены.</div>
+              <div className="px-4 py-6 text-sm text-muted-foreground">Строки офера не найдены.</div>
             )}
           </div>
         </section>
@@ -1241,7 +1256,7 @@ function LegacyContentTab(props: { event: AdminEventRow }) {
   const { event } = props;
   return (
     <div className="mt-5 space-y-4">
-      <InfoNote>Source-слой не редактируем напрямую. Эти поля должны сохраняться в EventOverride и перекрывать импорт при отдаче public.</InfoNote>
+      <InfoNote>Слой источника не редактируем напрямую. Эти поля сохраняются в переопределении события и перекрывают импорт при отдаче на сайт.</InfoNote>
       <OverrideField label="Название / H1" sourceValue={event.title} overrideValue={event.override?.title} />
       <OverrideField label="Короткое описание" sourceValue={event.description || 'нет в источнике'} overrideValue={event.override?.shortDescription} multiline />
       <OverrideField label="Описание" sourceValue={event.description || 'нет в источнике'} overrideValue={event.override?.description} multiline />
@@ -1267,8 +1282,8 @@ function LegacyMediaTab(props: { event: AdminEventRow }) {
       <section className="rounded-lg border border-border p-4">
         <h3 className="text-sm font-semibold">Обложка события</h3>
         <div className="mt-4 space-y-3">
-          <OverrideField label="Source imageUrl" sourceValue={event.imageUrl || 'нет'} overrideValue={null} />
-          <OverrideField label="Override imageUrl" sourceValue="пусто" overrideValue={event.override?.imageUrl} />
+          <OverrideField label="Картинка источника" sourceValue={event.imageUrl || 'нет'} overrideValue={null} />
+          <OverrideField label="Картинка (переопределение)" sourceValue="пусто" overrideValue={event.override?.imageUrl} />
         </div>
       </section>
     </div>
@@ -1284,14 +1299,14 @@ function LegacySeoTab(props: { event: AdminEventRow }) {
       <div className="rounded-lg border border-border p-4">
         <h3 className="text-sm font-semibold">Индексация</h3>
         <div className="mt-3 flex flex-wrap gap-2">
-          <Badge variant="outline">{event.override?.isIndexable ?? event.isIndexable ? 'index' : 'noindex'}</Badge>
-          <Badge variant="outline">{event.override?.canonicalPath || event.canonicalPath || 'canonical pending'}</Badge>
+          <Badge variant="outline">{event.override?.isIndexable ?? event.isIndexable ? 'индекс' : 'без индекса'}</Badge>
+          <Badge variant="outline">{event.override?.canonicalPath || event.canonicalPath || 'каноникал не задан'}</Badge>
         </div>
       </div>
-      <OverrideField label="seoH1" sourceValue={event.seoH1 || event.title} overrideValue={event.override?.seoH1} />
-      <OverrideField label="seoTitle" sourceValue={effectiveTitle || 'нет'} overrideValue={event.override?.seoTitle} />
-      <OverrideField label="seoDescription" sourceValue={effectiveDescription || 'нет'} overrideValue={event.override?.seoDescription} multiline />
-      <OverrideField label="canonicalPath" sourceValue={event.canonicalPath || 'нет'} overrideValue={event.override?.canonicalPath} />
+      <OverrideField label="SEO H1" sourceValue={event.seoH1 || event.title} overrideValue={event.override?.seoH1} />
+      <OverrideField label="SEO title" sourceValue={effectiveTitle || 'нет'} overrideValue={event.override?.seoTitle} />
+      <OverrideField label="SEO description" sourceValue={effectiveDescription || 'нет'} overrideValue={event.override?.seoDescription} multiline />
+      <OverrideField label="Канонический путь" sourceValue={event.canonicalPath || 'нет'} overrideValue={event.override?.canonicalPath} />
     </div>
   );
 }
@@ -1325,18 +1340,18 @@ function LegacyOverrideField(props: { label: string; sourceValue?: string | null
     <section className="rounded-lg border border-border p-4">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-sm font-semibold">{props.label}</h3>
-        <Badge variant="outline">{value ? 'override' : 'source'}</Badge>
+        <Badge variant="outline">{value ? 'переопределение' : 'источник'}</Badge>
       </div>
-      <div className="mt-3 text-xs text-muted-foreground">Source: {props.sourceValue || 'нет'}</div>
+      <div className="mt-3 text-xs text-muted-foreground">Источник: {props.sourceValue || 'нет'}</div>
       {props.multiline ? (
         <textarea
           value={value}
           readOnly
-          placeholder="Override пока не заполнен"
+          placeholder="Переопределение пока не заполнено"
           className="mt-3 min-h-24 w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm"
         />
       ) : (
-        <Input value={value} readOnly placeholder="Override пока не заполнен" className="mt-3" />
+        <Input value={value} readOnly placeholder="Переопределение пока не заполнено" className="mt-3" />
       )}
     </section>
   );
@@ -1364,7 +1379,7 @@ function ContentTab(props: { event: AdminEventRow; isSaving: boolean; saveError:
 
   return (
     <div className="mt-5 space-y-4">
-      <InfoNote>Source-managed поля не редактируем напрямую. Эти значения сохраняются в EventOverride и перекрывают импорт при отдаче public.</InfoNote>
+      <InfoNote>Поля источника не редактируем напрямую. Эти значения сохраняются в переопределении и перекрывают импорт при отдаче на сайт.</InfoNote>
       <EditableOverrideField label="Название / H1" sourceValue={event.title} value={draft.title} onChange={(title) => setDraft((current) => ({ ...current, title }))} />
       <EditableOverrideField
         label="Короткое описание"
@@ -1428,8 +1443,8 @@ function MediaTab(props: { event: AdminEventRow; isSaving: boolean; saveError: s
       <section className="rounded-lg border border-border p-4">
         <h3 className="text-sm font-semibold">Обложка события</h3>
         <div className="mt-4 space-y-3">
-          <SourceValue label="Source imageUrl" value={event.imageUrl || 'нет'} />
-          <EditableOverrideField label="Override imageUrl" sourceValue="пусто" value={imageUrlDraft} onChange={setImageUrlDraft} />
+          <SourceValue label="Картинка источника" value={event.imageUrl || 'нет'} />
+          <EditableOverrideField label="Картинка (переопределение)" sourceValue="пусто" value={imageUrlDraft} onChange={setImageUrlDraft} />
           <SavePanel isSaving={isSaving} error={saveError} onSave={() => onSave({ imageUrl: imageUrlDraft })} />
         </div>
       </section>
@@ -1467,21 +1482,21 @@ function SeoTab(props: { event: AdminEventRow; isSaving: boolean; saveError: str
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <label className="inline-flex items-center gap-2 text-sm">
             <input type="checkbox" checked={draft.isIndexable} onChange={(event) => setDraft((current) => ({ ...current, isIndexable: event.target.checked }))} />
-            index
+            индексировать
           </label>
-          <Badge variant="outline">{draft.canonicalPath || event.canonicalPath || 'canonical pending'}</Badge>
+          <Badge variant="outline">{draft.canonicalPath || event.canonicalPath || 'каноникал не задан'}</Badge>
         </div>
       </div>
-      <EditableOverrideField label="seoH1" sourceValue={event.seoH1 || event.title} value={draft.seoH1} onChange={(seoH1) => setDraft((current) => ({ ...current, seoH1 }))} />
-      <EditableOverrideField label="seoTitle" sourceValue={effectiveTitle || 'нет'} value={draft.seoTitle} onChange={(seoTitle) => setDraft((current) => ({ ...current, seoTitle }))} />
+      <EditableOverrideField label="SEO H1" sourceValue={event.seoH1 || event.title} value={draft.seoH1} onChange={(seoH1) => setDraft((current) => ({ ...current, seoH1 }))} />
+      <EditableOverrideField label="SEO title" sourceValue={effectiveTitle || 'нет'} value={draft.seoTitle} onChange={(seoTitle) => setDraft((current) => ({ ...current, seoTitle }))} />
       <EditableOverrideField
-        label="seoDescription"
+        label="SEO description"
         sourceValue={effectiveDescription || 'нет'}
         value={draft.seoDescription}
         onChange={(seoDescription) => setDraft((current) => ({ ...current, seoDescription }))}
         multiline
       />
-      <EditableOverrideField label="canonicalPath" sourceValue={event.canonicalPath || 'нет'} value={draft.canonicalPath} onChange={(canonicalPath) => setDraft((current) => ({ ...current, canonicalPath }))} />
+      <EditableOverrideField label="Канонический путь" sourceValue={event.canonicalPath || 'нет'} value={draft.canonicalPath} onChange={(canonicalPath) => setDraft((current) => ({ ...current, canonicalPath }))} />
       <SavePanel
         isSaving={isSaving}
         error={saveError}
@@ -1504,7 +1519,7 @@ function SourceValue(props: { label: string; value?: string | null }) {
     <section className="rounded-lg border border-border p-4">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-sm font-semibold">{props.label}</h3>
-        <Badge variant="outline">source</Badge>
+        <Badge variant="outline">источник</Badge>
       </div>
       <div className="mt-3 break-all text-xs text-muted-foreground">{props.value || 'нет'}</div>
     </section>
@@ -1516,19 +1531,19 @@ function EditableOverrideField(props: { label: string; sourceValue?: string | nu
     <section className="rounded-lg border border-border p-4">
       <div className="flex items-center justify-between gap-3">
         <h3 className="text-sm font-semibold">{props.label}</h3>
-        <Badge variant="outline">{props.value ? 'override' : 'source'}</Badge>
+        <Badge variant="outline">{props.value ? 'переопределение' : 'источник'}</Badge>
       </div>
-      <div className="mt-3 line-clamp-3 text-xs text-muted-foreground">Source: {props.sourceValue || 'нет'}</div>
+      <div className="mt-3 line-clamp-3 text-xs text-muted-foreground">Источник: {props.sourceValue || 'нет'}</div>
       {props.hint ? <p className="mt-2 text-xs text-muted-foreground">{props.hint}</p> : null}
       {props.multiline ? (
         <textarea
           value={props.value}
           onChange={(event) => props.onChange(event.target.value)}
-          placeholder="Override пока не заполнен"
+          placeholder="Переопределение пока не заполнено"
           className="mt-3 min-h-28 w-full resize-none rounded-md border border-input bg-background px-3 py-2 text-sm"
         />
       ) : (
-        <Input value={props.value} onChange={(event) => props.onChange(event.target.value)} placeholder="Override пока не заполнен" className="mt-3" />
+        <Input value={props.value} onChange={(event) => props.onChange(event.target.value)} placeholder="Переопределение пока не заполнено" className="mt-3" />
       )}
     </section>
   );
@@ -1537,7 +1552,7 @@ function EditableOverrideField(props: { label: string; sourceValue?: string | nu
 function SavePanel(props: { isSaving: boolean; error: string | null; onSave: () => void }) {
   return (
     <div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-border bg-background/95 py-3 backdrop-blur">
-      <div className="text-xs text-muted-foreground">{props.error ? <span className="text-warning-foreground">Ошибка сохранения: {props.error}</span> : 'Override сохранится поверх импортных данных.'}</div>
+      <div className="text-xs text-muted-foreground">{props.error ? <span className="text-warning-foreground">Ошибка сохранения: {props.error}</span> : 'Переопределение сохранится поверх импортных данных.'}</div>
       <Button size="sm" onClick={props.onSave} disabled={props.isSaving}>
         {props.isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
         Сохранить

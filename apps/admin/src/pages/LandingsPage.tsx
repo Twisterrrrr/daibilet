@@ -38,6 +38,22 @@ type LandingCandidatesResponse = {
 const PAGE_SIZE = 80;
 const DETAIL_EVENTS_PAGE_SIZE = 80;
 
+function landingStatusLabel(status?: string | null) {
+  const normalized = String(status || '').toLowerCase();
+  if (normalized === 'ready') return 'готово';
+  if (normalized === 'seed') return 'черновик';
+  if (normalized === 'empty') return 'пусто';
+  return status || '—';
+}
+
+function readinessLabel(status?: string | null) {
+  const normalized = String(status || '').toLowerCase();
+  if (normalized === 'ready') return 'готово';
+  if (normalized === 'review') return 'доработать';
+  if (normalized === 'blocked') return 'блокер';
+  return status || '—';
+}
+
 function localResponse(): LandingsResponse {
   return {
     generatedAt: adminData.generatedAt,
@@ -171,15 +187,15 @@ export function LandingsPage() {
     <div>
       <PageHeader
         title="Лендинги"
-        description="SEO-выборки каталога: правила matching, покрытие событиями и быстрый контроль попадания карточек."
+        description="SEO-выборки каталога: правила отбора, покрытие событиями и быстрый контроль попадания карточек."
         meta={
           <>
-            <Badge variant="outline">{formatNumber(payload.total)} rules</Badge>
-            <Badge variant="outline">{formatNumber(payload.metrics.ready)} ready</Badge>
+            <Badge variant="outline">{formatNumber(payload.total)} правил</Badge>
+            <Badge variant="outline">{formatNumber(payload.metrics.ready)} готово</Badge>
             {isLoading ? (
               <Badge variant="outline" className="gap-1">
                 <Loader2 className="h-3 w-3 animate-spin" />
-                backend
+                загрузка
               </Badge>
             ) : null}
           </>
@@ -188,7 +204,7 @@ export function LandingsPage() {
 
       <div className="mb-4 grid gap-3 md:grid-cols-4">
         <MetricCard value={payload.metrics.ready} label="Готовые" />
-        <MetricCard value={payload.metrics.seed} label="Seed" />
+        <MetricCard value={payload.metrics.seed} label="Черновики" />
         <MetricCard value={payload.metrics.empty} label="Пустые" />
         <MetricCard value={payload.metrics.matchedEvents} label="Событий в выборках" />
       </div>
@@ -200,16 +216,16 @@ export function LandingsPage() {
         </div>
         <select className="h-9 rounded-md border border-input bg-background px-3 text-sm" value={status} onChange={(event) => setStatus(event.target.value)}>
           <option value="all">Все статусы</option>
-          <option value="ready">Ready</option>
-          <option value="seed">Seed</option>
-          <option value="empty">Empty</option>
+          <option value="ready">Готово</option>
+          <option value="seed">Черновик</option>
+          <option value="empty">Пусто</option>
         </select>
         <div className="flex items-center text-xs text-muted-foreground">{formatNumber(payload.total)} найдено</div>
       </div>
 
       {loadError ? (
         <div className="mb-4">
-          <InfoNote>Backend fallback: {loadError}</InfoNote>
+          <InfoNote>Резерв API: {loadError}</InfoNote>
         </div>
       ) : null}
 
@@ -240,7 +256,7 @@ export function LandingsPage() {
                 {landing.subtitle ? <div className="mt-1 line-clamp-1 text-xs text-muted-foreground">{landing.subtitle}</div> : null}
               </td>
               <td className="px-4 py-3 align-top">
-                <StatusBadge status={landing.status === 'ready' ? 'live' : landing.status === 'seed' ? 'incomplete' : 'error'} label={landing.status} />
+                <StatusBadge status={landing.status === 'ready' ? 'live' : landing.status === 'seed' ? 'incomplete' : 'error'} label={landingStatusLabel(landing.status)} />
               </td>
               <td className="px-4 py-3 align-top text-sm">
                 <div>{formatNumber(landing.events)} событий</div>
@@ -263,7 +279,7 @@ export function LandingsPage() {
                 </div>
               </td>
               <td className="px-4 py-3 align-top text-xs text-muted-foreground">
-                <div>{landing.seo?.isIndexable ? 'index' : 'noindex'}</div>
+                <div>{landing.seo?.isIndexable ? 'индекс' : 'без индекса'}</div>
                 <div className="mt-1">{landing.seo?.canonicalUrl || `/landings/${landing.slug}`}</div>
               </td>
               <td className="px-4 py-3 align-top">
@@ -377,7 +393,7 @@ function LandingRuleCard({ landing, onChanged, onOpen }: { landing: AdminLanding
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <h2 className="text-sm font-semibold">{landing.title}</h2>
-              <StatusBadge status={landing.status === 'ready' ? 'live' : landing.status === 'seed' ? 'incomplete' : 'error'} label={landing.status} />
+              <StatusBadge status={landing.status === 'ready' ? 'live' : landing.status === 'seed' ? 'incomplete' : 'error'} label={landingStatusLabel(landing.status)} />
             </div>
             <p className="mt-1 font-mono text-xs text-muted-foreground">{landing.slug}</p>
             {landing.subtitle ? <p className="mt-2 max-w-3xl text-sm text-muted-foreground">{landing.subtitle}</p> : null}
@@ -393,7 +409,7 @@ function LandingRuleCard({ landing, onChanged, onOpen }: { landing: AdminLanding
 
       <div className="mb-4">
         <button type="button" onClick={onOpen} className="inline-flex h-8 items-center rounded-md border border-border px-3 text-xs font-semibold hover:bg-secondary">
-          Open full editor
+          Открыть полный редактор
         </button>
       </div>
 
@@ -403,43 +419,43 @@ function LandingRuleCard({ landing, onChanged, onOpen }: { landing: AdminLanding
             {chip}
           </Badge>
         ))}
-        {landing.city ? <Badge variant="outline">city: {landing.city}</Badge> : null}
-        {landing.venue ? <Badge variant="outline">venue: {landing.venue}</Badge> : null}
+        {landing.city ? <Badge variant="outline">город: {landing.city}</Badge> : null}
+        {landing.venue ? <Badge variant="outline">площадка: {landing.venue}</Badge> : null}
       </div>
 
       <div className="mb-4 grid gap-3 md:grid-cols-3">
-        <RuleBox title="Ключевые слова" items={landing.keywords || []} empty="нет keywords" />
-        <RuleBox title="Обязательные теги" items={landing.requiredTags || []} empty="нет tags" />
-        <RuleBox title="Исключения" items={landing.excludedTags || []} empty="нет excludeTags" />
+        <RuleBox title="Ключевые слова" items={landing.keywords || []} empty="нет ключевых слов" />
+        <RuleBox title="Обязательные теги" items={landing.requiredTags || []} empty="нет тегов" />
+        <RuleBox title="Исключения" items={landing.excludedTags || []} empty="нет исключений" />
       </div>
 
       <div className="mb-4 rounded-lg border border-border bg-secondary/20 p-3">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
-            <div className="text-xs font-medium text-muted-foreground">SEO / content override</div>
-            <div className="text-xs text-muted-foreground">Landing + SeoMeta for the public page.</div>
+            <div className="text-xs font-medium text-muted-foreground">SEO / переопределение контента</div>
+            <div className="text-xs text-muted-foreground">Лендинг и SEO-мета публичной страницы.</div>
           </div>
           <button type="button" onClick={saveLanding} disabled={saving} className="inline-flex h-9 items-center gap-2 rounded-md bg-primary px-3 text-xs font-semibold text-primary-foreground disabled:opacity-60">
             {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Save className="h-3.5 w-3.5" />}
-            Save
+            Сохранить
           </button>
         </div>
         <div className="grid gap-3 lg:grid-cols-2">
-          <Input value={form.title} onChange={(event) => setField('title', event.target.value)} placeholder="Title" className="h-9" />
-          <Input value={form.subtitle} onChange={(event) => setField('subtitle', event.target.value)} placeholder="Subtitle" className="h-9" />
+          <Input value={form.title} onChange={(event) => setField('title', event.target.value)} placeholder="Заголовок" className="h-9" />
+          <Input value={form.subtitle} onChange={(event) => setField('subtitle', event.target.value)} placeholder="Подзаголовок" className="h-9" />
           <Input value={form.seoH1} onChange={(event) => setField('seoH1', event.target.value)} placeholder="SEO H1" className="h-9" />
           <Input value={form.seoTitle} onChange={(event) => setField('seoTitle', event.target.value)} placeholder="SEO title" className="h-9" />
           <Input value={form.seoDescription} onChange={(event) => setField('seoDescription', event.target.value)} placeholder="SEO description" className="h-9 lg:col-span-2" />
-          <Input value={form.canonicalUrl} onChange={(event) => setField('canonicalUrl', event.target.value)} placeholder="Canonical URL" className="h-9" />
+          <Input value={form.canonicalUrl} onChange={(event) => setField('canonicalUrl', event.target.value)} placeholder="Канонический URL" className="h-9" />
           <div className="flex min-h-9 items-center gap-3 rounded-md border border-input bg-background px-3 text-xs">
             <label className="inline-flex items-center gap-2">
               <input type="checkbox" checked={form.isIndexable} onChange={(event) => setField('isIndexable', event.target.checked)} />
-              indexable
+              индексировать
             </label>
             <select value={form.status} onChange={(event) => setField('status', event.target.value)} className="ml-auto h-7 rounded border border-input bg-background px-2">
-              <option value="REVIEW">Review</option>
-              <option value="PUBLISHED">Published</option>
-              <option value="HIDDEN">Hidden</option>
+              <option value="REVIEW">На проверке</option>
+              <option value="PUBLISHED">Опубликовано</option>
+              <option value="HIDDEN">Скрыто</option>
             </select>
           </div>
         </div>
@@ -467,19 +483,19 @@ function LandingRuleCard({ landing, onChanged, onOpen }: { landing: AdminLanding
             </td>
             <td className="px-4 py-3 align-top text-sm font-medium">{formatMoney(event.priceFrom)}</td>
             <td className="px-4 py-3 align-top">
-              <StatusBadge status={event.readiness === 'ready' ? 'live' : event.readiness === 'blocked' ? 'error' : 'incomplete'} label={event.readiness} />
+              <StatusBadge status={event.readiness === 'ready' ? 'live' : event.readiness === 'blocked' ? 'error' : 'incomplete'} label={readinessLabel(event.readiness)} />
               <div className="mt-2 flex flex-wrap gap-1">
                 <button type="button" onClick={() => updateMatch(event.id, 'PINNED')} className="inline-flex h-7 items-center gap-1 rounded border border-border px-2 text-[11px] hover:bg-secondary">
                   <Pin className="h-3 w-3" />
-                  pin
+                  закрепить
                 </button>
                 <button type="button" onClick={() => updateMatch(event.id, 'EXCLUDED')} className="inline-flex h-7 items-center gap-1 rounded border border-border px-2 text-[11px] hover:bg-secondary">
                   <EyeOff className="h-3 w-3" />
-                  exclude
+                  исключить
                 </button>
                 <button type="button" onClick={() => updateMatch(event.id, 'REVIEW')} className="inline-flex h-7 items-center gap-1 rounded border border-border px-2 text-[11px] hover:bg-secondary">
                   <RotateCcw className="h-3 w-3" />
-                  review
+                  на проверку
                 </button>
               </div>
             </td>
@@ -570,15 +586,15 @@ function LandingDetailEditor({
     <Card className="border-primary/30 p-4 shadow-sm">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <div className="text-xs font-semibold uppercase text-muted-foreground">Full landing editor</div>
-          <h2 className="mt-1 text-lg font-semibold">{detail?.landing.title || detail?.rule.title || 'Loading...'}</h2>
+          <div className="text-xs font-semibold uppercase text-muted-foreground">Полный редактор лендинга</div>
+          <h2 className="mt-1 text-lg font-semibold">{detail?.landing.title || detail?.rule.title || 'Загрузка…'}</h2>
           <p className="mt-1 font-mono text-xs text-muted-foreground">{detail?.slug}</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          {isLoading ? <Badge variant="outline" className="gap-1"><Loader2 className="h-3 w-3 animate-spin" /> loading</Badge> : null}
-          {isSaving ? <Badge variant="outline" className="gap-1"><Loader2 className="h-3 w-3 animate-spin" /> saving</Badge> : null}
+          {isLoading ? <Badge variant="outline" className="gap-1"><Loader2 className="h-3 w-3 animate-spin" /> загрузка</Badge> : null}
+          {isSaving ? <Badge variant="outline" className="gap-1"><Loader2 className="h-3 w-3 animate-spin" /> сохранение</Badge> : null}
           <button type="button" onClick={onClose} className="inline-flex h-8 items-center rounded-md border border-border px-3 text-xs font-semibold hover:bg-secondary">
-            Close
+            Закрыть
           </button>
         </div>
       </div>
@@ -586,31 +602,31 @@ function LandingDetailEditor({
       {detail ? (
         <>
           <div className="mb-4 grid gap-3 md:grid-cols-5">
-            <MetricCard value={detail.metrics.effectiveEvents} label="Effective" />
-            <MetricCard value={detail.metrics.autoEvents} label="Auto match" />
-            <MetricCard value={detail.metrics.pinnedEvents} label="Pinned" />
-            <MetricCard value={detail.metrics.excludedEvents} label="Excluded" />
-            <MetricCard value={detail.metrics.reviewEvents} label="Review" />
+            <MetricCard value={detail.metrics.effectiveEvents} label="В выборке" />
+            <MetricCard value={detail.metrics.autoEvents} label="Авто" />
+            <MetricCard value={detail.metrics.pinnedEvents} label="Закреплено" />
+            <MetricCard value={detail.metrics.excludedEvents} label="Исключено" />
+            <MetricCard value={detail.metrics.reviewEvents} label="На проверке" />
           </div>
 
           <div className="mb-4 grid gap-3 lg:grid-cols-[1fr_280px]">
             <div className="rounded-lg border border-border bg-secondary/20 p-3">
-              <div className="mb-2 text-xs font-medium text-muted-foreground">Rule</div>
+              <div className="mb-2 text-xs font-medium text-muted-foreground">Правило</div>
               <div className="flex flex-wrap gap-1.5">
-                {(detail.rule.keywords || []).map((item) => <Badge key={`kw:${item}`} variant="outline">kw: {item}</Badge>)}
+                {(detail.rule.keywords || []).map((item) => <Badge key={`kw:${item}`} variant="outline">ключ: {item}</Badge>)}
                 {(detail.rule.requiredAnyKeywords || []).map((item) => <Badge key={`reqkw:${item}`} variant="secondary">обяз.: {item}</Badge>)}
                 {(detail.rule.requiredKeywordGroups || []).map((group, index) => (
                   <Badge key={`group:${index}:${group.join('|')}`} variant="secondary">
                     группа: {group.join(' / ')}
                   </Badge>
                 ))}
-                {(detail.rule.requiredTags || []).map((item) => <Badge key={`tag:${item}`} variant="secondary">tag: {item}</Badge>)}
-                {(detail.rule.excludedTags || []).map((item) => <Badge key={`ex:${item}`} variant="outline">exclude: {item}</Badge>)}
+                {(detail.rule.requiredTags || []).map((item) => <Badge key={`tag:${item}`} variant="secondary">тег: {item}</Badge>)}
+                {(detail.rule.excludedTags || []).map((item) => <Badge key={`ex:${item}`} variant="outline">искл. тег: {item}</Badge>)}
                 {(detail.rule.excludedKeywords || []).map((item) => <Badge key={`exkw:${item}`} variant="outline">искл.: {item}</Badge>)}
               </div>
             </div>
             <div className="rounded-lg border border-border bg-secondary/20 p-3">
-              <div className="mb-2 text-xs font-medium text-muted-foreground">Public SEO</div>
+              <div className="mb-2 text-xs font-medium text-muted-foreground">Публичное SEO</div>
               <div className="line-clamp-2 text-xs">{detail.seo.title}</div>
               <div className="mt-1 text-xs text-muted-foreground">{detail.seo.robots}</div>
             </div>
@@ -659,7 +675,7 @@ function LandingDetailEditor({
           </section>
 
           <div className="mb-4 flex flex-wrap items-center gap-3">
-            <Input value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Поиск событий в лендинге (server)..." className="h-9 min-w-[260px] flex-1" />
+            <Input value={query} onChange={(event) => onQueryChange(event.target.value)} placeholder="Поиск событий в лендинге..." className="h-9 min-w-[260px] flex-1" />
             <div className="text-xs text-muted-foreground">{formatNumber(eventsTotal)} событий · стр. {eventsPage}/{eventsPages}</div>
           </div>
 
@@ -699,7 +715,7 @@ function LandingDetailEditor({
           ) : null}
         </>
       ) : (
-        <InfoNote>Выберите лендинг или дождитесь загрузки detail endpoint.</InfoNote>
+        <InfoNote>Выберите лендинг или дождитесь загрузки деталей.</InfoNote>
       )}
     </Card>
   );
@@ -711,13 +727,13 @@ function LandingBlocksPreview({ blocks }: { blocks: NonNullable<AdminLandingDeta
     <section className="mb-4 rounded-lg border border-border bg-card p-3">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div>
-          <div className="text-sm font-semibold">Content blocks</div>
-          <div className="mt-1 text-xs text-muted-foreground">Public composition: hero context, value blocks, city grid, FAQ and SEO text.</div>
+          <div className="text-sm font-semibold">Контентные блоки</div>
+          <div className="mt-1 text-xs text-muted-foreground">Публичная композиция: hero, ценностные блоки, сетка городов, FAQ и SEO-текст.</div>
         </div>
-        <Badge variant="outline">{formatNumber(sorted.length)} blocks</Badge>
+        <Badge variant="outline">{formatNumber(sorted.length)} блоков</Badge>
       </div>
       {sorted.length ? (
-        <DataTableShell columns={['#', 'Type', 'Title', 'Variant', 'Enabled']}>
+        <DataTableShell columns={['#', 'Тип', 'Заголовок', 'Вариант', 'Вкл.']}>
           {sorted.map((block, index) => (
             <tr key={block.id || `${block.type}:${index}`} className="border-b border-border last:border-0 hover:bg-secondary/40">
               <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{block.sortOrder ?? index}</td>
@@ -729,12 +745,12 @@ function LandingBlocksPreview({ blocks }: { blocks: NonNullable<AdminLandingDeta
                 {block.subtitle ? <div className="mt-1 line-clamp-1 text-xs text-muted-foreground">{block.subtitle}</div> : null}
               </td>
               <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{block.variant || '—'}</td>
-              <td className="px-4 py-3 text-xs text-muted-foreground">{block.isEnabled === false ? 'off' : 'on'}</td>
+              <td className="px-4 py-3 text-xs text-muted-foreground">{block.isEnabled === false ? 'выкл' : 'вкл'}</td>
             </tr>
           ))}
         </DataTableShell>
       ) : (
-        <InfoNote>No saved blocks yet. Backend will render fallback blocks from the landing rule.</InfoNote>
+        <InfoNote>Сохранённых блоков пока нет. Сервер отрисует запасные блоки из правила лендинга.</InfoNote>
       )}
     </section>
   );
@@ -786,7 +802,7 @@ function LandingEventsEditorTable({
             <td className="px-4 py-3 align-top text-sm font-medium">{formatMoney(event.priceFrom)}</td>
             <td className="px-4 py-3 align-top">
               <div className="flex flex-wrap gap-1">
-                {event.isAutoMatch ? <Badge variant="outline">auto</Badge> : null}
+                {event.isAutoMatch ? <Badge variant="outline">авто</Badge> : null}
                 {event.manualStatus ? <Badge variant="secondary">{manualMatchLabel(event.manualStatus)}</Badge> : null}
               </div>
               <div className="mt-2 flex flex-wrap gap-1">
