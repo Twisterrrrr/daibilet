@@ -15,8 +15,8 @@
 | B.2 | Rewrite 4 гидов + SEO/ссылки/`[buy]` | Высокий | ✅ |
 | B.3 | Hide `spb-razvod-mostov-kakoi-reis` + 301 → rooftop | Средний | ✅ → **отменено** (статья снова PUBLISHED) |
 | B.4 | Commit → deploy-prod-next → `blog:upsert` ×4+hide | Критический | ✅ |
-| B.5 | Пакет 10 редакционных статей (verbatim + buy + upsert) | Критический | 🔄 |
-| B.6 | Вернуть `spb-razvod-mostov-kakoi-reis` PUBLISHED, снять 301 | Высокий | 🔄 |
+| B.5 | Пакет 10 редакционных статей (verbatim + buy + upsert) | Критический | ✅ |
+| B.6 | Вернуть `spb-razvod-mostov-kakoi-reis` PUBLISHED, снять 301 | Высокий | ✅ |
 
 ---
 
