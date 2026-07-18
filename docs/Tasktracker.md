@@ -154,7 +154,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 2.2.3 | City page LD+JSON в RSC | Высокий | ⏳ |
 | 2.2.4 | Venue page LD+JSON | Средний | ⏳ |
 | 2.2.5 | Google Rich Results / validator smoke | Низкий | ⏳ |
-| 2.2.6 | Root WebSite/Organization JSON-LD + Google favicon PNG (48/96/192) | Высокий | ✅ код 2026-07-18; ⏳ деплой |
+| 2.2.6 | Root WebSite/Organization JSON-LD + Google favicon PNG (48/96/192) | Высокий | ✅ 2026-07-19 deploy prod |
 
 ### 2.3 Canonical & indexing policy
 
