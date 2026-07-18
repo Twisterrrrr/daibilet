@@ -1,7 +1,7 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-07-14  
-**Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md)
+**Обновлено:** 2026-07-19  
+**Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
 
@@ -50,8 +50,8 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 0.3.1 | Login (basic auth / realm) | Критический | ⏳ |
 | 0.3.2 | Dashboard metrics загружаются | Высокий | ✅ 2026-07-14 aligned with Events (`admin_event_groups`) |
 | 0.3.3 | Sources: TC + Teplohod, last sync | Критический | ⏳ |
-| 0.3.4 | Events: list + detail + override save | Высокий | ✅ full catalog (no 10k cap) + override lean texts |
-| 0.3.5 | Orders: список реальных заказов (не mock) | Критический | ⏳ |
+| 0.3.4 | Events: list + detail + override save | Высокий | ✅ full catalog (no 10k cap) + override lean texts; UI-подписи на русском (2026-07-18) |
+| 0.3.5 | Orders: список реальных заказов (не mock) | Критический | 🔄 live list; prod cron `tc-orders` */10 2026-07-19 |
 | 0.3.6 | Event moderation / publish gate | Средний | ⏳ |
 | 0.3.7 | Зафиксировать результат в Diary / smoke log | Средний | ⏳ |
 
@@ -80,7 +80,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 0.5.9 | Catalog quick wins: lean DTO, no widgets in list, hydrate page-only, unified metrics, www/SEO redirects, SSR trim, warmup | Критический | ✅ 2026-07-14 |
 | 0.5.10 | Teplohod checkout fallback → account.teplohod.info (не teplohod.info/event 404) | Высокий | ✅ 2026-07-14 |
 | 0.5.11 | Post-deploy: clear `.next/cache` + revalidate; ChunkLoadError → one reload | Высокий | ✅ 2026-07-14 |
-| 0.5.12 | Teplohod: restore TI_Tickets bootstrap on event page + landing `evt_tep_*` buy | Критический | 🔄 2026-07-18 |
+| 0.5.12 | Teplohod: restore TI_Tickets bootstrap on event page + landing `evt_tep_*` buy | Критический | ✅ 2026-07-18 deploy |
 
 ---
 
@@ -154,6 +154,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 2.2.3 | City page LD+JSON в RSC | Высокий | ⏳ |
 | 2.2.4 | Venue page LD+JSON | Средний | ⏳ |
 | 2.2.5 | Google Rich Results / validator smoke | Низкий | ⏳ |
+| 2.2.6 | Root WebSite/Organization JSON-LD + Google favicon PNG (48/96/192) | Высокий | ✅ код 2026-07-18; ⏳ деплой |
 
 ### 2.3 Canonical & indexing policy
 
@@ -162,6 +163,14 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 2.3.1 | www → non-www (nginx) audit | Средний | ⏳ |
 | 2.3.2 | `noindex` для thin city/venue | Средний | ⏳ |
 | 2.3.3 | staging `noindex` | — | ✅ |
+
+### 2.4 Blog / content ops
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| 2.4.1 | 5 заголовков + план ([content-blog-plan.md](./content-blog-plan.md)) | Средний | ✅ 2026-07-19 |
+| 2.4.2 | Написать/опубликовать 5 статей | Высокий | ⏳ |
+| 2.4.3 | Weekly digest script → Article `review` + cron | Средний | ⏳ |
 
 ---
 

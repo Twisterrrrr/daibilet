@@ -4,6 +4,67 @@
 
 ---
 
+## 2026-07-19 — Cron TC orders-only + контент-план блога
+
+### Наблюдения
+
+- Зеркало заказов Ticketscloud на prod не обновлялось с 13.07 — sync только ручной, без cron; каталог (TEP 6ч) заказы не тянет.
+- Teplohod orders API в интеграции не описан; email-парсинг отклонён как MVP-путь.
+- Блог давно не обновлялся; нужен контент-план и еженедельный дайджест новых событий.
+
+### Решения
+
+- `deploy/cron/tc-orders-sync.sh` + crontab `*/10` только `npm run tc:orders` (`created_at=from,to`, lookback 3 дня, flock). Каталог не трогаем.
+- Smoke 2026-07-18: импортирован 1 заказ TC `done` (первая внешняя продажа) + 1 билет.
+- Контент-план: [content-blog-plan.md](./content-blog-plan.md) — 5 заголовков + дизайн weekly digest → Article status=`review`.
+
+### Проблемы
+
+- TEP-продажи в админке появятся только после partner orders API.
+- Auto-publish дайджеста без редактора — не включать.
+
+---
+
+## 2026-07-18 — Google SERP: favicon + WebSite JSON-LD
+
+### Наблюдения
+
+- В выдаче Google сайт отображался как серый глобус + URL `daibilet.ru` вместо «Дайбилет» и цветной иконки.
+- На проде `GET /favicon.ico` → **404**; в HTML не было `link rel="icon"` с PNG.
+- SSR JSON-LD `WebSite` + `Organization` уже был в `apps/web/app/layout.tsx`, но `Organization.logo` указывал на несуществующий `/favicon.ico`.
+- `robots.txt` иконки не блокирует (`Allow: /`).
+- `og:site_name` / title template (`%s | Дайбилет`) уже заданы в root metadata.
+
+### Решения
+
+- Добавлены стабильные PNG: `/favicon-48x48.png`, `/favicon-96x96.png`, `/icon-192x192.png`, `/logo-192x192.png`, `/apple-touch-icon.png` (+ SVG/ICO fallback) в `apps/web/public/`.
+- В root `metadata.icons` — `rel="icon"` type `image/png` (48/96/192) и apple-touch.
+- JSON-LD `Organization.logo` → `https://daibilet.ru/logo-192x192.png` (192×192); `WebSite.name` = «Дайбилет», SearchAction на `/events?q={search_term_string}`.
+- Для появления в SERP нужен деплой Next + переобход Google (дни/недели).
+
+### Проблемы
+
+- Без commit/push стандартный `deploy-prod-next.sh` (git pull) правки не подхватит.
+
+---
+
+## 2026-07-18 — Русификация UI админки
+
+### Наблюдения
+
+- Во всех разделах админки оставались английские бейджи и подписи: `imported`, `need attention`, `backend`, `Save`/`Close`, статусы `published`/`review`/`auto`, SEO-метки `index`/`noindex`, `Override`/`Source`.
+
+### Решения
+
+- Переведены пользовательские строки в страницах Events, Landings, Articles, Venues, Sources, Mapping, Settings, Dashboard, Change Requests и в shell/primitives.
+- `StatusBadge` по умолчанию показывает русские статусы вместо сырых `live`/`draft`.
+
+### Проблемы
+
+- Имена провайдеров (Ticketscloud, Teplohod.info) и технические slug/SEO-поля оставлены как бренды/термины.
+
+---
+
 ## 2026-07-18 — Full sync TC+TEP
 
 ### Наблюдения
