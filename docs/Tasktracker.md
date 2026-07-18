@@ -50,9 +50,9 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 0.3.1 | Login (basic auth / realm) | Критический | ⏳ |
 | 0.3.2 | Dashboard metrics загружаются | Высокий | ✅ 2026-07-14 aligned with Events (`admin_event_groups`) |
 | 0.3.3 | Sources: TC + Teplohod, last sync | Критический | ⏳ |
-| 0.3.4 | Events: list + detail + override save | Высокий | ✅ full catalog (no 10k cap) + override lean texts; UI-подписи на русском (2026-07-18) |
+| 0.3.4 | Events: list + detail + override save | Высокий | ✅ full catalog (no 10k cap) + override lean texts; UI-подписи на русском (2026-07-18); group readiness: future-sibling снимает NO_FUTURE blocker (2026-07-19, deploy ⏳) |
 | 0.3.5 | Orders: список реальных заказов (не mock) | Критический | 🔄 live list; prod cron `tc-orders` */10 2026-07-19 |
-| 0.3.6 | Event moderation / publish gate | Средний | ⏳ |
+| 0.3.6 | Event moderation / publish gate | Средний | 🔄 group readiness recalc после siblings (NO_FUTURE только если нет future в группе); остальное ⏳ |
 | 0.3.7 | Зафиксировать результат в Diary / smoke log | Средний | ⏳ |
 
 ### 0.4 `tc:sync` widgetUrl backfill (prod)
@@ -171,8 +171,8 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 |---|--------|-----------|--------|
 | 2.4.0 | Инвентарь статей (статика + prod `Article`), запрет дублей | Высокий | ✅ 2026-07-19 |
 | 2.4.1 | 5 уникальных заголовков + план ([content-blog-plan.md](./content-blog-plan.md)) | Средний | ✅ 2026-07-19 (сверено с инвентарём) |
-| 2.4.2 | Написать/опубликовать 4 статьи (без «как купить»; без пересечения с 13) | Высокий | ✅ 2026-07-19 (контент+обложки+статика; upsert БД на деплое) |
-| 2.4.3 | Weekly digest script → Article `REVIEW` + cron | Средний | ✅ 2026-07-19 |
+| 2.4.2 | Написать/опубликовать 4 статьи (без «как купить»; без пересечения с 13) | Высокий | ✅ 2026-07-19 prod upsert + URL 200 |
+| 2.4.3 | Weekly digest script → Article `REVIEW` + cron | Средний | ✅ 2026-07-19 cron + первый REVIEW |
 
 ---
 
@@ -226,3 +226,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 2026-07-13 | Roadmap перестроен на **Этапы 0–2** с чеклистами browser/admin smoke, tc:sync, SEO gaps |
 | 2026-07-11 | F3 cutover prod, Codex cherry-pick |
 | 2026-07-10 | F2 SSR complete, staging Next |
+
+## Google Search Console verification
+- [x] **Критический** — файл `googleb3313872246ac993.html` в `apps/web/public/`, deploy prod, curl 200 (2026-07-19)
+

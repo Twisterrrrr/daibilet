@@ -4,6 +4,45 @@
 
 ---
 
+## 2026-07-19 — Admin group readiness: NO_FUTURE не блокирует при future-sibling
+
+### Наблюдения
+
+- `groupAdminEventRows` / UI `groupAdminRows` брали `worstReadiness` по siblings: past-only слот с `NO_FUTURE_SESSIONS` красил всю карточку как «Блокер», даже если в группе есть будущий сеанс.
+- Representative `startsAt` = earliest → после merge нельзя судить о future только по полю группы.
+
+### Решения
+
+- После группировки: `finalizeGroupedAdminReadiness` — если в группе был future-слот, убрать только `NO_FUTURE_SESSIONS`; прочие high-issues оставляют `blocked`.
+- Backend: merge `readinessIssues`/`readinessCodes` + флаг `_groupHasFutureSession`; admin UI — зеркальная логика.
+- Unit: `apps/backend/src/admin-group-readiness.test.ts`.
+
+### Проблемы
+
+- Нужен деплой **API** (dto.js / admin grouped cache), иначе prod продолжит отдавать старый `worstReadiness`. Admin static — желателен для клиентского regroup, но source of truth — backend cache.
+
+---
+
+## 2026-07-19 — Prod: 4 статьи + upsert + digest cron
+
+### Наблюдения
+
+- Deploy `feat/next-monorepo` → `/opt/daibilet` (SHA `63b6af3`), Next health OK.
+- `npm run blog:upsert`: 4 статьи `PUBLISHED` в `Article`; публичные URL `/blog/...` → 200.
+- Первый `blog:weekly-digest`: создан `afisha-nedeli-2026-07-18` status=`REVIEW`, public 404 (ожидаемо).
+- Crontab: сохранён `*/10` tc-orders; добавлен `0 7 * * 0` blog-weekly-digest.
+
+### Решения
+
+- Дайджест **не** публиковать автоматом — тонкий черновик (2 события, нужна редактура); публикация вручную в Admin → Блог.
+- Temp ops-скрипты на сервере/локально удалить после прогона.
+
+### Проблемы
+
+- Digest SQL сейчас слабо наполняет МСК/СПб (0 capital в первом прогоне) — донастроить фильтр city slug / createdAt в следующем цикле.
+
+---
+
 ## 2026-07-19 — 4 статьи блога + weekly digest
 
 ### Наблюдения
@@ -713,3 +752,16 @@
 
 - Полный landing parity (hero sticky, filters, bridges/dinner profiles) — отдельно, не slice 4.
 - Slice 5: auth/pages (`/help`, `/blog`, legal).
+
+## 2026-07-19 — Google Search Console verification
+
+### Наблюдения
+- Нужен HTML-файл верификации Google по URL `/googleb3313872246ac993.html`, по аналогии с Yandex (`apps/web/public/yandex_*.html`).
+- Статика Next отдаётся из `apps/web/public/`; дублирование в `apps/public/public/` для verify-файлов не требуется.
+
+### Решения
+- Добавлен `apps/web/public/googleb3313872246ac993.html`; commit + deploy на prod, чтобы URL сразу отвечал 200.
+
+### Проблемы
+- Нет.
+
