@@ -7,12 +7,15 @@ import './globals.css';
 const SITE_URL = process.env.DAIBILET_SITE_URL || 'https://daibilet.ru';
 const SITE_NAME = 'Дайбилет';
 
-/** Стабильные URL иконок (кратные 48px) — Google Search / Googlebot-Image. */
+/** Favicon / PWA: силуэт билета ~90% кадра (мало padding во вкладке). */
+const ICON_32 = '/favicon-32x32.png';
 const ICON_48 = '/favicon-48x48.png';
 const ICON_96 = '/favicon-96x96.png';
 const ICON_192 = '/icon-192x192.png';
+const ICON_512 = '/icon-512x512.png';
 const LOGO_192 = '/logo-192x192.png';
 const APPLE_TOUCH = '/apple-touch-icon.png';
+const FAVICON_ICO = '/favicon.ico';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -22,13 +25,17 @@ export const metadata: Metadata = {
     template: '%s | Дайбилет',
   },
   description: 'Афиша событий, экскурсий и мероприятий в городах России. Билеты онлайн.',
+  manifest: '/site.webmanifest',
   icons: {
     icon: [
       { url: ICON_48, sizes: '48x48', type: 'image/png' },
+      { url: ICON_32, sizes: '32x32', type: 'image/png' },
       { url: ICON_96, sizes: '96x96', type: 'image/png' },
       { url: ICON_192, sizes: '192x192', type: 'image/png' },
+      { url: ICON_512, sizes: '512x512', type: 'image/png' },
+      { url: FAVICON_ICO, sizes: '48x48', type: 'image/x-icon' },
     ],
-    shortcut: ICON_96,
+    shortcut: ICON_48,
     apple: [{ url: APPLE_TOUCH, sizes: '180x180', type: 'image/png' }],
   },
   openGraph: {

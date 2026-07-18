@@ -1,6 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Дайбилет">
-  <g transform="rotate(45 24 24)">
-    <path d="M11 15h26a2 2 0 0 1 2 2v3.2a2.8 2.8 0 0 0 0 5.6V28a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2v-3.2a2.8 2.8 0 0 0 0-5.6V17a2 2 0 0 1 2-2z" fill="#4A7FD4"/>
-    <circle cx="24" cy="24" r="2.4" fill="#ffffff"/>
+  <!-- Силуэт ~88–92% кадра: толще + крупнее для читаемости во вкладке 16px -->
+  <g transform="translate(24 24) rotate(45) scale(1.5) translate(-24 -24)">
+    <path
+      d="M9 12.5h30a2.5 2.5 0 0 1 2.5 2.5v4.2a3.6 3.6 0 0 0 0 7.2v4.2a2.5 2.5 0 0 1-2.5 2.5H9a2.5 2.5 0 0 1-2.5-2.5v-4.2a3.6 3.6 0 0 0 0-7.2v-4.2A2.5 2.5 0 0 1 9 12.5z"
+      fill="#4A7FD4"
+    />
+    <circle cx="24" cy="24" r="3.2" fill="#ffffff"/>
   </g>
 </svg>
