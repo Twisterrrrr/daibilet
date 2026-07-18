@@ -134,40 +134,36 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               initialQuery={searchInitialQuery}
               className="hidden lg:inline-flex"
             />
-            <HeaderSearch
-              variant="overlay"
-              cityFilter={searchCityFilter}
-              initialQuery={searchInitialQuery}
-              className="!h-10 !w-10 !justify-center !gap-0 !border-0 !bg-transparent !px-0 text-slate-700 hover:!bg-slate-100 lg:hidden"
-            />
 
-            <HeaderAuthControls
-              ref={userMenuRef}
-              auth={auth}
-              isLoggedIn={isLoggedIn}
-              userMenuOpen={userMenuOpen}
-              onToggleUserMenu={() => setUserMenuOpen((value) => !value)}
-              onCloseUserMenu={() => setUserMenuOpen(false)}
-            />
+            <div className="hidden lg:contents">
+              <HeaderAuthControls
+                ref={userMenuRef}
+                auth={auth}
+                isLoggedIn={isLoggedIn}
+                userMenuOpen={userMenuOpen}
+                onToggleUserMenu={() => setUserMenuOpen((value) => !value)}
+                onCloseUserMenu={() => setUserMenuOpen(false)}
+              />
 
-            <Link
-              href="/help"
-              title="Помощь и FAQ"
-              aria-label="Помощь и FAQ"
-              className="hidden h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 md:inline-flex"
-            >
-              <HelpCircle className="h-5 w-5" />
-            </Link>
+              <Link
+                href="/help"
+                title="Помощь и FAQ"
+                aria-label="Помощь и FAQ"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100"
+              >
+                <HelpCircle className="h-5 w-5" />
+              </Link>
 
-            <button
-              type="button"
-              aria-label="Избранное"
-              title="Избранное"
-              onClick={() => setFavoritesOpen(true)}
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
-            >
-              <Heart className="h-5 w-5" />
-            </button>
+              <button
+                type="button"
+                aria-label="Избранное"
+                title="Избранное"
+                onClick={() => setFavoritesOpen(true)}
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+              >
+                <Heart className="h-5 w-5" />
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -185,6 +181,10 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
           searchInitialQuery={searchInitialQuery}
           onClose={() => setMobileOpen(false)}
           onCityChange={onCityChange}
+          onOpenFavorites={() => {
+            setMobileOpen(false);
+            setFavoritesOpen(true);
+          }}
         />
       ) : null}
       {favoritesOpen ? <FavoritesPanel onClose={() => setFavoritesOpen(false)} /> : null}
@@ -209,14 +209,14 @@ const HeaderAuthControls = forwardRef<
           type="button"
           aria-label="Личный кабинет"
           onClick={onToggleUserMenu}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 lg:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 xl:hidden"
         >
           <User className="h-5 w-5" />
         </button>
         <button
           type="button"
           onClick={onToggleUserMenu}
-          className="hidden items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 lg:inline-flex xl:px-4"
+          className="hidden items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 xl:inline-flex xl:px-4"
         >
           <User className="h-4 w-4" />
           {auth?.user?.name || 'Кабинет'}
@@ -251,13 +251,13 @@ const HeaderAuthControls = forwardRef<
       <Link
         href="/login?returnUrl=/account/purchases"
         aria-label="Войти"
-        className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 lg:hidden"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 xl:hidden"
       >
         <User className="h-5 w-5" />
       </Link>
       <Link
         href="/login?returnUrl=/account/purchases"
-        className="hidden items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 lg:inline-flex xl:px-4"
+        className="hidden items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 xl:inline-flex xl:px-4"
       >
         <LogIn className="h-4 w-4" />
         Войти
@@ -277,6 +277,7 @@ function MobileNavSheet({
   searchInitialQuery,
   onClose,
   onCityChange,
+  onOpenFavorites,
 }: {
   pathname: string;
   cityLabel: string;
@@ -288,6 +289,7 @@ function MobileNavSheet({
   searchInitialQuery?: string;
   onClose: () => void;
   onCityChange: (name: string) => void;
+  onOpenFavorites: () => void;
 }) {
   return (
     <div className="fixed inset-0 z-[60] lg:hidden">
@@ -320,6 +322,15 @@ function MobileNavSheet({
               {item.label}
             </Link>
           ))}
+          <div className="my-2 border-t border-slate-200" />
+          <button
+            type="button"
+            onClick={onOpenFavorites}
+            className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100"
+          >
+            <Heart className="h-4 w-4" />
+            Избранное
+          </button>
           <Link
             href="/help"
             onClick={onClose}
