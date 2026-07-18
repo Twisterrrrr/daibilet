@@ -5,6 +5,12 @@
 limit_req_zone $binary_remote_addr zone=daibilet_public_api:10m rate=60r/m;
 limit_req_status 429;
 
+# Known scrapers (liliabots.ru mirrors) — see patch-prod-nginx-scraper-block.py
+map $http_user_agent $daibilet_block_scraper {
+    default 0;
+    ~*(liliabots|liliabot) 1;
+}
+
 upstream daibilet_api {
     server 127.0.0.1:4000;
     keepalive 32;

@@ -4,6 +4,25 @@
 
 ---
 
+## 2026-07-19 — Скрейпер liliabots.ru копирует афишу
+
+### Наблюдения
+
+- В Google выдаче `liliabots.ru` индексирует карточки с брендом «Дайбилет» (title/snippet с ценами и площадками) — зеркало/парсер контента.
+- Публичный HTML и `/api/public/*` открыты без сессии (by design MVP); rate limit на API уже есть (60r/m).
+
+### Решения
+
+- `robots.txt`: `User-agent: liliabots|liliabot` → `Disallow: /`.
+- Nginx: `map $daibilet_block_scraper` + `403` на `daibilet.ru` / `api.daibilet.ru` (`patch-prod-nginx-scraper-block.py`).
+- Параллельно: жалоба в Google на копирование (Remove outdated content / Legal) — UA-блок не удаляет уже проиндексированные страницы зеркала.
+
+### Проблемы
+
+- Скрейпер может ходить с поддельным Chrome UA — тогда нужен Cloudflare Bot Fight / WAF и ужесточение HTML rate limit.
+
+---
+
 ## 2026-07-19 — Cron TC orders-only + контент-план блога
 
 ### Наблюдения
