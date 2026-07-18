@@ -4,6 +4,43 @@
 
 ---
 
+## 2026-07-19 — Канон Макса зафиксирован: «Хей, читатели!»
+
+### Наблюдения
+
+- Параллельный агент фильтров вернул старый канон «Эй, кто на маршруте!» / «Путешествуйте…» и open-air PUBLISHED — пользователь отверг.
+- На проде нужен полный текст `fentezi-fest-bylinnyy-bereg` + `[buy]` на два TC-события.
+
+### Решения
+
+- `01-max.md` / `personas.json` / README: канон только «Хей, читатели!» → «Мир лучше видеть своими глазами!»; «Эй…» в списке запрещённых.
+- Upsert: fest PUBLISHED (6699 chars, has_hey/buy/mir), open-air HIDDEN.
+- Prod HTML verified: has_hey=true, has_ey=false, buy labels/slugs present; open-air 404.
+
+### Проблемы
+
+- Concurrent `next build` на 4GB RAM → ENOENT pages-manifest / OOM; нужен flock + stop web на время билда.
+
+---
+
+## 2026-07-19 — Прод-verify: канон Макса на `fentezi-fest-bylinnyy-bereg`
+
+### Наблюдения
+
+- Жалоба: на проде якобы ещё «Эй, кто на маршруте» (короткий черновик). Curl + DB после upsert показывают полный канон.
+
+### Решения
+
+- Повторный `blog:upsert --slug=fentezi-fest-bylinnyy-bereg` + revalidate paths/tags.
+- DB: `has_hey=true`, `has_ey=false`, `has_mir=true`, `has_buy=true`, ~6699 chars.
+- `docs/Project.md`: канон Макса приведён к «Хей, читатели!» / «Мир лучше видеть своими глазами!».
+
+### Проблемы
+
+- Нет (smoke curl OK).
+
+---
+
 ## 2026-07-19 — Формат «Редакция» + rewrite 4 гидов
 
 ### Наблюдения
