@@ -16,6 +16,19 @@ export type BlogPost = {
 /** Обложки — уникальная статика на статью: /images/blog/{slug}.jpg */
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: 'open-air-festy-vyhodnoi-ru',
+    title: 'Open-air выходного: песок, рёв моторов и честный чек',
+    excerpt:
+      'Касатики, привет! Песчаный фест от 350 ₽ и Автодром Фест от 1000 ₽ — изнанка open-air выходного с лайфхаками.',
+    date: '19 июля 2026',
+    readMin: 2,
+    tag: 'Колонка',
+    city: 'Санкт-Петербург',
+    citySlug: 'saint-petersburg',
+    imageUrl: blogCoverUrl('open-air-festy-vyhodnoi-ru'),
+    imageAlt: 'Open-air фестиваль песчаных скульптур под летним солнцем',
+  },
+  {
     slug: 'kak-vybrat-koncert',
     title: 'Как выбрать концерт: гид по билетам и местам в зале',
     excerpt: 'Партер, балкон или танцпол — зоны зала, правила покупки и концерты из афиши с ценами.',
