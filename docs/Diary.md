@@ -150,16 +150,18 @@
 
 - В tab браузера синий билет выглядел крошечным: диагональный силуэт + большое прозрачное поле (~30–40% линейного размера).
 - Это именно favicon вкладки, не Google SERP.
+- Параллельный деплой на 3.8Gi RAM ломал Next (OOM/SIGTERM) — сайт кратко отдавал 502, затем восстановлен.
 
 ### Решения
 
-- Перерисован `favicon.svg`: scale ~1.5, толще билет, bbox почти edge-to-edge (~90% кадра).
+- Увеличен fill (~90% кадра); финальный арт на prod — горизонтальный classic ticket (Flaticon-style, `#4A7FD4`).
 - PNG: 32 / 48 / 96 / apple 180 / 192 / 512 + `favicon.ico`; `site.webmanifest` с 192+512.
-- `layout.tsx` metadata.icons + `manifest: /site.webmanifest`.
+- `layout.tsx` metadata.icons + `manifest: /site.webmanifest`. Проверено live: `/favicon-48x48.png`, `/icon-512x512.png`, `/site.webmanifest` → 200.
 
 ### Проблемы
 
-- Кэш favicon в браузере агрессивный — после деплоя может понадобиться hard refresh / новая вкладка.
+- Кэш favicon в браузере агрессивный — hard refresh / новая вкладка.
+- Не гонять два `next build`/`deploy-prod-next` одновременно на prod (OOM).
 
 ---
 
