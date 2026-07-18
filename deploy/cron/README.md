@@ -67,3 +67,32 @@ crontab -e
 - Скрипт: `node scripts/blog-weekly-digest.js` (slug `afisha-nedeli-YYYY-MM-DD`, status=`REVIEW`, `isIndexable=false`).
 - Лог: `/var/log/daibilet/blog-weekly-digest.log`
 - Ручной прогон: `cd /opt/daibilet && npm run blog:weekly-digest` (или `--dry-run`).
+## Prod: CPU/RAM mitigation (TEP sync + OOM watch)
+
+Teplohod auto-sync is **in-process** (TEP_AUTO_SYNC_* in .env / `apps/backend/src/server.js`), not cron.
+`tc-orders` cron `*/10` must stay unchanged.
+
+| Setting | Value |
+|---------|-------|
+| Interval | 12h (`TEP_AUTO_SYNC_INTERVAL_MS=43200000`) |
+| Cache warm | +15 min after sync (`TEP_AUTO_SYNC_WARM_DELAY_MS=900000`) |
+| Startup delay | 10 min (avoids sync storm on every restart) |
+| Import nice | `TEP_SYNC_NICE=15` |
+
+`ash
+chmod +x /opt/daibilet/deploy/scripts/watch-tep-sync-load.sh
+chmod +x /opt/daibilet/deploy/scripts/oom-watch.sh
+`
+
+`
+# Hourly OOM skim
+7 * * * * /opt/daibilet/deploy/scripts/oom-watch.sh
+`
+
+Manual load sample around sync:
+
+`
+APP_DIR=/opt/daibilet DURATION_SEC=600 /opt/daibilet/deploy/scripts/watch-tep-sync-load.sh
+`
+
+OOM checklist: `journalctl -u daibilet-web -u daibilet-api -p err --since '24 hours ago'`

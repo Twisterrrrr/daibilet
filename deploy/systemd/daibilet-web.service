@@ -8,6 +8,9 @@ WorkingDirectory=/opt/daibilet
 EnvironmentFile=/opt/daibilet/.env
 Environment=DAIBILET_WEB_PORT=3001
 Environment=NODE_ENV=production
+Environment=NODE_OPTIONS=--max-old-space-size=896
+MemoryHigh=1100M
+MemoryMax=1400M
 ExecStart=/usr/bin/env bash deploy/scripts/start-web-prod.sh
 Restart=always
 RestartSec=5

@@ -66,6 +66,16 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 ### 0.5 Ops / auth fixes (post-cutover)
 
+### 0.6 CPU/RAM mitigation (prod 3.8Gi)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| 0.6.1 | Stop legacy Docker + staging на prod (без rm -v) | Критический | ✅ 2026-07-19 |
+| 0.6.2 | systemd MemoryMax/High + NODE_OPTIONS web/api | Высокий | ✅ 2026-07-19 |
+| 0.6.3 | TEP sync реже + warm delay + nice | Высокий | ✅ 2026-07-19 |
+| 0.6.4 | watch-tep-sync-load + oom-watch cron | Средний | ✅ 2026-07-19 |
+| 0.6.5 | Сэмпл нагрузки на следующем auto-sync окне | Средний | 🔄 скрипт готов / at optional |
+
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | 0.5.1 | `USER_JWT_SECRET` prod/staging | Критический | ✅ |

@@ -764,4 +764,28 @@
 
 ### Проблемы
 - Нет.
+---
+
+## 2026-07-19 - Prod CPU/RAM mitigation (legacy Docker off + systemd limits + TEP spread)
+
+### Наблюдения
+
+- Host 3.8Gi: swap был почти полный (~2Gi used) при одновременном legacy Docker + staging + prod Next/API.
+- Prod трафик: nginx → systemd `daibilet-web:3001` / `daibilet-api:4000`; БД prod = `daibilet-tours-postgres:5437`.
+- Legacy compose (frontend/backend/admin/supplier/postgres16/redis) и staging (api:4001, postgres:5438, redis) не обслуживали daibilet.ru / admin.daibilet.ru.
+- TEP auto-sync каждые 360 мин + сразу warm/revalidate (~30–45s warm) давали пик вместе с import (~80–120s).
+
+### Решения
+
+- Остановлены (stop + `restart=no`, volumes **не** удалялись): legacy Docker stack + staging postgres/redis; systemd `daibilet-api-staging` / `daibilet-web-staging` stop+disable.
+- Оставлен: `daibilet-tours-postgres`, `daibilet-web`, `daibilet-api`.
+- systemd MemoryHigh/MemoryMax + `NODE_OPTIONS=--max-old-space-size` (web 896/1400M, api 1024/1536M); drop-ins в `deploy/systemd/*.service.d/memory.conf`.
+- TEP: default interval 12h; warm delay 15 min; startup delay 10 min; import через `nice`; env в `deploy/env/prod.env.example`.
+- Мониторинг: `deploy/scripts/watch-tep-sync-load.sh`, `deploy/scripts/oom-watch.sh` (+ hourly cron).
+
+### Проблемы
+
+- После stop available RAM вырос, swap упал ~2Gi→~65Mi — нужно подтвердить стабильность под лимитами MemoryMax при следующем sync.
+- staging.daibilet.ru временно без API/DB до явного start контейнеров/units.
+- Rollback: `docker start` нужных контейнеров; `systemctl enable --now daibilet-*-staging`; убрать drop-ins / вернуть `TEP_AUTO_SYNC_*`.
 

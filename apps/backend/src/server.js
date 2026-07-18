@@ -96,8 +96,14 @@ const adminAuth = {
   realm: process.env.ADMIN_AUTH_REALM || 'Daibilet admin',
 };
 
-const TEP_AUTO_SYNC_INTERVAL_MS = Number(process.env.TEP_AUTO_SYNC_INTERVAL_MS || 6 * 60 * 60 * 1000);
+// Default 12h (was 6h) to reduce CPU/RAM peaks on 3.8Gi hosts; override via env.
+const TEP_AUTO_SYNC_INTERVAL_MS = Number(process.env.TEP_AUTO_SYNC_INTERVAL_MS || 12 * 60 * 60 * 1000);
+const TEP_AUTO_SYNC_WARM_DELAY_MS = Number(process.env.TEP_AUTO_SYNC_WARM_DELAY_MS || 15 * 60 * 1000);
+const TEP_AUTO_SYNC_STARTUP_DELAY_MS = Number(
+  process.env.TEP_AUTO_SYNC_STARTUP_DELAY_MS || Math.min(10 * 60 * 1000, TEP_AUTO_SYNC_INTERVAL_MS),
+);
 let tepAutoSyncInFlight = false;
+let tepAutoSyncWarmTimer = null;
 
 const jsonCache = new Map();
 const PUBLIC_RESPONSE_CACHE_MS = 5 * 60 * 1000;
@@ -748,7 +754,19 @@ function scheduleTeplohodAutoSync() {
     try {
       console.log(`Teplohod auto-sync started (${reason})`);
       const result = await runTeplohodSync();
-      invalidatePublicCaches('teplohod auto-sync', { warm: true });
+      // Invalidate immediately; defer warm/revalidate to avoid stacking with import peak.
+      invalidatePublicCaches('teplohod auto-sync', { warm: false });
+      if (tepAutoSyncWarmTimer) clearTimeout(tepAutoSyncWarmTimer);
+      const warmDelay = Number.isFinite(TEP_AUTO_SYNC_WARM_DELAY_MS) ? Math.max(0, TEP_AUTO_SYNC_WARM_DELAY_MS) : 0;
+      if (warmDelay > 0) {
+        console.log(`Teplohod cache warm scheduled in ${Math.round(warmDelay / 1000)}s`);
+        tepAutoSyncWarmTimer = setTimeout(() => {
+          tepAutoSyncWarmTimer = null;
+          invalidatePublicCaches('teplohod auto-sync delayed-warm', { warm: true });
+        }, warmDelay);
+      } else {
+        invalidatePublicCaches('teplohod auto-sync', { warm: true });
+      }
       const landingAudit = await runLandingAudit(db, rootDir);
       const elapsed = Date.now() - startedAt;
       console.log(
@@ -763,14 +781,18 @@ function scheduleTeplohodAutoSync() {
     }
   };
 
-  const firstDelayMs = Math.min(120_000, TEP_AUTO_SYNC_INTERVAL_MS);
+  const firstDelayMs = Number.isFinite(TEP_AUTO_SYNC_STARTUP_DELAY_MS)
+    ? Math.max(60_000, TEP_AUTO_SYNC_STARTUP_DELAY_MS)
+    : Math.min(120_000, TEP_AUTO_SYNC_INTERVAL_MS);
   setTimeout(() => {
     void run('startup-delay');
   }, firstDelayMs);
   setInterval(() => {
     void run('interval');
   }, TEP_AUTO_SYNC_INTERVAL_MS);
-  console.log(`Teplohod auto-sync enabled: every ${Math.round(TEP_AUTO_SYNC_INTERVAL_MS / 60000)} min, first run in ${Math.round(firstDelayMs / 1000)}s`);
+  console.log(
+    `Teplohod auto-sync enabled: every ${Math.round(TEP_AUTO_SYNC_INTERVAL_MS / 60000)} min, first run in ${Math.round(firstDelayMs / 1000)}s, warm delay ${Math.round((Number.isFinite(TEP_AUTO_SYNC_WARM_DELAY_MS) ? TEP_AUTO_SYNC_WARM_DELAY_MS : 0) / 1000)}s`,
+  );
 }
 
 const STALE_ORDER_ARCHIVE_INTERVAL_MS = 6 * 60 * 60 * 1000; // every 6 hours
@@ -1140,7 +1162,13 @@ function canonicalSearchParams(searchParams, excludeKeys = []) {
 function runTeplohodSync() {
   return new Promise((resolve, reject) => {
     const startedAt = new Date().toISOString();
-    const child = spawn(process.execPath, [path.join(rootDir, 'scripts', 'tep-import-fixtures.js')], {
+    const tepScript = path.join(rootDir, 'scripts', 'tep-import-fixtures.js');
+    const niceN = Number(process.env.TEP_SYNC_NICE || 15);
+    const useNice = process.platform !== 'win32' && Number.isFinite(niceN) && niceN > 0;
+    const child = spawn(
+      useNice ? 'nice' : process.execPath,
+      useNice ? ['-n', String(niceN), process.execPath, tepScript] : [tepScript],
+      {
       cwd: rootDir,
       env: process.env,
       windowsHide: true,

@@ -6,6 +6,9 @@ After=network.target
 Type=simple
 WorkingDirectory=/opt/daibilet
 EnvironmentFile=/opt/daibilet/.env
+Environment=NODE_OPTIONS=--max-old-space-size=1024
+MemoryHigh=1200M
+MemoryMax=1536M
 ExecStart=/usr/bin/env npm --prefix apps/backend run start:ts
 Restart=always
 RestartSec=5
