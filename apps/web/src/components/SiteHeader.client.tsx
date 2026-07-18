@@ -79,19 +79,19 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200 bg-white/85 pt-[env(safe-area-inset-top,0px)] backdrop-blur-md">
-        <div className="container-page flex items-center justify-between gap-3 py-3 md:py-4">
-          <div className="flex min-w-0 items-center gap-3 lg:gap-6">
+        <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-3 lg:py-3.5">
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 lg:flex-none lg:gap-5">
             <button
               type="button"
               aria-label="Открыть меню"
               onClick={() => setMobileOpen(true)}
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 md:hidden"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 lg:hidden"
             >
               <Menu className="h-5 w-5" />
             </button>
 
-            <Link href="/" className="shrink-0">
-              <DaibiletLogo />
+            <Link href="/" className="min-w-0 shrink truncate">
+              <DaibiletLogo textClassName="text-lg sm:text-xl lg:text-2xl" />
             </Link>
 
             <CityPicker
@@ -100,21 +100,25 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               onChange={onCityChange}
               allLabel="Все города"
               variant="header"
-              className="hidden shrink-0 lg:block"
+              className="hidden max-w-[9.5rem] shrink-0 lg:block xl:max-w-none"
             />
           </div>
 
-          <nav aria-label="Основная навигация" className="hidden items-center gap-1 md:flex">
+          <nav aria-label="Основная навигация" className="hidden min-w-0 items-center gap-0.5 lg:flex">
             {NAV_LINKS.map((item) => {
               const active = isNavActive(pathname, item.href);
+              const secondary = item.href === '/venues' || item.href === '/locations' || item.href === '/blog';
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   className={
-                    active
-                      ? 'rounded-full bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary-600'
-                      : 'rounded-full px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100'
+                    [
+                      secondary ? 'hidden xl:inline-flex' : 'inline-flex',
+                      active
+                        ? 'rounded-full bg-primary/10 px-2.5 py-1.5 text-sm font-semibold text-primary-600 xl:px-3'
+                        : 'rounded-full px-2.5 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 xl:px-3',
+                    ].join(' ')
                   }
                 >
                   {item.label}
@@ -123,14 +127,20 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
             })}
           </nav>
 
-          <HeaderSearch
-            variant="overlay"
-            cityFilter={searchCityFilter}
-            initialQuery={searchInitialQuery}
-            className="hidden lg:inline-flex"
-          />
+          <div className="flex shrink-0 items-center gap-0.5 sm:gap-1.5">
+            <HeaderSearch
+              variant="overlay"
+              cityFilter={searchCityFilter}
+              initialQuery={searchInitialQuery}
+              className="hidden lg:inline-flex"
+            />
+            <HeaderSearch
+              variant="overlay"
+              cityFilter={searchCityFilter}
+              initialQuery={searchInitialQuery}
+              className="!h-10 !w-10 !justify-center !gap-0 !border-0 !bg-transparent !px-0 text-slate-700 hover:!bg-slate-100 lg:hidden"
+            />
 
-          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             <HeaderAuthControls
               ref={userMenuRef}
               auth={auth}
@@ -144,7 +154,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               href="/help"
               title="Помощь и FAQ"
               aria-label="Помощь и FAQ"
-              className="hidden h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 sm:inline-flex"
+              className="hidden h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 md:inline-flex"
             >
               <HelpCircle className="h-5 w-5" />
             </Link>
@@ -199,14 +209,14 @@ const HeaderAuthControls = forwardRef<
           type="button"
           aria-label="Личный кабинет"
           onClick={onToggleUserMenu}
-          className="hidden h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 md:inline-flex lg:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 lg:hidden"
         >
           <User className="h-5 w-5" />
         </button>
         <button
           type="button"
           onClick={onToggleUserMenu}
-          className="hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 lg:inline-flex"
+          className="hidden items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 lg:inline-flex xl:px-4"
         >
           <User className="h-4 w-4" />
           {auth?.user?.name || 'Кабинет'}
@@ -241,13 +251,13 @@ const HeaderAuthControls = forwardRef<
       <Link
         href="/login?returnUrl=/account/purchases"
         aria-label="Войти"
-        className="hidden h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 md:inline-flex lg:hidden"
+        className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 lg:hidden"
       >
         <User className="h-5 w-5" />
       </Link>
       <Link
         href="/login?returnUrl=/account/purchases"
-        className="hidden items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 lg:inline-flex"
+        className="hidden items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 lg:inline-flex xl:px-4"
       >
         <LogIn className="h-4 w-4" />
         Войти
@@ -280,9 +290,9 @@ function MobileNavSheet({
   onCityChange: (name: string) => void;
 }) {
   return (
-    <div className="fixed inset-0 z-[60] md:hidden">
+    <div className="fixed inset-0 z-[60] lg:hidden">
       <button type="button" aria-label="Закрыть меню" className="absolute inset-0 bg-slate-900/40" onClick={onClose} />
-      <aside className="relative flex h-full w-72 max-w-[85vw] flex-col bg-white shadow-xl">
+      <aside className="relative flex h-full w-[min(20rem,88vw)] flex-col bg-white shadow-xl">
         <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
           <DaibiletLogo textClassName="text-xl" />
           <button type="button" aria-label="Закрыть" onClick={onClose} className="rounded-full p-2 text-slate-500 hover:bg-slate-100">

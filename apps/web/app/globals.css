@@ -33,7 +33,7 @@
     --bridges-hero-glow: oklch(0.72 0.17 55 / 0.1);
   }
 
-  @media (min-width: 768px) {
+  @media (min-width: 1024px) {
     :root {
       --site-header-height: 4.5rem;
     }

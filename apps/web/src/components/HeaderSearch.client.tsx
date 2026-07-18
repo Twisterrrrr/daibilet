@@ -199,7 +199,7 @@ export function HeaderSearch({
           aria-label="Открыть поиск"
         >
           <Search className="h-4 w-4 shrink-0" />
-          <span className="hidden xl:inline">Поиск</span>
+          <span className="hidden min-[1180px]:inline">Поиск</span>
         </button>
 
         {overlayOpen ? (

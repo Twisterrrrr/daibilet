@@ -17,7 +17,7 @@ export function DaibiletLogo({
   return (
     <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <span
-        className={`font-display text-xl font-bold tracking-tight sm:text-2xl ${textClassName}`}
+        className={`font-display font-bold tracking-tight ${textClassName || 'text-xl sm:text-2xl'}`}
       >
         <span style={{ color: DAIBILET_LOGO_DARK }}>Дай</span>
         <span style={{ color: DAIBILET_LOGO_BLUE }}>билет</span>
