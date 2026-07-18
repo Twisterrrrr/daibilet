@@ -11,6 +11,7 @@ export type HomePickState = {
   seenIds: Set<string>;
   seenTitles: Set<string>;
   seenImages: Set<string>;
+  seenFamilies: Set<string>;
 };
 
 function isFeaturedEvent(event: PublicSession): boolean {
@@ -32,11 +33,43 @@ function sessionDedupeKey(event: PublicSession): string {
   return `title:${String(event.title || '').trim().toLowerCase()}`;
 }
 
+/**
+ * Family key for showcase rails: collapse near-duplicate ticket products
+ * (e.g. «Комбо 1/2/5/7» at the same venue) into one card.
+ */
+export function sessionFamilyKey(event: PublicSession): string {
+  const groupKey = String(event.groupKey || '').trim().toLowerCase();
+  if (groupKey.startsWith('merge|')) return `merge:${groupKey}`;
+
+  const venueKey = String(event.venueId || event.venueSlug || event.venue || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+  const title = String(event.title || '').trim().toLowerCase();
+
+  // «Комбо 1», «Комбо 7», «Комбо …» на одной площадке → одна карточка
+  // Не используем \b: в JS граница слова не работает с кириллицей.
+  if (venueKey && (/^комбо(?:\s|$|[-–—\d])/i.test(title) || /(?:^|[\s([{«"'])комбо\s*\d+/i.test(title))) {
+    return `combo-venue:${venueKey}`;
+  }
+
+  // Одинаковая площадка + «комбо #» после нормализации цифр
+  if (venueKey && title && /\d/.test(title)) {
+    const stem = title.replace(/\d+/g, '#').replace(/\s+/g, ' ').trim();
+    if (/^комбо(?:\s*#|\s|$)/.test(stem)) {
+      return `combo-venue:${venueKey}`;
+    }
+  }
+
+  return sessionDedupeKey(event);
+}
+
 export function createHomePickState(seed?: Partial<HomePickState>): HomePickState {
   return {
     seenIds: new Set(seed?.seenIds),
     seenTitles: new Set(seed?.seenTitles),
     seenImages: new Set(seed?.seenImages),
+    seenFamilies: new Set(seed?.seenFamilies),
   };
 }
 
@@ -44,12 +77,15 @@ function takeUnique(events: PublicSession[], max: number, state: HomePickState):
   const result: PublicSession[] = [];
   for (const event of events) {
     if (!sessionHasCoverImage(event)) continue;
-    if (state.seenIds.has(event.id) || state.seenTitles.has(sessionDedupeKey(event))) continue;
+    const dedupeKey = sessionDedupeKey(event);
+    const familyKey = sessionFamilyKey(event);
+    if (state.seenIds.has(event.id) || state.seenTitles.has(dedupeKey) || state.seenFamilies.has(familyKey)) continue;
     const imageKey = normalizeSessionImageKey(event.imageUrl);
     if (imageKey && state.seenImages.has(imageKey)) continue;
 
     state.seenIds.add(event.id);
-    state.seenTitles.add(sessionDedupeKey(event));
+    state.seenTitles.add(dedupeKey);
+    state.seenFamilies.add(familyKey);
     if (imageKey) state.seenImages.add(imageKey);
     result.push(event);
     if (result.length >= max) break;

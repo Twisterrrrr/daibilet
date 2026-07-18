@@ -8,7 +8,7 @@ import {
   resolveSessionTimeZoneForSession,
 } from '@/lib/datetime';
 import { spreadCatalogSessionsByCoverImage, normalizeSessionImageKey, sessionHasCoverImage } from '@/lib/session-cover-image';
-import { createHomePickState, type HomePickState } from '@/lib/home-showcase-sections';
+import { createHomePickState, sessionFamilyKey, type HomePickState } from '@/lib/home-showcase-sections';
 import type { PublicSession } from '@/types';
 
 export type HomeNowTabKey = 'today' | 'tomorrow' | 'weekend' | 'nearest';
@@ -79,12 +79,15 @@ function takeUnique(events: PublicSession[], max: number, state: HomePickState):
 
   for (const event of events) {
     if (!sessionHasCoverImage(event)) continue;
-    if (state.seenIds.has(event.id) || state.seenTitles.has(sessionDedupeKey(event))) continue;
+    const dedupeKey = sessionDedupeKey(event);
+    const familyKey = sessionFamilyKey(event);
+    if (state.seenIds.has(event.id) || state.seenTitles.has(dedupeKey) || state.seenFamilies.has(familyKey)) continue;
     const imageKey = normalizeSessionImageKey(event.imageUrl);
     if (imageKey && state.seenImages.has(imageKey)) continue;
 
     state.seenIds.add(event.id);
-    state.seenTitles.add(sessionDedupeKey(event));
+    state.seenTitles.add(dedupeKey);
+    state.seenFamilies.add(familyKey);
     if (imageKey) state.seenImages.add(imageKey);
     result.push(event);
     if (result.length >= max) break;

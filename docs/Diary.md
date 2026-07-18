@@ -4,6 +4,27 @@
 
 ---
 
+## 2026-07-19 — «Выбор редакции»: дедуп combo-family (не убирать секцию)
+
+### Наблюдения
+
+- Пользователь уточнил: секцию «Выбор редакции» **оставить**, но не показывать пачку near-duplicate «Комбо 1/2/5/7» Музей Гарри Поттера.
+- У комбо разные `groupKey` (`ticketscloud|комбо N|…`), поэтому старый dedup по groupKey/title не схлопывал siblings.
+- Предыдущая правка ошибочно вырезала весь блок — откатили.
+
+### Решения
+
+- Секция `#editors-pick` возвращена в `HomePageContent` / legacy `App.tsx`.
+- Добавлен `sessionFamilyKey`: на одной площадке все title вида «Комбо…» → один слот; `merge|` groupKey тоже family.
+- `seenFamilies` в shared `HomePickState` для editors-pick / home-now / popular.
+- Файлы: `home-showcase-sections.ts`, `home-now-section.ts` (web + public).
+
+### Проблемы
+
+- Долгосрочно лучше проставить `mergeGroupKey=harry-potter-spb` в override (скрипт уже есть) — тогда каталог сам схлопнет siblings.
+
+---
+
 ## 2026-07-19 — ИИ-журналисты: канон Макс/Анна/Елена/Игорь/Артур
 
 ### Наблюдения

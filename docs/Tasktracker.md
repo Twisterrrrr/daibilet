@@ -66,6 +66,10 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 ### 0.5 Ops / auth fixes (post-cutover)
 
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| 0.5.home-editors | «Выбор редакции»: дедуп combo-family (макс. 1 «Комбо» на venue), секцию оставить | Высокий | ✅ 2026-07-19 |
+
 ### 0.7 Admin grouped readiness (NO_FUTURE_SESSIONS)
 
 | # | Задача | Приоритет | Статус |
