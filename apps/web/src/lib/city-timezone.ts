@@ -12,7 +12,7 @@ const CITY_TIME_ZONE_OVERRIDES: Record<string, string> = {
   Екатеринбург: 'Asia/Yekaterinburg',
   Ижевск: 'Europe/Samara',
   Иркутск: 'Asia/Irkutsk',
-  Йошкар-Ола: 'Europe/Moscow',
+  'Йошкар-Ола': 'Europe/Moscow',
   Калининград: 'Europe/Kaliningrad',
   Кемерово: 'Asia/Novokuznetsk',
   'Киров (Кировская область)': 'Europe/Kirov',
