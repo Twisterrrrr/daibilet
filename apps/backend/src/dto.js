@@ -4616,7 +4616,8 @@ export async function buildPublicCityPage(db, citySlugOrId) {
 
   const destination = publicDestinationFromSession(matchedSessions[0]);
   const sessions = matchedSessions.slice(0, 160);
-  const cityVenues = publicVenuesForSessionsFromHub(sessions, venueHubRows, 24);
+  const cityVenues = await resolvePublicVenuesForSessions(db, matchedSessions, venueHubRows, 24);
+  const venueCount = countDistinctSessionVenues(matchedSessions);
   const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
   const landings = buildPublicLandings(sessions).filter((landing) => landing.events > 0);
@@ -4632,8 +4633,8 @@ export async function buildPublicCityPage(db, citySlugOrId) {
       title: destination.name,
       type: destination.type === 'region' ? 'region' : 'city',
       isDestination: true,
-      events: sessions.length,
-      venues: cityVenues.length,
+      events: matchedSessions.length,
+      venues: venueCount,
       categories,
       seoTitle: `${destination.name}: афиша, экскурсии и билеты | Дайбилет`,
       seoDescription: `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`,
@@ -4642,8 +4643,8 @@ export async function buildPublicCityPage(db, citySlugOrId) {
     venues: cityVenues,
     landings,
     stats: {
-      events: sessions.length,
-      venues: cityVenues.length,
+      events: matchedSessions.length,
+      venues: venueCount,
       categories: Object.keys(categories).length,
       priceFrom: prices.length ? Math.min(...prices) : null,
     },
@@ -5059,11 +5060,11 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     tags,
     city: event.city || 'Не указан',
     cityId: event.cityId,
-    citySlug: eventDestination.slug,
+    citySlug: eventDestination?.slug || publicCitySlug(event.city || 'Не указан'),
     sourceCitySlug: event.citySourceSlug,
-    destination: eventDestination.name,
-    destinationType: eventDestination.type,
-    timeZone: resolveCityTimeZone(event.city, eventDestination.name),
+    destination: eventDestination?.name || cleanDisplayName(event.city) || 'Не указан',
+    destinationType: eventDestination?.type || 'city',
+    timeZone: resolveCityTimeZone(event.city, eventDestination?.name || event.city),
     venueId: event.venueId,
     venueSlug: event.venueSlug,
     venue: event.venue || 'Не указано',
@@ -5695,6 +5696,7 @@ async function eventRows(db, limit, options = {}) {
   return result.rows.map((row) => {
     const tags = row.tags || [];
     const destination = publicDestinationForCity(row);
+    const fallbackDestinationName = cleanDisplayName(row.city) || 'Не указан';
     const priceFrom = displayPriceFrom(row.priceFromRub, row.sessionPriceFromRub, row.offerPriceRub);
     const purchase = purchaseInfo(row);
     const normalizedRow = { ...row, startsAt: row.nextStartsAt || row.startsAt, priceFrom, purchaseReady: purchase.ready, hasImage: Boolean(row.overrideImageUrl || row.imageUrl) };
@@ -5722,10 +5724,10 @@ async function eventRows(db, limit, options = {}) {
       proposedCategory: row.category || 'не определено',
       city: row.city || 'Не указан',
       cityId: row.cityId,
-      citySlug: destination.slug,
+      citySlug: destination?.slug || publicCitySlug(fallbackDestinationName),
       sourceCitySlug: row.citySlug,
-      destination: destination.name,
-      destinationType: destination.type,
+      destination: destination?.name || fallbackDestinationName,
+      destinationType: destination?.type || 'city',
       venue: formatPublicVenueTitle(row.venue) || 'Не указано',
       venueId: row.venueId,
       venueSlug: row.venueSlug,
@@ -7510,7 +7512,8 @@ async function destinationSummaryRowsFast(db) {
   const buckets = new Map();
   for (const row of result.rows) {
     const destination = publicDestinationForCity(row);
-    if (!destination.name || destination.name === 'Не указан') continue;
+    // Foreign / unroutable cities return null — skip without crashing /api/public/stats.
+    if (!destination?.name || destination.name === 'Не указан') continue;
     if (!buckets.has(destination.name)) {
       buckets.set(destination.name, {
         id: destination.id,
@@ -7783,13 +7786,156 @@ export function lookupDestinationCatalogSessions(citySlugOrId, requestedSlug, ca
   return catalogSessions.filter((session) => matchesPublicDestinationPage(session, citySlugOrId, requestedSlug));
 }
 
+export function countDistinctSessionVenues(sessions) {
+  const keys = new Set();
+  for (const session of sessions || []) {
+    if (session?.venueId) {
+      keys.add(`id:${session.venueId}`);
+      continue;
+    }
+    const slug = normalizePublicVenueSlugKey(session?.venueSlug || '');
+    if (slug) {
+      keys.add(`slug:${slug}`);
+      continue;
+    }
+    const name = cleanDisplayName(session?.venue);
+    if (name && name !== 'Не указано') {
+      keys.add(`name:${cleanDisplayName(session?.city) || ''}|${name.toLowerCase()}`);
+    }
+  }
+  return keys.size;
+}
+
+function sessionVenueIds(sessions) {
+  return [...new Set((sessions || []).map((session) => session.venueId).filter(Boolean))];
+}
+
+function sessionVenueSlugKeys(sessions) {
+  return new Set(
+    (sessions || [])
+      .map((session) => normalizePublicVenueSlugKey(session?.venueSlug || session?.venue || ''))
+      .filter(Boolean),
+  );
+}
+
+function hubRowMatchesSessionVenues(row, venueIds, venueSlugKeys) {
+  const ids = row?.mergedVenueIds || (row?.id ? [row.id] : []);
+  if (ids.some((id) => venueIds.has(id))) return true;
+  if (!venueSlugKeys.size) return false;
+  const slug = normalizePublicVenueSlugKey(publicVenueSlug(row.slug, row.name || row.title, row.id));
+  return Boolean(slug && venueSlugKeys.has(slug));
+}
+
 export function publicVenuesForSessionsFromHub(sessions, hubRows, limit) {
-  const venueIds = new Set(sessions.map((session) => session.venueId).filter(Boolean));
-  if (!venueIds.size) return [];
-  return hubRows
-    .filter((row) => (row.mergedVenueIds || [row.id]).some((id) => venueIds.has(id)))
-    .slice(0, limit)
-    .map(mapPublicVenueListItem);
+  const venueIds = new Set(sessionVenueIds(sessions));
+  const venueSlugKeys = sessionVenueSlugKeys(sessions);
+  if (!venueIds.size && !venueSlugKeys.size) return [];
+
+  const matched = [];
+  const usedIds = new Set();
+  for (const row of hubRows || []) {
+    if (!hubRowMatchesSessionVenues(row, venueIds, venueSlugKeys)) continue;
+    const ids = row.mergedVenueIds || [row.id];
+    if (ids.some((id) => usedIds.has(id))) continue;
+    ids.forEach((id) => usedIds.add(id));
+    matched.push(row);
+    if (matched.length >= limit) break;
+  }
+  return matched.map(mapPublicVenueListItem);
+}
+
+/**
+ * City hubs must show venues from city events even when the venue is outside the
+ * global top-N hub window (publicVenueHubRows limit). Murmansk "Мега Кружка" was
+ * rank ~511 with hub limit 500 → events>0 but venues=0.
+ */
+export async function resolvePublicVenuesForSessions(db, sessions, hubRows, limit = 24) {
+  const fromHub = publicVenuesForSessionsFromHub(sessions, hubRows, limit);
+  if (fromHub.length >= limit) return fromHub;
+
+  const venueIds = new Set(sessionVenueIds(sessions));
+  if (!venueIds.size) return fromHub;
+
+  const coveredIds = new Set();
+  for (const row of hubRows || []) {
+    if (!hubRowMatchesSessionVenues(row, venueIds, new Set())) continue;
+    for (const id of row.mergedVenueIds || [row.id]) coveredIds.add(id);
+  }
+  for (const item of fromHub) {
+    if (item?.id) coveredIds.add(item.id);
+  }
+
+  const missingIds = [...venueIds].filter((id) => !coveredIds.has(id));
+  if (!missingIds.length) return fromHub;
+
+  const { activeCounts, waterCounts, busCounts, heroImageFallbacks, nextSessionStartsAt } =
+    buildActiveVenueEventCounts(sessions);
+  const missingRows = (await venueRowsByIds(db, missingIds))
+    .map((row) => ({
+      ...row,
+      events: activeCounts.get(row.id) || Number(row.events) || 0,
+      waterEvents: waterCounts.get(row.id) || Number(row.waterEvents) || 0,
+      busEvents: busCounts.get(row.id) || 0,
+      heroImageUrl: resolveVenueHeroImageUrl(row, heroImageFallbacks),
+      nextSessionStartsAt: nextSessionStartsAt.get(row.id) || null,
+      mergedVenueIds: [row.id],
+    }))
+    .filter((row) => isPublicVenueHub(row));
+
+  const remaining = Math.max(0, limit - fromHub.length);
+  return [...fromHub, ...missingRows.slice(0, remaining).map(mapPublicVenueListItem)];
+}
+
+async function venueRowsByIds(db, ids) {
+  const venueIds = [...new Set((ids || []).map((id) => String(id || '').trim()).filter(Boolean))];
+  if (!venueIds.length) return [];
+
+  const result = await db.query(
+    `
+      select
+        venue.id,
+        venue.slug,
+        venue.title as name,
+        venue."shortDescription",
+        venue.description,
+        venue."heroImageUrl",
+        city.title as city,
+        venue.address,
+        venue.kind,
+        venue."pageStatus",
+        count(event.id)::int as events,
+        count(event.id) filter (where ${PUBLIC_WATER_EVENT_SQL})::int as "waterEvents"
+      from "Venue" venue
+      left join "City" city on city.id = venue."cityId"
+      left join "Event" event on event."venueId" = venue.id
+      left join "Category" cat on cat.id = event."categoryId"
+      left join "Subcategory" sub on sub.id = event."primarySubcategoryId"
+      where venue.id = any($1::text[])
+      group by venue.id, city.title
+    `,
+    [venueIds],
+  );
+
+  return result.rows.map((row) => {
+    const name = formatPublicVenueTitle(row.name);
+    const mapped = {
+      id: row.id,
+      slug: row.slug,
+      name,
+      city: row.city || 'Не указан',
+      address: row.address,
+      shortDescription: row.shortDescription,
+      heroImageUrl: row.heroImageUrl,
+      proposedKind: String(row.kind || 'OTHER').toLowerCase(),
+      kind: String(row.kind || 'OTHER').toUpperCase(),
+      pageStatus: String(row.pageStatus || 'NONE').toLowerCase(),
+      reason: row.pageStatus === 'CANDIDATE' ? 'кандидат на public-страницу' : 'пока только локация',
+      events: row.events,
+      waterEvents: row.waterEvents,
+    };
+    mapped.city = resolvePublicVenueCity(mapped);
+    return applyPublicVenueNormalization(mapped);
+  });
 }
 
 function matchesPublicDestinationPage(session, citySlugOrId, requestedSlug) {
@@ -8711,6 +8857,7 @@ async function publicEventRowsLean(db, limit) {
     .map((row) => {
       const tags = row.tags || [];
       const destination = publicDestinationForCity(row);
+      const fallbackDestinationName = cleanDisplayName(row.city) || 'Не указан';
       const priceFrom = displayPriceFrom(row.priceFromRub, row.sessionPriceFromRub, row.offerPriceRub);
       const purchase = purchaseInfo(row);
 
@@ -8725,10 +8872,10 @@ async function publicEventRowsLean(db, limit) {
         sourceCategory: row.category || 'unknown',
         city: row.city || 'Не указан',
         cityId: row.cityId,
-        citySlug: destination.slug,
+        citySlug: destination?.slug || publicCitySlug(fallbackDestinationName),
         sourceCitySlug: row.citySlug,
-        destination: destination.name,
-        destinationType: destination.type,
+        destination: destination?.name || fallbackDestinationName,
+        destinationType: destination?.type || 'city',
         venue: formatPublicVenueTitle(row.venue) || 'Не указано',
         venueId: row.venueId,
         venueSlug: row.venueSlug,

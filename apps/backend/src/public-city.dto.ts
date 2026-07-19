@@ -8,7 +8,8 @@ import {
   lookupDestinationCatalogSessions,
   publicDestinationFromSession,
   publicVenueHubRows,
-  publicVenuesForSessionsFromHub,
+  resolvePublicVenuesForSessions,
+  countDistinctSessionVenues,
 } from './dto.js';
 import { createDb } from './db.js';
 import { getPublicCatalogSessions } from './public-catalog.dto.js';
@@ -91,9 +92,10 @@ export async function buildPublicCityDto(
   if (forceRefresh) pageCache.delete(cacheKey);
 
   const requestedSlug = String(citySlugOrId || '').toLowerCase();
+  const legacyDb = getLegacyDb();
   const [catalogSessions, venueHubRows] = await Promise.all([
     getPublicCatalogSessions(forceRefresh, { hydrateSlots: false }),
-    publicVenueHubRows(getLegacyDb(), 500),
+    publicVenueHubRows(legacyDb, 500),
   ]);
   const matchedSessions = lookupDestinationCatalogSessions(
     citySlugOrId,
@@ -107,7 +109,8 @@ export async function buildPublicCityDto(
 
   const destination = publicDestinationFromSession(matchedSessions[0]);
   const sessions = matchedSessions.slice(0, CITY_SSR_SESSION_LIMIT).map((session) => toPublicCatalogListItem(session));
-  const venues = publicVenuesForSessionsFromHub(matchedSessions.slice(0, CITY_SSR_SESSION_LIMIT), venueHubRows, 24);
+  const venues = await resolvePublicVenuesForSessions(legacyDb, matchedSessions, venueHubRows, 24);
+  const venueCount = countDistinctSessionVenues(matchedSessions);
   const prices = matchedSessions
     .map((session: PublicSessionDto) => session.priceFrom)
     .filter((price: number | null | undefined): price is number =>
@@ -131,7 +134,7 @@ export async function buildPublicCityDto(
       type: destination.type as DestinationType,
       isDestination: true,
       events: matchedSessions.length,
-      venues: venues.length,
+      venues: venueCount,
       categories,
       seoH1: cityRecord?.seoH1 || destination.name,
       seoTitle: cityRecord?.seoTitle || `${destination.name}: афиша, экскурсии и билеты | Дайбилет`,
@@ -144,7 +147,7 @@ export async function buildPublicCityDto(
     landings,
     stats: {
       events: matchedSessions.length,
-      venues: venues.length,
+      venues: venueCount,
       categories: Object.keys(categories).length,
       priceFrom: prices.length ? Math.min(...prices) : null,
     },

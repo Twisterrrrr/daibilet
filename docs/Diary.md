@@ -1,3 +1,26 @@
+## 2026-07-19 — City hub: events>0 / venues=0 (Мурманск)
+
+### Наблюдения
+
+- `/cities/murmansk`: events=2, venues=0 при живой площадке «Мега Кружка» (`venue_5ea93efb186c38b2a9d379bd`, pageStatus=CANDIDATE).
+- События корректно связаны через `Event.venueId`; `/venues/mega-kruzhka` отдаёт events=2.
+- `publicVenueHubRows(limit=500)` берёт top-N по SQL count; «Мега Кружка» на ранге **511** → не попадала в hub.
+- `publicVenuesForSessionsFromHub` искал только в hubRows по `venueId` → пустой список и stats.venues=0.
+- Landings уже считали venues=1 (другой путь) — UI выглядел противоречиво.
+
+### Решения
+
+- `resolvePublicVenuesForSessions`: после hub-match догружает missing `venueId` через `venueRowsByIds`.
+- Match hub также по нормализованному `venueSlug`.
+- `countDistinctSessionVenues` для `city.venues` / `stats.venues` по всем сессиям города (не cap display-list).
+- UI: CTA «Все события» — `gap-2` + `shrink-0` у иконки Ticket.
+
+### Проблемы
+
+- Глобальный hub catalogue по-прежнему top-500; city hubs больше от него не зависят для счётчика площадок событий.
+
+---
+
 ## 2026-07-19 — City copy: предложный падеж («в Мурманске»)
 
 ### Наблюдения
@@ -17,6 +40,7 @@
 
 ---
 
+## 2026-07-19 — City hubs: Саранск brief + Иваново/Мурманск sights
 
 ### Наблюдения
 
@@ -28,6 +52,13 @@
 - Саранск: заполнен `brief` (текст владельца).
 - Иваново / Мурманск: топ-6 `sights[{title,text}]`; опечатка «конструструктивизма» → «конструктивизма».
 - Обновлён `docs/city-hub-content-gaps.md` (brief 65/65, sights ❌ = 0).
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-19 — City hubs: travel + FAQ wave 3 (43 города)
 
 ### Наблюдения

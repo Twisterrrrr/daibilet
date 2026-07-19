@@ -284,6 +284,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 1.3.3 | SSR JSON-LD: `FAQPage` | Высокий | ✅ 2026-07-19 |
 | 1.3.4 | SSR JSON-LD: `BreadcrumbList` | Средний | ✅ 2026-07-19 |
 | 1.3.5 | Hero, categories, venues, events grid | — | ✅ |
+| 1.3.5a | City hub: venues=0 при events>0 (hub top-500 miss) | Критический | ✅ 2026-07-19 |
 | 1.3.6 | `generateMetadata` | — | ✅ |
 | 1.3.7 | Развивать city hubs `/cities/{slug}` (контент, перелинковка, landings) | Высокий | ⏳ |
 | 1.3.8 | City-prefix в path venues/events (`/{city}/venues/...`) | — | 🚫 отклонено 2026-07-19 (flat URL) |

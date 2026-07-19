@@ -246,9 +246,9 @@ function CityHero({
               {guide?.brief || `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат, дату и площадку без долгого поиска по разным билетным системам.`}
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <a href="#city-schedule" className="inline-flex min-h-11 items-center justify-center rounded-lg bg-white px-5 text-sm font-semibold text-primary-700 hover:bg-primary-50">
-                <Ticket className="mr-2 h-4 w-4" />
-                Все события {cityIn}
+              <a href="#city-schedule" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-primary-700 hover:bg-primary-50">
+                <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>Все события {cityIn}</span>
               </a>
               <a href="#city-directions" className="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/25 px-5 text-sm font-semibold text-white hover:bg-white/10">
                 Смотреть направления
