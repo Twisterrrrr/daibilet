@@ -15,6 +15,7 @@
 ### Проблемы
 
 - Deploy Next (web-only); API менять не требуется — payload корректен, баг на merge в UI.
+- **Proof prod @9658b9f:** HTML `/events/tc-6969ae12140cc49e8ef266e3-neveroyatnyi-koncert-gruppy-kino` — в секции «Теги» ровно 2 `span.rounded-full` (Рок, Шоу - программа), без повторов.
 
 ---
 
