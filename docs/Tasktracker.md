@@ -64,7 +64,7 @@
 | R.8 | Tests verification + displayed rating | Высокий | ✅ |
 | R.9 | Commit + deploy API/admin/Next | Критический | 🔄 commit `1c2b156` pushed; deploy SSH с этой машины — Permission denied (нужен ключ на prod) |
 | R.10 | Disputes / supplier LK | — | 🚫 out of scope |
-| R.11 | ЛК: past slug 404 → sibling URL + review by eventId; время сеанса подписано; дата покупки без truncate | Критический | 🔄 |
+| R.11 | ЛК: past slug 404 → sibling URL + review by eventId; время сеанса подписано; дата покупки без truncate | Критический | ✅ 085617c deploy |
 
 ---
 

@@ -151,18 +151,19 @@ export async function enrichBuyerOrdersWithEventLinks(db, orders) {
 
     const tickets = (order.tickets || []).map((ticket) => {
       const link = ticket.eventId ? links.get(ticket.eventId) : null;
-      if (!link?.eventUrl) return ticket;
+      if (!link) return ticket;
+      // Avoid linking to past dated public pages that soft-404 with no sibling.
+      const nextUrl = link.hasFutureSession ? link.eventUrl : null;
       return {
         ...ticket,
-        // Keep purchased eventId for review verification; only refresh public URL.
-        eventUrl: link.eventUrl,
+        eventUrl: nextUrl,
       };
     });
 
     return {
       ...order,
       eventId: order.eventId || primaryTicket?.eventId || null,
-      eventUrl: primaryLink?.eventUrl || order.eventUrl || null,
+      eventUrl: primaryLink?.hasFutureSession ? primaryLink.eventUrl : null,
       tickets,
     };
   });

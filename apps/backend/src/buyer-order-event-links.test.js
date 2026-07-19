@@ -46,28 +46,36 @@ test('enrichBuyerOrdersWithEventLinks swaps past slug to meta-sibling with futur
   assert.equal(order.tickets[0].eventId, 'evt_past');
 });
 
-test('enrichBuyerOrdersWithEventLinks keeps own slug when no siblings', async () => {
+test('enrichBuyerOrdersWithEventLinks clears URL when no future sibling session', async () => {
   const db = {
     async query(sql) {
       if (String(sql).includes('with seed as')) {
-        return { rows: [] };
+        return {
+          rows: [
+            {
+              seed_id: 'evt_past',
+              eventId: 'evt_past',
+              slug: 'tc-abc-past-slot',
+              startsAt: null,
+            },
+          ],
+        };
       }
-      return {
-        rows: [{ id: 'evt_only', slug: 'tc-only-event' }],
-      };
+      return { rows: [] };
     },
   };
 
   const [order] = await enrichBuyerOrdersWithEventLinks(db, [
     {
-      id: 'ord2',
-      eventId: 'evt_only',
-      eventUrl: '/events/tc-only-event',
+      id: 'ord3',
+      eventId: 'evt_past',
+      eventUrl: '/events/tc-abc-past-slot',
       ticketCount: 1,
-      tickets: [{ id: 't2', eventId: 'evt_only', eventUrl: '/events/tc-only-event' }],
+      tickets: [{ id: 't3', eventId: 'evt_past', eventUrl: '/events/tc-abc-past-slot' }],
     },
   ]);
 
-  assert.equal(order.eventUrl, '/events/tc-only-event');
-  assert.equal(order.eventId, 'evt_only');
+  assert.equal(order.eventUrl, null);
+  assert.equal(order.tickets[0].eventUrl, null);
+  assert.equal(order.eventId, 'evt_past');
 });
