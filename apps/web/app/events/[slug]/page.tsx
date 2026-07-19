@@ -9,6 +9,7 @@ import '@/lib/env';
 import { toEventPageClientPayload } from '@/lib/event-page-client-props';
 import { eventHref } from '@/lib/routes';
 import { pageTitle, routeOpenGraph } from '@/lib/seo-meta';
+import { buildEventPageJsonLd } from '@/lib/structured-data';
 import { buildPublicEventDto } from '@daibilet/backend/public-read';
 
 export const revalidate = 300;
@@ -45,9 +46,17 @@ export default async function EventDetailPage({ params }: PageProps) {
 
   const { event, related } = payload;
   const clientPayload = toEventPageClientPayload(payload);
+  const jsonLdBlocks = buildEventPageJsonLd(payload);
 
   return (
     <SiteLayout>
+      {jsonLdBlocks.map((block, index) => (
+        <script
+          key={`event-jsonld-${index}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }}
+        />
+      ))}
       <EventHero payload={clientPayload} />
 
       <div className="container-page py-8">

@@ -110,7 +110,7 @@ npm run check:widgets -- --base https://daibilet.ru
 |--------|--------|-----|
 | **HeaderSearch** в шапке Next | ✅ | `HeaderSearch.client.tsx` + `/api/public/search` |
 | **Event breadcrumbs** | ⏳ | `/events` ✅; `/events/[slug]` ⏳ |
-| **Event JSON-LD** (`Event`, `Offer`, `BreadcrumbList`) SSR | ⏳ | legacy `EventPageView.tsx` |
+| **Event JSON-LD** (`Event`, `Offer`, `BreadcrumbList`) SSR | ✅ | `structured-data.ts` + event RSC |
 | **City FAQ + SEO text** SSR | ⏳ | `CityPageView` без FAQ-блока |
 | **City JSON-LD** (`FAQPage`, `BreadcrumbList`) SSR | ⏳ | только client `document.title` |
 | `/about` | ⏳ | route отсутствует в `apps/web` |
@@ -126,7 +126,7 @@ npm run check:widgets -- --base https://daibilet.ru
 | `app/robots.ts` | ⏳ | |
 | `app/sitemap.ts` index | ⏳ | |
 | sitemap events / cities / venues | ⏳ | chunked, только indexable |
-| SSR JSON-LD event page | ⏳ | `<script type="application/ld+json">` в RSC |
+| SSR JSON-LD event page | ✅ | `<script type="application/ld+json">` в RSC |
 | SSR JSON-LD city page | ⏳ | FAQ + breadcrumbs |
 | canonical / www policy audit | ⏳ | nginx + metadata cross-check |
 

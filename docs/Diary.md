@@ -1,3 +1,23 @@
+## 2026-07-19 — SSR JSON-LD Event + BreadcrumbList
+
+### Наблюдения
+
+- На `/events/[slug]` был `generateMetadata`, но в HTML source не было `application/ld+json` для Event/Breadcrumbs (в отличие от blog/`layout` WebSite+Organization).
+- UI-крошки в hero шли как События → Город → Venue → Category — не совпадали с Tasktracker 1.2.1.
+
+### Решения
+
+- Добавлен shared helper `apps/web/src/lib/structured-data.ts`: `buildEventBreadcrumbs`, `buildBreadcrumbListJsonLd`, `buildEventJsonLd`, `buildEventPageJsonLd`.
+- Event page RSC рендерит два SSR `<script type="application/ld+json">`: `@type: Event` (+ `Offer` при цене) и `BreadcrumbList` (Главная → События → Город? → Title).
+- Hero breadcrumbs синхронизированы с тем же helper (один source of truth; клиентский LD не дублируется).
+
+### Проблемы
+
+- Sitemap (пункт 4 / 2.1.x) не трогали в этом шаге.
+- City FAQ/BreadcrumbList SSR (1.3.x / 2.2.3) — следующий этап.
+
+---
+
 ## 2026-07-19 — Регрессионные тесты: Teplohod image + TC fake open-date
 
 ### Наблюдения

@@ -23,7 +23,8 @@ import {
   isFlexibleScheduleSession,
   scrollToBuyCard,
 } from '@/lib/event-page-utils';
-import { cityHref, venueHref } from '@/lib/routes';
+import { venueHref } from '@/lib/routes';
+import { buildEventBreadcrumbs } from '@/lib/structured-data';
 import { getTeplohodWidgetIds, openTeplohodWidget, TeplohodWidgetEmbed } from '@/components/TeplohodWidget.client';
 import { normalizeTcPurchaseUrl, TcOptionBuyButton, TcSessionSlot, TcWidgetButton } from '@/components/TcWidget.client';
 
@@ -333,10 +334,10 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
   const [hasImageError, setHasImageError] = useState(false);
   const heroImage = String(event.imageUrl || '').trim();
   const nextSession = pickRepresentativeSession((payload.sessions ?? []) as EventSession[]);
-  const cityLink = event.citySlug || event.city ? cityHref({ name: event.city, slug: event.citySlug, sourceSlug: event.sourceCitySlug }) : null;
   const venueLink = event.venue
     ? venueHref({ id: event.venueId || event.venueSlug || event.venue, slug: event.venueSlug, name: event.venue, type: event.venueKind })
     : null;
+  const breadcrumbs = buildEventBreadcrumbs(event);
 
   return (
     <div className="relative">
@@ -359,28 +360,22 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
       </div>
 
       <div className="container-page absolute inset-x-0 bottom-0 pb-6 sm:pb-8">
-        <nav className="mb-3 flex flex-wrap items-center gap-1.5 text-sm text-white/70">
-          <Link href="/events" className="transition hover:text-white">
-            События
-          </Link>
-          <ChevronRight className="h-3.5 w-3.5" />
-          {cityLink ? (
-            <>
-              <Link href={cityLink} className="transition hover:text-white">
-                {event.city}
-              </Link>
-              <ChevronRight className="h-3.5 w-3.5" />
-            </>
-          ) : null}
-          {venueLink && event.venue ? (
-            <>
-              <Link href={venueLink} className="transition hover:text-white">
-                {event.venue}
-              </Link>
-              <ChevronRight className="h-3.5 w-3.5" />
-            </>
-          ) : null}
-          <span className="text-white/90">{event.category}</span>
+        <nav aria-label="Хлебные крошки" className="mb-3 flex flex-wrap items-center gap-1.5 text-sm text-white/70">
+          {breadcrumbs.map((crumb, index) => {
+            const isLast = index === breadcrumbs.length - 1;
+            return (
+              <span key={`${crumb.path}:${index}`} className="inline-flex items-center gap-1.5">
+                {index > 0 ? <ChevronRight className="h-3.5 w-3.5" /> : null}
+                {isLast ? (
+                  <span className="line-clamp-1 text-white/90">{crumb.name}</span>
+                ) : (
+                  <Link href={crumb.path} className="transition hover:text-white">
+                    {crumb.name}
+                  </Link>
+                )}
+              </span>
+            );
+          })}
         </nav>
 
         <div className="flex items-end justify-between gap-4">

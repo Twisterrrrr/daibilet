@@ -170,9 +170,9 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| 1.2.1 | Breadcrumbs: Главная → События → Город? → Title | Высокий | ⏳ |
-| 1.2.2 | SSR JSON-LD: `Event` + `Offer` | Высокий | ⏳ |
-| 1.2.3 | SSR JSON-LD: `BreadcrumbList` | Высокий | ⏳ |
+| 1.2.1 | Breadcrumbs: Главная → События → Город? → Title | Высокий | ✅ |
+| 1.2.2 | SSR JSON-LD: `Event` + `Offer` | Высокий | ✅ |
+| 1.2.3 | SSR JSON-LD: `BreadcrumbList` | Высокий | ✅ |
 | 1.2.4 | `generateMetadata` | — | ✅ |
 | 1.2.5 | Sticky buy card + TC/TEP widgets | — | ✅ |
 | 1.2.6 | Мультисобытие «Варианты билетов» | Средний | 🔄 |
@@ -218,8 +218,8 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| 2.2.1 | Shared helper `lib/structured-data.ts` | Высокий | ⏳ |
-| 2.2.2 | Event page LD+JSON в RSC (View Source) | Высокий | ⏳ |
+| 2.2.1 | Shared helper `lib/structured-data.ts` | Высокий | ✅ |
+| 2.2.2 | Event page LD+JSON в RSC (View Source) | Высокий | ✅ |
 | 2.2.3 | City page LD+JSON в RSC | Высокий | ⏳ |
 | 2.2.4 | Venue page LD+JSON | Средний | ⏳ |
 | 2.2.5 | Google Rich Results / validator smoke | Низкий | ⏳ |
