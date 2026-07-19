@@ -52,12 +52,13 @@
 - Default `seoTitle`: `События ${entityLabel} на сегодня | Дайбилет` (DTO + legacy `dto.js`).
 - `generateMetadata` / client `applyCityMeta` / social-preview fallbacks согласованы.
 - Description без изменений (locative остаётся, без второго «на сегодня»).
-- Deploy prod `@54dc7bc` (включает `d49f463` + Suspense/SiteLayout build-fixes).
-- Proof: `/cities/murmansk` title = «События в Мурманске на сегодня | Дайбилет».
+- Deploy prod `@48e6147` (включает `d49f463` + Suspense/SiteLayout build-fixes).
+- Proof (view-source): `/cities/murmansk` → `<title>События в Мурманске на сегодня | Дайбилет</title>` (locative + «на сегодня»).
 
 ### Проблемы
 
 - Первый deploy упёрся в `/locations` useSearchParams и в SiteLayout fallback с children вне provider — починено отдельными коммитами.
+- SSH к prod нестабилен (banner timeout); деплой через nohup + poll лога.
 
 ---
 

@@ -27,7 +27,7 @@
 | P.2a | Brief-описания 14 адмцентров в `CITY_INFO` (hero/SEO) | Высокий | ✅ 2026-07-19 |
 | P.2b | Brief ещё 9 адмцентров (Чита…Хабаровск) в `CITY_INFO` | Высокий | ✅ 2026-07-19 |
 | P.2c | Предложный падеж хабов: «в Мурманске», не «в городе Мурманск» | Высокий | ✅ 2026-07-19 |
-| P.2d | SEO title city hubs: «События в … на сегодня» | Высокий | ✅ `d49f463` prod `@54dc7bc` |
+| P.2d | SEO title city hubs: «События в … на сегодня» | Высокий | ✅ `d49f463` prod `@48e6147` |
 | P.2e | **Wireframe city hub v1** — IA/UX фазы 1 (sticky tabs, афиша выше, FAQ accordion) | Высокий | ✅ [city-hub-wireframe-v1.md](./city-hub-wireframe-v1.md) |
 | P.2f | Реализация wireframe v1 в `apps/web` (`CityPageView`) | Высокий | ⏳ после P.2e |
 | P.2g | **Wireframe city hub v2** — IA фазы 2 (city-specific направления, конфиг) | Высокий | ✅ [city-hub-wireframe-v2.md](./city-hub-wireframe-v2.md) |
