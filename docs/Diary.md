@@ -15,6 +15,7 @@
 
 - Sitemap (пункт 4 / 2.1.x) не трогали в этом шаге.
 - City FAQ/BreadcrumbList SSR (1.3.x / 2.2.3) — следующий этап.
+- **Proof prod:** `https://daibilet.ru/events/retro-locman-ot-zaryadya-1294` — в HTML source: `Event` (+ `Offer`), `BreadcrumbList`, плюс root `WebSite`/`Organization`. Deploy `d8bf381`.
 
 ---
 
