@@ -260,3 +260,41 @@ export interface AdminEventChangeRequestActionDto {
   logAction?: string | null;
   noOp?: boolean;
 }
+
+export interface AdminReviewEventDto {
+  id: string;
+  title: string;
+  slug: string;
+}
+
+export interface AdminReviewRowDto {
+  id: string;
+  rating: number;
+  title?: string | null;
+  text: string;
+  authorName: string;
+  authorEmail: string;
+  isVerified: boolean;
+  status: string;
+  adminComment?: string | null;
+  purchaseRef?: string | null;
+  createdAt: string;
+  publishedAt?: string | null;
+  event?: AdminReviewEventDto | null;
+  externalOrder?: {
+    id: string;
+    publicCode?: string | null;
+    externalOrderId: string;
+    status: string;
+    purchasedAt?: string | null;
+  } | null;
+}
+
+export interface AdminReviewsListDto {
+  items: AdminReviewRowDto[];
+  total: number;
+  page: number;
+  pages: number;
+  pendingCount: number;
+}
+

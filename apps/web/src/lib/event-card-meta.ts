@@ -136,14 +136,14 @@ export function formatListDescription(value?: string | null): string {
     .trim();
 }
 
-/** Стабильный псевдорейтинг 4.0–5.0 до появления реальных отзывов. */
+/** Стабильный псевдорейтинг 4.5–5.0 до ≥10 реальных отзывов (только UI). */
 export function resolvePseudoRating(seed: string): number {
   let hash = 0;
   for (let i = 0; i < seed.length; i += 1) {
     hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
   }
-  const step = hash % 11;
-  return Math.round((4 + step / 10) * 10) / 10;
+  const step = hash % 6; // 0..5 → 4.5 .. 5.0
+  return Math.round((4.5 + step / 10) * 10) / 10;
 }
 
 export function formatShowcaseSessionDate(event: PublicSessionDto): string {

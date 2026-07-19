@@ -74,6 +74,25 @@ crontab -e
 - Скрипт: `node scripts/blog-weekly-digest.js` (slug `afisha-nedeli-YYYY-MM-DD`, status=`REVIEW`, `isIndexable=false`).
 - Лог: `/var/log/daibilet/blog-weekly-digest.log`
 - Ручной прогон: `cd /opt/daibilet && npm run blog:weekly-digest` (или `--dry-run`).
+
+## Prod: review-request emails (после сессии)
+
+Просьба оставить отзыв покупателям с email в `ExternalOrder` (сессия 1–2 дня назад).
+
+```bash
+chmod +x /opt/daibilet/deploy/cron/review-requests.sh
+crontab -e
+```
+
+```
+0 10 * * * APP_DIR=/opt/daibilet /opt/daibilet/deploy/cron/review-requests.sh >> /var/log/daibilet/review-requests.log 2>&1
+0 10 * * 0 APP_DIR=/opt/daibilet /opt/daibilet/deploy/cron/review-requests.sh --reminders >> /var/log/daibilet/review-requests.log 2>&1
+```
+
+- Без `SMTP_HOST`/`SMTP_FROM` — создаёт `ReviewRequest`, письмо skip + лог URL.
+- Для отправки: SMTP env + `nodemailer` в `apps/backend`.
+- Ручной: `npm run reviews:requests` / `--dry-run` / `--reminders`.
+
 ## Prod: CPU/RAM mitigation (TEP sync + OOM watch)
 
 ### Deploy discipline

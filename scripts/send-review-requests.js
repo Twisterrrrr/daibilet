@@ -1,0 +1,47 @@
+#!/usr/bin/env node
+/**
+ * Post-purchase review request emails (cron).
+ *
+ * Usage:
+ *   node --import tsx scripts/send-review-requests.js
+ *   node --import tsx scripts/send-review-requests.js --dry-run
+ *   node --import tsx scripts/send-review-requests.js --reminders
+ *
+ * SMTP: set SMTP_HOST + SMTP_FROM (+ SMTP_USER/SMTP_PASS). Without SMTP — creates
+ * ReviewRequest rows but skips send (logged). See docs/Project.md § Reviews.
+ */
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+async function loadEnv() {
+  try {
+    const { loadRootEnv } = await import('../apps/backend/src/env.ts');
+    loadRootEnv(rootDir);
+  } catch {
+    // optional
+  }
+}
+
+await loadEnv();
+
+const dryRun = process.argv.includes('--dry-run');
+const reminders = process.argv.includes('--reminders');
+
+const { sendReviewReminderBatch, sendReviewRequestBatch } = await import(
+  '../apps/backend/src/review-scheduler.ts'
+);
+const { disconnectPrisma } = await import('@daibilet/db');
+
+try {
+  if (reminders) {
+    const result = await sendReviewReminderBatch({ dryRun });
+    console.log(JSON.stringify({ ok: true, mode: 'reminders', dryRun, ...result }, null, 2));
+  } else {
+    const result = await sendReviewRequestBatch({ dryRun });
+    console.log(JSON.stringify({ ok: true, mode: 'requests', dryRun, ...result }, null, 2));
+  }
+} finally {
+  await disconnectPrisma().catch(() => undefined);
+}

@@ -131,6 +131,38 @@ Env для widgets / analytics: `NEXT_PUBLIC_TC_WIDGET_TOKEN`, `NEXT_PUBLIC_TEP_
 
 ---
 
+## Reviews (2026-07-19)
+
+Модуль отзывов покупателей (адаптация SPBBOATS под агрегатор; **без disputes**).
+
+### Правила
+
+- Комбо: рейтинг 1–5 + текст; привязка к покупке (дата / событие / № заказа·билета / ФИО).
+- **Верификация:** email и/или номер заказа/билета ↔ `ExternalOrder` (status done/confirmed), match события (вкл. meta-siblings / merge group). Capability **разрешает TC** (обратно SPBBOATS).
+- TEP без email/orders: форма ок, бейдж «Покупка подтверждена» — нет.
+- Публично: displayName `Иван К.`; полный номер билета / ФИО не светятся.
+- Модерация в админке обязательна.
+- Псевдорейтинг **4.5–5.0** до 10 голосов — **только UI**. JSON-LD `AggregateRating` — только при ≥10 реальных APPROVED.
+
+### URL / API
+
+| Что | Путь |
+|-----|------|
+| Форма (deep-link email) | `/reviews/write?token=…` |
+| Форма из ЛК | `/reviews/write?eventSlug=…&orderRef=…&email=…` |
+| Admin очередь | admin SPA `/reviews` |
+| Public list | `GET /api/reviews/events/:slug` |
+| Create | `POST /api/reviews` |
+| Admin moderate | `POST /api/admin/reviews/:id/{approve\|reject\|hide}` |
+
+### Email follow-up
+
+Cron: `deploy/cron/review-requests.sh` (ежедневно 10:00; вс — `--reminders`). Команда: `npm run reviews:requests`.
+
+SMTP (без env — graceful skip + лог URL): `SMTP_HOST`, `SMTP_FROM`, опционально `SMTP_USER`/`SMTP_PASS`/`SMTP_PORT`. Для отправки нужен `nodemailer` в `apps/backend`.
+
+---
+
 ## Блог / контент-ops
 
 - Карточки: `apps/web/src/data/blog-posts.ts` (+ зеркало в `apps/public`).

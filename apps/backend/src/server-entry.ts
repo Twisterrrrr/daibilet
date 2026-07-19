@@ -30,6 +30,7 @@ import {
   registerPublicCacheWarmer,
   startServer,
 } from './server.js';
+import { createAdminReviewsRouteHandler, createPublicReviewsRouteHandler } from './reviews-handler.js';
 import { createValidatedHandler } from './validated-handler.js';
 
 const env = readBackendEnv();
@@ -112,6 +113,8 @@ const server = startServer({
         applyEventChangeRequest: applyApprovedEventChangeRequest,
         invalidatePublicCaches,
       }),
+      createPublicReviewsRouteHandler(),
+      createAdminReviewsRouteHandler(),
     ],
   }),
 }) as Server;

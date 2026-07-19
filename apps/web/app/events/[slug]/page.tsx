@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { EventCard } from '@/components/EventCard';
 import { EventBuyCard, EventHero } from '@/components/EventPage.client';
 import { EventDescription, EventQuickInfo, EventTags } from '@/components/EventPageSections';
+import { ReviewSection } from '@/components/ReviewSection';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { toEventPageClientPayload } from '@/lib/event-page-client-props';
@@ -11,6 +12,8 @@ import { eventHref } from '@/lib/routes';
 import { pageTitle, routeOpenGraph } from '@/lib/seo-meta';
 import { buildEventPageJsonLd } from '@/lib/structured-data';
 import { buildPublicEventDto } from '@daibilet/backend/public-read';
+import { prisma } from '@/lib/db';
+import { shouldEmitAggregateRating } from '@/lib/review-rating';
 
 export const revalidate = 300;
 
@@ -46,7 +49,26 @@ export default async function EventDetailPage({ params }: PageProps) {
 
   const { event, related } = payload;
   const clientPayload = toEventPageClientPayload(payload);
-  const jsonLdBlocks = buildEventPageJsonLd(payload);
+
+  let aggregate: { ratingValue: number; reviewCount: number } | null = null;
+  try {
+    const approved = await prisma.review.findMany({
+      where: { eventId: event.id, status: 'APPROVED' },
+      select: { rating: true },
+    });
+    const reviewCount = approved.length;
+    const avgRating =
+      reviewCount > 0
+        ? Math.round((approved.reduce((sum, row) => sum + row.rating, 0) / reviewCount) * 10) / 10
+        : 0;
+    if (shouldEmitAggregateRating(reviewCount, avgRating)) {
+      aggregate = { ratingValue: avgRating, reviewCount };
+    }
+  } catch {
+    // Migration not applied yet / DB unavailable — keep Event JSON-LD without AggregateRating.
+  }
+
+  const jsonLdBlocks = buildEventPageJsonLd(payload, { aggregateRating: aggregate });
 
   return (
     <SiteLayout>
@@ -65,6 +87,7 @@ export default async function EventDetailPage({ params }: PageProps) {
             <EventDescription event={event} />
             <EventQuickInfo event={event} />
             <EventTags event={event} />
+            <ReviewSection eventId={event.id} eventSlug={event.slug} />
           </div>
 
           <div className="lg:col-span-1">
@@ -79,7 +102,7 @@ export default async function EventDetailPage({ params }: PageProps) {
         <section className="border-t border-slate-200 bg-slate-50 py-12">
           <div className="container-page">
             <h2 className="text-2xl font-bold text-slate-900">Похожие события</h2>
-            <ul className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            <ul className="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
               {related.slice(0, 6).map((session) => (
                 <li key={`${session.id}-${session.startsAt}`}>
                   <EventCard session={session} suppressPurchaseAnchors />

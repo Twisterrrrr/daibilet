@@ -1,3 +1,27 @@
+## 2026-07-19 — Модуль отзывов (ExternalOrder / TC)
+
+### Наблюдения
+
+- В Prisma уже были `Review*` / `ReviewRequest`, runtime API/UI/cron отсутствовали.
+- SPBBOATS запрещал отзывы для TC/TEP; у агрегатора основной путь наоборот — через `ExternalOrder`/tickets.
+- Каталог уже показывал псевдорейтинг; JSON-LD Event без AggregateRating.
+
+### Решения
+
+- Верификация: email и/или ticket/order ↔ ExternalOrder (done/confirmed) + event match (meta-siblings / mergeGroupKey); deep-link `ReviewRequest.token`.
+- Public: `/reviews/write`, блок на event page; displayName «Иван К.», бейдж «Покупка подтверждена».
+- Admin: `/reviews` — approve/reject/hide.
+- Cron `review-requests` после сессии; SMTP optional (graceful skip).
+- UI псевдо 4.5–5.0 до 10; AggregateRating только при ≥10 APPROVED.
+- Disputes / ЛК поставщика не трогали.
+
+### Проблемы
+
+- Без `SMTP_*` письма не уходят (ReviewRequest всё равно создаётся).
+- Deploy: migrate `20260719150000_review_external_order` + nodemailer при включении SMTP.
+
+---
+
 ## 2026-07-19 — City FAQ + thin noindex (пункт 5)
 
 ### Наблюдения

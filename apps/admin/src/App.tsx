@@ -8,6 +8,7 @@ import { EventChangeRequestsPage } from '@/pages/EventChangeRequestsPage';
 import { EventsPage } from '@/pages/EventsPage';
 import { ExternalOrdersPage } from '@/pages/ExternalOrdersPage';
 import { LandingsPage } from '@/pages/LandingsPage';
+import { ReviewsPage } from '@/pages/ReviewsPage';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { SimplePage } from '@/pages/SimplePage';
 import { SourcesPage } from '@/pages/SourcesPage';
@@ -23,6 +24,7 @@ export function App() {
           <Route path="change-requests" element={<EventChangeRequestsPage />} />
         ) : null}
         <Route path="orders" element={<ExternalOrdersPage />} />
+        <Route path="reviews" element={<ReviewsPage />} />
         <Route path="buyers" element={<BuyersPage />} />
         <Route path="venues" element={<VenuesPage />} />
         <Route path="cities" element={<SimplePage title="Города" description="Городские и региональные карточки каталога." kind="cities" />} />

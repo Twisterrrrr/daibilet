@@ -81,7 +81,23 @@ export function BuyerOrderCard({ order }: { order: BuyerOrder }) {
                     {ticket.eventTitle || order.eventTitle || 'Событие уточняется'} · {formatDateTime(ticket.startsAt)}
                   </div>
                 </div>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">{ticket.displayStatus}</span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">{ticket.displayStatus}</span>
+                  {order.eventUrl ? (
+                    <Link
+                      href={buildReviewWriteHref({
+                        eventUrl: order.eventUrl,
+                        eventTitle: ticket.eventTitle || order.eventTitle || '',
+                        orderRef: ticket.number || order.number,
+                        email: order.buyer.email || '',
+                        name: order.buyer.name || '',
+                      })}
+                      className="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-100"
+                    >
+                      Оставить отзыв
+                    </Link>
+                  ) : null}
+                </div>
               </div>
             ))}
           </div>
@@ -155,4 +171,31 @@ function formatCount(count: number, forms: [string, string, string]): string {
   const mod100 = Math.abs(count) % 100;
   const form = mod100 >= 11 && mod100 <= 19 ? forms[2] : mod10 === 1 ? forms[0] : mod10 >= 2 && mod10 <= 4 ? forms[1] : forms[2];
   return `${formatNumber(count)} ${form}`;
+}
+
+function extractSlugFromEventUrl(eventUrl: string): string {
+  try {
+    const path = eventUrl.startsWith('http') ? new URL(eventUrl).pathname : eventUrl;
+    const match = path.match(/\/events\/([^/?#]+)/);
+    return match ? decodeURIComponent(match[1]) : '';
+  } catch {
+    return '';
+  }
+}
+
+function buildReviewWriteHref(input: {
+  eventUrl: string;
+  eventTitle: string;
+  orderRef: string;
+  email: string;
+  name: string;
+}): string {
+  const params = new URLSearchParams();
+  const slug = extractSlugFromEventUrl(input.eventUrl);
+  if (slug) params.set('eventSlug', slug);
+  if (input.eventTitle) params.set('eventTitle', input.eventTitle);
+  if (input.orderRef) params.set('orderRef', input.orderRef);
+  if (input.email) params.set('email', input.email);
+  if (input.name) params.set('name', input.name);
+  return `/reviews/write?${params.toString()}`;
 }

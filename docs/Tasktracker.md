@@ -31,6 +31,23 @@
 
 ---
 
+## Reviews (2026-07-19)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| R.1 | Prisma: Review ↔ ExternalOrder + migration | Критический | ✅ |
+| R.2 | API create/list + admin moderate | Критический | ✅ |
+| R.3 | Admin UI `/reviews` очередь | Высокий | ✅ |
+| R.4 | Public ReviewSection + `/reviews/write` + ЛК deep-link | Высокий | ✅ |
+| R.5 | Cron review-request email (SMTP graceful) | Высокий | ✅ |
+| R.6 | Capability: TC allowed + verification | Критический | ✅ |
+| R.7 | Pseudo 4.5–5.0 UI; AggregateRating ≥10 | Высокий | ✅ |
+| R.8 | Tests verification + displayed rating | Высокий | ✅ |
+| R.9 | Commit + deploy API/admin/Next | Критический | 🔄 |
+| R.10 | Disputes / supplier LK | — | 🚫 out of scope |
+
+---
+
 ## Этап 0 — Post-cutover hardening (закрыть первым)
 
 **Цель:** prod Next стабилен, покупка через виджеты проверена в браузере, admin операционен, data debt по TC осознан.

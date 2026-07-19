@@ -1037,10 +1037,12 @@ model ExternalOrder {
   archivedAt           DateTime?
   updatedAt            DateTime  @updatedAt
 
-  source        Source           @relation(fields: [sourceId], references: [id])
-  siteUser      SiteUser?        @relation(fields: [siteUserId], references: [id], onDelete: SetNull)
-  tickets       ExternalTicket[]
-  checkoutOrder CheckoutOrder?
+  source         Source           @relation(fields: [sourceId], references: [id])
+  siteUser       SiteUser?        @relation(fields: [siteUserId], references: [id], onDelete: SetNull)
+  tickets        ExternalTicket[]
+  checkoutOrder  CheckoutOrder?
+  reviews        Review[]
+  reviewRequests ReviewRequest[]
 
   @@unique([sourceId, externalOrderId])
   @@index([status])
@@ -1871,6 +1873,7 @@ model Review {
   supplierId      String?
   siteUserId      String?
   checkoutOrderId String?
+  externalOrderId String?
   rating          Int
   title           String?
   text            String
@@ -1878,6 +1881,8 @@ model Review {
   authorEmail     String
   isVerified      Boolean      @default(false)
   voucherCode     String?
+  /// Public-facing purchase ref (ticket/order), never full PII in UI.
+  purchaseRef     String?
   verifyToken     String?      @unique
   helpfulCount    Int          @default(0)
   status          ReviewStatus @default(PENDING_EMAIL)
@@ -1891,6 +1896,7 @@ model Review {
   supplier         Supplier?               @relation(fields: [supplierId], references: [id], onDelete: SetNull)
   siteUser         SiteUser?               @relation(fields: [siteUserId], references: [id], onDelete: SetNull)
   checkoutOrder    CheckoutOrder?          @relation(fields: [checkoutOrderId], references: [id], onDelete: SetNull)
+  externalOrder    ExternalOrder?          @relation(fields: [externalOrderId], references: [id], onDelete: SetNull)
   supplierResponse ReviewSupplierResponse?
   disputes         ReviewDispute[]
   actionLogs       ReviewActionLog[]
@@ -1900,6 +1906,7 @@ model Review {
   @@index([supplierId, status])
   @@index([siteUserId])
   @@index([checkoutOrderId])
+  @@index([externalOrderId])
   @@index([status])
   @@index([createdAt])
 }
@@ -1992,7 +1999,12 @@ model ReviewRequest {
   email           String
   eventId         String
   checkoutOrderId String?
+  externalOrderId String?
   token           String    @unique
+  /// Snapshot for prefilled write form (date / event title / short order ref).
+  purchaseDate    DateTime?
+  purchaseRef     String?
+  buyerName       String?
   sentAt          DateTime  @default(now())
   reminderSentAt  DateTime?
   openedAt        DateTime?
@@ -2001,11 +2013,13 @@ model ReviewRequest {
 
   event         Event          @relation(fields: [eventId], references: [id], onDelete: Cascade)
   checkoutOrder CheckoutOrder? @relation(fields: [checkoutOrderId], references: [id], onDelete: SetNull)
+  externalOrder ExternalOrder? @relation(fields: [externalOrderId], references: [id], onDelete: SetNull)
 
   @@unique([email, eventId])
   @@index([token])
   @@index([eventId])
   @@index([checkoutOrderId])
+  @@index([externalOrderId])
 }
 
 model QualityIssue {

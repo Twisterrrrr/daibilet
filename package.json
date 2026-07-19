@@ -63,6 +63,7 @@
     "blog:sync-bodies": "node scripts/blog-sync-static-bodies.js",
     "blog:upsert": "node scripts/blog-upsert-articles.js",
     "blog:weekly-digest": "node scripts/blog-weekly-digest.js",
+    "reviews:requests": "node --import tsx scripts/send-review-requests.js",
     "landing:snapshot": "node scripts/landing-snapshot.mjs --write",
     "landing:audit": "node scripts/landing-audit.mjs",
     "tep:landing-diagnose": "node scripts/tep-landing-diagnose.mjs",

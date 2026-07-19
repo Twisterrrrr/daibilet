@@ -104,8 +104,11 @@ function resolveOfferUrl(payload: PublicEventPageDto, canonical: string): string
   return canonical;
 }
 
-/** Schema.org Event (+ Offer при наличии цены). */
-export function buildEventJsonLd(payload: PublicEventPageDto): Record<string, unknown> {
+/** Schema.org Event (+ Offer при наличии цены). AggregateRating — только при ≥10 реальных отзывов. */
+export function buildEventJsonLd(
+  payload: PublicEventPageDto,
+  options?: { aggregateRating?: { ratingValue: number; reviewCount: number } | null },
+): Record<string, unknown> {
   const event = payload.event;
   const path = event.canonicalPath || eventHref(event);
   const canonical = toAbsoluteUrl(path);
@@ -154,12 +157,26 @@ export function buildEventJsonLd(payload: PublicEventPageDto): Record<string, un
     };
   }
 
+  const aggregate = options?.aggregateRating;
+  if (aggregate && aggregate.reviewCount >= 10 && aggregate.ratingValue > 0) {
+    block.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: String(aggregate.ratingValue),
+      reviewCount: String(aggregate.reviewCount),
+      bestRating: '5',
+      worstRating: '1',
+    };
+  }
+
   return block;
 }
 
 /** SSR blocks для страницы события: Event (+ Offer) и BreadcrumbList. */
-export function buildEventPageJsonLd(payload: PublicEventPageDto): Array<Record<string, unknown>> {
-  return [buildEventJsonLd(payload), buildBreadcrumbListJsonLd(buildEventBreadcrumbs(payload.event))];
+export function buildEventPageJsonLd(
+  payload: PublicEventPageDto,
+  options?: { aggregateRating?: { ratingValue: number; reviewCount: number } | null },
+): Array<Record<string, unknown>> {
+  return [buildEventJsonLd(payload, options), buildBreadcrumbListJsonLd(buildEventBreadcrumbs(payload.event))];
 }
 
 export function buildFaqPageJsonLd(items: CityFaqItem[]): Record<string, unknown> | null {
