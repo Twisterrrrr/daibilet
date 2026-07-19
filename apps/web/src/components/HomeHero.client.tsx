@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 
 import { CityPicker } from '@/components/CityPicker.client';
 import { HomeHeroBackground } from '@/components/HomeHeroBackground.client';
-import { useSelectedCity } from '@/components/SelectedCityProvider.client';
+import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { buildCatalogHref, catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityToPrepositional } from '@/lib/city-declension';
@@ -37,7 +37,10 @@ type HomeHeroProps = {
 
 export function HomeHero({ destinations, totalEvents, totalVenues, cityCount }: HomeHeroProps) {
   const router = useRouter();
-  const { cityValue: destination, setCity: setDestination, selectedDestination } = useSelectedCity();
+  const selectedCity = useSelectedCityOptional();
+  const destination = selectedCity?.cityValue ?? 'all';
+  const setDestination = selectedCity?.setCity ?? (() => {});
+  const selectedDestination = selectedCity?.selectedDestination ?? null;
   const [heroQuery, setHeroQuery] = useState('');
   const [heroDate, setHeroDate] = useState('all');
 
