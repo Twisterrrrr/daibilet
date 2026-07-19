@@ -1,4 +1,26 @@
-## 2026-07-19 — TC виджет «Мероприятие прошло» на прошедшем dated slug
+## 2026-07-19 — Главная: пропали обложки Teplohod (signed S3)
+
+### Наблюдения
+
+- На daibilet.ru в «Выбор редакции» / «Куда сходить» серые плейсхолдеры у части карточек.
+- Рабочие: `ticketscloud-prod.storage.yandexcloud.net`, локальные `/images/cities`, blog covers.
+- Битые: `s3.twcstorage.ru/teplohod-private/...` с `X-Amz-Expires=21600` (~6ч) — после TTL HEAD → 500/fail, `img.onError` → серый фон.
+- Live TEP API сейчас отдаёт 186/187 first-image как signed S3; стабильный `api.teplohod.info/v1/image?item=EventN&dirtyAlias=…` по-прежнему 200.
+- В БД: ~186 `Event.imageUrl` с twcstorage (после sync).
+
+### Решения
+
+- `stabilizeTeplohodImageUrl`: signed S3 → `https://api.teplohod.info/v1/image?item=Event…&dirtyAlias=…`.
+- Применить в `pickFirstUsableEventImageUrl` (TS + legacy `dto.js`) и в `tep-import-fixtures.js` при записи.
+- One-shot rewrite в prod DB + restart API + revalidate home.
+
+### Проблемы
+
+- Пока sync не обновлён на сервере, следующий `tep:sync` снова мог бы писать signed URL — поэтому патч import обязателен вместе с serve-time rewrite.
+
+---
+
+
 
 ### Наблюдения
 
@@ -14,9 +36,11 @@
 - `pickPrimarySessionPurchase` переключает `externalId` / `purchaseUrl` / widgetPayload на ближайший продаваемый слот.
 - Тест: `public-event-widget-fallback.test.ts`. Аудит блога: `scripts/audit-blog-event-links.mjs`.
 
-### Проблемы
+### Добивка blog dead links (тот же день)
 
-- Ссылки из статей на конкретный прошедший TC slot остаются валидными только пока есть будущие meta-siblings; иначе страница станет 404 (ожидаемо).
+- Аудит `scripts/audit-blog-event-links.mjs`: 82 уникальных `/events` из MD; после API-фикса «Особо опасен» OK.
+- Прошедшие SINGLE без meta (орган/джаз/стендап/балет/…) → ссылки в 8 статьях обновлены на ближайшие будущие слоты + upsert PUBLISHED.
+- Фестивали «Былинный берег» / «Фэнтези Фест»: wide-lifetime («Даты в виджете»), не баг fake open-date.
 
 ---
 
