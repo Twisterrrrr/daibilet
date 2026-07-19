@@ -15,6 +15,32 @@
 ### Проблемы
 
 - HIDDEN `bylinnyy-bereg-*` по-прежнему без cover-файлов на диске (не в scope PUBLISHED).
+- Internal revalidate endpoint вернул 401; страницы всё равно отдают cover+inline после upsert (SSR из Article).
+
+### Добивка (тот же день)
+
+- Prod `@af32532`, `blog:upsert` ×19 PUBLISHED — OK.
+- Smoke: 4 статьи HTML с 2× `/images/blog/*` (cover+inline), все img 200.
+- API `/api/public/articles`: **19/19** с `coverImageUrl`.
+
+---
+
+## 2026-07-19 — Home SEO: точный шаблон description
+
+### Наблюдения
+
+- Title уже ок: «Дайбилет — экскурсии, музеи и мероприятия в городах России».
+- Description на prod был в другом порядке: «Билеты на экскурсии и события: … Афиша музеев…» — нужен фиксированный SERP-текст.
+
+### Решения
+
+- Шаблон: `Афиша событий, экскурсий и мероприятий в городах России. Билеты онлайн: Москва — {n}, Санкт-Петербург — {m}, Казань — {k}, Екатеринбург — {e}` (длинное тире).
+- Counts только живые из `getHomeDestinations` (slug-хабы); fallback без хардкод-цифр.
+- Title без цифр; layout default + OG/Twitter через те же константы.
+
+### Проблемы
+
+- Counts в SERP с лагом ISR (~300s); после deploy нужен curl title/description на prod.
 
 ---
 

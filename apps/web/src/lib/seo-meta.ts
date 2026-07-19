@@ -1,14 +1,20 @@
 const SITE_URL = process.env.DAIBILET_SITE_URL || 'https://daibilet.ru';
 
-/** Default home / root title — keep ≤~60–70 chars for SERP. */
+/** Default home / root title — keep ≤~60–70 chars for SERP; no live counts. */
 export const HOME_SEO_TITLE =
   'Дайбилет — экскурсии, музеи и мероприятия в городах России';
 
+/** Static fallback (layout / build without destinations) — no hardcoded city counts. */
 export const HOME_SEO_DESCRIPTION_FALLBACK =
-  'Билеты на экскурсии, музеи и мероприятия в городах России. Афиша событий онлайн на Дайбилет.';
+  'Афиша событий, экскурсий и мероприятий в городах России. Билеты онлайн.';
 
-/** Prefer major hubs in meta description; then fill by event count. */
-const HOME_SEO_CITY_SLUGS = ['moskva', 'sankt-peterburg', 'kazan', 'ekaterinburg'] as const;
+/** Fixed hubs + display names for home meta description (em dash —). */
+const HOME_SEO_CITIES = [
+  { slug: 'moskva', label: 'Москва' },
+  { slug: 'sankt-peterburg', label: 'Санкт-Петербург' },
+  { slug: 'kazan', label: 'Казань' },
+  { slug: 'ekaterinburg', label: 'Екатеринбург' },
+] as const;
 
 type DestinationLike = {
   name: string;
@@ -24,41 +30,28 @@ export function pageTitle(title: string): string {
     .trim();
 }
 
-/** Enrich home meta description with live city event counts (ISR/cache-friendly). */
-export function buildHomeSeoDescription(
-  destinations: DestinationLike[],
-  opts?: { limit?: number },
-): string {
-  const limit = opts?.limit ?? 4;
-  const cities = destinations.filter((item) => item.type === 'city' && Number(item.events) > 0);
+/**
+ * Home meta description with live city event counts.
+ * Template: «Афиша … России. Билеты онлайн: Москва — {n}, Санкт-Петербург — {m}, …»
+ */
+export function buildHomeSeoDescription(destinations: DestinationLike[]): string {
   const bySlug = new Map(
-    cities
-      .filter((city) => city.slug)
+    destinations
+      .filter((item) => item.type === 'city' && item.slug)
       .map((city) => [String(city.slug).toLowerCase(), city] as const),
   );
 
-  const picked: DestinationLike[] = [];
-  for (const slug of HOME_SEO_CITY_SLUGS) {
-    const city = bySlug.get(slug);
-    if (city) picked.push(city);
-    if (picked.length >= limit) break;
+  const parts: string[] = [];
+  for (const hub of HOME_SEO_CITIES) {
+    const city = bySlug.get(hub.slug);
+    const count = city ? Number(city.events) : 0;
+    if (!Number.isFinite(count) || count <= 0) continue;
+    parts.push(`${hub.label} — ${count}`);
   }
 
-  if (picked.length < limit) {
-    const used = new Set(picked.map((city) => String(city.slug || '').toLowerCase()));
-    const rest = [...cities]
-      .filter((city) => !used.has(String(city.slug || '').toLowerCase()))
-      .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru'));
-    for (const city of rest) {
-      picked.push(city);
-      if (picked.length >= limit) break;
-    }
-  }
+  if (!parts.length) return HOME_SEO_DESCRIPTION_FALLBACK;
 
-  if (!picked.length) return HOME_SEO_DESCRIPTION_FALLBACK;
-
-  const counts = picked.map((city) => `${city.name} — ${city.events}`).join(', ');
-  return `Билеты на экскурсии и события: ${counts}. Афиша музеев и мероприятий по городам России.`;
+  return `Афиша событий, экскурсий и мероприятий в городах России. Билеты онлайн: ${parts.join(', ')}`;
 }
 
 export function absoluteUrl(pathname: string): string {
