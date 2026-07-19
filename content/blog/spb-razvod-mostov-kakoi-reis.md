@@ -13,12 +13,13 @@ citySlug: saint-petersburg
 date: "11 июля 2026"
 readMin: 8
 imageAlt: "Разводной мост над Невой ночью"
+coverImageUrl: "/images/blog/spb-razvod-mostov-kakoi-reis.jpg"
 status: PUBLISHED
 ---
 
 Ночью на Неве почти все смотрят в одну сторону. Перед Эрмитажем собираются теплоходы, на открытых палубах становится теснее, и огромный пролёт Дворцового моста начинает подниматься над водой.
 
-[image side=right src="/images/blog/spb-razvod-mostov-kakoi-reis.jpg" alt="Разводной мост над Невой ночью"]
+[image side=right src="/images/blog/spb-razvod-mostov-kakoi-reis-inline.jpg" alt="Разводной мост над Невой ночью"]
 
 С берега это тоже видно, но теплоход даёт другой масштаб. Вы находитесь почти на уровне реки, проходите между подсвеченными набережными и за один вечер можете увидеть не один, а несколько мостов.
 

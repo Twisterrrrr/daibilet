@@ -1,3 +1,62 @@
+## 2026-07-19 — Blog: вернуть фото в статьи (cover + distinct inline)
+
+### Наблюдения
+
+- У всех PUBLISHED статей cover и `[image]` в MD/DB были, но в HTML body картинка пропадала: `filterDuplicateImageBlocks` вырезает inline, если `src` совпадает с `coverImageUrl`.
+- Эталон: `fentezi-fest-bylinnyy-bereg` уже имел отдельный `-inline.jpg` → на странице 2 img.
+- В `apps/web/public/images/` не хватало sync `muzyka-v-osobnyakah-spb.jpg` (эталон в `apps/public/...`).
+
+### Решения
+
+- Сгенерированы атмосферные `{slug}-inline.jpg` (без текста), сохранены в `apps/public/public/images/blog/` (+ локальный sync web).
+- Frontmatter: явный `coverImageUrl`; body `[image]` → `-inline.jpg`; `blog:sync-bodies`.
+- Commit только blog-артефактов (не трогать параллельный jazz-landing), `deploy-prod-next` + `blog:upsert` ×19.
+
+### Проблемы
+
+- HIDDEN `bylinnyy-bereg-*` по-прежнему без cover-файлов на диске (не в scope PUBLISHED).
+
+---
+
+## 2026-07-19 — Home SEO title + city counts in description
+
+### Наблюдения
+
+- Title вкладки/default был скудный: «Дайбилет — экскурсии, музеи и билеты» (~40 симв.), description без географии и объёма каталога.
+- На главной уже есть `getHomeDestinations` (ISR/`unstable_cache`) с `events` по городам — можно enrichment без отдельного API.
+
+### Решения
+
+- Default title → «Дайбилет — экскурсии, музеи и мероприятия в городах России»; template `%s | Дайбилет` без изменений.
+- Home `generateMetadata`: description/OG/Twitter с counts топ-хабов (Москва, СПб, Казань, Екатеринбург) из destinations; title без counts (читаемость ≤~70).
+- Константы/helper в `seo-meta.ts` (`HOME_SEO_TITLE`, `buildHomeSeoDescription`).
+
+### Проблемы
+
+- Counts в SERP обновляются с лагом ISR (~`revalidate` home); при недоступности DB — fallback description без цифр.
+
+---
+
+## 2026-07-19 — Blog soft-links: каталог → лендинги
+
+### Наблюдения
+
+- В `chto-poslushat-jazz` «джазовой афише Москвы» вела на сырой каталог `/events?q=джаз&city=moscow`, а не на лендинг жанра.
+- Канон: `concertsLandingHref('moscow','jazz')` → `/kontserty/moscow/?genre=Джаз` (prod 200, landing «Концерты…»).
+- Аудит soft-links «афише X / подборке»: ещё 3 статьи ссылались на city catalog при наличии тематического лендинга.
+
+### Решения
+
+- Замены: jazz → `/kontserty/moscow/?genre=Джаз`; стендап СПб → `/stendap-i-yumor/`; Казань речные → `/rechnye-progulki/kazan/`; автобусы МСК → `/avtobusnye-ekskursii/moscow/`.
+- `blog:sync-bodies` + prod `blog:upsert` ×4 + `revalidate` paths/tags articles.
+- Городские `/cities/{slug}` в `afisha-regionalnye-goroda` оставлены (нет тематического лендинга).
+
+### Проблемы
+
+- Полный `deploy-prod-next.sh` не гоняли: контент статей из `Article` после upsert; static bodies на сервере обновлены SCP для следующего билда.
+
+---
+
 ## 2026-07-19 - Teplohod orders: отложено (нет API у партнёра)
 
 ### Наблюдения

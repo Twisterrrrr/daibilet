@@ -13,11 +13,12 @@ citySlug: moscow
 date: "10 июля 2026"
 readMin: 8
 imageAlt: "Теплоход на Москве-реке у Зарядья"
+coverImageUrl: "/images/blog/moskva-rechnye-progulki-zaryade.jpg"
 status: PUBLISHED
 ---
 Причал у парка «Зарядье» расположен так удачно, что кажется: можно подойти к воде, купить любой билет и получить один и тот же вид на Кремль.
 
-[image side=right src="/images/blog/moskva-rechnye-progulki-zaryade.jpg" alt="Теплоход на Москве-реке у Зарядья"]
+[image side=right src="/images/blog/moskva-rechnye-progulki-zaryade-inline.jpg" alt="Теплоход на Москве-реке у Зарядья"]
 
 На практике отсюда отправляются короткие обзорные круги, рейсы до Киевского вокзала, экспрессы к Воробьёвым горам, прогулки с аудиогидом и теплоходы с обедом. Названия похожи, начальная точка одна, но сценарий поездки будет разным.
 

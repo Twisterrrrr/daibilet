@@ -18,6 +18,7 @@ tag: Колонка
 date: "19 июля 2026"
 readMin: 9
 imageAlt: "Парадный зал петербургского особняка с роялем и тёплым светом люстры"
+coverImageUrl: "/images/blog/muzyka-v-osobnyakah-spb.jpg"
 status: PUBLISHED
 ---
 
@@ -27,7 +28,7 @@ status: PUBLISHED
 
 Именно поэтому концерт в особняке — не уменьшенная версия филармонического вечера. Это другой жанр. Здесь музыка получает адрес, биографию и интерьер.
 
-[image side=right src="/images/blog/muzyka-v-osobnyakah-spb.jpg" alt="Парадный зал петербургского особняка с роялем и тёплым светом люстры"]
+[image side=right src="/images/blog/muzyka-v-osobnyakah-spb-inline.jpg" alt="Парадный зал петербургского особняка с роялем и тёплым светом люстры"]
 
 ## Когда дом становится частью партитуры
 

@@ -17,6 +17,7 @@ tag: Колонка
 date: "19 июля 2026"
 readMin: 2
 imageAlt: "Open-air фестиваль песчаных скульптур под летним солнцем"
+coverImageUrl: "/images/blog/open-air-festy-vyhodnoi-ru.jpg"
 status: HIDDEN
 ---
 

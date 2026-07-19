@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery';
+import { HOME_SEO_DESCRIPTION_FALLBACK, HOME_SEO_TITLE } from '@/lib/seo-meta';
 
 import './globals.css';
 
@@ -21,10 +22,10 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   applicationName: SITE_NAME,
   title: {
-    default: 'Дайбилет — экскурсии, музеи и билеты',
+    default: HOME_SEO_TITLE,
     template: '%s | Дайбилет',
   },
-  description: 'Афиша событий, экскурсий и мероприятий в городах России. Билеты онлайн.',
+  description: HOME_SEO_DESCRIPTION_FALLBACK,
   manifest: '/site.webmanifest',
   icons: {
     icon: [
@@ -43,13 +44,13 @@ export const metadata: Metadata = {
     locale: 'ru_RU',
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: 'Дайбилет — экскурсии, музеи и билеты',
-    description: 'Афиша событий, экскурсий и мероприятий в городах России. Билеты онлайн.',
+    title: HOME_SEO_TITLE,
+    description: HOME_SEO_DESCRIPTION_FALLBACK,
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Дайбилет — экскурсии, музеи и билеты',
-    description: 'Афиша событий, экскурсий и мероприятий в городах России. Билеты онлайн.',
+    title: HOME_SEO_TITLE,
+    description: HOME_SEO_DESCRIPTION_FALLBACK,
   },
   other: {
     'apple-mobile-web-app-title': SITE_NAME,

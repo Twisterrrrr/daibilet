@@ -2,18 +2,40 @@ import type { Metadata } from 'next';
 
 import { HomePageContent } from '@/components/HomePageContent';
 import { SiteLayout } from '@/components/SiteLayout';
-
-export const metadata: Metadata = {
-  title: {
-    absolute: 'Дайбилет — экскурсии, музеи и билеты',
-  },
-  description: 'Афиша событий, экскурсий и мероприятий в городах России. Билеты онлайн.',
-  openGraph: {
-    url: 'https://daibilet.ru/',
-  },
-};
+import {
+  HOME_SEO_DESCRIPTION_FALLBACK,
+  HOME_SEO_TITLE,
+  buildHomeSeoDescription,
+} from '@/lib/seo-meta';
+import { getHomeDestinations } from '@/server/cached-home-data';
 
 export const revalidate = 300;
+
+export async function generateMetadata(): Promise<Metadata> {
+  let description = HOME_SEO_DESCRIPTION_FALLBACK;
+  try {
+    const destinationsPayload = await getHomeDestinations();
+    description = buildHomeSeoDescription(destinationsPayload?.destinations ?? []);
+  } catch {
+    // keep fallback if destinations cache/DB is unavailable at build time
+  }
+
+  return {
+    title: {
+      absolute: HOME_SEO_TITLE,
+    },
+    description,
+    openGraph: {
+      url: 'https://daibilet.ru/',
+      title: HOME_SEO_TITLE,
+      description,
+    },
+    twitter: {
+      title: HOME_SEO_TITLE,
+      description,
+    },
+  };
+}
 
 export default function HomePage() {
   return (

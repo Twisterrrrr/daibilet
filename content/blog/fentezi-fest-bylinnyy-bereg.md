@@ -17,6 +17,7 @@ tag: Колонка
 date: "19 июля 2026"
 readMin: 7
 imageAlt: "Палаточный фестиваль на берегу реки на закате"
+coverImageUrl: "/images/blog/fentezi-fest-bylinnyy-bereg.jpg"
 status: PUBLISHED
 ---
 

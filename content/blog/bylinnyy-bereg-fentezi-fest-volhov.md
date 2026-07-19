@@ -17,6 +17,7 @@ tag: Колонка
 date: "19 июля 2026"
 readMin: 9
 imageAlt: "Берег Волхова на закате: тёмная вода, туман и северное небо"
+coverImageUrl: "/images/blog/bylinnyy-bereg-fentezi-fest-volhov.jpg"
 status: HIDDEN
 ---
 
