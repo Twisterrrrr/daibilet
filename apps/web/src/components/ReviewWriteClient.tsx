@@ -3,10 +3,9 @@
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { Suspense, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { ReviewSection } from '@/components/ReviewSection';
-import { SiteLayout } from '@/components/SiteLayout';
 
 type RequestInfo = {
   eventId: string;
@@ -123,17 +122,5 @@ function ReviewWriteContent() {
 }
 
 export default function ReviewWriteClient() {
-  return (
-    <SiteLayout>
-      <Suspense
-        fallback={
-          <div className="flex min-h-[50vh] items-center justify-center">
-            <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
-          </div>
-        }
-      >
-        <ReviewWriteContent />
-      </Suspense>
-    </SiteLayout>
-  );
+  return <ReviewWriteContent />;
 }
