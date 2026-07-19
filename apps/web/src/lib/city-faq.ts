@@ -2,13 +2,20 @@ import type { PublicCityPageDto } from '@daibilet/contracts/public';
 
 import { cityToGenitive, cityToPrepositional } from '@/lib/city-declension';
 import { formatNumber, formatPriceFrom } from '@/lib/format';
-import { resolveCityBrief } from '@/lib/cityInfo';
+import { resolveCityBrief, resolveCityInfo } from '@/lib/cityInfo';
 import { evaluateCityIndexability } from '@/lib/hub-indexability';
 
 export type CityFaqItem = {
   question: string;
   answer: string;
 };
+
+/** Редакционный FAQ из CITY_INFO (как добраться / городские вопросы). */
+export function buildCityEditorialFaqItems(payload: PublicCityPageDto): CityFaqItem[] {
+  const info = resolveCityInfo(payload.city.slug, payload.city.sourceSlug);
+  if (!info?.faq?.length) return [];
+  return info.faq.map((item) => ({ question: item.q, answer: item.a }));
+}
 
 /** FAQ только для indexable (не thin) городов — иначе пустой FAQPage вреден. */
 export function buildCityFaqItems(payload: PublicCityPageDto): CityFaqItem[] {

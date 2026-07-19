@@ -118,6 +118,8 @@ export function CityPageView({
         {city && payload ? (
           <>
             <CityHero city={city} stats={payload.stats} guide={guide} />
+            <CityTravelSection travel={guide?.travel} />
+            <CityEditorialFaqSection items={guide?.faq} />
             {contentReady ? (
               <>
                 <PopularDirections city={city} landings={payload.landings} categories={categories} />
@@ -389,6 +391,37 @@ function MustSeeSection({
             </div>
           </div>
         ))}
+      </div>
+    </section>
+  );
+}
+
+function CityTravelSection({ travel }: { travel?: string }) {
+  if (!travel?.trim()) return null;
+  return (
+    <section id="city-travel" className="border-t border-slate-100 bg-slate-50/60 py-10">
+      <div className="container-page max-w-3xl">
+        <h2 className="text-2xl font-bold text-slate-950">Как добраться и когда ехать</h2>
+        <p className="mt-4 text-sm leading-7 text-slate-600">{travel}</p>
+      </div>
+    </section>
+  );
+}
+
+function CityEditorialFaqSection({ items }: { items?: CityInfoEntry['faq'] }) {
+  if (!items?.length) return null;
+  return (
+    <section id="city-guide-faq" className="border-t border-slate-100 py-10">
+      <div className="container-page max-w-3xl">
+        <h2 className="text-2xl font-bold text-slate-950">Частые вопросы</h2>
+        <div className="mt-6 space-y-5">
+          {items.map((item, index) => (
+            <div key={`${item.q}:${index}`}>
+              <h3 className="text-sm font-semibold text-slate-900">{item.q}</h3>
+              <p className="mt-2 text-sm leading-7 text-slate-600">{item.a}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
