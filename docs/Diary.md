@@ -10,7 +10,7 @@
 
 ### Проблемы
 
-- Deploy/proof — после push `feat/next-monorepo`.
+- Deploy prod `@9a36f48` OK. Proof: chunk `/cities/[slug]/page-*.js` содержит `gap-x-4 gap-y-1.5`; `/cities/murmansk` + `?hub=editorial` → 200.
 
 ---
 
