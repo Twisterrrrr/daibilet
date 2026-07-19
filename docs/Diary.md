@@ -1,3 +1,19 @@
+## 2026-07-19 — City hub: gap между date и category chips
+
+### Наблюдения
+
+- На афише city hub date chips и category chips в одном ряду, но между группами («Выходные» ↔ «Все N») тот же `gap-1.5`, что и внутри группы — визуально слипаются.
+
+### Решения
+
+- В `CityPageView` (default + editorial через общий компонент): у ряда фильтров `gap-x-4 gap-y-1.5` между группами; внутри `DateFilterChips` / `CategoryFilter` оставлен компактный `gap-1.5`.
+
+### Проблемы
+
+- Deploy/proof — после push `feat/next-monorepo`.
+
+---
+
 ## 2026-07-19 — Адрес: «Проспект Кольский» → «Кольский проспект»
 
 ### Наблюдения

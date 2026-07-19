@@ -199,7 +199,7 @@ export function CityPageView({
                   setMode={setMode}
                   editorial={editorial}
                 />
-                <div className="mb-5 flex flex-wrap items-center gap-1.5 md:flex-nowrap md:overflow-x-auto md:pb-0.5">
+                <div className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-1.5 md:flex-nowrap md:overflow-x-auto md:pb-0.5">
                   <DateFilterChips active={dateFilter} onSelect={setDateFilter} editorial={editorial} />
                   {contentReady ? (
                     <CategoryFilter
