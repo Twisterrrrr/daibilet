@@ -13,7 +13,7 @@
 
 ### Проблемы
 
-- Deploy + proof view-source `/cities/sankt-peterburg`.
+- Deploy prod `@2079e3a` OK. Proof (view-source на сервере): `/cities/sankt-peterburg` → `<title>Санкт-Петербург: афиша, экскурсии и билеты на сегодня, 19 июля | Дайбилет</title>`.
 
 ---
 
