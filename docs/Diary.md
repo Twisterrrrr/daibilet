@@ -1,3 +1,44 @@
+## 2026-07-19 — TC виджет «Мероприятие прошло» на прошедшем dated slug
+
+### Наблюдения
+
+- Квест «Особо опасен» (`…6a3d444c…`, слот 19.07 04:30–06:30 UTC) уже закончился; в TC widget по этому `eventId` — «Мероприятие прошло.»
+- Sibling с будущей датой (`…6a3d446f…`, 26.07) в виджете продаётся нормально (несколько слотов).
+- Meta: `6a3d42ebe5b04d07b3b015fa`. В БД десятки RECURRING-слотов, не OPEN_DATE.
+- Баг UI: после фильтра прошедших сессий `buildWidgetOnlySessions` синтезировал «Билеты с открытой датой» для **любого** TicketsCloud → открывался протухший `eventId`.
+
+### Решения
+
+- Синтетический widget-slot только для `OPEN_DATE` / `open_date` (и в `public-event.dto.ts`, и в legacy `dto.js`).
+- Подтягиваем siblings по `EventSourceLink.metaExternalId`, чтобы past slug показывал будущие сеансы.
+- `pickPrimarySessionPurchase` переключает `externalId` / `purchaseUrl` / widgetPayload на ближайший продаваемый слот.
+- Тест: `public-event-widget-fallback.test.ts`. Аудит блога: `scripts/audit-blog-event-links.mjs`.
+
+### Проблемы
+
+- Ссылки из статей на конкретный прошедший TC slot остаются валидными только пока есть будущие meta-siblings; иначе страница станет 404 (ожидаемо).
+
+---
+
+## 2026-07-19 — Blog: отложить первый inline image после hero
+
+### Наблюдения
+
+- На mobile после cover hero сразу шёл body `[image]`: float-секция ставила `<img>` первым в DOM, визуально две картинки подряд.
+- Типичный MD: 1 абзац → `[image]` (гиды); колонки уже ниже — не трогаем.
+
+### Решения
+
+- `deferLeadingImageBlock` после `filterDuplicateImageBlocks`: первый image переносится после ≥2 paragraph-блоков (везде, не только mobile).
+- Убрана ветка `paragraph + next image` → float: предшествующий текст больше не затягивается под image-first layout.
+- Правки в `apps/web` и `apps/public` `BlogArticleContent.tsx`.
+
+### Проблемы
+
+- Нет: cover≠inline по-прежнему через `filterDuplicateImageBlocks`.
+
+---
+
 ## 2026-07-19 — Blog: вернуть фото в статьи (cover + distinct inline)
 
 ### Наблюдения

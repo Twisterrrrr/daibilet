@@ -428,8 +428,44 @@ export function filterDuplicateImageBlocks(
   });
 }
 
+/**
+ * Первый inline `[image]` слишком близко к hero даёт две картинки подряд (особенно на mobile).
+ * Переносим его после N текстовых абзацев; filterDuplicateImageBlocks не трогаем.
+ */
+export function deferLeadingImageBlock(
+  blocks: ContentBlock[],
+  minParagraphsBefore = 2,
+): ContentBlock[] {
+  const imageIndex = blocks.findIndex((block) => block.type === 'image');
+  if (imageIndex < 0) return blocks;
+
+  let paragraphsBefore = 0;
+  for (let i = 0; i < imageIndex; i += 1) {
+    if (blocks[i].type === 'paragraph') paragraphsBefore += 1;
+  }
+  if (paragraphsBefore >= minParagraphsBefore) return blocks;
+
+  const imageBlock = blocks[imageIndex];
+  const withoutImage = [...blocks.slice(0, imageIndex), ...blocks.slice(imageIndex + 1)];
+
+  let seen = 0;
+  let insertAt = withoutImage.length;
+  for (let i = 0; i < withoutImage.length; i += 1) {
+    if (withoutImage[i].type !== 'paragraph') continue;
+    seen += 1;
+    if (seen >= minParagraphsBefore) {
+      insertAt = i + 1;
+      break;
+    }
+  }
+
+  return [...withoutImage.slice(0, insertAt), imageBlock, ...withoutImage.slice(insertAt)];
+}
+
 export function renderBlogArticleContent(content: string, coverImageUrl?: string | null) {
-  const blocks = filterDuplicateImageBlocks(parseContentBlocks(content), coverImageUrl);
+  const blocks = deferLeadingImageBlock(
+    filterDuplicateImageBlocks(parseContentBlocks(content), coverImageUrl),
+  );
   const nodes: React.ReactNode[] = [];
   let isLeadParagraph = true;
 
@@ -459,17 +495,8 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
       continue;
     }
 
-    if (block.type === 'paragraph' && next?.type === 'image') {
-      const { paragraphs, endIndex } = collectParagraphBlocks(blocks, index);
-      nodes.push(
-        <BlogFloatedSection key={`p-img-${index}`} image={next.image}>
-          {renderParagraphNodes(paragraphs, `p-img-${index}`, isLeadParagraph)}
-        </BlogFloatedSection>,
-      );
-      index = endIndex + 2;
-      isLeadParagraph = false;
-      continue;
-    }
+    // Абзацы перед картинкой рендерим отдельно: иначе float ставит img первым в DOM
+    // (mobile: hero → inline подряд). Картинка подхватывается веткой `image` ниже.
 
     if (block.type === 'image') {
       const { paragraphs, endIndex } = collectParagraphBlocks(blocks, index + 1);
