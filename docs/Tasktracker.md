@@ -51,7 +51,7 @@
 | U.2 | Draft Apply/Reset, Esc/backdrop, focus trap, badge счётчика | Высокий | ✅ |
 | U.3 | Commit + deploy Next | Критический | ✅ `be8ee55` + prod start web (после обрыва SSH mid-deploy) |
 | U.4 | Город из шапки → `city=` каталога при `/events` без явного city; deep-link сохранить | Высокий | ✅ |
-| U.5 | Commit + deploy-prod-next U.4 | Критический | 🔄 |
+| U.5 | Commit + deploy-prod-next U.4 | Критический | ✅ `4772789` prod |
 
 ---
 

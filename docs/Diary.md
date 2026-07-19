@@ -15,6 +15,7 @@
 ### Проблемы
 
 - Короткий double-fetch возможен при прямом заходе на `/events` без city (сначала без фильтра, затем replace) — приемлемо; nav-ссылки сразу с city.
+- **Prod @4772789:** `deploy-prod-next` OK, `/events` 200, revalidate tags home/catalog.
 
 ---
 
