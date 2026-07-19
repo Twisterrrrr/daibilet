@@ -55,6 +55,7 @@
 ### Проблемы
 
 - Прямой заход на `/events` без city: краткий skeleton вместо «Все города» (ожидаемо без cookie-SSR).
+- **Prod @4c09cdb:** `deploy-prod-next` OK; `/events`, `/venues`, `/locations` 200. (Коммит смешан с CI pnpm-fix — anti-flash в том же SHA.)
 
 ---
 

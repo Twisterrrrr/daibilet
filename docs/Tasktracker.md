@@ -72,7 +72,7 @@
 | U.5 | Commit + deploy-prod-next U.4 | Критический | ✅ `4772789` prod |
 | U.6 | Город шапки → фильтр `/venues` и `/locations` (URL + storage + nav) | Высокий | ✅ (в `361dc4c`) |
 | U.7 | Anti-flash «Все города»→город на `/events` (и venues/locations): `cityReady` + layout sync | Высокий | ✅ |
-| U.8 | Anti-flash: не показывать SSR all-cities до inject; commit + deploy-prod-next U.6–U.8 | Критический | 🔄 |
+| U.8 | Anti-flash: не показывать SSR all-cities до inject; commit + deploy-prod-next U.6–U.8 | Критический | ✅ `4c09cdb` prod |
 
 ---
 
