@@ -4,6 +4,30 @@
 
 ---
 
+## 2026-07-19 — Закрытие дыр аудита админки
+
+### Наблюдения
+
+- Источник аудита: canvas `admin-audit` + Diary 2026-07-14; P0 (лимит 10k / метрики Dashboard≠Events) уже были закрыты ранее (`eventRows(db, null)` + `getCachedAdminGroupedEvents`).
+- Оставались P1: detail без override/source description, nav stubs, localhost:5178 в бандле, canPublish ≠ high readiness.
+- Заказы: 17/18 archived — не баг sync; `archiveStaleCancelledOrders` уводит cancelled/expired/… старше 30 дней. Confirmed не трогает.
+
+### Решения
+
+- `GET /api/admin/events/:id` → `event` + `override` (LEFT JOIN); UI Content/SEO/Media гидрирует из detail.
+- Lean `eventRows`: `left(e.description, 4000)` вместо `null`.
+- `publishGate` учитывает high `readinessIssues` → blockers → `canPublish=false`.
+- Nav: убраны mapping/taxonomy/audit stubs; Cities/Buyers — бейдж «только чтение»; Settings без localhost и без «auth отключена».
+- CORS: для `/api/admin` и sync/db больше нет `Access-Control-Allow-Origin: *`.
+- Тесты: `auth.test.ts`, `publish-gate.test.ts`.
+
+### Проблемы
+
+- Полный SQL read-model для Events (без in-memory group) — по-прежнему perf backlog (0.5.8).
+- ECR остаётся скрыт в prod (`VITE_DAIBILET_EVENT_CHANGE_REQUESTS` не включаем).
+
+---
+
 ## 2026-07-19 — Blog: только ссылки в multi-event + сверка цен/meta
 
 ### Наблюдения

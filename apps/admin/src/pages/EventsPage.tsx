@@ -15,7 +15,7 @@ const PAGE_SIZE = 80;
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_BASE_URL =
   ((import.meta as ImportMeta & { env?: { VITE_DAIBILET_PUBLIC_URL?: string } }).env?.VITE_DAIBILET_PUBLIC_URL as string | undefined) ||
-  'http://127.0.0.1:5178';
+  'https://daibilet.ru';
 
 const quickFilters = [
   { id: 'all', label: 'Все импортные' },
@@ -51,6 +51,18 @@ type EventsListResponse = {
 type AdminEventDetail = {
   eventId: string;
   eventIds?: string[];
+  event?: {
+    id?: string;
+    title?: string | null;
+    description?: string | null;
+    imageUrl?: string | null;
+    seoH1?: string | null;
+    seoTitle?: string | null;
+    seoDescription?: string | null;
+    canonicalPath?: string | null;
+    isIndexable?: boolean | null;
+  } | null;
+  override?: NonNullable<AdminEventRow['override']> | null;
   summary: {
     slots: number;
     offers: number;
@@ -858,7 +870,25 @@ function EventDetailSheet(props: {
   onOpenChange: (open: boolean) => void;
 }) {
   const { event, detail, taxonomy, isDetailLoading, isSavingOverride, isSavingModeration, isSavingTaxonomy, saveError, tab, onTabChange, onSaveOverride, onSaveModerationStatus, onSaveTaxonomy, onOpenChange } = props;
-  const problems = event ? problemLabels(event) : [];
+  const hydratedEvent = React.useMemo(() => {
+    if (!event) return null;
+    if (!detail?.event && !detail?.override) return event;
+    return {
+      ...event,
+      description: detail.event?.description ?? event.description,
+      imageUrl: detail.event?.imageUrl ?? event.imageUrl,
+      seoH1: detail.event?.seoH1 ?? event.seoH1,
+      seoTitle: detail.event?.seoTitle ?? event.seoTitle,
+      seoDescription: detail.event?.seoDescription ?? event.seoDescription,
+      canonicalPath: detail.event?.canonicalPath ?? event.canonicalPath,
+      isIndexable: detail.event?.isIndexable ?? event.isIndexable,
+      override: {
+        ...(event.override || {}),
+        ...(detail.override || {}),
+      },
+    };
+  }, [detail, event]);
+  const problems = hydratedEvent ? problemLabels(hydratedEvent) : [];
   const tabs: Array<{ id: DetailTab; label: string }> = [
     { id: 'overview', label: 'Обзор' },
     { id: 'classification', label: 'Классификация' },
@@ -873,19 +903,19 @@ function EventDetailSheet(props: {
   return (
     <Sheet open={Boolean(event)} onOpenChange={onOpenChange}>
       <SheetContent className="flex w-[min(920px,96vw)] flex-col overflow-y-auto sm:max-w-[920px]">
-        {event ? (
+        {hydratedEvent ? (
           <>
             <div className="pr-10">
               <div className="flex flex-wrap items-center gap-2">
-                <SourceBadge source={sourceBadgeFromEvent(event)} />
-                {readinessBadge(event)}
-                <Badge variant="outline">{event.proposedCategory}</Badge>
+                <SourceBadge source={sourceBadgeFromEvent(hydratedEvent)} />
+                {readinessBadge(hydratedEvent)}
+                <Badge variant="outline">{hydratedEvent.proposedCategory}</Badge>
               </div>
-              <h2 className="mt-3 text-xl font-semibold leading-snug">{event.override?.title || event.title}</h2>
+              <h2 className="mt-3 text-xl font-semibold leading-snug">{hydratedEvent.override?.title || hydratedEvent.title}</h2>
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <div className="font-mono text-xs text-muted-foreground">{event.id}</div>
+                <div className="font-mono text-xs text-muted-foreground">{hydratedEvent.id}</div>
                 <a
-                  href={`${PUBLIC_BASE_URL}/events/${encodeURIComponent(event.slug || event.id)}`}
+                  href={`${PUBLIC_BASE_URL}/events/${encodeURIComponent(hydratedEvent.slug || hydratedEvent.id)}`}
                   target="_blank"
                   rel="noreferrer"
                   className="inline-flex h-7 items-center gap-1 rounded-md border border-border px-2 text-xs font-medium text-muted-foreground transition hover:bg-secondary hover:text-foreground"
@@ -896,7 +926,7 @@ function EventDetailSheet(props: {
               </div>
             </div>
 
-            <ModerationPanel event={event} isSaving={isSavingModeration} error={saveError} onChange={onSaveModerationStatus} />
+            <ModerationPanel event={hydratedEvent} isSaving={isSavingModeration} error={saveError} onChange={onSaveModerationStatus} />
 
             <div className="mt-5 flex flex-wrap gap-2 border-b border-border pb-3">
               {tabs.map((item) => (
@@ -913,14 +943,16 @@ function EventDetailSheet(props: {
               ))}
             </div>
 
-            {tab === 'overview' ? <OverviewTab event={event} problems={problems} /> : null}
-            {tab === 'classification' ? <ClassificationTab event={event} taxonomy={taxonomy} isSaving={isSavingTaxonomy} saveError={saveError} onSave={onSaveTaxonomy} /> : null}
-            {tab === 'schedule' ? <ScheduleTab event={event} detail={detail} isLoading={isDetailLoading} /> : null}
-            {tab === 'sales' ? <SalesTab event={event} detail={detail} isLoading={isDetailLoading} /> : null}
-            {tab === 'content' ? <ContentTab event={event} isSaving={isSavingOverride} saveError={saveError} onSave={onSaveOverride} /> : null}
-            {tab === 'media' ? <MediaTab event={event} isSaving={isSavingOverride} saveError={saveError} onSave={onSaveOverride} /> : null}
-            {tab === 'seo' ? <SeoTab event={event} isSaving={isSavingOverride} saveError={saveError} onSave={onSaveOverride} /> : null}
-            {tab === 'source' ? <SourceTab event={event} problems={problems} /> : null}
+            {tab === 'overview' ? <OverviewTab event={hydratedEvent} problems={problems} /> : null}
+            {tab === 'classification' ? (
+              <ClassificationTab event={hydratedEvent} taxonomy={taxonomy} isSaving={isSavingTaxonomy} saveError={saveError} onSave={onSaveTaxonomy} />
+            ) : null}
+            {tab === 'schedule' ? <ScheduleTab event={hydratedEvent} detail={detail} isLoading={isDetailLoading} /> : null}
+            {tab === 'sales' ? <SalesTab event={hydratedEvent} detail={detail} isLoading={isDetailLoading} /> : null}
+            {tab === 'content' ? <ContentTab event={hydratedEvent} isSaving={isSavingOverride} saveError={saveError} onSave={onSaveOverride} /> : null}
+            {tab === 'media' ? <MediaTab event={hydratedEvent} isSaving={isSavingOverride} saveError={saveError} onSave={onSaveOverride} /> : null}
+            {tab === 'seo' ? <SeoTab event={hydratedEvent} isSaving={isSavingOverride} saveError={saveError} onSave={onSaveOverride} /> : null}
+            {tab === 'source' ? <SourceTab event={hydratedEvent} problems={problems} /> : null}
           </>
         ) : null}
       </SheetContent>
@@ -934,6 +966,8 @@ function ModerationPanel(props: { event: AdminEventRow; isSaving: boolean; error
   const blockers = event.publishBlockers || [];
   const warnings = event.publishWarnings || [];
   const canPublish = event.canPublish !== false && blockers.length === 0;
+  const readinessLabel =
+    event.readiness === 'ready' ? 'readiness: готово' : event.readiness === 'blocked' ? 'readiness: блокер' : 'readiness: доработать';
   const actions = [
     { status: 'DRAFT', label: 'В черновик' },
     { status: 'REVIEW', label: 'На проверку' },
@@ -949,16 +983,23 @@ function ModerationPanel(props: { event: AdminEventRow; isSaving: boolean; error
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="text-sm font-semibold">Модерация</h3>
             <Badge variant="outline">{status}</Badge>
+            {readinessBadge(event)}
+            <Badge variant="outline" className="font-normal text-muted-foreground">
+              {readinessLabel}
+            </Badge>
             {canPublish ? (
               <Badge variant="outline" className="border-success/30 bg-success/10 text-success">
                 publish gate ok
               </Badge>
             ) : (
               <Badge variant="outline" className="border-warning/30 bg-warning/10 text-warning-foreground">
-                есть блокеры
+                publish gate: блокеры
               </Badge>
             )}
           </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Readiness (контент/сеансы) и publish gate (цена/виджет/дата) считаются отдельно — blocked + publishable возможно.
+          </p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {blockers.map((item) => (
               <Badge key={item} variant="outline" className="border-warning/30 bg-warning/10 text-warning-foreground">
@@ -970,7 +1011,7 @@ function ModerationPanel(props: { event: AdminEventRow; isSaving: boolean; error
                 {item}
               </Badge>
             ))}
-            {!blockers.length && !warnings.length ? <span className="text-xs text-muted-foreground">Критичных замечаний нет.</span> : null}
+            {!blockers.length && !warnings.length ? <span className="text-xs text-muted-foreground">Критичных замечаний publish gate нет.</span> : null}
           </div>
           {error ? <div className="mt-2 text-xs text-warning-foreground">Ошибка сохранения: {error}</div> : null}
         </div>

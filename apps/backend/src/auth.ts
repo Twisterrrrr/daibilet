@@ -1,7 +1,5 @@
 import { createHash, timingSafeEqual } from 'node:crypto';
 import type { IncomingMessage } from 'node:http';
-import type { BackendEnv } from './env.js';
-import { resolveAdminEmail, resolveAdminPasswordHash } from './env.js';
 
 export interface AdminAuthConfig {
   email: string;
@@ -11,11 +9,22 @@ export interface AdminAuthConfig {
   requireAuth: boolean;
 }
 
-export function createAdminAuthConfig(env: BackendEnv): AdminAuthConfig {
+type AdminAuthEnv = {
+  NODE_ENV?: string;
+  DAIBILET_REQUIRE_ADMIN_AUTH?: string;
+  ADMIN_EMAIL?: string;
+  ADMIN_USER?: string;
+  ADMIN_PASSWORD?: string;
+  ADMIN_PASSWORD_SHA256?: string;
+  ADMIN_PASSWORD_HASH?: string;
+  ADMIN_AUTH_REALM: string;
+};
+
+export function createAdminAuthConfig(env: AdminAuthEnv): AdminAuthConfig {
   return {
-    email: resolveAdminEmail(env),
+    email: env.ADMIN_EMAIL || env.ADMIN_USER || '',
     password: env.ADMIN_PASSWORD || '',
-    passwordHash: resolveAdminPasswordHash(env),
+    passwordHash: env.ADMIN_PASSWORD_SHA256 || env.ADMIN_PASSWORD_HASH || '',
     realm: env.ADMIN_AUTH_REALM,
     requireAuth: env.NODE_ENV === 'production' || env.DAIBILET_REQUIRE_ADMIN_AUTH === '1',
   };
@@ -72,4 +81,3 @@ export function safeEqualString(actual: string, expected: string): boolean {
   const expectedDigest = createHash('sha256').update(String(expected)).digest();
   return timingSafeEqual(actualDigest, expectedDigest);
 }
-

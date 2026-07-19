@@ -93,6 +93,20 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 0.7.3 | Unit-тест admin-group-readiness + test:ts | Средний | ✅ 2026-07-19 |
 | 0.7.4 | Deploy API (+ admin static) prod | Высокий | ✅ 2026-07-19 bb7fc9c |
 
+### 0.8 Admin audit holes (2026-07-19)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| 0.8.1 | Убрать hard limit 10000 admin catalog | Критический | ✅ уже `eventRows(db, null)` |
+| 0.8.2 | Dashboard needsAttention ≡ Events | Критический | ✅ `admin_event_groups` |
+| 0.8.3 | GET events/:id → event+override | Высокий | ✅ |
+| 0.8.4 | Lean source description (left 4000) | Высокий | ✅ |
+| 0.8.5 | canPublish ← high readinessIssues | Высокий | ✅ |
+| 0.8.6 | Nav stubs / read-only badges / no localhost:5178 | Высокий | ✅ |
+| 0.8.7 | Orders archive: проверить правила (не unarchive) | Средний | ✅ documented (stale cancelled 30d) |
+| 0.8.8 | ECR остаётся скрыт в prod | Средний | ✅ |
+| 0.8.9 | Deploy API + admin static prod | Высокий | 🔄 |
+
 ### 0.6 CPU/RAM mitigation (prod 3.8Gi)
 
 | # | Задача | Приоритет | Статус |

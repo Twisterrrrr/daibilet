@@ -134,6 +134,7 @@ export function BuyersPage() {
         description="Сводка по людям из заказов: контакты, последние покупки, билеты и быстрый переход к заказам."
         meta={
           <>
+            <Badge variant="outline">только чтение</Badge>
             <Badge variant="outline">данные из заказов</Badge>
             <Badge variant="outline">архив отменённых через {archiveAfterDays} дн.</Badge>
           </>

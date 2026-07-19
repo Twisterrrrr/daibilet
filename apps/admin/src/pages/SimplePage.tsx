@@ -107,9 +107,10 @@ function CitiesPage({ title, description }: { title: string; description: string
     <div>
       <PageHeader
         title={title}
-        description={description}
+        description={`${description} Список только для чтения (PATCH городов не реализован).`}
         meta={
           <>
+            <Badge variant="outline">только чтение</Badge>
             <Badge variant="outline">{formatNumber(payload.metrics.cities)} городов</Badge>
             <Badge variant="outline">{formatNumber(payload.metrics.events)} событий</Badge>
             <Badge variant="outline">{formatNumber(payload.metrics.venues)} площадок</Badge>

@@ -3406,6 +3406,8 @@ export async function buildAdminEventDetail(db, eventId) {
     return {
       eventId,
       eventIds: [],
+      event: null,
+      override: null,
       summary: {
         slots: 0,
         offers: 0,
@@ -3424,7 +3426,9 @@ export async function buildAdminEventDetail(db, eventId) {
     };
   }
 
-  const [sessionsResult, offersResult, salesResult, orderStatusResult] = await Promise.all([
+  const primaryEventId = eventIds.includes(eventId) ? eventId : eventIds[0];
+
+  const [sessionsResult, offersResult, salesResult, orderStatusResult, contentResult] = await Promise.all([
     db.query(
       `
         select
@@ -3482,6 +3486,36 @@ export async function buildAdminEventDetail(db, eventId) {
       `,
       [eventIds],
     ),
+    db.query(
+      `
+        select
+          e.id,
+          e.title,
+          e.description,
+          e."imageUrl",
+          e."seoH1",
+          e."seoTitle",
+          e."seoDescription",
+          e."canonicalPath",
+          e."isIndexable",
+          override.title as "overrideTitle",
+          override.description as "overrideDescription",
+          override."shortDescription" as "overrideShortDescription",
+          override."imageUrl" as "overrideImageUrl",
+          override."seoH1" as "overrideSeoH1",
+          override."seoTitle" as "overrideSeoTitle",
+          override."seoDescription" as "overrideSeoDescription",
+          override."canonicalPath" as "overrideCanonicalPath",
+          override."isIndexable" as "overrideIsIndexable",
+          override."editorStatus" as "overrideEditorStatus",
+          override."mergeGroupKey" as "overrideMergeGroupKey"
+        from "Event" e
+        left join "EventOverride" override on override."eventId" = e.id
+        where e.id = $1
+        limit 1
+      `,
+      [primaryEventId],
+    ),
   ]);
 
   const sessions = sessionsResult.rows.map((row) => ({
@@ -3511,10 +3545,41 @@ export async function buildAdminEventDetail(db, eventId) {
     .map((session) => session.priceFrom)
     .concat(offers.map((offer) => offer.priceRub))
     .filter((value) => Number.isFinite(value) && value >= MIN_DISPLAY_PRICE_RUB);
+  const contentRow = contentResult.rows[0] || null;
+  const event = contentRow
+    ? {
+        id: contentRow.id,
+        title: contentRow.title,
+        description: contentRow.description,
+        imageUrl: contentRow.imageUrl,
+        seoH1: contentRow.seoH1,
+        seoTitle: contentRow.seoTitle,
+        seoDescription: contentRow.seoDescription,
+        canonicalPath: contentRow.canonicalPath,
+        isIndexable: contentRow.isIndexable,
+      }
+    : null;
+  const override = contentRow
+    ? {
+        title: contentRow.overrideTitle,
+        description: contentRow.overrideDescription,
+        shortDescription: contentRow.overrideShortDescription,
+        imageUrl: contentRow.overrideImageUrl,
+        seoH1: contentRow.overrideSeoH1,
+        seoTitle: contentRow.overrideSeoTitle,
+        seoDescription: contentRow.overrideSeoDescription,
+        canonicalPath: contentRow.overrideCanonicalPath,
+        isIndexable: contentRow.overrideIsIndexable,
+        editorStatus: contentRow.overrideEditorStatus,
+        mergeGroupKey: contentRow.overrideMergeGroupKey,
+      }
+    : null;
 
   return {
     eventId,
     eventIds,
+    event,
+    override,
     summary: {
       slots: sessions.length,
       offers: offers.length,
@@ -5325,7 +5390,7 @@ async function eventRows(db, limit, options = {}) {
         source.code as "sourceCode",
         source.name as "sourceName",
         e.title,
-        ${lean ? 'null::text as description,' : 'e.description,'}
+        ${lean ? "left(e.description, 4000) as description," : 'e.description,'}
         length(trim(coalesce(e.description, '')))::int as "descriptionLength",
         e.kind,
         e.status,
@@ -5441,7 +5506,7 @@ async function eventRows(db, limit, options = {}) {
     const normalizedRow = { ...row, startsAt: row.nextStartsAt || row.startsAt, priceFrom, purchaseReady: purchase.ready, hasImage: Boolean(row.overrideImageUrl || row.imageUrl) };
     const readinessIssues = buildReadinessIssues(normalizedRow);
     const reasons = readinessIssues.map((issue) => issue.label);
-    const gate = publishGate(normalizedRow, reasons);
+    const gate = publishGate(normalizedRow, reasons, readinessIssues);
     const moderationStatus = row.overrideEditorStatus || row.status || 'REVIEW';
     const offerStatus = purchase.status;
     const severity = readinessSeverity(readinessIssues);
@@ -5571,7 +5636,7 @@ function matchesAdminQuickFilter(event, view) {
   return true;
 }
 
-function publishGate(event, reasons) {
+export function publishGate(event, reasons, readinessIssues = []) {
   const blockers = [];
   const warnings = [];
 
@@ -5580,6 +5645,13 @@ function publishGate(event, reasons) {
   if (!event.startsAt && event.kind !== 'OPEN_DATE') blockers.push('нет даты');
   if (!event.venue) blockers.push('нет площадки');
   if (!event.city) blockers.push('нет города');
+
+  for (const issue of readinessIssues || []) {
+    if (issue?.severity === 'high') {
+      const label = issue.label || issue.code;
+      if (label) blockers.push(label);
+    }
+  }
 
   for (const reason of reasons || []) {
     if (reason.includes('изображ')) warnings.push(reason);

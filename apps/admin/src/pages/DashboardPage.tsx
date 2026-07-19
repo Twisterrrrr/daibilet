@@ -171,7 +171,7 @@ export function DashboardPage() {
               />
             ))}
             <div className="grid grid-cols-2 gap-2 pt-1">
-              <Metric icon={Layers} label="Категорий" value={adminData.importJob.categories} to="/taxonomy" />
+              <Metric icon={Layers} label="Категорий" value={adminData.importJob.categories} to="/events" />
               <Metric icon={MapPin} label="Городов" value={adminData.importJob.cities} to="/cities" />
             </div>
           </div>

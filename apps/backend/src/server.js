@@ -117,7 +117,7 @@ let activeCorsRequest = null;
 function getAllowedOrigins() {
   const raw =
     process.env.PUBLIC_CORS_ORIGINS ||
-    'https://daibilet.ru,https://www.daibilet.ru,http://localhost:5173,http://127.0.0.1:5173';
+    'https://daibilet.ru,https://www.daibilet.ru,https://admin.daibilet.ru,http://localhost:5173,http://127.0.0.1:5173,http://localhost:5176,http://127.0.0.1:5176';
   return raw
     .split(',')
     .map((value) => value.trim())
@@ -130,9 +130,21 @@ function routeNeedsCredentials(request) {
   return pathname.startsWith('/api/auth/') || pathname.startsWith('/api/account/') || pathname.startsWith('/api/user/auth/');
 }
 
+function isCorsProtectedPath(pathname) {
+  return (
+    pathname.startsWith('/api/admin') ||
+    pathname.startsWith('/api/v1/tc') ||
+    pathname.startsWith('/api/v1/tep') ||
+    pathname === '/api/db/stats' ||
+    pathname === '/api/db/events'
+  );
+}
+
 function buildCorsHeaders(request, { credentials = false } = {}) {
   const origin = String(request?.headers?.origin || '').trim();
   const allowed = getAllowedOrigins();
+  const pathname = request?.url ? new URL(request.url, 'http://127.0.0.1').pathname : '';
+  const protectedPath = isCorsProtectedPath(pathname);
   const base = {
     'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
     'access-control-allow-headers': 'content-type, authorization',
@@ -151,6 +163,14 @@ function buildCorsHeaders(request, { credentials = false } = {}) {
     return {
       ...base,
       'access-control-allow-origin': origin,
+      vary: 'Origin',
+    };
+  }
+
+  // Never reflect * for admin/sync/db: cross-origin callers must be allowlisted.
+  if (protectedPath) {
+    return {
+      ...base,
       vary: 'Origin',
     };
   }

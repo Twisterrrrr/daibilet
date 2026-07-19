@@ -8,7 +8,6 @@ import { EventChangeRequestsPage } from '@/pages/EventChangeRequestsPage';
 import { EventsPage } from '@/pages/EventsPage';
 import { ExternalOrdersPage } from '@/pages/ExternalOrdersPage';
 import { LandingsPage } from '@/pages/LandingsPage';
-import { MappingInboxPage } from '@/pages/MappingInboxPage';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { SimplePage } from '@/pages/SimplePage';
 import { SourcesPage } from '@/pages/SourcesPage';
@@ -30,10 +29,10 @@ export function App() {
         <Route path="landings" element={<LandingsPage />} />
         <Route path="articles" element={<ArticlesPage />} />
         <Route path="sources" element={<SourcesPage />} />
-        <Route path="mapping-inbox" element={<MappingInboxPage />} />
+        <Route path="mapping-inbox" element={<Navigate to="/" replace />} />
         <Route path="sync-health" element={<SourcesPage />} />
-        <Route path="taxonomy" element={<MappingInboxPage />} />
-        <Route path="audit-log" element={<SimplePage title="Журнал изменений" description="Позже здесь появится журнал ручных правок." kind="audit" />} />
+        <Route path="taxonomy" element={<Navigate to="/events" replace />} />
+        <Route path="audit-log" element={<Navigate to="/" replace />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
