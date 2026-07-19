@@ -16,7 +16,7 @@
 
 ### Проблемы
 
-- Proof: толстый `/cities/moskva` — FAQPage в HTML; thin `/cities/abakan` — `noindex, follow`.
+- **Proof prod** (deploy `9af7b45`): `/cities/moskva` — `index, follow` + SSR `FAQPage`/`BreadcrumbList` + UI FAQ; `/cities/abakan` — `noindex, follow`, без FAQPage/FAQ UI; СПб indexable.
 - Очередь пунктов 1–5 закрыта.
 
 ---
