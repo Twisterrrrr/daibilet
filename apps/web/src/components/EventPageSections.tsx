@@ -1,6 +1,7 @@
 import type { PublicEventDto } from '@daibilet/contracts/public';
 
 import { formatEventDescriptionHtml } from '@/lib/event-description-format';
+import { uniqueEventTagLabels } from '@/lib/event-tag-labels';
 
 export function EventDescription({ event }: { event: PublicEventDto }) {
   const description = String(event.description || '').trim();
@@ -42,7 +43,8 @@ export function EventQuickInfo({ event }: { event: PublicEventDto }) {
 export function EventTags({ event }: { event: PublicEventDto }) {
   const rawTags = Array.isArray(event.tags) ? event.tags : [];
   const rawSubcategories = Array.isArray(event.subcategories) ? event.subcategories : [];
-  const tags = [...rawTags, ...rawSubcategories].filter(Boolean).slice(0, 12);
+  // API often mirrors genre labels into both tags and subcategories — merge without dupes.
+  const tags = uniqueEventTagLabels([...rawTags, ...rawSubcategories], 12);
   if (!tags.length) return null;
 
   return (
@@ -50,7 +52,7 @@ export function EventTags({ event }: { event: PublicEventDto }) {
       <h2 className="text-lg font-bold text-slate-900">Теги</h2>
       <div className="mt-3 flex flex-wrap gap-2">
         {tags.map((tag) => (
-          <span key={tag} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">
+          <span key={tag.toLocaleLowerCase('ru')} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">
             {tag}
           </span>
         ))}

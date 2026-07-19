@@ -1,3 +1,23 @@
+## 2026-07-19 — Event page: дубли чипов в «Теги»
+
+### Наблюдения
+
+- На event page секция «Теги» показывала `Рок, Шоу - программа, Рок, Шоу - программа` (пример: `tc-6969ae12140cc49e8ef266e3-neveroyatnyi-koncert-gruppy-kino`).
+- `/api/public/events/{slug}` отдаёт одинаковые labels и в `event.tags`, и в `event.subcategories` (backend `pickCatalogSubcategories` берёт labels из tags, когда subcategory-слоя нет или он совпадает).
+- UI `EventTags` делал `[...tags, ...subcategories]` без dedupe → визуальные дубли; React `key={tag}` тоже конфликтовал.
+
+### Решения
+
+- `uniqueEventTagLabels`: unique по `trim` + `toLocaleLowerCase('ru')`, порядок первого вхождения, limit 12.
+- `EventTags` мержит оба массива через этот хелпер.
+- Unit-тест на кейс Рок / Шоу - программа.
+
+### Проблемы
+
+- Deploy Next (web-only); API менять не требуется — payload корректен, баг на merge в UI.
+
+---
+
 ## 2026-07-19 — Prod crash: cleanDisplayText is not defined
 
 ### Наблюдения

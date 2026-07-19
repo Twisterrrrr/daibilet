@@ -14,6 +14,7 @@
 | E.1 | Description: списки `✅` / `•` / `-` → `<ul><li>` + sanitize | Высокий | ✅ 2026-07-19 @38e8d12 prod proof seks-v-sssr |
 | E.2 | Unit-тесты обоих кейсов (checkmark + организационные детали) | Высокий | ✅ |
 | E.3 | Prod: `ReferenceError: cleanDisplayText is not defined` (re-export без local import в `event-page-utils`) | Критический | ✅ 7cdd4cf + rebuild 38e8d12 |
+| E.4 | Теги на event page: dedupe chips (tags∪subcategories) по нормализованному label | Высокий | 🔄 fix ready → commit+deploy |
 
 ---
 
