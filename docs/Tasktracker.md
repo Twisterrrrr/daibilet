@@ -32,7 +32,7 @@
 | P.2f | Реализация wireframe v1 в `apps/web` (`CityPageView`) | Высокий | ✅ `d877813` prod |
 | P.2g | **Wireframe city hub v2** — IA фазы 2 (city-specific направления, конфиг) | Высокий | ✅ [city-hub-wireframe-v2.md](./city-hub-wireframe-v2.md) |
 | P.2h | Реализация wireframe v2 в `apps/web` (плитки направлений, top-N venues, sights CTA) | Высокий | ⏳ после P.2g / внахлёст с P.2f |
-| P.2i | **Editorial hub template** (Lovable moodboard) — параллельный visual `?hub=editorial` | Средний | 🔄 experiment |
+| P.2i | **Editorial hub template** (Lovable moodboard) — параллельный visual `?hub=editorial` | Средний | ✅ `6efe0d8` prod |
 | P.3 | **Finance contour / ЛК поставщиков** — базовый контур | Высокий | ⏳ |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
 | P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |

@@ -14,7 +14,9 @@
 
 ### Проблемы
 
-- Deploy + proof URL СПб с/без `?hub=editorial` — после push.
+- Deploy prod `@6efe0d8` OK. Proof:
+  - Default: https://daibilet.ru/cities/sankt-peterburg — dark hero (`border-primary-950`), нет `font-serif` / `bg-zinc-50`.
+  - Editorial: https://daibilet.ru/cities/sankt-peterburg?hub=editorial — `font-serif` H1, `bg-zinc-50`, poster `aspect-[4/5]`, тот же `#affiche` IA.
 
 ---
 
