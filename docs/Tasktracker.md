@@ -207,12 +207,12 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| 2.1.1 | `apps/web/app/robots.ts` | Высокий | ⏳ |
-| 2.1.2 | `app/sitemap.ts` — index | Высокий | ⏳ |
-| 2.1.3 | Sitemap chunk: `/events/*` (indexable only) | Высокий | ⏳ |
-| 2.1.4 | Sitemap chunk: `/cities/*` | Высокий | ⏳ |
-| 2.1.5 | Sitemap chunk: `/venues/*`, landings | Средний | ⏳ |
-| 2.1.6 | Smoke: `/robots.txt`, `/sitemap.xml` 200 | Средний | ⏳ |
+| 2.1.1 | `apps/web/app/robots.ts` | Высокий | ✅ 2026-07-19 |
+| 2.1.2 | `app/sitemap.xml` — index → chunks | Высокий | ✅ 2026-07-19 |
+| 2.1.3 | Sitemap chunk: `/events/*` (catalog public) | Высокий | ✅ 2026-07-19 |
+| 2.1.4 | Sitemap chunk: `/cities/*` | Высокий | ✅ 2026-07-19 |
+| 2.1.5 | Sitemap chunk: `/venues/*`, landings, blog | Средний | ✅ 2026-07-19 |
+| 2.1.6 | Smoke: `/robots.txt`, `/sitemap.xml` + chunk 200 | Средний | ✅ 2026-07-19 |
 
 ### 2.2 SSR JSON-LD (пересечение с Этап 1)
 

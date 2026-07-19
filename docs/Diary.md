@@ -1,3 +1,26 @@
+## 2026-07-19 — Sitemap index + chunks / robots (пункт 4)
+
+### Наблюдения
+
+- Prod отдавал один плоский `urlset` на `/sitemap.xml` (static + cities + events≤2000 + venues≤1000) — риск упирания в лимит одной простыни при росте каталога.
+- `robots.txt` уже Allow `/` + Sitemap на `/sitemap.xml`; scrapers `liliabots` Disallow; Googlebot/Yandex не блокировались.
+- Native Next `generateSitemaps` нестабилен для корневого index → кастомные route handlers.
+
+### Решения
+
+- Удалён монолитный `app/sitemap.ts`.
+- Index: `app/sitemap.xml/route.ts` → `sitemapindex` со ссылками на chunks.
+- Chunks: `app/sitemaps/[chunk]/route.ts` + `lib/sitemap-data.ts` — `static`, `events`, `cities`, `venues`, `landings`, `blog`.
+- Events из public catalog (`hydrateSlots: false`); venues `isIndexable !== false`; blog из `buildPublicArticlesListDto` (уже indexable); landings из canonical category/city paths.
+- `robots.ts`: Allow `*` / Googlebot / Yandex; Sitemap → `https://daibilet.ru/sitemap.xml` (index).
+
+### Проблемы
+
+- City FAQ (пункт 5) не начинали.
+- Proof: curl 200 на `/robots.txt`, `/sitemap.xml` (index), `/sitemaps/events.xml` (и прочие chunks).
+
+---
+
 ## 2026-07-19 — SSR JSON-LD Event + BreadcrumbList
 
 ### Наблюдения
@@ -13,7 +36,7 @@
 
 ### Проблемы
 
-- Sitemap (пункт 4 / 2.1.x) не трогали в этом шаге.
+- Sitemap (пункт 4 / 2.1.x) закрыт отдельной записью выше.
 - City FAQ/BreadcrumbList SSR (1.3.x / 2.2.3) — следующий этап.
 - **Proof prod:** `https://daibilet.ru/events/retro-locman-ot-zaryadya-1294` — в HTML source: `Event` (+ `Offer`), `BreadcrumbList`, плюс root `WebSite`/`Organization`. Deploy `d8bf381`.
 

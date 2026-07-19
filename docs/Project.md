@@ -101,6 +101,7 @@ Cherry-pick из **`codex/phase2-foundation`**: schema, event change requests, a
 - **Prisma 7** — schema/migrations; runtime read через dto port
 - **Консистентность:** parity scripts; константы каталога в `@daibilet/contracts`
 - **SEO:** title template `%s | Дайбилет` без дублей; `og:url` route-specific (`seo-meta.ts`)
+- **Sitemap:** `/sitemap.xml` — index; chunks `/sitemaps/{static,events,cities,venues,landings,blog}.xml` (`lib/sitemap-data.ts`); `robots.txt` → index, Allow `/` для `*` / Googlebot / Yandex
 - **Веб-аналитика:** Яндекс.Метрика только в `apps/web` (`YandexMetrika` + `next/script`, ID `NEXT_PUBLIC_YANDEX_METRIKA_ID` / default `106786540`); admin не подключаем
 - **Метрики событий:** единый источник — public grouped catalog (`groupKey`), не raw imported rows
 

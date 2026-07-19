@@ -15,7 +15,7 @@
 |------|--------|----------|-----------------|
 | **0** | Post-cutover hardening: smoke, widgets, admin, backfill | **~90%** 🔄 | Browser widget smoke + SQL catalog read-model (0.5.8) |
 | **1** | Public parity: поиск, breadcrumbs, city FAQ/SEO | **~70%** 🔄 | event/city structured data |
-| **2** | SEO foundation: sitemap + SSR JSON-LD | **~40%** 🔄 | title/og:url fixed; sitemap есть |
+| **2** | SEO foundation: sitemap + SSR JSON-LD | **~70%** 🔄 | sitemap index+chunks ✅; JSON-LD event ✅; city FAQ ⏳ |
 | **3+** | Admin Next, dto retire, Phase G finance | ⏳ | После 0–2 |
 
 **Легенда статусов:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
@@ -123,9 +123,9 @@ npm run check:widgets -- --base https://daibilet.ru
 
 | Задача | Статус | Примечание |
 |--------|--------|------------|
-| `app/robots.ts` | ⏳ | |
-| `app/sitemap.ts` index | ⏳ | |
-| sitemap events / cities / venues | ⏳ | chunked, только indexable |
+| `app/robots.ts` | ✅ | Allow `/`, Sitemap → index; Googlebot/Yandex allow |
+| `app/sitemap.xml` index | ✅ | → `/sitemaps/{static,events,cities,venues,landings,blog}.xml` |
+| sitemap events / cities / venues / landings / blog | ✅ | chunked urlsets |
 | SSR JSON-LD event page | ✅ | `<script type="application/ld+json">` в RSC |
 | SSR JSON-LD city page | ⏳ | FAQ + breadcrumbs |
 | canonical / www policy audit | ⏳ | nginx + metadata cross-check |
