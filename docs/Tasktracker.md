@@ -29,7 +29,7 @@
 | G.2 | Челны → Республика Татарстан под карточкой Казани | Критический | ✅ |
 | G.3 | Expand standaloneCities адмцентрами с saleable | Высокий | ✅ |
 | G.4 | Expand cityToRegion для не-адмцентров (Тольятти, Сортавала, …) | Высокий | ✅ |
-| G.5 | Docs + prod deploy geo | Критический | 🔄 |
+| G.5 | Docs + prod deploy geo | Критический | ✅ `6f0fcf7` prod |
 
 См. [Project.md](./Project.md) § allowlist, [geo-excluded-cities.md](./geo-excluded-cities.md), Diary 2026-07-19.
 
