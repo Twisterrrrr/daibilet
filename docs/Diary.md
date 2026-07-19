@@ -15,7 +15,7 @@
 
 ### Проблемы
 
-- Нет (smoke после deploy: `/cities/sankt-peterburg` или `/cities/saint-petersburg`).
+- Deploy prod `@d877813` OK. Proof: `/cities/sankt-peterburg` — порядок `affiche → directions → venues → travel → sights → faq → seo`, sticky nav, чипы Сегодня/Выходные, один FAQ H2.
 
 ---
 

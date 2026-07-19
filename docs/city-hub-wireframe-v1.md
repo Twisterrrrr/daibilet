@@ -214,7 +214,7 @@ flowchart TB
 - [x] Счётчики компактные; hero без clutter
 - [x] Locative + SEO «на сегодня» без регрессии
 - [x] Светлая сетка; нет purple AI look; cards только у interactive (event cards, filters)
-- [ ] Smoke: ≥2 slug (напр. `murmansk`, `moscow`) — View Source + scrollspy + фильтры (после deploy)
+- [x] Smoke: ≥2 slug (напр. `murmansk`, `moscow`) — View Source + scrollspy + фильтры (после deploy)
 - [x] Внешние ссылки блога на `#city-schedule` по-прежнему скроллят к афише
 
 ---
