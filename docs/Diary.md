@@ -17,6 +17,7 @@
 
 - In-memory `PUBLIC_EVENT_CACHE_MS` (5 мин) — после deploy API нужен restart (или дождаться TTL).
 - Proof: slug выше — `timeLabel=18:00`, `timeZone=Asia/Yekaterinburg`, hero «Ближайший: … 18:00».
+- **Proof prod @9f1f744:** API + HTML — `Asia/Yekaterinburg` / `18:00` (было MSK `16:00`); JSON-LD `startDate` остаётся `2026-08-02T13:00:00.000Z`.
 
 ---
 
