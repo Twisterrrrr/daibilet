@@ -17,7 +17,7 @@
 | B.4 | Commit → deploy-prod-next → `blog:upsert` ×4+hide | Критический | ✅ |
 | B.5 | Пакет 10 редакционных статей (verbatim + buy + upsert) | Критический | ✅ |
 | B.6 | Вернуть `spb-razvod-mostov-kakoi-reis` PUBLISHED, снять 301 | Высокий | ✅ |
-| B.7 | Multi-event: убрать `[buy]`, только `/events` ссылки; цены/meta по prod; Cyrillic READY slug | Критический | 🔄 |
+| B.7 | Multi-event: убрать `[buy]`, только `/events` ссылки; цены/meta по prod; Cyrillic READY slug | Критический | ✅ |
 
 ---
 
@@ -105,7 +105,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 0.8.6 | Nav stubs / read-only badges / no localhost:5178 | Высокий | ✅ |
 | 0.8.7 | Orders archive: проверить правила (не unarchive) | Средний | ✅ documented (stale cancelled 30d) |
 | 0.8.8 | ECR остаётся скрыт в prod | Средний | ✅ |
-| 0.8.9 | Deploy API + admin static prod | Высокий | 🔄 |
+| 0.8.9 | Deploy API + admin static prod | Высокий | ✅ 2026-07-19 `7882d6d` |
 
 ### 0.6 CPU/RAM mitigation (prod 3.8Gi)
 
