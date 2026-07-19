@@ -1,7 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { Calendar as CalendarIcon, Users, Wallet, X } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { Calendar as CalendarIcon, SlidersHorizontal, Users, Wallet, X } from 'lucide-react';
 
 import { formatNumber } from '@/lib/format';
 
@@ -24,11 +25,14 @@ export const AGE_FILTER_OPTIONS = [
   { value: 18, label: '18+' },
 ] as const;
 
+const FOCUSABLE =
+  'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 const inputCls =
-  'h-9 w-full min-w-0 rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-900 outline-none transition hover:border-slate-300 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30';
+  'h-11 w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 text-base text-slate-900 outline-none transition hover:border-slate-300 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30 sm:h-10 sm:text-sm';
 const chipCls =
-  'inline-btn rounded-full border px-2.5 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50';
-const labelCls = 'mb-1.5 flex items-center gap-1 text-xs font-medium text-slate-600';
+  'inline-btn min-h-10 rounded-full border px-3.5 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:min-h-0 sm:px-2.5 sm:py-1 sm:text-xs';
+const labelCls = 'mb-2 flex items-center gap-1.5 text-sm font-medium text-slate-600 sm:mb-1.5 sm:text-xs';
 
 function filterChip(active: boolean) {
   return active
@@ -36,244 +40,336 @@ function filterChip(active: boolean) {
     : `${chipCls} border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50`;
 }
 
+function emptyFilters(): AdvancedCatalogFilters {
+  return {
+    dateFrom: '',
+    dateTo: '',
+    minPrice: 'all',
+    maxPrice: 'all',
+    ageMax: -1,
+    landing: 'all',
+  };
+}
+
 export function CatalogAdvancedFiltersPanel({
+  open,
   filters,
   landings,
-  onChange,
+  onApply,
   onClose,
   onReset,
 }: {
+  open: boolean;
   filters: AdvancedCatalogFilters;
   landings: LandingFacet[];
-  onChange: (patch: Partial<AdvancedCatalogFilters>) => void;
+  onApply: (next: AdvancedCatalogFilters) => void;
   onClose: () => void;
   onReset: () => void;
 }) {
+  const [mounted, setMounted] = React.useState(false);
+  const [draft, setDraft] = React.useState(filters);
   const [minDraft, setMinDraft] = React.useState(filters.minPrice === 'all' ? '' : filters.minPrice);
   const [maxDraft, setMaxDraft] = React.useState(filters.maxPrice === 'all' ? '' : filters.maxPrice);
-  const closeBtnRef = React.useRef<HTMLButtonElement>(null);
-  const firstPriceSync = React.useRef(true);
+  const dialogRef = React.useRef<HTMLDivElement>(null);
+  const titleId = React.useId();
 
   React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  React.useEffect(() => {
+    if (!open) return;
+    setDraft(filters);
     setMinDraft(filters.minPrice === 'all' ? '' : filters.minPrice);
     setMaxDraft(filters.maxPrice === 'all' ? '' : filters.maxPrice);
-  }, [filters.minPrice, filters.maxPrice]);
+  }, [open, filters]);
 
   React.useEffect(() => {
-    if (firstPriceSync.current) {
-      firstPriceSync.current = false;
-      return;
-    }
-    const timer = window.setTimeout(() => {
-      onChange({
-        minPrice: minDraft.trim() ? minDraft.trim() : 'all',
-        maxPrice: maxDraft.trim() ? maxDraft.trim() : 'all',
-      });
-    }, 350);
-    return () => window.clearTimeout(timer);
-  }, [maxDraft, minDraft, onChange]);
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
 
   React.useEffect(() => {
-    closeBtnRef.current?.focus();
-    const onKey = (event: KeyboardEvent) => {
+    if (!open) return;
+    const root = dialogRef.current;
+    if (!root) return;
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const focusable = () =>
+      Array.from(root.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+        (el) => !el.hasAttribute('disabled') && el.getAttribute('aria-hidden') !== 'true',
+      );
+
+    const frame = window.requestAnimationFrame(() => {
+      const nodes = focusable();
+      (nodes.find((el) => el.tagName === 'INPUT') ?? nodes[0])?.focus();
+    });
+
+    const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
         onClose();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+      const nodes = focusable();
+      if (!nodes.length) return;
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      document.removeEventListener('keydown', onKeyDown);
+      previouslyFocused?.focus?.();
+    };
+  }, [open, onClose]);
+
+  const patchDraft = (patch: Partial<AdvancedCatalogFilters>) => {
+    setDraft((prev) => ({ ...prev, ...patch }));
+  };
 
   const setDateRange = (from: string, to: string) => {
-    onChange({ dateFrom: from, dateTo: to });
+    patchDraft({ dateFrom: from, dateTo: to });
   };
 
   const isoDay = (date: Date) => date.toISOString().slice(0, 10);
 
-  return (
-    <div
-      id="advanced-filters-panel"
-      role="region"
-      aria-label="Расширенные фильтры"
-      className="catalog-advanced-filters relative rounded-xl border border-slate-200 bg-white p-3 sm:p-4"
-    >
+  const apply = () => {
+    onApply({
+      ...draft,
+      minPrice: minDraft.trim() ? minDraft.trim() : 'all',
+      maxPrice: maxDraft.trim() ? maxDraft.trim() : 'all',
+    });
+  };
+
+  const resetDraft = () => {
+    const cleared = emptyFilters();
+    setDraft(cleared);
+    setMinDraft('');
+    setMaxDraft('');
+    onReset();
+  };
+
+  if (!mounted || !open) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-start sm:px-4 sm:pt-16 md:pt-24">
       <button
-        ref={closeBtnRef}
         type="button"
+        aria-label="Закрыть фильтры"
+        className="absolute inset-0 bg-slate-900/55 backdrop-blur-[2px]"
         onClick={onClose}
-        className="inline-btn absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-        aria-label="Закрыть панель фильтров"
+      />
+      <div
+        ref={dialogRef}
+        id="advanced-filters-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="relative flex max-h-[min(92vh,44rem)] w-full flex-col overflow-hidden rounded-t-2xl border border-slate-200 bg-white shadow-2xl sm:max-h-[min(85vh,40rem)] sm:max-w-2xl sm:rounded-2xl"
       >
-        <X aria-hidden className="h-3.5 w-3.5" />
-      </button>
+        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 sm:px-5">
+          <div className="flex min-w-0 items-center gap-2">
+            <SlidersHorizontal aria-hidden className="h-4 w-4 shrink-0 text-slate-500" />
+            <h2 id={titleId} className="truncate text-base font-semibold text-slate-900">
+              Фильтры
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-btn grid h-10 w-10 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            aria-label="Закрыть"
+          >
+            <X aria-hidden className="h-5 w-5" />
+          </button>
+        </div>
 
-      <div className="grid gap-4 pr-8 lg:grid-cols-3 lg:gap-5">
-        <section>
-          <div className={labelCls}>
-            <CalendarIcon aria-hidden className="h-3.5 w-3.5 text-slate-400" />
-            Дата
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              type="date"
-              value={filters.dateFrom}
-              aria-label="Дата с"
-              onChange={(event) => onChange({ dateFrom: event.target.value })}
-              className={inputCls}
-            />
-            <input
-              type="date"
-              value={filters.dateTo}
-              min={filters.dateFrom || undefined}
-              aria-label="Дата по"
-              onChange={(event) => onChange({ dateTo: event.target.value })}
-              className={inputCls}
-            />
-          </div>
-          <div className="mt-2 flex flex-wrap gap-1">
-            {[
-              { label: 'Сегодня', days: 0 },
-              { label: 'Завтра', days: 1 },
-              { label: 'Неделя', days: 7 },
-              { label: 'Месяц', days: 30 },
-            ].map((item) => (
-              <button
-                key={item.label}
-                type="button"
-                onClick={() => {
-                  const today = new Date();
-                  const to = new Date(today);
-                  to.setDate(today.getDate() + item.days);
-                  setDateRange(isoDay(today), isoDay(to));
-                }}
-                className={filterChip(false)}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section>
-          <div className={labelCls}>
-            <Wallet aria-hidden className="h-3.5 w-3.5 text-slate-400" />
-            Цена, ₽
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              type="number"
-              min={0}
-              step={100}
-              value={minDraft}
-              placeholder="от"
-              aria-label="Цена от, руб."
-              onChange={(event) => setMinDraft(event.target.value)}
-              className={inputCls}
-            />
-            <input
-              type="number"
-              min={0}
-              step={100}
-              value={maxDraft}
-              placeholder="до"
-              aria-label="Цена до, руб."
-              onChange={(event) => setMaxDraft(event.target.value)}
-              className={inputCls}
-            />
-          </div>
-          <div className="mt-2 flex flex-wrap gap-1">
-            {[
-              { label: 'Бесплатно', min: '0', max: '0' },
-              { label: 'до 1000', min: '', max: '1000' },
-              { label: '1–3К', min: '1000', max: '3000' },
-              { label: '3К+', min: '3000', max: '' },
-            ].map((item) => (
-              <button
-                key={item.label}
-                type="button"
-                onClick={() => {
-                  setMinDraft(item.min);
-                  setMaxDraft(item.max);
-                }}
-                className={filterChip(false)}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        <section className="space-y-3">
-          <div>
-            <div className={labelCls}>
-              <Users aria-hidden className="h-3.5 w-3.5 text-slate-400" />
-              Возраст
-            </div>
-            <div className="flex flex-wrap gap-1" role="radiogroup" aria-label="Возрастное ограничение">
-              <button
-                type="button"
-                role="radio"
-                aria-checked={filters.ageMax < 0}
-                onClick={() => onChange({ ageMax: -1 })}
-                className={filterChip(filters.ageMax < 0)}
-              >
-                Любой
-              </button>
-              {AGE_FILTER_OPTIONS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  role="radio"
-                  aria-checked={filters.ageMax === option.value}
-                  onClick={() => onChange({ ageMax: option.value })}
-                  className={filterChip(filters.ageMax === option.value)}
-                >
-                  до {option.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {landings.length ? (
-            <div>
-              <label htmlFor="catalog-advanced-landing" className={labelCls}>
-                Подборка
-              </label>
-              <select
-                id="catalog-advanced-landing"
-                value={filters.landing}
-                onChange={(event) => onChange({ landing: event.target.value })}
-                className={inputCls}
-              >
-                <option value="all">Все подборки</option>
-                {landings.map((item) => (
-                  <option key={item.slug} value={item.slug}>
-                    {item.title} · {formatNumber(item.events)}
-                  </option>
+        <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5 sm:py-5">
+          <div className="grid gap-5 sm:gap-6">
+            <section>
+              <div className={labelCls}>
+                <CalendarIcon aria-hidden className="h-3.5 w-3.5 text-slate-400" />
+                Дата
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="date"
+                  value={draft.dateFrom}
+                  aria-label="Дата с"
+                  onChange={(event) => patchDraft({ dateFrom: event.target.value })}
+                  className={inputCls}
+                />
+                <input
+                  type="date"
+                  value={draft.dateTo}
+                  min={draft.dateFrom || undefined}
+                  aria-label="Дата по"
+                  onChange={(event) => patchDraft({ dateTo: event.target.value })}
+                  className={inputCls}
+                />
+              </div>
+              <div className="mt-2.5 flex flex-wrap gap-1.5">
+                {[
+                  { label: 'Сегодня', days: 0 },
+                  { label: 'Завтра', days: 1 },
+                  { label: 'Неделя', days: 7 },
+                  { label: 'Месяц', days: 30 },
+                ].map((item) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => {
+                      const today = new Date();
+                      const to = new Date(today);
+                      to.setDate(today.getDate() + item.days);
+                      setDateRange(isoDay(today), isoDay(to));
+                    }}
+                    className={filterChip(false)}
+                  >
+                    {item.label}
+                  </button>
                 ))}
-              </select>
-            </div>
-          ) : null}
-        </section>
-      </div>
+              </div>
+            </section>
 
-      <div className="mt-3 flex items-center justify-between gap-2 border-t border-slate-100 pt-3">
-        <button
-          type="button"
-          onClick={onReset}
-          className="inline-btn text-xs font-medium text-slate-500 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-        >
-          Сбросить
-        </button>
-        <button
-          type="button"
-          onClick={onClose}
-          className="inline-btn rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-        >
-          Готово
-        </button>
+            <section>
+              <div className={labelCls}>
+                <Wallet aria-hidden className="h-3.5 w-3.5 text-slate-400" />
+                Цена, ₽
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="number"
+                  min={0}
+                  step={100}
+                  inputMode="numeric"
+                  value={minDraft}
+                  placeholder="от"
+                  aria-label="Цена от, руб."
+                  onChange={(event) => setMinDraft(event.target.value)}
+                  className={inputCls}
+                />
+                <input
+                  type="number"
+                  min={0}
+                  step={100}
+                  inputMode="numeric"
+                  value={maxDraft}
+                  placeholder="до"
+                  aria-label="Цена до, руб."
+                  onChange={(event) => setMaxDraft(event.target.value)}
+                  className={inputCls}
+                />
+              </div>
+              <div className="mt-2.5 flex flex-wrap gap-1.5">
+                {[
+                  { label: 'Бесплатно', min: '0', max: '0' },
+                  { label: 'до 1000', min: '', max: '1000' },
+                  { label: '1–3К', min: '1000', max: '3000' },
+                  { label: '3К+', min: '3000', max: '' },
+                ].map((item) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => {
+                      setMinDraft(item.min);
+                      setMaxDraft(item.max);
+                    }}
+                    className={filterChip(false)}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            <section className="space-y-4">
+              <div>
+                <div className={labelCls}>
+                  <Users aria-hidden className="h-3.5 w-3.5 text-slate-400" />
+                  Возраст
+                </div>
+                <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label="Возрастное ограничение">
+                  <button
+                    type="button"
+                    role="radio"
+                    aria-checked={draft.ageMax < 0}
+                    onClick={() => patchDraft({ ageMax: -1 })}
+                    className={filterChip(draft.ageMax < 0)}
+                  >
+                    Любой
+                  </button>
+                  {AGE_FILTER_OPTIONS.map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      role="radio"
+                      aria-checked={draft.ageMax === option.value}
+                      onClick={() => patchDraft({ ageMax: option.value })}
+                      className={filterChip(draft.ageMax === option.value)}
+                    >
+                      до {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {landings.length ? (
+                <div>
+                  <label htmlFor="catalog-advanced-landing" className={labelCls}>
+                    Подборка
+                  </label>
+                  <select
+                    id="catalog-advanced-landing"
+                    value={draft.landing}
+                    onChange={(event) => patchDraft({ landing: event.target.value })}
+                    className={inputCls}
+                  >
+                    <option value="all">Все подборки</option>
+                    {landings.map((item) => (
+                      <option key={item.slug} value={item.slug}>
+                        {item.title} · {formatNumber(item.events)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : null}
+            </section>
+          </div>
+        </div>
+
+        <div className="flex shrink-0 items-center gap-2 border-t border-slate-100 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-5">
+          <button
+            type="button"
+            onClick={resetDraft}
+            className="inline-btn h-11 min-w-[6.5rem] rounded-xl px-4 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:h-10"
+          >
+            Сбросить
+          </button>
+          <button
+            type="button"
+            onClick={apply}
+            className="inline-btn btn-primary h-11 flex-1 rounded-xl px-4 text-sm font-semibold sm:h-10"
+          >
+            Применить
+          </button>
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

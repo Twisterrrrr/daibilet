@@ -35,7 +35,7 @@ type CatalogToolbarProps = {
 export function CatalogToolbar({ facets, values, viewMode, onViewModeChange, disabled = false }: CatalogToolbarProps) {
   const router = useRouter();
   const filters = useMemo(() => catalogFiltersFromQuery(values), [values]);
-  const [filtersOpen, setFiltersOpen] = useState(countAdvancedFilters(filters) > 0);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [qDraft, setQDraft] = useState(filters.q || '');
   const advancedCount = countAdvancedFilters(filters);
 
@@ -170,8 +170,9 @@ export function CatalogToolbar({ facets, values, viewMode, onViewModeChange, dis
 
             <button
               type="button"
-              onClick={() => setFiltersOpen((open) => !open)}
+              onClick={() => setFiltersOpen(true)}
               aria-expanded={filtersOpen}
+              aria-haspopup="dialog"
               aria-controls="advanced-filters-panel"
               className={`relative inline-btn inline-flex h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 ${
                 filtersOpen || advancedCount > 0
@@ -182,7 +183,10 @@ export function CatalogToolbar({ facets, values, viewMode, onViewModeChange, dis
               <SlidersHorizontal aria-hidden className="h-4 w-4" />
               <span className="hidden sm:inline">Фильтры</span>
               {advancedCount > 0 ? (
-                <span aria-hidden className="grid min-w-5 place-items-center rounded-full bg-white/25 px-1.5 text-xs">
+                <span
+                  className="grid min-w-5 place-items-center rounded-full bg-white/25 px-1.5 text-xs"
+                  aria-label={`Активных фильтров: ${advancedCount}`}
+                >
                   {advancedCount}
                 </span>
               ) : null}
@@ -201,47 +205,44 @@ export function CatalogToolbar({ facets, values, viewMode, onViewModeChange, dis
         </div>
       </form>
 
-      {filtersOpen ? (
-        <CatalogAdvancedFiltersPanel
-          filters={{
-            dateFrom: filters.from || '',
-            dateTo: filters.to || '',
-            minPrice: filters.minPrice != null ? String(filters.minPrice) : 'all',
-            maxPrice: filters.maxPrice != null ? String(filters.maxPrice) : 'all',
-            ageMax: filters.ageMax != null && filters.ageMax >= 0 ? filters.ageMax : -1,
-            landing: filters.landing || 'all',
-          }}
-          landings={facets.landings}
-          onChange={(patch) => {
-            navigate({
-              ...filters,
-              from: patch.dateFrom !== undefined ? patch.dateFrom || undefined : filters.from,
-              to: patch.dateTo !== undefined ? patch.dateTo || undefined : filters.to,
-              minPrice:
-                patch.minPrice !== undefined
-                  ? patch.minPrice === 'all'
-                    ? undefined
-                    : Number(patch.minPrice)
-                  : filters.minPrice,
-              maxPrice:
-                patch.maxPrice !== undefined
-                  ? patch.maxPrice === 'all'
-                    ? undefined
-                    : Number(patch.maxPrice)
-                  : filters.maxPrice,
-              ageMax: patch.ageMax !== undefined ? (patch.ageMax >= 0 ? patch.ageMax : undefined) : filters.ageMax,
-              landing:
-                patch.landing !== undefined
-                  ? patch.landing === 'all'
-                    ? undefined
-                    : patch.landing
-                  : filters.landing,
-            });
-          }}
-          onClose={() => setFiltersOpen(false)}
-          onReset={() => navigate({ sort: filters.sort, limit: filters.limit })}
-        />
-      ) : null}
+      <CatalogAdvancedFiltersPanel
+        open={filtersOpen}
+        filters={{
+          dateFrom: filters.from || '',
+          dateTo: filters.to || '',
+          minPrice: filters.minPrice != null ? String(filters.minPrice) : 'all',
+          maxPrice: filters.maxPrice != null ? String(filters.maxPrice) : 'all',
+          ageMax: filters.ageMax != null && filters.ageMax >= 0 ? filters.ageMax : -1,
+          landing: filters.landing || 'all',
+        }}
+        landings={facets.landings}
+        onApply={(next) => {
+          const minPrice = next.minPrice === 'all' ? undefined : Number(next.minPrice);
+          const maxPrice = next.maxPrice === 'all' ? undefined : Number(next.maxPrice);
+          navigate({
+            ...filters,
+            q: qDraft.trim() || filters.q,
+            from: next.dateFrom || undefined,
+            to: next.dateTo || undefined,
+            minPrice: Number.isFinite(minPrice) ? minPrice : undefined,
+            maxPrice: Number.isFinite(maxPrice) ? maxPrice : undefined,
+            ageMax: next.ageMax >= 0 ? next.ageMax : undefined,
+            landing: next.landing === 'all' ? undefined : next.landing,
+            page: undefined,
+          });
+          setFiltersOpen(false);
+        }}
+        onClose={() => setFiltersOpen(false)}
+        onReset={() => {
+          navigate({
+            q: filters.q,
+            city: filters.city,
+            category: filters.category,
+            sort: filters.sort,
+            limit: filters.limit,
+          });
+        }}
+      />
 
       <div className="-mx-4 px-4 sm:mx-0 sm:px-0">
         <div className="horizontal-snap-row flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">

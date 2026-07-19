@@ -123,7 +123,6 @@ export function countAdvancedFilters(values: CatalogFilterValues): number {
   if (values.from || values.to) count += 1;
   if (values.minPrice != null || values.maxPrice != null) count += 1;
   if (values.ageMax != null && values.ageMax >= 0) count += 1;
-  if (values.category) count += 1;
   if (values.landing) count += 1;
   return count;
 }
