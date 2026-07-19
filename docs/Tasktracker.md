@@ -67,7 +67,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| U.9 | Чипы категорий: уникальные пиктограммы (не fallback ticket) | Высокий | 🔄 commit→deploy |
+| U.9 | Чипы категорий: уникальные пиктограммы (не fallback ticket) | Высокий | ✅ `95d959d` prod |
 | U.1 | Расширенные фильтры `/events` — popup как поиск (desktop modal + mobile bottom sheet) | Высокий | ✅ |
 | U.2 | Draft Apply/Reset, Esc/backdrop, focus trap, badge счётчика | Высокий | ✅ |
 | U.3 | Commit + deploy Next | Критический | ✅ `be8ee55` + prod start web (после обрыва SSH mid-deploy) |
