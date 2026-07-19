@@ -1,3 +1,21 @@
+## 2026-07-19 — City hub: без popular tags, quieter chips
+
+### Наблюдения
+
+- На афише хаба (СПб) блок «Популярные теги» дублировал вес фильтров; date chips (navy) и category chips (primary blue) выглядели как два тяжёлых ряда pills без единой системы.
+
+### Решения
+
+- Убран `PopularTags` с city hub affiche (default + editorial через общий `CityPageView`).
+- Date + category chips: общий `hubFilterChipClass` — `rounded-md`, меньший padding, quiet border, единый active (`slate-800` / `zinc-900`).
+- Фильтр по tag с хаба снят (теги остаются на event page / подборках).
+
+### Проблемы
+
+- Deploy + proof SPB после commit.
+
+---
+
 ## 2026-07-19 — City hub editorial template (P.2i experiment)
 
 ### Наблюдения

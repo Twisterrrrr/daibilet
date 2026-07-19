@@ -4,12 +4,9 @@ import * as React from 'react';
 import {
   ArrowLeft,
   ArrowRight,
-  CalendarDays,
   Grid3X3,
   ListFilter,
   MapPin,
-  Search,
-  Tag,
   Ticket,
   TrendingUp,
 } from 'lucide-react';
@@ -17,7 +14,6 @@ import {
 import { EventCard } from '@/components/EventCard';
 import Link from 'next/link';
 import { formatMoney, formatNumber, formatPriceFrom } from '@/lib/format';
-import { collectPopularTags } from '@/lib/catalog-tags';
 import { resolveCityImage } from '@/lib/city-images';
 import type { CityFaqItem } from '@/lib/city-faq';
 import type { CityHubTemplate } from '@/lib/city-hub-template';
@@ -75,7 +71,6 @@ export function CityPageView({
   const [contentReady, setContentReady] = React.useState(() => Boolean(initialPayload?.sessions?.length));
   const [error, setError] = React.useState<string | null>(null);
   const [category, setCategory] = React.useState('all');
-  const [tag, setTag] = React.useState('all');
   const [dateFilter, setDateFilter] = React.useState<DateFilter>('all');
   const [mode, setMode] = React.useState<ViewMode>('cards');
 
@@ -120,18 +115,13 @@ export function CityPageView({
     if (!payload) return [];
     return payload.sessions.filter((session) => {
       if (category !== 'all' && session.category !== category) return false;
-      if (tag !== 'all' && !session.tags.includes(tag)) return false;
       if (!matchesCityDateFilter(session, dateFilter)) return false;
       return true;
     });
-  }, [category, dateFilter, payload, tag]);
+  }, [category, dateFilter, payload]);
 
   const city = payload?.city;
   const categories = city ? Object.entries(city.categories).sort((a, b) => b[1] - a[1]) : [];
-  const popularTags = React.useMemo(
-    () => (payload ? collectPopularTags(payload.sessions, 12).map(({ name, events }) => ({ name, count: events })) : []),
-    [payload],
-  );
   const guide = city ? cityGuideFor(city) : null;
   const recommended = payload ? rankRecommended(payload.sessions).slice(0, 6) : [];
   const unifiedFaq = React.useMemo(() => mergeCityFaqItems(guide?.faq, faqItems), [faqItems, guide?.faq]);
@@ -208,28 +198,14 @@ export function CityPageView({
                       categories={categories}
                       active={category}
                       total={payload.sessions.length}
-                      activeTag={tag}
                       editorial={editorial}
-                      onCategory={(value) => {
-                        setCategory(value);
-                        setTag('all');
-                      }}
+                      onCategory={setCategory}
                       onReset={() => {
                         setCategory('all');
-                        setTag('all');
                         setDateFilter('all');
                       }}
                     />
-                    <PopularTags
-                      tags={popularTags}
-                      active={tag}
-                      editorial={editorial}
-                      onSelect={(value) => {
-                        setTag(value);
-                        setCategory('all');
-                      }}
-                    />
-                    {dateFilter === 'all' && category === 'all' && tag === 'all' ? (
+                    {dateFilter === 'all' && category === 'all' ? (
                       <RecommendedEvents city={city} sessions={recommended} editorial={editorial} />
                     ) : null}
                     {mode === 'table' ? (
@@ -253,7 +229,6 @@ export function CityPageView({
                   editorial={editorial}
                   onCategory={(value) => {
                     setCategory(value);
-                    setTag('all');
                     setDateFilter('all');
                     scrollToSection('affiche');
                   }}
@@ -562,6 +537,23 @@ function CityStickyTabs({
   );
 }
 
+function hubFilterChipClass(isActive: boolean, editorial = false) {
+  const base =
+    'inline-flex items-center rounded-md border px-2.5 py-1 text-[11px] font-medium tracking-wide transition';
+  if (editorial) {
+    return `${base} ${
+      isActive
+        ? 'border-zinc-900 bg-zinc-900 text-white'
+        : 'border-zinc-200/90 bg-transparent text-zinc-600 hover:border-zinc-300 hover:text-zinc-900'
+    }`;
+  }
+  return `${base} ${
+    isActive
+      ? 'border-slate-800 bg-slate-800 text-white'
+      : 'border-slate-200/90 bg-transparent text-slate-600 hover:border-slate-300 hover:text-slate-900'
+  }`;
+}
+
 function DateFilterChips({
   active,
   onSelect,
@@ -578,7 +570,7 @@ function DateFilterChips({
   ];
 
   return (
-    <div className="mb-4 flex flex-wrap gap-2">
+    <div className="mb-3 flex flex-wrap gap-1.5">
       {chips.map((chip) => {
         const isActive = active === chip.value;
         return (
@@ -586,17 +578,8 @@ function DateFilterChips({
             key={chip.value}
             type="button"
             onClick={() => onSelect(chip.value)}
-            className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
-              editorial
-                ? isActive
-                  ? 'bg-zinc-900 text-white'
-                  : 'bg-white text-zinc-600 ring-1 ring-black/5 hover:bg-zinc-100'
-                : isActive
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
+            className={hubFilterChipClass(isActive, editorial)}
           >
-            {chip.value !== 'all' ? <CalendarDays className="h-3.5 w-3.5" /> : null}
             {chip.label}
           </button>
         );
@@ -956,58 +939,6 @@ function VenueHighlights({
   );
 }
 
-function PopularTags({
-  tags,
-  active,
-  onSelect,
-  editorial = false,
-}: {
-  tags: Array<{ name: string; count: number }>;
-  active: string;
-  onSelect: (tag: string) => void;
-  editorial?: boolean;
-}) {
-  if (!tags.length) return null;
-  return (
-    <div className="mb-5">
-      <div
-        className={`mb-2 text-xs font-semibold uppercase tracking-wide ${
-          editorial ? 'text-zinc-500' : 'text-slate-500'
-        }`}
-      >
-        Популярные теги
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {tags.map((item) => {
-          const isActive = active === item.name;
-          return (
-            <button
-              key={item.name}
-              type="button"
-              onClick={() => onSelect(isActive ? 'all' : item.name)}
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
-                editorial
-                  ? isActive
-                    ? 'border-zinc-900 bg-zinc-900 text-white'
-                    : 'border-transparent bg-white text-zinc-700 ring-1 ring-black/5 hover:bg-zinc-100'
-                  : isActive
-                    ? 'border-primary-500 bg-primary-600 text-white'
-                    : 'border-slate-200 bg-white text-slate-700 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700'
-              }`}
-            >
-              <Tag className="h-3 w-3" />
-              {item.name}
-              <span className={isActive ? 'text-white/70' : editorial ? 'text-zinc-400' : 'text-slate-400'}>
-                ({formatNumber(item.count)})
-              </span>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 function RecommendedEvents({
   city,
   sessions,
@@ -1129,45 +1060,22 @@ function CityCatalogHeader({
 function CategoryFilter(props: {
   categories: Array<[string, number]>;
   active: string;
-  activeTag: string;
   total: number;
   onCategory: (value: string) => void;
   onReset: () => void;
   editorial?: boolean;
 }) {
   const editorial = props.editorial;
-  const activeAll = props.active === 'all' && props.activeTag === 'all';
+  const activeAll = props.active === 'all';
   return (
-    <div className="mb-4 flex flex-wrap gap-2">
+    <div className="mb-5 flex flex-wrap gap-1.5">
       <button
         type="button"
         onClick={props.onReset}
-        className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-          editorial
-            ? activeAll
-              ? 'bg-zinc-900 text-white'
-              : 'bg-white text-zinc-700 ring-1 ring-black/5 hover:bg-zinc-100'
-            : activeAll
-              ? 'bg-primary-600 text-white'
-              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-        }`}
+        className={hubFilterChipClass(activeAll, editorial)}
       >
         Все {formatNumber(props.total)}
       </button>
-      {props.activeTag !== 'all' ? (
-        <button
-          type="button"
-          onClick={props.onReset}
-          className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold ${
-            editorial
-              ? 'bg-zinc-100 text-zinc-800 hover:bg-zinc-200'
-              : 'bg-primary-50 text-primary-700 hover:bg-primary-100'
-          }`}
-        >
-          <Search className="h-3.5 w-3.5" />
-          {props.activeTag}
-        </button>
-      ) : null}
       {props.categories.map(([name, count]) => {
         const isActive = props.active === name;
         return (
@@ -1175,15 +1083,7 @@ function CategoryFilter(props: {
             key={name}
             type="button"
             onClick={() => props.onCategory(name)}
-            className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-              editorial
-                ? isActive
-                  ? 'bg-zinc-900 text-white'
-                  : 'bg-white text-zinc-700 ring-1 ring-black/5 hover:bg-zinc-100'
-                : isActive
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
+            className={hubFilterChipClass(isActive, editorial)}
           >
             {name} {formatNumber(count)}
           </button>
