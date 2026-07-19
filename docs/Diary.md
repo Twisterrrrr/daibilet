@@ -1,3 +1,21 @@
+## 2026-07-19 — City hub `#directions`: только chips с count > 0
+
+### Наблюдения
+
+- На Rostov-на-Дону в «Популярные направления» landings с числом ок (Новый год, Стендап…), а «Мероприятия» / «Развлечения» шли без счётчика — выглядели как мёртвые подборки.
+- Корень: в `PopularDirections` category-chips хардкодили `count: 0`, хотя facet из hub feed имел реальные счётчики (15 / 1).
+
+### Решения
+
+- `CityPageView` (default + editorial): landings и categories в `#directions` только при `count > 0`; category chips берут реальный count; `hasDirections` — по тому же правилу.
+- Не трогали gap date/category chips (параллельный фикс).
+
+### Проблемы
+
+- Deploy/proof — после push.
+
+---
+
 ## 2026-07-19 — City hub: gap между date и category chips
 
 ### Наблюдения

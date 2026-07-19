@@ -137,7 +137,8 @@ export function CityPageView({
   const unifiedFaq = React.useMemo(() => mergeCityFaqItems(guide?.faq, faqItems), [faqItems, guide?.faq]);
 
   const hasDirections = Boolean(
-    (payload?.landings?.length || 0) > 0 || categories.length > 0,
+    (payload?.landings?.some((landing) => Number(landing.events) > 0) ?? false) ||
+      categories.some(([, count]) => count > 0),
   );
   const hasVenues = Boolean(payload?.venues?.length);
   const hasTravel = Boolean(guide?.travel?.trim());
@@ -681,21 +682,30 @@ function PopularDirections({
   editorial?: boolean;
 }) {
   const cityIn = cityInPrepositional(city);
-  const landingItems = landings.slice(0, 8).map((landing) => ({
-    key: landing.slug,
-    title: landing.title,
-    href: landingPageHref(landing.slug),
-    count: landing.events,
-    kind: 'link' as const,
-  }));
-  const categoryItems = categories.slice(0, Math.max(0, 8 - landingItems.length)).map(([name]) => ({
-    key: `category-${name}`,
-    title: name,
-    count: 0,
-    kind: 'category' as const,
-    category: name,
-  }));
-  const items = [...landingItems, ...categoryItems].slice(0, 8);
+  // Only directions with inventory in this city (count > 0). Empty landings/categories → no chip.
+  const landingItems = landings
+    .filter((landing) => Number(landing.events) > 0)
+    .slice(0, 8)
+    .map((landing) => ({
+      key: landing.slug,
+      title: landing.title,
+      href: landingPageHref(landing.slug),
+      count: landing.events,
+      kind: 'link' as const,
+    }));
+  const landingTitles = new Set(landingItems.map((item) => item.title.trim().toLowerCase()));
+  const categoryItems = categories
+    .filter(([, count]) => count > 0)
+    .filter(([name]) => !landingTitles.has(name.trim().toLowerCase()))
+    .slice(0, Math.max(0, 8 - landingItems.length))
+    .map(([name, count]) => ({
+      key: `category-${name}`,
+      title: name,
+      count,
+      kind: 'category' as const,
+      category: name,
+    }));
+  const items = [...landingItems, ...categoryItems].filter((item) => item.count > 0).slice(0, 8);
 
   if (!items.length) return null;
 
