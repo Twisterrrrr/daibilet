@@ -33,7 +33,7 @@
 
 ### Проблемы
 
-- Deploy с этой среды может упереться в SSH key к prod (как у reviews).
+- Первый `deploy-prod-next.sh`: Next build упал на `next-font-manifest.json`; retry после `rm -rf apps/web/.next` собрался, но SSH оборвался до `systemctl start daibilet-web` → 502. Дожали вручную: start web + smoke `/events` 200. Prod HEAD `be8ee55`.
 
 ---
 
