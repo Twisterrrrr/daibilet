@@ -13,7 +13,8 @@
 
 ### Проблемы
 
-- (заполняется после deploy/proof)
+- Deploy `deploy-prod-next` OK @`9bc8fa7`.
+- **Proof** `/cities/sankt-peterburg` + `?hub=editorial`: нет «регистрация на Дайбилете» / «Какие цены…» / «Можно ли выбрать площадку…»; есть city FAQ (Подорожник, разводка мостов, Эрмитаж); `#faq` + JSON-LD FAQPage с 3 city questions.
 
 ---
 

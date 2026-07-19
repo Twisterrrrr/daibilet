@@ -300,8 +300,8 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| 1.3.1 | FAQ block (редакционный / из payload) | Высокий | ✅ 2026-07-19; **fix:** только city FAQ, без platform @pending |
-| 1.3.1a | City hub FAQ: убрать generated/platform FAQ про Дайбилет | Высокий | 🔄 in progress |
+| 1.3.1 | FAQ block (редакционный / из payload) | Высокий | ✅ 2026-07-19; **fix:** только city FAQ @`9bc8fa7` |
+| 1.3.1a | City hub FAQ: убрать generated/platform FAQ про Дайбилет | Высокий | ✅ `9bc8fa7` prod proof SPB |
 | 1.3.2 | SEO text block (intro + перелинковка) | Высокий | ✅ 2026-07-19 |
 | 1.3.3 | SSR JSON-LD: `FAQPage` | Высокий | ✅ 2026-07-19 |
 | 1.3.4 | SSR JSON-LD: `BreadcrumbList` | Средний | ✅ 2026-07-19 |
@@ -422,7 +422,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
-| 2026-07-19 | 1.3.1a: city hub FAQ — только cityInfo/editorial; без platform «регистрация на Дайбилете» |
+| 2026-07-19 | 1.3.1a: city hub FAQ — только cityInfo/editorial; prod proof SPB @`9bc8fa7` |
 | 2026-07-19 | P.2n: city hub `#directions` — только chips с count > 0; prod proof rostov-na-donu @`044e441` |
 | 2026-07-19 | P.2m: city hub chips — gap-x-4 между date и category группами |
 | 2026-07-19 | P.2k: city hub — без подзаголовка счётчика; date+category one-row desktop; без «Стоит внимания» (дубль афиши) |
