@@ -1,3 +1,22 @@
+## 2026-07-19 — City hubs: brief-описания 14 адмцентров
+
+### Наблюдения
+
+- Описания city hub рендерятся из статического `CITY_INFO.brief` (`apps/web` + паритет `apps/public`), не из `City.introText` в БД.
+- Hero на `/cities/{slug}` берёт `guide?.brief` через `resolveCityInfo`; SEO-блок — `resolveCityBrief` в `city-faq.ts`.
+- Prod-slug ≠ «естественный» транслит: `arhangelsk`, `astrahan`, `yuzhno-sahalinsk`, `blagoveschensk-amurskaya-oblast` (Амурская, не Башкортостан).
+
+### Решения
+
+- Добавлены 14 `brief` в `CITY_INFO` (смысл текстов владельца, тон сайта).
+- Алиасы: `arkhangelsk`→`arhangelsk`, `astrakhan`→`astrahan`, `yuzhno-sakhalinsk`→`yuzhno-sahalinsk`, `blagoveshchensk`(+`-amurskaya-oblast`)→`blagoveschensk-amurskaya-oblast`.
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-19 — Geo-политика: адмцентры + region buckets + Челны
 
 ### Наблюдения
