@@ -13,7 +13,7 @@
 |---|--------|-----------|--------|
 | CI.1 | `validate-build-test`: pnpm до `setup-node` cache | Критический | ✅ `4c09cdb` |
 | CI.2 | Backend typecheck: exactOptional / indexed access | Критический | ✅ `7cc58ac` |
-| CI.3 | `web:build` без Postgres: empty home fallback | Критический | 🔄 |
+| CI.3 | `web:build` без Postgres: empty home fallback | Критический | ✅ `0f45004` CI green |
 
 ---
 
