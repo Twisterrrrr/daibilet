@@ -146,7 +146,7 @@ export async function buildSocialPreviewForPath(db, pathname, builders) {
     const city = payload.city;
     const canonicalPath = `/cities/${city.slug || slug}`;
     return {
-      title: city.seoTitle || `${city.name}: афиша и билеты | ${SITE_NAME}`,
+      title: city.seoTitle || `${city.name}: события на сегодня | ${SITE_NAME}`,
       description: city.seoDescription || `${city.name}: экскурсии, музеи и события.`,
       url: canonicalPath,
       image: city.heroImageUrl || null,

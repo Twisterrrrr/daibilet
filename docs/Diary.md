@@ -1,3 +1,22 @@
+## 2026-07-19 — City SEO: «на сегодня» в title хабов
+
+### Наблюдения
+
+- Title standalone city hubs: «Мурманск: афиша, экскурсии и билеты | Дайбилет» — без сигнала «сегодня».
+- Description уже с locative («в Мурманске») после P.2c; дублировать «на сегодня» в description не нужно.
+
+### Решения
+
+- Default `seoTitle`: `События ${entityLabel} на сегодня | Дайбилет` (DTO + legacy `dto.js`).
+- `generateMetadata` / client `applyCityMeta` / social-preview fallbacks согласованы.
+- Description без изменений (locative остаётся, без второго «на сегодня»).
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-19 — Prod: пустые главная и `/events` (stats null.name)
 
 ### Наблюдения

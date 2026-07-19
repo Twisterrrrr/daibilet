@@ -31,13 +31,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     isIndexable: city.isIndexable,
   });
 
+  const cityIn = inCityPrepositional(city.name);
+  const defaultTitle = `События ${cityIn} на сегодня`;
+
   return {
-    title: pageTitle(city.seoTitle || `${city.name}: афиша и билеты`),
-    description: city.seoDescription || `События и экскурсии ${inCityPrepositional(city.name)}`,
+    title: pageTitle(city.seoTitle || defaultTitle),
+    description: city.seoDescription || `События и экскурсии ${cityIn}`,
     alternates: { canonical: path },
     robots: robotsForIndexability(decision.indexable),
     openGraph: routeOpenGraph(path, {
-      title: city.seoTitle || `${city.name}: афиша и билеты | Дайбилет`,
+      title: city.seoTitle || `${defaultTitle} | Дайбилет`,
     }),
   };
 }

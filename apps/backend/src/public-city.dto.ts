@@ -137,7 +137,7 @@ export async function buildPublicCityDto(
       venues: venueCount,
       categories,
       seoH1: cityRecord?.seoH1 || destination.name,
-      seoTitle: cityRecord?.seoTitle || `${destination.name}: афиша, экскурсии и билеты | Дайбилет`,
+      seoTitle: cityRecord?.seoTitle || `События ${entityLabel} на сегодня | Дайбилет`,
       seoDescription: cityRecord?.seoDescription ||
         `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`,
       canonicalPath: cityRecord?.canonicalPath || `/cities/${destination.slug}`,

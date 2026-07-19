@@ -838,8 +838,9 @@ function navigateHome(section: string) {
 }
 
 function applyCityMeta(payload: PublicCityPage) {
-  document.title = payload.city.seoTitle || `${payload.city.name}: афиша и билеты | Дайбилет`;
-  upsertMeta('description', payload.city.seoDescription || `Афиша событий, экскурсии, музеи и билеты ${cityInPrepositional(payload.city)}.`);
+  const cityIn = cityInPrepositional(payload.city);
+  document.title = payload.city.seoTitle || `События ${cityIn} на сегодня | Дайбилет`;
+  upsertMeta('description', payload.city.seoDescription || `Афиша событий, экскурсии, музеи и билеты ${cityIn}.`);
   upsertMeta('robots', 'index, follow');
 }
 

@@ -920,8 +920,9 @@ function navigateHome(section: string) {
 }
 
 function applyCityMeta(payload: PublicCityPageDto) {
-  document.title = payload.city.seoTitle || `${payload.city.name}: афиша и билеты | Дайбилет`;
-  upsertMeta('description', payload.city.seoDescription || `Афиша событий, экскурсии, музеи и билеты ${cityInPrepositional(payload.city)}.`);
+  const cityIn = cityInPrepositional(payload.city);
+  document.title = payload.city.seoTitle || `События ${cityIn} на сегодня | Дайбилет`;
+  upsertMeta('description', payload.city.seoDescription || `Афиша событий, экскурсии, музеи и билеты ${cityIn}.`);
   // robots задаётся в generateMetadata (SSR); клиент не перезаписывает noindex thin-страниц
 }
 

@@ -4636,7 +4636,7 @@ export async function buildPublicCityPage(db, citySlugOrId) {
       events: matchedSessions.length,
       venues: venueCount,
       categories,
-      seoTitle: `${destination.name}: афиша, экскурсии и билеты | Дайбилет`,
+      seoTitle: `События ${entityLabel} на сегодня | Дайбилет`,
       seoDescription: `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`,
     },
     sessions,
