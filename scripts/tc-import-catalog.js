@@ -49,10 +49,27 @@ async function main() {
 
   const catalog = JSON.parse(fs.readFileSync(catalogPath, "utf8")).events || [];
   const summary = fs.existsSync(summaryPath) ? JSON.parse(fs.readFileSync(summaryPath, "utf8")) : null;
+  const stats = await importCatalogEvents(catalog, {
+    mode: "catalog JSON upsert import",
+    summary,
+    skipMissingFromCatalog: false,
+    endPool: true,
+  });
+  console.log(JSON.stringify(stats, null, 2));
+}
+
+/**
+ * Upsert normalized catalog events into Postgres (same path as full import).
+ * @param {object[]} catalog
+ * @param {{ mode?: string, summary?: object|null, skipMissingFromCatalog?: boolean, endPool?: boolean }} options
+ */
+async function importCatalogEvents(catalog, options = {}) {
   const startedAt = new Date();
   const client = await pool.connect();
   const syncId = `sync_tc_${Date.now()}`;
   const importedExternalIds = new Set();
+  const skipMissingFromCatalog = Boolean(options.skipMissingFromCatalog);
+  const summary = options.summary ?? null;
 
   const stats = {
     sourceEvents: catalog.length,
@@ -87,9 +104,9 @@ async function main() {
       [
         syncId,
         TICKETSCLOUD_SOURCE_ID,
-        "catalog JSON upsert import",
+        options.mode || "catalog JSON upsert import",
         startedAt.toISOString(),
-        JSON.stringify({ summaryCounts: summary?.counts || null }),
+        JSON.stringify({ summaryCounts: summary?.counts || null, skipMissingFromCatalog }),
       ],
     );
 
@@ -106,16 +123,18 @@ async function main() {
       else stats.eventsWithoutWidgetUrl += 1;
     }
 
-    const missingResult = await client.query(
-      `
-        select count(*)::int as count
-        from "EventSourceLink"
-        where "sourceId" = $1
-          and "externalId" <> all($2::text[])
-      `,
-      [TICKETSCLOUD_SOURCE_ID, [...importedExternalIds]],
-    );
-    stats.missingFromCatalog = missingResult.rows[0]?.count ?? 0;
+    if (!skipMissingFromCatalog) {
+      const missingResult = await client.query(
+        `
+          select count(*)::int as count
+          from "EventSourceLink"
+          where "sourceId" = $1
+            and "externalId" <> all($2::text[])
+        `,
+        [TICKETSCLOUD_SOURCE_ID, [...importedExternalIds]],
+      );
+      stats.missingFromCatalog = missingResult.rows[0]?.count ?? 0;
+    }
 
     const providerLinkStats = await syncProviderLinksForSource(client, TICKETSCLOUD_SOURCE_ID);
     stats.providerLinks = providerLinkStats.total;
@@ -137,7 +156,7 @@ async function main() {
       [syncId, new Date().toISOString(), JSON.stringify(stats)],
     );
     await client.query("COMMIT");
-    console.log(JSON.stringify(stats, null, 2));
+    return stats;
   } catch (error) {
     await client.query("ROLLBACK");
     try {
@@ -155,7 +174,9 @@ async function main() {
     throw error;
   } finally {
     client.release();
-    await pool.end();
+    if (options.endPool !== false) {
+      await pool.end();
+    }
   }
 }
 
@@ -521,7 +542,15 @@ function sha256(value) {
   return crypto.createHash("sha256").update(value).digest("hex");
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+module.exports = {
+  importCatalogEvent,
+  importCatalogEvents,
+  TICKETSCLOUD_SOURCE_ID,
+};
+
+if (require.main === module) {
+  main().catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  });
+}

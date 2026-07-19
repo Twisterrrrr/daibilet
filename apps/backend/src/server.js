@@ -498,7 +498,7 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'POST /api/v1/tc/sync' || route === 'POST /api/admin/sources/ticketscloud/sync') {
-      const result = await runTicketscloudCatalogSync();
+      const result = await runTicketscloudCatalogSync(url.searchParams);
       invalidatePublicCaches('ticketscloud catalog sync', { warm: true });
       sendJson(response, result);
       return;
@@ -1334,7 +1334,18 @@ function runTeplohodSync() {
   });
 }
 
-function runTicketscloudCatalogSync() {
+function runTicketscloudCatalogSync(searchParams = new URLSearchParams()) {
+  const idsRaw = searchParams.get('ids') || '';
+  const ids = idsRaw
+    .split(/[,;\s]+/)
+    .map((id) => id.trim())
+    .filter(Boolean);
+  const dryRun = searchParams.get('dryRun') === '1' || searchParams.get('dry-run') === '1';
+
+  if (ids.length) {
+    return runTicketscloudIdsSync(ids, { dryRun });
+  }
+
   return new Promise((resolve, reject) => {
     const startedAt = new Date().toISOString();
     const child = spawn(process.execPath, [path.join(rootDir, 'scripts', 'tc-full-sync.js')], {
@@ -1383,6 +1394,58 @@ function runTicketscloudCatalogSync() {
         import: importResult,
         stats: importResult.stats || fetchSummary?.counts || null,
         output: [stdout.trim(), importResult.output].filter(Boolean).join('\n\n--- import ---\n\n'),
+      });
+    });
+  });
+}
+
+function runTicketscloudIdsSync(ids, { dryRun = false } = {}) {
+  return new Promise((resolve, reject) => {
+    const startedAt = new Date().toISOString();
+    const args = [path.join(rootDir, 'scripts', 'tc-sync.js'), `--ids=${ids.join(',')}`];
+    if (dryRun) args.push('--dry-run');
+    args.push('--skip-revalidate');
+
+    const child = spawn(process.execPath, args, {
+      cwd: rootDir,
+      env: process.env,
+      windowsHide: true,
+    });
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on('error', reject);
+    child.on('close', (code) => {
+      if (code !== 0) {
+        const error = new Error(stderr || stdout || `Ticketscloud ids sync failed with exit code ${code}`);
+        error.statusCode = 500;
+        reject(error);
+        return;
+      }
+
+      let stats = null;
+      try {
+        stats = parseLastJsonObject(stdout);
+      } catch {
+        stats = null;
+      }
+
+      resolve({
+        ok: true,
+        source: 'TICKETSCLOUD',
+        mode: dryRun ? 'ids-dry-run' : 'ids-upsert',
+        startedAt,
+        finishedAt: new Date().toISOString(),
+        ids,
+        dryRun,
+        stats,
+        output: stdout.trim(),
       });
     });
   });

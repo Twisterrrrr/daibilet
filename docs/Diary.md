@@ -1,3 +1,45 @@
+## 2026-07-19 — TC on-demand sync `--ids`
+
+### Наблюдения
+
+- Full `tc:sync` тяжёлый; для точечного добавления/обновления событий нужен путь по списку Ticketscloud ids.
+- В proto уже есть `EventsRequest.ids`; upsert pipeline (`importCatalogEvent`) уже готов.
+
+### Решения
+
+- `npm run tc:sync` → `scripts/tc-sync.js`: без флагов = full fetch+import+revalidate; с `--ids=...` = gRPC by ids → normalize → тот же upsert (не insert-only).
+- `--dry-run` с `--ids`: только fetch+normalize, без БД.
+- Shared `scripts/lib/tc-catalog-fetch.js`; `importCatalogEvents(..., { skipMissingFromCatalog: true })` для ids-режима.
+- Admin: `POST /api/v1/tc/sync?ids=a,b&dry-run=1`.
+- Prod smoke: dry-run + upsert `6a5a15629c0d02f149eb31b7`, `6a4b7eb321d4fca102f90689` → +2 EventSourceLink (30637→30639).
+
+### Проблемы
+
+- Ids-режим после upsert всё ещё гоняет полный `ProviderLink` resync по source (~6s) — приемлемо; scoped sync можно отложить.
+- Не замена nightly/full sync: цены/даты остальных событий не обновляются.
+
+---
+
+## 2026-07-19 — UX: город шапки → venues/locations + anti-flash `/events`
+
+### Наблюдения
+
+- После `4772789` город шапки попадал в `/events`, но фильтр на `/venues` и `/locations` оставался локальным `useState('all')` и игнорировал шапку.
+- На `/events` был flash: первый кадр «Все города», затем `router.replace` с городом из `localStorage` — потому что inject шёл в `useEffect` после paint, а тулбар читал только URL.
+
+### Решения
+
+- Общий контур `CITY_FILTER_PATHS` (`/events`, `/venues`, `/locations`): inject `city=` из storage, nav-ссылки с городом, смена в шапке обновляет query текущей страницы; сброс → `persistSelectedCity('all')`.
+- Anti-flash: `cityReady` + placeholder «Город…» до resolve; `useLayoutEffect` для sync/replace; `CatalogShell` подставляет effective city до появления в URL.
+- Venues/Locations: фильтр города через URL `?city=` + storage, как каталог.
+
+### Проблемы
+
+- Полный SSR без cookie всё ещё не знает город до hydrate — поэтому pending-placeholder, а не «Все города».
+- Deploy: `deploy-prod-next` после commit.
+
+---
+
 ## 2026-07-19 — UX: город шапки → фильтр каталога `/events`
 
 ### Наблюдения

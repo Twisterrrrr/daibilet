@@ -7,6 +7,16 @@
 
 ---
 
+## Sync / TC (2026-07-19)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| S.1 | `tc:sync --ids=...` on-demand upsert (+ `--dry-run`) | Высокий | ✅ |
+| S.2 | Admin `POST /api/v1/tc/sync?ids=` | Средний | ✅ |
+| S.3 | Docs + prod smoke 2 ids | Высокий | ✅ |
+
+---
+
 ## Event page / UX (2026-07-19)
 
 | # | Задача | Приоритет | Статус |
@@ -52,6 +62,9 @@
 | U.3 | Commit + deploy Next | Критический | ✅ `be8ee55` + prod start web (после обрыва SSH mid-deploy) |
 | U.4 | Город из шапки → `city=` каталога при `/events` без явного city; deep-link сохранить | Высокий | ✅ |
 | U.5 | Commit + deploy-prod-next U.4 | Критический | ✅ `4772789` prod |
+| U.6 | Город шапки → фильтр `/venues` и `/locations` (URL + storage + nav) | Высокий | ✅ |
+| U.7 | Anti-flash «Все города»→город на `/events` (и venues/locations): `cityReady` + layout sync | Высокий | ✅ |
+| U.8 | Commit + deploy-prod-next U.6–U.7 | Критический | 🔄 |
 
 ---
 
@@ -342,6 +355,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-19 | TC on-demand: `tc:sync --ids` + `--dry-run`, admin `?ids=` (S.1–S.3) |
 | 2026-07-19 | URL: flat paths; SEO через city hubs (1.3.7 ⏳, 1.3.8 🚫) |
 | 2026-07-19 | Admin: editable Cities (PATCH) + Articles `publishedAt` UI (B.9/B.10) |
 | 2026-07-13 | Roadmap перестроен на **Этапы 0–2** с чеклистами browser/admin smoke, tc:sync, SEO gaps |

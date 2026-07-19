@@ -138,17 +138,29 @@ npm run tc:full-sync
 
 ```bash
 npm run tc:import    # только upsert из catalog.public.json
-npm run tc:sync      # full-sync + import
+npm run tc:sync      # full-sync + import + revalidate (nightly / maintenance)
+npm run tc:sync:help
+```
+
+### On-demand по ids (не замена full sync)
+
+Fetch `EventsRequest.ids` → normalize → тот же upsert `importCatalogEvent`:
+
+```bash
+npm run tc:sync -- --ids=id1,id2,id3
+npm run tc:sync -- --ids id1,id2 --dry-run   # fetch+normalize, без записи в БД
 ```
 
 Admin API (один вызов):
 
 ```text
 POST /api/v1/tc/sync
+POST /api/v1/tc/sync?ids=id1,id2&dry-run=1
 POST /api/admin/sources/ticketscloud/sync
 ```
 
-Цепочка: gRPC fetch → `data/ticketscloud/catalog.public.json` → `tc-import-catalog.js` → `ProviderLink` sync → invalidate public cache.
+Цепочка full: gRPC fetch → `data/ticketscloud/catalog.public.json` → `tc-import-catalog.js` → `ProviderLink` sync → invalidate public cache.  
+Цепочка ids: gRPC by ids → upsert (без `missingFromCatalog`) → revalidate (CLI) / cache invalidate (API).
 
 Требуется `DATABASE_URL` и `TICKETSCLOUD_WIDGET_TOKEN` (для `EventOffer.widgetUrl`).
 
