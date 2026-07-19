@@ -687,7 +687,9 @@ function loadRootEnv(projectRoot) {
 function firstImage(images) {
   if (!Array.isArray(images)) return null;
   for (const url of images) {
-    if (url && !isTeplohodPlaceholderImage(url)) return url;
+    if (!url || isTeplohodPlaceholderImage(url)) continue;
+    const stabilized = stabilizeTeplohodImageUrl(url);
+    if (stabilized && !isTeplohodPlaceholderImage(stabilized)) return stabilized;
   }
   return null;
 }
@@ -698,6 +700,21 @@ function isTeplohodPlaceholderImage(imageUrl) {
   if (raw.includes('placeholder.gif')) return true;
   if (/api\.teplohod\.info\/v1\/image\?item=&/.test(raw)) return true;
   return false;
+}
+
+/** Live API returns pre-signed S3 URLs (TTL ~6h) — persist stable proxy instead. */
+function stabilizeTeplohodImageUrl(imageUrl) {
+  const raw = String(imageUrl || '').trim();
+  if (!raw) return null;
+  const signedMatch = raw.match(
+    /teplohod-private\/images\/cache\/Events\/(Event\d+)\/([^/?#]+)/i,
+  );
+  if (signedMatch) {
+    const item = signedMatch[1];
+    const dirtyAlias = signedMatch[2];
+    return `https://api.teplohod.info/v1/image?item=${encodeURIComponent(item)}&dirtyAlias=${encodeURIComponent(dirtyAlias)}`;
+  }
+  return raw;
 }
 
 function money(input) {

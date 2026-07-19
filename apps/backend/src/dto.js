@@ -8312,9 +8312,26 @@ function isPlaceholderEventImageUrl(imageUrl) {
   return false;
 }
 
+/** Pre-signed Teplohod S3 URLs expire (~6h); keep stable api.teplohod.info proxy. */
+function stabilizeTeplohodImageUrl(imageUrl) {
+  const raw = String(imageUrl || '').trim();
+  if (!raw) return null;
+  const signedMatch = raw.match(
+    /teplohod-private\/images\/cache\/Events\/(Event\d+)\/([^/?#]+)/i,
+  );
+  if (signedMatch) {
+    const item = signedMatch[1];
+    const dirtyAlias = signedMatch[2];
+    return `https://api.teplohod.info/v1/image?item=${encodeURIComponent(item)}&dirtyAlias=${encodeURIComponent(dirtyAlias)}`;
+  }
+  return raw;
+}
+
 function pickFirstUsableEventImageUrl(...candidates) {
   for (const candidate of candidates) {
-    if (candidate && !isPlaceholderEventImageUrl(candidate)) return candidate;
+    if (!candidate || isPlaceholderEventImageUrl(candidate)) continue;
+    const stabilized = stabilizeTeplohodImageUrl(candidate);
+    if (stabilized && !isPlaceholderEventImageUrl(stabilized)) return stabilized;
   }
   return null;
 }

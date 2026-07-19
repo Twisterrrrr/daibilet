@@ -53,6 +53,19 @@ test('skips teplohod placeholder image and falls back to venue hero', () => {
   );
 });
 
+test('rewrites pre-signed Teplohod S3 URLs to stable image proxy', () => {
+  const result = mapGroupedPublicSession(catalogRow({
+    sourceCode: 'TEPLOHOD',
+    imageUrl:
+      'https://s3.twcstorage.ru/teplohod-private/images/cache/Events/Event498/38b30dabbe-1.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Expires=21600&X-Amz-Signature=deadbeef',
+  }));
+
+  assert.equal(
+    result.imageUrl,
+    'https://api.teplohod.info/v1/image?item=Event498&dirtyAlias=38b30dabbe-1.jpg',
+  );
+});
+
 test('uses ProviderLink SESSION parent identity for a Teplohod slot', () => {
   const result = mapGroupedPublicSession(catalogRow({
     sourceCode: 'TEPLOHOD',
