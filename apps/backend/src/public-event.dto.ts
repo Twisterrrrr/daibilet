@@ -148,6 +148,10 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
   for (const member of mergeGroupMembers) {
     eventsById.set(member.id, member);
   }
+  const metaGroupMembers = await loadMetaGroupMembers(requestedEvent);
+  for (const member of metaGroupMembers) {
+    eventsById.set(member.id, member);
+  }
   const mergedGroupEvents = [...eventsById.values()];
   const purchaseProvider = pickGroupPurchaseProvider(targetCatalogSession, mergedGroupEvents, requestedEvent);
   const purchaseGroupEventIds = filterGroupEventIdsByPurchaseProvider(
@@ -159,6 +163,7 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
   const offerScopeEventIds = [...new Set([
     ...purchaseGroupEventIds,
     ...mergeGroupMembers.map((member) => member.id),
+    ...metaGroupMembers.map((member) => member.id),
   ])];
   const representative = eventsById.get(targetCatalogSession?.id || purchaseGroupEventIds[0] || '') || requestedEvent;
 
@@ -237,6 +242,7 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
   const sessions = dedupePublicEventSessionsByStartsAt(
     publicSessions.length ? publicSessions : widgetOnlySessions,
   );
+  const primaryPurchase = pickPrimarySessionPurchase(sessions, eventPurchaseUrl, requestedIdentity.externalId);
   const tags = orderedEventTags(requestedEvent);
   const subcategories = pickCatalogSubcategories({
     category: requestedEvent.category?.title || null,
@@ -270,11 +276,11 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     slug: publicSlug(representative.slug),
     sourceSlug: representative.slug,
     sourceCode: eventSourceCode,
-    externalId: requestedIdentity.externalId,
+    externalId: primaryPurchase.externalId,
     widgetProvider: providerForSource(eventSourceCode),
     widgetPayload: buildProviderWidgetPayload({
       sourceCode: eventSourceCode,
-      externalId: requestedIdentity.externalId,
+      externalId: primaryPurchase.externalId,
     }),
     title,
     description: cleanImportedDescription(requestedEvent.override?.description || requestedEvent.description),
@@ -304,15 +310,18 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     eventType: requestedEvent.kind.toLowerCase(),
     landingSlugs,
     groupKey: targetCatalogSession?.groupKey || eventGroupKey(requestedEvent, requestedIdentity),
-    groupEventIds,
+    groupEventIds: [...new Set([
+      ...groupEventIds,
+      ...metaGroupMembers.map((member) => member.id),
+    ])],
     sessionCount: targetCatalogSession?.sessionCount || sessions.length,
-    purchaseUrl: eventPurchaseUrl,
-    widgetUrl: representativeOffer?.widgetUrl || eventPurchaseUrl,
+    purchaseUrl: primaryPurchase.purchaseUrl,
+    widgetUrl: representativeOffer?.widgetUrl || primaryPurchase.purchaseUrl,
     deeplinkUrl: representativeOffer?.deeplinkUrl || null,
-    purchaseReady: eventPurchase.ready,
+    purchaseReady: eventPurchase.ready || Boolean(primaryPurchase.purchaseUrl),
     purchaseMode: eventPurchase.mode,
     purchaseProvider: eventPurchase.provider,
-    purchaseUrlSource: eventPurchase.urlSource,
+    purchaseUrlSource: primaryPurchase.urlSource || eventPurchase.urlSource,
     seoH1: requestedEvent.override?.seoH1 || requestedEvent.seoH1 || title,
     seoTitle: requestedEvent.override?.seoTitle || requestedEvent.seoTitle || `${title}: билеты и расписание | Дайбилет`,
     seoDescription: cleanImportedDescription(requestedEvent.override?.seoDescription || requestedEvent.seoDescription) ||
@@ -454,13 +463,15 @@ function mapSession(
 function buildWidgetOnlySessions(
   sessions: PublicEventSession[],
   event: EventRecord,
-  sourceCode: string | null,
+  _sourceCode: string | null,
   purchase: ReturnType<typeof purchaseInfo>,
   purchaseUrl: string | null,
   catalogSession?: PublicSessionDto,
 ): PublicEventSession[] {
-  const widgetSchedule = isOpenDateCatalogRow({ kind: event.kind, sourceStatus: event.sourceStatus })
-    || providerForSource(sourceCode) === 'TICKETSCLOUD';
+  // Only true open-date / undated schedules get a synthetic slot.
+  // TicketsCloud dated products must NOT fall back to "В виджете" when all
+  // fixed sessions expired — that opens the past TC eventId ("Мероприятие прошло").
+  const widgetSchedule = isOpenDateCatalogRow({ kind: event.kind, sourceStatus: event.sourceStatus });
   if (sessions.length || !widgetSchedule || !purchase.ready) {
     return [];
   }
@@ -627,6 +638,76 @@ async function loadMergeGroupMembers(requestedEvent: EventRecord): Promise<Event
     },
     include: eventInclude,
   });
+}
+
+/** Same TicketsCloud meta product → sibling dated events with future slots. */
+async function loadMetaGroupMembers(requestedEvent: EventRecord): Promise<EventRecord[]> {
+  const metaIds = [...new Set(
+    requestedEvent.sourceLinks
+      .map((link) => link.metaExternalId)
+      .filter((value): value is string => Boolean(value)),
+  )];
+  if (!metaIds.length) return [];
+
+  const links = await prisma.eventSourceLink.findMany({
+    where: {
+      metaExternalId: { in: metaIds },
+      eventId: { not: requestedEvent.id },
+    },
+    select: { eventId: true },
+    take: 200,
+  });
+  const eventIds = [...new Set(links.map((link) => link.eventId))];
+  if (!eventIds.length) return [];
+
+  return prisma.event.findMany({
+    where: {
+      id: { in: eventIds },
+      status: { notIn: ['HIDDEN', 'DRAFT'] },
+    },
+    include: eventInclude,
+  });
+}
+
+function extractTcEventIdFromPurchaseUrl(url?: string | null): string | null {
+  if (!url) return null;
+  const match = String(url).match(/[?&]event=([^&]+)/i);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+function pickPrimarySessionPurchase(
+  sessions: PublicEventSession[],
+  fallbackUrl: string | null,
+  fallbackExternalId: string | null,
+): {
+  purchaseUrl: string | null;
+  externalId: string | null;
+  urlSource: PublicEventSession['purchaseUrlSource'] | null;
+} {
+  for (const session of sessions) {
+    if (session.purchaseReady === false) continue;
+    if (!session.purchaseUrl) continue;
+    if (typeof session.vacant === 'number' && session.vacant <= 0) continue;
+    const tcEventId = extractTcEventIdFromPurchaseUrl(session.purchaseUrl);
+    return {
+      purchaseUrl: session.purchaseUrl,
+      externalId: tcEventId || fallbackExternalId,
+      urlSource: session.purchaseUrlSource || null,
+    };
+  }
+  const firstWithUrl = sessions.find((session) => session.purchaseUrl);
+  if (firstWithUrl?.purchaseUrl) {
+    return {
+      purchaseUrl: firstWithUrl.purchaseUrl,
+      externalId: extractTcEventIdFromPurchaseUrl(firstWithUrl.purchaseUrl) || fallbackExternalId,
+      urlSource: firstWithUrl.purchaseUrlSource || null,
+    };
+  }
+  return {
+    purchaseUrl: fallbackUrl,
+    externalId: fallbackExternalId,
+    urlSource: null,
+  };
 }
 
 function resolveMultiPurchasePeers(groupEvents: EventRecord[], requestedEvent: EventRecord): EventRecord[] {

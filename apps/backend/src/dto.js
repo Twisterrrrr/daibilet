@@ -4899,8 +4899,30 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     venue: event.venue,
   };
   const targetGroupKey = targetPublicSession?.groupKey || publicEventGroupKey(fallbackPublicRow);
-  const groupEventIds = targetPublicSession?.groupEventIds?.length ? targetPublicSession.groupEventIds : [event.id];
+  let groupEventIds = targetPublicSession?.groupEventIds?.length ? targetPublicSession.groupEventIds : [event.id];
   const representativeRow = targetPublicSession || fallbackPublicRow;
+
+  // Expand TicketsCloud meta siblings so a past dated slug still shows future slots.
+  const metaResult = await db.query(
+    `
+      select distinct sibling."eventId" as id
+      from "EventSourceLink" requested
+      join "EventSourceLink" sibling
+        on sibling."metaExternalId" = requested."metaExternalId"
+       and sibling."eventId" <> requested."eventId"
+      where requested."eventId" = $1
+        and requested."metaExternalId" is not null
+        and nullif(trim(requested."metaExternalId"), '') is not null
+      limit 200
+    `,
+    [event.id],
+  );
+  if (metaResult.rows.length) {
+    groupEventIds = uniqueValues([
+      ...groupEventIds,
+      ...metaResult.rows.map((row) => row.id),
+    ]);
+  }
 
   const [sessionsResult, offersResult] = await Promise.all([
     db.query(
@@ -5112,7 +5134,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     };
   });
   const widgetOnlySessions = sessions.length === 0
-    && (isOpenDateCatalogRow({ kind: event.kind, sourceStatus: event.sourceStatus }) || purchase.provider === 'TICKETSCLOUD')
+    && isOpenDateCatalogRow({ kind: event.kind, sourceStatus: event.sourceStatus })
     && purchase.ready
     ? [{
         id: `widget_tep_${event.id}`,
