@@ -12,14 +12,17 @@
 - `buildAdminEventsList`: SQL page → hydrate только sibling ids страницы (`eventRowsByIds`, max 2500) → `groupAdminEventRows` (exact readiness/override/landingHits).
 - `buildAdminDashboard`: metrics из SQL aggregates (`launch.source=admin_event_groups_sql`), без full catalog.
 - TTL cache ~45s на SQL page variants; invalidate вместе с `invalidateAdminGroupedEventsCache`.
+- Startup: полный admin catalog warm **off** по умолчанию (`DAIBILET_ADMIN_STARTUP_WARM=1` для Landings SWR).
 - Landings list пока на старом `getCachedAdminGroupedEvents` (следующий шаг).
 - Тесты: `admin-events-sql-read-model.test.ts`; bench: `scripts/bench-admin-events-sql.mjs`.
+- **Prod bench @86bd059:** cold SQL page **5.5s** / list **6.2s**, warm list **0.35s**; `rowsLoaded=444` vs raw `30839`; heapΔ ~6–7 MB. Было cold ~16–25s + full catalog in RAM.
 
 ### Проблемы
 
 - SQL readiness/canPublish — аппроксимация для фильтров/метрик; строки страницы — exact JS.
 - `view=landing_match` фильтрует по `LandingMatch`, не по полному `LANDING_RULES` engine.
 - Public catalog SQL page + landings match SQL — ещё в backlog (пункт 2+).
+- SourceCode enum: нужен `::text` в coalesce с `''` (иначе 22P02).
 
 ---
 
