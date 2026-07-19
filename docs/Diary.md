@@ -1,3 +1,22 @@
+## 2026-07-19 — City hub FAQ: только city-specific, без платформы
+
+### Наблюдения
+
+- На `/cities/sankt-peterburg` accordion FAQ показывал платформенные вопросы: «Какие цены…», «Можно ли выбрать площадку…», «Нужна ли регистрация на Дайбилете…».
+- `buildCityFaqItems` генерировал FAQ про Дайбилет; `CityPageView` мержил его с `cityInfo.faq`.
+
+### Решения
+
+- `buildCityFaqItems` = только `cityInfo.faq` (editorial) для indexable городов; без FAQ — пустой массив → `#faq` скрыт.
+- JSON-LD `FAQPage` — тот же city FAQ, без platform mix.
+- Default + editorial через общий `CityPageView`.
+
+### Проблемы
+
+- (заполняется после deploy/proof)
+
+---
+
 ## 2026-07-19 — City hub `#directions`: только chips с count > 0
 
 ### Наблюдения

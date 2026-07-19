@@ -1319,9 +1319,10 @@ function cityGuideFor(city: PublicCityDto) {
   return resolveCityInfo(city.slug, city.sourceSlug);
 }
 
+/** Только city FAQ (cityInfo / editorial props). Платформенные FAQ про Дайбилет не подмешиваем. */
 function mergeCityFaqItems(
   editorial: CityInfoEntry['faq'] | undefined,
-  generated: CityFaqItem[],
+  cityFaq: CityFaqItem[],
 ): CityFaqItem[] {
   const items: CityFaqItem[] = [];
   const seen = new Set<string>();
@@ -1334,7 +1335,7 @@ function mergeCityFaqItems(
     items.push({ question, answer: item.a });
   }
 
-  for (const item of generated) {
+  for (const item of cityFaq) {
     const question = item.question.trim();
     const key = question.toLowerCase();
     if (!question || seen.has(key)) continue;

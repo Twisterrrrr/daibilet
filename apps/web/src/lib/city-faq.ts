@@ -1,6 +1,6 @@
 import type { PublicCityPageDto } from '@daibilet/contracts/public';
 
-import { cityToGenitive, inCityPrepositional } from '@/lib/city-declension';
+import { inCityPrepositional } from '@/lib/city-declension';
 import { formatNumber, formatPriceFrom } from '@/lib/format';
 import { resolveCityBrief, resolveCityInfo } from '@/lib/cityInfo';
 import { evaluateCityIndexability } from '@/lib/hub-indexability';
@@ -17,7 +17,11 @@ export function buildCityEditorialFaqItems(payload: PublicCityPageDto): CityFaqI
   return info.faq.map((item) => ({ question: item.q, answer: item.a }));
 }
 
-/** FAQ только для indexable (не thin) городов — иначе пустой FAQPage вреден. */
+/**
+ * FAQ для city hub: только city-specific (cityInfo.faq / editorial).
+ * Платформенные вопросы про Дайбилет (цены, регистрация, фильтры) сюда не входят.
+ * Если у города нет city FAQ — пустой массив (секция `#faq` скрывается).
+ */
 export function buildCityFaqItems(payload: PublicCityPageDto): CityFaqItem[] {
   const decision = evaluateCityIndexability({
     events: payload.stats?.events ?? payload.city.events ?? 0,
@@ -27,57 +31,7 @@ export function buildCityFaqItems(payload: PublicCityPageDto): CityFaqItem[] {
   });
   if (!decision.indexable) return [];
 
-  const city = payload.city;
-  const name = city.name;
-  const gen = cityToGenitive(name);
-  const inCity = inCityPrepositional(name);
-  const ofCity = gen === name ? `города ${name}` : gen;
-  const events = payload.stats?.events ?? city.events ?? 0;
-  const venues = payload.stats?.venues ?? city.venues ?? 0;
-  const categories = Object.entries(city.categories || {})
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 4)
-    .map(([label]) => label);
-  const priceFrom = payload.stats?.priceFrom;
-  const topCategory = categories[0];
-
-  const items: CityFaqItem[] = [
-    {
-      question: `Как купить билеты на события ${inCity}?`,
-      answer:
-        `На Дайбилете откройте карточку нужного события ${inCity}, выберите дату и тариф, затем оплатите у билетного оператора (Ticketscloud или Teplohod.info). Финансовый контур остаётся у поставщика — после оплаты билет приходит от него.`,
-    },
-    {
-      question: `Сколько событий сейчас в афише ${ofCity}?`,
-      answer:
-        events > 0
-          ? `Сейчас в каталоге ${formatNumber(events)} ${pluralEventsWord(events)}${venues > 0 ? ` на ${formatNumber(venues)} ${pluralVenuesWord(venues)}` : ''}${topCategory ? `. Популярные направления: ${categories.join(', ')}.` : '.'}`
-          : `Афиша ${ofCity} обновляется по мере появления сеансов. Загляните позже или посмотрите соседние города.`,
-    },
-  ];
-
-  if (priceFrom && priceFrom > 0) {
-    items.push({
-      question: `Какие цены на билеты ${inCity}?`,
-      answer: `Минимальная цена в текущей подборке — ${formatPriceFrom(priceFrom)}. Итоговая стоимость зависит от даты, тарифа и площадки; актуальная цена всегда на карточке события перед оплатой.`,
-    });
-  }
-
-  items.push({
-    question: `Можно ли выбрать площадку или категорию ${inCity}?`,
-    answer:
-      venues > 0 || categories.length
-        ? `Да: на странице города есть фильтры по категориям${venues > 0 ? ', блок площадок' : ''} и расписание. Можно сразу перейти к площадке или тематической подборке, если она есть для ${ofCity}.`
-        : `Да: откройте каталог событий с фильтром по городу ${name} и уточните категорию или дату.`,
-  });
-
-  items.push({
-    question: `Нужна ли регистрация на Дайбилете, чтобы купить билет ${inCity}?`,
-    answer:
-      'Для покупки через виджет поставщика отдельная регистрация на Дайбилете не обязательна. Аккаунт Дайбилета удобен, если хотите сохранять избранное и смотреть историю заказов в личном кабинете.',
-  });
-
-  return items;
+  return buildCityEditorialFaqItems(payload);
 }
 
 export function buildCitySeoText(payload: PublicCityPageDto): string | null {

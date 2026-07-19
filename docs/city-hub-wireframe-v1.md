@@ -164,7 +164,7 @@ flowchart TB
 | | |
 |--|--|
 | **Контент** | Q/A пары |
-| **Источник** | `cityInfo.faq` (+ при необходимости generated items из `buildCityFaqItems` / editorial) — **один** accordion-блок, без дубля «guide FAQ» + «SEO FAQ» как сейчас |
+| **Источник** | только city-specific FAQ (`cityInfo.faq` / editorial) — **один** accordion-блок; платформенные FAQ про Дайбилет (цены, регистрация, фильтры) **не** подмешивать; без FAQ — скрыть `#faq` |
 | **CTA** | Нет |
 | **Формат** | Accordion; JSON-LD FAQPage без регрессии |
 
