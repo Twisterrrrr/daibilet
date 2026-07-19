@@ -13,6 +13,7 @@ import {
 
 import { EventCard } from '@/components/EventCard';
 import Link from 'next/link';
+import { formatStreetAddress } from '@/lib/address';
 import { formatMoney, formatNumber, formatPriceFrom } from '@/lib/format';
 import { resolveCityImage } from '@/lib/city-images';
 import type { CityFaqItem } from '@/lib/city-faq';
@@ -932,7 +933,9 @@ function VenueHighlights({
               <span className={`flex items-center gap-1 text-sm ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
                 <MapPin className="h-3.5 w-3.5 shrink-0" />
                 {venue.address ? (
-                  <span className="line-clamp-1">{venue.address}</span>
+                  <span className="line-clamp-1">
+                    {formatStreetAddress(venue.address, { city: venue.city }) || venue.address}
+                  </span>
                 ) : (
                   <span>{pluralEvents(venue.events)}</span>
                 )}
