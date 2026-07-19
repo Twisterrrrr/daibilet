@@ -25,6 +25,34 @@ type HomePageData = {
   statsPayload: Awaited<ReturnType<typeof buildPublicStatsDto>>;
 };
 
+function emptyHomePageData(): HomePageData {
+  const generatedAt = new Date().toISOString();
+  return {
+    destinationsPayload: { generatedAt, destinations: [] },
+    catalogPayload: {
+      generatedAt,
+      items: [],
+      total: 0,
+      limit: 50,
+      offset: 0,
+      hasMore: false,
+      facets: {
+        cities: [],
+        categories: [],
+        subcategories: [],
+        landings: [],
+        priceSteps: [],
+      },
+    },
+    landingsCatalog: { generatedAt, city: 'all', items: [] },
+    venuesPayload: { generatedAt, total: 0, venues: [] },
+    statsPayload: {
+      generatedAt,
+      stats: { events: 0, destinations: 0, venues: 0, landings: 0 },
+    },
+  };
+}
+
 export const getHomeDestinations = unstable_cache(
   () => buildPublicDestinationsDto(),
   ['home-destinations-v2'],
@@ -55,13 +83,18 @@ export const getHomeStats = unstable_cache(
   homeCacheOptions,
 );
 
+/** Build/CI without Postgres: empty payloads (same pattern as SiteLayout destinations catch). */
 export async function getHomePageData(): Promise<HomePageData> {
-  const [destinationsPayload, catalogPayload, landingsCatalog, venuesPayload, statsPayload] = await Promise.all([
-    getHomeDestinations(),
-    getHomeCatalog(),
-    getHomeLandings(),
-    getHomeVenues(),
-    getHomeStats(),
-  ]);
-  return { destinationsPayload, catalogPayload, landingsCatalog, venuesPayload, statsPayload };
+  try {
+    const [destinationsPayload, catalogPayload, landingsCatalog, venuesPayload, statsPayload] = await Promise.all([
+      getHomeDestinations(),
+      getHomeCatalog(),
+      getHomeLandings(),
+      getHomeVenues(),
+      getHomeStats(),
+    ]);
+    return { destinationsPayload, catalogPayload, landingsCatalog, venuesPayload, statsPayload };
+  } catch {
+    return emptyHomePageData();
+  }
 }

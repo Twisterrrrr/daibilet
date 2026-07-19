@@ -14,7 +14,8 @@
 
 ### Проблемы
 
-- Возможны следующие падения на web/admin build — смотреть следующий run.
+- После typecheck: `web:build` prerender `/` → Prisma `Can't reach database server at 127.0.0.1:5437` (hero stats / `getHomePageData` без catch).
+- Fallback: `getHomePageData` → empty payloads при недоступной БД (как SiteLayout).
 
 ---
 

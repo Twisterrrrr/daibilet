@@ -58,20 +58,20 @@ export async function HomePageContent() {
   const destinations = destinationsPayload?.destinations ?? [];
   const cities = destinations.filter((item) => item.type === 'city');
   const topCities = [...cities].sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')).slice(0, 8);
-  const totalEvents = statsPayload.stats.events;
-  const totalVenues = statsPayload.stats.venues;
-  const cityCount = statsPayload.stats.destinations || cities.length;
+  const totalEvents = statsPayload?.stats?.events ?? 0;
+  const totalVenues = statsPayload?.stats?.venues ?? 0;
+  const cityCount = statsPayload?.stats?.destinations || cities.length;
 
-  const sessions = catalogPayload.items ?? [];
+  const sessions = catalogPayload?.items ?? [];
   const { editorsPick, homeNowTabs, popular } = buildHomePageSections(sessions);
   const sparseCatalog = sessions.length < 12;
 
-  const homeVenues = venuesPayload.venues
+  const homeVenues = (venuesPayload?.venues ?? [])
     .filter((venue) => venuePageTemplate(venue.type) === 'institution' && venue.events >= 3 && venue.address)
     .sort((a, b) => b.events - a.events)
     .slice(0, 8);
 
-  const promoLandings = (landingsCatalog.items || []).filter((item) => item.events > 0).slice(0, 6);
+  const promoLandings = (landingsCatalog?.items || []).filter((item) => item.events > 0).slice(0, 6);
   let blogCards = mergeBlogCards(null);
   try {
     const articlesPayload = await buildPublicArticlesListDto();
