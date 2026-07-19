@@ -12,7 +12,7 @@
 
 ### Проблемы
 
-- Deploy + proof SPB после commit.
+- Deploy prod `@5aa84d3` OK. Proof `/cities/sankt-peterburg`: нет «Популярные теги»; chips `rounded-md border px-2.5`; active `slate-800` (не primary blue). Editorial `?hub=editorial` — тоже без tag cloud.
 
 ---
 
