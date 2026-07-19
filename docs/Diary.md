@@ -1705,8 +1705,8 @@
 - Статика /_next/static через proxy на Node: при down Next → 502 на chunks.
 
 ### Решения
-- systemctl stop → m -rf apps/web/.next → pnpm web:build → start; /events 200, journal без cleanDisplayText.
+- `systemctl stop` → `rm -rf apps/web/.next` → `pnpm web:build` → start; `/events` и event slug 200, journal без `cleanDisplayText`.
 
 ### Проблемы
-- Нельзя параллелить два deploy-prod-next на одном хосте.
+- Нельзя параллелить два `deploy-prod-next` на одном хосте.
 
