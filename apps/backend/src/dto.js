@@ -125,11 +125,18 @@ const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 
 const CITY_ROUTING = loadCityRouting();
 const STANDALONE_CITY_NAMES = new Set(CITY_ROUTING.standaloneCities || []);
 const CITY_TO_REGION = new Map(Object.entries(CITY_ROUTING.cityToRegion || {}));
+const FOREIGN_CITY_NAMES = new Set(CITY_ROUTING.foreignCities || []);
+
+function isForeignPublicCity(name) {
+  const clean = cleanDisplayName(name);
+  return Boolean(clean && FOREIGN_CITY_NAMES.has(clean));
+}
 
 function isPublicRegionName(name) {
   const clean = cleanDisplayName(name);
   if (!clean || clean === 'Не указан') return false;
   if (STANDALONE_CITY_NAMES.has(clean)) return false;
+  if (FOREIGN_CITY_NAMES.has(clean)) return false;
   // «Республика Татарстан» — префикс (\b с кириллицей в JS ненадёжен).
   // «Чувашская Республика» / «… область|край|округ» — суффикс.
   return /^республика(?:\s|$)/iu.test(clean) || /(?:область|край|республика|округ)$/iu.test(clean);
@@ -384,7 +391,7 @@ function loadCityRouting() {
   try {
     return JSON.parse(readFileSync(path.join(PROJECT_ROOT, 'data', 'geo', 'city-routing.ru.json'), 'utf8'));
   } catch {
-    return { standaloneCities: [], cityToRegion: {} };
+    return { standaloneCities: [], cityToRegion: {}, foreignCities: [] };
   }
 }
 
@@ -6175,6 +6182,7 @@ function capitalizeLocality(value) {
 function routeCityToPublicDisplayName(cityName) {
   const clean = canonicalizePublicCityName(cityName) || cleanDisplayName(cityName);
   if (!clean || clean === 'Не указан') return clean;
+  if (isForeignPublicCity(clean)) return null;
   if (STANDALONE_CITY_NAMES.has(clean)) return clean;
   const mapped = CITY_TO_REGION.get(clean);
   if (mapped) return mapped;
@@ -6183,6 +6191,7 @@ function routeCityToPublicDisplayName(cityName) {
 
 function isAllowedPublicDestination(destination) {
   if (!destination?.name || destination.name === 'Не указан') return false;
+  if (isForeignPublicCity(destination.name)) return false;
   if (destination.type === 'city') return STANDALONE_CITY_NAMES.has(destination.name);
   if (destination.type === 'region') return PUBLIC_REGION_NAMES.has(destination.name) || isPublicRegionName(destination.name);
   return false;
@@ -7537,6 +7546,10 @@ async function destinationSummaryRowsFast(db) {
 function publicDestinationForCity(row) {
   const cityName = cleanDisplayName(row.city) || 'Не указан';
 
+  if (isForeignPublicCity(cityName)) {
+    return null;
+  }
+
   if (STANDALONE_CITY_NAMES.has(cityName)) {
     return buildPublicDestinationRecord(row, cityName);
   }
@@ -7555,6 +7568,7 @@ function publicDestinationForCity(row) {
   }
 
   const routed = routeCityToPublicDisplayName(cityName);
+  if (!routed) return null;
   return buildPublicDestinationRecord(row, routed);
 }
 
@@ -8222,7 +8236,9 @@ async function publicCatalogSessionsFast(db) {
   ]);
 
   const pinnedEventIds = new Set(pinnedResult.rows.map((row) => row.eventId));
-  const sessions = result.rows.map((row) => mapGroupedPublicSession(row, pinnedEventIds));
+  const sessions = result.rows
+    .map((row) => mapGroupedPublicSession(row, pinnedEventIds))
+    .filter(Boolean);
   return dedupeCrossSourceCatalogSessions(regroupMappedPublicCatalogSessions(sessions));
 }
 
@@ -8447,8 +8463,11 @@ function resolvePublicSessionCity(row) {
 export function mapGroupedPublicSession(row, pinnedEventIds = new Set()) {
   const tags = row.tags || [];
   const displayCity = resolvePublicSessionDisplayCity(row);
+  if (isForeignPublicCity(displayCity) || isForeignPublicCity(row.city)) return null;
   const groupCity = resolvePublicSessionCity(row);
+  if (!groupCity) return null;
   const destination = publicDestinationForCity({ ...row, city: row.city || displayCity });
+  if (!destination) return null;
   const fallbackWidgetUrl = buildProviderWidgetUrl(row);
   const purchase = purchaseInfo(row);
   const purchaseUrl = purchase.url || fallbackWidgetUrl;

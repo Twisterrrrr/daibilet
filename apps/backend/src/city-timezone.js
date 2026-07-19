@@ -63,7 +63,6 @@ const REGION_TIME_ZONES = {
   'Кемеровская область': 'Asia/Novokuznetsk',
   'Свердловская область': 'Asia/Yekaterinburg',
   'Ханты-Мансийский автономный округ': 'Asia/Yekaterinburg',
-  Япония: 'Asia/Tokyo',
 };
 
 const cityToRegion = routing.cityToRegion || {};

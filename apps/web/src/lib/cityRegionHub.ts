@@ -58,6 +58,24 @@ const REGION_HUBS: Array<{
     centerCity: 'Благовещенск (Амурская область)',
     centerSlugs: ['blagoveschensk-amurskaya-oblast', 'blagoveshchensk-amurskaya-oblast'],
   },
+  { regionName: 'Воронежская область', regionSlug: 'voronezhskaya-oblast', centerCity: 'Воронеж', centerSlugs: ['voronezh'] },
+  { regionName: 'Владимирская область', regionSlug: 'vladimirskaya-oblast', centerCity: 'Владимир', centerSlugs: ['vladimir'] },
+  { regionName: 'Тюменская область', regionSlug: 'tyumenskaya-oblast', centerCity: 'Тюмень', centerSlugs: ['tyumen'] },
+  { regionName: 'Иркутская область', regionSlug: 'irkutskaya-oblast', centerCity: 'Иркутск', centerSlugs: ['irkutsk'] },
+  { regionName: 'Пермский край', regionSlug: 'permskiy-kray', centerCity: 'Пермь', centerSlugs: ['perm'] },
+  { regionName: 'Удмуртская Республика', regionSlug: 'udmurtskaya-respublika', centerCity: 'Ижевск', centerSlugs: ['izhevsk'] },
+  { regionName: 'Псковская область', regionSlug: 'pskovskaya-oblast', centerCity: 'Псков', centerSlugs: ['pskov'] },
+  { regionName: 'Липецкая область', regionSlug: 'lipetskaya-oblast', centerCity: 'Липецк', centerSlugs: ['lipetsk'] },
+  { regionName: 'Тверская область', regionSlug: 'tverskaya-oblast', centerCity: 'Тверь', centerSlugs: ['tver'] },
+  { regionName: 'Орловская область', regionSlug: 'orlovskaya-oblast', centerCity: 'Орёл', centerSlugs: ['orel', 'oryol'] },
+  { regionName: 'Брянская область', regionSlug: 'bryanskaya-oblast', centerCity: 'Брянск', centerSlugs: ['bryansk'] },
+  { regionName: 'Республика Коми', regionSlug: 'respublika-komi', centerCity: 'Сыктывкар', centerSlugs: ['syktyvkar'] },
+  {
+    regionName: 'Кировская область',
+    regionSlug: 'kirovskaya-oblast',
+    centerCity: 'Киров (Кировская область)',
+    centerSlugs: ['kirov-kirovskaya-oblast', 'kirov'],
+  },
 ];
 
 const HUB_CITY_TO_REGION_SLUG = buildHubCityToRegionSlug();

@@ -29,6 +29,7 @@
 |---------|----------|
 | Адм. центр субъекта + saleable | `standaloneCities` + city hub (thin listing ok; приоритет ≥2–3 saleable) |
 | Город области/края/республики (не центр) | `cityToRegion` → субъект; **не** считать «дырой» allowlist |
+| Зарубежье (non-RF) | `foreignCities` — не standalone, не public catalog |
 | Мелкие посёлки (Сортавала, Лебяжье и т.п.) | только region, не standalone |
 | Набережные Челны | Татарстан → карточка Казани / блок «события области», не отдельный public city |
 

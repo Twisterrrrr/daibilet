@@ -107,7 +107,7 @@ export async function getPublicCatalogSessions(
     const sessions = filterCatalogSessions(
       dedupeCrossSourceCatalogSessions(
         regroupMappedPublicCatalogSessions(
-          rows.map((row) => mapGroupedPublicSession(row, pinnedEventIds)),
+          rows.map((row) => mapGroupedPublicSession(row, pinnedEventIds)).filter(Boolean),
         ),
       ),
     );

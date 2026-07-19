@@ -82,6 +82,7 @@ export interface PublicCatalogMappingRow {
 interface CityRoutingConfig {
   standaloneCities?: string[];
   cityToRegion?: Record<string, string>;
+  foreignCities?: string[];
 }
 
 interface PublicDestination {
@@ -96,6 +97,12 @@ const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '
 const cityRouting = loadCityRouting();
 const standaloneCityNames = new Set(cityRouting.standaloneCities || []);
 const cityToRegion = new Map(Object.entries(cityRouting.cityToRegion || {}));
+const foreignCityNames = new Set(cityRouting.foreignCities || []);
+
+function isForeignPublicCity(name: string | null | undefined): boolean {
+  const clean = cleanDisplayName(name);
+  return Boolean(clean && foreignCityNames.has(clean));
+}
 const cityImageAliases: Record<string, string> = {
   moskva: 'moscow',
   'sankt-peterburg': 'saint-petersburg',
@@ -113,7 +120,7 @@ const knownSessionCities = [
   'Владимир', 'Пермь', 'Тверь', 'Сочи', 'Тула',
 ].sort((left, right) => right.length - left.length);
 
-export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSessionDto {
+export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSessionDto | null {
   const tags = row.tags || [];
   const subcategories = pickCatalogSubcategories({
     category: row.category,
@@ -123,7 +130,9 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
     venue: row.venue,
   });
   const cityName = resolvePublicSessionCity(row);
+  if (isForeignPublicCity(cityName) || isForeignPublicCity(row.city)) return null;
   const destination = publicDestinationForCity({ ...row, city: cityName });
+  if (!destination) return null;
   const timeZone = resolveCityTimeZone(cityName, destination.name);
   const fallbackWidgetUrl = buildProviderWidgetUrl(row);
   const purchase = purchaseInfo(row);
@@ -324,10 +333,23 @@ function loadCityRouting(): CityRoutingConfig {
   }
 }
 
-function publicDestinationForCity(row: PublicCatalogMappingRow): PublicDestination {
+function publicDestinationForCity(row: PublicCatalogMappingRow): PublicDestination | null {
   const cityName = cleanDisplayName(row.city) || 'Не указан';
+  if (isForeignPublicCity(cityName)) return null;
+
   const mappedRegion = cityToRegion.get(cityName);
   if (mappedRegion && !standaloneCityNames.has(cityName)) {
+    // Fold into standalone city when mapped target is itself a public city (Зеленоград→Москва).
+    if (standaloneCityNames.has(mappedRegion)) {
+      const slug = publicSlug(mappedRegion);
+      return {
+        id: row.cityId || `city_${slug}`,
+        slug,
+        sourceSlug: row.citySlug || slug,
+        name: mappedRegion,
+        type: 'city',
+      };
+    }
     const slug = publicSlug(mappedRegion);
     return {
       id: row.regionId || `region_${slug}`,
