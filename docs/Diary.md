@@ -1,3 +1,22 @@
+## 2026-07-19 — City hubs: Саранск brief + Иваново/Мурманск sights
+
+### Наблюдения
+
+- У Саранска были travel/FAQ/sights, но `brief` был пустым — hero падал на fallback.
+- Иваново и Мурманск — последние ❌ по sights в gap-матрице среди standalone hubs.
+
+### Решения
+
+- Саранск: заполнен `brief` (текст владельца).
+- Иваново / Мурманск: топ-6 `sights[{title,text}]`; опечатка «конструструктивизма» → «конструктивизма».
+- Обновлён `docs/city-hub-content-gaps.md` (brief 65/65, sights ❌ = 0).
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-19 — City hubs: sights + travel/FAQ wave 2 + gaps table
 
 ### Наблюдения
