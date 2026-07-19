@@ -369,18 +369,26 @@ Endpoint:
 - `GET /events`;
 - `GET /events/{id}`.
 
-По рабочей модели статусы заказов Teplohod.info можно получать через API, но точный endpoint и формат ответа пока не описаны в переданном документе.
+**Prod probe 2026-07-19 (IP allowlist сервера):**
 
-В документе не описаны:
+| URL | HTTP |
+| --- | --- |
+| `GET https://api.teplohod.info/v1/events` | 200 |
+| `GET https://api.teplohod.info/v1/orders` (и aliases bookings/sales/…) | **404** |
+| `GET https://account.teplohod.info/api/orders` | **401** (endpoint существует) |
+| `GET https://account.teplohod.info/api/widgets` / `profile` / `events` | **401** |
 
-- создание заказа;
-- получение факта покупки;
-- получение статуса билета/заказа;
+Импортёр: `npm run tep:orders` (`scripts/tep-sync-orders.js`). Без `TEP_ORDERS_TOKEN` → `BLOCKED`. После выдачи токена: `TEP_ORDERS_API_URL` (default account `/api/orders`), `TEP_ORDERS_AUTH=bearer|access-token|both`.
+
+В документе партнёра по-прежнему не описаны:
+
+- точная auth-схема и выпуск токена для агента;
+- schema списка заказов / билетов;
+- filter/pagination для incremental sync;
 - webhook/callback после покупки;
-- endpoint городов, хотя он упоминается как `https://api.teplohod.info/v1/cities`;
-- лимиты и rate limits;
-- формат ссылки на покупку;
-- правила подписи webhook, если webhook существует.
+- лимиты и rate limits.
+
+См. чеклист вопросов в `docs/qa.md`.
 
 ### Предварительный маппинг
 

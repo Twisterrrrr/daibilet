@@ -498,6 +498,12 @@ export async function handleRequest(request, response) {
       return;
     }
 
+    if (route === 'POST /api/v1/tep/orders/sync' || route === 'POST /api/admin/orders/tep/sync') {
+      const result = await runTeplohodOrdersSync(url.searchParams);
+      sendJson(response, result);
+      return;
+    }
+
     if (route === 'GET /api/admin/events') {
       sendJson(response, await buildAdminEventsList(db, url.searchParams));
       return;
@@ -1343,6 +1349,63 @@ function runTicketscloudCatalogImport() {
         ok: true,
         stats,
         output: stdout.trim(),
+      });
+    });
+  });
+}
+
+function runTeplohodOrdersSync(searchParams = new URLSearchParams()) {
+  return new Promise((resolve, reject) => {
+    const startedAt = new Date().toISOString();
+    const args = [path.join(rootDir, 'scripts', 'tep-sync-orders.js')];
+    appendCliArg(args, 'from', searchParams.get('from'));
+    appendCliArg(args, 'to', searchParams.get('to'));
+    appendCliArg(args, 'page-size', searchParams.get('pageSize'));
+    appendCliArg(args, 'max-pages', searchParams.get('maxPages'));
+    if (searchParams.get('dryRun') === '1' || searchParams.get('dry-run') === '1') {
+      args.push('--dry-run');
+    }
+    if (searchParams.get('probe') === '1') {
+      args.push('--probe');
+    }
+
+    const child = spawn(process.execPath, args, {
+      cwd: rootDir,
+      env: process.env,
+      windowsHide: true,
+    });
+    let stdout = '';
+    let stderr = '';
+
+    child.stdout.on('data', (chunk) => {
+      stdout += chunk.toString();
+    });
+    child.stderr.on('data', (chunk) => {
+      stderr += chunk.toString();
+    });
+    child.on('error', reject);
+    child.on('close', (code) => {
+      // Exit 0 with status=BLOCKED is expected until partner token is issued.
+      let stats = null;
+      try {
+        stats = parseLastJsonObject(stdout);
+      } catch {
+        stats = null;
+      }
+      if (code !== 0) {
+        const error = new Error(stderr || stdout || `Teplohod orders sync failed with exit code ${code}`);
+        error.statusCode = 500;
+        error.stats = stats;
+        reject(error);
+        return;
+      }
+      resolve({
+        ok: true,
+        blocked: stats?.status === 'BLOCKED',
+        stats,
+        output: stdout.trim(),
+        startedAt,
+        finishedAt: new Date().toISOString(),
       });
     });
   });

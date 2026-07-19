@@ -4,6 +4,29 @@
 
 ---
 
+## 2026-07-19 — Teplohod orders sync (каркас + probe)
+
+### Наблюдения
+
+- Каталог TEP (`TEP_API_URL=https://api.teplohod.info/v1`, IP allowlist) отдаёт `events`/`cities`; все угаданные paths `/orders`, `/bookings`, `/sales` и т.п. → **404**.
+- На `account.teplohod.info` живой REST: `GET /api/orders` и `/api/widgets`, `/api/profile`, `/api/events` → **401 Unauthorized** (endpoint есть, credentials нет). В `.env` prod нет `TEP_ORDERS_TOKEN` / `TEPLOHOD_API_*`.
+- Публичной схемы ответа orders у партнёра нет; email-парсинг по-прежнему отвергнут.
+
+### Решения
+
+- `scripts/tep-sync-orders.js` + `npm run tep:orders`: upsert в `ExternalOrder`/`ExternalTicket` (source `src_teplohod`), идемпотентно; без токена → `status=BLOCKED` (не SUCCESS).
+- Default URL: `https://account.teplohod.info/api/orders`; auth `bearer` / `access-token` / `both`.
+- Cron `deploy/cron/tep-orders-sync.sh` `*/15` рядом с `tc-orders` `*/10` (orders-only, каталог не трогает).
+- API: `POST /api/v1/tep/orders/sync` (+ admin alias).
+- Документирован список вопросов партнёру (qa + integrations).
+
+### Проблемы
+
+- Импорт **0 заказов** до выдачи токена/схемы. После токена нужен smoke `--dry-run` и сверка полей маппинга.
+- Неизвестно, фильтрует ли account API по `widget_id` / dateFrom — передаём как query aliases.
+
+---
+
 ## 2026-07-19 — Admin: editable Cities + article publishedAt
 
 ### Наблюдения
