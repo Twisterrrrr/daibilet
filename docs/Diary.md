@@ -1444,6 +1444,11 @@
 - oom-watch каждые 5 мин; alerts в oom-watch-alerts.log при swap>350Mi или MemoryCurrent≥90% MemoryHigh.
 - PG в Docker не трогали (optional later, documented).
 
+### Prod apply (2026-07-19)
+- Commit 9fb19c3 pulled; cron +x; env TEP_AUTO_SYNC_ENABLED=0, startup delay 45m / skip-if-fresh 6h, DAIBILET_PUBLIC_STARTUP_WARM=0.
+- Crontab: 	c-orders */10, oom-watch */5, 	ep-catalog-sync 20 */12.
+- One restart daibilet-api only. Smoke: API/web health 200; tc-orders ran (no Permission denied); journal: in-process TEP disabled + startup warm skipped.
+
 ### Проблемы
 - После смены env нужен **один** restart daibilet-api (не пачкой).
 - Первые минуты после отключения startup public warm — cold cache до первого трафика / post-sync warm.
