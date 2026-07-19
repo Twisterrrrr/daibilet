@@ -7,6 +7,15 @@
 
 ---
 
+## Инциденты prod (2026-07-19)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| I.1 | Пустые главная + `/events`: stats 500 (`destination.name` on null) → empty home cascade | Критический | ✅ hotfix `dto.js` + restart API/web |
+| I.2 | Web follow-up: SiteLayout Suspense fallback + CatalogShell SSR keep (rebuild) | Высокий | ⏳ в worktree `daibilet-push` |
+
+---
+
 ## Продуктовый фокус (2026-07-19)
 
 Стратегия: не рекламировать «пустышку» — сначала витрина (хабы + контент + базовый финконтур).
@@ -329,6 +338,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 2.2.8 | Favicon: Flaticon ticket_1912 → бренд `#4A7FD4`, classic horizontal | Высокий | ✅ 2026-07-19 deploy prod |
 | 2.2.9 | Favicon: тот же билет, rotate 45°, fill ~88–90% (32/48/96/180/192/512/ico/svg) | Высокий | ✅ 2026-07-19 deploy prod fc736e1 |
 | 2.2.10 | Favicon: зеркало угла `rotate(-45)`, тот же крупный fill (все PNG/ICO/SVG) | Высокий | ✅ 2026-07-19 deploy prod 70bc59f |
+| 2.2.11 | Favicon: оптический recenter `translate(1.2 1.2)` после rotate(-45) | Высокий | 🔄 commit → deploy prod |
 
 ### 2.3 Canonical & indexing policy
 

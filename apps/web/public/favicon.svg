@@ -3,10 +3,12 @@
     Classic ticket after Flaticon ticket_1912 (Freepik): rounded rect,
     circular notches on short ends, dashed perforation. Rotated -45°,
     scaled so AABB fills ~88–90% of the frame (little padding for tab visibility).
+    After rotate, translate(1.2 1.2) optically recenters: full short-axis corners
+    point TL/BR and read as «влево-вверх» when only AABB-centered.
     Brand blue #4A7FD4 (DAIBILET_LOGO_BLUE / site.webmanifest theme_color).
     Attribution: Freepik / Flaticon https://www.flaticon.com/ru/free-icon/ticket_1912
   -->
-  <g transform="translate(24 24) rotate(-45) scale(0.88) translate(-24 -24)">
+  <g transform="translate(24 24) translate(1.2 1.2) rotate(-45) scale(0.88) translate(-24 -24)">
     <path
       fill="#4A7FD4"
       fill-rule="evenodd"

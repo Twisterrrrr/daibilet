@@ -1,3 +1,25 @@
+## 2026-07-19 — Prod: пустые главная и `/events` (stats null.name)
+
+### Наблюдения
+
+- `/api/public/stats` → 500: `Cannot read properties of null (reading 'name')` в `destinationSummaryRowsFast` (`publicDestinationForCity` возвращает `null` для foreign/unroutable городов).
+- `getHomePageData` через `Promise.all` — падение stats обнуляло весь home (editors-pick / rails без карточек).
+- `/api/public/events` был жив (2371+); каталог без `?city=` на клиенте сбрасывал SSR в скелетоны на время city bootstrap.
+- `daibilet-api` / `daibilet-web` active; OOM в dmesg нет; web под memory high после рестартов.
+
+### Решения
+
+- Hotfix prod: `dto.js` — null-safe `destination?.name` в stats/admin/public rows; restart `daibilet-api` + `daibilet-web`, сброс `.next/cache`.
+- Worktree: `getHomePageData` → `Promise.allSettled`; SiteLayout Suspense fallback сохраняет `{children}`; CatalogShell не затирает SSR catalog при city bootstrap.
+- Proof: stats 200 (`events:2487`); home HTML с `evt_`×30 + «Выбор редакции»; `/events?city=Москва` с карточками.
+
+### Проблемы
+
+- Правки SiteLayout/CatalogShell в worktree ещё требуют web rebuild на prod (сейчас хватает API hotfix + cache bust).
+- Не деплоить поверх активного favicon-агента без координации.
+
+---
+
 ## 2026-07-19 — City hub: events>0 / venues=0 (Мурманск)
 
 ### Наблюдения
@@ -1236,6 +1258,24 @@
 ### Проблемы
 
 - Hard refresh / новая вкладка обязательны — браузерный кэш favicon не инвалидируется сам.
+
+---
+
+## 2026-07-19 — Favicon: оптическое центрирование после rotate(-45)
+
+### Наблюдения
+
+- Во вкладке Chrome синий билет ощущался **смещённым влево-вверх**.
+- AABB после `rotate(-45) scale(0.88)` геометрически по центру (равные pad), масса почти в центре; визуальный сдвиг даёт оптика: полные углы короткой оси смотрят в TL/BR, вырезы — в BL/TR.
+
+### Решения
+
+- Компенсация после pivot: `translate(24 24) translate(1.2 1.2) rotate(-45) scale(0.88) translate(-24 -24)`.
+- Обновлены SVG (`apps/web/public` + legacy `apps/public/public`) и перегенерированы 32/48/96, apple 180, 192/512, logo-192, `favicon.ico`.
+
+### Проблемы
+
+- Hard refresh / новая вкладка — кэш favicon в Chrome не сбрасывается сам.
 
 ---
 
