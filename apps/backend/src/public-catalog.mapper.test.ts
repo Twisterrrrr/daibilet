@@ -102,6 +102,18 @@ test('keeps open-date events saleable without a fake schedule', () => {
   assert.equal(result.timeLabel, 'В виджете');
 });
 
+test('dated TicketsCloud without schedule does not get fake open-date labels', () => {
+  const result = mapGroupedPublicSession(catalogRow({
+    kind: 'RECURRING',
+    sourceStatus: 'PUBLIC',
+    startsAt: null,
+    upcomingSlots: [],
+  }));
+
+  assert.notEqual(result.dateLabel, 'Открытая дата');
+  assert.notEqual(result.timeLabel, 'В виджете');
+});
+
 test('converts imported Moscow wall time to the real UTC instant', () => {
   const prismaTimestamp = new Date('2026-07-10T16:30:00.000Z');
 

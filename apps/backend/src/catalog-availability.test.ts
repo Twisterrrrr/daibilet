@@ -10,6 +10,8 @@ test('isOpenDateCatalogRow accepts OPEN_DATE kind and open_date status', () => {
   assert.equal(isOpenDateCatalogRow({ kind: 'OPEN_DATE' }), true);
   assert.equal(isOpenDateCatalogRow({ sourceStatus: 'open_date' }), true);
   assert.equal(isOpenDateCatalogRow({ kind: 'SINGLE' }), false);
+  assert.equal(isOpenDateCatalogRow({ kind: 'RECURRING', sourceStatus: 'PUBLIC' }), false);
+  assert.equal(isOpenDateCatalogRow({ kind: 'SERIES', sourceStatus: 'widget' }), false);
 });
 
 test('hasUpcomingOrOpenSchedule rejects past TEP rows without schedule', () => {

@@ -17,6 +17,10 @@ import {
 import type { PurchaseProvider } from './types/common.js';
 import { getPublicCatalogSessions } from './public-catalog.dto.js';
 import { pickFirstUsableEventImageUrl } from './event-image-url.js';
+import {
+  pickPrimarySessionPurchase,
+  shouldSynthesizeWidgetOnlySession,
+} from './public-event-widget-fallback.js';
 import { pickCatalogSubcategories } from './public-catalog.mapper.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
 import type {
@@ -468,11 +472,12 @@ function buildWidgetOnlySessions(
   purchaseUrl: string | null,
   catalogSession?: PublicSessionDto,
 ): PublicEventSession[] {
-  // Only true open-date / undated schedules get a synthetic slot.
-  // TicketsCloud dated products must NOT fall back to "В виджете" when all
-  // fixed sessions expired — that opens the past TC eventId ("Мероприятие прошло").
-  const widgetSchedule = isOpenDateCatalogRow({ kind: event.kind, sourceStatus: event.sourceStatus });
-  if (sessions.length || !widgetSchedule || !purchase.ready) {
+  if (!shouldSynthesizeWidgetOnlySession({
+    sessionsLength: sessions.length,
+    kind: event.kind,
+    sourceStatus: event.sourceStatus,
+    purchaseReady: purchase.ready,
+  })) {
     return [];
   }
   return [{
@@ -667,47 +672,6 @@ async function loadMetaGroupMembers(requestedEvent: EventRecord): Promise<EventR
     },
     include: eventInclude,
   });
-}
-
-function extractTcEventIdFromPurchaseUrl(url?: string | null): string | null {
-  if (!url) return null;
-  const match = String(url).match(/[?&]event=([^&]+)/i);
-  return match ? decodeURIComponent(match[1]) : null;
-}
-
-function pickPrimarySessionPurchase(
-  sessions: PublicEventSession[],
-  fallbackUrl: string | null,
-  fallbackExternalId: string | null,
-): {
-  purchaseUrl: string | null;
-  externalId: string | null;
-  urlSource: PublicEventSession['purchaseUrlSource'] | null;
-} {
-  for (const session of sessions) {
-    if (session.purchaseReady === false) continue;
-    if (!session.purchaseUrl) continue;
-    if (typeof session.vacant === 'number' && session.vacant <= 0) continue;
-    const tcEventId = extractTcEventIdFromPurchaseUrl(session.purchaseUrl);
-    return {
-      purchaseUrl: session.purchaseUrl,
-      externalId: tcEventId || fallbackExternalId,
-      urlSource: session.purchaseUrlSource || null,
-    };
-  }
-  const firstWithUrl = sessions.find((session) => session.purchaseUrl);
-  if (firstWithUrl?.purchaseUrl) {
-    return {
-      purchaseUrl: firstWithUrl.purchaseUrl,
-      externalId: extractTcEventIdFromPurchaseUrl(firstWithUrl.purchaseUrl) || fallbackExternalId,
-      urlSource: firstWithUrl.purchaseUrlSource || null,
-    };
-  }
-  return {
-    purchaseUrl: fallbackUrl,
-    externalId: fallbackExternalId,
-    urlSource: null,
-  };
 }
 
 function resolveMultiPurchasePeers(groupEvents: EventRecord[], requestedEvent: EventRecord): EventRecord[] {

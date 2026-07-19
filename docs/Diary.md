@@ -1,3 +1,23 @@
+## 2026-07-19 — Регрессионные тесты: Teplohod image + TC fake open-date
+
+### Наблюдения
+
+- Фиксы B.15/B.16 уже в prod, но unit-покрытие было тонким; `public-event-widget-fallback.test.ts` не входил в `test:ts`.
+- Gate «синтетический widget-slot» и `pickPrimarySessionPurchase` жили внутри `public-event.dto.ts` без прямого импорта в тестах.
+
+### Решения
+
+- Вынесены чистые хелперы в `public-event-widget-fallback.ts`; dto использует их.
+- Расширены `event-image-url.test.ts` (нет twcstorage/X-Amz в результате, encode, non-TEP untouched) и widget-fallback (dated RECURRING/SINGLE, meta-sibling purchase switch).
+- `catalog-availability` + mapper: dated TC ≠ «Открытая дата».
+- `npm test` / `test:ts` включают оба файла; suite **57 pass**.
+
+### Проблемы
+
+- Пункт 3 (JSON-LD) не начат. Деплой API не нужен (только тесты + extract без смены поведения).
+
+---
+
 ## 2026-07-19 — 0.5.8 SQL read-model для admin Events
 
 ### Наблюдения
