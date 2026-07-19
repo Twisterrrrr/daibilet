@@ -119,11 +119,11 @@ export function CityPageView({
           <>
             <CityHero city={city} stats={payload.stats} guide={guide} />
             <CityTravelSection travel={guide?.travel} />
+            <CitySightsSection city={city} guide={guide} categories={categories} venues={payload.venues} allowFallback={contentReady} />
             <CityEditorialFaqSection items={guide?.faq} />
             {contentReady ? (
               <>
                 <PopularDirections city={city} landings={payload.landings} categories={categories} />
-                <MustSeeSection city={city} guide={guide} categories={categories} venues={payload.venues} />
                 <CategoryTiles categories={categories} onSelect={(value) => {
                   setCategory(value);
                   setTag('all');
@@ -358,26 +358,37 @@ function PopularDirections({ city, landings, categories }: { city: PublicCityDto
   );
 }
 
-function MustSeeSection({
+function CitySightsSection({
   city,
   guide,
   categories,
   venues,
+  allowFallback = false,
 }: {
   city: PublicCityDto;
   guide: CityInfoEntry | null;
   categories: Array<[string, number]>;
   venues: PublicVenueDto[];
+  allowFallback?: boolean;
 }) {
-  const places = guide?.mustSee.length ? guide.mustSee : buildFallbackMustSee(city, categories, venues);
+  const fromSights =
+    guide?.sights?.map((item) => ({ name: item.title, desc: item.text })) || [];
+  const fromMustSee = guide?.mustSee?.length ? guide.mustSee : [];
+  const places = fromSights.length
+    ? fromSights
+    : fromMustSee.length
+      ? fromMustSee
+      : allowFallback
+        ? buildFallbackMustSee(city, categories, venues)
+        : [];
   if (!places.length) return null;
   const cityIn = cityInPrepositional(city);
 
   return (
-    <section className="container-page py-12">
-      <h2 className="text-2xl font-bold text-slate-950">Что обязательно посетить {cityIn}</h2>
+    <section id="city-sights" className="container-page py-12">
+      <h2 className="text-2xl font-bold text-slate-950">Что посмотреть {cityIn}</h2>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-        Главные точки и сценарии, с которых удобно начать знакомство с городом. Ниже можно перейти к билетам, расписанию и площадкам.
+        Главные точки, с которых удобно начать знакомство с городом. Ниже — билеты, расписание и площадки.
       </p>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {places.slice(0, 6).map((place, index) => (
