@@ -1,3 +1,22 @@
+## 2026-07-19 — City hubs: ещё 9 brief (Чита…Хабаровск)
+
+### Наблюдения
+
+- Чита в исходнике владельца была дважды («Город привлекает…» / «Чита привлекает…») — оставлен один текст с «Чита привлекает…».
+- Prod-slug: `lipeck` (не lipetsk), `kirov-kirovskaya-oblast`, `habarovsk` (не khabarovsk).
+
+### Решения
+
+- +9 `brief` в `CITY_INFO` (web + public): chita, kirov-kirovskaya-oblast, kurgan, lipeck, ivanovo, kemerovo, cheboksary, barnaul, habarovsk.
+- Алиасы: `kirov`→`kirov-kirovskaya-oblast`, `lipetsk`→`lipeck`, `khabarovsk`→`habarovsk`.
+- Опечатка «Ииндустриальное» → «Индустриальное» (Кемерово).
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-19 — City hubs: brief-описания 14 адмцентров
 
 ### Наблюдения
