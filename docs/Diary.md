@@ -374,7 +374,7 @@
 
 ### Решения
 
-- Увеличен fill (~90% кадра); финальный арт на prod — горизонтальный classic ticket (Flaticon-style, `#4A7FD4`).
+- Увеличен fill (~90% кадра); временно на prod — горизонтальный classic ticket (Flaticon-style, `#4A7FD4`), чтобы убрать «пугающую» мелкую диагональ.
 - PNG: 32 / 48 / 96 / apple 180 / 192 / 512 + `favicon.ico`; `site.webmanifest` с 192+512.
 - `layout.tsx` metadata.icons + `manifest: /site.webmanifest`. Проверено live: `/favicon-48x48.png`, `/icon-512x512.png`, `/site.webmanifest` → 200.
 
@@ -382,6 +382,25 @@
 
 - Кэш favicon в браузере агрессивный — hard refresh / новая вкладка.
 - Не гонять два `next build`/`deploy-prod-next` одновременно на prod (OOM).
+
+---
+
+## 2026-07-19 — Favicon: снова 45°, но крупный fill
+
+### Наблюдения
+
+- После замены на горизонтальный Flaticon ticket пользователь ожидает снова поворот ~45°.
+- Горизонталь была намеренной реакцией на жалобу «диагональ мелкая/пугающая», не финальным отказом от угла.
+
+### Решения
+
+- Тот же силуэт ticket_1912 / `#4A7FD4`, `rotate(45)` + `scale(0.88)` → AABB ~88–90% кадра, мало padding.
+- Перегенерированы 32/48/96, apple 180, 192/512, logo-192, ico, svg (`apps/web/public` + legacy `apps/public/public/favicon.svg`).
+- layout/manifest без изменений.
+
+### Проблемы
+
+- Нужен hard refresh / новая вкладка из‑за кэша favicon.
 
 ---
 

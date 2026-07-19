@@ -76,4 +76,4 @@
 
 ## Атрибуция иконок
 
-Favicon / PWA-иконки (`apps/web/public/favicon.*`, `icon-*.png`, `apple-touch-icon.png`): силуэт билета по [Flaticon ticket_1912](https://www.flaticon.com/ru/free-icon/ticket_1912) (автор **Freepik** / **Flaticon**), перекрашен в бренд-синий `#4A7FD4` (`DAIBILET_LOGO_BLUE`).
+Favicon / PWA-иконки (`apps/web/public/favicon.*`, `icon-*.png`, `apple-touch-icon.png`): силуэт билета по [Flaticon ticket_1912](https://www.flaticon.com/ru/free-icon/ticket_1912) (автор **Freepik** / **Flaticon**), перекрашен в бренд-синий `#4A7FD4` (`DAIBILET_LOGO_BLUE`), повёрнут на 45° с крупным fill (~88–90% кадра).
