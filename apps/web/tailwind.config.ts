@@ -51,6 +51,7 @@ const config: Config = {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
         display: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
+        serif: ['Source Serif 4', 'Georgia', 'Times New Roman', 'serif'],
       },
       borderRadius: {
         lg: 'var(--radius)',

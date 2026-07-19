@@ -2,10 +2,12 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
 import { CityPageView } from '@/components/CityPageView.client';
+import { CityPageViewEditorial } from '@/components/CityPageViewEditorial.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { inCityPrepositional } from '@/lib/city-declension';
 import { buildCityFaqItems, buildCitySeoText } from '@/lib/city-faq';
+import { resolveCityHubTemplate } from '@/lib/city-hub-template';
 import { buildCityHubSeoTitle, buildCityHubSeoTitleCore } from '@/lib/city-hub-seo';
 import { evaluateCityIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { pageTitle, routeOpenGraph } from '@/lib/seo-meta';
@@ -16,6 +18,7 @@ export const revalidate = 300;
 
 type PageProps = {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -48,14 +51,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function CityPage({ params }: PageProps) {
+export default async function CityPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
-  const payload = await buildPublicCityDto(decodeURIComponent(slug));
+  const query = await searchParams;
+  const decodedSlug = decodeURIComponent(slug);
+  const payload = await buildPublicCityDto(decodedSlug);
   if (!payload?.city) notFound();
 
   const faqItems = buildCityFaqItems(payload);
   const seoText = buildCitySeoText(payload);
   const jsonLdBlocks = buildCityPageJsonLd(payload);
+  const hubTemplate = resolveCityHubTemplate({
+    slug: decodedSlug,
+    hubQuery: query.hub,
+  });
+  const View = hubTemplate === 'editorial' ? CityPageViewEditorial : CityPageView;
 
   return (
     <SiteLayout>
@@ -66,12 +76,7 @@ export default async function CityPage({ params }: PageProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }}
         />
       ))}
-      <CityPageView
-        slug={decodeURIComponent(slug)}
-        initialPayload={payload}
-        faqItems={faqItems}
-        seoText={seoText}
-      />
+      <View slug={decodedSlug} initialPayload={payload} faqItems={faqItems} seoText={seoText} />
     </SiteLayout>
   );
 }

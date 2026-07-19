@@ -1,3 +1,23 @@
+## 2026-07-19 — City hub editorial template (P.2i experiment)
+
+### Наблюдения
+
+- Фаза 1 (`d877813`) — default IA: affiche first + sticky + FAQ accordion.
+- Lovable Vite mock (`city-hub-redesign`) — moodboard only: light zinc, serif H1, poster 4:5 cards; не порт стека (TanStack/bun/shadcn/terracotta).
+
+### Решения
+
+- Параллельный template: `hubTemplate: 'editorial' | 'default'`; `CityPageViewEditorial` → `CityPageView hubTemplate="editorial"`.
+- Включение: `?hub=editorial` (любой город); `?hub=default` форсирует фазу 1; optional env `CITY_HUB_EDITORIAL_SLUGS` allowlist (не трогает 65 городов по умолчанию).
+- Visual: Source Serif 4 H1/H2, zinc-50, compact counters, sticky tabs, affiche poster-cards (`AffichePosterCard`), те же API/`cityInfo` данные.
+- Default phase 1 без регрессии.
+
+### Проблемы
+
+- Deploy + proof URL СПб с/без `?hub=editorial` — после push.
+
+---
+
 ## 2026-07-19 — City hub фаза 1 (P.2f) реализована
 
 ### Наблюдения

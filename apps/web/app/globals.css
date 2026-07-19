@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -25,6 +25,7 @@
     --gradient-hero: linear-gradient(180deg, hsl(224, 76%, 48%) 0%, hsl(224, 76%, 38%) 100%);
     --font-body: 'Inter', system-ui, sans-serif;
     --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+    --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
     --site-header-height: 4rem;
     --bridges-gradient-hero: radial-gradient(ellipse 90% 70% at 70% 40%, oklch(0.38 0.14 265 / 0.9), transparent 70%),
       linear-gradient(135deg, oklch(0.22 0.10 265), oklch(0.30 0.13 262));
@@ -75,6 +76,10 @@
 
   .font-display {
     font-family: var(--font-display);
+  }
+
+  .font-serif {
+    font-family: var(--font-serif);
   }
 
   button:not(.inline-btn):not(.event-favorite-btn),

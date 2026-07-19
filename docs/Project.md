@@ -89,7 +89,7 @@ packages/config   — shared tsconfig/eslint
 | `/` | SSR dynamic | home + top cities |
 | `/events` | SSR dynamic | каталог, filters GET, pagination |
 | `/events/[slug]` | SSR dynamic | event hero + sticky buy card (TC/Teplohod widgets) |
-| `/cities`, `/cities/[slug]` | SSR dynamic | **city hub** (SEO-якорь города) |
+| `/cities`, `/cities/[slug]` | SSR dynamic | **city hub** (SEO-якорь города); default = wireframe v1; `?hub=editorial` = параллельный visual experiment (P.2i) |
 | `/venues`, `/venues/[slug]` | SSR dynamic | |
 | `/locations`, `/locations/[slug]` | SSR dynamic | |
 | `/podborki` | ISR 3600 | каталог подборок |
