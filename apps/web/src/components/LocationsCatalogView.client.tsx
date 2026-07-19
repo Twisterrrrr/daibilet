@@ -1,14 +1,18 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 
 import { LocationCard } from '@/components/LocationCard.client';
+import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicVenueDto } from '@daibilet/contracts/public';
+import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { formatNumber } from '@/lib/format';
+import { persistSelectedCity } from '@/lib/selected-city';
 import { LOCATION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
-import { venueCatalogHref, venueHref } from '@/lib/routes';
+import { venueHref } from '@/lib/routes';
 
 type SortMode = 'events' | 'asc' | 'desc';
 
@@ -19,10 +23,16 @@ const SORT_OPTIONS: Array<[SortMode, string]> = [
 ];
 
 export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const selectedCity = useSelectedCityOptional();
   const [query, setQuery] = useState('');
-  const [cityFilter, setCityFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [sortMode, setSortMode] = useState<SortMode>('events');
+
+  const urlCity = searchParams.get('city')?.trim() || '';
+  const cityReady = selectedCity?.cityReady ?? true;
+  const cityPending = !urlCity && Boolean(selectedCity) && !cityReady;
 
   const cityOptions = useMemo(() => {
     const counts = new Map<string, number>();
@@ -32,6 +42,26 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
     }
     return [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'ru'));
   }, [venues]);
+
+  const cityFilter = useMemo(() => {
+    if (urlCity) {
+      const fromOptions = cityOptions.find(([name]) => name.toLowerCase() === urlCity.toLowerCase());
+      if (fromOptions) return fromOptions[0];
+      return urlCity;
+    }
+    if (!cityReady || !selectedCity || selectedCity.cityValue === 'all') return 'all';
+    const fromOptions = cityOptions.find(([name]) => name === selectedCity.cityValue);
+    return fromOptions ? fromOptions[0] : selectedCity.cityValue;
+  }, [urlCity, cityReady, selectedCity, cityOptions]);
+
+  const setCityFilter = (next: string) => {
+    persistSelectedCity(next === 'all' ? 'all' : next);
+    const params = new URLSearchParams(searchParams.toString());
+    if (next === 'all') params.delete('city');
+    else params.set('city', next);
+    const qs = params.toString();
+    router.replace(qs ? `/locations?${qs}` : '/locations', { scroll: false });
+  };
 
   const typeOptions = useMemo(() => {
     const counts = new Map<string, number>();
@@ -46,6 +76,7 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
   }, [venues]);
 
   const filteredVenues = useMemo(() => {
+    if (cityPending) return [];
     const normalized = query.trim().toLowerCase();
     const filtered = venues.filter((venue) => {
       if (cityFilter !== 'all' && venue.city !== cityFilter) return false;
@@ -63,9 +94,11 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
       if (sortMode === 'desc') return right.name.localeCompare(left.name, 'ru');
       return left.name.localeCompare(right.name, 'ru');
     });
-  }, [venues, query, cityFilter, typeFilter, sortMode]);
+  }, [venues, query, cityFilter, typeFilter, sortMode, cityPending]);
 
   const cityCount = cityOptions.length;
+  const eventsHref = catalogHrefWithSelectedCity(selectedCity?.cityValue);
+  const venuesHref = venueCatalogHrefWithSelectedCity('/venues', selectedCity?.cityValue);
 
   return (
     <>
@@ -94,10 +127,12 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
               />
             </div>
             <select
-              value={cityFilter}
+              value={cityPending ? '' : cityFilter}
+              disabled={cityPending}
               onChange={(event) => setCityFilter(event.target.value)}
-              className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none"
+              className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none disabled:opacity-70"
             >
+              {cityPending ? <option value="">Город…</option> : null}
               <option value="all">Все города</option>
               {cityOptions.map(([city, count]) => (
                 <option key={city} value={city}>
@@ -144,8 +179,14 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
       <div className="container-page py-8">
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
           <h2 className="text-lg font-semibold text-slate-900">
-            Найдено: {formatNumber(filteredVenues.length)}
-            {venues.length ? <span className="font-normal text-slate-500"> из {formatNumber(venues.length)}</span> : null}
+            {cityPending ? (
+              'Загрузка…'
+            ) : (
+              <>
+                Найдено: {formatNumber(filteredVenues.length)}
+                {venues.length ? <span className="font-normal text-slate-500"> из {formatNumber(venues.length)}</span> : null}
+              </>
+            )}
           </h2>
           <div className="flex flex-wrap items-center gap-3">
             <select
@@ -159,13 +200,19 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
                 </option>
               ))}
             </select>
-            <Link href={venueCatalogHref('institution')} className="text-sm font-semibold text-primary-600 hover:underline">
+            <Link href={venuesHref} className="text-sm font-semibold text-primary-600 hover:underline">
               Площадки: музеи и театры →
             </Link>
           </div>
         </div>
 
-        {filteredVenues.length > 0 ? (
+        {cityPending ? (
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="h-40 animate-pulse rounded-xl bg-slate-100" />
+            ))}
+          </div>
+        ) : filteredVenues.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {filteredVenues.map((venue) => (
               <LocationCard key={venue.id} venue={venue} href={venueHref(venue)} />
@@ -182,7 +229,7 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
           <Link href="/cities" className="font-medium text-primary hover:underline">
             Все города
           </Link>
-          <Link href="/events" className="font-medium text-primary hover:underline">
+          <Link href={eventsHref} className="font-medium text-primary hover:underline">
             Афиша событий
           </Link>
         </nav>

@@ -71,6 +71,7 @@ export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }
       ))}
       <Link
         href="/events"
+        onClick={() => persistSelectedCity('all')}
         className="ml-auto inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
       >
         <X className="h-3.5 w-3.5" aria-hidden />

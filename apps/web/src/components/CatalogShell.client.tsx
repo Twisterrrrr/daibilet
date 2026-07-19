@@ -8,8 +8,9 @@ import { CatalogActiveFilters } from '@/components/CatalogActiveFilters';
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
 import { CatalogResults } from '@/components/CatalogResults.client';
 import { CatalogToolbar } from '@/components/CatalogToolbar.client';
+import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
-import { catalogFiltersFromQuery } from '@/lib/catalog-url';
+import { catalogFiltersFromQuery, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { pluralEvents } from '@/lib/format';
 import {
   parseCatalogViewMode,
@@ -27,10 +28,16 @@ type CatalogShellProps = {
 export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: CatalogShellProps) {
   const router = useRouter();
   const urlSearchParams = useSearchParams();
+  const selectedCity = useSelectedCityOptional();
   const [catalog, setCatalog] = useState<PublicCatalogDto | null>(initialCatalog);
   const [loading, setLoading] = useState(!initialCatalog);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewModeState] = useState<CatalogViewMode>('cards');
+
+  const urlHasCity = Boolean(urlSearchParams.get('city')?.trim());
+  const cityReady = selectedCity?.cityReady ?? true;
+  /** Wait for storage resolve when URL has no city — avoids «Все города» then Уфа. */
+  const cityBootstrapPending = !urlHasCity && Boolean(selectedCity) && !cityReady;
 
   const searchParamsRecord = useMemo(
     () => searchParamsToRecord(Object.fromEntries(urlSearchParams.entries())),
@@ -47,25 +54,25 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   const queryKey = useMemo(() => catalogQueryCacheKey(query), [query]);
 
-  const filterValues = useMemo(
-    () =>
-      catalogFiltersFromQuery({
-        q: query.q,
-        city: query.city,
-        category: query.category,
-        landing: query.landing,
-        date: query.date,
-        from: query.from,
-        to: query.to,
-        sort: query.sort,
-        limit: query.limit as 50 | 100 | 200 | 300 | undefined,
-        minPrice: query.minPrice,
-        maxPrice: query.maxPrice ?? query.priceMax,
-        ageMax: query.ageMax,
-        page: query.page,
-      }),
-    [query],
-  );
+  const filterValues = useMemo(() => {
+    const base = catalogFiltersFromQuery({
+      q: query.q,
+      city: query.city,
+      category: query.category,
+      landing: query.landing,
+      date: query.date,
+      from: query.from,
+      to: query.to,
+      sort: query.sort,
+      limit: query.limit as 50 | 100 | 200 | 300 | undefined,
+      minPrice: query.minPrice,
+      maxPrice: query.maxPrice ?? query.priceMax,
+      ageMax: query.ageMax,
+      page: query.page,
+    });
+    if (base.city || !cityReady || !selectedCity || selectedCity.cityValue === 'all') return base;
+    return { ...base, city: selectedCity.cityValue };
+  }, [query, cityReady, selectedCity]);
 
   useEffect(() => {
     const fromUrl = urlSearchParams.get('view');
@@ -77,7 +84,21 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   }, [urlSearchParams]);
 
   useEffect(() => {
-    if (initialQueryKey && queryKey === initialQueryKey && initialCatalog) {
+    if (cityBootstrapPending) {
+      setLoading(true);
+      return;
+    }
+
+    if (initialQueryKey && queryKey === initialQueryKey && initialCatalog && urlHasCity) {
+      setCatalog(initialCatalog);
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
+    // SSR catalog without city is wrong when header will inject city — skip until URL catches up,
+    // but still allow fetch with effective city from context.
+    if (initialQueryKey && queryKey === initialQueryKey && initialCatalog && !filterValues.city) {
       setCatalog(initialCatalog);
       setLoading(false);
       setError(null);
@@ -88,7 +109,11 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     setLoading(true);
     setError(null);
 
-    const qs = urlSearchParams.toString();
+    const params = new URLSearchParams(urlSearchParams.toString());
+    if (!params.get('city')?.trim() && filterValues.city) {
+      params.set('city', filterValues.city);
+    }
+    const qs = params.toString();
     fetch(`/api/public/events${qs ? `?${qs}` : ''}`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error('catalog_fetch_failed');
@@ -105,7 +130,15 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       });
 
     return () => controller.abort();
-  }, [urlSearchParams, queryKey, initialQueryKey, initialCatalog]);
+  }, [
+    urlSearchParams,
+    queryKey,
+    initialQueryKey,
+    initialCatalog,
+    cityBootstrapPending,
+    urlHasCity,
+    filterValues.city,
+  ]);
 
   const setViewMode = useCallback(
     (next: CatalogViewMode) => {
@@ -152,11 +185,12 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           values={filterValues}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
-          disabled={loading && !catalog}
+          disabled={(loading && !catalog) || cityBootstrapPending}
+          cityReady={cityReady || urlHasCity}
         />
       </div>
 
-      {loading && !catalog ? (
+      {(loading && !catalog) || cityBootstrapPending ? (
         <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, index) => (
             <div key={index} className="h-72 animate-pulse rounded-xl bg-slate-100" />
@@ -183,10 +217,16 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         <Link href="/cities" className="font-medium hover:text-primary">
           Города
         </Link>
-        <Link href="/venues" className="font-medium hover:text-primary">
+        <Link
+          href={venueCatalogHrefWithSelectedCity('/venues', selectedCity?.cityValue)}
+          className="font-medium hover:text-primary"
+        >
           Площадки
         </Link>
-        <Link href="/locations" className="font-medium hover:text-primary">
+        <Link
+          href={venueCatalogHrefWithSelectedCity('/locations', selectedCity?.cityValue)}
+          className="font-medium hover:text-primary"
+        >
           Локации
         </Link>
         <Link href="/podborki" className="font-medium hover:text-primary">

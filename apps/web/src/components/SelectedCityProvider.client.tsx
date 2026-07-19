@@ -1,13 +1,14 @@
 'use client';
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useLayoutEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { buildCatalogHref } from '@/lib/catalog-url';
 import {
+  isCityFilterPath,
   matchDestination,
-  mergeStoredCityIntoEventsParams,
+  mergeStoredCityIntoSearchParams,
   persistSelectedCity,
   resolveCityLabel,
 } from '@/lib/selected-city';
@@ -15,11 +16,20 @@ import {
 type SelectedCityContextValue = {
   cityValue: string;
   cityLabel: string;
+  /** False until client has read storage / URL — avoid flashing «Все города». */
+  cityReady: boolean;
   selectedDestination: PublicDestinationDto | null;
   setCity: (name: string) => void;
 };
 
 const SelectedCityContext = createContext<SelectedCityContextValue | null>(null);
+
+function catalogPathBase(pathname: string): string {
+  const path = pathname.replace(/\/$/, '') || '/';
+  if (path.startsWith('/venues')) return '/venues';
+  if (path.startsWith('/locations')) return '/locations';
+  return '/events';
+}
 
 export function SelectedCityProvider({
   destinations,
@@ -33,24 +43,32 @@ export function SelectedCityProvider({
   const searchParams = useSearchParams();
   const urlCity = searchParams.get('city');
   const [cityLabel, setCityLabel] = useState('Все города');
+  const [cityReady, setCityReady] = useState(false);
 
-  useEffect(() => {
-    const fromUrl = pathname.startsWith('/events') ? urlCity : null;
+  // Sync before paint so the first meaningful filter render already has the stored city.
+  useLayoutEffect(() => {
+    const fromUrl = isCityFilterPath(pathname) ? urlCity : null;
     setCityLabel(resolveCityLabel(destinations, fromUrl));
+    setCityReady(true);
   }, [destinations, pathname, urlCity]);
 
-  // On /events without explicit city= — apply header city from localStorage (deep-links with city= win).
-  useEffect(() => {
-    if (!pathname.startsWith('/events')) return;
-    const merged = mergeStoredCityIntoEventsParams(destinations, new URLSearchParams(searchParams.toString()));
+  // City-filter pages without explicit city= — apply header city from localStorage.
+  useLayoutEffect(() => {
+    if (!isCityFilterPath(pathname)) return;
+    const base = catalogPathBase(pathname);
+    // Only index pages: /events, /venues, /locations (not /events/[slug]).
+    const path = pathname.replace(/\/$/, '') || '/';
+    if (path !== base) return;
+
+    const merged = mergeStoredCityIntoSearchParams(destinations, new URLSearchParams(searchParams.toString()));
     if (!merged) return;
     const query = merged.toString();
-    router.replace(query ? `/events?${query}` : '/events', { scroll: false });
+    router.replace(query ? `${base}?${query}` : base, { scroll: false });
   }, [destinations, pathname, router, searchParams]);
 
   // Keep storage aligned with an explicit catalog city (including deep-links).
-  useEffect(() => {
-    if (!pathname.startsWith('/events') || !urlCity) return;
+  useLayoutEffect(() => {
+    if (!isCityFilterPath(pathname) || !urlCity) return;
     const matched = matchDestination(destinations, urlCity);
     if (matched) persistSelectedCity(matched.name);
   }, [destinations, pathname, urlCity]);
@@ -65,18 +83,20 @@ export function SelectedCityProvider({
     (name: string) => {
       persistSelectedCity(name);
       setCityLabel(name === 'all' ? 'Все города' : name);
+      setCityReady(true);
 
       if (pathname === '/') {
         return;
       }
 
-      if (pathname.startsWith('/events')) {
+      const path = pathname.replace(/\/$/, '') || '/';
+      if (path === '/events' || path === '/venues' || path === '/locations') {
         const params = new URLSearchParams(searchParams.toString());
         if (name === 'all') params.delete('city');
         else params.set('city', name);
         params.delete('page');
         const query = params.toString();
-        router.push(query ? `/events?${query}` : '/events');
+        router.push(query ? `${path}?${query}` : path);
         return;
       }
 
@@ -91,8 +111,8 @@ export function SelectedCityProvider({
   );
 
   const value = useMemo(
-    () => ({ cityValue, cityLabel, selectedDestination, setCity }),
-    [cityValue, cityLabel, selectedDestination, setCity],
+    () => ({ cityValue, cityLabel, cityReady, selectedDestination, setCity }),
+    [cityValue, cityLabel, cityReady, selectedDestination, setCity],
   );
 
   return <SelectedCityContext.Provider value={value}>{children}</SelectedCityContext.Provider>;

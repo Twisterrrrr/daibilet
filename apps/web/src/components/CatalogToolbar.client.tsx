@@ -31,14 +31,24 @@ type CatalogToolbarProps = {
   viewMode: CatalogViewMode;
   onViewModeChange: (mode: CatalogViewMode) => void;
   disabled?: boolean;
+  /** False until header city from storage is resolved — hide «Все города» flash. */
+  cityReady?: boolean;
 };
 
-export function CatalogToolbar({ facets, values, viewMode, onViewModeChange, disabled = false }: CatalogToolbarProps) {
+export function CatalogToolbar({
+  facets,
+  values,
+  viewMode,
+  onViewModeChange,
+  disabled = false,
+  cityReady = true,
+}: CatalogToolbarProps) {
   const router = useRouter();
   const filters = useMemo(() => catalogFiltersFromQuery(values), [values]);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [qDraft, setQDraft] = useState(filters.q || '');
   const advancedCount = countAdvancedFilters(filters);
+  const cityPending = !cityReady && !filters.city;
 
   useEffect(() => {
     setQDraft(filters.q || '');
@@ -106,7 +116,8 @@ export function CatalogToolbar({ facets, values, viewMode, onViewModeChange, dis
             <select
               id="catalog-city"
               name="city"
-              value={filters.city || 'all'}
+              value={cityPending ? '' : filters.city || 'all'}
+              disabled={disabled || cityPending}
               onChange={(event) => {
                 const nextCity = event.target.value;
                 persistSelectedCity(nextCity === 'all' ? 'all' : nextCity);
@@ -117,8 +128,9 @@ export function CatalogToolbar({ facets, values, viewMode, onViewModeChange, dis
                   page: undefined,
                 });
               }}
-              className="h-11 w-full appearance-none rounded-xl bg-slate-50 pl-4 pr-9 text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/60"
+              className="h-11 w-full appearance-none rounded-xl bg-slate-50 pl-4 pr-9 text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-70"
             >
+              {cityPending ? <option value="">Город…</option> : null}
               <option value="all">Все города</option>
               {facets.cities.slice(0, 40).map((item) => (
                 <option key={item.name} value={item.name}>

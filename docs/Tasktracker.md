@@ -11,9 +11,9 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| S.1 | `tc:sync --ids=...` on-demand upsert (+ `--dry-run`) | Высокий | ✅ |
-| S.2 | Admin `POST /api/v1/tc/sync?ids=` | Средний | ✅ |
-| S.3 | Docs + prod smoke 2 ids | Высокий | ✅ |
+| S.1 | `tc:sync --ids=...` on-demand upsert (+ `--dry-run`) | Высокий | ✅ `6cc137d` prod |
+| S.2 | Admin `POST /api/v1/tc/sync?ids=` | Средний | ✅ `6cc137d` |
+| S.3 | Docs + prod smoke 2 ids | Высокий | ✅ +2 ESL |
 
 ---
 

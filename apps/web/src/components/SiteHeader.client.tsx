@@ -12,13 +12,13 @@ import { HeaderSearch } from '@/components/HeaderSearch.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { useUserAuthOptional } from '@/hooks/useUserAuth';
-import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
+import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 
 const NAV_LINKS = [
   { label: 'События', href: '/events', catalog: true },
   { label: 'Города', href: '/cities' },
-  { label: 'Площадки', href: '/venues' },
-  { label: 'Локации', href: '/locations' },
+  { label: 'Площадки', href: '/venues', venueCatalog: 'venues' as const },
+  { label: 'Локации', href: '/locations', venueCatalog: 'locations' as const },
   { label: 'Подборки', href: '/podborki' },
   { label: 'Блог', href: '/blog' },
 ] as const;
@@ -53,12 +53,21 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
 
   const cityLabel = selectedCity?.cityLabel ?? 'Все города';
   const cityValue = selectedCity?.cityValue ?? 'all';
+  const cityReady = selectedCity?.cityReady ?? false;
   const onCityChange = selectedCity?.setCity ?? (() => undefined);
-  const navLinks = NAV_LINKS.map((item) =>
-    'catalog' in item && item.catalog
-      ? { ...item, href: catalogHrefWithSelectedCity(cityValue) }
-      : { ...item, href: item.href },
-  );
+  const navLinks = NAV_LINKS.map((item) => {
+    if ('catalog' in item && item.catalog) {
+      return { ...item, href: catalogHrefWithSelectedCity(cityReady ? cityValue : 'all') };
+    }
+    if ('venueCatalog' in item && item.venueCatalog) {
+      const path = item.venueCatalog === 'venues' ? '/venues' : '/locations';
+      return {
+        ...item,
+        href: venueCatalogHrefWithSelectedCity(path, cityReady ? cityValue : 'all'),
+      };
+    }
+    return { ...item, href: item.href };
+  });
 
   useEffect(() => {
     if (!userMenuOpen) return;

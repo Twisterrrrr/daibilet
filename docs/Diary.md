@@ -12,6 +12,7 @@
 - Shared `scripts/lib/tc-catalog-fetch.js`; `importCatalogEvents(..., { skipMissingFromCatalog: true })` для ids-режима.
 - Admin: `POST /api/v1/tc/sync?ids=a,b&dry-run=1`.
 - Prod smoke: dry-run + upsert `6a5a15629c0d02f149eb31b7`, `6a4b7eb321d4fca102f90689` → +2 EventSourceLink (30637→30639).
+- **Prod @6cc137d:** `git pull` + `daibilet-api` restart; `npm run tc:sync -- --help` OK.
 
 ### Проблемы
 

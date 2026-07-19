@@ -89,6 +89,17 @@ export function catalogHrefWithSelectedCity(
   return buildCatalogHref({ ...values, city });
 }
 
+/** `/venues` or `/locations` href with header city when none is explicit. */
+export function venueCatalogHrefWithSelectedCity(
+  path: '/venues' | '/locations',
+  cityValue: string | null | undefined,
+  explicitCity?: string | null,
+): string {
+  const city = explicitCity || (cityValue && cityValue !== 'all' ? cityValue : undefined);
+  if (!city) return path;
+  return `${path}?city=${encodeURIComponent(city)}`;
+}
+
 export function mergeCatalogFilters(
   base: CatalogFilterValues,
   patch: Partial<CatalogFilterValues>,

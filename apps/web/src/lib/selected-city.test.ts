@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { buildCatalogHref, catalogHrefWithSelectedCity } from './catalog-url.ts';
+import { buildCatalogHref, catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from './catalog-url.ts';
 import {
+  isCityFilterPath,
   matchDestination,
   mergeStoredCityIntoEventsParams,
+  mergeStoredCityIntoSearchParams,
+  pathHrefWithSelectedCity,
   SELECTED_CITY_STORAGE_KEY,
 } from './selected-city.ts';
 
@@ -33,7 +36,29 @@ test('catalogHrefWithSelectedCity skips all', () => {
   assert.equal(buildCatalogHref({ date: 'weekend' }), '/events?date=weekend');
 });
 
-test('mergeStoredCityIntoEventsParams injects storage city only when city missing', () => {
+test('venueCatalogHrefWithSelectedCity adds city to venues and locations', () => {
+  assert.equal(venueCatalogHrefWithSelectedCity('/venues', 'Уфа'), '/venues?city=%D0%A3%D1%84%D0%B0');
+  assert.equal(venueCatalogHrefWithSelectedCity('/locations', 'all'), '/locations');
+  assert.equal(
+    venueCatalogHrefWithSelectedCity('/venues', 'Уфа', 'Москва'),
+    '/venues?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0',
+  );
+});
+
+test('pathHrefWithSelectedCity builds city query on arbitrary path', () => {
+  assert.equal(pathHrefWithSelectedCity('/venues', 'Уфа'), '/venues?city=%D0%A3%D1%84%D0%B0');
+  assert.equal(pathHrefWithSelectedCity('/locations', 'all', { q: 'парк' }), '/locations?q=%D0%BF%D0%B0%D1%80%D0%BA');
+});
+
+test('isCityFilterPath covers events venues locations', () => {
+  assert.equal(isCityFilterPath('/events'), true);
+  assert.equal(isCityFilterPath('/venues'), true);
+  assert.equal(isCityFilterPath('/locations'), true);
+  assert.equal(isCityFilterPath('/cities'), false);
+  assert.equal(isCityFilterPath('/events/slug'), true);
+});
+
+test('mergeStoredCityIntoSearchParams injects storage city only when city missing', () => {
   const storage = new Map<string, string>();
   const original = globalThis.localStorage;
   Object.defineProperty(globalThis, 'localStorage', {
@@ -47,7 +72,7 @@ test('mergeStoredCityIntoEventsParams injects storage city only when city missin
 
   try {
     storage.set(SELECTED_CITY_STORAGE_KEY, 'Уфа');
-    const injected = mergeStoredCityIntoEventsParams([...destinations], new URLSearchParams('date=today'));
+    const injected = mergeStoredCityIntoSearchParams([...destinations], new URLSearchParams('date=today'));
     assert.ok(injected);
     assert.equal(injected!.get('city'), 'Уфа');
     assert.equal(injected!.get('date'), 'today');
@@ -56,7 +81,7 @@ test('mergeStoredCityIntoEventsParams injects storage city only when city missin
     assert.equal(kept, null);
 
     storage.clear();
-    const empty = mergeStoredCityIntoEventsParams([...destinations], new URLSearchParams(''));
+    const empty = mergeStoredCityIntoSearchParams([...destinations], new URLSearchParams(''));
     assert.equal(empty, null);
   } finally {
     Object.defineProperty(globalThis, 'localStorage', { configurable: true, value: original });
