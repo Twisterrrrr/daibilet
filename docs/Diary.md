@@ -19,6 +19,7 @@
 
 - Без `SMTP_*` письма не уходят (ReviewRequest всё равно создаётся).
 - Deploy: migrate `20260719150000_review_external_order` + nodemailer при включении SMTP.
+- Commit `1c2b156` запушен в `feat/next-monorepo`; SSH deploy с этой среды — `Permission denied (publickey)` к `213.171.7.16`. Нужен ручной `deploy-prod-next.sh` на сервере.
 
 ---
 

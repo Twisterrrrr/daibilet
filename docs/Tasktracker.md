@@ -43,7 +43,7 @@
 | R.6 | Capability: TC allowed + verification | Критический | ✅ |
 | R.7 | Pseudo 4.5–5.0 UI; AggregateRating ≥10 | Высокий | ✅ |
 | R.8 | Tests verification + displayed rating | Высокий | ✅ |
-| R.9 | Commit + deploy API/admin/Next | Критический | 🔄 |
+| R.9 | Commit + deploy API/admin/Next | Критический | 🔄 commit `1c2b156` pushed; deploy SSH с этой машины — Permission denied (нужен ключ на prod) |
 | R.10 | Disputes / supplier LK | — | 🚫 out of scope |
 
 ---
