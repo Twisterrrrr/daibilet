@@ -1,40 +1,20 @@
 import type { PublicEventDto } from '@daibilet/contracts/public';
 
-import {
-  cleanDisplayText,
-  isDescriptionSectionHeading,
-  sanitizeEventHtml,
-  splitDescriptionParagraphs,
-} from '@/lib/event-page-utils';
+import { formatEventDescriptionHtml } from '@/lib/event-description-format';
 
 export function EventDescription({ event }: { event: PublicEventDto }) {
   const description = String(event.description || '').trim();
   if (!description) return null;
-  const hasHtml = /<[a-z][\s\S]*>/i.test(description);
+  const html = formatEventDescriptionHtml(description);
+  if (!html) return null;
 
   return (
     <div>
       <h2 className="text-lg font-bold text-slate-900">О событии</h2>
-      {hasHtml ? (
-        <div
-          className="prose prose-slate mt-4 max-w-none text-sm leading-7 text-slate-600 [&_li+li]:mt-2 [&_p+p]:mt-5 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5"
-          dangerouslySetInnerHTML={{ __html: sanitizeEventHtml(description) }}
-        />
-      ) : (
-        <div className="mt-4 max-w-none space-y-5 text-sm leading-7 text-slate-600">
-          {splitDescriptionParagraphs(description).map((paragraph, index) => {
-            const text = cleanDisplayText(paragraph);
-            if (isDescriptionSectionHeading(text)) {
-              return (
-                <h3 key={index} className="pt-1 text-base font-semibold text-slate-900">
-                  {text}
-                </h3>
-              );
-            }
-            return <p key={index}>{text}</p>;
-          })}
-        </div>
-      )}
+      <div
+        className="prose prose-slate mt-4 max-w-none text-sm leading-7 text-slate-600 [&_h3]:mt-5 [&_h3]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-slate-900 [&_li+li]:mt-2 [&_p+p]:mt-5 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5 [&_h3+ul]:mt-2"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
     </div>
   );
 }

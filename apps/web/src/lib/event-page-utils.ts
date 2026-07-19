@@ -92,60 +92,14 @@ export function formatBuyCardPrice(range: { min: number; max: number }): string 
   return `${formatNumber(min)} – ${formatNumber(max)} ₽`;
 }
 
-export function cleanDisplayText(value?: string | null): string {
-  return String(value || '')
-    .replace(/<\s*br\s*\/?>/gi, '\n')
-    .replace(/<\/\s*(p|div|li|h[1-6])\s*>/gi, '\n')
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/&nbsp;/gi, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-export function sanitizeEventHtml(html: string): string {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, '')
-    .replace(/<style[\s\S]*?<\/style>/gi, '')
-    .replace(/\son\w+="[^"]*"/gi, '')
-    .replace(/\son\w+='[^']*'/gi, '');
-}
-
-/** Soft-wrap join: "Храм Христа\\nСпасителя" → one line; keep real paragraph breaks. */
-function joinSoftWrappedLines(text: string): string {
-  // Only join when next line starts lowercase (wrap), not a new sentence/paragraph.
-  return text.replace(/([^\n.!?…:;—–-])\n(?=[a-zа-яё])/gu, '$1 ');
-}
-
-export function isDescriptionSectionHeading(line: string): boolean {
-  const text = cleanDisplayText(line);
-  if (!text || text.length > 72) return false;
-  if (/[.!?…]$/u.test(text)) return false;
-  if (/^(?:о маршруте|о событии|программа|включено|в стоимость входит|важно|маршрут|что вас ждёт|что вас ждет|условия|описание|подробнее|внимание|для кого|как добраться|расписание)$/iu.test(text)) {
-    return true;
-  }
-  const letters = text.replace(/[^a-zA-Zа-яА-ЯёЁ]/gu, '');
-  if (letters.length >= 3 && letters === letters.toUpperCase() && text.length <= 60) return true;
-  return false;
-}
-
-export function splitDescriptionParagraphs(text: string): string[] {
-  const normalized = joinSoftWrappedLines(String(text || '').replace(/\r\n?/g, '\n')).trim();
-  const byBlankLine = normalized
-    .split(/\n\s*\n+/)
-    .map((part) => cleanDisplayText(part))
-    .filter(Boolean);
-  if (byBlankLine.length > 1) return byBlankLine;
-
-  // Legacy public EventPage: single newlines are paragraphs when no blank lines.
-  const byLine = normalized
-    .split(/\n+/)
-    .map((part) => cleanDisplayText(part))
-    .filter(Boolean);
-  if (byLine.length > 1) return byLine;
-
-  const single = cleanDisplayText(normalized);
-  return single ? [single] : [];
-}
+export {
+  cleanDisplayText,
+  formatEventDescriptionHtml,
+  isDescriptionSectionHeading,
+  parseEventDescriptionBlocks,
+  sanitizeEventHtml,
+  splitDescriptionParagraphs,
+} from './event-description-format';
 
 export type TicketCategoryRow = {
   key: string;

@@ -1,3 +1,22 @@
+## 2026-07-19 — Event description: маркеры → списки
+
+### Наблюдения
+
+- На event page plain-text description с `✅` / `- ` схлопывался в одну простыню: `cleanDisplayText` заменял `\n` на пробелы внутри blank-line блоков.
+- Эталон: `tc-699c7af75b4672904c313d52-seks-v-sssr-intimnye-tainy-stolicy-18` — checkmark-пункты и блок «Организационные детали:».
+
+### Решения
+
+- Модуль `event-description-format.ts`: детект line bullets (`✅`/`•`/`-`/`–`/`—`) и inline после двоеточия; рендер `<p>`/`<h3>`/`<ul><li>` с escape + sanitize.
+- Уже готовый HTML не переразбирается — только sanitize.
+- `EventDescription` всегда через `formatEventDescriptionHtml`.
+
+### Проблемы
+
+- Deploy Next после commit.
+
+---
+
 ## 2026-07-19 — Модуль отзывов (ExternalOrder / TC)
 
 ### Наблюдения
