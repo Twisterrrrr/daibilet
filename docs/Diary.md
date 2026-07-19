@@ -1,3 +1,21 @@
+## 2026-07-19 — CI: pnpm missing before setup-node cache
+
+### Наблюдения
+
+- Job `validate-build-test` падал за ~14–19с на `feat/next-monorepo` и PR #1 (тот же branch, title hero-stats).
+- Ошибка: `Unable to locate executable file: pnpm` на шаге `actions/setup-node@v4` с `cache: pnpm`.
+
+### Решения
+
+- В `.github/workflows/ci.yml` поставить `pnpm/action-setup@v4` **до** `setup-node` (cache требует pnpm в PATH).
+- Отдельной ветки hero-stats нет: PR #1 = `feat/next-monorepo`.
+
+### Проблемы
+
+- После фикса порядка возможны следующие падения на typecheck/build — смотреть следующий run.
+
+---
+
 ## 2026-07-19 — TC on-demand sync `--ids`
 
 ### Наблюдения
@@ -21,6 +39,25 @@
 
 ---
 
+## 2026-07-19 — Anti-flash каталога: не показывать SSR «все города»
+
+### Наблюдения
+
+- В `361dc4c` уже были venues/locations + `cityReady`, но на `/events` без `?city=` оставался flash контента: после resolve storage на один кадр показывался SSR-каталог «все города» (toolbar уже с Уфой), затем client fetch.
+- Причина: `useState(initialCatalog)` + `loading=false` при наличии SSR payload; `cityBootstrapPending` снимался до завершения fetch с effective city.
+
+### Решения
+
+- `CatalogShell`: SSR catalog доверяем только если URL уже содержит `city`; иначе старт с `catalog=null` / skeleton → fetch с городом из шапки (`effectiveQueryKey`).
+- Deep-link с явным `city=` и сброс `persistSelectedCity('all')` без изменений.
+- Venues/Locations уже фильтруют client-side по effective city — отдельный SSR-flash не затрагивает.
+
+### Проблемы
+
+- Прямой заход на `/events` без city: краткий skeleton вместо «Все города» (ожидаемо без cookie-SSR).
+
+---
+
 ## 2026-07-19 — UX: город шапки → venues/locations + anti-flash `/events`
 
 ### Наблюдения
@@ -33,6 +70,7 @@
 - Общий контур `CITY_FILTER_PATHS` (`/events`, `/venues`, `/locations`): inject `city=` из storage, nav-ссылки с городом, смена в шапке обновляет query текущей страницы; сброс → `persistSelectedCity('all')`.
 - Anti-flash: `cityReady` + placeholder «Город…» до resolve; `useLayoutEffect` для sync/replace; `CatalogShell` подставляет effective city до появления в URL.
 - Venues/Locations: фильтр города через URL `?city=` + storage, как каталог.
+- Код venues/locations+cityReady случайно уехал в `361dc4c` (docs tc:sync); дожим anti-flash SSR в отдельном fix-commit.
 
 ### Проблемы
 

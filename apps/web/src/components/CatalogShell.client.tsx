@@ -29,12 +29,13 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   const router = useRouter();
   const urlSearchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
-  const [catalog, setCatalog] = useState<PublicCatalogDto | null>(initialCatalog);
-  const [loading, setLoading] = useState(!initialCatalog);
+  const urlHasCity = Boolean(urlSearchParams.get('city')?.trim());
+  // Trust SSR catalog only when URL already has city — otherwise first paint would be «all cities».
+  const [catalog, setCatalog] = useState<PublicCatalogDto | null>(() => (urlHasCity ? initialCatalog : null));
+  const [loading, setLoading] = useState(() => !(urlHasCity && initialCatalog));
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewModeState] = useState<CatalogViewMode>('cards');
 
-  const urlHasCity = Boolean(urlSearchParams.get('city')?.trim());
   const cityReady = selectedCity?.cityReady ?? true;
   /** Wait for storage resolve when URL has no city — avoids «Все города» then Уфа. */
   const cityBootstrapPending = !urlHasCity && Boolean(selectedCity) && !cityReady;
@@ -74,6 +75,12 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     return { ...base, city: selectedCity.cityValue };
   }, [query, cityReady, selectedCity]);
 
+  /** Effective query key including header-city inject (before URL catches up). */
+  const effectiveQueryKey = useMemo(() => {
+    if (!filterValues.city || query.city) return queryKey;
+    return catalogQueryCacheKey({ ...query, city: filterValues.city });
+  }, [filterValues.city, query, queryKey]);
+
   useEffect(() => {
     const fromUrl = urlSearchParams.get('view');
     if (fromUrl) {
@@ -86,19 +93,20 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   useEffect(() => {
     if (cityBootstrapPending) {
       setLoading(true);
+      setCatalog(null);
       return;
     }
 
-    if (initialQueryKey && queryKey === initialQueryKey && initialCatalog && urlHasCity) {
+    // Deep-link or post-replace URL already has city — SSR payload matches.
+    if (initialQueryKey && effectiveQueryKey === initialQueryKey && initialCatalog && urlHasCity) {
       setCatalog(initialCatalog);
       setLoading(false);
       setError(null);
       return;
     }
 
-    // SSR catalog without city is wrong when header will inject city — skip until URL catches up,
-    // but still allow fetch with effective city from context.
-    if (initialQueryKey && queryKey === initialQueryKey && initialCatalog && !filterValues.city) {
+    // True «all cities»: URL has no city and header city is all — SSR catalog is correct.
+    if (initialQueryKey && effectiveQueryKey === initialQueryKey && initialCatalog && !filterValues.city) {
       setCatalog(initialCatalog);
       setLoading(false);
       setError(null);
@@ -132,7 +140,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     return () => controller.abort();
   }, [
     urlSearchParams,
-    queryKey,
+    effectiveQueryKey,
     initialQueryKey,
     initialCatalog,
     cityBootstrapPending,

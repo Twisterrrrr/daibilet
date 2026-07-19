@@ -52,11 +52,10 @@ export function SelectedCityProvider({
     setCityReady(true);
   }, [destinations, pathname, urlCity]);
 
-  // City-filter pages without explicit city= — apply header city from localStorage.
+  // Index pages without explicit city= — inject header city into URL (deep-links untouched).
   useLayoutEffect(() => {
     if (!isCityFilterPath(pathname)) return;
     const base = catalogPathBase(pathname);
-    // Only index pages: /events, /venues, /locations (not /events/[slug]).
     const path = pathname.replace(/\/$/, '') || '/';
     if (path !== base) return;
 

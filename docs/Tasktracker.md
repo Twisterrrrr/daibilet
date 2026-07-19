@@ -7,6 +7,14 @@
 
 ---
 
+## CI (2026-07-19)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| CI.1 | `validate-build-test`: pnpm до `setup-node` cache | Критический | 🔄 push fix |
+
+---
+
 ## Sync / TC (2026-07-19)
 
 | # | Задача | Приоритет | Статус |
@@ -62,9 +70,9 @@
 | U.3 | Commit + deploy Next | Критический | ✅ `be8ee55` + prod start web (после обрыва SSH mid-deploy) |
 | U.4 | Город из шапки → `city=` каталога при `/events` без явного city; deep-link сохранить | Высокий | ✅ |
 | U.5 | Commit + deploy-prod-next U.4 | Критический | ✅ `4772789` prod |
-| U.6 | Город шапки → фильтр `/venues` и `/locations` (URL + storage + nav) | Высокий | ✅ |
+| U.6 | Город шапки → фильтр `/venues` и `/locations` (URL + storage + nav) | Высокий | ✅ (в `361dc4c`) |
 | U.7 | Anti-flash «Все города»→город на `/events` (и venues/locations): `cityReady` + layout sync | Высокий | ✅ |
-| U.8 | Commit + deploy-prod-next U.6–U.7 | Критический | 🔄 |
+| U.8 | Anti-flash: не показывать SSR all-cities до inject; commit + deploy-prod-next U.6–U.8 | Критический | 🔄 |
 
 ---
 
