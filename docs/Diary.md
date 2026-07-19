@@ -12,7 +12,8 @@
 
 ### Проблемы
 
-- Deploy/proof — после push.
+- Commit `044e441` уже был в origin; предыдущий агент завис mid-deploy. Дожали: `deploy-prod-next` OK @`044e441`.
+- **Proof** `/cities/rostov-na-donu` + `?hub=editorial`: `#directions` — все chips с count > 0 (Новый год 2, Стендап 2, Детям 2, Концерты 8, Мероприятия 15, Развлечения 1); пустых без числа нет.
 
 ---
 

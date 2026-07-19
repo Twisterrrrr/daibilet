@@ -38,7 +38,7 @@
 | P.2k | City hub affiche UX: скрыть подзаголовок счётчика; date+category в одну строку (desktop); убрать «Стоит внимания» (дубль афиши) | Высокий | ✅ `2808ed5` prod proof murmansk |
 | P.2l | Адрес UI: «Проспект Кольский» → «Кольский проспект» (нормализатор прилагательных + hub venues) | Средний | ✅ `8d65740` prod + DB |
 | P.2m | City hub chips: визуальный gap между группами date и category (`gap-x-4`) | Средний | ✅ `9a36f48` prod |
-| P.2n | City hub `#directions`: не рендерить landings/categories с count=0 (без пустых «Мероприятия»/«Развлечения») | Высокий | 🔄 |
+| P.2n | City hub `#directions`: не рендерить landings/categories с count=0 (без пустых «Мероприятия»/«Развлечения») | Высокий | ✅ `044e441` prod proof rostov-na-donu |
 | P.3 | **Finance contour / ЛК поставщиков** — базовый контур | Высокий | ⏳ |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
 | P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |
@@ -421,6 +421,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-19 | P.2n: city hub `#directions` — только chips с count > 0; prod proof rostov-na-donu @`044e441` |
 | 2026-07-19 | P.2m: city hub chips — gap-x-4 между date и category группами |
 | 2026-07-19 | P.2k: city hub — без подзаголовка счётчика; date+category one-row desktop; без «Стоит внимания» (дубль афиши) |
 | 2026-07-19 | P.2j: city hub без «Популярные теги»; единые компактные date/category chips |
