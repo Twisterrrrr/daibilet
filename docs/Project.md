@@ -62,12 +62,17 @@ packages/config   — shared tsconfig/eslint
 | `/` | SSR dynamic | home + top cities |
 | `/events` | SSR dynamic | каталог, filters GET, pagination |
 | `/events/[slug]` | SSR dynamic | event hero + sticky buy card (TC/Teplohod widgets) |
-| `/cities`, `/cities/[slug]` | SSR dynamic | lean session embed |
+| `/cities`, `/cities/[slug]` | SSR dynamic | **city hub** (SEO-якорь города) |
 | `/venues`, `/venues/[slug]` | SSR dynamic | |
 | `/locations`, `/locations/[slug]` | SSR dynamic | |
 | `/podborki` | ISR 3600 | каталог подборок |
 | `/rechnye-progulki/...`, `/{city}/night-bridges/` | ISR/SSG | landing SEO paths |
 | `/api/public/*` | Route Handlers | parity с legacy API |
+
+### URL / SEO policy (2026-07-19)
+
+- **Flat URL:** `/events/{slug}`, `/venues/{slug}`, `/cities/{slug}` — без city-prefix в path (`/{city}/venues/...` и т.п. **отклонено**).
+- **SEO-фокус:** усиливать city hubs `/cities/{slug}` + landings; город в breadcrumbs/JSON-LD; sitemap + canonical.
 
 ---
 
@@ -100,7 +105,7 @@ Cherry-pick из **`codex/phase2-foundation`**: schema, event change requests, a
 - **Next 15**, React 19, Tailwind 3
 - **Prisma 7** — schema/migrations; runtime read через dto port
 - **Консистентность:** parity scripts; константы каталога в `@daibilet/contracts`
-- **SEO:** title template `%s | Дайбилет` без дублей; `og:url` route-specific (`seo-meta.ts`)
+- **SEO:** title template `%s | Дайбилет` без дублей; `og:url` route-specific (`seo-meta.ts`); flat entity URLs + city hubs (см. URL / SEO policy выше)
 - **Sitemap:** `/sitemap.xml` — index; chunks `/sitemaps/{static,events,cities,venues,landings,blog}.xml` (`lib/sitemap-data.ts`); `robots.txt` → index, Allow `/` для `*` / Googlebot / Yandex
 - **Веб-аналитика:** Яндекс.Метрика только в `apps/web` (`YandexMetrika` + `next/script`, ID `NEXT_PUBLIC_YANDEX_METRIKA_ID` / default `106786540`); admin не подключаем
 - **Метрики событий:** единый источник — public grouped catalog (`groupKey`), не raw imported rows

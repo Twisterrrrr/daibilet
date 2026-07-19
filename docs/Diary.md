@@ -1,3 +1,42 @@
+## 2026-07-19 — Event page: TZ региона события (= виджет)
+
+### Наблюдения
+
+- Карточка Уфа (`…lesha-kotoryi-ustroilsya…`): hero/сеанс показывали **16:00** при `startsAt=2026-08-02T13:00:00.000Z` — это **Europe/Moscow**, не локальное Уфы.
+- Каталог/related уже форматировали через `resolveCityTimeZone` → `Asia/Yekaterinburg` → **18:00**; event page (`public-event.dto.ts` `mapSession`) вызывал `formatDate/formatTime` **без** TZ → default `SITE_TIME_ZONE=Europe/Moscow`.
+- JSON-LD `startDate` оставался ISO UTC (корректно как абсолютный instant).
+- ЛК «Сеанс: Europe/Moscow» (`BuyerOrderCard`) — отдельное правило заказов, не трогали.
+
+### Решения
+
+- Источник TZ: `resolveCityTimeZone(city, destination)` из `city-timezone` (оверрайды городов + регионы), не browser TZ и не forced MSK.
+- `mapSession` + `event.timeZone`; hydrate catalog slots и TS mapper тоже с city TZ; TcWidget fallback `toLocale*` уважает `session.timeZone`.
+- Unit: `city-timezone-display.test.ts` (Уфа→18:00 YEKT vs 16:00 MSK).
+
+### Проблемы
+
+- In-memory `PUBLIC_EVENT_CACHE_MS` (5 мин) — после deploy API нужен restart (или дождаться TTL).
+- Proof: slug выше — `timeLabel=18:00`, `timeZone=Asia/Yekaterinburg`, hero «Ближайший: … 18:00».
+
+---
+
+## 2026-07-19 — URL: flat paths, SEO через city hubs
+
+### Наблюдения
+
+- Обсуждался city-prefix в path (`/{city}/venues/...` и аналоги). Устная формулировка «развивать пабы» в контексте city URL = **хабы** (city hubs), не бары.
+
+### Решения
+
+- **URL остаются flat:** `/events/{slug}`, `/venues/{slug}`, `/cities/{slug}`. City-prefix в path **не** вводим.
+- SEO-фокус: развитие городских хабов `/cities/{slug}` + landings; breadcrumbs/JSON-LD с городом; sitemap/canonical (как есть / доращивать).
+
+### Проблемы
+
+- Нет: схема path не меняется → без миграции URL/редиректов.
+
+---
+
 ## 2026-07-19 — Event page: дубли чипов в «Теги»
 
 ### Наблюдения

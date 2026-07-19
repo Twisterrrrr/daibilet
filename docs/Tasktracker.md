@@ -15,6 +15,7 @@
 | E.2 | Unit-тесты обоих кейсов (checkmark + организационные детали) | Высокий | ✅ |
 | E.3 | Prod: `ReferenceError: cleanDisplayText is not defined` (re-export без local import в `event-page-utils`) | Критический | ✅ 7cdd4cf + rebuild 38e8d12 |
 | E.4 | Теги на event page: dedupe chips (tags∪subcategories) по нормализованному label | Высокий | ✅ 2026-07-19 @9658b9f prod proof kino |
+| E.5 | Event page display time = TZ региона события (как виджет), не forced MSK | Критический | 🔄 fix ready → commit/deploy |
 
 ---
 
@@ -226,6 +227,8 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 1.3.4 | SSR JSON-LD: `BreadcrumbList` | Средний | ✅ 2026-07-19 |
 | 1.3.5 | Hero, categories, venues, events grid | — | ✅ |
 | 1.3.6 | `generateMetadata` | — | ✅ |
+| 1.3.7 | Развивать city hubs `/cities/{slug}` (контент, перелинковка, landings) | Высокий | ⏳ |
+| 1.3.8 | City-prefix в path venues/events (`/{city}/venues/...`) | — | 🚫 отклонено 2026-07-19 (flat URL) |
 
 ### 1.4 Прочие public routes
 
@@ -337,6 +340,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-19 | URL: flat paths; SEO через city hubs (1.3.7 ⏳, 1.3.8 🚫) |
 | 2026-07-19 | Admin: editable Cities (PATCH) + Articles `publishedAt` UI (B.9/B.10) |
 | 2026-07-13 | Roadmap перестроен на **Этапы 0–2** с чеклистами browser/admin smoke, tc:sync, SEO gaps |
 | 2026-07-11 | F3 cutover prod, Codex cherry-pick |
