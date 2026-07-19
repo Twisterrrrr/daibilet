@@ -10,21 +10,21 @@ export function matchDestination(destinations: PublicDestinationDto[], value?: s
   ) || null;
 }
 
+export function readStoredSelectedCity(destinations: PublicDestinationDto[]): string | null {
+  try {
+    const stored = localStorage.getItem(SELECTED_CITY_STORAGE_KEY)?.trim();
+    const fromStorage = matchDestination(destinations, stored);
+    return fromStorage?.name || null;
+  } catch {
+    return null;
+  }
+}
+
 export function resolveCityLabel(destinations: PublicDestinationDto[], urlCity?: string | null): string {
   const fromUrl = matchDestination(destinations, urlCity);
   if (fromUrl) return fromUrl.name;
 
-  if (typeof window === 'undefined') return 'Все города';
-
-  try {
-    const stored = localStorage.getItem(SELECTED_CITY_STORAGE_KEY)?.trim();
-    const fromStorage = matchDestination(destinations, stored);
-    if (fromStorage) return fromStorage.name;
-  } catch {
-    // ignore storage errors
-  }
-
-  return 'Все города';
+  return readStoredSelectedCity(destinations) || 'Все города';
 }
 
 export function persistSelectedCity(name: string) {
@@ -34,4 +34,23 @@ export function persistSelectedCity(name: string) {
   } catch {
     // ignore storage errors
   }
+}
+
+/**
+ * If `/events` has no explicit `city` query, inject the stored header city.
+ * Preserves deep-links that already set `city`.
+ */
+export function mergeStoredCityIntoEventsParams(
+  destinations: PublicDestinationDto[],
+  searchParams: URLSearchParams,
+): URLSearchParams | null {
+  const explicit = searchParams.get('city')?.trim();
+  if (explicit) return null;
+
+  const stored = readStoredSelectedCity(destinations);
+  if (!stored) return null;
+
+  const next = new URLSearchParams(searchParams.toString());
+  next.set('city', stored);
+  return next;
 }

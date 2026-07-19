@@ -5,6 +5,7 @@ import { Heart, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import type { PublicSessionDto } from '@daibilet/contracts/public';
+import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import {
   FAVORITES_CHANGED_EVENT,
   readFavoriteIds,
@@ -13,11 +14,14 @@ import {
 } from '@/lib/favorites';
 import { formatPriceFrom } from '@/lib/format';
 import { eventHref } from '@/lib/routes';
+import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 
 export function FavoritesPanel({ onClose }: { onClose: () => void }) {
+  const selectedCity = useSelectedCityOptional();
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(() => readFavoriteIds());
   const [catalogSessions, setCatalogSessions] = useState<PublicSessionDto[]>([]);
   const sessions = resolveFavoriteSessions(favoriteIds, catalogSessions);
+  const eventsHref = catalogHrefWithSelectedCity(selectedCity?.cityValue);
 
   useEffect(() => {
     const sync = () => setFavoriteIds(readFavoriteIds());
@@ -96,7 +100,7 @@ export function FavoritesPanel({ onClose }: { onClose: () => void }) {
             <p className="font-medium text-slate-700">Пока пусто</p>
             <p className="mt-1">Отмечайте события сердечком на карточках — они появятся здесь. Список хранится в браузере на этом устройстве.</p>
             <Link
-              href="/events"
+              href={eventsHref}
               onClick={onClose}
               className="mt-4 inline-flex items-center justify-center rounded-full bg-primary-600 px-4 py-2 text-xs font-semibold text-white hover:bg-primary-700"
             >

@@ -23,6 +23,7 @@ import {
   CATALOG_PRESETS,
 } from '@/lib/catalog-presets';
 import { categoryEmoji, type CatalogViewMode } from '@/lib/catalog-view-mode';
+import { persistSelectedCity } from '@/lib/selected-city';
 
 type CatalogToolbarProps = {
   facets: PublicCatalogDto['facets'];
@@ -50,10 +51,12 @@ export function CatalogToolbar({ facets, values, viewMode, onViewModeChange, dis
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
+    const nextCity = String(data.get('city') || 'all');
+    persistSelectedCity(nextCity === 'all' ? 'all' : nextCity);
     const next = catalogFiltersFromQuery({
       ...filters,
       q: String(data.get('q') || ''),
-      city: String(data.get('city') || 'all'),
+      city: nextCity,
       category: String(data.get('category') || 'all'),
       landing: String(data.get('landing') || 'all'),
       date: String(data.get('date') || 'all'),
@@ -106,6 +109,7 @@ export function CatalogToolbar({ facets, values, viewMode, onViewModeChange, dis
               value={filters.city || 'all'}
               onChange={(event) => {
                 const nextCity = event.target.value;
+                persistSelectedCity(nextCity === 'all' ? 'all' : nextCity);
                 navigate({
                   ...filters,
                   q: qDraft.trim() || undefined,

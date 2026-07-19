@@ -1,4 +1,25 @@
+## 2026-07-19 — UX: город шапки → фильтр каталога `/events`
+
+### Наблюдения
+
+- Пользователь: в шапке выбран город (напр. Уфа), переход в «События»/`/events` открывал каталог без `city=` — фильтр города приходилось выбирать отдельно.
+- Город шапки уже жил в `localStorage` (`daibilet:selected-city`) через `SelectedCityProvider`, а каталог читал только URL `?city=`.
+- Смена города в шапке на `/events` уже обновляла query — ломалась именно навигация без явного `city`.
+
+### Решения
+
+- На `/events` без `city=` — `router.replace` с городом из storage (`mergeStoredCityIntoEventsParams`); deep-link с другим `city=` не трогаем и синхронизируем в storage.
+- Ссылки «События», hero-chips `/events…`, поиск шапки, избранное — `catalogHrefWithSelectedCity`.
+- Сброс города в тулбаре/чипе → `persistSelectedCity('all')`, чтобы auto-inject не вернул город.
+
+### Проблемы
+
+- Короткий double-fetch возможен при прямом заходе на `/events` без city (сначала без фильтра, затем replace) — приемлемо; nav-ссылки сразу с city.
+
+---
+
 ## 2026-07-19 — Event page: TZ региона события (= виджет)
+
 
 ### Наблюдения
 

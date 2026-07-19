@@ -8,7 +8,7 @@ import { CityPicker } from '@/components/CityPicker.client';
 import { HomeHeroBackground } from '@/components/HomeHeroBackground.client';
 import { useSelectedCity } from '@/components/SelectedCityProvider.client';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
-import { buildCatalogHref } from '@/lib/catalog-url';
+import { buildCatalogHref, catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityToPrepositional } from '@/lib/city-declension';
 import {
   formatNumber,
@@ -139,15 +139,28 @@ export function HomeHero({ destinations, totalEvents, totalVenues, cityCount }: 
         </form>
 
         <div className="mx-auto mt-4 flex max-w-5xl flex-wrap items-center justify-center gap-2">
-          {HERO_QUICK_CHIPS.map((chip) => (
-            <a
-              key={chip.label}
-              href={chip.href}
-              className="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
-            >
-              {chip.label}
-            </a>
-          ))}
+          {HERO_QUICK_CHIPS.map((chip) => {
+            let href = chip.href;
+            if (chip.href.startsWith('/events')) {
+              const params = new URLSearchParams(chip.href.includes('?') ? chip.href.slice(chip.href.indexOf('?') + 1) : '');
+              href = catalogHrefWithSelectedCity(destination, {
+                q: params.get('q') || undefined,
+                city: params.get('city') || undefined,
+                category: params.get('category') || undefined,
+                date: params.get('date') || undefined,
+                sort: (params.get('sort') as 'popular' | 'time' | undefined) || undefined,
+              });
+            }
+            return (
+              <a
+                key={chip.label}
+                href={href}
+                className="rounded-full border border-white/25 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white backdrop-blur-sm transition hover:bg-white/20"
+              >
+                {chip.label}
+              </a>
+            );
+          })}
         </div>
       </div>
     </section>

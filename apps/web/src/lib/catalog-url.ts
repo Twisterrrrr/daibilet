@@ -80,6 +80,15 @@ export function buildCatalogHref(values: CatalogFilterValues): string {
   return query ? `/events?${query}` : '/events';
 }
 
+/** Catalog `/events` href with header city when values have no explicit `city`. */
+export function catalogHrefWithSelectedCity(
+  cityValue: string | null | undefined,
+  values: CatalogFilterValues = {},
+): string {
+  const city = values.city || (cityValue && cityValue !== 'all' ? cityValue : undefined);
+  return buildCatalogHref({ ...values, city });
+}
+
 export function mergeCatalogFilters(
   base: CatalogFilterValues,
   patch: Partial<CatalogFilterValues>,

@@ -4,6 +4,8 @@ import { Search, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
+import { buildCatalogHref } from '@/lib/catalog-url';
+
 type SearchItem = {
   type: 'event' | 'city' | 'landing';
   label: string;
@@ -117,7 +119,13 @@ export function HeaderSearch({
 
   const submit = (value?: string) => {
     const normalized = (value ?? query).trim();
-    navigate(normalized ? `/events?q=${encodeURIComponent(normalized)}` : '/events');
+    navigate(
+      buildCatalogHref({
+        q: normalized || undefined,
+        city: cityFilter && cityFilter !== 'all' ? cityFilter : undefined,
+        sort: 'popular',
+      }),
+    );
   };
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {

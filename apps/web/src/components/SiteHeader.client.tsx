@@ -12,9 +12,10 @@ import { HeaderSearch } from '@/components/HeaderSearch.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { useUserAuthOptional } from '@/hooks/useUserAuth';
+import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 
 const NAV_LINKS = [
-  { label: 'События', href: '/events' },
+  { label: 'События', href: '/events', catalog: true },
   { label: 'Города', href: '/cities' },
   { label: 'Площадки', href: '/venues' },
   { label: 'Локации', href: '/locations' },
@@ -53,6 +54,11 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   const cityLabel = selectedCity?.cityLabel ?? 'Все города';
   const cityValue = selectedCity?.cityValue ?? 'all';
   const onCityChange = selectedCity?.setCity ?? (() => undefined);
+  const navLinks = NAV_LINKS.map((item) =>
+    'catalog' in item && item.catalog
+      ? { ...item, href: catalogHrefWithSelectedCity(cityValue) }
+      : { ...item, href: item.href },
+  );
 
   useEffect(() => {
     if (!userMenuOpen) return;
@@ -105,12 +111,12 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
           </div>
 
           <nav aria-label="Основная навигация" className="hidden min-w-0 items-center gap-0.5 lg:flex">
-            {NAV_LINKS.map((item) => {
-              const active = isNavActive(pathname, item.href);
-              const secondary = item.href === '/venues' || item.href === '/locations' || item.href === '/blog';
+            {navLinks.map((item) => {
+              const active = isNavActive(pathname, item.href.split('?')[0] || item.href);
+              const secondary = item.href.startsWith('/venues') || item.href.startsWith('/locations') || item.href.startsWith('/blog');
               return (
                 <Link
-                  key={item.href}
+                  key={item.label}
                   href={item.href}
                   className={
                     [
@@ -172,6 +178,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
       {mobileOpen ? (
         <MobileNavSheet
           pathname={pathname}
+          navLinks={navLinks}
           cityLabel={cityLabel}
           cityValue={cityValue}
           destinations={destinations}
@@ -268,6 +275,7 @@ const HeaderAuthControls = forwardRef<
 
 function MobileNavSheet({
   pathname,
+  navLinks,
   cityLabel,
   cityValue,
   destinations,
@@ -280,6 +288,7 @@ function MobileNavSheet({
   onOpenFavorites,
 }: {
   pathname: string;
+  navLinks: Array<{ label: string; href: string }>;
   cityLabel: string;
   cityValue: string;
   destinations: PublicDestinationDto[];
@@ -310,13 +319,15 @@ function MobileNavSheet({
           />
         </div>
         <nav aria-label="Мобильная навигация" className="flex-1 overflow-y-auto p-2">
-          {NAV_LINKS.map((item) => (
+          {navLinks.map((item) => (
             <Link
-              key={item.href}
+              key={item.label}
               href={item.href}
               onClick={onClose}
               className={`block w-full rounded-lg px-4 py-3 text-left text-base font-medium ${
-                isNavActive(pathname, item.href) ? 'bg-primary/10 font-semibold text-primary-600' : 'text-slate-700 hover:bg-slate-100'
+                isNavActive(pathname, item.href.split('?')[0] || item.href)
+                  ? 'bg-primary/10 font-semibold text-primary-600'
+                  : 'text-slate-700 hover:bg-slate-100'
               }`}
             >
               {item.label}

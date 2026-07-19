@@ -5,7 +5,12 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { buildCatalogHref } from '@/lib/catalog-url';
-import { matchDestination, persistSelectedCity, resolveCityLabel } from '@/lib/selected-city';
+import {
+  matchDestination,
+  mergeStoredCityIntoEventsParams,
+  persistSelectedCity,
+  resolveCityLabel,
+} from '@/lib/selected-city';
 
 type SelectedCityContextValue = {
   cityValue: string;
@@ -34,6 +39,22 @@ export function SelectedCityProvider({
     setCityLabel(resolveCityLabel(destinations, fromUrl));
   }, [destinations, pathname, urlCity]);
 
+  // On /events without explicit city= — apply header city from localStorage (deep-links with city= win).
+  useEffect(() => {
+    if (!pathname.startsWith('/events')) return;
+    const merged = mergeStoredCityIntoEventsParams(destinations, new URLSearchParams(searchParams.toString()));
+    if (!merged) return;
+    const query = merged.toString();
+    router.replace(query ? `/events?${query}` : '/events', { scroll: false });
+  }, [destinations, pathname, router, searchParams]);
+
+  // Keep storage aligned with an explicit catalog city (including deep-links).
+  useEffect(() => {
+    if (!pathname.startsWith('/events') || !urlCity) return;
+    const matched = matchDestination(destinations, urlCity);
+    if (matched) persistSelectedCity(matched.name);
+  }, [destinations, pathname, urlCity]);
+
   const cityValue = cityLabel === 'Все города' ? 'all' : cityLabel;
   const selectedDestination = useMemo(
     () => (cityValue === 'all' ? null : matchDestination(destinations, cityValue)),
@@ -53,6 +74,7 @@ export function SelectedCityProvider({
         const params = new URLSearchParams(searchParams.toString());
         if (name === 'all') params.delete('city');
         else params.set('city', name);
+        params.delete('page');
         const query = params.toString();
         router.push(query ? `/events?${query}` : '/events');
         return;

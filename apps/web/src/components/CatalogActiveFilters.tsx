@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link';
 import { SlidersHorizontal, X } from 'lucide-react';
 
@@ -7,6 +9,7 @@ import {
   clearCatalogFilterKey,
   type CatalogFilterValues,
 } from '@/lib/catalog-url';
+import { persistSelectedCity } from '@/lib/selected-city';
 
 export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }) {
   const chips: Array<{ key: keyof CatalogFilterValues; label: string }> = [];
@@ -57,6 +60,9 @@ export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }
         <Link
           key={`${chip.key}:${chip.label}`}
           href={buildCatalogHref(clearCatalogFilterKey(values, chip.key))}
+          onClick={() => {
+            if (chip.key === 'city') persistSelectedCity('all');
+          }}
           className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary-700 ring-1 ring-primary/20 transition hover:bg-primary/20"
         >
           {chip.label}
