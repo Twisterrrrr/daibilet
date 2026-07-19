@@ -768,17 +768,28 @@ export function startServer(options = {}) {
     if (!options.prewarmBeforeListen && (options.warmPublicOnStartup ?? DAIBILET_PUBLIC_STARTUP_WARM)) {
       void warmPublicCaches('startup');
     }
-    // Warm admin catalog + Landings/Sources so section switches stay in-memory.
-    void warmAdminGroupedEventsCache(db, 'startup')
-      .then(async () => {
-        await Promise.all([
-          buildAdminLandingsList(db, new URLSearchParams()),
-          buildAdminSources(db),
-        ]);
-      })
-      .catch((error) => {
-        console.warn(`Admin cache warm failed: ${error instanceof Error ? error.message : String(error)}`);
+    // Admin Events/Dashboard use SQL read-model (no full catalog in RAM).
+    // Full grouped warm remains opt-in for Landings SWR: DAIBILET_ADMIN_STARTUP_WARM=1.
+    const adminStartupWarm =
+      options.warmAdminOnStartup ??
+      ['1', 'true', 'yes', 'on'].includes(String(process.env.DAIBILET_ADMIN_STARTUP_WARM || '').toLowerCase());
+    if (adminStartupWarm) {
+      void warmAdminGroupedEventsCache(db, 'startup')
+        .then(async () => {
+          await Promise.all([
+            buildAdminLandingsList(db, new URLSearchParams()),
+            buildAdminSources(db),
+          ]);
+        })
+        .catch((error) => {
+          console.warn(`Admin cache warm failed: ${error instanceof Error ? error.message : String(error)}`);
+        });
+    } else {
+      console.log('Admin full-catalog startup warm skipped (DAIBILET_ADMIN_STARTUP_WARM off; Events uses SQL read-model)');
+      void buildAdminSources(db).catch((error) => {
+        console.warn(`Admin sources warm failed: ${error instanceof Error ? error.message : String(error)}`);
       });
+    }
     scheduleTeplohodAutoSync();
     scheduleStaleOrderArchive();
   });

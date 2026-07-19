@@ -42,9 +42,9 @@ const VENUE_TITLE_SQL = `coalesce(
 const SOURCE_LABEL_SQL = `coalesce(
   nullif(trim(source.name), ''),
   case
-    when upper(coalesce(source.code, offer."sourceCode", '')) ~ '(TC|TICKETSCLOUD)' then 'Ticketscloud'
-    when upper(coalesce(source.code, offer."sourceCode", '')) like '%TEPLOHOD%' then 'Teplohod.info'
-    else nullif(upper(coalesce(source.code, offer."sourceCode", '')), '')
+    when upper(coalesce(source.code::text, offer."sourceCode"::text, '')) ~ '(TC|TICKETSCLOUD)' then 'Ticketscloud'
+    when upper(coalesce(source.code::text, offer."sourceCode"::text, '')) like '%TEPLOHOD%' then 'Teplohod.info'
+    else nullif(upper(coalesce(source.code::text, offer."sourceCode"::text, '')), '')
   end,
   'Источник'
 )`;
@@ -232,7 +232,7 @@ async function queryAdminEventGroupsPageUncached(db, searchParams) {
         length(trim(coalesce(override.description, e.description, override."shortDescription", '')))::int
           as "descriptionLength",
         ${SOURCE_LABEL_SQL} as "sourceLabel",
-        coalesce(source.code, offer."sourceCode") as "sourceCode",
+        coalesce(source.code::text, offer."sourceCode"::text) as "sourceCode",
         ${CITY_LABEL_SQL} as "cityLabel",
         ${VENUE_TITLE_SQL} as "venueLabel",
         coalesce(nullif(trim(cat.title), ''), 'не определено') as "proposedCategory",
@@ -242,14 +242,14 @@ async function queryAdminEventGroupsPageUncached(db, searchParams) {
           or nullif(trim(offer."deeplinkUrl"), '') is not null
           or (
             (
-              upper(coalesce(source.code, offer."sourceCode", '')) like '%TEPLOHOD%'
-              or upper(coalesce(source.code, offer."sourceCode", '')) ~ '(TC|TICKETSCLOUD)'
+              upper(coalesce(source.code::text, offer."sourceCode"::text, '')) like '%TEPLOHOD%'
+              or upper(coalesce(source.code::text, offer."sourceCode"::text, '')) ~ '(TC|TICKETSCLOUD)'
             )
             and nullif(trim(source_link."externalId"), '') is not null
           )
         ) as "purchaseReady",
         (
-          upper(coalesce(e.kind, '')) = 'OPEN_DATE'
+          upper(coalesce(e.kind::text, '')) = 'OPEN_DATE'
           or bool_or(${ACTIVE_SESSION_SQL})
         ) as "hasFutureSession",
         min(session."startsAt") filter (where ${ACTIVE_SESSION_SQL}) as "nextStartsAt",
