@@ -17,6 +17,26 @@
 
 ---
 
+## 2026-07-19 — Расширенные фильтры каталога → popup
+
+### Наблюдения
+
+- `CatalogAdvancedFiltersPanel` раскрывался inline под тулбаром и раздувал `/events`.
+- Поиск в шапке уже использует overlay-modal (`HeaderSearch` variant=`overlay`): backdrop, Esc, `role="dialog"`.
+
+### Решения
+
+- Фильтры открываются кнопкой «Фильтры» в `CatalogToolbar` как portal-modal (тот же UX, что поиск).
+- Desktop: центрированная модалка `max-w-2xl`; mobile: bottom sheet (`items-end`, `rounded-t-2xl`, safe-area).
+- Draft + «Применить» / «Сбросить»; Esc + backdrop; focus trap; badge с числом активных advanced-фильтров.
+- Query-params (`from`/`to`/`minPrice`/`maxPrice`/`ageMax`/`landing`) без изменений схемы; счётчик больше не включает `category` (она в чипах категорий).
+
+### Проблемы
+
+- Deploy с этой среды может упереться в SSH key к prod (как у reviews).
+
+---
+
 ## 2026-07-19 — Модуль отзывов (ExternalOrder / TC)
 
 ### Наблюдения
