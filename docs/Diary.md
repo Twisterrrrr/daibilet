@@ -1,3 +1,24 @@
+## 2026-07-19 — ЛК заказов: 404 / время / truncate
+
+### Наблюдения
+
+- Ссылка из заказа на past dated TC slug (`…-14-iyulya-21-30`) давала 404/пустую карточку → «Оставить отзыв» бесполезен (resolve отзывов был только по точному `slug`).
+- В строке билета две «голые» даты/времени без подписей; `formatDateTime` без `Europe/Moscow`.
+- Блок покупателя: `max-w-[170px] truncate` обрезал «Дата покупки» на desktop.
+
+### Решения
+
+- `buyer-order-event-links.js`: для account/public orders резолв `eventUrl` → meta-sibling / merge с ближайшим будущим сеансом; `eventId` покупки сохраняем для verification.
+- Soft-404 в `loadPublicEventDto`: unsaleable slug → одноразовый hop на sibling с future session.
+- Reviews: `resolveReviewEvent` по id / `tc-{24hex}-*` / slug; `/reviews/write` работает по `eventId`+`orderRef` даже без публичной карточки (`forceFormOpen`).
+- UI: «Сеанс: …» (MSK), «Дата покупки» без truncate, шире колонка buyer.
+
+### Проблемы
+
+- Deploy Next + API после commit.
+
+---
+
 ## 2026-07-19 — Event description: маркеры → списки
 
 ### Наблюдения

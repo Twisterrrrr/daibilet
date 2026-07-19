@@ -23,6 +23,7 @@ import {
 } from './event-venue-context.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
 import { toPublicCatalogListItem } from './public-catalog-list-item.ts';
+import { enrichBuyerOrdersWithEventLinks } from './buyer-order-event-links.js';
 import {
   buildAdminEventGroupKey,
   invalidateAdminEventsSqlReadModelCache,
@@ -1191,17 +1192,18 @@ export async function buildPublicBuyerOrders(db, searchParams = new URLSearchPar
     .filter((order) => matchesPublicOrderLookup(order, lookup))
     .slice(0, 20)
     .map(mapPublicBuyerOrder);
+  const rows = await enrichBuyerOrdersWithEventLinks(db, matched);
 
   return {
     generatedAt: new Date().toISOString(),
     lookupRequired: false,
     minLookupLength,
-    total: matched.length,
-    rows: matched,
+    total: rows.length,
+    rows,
     metrics: {
-      orders: matched.length,
-      tickets: matched.reduce((sum, order) => sum + order.ticketCount, 0),
-      active: matched.filter((order) => !order.isFinal).length,
+      orders: rows.length,
+      tickets: rows.reduce((sum, order) => sum + order.ticketCount, 0),
+      active: rows.filter((order) => !order.isFinal).length,
     },
   };
 }
@@ -1309,7 +1311,8 @@ export async function buildAccountPurchases(db, userEmail, searchParams = new UR
     [email, limit, offset],
   );
 
-  const rows = result.rows.map(mapAdminOrderRow).filter((order) => orderMatchesAccountEmail(order, email)).map(mapAccountBuyerOrder);
+  const mapped = result.rows.map(mapAdminOrderRow).filter((order) => orderMatchesAccountEmail(order, email)).map(mapAccountBuyerOrder);
+  const rows = await enrichBuyerOrdersWithEventLinks(db, mapped);
 
   return {
     generatedAt: new Date().toISOString(),
@@ -1331,7 +1334,8 @@ export async function buildAccountOrderDetail(db, userEmail, orderId) {
   const order = await buildAdminOrderDetail(db, orderId);
   if (!order) return null;
   if (!orderMatchesAccountEmail(order, email)) return null;
-  return mapAccountBuyerOrder(order);
+  const [enriched] = await enrichBuyerOrdersWithEventLinks(db, [mapAccountBuyerOrder(order)]);
+  return enriched;
 }
 
 export async function buildAdminBuyersList(db, searchParams = new URLSearchParams()) {
@@ -1890,6 +1894,7 @@ function mapPublicBuyerOrder(order) {
       email: maskEmail(order.buyer.email),
       phone: maskPhone(order.buyer.phone),
     },
+    eventId: primaryTicket?.eventId || null,
     eventTitle: order.eventTitle,
     eventUrl,
     purchasedAt: order.purchasedAt,
@@ -1903,6 +1908,7 @@ function mapPublicBuyerOrder(order) {
       number: ticket.externalTicketId,
       status: ticket.status || 'unknown',
       displayStatus: ticket.displayStatus || orderStatusLabel(resolveTicketStatusForDisplay(ticket.status, order.status)),
+      eventId: ticket.eventId || null,
       eventTitle: ticket.eventTitle,
       eventUrl: ticket.eventSlug ? `/events/${publicEventSlug(ticket.eventSlug)}` : ticket.eventId ? `/events/${encodeURIComponent(ticket.eventId)}` : null,
       startsAt: ticket.startsAt,

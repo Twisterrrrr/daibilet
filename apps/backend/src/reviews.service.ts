@@ -198,11 +198,8 @@ export async function verifyReviewEmail(token: string) {
   return { message: 'Email подтверждён! Отзыв отправлен на модерацию.' };
 }
 
-export async function listApprovedReviewsByEventSlug(slug: string, page = 1, limit = 10) {
-  const event = await prisma.event.findUnique({
-    where: { slug },
-    select: { id: true, slug: true },
-  });
+export async function listApprovedReviewsByEventSlug(slugOrId: string, page = 1, limit = 10) {
+  const event = await resolveReviewEvent(slugOrId);
   if (!event) throw new ReviewServiceError('event_not_found', 'Событие не найдено', 404);
 
   const where = { eventId: event.id, status: 'APPROVED' as const };
@@ -235,6 +232,7 @@ export async function listApprovedReviewsByEventSlug(slug: string, page = 1, lim
   return {
     eventId: event.id,
     eventSlug: event.slug,
+    eventTitle: event.title,
     items: rows.map((row) => ({
       id: row.id,
       rating: row.rating,
@@ -249,6 +247,66 @@ export async function listApprovedReviewsByEventSlug(slug: string, page = 1, lim
     totalPages: Math.max(1, Math.ceil(total / limit)),
     summary,
   };
+}
+
+async function resolveReviewEvent(slugOrId: string): Promise<{ id: string; slug: string; title: string } | null> {
+  const raw = String(slugOrId || '').trim();
+  if (!raw) return null;
+
+  const select = { id: true, slug: true, title: true } as const;
+  const direct = await prisma.event.findFirst({
+    where: { OR: [{ id: raw }, { slug: raw }] },
+    select,
+  });
+  if (direct) return direct;
+
+  const tcPrefixMatch = raw.match(/^tc-([a-f0-9]{24})-/i);
+  if (tcPrefixMatch?.[1]) {
+    const tcId = tcPrefixMatch[1];
+    const tcEvent = await prisma.event.findFirst({
+      where: { OR: [{ id: tcId }, { id: `evt_${tcId}` }] },
+      select,
+    });
+    if (tcEvent) return tcEvent;
+  }
+
+  const normalized = publicSlugLite(raw);
+  if (normalized && normalized !== raw) {
+    const byNormalized = await prisma.event.findFirst({
+      where: { slug: normalized },
+      select,
+    });
+    if (byNormalized) return byNormalized;
+  }
+
+  // Soft resolve: past dated slug may have been replaced — match by TC id prefix inside slug.
+  if (tcPrefixMatch?.[1]) {
+    const like = await prisma.event.findFirst({
+      where: { slug: { contains: tcPrefixMatch[1], mode: 'insensitive' } },
+      orderBy: { updatedAt: 'desc' },
+      select,
+    });
+    if (like) return like;
+  }
+
+  return null;
+}
+
+function publicSlugLite(value: string): string {
+  const letters: Record<string, string> = {
+    а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y',
+    к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f',
+    х: 'h', ц: 'c', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya',
+  };
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .split('')
+    .map((character) => letters[character] ?? character)
+    .join('')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-{2,}/g, '-');
 }
 
 export async function getEventReviewSummary(eventId: string): Promise<RatingSummary> {

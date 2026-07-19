@@ -226,6 +226,7 @@ export function ReviewSection({
   prefillName,
   reviewRequestToken,
   orderOrTicketRef,
+  forceFormOpen = false,
 }: {
   eventId: string;
   eventSlug: string;
@@ -233,6 +234,7 @@ export function ReviewSection({
   prefillName?: string;
   reviewRequestToken?: string;
   orderOrTicketRef?: string;
+  forceFormOpen?: boolean;
 }) {
   const [data, setData] = useState<{
     items: ReviewItem[];
@@ -242,12 +244,13 @@ export function ReviewSection({
     summary: RatingSummary;
   } | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(Boolean(reviewRequestToken));
+  const [showForm, setShowForm] = useState(Boolean(forceFormOpen || reviewRequestToken || orderOrTicketRef));
 
   const loadReviews = useCallback(
     async (page = 1) => {
       try {
-        const res = await fetch(`/api/reviews/events/${encodeURIComponent(eventSlug)}?page=${page}&limit=10`, {
+        const key = eventSlug || eventId;
+        const res = await fetch(`/api/reviews/events/${encodeURIComponent(key)}?page=${page}&limit=10`, {
           cache: 'no-store',
         });
         if (!res.ok) return;
@@ -261,17 +264,21 @@ export function ReviewSection({
             : json,
         );
       } catch {
-        // no-op
+        // no-op — form still works by eventId
       } finally {
         setLoading(false);
       }
     },
-    [eventSlug],
+    [eventSlug, eventId],
   );
 
   useEffect(() => {
     void loadReviews();
   }, [loadReviews]);
+
+  useEffect(() => {
+    if (forceFormOpen || reviewRequestToken || orderOrTicketRef) setShowForm(true);
+  }, [forceFormOpen, reviewRequestToken, orderOrTicketRef]);
 
   if (loading) {
     return (

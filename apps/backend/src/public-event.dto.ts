@@ -127,7 +127,7 @@ export async function buildPublicEventDto(
   }
 }
 
-async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPageDto | null> {
+async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = true): Promise<PublicEventPageDto | null> {
   const catalogSessions = await getPublicCatalogSessions();
   const requestedSlug = publicSlug(eventSlugOrId);
   const targetCatalogSession = catalogSessions.find((session) =>
@@ -353,6 +353,12 @@ async function loadPublicEventDto(eventSlugOrId: string): Promise<PublicEventPag
     purchaseReady: event.purchaseReady,
     priceFrom: event.priceFrom,
   })) {
+    if (allowSoftRedirect) {
+      const nearestSibling = await findNearestSaleableSiblingSlug(requestedEvent, metaGroupMembers, mergeGroupMembers);
+      if (nearestSibling && publicSlug(nearestSibling) !== requestedSlug) {
+        return loadPublicEventDto(nearestSibling, false);
+      }
+    }
     return null;
   }
 
@@ -672,6 +678,38 @@ async function loadMetaGroupMembers(requestedEvent: EventRecord): Promise<EventR
     },
     include: eventInclude,
   });
+}
+
+/**
+ * Past dated / unsaleable slug → nearest meta/merge sibling that still has a future session.
+ * Used as soft-404 recovery so order deep-links stay useful.
+ */
+async function findNearestSaleableSiblingSlug(
+  requestedEvent: EventRecord,
+  metaMembers: EventRecord[],
+  mergeMembers: EventRecord[],
+): Promise<string | null> {
+  const candidates = [...metaMembers, ...mergeMembers].filter((event) => event.id !== requestedEvent.id);
+  if (!candidates.length) return null;
+
+  const now = new Date();
+  const sessions = await prisma.eventSession.findMany({
+    where: {
+      eventId: { in: candidates.map((event) => event.id) },
+      OR: [{ startsAt: { gte: now } }, { endsAt: { gte: now } }],
+    },
+    select: { eventId: true, startsAt: true },
+    orderBy: { startsAt: 'asc' },
+    take: 50,
+  });
+  if (!sessions.length) return null;
+
+  const byId = new Map(candidates.map((event) => [event.id, event]));
+  for (const session of sessions) {
+    const event = byId.get(session.eventId);
+    if (event?.slug) return event.slug;
+  }
+  return null;
 }
 
 function resolveMultiPurchasePeers(groupEvents: EventRecord[], requestedEvent: EventRecord): EventRecord[] {

@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ArrowRight, CheckCircle2, Clock3, HelpCircle, XCircle } from 'lucide-react';
 
+import { SITE_TIME_ZONE, parseSessionStartsAt } from '@/lib/datetime';
 import { formatNumber } from '@/lib/format';
 
 export type BuyerOrder = {
@@ -17,6 +18,7 @@ export type BuyerOrder = {
     email?: string | null;
     phone?: string | null;
   };
+  eventId?: string | null;
   eventTitle?: string | null;
   eventUrl?: string | null;
   purchasedAt?: string | null;
@@ -27,7 +29,9 @@ export type BuyerOrder = {
     id: string;
     number?: string | null;
     displayStatus: string;
+    eventId?: string | null;
     eventTitle?: string | null;
+    eventUrl?: string | null;
     startsAt?: string | null;
   }>;
 };
@@ -35,7 +39,7 @@ export type BuyerOrder = {
 export function BuyerOrderCard({ order }: { order: BuyerOrder }) {
   return (
     <article className="overflow-hidden rounded-2xl bg-white shadow-[0_14px_40px_rgba(15,23,42,0.08)]">
-      <div className="grid gap-4 p-5 lg:grid-cols-[minmax(0,1fr)_280px]">
+      <div className="grid gap-4 p-5 lg:grid-cols-[minmax(0,1fr)_minmax(260px,340px)]">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <StatusPill order={order} />
@@ -61,7 +65,7 @@ export function BuyerOrderCard({ order }: { order: BuyerOrder }) {
           <InfoRow label="Покупатель" value={order.buyer.name || 'не указан'} />
           <InfoRow label="Email" value={order.buyer.email || '-'} />
           <InfoRow label="Телефон" value={order.buyer.phone || '-'} />
-          <InfoRow label="Дата покупки" value={formatDateTime(order.purchasedAt)} />
+          <InfoRow label="Дата покупки" value={formatPurchaseDateTime(order.purchasedAt)} />
           {order.amountRub ? <InfoRow label="Сумма" value={`${formatNumber(order.amountRub)} ₽`} /> : null}
         </dl>
       </div>
@@ -73,33 +77,40 @@ export function BuyerOrderCard({ order }: { order: BuyerOrder }) {
         </div>
         {order.tickets.length ? (
           <div className="grid gap-2">
-            {order.tickets.map((ticket) => (
-              <div key={ticket.id} className="grid gap-2 rounded-xl bg-white p-3 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
-                <div className="min-w-0">
-                  <div className="font-semibold text-slate-900">{ticket.number || 'Билет без номера'}</div>
-                  <div className="mt-1 text-xs text-slate-500">
-                    {ticket.eventTitle || order.eventTitle || 'Событие уточняется'} · {formatDateTime(ticket.startsAt)}
+            {order.tickets.map((ticket) => {
+              const reviewHref = buildReviewWriteHref({
+                eventId: ticket.eventId || order.eventId || '',
+                eventUrl: ticket.eventUrl || order.eventUrl || '',
+                eventTitle: ticket.eventTitle || order.eventTitle || '',
+                orderRef: ticket.number || order.number,
+                email: order.buyer.email || '',
+                name: order.buyer.name || '',
+              });
+              return (
+                <div key={ticket.id} className="grid gap-2 rounded-xl bg-white p-3 text-sm sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                  <div className="min-w-0">
+                    <div className="font-semibold text-slate-900">{ticket.number || 'Билет без номера'}</div>
+                    <div className="mt-1 text-xs text-slate-500">{ticket.eventTitle || order.eventTitle || 'Событие уточняется'}</div>
+                    {ticket.startsAt ? (
+                      <div className="mt-1 text-xs text-slate-600">
+                        <span className="text-slate-400">Сеанс:</span> {formatSessionDateTime(ticket.startsAt)}
+                      </div>
+                    ) : null}
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">{ticket.displayStatus}</span>
+                    {reviewHref ? (
+                      <Link
+                        href={reviewHref}
+                        className="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-100"
+                      >
+                        Оставить отзыв
+                      </Link>
+                    ) : null}
                   </div>
                 </div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">{ticket.displayStatus}</span>
-                  {order.eventUrl ? (
-                    <Link
-                      href={buildReviewWriteHref({
-                        eventUrl: order.eventUrl,
-                        eventTitle: ticket.eventTitle || order.eventTitle || '',
-                        orderRef: ticket.number || order.number,
-                        email: order.buyer.email || '',
-                        name: order.buyer.name || '',
-                      })}
-                      className="rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-700 hover:bg-primary-100"
-                    >
-                      Оставить отзыв
-                    </Link>
-                  ) : null}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <p className="rounded-xl bg-white p-4 text-sm leading-6 text-slate-500">
@@ -146,16 +157,30 @@ function StatusPill({ order }: { order: BuyerOrder }) {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-start justify-between gap-3">
-      <dt className="text-slate-500">{label}</dt>
-      <dd className="max-w-[170px] truncate text-right font-semibold text-slate-800">{value}</dd>
+    <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-x-3">
+      <dt className="shrink-0 text-slate-500">{label}</dt>
+      <dd className="min-w-0 whitespace-normal break-words text-right font-semibold text-slate-800">{value}</dd>
     </div>
   );
 }
 
-function formatDateTime(value?: string | null): string {
+function formatSessionDateTime(value?: string | null): string {
+  if (!value) return 'не указан';
+  const date = parseSessionStartsAt(value);
+  if (Number.isNaN(date.getTime())) return 'не указан';
+  return new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: SITE_TIME_ZONE,
+  }).format(date);
+}
+
+function formatPurchaseDateTime(value?: string | null): string {
   if (!value) return 'не указана';
-  const date = new Date(value);
+  const date = parseSessionStartsAt(value);
   if (Number.isNaN(date.getTime())) return 'не указана';
   return new Intl.DateTimeFormat('ru-RU', {
     day: 'numeric',
@@ -163,6 +188,7 @@ function formatDateTime(value?: string | null): string {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: SITE_TIME_ZONE,
   }).format(date);
 }
 
@@ -184,18 +210,21 @@ function extractSlugFromEventUrl(eventUrl: string): string {
 }
 
 function buildReviewWriteHref(input: {
-  eventUrl: string;
+  eventId?: string;
+  eventUrl?: string;
   eventTitle: string;
   orderRef: string;
   email: string;
   name: string;
-}): string {
+}): string | null {
   const params = new URLSearchParams();
-  const slug = extractSlugFromEventUrl(input.eventUrl);
+  const slug = input.eventUrl ? extractSlugFromEventUrl(input.eventUrl) : '';
+  if (input.eventId) params.set('eventId', input.eventId);
   if (slug) params.set('eventSlug', slug);
   if (input.eventTitle) params.set('eventTitle', input.eventTitle);
   if (input.orderRef) params.set('orderRef', input.orderRef);
   if (input.email) params.set('email', input.email);
   if (input.name) params.set('name', input.name);
+  if (!input.eventId && !slug) return null;
   return `/reviews/write?${params.toString()}`;
 }

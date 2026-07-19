@@ -39,14 +39,39 @@ function ReviewWriteContent() {
           setEventData(data);
           return;
         }
-        if (eventSlug) {
-          const res = await fetch(`/api/reviews/events/${encodeURIComponent(eventSlug)}?page=1&limit=1`);
-          if (!res.ok) throw new Error('Событие не найдено');
-          const payload = await res.json();
+
+        const lookupKey = eventSlug || eventId;
+        if (lookupKey) {
+          let resolvedId = eventId || '';
+          let resolvedSlug = eventSlug || '';
+          let resolvedTitle = searchParams.get('eventTitle') || 'событие';
+
+          try {
+            const res = await fetch(`/api/reviews/events/${encodeURIComponent(lookupKey)}?page=1&limit=1`);
+            if (res.ok) {
+              const payload = await res.json();
+              resolvedId = payload.eventId || resolvedId;
+              resolvedSlug = payload.eventSlug || resolvedSlug || lookupKey;
+              if (payload.eventTitle) resolvedTitle = payload.eventTitle;
+            }
+          } catch {
+            // Public card may be gone — still allow review by eventId/orderRef.
+          }
+
+          if (!resolvedId && eventId) resolvedId = eventId;
+          if (!resolvedId && !resolvedSlug) {
+            throw new Error('Событие не найдено');
+          }
+
+          // Form needs eventId for POST /api/reviews. If API resolve failed but query has eventId, proceed.
+          if (!resolvedId) {
+            throw new Error('Событие не найдено. Откройте отзыв из личного кабинета или письма.');
+          }
+
           setEventData({
-            eventId: payload.eventId,
-            eventSlug: payload.eventSlug || eventSlug,
-            eventTitle: searchParams.get('eventTitle') || 'событие',
+            eventId: resolvedId,
+            eventSlug: resolvedSlug || resolvedId,
+            eventTitle: resolvedTitle,
             email: searchParams.get('email') || '',
             buyerName: searchParams.get('name'),
             purchaseRef: orderRef || null,
@@ -54,18 +79,7 @@ function ReviewWriteContent() {
           });
           return;
         }
-        if (eventId && eventSlug) {
-          setEventData({
-            eventId,
-            eventSlug,
-            eventTitle: searchParams.get('eventTitle') || 'событие',
-            email: searchParams.get('email') || '',
-            buyerName: searchParams.get('name'),
-            purchaseRef: orderRef || null,
-            token: '',
-          });
-          return;
-        }
+
         setError('Ссылка недействительна');
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Ошибка загрузки');
@@ -88,12 +102,12 @@ function ReviewWriteContent() {
     return (
       <div className="mx-auto max-w-lg px-4 py-20 text-center">
         <p className="text-lg font-medium text-slate-900">{error || 'Ссылка недействительна'}</p>
-        <p className="mt-2 text-sm text-slate-500">Попробуйте оставить отзыв на странице мероприятия.</p>
+        <p className="mt-2 text-sm text-slate-500">Попробуйте оставить отзыв из раздела «Мои покупки» — форма работает даже без публичной страницы события.</p>
         <Link
-          href="/"
+          href="/account/purchases"
           className="mt-6 inline-block rounded-lg bg-primary-600 px-6 py-3 text-sm font-medium text-white hover:bg-primary-700"
         >
-          На главную
+          Мои покупки
         </Link>
       </div>
     );
@@ -116,6 +130,7 @@ function ReviewWriteContent() {
         prefillName={eventData.buyerName || undefined}
         reviewRequestToken={token || undefined}
         orderOrTicketRef={eventData.purchaseRef || orderRef}
+        forceFormOpen
       />
     </div>
   );
