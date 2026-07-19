@@ -27,7 +27,9 @@
 | P.2a | Brief-описания 14 адмцентров в `CITY_INFO` (hero/SEO) | Высокий | ✅ 2026-07-19 |
 | P.2b | Brief ещё 9 адмцентров (Чита…Хабаровск) в `CITY_INFO` | Высокий | ✅ 2026-07-19 |
 | P.2c | Предложный падеж хабов: «в Мурманске», не «в городе Мурманск» | Высокий | ✅ 2026-07-19 |
-| P.2d | SEO title city hubs: «События в … на сегодня» | Высокий | 🔄 |
+| P.2d | SEO title city hubs: «События в … на сегодня» | Высокий | ✅ `d49f463` (+ deploy) |
+| P.2e | **Wireframe city hub v1** — IA/UX фазы 1 (sticky tabs, афиша выше, FAQ accordion) | Высокий | ✅ [city-hub-wireframe-v1.md](./city-hub-wireframe-v1.md) |
+| P.2f | Реализация wireframe v1 в `apps/web` (`CityPageView`) | Высокий | ⏳ после P.2e |
 | P.3 | **Finance contour / ЛК поставщиков** — базовый контур | Высокий | ⏳ |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
 | P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |
@@ -410,6 +412,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-19 | P.2e: wireframe city hub v1 согласован (docs); P.2f реализация ⏳ |
 | 2026-07-19 | Продукт: реклама deferred; фокус AI/статьи, city hubs, финконтур; allowlist без хабов не раздувать (P.1–P.5) |
 | 2026-07-19 | TC on-demand: `tc:sync --ids` + `--dry-run`, admin `?ids=` (S.1–S.3) |
 | 2026-07-19 | URL: flat paths; SEO через city hubs (1.3.7 ⏳, 1.3.8 🚫) |

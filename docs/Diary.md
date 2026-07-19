@@ -1,3 +1,24 @@
+## 2026-07-19 — City hub wireframe v1 (фаза 1)
+
+### Наблюдения
+
+- Текущий `/cities/[slug]` (`CityPageView`): hero → travel → sights → guide FAQ → направления/venues/tags → recommended → **афиша `#city-schedule` внизу** → SEO → второй FAQ — гид мешает дойти до покупки.
+- Контент 65 хабов готов по brief/travel/faq; sights местами ⚠️; фото-bento и карта не обеспечены данными.
+- Пользователь согласовал wireframe фазы 1 **без** кода Lovable.
+
+### Решения
+
+- Зафиксирован IA: [city-hub-wireframe-v1.md](./city-hub-wireframe-v1.md) — sticky tabs, афиша выше гида, FAQ accordion (один блок), компактные счётчики, чипы Сегодня/Выходные, светлая издательская сетка.
+- Якоря: `#affiche` (+ alias `#city-schedule`), `#directions`, `#venues`, `#travel`, `#sights`, `#faq`.
+- Out of scope фазы 1: погода/мосты, bento sights, карта площадок, dark redesign 65, тёмный акцент СПб.
+- Оценка реализации: **M** (~1–2 eng-дня); wireframe = docs only.
+
+### Проблемы
+
+- Нет (ожидает отдельный code-task после wireframe).
+
+---
+
 ## 2026-07-19 — City SEO: «на сегодня» в title хабов
 
 ### Наблюдения
