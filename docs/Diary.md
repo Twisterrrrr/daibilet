@@ -53,7 +53,8 @@
 
 ### Проблемы
 
-- Deploy Next после commit.
+- Bare `export { cleanDisplayText } from '…'` не давал локальный биндинг → `ReferenceError` в ticket helpers (см. запись выше).
+- **Proof prod:** slug `seks-v-sssr…` — RSC HTML содержит `<ul>` (7 checkmark + 5 org details), маркеры сняты, абзацы/`<h3>` сохранены.
 
 ---
 

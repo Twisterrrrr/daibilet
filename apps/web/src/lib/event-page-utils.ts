@@ -1,6 +1,23 @@
 import type { PublicEventPageDto } from '@daibilet/contracts/public';
 
 import { formatNumber } from '@/lib/format';
+import {
+  cleanDisplayText,
+  formatEventDescriptionHtml,
+  isDescriptionSectionHeading,
+  parseEventDescriptionBlocks,
+  sanitizeEventHtml,
+  splitDescriptionParagraphs,
+} from './event-description-format';
+
+export {
+  cleanDisplayText,
+  formatEventDescriptionHtml,
+  isDescriptionSectionHeading,
+  parseEventDescriptionBlocks,
+  sanitizeEventHtml,
+  splitDescriptionParagraphs,
+};
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 
@@ -91,24 +108,6 @@ export function formatBuyCardPrice(range: { min: number; max: number }): string 
   if (min === max) return `${formatNumber(min)} ₽`;
   return `${formatNumber(min)} – ${formatNumber(max)} ₽`;
 }
-
-import {
-  cleanDisplayText,
-  formatEventDescriptionHtml,
-  isDescriptionSectionHeading,
-  parseEventDescriptionBlocks,
-  sanitizeEventHtml,
-  splitDescriptionParagraphs,
-} from './event-description-format';
-
-export {
-  cleanDisplayText,
-  formatEventDescriptionHtml,
-  isDescriptionSectionHeading,
-  parseEventDescriptionBlocks,
-  sanitizeEventHtml,
-  splitDescriptionParagraphs,
-};
 
 export type TicketCategoryRow = {
   key: string;
