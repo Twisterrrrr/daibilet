@@ -48,6 +48,12 @@ const SLUG_META: Record<
     citySlug: 'saint-petersburg',
     city: 'Санкт-Петербург',
   },
+  'muzyka-v-osobnyakah-spb': {
+    authorId: 'anna',
+    articleType: 'column',
+    citySlug: 'saint-petersburg',
+    city: 'Санкт-Петербург',
+  },
   'kak-vybrat-koncert': { authorId: 'editorial', articleType: 'gid' },
   'kuda-poyti-s-detmi': { authorId: 'editorial', articleType: 'gid' },
   'spb-rooftop-guide': {

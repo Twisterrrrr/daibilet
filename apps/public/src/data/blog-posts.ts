@@ -19,6 +19,22 @@ export type BlogPost = {
 /** Обложки — уникальная статика на статью: /images/blog/{slug}.jpg */
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: 'muzyka-v-osobnyakah-spb',
+    title: 'Музыка с адресом: зачем слушать классику в петербургских особняках',
+    excerpt:
+      'Авторская колонка Анны: классика в особняках Половцова, Шрёдера, Мясникова и усадьбе Державина — адреса, интерьеры и цены.',
+    date: '19 июля 2026',
+    readMin: 9,
+    tag: 'Колонка',
+    city: 'Санкт-Петербург',
+    citySlug: 'saint-petersburg',
+    authorId: 'anna',
+    authorName: 'Анна',
+    articleType: 'column',
+    imageUrl: blogCoverUrl('muzyka-v-osobnyakah-spb'),
+    imageAlt: 'Парадный зал петербургского особняка с роялем и тёплым светом люстры',
+  },
+  {
     slug: 'fentezi-fest-bylinnyy-bereg',
     title: 'Крыши и разводные мосты в Петербурге: можно ли успеть всё за один вечер',
     excerpt: 'Концерт на крыше Невского и ночной теплоход к разводным мостам — как совместить и кому что подходит.',

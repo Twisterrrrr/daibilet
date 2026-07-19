@@ -32,16 +32,17 @@
     {
       "authorId": "anna",
       "name": "Анна",
-      "column": "Между эпохами",
+      "column": "Город крупным планом",
       "role": "esthete",
       "doc": "02-anna.md",
       "register": "благородный слог, история и архитектура, без сленга",
       "address": "vy",
       "ctaTone": "soft",
-      "structure": "4 paragraphs",
+      "structure": "4 paragraphs base / longform when editorial provides full text",
       "style_prototypes": ["Леонид Парфенов", "Григорий Ревзин"],
-      "topics": ["Калининград", "Санкт-Петербург", "Золотое кольцо", "музеи", "выставки"],
-      "pilotFit": "high"
+      "topics": ["Калининград", "Санкт-Петербург", "Золотое кольцо", "музеи", "выставки", "особняки", "концерты в интерьерах"],
+      "pilotFit": "high",
+      "pilotSlug": "muzyka-v-osobnyakah-spb"
     },
     {
       "authorId": "elena",
