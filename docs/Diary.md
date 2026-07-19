@@ -1,3 +1,22 @@
+## 2026-07-19 — Аудит городов вне public destinations
+
+### Наблюдения
+
+- Prod: 180 городов с READY и/или saleable; публичный каталог — **36** city destinations (+ 4 region).
+- Исключено **144** города: см. `docs/geo-excluded-cities.md`.
+- Доминирующие причины: `allowlist` 126, `cityToRegion` 8, `no-saleable` 8, `republic-regex` 1 (Набережные Челны), `other` 1.
+- API подтверждает: «Республика Татарстан» / «Республика Хакасия» **нет** в destinations — `isPublicRegionName` с якорем `$` не матчит «Республика …».
+
+### Решения
+
+- Отчёт зафиксирован в `docs/geo-excluded-cities.md` (без deploy, без расширения allowlist).
+
+### Проблемы
+
+- `republic-regex`: свёртка в «Республика …» отфильтровывается из public destinations.
+
+---
+
 ## 2026-07-19 — Продуктовая стратегия: не рекламировать «пустышку»
 
 ### Наблюдения
