@@ -17,6 +17,7 @@
 | B.4 | Commit → deploy-prod-next → `blog:upsert` ×4+hide | Критический | ✅ |
 | B.5 | Пакет 10 редакционных статей (verbatim + buy + upsert) | Критический | ✅ |
 | B.6 | Вернуть `spb-razvod-mostov-kakoi-reis` PUBLISHED, снять 301 | Высокий | ✅ |
+| B.7 | Multi-event: убрать `[buy]`, только `/events` ссылки; цены/meta по prod; Cyrillic READY slug | Критический | 🔄 |
 
 ---
 

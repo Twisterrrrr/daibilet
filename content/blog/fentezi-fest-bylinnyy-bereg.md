@@ -46,9 +46,9 @@ status: PUBLISHED
 
 [image side=right src="/images/blog/fentezi-fest-bylinnyy-bereg-inline.jpg" alt="Исторический лагерь и костры на берегу реки"]
 
-Карточка в афише: [«Былинный берег»](/events/tc-6a08d60c3aa2e7a8469953dc-bylinnyi-bereg-2026).
+Карточка в афише: [«Былинный берег»](/events/tc-6a08d60c3aa2e7a8469953dc-былинныи-берег-2026).
 
-[buy slug="tc-6a08d60c3aa2e7a8469953dc-bylinnyi-bereg-2026" label="Купить билет на Былинный берег"]
+
 
 ## «Фэнтези Фест»: можно не смотреть, а играть
 
@@ -68,9 +68,9 @@ status: PUBLISHED
 
 Это как разница между просмотром фильма и ролью внутри фильма.
 
-Карточка в афише: [«Фэнтези Фест»](/events/tc-6a0a1d4d69c61af2fb0eb202-fentezi-fest-2026).
+Карточка в афише: [«Фэнтези Фест»](/events/tc-6a0a1d4d69c61af2fb0eb202-фэнтези-фест-2026).
 
-[buy slug="tc-6a0a1d4d69c61af2fb0eb202-fentezi-fest-2026" label="Купить билет на Фэнтези Фест"]
+
 
 ## Что выбрать
 

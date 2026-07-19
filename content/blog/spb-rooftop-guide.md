@@ -32,7 +32,7 @@ status: PUBLISHED
 
 Из афиши Дайбилет ориентир по формату — [ROMANTIC JAZZ HITS на крыше Невского](/events/tc-697a69d06364170132782a27-romantic-jazz-hits-na-kryshe-nevskogo-fortepiannye-improvizacii-v-salone-serebryanogo-veka-vech) (салон + обзорная, от 1450 ₽). Смотрите актуальную дату и описание площадки перед покупкой.
 
-[buy slug="tc-697a69d06364170132782a27-romantic-jazz-hits-na-kryshe-nevskogo-fortepiannye-improvizacii-v-salone-serebryanogo-veka-vech" label="Билет на крышу Невского"]
+
 
 ## Разводные мосты с воды: ночь, ради которой стоит не спать
 
@@ -55,9 +55,9 @@ status: PUBLISHED
 
 Последний пункт особенно важен. После развода мостов попасть с одного берега Невы на другой на машине бывает сложно. Удобный причал иногда ценнее ещё одного моста в маршруте.
 
-Сравнить рейсы удобнее на лендинге [«Ночные разводные мосты»](/bridges-night). Пример собранного маршрута с гидом — [«Пять разводных мостов»](/events/nochnaya-ekskursiya-pyat-razvodnyh-mostov-s-gidom-925) (от 1200 ₽).
+Сравнить рейсы удобнее на лендинге [«Ночные разводные мосты»](/bridges-night). Пример собранного маршрута с гидом — [«Пять разводных мостов»](/events/ночная-экскурсия-пять-разводных-мостов-с-гидом-925) (от 1200 ₽).
 
-[buy slug="nochnaya-ekskursiya-pyat-razvodnyh-mostov-s-gidom-925" label="Билет на развод мостов"]
+
 
 ## Крыша или теплоход?
 
