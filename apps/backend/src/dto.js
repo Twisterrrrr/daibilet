@@ -130,7 +130,9 @@ function isPublicRegionName(name) {
   const clean = cleanDisplayName(name);
   if (!clean || clean === 'Не указан') return false;
   if (STANDALONE_CITY_NAMES.has(clean)) return false;
-  return /(?:область|край|республика|округ)$/iu.test(clean);
+  // «Республика Татарстан» — префикс (\b с кириллицей в JS ненадёжен).
+  // «Чувашская Республика» / «… область|край|округ» — суффикс.
+  return /^республика(?:\s|$)/iu.test(clean) || /(?:область|край|республика|округ)$/iu.test(clean);
 }
 
 const PUBLIC_REGION_NAMES = new Set([
@@ -7825,6 +7827,18 @@ function destinationSortGroup(name, type) {
     'Республика Хакасия': '06-khakasia',
     'Ульяновск': '07-ulyanovsk',
     'Ульяновская область': '07-ulyanovsk',
+    'Владивосток': '08-vladivostok',
+    'Приморский край': '08-vladivostok',
+    'Хабаровск': '09-khabarovsk',
+    'Хабаровский край': '09-khabarovsk',
+    'Самара': '10-samara',
+    'Самарская область': '10-samara',
+    'Челябинск': '11-chelyabinsk',
+    'Челябинская область': '11-chelyabinsk',
+    'Уфа': '12-ufa',
+    'Республика Башкортостан': '12-ufa',
+    'Барнаул': '13-barnaul',
+    'Алтайский край': '13-barnaul',
   };
   return groups[name] || `90-${type}-${name}`;
 }
@@ -7841,8 +7855,27 @@ export function destinationPrepositional(destination) {
     'krasnoyarskiy-kray': 'в Красноярском крае',
     'respublika-tatarstan': 'в Республике Татарстан',
     'respublika-hakasiya': 'в Республике Хакасии',
+    'respublika-bashkortostan': 'в Республике Башкортостан',
+    'respublika-kareliya': 'в Республике Карелия',
     'ulyanovskaya-oblast': 'в Ульяновской области',
     'habarovskiy-kray': 'в Хабаровском крае',
+    'primorskiy-kray': 'в Приморском крае',
+    'altayskiy-kray': 'в Алтайском крае',
+    'samarskaya-oblast': 'в Самарской области',
+    'chelyabinskaya-oblast': 'в Челябинской области',
+    'kemerovskaya-oblast': 'в Кемеровской области',
+    'rostovskaya-oblast': 'в Ростовской области',
+    'sverdlovskaya-oblast': 'в Свердловской области',
+    'nizhegorodskaya-oblast': 'в Нижегородской области',
+    'orenburgskaya-oblast': 'в Оренбургской области',
+    'tulskaya-oblast': 'в Тульской области',
+    'vologodskaya-oblast': 'в Вологодской области',
+    'stavropolskiy-kray': 'в Ставропольском крае',
+    'kaliningradskaya-oblast': 'в Калининградской области',
+    'kaluzhskaya-oblast': 'в Калужской области',
+    'yaroslavskaya-oblast': 'в Ярославской области',
+    'amurskaya-oblast': 'в Амурской области',
+    'hanty-mansiyskiy-avtonomnyy-okrug': 'в Ханты-Мансийском автономном округе',
   };
   if (bySlug[destination.slug]) return bySlug[destination.slug];
 

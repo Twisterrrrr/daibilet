@@ -1,4 +1,4 @@
-import type { PublicDestination } from '@/types';
+import type { PublicDestinationDto } from '@daibilet/contracts/public';
 
 export type CityCardRegion = {
   slug: string;
@@ -26,6 +26,38 @@ const REGION_HUBS: Array<{
   { regionName: 'Ульяновская область', regionSlug: 'ulyanovskaya-oblast', centerCity: 'Ульяновск', centerSlugs: ['ulyanovsk'] },
   { regionName: 'Республика Хакасия', regionSlug: 'respublika-hakasiya', centerCity: 'Абакан', centerSlugs: ['abakan'] },
   { regionName: 'Хабаровский край', regionSlug: 'habarovskiy-kray', centerCity: 'Хабаровск', centerSlugs: ['habarovsk', 'khabarovsk'] },
+  { regionName: 'Приморский край', regionSlug: 'primorskiy-kray', centerCity: 'Владивосток', centerSlugs: ['vladivostok'] },
+  { regionName: 'Алтайский край', regionSlug: 'altayskiy-kray', centerCity: 'Барнаул', centerSlugs: ['barnaul'] },
+  { regionName: 'Самарская область', regionSlug: 'samarskaya-oblast', centerCity: 'Самара', centerSlugs: ['samara'] },
+  { regionName: 'Челябинская область', regionSlug: 'chelyabinskaya-oblast', centerCity: 'Челябинск', centerSlugs: ['chelyabinsk', 'cheljabinsk'] },
+  { regionName: 'Кемеровская область', regionSlug: 'kemerovskaya-oblast', centerCity: 'Кемерово', centerSlugs: ['kemerovo'] },
+  { regionName: 'Ростовская область', regionSlug: 'rostovskaya-oblast', centerCity: 'Ростов-на-Дону', centerSlugs: ['rostov-na-donu'] },
+  { regionName: 'Свердловская область', regionSlug: 'sverdlovskaya-oblast', centerCity: 'Екатеринбург', centerSlugs: ['ekaterinburg', 'yekaterinburg'] },
+  {
+    regionName: 'Нижегородская область',
+    regionSlug: 'nizhegorodskaya-oblast',
+    centerCity: 'Нижний Новгород',
+    centerSlugs: ['nizhniy-novgorod', 'nizhny-novgorod'],
+  },
+  { regionName: 'Оренбургская область', regionSlug: 'orenburgskaya-oblast', centerCity: 'Оренбург', centerSlugs: ['orenburg'] },
+  { regionName: 'Тульская область', regionSlug: 'tulskaya-oblast', centerCity: 'Тула', centerSlugs: ['tula'] },
+  { regionName: 'Вологодская область', regionSlug: 'vologodskaya-oblast', centerCity: 'Вологда', centerSlugs: ['vologda'] },
+  { regionName: 'Ставропольский край', regionSlug: 'stavropolskiy-kray', centerCity: 'Ставрополь', centerSlugs: ['stavropol'] },
+  { regionName: 'Калининградская область', regionSlug: 'kaliningradskaya-oblast', centerCity: 'Калининград', centerSlugs: ['kaliningrad'] },
+  { regionName: 'Калужская область', regionSlug: 'kaluzhskaya-oblast', centerCity: 'Калуга', centerSlugs: ['kaluga'] },
+  { regionName: 'Ярославская область', regionSlug: 'yaroslavskaya-oblast', centerCity: 'Ярославль', centerSlugs: ['yaroslavl'] },
+  {
+    regionName: 'Республика Башкортостан',
+    regionSlug: 'respublika-bashkortostan',
+    centerCity: 'Уфа',
+    centerSlugs: ['ufa'],
+  },
+  {
+    regionName: 'Амурская область',
+    regionSlug: 'amurskaya-oblast',
+    centerCity: 'Благовещенск (Амурская область)',
+    centerSlugs: ['blagoveschensk-amurskaya-oblast', 'blagoveshchensk-amurskaya-oblast'],
+  },
 ];
 
 const HUB_CITY_TO_REGION_SLUG = buildHubCityToRegionSlug();
@@ -47,8 +79,8 @@ function buildHubCityToRegionSlug() {
 }
 
 export function resolveCityRegion(
-  city: Pick<PublicDestination, 'slug' | 'sourceSlug' | 'name'>,
-  destinations: PublicDestination[],
+  city: Pick<PublicDestinationDto, 'slug' | 'sourceSlug' | 'name'>,
+  destinations: PublicDestinationDto[],
 ): CityCardRegion | null {
   const regionSlug = lookupRegionSlug(city);
   if (!regionSlug) return null;
@@ -65,9 +97,9 @@ export function resolveCityRegion(
 
 /** Регионы без карточки областного центра в текущем списке городов. */
 export function filterOrphanRegions(
-  regions: PublicDestination[],
-  visibleCities: PublicDestination[],
-): PublicDestination[] {
+  regions: PublicDestinationDto[],
+  visibleCities: PublicDestinationDto[],
+): PublicDestinationDto[] {
   const cityNames = new Set(visibleCities.map((city) => city.name));
   return regions.filter((region) => {
     const center = getRegionCenterCityName(region);
@@ -76,14 +108,14 @@ export function filterOrphanRegions(
   });
 }
 
-export function getRegionCenterCityName(region: Pick<PublicDestination, 'name' | 'slug'>): string | null {
+export function getRegionCenterCityName(region: Pick<PublicDestinationDto, 'name' | 'slug'>): string | null {
   const byName = region.name ? REGION_CENTER_BY_NAME.get(region.name) : null;
   if (byName) return byName;
   const bySlug = region.slug ? REGION_CENTER_BY_SLUG.get(region.slug) : null;
   return bySlug || null;
 }
 
-function lookupRegionSlug(city: Pick<PublicDestination, 'slug' | 'sourceSlug' | 'name'>) {
+function lookupRegionSlug(city: Pick<PublicDestinationDto, 'slug' | 'sourceSlug' | 'name'>) {
   for (const key of [city.slug, city.sourceSlug, city.name]) {
     const normalized = normalizeKey(key);
     if (normalized && HUB_CITY_TO_REGION_SLUG[normalized]) {

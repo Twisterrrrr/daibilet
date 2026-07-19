@@ -829,8 +829,14 @@ function cityInPrepositional(city: PublicCityDto) {
     'krasnoyarskiy-kray': 'в Красноярском крае',
     'respublika-tatarstan': 'в Республике Татарстан',
     'respublika-hakasiya': 'в Республике Хакасия',
+    'respublika-bashkortostan': 'в Республике Башкортостан',
+    'respublika-kareliya': 'в Республике Карелия',
     'ulyanovskaya-oblast': 'в Ульяновской области',
     'habarovskiy-kray': 'в Хабаровском крае',
+    'primorskiy-kray': 'в Приморском крае',
+    'altayskiy-kray': 'в Алтайском крае',
+    'samarskaya-oblast': 'в Самарской области',
+    'chelyabinskaya-oblast': 'в Челябинской области',
   };
   if (bySlug[city.slug]) return bySlug[city.slug];
   if (city.sourceSlug && bySlug[city.sourceSlug]) return bySlug[city.sourceSlug];

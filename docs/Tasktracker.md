@@ -17,9 +17,21 @@
 | P.2 | **City hubs** — усиление `/cities/{slug}` (SEO + контент) | Критический | 🔄 |
 | P.3 | **Finance contour / ЛК поставщиков** — базовый контур | Высокий | ⏳ |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
-| P.5 | **Allowlist городов** — не раздувать массово без хабов | Высокий | 🔄 политика |
+| P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |
 
-См. [Project.md](./Project.md) § «Продуктовые приоритеты», Diary 2026-07-19.
+---
+
+## Geo / destinations (2026-07-19)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| G.1 | Fix `isPublicRegionName` для «Республика …» (префикс, без `\b`) | Критический | ✅ |
+| G.2 | Челны → Республика Татарстан под карточкой Казани | Критический | ✅ |
+| G.3 | Expand standaloneCities адмцентрами с saleable | Высокий | ✅ |
+| G.4 | Expand cityToRegion для не-адмцентров (Тольятти, Сортавала, …) | Высокий | ✅ |
+| G.5 | Docs + prod deploy geo | Критический | 🔄 |
+
+См. [Project.md](./Project.md) § allowlist, [geo-excluded-cities.md](./geo-excluded-cities.md), Diary 2026-07-19.
 
 ---
 
