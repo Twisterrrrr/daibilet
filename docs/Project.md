@@ -34,13 +34,14 @@ packages/config   — shared tsconfig/eslint
 
 | Endpoint | Контракт |
 |----------|----------|
-| `GET /api/admin/dashboard` | Только `generatedAt` + `metrics` (grouped catalog, не raw Event) |
+| `GET /api/admin/dashboard` | Только `generatedAt` + `metrics` (SQL group aggregates, `launch.source=admin_event_groups_sql`) |
 | `GET /api/admin/{events,venues,cities,buyers,orders,landings}` | `page/limit/q` → `{ page, pages, limit, total, rows }` |
+| `GET /api/admin/events` | **SQL read-model:** group+filter+page в Postgres; hydrate только siblings текущей страницы (`metrics.readModel=sql_group_page`) |
 | `GET /api/admin/landings/:slug` | Пагинация событий: `page/limit/q` + `events[]` текущей страницы |
 | `GET/PATCH /api/admin/cities/:id` | Карточка `City`: title, slug (unique), SEO/intro/hero, `isDestination` |
 | `POST/PATCH /api/admin/articles` | Upsert статьи; `publishedAt` задаётся оператором или `now` при publish |
 
-**Perf debt:** events/landings match всё ещё full grouped catalog → filter → slice (см. Tasktracker 0.5.8).
+**Perf debt:** landings match / public catalog list всё ещё full (or cached) grouped set → filter → slice. Events list — ✅ SQL (0.5.8).
 
 ---
 

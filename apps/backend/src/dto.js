@@ -23,6 +23,12 @@ import {
 } from './event-venue-context.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
 import { toPublicCatalogListItem } from './public-catalog-list-item.ts';
+import {
+  buildAdminEventGroupKey,
+  invalidateAdminEventsSqlReadModelCache,
+  queryAdminEventGroupsPage,
+  queryAdminLaunchMetricsSql,
+} from './admin-events-sql-read-model.js';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const ACTIVE_SESSION_SQL = `(
@@ -380,17 +386,17 @@ function loadCityRouting() {
 }
 
 export async function buildAdminDashboard(db) {
-  const [stats, categoryCountResult, destinationCountResult, cached] = await Promise.all([
+  const [stats, categoryCountResult, destinationCountResult, launchSql] = await Promise.all([
     db.stats(),
     db.query('select count(*)::int as total from "Category"'),
     db.query('select count(*)::int as total from "City" where coalesce("isDestination", false) = true'),
-    // Same grouped catalog + readiness as /api/admin/events (not public saleable-only groups).
-    getCachedAdminGroupedEvents(db),
+    // SQL group metrics — no full catalog materialization in Node RAM.
+    queryAdminLaunchMetricsSql(db),
   ]);
 
   const launch = {
-    ...(cached.launch || buildLaunchMetrics(cached.items || [])),
-    source: 'admin_event_groups',
+    ...launchSql,
+    source: 'admin_event_groups_sql',
   };
   const destinations = Number(destinationCountResult.rows[0]?.total || 0);
   const readyEvents = Number(launch.readyForSeo || 0);
@@ -413,12 +419,11 @@ export async function buildAdminDashboard(db) {
   };
 }
 
-/** Kept for compatibility; same source as Events list. */
+/** Kept for compatibility; SQL metrics (same source as Events list). */
 async function buildAdminLaunchMetricsCompact(db) {
-  const cached = await getCachedAdminGroupedEvents(db);
   return {
-    ...(cached.launch || buildLaunchMetrics(cached.items || [])),
-    source: 'admin_event_groups',
+    ...(await queryAdminLaunchMetricsSql(db)),
+    source: 'admin_event_groups_sql',
   };
 }
 
@@ -2191,6 +2196,7 @@ export function invalidateAdminGroupedEventsCache(db = null, reason = 'invalidat
   } else {
     adminGroupedEventsCache = { expiresAt: 0, staleUntil: 0, items: null, launch: null, sourceCount: 0, builtAt: 0 };
   }
+  invalidateAdminEventsSqlReadModelCache();
   if (db) {
     void scheduleAdminGroupedEventsRebuild(db, reason);
   }
@@ -2207,84 +2213,69 @@ export async function warmAdminGroupedEventsCache(db, reason = 'warmup') {
 }
 
 export async function buildAdminEventsList(db, searchParams) {
-  const limit = clampNumber(searchParams.get('limit'), 1, 500, 80);
-  const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
-  const query = String(searchParams.get('q') || '').trim().toLowerCase();
-  const view = searchParams.get('view') || 'all';
-  const sourceCategory = searchParams.get('category') || 'all';
-  const sourceFilter = String(searchParams.get('source') || 'all').toUpperCase();
-  const readiness = searchParams.get('readiness') || 'all';
-
-  const cached = await getCachedAdminGroupedEvents(db);
-  const events = cached.items;
-  const launch = cached.launch || buildLaunchMetrics(events);
-  const quickFilters = ['all', 'needs_attention', 'ready_publish', 'purchase_blocked', 'no_image', 'landing_match'].map((id) => ({
-    id,
-    count:
-      id === 'all'
-        ? events.length
-        : id === 'needs_attention'
-          ? launch.needsAttention
-          : id === 'ready_publish'
-            ? launch.readyForSeo
-            : id === 'purchase_blocked'
-              ? launch.purchaseBlocked
-              : id === 'no_image'
-                ? launch.noImage
-                : id === 'landing_match'
-                  ? launch.landingMatched
-                  : events.filter((event) => matchesAdminQuickFilter(event, id)).length,
-  }));
-
-  const rows = events.filter((event) => {
-    if (!matchesAdminQuickFilter(event, view)) return false;
-    if (sourceFilter !== 'ALL' && String(event.sourceCode || event.source || '').toUpperCase() !== sourceFilter) return false;
-    if (sourceCategory !== 'all' && event.proposedCategory !== sourceCategory) return false;
-    if (readiness !== 'all' && event.readiness !== readiness) return false;
-    if (!query) return true;
-
-    return [
-      event.title,
-      event.id,
-      event.city,
-      event.destination,
-      event.venue,
-      event.sourceCategory,
-      event.proposedCategory,
-      event.offerStatus,
-      ...(event.tags || []),
-      ...(event.landingHits || []),
-    ]
-      .filter(Boolean)
-      .join(' ')
-      .toLowerCase()
-      .includes(query);
+  const startedAt = Date.now();
+  // SQL pages groups in DB; hydrate only sibling rows for the current page.
+  const sqlPage = await queryAdminEventGroupsPage(db, searchParams);
+  const sourceEvents = sqlPage.eventIds.length
+    ? await eventRowsByIds(db, sqlPage.eventIds, { maxIds: 2500 })
+    : [];
+  const groupedPage = groupAdminEventRows(sourceEvents);
+  // Preserve SQL page order (startsAt, title).
+  const order = new Map(sqlPage.pageGroups.map((group, index) => [group.groupKey, index]));
+  const rows = groupedPage.sort((a, b) => {
+    const ai = order.has(a.groupKey) ? order.get(a.groupKey) : Number.MAX_SAFE_INTEGER;
+    const bi = order.has(b.groupKey) ? order.get(b.groupKey) : Number.MAX_SAFE_INTEGER;
+    return ai - bi;
   });
 
-  const total = rows.length;
-  const pages = Math.max(1, Math.ceil(total / limit));
-  const safePage = Math.min(page, pages);
+  const launch = sqlPage.launch;
+  const quickFilters = ['all', 'needs_attention', 'ready_publish', 'purchase_blocked', 'no_image', 'landing_match'].map(
+    (id) => ({
+      id,
+      count:
+        id === 'all'
+          ? launch.groupedEvents
+          : id === 'needs_attention'
+            ? launch.needsAttention
+            : id === 'ready_publish'
+              ? launch.readyForSeo
+              : id === 'purchase_blocked'
+                ? launch.purchaseBlocked
+                : id === 'no_image'
+                  ? launch.noImage
+                  : id === 'landing_match'
+                    ? launch.landingMatched
+                    : 0,
+    }),
+  );
+
+  console.log(
+    `Admin events SQL read-model: loaded ${sourceEvents.length} raw rows → ${rows.length} groups ` +
+      `(page ${sqlPage.page}/${sqlPage.pages}, totalGroups=${sqlPage.total}) in ${Date.now() - startedAt}ms`,
+  );
 
   return {
     generatedAt: new Date().toISOString(),
-    page: safePage,
-    pages,
-    limit,
-    total,
-    rows: rows.slice((safePage - 1) * limit, safePage * limit),
-    categories: Array.from(new Set(events.map((event) => event.proposedCategory))).sort((a, b) => a.localeCompare(b, 'ru')),
-    sources: Array.from(new Set(events.map((event) => event.sourceCode).filter(Boolean))).sort(),
+    page: sqlPage.page,
+    pages: sqlPage.pages,
+    limit: sqlPage.limit,
+    total: sqlPage.total,
+    rows,
+    categories: Array.from(sqlPage.categories || []).sort((a, b) => String(a).localeCompare(String(b), 'ru')),
+    sources: Array.from(sqlPage.sources || []).sort(),
     quickFilters,
     metrics: {
-      events: events.length,
+      events: launch.groupedEvents,
       readyEvents: launch.readyForSeo,
-      reviewEvents: Math.max(0, events.length - launch.readyForSeo),
+      reviewEvents: Math.max(0, launch.groupedEvents - launch.readyForSeo),
       landingRules: LANDING_RULES.length,
-      sourceEvents: cached.sourceCount,
-      groupedEvents: events.length,
+      sourceEvents: sqlPage.sourceCount,
+      groupedEvents: launch.groupedEvents,
+      rowsLoaded: sourceEvents.length,
+      readModel: 'sql_group_page',
       launch: {
         ...launch,
-        source: 'admin_event_groups',
+        source: 'admin_event_groups_sql',
       },
     },
   };
@@ -3117,12 +3108,12 @@ function groupPublicEventRows(events) {
 }
 
 function adminEventGroupKey(event) {
-  return [
-    normalizeGroupPart(event.source),
-    normalizeGroupPart(event.title),
-    normalizeGroupPart(event.city),
-    normalizeGroupPart(formatPublicVenueTitle(event.venue) || event.venue),
-  ].join('|');
+  return buildAdminEventGroupKey({
+    sourceName: event.source,
+    title: event.title,
+    city: event.city,
+    venue: event.venue,
+  });
 }
 
 function publicEventGroupKey(event) {
@@ -5807,9 +5798,10 @@ function adminOfferStatus(row) {
   return purchaseInfo(row).status;
 }
 
-async function eventRowsByIds(db, ids) {
+async function eventRowsByIds(db, ids, options = {}) {
   if (!ids.length) return [];
-  const unique = Array.from(new Set(ids.filter(Boolean))).slice(0, 500);
+  const maxIds = Number.isFinite(options.maxIds) ? Math.max(1, Math.floor(options.maxIds)) : 500;
+  const unique = Array.from(new Set(ids.filter(Boolean))).slice(0, maxIds);
   return eventRows(db, null, { lean: true, ids: unique });
 }
 

@@ -1,3 +1,28 @@
+## 2026-07-19 — 0.5.8 SQL read-model для admin Events
+
+### Наблюдения
+
+- Hot path: `getCachedAdminGroupedEvents` → `eventRows(db, null, { lean: true })` → `groupAdminEventRows` → filter/slice в JS.
+- Cold cache ~25s / OOM риск на 3.8Gi: Node держал полный grouped catalog в RAM.
+- Public catalog уже hydrate-only-page, но base cache всё ещё full sessions (отдельный пункт).
+
+### Решения
+
+- Новый модуль `admin-events-sql-read-model.js`: group key в SQL (= `adminEventGroupKey`), LIMIT/OFFSET по группам, фильтры в SQL.
+- `buildAdminEventsList`: SQL page → hydrate только sibling ids страницы (`eventRowsByIds`, max 2500) → `groupAdminEventRows` (exact readiness/override/landingHits).
+- `buildAdminDashboard`: metrics из SQL aggregates (`launch.source=admin_event_groups_sql`), без full catalog.
+- TTL cache ~45s на SQL page variants; invalidate вместе с `invalidateAdminGroupedEventsCache`.
+- Landings list пока на старом `getCachedAdminGroupedEvents` (следующий шаг).
+- Тесты: `admin-events-sql-read-model.test.ts`; bench: `scripts/bench-admin-events-sql.mjs`.
+
+### Проблемы
+
+- SQL readiness/canPublish — аппроксимация для фильтров/метрик; строки страницы — exact JS.
+- `view=landing_match` фильтрует по `LandingMatch`, не по полному `LANDING_RULES` engine.
+- Public catalog SQL page + landings match SQL — ещё в backlog (пункт 2+).
+
+---
+
 ## 2026-07-19 — Главная: пропали обложки Teplohod (signed S3)
 
 ### Наблюдения
