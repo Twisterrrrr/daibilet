@@ -22,9 +22,9 @@ export function stabilizeTeplohodImageUrl(imageUrl?: string | null): string | nu
   const signedMatch = raw.match(
     /teplohod-private\/images\/cache\/Events\/(Event\d+)\/([^/?#]+)/i,
   );
-  if (signedMatch) {
-    const item = signedMatch[1];
-    const dirtyAlias = signedMatch[2];
+  const item = signedMatch?.[1];
+  const dirtyAlias = signedMatch?.[2];
+  if (item && dirtyAlias) {
     return `https://api.teplohod.info/v1/image?item=${encodeURIComponent(item)}&dirtyAlias=${encodeURIComponent(dirtyAlias)}`;
   }
 

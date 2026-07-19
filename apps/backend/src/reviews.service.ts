@@ -33,13 +33,13 @@ export type CreateReviewInput = {
   text: string;
   authorName: string;
   authorEmail: string;
-  title?: string | null;
-  orderOrTicketRef?: string | null;
-  reviewRequestToken?: string | null;
-  website?: string | null;
-  formStartedAt?: number | string | null;
-  siteUserId?: string | null;
-  purchaseDate?: string | null;
+  title?: string | null | undefined;
+  orderOrTicketRef?: string | null | undefined;
+  reviewRequestToken?: string | null | undefined;
+  website?: string | null | undefined;
+  formStartedAt?: number | string | null | undefined;
+  siteUserId?: string | null | undefined;
+  purchaseDate?: string | null | undefined;
 };
 
 function appUrl(): string {
@@ -346,10 +346,10 @@ export async function getReviewRequestInfo(token: string) {
 }
 
 export async function adminListReviews(filters: {
-  status?: string | null;
-  eventId?: string | null;
-  page?: number;
-  limit?: number;
+  status?: string | null | undefined;
+  eventId?: string | null | undefined;
+  page?: number | undefined;
+  limit?: number | undefined;
 }) {
   const page = filters.page || 1;
   const limit = Math.min(100, filters.limit || 20);
@@ -415,7 +415,7 @@ export async function adminListReviews(filters: {
 export async function adminModerateReview(
   reviewId: string,
   action: 'approve' | 'reject' | 'hide',
-  adminComment?: string | null,
+  adminComment?: string | null | undefined,
 ) {
   const review = await prisma.review.findUnique({ where: { id: reviewId } });
   if (!review) throw new ReviewServiceError('not_found', 'Отзыв не найден', 404);

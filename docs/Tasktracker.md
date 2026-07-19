@@ -11,7 +11,8 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| CI.1 | `validate-build-test`: pnpm до `setup-node` cache | Критический | 🔄 push fix |
+| CI.1 | `validate-build-test`: pnpm до `setup-node` cache | Критический | ✅ `4c09cdb` |
+| CI.2 | Backend typecheck: exactOptional / indexed access | Критический | 🔄 |
 
 ---
 

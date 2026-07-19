@@ -4,15 +4,17 @@
 
 - Job `validate-build-test` падал за ~14–19с на `feat/next-monorepo` и PR #1 (тот же branch, title hero-stats).
 - Ошибка: `Unable to locate executable file: pnpm` на шаге `actions/setup-node@v4` с `cache: pnpm`.
+- После фикса порядка: `backend:typecheck` — `exactOptionalPropertyTypes` / `noUncheckedIndexedAccess` (включены в e9d72f1, раньше CI не доходил).
 
 ### Решения
 
 - В `.github/workflows/ci.yml` поставить `pnpm/action-setup@v4` **до** `setup-node` (cache требует pnpm в PATH).
+- Widen optional types (`| undefined`) + guards для indexed access в reviews/auth/catalog/image-url.
 - Отдельной ветки hero-stats нет: PR #1 = `feat/next-monorepo`.
 
 ### Проблемы
 
-- После фикса порядка возможны следующие падения на typecheck/build — смотреть следующий run.
+- Возможны следующие падения на web/admin build — смотреть следующий run.
 
 ---
 

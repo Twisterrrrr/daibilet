@@ -10,13 +10,13 @@ export interface AdminAuthConfig {
 }
 
 type AdminAuthEnv = {
-  NODE_ENV?: string;
-  DAIBILET_REQUIRE_ADMIN_AUTH?: string;
-  ADMIN_EMAIL?: string;
-  ADMIN_USER?: string;
-  ADMIN_PASSWORD?: string;
-  ADMIN_PASSWORD_SHA256?: string;
-  ADMIN_PASSWORD_HASH?: string;
+  NODE_ENV?: string | undefined;
+  DAIBILET_REQUIRE_ADMIN_AUTH?: string | undefined;
+  ADMIN_EMAIL?: string | undefined;
+  ADMIN_USER?: string | undefined;
+  ADMIN_PASSWORD?: string | undefined;
+  ADMIN_PASSWORD_SHA256?: string | undefined;
+  ADMIN_PASSWORD_HASH?: string | undefined;
   ADMIN_AUTH_REALM: string;
 };
 

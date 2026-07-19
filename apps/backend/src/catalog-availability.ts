@@ -22,15 +22,15 @@ export const ACTIVE_SESSION_SQL = `(
 )`;
 
 export interface CatalogScheduleRow {
-  kind?: string | null;
-  sourceStatus?: string | null;
-  startsAt?: string | Date | null;
-  endsAt?: string | Date | null;
+  kind?: string | null | undefined;
+  sourceStatus?: string | null | undefined;
+  startsAt?: string | Date | null | undefined;
+  endsAt?: string | Date | null | undefined;
 }
 
 export interface CatalogSaleableRow extends CatalogScheduleRow {
-  purchaseReady?: boolean;
-  priceFrom?: number | null;
+  purchaseReady?: boolean | undefined;
+  priceFrom?: number | null | undefined;
 }
 
 export function isOpenDateCatalogRow(row: CatalogScheduleRow): boolean {

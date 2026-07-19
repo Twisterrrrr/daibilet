@@ -18,7 +18,8 @@ export function shouldSynthesizeWidgetOnlySession(input: {
 export function extractTcEventIdFromPurchaseUrl(url?: string | null): string | null {
   if (!url) return null;
   const match = String(url).match(/[?&]event=([^&]+)/i);
-  return match ? decodeURIComponent(match[1]) : null;
+  const eventId = match?.[1];
+  return eventId ? decodeURIComponent(eventId) : null;
 }
 
 export type WidgetFallbackSessionPurchase = {

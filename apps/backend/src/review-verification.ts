@@ -31,10 +31,10 @@ export function normalizeEmail(email: string | null | undefined): string {
 
 export type PurchaseVerificationInput = {
   eventId: string;
-  email?: string | null;
-  orderOrTicketRef?: string | null;
-  reviewRequestToken?: string | null;
-  siteUserId?: string | null;
+  email?: string | null | undefined;
+  orderOrTicketRef?: string | null | undefined;
+  reviewRequestToken?: string | null | undefined;
+  siteUserId?: string | null | undefined;
 };
 
 export type PurchaseVerificationResult = {

@@ -73,11 +73,12 @@ export function createPublicReviewsRouteHandler(): TypedRouteHandler {
       }
 
       const bySlug = matchPath(context.pathname, /^\/api\/reviews\/events\/([^/]+)$/);
-      if (context.method === 'GET' && bySlug) {
+      const eventSlug = bySlug?.[0];
+      if (context.method === 'GET' && eventSlug) {
         const query = parseSearchParams(listQuerySchema, context.searchParams);
         sendJson(
           context.response,
-          await listApprovedReviewsByEventSlug(bySlug[0], query.page || 1, query.limit || 10),
+          await listApprovedReviewsByEventSlug(eventSlug, query.page || 1, query.limit || 10),
           { cacheControl: 'public, max-age=60' },
         );
         return true;
@@ -118,24 +119,24 @@ export function createAdminReviewsRouteHandler(): TypedRouteHandler {
         return true;
       }
 
-      const approve = matchPath(context.pathname, /^\/api\/admin\/reviews\/([^/]+)\/approve$/);
-      if (context.method === 'POST' && approve) {
+      const approveId = matchPath(context.pathname, /^\/api\/admin\/reviews\/([^/]+)\/approve$/)?.[0];
+      if (context.method === 'POST' && approveId) {
         const body = await parseJsonBody(moderateBodySchema, context.request);
-        sendJson(context.response, await adminModerateReview(approve[0], 'approve', body.adminComment));
+        sendJson(context.response, await adminModerateReview(approveId, 'approve', body.adminComment));
         return true;
       }
 
-      const reject = matchPath(context.pathname, /^\/api\/admin\/reviews\/([^/]+)\/reject$/);
-      if (context.method === 'POST' && reject) {
+      const rejectId = matchPath(context.pathname, /^\/api\/admin\/reviews\/([^/]+)\/reject$/)?.[0];
+      if (context.method === 'POST' && rejectId) {
         const body = await parseJsonBody(moderateBodySchema, context.request);
-        sendJson(context.response, await adminModerateReview(reject[0], 'reject', body.adminComment));
+        sendJson(context.response, await adminModerateReview(rejectId, 'reject', body.adminComment));
         return true;
       }
 
-      const hide = matchPath(context.pathname, /^\/api\/admin\/reviews\/([^/]+)\/hide$/);
-      if (context.method === 'POST' && hide) {
+      const hideId = matchPath(context.pathname, /^\/api\/admin\/reviews\/([^/]+)\/hide$/)?.[0];
+      if (context.method === 'POST' && hideId) {
         const body = await parseJsonBody(moderateBodySchema, context.request);
-        sendJson(context.response, await adminModerateReview(hide[0], 'hide', body.adminComment));
+        sendJson(context.response, await adminModerateReview(hideId, 'hide', body.adminComment));
         return true;
       }
 

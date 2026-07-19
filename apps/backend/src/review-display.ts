@@ -6,9 +6,11 @@ export function formatReviewDisplayName(fullName: string): string {
     .split(/\s+/)
     .filter(Boolean);
   if (parts.length === 0) return 'Гость';
-  const first = parts[0];
+  const first = parts[0] ?? 'Гость';
   if (parts.length === 1) return first;
-  const lastInitial = parts[parts.length - 1].charAt(0).toUpperCase();
+  const last = parts[parts.length - 1];
+  if (!last) return first;
+  const lastInitial = last.charAt(0).toUpperCase();
   return `${first} ${lastInitial}.`;
 }
 
