@@ -29,7 +29,7 @@
 
 ### Проблемы
 
-- Deploy/proof — после push `feat/next-monorepo`.
+- Deploy prod `@8d65740` OK. Proof `/cities/murmansk` + `/venues/mega-kruzhka`: UI «Кольский проспект»; в БД `Venue` address тоже обновлён (`проспект Кольский…` → `Кольский проспект…`).
 
 ---
 
