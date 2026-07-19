@@ -1426,3 +1426,25 @@
 
 ### Проблемы
 - Auto-stash на сервере после pull (untracked drop-ins уже в commit) — можно drop; не влияет на readiness.
+
+---
+
+## 2026-07-19 - CPU/RAM audit follow-up (cron +x, TEP isolation, oom-watch)
+
+### Наблюдения
+- 	c-orders-sync.sh на prod был без execute bit → crontab */10 писал Permission denied.
+- In-process TEP auto-sync + full public warm на каждом рестарте API давали пики CPU/RAM на 3.8Gi.
+- Hourly oom-watch не ловил рост swap / приближение к MemoryHigh между часами.
+
+### Решения
+- chmod +x на cron/scripts в git (100755) и на prod; flock в tc-orders сохранён.
+- Deploy discipline: комментарий в deploy-prod-next.sh + README — один controlled restart sequence.
+- TEP: TEP_AUTO_SYNC_ENABLED=0 + cron/systemd 	ep-catalog-sync (nice + MemoryMax); in-process fallback с startup delay 45m + skip-if-fresh 6h.
+- DAIBILET_PUBLIC_STARTUP_WARM=0 — полный warm только post-sync delayed.
+- oom-watch каждые 5 мин; alerts в oom-watch-alerts.log при swap>350Mi или MemoryCurrent≥90% MemoryHigh.
+- PG в Docker не трогали (optional later, documented).
+
+### Проблемы
+- После смены env нужен **один** restart daibilet-api (не пачкой).
+- Первые минуты после отключения startup public warm — cold cache до первого трафика / post-sync warm.
+

@@ -122,9 +122,15 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 |---|--------|-----------|--------|
 | 0.6.1 | Stop legacy Docker + staging на prod (без rm -v) | Критический | ✅ 2026-07-19 |
 | 0.6.2 | systemd MemoryMax/High + NODE_OPTIONS web/api | Высокий | ✅ 2026-07-19 |
-| 0.6.3 | TEP sync реже + warm delay + nice | Высокий | ✅ 2026-07-19 |
-| 0.6.4 | watch-tep-sync-load + oom-watch cron | Средний | ✅ 2026-07-19 |
-| 0.6.5 | Сэмпл нагрузки на следующем auto-sync окне | Средний | 🔄 скрипт готов / at optional |
+| 0.6.3 | TEP sync cadence + warm delay + nice | Высокий | ✅ 2026-07-19 |
+| 0.6.4 | watch-tep-sync-load + oom-watch cron | Средний | ✅ 2026-07-19; oom-watch */5 + alerts |
+| 0.6.5 | Замер нагрузки на следующем auto-sync окне | Средний | ⏳ скрипт готов / at optional |
+| 0.6.6 | cron +x (tc-orders Permission denied) | Критический | ✅ 2026-07-19 |
+| 0.6.7 | TEP out-of-process cron/systemd + DISABLE in-process | Высокий | ✅ 2026-07-19 |
+| 0.6.8 | Skip startup TEP sync if fresh + delay 45m | Высокий | ✅ 2026-07-19 |
+| 0.6.9 | Убрать двойной public warm (startup off) | Высокий | ✅ 2026-07-19 |
+| 0.6.10 | Deploy discipline (один restart) | Средний | ✅ 2026-07-19 docs+script |
+| 0.6.11 | PG host migrate / dockerd idle | Низкий | ⏳ documented only — не мигрировать без запроса |
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|

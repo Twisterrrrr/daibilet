@@ -76,25 +76,60 @@ crontab -e
 - Ручной прогон: `cd /opt/daibilet && npm run blog:weekly-digest` (или `--dry-run`).
 ## Prod: CPU/RAM mitigation (TEP sync + OOM watch)
 
-Teplohod auto-sync is **in-process** (TEP_AUTO_SYNC_* in .env / `apps/backend/src/server.js`), not cron.
-`tc-orders` cron `*/10` must stay unchanged.
+### Deploy discipline
+- Use deploy/scripts/deploy-prod-next.sh: **one** controlled sequence (stop web -> restart api -> start web).
+- Do not batch-restart staging/docker/unrelated units in the same pass.
+
+### TEP catalog sync (out-of-process, preferred)
+Prefer cron or systemd oneshot over in-process API auto-sync:
+
+`ash
+chmod +x /opt/daibilet/deploy/cron/tep-catalog-sync.sh
+# In /opt/daibilet/.env:
+#   TEP_AUTO_SYNC_ENABLED=0
+#   DAIBILET_PUBLIC_STARTUP_WARM=0
+#   TEP_AUTO_SYNC_STARTUP_DELAY_MS=2700000
+#   TEP_AUTO_SYNC_SKIP_IF_FRESH_MS=21600000
+`
+
+Cron (every 12h, offset 20 min):
+
+`
+20 */12 * * * APP_DIR=/opt/daibilet /opt/daibilet/deploy/cron/tep-catalog-sync.sh >> /var/log/daibilet/tep-catalog-sync.log 2>&1
+`
+
+Or systemd timer (MemoryHigh/Max isolation):
+
+`ash
+cp /opt/daibilet/deploy/systemd/daibilet-tep-catalog-sync.service /etc/systemd/system/
+cp /opt/daibilet/deploy/systemd/daibilet-tep-catalog-sync.timer /etc/systemd/system/
+systemctl daemon-reload && systemctl enable --now daibilet-tep-catalog-sync.timer
+`
+
+In-process fallback (only if cron/timer off): TEP_AUTO_SYNC_ENABLED=1 with 45min startup delay + skip-if-fresh 6h.
 
 | Setting | Value |
 |---------|-------|
-| Interval | 12h (`TEP_AUTO_SYNC_INTERVAL_MS=43200000`) |
-| Cache warm | +15 min after sync (`TEP_AUTO_SYNC_WARM_DELAY_MS=900000`) |
-| Startup delay | 10 min (avoids sync storm on every restart) |
-| Import nice | `TEP_SYNC_NICE=15` |
+| Interval | 12h |
+| Cache warm | +15 min after sync (post-sync only; startup public warm off) |
+| Startup delay | 45 min + skip if last SUCCESS <6h |
+| Import nice | TEP_SYNC_NICE=15 |
 
+	c-orders cron */10 must stay unchanged (flock preserved).
+
+### OOM watch
 `ash
-chmod +x /opt/daibilet/deploy/scripts/watch-tep-sync-load.sh
 chmod +x /opt/daibilet/deploy/scripts/oom-watch.sh
+chmod +x /opt/daibilet/deploy/scripts/watch-tep-sync-load.sh
 `
 
 `
-# Hourly OOM skim
-7 * * * * /opt/daibilet/deploy/scripts/oom-watch.sh
+# Every 5 min: skim + alert log only when swap>350Mi or MemoryCurrent near MemoryHigh
+*/5 * * * * /opt/daibilet/deploy/scripts/oom-watch.sh
 `
+
+- Skim: /var/log/daibilet/oom-watch.log
+- Alerts only: /var/log/daibilet/oom-watch-alerts.log
 
 Manual load sample around sync:
 
@@ -102,4 +137,7 @@ Manual load sample around sync:
 APP_DIR=/opt/daibilet DURATION_SEC=600 /opt/daibilet/deploy/scripts/watch-tep-sync-load.sh
 `
 
-OOM checklist: `journalctl -u daibilet-web -u daibilet-api -p err --since '24 hours ago'`
+### Postgres / dockerd (optional later — do NOT migrate without explicit request)
+Prod PG stays in Docker (daibilet-tours-postgres:5437). Moving PG to host is optional capacity work; risk of data loss if rushed. Periodically docker system prune (already cron weekly) is enough to keep idle image/build cache from growing; do not stop the prod postgres container.
+
+OOM checklist: journalctl -u daibilet-web -u daibilet-api -p err --since '24 hours ago'

@@ -99,10 +99,22 @@ const adminAuth = {
 };
 
 // Default 12h (was 6h) to reduce CPU/RAM peaks on 3.8Gi hosts; override via env.
+// Prefer out-of-process cron (deploy/cron/tep-catalog-sync.sh) on small hosts: set TEP_AUTO_SYNC_ENABLED=0.
+const TEP_AUTO_SYNC_ENABLED = !['0', 'false', 'off', 'no'].includes(
+  String(process.env.TEP_AUTO_SYNC_ENABLED ?? '1').trim().toLowerCase(),
+);
 const TEP_AUTO_SYNC_INTERVAL_MS = Number(process.env.TEP_AUTO_SYNC_INTERVAL_MS || 12 * 60 * 60 * 1000);
 const TEP_AUTO_SYNC_WARM_DELAY_MS = Number(process.env.TEP_AUTO_SYNC_WARM_DELAY_MS || 15 * 60 * 1000);
+// Default 45min startup delay; skip startup sync when last SUCCESS catalog sync is fresher than SKIP_IF_FRESH.
 const TEP_AUTO_SYNC_STARTUP_DELAY_MS = Number(
-  process.env.TEP_AUTO_SYNC_STARTUP_DELAY_MS || Math.min(10 * 60 * 1000, TEP_AUTO_SYNC_INTERVAL_MS),
+  process.env.TEP_AUTO_SYNC_STARTUP_DELAY_MS || Math.min(45 * 60 * 1000, TEP_AUTO_SYNC_INTERVAL_MS),
+);
+const TEP_AUTO_SYNC_SKIP_IF_FRESH_MS = Number(
+  process.env.TEP_AUTO_SYNC_SKIP_IF_FRESH_MS || 6 * 60 * 60 * 1000,
+);
+// Full public warm on every API restart + post-sync warm stacks CPU; default off (post-sync delayed warm only).
+const DAIBILET_PUBLIC_STARTUP_WARM = ['1', 'true', 'yes', 'on'].includes(
+  String(process.env.DAIBILET_PUBLIC_STARTUP_WARM ?? '0').trim().toLowerCase(),
 );
 let tepAutoSyncInFlight = false;
 let tepAutoSyncWarmTimer = null;
@@ -752,7 +764,10 @@ export function startServer(options = {}) {
   const server = createServer(requestHandler);
   const listen = () => server.listen(serverPort, host, () => {
     console.log(`Daibilet backend listening on http://${host}:${serverPort}`);
-    if (!options.prewarmBeforeListen) void warmPublicCaches('startup');
+    // Avoid double full warm (startup + post-sync). Opt-in via DAIBILET_PUBLIC_STARTUP_WARM=1.
+    if (!options.prewarmBeforeListen && (options.warmPublicOnStartup ?? DAIBILET_PUBLIC_STARTUP_WARM)) {
+      void warmPublicCaches('startup');
+    }
     // Warm admin catalog + Landings/Sources so section switches stay in-memory.
     void warmAdminGroupedEventsCache(db, 'startup')
       .then(async () => {
@@ -771,6 +786,9 @@ export function startServer(options = {}) {
     console.log('Warming public caches before listen...');
     void warmPublicCaches('startup').finally(listen);
   } else {
+    if (!(options.warmPublicOnStartup ?? DAIBILET_PUBLIC_STARTUP_WARM)) {
+      console.log('Public startup warm skipped (DAIBILET_PUBLIC_STARTUP_WARM off; post-sync delayed warm remains)');
+    }
     listen();
   }
   return server;
@@ -785,7 +803,38 @@ function isMainModule() {
   return Boolean(entry && import.meta.url === pathToFileURL(entry).href);
 }
 
+async function getTeplohodLastCatalogSuccessMs() {
+  try {
+    const result = await db.query(
+      `
+        select ssr."finishedAt", ssr."startedAt"
+        from "SourceSyncRun" ssr
+        join "Source" s on s.id = ssr."sourceId"
+        where s.code::text = 'TEPLOHOD'
+          and ssr.status::text = 'SUCCESS'
+          and coalesce(ssr.mode, '') !~* 'orders|order|polling'
+        order by coalesce(ssr."finishedAt", ssr."startedAt") desc
+        limit 1
+      `,
+    );
+    const row = result.rows?.[0];
+    if (!row) return null;
+    const at = row.finishedAt || row.startedAt;
+    const ms = at ? new Date(at).getTime() : NaN;
+    return Number.isFinite(ms) ? ms : null;
+  } catch (error) {
+    console.warn(
+      `Teplohod last-sync lookup failed: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    return null;
+  }
+}
+
 function scheduleTeplohodAutoSync() {
+  if (!TEP_AUTO_SYNC_ENABLED) {
+    console.log('Teplohod in-process auto-sync disabled (TEP_AUTO_SYNC_ENABLED=0; use cron/systemd tep-catalog-sync)');
+    return;
+  }
   if (!Number.isFinite(TEP_AUTO_SYNC_INTERVAL_MS) || TEP_AUTO_SYNC_INTERVAL_MS < 60_000) {
     return;
   }
@@ -794,6 +843,21 @@ function scheduleTeplohodAutoSync() {
     if (tepAutoSyncInFlight) {
       console.log(`Teplohod auto-sync skipped (${reason}): previous run still active`);
       return;
+    }
+
+    if (
+      reason === 'startup-delay' &&
+      Number.isFinite(TEP_AUTO_SYNC_SKIP_IF_FRESH_MS) &&
+      TEP_AUTO_SYNC_SKIP_IF_FRESH_MS > 0
+    ) {
+      const lastMs = await getTeplohodLastCatalogSuccessMs();
+      if (lastMs != null && Date.now() - lastMs < TEP_AUTO_SYNC_SKIP_IF_FRESH_MS) {
+        const ageMin = Math.round((Date.now() - lastMs) / 60000);
+        console.log(
+          `Teplohod auto-sync skipped (startup-delay): last SUCCESS ${ageMin} min ago (< ${Math.round(TEP_AUTO_SYNC_SKIP_IF_FRESH_MS / 60000)} min fresh window)`,
+        );
+        return;
+      }
     }
 
     tepAutoSyncInFlight = true;
@@ -838,7 +902,7 @@ function scheduleTeplohodAutoSync() {
     void run('interval');
   }, TEP_AUTO_SYNC_INTERVAL_MS);
   console.log(
-    `Teplohod auto-sync enabled: every ${Math.round(TEP_AUTO_SYNC_INTERVAL_MS / 60000)} min, first run in ${Math.round(firstDelayMs / 1000)}s, warm delay ${Math.round((Number.isFinite(TEP_AUTO_SYNC_WARM_DELAY_MS) ? TEP_AUTO_SYNC_WARM_DELAY_MS : 0) / 1000)}s`,
+    `Teplohod auto-sync enabled: every ${Math.round(TEP_AUTO_SYNC_INTERVAL_MS / 60000)} min, first run in ${Math.round(firstDelayMs / 1000)}s, warm delay ${Math.round((Number.isFinite(TEP_AUTO_SYNC_WARM_DELAY_MS) ? TEP_AUTO_SYNC_WARM_DELAY_MS : 0) / 1000)}s, skip-if-fresh ${Math.round((Number.isFinite(TEP_AUTO_SYNC_SKIP_IF_FRESH_MS) ? TEP_AUTO_SYNC_SKIP_IF_FRESH_MS : 0) / 60000)} min`,
   );
 }
 

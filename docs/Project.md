@@ -133,7 +133,14 @@ Env для widgets / analytics: `NEXT_PUBLIC_TC_WIDGET_TOKEN`, `NEXT_PUBLIC_TEP_
 
 - Карточки: `apps/web/src/data/blog-posts.ts` (+ зеркало в `apps/public`).
 - Тексты: `content/blog/*.md` → `npm run blog:sync-bodies` → `blog-article-bodies.ts` (SSR fallback); прод-источник — `Article` через `npm run blog:upsert`.
-- Еженедельный дайджест новых событий: `npm run blog:weekly-digest` → `Article` status=`REVIEW` (cron вс 07:00, см. `deploy/cron/README.md`). Без auto-publish.
+- ### CPU/RAM (prod 3.8Gi)
+- Deploy: один controlled restart (deploy/scripts/deploy-prod-next.sh) — не пачкой.
+- TEP **каталог**: предпочтительно out-of-process deploy/cron/tep-catalog-sync.sh / daibilet-tep-catalog-sync.timer; in-process TEP_AUTO_SYNC_ENABLED=0 на prod.
+- Public warm: DAIBILET_PUBLIC_STARTUP_WARM=0, warm после sync с delay.
+- OOM watch: deploy/scripts/oom-watch.sh каждые 5 мин + oom-watch-alerts.log.
+- Postgres prod остаётся в Docker (:5437); миграция на host — optional later, только по явному запросу.
+
+Еженедельный дайджест новых событий: `npm run blog:weekly-digest` → `Article` status=`REVIEW` (cron вс 07:00, см. `deploy/cron/README.md`). Без auto-publish.
 - План и антидубли: [content-blog-plan.md](./content-blog-plan.md).
 
 ### ИИ-колонки блога (2026-07-19)

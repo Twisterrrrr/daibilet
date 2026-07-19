@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
-# F3 prod deploy: feat/next-monorepo → Next apps/web :3001 + legacy API :4000
+# F3 prod deploy: feat/next-monorepo -> Next apps/web :3001 + legacy API :4000
+#
+# Deploy discipline (CPU/RAM on 3.8Gi):
+# - One controlled restart sequence only: stop web -> restart api -> start web.
+# - Do NOT batch-restart unrelated units (staging, docker stacks, timers) in the same pass.
+# - Avoid back-to-back deploys that re-trigger TEP startup sync; prefer TEP_AUTO_SYNC_ENABLED=0 + cron.
+#
 set -euo pipefail
 
 APP_DIR="${APP_DIR:-/opt/daibilet}"

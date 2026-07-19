@@ -1,0 +1,26 @@
+# Optional: out-of-process TEP catalog sync (preferred over in-process API auto-sync on 3.8Gi).
+# Install:
+#   cp deploy/systemd/daibilet-tep-catalog-sync.service /etc/systemd/system/
+#   cp deploy/systemd/daibilet-tep-catalog-sync.timer /etc/systemd/system/
+#   systemctl daemon-reload && systemctl enable --now daibilet-tep-catalog-sync.timer
+# Also set TEP_AUTO_SYNC_ENABLED=0 in /opt/daibilet/.env and restart daibilet-api once.
+[Unit]
+Description=Daibilet Teplohod catalog sync (oneshot)
+After=network-online.target daibilet-api.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/daibilet
+Environment=APP_DIR=/opt/daibilet
+Environment=TEP_SYNC_NICE=15
+Nice=15
+# Cap sync job so it cannot starve web/api (soft high + hard max)
+MemoryHigh=700M
+MemoryMax=900M
+ExecStart=/opt/daibilet/deploy/cron/tep-catalog-sync.sh
+StandardOutput=append:/var/log/daibilet/tep-catalog-sync.log
+StandardError=append:/var/log/daibilet/tep-catalog-sync.log
+
+[Install]
+WantedBy=multi-user.target
