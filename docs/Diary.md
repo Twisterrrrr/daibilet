@@ -1,3 +1,22 @@
+## 2026-07-19 — Prod crash: cleanDisplayText is not defined
+
+### Наблюдения
+
+- Клиентский `ReferenceError: cleanDisplayText is not defined` в chunk `7198-*.js` на event pages (и SSR digest в journal `daibilet-web`).
+- Симптом выглядел как ChunkLoadError/502 на статике при рестартах Next (OOM / mid-deploy), но корневой runtime-баг — отсутствие локального биндинга функции.
+- В `event-page-utils.ts` был только `export { cleanDisplayText, … } from './event-description-format'` — re-export **не** создаёт локальное имя; вызовы `cleanDisplayText(...)` внутри того же модуля падали.
+
+### Решения
+
+- Заменён bare re-export на `import { cleanDisplayText, … } from './event-description-format'` + явный `export { … }`.
+- Commit + deploy-prod-next; smoke `/events` и event slug после hard refresh.
+
+### Проблемы
+
+- MemoryHigh Next (~1.1G) на 3.8Gi хосте: при деплое/нагрузке возможны краткие 502 на `/_next/static` пока статика проксируется через Node. Отдельно рассмотреть `alias` на `.next/static` в nginx.
+
+---
+
 ## 2026-07-19 — ЛК заказов: 404 / время / truncate
 
 ### Наблюдения

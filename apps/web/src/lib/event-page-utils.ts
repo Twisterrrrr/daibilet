@@ -92,7 +92,7 @@ export function formatBuyCardPrice(range: { min: number; max: number }): string 
   return `${formatNumber(min)} – ${formatNumber(max)} ₽`;
 }
 
-export {
+import {
   cleanDisplayText,
   formatEventDescriptionHtml,
   isDescriptionSectionHeading,
@@ -100,6 +100,15 @@ export {
   sanitizeEventHtml,
   splitDescriptionParagraphs,
 } from './event-description-format';
+
+export {
+  cleanDisplayText,
+  formatEventDescriptionHtml,
+  isDescriptionSectionHeading,
+  parseEventDescriptionBlocks,
+  sanitizeEventHtml,
+  splitDescriptionParagraphs,
+};
 
 export type TicketCategoryRow = {
   key: string;

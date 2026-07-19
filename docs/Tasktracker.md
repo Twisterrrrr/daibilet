@@ -13,6 +13,7 @@
 |---|--------|-----------|--------|
 | E.1 | Description: списки `✅` / `•` / `-` → `<ul><li>` + sanitize | Высокий | 🔄 код готов, deploy ⏳ |
 | E.2 | Unit-тесты обоих кейсов (checkmark + организационные детали) | Высокий | ✅ |
+| E.3 | Prod: `ReferenceError: cleanDisplayText is not defined` (re-export без local import в `event-page-utils`) | Критический | 🔄 fix → commit+deploy |
 
 ---
 
