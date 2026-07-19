@@ -91,59 +91,47 @@ export function BlogListFiltered({
   const hasActive = city !== 'all' || author !== 'all';
 
   const selectClass =
-    'min-w-[9.5rem] flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100 sm:flex-none';
+    'min-w-[10rem] flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100 sm:max-w-[16rem] sm:flex-none';
 
   return (
     <div>
-      <div className="mb-6 flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:flex-wrap sm:items-end">
-        <label className="flex min-w-[10rem] flex-1 flex-col gap-1.5 text-sm sm:max-w-[16rem]">
-          <span className="font-medium text-slate-600">Город</span>
-          <select
-            className={selectClass}
-            value={city}
-            onChange={(event) => setFilter('city', event.target.value)}
-            aria-label="Фильтр по городу"
-          >
-            <option value="all">Все города</option>
-            {cityOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label} ({option.count})
-              </option>
-            ))}
-          </select>
-        </label>
+      <div className="mb-6 flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:flex-wrap sm:items-center">
+        <select
+          className={selectClass}
+          value={city}
+          onChange={(event) => setFilter('city', event.target.value)}
+          aria-label="Фильтр по городу"
+        >
+          <option value="all">Все города</option>
+          {cityOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label} ({option.count})
+            </option>
+          ))}
+        </select>
 
-        <label className="flex min-w-[10rem] flex-1 flex-col gap-1.5 text-sm sm:max-w-[16rem]">
-          <span className="font-medium text-slate-600">Автор</span>
-          <select
-            className={selectClass}
-            value={author}
-            onChange={(event) => setFilter('author', event.target.value)}
-            aria-label="Фильтр по автору"
-          >
-            <option value="all">Все авторы</option>
-            {authorOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label} ({option.count})
-              </option>
-            ))}
-          </select>
-        </label>
+        <select
+          className={selectClass}
+          value={author}
+          onChange={(event) => setFilter('author', event.target.value)}
+          aria-label="Фильтр по автору"
+        >
+          <option value="all">Все авторы</option>
+          {authorOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label} ({option.count})
+            </option>
+          ))}
+        </select>
 
         {hasActive ? (
-          <div className="flex flex-col gap-1.5 self-start sm:self-auto">
-            {/* Спейсер под высоту лейбла — «Сбросить» на одной линии с select */}
-            <span className="invisible select-none text-sm font-medium" aria-hidden>
-              Сбросить
-            </span>
-            <button
-              type="button"
-              onClick={resetFilters}
-              className="py-2.5 text-sm font-medium text-primary-600 hover:text-primary-700"
-            >
-              Сбросить
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="py-2.5 text-sm font-medium text-primary-600 hover:text-primary-700"
+          >
+            Сбросить
+          </button>
         ) : null}
       </div>
 
