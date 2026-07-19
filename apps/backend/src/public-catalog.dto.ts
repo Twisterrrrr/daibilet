@@ -5,6 +5,7 @@ import {
   ACTIVE_SESSION_SQL,
   isSaleableForPublicCatalog,
 } from './catalog-availability.js';
+import { resolveCityTimeZone } from './city-timezone.js';
 import {
   dedupeCrossSourceCatalogSessions,
   formatDate,
@@ -745,14 +746,16 @@ async function hydrateCatalogUpcomingSlots(
         const startsAt = row.startsAt?.toISOString();
         if (!startsAt || seenStartsAt.has(startsAt)) continue;
         seenStartsAt.add(startsAt);
+        const timeZone = session.timeZone || resolveCityTimeZone(session.city, session.destination);
         hydratedSlots.push({
           id: row.id,
           eventId: row.eventId,
           startsAt,
           endsAt: row.endsAt?.toISOString() || null,
-          dateLabel: formatDate(startsAt),
-          timeLabel: formatTime(startsAt),
-          timeBucket: timeBucket(startsAt),
+          dateLabel: formatDate(startsAt, timeZone),
+          timeLabel: formatTime(startsAt, timeZone),
+          timeBucket: timeBucket(startsAt, timeZone),
+          timeZone,
           // List consumers strip purchaseUrl; keep for event-level hydrate callers.
           purchaseUrl: session.purchaseUrl ?? null,
         });

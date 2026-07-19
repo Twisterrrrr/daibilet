@@ -201,6 +201,7 @@ function formatSessionLabels(session: {
   startsAt?: string | null;
   dateLabel?: string | null;
   timeLabel?: string | null;
+  timeZone?: string | null;
 }) {
   if (session.dateLabel && session.timeLabel) {
     const commaIndex = session.dateLabel.indexOf(',');
@@ -214,10 +215,11 @@ function formatSessionLabels(session: {
   if (session.startsAt) {
     const d = new Date(session.startsAt);
     if (!Number.isNaN(d.getTime())) {
+      const timeZone = session.timeZone || undefined;
       return {
-        weekday: d.toLocaleDateString('ru-RU', { weekday: 'short' }),
-        date: d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }),
-        time: d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+        weekday: d.toLocaleDateString('ru-RU', { weekday: 'short', timeZone }),
+        date: d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', timeZone }),
+        time: d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', timeZone }),
       };
     }
   }
@@ -238,6 +240,7 @@ export function TcSessionSlot({
     startsAt?: string | null;
     dateLabel?: string | null;
     timeLabel?: string | null;
+    timeZone?: string | null;
     vacant?: number | null;
     purchaseUrl?: string | null;
   };
@@ -311,6 +314,7 @@ function StaticSessionRow({
     startsAt?: string | null;
     dateLabel?: string | null;
     timeLabel?: string | null;
+    timeZone?: string | null;
     vacant?: number | null;
   };
   purchaseUrl?: string | null;

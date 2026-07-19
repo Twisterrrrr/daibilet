@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolveCityTimeZone } from './city-timezone.js';
 import { matchingLandingSlugs } from './landing-rules.js';
 import { isFutureSlotStart, isOpenDateCatalogRow } from './catalog-availability.js';
 import { pickFirstUsableEventImageUrl } from './event-image-url.js';
@@ -123,6 +124,7 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
   });
   const cityName = resolvePublicSessionCity(row);
   const destination = publicDestinationForCity({ ...row, city: cityName });
+  const timeZone = resolveCityTimeZone(cityName, destination.name);
   const fallbackWidgetUrl = buildProviderWidgetUrl(row);
   const purchase = purchaseInfo(row);
   const purchaseUrl = purchase.url || fallbackWidgetUrl;
@@ -150,9 +152,10 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
         ...(slot.id ? { id: slot.id } : {}),
         ...(slot.eventId ? { eventId: slot.eventId } : {}),
         startsAt,
-        dateLabel: formatDate(startsAt),
-        timeLabel: formatTime(startsAt),
-        timeBucket: timeBucket(startsAt),
+        dateLabel: formatDate(startsAt, timeZone),
+        timeLabel: formatTime(startsAt, timeZone),
+        timeBucket: timeBucket(startsAt, timeZone),
+        timeZone,
         purchaseUrl: slotPurchase.url || purchaseUrl,
       };
     });
@@ -176,6 +179,7 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
     city: cityName,
     destination: destination.name,
     destinationType: destination.type,
+    timeZone,
     venueId: row.venueId,
     venueSlug: row.venueSlug,
     venue: row.venue || 'Не указано',
@@ -197,9 +201,9 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
     ageLimit: row.ageLimit ?? null,
     description: cleanImportedDescription(row.overrideDescription || row.description || row.overrideShortDescription),
     startsAt,
-    dateLabel: openDate ? 'Открытая дата' : formatDate(startsAt),
-    timeLabel: openDate ? 'В виджете' : formatTime(startsAt),
-    timeBucket: openDate ? 'day' : timeBucket(startsAt),
+    dateLabel: openDate ? 'Открытая дата' : formatDate(startsAt, timeZone),
+    timeLabel: openDate ? 'В виджете' : formatTime(startsAt, timeZone),
+    timeBucket: openDate ? 'day' : timeBucket(startsAt, timeZone),
     priceFrom: row.priceFrom,
     priceTo: row.priceTo ?? row.priceFrom,
     vacant: row.vacant,
@@ -417,20 +421,38 @@ function cleanDisplayName(value?: string | null): string {
   return String(value || '').replace(/\s+/g, ' ').trim();
 }
 
-function formatDate(value: string | Date): string {
+function formatDate(value: string | Date, timeZone: string): string {
   const date = new Date(value);
   if (!Number.isFinite(date.getTime())) return '';
-  return new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short', weekday: 'short' }).format(date);
+  return new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'short',
+    weekday: 'short',
+    timeZone,
+  }).format(date);
 }
 
-function formatTime(value: string | Date): string {
+function formatTime(value: string | Date, timeZone: string): string {
   const date = new Date(value);
   if (!Number.isFinite(date.getTime())) return '';
-  return new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit' }).format(date);
+  return new Intl.DateTimeFormat('ru-RU', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone,
+  }).format(date);
 }
 
-function timeBucket(value: string | Date): TimeBucket {
-  const hour = new Date(value).getHours();
+function timeBucket(value: string | Date, timeZone: string): TimeBucket {
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return 'day';
+  const hourPart = new Intl.DateTimeFormat('en-GB', {
+    timeZone,
+    hour: 'numeric',
+    hour12: false,
+  })
+    .formatToParts(date)
+    .find((part) => part.type === 'hour');
+  const hour = Number(hourPart?.value);
   if (hour >= 6 && hour < 12) return 'morning';
   if (hour >= 12 && hour < 17) return 'day';
   if (hour >= 17 && hour < 23) return 'evening';

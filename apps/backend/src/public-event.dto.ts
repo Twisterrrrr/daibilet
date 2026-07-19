@@ -5,6 +5,7 @@ import {
   isOpenDateCatalogRow,
   isWideLifetimeSession,
 } from './catalog-availability.js';
+import { resolveCityTimeZone } from './city-timezone.js';
 import { dedupePublicOffers, formatDate, formatTime, isSaleableEventForPublic, normalizeStartsAt, preferNamedTicketOffers, timeBucket } from './dto.js';
 import { findLandingRule, matchingLandingSlugs } from './landing-rules.js';
 import {
@@ -303,6 +304,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     sourceCitySlug: requestedEvent.primaryCity?.slug || null,
     destination: destination.name,
     destinationType: destination.type,
+    timeZone: resolveCityTimeZone(requestedEvent.primaryCity?.title, destination.name),
     venueId: requestedEvent.venue?.id || null,
     venueSlug: requestedEvent.venue?.slug || null,
     venue: requestedEvent.venue?.title || 'Не указано',
@@ -453,14 +455,21 @@ function mapSession(
   const openDate = requestedEvent.kind === 'OPEN_DATE' || session.sourceStatus?.toLowerCase() === 'open_date';
   const wideLifetime = isWideLifetimeSession(session.startsAt, session.endsAt);
   const startsAt = openDate || wideLifetime ? null : normalizeStartsAt(session.startsAt);
+  // Display = local wall-clock of the event city/region (same as TC/TEP widget), not browser TZ / forced MSK.
+  const destination = eventDestination(event);
+  const timeZone = resolveCityTimeZone(
+    event.primaryCity?.title || requestedEvent.primaryCity?.title,
+    destination.name,
+  );
   return {
     id: session.id,
     eventId: session.eventId,
     startsAt,
     endsAt: normalizeStartsAt(session.endsAt),
-    dateLabel: openDate ? 'Открытая дата' : wideLifetime ? 'Даты в виджете' : formatDate(session.startsAt),
-    timeLabel: openDate ? 'В виджете' : wideLifetime ? 'При покупке' : formatTime(session.startsAt),
-    timeBucket: openDate || wideLifetime ? 'day' : timeBucket(session.startsAt),
+    dateLabel: openDate ? 'Открытая дата' : wideLifetime ? 'Даты в виджете' : formatDate(session.startsAt, timeZone),
+    timeLabel: openDate ? 'В виджете' : wideLifetime ? 'При покупке' : formatTime(session.startsAt, timeZone),
+    timeBucket: openDate || wideLifetime ? 'day' : timeBucket(session.startsAt, timeZone),
+    timeZone,
     sourceStatus: session.sourceStatus,
     priceFrom: displayPriceFrom(session.priceFromRub, offer?.priceRub),
     vacant: session.ticketsVacant,

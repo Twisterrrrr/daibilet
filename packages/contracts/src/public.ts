@@ -85,6 +85,7 @@ export interface PublicSessionDto extends PurchaseFields {
   dateLabel: string;
   timeLabel: string;
   timeBucket: TimeBucket;
+  timeZone?: string | null;
   priceFrom?: number | null;
   priceTo?: number | null;
   vacant?: number | null;
@@ -199,6 +200,8 @@ export interface PublicEventDto extends SeoFields, PurchaseFields {
   venueSlug?: string | null;
   destination?: string | null;
   destinationType?: DestinationType | string | null;
+  /** IANA TZ of event city/region — display labels match widget local time. */
+  timeZone?: string | null;
   venue: string;
   venueAddress?: string | null;
   venueKind: string;
@@ -228,6 +231,7 @@ export interface PublicEventPageDto extends ApiEnvelope {
     id: string;
     eventId: string;
     startsAt: string | null;
+    timeZone?: string | null;
     priceFrom?: number | null;
     vacant?: number | null;
     sourceStatus?: string | null;
