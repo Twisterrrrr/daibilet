@@ -4,6 +4,28 @@
 
 ---
 
+## 2026-07-19 — Блог часть 2 (7 редакционных гидов)
+
+### Наблюдения
+
+- Пользователь прислал 7 переработанных evergreen-текстов («часть 2»).
+- Все multi-event → только markdown `/events/{slug}`, без `[buy]`.
+- `spb-razvod-mostov-kakoi-reis` не трогали; обновлён комбинированный `spb-rooftop-guide`.
+- Колонка Макса `fentezi-fest-bylinnyy-bereg` не трогалась.
+
+### Решения
+
+- Опубликованы slug: `kazan-rechnye-progulki`, `moskva-rechnye-progulki-zaryade`, `spb-rooftop-guide`, `spb-stendap-gid`, `moskva-master-klass-emal`, `myuzikly-teatr-novichok-msk-spb`, `spb-planetarium-gid` (`authorId=editorial`).
+- Сверка READY: ~40 ссылок на события; цены стендапа/балета/возраста органа поправлены по афише.
+- Commit → `deploy-prod-next` → `blog:upsert` ×7.
+
+### Проблемы
+
+- READY на Свияжск/Болгар в афише нет — в тексте остались без ссылок, отсылка к `/city/kazan`.
+- У части «три разводных» в БД битые `priceFromRub=10`; для гида взят валидный slug с 1050 ₽.
+
+---
+
 ## 2026-07-19 — Закрытие дыр аудита админки
 
 ### Наблюдения

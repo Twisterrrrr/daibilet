@@ -99,7 +99,7 @@ const SLUG_META: Record<
     city: 'Москва',
   },
   'spb-planetarium-gid': {
-    authorId: 'elena',
+    authorId: 'editorial',
     articleType: 'gid',
     citySlug: 'saint-petersburg',
     city: 'Санкт-Петербург',
@@ -129,7 +129,7 @@ const SLUG_META: Record<
     city: 'Москва',
   },
   'myuzikly-teatr-novichok-msk-spb': {
-    authorId: 'anna',
+    authorId: 'editorial',
     articleType: 'gid',
     citySlug: 'multi',
     city: 'Несколько городов',
