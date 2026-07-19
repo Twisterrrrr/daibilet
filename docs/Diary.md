@@ -17,7 +17,7 @@
 ### Проблемы
 
 - City FAQ (пункт 5) не начинали.
-- Proof: curl 200 на `/robots.txt`, `/sitemap.xml` (index), `/sitemaps/events.xml` (и прочие chunks).
+- **Proof prod** (deploy `4282895`): `/robots.txt`, `/sitemap.xml` (sitemapindex), `/sitemaps/{static,events,cities,venues,landings,blog}.xml` — все **200**; events chunk ~2394 URL.
 
 ---
 
