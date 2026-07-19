@@ -23,13 +23,9 @@ if ! flock -n 9; then
   exit 0
 fi
 
-# tsx lives under apps/backend; invoke the binary (node --import tsx fails from repo root)
-TSX_BIN="${TSX_BIN:-$APP_DIR/apps/backend/node_modules/.bin/tsx}"
-if [[ ! -x "$TSX_BIN" ]]; then
-  echo "tsx not found at $TSX_BIN" >&2
-  exit 1
-fi
+# Resolve tsx loader from apps/backend (not hoisted to root package imports)
+TSX_LOADER="${TSX_LOADER:-$(readlink -f "$APP_DIR/apps/backend/node_modules/tsx/dist/loader.mjs")}"
 
 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) start review-requests"
-"$TSX_BIN" scripts/send-review-requests.js "$@"
+node --import "$TSX_LOADER" scripts/send-review-requests.js "$@"
 echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) done review-requests"
