@@ -5,6 +5,16 @@ const DEFAULT_TITLE = 'Дайбилет — экскурсии, музеи и с
 const DEFAULT_DESCRIPTION =
   'Билеты на экскурсии, музеи, речные прогулки и события в городах России. Сравнение цен и расписания на Дайбилет.';
 
+function cityHubSeoTitleFallback(cityName) {
+  const name = String(cityName || '').trim() || 'Город';
+  const short = new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'Europe/Moscow',
+  }).format(new Date());
+  return `${name}: афиша, экскурсии и билеты на сегодня, ${short} | ${SITE_NAME}`;
+}
+
 const BOT_UA_RE =
   /(bot|telegram|facebook|twitter|linkedin|slack|whatsapp|discord|vkshare|preview|embedly|pinterest|skype|googlebot|bingpreview|yandex|mail\.ru)/i;
 
@@ -146,7 +156,7 @@ export async function buildSocialPreviewForPath(db, pathname, builders) {
     const city = payload.city;
     const canonicalPath = `/cities/${city.slug || slug}`;
     return {
-      title: city.seoTitle || `${city.name}: события на сегодня | ${SITE_NAME}`,
+      title: city.seoTitle || cityHubSeoTitleFallback(city.name),
       description: city.seoDescription || `${city.name}: экскурсии, музеи и события.`,
       url: canonicalPath,
       image: city.heroImageUrl || null,

@@ -25,6 +25,7 @@ import { landingPageHref } from '@/lib/landing-slugs';
 import { eventHref, sessionVenueHref, venueHref } from '@/routes';
 import { inCityPrepositional } from '@/lib/city-declension';
 import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
+import { buildCityHubSeoTitle } from '@/lib/city-hub-seo';
 import {
   buildCityPageShell,
   readCachedCityPage,
@@ -839,7 +840,7 @@ function navigateHome(section: string) {
 
 function applyCityMeta(payload: PublicCityPage) {
   const cityIn = cityInPrepositional(payload.city);
-  document.title = payload.city.seoTitle || `События ${cityIn} на сегодня | Дайбилет`;
+  document.title = payload.city.seoTitle || buildCityHubSeoTitle(payload.city.name);
   upsertMeta('description', payload.city.seoDescription || `Афиша событий, экскурсии, музеи и билеты ${cityIn}.`);
   upsertMeta('robots', 'index, follow');
 }

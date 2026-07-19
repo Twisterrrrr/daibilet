@@ -27,6 +27,7 @@ import { landingPageHref } from '@/lib/landing-routes';
 import { eventHref, sessionVenueHref, venueHref } from '@/lib/routes';
 import { inCityPrepositional } from '@/lib/city-declension';
 import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
+import { buildCityHubSeoTitle } from '@/lib/city-hub-seo';
 import type {
   PublicCityDto,
   PublicCityPageDto,
@@ -921,7 +922,7 @@ function navigateHome(section: string) {
 
 function applyCityMeta(payload: PublicCityPageDto) {
   const cityIn = cityInPrepositional(payload.city);
-  document.title = payload.city.seoTitle || `События ${cityIn} на сегодня | Дайбилет`;
+  document.title = payload.city.seoTitle || buildCityHubSeoTitle(payload.city.name);
   upsertMeta('description', payload.city.seoDescription || `Афиша событий, экскурсии, музеи и билеты ${cityIn}.`);
   // robots задаётся в generateMetadata (SSR); клиент не перезаписывает noindex thin-страниц
 }

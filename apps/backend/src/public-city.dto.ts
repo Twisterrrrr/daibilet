@@ -4,6 +4,7 @@ import { prisma } from '@daibilet/db';
 import {
   buildPublicDestinationRowsFromSessions,
   buildPublicLandings,
+  buildCityHubSeoTitle,
   destinationPrepositional,
   lookupDestinationCatalogSessions,
   publicDestinationFromSession,
@@ -137,7 +138,7 @@ export async function buildPublicCityDto(
       venues: venueCount,
       categories,
       seoH1: cityRecord?.seoH1 || destination.name,
-      seoTitle: cityRecord?.seoTitle || `События ${entityLabel} на сегодня | Дайбилет`,
+      seoTitle: cityRecord?.seoTitle || buildCityHubSeoTitle(destination.name),
       seoDescription: cityRecord?.seoDescription ||
         `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`,
       canonicalPath: cityRecord?.canonicalPath || `/cities/${destination.slug}`,

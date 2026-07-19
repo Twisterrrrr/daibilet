@@ -1,3 +1,22 @@
+## 2026-07-19 — City SEO title: именительный + дата «сегодня»
+
+### Наблюдения
+
+- Паттерн P.2d «События в … на сегодня» (предложный) хуже старого brand-title «Город: афиша, экскурсии и билеты».
+- Нужен сигнал актуальности: «на сегодня, {дата}» (MSK, человекочитаемо).
+
+### Решения
+
+- Title standalone hubs: `{City}: афиша, экскурсии и билеты на сегодня, {19 июля} | Дайбилет` (именительный падеж).
+- Хелпер `buildCityHubSeoTitle` (web / public / backend DTO + legacy `dto.js`); `generateMetadata` всегда считает title с живой датой.
+- Description без изменений (locative).
+
+### Проблемы
+
+- Deploy + proof view-source `/cities/sankt-peterburg`.
+
+---
+
 ## 2026-07-19 — City hub wireframe v2 (фаза 2, city-specific)
 
 ### Наблюдения

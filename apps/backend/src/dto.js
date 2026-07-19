@@ -4605,6 +4605,17 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
   };
 }
 
+/** «Санкт-Петербург: афиша, экскурсии и билеты на сегодня, 19 июля | Дайбилет» */
+export function buildCityHubSeoTitle(cityName, reference = new Date()) {
+  const name = String(cityName || '').trim() || 'Город';
+  const short = new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'Europe/Moscow',
+  }).format(reference);
+  return `${name}: афиша, экскурсии и билеты на сегодня, ${short} | Дайбилет`;
+}
+
 export async function buildPublicCityPage(db, citySlugOrId) {
   const requestedSlug = String(citySlugOrId || '').toLowerCase();
   const [catalogSessions, venueHubRows] = await Promise.all([
@@ -4636,7 +4647,7 @@ export async function buildPublicCityPage(db, citySlugOrId) {
       events: matchedSessions.length,
       venues: venueCount,
       categories,
-      seoTitle: `События ${entityLabel} на сегодня | Дайбилет`,
+      seoTitle: buildCityHubSeoTitle(destination.name),
       seoDescription: `Афиша событий, экскурсий, музеев и активностей ${entityLabel}. Быстрый выбор по датам, площадкам и категориям.`,
     },
     sessions,

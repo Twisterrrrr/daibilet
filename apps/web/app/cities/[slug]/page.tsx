@@ -6,6 +6,7 @@ import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { inCityPrepositional } from '@/lib/city-declension';
 import { buildCityFaqItems, buildCitySeoText } from '@/lib/city-faq';
+import { buildCityHubSeoTitle, buildCityHubSeoTitleCore } from '@/lib/city-hub-seo';
 import { evaluateCityIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { pageTitle, routeOpenGraph } from '@/lib/seo-meta';
 import { buildCityPageJsonLd } from '@/lib/structured-data';
@@ -32,15 +33,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
 
   const cityIn = inCityPrepositional(city.name);
-  const defaultTitle = `События ${cityIn} на сегодня`;
+  // Живая дата в title (MSK); admin seoTitle без даты не перекрывает паттерн хаба.
+  const hubTitle = buildCityHubSeoTitleCore(city.name);
+  const hubTitleFull = buildCityHubSeoTitle(city.name);
 
   return {
-    title: pageTitle(city.seoTitle || defaultTitle),
+    title: pageTitle(hubTitle),
     description: city.seoDescription || `События и экскурсии ${cityIn}`,
     alternates: { canonical: path },
     robots: robotsForIndexability(decision.indexable),
     openGraph: routeOpenGraph(path, {
-      title: city.seoTitle || `${defaultTitle} | Дайбилет`,
+      title: hubTitleFull,
     }),
   };
 }
