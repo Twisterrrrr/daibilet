@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
 
 import { LocationsCatalogView } from '@/components/LocationsCatalogView.client';
 import { VenuesCatalogView } from '@/components/VenuesCatalogView.client';
@@ -67,9 +68,13 @@ export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
         </div>
       </div>
       {family === 'location' ? (
-        <LocationsCatalogView venues={venues} />
+        <Suspense fallback={<div className="container-page py-10 text-sm text-slate-500">Загрузка локаций…</div>}>
+          <LocationsCatalogView venues={venues} />
+        </Suspense>
       ) : (
-        <VenuesCatalogView venues={venues} />
+        <Suspense fallback={<div className="container-page py-10 text-sm text-slate-500">Загрузка площадок…</div>}>
+          <VenuesCatalogView venues={venues} />
+        </Suspense>
       )}
     </SiteLayout>
   );
