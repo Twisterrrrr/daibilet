@@ -117,7 +117,13 @@ export async function buildPublicCityDto(
     .filter((price: number | null | undefined): price is number =>
       Number.isFinite(price) && Number(price) >= MIN_DISPLAY_PRICE_RUB,
     );
-  const categories = countBy(matchedSessions.map((event: PublicSessionDto) => event.category).filter(Boolean));
+  // Facet counts must match the hub feed (`sessions`), not the full city catalog.
+  // `city.events` / `stats.events` stay on matchedSessions for hero totals.
+  const categories = countBy(
+    sessions
+      .map((event) => event.category)
+      .filter((value): value is string => Boolean(value)),
+  );
   const landings = (buildPublicLandings(matchedSessions) as PublicLandingDto[]).filter((landing) => landing.events > 0);
   const entityLabel = destinationPrepositional(destination);
   const cityRecord = destination.type === 'city' && matchedSessions[0]?.cityId

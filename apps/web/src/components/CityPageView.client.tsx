@@ -121,7 +121,17 @@ export function CityPageView({
   }, [category, dateFilter, payload]);
 
   const city = payload?.city;
-  const categories = city ? Object.entries(city.categories).sort((a, b) => b[1] - a[1]) : [];
+  // Chip facets = hub feed only (same universe as the list / «Все»), not full-city catalog.
+  const categories = React.useMemo(() => {
+    if (!payload?.sessions?.length) return [] as Array<[string, number]>;
+    const counts = new Map<string, number>();
+    for (const session of payload.sessions) {
+      const name = session.category?.trim();
+      if (!name) continue;
+      counts.set(name, (counts.get(name) || 0) + 1);
+    }
+    return Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
+  }, [payload]);
   const guide = city ? cityGuideFor(city) : null;
   const recommended = payload ? rankRecommended(payload.sessions).slice(0, 6) : [];
   const unifiedFaq = React.useMemo(() => mergeCityFaqItems(guide?.faq, faqItems), [faqItems, guide?.faq]);
@@ -197,7 +207,7 @@ export function CityPageView({
                     <CategoryFilter
                       categories={categories}
                       active={category}
-                      total={payload.sessions.length}
+                      filteredCount={sessions.length}
                       editorial={editorial}
                       onCategory={setCategory}
                       onReset={() => {
@@ -681,10 +691,10 @@ function PopularDirections({
     count: landing.events,
     kind: 'link' as const,
   }));
-  const categoryItems = categories.slice(0, Math.max(0, 8 - landingItems.length)).map(([name, count]) => ({
+  const categoryItems = categories.slice(0, Math.max(0, 8 - landingItems.length)).map(([name]) => ({
     key: `category-${name}`,
     title: name,
-    count,
+    count: 0,
     kind: 'category' as const,
     category: name,
   }));
@@ -984,7 +994,6 @@ function RecommendedEvents({
 }
 
 function CityCatalogHeader({
-  city,
   count,
   mode,
   setMode,
@@ -996,7 +1005,6 @@ function CityCatalogHeader({
   setMode: (mode: ViewMode) => void;
   editorial?: boolean;
 }) {
-  const cityIn = cityInPrepositional(city);
   return (
     <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
@@ -1004,13 +1012,13 @@ function CityCatalogHeader({
           className={
             editorial
               ? 'font-serif text-3xl font-semibold text-balance text-zinc-950 sm:text-4xl'
-              : 'text-2xl font-bold text-slate-950'
+              : 'font-display text-2xl font-bold tracking-tight text-slate-950'
           }
         >
-          {editorial ? 'Ближайшие события' : `Афиша ${cityIn}`}
+          Ближайшие события
         </h2>
         <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-          {pluralEvents(count)} после выбранных фильтров. Для повторяющихся событий карточка объединяет ближайшие слоты.
+          {pluralEvents(count)} в текущей выдаче. Повторяющиеся события объединены в одну карточку.
         </p>
       </div>
       <div
@@ -1060,7 +1068,7 @@ function CityCatalogHeader({
 function CategoryFilter(props: {
   categories: Array<[string, number]>;
   active: string;
-  total: number;
+  filteredCount: number;
   onCategory: (value: string) => void;
   onReset: () => void;
   editorial?: boolean;
@@ -1074,9 +1082,12 @@ function CategoryFilter(props: {
         onClick={props.onReset}
         className={hubFilterChipClass(activeAll, editorial)}
       >
-        Все {formatNumber(props.total)}
+        Все
+        {activeAll ? (
+          <span className="ml-1.5 tabular-nums text-white/70">{formatNumber(props.filteredCount)}</span>
+        ) : null}
       </button>
-      {props.categories.map(([name, count]) => {
+      {props.categories.map(([name]) => {
         const isActive = props.active === name;
         return (
           <button
@@ -1085,7 +1096,10 @@ function CategoryFilter(props: {
             onClick={() => props.onCategory(name)}
             className={hubFilterChipClass(isActive, editorial)}
           >
-            {name} {formatNumber(count)}
+            {name}
+            {isActive ? (
+              <span className="ml-1.5 tabular-nums text-white/70">{formatNumber(props.filteredCount)}</span>
+            ) : null}
           </button>
         );
       })}

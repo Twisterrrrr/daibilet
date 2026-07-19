@@ -1,3 +1,22 @@
+## 2026-07-19 — City hub: согласованные счётчики чипов (48 vs 635)
+
+### Наблюдения
+
+- На СПб «Все 48» рядом с «Мероприятия 635+»: разные базы.
+- `CITY_SSR_SESSION_LIMIT = 48` → `payload.sessions`; `city.categories` считались по всем `matchedSessions` (~850).
+
+### Решения
+
+- Backend: `city.categories` = countBy по той же `sessions` slice, что в payload; hero `stats.events` = full-city.
+- Client: чипы из `payload.sessions`; число только у активного; default title «Ближайшие события».
+- Popular tags уже сняты (`5aa84d3`) — не возвращаем.
+
+### Проблемы
+
+- До: sessions=48, Мероприятия≈635. После: sum(categories) ≤ sessions.length.
+
+---
+
 ## 2026-07-19 — City hub: без popular tags, quieter chips
 
 ### Наблюдения
