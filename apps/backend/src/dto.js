@@ -6718,7 +6718,7 @@ function buildDefaultLandingBlocks(rule, matchedEvents) {
       title: rule.title,
       subtitle: rule.subtitle || null,
       body: landingType === 'CITY'
-        ? `Подборка собирает предложения в городе ${rule.city}: ближайшие даты, площадки, цены и ссылку на покупку у билетного оператора.`
+        ? `Подборка собирает предложения ${destinationPrepositional({ slug: '', name: rule.city, type: 'city' })}: ближайшие даты, площадки, цены и ссылку на покупку у билетного оператора.`
         : `Это тематическая витрина по направлению «${rule.title}». На верхнем уровне важнее быстро показать города и форматы, а покупочную таблицу оставляем как удобный модуль ниже.`,
       sortOrder: 30,
     },
@@ -7895,11 +7895,29 @@ export function destinationPrepositional(destination) {
 
   const name = cleanDisplayName(destination.name);
   if (!name) return 'в выбранном направлении';
-  if (name === 'Москва') return 'в Москве';
-  if (name === 'Санкт-Петербург') return 'в Санкт-Петербурге';
   if (destination.type === 'region') return `в регионе ${name}`;
+  // Предложный падеж: «в Мурманске», не «в городе Мурманск»
+  if (name.endsWith('ы')) return `в ${name.slice(0, -1)}ах`;
   if (name.endsWith('а')) return `в ${name.slice(0, -1)}е`;
-  return `в городе ${name}`;
+  if (name.endsWith('я')) return `в ${name.slice(0, -1)}е`;
+  if (name.endsWith('ь')) return `в ${name.slice(0, -1)}и`;
+  if (name.endsWith('о')) return `в ${name.slice(0, -1)}е`;
+  if (/[еуюэ]$/i.test(name)) return `в ${name}`;
+  const known = {
+    Москва: 'в Москве',
+    'Санкт-Петербург': 'в Санкт-Петербурге',
+    Мурманск: 'в Мурманске',
+    Орёл: 'в Орле',
+    Орел: 'в Орле',
+    Казань: 'в Казани',
+    Сочи: 'в Сочи',
+    'Нижний Новгород': 'в Нижнем Новгороде',
+    'Ростов-на-Дону': 'в Ростове-на-Дону',
+    'Улан-Удэ': 'в Улан-Удэ',
+    Чебоксары: 'в Чебоксарах',
+  };
+  if (known[name]) return known[name];
+  return `в ${name}е`;
 }
 
 async function publicSessions(db, limit) {

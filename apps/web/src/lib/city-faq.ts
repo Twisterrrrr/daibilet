@@ -1,6 +1,6 @@
 import type { PublicCityPageDto } from '@daibilet/contracts/public';
 
-import { cityToGenitive, cityToPrepositional } from '@/lib/city-declension';
+import { cityToGenitive, inCityPrepositional } from '@/lib/city-declension';
 import { formatNumber, formatPriceFrom } from '@/lib/format';
 import { resolveCityBrief, resolveCityInfo } from '@/lib/cityInfo';
 import { evaluateCityIndexability } from '@/lib/hub-indexability';
@@ -29,9 +29,8 @@ export function buildCityFaqItems(payload: PublicCityPageDto): CityFaqItem[] {
 
   const city = payload.city;
   const name = city.name;
-  const prep = cityToPrepositional(name);
   const gen = cityToGenitive(name);
-  const inCity = prep === name ? `в городе ${name}` : `в ${prep}`;
+  const inCity = inCityPrepositional(name);
   const ofCity = gen === name ? `города ${name}` : gen;
   const events = payload.stats?.events ?? city.events ?? 0;
   const venues = payload.stats?.venues ?? city.venues ?? 0;
@@ -92,8 +91,7 @@ export function buildCitySeoText(payload: PublicCityPageDto): string | null {
 
   const city = payload.city;
   const brief = resolveCityBrief(city.slug, city.sourceSlug, city.name);
-  const prep = cityToPrepositional(city.name);
-  const inCity = prep === city.name ? `в городе ${city.name}` : `в ${prep}`;
+  const inCity = inCityPrepositional(city.name);
   const events = payload.stats?.events ?? city.events ?? 0;
   const venues = payload.stats?.venues ?? city.venues ?? 0;
   const priceFrom = payload.stats?.priceFrom;

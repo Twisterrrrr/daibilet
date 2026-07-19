@@ -1,4 +1,22 @@
-## 2026-07-19 — City hubs: Саранск brief + Иваново/Мурманск sights
+## 2026-07-19 — City copy: предложный падеж («в Мурманске»)
+
+### Наблюдения
+
+- UI хабов писал «Что посмотреть в городе Мурманск» / «Все события в городе …» — грамматически неверно.
+- `city-declension` покрывал ~40 городов; fallback в `cityInPrepositional` был `в городе ${name}` для имён без -а.
+
+### Решения
+
+- Расширен словарь `CITY_FORMS` (web + public) + эвристика; добавлен `inCityPrepositional`.
+- CityPage / city-faq / metadata: `в ${locative}`, без «в городе X».
+- `destinationPrepositional` в `dto.js` — тот же принцип.
+
+### Проблемы
+
+- Нет.
+
+---
+
 
 ### Наблюдения
 

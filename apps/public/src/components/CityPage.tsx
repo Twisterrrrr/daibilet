@@ -23,6 +23,7 @@ import { resolveCityImage } from '@/lib/city-images';
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { landingPageHref } from '@/lib/landing-slugs';
 import { eventHref, sessionVenueHref, venueHref } from '@/routes';
+import { inCityPrepositional } from '@/lib/city-declension';
 import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
 import {
   buildCityPageShell,
@@ -804,11 +805,8 @@ function cityInPrepositional(city: PublicCity) {
   if (city.sourceSlug && bySlug[city.sourceSlug]) return bySlug[city.sourceSlug];
 
   const name = city.name.trim();
-  if (name === 'Москва') return 'в Москве';
-  if (name === 'Санкт-Петербург') return 'в Санкт-Петербурге';
   if (city.type === 'region') return `в регионе ${name}`;
-  if (name.endsWith('а')) return `в ${name.slice(0, -1)}е`;
-  return `в городе ${name}`;
+  return inCityPrepositional(name);
 }
 
 function scrollToSchedule() {

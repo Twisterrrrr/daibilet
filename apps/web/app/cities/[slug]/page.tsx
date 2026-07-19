@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { CityPageView } from '@/components/CityPageView.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
+import { inCityPrepositional } from '@/lib/city-declension';
 import { buildCityFaqItems, buildCitySeoText } from '@/lib/city-faq';
 import { evaluateCityIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { pageTitle, routeOpenGraph } from '@/lib/seo-meta';
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: pageTitle(city.seoTitle || `${city.name}: афиша и билеты`),
-    description: city.seoDescription || `События и экскурсии в городе ${city.name}`,
+    description: city.seoDescription || `События и экскурсии ${inCityPrepositional(city.name)}`,
     alternates: { canonical: path },
     robots: robotsForIndexability(decision.indexable),
     openGraph: routeOpenGraph(path, {
