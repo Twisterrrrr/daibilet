@@ -4,6 +4,27 @@
 
 ---
 
+## 2026-07-19 — Admin: editable Cities + article publishedAt
+
+### Наблюдения
+
+- Cities в админке были read-only (`GET /api/admin/cities` + бейдж «только чтение»); публичный каталог городов живёт на Prisma `City` (title/slug/SEO/intro/`isDestination`), без `isActive`/`sortOrder`.
+- Статьи: `upsertAdminArticle` уже принимал `publishedAt`, но UI не загружал/не сохранял поле — нельзя было разнести даты блога без SQL.
+
+### Решения
+
+- API: `GET/PATCH /api/admin/cities/:id` — update City; slug unique → 409 `slug_not_unique`; invalidate public caches.
+- Admin Cities: sheet-форма (title, slug, SEO, intro, hero, isDestination); регионы в списке не PATCH (только City).
+- Admin Articles: datetime-local `publishedAt`, колонка даты в списке; при publish пустая дата → now (UI + backend).
+- Docs: Project/Tasktracker/Diary обновлены (B.9/B.10).
+
+### Проблемы
+
+- Смена slug города ломает старые `/cities/{old}` URL — оператору нужна осторожность; 301 не делаем в этом тикете.
+- Region rows в destination rollup по-прежнему без отдельного PATCH.
+
+---
+
 ## 2026-07-19 — Первая колонка Анны (особняки СПб)
 
 ### Наблюдения

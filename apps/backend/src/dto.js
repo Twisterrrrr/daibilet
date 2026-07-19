@@ -474,6 +474,172 @@ export async function buildAdminCitiesList(db, searchParams = new URLSearchParam
   };
 }
 
+function mapAdminCityRow(row) {
+  if (!row) return null;
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    sourceTitle: row.sourceTitle || null,
+    introTitle: row.introTitle || null,
+    introText: row.introText || null,
+    heroImageUrl: row.heroImageUrl || null,
+    seoH1: row.seoH1 || null,
+    seoTitle: row.seoTitle || null,
+    seoDescription: row.seoDescription || null,
+    canonicalPath: row.canonicalPath || null,
+    isDestination: row.isDestination === true,
+    regionId: row.regionId || null,
+    editable: true,
+  };
+}
+
+function normalizeCitySlug(value) {
+  return (
+    String(value || '')
+      .trim()
+      .toLowerCase()
+      .replace(/ё/g, 'e')
+      .replace(/[^a-z0-9а-я-]+/gi, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 120) || ''
+  );
+}
+
+function normalizeCityPayload(payload) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    throw Object.assign(new Error('city_payload_invalid'), { statusCode: 400 });
+  }
+
+  const normalized = {};
+  for (const key of [
+    'title',
+    'sourceTitle',
+    'introTitle',
+    'introText',
+    'heroImageUrl',
+    'seoH1',
+    'seoTitle',
+    'seoDescription',
+    'canonicalPath',
+  ]) {
+    if (!Object.prototype.hasOwnProperty.call(payload, key)) continue;
+    normalized[key] = normalizeNullableString(payload[key]);
+  }
+
+  if (Object.prototype.hasOwnProperty.call(payload, 'slug')) {
+    const slug = normalizeCitySlug(payload.slug);
+    if (!slug) throw Object.assign(new Error('slug_required'), { statusCode: 400 });
+    normalized.slug = slug;
+  }
+
+  if (Object.prototype.hasOwnProperty.call(payload, 'isDestination')) {
+    normalized.isDestination = payload.isDestination == null ? null : Boolean(payload.isDestination);
+  }
+
+  if (Object.prototype.hasOwnProperty.call(payload, 'name') && !Object.prototype.hasOwnProperty.call(payload, 'title')) {
+    normalized.title = normalizeNullableString(payload.name);
+  }
+
+  return normalized;
+}
+
+export async function buildAdminCityDetail(db, cityIdOrSlug) {
+  const key = String(cityIdOrSlug || '').trim();
+  if (!key) return null;
+  const slugHint = key.startsWith('city_') ? key.slice(5) : key;
+  const { rows } = await db.query(
+    `
+      select *
+      from "City"
+      where id = $1 or slug = $1 or slug = $2
+      order by case when id = $1 then 0 when slug = $1 then 1 else 2 end
+      limit 1
+    `,
+    [key, slugHint],
+  );
+  return mapAdminCityRow(rows[0]);
+}
+
+export async function updateAdminCity(db, cityIdOrSlug, payload = {}) {
+  const current = await buildAdminCityDetail(db, cityIdOrSlug);
+  if (!current) {
+    throw Object.assign(new Error('city_not_found'), { statusCode: 404 });
+  }
+
+  const normalized = normalizeCityPayload(payload);
+  const next = {
+    ...current,
+    ...Object.fromEntries(Object.entries(normalized).filter(([, value]) => value !== undefined)),
+  };
+
+  const title = String(next.title || '').trim();
+  if (!title) throw Object.assign(new Error('title_required'), { statusCode: 400 });
+
+  const slug = normalizeCitySlug(next.slug || current.slug);
+  if (!slug) throw Object.assign(new Error('slug_required'), { statusCode: 400 });
+
+  if (slug !== current.slug) {
+    const { rows: conflicts } = await db.query(
+      `select id from "City" where slug = $1 and id <> $2 limit 1`,
+      [slug, current.id],
+    );
+    if (conflicts[0]) {
+      throw Object.assign(new Error('slug_not_unique'), { statusCode: 409 });
+    }
+  }
+
+  const canonicalPath =
+    next.canonicalPath ||
+    current.canonicalPath ||
+    `/cities/${slug}`;
+
+  try {
+    const { rows } = await db.query(
+      `
+        update "City"
+        set
+          slug = $2,
+          title = $3,
+          "sourceTitle" = $4,
+          "introTitle" = $5,
+          "introText" = $6,
+          "heroImageUrl" = $7,
+          "seoH1" = $8,
+          "seoTitle" = $9,
+          "seoDescription" = $10,
+          "canonicalPath" = $11,
+          "isDestination" = $12
+        where id = $1
+        returning id
+      `,
+      [
+        current.id,
+        slug,
+        title,
+        next.sourceTitle ?? null,
+        next.introTitle ?? null,
+        next.introText ?? null,
+        next.heroImageUrl ?? null,
+        next.seoH1 ?? null,
+        next.seoTitle ?? null,
+        next.seoDescription ?? null,
+        canonicalPath,
+        next.isDestination === true,
+      ],
+    );
+    if (!rows[0]) throw Object.assign(new Error('city_not_found'), { statusCode: 404 });
+  } catch (error) {
+    if (error?.code === '23505') {
+      throw Object.assign(new Error('slug_not_unique'), { statusCode: 409 });
+    }
+    throw error;
+  }
+
+  return buildAdminCityDetail(db, current.id);
+}
+
 let adminSourcesCache = { expiresAt: 0, staleUntil: 0, payload: null };
 let adminSourcesBuildPromise = null;
 const ADMIN_SOURCES_TTL_MS = Number(process.env.ADMIN_SOURCES_TTL_MS || 2 * 60_000);

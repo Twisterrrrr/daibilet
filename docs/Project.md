@@ -37,6 +37,8 @@ packages/config   — shared tsconfig/eslint
 | `GET /api/admin/dashboard` | Только `generatedAt` + `metrics` (grouped catalog, не raw Event) |
 | `GET /api/admin/{events,venues,cities,buyers,orders,landings}` | `page/limit/q` → `{ page, pages, limit, total, rows }` |
 | `GET /api/admin/landings/:slug` | Пагинация событий: `page/limit/q` + `events[]` текущей страницы |
+| `GET/PATCH /api/admin/cities/:id` | Карточка `City`: title, slug (unique), SEO/intro/hero, `isDestination` |
+| `POST/PATCH /api/admin/articles` | Upsert статьи; `publishedAt` задаётся оператором или `now` при publish |
 
 **Perf debt:** events/landings match всё ещё full grouped catalog → filter → slice (см. Tasktracker 0.5.8).
 

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { formatDateTime } from '@/data';
 
 
 type ArticleRow = {
@@ -17,6 +18,7 @@ type ArticleRow = {
   excerpt: string;
   coverImageUrl?: string | null;
   city?: string | null;
+  publishedAt?: string | null;
   updatedAt?: string | null;
 };
 
@@ -39,6 +41,7 @@ type ArticleDraft = {
   seoDescription: string;
   canonicalPath: string;
   isIndexable: boolean;
+  publishedAt: string;
 };
 
 const STATUS_OPTIONS = [
@@ -60,7 +63,24 @@ function emptyDraft(): ArticleDraft {
     seoDescription: '',
     canonicalPath: '',
     isIndexable: false,
+    publishedAt: '',
   };
+}
+
+function toDatetimeLocalValue(iso?: string | null): string {
+  if (!iso) return '';
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+function fromDatetimeLocalValue(value: string): string | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  const date = new Date(trimmed);
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString();
 }
 
 function detailToDraft(detail: ArticleDetail): ArticleDraft {
@@ -75,6 +95,7 @@ function detailToDraft(detail: ArticleDetail): ArticleDraft {
     seoDescription: detail.seoDescription || detail.excerpt || '',
     canonicalPath: detail.canonicalPath || `/blog/${detail.slug}`,
     isIndexable: detail.isIndexable,
+    publishedAt: toDatetimeLocalValue(detail.publishedAt),
   };
 }
 
@@ -128,11 +149,26 @@ export function ArticlesPage() {
     setDraft(detailToDraft(detail));
   };
 
+  const onStatusChange = (status: string) => {
+    setDraft((prev) => {
+      const next = { ...prev, status };
+      if (status === 'published' && !prev.publishedAt.trim()) {
+        next.publishedAt = toDatetimeLocalValue(new Date().toISOString());
+      }
+      return next;
+    });
+  };
+
   const saveDraft = async () => {
     setIsSaving(true);
     setError(null);
     try {
       const isNew = selectedId === 'new';
+      let publishedAt = fromDatetimeLocalValue(draft.publishedAt);
+      if (draft.status === 'published' && !publishedAt) {
+        publishedAt = new Date().toISOString();
+      }
+
       const response = await adminFetch(
         isNew ? `/api/admin/articles` : `/api/admin/articles/${encodeURIComponent(selectedId || '')}`,
         {
@@ -140,6 +176,7 @@ export function ArticlesPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             ...draft,
+            publishedAt,
             canonicalPath: draft.canonicalPath || `/blog/${draft.slug || 'article'}`,
           }),
         },
@@ -171,7 +208,11 @@ export function ArticlesPage() {
 
       {error ? <Card className="mb-4 border-destructive/30 p-4 text-sm text-destructive">{error}</Card> : null}
 
-      <DataTableShell columns={['Статья', 'Статус']} loading={isLoading} empty={!isLoading && rows.length === 0 ? <div className="p-8 text-sm text-muted-foreground">Статей пока нет.</div> : undefined}>
+      <DataTableShell
+        columns={['Статья', 'Дата', 'Статус']}
+        loading={isLoading}
+        empty={!isLoading && rows.length === 0 ? <div className="p-8 text-sm text-muted-foreground">Статей пока нет.</div> : undefined}
+      >
         {rows.map((row) => (
           <tr key={row.id} className="border-b border-border transition hover:bg-muted/40">
             <td className="px-4 py-3">
@@ -183,6 +224,7 @@ export function ArticlesPage() {
                 </div>
               </button>
             </td>
+            <td className="px-4 py-3 text-sm text-muted-foreground">{row.publishedAt ? formatDateTime(row.publishedAt) : '—'}</td>
             <td className="px-4 py-3">{articleStatusBadge(row.status)}</td>
           </tr>
         ))}
@@ -208,7 +250,7 @@ export function ArticlesPage() {
               <select
                 className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
                 value={draft.status}
-                onChange={(e) => setDraft((prev) => ({ ...prev, status: e.target.value }))}
+                onChange={(e) => onStatusChange(e.target.value)}
               >
                 {STATUS_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -216,6 +258,18 @@ export function ArticlesPage() {
                   </option>
                 ))}
               </select>
+            </label>
+
+            <label className="block space-y-1 text-sm">
+              <span>Дата публикации</span>
+              <Input
+                type="datetime-local"
+                value={draft.publishedAt}
+                onChange={(e) => setDraft((prev) => ({ ...prev, publishedAt: e.target.value }))}
+              />
+              <span className="text-xs text-muted-foreground">
+                При статусе «Опубликовано» пустая дата → сейчас; задайте вручную, чтобы разнести даты в блоге.
+              </span>
             </label>
 
             <label className="block space-y-1 text-sm">

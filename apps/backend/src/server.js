@@ -10,6 +10,8 @@ import {
   buildAdminDashboard,
   buildAdminBuyersList,
   buildAdminCitiesList,
+  buildAdminCityDetail,
+  updateAdminCity,
   buildAdminEventDetail,
   buildAdminEventsList,
   buildAdminLandingDetail,
@@ -575,6 +577,25 @@ export async function handleRequest(request, response) {
 
     if (route === 'GET /api/admin/cities') {
       sendJson(response, await buildAdminCitiesList(db, url.searchParams));
+      return;
+    }
+
+    const cityDetailMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/admin\/cities\/([^/]+)$/) : null;
+    if (cityDetailMatch) {
+      const detail = await buildAdminCityDetail(db, decodeURIComponent(cityDetailMatch[1]));
+      sendJson(response, detail || { error: 'city_not_found' }, detail ? 200 : 404);
+      return;
+    }
+
+    const cityUpdateMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/cities\/([^/]+)$/) : null;
+    if (cityUpdateMatch) {
+      try {
+        const result = await updateAdminCity(db, decodeURIComponent(cityUpdateMatch[1]), await readJsonBody(request));
+        invalidatePublicCaches('city update');
+        sendJson(response, result);
+      } catch (error) {
+        sendJson(response, { error: error.message || 'city_update_failed' }, error.statusCode || 500);
+      }
       return;
     }
 
