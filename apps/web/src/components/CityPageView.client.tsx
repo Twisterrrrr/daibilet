@@ -6,7 +6,6 @@ import {
   ArrowRight,
   CalendarDays,
   Grid3X3,
-  Landmark,
   ListFilter,
   MapPin,
   Search,
@@ -27,7 +26,13 @@ import { landingPageHref } from '@/lib/landing-routes';
 import { eventHref, sessionVenueHref, venueHref } from '@/lib/routes';
 import { inCityPrepositional } from '@/lib/city-declension';
 import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
-import { buildCityHubSeoTitle } from '@/lib/city-hub-seo';
+import { isOpenDate } from '@/lib/event-card-meta';
+import {
+  collectSessionStartsAtTimes,
+  isSameSessionDay,
+  isSessionWeekend,
+  resolveSessionTimeZoneForSession,
+} from '@/lib/datetime';
 import type {
   PublicCityDto,
   PublicCityPageDto,
@@ -37,6 +42,18 @@ import type {
 } from '@daibilet/contracts/public';
 
 type ViewMode = 'cards' | 'table';
+type DateFilter = 'all' | 'today' | 'weekend';
+
+const CITY_HASH_ALIASES: Record<string, string> = {
+  'city-schedule': 'affiche',
+  'city-directions': 'directions',
+  'city-sights': 'sights',
+  'city-travel': 'travel',
+  'city-guide-faq': 'faq',
+  'city-seo': 'seo',
+};
+
+const SECTION_SCROLL_MT = 'scroll-mt-[calc(var(--site-header-height)+3.25rem)]';
 
 export function CityPageView({
   slug,
@@ -54,6 +71,7 @@ export function CityPageView({
   const [error, setError] = React.useState<string | null>(null);
   const [category, setCategory] = React.useState('all');
   const [tag, setTag] = React.useState('all');
+  const [dateFilter, setDateFilter] = React.useState<DateFilter>('all');
   const [mode, setMode] = React.useState<ViewMode>('cards');
 
   React.useEffect(() => {
@@ -79,17 +97,29 @@ export function CityPageView({
 
   React.useEffect(() => {
     if (!contentReady) return;
-    if (window.location.hash === '#city-schedule') scrollToSchedule();
+    const hash = window.location.hash.replace(/^#/, '');
+    if (!hash) return;
+    scrollToSection(hash);
   }, [contentReady, slug]);
+
+  React.useEffect(() => {
+    const onHashChange = () => {
+      const hash = window.location.hash.replace(/^#/, '');
+      if (hash) scrollToSection(hash);
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
 
   const sessions = React.useMemo(() => {
     if (!payload) return [];
     return payload.sessions.filter((session) => {
       if (category !== 'all' && session.category !== category) return false;
       if (tag !== 'all' && !session.tags.includes(tag)) return false;
+      if (!matchesCityDateFilter(session, dateFilter)) return false;
       return true;
     });
-  }, [category, payload, tag]);
+  }, [category, dateFilter, payload, tag]);
 
   const city = payload?.city;
   const categories = city ? Object.entries(city.categories).sort((a, b) => b[1] - a[1]) : [];
@@ -99,7 +129,33 @@ export function CityPageView({
   );
   const guide = city ? cityGuideFor(city) : null;
   const recommended = payload ? rankRecommended(payload.sessions).slice(0, 6) : [];
-  const moreEvents = payload ? rankRecommended(payload.sessions).slice(6, 30) : [];
+  const unifiedFaq = React.useMemo(() => mergeCityFaqItems(guide?.faq, faqItems), [faqItems, guide?.faq]);
+
+  const hasDirections = Boolean(
+    (payload?.landings?.length || 0) > 0 || categories.length > 0,
+  );
+  const hasVenues = Boolean(payload?.venues?.length);
+  const hasTravel = Boolean(guide?.travel?.trim());
+  const hasSights = Boolean(
+    guide?.sights?.length ||
+      guide?.mustSee?.length ||
+      (contentReady && (categories.length > 0 || (payload?.venues?.length || 0) > 0)),
+  );
+  const hasFaq = unifiedFaq.length > 0;
+  const hasSeo = Boolean(seoText);
+
+  const tabs = React.useMemo(
+    () =>
+      [
+        { id: 'affiche', label: 'Афиша', show: true },
+        { id: 'directions', label: 'Направления', show: hasDirections },
+        { id: 'venues', label: 'Площадки', show: hasVenues },
+        { id: 'travel', label: 'Как добраться', show: hasTravel },
+        { id: 'sights', label: 'Достопримечательности', show: hasSights },
+        { id: 'faq', label: 'FAQ', show: hasFaq },
+      ].filter((tab) => tab.show),
+    [hasDirections, hasFaq, hasSights, hasTravel, hasVenues],
+  );
 
   return (
     <div className="bg-white text-slate-900">
@@ -119,34 +175,13 @@ export function CityPageView({
 
         {city && payload ? (
           <>
-            <CityHero city={city} stats={payload.stats} guide={guide} />
-            <CityTravelSection travel={guide?.travel} />
-            <CitySightsSection city={city} guide={guide} categories={categories} venues={payload.venues} allowFallback={contentReady} />
-            <CityEditorialFaqSection items={guide?.faq} />
-            {contentReady ? (
-              <>
-                <PopularDirections city={city} landings={payload.landings} categories={categories} />
-                <CategoryTiles categories={categories} onSelect={(value) => {
-                  setCategory(value);
-                  setTag('all');
-                  scrollToSchedule();
-                }} />
-                <VenueHighlights city={city} venues={payload.venues} />
-                <PopularTags tags={popularTags} active={tag} onSelect={(value) => {
-                  setTag(value);
-                  setCategory('all');
-                  scrollToSchedule();
-                }} />
-                <RecommendedEvents city={city} sessions={recommended} />
-                <MoreEvents sessions={moreEvents} />
-              </>
-            ) : (
-              <CityContentLoadingState />
-            )}
+            <CityHero city={city} stats={payload.stats} guide={guide} hasTravel={hasTravel} />
+            <CityStickyTabs tabs={tabs} />
 
-            <section id="city-schedule" className="container-page grid gap-6 py-8 lg:grid-cols-[minmax(0,1fr)_320px]">
-              <div className="min-w-0">
+            <section id="affiche" className={`border-b border-slate-100 ${SECTION_SCROLL_MT}`}>
+              <div className="container-page py-8">
                 <CityCatalogHeader city={city} count={sessions.length} mode={mode} setMode={setMode} />
+                <DateFilterChips active={dateFilter} onSelect={setDateFilter} />
                 {contentReady ? (
                   <>
                     <CategoryFilter
@@ -161,26 +196,57 @@ export function CityPageView({
                       onReset={() => {
                         setCategory('all');
                         setTag('all');
+                        setDateFilter('all');
                       }}
                     />
+                    <PopularTags
+                      tags={popularTags}
+                      active={tag}
+                      onSelect={(value) => {
+                        setTag(value);
+                        setCategory('all');
+                      }}
+                    />
+                    {dateFilter === 'all' && category === 'all' && tag === 'all' ? (
+                      <RecommendedEvents city={city} sessions={recommended} />
+                    ) : null}
                     {mode === 'table' ? <CityEventsTable sessions={sessions} /> : <CityEventsGrid sessions={sessions} />}
                   </>
                 ) : (
                   <CityScheduleLoadingState />
                 )}
               </div>
-
-              <aside className="grid content-start gap-4">
-                {contentReady ? (
-                  <CityGuideAside city={city} stats={payload.stats} categories={categories} landings={payload.landings} />
-                ) : (
-                  <div className="h-64 rounded-xl bg-slate-50" />
-                )}
-              </aside>
             </section>
 
-            {seoText ? <CitySeoTextSection cityName={city.name} text={seoText} /> : null}
-            {faqItems.length ? <CityFaqSection cityName={city.name} items={faqItems} /> : null}
+            {contentReady ? (
+              <>
+                <PopularDirections
+                  city={city}
+                  landings={payload.landings}
+                  categories={categories}
+                  onCategory={(value) => {
+                    setCategory(value);
+                    setTag('all');
+                    setDateFilter('all');
+                    scrollToSection('affiche');
+                  }}
+                />
+                <VenueHighlights city={city} venues={payload.venues} />
+              </>
+            ) : (
+              <CityContentLoadingState />
+            )}
+
+            <CityTravelSection travel={guide?.travel} />
+            <CitySightsSection
+              city={city}
+              guide={guide}
+              categories={categories}
+              venues={payload.venues}
+              allowFallback={contentReady}
+            />
+            {hasFaq ? <CityFaqSection cityName={city.name} items={unifiedFaq} /> : null}
+            {hasSeo && seoText ? <CitySeoTextSection cityName={city.name} text={seoText} /> : null}
           </>
         ) : null}
       </main>
@@ -192,10 +258,12 @@ function CityHero({
   city,
   stats,
   guide,
+  hasTravel,
 }: {
   city: PublicCityDto;
   stats: PublicCityPageDto['stats'];
   guide: CityInfoEntry | null;
+  hasTravel: boolean;
 }) {
   const [hasImageError, setHasImageError] = React.useState(false);
   const heroImage = resolveCityImage({
@@ -212,7 +280,7 @@ function CityHero({
   });
 
   return (
-    <section className="relative min-h-[320px] overflow-hidden border-b border-primary-950 text-white sm:min-h-[380px]">
+    <section id="top" className="relative min-h-[280px] overflow-hidden border-b border-primary-950 text-white sm:min-h-[320px]">
       {showImage ? (
         <div className="absolute inset-0 overflow-hidden">
           <img
@@ -228,7 +296,7 @@ function CityHero({
       )}
       <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/50 to-slate-950/25" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950/55 to-transparent" />
-      <div className="container-page relative py-14 sm:py-16">
+      <div className="container-page relative py-12 sm:py-14">
         <div className="flex items-center gap-2 text-sm text-primary-100/80">
           <button type="button" onClick={() => navigateHome('top')} className="hover:text-white">
             Главная
@@ -236,33 +304,150 @@ function CityHero({
           <span>/</span>
           <span className="text-white">{city.name}</span>
         </div>
-        <div className="mt-5 grid gap-8 lg:grid-cols-[minmax(0,1fr)_330px] lg:items-end">
-          <div>
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-white/12 px-3 py-1 text-sm font-semibold text-white/86">
-              <MapPin className="h-4 w-4" />
-              {city.type === 'region' ? 'Страница направления' : 'Страница города'}
-            </div>
-            <h1 className="max-w-4xl text-4xl font-extrabold sm:text-5xl">{city.name}</h1>
-            <p className="mt-4 max-w-3xl text-base leading-7 text-primary-50/88 sm:text-lg">
-              {guide?.brief || `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат, дату и площадку без долгого поиска по разным билетным системам.`}
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <a href="#city-schedule" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-primary-700 hover:bg-primary-50">
-                <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
-                <span>Все события {cityIn}</span>
+        <div className="mt-5 max-w-4xl">
+          <h1 className="text-4xl font-extrabold sm:text-5xl">{city.name}</h1>
+          <p className="mt-4 max-w-3xl text-base leading-7 text-primary-50/88 sm:text-lg">
+            {guide?.brief ||
+              `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат, дату и площадку без долгого поиска по разным билетным системам.`}
+          </p>
+          <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/80">
+            <span>
+              <span className="font-semibold text-white">{formatNumber(stats.events)}</span> событий
+            </span>
+            <span aria-hidden="true" className="text-white/35">
+              ·
+            </span>
+            <span>
+              <span className="font-semibold text-white">{formatNumber(stats.venues)}</span> площадок
+            </span>
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a
+              href="#affiche"
+              onClick={(event) => {
+                event.preventDefault();
+                scrollToSection('affiche');
+              }}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+            >
+              <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <span>События {cityIn}</span>
+            </a>
+            {hasTravel ? (
+              <a
+                href="#travel"
+                onClick={(event) => {
+                  event.preventDefault();
+                  scrollToSection('travel');
+                }}
+                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/25 px-5 text-sm font-semibold text-white hover:bg-white/10"
+              >
+                Как добраться
               </a>
-              <a href="#city-directions" className="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/25 px-5 text-sm font-semibold text-white hover:bg-white/10">
-                Смотреть направления
-              </a>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <HeroStat label="Событий" value={formatNumber(stats.events)} />
-            <HeroStat label="Площадок" value={formatNumber(stats.venues)} />
+            ) : null}
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function CityStickyTabs({ tabs }: { tabs: Array<{ id: string; label: string }> }) {
+  const [activeId, setActiveId] = React.useState(tabs[0]?.id || 'affiche');
+
+  React.useEffect(() => {
+    if (!tabs.length) return;
+    const elements = tabs
+      .map((tab) => document.getElementById(tab.id))
+      .filter((el): el is HTMLElement => Boolean(el));
+    if (!elements.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        const top = visible[0]?.target;
+        if (top?.id) setActiveId(top.id);
+      },
+      {
+        rootMargin: '-20% 0px -55% 0px',
+        threshold: [0.08, 0.2, 0.4],
+      },
+    );
+
+    for (const el of elements) observer.observe(el);
+    return () => observer.disconnect();
+  }, [tabs]);
+
+  if (!tabs.length) return null;
+
+  return (
+    <nav
+      aria-label="Разделы страницы города"
+      className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur"
+    >
+      <div className="container-page flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {tabs.map((tab) => {
+          const active = activeId === tab.id;
+          return (
+            <a
+              key={tab.id}
+              href={`#${tab.id}`}
+              onClick={(event) => {
+                event.preventDefault();
+                setActiveId(tab.id);
+                scrollToSection(tab.id);
+                if (typeof window !== 'undefined') {
+                  window.history.replaceState(null, '', `#${tab.id}`);
+                }
+              }}
+              className={`shrink-0 border-b-2 px-3 py-3 text-sm font-medium transition sm:px-4 ${
+                active
+                  ? 'border-primary-600 text-primary-700'
+                  : 'border-transparent text-slate-600 hover:text-primary-700'
+              }`}
+            >
+              {tab.label}
+            </a>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+
+function DateFilterChips({
+  active,
+  onSelect,
+}: {
+  active: DateFilter;
+  onSelect: (value: DateFilter) => void;
+}) {
+  const chips: Array<{ value: DateFilter; label: string }> = [
+    { value: 'all', label: 'Все даты' },
+    { value: 'today', label: 'Сегодня' },
+    { value: 'weekend', label: 'Выходные' },
+  ];
+
+  return (
+    <div className="mb-4 flex flex-wrap gap-2">
+      {chips.map((chip) => (
+        <button
+          key={chip.value}
+          type="button"
+          onClick={() => onSelect(chip.value)}
+          className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition ${
+            active === chip.value
+              ? 'bg-slate-900 text-white'
+              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+          }`}
+        >
+          {chip.value !== 'all' ? <CalendarDays className="h-3.5 w-3.5" /> : null}
+          {chip.label}
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -316,44 +501,67 @@ function CityLoadingState() {
   );
 }
 
-function PopularDirections({ city, landings, categories }: { city: PublicCityDto; landings: PublicLandingDto[]; categories: Array<[string, number]> }) {
+function PopularDirections({
+  city,
+  landings,
+  categories,
+  onCategory,
+}: {
+  city: PublicCityDto;
+  landings: PublicLandingDto[];
+  categories: Array<[string, number]>;
+  onCategory: (category: string) => void;
+}) {
   const cityIn = cityInPrepositional(city);
-  const items = [
-    ...landings.slice(0, 8).map((landing) => ({
-      key: landing.slug,
-      title: landing.title,
-      subtitle: landing.subtitle,
-      href: landingPageHref(landing.slug),
-      count: landing.events,
-    })),
-    ...categories.slice(0, Math.max(0, 6 - landings.length)).map(([name, count]) => ({
-      key: `category-${name}`,
-      title: name,
-      subtitle: `Быстрый вход в афишу ${cityIn}`,
-      href: '#city-schedule',
-      count,
-    })),
-  ].slice(0, 8);
+  const landingItems = landings.slice(0, 8).map((landing) => ({
+    key: landing.slug,
+    title: landing.title,
+    href: landingPageHref(landing.slug),
+    count: landing.events,
+    kind: 'link' as const,
+  }));
+  const categoryItems = categories.slice(0, Math.max(0, 8 - landingItems.length)).map(([name, count]) => ({
+    key: `category-${name}`,
+    title: name,
+    count,
+    kind: 'category' as const,
+    category: name,
+  }));
+  const items = [...landingItems, ...categoryItems].slice(0, 8);
 
   if (!items.length) return null;
 
   return (
-    <section id="city-directions" className="bg-gradient-to-r from-primary-50 to-amber-50 py-8">
+    <section id="directions" className={`border-b border-slate-100 bg-slate-50/70 py-8 ${SECTION_SCROLL_MT}`}>
       <div className="container-page">
         <h2 className="text-lg font-bold text-slate-950">Популярные направления</h2>
+        <p className="mt-1 text-sm text-slate-600">Подборки и категории {cityIn}</p>
         <div className="mt-3 flex flex-wrap gap-2">
-          {items.map((item) => (
-            <a
-              key={item.key}
-              href={item.href}
-              className="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-white px-4 py-2 text-sm font-medium text-primary-700 shadow-sm transition hover:border-primary-300 hover:bg-primary-100"
-            >
-              <TrendingUp className="h-3.5 w-3.5" />
-              <span>{item.title}</span>
-              {item.count ? <span className="text-xs text-primary-500">({formatNumber(item.count)})</span> : null}
-              <ArrowRight className="h-3.5 w-3.5" />
-            </a>
-          ))}
+          {items.map((item) =>
+            item.kind === 'link' ? (
+              <a
+                key={item.key}
+                href={item.href}
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-primary-300 hover:text-primary-700"
+              >
+                <TrendingUp className="h-3.5 w-3.5" />
+                <span>{item.title}</span>
+                {item.count ? <span className="text-xs text-slate-400">({formatNumber(item.count)})</span> : null}
+                <ArrowRight className="h-3.5 w-3.5" />
+              </a>
+            ) : (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => onCategory(item.category)}
+                className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-primary-300 hover:text-primary-700"
+              >
+                <TrendingUp className="h-3.5 w-3.5" />
+                <span>{item.title}</span>
+                {item.count ? <span className="text-xs text-slate-400">({formatNumber(item.count)})</span> : null}
+              </button>
+            ),
+          )}
         </div>
       </div>
     </section>
@@ -373,8 +581,7 @@ function CitySightsSection({
   venues: PublicVenueDto[];
   allowFallback?: boolean;
 }) {
-  const fromSights =
-    guide?.sights?.map((item) => ({ name: item.title, desc: item.text })) || [];
+  const fromSights = guide?.sights?.map((item) => ({ name: item.title, desc: item.text })) || [];
   const fromMustSee = guide?.mustSee?.length ? guide.mustSee : [];
   const places = fromSights.length
     ? fromSights
@@ -387,24 +594,24 @@ function CitySightsSection({
   const cityIn = cityInPrepositional(city);
 
   return (
-    <section id="city-sights" className="container-page py-12">
+    <section id="sights" className={`container-page border-b border-slate-100 py-10 ${SECTION_SCROLL_MT}`}>
       <h2 className="text-2xl font-bold text-slate-950">Что посмотреть {cityIn}</h2>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-        Главные точки, с которых удобно начать знакомство с городом. Ниже — билеты, расписание и площадки.
+        Главные точки, с которых удобно начать знакомство с городом.
       </p>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <ol className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {places.slice(0, 6).map((place, index) => (
-          <div key={`${place.name}:${index}`} className="flex gap-4 rounded-lg bg-white p-5 shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition hover:shadow-[0_16px_34px_rgba(15,23,42,0.1)]">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary-100 text-lg font-bold text-primary-600">
+          <li key={`${place.name}:${index}`} className="flex gap-3">
+            <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-primary-50 text-sm font-bold text-primary-700">
               {index + 1}
-            </div>
+            </span>
             <div>
               <h3 className="font-semibold text-slate-950">{place.name}</h3>
               <p className="mt-1 text-sm leading-6 text-slate-500">{place.desc}</p>
             </div>
-          </div>
+          </li>
         ))}
-      </div>
+      </ol>
     </section>
   );
 }
@@ -412,58 +619,20 @@ function CitySightsSection({
 function CityTravelSection({ travel }: { travel?: string }) {
   if (!travel?.trim()) return null;
   return (
-    <section id="city-travel" className="border-t border-slate-100 bg-slate-50/60 py-10">
+    <section id="travel" className={`border-b border-slate-100 bg-slate-50/60 py-10 ${SECTION_SCROLL_MT}`}>
       <div className="container-page max-w-3xl">
         <h2 className="text-2xl font-bold text-slate-950">Как добраться и когда ехать</h2>
         <p className="mt-4 text-sm leading-7 text-slate-600">{travel}</p>
-      </div>
-    </section>
-  );
-}
-
-function CityEditorialFaqSection({ items }: { items?: CityInfoEntry['faq'] }) {
-  if (!items?.length) return null;
-  return (
-    <section id="city-guide-faq" className="border-t border-slate-100 py-10">
-      <div className="container-page max-w-3xl">
-        <h2 className="text-2xl font-bold text-slate-950">Частые вопросы</h2>
-        <div className="mt-6 space-y-5">
-          {items.map((item, index) => (
-            <div key={`${item.q}:${index}`}>
-              <h3 className="text-sm font-semibold text-slate-900">{item.q}</h3>
-              <p className="mt-2 text-sm leading-7 text-slate-600">{item.a}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CategoryTiles({ categories, onSelect }: { categories: Array<[string, number]>; onSelect: (category: string) => void }) {
-  if (!categories.length) return null;
-  return (
-    <section className="bg-slate-50 py-10">
-      <div className="container-page">
-        <div className="grid gap-3 sm:grid-cols-3">
-          {categories.slice(0, 3).map(([name, count]) => (
-            <button
-              key={name}
-              type="button"
-              onClick={() => onSelect(name)}
-              className="flex items-center gap-4 rounded-lg bg-white p-5 text-left shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition hover:bg-primary-50 hover:shadow-[0_16px_34px_rgba(15,23,42,0.1)]"
-            >
-              <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-50 text-primary-700">
-                <Landmark className="h-6 w-6" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="block font-semibold text-slate-950">{name}</span>
-                <span className="mt-1 block text-sm text-slate-500">{pluralEvents(count)}</span>
-              </span>
-              <ArrowRight className="h-5 w-5 text-slate-400" />
-            </button>
-          ))}
-        </div>
+        <a
+          href="#affiche"
+          onClick={(event) => {
+            event.preventDefault();
+            scrollToSection('affiche');
+          }}
+          className="mt-5 inline-flex text-sm font-semibold text-primary-700 hover:text-primary-800"
+        >
+          К афише →
+        </a>
       </div>
     </section>
   );
@@ -477,7 +646,7 @@ function VenueHighlights({ city, venues }: { city: PublicCityDto; venues: Public
   const featured = [...institutions, ...locations].slice(0, 6);
 
   return (
-    <section className="container-page py-10">
+    <section id="venues" className={`container-page border-b border-slate-100 py-10 ${SECTION_SCROLL_MT}`}>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 className="text-2xl font-bold text-slate-950">Площадки и локации</h2>
@@ -486,7 +655,14 @@ function VenueHighlights({ city, venues }: { city: PublicCityDto; venues: Public
           </p>
         </div>
         <div className="flex flex-wrap gap-3 text-sm font-semibold">
-          <a href="#city-schedule" className="text-primary-700 hover:text-primary-800">
+          <a
+            href="#affiche"
+            onClick={(event) => {
+              event.preventDefault();
+              scrollToSection('affiche');
+            }}
+            className="text-primary-700 hover:text-primary-800"
+          >
             Смотреть афишу
           </a>
           {locations.length ? (
@@ -496,52 +672,62 @@ function VenueHighlights({ city, venues }: { city: PublicCityDto; venues: Public
           ) : null}
         </div>
       </div>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="mt-6 divide-y divide-slate-100 border-y border-slate-100">
         {featured.map((venue) => (
-          <a key={venue.id} href={venueHref(venue)} className="rounded-lg bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition hover:bg-primary-50/60 hover:shadow-[0_16px_34px_rgba(15,23,42,0.1)]">
-            <div className="font-semibold text-slate-950">{venue.name}</div>
-            {venue.address ? (
-              <div className="mt-2 flex items-start gap-1 text-sm text-slate-500">
-                <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                <span className="line-clamp-2">{venue.address}</span>
-              </div>
-            ) : (
-              <div className="mt-2 flex items-center gap-1 text-sm text-slate-500">
-                <MapPin className="h-4 w-4" />
-                {pluralEvents(venue.events)}
-              </div>
-            )}
-          </a>
+          <li key={venue.id}>
+            <a
+              href={venueHref(venue)}
+              className="flex flex-col gap-1 py-3.5 transition hover:bg-slate-50/80 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
+            >
+              <span className="font-semibold text-slate-950">{venue.name}</span>
+              <span className="flex items-center gap-1 text-sm text-slate-500">
+                <MapPin className="h-3.5 w-3.5 shrink-0" />
+                {venue.address ? (
+                  <span className="line-clamp-1">{venue.address}</span>
+                ) : (
+                  <span>{pluralEvents(venue.events)}</span>
+                )}
+              </span>
+            </a>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }
 
-function PopularTags({ tags, active, onSelect }: { tags: Array<{ name: string; count: number }>; active: string; onSelect: (tag: string) => void }) {
+function PopularTags({
+  tags,
+  active,
+  onSelect,
+}: {
+  tags: Array<{ name: string; count: number }>;
+  active: string;
+  onSelect: (tag: string) => void;
+}) {
   if (!tags.length) return null;
   return (
-    <section className="container-page py-10">
-      <h3 className="text-lg font-semibold text-slate-950">Популярные теги</h3>
-      <div className="mt-3 flex flex-wrap gap-2">
+    <div className="mb-5">
+      <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">Популярные теги</div>
+      <div className="flex flex-wrap gap-2">
         {tags.map((item) => (
           <button
             key={item.name}
             type="button"
             onClick={() => onSelect(active === item.name ? 'all' : item.name)}
-            className={`inline-flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition ${
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition ${
               active === item.name
                 ? 'border-primary-500 bg-primary-600 text-white'
                 : 'border-slate-200 bg-white text-slate-700 hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700'
             }`}
           >
-            <Tag className="h-3.5 w-3.5" />
+            <Tag className="h-3 w-3" />
             {item.name}
             <span className={active === item.name ? 'text-white/70' : 'text-slate-400'}>({formatNumber(item.count)})</span>
           </button>
         ))}
       </div>
-    </section>
+    </div>
   );
 }
 
@@ -549,36 +735,15 @@ function RecommendedEvents({ city, sessions }: { city: PublicCityDto; sessions: 
   if (!sessions.length) return null;
   const cityIn = cityInPrepositional(city);
   return (
-    <section className="container-page pb-12">
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-slate-950">Рекомендуем {cityIn}</h2>
-          <p className="mt-1 text-sm text-slate-500">События с ближайшими датами, ценой и наполненной карточкой.</p>
-        </div>
-        <a href="#city-schedule" className="hidden text-sm font-semibold text-primary-700 hover:text-primary-800 sm:inline-flex sm:items-center sm:gap-1">
-          Все события <ArrowRight className="h-4 w-4" />
-        </a>
-      </div>
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="mb-8">
+      <h3 className="text-lg font-bold text-slate-950">Стоит внимания {cityIn}</h3>
+      <p className="mt-1 text-sm text-slate-500">Ближайшие даты и наполненные карточки.</p>
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {sessions.map((session) => (
           <EventCard key={session.id} session={session} />
         ))}
       </div>
-    </section>
-  );
-}
-
-function MoreEvents({ sessions }: { sessions: PublicSessionDto[] }) {
-  if (!sessions.length) return null;
-  return (
-    <section className="container-page pb-12">
-      <h2 className="text-xl font-bold text-slate-950">Ещё события</h2>
-      <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {sessions.map((session) => (
-          <EventCard key={session.id} session={session} compact />
-        ))}
-      </div>
-    </section>
+    </div>
   );
 }
 
@@ -597,17 +762,25 @@ function CityCatalogHeader({
   return (
     <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h2 className="text-2xl font-bold text-slate-950">События {cityIn}</h2>
+        <h2 className="text-2xl font-bold text-slate-950">Афиша {cityIn}</h2>
         <p className="mt-1 text-sm leading-6 text-slate-600">
           {pluralEvents(count)} после выбранных фильтров. Для повторяющихся событий карточка объединяет ближайшие слоты.
         </p>
       </div>
-      <div className="inline-flex overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
-        <button type="button" onClick={() => setMode('cards')} className={`inline-flex min-h-10 items-center gap-2 px-4 text-sm font-medium ${mode === 'cards' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}>
+      <div className="hidden overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm sm:inline-flex">
+        <button
+          type="button"
+          onClick={() => setMode('cards')}
+          className={`inline-flex min-h-10 items-center gap-2 px-4 text-sm font-medium ${mode === 'cards' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}
+        >
           <Grid3X3 className="h-4 w-4" />
           Карточки
         </button>
-        <button type="button" onClick={() => setMode('table')} className={`inline-flex min-h-10 items-center gap-2 border-l border-slate-200 px-4 text-sm font-medium ${mode === 'table' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}>
+        <button
+          type="button"
+          onClick={() => setMode('table')}
+          className={`inline-flex min-h-10 items-center gap-2 border-l border-slate-200 px-4 text-sm font-medium ${mode === 'table' ? 'bg-primary-600 text-white' : 'text-slate-600 hover:bg-slate-50'}`}
+        >
           <ListFilter className="h-4 w-4" />
           Таблица
         </button>
@@ -626,17 +799,30 @@ function CategoryFilter(props: {
 }) {
   return (
     <div className="mb-4 flex flex-wrap gap-2">
-      <button type="button" onClick={props.onReset} className={`rounded-full px-3 py-1.5 text-xs font-semibold ${props.active === 'all' && props.activeTag === 'all' ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
+      <button
+        type="button"
+        onClick={props.onReset}
+        className={`rounded-full px-3 py-1.5 text-xs font-semibold ${props.active === 'all' && props.activeTag === 'all' ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+      >
         Все {formatNumber(props.total)}
       </button>
       {props.activeTag !== 'all' ? (
-        <button type="button" onClick={props.onReset} className="inline-flex items-center gap-1 rounded-full bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700 hover:bg-primary-100">
+        <button
+          type="button"
+          onClick={props.onReset}
+          className="inline-flex items-center gap-1 rounded-full bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-700 hover:bg-primary-100"
+        >
           <Search className="h-3.5 w-3.5" />
           {props.activeTag}
         </button>
       ) : null}
       {props.categories.map(([name, count]) => (
-        <button key={name} type="button" onClick={() => props.onCategory(name)} className={`rounded-full px-3 py-1.5 text-xs font-semibold ${props.active === name ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>
+        <button
+          key={name}
+          type="button"
+          onClick={() => props.onCategory(name)}
+          className={`rounded-full px-3 py-1.5 text-xs font-semibold ${props.active === name ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+        >
           {name} {formatNumber(count)}
         </button>
       ))}
@@ -677,7 +863,9 @@ function CityEventsTable({ sessions }: { sessions: PublicSessionDto[] }) {
                 <div className="text-xs text-slate-500">{session.timeLabel}</div>
               </td>
               <td className="min-w-[320px] px-4 py-3">
-                <a href={eventHref(session)} className="font-medium text-slate-950 hover:text-primary-700">{session.title}</a>
+                <a href={eventHref(session)} className="font-medium text-slate-950 hover:text-primary-700">
+                  {session.title}
+                </a>
                 <div className="mt-1 text-xs text-slate-500">{session.tags.slice(0, 2).join(' · ')}</div>
               </td>
               <td className="max-w-[240px] px-4 py-3 text-slate-600">
@@ -706,55 +894,9 @@ function CityEventsTable({ sessions }: { sessions: PublicSessionDto[] }) {
   );
 }
 
-function CityGuideAside({
-  city,
-  stats,
-  categories,
-  landings,
-}: {
-  city: PublicCityDto;
-  stats: PublicCityPageDto['stats'];
-  categories: Array<[string, number]>;
-  landings: PublicLandingDto[];
-}) {
-  return (
-    <>
-      <section className="rounded-lg bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
-        <h3 className="text-sm font-semibold text-slate-950">Как выбрать</h3>
-        <div className="mt-3 grid gap-3 text-sm leading-6 text-slate-600">
-          <p>Сначала выберите сценарий: прогулка, музей, мероприятие или активность.</p>
-          <p>Затем сравните дату, место старта и цену. Для повторяющихся событий смотрите слоты внутри карточки.</p>
-          <p>Покупка открывается в виджете билетной системы, финансовый контур остается на стороне поставщика.</p>
-        </div>
-      </section>
-      <section className="rounded-lg bg-slate-50 p-4">
-        <h3 className="text-sm font-semibold text-slate-950">Коротко о странице</h3>
-        <div className="mt-3 grid gap-2">
-          <HubFact label={city.type === 'region' ? 'Направление' : 'Город'} value={city.name} />
-          <HubFact label="Событий" value={formatNumber(stats.events)} />
-          <HubFact label="Топ-категория" value={categories[0]?.[0] || 'скоро появится'} />
-        </div>
-      </section>
-      {landings.length ? (
-        <section className="rounded-lg bg-white p-4 shadow-[0_10px_28px_rgba(15,23,42,0.06)]">
-          <h3 className="text-sm font-semibold text-slate-950">Подборки</h3>
-          <div className="mt-3 grid gap-3">
-            {landings.slice(0, 6).map((landing) => (
-              <a key={landing.slug} href={landingPageHref(landing.slug)} className="rounded-lg bg-slate-50 p-3 transition hover:bg-primary-50/70">
-                <div className="text-sm font-semibold text-slate-950">{landing.title}</div>
-                <div className="mt-1 text-xs text-slate-500">{formatNumber(landing.events)} событий · {formatMoney(landing.priceFrom)}</div>
-              </a>
-            ))}
-          </div>
-        </section>
-      ) : null}
-    </>
-  );
-}
-
 function CitySeoTextSection({ cityName, text }: { cityName: string; text: string }) {
   return (
-    <section id="city-seo" className="border-t border-slate-100 bg-slate-50/70 py-12">
+    <section id="seo" className={`border-t border-slate-100 bg-slate-50/70 py-12 ${SECTION_SCROLL_MT}`}>
       <div className="container-page max-w-3xl">
         <h2 className="text-2xl font-bold text-slate-900">Афиша {cityName}</h2>
         <p className="mt-4 text-sm leading-7 text-slate-600">{text}</p>
@@ -764,45 +906,37 @@ function CitySeoTextSection({ cityName, text }: { cityName: string; text: string
 }
 
 function CityFaqSection({ cityName, items }: { cityName: string; items: CityFaqItem[] }) {
+  const [openIndex, setOpenIndex] = React.useState<number | null>(0);
+
   return (
-    <section id="faq" className="border-t border-slate-100 py-12">
+    <section id="faq" className={`border-t border-slate-100 py-12 ${SECTION_SCROLL_MT}`}>
       <div className="container-page">
         <h2 className="mb-2 text-center text-2xl font-bold text-slate-900 md:text-3xl">Частые вопросы</h2>
-        <p className="mb-10 text-center text-slate-600">Ответы о билетах и афише {cityName}</p>
+        <p className="mb-8 text-center text-slate-600">Ответы о городе и афише {cityName}</p>
         <div className="mx-auto max-w-3xl space-y-2">
-          {items.map((item, index) => (
-            <details
-              key={`${item.question}:${index}`}
-              className="group rounded-xl border border-slate-200 bg-white transition-colors hover:border-slate-300"
-            >
-              <summary className="flex cursor-pointer list-none select-none items-center justify-between gap-3 p-4 text-left text-sm font-medium text-slate-900">
-                <span className="pr-2">{item.question}</span>
-                <span className="shrink-0 text-slate-400 transition-transform group-open:rotate-180">▾</span>
-              </summary>
-              <div className="px-4 pb-4 text-sm leading-relaxed text-slate-600">{item.answer}</div>
-            </details>
-          ))}
+          {items.map((item, index) => {
+            const open = openIndex === index;
+            return (
+              <div
+                key={`${item.question}:${index}`}
+                className="rounded-xl border border-slate-200 bg-white transition-colors hover:border-slate-300"
+              >
+                <button
+                  type="button"
+                  aria-expanded={open}
+                  onClick={() => setOpenIndex(open ? null : index)}
+                  className="flex w-full cursor-pointer items-center justify-between gap-3 p-4 text-left text-sm font-medium text-slate-900"
+                >
+                  <span className="pr-2">{item.question}</span>
+                  <span className={`shrink-0 text-slate-400 transition-transform ${open ? 'rotate-180' : ''}`}>▾</span>
+                </button>
+                {open ? <div className="px-4 pb-4 text-sm leading-relaxed text-slate-600">{item.answer}</div> : null}
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
-  );
-}
-
-function HubFact({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg bg-white p-3">
-      <div className="text-xs font-medium text-slate-500">{label}</div>
-      <div className="mt-1 text-sm font-semibold text-slate-950">{value}</div>
-    </div>
-  );
-}
-
-function HeroStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg bg-white/12 p-4">
-      <div className="text-xs font-medium uppercase text-white/60">{label}</div>
-      <div className="mt-1 text-xl font-bold text-white">{value}</div>
-    </div>
   );
 }
 
@@ -823,6 +957,45 @@ function EmptyState() {
 
 function cityGuideFor(city: PublicCityDto) {
   return resolveCityInfo(city.slug, city.sourceSlug);
+}
+
+function mergeCityFaqItems(
+  editorial: CityInfoEntry['faq'] | undefined,
+  generated: CityFaqItem[],
+): CityFaqItem[] {
+  const items: CityFaqItem[] = [];
+  const seen = new Set<string>();
+
+  for (const item of editorial || []) {
+    const question = item.q.trim();
+    const key = question.toLowerCase();
+    if (!question || seen.has(key)) continue;
+    seen.add(key);
+    items.push({ question, answer: item.a });
+  }
+
+  for (const item of generated) {
+    const question = item.question.trim();
+    const key = question.toLowerCase();
+    if (!question || seen.has(key)) continue;
+    seen.add(key);
+    items.push(item);
+  }
+
+  return items;
+}
+
+function matchesCityDateFilter(session: PublicSessionDto, filter: DateFilter): boolean {
+  if (filter === 'all') return true;
+  if (isOpenDate(session)) return true;
+  const timeZone = resolveSessionTimeZoneForSession(session);
+  const times = collectSessionStartsAtTimes(session);
+  if (!times.length) return false;
+  return times.some((startsAt) => {
+    if (filter === 'today') return isSameSessionDay(startsAt, new Date(), timeZone);
+    if (filter === 'weekend') return isSessionWeekend(startsAt, timeZone);
+    return true;
+  });
 }
 
 function buildFallbackMustSee(city: PublicCityDto, categories: Array<[string, number]>, venues: PublicVenueDto[]) {
@@ -892,8 +1065,16 @@ function cityInPrepositional(city: PublicCityDto) {
   return inCityPrepositional(name);
 }
 
-function scrollToSchedule() {
-  window.setTimeout(() => document.querySelector('#city-schedule')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 0);
+function resolveSectionId(hash: string): string {
+  const raw = hash.replace(/^#/, '');
+  return CITY_HASH_ALIASES[raw] || raw;
+}
+
+function scrollToSection(id: string) {
+  const targetId = resolveSectionId(id);
+  window.setTimeout(() => {
+    document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 0);
 }
 
 function navigateHome(section: string) {
@@ -918,21 +1099,4 @@ function navigateHome(section: string) {
     return;
   }
   window.location.href = `/#${section}`;
-}
-
-function applyCityMeta(payload: PublicCityPageDto) {
-  const cityIn = cityInPrepositional(payload.city);
-  document.title = payload.city.seoTitle || buildCityHubSeoTitle(payload.city.name);
-  upsertMeta('description', payload.city.seoDescription || `Афиша событий, экскурсии, музеи и билеты ${cityIn}.`);
-  // robots задаётся в generateMetadata (SSR); клиент не перезаписывает noindex thin-страниц
-}
-
-function upsertMeta(name: string, content: string) {
-  let element = document.querySelector<HTMLMetaElement>(`meta[name="${name}"]`);
-  if (!element) {
-    element = document.createElement('meta');
-    element.name = name;
-    document.head.appendChild(element);
-  }
-  element.content = content;
 }

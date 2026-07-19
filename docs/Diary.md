@@ -1,3 +1,24 @@
+## 2026-07-19 — City hub фаза 1 (P.2f) реализована
+
+### Наблюдения
+
+- Wireframe v1 закрыт кодом в `CityPageView`: порядок Hero → sticky tabs → `#affiche` → `#directions` → `#venues` → `#travel` → `#sights` → `#faq` → `#seo`.
+- Lovable-репо не портировали — только IA/UX выводы (афиша выше гида, один FAQ accordion, компактные счётчики).
+
+### Решения
+
+- Sticky tabs + IntersectionObserver scrollspy; mobile horizontal chips.
+- Чипы **Сегодня / Выходные** через `datetime` TZ helpers (как на event/landing).
+- FAQ: editorial `cityInfo.faq` + generated `faqItems` в одном accordion (one-open).
+- Alias `#city-schedule` → `#affiche` (и старые `#city-*` якоря); `cityEventsHref` → `#affiche`.
+- P.2f ✅; deploy prod после push `feat/next-monorepo`.
+
+### Проблемы
+
+- Нет (smoke после deploy: `/cities/sankt-peterburg` или `/cities/saint-petersburg`).
+
+---
+
 ## 2026-07-19 — City SEO title: именительный + дата «сегодня»
 
 ### Наблюдения
@@ -18,6 +39,7 @@
 ---
 
 ## 2026-07-19 — City hub wireframe v2 (фаза 2, city-specific)
+
 
 ### Наблюдения
 

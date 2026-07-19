@@ -204,18 +204,18 @@ flowchart TB
 - [x] Wireframe v1 записан и согласован (этот файл)
 - [ ] Ссылка на файл в Tasktracker / Diary
 
-### Реализация (фаза 1 code — отдельно, после wireframe)
+### Реализация (фаза 1 code)
 
-- [ ] Порядок секций: hero → sticky tabs → **affiche раньше гида**
-- [ ] Якоря `#affiche`, `#directions`, `#venues`, `#travel`, `#sights`, `#faq` (+ aliases старых hash)
-- [ ] Sticky tabs работают desktop + mobile; пустые секции не в табах
-- [ ] Чипы Сегодня / Выходные фильтруют sessions корректно по TZ
-- [ ] FAQ — один accordion; без двойного FAQ-блока
-- [ ] Счётчики компактные; hero без clutter
-- [ ] Locative + SEO «на сегодня» без регрессии
-- [ ] Светлая сетка; нет purple AI look; cards только у interactive (event cards, filters)
-- [ ] Smoke: ≥2 slug (напр. `murmansk`, `moscow`) — View Source + scrollspy + фильтры
-- [ ] Внешние ссылки блога на `#city-schedule` по-прежнему скроллят к афише
+- [x] Порядок секций: hero → sticky tabs → **affiche раньше гида**
+- [x] Якоря `#affiche`, `#directions`, `#venues`, `#travel`, `#sights`, `#faq` (+ aliases старых hash)
+- [x] Sticky tabs работают desktop + mobile; пустые секции не в табах
+- [x] Чипы Сегодня / Выходные фильтруют sessions корректно по TZ
+- [x] FAQ — один accordion; без двойного FAQ-блока
+- [x] Счётчики компактные; hero без clutter
+- [x] Locative + SEO «на сегодня» без регрессии
+- [x] Светлая сетка; нет purple AI look; cards только у interactive (event cards, filters)
+- [ ] Smoke: ≥2 slug (напр. `murmansk`, `moscow`) — View Source + scrollspy + фильтры (после deploy)
+- [x] Внешние ссылки блога на `#city-schedule` по-прежнему скроллят к афише
 
 ---
 
