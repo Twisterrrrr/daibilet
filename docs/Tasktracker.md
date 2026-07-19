@@ -32,7 +32,7 @@
 | G.3 | Expand standaloneCities адмцентрами с saleable | Высокий | ✅ |
 | G.4 | Expand cityToRegion для не-адмцентров (Тольятти, Сортавала, …) | Высокий | ✅ |
 | G.5 | Docs + prod deploy geo | Критический | ✅ `6f0fcf7` prod |
-| G.6 | Хвост allowlist 63 → cityToRegion; зарубежье (`foreignCities`: Батуми, Осака) | Высокий | 🔄 commit+deploy |
+| G.6 | Хвост allowlist 63 → cityToRegion; зарубежье (`foreignCities`: Батуми, Осака) | Высокий | ✅ `a63d612` prod (HEAD `c312095`) |
 
 См. [Project.md](./Project.md) § allowlist, [geo-excluded-cities.md](./geo-excluded-cities.md), Diary 2026-07-19.
 

@@ -70,6 +70,7 @@
 - Хвост 63: **59** → субъект через `cityToRegion`; **Зеленоград/Щербинка→Москва**, **Пушкин→Санкт-Петербург**; **Батуми** cut; без маппинга — **0**.
 - `standaloneCities` не трогали (мелкие не добавляли). REGION_HUBS расширен под новые субъекты с уже существующими центрами.
 - Docs: `geo-excluded-cities.md`, Tasktracker G.6.
+- **Prod:** deploy-prod-next OK. Proof: `foreignCities`=[Батуми,Осака]; destinations city=65 region=36; foreign not in dest; Batumi search items=0; МО/ЛО/Краснодар/Ростов/Башкортостан/Челябинск/Ставрополь/Воронеж — есть.
 
 ### Проблемы
 
