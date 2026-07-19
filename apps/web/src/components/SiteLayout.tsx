@@ -17,15 +17,21 @@ export async function SiteLayout({ children }: { children: React.ReactNode }) {
     // SSR/build without DB — footer city links stay empty until runtime with DB.
   }
 
+  // Keep page body in Suspense fallback — SelectedCityProvider uses useSearchParams and
+  // would otherwise replace the whole shell (including home/catalog) with an empty spacer.
+  const shell = (header: React.ReactNode) => (
+    <div className="flex min-h-screen flex-col bg-background">
+      {header}
+      <main className="flex-1">{children}</main>
+      <SiteFooter destinations={destinations} />
+    </div>
+  );
+
   return (
     <SiteProviders>
-      <Suspense fallback={<div aria-hidden="true" className="site-header-spacer" />}>
+      <Suspense fallback={shell(<div aria-hidden="true" className="site-header-spacer" />)}>
         <SelectedCityProvider destinations={destinations}>
-          <div className="flex min-h-screen flex-col bg-background">
-            <SiteHeader destinations={destinations} />
-            <main className="flex-1">{children}</main>
-            <SiteFooter destinations={destinations} />
-          </div>
+          {shell(<SiteHeader destinations={destinations} />)}
         </SelectedCityProvider>
       </Suspense>
     </SiteProviders>

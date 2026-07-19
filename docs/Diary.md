@@ -34,7 +34,7 @@
 
 ### Проблемы
 
-- Правки SiteLayout/CatalogShell в worktree ещё требуют web rebuild на prod (сейчас хватает API hotfix + cache bust).
+- SiteLayout/CatalogShell/`Promise.allSettled` закоммичены в `feat/next-monorepo` — нужен web rebuild на prod при следующем deploy.
 - Не деплоить поверх активного favicon-агента без координации.
 
 ---

@@ -30,9 +30,9 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
   const urlSearchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
   const urlHasCity = Boolean(urlSearchParams.get('city')?.trim());
-  // Trust SSR catalog only when URL already has city — otherwise first paint would be «all cities».
-  const [catalog, setCatalog] = useState<PublicCatalogDto | null>(() => (urlHasCity ? initialCatalog : null));
-  const [loading, setLoading] = useState(() => !(urlHasCity && initialCatalog));
+  // Keep SSR catalog visible during city bootstrap; only refetch when injected city differs.
+  const [catalog, setCatalog] = useState<PublicCatalogDto | null>(() => initialCatalog);
+  const [loading, setLoading] = useState(() => !initialCatalog);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewModeState] = useState<CatalogViewMode>('cards');
 
@@ -92,8 +92,8 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   useEffect(() => {
     if (cityBootstrapPending) {
-      setLoading(true);
-      setCatalog(null);
+      // Keep SSR cards while resolving stored city — only mark loading if we have nothing yet.
+      if (!catalog) setLoading(true);
       return;
     }
 
@@ -198,7 +198,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         />
       </div>
 
-      {(loading && !catalog) || cityBootstrapPending ? (
+      {(loading && !catalog) || (cityBootstrapPending && !catalog) ? (
         <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, index) => (
             <div key={index} className="h-72 animate-pulse rounded-xl bg-slate-100" />

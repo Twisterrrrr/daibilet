@@ -55,13 +55,13 @@ function emptyHomePageData(): HomePageData {
 
 export const getHomeDestinations = unstable_cache(
   () => buildPublicDestinationsDto(),
-  ['home-destinations-v2'],
+  ['home-destinations-v3-statsfix'],
   homeCacheOptions,
 );
 
 export const getHomeCatalog = unstable_cache(
   () => buildPublicCatalogDto({ limit: 50, sort: 'popular' }),
-  ['home-catalog-v3'],
+  ['home-catalog-v4-statsfix'],
   homeCacheOptions,
 );
 
@@ -79,22 +79,28 @@ export const getHomeVenues = unstable_cache(
 
 export const getHomeStats = unstable_cache(
   () => buildPublicStatsDto(),
-  ['home-stats-v1'],
+  ['home-stats-v2-statsfix'],
   homeCacheOptions,
 );
 
-/** Build/CI without Postgres: empty payloads (same pattern as SiteLayout destinations catch). */
+/** Partial failure (e.g. stats) must not wipe the whole home — use allSettled + empty fallbacks. */
 export async function getHomePageData(): Promise<HomePageData> {
-  try {
-    const [destinationsPayload, catalogPayload, landingsCatalog, venuesPayload, statsPayload] = await Promise.all([
+  const empty = emptyHomePageData();
+  const [destinationsResult, catalogResult, landingsResult, venuesResult, statsResult] =
+    await Promise.allSettled([
       getHomeDestinations(),
       getHomeCatalog(),
       getHomeLandings(),
       getHomeVenues(),
       getHomeStats(),
     ]);
-    return { destinationsPayload, catalogPayload, landingsCatalog, venuesPayload, statsPayload };
-  } catch {
-    return emptyHomePageData();
-  }
+
+  return {
+    destinationsPayload:
+      destinationsResult.status === 'fulfilled' ? destinationsResult.value : empty.destinationsPayload,
+    catalogPayload: catalogResult.status === 'fulfilled' ? catalogResult.value : empty.catalogPayload,
+    landingsCatalog: landingsResult.status === 'fulfilled' ? landingsResult.value : empty.landingsCatalog,
+    venuesPayload: venuesResult.status === 'fulfilled' ? venuesResult.value : empty.venuesPayload,
+    statsPayload: statsResult.status === 'fulfilled' ? statsResult.value : empty.statsPayload,
+  };
 }
