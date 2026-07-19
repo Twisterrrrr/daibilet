@@ -56,10 +56,14 @@ const SORT_OPTIONS: Array<[SortMode, string]> = [
 ];
 
 const CATEGORY_EMOJI: Record<string, string> = {
-  Экскурсии: '🚶',
+  Экскурсии: '🚌',
+  'Музеи и арт': '🏛',
   Музеи: '🏛',
   Мероприятия: '🎭',
-  'Активный отдых': '⚡',
+  Развлечения: '🎡',
+  'Активный отдых': '🏃',
+  Речные: '⛴️',
+  'Речные прогулки': '⛴️',
   Выставки: '🖼',
   Театры: '🎪',
   Концерты: '🎵',
@@ -67,7 +71,8 @@ const CATEGORY_EMOJI: Record<string, string> = {
 };
 
 function categoryEmoji(name: string): string {
-  return CATEGORY_EMOJI[name] || '🎫';
+  const key = String(name || '').trim();
+  return CATEGORY_EMOJI[key] || '✨';
 }
 
 const CATALOG_PAGE_SIZES = [100, 200, 300] as const;

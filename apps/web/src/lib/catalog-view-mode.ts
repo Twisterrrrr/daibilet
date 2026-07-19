@@ -25,13 +25,23 @@ export function storeCatalogViewMode(mode: CatalogViewMode) {
   }
 }
 
+/** Пиктограммы чипов категорий каталога — уникальные на каждую топ-категорию. */
 const CATEGORY_EMOJI: Record<string, string> = {
   Экскурсии: '🚌',
+  'Музеи и арт': '🏛',
+  Музеи: '🏛',
+  Мероприятия: '🎭',
+  Развлечения: '🎡',
+  'Активный отдых': '🏃',
   Речные: '⛴️',
+  'Речные прогулки': '⛴️',
   Концерты: '🎵',
+  Выставки: '🖼',
+  Театры: '🎪',
   Детям: '🧒',
 };
 
 export function categoryEmoji(name: string): string {
-  return CATEGORY_EMOJI[name] || '🎫';
+  const key = String(name || '').trim();
+  return CATEGORY_EMOJI[key] || '✨';
 }
