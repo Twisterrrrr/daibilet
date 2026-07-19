@@ -1,3 +1,24 @@
+## 2026-07-19 — City hub wireframe v2 (фаза 2, city-specific)
+
+### Наблюдения
+
+- Риск фазы 2: один UI на 65 хабов без fingerprint — копипаста направлений и CTA.
+- Фаза 1 (v1) закрывает каркас: афиша выше, sticky, FAQ accordion, чипы Сегодня/Выходные.
+- Продукт фазы 2: плитки направлений, усиление афиши, sights→афиша только при реальной привязке, venues топ-N без карты. Фаза 3 (погода/мосты, bento, карта, dark СПб) — вне scope.
+
+### Решения
+
+- Зафиксирован IA: [city-hub-wireframe-v2.md](./city-hub-wireframe-v2.md) — принцип city-specific (общий каркас + per-city конфиг).
+- Конфиг-идея: `featuredDirections[]`, `highlightSeason`, `hideSections?`, `primaryCta?` (расширение `cityInfo` или соседний `cityHubConfig`; без кода).
+- Fingerprint-примеры: СПб, Сочи, Казань, Мурманск, Москва.
+- P.2g wireframe ✅; P.2h реализация ⏳. Docs only, без deploy.
+
+### Проблемы
+
+- Нет (ожидает code-task P.2h после/внахлёст с P.2f).
+
+---
+
 ## 2026-07-19 — City hub wireframe v1 (фаза 1)
 
 ### Наблюдения
