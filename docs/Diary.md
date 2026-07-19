@@ -1697,3 +1697,16 @@
 - После смены env нужен **один** restart daibilet-api (не пачкой).
 - Первые минуты после отключения startup public warm — cold cache до первого трафика / post-sync warm.
 
+
+## 2026-07-19 — Prod: битый .next mid-deploy + cleanDisplayText
+
+### Наблюдения
+- После фикса cleanDisplayText параллельный deploy оставил .next без prerender-manifest.json → daibilet-web crash-loop, сайт 502 / Application error.
+- Статика /_next/static через proxy на Node: при down Next → 502 на chunks.
+
+### Решения
+- systemctl stop → m -rf apps/web/.next → pnpm web:build → start; /events 200, journal без cleanDisplayText.
+
+### Проблемы
+- Нельзя параллелить два deploy-prod-next на одном хосте.
+

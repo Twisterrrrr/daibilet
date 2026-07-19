@@ -11,9 +11,9 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| E.1 | Description: списки `✅` / `•` / `-` → `<ul><li>` + sanitize | Высокий | ✅ 2026-07-19 @18e5f8f prod proof seks-v-sssr |
+| E.1 | Description: списки `✅` / `•` / `-` → `<ul><li>` + sanitize | Высокий | ✅ 2026-07-19 @38e8d12 prod proof seks-v-sssr |
 | E.2 | Unit-тесты обоих кейсов (checkmark + организационные детали) | Высокий | ✅ |
-| E.3 | Prod: `ReferenceError: cleanDisplayText is not defined` (re-export без local import в `event-page-utils`) | Критический | 🔄 fix → commit+deploy |
+| E.3 | Prod: `ReferenceError: cleanDisplayText is not defined` (re-export без local import в `event-page-utils`) | Критический | ✅ 7cdd4cf + rebuild 38e8d12 |
 
 ---
 
