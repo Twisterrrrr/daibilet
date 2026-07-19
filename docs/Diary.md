@@ -1,3 +1,23 @@
+## 2026-07-19 — City hub: без подзаголовка выдачи, chips в одну строку, без «Стоит внимания»
+
+### Наблюдения
+
+- Подзаголовок афиши («N событий в текущей выдаче. Повторяющиеся…») шумел под H2.
+- Date chips и category chips шли двумя рядами на desktop.
+- Блок «Стоит внимания в {городе}» дублировал те же карточки, что и основная афиша (Мурманск: Света + Мираж дважды).
+
+### Решения
+
+- Убран подзаголовок в `CityCatalogHeader` (default + editorial).
+- Date + category chips: общий ряд `flex-wrap` / `md:flex-nowrap` (+ horizontal scroll на desktop при переполнении).
+- С хаба снят `RecommendedEvents` / `rankRecommended` — афиша `#affiche` единственный список карточек.
+
+### Проблемы
+
+- Deploy/proof — после push `feat/next-monorepo` (поверх `721bf10` chip counts).
+
+---
+
 ## 2026-07-19 — City hub: согласованные счётчики чипов (48 vs 635)
 
 ### Наблюдения

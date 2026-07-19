@@ -133,7 +133,6 @@ export function CityPageView({
     return Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
   }, [payload]);
   const guide = city ? cityGuideFor(city) : null;
-  const recommended = payload ? rankRecommended(payload.sessions).slice(0, 6) : [];
   const unifiedFaq = React.useMemo(() => mergeCityFaqItems(guide?.faq, faqItems), [faqItems, guide?.faq]);
 
   const hasDirections = Boolean(
@@ -195,15 +194,13 @@ export function CityPageView({
             >
               <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
                 <CityCatalogHeader
-                  city={city}
-                  count={sessions.length}
                   mode={mode}
                   setMode={setMode}
                   editorial={editorial}
                 />
-                <DateFilterChips active={dateFilter} onSelect={setDateFilter} editorial={editorial} />
-                {contentReady ? (
-                  <>
+                <div className="mb-5 flex flex-wrap items-center gap-1.5 md:flex-nowrap md:overflow-x-auto md:pb-0.5">
+                  <DateFilterChips active={dateFilter} onSelect={setDateFilter} editorial={editorial} />
+                  {contentReady ? (
                     <CategoryFilter
                       categories={categories}
                       active={category}
@@ -215,15 +212,14 @@ export function CityPageView({
                         setDateFilter('all');
                       }}
                     />
-                    {dateFilter === 'all' && category === 'all' ? (
-                      <RecommendedEvents city={city} sessions={recommended} editorial={editorial} />
-                    ) : null}
-                    {mode === 'table' ? (
-                      <CityEventsTable sessions={sessions} />
-                    ) : (
-                      <CityEventsGrid sessions={sessions} editorial={editorial} />
-                    )}
-                  </>
+                  ) : null}
+                </div>
+                {contentReady ? (
+                  mode === 'table' ? (
+                    <CityEventsTable sessions={sessions} />
+                  ) : (
+                    <CityEventsGrid sessions={sessions} editorial={editorial} />
+                  )
                 ) : (
                   <CityScheduleLoadingState />
                 )}
@@ -580,7 +576,7 @@ function DateFilterChips({
   ];
 
   return (
-    <div className="mb-3 flex flex-wrap gap-1.5">
+    <div className="flex shrink-0 flex-wrap gap-1.5 md:flex-nowrap">
       {chips.map((chip) => {
         const isActive = active === chip.value;
         return (
@@ -949,58 +945,11 @@ function VenueHighlights({
   );
 }
 
-function RecommendedEvents({
-  city,
-  sessions,
-  editorial = false,
-}: {
-  city: PublicCityDto;
-  sessions: PublicSessionDto[];
-  editorial?: boolean;
-}) {
-  if (!sessions.length) return null;
-  const cityIn = cityInPrepositional(city);
-  return (
-    <div className="mb-8">
-      <h3
-        className={
-          editorial
-            ? 'font-serif text-2xl font-semibold text-zinc-950'
-            : 'text-lg font-bold text-slate-950'
-        }
-      >
-        Стоит внимания {cityIn}
-      </h3>
-      <p className={`mt-1 text-sm ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
-        Ближайшие даты и наполненные карточки.
-      </p>
-      <div
-        className={
-          editorial
-            ? 'mt-5 grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-3'
-            : 'mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3'
-        }
-      >
-        {sessions.map((session) =>
-          editorial ? (
-            <AffichePosterCard key={session.id} session={session} />
-          ) : (
-            <EventCard key={session.id} session={session} />
-          ),
-        )}
-      </div>
-    </div>
-  );
-}
-
 function CityCatalogHeader({
-  count,
   mode,
   setMode,
   editorial = false,
 }: {
-  city: PublicCityDto;
-  count: number;
   mode: ViewMode;
   setMode: (mode: ViewMode) => void;
   editorial?: boolean;
@@ -1017,9 +966,6 @@ function CityCatalogHeader({
         >
           Ближайшие события
         </h2>
-        <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-          {pluralEvents(count)} в текущей выдаче. Повторяющиеся события объединены в одну карточку.
-        </p>
       </div>
       <div
         className={`hidden overflow-hidden rounded-lg shadow-sm sm:inline-flex ${
@@ -1076,7 +1022,7 @@ function CategoryFilter(props: {
   const editorial = props.editorial;
   const activeAll = props.active === 'all';
   return (
-    <div className="mb-5 flex flex-wrap gap-1.5">
+    <div className="flex min-w-0 flex-wrap gap-1.5 md:flex-nowrap">
       <button
         type="button"
         onClick={props.onReset}
@@ -1094,7 +1040,7 @@ function CategoryFilter(props: {
             key={name}
             type="button"
             onClick={() => props.onCategory(name)}
-            className={hubFilterChipClass(isActive, editorial)}
+            className={`shrink-0 ${hubFilterChipClass(isActive, editorial)}`}
           >
             {name}
             {isActive ? (
@@ -1409,24 +1355,6 @@ function buildFallbackMustSee(city: PublicCityDto, categories: Array<[string, nu
     desc: `${pluralEvents(venue.events)} на странице площадки. Проверьте расписание, цену и ближайшие даты.`,
   }));
   return [...categoryPlaces, ...venuePlaces];
-}
-
-function rankRecommended(sessions: PublicSessionDto[]) {
-  return [...sessions].sort((a, b) => {
-    const scoreDiff = sessionQualityScore(b) - sessionQualityScore(a);
-    if (scoreDiff) return scoreDiff;
-    return new Date(a.startsAt || 0).getTime() - new Date(b.startsAt || 0).getTime();
-  });
-}
-
-function sessionQualityScore(session: PublicSessionDto) {
-  let score = 0;
-  if (session.imageUrl) score += 3;
-  if (session.priceFrom) score += 3;
-  if (session.purchaseUrl || session.widgetUrl || session.deeplinkUrl) score += 2;
-  if (session.tags.length) score += 1;
-  if ((session.sessionCount || 0) > 1) score += 1;
-  return score;
 }
 
 function pluralEvents(n: number): string {
