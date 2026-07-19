@@ -181,10 +181,10 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| 1.3.1 | FAQ block (редакционный / из payload) | Высокий | ⏳ |
-| 1.3.2 | SEO text block (intro + перелинковка) | Высокий | ⏳ |
-| 1.3.3 | SSR JSON-LD: `FAQPage` | Высокий | ⏳ |
-| 1.3.4 | SSR JSON-LD: `BreadcrumbList` | Средний | ⏳ |
+| 1.3.1 | FAQ block (редакционный / из payload) | Высокий | ✅ 2026-07-19 |
+| 1.3.2 | SEO text block (intro + перелинковка) | Высокий | ✅ 2026-07-19 |
+| 1.3.3 | SSR JSON-LD: `FAQPage` | Высокий | ✅ 2026-07-19 |
+| 1.3.4 | SSR JSON-LD: `BreadcrumbList` | Средний | ✅ 2026-07-19 |
 | 1.3.5 | Hero, categories, venues, events grid | — | ✅ |
 | 1.3.6 | `generateMetadata` | — | ✅ |
 
@@ -220,7 +220,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 |---|--------|-----------|--------|
 | 2.2.1 | Shared helper `lib/structured-data.ts` | Высокий | ✅ |
 | 2.2.2 | Event page LD+JSON в RSC (View Source) | Высокий | ✅ |
-| 2.2.3 | City page LD+JSON в RSC | Высокий | ⏳ |
+| 2.2.3 | City page LD+JSON в RSC | Высокий | ✅ 2026-07-19 |
 | 2.2.4 | Venue page LD+JSON | Средний | ⏳ |
 | 2.2.5 | Google Rich Results / validator smoke | Низкий | ⏳ |
 | 2.2.6 | Root WebSite/Organization JSON-LD + Google favicon PNG (48/96/192) | Высокий | ✅ 2026-07-19 deploy prod |
@@ -234,7 +234,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | 2.3.1 | www → non-www (nginx) audit | Средний | ⏳ |
-| 2.3.2 | `noindex` для thin city/venue | Средний | ⏳ |
+| 2.3.2 | `noindex` для thin city/venue | Средний | ✅ 2026-07-19 |
 | 2.3.3 | staging `noindex` | — | ✅ |
 
 ### 2.4 Blog / content ops

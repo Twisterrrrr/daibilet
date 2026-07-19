@@ -1,3 +1,26 @@
+## 2026-07-19 — City FAQ + thin noindex (пункт 5)
+
+### Наблюдения
+
+- City page имел hero/catalog, но без FAQ/SEO text и без SSR JSON-LD; `generateMetadata` всегда indexable.
+- В каталоге есть thin-города (1–2 события: `abakan`, `orel`, `pskov`) рядом с толстыми (`moskva` ~668, `sankt-peterburg` ~826).
+- Пустой FAQPage на thin-странице вреден для SEO.
+
+### Решения
+
+- `hub-indexability.ts`: city thin если `events < 3` (и не strong); venue thin если `events < 1` или `isIndexable === false`.
+- Strong cities whitelist (`moskva`/`sankt-peterburg`/крупные хабы) всегда indexable.
+- City FAQ + SEO text только для indexable; SSR `FAQPage` + `BreadcrumbList`; metadata `robots: noindex,follow` для thin.
+- Sitemap cities/venues фильтрует thin.
+- Venue detail тоже `robots` + BreadcrumbList SSR.
+
+### Проблемы
+
+- Proof: толстый `/cities/moskva` — FAQPage в HTML; thin `/cities/abakan` — `noindex, follow`.
+- Очередь пунктов 1–5 закрыта.
+
+---
+
 ## 2026-07-19 — Sitemap index + chunks / robots (пункт 4)
 
 ### Наблюдения
@@ -16,7 +39,7 @@
 
 ### Проблемы
 
-- City FAQ (пункт 5) не начинали.
+- City FAQ (пункт 5) закрыт отдельной записью выше.
 - **Proof prod** (deploy `4282895`): `/robots.txt`, `/sitemap.xml` (sitemapindex), `/sitemaps/{static,events,cities,venues,landings,blog}.xml` — все **200**; events chunk ~2394 URL.
 
 ---

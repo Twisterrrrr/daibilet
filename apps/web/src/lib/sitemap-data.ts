@@ -5,6 +5,7 @@ import {
   getPublicCatalogSessions,
 } from '@daibilet/backend/public-read';
 
+import { evaluateCityIndexability, evaluateVenueIndexability } from '@/lib/hub-indexability';
 import {
   CITY_LANDING_PATH_BY_SLUG,
   DEFAULT_CITY_BY_LANDING_SLUG,
@@ -102,7 +103,14 @@ export async function buildEventsSitemapEntries(now = new Date()): Promise<Sitem
 export async function buildCitiesSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
   const destinationsPayload = await buildPublicDestinationsDto();
   return (destinationsPayload?.destinations || [])
-    .filter((destination) => destination.type === 'city' && destination.slug)
+    .filter((destination) => {
+      if (destination.type !== 'city' || !destination.slug) return false;
+      return evaluateCityIndexability({
+        events: destination.events,
+        slug: destination.slug,
+        sourceSlug: destination.sourceSlug,
+      }).indexable;
+    })
     .map((destination) =>
       entry(`/cities/${encodeURIComponent(String(destination.slug))}`, now, 'daily', 0.75),
     );
@@ -111,7 +119,13 @@ export async function buildCitiesSitemapEntries(now = new Date()): Promise<Sitem
 export async function buildVenuesSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
   const venuesPayload = await buildPublicVenuesDto(new URLSearchParams(`limit=${MAX_VENUES}`));
   return (venuesPayload?.venues || [])
-    .filter((venue) => venue.isIndexable !== false && venue.slug)
+    .filter((venue) => {
+      if (!venue.slug) return false;
+      return evaluateVenueIndexability({
+        events: venue.events,
+        isIndexable: venue.isIndexable,
+      }).indexable;
+    })
     .slice(0, MAX_VENUES)
     .map((venue) => entry(`/venues/${encodeURIComponent(String(venue.slug))}`, now, 'weekly', 0.6));
 }

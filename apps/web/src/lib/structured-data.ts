@@ -1,7 +1,14 @@
-import type { PublicEventDto, PublicEventPageDto } from '@daibilet/contracts/public';
+import type {
+  PublicCityPageDto,
+  PublicEventDto,
+  PublicEventPageDto,
+  PublicVenuePageDto,
+} from '@daibilet/contracts/public';
 
+import { buildCityFaqItems, type CityFaqItem } from '@/lib/city-faq';
 import { getTicketPriceRange, isFlexibleScheduleSession } from '@/lib/event-page-utils';
-import { cityHref, eventHref } from '@/lib/routes';
+import { evaluateCityIndexability } from '@/lib/hub-indexability';
+import { cityHref, eventHref, venueHref } from '@/lib/routes';
 import { absoluteUrl } from '@/lib/seo-meta';
 
 const SITE_URL = (process.env.DAIBILET_SITE_URL || 'https://daibilet.ru').replace(/\/$/, '');
@@ -153,4 +160,74 @@ export function buildEventJsonLd(payload: PublicEventPageDto): Record<string, un
 /** SSR blocks для страницы события: Event (+ Offer) и BreadcrumbList. */
 export function buildEventPageJsonLd(payload: PublicEventPageDto): Array<Record<string, unknown>> {
   return [buildEventJsonLd(payload), buildBreadcrumbListJsonLd(buildEventBreadcrumbs(payload.event))];
+}
+
+export function buildFaqPageJsonLd(items: CityFaqItem[]): Record<string, unknown> | null {
+  if (!items.length) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: items.map((item) => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  };
+}
+
+/** Хлебные крошки города: Главная → Города → City */
+export function buildCityBreadcrumbs(payload: PublicCityPageDto): StructuredBreadcrumb[] {
+  const city = payload.city;
+  const path = city.canonicalPath || `/cities/${city.slug}`;
+  return [
+    { name: 'Главная', path: '/' },
+    { name: 'Города', path: '/cities' },
+    { name: city.seoH1 || city.name, path },
+  ];
+}
+
+/** SSR blocks для city page: FAQPage (если не thin) + BreadcrumbList. */
+export function buildCityPageJsonLd(payload: PublicCityPageDto): Array<Record<string, unknown>> {
+  const blocks: Array<Record<string, unknown>> = [
+    buildBreadcrumbListJsonLd(buildCityBreadcrumbs(payload)),
+  ];
+
+  const decision = evaluateCityIndexability({
+    events: payload.stats?.events ?? payload.city.events ?? 0,
+    slug: payload.city.slug,
+    sourceSlug: payload.city.sourceSlug,
+    isIndexable: payload.city.isIndexable,
+  });
+
+  if (decision.indexable) {
+    const faq = buildFaqPageJsonLd(buildCityFaqItems(payload));
+    if (faq) blocks.unshift(faq);
+  }
+
+  return blocks;
+}
+
+export function buildVenueBreadcrumbs(payload: PublicVenuePageDto): StructuredBreadcrumb[] {
+  const venue = payload.venue;
+  const path = venue.canonicalPath || venueHref(venue);
+  const crumbs: StructuredBreadcrumb[] = [
+    { name: 'Главная', path: '/' },
+    { name: 'Площадки', path: '/venues' },
+  ];
+  if (venue.city && venue.city !== 'Не указан') {
+    crumbs.push({
+      name: venue.city,
+      path: cityHref({ name: venue.city }),
+    });
+  }
+  crumbs.push({ name: venue.seoH1 || venue.title || venue.name, path });
+  return crumbs;
+}
+
+/** SSR BreadcrumbList для venue (FAQ на venue пока не в scope п.5). */
+export function buildVenuePageJsonLd(payload: PublicVenuePageDto): Array<Record<string, unknown>> {
+  return [buildBreadcrumbListJsonLd(buildVenueBreadcrumbs(payload))];
 }

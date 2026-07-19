@@ -20,6 +20,7 @@ import Link from 'next/link';
 import { formatMoney, formatNumber } from '@/lib/format';
 import { collectPopularTags } from '@/lib/catalog-tags';
 import { resolveCityImage } from '@/lib/city-images';
+import type { CityFaqItem } from '@/lib/city-faq';
 import { venuePageTemplate } from '@/lib/venue-meta';
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { landingPageHref } from '@/lib/landing-routes';
@@ -35,7 +36,17 @@ import type {
 
 type ViewMode = 'cards' | 'table';
 
-export function CityPageView({ slug, initialPayload }: { slug: string; initialPayload: PublicCityPageDto | null }) {
+export function CityPageView({
+  slug,
+  initialPayload,
+  faqItems = [],
+  seoText = null,
+}: {
+  slug: string;
+  initialPayload: PublicCityPageDto | null;
+  faqItems?: CityFaqItem[];
+  seoText?: string | null;
+}) {
   const [payload, setPayload] = React.useState<PublicCityPageDto | null>(initialPayload);
   const [contentReady, setContentReady] = React.useState(() => Boolean(initialPayload?.sessions?.length));
   const [error, setError] = React.useState<string | null>(null);
@@ -163,6 +174,9 @@ export function CityPageView({ slug, initialPayload }: { slug: string; initialPa
                 )}
               </aside>
             </section>
+
+            {seoText ? <CitySeoTextSection cityName={city.name} text={seoText} /> : null}
+            {faqItems.length ? <CityFaqSection cityName={city.name} items={faqItems} /> : null}
           </>
         ) : null}
       </main>
@@ -692,6 +706,42 @@ function CityGuideAside({
   );
 }
 
+function CitySeoTextSection({ cityName, text }: { cityName: string; text: string }) {
+  return (
+    <section id="city-seo" className="border-t border-slate-100 bg-slate-50/70 py-12">
+      <div className="container-page max-w-3xl">
+        <h2 className="text-2xl font-bold text-slate-900">Афиша {cityName}</h2>
+        <p className="mt-4 text-sm leading-7 text-slate-600">{text}</p>
+      </div>
+    </section>
+  );
+}
+
+function CityFaqSection({ cityName, items }: { cityName: string; items: CityFaqItem[] }) {
+  return (
+    <section id="faq" className="border-t border-slate-100 py-12">
+      <div className="container-page">
+        <h2 className="mb-2 text-center text-2xl font-bold text-slate-900 md:text-3xl">Частые вопросы</h2>
+        <p className="mb-10 text-center text-slate-600">Ответы о билетах и афише {cityName}</p>
+        <div className="mx-auto max-w-3xl space-y-2">
+          {items.map((item, index) => (
+            <details
+              key={`${item.question}:${index}`}
+              className="group rounded-xl border border-slate-200 bg-white transition-colors hover:border-slate-300"
+            >
+              <summary className="flex cursor-pointer list-none select-none items-center justify-between gap-3 p-4 text-left text-sm font-medium text-slate-900">
+                <span className="pr-2">{item.question}</span>
+                <span className="shrink-0 text-slate-400 transition-transform group-open:rotate-180">▾</span>
+              </summary>
+              <div className="px-4 pb-4 text-sm leading-relaxed text-slate-600">{item.answer}</div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function HubFact({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg bg-white p-3">
@@ -824,7 +874,7 @@ function navigateHome(section: string) {
 function applyCityMeta(payload: PublicCityPageDto) {
   document.title = payload.city.seoTitle || `${payload.city.name}: афиша и билеты | Дайбилет`;
   upsertMeta('description', payload.city.seoDescription || `Афиша событий, экскурсии, музеи и билеты ${cityInPrepositional(payload.city)}.`);
-  upsertMeta('robots', 'index, follow');
+  // robots задаётся в generateMetadata (SSR); клиент не перезаписывает noindex thin-страниц
 }
 
 function upsertMeta(name: string, content: string) {

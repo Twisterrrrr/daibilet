@@ -9,7 +9,9 @@ import { VenuePageView } from '@/components/VenuePageView.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { buildPublicVenueDto, buildPublicVenuesDto } from '@daibilet/backend/public-read';
+import { evaluateVenueIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { venueHref } from '@/lib/routes';
+import { buildVenuePageJsonLd } from '@/lib/structured-data';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -25,10 +27,15 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
   const payload = await buildPublicVenueDto(decodeURIComponent(slug));
   if (!payload?.venue) return { title: 'Площадка не найдена | Дайбилет' };
   const venue = payload.venue;
+  const decision = evaluateVenueIndexability({
+    events: payload.stats?.events ?? venue.events ?? 0,
+    isIndexable: venue.isIndexable,
+  });
   return {
     title: venue.seoTitle || `${venue.title || venue.name} | Дайбилет`,
     description: venue.seoDescription || venue.shortDescription || venue.description || undefined,
     alternates: { canonical: venue.canonicalPath || venueHref(venue) },
+    robots: robotsForIndexability(decision.indexable),
     openGraph: {
       title: venue.seoTitle || venue.title || venue.name,
       description: venue.seoDescription || undefined,
@@ -72,8 +79,17 @@ export async function VenueDetailPage({ slug }: { slug: string }) {
   const payload = await buildPublicVenueDto(decodeURIComponent(slug));
   if (!payload?.venue) notFound();
 
+  const jsonLdBlocks = buildVenuePageJsonLd(payload);
+
   return (
     <SiteLayout>
+      {jsonLdBlocks.map((block, index) => (
+        <script
+          key={`venue-jsonld-${index}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }}
+        />
+      ))}
       <VenuePageView slug={decodeURIComponent(slug)} initialPayload={payload} />
     </SiteLayout>
   );

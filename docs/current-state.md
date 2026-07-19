@@ -111,8 +111,8 @@ npm run check:widgets -- --base https://daibilet.ru
 | **HeaderSearch** в шапке Next | ✅ | `HeaderSearch.client.tsx` + `/api/public/search` |
 | **Event breadcrumbs** | ⏳ | `/events` ✅; `/events/[slug]` ⏳ |
 | **Event JSON-LD** (`Event`, `Offer`, `BreadcrumbList`) SSR | ✅ | `structured-data.ts` + event RSC |
-| **City FAQ + SEO text** SSR | ⏳ | `CityPageView` без FAQ-блока |
-| **City JSON-LD** (`FAQPage`, `BreadcrumbList`) SSR | ⏳ | только client `document.title` |
+| **City FAQ + SEO text** SSR | ✅ | FAQ + SEO text на indexable cities |
+| **City JSON-LD** (`FAQPage`, `BreadcrumbList`) SSR | ✅ | RSC + thin → без FAQPage |
 | `/about` | ⏳ | route отсутствует в `apps/web` |
 
 **Уже есть:** `generateMetadata` event/city, catalog breadcrumbs, `/help` + FAQ JSON-LD, landings JSON-LD (client).
@@ -125,9 +125,9 @@ npm run check:widgets -- --base https://daibilet.ru
 |--------|--------|------------|
 | `app/robots.ts` | ✅ | Allow `/`, Sitemap → index; Googlebot/Yandex allow |
 | `app/sitemap.xml` index | ✅ | → `/sitemaps/{static,events,cities,venues,landings,blog}.xml` |
-| sitemap events / cities / venues / landings / blog | ✅ | chunked urlsets |
+| sitemap events / cities / venues / landings / blog | ✅ | chunked urlsets; cities/venues без thin |
 | SSR JSON-LD event page | ✅ | `<script type="application/ld+json">` в RSC |
-| SSR JSON-LD city page | ⏳ | FAQ + breadcrumbs |
+| SSR JSON-LD city page | ✅ | FAQPage + BreadcrumbList; thin → noindex |
 | canonical / www policy audit | ⏳ | nginx + metadata cross-check |
 
 Очередность: [spbboats-next-prisma-extraction.md § Step A](./spbboats-next-prisma-extraction.md).
