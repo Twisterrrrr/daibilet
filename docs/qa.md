@@ -1,17 +1,14 @@
 # qa.md — открытые вопросы
 
-## 2026-07-19 — Teplohod orders API (блокер импорта)
+## 2026-07-19 — Teplohod orders API — ЗАКРЫТО / отложено
 
-Спросить у Теплохода / аккаунт-менеджера:
+**Ответ партнёра:** у teplohod.info **нет** функционала API/выгрузки заказов для агента.
 
-1. **Endpoint:** подтверждаете ли `GET https://account.teplohod.info/api/orders` как список продаж агента? Есть ли другой URL (в т.ч. на `api.teplohod.info/v1` под IP allowlist)?
-2. **Auth:** схема (Bearer / `access-token` query / Basic / кастомный header). Как выпустить токен для виджета `14208` / нашего агентского аккаунта?
-3. **Поля ответа:** id заказа, статус, даты создания/оплаты, email/телефон покупателя, билеты (id/status), `event_id` / `event_time_id`.
-4. **Фильтры инкрементального sync:** `dateFrom`/`dateTo` / `updatedSince` / pagination (`page`, `per-page`).
-5. **Webhooks:** есть ли callback после оплаты как альтернатива polling?
-6. **Scope:** отдаются ли только продажи через наш `widget_id`, или весь кабинет?
+- Не запрашивать `TEP_ORDERS_TOKEN`; не считать отсутствие токена launch-blocker.
+- Cron `tep-orders-sync` на prod **отключён** (2026-07-19).
+- Скрипт `tep:orders` в репо — заготовка на случай появления API позже.
+- Активный orders-path: только **Ticketscloud** (`tc:orders` + cron `*/10`).
 
-До ответа: `npm run tep:orders` → `BLOCKED`; cron `*/15` логирует BLOCKED, заказы не пишет.
 
 ## 2026-07-19 — после аудита админки
 

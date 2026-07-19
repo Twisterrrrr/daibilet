@@ -20,26 +20,13 @@ crontab -e
 - Lookback: последние `TC_ORDERS_LOOKBACK_DAYS` дней (по умолчанию 3) + flock против overlap.
 - Лог: `/var/log/daibilet/tc-orders-sync.log`
 
-## Prod: Teplohod orders-only (каркас; ждёт токен партнёра)
+## Prod: Teplohod orders-only — ОТЛОЖЕНО (2026-07-19)
 
-Orders-only — **не** каталог (`tep:sync`). Candidate endpoint: `https://account.teplohod.info/api/orders` (prod probe → **401** без auth). Каталожный `api.teplohod.info/v1/orders` — **404**.
+Партнёр teplohod.info: **нет** API/выгрузки заказов. Cron `tep-orders-sync` **не** ставить на prod (скрипт `deploy/cron/tep-orders-sync.sh` и `npm run tep:orders` — заготовка в репо).
 
-```bash
-chmod +x /opt/daibilet/deploy/cron/tep-orders-sync.sh
-mkdir -p /var/log/daibilet
-crontab -e
-```
+- Не требовать `TEP_ORDERS_TOKEN` как блокер.
+- Активный orders cron: только `tc-orders-sync` (`*/10`).
 
-```
-*/15 * * * * APP_DIR=/opt/daibilet /opt/daibilet/deploy/cron/tep-orders-sync.sh >> /var/log/daibilet/tep-orders-sync.log 2>&1
-```
-
-- Интервал: **15 минут**.
-- Без `TEP_ORDERS_TOKEN` скрипт пишет `status=BLOCKED` и exit 0 (не врёт SUCCESS / не импортирует).
-- После выдачи токена: `TEP_ORDERS_TOKEN=…` (+ опц. `TEP_ORDERS_API_URL`, `TEP_ORDERS_AUTH=bearer|access-token|both`).
-- Ручной прогон: `npm run tep:orders -- --probe` / `--dry-run` / `--from=… --to=…`.
-- Лог: `/var/log/daibilet/tep-orders-sync.log`
-- `tc-orders` cron не менять.
 
 ## Staging (nightly health)
 

@@ -378,17 +378,10 @@ Endpoint:
 | `GET https://account.teplohod.info/api/orders` | **401** (endpoint существует) |
 | `GET https://account.teplohod.info/api/widgets` / `profile` / `events` | **401** |
 
-Импортёр: `npm run tep:orders` (`scripts/tep-sync-orders.js`). Без `TEP_ORDERS_TOKEN` → `BLOCKED`. После выдачи токена: `TEP_ORDERS_API_URL` (default account `/api/orders`), `TEP_ORDERS_AUTH=bearer|access-token|both`.
-
-В документе партнёра по-прежнему не описаны:
-
-- точная auth-схема и выпуск токена для агента;
-- schema списка заказов / билетов;
-- filter/pagination для incremental sync;
-- webhook/callback после покупки;
-- лимиты и rate limits.
-
-См. чеклист вопросов в `docs/qa.md`.
+**2026-07-19 — отложено:** партнёр подтвердил, что **API/выгрузки заказов нет**.
+Не запрашивать `TEP_ORDERS_TOKEN`. Cron `tep-orders-sync` на prod отключён.
+Скрипт `npm run tep:orders` остаётся в репо как заготовка, не активный prod-path.
+См. `docs/qa.md` (закрыто) и Diary 2026-07-19.
 
 ### Предварительный маппинг
 
@@ -400,7 +393,7 @@ fetchCategories() // категории можно выводить из пол�
 fetchVenues()
 fetchEvents(updatedSince?)
 fetchEventSessions(eventExternalId)
-fetchOrders(updatedSince?) // статусы доступны через API, требуется точный endpoint
+fetchOrders(updatedSince?) // DEFERRED: у партнёра нет orders API (2026-07-19)
 ```
 
 Адаптер должен возвращать нормализованные DTO, не завязанные на оригинальные поля источника. Оригинальный ответ сохраняем в `source_payload`.

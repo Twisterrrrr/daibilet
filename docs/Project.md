@@ -123,9 +123,9 @@ Env для widgets / analytics: `NEXT_PUBLIC_TC_WIDGET_TOKEN`, `NEXT_PUBLIC_TEP_
 | Источник | Команда | Cron | Статус |
 |----------|---------|------|--------|
 | Ticketscloud | `npm run tc:orders` | `*/10` `deploy/cron/tc-orders-sync.sh` | работает (IP/token TC) |
-| Teplohod | `npm run tep:orders` | `*/15` `deploy/cron/tep-orders-sync.sh` | каркас: candidate `account.teplohod.info/api/orders` (401); без `TEP_ORDERS_TOKEN` → `BLOCKED` |
+| Teplohod | `npm run tep:orders` (заготовка) | — (cron снят с prod) | ⏸ **отложено**: у партнёра нет API заказов; не prod-path |
 
-Модели: `ExternalOrder` / `ExternalTicket` (source `src_ticketscloud` / `src_teplohod`). Каталог TEP auto-sync **не** тянет заказы. Вопросы партнёру — `docs/qa.md`.
+Модели: `ExternalOrder` / `ExternalTicket` (source `src_ticketscloud` / `src_teplohod`). Каталог TEP auto-sync **не** тянет заказы. Активный orders-sync на prod — только TC. TEP orders отложены (у партнёра нет API). См. `docs/qa.md`.
 
 ---
 

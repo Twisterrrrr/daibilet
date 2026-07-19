@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Teplohod orders-only polling (не каталог tep:sync).
-# Рекомендуемый cron: */15 * * * *
-# Без TEP_ORDERS_TOKEN скрипт честно пишет status=BLOCKED и выходит 0 (не врёт SUCCESS).
+# Teplohod orders-only polling STUB (not catalog tep:sync).
+# DEFERRED 2026-07-19: partner has no orders API. Do NOT enable on prod crontab.
+# Kept for possible future API; without credentials exits 0 with status=BLOCKED.
 set -euo pipefail
 
 APP_DIR="${APP_DIR:-/opt/daibilet}"

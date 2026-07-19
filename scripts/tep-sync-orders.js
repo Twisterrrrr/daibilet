@@ -1,28 +1,18 @@
 /**
- * Teplohod orders sync (mirror of scripts/tc-sync-orders.js).
+ * Teplohod orders sync STUB (mirror of scripts/tc-sync-orders.js).
  *
- * Known facts (prod probe 2026-07-19):
- * - Catalog API https://api.teplohod.info/v1 has NO /orders (404). Auth = IP allowlist, no token.
- * - Account API https://account.teplohod.info/api/orders EXISTS but returns 401 without credentials.
- * - We do not have TEP_ORDERS_TOKEN / partner auth docs yet.
+ * Status 2026-07-19: DEFERRED — partner teplohod.info confirmed there is NO orders API/export.
+ * Do not treat missing TEP_ORDERS_TOKEN as a launch blocker. Do not enable prod cron.
+ * Script kept for a possible future API; without credentials exits 0 with status=BLOCKED.
  *
- * Without token the script exits 0 with status=BLOCKED (honest for cron; does not invent SUCCESS).
- * With token it polls TEP_ORDERS_API_URL and upserts ExternalOrder / ExternalTicket for source TEPLOHOD.
+ * Historical probe notes:
+ * - Catalog https://api.teplohod.info/v1 — IP allowlist, no /orders (404).
+ * - account.teplohod.info/api/orders — exists but 401; not a supported agent orders feed.
  *
- * Env:
- *   TEP_ORDERS_API_URL   default https://account.teplohod.info/api/orders
- *   TEP_ORDERS_TOKEN     or TEPLOHOD_API_TOKEN / TEP_API_TOKEN / TEPLOHOD_API_KEY
- *   TEP_ORDERS_AUTH      bearer | access-token | both (default both)
- *   TEP_USER_AGENT       optional
- *   DATABASE_URL
+ * Env (only if partner ever ships an API):
+ *   TEP_ORDERS_API_URL, TEP_ORDERS_TOKEN, TEP_ORDERS_AUTH, TEP_USER_AGENT, DATABASE_URL
  *
- * CLI:
- *   --dry-run            fetch + normalize, no DB writes
- *   --probe              HEAD/GET reachability report only
- *   --from=YYYY-MM-DD    passed as query if partner supports it
- *   --to=YYYY-MM-DD
- *   --page=1 --page-size=100 --max-pages=50
- *   --require-ready      exit 2 when BLOCKED (for CI)
+ * CLI: --dry-run | --probe | --from= | --to= | --page= | --require-ready
  */
 const fs = require("fs");
 const path = require("path");
@@ -43,7 +33,7 @@ const MAX_PAGE_SIZE = 200;
 const STALE_CANCELLED_ARCHIVE_DAYS = 30;
 
 const PARTNER_ASK = [
-  "Confirm orders list endpoint (we see 401 on GET https://account.teplohod.info/api/orders).",
+  "Partner stated no orders API (2026-07-19). Revisit only if they ship one.",
   "Auth scheme: Bearer token, access-token query, Basic, or other header name.",
   "Issue agent/partner API token scoped to our widget_id / sales channel.",
   "Response schema: order id, status, created/paid dates, buyer email/phone, tickets[], event/time ids.",
@@ -83,10 +73,10 @@ async function main() {
       status: "BLOCKED",
       source: SOURCE_CODE,
       reason:
-        "Teplohod orders API credentials missing. Endpoint candidate exists (account.teplohod.info/api/orders → 401), but token/auth not provided. Catalog IP API has no /orders.",
+        "Teplohod orders sync deferred: partner has no orders API (2026-07-19). Stub only; not a prod path.",
       ordersUrl,
       askPartner: PARTNER_ASK,
-      hint: "Set TEP_ORDERS_TOKEN (and optionally TEP_ORDERS_API_URL / TEP_ORDERS_AUTH) then re-run npm run tep:orders",
+      hint: "Do not enable prod cron. Revisit only if partner ships an orders API.",
     };
     console.log(JSON.stringify(blocked, null, 2));
     await pool.end();
