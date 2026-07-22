@@ -6,24 +6,38 @@ export type BreadcrumbItem = { label: string; href?: string };
 /** Белая полоска над hero — как в Lovable и на страницах площадок/локаций. */
 export function PageBreadcrumbBar({ items }: { items: BreadcrumbItem[] }) {
   if (!items.length) return null;
+  const lastIndex = items.length - 1;
   return (
     <div className="border-b border-slate-200 bg-white">
       <nav
         aria-label="Хлебные крошки"
-        className="container-page flex min-h-11 flex-wrap items-center gap-1.5 py-3 text-sm text-slate-500"
+        className="container-page flex min-h-11 items-center gap-1.5 overflow-hidden py-3 text-sm text-slate-500"
       >
-        {items.map((item, index) => (
-          <React.Fragment key={`${item.label}:${index}`}>
-            {index > 0 ? <ChevronRight className="h-3.5 w-3.5 shrink-0 text-slate-300" aria-hidden /> : null}
-            {item.href ? (
-              <a href={item.href} className="transition-colors hover:text-primary-600">
-                {item.label}
-              </a>
-            ) : (
-              <span className="text-slate-900">{item.label}</span>
-            )}
-          </React.Fragment>
-        ))}
+        {items.map((item, index) => {
+          const isLast = index === lastIndex;
+          return (
+            <React.Fragment key={`${item.label}:${index}`}>
+              {index > 0 ? <ChevronRight className="h-3.5 w-3.5 shrink-0 text-slate-300" aria-hidden /> : null}
+              {item.href ? (
+                <a
+                  href={item.href}
+                  title={item.label}
+                  className={
+                    isLast
+                      ? 'min-w-0 truncate text-slate-900 transition-colors hover:text-primary-600'
+                      : 'shrink-0 transition-colors hover:text-primary-600'
+                  }
+                >
+                  {item.label}
+                </a>
+              ) : (
+                <span title={item.label} className={isLast ? 'min-w-0 truncate text-slate-900' : 'shrink-0 text-slate-900'}>
+                  {item.label}
+                </span>
+              )}
+            </React.Fragment>
+          );
+        })}
       </nav>
     </div>
   );
