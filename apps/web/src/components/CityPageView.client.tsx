@@ -520,78 +520,77 @@ function CityHeroDefault({
   const focusX = focusParts[0] || 'center';
   const focusY = focusParts[1] || '32%';
 
-  const heroCopy = (
-    <>
-      <div className="flex items-center gap-2 text-sm text-primary-100/80">
-        <button type="button" onClick={() => navigateHome('top')} className="hover:text-white">
-          Главная
-        </button>
-        <span>/</span>
-        <span className="text-white">{city.name}</span>
-      </div>
-      <div className="mt-5">
-        <h1 className="text-4xl font-extrabold sm:text-5xl">{city.name}</h1>
-        <p className="mt-4 max-w-3xl text-base leading-7 text-primary-50/88 sm:text-lg">{brief}</p>
-        <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/80">
-          <span className="font-semibold text-white">{pluralEvents(stats.events)}</span>
-          <span aria-hidden="true" className="text-white/35">
-            ·
-          </span>
-          <span className="font-semibold text-white">{pluralVenues(stats.venues)}</span>
-        </p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <a
-            href="#affiche"
-            onClick={(event) => {
-              event.preventDefault();
-              scrollToSection('affiche');
-            }}
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-primary-700 hover:bg-primary-50"
-          >
-            <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
-            <span>События {cityIn}</span>
-          </a>
-          {hasTravel ? (
-            <a
-              href="#travel"
-              onClick={(event) => {
-                event.preventDefault();
-                scrollToSection('travel');
-              }}
-              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/25 px-5 text-sm font-semibold text-white hover:bg-white/10"
-            >
-              Как добраться
-            </a>
-          ) : null}
-        </div>
-      </div>
-    </>
-  );
-
   return (
     <section
       id="top"
-      className="overflow-hidden border-b border-primary-950 bg-[#071525] text-white"
+      className="relative min-h-[340px] overflow-hidden border-b border-primary-950 bg-[#071525] text-white sm:min-h-[420px] lg:min-h-[480px]"
     >
+      {/* Фото на всю ширину, в т.ч. mobile. Без масок на самом img. */}
+      <div aria-hidden="true" className="absolute inset-0">
+        <SafeImage
+          src={heroImage}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          style={{ objectPosition: `${focusX} ${focusY}` }}
+          className="object-cover"
+          fallback={<div className="absolute inset-0 bg-[#0a233c]" />}
+        />
+      </div>
+
       {/*
-        Split layout: слева сплошной фон под текст, справа чистое фото.
-        Никаких absolute-градиентов/масок поверх или под картинкой.
+        Мягкий переход цвета в прозрачность на стыке с фото:
+        слева плотный фон под текст, у края ~50%, дальше картинка чистая.
       */}
-      <div className="grid min-h-[340px] lg:min-h-[480px] lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] 2xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
-        <div className="flex items-center bg-[#071525] py-12 sm:min-h-[420px] sm:py-14 lg:min-h-0">
-          <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-14 2xl:px-20">{heroCopy}</div>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,#071525_0%,rgba(7,21,37,0.88)_42%,rgba(7,21,37,0.45)_72%,transparent_100%)] lg:bg-[linear-gradient(to_right,#071525_0%,#071525_34%,rgba(7,21,37,0.5)_52%,rgba(7,21,37,0.18)_64%,transparent_76%)]"
+      />
+
+      <div className="container-page relative z-[1] py-12 sm:py-14">
+        <div className="flex items-center gap-2 text-sm text-primary-100/80">
+          <button type="button" onClick={() => navigateHome('top')} className="hover:text-white">
+            Главная
+          </button>
+          <span>/</span>
+          <span className="text-white">{city.name}</span>
         </div>
-        <div aria-hidden="true" className="relative hidden min-h-[480px] lg:block">
-          <SafeImage
-            src={heroImage}
-            alt=""
-            fill
-            priority
-            sizes="(max-width: 1023px) 100vw, 55vw"
-            style={{ objectPosition: `${focusX} ${focusY}` }}
-            className="object-cover"
-            fallback={<div className="absolute inset-0 bg-[#0a233c]" />}
-          />
+        <div className="mt-5 max-w-2xl lg:max-w-xl xl:max-w-2xl">
+          <h1 className="text-4xl font-extrabold sm:text-5xl">{city.name}</h1>
+          <p className="mt-4 text-base leading-7 text-primary-50/88 sm:text-lg">{brief}</p>
+          <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/80">
+            <span className="font-semibold text-white">{pluralEvents(stats.events)}</span>
+            <span aria-hidden="true" className="text-white/35">
+              ·
+            </span>
+            <span className="font-semibold text-white">{pluralVenues(stats.venues)}</span>
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a
+              href="#affiche"
+              onClick={(event) => {
+                event.preventDefault();
+                scrollToSection('affiche');
+              }}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+            >
+              <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
+              <span>События {cityIn}</span>
+            </a>
+            {hasTravel ? (
+              <a
+                href="#travel"
+                onClick={(event) => {
+                  event.preventDefault();
+                  scrollToSection('travel');
+                }}
+                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/25 px-5 text-sm font-semibold text-white hover:bg-white/10"
+              >
+                Как добраться
+              </a>
+            ) : null}
+          </div>
         </div>
       </div>
     </section>
