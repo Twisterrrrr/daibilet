@@ -31,12 +31,12 @@ export function CityHubArticleTeaser({
     <article
       className={
         editorial
-          ? 'overflow-hidden rounded-2xl border border-zinc-200 bg-white md:grid md:grid-cols-[minmax(11rem,32%)_minmax(0,1fr)]'
-          : 'overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm md:grid md:grid-cols-[minmax(11rem,32%)_minmax(0,1fr)]'
+          ? 'overflow-hidden rounded-2xl border border-zinc-200 bg-white md:grid md:grid-cols-[minmax(14rem,40%)_minmax(0,1fr)] md:items-start'
+          : 'overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm md:grid md:grid-cols-[minmax(14rem,40%)_minmax(0,1fr)] md:items-start'
       }
     >
       <div
-        className={`relative aspect-[16/10] overflow-hidden md:aspect-auto md:min-h-full ${
+        className={`relative aspect-[16/10] overflow-hidden ${
           editorial ? 'bg-zinc-100' : 'bg-slate-100'
         }`}
       >
@@ -45,7 +45,7 @@ export function CityHubArticleTeaser({
           alt=""
           fill
           sizes={IMAGE_SIZES.blogCard}
-          className="object-cover"
+          className="object-cover object-center"
           fallback={
             <div
               className={`flex h-full w-full items-center justify-center text-sm ${
