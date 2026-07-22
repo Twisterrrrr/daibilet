@@ -14,6 +14,7 @@ import type { PublicCatalogDto } from '@daibilet/contracts/public';
 import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZES } from '@daibilet/contracts/catalog';
 import {
   buildCatalogHref,
+  CATALOG_SORT_OPTIONS,
   catalogFiltersFromQuery,
   venueCatalogHrefWithSelectedCity,
   type CatalogFilterValues,
@@ -237,6 +238,37 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           disabled={(loading && !catalog) || cityBootstrapPending}
           cityReady={cityReady || urlHasCity}
         />
+      </div>
+
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <span className="text-xs font-medium text-slate-500">Сортировка</span>
+        <div role="radiogroup" aria-label="Сортировка" className="inline-flex rounded-xl bg-slate-100 p-1">
+          {CATALOG_SORT_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              role="radio"
+              aria-checked={filterValues.sort === option.value}
+              disabled={(loading && !catalog) || cityBootstrapPending}
+              onClick={() => {
+                router.push(
+                  buildCatalogHref({
+                    ...filterValues,
+                    sort: option.value,
+                    page: undefined,
+                  }),
+                );
+              }}
+              className={`inline-btn h-8 rounded-lg px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
+                filterValues.sort === option.value
+                  ? 'bg-white text-slate-900 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {(loading && !catalog) || (cityBootstrapPending && !catalog) ? (

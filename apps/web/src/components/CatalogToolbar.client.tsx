@@ -3,14 +3,14 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 
 import { CatalogAdvancedFiltersPanel } from '@/components/CatalogAdvancedFiltersPanel.client';
 
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
 import {
   buildCatalogHref,
-  CATALOG_SORT_OPTIONS,
+  CATALOG_DATE_OPTIONS,
   catalogFiltersFromQuery,
   countAdvancedFilters,
   type CatalogFilterValues,
@@ -21,7 +21,6 @@ import {
   CATALOG_PRESETS,
 } from '@/lib/catalog-presets';
 import { categoryEmoji } from '@/lib/catalog-view-mode';
-import { persistSelectedCity } from '@/lib/selected-city';
 
 type CatalogToolbarProps = {
   facets: PublicCatalogDto['facets'];
@@ -31,18 +30,23 @@ type CatalogToolbarProps = {
   cityReady?: boolean;
 };
 
+const SEARCH_DEBOUNCE_MS = 350;
+
 export function CatalogToolbar({
   facets,
   values,
   disabled = false,
-  cityReady = true,
+  cityReady: _cityReady = true,
 }: CatalogToolbarProps) {
   const router = useRouter();
   const filters = useMemo(() => catalogFiltersFromQuery(values), [values]);
+  const filtersRef = useRef(filters);
+  filtersRef.current = filters;
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [presetsOpen, setPresetsOpen] = useState(false);
   const [qDraft, setQDraft] = useState(filters.q || '');
   const advancedCount = countAdvancedFilters(filters);
-  const cityPending = !cityReady && !filters.city;
+  const activePreset = CATALOG_PRESETS.some((preset) => catalogPresetMatches(preset.slug, filters));
 
   useEffect(() => {
     setQDraft(filters.q || '');
@@ -52,34 +56,37 @@ export function CatalogToolbar({
     router.push(buildCatalogHref(next));
   };
 
+  // Live-apply search (debounce). Enter still submits immediately via form.
+  useEffect(() => {
+    const next = qDraft.trim();
+    const current = (filtersRef.current.q || '').trim();
+    if (next === current) return;
+    const timer = window.setTimeout(() => {
+      const latest = filtersRef.current;
+      navigate({
+        ...latest,
+        q: next || undefined,
+        page: undefined,
+      });
+    }, SEARCH_DEBOUNCE_MS);
+    return () => window.clearTimeout(timer);
+  }, [qDraft]);
+
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    const nextCity = String(data.get('city') || 'all');
-    persistSelectedCity(nextCity === 'all' ? 'all' : nextCity);
-    const next = catalogFiltersFromQuery({
+    navigate({
       ...filters,
-      q: String(data.get('q') || ''),
-      city: nextCity,
-      category: String(data.get('category') || 'all'),
-      landing: String(data.get('landing') || 'all'),
-      date: String(data.get('date') || 'all'),
-      from: String(data.get('from') || ''),
-      to: String(data.get('to') || ''),
-      minPrice: parseOptionalNumber(data.get('minPrice')),
-      maxPrice: parseOptionalNumber(data.get('maxPrice')),
-      ageMax: parseAgeMax(data.get('ageMax')),
-      sort: filters.sort,
-      limit: filters.limit,
+      q: qDraft.trim() || undefined,
+      page: undefined,
     });
-    navigate(next);
   };
 
   return (
     <div className="space-y-3">
       <form onSubmit={onSubmit} className="space-y-3">
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <label className="relative flex flex-1 items-center">
+        {/* Primary: поиск · дата · Фильтры */}
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <label className="relative flex min-w-0 flex-1 items-center">
             <span className="sr-only">Поиск по событиям</span>
             <Search aria-hidden className="pointer-events-none absolute left-3 h-4 w-4 text-slate-400" />
             <input
@@ -89,106 +96,81 @@ export function CatalogToolbar({
               onChange={(event) => setQDraft(event.target.value)}
               placeholder="Название, место или артист"
               aria-label="Поиск по событиям"
-              className="inline-btn h-11 w-full rounded-xl bg-slate-50 pl-10 pr-9 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-primary/60"
+              disabled={disabled}
+              className="inline-btn h-11 w-full rounded-xl bg-slate-50 pl-10 pr-9 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus-visible:bg-white focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60"
             />
             {qDraft ? (
               <button
                 type="button"
                 aria-label="Очистить поиск"
-                onClick={() => setQDraft('')}
-                className="inline-btn absolute right-2 grid h-6 w-6 place-items-center rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-700"
+                disabled={disabled}
+                onClick={() => {
+                  setQDraft('');
+                  navigate({ ...filters, q: undefined, page: undefined });
+                }}
+                className="inline-btn absolute right-2 grid h-6 w-6 place-items-center rounded-full text-slate-400 hover:bg-slate-200 hover:text-slate-700 disabled:opacity-60"
               >
                 <X aria-hidden className="h-3.5 w-3.5" />
               </button>
             ) : null}
           </label>
 
-          <div className="relative sm:w-52">
-            <label htmlFor="catalog-city" className="sr-only">
-              Город
+          <div className="relative sm:w-44">
+            <label htmlFor="catalog-date" className="sr-only">
+              Дата
             </label>
             <select
-              id="catalog-city"
-              name="city"
-              value={cityPending ? '' : filters.city || 'all'}
-              disabled={disabled || cityPending}
+              id="catalog-date"
+              name="date"
+              value={filters.date || 'all'}
+              disabled={disabled}
               onChange={(event) => {
-                const nextCity = event.target.value;
-                persistSelectedCity(nextCity === 'all' ? 'all' : nextCity);
+                const nextDate = event.target.value;
                 navigate({
                   ...filters,
                   q: qDraft.trim() || undefined,
-                  city: nextCity === 'all' ? undefined : nextCity,
+                  date: nextDate === 'all' ? undefined : nextDate,
                   page: undefined,
                 });
               }}
               className="h-11 w-full appearance-none rounded-xl bg-slate-50 pl-4 pr-9 text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-70"
             >
-              {cityPending ? <option value="">Город…</option> : null}
-              <option value="all">Все города</option>
-              {facets.cities.slice(0, 40).map((item) => (
-                <option key={item.name} value={item.name}>
-                  {item.name}
+              {CATALOG_DATE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
                 </option>
               ))}
             </select>
-            <ChevronDown aria-hidden className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <ChevronDown
+              aria-hidden
+              className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+            />
           </div>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <div role="radiogroup" aria-label="Сортировка" className="inline-flex rounded-xl bg-slate-100 p-1">
-            {CATALOG_SORT_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                role="radio"
-                aria-checked={filters.sort === option.value}
-                onClick={() => navigate({ ...filters, sort: option.value })}
-                className={`inline-btn h-9 rounded-lg px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
-                  filters.sort === option.value
-                    ? 'bg-white text-slate-900 shadow-sm'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
+          <button
+            type="button"
+            onClick={() => setFiltersOpen(true)}
+            disabled={disabled}
+            aria-expanded={filtersOpen}
+            aria-haspopup="dialog"
+            aria-controls="advanced-filters-panel"
+            className={`relative inline-btn inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 disabled:opacity-60 ${
+              filtersOpen || advancedCount > 0
+                ? 'bg-primary-600 text-white hover:bg-primary-700'
+                : 'bg-slate-900 text-white hover:bg-slate-800'
+            }`}
+          >
+            <SlidersHorizontal aria-hidden className="h-4 w-4" />
+            <span>Фильтры</span>
+            {advancedCount > 0 ? (
+              <span
+                className="grid min-w-5 place-items-center rounded-full bg-white/25 px-1.5 text-xs"
+                aria-label={`Активных фильтров: ${advancedCount}`}
               >
-                {option.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="ml-auto flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setFiltersOpen(true)}
-              aria-expanded={filtersOpen}
-              aria-haspopup="dialog"
-              aria-controls="advanced-filters-panel"
-              className={`relative inline-btn inline-flex h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 ${
-                filtersOpen || advancedCount > 0
-                  ? 'bg-primary-600 text-white hover:bg-primary-700'
-                  : 'bg-slate-900 text-white hover:bg-slate-800'
-              }`}
-            >
-              <SlidersHorizontal aria-hidden className="h-4 w-4" />
-              <span className="hidden sm:inline">Фильтры</span>
-              {advancedCount > 0 ? (
-                <span
-                  className="grid min-w-5 place-items-center rounded-full bg-white/25 px-1.5 text-xs"
-                  aria-label={`Активных фильтров: ${advancedCount}`}
-                >
-                  {advancedCount}
-                </span>
-              ) : null}
-            </button>
-
-            <button
-              type="submit"
-              disabled={disabled}
-              className="btn-primary inline-btn h-10 px-4 text-sm disabled:opacity-60"
-            >
-              Найти
-            </button>
-          </div>
+                {advancedCount}
+              </span>
+            ) : null}
+          </button>
         </div>
       </form>
 
@@ -231,15 +213,17 @@ export function CatalogToolbar({
         }}
       />
 
+      {/* Secondary primary intent: категории */}
       <div className="-mx-4 px-4 sm:mx-0 sm:px-0">
         <div className="horizontal-snap-row flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <Link
-            href={buildCatalogHref({ ...filters, category: undefined })}
-            className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition ${
-              !filters.category ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+            href={buildCatalogHref({ ...filters, category: undefined, page: undefined })}
+            className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition ${
+              !filters.category
+                ? 'bg-slate-900 text-white'
+                : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
             }`}
           >
-            <span className="mr-1">✨</span>
             Все
           </Link>
           {facets.categories.map((item) => (
@@ -248,14 +232,15 @@ export function CatalogToolbar({
               href={buildCatalogHref({
                 ...filters,
                 category: filters.category === item.name ? undefined : item.name,
+                page: undefined,
               })}
-              className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition ${
+              className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition ${
                 filters.category === item.name
                   ? 'bg-slate-900 text-white'
                   : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
               }`}
             >
-              <span className="mr-1">{categoryEmoji(item.name)}</span>
+              <span className="mr-1 opacity-80">{categoryEmoji(item.name)}</span>
               {item.name}
               <span className={filters.category === item.name ? 'ml-1 text-white/70' : 'ml-1 text-slate-400'}>
                 {item.events}
@@ -265,39 +250,43 @@ export function CatalogToolbar({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs font-medium uppercase tracking-wide text-slate-400">Подборки:</span>
-        {CATALOG_PRESETS.map((preset) => {
-          const active = catalogPresetMatches(preset.slug, filters);
-          const href = active
-            ? buildCatalogHref({ city: filters.city, sort: 'popular' })
-            : buildCatalogPresetHref(preset.slug, filters.city);
-          return (
-            <Link
-              key={preset.slug}
-              href={href}
-              className={`inline-btn rounded-full px-3 py-1 text-xs font-medium transition ${
-                active ? 'bg-primary/10 text-primary-700 ring-1 ring-primary/30' : 'text-slate-600 hover:bg-slate-100'
-              }`}
-            >
-              {preset.label}
-            </Link>
-          );
-        })}
+      {/* Подборки: слабее / свёрнуты на мобиле если не активны */}
+      <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+        <button
+          type="button"
+          onClick={() => setPresetsOpen((open) => !open)}
+          className="inline-btn text-xs font-medium text-slate-500 hover:text-slate-800 sm:pointer-events-none sm:cursor-default"
+          aria-expanded={presetsOpen || activePreset}
+        >
+          Подборки
+          <span className="ml-1 sm:hidden">{presetsOpen || activePreset ? '▾' : '▸'}</span>
+        </button>
+        <div
+          className={`flex flex-wrap items-center gap-1.5 ${
+            presetsOpen || activePreset ? 'flex' : 'hidden sm:flex'
+          }`}
+        >
+          {CATALOG_PRESETS.map((preset) => {
+            const active = catalogPresetMatches(preset.slug, filters);
+            const href = active
+              ? buildCatalogHref({ city: filters.city, sort: 'popular' })
+              : buildCatalogPresetHref(preset.slug, filters.city);
+            return (
+              <Link
+                key={preset.slug}
+                href={href}
+                className={`inline-btn rounded-full px-2.5 py-0.5 text-xs transition ${
+                  active
+                    ? 'bg-slate-100 font-medium text-slate-800 ring-1 ring-slate-200'
+                    : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'
+                }`}
+              >
+                {preset.label}
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
-}
-
-
-function parseOptionalNumber(value: FormDataEntryValue | null): number | undefined {
-  const raw = String(value ?? '').trim();
-  if (!raw) return undefined;
-  const parsed = Number(raw);
-  return Number.isFinite(parsed) ? parsed : undefined;
-}
-
-function parseAgeMax(value: FormDataEntryValue | null): number | undefined {
-  const parsed = Number(String(value ?? '-1'));
-  return Number.isFinite(parsed) && parsed >= 0 ? parsed : undefined;
 }

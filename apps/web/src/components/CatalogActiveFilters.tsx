@@ -15,7 +15,7 @@ export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }
   const chips: Array<{ key: keyof CatalogFilterValues; label: string }> = [];
 
   if (values.q?.trim()) chips.push({ key: 'q', label: `«${values.q.trim()}»` });
-  if (values.city) chips.push({ key: 'city', label: values.city });
+  // Город только в хедере - не дублируем чипом (сброс города через селектор в шапке).
   if (values.category) chips.push({ key: 'category', label: values.category });
   if (values.landing) chips.push({ key: 'landing', label: values.landing });
   if (values.date) {
@@ -30,7 +30,7 @@ export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }
   if (values.from || values.to) {
     chips.push({
       key: 'from',
-      label: values.from && values.to ? `${values.from} — ${values.to}` : values.from || values.to || '',
+      label: values.from && values.to ? `${values.from} - ${values.to}` : values.from || values.to || '',
     });
   }
   if (values.minPrice === 0 && values.maxPrice === 0) {
@@ -60,9 +60,6 @@ export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }
         <Link
           key={`${chip.key}:${chip.label}`}
           href={buildCatalogHref(clearCatalogFilterKey(values, chip.key))}
-          onClick={() => {
-            if (chip.key === 'city') persistSelectedCity('all');
-          }}
           className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary-700 ring-1 ring-primary/20 transition hover:bg-primary/20"
         >
           {chip.label}
