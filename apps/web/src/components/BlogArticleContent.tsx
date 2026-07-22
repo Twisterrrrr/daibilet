@@ -569,7 +569,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <ul
             key={`ul-${index}`}
-            className="my-5 list-disc space-y-2.5 pl-6 text-[1.0625rem] leading-relaxed text-slate-700 marker:text-primary-500"
+            className="my-5 list-disc space-y-2.5 pl-6 text-sm leading-7 text-slate-600 marker:text-primary-500"
           >
             {block.items.map((item, itemIndex) => (
               <li key={itemIndex} className="pl-1">
