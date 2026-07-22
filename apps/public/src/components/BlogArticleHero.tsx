@@ -31,8 +31,8 @@ export function BlogArticleHero({
     <>
       <PageBreadcrumbBar items={breadcrumbs} />
       <section className="relative overflow-hidden border-b border-slate-200 bg-slate-900 text-white">
-        {/* Чуть выше плоского баннера: ~4:3 / 3:2 по ширине, с потолком высоты на широких экранах. */}
-        <div className="relative h-[min(78vw,26rem)] w-full sm:h-[min(58vw,30rem)] lg:h-[min(46vw,32rem)]">
+        {/* Mobile Stories 9:16 по высоте; от sm - мягче, на lg потолок чтобы не уезжало. */}
+        <div className="relative aspect-[9/16] w-full sm:aspect-[3/4] lg:aspect-auto lg:h-[min(48vw,36rem)]">
           {showImage ? (
             <img
               src={coverImageUrl || ''}
@@ -46,7 +46,7 @@ export function BlogArticleHero({
             <div className="absolute inset-0 bg-gradient-to-br from-amber-500 via-rose-500 to-primary-700" />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/55 to-slate-950/25" />
-          <div className="container-page relative flex h-full flex-col justify-end py-8 sm:py-10 lg:py-12">
+          <div className="container-page relative flex h-full flex-col justify-end py-10 sm:py-12 lg:py-14">
             <div className="flex flex-wrap items-center gap-2">
               <p className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wider text-white/80">
                 <BookOpen className="h-4 w-4" />
