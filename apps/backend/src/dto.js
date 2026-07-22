@@ -398,7 +398,8 @@ const LANDING_RULES = [
     tags: ['Экскурсии по крышам', 'Крыши'],
     keywords: ['крыш', 'руф', 'панорам'],
     keywordScope: 'content',
-    requiredKeywordGroups: [['экскурс', 'прогулк', 'тур']],
+    requiredTitleKeywordGroups: [['экскурс', 'прогулк', 'тур']],
+    requiredKeywordGroups: [['крыш', 'руф', 'панорам']],
     excludeKeywords: ['теплоход', 'катер', 'речн', 'концерт', 'музыкальн', 'вечеринк', 'фуршет'],
   },
   {
