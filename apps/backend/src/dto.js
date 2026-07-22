@@ -6113,6 +6113,16 @@ function isVenueHallSuffix(suffix) {
   return false;
 }
 
+function venueTitleHasOnlyHallSuffixes(name) {
+  const title = String(formatPublicVenueTitle(name) || name || '').trim();
+  const segments = title
+    .split(/\s*\|\s*/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (segments.length <= 1) return false;
+  return segments.slice(1).every((part) => isVenueHallSuffix(part));
+}
+
 function canonicalVenueMergeTitle(name) {
   let title = String(formatPublicVenueTitle(name) || '').trim();
   if (!title) return title;
@@ -6149,19 +6159,30 @@ function normalizeVenueTextKey(value) {
     .trim();
 }
 
+/** Collapse "24 27 б" / "24/27 Б" → stable house token for venue merge keys. */
+function normalizeVenueAddressMergeKey(value) {
+  return normalizeVenueTextKey(value)
+    .replace(/(\d)\s+([a-zа-я])/gi, '$1$2')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function venueTitleLooksLikeAddress(name) {
   const text = String(name || '').toLowerCase();
   return /(?:\bul\.|\bпр\.|\bпер\.|наб\.|,\s*с\.|,\s*д\.|,\s*дом\b|район,|область,|республик)/i.test(text);
 }
 
 function canonicalVenueAddressKey(name, address) {
-  let text = normalizeVenueTextKey(`${canonicalVenueMergeTitle(name) || formatPublicVenueTitle(name) || ''} ${address || ''}`);
-  text = text
+  const titlePart = normalizeVenueTextKey(canonicalVenueMergeTitle(name) || formatPublicVenueTitle(name) || '');
+  const addressPart = normalizeVenueAddressMergeKey(address || '');
+  let text = `${titlePart} ${addressPart}`
     .replace(/(?:^|\s)причал(?:\s|$)/g, ' ')
     .replace(/(?:^|\s)наб(?:\s|$)/g, ' набережная ')
     .replace(/(?:^|\s)ул(?:\s|$)/g, ' улица ')
     .replace(/\s+/g, ' ')
     .trim();
+  // Re-apply house-letter glue after ул→улица expansion.
+  text = text.replace(/(\d)\s+([a-zа-я])/gi, '$1$2');
   return text;
 }
 
@@ -6181,6 +6202,12 @@ function normalizePublicVenueMergeKey(name, city, address) {
 
   if (venueTitleLooksLikeAddress(name)) {
     return `geo|${title}`;
+  }
+
+  // «Club | Красный зал» / «Club | Основной зал» → одна карточка клуба в городе,
+  // даже если в адресе пляшет пробел («24/27Б» vs «24/27 Б»).
+  if (title && venueTitleHasOnlyHallSuffixes(name)) {
+    return `clubhall|${cityKey}|${title}`;
   }
 
   const addressKey = canonicalVenueAddressKey(name, address);
