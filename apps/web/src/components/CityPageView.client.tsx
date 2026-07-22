@@ -160,17 +160,21 @@ export function CityPageView({
   const hasAbout = aboutArticles.length > 0;
   const hasPractice = hasTravel || hasFaq || practiceArticles.length > 0;
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
+  const showSightsBlock = hasSights || sightsArticles.length > 0;
+  /** Нет editorial-материалов - блок «Куда сходить» занимает слот перед афишей. */
+  const showSightsBeforeAffiche = !hasAbout && showSightsBlock;
 
   const tabs = React.useMemo(
     () =>
       [
         { id: 'about', label: 'О городе', show: hasAbout },
+        { id: 'sights', label: 'Куда сходить', show: showSightsBeforeAffiche },
         { id: 'affiche', label: 'Афиша', show: true },
-        { id: 'sights', label: 'Куда сходить', show: hasSights || sightsArticles.length > 0 },
+        { id: 'sights', label: 'Куда сходить', show: showSightsBlock && !showSightsBeforeAffiche },
         { id: 'practice', label: 'Советы', show: hasPractice },
         { id: 'more', label: 'Топ-запросы', show: hasMore },
       ].filter((tab) => tab.show),
-    [hasAbout, hasMore, hasPractice, hasSights, sightsArticles.length],
+    [hasAbout, hasMore, hasPractice, showSightsBeforeAffiche, showSightsBlock],
   );
 
   return (
@@ -228,6 +232,19 @@ export function CityPageView({
                   />
                 </div>
               </section>
+            ) : null}
+
+            {showSightsBeforeAffiche ? (
+              <CitySightsSection
+                city={city}
+                guide={guide}
+                categories={categories}
+                venues={payload.venues}
+                allowFallback={contentReady}
+                editorial={editorial}
+                articles={sightsArticles}
+                sessions={payload.sessions}
+              />
             ) : null}
 
             <section
@@ -288,16 +305,18 @@ export function CityPageView({
               </div>
             </section>
 
-            <CitySightsSection
-              city={city}
-              guide={guide}
-              categories={categories}
-              venues={payload.venues}
-              allowFallback={contentReady}
-              editorial={editorial}
-              articles={sightsArticles}
-              sessions={payload.sessions}
-            />
+            {showSightsBlock && !showSightsBeforeAffiche ? (
+              <CitySightsSection
+                city={city}
+                guide={guide}
+                categories={categories}
+                venues={payload.venues}
+                allowFallback={contentReady}
+                editorial={editorial}
+                articles={sightsArticles}
+                sessions={payload.sessions}
+              />
+            ) : null}
 
             {hasPractice ? (
               <section
