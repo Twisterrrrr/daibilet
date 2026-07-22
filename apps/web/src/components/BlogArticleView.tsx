@@ -26,8 +26,6 @@ export function BlogArticleView({
   const breadcrumbs = [
     { label: 'Главная', href: '/' },
     { label: 'Блог', href: '/blog' },
-    ...(article.city && cityLink ? [{ label: article.city, href: cityLink }] : []),
-    { label: article.title },
   ];
 
   return (
