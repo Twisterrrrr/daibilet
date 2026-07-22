@@ -1,6 +1,7 @@
 import type { Server } from 'node:http';
 import { buildAdminEventChangeRequestDetailDto, buildAdminEventChangeRequestsDto } from './admin-event-change-requests.dto.js';
 import { createAdminEventChangeRequestsRouteHandler } from './admin-event-change-requests-handler.js';
+import { createAdminEventScheduleRouteHandler } from './admin-event-schedule-handler.js';
 import { createAdminEventsRouteHandler } from './admin-events-handler.js';
 import { createAdminEventsReadRouteHandler } from './admin-events-read-handler.js';
 import { buildAdminEventDetailDto, buildAdminEventsListDto } from './admin-events.dto.js';
@@ -97,6 +98,9 @@ const server = startServer({
       createAdminSuppliersRouteHandler({
         buildSuppliersList: buildAdminSuppliersListDto,
         buildSupplierDetail: buildAdminSupplierDetailDto,
+      }),
+      createAdminEventScheduleRouteHandler({
+        invalidatePublicCaches,
       }),
       createAdminOrdersRouteHandler({
         db,

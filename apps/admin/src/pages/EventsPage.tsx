@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { adminFetch } from '@/lib/admin-api';
 import { useSearchParams } from 'react-router-dom';
-import { AlertTriangle, ArrowRight, ExternalLink, EyeOff, Image, Loader2, Save, Search, X } from 'lucide-react';
+import { AlertTriangle, ArrowRight, CalendarClock, ExternalLink, EyeOff, Image, Loader2, Plus, RotateCcw, Save, Search, X } from 'lucide-react';
 
 import { DataTableShell, FilterBar, InfoNote, PageHeader, QuickFilterBar, SourceBadge, StatusBadge } from '@/components/admin/primitives';
 import { Badge } from '@/components/ui/badge';
@@ -99,6 +99,72 @@ type AdminEventDetail = {
 };
 
 type EventOverridePatch = Partial<NonNullable<AdminEventRow['override']>>;
+
+type AdminEventSchedule = {
+  eventId: string;
+  slug: string;
+  title: string;
+  kind: 'SINGLE' | 'RECURRING' | 'OPEN_DATE' | string;
+  status: string;
+  purchaseFlow: string;
+  managementMode: string;
+  scheduleLocked: boolean;
+  editable: boolean;
+  lockCode?: string | null;
+  lockReason?: string | null;
+  defaultCapacityTotal?: number | null;
+  openDate: {
+    validFrom?: string | null;
+    validTo?: string | null;
+    validDays?: number | null;
+  };
+  salesPolicy: {
+    startsAt?: string | null;
+    endsAt?: string | null;
+  };
+  sessions: Array<{
+    id: string;
+    startsAt?: string | null;
+    endsAt?: string | null;
+    sourceStatus?: string | null;
+    priceFromRub?: number | null;
+    ticketsVacant?: number | null;
+    capacityTotal?: number | null;
+    capacitySold: number;
+    isActive: boolean;
+    cancelledAt?: string | null;
+    cancelReason?: string | null;
+    externalId?: string | null;
+    hasSales: boolean;
+  }>;
+  offers: Array<{
+    id: string;
+    sourceCode: string;
+    title?: string | null;
+    priceRub?: number | null;
+    oldPriceRub?: number | null;
+    capacityTotal?: number | null;
+    groupSize: number;
+    weekdayMask?: number | null;
+    active: boolean;
+  }>;
+  updatedAt: string;
+};
+
+type ScheduleModePatch = {
+  kind?: 'SINGLE' | 'RECURRING' | 'OPEN_DATE';
+  scheduleLocked?: boolean;
+  defaultCapacityTotal?: number | null;
+  openDateValidDays?: number | null;
+};
+
+type ScheduleSessionCreatePatch = {
+  startsAt: string;
+  endsAt?: string | null;
+  priceFromRub?: number | null;
+  ticketsVacant?: number | null;
+  capacityTotal?: number | null;
+};
 
 type AdminTaxonomy = {
   categories: Array<{ id: string; slug: string; title: string; position: number }>;
@@ -288,6 +354,33 @@ function purchaseSourceLabel(event: AdminEventRow) {
   return event.purchaseMode || 'виджет';
 }
 
+function normalizeScheduleKind(value?: string | null): 'SINGLE' | 'RECURRING' | 'OPEN_DATE' {
+  const normalized = String(value || '').toUpperCase();
+  if (normalized === 'SINGLE') return 'SINGLE';
+  if (normalized === 'OPEN_DATE') return 'OPEN_DATE';
+  return 'RECURRING';
+}
+
+function scheduleModeLabel(value?: string | null) {
+  const normalized = normalizeScheduleKind(value);
+  if (normalized === 'SINGLE') return 'разовое';
+  if (normalized === 'OPEN_DATE') return 'открытая дата';
+  return 'повторяющееся';
+}
+
+function parseOptionalInt(value: string): number | undefined {
+  const cleaned = String(value || '').trim();
+  if (!cleaned) return undefined;
+  const parsed = Number(cleaned.replace(',', '.'));
+  if (!Number.isFinite(parsed)) return undefined;
+  return Math.trunc(parsed);
+}
+
+function datetimeLocalToIso(value: string): string {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toISOString();
+}
+
 function shortOfferLabel(event: AdminEventRow) {
   if (!isPurchaseReady(event)) return 'нет виджета';
   const source = sourceBadgeFromEvent(event);
@@ -449,12 +542,16 @@ export function EventsPage() {
   const [selectedEvent, setSelectedEvent] = React.useState<AdminEventRow | null>(null);
   const [detailTab, setDetailTab] = React.useState<DetailTab>('overview');
   const [eventDetail, setEventDetail] = React.useState<AdminEventDetail | null>(null);
+  const [eventSchedule, setEventSchedule] = React.useState<AdminEventSchedule | null>(null);
   const [taxonomy, setTaxonomy] = React.useState<AdminTaxonomy | null>(null);
   const [isDetailLoading, setIsDetailLoading] = React.useState(false);
+  const [isScheduleLoading, setIsScheduleLoading] = React.useState(false);
   const [isSavingOverride, setIsSavingOverride] = React.useState(false);
   const [isSavingModeration, setIsSavingModeration] = React.useState(false);
   const [isSavingTaxonomy, setIsSavingTaxonomy] = React.useState(false);
+  const [isSavingSchedule, setIsSavingSchedule] = React.useState(false);
   const [saveError, setSaveError] = React.useState<string | null>(null);
+  const [scheduleError, setScheduleError] = React.useState<string | null>(null);
 
   const q = params.get('q') ?? '';
   const view = params.get('view') ?? 'all';
@@ -520,7 +617,9 @@ export function EventsPage() {
   React.useEffect(() => {
     if (!selectedEvent) {
       setEventDetail(null);
+      setEventSchedule(null);
       setIsDetailLoading(false);
+      setIsScheduleLoading(false);
       return;
     }
 
@@ -545,6 +644,32 @@ export function EventsPage() {
 
     return () => controller.abort();
   }, [selectedEvent]);
+
+  React.useEffect(() => {
+    if (!selectedEvent || detailTab !== 'schedule') return;
+
+    const controller = new AbortController();
+    setIsScheduleLoading(true);
+    setScheduleError(null);
+
+    adminFetch(`/api/admin/events/${encodeURIComponent(selectedEvent.id)}/schedule`, {
+      cache: 'no-store',
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        return (await response.json()) as AdminEventSchedule;
+      })
+      .then(setEventSchedule)
+      .catch((error) => {
+        if (!controller.signal.aborted) setScheduleError(error instanceof Error ? error.message : String(error));
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setIsScheduleLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [detailTab, selectedEvent]);
 
   const quickFilterItems = React.useMemo(() => {
     const counts = new Map(payload.quickFilters.map((item) => [item.id, item.count]));
@@ -652,6 +777,66 @@ export function EventsPage() {
       setSaveError(error instanceof Error ? error.message : String(error));
     } finally {
       setIsSavingTaxonomy(false);
+    }
+  };
+
+  const patchScheduleMode = async (patch: ScheduleModePatch) => {
+    if (!selectedEvent) return;
+    setIsSavingSchedule(true);
+    setScheduleError(null);
+
+    try {
+      const response = await adminFetch(`/api/admin/events/${encodeURIComponent(selectedEvent.id)}/schedule`, {
+        method: 'PATCH',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(patch),
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      setEventSchedule((await response.json()) as AdminEventSchedule);
+    } catch (error) {
+      setScheduleError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setIsSavingSchedule(false);
+    }
+  };
+
+  const createScheduleSession = async (patch: ScheduleSessionCreatePatch) => {
+    if (!selectedEvent) return;
+    setIsSavingSchedule(true);
+    setScheduleError(null);
+
+    try {
+      const response = await adminFetch(`/api/admin/events/${encodeURIComponent(selectedEvent.id)}/schedule/sessions`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(patch),
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      setEventSchedule((await response.json()) as AdminEventSchedule);
+    } catch (error) {
+      setScheduleError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setIsSavingSchedule(false);
+    }
+  };
+
+  const runScheduleSessionAction = async (sessionId: string, action: 'cancel' | 'restore') => {
+    if (!selectedEvent) return;
+    setIsSavingSchedule(true);
+    setScheduleError(null);
+
+    try {
+      const response = await adminFetch(`/api/admin/events/${encodeURIComponent(selectedEvent.id)}/schedule/sessions/${encodeURIComponent(sessionId)}/${action}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: action === 'cancel' ? JSON.stringify({ reason: 'admin_cancelled' }) : undefined,
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      setEventSchedule((await response.json()) as AdminEventSchedule);
+    } catch (error) {
+      setScheduleError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setIsSavingSchedule(false);
     }
   };
 
@@ -827,17 +1012,24 @@ export function EventsPage() {
       <EventDetailSheet
         event={selectedEvent}
         detail={eventDetail}
+        schedule={eventSchedule}
         isDetailLoading={isDetailLoading}
+        isScheduleLoading={isScheduleLoading}
         isSavingOverride={isSavingOverride}
         isSavingModeration={isSavingModeration}
         isSavingTaxonomy={isSavingTaxonomy}
+        isSavingSchedule={isSavingSchedule}
         saveError={saveError}
+        scheduleError={scheduleError}
         taxonomy={taxonomy}
         tab={detailTab}
         onTabChange={setDetailTab}
         onSaveOverride={saveOverride}
         onSaveModerationStatus={saveModerationStatus}
         onSaveTaxonomy={saveTaxonomy}
+        onPatchScheduleMode={patchScheduleMode}
+        onCreateScheduleSession={createScheduleSession}
+        onScheduleSessionAction={runScheduleSessionAction}
         onOpenChange={(open) => !open && setSelectedEvent(null)}
       />
     </div>
@@ -856,20 +1048,49 @@ function MetricCard(props: { value: number; label: string }) {
 function EventDetailSheet(props: {
   event: AdminEventRow | null;
   detail: AdminEventDetail | null;
+  schedule: AdminEventSchedule | null;
   taxonomy: AdminTaxonomy | null;
   isDetailLoading: boolean;
+  isScheduleLoading: boolean;
   isSavingOverride: boolean;
   isSavingModeration: boolean;
   isSavingTaxonomy: boolean;
+  isSavingSchedule: boolean;
   saveError: string | null;
+  scheduleError: string | null;
   tab: DetailTab;
   onTabChange: (tab: DetailTab) => void;
   onSaveOverride: (patch: EventOverridePatch) => Promise<void>;
   onSaveModerationStatus: (editorStatus: string) => Promise<void>;
   onSaveTaxonomy: (patch: { categoryId?: string | null; primarySubcategoryId?: string | null; subcategoryIds: string[]; tagIds: string[] }) => Promise<void>;
+  onPatchScheduleMode: (patch: ScheduleModePatch) => Promise<void>;
+  onCreateScheduleSession: (patch: ScheduleSessionCreatePatch) => Promise<void>;
+  onScheduleSessionAction: (sessionId: string, action: 'cancel' | 'restore') => Promise<void>;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { event, detail, taxonomy, isDetailLoading, isSavingOverride, isSavingModeration, isSavingTaxonomy, saveError, tab, onTabChange, onSaveOverride, onSaveModerationStatus, onSaveTaxonomy, onOpenChange } = props;
+  const {
+    event,
+    detail,
+    schedule,
+    taxonomy,
+    isDetailLoading,
+    isScheduleLoading,
+    isSavingOverride,
+    isSavingModeration,
+    isSavingTaxonomy,
+    isSavingSchedule,
+    saveError,
+    scheduleError,
+    tab,
+    onTabChange,
+    onSaveOverride,
+    onSaveModerationStatus,
+    onSaveTaxonomy,
+    onPatchScheduleMode,
+    onCreateScheduleSession,
+    onScheduleSessionAction,
+    onOpenChange,
+  } = props;
   const hydratedEvent = React.useMemo(() => {
     if (!event) return null;
     if (!detail?.event && !detail?.override) return event;
@@ -947,7 +1168,19 @@ function EventDetailSheet(props: {
             {tab === 'classification' ? (
               <ClassificationTab event={hydratedEvent} taxonomy={taxonomy} isSaving={isSavingTaxonomy} saveError={saveError} onSave={onSaveTaxonomy} />
             ) : null}
-            {tab === 'schedule' ? <ScheduleTab event={hydratedEvent} detail={detail} isLoading={isDetailLoading} /> : null}
+            {tab === 'schedule' ? (
+              <ManagedScheduleTab
+                event={hydratedEvent}
+                detail={detail}
+                schedule={schedule}
+                isLoading={isDetailLoading || isScheduleLoading}
+                isSaving={isSavingSchedule}
+                error={scheduleError}
+                onPatchMode={onPatchScheduleMode}
+                onCreateSession={onCreateScheduleSession}
+                onSessionAction={onScheduleSessionAction}
+              />
+            ) : null}
             {tab === 'sales' ? <SalesTab event={hydratedEvent} detail={detail} isLoading={isDetailLoading} /> : null}
             {tab === 'content' ? <ContentTab event={hydratedEvent} isSaving={isSavingOverride} saveError={saveError} onSave={onSaveOverride} /> : null}
             {tab === 'media' ? <MediaTab event={hydratedEvent} isSaving={isSavingOverride} saveError={saveError} onSave={onSaveOverride} /> : null}
@@ -1265,6 +1498,271 @@ function ScheduleTab(props: { event: AdminEventRow; detail: AdminEventDetail | n
               ))}
             </tbody>
           </table>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function ManagedScheduleTab(props: {
+  event: AdminEventRow;
+  detail: AdminEventDetail | null;
+  schedule: AdminEventSchedule | null;
+  isLoading: boolean;
+  isSaving: boolean;
+  error: string | null;
+  onPatchMode: (patch: ScheduleModePatch) => Promise<void>;
+  onCreateSession: (patch: ScheduleSessionCreatePatch) => Promise<void>;
+  onSessionAction: (sessionId: string, action: 'cancel' | 'restore') => Promise<void>;
+}) {
+  const { event, detail, schedule, isLoading, isSaving, error, onPatchMode, onCreateSession, onSessionAction } = props;
+  const [mode, setMode] = React.useState<'SINGLE' | 'RECURRING' | 'OPEN_DATE'>('RECURRING');
+  const [defaultCapacity, setDefaultCapacity] = React.useState('');
+  const [openDateDays, setOpenDateDays] = React.useState('');
+  const [newSession, setNewSession] = React.useState({
+    startsAt: '',
+    endsAt: '',
+    priceFromRub: '',
+    ticketsVacant: '',
+    capacityTotal: '',
+  });
+
+  React.useEffect(() => {
+    setMode(normalizeScheduleKind(schedule?.kind || event.eventType));
+    setDefaultCapacity(schedule?.defaultCapacityTotal ? String(schedule.defaultCapacityTotal) : '');
+    setOpenDateDays(schedule?.openDate.validDays ? String(schedule.openDate.validDays) : '');
+  }, [event.eventType, schedule?.defaultCapacityTotal, schedule?.kind, schedule?.openDate.validDays]);
+
+  const sessions: AdminEventSchedule['sessions'] = schedule?.sessions?.length
+    ? schedule.sessions
+    : (detail?.sessions?.length
+        ? detail.sessions.map((session) => ({
+            id: session.id,
+            startsAt: session.startsAt,
+            endsAt: session.endsAt,
+            sourceStatus: session.sourceStatus,
+            priceFromRub: session.priceFrom,
+            ticketsVacant: session.vacant,
+            capacityTotal: null,
+            capacitySold: 0,
+            isActive: true,
+            cancelledAt: null,
+            cancelReason: null,
+            externalId: session.externalId,
+            hasSales: false,
+          }))
+        : [{
+            id: `${event.id}:current`,
+            startsAt: event.startsAt,
+            endsAt: null,
+            sourceStatus: event.status,
+            priceFromRub: event.priceFrom,
+            ticketsVacant: event.vacant,
+            capacityTotal: null,
+            capacitySold: 0,
+            isActive: true,
+            cancelledAt: null,
+            cancelReason: null,
+            externalId: null,
+            hasSales: false,
+          }]);
+  const offers = schedule?.offers?.length
+    ? schedule.offers
+    : (detail?.offers || []).map((offer) => ({
+        id: offer.id,
+        sourceCode: offer.sourceCode,
+        title: offer.title,
+        priceRub: offer.priceRub,
+        oldPriceRub: null,
+        capacityTotal: null,
+        groupSize: 1,
+        weekdayMask: null,
+        active: offer.active,
+      }));
+  const activeSessions = sessions.filter((session) => session.isActive);
+  const vacant = activeSessions.reduce((sum, session) => sum + (session.ticketsVacant || 0), 0);
+  const sold = sessions.reduce((sum, session) => sum + session.capacitySold, 0);
+  const prices = [
+    ...offers.map((offer) => offer.priceRub),
+    ...sessions.map((session) => session.priceFromRub),
+    event.priceFrom,
+  ].filter((value): value is number => Number.isFinite(value) && Number(value) >= MIN_DISPLAY_PRICE_RUB);
+  const priceFrom = prices.length ? Math.min(...prices) : null;
+  const editable = schedule?.editable === true;
+  const sourceManaged = schedule?.lockCode === 'SOURCE_MANAGED' || String(schedule?.managementMode || '').toUpperCase() === 'SOURCE_MANAGED';
+  const canUnlock = Boolean(schedule && !sourceManaged && schedule.scheduleLocked);
+  const isOpenDate = mode === 'OPEN_DATE';
+
+  const saveMode = () => {
+    const patch: ScheduleModePatch = { kind: mode };
+    const capacity = parseOptionalInt(defaultCapacity);
+    const days = parseOptionalInt(openDateDays);
+    if (capacity !== undefined) patch.defaultCapacityTotal = capacity;
+    if (mode === 'OPEN_DATE') patch.openDateValidDays = days ?? schedule?.openDate.validDays ?? 365;
+    if (schedule?.scheduleLocked) patch.scheduleLocked = false;
+    return onPatchMode(patch);
+  };
+
+  const addSession = async () => {
+    if (!newSession.startsAt) return;
+    await onCreateSession({
+      startsAt: datetimeLocalToIso(newSession.startsAt),
+      endsAt: newSession.endsAt ? datetimeLocalToIso(newSession.endsAt) : null,
+      priceFromRub: parseOptionalInt(newSession.priceFromRub) ?? null,
+      ticketsVacant: parseOptionalInt(newSession.ticketsVacant) ?? null,
+      capacityTotal: parseOptionalInt(newSession.capacityTotal) ?? null,
+    });
+    setNewSession({ startsAt: '', endsAt: '', priceFromRub: '', ticketsVacant: '', capacityTotal: '' });
+  };
+
+  return (
+    <div className="mt-5 space-y-4">
+      <div className="grid gap-3 md:grid-cols-4">
+        <MetricCard value={activeSessions.length || detail?.summary?.slots || 0} label="Активных слотов" />
+        <MetricCard value={vacant || detail?.summary?.vacant || event.vacant || 0} label="Остаток" />
+        <MetricCard value={offers.length || detail?.summary?.offers || 0} label="Категорий билетов" />
+        <div className="rounded-lg border border-border bg-card p-4">
+          <div className="text-2xl font-semibold">{formatMoney(priceFrom)}</div>
+          <div className="text-xs text-muted-foreground">Цена от</div>
+        </div>
+      </div>
+
+      <section className="rounded-lg border border-border p-4">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h3 className="text-sm font-semibold">Режим расписания</h3>
+            <div className="mt-1 text-xs text-muted-foreground">
+              {schedule?.lockReason || (editable ? 'Можно редактировать ручное расписание.' : 'Расписание пока доступно только для просмотра.')}
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {isLoading ? (
+              <Badge variant="outline" className="gap-1">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                загрузка
+              </Badge>
+            ) : null}
+            <Badge variant={editable ? 'secondary' : 'outline'}>{scheduleModeLabel(schedule?.kind || event.eventType)}</Badge>
+            {schedule?.scheduleLocked ? <Badge variant="outline">закрыто</Badge> : null}
+          </div>
+        </div>
+
+        {error ? <div className="mt-3 rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-sm text-warning-foreground">{error}</div> : null}
+
+        <div className="mt-4 grid gap-3 md:grid-cols-[1fr_1fr_1fr_auto]">
+          <select className="h-9 rounded-md border border-input bg-background px-3 text-sm" value={mode} disabled={sourceManaged || isSaving} onChange={(item) => setMode(item.target.value as 'SINGLE' | 'RECURRING' | 'OPEN_DATE')}>
+            <option value="SINGLE">Разовое</option>
+            <option value="RECURRING">Повторяющееся</option>
+            <option value="OPEN_DATE">Открытая дата</option>
+          </select>
+          <Input value={defaultCapacity} disabled={sourceManaged || isSaving} onChange={(item) => setDefaultCapacity(item.target.value)} placeholder="Квота по умолчанию" />
+          <Input value={openDateDays} disabled={sourceManaged || isSaving || mode !== 'OPEN_DATE'} onChange={(item) => setOpenDateDays(item.target.value)} placeholder="Дней действия open-date" />
+          <div className="flex gap-2">
+            {canUnlock ? (
+              <Button type="button" size="sm" variant="outline" disabled={isSaving} onClick={() => onPatchMode({ scheduleLocked: false })}>
+                <CalendarClock className="h-4 w-4" />
+                Ручной режим
+              </Button>
+            ) : null}
+            <Button type="button" size="sm" disabled={sourceManaged || isSaving} onClick={saveMode}>
+              {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+              Сохранить
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {!isOpenDate ? (
+        <section className="rounded-lg border border-border p-4">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-sm font-semibold">Добавить слот</h3>
+            <Badge variant="outline">ручное событие</Badge>
+          </div>
+          <div className="mt-4 grid gap-3 md:grid-cols-[1.2fr_1.2fr_0.8fr_0.8fr_0.8fr_auto]">
+            <Input type="datetime-local" value={newSession.startsAt} disabled={!editable || isSaving} onChange={(item) => setNewSession((current) => ({ ...current, startsAt: item.target.value }))} />
+            <Input type="datetime-local" value={newSession.endsAt} disabled={!editable || isSaving} onChange={(item) => setNewSession((current) => ({ ...current, endsAt: item.target.value }))} />
+            <Input value={newSession.priceFromRub} disabled={!editable || isSaving} onChange={(item) => setNewSession((current) => ({ ...current, priceFromRub: item.target.value }))} placeholder="Цена от" />
+            <Input value={newSession.ticketsVacant} disabled={!editable || isSaving} onChange={(item) => setNewSession((current) => ({ ...current, ticketsVacant: item.target.value }))} placeholder="Остаток" />
+            <Input value={newSession.capacityTotal} disabled={!editable || isSaving} onChange={(item) => setNewSession((current) => ({ ...current, capacityTotal: item.target.value }))} placeholder="Квота" />
+            <Button type="button" size="sm" disabled={!editable || isSaving || !newSession.startsAt} onClick={addSession}>
+              {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
+              Добавить
+            </Button>
+          </div>
+        </section>
+      ) : null}
+
+      <section className="rounded-lg border border-border">
+        <div className="flex items-center justify-between border-b border-border px-4 py-3">
+          <h3 className="text-sm font-semibold">Слоты и наличие</h3>
+          <Badge variant="outline">{formatNumber(sold)} продано</Badge>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead className="bg-secondary/50 text-xs text-muted-foreground">
+              <tr>
+                <th className="px-4 py-3 font-medium">Дата и время</th>
+                <th className="px-4 py-3 font-medium">Статус</th>
+                <th className="px-4 py-3 font-medium">Цена</th>
+                <th className="px-4 py-3 font-medium">Остаток</th>
+                <th className="px-4 py-3 font-medium">Квота / продано</th>
+                <th className="px-4 py-3 font-medium">Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sessions.map((session) => (
+                <tr key={session.id} className="border-t border-border">
+                  <td className="px-4 py-3">{formatDateTime(session.startsAt)}</td>
+                  <td className="px-4 py-3">
+                    <StatusBadge status={session.isActive ? 'live' : 'incomplete'} label={session.isActive ? sessionStatusLabel(session.sourceStatus || 'ready') : 'отменен'} />
+                  </td>
+                  <td className="px-4 py-3 font-medium">{formatMoney(session.priceFromRub)}</td>
+                  <td className="px-4 py-3">{formatNumber(session.ticketsVacant)}</td>
+                  <td className="px-4 py-3">{formatNumber(session.capacityTotal)} / {formatNumber(session.capacitySold)}</td>
+                  <td className="px-4 py-3">
+                    {session.isActive ? (
+                      <Button type="button" size="sm" variant="ghost" disabled={!editable || isSaving || session.hasSales} onClick={() => onSessionAction(session.id, 'cancel')}>
+                        <X className="h-4 w-4" />
+                        Отменить
+                      </Button>
+                    ) : (
+                      <Button type="button" size="sm" variant="ghost" disabled={!editable || isSaving} onClick={() => onSessionAction(session.id, 'restore')}>
+                        <RotateCcw className="h-4 w-4" />
+                        Вернуть
+                      </Button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {!sessions.length ? (
+                <tr>
+                  <td className="px-4 py-6 text-sm text-muted-foreground" colSpan={6}>Слотов пока нет.</td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-border">
+        <div className="border-b border-border px-4 py-3">
+          <h3 className="text-sm font-semibold">Категории билетов</h3>
+        </div>
+        <div className="divide-y divide-border">
+          {offers.length ? offers.map((offer) => (
+            <div key={offer.id} className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 text-sm">
+              <div>
+                <div className="font-medium">{offer.title || sourceCodeLabel(offer.sourceCode)}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{sourceCodeLabel(offer.sourceCode)} · группа {formatNumber(offer.groupSize)}</div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">{formatMoney(offer.priceRub)}</span>
+                <StatusBadge status={offer.active ? 'live' : 'incomplete'} label={offer.active ? 'активна' : 'выключена'} />
+              </div>
+            </div>
+          )) : (
+            <div className="px-4 py-6 text-sm text-muted-foreground">Категории билетов пока не заведены.</div>
+          )}
         </div>
       </section>
     </div>
