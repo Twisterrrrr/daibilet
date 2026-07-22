@@ -3,13 +3,20 @@ import { ArrowLeft } from 'lucide-react';
 
 import { BlogArticleHero } from '@/components/BlogArticleHero';
 import { BlogArticleContent } from '@/components/BlogArticleContent';
+import { BlogRelatedSidebar } from '@/components/BlogRelatedSidebar';
 import { SiteLayout } from '@/components/SiteLayout';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import { resolveBlogCityHref } from '@/lib/blog-article-city';
-import type { BlogArticleDto } from '@/lib/blog-utils';
+import type { BlogArticleDto, BlogCardDto } from '@/lib/blog-utils';
 import { estimateReadMin, formatBlogPublishedAt } from '@/lib/blog-utils';
 
-export function BlogArticleView({ article }: { article: BlogArticleDto }) {
+export function BlogArticleView({
+  article,
+  related = [],
+}: {
+  article: BlogArticleDto;
+  related?: BlogCardDto[];
+}) {
   const readMin = estimateReadMin(article.content);
   const publishedLabel = formatBlogPublishedAt(
     article.publishedAt,
@@ -39,12 +46,25 @@ export function BlogArticleView({ article }: { article: BlogArticleDto }) {
         />
 
         <main className="container-page relative z-10 py-10 sm:py-14">
-          <article className="mx-auto max-w-[42rem] rounded-2xl border border-slate-200/90 bg-white px-5 py-8 shadow-sm sm:px-8 sm:py-10 md:px-10 md:py-11">
-            <BlogArticleContent
-              content={article.content || article.excerpt || ''}
-              coverImageUrl={article.coverImageUrl}
+          <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_17.5rem] lg:items-start lg:gap-8 xl:grid-cols-[minmax(0,1fr)_19rem] xl:gap-10">
+            <article className="min-w-0 rounded-2xl border border-slate-200/90 bg-white px-5 py-8 shadow-sm sm:px-8 sm:py-10 md:px-10 md:py-11">
+              <BlogArticleContent
+                content={article.content || article.excerpt || ''}
+                coverImageUrl={article.coverImageUrl}
+              />
+            </article>
+
+            <BlogRelatedSidebar
+              posts={related}
+              className="sticky top-24 mt-8 hidden lg:mt-0 lg:block"
             />
-          </article>
+          </div>
+
+          {related.length ? (
+            <div className="mt-10 lg:hidden">
+              <BlogRelatedSidebar posts={related} />
+            </div>
+          ) : null}
 
           <footer className="mt-10 flex flex-col gap-4 border-t border-slate-200/80 pt-8 sm:flex-row sm:items-center sm:justify-between">
             <Link

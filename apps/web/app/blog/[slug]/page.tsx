@@ -4,8 +4,8 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { BlogArticleView } from '@/components/BlogArticleView';
 import '@/lib/env';
 import { buildBlogArticleJsonLd, buildBlogArticleMetadata } from '@/lib/blog-article-seo';
-import { resolveStaticArticle } from '@/lib/blog-utils';
-import { buildPublicArticlePageDto } from '@daibilet/backend/public-read';
+import { mergeBlogCards, pickRelatedBlogCards, resolveStaticArticle } from '@/lib/blog-utils';
+import { buildPublicArticlePageDto, buildPublicArticlesListDto } from '@daibilet/backend/public-read';
 
 export const revalidate = 300;
 
@@ -38,6 +38,17 @@ async function loadArticle(slug: string) {
   return resolveStaticArticle(slug);
 }
 
+async function loadRelated(article: NonNullable<Awaited<ReturnType<typeof loadArticle>>>) {
+  let posts = mergeBlogCards(null);
+  try {
+    const payload = await buildPublicArticlesListDto();
+    posts = mergeBlogCards(payload?.articles);
+  } catch {
+    // static fallback already in mergeBlogCards(null)
+  }
+  return pickRelatedBlogCards(article, posts, 5);
+}
+
 export default async function BlogArticlePage({ params }: PageProps) {
   const { slug } = await params;
   const decoded = decodeURIComponent(slug);
@@ -47,6 +58,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
   const article = await loadArticle(decoded);
   if (!article) notFound();
 
+  const related = await loadRelated(article);
   const jsonLdBlocks = buildBlogArticleJsonLd(article);
 
   return (
@@ -58,7 +70,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }}
         />
       ))}
-      <BlogArticleView article={article} />
+      <BlogArticleView article={article} related={related} />
     </>
   );
 }

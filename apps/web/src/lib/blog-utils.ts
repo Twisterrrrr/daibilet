@@ -175,3 +175,36 @@ export function formatBlogPublishedAt(value?: string | null, fallback = ''): str
     return fallback;
   }
 }
+
+/** Похожие статьи для сайдбара: город → автор → тип → остальные. */
+export function pickRelatedBlogCards(
+  current: Pick<BlogArticleDto, 'slug' | 'citySlug' | 'authorId' | 'articleType'>,
+  posts: BlogCardDto[],
+  limit = 5,
+): BlogCardDto[] {
+  const others = posts.filter((post) => post.slug && post.slug !== current.slug);
+  if (!others.length || limit <= 0) return [];
+
+  const city = String(current.citySlug || '').trim().toLowerCase();
+  const author = String(current.authorId || '').trim().toLowerCase();
+  const type = String(current.articleType || '').trim().toLowerCase();
+
+  const score = (post: BlogCardDto): number => {
+    let value = 0;
+    if (city && String(post.citySlug || '').toLowerCase() === city) value += 100;
+    if (author && String(post.authorId || '').toLowerCase() === author) value += 40;
+    if (type && String(post.articleType || '').toLowerCase() === type) value += 20;
+    return value;
+  };
+
+  return [...others]
+    .sort((a, b) => {
+      const diff = score(b) - score(a);
+      if (diff !== 0) return diff;
+      const ta = Date.parse(String(a.publishedAt || '')) || 0;
+      const tb = Date.parse(String(b.publishedAt || '')) || 0;
+      if (tb !== ta) return tb - ta;
+      return a.title.localeCompare(b.title, 'ru');
+    })
+    .slice(0, limit);
+}
