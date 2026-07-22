@@ -1,3 +1,22 @@
+## 2026-07-22 — City hub × blog phase 2 (mini-row сессий)
+
+### Наблюдения
+
+- После harden picker (P.2o) тизеры всё ещё не связывали материал с афишей города без клика в `#affiche`.
+- Codex `ArticleEventMiniRow` уже делал keyword match по загруженным sessions — переносим в Next, без Vite merge.
+
+### Решения
+
+- `matchArticleSessions` в `city-hub-articles.ts`: до 3 сессий, keyword score → иначе quality fallback.
+- `CityHubArticleTeaser` + все `CityHubArticlesGrid` на хабе получают `payload.sessions` (полный список города, не filtered).
+- P.2p ✅; CMS citySlug binding остаётся phase 3.
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-22 — City hub × blog: Codex port в phase 1 picker
 
 ### Наблюдения

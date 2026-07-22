@@ -293,3 +293,96 @@ export function hasAnyCityHubArticles(buckets: CityHubArticlesBuckets | null | u
   if (!buckets) return false;
   return Object.values(buckets).some((list) => list.length > 0);
 }
+
+/** Минимальный контракт сессии для mini-row (phase 2). */
+export type CityHubSessionMatchInput = {
+  id: string;
+  title: string;
+  category?: string | null;
+  venue?: string | null;
+  tags?: string[] | null;
+  subcategories?: string[] | null;
+  startsAt?: string | null;
+  imageUrl?: string | null;
+  priceFrom?: number | null;
+};
+
+const ARTICLE_KEYWORD_STOP = new Set([
+  'куда',
+  'сходить',
+  'город',
+  'города',
+  'гиде',
+  'гид',
+  'обзор',
+  'лучшие',
+  'лучшее',
+  'билеты',
+  'афиша',
+  'материал',
+  'статьи',
+  'статья',
+]);
+
+function articleKeywords(article: BlogCardDto): string[] {
+  return [
+    ...new Set(normalizeText(`${article.title} ${article.slug} ${article.excerpt || ''}`).split(' ')),
+  ]
+    .filter((word) => word.length >= 4 && !ARTICLE_KEYWORD_STOP.has(word))
+    .slice(0, 10);
+}
+
+function scoreArticleSession(session: CityHubSessionMatchInput, keywords: string[]): number {
+  if (!keywords.length) return 0;
+  const text = normalizeText(
+    [session.title, session.category, session.venue, ...(session.tags || []), ...(session.subcategories || [])].join(
+      ' ',
+    ),
+  );
+  return keywords.reduce((score, keyword) => score + (text.includes(keyword) ? 1 : 0), 0);
+}
+
+function sessionQualityScore(session: CityHubSessionMatchInput): number {
+  let score = 0;
+  if (session.imageUrl) score += 3;
+  if (typeof session.priceFrom === 'number' && session.priceFrom >= 100) score += 2;
+  if (session.tags?.length) score += 1;
+  return score;
+}
+
+function startsAtMs(session: CityHubSessionMatchInput): number {
+  const value = session.startsAt ? new Date(session.startsAt).getTime() : Number.POSITIVE_INFINITY;
+  return Number.isFinite(value) ? value : Number.POSITIVE_INFINITY;
+}
+
+/**
+ * До 3 сессий хаба под тизер статьи: keyword match, иначе quality fallback.
+ * Только уже загруженные sessions города — без новых запросов.
+ */
+export function matchArticleSessions<T extends CityHubSessionMatchInput>(
+  article: BlogCardDto,
+  sessions: T[],
+  limit = 3,
+): T[] {
+  if (!sessions.length || limit <= 0) return [];
+  const keywords = articleKeywords(article);
+  const matched = sessions
+    .map((session) => ({ session, score: scoreArticleSession(session, keywords) }))
+    .filter((item) => item.score > 0)
+    .sort((left, right) => {
+      if (right.score !== left.score) return right.score - left.score;
+      return startsAtMs(left.session) - startsAtMs(right.session);
+    })
+    .slice(0, limit)
+    .map((item) => item.session);
+
+  if (matched.length) return matched;
+
+  return [...sessions]
+    .sort((a, b) => {
+      const quality = sessionQualityScore(b) - sessionQualityScore(a);
+      if (quality) return quality;
+      return startsAtMs(a) - startsAtMs(b);
+    })
+    .slice(0, limit);
+}

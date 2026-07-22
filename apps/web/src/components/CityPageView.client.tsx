@@ -231,6 +231,7 @@ export function CityPageView({
                   <CityHubArticlesGrid
                     articles={aboutArticles}
                     editorial={editorial}
+                    sessions={payload.sessions}
                     onSeeAffiche={() => scrollToSection('affiche')}
                   />
                 </div>
@@ -284,6 +285,7 @@ export function CityPageView({
                         <CityHubArticlesGrid
                           articles={afficheArticles}
                           editorial={editorial}
+                          sessions={payload.sessions}
                           onSeeAffiche={() => scrollToSection('affiche')}
                         />
                       </div>
@@ -303,6 +305,7 @@ export function CityPageView({
               allowFallback={contentReady}
               editorial={editorial}
               articles={sightsArticles}
+              sessions={payload.sessions}
             />
 
             {hasPractice ? (
@@ -336,6 +339,7 @@ export function CityPageView({
                     <CityHubArticlesGrid
                       articles={practiceArticles}
                       editorial={editorial}
+                      sessions={payload.sessions}
                       onSeeAffiche={() => scrollToSection('affiche')}
                     />
                   </div>
@@ -386,6 +390,7 @@ export function CityPageView({
                     <CityHubArticlesGrid
                       articles={moreArticles}
                       editorial={editorial}
+                      sessions={payload.sessions}
                       onSeeAffiche={() => scrollToSection('affiche')}
                     />
                   </div>
@@ -909,6 +914,7 @@ function CitySightsSection({
   allowFallback = false,
   editorial = false,
   articles = [],
+  sessions = [],
 }: {
   city: PublicCityDto;
   guide: CityInfoEntry | null;
@@ -917,6 +923,7 @@ function CitySightsSection({
   allowFallback?: boolean;
   editorial?: boolean;
   articles?: BlogCardDto[];
+  sessions?: PublicSessionDto[];
 }) {
   const fromSights = guide?.sights?.map((item) => ({ name: item.title, desc: item.text })) || [];
   const fromMustSee = guide?.mustSee?.length ? guide.mustSee : [];
@@ -984,6 +991,7 @@ function CitySightsSection({
           <CityHubArticlesGrid
             articles={articles}
             editorial={editorial}
+            sessions={sessions}
             onSeeAffiche={() => scrollToSection('affiche')}
           />
         </div>

@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { pickCityHubArticles, type CityHubArticlesBuckets } from './city-hub-articles.ts';
+import {
+  matchArticleSessions,
+  pickCityHubArticles,
+  type CityHubArticlesBuckets,
+} from './city-hub-articles.ts';
 
 type TestCard = {
   slug: string;
@@ -122,4 +126,60 @@ test('pickCityHubArticles: Moscow hub keeps Moscow article', () => {
   ];
   const buckets = pickCityHubArticles(moscow, articles);
   assert.ok(allSlugs(buckets).includes('moskva-rechnye'));
+});
+
+test('matchArticleSessions: prefers keyword hits over quality fallback', () => {
+  const article = card({
+    slug: 'spb-rooftop',
+    title: 'Крыши и open-air Петербурга',
+    excerpt: 'Смотровые площадки и вечерние крыши',
+  });
+  const sessions = [
+    {
+      id: '1',
+      title: 'Концерт в клубе',
+      category: 'Музыка',
+      venue: 'A2',
+      tags: ['концерт'],
+      startsAt: '2026-07-23T18:00:00Z',
+      imageUrl: '/a.jpg',
+      priceFrom: 1000,
+    },
+    {
+      id: '2',
+      title: 'Прогулка по крышам',
+      category: 'Экскурсии',
+      venue: 'Центр',
+      tags: ['крыши'],
+      startsAt: '2026-07-24T12:00:00Z',
+      priceFrom: 800,
+    },
+  ];
+  const matched = matchArticleSessions(article, sessions, 3);
+  assert.equal(matched[0]?.id, '2');
+});
+
+test('matchArticleSessions: falls back to quality when no keywords hit', () => {
+  const article = card({
+    slug: 'generic-tips',
+    title: 'Как выбрать формат',
+    excerpt: 'Советы без привязки к афише',
+  });
+  const sessions = [
+    {
+      id: 'cheap',
+      title: 'Событие без фото',
+      startsAt: '2026-07-23T10:00:00Z',
+      priceFrom: 50,
+    },
+    {
+      id: 'rich',
+      title: 'Событие с фото',
+      startsAt: '2026-07-25T10:00:00Z',
+      imageUrl: '/x.jpg',
+      priceFrom: 500,
+    },
+  ];
+  const matched = matchArticleSessions(article, sessions, 1);
+  assert.equal(matched[0]?.id, 'rich');
 });

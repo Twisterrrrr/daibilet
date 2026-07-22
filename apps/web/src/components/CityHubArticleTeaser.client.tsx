@@ -5,21 +5,30 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
-import { cityHubArticleBadges } from '@/lib/city-hub-articles';
+import { cityHubArticleBadges, matchArticleSessions } from '@/lib/city-hub-articles';
 import type { BlogCardDto } from '@/lib/blog-utils';
+import { formatPriceFrom } from '@/lib/format';
+import { eventHref } from '@/lib/routes';
+import type { PublicSessionDto } from '@daibilet/contracts/public';
 
 export function CityHubArticleTeaser({
   article,
   editorial = false,
+  sessions = [],
   onSeeAffiche,
 }: {
   article: BlogCardDto;
   editorial?: boolean;
+  sessions?: PublicSessionDto[];
   onSeeAffiche?: () => void;
 }) {
   const [open, setOpen] = React.useState(false);
   const badges = cityHubArticleBadges(article);
   const excerpt = String(article.excerpt || '').trim();
+  const relatedSessions = React.useMemo(
+    () => matchArticleSessions(article, sessions, 3),
+    [article, sessions],
+  );
 
   return (
     <article
@@ -98,6 +107,50 @@ export function CityHubArticleTeaser({
           </>
         ) : null}
 
+        {relatedSessions.length ? (
+          <div
+            className={`mt-3 grid gap-2 border-t pt-3 ${
+              editorial ? 'border-zinc-100' : 'border-slate-100'
+            }`}
+          >
+            {relatedSessions.map((session) => (
+              <Link
+                key={session.id}
+                href={eventHref(session)}
+                className={`grid grid-cols-[1fr_auto] gap-3 rounded-lg px-3 py-2 text-sm ${
+                  editorial
+                    ? 'bg-zinc-50 hover:bg-zinc-100'
+                    : 'bg-slate-50 hover:bg-primary-50/70'
+                }`}
+              >
+                <span className="min-w-0">
+                  <span
+                    className={`block truncate font-semibold ${
+                      editorial ? 'text-zinc-900' : 'text-slate-900'
+                    }`}
+                  >
+                    {session.title}
+                  </span>
+                  <span
+                    className={`mt-0.5 block truncate text-xs ${
+                      editorial ? 'text-zinc-500' : 'text-slate-500'
+                    }`}
+                  >
+                    {[session.dateLabel, session.venue].filter(Boolean).join(' · ')}
+                  </span>
+                </span>
+                <span
+                  className={`self-center whitespace-nowrap text-xs font-semibold ${
+                    editorial ? 'text-zinc-700' : 'text-primary-700'
+                  }`}
+                >
+                  {formatPriceFrom(session.priceFrom)}
+                </span>
+              </Link>
+            ))}
+          </div>
+        ) : null}
+
         <div className="mt-4 flex flex-wrap gap-2">
           <button
             type="button"
@@ -130,10 +183,12 @@ export function CityHubArticleTeaser({
 export function CityHubArticlesGrid({
   articles,
   editorial = false,
+  sessions = [],
   onSeeAffiche,
 }: {
   articles: BlogCardDto[];
   editorial?: boolean;
+  sessions?: PublicSessionDto[];
   onSeeAffiche?: () => void;
 }) {
   if (!articles.length) return null;
@@ -144,6 +199,7 @@ export function CityHubArticlesGrid({
           key={article.slug}
           article={article}
           editorial={editorial}
+          sessions={sessions}
           onSeeAffiche={onSeeAffiche}
         />
       ))}
