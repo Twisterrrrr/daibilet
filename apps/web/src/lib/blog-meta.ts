@@ -54,6 +54,12 @@ const SLUG_META: Record<
     citySlug: 'saint-petersburg',
     city: 'Санкт-Петербург',
   },
+  'spb-s-rebenkom-v-dozhd': {
+    authorId: 'elena',
+    articleType: 'column',
+    citySlug: 'saint-petersburg',
+    city: 'Санкт-Петербург',
+  },
   'kazan-na-vkus-master-klassy': {
     authorId: 'artur',
     articleType: 'column',

@@ -21,6 +21,23 @@ export type BlogPost = {
 /** Обложки — уникальная статика на статью: /images/blog/{slug}.jpg */
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: 'spb-s-rebenkom-v-dozhd',
+    title:
+      'Куда сходить с ребёнком в Петербурге в дождь: четыре места без мокрых ног и родительского героизма',
+    excerpt:
+      'Колонка Елены: планетарий, Музей Матрёшки, мир Гарри Поттера и концерт для малышей — как собрать спокойный семейный день под дождём.',
+    date: '22 июля 2026',
+    readMin: 11,
+    tag: 'Колонка',
+    city: 'Санкт-Петербург',
+    citySlug: 'saint-petersburg',
+    authorId: 'elena',
+    authorName: 'Елена',
+    articleType: 'column',
+    imageUrl: blogCoverUrl('spb-s-rebenkom-v-dozhd'),
+    imageAlt: 'Дождливый Петербург за окном и тёплый свет внутри — семейный день без мокрых ног',
+  },
+  {
     slug: 'kazan-na-vkus-master-klassy',
     title: 'Казань на вкус: где приготовить эчпочмак, чак-чак и губадию своими руками',
     excerpt:
