@@ -13,6 +13,8 @@ export const IMAGE_SIZES = {
   cityCard: '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw',
   institutionCard: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw',
   landingCard: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
+  /** Full-width city-hub / catalog landing banners */
+  landingBanner: '100vw',
   blogCard: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
   blogThumb: '5rem',
   blogFeatured: '(max-width: 1024px) 100vw, 60vw',

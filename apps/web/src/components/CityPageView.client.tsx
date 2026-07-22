@@ -861,7 +861,7 @@ function PopularDirections({
   const citySlug = city.slug || city.sourceSlug || undefined;
   const landingItems = landings
     .filter((landing) => Number(landing.events) > 0)
-    .slice(0, 9)
+    .slice(0, 6)
     .map((landing) => ({
       slug: landing.slug,
       title: landing.title,
@@ -880,26 +880,27 @@ function PopularDirections({
   return (
     <section
       id="directions"
-      className={`py-8 ${nested ? '' : SECTION_SCROLL_MT} ${
+      className={`py-10 ${nested ? '' : SECTION_SCROLL_MT} ${
         nested
           ? ''
-          : `border-b ${editorial ? 'border-zinc-200 bg-zinc-50/40' : 'border-slate-100 bg-gradient-to-b from-slate-50/90 to-white'}`
+          : `border-b ${editorial ? 'border-zinc-200 bg-zinc-50/50' : 'border-slate-100 bg-slate-50/80'}`
       }`}
     >
       <div className="container-page">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div className="max-w-2xl">
             <h3
               className={
                 editorial
                   ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
-                  : 'text-xl font-bold tracking-tight text-slate-950 sm:text-2xl'
+                  : 'font-display text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl'
               }
             >
-              Популярные направления
+              Подборки по топ-запросам
             </h3>
-            <p className={`mt-1 max-w-2xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-              Те же подборки, что в разделе «Подборки» - сразу с афишей {cityIn}.
+            <p className={`mt-2 text-sm leading-6 sm:text-base ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+              Не листайте всю афишу {cityIn}: мы уже собрали то, что ищут чаще всего - с ценами, датами и площадками в
+              одном списке.
             </p>
           </div>
           <Link
@@ -913,9 +914,15 @@ function PopularDirections({
         </div>
 
         {landingItems.length ? (
-          <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {landingItems.map((landing) => (
-              <LandingDirectionCard key={landing.slug} landing={landing} citySlug={citySlug} />
+          <div className="mt-6 flex flex-col gap-3 sm:gap-4">
+            {landingItems.map((landing, index) => (
+              <LandingDirectionCard
+                key={landing.slug}
+                landing={landing}
+                citySlug={citySlug}
+                variant="banner"
+                rank={index + 1}
+              />
             ))}
           </div>
         ) : null}

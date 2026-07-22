@@ -59,17 +59,77 @@ function landingGradient(slug: string): string {
   return 'from-indigo-600 via-primary to-fuchsia-700';
 }
 
-/** Та же карточка, что в разделе «Подборки» (`/podborki`). */
+function landingBenefit(landing: LandingDirectionCardItem): string {
+  if (landing.subtitle?.trim()) return landing.subtitle.trim();
+  return 'Готовый список с ценами, датами и площадками - без долгого поиска по афише.';
+}
+
+/** Та же сущность, что в «Подборки» (`/podborki`): плитка или широкий баннер для city hub. */
 export function LandingDirectionCard({
   landing,
   citySlug,
+  variant = 'tile',
+  rank,
 }: {
   landing: LandingDirectionCardItem;
   citySlug?: string | null;
+  variant?: 'tile' | 'banner';
+  /** 1-based порядок в топе запросов (для баннера). */
+  rank?: number;
 }) {
   const emoji = LANDING_EMOJI[landing.slug] || '✨';
   const imageUrl = resolveLandingCardImage(landing.slug);
   const href = landingCategoryHref(landing.slug, citySlug && citySlug !== 'all' ? citySlug : undefined);
+  const priceLabel = formatLandingPrice(landing.priceFrom);
+  const eventsLabel = pluralEvents(landing.events);
+
+  if (variant === 'banner') {
+    return (
+      <Link
+        href={href}
+        className="group relative flex min-h-[10.5rem] w-full overflow-hidden bg-slate-950 text-white ring-1 ring-slate-900/10 transition hover:ring-primary-500/40 sm:min-h-[11.5rem]"
+      >
+        {imageUrl ? (
+          <SafeImage
+            src={imageUrl}
+            alt=""
+            fill
+            sizes={IMAGE_SIZES.landingBanner}
+            className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+          />
+        ) : (
+          <div className={`absolute inset-0 bg-gradient-to-br ${landingGradient(landing.slug)}`} />
+        )}
+        {/* Читаемость слева + лёгкий fade справа, чтобы баннер «дышал» на широком экране. */}
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-gradient-to-r from-slate-950 from-[8%] via-slate-950/88 via-[42%] to-slate-950/25 to-[88%]"
+        />
+        <div aria-hidden className="absolute inset-y-0 right-0 w-1/3 bg-gradient-to-l from-slate-950/50 to-transparent" />
+
+        <div className="relative z-[1] flex w-full flex-col justify-center gap-3 px-5 py-6 sm:px-7 sm:py-7 lg:flex-row lg:items-end lg:justify-between lg:gap-8">
+          <div className="min-w-0 max-w-2xl">
+            <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-white/55">
+              {typeof rank === 'number' ? `Топ-запрос · ${String(rank).padStart(2, '0')}` : 'Топ-запрос'}
+            </p>
+            <h3 className="font-display mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">{landing.title}</h3>
+            <p className="mt-2 max-w-xl text-sm leading-6 text-white/80 sm:text-[0.95rem]">{landingBenefit(landing)}</p>
+            <p className="mt-3 text-sm font-semibold text-white/90">
+              {eventsLabel}
+              <span className="mx-2 text-white/35" aria-hidden>
+                ·
+              </span>
+              {priceLabel}
+            </p>
+          </div>
+          <span className="inline-flex shrink-0 items-center gap-2 self-start rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-sm transition group-hover:gap-3 lg:self-end">
+            Открыть подборку
+            <ArrowRight className="h-4 w-4" aria-hidden />
+          </span>
+        </div>
+      </Link>
+    );
+  }
 
   return (
     <Link
@@ -97,7 +157,7 @@ export function LandingDirectionCard({
           <p className="mt-1 line-clamp-2 text-xs text-white/80 sm:text-sm">{landing.subtitle}</p>
         ) : null}
         <p className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-white/90 group-hover:text-white sm:text-sm">
-          {pluralEvents(landing.events)} · {formatLandingPrice(landing.priceFrom)}
+          {eventsLabel} · {priceLabel}
           <ArrowRight className="h-3.5 w-3.5" />
         </p>
       </div>
