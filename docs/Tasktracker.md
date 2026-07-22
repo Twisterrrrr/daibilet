@@ -42,7 +42,7 @@
 | P.2o | **City hub × blog phase 1** — editorial тизеры (about/affiche/sights/practice/more), sticky 5 tabs | Высокий | ✅ `bb65e4a` prod proof sankt-peterburg |
 | L.1 | Catalog API: public Cache-Control + Next `getCachedCatalog`; favorites `?ids=`; landing skip no-store; page sizes 50/100 | Критический | ✅ `bb65e4a` prod; nginx proxy_cache+limit_req ✅ |
 | L.2 | Images: `next/image` + WebP/AVIF (`SafeImage`), remotePatterns TC/TEP/S3, sharp, hot-path cards/heroes | Высокий | ✅ `9646968` prod proof AVIF `/_next/image` |
-| L.3 | TC catalog sync load: nightly timer + flock/nice/ionice; `--ids` ProviderLink filter; RawImport payloadHash skip; light warm | Критический | 🔄 код в worktree |
+| L.3 | TC catalog sync load: nightly timer + flock/nice/ionice; `--ids` ProviderLink filter; RawImport payloadHash skip; light warm | Критический | ✅ `efc8459` prod; timer next 03:20 UTC |
 | P.3 | **Finance contour / ЛК поставщиков** — базовый контур | Высокий | ⏳ |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
 | P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |
