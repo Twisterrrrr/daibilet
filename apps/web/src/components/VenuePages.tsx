@@ -12,6 +12,7 @@ import '@/lib/env';
 import { buildPublicVenueDto, buildPublicVenuesDto } from '@daibilet/backend/public-read';
 import { evaluateVenueIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { venueHref } from '@/lib/routes';
+import { absoluteUrl, pageTitle } from '@/lib/seo-meta';
 import { buildVenuePageJsonLd } from '@/lib/structured-data';
 
 type PageProps = {
@@ -20,27 +21,75 @@ type PageProps = {
   listPath: '/venues' | '/locations';
 };
 
-export async function generateVenueListMetadata(title: string, description: string): Promise<Metadata> {
-  return { title, description };
+export async function generateVenueListMetadata(
+  title: string,
+  description: string,
+  listPath: '/venues' | '/locations' = '/venues',
+): Promise<Metadata> {
+  const cleanTitle = pageTitle(title);
+  const shareTitle = `${cleanTitle} | Дайбилет`;
+  return {
+    title: cleanTitle,
+    description,
+    alternates: { canonical: listPath },
+    openGraph: {
+      type: 'website',
+      locale: 'ru_RU',
+      siteName: 'Дайбилет',
+      url: absoluteUrl(listPath),
+      title: shareTitle,
+      description,
+    },
+    twitter: {
+      card: 'summary',
+      title: shareTitle,
+      description,
+    },
+  };
 }
 
 export async function generateVenueDetailMetadata(slug: string): Promise<Metadata> {
   const payload = await buildPublicVenueDto(decodeURIComponent(slug));
-  if (!payload?.venue) return { title: 'Площадка не найдена | Дайбилет' };
+  if (!payload?.venue) return { title: 'Площадка не найдена' };
   const venue = payload.venue;
   const decision = evaluateVenueIndexability({
     events: payload.stats?.events ?? venue.events ?? 0,
     isIndexable: venue.isIndexable,
   });
+  const title = pageTitle(venue.seoTitle || venue.title || venue.name || 'Площадка');
+  const description =
+    venue.seoDescription || venue.shortDescription || venue.description || undefined;
+  const canonicalPath = venue.canonicalPath || venueHref(venue);
+  const shareTitle = `${title} | Дайбилет`;
+  const image = venue.heroImageUrl ? absoluteUrl(venue.heroImageUrl) : undefined;
+
   return {
-    title: venue.seoTitle || `${venue.title || venue.name} | Дайбилет`,
-    description: venue.seoDescription || venue.shortDescription || venue.description || undefined,
-    alternates: { canonical: venue.canonicalPath || venueHref(venue) },
+    title,
+    description,
+    alternates: { canonical: canonicalPath },
     robots: robotsForIndexability(decision.indexable),
     openGraph: {
-      title: venue.seoTitle || venue.title || venue.name,
-      description: venue.seoDescription || undefined,
-      images: venue.heroImageUrl ? [{ url: venue.heroImageUrl }] : undefined,
+      type: 'website',
+      locale: 'ru_RU',
+      siteName: 'Дайбилет',
+      url: absoluteUrl(canonicalPath),
+      title: shareTitle,
+      description,
+      images: image
+        ? [
+            {
+              url: image,
+              secureUrl: image,
+              alt: title,
+            },
+          ]
+        : undefined,
+    },
+    twitter: {
+      card: image ? 'summary_large_image' : 'summary',
+      title: shareTitle,
+      description,
+      images: image ? [image] : undefined,
     },
   };
 }

@@ -4,8 +4,9 @@ import { VenueListPage, generateVenueListMetadata } from '@/components/VenuePage
 
 export async function generateMetadata(): Promise<Metadata> {
   return generateVenueListMetadata(
-    'Площадки: музеи, галереи и театры — билеты онлайн | Дайбилет',
+    'Площадки: музеи, галереи и театры - билеты онлайн',
     'Каталог площадок Дайбилет: музеи, галереи, театры и арт-пространства. Актуальная афиша и электронные билеты.',
+    '/venues',
   );
 }
 

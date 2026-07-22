@@ -133,13 +133,13 @@ export function renderSocialPreviewHtml(meta, { redirectPath } = {}) {
   const image = meta?.image || null;
   const redirect = redirectPath ? absoluteUrl(redirectPath) : url;
 
+  // Без мгновенного refresh: часть Telegram-клиентов уходит на SPA и теряет OG.
   return `<!doctype html>
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     ${buildMetaTags({ title, description, url, image, type: meta?.type || 'website' })}
-    <meta http-equiv="refresh" content="0;url=${escapeHtml(redirect)}" />
   </head>
   <body>
     <p><a href="${escapeHtml(redirect)}">${escapeHtml(title)}</a></p>

@@ -4,8 +4,9 @@ import { VenueListPage, generateVenueListMetadata } from '@/components/VenuePage
 
 export async function generateMetadata(): Promise<Metadata> {
   return generateVenueListMetadata(
-    'Локации: причалы, парки и точки старта экскурсий | Дайбилет',
+    'Локации: причалы, парки и точки старта экскурсий',
     'Куда приходить: причалы речных прогулок, парки, точки старта пеших экскурсий, автобусные остановки и встречи в аэропорту.',
+    '/locations',
   );
 }
 
