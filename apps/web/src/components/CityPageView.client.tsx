@@ -524,30 +524,38 @@ function CityHeroDefault({
     guide?.brief ||
     `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат, дату и площадку без долгого поиска по разным билетным системам.`;
 
-  // Полный cover как раньше; при расширении экрана якорим кадр вправо (режем слева),
-  // а слева закрываем поле градиентом — без ужатия фото в узкую колонку.
+  // До «обычной» ширины (~1280px) фото на весь hero как раньше.
+  // Шире — плоскость фото не растягиваем: якорим справа, слева нарастает градиент.
   const focusParts = String(heroFocus || 'center 45%').trim().split(/\s+/);
+  const focusX = focusParts[0] || 'center';
   const focusY = focusParts[1] || '45%';
-  const heroObjectPosition = `right ${focusY}`;
 
   return (
     <section
       id="top"
       className="relative min-h-[280px] overflow-hidden border-b border-primary-950 bg-slate-950 text-white sm:min-h-[320px]"
     >
-      <SafeImage
-        src={heroImage}
-        alt=""
-        fill
-        priority
-        sizes={IMAGE_SIZES.eventHero}
-        style={{ objectPosition: heroObjectPosition }}
-        className="object-cover"
-        fallback={<div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950" />}
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-slate-950 from-[5%] via-slate-950/80 via-[32%] to-transparent to-[68%]" />
-      <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950/55 to-transparent" />
-      <div className="container-page relative py-12 sm:py-14">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-y-0 right-0 z-0 h-full w-full max-w-[80rem]"
+      >
+        <SafeImage
+          src={heroImage}
+          alt=""
+          fill
+          priority
+          sizes="(max-width: 1280px) 100vw, 80rem"
+          style={{ objectPosition: `${focusX} ${focusY}` }}
+          className="object-cover"
+          fallback={
+            <div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950" />
+          }
+        />
+        <div className="absolute inset-y-0 left-0 w-[28%] bg-gradient-to-r from-slate-950 via-slate-950/55 to-transparent sm:w-[22%]" />
+      </div>
+      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-slate-950 from-[8%] via-slate-950/75 via-[34%] to-transparent to-[72%]" />
+      <div className="absolute inset-x-0 bottom-0 z-[1] h-32 bg-gradient-to-t from-slate-950/55 to-transparent" />
+      <div className="container-page relative z-[2] py-12 sm:py-14">
         <div className="flex items-center gap-2 text-sm text-primary-100/80">
           <button type="button" onClick={() => navigateHome('top')} className="hover:text-white">
             Главная
