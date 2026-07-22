@@ -53,6 +53,19 @@ export interface PublicLandingDto extends SeoFields {
   strength: 'ready' | 'seed' | 'empty';
 }
 
+export interface PublicArticleDto {
+  slug: string;
+  title: string;
+  excerpt?: string | null;
+  coverImageUrl?: string | null;
+  city?: string | null;
+  citySlug?: string | null;
+  articleType?: 'gid' | 'obzor' | 'column' | string | null;
+  authorName?: string | null;
+  publishedAt?: string | null;
+  isIndexable?: boolean | null;
+}
+
 export interface PublicSessionDto extends PurchaseFields {
   id: string;
   slug?: string | null;
@@ -223,6 +236,7 @@ export interface PublicCityPageDto extends ApiEnvelope {
   sessions: PublicSessionDto[];
   venues: PublicVenueDto[];
   landings: PublicLandingDto[];
+  articles: PublicArticleDto[];
   stats: {
     events: number;
     venues: number;

@@ -32,6 +32,19 @@ export type PublicLanding = {
   seoDescription?: string | null;
 };
 
+export type PublicArticle = {
+  slug: string;
+  title: string;
+  excerpt?: string | null;
+  coverImageUrl?: string | null;
+  city?: string | null;
+  citySlug?: string | null;
+  articleType?: 'gid' | 'obzor' | 'column' | string | null;
+  authorName?: string | null;
+  publishedAt?: string | null;
+  isIndexable?: boolean | null;
+};
+
 export type PublicLandingContentBlock = {
   id?: string;
   type: string;
@@ -158,6 +171,7 @@ export type PublicCityPage = {
   sessions: PublicSession[];
   venues: PublicVenue[];
   landings: PublicLanding[];
+  articles?: PublicArticle[];
   stats: {
     events: number;
     venues: number;

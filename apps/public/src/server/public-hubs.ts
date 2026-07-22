@@ -1,5 +1,6 @@
-import { prisma } from '@daibilet/db';
+import { ArticleStatus, prisma } from '@daibilet/db';
 import type {
+  PublicArticleDto,
   PublicCityPageDto,
   PublicDestinationDto,
   PublicLandingDto,
@@ -19,6 +20,7 @@ import {
 
 const CACHE_MS = 5 * 60 * 1000;
 const CITY_PAGE_LIMIT = 160;
+const CITY_ARTICLE_LIMIT = 24;
 const CITY_VENUE_LIMIT = 24;
 const VENUE_PAGE_LIMIT = 120;
 const LANDING_PAGE_LIMIT = 240;
@@ -137,7 +139,7 @@ export async function buildNextPublicCityPage(slugOrId: string, forceRefresh = f
 
   const sessions = matched.slice(0, CITY_PAGE_LIMIT);
   const destination = destinationFromSession(sessions[0]);
-  const [venues, cityRecord] = await Promise.all([
+  const [venues, cityRecord, articles] = await Promise.all([
     venuesForSessions(sessions, CITY_VENUE_LIMIT),
     destination.type === 'city' && sessions[0].cityId
       ? prisma.city.findUnique({
@@ -151,6 +153,7 @@ export async function buildNextPublicCityPage(slugOrId: string, forceRefresh = f
         },
       })
       : Promise.resolve(null),
+    publicArticlesForCityHub(CITY_ARTICLE_LIMIT),
   ]);
   const categories = countBy(sessions.map((session) => session.category).filter(Boolean));
   const prices = displayPrices(sessions.map((session) => session.priceFrom));
@@ -177,6 +180,7 @@ export async function buildNextPublicCityPage(slugOrId: string, forceRefresh = f
     sessions,
     venues,
     landings: buildLandingCards(sessions).filter((landing) => landing.events > 0),
+    articles,
     stats: {
       events: sessions.length,
       venues: venues.length,
@@ -346,6 +350,53 @@ export async function buildNextPublicLandingPage(slugOrAlias: string, forceRefre
   };
   landingPageCache.set(canonical, { expiresAt: Date.now() + CACHE_MS, payload });
   return payload;
+}
+
+async function publicArticlesForCityHub(limit: number): Promise<PublicArticleDto[]> {
+  const now = new Date();
+  const rows = await prisma.article.findMany({
+    where: {
+      status: ArticleStatus.PUBLISHED,
+      isIndexable: true,
+      OR: [{ publishedAt: null }, { publishedAt: { lte: now } }],
+    },
+    orderBy: [{ publishedAt: 'desc' }, { updatedAt: 'desc' }],
+    take: limit,
+    select: {
+      slug: true,
+      title: true,
+      excerpt: true,
+      coverImageUrl: true,
+      isIndexable: true,
+      publishedAt: true,
+      city: {
+        select: {
+          title: true,
+          slug: true,
+        },
+      },
+    },
+  });
+
+  return rows.map((article) => ({
+    slug: article.slug,
+    title: article.title,
+    excerpt: article.excerpt,
+    coverImageUrl: article.coverImageUrl,
+    city: article.city?.title || null,
+    citySlug: article.city?.slug || null,
+    articleType: inferArticleType(article.slug, article.title),
+    authorName: null,
+    publishedAt: article.publishedAt?.toISOString() || null,
+    isIndexable: article.isIndexable,
+  }));
+}
+
+function inferArticleType(slug: string, title: string): PublicArticleDto['articleType'] {
+  const text = `${slug} ${title}`.toLowerCase();
+  if (/(gid|guide|гид|куда|сходить|посмотреть|достопримеч|маршрут)/i.test(text)) return 'gid';
+  if (/(колонка|мнение|личный|совет|как|почему|выходн|вечер)/i.test(text)) return 'column';
+  return 'obzor';
 }
 
 function destinationRows(sessions: PublicSessionDto[]): PublicDestinationDto[] {
