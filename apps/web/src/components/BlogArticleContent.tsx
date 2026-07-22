@@ -38,7 +38,8 @@ type ContentBlock =
 
 function renderInline(text: string, keyPrefix = ''): React.ReactNode[] {
   const nodes: React.ReactNode[] = [];
-  const regex = /\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*/g;
+  // **bold** before *italic* so double asterisks are not split into empties.
+  const regex = /\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*|\*([^*]+)\*/g;
   let last = 0;
   let match: RegExpExecArray | null;
   let key = 0;
@@ -62,6 +63,12 @@ function renderInline(text: string, keyPrefix = ''): React.ReactNode[] {
         <strong key={`${keyPrefix}strong-${key++}`} className="font-semibold text-slate-900">
           {match[3]}
         </strong>,
+      );
+    } else if (match[4]) {
+      nodes.push(
+        <em key={`${keyPrefix}em-${key++}`} className="italic text-slate-700">
+          {match[4]}
+        </em>,
       );
     }
     last = regex.lastIndex;
