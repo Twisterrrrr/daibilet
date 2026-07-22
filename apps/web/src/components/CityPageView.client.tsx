@@ -516,8 +516,8 @@ function CityHeroDefault({
     guide?.brief ||
     `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат, дату и площадку без долгого поиска по разным билетным системам.`;
 
-  // Mobile: cover + city focus. Desktop: масштаб по высоте hero (width:auto) -
-  // полная высота фото; при росте ширины режет слева, не сверху/снизу.
+  // Mobile: cover + city focus. Desktop: фото по высоте hero, сдвиг от правого края
+  // и мягкая маска в обе стороны (синий ночного неба → slate-950 без жёсткого обреза).
   const focusParts = String(heroFocus || 'center 32%').trim().split(/\s+/);
   const focusX = focusParts[0] || 'center';
   const focusY = focusParts[1] || '32%';
@@ -530,38 +530,56 @@ function CityHeroDefault({
       <style>{`
         @media (min-width: 1024px) {
           #top .city-hero-photo {
-            inset: auto 0 0 auto !important;
+            inset: auto 18% 0 auto !important;
             left: auto !important;
-            right: 0 !important;
+            right: 18% !important;
             top: 0 !important;
             bottom: 0 !important;
             width: auto !important;
-            max-width: none !important;
+            max-width: min(62vw, 52rem) !important;
             height: 100% !important;
             object-fit: cover !important;
-            object-position: right center !important;
+            object-position: center center !important;
+            -webkit-mask-image: linear-gradient(
+              to right,
+              transparent 0%,
+              rgba(0, 0, 0, 0.22) 8%,
+              #000 22%,
+              #000 76%,
+              rgba(0, 0, 0, 0.28) 90%,
+              transparent 100%
+            );
+            mask-image: linear-gradient(
+              to right,
+              transparent 0%,
+              rgba(0, 0, 0, 0.22) 8%,
+              #000 22%,
+              #000 76%,
+              rgba(0, 0, 0, 0.28) 90%,
+              transparent 100%
+            );
           }
         }
       `}</style>
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 right-0 z-0 h-full w-full max-w-[80rem]"
+        className="city-hero-photo-wrap pointer-events-none absolute inset-0 z-0"
       >
         <SafeImage
           src={heroImage}
           alt=""
           fill
           priority
-          sizes="(max-width: 1280px) 100vw, 80rem"
+          sizes="(max-width: 1023px) 100vw, min(62vw, 52rem)"
           style={{ objectPosition: `${focusX} ${focusY}` }}
           className="city-hero-photo object-cover"
           fallback={
             <div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950" />
           }
         />
-        <div className="absolute inset-y-0 left-0 w-[28%] bg-gradient-to-r from-slate-950 via-slate-950/55 to-transparent sm:w-[22%]" />
       </div>
-      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-slate-950 from-[8%] via-slate-950/75 via-[34%] to-transparent to-[72%]" />
+      {/* Читаемость текста слева: длинный fade в тон ночного синего, без жёсткой стены. */}
+      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-slate-950 from-[12%] via-[#07111f]/88 via-[38%] to-transparent to-[78%] lg:from-[18%] lg:via-[#07111f]/75 lg:via-[42%] lg:to-[70%]" />
       <div className="absolute inset-x-0 bottom-0 z-[1] h-32 bg-gradient-to-t from-slate-950/55 to-transparent" />
       <div className="container-page relative z-[2] py-12 sm:py-14">
         <div className="flex items-center gap-2 text-sm text-primary-100/80">
