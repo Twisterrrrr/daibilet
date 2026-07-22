@@ -343,7 +343,7 @@ function BlogFloatedSection({
   return (
     <div className="my-6 clearfix">
       <BlogFigure image={image} className={`mb-3 w-full max-w-[15.5rem] sm:max-w-[14.5rem] ${floatClass}`} />
-      <div className="min-w-0 [&>p+p]:mt-[0.85em]">{children}</div>
+      <div className="min-w-0 [&>p+p]:mt-[1.275em]">{children}</div>
     </div>
   );
 }
@@ -385,7 +385,7 @@ function BlogFlexRow({
   imageSide: 'left' | 'right';
 }) {
   const imageNode = <BlogFigure image={image} className="w-full shrink-0 sm:w-[42%] md:w-72 lg:w-80" />;
-  const contentNode = <div className="min-w-0 flex-1 [&>p+p]:mt-[0.85em]">{children}</div>;
+  const contentNode = <div className="min-w-0 flex-1 [&>p+p]:mt-[1.275em]">{children}</div>;
 
   return (
     <div className="my-8 flex flex-col gap-6 rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4 sm:flex-row sm:items-start sm:gap-8 sm:p-6">
@@ -616,7 +616,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
     }
   }
 
-  return <div className="blog-article-prose [&>p+p]:mt-[0.85em]">{nodes}</div>;
+  return <div className="blog-article-prose [&>p+p]:mt-[1.275em]">{nodes}</div>;
 }
 
 export function BlogArticleContent({
