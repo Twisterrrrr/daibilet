@@ -16,7 +16,7 @@ import { EventCard } from '@/components/EventCard';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import Link from 'next/link';
 import { formatStreetAddress } from '@/lib/address';
-import { formatMoney, formatNumber, formatPriceFrom } from '@/lib/format';
+import { formatMoney, formatNumber, formatPriceFrom, pluralEvents, pluralVenues } from '@/lib/format';
 import { resolveCityImage } from '@/lib/city-images';
 import type { CityFaqItem } from '@/lib/city-faq';
 import type { CityHubArticlesBuckets } from '@/lib/city-hub-articles';
@@ -553,15 +553,11 @@ function CityHeroDefault({
           <h1 className="text-4xl font-extrabold sm:text-5xl">{city.name}</h1>
           <p className="mt-4 max-w-3xl text-base leading-7 text-primary-50/88 sm:text-lg">{brief}</p>
           <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/80">
-            <span>
-              <span className="font-semibold text-white">{formatNumber(stats.events)}</span> событий
-            </span>
+            <span className="font-semibold text-white">{pluralEvents(stats.events)}</span>
             <span aria-hidden="true" className="text-white/35">
               ·
             </span>
-            <span>
-              <span className="font-semibold text-white">{formatNumber(stats.venues)}</span> площадок
-            </span>
+            <span className="font-semibold text-white">{pluralVenues(stats.venues)}</span>
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <a
@@ -1554,15 +1550,6 @@ function buildFallbackMustSee(city: PublicCityDto, categories: Array<[string, nu
     desc: `${pluralEvents(venue.events)} на странице площадки. Проверьте расписание, цену и ближайшие даты.`,
   }));
   return [...categoryPlaces, ...venuePlaces];
-}
-
-function pluralEvents(n: number): string {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod100 >= 11 && mod100 <= 19) return `${formatNumber(n)} событий`;
-  if (mod10 === 1) return `${formatNumber(n)} событие`;
-  if (mod10 >= 2 && mod10 <= 4) return `${formatNumber(n)} события`;
-  return `${formatNumber(n)} событий`;
 }
 
 function cityInPrepositional(city: PublicCityDto) {
