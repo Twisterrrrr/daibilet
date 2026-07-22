@@ -4,6 +4,7 @@ import { LandingsCatalogView } from '@/components/LandingsCatalogView.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { collectPopularTags } from '@/lib/catalog-tags';
+import { buildShareMetadata, pageTitle } from '@/lib/seo-meta';
 import {
   buildPublicDestinationsDto,
   buildPublicLandingsCatalogDto,
@@ -17,11 +18,18 @@ type PageProps = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
+  const title = pageTitle('Подборки - тематические коллекции событий');
+  const description =
+    'Готовые подборки на вечер, выходные и бюджет, популярные запросы и теги - с переходом в каталог с нужными фильтрами.';
   return {
-    title: 'Подборки — тематические коллекции событий',
-    description:
-      'Готовые подборки на вечер, выходные и бюджет, популярные запросы и теги — с переходом в каталог с нужными фильтрами.',
+    title,
+    description,
     alternates: { canonical: '/podborki' },
+    ...buildShareMetadata({
+      title: `${title} | Дайбилет`,
+      description,
+      path: '/podborki',
+    }),
   };
 }
 

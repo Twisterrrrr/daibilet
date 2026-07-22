@@ -5,8 +5,9 @@ import { LandingPageView } from '@/components/LandingPageView.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
+import { resolveLandingCardImage } from '@/lib/landing-images';
 import { landingCategoryHref, resolveLandingRouteFromLocation } from '@/lib/landing-routes';
-import { pageTitle, routeOpenGraph } from '@/lib/seo-meta';
+import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { fetchLandingPageDto, finalizeLandingPayload } from '@/server/landing-page';
 
 export const revalidate = 3600;
@@ -30,16 +31,24 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
 
   const landing = payload.landing;
   const canonical = landingCategoryHref(slug, route.citySlug);
+  const title = pageTitle(landing.seoTitle || landing.title);
+  const shareTitle = String(landing.seoTitle || '').includes('Дайбилет')
+    ? String(landing.seoTitle)
+    : `${title} | Дайбилет`;
+  const description = landing.seoDescription || landing.subtitle || undefined;
+  const image = landing.imageUrl || resolveLandingCardImage(slug);
+
   return {
-    title: pageTitle(landing.seoTitle || landing.title),
-    description: landing.seoDescription || landing.subtitle || undefined,
+    title,
+    description,
     alternates: {
       canonical,
     },
-    openGraph: routeOpenGraph(canonical, {
-      title: landing.seoTitle || landing.title,
-      description: landing.seoDescription || landing.subtitle || undefined,
-      images: landing.imageUrl ? [{ url: landing.imageUrl }] : undefined,
+    ...buildShareMetadata({
+      title: shareTitle,
+      description,
+      path: canonical,
+      image,
     }),
   };
 }

@@ -4,16 +4,22 @@ import { Suspense } from 'react';
 import { CatalogShell } from '@/components/CatalogShell.client';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { SiteLayout } from '@/components/SiteLayout';
-import { pageTitle, routeOpenGraph } from '@/lib/seo-meta';
+import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { catalogQueryCacheKey, parseCatalogPageQuery } from '@/server/catalog-query';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 
+const EVENTS_TITLE = 'События, экскурсии и билеты';
+const EVENTS_DESCRIPTION =
+  'Полный каталог событий Дайбилет: фильтры по городу, дате, категории, цене и подборкам.';
+
 export const metadata: Metadata = {
-  title: pageTitle('События, экскурсии и билеты'),
-  description: 'Полный каталог событий Дайбилет: фильтры по городу, дате, категории, цене и подборкам.',
+  title: pageTitle(EVENTS_TITLE),
+  description: EVENTS_DESCRIPTION,
   alternates: { canonical: '/events' },
-  openGraph: routeOpenGraph('/events', {
-    title: 'События, экскурсии и билеты',
+  ...buildShareMetadata({
+    title: `${EVENTS_TITLE} | Дайбилет`,
+    description: EVENTS_DESCRIPTION,
+    path: '/events',
   }),
 };
 

@@ -56,7 +56,10 @@ export function buildHomeSeoDescription(destinations: DestinationLike[]): string
 }
 
 export function absoluteUrl(pathname: string): string {
-  const path = pathname.startsWith('/') ? pathname : `/${pathname}`;
+  const value = String(pathname || '').trim();
+  if (!value) return SITE_URL.replace(/\/+$/, '');
+  if (/^https?:\/\//i.test(value)) return value;
+  const path = value.startsWith('/') ? value : `/${value}`;
   return new URL(path, SITE_URL).toString();
 }
 
@@ -64,5 +67,44 @@ export function routeOpenGraph(pathname: string, extras: Record<string, unknown>
   return {
     url: absoluteUrl(pathname),
     ...extras,
+  };
+}
+
+/** Единый пакет OG + Twitter, чтобы twitter не наследовал title/description главной. */
+export function buildShareMetadata(input: {
+  title: string;
+  description?: string | null;
+  path: string;
+  image?: string | null;
+  type?: 'website' | 'article';
+}): Pick<import('next').Metadata, 'openGraph' | 'twitter'> {
+  const shareTitle = String(input.title || '').trim();
+  const description = String(input.description || '').trim() || undefined;
+  const url = absoluteUrl(input.path);
+  const image = input.image ? absoluteUrl(input.image) : undefined;
+  return {
+    openGraph: {
+      type: input.type || 'website',
+      locale: 'ru_RU',
+      siteName: 'Дайбилет',
+      url,
+      title: shareTitle,
+      description,
+      images: image
+        ? [
+            {
+              url: image,
+              secureUrl: image,
+              alt: shareTitle,
+            },
+          ]
+        : undefined,
+    },
+    twitter: {
+      card: image ? 'summary_large_image' : 'summary',
+      title: shareTitle,
+      description,
+      images: image ? [image] : undefined,
+    },
   };
 }

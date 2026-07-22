@@ -84,13 +84,20 @@ const CITY_SHARE_SLUGS = new Set([
 ]);
 
 function cityShareImageFallback(slug, sourceSlug, name) {
-  const raw = String(sourceSlug || slug || name || '')
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, '-');
-  const imageSlug = CITY_SHARE_ALIASES[raw] || raw;
-  if (!CITY_SHARE_SLUGS.has(imageSlug)) return null;
-  return `/images/cities/${imageSlug}.png`;
+  // Prefer latin public slug: sourceSlug may be translit garbage / cyrillic ("нижнии-новгород").
+  const candidates = [slug, sourceSlug, name]
+    .map((value) =>
+      String(value || '')
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-'),
+    )
+    .filter(Boolean);
+  for (const raw of candidates) {
+    const imageSlug = CITY_SHARE_ALIASES[raw] || raw;
+    if (CITY_SHARE_SLUGS.has(imageSlug)) return `/images/cities/${imageSlug}.png`;
+  }
+  return null;
 }
 
 const BOT_UA_RE =
@@ -250,6 +257,39 @@ export async function buildSocialPreviewForPath(db, pathname, builders) {
       image: city.heroImageUrl || cityShareImageFallback(city.slug, city.sourceSlug, city.name),
       redirectPath: canonicalPath,
       type: 'website',
+    };
+  }
+
+  if (path === '/blog') {
+    return {
+      title: `Блог - гайды и советы о событиях | ${SITE_NAME}`,
+      description:
+        'Гайды по концертам, театру и городским прогулкам. Как выбрать билет, куда пойти с детьми, что смотреть на этой неделе.',
+      url: '/blog',
+      image: null,
+      redirectPath: '/blog',
+    };
+  }
+
+  if (path === '/venues') {
+    return {
+      title: `Площадки: музеи, галереи и театры - билеты онлайн | ${SITE_NAME}`,
+      description:
+        'Каталог площадок Дайбилет: музеи, галереи, театры и арт-пространства. Актуальная афиша и электронные билеты.',
+      url: '/venues',
+      image: null,
+      redirectPath: '/venues',
+    };
+  }
+
+  if (path === '/locations') {
+    return {
+      title: `Локации: причалы, парки и точки старта экскурсий | ${SITE_NAME}`,
+      description:
+        'Куда приходить: причалы речных прогулок, парки, точки старта пеших экскурсий, автобусные остановки и встречи в аэропорту.',
+      url: '/locations',
+      image: null,
+      redirectPath: '/locations',
     };
   }
 

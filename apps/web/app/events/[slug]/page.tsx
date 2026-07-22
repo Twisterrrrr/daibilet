@@ -9,7 +9,7 @@ import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { toEventPageClientPayload } from '@/lib/event-page-client-props';
 import { eventHref } from '@/lib/routes';
-import { pageTitle, routeOpenGraph } from '@/lib/seo-meta';
+import { pageTitle, absoluteUrl, buildShareMetadata } from '@/lib/seo-meta';
 import { buildEventPageJsonLd } from '@/lib/structured-data';
 import { buildPublicEventDto } from '@daibilet/backend/public-read';
 import { prisma } from '@/lib/db';
@@ -28,16 +28,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const event = payload.event;
   const path = event.canonicalPath || eventHref(event);
+  const title = pageTitle(event.seoTitle || event.title);
+  const shareTitle = event.seoTitle?.includes('Дайбилет')
+    ? String(event.seoTitle)
+    : `${title} | Дайбилет`;
+  const description =
+    event.seoDescription || event.description || `${event.title} - билеты на Дайбилет`;
+
   return {
-    title: pageTitle(event.seoTitle || event.title),
-    description: event.seoDescription || event.description || `${event.title} — билеты на Дайбилет`,
+    title,
+    description,
     alternates: {
       canonical: path,
     },
-    openGraph: routeOpenGraph(path, {
-      title: event.seoTitle || event.title,
-      description: event.seoDescription || event.description || undefined,
-      images: event.imageUrl ? [{ url: event.imageUrl }] : undefined,
+    ...buildShareMetadata({
+      title: shareTitle,
+      description,
+      path,
+      image: event.imageUrl,
     }),
   };
 }

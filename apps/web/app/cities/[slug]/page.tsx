@@ -16,7 +16,7 @@ import {
 import { resolveCityImage } from '@/lib/city-images';
 import { evaluateCityIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { mergeBlogCards } from '@/lib/blog-utils';
-import { absoluteUrl, pageTitle, routeOpenGraph } from '@/lib/seo-meta';
+import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { buildCityPageJsonLd } from '@/lib/structured-data';
 import { buildPublicArticlesListDto, buildPublicCityDto } from '@daibilet/backend/public-read';
 
@@ -51,37 +51,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     name: city.name,
     heroImageUrl: city.heroImageUrl,
   });
-  const image = imagePath ? absoluteUrl(imagePath) : undefined;
 
   return {
     title: pageTitle(hubTitle),
     description,
     alternates: { canonical: path },
     robots: robotsForIndexability(decision.indexable),
-    openGraph: routeOpenGraph(path, {
-      type: 'website',
-      locale: 'ru_RU',
-      siteName: 'Дайбилет',
+    ...buildShareMetadata({
       title: hubTitleFull,
       description,
-      images: image
-        ? [
-            {
-              url: image,
-              secureUrl: image,
-              width: 1200,
-              height: 630,
-              alt: city.name,
-            },
-          ]
-        : undefined,
+      path,
+      image: imagePath,
     }),
-    twitter: {
-      card: image ? 'summary_large_image' : 'summary',
-      title: hubTitleFull,
-      description,
-      images: image ? [image] : undefined,
-    },
   };
 }
 

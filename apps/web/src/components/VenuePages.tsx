@@ -12,7 +12,7 @@ import '@/lib/env';
 import { buildPublicVenueDto, buildPublicVenuesDto } from '@daibilet/backend/public-read';
 import { evaluateVenueIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { venueHref } from '@/lib/routes';
-import { absoluteUrl, pageTitle } from '@/lib/seo-meta';
+import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { buildVenuePageJsonLd } from '@/lib/structured-data';
 import { resolveVenueSeoTitle } from '@/lib/venue-seo';
 
@@ -33,19 +33,11 @@ export async function generateVenueListMetadata(
     title: cleanTitle,
     description,
     alternates: { canonical: listPath },
-    openGraph: {
-      type: 'website',
-      locale: 'ru_RU',
-      siteName: 'Дайбилет',
-      url: absoluteUrl(listPath),
+    ...buildShareMetadata({
       title: shareTitle,
       description,
-    },
-    twitter: {
-      card: 'summary',
-      title: shareTitle,
-      description,
-    },
+      path: listPath,
+    }),
   };
 }
 
@@ -61,36 +53,18 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
   const description =
     venue.seoDescription || venue.shortDescription || venue.description || undefined;
   const canonicalPath = venue.canonicalPath || venueHref(venue);
-  const image = venue.heroImageUrl ? absoluteUrl(venue.heroImageUrl) : undefined;
 
   return {
     title: pageTitle(title),
     description,
     alternates: { canonical: canonicalPath },
     robots: robotsForIndexability(decision.indexable),
-    openGraph: {
-      type: 'website',
-      locale: 'ru_RU',
-      siteName: 'Дайбилет',
-      url: absoluteUrl(canonicalPath),
+    ...buildShareMetadata({
       title: shareTitle,
       description,
-      images: image
-        ? [
-            {
-              url: image,
-              secureUrl: image,
-              alt: title,
-            },
-          ]
-        : undefined,
-    },
-    twitter: {
-      card: image ? 'summary_large_image' : 'summary',
-      title: shareTitle,
-      description,
-      images: image ? [image] : undefined,
-    },
+      path: canonicalPath,
+      image: venue.heroImageUrl,
+    }),
   };
 }
 
