@@ -11,9 +11,9 @@ export type CityHubArticleBucket =
 export type CityHubArticlesBuckets = Record<CityHubArticleBucket, BlogCardDto[]>;
 
 const LIMITS: Record<CityHubArticleBucket, number> = {
-  about: 2,
+  about: 3,
   affiche: 1,
-  sights: 2,
+  sights: 3,
   practice: 1,
   more: 1,
 };

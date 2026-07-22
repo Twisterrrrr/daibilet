@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
-import { cityHubArticleBadges, matchArticleSessions } from '@/lib/city-hub-articles';
+import { matchArticleSessions } from '@/lib/city-hub-articles';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { formatPriceFrom } from '@/lib/format';
 import { eventHref } from '@/lib/routes';
@@ -20,7 +20,6 @@ export function CityHubArticleTeaser({
   editorial?: boolean;
   sessions?: PublicSessionDto[];
 }) {
-  const badges = cityHubArticleBadges(article);
   const excerpt = String(article.excerpt || '').trim();
   const articleHref = `/blog/${article.slug}`;
   const relatedSessions = React.useMemo(
@@ -32,15 +31,14 @@ export function CityHubArticleTeaser({
     <article
       className={
         editorial
-          ? 'overflow-hidden rounded-2xl border border-zinc-200 bg-white md:grid md:grid-cols-[minmax(16rem,42%)_minmax(0,1fr)] md:items-stretch'
-          : 'overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm md:grid md:grid-cols-[minmax(16rem,42%)_minmax(0,1fr)] md:items-stretch'
+          ? 'flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white'
+          : 'flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm'
       }
     >
-      {/* Фото на всю высоту карточки; контент прижат вправо */}
       <Link
         href={articleHref}
         aria-label={article.title}
-        className={`relative block aspect-[16/10] overflow-hidden md:aspect-auto md:min-h-full md:h-auto md:self-stretch ${
+        className={`relative block aspect-[16/10] shrink-0 overflow-hidden ${
           editorial ? 'bg-zinc-100' : 'bg-slate-100'
         }`}
       >
@@ -62,25 +60,8 @@ export function CityHubArticleTeaser({
         />
       </Link>
 
-      <div className="flex min-w-0 flex-col justify-between p-3.5 sm:p-5 md:p-6">
+      <div className="flex min-w-0 flex-1 flex-col justify-between p-3.5 sm:p-4">
         <div className="min-w-0">
-          {badges.length ? (
-            <div className="mb-1.5 flex flex-wrap gap-1.5">
-              {badges.map((badge) => (
-                <span
-                  key={badge}
-                  className={
-                    editorial
-                      ? 'rounded-md border border-zinc-200 px-2 py-0.5 text-[11px] font-medium text-zinc-600'
-                      : 'rounded-md border border-slate-200 px-2 py-0.5 text-[11px] font-medium text-slate-600'
-                  }
-                >
-                  {badge}
-                </span>
-              ))}
-            </div>
-          ) : null}
-
           <h3
             className={`line-clamp-2 text-sm font-semibold leading-snug sm:text-base ${
               editorial ? 'text-zinc-950' : 'text-slate-950'
@@ -93,7 +74,7 @@ export function CityHubArticleTeaser({
 
           {excerpt ? (
             <p
-              className={`mt-1.5 line-clamp-2 text-xs leading-relaxed sm:text-sm ${
+              className={`mt-1.5 line-clamp-3 text-xs leading-relaxed sm:text-sm ${
                 editorial ? 'text-zinc-600' : 'text-slate-600'
               }`}
             >
@@ -174,9 +155,10 @@ export function CityHubArticlesGrid({
   sessions?: PublicSessionDto[];
 }) {
   if (!articles.length) return null;
+  const items = articles.slice(0, 3);
   return (
-    <div className="mt-4 grid gap-3">
-      {articles.map((article) => (
+    <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {items.map((article) => (
         <CityHubArticleTeaser
           key={article.slug}
           article={article}
