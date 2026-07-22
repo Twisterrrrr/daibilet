@@ -19,3 +19,10 @@ Implemented boundaries:
 - old anchors `#directions`, `#venues`, `#travel`, `#faq`, and `#seo` stay addressable inside the new parent sections.
 
 Do not render full article HTML on city hubs. Canonical, full text, and Article JSON-LD remain owned by `/blog/[slug]`.
+
+Apps/web integration note:
+
+- port the pure picker, teaser semantics, anchors, and local `#affiche` CTA;
+- do not copy the direct Prisma read from `apps/public/src/server/public-hubs.ts` into `apps/web`;
+- in the Next App Router implementation, fetch the city payload and the lightweight article list on the server page, then pass selected teasers into `CityPageView`;
+- keep `articles` optional in shared contracts while legacy backend and Next-backed city payloads coexist.

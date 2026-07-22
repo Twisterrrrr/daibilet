@@ -124,6 +124,7 @@ export async function buildPublicCityDto(
     sessions: pageSessions,
     venues,
     landings: buildPublicLandings(pageSessions).filter((landing) => landing.events > 0),
+    articles: [],
     stats: {
       events: pageSessions.length,
       venues: venues.length,

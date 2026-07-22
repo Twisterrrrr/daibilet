@@ -236,7 +236,7 @@ export interface PublicCityPageDto extends ApiEnvelope {
   sessions: PublicSessionDto[];
   venues: PublicVenueDto[];
   landings: PublicLandingDto[];
-  articles: PublicArticleDto[];
+  articles?: PublicArticleDto[];
   stats: {
     events: number;
     venues: number;
