@@ -69,6 +69,36 @@ test('requires an excursion signal for country tours', () => {
   }
 });
 
+test('keeps rooftop tours separate from concerts and parties', () => {
+  const rooftops = findLandingRule('rooftops');
+  assert.ok(rooftops);
+
+  assert.equal(matchesLandingRule({
+    title: 'Экскурсия по крышам Петербурга',
+    category: 'Экскурсии',
+    city: 'Санкт-Петербург',
+  }, rooftops), true);
+  assert.equal(matchesLandingRule({
+    title: 'Концерт на крыше Невского',
+    category: 'Музыка',
+    city: 'Санкт-Петербург',
+  }, rooftops), false);
+});
+
+test('requires a seasonal term in a New Year title', () => {
+  const newYear = findLandingRule('new-year');
+  assert.ok(newYear);
+
+  assert.equal(matchesLandingRule({
+    title: 'Новогодний концерт в декабре',
+    tags: ['Новый год'],
+  }, newYear), true);
+  assert.equal(matchesLandingRule({
+    title: 'Концерт на крыше Невского',
+    tags: ['Новый год'],
+  }, newYear), false);
+});
+
 test('applies canonical subcategory rules and Moscow-time schedule', () => {
   assert.equal(matchingLandingSlugs({
     title: 'Обзорная экскурсия по городу',
@@ -99,4 +129,10 @@ test('applies canonical subcategory rules and Moscow-time schedule', () => {
   });
   assert.equal(busByVenue.includes('bus-tours'), true);
   assert.equal(busByVenue.includes('river-cruises'), false);
+
+  assert.equal(matchingLandingSlugs({
+    title: 'Экскурсия на двухэтажном автобусе Hop on - hop off',
+    category: 'Экскурсии',
+    city: 'Москва',
+  }).includes('bus-tours'), true);
 });

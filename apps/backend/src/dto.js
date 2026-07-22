@@ -224,6 +224,7 @@ const LANDING_RULES = [
     subtitle: 'Елки, шоу, концерты и праздничные программы',
     chips: ['декабрь', 'детям', 'шоу'],
     keywords: ['новогод', 'новый год', 'елка', 'ёлка', 'рождество'],
+    requiredTitleKeywordGroups: [['новогод', 'новый год', 'елка', 'ёлка', 'рождеств']],
   },
   {
     slug: 'moscow-dinner-boat',
@@ -259,7 +260,6 @@ const LANDING_RULES = [
     chips: ['автобус', 'обзорная', 'город'],
     tags: ['Автобусные туры', 'Автобусные экскурсии'],
     keywords: ['автобус', 'автобусн', 'обзорн', 'сити тур', 'city tour'],
-    requiredAnySubcategories: ['Автобусные туры', 'Автобусные экскурсии'],
     requiredAnyVenueKeywords: ['туристическ', 'city sightseeing', 'hop on', 'hop-off', 'hop off'],
     requiredTitleKeywordGroups: [
       ['обзорн', 'экскурс', 'двухэтажн', 'hop on', 'city tour', 'сити тур'],
@@ -398,7 +398,8 @@ const LANDING_RULES = [
     tags: ['Экскурсии по крышам', 'Крыши'],
     keywords: ['крыш', 'руф', 'панорам'],
     keywordScope: 'content',
-    excludeKeywords: ['теплоход', 'катер', 'речн'],
+    requiredKeywordGroups: [['экскурс', 'прогулк', 'тур']],
+    excludeKeywords: ['теплоход', 'катер', 'речн', 'концерт', 'музыкальн', 'вечеринк', 'фуршет'],
   },
   {
     slug: 'active-sport',
