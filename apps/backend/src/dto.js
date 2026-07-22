@@ -25,6 +25,11 @@ import { formatPublicEventTitle } from './event-title-normalize.ts';
 import { toPublicCatalogListItem } from './public-catalog-list-item.ts';
 import { enrichBuyerOrdersWithEventLinks } from './buyer-order-event-links.js';
 import {
+  blogCitySlugAliases,
+  canonicalBlogCitySlug,
+  isBroadBlogCitySlug,
+} from './blog-city-slug.js';
+import {
   buildAdminEventGroupKey,
   invalidateAdminEventsSqlReadModelCache,
   queryAdminEventGroupsPage,
@@ -9981,6 +9986,7 @@ async function fetchLandingAuditEventRow(db, eventId) {
 }
 
 function mapPublicArticleRow(row) {
+  const citySlug = canonicalBlogCitySlug(row.citySlug) || row.citySlug || null;
   return {
     id: row.id,
     slug: row.slug,
@@ -9988,7 +9994,7 @@ function mapPublicArticleRow(row) {
     excerpt: row.excerpt || null,
     coverImageUrl: row.coverImageUrl || null,
     city: row.city || null,
-    citySlug: row.citySlug || null,
+    citySlug,
     authorId: row.authorId || null,
     authorName: row.authorName || null,
     articleType: row.articleType || null,
@@ -10008,8 +10014,29 @@ function mapPublicArticleDetail(row) {
   };
 }
 
-export async function buildPublicArticlesList(db) {
-  const { rows } = await db.query(`
+export async function buildPublicArticlesList(db, options = {}) {
+  const citySlugFilter = canonicalBlogCitySlug(options.citySlug);
+  const includeBroad = options.includeBroad === true;
+  const limit = Math.min(Math.max(Number(options.limit) || 100, 1), 200);
+  const aliases = citySlugFilter && !isBroadBlogCitySlug(citySlugFilter)
+    ? blogCitySlugAliases(citySlugFilter)
+    : [];
+
+  const params = [];
+  let whereExtra = '';
+  if (aliases.length) {
+    params.push(aliases);
+    const aliasIdx = params.length;
+    whereExtra += ` and (
+      coalesce(nullif(a."citySlug", ''), c.slug) = any($${aliasIdx}::text[])
+      ${includeBroad ? ` or coalesce(nullif(a."citySlug", ''), '') in ('multi', 'regions')` : ''}
+    )`;
+  }
+  params.push(limit);
+  const limitIdx = params.length;
+
+  const { rows } = await db.query(
+    `
     select
       a.id,
       a.slug,
@@ -10024,21 +10051,28 @@ export async function buildPublicArticlesList(db) {
       a."authorName",
       a."articleType",
       case
-        when a.slug = 'afisha-regionalnye-goroda' then 'Регионы'
-        when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'Несколько городов'
-        else c.title
+        when coalesce(nullif(a."citySlug", ''), '') = 'regions' then 'Регионы'
+        when coalesce(nullif(a."citySlug", ''), '') = 'multi' then 'Несколько городов'
+        else coalesce(c.title, null)
       end as city,
-      case
-        when a.slug = 'afisha-regionalnye-goroda' then 'regions'
-        when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'multi'
-        else c.slug
-      end as "citySlug"
+      coalesce(
+        nullif(a."citySlug", ''),
+        case
+          when a.slug = 'afisha-regionalnye-goroda' then 'regions'
+          when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'multi'
+          else c.slug
+        end
+      ) as "citySlug"
     from "Article" a
     left join "City" c on c.id = a."cityId"
     where a.status = 'PUBLISHED'
       and coalesce(a."isIndexable", true) = true
+      ${whereExtra}
     order by a."publishedAt" desc nulls last, a."updatedAt" desc
-  `);
+    limit $${limitIdx}
+  `,
+    params,
+  );
   return {
     generatedAt: new Date().toISOString(),
     total: rows.length,
@@ -10066,15 +10100,18 @@ export async function buildPublicArticlePage(db, slug) {
         a."authorName",
         a."articleType",
         case
-          when a.slug = 'afisha-regionalnye-goroda' then 'Регионы'
-          when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'Несколько городов'
-          else c.title
+          when coalesce(nullif(a."citySlug", ''), '') = 'regions' then 'Регионы'
+          when coalesce(nullif(a."citySlug", ''), '') = 'multi' then 'Несколько городов'
+          else coalesce(c.title, null)
         end as city,
-        case
-          when a.slug = 'afisha-regionalnye-goroda' then 'regions'
-          when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'multi'
-          else c.slug
-        end as "citySlug"
+        coalesce(
+          nullif(a."citySlug", ''),
+          case
+            when a.slug = 'afisha-regionalnye-goroda' then 'regions'
+            when a.slug = 'myuzikly-teatr-novichok-msk-spb' then 'multi'
+            else c.slug
+          end
+        ) as "citySlug"
       from "Article" a
       left join "City" c on c.id = a."cityId"
       where a.slug = $1
@@ -10102,6 +10139,7 @@ export async function buildAdminArticlesList(db) {
       a."publishedAt",
       a."isIndexable",
       a."updatedAt",
+      a."citySlug",
       c.title as city
     from "Article" a
     left join "City" c on c.id = a."cityId"
@@ -10118,6 +10156,7 @@ export async function buildAdminArticlesList(db) {
       excerpt: row.excerpt || '',
       coverImageUrl: row.coverImageUrl || null,
       city: row.city || null,
+      citySlug: canonicalBlogCitySlug(row.citySlug) || row.citySlug || null,
       publishedAt: row.publishedAt ? new Date(row.publishedAt).toISOString() : null,
       isIndexable: row.isIndexable !== false,
       updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
@@ -10131,7 +10170,7 @@ export async function buildAdminArticleDetail(db, articleId) {
       select
         a.*,
         c.title as city,
-        c.slug as "citySlug"
+        c.slug as "joinedCitySlug"
       from "Article" a
       left join "City" c on c.id = a."cityId"
       where a.id = $1
@@ -10141,6 +10180,12 @@ export async function buildAdminArticleDetail(db, articleId) {
   );
   const row = rows[0];
   if (!row) return null;
+  const citySlug =
+    canonicalBlogCitySlug(row.citySlug) ||
+    canonicalBlogCitySlug(row.joinedCitySlug) ||
+    row.citySlug ||
+    row.joinedCitySlug ||
+    null;
   return {
     id: row.id,
     slug: row.slug,
@@ -10151,7 +10196,7 @@ export async function buildAdminArticleDetail(db, articleId) {
     coverImageUrl: row.coverImageUrl || null,
     cityId: row.cityId || null,
     city: row.city || null,
-    citySlug: row.citySlug || null,
+    citySlug,
     authorId: row.authorId || null,
     authorName: row.authorName || null,
     articleType: row.articleType || null,
@@ -10163,6 +10208,13 @@ export async function buildAdminArticleDetail(db, articleId) {
     publishedAt: row.publishedAt ? new Date(row.publishedAt).toISOString() : null,
     updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
   };
+}
+
+async function resolveArticleCityId(db, citySlug) {
+  const aliases = blogCitySlugAliases(citySlug);
+  if (!aliases.length) return null;
+  const { rows } = await db.query(`select id from "City" where slug = any($1::text[]) limit 1`, [aliases]);
+  return rows[0]?.id || null;
 }
 
 function normalizeArticleStatus(value) {
@@ -10189,7 +10241,18 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
   const excerpt = payload.excerpt ?? current?.excerpt ?? null;
   const content = payload.content ?? current?.content ?? null;
   const coverImageUrl = payload.coverImageUrl ?? current?.coverImageUrl ?? null;
-  const cityId = payload.cityId ?? current?.cityId ?? null;
+  const finalCitySlug =
+    payload.citySlug !== undefined
+      ? canonicalBlogCitySlug(payload.citySlug)
+      : canonicalBlogCitySlug(current?.citySlug) || current?.citySlug || null;
+  let cityId = current?.cityId ?? null;
+  if (payload.cityId !== undefined) {
+    cityId = payload.cityId || null;
+  } else if (payload.citySlug !== undefined) {
+    cityId = finalCitySlug ? await resolveArticleCityId(db, finalCitySlug) : null;
+  } else if (!cityId && finalCitySlug) {
+    cityId = await resolveArticleCityId(db, finalCitySlug);
+  }
   const authorId = payload.authorId ?? current?.authorId ?? null;
   const authorName = payload.authorName ?? current?.authorName ?? null;
   const articleType = payload.articleType ?? current?.articleType ?? null;
@@ -10215,15 +10278,16 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
           content = $6,
           "coverImageUrl" = $7,
           "cityId" = $8,
-          "authorId" = $9,
-          "authorName" = $10,
-          "articleType" = $11,
-          "seoH1" = $12,
-          "seoTitle" = $13,
-          "seoDescription" = $14,
-          "canonicalPath" = $15,
-          "isIndexable" = $16,
-          "publishedAt" = $17,
+          "citySlug" = $9,
+          "authorId" = $10,
+          "authorName" = $11,
+          "articleType" = $12,
+          "seoH1" = $13,
+          "seoTitle" = $14,
+          "seoDescription" = $15,
+          "canonicalPath" = $16,
+          "isIndexable" = $17,
+          "publishedAt" = $18,
           "updatedAt" = now()
         where id = $1
         returning id
@@ -10237,6 +10301,7 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
         content,
         coverImageUrl,
         cityId,
+        finalCitySlug,
         authorId,
         authorName,
         articleType,
@@ -10255,16 +10320,16 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
   await db.query(
     `
       insert into "Article" (
-        id, slug, status, title, excerpt, content, "coverImageUrl", "cityId",
+        id, slug, status, title, excerpt, content, "coverImageUrl", "cityId", "citySlug",
         "authorId", "authorName", "articleType",
         "seoH1", "seoTitle", "seoDescription", "canonicalPath", "isIndexable",
         "publishedAt", "createdAt", "updatedAt"
       )
       values (
-        $1, $2, $3::"ArticleStatus", $4, $5, $6, $7, $8,
-        $9, $10, $11,
-        $12, $13, $14, $15, $16,
-        $17, now(), now()
+        $1, $2, $3::"ArticleStatus", $4, $5, $6, $7, $8, $9,
+        $10, $11, $12,
+        $13, $14, $15, $16, $17,
+        $18, now(), now()
       )
     `,
     [
@@ -10276,6 +10341,7 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
       content,
       coverImageUrl,
       cityId,
+      finalCitySlug,
       authorId,
       authorName,
       articleType,

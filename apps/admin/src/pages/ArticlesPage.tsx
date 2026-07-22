@@ -18,6 +18,7 @@ type ArticleRow = {
   excerpt: string;
   coverImageUrl?: string | null;
   city?: string | null;
+  citySlug?: string | null;
   publishedAt?: string | null;
   updatedAt?: string | null;
 };
@@ -37,6 +38,7 @@ type ArticleDraft = {
   excerpt: string;
   content: string;
   coverImageUrl: string;
+  citySlug: string;
   seoTitle: string;
   seoDescription: string;
   canonicalPath: string;
@@ -59,6 +61,7 @@ function emptyDraft(): ArticleDraft {
     excerpt: '',
     content: '',
     coverImageUrl: '',
+    citySlug: '',
     seoTitle: '',
     seoDescription: '',
     canonicalPath: '',
@@ -91,6 +94,7 @@ function detailToDraft(detail: ArticleDetail): ArticleDraft {
     excerpt: detail.excerpt || '',
     content: detail.content || '',
     coverImageUrl: detail.coverImageUrl || '',
+    citySlug: detail.citySlug || '',
     seoTitle: detail.seoTitle || detail.title,
     seoDescription: detail.seoDescription || detail.excerpt || '',
     canonicalPath: detail.canonicalPath || `/blog/${detail.slug}`,
@@ -220,7 +224,7 @@ export function ArticlesPage() {
                 <div className="font-medium text-foreground">{row.title}</div>
                 <div className="mt-1 text-sm text-muted-foreground">
                   /blog/{row.slug}
-                  {row.city ? ` · ${row.city}` : ''}
+                  {row.citySlug ? ` · ${row.citySlug}` : row.city ? ` · ${row.city}` : ''}
                 </div>
               </button>
             </td>
@@ -243,6 +247,18 @@ export function ArticlesPage() {
             <label className="block space-y-1 text-sm">
               <span>ЧПУ (slug)</span>
               <Input value={draft.slug} onChange={(e) => setDraft((prev) => ({ ...prev, slug: e.target.value }))} placeholder="kak-vybrat-koncert" />
+            </label>
+
+            <label className="block space-y-1 text-sm">
+              <span>Город (citySlug)</span>
+              <Input
+                value={draft.citySlug}
+                onChange={(e) => setDraft((prev) => ({ ...prev, citySlug: e.target.value }))}
+                placeholder="saint-petersburg | moscow | multi | regions"
+              />
+              <span className="text-xs text-muted-foreground">
+                Канонический slug для хаба города. Пусто — без CMS-привязки.
+              </span>
             </label>
 
             <label className="block space-y-1 text-sm">

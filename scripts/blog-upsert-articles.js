@@ -14,6 +14,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { createDb } from '../apps/backend/src/db.js';
+import { blogCitySlugAliases, canonicalBlogCitySlug } from '../apps/backend/src/blog-city-slug.js';
 import { loadBlogMarkdownDir } from './lib/blog-content.mjs';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -37,7 +38,9 @@ const db = createDb(rootDir);
 
 async function resolveCityId(citySlug) {
   if (!citySlug) return null;
-  const { rows } = await db.query(`select id from "City" where slug = $1 limit 1`, [citySlug]);
+  const aliases = blogCitySlugAliases(canonicalBlogCitySlug(citySlug) || citySlug);
+  if (!aliases.length) return null;
+  const { rows } = await db.query(`select id from "City" where slug = any($1::text[]) limit 1`, [aliases]);
   return rows[0]?.id || null;
 }
 
@@ -54,7 +57,8 @@ async function upsertArticle(article) {
   const seoH1 = meta.seoH1 || title;
   const canonicalPath = meta.canonicalPath || `/blog/${slug}`;
   const isIndexable = status === 'PUBLISHED';
-  const cityId = await resolveCityId(meta.citySlug);
+  const citySlug = canonicalBlogCitySlug(meta.citySlug) || meta.citySlug || null;
+  const cityId = await resolveCityId(citySlug);
   const authorId = meta.authorId || (meta.author === 'Макс' ? 'max' : null) || 'editorial';
   const authorName =
     meta.authorName || meta.author || meta.persona || (authorId === 'editorial' ? 'Редакция' : authorId);
@@ -90,15 +94,16 @@ async function upsertArticle(article) {
           content = $5,
           "coverImageUrl" = $6,
           "cityId" = $7,
-          "authorId" = $8,
-          "authorName" = $9,
-          "articleType" = $10,
-          "seoH1" = $11,
-          "seoTitle" = $12,
-          "seoDescription" = $13,
-          "canonicalPath" = $14,
-          "isIndexable" = $15,
-          "publishedAt" = coalesce("publishedAt", $16::timestamptz),
+          "citySlug" = $8,
+          "authorId" = $9,
+          "authorName" = $10,
+          "articleType" = $11,
+          "seoH1" = $12,
+          "seoTitle" = $13,
+          "seoDescription" = $14,
+          "canonicalPath" = $15,
+          "isIndexable" = $16,
+          "publishedAt" = coalesce("publishedAt", $17::timestamptz),
           "updatedAt" = now()
         where id = $1
       `,
@@ -110,6 +115,7 @@ async function upsertArticle(article) {
         content,
         coverImageUrl,
         cityId,
+        citySlug,
         authorId,
         authorName,
         normalizedType,
@@ -129,15 +135,15 @@ async function upsertArticle(article) {
   await db.query(
     `
       insert into "Article" (
-        id, slug, status, title, excerpt, content, "coverImageUrl", "cityId",
+        id, slug, status, title, excerpt, content, "coverImageUrl", "cityId", "citySlug",
         "authorId", "authorName", "articleType",
         "seoH1", "seoTitle", "seoDescription", "canonicalPath", "isIndexable",
         "publishedAt", "createdAt", "updatedAt"
       ) values (
-        $1, $2, $3::"ArticleStatus", $4, $5, $6, $7, $8,
-        $9, $10, $11,
-        $12, $13, $14, $15, $16,
-        $17::timestamptz, now(), now()
+        $1, $2, $3::"ArticleStatus", $4, $5, $6, $7, $8, $9,
+        $10, $11, $12,
+        $13, $14, $15, $16, $17,
+        $18::timestamptz, now(), now()
       )
     `,
     [
@@ -149,6 +155,7 @@ async function upsertArticle(article) {
       content,
       coverImageUrl,
       cityId,
+      citySlug,
       authorId,
       authorName,
       normalizedType,

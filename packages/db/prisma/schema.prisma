@@ -957,6 +957,8 @@ model Article {
   content        String?
   coverImageUrl  String?
   cityId         String?
+  /// Редакционный citySlug блога (moscow|saint-petersburg|multi|regions|…).
+  citySlug       String?
   /// ИИ-автор / редакция: max|anna|elena|igor|artur|editorial
   authorId       String?
   authorName     String?
@@ -976,6 +978,7 @@ model Article {
   @@index([status, isIndexable, publishedAt])
   @@index([authorId])
   @@index([articleType])
+  @@index([citySlug])
 }
 
 model SeoMeta {

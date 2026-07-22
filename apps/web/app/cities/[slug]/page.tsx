@@ -63,7 +63,11 @@ export default async function CityPage({ params, searchParams }: PageProps) {
   const decodedSlug = decodeURIComponent(slug);
   const [payload, articlesPayload] = await Promise.all([
     buildPublicCityDto(decodedSlug),
-    buildPublicArticlesListDto().catch(() => null),
+    buildPublicArticlesListDto({
+      citySlug: decodedSlug,
+      includeBroad: true,
+      limit: 40,
+    }).catch(() => null),
   ]);
   if (!payload?.city) notFound();
 
@@ -74,7 +78,7 @@ export default async function CityPage({ params, searchParams }: PageProps) {
     slug: decodedSlug,
     hubQuery: query.hub,
   });
-  const blogCards = mergeBlogCards(articlesPayload?.articles?.slice(0, 20) || null);
+  const blogCards = mergeBlogCards(articlesPayload?.articles || null);
   const hubArticles = pickCityHubArticles(
     {
       slug: payload.city.slug,

@@ -1,3 +1,24 @@
+## 2026-07-22 — City hub × blog phase 3 (CMS citySlug)
+
+### Наблюдения
+
+- Хаб брал глобальный top-20 статей → городские материалы могли не попасть в picker.
+- `cityId` часто null: frontmatter `saint-petersburg`, а `City.slug` = `sankt-peterburg`.
+- Admin не давал править citySlug; pseudo-города multi/regions жили hardcoded CASE в SQL.
+
+### Решения
+
+- Колонка `Article.citySlug` + migration backfill; индекс.
+- Public/admin API: `?citySlug=` + `includeBroad=1`; hub fetch limit 40 city+broad.
+- Picker: явный CMS citySlug = только точное совпадение (title heuristics только если citySlug пуст).
+- blog-upsert + admin поле citySlug; alias-resolve City.id.
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-22 — City hub: «Советы» + on-page SEO фразы
 
 ### Наблюдения

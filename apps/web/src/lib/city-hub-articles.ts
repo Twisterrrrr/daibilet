@@ -149,10 +149,19 @@ function articleMentionsCity(article: BlogCardDto, hubSlug: string, tokens: stri
   const aliases = CITY_ALIASES[hubSlug] || [hubSlug];
   const aliasSet = new Set(tokens);
   const articleSlug = normalizeBlogCitySlug(article.citySlug, article.city);
-  if (articleSlug && (aliases.includes(articleSlug) || articleSlug === hubSlug)) return true;
+
+  // Phase 3: явный CMS citySlug — только точное совпадение (без эвристик по title).
+  if (articleSlug) {
+    if (isBroadCityMarker(articleSlug)) return false;
+    return aliases.includes(articleSlug) || articleSlug === hubSlug;
+  }
 
   const articleCity = normalizeText(article.city);
-  if (articleCity && tokens.some((token) => token.length >= 4 && articleCity.includes(token))) return true;
+  if (articleCity && tokens.some((token) => token.length >= 4 && articleCity.includes(token))) {
+    const hay = normalizeText(`${article.slug} ${article.title}`);
+    if (containsForeignCitySignal(hay, aliasSet)) return false;
+    return true;
+  }
 
   const hay = normalizeText(`${article.slug} ${article.title} ${article.excerpt || ''}`);
   if (containsForeignCitySignal(hay, aliasSet)) return false;

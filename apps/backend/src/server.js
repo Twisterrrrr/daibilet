@@ -307,7 +307,20 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/public/articles') {
-      sendPublicJson(response, await withPublicResponseCache('articles:list', () => buildPublicArticlesList(db)));
+      const citySlug = url.searchParams.get('citySlug') || undefined;
+      const includeBroad = url.searchParams.get('includeBroad') === '1';
+      const limitRaw = Number(url.searchParams.get('limit') || 0);
+      const cacheKey = `articles:list:${citySlug || 'all'}:${includeBroad ? 1 : 0}:${limitRaw || 100}`;
+      sendPublicJson(
+        response,
+        await withPublicResponseCache(cacheKey, () =>
+          buildPublicArticlesList(db, {
+            citySlug,
+            includeBroad,
+            limit: limitRaw > 0 ? limitRaw : undefined,
+          }),
+        ),
+      );
       return;
     }
 

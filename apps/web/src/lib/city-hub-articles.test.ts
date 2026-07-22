@@ -115,17 +115,19 @@ test('pickCityHubArticles: one article appears in at most one bucket', () => {
   assert.equal(count, 1);
 });
 
-test('pickCityHubArticles: Moscow hub keeps Moscow article', () => {
+test('pickCityHubArticles: explicit CMS citySlug wins over title heuristics', () => {
   const articles = [
     card({
-      slug: 'moskva-rechnye',
-      title: 'Речные прогулки Москвы',
+      slug: 'msk-about-spb-word',
+      title: 'Гид по Петербургу для москвича',
       citySlug: 'moscow',
       articleType: 'gid',
     }),
   ];
-  const buckets = pickCityHubArticles(moscow, articles);
-  assert.ok(allSlugs(buckets).includes('moskva-rechnye'));
+  const onSpb = pickCityHubArticles(spb, articles);
+  assert.equal(allSlugs(onSpb).includes('msk-about-spb-word'), false);
+  const onMsk = pickCityHubArticles(moscow, articles);
+  assert.ok(allSlugs(onMsk).includes('msk-about-spb-word'));
 });
 
 test('matchArticleSessions: prefers keyword hits over quality fallback', () => {
