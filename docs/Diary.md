@@ -1,3 +1,43 @@
+## 2026-07-22 — Admin smoke 0.3 + тестовая покупка закрыты
+
+### Наблюдения
+
+- После закрытия browser 0.2 в docs ещё висели Admin smoke (login/sources) и опц. тестовая покупка → ExternalOrder.
+
+### Решения
+
+- 0.3.1 / 0.3.3 / 0.3.6 / 0.3.7 → ✅ по ручному подтверждению на prod.
+- Чеклист 0.2: тестовая покупка → ExternalOrder отмечена ✅.
+- Этап 0 smoke exit criteria выполнены (TEP orders остаётся ⏸ — нет API у партнёра).
+
+### Проблемы
+
+- Нет.
+
+---
+
+## 2026-07-22 — L.3 TC catalog sync: снизить нагрузку на prod
+
+### Наблюдения
+
+- Полный `tc:sync` днём конкурирует с API/Next за CPU/RAM (3.8Gi).
+- `syncProviderLinksForSource` на `--ids` всё равно пересобирал ProviderLink по всему TC source.
+- `RawImportRecord` upsert всегда переписывал JSON даже при том же `payloadHash`.
+- Post-sync `invalidatePublicCaches({ warm: true })` = full warm (venues/cities/landings/admin).
+
+### Решения
+
+- `deploy/cron/tc-catalog-sync.sh` + `daibilet-tc-catalog-sync.{service,timer}` — nightly 03:20, flock/nice/ionice, лог `/var/log/daibilet/tc-catalog-sync.log`.
+- `syncProviderLinksForSource(client, sourceId, { eventIds })`; `tc:sync --ids` передаёт imported Event ids.
+- RawImport upsert: `WHERE payloadHash IS DISTINCT FROM excluded.payloadHash` (TC/TEP catalog + orders).
+- Light warm: `warmPublicCachesLight` + `POST /api/internal/public-cache`; `post-catalog-sync-warm.mjs`; full warm только при `TC_CATALOG_SYNC_FULL_WARM=1`.
+
+### Проблемы
+
+- Timer нужно enable на prod после deploy (`systemctl enable --now daibilet-tc-catalog-sync.timer`).
+
+---
+
 ## 2026-07-22 — Browser smoke 0.2 закрыт
 
 ### Наблюдения

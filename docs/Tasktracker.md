@@ -42,6 +42,7 @@
 | P.2o | **City hub × blog phase 1** — editorial тизеры (about/affiche/sights/practice/more), sticky 5 tabs | Высокий | ✅ `bb65e4a` prod proof sankt-peterburg |
 | L.1 | Catalog API: public Cache-Control + Next `getCachedCatalog`; favorites `?ids=`; landing skip no-store; page sizes 50/100 | Критический | ✅ `bb65e4a` prod; nginx proxy_cache+limit_req ✅ |
 | L.2 | Images: `next/image` + WebP/AVIF (`SafeImage`), remotePatterns TC/TEP/S3, sharp, hot-path cards/heroes | Высокий | ✅ `9646968` prod proof AVIF `/_next/image` |
+| L.3 | TC catalog sync load: nightly timer + flock/nice/ionice; `--ids` ProviderLink filter; RawImport payloadHash skip; light warm | Критический | 🔄 код в worktree |
 | P.3 | **Finance contour / ЛК поставщиков** — базовый контур | Высокий | ⏳ |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
 | P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |
@@ -187,22 +188,24 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 - [x] Hero / buy card: цена и CTA видны
 - [x] Клик «Купить» → TC modal **или** Teplohod widget
 - [x] DevTools console: нет blocking errors
-- [ ] (опц.) тестовая покупка → ExternalOrder в admin
+- [x] (опц.) тестовая покупка → ExternalOrder в admin
 
-Закрыто 2026-07-22: ручное подтверждение (prod виджеты работают; API `check:widgets` был ✅ с 2026-07-13).
+Закрыто 2026-07-22: ручное подтверждение (prod виджеты работают; API `check:widgets` был ✅ с 2026-07-13). Тестовая покупка → ExternalOrder подтверждена отдельно.
 
 ### 0.3 Admin smoke (`:4000` + static admin)
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| 0.3.1 | Login (basic auth / realm) | Критический | ⏳ |
+| 0.3.1 | Login (basic auth / realm) | Критический | ✅ 2026-07-22 |
 | 0.3.2 | Dashboard metrics загружаются | Высокий | ✅ 2026-07-14 aligned with Events (`admin_event_groups`) |
-| 0.3.3 | Sources: TC + Teplohod, last sync | Критический | ⏳ |
-| 0.3.4 | Events: list + detail + override save | Высокий | ✅ full catalog (no 10k cap) + override lean texts; UI-подписи на русском (2026-07-18); group readiness: future-sibling снимает NO_FUTURE blocker (2026-07-19, deploy ⏳) |
+| 0.3.3 | Sources: TC + Teplohod, last sync | Критический | ✅ 2026-07-22 |
+| 0.3.4 | Events: list + detail + override save | Высокий | ✅ full catalog + override lean texts; UI на русском; group readiness future-sibling |
 | 0.3.5 | Orders: список реальных заказов (не mock) | Критический | ✅ TC live + cron */10; TEP orders **отложено** (партнёр: нет API, 2026-07-19) |
 | 0.3.5a | TEP orders: получить токен + schema у Теплохода, smoke import | Критический | ⏸ отложено — у партнёра нет API заказов; cron tep-orders снят с prod |
-| 0.3.6 | Event moderation / publish gate | Средний | 🔄 group readiness recalc после siblings (NO_FUTURE только если нет future в группе); остальное ⏳ |
-| 0.3.7 | Зафиксировать результат в Diary / smoke log | Средний | ⏳ |
+| 0.3.6 | Event moderation / publish gate | Средний | ✅ group readiness + admin smoke 2026-07-22 |
+| 0.3.7 | Зафиксировать результат в Diary / smoke log | Средний | ✅ 2026-07-22 |
+
+**Admin smoke закрыт 2026-07-22** (ручное подтверждение: login, sources, events, orders, виджет→ExternalOrder). TEP orders остаётся ⏸.
 
 ### 0.4 `tc:sync` widgetUrl backfill (prod)
 

@@ -13,7 +13,7 @@
 
 | Этап | Фокус | Прогресс | Блокер закрытия |
 |------|--------|----------|-----------------|
-| **0** | Post-cutover hardening: smoke, widgets, admin, backfill | **~95%** 🔄 | Browser smoke ✅ 2026-07-22; остаётся Admin smoke (0.3) |
+| **0** | Post-cutover hardening: smoke, widgets, admin, backfill | **✅** | Browser + Admin smoke ✅ 2026-07-22; TEP orders ⏸ (нет API у партнёра) |
 | **1** | Public parity: поиск, breadcrumbs, city FAQ/SEO | **~70%** 🔄 | event/city structured data |
 | **2** | SEO foundation: sitemap + SSR JSON-LD | **~70%** 🔄 | sitemap index+chunks ✅; JSON-LD event ✅; city FAQ ⏳ |
 | **3+** | Admin Next, dto retire, Phase G finance | ⏳ | После 0–2 |
@@ -90,11 +90,14 @@ npm run check:widgets -- --base https://daibilet.ru
 
 | Проверка | Статус |
 |----------|--------|
-| Basic auth / realm login | ⏳ |
-| Sources: TC + Teplohod status visible | ⏳ |
-| Events: список + override save | ⏳ |
-| Orders: реальные ExternalOrder, не mock | ⏳ |
-| Sync trigger / last sync timestamp | ⏳ |
+| Basic auth / realm login | ✅ 2026-07-22 |
+| Sources: TC + Teplohod status visible | ✅ 2026-07-22 |
+| Events: список + override save | ✅ |
+| Orders: реальные ExternalOrder, не mock | ✅ TC; TEP ⏸ |
+| Sync trigger / last sync timestamp | ✅ 2026-07-22 |
+| Тестовая покупка → ExternalOrder | ✅ 2026-07-22 |
+
+**Закрыто 2026-07-22** (ручное подтверждение на prod).
 
 ### `tc:sync` backfill prod
 
