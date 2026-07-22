@@ -244,7 +244,7 @@ function BlogTable({ rows, className = '' }: { rows: string[][]; className?: str
 
   return (
     <div className={`overflow-x-auto rounded-xl border border-slate-200/90 bg-white shadow-sm ${className}`}>
-      <table className="w-full min-w-[28rem] border-collapse text-sm">
+      <table className="w-full min-w-[28rem] border-collapse text-base">
         <thead>
           <tr className="border-b border-slate-200 bg-slate-100/90">
             {header.map((cell, cellIndex) => (
@@ -298,11 +298,6 @@ function BlogFigure({
           className="object-cover"
         />
       </div>
-      {image.alt ? (
-        <figcaption className="mt-2.5 text-center text-xs leading-snug text-slate-500 sm:text-sm">
-          {image.alt}
-        </figcaption>
-      ) : null}
     </figure>
   );
 }
@@ -316,13 +311,13 @@ function BlogFloatedSection({
 }) {
   const floatClass =
     image.side === 'left'
-      ? 'sm:float-left sm:mr-6 sm:mb-4'
-      : 'sm:float-right sm:ml-6 sm:mb-4';
+      ? 'sm:float-left sm:mr-5 sm:mb-3'
+      : 'sm:float-right sm:ml-5 sm:mb-3';
 
   return (
-    <div className="my-8 clearfix">
-      <BlogFigure image={image} className={`mb-4 w-full max-w-md ${floatClass}`} />
-      <div className="min-w-0">{children}</div>
+    <div className="my-6 clearfix">
+      <BlogFigure image={image} className={`mb-3 w-full max-w-[15.5rem] sm:max-w-[14.5rem] ${floatClass}`} />
+      <div className="min-w-0 [&>p+p]:mt-[0.85em]">{children}</div>
     </div>
   );
 }
@@ -347,13 +342,7 @@ function renderParagraphNodes(
   return paragraphs.map((text, paragraphIndex) => (
     <p
       key={`${keyPrefix}-p-${paragraphIndex}`}
-      className={
-        paragraphIndex === 0 && isLead
-          ? LEAD_PARAGRAPH_CLASS
-          : paragraphIndex === 0
-            ? PARAGRAPH_CLASS
-            : `${PARAGRAPH_CLASS} mt-4`
-      }
+      className={paragraphIndex === 0 && isLead ? LEAD_PARAGRAPH_CLASS : PARAGRAPH_CLASS}
     >
       {renderInline(text, `${keyPrefix}-${paragraphIndex}-`)}
     </p>
@@ -370,7 +359,7 @@ function BlogFlexRow({
   imageSide: 'left' | 'right';
 }) {
   const imageNode = <BlogFigure image={image} className="w-full shrink-0 sm:w-[42%] md:w-72 lg:w-80" />;
-  const contentNode = <div className="min-w-0 flex-1">{children}</div>;
+  const contentNode = <div className="min-w-0 flex-1 [&>p+p]:mt-[0.85em]">{children}</div>;
 
   return (
     <div className="my-8 flex flex-col gap-6 rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4 sm:flex-row sm:items-start sm:gap-8 sm:p-6">
@@ -394,9 +383,9 @@ function tableRowsFromBlock(block: Extract<ContentBlock, { type: 'table' }>): st
 }
 
 const PARAGRAPH_CLASS =
-  'text-sm leading-7 text-slate-600 [overflow-wrap:anywhere] [&+&]:mt-4';
+  'text-[1.0625rem] leading-[1.75] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-lg sm:leading-[1.8]';
 const LEAD_PARAGRAPH_CLASS =
-  'text-sm leading-7 text-slate-600 [overflow-wrap:anywhere]';
+  'text-[1.0625rem] leading-[1.75] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-lg sm:leading-[1.8]';
 
 function normalizeImageSrc(src: string): string {
   const trimmed = src.trim();
@@ -532,7 +521,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <h2
             key={`h2-${index}`}
-            className="scroll-mt-24 mb-4 font-display text-2xl font-bold tracking-tight text-slate-950 sm:text-[1.75rem] lg:text-3xl [&:not(:first-child)]:mt-12 [&:not(:first-child)]:border-t [&:not(:first-child)]:border-slate-200/80 [&:not(:first-child)]:pt-10"
+            className="scroll-mt-24 mb-3 font-display text-[1.35rem] font-bold tracking-tight text-slate-950 sm:text-2xl lg:text-[1.65rem] [&:not(:first-child)]:mt-8 [&:not(:first-child)]:pt-1"
           >
             {block.text}
           </h2>,
@@ -543,7 +532,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <h3
             key={`h3-${index}`}
-            className="scroll-mt-24 mb-4 border-l-4 border-primary-500 pl-4 font-display text-xl font-bold tracking-tight text-slate-950 sm:pl-5 sm:text-2xl [&:not(:first-child)]:mt-10"
+            className="scroll-mt-24 mb-2.5 font-display text-lg font-bold tracking-tight text-slate-950 sm:text-xl [&:not(:first-child)]:mt-6"
           >
             {block.text}
           </h3>,
@@ -554,7 +543,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <ol
             key={`ol-${index}`}
-            className="my-5 list-decimal space-y-2.5 pl-6 text-sm leading-7 text-slate-600 marker:font-semibold marker:text-primary-600"
+            className="my-4 list-decimal space-y-2 pl-6 text-[1.0625rem] leading-[1.75] text-pretty text-slate-800 marker:font-semibold marker:text-primary-600 sm:text-lg sm:leading-[1.8]"
           >
             {block.items.map((item, itemIndex) => (
               <li key={itemIndex} className="pl-1">
@@ -569,7 +558,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <ul
             key={`ul-${index}`}
-            className="my-5 list-disc space-y-2.5 pl-6 text-sm leading-7 text-slate-600 marker:text-primary-500"
+            className="my-4 list-disc space-y-2 pl-6 text-[1.0625rem] leading-[1.75] text-pretty text-slate-800 marker:text-primary-500 sm:text-lg sm:leading-[1.8]"
           >
             {block.items.map((item, itemIndex) => (
               <li key={itemIndex} className="pl-1">
@@ -590,7 +579,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         break;
       case 'paragraph':
         nodes.push(
-          <p key={`p-${index}`} className={isLeadParagraph ? `${LEAD_PARAGRAPH_CLASS} mb-1` : `${PARAGRAPH_CLASS} mt-4`}>
+          <p key={`p-${index}`} className={isLeadParagraph ? LEAD_PARAGRAPH_CLASS : PARAGRAPH_CLASS}>
             {renderInline(block.text, `p-${index}-`)}
           </p>,
         );
@@ -601,7 +590,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
     }
   }
 
-  return <div className="blog-article-prose">{nodes}</div>;
+  return <div className="blog-article-prose [&>p+p]:mt-[0.85em]">{nodes}</div>;
 }
 
 export function BlogArticleContent({

@@ -524,19 +524,28 @@ function CityHeroDefault({
     guide?.brief ||
     `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат, дату и площадку без долгого поиска по разным билетным системам.`;
 
+  // Полный cover как раньше; при расширении экрана якорим кадр вправо (режем слева),
+  // а слева закрываем поле градиентом — без ужатия фото в узкую колонку.
+  const focusParts = String(heroFocus || 'center 45%').trim().split(/\s+/);
+  const focusY = focusParts[1] || '45%';
+  const heroObjectPosition = `right ${focusY}`;
+
   return (
-    <section id="top" className="relative min-h-[280px] overflow-hidden border-b border-primary-950 text-white sm:min-h-[320px]">
+    <section
+      id="top"
+      className="relative min-h-[280px] overflow-hidden border-b border-primary-950 bg-slate-950 text-white sm:min-h-[320px]"
+    >
       <SafeImage
         src={heroImage}
         alt=""
         fill
         priority
         sizes={IMAGE_SIZES.eventHero}
-        style={{ objectPosition: heroFocus }}
+        style={{ objectPosition: heroObjectPosition }}
         className="object-cover"
         fallback={<div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950" />}
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/50 to-slate-950/25" />
+      <div className="absolute inset-0 bg-gradient-to-r from-slate-950 from-[5%] via-slate-950/80 via-[32%] to-transparent to-[68%]" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950/55 to-transparent" />
       <div className="container-page relative py-12 sm:py-14">
         <div className="flex items-center gap-2 text-sm text-primary-100/80">

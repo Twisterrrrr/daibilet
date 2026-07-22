@@ -39,7 +39,7 @@ export function BlogArticleView({ article }: { article: BlogArticleDto }) {
         />
 
         <main className="container-page relative z-10 py-10 sm:py-14">
-          <article className="rounded-2xl border border-slate-200/90 bg-white px-6 py-8 shadow-sm sm:px-10 sm:py-10 lg:px-12 lg:py-12">
+          <article className="mx-auto max-w-[42rem] rounded-2xl border border-slate-200/90 bg-white px-5 py-8 shadow-sm sm:px-8 sm:py-10 md:px-10 md:py-11">
             <BlogArticleContent
               content={article.content || article.excerpt || ''}
               coverImageUrl={article.coverImageUrl}
