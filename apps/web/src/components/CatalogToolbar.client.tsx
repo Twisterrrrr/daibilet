@@ -6,10 +6,8 @@ import { ChevronDown, Search, SlidersHorizontal, X } from 'lucide-react';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 
 import { CatalogAdvancedFiltersPanel } from '@/components/CatalogAdvancedFiltersPanel.client';
-import { ViewModeToggle } from '@/components/CatalogResults.client';
 
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
-import { CATALOG_PAGE_SIZES } from '@daibilet/contracts/catalog';
 import {
   buildCatalogHref,
   CATALOG_SORT_OPTIONS,
@@ -22,14 +20,12 @@ import {
   catalogPresetMatches,
   CATALOG_PRESETS,
 } from '@/lib/catalog-presets';
-import { categoryEmoji, type CatalogViewMode } from '@/lib/catalog-view-mode';
+import { categoryEmoji } from '@/lib/catalog-view-mode';
 import { persistSelectedCity } from '@/lib/selected-city';
 
 type CatalogToolbarProps = {
   facets: PublicCatalogDto['facets'];
   values: CatalogFilterValues;
-  viewMode: CatalogViewMode;
-  onViewModeChange: (mode: CatalogViewMode) => void;
   disabled?: boolean;
   /** False until header city from storage is resolved — hide «Все города» flash. */
   cityReady?: boolean;
@@ -38,8 +34,6 @@ type CatalogToolbarProps = {
 export function CatalogToolbar({
   facets,
   values,
-  viewMode,
-  onViewModeChange,
   disabled = false,
   cityReady = true,
 }: CatalogToolbarProps) {
@@ -163,27 +157,6 @@ export function CatalogToolbar({
           </div>
 
           <div className="ml-auto flex items-center gap-2">
-            <div className="relative hidden sm:block">
-              <label htmlFor="catalog-page-size" className="sr-only">
-                Карточек на странице
-              </label>
-              <select
-                id="catalog-page-size"
-                value={filters.limit}
-                onChange={(event) =>
-                  navigate({ ...filters, limit: Number(event.target.value) as CatalogFilterValues['limit'] })
-                }
-                className="inline-btn h-10 appearance-none rounded-xl bg-slate-100 pl-3 pr-8 text-sm font-semibold text-slate-700 outline-none transition hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-primary/60"
-              >
-                {CATALOG_PAGE_SIZES.map((size) => (
-                  <option key={size} value={size}>
-                    {size} на странице
-                  </option>
-                ))}
-              </select>
-              <ChevronDown aria-hidden className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            </div>
-
             <button
               type="button"
               onClick={() => setFiltersOpen(true)}
@@ -207,8 +180,6 @@ export function CatalogToolbar({
                 </span>
               ) : null}
             </button>
-
-            <ViewModeToggle mode={viewMode} onChange={onViewModeChange} />
 
             <button
               type="submit"

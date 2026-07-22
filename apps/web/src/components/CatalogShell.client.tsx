@@ -3,14 +3,21 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { ChevronDown } from 'lucide-react';
 
 import { CatalogActiveFilters } from '@/components/CatalogActiveFilters';
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
-import { CatalogResults } from '@/components/CatalogResults.client';
+import { CatalogResults, ViewModeToggle } from '@/components/CatalogResults.client';
 import { CatalogToolbar } from '@/components/CatalogToolbar.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
-import { catalogFiltersFromQuery, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
+import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZES } from '@daibilet/contracts/catalog';
+import {
+  buildCatalogHref,
+  catalogFiltersFromQuery,
+  venueCatalogHrefWithSelectedCity,
+  type CatalogFilterValues,
+} from '@/lib/catalog-url';
 import { pluralEvents } from '@/lib/format';
 import {
   parseCatalogViewMode,
@@ -171,18 +178,54 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   return (
     <>
-      <div className="max-w-3xl">
-        <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Каталог событий</h1>
-        <p className="mt-2 text-sm text-slate-500">
-          {loading && !catalog ? 'Загрузка…' : null}
-          {catalog ? (
-            <>
-              {pluralEvents(catalog.total)}
-              {catalog.items.length < catalog.total ? ` · показано ${catalog.items.length}` : ''}
-            </>
-          ) : null}
-          {error ? error : null}
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+        <div className="min-w-0 max-w-3xl">
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Каталог событий</h1>
+          <p className="mt-2 text-sm text-slate-500">
+            {loading && !catalog ? 'Загрузка…' : null}
+            {catalog ? (
+              <>
+                {pluralEvents(catalog.total)}
+                {catalog.items.length < catalog.total ? ` · показано ${catalog.items.length}` : ''}
+              </>
+            ) : null}
+            {error ? error : null}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 sm:ml-auto sm:pt-1">
+          <div className="relative">
+            <label htmlFor="catalog-page-size" className="sr-only">
+              Карточек на странице
+            </label>
+            <select
+              id="catalog-page-size"
+              value={filterValues.limit ?? CATALOG_PAGE_SIZE_DEFAULT}
+              disabled={(loading && !catalog) || cityBootstrapPending}
+              onChange={(event) => {
+                router.push(
+                  buildCatalogHref({
+                    ...filterValues,
+                    limit: Number(event.target.value) as CatalogFilterValues['limit'],
+                    page: undefined,
+                  }),
+                );
+              }}
+              className="inline-btn h-10 appearance-none rounded-xl bg-slate-100 pl-3 pr-8 text-sm font-semibold text-slate-700 outline-none transition hover:bg-slate-200 focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60"
+            >
+              {CATALOG_PAGE_SIZES.map((size) => (
+                <option key={size} value={size}>
+                  {size} на странице
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              aria-hidden
+              className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+            />
+          </div>
+          <ViewModeToggle mode={viewMode} onChange={setViewMode} />
+        </div>
       </div>
 
       <CatalogActiveFilters values={filterValues} />
@@ -191,8 +234,6 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         <CatalogToolbar
           facets={facets}
           values={filterValues}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
           disabled={(loading && !catalog) || cityBootstrapPending}
           cityReady={cityReady || urlHasCity}
         />
