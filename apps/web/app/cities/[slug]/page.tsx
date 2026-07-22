@@ -7,12 +7,14 @@ import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { inCityPrepositional } from '@/lib/city-declension';
 import { buildCityFaqItems, buildCitySeoText } from '@/lib/city-faq';
+import { pickCityHubArticles } from '@/lib/city-hub-articles';
 import { resolveCityHubTemplate } from '@/lib/city-hub-template';
 import { buildCityHubSeoTitle, buildCityHubSeoTitleCore } from '@/lib/city-hub-seo';
 import { evaluateCityIndexability, robotsForIndexability } from '@/lib/hub-indexability';
+import { mergeBlogCards } from '@/lib/blog-utils';
 import { pageTitle, routeOpenGraph } from '@/lib/seo-meta';
 import { buildCityPageJsonLd } from '@/lib/structured-data';
-import { buildPublicCityDto } from '@daibilet/backend/public-read';
+import { buildPublicArticlesListDto, buildPublicCityDto } from '@daibilet/backend/public-read';
 
 export const revalidate = 300;
 
@@ -55,7 +57,10 @@ export default async function CityPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
   const query = await searchParams;
   const decodedSlug = decodeURIComponent(slug);
-  const payload = await buildPublicCityDto(decodedSlug);
+  const [payload, articlesPayload] = await Promise.all([
+    buildPublicCityDto(decodedSlug),
+    buildPublicArticlesListDto().catch(() => null),
+  ]);
   if (!payload?.city) notFound();
 
   const faqItems = buildCityFaqItems(payload);
@@ -65,6 +70,15 @@ export default async function CityPage({ params, searchParams }: PageProps) {
     slug: decodedSlug,
     hubQuery: query.hub,
   });
+  const blogCards = mergeBlogCards(articlesPayload?.articles?.slice(0, 20) || null);
+  const hubArticles = pickCityHubArticles(
+    {
+      slug: payload.city.slug,
+      sourceSlug: payload.city.sourceSlug,
+      name: payload.city.name,
+    },
+    blogCards,
+  );
   const View = hubTemplate === 'editorial' ? CityPageViewEditorial : CityPageView;
 
   return (
@@ -76,7 +90,13 @@ export default async function CityPage({ params, searchParams }: PageProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }}
         />
       ))}
-      <View slug={decodedSlug} initialPayload={payload} faqItems={faqItems} seoText={seoText} />
+      <View
+        slug={decodedSlug}
+        initialPayload={payload}
+        faqItems={faqItems}
+        seoText={seoText}
+        hubArticles={hubArticles}
+      />
     </SiteLayout>
   );
 }

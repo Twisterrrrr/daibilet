@@ -1,6 +1,6 @@
 # Project — Daibilet (Next full-stack migration)
 
-**Обновлено:** 2026-07-19  
+**Обновлено:** 2026-07-22  
 **Ветка migration / prod:** `feat/next-monorepo`  
 **Prod:** Next `apps/web` `:3001` + legacy API `:4000` + Vite admin static
 
@@ -12,14 +12,14 @@
 
 ---
 
-## Продуктовые приоритеты (2026-07-19)
+## Продуктовые приоритеты (2026-07-22)
 
 Решение владельца: **не рекламировать «пустышку»** — сначала собрать витрину, потом paid acquisition.
 
 | Приоритет | Фокус | Статус |
 |-----------|--------|--------|
 | 1 | **AI / статьи** — редакционный контент, ИИ-колонки, blog ops | активный |
-| 2 | **City hubs** — SEO-якоря `/cities/{slug}`, контент и каталог вокруг города | активный |
+| 2 | **City hubs** — SEO-якоря `/cities/{slug}`, контент и каталог вокруг города; **phase 1 blog teasers** (P.2k) | активный |
 | 3 | **Finance contour / ЛК поставщиков** — базовый финконтур, не «реклама ради трафика» | активный |
 | — | **Реклама / paid** | ⚠️ отложена до готовности витрины (хабы + контент + базовый финконтур) |
 
@@ -89,7 +89,7 @@ packages/config   — shared tsconfig/eslint
 | `/` | SSR dynamic | home + top cities |
 | `/events` | SSR dynamic | каталог, filters GET, pagination |
 | `/events/[slug]` | SSR dynamic | event hero + sticky buy card (TC/Teplohod widgets) |
-| `/cities`, `/cities/[slug]` | SSR dynamic | **city hub** (SEO-якорь города); default = wireframe v1; `?hub=editorial` = параллельный visual experiment (P.2i) |
+| `/cities`, `/cities/[slug]` | SSR dynamic | **city hub** (SEO-якорь города); default = wireframe v1 + blog teasers (P.2k); `?hub=editorial` = параллельный visual experiment (P.2i) |
 | `/venues`, `/venues/[slug]` | SSR dynamic | |
 | `/locations`, `/locations/[slug]` | SSR dynamic | |
 | `/podborki` | ISR 3600 | каталог подборок |

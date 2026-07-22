@@ -25,6 +25,7 @@ export function catalogQueryCacheKey(query: PublicCatalogQuery): string {
     minPrice: query.minPrice ?? '',
     maxPrice: query.maxPrice ?? query.priceMax ?? '',
     ageMax: query.ageMax ?? '',
+    ids: Array.isArray(query.ids) ? [...query.ids].sort().join(',') : '',
   };
   return JSON.stringify(normalized);
 }

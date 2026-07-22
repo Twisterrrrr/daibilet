@@ -11,13 +11,16 @@ import {
   TrendingUp,
 } from 'lucide-react';
 
+import { CityHubArticlesGrid } from '@/components/CityHubArticleTeaser.client';
 import { EventCard } from '@/components/EventCard';
 import Link from 'next/link';
 import { formatStreetAddress } from '@/lib/address';
 import { formatMoney, formatNumber, formatPriceFrom } from '@/lib/format';
 import { resolveCityImage } from '@/lib/city-images';
 import type { CityFaqItem } from '@/lib/city-faq';
+import type { CityHubArticlesBuckets } from '@/lib/city-hub-articles';
 import type { CityHubTemplate } from '@/lib/city-hub-template';
+import type { BlogCardDto } from '@/lib/blog-utils';
 import { venuePageTemplate } from '@/lib/venue-meta';
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { landingPageHref } from '@/lib/landing-routes';
@@ -44,11 +47,15 @@ type DateFilter = 'all' | 'today' | 'weekend';
 
 const CITY_HASH_ALIASES: Record<string, string> = {
   'city-schedule': 'affiche',
-  'city-directions': 'directions',
+  'city-directions': 'more',
   'city-sights': 'sights',
-  'city-travel': 'travel',
-  'city-guide-faq': 'faq',
+  'city-travel': 'practice',
+  'city-guide-faq': 'practice',
   'city-seo': 'seo',
+  directions: 'more',
+  venues: 'more',
+  travel: 'practice',
+  faq: 'practice',
 };
 
 const SECTION_SCROLL_MT = 'scroll-mt-[calc(var(--site-header-height)+3.25rem)]';
@@ -59,6 +66,7 @@ export function CityPageView({
   faqItems = [],
   seoText = null,
   hubTemplate = 'default',
+  hubArticles = null,
 }: {
   slug: string;
   initialPayload: PublicCityPageDto | null;
@@ -66,6 +74,7 @@ export function CityPageView({
   seoText?: string | null;
   /** `editorial` — параллельный Lovable-like visual; default = фаза 1 wireframe. */
   hubTemplate?: CityHubTemplate;
+  hubArticles?: CityHubArticlesBuckets | null;
 }) {
   const editorial = hubTemplate === 'editorial';
   const [payload, setPayload] = React.useState<PublicCityPageDto | null>(initialPayload);
@@ -149,18 +158,25 @@ export function CityPageView({
   );
   const hasFaq = unifiedFaq.length > 0;
   const hasSeo = Boolean(seoText);
+  const aboutArticles = hubArticles?.about || [];
+  const afficheArticles = hubArticles?.affiche || [];
+  const sightsArticles = hubArticles?.sights || [];
+  const practiceArticles = hubArticles?.practice || [];
+  const moreArticles = hubArticles?.more || [];
+  const hasAbout = aboutArticles.length > 0;
+  const hasPractice = hasTravel || hasFaq || practiceArticles.length > 0;
+  const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
 
   const tabs = React.useMemo(
     () =>
       [
+        { id: 'about', label: 'О городе', show: hasAbout },
         { id: 'affiche', label: 'Афиша', show: true },
-        { id: 'directions', label: 'Направления', show: hasDirections },
-        { id: 'venues', label: 'Площадки', show: hasVenues },
-        { id: 'travel', label: 'Как добраться', show: hasTravel },
-        { id: 'sights', label: 'Достопримечательности', show: hasSights },
-        { id: 'faq', label: 'FAQ', show: hasFaq },
+        { id: 'sights', label: 'Куда сходить', show: hasSights || sightsArticles.length > 0 },
+        { id: 'practice', label: 'Практика', show: hasPractice },
+        { id: 'more', label: 'Ещё', show: hasMore },
       ].filter((tab) => tab.show),
-    [hasDirections, hasFaq, hasSights, hasTravel, hasVenues],
+    [hasAbout, hasMore, hasPractice, hasSights, sightsArticles.length],
   );
 
   return (
@@ -190,6 +206,36 @@ export function CityPageView({
             />
             <CityStickyTabs tabs={tabs} editorial={editorial} />
 
+            {hasAbout ? (
+              <section
+                id="about"
+                className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
+              >
+                <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
+                  <h2
+                    className={
+                      editorial
+                        ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
+                        : 'text-2xl font-bold text-slate-950'
+                    }
+                  >
+                    О городе
+                  </h2>
+                  <h3 className={`mt-4 text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
+                    Зачем ехать
+                  </h3>
+                  <p className={`mt-1 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                    Короткие материалы, которые помогают понять настроение города до выбора билетов.
+                  </p>
+                  <CityHubArticlesGrid
+                    articles={aboutArticles}
+                    editorial={editorial}
+                    onSeeAffiche={() => scrollToSection('affiche')}
+                  />
+                </div>
+              </section>
+            ) : null}
+
             <section
               id="affiche"
               className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
@@ -200,6 +246,9 @@ export function CityPageView({
                   setMode={setMode}
                   editorial={editorial}
                 />
+                <h3 className={`mb-3 text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
+                  Что купить сейчас
+                </h3>
                 <div className="mb-5 flex flex-wrap items-center gap-x-4 gap-y-1.5 md:flex-nowrap md:overflow-x-auto md:pb-0.5">
                   <DateFilterChips active={dateFilter} onSelect={setDateFilter} editorial={editorial} />
                   {contentReady ? (
@@ -217,37 +266,34 @@ export function CityPageView({
                   ) : null}
                 </div>
                 {contentReady ? (
-                  mode === 'table' ? (
-                    <CityEventsTable sessions={sessions} />
-                  ) : (
-                    <CityEventsGrid sessions={sessions} editorial={editorial} />
-                  )
+                  <>
+                    {mode === 'table' ? (
+                      <CityEventsTable sessions={sessions} />
+                    ) : (
+                      <CityEventsGrid sessions={sessions} editorial={editorial} />
+                    )}
+                    {afficheArticles.length ? (
+                      <div className="mt-8">
+                        <h3 className={`text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
+                          Подсказка по выбору
+                        </h3>
+                        <p className={`mt-1 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                          Материал, который помогает сузить афишу под ваш сценарий.
+                        </p>
+                        <CityHubArticlesGrid
+                          articles={afficheArticles}
+                          editorial={editorial}
+                          onSeeAffiche={() => scrollToSection('affiche')}
+                        />
+                      </div>
+                    ) : null}
+                  </>
                 ) : (
                   <CityScheduleLoadingState />
                 )}
               </div>
             </section>
 
-            {contentReady ? (
-              <>
-                <PopularDirections
-                  city={city}
-                  landings={payload.landings}
-                  categories={categories}
-                  editorial={editorial}
-                  onCategory={(value) => {
-                    setCategory(value);
-                    setDateFilter('all');
-                    scrollToSection('affiche');
-                  }}
-                />
-                <VenueHighlights city={city} venues={payload.venues} editorial={editorial} />
-              </>
-            ) : (
-              <CityContentLoadingState />
-            )}
-
-            <CityTravelSection travel={guide?.travel} editorial={editorial} />
             <CitySightsSection
               city={city}
               guide={guide}
@@ -255,8 +301,99 @@ export function CityPageView({
               venues={payload.venues}
               allowFallback={contentReady}
               editorial={editorial}
+              articles={sightsArticles}
             />
-            {hasFaq ? <CityFaqSection cityName={city.name} items={unifiedFaq} editorial={editorial} /> : null}
+
+            {hasPractice ? (
+              <section
+                id="practice"
+                className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
+              >
+                <div className={`container-page ${editorial ? 'pt-12 pb-4' : 'pt-8 pb-2'}`}>
+                  <h2
+                    className={
+                      editorial
+                        ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
+                        : 'text-2xl font-bold text-slate-950'
+                    }
+                  >
+                    Практика
+                  </h2>
+                  <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                    Как добраться, когда ехать и ответы на частые вопросы.
+                  </p>
+                </div>
+                <CityTravelSection travel={guide?.travel} editorial={editorial} nested />
+                {hasFaq ? (
+                  <CityFaqSection cityName={city.name} items={unifiedFaq} editorial={editorial} nested />
+                ) : null}
+                {practiceArticles.length ? (
+                  <div className={`container-page ${editorial ? 'pb-12' : 'pb-8'}`}>
+                    <h3 className={`text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
+                      Полезно перед поездкой
+                    </h3>
+                    <CityHubArticlesGrid
+                      articles={practiceArticles}
+                      editorial={editorial}
+                      onSeeAffiche={() => scrollToSection('affiche')}
+                    />
+                  </div>
+                ) : null}
+              </section>
+            ) : null}
+
+            {hasMore ? (
+              <section
+                id="more"
+                className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
+              >
+                <div className={`container-page ${editorial ? 'pt-12 pb-4' : 'pt-8 pb-2'}`}>
+                  <h2
+                    className={
+                      editorial
+                        ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
+                        : 'text-2xl font-bold text-slate-950'
+                    }
+                  >
+                    Ещё по городу
+                  </h2>
+                </div>
+                {contentReady ? (
+                  <>
+                    <PopularDirections
+                      city={city}
+                      landings={payload.landings}
+                      categories={categories}
+                      editorial={editorial}
+                      nested
+                      onCategory={(value) => {
+                        setCategory(value);
+                        setDateFilter('all');
+                        scrollToSection('affiche');
+                      }}
+                    />
+                    <VenueHighlights city={city} venues={payload.venues} editorial={editorial} nested />
+                  </>
+                ) : (
+                  <CityContentLoadingState />
+                )}
+                {moreArticles.length ? (
+                  <div className={`container-page ${editorial ? 'pb-12' : 'pb-8'}`}>
+                    <h3 className={`text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
+                      Из блога
+                    </h3>
+                    <CityHubArticlesGrid
+                      articles={moreArticles}
+                      editorial={editorial}
+                      onSeeAffiche={() => scrollToSection('affiche')}
+                    />
+                  </div>
+                ) : null}
+              </section>
+            ) : contentReady ? null : (
+              <CityContentLoadingState />
+            )}
+
             {hasSeo && seoText ? (
               <CitySeoTextSection cityName={city.name} text={seoText} editorial={editorial} />
             ) : null}
@@ -674,12 +811,14 @@ function PopularDirections({
   categories,
   onCategory,
   editorial = false,
+  nested = false,
 }: {
   city: PublicCityDto;
   landings: PublicLandingDto[];
   categories: Array<[string, number]>;
   onCategory: (category: string) => void;
   editorial?: boolean;
+  nested?: boolean;
 }) {
   const cityIn = cityInPrepositional(city);
   // Only directions with inventory in this city (count > 0). Empty landings/categories → no chip.
@@ -716,20 +855,22 @@ function PopularDirections({
   return (
     <section
       id="directions"
-      className={`border-b py-8 ${SECTION_SCROLL_MT} ${
-        editorial ? 'border-zinc-200 bg-zinc-50/40' : 'border-slate-100 bg-slate-50/70'
+      className={`py-8 ${nested ? '' : SECTION_SCROLL_MT} ${
+        nested
+          ? ''
+          : `border-b ${editorial ? 'border-zinc-200 bg-zinc-50/40' : 'border-slate-100 bg-slate-50/70'}`
       }`}
     >
       <div className="container-page">
-        <h2
+        <h3
           className={
             editorial
-              ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
+              ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
               : 'text-lg font-bold text-slate-950'
           }
         >
           Популярные направления
-        </h2>
+        </h3>
         <p className={`mt-1 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
           Подборки и категории {cityIn}
         </p>
@@ -771,6 +912,7 @@ function CitySightsSection({
   venues,
   allowFallback = false,
   editorial = false,
+  articles = [],
 }: {
   city: PublicCityDto;
   guide: CityInfoEntry | null;
@@ -778,6 +920,7 @@ function CitySightsSection({
   venues: PublicVenueDto[];
   allowFallback?: boolean;
   editorial?: boolean;
+  articles?: BlogCardDto[];
 }) {
   const fromSights = guide?.sights?.map((item) => ({ name: item.title, desc: item.text })) || [];
   const fromMustSee = guide?.mustSee?.length ? guide.mustSee : [];
@@ -788,7 +931,7 @@ function CitySightsSection({
       : allowFallback
         ? buildFallbackMustSee(city, categories, venues)
         : [];
-  if (!places.length) return null;
+  if (!places.length && !articles.length) return null;
   const cityIn = cityInPrepositional(city);
 
   return (
@@ -805,51 +948,87 @@ function CitySightsSection({
             : 'text-2xl font-bold text-slate-950'
         }
       >
-        Что посмотреть {cityIn}
+        Куда сходить {cityIn}
       </h2>
-      <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-        Главные точки, с которых удобно начать знакомство с городом.
-      </p>
-      <ol className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {places.slice(0, 6).map((place, index) => (
-          <li key={`${place.name}:${index}`} className="flex gap-3">
-            <span
-              className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                editorial ? 'bg-zinc-100 text-zinc-800' : 'bg-primary-50 text-primary-700'
-              }`}
-            >
-              {index + 1}
-            </span>
-            <div>
-              <h3 className={`font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>{place.name}</h3>
-              <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>{place.desc}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
+      {places.length ? (
+        <>
+          <h3 className={`mt-4 text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
+            Главные места
+          </h3>
+          <p className={`mt-1 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+            Точки, с которых удобно начать знакомство с городом.
+          </p>
+          <ol className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {places.slice(0, 6).map((place, index) => (
+              <li key={`${place.name}:${index}`} className="flex gap-3">
+                <span
+                  className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                    editorial ? 'bg-zinc-100 text-zinc-800' : 'bg-primary-50 text-primary-700'
+                  }`}
+                >
+                  {index + 1}
+                </span>
+                <div>
+                  <div className={`font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>{place.name}</div>
+                  <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>{place.desc}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </>
+      ) : null}
+      {articles.length ? (
+        <div className={places.length ? 'mt-8' : 'mt-4'}>
+          <h3 className={`text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
+            Материалы по темам
+          </h3>
+          <p className={`mt-1 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+            Подборки и гиды, которые помогают выбрать формат прогулки или события.
+          </p>
+          <CityHubArticlesGrid
+            articles={articles}
+            editorial={editorial}
+            onSeeAffiche={() => scrollToSection('affiche')}
+          />
+        </div>
+      ) : null}
     </section>
   );
 }
 
-function CityTravelSection({ travel, editorial = false }: { travel?: string; editorial?: boolean }) {
+function CityTravelSection({
+  travel,
+  editorial = false,
+  nested = false,
+}: {
+  travel?: string;
+  editorial?: boolean;
+  nested?: boolean;
+}) {
   if (!travel?.trim()) return null;
   return (
     <section
       id="travel"
-      className={`border-b py-10 ${SECTION_SCROLL_MT} ${
-        editorial ? 'border-zinc-200 bg-white/50' : 'border-slate-100 bg-slate-50/60'
+      className={`py-10 ${nested ? '' : `${SECTION_SCROLL_MT} border-b`} ${
+        nested
+          ? editorial
+            ? 'bg-white/50'
+            : 'bg-slate-50/60'
+          : editorial
+            ? 'border-zinc-200 bg-white/50'
+            : 'border-slate-100 bg-slate-50/60'
       }`}
     >
       <div className="container-page max-w-3xl">
-        <h2
+        <h3
           className={
             editorial
-              ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
+              ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
               : 'text-2xl font-bold text-slate-950'
           }
         >
           Как добраться и когда ехать
-        </h2>
+        </h3>
         <p className={`mt-4 text-sm leading-7 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>{travel}</p>
         <a
           href="#affiche"
@@ -872,10 +1051,12 @@ function VenueHighlights({
   city,
   venues,
   editorial = false,
+  nested = false,
 }: {
   city: PublicCityDto;
   venues: PublicVenueDto[];
   editorial?: boolean;
+  nested?: boolean;
 }) {
   if (!venues.length) return null;
   const cityIn = cityInPrepositional(city);
@@ -886,21 +1067,21 @@ function VenueHighlights({
   return (
     <section
       id="venues"
-      className={`container-page border-b py-10 ${SECTION_SCROLL_MT} ${
-        editorial ? 'border-zinc-200' : 'border-slate-100'
+      className={`container-page py-10 ${nested ? '' : `${SECTION_SCROLL_MT} border-b`} ${
+        nested ? '' : editorial ? 'border-zinc-200' : 'border-slate-100'
       }`}
     >
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2
+          <h3
             className={
               editorial
-                ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
+                ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
                 : 'text-2xl font-bold text-slate-950'
             }
           >
             Площадки и локации
-          </h2>
+          </h3>
           <p className={`mt-1 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
             Музеи, театры, причалы и точки старта экскурсий {cityIn}.
           </p>
@@ -1232,28 +1413,32 @@ function CityFaqSection({
   cityName,
   items,
   editorial = false,
+  nested = false,
 }: {
   cityName: string;
   items: CityFaqItem[];
   editorial?: boolean;
+  nested?: boolean;
 }) {
   const [openIndex, setOpenIndex] = React.useState<number | null>(0);
 
   return (
     <section
       id="faq"
-      className={`border-t py-12 ${SECTION_SCROLL_MT} ${editorial ? 'border-zinc-200' : 'border-slate-100'}`}
+      className={`py-12 ${nested ? '' : `${SECTION_SCROLL_MT} border-t`} ${
+        nested ? '' : editorial ? 'border-zinc-200' : 'border-slate-100'
+      }`}
     >
       <div className="container-page">
-        <h2
+        <h3
           className={
             editorial
-              ? 'mb-2 text-center font-serif text-3xl font-semibold text-zinc-950 md:text-4xl'
+              ? 'mb-2 text-center font-serif text-2xl font-semibold text-zinc-950 md:text-3xl'
               : 'mb-2 text-center text-2xl font-bold text-slate-900 md:text-3xl'
           }
         >
           Частые вопросы
-        </h2>
+        </h3>
         <p className={`mb-8 text-center ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
           Ответы о городе и афише {cityName}
         </p>

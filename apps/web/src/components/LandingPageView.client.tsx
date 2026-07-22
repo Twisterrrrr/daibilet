@@ -629,13 +629,21 @@ export function LandingPageView({
   }, [slug, citySlug, initialCachedPayload]);
 
   React.useEffect(() => {
+    // SSR already hydrated the landing — do not force a no-store remount fetch.
+    if (initialCachedPayload?.landing) {
+      setApiPayload(initialCachedPayload);
+      setIsSessionsLoading(false);
+      setSessionsError(null);
+      return;
+    }
+
     let disposed = false;
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 25000);
 
-    setIsSessionsLoading(false);
+    setIsSessionsLoading(true);
     setSessionsError(null);
-    fetch(`/api/public/landings/${encodeURIComponent(slug)}`, { signal: controller.signal, cache: 'no-store' })
+    fetch(`/api/public/landings/${encodeURIComponent(slug)}`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as PublicLandingPageDto | null;
@@ -664,7 +672,7 @@ export function LandingPageView({
       window.clearTimeout(timeout);
       controller.abort();
     };
-  }, [slug, citySlug]);
+  }, [slug, citySlug, initialCachedPayload]);
 
   React.useEffect(() => {
     const cityName = resolveLandingCityName(citySlug);

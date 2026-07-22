@@ -7,6 +7,15 @@ const nullableString = z.preprocess(
 );
 const optionalFlag = z.coerce.number().int().min(0).max(1).optional();
 const idList = z.array(z.string().trim().min(1)).max(100).optional();
+/** Comma-separated or repeated `ids=` query → favorites / by-key lookup (max 50). */
+const csvIdList = z.preprocess((value) => {
+  if (value == null || value === '') return undefined;
+  const parts = Array.isArray(value)
+    ? value.flatMap((item) => String(item).split(','))
+    : String(value).split(',');
+  const cleaned = parts.map((item) => item.trim()).filter(Boolean);
+  return cleaned.length ? cleaned.slice(0, 50) : undefined;
+}, z.array(z.string().min(1)).max(50).optional());
 const publishStatus = z.enum(['DRAFT', 'REVIEW', 'READY', 'PUBLISHED', 'HIDDEN']);
 
 export const paginationQuerySchema = z.object({
@@ -32,6 +41,8 @@ export const publicCatalogQuerySchema = paginationQuerySchema.extend({
   priceMax: z.coerce.number().int().min(0).optional(),
   ageMax: z.coerce.number().int().min(-1).max(99).optional(),
   refresh: optionalFlag,
+  ids: csvIdList,
+  limit: z.coerce.number().int().min(1).max(100).optional(),
 });
 
 export const adminEventsQuerySchema = paginationQuerySchema.extend({

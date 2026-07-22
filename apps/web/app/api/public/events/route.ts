@@ -1,7 +1,8 @@
 import '@/lib/env';
 import { parseCatalogApiQuery } from '@/server/catalog-query';
-import { buildPublicCatalogDto } from '@daibilet/backend/public-read';
+import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { publicJsonResponse } from '@/server/public-json-response';
+
 export const dynamic = 'force-dynamic';
 export const revalidate = 300;
 
@@ -9,7 +10,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   try {
     const query = parseCatalogApiQuery(url.searchParams);
-    const payload = await buildPublicCatalogDto(query);
+    const payload = await getCachedCatalog(query);
     return publicJsonResponse(payload);
   } catch (error) {
     return publicJsonResponse(

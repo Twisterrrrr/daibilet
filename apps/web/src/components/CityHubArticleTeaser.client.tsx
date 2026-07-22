@@ -1,0 +1,154 @@
+'use client';
+
+import * as React from 'react';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+
+import { cityHubArticleBadges } from '@/lib/city-hub-articles';
+import type { BlogCardDto } from '@/lib/blog-utils';
+
+export function CityHubArticleTeaser({
+  article,
+  editorial = false,
+  onSeeAffiche,
+}: {
+  article: BlogCardDto;
+  editorial?: boolean;
+  onSeeAffiche?: () => void;
+}) {
+  const [imageFailed, setImageFailed] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
+  const badges = cityHubArticleBadges(article);
+  const excerpt = String(article.excerpt || '').trim();
+
+  return (
+    <article
+      className={
+        editorial
+          ? 'overflow-hidden rounded-2xl border border-zinc-200 bg-white'
+          : 'overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm'
+      }
+    >
+      <div className={`relative aspect-[16/9] overflow-hidden ${editorial ? 'bg-zinc-100' : 'bg-slate-100'}`}>
+        {!imageFailed && article.coverImageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={article.coverImageUrl}
+            alt=""
+            loading="lazy"
+            onError={() => setImageFailed(true)}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div
+            className={`flex h-full w-full items-center justify-center text-sm ${
+              editorial ? 'bg-zinc-200 text-zinc-500' : 'bg-slate-200 text-slate-500'
+            }`}
+          >
+            Материал
+          </div>
+        )}
+      </div>
+
+      <div className="p-4 sm:p-5">
+        {badges.length ? (
+          <div className="mb-2 flex flex-wrap gap-1.5">
+            {badges.map((badge) => (
+              <span
+                key={badge}
+                className={
+                  editorial
+                    ? 'rounded-md border border-zinc-200 px-2 py-0.5 text-[11px] font-medium text-zinc-600'
+                    : 'rounded-md border border-slate-200 px-2 py-0.5 text-[11px] font-medium text-slate-600'
+                }
+              >
+                {badge}
+              </span>
+            ))}
+          </div>
+        ) : null}
+
+        <h3
+          className={`line-clamp-2 text-base font-semibold leading-snug ${
+            editorial ? 'text-zinc-950' : 'text-slate-950'
+          }`}
+        >
+          {article.title}
+        </h3>
+
+        {excerpt ? (
+          <>
+            <p
+              className={`mt-2 text-sm leading-relaxed ${editorial ? 'text-zinc-600' : 'text-slate-600'} ${
+                open ? '' : 'line-clamp-3'
+              }`}
+            >
+              {excerpt}
+            </p>
+            {excerpt.length > 140 ? (
+              <button
+                type="button"
+                aria-expanded={open}
+                onClick={() => setOpen((value) => !value)}
+                className={`mt-2 text-left text-xs font-semibold ${
+                  editorial ? 'text-zinc-700 hover:underline' : 'text-primary-700 hover:text-primary-800'
+                }`}
+              >
+                {open ? 'Свернуть' : 'Коротко о чём'} {open ? '▴' : '▾'}
+              </button>
+            ) : null}
+          </>
+        ) : null}
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => onSeeAffiche?.()}
+            className={
+              editorial
+                ? 'inline-flex min-h-10 items-center justify-center rounded-full bg-zinc-950 px-4 text-sm font-medium text-white hover:bg-zinc-800'
+                : 'inline-flex min-h-10 items-center justify-center rounded-lg bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700'
+            }
+          >
+            Смотреть в афише
+          </button>
+          <Link
+            href={`/blog/${article.slug}`}
+            className={
+              editorial
+                ? 'inline-flex min-h-10 items-center gap-1 rounded-full border border-zinc-300 px-4 text-sm font-medium text-zinc-800 hover:border-zinc-400'
+                : 'inline-flex min-h-10 items-center gap-1 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-700'
+            }
+          >
+            Открыть материал
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export function CityHubArticlesGrid({
+  articles,
+  editorial = false,
+  onSeeAffiche,
+}: {
+  articles: BlogCardDto[];
+  editorial?: boolean;
+  onSeeAffiche?: () => void;
+}) {
+  if (!articles.length) return null;
+  return (
+    <div className={`mt-5 grid gap-4 ${articles.length > 1 ? 'sm:grid-cols-2' : 'max-w-xl'}`}>
+      {articles.map((article) => (
+        <CityHubArticleTeaser
+          key={article.slug}
+          article={article}
+          editorial={editorial}
+          onSeeAffiche={onSeeAffiche}
+        />
+      ))}
+    </div>
+  );
+}

@@ -65,11 +65,14 @@ const LIST_SLOT_PREVIEW_LIMIT = 3;
 export async function buildPublicCatalogDto(query: PublicCatalogQuery): Promise<PublicCatalogDto> {
   // Base catalog cache omits heavy slot hydration; hydrate only the requested page.
   const sessions = await getPublicCatalogSessions(query.refresh === 1, { hydrateSlots: false });
-  const coverSessions = sessions.filter(sessionHasCoverImage);
-  const facets = buildCatalogFacets(coverSessions);
-  const filtered = coverSessions.filter((session) => matchesCatalogQuery(session, query));
+  const byIds = Boolean(query.ids?.length);
+  // Favorites / ids lookup: allow sessions without cover; normal catalog stays cover-gated.
+  const sourceSessions = byIds ? sessions : sessions.filter(sessionHasCoverImage);
+  const facets = buildCatalogFacets(byIds ? sessions.filter(sessionHasCoverImage) : sourceSessions);
+  const filtered = sourceSessions.filter((session) => matchesCatalogQuery(session, query));
   const sorted = sortCatalogSessions(filtered, query.sort || 'time');
-  const limit = clampNumber(query.limit, 1, CATALOG_PAGE_SIZE_MAX, CATALOG_PAGE_SIZE_DEFAULT);
+  const defaultLimit = byIds ? Math.min(Math.max(query.ids!.length, 1), CATALOG_PAGE_SIZE_MAX) : CATALOG_PAGE_SIZE_DEFAULT;
+  const limit = clampNumber(query.limit, 1, CATALOG_PAGE_SIZE_MAX, defaultLimit);
   const offset = clampNumber(query.offset, 0, 100000, 0);
   const pageRows = sorted.slice(offset, offset + limit);
   const hydratedPage = await hydrateCatalogUpcomingSlots(pageRows, LIST_SLOT_PREVIEW_LIMIT);
@@ -480,6 +483,10 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
 }
 
 function matchesCatalogQuery(session: PublicSessionDto, query: PublicCatalogQuery): boolean {
+  if (query.ids?.length) {
+    const keys = new Set(query.ids);
+    if (!keys.has(session.id) && !(session.groupKey && keys.has(session.groupKey))) return false;
+  }
   const destination = query.destination;
   if (destination && destination !== 'all' && session.destination !== destination) return false;
   if (query.city && query.city !== 'all' && session.city !== query.city && session.destination !== query.city) return false;

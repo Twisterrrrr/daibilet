@@ -35,15 +35,26 @@ export function FavoritesPanel({ onClose }: { onClose: () => void }) {
   }, []);
 
   useEffect(() => {
+    if (!favoriteIds.size) {
+      setCatalogSessions([]);
+      return;
+    }
+
+    const ids = [...favoriteIds].slice(0, 50);
     const controller = new AbortController();
-    fetch('/api/public/events?limit=300', { cache: 'no-store', signal: controller.signal })
+    const params = new URLSearchParams({
+      ids: ids.join(','),
+      limit: String(Math.min(Math.max(ids.length, 1), 50)),
+    });
+
+    fetch(`/api/public/events?${params.toString()}`, { signal: controller.signal })
       .then(async (response) => (response.ok ? ((await response.json()) as { items?: PublicSessionDto[] }) : null))
       .then((payload) => {
         if (payload?.items) setCatalogSessions(payload.items);
       })
       .catch(() => undefined);
     return () => controller.abort();
-  }, []);
+  }, [favoriteIds]);
 
   return (
     <div className="fixed inset-0 z-[60]">

@@ -1,3 +1,46 @@
+## 2026-07-22 — Load fixes: catalog cache headers, landing refetch, favorites ids
+
+### Наблюдения
+
+- Prod `/api/public/events` идёт в legacy API (`:4000`), не в Next. TS `public-catalog-handler` отвечал `Cache-Control: no-store` → браузер/nginx не кэшировали каталог.
+- `LandingPageView` при наличии SSR `initialPayload` всё равно делал `fetch(..., cache: 'no-store')`.
+- `FavoritesPanel` тянул `limit=300 no-store`.
+- nginx: `proxy_cache_path` был, но `proxy_cache` в `location /` не применялся; `limit_req` на `daibilet.ru /api/` отсутствовал.
+
+### Решения
+
+- Public handlers → `sendPublicJson` (`public, max-age=60, s-maxage=300, swr=600`).
+- Next `/api/public/events` → `getCachedCatalog`.
+- Landing: skip client refetch если SSR landing уже есть.
+- Favorites: `?ids=` (max 50) без no-store; catalog page sizes 50/100.
+- nginx prod: включён `proxy_cache` на `/` + `limit_req` на `daibilet.ru /api/`.
+
+### Проблемы
+
+- Images webp/avif — отдельный трек (п.6 аудита).
+
+---
+
+## 2026-07-22 — City hub × blog phase 1 (editorial teasers)
+
+### Наблюдения
+
+- Хаб был посередине между витриной и справочником: brief/travel/FAQ есть, блог жил отдельно на `/blog`.
+- `citySlug` у статей заполнен слабо; API `?citySlug=` не является строгим фильтром — нужен fallback-подбор.
+
+### Решения
+
+- Фаза 1: 5 sticky tabs (`#about` `#affiche` `#sights` `#practice` `#more`); старые якоря `#travel/#faq/#directions/#venues` сохранены внутри родителей.
+- SSR: `buildPublicArticlesListDto` + `mergeBlogCards` + `pickCityHubArticles` (лимиты 2/1/2/1/1, без повторов).
+- `CityHubArticleTeaser`: cover/title/excerpt, badges, CTA «Смотреть в афише» (scroll `#affiche`) + «Открыть материал».
+- Пустые бакеты не рендерятся; не возвращаем «Стоит внимания» (снято ранее).
+
+### Проблемы
+
+- Mini-row событий и точная CMS-привязка citySlug — фазы 2–3.
+
+---
+
 ## 2026-07-19 — City hub FAQ: только city-specific, без платформы
 
 ### Наблюдения

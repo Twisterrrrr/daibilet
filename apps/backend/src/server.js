@@ -121,7 +121,7 @@ let tepAutoSyncWarmTimer = null;
 
 const jsonCache = new Map();
 const PUBLIC_RESPONSE_CACHE_MS = 5 * 60 * 1000;
-const PUBLIC_HTTP_CACHE_CONTROL = 'public, max-age=60, stale-while-revalidate=300';
+const PUBLIC_HTTP_CACHE_CONTROL = 'public, max-age=60, s-maxage=300, stale-while-revalidate=600';
 const MAX_PUBLIC_RESPONSE_CACHE_ENTRIES = 80;
 const publicResponseCache = new Map();
 const publicCacheInvalidators = new Set();
