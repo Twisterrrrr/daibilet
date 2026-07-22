@@ -36,6 +36,8 @@
 
 - Timer нужно enable на prod после deploy (`systemctl enable --now daibilet-tc-catalog-sync.timer`).
 
+**Prod @`efc8459`:** deploy-prod-next OK; `daibilet-tc-catalog-sync.timer` enabled, next `2026-07-23 03:20 UTC`; smoke `POST /api/internal/public-cache` warm=light → 200.
+
 ---
 
 ## 2026-07-22 — Browser smoke 0.2 закрыт
