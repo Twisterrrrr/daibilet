@@ -21,6 +21,22 @@ export type BlogPost = {
 /** Обложки — уникальная статика на статью: /images/blog/{slug}.jpg */
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: 'kazan-na-vkus-master-klassy',
+    title: 'Казань на вкус: где приготовить эчпочмак, чак-чак и губадию своими руками',
+    excerpt:
+      'Колонка Артура: мастер-классы в Доме-музее Эчпочмака — эчпочмак, чак-чак, губадия и гастроужин, с ценами и маршрутом на день.',
+    date: '22 июля 2026',
+    readMin: 10,
+    tag: 'Колонка',
+    city: 'Казань',
+    citySlug: 'kazan',
+    authorId: 'artur',
+    authorName: 'Артур',
+    articleType: 'column',
+    imageUrl: blogCoverUrl('kazan-na-vkus-master-klassy'),
+    imageAlt: 'Горячие эчпочмаки и чак-чак на деревянном столе в тёплом кухонном свете',
+  },
+  {
     slug: 'muzyka-v-osobnyakah-spb',
     title: 'Музыка с адресом: зачем слушать классику в петербургских особняках',
     excerpt:

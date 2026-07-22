@@ -1,3 +1,21 @@
+## 2026-07-22 — Колонка Артура: Казань на вкус (мастер-классы)
+
+### Наблюдения
+
+- В каталоге есть 4 МК Дома-музея Эчпочмака + татарский гастроужин; venue slug `dom-muzei-echpochmaka`.
+
+### Решения
+
+- Статья `kazan-na-vkus-master-klassy`: `authorId=artur`, `citySlug=kazan`, cover + distinct `-inline.jpg`.
+- Внутренние ссылки: 4 МК, venue, `/cities/kazan`, гастроужин.
+- Meta в `blog-meta.ts` + тизер в `blog-posts.ts`.
+
+### Проблемы
+
+- Публикация на prod: commit → deploy-prod-next → `blog:upsert --slug=kazan-na-vkus-master-klassy`.
+
+---
+
 ## 2026-07-22 — City hub × blog phase 3 (CMS citySlug)
 
 ### Наблюдения
