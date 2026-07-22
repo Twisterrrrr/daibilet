@@ -1400,7 +1400,7 @@ function CitySeoTextSection({
                 : 'text-2xl font-bold text-slate-900'
             }
           >
-            Афиша {cityName}
+            Афиша {cityToGenitive(cityName)}
           </h2>
           <p className={`mt-4 text-sm leading-7 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>{text}</p>
         </div>
