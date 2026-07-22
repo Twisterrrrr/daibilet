@@ -569,10 +569,14 @@ function CityHeroDefault({
           }
         }
       `}</style>
-      {/* Подложка под фото: синий неба, чтобы края маски не уходили в чёрный. */}
+      {/* Подложка: ночной синий под фото и под длинным fade слева. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 z-0 hidden w-[72%] bg-[radial-gradient(ellipse_at_70%_45%,#0c2748_0%,#07111f_42%,transparent_72%)] lg:block xl:w-[78%]"
+        className="pointer-events-none absolute inset-0 z-0 bg-[#071525]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 z-0 hidden w-[78%] bg-[radial-gradient(ellipse_at_72%_42%,#0e2f52_0%,#0a1f38_38%,transparent_74%)] lg:block"
       />
       <div
         aria-hidden="true"
@@ -591,9 +595,12 @@ function CityHeroDefault({
           }
         />
       </div>
-      {/* Читаемость слева: slate → ночной синий → прозрачность (не чёрная стена). */}
-      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-slate-950 from-[10%] via-[#071525]/80 via-[36%] to-transparent to-[72%] lg:from-[14%] lg:via-[#0a1a30]/55 lg:via-[40%] lg:to-[68%]" />
-      <div className="absolute inset-x-0 bottom-0 z-[1] h-32 bg-gradient-to-t from-slate-950/55 to-transparent" />
+      {/* Длинный fade: синий держится почти до правого края, в чёрный уходит только в конце. */}
+      <div
+        aria-hidden
+        className="absolute inset-0 z-[1] bg-[linear-gradient(to_right,#0a1a30_0%,#0b2038_18%,#0a1a30f2_36%,#071525cc_58%,#02061799_78%,#02061733_90%,transparent_98%)]"
+      />
+      <div className="absolute inset-x-0 bottom-0 z-[1] h-32 bg-gradient-to-t from-slate-950/50 to-transparent" />
       <div className="container-page relative z-[2] py-12 sm:py-14">
         <div className="flex items-center gap-2 text-sm text-primary-100/80">
           <button type="button" onClick={() => navigateHome('top')} className="hover:text-white">
