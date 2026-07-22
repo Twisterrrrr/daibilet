@@ -25,6 +25,15 @@ import { createPublicEventRouteHandler } from './public-event-handler.js';
 import { buildPublicVenueDto, buildPublicVenuesDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
 import { createPublicVenueRouteHandler } from './public-venue-handler.js';
 import { createPublicReadStackWarmer } from './public-warmup.js';
+import { createSupplierPortalRouteHandler } from './supplier-portal-handler.js';
+import {
+  buildSupplierPortalDashboardDto,
+  buildSupplierPortalEventsListDto,
+  buildSupplierPortalFinanceDto,
+  buildSupplierPortalOrdersListDto,
+  buildSupplierPortalProfileDto,
+  buildSupplierPortalReviewsListDto,
+} from './supplier-portal.dto.js';
 import {
   db,
   handleRequest,
@@ -122,6 +131,14 @@ const server = startServer({
         reviewEventChangeRequest,
         applyEventChangeRequest: applyApprovedEventChangeRequest,
         invalidatePublicCaches,
+      }),
+      createSupplierPortalRouteHandler({
+        buildDashboard: buildSupplierPortalDashboardDto,
+        buildProfile: buildSupplierPortalProfileDto,
+        buildEventsList: buildSupplierPortalEventsListDto,
+        buildOrdersList: buildSupplierPortalOrdersListDto,
+        buildFinance: buildSupplierPortalFinanceDto,
+        buildReviewsList: buildSupplierPortalReviewsListDto,
       }),
       createPublicReviewsRouteHandler(),
       createAdminReviewsRouteHandler(),

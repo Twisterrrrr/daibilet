@@ -367,12 +367,14 @@ Status 2026-07-22:
 
 ### Phase 2.5: supplier LC MVP
 
-- read-first supplier dashboard;
-- orders;
-- reviews;
-- balance;
-- reports/documents;
-- team and requisites.
+- ✅ read-first supplier dashboard: `GET /api/supplier/dashboard`;
+- ✅ supplier events read model: `GET /api/supplier/events`;
+- ✅ internal checkout order items: `GET /api/supplier/orders`;
+- ✅ balance/ledger/payout snapshot: `GET /api/supplier/finance`;
+- ✅ reviews queue: `GET /api/supplier/reviews`;
+- ✅ legal/bank/profile snapshot: `GET /api/supplier/profile`;
+- ✅ `apps/supplier` app shell;
+- reports/documents write flows are deferred until real finance operations start.
 
 ### Phase 2.6: reviews MVP
 

@@ -80,7 +80,10 @@
     "admin:data": "node scripts/build-admin-prototype-data.js",
     "admin:serve": "pnpm --filter @tours/admin dev",
     "admin:dev": "pnpm --filter @tours/admin dev",
-    "admin:build": "pnpm --filter @tours/admin build"
+    "admin:build": "pnpm --filter @tours/admin build",
+    "supplier:dev": "pnpm --filter @daibilet/supplier dev",
+    "supplier:build": "pnpm --filter @daibilet/supplier build",
+    "supplier:typecheck": "pnpm --filter @daibilet/supplier typecheck"
   },
   "keywords": [],
   "author": "",
