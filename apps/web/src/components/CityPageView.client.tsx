@@ -233,7 +233,6 @@ export function CityPageView({
                     articles={aboutArticles}
                     editorial={editorial}
                     sessions={payload.sessions}
-                    onSeeAffiche={() => scrollToSection('affiche')}
                   />
                 </div>
               </section>
@@ -287,7 +286,6 @@ export function CityPageView({
                           articles={afficheArticles}
                           editorial={editorial}
                           sessions={payload.sessions}
-                          onSeeAffiche={() => scrollToSection('affiche')}
                         />
                       </div>
                     ) : null}
@@ -341,7 +339,6 @@ export function CityPageView({
                       articles={practiceArticles}
                       editorial={editorial}
                       sessions={payload.sessions}
-                      onSeeAffiche={() => scrollToSection('affiche')}
                     />
                   </div>
                 ) : null}
@@ -392,7 +389,6 @@ export function CityPageView({
                       articles={moreArticles}
                       editorial={editorial}
                       sessions={payload.sessions}
-                      onSeeAffiche={() => scrollToSection('affiche')}
                     />
                   </div>
                 ) : null}
@@ -989,7 +985,6 @@ function CitySightsSection({
             articles={articles}
             editorial={editorial}
             sessions={sessions}
-            onSeeAffiche={() => scrollToSection('affiche')}
           />
         </div>
       ) : null}
