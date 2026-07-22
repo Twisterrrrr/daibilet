@@ -31,8 +31,8 @@ export function BlogArticleHero({
     <>
       <PageBreadcrumbBar items={breadcrumbs} />
       <section className="relative overflow-hidden border-b border-slate-200 bg-slate-900 text-white">
-        {/* Mobile Stories 9:16 по высоте; от sm - мягче, на lg потолок чтобы не уезжало. */}
-        <div className="relative aspect-[9/16] w-full sm:aspect-[3/4] lg:aspect-auto lg:h-[min(48vw,36rem)]">
+        {/* Mobile ~3:4 (на 25% ниже прежнего 9:16); на lg потолок высоты. */}
+        <div className="relative aspect-[3/4] w-full lg:aspect-auto lg:h-[min(48vw,36rem)]">
           {showImage ? (
             <img
               src={coverImageUrl || ''}
