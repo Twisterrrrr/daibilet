@@ -2824,6 +2824,11 @@
 ### Проблемы
 - Локальная оболочка не находит `pnpm`, поэтому backend tests/typecheck можно подтвердить на prod deploy host.
 
+### Prod proof
+- Commit `a67fa48` отправлен в `feat/next-monorepo`. Перед deploy обнаружен и дождались завершения другого `deploy-prod-next`; затем выполнен один последовательный `deploy-prod-next.sh` с restart API и Next build.
+- `GET :4000/api/public/landings/country-tours` и `GET :3001/api/public/landings/country-tours` отдают по 3 карточки: «Тур в Выборг - Шведское сердце России», «Курс на Кронштадт: история, архитектура, форты с воды», «Экскурсия в Пушкин (бывшее Царское Село) с посещением лицея».
+- В выдаче нет «Пиковой дамы», концертов и других культурных событий по совпадению топонима.
+
 ## 2026-07-22 - Admin articles: sync to public + archive/delete + author
 
 ### Наблюдения
