@@ -12,7 +12,7 @@
 
 ### Проблемы
 
-- Публикация на prod: commit → deploy-prod-next → `blog:upsert --slug=kazan-na-vkus-master-klassy`.
+- Нет (опубликовано: deploy `@93d3a07`, upsert PUBLISHED, smoke 200 + все внутренние ссылки).
 
 ---
 
