@@ -516,8 +516,8 @@ function CityHeroDefault({
     guide?.brief ||
     `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат, дату и площадку без долгого поиска по разным билетным системам.`;
 
-  // Mobile: cover + city focus. Desktop: фото по высоте hero, сдвиг от правого края
-  // и мягкая маска в обе стороны (синий ночного неба → slate-950 без жёсткого обреза).
+  // Mobile: cover + city focus. Desktop: фото крупнее на ultrawide, узкая маска
+  // и синий (тон ночного неба) по краям - не сразу в чёрный.
   const focusParts = String(heroFocus || 'center 32%').trim().split(/\s+/);
   const focusX = focusParts[0] || 'center';
   const focusY = focusParts[1] || '32%';
@@ -530,37 +530,50 @@ function CityHeroDefault({
       <style>{`
         @media (min-width: 1024px) {
           #top .city-hero-photo {
-            inset: auto 18% 0 auto !important;
+            inset: auto 12% 0 auto !important;
             left: auto !important;
-            right: 18% !important;
+            right: 12% !important;
             top: 0 !important;
             bottom: 0 !important;
             width: auto !important;
-            max-width: min(62vw, 52rem) !important;
+            max-width: min(70vw, 60rem) !important;
             height: 100% !important;
             object-fit: cover !important;
             object-position: center center !important;
+            /* Узкая маска: съедает мало кадра, края мягкие. */
             -webkit-mask-image: linear-gradient(
               to right,
               transparent 0%,
-              rgba(0, 0, 0, 0.22) 8%,
-              #000 22%,
-              #000 76%,
-              rgba(0, 0, 0, 0.28) 90%,
+              #000 7%,
+              #000 93%,
               transparent 100%
             );
             mask-image: linear-gradient(
               to right,
               transparent 0%,
-              rgba(0, 0, 0, 0.22) 8%,
-              #000 22%,
-              #000 76%,
-              rgba(0, 0, 0, 0.28) 90%,
+              #000 7%,
+              #000 93%,
               transparent 100%
             );
           }
         }
+        /* 21:9 / ultrawide: чуть увеличить кадр и сдвинуть ближе к краю. */
+        @media (min-width: 1600px) {
+          #top .city-hero-photo {
+            right: 8% !important;
+            top: 50% !important;
+            bottom: auto !important;
+            height: 118% !important;
+            max-width: min(78vw, 74rem) !important;
+            transform: translateY(-50%);
+          }
+        }
       `}</style>
+      {/* Подложка под фото: синий неба, чтобы края маски не уходили в чёрный. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-y-0 right-0 z-0 hidden w-[72%] bg-[radial-gradient(ellipse_at_70%_45%,#0c2748_0%,#07111f_42%,transparent_72%)] lg:block xl:w-[78%]"
+      />
       <div
         aria-hidden="true"
         className="city-hero-photo-wrap pointer-events-none absolute inset-0 z-0"
@@ -570,7 +583,7 @@ function CityHeroDefault({
           alt=""
           fill
           priority
-          sizes="(max-width: 1023px) 100vw, min(62vw, 52rem)"
+          sizes="(max-width: 1023px) 100vw, (max-width: 1599px) min(70vw, 60rem), min(78vw, 74rem)"
           style={{ objectPosition: `${focusX} ${focusY}` }}
           className="city-hero-photo object-cover"
           fallback={
@@ -578,8 +591,8 @@ function CityHeroDefault({
           }
         />
       </div>
-      {/* Читаемость текста слева: длинный fade в тон ночного синего, без жёсткой стены. */}
-      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-slate-950 from-[12%] via-[#07111f]/88 via-[38%] to-transparent to-[78%] lg:from-[18%] lg:via-[#07111f]/75 lg:via-[42%] lg:to-[70%]" />
+      {/* Читаемость слева: slate → ночной синий → прозрачность (не чёрная стена). */}
+      <div className="absolute inset-0 z-[1] bg-gradient-to-r from-slate-950 from-[10%] via-[#071525]/80 via-[36%] to-transparent to-[72%] lg:from-[14%] lg:via-[#0a1a30]/55 lg:via-[40%] lg:to-[68%]" />
       <div className="absolute inset-x-0 bottom-0 z-[1] h-32 bg-gradient-to-t from-slate-950/55 to-transparent" />
       <div className="container-page relative z-[2] py-12 sm:py-14">
         <div className="flex items-center gap-2 text-sm text-primary-100/80">
