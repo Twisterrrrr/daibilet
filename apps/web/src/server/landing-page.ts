@@ -24,7 +24,7 @@ export function finalizeLandingPayload(
   genre?: string | null,
 ): PublicLandingPageDto {
   const cityName = resolveLandingCityName(citySlug);
-  let sessions = filterSessionsByCity(payload.sessions, cityName);
+  let sessions = filterSessionsByCity(payload.sessions, cityName, citySlug);
   sessions = filterSessionsByGenre(sessions, genre);
 
   return {

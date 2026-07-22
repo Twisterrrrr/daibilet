@@ -32,11 +32,36 @@ export function resolveLandingCityName(citySlug?: string | null): string | null 
 }
 
 function resolveSessionCityName(session: PublicSessionDto): string {
+  if (session.city && session.city !== 'Не указан') return session.city;
   if (session.destination && session.destination !== 'Не указан') return session.destination;
   return session.city || 'Не указан';
 }
 
-export function filterSessionsByCity(sessions: PublicSessionDto[], cityName: string | null): PublicSessionDto[] {
+export function filterSessionsByCity(
+  sessions: PublicSessionDto[],
+  cityName: string | null,
+  citySlug?: string | null,
+): PublicSessionDto[] {
+  const slug = String(citySlug || '')
+    .trim()
+    .toLowerCase();
+  if (slug) {
+    const aliases = new Set(
+      Object.entries(LANDING_CITY_SLUGS)
+        .filter(([, name]) => name === (cityName || LANDING_CITY_SLUGS[slug]))
+        .map(([key]) => key),
+    );
+    aliases.add(slug);
+    // moscow ↔ moskva etc. already in LANDING_CITY_SLUGS keys for same name
+    return sessions.filter((session) => {
+      const sessionSlug = String(session.citySlug || '')
+        .trim()
+        .toLowerCase();
+      if (sessionSlug && aliases.has(sessionSlug)) return true;
+      if (cityName && resolveSessionCityName(session) === cityName) return true;
+      return false;
+    });
+  }
   if (!cityName) return sessions;
   return sessions.filter((session) => resolveSessionCityName(session) === cityName);
 }

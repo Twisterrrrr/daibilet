@@ -29,7 +29,9 @@ import {
   busLandingHref,
   landingCategoryHref,
   landingPageHref,
+  MULTI_CITY_LANDING_SLUGS,
   normalizeCitySlug,
+  normalizeKnownCitySlug,
   partyLandingHref,
   resolveConcertGenreTag,
   riverLandingHref,
@@ -2502,6 +2504,25 @@ function LandingFilters({
       const slugKey = seasonalCityGuide(landingSlug, value)?.slug;
       if (slugKey && value !== currentCityName) {
         window.location.href = landingCategoryHref(landingSlug, slugKey);
+        return;
+      }
+    }
+    // Остальные MULTI_CITY ЧПУ (выставки, стендап, экскурсии…): смена города = смена URL.
+    const multiCitySlug = landingSlug ? canonicalLandingSlug(landingSlug) : '';
+    if (multiCitySlug && MULTI_CITY_LANDING_SLUGS.has(multiCitySlug)) {
+      if (value === 'all') {
+        window.location.href = landingCategoryHref(landingSlug!);
+        return;
+      }
+      const slugKey =
+        citySlugByName(value) ||
+        normalizeKnownCitySlug(value) ||
+        normalizeCitySlug(value);
+      if (slugKey) {
+        if (value === currentCityName && citySlug && normalizeKnownCitySlug(citySlug) === normalizeKnownCitySlug(slugKey)) {
+          return;
+        }
+        window.location.href = landingCategoryHref(landingSlug!, slugKey);
         return;
       }
     }

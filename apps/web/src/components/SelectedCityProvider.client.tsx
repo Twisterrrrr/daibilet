@@ -5,6 +5,14 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { buildCatalogHref } from '@/lib/catalog-url';
+import { resolveLandingCityName } from '@/lib/landing-city';
+import { canonicalLandingSlug } from '@/lib/landing-constants';
+import {
+  landingCategoryHref,
+  MULTI_CITY_LANDING_SLUGS,
+  normalizeKnownCitySlug,
+  resolveLandingRouteFromLocation,
+} from '@/lib/landing-routes';
 import {
   isCityFilterPath,
   matchDestination,
@@ -47,6 +55,23 @@ export function SelectedCityProvider({
 
   // Sync before paint so the first meaningful filter render already has the stored city.
   useLayoutEffect(() => {
+    const landingRoute = resolveLandingRouteFromLocation(pathname);
+    if (landingRoute?.citySlug && MULTI_CITY_LANDING_SLUGS.has(canonicalLandingSlug(landingRoute.landingSlug))) {
+      const fromLanding =
+        matchDestination(destinations, landingRoute.citySlug) ||
+        matchDestination(destinations, resolveLandingCityName(landingRoute.citySlug));
+      if (fromLanding?.name) {
+        setCityLabel(fromLanding.name);
+        setCityReady(true);
+        return;
+      }
+      const fallbackName = resolveLandingCityName(landingRoute.citySlug);
+      if (fallbackName) {
+        setCityLabel(fallbackName);
+        setCityReady(true);
+        return;
+      }
+    }
     const fromUrl = isCityFilterPath(pathname) ? urlCity : null;
     setCityLabel(resolveCityLabel(destinations, fromUrl));
     setCityReady(true);
@@ -99,6 +124,26 @@ export function SelectedCityProvider({
         return;
       }
 
+      const landingRoute = resolveLandingRouteFromLocation(pathname);
+      if (
+        landingRoute &&
+        MULTI_CITY_LANDING_SLUGS.has(canonicalLandingSlug(landingRoute.landingSlug))
+      ) {
+        if (name === 'all') {
+          router.push(landingCategoryHref(landingRoute.landingSlug));
+          return;
+        }
+        const matched = matchDestination(destinations, name);
+        const citySlug =
+          normalizeKnownCitySlug(matched?.slug) ||
+          normalizeKnownCitySlug(matched?.sourceSlug) ||
+          normalizeKnownCitySlug(name);
+        if (citySlug) {
+          router.push(landingCategoryHref(landingRoute.landingSlug, citySlug));
+          return;
+        }
+      }
+
       router.push(
         buildCatalogHref({
           city: name !== 'all' ? name : undefined,
@@ -106,7 +151,7 @@ export function SelectedCityProvider({
         }),
       );
     },
-    [pathname, router, searchParams],
+    [destinations, pathname, router, searchParams],
   );
 
   const value = useMemo(
