@@ -4,11 +4,18 @@ import * as React from 'react';
 import {
   ArrowLeft,
   ArrowRight,
+  Bus,
   Grid3X3,
   ListFilter,
   MapPin,
+  Mic,
+  Music,
+  Ship,
+  Sparkles,
   Ticket,
-  TrendingUp,
+  Users,
+  UtensilsCrossed,
+  type LucideIcon,
 } from 'lucide-react';
 
 import { CityHubArticlesGrid } from '@/components/CityHubArticleTeaser.client';
@@ -842,6 +849,8 @@ function PopularDirections({
       href: landingPageHref(landing.slug),
       count: landing.events,
       kind: 'link' as const,
+      imageUrl: landing.heroImageUrl || landing.imageUrl || null,
+      slug: landing.slug,
     }));
   const landingTitles = new Set(landingItems.map((item) => item.title.trim().toLowerCase()));
   const categoryItems = categories
@@ -854,14 +863,12 @@ function PopularDirections({
       count,
       kind: 'category' as const,
       category: name,
+      imageUrl: null as string | null,
+      slug: name,
     }));
   const items = [...landingItems, ...categoryItems].filter((item) => item.count > 0).slice(0, 8);
 
   if (!items.length) return null;
-
-  const chipClass = editorial
-    ? 'inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-medium text-zinc-700 ring-1 ring-black/5 transition hover:bg-zinc-100'
-    : 'inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-primary-300 hover:text-primary-700';
 
   return (
     <section
@@ -869,51 +876,182 @@ function PopularDirections({
       className={`py-8 ${nested ? '' : SECTION_SCROLL_MT} ${
         nested
           ? ''
-          : `border-b ${editorial ? 'border-zinc-200 bg-zinc-50/40' : 'border-slate-100 bg-slate-50/70'}`
+          : `border-b ${editorial ? 'border-zinc-200 bg-zinc-50/40' : 'border-slate-100 bg-gradient-to-b from-slate-50/90 to-white'}`
       }`}
     >
       <div className="container-page">
-        <h3
-          className={
-            editorial
-              ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
-              : 'text-lg font-bold text-slate-950'
-          }
-        >
-          Популярные направления
-        </h3>
-        <p className={`mt-1 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-          Подборки и категории {cityIn}
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {items.map((item) =>
-            item.kind === 'link' ? (
-              <a key={item.key} href={item.href} className={chipClass}>
-                <TrendingUp className="h-3.5 w-3.5" />
-                <span>{item.title}</span>
-                {item.count ? (
-                  <span className={`text-xs ${editorial ? 'text-zinc-400' : 'text-slate-400'}`}>
-                    ({formatNumber(item.count)})
-                  </span>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h3
+              className={
+                editorial
+                  ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
+                  : 'text-xl font-bold tracking-tight text-slate-950 sm:text-2xl'
+              }
+            >
+              Популярные направления
+            </h3>
+            <p className={`mt-1 max-w-2xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+              Готовые подборки и категории {cityIn} - откройте страницу и сразу выбирайте билет.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {items.map((item) => {
+            const visual = resolveDirectionVisual(item.title, item.slug);
+            const Icon = visual.Icon;
+            const body = (
+              <>
+                <div className="relative z-[1] flex min-h-[7.5rem] flex-col justify-between gap-3 p-4 sm:min-h-[8.25rem] sm:p-5">
+                  <div className="flex items-start justify-between gap-3">
+                    <span
+                      className={`inline-flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${visual.iconWrap}`}
+                    >
+                      <Icon className="h-5 w-5" strokeWidth={2} />
+                    </span>
+                    <span
+                      className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold tabular-nums ${visual.countWrap}`}
+                    >
+                      {formatNumber(item.count)}
+                    </span>
+                  </div>
+                  <div className="min-w-0">
+                    <div
+                      className={`line-clamp-2 text-[0.95rem] font-semibold leading-snug sm:text-base ${
+                        editorial ? 'text-zinc-950' : 'text-slate-950'
+                      }`}
+                    >
+                      {item.title}
+                    </div>
+                    <div
+                      className={`mt-1.5 inline-flex items-center gap-1 text-xs font-medium ${
+                        editorial ? 'text-zinc-500' : 'text-slate-500'
+                      } transition group-hover:text-primary-700`}
+                    >
+                      Смотреть
+                      <ArrowRight className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+                    </div>
+                  </div>
+                </div>
+                {item.imageUrl ? (
+                  <div className="pointer-events-none absolute inset-y-0 right-0 w-[42%] opacity-[0.22] transition duration-300 group-hover:opacity-[0.34]">
+                    <SafeImage
+                      src={item.imageUrl}
+                      alt=""
+                      fill
+                      sizes="200px"
+                      className="object-cover object-center"
+                      fallback={<div className="h-full w-full bg-transparent" />}
+                    />
+                    <div
+                      className={`absolute inset-0 bg-gradient-to-r ${
+                        editorial ? 'from-white via-white/80 to-transparent' : 'from-white via-white/75 to-transparent'
+                      }`}
+                    />
+                  </div>
                 ) : null}
-                <ArrowRight className="h-3.5 w-3.5" />
+              </>
+            );
+
+            const shellClass = editorial
+              ? `group relative overflow-hidden rounded-2xl bg-white text-left ring-1 ring-zinc-200/90 transition duration-200 hover:-translate-y-0.5 hover:ring-zinc-300 ${visual.tile}`
+              : `group relative overflow-hidden rounded-2xl bg-white text-left shadow-sm ring-1 ring-slate-200/80 transition duration-200 hover:-translate-y-0.5 hover:shadow-md hover:ring-primary-200 ${visual.tile}`;
+
+            return item.kind === 'link' ? (
+              <a key={item.key} href={item.href} className={shellClass}>
+                {body}
               </a>
             ) : (
-              <button key={item.key} type="button" onClick={() => onCategory(item.category)} className={chipClass}>
-                <TrendingUp className="h-3.5 w-3.5" />
-                <span>{item.title}</span>
-                {item.count ? (
-                  <span className={`text-xs ${editorial ? 'text-zinc-400' : 'text-slate-400'}`}>
-                    ({formatNumber(item.count)})
-                  </span>
-                ) : null}
+              <button
+                key={item.key}
+                type="button"
+                onClick={() => onCategory(item.category)}
+                className={shellClass}
+              >
+                {body}
               </button>
-            ),
-          )}
+            );
+          })}
         </div>
       </div>
     </section>
   );
+}
+
+type DirectionVisual = {
+  Icon: LucideIcon;
+  iconWrap: string;
+  countWrap: string;
+  tile: string;
+};
+
+function resolveDirectionVisual(title: string, slugOrKey: string): DirectionVisual {
+  const hay = `${title} ${slugOrKey}`.toLowerCase();
+
+  if (/речн|теплоход|прогулк|bridges|набереж|водн/.test(hay)) {
+    return {
+      Icon: Ship,
+      iconWrap: 'bg-sky-100 text-sky-700',
+      countWrap: 'bg-sky-50 text-sky-800',
+      tile: 'bg-gradient-to-br from-sky-50/80 via-white to-white',
+    };
+  }
+  if (/автобус|обзорн|hop|bus/.test(hay)) {
+    return {
+      Icon: Bus,
+      iconWrap: 'bg-amber-100 text-amber-800',
+      countWrap: 'bg-amber-50 text-amber-900',
+      tile: 'bg-gradient-to-br from-amber-50/70 via-white to-white',
+    };
+  }
+  if (/стендап|юмор|comedy|standup/.test(hay)) {
+    return {
+      Icon: Mic,
+      iconWrap: 'bg-orange-100 text-orange-800',
+      countWrap: 'bg-orange-50 text-orange-900',
+      tile: 'bg-gradient-to-br from-orange-50/70 via-white to-white',
+    };
+  }
+  if (/концерт|музык|jazz|джаз/.test(hay)) {
+    return {
+      Icon: Music,
+      iconWrap: 'bg-violet-100 text-violet-800',
+      countWrap: 'bg-violet-50 text-violet-900',
+      tile: 'bg-gradient-to-br from-violet-50/60 via-white to-white',
+    };
+  }
+  if (/дет|семь|family|kids/.test(hay)) {
+    return {
+      Icon: Users,
+      iconWrap: 'bg-emerald-100 text-emerald-800',
+      countWrap: 'bg-emerald-50 text-emerald-900',
+      tile: 'bg-gradient-to-br from-emerald-50/70 via-white to-white',
+    };
+  }
+  if (/ужин|гастро|ресторан|кухн|еда/.test(hay)) {
+    return {
+      Icon: UtensilsCrossed,
+      iconWrap: 'bg-rose-100 text-rose-800',
+      countWrap: 'bg-rose-50 text-rose-900',
+      tile: 'bg-gradient-to-br from-rose-50/70 via-white to-white',
+    };
+  }
+  if (/вечер|дискотек|вечеринк|party|новый год|праздн/.test(hay)) {
+    return {
+      Icon: Sparkles,
+      iconWrap: 'bg-fuchsia-100 text-fuchsia-800',
+      countWrap: 'bg-fuchsia-50 text-fuchsia-900',
+      tile: 'bg-gradient-to-br from-fuchsia-50/60 via-white to-white',
+    };
+  }
+
+  return {
+    Icon: Ticket,
+    iconWrap: 'bg-primary-100 text-primary-800',
+    countWrap: 'bg-primary-50 text-primary-900',
+    tile: 'bg-gradient-to-br from-primary-50/50 via-white to-white',
+  };
 }
 
 function CitySightsSection({
