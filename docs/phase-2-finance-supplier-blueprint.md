@@ -334,6 +334,20 @@ Implemented admin moderation/read API slice 2026-07-10:
 - ✅ readiness guardrails покрыты unit-тестом;
 - ⏳ write actions отложены: создание/редактирование поставщика, legal/bank update, payment settings update.
 
+### Phase 2.2b: event schedule management
+
+Checkout sells a concrete ticket category on a concrete slot, or an open-date product. Before enabling STUB/YooKassa checkout, admin must be able to inspect and edit manual schedules without touching imported TC/Teplohod schedules.
+
+Status 2026-07-22:
+
+- done: contracts for admin event schedule DTO, sessions and offers;
+- done: backend routes `GET/PATCH /api/admin/events/:id/schedule`;
+- done: backend routes to create, update, cancel and restore sessions;
+- done: guardrails for `SOURCE_MANAGED`, `scheduleLocked`, `SINGLE`, `RECURRING`, `OPEN_DATE`, duplicate starts and capacity below sold;
+- done: every schedule mutation writes `EventChangeLog` and invalidates public caches;
+- done: minimal admin Schedule tab in event detail can unlock manual schedule, save mode, create slots, cancel and restore slots;
+- next: Offers editor, recurrence-rule generator, then STUB checkout.
+
 ### Phase 2.3: checkout sandbox
 
 - one manual/internal event;

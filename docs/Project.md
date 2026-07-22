@@ -268,6 +268,14 @@ Daily scan saleable public catalog texts (`title`/`description` + override) на
 
 ## Phase 2 Supplier Control Plane (2026-07-22)
 
+Schedule foundation added in the same phase:
+
+- backend: `GET/PATCH /api/admin/events/:id/schedule`;
+- backend: create/update/cancel/restore slots under `/api/admin/events/:id/schedule/sessions`;
+- admin: minimal Schedule tab in event detail for manual mode, slot creation and cancel/restore actions;
+- guardrail: TC/Teplohod `SOURCE_MANAGED` schedules stay read-only; manual schedules support `SINGLE`, `RECURRING` and `OPEN_DATE`;
+- checkout dependency: STUB/YooKassa can be enabled only after the event has a clear slot/open-date model and ticket offers.
+
 Первый безопасный срез финконтура сделан как read/control-plane foundation, без включения реальной оплаты:
 
 - backend: `GET /api/admin/suppliers`, `GET /api/admin/suppliers/:id`;

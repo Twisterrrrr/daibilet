@@ -6550,3 +6550,23 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 - Реальные платежи не включены: это сознательно, Phase 1 widget-first не трогаем.
 - Общий backend typecheck в текущей ветке падает на существующих строгих ошибках `public-catalog.mapper.test.ts` и `public-city-venues.test.ts`; новый supplier unit test проходит.
 - Следующий шаг: supplier LC read-first API/app shell или STUB checkout на одном manual/internal событии.
+## 2026-07-22 — Phase 2: Admin Event Schedule API
+
+### Observations
+
+- Phase 2 checkout cannot safely sell an abstract event. It needs either a concrete `EventSession` slot plus ticket category, or an `OPEN_DATE` product.
+- SPBBOATS invariant stays: imported TC/Teplohod schedules are source-managed and read-only; manual/Daibilet-managed schedules can be edited through admin.
+
+### Decisions
+
+- Added admin contracts and backend routes for `GET/PATCH /api/admin/events/:id/schedule`.
+- Added session operations: create, update, cancel and restore.
+- Guardrails cover `SOURCE_MANAGED`, `scheduleLocked`, `SINGLE`, `RECURRING`, `OPEN_DATE`, duplicate start times and capacity below already sold tickets.
+- Every schedule mutation writes `EventChangeLog` and invalidates public caches.
+
+### Problems
+
+- Minimal admin Schedule tab is connected; Offers editor and recurrence-rule generator are still next.
+- Full backend typecheck still fails on pre-existing strict issues in `public-catalog.mapper.test.ts` and `public-city-venues.test.ts`; new schedule tests pass.
+
+---

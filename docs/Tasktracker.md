@@ -936,6 +936,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | C.2 | Admin EventChangeRequestsPage | Средний | ✅ (flag) |
 | C.3 | Phase G finance runtime / ЛК поставщиков (P.3) | Высокий | ⏳ (продуктовый фокус; не ждать F5 целиком) |
 | C.3.1 | Admin Supplier Control Plane: contracts + Prisma read API + admin table | Высокий | ✅ 2026-07-22 (`/api/admin/suppliers`, `/suppliers`) |
+| C.3.1a | Admin Event Schedule API + Schedule tab: mode/open-date + create/update/cancel/restore slots | High | done 2026-07-22 (`/api/admin/events/:id/schedule`) |
 | C.3.2 | Supplier LC read-first API/app shell | Высокий | ⏳ |
 | C.3.3 | STUB checkout на одном ручном событии | Высокий | ⏳ |
 

@@ -111,6 +111,99 @@ export interface AdminEventDetailDto extends AdminEventRowDto {
   }>;
 }
 
+export type AdminEventScheduleLockCode =
+  | 'SOURCE_MANAGED'
+  | 'SCHEDULE_LOCKED';
+
+export interface AdminEventScheduleSessionDto {
+  id: string;
+  startsAt?: string | null;
+  endsAt?: string | null;
+  sourceStatus?: string | null;
+  priceFromRub?: number | null;
+  ticketsVacant?: number | null;
+  capacityTotal?: number | null;
+  capacitySold: number;
+  isActive: boolean;
+  cancelledAt?: string | null;
+  cancelReason?: string | null;
+  externalId?: string | null;
+  hasSales: boolean;
+}
+
+export interface AdminEventScheduleOfferDto {
+  id: string;
+  sourceCode: SourceCode;
+  title?: string | null;
+  priceRub?: number | null;
+  oldPriceRub?: number | null;
+  capacityTotal?: number | null;
+  groupSize: number;
+  weekdayMask?: number | null;
+  active: boolean;
+}
+
+export interface AdminEventScheduleDto {
+  eventId: string;
+  slug: string;
+  title: string;
+  kind: 'SINGLE' | 'RECURRING' | 'OPEN_DATE' | string;
+  status: string;
+  purchaseFlow: string;
+  managementMode: string;
+  scheduleLocked: boolean;
+  editable: boolean;
+  lockCode?: AdminEventScheduleLockCode | null;
+  lockReason?: string | null;
+  defaultCapacityTotal?: number | null;
+  openDate: {
+    validFrom?: string | null;
+    validTo?: string | null;
+    validDays?: number | null;
+  };
+  salesPolicy: {
+    startsAt?: string | null;
+    endsAt?: string | null;
+  };
+  sessions: AdminEventScheduleSessionDto[];
+  offers: AdminEventScheduleOfferDto[];
+  updatedAt: string;
+}
+
+export interface AdminEventScheduleModePatchDto {
+  kind?: 'SINGLE' | 'RECURRING' | 'OPEN_DATE';
+  scheduleLocked?: boolean;
+  defaultCapacityTotal?: number | null;
+  openDateValidFrom?: string | null;
+  openDateValidTo?: string | null;
+  openDateValidDays?: number | null;
+  salesStartsAt?: string | null;
+  salesEndsAt?: string | null;
+}
+
+export interface AdminEventScheduleSessionCreateDto {
+  startsAt: string;
+  endsAt?: string | null;
+  priceFromRub?: number | null;
+  ticketsVacant?: number | null;
+  capacityTotal?: number | null;
+  isActive?: boolean;
+}
+
+export interface AdminEventScheduleSessionPatchDto {
+  startsAt?: string;
+  endsAt?: string | null;
+  priceFromRub?: number | null;
+  ticketsVacant?: number | null;
+  capacityTotal?: number | null;
+  isActive?: boolean;
+  cancelReason?: string | null;
+}
+
+export interface AdminEventScheduleSessionCancelDto {
+  reason?: string | null;
+}
+
 export interface AdminEventsListDto {
   generatedAt: string;
   total: number;
