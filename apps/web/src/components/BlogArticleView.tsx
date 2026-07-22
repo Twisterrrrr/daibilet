@@ -54,17 +54,8 @@ export function BlogArticleView({
               />
             </article>
 
-            <BlogRelatedSidebar
-              posts={related}
-              className="sticky top-24 mt-8 hidden lg:mt-0 lg:block"
-            />
+            <BlogRelatedSidebar posts={related} className="mt-10 lg:sticky lg:top-24 lg:mt-0" />
           </div>
-
-          {related.length ? (
-            <div className="mt-10 lg:hidden">
-              <BlogRelatedSidebar posts={related} />
-            </div>
-          ) : null}
 
           <footer className="mt-10 flex flex-col gap-4 border-t border-slate-200/80 pt-8 sm:flex-row sm:items-center sm:justify-between">
             <Link
