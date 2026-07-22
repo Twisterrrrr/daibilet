@@ -66,15 +66,19 @@ export function ViewModeToggle({
   onChange: (mode: CatalogViewMode) => void;
 }) {
   return (
-    <div className="flex overflow-hidden rounded-xl bg-slate-100 p-1" role="radiogroup" aria-label="Вид каталога">
+    <div
+      className="inline-flex h-10 shrink-0 items-center overflow-hidden rounded-xl bg-slate-100 p-1 ring-1 ring-slate-200/80"
+      role="radiogroup"
+      aria-label="Вид каталога"
+    >
       <ViewModeButton active={mode === 'cards'} label="Карточки" onClick={() => onChange('cards')}>
-        <Grid3X3 className="h-4 w-4" />
+        <Grid3X3 className="h-4 w-4" aria-hidden />
       </ViewModeButton>
       <ViewModeButton active={mode === 'list'} label="Список" onClick={() => onChange('list')}>
-        <List className="h-4 w-4" />
+        <List className="h-4 w-4" aria-hidden />
       </ViewModeButton>
       <ViewModeButton active={mode === 'table'} label="Таблица" onClick={() => onChange('table')}>
-        <Table2 className="h-4 w-4" />
+        <Table2 className="h-4 w-4" aria-hidden />
       </ViewModeButton>
     </div>
   );
@@ -99,8 +103,10 @@ function ViewModeButton({
       aria-label={label}
       title={label}
       onClick={onClick}
-      className={`grid h-9 w-9 place-items-center rounded-lg transition ${
-        active ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+      className={`grid h-8 w-8 place-items-center rounded-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
+        active
+          ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
+          : 'text-slate-500 hover:bg-white/70 hover:text-slate-800'
       }`}
     >
       {children}

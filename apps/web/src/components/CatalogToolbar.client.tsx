@@ -208,6 +208,8 @@ export function CatalogToolbar({
               ) : null}
             </button>
 
+            <ViewModeToggle mode={viewMode} onChange={onViewModeChange} />
+
             <button
               type="submit"
               disabled={disabled}
@@ -215,8 +217,6 @@ export function CatalogToolbar({
             >
               Найти
             </button>
-
-            <ViewModeToggle mode={viewMode} onChange={onViewModeChange} />
           </div>
         </div>
       </form>
