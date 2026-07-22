@@ -2825,6 +2825,7 @@
 
 ### Проблемы
 - До F5 правила дублируются в `landing-rules.ts` и runtime `dto.js`, что создаёт риск повторного drift.
+- Первый smoke после rule deploy выявил ещё один legacy path: `buildPublicLandingPageManaged` фильтровал `session.landingSlugs`, а не исполнял `matchesRule`. Поэтому любое устаревшее поле `landingSlugs` могло вернуть нерелевантную выдачу. Runtime filter переведён на `matchesRule`; нужен корректирующий последовательный deploy.
 
 ## 2026-07-23 - country-tours: source of runtime rules
 

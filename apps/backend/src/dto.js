@@ -4860,7 +4860,7 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
       const ids = sessionGroupIds(session);
       if (ids.some((id) => excludedIds.has(id))) return false;
       if (ids.some((id) => pinnedIds.has(id))) return true;
-      return sessionMatchesLandingSlug(session, rule.slug) && sessionMatchesLandingSchedule(session, rule);
+      return matchesRule(session, rule) && sessionMatchesLandingSchedule(session, rule);
     })
     .slice(0, 48)
     .map((session) => {
@@ -9517,7 +9517,7 @@ function applyLandingScheduleToSession(session, rule) {
 
 function filterSessionsForLandingRule(sessions, rule) {
   return sessions
-    .filter((session) => sessionMatchesLandingSlug(session, rule.slug) && sessionMatchesLandingSchedule(session, rule))
+    .filter((session) => matchesRule(session, rule) && sessionMatchesLandingSchedule(session, rule))
     .map((session) => applyLandingScheduleToSession(session, rule))
     .filter(Boolean)
     .slice(0, 48);
