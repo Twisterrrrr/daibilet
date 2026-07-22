@@ -525,14 +525,21 @@ function CityHeroDefault({
       id="top"
       className="relative min-h-[340px] overflow-hidden border-b border-primary-950 bg-[#071525] text-white sm:min-h-[420px] lg:min-h-[480px]"
     >
-      {/* Фото на всю ширину, в т.ч. mobile. Без масок на самом img. */}
-      <div aria-hidden="true" className="absolute inset-0">
+      {/*
+        Mobile: full-bleed.
+        Desktop 16:9: фото справа обычного размера (без scale).
+        Ultrawide (≥1600px): только там увеличиваем кадр.
+      */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 lg:inset-y-0 lg:left-auto lg:right-0 lg:w-[min(56vw,50rem)] min-[1600px]:top-1/2 min-[1600px]:bottom-auto min-[1600px]:h-[118%] min-[1600px]:w-[min(72vw,70rem)] min-[1600px]:-translate-y-1/2"
+      >
         <SafeImage
           src={heroImage}
           alt=""
           fill
           priority
-          sizes="100vw"
+          sizes="(max-width: 1023px) 100vw, (max-width: 1599px) 56vw, 72vw"
           style={{ objectPosition: `${focusX} ${focusY}` }}
           className="object-cover"
           fallback={<div className="absolute inset-0 bg-[#0a233c]" />}
@@ -540,8 +547,7 @@ function CityHeroDefault({
       </div>
 
       {/*
-        Мягкий переход цвета в прозрачность на стыке с фото:
-        слева плотный фон под текст, у края ~50%, дальше картинка чистая.
+        Цвет → ~50% на стыке → прозрачность. Правая часть кадра без вуали.
       */}
       <div
         aria-hidden
