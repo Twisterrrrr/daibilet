@@ -2516,3 +2516,24 @@
 ### Проблемы
 - Нельзя параллелить два `deploy-prod-next` на одном хосте.
 
+---
+
+## 2026-07-22 — Phase 2: Admin Supplier Control Plane
+
+### Наблюдения
+- В SPBBOATS полезны инварианты, но не весь тяжелый контур: ticket category отдельно от слота, импортные расписания read-only, checkout идемпотентный, финансы строятся поверх ledger.
+- В Daibilet уже есть Prisma foundation: `Supplier`, `SupplierUser`, `CheckoutOrder`, `CheckoutItem`, `Payment`, `RefundRequest`, `Payout`, `SupplierLedgerEntry`, `SupplierReport`, `SupplierDocument`, `Review`.
+- Поэтому первый шаг фазы 2 лучше делать не новой миграцией и не включением YooKassa, а управляемым экраном готовности поставщиков.
+
+### Решения
+- Добавлен contract layer для `AdminSuppliersListDto` / `AdminSupplierDetailDto`.
+- Добавлен Prisma-backed backend read-model:
+  - `GET /api/admin/suppliers`
+  - `GET /api/admin/suppliers/:id`
+- Добавлена admin page `/suppliers`: поиск, фильтр статуса, таблица, detail drawer, readiness, события, заказы, ledger/finance summary, отзывы.
+- Readiness блокирует internal checkout, если нет активного поставщика, владельца ЛК, verified legal profile, основного счета, комиссии или YooKassa shop id.
+
+### Проблемы
+- Реальные платежи не включены: это сознательно, Phase 1 widget-first не трогаем.
+- Общий backend typecheck в текущей ветке падает на существующих строгих ошибках `public-catalog.mapper.test.ts` и `public-city-venues.test.ts`; новый supplier unit test проходит.
+- Следующий шаг: supplier LC read-first API/app shell или STUB checkout на одном manual/internal событии.

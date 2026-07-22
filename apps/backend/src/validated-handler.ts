@@ -106,6 +106,7 @@ function validateSafeRouteQuery(context: RouteContext): void {
   if (
     route === 'GET /api/admin/venues' ||
     route === 'GET /api/admin/buyers' ||
+    route === 'GET /api/admin/suppliers' ||
     route === 'GET /api/admin/order-event-candidates'
   ) {
     parseSearchParams(searchQuerySchema, context.searchParams);

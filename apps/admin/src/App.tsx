@@ -12,6 +12,7 @@ import { ReviewsPage } from '@/pages/ReviewsPage';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { SimplePage } from '@/pages/SimplePage';
 import { SourcesPage } from '@/pages/SourcesPage';
+import { SuppliersPage } from '@/pages/SuppliersPage';
 import { VenuesPage } from '@/pages/VenuesPage';
 
 export function App() {
@@ -24,6 +25,7 @@ export function App() {
           <Route path="change-requests" element={<EventChangeRequestsPage />} />
         ) : null}
         <Route path="orders" element={<ExternalOrdersPage />} />
+        <Route path="suppliers" element={<SuppliersPage />} />
         <Route path="reviews" element={<ReviewsPage />} />
         <Route path="buyers" element={<BuyersPage />} />
         <Route path="venues" element={<VenuesPage />} />
