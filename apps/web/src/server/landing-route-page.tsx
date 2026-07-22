@@ -4,9 +4,15 @@ import { notFound } from 'next/navigation';
 import { LandingPageView } from '@/components/LandingPageView.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
+import { resolveLandingCityName } from '@/lib/landing-city';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
 import { resolveLandingCardImage } from '@/lib/landing-images';
 import { landingCategoryHref, resolveLandingRouteFromLocation } from '@/lib/landing-routes';
+import {
+  buildCategoryCityListingMeta,
+  evaluateListingIndexability,
+  robotsForListingIndexability,
+} from '@/lib/seo-listing-meta';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { fetchLandingPageDto, finalizeLandingPayload } from '@/server/landing-page';
 
@@ -29,21 +35,44 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
   const payload = await fetchLandingPageDto(slug);
   if (!payload?.landing) return { title: pageTitle('Подборка') };
 
-  const landing = payload.landing;
+  const genre = undefined;
+  const finalized = finalizeLandingPayload(payload, slug, route.citySlug, genre);
+  const landing = finalized.landing;
   const canonical = landingCategoryHref(slug, route.citySlug);
-  const title = pageTitle(landing.seoTitle || landing.title);
-  const shareTitle = String(landing.seoTitle || '').includes('Дайбилет')
-    ? String(landing.seoTitle)
-    : `${title} | Дайбилет`;
-  const description = landing.seoDescription || landing.subtitle || undefined;
+  const cityName = resolveLandingCityName(route.citySlug);
+  const offers = finalized.stats?.events ?? 0;
+  const indexDecision = evaluateListingIndexability({ offers });
+
+  let title: string;
+  let description: string | undefined;
+  let shareTitle: string;
+
+  if (cityName) {
+    const listingMeta = buildCategoryCityListingMeta({
+      landingSlug: slug,
+      cityName,
+      fallbackTitle: landing.title,
+    });
+    title = listingMeta.title;
+    description = listingMeta.description;
+    shareTitle = listingMeta.title;
+  } else {
+    title = pageTitle(landing.seoTitle || landing.title);
+    shareTitle = String(landing.seoTitle || '').includes('Дайбилет')
+      ? String(landing.seoTitle)
+      : `${title} | Дайбилет`;
+    description = landing.seoDescription || landing.subtitle || undefined;
+  }
+
   const image = landing.imageUrl || resolveLandingCardImage(slug);
 
   return {
-    title,
+    title: cityName ? { absolute: title } : title,
     description,
     alternates: {
       canonical,
     },
+    robots: robotsForListingIndexability(indexDecision.indexable),
     ...buildShareMetadata({
       title: shareTitle,
       description,

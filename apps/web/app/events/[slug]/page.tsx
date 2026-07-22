@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { EventCard } from '@/components/EventCard';
 import { EventBuyCard, EventHero } from '@/components/EventPage.client';
-import { EventDescription, EventQuickInfo, EventTags } from '@/components/EventPageSections';
+import { EventDescription, EventQuickInfo, EventTags, EventTrustStrip } from '@/components/EventPageSections';
 import { ReviewSection } from '@/components/ReviewSection';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
@@ -95,6 +95,7 @@ export default async function EventDetailPage({ params }: PageProps) {
             <EventDescription event={event} />
             <EventQuickInfo event={event} />
             <EventTags event={event} />
+            <EventTrustStrip />
             <ReviewSection eventId={event.id} eventSlug={event.slug} />
           </div>
 

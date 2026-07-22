@@ -168,7 +168,7 @@ export function CityPageView({
         { id: 'affiche', label: 'Афиша', show: true },
         { id: 'sights', label: 'Куда сходить', show: hasSights || sightsArticles.length > 0 },
         { id: 'practice', label: 'Советы', show: hasPractice },
-        { id: 'more', label: 'Ещё', show: hasMore },
+        { id: 'more', label: 'Топ-запросы', show: hasMore },
       ].filter((tab) => tab.show),
     [hasAbout, hasMore, hasPractice, hasSights, sightsArticles.length],
   );
@@ -350,7 +350,7 @@ export function CityPageView({
                         : 'text-2xl font-bold text-slate-950'
                     }
                   >
-                    Ещё по городу
+                    Топ-запросы
                   </h2>
                 </div>
                 {contentReady ? (
@@ -516,134 +516,82 @@ function CityHeroDefault({
     guide?.brief ||
     `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат, дату и площадку без долгого поиска по разным билетным системам.`;
 
-  // Mobile: cover + city focus. Desktop: фото крупнее на ultrawide, узкая маска
-  // и синий (тон ночного неба) по краям - не сразу в чёрный.
   const focusParts = String(heroFocus || 'center 32%').trim().split(/\s+/);
   const focusX = focusParts[0] || 'center';
   const focusY = focusParts[1] || '32%';
 
+  const heroCopy = (
+    <>
+      <div className="flex items-center gap-2 text-sm text-primary-100/80">
+        <button type="button" onClick={() => navigateHome('top')} className="hover:text-white">
+          Главная
+        </button>
+        <span>/</span>
+        <span className="text-white">{city.name}</span>
+      </div>
+      <div className="mt-5">
+        <h1 className="text-4xl font-extrabold sm:text-5xl">{city.name}</h1>
+        <p className="mt-4 max-w-3xl text-base leading-7 text-primary-50/88 sm:text-lg">{brief}</p>
+        <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/80">
+          <span className="font-semibold text-white">{pluralEvents(stats.events)}</span>
+          <span aria-hidden="true" className="text-white/35">
+            ·
+          </span>
+          <span className="font-semibold text-white">{pluralVenues(stats.venues)}</span>
+        </p>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <a
+            href="#affiche"
+            onClick={(event) => {
+              event.preventDefault();
+              scrollToSection('affiche');
+            }}
+            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+          >
+            <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
+            <span>События {cityIn}</span>
+          </a>
+          {hasTravel ? (
+            <a
+              href="#travel"
+              onClick={(event) => {
+                event.preventDefault();
+                scrollToSection('travel');
+              }}
+              className="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/25 px-5 text-sm font-semibold text-white hover:bg-white/10"
+            >
+              Как добраться
+            </a>
+          ) : null}
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <section
       id="top"
-      className="relative min-h-[340px] overflow-hidden border-b border-primary-950 bg-slate-950 text-white sm:min-h-[420px] lg:min-h-[480px]"
+      className="overflow-hidden border-b border-primary-950 bg-[#071525] text-white"
     >
-      <style>{`
-        @media (min-width: 1024px) {
-          #top .city-hero-photo {
-            inset: auto 12% 0 auto !important;
-            left: auto !important;
-            right: 12% !important;
-            top: 0 !important;
-            bottom: 0 !important;
-            width: auto !important;
-            max-width: min(70vw, 60rem) !important;
-            height: 100% !important;
-            object-fit: cover !important;
-            object-position: center center !important;
-            /* Узкая маска: съедает мало кадра, края мягкие. */
-            -webkit-mask-image: linear-gradient(
-              to right,
-              transparent 0%,
-              #000 7%,
-              #000 93%,
-              transparent 100%
-            );
-            mask-image: linear-gradient(
-              to right,
-              transparent 0%,
-              #000 7%,
-              #000 93%,
-              transparent 100%
-            );
-          }
-        }
-        /* 21:9 / ultrawide: чуть увеличить кадр и сдвинуть ближе к краю. */
-        @media (min-width: 1600px) {
-          #top .city-hero-photo {
-            right: 8% !important;
-            top: 50% !important;
-            bottom: auto !important;
-            height: 118% !important;
-            max-width: min(78vw, 74rem) !important;
-            transform: translateY(-50%);
-          }
-        }
-      `}</style>
-      {/* Подложка: ночной синий под фото и под длинным fade слева. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 z-0 bg-[#071525]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 z-0 hidden w-[78%] bg-[radial-gradient(ellipse_at_72%_42%,#0e2f52_0%,#0a1f38_38%,transparent_74%)] lg:block"
-      />
-      <div
-        aria-hidden="true"
-        className="city-hero-photo-wrap pointer-events-none absolute inset-0 z-0"
-      >
-        <SafeImage
-          src={heroImage}
-          alt=""
-          fill
-          priority
-          sizes="(max-width: 1023px) 100vw, (max-width: 1599px) min(70vw, 60rem), min(78vw, 74rem)"
-          style={{ objectPosition: `${focusX} ${focusY}` }}
-          className="city-hero-photo object-cover"
-          fallback={
-            <div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950" />
-          }
-        />
-      </div>
-      {/* Длинный fade: синий держится почти до правого края, в чёрный уходит только в конце. */}
-      <div
-        aria-hidden
-        className="absolute inset-0 z-[1] bg-[linear-gradient(to_right,#0a1a30_0%,#0b2038_18%,#0a1a30f2_36%,#071525cc_58%,#02061799_78%,#02061733_90%,transparent_98%)]"
-      />
-      <div className="absolute inset-x-0 bottom-0 z-[1] h-32 bg-gradient-to-t from-slate-950/50 to-transparent" />
-      <div className="container-page relative z-[2] py-12 sm:py-14">
-        <div className="flex items-center gap-2 text-sm text-primary-100/80">
-          <button type="button" onClick={() => navigateHome('top')} className="hover:text-white">
-            Главная
-          </button>
-          <span>/</span>
-          <span className="text-white">{city.name}</span>
+      {/*
+        Split layout: слева сплошной фон под текст, справа чистое фото.
+        Никаких absolute-градиентов/масок поверх или под картинкой.
+      */}
+      <div className="grid min-h-[340px] lg:min-h-[480px] lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] 2xl:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)]">
+        <div className="flex items-center bg-[#071525] py-12 sm:min-h-[420px] sm:py-14 lg:min-h-0">
+          <div className="w-full px-4 sm:px-6 lg:px-10 xl:px-14 2xl:px-20">{heroCopy}</div>
         </div>
-        <div className="mt-5 max-w-4xl">
-          <h1 className="text-4xl font-extrabold sm:text-5xl">{city.name}</h1>
-          <p className="mt-4 max-w-3xl text-base leading-7 text-primary-50/88 sm:text-lg">{brief}</p>
-          <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/80">
-            <span className="font-semibold text-white">{pluralEvents(stats.events)}</span>
-            <span aria-hidden="true" className="text-white/35">
-              ·
-            </span>
-            <span className="font-semibold text-white">{pluralVenues(stats.venues)}</span>
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <a
-              href="#affiche"
-              onClick={(event) => {
-                event.preventDefault();
-                scrollToSection('affiche');
-              }}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-primary-700 hover:bg-primary-50"
-            >
-              <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
-              <span>События {cityIn}</span>
-            </a>
-            {hasTravel ? (
-              <a
-                href="#travel"
-                onClick={(event) => {
-                  event.preventDefault();
-                  scrollToSection('travel');
-                }}
-                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/25 px-5 text-sm font-semibold text-white hover:bg-white/10"
-              >
-                Как добраться
-              </a>
-            ) : null}
-          </div>
+        <div aria-hidden="true" className="relative hidden min-h-[480px] lg:block">
+          <SafeImage
+            src={heroImage}
+            alt=""
+            fill
+            priority
+            sizes="(max-width: 1023px) 100vw, 55vw"
+            style={{ objectPosition: `${focusX} ${focusY}` }}
+            className="object-cover"
+            fallback={<div className="absolute inset-0 bg-[#0a233c]" />}
+          />
         </div>
       </div>
     </section>

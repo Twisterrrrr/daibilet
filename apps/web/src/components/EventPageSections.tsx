@@ -1,3 +1,6 @@
+import Link from 'next/link';
+import { HelpCircle, RotateCcw, ShieldCheck, Ticket } from 'lucide-react';
+
 import type { PublicEventDto } from '@daibilet/contracts/public';
 
 import { formatEventDescriptionHtml } from '@/lib/event-description-format';
@@ -58,5 +61,38 @@ export function EventTags({ event }: { event: PublicEventDto }) {
         ))}
       </div>
     </div>
+  );
+}
+
+const TRUST_LINKS = [
+  { href: '/help', label: 'Как купить и получить билет', icon: Ticket },
+  { href: '/legal#refunds', label: 'Правила возврата', icon: RotateCcw },
+  { href: '/contacts', label: 'Поддержка и контакты', icon: HelpCircle },
+  { href: '/offer', label: 'Оферта и условия', icon: ShieldCheck },
+] as const;
+
+/** Trust / E-E-A-T strip: путь покупки и поддержка без дублирования thin-контента события. */
+export function EventTrustStrip() {
+  return (
+    <section className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5">
+      <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500">Покупка и поддержка</h2>
+      <p className="mt-2 text-sm leading-6 text-slate-600">
+        Билет оформляется через систему организатора. На Дайбилет - сравнение предложений, карточка события и помощь по
+        заказу.
+      </p>
+      <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+        {TRUST_LINKS.map(({ href, label, icon: Icon }) => (
+          <li key={href}>
+            <Link
+              href={href}
+              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-800 transition hover:border-primary/40 hover:text-primary-700"
+            >
+              <Icon className="h-4 w-4 shrink-0 text-primary-600" />
+              {label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

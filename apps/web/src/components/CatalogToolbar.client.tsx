@@ -17,8 +17,8 @@ import {
   countAdvancedFilters,
   type CatalogFilterValues,
 } from '@/lib/catalog-url';
+import { buildCatalogPresetHref } from '@/lib/catalog-links';
 import {
-  buildCatalogPresetValues,
   catalogPresetMatches,
   CATALOG_PRESETS,
 } from '@/lib/catalog-presets';
@@ -298,9 +298,9 @@ export function CatalogToolbar({
         <span className="text-xs font-medium uppercase tracking-wide text-slate-400">Подборки:</span>
         {CATALOG_PRESETS.map((preset) => {
           const active = catalogPresetMatches(preset.slug, filters);
-          const href = buildCatalogHref(
-            active ? { sort: 'popular' } : buildCatalogPresetValues(preset.slug, false),
-          );
+          const href = active
+            ? buildCatalogHref({ city: filters.city, sort: 'popular' })
+            : buildCatalogPresetHref(preset.slug, filters.city);
           return (
             <Link
               key={preset.slug}

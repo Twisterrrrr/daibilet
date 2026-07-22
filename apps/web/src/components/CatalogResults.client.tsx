@@ -35,10 +35,6 @@ export function CatalogResults({ items, viewMode, onViewModeChange }: CatalogRes
 
   return (
     <>
-      <div className="mt-4 flex justify-end md:hidden">
-        <ViewModeToggle mode={viewMode} onChange={onViewModeChange} />
-      </div>
-
       {viewMode === 'list' ? (
         <ul className="mt-8 space-y-3">
           {items.map((session) => (
@@ -70,7 +66,7 @@ export function ViewModeToggle({
   onChange: (mode: CatalogViewMode) => void;
 }) {
   return (
-    <div className="hidden overflow-hidden rounded-xl bg-slate-100 p-1 md:flex" role="radiogroup" aria-label="Вид списка">
+    <div className="flex overflow-hidden rounded-xl bg-slate-100 p-1" role="radiogroup" aria-label="Вид каталога">
       <ViewModeButton active={mode === 'cards'} label="Карточки" onClick={() => onChange('cards')}>
         <Grid3X3 className="h-4 w-4" />
       </ViewModeButton>
@@ -98,7 +94,10 @@ function ViewModeButton({
   return (
     <button
       type="button"
+      role="radio"
+      aria-checked={active}
       aria-label={label}
+      title={label}
       onClick={onClick}
       className={`grid h-9 w-9 place-items-center rounded-lg transition ${
         active ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'

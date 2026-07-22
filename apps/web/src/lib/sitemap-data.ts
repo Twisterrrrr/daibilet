@@ -11,9 +11,14 @@ import {
   DEFAULT_CITY_BY_LANDING_SLUG,
   LANDING_CATEGORY_PATH_BY_SLUG,
   MULTI_CITY_LANDING_SLUGS,
+  PRIORITY_LISTING_CITY_SLUGS,
   cityPathSegment,
+  isLandingCityAllowed,
   landingCategoryHref,
 } from '@/lib/landing-routes';
+import { listCatalogIntents, catalogIntentPath } from '@/lib/catalog-intent-routes';
+import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
+import { finalizeLandingPayload, fetchLandingPageDto } from '@/server/landing-page';
 
 export const SITEMAP_CHUNKS = [
   'static',
@@ -72,6 +77,7 @@ function entry(
 }
 
 export function buildStaticSitemapEntries(now = new Date()): SitemapEntry[] {
+  const intentPaths = listCatalogIntents().map((item) => catalogIntentPath(item.intent));
   return [
     entry('/', now, 'hourly', 1),
     entry('/events', now, 'hourly', 0.8),
@@ -79,8 +85,14 @@ export function buildStaticSitemapEntries(now = new Date()): SitemapEntry[] {
     entry('/venues', now, 'daily', 0.8),
     entry('/locations', now, 'daily', 0.7),
     entry('/podborki', now, 'daily', 0.8),
+    ...intentPaths.map((path) => entry(path, now, 'daily', 0.7)),
     entry('/blog', now, 'daily', 0.8),
     entry('/help', now, 'monthly', 0.5),
+    entry('/contacts', now, 'monthly', 0.5),
+    entry('/offer', now, 'yearly', 0.3),
+    entry('/privacy', now, 'yearly', 0.3),
+    entry('/legal', now, 'yearly', 0.3),
+    entry('/requisites', now, 'yearly', 0.3),
   ];
 }
 
@@ -130,21 +142,48 @@ export async function buildVenuesSitemapEntries(now = new Date()): Promise<Sitem
     .map((venue) => entry(`/venues/${encodeURIComponent(String(venue.slug))}`, now, 'weekly', 0.6));
 }
 
-export function buildLandingsSitemapEntries(now = new Date()): SitemapEntry[] {
+export async function buildLandingsSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
   const paths = new Set<string>();
 
   for (const slug of Object.keys(LANDING_CATEGORY_PATH_BY_SLUG)) {
-    paths.add(landingCategoryHref(slug));
-    if (MULTI_CITY_LANDING_SLUGS.has(slug)) {
-      paths.add(landingCategoryHref(slug, 'moscow'));
-      paths.add(landingCategoryHref(slug, 'saint-petersburg'));
+    if (isLandingCityAllowed(slug, 'moscow') && isLandingCityAllowed(slug, 'saint-petersburg') && isLandingCityAllowed(slug, 'kazan')) {
+      paths.add(landingCategoryHref(slug));
+    }
+    if (!MULTI_CITY_LANDING_SLUGS.has(slug)) continue;
+    for (const city of PRIORITY_LISTING_CITY_SLUGS) {
+      if (!isLandingCityAllowed(slug, city)) continue;
+      try {
+        const payload = await fetchLandingPageDto(slug);
+        if (!payload?.landing) continue;
+        const finalized = finalizeLandingPayload(payload, slug, city);
+        const offers = finalized.stats?.events ?? 0;
+        if (!evaluateListingIndexability({ offers, minOffers: MIN_LISTING_OFFERS_FOR_INDEX }).indexable) {
+          continue;
+        }
+        paths.add(landingCategoryHref(slug, city));
+      } catch {
+        // DB unavailable at build - skip city variant rather than ship thin URL.
+      }
     }
   }
 
   for (const slug of Object.keys(CITY_LANDING_PATH_BY_SLUG)) {
     const city = DEFAULT_CITY_BY_LANDING_SLUG[slug];
     if (!cityPathSegment(city)) continue;
-    paths.add(landingCategoryHref(slug, city));
+    try {
+      const payload = await fetchLandingPageDto(slug);
+      if (!payload?.landing) {
+        paths.add(landingCategoryHref(slug, city));
+        continue;
+      }
+      const finalized = finalizeLandingPayload(payload, slug, city);
+      const offers = finalized.stats?.events ?? 0;
+      if (evaluateListingIndexability({ offers }).indexable) {
+        paths.add(landingCategoryHref(slug, city));
+      }
+    } catch {
+      paths.add(landingCategoryHref(slug, city));
+    }
   }
 
   return [...paths].map((path) => entry(path.replace(/\/$/, '') || '/', now, 'weekly', 0.65));

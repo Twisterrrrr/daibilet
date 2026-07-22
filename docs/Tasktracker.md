@@ -1,6 +1,6 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-07-22  
+**Обновлено:** 2026-07-23
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
@@ -14,6 +14,28 @@
 | I.1 | Пустые главная + `/events`: stats 500 (`destination.name` on null) → empty home cascade | Критический | ✅ hotfix `dto.js` + restart API/web |
 | I.2 | Web follow-up: SiteLayout Suspense fallback + CatalogShell SSR keep (rebuild) | Высокий | ⏳ в worktree `daibilet-push` |
 | I.3 | Telegram OG: WebpageBot видит, чаты нет; площадки без title/desc | Критический | 🔄 nginx→social-preview + venue twitter ✅ `1c81cdf`; **блокер: AAAA всё ещё в DNS** |
+
+---
+
+## Продуктовый фокус (2026-07-22) — SEO-листинги приоритетнее блога
+
+**Сдвиг приоритета:** обычные статьи блога вторичны; фокус на **ЧПУ SEO-листингах** category×city (+ intent `/podborki/...`).
+
+| # | Задача | Приоритет | Статус | Ownership |
+|---|--------|-----------|--------|-----------|
+| SEO.1 | Формулы Title/Description category×city (`seo-listing-meta.ts`) | Критический | ✅ | агент |
+| SEO.2 | On-page SEO тексты TOP seed (~18 шт., 1000–1200) под сеткой | Критический | ✅ | агент (seed); владелец - утверждение/правки |
+| SEO.3 | Thin pages: `noindex,follow` если &lt; 6 офферов; sitemap filter | Критический | ✅ | агент |
+| SEO.4 | MULTI_CITY: standup / family-kids / concerts / active-sport + SPB/MSK/Kazan | Высокий | ✅ | агент |
+| SEO.5 | Intent ЧПУ `/podborki/{intent}` (+ city) + preset links | Высокий | ✅ | агент |
+| SEO.6 | `/contacts` + footer/sitemap trust | Высокий | ✅ | агент |
+| SEO.7 | Event trust strip | Средний | ✅ | агент |
+| SEO.8 | TOP-15 launch set: водные, стендап, экскурсии, культура, intent; «крыши» только СПб | Высокий | ✅ 2026-07-23 | владелец утвердил, агент внедрил |
+| SEO.8a | Editorial polish текстов TOP-15, в первую очередь новые `walking-tours`, `country-tours`, `exhibitions`, `unusual-theatres`, `excursions`, `rooftops` | Высокий | 🔄 seed готов, нужна редакторская вычитка | владелец + агент |
+| SEO.9 | Реальные отзывы / телефон 8-800 на контактах | Средний | ⏳ номер pending, email + ИНН/ОГРНИП уже опубликованы | **владелец** |
+| SEO.11 | Порог индекса SEO-листингов | Критический | ✅ оставлен `MIN_LISTING_OFFERS_FOR_INDEX = 6` | агент |
+| SEO.10 | Editorial polish SEO-текстов (убрать шаблонный хвост) | Средний | ⏳ | владелец + агент |
+| P.1 | AI / статьи блога | Средний | ⚠️ deferred vs SEO.1–SEO.7 | — |
 
 ---
 
@@ -436,6 +458,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | Дата | Изменение |
 |------|-----------|
 | 2026-07-19 | 1.3.1a: city hub FAQ — только cityInfo/editorial; prod proof SPB @`9bc8fa7` |
+| 2026-07-23 | SEO.8: утверждён и внедрён TOP-15. Weekend URL канонизирован в `na-vyhodnye`; крыши и загородные экскурсии ограничены Санкт-Петербургом; индекс-порог сохранён на 6 |
 | 2026-07-19 | P.2n: city hub `#directions` — только chips с count > 0; prod proof rostov-na-donu @`044e441` |
 | 2026-07-19 | P.2m: city hub chips — gap-x-4 между date и category группами |
 | 2026-07-19 | P.2k: city hub — без подзаголовка счётчика; date+category one-row desktop; без «Стоит внимания» (дубль афиши) |

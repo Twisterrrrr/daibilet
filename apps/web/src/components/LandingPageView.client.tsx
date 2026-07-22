@@ -41,6 +41,8 @@ import {
 } from '@/lib/bridges-session-utils';
 import { resolveLandingCopy, shouldUseLandingCopy } from '@/lib/landing-copy';
 import { applyLandingSeoMeta, resolveLandingSeo, useLandingTodayReference } from '@/lib/landing-seo';
+import { buildCategoryCityListingMeta } from '@/lib/seo-listing-meta';
+import { LandingSeoBottom, landingBlocksHaveSeoText } from '@/components/LandingSeoBottom.client';
 import { buildBridgesProductJsonLd } from '@/lib/bridges-seo';
 import { formatLandingTodayIso, formatLandingTodayLong } from '@/lib/datetime';
 import { BRIDGES_LANDING } from '@/data/bridges-landing';
@@ -698,6 +700,14 @@ export function LandingPageView({
     const canonicalPath = landingCategoryHref(slug, citySlug);
     const seoInput = buildLandingSeoInput(payload.landing, slug, profile, citySlug, payload.stats, todayReference);
     const seo = resolveLandingSeo(seoInput);
+    const cityName = seoInput.cityName;
+    const listingMeta = cityName
+      ? buildCategoryCityListingMeta({
+          landingSlug: slug,
+          cityName,
+          fallbackTitle: payload.landing.title,
+        })
+      : null;
     applyLandingSeoMeta({
       ...seoInput,
       canonicalPath,
@@ -721,11 +731,16 @@ export function LandingPageView({
                 priceFrom: payload.stats?.priceFrom ?? null,
                 priceTo: payload.stats?.priceTo ?? null,
                 offerCount: payload.stats?.events ?? 0,
-                description: seo.description,
+                description: listingMeta?.description || seo.description,
               }),
             ]
           : undefined,
     });
+    if (listingMeta && typeof document !== 'undefined') {
+      document.title = listingMeta.title;
+      const desc = document.querySelector('meta[name="description"]');
+      if (desc) desc.setAttribute('content', listingMeta.description);
+    }
   }, [payload?.landing, payload?.stats, slug, profile, citySlug, todayReference]);
 
   const filteredSessions = React.useMemo(() => {
@@ -937,6 +952,14 @@ export function LandingPageView({
               </>
             ) : null}
           </section>
+          <div className="container-page">
+            <LandingSeoBottom
+              landingSlug={slug}
+              citySlug={citySlug}
+              seoInput={buildLandingSeoInput(payload.landing, slug, profile, citySlug, payload.stats, todayReference)}
+              hasCmsSeoText={landingBlocksHaveSeoText(payload.blocks)}
+            />
+          </div>
           {profile === 'dinner' ? (
             <>
               <section className="container-page">

@@ -1,3 +1,50 @@
+## 2026-07-23 - утверждённый SEO launch set TOP-15
+
+### Наблюдения
+
+- В category×city контуре уже были речные прогулки и стендап, но не хватало правил и URL для пеших, загородных экскурсий, выставок, необычных театров, общих экскурсий и крыш.
+- Старый intent slug `na-vyhodnyh` расходился с утверждённым URL.
+- Контакты уже показывают ИНН и ОГРНИП рядом с данными ИП, поэтому номер телефона не требуется для E-A-T на текущем этапе.
+
+### Решения
+
+- Утверждён launch set из 15 URL: речные прогулки, стендап, пешие и загородные экскурсии, выставки и музеи, необычные театры, экскурсии Казани, бесплатные события и события на выходные в Москве и Санкт-Петербурге.
+- Добавлены landing rules, category paths, city variants, SEO meta labels и editorial seed для новых slug: `walking-tours`, `country-tours`, `exhibitions`, `unusual-theatres`, `excursions`, `rooftops`.
+- `rooftops` и `country-tours` ограничены Санкт-Петербургом в роутинге, static params и sitemap. Московская посадка крыш не создаётся и не попадает в sitemap.
+- Канонический intent URL: `na-vyhodnye`; `na-vyhodnyh` permanently redirect на него.
+- Порог индексации сохранён: `MIN_LISTING_OFFERS_FOR_INDEX = 6`. При меньшем числе офферов URL доступен, но получает `noindex,follow` и исключается из sitemap.
+
+### Проблемы
+
+- Индексация каждой URL зависит от наличия минимум шести актуальных офферов после sync каталога. DB seed landing не нужен: правила формируют выдачу по данным каталога.
+- Публичный номер 8-800 или городской номер pending у владельца; фейковый телефон не добавляется.
+
+---
+
+## 2026-07-22 — SEO-листинги / ЧПУ category×city (приоритет vs блог)
+
+### Наблюдения
+
+- Органика упирается в thin query-URL (`/events?…`) и нехватку индексируемых category×city посадок.
+- Уже есть контур landings (`/rechnye-progulki/moscow`) и city hubs; нельзя плодить `/{city}/category`.
+- Яндекс штрафует коммерческие страницы с пустой/бедной выдачей.
+
+### Решения
+
+- Формулы meta в `seo-listing-meta.ts` (год в title, description без стрелок).
+- Editorial seed `seo-listing-texts.ts` (~18 текстов) + fallback; блок `LandingSeoBottom` под сеткой.
+- Порог индексации листингов: **≥ 6** офферов (`noindex,follow` иначе); sitemap landings фильтрует thin city-variants.
+- Intent-подборки `/podborki/{intent}` / `{city}`; contacts; EventTrustStrip; footer/sitemap.
+- Приоритет продукта: SEO-листинги выше обычного блога (Tasktracker SEO.*).
+
+### Проблемы
+
+- «Экскурсии по крышам» ещё нет отдельного landing slug - нужен seed от владельца или intent с `q`.
+- Без живого каталога в CI нельзя гарантировать список thin URL; проверка на запросе + sitemap async filter.
+- Часть SEO-текстов добита до 1000+ символов шаблонным хвостом - нужен editorial polish (SEO.10).
+
+---
+
 ## 2026-07-22 — Колонка Артура: Казань на вкус (мастер-классы)
 
 ### Наблюдения

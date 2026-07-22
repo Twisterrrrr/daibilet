@@ -18,10 +18,12 @@ const catalogLinks = [
 
 const companyLinks = [
   { label: 'Блог', href: '/blog' },
+  { label: 'Контакты', href: '/contacts' },
   { label: 'Помощь', href: '/help' },
   { label: 'Площадки', href: '/venues' },
   { label: 'Локации', href: '/locations' },
   { label: 'Подборки', href: '/podborki' },
+  { label: 'Реквизиты', href: '/requisites' },
   { label: 'Мои покупки', href: '/account/purchases' },
 ];
 

@@ -8,6 +8,12 @@ export const LANDING_CATEGORY_PATH_BY_SLUG: Record<string, string> = {
   'family-kids': 'detyam-i-semyam',
   'concerts-genre': 'kontserty',
   'active-sport': 'aktivnyj-otdyh',
+  'walking-tours': 'peshie-ekskursii',
+  'country-tours': 'zagorodnye-ekskursii',
+  exhibitions: 'vystavki-i-muzei',
+  'unusual-theatres': 'neobychnye-teatry',
+  excursions: 'ekskursii',
+  rooftops: 'progulki-po-krysham',
   'new-year': 'novyj-god',
   'salute-9-may': 'salut-9-maya',
 };
@@ -28,13 +34,37 @@ export const LANDING_SLUG_BY_CITY_LANDING_PATH: Record<string, string> = Object.
   Object.entries(CITY_LANDING_PATH_BY_SLUG).map(([slug, path]) => [path, slug]),
 );
 
+/** Категории с ЧПУ `/{categoryPath}/{city}` (не `/{city}/…`). */
 export const MULTI_CITY_LANDING_SLUGS = new Set<string>([
   CANONICAL_LANDING_SLUGS.river,
   CANONICAL_LANDING_SLUGS.bus,
   CANONICAL_LANDING_SLUGS.party,
+  'standup',
+  'family-kids',
+  'concerts-genre',
+  'active-sport',
+  'walking-tours',
+  'country-tours',
+  'exhibitions',
+  'unusual-theatres',
+  'excursions',
+  'rooftops',
   'salute-9-may',
   'new-year',
 ]);
+
+/** Приоритетные города для sitemap / static params SEO-листингов. */
+export const PRIORITY_LISTING_CITY_SLUGS = [
+  'moscow',
+  'saint-petersburg',
+  'kazan',
+] as const;
+
+/** Ограничения городов для узких SEO-посадок. */
+export const LANDING_ALLOWED_CITY_SLUGS: Partial<Record<string, readonly string[]>> = {
+  'country-tours': ['saint-petersburg'],
+  rooftops: ['saint-petersburg'],
+};
 
 export const CITY_SCOPED_LANDING_SLUGS = new Set<string>(Object.keys(CITY_LANDING_PATH_BY_SLUG));
 
@@ -116,6 +146,11 @@ export function isCityScopedLanding(slug: string): boolean {
   return CITY_SCOPED_LANDING_SLUGS.has(canonicalLandingSlug(slug));
 }
 
+export function isLandingCityAllowed(landingSlug: string, citySlug: string): boolean {
+  const allowed = LANDING_ALLOWED_CITY_SLUGS[canonicalLandingSlug(landingSlug)];
+  return !allowed || allowed.includes(citySlug);
+}
+
 export type LandingRouteTarget = {
   landingSlug: string;
   citySlug?: string;
@@ -147,6 +182,7 @@ function resolveCategoryFirstRoute(segment1: string, segment2?: string, segment3
 
   const cityFromPath = normalizeKnownCitySlug(segment2);
   if (cityFromPath) {
+    if (!isLandingCityAllowed(landingSlug, cityFromPath)) return null;
     return {
       landingSlug,
       citySlug: cityFromPath,
@@ -201,7 +237,7 @@ export function landingCategoryHref(
   const categoryPath = LANDING_CATEGORY_PATH_BY_SLUG[slug] || slug;
   const segments = [categoryPath];
 
-  if (citySlug && MULTI_CITY_LANDING_SLUGS.has(slug)) {
+  if (citySlug && MULTI_CITY_LANDING_SLUGS.has(slug) && isLandingCityAllowed(slug, citySlug)) {
     const citySegment = cityPathSegment(citySlug);
     if (citySegment) segments.push(citySegment);
   }
@@ -222,6 +258,7 @@ export function resolveMisorderedLandingRedirect(pathname: string): string | nul
   const categoryPath = match[2].toLowerCase();
   const landingSlug = LANDING_SLUG_BY_CATEGORY_PATH[categoryPath];
   if (!citySlug || !landingSlug || !MULTI_CITY_LANDING_SLUGS.has(landingSlug)) return null;
+  if (!isLandingCityAllowed(landingSlug, citySlug)) return null;
 
   return landingCategoryHref(landingSlug, citySlug);
 }
@@ -269,14 +306,19 @@ export function resolveLegacyLandingRedirect(pathname: string): string | null {
 }
 
 export function listLandingStaticParamsOne(): Array<{ segment: string }> {
-  return Object.values(LANDING_CATEGORY_PATH_BY_SLUG).map((segment) => ({ segment }));
+  return Object.entries(LANDING_CATEGORY_PATH_BY_SLUG)
+    .filter(([slug]) => !LANDING_ALLOWED_CITY_SLUGS[slug])
+    .map(([, segment]) => ({ segment }));
 }
 
 export function listLandingStaticParamsTwo(): Array<{ segment: string; segment2: string }> {
   const paths: Array<{ segment: string; segment2: string }> = [];
-  for (const categoryPath of Object.values(LANDING_CATEGORY_PATH_BY_SLUG)) {
-    paths.push({ segment: categoryPath, segment2: 'moscow' });
-    paths.push({ segment: categoryPath, segment2: 'saint-petersburg' });
+  for (const [landingSlug, categoryPath] of Object.entries(LANDING_CATEGORY_PATH_BY_SLUG)) {
+    if (!MULTI_CITY_LANDING_SLUGS.has(landingSlug)) continue;
+    for (const city of PRIORITY_LISTING_CITY_SLUGS) {
+      if (!isLandingCityAllowed(landingSlug, city)) continue;
+      paths.push({ segment: categoryPath, segment2: city });
+    }
   }
   for (const slug of Object.keys(CITY_LANDING_PATH_BY_SLUG)) {
     const citySegment = cityPathSegment(DEFAULT_CITY_BY_LANDING_SLUG[slug]);

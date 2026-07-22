@@ -1,15 +1,9 @@
-import { buildCatalogPresetValues, type CatalogPresetSlug } from '@/lib/catalog-presets';
+import type { CatalogPresetSlug } from '@/lib/catalog-presets';
+import { catalogPresetToIntentPath } from '@/lib/catalog-intent-routes';
 
+/** Статичный SEO-URL подборки; fallback на /events только если пресет неизвестен. */
 export function buildCatalogPresetHref(slug: CatalogPresetSlug, city?: string): string {
-  const patch = buildCatalogPresetValues(slug, false);
-  const params = new URLSearchParams();
-  if (city && city !== 'all') params.set('city', city);
-  if (patch.date) params.set('date', patch.date);
-  if (patch.minPrice != null) params.set('minPrice', String(patch.minPrice));
-  if (patch.maxPrice != null) params.set('maxPrice', String(patch.maxPrice));
-  if (patch.sort && patch.sort !== 'popular') params.set('sort', patch.sort);
-  const query = params.toString();
-  return query ? `/events?${query}` : '/events';
+  return catalogPresetToIntentPath(slug, city) || '/events';
 }
 
 export function buildCatalogTagHref(tag: string, city?: string): string {

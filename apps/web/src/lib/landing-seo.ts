@@ -261,6 +261,36 @@ export function resolveLandingSeo(input: LandingSeoInput): LandingSeo {
 }
 
 /** Обновляет document.title, meta, canonical и JSON-LD. */
+/** On-page SEO текст под сеткой (fallback, если нет CMS SEO_TEXT). Без em/en dash. */
+export function buildLandingOnPageSeoText(input: LandingSeoInput): string {
+  const seo = resolveLandingSeo(input);
+  const cityName = input.cityName?.trim() || null;
+  const prep = input.cityPrep?.trim() || cityName || 'России';
+  const events = resolveEventsCount(input);
+  const priceFrom = input.stats?.priceFrom ?? null;
+  const title = input.landingTitle?.trim() || seo.h1Lead.trim();
+
+  const where = cityName ? `по ${prep}` : 'по городам России';
+  const countPart =
+    events > 0
+      ? `В подборке сейчас ${events} вариантов с актуальным расписанием.`
+      : 'Расписание обновляется по данным организаторов.';
+  const pricePart =
+    priceFrom && priceFrom > 0
+      ? ` Цены стартуют примерно от ${roundPrice(priceFrom)} рублей - точная стоимость зависит от сеанса и категории билета.`
+      : '';
+
+  return (
+    `${title.trim()} ${where}: сравните маршруты, время отправления и стоимость на одной странице. ` +
+    `${countPart}${pricePart} ` +
+    `Выберите удобную дату, откройте карточку предложения и перейдите к покупке. ` +
+    `Оформление билета проходит в билетной системе организатора; Дайбилет помогает выбрать подходящий вариант и сохранить ссылку на событие. ` +
+    `Если нужен другой город или формат, вернитесь к каталогу направлений или откройте хаб города с полной афишей.`
+  )
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export function applyLandingSeoMeta(input: LandingSeoInput): LandingSeo {
   const seo = resolveLandingSeo(input);
   document.title = seo.title;

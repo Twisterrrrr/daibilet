@@ -1,6 +1,6 @@
 # Project — Daibilet (Next full-stack migration)
 
-**Обновлено:** 2026-07-22  
+**Обновлено:** 2026-07-23
 **Ветка migration / prod:** `feat/next-monorepo`  
 **Prod:** Next `apps/web` `:3001` + legacy API `:4000` + Vite admin static
 
@@ -96,10 +96,15 @@ packages/config   — shared tsconfig/eslint
 | `/rechnye-progulki/...`, `/{city}/night-bridges/` | ISR/SSG | landing SEO paths |
 | `/api/public/*` | Route Handlers | parity с legacy API |
 
-### URL / SEO policy (2026-07-19)
+### URL / SEO policy (2026-07-19, доп. 2026-07-22)
 
 - **Flat URL:** `/events/{slug}`, `/venues/{slug}`, `/cities/{slug}` — без city-prefix в path (`/{city}/venues/...` и т.п. **отклонено**).
-- **SEO-фокус:** усиливать city hubs `/cities/{slug}` + landings; город в breadcrumbs/JSON-LD; sitemap + canonical.
+- **SEO-фокус:** city hubs `/cities/{slug}` + **category×city landings** (`/rechnye-progulki/moscow`, `/stendap-i-yumor/kazan`, …) + intent `/podborki/{intent}`; sitemap + canonical.
+- **Meta (city listing):** `[Категория] в [Городе] [Год] - купить билеты, расписание и цены на Дайбилет` (`seo-listing-meta.ts`).
+- **Thin listing:** &lt; 6 офферов → `noindex,follow` (страница доступна, не в индексе).
+- **Launch set:** утверждён TOP-15 category×city и intent URL. Для узких направлений действуют ограничения городов: `/progulki-po-krysham/saint-petersburg` и `/zagorodnye-ekskursii/saint-petersburg` не получают московских вариантов. Канонический weekend intent - `/podborki/na-vyhodnye`; старый `na-vyhodnyh` отдаёт permanent redirect.
+- **Контакты:** до подключения номера 8-800 публикуются email, ИНН и ОГРНИП, без подставного телефона.
+- Обычный блог - вторичен относительно SEO-листингов до насыщения ядра посадок.
 
 ---
 
