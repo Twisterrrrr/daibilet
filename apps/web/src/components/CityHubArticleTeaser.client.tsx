@@ -27,48 +27,43 @@ export function CityHubArticleTeaser({
     () => matchArticleSessions(article, sessions, 3),
     [article, sessions],
   );
-  const hasTickets = relatedSessions.length > 0;
-
-  const cardBorder = editorial ? 'border-zinc-200' : 'border-slate-200';
-  const cardShadow = editorial ? '' : 'shadow-sm';
 
   return (
     <article
       className={
-        hasTickets
-          ? `grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(16.5rem,21rem)] lg:items-stretch lg:gap-4`
-          : undefined
+        editorial
+          ? 'overflow-hidden rounded-2xl border border-zinc-200 bg-white md:grid md:grid-cols-[minmax(16rem,42%)_minmax(0,1fr)] md:items-stretch'
+          : 'overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm md:grid md:grid-cols-[minmax(16rem,42%)_minmax(0,1fr)] md:items-stretch'
       }
     >
-      <div
-        className={`overflow-hidden rounded-2xl border bg-white ${cardBorder} ${cardShadow} md:grid md:grid-cols-[minmax(13rem,38%)_minmax(0,1fr)] md:items-stretch`}
+      {/* Фото на всю высоту карточки; контент прижат вправо */}
+      <Link
+        href={articleHref}
+        aria-label={article.title}
+        className={`relative block aspect-[16/10] overflow-hidden md:aspect-auto md:min-h-full md:h-auto md:self-stretch ${
+          editorial ? 'bg-zinc-100' : 'bg-slate-100'
+        }`}
       >
-        <Link
-          href={articleHref}
-          aria-label={article.title}
-          className={`relative block aspect-[16/10] overflow-hidden md:aspect-auto md:min-h-[12rem] md:h-full ${
-            editorial ? 'bg-zinc-100' : 'bg-slate-100'
-          }`}
-        >
-          <SafeImage
-            src={article.coverImageUrl}
-            alt=""
-            fill
-            sizes={IMAGE_SIZES.blogCard}
-            className="object-cover object-center transition duration-300 hover:scale-[1.02]"
-            fallback={
-              <div
-                className={`flex h-full w-full items-center justify-center text-sm ${
-                  editorial ? 'bg-zinc-200 text-zinc-500' : 'bg-slate-200 text-slate-500'
-                }`}
-              >
-                Материал
-              </div>
-            }
-          />
-        </Link>
+        <SafeImage
+          src={article.coverImageUrl}
+          alt=""
+          fill
+          sizes={IMAGE_SIZES.blogCard}
+          className="object-cover object-center transition duration-300 hover:scale-[1.02]"
+          fallback={
+            <div
+              className={`flex h-full w-full items-center justify-center text-sm ${
+                editorial ? 'bg-zinc-200 text-zinc-500' : 'bg-slate-200 text-slate-500'
+              }`}
+            >
+              Материал
+            </div>
+          }
+        />
+      </Link>
 
-        <div className="flex min-w-0 flex-col p-3.5 sm:p-4">
+      <div className="flex min-w-0 flex-col justify-between p-3.5 sm:p-5 md:p-6">
+        <div className="min-w-0">
           {badges.length ? (
             <div className="mb-1.5 flex flex-wrap gap-1.5">
               {badges.map((badge) => (
@@ -87,7 +82,7 @@ export function CityHubArticleTeaser({
           ) : null}
 
           <h3
-            className={`line-clamp-2 text-sm font-semibold leading-snug sm:text-[0.95rem] ${
+            className={`line-clamp-2 text-sm font-semibold leading-snug sm:text-base ${
               editorial ? 'text-zinc-950' : 'text-slate-950'
             }`}
           >
@@ -106,72 +101,65 @@ export function CityHubArticleTeaser({
             </p>
           ) : null}
 
-          <div className="mt-auto pt-3">
-            <Link
-              href={articleHref}
-              className={
-                editorial
-                  ? 'inline-flex min-h-9 items-center gap-1 rounded-full border border-zinc-300 px-3.5 text-sm font-medium text-zinc-800 hover:border-zinc-400'
-                  : 'inline-flex min-h-9 items-center gap-1 rounded-lg border border-slate-200 px-3.5 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-700'
-              }
+          {relatedSessions.length ? (
+            <div
+              className={`mt-3 grid gap-1.5 border-t pt-3 ${
+                editorial ? 'border-zinc-100' : 'border-slate-100'
+              }`}
             >
-              Открыть материал
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {hasTickets ? (
-        <aside
-          className={`overflow-hidden rounded-2xl border bg-white p-3 sm:p-3.5 ${cardBorder} ${cardShadow}`}
-        >
-          <p
-            className={`mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] ${
-              editorial ? 'text-zinc-500' : 'text-slate-500'
-            }`}
-          >
-            В материале
-          </p>
-          <div className="grid gap-1.5">
-            {relatedSessions.map((session) => (
-              <Link
-                key={session.id}
-                href={eventHref(session)}
-                className={`grid grid-cols-[1fr_auto] gap-2 rounded-md px-2.5 py-2 text-xs sm:text-sm ${
-                  editorial
-                    ? 'bg-zinc-50 hover:bg-zinc-100'
-                    : 'bg-slate-50 hover:bg-primary-50/70'
-                }`}
-              >
-                <span className="min-w-0">
-                  <span
-                    className={`block truncate font-semibold ${
-                      editorial ? 'text-zinc-900' : 'text-slate-900'
-                    }`}
-                  >
-                    {session.title}
-                  </span>
-                  <span
-                    className={`mt-0.5 block truncate text-[11px] ${
-                      editorial ? 'text-zinc-500' : 'text-slate-500'
-                    }`}
-                  >
-                    {[session.dateLabel, session.venue].filter(Boolean).join(' · ')}
-                  </span>
-                </span>
-                <span
-                  className={`self-center whitespace-nowrap text-[11px] font-semibold sm:text-xs ${
-                    editorial ? 'text-zinc-700' : 'text-primary-700'
+              {relatedSessions.map((session) => (
+                <Link
+                  key={session.id}
+                  href={eventHref(session)}
+                  className={`grid grid-cols-[1fr_auto] gap-2 rounded-md px-2.5 py-1.5 text-xs sm:text-sm ${
+                    editorial
+                      ? 'bg-zinc-50 hover:bg-zinc-100'
+                      : 'bg-slate-50 hover:bg-primary-50/70'
                   }`}
                 >
-                  {formatPriceFrom(session.priceFrom)}
-                </span>
-              </Link>
-            ))}
-          </div>
-        </aside>
-      ) : null}
+                  <span className="min-w-0">
+                    <span
+                      className={`block truncate font-semibold ${
+                        editorial ? 'text-zinc-900' : 'text-slate-900'
+                      }`}
+                    >
+                      {session.title}
+                    </span>
+                    <span
+                      className={`mt-0.5 block truncate text-[11px] ${
+                        editorial ? 'text-zinc-500' : 'text-slate-500'
+                      }`}
+                    >
+                      {[session.dateLabel, session.venue].filter(Boolean).join(' · ')}
+                    </span>
+                  </span>
+                  <span
+                    className={`self-center whitespace-nowrap text-[11px] font-semibold sm:text-xs ${
+                      editorial ? 'text-zinc-700' : 'text-primary-700'
+                    }`}
+                  >
+                    {formatPriceFrom(session.priceFrom)}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          ) : null}
+        </div>
+
+        <div className="mt-4">
+          <Link
+            href={articleHref}
+            className={
+              editorial
+                ? 'inline-flex min-h-9 items-center gap-1 rounded-full border border-zinc-300 px-3.5 text-sm font-medium text-zinc-800 hover:border-zinc-400'
+                : 'inline-flex min-h-9 items-center gap-1 rounded-lg border border-slate-200 px-3.5 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-700'
+            }
+          >
+            Открыть материал
+            <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+      </div>
     </article>
   );
 }
@@ -187,7 +175,7 @@ export function CityHubArticlesGrid({
 }) {
   if (!articles.length) return null;
   return (
-    <div className="mt-4 grid gap-4">
+    <div className="mt-4 grid gap-3">
       {articles.map((article) => (
         <CityHubArticleTeaser
           key={article.slug}
