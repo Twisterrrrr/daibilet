@@ -1768,7 +1768,10 @@ function mapAdminOrderRow(row) {
   const hasUnlinkedTickets =
     shouldExpectTicket &&
     (unlinkedTickets > 0 || tickets.some((ticket) => !ticket.eventId || !ticket.eventTitle));
-  const missingArtifact = shouldExpectTicket && ticketCount === 0;
+  // TC set/admission products often have empty tickets[] but paid sets_values - not a mirror gap.
+  const setProducts = listSetProductsFromSnapshot(row.buyerSnapshot);
+  const hasSetFulfillment = setProducts.length > 0;
+  const missingArtifact = shouldExpectTicket && ticketCount === 0 && !hasSetFulfillment;
   const sourceCode = String(row.sourceCode || '').toUpperCase();
   const eventTitlesFromRow = Array.isArray(row.eventTitles) ? row.eventTitles.filter(Boolean) : [];
   const eventTitles = Array.from(
@@ -1778,6 +1781,27 @@ function mapAdminOrderRow(row) {
   const eventTitle = eventTitles[0] || snapshotEventTitle || null;
   const sessionDates = tickets.map((ticket) => ticket.startsAt).filter(Boolean).sort();
   const eventDateLabel = row.firstStartsAt || sessionDates[0] || null;
+  const displayTickets =
+    tickets.length > 0
+      ? tickets
+      : setProducts.map((set, index) =>
+          mapAdminOrderTicket(
+            {
+              id: `set:${set.id || index + 1}`,
+              externalTicketId: firstString(set.name, set.id, `Набор ${index + 1}`),
+              status: row.status || 'done',
+              origin: 'set',
+              eventId: null,
+              sessionId: null,
+              eventTitle: snapshotEventTitle || firstString(set.name) || null,
+              eventSlug: null,
+              startsAt: null,
+            },
+            row.status,
+            row.buyerSnapshot,
+          ),
+        );
+  const displayTicketCount = ticketCount > 0 ? ticketCount : displayTickets.length;
 
   return {
     id: row.id,
@@ -1801,14 +1825,14 @@ function mapAdminOrderRow(row) {
     isArchived: Boolean(row.archivedAt),
     canArchive: !row.archivedAt && isArchivableOrderStatus(row.status),
     updatedAt: row.updatedAt || null,
-    ticketCount,
+    ticketCount: displayTicketCount,
     unlinkedTickets,
     eventTitle,
     eventTitles: eventTitles.length ? eventTitles : eventTitle ? [eventTitle] : [],
     eventDateLabel,
-    tickets,
+    tickets: displayTickets,
     amountRub: extractOrderAmountRub(row.buyerSnapshot),
-    artifactStatus: missingArtifact ? 'missing' : ticketCount > 0 ? 'tickets' : 'not_required',
+    artifactStatus: missingArtifact ? 'missing' : displayTicketCount > 0 || hasSetFulfillment ? 'tickets' : 'not_required',
     refundRequestsCount: 0,
     hasPendingRefundRequests: isRefundStatus(row.status),
     needsAttention: problemStatus || missingArtifact || hasUnlinkedTickets,
@@ -1818,6 +1842,18 @@ function mapAdminOrderRow(row) {
       ...(hasUnlinkedTickets ? ['Есть билеты без связи с событием'] : []),
     ],
   };
+}
+
+/** TicketsCloud set/admission lines live in values.sets_values when seats tickets[] is empty. */
+function listSetProductsFromSnapshot(snapshot) {
+  const payload = snapshot && typeof snapshot === 'object' ? snapshot : {};
+  const values =
+    (payload.values && typeof payload.values === 'object' && payload.values) ||
+    (payload.sourcePayload?.values && typeof payload.sourcePayload.values === 'object' && payload.sourcePayload.values) ||
+    {};
+  const sets = values.sets_values;
+  if (!sets || typeof sets !== 'object' || Array.isArray(sets)) return [];
+  return Object.values(sets).filter((item) => item && typeof item === 'object');
 }
 
 function mapAdminOrderTicket(ticket, orderStatus = null, buyerSnapshot = null) {

@@ -143,13 +143,30 @@ async function persistOrders(orders, refs, syncId, startedAt, options) {
       });
 
       await upsertRawOrder(client, externalOrderId, order, refs);
-      await client.query('delete from "ExternalTicket" where "externalOrderId" = $1 and coalesce(origin, $2) = $2', [orderDbId, "source"]);
+      await client.query(
+        'delete from "ExternalTicket" where "externalOrderId" = $1 and coalesce(origin, $2) in ($2, $3)',
+        [orderDbId, "source", "set"],
+      );
 
-      const tickets = Array.isArray(order.tickets) ? order.tickets : [];
+      let tickets = Array.isArray(order.tickets) ? order.tickets : [];
+      if (!tickets.length) {
+        const sets = order.values?.sets_values;
+        if (sets && typeof sets === "object" && !Array.isArray(sets)) {
+          tickets = Object.values(sets)
+            .filter((item) => item && typeof item === "object")
+            .map((set, index) => ({
+              id: set.id || `${externalOrderId}_set_${index + 1}`,
+              number: set.name || `set-${index + 1}`,
+              status: order.status || "done",
+              origin: "set",
+            }));
+        }
+      }
       if (!tickets.length) stats.withoutTickets += 1;
 
       for (const [index, ticket] of tickets.entries()) {
         const externalTicketId = String(ticket.id || ticket.number || `${externalOrderId}_${index + 1}`);
+        const origin = ticket.origin === "set" ? "set" : "source";
         await client.query(
           `
             insert into "ExternalTicket" (id, "externalOrderId", "externalTicketId", status, "eventId", "sessionId", origin)
@@ -163,13 +180,13 @@ async function persistOrders(orders, refs, syncId, startedAt, options) {
               origin = excluded.origin
           `,
           [
-            stableId("extticket_tc", externalTicketId),
+            stableId(origin === "set" ? "extticket_tc_set" : "extticket_tc", externalTicketId),
             orderDbId,
             externalTicketId,
             String(ticket.status || order.status || "unknown"),
             linked.eventId,
             linked.sessionId,
-            "source",
+            origin,
           ],
         );
         stats.importedTickets += 1;

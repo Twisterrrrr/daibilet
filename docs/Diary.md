@@ -2742,6 +2742,20 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 ### Проблемы
 - Включение IPv6 на Timeweb без глобального адреса на интерфейсе оставляет AAAA «мёртвым» - хуже, чем отсутствие AAAA.
 
+## 2026-07-22 - Orders: TC sets without tickets[] are not «missing mirror»
+
+### Наблюдения
+- Заказ TC `113996822` (ИгроВечер) status=done, оплата 1089 ₽, но `tickets: []`.
+- Позиция в `values.sets_values` («С 19:00 - ИгроВечер») - формат set/admission, не seat-билет.
+- Админка помечала «Нет билетов в зеркале» ложно.
+
+### Решения
+- `mapAdminOrderRow`: если есть `sets_values`, не ставить missingArtifact; показывать синтетические позиции набора.
+- `tc-sync-orders`: при пустом `tickets[]` писать ExternalTicket из `sets_values` с origin=`set`.
+
+### Проблемы
+- Старые заказы без ре-синка уже чинятся эвристикой в DTO; полный backfill зеркала - через следующий orders sync.
+
 ## 2026-07-22 - Blog: preserve admin textarea line breaks
 
 ### Наблюдения
