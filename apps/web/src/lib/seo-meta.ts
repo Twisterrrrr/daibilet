@@ -26,7 +26,8 @@ type DestinationLike = {
 /** Strip trailing brand suffixes so root title template does not become "X | Дайбилет | Дайбилет". */
 export function pageTitle(title: string): string {
   return String(title || '')
-    .replace(/\s*[|—-]\s*Дайбилет\s*$/i, '')
+    .replace(/\s*[|\u2013\u2014-]\s*Дайбилет\s*$/i, '')
+    .replace(/\s*[|\u2013\u2014-]\s*Блог Дайбилет\s*$/i, '')
     .trim();
 }
 

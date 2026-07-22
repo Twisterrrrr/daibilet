@@ -37,7 +37,7 @@ function absoluteUrl(pathOrUrl) {
   return `${SITE_ORIGIN}${value.startsWith('/') ? value : `/${value}`}`;
 }
 
-function buildMetaTags({ title, description, url, image }) {
+function buildMetaTags({ title, description, url, image, type = 'website' }) {
   const safeTitle = escapeHtml(title);
   const safeDescription = escapeHtml(description);
   const safeUrl = escapeHtml(url);
@@ -46,12 +46,16 @@ function buildMetaTags({ title, description, url, image }) {
   return [
     `<title>${safeTitle}</title>`,
     `<meta name="description" content="${safeDescription}" />`,
-    `<meta property="og:type" content="website" />`,
+    `<meta property="og:type" content="${escapeHtml(type)}" />`,
+    `<meta property="og:locale" content="ru_RU" />`,
     `<meta property="og:site_name" content="${SITE_NAME}" />`,
     `<meta property="og:title" content="${safeTitle}" />`,
     `<meta property="og:description" content="${safeDescription}" />`,
     `<meta property="og:url" content="${safeUrl}" />`,
     safeImage ? `<meta property="og:image" content="${safeImage}" />` : '',
+    safeImage ? `<meta property="og:image:secure_url" content="${safeImage}" />` : '',
+    safeImage ? `<meta property="og:image:width" content="1200" />` : '',
+    safeImage ? `<meta property="og:image:height" content="630" />` : '',
     `<meta name="twitter:card" content="${safeImage ? 'summary_large_image' : 'summary'}" />`,
     `<meta name="twitter:title" content="${safeTitle}" />`,
     `<meta name="twitter:description" content="${safeDescription}" />`,
@@ -74,7 +78,7 @@ export function renderSocialPreviewHtml(meta, { redirectPath } = {}) {
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    ${buildMetaTags({ title, description, url, image })}
+    ${buildMetaTags({ title, description, url, image, type: meta?.type || 'website' })}
     <meta http-equiv="refresh" content="0;url=${escapeHtml(redirect)}" />
   </head>
   <body>
