@@ -2734,13 +2734,18 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 - Статья `https://daibilet.ru/blog/kazan-na-vkus-master-klassy` отдаёт полный OG (title/description/image) по IPv4, cover JPEG 200 OK.
 - В DNS Timeweb есть AAAA `2a03:6f01:1:2::ef11`, но на VPS нет рабочего global IPv6: eth0 только link-local, curl по AAAA таймаутится.
 - Telegram и часть краулеров предпочитают IPv6 при наличии AAAA → превью ссылки не строится (голый URL в чате).
+- `@WebpageBot` может видеть превью (часто ходит по IPv4), а обычные чаты - нет: это не «блокировка сайта», а DNS AAAA + negative cache Telegram.
+- На 2026-07-22 вечером AAAA всё ещё в DNS (`dig AAAA daibilet.ru` → тот же адрес, curl -6 → No route to host).
 
 ### Решения
 - Удалить AAAA у `daibilet.ru` / `www` / `api` / `admin` в панели DNS Timeweb (пока IPv6 на сервере не настроен), либо корректно выдать адрес на eth0 и проверить маршрутизацию.
-- После смены DNS: TTL ~5 мин (SOA minimum 300), затем обновить кэш через `@WebpageBot` или переслать URL.
+- После смены DNS: TTL ~5-10 мин, затем в чат слать URL с `?v=2` (или новый URL) - WebpageBot сам по себе кэш чата не сбрасывает.
+- nginx: social bots → `/api/public/social-preview?path=$uri` (чистый OG HTML, без Next `private, no-store` и без meta refresh).
+- Venue metadata: явные `twitter:title`/`twitter:description` + fallback description; иначе Twitter-карточка наследовала title/description главной.
 
 ### Проблемы
 - Включение IPv6 на Timeweb без глобального адреса на интерфейсе оставляет AAAA «мёртвым» - хуже, чем отсутствие AAAA.
+- Пока AAAA жив, превью в чатах будут нестабильны даже при идеальных OG.
 
 ## 2026-07-22 - Orders: TC sets without tickets[] are not «missing mirror»
 
