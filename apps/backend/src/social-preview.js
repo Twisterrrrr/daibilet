@@ -15,6 +15,66 @@ function cityHubSeoTitleFallback(cityName) {
   return `${name}: афиша, экскурсии и билеты на сегодня, ${short} | ${SITE_NAME}`;
 }
 
+const CITY_SHARE_ALIASES = {
+  moskva: 'moscow',
+  'sankt-peterburg': 'saint-petersburg',
+  'nizhniy-novgorod': 'nizhny-novgorod',
+  'velikiy-novgorod': 'veliky-novgorod',
+  'rostov-na-donu': 'rostov-on-don',
+  rostov: 'rostov-on-don',
+};
+
+const CITY_SHARE_SLUGS = new Set([
+  'saint-petersburg',
+  'moscow',
+  'kazan',
+  'kaliningrad',
+  'vladivostok',
+  'vologda',
+  'irkutsk',
+  'perm',
+  'samara',
+  'sochi',
+  'ekaterinburg',
+  'nizhny-novgorod',
+  'novosibirsk',
+  'krasnodar',
+  'suzdal',
+  'veliky-novgorod',
+  'voronezh',
+  'yaroslavl',
+  'krasnoyarsk',
+  'omsk',
+  'chelyabinsk',
+  'rostov-on-don',
+  'saratov',
+  'tula',
+  'tver',
+  'tyumen',
+  'ufa',
+  'ulan-ude',
+  'ryazan',
+  'stavropol',
+  'tomsk',
+  'ulyanovsk',
+  'izhevsk',
+  'orel',
+  'orenburg',
+  'penza',
+  'volgograd',
+  'sortavala',
+]);
+
+function cityShareImageFallback(slug, sourceSlug, name) {
+  const raw = String(sourceSlug || slug || name || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-');
+  const imageSlug = CITY_SHARE_ALIASES[raw] || raw;
+  if (!CITY_SHARE_SLUGS.has(imageSlug)) return null;
+  return `/images/cities/${imageSlug}.png`;
+}
+
 const BOT_UA_RE =
   /(bot|telegram|facebook|twitter|linkedin|slack|whatsapp|discord|vkshare|preview|embedly|pinterest|skype|googlebot|bingpreview|yandex|mail\.ru)/i;
 
@@ -149,6 +209,7 @@ export async function buildSocialPreviewForPath(db, pathname, builders) {
       url: canonicalPath,
       image: article.coverImageUrl || null,
       redirectPath: canonicalPath,
+      type: 'article',
     };
   }
 
@@ -163,8 +224,9 @@ export async function buildSocialPreviewForPath(db, pathname, builders) {
       title: city.seoTitle || cityHubSeoTitleFallback(city.name),
       description: city.seoDescription || `${city.name}: экскурсии, музеи и события.`,
       url: canonicalPath,
-      image: city.heroImageUrl || null,
+      image: city.heroImageUrl || cityShareImageFallback(city.slug, city.sourceSlug, city.name),
       redirectPath: canonicalPath,
+      type: 'website',
     };
   }
 
