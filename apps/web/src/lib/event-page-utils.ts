@@ -101,7 +101,6 @@ export function getTicketPriceRange(payload: PublicEventPageDto): TicketPriceRan
   const sessionPrices: number[] = [];
   for (const session of payload.sessions ?? []) {
     if (knownPrice(session.priceFrom)) sessionPrices.push(session.priceFrom);
-    if (knownPrice(session.priceTo)) sessionPrices.push(session.priceTo);
   }
   const sessionPriceRange = rangeFromExactPrices(sessionPrices);
   if (sessionPriceRange) return sessionPriceRange;

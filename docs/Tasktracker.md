@@ -119,6 +119,7 @@
 | E.3 | Prod: `ReferenceError: cleanDisplayText is not defined` (re-export без local import в `event-page-utils`) | Критический | ✅ 7cdd4cf + rebuild 38e8d12 |
 | E.4 | Теги на event page: dedupe chips (tags∪subcategories) по нормализованному label | Высокий | ✅ 2026-07-19 @9658b9f prod proof kino |
 | E.5 | Event page display time = TZ региона события (как виджет), не forced MSK | Критический | ✅ 2026-07-19 @9f1f744 prod proof Уфа 18:00 |
+| E.6 | Hero CTA показывает только минимальную цену `от`; buy-card сохраняет диапазон точных категорий | Высокий | ✅ 2026-07-23 |
 
 ---
 

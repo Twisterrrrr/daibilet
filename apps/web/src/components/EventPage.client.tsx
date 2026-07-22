@@ -25,6 +25,7 @@ import {
 } from '@/lib/event-page-utils';
 import { venueHref } from '@/lib/routes';
 import { buildEventBreadcrumbs } from '@/lib/structured-data';
+import { resolveEventHeroObjectPosition } from '@/lib/event-image-focus';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { getTeplohodWidgetIds, openTeplohodWidget, TeplohodWidgetEmbed } from '@/components/TeplohodWidget.client';
 import { normalizeTcPurchaseUrl, TcOptionBuyButton, TcSessionSlot, TcWidgetButton } from '@/components/TcWidget.client';
@@ -327,12 +328,15 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
   const { event, stats } = payload;
   const ageLimit = formatAgeLimit(event.ageLimit);
   const priceRange = getTicketPriceRange(payload);
-  const priceLabel = priceRange
-    ? formatHeroBuyButtonPrice(priceRange)
-    : formatPriceRub(stats.priceFrom ?? event.priceFrom)
-      ? `от ${formatPriceRub(stats.priceFrom ?? event.priceFrom)}`
-      : '';
+  const fallbackPrice = formatPriceRub(stats.priceFrom ?? event.priceFrom);
+  const priceLabel = priceRange ? formatHeroBuyButtonPrice(priceRange) : fallbackPrice ? `от ${fallbackPrice}` : '';
   const heroImage = String(event.imageUrl || '').trim();
+  const heroObjectPosition = resolveEventHeroObjectPosition({
+    slug: event.slug,
+    sourceSlug: event.sourceSlug,
+    externalId: event.externalId,
+    id: event.id,
+  });
   const nextSession = pickRepresentativeSession((payload.sessions ?? []) as EventSession[]);
   const venueLink = event.venue
     ? venueHref({ id: event.venueId || event.venueSlug || event.venue, slug: event.venueSlug, name: event.venue, type: event.venueKind })
@@ -348,7 +352,8 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
           fill
           priority
           sizes={IMAGE_SIZES.eventHero}
-          className="object-cover object-top opacity-80 lg:object-[center_30%]"
+          style={{ objectPosition: heroObjectPosition }}
+          className="object-cover opacity-80"
           fallback={
             <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600 to-primary-900">
               <span className="text-8xl opacity-30">🎭</span>
