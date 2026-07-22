@@ -11,6 +11,10 @@ const EVENT_HERO_OBJECT_POSITION: Record<string, string> = {
   'tc-6a319c0e3e6da873bc2af400-nurminskii-solnyi-koncert-perm-9-oktyabrya-nebar':
     'center 16%',
   '6a319c0e3e6da873bc2af400': 'center 16%',
+  // Плотный хедшот: глаза ~45% кадра, дефолт 18% режет лоб/макушку.
+  'tc-6a4cdfa9269f8c2690ba9ebb-aleksei-saprykin-chtenie': 'center 50%',
+  '6a4cdfa9269f8c2690ba9ebb': 'center 50%',
+  'evt_6a4cdfa9269f8c2690ba9ebb': 'center 50%',
 };
 
 function normalizeKey(value?: string | null): string {
