@@ -27,6 +27,7 @@ import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { landingPageHref } from '@/lib/landing-routes';
 import { eventHref, sessionVenueHref, venueHref } from '@/lib/routes';
 import { inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
+import { buildCityHubSeoPhrase } from '@/lib/city-hub-seo';
 import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
 import { isOpenDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import {
@@ -174,7 +175,7 @@ export function CityPageView({
         { id: 'about', label: 'О городе', show: hasAbout },
         { id: 'affiche', label: 'Афиша', show: true },
         { id: 'sights', label: 'Куда сходить', show: hasSights || sightsArticles.length > 0 },
-        { id: 'practice', label: 'Практика', show: hasPractice },
+        { id: 'practice', label: 'Советы', show: hasPractice },
         { id: 'more', label: 'Ещё', show: hasMore },
       ].filter((tab) => tab.show),
     [hasAbout, hasMore, hasPractice, hasSights, sightsArticles.length],
@@ -321,7 +322,7 @@ export function CityPageView({
                         : 'text-2xl font-bold text-slate-950'
                     }
                   >
-                    Практика
+                    Советы
                   </h2>
                   <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
                     Как добраться, когда ехать и ответы на частые вопросы.
@@ -1400,7 +1401,7 @@ function CitySeoTextSection({
                 : 'text-2xl font-bold text-slate-900'
             }
           >
-            Афиша {cityToGenitive(cityName)}
+            {buildCityHubSeoPhrase(cityName)}
           </h2>
           <p className={`mt-4 text-sm leading-7 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>{text}</p>
         </div>

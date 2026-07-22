@@ -1,4 +1,20 @@
-## 2026-07-22 — City hub × blog phase 2 (mini-row сессий)
+## 2026-07-22 — City hub: «Советы» + on-page SEO фразы
+
+### Наблюдения
+
+- Длинные запросы («афиша, экскурсии и билеты…») жили в основном в `<title>` / meta description; блок `#seo` был brief + счётчики.
+- «Практика» как ярлык секции звучал канцелярски.
+
+### Решения
+
+- Sticky/H2: **Советы** (якорь `#practice` сохранён).
+- `buildCityHubSeoPhrase` + усиленный `buildCitySeoText` / H2 `#seo`; fallback meta description через `buildCityHubSeoDescription`.
+
+### Проблемы
+
+- Нет.
+
+---
 
 ### Наблюдения
 

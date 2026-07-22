@@ -5,11 +5,14 @@ import { CityPageView } from '@/components/CityPageView.client';
 import { CityPageViewEditorial } from '@/components/CityPageViewEditorial.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
-import { inCityPrepositional } from '@/lib/city-declension';
 import { buildCityFaqItems, buildCitySeoText } from '@/lib/city-faq';
 import { pickCityHubArticles } from '@/lib/city-hub-articles';
 import { resolveCityHubTemplate } from '@/lib/city-hub-template';
-import { buildCityHubSeoTitle, buildCityHubSeoTitleCore } from '@/lib/city-hub-seo';
+import {
+  buildCityHubSeoDescription,
+  buildCityHubSeoTitle,
+  buildCityHubSeoTitleCore,
+} from '@/lib/city-hub-seo';
 import { evaluateCityIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { mergeBlogCards } from '@/lib/blog-utils';
 import { pageTitle, routeOpenGraph } from '@/lib/seo-meta';
@@ -37,18 +40,19 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     isIndexable: city.isIndexable,
   });
 
-  const cityIn = inCityPrepositional(city.name);
   // Живая дата в title (MSK); admin seoTitle без даты не перекрывает паттерн хаба.
   const hubTitle = buildCityHubSeoTitleCore(city.name);
   const hubTitleFull = buildCityHubSeoTitle(city.name);
+  const description = city.seoDescription || buildCityHubSeoDescription(city.name);
 
   return {
     title: pageTitle(hubTitle),
-    description: city.seoDescription || `События и экскурсии ${cityIn}`,
+    description,
     alternates: { canonical: path },
     robots: robotsForIndexability(decision.indexable),
     openGraph: routeOpenGraph(path, {
       title: hubTitleFull,
+      description,
     }),
   };
 }

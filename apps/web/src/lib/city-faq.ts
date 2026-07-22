@@ -1,8 +1,9 @@
 import type { PublicCityPageDto } from '@daibilet/contracts/public';
 
-import { inCityPrepositional } from '@/lib/city-declension';
+import { cityToGenitive, inCityPrepositional } from '@/lib/city-declension';
 import { formatNumber, formatPriceFrom } from '@/lib/format';
 import { resolveCityBrief, resolveCityInfo } from '@/lib/cityInfo';
+import { buildCityHubSeoPhrase } from '@/lib/city-hub-seo';
 import { evaluateCityIndexability } from '@/lib/hub-indexability';
 
 export type CityFaqItem = {
@@ -34,6 +35,10 @@ export function buildCityFaqItems(payload: PublicCityPageDto): CityFaqItem[] {
   return buildCityEditorialFaqItems(payload);
 }
 
+/**
+ * Видимый SEO-текст внизу хаба (`#seo`).
+ * Brief + ключевая фраза (как в title) + живые счётчики — не только meta.
+ */
 export function buildCitySeoText(payload: PublicCityPageDto): string | null {
   const decision = evaluateCityIndexability({
     events: payload.stats?.events ?? payload.city.events ?? 0,
@@ -46,14 +51,17 @@ export function buildCitySeoText(payload: PublicCityPageDto): string | null {
   const city = payload.city;
   const brief = resolveCityBrief(city.slug, city.sourceSlug, city.name);
   const inCity = inCityPrepositional(city.name);
+  const cityGen = cityToGenitive(city.name);
   const events = payload.stats?.events ?? city.events ?? 0;
   const venues = payload.stats?.venues ?? city.venues ?? 0;
   const priceFrom = payload.stats?.priceFrom;
+  const phrase = buildCityHubSeoPhrase(city.name);
 
   const parts = [
     brief,
+    `${phrase}: события, концерты, музеи, экскурсии и шоу ${inCity}. На Дайбилете можно сравнить даты и площадки и купить билеты онлайн.`,
     events > 0
-      ? `В афише Дайбилета — ${formatNumber(events)} ${pluralEventsWord(events)}${venues > 0 ? ` и ${formatNumber(venues)} ${pluralVenuesWord(venues)}` : ''} ${inCity}.`
+      ? `В афише ${cityGen} на Дайбилете — ${formatNumber(events)} ${pluralEventsWord(events)}${venues > 0 ? ` и ${formatNumber(venues)} ${pluralVenuesWord(venues)}` : ''} ${inCity}.`
       : null,
     priceFrom && priceFrom > 0 ? `Билеты ${formatPriceFrom(priceFrom)}.` : null,
     'Сравнивайте даты и площадки, затем переходите к оплате у билетного оператора.',
