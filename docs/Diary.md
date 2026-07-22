@@ -1,3 +1,21 @@
+## 2026-07-22 — Prod deploy load + city hub blog @`bb65e4a`
+
+### Наблюдения
+
+- Rebase поверх `7787c30` (FAQ city-only / empty directions): конфликты в `CityPageView` / Tasktracker / Diary.
+- `curl -I` (HEAD) на public API даёт 404/`no-store` — ложный сигнал; проверять GET.
+
+### Решения
+
+- Merge: сохранены chip UX P.2k–n + H3 «Что купить сейчас» + тизеры; Tasktracker P.2o + L.1.
+- `deploy-prod-next` OK @`bb65e4a`. Proof: GET `/api/public/events?limit=50` → `Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=600`; `?ids=` 200; hub SPB — sticky `#about|#affiche|#sights|#practice|#more` + `/blog/*` teasers.
+
+### Проблемы
+
+- Images webp/`next/image` (п.6 аудита) — ещё не в этом релизе.
+
+---
+
 ## 2026-07-22 — Load fixes: catalog cache headers, landing refetch, favorites ids
 
 ### Наблюдения
