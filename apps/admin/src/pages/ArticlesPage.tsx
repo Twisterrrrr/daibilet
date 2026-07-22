@@ -415,6 +415,10 @@ export function ArticlesPage() {
                 value={draft.content}
                 onChange={(e) => setDraft((prev) => ({ ...prev, content: e.target.value }))}
               />
+              <span className="block text-xs text-muted-foreground">
+                Enter - перенос строки на сайте. Пустая строка - новый абзац. Поддерживаются **жирный**, *курсив*,
+                [ссылка](/path), ## заголовок.
+              </span>
             </label>
 
             <label className="block space-y-1 text-sm">

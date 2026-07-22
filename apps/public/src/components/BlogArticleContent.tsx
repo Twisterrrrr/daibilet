@@ -31,7 +31,8 @@ type ContentBlock =
   | { type: 'image'; image: ParsedImageBlock }
   | { type: 'cta'; data: ReturnType<typeof parseCtaBlock> & object };
 
-function renderInline(text: string, keyPrefix = ''): React.ReactNode[] {
+/** Inline markdown на одной строке (без \\n). */
+function renderInlineLine(text: string, keyPrefix = ''): React.ReactNode[] {
   const nodes: React.ReactNode[] = [];
   // **bold** before *italic* so double asterisks are not split into empties.
   const regex = /\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*|\*([^*]+)\*/g;
@@ -70,6 +71,24 @@ function renderInline(text: string, keyPrefix = ''): React.ReactNode[] {
   }
 
   if (last < text.length) nodes.push(text.slice(last));
+  return nodes;
+}
+
+/**
+ * Как в админском textarea: одиночный Enter → перенос (<br>),
+ * пустая строка (\\n\\n) → новый абзац (см. parseContentBlocks).
+ */
+function renderInline(text: string, keyPrefix = ''): React.ReactNode[] {
+  const lines = String(text || '').split('\n');
+  if (lines.length <= 1) return renderInlineLine(text, keyPrefix);
+
+  const nodes: React.ReactNode[] = [];
+  lines.forEach((line, lineIndex) => {
+    if (lineIndex > 0) {
+      nodes.push(<br key={`${keyPrefix}br-${lineIndex}`} />);
+    }
+    nodes.push(...renderInlineLine(line, `${keyPrefix}l${lineIndex}-`));
+  });
   return nodes;
 }
 

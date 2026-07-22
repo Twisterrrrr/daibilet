@@ -2714,14 +2714,42 @@
 
 ### Наблюдения
 - Правки Article из админки писались в Postgres, но Next держал in-memory DTO-кэш статей 5 мин и не ревалидировал /blog.
-- HIDDEN/архив мог «воскресать» через static fallback esolveStaticArticle.
+- HIDDEN/архив мог «воскресать» через static fallback 
+esolveStaticArticle.
 - В UI не было автора, удаления и явного архива.
 
 ### Решения
 - clearPublicArticlesDtoCache на invalidate + в Next /api/internal/revalidate.
-- После create/update/delete: evalidateNextBlogArticle (/blog, slug, city hub).
+- После create/update/delete: 
+evalidateNextBlogArticle (/blog, slug, city hub).
 - cmsOwned для непубличных slug - без static fallback.
 - Admin: колонка/поле Автор, кнопки «В архив» (HIDDEN) и «Удалить» (DELETE).
 
 ### Проблемы
 - После деплоя нужен restart daibilet-api, иначе handlers в API-процессе старые.
+
+## 2026-07-22 - Telegram preview: broken AAAA / IPv6
+
+### Наблюдения
+- Статья `https://daibilet.ru/blog/kazan-na-vkus-master-klassy` отдаёт полный OG (title/description/image) по IPv4, cover JPEG 200 OK.
+- В DNS Timeweb есть AAAA `2a03:6f01:1:2::ef11`, но на VPS нет рабочего global IPv6: eth0 только link-local, curl по AAAA таймаутится.
+- Telegram и часть краулеров предпочитают IPv6 при наличии AAAA → превью ссылки не строится (голый URL в чате).
+
+### Решения
+- Удалить AAAA у `daibilet.ru` / `www` / `api` / `admin` в панели DNS Timeweb (пока IPv6 на сервере не настроен), либо корректно выдать адрес на eth0 и проверить маршрутизацию.
+- После смены DNS: TTL ~5 мин (SOA minimum 300), затем обновить кэш через `@WebpageBot` или переслать URL.
+
+### Проблемы
+- Включение IPv6 на Timeweb без глобального адреса на интерфейсе оставляет AAAA «мёртвым» - хуже, чем отсутствие AAAA.
+
+## 2026-07-22 - Blog: preserve admin textarea line breaks
+
+### Наблюдения
+- В админке Enter в textarea сохранялся в content, но на сайте HTML схлопывал одиночный \\n в пробел внутри `<p>`.
+
+### Решения
+- `renderInline` в BlogArticleContent (web + public): одиночный Enter → `<br>`, пустая строка по-прежнему новый абзац.
+- Подсказка под полем «Текст статьи» в ArticlesPage.
+
+### Проблемы
+- Старые MD с «мягкой» разбивкой длинных строк на 80 символов тоже покажут переносы - при необходимости править вручную.
