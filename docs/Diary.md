@@ -2709,3 +2709,19 @@
 
 ### Проблемы
 - Экранирование Bearer в PowerShell при remote curl — не использовать однострочный ssh с вложенными кавычками.
+
+## 2026-07-22 - Admin articles: sync to public + archive/delete + author
+
+### Наблюдения
+- Правки Article из админки писались в Postgres, но Next держал in-memory DTO-кэш статей 5 мин и не ревалидировал /blog.
+- HIDDEN/архив мог «воскресать» через static fallback esolveStaticArticle.
+- В UI не было автора, удаления и явного архива.
+
+### Решения
+- clearPublicArticlesDtoCache на invalidate + в Next /api/internal/revalidate.
+- После create/update/delete: evalidateNextBlogArticle (/blog, slug, city hub).
+- cmsOwned для непубличных slug - без static fallback.
+- Admin: колонка/поле Автор, кнопки «В архив» (HIDDEN) и «Удалить» (DELETE).
+
+### Проблемы
+- После деплоя нужен restart daibilet-api, иначе handlers в API-процессе старые.

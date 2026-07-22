@@ -540,7 +540,7 @@ function CityHeroDefault({
   return (
     <section
       id="top"
-      className="relative min-h-[300px] overflow-hidden border-b border-primary-950 bg-slate-950 text-white sm:min-h-[360px] lg:min-h-[400px]"
+      className="relative min-h-[340px] overflow-hidden border-b border-primary-950 bg-slate-950 text-white sm:min-h-[420px] lg:min-h-[480px]"
     >
       <div
         aria-hidden="true"
@@ -553,7 +553,7 @@ function CityHeroDefault({
           priority
           sizes="(max-width: 1280px) 100vw, 80rem"
           style={{ objectPosition: `${focusX} ${focusY}` }}
-          className="object-cover object-right"
+          className="object-cover"
           fallback={
             <div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950" />
           }

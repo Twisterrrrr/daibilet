@@ -3,7 +3,8 @@ import { citySlug } from '@/lib/routes';
 /** Вертикальное (и при необходимости горизонтальное) кадрирование карточек городов. */
 const CITY_IMAGE_OBJECT_POSITION: Record<string, string> = {
   chelyabinsk: '65% 57%',
-  ekaterinburg: '58% 22%',
+  // Небоскрёбы (Исеть и др.) у верхнего края кадра - якорим к top, иначе hero их срезает.
+  ekaterinburg: '72% 0%',
   irkutsk: '59% 52%',
   izhevsk: '60% 52%',
   kaliningrad: '65% 49%',
