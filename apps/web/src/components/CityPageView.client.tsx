@@ -531,8 +531,8 @@ function CityHeroDefault({
     guide?.brief ||
     `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат, дату и площадку без долгого поиска по разным билетным системам.`;
 
-  // До «обычной» ширины (~1280px) фото на весь hero как раньше.
-  // Шире — плоскость фото не растягиваем: якорим справа, слева нарастает градиент.
+  // Mobile: cover + city focus. Desktop: масштаб по высоте hero (width:auto) -
+  // полная высота фото; при росте ширины режет слева, не сверху/снизу.
   const focusParts = String(heroFocus || 'center 32%').trim().split(/\s+/);
   const focusX = focusParts[0] || 'center';
   const focusY = focusParts[1] || '32%';
@@ -542,6 +542,22 @@ function CityHeroDefault({
       id="top"
       className="relative min-h-[340px] overflow-hidden border-b border-primary-950 bg-slate-950 text-white sm:min-h-[420px] lg:min-h-[480px]"
     >
+      <style>{`
+        @media (min-width: 1024px) {
+          #top .city-hero-photo {
+            inset: auto 0 0 auto !important;
+            left: auto !important;
+            right: 0 !important;
+            top: 0 !important;
+            bottom: 0 !important;
+            width: auto !important;
+            max-width: none !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            object-position: right center !important;
+          }
+        }
+      `}</style>
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-y-0 right-0 z-0 h-full w-full max-w-[80rem]"
@@ -553,7 +569,7 @@ function CityHeroDefault({
           priority
           sizes="(max-width: 1280px) 100vw, 80rem"
           style={{ objectPosition: `${focusX} ${focusY}` }}
-          className="object-cover"
+          className="city-hero-photo object-cover"
           fallback={
             <div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950" />
           }
