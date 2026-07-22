@@ -12,6 +12,18 @@ function absoluteUrl(path: string): string {
   return `${SITE_URL}${path.startsWith('/') ? path : `/${path}`}`;
 }
 
+/** Для шаринга: 1200x630 *-og.* рядом с обложкой блога (Telegram/VK капризны к progressive и «не тому» кадру). */
+function resolveBlogShareImage(coverImageUrl?: string | null): string | undefined {
+  if (!coverImageUrl) return undefined;
+  const raw = coverImageUrl.trim();
+  if (!raw) return undefined;
+  if (/-og\.(jpe?g|png|webp)(\?|$)/i.test(raw)) return absoluteUrl(raw);
+  if (/\/images\/blog\/[^?#]+\.(jpe?g|png|webp)(\?|$)/i.test(raw)) {
+    return absoluteUrl(raw.replace(/(\.(jpe?g|png|webp))(\?|$)/i, '-og$1$3'));
+  }
+  return absoluteUrl(raw);
+}
+
 export function buildBlogArticleBreadcrumbs(article: BlogArticleDto): Array<{ name: string; path: string }> {
   const canonicalPath = article.canonicalPath || `/blog/${article.slug}`;
   const cityLink = resolveBlogCityHref(article.city, article.citySlug);
@@ -30,7 +42,7 @@ export function buildBlogArticleMetadata(article: BlogArticleDto): Metadata {
   const description = article.seoDescription || article.excerpt || article.title;
   const canonicalPath = article.canonicalPath || `/blog/${article.slug}`;
   const canonical = absoluteUrl(canonicalPath);
-  const image = article.coverImageUrl ? absoluteUrl(article.coverImageUrl) : undefined;
+  const image = resolveBlogShareImage(article.coverImageUrl);
   const indexable = article.isIndexable !== false;
 
   return {
@@ -74,7 +86,7 @@ export function buildBlogArticleJsonLd(article: BlogArticleDto): Array<Record<st
   const description = article.seoDescription || article.excerpt || article.title;
   const canonicalPath = article.canonicalPath || `/blog/${article.slug}`;
   const canonical = absoluteUrl(canonicalPath);
-  const image = article.coverImageUrl ? absoluteUrl(article.coverImageUrl) : undefined;
+  const image = resolveBlogShareImage(article.coverImageUrl) || (article.coverImageUrl ? absoluteUrl(article.coverImageUrl) : undefined);
   const breadcrumbs = buildBlogArticleBreadcrumbs(article);
 
   const blocks: Array<Record<string, unknown>> = [

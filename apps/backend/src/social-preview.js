@@ -203,11 +203,16 @@ export async function buildSocialPreviewForPath(db, pathname, builders) {
     const article = payload?.article;
     if (!article) return null;
     const canonicalPath = article.canonicalPath || `/blog/${article.slug}`;
+    const cover = article.coverImageUrl || null;
+    const shareImage =
+      cover && /\/images\/blog\/.+\.(jpe?g|png|webp)$/i.test(cover) && !/-og\./i.test(cover)
+        ? cover.replace(/(\.(jpe?g|png|webp))$/i, '-og$1')
+        : cover;
     return {
       title: article.seoTitle || article.title,
       description: article.seoDescription || article.excerpt || article.title,
       url: canonicalPath,
-      image: article.coverImageUrl || null,
+      image: shareImage,
       redirectPath: canonicalPath,
       type: 'article',
     };
