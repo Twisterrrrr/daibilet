@@ -2810,6 +2810,20 @@
 ### Проблемы
 - Экранирование Bearer в PowerShell при remote curl — не использовать однострочный ssh с вложенными кавычками.
 
+## 2026-07-23 - country-tours: source of runtime rules
+
+### Наблюдения
+- `GET /api/public/landings/country-tours` на legacy API `:4000` и Next route handler получают landing через `buildPublicLandingPageManaged` из `apps/backend/src/dto.js`.
+- `LandingMatch` в этом пути хранит только ручные `PINNED` и `EXCLUDED`; автоматические match rows не формируют public выдачу.
+- Commit `502a282` ужесточил только `landing-rules.ts`, поэтому legacy `dto.js` продолжал матчить концерты и театральные события по словам «Петергоф», «Пушкин» и другим топонимам.
+
+### Решения
+- Синхронизировано правило `country-tours` в `dto.js`: одновременно обязательны экскурсионный и загородный/направленческий сигналы.
+- До F5 изменения landing rules в TypeScript и `dto.js` вносятся парно. Продовый deploy должен перезапустить `daibilet-api`, так как process исполняет исходный ESM `server.js`/`dto.js`.
+
+### Проблемы
+- Локальная оболочка не находит `pnpm`, поэтому backend tests/typecheck можно подтвердить на prod deploy host.
+
 ## 2026-07-22 - Admin articles: sync to public + archive/delete + author
 
 ### Наблюдения

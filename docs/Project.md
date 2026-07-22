@@ -51,7 +51,7 @@ packages/contracts — Zod/types, catalog constants
 packages/config   — shared tsconfig/eslint
 ```
 
-**Read path:** `@daibilet/backend/public-read` → `public-*.dto.ts` (+ lean catalog list-item).
+**Read path:** `@daibilet/backend/public-read` → `public-*.dto.ts` (+ lean catalog list-item). Landing page DTO использует legacy `dto.js` как источник данных и правил. `apps/backend/src/landing-rules.ts` должен оставаться синхронен с `dto.js` до F5.
 
 **Write/sync path:** legacy `server.js` / sync scripts; после sync — `invalidatePublicCaches({ warm: true })` + Next revalidate.
 
