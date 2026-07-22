@@ -203,6 +203,7 @@ SMTP (без env — graceful skip + лог URL): `SMTP_HOST`, `SMTP_FROM`, оп
 - ### CPU/RAM (prod 3.8Gi)
 - Deploy: один controlled restart (deploy/scripts/deploy-prod-next.sh) — не пачкой.
 - TEP **каталог**: предпочтительно out-of-process deploy/cron/tep-catalog-sync.sh / daibilet-tep-catalog-sync.timer; in-process TEP_AUTO_SYNC_ENABLED=0 на prod.
+- TC **каталог**: nightly out-of-process `deploy/cron/tc-catalog-sync.sh` / `daibilet-tc-catalog-sync.timer` (03:20); daytime — только `tc:sync --ids`; post-sync light warm (full warm opt-in `TC_CATALOG_SYNC_FULL_WARM=1`).
 - Public warm: DAIBILET_PUBLIC_STARTUP_WARM=0, warm после sync с delay.
 - OOM watch: deploy/scripts/oom-watch.sh каждые 5 мин + oom-watch-alerts.log.
 - Postgres prod остаётся в Docker (:5437); миграция на host — optional later, только по явному запросу.

@@ -297,6 +297,7 @@ async function upsertRawOrder(client, externalOrderId, order, refs) {
         payload = excluded.payload,
         "payloadHash" = excluded."payloadHash",
         "importedAt" = excluded."importedAt"
+      where "RawImportRecord"."payloadHash" is distinct from excluded."payloadHash"
     `,
     [stableId("raw_tc_order", externalOrderId), SOURCE_ID, externalOrderId, payloadText, sha256(payloadText)],
   );

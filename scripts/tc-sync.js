@@ -92,9 +92,13 @@ async function runIdsSync(options) {
   });
 
   if (!options.skipRevalidate) {
-    const revalidate = spawnSync(process.execPath, [path.join(rootDir, "scripts", "revalidate-next-home.mjs")], {
+    const revalidate = spawnSync(process.execPath, [path.join(rootDir, "scripts", "post-catalog-sync-warm.mjs")], {
       cwd: rootDir,
-      env: process.env,
+      env: {
+        ...process.env,
+        // ids upsert: always light warm (never full stack after small patch)
+        TC_CATALOG_SYNC_FULL_WARM: "0",
+      },
       stdio: "inherit",
       windowsHide: true,
     });
@@ -127,7 +131,8 @@ function runFullSyncPipeline() {
   const steps = [
     ["scripts/tc-full-sync.js"],
     ["scripts/tc-import-catalog.js"],
-    ["scripts/revalidate-next-home.mjs"],
+    // Light revalidate/warm by default; set TC_CATALOG_SYNC_FULL_WARM=1 for nightly full warm.
+    ["scripts/post-catalog-sync-warm.mjs"],
   ];
 
   for (const [script] of steps) {
@@ -191,17 +196,22 @@ function parseIds(raw) {
 
 function printHelp() {
   console.log(`Usage:
-  npm run tc:sync                              # full PUBLIC fetch + import + revalidate
+  npm run tc:sync                              # full PUBLIC fetch + import + light revalidate/warm
   npm run tc:sync -- --ids=id1,id2,id3         # on-demand upsert by Ticketscloud event ids
   npm run tc:sync -- --ids id1,id2 --dry-run   # fetch+normalize only (no DB write)
 
 Flags:
   --ids=... | --ids ...   comma/space-separated Ticketscloud event ids
   --dry-run               with --ids: no DB writes / revalidate
-  --skip-revalidate       with --ids: skip Next home revalidate after upsert
+  --skip-revalidate       with --ids: skip Next/API warm after upsert
   -h, --help              show this help
 
-Does not replace nightly/full sync. Existing events are upserted (prices/dates/images refresh).`);
+Env:
+  TC_CATALOG_SYNC_FULL_WARM=1   full public warm after full sync (venues/cities/landings/admin)
+  (default light warm — preferred for nightly timer)
+
+Does not replace nightly/full sync. Existing events are upserted (prices/dates/images refresh).
+--ids scopes ProviderLink sync to imported Event ids only.`);
 }
 
 function loadRootEnv(projectRoot) {

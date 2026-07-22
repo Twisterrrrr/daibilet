@@ -246,7 +246,7 @@
 
 **Follow-up 2026-07-13:** выполнен `npm run tc:sync` на prod (`213.171.7.16`): 17356 source events, 17082 offers с widgetUrl, 66535 ProviderLink, ~101s. `check:widgets` 4/4 OK после sync.
 
-**Статус:** Активно (defer снят для TC backfill; browser smoke 0.2 — отдельно).
+**Статус:** Активно (defer снят для TC backfill; browser smoke 0.2 ✅ 2026-07-22).
 
 ---
 

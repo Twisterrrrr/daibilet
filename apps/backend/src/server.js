@@ -239,6 +239,27 @@ export async function handleRequest(request, response) {
       return;
     }
 
+    if (route === 'POST /api/internal/public-cache') {
+      const secret = String(process.env.DAIBILET_NEXT_REVALIDATE_SECRET || '').trim();
+      const auth = String(request.headers.authorization || '');
+      const token = auth.startsWith('Bearer ') ? auth.slice(7).trim() : '';
+      if (!secret || token !== secret) {
+        sendJson(response, { error: 'unauthorized' }, 401);
+        return;
+      }
+      const body = await readJsonBody(request).catch(() => ({}));
+      const warmRaw = String(body?.warm ?? body?.mode ?? 'light').toLowerCase();
+      const warm = warmRaw === 'full' || warmRaw === 'true' || warmRaw === '1'
+        ? 'full'
+        : warmRaw === 'false' || warmRaw === '0' || warmRaw === 'none'
+          ? false
+          : 'light';
+      const reason = String(body?.reason || 'internal public-cache').slice(0, 120);
+      invalidatePublicCaches(reason, { warm });
+      sendJson(response, { ok: true, warm: warm || 'none', reason });
+      return;
+    }
+
     if (route === 'GET /api/db/stats') {
       sendJson(response, await db.stats());
       return;
@@ -499,7 +520,11 @@ export async function handleRequest(request, response) {
 
     if (route === 'POST /api/v1/tc/sync' || route === 'POST /api/admin/sources/ticketscloud/sync') {
       const result = await runTicketscloudCatalogSync(url.searchParams);
-      invalidatePublicCaches('ticketscloud catalog sync', { warm: true });
+      // Light warm by default — full warm stacks CPU with import; nightly cron can request full.
+      const warmMode = ['1', 'true', 'full'].includes(String(url.searchParams.get('fullWarm') || '').toLowerCase())
+        ? 'full'
+        : 'light';
+      invalidatePublicCaches('ticketscloud catalog sync', { warm: warmMode });
       sendJson(response, result);
       return;
     }
@@ -984,9 +1009,33 @@ export async function warmPublicCaches(reason) {
     void warmAdminGroupedEventsCache(db, `after:${reason}`).catch((error) => {
       console.warn(`Admin cache warm failed after ${reason}: ${error instanceof Error ? error.message : String(error)}`);
     });
-    return { elapsedMs: elapsed, typed };
+    return { elapsedMs: elapsed, typed, mode: 'full' };
   } catch (error) {
     console.warn(`Public cache warm failed after ${reason}: ${error instanceof Error ? error.message : String(error)}`);
+    return null;
+  }
+}
+
+/** Light warm after catalog sync: core home/catalog only (no venues/cities/landings/admin full rebuild). */
+export async function warmPublicCachesLight(reason) {
+  const startedAt = Date.now();
+  try {
+    const [destinations, preview, stats] = await Promise.all([
+      buildPublicDestinations(db),
+      buildPublicHomePreview(db),
+      buildPublicStats(db),
+    ]);
+    await warmPublicCatalogCache(db);
+    await withPublicResponseCache('events:limit=50', () =>
+      buildCatalogSessions(db, new URLSearchParams({ limit: '50', sort: 'time' })).catch(() => null),
+    );
+    const elapsed = Date.now() - startedAt;
+    console.log(
+      `Public cache light-warmed after ${reason}: ${stats?.stats?.events || preview?.sessions?.length || 0} events, ${destinations?.destinations?.length || 0} destinations in ${elapsed}ms`,
+    );
+    return { elapsedMs: elapsed, mode: 'light' };
+  } catch (error) {
+    console.warn(`Public cache light warm failed after ${reason}: ${error instanceof Error ? error.message : String(error)}`);
     return null;
   }
 }
@@ -1001,11 +1050,20 @@ export function invalidatePublicCaches(reason, options = {}) {
       console.warn(`Public cache invalidator failed: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
-  if (options.warm) {
-    // Soft-expire admin list so UI stays fast (SWR) while rebuild catches import changes.
+  const warmMode = resolveWarmMode(options);
+  if (warmMode === 'full') {
     invalidateAdminGroupedEventsCache(db, `public:${reason}`);
     void warmPublicCaches(reason);
+  } else if (warmMode === 'light') {
+    void warmPublicCachesLight(reason);
   }
+}
+
+function resolveWarmMode(options = {}) {
+  if (options.warm === 'light' || options.warmMode === 'light') return 'light';
+  if (options.warm === 'full' || options.warmMode === 'full') return 'full';
+  if (options.warm === true) return 'full';
+  return 'none';
 }
 
 export function registerPublicCacheInvalidator(invalidator) {

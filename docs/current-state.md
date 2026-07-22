@@ -153,7 +153,7 @@ Read path: `@daibilet/backend/public-read` → `public-*.dto.ts` (+ частич
 
 ## Немедленные next steps (приоритет)
 
-1. **Этап 0:** Admin smoke (0.3) → отметить в Tasktracker; browser smoke 0.2 ✅.
+1. **Этап 0 smoke:** ✅ browser 0.2 + admin 0.3 (2026-07-22). Дальше — gaps этапа 1 / L.3 TC nightly sync.
 2. **Этап 1:** event/city breadcrumbs + JSON-LD SSR (один PR).
 3. **Deploy:** `pnpm deploy:preflight` + выкат HeaderSearch / multievent.
 

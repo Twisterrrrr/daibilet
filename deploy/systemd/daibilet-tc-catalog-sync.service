@@ -1,0 +1,29 @@
+# Optional: out-of-process TC catalog sync (nightly). Prefer over ad-hoc daytime full sync on 3.8Gi.
+# Install:
+#   cp deploy/systemd/daibilet-tc-catalog-sync.service /etc/systemd/system/
+#   cp deploy/systemd/daibilet-tc-catalog-sync.timer /etc/systemd/system/
+#   systemctl daemon-reload && systemctl enable --now daibilet-tc-catalog-sync.timer
+# On-demand daytime: npm run tc:sync -- --ids=...
+[Unit]
+Description=Daibilet Ticketscloud catalog sync (oneshot)
+After=network-online.target daibilet-api.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/daibilet
+Environment=APP_DIR=/opt/daibilet
+Environment=TC_SYNC_NICE=15
+# Nightly: keep warm light unless explicitly overridden in drop-in / env file.
+Environment=TC_CATALOG_SYNC_FULL_WARM=0
+Nice=15
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+MemoryHigh=700M
+MemoryMax=900M
+ExecStart=/opt/daibilet/deploy/cron/tc-catalog-sync.sh
+StandardOutput=append:/var/log/daibilet/tc-catalog-sync.log
+StandardError=append:/var/log/daibilet/tc-catalog-sync.log
+
+[Install]
+WantedBy=multi-user.target

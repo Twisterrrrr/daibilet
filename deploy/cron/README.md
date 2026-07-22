@@ -2,6 +2,39 @@
 
 После deploy фаз A–D на staging/prod.
 
+## Prod: Ticketscloud catalog sync (nightly, out-of-process)
+
+Полный `tc:sync` тяжёлый для 3.8Gi — **не** гонять днём. Онлайн-правки: `npm run tc:sync -- --ids=...`.
+
+```bash
+chmod +x /opt/daibilet/deploy/cron/tc-catalog-sync.sh
+mkdir -p /var/log/daibilet
+```
+
+Systemd (предпочтительно, 1×/сутки 03:20):
+
+```bash
+cp /opt/daibilet/deploy/systemd/daibilet-tc-catalog-sync.service /etc/systemd/system/
+cp /opt/daibilet/deploy/systemd/daibilet-tc-catalog-sync.timer /etc/systemd/system/
+systemctl daemon-reload && systemctl enable --now daibilet-tc-catalog-sync.timer
+systemctl list-timers | grep tc-catalog
+```
+
+Или cron:
+
+```
+20 3 * * * APP_DIR=/opt/daibilet /opt/daibilet/deploy/cron/tc-catalog-sync.sh >> /var/log/daibilet/tc-catalog-sync.log 2>&1
+```
+
+| Setting | Value |
+|---------|-------|
+| Schedule | nightly 03:20 |
+| Isolation | flock + nice 15 + ionice best-effort |
+| Memory | MemoryHigh 700M / MemoryMax 900M (systemd) |
+| Post-sync | light Next revalidate + light API warm (`TC_CATALOG_SYNC_FULL_WARM=0`) |
+| Full warm | set `TC_CATALOG_SYNC_FULL_WARM=1` in service drop-in if needed |
+| Log | `/var/log/daibilet/tc-catalog-sync.log` |
+
 ## Prod: Ticketscloud orders-only (обязательно для зеркала заказов)
 
 Только `npm run tc:orders` — **не** каталог (`tc:sync` / `tep:sync`).

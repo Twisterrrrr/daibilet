@@ -469,6 +469,7 @@ async function upsertRawRecord(client, externalId, payload) {
         payload = excluded.payload,
         "payloadHash" = excluded."payloadHash",
         "importedAt" = excluded."importedAt"
+      where "RawImportRecord"."payloadHash" is distinct from excluded."payloadHash"
     `,
     [`raw_tep_event_${externalId}`, TEPL0HOD_SOURCE_ID, externalId, payloadText, sha256(payloadText)],
   );

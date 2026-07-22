@@ -110,9 +110,11 @@ async function importCatalogEvents(catalog, options = {}) {
       ],
     );
 
+    const importedEventIds = [];
     for (const event of catalog) {
       importedExternalIds.add(String(event.externalId));
       const rowStats = await importCatalogEvent(client, event, summary);
+      if (rowStats.eventId) importedEventIds.push(rowStats.eventId);
       stats.importedEvents += 1;
       stats.sessions += rowStats.sessions;
       stats.offers += rowStats.offers;
@@ -136,8 +138,13 @@ async function importCatalogEvents(catalog, options = {}) {
       stats.missingFromCatalog = missingResult.rows[0]?.count ?? 0;
     }
 
-    const providerLinkStats = await syncProviderLinksForSource(client, TICKETSCLOUD_SOURCE_ID);
+    const providerLinkStats = await syncProviderLinksForSource(
+      client,
+      TICKETSCLOUD_SOURCE_ID,
+      skipMissingFromCatalog ? { eventIds: importedEventIds } : undefined,
+    );
     stats.providerLinks = providerLinkStats.total;
+    stats.providerLinksFiltered = Boolean(skipMissingFromCatalog);
 
     const afterResult = await client.query(
       `select count(*)::int as count from "EventSourceLink" where "sourceId" = $1`,
@@ -181,9 +188,10 @@ async function importCatalogEvents(catalog, options = {}) {
 }
 
 async function importCatalogEvent(client, event, summary) {
-  const rowStats = { sessions: 0, offers: 0, tags: 0, venue: false, city: false, hasWidgetUrl: false };
+  const rowStats = { eventId: null, sessions: 0, offers: 0, tags: 0, venue: false, city: false, hasWidgetUrl: false };
   const externalId = String(event.externalId);
   const eventId = id("evt", externalId);
+  rowStats.eventId = eventId;
   const venue = event.venue || {};
   const city = venue.city || {};
   const cityId = city.id ? id("city", city.id) : null;
@@ -334,6 +342,7 @@ async function importCatalogEvent(client, event, summary) {
         payload = excluded.payload,
         "payloadHash" = excluded."payloadHash",
         "importedAt" = excluded."importedAt"
+      where "RawImportRecord"."payloadHash" is distinct from excluded."payloadHash"
     `,
     [`raw_tc_event_${externalId}`, TICKETSCLOUD_SOURCE_ID, externalId, payloadText, sha256(payloadText)],
   );
