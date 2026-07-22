@@ -26,7 +26,7 @@ import { venuePageTemplate } from '@/lib/venue-meta';
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { landingPageHref } from '@/lib/landing-routes';
 import { eventHref, sessionVenueHref, venueHref } from '@/lib/routes';
-import { inCityPrepositional } from '@/lib/city-declension';
+import { inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
 import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
 import { isOpenDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import {
@@ -1009,39 +1009,41 @@ function CityTravelSection({
   return (
     <section
       id="travel"
-      className={`py-10 ${nested ? '' : `${SECTION_SCROLL_MT} border-b`} ${
+      className={`py-8 sm:py-10 ${nested ? '' : `${SECTION_SCROLL_MT} border-b`} ${
         nested
           ? editorial
-            ? 'bg-white/50'
-            : 'bg-slate-50/60'
+            ? 'bg-zinc-50'
+            : 'bg-slate-50'
           : editorial
-            ? 'border-zinc-200 bg-white/50'
-            : 'border-slate-100 bg-slate-50/60'
+            ? 'border-zinc-200 bg-zinc-50'
+            : 'border-slate-100 bg-slate-50'
       }`}
     >
-      <div className="container-page max-w-3xl">
-        <h3
-          className={
-            editorial
-              ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
-              : 'text-2xl font-bold text-slate-950'
-          }
-        >
-          Как добраться и когда ехать
-        </h3>
-        <p className={`mt-4 text-sm leading-7 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>{travel}</p>
-        <a
-          href="#affiche"
-          onClick={(event) => {
-            event.preventDefault();
-            scrollToSection('affiche');
-          }}
-          className={`mt-5 inline-flex text-sm font-semibold ${
-            editorial ? 'text-zinc-900 underline-offset-4 hover:underline' : 'text-primary-700 hover:text-primary-800'
-          }`}
-        >
-          К афише →
-        </a>
+      <div className="container-page">
+        <div className="max-w-3xl">
+          <h3
+            className={
+              editorial
+                ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
+                : 'text-2xl font-bold text-slate-950'
+            }
+          >
+            Как добраться и когда ехать
+          </h3>
+          <p className={`mt-4 text-sm leading-7 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>{travel}</p>
+          <a
+            href="#affiche"
+            onClick={(event) => {
+              event.preventDefault();
+              scrollToSection('affiche');
+            }}
+            className={`mt-5 inline-flex text-sm font-semibold ${
+              editorial ? 'text-zinc-900 underline-offset-4 hover:underline' : 'text-primary-700 hover:text-primary-800'
+            }`}
+          >
+            К афише →
+          </a>
+        </div>
       </div>
     </section>
   );
@@ -1389,17 +1391,19 @@ function CitySeoTextSection({
         editorial ? 'border-zinc-200 bg-white/60' : 'border-slate-100 bg-slate-50/70'
       }`}
     >
-      <div className="container-page max-w-3xl">
-        <h2
-          className={
-            editorial
-              ? 'font-serif text-3xl font-semibold text-zinc-950'
-              : 'text-2xl font-bold text-slate-900'
-          }
-        >
-          Афиша {cityName}
-        </h2>
-        <p className={`mt-4 text-sm leading-7 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>{text}</p>
+      <div className="container-page">
+        <div className="max-w-3xl">
+          <h2
+            className={
+              editorial
+                ? 'font-serif text-3xl font-semibold text-zinc-950'
+                : 'text-2xl font-bold text-slate-900'
+            }
+          >
+            Афиша {cityName}
+          </h2>
+          <p className={`mt-4 text-sm leading-7 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>{text}</p>
+        </div>
       </div>
     </section>
   );
@@ -1417,64 +1421,69 @@ function CityFaqSection({
   nested?: boolean;
 }) {
   const [openIndex, setOpenIndex] = React.useState<number | null>(0);
+  const cityGenitive = cityToGenitive(cityName);
 
   return (
     <section
       id="faq"
-      className={`py-12 ${nested ? '' : `${SECTION_SCROLL_MT} border-t`} ${
+      className={`py-8 sm:py-10 ${nested ? '' : `${SECTION_SCROLL_MT} border-t`} ${
         nested ? '' : editorial ? 'border-zinc-200' : 'border-slate-100'
       }`}
     >
       <div className="container-page">
-        <h3
-          className={
-            editorial
-              ? 'mb-2 text-center font-serif text-2xl font-semibold text-zinc-950 md:text-3xl'
-              : 'mb-2 text-center text-2xl font-bold text-slate-900 md:text-3xl'
-          }
-        >
-          Частые вопросы
-        </h3>
-        <p className={`mb-8 text-center ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-          Ответы о городе и афише {cityName}
-        </p>
-        <div className="mx-auto max-w-3xl space-y-2">
-          {items.map((item, index) => {
-            const open = openIndex === index;
-            return (
-              <div
-                key={`${item.question}:${index}`}
-                className={`rounded-xl border transition-colors ${
-                  editorial
-                    ? 'border-zinc-200 bg-white hover:border-zinc-300'
-                    : 'border-slate-200 bg-white hover:border-slate-300'
-                }`}
-              >
-                <button
-                  type="button"
-                  aria-expanded={open}
-                  onClick={() => setOpenIndex(open ? null : index)}
-                  className={`flex w-full cursor-pointer items-center justify-between gap-3 p-4 text-left text-sm font-medium ${
-                    editorial ? 'text-zinc-900' : 'text-slate-900'
+        <div className="max-w-3xl">
+          <h3
+            className={
+              editorial
+                ? 'mb-2 font-serif text-2xl font-semibold text-zinc-950 md:text-3xl'
+                : 'mb-2 text-2xl font-bold text-slate-900 md:text-3xl'
+            }
+          >
+            Частые вопросы
+          </h3>
+          <p className={`mb-6 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+            Ответы о городе и афише {cityGenitive}
+          </p>
+          <div className="space-y-2">
+            {items.map((item, index) => {
+              const open = openIndex === index;
+              return (
+                <div
+                  key={`${item.question}:${index}`}
+                  className={`rounded-xl border transition-colors ${
+                    editorial
+                      ? 'border-zinc-200 bg-white hover:border-zinc-300'
+                      : 'border-slate-200 bg-white hover:border-slate-300'
                   }`}
                 >
-                  <span className="pr-2">{item.question}</span>
-                  <span
-                    className={`shrink-0 transition-transform ${editorial ? 'text-zinc-400' : 'text-slate-400'} ${
-                      open ? 'rotate-180' : ''
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    onClick={() => setOpenIndex(open ? null : index)}
+                    className={`flex w-full cursor-pointer items-center justify-between gap-3 p-4 text-left text-sm font-medium ${
+                      editorial ? 'text-zinc-900' : 'text-slate-900'
                     }`}
                   >
-                    ▾
-                  </span>
-                </button>
-                {open ? (
-                  <div className={`px-4 pb-4 text-sm leading-relaxed ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-                    {item.answer}
-                  </div>
-                ) : null}
-              </div>
-            );
-          })}
+                    <span className="pr-2">{item.question}</span>
+                    <span
+                      className={`shrink-0 transition-transform ${editorial ? 'text-zinc-400' : 'text-slate-400'} ${
+                        open ? 'rotate-180' : ''
+                      }`}
+                    >
+                      ▾
+                    </span>
+                  </button>
+                  {open ? (
+                    <div
+                      className={`px-4 pb-4 text-sm leading-relaxed ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}
+                    >
+                      {item.answer}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
