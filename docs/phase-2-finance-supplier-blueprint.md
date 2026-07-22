@@ -327,6 +327,13 @@ Implemented admin moderation/read API slice 2026-07-10:
 - supplier events/venues;
 - readiness for internal checkout.
 
+Статус 2026-07-22:
+
+- ✅ contracts + Prisma read API: `GET /api/admin/suppliers`, `GET /api/admin/suppliers/:id`;
+- ✅ admin page `/suppliers` с readiness, событиями, заказами, ledger/finance summary и отзывами;
+- ✅ readiness guardrails покрыты unit-тестом;
+- ⏳ write actions отложены: создание/редактирование поставщика, legal/bank update, payment settings update.
+
 ### Phase 2.3: checkout sandbox
 
 - one manual/internal event;

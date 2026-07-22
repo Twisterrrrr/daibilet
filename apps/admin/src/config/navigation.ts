@@ -13,6 +13,7 @@ import {
   Settings,
   UserRound,
   GitPullRequest,
+  Handshake,
 } from 'lucide-react';
 
 export type NavZoneId = 'work' | 'hubs' | 'system';
@@ -38,6 +39,7 @@ export const NAV_ZONES: NavZone[] = [
         ? [{ id: 'change-requests', title: 'Заявки на изменения', path: '/change-requests', icon: GitPullRequest }]
         : []),
       { id: 'orders', title: 'Заказы', path: '/orders', icon: Receipt },
+      { id: 'suppliers', title: 'Поставщики', path: '/suppliers', icon: Handshake },
       { id: 'reviews', title: 'Отзывы', path: '/reviews', icon: MessageSquareQuote },
       { id: 'buyers', title: 'Покупатели', path: '/buyers', icon: UserRound },
     ],

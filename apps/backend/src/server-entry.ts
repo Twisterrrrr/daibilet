@@ -10,6 +10,8 @@ import { createAdminLandingsRouteHandler } from './admin-landings-handler.js';
 import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
 import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler.js';
 import { buildAdminOrdersListDto } from './admin-orders.dto.js';
+import { createAdminSuppliersRouteHandler } from './admin-suppliers-handler.js';
+import { buildAdminSupplierDetailDto, buildAdminSuppliersListDto } from './admin-suppliers.dto.js';
 import { createAdminAuthConfig } from './auth.js';
 import { readBackendEnv } from './env.js';
 import { updateAdminEventOverride, updateAdminLandingMatch, upsertAdminOrderTicket } from './dto.js';
@@ -93,6 +95,10 @@ const server = startServer({
         enabled: adminFlags.events,
         buildEventsList: buildAdminEventsListDto,
         buildEventDetail: buildAdminEventDetailDto,
+      }),
+      createAdminSuppliersRouteHandler({
+        buildSuppliersList: buildAdminSuppliersListDto,
+        buildSupplierDetail: buildAdminSupplierDetailDto,
       }),
       createAdminOrdersRouteHandler({
         db,

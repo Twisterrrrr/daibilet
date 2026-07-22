@@ -263,3 +263,16 @@ Daily scan saleable public catalog texts (`title`/`description` + override) на
 - [ai-journalists/README.md](./ai-journalists/README.md) — ИИ-колонки / персоны
 - [decision-log.md](./decision-log.md) — архитектурные решения
 - [current-state.md](./current-state.md) — оперативный статус
+
+---
+
+## Phase 2 Supplier Control Plane (2026-07-22)
+
+Первый безопасный срез финконтура сделан как read/control-plane foundation, без включения реальной оплаты:
+
+- backend: `GET /api/admin/suppliers`, `GET /api/admin/suppliers/:id`;
+- contracts: `AdminSuppliersListDto`, `AdminSupplierDetailDto`, readiness-коды;
+- admin: страница `/suppliers` с поиском, статусами, readiness, событиями, заказами, финсводкой;
+- guardrail: внутренний checkout нельзя считать готовым без активного поставщика, владельца ЛК, verified legal profile, основного банковского счета, комиссии и YooKassa shop id.
+
+Это не меняет Phase 1 widget-first: TC/Teplohod продажи остаются через виджеты, `ExternalOrder` остается отдельным контуром.
