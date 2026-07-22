@@ -3,7 +3,7 @@ import { citySlug } from '@/lib/routes';
 /** Вертикальное (и при необходимости горизонтальное) кадрирование карточек городов. */
 const CITY_IMAGE_OBJECT_POSITION: Record<string, string> = {
   chelyabinsk: '65% 57%',
-  ekaterinburg: '54% 56%',
+  ekaterinburg: '58% 22%',
   irkutsk: '59% 52%',
   izhevsk: '60% 52%',
   kaliningrad: '65% 49%',
@@ -62,7 +62,7 @@ type CityFocusSource = {
 export function resolveCityImageObjectPosition(city: CityFocusSource): string {
   const slug = citySlug(city);
   const key = SLUG_ALIASES[slug] || slug;
-  return CITY_IMAGE_OBJECT_POSITION[key] || 'center 45%';
+  return CITY_IMAGE_OBJECT_POSITION[key] || 'center 32%';
 }
 
 export function cityImageObjectPositionClass(city: CityFocusSource): string {

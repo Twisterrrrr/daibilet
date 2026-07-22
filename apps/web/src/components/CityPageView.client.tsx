@@ -533,14 +533,14 @@ function CityHeroDefault({
 
   // До «обычной» ширины (~1280px) фото на весь hero как раньше.
   // Шире — плоскость фото не растягиваем: якорим справа, слева нарастает градиент.
-  const focusParts = String(heroFocus || 'center 45%').trim().split(/\s+/);
+  const focusParts = String(heroFocus || 'center 32%').trim().split(/\s+/);
   const focusX = focusParts[0] || 'center';
-  const focusY = focusParts[1] || '45%';
+  const focusY = focusParts[1] || '32%';
 
   return (
     <section
       id="top"
-      className="relative min-h-[280px] overflow-hidden border-b border-primary-950 bg-slate-950 text-white sm:min-h-[320px]"
+      className="relative min-h-[300px] overflow-hidden border-b border-primary-950 bg-slate-950 text-white sm:min-h-[360px] lg:min-h-[400px]"
     >
       <div
         aria-hidden="true"
@@ -553,7 +553,7 @@ function CityHeroDefault({
           priority
           sizes="(max-width: 1280px) 100vw, 80rem"
           style={{ objectPosition: `${focusX} ${focusY}` }}
-          className="object-cover"
+          className="object-cover object-right"
           fallback={
             <div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950" />
           }
