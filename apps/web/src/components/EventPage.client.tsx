@@ -14,6 +14,7 @@ import {
   formatAgeLimit,
   formatBuyCardPrice,
   formatCategoryPrice,
+  formatHeroBuyButtonPrice,
   formatPriceRub,
   formatVacantSeats,
   getTicketPriceRange,
@@ -115,7 +116,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
           </ul>
         </div>
       ) : priceRange && priceRange.min !== priceRange.max ? (
-        <p className="mt-3 text-sm text-slate-500">Полный список категорий — в виджете при покупке.</p>
+        <p className="mt-3 text-sm text-slate-500">Полный список категорий - в виджете при покупке.</p>
       ) : null}
 
       {!showMultiPurchase && visibleSessions.length > 0 ? (
@@ -180,7 +181,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
         </div>
       ) : (
         <p className="mt-5 text-xs leading-relaxed text-slate-500">
-          Выберите комплект и нажмите «Купить» напротив нужного варианта — откроется виджет Ticketscloud.
+          Выберите комплект и нажмите «Купить» напротив нужного варианта - откроется виджет Ticketscloud.
         </p>
       )}
 
@@ -201,7 +202,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
 
 function StaticSessionRow({ session }: { session: EventSession }) {
   const flexibleSchedule = isFlexibleScheduleSession(session);
-  const weekday = session.dateLabel?.split(',')[0]?.trim() || '—';
+  const weekday = session.dateLabel?.split(',')[0]?.trim() || '-';
 
   return (
     <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2.5">
@@ -213,7 +214,7 @@ function StaticSessionRow({ session }: { session: EventSession }) {
         ) : null}
         <div>
           <p className="text-sm font-medium text-slate-900">
-            {flexibleSchedule ? FLEXIBLE_SCHEDULE_LABEL : session.dateLabel || '—'}
+            {flexibleSchedule ? FLEXIBLE_SCHEDULE_LABEL : session.dateLabel || '-'}
           </p>
           {session.timeLabel && !flexibleSchedule ? (
             <p className="text-xs text-slate-500">{session.timeLabel}</p>
@@ -244,12 +245,8 @@ export function EventHeroBuyButton({
   const sessions = payload.sessions ?? [];
   const offers = payload.offers ?? [];
   const trimmedPrice = priceLabel.trim();
-  const isFromPrice = /^от\s+/i.test(trimmedPrice);
-  const normalizedPrice = trimmedPrice.replace(/^от\s+/i, '').trim();
-  const label = normalizedPrice
-    ? isFromPrice
-      ? `Купить билет — от ${normalizedPrice}`
-      : `Купить билет — ${normalizedPrice}`
+  const label = trimmedPrice
+    ? `Купить билет - ${trimmedPrice}`
     : 'Купить билет';
   const purchaseOptions = payload.purchaseOptions ?? [];
   const showMultiPurchase = purchaseOptions.length >= 2;
@@ -330,7 +327,11 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
   const { event, stats } = payload;
   const ageLimit = formatAgeLimit(event.ageLimit);
   const priceRange = getTicketPriceRange(payload);
-  const priceLabel = priceRange ? formatBuyCardPrice(priceRange) : formatPriceRub(stats.priceFrom ?? event.priceFrom) || '';
+  const priceLabel = priceRange
+    ? formatHeroBuyButtonPrice(priceRange)
+    : formatPriceRub(stats.priceFrom ?? event.priceFrom)
+      ? `от ${formatPriceRub(stats.priceFrom ?? event.priceFrom)}`
+      : '';
   const heroImage = String(event.imageUrl || '').trim();
   const nextSession = pickRepresentativeSession((payload.sessions ?? []) as EventSession[]);
   const venueLink = event.venue
@@ -415,7 +416,7 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
                 <span className="flex items-center gap-1.5">
                   <Calendar className="h-4 w-4" />
                   {isFlexibleScheduleSession(nextSession) || !nextSession.startsAt
-                    ? 'Ближайший рейс — в виджете'
+                    ? 'Ближайший рейс - в виджете'
                     : `Ближайший: ${[nextSession.dateLabel, nextSession.timeLabel].filter(Boolean).join(', ')}`}
                 </span>
               ) : null}

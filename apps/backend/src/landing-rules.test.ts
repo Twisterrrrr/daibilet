@@ -39,6 +39,36 @@ test('keeps city and venue landing constraints strict', () => {
   );
 });
 
+test('requires an excursion signal for country tours', () => {
+  const countryTours = findLandingRule('country-tours');
+  assert.ok(countryTours);
+
+  assert.equal(matchesLandingRule({
+    title: 'Автобусная экскурсия в Петергоф',
+    category: 'Экскурсии',
+    subcategories: ['Автобусные экскурсии'],
+    city: 'Санкт-Петербург',
+  }, countryTours), true);
+  assert.equal(matchesLandingRule({
+    title: 'Тур в Выборг - шведское сердце России',
+    category: 'Экскурсии',
+    subcategories: ['Автобусный тур'],
+    city: 'Санкт-Петербург',
+  }, countryTours), true);
+
+  for (const candidate of [
+    { title: 'Концерт в Большом Петергофском дворце', category: 'Музыка' },
+    { title: 'Пиковая дама. Салонные чтения повести Пушкина', category: 'Театр' },
+    { title: 'Мастер-класс в Павловске', category: 'Мастер-классы' },
+    { title: 'Экскурсия в Кронштадт', category: 'Экскурсии', city: 'Москва' },
+  ]) {
+    assert.equal(matchesLandingRule({
+      ...candidate,
+      city: candidate.city || 'Санкт-Петербург',
+    }, countryTours), false, candidate.title);
+  }
+});
+
 test('applies canonical subcategory rules and Moscow-time schedule', () => {
   assert.equal(matchingLandingSlugs({
     title: 'Обзорная экскурсия по городу',

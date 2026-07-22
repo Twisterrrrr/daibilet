@@ -62,51 +62,70 @@ export function formatPriceRub(value?: number | null): string | null {
   return `${formatNumber(Math.round(value))} ₽`;
 }
 
-export function getTicketPriceRange(payload: PublicEventPageDto): { min: number; max: number } | null {
-  const values: number[] = [];
+export type TicketPriceRange = {
+  min: number;
+  max: number;
+};
 
-  if (Array.isArray(payload.purchaseOptions) && payload.purchaseOptions.length) {
-    for (const option of payload.purchaseOptions) {
-      if (typeof option.priceFrom === 'number' && option.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
-        values.push(option.priceFrom);
-      }
-    }
-  }
+function knownPrice(value?: number | null): value is number {
+  return typeof value === 'number' && value >= MIN_DISPLAY_PRICE_RUB;
+}
 
-  if (Array.isArray(payload.ticketPrices) && payload.ticketPrices.length) {
-    for (const item of payload.ticketPrices) {
-      if (item.priceRub >= MIN_DISPLAY_PRICE_RUB) values.push(item.priceRub);
-    }
-  } else {
-    for (const offer of payload.offers ?? []) {
-      if (offer.active !== false && typeof offer.priceRub === 'number' && offer.priceRub >= MIN_DISPLAY_PRICE_RUB) {
-        values.push(offer.priceRub);
-      }
-    }
-    if (typeof payload.stats.priceFrom === 'number' && payload.stats.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
-      values.push(payload.stats.priceFrom);
-    }
-    if (typeof payload.event.priceFrom === 'number' && payload.event.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
-      values.push(payload.event.priceFrom);
-    }
-  }
-
-  for (const session of payload.sessions ?? []) {
-    if (typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB) {
-      values.push(session.priceFrom);
-    }
-  }
-
+function rangeFromExactPrices(values: number[]): TicketPriceRange | null {
   if (!values.length) return null;
   return { min: Math.min(...values), max: Math.max(...values) };
 }
 
-export function formatBuyCardPrice(range: { min: number; max: number }): string {
+export function getTicketPriceRange(payload: PublicEventPageDto): TicketPriceRange | null {
+  const exactValues: number[] = [];
+
+  if (Array.isArray(payload.ticketPrices) && payload.ticketPrices.length) {
+    for (const item of payload.ticketPrices) {
+      if (knownPrice(item.priceRub)) exactValues.push(item.priceRub);
+    }
+  }
+
+  // `ticketPrices` are the canonical, exact categories on the event page.
+  // They take precedence over summary `priceFrom` fields.
+  const ticketPriceRange = rangeFromExactPrices(exactValues);
+  if (ticketPriceRange) return ticketPriceRange;
+
+  for (const offer of payload.offers ?? []) {
+    if (offer.active !== false && knownPrice(offer.priceRub)) {
+      exactValues.push(offer.priceRub);
+    }
+  }
+  const offerPriceRange = rangeFromExactPrices(exactValues);
+  if (offerPriceRange) return offerPriceRange;
+
+  const sessionPrices: number[] = [];
+  for (const session of payload.sessions ?? []) {
+    if (knownPrice(session.priceFrom)) sessionPrices.push(session.priceFrom);
+    if (knownPrice(session.priceTo)) sessionPrices.push(session.priceTo);
+  }
+  const sessionPriceRange = rangeFromExactPrices(sessionPrices);
+  if (sessionPriceRange) return sessionPriceRange;
+
+  const fallbackPrices: number[] = [];
+  for (const option of payload.purchaseOptions ?? []) {
+    if (knownPrice(option.priceFrom)) fallbackPrices.push(option.priceFrom);
+  }
+  if (knownPrice(payload.stats.priceFrom)) fallbackPrices.push(payload.stats.priceFrom);
+  if (knownPrice(payload.event.priceFrom)) fallbackPrices.push(payload.event.priceFrom);
+
+  return rangeFromExactPrices(fallbackPrices);
+}
+
+export function formatBuyCardPrice(range: TicketPriceRange): string {
   const min = Math.round(range.min);
   const max = Math.round(range.max);
-  // Одна цена (одна категория / один тариф) — без «от».
   if (min === max) return `${formatNumber(min)} ₽`;
-  return `${formatNumber(min)} – ${formatNumber(max)} ₽`;
+  return `${formatNumber(min)} - ${formatNumber(max)} ₽`;
+}
+
+/** Hero CTA intentionally advertises only the minimum available price. */
+export function formatHeroBuyButtonPrice(range: TicketPriceRange): string {
+  return `от ${formatNumber(Math.round(range.min))} ₽`;
 }
 
 export type TicketCategoryRow = {
@@ -279,7 +298,7 @@ export function buildGroupedTicketCategories(payload: PublicEventPageDto): Ticke
 
 export function formatCategoryPrice(minPrice: number, maxPrice: number): string {
   if (minPrice === maxPrice) return `${formatNumber(Math.round(minPrice))} ₽`;
-  return `${formatNumber(Math.round(minPrice))} – ${formatNumber(Math.round(maxPrice))} ₽`;
+  return `${formatNumber(Math.round(minPrice))} - ${formatNumber(Math.round(maxPrice))} ₽`;
 }
 
 export function scrollToBuyCard() {
