@@ -13,7 +13,7 @@
 
 | Этап | Фокус | Прогресс | Блокер закрытия |
 |------|--------|----------|-----------------|
-| **0** | Post-cutover hardening: smoke, widgets, admin, backfill | **~90%** 🔄 | Browser widget smoke + SQL catalog read-model (0.5.8) |
+| **0** | Post-cutover hardening: smoke, widgets, admin, backfill | **~95%** 🔄 | Browser smoke ✅ 2026-07-22; остаётся Admin smoke (0.3) |
 | **1** | Public parity: поиск, breadcrumbs, city FAQ/SEO | **~70%** 🔄 | event/city structured data |
 | **2** | SEO foundation: sitemap + SSR JSON-LD | **~70%** 🔄 | sitemap index+chunks ✅; JSON-LD event ✅; city FAQ ⏳ |
 | **3+** | Admin Next, dto retire, Phase G finance | ⏳ | После 0–2 |
@@ -78,12 +78,13 @@ npm run check:widgets -- --base https://daibilet.ru
 
 | Slug | Провайдер | API `check:widgets` | Browser «Купить» |
 |------|-----------|---------------------|------------------|
-| `tc-6a266b49465e94f72b4ef8f6-interaktivnaya-vystavka-nyuton-park` | TC | ✅ 2026-07-13 | ⏳ |
-| `tc-6a3582f0bbd948da83dece6e-kombo-kvest` | TC | ✅ 2026-07-13 | ⏳ |
-| `progulka-ot-prichala-kitai-gorod-do-prichala-kievskii-826` | Teplohod | ✅ 2026-07-13 | ⏳ |
-| `centralnaya-krugovaya-rechnaya-progulka-ot-parka-zaryade-ves-centr-za-chas-683` | Teplohod | ✅ 2026-07-13 | ⏳ |
+| `tc-6a266b49465e94f72b4ef8f6-interaktivnaya-vystavka-nyuton-park` | TC | ✅ 2026-07-13 | ✅ 2026-07-22 |
+| `tc-6a3582f0bbd948da83dece6e-kombo-kvest` | TC | ✅ 2026-07-13 | ✅ 2026-07-22 |
+| `progulka-ot-prichala-kitai-gorod-do-prichala-kievskii-826` | Teplohod | ✅ 2026-07-13 | ✅ 2026-07-22 |
+| `centralnaya-krugovaya-rechnaya-progulka-ot-parka-zaryade-ves-centr-za-chas-683` | Teplohod | ✅ 2026-07-13 | ✅ 2026-07-22 |
 
-**Критерий OK:** hard refresh → «Купить» → модал TC / iframe Teplohod без console error.
+**Критерий OK:** hard refresh → «Купить» → модал TC / iframe Teplohod без console error.  
+**Закрыто 2026-07-22** (ручное подтверждение на prod).
 
 ### Admin smoke (`http://127.0.0.1:4000` + static admin)
 
@@ -149,7 +150,7 @@ Read path: `@daibilet/backend/public-read` → `public-*.dto.ts` (+ частич
 
 ## Немедленные next steps (приоритет)
 
-1. **Этап 0:** browser smoke 4 slug + admin smoke → отметить в Tasktracker.
+1. **Этап 0:** Admin smoke (0.3) → отметить в Tasktracker; browser smoke 0.2 ✅.
 2. **Этап 1:** event/city breadcrumbs + JSON-LD SSR (один PR).
 3. **Deploy:** `pnpm deploy:preflight` + выкат HeaderSearch / multievent.
 

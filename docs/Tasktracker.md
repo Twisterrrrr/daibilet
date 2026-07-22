@@ -176,18 +176,20 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | # | Slug | TC / TEP | API check | Browser «Купить» | Статус |
 |---|------|----------|-----------|------------------|--------|
-| 0.2.1 | `tc-6a266b49465e94f72b4ef8f6-interaktivnaya-vystavka-nyuton-park` | TC | ✅ 2026-07-13 | ⏳ | ⏳ |
-| 0.2.2 | `tc-6a3582f0bbd948da83dece6e-kombo-kvest` | TC | ✅ 2026-07-13 | ⏳ | ⏳ |
-| 0.2.3 | `progulka-ot-prichala-kitai-gorod-do-prichala-kievskii-826` | TEP | ✅ 2026-07-13 | ⏳ | ⏳ |
-| 0.2.4 | `centralnaya-krugovaya-rechnaya-progulka-ot-parka-zaryade-ves-centr-za-chas-683` | TEP | ✅ 2026-07-13 | ⏳ | ⏳ |
+| 0.2.1 | `tc-6a266b49465e94f72b4ef8f6-interaktivnaya-vystavka-nyuton-park` | TC | ✅ 2026-07-13 | ✅ 2026-07-22 | ✅ |
+| 0.2.2 | `tc-6a3582f0bbd948da83dece6e-kombo-kvest` | TC | ✅ 2026-07-13 | ✅ 2026-07-22 | ✅ |
+| 0.2.3 | `progulka-ot-prichala-kitai-gorod-do-prichala-kievskii-826` | TEP | ✅ 2026-07-13 | ✅ 2026-07-22 | ✅ |
+| 0.2.4 | `centralnaya-krugovaya-rechnaya-progulka-ot-parka-zaryade-ves-centr-za-chas-683` | TEP | ✅ 2026-07-13 | ✅ 2026-07-22 | ✅ |
 
 **Чеклист на каждый slug (browser):**
 
-- [ ] Hard refresh `/events/{slug}`
-- [ ] Hero / buy card: цена и CTA видны
-- [ ] Клик «Купить» → TC modal **или** Teplohod widget
-- [ ] DevTools console: нет blocking errors
+- [x] Hard refresh `/events/{slug}`
+- [x] Hero / buy card: цена и CTA видны
+- [x] Клик «Купить» → TC modal **или** Teplohod widget
+- [x] DevTools console: нет blocking errors
 - [ ] (опц.) тестовая покупка → ExternalOrder в admin
+
+Закрыто 2026-07-22: ручное подтверждение (prod виджеты работают; API `check:widgets` был ✅ с 2026-07-13).
 
 ### 0.3 Admin smoke (`:4000` + static admin)
 
@@ -209,7 +211,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 0.4.1 | Оценить долг: `check:sync-invariants` на prod | Высокий | ⏳ |
 | 0.4.2 | **Вариант A:** `npm run tc:sync` на prod (token, maintenance window) | Средний | ✅ 2026-07-13 (~101s, 17082 widgetUrl) |
 | 0.4.3 | **Вариант B:** defer + [decision-log.md](./decision-log.md) (критерии: saleable events OK) | Средний | ✅ 2026-07-13 (до sync) |
-| 0.4.4 | Post-sync: `check:widgets` + 0.2 browser smoke повтор | Высокий | API ✅ 2026-07-13 / browser ⏳ |
+| 0.4.4 | Post-sync: `check:widgets` + 0.2 browser smoke повтор | Высокий | ✅ API 2026-07-13 + browser 2026-07-22 |
 
 ### 0.5 Ops / auth fixes (post-cutover)
 
