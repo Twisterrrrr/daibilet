@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import { BlogArticleCta, parseCtaBlock } from '@/components/BlogArticleCta';
 import { BlogBuyButton, parseBuyBlock } from '@/components/BlogBuyButton.client';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { handleBlogLinkClick } from '@/lib/blog-navigate';
 
 const IMAGE_BLOCK_REGEX = /^\[image\s+side=(left|right)\s+src="([^"]+)"(?:\s+alt="([^"]*)")?\]$/i;
@@ -286,19 +287,17 @@ function BlogFigure({
   image: ParsedImageBlock;
   className?: string;
 }) {
-  const [hasImageError, setHasImageError] = React.useState(false);
-  if (hasImageError) return null;
-
   return (
     <figure className={className}>
-      <img
-        src={image.src}
-        alt={image.alt}
-        loading="lazy"
-        decoding="async"
-        onError={() => setHasImageError(true)}
-        className="aspect-[4/3] w-full rounded-xl border border-slate-200/80 object-cover shadow-md"
-      />
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-slate-200/80 shadow-md">
+        <SafeImage
+          src={image.src}
+          alt={image.alt}
+          fill
+          sizes={IMAGE_SIZES.blogCard}
+          className="object-cover"
+        />
+      </div>
       {image.alt ? (
         <figcaption className="mt-2.5 text-center text-xs leading-snug text-slate-500 sm:text-sm">
           {image.alt}

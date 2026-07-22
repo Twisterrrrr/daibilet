@@ -17,6 +17,7 @@ import {
 
 import { LocationCard } from '@/components/LocationCard.client';
 import { OsmMapEmbed } from '@/components/OsmMapEmbed';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { expandSessionPurchaseVariants, isSessionPurchaseBlocked } from '@/lib/event-purchase';
 import { formatMoney, formatNumber } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
@@ -71,7 +72,13 @@ export function LocationVenueLayout({
           <section className="relative overflow-hidden bg-slate-900 text-white">
             <div className="absolute inset-0">
               {venue.heroImageUrl ? (
-                <img src={venue.heroImageUrl} alt="" className="h-full w-full object-cover opacity-40" />
+                <SafeImage
+                  src={venue.heroImageUrl}
+                  alt=""
+                  fill
+                  sizes={IMAGE_SIZES.eventHero}
+                  className="object-cover opacity-40"
+                />
               ) : (
                 <div className="h-full w-full bg-gradient-to-br from-sky-800 to-slate-950" />
               )}
@@ -106,7 +113,7 @@ export function LocationVenueLayout({
         <section className="relative overflow-hidden bg-slate-900 text-white">
           <div className="absolute inset-0">
             {venue.heroImageUrl ? (
-              <img src={venue.heroImageUrl} alt="" className="h-full w-full object-cover opacity-60" />
+              <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventHero} className="object-cover opacity-60" />
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-amber-600 via-orange-600 to-rose-700" />
             )}
@@ -138,7 +145,7 @@ export function LocationVenueLayout({
           <section className="relative overflow-hidden bg-emerald-900 text-white">
           <div className="absolute inset-0">
             {venue.heroImageUrl ? (
-              <img src={venue.heroImageUrl} alt="" className="h-full w-full object-cover opacity-60" />
+              <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventHero} className="object-cover opacity-60" />
             ) : (
               <div className="h-full w-full bg-gradient-to-br from-emerald-700 to-emerald-950" />
             )}
@@ -174,7 +181,7 @@ export function LocationVenueLayout({
               <div className="relative overflow-hidden lg:rounded-l-3xl">
                 <div className="relative aspect-[16/10] lg:aspect-auto lg:h-[520px]">
                   {venue.heroImageUrl ? (
-                    <img src={venue.heroImageUrl} alt="" className="h-full w-full object-cover" />
+                    <SafeImage src={venue.heroImageUrl} alt="" fill sizes={IMAGE_SIZES.eventCard} className="object-cover" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-sky-500 via-primary-600 to-indigo-700">
                       <TypeIcon className="h-16 w-16 text-white/40" />

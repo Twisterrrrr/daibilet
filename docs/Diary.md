@@ -1,3 +1,24 @@
+## 2026-07-22 — L.2 Images: next/image + WebP/AVIF
+
+### Наблюдения
+
+- Hot-path UI (каталог, главная, city hub, blog, venues) отдавал сырые `<img>` JPG/PNG с TC/TEP CDN без ресайза.
+- Prod без `sharp` → дефолтный Next image optimizer слабый/медленный.
+- Хосты обложек: `ticketscloud-prod.storage.yandexcloud.net`, `s3.twcstorage.ru`, плюс стабильный `api.teplohod.info`.
+
+### Решения
+
+- `next.config.ts`: `formats` avif/webp, `minimumCacheTTL` 7d, урезанные `deviceSizes`/`imageSizes`, `remotePatterns` для CDN.
+- `SafeImage.client.tsx` + `IMAGE_SIZES`; замена `<img>` в EventCard/CityCard/blog/hub/heroes/venues/search/favorites.
+- `@daibilet/web` dependency `sharp` для prod encode.
+
+### Проблемы
+
+- Первый холодный `/_next/image` на VPS даёт CPU spike — кэш 7d + nginx `proxy_cache` на `/` смягчают после прогрева.
+- Inline blog markdown images без fallback placeholder при 404 (раньше скрывались) — редкий кейс.
+
+---
+
 ## 2026-07-22 — Prod deploy load + city hub blog @`bb65e4a`
 
 ### Наблюдения

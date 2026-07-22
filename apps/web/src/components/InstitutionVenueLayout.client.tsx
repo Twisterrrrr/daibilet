@@ -15,6 +15,7 @@ import {
 
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { OsmMapEmbed } from '@/components/OsmMapEmbed';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatMoney, formatNumber } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
 import { institutionTypeEmoji, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
@@ -91,7 +92,13 @@ export function InstitutionVenueLayout({
       <section className="relative overflow-hidden bg-slate-900 text-white">
         <div className="absolute inset-0">
           {venue.heroImageUrl ? (
-            <img src={venue.heroImageUrl} alt="" className="h-full w-full object-cover opacity-40" />
+            <SafeImage
+              src={venue.heroImageUrl}
+              alt=""
+              fill
+              sizes={IMAGE_SIZES.eventHero}
+              className="object-cover opacity-40"
+            />
           ) : (
             <div className={`h-full w-full ${isTheatre ? 'bg-gradient-to-br from-rose-800 to-slate-950' : 'bg-gradient-to-br from-indigo-800 to-slate-950'}`} />
           )}

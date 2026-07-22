@@ -4,6 +4,7 @@ import { Search, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { buildCatalogHref } from '@/lib/catalog-url';
 
 type SearchItem = {
@@ -181,7 +182,15 @@ export function HeaderSearch({
               }`}
             >
               {item.imageUrl ? (
-                <img src={item.imageUrl} alt="" className="h-10 w-10 flex-shrink-0 rounded-lg object-cover" loading="lazy" />
+                <span className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-lg">
+                  <SafeImage
+                    src={item.imageUrl}
+                    alt=""
+                    fill
+                    sizes={IMAGE_SIZES.searchThumb}
+                    className="object-cover"
+                  />
+                </span>
               ) : (
                 <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-xs font-semibold uppercase text-slate-500">
                   {item.type === 'city' ? 'Г' : item.type === 'landing' ? 'П' : 'E'}

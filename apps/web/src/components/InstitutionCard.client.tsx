@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import { MapPin, Ticket } from 'lucide-react';
-import { useState } from 'react';
 
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import type { PublicVenueDto } from '@daibilet/contracts/public';
 import { formatStreetAddress } from '@/lib/address';
 import { pluralEvents } from '@/lib/format';
@@ -24,8 +24,6 @@ function topCategory(venue: Pick<PublicVenueDto, 'categories'>): string | null {
 }
 
 export function InstitutionCard({ venue, href }: { venue: PublicVenueDto; href: string }) {
-  const [hasImageError, setHasImageError] = useState(false);
-  const showImage = Boolean(venue.heroImageUrl && !hasImageError);
   const typeLabel = venueTypeLabel(venue.type);
   const gradient = TYPE_GRADIENT[venue.type] || 'from-slate-700 via-slate-800 to-slate-950';
   const street = formatStreetAddress(venue.address, { city: venue.city });
@@ -37,18 +35,14 @@ export function InstitutionCard({ venue, href }: { venue: PublicVenueDto; href: 
       className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg hover:shadow-slate-200/50"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-        {showImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={venue.heroImageUrl || ''}
-            alt=""
-            loading="lazy"
-            onError={() => setHasImageError(true)}
-            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-          />
-        ) : (
-          <div className={`h-full w-full bg-gradient-to-br ${gradient}`} />
-        )}
+        <SafeImage
+          src={venue.heroImageUrl}
+          alt=""
+          fill
+          sizes={IMAGE_SIZES.institutionCard}
+          className="object-cover transition duration-500 group-hover:scale-105"
+          fallback={<div className={`h-full w-full bg-gradient-to-br ${gradient}`} />}
+        />
 
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
           <span className="rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-slate-700 backdrop-blur">

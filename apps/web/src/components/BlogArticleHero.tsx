@@ -4,6 +4,7 @@ import * as React from 'react';
 import { BookOpen, Clock, MapPin } from 'lucide-react';
 
 import { PageBreadcrumbBar, type BreadcrumbItem } from '@/components/PageBreadcrumbs';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 
 type BlogArticleHeroProps = {
   breadcrumbs: BreadcrumbItem[];
@@ -29,26 +30,20 @@ export function BlogArticleHero({
   cityHref,
   authorName,
 }: BlogArticleHeroProps) {
-  const [hasImageError, setHasImageError] = React.useState(false);
-  const showImage = Boolean(coverImageUrl) && !hasImageError;
-
   return (
     <>
       <PageBreadcrumbBar items={breadcrumbs} />
       <section className="relative overflow-hidden border-b border-slate-200 bg-slate-900 text-white">
         <div className="relative min-h-[280px] sm:min-h-[320px] lg:min-h-[380px]">
-          {showImage ? (
-            <img
-              src={coverImageUrl || ''}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover object-center"
-              loading="eager"
-              decoding="async"
-              onError={() => setHasImageError(true)}
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-500 via-rose-500 to-primary-700" />
-          )}
+          <SafeImage
+            src={coverImageUrl}
+            alt=""
+            fill
+            priority
+            sizes={IMAGE_SIZES.blogFeatured}
+            className="object-cover object-center"
+            fallback={<div className="absolute inset-0 bg-gradient-to-br from-amber-500 via-rose-500 to-primary-700" />}
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-950/55 to-slate-950/25" />
           <div className="container-page relative flex h-full min-h-[inherit] flex-col justify-end py-10 sm:py-12 lg:py-14">
             <div className="flex flex-wrap items-center gap-2">

@@ -6,6 +6,7 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 
 import { CityPicker } from '@/components/CityPicker.client';
 import { SectionPageHero } from '@/components/PageBreadcrumbs';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { buildCatalogPresetHref, buildCatalogTagHref } from '@/lib/catalog-links';
 import { CATALOG_PRESETS } from '@/lib/catalog-presets';
 import { formatNumber, formatPriceFrom, pluralEvents } from '@/lib/format';
@@ -97,12 +98,12 @@ function LandingDirectionCard({
       className="group relative flex h-56 flex-col justify-end overflow-hidden rounded-2xl bg-slate-900 shadow-sm ring-1 ring-slate-900/10 transition hover:-translate-y-0.5 hover:shadow-xl sm:h-60"
     >
       {imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
+        <SafeImage
           src={imageUrl}
           alt=""
-          loading="lazy"
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+          fill
+          sizes={IMAGE_SIZES.landingCard}
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
       ) : (
         <div className={`absolute inset-0 bg-gradient-to-br ${landingGradient(landing.slug)} opacity-90`} />

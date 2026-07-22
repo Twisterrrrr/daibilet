@@ -13,6 +13,7 @@ import {
 
 import { CityHubArticlesGrid } from '@/components/CityHubArticleTeaser.client';
 import { EventCard } from '@/components/EventCard';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import Link from 'next/link';
 import { formatStreetAddress } from '@/lib/address';
 import { formatMoney, formatNumber, formatPriceFrom } from '@/lib/format';
@@ -506,13 +507,11 @@ function CityHeroDefault({
   guide: CityInfoEntry | null;
   hasTravel: boolean;
 }) {
-  const [hasImageError, setHasImageError] = React.useState(false);
   const heroImage = resolveCityImage({
     slug: city.slug,
     sourceSlug: city.sourceSlug,
     name: city.name,
   });
-  const showImage = Boolean(heroImage && !hasImageError);
   const cityIn = cityInPrepositional(city);
   const heroFocus = resolveCityImageObjectPosition({
     slug: city.slug,
@@ -525,19 +524,16 @@ function CityHeroDefault({
 
   return (
     <section id="top" className="relative min-h-[280px] overflow-hidden border-b border-primary-950 text-white sm:min-h-[320px]">
-      {showImage ? (
-        <div className="absolute inset-0 overflow-hidden">
-          <img
-            src={heroImage || ''}
-            alt=""
-            style={{ objectPosition: heroFocus }}
-            className="absolute inset-0 h-full w-full object-cover"
-            onError={() => setHasImageError(true)}
-          />
-        </div>
-      ) : (
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950" />
-      )}
+      <SafeImage
+        src={heroImage}
+        alt=""
+        fill
+        priority
+        sizes={IMAGE_SIZES.eventHero}
+        style={{ objectPosition: heroFocus }}
+        className="object-cover"
+        fallback={<div className="absolute inset-0 bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950" />}
+      />
       <div className="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/50 to-slate-950/25" />
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-950/55 to-transparent" />
       <div className="container-page relative py-12 sm:py-14">
@@ -1277,29 +1273,25 @@ function CityEventsGrid({
 
 function AffichePosterCard({ session }: { session: PublicSessionDto }) {
   const href = eventHref(session);
-  const [hasImageError, setHasImageError] = React.useState(false);
-  const showImage = Boolean(session.imageUrl && !hasImageError);
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const dateBadge = [session.dateLabel, session.timeLabel].filter(Boolean).join(' · ') || session.category;
 
   return (
     <article className="group relative flex flex-col">
       <Link href={href} className="absolute inset-0 z-[1] rounded-xl" aria-label={`Событие: ${session.title}`} />
-      <div className="relative mb-4 overflow-hidden rounded-xl bg-zinc-100">
-        {showImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={session.imageUrl || ''}
-            alt=""
-            loading="lazy"
-            onError={() => setHasImageError(true)}
-            className="aspect-[4/5] w-full object-cover outline outline-1 -outline-offset-1 outline-black/5 transition-transform duration-500 group-hover:scale-[1.03]"
-          />
-        ) : (
-          <div className="flex aspect-[4/5] w-full items-center justify-center bg-gradient-to-br from-zinc-100 to-zinc-200">
-            <Ticket className="h-8 w-8 text-zinc-400" />
-          </div>
-        )}
+      <div className="relative mb-4 aspect-[4/5] overflow-hidden rounded-xl bg-zinc-100">
+        <SafeImage
+          src={session.imageUrl}
+          alt=""
+          fill
+          sizes={IMAGE_SIZES.affichePoster}
+          className="object-cover outline outline-1 -outline-offset-1 outline-black/5 transition-transform duration-500 group-hover:scale-[1.03]"
+          fallback={
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-100 to-zinc-200">
+              <Ticket className="h-8 w-8 text-zinc-400" />
+            </div>
+          }
+        />
         {dateBadge ? (
           <div className="absolute left-3 top-3">
             <span className="rounded-sm bg-white/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-zinc-800 backdrop-blur-sm">

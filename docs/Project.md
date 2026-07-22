@@ -130,6 +130,7 @@ Cherry-pick из **`codex/phase2-foundation`**: schema, event change requests, a
 
 - **Node** ≥22.13, **pnpm** 11.7 workspaces
 - **Next 15**, React 19, Tailwind 3
+- **Images:** `next/image` + `sharp` (WebP/AVIF), `SafeImage` wrapper, `remotePatterns` для TC/TEP/S3 CDN
 - **Prisma 7** — schema/migrations; runtime read через dto port
 - **Консистентность:** parity scripts; константы каталога в `@daibilet/contracts`
 - **SEO:** title template `%s | Дайбилет` без дублей; `og:url` route-specific (`seo-meta.ts`); flat entity URLs + city hubs (см. URL / SEO policy выше)

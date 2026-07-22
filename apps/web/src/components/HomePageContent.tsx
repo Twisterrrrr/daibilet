@@ -15,6 +15,7 @@ import { EventCard } from '@/components/EventCard';
 import { HomeEventRail, HomeNowSection } from '@/components/HomeNowSection.client';
 import { HomeHero } from '@/components/HomeHero.client';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import { mergeBlogCards } from '@/lib/blog-utils';
 import { buildPublicArticlesListDto } from '@daibilet/backend/public-read';
@@ -248,8 +249,13 @@ export async function HomePageContent() {
                 href={`/blog/${featuredBlog.slug}`}
                 className="group relative min-h-[240px] overflow-hidden rounded-2xl bg-slate-900 text-white shadow-lg sm:min-h-[280px]"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={featuredBlog.coverImageUrl} alt="" className="absolute inset-0 h-full w-full object-cover opacity-80 transition duration-500 group-hover:scale-105" />
+                <SafeImage
+                  src={featuredBlog.coverImageUrl}
+                  alt=""
+                  fill
+                  sizes={IMAGE_SIZES.blogFeatured}
+                  className="object-cover opacity-80 transition duration-500 group-hover:scale-105"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                 <div className="relative flex h-full flex-col justify-end p-6">
                   <span className="inline-flex w-fit rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">{featuredBlog.tag}</span>
@@ -264,9 +270,14 @@ export async function HomePageContent() {
                     href={`/blog/${post.slug}`}
                     className="group flex gap-4 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-primary/30 hover:shadow-md"
                   >
-                    <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-200">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={post.coverImageUrl} alt="" className="h-full w-full object-cover transition group-hover:scale-105" />
+                    <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-200">
+                      <SafeImage
+                        src={post.coverImageUrl}
+                        alt=""
+                        fill
+                        sizes={IMAGE_SIZES.blogThumb}
+                        className="object-cover transition group-hover:scale-105"
+                      />
                     </div>
                     <div className="min-w-0">
                       <p className="text-xs font-semibold uppercase tracking-wide text-primary-600">{post.tag}</p>

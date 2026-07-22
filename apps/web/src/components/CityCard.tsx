@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { Landmark, MapPin } from 'lucide-react';
-import { useState } from 'react';
 
 import { RegionDestinationLink } from '@/components/RegionDestinationLink';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { CITY_CARD_ASPECT_CLASS, cityCardTitleClass } from '@/lib/city-card-styles';
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
@@ -24,8 +24,6 @@ export function CityCard({ city, large = false, description, region }: CityCardP
   const slug = city.slug || city.name;
   const imageUrl = resolveCityCardImage(city);
   const href = cityHref(city);
-  const [hasImageError, setHasImageError] = useState(false);
-  const showImage = Boolean(imageUrl && !hasImageError);
   const imageFocus = resolveCityImageObjectPosition({ slug, sourceSlug: city.sourceSlug, name: city.name });
   const brief = description || '';
 
@@ -33,19 +31,15 @@ export function CityCard({ city, large = false, description, region }: CityCardP
     <div className="flex flex-col">
       <Link href={href} className="card group relative block overflow-hidden">
         <div className={`relative ${CITY_CARD_ASPECT_CLASS} overflow-hidden`}>
-          {showImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={imageUrl || ''}
-              alt=""
-              loading="lazy"
-              onError={() => setHasImageError(true)}
-              style={{ objectPosition: imageFocus }}
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-primary-700 to-primary-900" />
-          )}
+          <SafeImage
+            src={imageUrl}
+            alt=""
+            fill
+            sizes={IMAGE_SIZES.cityCard}
+            style={{ objectPosition: imageFocus }}
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            fallback={<div className="absolute inset-0 bg-gradient-to-br from-primary-700 to-primary-900" />}
+          />
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10" />
           <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4">
             <h3 className={`${cityCardTitleClass(large ? 'large' : 'compact')} line-clamp-2`}>{city.name}</h3>

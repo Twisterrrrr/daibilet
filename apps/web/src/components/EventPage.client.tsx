@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { Calendar, ChevronRight, MapPin, Shield, Users } from 'lucide-react';
-import { useState } from 'react';
 
 import type { PublicEventPageDto } from '@daibilet/contracts/public';
 import {
@@ -25,6 +24,7 @@ import {
 } from '@/lib/event-page-utils';
 import { venueHref } from '@/lib/routes';
 import { buildEventBreadcrumbs } from '@/lib/structured-data';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { getTeplohodWidgetIds, openTeplohodWidget, TeplohodWidgetEmbed } from '@/components/TeplohodWidget.client';
 import { normalizeTcPurchaseUrl, TcOptionBuyButton, TcSessionSlot, TcWidgetButton } from '@/components/TcWidget.client';
 
@@ -331,7 +331,6 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
   const ageLimit = formatAgeLimit(event.ageLimit);
   const priceRange = getTicketPriceRange(payload);
   const priceLabel = priceRange ? formatBuyCardPrice(priceRange) : formatPriceRub(stats.priceFrom ?? event.priceFrom) || '';
-  const [hasImageError, setHasImageError] = useState(false);
   const heroImage = String(event.imageUrl || '').trim();
   const nextSession = pickRepresentativeSession((payload.sessions ?? []) as EventSession[]);
   const venueLink = event.venue
@@ -341,21 +340,20 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
 
   return (
     <div className="relative">
-      <div className="min-h-[calc(100vh-6rem)] overflow-hidden bg-slate-900 sm:min-h-0 sm:h-80 lg:h-[420px]">
-        {heroImage && !hasImageError ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={heroImage}
-            alt={event.title}
-            className="absolute inset-0 h-full w-full object-cover object-top opacity-80 lg:object-[center_30%]"
-            loading="eager"
-            onError={() => setHasImageError(true)}
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600 to-primary-900">
-            <span className="text-8xl opacity-30">🎭</span>
-          </div>
-        )}
+      <div className="relative min-h-[calc(100vh-6rem)] overflow-hidden bg-slate-900 sm:min-h-0 sm:h-80 lg:h-[420px]">
+        <SafeImage
+          src={heroImage || null}
+          alt={event.title}
+          fill
+          priority
+          sizes={IMAGE_SIZES.eventHero}
+          className="object-cover object-top opacity-80 lg:object-[center_30%]"
+          fallback={
+            <div className="flex h-full items-center justify-center bg-gradient-to-br from-primary-600 to-primary-900">
+              <span className="text-8xl opacity-30">🎭</span>
+            </div>
+          }
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
       </div>
 

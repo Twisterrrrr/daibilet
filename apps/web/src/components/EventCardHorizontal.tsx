@@ -2,9 +2,9 @@
 
 import Link from 'next/link';
 import { Clock, MapPin, Star, Ticket } from 'lucide-react';
-import { useState } from 'react';
 
 import { EventFavoriteButton } from '@/components/EventFavoriteButton.client';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 import { collectCatalogLabels } from '@/lib/catalog-labels';
 import { EventImageBadges } from '@/lib/event-card-badges';
@@ -24,9 +24,7 @@ import { eventHref, sessionVenueHref } from '@/lib/routes';
 const SLOT_CHIP_CLASS =
   'inline-btn inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-full bg-slate-100 px-2.5 text-[10px] font-medium leading-none text-slate-700';
 
-export function EventCardHorizontal({ session }: { session: PublicSessionDto | PublicCatalogListItemDto }) {
-  const [hasImageError, setHasImageError] = useState(false);
-  const showImage = Boolean(session.imageUrl && !hasImageError);
+export function EventCardHorizontal({ session }: { session: PublicCatalogListItemDto | PublicSessionDto }) {
   const href = eventHref(session);
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const highlights = collectCatalogLabels(session).slice(0, 3);
@@ -47,18 +45,14 @@ export function EventCardHorizontal({ session }: { session: PublicSessionDto | P
     <article className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-slate-200/60 sm:flex-row">
       <Link href={href} className="absolute inset-0 z-[1] rounded-xl" aria-label={`Событие: ${session.title}`} />
       <div className="relative aspect-video w-full shrink-0 bg-slate-100 sm:min-w-[20rem] sm:w-80">
-        {!showImage ? (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200" />
-        ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={session.imageUrl || ''}
-            alt={session.title}
-            loading="lazy"
-            onError={() => setHasImageError(true)}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-          />
-        )}
+        <SafeImage
+          src={session.imageUrl}
+          alt={session.title}
+          fill
+          sizes={IMAGE_SIZES.eventCardHorizontal}
+          className="object-cover transition-transform duration-500 group-hover:scale-110"
+          fallback={<div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200" />}
+        />
         <EventImageBadges event={session} rail recommendVariant="compact" />
         {hasPrice ? (
           <span className="absolute bottom-2 right-2 rounded-full bg-primary-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm sm:bottom-3 sm:right-3">

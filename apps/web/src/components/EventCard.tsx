@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { Clock, MapPin, Star, Ticket } from 'lucide-react';
-import { useState } from 'react';
 
 import { EventFavoriteButton } from '@/components/EventFavoriteButton.client';
 import {
@@ -11,6 +10,7 @@ import {
   useCatalogPurchase,
 } from '@/components/CatalogPurchaseTrigger.client';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 import { collectCatalogLabels } from '@/lib/catalog-labels';
 import { EventImageBadges } from '@/lib/event-card-badges';
@@ -67,8 +67,6 @@ export function EventCard({
   }
 
   const href = eventHref(session);
-  const [hasImageError, setHasImageError] = useState(false);
-  const showImage = Boolean(session.imageUrl && !hasImageError);
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const destinationLabel = resolveEventCardDestinationLabel(session);
   const highlights = collectCatalogLabels(session);
@@ -96,22 +94,20 @@ export function EventCard({
         {landingActions ? (
           <Link href={href} className="absolute inset-0 z-[1] rounded-t-xl" aria-label={`Страница события: ${session.title}`} />
         ) : null}
-        {!showImage ? (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-300/80 bg-white/60 shadow-sm">
-              <div className="h-3.5 w-3.5 rotate-45 rounded-[6px] border border-slate-300/90 bg-slate-200/90" />
+        <SafeImage
+          src={session.imageUrl}
+          alt={session.title}
+          fill
+          sizes={IMAGE_SIZES.eventCard}
+          className="object-cover transition-transform duration-500 group-hover:scale-110"
+          fallback={
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-300/80 bg-white/60 shadow-sm">
+                <div className="h-3.5 w-3.5 rotate-45 rounded-[6px] border border-slate-300/90 bg-slate-200/90" />
+              </div>
             </div>
-          </div>
-        ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={session.imageUrl || ''}
-            alt={session.title}
-            loading="lazy"
-            onError={() => setHasImageError(true)}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-          />
-        )}
+          }
+        />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
         <EventImageBadges event={session} showSoonBadge={showSoonBadge} />
@@ -259,8 +255,6 @@ function ShowcaseEventCard({
   editorsPickBadge?: boolean;
 }) {
   const href = eventHref(session);
-  const [hasImageError, setHasImageError] = useState(false);
-  const showImage = Boolean(session.imageUrl && !hasImageError);
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const pseudoRating = resolvePseudoRating(session.groupKey || session.id);
   const cityLabel = resolveEventCardDestinationLabel(session);
@@ -277,20 +271,18 @@ function ShowcaseEventCard({
     >
       <Link href={href} className="absolute inset-0 z-[1] rounded-xl" aria-label={`Событие: ${session.title}`} />
       <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden bg-slate-100">
-        {!showImage ? (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-3xl">
-            🎫
-          </div>
-        ) : (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={session.imageUrl || ''}
-            alt={session.title}
-            loading="lazy"
-            onError={() => setHasImageError(true)}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-        )}
+        <SafeImage
+          src={session.imageUrl}
+          alt={session.title}
+          fill
+          sizes={IMAGE_SIZES.eventCard}
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          fallback={
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-3xl">
+              🎫
+            </div>
+          }
+        />
 
         <EventImageBadges event={session} rail={rail} editorsPick={editorsPickBadge} />
         <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />

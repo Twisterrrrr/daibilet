@@ -4,6 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { cityHubArticleBadges } from '@/lib/city-hub-articles';
 import type { BlogCardDto } from '@/lib/blog-utils';
 
@@ -16,7 +17,6 @@ export function CityHubArticleTeaser({
   editorial?: boolean;
   onSeeAffiche?: () => void;
 }) {
-  const [imageFailed, setImageFailed] = React.useState(false);
   const [open, setOpen] = React.useState(false);
   const badges = cityHubArticleBadges(article);
   const excerpt = String(article.excerpt || '').trim();
@@ -30,24 +30,22 @@ export function CityHubArticleTeaser({
       }
     >
       <div className={`relative aspect-[16/9] overflow-hidden ${editorial ? 'bg-zinc-100' : 'bg-slate-100'}`}>
-        {!imageFailed && article.coverImageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={article.coverImageUrl}
-            alt=""
-            loading="lazy"
-            onError={() => setImageFailed(true)}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div
-            className={`flex h-full w-full items-center justify-center text-sm ${
-              editorial ? 'bg-zinc-200 text-zinc-500' : 'bg-slate-200 text-slate-500'
-            }`}
-          >
-            Материал
-          </div>
-        )}
+        <SafeImage
+          src={article.coverImageUrl}
+          alt=""
+          fill
+          sizes={IMAGE_SIZES.blogCard}
+          className="object-cover"
+          fallback={
+            <div
+              className={`flex h-full w-full items-center justify-center text-sm ${
+                editorial ? 'bg-zinc-200 text-zinc-500' : 'bg-slate-200 text-slate-500'
+              }`}
+            >
+              Материал
+            </div>
+          }
+        />
       </div>
 
       <div className="p-4 sm:p-5">

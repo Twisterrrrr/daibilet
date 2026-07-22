@@ -5,6 +5,7 @@ import { Heart, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import type { PublicSessionDto } from '@daibilet/contracts/public';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import {
   FAVORITES_CHANGED_EVENT,
@@ -78,12 +79,18 @@ export function FavoritesPanel({ onClose }: { onClose: () => void }) {
             {sessions.map((session) => (
               <li key={session.groupKey || session.id} className="flex gap-3 rounded-xl border border-slate-200 p-3">
                 <Link href={eventHref(session)} onClick={onClose} className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-                  {session.imageUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={session.imageUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-lg">🎫</div>
-                  )}
+                  <SafeImage
+                    src={session.imageUrl}
+                    alt=""
+                    fill
+                    sizes={IMAGE_SIZES.favoritesThumb}
+                    className="object-cover"
+                    fallback={
+                      <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-lg">
+                        🎫
+                      </div>
+                    }
+                  />
                 </Link>
                 <div className="min-w-0 flex-1">
                   <Link href={eventHref(session)} onClick={onClose} className="line-clamp-2 text-sm font-semibold text-slate-900 hover:text-primary-700">
