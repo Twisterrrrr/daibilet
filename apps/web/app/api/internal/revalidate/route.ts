@@ -2,6 +2,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
 
 import { HOME_PAGE_CACHE_TAG } from '@/server/cache-config';
+import { clearPublicArticlesDtoCache } from '@daibilet/backend/public-read';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,6 +31,13 @@ export async function POST(request: Request) {
     body = (await request.json()) as RevalidateBody;
   } catch {
     body = {};
+  }
+
+  // Next SSR keeps its own in-memory article DTO cache - clear on every revalidate.
+  try {
+    clearPublicArticlesDtoCache();
+  } catch {
+    /* ignore if module unavailable in this runtime */
   }
 
   const tags = body.tags?.length ? body.tags : [HOME_PAGE_CACHE_TAG];

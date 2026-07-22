@@ -53,6 +53,7 @@ import {
   buildAdminArticlesList,
   buildAdminArticleDetail,
   upsertAdminArticle,
+  deleteAdminArticle,
   publicVenueSlug,
   publicVenuePageTemplate,
   clearPublicDataCaches,
@@ -72,6 +73,8 @@ import {
   isSocialPreviewAgent,
   renderSocialPreviewHtml,
 } from './social-preview.js';
+import { clearPublicArticlesDtoCache } from './public-articles.dto.js';
+import { revalidateNextBlogArticle } from './revalidate-next-blog.js';
 import {
   assertAuthRateLimit,
   authenticateAccessToken,
@@ -720,6 +723,11 @@ export async function handleRequest(request, response) {
     if (route === 'POST /api/admin/articles') {
       const result = await upsertAdminArticle(db, null, await readJsonBody(request));
       invalidatePublicCaches('article create');
+      void revalidateNextBlogArticle({
+        slug: result?.slug,
+        citySlug: result?.citySlug,
+        reason: 'article create',
+      });
       sendJson(response, result, 201);
       return;
     }
@@ -733,9 +741,34 @@ export async function handleRequest(request, response) {
 
     const articleUpdateMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/articles\/([^/]+)$/) : null;
     if (articleUpdateMatch) {
-      const result = await upsertAdminArticle(db, decodeURIComponent(articleUpdateMatch[1]), await readJsonBody(request));
+      const articleId = decodeURIComponent(articleUpdateMatch[1]);
+      const before = await buildAdminArticleDetail(db, articleId);
+      const result = await upsertAdminArticle(db, articleId, await readJsonBody(request));
       invalidatePublicCaches('article update');
+      void revalidateNextBlogArticle({
+        slug: result?.slug,
+        previousSlug: before?.slug,
+        citySlug: result?.citySlug || before?.citySlug,
+        reason: 'article update',
+      });
       sendJson(response, result);
+      return;
+    }
+
+    const articleDeleteMatch = request.method === 'DELETE' ? url.pathname.match(/^\/api\/admin\/articles\/([^/]+)$/) : null;
+    if (articleDeleteMatch) {
+      const deleted = await deleteAdminArticle(db, decodeURIComponent(articleDeleteMatch[1]));
+      if (!deleted) {
+        sendJson(response, { error: 'article_not_found' }, 404);
+        return;
+      }
+      invalidatePublicCaches('article delete');
+      void revalidateNextBlogArticle({
+        slug: deleted.slug,
+        citySlug: deleted.citySlug,
+        reason: 'article delete',
+      });
+      sendJson(response, { ok: true, deleted });
       return;
     }
 
@@ -1090,6 +1123,7 @@ export function registerPublicCacheWarmer(warmer) {
 }
 
 registerPublicCacheInvalidator((reason, options = {}) => {
+  clearPublicArticlesDtoCache();
   if (!options?.warm) return;
   import('./revalidate-next-home.js')
     .then(({ revalidateNextHome }) => revalidateNextHome(reason))

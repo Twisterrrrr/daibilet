@@ -10120,11 +10120,29 @@ export async function buildPublicArticlePage(db, slug) {
     `,
     [slug],
   );
-  if (!rows[0]) return null;
-  return {
-    generatedAt: new Date().toISOString(),
-    article: mapPublicArticleDetail(rows[0]),
-  };
+  if (rows[0]) {
+    return {
+      generatedAt: new Date().toISOString(),
+      article: mapPublicArticleDetail(rows[0]),
+      cmsOwned: true,
+    };
+  }
+
+  // Article exists in CMS but is not public (draft/review/archive) - do not fall back to static body.
+  const { rows: ownedRows } = await db.query(
+    `select status::text as status from "Article" where slug = $1 limit 1`,
+    [slug],
+  );
+  if (ownedRows[0]) {
+    return {
+      generatedAt: new Date().toISOString(),
+      article: null,
+      cmsOwned: true,
+      cmsStatus: String(ownedRows[0].status || '').toLowerCase(),
+    };
+  }
+
+  return null;
 }
 
 export async function buildAdminArticlesList(db) {
@@ -10140,6 +10158,9 @@ export async function buildAdminArticlesList(db) {
       a."isIndexable",
       a."updatedAt",
       a."citySlug",
+      a."authorId",
+      a."authorName",
+      a."articleType",
       c.title as city
     from "Article" a
     left join "City" c on c.id = a."cityId"
@@ -10157,6 +10178,9 @@ export async function buildAdminArticlesList(db) {
       coverImageUrl: row.coverImageUrl || null,
       city: row.city || null,
       citySlug: canonicalBlogCitySlug(row.citySlug) || row.citySlug || null,
+      authorId: row.authorId || null,
+      authorName: row.authorName || null,
+      articleType: row.articleType || null,
       publishedAt: row.publishedAt ? new Date(row.publishedAt).toISOString() : null,
       isIndexable: row.isIndexable !== false,
       updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
@@ -10354,4 +10378,11 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
     ],
   );
   return buildAdminArticleDetail(db, id);
+}
+
+export async function deleteAdminArticle(db, articleId) {
+  const current = await buildAdminArticleDetail(db, articleId);
+  if (!current) return null;
+  await db.query(`delete from "Article" where id = $1`, [articleId]);
+  return current;
 }

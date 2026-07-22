@@ -14,6 +14,7 @@ import { createAdminAuthConfig } from './auth.js';
 import { readBackendEnv } from './env.js';
 import { updateAdminEventOverride, updateAdminLandingMatch, upsertAdminOrderTicket } from './dto.js';
 import { buildPublicCatalogDto, clearPublicCatalogDtoCache, getPublicCatalogSessions } from './public-catalog.dto.js';
+import { clearPublicArticlesDtoCache } from './public-articles.dto.js';
 import { createPublicCatalogRouteHandler } from './public-catalog-handler.js';
 import { buildPublicCityDto, buildPublicDestinationsDto, clearPublicCityDtoCache } from './public-city.dto.js';
 import { createPublicCityRouteHandler } from './public-city-handler.js';
@@ -51,6 +52,7 @@ registerPublicCacheInvalidator(() => {
   clearPublicCityDtoCache();
   clearPublicEventDtoCache();
   clearPublicVenueDtoCache();
+  clearPublicArticlesDtoCache();
 });
 registerPublicCacheWarmer(createPublicReadStackWarmer({
   flags: publicFlags,

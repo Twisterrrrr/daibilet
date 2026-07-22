@@ -32,6 +32,8 @@ async function loadArticle(slug: string) {
   try {
     const payload = await buildPublicArticlePageDto(slug);
     if (payload?.article) return payload.article;
+    // CMS owns this slug (draft/review/archive) - do not resurrect static fallback body.
+    if (payload?.cmsOwned) return null;
   } catch {
     // fallback below
   }
