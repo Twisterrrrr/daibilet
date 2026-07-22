@@ -15,6 +15,24 @@ function cityHubSeoTitleFallback(cityName) {
   return `${name}: афиша, экскурсии и билеты на сегодня, ${short} | ${SITE_NAME}`;
 }
 
+function venueSeoTitleFallback(venueName) {
+  const name = String(venueName || '').trim() || 'Площадка';
+  const short = new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    timeZone: 'Europe/Moscow',
+  }).format(new Date());
+  return `${name}: афиша и билеты на сегодня, ${short} | ${SITE_NAME}`;
+}
+
+function resolveVenueShareTitle(venue) {
+  const custom = String(venue?.seoTitle || '').trim();
+  if (custom && /на сегодня/i.test(custom)) {
+    return /\|?\s*Дайбилет\s*$/i.test(custom) ? custom : `${custom} | ${SITE_NAME}`;
+  }
+  return venueSeoTitleFallback(venue?.name || venue?.title);
+}
+
 const CITY_SHARE_ALIASES = {
   moskva: 'moscow',
   'sankt-peterburg': 'saint-petersburg',
@@ -168,7 +186,7 @@ export async function buildSocialPreviewForPath(db, pathname, builders) {
     const canonicalSlug = publicVenueSlug(venue.slug, venue.name || venue.title, venue.id);
     const canonicalPath = venue.canonicalPath || `${basePath}/${canonicalSlug}`;
     return {
-      title: venue.seoTitle || `${venue.name}: афиша и билеты | ${SITE_NAME}`,
+      title: resolveVenueShareTitle(venue),
       description:
         venue.seoDescription ||
         venue.shortDescription ||

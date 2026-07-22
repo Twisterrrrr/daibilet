@@ -14,6 +14,7 @@ import { evaluateVenueIndexability, robotsForIndexability } from '@/lib/hub-inde
 import { venueHref } from '@/lib/routes';
 import { absoluteUrl, pageTitle } from '@/lib/seo-meta';
 import { buildVenuePageJsonLd } from '@/lib/structured-data';
+import { resolveVenueSeoTitle } from '@/lib/venue-seo';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -56,15 +57,14 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
     events: payload.stats?.events ?? venue.events ?? 0,
     isIndexable: venue.isIndexable,
   });
-  const title = pageTitle(venue.seoTitle || venue.title || venue.name || 'Площадка');
+  const { core: title, full: shareTitle } = resolveVenueSeoTitle(venue);
   const description =
     venue.seoDescription || venue.shortDescription || venue.description || undefined;
   const canonicalPath = venue.canonicalPath || venueHref(venue);
-  const shareTitle = `${title} | Дайбилет`;
   const image = venue.heroImageUrl ? absoluteUrl(venue.heroImageUrl) : undefined;
 
   return {
-    title,
+    title: pageTitle(title),
     description,
     alternates: { canonical: canonicalPath },
     robots: robotsForIndexability(decision.indexable),
