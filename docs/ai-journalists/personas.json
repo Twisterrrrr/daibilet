@@ -54,7 +54,7 @@
       "address": "vy",
       "ctaTone": "soft",
       "structure": "4 paragraphs",
-      "style_prototypes": ["Ольга Савельева", "Т—Ж Путешествия"],
+      "style_prototypes": ["Ольга Савельева", "Т-Ж Путешествия"],
       "topics": ["Краснодарский край", "Кавминводы", "Казань семья", "Великий Устюг"],
       "pilotFit": "high"
     },

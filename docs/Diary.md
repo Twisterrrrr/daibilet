@@ -2694,3 +2694,18 @@
 ### Проблемы
 - Нельзя параллелить два `deploy-prod-next` на одном хосте.
 
+
+## 2026-07-22 — Колонка Елены: СПб с ребёнком в дождь
+
+### Наблюдения
+- Текст колонки про четыре indoor-формата (планетарий, Музей Матрешки, Гарри Поттер, Особняк Мясникова) + запасной outdoor (песчаные скульптуры).
+- После pnpm blog:upsert страница в БД PUBLISHED, но revalidate с локального PowerShell ломался на Authorization: Bearer (host resolve / 401).
+
+### Решения
+- Статья `spb-s-rebenkom-v-dozhd`, authorId `elena`, citySlug `saint-petersburg`; cover + distinct inline.
+- Soft-links на venues/events каталога; deploy-prod-next + upsert.
+- Revalidate надёжнее гонять **на сервере** через SSH + here-doc (curl с Bearer из .env), не из Windows PowerShell.
+- Smoke 200: page, cover, inline; в HTML — Елена, Читайте также, ссылки на события/хаб.
+
+### Проблемы
+- Экранирование Bearer в PowerShell при remote curl — не использовать однострочный ssh с вложенными кавычками.
