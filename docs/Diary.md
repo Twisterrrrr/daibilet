@@ -1,3 +1,22 @@
+## 2026-07-22 — City hub × blog: Codex port в phase 1 picker
+
+### Наблюдения
+
+- Параллельная ветка `codex/city-hub-editorial-alt` (Vite `apps/public`) дублирует IA phase 1; финконтур `codex/phase2-finance-supplier` не трогаем.
+- Наш `pickCityHubArticles` был слабее: мало алиасов, нет отсева чужого города → статья «в Москве» могла попасть на хаб СПб через generic gid.
+
+### Решения
+
+- Порт в Next `apps/web`: расширенные `CITY_ALIASES` (кириллица + стемы), `containsForeignCitySignal`, broad `multi/regions`, tie-break по `publishedAt`, шире keywords секций.
+- Unit-тесты `city-hub-articles.test.ts` (6). Vite/finance из Codex не мержим.
+- Phase 2 (P.2p): mini-row сессий на тизере — следующий шаг.
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-22 — Admin smoke 0.3 + тестовая покупка закрыты
 
 ### Наблюдения

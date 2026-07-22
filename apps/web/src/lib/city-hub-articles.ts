@@ -1,5 +1,5 @@
-import type { BlogCardDto } from '@/lib/blog-utils';
-import { normalizeBlogCitySlug } from '@/lib/blog-meta';
+import type { BlogCardDto } from './blog-utils.ts';
+import { normalizeBlogCitySlug } from './blog-meta.ts';
 
 export type CityHubArticleBucket =
   | 'about'
@@ -18,24 +18,94 @@ const LIMITS: Record<CityHubArticleBucket, number> = {
   more: 1,
 };
 
+/** Канонический slug хаба → алиасы (латиница + кириллица). Порт из Codex city-hub-editorial-alt. */
 const CITY_ALIASES: Record<string, string[]> = {
-  moscow: ['moscow', 'moskva', 'msk'],
-  'saint-petersburg': ['saint-petersburg', 'sankt-peterburg', 'spb', 'petersburg'],
-  kazan: ['kazan'],
-  ekaterinburg: ['ekaterinburg', 'yekaterinburg'],
-  'nizhny-novgorod': ['nizhny-novgorod', 'nizhniy-novgorod'],
-  ufa: ['ufa'],
+  moscow: ['moscow', 'moskva', 'msk', 'москва', 'москов', 'москв'],
+  moskva: ['moscow', 'moskva', 'msk', 'москва', 'москов', 'москв'],
+  'saint-petersburg': [
+    'saint-petersburg',
+    'sankt-peterburg',
+    'spb',
+    'petersburg',
+    'peterburg',
+    'петербург',
+    'санкт',
+  ],
+  'sankt-peterburg': [
+    'saint-petersburg',
+    'sankt-peterburg',
+    'spb',
+    'petersburg',
+    'peterburg',
+    'петербург',
+    'санкт',
+  ],
+  spb: [
+    'saint-petersburg',
+    'sankt-peterburg',
+    'spb',
+    'petersburg',
+    'peterburg',
+    'петербург',
+    'санкт',
+  ],
+  kazan: ['kazan', 'казань', 'казан'],
+  kaliningrad: ['kaliningrad', 'калининград'],
+  'nizhny-novgorod': ['nizhny-novgorod', 'nizhniy-novgorod', 'нижний', 'новгород'],
+  'nizhniy-novgorod': ['nizhny-novgorod', 'nizhniy-novgorod', 'нижний', 'новгород'],
+  'veliky-novgorod': ['veliky-novgorod', 'velikiy-novgorod', 'великий', 'новгород'],
+  'velikiy-novgorod': ['veliky-novgorod', 'velikiy-novgorod', 'великий', 'новгород'],
+  krasnodar: ['krasnodar', 'краснодар'],
+  krasnoyarsk: ['krasnoyarsk', 'красноярск'],
+  yaroslavl: ['yaroslavl', 'ярославль', 'ярослав'],
+  vladimir: ['vladimir', 'владимир'],
+  ekaterinburg: ['ekaterinburg', 'yekaterinburg', 'екатеринбург'],
+  novosibirsk: ['novosibirsk', 'новосибирск'],
+  tula: ['tula', 'тула', 'туль'],
+  samara: ['samara', 'самара', 'самар'],
+  omsk: ['omsk', 'омск'],
+  ufa: ['ufa', 'уфа'],
+  tver: ['tver', 'тверь', 'твер'],
+  tyumen: ['tyumen', 'тюмень', 'тюмен'],
+  voronezh: ['voronezh', 'воронеж'],
+  'rostov-na-donu': ['rostov-na-donu', 'rostov-on-don', 'ростов'],
+  vladivostok: ['vladivostok', 'владивосток'],
+  vologda: ['vologda', 'вологда', 'вологод'],
+  irkutsk: ['irkutsk', 'иркутск'],
+  perm: ['perm', 'пермь', 'перм'],
+  saratov: ['saratov', 'саратов'],
+  'ulan-ude': ['ulan-ude', 'улан-удэ', 'улан удэ'],
+  chelyabinsk: ['chelyabinsk', 'челябинск'],
 };
 
+const KNOWN_CITY_ALIASES = new Set(
+  Object.entries(CITY_ALIASES)
+    .flatMap(([slug, aliases]) => [slug, ...aliases])
+    .map(normalizeText)
+    .filter((alias) => alias.length >= 4),
+);
+
 const AFFICHE_RE =
-  /вечер|выходн|сегодня|скоро|дискотек|шоу|как выбрать|куда пойти|афиш/i;
+  /вечер|выходн|сегодня|завтра|скоро|дискотек|шоу|как выбрать|куда пойти|афиш|билет|событи/i;
 const PRACTICE_RE =
-  /как выбрать|не перепутать|для новичка|как не|рейс|формат|подготов|инструкц/i;
+  /как выбрать|не перепутать|для новичка|как не|рейс|формат|подготов|инструкц|как добраться|транспорт|метро|вокзал|аэропорт|совет|практик|планир/i;
 const SIGHTS_RE =
-  /прогулк|двор|парадн|крыш|мост|обзорн|достопримечат|маршрут|музей|экскурс/i;
+  /прогулк|двор|парадн|крыш|мост|обзорн|достопримечат|маршрут|музей|экскурс|парк|места|куда сходить|что посмотреть/i;
+const ABOUT_RE = /обзор|гид по городу|зачем|почему|первый раз|история|атмосфера|лучшее/i;
+const MORE_RE = /подборка|площадк|район|окрестност|рядом|необычн|топ/i;
 
 function emptyBuckets(): CityHubArticlesBuckets {
   return { about: [], affiche: [], sights: [], practice: [], more: [] };
+}
+
+function normalizeText(value?: string | null): string {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    .replace(/[^a-zа-я0-9]+/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function normalizeHubCitySlug(slug?: string | null, sourceSlug?: string | null, name?: string | null): string {
@@ -43,37 +113,67 @@ function normalizeHubCitySlug(slug?: string | null, sourceSlug?: string | null, 
   if (raw === 'moskva' || raw === 'msk') return 'moscow';
   if (raw === 'sankt-peterburg' || raw === 'spb') return 'saint-petersburg';
   if (raw === 'nizhniy-novgorod') return 'nizhny-novgorod';
+  if (raw === 'velikiy-novgorod') return 'veliky-novgorod';
   return raw;
 }
 
 function cityMatchTokens(hubSlug: string, cityName: string): string[] {
   const tokens = new Set<string>();
   for (const alias of CITY_ALIASES[hubSlug] || [hubSlug]) {
-    if (alias) tokens.add(alias.toLowerCase());
+    const normalized = normalizeText(alias);
+    if (normalized) tokens.add(normalized);
   }
-  const name = cityName.trim().toLowerCase();
+  const name = normalizeText(cityName);
   if (name) {
     tokens.add(name);
-    for (const part of name.split(/[\s-]+/).filter((p) => p.length >= 4)) {
+    for (const part of name.split(' ').filter((p) => p.length >= 4)) {
       tokens.add(part);
     }
   }
   return [...tokens].filter(Boolean);
 }
 
+function isBroadCityMarker(value: string): boolean {
+  return /(^|\s)(multi|all|region|regions|russia|росси|регион|города|все)(\s|$)/.test(value);
+}
+
+function containsForeignCitySignal(text: string, currentAliases: Set<string>): boolean {
+  for (const alias of KNOWN_CITY_ALIASES) {
+    if (currentAliases.has(alias)) continue;
+    if (text.includes(alias)) return true;
+  }
+  return false;
+}
+
 function articleMentionsCity(article: BlogCardDto, hubSlug: string, tokens: string[]): boolean {
-  const articleSlug = normalizeBlogCitySlug(article.citySlug, article.city);
   const aliases = CITY_ALIASES[hubSlug] || [hubSlug];
+  const aliasSet = new Set(tokens);
+  const articleSlug = normalizeBlogCitySlug(article.citySlug, article.city);
   if (articleSlug && (aliases.includes(articleSlug) || articleSlug === hubSlug)) return true;
 
-  const hay = `${article.slug} ${article.title} ${article.excerpt || ''}`.toLowerCase();
+  const articleCity = normalizeText(article.city);
+  if (articleCity && tokens.some((token) => token.length >= 4 && articleCity.includes(token))) return true;
+
+  const hay = normalizeText(`${article.slug} ${article.title} ${article.excerpt || ''}`);
+  if (containsForeignCitySignal(hay, aliasSet)) return false;
   return tokens.some((token) => token.length >= 3 && hay.includes(token));
 }
 
-function isGenericUseful(article: BlogCardDto): boolean {
+function isBroadUseful(article: BlogCardDto, hubTokens: string[]): boolean {
+  const explicit = normalizeText(article.citySlug) || normalizeText(article.city);
+  const hay = normalizeText(`${article.slug} ${article.title}`);
+  if (explicit && !isBroadCityMarker(explicit)) return false;
+  if (containsForeignCitySignal(hay, new Set(hubTokens))) return false;
+  if (explicit && isBroadCityMarker(explicit)) return true;
+  return false;
+}
+
+function isGenericUseful(article: BlogCardDto, hubTokens: string[]): boolean {
+  const hay = normalizeText(`${article.slug} ${article.title}`);
+  if (containsForeignCitySignal(hay, new Set(hubTokens))) return false;
+
   const type = String(article.articleType || '').toLowerCase();
   if (type === 'gid' || type === 'obzor') return true;
-  const hay = `${article.slug} ${article.title}`.toLowerCase();
   return PRACTICE_RE.test(hay) || AFFICHE_RE.test(hay);
 }
 
@@ -86,6 +186,7 @@ function scoreForBucket(article: BlogCardDto, bucket: CityHubArticleBucket, city
     if (type === 'obzor') score += 30;
     if (type === 'column' && cityHit) score += 25;
     if (type === 'gid' && cityHit) score += 15;
+    if (ABOUT_RE.test(hay)) score += 20;
     if (!cityHit && type === 'obzor') score += 5;
   } else if (bucket === 'affiche') {
     if (AFFICHE_RE.test(hay)) score += 35;
@@ -97,7 +198,9 @@ function scoreForBucket(article: BlogCardDto, bucket: CityHubArticleBucket, city
   } else if (bucket === 'practice') {
     if (PRACTICE_RE.test(hay)) score += 40;
     if (type === 'gid' && !cityHit) score += 10;
+    if (type === 'column' && !cityHit) score += 8;
   } else if (bucket === 'more') {
+    if (MORE_RE.test(hay)) score += 20;
     if (cityHit) score += 10;
     if (type === 'gid') score += 5;
   }
@@ -105,9 +208,15 @@ function scoreForBucket(article: BlogCardDto, bucket: CityHubArticleBucket, city
   return score;
 }
 
+function publishedTime(article: BlogCardDto): number {
+  const value = article.publishedAt ? new Date(article.publishedAt).getTime() : 0;
+  return Number.isFinite(value) ? value : 0;
+}
+
 /**
  * Подбор тизеров блога для секций city hub.
  * Одна статья — максимум в одной секции. Пустые бакеты допустимы.
+ * Улучшения из Codex: кириллические алиасы, отсев чужих городов, broad multi/regions.
  */
 export function pickCityHubArticles(
   city: { slug: string; sourceSlug?: string | null; name: string },
@@ -119,14 +228,20 @@ export function pickCityHubArticles(
   const hubSlug = normalizeHubCitySlug(city.slug, city.sourceSlug, city.name);
   const tokens = cityMatchTokens(hubSlug, city.name);
   const cityHitBySlug = new Map<string, boolean>();
+  const broadBySlug = new Map<string, boolean>();
 
   for (const article of articles) {
-    cityHitBySlug.set(article.slug, articleMentionsCity(article, hubSlug, tokens));
+    const cityHit = articleMentionsCity(article, hubSlug, tokens);
+    cityHitBySlug.set(article.slug, cityHit);
+    broadBySlug.set(article.slug, !cityHit && isBroadUseful(article, tokens));
   }
 
   const cityPool = articles.filter((a) => cityHitBySlug.get(a.slug));
-  const genericPool = articles.filter((a) => !cityHitBySlug.get(a.slug) && isGenericUseful(a));
-  const pool = [...cityPool, ...genericPool];
+  const broadPool = articles.filter((a) => broadBySlug.get(a.slug));
+  const genericPool = articles.filter(
+    (a) => !cityHitBySlug.get(a.slug) && !broadBySlug.get(a.slug) && isGenericUseful(a, tokens),
+  );
+  const pool = [...cityPool, ...broadPool, ...genericPool];
 
   const used = new Set<string>();
   const order: CityHubArticleBucket[] = ['about', 'affiche', 'sights', 'practice', 'more'];
@@ -143,7 +258,10 @@ export function pickCityHubArticles(
         score: scoreForBucket(article, bucket, Boolean(cityHitBySlug.get(article.slug))),
       }))
       .filter((row) => row.score >= minScore)
-      .sort((a, b) => b.score - a.score)
+      .sort((a, b) => {
+        if (b.score !== a.score) return b.score - a.score;
+        return publishedTime(b.article) - publishedTime(a.article);
+      })
       .slice(0, limit);
 
     for (const row of ranked) used.add(row.article.slug);
