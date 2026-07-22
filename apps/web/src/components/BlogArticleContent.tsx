@@ -394,9 +394,9 @@ function tableRowsFromBlock(block: Extract<ContentBlock, { type: 'table' }>): st
 }
 
 const PARAGRAPH_CLASS =
-  'text-[1.0625rem] leading-[1.8] text-slate-700 [overflow-wrap:anywhere] [&+&]:mt-4';
+  'text-sm leading-7 text-slate-600 [overflow-wrap:anywhere] [&+&]:mt-4';
 const LEAD_PARAGRAPH_CLASS =
-  'text-lg leading-[1.75] text-slate-600 [overflow-wrap:anywhere]';
+  'text-sm leading-7 text-slate-600 [overflow-wrap:anywhere]';
 
 function normalizeImageSrc(src: string): string {
   const trimmed = src.trim();
@@ -554,7 +554,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <ol
             key={`ol-${index}`}
-            className="my-5 list-decimal space-y-2.5 pl-6 text-[1.0625rem] leading-relaxed text-slate-700 marker:font-semibold marker:text-primary-600"
+            className="my-5 list-decimal space-y-2.5 pl-6 text-sm leading-7 text-slate-600 marker:font-semibold marker:text-primary-600"
           >
             {block.items.map((item, itemIndex) => (
               <li key={itemIndex} className="pl-1">
