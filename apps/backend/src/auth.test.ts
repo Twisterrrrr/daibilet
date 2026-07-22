@@ -22,6 +22,7 @@ test('admin paths are protected', () => {
   assert.equal(isProtectedPath('/api/admin/articles/x'), true);
   assert.equal(isProtectedPath('/api/db/stats'), true);
   assert.equal(isProtectedPath('/api/v1/tc/sync'), true);
+  assert.equal(isProtectedPath('/api/supplier/dashboard'), true);
   assert.equal(isProtectedPath('/api/public/events'), false);
   assert.equal(isProtectedPath('/api/health'), false);
 });

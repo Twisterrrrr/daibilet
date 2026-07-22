@@ -22,7 +22,8 @@
       "types": "./src/schemas.ts",
       "default": "./src/schemas.ts"
     },
-    "./source": "./src/source.ts"
+    "./source": "./src/source.ts",
+    "./supplier": "./src/supplier.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit"

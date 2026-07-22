@@ -6570,3 +6570,32 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 - Full backend typecheck still fails on pre-existing strict issues in `public-catalog.mapper.test.ts` and `public-city-venues.test.ts`; new schedule tests pass.
 
 ---
+
+## 2026-07-22 — Phase 2: Supplier LC read-first API/app shell
+
+### Decisions
+
+- Added supplier-facing contracts (`SupplierPortal*Dto`) separate from admin supplier DTOs.
+- Added protected read-only backend endpoints:
+  - `GET /api/supplier/me` / `GET /api/supplier/profile`
+  - `GET /api/supplier/dashboard`
+  - `GET /api/supplier/events`
+  - `GET /api/supplier/orders`
+  - `GET /api/supplier/finance`
+  - `GET /api/supplier/reviews`
+- Supplier identity is currently resolved by `supplierId`, `slug` or `supplier` query param; real supplier auth replaces this later.
+- `/api/supplier/*` is protected by the production Basic Auth guard to avoid leaking buyer/order PII before supplier auth exists.
+- Added `apps/supplier` Vite/React shell with Dashboard, Events, Orders, Finance, Reviews and Profile.
+
+### Verification
+
+- `@daibilet/contracts typecheck` passed.
+- `@daibilet/supplier` typecheck and Vite build passed.
+- Targeted backend tests passed for supplier portal, admin supplier readiness and schedule management.
+- Full backend typecheck still has the pre-existing strict test errors in `public-catalog.mapper.test.ts` and `public-city-venues.test.ts`.
+
+### Next
+
+- STUB checkout on one manual `DAIBILET_MANAGED` event with explicit ticket offers and concrete session/open-date policy.
+
+---

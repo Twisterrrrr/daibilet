@@ -35,6 +35,7 @@ export function isProtectedPath(pathname: string): boolean {
     pathname === '/api/db/stats' ||
     pathname === '/api/db/events' ||
     pathname.startsWith('/api/admin') ||
+    pathname.startsWith('/api/supplier') ||
     pathname.startsWith('/api/v1/tc') ||
     pathname.startsWith('/api/v1/tep')
   );

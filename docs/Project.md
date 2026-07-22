@@ -284,3 +284,13 @@ Schedule foundation added in the same phase:
 - guardrail: внутренний checkout нельзя считать готовым без активного поставщика, владельца ЛК, verified legal profile, основного банковского счета, комиссии и YooKassa shop id.
 
 Это не меняет Phase 1 widget-first: TC/Teplohod продажи остаются через виджеты, `ExternalOrder` остается отдельным контуром.
+
+Supplier LC read-first slice added:
+
+- contracts: `SupplierPortal*Dto`;
+- backend: protected `GET /api/supplier/me|profile|dashboard|events|orders|finance|reviews`;
+- app: `apps/supplier` Vite shell on local port `5179`;
+- security: until real supplier auth exists, `/api/supplier/*` is protected by the same production Basic Auth guard as admin;
+- scope: read-only dashboard, events, internal checkout orders, ledger/payout snapshot, reviews and legal/bank profile.
+
+Next Phase 2 step: STUB checkout for one manual `DAIBILET_MANAGED` event with explicit offers and either a concrete session or open-date policy.
