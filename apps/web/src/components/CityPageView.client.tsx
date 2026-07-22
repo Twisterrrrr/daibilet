@@ -547,18 +547,18 @@ function CityHeroDefault({
       {/*
         Mobile: full-bleed.
         Desktop 16:9: фото справа обычного размера (без scale).
-        Ultrawide (≥1600px): только там увеличиваем кадр.
+        Ultrawide: ширина и высота кадра растут плавно после 1600px.
       */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 lg:inset-y-0 lg:left-auto lg:right-0 lg:w-[min(56vw,50rem)] min-[1600px]:top-1/2 min-[1600px]:bottom-auto min-[1600px]:h-[118%] min-[1600px]:w-[min(72vw,70rem)] min-[1600px]:-translate-y-1/2"
+        className="pointer-events-none absolute inset-0 lg:inset-y-0 lg:left-auto lg:right-0 lg:w-[min(56vw,50rem)] min-[1600px]:top-1/2 min-[1600px]:bottom-auto min-[1600px]:h-[clamp(100%,calc(100%+18vw-18rem),118%)] min-[1600px]:w-[clamp(50rem,calc(80vw-30rem),70rem)] min-[1600px]:-translate-y-1/2"
       >
         <SafeImage
           src={heroImage}
           alt=""
           fill
           priority
-          sizes="(max-width: 1023px) 100vw, (max-width: 1599px) 56vw, 72vw"
+          sizes="(max-width: 1023px) 100vw, (max-width: 1599px) 56vw, (max-width: 1999px) calc(80vw - 30rem), 70rem"
           style={{ objectPosition: `${focusX} ${focusY}` }}
           className="object-cover"
           fallback={<div className="absolute inset-0 bg-[#0a233c]" />}
