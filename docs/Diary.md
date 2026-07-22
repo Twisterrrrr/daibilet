@@ -17,6 +17,8 @@
 - Первый холодный `/_next/image` на VPS даёт CPU spike — кэш 7d + nginx `proxy_cache` на `/` смягчают после прогрева.
 - Inline blog markdown images без fallback placeholder при 404 (раньше скрывались) — редкий кейс.
 
+**Prod @`9646968`:** `deploy-prod-next` OK; sharp в `apps/web`; proof `Accept: image/avif` → `content-type: image/avif` для hero и remote TEP S3; `/events` HTML содержит `/_next/image?url=…`.
+
 ---
 
 ## 2026-07-22 — Prod deploy load + city hub blog @`bb65e4a`
