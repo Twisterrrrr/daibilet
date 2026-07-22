@@ -84,6 +84,12 @@ fi
 sleep 4
 curl -fsS "http://127.0.0.1:${WEB_PORT}/api/health" >/dev/null && echo "Next /api/health OK on :$WEB_PORT"
 
+# Drop nginx HTML proxy cache so browsers don't get pre-deploy RSC/HTML pointing at deleted chunks.
+if [[ -d /var/cache/nginx/daibilet ]]; then
+  rm -rf /var/cache/nginx/daibilet/* || true
+  echo "Cleared nginx proxy cache /var/cache/nginx/daibilet"
+fi
+
 # Bust ISR / unstable_cache after deploy (same tags/paths as backend revalidate-next-home).
 REVALIDATE_SECRET="${DAIBILET_NEXT_REVALIDATE_SECRET:-}"
 if [[ -z "$REVALIDATE_SECRET" && -f .env ]]; then
