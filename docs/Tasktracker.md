@@ -14,7 +14,7 @@
 | H.1 | Shared `HeroLayout` + `HeroMedia` (LCP priority) | Критический | ✅ |
 | H.2 | Home imageOverlay/rotator + Prisma `HeroBanner` + admin toggle | Критический | ✅ `72ea839` prod migrate+deploy |
 | H.3 | `/cities` split + RF map hover + top tiles ISR 1h | Высокий | ✅ |
-| H.3b | `/cities` top tiles + «Популярные города»: max-w-5xl + items-stretch (как podborki) | Критический | 🔄 commit+deploy |
+| H.3b | `/cities` top tiles + «Популярные города»: max-w-5xl + items-stretch (как podborki) | Критический | ✅ `d1ccd8a` prod |
 | H.4 | `/podborki` editorial 70/30 featured/trending | Высокий | ✅ |
 | H.5 | `/venues` dark imageOverlay + search | Средний | ✅ MVP |
 | H.6 | `/locations` withMap (map points on list) | Средний | 🔄 stub: RussiaMap + filters; pin map follow-up |

@@ -12,7 +12,7 @@
 
 ### Проблемы
 
-- Нет (commit + deploy-prod-next). Hero фото city hub (`/cities/[slug]`) - вне скоупа.
+- Первый `deploy-prod-next` упал на mid-build `.next` ENOENT (web с `Restart=always` успевал подняться во время `next build`). Дожали: `Restart=no` runtime override → clean build → start. **Prod @`d1ccd8a`:** `/cities` 200, HTML с `max-w-5xl items-stretch`. Hero фото city hub (`/cities/[slug]`) - вне скоупа.
 
 ---
 
