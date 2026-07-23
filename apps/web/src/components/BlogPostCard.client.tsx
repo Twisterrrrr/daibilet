@@ -13,41 +13,10 @@ import { resolveBlogListingQuickLinks } from '@/lib/blog-listing-links';
 
 export type BlogPostCardVariant = 'large' | 'small' | 'default';
 
-function BlogCardCover({
-  post,
-  isLarge,
-  isSmall,
-}: {
-  post: BlogCardDto;
-  isLarge: boolean;
-  isSmall: boolean;
-}) {
+function CoverBadges({ post, tag }: { post: BlogCardDto; tag: string }) {
   const cityLink = resolveBlogCityHref(post.city, post.citySlug);
-  const tag = post.tag || 'Гид';
-
   return (
-    <div
-      className={[
-        'relative overflow-hidden bg-slate-200',
-        isLarge
-          ? 'aspect-[16/10] min-h-[12rem] sm:min-h-[14rem] lg:aspect-auto lg:min-h-[18rem] lg:flex-1'
-          : isSmall
-            ? 'aspect-[16/10]'
-            : 'aspect-[16/9]',
-      ].join(' ')}
-    >
-      <SafeImage
-        src={post.coverImageUrl}
-        alt=""
-        fill
-        sizes={isLarge ? IMAGE_SIZES.blogFeatured : IMAGE_SIZES.blogCard}
-        className="object-cover transition-transform duration-500 group-hover:scale-105"
-        fallback={
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-300 to-slate-400 text-4xl">
-            📰
-          </div>
-        }
-      />
+    <>
       <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-center gap-2 p-3">
         <span className="inline-flex rounded-full bg-white/95 px-2.5 py-0.5 text-xs font-semibold text-slate-900 shadow-sm">
@@ -60,7 +29,7 @@ function BlogCardCover({
           </span>
         ) : null}
       </div>
-    </div>
+    </>
   );
 }
 
@@ -126,12 +95,28 @@ export function BlogPostCard({
   if (isLarge) {
     return (
       <article className={cardShell}>
-        <Link href={articleHref} aria-label={post.title} className="relative block min-h-0 flex-1">
-          <BlogCardCover post={{ ...post, tag }} isLarge isSmall={false} />
+        <Link
+          href={articleHref}
+          aria-label={post.title}
+          className="relative block aspect-[16/10] min-h-[12rem] shrink-0 overflow-hidden bg-slate-200 sm:min-h-[14rem] lg:aspect-auto lg:min-h-[16rem] lg:flex-1"
+        >
+          <SafeImage
+            src={post.coverImageUrl}
+            alt=""
+            fill
+            sizes={IMAGE_SIZES.blogFeatured}
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            fallback={
+              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-300 to-slate-400 text-4xl">
+                📰
+              </div>
+            }
+          />
+          <CoverBadges post={post} tag={tag} />
         </Link>
-        <div className="flex min-w-0 flex-1 flex-col justify-between p-5 sm:p-6">
+        <div className="flex min-w-0 flex-col justify-between p-5 sm:p-6">
           <div className="min-w-0">
-            <h2 className="text-xl font-semibold leading-snug text-slate-900 group-hover:text-primary-700 sm:text-2xl lg:text-[1.75rem]">
+            <h2 className="font-display text-xl font-bold leading-snug text-slate-900 sm:text-2xl lg:text-[1.75rem]">
               <Link href={articleHref} className="hover:text-primary-700">
                 {post.title}
               </Link>
@@ -142,7 +127,7 @@ export function BlogPostCard({
               </p>
             ) : null}
             {quickLinks.length ? (
-              <div className="mt-3 flex flex-wrap gap-2 border-t border-slate-100 pt-3">
+              <div className="mt-3 flex flex-wrap gap-2 border-t border-slate-100 pt-3" aria-label="Связанные разделы">
                 {quickLinks.map((link) => (
                   <Link
                     key={link.href}
@@ -163,7 +148,26 @@ export function BlogPostCard({
 
   return (
     <Link href={articleHref} className={cardShell}>
-      <BlogCardCover post={{ ...post, tag }} isLarge={false} isSmall={isSmall} />
+      <div
+        className={[
+          'relative overflow-hidden bg-slate-200',
+          isSmall ? 'aspect-[16/10]' : 'aspect-[16/9]',
+        ].join(' ')}
+      >
+        <SafeImage
+          src={post.coverImageUrl}
+          alt=""
+          fill
+          sizes={IMAGE_SIZES.blogCard}
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          fallback={
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-300 to-slate-400 text-4xl">
+              📰
+            </div>
+          }
+        />
+        <CoverBadges post={post} tag={tag} />
+      </div>
       <div className={['flex flex-1 flex-col', isSmall ? 'p-4' : 'p-5'].join(' ')}>
         <h2
           className={[
