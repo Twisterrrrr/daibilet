@@ -84,11 +84,11 @@ export function LandingsCatalogView({
         title="Подборки событий"
         description="Готовые списки под настроение и повод: вечер, выходные, бюджет или редкие премьеры."
       >
-        {/* Editorial 70/30: featured + trending equal-height siblings (not title|aside). */}
+        {/* Featured + trending: equal-height, centered content width (not full-bleed 70/30 extremes). */}
         <div
           className={
             trending.length
-              ? 'mt-6 grid items-stretch gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,3fr)] lg:gap-6'
+              ? 'mx-auto mt-6 grid w-full max-w-5xl items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(14rem,1fr)] lg:gap-5'
               : 'mt-6'
           }
         >
