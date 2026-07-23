@@ -45,7 +45,6 @@ import {
   buildPublicHomePreview,
   buildPublicDestinations,
   buildPublicStats,
-  buildPublicSearch,
   buildPublicPromoBlocks,
   buildPublicLandingsCatalog,
   buildPublicArticlesList,

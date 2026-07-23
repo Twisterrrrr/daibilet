@@ -19,6 +19,17 @@ export function createPublicVenueRouteHandler(
       sendPublicJson(context.response, await deps.buildVenues(context.searchParams, forceRefresh));
       return true;
     }
+    if (context.pathname === '/api/public/venues/map-tip') {
+      const { loadVenueMapTip } = await import('./public-venue-map-tip.js');
+      const tipId = String(context.searchParams.get('id') || context.searchParams.get('slug') || '').trim();
+      const tip = await loadVenueMapTip(tipId);
+      if (!tip) {
+        sendPublicJson(context.response, { error: 'not_found' }, 404);
+        return true;
+      }
+      sendPublicJson(context.response, { tip });
+      return true;
+    }
     const match = matchPath(context.pathname, /^\/api\/public\/venues\/([^/]+)$/);
     if (!match?.[0]) return false;
     sendPublicJson(context.response, await deps.buildVenue(match[0], forceRefresh));
