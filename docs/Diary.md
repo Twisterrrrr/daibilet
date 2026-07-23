@@ -1,4 +1,23 @@
+## 2026-07-23 - Hero главной: ротация славянских туристов
+
+### Наблюдения
+
+- Hero был один кадр (`home-hero-friends-selfie.jpg` + mobile crop); эталон в `apps/public/public/images/hero/`, sync в Next при `web:build`.
+
+### Решения
+
+- Добавлены 6 кадров `hero-slavic-01..06.png` (славянская внешность, позитивные эмоции, разные сцены).
+- Пул `HOME_HERO_IMAGES` (7 шт. с учётом старого selfie); SSR-выбор `pickHomeHeroImage()` + `connection()` на каждый запрос без hydration flash.
+- Alt на русском; `HomeHeroBackground` принимает выбранный сет.
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-23 - SEO Казань/Екб: падежи + 3 meta-шаблона + thin cards
+
 
 ### Наблюдения
 

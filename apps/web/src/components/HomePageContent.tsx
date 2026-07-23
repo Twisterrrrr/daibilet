@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { connection } from 'next/server';
 import {
   ArrowRight,
   CalendarDays,
@@ -23,6 +24,7 @@ import '@/lib/env';
 import { getHomePageData } from '@/server/cached-home-data';
 import { formatMoney, pluralEvents } from '@/lib/format';
 import { buildHomePageSections } from '@/lib/home-page-sections';
+import { pickHomeHeroImage } from '@/lib/home-hero-images';
 import { HOME_FORMAT_TILES, HOME_TRUST_ITEMS } from '@/lib/home-scenarios';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { venueHref } from '@/lib/routes';
@@ -53,6 +55,10 @@ function promoBlockIcon(slug: string, index: number) {
 }
 
 export async function HomePageContent() {
+  // Per-request hero pick (avoids ISR baking one frame for all visitors).
+  // Catalog/stats still come from unstable_cache in getHomePageData.
+  await connection();
+
   const { destinationsPayload, catalogPayload, landingsCatalog, venuesPayload, statsPayload } =
     await getHomePageData();
 
@@ -85,10 +91,17 @@ export async function HomePageContent() {
     : [...blogCards].reverse();
   const blogPosts = orderedBlog.slice(0, 4);
   const [featuredBlog, ...restBlog] = blogPosts;
+  const heroImage = pickHomeHeroImage();
 
   return (
     <>
-      <HomeHero destinations={destinations} totalEvents={totalEvents} totalVenues={totalVenues} cityCount={cityCount} />
+      <HomeHero
+        destinations={destinations}
+        totalEvents={totalEvents}
+        totalVenues={totalVenues}
+        cityCount={cityCount}
+        heroImage={heroImage}
+      />
 
       <HomeEventRail
         id="editors-pick"

@@ -19,6 +19,7 @@ import {
   pluralVenues,
   roundStatToTen,
 } from '@/lib/format';
+import type { HomeHeroImageSet } from '@/lib/home-hero-images';
 import { HERO_QUICK_CHIPS } from '@/lib/home-scenarios';
 
 const HERO_DATE_OPTIONS = [
@@ -33,9 +34,10 @@ type HomeHeroProps = {
   totalEvents: number;
   totalVenues: number;
   cityCount: number;
+  heroImage: HomeHeroImageSet;
 };
 
-export function HomeHero({ destinations, totalEvents, totalVenues, cityCount }: HomeHeroProps) {
+export function HomeHero({ destinations, totalEvents, totalVenues, cityCount, heroImage }: HomeHeroProps) {
   const router = useRouter();
   const selectedCity = useSelectedCityOptional();
   const destination = selectedCity?.cityValue ?? 'all';
@@ -65,7 +67,7 @@ export function HomeHero({ destinations, totalEvents, totalVenues, cityCount }: 
 
   return (
     <section className="relative overflow-hidden bg-slate-900">
-      <HomeHeroBackground />
+      <HomeHeroBackground image={heroImage} />
       <div className="container-page relative pb-12 pt-12 sm:pb-16 sm:pt-16">
         <div className="mx-auto max-w-3xl text-center drop-shadow-[0_2px_14px_rgba(15,23,42,0.55)]">
           <HomeHeroStats
