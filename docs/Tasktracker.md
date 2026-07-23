@@ -179,7 +179,7 @@
 | B.24 | `/blog` view toggle: magazine-сетка \| список + localStorage/`?view=` | Высокий | ✅ `0741106` prod via `ed874cb` | агент |
 | B.24b | Blog cards: убрать cover badges (tag/city на фото) | Высокий | ✅ `b542a45` (+ merge B.24) | агент |
 | B.25 | Авторы колонок: brand blue (`text-primary-600`), без бейджа «Колонка» | Высокий | ✅ `ed874cb` prod | агент |
-| B.26 | `/blog` UX: темы, поиск, «Показать ещё», CTA CHPU, дата на large | Высокий | 🔄 in progress | агент |
+| B.26 | `/blog` UX: темы, поиск, «Показать ещё», CTA CHPU, дата на large | Высокий | ✅ `bd8ec37` prod | агент |
 
 ---
 

@@ -14,7 +14,7 @@
 
 ### Проблемы
 
-- Deploy/smoke - после commit.
+- Нет. **Prod @`bd8ec37`:** deploy-prod-next OK; smoke `/blog` - поиск, темы, «Показать ещё», «Смотреть расписание»/«К событиям», дата large.
 
 ---
 
