@@ -1,3 +1,20 @@
+## 2026-07-23 - `/blog` listing: нейтральная шапка
+
+### Наблюдения
+
+- Владелец: full-bleed `BlogListHero` с kenburns/фото «ужас» - нужна простая нейтральная полоска.
+
+### Решения
+
+- `BlogListHero`: убрали фото/motion/тёмный overlay; крошки + strip `bg-slate-50`, H1 `font-display`, короткий description.
+- Magazine grid ниже не трогали; article hero без изменений.
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-23 - Правило: cover обязателен + догенерация bylinnyy
 
 ### Наблюдения
