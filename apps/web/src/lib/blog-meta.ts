@@ -177,6 +177,42 @@ const SLUG_META: Record<
     citySlug: 'ekaterinburg',
     city: 'Екатеринбург',
   },
+  'moscow-2-dnya-samostoyatelno-marshrut': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'moscow',
+    city: 'Москва',
+  },
+  'moskva-rechnye-progulki-kak-vybrat': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'moscow',
+    city: 'Москва',
+  },
+  'uzhin-na-teplohode-moskva-kak-vybrat': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'moscow',
+    city: 'Москва',
+  },
+  'sankt-peterburg-3-dnya-samostoyatelno': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'saint-petersburg',
+    city: 'Санкт-Петербург',
+  },
+  'rechnye-progulki-neva-kanaly-kak-vybrat': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'saint-petersburg',
+    city: 'Санкт-Петербург',
+  },
+  'koncerty-peterburg-osobnyak-klub-zal': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'saint-petersburg',
+    city: 'Санкт-Петербург',
+  },
 };
 
 export function authorLabel(authorId?: string | null): string {

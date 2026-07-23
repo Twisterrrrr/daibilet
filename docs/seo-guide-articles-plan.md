@@ -2,7 +2,7 @@
 
 **Дата:** 2026-07-23  
 **Цель:** статьи-гиды → утверждённые category×city / intent посадки.  
-**Статус:** batch #1 (10 шт., Казань + Екб) утверждён; **пачка A (ID 1, 8, 10) размещена в блоге 2026-07-23**; пачка B ждёт тексты GPT.  
+**Статус:** batch #1 (10 шт., Казань + Екб) утверждён; **пачка A (ID 1, 8, 10) размещена 2026-07-23**; **пачка МСК/СПб (ID 11, 12, 18, 19, 30 + концерты СПб) размещена 2026-07-23**; пачка B (остаток batch #1) ждёт тексты GPT.  
 **Первая генерация:** эталоны ТЗ №1 (ID 1), №2 (ID 8), №3 (ID 10) - см. `seo-guide-articles-gpt-prompt.md` → «Эталонные ТЗ (3 типа)».
 
 Связанные файлы:
@@ -105,9 +105,10 @@
 ## Очередь публикации
 
 1. **Пачка A (эталоны) - размещено 2026-07-23:** ID **1, 8, 10** → `/blog/kazan-2-3-dnya-samostoyatelno-karta`, `/blog/ekb-stendap-uralskiy-yumor`, `/blog/ekb-uralskiy-mars-bazhovskie-ekskursii` (`PUBLISHED`; cover = плейсхолдер city image, TODO уникальные фото).
-2. **Пачка B:** остальной batch #1 (ID 2, 3, 4, 5, 6, 7, 9) - универсальный User + строки плана.
-3. Затем batch #2: High МСК/СПб из таблицы выше.
-4. Средний - после editorial polish и насыщения каталога.
+2. **Пачка МСК/СПб - размещено 2026-07-23:** ID **11, 12, 18, 19, 30** + `koncerty-peterburg-osobnyak-klub-zal` (вне исходной нумерации) → см. таблицу ниже.
+3. **Пачка B:** остальной batch #1 (ID 2, 3, 4, 5, 6, 7, 9) - универсальный User + строки плана.
+4. Затем остаток batch #2 High/Средний МСК/СПб.
+5. Средний - после editorial polish и насыщения каталога.
 
 ## Пилот размещения
 
@@ -116,5 +117,11 @@
 | 1 | `kazan-2-3-dnya-samostoyatelno-karta` | https://daibilet.ru/blog/kazan-2-3-dnya-samostoyatelno-karta | ✅ размещено | TODO: уникальное фото (сейчас `kazan.png`) |
 | 8 | `ekb-stendap-uralskiy-yumor` | https://daibilet.ru/blog/ekb-stendap-uralskiy-yumor | ✅ размещено | TODO: уникальное фото (сейчас `ekaterinburg.png`) |
 | 10 | `ekb-uralskiy-mars-bazhovskie-ekskursii` | https://daibilet.ru/blog/ekb-uralskiy-mars-bazhovskie-ekskursii | ✅ размещено | TODO: уникальное фото (сейчас `ekaterinburg.png`) |
+| 11 | `moscow-2-dnya-samostoyatelno-marshrut` | https://daibilet.ru/blog/moscow-2-dnya-samostoyatelno-marshrut | ✅ размещено | TODO: уникальное фото (сейчас `moscow.png`) |
+| 12 | `moskva-rechnye-progulki-kak-vybrat` | https://daibilet.ru/blog/moskva-rechnye-progulki-kak-vybrat | ✅ размещено | TODO: уникальное фото (сейчас `moscow.png`) |
+| 18 | `sankt-peterburg-3-dnya-samostoyatelno` | https://daibilet.ru/blog/sankt-peterburg-3-dnya-samostoyatelno | ✅ размещено | TODO: уникальное фото (сейчас `saint-petersburg.png`) |
+| 19 | `rechnye-progulki-neva-kanaly-kak-vybrat` | https://daibilet.ru/blog/rechnye-progulki-neva-kanaly-kak-vybrat | ✅ размещено | TODO: уникальное фото (сейчас `saint-petersburg.png`) |
+| 30 | `uzhin-na-teplohode-moskva-kak-vybrat` | https://daibilet.ru/blog/uzhin-na-teplohode-moskva-kak-vybrat | ✅ размещено | TODO: уникальное фото (сейчас `moscow.png`) |
+| - | `koncerty-peterburg-osobnyak-klub-zal` | https://daibilet.ru/blog/koncerty-peterburg-osobnyak-klub-zal | ✅ размещено | TODO: уникальное фото (сейчас `saint-petersburg.png`) |
 
 Пачка B (не размещена): ID 2, 3, 4, 5, 6, 7, 9.

@@ -1,3 +1,23 @@
+## 2026-07-23 - SEO guides МСК/СПб → блог
+
+### Наблюдения
+
+- Архив `daibilet-guides-moscow-spb.zip`: 6 MD (Москва 2 дня / речные / ужин; СПб 3 дня / Нева-каналы / концерты).
+- Frontmatter совпал со схемой; длинных тире нет; `[NOTE]` + CTA на живые CHPU МСК/СПб.
+- Не пересекается со slug пачки A (Казань/Екб).
+
+### Решения
+
+- `PUBLISHED` в `content/blog/` + карточки `blog-posts` (web+public), `blog-meta`, `blog:sync-bodies`.
+- Cover: плейсхолдер `cities/moscow.png` / `saint-petersburg.png` → `/images/blog/{slug}.jpg` (TODO уникальные фото).
+- План `docs/seo-guide-articles-plan.md`: ID 11, 12, 18, 19, 30 + концерты СПб отмечены размещёнными.
+
+### Проблемы
+
+- Уникальные обложки/inline ещё не сняты - city placeholder.
+
+---
+
 ## 2026-07-23 - Batch A: уникальные cover вместо city-placeholder
 
 ### Наблюдения
