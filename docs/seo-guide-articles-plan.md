@@ -1,8 +1,8 @@
 # План путеводителей (контентная воронка → CHPU)
 
-**Дата:** 2026-07-23  
+**Дата:** 2026-07-23 (календарь антиспам пересобран 2026-07-23 вечер)  
 **Цель:** статьи-гиды → утверждённые category×city / intent посадки.  
-**Статус:** batch #1 (10 шт., Казань + Екб) утверждён; **пачка A + МСК/СПб** - тексты владельца (анти-ИИ) в `content/blog/`, CMS `PUBLISHED` + `publishedAt` по календарю ≤3/день; пачка B (остаток batch #1) ждёт тексты GPT.  
+**Статус:** batch #1 (10 шт., Казань + Екб) утверждён; **пачка A + МСК/СПб** - тексты владельца (анти-ИИ) в `content/blog/`, CMS `PUBLISHED` + `publishedAt` по **хаос-календарю** (не ровно 3/день 09:00); пачка B (остаток batch #1) ждёт тексты GPT.  
 **Первая генерация:** эталоны ТЗ №1 (ID 1), №2 (ID 8), №3 (ID 10) - см. `seo-guide-articles-gpt-prompt.md` → «Эталонные ТЗ (3 типа)».
 
 Связанные файлы:
@@ -19,7 +19,14 @@
 - **Загородные:** роут `/zagorodnye-ekskursii/{city}` разрешён только для `saint-petersburg` (`LANDING_ALLOWED_CITY_SLUGS`). Для Казани/Екб в batch #1 CTA = `/ekskursii/{city}` (зафиксировано ниже).
 - Отдельного CHPU «смотровые площадки» нет → CTA = `/ekskursii/ekaterinburg`.
 - Год в H1 / `title` / `seoTitle` / `seoH1` - обновляемый (сейчас **2026**).
-- **Публикация:** максимум **3 статьи в день**; в дневной пачке **миксовать города** (не выкладывать 3 из одного города). Технически: `status: PUBLISHED` + `publishedAt` (ISO); public API / sitemap отдают только `publishedAt <= now`.
+- **Публикация (антиспам, решение владельца 2026-07-23):** «живая редакция», не конвейер.
+  - **Не** ровно N статей каждый день и **не** круглые таймстампы (`00:00`, каждые 8ч, все в `09:00`).
+  - Ритм-пример: **2 / 4 / 1 / перерыв вс**; времена вроде `11:15`, `16:40` MSK.
+  - В дневной пачке **миксовать города**.
+  - Технически: `status: PUBLISHED` + `publishedAt` (ISO `+03:00`); public API / sitemap: `publishedAt <= now`.
+- **Авторские колонки (щит от антиспама):** 4 персоны (Макс «Изнанка маршрута», Анна «Город крупным планом», Елена «Спокойный маршрут», Игорь «Место силы»; плюс Артур «На вкус»). Публиковать колонку в **пн**; в этот день **не** выкладывать SEO-гиды.
+- **Микс шаблонов (~⅓ / ~⅓ / ~⅓):** длинный гид 5–7к; короткая подборка ТОП-5 ~3к; событийный анонс фестиваля/вечера. Не все статьи-близнецы по структуре (см. GPT-prompt).
+- **Safety (индекс):** если Яндекс/GSC глотает **80–90%** URL - ок; если «малоценная» / не в индекс - снизить до **1 гид/день**. Owner action в Вебмастере (см. `docs/qa.md`, `docs/Diary.md`).
 
 ## Batch #1 - приоритет генерации (10 статей)
 
@@ -105,33 +112,66 @@
 
 ## Очередь публикации
 
-1. **Календарь live (≤3/день, микс городов)** - см. таблицу ниже. Статус в CMS: `PUBLISHED` + `publishedAt`.
-2. **Пачка B:** остальной batch #1 (ID 2, 3, 4, 5, 6, 7, 9) - универсальный User + строки плана; в график публикации - тоже ≤3/день с миксом городов.
+1. **Хаос-календарь** (микс городов + шаблонов + пн-колонки) - таблица ниже. Статус: `PUBLISHED` + `publishedAt`.
+2. **Пачка B:** остальной batch #1 (ID 2, 3, 4, 5, 6, 7, 9) - универсальный User с явным `template_type`; график - хаос, не конвейер 3×09:00.
 3. Затем остаток batch #2 High/Средний МСК/СПб.
 4. Средний - после editorial polish и насыщения каталога.
 
-## Календарь публикации (пачка A + МСК/СПб)
+## Типы шаблонов (микс ~⅓)
 
-Время слота: **09:00 Europe/Moscow** (`publishedAt` ISO `+03:00`).
+| Тип | Объём тела | Когда | Эталон / hint |
+|-----|------------|-------|---------------|
+| `long` | 5000-7000 | городской маршрут на 2-3 дня | ТЗ №1 |
+| `top5` | ~3000 | короткая подборка ТОП-5 / «как выбрать» без лонгрида | укороченный User + списки |
+| `events` | 3500-5500 | стендап / концерт / фест / ужин-формат | ТЗ №2 + событийный угол |
 
-| Дата | Города | Slug (3 шт.) |
-|------|--------|--------------|
-| **2026-07-23** (сегодня, live) | Казань + Екб + Москва | `kazan-2-3-dnya-samostoyatelno-karta`, `ekb-stendap-uralskiy-yumor`, `moscow-2-dnya-samostoyatelno-marshrut` |
-| **2026-07-24** | Екб + СПб + Москва | `ekb-uralskiy-mars-bazhovskie-ekskursii`, `sankt-peterburg-3-dnya-samostoyatelno`, `moskva-rechnye-progulki-kak-vybrat` |
-| **2026-07-25** | Москва + СПб + СПб | `uzhin-na-teplohode-moskva-kak-vybrat`, `rechnye-progulki-neva-kanaly-kak-vybrat`, `koncerty-peterburg-osobnyak-klub-zal` |
+## Правило колонок (пн = щит)
+
+| Колонка | Автор | Живые / в графике |
+|---------|-------|-------------------|
+| Изнанка маршрута | Макс | ✅ `fentezi-fest-bylinnyy-bereg`; ⏳ пн 27.07 `open-air-festy-vyhodnoi-ru` |
+| Город крупным планом | Анна | ✅ `muzyka-v-osobnyakah-spb` |
+| Спокойный маршрут | Елена | ✅ `spb-s-rebenkom-v-dozhd` |
+| На вкус | Артур | ✅ `kazan-na-vkus-master-klassy` |
+| Место силы | Игорь | ⏳ пн 03.08 `bylinnyy-bereg-fentezi-fest-volhov` |
+
+`bylinnyy-bereg-fentezi-fest` (Макс, HIDDEN) - дубль live-колонки, **не** в график.
+
+В **пн** - только колонка (или ничего); SEO-гиды в пн не ставить.
+
+## Календарь публикации (антиспам / хаос)
+
+Время: Europe/Moscow, `publishedAt` ISO `+03:00`. Ритм: **2 / 1 / вс-перерыв / пн-колонка / 2 / 1**.
+
+| Дата | Время | Тип | Город | Slug |
+|------|-------|-----|-------|------|
+| **2026-07-23** чт | 09:00 | long | Казань | `kazan-2-3-dnya-samostoyatelno-karta` ✅ live |
+| **2026-07-23** чт | 09:00 | events | Екб | `ekb-stendap-uralskiy-yumor` ✅ live |
+| **2026-07-23** чт | 09:00 | long | Москва | `moscow-2-dnya-samostoyatelno-marshrut` ✅ live |
+| **2026-07-24** пт | 11:15 | top5 | Екб | `ekb-uralskiy-mars-bazhovskie-ekskursii` |
+| **2026-07-24** пт | 16:40 | long | СПб | `sankt-peterburg-3-dnya-samostoyatelno` |
+| **2026-07-25** сб | 14:25 | top5 | Москва | `moskva-rechnye-progulki-kak-vybrat` |
+| **2026-07-26** вс | - | - | - | **перерыв** |
+| **2026-07-27** пн | 10:35 | column | СПб | `open-air-festy-vyhodnoi-ru` (Макс) |
+| **2026-07-28** вт | 11:50 | events | Москва | `uzhin-na-teplohode-moskva-kak-vybrat` |
+| **2026-07-28** вт | 18:20 | top5 | СПб | `rechnye-progulki-neva-kanaly-kak-vybrat` |
+| **2026-07-29** ср | 15:10 | events | СПб | `koncerty-peterburg-osobnyak-klub-zal` |
+| **2026-08-03** пн | 12:20 | column | регионы | `bylinnyy-bereg-fentezi-fest-volhov` (Игорь) |
 
 ## Пилот размещения
 
-| ID | Slug | URL | publishAt | Статус | Cover |
-|----|------|-----|-----------|--------|-------|
-| 1 | `kazan-2-3-dnya-samostoyatelno-karta` | https://daibilet.ru/blog/kazan-2-3-dnya-samostoyatelno-karta | 2026-07-23 | ✅ live (owner rewrite) | уникальный jpg (batch A) |
-| 8 | `ekb-stendap-uralskiy-yumor` | https://daibilet.ru/blog/ekb-stendap-uralskiy-yumor | 2026-07-23 | ✅ live (owner rewrite) | уникальный jpg (batch A) |
-| 11 | `moscow-2-dnya-samostoyatelno-marshrut` | https://daibilet.ru/blog/moscow-2-dnya-samostoyatelno-marshrut | 2026-07-23 | ✅ live (owner rewrite) | TODO уникальное фото |
-| 10 | `ekb-uralskiy-mars-bazhovskie-ekskursii` | https://daibilet.ru/blog/ekb-uralskiy-mars-bazhovskie-ekskursii | 2026-07-24 | ⏳ schedule (owner rewrite) | уникальный jpg (batch A) |
-| 18 | `sankt-peterburg-3-dnya-samostoyatelno` | https://daibilet.ru/blog/sankt-peterburg-3-dnya-samostoyatelno | 2026-07-24 | ⏳ schedule (owner rewrite) | TODO уникальное фото |
-| 12 | `moskva-rechnye-progulki-kak-vybrat` | https://daibilet.ru/blog/moskva-rechnye-progulki-kak-vybrat | 2026-07-24 | ⏳ schedule (owner rewrite) | TODO уникальное фото |
-| 30 | `uzhin-na-teplohode-moskva-kak-vybrat` | https://daibilet.ru/blog/uzhin-na-teplohode-moskva-kak-vybrat | 2026-07-25 | ⏳ schedule (owner rewrite) | TODO уникальное фото |
-| 19 | `rechnye-progulki-neva-kanaly-kak-vybrat` | https://daibilet.ru/blog/rechnye-progulki-neva-kanaly-kak-vybrat | 2026-07-25 | ⏳ schedule (owner rewrite) | TODO уникальное фото |
-| - | `koncerty-peterburg-osobnyak-klub-zal` | https://daibilet.ru/blog/koncerty-peterburg-osobnyak-klub-zal | 2026-07-25 | ⏳ schedule (owner rewrite) | TODO уникальное фото |
+| ID | Slug | publishAt MSK | Тип | Статус | Cover |
+|----|------|---------------|-----|--------|-------|
+| 1 | `kazan-2-3-dnya-samostoyatelno-karta` | 2026-07-23 09:00 | long | ✅ live | уникальный jpg (batch A) |
+| 8 | `ekb-stendap-uralskiy-yumor` | 2026-07-23 09:00 | events | ✅ live | уникальный jpg (batch A) |
+| 11 | `moscow-2-dnya-samostoyatelno-marshrut` | 2026-07-23 09:00 | long | ✅ live | TODO уникальное фото |
+| 10 | `ekb-uralskiy-mars-bazhovskie-ekskursii` | 2026-07-24 11:15 | top5 | ⏳ schedule | уникальный jpg (batch A) |
+| 18 | `sankt-peterburg-3-dnya-samostoyatelno` | 2026-07-24 16:40 | long | ⏳ schedule | TODO уникальное фото |
+| 12 | `moskva-rechnye-progulki-kak-vybrat` | 2026-07-25 14:25 | top5 | ⏳ schedule | TODO уникальное фото |
+| - | `open-air-festy-vyhodnoi-ru` | 2026-07-27 10:35 | column | ⏳ schedule пн | jpg есть |
+| 30 | `uzhin-na-teplohode-moskva-kak-vybrat` | 2026-07-28 11:50 | events | ⏳ schedule | TODO уникальное фото |
+| 19 | `rechnye-progulki-neva-kanaly-kak-vybrat` | 2026-07-28 18:20 | top5 | ⏳ schedule | TODO уникальное фото |
+| - | `koncerty-peterburg-osobnyak-klub-zal` | 2026-07-29 15:10 | events | ⏳ schedule | TODO уникальное фото |
+| - | `bylinnyy-bereg-fentezi-fest-volhov` | 2026-08-03 12:20 | column | ⏳ schedule пн | jpg есть |
 
 Пачка B (не размещена): ID 2, 3, 4, 5, 6, 7, 9.

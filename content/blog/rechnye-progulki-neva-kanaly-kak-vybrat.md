@@ -10,11 +10,11 @@ authorName: Редакция
 articleType: gid
 tag: Город
 citySlug: saint-petersburg
-date: "25 июл 2026"
+date: "28 июл 2026"
 readMin: 10
 imageAlt: "Теплоход проходит под мостом на канале Санкт-Петербурга"
 coverImageUrl: "/images/blog/rechnye-progulki-neva-kanaly-kak-vybrat.jpg"
-publishedAt: "2026-07-25T09:00:00+03:00"
+publishedAt: "2026-07-28T18:20:00+03:00"
 status: PUBLISHED
 ---
 

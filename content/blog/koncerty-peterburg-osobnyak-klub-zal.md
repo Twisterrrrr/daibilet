@@ -10,11 +10,11 @@ authorName: Редакция
 articleType: gid
 tag: Город
 citySlug: saint-petersburg
-date: "25 июл 2026"
+date: "29 июл 2026"
 readMin: 9
 imageAlt: "Камерный концерт в историческом интерьере Петербурга"
 coverImageUrl: "/images/blog/koncerty-peterburg-osobnyak-klub-zal.jpg"
-publishedAt: "2026-07-25T09:00:00+03:00"
+publishedAt: "2026-07-29T15:10:00+03:00"
 status: PUBLISHED
 ---
 

@@ -14,7 +14,7 @@ date: "24 июл 2026"
 readMin: 10
 imageAlt: "Красно-оранжевый карьерный пейзаж Уральского Марса"
 coverImageUrl: "/images/blog/ekb-uralskiy-mars-bazhovskie-ekskursii.jpg"
-publishedAt: "2026-07-24T09:00:00+03:00"
+publishedAt: "2026-07-24T11:15:00+03:00"
 status: PUBLISHED
 ---
 
