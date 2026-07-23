@@ -1,3 +1,20 @@
+## 2026-07-24 - Blog Featured Hero: CTA-плитка под «Свежее»
+
+### Наблюдения
+
+- Владелец: справа под списком «Свежее» большая белая пустота - визуально не уравновешивает левый featured.
+- Скрин ekb-stendap cityscape: на prod cover уже сцена/микрофон (/images/blog/ekb-stendap-uralskiy-yumor.jpg, 2.0MB) - скрин устарел.
+
+### Решения
+
+- BlogFeaturedHero: под списком - promo tile (blog-hero-promo.jpg, микрофон) + CTA «Афиша: {город}» (events/hub) или «Смотреть все гайды» -> /podborki; mt-auto flex-1 выравнивает высоту с левой колонкой.
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-24 - Hero-зоны: HeroLayout + home rotator (P0/P1/P2)
 
 ### Наблюдения
