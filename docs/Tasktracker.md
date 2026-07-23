@@ -53,6 +53,7 @@
 | SEO.19a | Blog mid-article плашка `[NOTE]` (`BlogArticleNote`) | Высокий | ✅ 2026-07-23; hotfix nested `[link](url)` in text= | агент |
 | SEO.19b | Batch A: уникальные cover вместо city-placeholder (3 jpg) | Высокий | ✅ 2026-07-23 | агент |
 | SEO.19b2 | МСК/СПб: уникальные cover ×6 + magazine `/blog` hero | Высокий | ✅ 2026-07-23 | агент |
+| SEO.19b3 | Правило: cover обязателен до PUBLISHED; догенерация missing (bylinnyy ×2) | Критический | ✅ 2026-07-23 | агент |
 | SEO.19c | Публикация гидов: хаос-график + микс городов; `publishedAt` schedule filter | Высокий | ✅ 2026-07-23; антиспам-пересбор вечер | агент |
 | SEO.19d | Owner anti-AI rewrite 9 гидов + upsert по графику | Высокий | ✅ 2026-07-23 | владелец + агент |
 | SEO.19e | Антиспам: пн-колонки + template_type long/top5/events + safety индекс | Высокий | ✅ 2026-07-23 вечер (календарь + docs + upsert) | агент |
@@ -168,7 +169,7 @@
 | B.18 | Колонка Артура «На вкус»: `kazan-na-vkus-master-klassy` (МК Эчпочмака + гастроужин) | Критический | ✅ 2026-07-22 @93d3a07 + upsert |
 | B.19 | Колонка Елены: `spb-s-rebenkom-v-dozhd` (СПб с ребёнком в дождь) | Критический | ✅ 2026-07-22 upsert + revalidate |
 | B.20 | `/blog` magazine layout: listing asymmetric + article journal (serif/dropcap/quotes/sidebar) | Высокий | ✅ `a4ecab6` |
-| B.21 | Blog typography: откат Source Serif → site `font-display`; убрать dropcap | Критический | 🔄 |
+| B.21 | Blog typography: откат Source Serif → site `font-display`; убрать dropcap | Критический | ✅ `230ebc2` |
 
 ---
 

@@ -1,3 +1,22 @@
+## 2026-07-23 - Правило: cover обязателен + догенерация bylinnyy
+
+### Наблюдения
+
+- Решение владельца: к любой blog article всегда генерируем уникальный cover (GenerateImage), не city-placeholder.
+- Аудит `content/blog` × `apps/public/public/images/blog/{slug}.jpg`: МСК/СПб ×6 и batch A уже уникальные; missing cover только у `bylinnyy-bereg-fentezi-fest-volhov` (PUBLISHED) и `bylinnyy-bereg-fentezi-fest` (HIDDEN).
+
+### Решения
+
+- Правило зафиксировано: `.cursorrules` §6, `docs/seo-guide-articles-gpt-prompt.md`, `docs/seo-guide-articles-plan.md`.
+- Сгенерированы 2 cover JPG → `apps/public/public/images/blog/{slug}.jpg` (frontmatter уже указывал пути).
+- Parallel WIP (large-card fill в `BlogPostCard`) не трогали; font revert и cadence уже в истории ветки.
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-23 - Blog typography: откат Source Serif
 
 ### Наблюдения
