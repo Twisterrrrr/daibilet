@@ -1,9 +1,11 @@
 import Link from 'next/link';
 
+import { BlogFeaturedHero } from '@/components/BlogFeaturedHero';
 import { BlogListFiltered } from '@/components/BlogListFiltered.client';
 import { BlogListHero } from '@/components/BlogListHero';
 import { SiteLayout } from '@/components/SiteLayout';
 import type { BlogCardDto } from '@/lib/blog-utils';
+import { splitBlogListingHero } from '@/lib/blog-utils';
 
 export type BlogListFilters = {
   city?: string;
@@ -19,13 +21,17 @@ export function BlogListView({
   posts: BlogCardDto[];
   filters?: BlogListFilters;
 }) {
+  const { featured, feed, hot } = splitBlogListingHero(posts);
+
   return (
     <SiteLayout>
       <BlogListHero breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Блог' }]} />
 
       {/* div, not nested <main>: SiteLayout already wraps children in <main> */}
       <div className="container-page py-10 sm:py-14">
-        <BlogListFiltered posts={posts} initialFilters={filters} />
+        {featured ? <BlogFeaturedHero featured={featured} hotPosts={hot} /> : null}
+
+        <BlogListFiltered posts={feed} initialFilters={filters} />
 
         <p className="mt-12 text-sm text-slate-500">
           Новые материалы выходят каждую неделю. А готовые списки событий - в{' '}

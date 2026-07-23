@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
 import { formatAdminDateTime, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
+import { setAdminArticleFeaturedAction } from '@/server/admin-article-actions';
 import { loadAdminArticlesList } from '@/server/admin-articles-data';
 
 export const dynamic = 'force-dynamic';
@@ -45,7 +46,7 @@ export default async function AdminArticlesPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">Блог / статьи</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Список и CRUD статей в Next.
+            Список и CRUD статей в Next. Колонка Hero - статья на баннере /blog.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -59,6 +60,12 @@ export default async function AdminArticlesPage({ searchParams }: PageProps) {
       </header>
 
       <AdminApiErrorBanner errors={data.errors} />
+
+      {first(raw.featured) === '1' ? (
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-800">
+          Hero обновлён.
+        </div>
+      ) : null}
 
       <form className="flex flex-wrap gap-2" action="/admin/articles" method="get">
         <input type="hidden" name="status" value={status} />
@@ -115,6 +122,7 @@ export default async function AdminArticlesPage({ searchParams }: PageProps) {
               <tr>
                 <th className="px-3 py-2 font-medium">Статья</th>
                 <th className="px-3 py-2 font-medium">Статус</th>
+                <th className="px-3 py-2 font-medium">Hero</th>
                 <th className="px-3 py-2 font-medium">Автор</th>
                 <th className="px-3 py-2 font-medium">Обновлено</th>
                 <th className="px-3 py-2 font-medium">Действия</th>
@@ -123,7 +131,7 @@ export default async function AdminArticlesPage({ searchParams }: PageProps) {
             <tbody>
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-3 py-8 text-center text-slate-500">
+                  <td colSpan={6} className="px-3 py-8 text-center text-slate-500">
                     Нет статей по текущему фильтру.
                   </td>
                 </tr>
@@ -141,6 +149,31 @@ export default async function AdminArticlesPage({ searchParams }: PageProps) {
                       <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs">
                         {statusLabel(row.status)}
                       </span>
+                    </td>
+                    <td className="px-3 py-2">
+                      <form action={setAdminArticleFeaturedAction}>
+                        <input type="hidden" name="id" value={row.id} />
+                        <input
+                          type="hidden"
+                          name="isFeatured"
+                          value={row.isFeatured ? 'false' : 'true'}
+                        />
+                        <button
+                          type="submit"
+                          className={`rounded-md border px-2 py-0.5 text-xs font-medium ${
+                            row.isFeatured
+                              ? 'border-emerald-300 bg-emerald-50 text-emerald-900'
+                              : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                          }`}
+                          title={
+                            row.isFeatured
+                              ? 'Убрать из Hero'
+                              : 'Поставить в Hero (сбросит другие)'
+                          }
+                        >
+                          {row.isFeatured ? 'В Hero · on' : 'В Hero'}
+                        </button>
+                      </form>
                     </td>
                     <td className="px-3 py-2 text-slate-600">{row.authorName || row.authorId || '—'}</td>
                     <td className="px-3 py-2 text-xs text-slate-500">

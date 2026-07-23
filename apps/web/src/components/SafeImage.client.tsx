@@ -17,7 +17,7 @@ export const IMAGE_SIZES = {
   landingBanner: '100vw',
   blogCard: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
   blogThumb: '5rem',
-  blogFeatured: '(max-width: 1024px) 100vw, 60vw',
+  blogFeatured: '(max-width: 768px) 100vw, 60vw',
   searchThumb: '2.5rem',
   favoritesThumb: '4rem',
   eventHero: '100vw',

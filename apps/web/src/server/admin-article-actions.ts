@@ -31,6 +31,7 @@ function readDraft(formData: FormData) {
   const seoDescription = String(formData.get('seoDescription') || '').trim();
   const canonicalPath = String(formData.get('canonicalPath') || '').trim();
   const isIndexable = formData.get('isIndexable') === 'on' || formData.get('isIndexable') === 'true';
+  const isFeatured = formData.get('isFeatured') === 'on' || formData.get('isFeatured') === 'true';
   let publishedAt = fromDatetimeLocalValue(String(formData.get('publishedAt') || ''));
   if (status === 'published' && !publishedAt) {
     publishedAt = new Date().toISOString();
@@ -50,6 +51,7 @@ function readDraft(formData: FormData) {
     seoDescription: seoDescription || excerpt,
     canonicalPath: canonicalPath || `/blog/${slug || 'article'}`,
     isIndexable,
+    isFeatured,
     publishedAt,
   };
 }
@@ -83,7 +85,7 @@ export async function archiveAdminArticleAction(formData: FormData) {
   const id = String(formData.get('id') || '').trim();
   if (!id || id === 'new') throw new Error('missing article id');
 
-  const body = { ...readDraft(formData), status: 'hidden' };
+  const body = { ...readDraft(formData), status: 'hidden', isFeatured: false };
   const response = await adminApiFetch(`/api/admin/articles/${encodeURIComponent(id)}`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
@@ -96,4 +98,25 @@ export async function archiveAdminArticleAction(formData: FormData) {
   revalidatePath('/admin/articles');
   revalidatePath(`/admin/articles/${id}`);
   redirect(`/admin/articles/${id}?archived=1`);
+}
+
+/** Toggle «В Hero» from list: last-wins clears other featured on API. */
+export async function setAdminArticleFeaturedAction(formData: FormData) {
+  const id = String(formData.get('id') || '').trim();
+  if (!id || id === 'new') throw new Error('missing article id');
+  const isFeatured = formData.get('isFeatured') === 'on' || formData.get('isFeatured') === 'true';
+
+  const response = await adminApiFetch(`/api/admin/articles/${encodeURIComponent(id)}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ isFeatured }),
+  });
+  if (!response.ok) {
+    throw new Error(`featured toggle failed HTTP ${response.status}`);
+  }
+
+  revalidatePath('/admin/articles');
+  revalidatePath(`/admin/articles/${id}`);
+  revalidatePath('/blog');
+  redirect('/admin/articles?featured=1');
 }

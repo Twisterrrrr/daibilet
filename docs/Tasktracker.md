@@ -180,6 +180,7 @@
 | B.24b | Blog cards: убрать cover badges (tag/city на фото) | Высокий | ✅ `b542a45` (+ merge B.24) | агент |
 | B.25 | Авторы колонок: brand blue (`text-primary-600`), без бейджа «Колонка» | Высокий | ✅ `ed874cb` prod | агент |
 | B.26 | `/blog` UX: темы, поиск, «Показать ещё», CTA CHPU, дата на large | Высокий | ✅ `bd8ec37` prod | агент |
+| B.27 | Blog Hero: `Article.isFeatured`, informational hero + admin toggle, LCP priority | Критический | 🔄 commit/deploy | агент |
 
 ---
 

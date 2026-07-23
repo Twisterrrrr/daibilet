@@ -13,6 +13,7 @@ export type AdminArticleRow = {
   authorName?: string | null;
   publishedAt?: string | null;
   updatedAt?: string | null;
+  isFeatured?: boolean;
 };
 
 export type AdminArticleDetail = AdminArticleRow & {
@@ -21,6 +22,7 @@ export type AdminArticleDetail = AdminArticleRow & {
   seoDescription?: string | null;
   canonicalPath?: string | null;
   isIndexable: boolean;
+  isFeatured: boolean;
 };
 
 export type AdminArticlesListData = {
@@ -43,6 +45,7 @@ function normalizeArticleRow(raw: unknown): AdminArticleRow {
     authorName: row.authorName != null ? String(row.authorName) : null,
     publishedAt: row.publishedAt != null ? String(row.publishedAt) : null,
     updatedAt: row.updatedAt != null ? String(row.updatedAt) : null,
+    isFeatured: Boolean(row.isFeatured),
   };
 }
 
@@ -56,6 +59,7 @@ function normalizeArticleDetail(raw: unknown): AdminArticleDetail {
     seoDescription: row.seoDescription != null ? String(row.seoDescription) : null,
     canonicalPath: row.canonicalPath != null ? String(row.canonicalPath) : null,
     isIndexable: Boolean(row.isIndexable),
+    isFeatured: Boolean(row.isFeatured),
   };
 }
 

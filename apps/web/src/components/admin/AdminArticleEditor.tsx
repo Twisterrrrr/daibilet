@@ -189,6 +189,17 @@ export function AdminArticleEditor({ mode, article, notice }: Props) {
           Indexable
         </label>
 
+        <label className="flex items-center gap-2 text-sm text-slate-700">
+          <input
+            type="checkbox"
+            name="isFeatured"
+            defaultChecked={Boolean(article?.isFeatured)}
+            className="h-4 w-4 rounded border-slate-300"
+          />
+          В Hero на /blog
+          <span className="text-xs text-slate-500">(только одна; включение сбрасывает остальные)</span>
+        </label>
+
         <div className="flex flex-wrap gap-2">
           <button
             type="submit"

@@ -10129,6 +10129,7 @@ function mapPublicArticleRow(row) {
     articleType: row.articleType || null,
     publishedAt: row.publishedAt ? new Date(row.publishedAt).toISOString() : null,
     isIndexable: row.isIndexable !== false,
+    isFeatured: row.isFeatured === true,
     seoTitle: row.seoTitle || row.title,
     seoDescription: row.seoDescription || row.excerpt || null,
   };
@@ -10174,6 +10175,7 @@ export async function buildPublicArticlesList(db, options = {}) {
       a."coverImageUrl",
       a."publishedAt",
       a."isIndexable",
+      a."isFeatured",
       a."seoTitle",
       a."seoDescription",
       a."authorId",
@@ -10198,7 +10200,7 @@ export async function buildPublicArticlesList(db, options = {}) {
       and coalesce(a."isIndexable", true) = true
       and (a."publishedAt" is null or a."publishedAt" <= now())
       ${whereExtra}
-    order by a."publishedAt" desc nulls last, a."updatedAt" desc
+    order by a."isFeatured" desc, a."publishedAt" desc nulls last, a."updatedAt" desc
     limit $${limitIdx}
   `,
     params,
@@ -10287,6 +10289,7 @@ export async function buildAdminArticlesList(db) {
       a."coverImageUrl",
       a."publishedAt",
       a."isIndexable",
+      a."isFeatured",
       a."updatedAt",
       a."citySlug",
       a."authorId",
@@ -10295,7 +10298,7 @@ export async function buildAdminArticlesList(db) {
       c.title as city
     from "Article" a
     left join "City" c on c.id = a."cityId"
-    order by a."updatedAt" desc
+    order by a."isFeatured" desc, a."updatedAt" desc
   `);
   return {
     generatedAt: new Date().toISOString(),
@@ -10314,6 +10317,7 @@ export async function buildAdminArticlesList(db) {
       articleType: row.articleType || null,
       publishedAt: row.publishedAt ? new Date(row.publishedAt).toISOString() : null,
       isIndexable: row.isIndexable !== false,
+      isFeatured: row.isFeatured === true,
       updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
     })),
   };
@@ -10360,6 +10364,7 @@ export async function buildAdminArticleDetail(db, articleId) {
     seoDescription: row.seoDescription || null,
     canonicalPath: row.canonicalPath || null,
     isIndexable: row.isIndexable !== false,
+    isFeatured: row.isFeatured === true,
     publishedAt: row.publishedAt ? new Date(row.publishedAt).toISOString() : null,
     updatedAt: row.updatedAt ? new Date(row.updatedAt).toISOString() : null,
   };
@@ -10416,12 +10421,22 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
   const seoDescription = payload.seoDescription ?? current?.seoDescription ?? excerpt;
   const canonicalPath = payload.canonicalPath ?? current?.canonicalPath ?? `/blog/${slug}`;
   const isIndexable = payload.isIndexable ?? current?.isIndexable ?? status === 'PUBLISHED';
+  const isFeatured =
+    payload.isFeatured !== undefined
+      ? Boolean(payload.isFeatured)
+      : Boolean(current?.isFeatured);
   const publishedAt =
     status === 'PUBLISHED'
       ? payload.publishedAt || current?.publishedAt || new Date().toISOString()
       : payload.publishedAt ?? current?.publishedAt ?? null;
 
   if (current) {
+    if (isFeatured) {
+      await db.query(
+        `update "Article" set "isFeatured" = false where "isFeatured" = true and id <> $1`,
+        [current.id],
+      );
+    }
     const { rows } = await db.query(
       `
         update "Article"
@@ -10442,7 +10457,8 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
           "seoDescription" = $15,
           "canonicalPath" = $16,
           "isIndexable" = $17,
-          "publishedAt" = $18,
+          "isFeatured" = $18,
+          "publishedAt" = $19,
           "updatedAt" = now()
         where id = $1
         returning id
@@ -10465,6 +10481,7 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
         seoDescription,
         canonicalPath,
         isIndexable,
+        isFeatured,
         publishedAt,
       ],
     );
@@ -10472,19 +10489,22 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
   }
 
   const id = `article_${randomUUID().replace(/-/g, '').slice(0, 24)}`;
+  if (isFeatured) {
+    await db.query(`update "Article" set "isFeatured" = false where "isFeatured" = true`);
+  }
   await db.query(
     `
       insert into "Article" (
         id, slug, status, title, excerpt, content, "coverImageUrl", "cityId", "citySlug",
         "authorId", "authorName", "articleType",
-        "seoH1", "seoTitle", "seoDescription", "canonicalPath", "isIndexable",
+        "seoH1", "seoTitle", "seoDescription", "canonicalPath", "isIndexable", "isFeatured",
         "publishedAt", "createdAt", "updatedAt"
       )
       values (
         $1, $2, $3::"ArticleStatus", $4, $5, $6, $7, $8, $9,
         $10, $11, $12,
-        $13, $14, $15, $16, $17,
-        $18, now(), now()
+        $13, $14, $15, $16, $17, $18,
+        $19, now(), now()
       )
     `,
     [
@@ -10505,6 +10525,7 @@ export async function upsertAdminArticle(db, articleId, payload = {}) {
       seoDescription,
       canonicalPath,
       isIndexable,
+      isFeatured,
       publishedAt,
     ],
   );

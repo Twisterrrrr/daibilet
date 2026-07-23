@@ -27,6 +27,8 @@ export type BlogCardDto = {
   topics?: BlogTopicId[];
   /** Нижний регистр: title + excerpt + tag + slug + фрагмент body для поиска на `/blog`. */
   searchText?: string;
+  /** Админский флаг Blog Hero (isFeatured). */
+  isFeatured?: boolean;
 };
 
 export type BlogArticleDto = {
@@ -222,6 +224,7 @@ export function mergeBlogCards(
     authorId?: string | null;
     authorName?: string | null;
     articleType?: string | null;
+    isFeatured?: boolean | null;
   }> | null,
 ): BlogCardDto[] {
   if (!apiArticles?.length) return staticBlogCards();
@@ -254,9 +257,38 @@ export function mergeBlogCards(
         tag: enriched.tag,
         city: enriched.city,
       }),
+      isFeatured: article.isFeatured === true,
       ...enriched,
     };
   });
+}
+
+/**
+ * Hero / feed split for `/blog`:
+ * - featured = isFeatured, else latest (first in list)
+ * - feed = everything except featured (no duplicate in magazine first slot)
+ * - hot = next 3-4 for informational sidebar
+ */
+export function splitBlogListingHero(
+  posts: BlogCardDto[],
+  hotLimit = 4,
+): {
+  featured: BlogCardDto | null;
+  feed: BlogCardDto[];
+  hot: BlogCardDto[];
+} {
+  if (!posts.length) return { featured: null, feed: [], hot: [] };
+
+  const flagged = posts.find((post) => post.isFeatured);
+  const featured = flagged || posts[0] || null;
+  if (!featured) return { featured: null, feed: [], hot: [] };
+
+  const feed = posts.filter((post) => post.slug !== featured.slug);
+  return {
+    featured,
+    feed,
+    hot: feed.slice(0, Math.max(3, Math.min(hotLimit, 4))),
+  };
 }
 
 export function resolveStaticArticle(slug: string): BlogArticleDto | null {

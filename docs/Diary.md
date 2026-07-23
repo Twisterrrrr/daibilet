@@ -1,3 +1,23 @@
+## 2026-07-24 - Blog Hero: isFeatured + informational layout (LCP)
+
+### Наблюдения
+
+- Владелец: «главная» как первая magazine-карточка даёт плохой LCP (lazy) и нет управления из админки.
+- Нужен отдельный Hero над фидом (информационный: баннер слева + 3-4 свежих справа), не full-bleed kenburns.
+
+### Решения
+
+- Prisma `Article.isFeatured Boolean @default(false)` + migration; API last-wins (при set true сбрасывает остальные).
+- `/blog`: SectionPageHero strip → BlogFeaturedHero (`next/image` priority, sizes 768/60vw) → фильтры/фид без дубля featured.
+- Fallback: latest published в том же Hero-компоненте с priority.
+- Admin `/admin/articles`: колонка/toggle «В Hero» + чекбокс в редакторе.
+
+### Проблемы
+
+- Deploy/migrate на prod после commit (см. SHA в Tasktracker B.27).
+
+---
+
 ## 2026-07-24 - `/blog` UX: темы, поиск, load more, CTA, дата large
 
 ### Наблюдения
