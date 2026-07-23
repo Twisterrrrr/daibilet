@@ -3,16 +3,16 @@
 import Link from 'next/link';
 import { ChevronRight, MapPin } from 'lucide-react';
 
-import type { PublicVenueDto } from '@daibilet/contracts/public';
 import { formatStreetAddress } from '@/lib/address';
 import { pluralEvents } from '@/lib/format';
+import type { VenueCatalogCard } from '@/lib/venue-map-types';
 import { venueTypeLabel } from '@/lib/venue-meta';
 
 export function InstitutionListRow({
   venue,
   href,
 }: {
-  venue: Pick<PublicVenueDto, 'name' | 'city' | 'events' | 'type' | 'address'>;
+  venue: Pick<VenueCatalogCard, 'name' | 'city' | 'events' | 'type' | 'address'>;
   href: string;
 }) {
   const street = formatStreetAddress(venue.address, { city: venue.city });
@@ -49,8 +49,8 @@ export function InstitutionList({
   hrefFor,
   className = '',
 }: {
-  venues: Array<Pick<PublicVenueDto, 'id' | 'name' | 'city' | 'events' | 'type' | 'address'>>;
-  hrefFor: (venue: Pick<PublicVenueDto, 'id' | 'name' | 'city' | 'events' | 'type' | 'address'>) => string;
+  venues: Array<Pick<VenueCatalogCard, 'id' | 'name' | 'city' | 'events' | 'type' | 'address' | 'slug'>>;
+  hrefFor: (venue: Pick<VenueCatalogCard, 'id' | 'name' | 'city' | 'events' | 'type' | 'address' | 'slug'>) => string;
   className?: string;
 }) {
   if (!venues.length) return null;

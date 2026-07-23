@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { MapPin, Ticket } from 'lucide-react';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
-import type { PublicVenueDto } from '@daibilet/contracts/public';
 import { formatStreetAddress } from '@/lib/address';
 import { pluralEvents } from '@/lib/format';
+import type { VenueCatalogCard } from '@/lib/venue-map-types';
 import { venueTypeLabel } from '@/lib/venue-meta';
 
 const TYPE_GRADIENT: Record<string, string> = {
@@ -17,13 +17,15 @@ const TYPE_GRADIENT: Record<string, string> = {
   club_bar_restaurant: 'from-emerald-600 via-teal-800 to-slate-950',
 };
 
-function topCategory(venue: Pick<PublicVenueDto, 'categories'>): string | null {
+type InstitutionCardVenue = VenueCatalogCard;
+
+function topCategory(venue: InstitutionCardVenue): string | null {
   const entries = Object.entries(venue.categories || {});
   if (!entries.length) return null;
   return entries.sort((a, b) => b[1] - a[1])[0][0];
 }
 
-export function InstitutionCard({ venue, href }: { venue: PublicVenueDto; href: string }) {
+export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; href: string }) {
   const typeLabel = venueTypeLabel(venue.type);
   const gradient = TYPE_GRADIENT[venue.type] || 'from-slate-700 via-slate-800 to-slate-950';
   const street = formatStreetAddress(venue.address, { city: venue.city });

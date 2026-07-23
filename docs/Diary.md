@@ -1,3 +1,27 @@
+## 2026-07-24 - Owner blind spots: Prisma pool, lean catalog, pg_trgm, map hydration
+
+### Наблюдения
+
+- PrismaClient в `@daibilet/db` кэшировался на `globalThis` только вне production - при re-eval/дублях графа импортов adapter-pg открывал лишние Pool.
+- `/podborki` тянул полный `getPublicCatalogSessions()` только ради тегов/totalEvents (закрыто owner pack + `unstable_cache`).
+- Header search гидрировал весь catalog sessions и делал JS `includes` на каждый keystroke.
+- `/locations` aside был stub `RussiaMap`; нужен pin map без огромного JSON локаций в client props.
+
+### Решения
+
+1. **Prisma singleton:** всегда pin на `globalThis.__daibiletPrisma` + shared `pg.Pool` (`DAIBILET_PG_POOL_MAX`, default 8).
+2. **Lean + cache:** venues `select`+`_count`; surfaces cache 600s; Redis не вводили (follow-up).
+3. **Search:** migration `pg_trgm` + GIN; `public-search.dto` на similarity/ILIKE + synonyms. Meilisearch = P2.
+4. **Map:** `LocationsPinMap` получает только `{ id, lat, lng }[]`; tip - `GET /api/public/venues/map-tip`.
+
+### Проблемы
+
+- Legacy `createDb` Pool (`max: 3`) отдельно от Prisma pool - унификация позже.
+- Landings catalog DTO всё ещё rule-match по sessions (память 5м).
+- Deploy: migrate `20260724050000_pg_trgm_search` + deploy-prod-next.
+
+---
+
 ## 2026-07-24 - SEO foundations audit: Place JSON-LD + sitemap locations
 
 ### Наблюдения

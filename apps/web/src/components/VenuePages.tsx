@@ -8,18 +8,47 @@ import { VenuePageView } from '@/components/VenuePageView.client';
 import { VenueCatalogPageSkeleton } from '@/components/VenueCatalogSkeletons';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
-import { buildPublicVenueDto, buildPublicVenuesDto } from '@daibilet/backend/public-read';
+import { buildPublicVenueDto } from '@daibilet/backend/public-read';
+import type { VenueCatalogCard } from '@/lib/venue-map-types';
 import { evaluateVenueIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { venueHref } from '@/lib/routes';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
+import { getCachedVenuesCatalog } from '@/server/cached-public-surfaces';
 import { buildVenuePageJsonLd } from '@/lib/structured-data';
 import { resolveVenueSeoTitle } from '@/lib/venue-seo';
+import { toVenueMapMarkers } from '@/server/venue-map-data';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
   family: 'institution' | 'location';
   listPath: '/venues' | '/locations';
 };
+
+function toVenueCatalogCard(venue: {
+  id: string;
+  slug?: string | null;
+  name: string;
+  city: string;
+  address?: string | null;
+  type: string;
+  events: number;
+  shortDescription?: string | null;
+  heroImageUrl?: string | null;
+  nextSlot?: string | null;
+}): VenueCatalogCard {
+  return {
+    id: venue.id,
+    slug: String(venue.slug || venue.id),
+    name: venue.name,
+    city: venue.city,
+    address: venue.address ?? null,
+    type: venue.type,
+    events: venue.events || 0,
+    shortDescription: venue.shortDescription ?? null,
+    heroImageUrl: venue.heroImageUrl ?? null,
+    nextSlot: venue.nextSlot ?? null,
+  };
+}
 
 export async function generateVenueListMetadata(
   title: string,
@@ -68,19 +97,24 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
 }
 
 export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
-  const params = new URLSearchParams({ family, limit: '500' });
-  let venues: Awaited<ReturnType<typeof buildPublicVenuesDto>>['venues'] = [];
+  let venues: VenueCatalogCard[] = [];
+  let mapMarkers: ReturnType<typeof toVenueMapMarkers> = [];
   try {
-    const payload = await buildPublicVenuesDto(params);
-    venues = payload.venues ?? [];
+    const payload = await getCachedVenuesCatalog(family, 500);
+    const raw = payload.venues ?? [];
+    venues = raw.map(toVenueCatalogCard);
+    if (family === 'location') {
+      mapMarkers = toVenueMapMarkers(raw);
+    }
   } catch {
     venues = [];
+    mapMarkers = [];
   }
   return (
     <SiteLayout>
       {family === 'location' ? (
         <Suspense fallback={<VenueCatalogPageSkeleton family="location" />}>
-          <LocationsCatalogView venues={venues} />
+          <LocationsCatalogView venues={venues} mapMarkers={mapMarkers} />
         </Suspense>
       ) : (
         <Suspense fallback={<VenueCatalogPageSkeleton family="institution" />}>

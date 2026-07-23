@@ -8,12 +8,12 @@ import { Search } from 'lucide-react';
 import { LocationCard } from '@/components/LocationCard.client';
 import { LocationsCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
 import { HeroLayout } from '@/components/HeroLayout';
-import { RussiaMap } from '@/components/RussiaMap.client';
+import { LocationsPinMap } from '@/components/LocationsPinMap.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
-import type { PublicVenueDto } from '@daibilet/contracts/public';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { formatNumber, pluralCities } from '@/lib/format';
 import { persistSelectedCity } from '@/lib/selected-city';
+import type { VenueCatalogCard, VenueMapMarker } from '@/lib/venue-map-types';
 import { LOCATION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
 
@@ -25,7 +25,13 @@ const SORT_OPTIONS: Array<[SortMode, string]> = [
   ['desc', 'Я–А'],
 ];
 
-export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
+export function LocationsCatalogView({
+  venues,
+  mapMarkers = [],
+}: {
+  venues: VenueCatalogCard[];
+  mapMarkers?: VenueMapMarker[];
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
@@ -117,7 +123,7 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
         description="Куда приходить и как найти место встречи - чтобы не пропустить рейс или экскурсию."
         tone="light"
         className="bg-slate-100"
-        aside={<RussiaMap />}
+        aside={<LocationsPinMap markers={mapMarkers} />}
       >
         <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-slate-900 shadow-lg sm:flex-row">
           <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">

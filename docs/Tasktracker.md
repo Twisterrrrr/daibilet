@@ -21,7 +21,7 @@
 | H.4 | `/podborki` featured+trending equal-height, centered `max-w-5xl` | Высокий | ✅ `533d40a` prod @`d1ccd8a` |
 | H.4b | `/podborki` tag soup → `LandingCategory` + carousels (by-type/for-whom/seasonal) | Критический | ✅ `30e87fe`+`44887fb` |
 | H.5 | `/venues` dark imageOverlay + search | Средний | ✅ MVP |
-| H.6 | `/locations` withMap (map points on list) | Средний | 🔄 stub: RussiaMap + filters; pin map follow-up |
+| H.6 | `/locations` withMap (map points on list) | Средний | ✅ pin map: flat markers + `/api/public/venues/map-tip` |
 | H.7 | Video loop asset для home | Низкий | ⏳ нет ассета - rotator images |
 | H.8 | Blog Featured Hero + interactive list H1 + «Свежее»×3 + min price | Высокий | ✅ `b45995c` prod @`c39d124` |
 | H.8b | `/blog` featured+«Свежее»: max-w-5xl composition + square thumbs | Критический | ✅ `90f6151` prod @`d1ccd8a` |
@@ -37,6 +37,12 @@
 | P.V1 | `/venues`+`/locations`: lean Prisma `_count` вместо session hydrate для плиток | Высокий | ✅ `9af3910` (deploy pending SSH) |
 | P.V2 | Suspense + pulse skeletons на фильтрах (city/type), без full-page loader | Высокий | ✅ `9af3910` |
 | P.V3 | `Venue @@index([title])` + migrate `20260724030000_venue_title_search_index` | Средний | ✅ `9af3910` (migrate on deploy) |
+| PERF.1 | Prisma singleton `globalThis` + shared pg Pool (`@daibilet/db`) | Критический | ✅ `6ce435a` |
+| PERF.2 | Lean catalog DTOs + `unstable_cache` 600s для podborki/venues/locations (Redis follow-up) | Высокий | ✅ partial; landings rule-match sessions ещё в DTO |
+| PERF.3 | Header search: pg_trgm + synonyms (Meilisearch P2) | Высокий | ✅ `125feab` |
+| PERF.4 | Meilisearch / full-text service | Средний | ⚠️ P2 deferred |
+| PERF.5 | Unify legacy `createDb` Pool with Prisma shared Pool | Средний | ⏳ |
+| H.6b | `/locations` pin map: flat `{id,lat,lng}` props + map-tip API | Высокий | ✅ |
 
 ---
 

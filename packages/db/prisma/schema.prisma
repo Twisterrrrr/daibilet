@@ -587,6 +587,7 @@ model Event {
   @@index([venueId])
   @@index([categoryId])
   @@index([supplierId, status])
+  @@index([title])
 }
 
 model EventOverride {

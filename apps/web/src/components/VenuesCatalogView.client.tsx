@@ -11,7 +11,7 @@ import { VenuesCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
 import { HeroLayout } from '@/components/HeroLayout';
 import { HeroMedia } from '@/components/HeroMedia.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
-import type { PublicVenueDto } from '@daibilet/contracts/public';
+import type { VenueCatalogCard } from '@/lib/venue-map-types';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { formatNumber, pluralCities, pluralVenues } from '@/lib/format';
 import { persistSelectedCity } from '@/lib/selected-city';
@@ -44,7 +44,7 @@ function readStoredViewMode(): ViewMode {
   }
 }
 
-export function VenuesCatalogView({ venues }: { venues: PublicVenueDto[] }) {
+export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
