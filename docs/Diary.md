@@ -1,3 +1,20 @@
+## 2026-07-24 - BlogPostCard large: continuous excerpt above chips
+
+### Наблюдения
+
+- Владелец: на large-карточке `/blog` первый абзац резался `line-clamp` с `…`, затем chips, затем второй абзац - текст прерывался mid-sentence.
+
+### Решения
+
+- Порядок large: title → continuous excerpt (1–2 абзаца, общий `line-clamp-9`) → quick-links chips → meta footer.
+- `expandLargeListingCopy`: без split по пробелу mid-phrase; если нет границы предложения - один абзац.
+
+### Проблемы
+
+- Нет (deploy в этом же проходе).
+
+---
+
 ## 2026-07-23 - Blog: авторы колонок brand blue
 
 ### Наблюдения

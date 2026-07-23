@@ -73,11 +73,12 @@ export function BlogPostCard({
     'hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md',
   ].join(' ');
 
-  // Large: article + отдельные ссылки снизу (как city hub), иначе nested <a> ломает разметку.
-  // Cover: fixed 2:1 (не lg:flex-1) - иначе фото съедает высоту row-span-2; текст/chips получают flex-1.
+  // Large: article + chips под всем текстом (перед meta), иначе nested <a> ломает разметку.
+  // Cover: fixed 2:1 (не lg:flex-1) - иначе фото съедает высоту row-span-2; текст получает flex-1.
   if (isLarge) {
     const primary = largeCopy?.primary || excerpt;
     const secondary = largeCopy?.secondary || '';
+    const hasCopy = Boolean(primary || secondary);
 
     return (
       <article className={cardShell}>
@@ -105,11 +106,13 @@ export function BlogPostCard({
               {post.title}
             </Link>
           </h2>
-          {primary ? (
-            <p className="mt-2.5 line-clamp-4 text-sm leading-relaxed text-slate-600 sm:text-base sm:leading-[1.55]">
-              {primary}
+          {hasCopy ? (
+            <p className="mt-2.5 flex-1 whitespace-pre-line text-sm leading-relaxed text-slate-600 line-clamp-9 sm:text-base sm:leading-[1.55]">
+              {[primary, secondary].filter(Boolean).join('\n\n')}
             </p>
-          ) : null}
+          ) : (
+            <div className="flex-1" />
+          )}
           {quickLinks.length ? (
             <div className="mt-3 flex flex-wrap gap-2 border-t border-slate-100 pt-3" aria-label="Связанные разделы">
               {quickLinks.map((link) => (
@@ -123,13 +126,6 @@ export function BlogPostCard({
               ))}
             </div>
           ) : null}
-          {secondary ? (
-            <p className="mt-3 flex-1 line-clamp-5 text-sm leading-relaxed text-slate-600 sm:text-[0.95rem] sm:leading-[1.55]">
-              {secondary}
-            </p>
-          ) : (
-            <div className="flex-1" />
-          )}
           <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />
         </div>
       </article>

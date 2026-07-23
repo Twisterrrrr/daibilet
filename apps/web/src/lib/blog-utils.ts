@@ -81,7 +81,7 @@ export function expandListingExcerpt(slug: string, excerpt: string, maxChars = 4
   return sliced || base || lead.slice(0, maxChars);
 }
 
-/** Split expanded lead into two paragraphs for large magazine cards (text below chips). */
+/** Split expanded lead into up to two paragraphs for large magazine cards (continuous block above chips). */
 export function expandLargeListingCopy(
   slug: string,
   excerpt: string,
@@ -100,8 +100,8 @@ export function expandLargeListingCopy(
   if (sentenceEnd >= 0) {
     splitAt = from + sentenceEnd + 1;
   } else {
-    const space = full.indexOf(' ', mid);
-    splitAt = space > 0 ? space : mid;
+    // Prefer a single continuous paragraph over a mid-word/mid-phrase cut.
+    return { primary: full, secondary: '' };
   }
 
   const primary = full.slice(0, splitAt).trim();
