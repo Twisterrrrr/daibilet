@@ -11,7 +11,7 @@ import { getTicketPriceRange, isFlexibleScheduleSession } from '@/lib/event-page
 import { evaluateCityIndexability } from '@/lib/hub-indexability';
 import { resolveLandingCityName } from '@/lib/landing-city';
 import { landingCategoryHref } from '@/lib/landing-routes';
-import { cityHref, eventHref, venueHref } from '@/lib/routes';
+import { cityHref, eventHref, venueHref, venuePageTemplate } from '@/lib/routes';
 import {
   cityHubPathFromLandingCity,
   landingBreadcrumbLabel,
@@ -218,6 +218,16 @@ export function buildEventJsonLd(
       addressCountry: 'RU',
     },
   };
+  if (event.venueSlug || event.venueId) {
+    location.url = toAbsoluteUrl(
+      venueHref({
+        id: event.venueId || event.venueSlug || '',
+        slug: event.venueSlug,
+        name: event.venue || locationName,
+        type: event.venueKind,
+      }),
+    );
+  }
 
   const block: Record<string, unknown> = {
     '@context': 'https://schema.org',
@@ -320,9 +330,10 @@ export function buildCityPageJsonLd(payload: PublicCityPageDto): Array<Record<st
 export function buildVenueBreadcrumbs(payload: PublicVenuePageDto): StructuredBreadcrumb[] {
   const venue = payload.venue;
   const path = venue.canonicalPath || venueHref(venue);
+  const catalogPath = venuePageTemplate(venue.type) === 'location' ? '/locations' : '/venues';
   const crumbs: StructuredBreadcrumb[] = [
     { name: 'Главная', path: '/' },
-    { name: 'Площадки', path: '/venues' },
+    { name: catalogPath === '/locations' ? 'Локации' : 'Площадки', path: catalogPath },
   ];
   if (venue.city && venue.city !== 'Не указан') {
     crumbs.push({
@@ -334,7 +345,46 @@ export function buildVenueBreadcrumbs(payload: PublicVenuePageDto): StructuredBr
   return crumbs;
 }
 
-/** SSR BreadcrumbList для venue (FAQ на venue пока не в scope п.5). */
+/** Schema.org Place (+ GeoCoordinates) для страницы площадки / локации. */
+export function buildVenuePlaceJsonLd(payload: PublicVenuePageDto): Record<string, unknown> {
+  const venue = payload.venue;
+  const path = venue.canonicalPath || venueHref(venue);
+  const canonical = toAbsoluteUrl(path);
+  const image = venue.heroImageUrl ? toAbsoluteUrl(venue.heroImageUrl) : undefined;
+  const description = venue.seoDescription || venue.shortDescription || venue.description || undefined;
+
+  const block: Record<string, unknown> = {
+    '@context': 'https://schema.org',
+    '@type': 'Place',
+    name: venue.seoH1 || venue.title || venue.name,
+    description,
+    url: canonical,
+    image: image ? [image] : undefined,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: venue.city && venue.city !== 'Не указан' ? venue.city : undefined,
+      streetAddress: venue.address || undefined,
+      addressCountry: 'RU',
+    },
+  };
+
+  if (
+    typeof venue.latitude === 'number' &&
+    typeof venue.longitude === 'number' &&
+    Number.isFinite(venue.latitude) &&
+    Number.isFinite(venue.longitude)
+  ) {
+    block.geo = {
+      '@type': 'GeoCoordinates',
+      latitude: venue.latitude,
+      longitude: venue.longitude,
+    };
+  }
+
+  return block;
+}
+
+/** SSR blocks для venue/location: Place (+ geo) и BreadcrumbList. */
 export function buildVenuePageJsonLd(payload: PublicVenuePageDto): Array<Record<string, unknown>> {
-  return [buildBreadcrumbListJsonLd(buildVenueBreadcrumbs(payload))];
+  return [buildVenuePlaceJsonLd(payload), buildBreadcrumbListJsonLd(buildVenueBreadcrumbs(payload))];
 }

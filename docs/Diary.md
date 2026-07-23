@@ -1,3 +1,45 @@
+## 2026-07-24 - SEO foundations audit: Place JSON-LD + sitemap locations
+
+### Наблюдения
+
+- CHPU уже живы: /blog|cities|venues|locations|events/[slug]; Prisma slug @unique на Article/City/Venue/Event/Landing.
+- Sitemap - не монолитный pp/sitemap.ts (удалён ранее): index + chunks + MIN_LISTING_OFFERS_FOR_INDEX=6.
+- Event JSON-LD (цена/дата/адрес) и BreadcrumbList/ItemList уже SSR; на venue был только BreadcrumbList.
+- Chunk venues в sitemap всегда писал /venues/{slug} даже для location-template (живой URL /locations/{slug}).
+
+### Решения
+
+- uildVenuePlaceJsonLd: Place + PostalAddress + GeoCoordinates; breadcrumbs учитывают /locations vs /venues.
+- Event.location.url → venue CHPU при наличии slug.
+- Sitemap venues → canonicalPath / enueHref (locations|venues).
+- Экспорт 	ransliterateSlug из 
+outes.ts (паритет с backend publicCitySlug).
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next).
+
+---
+## 2026-07-24 - Owner pack: podborki categories, blog rank/cursor, cities hub tags
+
+### Наблюдения
+
+- `/podborki` держал tag soup вместо смысловых блоков; Landing = подборка, нужен category layer.
+- `/blog` фильтровал по `?city=` жёстко и пагинировал offset; город шапки только менял H1.
+- `/cities` карточки показывали сухой счётчик без кликабельных направлений; ISR был 1h.
+
+### Решения
+
+- Prisma `LandingCategory` + `Landing.categoryId`, migrate `20260724040000_landing_category` (by-type / for-whom / seasonal) + backfill; UI - горизонтальные карусели.
+- Blog: rank-then-others по городу шапки; cursor pagination; canonical `/blog/{slug}`. API: `rankCitySlug`/`cursor`/`excludeFeatured`.
+- Cities: `hubTags` в destinations DTO; mini-tags на `CityCard`; `revalidate = 86400`.
+
+### Проблемы
+
+- Параллельные агенты трогали `dto.js`/Diary - owner-pack SHA `30e87fe` + `44887fb`. Deploy: migrate + deploy-prod-next.
+
+---
+
 ## 2026-07-24 - Home hero: face-safe object-position
 
 ### Наблюдения
@@ -14,11 +56,11 @@
 - Нет (commit + deploy-prod-next).
 
 ---
+## 2026-07-24 - /cities: симметрия tiles+aside после photo-hero
 
+## 2026-07-24 - /cities: симметрия tiles+aside после photo-hero
 
 ### Наблюдения
-
-- Владелец: левый отступ до сетки меньше правого у «Популярные города». Nested `max-w-5xl` внутри `container-page` после photo-hero снова давал left-bias.
 
 ### Решения
 

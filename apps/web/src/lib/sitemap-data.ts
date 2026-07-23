@@ -22,6 +22,7 @@ import {
   listCatalogIntents,
 } from '@/lib/catalog-intent-routes';
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
+import { venueHref } from '@/lib/routes';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 import { parseCatalogPageQuery } from '@/server/catalog-query';
 import { finalizeLandingPayload, fetchLandingPageDto } from '@/server/landing-page';
@@ -190,7 +191,17 @@ export async function buildVenuesSitemapEntries(now = new Date()): Promise<Sitem
       }).indexable;
     })
     .slice(0, MAX_VENUES)
-    .map((venue) => entry(`/venues/${encodeURIComponent(String(venue.slug))}`, now, 'weekly', 0.6));
+    .map((venue) => {
+      const path =
+        venue.canonicalPath ||
+        venueHref({
+          id: venue.id,
+          slug: venue.slug,
+          name: venue.name,
+          type: venue.type,
+        });
+      return entry(path, now, 'weekly', 0.6);
+    });
 }
 
 export async function buildLandingsSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {

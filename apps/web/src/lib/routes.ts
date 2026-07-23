@@ -79,7 +79,11 @@ export function sessionVenueHref(
   });
 }
 
-function normalizeSlug(value?: string | null): string {
+/**
+ * Транслитерация кириллицы → латиница для CHPU slug (import/create/href).
+ * Совместима с `publicCitySlug` в backend dto.js.
+ */
+export function transliterateSlug(value?: string | null): string {
   return String(value || '')
     .trim()
     .toLowerCase()
@@ -89,6 +93,10 @@ function normalizeSlug(value?: string | null): string {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .replace(/-{2,}/g, '-');
+}
+
+function normalizeSlug(value?: string | null): string {
+  return transliterateSlug(value);
 }
 
 function isOpaqueId(value: string): boolean {
