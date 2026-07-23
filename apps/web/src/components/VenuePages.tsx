@@ -1,6 +1,4 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { ChevronRight } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
@@ -77,19 +75,8 @@ export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
   } catch {
     venues = [];
   }
-  const breadcrumbLabel = family === 'location' ? 'Локации' : 'Площадки';
-
   return (
     <SiteLayout>
-      <div className="border-b border-slate-200 bg-white">
-        <div className="container-page flex items-center gap-1.5 py-3 text-sm text-slate-500">
-          <Link href="/" className="hover:text-primary-600">
-            Главная
-          </Link>
-          <ChevronRight className="h-3.5 w-3.5" />
-          <span className="text-slate-900">{breadcrumbLabel}</span>
-        </div>
-      </div>
       {family === 'location' ? (
         <Suspense fallback={<div className="container-page py-10 text-sm text-slate-500">Загрузка локаций…</div>}>
           <LocationsCatalogView venues={venues} />

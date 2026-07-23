@@ -1,101 +1,84 @@
 'use client';
 
 import Link from 'next/link';
+import { MapPin } from 'lucide-react';
 import { useState } from 'react';
 
 type MapCity = {
   slug: string;
   name: string;
-  x: number;
-  y: number;
+  region: string;
 };
 
 const HOTSPOTS: MapCity[] = [
-  { slug: 'moscow', name: 'Москва', x: 520, y: 250 },
-  { slug: 'saint-petersburg', name: 'Санкт-Петербург', x: 430, y: 160 },
-  { slug: 'kazan', name: 'Казань', x: 580, y: 270 },
+  { slug: 'moscow', name: 'Москва', region: 'Центр' },
+  { slug: 'saint-petersburg', name: 'Санкт-Петербург', region: 'Северо-Запад' },
+  { slug: 'kazan', name: 'Казань', region: 'Поволжье' },
 ];
 
 /**
- * Simplified RF outline with hover hotspots for top cities.
- * Decorative + navigational - not a precise geo projection.
+ * Calm rectangular city picker for catalog heroes (cities / locations).
+ * Replaces the irregular SVG stub - links stay navigational until a real map lands.
  */
 export function RussiaMap({ className = '' }: { className?: string }) {
   const [hover, setHover] = useState<string | null>(null);
 
   return (
-    <div className={`relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`.trim()}>
-      <svg viewBox="0 0 1000 560" className="h-auto w-full" role="img" aria-label="Карта России: Москва, Санкт-Петербург, Казань">
-        <defs>
-          <linearGradient id="rfFill" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#e2e8f0" />
-            <stop offset="100%" stopColor="#f1f5f9" />
-          </linearGradient>
-        </defs>
-        <path
-          d="M120 180 C180 120 260 100 340 110 C400 80 460 70 520 90 C600 70 700 90 780 130 C860 160 920 210 940 280 C950 340 930 400 880 430 C800 470 700 480 620 460 C540 490 460 500 380 470 C300 490 220 470 160 420 C110 370 90 280 120 180 Z"
-          fill="url(#rfFill)"
-          stroke="#94a3b8"
-          strokeWidth="3"
+    <div
+      className={`overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`.trim()}
+      role="navigation"
+      aria-label="Популярные города"
+    >
+      <div className="relative border-b border-slate-100 bg-gradient-to-br from-slate-50 via-white to-sky-50 px-5 py-5 sm:px-6 sm:py-6">
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.35]"
+          style={{
+            backgroundImage:
+              'linear-gradient(to right, rgb(148 163 184 / 0.25) 1px, transparent 1px), linear-gradient(to bottom, rgb(148 163 184 / 0.25) 1px, transparent 1px)',
+            backgroundSize: '28px 28px',
+          }}
+          aria-hidden
         />
-        <path
-          d="M480 455 C500 470 530 475 550 465 C540 490 510 495 490 480 Z"
-          fill="#e2e8f0"
-          stroke="#94a3b8"
-          strokeWidth="2"
-        />
-        {HOTSPOTS.map((city) => {
-          const active = hover === city.slug;
-          return (
-            <a
-              key={city.slug}
-              href={`/cities/${city.slug}`}
-              onMouseEnter={() => setHover(city.slug)}
-              onMouseLeave={() => setHover(null)}
-              onFocus={() => setHover(city.slug)}
-              onBlur={() => setHover(null)}
-            >
-              <circle
-                cx={city.x}
-                cy={city.y}
-                r={active ? 18 : 12}
-                fill={active ? '#2563eb' : '#1e293b'}
-                className="transition-all duration-200"
-              />
-              <circle
-                cx={city.x}
-                cy={city.y}
-                r={active ? 28 : 20}
-                fill="none"
-                stroke={active ? '#60a5fa' : '#94a3b8'}
-                strokeWidth="2"
-                opacity={active ? 1 : 0.5}
-              />
-              <text
-                x={city.x}
-                y={city.y - (active ? 34 : 28)}
-                textAnchor="middle"
-                fill="#1e293b"
-                fontSize="18"
-                fontWeight="600"
-                style={{ fontFamily: 'Space Grotesk, system-ui, sans-serif' }}
-              >
-                {city.name}
-              </text>
-            </a>
-          );
-        })}
-      </svg>
-      <div className="flex flex-wrap items-center justify-center gap-2 border-t border-slate-100 px-4 py-3">
-        {HOTSPOTS.map((city) => (
-          <Link
-            key={`chip-${city.slug}`}
-            href={`/cities/${city.slug}`}
-            className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-700 transition hover:border-primary-300 hover:bg-primary-50 hover:text-primary-800"
-          >
-            {city.name}
-          </Link>
-        ))}
+        <p className="relative text-xs font-semibold uppercase tracking-wider text-slate-500">Популярные города</p>
+        <ul className="relative mt-4 space-y-2">
+          {HOTSPOTS.map((city) => {
+            const active = hover === city.slug;
+            return (
+              <li key={city.slug}>
+                <Link
+                  href={`/cities/${city.slug}`}
+                  onMouseEnter={() => setHover(city.slug)}
+                  onMouseLeave={() => setHover(null)}
+                  onFocus={() => setHover(city.slug)}
+                  onBlur={() => setHover(null)}
+                  className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition ${
+                    active
+                      ? 'border-primary-300 bg-primary-50 text-primary-900 shadow-sm'
+                      : 'border-slate-200/80 bg-white/80 text-slate-800 hover:border-slate-300 hover:bg-white'
+                  }`}
+                >
+                  <span
+                    className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${
+                      active ? 'bg-primary-600 text-white' : 'bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    <MapPin className="h-4 w-4" aria-hidden />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-semibold">{city.name}</span>
+                    <span className="block truncate text-xs text-slate-500">{city.region}</span>
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+        <span className="text-xs text-slate-500">Афиша и площадки по городу</span>
+        <Link href="/cities" className="text-xs font-semibold text-primary-700 hover:text-primary-800 hover:underline">
+          Все города →
+        </Link>
       </div>
     </div>
   );

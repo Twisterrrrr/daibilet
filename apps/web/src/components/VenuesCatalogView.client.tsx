@@ -12,7 +12,7 @@ import { HeroMedia } from '@/components/HeroMedia.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicVenueDto } from '@daibilet/contracts/public';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
-import { formatNumber } from '@/lib/format';
+import { formatNumber, pluralCities, pluralVenues } from '@/lib/format';
 import { persistSelectedCity } from '@/lib/selected-city';
 import { INSTITUTION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
@@ -142,7 +142,9 @@ export function VenuesCatalogView({ venues }: { venues: PublicVenueDto[] }) {
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Площадки' }]}
         eyebrow={
           venues.length
-            ? `${formatNumber(venues.length)} площадок${cityCount ? ` · ${cityCount} ${cityCount === 1 ? 'город' : cityCount >= 2 && cityCount <= 4 ? 'города' : 'городов'}` : ''}`
+            ? cityCount
+              ? `${pluralVenues(venues.length)} · ${pluralCities(cityCount)}`
+              : pluralVenues(venues.length)
             : 'Площадки'
         }
         title="Музеи, галереи, театры и клубы"

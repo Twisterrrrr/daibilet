@@ -11,7 +11,7 @@ import { RussiaMap } from '@/components/RussiaMap.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicVenueDto } from '@daibilet/contracts/public';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
-import { formatNumber } from '@/lib/format';
+import { formatNumber, pluralCities } from '@/lib/format';
 import { persistSelectedCity } from '@/lib/selected-city';
 import { LOCATION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
@@ -107,7 +107,7 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
       <HeroLayout
         variant="withMap"
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Локации' }]}
-        eyebrow={`${venues.length} локаций · ${cityCount} ${cityCount === 1 ? 'город' : cityCount >= 2 && cityCount <= 4 ? 'города' : 'городов'}`}
+        eyebrow={`${formatNumber(venues.length)} локаций · ${pluralCities(cityCount)}`}
         title="Причалы, парки и точки старта"
         description="Куда приходить и как найти место встречи - чтобы не пропустить рейс или экскурсию."
         tone="light"

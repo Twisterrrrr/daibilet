@@ -1,3 +1,42 @@
+## 2026-07-24 - Venues/Locations: дубль крошек, склонение, map stub
+
+### Наблюдения
+
+- `/venues` и `/locations`: «Главная > …» дважды - `VenueListPage` рисовал крошки, затем `HeroLayout` снова.
+- Hero stats: «54 ГОРОДОВ» из-за naive `cityCount <= 4` без mod10/teens; для 54 нужно «города».
+- `/locations` (и `/cities`): SVG cloud-blob RussiaMap выглядел как сломанный stub.
+
+### Решения
+
+- Убрали page-level крошки из `VenueListPage`; единственный источник - `HeroLayout` breadcrumbs (как на cities/podborki).
+- Eyebrow: `pluralVenues` / `pluralCities` из `@/lib/format`.
+- `RussiaMap`: прямоугольная панель «Популярные города» вместо irregular SVG outline.
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next).
+
+---
+
+## 2026-07-24 - Blog: interactive H1 + «Свежее»×3
+
+### Наблюдения
+
+- Владелец: `/blog` SectionPageHero слишком плоский; «Свежее» без превью и без коммерческого якоря на афишу.
+- Город из шапки (`SelectedCityProvider`) не влиял на H1 блога.
+
+### Решения
+
+- `BlogListHero`: search-focused блок (rounded-3xl, soft primary tint), H1 geo-aware через `cityToPrepositional`, `?q=` + быстрые `?topic=` чипы без full reload, счётчик гайдов.
+- `BlogFeaturedHero` «Свежее»: 3 позиции, thumb 80×80 `rounded-lg`, цветные city pills, строка «Билеты в {City_Пр} от N ₽» (Ticket) из `buildPublicCityDto.stats.priceFrom` / fallback CHPU landings catalog.
+- Feed: поиск/темы убраны из `BlogListFiltered` (остались city/author + view).
+
+### Проблемы
+
+- Нет (commit + deploy ниже).
+
+---
+
 ## 2026-07-24 - City hub «Зачем ехать»: gap в large card
 
 ### Наблюдения
