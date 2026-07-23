@@ -53,6 +53,7 @@
 | SEO.18 | План 20-30 путеводителей → CHPU (`docs/seo-guide-articles-plan.md`) | Высокий | ✅ 2026-07-23 batch #1 = 10 Казань/Екб | агент |
 | SEO.19 | Batch #1 генерация/размещение 10 гидов (GPT → MD → blog) | Высокий | ⏳ пачка A+МСК/СПб owner rewrite ✅; хаос-календарь ✅ 2026-07-23; B (2-7,9) ждёт тексты | владелец + агент |
 | SEO.19a | Blog mid-article плашка `[NOTE]` (`BlogArticleNote`) | Высокий | ✅ 2026-07-23; hotfix nested `[link](url)` in text= | агент |
+| SEO.19f | Blog markdown SEO: links/H2/NOTE harden + price accents + tests | Критический | 🔄 in progress | агент |
 | SEO.19b | Batch A: уникальные cover вместо city-placeholder (3 jpg) | Высокий | ✅ 2026-07-23 | агент |
 | SEO.19b2 | МСК/СПб: уникальные cover ×6 + magazine `/blog` hero | Высокий | ✅ 2026-07-23 | агент |
 | SEO.19b3 | Правило: cover обязателен до PUBLISHED; догенерация missing (bylinnyy ×2) | Критический | ✅ 2026-07-23 | агент |
@@ -173,6 +174,7 @@
 | B.20 | `/blog` magazine layout: listing asymmetric + article journal (serif/dropcap/quotes/sidebar) | Высокий | ✅ `a4ecab6` |
 | B.21 | Blog typography: откат Source Serif → site `font-display`; убрать dropcap | Критический | ✅ `230ebc2` (prod includes via `6656adf`+) |
 | B.22 | `/blog` large card: cover 2:1 (не flex-fill) + excerpt ~6 строк из lead | Высокий | ✅ `0be544f` (prod via `fc5e309`) |
+| B.23 | Blog prose: markdown links/H2 anchors/NOTE/prices + visual accents | Критический | 🔄 | агент |
 
 ---
 

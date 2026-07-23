@@ -1,3 +1,24 @@
+## 2026-07-23 - Blog markdown: links / H2 / NOTE / prices
+
+### Наблюдения
+
+- Владелец: качественный MD гидов на live выглядит монолитом - слабые акценты; риск битых ссылок, NOTE, иерархии H2/H3; цены «от N ₽» без выделения; нужна рабочая внутренняя перелинковка.
+- Smoke prod kazan/moscow: `<a href>`, `<h2>/<h3>`, `role="note"` уже были после hotfix `f68a95d`, но: H2 без inline/якорей, цены plain text, клик по ссылке всегда `preventDefault` (ломал Ctrl/Cmd+click), визуально мало иерархии.
+
+### Решения
+
+- `apps/web/src/lib/blog-markdown.ts`: tokenize `[text](url)` / bold / italic + pragmatic price wrap; `parseNoteBlock` с attrs, допускающими `]` в quoted text; heading parse + slug anchors; `parseGuideStructure` для тестов.
+- `BlogArticleContent`: H2/H3 с `id`, inline markdown, сильнее spacing/border у H2, ярче links/lists; `#` в теле → h2.
+- `BlogArticleNote` / CTA: общий `SHORTCODE_ATTRS`; NOTE inset усилен.
+- `blog-navigate`: modifier/middle-click оставляют native open-in-new-tab.
+- Тесты: `blog-markdown.test.ts` (9). Parallel unify headers / large-card уже в `fc5e309` / `0be544f`.
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-23 - `/blog` large card: ниже cover, длиннее excerpt
 
 ### Наблюдения

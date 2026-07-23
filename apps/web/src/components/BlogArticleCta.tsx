@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 
+import { SHORTCODE_ATTRS } from '@/lib/blog-markdown';
 import { navigateBlogHref } from '@/lib/blog-navigate';
 
 type BlogArticleCtaProps = {
@@ -43,12 +44,12 @@ export function BlogArticleCta({ title, text, button, href, secondaryButton, sec
 export type ParsedCta = BlogArticleCtaProps;
 
 /** Как у NOTE: `]` внутри quoted attrs (напр. text с markdown-ссылкой) не должен обрывать блок. */
-const CTA_REGEX = /^\[CTA\s+((?:[^\]"]|"[^"]*")+)\]$/;
+const CTA_REGEX = new RegExp(String.raw`^\[CTA\s+${SHORTCODE_ATTRS}\]$`);
 
 export function parseCtaBlock(block: string): ParsedCta | null {
   const trimmed = block.trim();
   const match = trimmed.match(CTA_REGEX);
-  if (!match) return null;
+  if (!match?.[1]) return null;
 
   const attrs: Record<string, string> = {};
   const attrRegex = /(\w+)="([^"]*)"/g;

@@ -6,12 +6,24 @@ import { BlogArticleCta, parseCtaBlock } from '@/components/BlogArticleCta';
 import { BlogArticleNote, parseNoteBlock } from '@/components/BlogArticleNote';
 import { BlogBuyButton, parseBuyBlock } from '@/components/BlogBuyButton.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import {
+  SHORTCODE_ATTRS,
+  isUsableBlogHref,
+  parseHeadingLine,
+  slugifyBlogHeading,
+  tokenizeInlineMarkdown,
+  type InlineToken,
+} from '@/lib/blog-markdown';
 import { handleBlogLinkClick } from '@/lib/blog-navigate';
 
 const IMAGE_BLOCK_REGEX = /^\[image\s+side=(left|right)\s+src="([^"]+)"(?:\s+alt="([^"]*)")?\]$/i;
 const MD_IMAGE_LINE_REGEX = /^!\[([^\]]*)\]\(([^)]+)\)$/;
-const QUOTE_ATTRS = String.raw`((?:[^\]"]|"[^"]*")+)`;
-const QUOTE_REGEX = new RegExp(String.raw`^\[QUOTE\s+${QUOTE_ATTRS}\]$`, 'i');
+const QUOTE_REGEX = new RegExp(String.raw`^\[QUOTE\s+${SHORTCODE_ATTRS}\]$`, 'i');
+
+const BODY_LINK_CLASS =
+  'font-semibold text-primary-700 underline decoration-primary/40 underline-offset-[3px] transition hover:text-primary-800 hover:decoration-primary/70';
+const PRICE_CLASS =
+  'whitespace-nowrap rounded-sm bg-primary/8 px-1 py-0.5 font-semibold tabular-nums text-primary-800';
 
 export type ParsedQuote = { text: string; cite?: string };
 
@@ -71,47 +83,48 @@ type ContentBlock =
   | { type: 'buy'; data: NonNullable<ReturnType<typeof parseBuyBlock>> }
   | { type: 'note'; data: NonNullable<ReturnType<typeof parseNoteBlock>> };
 
+function renderInlineToken(token: InlineToken, key: string): React.ReactNode {
+  switch (token.type) {
+    case 'link':
+      if (!isUsableBlogHref(token.href)) return token.text;
+      return (
+        <a
+          key={key}
+          href={token.href}
+          onClick={(event) => handleBlogLinkClick(event, token.href)}
+          className={BODY_LINK_CLASS}
+        >
+          {token.text}
+        </a>
+      );
+    case 'strong':
+      return (
+        <strong key={key} className="font-semibold text-slate-900">
+          {token.value}
+        </strong>
+      );
+    case 'em':
+      return (
+        <em key={key} className="italic text-slate-700">
+          {token.value}
+        </em>
+      );
+    case 'price':
+      return (
+        <span key={key} className={PRICE_CLASS}>
+          {token.value}
+        </span>
+      );
+    default:
+      return token.value;
+  }
+}
+
 /** Inline markdown на одной строке (без \\n). */
 function renderInlineLine(text: string, keyPrefix = ''): React.ReactNode[] {
-  const nodes: React.ReactNode[] = [];
-  // **bold** before *italic* so double asterisks are not split into empties.
-  const regex = /\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*|\*([^*]+)\*/g;
-  let last = 0;
-  let match: RegExpExecArray | null;
-  let key = 0;
-
-  while ((match = regex.exec(text)) !== null) {
-    if (match.index > last) nodes.push(text.slice(last, match.index));
-    if (match[1] && match[2]) {
-      const linkHref = match[2];
-      nodes.push(
-        <a
-          key={`${keyPrefix}lnk-${key++}`}
-          href={linkHref}
-          onClick={(event) => handleBlogLinkClick(event, linkHref)}
-          className="font-medium text-primary-600 underline decoration-primary/30 underline-offset-[3px] transition hover:text-primary-700 hover:decoration-primary/60"
-        >
-          {match[1]}
-        </a>,
-      );
-    } else if (match[3]) {
-      nodes.push(
-        <strong key={`${keyPrefix}strong-${key++}`} className="font-semibold text-slate-900">
-          {match[3]}
-        </strong>,
-      );
-    } else if (match[4]) {
-      nodes.push(
-        <em key={`${keyPrefix}em-${key++}`} className="italic text-slate-700">
-          {match[4]}
-        </em>,
-      );
-    }
-    last = regex.lastIndex;
-  }
-
-  if (last < text.length) nodes.push(text.slice(last));
-  return nodes;
+  return tokenizeInlineMarkdown(text).map((token, index) =>
+    renderInlineToken(token, `${keyPrefix}t${index}`),
+  );
 }
 
 /**
@@ -175,7 +188,7 @@ function isSpecialLine(line: string): boolean {
   if (parseImageBlock(trimmed)) return true;
   if (isTableLine(trimmed)) return true;
   if (isBlockquoteLine(trimmed)) return true;
-  if (trimmed.startsWith('## ') || trimmed.startsWith('### ')) return true;
+  if (trimmed.startsWith('## ') || trimmed.startsWith('### ') || trimmed.startsWith('# ')) return true;
   if (isStandaloneBoldHeading(trimmed)) return true;
   if (isOrderedListLine(trimmed) || isUnorderedListLine(trimmed)) return true;
   return false;
@@ -259,16 +272,15 @@ export function parseContentBlocks(content: string): ContentBlock[] {
       continue;
     }
 
-    if (line.startsWith('## ')) {
+    const heading = parseHeadingLine(line);
+    if (heading) {
       flushParagraph();
-      blocks.push({ type: 'h2', text: line.replace(/^##\s+/, '') });
-      index += 1;
-      continue;
-    }
-
-    if (line.startsWith('### ')) {
-      flushParagraph();
-      blocks.push({ type: 'h3', text: line.replace(/^###\s+/, '') });
+      // В теле статьи один H1 уже в hero - `#` / `##` → h2, `###` → h3.
+      if (heading.level === 3) {
+        blocks.push({ type: 'h3', text: heading.text });
+      } else {
+        blocks.push({ type: 'h2', text: heading.text });
+      }
       index += 1;
       continue;
     }
@@ -524,9 +536,15 @@ function tableRowsFromBlock(block: Extract<ContentBlock, { type: 'table' }>): st
 }
 
 const PARAGRAPH_CLASS =
-  'text-base leading-[1.6] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-[1.0625rem] sm:leading-[1.6]';
+  'text-base leading-[1.65] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-[1.0625rem] sm:leading-[1.65]';
 const LEAD_PARAGRAPH_CLASS =
-  'text-[1.0625rem] leading-[1.6] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-lg sm:leading-[1.55]';
+  'text-[1.0625rem] leading-[1.65] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-lg sm:leading-[1.6]';
+const H2_CLASS =
+  'scroll-mt-24 mb-4 border-b border-slate-200/90 pb-2.5 font-display text-[1.45rem] font-bold tracking-tight text-slate-950 sm:text-[1.7rem] lg:text-[1.8rem] [&:not(:first-child)]:mt-12 [&:not(:first-child)]:pt-1';
+const H3_CLASS =
+  'scroll-mt-24 mb-3 font-display text-[1.125rem] font-bold tracking-tight text-slate-900 sm:text-xl [&:not(:first-child)]:mt-8';
+const LIST_CLASS =
+  'my-5 space-y-2.5 pl-6 text-base leading-[1.65] text-pretty text-slate-800 sm:text-[1.0625rem]';
 
 function normalizeImageSrc(src: string): string {
   const trimmed = src.trim();
@@ -670,9 +688,10 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <h2
             key={`h2-${index}`}
-            className="scroll-mt-24 mb-3 font-display text-[1.4rem] font-bold tracking-tight text-slate-950 sm:text-[1.65rem] lg:text-[1.75rem] [&:not(:first-child)]:mt-10 [&:not(:first-child)]:pt-1"
+            id={slugifyBlogHeading(block.text)}
+            className={H2_CLASS}
           >
-            {block.text}
+            {renderInline(block.text, `h2-${index}-`)}
           </h2>,
         );
         isLeadParagraph = false;
@@ -681,9 +700,10 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <h3
             key={`h3-${index}`}
-            className="scroll-mt-24 mb-2.5 font-display text-lg font-bold tracking-tight text-slate-950 sm:text-xl [&:not(:first-child)]:mt-7"
+            id={slugifyBlogHeading(block.text)}
+            className={H3_CLASS}
           >
-            {block.text}
+            {renderInline(block.text, `h3-${index}-`)}
           </h3>,
         );
         isLeadParagraph = false;
@@ -692,10 +712,10 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <ol
             key={`ol-${index}`}
-            className="my-4 list-decimal space-y-2 pl-6 text-base leading-[1.6] text-pretty text-slate-800 marker:font-semibold marker:text-primary-600 sm:text-[1.0625rem]"
+            className={`${LIST_CLASS} list-decimal marker:font-semibold marker:text-primary-600`}
           >
             {block.items.map((item, itemIndex) => (
-              <li key={itemIndex} className="pl-1">
+              <li key={itemIndex} className="pl-1.5">
                 {renderInline(item, `ol-${index}-${itemIndex}-`)}
               </li>
             ))}
@@ -707,10 +727,10 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <ul
             key={`ul-${index}`}
-            className="my-4 list-disc space-y-2 pl-6 text-base leading-[1.6] text-pretty text-slate-800 marker:text-primary-500 sm:text-[1.0625rem]"
+            className={`${LIST_CLASS} list-disc marker:text-primary-500`}
           >
             {block.items.map((item, itemIndex) => (
-              <li key={itemIndex} className="pl-1">
+              <li key={itemIndex} className="pl-1.5">
                 {renderInline(item, `ul-${index}-${itemIndex}-`)}
               </li>
             ))}
