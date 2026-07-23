@@ -53,7 +53,11 @@ export function BlogRelatedSidebar({
             Читайте также
           </p>
           <ul className="mt-3 space-y-4">
-            {posts.map((post) => (
+            {posts.map((post) => {
+              const metaLabel = [post.tag === 'Колонка' ? null : post.tag, post.city]
+                .filter(Boolean)
+                .join(' · ');
+              return (
               <li key={post.slug}>
                 <Link href={`/blog/${post.slug}`} className="group flex gap-3">
                   <div className="relative h-16 w-20 shrink-0 overflow-hidden bg-slate-100">
@@ -67,9 +71,9 @@ export function BlogRelatedSidebar({
                     />
                   </div>
                   <div className="min-w-0">
-                    {post.tag || post.city ? (
+                    {metaLabel ? (
                       <p className="text-[10px] font-medium uppercase tracking-wider text-slate-500">
-                        {[post.tag, post.city].filter(Boolean).join(' · ')}
+                        {metaLabel}
                       </p>
                     ) : null}
                     <h3 className="mt-0.5 line-clamp-3 font-display text-sm font-bold leading-snug text-slate-900 group-hover:text-primary-700">
@@ -78,7 +82,8 @@ export function BlogRelatedSidebar({
                   </div>
                 </Link>
               </li>
-            ))}
+              );
+            })}
           </ul>
           <Link
             href="/blog"

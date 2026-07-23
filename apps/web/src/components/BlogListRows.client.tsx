@@ -7,7 +7,7 @@ import { SafeImage } from '@/components/SafeImage.client';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { formatBlogPublishedAt } from '@/lib/blog-utils';
-import { authorLabel } from '@/lib/blog-meta';
+import { authorLabel, blogAuthorNameClassName, isColumnArticle } from '@/lib/blog-meta';
 import { resolveBlogListingQuickLinks } from '@/lib/blog-listing-links';
 
 function BlogListRow({ post }: { post: BlogCardDto }) {
@@ -26,7 +26,10 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
   });
 
   const chips: Array<{ key: string; label: string }> = [];
-  if (tag) chips.push({ key: `tag-${tag}`, label: tag });
+  // Без бейджа «Колонка» - сигнал только цвет имени автора.
+  if (tag && tag !== 'Колонка' && !isColumnArticle(post.articleType)) {
+    chips.push({ key: `tag-${tag}`, label: tag });
+  }
   if (post.city) chips.push({ key: `city-${post.city}`, label: post.city });
 
   return (
@@ -65,7 +68,7 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
 
         <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 sm:text-xs">
           {post.authorName || post.authorId ? (
-            <span className="font-medium text-slate-600">
+            <span className={blogAuthorNameClassName(post.articleType)}>
               {post.authorName || authorLabel(post.authorId)}
             </span>
           ) : null}

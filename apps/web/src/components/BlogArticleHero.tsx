@@ -5,6 +5,7 @@ import { BookOpen, Clock, MapPin } from 'lucide-react';
 
 import { PageBreadcrumbBar, type BreadcrumbItem } from '@/components/PageBreadcrumbs';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { blogAuthorNameClassName } from '@/lib/blog-meta';
 
 type BlogArticleHeroProps = {
   breadcrumbs: BreadcrumbItem[];
@@ -18,6 +19,8 @@ type BlogArticleHeroProps = {
   tag?: string | null;
   /** Имя автора колонки (не тип «Колонка»). */
   authorName?: string | null;
+  /** articleType === 'column' → brand blue имя, без бейджа типа. */
+  articleType?: string | null;
 };
 
 export function BlogArticleHero({
@@ -31,6 +34,7 @@ export function BlogArticleHero({
   cityHref,
   tag,
   authorName,
+  articleType,
 }: BlogArticleHeroProps) {
   return (
     <>
@@ -89,7 +93,9 @@ export function BlogArticleHero({
               ) : null}
 
               <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-white/65 sm:text-sm">
-                {authorName ? <span className="font-medium text-white/90">{authorName}</span> : null}
+                {authorName ? (
+                  <span className={blogAuthorNameClassName(articleType, 'dark')}>{authorName}</span>
+                ) : null}
                 {publishedLabel ? <span>{publishedLabel}</span> : null}
                 {readMin ? (
                   <span className="inline-flex items-center gap-1">

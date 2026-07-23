@@ -70,8 +70,9 @@ function buildTopicLinks(article: BlogArticleDto): BlogSidebarLink[] {
 
 function resolveArticleTag(article: BlogArticleDto): string | null {
   const staticPost = BLOG_POSTS.find((post) => post.slug === article.slug);
+  // Колонка: без бейджа типа - сигнал только цвет имени автора.
+  if (article.articleType === 'column' || staticPost?.tag === 'Колонка') return null;
   if (staticPost?.tag) return staticPost.tag;
-  if (article.articleType === 'column') return 'Колонка';
   if (article.articleType === 'obzor') return 'Обзор';
   if (article.articleType === 'digest') return 'Дайджест';
   if (article.city) return 'Город';
@@ -113,6 +114,7 @@ export function BlogArticleView({
           cityHref={cityLink}
           tag={tag}
           authorName={article.authorName}
+          articleType={article.articleType}
         />
 
         {/* div, not nested <main>: SiteLayout already wraps children in <main> */}
@@ -173,7 +175,9 @@ export function BlogArticleView({
                     <li key={`strip-${post.slug}`}>
                       <Link href={`/blog/${post.slug}`} className="group block">
                         <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                          {[post.tag, post.city].filter(Boolean).join(' · ') || 'Блог'}
+                          {[post.tag === 'Колонка' ? null : post.tag, post.city]
+                            .filter(Boolean)
+                            .join(' · ') || 'Блог'}
                         </p>
                         <h3 className="mt-1 font-display text-base font-bold leading-snug text-slate-900 group-hover:text-primary-700">
                           {post.title}

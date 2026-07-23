@@ -7,7 +7,7 @@ import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { expandLargeListingCopy, formatBlogPublishedAt } from '@/lib/blog-utils';
-import { authorLabel } from '@/lib/blog-meta';
+import { authorLabel, blogAuthorNameClassName } from '@/lib/blog-meta';
 import { resolveBlogListingQuickLinks } from '@/lib/blog-listing-links';
 
 export type BlogPostCardVariant = 'large' | 'small' | 'default';
@@ -29,7 +29,9 @@ function BlogCardMeta({
       ].join(' ')}
     >
       {post.authorName || post.authorId ? (
-        <span className="font-medium text-slate-600">{post.authorName || authorLabel(post.authorId)}</span>
+        <span className={blogAuthorNameClassName(post.articleType)}>
+          {post.authorName || authorLabel(post.authorId)}
+        </span>
       ) : null}
       {dateLabel ? <span>{dateLabel}</span> : null}
       <span className="inline-flex items-center gap-1">

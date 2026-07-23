@@ -220,6 +220,24 @@ export function authorLabel(authorId?: string | null): string {
   return BLOG_AUTHOR_LABELS[id] || 'Редакция';
 }
 
+export function isColumnArticle(articleType?: string | null): boolean {
+  const type = String(articleType || '')
+    .trim()
+    .toLowerCase();
+  return type === 'column' || type === 'kolonka';
+}
+
+/** Имя автора колонки - brand blue; «Редакция» и прочие - нейтральный slate. */
+export function blogAuthorNameClassName(
+  articleType?: string | null,
+  surface: 'light' | 'dark' = 'light',
+): string {
+  if (isColumnArticle(articleType)) {
+    return surface === 'dark' ? 'font-medium text-primary-300' : 'font-medium text-primary-600';
+  }
+  return surface === 'dark' ? 'font-medium text-white/90' : 'font-medium text-slate-600';
+}
+
 export function articleTypeLabel(type?: string | null): string {
   const key = String(type || 'gid').trim().toLowerCase();
   return BLOG_ARTICLE_TYPE_LABELS[key] || BLOG_ARTICLE_TYPE_LABELS.gid;
