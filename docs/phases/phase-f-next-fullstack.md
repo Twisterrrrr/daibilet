@@ -120,7 +120,6 @@ Handoff для Codex: [codex-phase2-next-handoff.md](../codex-phase2-next-handof
 - [ ] Cutover admin.daibilet.ru → Next; retire Vite static (F4.1c)
 - [ ] Sync jobs → `apps/worker` or Route Handlers + cron
 - [ ] Writes still via ported services (Prisma transactions)
-- [ ] Cutover admin.daibilet.ru → Next; retire Vite static
 
 ### F5 — Retire legacy (2+ нед)
 
