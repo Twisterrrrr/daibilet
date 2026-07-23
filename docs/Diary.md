@@ -31,7 +31,7 @@
 
 ### Проблемы
 
-- Нет.
+- Нет. **Prod @`6656adf`:** `deploy-prod-next` OK; `/blog` + лонгриды без `font-serif`/`blog-dropcap`, H1 на `font-display`.
 
 ---
 
