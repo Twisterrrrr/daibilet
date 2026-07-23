@@ -81,6 +81,34 @@ export function expandListingExcerpt(slug: string, excerpt: string, maxChars = 4
   return sliced || base || lead.slice(0, maxChars);
 }
 
+/** Split expanded lead into two paragraphs for large magazine cards (text below chips). */
+export function expandLargeListingCopy(
+  slug: string,
+  excerpt: string,
+  maxChars = 760,
+): { primary: string; secondary: string } {
+  const full = expandListingExcerpt(slug, excerpt, maxChars).trim();
+  if (!full) return { primary: '', secondary: '' };
+  if (full.length < 280) return { primary: full, secondary: '' };
+
+  const mid = Math.floor(full.length * 0.42);
+  const from = Math.max(100, mid - 90);
+  const to = Math.min(full.length - 60, mid + 140);
+  const window = full.slice(from, to);
+  const sentenceEnd = window.search(/[.!?][\s\u00a0]+/);
+  let splitAt: number;
+  if (sentenceEnd >= 0) {
+    splitAt = from + sentenceEnd + 1;
+  } else {
+    const space = full.indexOf(' ', mid);
+    splitAt = space > 0 ? space : mid;
+  }
+
+  const primary = full.slice(0, splitAt).trim();
+  const secondary = full.slice(splitAt).trim();
+  return { primary, secondary };
+}
+
 function enrichCardFields(slug: string, partial: Partial<BlogCardDto>): Pick<
   BlogCardDto,
   'city' | 'citySlug' | 'authorId' | 'authorName' | 'articleType' | 'tag'

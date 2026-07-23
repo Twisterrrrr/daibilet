@@ -1,37 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { Clock, MapPin } from 'lucide-react';
+import { Clock } from 'lucide-react';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import type { BlogCardDto } from '@/lib/blog-utils';
-import { formatBlogPublishedAt } from '@/lib/blog-utils';
+import { expandLargeListingCopy, formatBlogPublishedAt } from '@/lib/blog-utils';
 import { authorLabel } from '@/lib/blog-meta';
-import { resolveBlogCityHref } from '@/lib/blog-article-city';
 import { resolveBlogListingQuickLinks } from '@/lib/blog-listing-links';
 
 export type BlogPostCardVariant = 'large' | 'small' | 'default';
-
-function CoverBadges({ post, tag }: { post: BlogCardDto; tag: string }) {
-  const cityLink = resolveBlogCityHref(post.city, post.citySlug);
-  return (
-    <>
-      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 flex flex-wrap items-center gap-2 p-3">
-        <span className="inline-flex rounded-full bg-white/95 px-2.5 py-0.5 text-xs font-semibold text-slate-900 shadow-sm">
-          {tag}
-        </span>
-        {post.city && cityLink ? (
-          <span className="inline-flex items-center gap-1 rounded-full bg-black/50 px-2.5 py-0.5 text-xs font-semibold text-white ring-1 ring-white/20 backdrop-blur">
-            <MapPin className="h-3 w-3" aria-hidden />
-            {post.city}
-          </span>
-        ) : null}
-      </div>
-    </>
-  );
-}
 
 function BlogCardMeta({
   post,
@@ -45,8 +24,8 @@ function BlogCardMeta({
   return (
     <div
       className={[
-        'mt-4 flex flex-wrap items-center gap-3 text-slate-500',
-        isLarge ? 'text-xs sm:text-sm' : 'text-[11px]',
+        'flex flex-wrap items-center gap-3 text-slate-500',
+        isLarge ? 'mt-3 text-xs sm:text-sm' : 'mt-4 text-[11px]',
       ].join(' ')}
     >
       {post.authorName || post.authorId ? (
@@ -75,6 +54,7 @@ export function BlogPostCard({
   const isSmall = variant === 'small';
   const articleHref = `/blog/${post.slug}`;
   const excerpt = String(post.excerpt || '').trim();
+  const largeCopy = isLarge ? expandLargeListingCopy(post.slug, excerpt) : null;
   const quickLinks = isLarge
     ? resolveBlogListingQuickLinks({
         slug: post.slug,
@@ -94,6 +74,9 @@ export function BlogPostCard({
   // Large: article + отдельные ссылки снизу (как city hub), иначе nested <a> ломает разметку.
   // Cover: fixed 2:1 (не lg:flex-1) - иначе фото съедает высоту row-span-2; текст/chips получают flex-1.
   if (isLarge) {
+    const primary = largeCopy?.primary || excerpt;
+    const secondary = largeCopy?.secondary || '';
+
     return (
       <article className={cardShell}>
         <Link
@@ -113,34 +96,38 @@ export function BlogPostCard({
               </div>
             }
           />
-          <CoverBadges post={post} tag={tag} />
         </Link>
-        <div className="flex min-w-0 flex-1 flex-col justify-between p-5 sm:p-6">
-          <div className="min-w-0">
-            <h2 className="font-display text-xl font-bold leading-snug text-slate-900 sm:text-2xl lg:text-[1.75rem]">
-              <Link href={articleHref} className="hover:text-primary-700">
-                {post.title}
-              </Link>
-            </h2>
-            {excerpt ? (
-              <p className="mt-2.5 line-clamp-6 text-sm leading-relaxed text-slate-600 sm:text-base sm:leading-[1.55]">
-                {excerpt}
-              </p>
-            ) : null}
-            {quickLinks.length ? (
-              <div className="mt-3 flex flex-wrap gap-2 border-t border-slate-100 pt-3" aria-label="Связанные разделы">
-                {quickLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className="inline-flex max-w-full items-center truncate rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:border-primary/40 hover:bg-primary-50/70 hover:text-primary-700 sm:text-sm"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
-              </div>
-            ) : null}
-          </div>
+        <div className="flex min-w-0 flex-1 flex-col p-5 sm:p-6">
+          <h2 className="font-display text-xl font-bold leading-snug text-slate-900 sm:text-2xl lg:text-[1.75rem]">
+            <Link href={articleHref} className="hover:text-primary-700">
+              {post.title}
+            </Link>
+          </h2>
+          {primary ? (
+            <p className="mt-2.5 line-clamp-4 text-sm leading-relaxed text-slate-600 sm:text-base sm:leading-[1.55]">
+              {primary}
+            </p>
+          ) : null}
+          {quickLinks.length ? (
+            <div className="mt-3 flex flex-wrap gap-2 border-t border-slate-100 pt-3" aria-label="Связанные разделы">
+              {quickLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="inline-flex max-w-full items-center truncate rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:border-primary/40 hover:bg-primary-50/70 hover:text-primary-700 sm:text-sm"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          ) : null}
+          {secondary ? (
+            <p className="mt-3 flex-1 line-clamp-5 text-sm leading-relaxed text-slate-600 sm:text-[0.95rem] sm:leading-[1.55]">
+              {secondary}
+            </p>
+          ) : (
+            <div className="flex-1" />
+          )}
           <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />
         </div>
       </article>
@@ -167,7 +154,6 @@ export function BlogPostCard({
             </div>
           }
         />
-        <CoverBadges post={post} tag={tag} />
       </div>
       <div className={['flex flex-1 flex-col', isSmall ? 'p-4' : 'p-5'].join(' ')}>
         <h2
