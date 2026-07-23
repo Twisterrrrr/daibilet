@@ -1,12 +1,20 @@
 'use client';
 
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { LayoutGrid, List } from 'lucide-react';
 
+import { BlogListRows } from '@/components/BlogListRows.client';
 import { BlogMagazineGrid } from '@/components/BlogMagazineGrid.client';
 import type { BlogListFilters } from '@/components/BlogListView';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { authorLabel, cityFilterLabel } from '@/lib/blog-meta';
+import {
+  parseBlogViewMode,
+  readStoredBlogViewMode,
+  storeBlogViewMode,
+  type BlogViewMode,
+} from '@/lib/blog-view-mode';
 
 function paramValue(value: string | null | undefined, fallback = 'all'): string {
   const raw = String(value || '').trim();
@@ -30,6 +38,63 @@ function buildOptions(
     .sort((a, b) => a.label.localeCompare(b.label, 'ru'));
 }
 
+function BlogViewModeToggle({
+  mode,
+  onChange,
+}: {
+  mode: BlogViewMode;
+  onChange: (mode: BlogViewMode) => void;
+}) {
+  return (
+    <div
+      className="inline-flex h-10 shrink-0 items-center overflow-hidden rounded-xl bg-slate-100 p-1 ring-1 ring-slate-200/80"
+      role="radiogroup"
+      aria-label="Вид списка статей"
+    >
+      <ViewModeButton
+        active={mode === 'magazine'}
+        label="Сетка"
+        onClick={() => onChange('magazine')}
+      >
+        <LayoutGrid className="h-4 w-4" aria-hidden />
+      </ViewModeButton>
+      <ViewModeButton active={mode === 'list'} label="Список" onClick={() => onChange('list')}>
+        <List className="h-4 w-4" aria-hidden />
+      </ViewModeButton>
+    </div>
+  );
+}
+
+function ViewModeButton({
+  active,
+  label,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  label: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={active}
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+      className={`grid h-8 w-8 place-items-center rounded-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
+        active
+          ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
+          : 'text-slate-500 hover:bg-white/70 hover:text-slate-800'
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
 export function BlogListFiltered({
   posts,
   initialFilters,
@@ -40,6 +105,7 @@ export function BlogListFiltered({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [viewMode, setViewModeState] = useState<BlogViewMode>('magazine');
 
   const city = paramValue(searchParams.get('city') ?? initialFilters?.city);
   const author = paramValue(searchParams.get('author') ?? initialFilters?.author);
@@ -72,6 +138,28 @@ export function BlogListFiltered({
     });
   }, [posts, city, author]);
 
+  useEffect(() => {
+    const fromUrl = searchParams.get('view');
+    if (fromUrl) {
+      setViewModeState(parseBlogViewMode(fromUrl));
+      return;
+    }
+    setViewModeState(readStoredBlogViewMode() || 'magazine');
+  }, [searchParams]);
+
+  const setViewMode = useCallback(
+    (next: BlogViewMode) => {
+      setViewModeState(next);
+      storeBlogViewMode(next);
+      const params = new URLSearchParams(searchParams.toString());
+      if (next === 'magazine') params.delete('view');
+      else params.set('view', next);
+      const qs = params.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    },
+    [pathname, router, searchParams],
+  );
+
   const setFilter = useCallback(
     (key: 'city' | 'author', value: string) => {
       const next = new URLSearchParams(searchParams.toString());
@@ -85,8 +173,11 @@ export function BlogListFiltered({
   );
 
   const resetFilters = useCallback(() => {
-    router.replace(pathname, { scroll: false });
-  }, [pathname, router]);
+    const next = new URLSearchParams();
+    if (viewMode === 'list') next.set('view', 'list');
+    const qs = next.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+  }, [pathname, router, viewMode]);
 
   const hasActive = city !== 'all' || author !== 'all';
 
@@ -133,15 +224,25 @@ export function BlogListFiltered({
             Сбросить
           </button>
         ) : null}
+
+        <div className="sm:ml-auto">
+          <BlogViewModeToggle mode={viewMode} onChange={setViewMode} />
+        </div>
       </div>
 
-      <p className="mb-4 text-sm text-slate-500">
-        Найдено: <span className="font-semibold text-slate-800">{filtered.length}</span>
-        {posts.length ? <span> из {posts.length}</span> : null}
-      </p>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-slate-500">
+          Найдено: <span className="font-semibold text-slate-800">{filtered.length}</span>
+          {posts.length ? <span> из {posts.length}</span> : null}
+        </p>
+      </div>
 
       {filtered.length > 0 ? (
-        <BlogMagazineGrid posts={filtered} />
+        viewMode === 'list' ? (
+          <BlogListRows posts={filtered} />
+        ) : (
+          <BlogMagazineGrid posts={filtered} />
+        )
       ) : (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 py-16 text-center text-slate-500">
           <p className="text-lg font-semibold text-slate-700">Ничего не нашли</p>

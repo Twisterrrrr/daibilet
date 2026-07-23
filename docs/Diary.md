@@ -1,3 +1,21 @@
+## 2026-07-23 - `/blog` view toggle (magazine | list)
+
+### Наблюдения
+
+- Владелец: magazine-сетка ок, но нужен переключатель на информативный список (как в каталоге). Cover badges (tag/city на фото) убираем - в list они не нужны на thumb.
+
+### Решения
+
+- `blog-view-mode.ts`: modes `magazine` \| `list`; persist `localStorage` key `blog:viewMode`; URL `?view=list` (aliases `grid`/`cards` → magazine). Default = magazine.
+- Toggle icon (LayoutGrid / List) справа в strip фильтров `/blog`; list = `BlogListRows` (thumb слева, title/excerpt/meta/chips справа, без бейджей на фото).
+- Parallel: убраны `CoverBadges` с magazine cards; large-card copy split через `expandLargeListingCopy`.
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-23 - Blog markdown: links / H2 / NOTE / prices
 
 ### Наблюдения

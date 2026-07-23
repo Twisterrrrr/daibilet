@@ -176,6 +176,8 @@
 | B.21 | Blog typography: откат Source Serif → site `font-display`; убрать dropcap | Критический | ✅ `230ebc2` (prod includes via `6656adf`+) |
 | B.22 | `/blog` large card: cover 2:1 (не flex-fill) + excerpt ~6 строк из lead | Высокий | ✅ `0be544f` (prod via `fc5e309`) |
 | B.23 | Blog prose: markdown links/H2 anchors/NOTE/prices + visual accents | Критический | ✅ `4f6cdb3` prod | агент |
+| B.24 | `/blog` view toggle: magazine-сетка \| список + localStorage/`?view=` | Высокий | 🔄 | агент |
+| B.24b | Blog cards: убрать cover badges (tag/city на фото) | Высокий | 🔄 merge с B.24 | агент |
 
 ---
 
@@ -506,6 +508,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-23 | B.24: `/blog` magazine\|list view toggle + localStorage/`?view=` (merge badges-off) |
 | 2026-07-23 | B.21: blog fonts rollback - Source Serif → Space Grotesk / site default; dropcap off |
 | 2026-07-23 | B.20: blog magazine full scope - listing asymmetric + article serif/dropcap/quotes/topic sidebar |
 | 2026-07-23 | B.20: `/blog` asymmetric magazine grid (large 2/3 + 2 small; mirror); city hub teasers |
