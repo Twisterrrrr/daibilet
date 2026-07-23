@@ -34,6 +34,7 @@
 ### Проблемы
 
 - Local migrate: postgres :5437 down; `prisma.config.ts` jiti/babel broken locally (generate обходили `--schema` без config). Prod: `db:deploy` sequential после generate.
+- **Prod @`72ea839`:** migrate `20260724020000_hero_banner` OK (HeroBanner seed titles на `/`); deploy-prod-next OK; smoke `/` `/cities` `/podborki` `/venues` `/locations` `/blog` 200.
 
 ---
 
@@ -52,7 +53,7 @@
 
 ### Проблемы
 
-- Нет.
+- Нет. **Prod @`72ea839`** (trust @`3c287c6` + `fc6f817`): `/` без ИНН/ОГРНИП/юр.адреса; `/contacts` с ИНН+ОГРНИП, без блока адреса.
 
 ---
 

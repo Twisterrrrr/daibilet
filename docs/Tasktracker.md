@@ -12,7 +12,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | H.1 | Shared `HeroLayout` + `HeroMedia` (LCP priority) | Критический | ✅ |
-| H.2 | Home imageOverlay/rotator + Prisma `HeroBanner` + admin toggle | Критический | 🔄 commit → migrate `20260724020000_hero_banner` → deploy-prod-next |
+| H.2 | Home imageOverlay/rotator + Prisma `HeroBanner` + admin toggle | Критический | ✅ `72ea839` prod migrate+deploy |
 | H.3 | `/cities` split + RF map hover + top tiles ISR 1h | Высокий | ✅ |
 | H.4 | `/podborki` editorial 70/30 featured/trending | Высокий | ✅ |
 | H.5 | `/venues` dark imageOverlay + search | Средний | ✅ MVP |
