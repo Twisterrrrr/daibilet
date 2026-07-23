@@ -13,6 +13,8 @@
 - `buildCatalogTagHref` / `resolveCatalogTagHref`: тег → CHPU landing/intent (city-aware); `/events?q=` только fallback. На топ-24 тегах каталога: **23 CHPU / 1 fallback** (`Шоу - программа`).
 - Футер: ИНН + ОГРНИП рядом с email + ссылка на `/requisites`. `/contacts`: ИНН/ОГРНИП усилены (отдельные строки, не muted). Телефон не добавляем.
 
+**Prod @`c72364f`:** deploy-prod-next OK; `/podborki` tag cloud - 23 CHPU + 1 query fallback; home footer содержит ИНН/ОГРНИП; `/contacts` реквизиты на месте.
+
 ### Проблемы
 
 - Публичный 8-800 / городской номер pending у владельца (SEO.9).
