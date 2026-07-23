@@ -14,6 +14,8 @@
 
 - Нет.
 
+**Prod @`0cf20db`:** footer «Популярные направления» на `/` со всеми 8 CHPU/intent URL; event standup SPB breadcrumbs `Главная → Санкт-Петербург → Стендап и юмор`; `/rechnye-progulki/saint-petersburg/` - «часто ищут» + SSR `BreadcrumbList` + `ItemList`.
+
 ---
 
 ## 2026-07-23 - catalog cards: eye-line object-position
