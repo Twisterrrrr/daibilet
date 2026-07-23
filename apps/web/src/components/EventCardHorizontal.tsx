@@ -17,6 +17,7 @@ import {
   MIN_DISPLAY_PRICE_RUB,
   resolvePseudoRating,
 } from '@/lib/event-card-meta';
+import { resolveEventCardObjectPosition } from '@/lib/event-image-focus';
 import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
 import { formatMoneyRange, formatPriceFrom } from '@/lib/format';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
@@ -26,6 +27,11 @@ const SLOT_CHIP_CLASS =
 
 export function EventCardHorizontal({ session }: { session: PublicCatalogListItemDto | PublicSessionDto }) {
   const href = eventHref(session);
+  const imageObjectPosition = resolveEventCardObjectPosition({
+    slug: session.slug,
+    sourceSlug: 'sourceSlug' in session ? session.sourceSlug : undefined,
+    id: session.id,
+  });
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const highlights = collectCatalogLabels(session).slice(0, 3);
   const openDate = isOpenDate(session);
@@ -50,6 +56,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
           alt={session.title}
           fill
           sizes={IMAGE_SIZES.eventCardHorizontal}
+          style={{ objectPosition: imageObjectPosition }}
           className="object-cover transition-transform duration-500 group-hover:scale-110"
           fallback={<div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200" />}
         />

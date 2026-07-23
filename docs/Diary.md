@@ -1,3 +1,22 @@
+## 2026-07-23 - catalog cards: eye-line object-position
+
+### Наблюдения
+
+- На карточках каталога (Pianissimo: Чефанов / Моюн Юн) `object-fit: cover` без `object-position` (дефолт center 50%) резал портретные афиши по глазам/лбу в 16:9 превью.
+- На странице события уже был eye-focus (`event-image-focus.ts`, default `center 18%` + overrides Saprykin/Nurminsky).
+
+### Решения
+
+- Добавлен `resolveEventCardObjectPosition`: те же overrides, default `center 20%` под 16:9 card crop.
+- Подключено в `EventCard` / Showcase / `EventCardHorizontal`. Hero API не менялся (`center 18%`).
+- Точечные Pianissimo overrides не нужны: дефолт держит глаза в кадре.
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-23 - mobile UX каталога `/events`
 
 ### Наблюдения
