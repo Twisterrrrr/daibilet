@@ -45,6 +45,8 @@ import { resolveLandingCopy, shouldUseLandingCopy } from '@/lib/landing-copy';
 import { applyLandingSeoMeta, resolveLandingSeo, useLandingTodayReference } from '@/lib/landing-seo';
 import { buildCategoryCityListingMeta } from '@/lib/seo-listing-meta';
 import { LandingSeoBottom, landingBlocksHaveSeoText } from '@/components/LandingSeoBottom.client';
+import { LandingSeeAlso } from '@/components/LandingSeeAlso';
+import { resolveRelatedListingLinks } from '@/lib/seo-internal-links';
 import { buildBridgesProductJsonLd } from '@/lib/bridges-seo';
 import { formatLandingTodayIso, formatLandingTodayLong } from '@/lib/datetime';
 import { BRIDGES_LANDING } from '@/data/bridges-landing';
@@ -955,6 +957,12 @@ export function LandingPageView({
             ) : null}
           </section>
           <div className="container-page">
+            {citySlug && cityName ? (
+              <LandingSeeAlso
+                cityName={cityName}
+                links={resolveRelatedListingLinks(slug, citySlug)}
+              />
+            ) : null}
             <LandingSeoBottom
               landingSlug={slug}
               citySlug={citySlug}

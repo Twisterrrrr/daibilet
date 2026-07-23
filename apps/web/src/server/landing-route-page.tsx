@@ -14,6 +14,7 @@ import {
   robotsForListingIndexability,
 } from '@/lib/seo-listing-meta';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
+import { buildLandingPageJsonLd } from '@/lib/structured-data';
 import { fetchLandingPageDto, finalizeLandingPayload } from '@/server/landing-page';
 
 export const revalidate = 3600;
@@ -98,9 +99,24 @@ export async function LandingRoutePage({
 
   const genre = readSearchParam(searchParams, 'genre') || readSearchParam(searchParams, 'tag');
   const finalized = finalizeLandingPayload(payload, slug, route.citySlug, genre);
+  const canonical = landingCategoryHref(slug, route.citySlug);
+  const jsonLdBlocks = buildLandingPageJsonLd({
+    landingSlug: slug,
+    citySlug: route.citySlug,
+    landingTitle: finalized.landing.title,
+    canonicalPath: canonical,
+    sessions: finalized.sessions,
+  });
 
   return (
     <SiteLayout>
+      {jsonLdBlocks.map((block, index) => (
+        <script
+          key={`landing-jsonld-${index}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }}
+        />
+      ))}
       <LandingPageView
         slug={slug}
         citySlug={route.citySlug}

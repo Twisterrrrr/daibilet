@@ -5,6 +5,7 @@ import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { cityHref } from '@/lib/routes';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { CANONICAL_LANDING_SLUGS } from '@/lib/landing-constants';
+import { getFooterPopularDirections } from '@/lib/seo-internal-links';
 
 const catalogLinks = [
   { label: 'Экскурсии', href: '/events?category=Экскурсии' },
@@ -41,6 +42,8 @@ export function SiteFooter({ destinations }: SiteFooterProps) {
       href: cityHref(city),
     }));
 
+  const popularDirections = getFooterPopularDirections();
+
   return (
     <footer className="border-t border-slate-200 bg-slate-50">
       <div className="container-page py-12">
@@ -66,6 +69,29 @@ export function SiteFooter({ destinations }: SiteFooterProps) {
           <FooterColumn title="События" links={catalogLinks} />
           <FooterColumn title="Города" links={cityLinks} />
           <FooterColumn title="Компания" links={companyLinks} />
+        </div>
+
+        <div className="mt-10 border-t border-slate-200 pt-8">
+          <h3 className="text-sm font-semibold text-slate-900">Популярные направления</h3>
+          <div className="mt-4 grid gap-6 sm:grid-cols-2">
+            {popularDirections.map((block) => (
+              <div key={block.citySlug}>
+                <p className="text-sm font-medium text-slate-800">{block.cityName}</p>
+                <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1.5">
+                  {block.links.map((link) => (
+                    <li key={`${block.citySlug}:${link.href}`}>
+                      <Link
+                        href={link.href}
+                        className="text-sm text-slate-500 transition-colors hover:text-primary-600"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="mt-10 border-t border-slate-200 pt-6">

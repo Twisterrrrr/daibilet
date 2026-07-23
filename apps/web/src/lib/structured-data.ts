@@ -2,13 +2,21 @@ import type {
   PublicCityPageDto,
   PublicEventDto,
   PublicEventPageDto,
+  PublicSessionDto,
   PublicVenuePageDto,
 } from '@daibilet/contracts/public';
 
 import { buildCityFaqItems, type CityFaqItem } from '@/lib/city-faq';
 import { getTicketPriceRange, isFlexibleScheduleSession } from '@/lib/event-page-utils';
 import { evaluateCityIndexability } from '@/lib/hub-indexability';
+import { resolveLandingCityName } from '@/lib/landing-city';
+import { landingCategoryHref } from '@/lib/landing-routes';
 import { cityHref, eventHref, venueHref } from '@/lib/routes';
+import {
+  cityHubPathFromLandingCity,
+  landingBreadcrumbLabel,
+  resolveEventLandingForBreadcrumb,
+} from '@/lib/seo-internal-links';
 import { absoluteUrl } from '@/lib/seo-meta';
 
 const SITE_URL = (process.env.DAIBILET_SITE_URL || 'https://daibilet.ru').replace(/\/$/, '');
@@ -26,13 +34,10 @@ export type StructuredBreadcrumb = {
   path: string;
 };
 
-/** Хлебные крошки события: Главная → События → Город? → Title */
+/** Хлебные крошки события: Главная → Город → Категория (CHPU) → Title */
 export function buildEventBreadcrumbs(event: PublicEventDto): StructuredBreadcrumb[] {
   const path = event.canonicalPath || eventHref(event);
-  const crumbs: StructuredBreadcrumb[] = [
-    { name: 'Главная', path: '/' },
-    { name: 'События', path: '/events' },
-  ];
+  const crumbs: StructuredBreadcrumb[] = [{ name: 'Главная', path: '/' }];
 
   if (event.city && (event.citySlug || event.sourceCitySlug || event.city)) {
     crumbs.push({
@@ -45,8 +50,93 @@ export function buildEventBreadcrumbs(event: PublicEventDto): StructuredBreadcru
     });
   }
 
+  const landingCrumb = resolveEventLandingForBreadcrumb({
+    landingSlugs: event.landingSlugs,
+    citySlug: event.citySlug,
+    sourceCitySlug: event.sourceCitySlug,
+    category: event.category,
+    tags: event.tags,
+    title: event.title,
+  });
+  if (landingCrumb) {
+    crumbs.push({ name: landingCrumb.label, path: landingCrumb.href });
+  }
+
   crumbs.push({ name: event.seoH1 || event.title, path });
   return crumbs;
+}
+
+/** Хлебные крошки CHPU-листинга: Главная → Город? → Категория */
+export function buildLandingBreadcrumbs(input: {
+  landingSlug: string;
+  citySlug?: string | null;
+  landingTitle?: string | null;
+  canonicalPath: string;
+}): StructuredBreadcrumb[] {
+  const crumbs: StructuredBreadcrumb[] = [{ name: 'Главная', path: '/' }];
+  const cityName = resolveLandingCityName(input.citySlug);
+  const cityHub = cityHubPathFromLandingCity(input.citySlug);
+  if (cityName && cityHub) {
+    crumbs.push({ name: cityName, path: cityHub });
+  }
+  crumbs.push({
+    name: landingBreadcrumbLabel(input.landingSlug, input.landingTitle),
+    path: input.canonicalPath,
+  });
+  return crumbs;
+}
+
+/**
+ * ItemList только для CHPU-листингов с непустой выдачей.
+ * Не вызывать для `/events` каталога.
+ */
+export function buildLandingItemListJsonLd(input: {
+  sessions: Array<Pick<PublicSessionDto, 'title' | 'slug' | 'sourceSlug' | 'id'>>;
+  canonicalPath: string;
+  name: string;
+}): Record<string, unknown> | null {
+  const items = (input.sessions || []).slice(0, 48);
+  if (!items.length) return null;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: input.name,
+    numberOfItems: items.length,
+    url: toAbsoluteUrl(input.canonicalPath),
+    itemListElement: items.map((session, index) => {
+      const path = eventHref(session);
+      return {
+        '@type': 'ListItem',
+        position: index + 1,
+        name: session.title,
+        url: toAbsoluteUrl(path),
+        item: toAbsoluteUrl(path),
+      };
+    }),
+  };
+}
+
+/** SSR blocks для CHPU landing: BreadcrumbList + ItemList (если есть офферы). */
+export function buildLandingPageJsonLd(input: {
+  landingSlug: string;
+  citySlug?: string | null;
+  landingTitle?: string | null;
+  canonicalPath: string;
+  sessions: Array<Pick<PublicSessionDto, 'title' | 'slug' | 'sourceSlug' | 'id'>>;
+}): Array<Record<string, unknown>> {
+  const crumbs = buildLandingBreadcrumbs(input);
+  const blocks: Array<Record<string, unknown>> = [buildBreadcrumbListJsonLd(crumbs)];
+  const listName = input.citySlug
+    ? `${landingBreadcrumbLabel(input.landingSlug, input.landingTitle)} - ${resolveLandingCityName(input.citySlug) || ''}`.trim()
+    : landingBreadcrumbLabel(input.landingSlug, input.landingTitle);
+  const itemList = buildLandingItemListJsonLd({
+    sessions: input.sessions,
+    canonicalPath: input.canonicalPath || landingCategoryHref(input.landingSlug, input.citySlug),
+    name: listName,
+  });
+  if (itemList) blocks.push(itemList);
+  return blocks;
 }
 
 export function buildBreadcrumbListJsonLd(items: StructuredBreadcrumb[]): Record<string, unknown> {
