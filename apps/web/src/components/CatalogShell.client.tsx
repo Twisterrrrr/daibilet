@@ -225,9 +225,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
               className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
             />
           </div>
-          <div className="hidden sm:block">
-            <ViewModeToggle mode={viewMode} onChange={setViewMode} />
-          </div>
+          <ViewModeToggle mode={viewMode} onChange={setViewMode} />
         </div>
       </div>
 
@@ -242,7 +240,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         />
       </div>
 
-      {/* Sort + view: compact near results; mobile = snap chips */}
+      {/* Sort chips near results; mobile = horizontal snap */}
       <div className="mt-3 flex items-center gap-2 sm:mt-4 sm:flex-wrap">
         <span className="hidden text-xs font-medium text-slate-500 sm:inline">Сортировка</span>
         <div
@@ -275,9 +273,6 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
               {option.label}
             </button>
           ))}
-        </div>
-        <div className="shrink-0 sm:hidden">
-          <ViewModeToggle mode={viewMode} onChange={setViewMode} />
         </div>
       </div>
 
