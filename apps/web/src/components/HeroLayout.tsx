@@ -65,7 +65,7 @@ export function HeroLayout({
   breadcrumbs,
   tone: toneProp,
   className = '',
-  splitClassName = 'lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]',
+  splitClassName = 'lg:grid-cols-[minmax(0,2fr)_minmax(14rem,1fr)]',
   children,
   media,
 }: HeroLayoutProps) {
@@ -77,21 +77,23 @@ export function HeroLayout({
       <>
         {breadcrumbs?.length ? <PageBreadcrumbBar items={breadcrumbs} /> : null}
         <section className={`relative overflow-hidden border-b border-slate-200 ${t.section} ${className}`.trim()}>
-          <div className={`container-page grid gap-8 py-10 lg:items-center lg:gap-10 lg:py-14 ${splitClassName}`.trim()}>
-            <div className="min-w-0">
-              {brand ? <div className={`font-display text-sm font-bold tracking-[0.18em] uppercase ${t.brand}`}>{brand}</div> : null}
-              {eyebrow ? <p className={`text-sm font-semibold uppercase tracking-wider ${t.eyebrow} ${brand ? 'mt-2' : ''}`}>{eyebrow}</p> : null}
-              <h1
-                className={`font-display text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl ${t.title} ${
-                  brand || eyebrow ? 'mt-3' : ''
-                }`}
-              >
-                {title}
-              </h1>
-              {description ? <p className={`mt-3 max-w-xl text-base leading-relaxed sm:text-lg ${t.description}`}>{description}</p> : null}
-              {children}
+          <div className="container-page py-10 lg:py-14">
+            <div className={`mx-auto grid w-full max-w-5xl items-stretch gap-4 lg:gap-5 ${splitClassName}`.trim()}>
+              <div className="min-w-0">
+                {brand ? <div className={`font-display text-sm font-bold tracking-[0.18em] uppercase ${t.brand}`}>{brand}</div> : null}
+                {eyebrow ? <p className={`text-sm font-semibold uppercase tracking-wider ${t.eyebrow} ${brand ? 'mt-2' : ''}`}>{eyebrow}</p> : null}
+                <h1
+                  className={`font-display text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl ${t.title} ${
+                    brand || eyebrow ? 'mt-3' : ''
+                  }`}
+                >
+                  {title}
+                </h1>
+                {description ? <p className={`mt-3 max-w-xl text-base leading-relaxed sm:text-lg ${t.description}`}>{description}</p> : null}
+                {children}
+              </div>
+              <div className="min-w-0 self-stretch">{aside}</div>
             </div>
-            <div className="min-w-0">{aside}</div>
           </div>
         </section>
       </>

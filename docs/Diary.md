@@ -1,3 +1,21 @@
+## 2026-07-24 - /cities: top tiles + «Популярные города» без белой дыры
+
+### Наблюдения
+
+- Владелец (скрин `/cities`): `HeroLayout` split на полной `container-page` разъезжал сетку карточек и aside «Популярные города» к краям; посередине огромный gutter. Aside не тянулся по высоте сетки (как раньше на podborki).
+
+### Решения
+
+- `/cities`: `HeroLayout` `minimal` + композиция `mx-auto max-w-5xl items-stretch` `2fr / minmax(14rem,1fr)` + `lg:gap-5` (как `/podborki` / blog featured).
+- `RussiaMap`: `flex h-full flex-col` чтобы панель stretch'илась; облачный SVG не возвращали.
+- `HeroLayout` split default тоже на max-w-5xl + stretch (на случай повторного использования).
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next). Hero фото city hub (`/cities/[slug]`) - вне скоупа.
+
+---
+
 ## 2026-07-24 - /blog: featured + «Свежее» без белой дыры
 
 ### Наблюдения

@@ -25,11 +25,11 @@ export function RussiaMap({ className = '' }: { className?: string }) {
 
   return (
     <div
-      className={`overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`.trim()}
+      className={`flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`.trim()}
       role="navigation"
       aria-label="Популярные города"
     >
-      <div className="relative border-b border-slate-100 bg-gradient-to-br from-slate-50 via-white to-sky-50 px-5 py-5 sm:px-6 sm:py-6">
+      <div className="relative flex flex-1 flex-col border-b border-slate-100 bg-gradient-to-br from-slate-50 via-white to-sky-50 px-5 py-5 sm:px-6 sm:py-6">
         <div
           className="pointer-events-none absolute inset-0 opacity-[0.35]"
           style={{
@@ -74,7 +74,7 @@ export function RussiaMap({ className = '' }: { className?: string }) {
           })}
         </ul>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-2 px-4 py-3">
         <span className="text-xs text-slate-500">Афиша и площадки по городу</span>
         <Link href="/cities" className="text-xs font-semibold text-primary-700 hover:text-primary-800 hover:underline">
           Все города →

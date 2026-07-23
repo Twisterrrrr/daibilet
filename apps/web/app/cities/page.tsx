@@ -32,21 +32,30 @@ export default async function CitiesIndexPage() {
   return (
     <SiteLayout>
       <HeroLayout
-        variant="split"
+        variant="minimal"
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Города' }]}
         title="Города России"
         description="Выберите город - покажем афишу, площадки и подборки с актуальными билетами."
-        aside={<RussiaMap />}
       >
-        {topCities.length ? (
-          <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {topCities.map((city) => (
-              <li key={city.slug || city.name}>
-                <CityCard city={city} />
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        {/* Top tiles + popular cities: one centered composition (same spacing as /podborki). */}
+        <div
+          className={
+            topCities.length
+              ? 'mx-auto mt-6 grid w-full max-w-5xl items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(14rem,1fr)] lg:gap-5'
+              : 'mx-auto mt-6 w-full max-w-5xl'
+          }
+        >
+          {topCities.length ? (
+            <ul className="grid h-full grid-cols-2 content-start gap-3 sm:grid-cols-3">
+              {topCities.map((city) => (
+                <li key={city.slug || city.name}>
+                  <CityCard city={city} />
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          <RussiaMap className="h-full min-h-[14rem]" />
+        </div>
       </HeroLayout>
       <div className="container-page bg-slate-50 py-10">
         <CitiesCatalogView destinations={destinations} hideIntro />
