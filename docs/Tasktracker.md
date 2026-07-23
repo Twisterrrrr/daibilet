@@ -169,7 +169,7 @@
 | U.6 | Город шапки → фильтр `/venues` и `/locations` (URL + storage + nav) | Высокий | ✅ (в `361dc4c`) |
 | U.7 | Anti-flash «Все города»→город на `/events` (и venues/locations): `cityReady` + layout sync | Высокий | ✅ |
 | U.8 | Anti-flash: не показывать SSR all-cities до inject; commit + deploy-prod-next U.6–U.8 | Критический | ✅ `4c09cdb` prod |
-| U.10 | Catalog cards: eye-line `object-position` (16:9 headshots Pianissimo) | Высокий | 🔄 |
+| U.10 | Catalog cards: eye-line `object-position` (16:9 headshots Pianissimo) | Высокий | ✅ `539f571` prod |
 
 ---
 

@@ -11,6 +11,8 @@
 - Подключено в `EventCard` / Showcase / `EventCardHorizontal`. Hero API не менялся (`center 18%`).
 - Точечные Pianissimo overrides не нужны: дефолт держит глаза в кадре.
 
+**Prod @`539f571`:** deploy-prod-next OK; `/events?q=Pianissimo` HTML содержит `object-position: center 20%`; event hero Pianissimo остаётся `center 18%`.
+
 ### Проблемы
 
 - Нет.
