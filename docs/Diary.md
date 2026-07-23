@@ -11,7 +11,7 @@
 
 ### Проблемы
 
-- Нет (deploy в этом же проходе).
+- Нет. **Prod @`e3fa7bc`:** deploy-prod-next OK.
 
 ---
 
