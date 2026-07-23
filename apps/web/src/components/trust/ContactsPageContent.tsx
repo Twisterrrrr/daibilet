@@ -57,16 +57,14 @@ export function ContactsPageContent() {
                 <p className="mt-1 text-sm font-medium leading-6 text-slate-800">
                   Индивидуальный предприниматель Бутин Василий Александрович
                 </p>
-                <dl className="mt-3 space-y-1.5 text-sm">
-                  <div className="flex flex-wrap gap-x-2">
-                    <dt className="font-semibold text-slate-700">ИНН</dt>
-                    <dd className="font-mono font-medium text-slate-900">781125361276</dd>
-                  </div>
-                  <div className="flex flex-wrap gap-x-2">
-                    <dt className="font-semibold text-slate-700">ОГРНИП</dt>
-                    <dd className="font-mono font-medium text-slate-900">306784709000338</dd>
-                  </div>
-                </dl>
+                <div className="mt-3 space-y-1 text-sm font-medium text-slate-900">
+                  <p>
+                    ИНН <span className="font-mono">781125361276</span>
+                  </p>
+                  <p>
+                    ОГРНИП <span className="font-mono">306784709000338</span>
+                  </p>
+                </div>
                 <Link href="/requisites" className="mt-3 inline-block text-sm font-semibold text-primary-700 hover:underline">
                   Полные реквизиты
                 </Link>
