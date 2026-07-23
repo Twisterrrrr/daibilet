@@ -16,6 +16,7 @@ import {
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { buildLandingPageJsonLd } from '@/lib/structured-data';
 import { fetchLandingPageDto, finalizeLandingPayload } from '@/server/landing-page';
+import { loadThinRelatedCardSessions } from '@/server/landing-thin-related';
 
 export const revalidate = 3600;
 
@@ -100,6 +101,14 @@ export async function LandingRoutePage({
   const genre = readSearchParam(searchParams, 'genre') || readSearchParam(searchParams, 'tag');
   const finalized = finalizeLandingPayload(payload, slug, route.citySlug, genre);
   const canonical = landingCategoryHref(slug, route.citySlug);
+  const offerCount = finalized.stats?.events ?? finalized.sessions?.length ?? 0;
+  const thinRelatedSessions = route.citySlug
+    ? await loadThinRelatedCardSessions({
+        landingSlug: slug,
+        citySlug: route.citySlug,
+        offerCount,
+      })
+    : [];
   const jsonLdBlocks = buildLandingPageJsonLd({
     landingSlug: slug,
     citySlug: route.citySlug,
@@ -122,6 +131,7 @@ export async function LandingRoutePage({
         citySlug={route.citySlug}
         initialPayload={finalized}
         genre={genre}
+        thinRelatedSessions={thinRelatedSessions}
       />
     </SiteLayout>
   );

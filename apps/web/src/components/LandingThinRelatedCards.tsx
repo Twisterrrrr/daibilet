@@ -14,6 +14,8 @@ type LandingThinRelatedCardsProps = {
   citySlug: string;
   cityName: string;
   offerCount: number;
+  /** SSR seed (если уже загружены на сервере). */
+  initialSessions?: PublicSessionDto[];
 };
 
 function pickSessionForCard(sessions: PublicSessionDto[]): PublicSessionDto | null {
@@ -37,13 +39,21 @@ export function LandingThinRelatedCards({
   citySlug,
   cityName,
   offerCount,
+  initialSessions = [],
 }: LandingThinRelatedCardsProps) {
-  const [cards, setCards] = React.useState<PublicSessionDto[]>([]);
   const enabled = shouldShowThinRelatedCards(offerCount) && Boolean(citySlug && cityName);
+  const seedKey = initialSessions.map((s) => s.id || s.slug).join('|');
+  const [cards, setCards] = React.useState<PublicSessionDto[]>(
+    () => (enabled && initialSessions.length >= 3 ? initialSessions.slice(0, 4) : []),
+  );
 
   React.useEffect(() => {
     if (!enabled) {
       setCards([]);
+      return;
+    }
+    if (initialSessions.length >= 3) {
+      setCards(initialSessions.slice(0, 4));
       return;
     }
 
@@ -53,7 +63,7 @@ export function LandingThinRelatedCards({
 
     (async () => {
       const next: PublicSessionDto[] = [];
-      const seenEvents = new Set<string>();
+      const seen = new Set<string>();
 
       for (const target of targets) {
         if (next.length >= 4) break;
@@ -66,21 +76,21 @@ export function LandingThinRelatedCards({
           const pick = pickSessionForCard(citySessions);
           if (!pick) continue;
           const key = pick.groupKey || pick.id || pick.slug;
-          if (seenEvents.has(key)) continue;
-          seenEvents.add(key);
+          if (seen.has(key)) continue;
+          seen.add(key);
           next.push(pick);
         } catch {
           // skip failed related landing
         }
       }
 
-      if (!disposed) setCards(next);
+      if (!disposed) setCards(next.length >= 3 ? next.slice(0, 4) : []);
     })();
 
     return () => {
       disposed = true;
     };
-  }, [enabled, landingSlug, citySlug, cityName]);
+  }, [enabled, landingSlug, citySlug, cityName, seedKey, initialSessions]);
 
   if (!enabled || cards.length < 3) return null;
 

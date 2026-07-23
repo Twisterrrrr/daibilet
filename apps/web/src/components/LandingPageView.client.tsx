@@ -590,11 +590,13 @@ export function LandingPageView({
   citySlug,
   initialPayload,
   genre: initialGenre,
+  thinRelatedSessions = [],
 }: {
   slug: string;
   citySlug?: string;
   initialPayload: PublicLandingPageDto;
   genre?: string | null;
+  thinRelatedSessions?: PublicSessionDto[];
 }) {
   const slug = canonicalLandingSlug(rawSlug);
   const profile = getLandingProfile(slug);
@@ -969,6 +971,7 @@ export function LandingPageView({
                   citySlug={citySlug}
                   cityName={cityName}
                   offerCount={payload.stats?.events ?? payload.sessions?.length ?? 0}
+                  initialSessions={thinRelatedSessions}
                 />
               </>
             ) : null}
