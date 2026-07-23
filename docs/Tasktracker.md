@@ -178,7 +178,7 @@
 | B.23 | Blog prose: markdown links/H2 anchors/NOTE/prices + visual accents | Критический | ✅ `4f6cdb3` prod | агент |
 | B.24 | `/blog` view toggle: magazine-сетка \| список + localStorage/`?view=` | Высокий | ✅ `0741106` | агент |
 | B.24b | Blog cards: убрать cover badges (tag/city на фото) | Высокий | ✅ `b542a45` (+ merge B.24) | агент |
-| B.25 | Авторы колонок: brand blue (`text-primary-600`), без бейджа «Колонка» | Высокий | 🔄 | агент |
+| B.25 | Авторы колонок: brand blue (`text-primary-600`), без бейджа «Колонка» | Высокий | ✅ `ed874cb` prod | агент |
 
 ---
 
