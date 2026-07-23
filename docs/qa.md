@@ -2,7 +2,7 @@
 
 ## 2026-07-23 - F4 и качество landing matching
 
-1. **Решение владельца:** следующий крупный поток - F4 admin → Next. Finance contour / ЛК поставщиков отложен до готовности продукта.
+1. **Решение владельца:** следующий крупный поток - F4 admin → Next (kickoff shell `/admin` стартовал). Finance contour / ЛК поставщиков отложен до готовности продукта. До cutover канон - Vite admin; нужен ли отдельный `admin.` vhost на Next раньше полного port UI?
 2. **Канон правил:** до F5 public landing runtime исполняет legacy `dto.js`, а TypeScript `landing-rules.ts` служит typed public path и тестам. Любое изменение правил вносится в оба файла. Нужна ли отдельная генерация rules из единого источника до F5?
 3. **Проверка выдачи:** `LandingMatch` в public path применяется только для ручных `PINNED`/`EXCLUDED`; пересчёт automatic rows не исправляет public выдачу. Нужен ли отдельный автоматический scheduled audit всех landing rules с алертами на характерные мусорные слова?
 

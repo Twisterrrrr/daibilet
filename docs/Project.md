@@ -8,7 +8,7 @@
 
 ## Цель
 
-Миграция public-сайта на **Next.js 15 App Router** в monorepo (`apps/web`) для **SEO через SSR/ISR**. Public cutover (F3) выполнен; admin остаётся на Vite static до F4.
+Миграция public-сайта на **Next.js 15 App Router** в monorepo (`apps/web`) для **SEO через SSR/ISR**. Public cutover (F3) выполнен. **F4 начат:** shell `/admin` в Next + Basic Auth; канон операторки пока Vite `apps/admin` на admin.daibilet.ru.
 
 ---
 
@@ -18,7 +18,7 @@
 
 | Приоритет | Фокус | Статус |
 |-----------|--------|--------|
-| 1 | **F4 admin → Next** — перенос admin SPA в Next route group | следующий крупный поток |
+| 1 | **F4 admin → Next** — перенос admin SPA в Next route group | 🔄 kickoff: shell + auth |
 | 2 | **Landing matching quality** — правила, аудит выдачи и актуальность событий всех посадок | активный |
 | 3 | **AI / статьи и city hubs** — редакционный контент и SEO-якоря | поддерживающий поток |
 | — | **Finance contour / ЛК поставщиков** | ⚠️ deferred: продукт ещё не готов |
@@ -45,7 +45,8 @@
 ```
 apps/web          — Next 15: public SSR/ISR, Route Handlers, client widgets
 apps/backend      — legacy API + dto.js (sync/writes, admin API)
-apps/admin        — Vite SPA (static на admin.daibilet.ru)
+apps/admin        — Vite SPA (канон на admin.daibilet.ru до F4 cutover)
+apps/web/app/(admin)/admin — Next admin shell (F4, /admin, Basic Auth)
 apps/public       — Vite SPA (deprecated после F3)
 packages/db       — Prisma schema + client
 packages/contracts — Zod/types, catalog constants
@@ -125,7 +126,7 @@ Cherry-pick из **`codex/phase2-foundation`**: schema, event change requests, a
 | F1 Monorepo shell | ✅ | `pnpm web:build`, health route |
 | F2 Public SSR | ✅ | View Source без JS, parity scripts |
 | F3 Cutover | ✅ | nginx → Next prod (`:3001`) |
-| F4 Admin + worker | ⏳ | admin в Next, sync в worker |
+| F4 Admin + worker | 🔄 | shell `/admin` + Basic Auth; port pages; sync → worker |
 | F5 Retire dto.js | ⏳ | parity 100%, server.js removed |
 
 Детали: [phases/phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), F3: [phases/phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md).

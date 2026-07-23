@@ -1,3 +1,21 @@
+## 2026-07-23 - SEO: внутренняя перелинковка + JSON-LD ItemList
+
+### Наблюдения
+
+- Нужен сквозной вес с главной на CHPU-посадки; крошки события вели на `/events`, без категории; на листингах не было «Смотрите также» и SSR `ItemList`.
+
+### Решения
+
+- Футер: блок «Популярные направления» (Москва / СПб) с реальными CHPU и `/podborki/{intent}/{city}` (`seo-internal-links.ts`).
+- Event breadcrumbs: `Главная → Город → Landing → Title` + matching по `landingSlugs` / эвристике; JSON-LD BreadcrumbList согласован.
+- Landing: блок «Смотрите также» (конфиг slug×city) над SEO-текстом; SSR `BreadcrumbList` + `ItemList` только на CHPU при non-empty sessions.
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-23 - catalog cards: eye-line object-position
 
 ### Наблюдения
@@ -2868,6 +2886,23 @@
 
 ### Проблемы
 - Экранирование Bearer в PowerShell при remote curl — не использовать однострочный ssh с вложенными кавычками.
+
+## 2026-07-23 - F4 kickoff: admin shell в Next
+
+### Наблюдения
+- F4 ранее был только в backlog (F4.1/F4.2 ⏳), реализации в `apps/web` не было.
+- Канон операторки: Vite `apps/admin` на admin.daibilet.ru; API admin под Basic Auth в legacy backend.
+- Параллельно идут SEO interlinking и catalog tweaks - F4 kickoff не трогает их файлы.
+
+### Решения
+- Первый инкремент: `apps/web/app/(admin)/admin` (stub dashboard + shell), Edge Basic Auth в `middleware` на `/admin`, `robots: noindex`.
+- Credentials contract как у backend: `ADMIN_EMAIL`/`ADMIN_USER` + `ADMIN_PASSWORD` или `ADMIN_PASSWORD_SHA256`.
+- Vite admin остаётся каноном до cutover; Finance contour не трогаем.
+- Следующий шаг: port DashboardPage на live `/api/admin/dashboard`.
+
+### Проблемы
+- Next middleware на Edge - нельзя импортировать `apps/backend` Node `auth.ts`; дублирован минимальный Edge helper `admin-basic-auth.ts`.
+- Prod deploy этого инкремента опционален: `/admin` на public host безопасен (auth + noindex), но cutover admin subdomain не делаем.
 
 ## 2026-07-23 - landing matching audit and product priority
 

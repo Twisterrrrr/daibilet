@@ -1,9 +1,24 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+import {
+  isAdminUiPath,
+  isAuthorizedAdminBasicAuth,
+  readAdminBasicAuthConfig,
+} from '@/lib/admin-basic-auth';
 import { resolveLegacyLandingRedirect } from '@/lib/landing-routes';
 
-export function middleware(request: NextRequest) {
+function unauthorizedAdminResponse(realm: string) {
+  return new NextResponse('Authentication required', {
+    status: 401,
+    headers: {
+      'WWW-Authenticate': `Basic realm="${realm}", charset="UTF-8"`,
+      'Cache-Control': 'no-store',
+    },
+  });
+}
+
+export async function middleware(request: NextRequest) {
   const host = request.headers.get('host')?.toLowerCase() || '';
   if (host === 'www.daibilet.ru' || host.startsWith('www.daibilet.ru:')) {
     const url = request.nextUrl.clone();
@@ -13,7 +28,15 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 301);
   }
 
-  const redirectTarget = resolveLegacyLandingRedirect(request.nextUrl.pathname);
+  const { pathname } = request.nextUrl;
+  if (isAdminUiPath(pathname)) {
+    const config = readAdminBasicAuthConfig(process.env);
+    const ok = await isAuthorizedAdminBasicAuth(request.headers.get('authorization'), config);
+    if (!ok) return unauthorizedAdminResponse(config.realm);
+    return NextResponse.next();
+  }
+
+  const redirectTarget = resolveLegacyLandingRedirect(pathname);
   if (!redirectTarget) return NextResponse.next();
 
   const url = request.nextUrl.clone();
@@ -24,6 +47,8 @@ export function middleware(request: NextRequest) {
 // Static matcher only — Next rejects spread/dynamic arrays in config.matcher.
 export const config = {
   matcher: [
+    '/admin',
+    '/admin/:path*',
     '/landings/:path*',
     '/:city/:category',
     '/river-cruises',

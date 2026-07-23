@@ -111,12 +111,13 @@ Handoff для Codex: [codex-phase2-next-handoff.md](../codex-phase2-next-handof
 - [ ] Prod cutover + rollback plan
 - [ ] Post-F3: Codex cherry-pick ([plan](../codex-cherry-pick-plan.md))
 
-### F4 — Admin + worker (2–3 нед)
+### F4 — Admin + worker (2–3 нед) 🔄
 
-- [ ] Admin route group `(admin)` в Next, Basic Auth middleware
-- [ ] Port admin pages from Vite
+- [x] Admin route group `(admin)` в Next, Basic Auth middleware (kickoff `/admin` stub)
+- [ ] Port admin pages from Vite (next: Dashboard live metrics)
 - [ ] Sync jobs → `apps/worker` or Route Handlers + cron
 - [ ] Writes still via ported services (Prisma transactions)
+- [ ] Cutover admin.daibilet.ru → Next; retire Vite static
 
 ### F5 — Retire legacy (2+ нед)
 

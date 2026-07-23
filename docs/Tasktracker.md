@@ -23,8 +23,8 @@
 
 ## Решение владельца (2026-07-23)
 
-- Следующий крупный поток - **F4 admin → Next**.
-- Текущий launch-фокус - качество landing matching и актуальность событий во всех посадках.
+- Крупный поток **F4 admin → Next** - **in progress** (kickoff 2026-07-23).
+- Текущий launch-фокус параллельно - качество landing matching и актуальность событий во всех посадках.
 - Finance contour / ЛК поставщиков отложен: продукт ещё не готов. Изменения Codex finance не трогаем.
 
 | # | Задача | Приоритет | Статус | Ownership |
@@ -42,6 +42,8 @@
 | SEO.8c | Аудит всех landing rules: исключить мусорные попадания, сверить сэмплы и runtime `dto.js` | Критический | 🔄 2026-07-23 | rules audit в работе; `rooftops`, `new-year`, `bus-tours` требуют deploy/smoke |
 | SEO.9 | Реальные отзывы / телефон 8-800 на контактах | Средний | ⏳ номер pending, email + ИНН/ОГРНИП уже опубликованы | **владелец** |
 | SEO.11 | Порог индекса SEO-листингов | Критический | ✅ оставлен `MIN_LISTING_OFFERS_FOR_INDEX = 6` | агент |
+| SEO.12 | Внутренняя перелинковка: футер «Популярные направления», event breadcrumbs → CHPU, «Смотрите также» на листингах | Высокий | ✅ 2026-07-23 | агент |
+| SEO.13 | SSR JSON-LD: BreadcrumbList (listing+event) + ItemList только на CHPU landings (non-empty) | Высокий | ✅ 2026-07-23 | агент |
 | SEO.10 | Editorial polish SEO-текстов (убрать шаблонный хвост) | Средний | ⏳ | владелец + агент |
 | P.1 | AI / статьи блога | Средний | ⚠️ deferred vs SEO.1–SEO.7 | — |
 
@@ -432,12 +434,23 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 ---
 
-## F4–F5 — Backlog (после этапов 0–2)
+## F4 — Admin → Next (in progress)
+
+**Канон до cutover:** Vite `apps/admin` на admin.daibilet.ru. Next `/admin` - миграционный контур, не ломает public.
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| F4.1 | Admin route group в Next | Высокий | ⏳ |
-| F4.2 | Sync jobs → apps/worker | Средний | ⏳ |
+| F4.0 | Kickoff: `(admin)` route group `/admin`, shell, stub dashboard, Basic Auth middleware | Критический | ✅ 2026-07-23 |
+| F4.1 | Port Dashboard (live `/api/admin/dashboard` + sources) | Высокий | ⏳ next |
+| F4.1a | Port Events / Landings / Articles (операторский CRUD) | Высокий | ⏳ |
+| F4.1b | Port Sources / sync-health / Settings | Средний | ⏳ |
+| F4.1c | Cutover admin.daibilet.ru → Next; retire Vite admin static | Высокий | ⏳ |
+| F4.2 | Sync jobs → apps/worker | Средний | ⏳ (после UI port) |
+
+## F5 — Retire legacy
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
 | F5.1 | dto.js read → pure Prisma | Высокий | ⏳ |
 | F5.2 | Retire server.js / TS flags | Средний | ⏳ |
 
@@ -467,6 +480,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-23 | F4 kickoff: Next `/admin` shell + Basic Auth middleware; Vite admin остаётся каноном |
 | 2026-07-23 | SEO.8b: найдено расхождение `landing-rules.ts` и legacy runtime `dto.js`; синхронизировано правило `country-tours`, prod smoke: 3 экскурсии, без оперы и концертов |
 | 2026-07-23 | SEO.8b: `country-tours` перестал матчить любое событие СПб с топонимом пригорода; теперь нужны одновременно экскурсионный и направленческий сигналы |
 | 2026-07-19 | 1.3.1a: city hub FAQ — только cityInfo/editorial; prod proof SPB @`9bc8fa7` |
