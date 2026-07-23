@@ -47,13 +47,13 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
       <Link
         href={articleHref}
         aria-label={post.title}
-        className="relative aspect-[4/3] w-[6.5rem] shrink-0 overflow-hidden bg-slate-200 sm:w-40 md:w-48"
+        className="relative aspect-video w-[9rem] shrink-0 self-start overflow-hidden bg-slate-200 sm:w-52 md:w-64 lg:w-72"
       >
         <SafeImage
           src={post.coverImageUrl}
           alt=""
           fill
-          sizes="(max-width: 640px) 6.5rem, (max-width: 768px) 10rem, 12rem"
+          sizes="(max-width: 640px) 9rem, (max-width: 768px) 13rem, (max-width: 1024px) 16rem, 18rem"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
           fallback={
             <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-300 to-slate-400 text-2xl">
