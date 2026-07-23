@@ -44,6 +44,15 @@ export function pluralVenues(count: number): string {
   return `${formatNumber(count)} площадок`;
 }
 
+export function pluralGuides(count: number): string {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod100 >= 11 && mod100 <= 19) return `${formatNumber(count)} гайдов`;
+  if (mod10 === 1) return `${formatNumber(count)} гайд`;
+  if (mod10 >= 2 && mod10 <= 4) return `${formatNumber(count)} гайда`;
+  return `${formatNumber(count)} гайдов`;
+}
+
 export function roundStatToTen(value?: number | null): number {
   const count = Math.max(0, Math.round(value || 0));
   if (count === 0) return 0;

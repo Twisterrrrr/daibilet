@@ -267,11 +267,11 @@ export function mergeBlogCards(
  * Hero / feed split for `/blog`:
  * - featured = isFeatured, else latest (first in list)
  * - feed = everything except featured (no duplicate in magazine first slot)
- * - hot = next 3-4 for informational sidebar
+ * - hot = next 3 for «Свежее» sidebar
  */
 export function splitBlogListingHero(
   posts: BlogCardDto[],
-  hotLimit = 4,
+  hotLimit = 3,
 ): {
   featured: BlogCardDto | null;
   feed: BlogCardDto[];
@@ -284,10 +284,11 @@ export function splitBlogListingHero(
   if (!featured) return { featured: null, feed: [], hot: [] };
 
   const feed = posts.filter((post) => post.slug !== featured.slug);
+  const limit = Math.max(1, Math.min(hotLimit, 3));
   return {
     featured,
     feed,
-    hot: feed.slice(0, Math.max(3, Math.min(hotLimit, 4))),
+    hot: feed.slice(0, limit),
   };
 }
 

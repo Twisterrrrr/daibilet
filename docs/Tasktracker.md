@@ -18,7 +18,7 @@
 | H.5 | `/venues` dark imageOverlay + search | Средний | ✅ MVP |
 | H.6 | `/locations` withMap (map points on list) | Средний | 🔄 stub: RussiaMap + filters; pin map follow-up |
 | H.7 | Video loop asset для home | Низкий | ⏳ нет ассета - rotator images |
-| H.8 | Blog Featured Hero | Высокий | 🔄 parallel agent - не трогаем |
+| H.8 | Blog Featured Hero + interactive list H1 + «Свежее»×3 + min price | Высокий | 🔄 commit/deploy |
 
 ---
 

@@ -25,6 +25,25 @@ export const BLOG_CITY_FILTER_LABELS: Record<string, string> = {
   multi: 'Несколько городов',
 };
 
+/** Цветные плашки городов в колонке «Свежее» (без purple glow). */
+export const BLOG_CITY_BADGE_CLASS: Record<string, string> = {
+  moscow: 'bg-rose-50 text-rose-800 ring-rose-200/80',
+  'saint-petersburg': 'bg-sky-50 text-sky-900 ring-sky-200/80',
+  kazan: 'bg-emerald-50 text-emerald-900 ring-emerald-200/80',
+  ekaterinburg: 'bg-amber-50 text-amber-950 ring-amber-200/80',
+  regions: 'bg-slate-100 text-slate-700 ring-slate-200/80',
+  multi: 'bg-slate-100 text-slate-700 ring-slate-200/80',
+};
+
+export function blogCityBadgeClassName(citySlug?: string | null): string {
+  const slug = String(citySlug || '')
+    .trim()
+    .toLowerCase();
+  return (
+    BLOG_CITY_BADGE_CLASS[slug] || 'bg-primary-50 text-primary-800 ring-primary-200/70'
+  );
+}
+
 export type BlogArticleType = keyof typeof BLOG_ARTICLE_TYPE_LABELS;
 
 /** Канонические метаданные по slug (статика + backfill эвристики). */

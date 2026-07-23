@@ -17,19 +17,30 @@ export type BlogListFilters = {
 export function BlogListView({
   posts,
   filters,
+  hotMinPrices = {},
 }: {
   posts: BlogCardDto[];
   filters?: BlogListFilters;
+  hotMinPrices?: Record<string, number>;
 }) {
   const { featured, feed, hot } = splitBlogListingHero(posts);
 
   return (
     <SiteLayout>
-      <BlogListHero breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Блог' }]} />
+      <BlogListHero
+        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Блог' }]}
+        guidesCount={posts.length}
+      />
 
       {/* div, not nested <main>: SiteLayout already wraps children in <main> */}
       <div className="container-page py-10 sm:py-14">
-        {featured ? <BlogFeaturedHero featured={featured} hotPosts={hot} /> : null}
+        {featured ? (
+          <BlogFeaturedHero
+            featured={featured}
+            hotPosts={hot}
+            hotMinPrices={hotMinPrices}
+          />
+        ) : null}
 
         <BlogListFiltered posts={feed} initialFilters={filters} />
 

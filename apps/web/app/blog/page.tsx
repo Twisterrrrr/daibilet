@@ -4,7 +4,8 @@ import { Suspense } from 'react';
 import { BlogListView } from '@/components/BlogListView';
 import '@/lib/env';
 import { buildBlogListMetadata } from '@/lib/blog-article-seo';
-import { expandListingExcerpt, mergeBlogCards } from '@/lib/blog-utils';
+import { resolveBlogHotMinPrices } from '@/lib/blog-hot-prices';
+import { expandListingExcerpt, mergeBlogCards, splitBlogListingHero } from '@/lib/blog-utils';
 import { buildPublicArticlesListDto } from '@daibilet/backend/public-read';
 
 export const metadata: Metadata = buildBlogListMetadata();
@@ -44,9 +45,17 @@ export default async function BlogPage({ searchParams }: PageProps) {
     // fallback to static posts
   }
 
+  const { hot } = splitBlogListingHero(posts);
+  let hotMinPrices: Record<string, number> = {};
+  try {
+    hotMinPrices = await resolveBlogHotMinPrices(hot);
+  } catch {
+    hotMinPrices = {};
+  }
+
   return (
-    <Suspense fallback={<BlogListView posts={posts} filters={filters} />}>
-      <BlogListView posts={posts} filters={filters} />
+    <Suspense fallback={<BlogListView posts={posts} filters={filters} hotMinPrices={hotMinPrices} />}>
+      <BlogListView posts={posts} filters={filters} hotMinPrices={hotMinPrices} />
     </Suspense>
   );
 }

@@ -1,10 +1,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Ticket } from 'lucide-react';
 
 import { resolveBlogCityEventsHref, resolveBlogCityHref } from '@/lib/blog-article-city';
-import { authorLabel, blogAuthorNameClassName, cityFilterLabel } from '@/lib/blog-meta';
+import {
+  authorLabel,
+  blogAuthorNameClassName,
+  blogCityBadgeClassName,
+  cityFilterLabel,
+} from '@/lib/blog-meta';
 import { resolveBlogListingCta } from '@/lib/blog-listing-links';
+import { cityToPrepositional } from '@/lib/city-declension';
+import { formatNumber } from '@/lib/format';
 import {
   expandListingExcerpt,
   resolveBlogCardDateLabel,
@@ -15,10 +22,13 @@ import {
 const FEATURED_IMAGE_SIZES = '(max-width: 768px) 100vw, 60vw';
 const SIDEBAR_PROMO_IMAGE = '/images/blog/blog-hero-promo.jpg';
 const SIDEBAR_PROMO_SIZES = '(max-width: 1024px) 100vw, 28vw';
+const HOT_THUMB_SIZES = '80px';
 
 type BlogFeaturedHeroProps = {
   featured: BlogCardDto;
   hotPosts: BlogCardDto[];
+  /** slug → min price (city hub or related CHPU). */
+  hotMinPrices?: Record<string, number>;
 };
 
 function resolveSidebarPromo(featured: BlogCardDto): { href: string; label: string; kicker: string } {
@@ -49,7 +59,30 @@ function resolveSidebarPromo(featured: BlogCardDto): { href: string; label: stri
   };
 }
 
-export function BlogFeaturedHero({ featured, hotPosts }: BlogFeaturedHeroProps) {
+function resolveTicketsLine(post: BlogCardDto, minPrice?: number) {
+  if (typeof minPrice !== 'number' || !Number.isFinite(minPrice) || minPrice < 100) {
+    return null;
+  }
+  const cityLabel = cityFilterLabel(post.citySlug, post.city);
+  if (!cityLabel || cityLabel === 'Регионы' || cityLabel === 'Несколько городов' || cityLabel === 'Без города') {
+    return null;
+  }
+  const href =
+    resolveBlogCityEventsHref(post.city, post.citySlug) ||
+    resolveBlogCityHref(post.city, post.citySlug);
+  if (!href) return null;
+
+  return {
+    href,
+    label: `Билеты в ${cityToPrepositional(cityLabel)} от ${formatNumber(minPrice)} ₽`,
+  };
+}
+
+export function BlogFeaturedHero({
+  featured,
+  hotPosts,
+  hotMinPrices = {},
+}: BlogFeaturedHeroProps) {
   const articleHref = `/blog/${featured.slug}`;
   const lead = expandListingExcerpt(featured.slug, featured.excerpt, 280);
   const dateLabel = resolveBlogCardDateLabel(featured);
@@ -67,7 +100,7 @@ export function BlogFeaturedHero({ featured, hotPosts }: BlogFeaturedHeroProps) 
       aria-label="Главная статья блога"
       className="mb-8 grid items-stretch gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(16rem,0.9fr)] lg:gap-8"
     >
-      <article className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <Link
           href={articleHref}
           aria-label={featured.title}
@@ -82,7 +115,7 @@ export function BlogFeaturedHero({ featured, hotPosts }: BlogFeaturedHeroProps) 
             className="object-cover"
           />
         </Link>
-        <div className="flex flex-col gap-3 p-5 sm:p-6">
+        <div className="flex flex-1 flex-col gap-3 p-5 sm:p-6">
           {featured.tag ? (
             <span className="text-xs font-semibold uppercase tracking-wide text-primary-600">
               {featured.tag}
@@ -102,7 +135,7 @@ export function BlogFeaturedHero({ featured, hotPosts }: BlogFeaturedHeroProps) 
             ) : null}
             {dateLabel ? <time dateTime={featured.publishedAt || undefined}>{dateLabel}</time> : null}
           </div>
-          <div className="mt-1 flex flex-wrap gap-2">
+          <div className="mt-auto flex flex-wrap gap-2 pt-1">
             <Link
               href={articleHref}
               className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
@@ -123,34 +156,60 @@ export function BlogFeaturedHero({ featured, hotPosts }: BlogFeaturedHeroProps) 
 
       {hotPosts.length ? (
         <aside aria-label="Свежие материалы" className="flex h-full flex-col gap-4">
-          <div>
+          <div className="flex min-h-0 flex-1 flex-col">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
               Свежее
             </p>
-            <ul className="divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
+            <ul className="flex flex-1 flex-col divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white">
               {hotPosts.map((post) => {
                 const href = `/blog/${post.slug}`;
-                const postDate = resolveBlogCardDateLabel(post);
+                const cityLabel = cityFilterLabel(post.citySlug, post.city);
+                const showCity =
+                  Boolean(post.citySlug || post.city) && cityLabel !== 'Без города';
+                const tickets = resolveTicketsLine(post, hotMinPrices[post.slug]);
+
                 return (
-                  <li key={post.slug}>
-                    <Link
-                      href={href}
-                      className="block px-4 py-3.5 transition hover:bg-slate-50 sm:px-5"
-                    >
-                      <span className="block text-sm font-semibold leading-snug text-slate-900">
-                        {post.title}
-                      </span>
-                      <span className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-slate-500">
-                        {post.authorName || post.authorId ? (
-                          <span className={blogAuthorNameClassName(post.articleType)}>
-                            {post.authorName || authorLabel(post.authorId)}
+                  <li key={post.slug} className="flex-1">
+                    <div className="flex h-full gap-3 px-3 py-3 transition hover:bg-slate-50 sm:px-4">
+                      <Link
+                        href={href}
+                        className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-slate-200"
+                        aria-hidden
+                        tabIndex={-1}
+                      >
+                        <Image
+                          src={post.coverImageUrl}
+                          alt=""
+                          fill
+                          sizes={HOT_THUMB_SIZES}
+                          className="object-cover"
+                        />
+                      </Link>
+                      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1">
+                        {showCity ? (
+                          <span
+                            className={`inline-flex w-fit max-w-full truncate rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 ${blogCityBadgeClassName(post.citySlug)}`}
+                          >
+                            {cityLabel === 'Санкт-Петербург' ? 'Питер' : cityLabel}
                           </span>
                         ) : null}
-                        {postDate ? (
-                          <time dateTime={post.publishedAt || undefined}>{postDate}</time>
+                        <Link
+                          href={href}
+                          className="line-clamp-2 text-sm font-semibold leading-snug text-slate-900 hover:text-primary-700"
+                        >
+                          {post.title}
+                        </Link>
+                        {tickets ? (
+                          <Link
+                            href={tickets.href}
+                            className="inline-flex items-center gap-1 text-[11px] font-medium text-primary-700 hover:text-primary-800"
+                          >
+                            <Ticket className="h-3 w-3 shrink-0" aria-hidden />
+                            <span className="line-clamp-1">{tickets.label}</span>
+                          </Link>
                         ) : null}
-                      </span>
-                    </Link>
+                      </div>
+                    </div>
                   </li>
                 );
               })}
@@ -159,7 +218,7 @@ export function BlogFeaturedHero({ featured, hotPosts }: BlogFeaturedHeroProps) 
 
           <Link
             href={sidebarPromo.href}
-            className="group relative mt-auto flex min-h-[10.5rem] flex-1 overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm transition hover:shadow-md"
+            className="group relative mt-auto flex min-h-[9.5rem] flex-[0.85] overflow-hidden rounded-2xl bg-slate-900 text-white"
           >
             <Image
               src={SIDEBAR_PROMO_IMAGE}

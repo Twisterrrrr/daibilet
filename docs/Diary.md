@@ -1,3 +1,22 @@
+## 2026-07-24 - Blog: interactive H1 + «Свежее»×3
+
+### Наблюдения
+
+- Владелец: `/blog` SectionPageHero слишком плоский; «Свежее» без превью и без коммерческого якоря на афишу.
+- Город из шапки (`SelectedCityProvider`) не влиял на H1 блога.
+
+### Решения
+
+- `BlogListHero`: search-focused блок (rounded-3xl, soft primary tint), H1 geo-aware через `cityToPrepositional`, `?q=` + быстрые `?topic=` чипы без full reload, счётчик гайдов.
+- `BlogFeaturedHero` «Свежее»: 3 позиции, thumb 80×80 `rounded-lg`, цветные city pills, строка «Билеты в {City_Пр} от N ₽» (Ticket) из `buildPublicCityDto.stats.priceFrom` / fallback CHPU landings catalog.
+- Feed: поиск/темы убраны из `BlogListFiltered` (остались city/author + view).
+
+### Проблемы
+
+- Нет (commit + deploy ниже).
+
+---
+
 ## 2026-07-24 - Venues/Locations: дубль крошек, склонение, map stub
 
 ### Наблюдения

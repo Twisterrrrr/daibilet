@@ -53,7 +53,7 @@ test('splitBlogListingHero: featured out of feed, fallback latest', () => {
   assert.equal(fallback.featured?.slug, cards[0]?.slug);
   assert.ok(!fallback.feed.some((p) => p.slug === fallback.featured?.slug));
   assert.ok(fallback.hot.length >= 1);
-  assert.ok(fallback.hot.length <= 4);
+  assert.ok(fallback.hot.length <= 3);
 
   const flaggedSlug = cards[2]!.slug;
   const withFlag = cards.map((c, i) => ({ ...c, isFeatured: i === 2 }));
