@@ -157,14 +157,24 @@ export default async function AdminArticlesPage({ searchParams }: PageProps) {
                         <Link href={`/admin/articles/${encodeURIComponent(row.id)}`} className="text-sky-700 hover:underline">
                           Редактировать
                         </Link>
-                        <a
-                          href={`${PUBLIC_SITE_BASE.replace(/\/$/, '')}/blog/${encodeURIComponent(row.slug)}`}
-                          className="text-slate-500 hover:underline"
+                        <Link
+                          href={`/admin/articles/${encodeURIComponent(row.id)}/preview`}
+                          className="text-amber-800 hover:underline"
                           target="_blank"
                           rel="noreferrer"
                         >
-                          Public
-                        </a>
+                          Превью
+                        </Link>
+                        {row.status.toLowerCase() === 'published' ? (
+                          <a
+                            href={`${PUBLIC_SITE_BASE.replace(/\/$/, '')}/blog/${encodeURIComponent(row.slug)}`}
+                            className="text-slate-500 hover:underline"
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Public
+                          </a>
+                        ) : null}
                       </div>
                     </td>
                   </tr>

@@ -1,3 +1,23 @@
+## 2026-07-23 - Admin preview статей (draft / scheduled)
+
+### Наблюдения
+
+- Public `/blog/[slug]` отдаёт только `PUBLISHED`; черновики и отложенные (`publishedAt` в будущем) не видны до go-live.
+- При графике max 3/day владельцу нужен визуальный QA (NOTE callouts, cover, typography) до публикации.
+
+### Решения
+
+- Изолированный route `(article-preview)/admin/articles/[id]/preview` - без `AdminNextShell`, тот же `BlogArticleView` + markdown pipeline.
+- Auth: middleware Basic Auth на `/admin/*`; metadata `robots: noindex`.
+- Баннер: «Черновик» / «Запланировано на …» (future `publishedAt`) / статусы review/published/archive.
+- Кнопки «Превью» в list + edit. Поле канона остаётся `publishedAt` (merge со schedule-агентом: DRAFT + future `publishedAt`).
+
+### Проблемы
+
+- Нет (finance не трогали).
+
+---
+
 ## 2026-07-23 - SEO guides МСК/СПб → блог
 
 ### Наблюдения

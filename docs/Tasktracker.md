@@ -457,6 +457,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | F4.3 | Port Events override/moderation + Landings SEO/matches to Next | Высокий | ✅ 2026-07-23 |
 | F4.4 | Orders/Venues/Cities in Next + soft-retire `/legacy` (Vite kept for gaps) | Средний | ✅ 2026-07-23 |
 | F4.5 | Remaining rare ops (taxonomy, candidates, ticket-link, ECR/Reviews) | Низкий | ✅ 2026-07-23 |
+| F4.6 | Admin article preview (`/admin/articles/[id]/preview`, noindex) | Высокий | ✅ 2026-07-23 |
 
 ## F5 — Retire legacy
 
@@ -492,6 +493,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | Дата | Изменение |
 |------|-----------|
 | 2026-07-23 | F4.5: Next taxonomy + ticket-link + landing candidates + Reviews + ECR; Vite remain for schedule/blocks/buyers; retire not yet |
+| 2026-07-23 | F4.6: admin preview статей `/admin/articles/[id]/preview` (noindex, Basic Auth, status+publishedAt banner) |
 | 2026-07-23 | F4.4: Next Orders/Venues/Cities + soft-retire `/legacy` (Vite remain for taxonomy/candidates/ticket-link); retire not yet |
 | 2026-07-23 | F4.3: Next Events override/moderation/SEO + Landings SEO/matches; Vite остаётся для taxonomy/candidates/Orders |
 | 2026-07-23 | F4.2: `@daibilet/worker` CLI + cron wrappers → same scripts/*; Admin Sources API unchanged |

@@ -69,6 +69,7 @@ packages/config   — shared tsconfig/eslint
 | `GET /api/admin/landings/:slug` | Пагинация событий: `page/limit/q` + `events[]` текущей страницы |
 | `GET/PATCH /api/admin/cities/:id` | Карточка `City`: title, slug (unique), SEO/intro/hero, `isDestination` |
 | `POST/PATCH /api/admin/articles` | Upsert статьи; `publishedAt` задаётся оператором или `now` при publish |
+| `/admin/articles/[id]/preview` | Admin-only SSR превью (тот же markdown pipeline что `/blog/[slug]`); `noindex`; Basic Auth; баннер статуса / `publishedAt` |
 
 **Perf debt:** landings match / public catalog list всё ещё full (or cached) grouped set → filter → slice. Events list — ✅ SQL (0.5.8).
 
