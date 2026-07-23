@@ -79,14 +79,58 @@ export function LandingsCatalogView({
   return (
     <>
       <HeroLayout
-        variant="split"
-        splitClassName="lg:grid-cols-[minmax(0,7fr)_minmax(0,3fr)]"
+        variant="minimal"
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Подборки' }]}
         title="Подборки событий"
         description="Готовые списки под настроение и повод: вечер, выходные, бюджет или редкие премьеры."
-        aside={
-          trending.length ? (
-            <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm lg:min-h-full">
+      >
+        {/* Editorial 70/30: featured + trending equal-height siblings (not title|aside). */}
+        <div
+          className={
+            trending.length
+              ? 'mt-6 grid items-stretch gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,3fr)] lg:gap-6'
+              : 'mt-6'
+          }
+        >
+          {featured ? (
+            <Link
+              href={featuredHref}
+              className="group relative flex min-h-[14rem] h-full overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm ring-1 ring-slate-900/10 sm:min-h-[16rem]"
+            >
+              {featuredImage ? (
+                <SafeImage
+                  src={featuredImage}
+                  alt=""
+                  fill
+                  priority
+                  sizes={IMAGE_SIZES.landingBanner}
+                  className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-950" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/35 to-transparent" />
+              <div className="relative z-10 mt-auto flex w-full flex-col gap-2 p-5">
+                <span className="text-xs font-semibold uppercase tracking-wider text-sky-200">Избранная подборка</span>
+                <span className="font-display text-2xl font-extrabold leading-tight sm:text-3xl">{featured.title}</span>
+                <span className="text-sm text-white/80">
+                  {pluralEvents(featured.events)}
+                  {featured.subtitle ? ` · ${featured.subtitle}` : ''}
+                </span>
+                <span className="inline-flex items-center gap-1 text-sm font-semibold text-white">
+                  Смотреть
+                  <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                </span>
+              </div>
+            </Link>
+          ) : (
+            <div className="flex min-h-[12rem] h-full items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white text-sm text-slate-400">
+              Подборки скоро появятся
+            </div>
+          )}
+
+          {trending.length ? (
+            <div className="flex h-full min-h-[14rem] flex-col rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:min-h-[16rem]">
               <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">В тренде</p>
               <ul className="space-y-2">
                 {trending.map((item, index) => (
@@ -107,45 +151,8 @@ export function LandingsCatalogView({
                 ))}
               </ul>
             </div>
-          ) : null
-        }
-      >
-        {featured ? (
-          <Link
-            href={featuredHref}
-            className="group relative mt-6 flex min-h-[14rem] overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm ring-1 ring-slate-900/10 sm:min-h-[16rem]"
-          >
-            {featuredImage ? (
-              <SafeImage
-                src={featuredImage}
-                alt=""
-                fill
-                priority
-                sizes={IMAGE_SIZES.landingBanner}
-                className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
-              />
-            ) : (
-              <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-950" />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/35 to-transparent" />
-            <div className="relative z-10 mt-auto flex w-full flex-col gap-2 p-5">
-              <span className="text-xs font-semibold uppercase tracking-wider text-sky-200">Избранная подборка</span>
-              <span className="font-display text-2xl font-extrabold leading-tight sm:text-3xl">{featured.title}</span>
-              <span className="text-sm text-white/80">
-                {pluralEvents(featured.events)}
-                {featured.subtitle ? ` · ${featured.subtitle}` : ''}
-              </span>
-              <span className="inline-flex items-center gap-1 text-sm font-semibold text-white">
-                Смотреть
-                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
-              </span>
-            </div>
-          </Link>
-        ) : (
-          <div className="mt-6 flex min-h-[12rem] items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white text-sm text-slate-400">
-            Подборки скоро появятся
-          </div>
-        )}
+          ) : null}
+        </div>
       </HeroLayout>
 
       <div className="container-page bg-slate-50 py-10 sm:py-12">

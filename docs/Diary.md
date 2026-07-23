@@ -17,6 +17,22 @@
 
 ---
 
+## 2026-07-24 - /podborki: «В тренде» equal-height с featured
+
+### Наблюдения
+
+- Hero split ставил title|aside с `lg:items-center`: блок «В тренде» сидел короткой карточкой, низ не совпадал с featured-баннером.
+
+### Решения
+
+- `LandingsCatalogView`: `HeroLayout` `minimal` + сетка 70/30 `items-stretch` для featured и trending (siblings, список сверху внутри полной высоты панели). Тренды не удаляли.
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next).
+
+---
+
 ## 2026-07-24 - Venues/Locations: дубль крошек, склонение, map stub
 
 ### Наблюдения
