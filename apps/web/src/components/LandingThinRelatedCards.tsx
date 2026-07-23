@@ -84,13 +84,37 @@ export function LandingThinRelatedCards({
         }
       }
 
-      if (!disposed) setCards(next.length >= 3 ? next.slice(0, 4) : []);
+      if (!disposed) {
+        if (next.length >= 3) {
+          setCards(next.slice(0, 4));
+          return;
+        }
+        // Fallback: popular catalog for the city (thin cities often lack sibling landings).
+        try {
+          const response = await fetch(
+            `/api/public/events?city=${encodeURIComponent(citySlug)}&limit=24&sort=popular`,
+          );
+          if (response.ok) {
+            const data = (await response.json()) as { items?: PublicSessionDto[] };
+            for (const item of data.items || []) {
+              if (next.length >= 4) break;
+              const key = item.groupKey || item.id || item.slug;
+              if (!key || seen.has(key)) continue;
+              seen.add(key);
+              next.push(item);
+            }
+          }
+        } catch {
+          // optional
+        }
+        setCards(next.length >= 3 ? next.slice(0, 4) : []);
+      }
     })();
 
     return () => {
       disposed = true;
     };
-  }, [enabled, landingSlug, citySlug, cityName, seedKey, initialSessions]);
+  }, [enabled, landingSlug, citySlug, cityName, seedKey]);
 
   if (!enabled || cards.length < 3) return null;
 

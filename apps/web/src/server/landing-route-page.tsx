@@ -107,6 +107,7 @@ export async function LandingRoutePage({
         landingSlug: slug,
         citySlug: route.citySlug,
         offerCount,
+        excludeSessions: finalized.sessions,
       })
     : [];
   const jsonLdBlocks = buildLandingPageJsonLd({

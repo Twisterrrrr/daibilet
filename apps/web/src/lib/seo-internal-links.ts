@@ -398,20 +398,43 @@ export function resolveRelatedLandingCardTargets(
   const out: Array<{ slug: string; label: string; href: string }> = [];
   const seen = new Set<string>();
 
-  for (const spec of specs) {
-    if (out.length >= limit) break;
-    if (spec.type !== 'landing') continue;
-    const relatedSlug = canonicalLandingSlug(spec.slug);
-    if (relatedSlug === slug || seen.has(relatedSlug)) continue;
-    if (city && !isLandingCityAllowed(relatedSlug, city)) continue;
+  const pushLanding = (relatedSlugRaw: string, label?: string) => {
+    if (out.length >= limit) return;
+    const relatedSlug = canonicalLandingSlug(relatedSlugRaw);
+    if (!relatedSlug || relatedSlug === slug || seen.has(relatedSlug)) return;
+    if (city && !isLandingCityAllowed(relatedSlug, city)) return;
     const href = landingCategoryHref(relatedSlug, city);
-    if (!href) continue;
+    if (!href) return;
     seen.add(relatedSlug);
     out.push({
       slug: relatedSlug,
-      label: spec.label || landingBreadcrumbLabel(relatedSlug),
+      label: label || landingBreadcrumbLabel(relatedSlug),
       href,
     });
+  };
+
+  for (const spec of specs) {
+    if (out.length >= limit) break;
+    if (spec.type !== 'landing') continue;
+    pushLanding(spec.slug, spec.label);
+  }
+
+  // Добор до 3–4 категорий: в `*` часто мало landing-ссылок (остальное intent).
+  const fallbackLandings = [
+    'standup',
+    'concerts-genre',
+    'excursions',
+    'walking-tours',
+    'river-cruises',
+    'exhibitions',
+    'family-kids',
+    'bus-tours',
+    'active-sport',
+    'unusual-theatres',
+  ];
+  for (const relatedSlug of fallbackLandings) {
+    if (out.length >= limit) break;
+    pushLanding(relatedSlug);
   }
 
   return out;
