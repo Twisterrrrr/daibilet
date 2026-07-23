@@ -50,7 +50,7 @@
 ### Проблемы
 
 - Count на плитках теперь active Event rows, не saleable groupKey из каталога - возможны небольшие расхождения цифр vs афиша; DTO shape без изменений.
-- Deploy: `db:deploy` в `deploy-prod-next` подхватит индекс.
+- Commit `9af3910` запушен в `feat/next-monorepo`. SSH deploy с этой среды - `Permission denied (publickey)` к `213.171.7.16`. Нужен ручной `BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh` (подхватит migrate `20260724030000_venue_title_search_index`).
 
 ---
 
