@@ -1,3 +1,20 @@
+## 2026-07-24 - City hub «Зачем ехать»: gap в large card
+
+### Наблюдения
+
+- Magazine 1+2 на city hub: large card слева тянулась `h-full` + `flex-1 justify-between` до высоты двух small справа - между related events и «Открыть материал» огромная белая пустота (СПб).
+
+### Решения
+
+- `CityHubArticleTeaser` large: без `h-full`/`flex-1`/`justify-between`; фиксированный aspect у cover; CTA с обычным `mt-4`.
+- Grid: `items-start` + `lg:self-start` на lead; related sessions large до 4.
+
+### Проблемы
+
+- Нет (deploy после commit).
+
+---
+
 ## 2026-07-24 - Blog Featured Hero: CTA-плитка под «Свежее»
 
 ### Наблюдения

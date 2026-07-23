@@ -27,25 +27,27 @@ export function CityHubArticleTeaser({
   const isLarge = variant === 'large';
   const isSmall = variant === 'small';
   const relatedSessions = React.useMemo(
-    () => matchArticleSessions(article, sessions, isSmall ? 2 : 3),
-    [article, sessions, isSmall],
+    () => matchArticleSessions(article, sessions, isSmall ? 2 : isLarge ? 4 : 3),
+    [article, sessions, isLarge, isSmall],
   );
 
   return (
     <article
       className={
         editorial
-          ? 'flex h-full flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white'
-          : 'flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm'
+          ? `flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white ${
+              isLarge ? '' : 'h-full'
+            }`
+          : `flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${
+              isLarge ? '' : 'h-full'
+            }`
       }
     >
       <Link
         href={articleHref}
         aria-label={article.title}
         className={`relative block shrink-0 overflow-hidden ${
-          isLarge
-            ? 'aspect-[16/10] min-h-[11rem] lg:aspect-auto lg:min-h-[16rem] lg:flex-1'
-            : 'aspect-[16/10]'
+          isLarge ? 'aspect-[16/10] min-h-[11rem] lg:min-h-[16rem]' : 'aspect-[16/10]'
         } ${editorial ? 'bg-zinc-100' : 'bg-slate-100'}`}
       >
         <SafeImage
@@ -67,9 +69,9 @@ export function CityHubArticleTeaser({
       </Link>
 
       <div
-        className={`flex min-w-0 flex-1 flex-col justify-between ${
+        className={`flex min-w-0 flex-col ${
           isLarge ? 'p-4 sm:p-5' : isSmall ? 'p-3 sm:p-3.5' : 'p-3.5 sm:p-4'
-        }`}
+        } ${isLarge ? '' : 'h-full flex-1'}`}
       >
         <div className="min-w-0">
           <h3
@@ -145,7 +147,7 @@ export function CityHubArticleTeaser({
           ) : null}
         </div>
 
-        <div className="mt-4">
+        <div className={isLarge ? 'mt-4' : 'mt-auto pt-4'}>
           <Link
             href={articleHref}
             className={
@@ -178,8 +180,8 @@ export function CityHubArticlesGrid({
   if (items.length === 3) {
     const [lead, sideA, sideB] = items;
     return (
-      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3 lg:grid-rows-2 lg:gap-5">
-        <div className="lg:col-span-2 lg:row-span-2">
+      <div className="mt-4 grid grid-cols-1 items-start gap-4 lg:grid-cols-3 lg:grid-rows-2 lg:gap-5">
+        <div className="lg:col-span-2 lg:row-span-2 lg:self-start">
           <CityHubArticleTeaser
             key={lead!.slug}
             article={lead!}
