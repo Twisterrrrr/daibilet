@@ -29,7 +29,7 @@ if ! flock -n 9; then
   exit 0
 fi
 
-echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) start tc:orders from=${FROM_DATE} to=${TO_DATE}"
-# Только заказы TC. Каталог (tc:sync / tep:sync) сюда не входит.
-npm run tc:orders -- --from="$FROM_DATE" --to="$TO_DATE"
-echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) done tc:orders"
+echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) start worker tc-orders from=${FROM_DATE} to=${TO_DATE}"
+# F4.2: только заказы TC через apps/worker. Каталог сюда не входит.
+node apps/worker/bin/run.mjs tc-orders -- --from="$FROM_DATE" --to="$TO_DATE"
+echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) done worker tc-orders"

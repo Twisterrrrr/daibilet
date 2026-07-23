@@ -118,9 +118,9 @@ Handoff для Codex: [codex-phase2-next-handoff.md](../codex-phase2-next-handof
 - [x] Port Events / Landings lists + Articles CRUD (F4.1a); Vite for event override / landing matches
 - [x] Port Sources + sync triggers + read-only Settings (F4.1b)
 - [x] Cutover admin.daibilet.ru → Next; Vite deep CRUD at `/legacy` (F4.1c)
-- [ ] Sync jobs → `apps/worker` or Route Handlers + cron
+- [x] Sync jobs → `apps/worker` CLI + cron (F4.2; same `scripts/*`)
+- [ ] Port remaining Vite deep CRUD / retire `/legacy` (F4.3)
 - [ ] Writes still via ported services (Prisma transactions)
-- [ ] Retire Vite `/legacy` after full Events/Landings CRUD port
 
 ### F5 — Retire legacy (2+ нед)
 

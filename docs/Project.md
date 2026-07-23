@@ -128,7 +128,7 @@ Cherry-pick из **`codex/phase2-foundation`**: schema, event change requests, a
 | F1 Monorepo shell | ✅ | `pnpm web:build`, health route |
 | F2 Public SSR | ✅ | View Source без JS, parity scripts |
 | F3 Cutover | ✅ | nginx → Next prod (`:3001`) |
-| F4 Admin + worker | 🔄 | admin host on Next; Vite `/legacy`; worker pending |
+| F4 Admin + worker | 🔄 | admin host on Next; Vite `/legacy`; worker CLI ✅ F4.2 |
 | F5 Retire dto.js | ⏳ | parity 100%, server.js removed |
 
 Детали: [phases/phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), F3: [phases/phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md).

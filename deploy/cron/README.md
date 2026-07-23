@@ -1,6 +1,9 @@
 # Cron jobs
 
-После deploy фаз A–D на staging/prod.
+Канон F4.2: out-of-process sync через `@daibilet/worker` (`node apps/worker/bin/run.mjs <job>`).
+Wrappers ниже сохраняют flock/nice; systemd `ExecStart` без смены пути.
+
+См. [phase-f4-worker.md](../phases/phase-f4-worker.md), [apps/worker/README.md](../../apps/worker/README.md).
 
 ## Prod: Ticketscloud catalog sync (nightly, out-of-process)
 

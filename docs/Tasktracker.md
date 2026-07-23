@@ -451,7 +451,8 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | F4.1a | Port Events / Landings / Articles (lists + articles CRUD) | Высокий | ✅ 2026-07-23 |
 | F4.1b | Port Sources / sync-health / Settings | Средний | ✅ 2026-07-23 |
 | F4.1c | Cutover admin.daibilet.ru → Next; Vite deep CRUD at `/legacy` | Высокий | ✅ 2026-07-23 |
-| F4.2 | Sync jobs → apps/worker | Средний | ⏳ next |
+| F4.2 | Sync jobs → apps/worker | Средний | ✅ 2026-07-23 |
+| F4.3 | Port remaining Vite deep CRUD (Events override, Landings matches) → path to retire `/legacy` | Высокий | ⏳ next |
 
 ## F5 — Retire legacy
 
@@ -486,6 +487,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-23 | F4.2: `@daibilet/worker` CLI + cron wrappers → same scripts/*; Admin Sources API unchanged |
 | 2026-07-23 | SEO.16–18: TOP-15 для ручного переобхода (owner); sitemap intents без thin; план 30 путеводителей |
 | 2026-07-23 | F4.1c: admin.daibilet.ru → Next (middleware host rewrite) + Vite `/legacy` for deep CRUD; nginx patch + deploy |
 | 2026-07-23 | F4.1b: Next `/admin/sources` (+ sync trigger, sync-health) и read-only `/admin/settings` |

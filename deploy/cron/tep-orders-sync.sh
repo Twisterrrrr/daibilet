@@ -28,7 +28,7 @@ if ! flock -n 9; then
   exit 0
 fi
 
-echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) start tep:orders from=${FROM_DATE} to=${TO_DATE}"
-# Только заказы TEP. Каталог (tep:sync / tc:sync) сюда не входит. tc-orders не трогаем.
-npm run tep:orders -- --from="$FROM_DATE" --to="$TO_DATE"
-echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) done tep:orders"
+echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) start worker tep-orders from=${FROM_DATE} to=${TO_DATE}"
+# F4.2 stub via apps/worker. Каталог / tc-orders не трогаем. Do NOT enable on prod.
+node apps/worker/bin/run.mjs tep-orders -- --from="$FROM_DATE" --to="$TO_DATE"
+echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) done worker tep-orders"

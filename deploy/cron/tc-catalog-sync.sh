@@ -29,9 +29,10 @@ if ! flock -n 9; then
   exit 0
 fi
 
-echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) start tc:sync nice=${NICE_N} full_warm=${TC_CATALOG_SYNC_FULL_WARM}"
+echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) start worker tc-catalog nice=${NICE_N} full_warm=${TC_CATALOG_SYNC_FULL_WARM}"
 
-cmd=(npm run tc:sync)
+# F4.2: canonical entrypoint apps/worker (same scripts/tc-sync.js as npm run tc:sync)
+cmd=(node apps/worker/bin/run.mjs tc-catalog)
 if command -v nice >/dev/null 2>&1 && [[ "$NICE_N" =~ ^[0-9]+$ ]] && (( NICE_N > 0 )); then
   cmd=(nice -n "$NICE_N" "${cmd[@]}")
 fi
@@ -40,4 +41,4 @@ if command -v ionice >/dev/null 2>&1; then
 fi
 
 "${cmd[@]}"
-echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) done tc:sync"
+echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) done worker tc-catalog"

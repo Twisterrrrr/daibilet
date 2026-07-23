@@ -102,7 +102,8 @@ const adminAuth = {
 };
 
 // Default 12h (was 6h) to reduce CPU/RAM peaks on 3.8Gi hosts; override via env.
-// Prefer out-of-process cron (deploy/cron/tep-catalog-sync.sh) on small hosts: set TEP_AUTO_SYNC_ENABLED=0.
+// Prefer out-of-process worker (apps/worker + deploy/cron/*-sync.sh) on small hosts: set TEP_AUTO_SYNC_ENABLED=0.
+// Admin Sources POST still spawns the same root scripts/* as worker jobs (compatible pipeline).
 const TEP_AUTO_SYNC_ENABLED = !['0', 'false', 'off', 'no'].includes(
   String(process.env.TEP_AUTO_SYNC_ENABLED ?? '1').trim().toLowerCase(),
 );

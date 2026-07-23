@@ -1,4 +1,24 @@
-## 2026-07-23 - SEO: переобход URL + sitemap intents + план путеводителей
+## 2026-07-23 - F4.2 Sync jobs → apps/worker
+
+### Наблюдения
+
+- `apps/worker` отсутствовал; sync жил в root `scripts/*` + cron/systemd + spawn из `server.js`.
+- Admin Sources уже бьёт в legacy API (`POST …/ticketscloud/sync`, `…/tep/sync`) - тот же pipeline.
+- Long-running worker daemon на 3.8Gi нежелателен (OOM risk уже снимали out-of-process oneshot).
+
+### Решения
+
+- Добавлен `@daibilet/worker`: CLI `bin/run.mjs` с jobs `tc-catalog` / `tep-catalog` / `tc-orders` / `tep-orders` / `health`.
+- Jobs только spawn тех же root scripts (без переписывания TC/TEP).
+- `deploy/cron/*-sync.sh` переведены на worker CLI; systemd timers без смены ExecStart.
+- Admin triggers не трогали: совместимость Sources сохранена.
+- Docs: `docs/phases/phase-f4-worker.md`; Tasktracker F4.2 ✅; next = F4.3 deep CRUD port.
+
+### Проблемы
+
+- Prod подхватит worker после git pull (полный `deploy-prod-next` не обязателен для CLI-only).
+- `tep-orders` по-прежнему stub / cron off.
+
 
 ### Наблюдения
 

@@ -25,10 +25,11 @@ if ! flock -n 9; then
   exit 0
 fi
 
-echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) start tep:sync nice=${NICE_N}"
+echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) start worker tep-catalog nice=${NICE_N}"
+# F4.2: canonical entrypoint apps/worker (tep-import-fixtures + revalidate)
 if command -v nice >/dev/null 2>&1 && [[ "$NICE_N" =~ ^[0-9]+$ ]] && (( NICE_N > 0 )); then
-  nice -n "$NICE_N" npm run tep:sync
+  nice -n "$NICE_N" node apps/worker/bin/run.mjs tep-catalog
 else
-  npm run tep:sync
+  node apps/worker/bin/run.mjs tep-catalog
 fi
-echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) done tep:sync"
+echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) done worker tep-catalog"
