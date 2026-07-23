@@ -3559,3 +3559,18 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 
 ### Проблемы
 - Старые MD с «мягкой» разбивкой длинных строк на 80 символов тоже покажут переносы - при необходимости править вручную.
+
+## 2026-07-23 - Infinite reload: ChunkLoadRecovery + nested main
+
+### Наблюдения
+- Владелец: страница «постоянно рефрешится». Воспроизведено на `https://daibilet.ru/blog`: ~18 full document loads / 12 с.
+- Console: React minified #418 (hydration text mismatch) из chunk `/_next/static/chunks/567e3fde-…js`.
+- После каждого reload nginx отдавал 429 на статику (шторм запросов).
+- `ChunkLoadRecovery` (harden `a712127`) матчил **любой** ErrorEvent, у которого `event.filename` содержит `/_next/static/chunks/`, и на mount сразу снимал one-shot флаг → бесконечный `location.reload()`.
+
+### Решения
+- `ChunkLoadRecovery`: убрать match по filename; reload только на реальных ChunkLoad/dynamic-import сообщениях или на failed `<script src="…/_next/static/chunks/…">`; флаг чистить через 15 с стабильности, не сразу на mount.
+- Убрать вложенный `<main>` внутри `SiteLayout` (blog list/article, podborki, city/venue hubs, trust shell) — невалидный HTML и источник hydration #418.
+
+### Проблемы
+- Hydration #418 на blog может ещё мелькать в console до полного выравнивания SSR/client; без ChunkLoad-лупа страница больше не крутится.

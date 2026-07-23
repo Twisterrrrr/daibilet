@@ -80,7 +80,7 @@ export function VenuePageView({ slug, initialPayload }: { slug: string; initialP
 
   return (
     <div className={`min-h-screen text-slate-900 ${useLovableLayout ? 'bg-slate-50' : 'bg-white'}`}>
-      <main>
+      <div>
         {!payload && !error ? (
           <div className="container-page py-16 text-sm text-slate-500">Загружаем страницу...</div>
         ) : null}
@@ -187,7 +187,7 @@ export function VenuePageView({ slug, initialPayload }: { slug: string; initialP
             )}
           </>
         ) : null}
-      </main>
+      </div>
     </div>
   );
 }

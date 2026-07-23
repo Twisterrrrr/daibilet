@@ -21,7 +21,8 @@ export function BlogListView({
     <SiteLayout>
       <BlogListHero breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Блог' }]} />
 
-      <main className="container-page py-10 sm:py-14">
+      {/* div, not nested <main>: SiteLayout already wraps children in <main> */}
+      <div className="container-page py-10 sm:py-14">
         <BlogListFiltered posts={posts} initialFilters={filters} />
 
         <p className="mt-12 text-sm text-slate-500">
@@ -31,7 +32,7 @@ export function BlogListView({
           </Link>
           .
         </p>
-      </main>
+      </div>
     </SiteLayout>
   );
 }

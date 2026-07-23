@@ -115,7 +115,8 @@ export function BlogArticleView({
           authorName={article.authorName}
         />
 
-        <main className="container-page relative z-10 py-10 sm:py-14">
+        {/* div, not nested <main>: SiteLayout already wraps children in <main> */}
+        <div className="container-page relative z-10 py-10 sm:py-14">
           <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16.5rem] lg:items-start lg:gap-12 xl:grid-cols-[minmax(0,1fr)_18rem] xl:gap-14">
             <article className="min-w-0 bg-white px-5 py-8 shadow-[0_1px_0_rgba(15,23,42,0.04)] sm:px-9 sm:py-11 md:px-12 md:py-12">
               <BlogArticleContent
@@ -199,7 +200,7 @@ export function BlogArticleView({
               </Link>
             ) : null}
           </footer>
-        </main>
+        </div>
       </div>
     </SiteLayout>
   );

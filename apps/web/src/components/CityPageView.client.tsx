@@ -179,7 +179,7 @@ export function CityPageView({
 
   return (
     <div className={editorial ? 'bg-zinc-50 text-zinc-900' : 'bg-white text-slate-900'}>
-      <main>
+      <div>
         {!payload && !error ? <CityLoadingState editorial={editorial} /> : null}
 
         {error && !payload?.city ? (
@@ -413,7 +413,7 @@ export function CityPageView({
             ) : null}
           </>
         ) : null}
-      </main>
+      </div>
     </div>
   );
 }

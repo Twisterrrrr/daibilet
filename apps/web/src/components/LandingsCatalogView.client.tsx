@@ -79,7 +79,7 @@ export function LandingsCatalogView({
         description="Готовые списки под настроение и повод: вечер, выходные, бюджет или редкие премьеры."
       />
 
-      <main className="container-page bg-slate-50 py-10 sm:py-12">
+      <div className="container-page bg-slate-50 py-10 sm:py-12">
         <section>
           <h2 className="font-display text-xl font-bold text-slate-900">Быстрые подборки</h2>
           <div className="mt-3 flex flex-nowrap gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -174,7 +174,7 @@ export function LandingsCatalogView({
           </Link>
           .
         </p>
-      </main>
+      </div>
     </>
   );
 }

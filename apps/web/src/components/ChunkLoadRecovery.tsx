@@ -3,9 +3,10 @@
 import { useEffect } from 'react';
 
 const RELOAD_FLAG = 'daibilet-chunk-reload';
+const CLEAR_AFTER_MS = 15_000;
 
 function isChunkLoadFailure(message: string): boolean {
-  return /ChunkLoadError|Loading chunk [\d]+ failed|Failed to fetch dynamically imported module|error loading dynamically imported module|\/_next\/static\/chunks\//i.test(
+  return /ChunkLoadError|Loading chunk [\d]+ failed|Failed to fetch dynamically imported module|error loading dynamically imported module/i.test(
     message,
   );
 }
@@ -23,17 +24,34 @@ function reloadOnce(): void {
 /**
  * After Next redeploy, open tabs keep old chunk hashes -> 404/400 / ChunkLoadError.
  * One soft reload usually picks up the new HTML + manifests.
+ *
+ * Important: do NOT treat every error whose stack points at `/_next/static/chunks/`
+ * as a chunk-load failure (hydration mismatches etc. live in those files too) —
+ * that plus clearing the flag on mount caused infinite full-page reloads.
  */
 export function ChunkLoadRecovery() {
   useEffect(() => {
-    try {
-      sessionStorage.removeItem(RELOAD_FLAG);
-    } catch {
-      /* ignore */
-    }
+    // Clear the one-shot flag only after the page stayed healthy for a bit.
+    const clearTimer = window.setTimeout(() => {
+      try {
+        sessionStorage.removeItem(RELOAD_FLAG);
+      } catch {
+        /* ignore */
+      }
+    }, CLEAR_AFTER_MS);
 
     const onError = (event: ErrorEvent) => {
-      const msg = [event.message, event.error?.message, event.filename].filter(Boolean).join(' ');
+      // Failed <script src="/_next/static/chunks/..."> load after deploy.
+      const target = event.target;
+      if (target instanceof HTMLScriptElement) {
+        const src = target.src || '';
+        if (/\/_next\/static\/chunks\//.test(src)) {
+          reloadOnce();
+          return;
+        }
+      }
+
+      const msg = [event.message, event.error?.message].filter(Boolean).join(' ');
       if (isChunkLoadFailure(msg)) reloadOnce();
     };
 
@@ -48,10 +66,11 @@ export function ChunkLoadRecovery() {
       if (isChunkLoadFailure(msg)) reloadOnce();
     };
 
-    window.addEventListener('error', onError);
+    window.addEventListener('error', onError, true);
     window.addEventListener('unhandledrejection', onRejection);
     return () => {
-      window.removeEventListener('error', onError);
+      window.clearTimeout(clearTimer);
+      window.removeEventListener('error', onError, true);
       window.removeEventListener('unhandledrejection', onRejection);
     };
   }, []);
