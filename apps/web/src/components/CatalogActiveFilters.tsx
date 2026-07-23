@@ -48,19 +48,20 @@ export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }
 
   return (
     <div
-      className="mb-4 flex flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm"
+      className="-mx-4 mb-3 flex items-center gap-2 overflow-x-auto px-4 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mb-4 sm:flex-wrap sm:overflow-visible sm:rounded-2xl sm:border sm:border-slate-200 sm:bg-white sm:p-3 sm:shadow-sm sm:px-3"
       role="region"
       aria-label="Активные фильтры"
     >
-      <span className="inline-flex items-center gap-1.5 pl-1 pr-1 text-xs font-bold uppercase tracking-wider text-slate-500">
+      <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 sm:pl-1 sm:pr-1">
         <SlidersHorizontal aria-hidden className="h-3.5 w-3.5" />
-        Активно · {chips.length}
+        <span className="sm:hidden">{chips.length}</span>
+        <span className="hidden sm:inline">Активно · {chips.length}</span>
       </span>
       {chips.map((chip) => (
         <Link
           key={`${chip.key}:${chip.label}`}
           href={buildCatalogHref(clearCatalogFilterKey(values, chip.key))}
-          className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary-700 ring-1 ring-primary/20 transition hover:bg-primary/20"
+          className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary-700 ring-1 ring-primary/20 transition hover:bg-primary/20"
         >
           {chip.label}
           <X className="h-3 w-3" aria-hidden />
@@ -69,10 +70,10 @@ export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }
       <Link
         href="/events"
         onClick={() => persistSelectedCity('all')}
-        className="ml-auto inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700"
+        className="inline-flex shrink-0 items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 sm:ml-auto"
       >
         <X className="h-3.5 w-3.5" aria-hidden />
-        Сбросить фильтры
+        Сбросить
       </Link>
     </div>
   );

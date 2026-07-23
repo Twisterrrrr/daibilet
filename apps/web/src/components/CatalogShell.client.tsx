@@ -195,7 +195,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         </div>
 
         <div className="flex flex-wrap items-center gap-2 sm:ml-auto sm:pt-1">
-          <div className="relative">
+          <div className="relative hidden sm:block">
             <label htmlFor="catalog-page-size" className="sr-only">
               Карточек на странице
             </label>
@@ -225,13 +225,15 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
               className="pointer-events-none absolute right-2 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
             />
           </div>
-          <ViewModeToggle mode={viewMode} onChange={setViewMode} />
+          <div className="hidden sm:block">
+            <ViewModeToggle mode={viewMode} onChange={setViewMode} />
+          </div>
         </div>
       </div>
 
       <CatalogActiveFilters values={filterValues} />
 
-      <div className="catalog-toolbar -mx-4 mt-6 border-b border-slate-200 bg-white px-4 py-3 sm:-mx-6 sm:px-6">
+      <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 mt-6 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:static sm:-mx-6 sm:bg-white sm:px-6 sm:backdrop-blur-none">
         <CatalogToolbar
           facets={facets}
           values={filterValues}
@@ -240,9 +242,14 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
         />
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
-        <span className="text-xs font-medium text-slate-500">Сортировка</span>
-        <div role="radiogroup" aria-label="Сортировка" className="inline-flex rounded-xl bg-slate-100 p-1">
+      {/* Sort + view: compact near results; mobile = snap chips */}
+      <div className="mt-3 flex items-center gap-2 sm:mt-4 sm:flex-wrap">
+        <span className="hidden text-xs font-medium text-slate-500 sm:inline">Сортировка</span>
+        <div
+          role="radiogroup"
+          aria-label="Сортировка"
+          className="-mx-4 flex min-w-0 flex-1 gap-2 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-none sm:overflow-visible sm:rounded-xl sm:bg-slate-100 sm:p-1 sm:px-1"
+        >
           {CATALOG_SORT_OPTIONS.map((option) => (
             <button
               key={option.value}
@@ -259,15 +266,18 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
                   }),
                 );
               }}
-              className={`inline-btn h-8 rounded-lg px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 ${
+              className={`inline-btn h-8 shrink-0 snap-start rounded-full px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 disabled:opacity-60 sm:rounded-lg ${
                 filterValues.sort === option.value
-                  ? 'bg-white text-slate-900 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-slate-900 text-white shadow-sm sm:bg-white sm:text-slate-900'
+                  : 'bg-slate-100 text-slate-600 hover:text-slate-900 sm:bg-transparent'
               }`}
             >
               {option.label}
             </button>
           ))}
+        </div>
+        <div className="shrink-0 sm:hidden">
+          <ViewModeToggle mode={viewMode} onChange={setViewMode} />
         </div>
       </div>
 

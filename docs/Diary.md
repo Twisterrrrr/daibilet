@@ -1,3 +1,23 @@
+## 2026-07-23 - mobile UX каталога `/events`
+
+### Наблюдения
+
+- После упрощения toolbar (`bfc8cb7`) desktop стал чище, но mobile оставался «сжатым desktop»: полный search + select даты + тяжёлый active-card, sort отдельно, page-size в title.
+
+### Решения
+
+- Sticky compact bar (под site header): поиск-pill / чип даты / иконка Фильтры с badge; раскрытие поиска по тапу.
+- Горизонтальный date scroller (Любая / Сегодня / Завтра / Выходные / Вечер) вместо select на mobile.
+- Категории с большим visual weight + snap; подборки secondary; sort chips + view у выдачи; page-size только desktop.
+- Пагинация: на mobile siblingCount=0 (уже окно номеров) + prev/next.
+- URL/query, city-in-header, live search, advanced drawer без изменений контракта.
+
+### Проблемы
+
+- Browser MCP недоступен для viewport-smoke до деплоя; проверка через curl HTML + ручной телефон.
+
+---
+
 ## 2026-07-23 - упрощение фильтров каталога и numbered pagination
 
 ### Наблюдения

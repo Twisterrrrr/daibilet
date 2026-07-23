@@ -60,7 +60,8 @@ export function CatalogPaginationLinks({
 
   const prevPage = page > 1 ? page - 1 : null;
   const nextPage = page < totalPages ? page + 1 : null;
-  const items = buildPaginationItems(page, totalPages, 1);
+  const mobileItems = buildPaginationItems(page, totalPages, 0);
+  const desktopItems = buildPaginationItems(page, totalPages, 1);
 
   const pageBtn =
     'inline-flex min-h-10 min-w-10 items-center justify-center rounded-lg border px-2.5 text-sm font-semibold transition';
@@ -69,13 +70,41 @@ export function CatalogPaginationLinks({
   const navBtn =
     'inline-flex min-h-10 items-center justify-center rounded-lg border border-slate-200 px-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:pointer-events-none disabled:opacity-40';
 
+  const renderItems = (items: Array<number | 'ellipsis'>, className: string) => (
+    <ol className={className}>
+      {items.map((item, index) =>
+        item === 'ellipsis' ? (
+          <li
+            key={`ellipsis-${index}`}
+            className="inline-flex min-h-10 min-w-8 items-center justify-center text-sm text-slate-400"
+            aria-hidden
+          >
+            …
+          </li>
+        ) : (
+          <li key={item}>
+            {item === page ? (
+              <span className={pageBtnActive} aria-current="page">
+                {item}
+              </span>
+            ) : (
+              <Link href={buildHref(item)} className={pageBtnIdle} aria-label={`Страница ${item}`}>
+                {item}
+              </Link>
+            )}
+          </li>
+        ),
+      )}
+    </ol>
+  );
+
   return (
     <nav aria-label="Пагинация каталога" className="mt-10 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
       <p className="text-sm text-slate-500">
         Страница {page} из {totalPages} · {pluralEvents(total)}
       </p>
 
-      <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+      <div className="flex flex-wrap items-center justify-between gap-1.5 sm:justify-start sm:gap-2">
         {prevPage ? (
           <Link href={buildHref(prevPage)} rel="prev" className={navBtn} aria-label="Предыдущая страница">
             <span className="sm:hidden">←</span>
@@ -88,31 +117,8 @@ export function CatalogPaginationLinks({
           </span>
         )}
 
-        <ol className="flex flex-wrap items-center gap-1 sm:gap-1.5">
-          {items.map((item, index) =>
-            item === 'ellipsis' ? (
-              <li
-                key={`ellipsis-${index}`}
-                className="inline-flex min-h-10 min-w-8 items-center justify-center text-sm text-slate-400"
-                aria-hidden
-              >
-                …
-              </li>
-            ) : (
-              <li key={item}>
-                {item === page ? (
-                  <span className={pageBtnActive} aria-current="page">
-                    {item}
-                  </span>
-                ) : (
-                  <Link href={buildHref(item)} className={pageBtnIdle} aria-label={`Страница ${item}`}>
-                    {item}
-                  </Link>
-                )}
-              </li>
-            ),
-          )}
-        </ol>
+        {renderItems(mobileItems, 'flex items-center gap-1 sm:hidden')}
+        {renderItems(desktopItems, 'hidden sm:flex sm:flex-wrap sm:items-center sm:gap-1.5')}
 
         {nextPage ? (
           <Link href={buildHref(nextPage)} rel="next" className={`${navBtn} border-slate-900 bg-slate-900 text-white hover:bg-slate-800`} aria-label="Следующая страница">
