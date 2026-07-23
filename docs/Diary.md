@@ -15,3670 +15,3671 @@
 - Нет. **Prod @`ed874cb`**.
 
 ---
+
 ## 2026-07-23 - `/blog` view toggle (magazine | list)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т╨╗╨░╨┤╨╡╨╗╨╡╤Ж: magazine-╤Б╨╡╤В╨║╨░ ╨╛╨║, ╨╜╨╛ ╨╜╤Г╨╢╨╡╨╜ ╨┐╨╡╤А╨╡╨║╨╗╤О╤З╨░╤В╨╡╨╗╤М ╨╜╨░ ╨╕╨╜╤Д╨╛╤А╨╝╨░╤В╨╕╨▓╨╜╤Л╨╣ ╤Б╨┐╨╕╤Б╨╛╨║ (╨║╨░╨║ ╨▓ ╨║╨░╤В╨░╨╗╨╛╨│╨╡). Cover badges (tag/city ╨╜╨░ ╤Д╨╛╤В╨╛) ╤Г╨▒╨╕╤А╨░╨╡╨╝ - ╨▓ list ╨╛╨╜╨╕ ╨╜╨╡ ╨╜╤Г╨╢╨╜╤Л ╨╜╨░ thumb.
+- Владелец: magazine-сетка ок, но нужен переключатель на информативный список (как в каталоге). Cover badges (tag/city на фото) убираем - в list они не нужны на thumb.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `blog-view-mode.ts`: modes `magazine` \| `list`; persist `localStorage` key `blog:viewMode`; URL `?view=list` (aliases `grid`/`cards` тЖТ magazine). Default = magazine.
-- Toggle icon (LayoutGrid / List) ╤Б╨┐╤А╨░╨▓╨░ ╨▓ strip ╤Д╨╕╨╗╤М╤В╤А╨╛╨▓ `/blog`; list = `BlogListRows` (thumb ╤Б╨╗╨╡╨▓╨░, title/excerpt/meta/chips ╤Б╨┐╤А╨░╨▓╨░, ╨▒╨╡╨╖ ╨▒╨╡╨╣╨┤╨╢╨╡╨╣ ╨╜╨░ ╤Д╨╛╤В╨╛).
-- Parallel: ╤Г╨▒╤А╨░╨╜╤Л `CoverBadges` ╤Б magazine cards; large-card copy split ╤З╨╡╤А╨╡╨╖ `expandLargeListingCopy`.
+- `blog-view-mode.ts`: modes `magazine` \| `list`; persist `localStorage` key `blog:viewMode`; URL `?view=list` (aliases `grid`/`cards` → magazine). Default = magazine.
+- Toggle icon (LayoutGrid / List) справа в strip фильтров `/blog`; list = `BlogListRows` (thumb слева, title/excerpt/meta/chips справа, без бейджей на фото).
+- Parallel: убраны `CoverBadges` с magazine cards; large-card copy split через `expandLargeListingCopy`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В.
+- Нет. **Prod @`ed874cb`** (включает `0741106`): toggle на `/blog`; smoke aria «Вид списка статей».
 
 ---
 
 ## 2026-07-23 - Blog markdown: links / H2 / NOTE / prices
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т╨╗╨░╨┤╨╡╨╗╨╡╤Ж: ╨║╨░╤З╨╡╤Б╤В╨▓╨╡╨╜╨╜╤Л╨╣ MD ╨│╨╕╨┤╨╛╨▓ ╨╜╨░ live ╨▓╤Л╨│╨╗╤П╨┤╨╕╤В ╨╝╨╛╨╜╨╛╨╗╨╕╤В╨╛╨╝ - ╤Б╨╗╨░╨▒╤Л╨╡ ╨░╨║╤Ж╨╡╨╜╤В╤Л; ╤А╨╕╤Б╨║ ╨▒╨╕╤В╤Л╤Е ╤Б╤Б╤Л╨╗╨╛╨║, NOTE, ╨╕╨╡╤А╨░╤А╤Е╨╕╨╕ H2/H3; ╤Ж╨╡╨╜╤Л ┬л╨╛╤В N тВ╜┬╗ ╨▒╨╡╨╖ ╨▓╤Л╨┤╨╡╨╗╨╡╨╜╨╕╤П; ╨╜╤Г╨╢╨╜╨░ ╤А╨░╨▒╨╛╤З╨░╤П ╨▓╨╜╤Г╤В╤А╨╡╨╜╨╜╤П╤П ╨┐╨╡╤А╨╡╨╗╨╕╨╜╨║╨╛╨▓╨║╨░.
-- Smoke prod kazan/moscow: `<a href>`, `<h2>/<h3>`, `role="note"` ╤Г╨╢╨╡ ╨▒╤Л╨╗╨╕ ╨┐╨╛╤Б╨╗╨╡ hotfix `f68a95d`, ╨╜╨╛: H2 ╨▒╨╡╨╖ inline/╤П╨║╨╛╤А╨╡╨╣, ╤Ж╨╡╨╜╤Л plain text, ╨║╨╗╨╕╨║ ╨┐╨╛ ╤Б╤Б╤Л╨╗╨║╨╡ ╨▓╤Б╨╡╨│╨┤╨░ `preventDefault` (╨╗╨╛╨╝╨░╨╗ Ctrl/Cmd+click), ╨▓╨╕╨╖╤Г╨░╨╗╤М╨╜╨╛ ╨╝╨░╨╗╨╛ ╨╕╨╡╤А╨░╤А╤Е╨╕╨╕.
+- Владелец: качественный MD гидов на live выглядит монолитом - слабые акценты; риск битых ссылок, NOTE, иерархии H2/H3; цены «от N ₽» без выделения; нужна рабочая внутренняя перелинковка.
+- Smoke prod kazan/moscow: `<a href>`, `<h2>/<h3>`, `role="note"` уже были после hotfix `f68a95d`, но: H2 без inline/якорей, цены plain text, клик по ссылке всегда `preventDefault` (ломал Ctrl/Cmd+click), визуально мало иерархии.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `apps/web/src/lib/blog-markdown.ts`: tokenize `[text](url)` / bold / italic + pragmatic price wrap; `parseNoteBlock` ╤Б attrs, ╨┤╨╛╨┐╤Г╤Б╨║╨░╤О╤Й╨╕╨╝╨╕ `]` ╨▓ quoted text; heading parse + slug anchors; `parseGuideStructure` ╨┤╨╗╤П ╤В╨╡╤Б╤В╨╛╨▓.
-- `BlogArticleContent`: H2/H3 ╤Б `id`, inline markdown, ╤Б╨╕╨╗╤М╨╜╨╡╨╡ spacing/border ╤Г H2, ╤П╤А╤З╨╡ links/lists; `#` ╨▓ ╤В╨╡╨╗╨╡ тЖТ h2.
-- `BlogArticleNote` / CTA: ╨╛╨▒╤Й╨╕╨╣ `SHORTCODE_ATTRS`; NOTE inset ╤Г╤Б╨╕╨╗╨╡╨╜.
-- `blog-navigate`: modifier/middle-click ╨╛╤Б╤В╨░╨▓╨╗╤П╤О╤В native open-in-new-tab.
-- ╨в╨╡╤Б╤В╤Л: `blog-markdown.test.ts` (9). Parallel unify headers / large-card ╤Г╨╢╨╡ ╨▓ `fc5e309` / `0be544f`.
+- `apps/web/src/lib/blog-markdown.ts`: tokenize `[text](url)` / bold / italic + pragmatic price wrap; `parseNoteBlock` с attrs, допускающими `]` в quoted text; heading parse + slug anchors; `parseGuideStructure` для тестов.
+- `BlogArticleContent`: H2/H3 с `id`, inline markdown, сильнее spacing/border у H2, ярче links/lists; `#` в теле → h2.
+- `BlogArticleNote` / CTA: общий `SHORTCODE_ATTRS`; NOTE inset усилен.
+- `blog-navigate`: modifier/middle-click оставляют native open-in-new-tab.
+- Тесты: `blog-markdown.test.ts` (9). Parallel unify headers / large-card уже в `fc5e309` / `0be544f`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В.
-
----
-
-## 2026-07-23 - `/blog` large card: ╨╜╨╕╨╢╨╡ cover, ╨┤╨╗╨╕╨╜╨╜╨╡╨╡ excerpt
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Т╨╗╨░╨┤╨╡╨╗╨╡╤Ж: ╨║╤А╤Г╨┐╨╜╤Л╨╣ ╨▒╨╗╨╛╨║ magazine (╤Д╨╛╤В╨╛) ┬л╨╜╨╡ ╨╕╨╜╤Д╨╛╤А╨╝╨░╤В╨╕╨▓╨╜╨╛┬╗ - ╤Б╨╗╨╕╤И╨║╨╛╨╝ tall cover, excerpt ╨▓ 1-2 ╤Б╤В╤А╨╛╨║╨╕.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- `BlogPostCard` large/mirrored: cover `aspect-[2/1]` ╨▓╨╝╨╡╤Б╤В╨╛ `lg:flex-1` (╨▒╨╛╨╗╤М╤И╨╡ ╨╜╨╡ ╤А╨░╤Б╤В╤П╨│╨╕╨▓╨░╨╡╤В╤Б╤П ╨╜╨░ row-span-2); ╤В╨╡╨║╤Б╤В + chips ╨╜╨░ `flex-1`.
-- Excerpt large: `line-clamp-6`; ╨╜╨░ `/blog` excerpt ╤А╨░╤Б╤И╨╕╤А╤П╨╡╤В╤Б╤П ╨╕╨╖ lead body (`expandListingExcerpt`, ~420 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓). Small cards ╨▒╨╡╨╖ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╣ layout.
-- Quick-links chips ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╤Л.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╨╡╤В.
+- Нет.
 
 ---
 
-## 2026-07-23 - ╨Х╨┤╨╕╨╜╤Л╨╣ ╨╜╨╡╨╣╤В╤А╨░╨╗╤М╨╜╤Л╨╣ strip ╤И╨░╨┐╨╛╨║
+## 2026-07-23 - `/blog` large card: ниже cover, длиннее excerpt
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т╨╗╨░╨┤╨╡╨╗╨╡╤Ж: ╤Г╤А╨░╨▓╨╜╤П╤В╤М ╤И╨░╨┐╨║╨╕ ╨║╨░╤В╨░╨╗╨╛╨│╨░, ╤Б╤В╨░╤В╨╡╨╣, ╨│╨╛╤А╨╛╨┤╨░ ╨╕ ╨┐╨╛╨┤╨▒╨╛╤А╨╛╨║. ╨г ╨▒╨╗╨╛╨│╨░ ╤Г╨╢╨╡ ╨▒╤Л╨╗ strip `bg-slate-50` + H1; ╤Г `/podborki` - fuchsia gradient; ╤Г city hub - full-bleed photo; ╤Г `/events` - H1 ╨▓╨╜╤Г╤В╤А╨╕ ╨║╨╛╨╜╤В╨╡╨╜╤В╨░ ╨▒╨╡╨╖ strip.
+- Владелец: крупный блок magazine (фото) «не информативно» - слишком tall cover, excerpt в 1-2 строки.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ъ╨░╨╜╨╛╨╜: `SectionPageHero` = `PageBreadcrumbBar` + `bg-slate-50` + H1 `font-display` + ╨║╨╛╤А╨╛╤В╨║╨╕╨╣ support. `gradientClass` deprecated/ignored.
-- ╨Я╤А╨╕╨╝╨╡╨╜╨╡╨╜╨╛: `/events`, `/blog` (`BlogListHero` wrapper), city hub (╨▒╨╡╨╖ ╤Д╨╛╤В╨╛), `/podborki`, intent pages.
-- `CatalogShell` ╨▒╨╛╨╗╤М╤И╨╡ ╨╜╨╡ ╨┤╤Г╨▒╨╗╨╕╤А╤Г╨╡╤В H1 - ╤В╨╛╨╗╤М╨║╨╛ ╤Б╤З╤С╤В╤З╨╕╨║ + controls.
-- City photo hero ╤Б╨╜╤П╤В ╨┐╨╛ ╤П╨▓╨╜╨╛╨╣ ╨┐╤А╨╛╤Б╤М╨▒╨╡ ╤Г╤А╨░╨▓╨╜╤П╤В╤М; ╤Д╨╛╤В╨╛ ╨╛╤Б╤В╨░╤С╤В╤Б╤П ╨╜╨░ ╨║╨░╤А╤В╨╛╤З╨║╨░╤Е ╨│╨╛╤А╨╛╨┤╨░/╨░╤Д╨╕╤И╨╡.
+- `BlogPostCard` large/mirrored: cover `aspect-[2/1]` вместо `lg:flex-1` (больше не растягивается на row-span-2); текст + chips на `flex-1`.
+- Excerpt large: `line-clamp-6`; на `/blog` excerpt расширяется из lead body (`expandListingExcerpt`, ~420 символов). Small cards без изменений layout.
+- Quick-links chips сохранены.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В. **Prod @`db34d03` (╨║╨╛╨┤ `fc5e309`):** deploy-prod-next OK; smoke `/events` `/blog` `/cities/sankt-peterburg` `/podborki` - `bg-slate-50` + crumbs + H1, ╨▒╨╡╨╖ fuchsia/full-bleed city photo.
-
----
-
-## 2026-07-23 - `/blog` listing: ╨╜╨╡╨╣╤В╤А╨░╨╗╤М╨╜╨░╤П ╤И╨░╨┐╨║╨░
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Т╨╗╨░╨┤╨╡╨╗╨╡╤Ж: full-bleed `BlogListHero` ╤Б kenburns/╤Д╨╛╤В╨╛ ┬л╤Г╨╢╨░╤Б┬╗ - ╨╜╤Г╨╢╨╜╨░ ╨┐╤А╨╛╤Б╤В╨░╤П ╨╜╨╡╨╣╤В╤А╨░╨╗╤М╨╜╨░╤П ╨┐╨╛╨╗╨╛╤Б╨║╨░.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- `BlogListHero`: ╤Г╨▒╤А╨░╨╗╨╕ ╤Д╨╛╤В╨╛/motion/╤В╤С╨╝╨╜╤Л╨╣ overlay; ╨║╤А╨╛╤И╨║╨╕ + strip `bg-slate-50`, H1 `font-display`, ╨║╨╛╤А╨╛╤В╨║╨╕╨╣ description.
-- Magazine grid ╨╜╨╕╨╢╨╡ ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕; article hero ╨▒╨╡╨╖ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╣.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╨╡╤В.
+- Нет.
 
 ---
 
-## 2026-07-23 - ╨Я╤А╨░╨▓╨╕╨╗╨╛: cover ╨╛╨▒╤П╨╖╨░╤В╨╡╨╗╨╡╨╜ + ╨┤╨╛╨│╨╡╨╜╨╡╤А╨░╤Ж╨╕╤П bylinnyy
+## 2026-07-23 - Единый нейтральный strip шапок
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨а╨╡╤И╨╡╨╜╨╕╨╡ ╨▓╨╗╨░╨┤╨╡╨╗╤М╤Ж╨░: ╨║ ╨╗╤О╨▒╨╛╨╣ blog article ╨▓╤Б╨╡╨│╨┤╨░ ╨│╨╡╨╜╨╡╤А╨╕╤А╤Г╨╡╨╝ ╤Г╨╜╨╕╨║╨░╨╗╤М╨╜╤Л╨╣ cover (GenerateImage), ╨╜╨╡ city-placeholder.
-- ╨Р╤Г╨┤╨╕╤В `content/blog` ├Ч `apps/public/public/images/blog/{slug}.jpg`: ╨Ь╨б╨Ъ/╨б╨Я╨▒ ├Ч6 ╨╕ batch A ╤Г╨╢╨╡ ╤Г╨╜╨╕╨║╨░╨╗╤М╨╜╤Л╨╡; missing cover ╤В╨╛╨╗╤М╨║╨╛ ╤Г `bylinnyy-bereg-fentezi-fest-volhov` (PUBLISHED) ╨╕ `bylinnyy-bereg-fentezi-fest` (HIDDEN).
+- Владелец: уравнять шапки каталога, статей, города и подборок. У блога уже был strip `bg-slate-50` + H1; у `/podborki` - fuchsia gradient; у city hub - full-bleed photo; у `/events` - H1 внутри контента без strip.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Я╤А╨░╨▓╨╕╨╗╨╛ ╨╖╨░╤Д╨╕╨║╤Б╨╕╤А╨╛╨▓╨░╨╜╨╛: `.cursorrules` ┬з6, `docs/seo-guide-articles-gpt-prompt.md`, `docs/seo-guide-articles-plan.md`.
-- ╨б╨│╨╡╨╜╨╡╤А╨╕╤А╨╛╨▓╨░╨╜╤Л 2 cover JPG тЖТ `apps/public/public/images/blog/{slug}.jpg` (frontmatter ╤Г╨╢╨╡ ╤Г╨║╨░╨╖╤Л╨▓╨░╨╗ ╨┐╤Г╤В╨╕).
-- Parallel WIP (large-card fill ╨▓ `BlogPostCard`) ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕; font revert ╨╕ cadence ╤Г╨╢╨╡ ╨▓ ╨╕╤Б╤В╨╛╤А╨╕╨╕ ╨▓╨╡╤В╨║╨╕.
+- Канон: `SectionPageHero` = `PageBreadcrumbBar` + `bg-slate-50` + H1 `font-display` + короткий support. `gradientClass` deprecated/ignored.
+- Применено: `/events`, `/blog` (`BlogListHero` wrapper), city hub (без фото), `/podborki`, intent pages.
+- `CatalogShell` больше не дублирует H1 - только счётчик + controls.
+- City photo hero снят по явной просьбе уравнять; фото остаётся на карточках города/афише.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В.
-
----
-
-## 2026-07-23 - Blog typography: ╨╛╤В╨║╨░╤В Source Serif
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Т╨╗╨░╨┤╨╡╨╗╨╡╤Ж: ╤И╤А╨╕╤Д╤В╤Л ╨▓ ╨▒╨╗╨╛╨│╨╡ ╨┐╨╛╤Б╨╗╨╡ magazine redesign (`a4ecab6`) ┬л╨╜╨╡ ╤В╨╡┬╗ - Source Serif ╨╜╨░ H1/H2/H3 ╨╕ listing titles ╤З╤Г╨╢╨╡╤А╨╛╨┤╨╜╤Л ╨╛╤В╨╜╨╛╤Б╨╕╤В╨╡╨╗╤М╨╜╨╛ ╨╛╤Б╤В╨░╨╗╤М╨╜╨╛╨│╨╛ ╤Б╨░╨╣╤В╨░.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨Т╨╡╤А╨╜╤Г╨╗╨╕ site default: Space Grotesk (`font-display`) / bold ╨╜╨░ hero, article H2/H3, cards, sidebar, strip.
-- ╨г╨▒╤А╨░╨╗╨╕ drop cap ╨╕ serif pull-quote; ╤Ж╨╕╤В╨░╤В╤Л ╨╜╨░ `font-display`.
-- Magazine layout (grid/sidebar/quotes anatomy) ╨╛╤Б╤В╨░╨▓╨╕╨╗╨╕; Source Serif ╨╛╤Б╤В╨░╤С╤В╤Б╤П ╨┤╨╗╤П city editorial hub.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╨╡╤В. **Prod @`6656adf`:** `deploy-prod-next` OK; `/blog` + ╨╗╨╛╨╜╨│╤А╨╕╨┤╤Л ╨▒╨╡╨╖ `font-serif`/`blog-dropcap`, H1 ╨╜╨░ `font-display`.
+- Нет. **Prod @`db34d03` (код `fc5e309`):** deploy-prod-next OK; smoke `/events` `/blog` `/cities/sankt-peterburg` `/podborki` - `bg-slate-50` + crumbs + H1, без fuchsia/full-bleed city photo.
 
 ---
 
-## 2026-07-23 - ╨Ь╨б╨Ъ/╨б╨Я╨▒ covers + magazine `/blog` hero
+## 2026-07-23 - `/blog` listing: нейтральная шапка
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨г 6 ╨│╨╕╨┤╨╛╨▓ ╨Ь╨б╨Ъ/╨б╨Я╨▒ cover ╨▒╤Л╨╗ city-placeholder (~95KB, ╨┤╨▓╨░ ╨╛╨┤╨╕╨╜╨░╨║╨╛╨▓╤Л╤Е ╤Е╤Н╤И╨░ moscow/spb).
-- Batch A (╨Ъ╨░╨╖╨░╨╜╤М/╨Х╨║╨▒ ├Ч3) ╤Г╨╢╨╡ ╤Г╨╜╨╕╨║╨░╨╗╤М╨╜╤Л╨╡ - ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕.
-- Listing `/blog` ╤Б╨╕╨┤╨╡╨╗ ╨╜╨░ generic `SectionPageHero` (amber-rose gradient) - ╨▓╤Л╨│╨╗╤П╨┤╨╡╨╗ ╨║╨░╨║ ╤А╨░╨╖╨┤╨╡╨╗-dashboard, ╨╜╨╡ magazine.
+- Владелец: full-bleed `BlogListHero` с kenburns/фото «ужас» - нужна простая нейтральная полоска.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨б╨│╨╡╨╜╨╡╤А╨╕╤А╨╛╨▓╨░╨╜╤Л 6 landscape JPG тЖТ `apps/public/public/images/blog/{slug}.jpg`; frontmatter ╤Г╨╢╨╡ ╤Г╨║╨░╨╖╤Л╨▓╨░╨╗ ╤Н╤В╨╕ ╨┐╤Г╤В╨╕.
-- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜ `blog-list-hero.jpg` + `BlogListHero`: full-bleed ╤Д╨╛╤В╨╛, Source Serif H1, ╨▒╤А╨╡╨╜╨┤ eyebrow, kenburns/rise motion.
-- Article hero: ╤З╤Г╤В╤М ╨▓╤Л╤И╨╡ plane, amber brand eyebrow, full-bleed sizes, ╤В╨╡ ╨╢╨╡ motion keyframes.
-- F4.6 ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕.
+- `BlogListHero`: убрали фото/motion/тёмный overlay; крошки + strip `bg-slate-50`, H1 `font-display`, короткий description.
+- Magazine grid ниже не трогали; article hero без изменений.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В.
+- Нет.
 
 ---
 
-## 2026-07-23 - ╨Р╨╜╤В╨╕╤Б╨┐╨░╨╝ ╨┐╤Г╨▒╨╗╨╕╨║╨░╤Ж╨╕╨╣: ╤Е╨░╨╛╤Б-╨│╤А╨░╤Д╨╕╨║ + ╨║╨╛╨╗╨╛╨╜╨║╨╕ ╨┐╨╜
+## 2026-07-23 - Правило: cover обязателен + догенерация bylinnyy
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т╨╗╨░╨┤╨╡╨╗╨╡╤Ж: ╤А╨░╨▓╨╜╨╛╨╝╨╡╤А╨╜╤Л╨╡ 3/╨┤╨╡╨╜╤М ╨▓ 09:00 ╨╕ ╤Б╤В╨░╤В╤М╨╕-╨▒╨╗╨╕╨╖╨╜╨╡╤Ж╤Л ╨▓╤Л╨│╨╗╤П╨┤╤П╤В ╨║╨░╨║ ╤Б╨┐╨░╨╝ ╨┤╨╗╤П ╨░╨│╤А╨╡╨│╨░╤В╨╛╤А╨░.
-- ╨й╨╕╤В: ╨░╨▓╤В╨╛╤А╤Б╨║╨╕╨╡ ╨║╨╛╨╗╨╛╨╜╨║╨╕ (╨Ь╨░╨║╤Б / ╨Р╨╜╨╜╨░ / ╨Х╨╗╨╡╨╜╨░ / ╨Ш╨│╨╛╤А╤М / ╨Р╤А╤В╤Г╤А) - ╨┐╤Г╨▒╨╗╨╕╨║╨╛╨▓╨░╤В╤М ╨▓ **╨┐╨╜**, ╨▒╨╡╨╖ SEO-╨│╨╕╨┤╨╛╨▓ ╨▓ ╤В╨╛╤В ╨╢╨╡ ╨┤╨╡╨╜╤М.
-- ╨Э╨╡╨╛╨┐╤Г╨▒╨╗╨╕╨║╨╛╨▓╨░╨╜╨╜╤Л╨╡ ╨║╨╛╨╗╨╛╨╜╨║╨╕ ╨▓ ╤А╨╡╨┐╨╛: `open-air-festy-vyhodnoi-ru` (╨Ь╨░╨║╤Б, ╨▒╤Л╨╗╨░ HIDDEN), `bylinnyy-bereg-fentezi-fest-volhov` (╨Ш╨│╨╛╤А╤М, HIDDEN). ╨Ф╤Г╨▒╨╗╤М ╨Ь╨░╨║╤Б╨░ `bylinnyy-bereg-fentezi-fest` ╨╛╤Б╤В╨░╨▓╨╗╨╡╨╜ HIDDEN.
-- Live 23.07 (3 ╨│╨╕╨┤╨░) ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕.
+- Решение владельца: к любой blog article всегда генерируем уникальный cover (GenerateImage), не city-placeholder.
+- Аудит `content/blog` × `apps/public/public/images/blog/{slug}.jpg`: МСК/СПб ×6 и batch A уже уникальные; missing cover только у `bylinnyy-bereg-fentezi-fest-volhov` (PUBLISHED) и `bylinnyy-bereg-fentezi-fest` (HIDDEN).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Я╨╡╤А╨╡╤Б╨╛╨▒╤А╨░╨╜ ╨║╨░╨╗╨╡╨╜╨┤╨░╤А╤М: 2 (╨┐╤В) / 1 (╤Б╨▒) / ╨▓╤Б-╨┐╨╡╤А╨╡╤А╤Л╨▓ / ╨┐╨╜-╨║╨╛╨╗╨╛╨╜╨║╨░ / 2 (╨▓╤В) / 1 (╤Б╤А); ╨▓╤А╨╡╨╝╨╡╨╜╨░ 11:15, 16:40, 14:25, 10:35, 11:50, 18:20, 15:10, 12:20 MSK.
-- ╨Ь╨╕╨║╤Б ╤И╨░╨▒╨╗╨╛╨╜╨╛╨▓ ~тЕУ long / ~тЕУ top5 / ~тЕУ events ╨╖╨░╤Д╨╕╨║╤Б╨╕╤А╨╛╨▓╨░╨╜ ╨▓ plan + GPT-prompt (`template_type`).
-- Frontmatter `publishedAt` ╤Г 6 ╨│╨╕╨┤╨╛╨▓ + 2 ╨║╨╛╨╗╨╛╨╜╨╛╨║; upsert prod `--force-published-at`.
-- **Safety marker:** ╨╕╨╜╨┤╨╡╨║╤Б 80тАУ90% - ╨╛╨║; ┬л╨╝╨░╨╗╨╛╤Ж╨╡╨╜╨╜╨░╤П┬╗ / ╨▓╨╜╨╡ ╨╕╨╜╨┤╨╡╨║╤Б╨░ - ╤Б╨╜╨╕╨╖╨╕╤В╤М ╨┤╨╛ 1 ╨│╨╕╨┤/╨┤╨╡╨╜╤М (owner ╨▓ ╨Т╨╡╨▒╨╝╨░╤Б╤В╨╡╤А╨╡) - ╤Б╨╝. `docs/qa.md`.
+- Правило зафиксировано: `.cursorrules` §6, `docs/seo-guide-articles-gpt-prompt.md`, `docs/seo-guide-articles-plan.md`.
+- Сгенерированы 2 cover JPG → `apps/public/public/images/blog/{slug}.jpg` (frontmatter уже указывал пути).
+- Parallel WIP (large-card fill в `BlogPostCard`) не трогали; font revert и cadence уже в истории ветки.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨в╨╡╨║╤Б╤В╤Л ╤Г╨╢╨╡ ╨╜╨░╨┐╨╕╤Б╨░╨╜╤Л ╨║╨░╨║ long (~5тАУ7╨║); ╤Б╨╝╨╡╨╜╨░ template_type ╨┤╨╗╤П ╤З╨░╤Б╤В╨╕ URL - ╤А╨╡╨┤╨░╨║╤Ж╨╕╨╛╨╜╨╜╤Л╨╣ ╨┤╨╛╨╗╨│ ╨┐╨░╤З╨║╨╕ B / polish, ╨╜╨╡ ╨▒╨╗╨╛╨║╨╡╤А ╨│╤А╨░╤Д╨╕╨║╨░.
+- Нет.
 
 ---
 
-## 2026-07-23 - SEO guides: owner anti-AI rewrite (9 ╤И╤В.)
+## 2026-07-23 - Blog typography: откат Source Serif
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т╨╗╨░╨┤╨╡╨╗╨╡╤Ж ╨┐╨╡╤А╨╡╨┐╨╕╤Б╨░╨╗ ╨▓╤Б╨╡ 9 ╨│╨╕╨┤╨╛╨▓ (╨┐╨░╤З╨║╨░ A + ╨Ь╨б╨Ъ/╨б╨Я╨▒); `validation-report.json` - 5000-7000, NOTE, ╨▒╨╡╨╖ em/en dash, ╨▒╨╡╨╖ `/events?q=`, articleType gid.
-- Desktop MD ╨▒╤Л╨╗╨╕ `status: DRAFT` ╨▒╨╡╨╖ `publishedAt`; schedule-╨╕╨╜╤Д╤А╨░ ╤Г╨╢╨╡ ╨╜╨░ `PUBLISHED` + future `publishedAt`.
+- Владелец: шрифты в блоге после magazine redesign (`a4ecab6`) «не те» - Source Serif на H1/H2/H3 и listing titles чужеродны относительно остального сайта.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ч╨░╨╝╨╡╨╜╨╡╨╜╤Л ╤В╨╡╨╗╨░ `content/blog/{slug}.md`; covers ╨Ъ╨░╨╖╨░╨╜╤М/╨Х╨║╨▒ ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╤Л; ╨Ь╨б╨Ъ/╨б╨Я╨▒ placeholders.
-- ╨б╤В╨░╤В╤Г╤Б ╨▓ ╤А╨╡╨┐╨╛/CMS: `PUBLISHED` + `publishedAt` ╨┐╨╛ ╨║╨░╨╗╨╡╨╜╨┤╨░╤А╤О 23/24/25.07 09:00 MSK (╨╜╨╡ DRAFT - cron ╨╜╨╡ ╨╜╤Г╨╢╨╡╨╜).
-- ╨Ъ╨░╤А╤В╨╛╤З╨║╨╕ `blog-posts` (web+public) + `blog:sync-bodies`; plan ╨╛╤В╨╝╨╡╤З╨╡╨╜ owner rewrite.
+- Вернули site default: Space Grotesk (`font-display`) / bold на hero, article H2/H3, cards, sidebar, strip.
+- Убрали drop cap и serif pull-quote; цитаты на `font-display`.
+- Magazine layout (grid/sidebar/quotes anatomy) оставили; Source Serif остаётся для city editorial hub.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В. **Prod @`c5c70bc`:** deploy + upsert ├Ч9 `--force-published-at`; live 23.07 = 3├Ч200 (╨Ъ╨░╨╖╨░╨╜╤М/╨Х╨║╨▒/╨Ь╨╛╤Б╨║╨▓╨░); 24-25.07 = 404 ╨┤╨╛ ╤Б╨╗╨╛╤В╨░.
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- Listing ╤Г╨╢╨╡ ╨╕╨╝╨╡╨╗ asymmetric grid (`45b013b`); ╤Б╤В╨░╤В╤М╤П ╨╛╤Б╤В╨░╨▓╨░╨╗╨░╤Б╤М ┬л╨║╨░╤А╤В╨╛╤З╨╜╨╛╨╣┬╗ ╤Б display Grotesk ╨╕ ╨▒╨╡╨╖ journal anatomy.
-- ╨Т ╨▒╤А╨╡╨╜╨┤╨╡ ╤Г╨╢╨╡ ╨╡╤Б╤В╤М Source Serif 4 (`--font-serif`) ╨╕ Space Grotesk - ╨┤╨╗╤П longread ╨▒╨╡╤А╤С╨╝ serif, body Inter.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Article: hero ╤Б serif H1 + lead; drop cap; pull quotes (`>` ╨╕ `[QUOTE]`); NOTE ╨║╨░╨║ magazine inset; body 16-18px / lh ~1.6.
-- Sidebar: ┬л╨Я╨╛ ╤В╨╡╨╝╨╡┬╗ (city hub / events / blog filter / CTA ╨╕╨╖ MD) + ╨║╨╛╨╝╨┐╨░╨║╤В╨╜╤Л╨╡ related.
-- ╨Э╨╕╨╖ ╤Б╤В╨░╤В╤М╨╕: strip ┬л╨Ф╨░╨╗╤М╤И╨╡ ╨┐╨╛ ╤В╨╡╨╝╨╡┬╗ ╨▒╨╡╨╖ inline widget.
-- Listing: serif ╨╜╨░ large titles, ╨▒╨╛╨╗╤М╤И╨╡ white space ╨╝╨╡╨╢╨┤╤Г ╤А╤П╨┤╨░╨╝╨╕.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- Sticky ┬л╨╢╨╕╨▓╤Л╨╡┬╗ ╤Б╨╛╨▒╤Л╤В╨╕╤П ╨╕╨╖ public API / TC widget ╨▓╨╜╤Г╤В╤А╨╕ MD - v2.
+- Нет. **Prod @`6656adf`:** `deploy-prod-next` OK; `/blog` + лонгриды без `font-serif`/`blog-dropcap`, H1 на `font-display`.
 
 ---
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+## 2026-07-23 - МСК/СПб covers + magazine `/blog` hero
 
-- `/blog` ╨▒╤Л╨╗ ╤А╨░╨▓╨╜╨╛╨╝╨╡╤А╨╜╨╛╨╣ ╤Б╨╡╤В╨║╨╛╨╣ 3 ╨║╨╛╨╗╨╛╨╜╨║╨╕ - ╨▓╨╕╨╖╤Г╨░╨╗╤М╨╜╨╛ ╨┐╨╗╨╛╤Б╨║╨╛, ╨▒╨╡╨╖ ╤А╨╕╤В╨╝╨░.
-- City hub teasers (╨┤╨╛ 3 ╤И╤В) ╤В╨╛╨╢╨╡ ╤И╨╗╨╕ ╨╛╨┤╨╕╨╜╨░╨║╨╛╨▓╤Л╨╝╨╕ ╨║╨░╤А╤В╨╛╤З╨║╨░╨╝╨╕ ╨▓ ╤А╤П╨┤.
+### Наблюдения
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+- У 6 гидов МСК/СПб cover был city-placeholder (~95KB, два одинаковых хэша moscow/spb).
+- Batch A (Казань/Екб ×3) уже уникальные - не трогали.
+- Listing `/blog` сидел на generic `SectionPageHero` (amber-rose gradient) - выглядел как раздел-dashboard, не magazine.
 
-- `BlogMagazineGrid`: desktop ╨▒╨╗╨╛╨║╨╕ ╨┐╨╛ 3 - ╨║╤А╤Г╨┐╨╜╨░╤П ~2/3 + ╨┤╨▓╨╡ stacked ~1/3, ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╕╨╣ ╨▒╨╗╨╛╨║ ╨╖╨╡╤А╨║╨░╨╗╤М╨╜╨╛; ╤Е╨▓╨╛╤Б╤В pair/single ╨░╨║╨║╤Г╤А╨░╤В╨╜╨╛.
-- `BlogPostCard` variants `large|small|default` (╨▓╤Л╤И╨╡ cover / ╨║╤А╤Г╨┐╨╜╨╡╨╡ title ╤Г large).
-- City hub `CityHubArticlesGrid` ╨┐╤А╨╕ 3 ╤В╨╕╨╖╨╡╤А╨░╤Е - ╤В╨╛╤В ╨╢╨╡ 2/3+1/3 ╤А╨╕╤В╨╝.
-- Mobile: single column, ╨║╤А╤Г╨┐╨╜╤Л╨╡ ╨║╨░╤А╤В╨╛╤З╨║╨╕.
+### Решения
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+- Сгенерированы 6 landscape JPG → `apps/public/public/images/blog/{slug}.jpg`; frontmatter уже указывал эти пути.
+- Добавлен `blog-list-hero.jpg` + `BlogListHero`: full-bleed фото, Source Serif H1, бренд eyebrow, kenburns/rise motion.
+- Article hero: чуть выше plane, amber brand eyebrow, full-bleed sizes, те же motion keyframes.
+- F4.6 не трогали.
 
-- ╨Э╨╡╤В.
+### Проблемы
+
+- Нет.
 
 ---
 
-## 2026-07-23 - Admin preview ╤Б╤В╨░╤В╨╡╨╣ (draft / scheduled)
+## 2026-07-23 - Антиспам публикаций: хаос-график + колонки пн
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Public `/blog/[slug]` ╨╛╤В╨┤╨░╤С╤В ╤В╨╛╨╗╤М╨║╨╛ `PUBLISHED`; ╤З╨╡╤А╨╜╨╛╨▓╨╕╨║╨╕ ╨╕ ╨╛╤В╨╗╨╛╨╢╨╡╨╜╨╜╤Л╨╡ (`publishedAt` ╨▓ ╨▒╤Г╨┤╤Г╤Й╨╡╨╝) ╨╜╨╡ ╨▓╨╕╨┤╨╜╤Л ╨┤╨╛ go-live.
-- ╨Я╤А╨╕ ╨│╤А╨░╤Д╨╕╨║╨╡ max 3/day ╨▓╨╗╨░╨┤╨╡╨╗╤М╤Ж╤Г ╨╜╤Г╨╢╨╡╨╜ ╨▓╨╕╨╖╤Г╨░╨╗╤М╨╜╤Л╨╣ QA (NOTE callouts, cover, typography) ╨┤╨╛ ╨┐╤Г╨▒╨╗╨╕╨║╨░╤Ж╨╕╨╕.
+- Владелец: равномерные 3/день в 09:00 и статьи-близнецы выглядят как спам для агрегатора.
+- Щит: авторские колонки (Макс / Анна / Елена / Игорь / Артур) - публиковать в **пн**, без SEO-гидов в тот же день.
+- Неопубликованные колонки в репо: `open-air-festy-vyhodnoi-ru` (Макс, была HIDDEN), `bylinnyy-bereg-fentezi-fest-volhov` (Игорь, HIDDEN). Дубль Макса `bylinnyy-bereg-fentezi-fest` оставлен HIDDEN.
+- Live 23.07 (3 гида) не трогали.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ш╨╖╨╛╨╗╨╕╤А╨╛╨▓╨░╨╜╨╜╤Л╨╣ route `(article-preview)/admin/articles/[id]/preview` - ╨▒╨╡╨╖ `AdminNextShell`, ╤В╨╛╤В ╨╢╨╡ `BlogArticleView` + markdown pipeline.
-- Auth: middleware Basic Auth ╨╜╨░ `/admin/*`; metadata `robots: noindex`.
-- ╨С╨░╨╜╨╜╨╡╤А: ┬л╨з╨╡╤А╨╜╨╛╨▓╨╕╨║┬╗ / ┬л╨Ч╨░╨┐╨╗╨░╨╜╨╕╤А╨╛╨▓╨░╨╜╨╛ ╨╜╨░ тАж┬╗ (future `publishedAt`) / ╤Б╤В╨░╤В╤Г╤Б╤Л review/published/archive.
-- ╨Ъ╨╜╨╛╨┐╨║╨╕ ┬л╨Я╤А╨╡╨▓╤М╤О┬╗ ╨▓ list + edit. ╨Я╨╛╨╗╨╡ ╨║╨░╨╜╨╛╨╜╨░ ╨╛╤Б╤В╨░╤С╤В╤Б╤П `publishedAt` (schedule-╨░╨│╨╡╨╜╤В: `PUBLISHED` + future `publishedAt`, public filter `publishedAt <= now`).
+- Пересобран календарь: 2 (пт) / 1 (сб) / вс-перерыв / пн-колонка / 2 (вт) / 1 (ср); времена 11:15, 16:40, 14:25, 10:35, 11:50, 18:20, 15:10, 12:20 MSK.
+- Микс шаблонов ~⅓ long / ~⅓ top5 / ~⅓ events зафиксирован в plan + GPT-prompt (`template_type`).
+- Frontmatter `publishedAt` у 6 гидов + 2 колонок; upsert prod `--force-published-at`.
+- **Safety marker:** индекс 80–90% - ок; «малоценная» / вне индекса - снизить до 1 гид/день (owner в Вебмастере) - см. `docs/qa.md`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В (finance ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕). **Prod @`b664b84`:** deploy OK; preview ╨▒╨╡╨╖ auth тЖТ 401; ╤Б Basic Auth тЖТ 200 + `noindex` + ╨▒╨░╨╜╨╜╨╡╤А.
+- Тексты уже написаны как long (~5–7к); смена template_type для части URL - редакционный долг пачки B / polish, не блокер графика.
+
+---
+
+## 2026-07-23 - SEO guides: owner anti-AI rewrite (9 шт.)
+
+### Наблюдения
+
+- Владелец переписал все 9 гидов (пачка A + МСК/СПб); `validation-report.json` - 5000-7000, NOTE, без em/en dash, без `/events?q=`, articleType gid.
+- Desktop MD были `status: DRAFT` без `publishedAt`; schedule-инфра уже на `PUBLISHED` + future `publishedAt`.
+
+### Решения
+
+- Заменены тела `content/blog/{slug}.md`; covers Казань/Екб сохранены; МСК/СПб placeholders.
+- Статус в репо/CMS: `PUBLISHED` + `publishedAt` по календарю 23/24/25.07 09:00 MSK (не DRAFT - cron не нужен).
+- Карточки `blog-posts` (web+public) + `blog:sync-bodies`; plan отмечен owner rewrite.
+
+### Проблемы
+
+- Нет. **Prod @`c5c70bc`:** deploy + upsert ×9 `--force-published-at`; live 23.07 = 3×200 (Казань/Екб/Москва); 24-25.07 = 404 до слота.
+
+### Наблюдения
+
+- Listing уже имел asymmetric grid (`45b013b`); статья оставалась «карточной» с display Grotesk и без journal anatomy.
+- В бренде уже есть Source Serif 4 (`--font-serif`) и Space Grotesk - для longread берём serif, body Inter.
+
+### Решения
+
+- Article: hero с serif H1 + lead; drop cap; pull quotes (`>` и `[QUOTE]`); NOTE как magazine inset; body 16-18px / lh ~1.6.
+- Sidebar: «По теме» (city hub / events / blog filter / CTA из MD) + компактные related.
+- Низ статьи: strip «Дальше по теме» без inline widget.
+- Listing: serif на large titles, больше white space между рядами.
+
+### Проблемы
+
+- Sticky «живые» события из public API / TC widget внутри MD - v2.
+
+---
+
+### Наблюдения
+
+- `/blog` был равномерной сеткой 3 колонки - визуально плоско, без ритма.
+- City hub teasers (до 3 шт) тоже шли одинаковыми карточками в ряд.
+
+### Решения
+
+- `BlogMagazineGrid`: desktop блоки по 3 - крупная ~2/3 + две stacked ~1/3, следующий блок зеркально; хвост pair/single аккуратно.
+- `BlogPostCard` variants `large|small|default` (выше cover / крупнее title у large).
+- City hub `CityHubArticlesGrid` при 3 тизерах - тот же 2/3+1/3 ритм.
+- Mobile: single column, крупные карточки.
+
+### Проблемы
+
+- Нет.
+
+---
+
+## 2026-07-23 - Admin preview статей (draft / scheduled)
+
+### Наблюдения
+
+- Public `/blog/[slug]` отдаёт только `PUBLISHED`; черновики и отложенные (`publishedAt` в будущем) не видны до go-live.
+- При графике max 3/day владельцу нужен визуальный QA (NOTE callouts, cover, typography) до публикации.
+
+### Решения
+
+- Изолированный route `(article-preview)/admin/articles/[id]/preview` - без `AdminNextShell`, тот же `BlogArticleView` + markdown pipeline.
+- Auth: middleware Basic Auth на `/admin/*`; metadata `robots: noindex`.
+- Баннер: «Черновик» / «Запланировано на …» (future `publishedAt`) / статусы review/published/archive.
+- Кнопки «Превью» в list + edit. Поле канона остаётся `publishedAt` (schedule-агент: `PUBLISHED` + future `publishedAt`, public filter `publishedAt <= now`).
+
+### Проблемы
+
+- Нет (finance не трогали). **Prod @`b664b84`:** deploy OK; preview без auth → 401; с Basic Auth → 200 + `noindex` + баннер.
 
 ---
 
 ## 2026-07-23 - SEO guides: max 3/day + schedule publishedAt
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т╨╗╨░╨┤╨╡╨╗╨╡╤Ж: ╨╜╨╡ ╨▒╨╛╨╗╨╡╨╡ 3 ╤Б╤В╨░╤В╨╡╨╣ ╨▓ ╨┤╨╡╨╜╤М live; ╨╛╤Б╤В╨░╨╗╤М╨╜╨╛╨╡ ╨▓ ╨│╤А╨░╤Д╨╕╨║; ╨▓ ╨┤╨╜╨╡╨▓╨╜╨╛╨╣ ╨┐╨░╤З╨║╨╡ ╨╝╨╕╨║╤Б╨╛╨▓╨░╤В╤М ╨│╨╛╤А╨╛╨┤╨░.
-- ╨Э╨░ prod ╨┐╨░╤З╨║╨░ A (3) + ╨Ь╨б╨Ъ/╨б╨Я╨▒ (6) ╨▒╤Л╨╗╨╕ live ╤А╨░╨╖╨╛╨╝.
-- Public API ╤Д╨╕╨╗╤М╤В╤А╨╛╨▓╨░╨╗ ╤В╨╛╨╗╤М╨║╨╛ `status=PUBLISHED`, ╨▒╨╡╨╖ `publishedAt <= now` - future date ╨╜╨╡ ╤Б╨║╤А╤Л╨▓╨░╨╗ URL.
+- Владелец: не более 3 статей в день live; остальное в график; в дневной пачке миксовать города.
+- На prod пачка A (3) + МСК/СПб (6) были live разом.
+- Public API фильтровал только `status=PUBLISHED`, без `publishedAt <= now` - future date не скрывал URL.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- Runtime: `buildPublicArticlesList` / `buildPublicArticlePage` - ╤Г╤Б╨╗╨╛╨▓╨╕╨╡ `(publishedAt is null or publishedAt <= now())`.
-- ╨Ъ╨░╨╗╨╡╨╜╨┤╨░╤А╤М 09:00 MSK: 23.07 - ╨Ъ╨░╨╖╨░╨╜╤М/╨Х╨║╨▒/╨Ь╨╛╤Б╨║╨▓╨░; 24.07 - ╨Х╨║╨▒/╨б╨Я╨▒/╨Ь╨╛╤Б╨║╨▓╨░; 25.07 - ╨Ь╨╛╤Б╨║╨▓╨░/╨б╨Я╨▒/╨б╨Я╨▒.
-- Frontmatter `publishedAt` + `blog:upsert --force-published-at`; ╨┐╤А╨░╨▓╨╕╨╗╨╛ ╨▓ plan + GPT prompt.
-- ╨б╤В╨░╤В╤Г╤Б ╨╛╤Б╤В╨░╤С╤В╤Б╤П `PUBLISHED` (╨╜╨╡ DRAFT): ╤А╨░╤Б╨┐╨╕╤Б╨░╨╜╨╕╨╡ ╤З╨╡╤А╨╡╨╖ ╨┤╨░╤В╤Г, cron ╨╜╨╡ ╨╜╤Г╨╢╨╡╨╜.
+- Runtime: `buildPublicArticlesList` / `buildPublicArticlePage` - условие `(publishedAt is null or publishedAt <= now())`.
+- Календарь 09:00 MSK: 23.07 - Казань/Екб/Москва; 24.07 - Екб/СПб/Москва; 25.07 - Москва/СПб/СПб.
+- Frontmatter `publishedAt` + `blog:upsert --force-published-at`; правило в plan + GPT prompt.
+- Статус остаётся `PUBLISHED` (не DRAFT): расписание через дату, cron не нужен.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- 25.07 ╨╜╨╡╨╕╨╖╨▒╨╡╨╢╨╜╨╛ 2├Ч╨б╨Я╨▒ (╨╛╤Б╤В╨░╤В╨╛╨║ ╨╕╨╜╨▓╨╡╨╜╤В╨░╤А╤П 3 ╨Ь╨б╨Ъ + 3 ╨б╨Я╨▒ ╨┐╨╛╤Б╨╗╨╡ ╨┤╨▓╤Г╤Е ╤Б╨╝╨╡╤И╨░╨╜╨╜╤Л╤Е ╨┤╨╜╨╡╨╣).
-
----
-
-## 2026-07-23 - SEO guides ╨Ь╨б╨Ъ/╨б╨Я╨▒ тЖТ ╨▒╨╗╨╛╨│
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Р╤А╤Е╨╕╨▓ `daibilet-guides-moscow-spb.zip`: 6 MD (╨Ь╨╛╤Б╨║╨▓╨░ 2 ╨┤╨╜╤П / ╤А╨╡╤З╨╜╤Л╨╡ / ╤Г╨╢╨╕╨╜; ╨б╨Я╨▒ 3 ╨┤╨╜╤П / ╨Э╨╡╨▓╨░-╨║╨░╨╜╨░╨╗╤Л / ╨║╨╛╨╜╤Ж╨╡╤А╤В╤Л).
-- Frontmatter ╤Б╨╛╨▓╨┐╨░╨╗ ╤Б╨╛ ╤Б╤Е╨╡╨╝╨╛╨╣; ╨┤╨╗╨╕╨╜╨╜╤Л╤Е ╤В╨╕╤А╨╡ ╨╜╨╡╤В; `[NOTE]` + CTA ╨╜╨░ ╨╢╨╕╨▓╤Л╨╡ CHPU ╨Ь╨б╨Ъ/╨б╨Я╨▒.
-- ╨Э╨╡ ╨┐╨╡╤А╨╡╤Б╨╡╨║╨░╨╡╤В╤Б╤П ╤Б╨╛ slug ╨┐╨░╤З╨║╨╕ A (╨Ъ╨░╨╖╨░╨╜╤М/╨Х╨║╨▒).
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- `PUBLISHED` ╨▓ `content/blog/` + ╨║╨░╤А╤В╨╛╤З╨║╨╕ `blog-posts` (web+public), `blog-meta`, `blog:sync-bodies`.
-- Cover: ╨┐╨╗╨╡╨╣╤Б╤Е╨╛╨╗╨┤╨╡╤А `cities/moscow.png` / `saint-petersburg.png` тЖТ `/images/blog/{slug}.jpg` (TODO ╤Г╨╜╨╕╨║╨░╨╗╤М╨╜╤Л╨╡ ╤Д╨╛╤В╨╛).
-- ╨Я╨╗╨░╨╜ `docs/seo-guide-articles-plan.md`: ID 11, 12, 18, 19, 30 + ╨║╨╛╨╜╤Ж╨╡╤А╤В╤Л ╨б╨Я╨▒ ╨╛╤В╨╝╨╡╤З╨╡╨╜╤Л ╤А╨░╨╖╨╝╨╡╤Й╤С╨╜╨╜╤Л╨╝╨╕.
-- ╨Я╨╛╨╖╨╢╨╡ ╤А╨░╨╖╨╜╨╡╤Б╨╡╨╜╤Л ╨┐╨╛ ╨║╨░╨╗╨╡╨╜╨┤╨░╤А╤О тЙд3/╨┤╨╡╨╜╤М (╤Б╨╝. ╨╖╨░╨┐╨╕╤Б╤М ╨▓╤Л╤И╨╡).
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨г╨╜╨╕╨║╨░╨╗╤М╨╜╤Л╨╡ ╨╛╨▒╨╗╨╛╨╢╨║╨╕/inline ╨╡╤Й╤С ╨╜╨╡ ╤Б╨╜╤П╤В╤Л - city placeholder.
+- 25.07 неизбежно 2×СПб (остаток инвентаря 3 МСК + 3 СПб после двух смешанных дней).
 
 ---
 
-## 2026-07-23 - Batch A: ╤Г╨╜╨╕╨║╨░╨╗╤М╨╜╤Л╨╡ cover ╨▓╨╝╨╡╤Б╤В╨╛ city-placeholder
+## 2026-07-23 - SEO guides МСК/СПб → блог
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╨░ prod ╤Г ╨│╨╕╨┤╨╛╨▓ batch A (`kazan-2-3-dnya-samostoyatelno-karta`, `ekb-stendap-uralskiy-yumor`, `ekb-uralskiy-mars-bazhovskie-ekskursii`) cover ╨▒╤Л╨╗ ╨║╨╛╨┐╨╕╨╡╨╣ `cities/*.png`.
-- Frontmatter ╤Г╨╢╨╡ ╤Г╨║╨░╨╖╤Л╨▓╨░╨╗ `/images/blog/{slug}.jpg`; ╨╝╨╡╨╜╤П╤В╤М MD ╨╜╨╡ ╨╜╤Г╨╢╨╜╨╛.
+- Архив `daibilet-guides-moscow-spb.zip`: 6 MD (Москва 2 дня / речные / ужин; СПб 3 дня / Нева-каналы / концерты).
+- Frontmatter совпал со схемой; длинных тире нет; `[NOTE]` + CTA на живые CHPU МСК/СПб.
+- Не пересекается со slug пачки A (Казань/Екб).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨б╨│╨╡╨╜╨╡╤А╨╕╤А╨╛╨▓╨░╨╜╤Л 3 ╤Г╨╜╨╕╨║╨░╨╗╤М╨╜╤Л╨╡ landscape-╨╛╨▒╨╗╨╛╨╢╨║╨╕ (╨▒╨╡╨╖ ╤В╨╡╨║╤Б╤В╨░/╨╗╨╛╨│╨╛╤В╨╕╨┐╨╛╨▓) тЖТ `apps/public/public/images/blog/{slug}.jpg`.
-- Sync ╨▓ Next public ╨╕╨┤╤С╤В ╤З╨╡╤А╨╡╨╖ `apps/web/scripts/sync-public-assets.mjs` ╨╜╨░ build.
-- Moscow-spb zip / F4 ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕.
+- `PUBLISHED` в `content/blog/` + карточки `blog-posts` (web+public), `blog-meta`, `blog:sync-bodies`.
+- Cover: плейсхолдер `cities/moscow.png` / `saint-petersburg.png` → `/images/blog/{slug}.jpg` (TODO уникальные фото).
+- План `docs/seo-guide-articles-plan.md`: ID 11, 12, 18, 19, 30 + концерты СПб отмечены размещёнными.
+- Позже разнесены по календарю ≤3/день (см. запись выше).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Inline-╤Д╨╛╤В╨╛ ╨┤╨╗╤П batch A ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г ╨╜╨╡ ╤Б╨┤╨╡╨╗╨░╨╜╤Л (╨▓╨╜╨╡ scope ╤Н╤В╨╛╨╣ ╨╖╨░╨┤╨░╤З╨╕).
+- Уникальные обложки/inline ещё не сняты - city placeholder.
+
+---
+
+## 2026-07-23 - Batch A: уникальные cover вместо city-placeholder
+
+### Наблюдения
+
+- На prod у гидов batch A (`kazan-2-3-dnya-samostoyatelno-karta`, `ekb-stendap-uralskiy-yumor`, `ekb-uralskiy-mars-bazhovskie-ekskursii`) cover был копией `cities/*.png`.
+- Frontmatter уже указывал `/images/blog/{slug}.jpg`; менять MD не нужно.
+
+### Решения
+
+- Сгенерированы 3 уникальные landscape-обложки (без текста/логотипов) → `apps/public/public/images/blog/{slug}.jpg`.
+- Sync в Next public идёт через `apps/web/scripts/sync-public-assets.mjs` на build.
+- Moscow-spb zip / F4 не трогали.
+
+### Проблемы
+
+- Inline-фото для batch A по-прежнему не сделаны (вне scope этой задачи).
 
 ---
 
 ## 2026-07-23 - Fix `[NOTE]` mid-article: nested markdown links
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╨░ prod `/blog/kazan-2-3-dnya-samostoyatelno-karta` ╤Б╤Л╤А╨╛╨╣ `NOTE label=тАж` ╤А╨╡╨╜╨┤╨╡╤А╨╕╨╗╤Б╤П ╨║╨░╨║ ╨╛╨┤╨╜╨░ ╤Б╨╕╨╜╤П╤П ╤Б╤Б╤Л╨╗╨║╨░.
-- ╨Т╤Б╨╡ 3 guide batch A ╨╕╨╝╨╡╤О╤В `[╨░╨╜╨║╨╛╤А](url)` ╨▓╨╜╤Г╤В╤А╨╕ `text="тАж"`.
+- На prod `/blog/kazan-2-3-dnya-samostoyatelno-karta` сырой `NOTE label=…` рендерился как одна синяя ссылка.
+- Все 3 guide batch A имеют `[анкор](url)` внутри `text="…"`.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `parseNoteBlock` / `CTA_REGEX`: ╨▓╨╝╨╡╤Б╤В╨╛ `[^\]]+` - `(?:[^\]"]|"[^"]*")+`, ╤З╤В╨╛╨▒╤Л `]` ╨▓╨╜╤Г╤В╤А╨╕ ╨║╨░╨▓╤Л╤З╨╡╨║ ╨╜╨╡ ╨╛╨▒╤А╤Л╨▓╨░╨╗ ╨▒╨╗╨╛╨║.
-- ╨Я╨╛╨┤╨┤╨╡╤А╨╢╨░╨╜ bare `NOTE label=тАж` ╨▒╨╡╨╖ ╤Б╨║╨╛╨▒╨╛╨║.
+- `parseNoteBlock` / `CTA_REGEX`: вместо `[^\]]+` - `(?:[^\]"]|"[^"]*")+`, чтобы `]` внутри кавычек не обрывал блок.
+- Поддержан bare `NOTE label=…` без скобок.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨б╤В╨░╤А╤Л╨╣ regex + inline link-╨┐╨░╤А╤Б╨╡╤А ╤Б╨║╨╗╨╡╨╕╨▓╨░╨╗╨╕ `[NOTE тАж [╨░╨╜╨║╨╛╤А]` ╨▓ ╨╛╨┤╨╕╨╜ `<a href=url>` - ╨╛╤В╤Б╤О╨┤╨░ ┬л╤Б╨╕╨╜╤П╤П ╤Б╤В╤А╨╛╨║╨░┬╗.
+- Старый regex + inline link-парсер склеивали `[NOTE … [анкор]` в один `<a href=url>` - отсюда «синяя строка».
 
 ---
 
 ## 2026-07-23 - F4.6 hard-retire Vite /legacy
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т╨╗╨░╨┤╨╡╨╗╨╡╤Ж ╨▓╤Л╨▒╤А╨░╨╗ F4.6: ╨┤╨╛╨▒╨╕╤В╤М schedule/sales/source, landing blocks, buyers (+ unarchive/delete), ╨╖╨░╤В╨╡╨╝ ╤Г╨▒╤А╨░╤В╤М `/legacy`.
-- Landing blocks write API ╨▓ ╨▒╤Н╨║╨╡╨╜╨┤╨╡ ╨╜╨╡ ╨▒╤Л╨╗╨╛ (Vite = preview). Mapping inbox / audit-log ╨▓ Vite ╤Г╨╢╨╡ stub тЖТ `/`.
-- Finance / blog content ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕.
+- Владелец выбрал F4.6: добить schedule/sales/source, landing blocks, buyers (+ unarchive/delete), затем убрать `/legacy`.
+- Landing blocks write API в бэкенде не было (Vite = preview). Mapping inbox / audit-log в Vite уже stub → `/`.
+- Finance / blog content не трогали.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
 - Next: event ops panels; landing blocks preview; `/admin/buyers`; order unarchive + hard delete.
-- Hard-retire: nginx ╨▒╨╡╨╖ `/legacy`, deploy ╨▒╨╡╨╖ Vite build/rsync, middleware `/legacy` тЖТ `/admin`.
-- **Vite retire status: YES** (served SPA). `apps/admin` source ╨╝╨╛╨╢╨╡╤В ╨╛╤Б╤В╨░╤В╤М╤Б╤П ╨▓ ╨╝╨╛╨╜╨╛╤А╨╡╨┐╨╛.
+- Hard-retire: nginx без `/legacy`, deploy без Vite build/rsync, middleware `/legacy` → `/admin`.
+- **Vite retire status: YES** (served SPA). `apps/admin` source может остаться в монорепо.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Blocks CRUD write - ╨╛╤В╨┤╨╡╨╗╤М╨╜╤Л╨╣ future API, ╨╡╤Б╨╗╨╕ ╨┐╨╛╨╜╨░╨┤╨╛╨▒╨╕╤В╤Б╤П ╤А╨╡╨┤╨░╨║╤В╨╕╤А╨╛╨▓╨░╨╜╨╕╨╡ ╤Б╨╛╤Б╤В╨░╨▓╨░ ╨▒╨╗╨╛╨║╨╛╨▓.
+- Blocks CRUD write - отдельный future API, если понадобится редактирование состава блоков.
 
 ---
 
 ## 2026-07-23 - F4.5 rare ops (taxonomy / ticket-link / ECR / Reviews)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т╨╗╨░╨┤╨╡╨╗╨╡╤Ж ╨▓╤Л╨▒╤А╨░╨╗ F4.5 rare ops (╨╜╨╡ freeze): taxonomy, ticket-link, ECR/Reviews + candidates.
-- API ╤Г╨╢╨╡ ╨▒╤Л╨╗: `/api/admin/taxonomy`, event taxonomy PATCH, order tickets POST, reviews, event-change-requests, landing candidates.
-- ╨Я╨░╤А╨░╨╗╨╗╨╡╨╗╤М╨╜╨╛ guides batch A - content/blog ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕.
+- Владелец выбрал F4.5 rare ops (не freeze): taxonomy, ticket-link, ECR/Reviews + candidates.
+- API уже был: `/api/admin/taxonomy`, event taxonomy PATCH, order tickets POST, reviews, event-change-requests, landing candidates.
+- Параллельно guides batch A - content/blog не трогали.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- Next: taxonomy form ╨╜╨░ `/admin/events/[id]`; ticket upsert + candidates ╨╜╨░ orders; candidates search ╨╜╨░ landings; `/admin/reviews`; `/admin/change-requests` (+ detail).
-- Nav: ╨Ю╤В╨╖╤Л╨▓╤Л + ECR.
-- Soft-retire checklist ╨╛╨▒╨╜╨╛╨▓╨╗╤С╨╜; **Vite hard-retire: NO** (schedule/sales, content blocks, buyers, unarchive/delete).
+- Next: taxonomy form на `/admin/events/[id]`; ticket upsert + candidates на orders; candidates search на landings; `/admin/reviews`; `/admin/change-requests` (+ detail).
+- Nav: Отзывы + ECR.
+- Soft-retire checklist обновлён; **Vite hard-retire: NO** (schedule/sales, content blocks, buyers, unarchive/delete).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Я╨╛╨╗╨╜╤Л╨╣ Vite Events sheet (╤А╨░╤Б╨┐╨╕╤Б╨░╨╜╨╕╨╡/╨┐╤А╨╛╨┤╨░╨╢╨╕) ╨╕ landing blocks editor ╨▓╤Б╤С ╨╡╤Й╤С ╨╜╤Г╨╢╨╜╤Л.
-- Finance ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕.
+- Полный Vite Events sheet (расписание/продажи) и landing blocks editor всё ещё нужны.
+- Finance не трогали.
 
 ---
 
-## 2026-07-23 - SEO guide ╨┐╨░╤З╨║╨░ A (ID 1, 8, 10) тЖТ ╨▒╨╗╨╛╨│
+## 2026-07-23 - SEO guide пачка A (ID 1, 8, 10) → блог
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Р╤А╤Е╨╕╨▓ `daibilet-guides-batch-a.zip`: 3 MD ╤Н╤В╨░╨╗╨╛╨╜╨░ (╨Ъ╨░╨╖╨░╨╜╤М 2-3 ╨┤╨╜╤П, ╤Б╤В╨╡╨╜╨┤╨░╨┐ ╨Х╨║╨▒, ╨г╤А╨░╨╗╤М╤Б╨║╨╕╨╣ ╨Ь╨░╤А╤Б).
-- Frontmatter GPT ╤Б╨╛╨▓╨┐╨░╨╗ ╤Б╨╛ ╤Б╤Е╨╡╨╝╨╛╨╣ `content/blog`; ╨┤╨╗╨╕╨╜╨╜╤Л╤Е ╤В╨╕╤А╨╡ ╨╜╨╡╤В; `[NOTE]` + CTA ╨╜╨░ ╨┐╨╛╨┤╤В╨▓╨╡╤А╨╢╨┤╤С╨╜╨╜╤Л╨╡ CHPU.
+- Архив `daibilet-guides-batch-a.zip`: 3 MD эталона (Казань 2-3 дня, стендап Екб, Уральский Марс).
+- Frontmatter GPT совпал со схемой `content/blog`; длинных тире нет; `[NOTE]` + CTA на подтверждённые CHPU.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨а╨░╨╖╨╝╨╡╤Й╨╡╨╜╤Л `content/blog/{kazan-2-3-dnya-samostoyatelno-karta,ekb-stendap-uralskiy-yumor,ekb-uralskiy-mars-bazhovskie-ekskursii}.md` (`PUBLISHED`).
-- ╨Ъ╨░╤А╤В╨╛╤З╨║╨╕ ╨▓ `blog-posts` (web+public), `blog-meta` (+ ╤Д╨╕╨╗╤М╤В╤А `ekaterinburg`), `blog:sync-bodies`.
-- Cover: `/images/blog/{slug}.jpg` (╤Б╨╜╨░╤З╨░╨╗╨░ city-placeholder; ╨┐╨╛╨╖╨╢╨╡ ╨╖╨░╨╝╨╡╨╜╨╡╨╜╤Л ╤Г╨╜╨╕╨║╨░╨╗╤М╨╜╤Л╨╝╨╕ ╤Д╨╛╤В╨╛ - ╤Б╨╝. ╨╖╨░╨┐╨╕╤Б╤М ╨▓╤Л╤И╨╡).
-- ╨Я╨╗╨░╨╜: `docs/seo-guide-articles-plan.md` - ╨┐╨░╤З╨║╨░ A ╨╛╤В╨╝╨╡╤З╨╡╨╜╨░ ╤А╨░╨╖╨╝╨╡╤Й╤С╨╜╨╜╨╛╨╣.
+- Размещены `content/blog/{kazan-2-3-dnya-samostoyatelno-karta,ekb-stendap-uralskiy-yumor,ekb-uralskiy-mars-bazhovskie-ekskursii}.md` (`PUBLISHED`).
+- Карточки в `blog-posts` (web+public), `blog-meta` (+ фильтр `ekaterinburg`), `blog:sync-bodies`.
+- Cover: `/images/blog/{slug}.jpg` (сначала city-placeholder; позже заменены уникальными фото - см. запись выше).
+- План: `docs/seo-guide-articles-plan.md` - пачка A отмечена размещённой.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Inline-╤Д╨╛╤В╨╛ ╨┤╨╗╤П batch A ╨╡╤Й╤С ╨╜╨╡ ╤Б╨┤╨╡╨╗╨░╨╜╤Л (covers ╨╖╨░╨║╤А╤Л╤В╤Л ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛╨╣ ╨╖╨░╨┐╨╕╤Б╤М╤О).
+- Inline-фото для batch A ещё не сделаны (covers закрыты отдельной записью).
 
 ---
 
 ## 2026-07-23 - F4.4 Orders/Venues/Cities + soft-retire legacy
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╤Б╨╗╨╡ F4.3 daily edit Events/Landings ╤Г╨╢╨╡ ╨▓ Next; ╨╛╨┐╨╡╤А╨░╤В╨╛╤А╤Б╨║╨╕╨╣ ╨╛╤Б╤В╨░╤В╨╛╨║: Orders mirror, Venues/Cities SEO.
-- ╨Я╨╛╨╗╨╜╤Л╨╣ Vite Events/Orders sheet ╤Б╨╗╨╕╤И╨║╨╛╨╝ ╨▓╨╡╨╗╨╕╨║ ╨┤╨╗╤П hard retire ╨▓ ╨╛╨┤╨╜╨╛╨╝ ╨╕╨╜╨║╤А╨╡╨╝╨╡╨╜╤В╨╡.
+- После F4.3 daily edit Events/Landings уже в Next; операторский остаток: Orders mirror, Venues/Cities SEO.
+- Полный Vite Events/Orders sheet слишком велик для hard retire в одном инкременте.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
 - Next: `/admin/orders` (+ detail/archive/sync), `/admin/venues/[id]`, `/admin/cities/[id]`.
 - Nav: Orders/Venues/Cities ready.
-- Soft-retire: nginx/docs mark `/legacy` deprecated; Vite build ╨╛╤Б╤В╨░╤С╤В╤Б╤П.
+- Soft-retire: nginx/docs mark `/legacy` deprecated; Vite build остаётся.
 - Checklist full retire: `docs/phases/phase-f4-retire-legacy.md`.
-- **Vite retire possible: NO** (taxonomy, candidates, ticket-link, ECR ╨▒╨╡╨╖ Next-╨╖╨░╨╝╨╡╨╜╤Л).
+- **Vite retire possible: NO** (taxonomy, candidates, ticket-link, ECR без Next-замены).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Ticket upsert / unarchive / delete ╨╛╤Б╤В╨░╤О╤В╤Б╤П ╨╜╨░ Vite.
-- Finance ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕.
+- Ticket upsert / unarchive / delete остаются на Vite.
+- Finance не трогали.
 
 ---
 
 ## 2026-07-23 - SEO guide batch #1 + blog NOTE callout
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т╨╗╨░╨┤╨╡╨╗╨╡╤Ж ╤Г╤В╨▓╨╡╤А╨┤╨╕╨╗ 10 ╨┐╤Г╤В╨╡╨▓╨╛╨┤╨╕╤В╨╡╨╗╨╡╨╣ (5 ╨Ъ╨░╨╖╨░╨╜╤М + 5 ╨Х╨║╨▒) ╤Б mid CTA ╨╕ ╨┐╤А╨░╨▓╨╕╨╗╨░╨╝╨╕ ╨╛╤Д╨╛╤А╨╝╨╗╨╡╨╜╨╕╤П.
-- `/zagorodnye-ekskursii/{city}` ╨▓ ╤А╨╛╤Г╤В╨╕╨╜╨│╨╡ ╤А╨░╨╖╤А╨╡╤И╤С╨╜ ╤В╨╛╨╗╤М╨║╨╛ ╨┤╨╗╤П `saint-petersburg`; ╨┤╨╗╤П ╨Ъ╨░╨╖╨░╨╜╨╕/╨Х╨║╨▒ CTA ╨╖╨░╨│╨╛╤А╨╛╨┤╨╜╤Л╤Е ╤В╨╡╨╝ = `/ekskursii/{city}/`.
-- ╨Ю╤В╨┤╨╡╨╗╤М╨╜╨╛╨│╨╛ CHPU ┬л╤Б╨╝╨╛╤В╤А╨╛╨▓╤Л╨╡ ╨┐╨╗╨╛╤Й╨░╨┤╨║╨╕┬╗ ╨╜╨╡╤В тЖТ ╨Х╨║╨▒ ╤Б╨╝╨╛╤В╤А╨╛╨▓╤Л╨╡ CTA = `/ekskursii/ekaterinburg/`.
-- ╨Т ╨▒╨╗╨╛╨│╨╡ ╤Г╨╢╨╡ ╨▒╤Л╨╗╨╕ `[CTA]` / `[buy]` / `[image]`, ╨╜╨╛ ╨╜╨╡ ╨▒╤Л╨╗╨╛ ╨╜╨░╤В╨╕╨▓╨╜╨╛╨╣ mid-article ╨┐╨╗╨░╤И╨║╨╕ ┬л╨Т╨░╨╢╨╜╨╛┬╗.
+- Владелец утвердил 10 путеводителей (5 Казань + 5 Екб) с mid CTA и правилами оформления.
+- `/zagorodnye-ekskursii/{city}` в роутинге разрешён только для `saint-petersburg`; для Казани/Екб CTA загородных тем = `/ekskursii/{city}/`.
+- Отдельного CHPU «смотровые площадки» нет → Екб смотровые CTA = `/ekskursii/ekaterinburg/`.
+- В блоге уже были `[CTA]` / `[buy]` / `[image]`, но не было нативной mid-article плашки «Важно».
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- Batch #1 ╨╖╨░╤Д╨╕╨║╤Б╨╕╤А╨╛╨▓╨░╨╜ ╨▓ `docs/seo-guide-articles-plan.md` (+ csv); GPT batch-╨┐╤А╨╛╨╝╨┐╤В - `docs/seo-guide-articles-gpt-prompt.md`.
-- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜ `BlogArticleNote` + ╨┐╨░╤А╤Б╨╡╤А `[NOTE label="тАж" text="тАж"]` ╨▓ `BlogArticleContent`; `![alt](TODO-photo)` ╤А╨╡╨╜╨┤╨╡╤А╨╕╤В╤Б╤П ╨║╨░╨║ ╨┐╨╗╨╡╨╣╤Б╤Е╨╛╨╗╨┤╨╡╤А.
-- ╨Я╨╛╨╗╨╜╤Л╨╡ 10 ╤В╨╡╨║╤Б╤В╨╛╨▓ ╨╜╨╡ ╨┐╨╕╤И╨╡╨╝ ╨▓ ╤Н╤В╨╛╨╝ ╤В╨╕╨║╨╡╤В╨╡; ╨│╨╡╨╜╨╡╤А╨░╤Ж╨╕╤П ╤Г ╨▓╨╗╨░╨┤╨╡╨╗╤М╤Ж╨░ ╨▓ GPT, ╤А╨░╨╖╨╝╨╡╤Й╨╡╨╜╨╕╨╡ ╨┐╨░╤З╨║╨░╨╝╨╕ MD ╨▓ Cursor.
+- Batch #1 зафиксирован в `docs/seo-guide-articles-plan.md` (+ csv); GPT batch-промпт - `docs/seo-guide-articles-gpt-prompt.md`.
+- Добавлен `BlogArticleNote` + парсер `[NOTE label="…" text="…"]` в `BlogArticleContent`; `![alt](TODO-photo)` рендерится как плейсхолдер.
+- Полные 10 текстов не пишем в этом тикете; генерация у владельца в GPT, размещение пачками MD в Cursor.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Intent `/podborki/besplatno/kazan` ╨╝╨╛╨╢╨╡╤В ╨▒╤Л╤В╤М thin (&lt; 6) - CTA ╨▓╤Б╤С ╤А╨░╨▓╨╜╨╛ ╨║╨░╨╜╨╛╨╜╨╕╤З╨╡╤Б╨║╨╕╨╣ intent URL.
+- Intent `/podborki/besplatno/kazan` может быть thin (&lt; 6) - CTA всё равно канонический intent URL.
 
-## 2026-07-23 - F4.3 Events/Landings deep CRUD тЖТ Next
+## 2026-07-23 - F4.3 Events/Landings deep CRUD → Next
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Vite EventsPage ~1539 LOC (8 tabs) ╨╕ LandingsPage ~802 LOC - ╨┐╨╛╨╗╨╜╤Л╨╣ port ╨▓ ╨╛╨┤╨╜╨╛╨╝ ╨╕╨╜╨║╤А╨╡╨╝╨╡╨╜╤В╨╡ ╤А╨╕╤Б╨║╨╛╨▓╨░╨╜.
-- ╨Ю╨┐╨╡╤А╨░╤В╨╛╤А╤Б╨║╨╕╨╣ hot path: override ╤В╨╡╨║╤Б╤В╨╛╨▓ + ╤Б╤В╨░╤В╤Г╤Б ╨┐╤Г╨▒╨╗╨╕╨║╨░╤Ж╨╕╨╕; pin/exclude + SEO ╨╗╨╡╨╜╨┤╨╕╨╜╨│╨░.
-- Backend PATCH ╤Г╨╢╨╡ ╨│╨╛╤В╨╛╨▓ (`/override`, `/moderation`, `/landings/:slug`, `/matches/:eventId`).
+- Vite EventsPage ~1539 LOC (8 tabs) и LandingsPage ~802 LOC - полный port в одном инкременте рискован.
+- Операторский hot path: override текстов + статус публикации; pin/exclude + SEO лендинга.
+- Backend PATCH уже готов (`/override`, `/moderation`, `/landings/:slug`, `/matches/:eventId`).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
 - Next `/admin/events/[id]`: Content + SEO + Media override + ModerationPanel (server actions).
-- Next `/admin/landings/[slug]`: SEO form + Pin/Hide/Auto ╨╜╨░ sample/excluded.
-- List deep-links ╨▓╨╡╨┤╤Г╤В ╨▓ Next; Vite ╤Б╤Б╤Л╨╗╨║╨╕ ╤В╨╛╨╗╤М╨║╨╛ ╨┤╨╗╤П taxonomy / candidates.
-- Zod `mergeGroupKey` ╨▓ override schema (typed path).
-- Docs: `phase-f4-deep-crud.md`; Tasktracker F4.3 тЬЕ; next = F4.4 remaining legacy.
+- Next `/admin/landings/[slug]`: SEO form + Pin/Hide/Auto на sample/excluded.
+- List deep-links ведут в Next; Vite ссылки только для taxonomy / candidates.
+- Zod `mergeGroupKey` в override schema (typed path).
+- Docs: `phase-f4-deep-crud.md`; Tasktracker F4.3 ✅; next = F4.4 remaining legacy.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- canPublish gate ╨╜╨░ detail - soft (╨╕╨╖ list q=id); PUBLISHED disabled ╨┐╤А╨╕ blockers.
-- Candidates search ╨╕ taxonomy ╨╛╤Б╤В╨░╤О╤В╤Б╤П ╨╜╨░ `/legacy` ╨┤╨╛ F4.4.
-- Finance ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕.
-
----
-
-## 2026-07-23 - F4.2 Sync jobs тЖТ apps/worker
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- `apps/worker` ╨╛╤В╤Б╤Г╤В╤Б╤В╨▓╨╛╨▓╨░╨╗; sync ╨╢╨╕╨╗ ╨▓ root `scripts/*` + cron/systemd + spawn ╨╕╨╖ `server.js`.
-- Admin Sources ╤Г╨╢╨╡ ╨▒╤М╤С╤В ╨▓ legacy API (`POST тАж/ticketscloud/sync`, `тАж/tep/sync`) - ╤В╨╛╤В ╨╢╨╡ pipeline.
-- Long-running worker daemon ╨╜╨░ 3.8Gi ╨╜╨╡╨╢╨╡╨╗╨░╤В╨╡╨╗╨╡╨╜ (OOM risk ╤Г╨╢╨╡ ╤Б╨╜╨╕╨╝╨░╨╗╨╕ out-of-process oneshot).
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜ `@daibilet/worker`: CLI `bin/run.mjs` ╤Б jobs `tc-catalog` / `tep-catalog` / `tc-orders` / `tep-orders` / `health`.
-- Jobs ╤В╨╛╨╗╤М╨║╨╛ spawn ╤В╨╡╤Е ╨╢╨╡ root scripts (╨▒╨╡╨╖ ╨┐╨╡╤А╨╡╨┐╨╕╤Б╤Л╨▓╨░╨╜╨╕╤П TC/TEP).
-- `deploy/cron/*-sync.sh` ╨┐╨╡╤А╨╡╨▓╨╡╨┤╨╡╨╜╤Л ╨╜╨░ worker CLI; systemd timers ╨▒╨╡╨╖ ╤Б╨╝╨╡╨╜╤Л ExecStart.
-- Admin triggers ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕: ╤Б╨╛╨▓╨╝╨╡╤Б╤В╨╕╨╝╨╛╤Б╤В╤М Sources ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╨░.
-- Docs: `docs/phases/phase-f4-worker.md`; Tasktracker F4.2 тЬЕ; next = F4.3 deep CRUD port.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- Prod ╨┐╨╛╨┤╤Е╨▓╨░╤В╨╕╤В worker ╨┐╨╛╤Б╨╗╨╡ git pull (╨┐╨╛╨╗╨╜╤Л╨╣ `deploy-prod-next` ╨╜╨╡ ╨╛╨▒╤П╨╖╨░╤В╨╡╨╗╨╡╨╜ ╨┤╨╗╤П CLI-only).
-- `tep-orders` ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г stub / cron off.
-
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨г╤В╨▓╨╡╤А╨╢╨┤╤С╨╜╨╜╤Л╨╣ TOP-15 ╨╜╤Г╨╢╨╡╨╜ ╨▓╨╗╨░╨┤╨╡╨╗╤М╤Ж╤Г ╨┤╨╗╤П ╤А╤Г╤З╨╜╨╛╨│╨╛ ╨┐╨╡╤А╨╡╨╛╨▒╤Е╨╛╨┤╨░ ╨▓ ╨п╨╜╨┤╨╡╨║╤Б.╨Т╨╡╨▒╨╝╨░╤Б╤В╨╡╤А / GSC - ╨░╨│╨╡╨╜╤В ╨▓ ╨┐╨░╨╜╨╡╨╗╨╕ ╨╜╨╡ ╨╗╨╛╨│╨╕╨╜╨╕╤В╤Б╤П.
-- Landings chunk ╨╜╨░ prod ╤Г╨╢╨╡ ╤Д╨╕╨╗╤М╤В╤А╤Г╨╡╤В thin (< 6 ╨╛╤Д╤Д╨╡╤А╨╛╨▓): ╨Ъ╨░╨╖╨░╨╜╤М/╨║╤А╤Л╤И╨╕/╨╖╨░╨│╨╛╤А╨╛╨┤╨╜╤Л╨╡ ╨╕ ╤А╤П╨┤ TOP URL ╨║╨╛╤А╤А╨╡╨║╤В╨╜╨╛ ╨╛╤В╤Б╤Г╤В╤Б╤В╨▓╤Г╤О╤В ╨▓ sitemap.
-- Static sitemap ╤Б╨╗╨╡╨┐╨╛ ╨▓╨║╨╗╤О╤З╨░╨╗ ╨▓╤Б╨╡ `/podborki/{intent}` ╨▒╨╡╨╖ ╨┐╤А╨╛╨▓╨╡╤А╨║╨╕ ╨╛╤Д╤Д╨╡╤А╨╛╨▓: `/podborki/besplatno` ╨▒╤Л╨╗ ╨▓ sitemap ╨┐╤А╨╕ `noindex,follow`.
-- City hubs `/cities/kazan` ╨╕ `/cities/ekaterinburg` ╨▓ cities chunk ╨╡╤Б╤В╤М; indexable ╨Х╨║╨▒-╤Б╤В╨╡╨╜╨┤╨░╨┐ ╨╡╤Б╤В╤М ╨▓ landings.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨б╨╛╨▒╤А╨░╨╜ ╨║╨╛╨┐╨╕╨┐╨░╤Б╤В TOP-15 ╨░╨▒╤Б╨╛╨╗╤О╤В╨╜╤Л╤Е URL ╨┤╨╗╤П ╨┐╨╡╤А╨╡╨╛╨▒╤Е╨╛╨┤╨░ (owner action).
-- `buildStaticSitemapEntries` ╤Б╤В╨░╨╗ async: intents (╨╕ city-variants ╨┐╤А╨╕╨╛╤А╨╕╤В╨╡╤В╨╜╤Л╤Е ╨│╨╛╤А╨╛╨┤╨╛╨▓) ╨┐╨╛╨┐╨░╨┤╨░╤О╤В ╨▓ sitemap ╤В╨╛╨╗╤М╨║╨╛ ╨┐╤А╨╕ тЙе `MIN_LISTING_OFFERS_FOR_INDEX`.
-- ╨Я╨╗╨░╨╜ ╨║╨╛╨╜╤В╨╡╨╜╤В╨╜╨╛╨╣ ╨▓╨╛╤А╨╛╨╜╨║╨╕: `docs/seo-guide-articles-plan.md` (+ csv) - 30 ╤В╨╡╨╝ ╨Ъ╨░╨╖╨░╨╜╤М/╨Х╨║╨▒/╨Ь╨б╨Ъ/╨б╨Я╨▒ ╤Б CHPU ╨╕ ╨┐╤А╨╕╨╛╤А╨╕╤В╨╡╤В╨╛╨╝. ╨Я╨╛╨╗╨╜╤Л╨╡ ╤В╨╡╨║╤Б╤В╤Л ╨╜╨╡ ╨┐╨╕╤И╨╡╨╝ ╨┐╨░╤З╨║╨╛╨╣.
-- Sitemap ╨┤╨╗╤П ╨┐╨░╨╜╨╡╨╗╨╡╨╣: `https://daibilet.ru/sitemap.xml` (index).
-- **Prod smoke @`7a8aa6c` (╨║╨╛╨┤ fix `0fe5140`):** `/sitemaps/static.xml` ╨▒╨╡╨╖ thin `/podborki/besplatno`; `/podborki/na-vyhodnye` ╨╕ ╤Б╨╛╤Б╨╡╨┤╨╜╨╕╨╡ indexable intents ╨╜╨░ ╨╝╨╡╤Б╤В╨╡; landings ╨▒╨╡╨╖ ╨Ъ╨░╨╖╨░╨╜╤М/╨║╤А╤Л╤И/╨╖╨░╨│╨╛╤А╨╛╨┤╨╜╤Л╤Е thin; `/cities/kazan` + `/cities/ekaterinburg` ╨▓ cities chunk; ╨Х╨║╨▒-╤Б╤В╨╡╨╜╨┤╨░╨┐ ╨▓ landings.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨з╨░╤Б╤В╤М TOP-15 ╤Б╨╡╨╣╤З╨░╤Б thin (`noindex`) - ╨┐╨╡╤А╨╡╨╛╨▒╤Е╨╛╨┤ ╨▓╤Б╤С ╤А╨░╨▓╨╜╨╛ ╨╕╨╝╨╡╨╡╤В ╤Б╨╝╤Л╤Б╨╗, ╨╜╨╛ ╨╕╨╜╨┤╨╡╨║╤Б╨░╤Ж╨╕╤П ╨┤╨╛╨╢╨┤╤С╤В╤Б╤П тЙе 6 ╨╛╤Д╤Д╨╡╤А╨╛╨▓ ╨┐╨╛╤Б╨╗╨╡ sync/matching.
-- ╨Ю╤В╨┐╤А╨░╨▓╨║╨░ sitemap ╨╕ ╨║╨╗╨╕╨║╨╕ ╨▓ ╨Т╨╡╨▒╨╝╨░╤Б╤В╨╡╤А╨╡/GSC - ╤В╨╛╨╗╤М╨║╨╛ ╤А╤Г╨║╨░╨╝╨╕ ╨▓╨╗╨░╨┤╨╡╨╗╤М╤Ж╨░.
+- canPublish gate на detail - soft (из list q=id); PUBLISHED disabled при blockers.
+- Candidates search и taxonomy остаются на `/legacy` до F4.4.
+- Finance не трогали.
 
 ---
 
-## 2026-07-23 - Hero ╨│╨╗╨░╨▓╨╜╨╛╨╣: ╤А╨╛╤В╨░╤Ж╨╕╤П ╤Б╨╗╨░╨▓╤П╨╜╤Б╨║╨╕╤Е ╤В╤Г╤А╨╕╤Б╤В╨╛╨▓
+## 2026-07-23 - F4.2 Sync jobs → apps/worker
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Hero ╨▒╤Л╨╗ ╨╛╨┤╨╕╨╜ ╨║╨░╨┤╤А (`home-hero-friends-selfie.jpg` + mobile crop); ╤Н╤В╨░╨╗╨╛╨╜ ╨▓ `apps/public/public/images/hero/`, sync ╨▓ Next ╨┐╤А╨╕ `web:build`.
+- `apps/worker` отсутствовал; sync жил в root `scripts/*` + cron/systemd + spawn из `server.js`.
+- Admin Sources уже бьёт в legacy API (`POST …/ticketscloud/sync`, `…/tep/sync`) - тот же pipeline.
+- Long-running worker daemon на 3.8Gi нежелателен (OOM risk уже снимали out-of-process oneshot).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜╤Л 6 ╨║╨░╨┤╤А╨╛╨▓ `hero-slavic-01..06.png` (╤Б╨╗╨░╨▓╤П╨╜╤Б╨║╨░╤П ╨▓╨╜╨╡╤И╨╜╨╛╤Б╤В╤М, ╨┐╨╛╨╖╨╕╤В╨╕╨▓╨╜╤Л╨╡ ╤Н╨╝╨╛╤Ж╨╕╨╕, ╤А╨░╨╖╨╜╤Л╨╡ ╤Б╤Ж╨╡╨╜╤Л).
-- ╨Я╤Г╨╗ `HOME_HERO_IMAGES` (7 ╤И╤В. ╤Б ╤Г╤З╤С╤В╨╛╨╝ ╤Б╤В╨░╤А╨╛╨│╨╛ selfie); SSR-╨▓╤Л╨▒╨╛╤А `pickHomeHeroImage()` + `connection()` ╨╜╨░ ╨║╨░╨╢╨┤╤Л╨╣ ╨╖╨░╨┐╤А╨╛╤Б ╨▒╨╡╨╖ hydration flash.
-- Alt ╨╜╨░ ╤А╤Г╤Б╤Б╨║╨╛╨╝; `HomeHeroBackground` ╨┐╤А╨╕╨╜╨╕╨╝╨░╨╡╤В ╨▓╤Л╨▒╤А╨░╨╜╨╜╤Л╨╣ ╤Б╨╡╤В.
+- Добавлен `@daibilet/worker`: CLI `bin/run.mjs` с jobs `tc-catalog` / `tep-catalog` / `tc-orders` / `tep-orders` / `health`.
+- Jobs только spawn тех же root scripts (без переписывания TC/TEP).
+- `deploy/cron/*-sync.sh` переведены на worker CLI; systemd timers без смены ExecStart.
+- Admin triggers не трогали: совместимость Sources сохранена.
+- Docs: `docs/phases/phase-f4-worker.md`; Tasktracker F4.2 ✅; next = F4.3 deep CRUD port.
 
-**Prod @`ee002e7`:** deploy-prod-next OK; `/` dynamic; 5 ╨╖╨░╨┐╤А╨╛╤Б╨╛╨▓ тЖТ ╤А╨░╨╖╨╜╤Л╨╡ hero (`slavic-01`, selfie, `slavic-05`, тАж); PNG 200.
+### Проблемы
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╨╡╤В.
-
----
-
-## 2026-07-23 - SEO ╨Ъ╨░╨╖╨░╨╜╤М/╨Х╨║╨▒: ╨┐╨░╨┤╨╡╨╢╨╕ + 3 meta-╤И╨░╨▒╨╗╨╛╨╜╨░ + thin cards
+- Prod подхватит worker после git pull (полный `deploy-prod-next` не обязателен для CLI-only).
+- `tep-orders` по-прежнему stub / cron off.
 
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨░╨┤╨╡╨╢╨╕ ╨Ъ╨░╨╖╨░╨╜╨╕/╨Х╨║╨░╤В╨╡╤А╨╕╨╜╨▒╤Г╤А╨│╨░ ╤Г╨╢╨╡ ╨▒╤Л╨╗╨╕ ╨▓ `city-declension.ts`; ╨╜╨╡ ╤Е╨▓╨░╤В╨░╨╗╨╛ ╨╡╨┤╨╕╨╜╨╛╨╣ API `{City_╨Ш╨╝/╨а╨╛╨┤/╨Я╤А}` ╨┐╨╛ slug ╨╕ ╨╛╤В╨┤╨╡╨╗╤М╨╜╤Л╤Е ╤Д╨╛╤А╨╝╤Г╨╗ meta.
-- ╨Я╨╛╤А╨╛╨│ ╨╕╨╜╨┤╨╡╨║╤Б╨░ `MIN_LISTING_OFFERS_FOR_INDEX = 6` ╨╛╤Б╤В╨░╨▓╨╗╨╡╨╜ (╨╜╨╡ ╨┐╨╛╨┤╨╜╨╕╨╝╨░╤В╤М).
+- Утверждённый TOP-15 нужен владельцу для ручного переобхода в Яндекс.Вебмастер / GSC - агент в панели не логинится.
+- Landings chunk на prod уже фильтрует thin (< 6 офферов): Казань/крыши/загородные и ряд TOP URL корректно отсутствуют в sitemap.
+- Static sitemap слепо включал все `/podborki/{intent}` без проверки офферов: `/podborki/besplatno` был в sitemap при `noindex,follow`.
+- City hubs `/cities/kazan` и `/cities/ekaterinburg` в cities chunk есть; indexable Екб-стендап есть в landings.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `resolveCityCases` / `isSeoExpansionCity` + slugтЖТ╨╕╨╝╤П ╨▓ `city-declension.ts`.
-- ╨и╨░╨▒╨╗╨╛╨╜ тДЦ1 listing (╨Ъ╨░╨╖╨░╨╜╤М/╨Х╨║╨▒): title ╤Б `:`, description ┬л╨Р╨║╤В╤Г╨░╨╗╤М╨╜╨░╤П ╨░╤Д╨╕╤И╨░ ╨║╨░╤В╨╡╨│╨╛╤А╨╕╨╕тАж Daibilet.ru┬╗ (`seo-listing-meta.ts`). ╨Ь╨╛╤Б╨║╨▓╨░/╨б╨Я╨▒ ╨▒╨╡╨╖ ╤А╨╡╨│╤А╨╡╤Б╤Б╨░ (╤Б╤В╨░╤А╤Л╨╣ dash / ┬л╨Ш╤Й╨╡╤В╨╡тАж┬╗).
-- ╨и╨░╨▒╨╗╨╛╨╜ тДЦ2 hub: `╨Р╤Д╨╕╤И╨░ {╨а╨╛╨┤} {╨У╨╛╨┤} - ╨║╤Г╨┤╨░ ╤Б╤Е╨╛╨┤╨╕╤В╤МтАж` (`city-hub-seo.ts`).
-- ╨и╨░╨▒╨╗╨╛╨╜ тДЦ3 event: title ╤Б optional ┬л╨╛╤В N ╤А╤Г╨▒.┬╗ (`seo-event-meta.ts`).
-- Thin trick: ╨┐╤А╨╕ ╤А╨╛╨▓╨╜╨╛ 6тАУ7 ╨╛╤Д╤Д╨╡╤А╨░╤Е - `LandingThinRelatedCards` (3тАУ4 ╨║╨░╤А╤В╨╛╤З╨║╨╕ ╤Б╨╝╨╡╨╢╨╜╤Л╤Е ╨║╨░╤В╨╡╨│╨╛╤А╨╕╨╣) ╤А╤П╨┤╨╛╨╝ ╤Б ┬л╨б╨╝╨╛╤В╤А╨╕╤В╨╡ ╤В╨░╨║╨╢╨╡┬╗.
+- Собран копипаст TOP-15 абсолютных URL для переобхода (owner action).
+- `buildStaticSitemapEntries` стал async: intents (и city-variants приоритетных городов) попадают в sitemap только при ≥ `MIN_LISTING_OFFERS_FOR_INDEX`.
+- План контентной воронки: `docs/seo-guide-articles-plan.md` (+ csv) - 30 тем Казань/Екб/МСК/СПб с CHPU и приоритетом. Полные тексты не пишем пачкой.
+- Sitemap для панелей: `https://daibilet.ru/sitemap.xml` (index).
+- **Prod smoke @`7a8aa6c` (код fix `0fe5140`):** `/sitemaps/static.xml` без thin `/podborki/besplatno`; `/podborki/na-vyhodnye` и соседние indexable intents на месте; landings без Казань/крыш/загородных thin; `/cities/kazan` + `/cities/ekaterinburg` в cities chunk; Екб-стендап в landings.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В.
-
----
-
-## 2026-07-23 - SEO owner brief: ╨┐╨╛╤А╨╛╨│ 6, ╤В╨╡╨│╨╕ тЖТ CHPU, trust contacts
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨С╨░╨╖╨░ ~2400 ╤Б╨╛╨▒╤Л╤В╨╕╨╣: ╨б╨Я╨▒ ~819, ╨Ь╨╛╤Б╨║╨▓╨░ ~663, ╨Х╨║╨░╤В╨╡╤А╨╕╨╜╨▒╤Г╤А╨│ ~57, ╨Ъ╨░╨╖╨░╨╜╤М ~51. ╨Я╨╛╤А╨╛╨│ ╨╕╨╜╨┤╨╡╨║╤Б╨░╤Ж╨╕╨╕ ╨╗╨╕╤Б╤В╨╕╨╜╨│╨╛╨▓ 10-12 ╤Б╤А╨╡╨╢╨╡╤В ╨┐╨╛╨╗╨╛╨▓╨╕╨╜╤Г ╨┐╨╛╤Б╨░╨┤╨╛╨║ ╨Х╨║╨▒/╨Ъ╨░╨╖╨░╨╜╤М.
-- `/podborki` ╨╛╨▒╨╗╨░╨║╨╛ ╤В╨╡╨│╨╛╨▓ ╨▓╨╡╨╗╨╛ ╨╜╨░ thin `/events?q=тАж`, ╤Е╨╛╤В╤П CHPU landings/intent ╤Г╨╢╨╡ ╨╡╤Б╤В╤М.
-- ╨Ъ╨╛╨╜╤В╨░╨║╤В╤Л: email ╨╡╤Б╤В╤М, ╤В╨╡╨╗╨╡╤Д╨╛╨╜╨░ ╨╜╨╡╤В (╨╢╨┤╤С╨╝ 8-800). ╨Ш╨Э╨Э/╨Ю╨У╨а╨Э╨Ш╨Я ╨▒╤Л╨╗╨╕ ╨╜╨░ `/contacts`, ╨╜╨╛ ╨▓ ╤Д╤Г╤В╨╡╤А╨╡ ╤А╨╡╨║╨▓╨╕╨╖╨╕╤В╤Л ╨╜╨╡ ╤Б╨▓╨╡╤В╨╕╨╗╨╕╤Б╤М - ╨┤╨╗╤П ╨п╨╜╨┤╨╡╨║╤Б╨░ (╨╜╨╕╤И╨░ ╨▒╨╕╨╗╨╡╤В╤Л) ╤Б╨╗╨░╨▒╤Л╨╣ trust.
-- ╨в╨╡╨║╤Б╤В╤Л ╨▓ ╨║╨░╤А╤В╨╛╤З╨║╨░╤Е ╨┤╨╗╤П ╤А╨╛╨▒╨╛╤В╨╛╨▓ ╨▒╨╡╨┤╨╜╨╛╨▓╨░╤В╤Л; ╤Д╨╛╨║╤Г╤Б SEO ╨╛╤Б╤В╨░╤С╤В╤Б╤П ╨╜╨░ ╨╗╨╕╤Б╤В╨╕╨╜╨│╨░╤Е, ╨║╨░╤А╤В╨╛╤З╨║╨╕ ╨╜╨╡ ╤А╨░╨╖╨┤╤Г╨▓╨░╨╡╨╝.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- `MIN_LISTING_OFFERS_FOR_INDEX = 6` ╨┐╨╛╨┤╤В╨▓╨╡╤А╨╢╨┤╤С╨╜ ╨╕ ╨╛╤Б╤В╨░╨▓╨╗╨╡╨╜; soft-╤Ж╨╡╨╗╤М `SOFT_LISTING_OFFERS_TARGET = 10`.
-- `buildCatalogTagHref` / `resolveCatalogTagHref`: ╤В╨╡╨│ тЖТ CHPU landing/intent (city-aware); `/events?q=` ╤В╨╛╨╗╤М╨║╨╛ fallback. ╨Э╨░ ╤В╨╛╨┐-24 ╤В╨╡╨│╨░╤Е ╨║╨░╤В╨░╨╗╨╛╨│╨░: **23 CHPU / 1 fallback** (`╨и╨╛╤Г - ╨┐╤А╨╛╨│╤А╨░╨╝╨╝╨░`).
-- ╨д╤Г╤В╨╡╤А: ╨Ш╨Э╨Э + ╨Ю╨У╨а╨Э╨Ш╨Я ╤А╤П╨┤╨╛╨╝ ╤Б email + ╤Б╤Б╤Л╨╗╨║╨░ ╨╜╨░ `/requisites`. `/contacts`: ╨Ш╨Э╨Э/╨Ю╨У╨а╨Э╨Ш╨Я ╤Г╤Б╨╕╨╗╨╡╨╜╤Л (╨╛╤В╨┤╨╡╨╗╤М╨╜╤Л╨╡ ╤Б╤В╤А╨╛╨║╨╕, ╨╜╨╡ muted). ╨в╨╡╨╗╨╡╤Д╨╛╨╜ ╨╜╨╡ ╨┤╨╛╨▒╨░╨▓╨╗╤П╨╡╨╝.
-
-**Prod @`c72364f`:** deploy-prod-next OK; `/podborki` tag cloud - 23 CHPU + 1 query fallback; home footer ╤Б╨╛╨┤╨╡╤А╨╢╨╕╤В ╨Ш╨Э╨Э/╨Ю╨У╨а╨Э╨Ш╨Я; `/contacts` ╤А╨╡╨║╨▓╨╕╨╖╨╕╤В╤Л ╨╜╨░ ╨╝╨╡╤Б╤В╨╡.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Я╤Г╨▒╨╗╨╕╤З╨╜╤Л╨╣ 8-800 / ╨│╨╛╤А╨╛╨┤╤Б╨║╨╛╨╣ ╨╜╨╛╨╝╨╡╤А pending ╤Г ╨▓╨╗╨░╨┤╨╡╨╗╤М╤Ж╨░ (SEO.9).
-- ╨з╨░╤Б╤В╤М ╤А╨╡╨┤╨║╨╕╤Е ╤В╨╡╨│╨╛╨▓ ╨╛╤Б╤В╨░╨╜╨╡╤В╤Б╤П ╨╜╨░ query-fallback - ╤А╨░╤Б╤И╨╕╤А╤П╤В╤М ╤Б╨╗╨╛╨▓╨░╤А╤М ╨┐╨╛ ╨╝╨╡╤А╨╡ ╨┐╨╛╤П╨▓╨╗╨╡╨╜╨╕╤П ╨▓ ╨╛╨▒╨╗╨░╨║╨╡.
+- Часть TOP-15 сейчас thin (`noindex`) - переобход всё равно имеет смысл, но индексация дождётся ≥ 6 офферов после sync/matching.
+- Отправка sitemap и клики в Вебмастере/GSC - только руками владельца.
 
 ---
 
-## 2026-07-23 - SEO: ╨▓╨╜╤Г╤В╤А╨╡╨╜╨╜╤П╤П ╨┐╨╡╤А╨╡╨╗╨╕╨╜╨║╨╛╨▓╨║╨░ + JSON-LD ItemList
+## 2026-07-23 - Hero главной: ротация славянских туристов
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╤Г╨╢╨╡╨╜ ╤Б╨║╨▓╨╛╨╖╨╜╨╛╨╣ ╨▓╨╡╤Б ╤Б ╨│╨╗╨░╨▓╨╜╨╛╨╣ ╨╜╨░ CHPU-╨┐╨╛╤Б╨░╨┤╨║╨╕; ╨║╤А╨╛╤И╨║╨╕ ╤Б╨╛╨▒╤Л╤В╨╕╤П ╨▓╨╡╨╗╨╕ ╨╜╨░ `/events`, ╨▒╨╡╨╖ ╨║╨░╤В╨╡╨│╨╛╤А╨╕╨╕; ╨╜╨░ ╨╗╨╕╤Б╤В╨╕╨╜╨│╨░╤Е ╨╜╨╡ ╨▒╤Л╨╗╨╛ ┬л╨б╨╝╨╛╤В╤А╨╕╤В╨╡ ╤В╨░╨║╨╢╨╡┬╗ ╨╕ SSR `ItemList`.
+- Hero был один кадр (`home-hero-friends-selfie.jpg` + mobile crop); эталон в `apps/public/public/images/hero/`, sync в Next при `web:build`.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨д╤Г╤В╨╡╤А: ╨▒╨╗╨╛╨║ ┬л╨Я╨╛╨┐╤Г╨╗╤П╤А╨╜╤Л╨╡ ╨╜╨░╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╤П┬╗ (╨Ь╨╛╤Б╨║╨▓╨░ / ╨б╨Я╨▒) ╤Б ╤А╨╡╨░╨╗╤М╨╜╤Л╨╝╨╕ CHPU ╨╕ `/podborki/{intent}/{city}` (`seo-internal-links.ts`).
-- Event breadcrumbs: `╨У╨╗╨░╨▓╨╜╨░╤П тЖТ ╨У╨╛╤А╨╛╨┤ тЖТ Landing тЖТ Title` + matching ╨┐╨╛ `landingSlugs` / ╤Н╨▓╤А╨╕╤Б╤В╨╕╨║╨╡; JSON-LD BreadcrumbList ╤Б╨╛╨│╨╗╨░╤Б╨╛╨▓╨░╨╜.
-- Landing: ╨▒╨╗╨╛╨║ ┬л╨б╨╝╨╛╤В╤А╨╕╤В╨╡ ╤В╨░╨║╨╢╨╡┬╗ (╨║╨╛╨╜╤Д╨╕╨│ slug├Чcity) ╨╜╨░╨┤ SEO-╤В╨╡╨║╤Б╤В╨╛╨╝; SSR `BreadcrumbList` + `ItemList` ╤В╨╛╨╗╤М╨║╨╛ ╨╜╨░ CHPU ╨┐╤А╨╕ non-empty sessions.
+- Добавлены 6 кадров `hero-slavic-01..06.png` (славянская внешность, позитивные эмоции, разные сцены).
+- Пул `HOME_HERO_IMAGES` (7 шт. с учётом старого selfie); SSR-выбор `pickHomeHeroImage()` + `connection()` на каждый запрос без hydration flash.
+- Alt на русском; `HomeHeroBackground` принимает выбранный сет.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+**Prod @`ee002e7`:** deploy-prod-next OK; `/` dynamic; 5 запросов → разные hero (`slavic-01`, selfie, `slavic-05`, …); PNG 200.
 
-- ╨Э╨╡╤В.
+### Проблемы
 
-**Prod @`0cf20db`:** footer ┬л╨Я╨╛╨┐╤Г╨╗╤П╤А╨╜╤Л╨╡ ╨╜╨░╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╤П┬╗ ╨╜╨░ `/` ╤Б╨╛ ╨▓╤Б╨╡╨╝╨╕ 8 CHPU/intent URL; event standup SPB breadcrumbs `╨У╨╗╨░╨▓╨╜╨░╤П тЖТ ╨б╨░╨╜╨║╤В-╨Я╨╡╤В╨╡╤А╨▒╤Г╤А╨│ тЖТ ╨б╤В╨╡╨╜╨┤╨░╨┐ ╨╕ ╤О╨╝╨╛╤А`; `/rechnye-progulki/saint-petersburg/` - ┬л╤З╨░╤Б╤В╨╛ ╨╕╤Й╤Г╤В┬╗ + SSR `BreadcrumbList` + `ItemList`.
+- Нет.
+
+---
+
+## 2026-07-23 - SEO Казань/Екб: падежи + 3 meta-шаблона + thin cards
+
+
+### Наблюдения
+
+- Падежи Казани/Екатеринбурга уже были в `city-declension.ts`; не хватало единой API `{City_Им/Род/Пр}` по slug и отдельных формул meta.
+- Порог индекса `MIN_LISTING_OFFERS_FOR_INDEX = 6` оставлен (не поднимать).
+
+### Решения
+
+- `resolveCityCases` / `isSeoExpansionCity` + slug→имя в `city-declension.ts`.
+- Шаблон №1 listing (Казань/Екб): title с `:`, description «Актуальная афиша категории… Daibilet.ru» (`seo-listing-meta.ts`). Москва/СПб без регресса (старый dash / «Ищете…»).
+- Шаблон №2 hub: `Афиша {Род} {Год} - куда сходить…` (`city-hub-seo.ts`).
+- Шаблон №3 event: title с optional «от N руб.» (`seo-event-meta.ts`).
+- Thin trick: при ровно 6–7 офферах - `LandingThinRelatedCards` (3–4 карточки смежных категорий) рядом с «Смотрите также».
+
+### Проблемы
+
+- Нет.
+
+---
+
+## 2026-07-23 - SEO owner brief: порог 6, теги → CHPU, trust contacts
+
+### Наблюдения
+
+- База ~2400 событий: СПб ~819, Москва ~663, Екатеринбург ~57, Казань ~51. Порог индексации листингов 10-12 срежет половину посадок Екб/Казань.
+- `/podborki` облако тегов вело на thin `/events?q=…`, хотя CHPU landings/intent уже есть.
+- Контакты: email есть, телефона нет (ждём 8-800). ИНН/ОГРНИП были на `/contacts`, но в футере реквизиты не светились - для Яндекса (ниша билеты) слабый trust.
+- Тексты в карточках для роботов бедноваты; фокус SEO остаётся на листингах, карточки не раздуваем.
+
+### Решения
+
+- `MIN_LISTING_OFFERS_FOR_INDEX = 6` подтверждён и оставлен; soft-цель `SOFT_LISTING_OFFERS_TARGET = 10`.
+- `buildCatalogTagHref` / `resolveCatalogTagHref`: тег → CHPU landing/intent (city-aware); `/events?q=` только fallback. На топ-24 тегах каталога: **23 CHPU / 1 fallback** (`Шоу - программа`).
+- Футер: ИНН + ОГРНИП рядом с email + ссылка на `/requisites`. `/contacts`: ИНН/ОГРНИП усилены (отдельные строки, не muted). Телефон не добавляем.
+
+**Prod @`c72364f`:** deploy-prod-next OK; `/podborki` tag cloud - 23 CHPU + 1 query fallback; home footer содержит ИНН/ОГРНИП; `/contacts` реквизиты на месте.
+
+### Проблемы
+
+- Публичный 8-800 / городской номер pending у владельца (SEO.9).
+- Часть редких тегов останется на query-fallback - расширять словарь по мере появления в облаке.
+
+---
+
+## 2026-07-23 - SEO: внутренняя перелинковка + JSON-LD ItemList
+
+### Наблюдения
+
+- Нужен сквозной вес с главной на CHPU-посадки; крошки события вели на `/events`, без категории; на листингах не было «Смотрите также» и SSR `ItemList`.
+
+### Решения
+
+- Футер: блок «Популярные направления» (Москва / СПб) с реальными CHPU и `/podborki/{intent}/{city}` (`seo-internal-links.ts`).
+- Event breadcrumbs: `Главная → Город → Landing → Title` + matching по `landingSlugs` / эвристике; JSON-LD BreadcrumbList согласован.
+- Landing: блок «Смотрите также» (конфиг slug×city) над SEO-текстом; SSR `BreadcrumbList` + `ItemList` только на CHPU при non-empty sessions.
+
+### Проблемы
+
+- Нет.
+
+**Prod @`0cf20db`:** footer «Популярные направления» на `/` со всеми 8 CHPU/intent URL; event standup SPB breadcrumbs `Главная → Санкт-Петербург → Стендап и юмор`; `/rechnye-progulki/saint-petersburg/` - «часто ищут» + SSR `BreadcrumbList` + `ItemList`.
 
 ---
 
 ## 2026-07-23 - catalog cards: eye-line object-position
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╨░ ╨║╨░╤А╤В╨╛╤З╨║╨░╤Е ╨║╨░╤В╨░╨╗╨╛╨│╨░ (Pianissimo: ╨з╨╡╤Д╨░╨╜╨╛╨▓ / ╨Ь╨╛╤О╨╜ ╨о╨╜) `object-fit: cover` ╨▒╨╡╨╖ `object-position` (╨┤╨╡╤Д╨╛╨╗╤В center 50%) ╤А╨╡╨╖╨░╨╗ ╨┐╨╛╤А╤В╤А╨╡╤В╨╜╤Л╨╡ ╨░╤Д╨╕╤И╨╕ ╨┐╨╛ ╨│╨╗╨░╨╖╨░╨╝/╨╗╨▒╤Г ╨▓ 16:9 ╨┐╤А╨╡╨▓╤М╤О.
-- ╨Э╨░ ╤Б╤В╤А╨░╨╜╨╕╤Ж╨╡ ╤Б╨╛╨▒╤Л╤В╨╕╤П ╤Г╨╢╨╡ ╨▒╤Л╨╗ eye-focus (`event-image-focus.ts`, default `center 18%` + overrides Saprykin/Nurminsky).
+- На карточках каталога (Pianissimo: Чефанов / Моюн Юн) `object-fit: cover` без `object-position` (дефолт center 50%) резал портретные афиши по глазам/лбу в 16:9 превью.
+- На странице события уже был eye-focus (`event-image-focus.ts`, default `center 18%` + overrides Saprykin/Nurminsky).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜ `resolveEventCardObjectPosition`: ╤В╨╡ ╨╢╨╡ overrides, default `center 20%` ╨┐╨╛╨┤ 16:9 card crop.
-- ╨Я╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╨╛ ╨▓ `EventCard` / Showcase / `EventCardHorizontal`. Hero API ╨╜╨╡ ╨╝╨╡╨╜╤П╨╗╤Б╤П (`center 18%`).
-- ╨в╨╛╤З╨╡╤З╨╜╤Л╨╡ Pianissimo overrides ╨╜╨╡ ╨╜╤Г╨╢╨╜╤Л: ╨┤╨╡╤Д╨╛╨╗╤В ╨┤╨╡╤А╨╢╨╕╤В ╨│╨╗╨░╨╖╨░ ╨▓ ╨║╨░╨┤╤А╨╡.
+- Добавлен `resolveEventCardObjectPosition`: те же overrides, default `center 20%` под 16:9 card crop.
+- Подключено в `EventCard` / Showcase / `EventCardHorizontal`. Hero API не менялся (`center 18%`).
+- Точечные Pianissimo overrides не нужны: дефолт держит глаза в кадре.
 
-**Prod @`539f571`:** deploy-prod-next OK; `/events?q=Pianissimo` HTML ╤Б╨╛╨┤╨╡╤А╨╢╨╕╤В `object-position: center 20%`; event hero Pianissimo ╨╛╤Б╤В╨░╤С╤В╤Б╤П `center 18%`.
+**Prod @`539f571`:** deploy-prod-next OK; `/events?q=Pianissimo` HTML содержит `object-position: center 20%`; event hero Pianissimo остаётся `center 18%`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В.
-
----
-
-## 2026-07-23 - mobile UX ╨║╨░╤В╨░╨╗╨╛╨│╨░ `/events`
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Я╨╛╤Б╨╗╨╡ ╤Г╨┐╤А╨╛╤Й╨╡╨╜╨╕╤П toolbar (`bfc8cb7`) desktop ╤Б╤В╨░╨╗ ╤З╨╕╤Й╨╡, ╨╜╨╛ mobile ╨╛╤Б╤В╨░╨▓╨░╨╗╤Б╤П ┬л╤Б╨╢╨░╤В╤Л╨╝ desktop┬╗: ╨┐╨╛╨╗╨╜╤Л╨╣ search + select ╨┤╨░╤В╤Л + ╤В╤П╨╢╤С╨╗╤Л╨╣ active-card, sort ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛, page-size ╨▓ title.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Sticky compact bar (╨┐╨╛╨┤ site header): ╨┐╨╛╨╕╤Б╨║-pill / ╤З╨╕╨┐ ╨┤╨░╤В╤Л / ╨╕╨║╨╛╨╜╨║╨░ ╨д╨╕╨╗╤М╤В╤А╤Л ╤Б badge; ╤А╨░╤Б╨║╤А╤Л╤В╨╕╨╡ ╨┐╨╛╨╕╤Б╨║╨░ ╨┐╨╛ ╤В╨░╨┐╤Г.
-- ╨У╨╛╤А╨╕╨╖╨╛╨╜╤В╨░╨╗╤М╨╜╤Л╨╣ date scroller (╨Ы╤О╨▒╨░╤П / ╨б╨╡╨│╨╛╨┤╨╜╤П / ╨Ч╨░╨▓╤В╤А╨░ / ╨Т╤Л╤Е╨╛╨┤╨╜╤Л╨╡ / ╨Т╨╡╤З╨╡╤А) ╨▓╨╝╨╡╤Б╤В╨╛ select ╨╜╨░ mobile.
-- ╨Ъ╨░╤В╨╡╨│╨╛╤А╨╕╨╕ ╤Б ╨▒╨╛╨╗╤М╤И╨╕╨╝ visual weight + snap; ╨┐╨╛╨┤╨▒╨╛╤А╨║╨╕ secondary; sort chips + view ╤Г ╨▓╤Л╨┤╨░╤З╨╕; page-size ╤В╨╛╨╗╤М╨║╨╛ desktop.
-- ╨Я╨░╨│╨╕╨╜╨░╤Ж╨╕╤П: ╨╜╨░ mobile siblingCount=0 (╤Г╨╢╨╡ ╨╛╨║╨╜╨╛ ╨╜╨╛╨╝╨╡╤А╨╛╨▓) + prev/next.
-- URL/query, city-in-header, live search, advanced drawer ╨▒╨╡╨╖ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╣ ╨║╨╛╨╜╤В╤А╨░╨║╤В╨░.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- Browser MCP ╨╜╨╡╨┤╨╛╤Б╤В╤Г╨┐╨╡╨╜ ╨┤╨╗╤П viewport-smoke ╨┤╨╛ ╨┤╨╡╨┐╨╗╨╛╤П; ╨┐╤А╨╛╨▓╨╡╤А╨║╨░ ╤З╨╡╤А╨╡╨╖ curl HTML + ╤А╤Г╤З╨╜╨╛╨╣ ╤В╨╡╨╗╨╡╤Д╨╛╨╜.
+- Нет.
 
 ---
 
-## 2026-07-23 - ╤Г╨┐╤А╨╛╤Й╨╡╨╜╨╕╨╡ ╤Д╨╕╨╗╤М╤В╤А╨╛╨▓ ╨║╨░╤В╨░╨╗╨╛╨│╨░ ╨╕ numbered pagination
+## 2026-07-23 - mobile UX каталога `/events`
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨С╨╗╨╛╨║ ╤Д╨╕╨╗╤М╤В╤А╨╛╨▓ `/events` ╨▒╤Л╨╗ ╨┐╨╡╤А╨╡╨│╤А╤Г╨╢╨╡╨╜: ╨│╨╛╤А╨╛╨┤ ╨┤╤Г╨▒╨╗╨╕╤А╨╛╨▓╨░╨╗╤Б╤П (╤Е╨╡╨┤╨╡╤А + ╤З╨╕╨┐ + select), live-╤З╨╕╨┐╤Л ╤Б╨╝╨╡╤И╨╕╨▓╨░╨╗╨╕╤Б╤М ╤Б ╤Д╨╛╤А╨╝╨╛╨╣ ╨╕ ╨║╨╜╨╛╨┐╨║╨╛╨╣ ┬л╨Э╨░╨╣╤В╨╕┬╗, ╨║╨░╤В╨╡╨│╨╛╤А╨╕╨╕ ╨╕ ╨┐╨╛╨┤╨▒╨╛╤А╨║╨╕ ╤И╨╗╨╕ ╨┤╨▓╤Г╨╝╤П ╤В╤П╨╢╤С╨╗╤Л╨╝╨╕ ╤А╤П╨┤╨░╨╝╨╕.
-- ╨Я╨░╨│╨╕╨╜╨░╤Ж╨╕╤П ╨▒╤Л╨╗╨░ ╤В╨╛╨╗╤М╨║╨╛ prev/next ╨▒╨╡╨╖ ╨┐╤А╤Л╨╢╨║╨░ ╨╜╨░ ╨╜╨╛╨╝╨╡╤А ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л.
+- После упрощения toolbar (`bfc8cb7`) desktop стал чище, но mobile оставался «сжатым desktop»: полный search + select даты + тяжёлый active-card, sort отдельно, page-size в title.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- Toolbar: ╨┐╨╛╨╕╤Б╨║ ┬╖ ╨┤╨░╤В╨░ ┬╖ ┬л╨д╨╕╨╗╤М╤В╤А╤Л┬╗; ╨│╨╛╤А╨╛╨┤ ╤Г╨▒╤А╨░╨╜ ╨╕╨╖ toolbar ╨╕ ╨╕╨╖ active-chips; ┬л╨Э╨░╨╣╤В╨╕┬╗ ╤Г╨▒╤А╨░╨╜ (debounce + Enter); ╨║╨░╤В╨╡╨│╨╛╤А╨╕╨╕ - primary intent; ╨┐╨╛╨┤╨▒╨╛╤А╨║╨╕ ╤Б╨╗╨░╨▒╨╡╨╡/╤Б╨▓╨╛╤А╨░╤З╨╕╨▓╨░╤О╤В╤Б╤П; ╤Б╨╛╤А╤В ╤Г ╨▓╤Л╨┤╨░╤З╨╕.
-- `CatalogPaginationLinks`: numbered window `1 тАж ╨╛╨║╤А╨╡╤Б╤В╨╜╨╛╤Б╤В╤М тАж last` + prev/next, query params ╤Б╨╛╤Е╤А╨░╨╜╤П╤О╤В╤Б╤П.
+- Sticky compact bar (под site header): поиск-pill / чип даты / иконка Фильтры с badge; раскрытие поиска по тапу.
+- Горизонтальный date scroller (Любая / Сегодня / Завтра / Выходные / Вечер) вместо select на mobile.
+- Категории с большим visual weight + snap; подборки secondary; sort chips + view у выдачи; page-size только desktop.
+- Пагинация: на mobile siblingCount=0 (уже окно номеров) + prev/next.
+- URL/query, city-in-header, live search, advanced drawer без изменений контракта.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В.
+- Browser MCP недоступен для viewport-smoke до деплоя; проверка через curl HTML + ручной телефон.
+
+---
+
+## 2026-07-23 - упрощение фильтров каталога и numbered pagination
+
+### Наблюдения
+
+- Блок фильтров `/events` был перегружен: город дублировался (хедер + чип + select), live-чипы смешивались с формой и кнопкой «Найти», категории и подборки шли двумя тяжёлыми рядами.
+- Пагинация была только prev/next без прыжка на номер страницы.
+
+### Решения
+
+- Toolbar: поиск · дата · «Фильтры»; город убран из toolbar и из active-chips; «Найти» убран (debounce + Enter); категории - primary intent; подборки слабее/сворачиваются; сорт у выдачи.
+- `CatalogPaginationLinks`: numbered window `1 … окрестность … last` + prev/next, query params сохраняются.
+
+### Проблемы
+
+- Нет.
 
 ---
 
 
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Hero CTA ╨▓╤Л╨▓╨╛╨┤╨╕╨╗ ╤В╨╛╤В ╨╢╨╡ ╤Д╨╛╤А╨╝╨░╤В ╤Ж╨╡╨╜╤Л, ╤З╤В╨╛ ╨╕ buy-card. ╨Ф╨╗╤П ╤Б╨╛╨▒╤Л╤В╨╕╤П Anastasiya Vysotskaya LADYNSAX payload ╤Б╨╛╨┤╨╡╤А╨╢╨╕╤В ╤В╨╛╤З╨╜╤Л╨╡ ╨║╨░╤В╨╡╨│╨╛╤А╨╕╨╕ ╨╛╤В 1 000 ╨┤╨╛ 3 000 тВ╜, ╨┐╨╛╤Н╤В╨╛╨╝╤Г ╨▓ ╨║╨╜╨╛╨┐╨║╨╡ ╨┐╨╛╤П╨▓╨╗╤П╨╗╤Б╤П ╨┤╨╕╨░╨┐╨░╨╖╨╛╨╜.
+- Hero CTA выводил тот же формат цены, что и buy-card. Для события Anastasiya Vysotskaya LADYNSAX payload содержит точные категории от 1 000 до 3 000 ₽, поэтому в кнопке появлялся диапазон.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨д╨╛╤А╨╝╨░╤В╤В╨╡╤А╤Л ╤А╨░╨╖╨┤╨╡╨╗╨╡╨╜╤Л: hero CTA ╨▓╤Б╨╡╨│╨┤╨░ ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╡╤В ╨╝╨╕╨╜╨╕╨╝╤Г╨╝ ╨▓ ╨▓╨╕╨┤╨╡ `╨╛╤В 1 000 тВ╜`, ╨░ buy-card ╤Б╨╛╤Е╤А╨░╨╜╤П╨╡╤В ╨╛╨┤╨╜╤Г ╤В╨╛╤З╨╜╤Г╤О ╤Ж╨╡╨╜╤Г ╨╕╨╗╨╕ ╨┤╨╕╨░╨┐╨░╨╖╨╛╨╜ ╨║╨░╤В╨╡╨│╨╛╤А╨╕╨╣.
-- ╨Т ╨▓╨╕╨┤╨╕╨╝╤Л╤Е ╤Б╤В╤А╨╛╨║╨░╤Е event page ╨╖╨░╨╝╨╡╨╜╨╡╨╜╤Л ╨┤╨╗╨╕╨╜╨╜╤Л╨╡ ╨╕ ╤Б╤А╨╡╨┤╨╜╨╕╨╡ ╤В╨╕╤А╨╡ ╨╜╨░ ╨╛╨▒╤Л╤З╨╜╤Л╨╣ ╨┤╨╡╤Д╨╕╤Б.
-- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜╤Л ╤В╨╡╤Б╤В╤Л ╨┤╨╗╤П hero ╤Б ╨╝╨╕╨╜╨╕╨╝╨░╨╗╤М╨╜╨╛╨╣ ╤Ж╨╡╨╜╨╛╨╣, ╨┤╨╕╨░╨┐╨░╨╖╨╛╨╜╨░ buy-card ╨╕ ╨╛╨┤╨╜╨╛╨╣ ╤В╨╛╤З╨╜╨╛╨╣ ╤Ж╨╡╨╜╤Л.
+- Форматтеры разделены: hero CTA всегда показывает минимум в виде `от 1 000 ₽`, а buy-card сохраняет одну точную цену или диапазон категорий.
+- В видимых строках event page заменены длинные и средние тире на обычный дефис.
+- Добавлены тесты для hero с минимальной ценой, диапазона buy-card и одной точной цены.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В.
-
----
-
-## 2026-07-23 - ╨┐╨╗╨░╨▓╨╜╤Л╨╣ ultrawide hero city hub
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨г hero ╨│╨╛╤А╨╛╨┤╨░ ╨╜╨░ ╤И╨╕╤А╨╕╨╜╨░╤Е ╨╛╤В 1600px ╨┐╤А╨╕╨╝╨╡╨╜╤П╨╗╨╛╤Б╤М ╤А╨╡╨╖╨║╨╛╨╡ ╤Г╨▓╨╡╨╗╨╕╤З╨╡╨╜╨╕╨╡ ╨╕╨╖╨╛╨▒╤А╨░╨╢╨╡╨╜╨╕╤П: ╨▓╤Л╤Б╨╛╤В╨░ ╤Б╤А╨░╨╖╤Г ╤Б╤В╨░╨╜╨╛╨▓╨╕╨╗╨░╤Б╤М 118%, ╨░ ╤И╨╕╤А╨╕╨╜╨░ ╨╝╨╡╨╜╤П╨╗╨░╤Б╤М ╨┤╨╛ 72vw. ╨Э╨░ ╨┐╨╡╤А╨╡╤Е╨╛╨┤╨╡ ╤Б ╨╛╨▒╤Л╤З╨╜╨╛╨│╨╛ desktop ╤Н╤В╨╛ ╤Б╨╛╨╖╨┤╨░╨▓╨░╨╗╨╛ ╨╖╨░╨╝╨╡╤В╨╜╤Л╨╣ ╤Б╨║╨░╤З╨╛╨║ ╨║╨╛╨╝╨┐╨╛╨╖╨╕╤Ж╨╕╨╕.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨Ф╨╗╤П `CityHeroDefault` ╤А╨░╨╖╨╝╨╡╤А hero-╨║╨░╨┤╤А╨░ ╨┐╨╛╤Б╨╗╨╡ 1600px ╤А╨░╤Б╤Б╤З╨╕╤В╤Л╨▓╨░╨╡╤В╤Б╤П ╤З╨╡╤А╨╡╨╖ `clamp()`: ╤Б╤В╨░╤А╤В╤Г╨╡╤В ╤Б ╨┐╤А╨╡╨╢╨╜╨╕╤Е desktop 50rem ╨╕ 100% ╨▓╤Л╤Б╨╛╤В╤Л, ╨╖╨░╤В╨╡╨╝ ╨┐╨╗╨░╨▓╨╜╨╛ ╤А╨░╤Б╤В╤С╤В ╨┤╨╛ 70rem ╨╕ 118% ╨╜╨░ ultrawide.
-- `sizes` ╤Б╨╕╨╜╤Е╤А╨╛╨╜╨╕╨╖╨╕╤А╨╛╨▓╨░╨╜ ╤Б ╨╜╨╛╨▓╨╛╨╣ ╤Д╨╛╤А╨╝╤Г╨╗╨╛╨╣ ╤И╨╕╤А╨╕╨╜╤Л, ╤З╤В╨╛╨▒╤Л ╨▒╤А╨░╤Г╨╖╨╡╤А ╨╖╨░╨┐╤А╨░╤И╨╕╨▓╨░╨╗ ╨┐╨╛╨┤╤Е╨╛╨┤╤П╤Й╨╕╨╣ ╤А╨░╨╖╨╝╨╡╤А ╨╕╨╖╨╛╨▒╤А╨░╨╢╨╡╨╜╨╕╤П.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Ы╨╛╨║╨░╨╗╤М╨╜╤Л╨╡ Node/pnpm-╨╕╨╜╤Б╤В╤А╤Г╨╝╨╡╨╜╤В╤Л ╨▓ ╤А╨░╨▒╨╛╤З╨╡╨╝ ╨╛╨║╤А╤Г╨╢╨╡╨╜╨╕╨╕ ╨╜╨╡╨┤╨╛╤Б╤В╤Г╨┐╨╜╤Л, ╨┐╨╛╤Н╤В╨╛╨╝╤Г ╨░╨▓╤В╨╛╨╝╨░╤В╨╕╤З╨╡╤Б╨║╨░╤П ╨┐╤А╨╛╨▓╨╡╤А╨║╨░ ╤Б╨▒╨╛╤А╨║╨╕ ╨╜╨╡ ╨▓╤Л╨┐╨╛╨╗╨╜╨╡╨╜╨░. ╨Ш╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╡ ╨╛╨│╤А╨░╨╜╨╕╤З╨╡╨╜╨╛ utility-╨║╨╗╨░╤Б╤Б╨░╨╝╨╕ Tailwind ╨▓ ╨║╨╗╨╕╨╡╨╜╤В╤Б╨║╨╛╨╝ hero.
+- Нет.
 
 ---
 
-## 2026-07-23 - ╤В╨╛╤З╨╜╨╛╤Б╤В╤М ╨▓╤Л╨┤╨░╤З╨╕ ╨╖╨░╨│╨╛╤А╨╛╨┤╨╜╤Л╤Е ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╣
+## 2026-07-23 - плавный ultrawide hero city hub
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Prod `GET /api/public/landings/country-tours` ╨╛╤В╨┤╨░╨▓╨░╨╗ 10 ╤Б╨╡╤Б╤Б╨╕╨╣. ╨Э╨░╤А╤П╨┤╤Г ╤Б ╤В╤А╨╡╨╝╤П ╨┐╤А╨╛╤Д╨╕╨╗╤М╨╜╤Л╨╝╨╕ ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╤П╨╝╨╕ ╤В╤Г╨┤╨░ ╨┐╨╛╨┐╨░╨┤╨░╨╗╨╕ ╤Б╨┐╨╡╨║╤В╨░╨║╨╗╨╕, ╨║╨╛╨╜╤Ж╨╡╤А╤В╤Л, ╨╝╤Г╨╖╤Л╨║╨░╨╗╤М╨╜╤Л╨╡ ╤З╤В╨╡╨╜╨╕╤П ╨╕ ╨╕╨╜╤В╨╡╤А╨░╨║╤В╨╕╨▓╨╜╤Л╨╡ ╨┐╤А╨╛╨│╤А╨░╨╝╨╝╤Л, ╨╡╤Б╨╗╨╕ ╨▓ ╨╕╤Е ╨╜╨░╨╖╨▓╨░╨╜╨╕╨╕ ╨▓╤Б╤В╤А╨╡╤З╨░╨╗╨╕╤Б╤М ╨Я╨╡╤В╨╡╤А╨│╨╛╤Д, ╨Я╤Г╤И╨║╨╕╨╜ ╨╕╨╗╨╕ ╨┤╤А╤Г╨│╨╛╨╣ ╨┐╤А╨╕╨│╨╛╤А╨╛╨┤.
-- ╨Я╤А╨╕╤З╨╕╨╜╨░: ╨┐╤А╨░╨▓╨╕╨╗╨╛ `country-tours` ╤Б╤З╨╕╤В╨░╨╗╨╛ ╨┤╨╛╤Б╤В╨░╤В╨╛╤З╨╜╤Л╨╝ ╨╛╨┤╨╕╨╜ ╨╜╨░╨┐╤А╨░╨▓╨╗╨╡╨╜╤З╨╡╤Б╨║╨╕╨╣ keyword ╨▓ content-╨┐╨╛╨╗╤П╤Е ╨╕ ╨╜╨╡ ╤В╤А╨╡╨▒╨╛╨▓╨░╨╗╨╛ ╨┐╤А╨╕╨╖╨╜╨░╨║╨░ ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕.
+- У hero города на ширинах от 1600px применялось резкое увеличение изображения: высота сразу становилась 118%, а ширина менялась до 72vw. На переходе с обычного desktop это создавало заметный скачок композиции.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ф╨╗╤П `country-tours` ╨┤╨╛╨▒╨░╨▓╨╗╨╡╨╜╤Л ╨┤╨▓╨╡ ╨╛╨▒╤П╨╖╨░╤В╨╡╨╗╤М╨╜╤Л╨╡ ╨│╤А╤Г╨┐╨┐╤Л ╤Б╨╕╨│╨╜╨░╨╗╨╛╨▓: `╤Н╨║╤Б╨║╤Г╤А╤Б` ╨╕ ╨╛╨┤╨╕╨╜ ╨╕╨╖ ╤В╨╛╨┐╨╛╨╜╨╕╨╝╨╛╨▓/╨╜╨░╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╨╣ ╨╖╨░╨│╨╛╤А╨╛╨┤╨╜╨╛╨╣ ╨┐╨╛╨╡╨╖╨┤╨║╨╕. ╨б╨╕╨│╨╜╨░╨╗ ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕ ╨╝╨╛╨╢╨╡╤В ╨┐╤А╨╕╤Е╨╛╨┤╨╕╤В╤М ╨╕╨╖ ╨║╨░╤В╨╡╨│╨╛╤А╨╕╨╕, ╤В╨╡╨│╨░ ╨╕╨╗╨╕ ╨╜╨░╨╖╨▓╨░╨╜╨╕╤П.
-- ╨Ю╨│╤А╨░╨╜╨╕╤З╨╡╨╜╨╕╨╡ ╨│╨╛╤А╨╛╨┤╨░ `╨б╨░╨╜╨║╤В-╨Я╨╡╤В╨╡╤А╨▒╤Г╤А╨│` ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╨╛. ╨а╨╡╨│╤А╨╡╤Б╤Б╨╕╨╛╨╜╨╜╤Л╨╣ ╤В╨╡╤Б╤В ╨┐╨╛╨║╤А╤Л╨▓╨░╨╡╤В ╤А╨╡╨╗╨╡╨▓╨░╨╜╤В╨╜╤Л╨╡ ╨░╨▓╤В╨╛╨▒╤Г╤Б╨╜╤Л╨╡ ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕ ╨▓ ╨Я╨╡╤В╨╡╤А╨│╨╛╤Д ╨╕ ╨Т╤Л╨▒╨╛╤А╨│, ╨░ ╤В╨░╨║╨╢╨╡ ╨║╨╛╨╜╤Ж╨╡╤А╤В╤Л, ╤В╨╡╨░╤В╤А, ╨╝╨░╤Б╤В╨╡╤А-╨║╨╗╨░╤Б╤Б╤Л ╨╕ ╨╝╨╛╤Б╨║╨╛╨▓╤Б╨║╤Г╤О ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╤О ╨║╨░╨║ ╨╛╤В╤А╨╕╤Ж╨░╤В╨╡╨╗╤М╨╜╤Л╨╡ ╤Б╨╗╤Г╤З╨░╨╕.
+- Для `CityHeroDefault` размер hero-кадра после 1600px рассчитывается через `clamp()`: стартует с прежних desktop 50rem и 100% высоты, затем плавно растёт до 70rem и 118% на ultrawide.
+- `sizes` синхронизирован с новой формулой ширины, чтобы браузер запрашивал подходящий размер изображения.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Ш╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╡ ╨╗╨╛╨║╨░╨╗╤М╨╜╨╛╨╡: ╨╜╨░ prod ╤Б╤В╨░╤А╨░╤П ╨▓╤Л╨┤╨░╤З╨░ ╤Б╨╛╤Е╤А╨░╨╜╨╕╤В╤Б╤П ╨┤╨╛ ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛╨│╨╛ ╨╖╨░╨┐╤А╨╛╤И╨╡╨╜╨╜╨╛╨│╨╛ ╨┤╨╡╨┐╨╗╨╛╤П. ╨Ы╨╛╨║╨░╨╗╤М╨╜╤Л╨╡ Node/pnpm-╨╕╨╜╤Б╤В╤А╤Г╨╝╨╡╨╜╤В╤Л ╨▓ ╤А╨░╨▒╨╛╤З╨╡╨╝ ╨╛╨║╤А╤Г╨╢╨╡╨╜╨╕╨╕ ╨╜╨╡╨┤╨╛╤Б╤В╤Г╨┐╨╜╤Л, ╨┐╨╛╤Н╤В╨╛╨╝╤Г ╨░╨▓╤В╨╛╨╝╨░╤В╨╕╤З╨╡╤Б╨║╨╕╨╣ ╨╖╨░╨┐╤Г╤Б╨║ ╤В╨╡╤Б╤В╨░ ╨╕ ╤В╨╛╤З╨╜╤Л╨╣ ╨┐╨╡╤А╨╡╤Б╤З╤С╤В ╨┐╨╛╤Б╨╗╨╡ ╨┐╤А╨░╨▓╨╕╨╗╨░ ╨╜╨╡ ╨▓╤Л╨┐╨╛╨╗╨╜╨╡╨╜╤Л.
-
----
-
-## 2026-07-23 - ╤Г╤В╨▓╨╡╤А╨╢╨┤╤С╨╜╨╜╤Л╨╣ SEO launch set TOP-15
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Т category├Чcity ╨║╨╛╨╜╤В╤Г╤А╨╡ ╤Г╨╢╨╡ ╨▒╤Л╨╗╨╕ ╤А╨╡╤З╨╜╤Л╨╡ ╨┐╤А╨╛╨│╤Г╨╗╨║╨╕ ╨╕ ╤Б╤В╨╡╨╜╨┤╨░╨┐, ╨╜╨╛ ╨╜╨╡ ╤Е╨▓╨░╤В╨░╨╗╨╛ ╨┐╤А╨░╨▓╨╕╨╗ ╨╕ URL ╨┤╨╗╤П ╨┐╨╡╤И╨╕╤Е, ╨╖╨░╨│╨╛╤А╨╛╨┤╨╜╤Л╤Е ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╣, ╨▓╤Л╤Б╤В╨░╨▓╨╛╨║, ╨╜╨╡╨╛╨▒╤Л╤З╨╜╤Л╤Е ╤В╨╡╨░╤В╤А╨╛╨▓, ╨╛╨▒╤Й╨╕╤Е ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╣ ╨╕ ╨║╤А╤Л╤И.
-- ╨б╤В╨░╤А╤Л╨╣ intent slug `na-vyhodnyh` ╤А╨░╤Б╤Е╨╛╨┤╨╕╨╗╤Б╤П ╤Б ╤Г╤В╨▓╨╡╤А╨╢╨┤╤С╨╜╨╜╤Л╨╝ URL.
-- ╨Ъ╨╛╨╜╤В╨░╨║╤В╤Л ╤Г╨╢╨╡ ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╤О╤В ╨Ш╨Э╨Э ╨╕ ╨Ю╨У╨а╨Э╨Ш╨Я ╤А╤П╨┤╨╛╨╝ ╤Б ╨┤╨░╨╜╨╜╤Л╨╝╨╕ ╨Ш╨Я, ╨┐╨╛╤Н╤В╨╛╨╝╤Г ╨╜╨╛╨╝╨╡╤А ╤В╨╡╨╗╨╡╤Д╨╛╨╜╨░ ╨╜╨╡ ╤В╤А╨╡╨▒╤Г╨╡╤В╤Б╤П ╨┤╨╗╤П E-A-T ╨╜╨░ ╤В╨╡╨║╤Г╤Й╨╡╨╝ ╤Н╤В╨░╨┐╨╡.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨г╤В╨▓╨╡╤А╨╢╨┤╤С╨╜ launch set ╨╕╨╖ 15 URL: ╤А╨╡╤З╨╜╤Л╨╡ ╨┐╤А╨╛╨│╤Г╨╗╨║╨╕, ╤Б╤В╨╡╨╜╨┤╨░╨┐, ╨┐╨╡╤И╨╕╨╡ ╨╕ ╨╖╨░╨│╨╛╤А╨╛╨┤╨╜╤Л╨╡ ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕, ╨▓╤Л╤Б╤В╨░╨▓╨║╨╕ ╨╕ ╨╝╤Г╨╖╨╡╨╕, ╨╜╨╡╨╛╨▒╤Л╤З╨╜╤Л╨╡ ╤В╨╡╨░╤В╤А╤Л, ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕ ╨Ъ╨░╨╖╨░╨╜╨╕, ╨▒╨╡╤Б╨┐╨╗╨░╤В╨╜╤Л╨╡ ╤Б╨╛╨▒╤Л╤В╨╕╤П ╨╕ ╤Б╨╛╨▒╤Л╤В╨╕╤П ╨╜╨░ ╨▓╤Л╤Е╨╛╨┤╨╜╤Л╨╡ ╨▓ ╨Ь╨╛╤Б╨║╨▓╨╡ ╨╕ ╨б╨░╨╜╨║╤В-╨Я╨╡╤В╨╡╤А╨▒╤Г╤А╨│╨╡.
-- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜╤Л landing rules, category paths, city variants, SEO meta labels ╨╕ editorial seed ╨┤╨╗╤П ╨╜╨╛╨▓╤Л╤Е slug: `walking-tours`, `country-tours`, `exhibitions`, `unusual-theatres`, `excursions`, `rooftops`.
-- `rooftops` ╨╕ `country-tours` ╨╛╨│╤А╨░╨╜╨╕╤З╨╡╨╜╤Л ╨б╨░╨╜╨║╤В-╨Я╨╡╤В╨╡╤А╨▒╤Г╤А╨│╨╛╨╝ ╨▓ ╤А╨╛╤Г╤В╨╕╨╜╨│╨╡, static params ╨╕ sitemap. ╨Ь╨╛╤Б╨║╨╛╨▓╤Б╨║╨░╤П ╨┐╨╛╤Б╨░╨┤╨║╨░ ╨║╤А╤Л╤И ╨╜╨╡ ╤Б╨╛╨╖╨┤╨░╤С╤В╤Б╤П ╨╕ ╨╜╨╡ ╨┐╨╛╨┐╨░╨┤╨░╨╡╤В ╨▓ sitemap.
-- ╨Ъ╨░╨╜╨╛╨╜╨╕╤З╨╡╤Б╨║╨╕╨╣ intent URL: `na-vyhodnye`; `na-vyhodnyh` permanently redirect ╨╜╨░ ╨╜╨╡╨│╨╛.
-- ╨Я╨╛╤А╨╛╨│ ╨╕╨╜╨┤╨╡╨║╤Б╨░╤Ж╨╕╨╕ ╤Б╨╛╤Е╤А╨░╨╜╤С╨╜: `MIN_LISTING_OFFERS_FOR_INDEX = 6`. ╨Я╤А╨╕ ╨╝╨╡╨╜╤М╤И╨╡╨╝ ╤З╨╕╤Б╨╗╨╡ ╨╛╤Д╤Д╨╡╤А╨╛╨▓ URL ╨┤╨╛╤Б╤В╤Г╨┐╨╡╨╜, ╨╜╨╛ ╨┐╨╛╨╗╤Г╤З╨░╨╡╤В `noindex,follow` ╨╕ ╨╕╤Б╨║╨╗╤О╤З╨░╨╡╤В╤Б╤П ╨╕╨╖ sitemap.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Ш╨╜╨┤╨╡╨║╤Б╨░╤Ж╨╕╤П ╨║╨░╨╢╨┤╨╛╨╣ URL ╨╖╨░╨▓╨╕╤Б╨╕╤В ╨╛╤В ╨╜╨░╨╗╨╕╤З╨╕╤П ╨╝╨╕╨╜╨╕╨╝╤Г╨╝ ╤И╨╡╤Б╤В╨╕ ╨░╨║╤В╤Г╨░╨╗╤М╨╜╤Л╤Е ╨╛╤Д╤Д╨╡╤А╨╛╨▓ ╨┐╨╛╤Б╨╗╨╡ sync ╨║╨░╤В╨░╨╗╨╛╨│╨░. DB seed landing ╨╜╨╡ ╨╜╤Г╨╢╨╡╨╜: ╨┐╤А╨░╨▓╨╕╨╗╨░ ╤Д╨╛╤А╨╝╨╕╤А╤Г╤О╤В ╨▓╤Л╨┤╨░╤З╤Г ╨┐╨╛ ╨┤╨░╨╜╨╜╤Л╨╝ ╨║╨░╤В╨░╨╗╨╛╨│╨░.
-- ╨Я╤Г╨▒╨╗╨╕╤З╨╜╤Л╨╣ ╨╜╨╛╨╝╨╡╤А 8-800 ╨╕╨╗╨╕ ╨│╨╛╤А╨╛╨┤╤Б╨║╨╛╨╣ ╨╜╨╛╨╝╨╡╤А pending ╤Г ╨▓╨╗╨░╨┤╨╡╨╗╤М╤Ж╨░; ╤Д╨╡╨╣╨║╨╛╨▓╤Л╨╣ ╤В╨╡╨╗╨╡╤Д╨╛╨╜ ╨╜╨╡ ╨┤╨╛╨▒╨░╨▓╨╗╤П╨╡╤В╤Б╤П.
+- Локальные Node/pnpm-инструменты в рабочем окружении недоступны, поэтому автоматическая проверка сборки не выполнена. Изменение ограничено utility-классами Tailwind в клиентском hero.
 
 ---
 
-## 2026-07-22 тАФ SEO-╨╗╨╕╤Б╤В╨╕╨╜╨│╨╕ / ╨з╨Я╨г category├Чcity (╨┐╤А╨╕╨╛╤А╨╕╤В╨╡╤В vs ╨▒╨╗╨╛╨│)
+## 2026-07-23 - точность выдачи загородных экскурсий
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Ю╤А╨│╨░╨╜╨╕╨║╨░ ╤Г╨┐╨╕╤А╨░╨╡╤В╤Б╤П ╨▓ thin query-URL (`/events?тАж`) ╨╕ ╨╜╨╡╤Е╨▓╨░╤В╨║╤Г ╨╕╨╜╨┤╨╡╨║╤Б╨╕╤А╤Г╨╡╨╝╤Л╤Е category├Чcity ╨┐╨╛╤Б╨░╨┤╨╛╨║.
-- ╨г╨╢╨╡ ╨╡╤Б╤В╤М ╨║╨╛╨╜╤В╤Г╤А landings (`/rechnye-progulki/moscow`) ╨╕ city hubs; ╨╜╨╡╨╗╤М╨╖╤П ╨┐╨╗╨╛╨┤╨╕╤В╤М `/{city}/category`.
-- ╨п╨╜╨┤╨╡╨║╤Б ╤И╤В╤А╨░╤Д╤Г╨╡╤В ╨║╨╛╨╝╨╝╨╡╤А╤З╨╡╤Б╨║╨╕╨╡ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л ╤Б ╨┐╤Г╤Б╤В╨╛╨╣/╨▒╨╡╨┤╨╜╨╛╨╣ ╨▓╤Л╨┤╨░╤З╨╡╨╣.
+- Prod `GET /api/public/landings/country-tours` отдавал 10 сессий. Наряду с тремя профильными экскурсиями туда попадали спектакли, концерты, музыкальные чтения и интерактивные программы, если в их названии встречались Петергоф, Пушкин или другой пригород.
+- Причина: правило `country-tours` считало достаточным один направленческий keyword в content-полях и не требовало признака экскурсии.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨д╨╛╤А╨╝╤Г╨╗╤Л meta ╨▓ `seo-listing-meta.ts` (╨│╨╛╨┤ ╨▓ title, description ╨▒╨╡╨╖ ╤Б╤В╤А╨╡╨╗╨╛╨║).
-- Editorial seed `seo-listing-texts.ts` (~18 ╤В╨╡╨║╤Б╤В╨╛╨▓) + fallback; ╨▒╨╗╨╛╨║ `LandingSeoBottom` ╨┐╨╛╨┤ ╤Б╨╡╤В╨║╨╛╨╣.
-- ╨Я╨╛╤А╨╛╨│ ╨╕╨╜╨┤╨╡╨║╤Б╨░╤Ж╨╕╨╕ ╨╗╨╕╤Б╤В╨╕╨╜╨│╨╛╨▓: **тЙе 6** ╨╛╤Д╤Д╨╡╤А╨╛╨▓ (`noindex,follow` ╨╕╨╜╨░╤З╨╡); sitemap landings ╤Д╨╕╨╗╤М╤В╤А╤Г╨╡╤В thin city-variants.
-- Intent-╨┐╨╛╨┤╨▒╨╛╤А╨║╨╕ `/podborki/{intent}` / `{city}`; contacts; EventTrustStrip; footer/sitemap.
-- ╨Я╤А╨╕╨╛╤А╨╕╤В╨╡╤В ╨┐╤А╨╛╨┤╤Г╨║╤В╨░: SEO-╨╗╨╕╤Б╤В╨╕╨╜╨│╨╕ ╨▓╤Л╤И╨╡ ╨╛╨▒╤Л╤З╨╜╨╛╨│╨╛ ╨▒╨╗╨╛╨│╨░ (Tasktracker SEO.*).
+- Для `country-tours` добавлены две обязательные группы сигналов: `экскурс` и один из топонимов/направлений загородной поездки. Сигнал экскурсии может приходить из категории, тега или названия.
+- Ограничение города `Санкт-Петербург` сохранено. Регрессионный тест покрывает релевантные автобусные экскурсии в Петергоф и Выборг, а также концерты, театр, мастер-классы и московскую экскурсию как отрицательные случаи.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ┬л╨н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕ ╨┐╨╛ ╨║╤А╤Л╤И╨░╨╝┬╗ ╨╡╤Й╤С ╨╜╨╡╤В ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛╨│╨╛ landing slug - ╨╜╤Г╨╢╨╡╨╜ seed ╨╛╤В ╨▓╨╗╨░╨┤╨╡╨╗╤М╤Ж╨░ ╨╕╨╗╨╕ intent ╤Б `q`.
-- ╨С╨╡╨╖ ╨╢╨╕╨▓╨╛╨│╨╛ ╨║╨░╤В╨░╨╗╨╛╨│╨░ ╨▓ CI ╨╜╨╡╨╗╤М╨╖╤П ╨│╨░╤А╨░╨╜╤В╨╕╤А╨╛╨▓╨░╤В╤М ╤Б╨┐╨╕╤Б╨╛╨║ thin URL; ╨┐╤А╨╛╨▓╨╡╤А╨║╨░ ╨╜╨░ ╨╖╨░╨┐╤А╨╛╤Б╨╡ + sitemap async filter.
-- ╨з╨░╤Б╤В╤М SEO-╤В╨╡╨║╤Б╤В╨╛╨▓ ╨┤╨╛╨▒╨╕╤В╨░ ╨┤╨╛ 1000+ ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓ ╤И╨░╨▒╨╗╨╛╨╜╨╜╤Л╨╝ ╤Е╨▓╨╛╤Б╤В╨╛╨╝ - ╨╜╤Г╨╢╨╡╨╜ editorial polish (SEO.10).
+- Изменение локальное: на prod старая выдача сохранится до отдельного запрошенного деплоя. Локальные Node/pnpm-инструменты в рабочем окружении недоступны, поэтому автоматический запуск теста и точный пересчёт после правила не выполнены.
 
 ---
 
-## 2026-07-22 тАФ ╨Ъ╨╛╨╗╨╛╨╜╨║╨░ ╨Р╤А╤В╤Г╤А╨░: ╨Ъ╨░╨╖╨░╨╜╤М ╨╜╨░ ╨▓╨║╤Г╤Б (╨╝╨░╤Б╤В╨╡╤А-╨║╨╗╨░╤Б╤Б╤Л)
+## 2026-07-23 - утверждённый SEO launch set TOP-15
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т ╨║╨░╤В╨░╨╗╨╛╨│╨╡ ╨╡╤Б╤В╤М 4 ╨Ь╨Ъ ╨Ф╨╛╨╝╨░-╨╝╤Г╨╖╨╡╤П ╨н╤З╨┐╨╛╤З╨╝╨░╨║╨░ + ╤В╨░╤В╨░╤А╤Б╨║╨╕╨╣ ╨│╨░╤Б╤В╤А╨╛╤Г╨╢╨╕╨╜; venue slug `dom-muzei-echpochmaka`.
+- В category×city контуре уже были речные прогулки и стендап, но не хватало правил и URL для пеших, загородных экскурсий, выставок, необычных театров, общих экскурсий и крыш.
+- Старый intent slug `na-vyhodnyh` расходился с утверждённым URL.
+- Контакты уже показывают ИНН и ОГРНИП рядом с данными ИП, поэтому номер телефона не требуется для E-A-T на текущем этапе.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨б╤В╨░╤В╤М╤П `kazan-na-vkus-master-klassy`: `authorId=artur`, `citySlug=kazan`, cover + distinct `-inline.jpg`.
-- ╨Т╨╜╤Г╤В╤А╨╡╨╜╨╜╨╕╨╡ ╤Б╤Б╤Л╨╗╨║╨╕: 4 ╨Ь╨Ъ, venue, `/cities/kazan`, ╨│╨░╤Б╤В╤А╨╛╤Г╨╢╨╕╨╜.
-- Meta ╨▓ `blog-meta.ts` + ╤В╨╕╨╖╨╡╤А ╨▓ `blog-posts.ts`.
+- Утверждён launch set из 15 URL: речные прогулки, стендап, пешие и загородные экскурсии, выставки и музеи, необычные театры, экскурсии Казани, бесплатные события и события на выходные в Москве и Санкт-Петербурге.
+- Добавлены landing rules, category paths, city variants, SEO meta labels и editorial seed для новых slug: `walking-tours`, `country-tours`, `exhibitions`, `unusual-theatres`, `excursions`, `rooftops`.
+- `rooftops` и `country-tours` ограничены Санкт-Петербургом в роутинге, static params и sitemap. Московская посадка крыш не создаётся и не попадает в sitemap.
+- Канонический intent URL: `na-vyhodnye`; `na-vyhodnyh` permanently redirect на него.
+- Порог индексации сохранён: `MIN_LISTING_OFFERS_FOR_INDEX = 6`. При меньшем числе офферов URL доступен, но получает `noindex,follow` и исключается из sitemap.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В (╨╛╨┐╤Г╨▒╨╗╨╕╨║╨╛╨▓╨░╨╜╨╛: deploy `@93d3a07`, upsert PUBLISHED, smoke 200 + ╨▓╤Б╨╡ ╨▓╨╜╤Г╤В╤А╨╡╨╜╨╜╨╕╨╡ ╤Б╤Б╤Л╨╗╨║╨╕).
+- Индексация каждой URL зависит от наличия минимум шести актуальных офферов после sync каталога. DB seed landing не нужен: правила формируют выдачу по данным каталога.
+- Публичный номер 8-800 или городской номер pending у владельца; фейковый телефон не добавляется.
 
 ---
 
-## 2026-07-22 тАФ City hub ├Ч blog phase 3 (CMS citySlug)
+## 2026-07-22 — SEO-листинги / ЧПУ category×city (приоритет vs блог)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨е╨░╨▒ ╨▒╤А╨░╨╗ ╨│╨╗╨╛╨▒╨░╨╗╤М╨╜╤Л╨╣ top-20 ╤Б╤В╨░╤В╨╡╨╣ тЖТ ╨│╨╛╤А╨╛╨┤╤Б╨║╨╕╨╡ ╨╝╨░╤В╨╡╤А╨╕╨░╨╗╤Л ╨╝╨╛╨│╨╗╨╕ ╨╜╨╡ ╨┐╨╛╨┐╨░╤Б╤В╤М ╨▓ picker.
-- `cityId` ╤З╨░╤Б╤В╨╛ null: frontmatter `saint-petersburg`, ╨░ `City.slug` = `sankt-peterburg`.
-- Admin ╨╜╨╡ ╨┤╨░╨▓╨░╨╗ ╨┐╤А╨░╨▓╨╕╤В╤М citySlug; pseudo-╨│╨╛╤А╨╛╨┤╨░ multi/regions ╨╢╨╕╨╗╨╕ hardcoded CASE ╨▓ SQL.
+- Органика упирается в thin query-URL (`/events?…`) и нехватку индексируемых category×city посадок.
+- Уже есть контур landings (`/rechnye-progulki/moscow`) и city hubs; нельзя плодить `/{city}/category`.
+- Яндекс штрафует коммерческие страницы с пустой/бедной выдачей.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ъ╨╛╨╗╨╛╨╜╨║╨░ `Article.citySlug` + migration backfill; ╨╕╨╜╨┤╨╡╨║╤Б.
+- Формулы meta в `seo-listing-meta.ts` (год в title, description без стрелок).
+- Editorial seed `seo-listing-texts.ts` (~18 текстов) + fallback; блок `LandingSeoBottom` под сеткой.
+- Порог индексации листингов: **≥ 6** офферов (`noindex,follow` иначе); sitemap landings фильтрует thin city-variants.
+- Intent-подборки `/podborki/{intent}` / `{city}`; contacts; EventTrustStrip; footer/sitemap.
+- Приоритет продукта: SEO-листинги выше обычного блога (Tasktracker SEO.*).
+
+### Проблемы
+
+- «Экскурсии по крышам» ещё нет отдельного landing slug - нужен seed от владельца или intent с `q`.
+- Без живого каталога в CI нельзя гарантировать список thin URL; проверка на запросе + sitemap async filter.
+- Часть SEO-текстов добита до 1000+ символов шаблонным хвостом - нужен editorial polish (SEO.10).
+
+---
+
+## 2026-07-22 — Колонка Артура: Казань на вкус (мастер-классы)
+
+### Наблюдения
+
+- В каталоге есть 4 МК Дома-музея Эчпочмака + татарский гастроужин; venue slug `dom-muzei-echpochmaka`.
+
+### Решения
+
+- Статья `kazan-na-vkus-master-klassy`: `authorId=artur`, `citySlug=kazan`, cover + distinct `-inline.jpg`.
+- Внутренние ссылки: 4 МК, venue, `/cities/kazan`, гастроужин.
+- Meta в `blog-meta.ts` + тизер в `blog-posts.ts`.
+
+### Проблемы
+
+- Нет (опубликовано: deploy `@93d3a07`, upsert PUBLISHED, smoke 200 + все внутренние ссылки).
+
+---
+
+## 2026-07-22 — City hub × blog phase 3 (CMS citySlug)
+
+### Наблюдения
+
+- Хаб брал глобальный top-20 статей → городские материалы могли не попасть в picker.
+- `cityId` часто null: frontmatter `saint-petersburg`, а `City.slug` = `sankt-peterburg`.
+- Admin не давал править citySlug; pseudo-города multi/regions жили hardcoded CASE в SQL.
+
+### Решения
+
+- Колонка `Article.citySlug` + migration backfill; индекс.
 - Public/admin API: `?citySlug=` + `includeBroad=1`; hub fetch limit 40 city+broad.
-- Picker: ╤П╨▓╨╜╤Л╨╣ CMS citySlug = ╤В╨╛╨╗╤М╨║╨╛ ╤В╨╛╤З╨╜╨╛╨╡ ╤Б╨╛╨▓╨┐╨░╨┤╨╡╨╜╨╕╨╡ (title heuristics ╤В╨╛╨╗╤М╨║╨╛ ╨╡╤Б╨╗╨╕ citySlug ╨┐╤Г╤Б╤В).
-- blog-upsert + admin ╨┐╨╛╨╗╨╡ citySlug; alias-resolve City.id.
+- Picker: явный CMS citySlug = только точное совпадение (title heuristics только если citySlug пуст).
+- blog-upsert + admin поле citySlug; alias-resolve City.id.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В.
-
----
-
-## 2026-07-22 тАФ City hub: ┬л╨б╨╛╨▓╨╡╤В╤Л┬╗ + on-page SEO ╤Д╤А╨░╨╖╤Л
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Ф╨╗╨╕╨╜╨╜╤Л╨╡ ╨╖╨░╨┐╤А╨╛╤Б╤Л (┬л╨░╤Д╨╕╤И╨░, ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕ ╨╕ ╨▒╨╕╨╗╨╡╤В╤ЛтАж┬╗) ╨╢╨╕╨╗╨╕ ╨▓ ╨╛╤Б╨╜╨╛╨▓╨╜╨╛╨╝ ╨▓ `<title>` / meta description; ╨▒╨╗╨╛╨║ `#seo` ╨▒╤Л╨╗ brief + ╤Б╤З╤С╤В╤З╨╕╨║╨╕.
-- ┬л╨Я╤А╨░╨║╤В╨╕╨║╨░┬╗ ╨║╨░╨║ ╤П╤А╨╗╤Л╨║ ╤Б╨╡╨║╤Ж╨╕╨╕ ╨╖╨▓╤Г╤З╨░╨╗ ╨║╨░╨╜╤Ж╨╡╨╗╤П╤А╤Б╨║╨╕.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Sticky/H2: **╨б╨╛╨▓╨╡╤В╤Л** (╤П╨║╨╛╤А╤М `#practice` ╤Б╨╛╤Е╤А╨░╨╜╤С╨╜).
-- `buildCityHubSeoPhrase` + ╤Г╤Б╨╕╨╗╨╡╨╜╨╜╤Л╨╣ `buildCitySeoText` / H2 `#seo`; fallback meta description ╤З╨╡╤А╨╡╨╖ `buildCityHubSeoDescription`.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╨╡╤В.
+- Нет.
 
 ---
 
-## 2026-07-22 тАФ City hub ├Ч blog phase 2 (mini-row ╤Б╨╡╤Б╤Б╨╕╨╣)
+## 2026-07-22 — City hub: «Советы» + on-page SEO фразы
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╤Б╨╗╨╡ harden picker (P.2o) ╤В╨╕╨╖╨╡╤А╤Л ╨▓╤Б╤С ╨╡╤Й╤С ╨╜╨╡ ╤Б╨▓╤П╨╖╤Л╨▓╨░╨╗╨╕ ╨╝╨░╤В╨╡╤А╨╕╨░╨╗ ╤Б ╨░╤Д╨╕╤И╨╡╨╣ ╨│╨╛╤А╨╛╨┤╨░ ╨▒╨╡╨╖ ╨║╨╗╨╕╨║╨░ ╨▓ `#affiche`.
-- Codex `ArticleEventMiniRow` ╤Г╨╢╨╡ ╨┤╨╡╨╗╨░╨╗ keyword match ╨┐╨╛ ╨╖╨░╨│╤А╤Г╨╢╨╡╨╜╨╜╤Л╨╝ sessions тАФ ╨┐╨╡╤А╨╡╨╜╨╛╤Б╨╕╨╝ ╨▓ Next, ╨▒╨╡╨╖ Vite merge.
+- Длинные запросы («афиша, экскурсии и билеты…») жили в основном в `<title>` / meta description; блок `#seo` был brief + счётчики.
+- «Практика» как ярлык секции звучал канцелярски.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `matchArticleSessions` ╨▓ `city-hub-articles.ts`: ╨┤╨╛ 3 ╤Б╨╡╤Б╤Б╨╕╨╣, keyword score тЖТ ╨╕╨╜╨░╤З╨╡ quality fallback.
-- `CityHubArticleTeaser` + ╨▓╤Б╨╡ `CityHubArticlesGrid` ╨╜╨░ ╤Е╨░╨▒╨╡ ╨┐╨╛╨╗╤Г╤З╨░╤О╤В `payload.sessions` (╨┐╨╛╨╗╨╜╤Л╨╣ ╤Б╨┐╨╕╤Б╨╛╨║ ╨│╨╛╤А╨╛╨┤╨░, ╨╜╨╡ filtered).
-- P.2p тЬЕ; CMS citySlug binding ╨╛╤Б╤В╨░╤С╤В╤Б╤П phase 3.
+- Sticky/H2: **Советы** (якорь `#practice` сохранён).
+- `buildCityHubSeoPhrase` + усиленный `buildCitySeoText` / H2 `#seo`; fallback meta description через `buildCityHubSeoDescription`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В.
-
----
-
-## 2026-07-22 тАФ City hub ├Ч blog: Codex port ╨▓ phase 1 picker
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Я╨░╤А╨░╨╗╨╗╨╡╨╗╤М╨╜╨░╤П ╨▓╨╡╤В╨║╨░ `codex/city-hub-editorial-alt` (Vite `apps/public`) ╨┤╤Г╨▒╨╗╨╕╤А╤Г╨╡╤В IA phase 1; ╤Д╨╕╨╜╨║╨╛╨╜╤В╤Г╤А `codex/phase2-finance-supplier` ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╡╨╝.
-- ╨Э╨░╤И `pickCityHubArticles` ╨▒╤Л╨╗ ╤Б╨╗╨░╨▒╨╡╨╡: ╨╝╨░╨╗╨╛ ╨░╨╗╨╕╨░╤Б╨╛╨▓, ╨╜╨╡╤В ╨╛╤В╤Б╨╡╨▓╨░ ╤З╤Г╨╢╨╛╨│╨╛ ╨│╨╛╤А╨╛╨┤╨░ тЖТ ╤Б╤В╨░╤В╤М╤П ┬л╨▓ ╨Ь╨╛╤Б╨║╨▓╨╡┬╗ ╨╝╨╛╨│╨╗╨░ ╨┐╨╛╨┐╨░╤Б╤В╤М ╨╜╨░ ╤Е╨░╨▒ ╨б╨Я╨▒ ╤З╨╡╤А╨╡╨╖ generic gid.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨Я╨╛╤А╤В ╨▓ Next `apps/web`: ╤А╨░╤Б╤И╨╕╤А╨╡╨╜╨╜╤Л╨╡ `CITY_ALIASES` (╨║╨╕╤А╨╕╨╗╨╗╨╕╤Ж╨░ + ╤Б╤В╨╡╨╝╤Л), `containsForeignCitySignal`, broad `multi/regions`, tie-break ╨┐╨╛ `publishedAt`, ╤И╨╕╤А╨╡ keywords ╤Б╨╡╨║╤Ж╨╕╨╣.
-- Unit-╤В╨╡╤Б╤В╤Л `city-hub-articles.test.ts` (6). Vite/finance ╨╕╨╖ Codex ╨╜╨╡ ╨╝╨╡╤А╨╢╨╕╨╝.
-- Phase 2 (P.2p): mini-row ╤Б╨╡╤Б╤Б╨╕╨╣ ╨╜╨░ ╤В╨╕╨╖╨╡╤А╨╡ тАФ ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╕╨╣ ╤И╨░╨│.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╨╡╤В.
+- Нет.
 
 ---
 
-## 2026-07-22 тАФ Admin smoke 0.3 + ╤В╨╡╤Б╤В╨╛╨▓╨░╤П ╨┐╨╛╨║╤Г╨┐╨║╨░ ╨╖╨░╨║╤А╤Л╤В╤Л
+## 2026-07-22 — City hub × blog phase 2 (mini-row сессий)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╤Б╨╗╨╡ ╨╖╨░╨║╤А╤Л╤В╨╕╤П browser 0.2 ╨▓ docs ╨╡╤Й╤С ╨▓╨╕╤Б╨╡╨╗╨╕ Admin smoke (login/sources) ╨╕ ╨╛╨┐╤Ж. ╤В╨╡╤Б╤В╨╛╨▓╨░╤П ╨┐╨╛╨║╤Г╨┐╨║╨░ тЖТ ExternalOrder.
+- После harden picker (P.2o) тизеры всё ещё не связывали материал с афишей города без клика в `#affiche`.
+- Codex `ArticleEventMiniRow` уже делал keyword match по загруженным sessions — переносим в Next, без Vite merge.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- 0.3.1 / 0.3.3 / 0.3.6 / 0.3.7 тЖТ тЬЕ ╨┐╨╛ ╤А╤Г╤З╨╜╨╛╨╝╤Г ╨┐╨╛╨┤╤В╨▓╨╡╤А╨╢╨┤╨╡╨╜╨╕╤О ╨╜╨░ prod.
-- ╨з╨╡╨║╨╗╨╕╤Б╤В 0.2: ╤В╨╡╤Б╤В╨╛╨▓╨░╤П ╨┐╨╛╨║╤Г╨┐╨║╨░ тЖТ ExternalOrder ╨╛╤В╨╝╨╡╤З╨╡╨╜╨░ тЬЕ.
-- ╨н╤В╨░╨┐ 0 smoke exit criteria ╨▓╤Л╨┐╨╛╨╗╨╜╨╡╨╜╤Л (TEP orders ╨╛╤Б╤В╨░╤С╤В╤Б╤П тП╕ тАФ ╨╜╨╡╤В API ╤Г ╨┐╨░╤А╤В╨╜╤С╤А╨░).
+- `matchArticleSessions` в `city-hub-articles.ts`: до 3 сессий, keyword score → иначе quality fallback.
+- `CityHubArticleTeaser` + все `CityHubArticlesGrid` на хабе получают `payload.sessions` (полный список города, не filtered).
+- P.2p ✅; CMS citySlug binding остаётся phase 3.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В.
+- Нет.
 
 ---
 
-## 2026-07-22 тАФ L.3 TC catalog sync: ╤Б╨╜╨╕╨╖╨╕╤В╤М ╨╜╨░╨│╤А╤Г╨╖╨║╤Г ╨╜╨░ prod
+## 2026-07-22 — City hub × blog: Codex port в phase 1 picker
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╨╗╨╜╤Л╨╣ `tc:sync` ╨┤╨╜╤С╨╝ ╨║╨╛╨╜╨║╤Г╤А╨╕╤А╤Г╨╡╤В ╤Б API/Next ╨╖╨░ CPU/RAM (3.8Gi).
-- `syncProviderLinksForSource` ╨╜╨░ `--ids` ╨▓╤Б╤С ╤А╨░╨▓╨╜╨╛ ╨┐╨╡╤А╨╡╤Б╨╛╨▒╨╕╤А╨░╨╗ ProviderLink ╨┐╨╛ ╨▓╤Б╨╡╨╝╤Г TC source.
-- `RawImportRecord` upsert ╨▓╤Б╨╡╨│╨┤╨░ ╨┐╨╡╤А╨╡╨┐╨╕╤Б╤Л╨▓╨░╨╗ JSON ╨┤╨░╨╢╨╡ ╨┐╤А╨╕ ╤В╨╛╨╝ ╨╢╨╡ `payloadHash`.
+- Параллельная ветка `codex/city-hub-editorial-alt` (Vite `apps/public`) дублирует IA phase 1; финконтур `codex/phase2-finance-supplier` не трогаем.
+- Наш `pickCityHubArticles` был слабее: мало алиасов, нет отсева чужого города → статья «в Москве» могла попасть на хаб СПб через generic gid.
+
+### Решения
+
+- Порт в Next `apps/web`: расширенные `CITY_ALIASES` (кириллица + стемы), `containsForeignCitySignal`, broad `multi/regions`, tie-break по `publishedAt`, шире keywords секций.
+- Unit-тесты `city-hub-articles.test.ts` (6). Vite/finance из Codex не мержим.
+- Phase 2 (P.2p): mini-row сессий на тизере — следующий шаг.
+
+### Проблемы
+
+- Нет.
+
+---
+
+## 2026-07-22 — Admin smoke 0.3 + тестовая покупка закрыты
+
+### Наблюдения
+
+- После закрытия browser 0.2 в docs ещё висели Admin smoke (login/sources) и опц. тестовая покупка → ExternalOrder.
+
+### Решения
+
+- 0.3.1 / 0.3.3 / 0.3.6 / 0.3.7 → ✅ по ручному подтверждению на prod.
+- Чеклист 0.2: тестовая покупка → ExternalOrder отмечена ✅.
+- Этап 0 smoke exit criteria выполнены (TEP orders остаётся ⏸ — нет API у партнёра).
+
+### Проблемы
+
+- Нет.
+
+---
+
+## 2026-07-22 — L.3 TC catalog sync: снизить нагрузку на prod
+
+### Наблюдения
+
+- Полный `tc:sync` днём конкурирует с API/Next за CPU/RAM (3.8Gi).
+- `syncProviderLinksForSource` на `--ids` всё равно пересобирал ProviderLink по всему TC source.
+- `RawImportRecord` upsert всегда переписывал JSON даже при том же `payloadHash`.
 - Post-sync `invalidatePublicCaches({ warm: true })` = full warm (venues/cities/landings/admin).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `deploy/cron/tc-catalog-sync.sh` + `daibilet-tc-catalog-sync.{service,timer}` тАФ nightly 03:20, flock/nice/ionice, ╨╗╨╛╨│ `/var/log/daibilet/tc-catalog-sync.log`.
-- `syncProviderLinksForSource(client, sourceId, { eventIds })`; `tc:sync --ids` ╨┐╨╡╤А╨╡╨┤╨░╤С╤В imported Event ids.
+- `deploy/cron/tc-catalog-sync.sh` + `daibilet-tc-catalog-sync.{service,timer}` — nightly 03:20, flock/nice/ionice, лог `/var/log/daibilet/tc-catalog-sync.log`.
+- `syncProviderLinksForSource(client, sourceId, { eventIds })`; `tc:sync --ids` передаёт imported Event ids.
 - RawImport upsert: `WHERE payloadHash IS DISTINCT FROM excluded.payloadHash` (TC/TEP catalog + orders).
-- Light warm: `warmPublicCachesLight` + `POST /api/internal/public-cache`; `post-catalog-sync-warm.mjs`; full warm ╤В╨╛╨╗╤М╨║╨╛ ╨┐╤А╨╕ `TC_CATALOG_SYNC_FULL_WARM=1`.
+- Light warm: `warmPublicCachesLight` + `POST /api/internal/public-cache`; `post-catalog-sync-warm.mjs`; full warm только при `TC_CATALOG_SYNC_FULL_WARM=1`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Timer ╨╜╤Г╨╢╨╜╨╛ enable ╨╜╨░ prod ╨┐╨╛╤Б╨╗╨╡ deploy (`systemctl enable --now daibilet-tc-catalog-sync.timer`).
+- Timer нужно enable на prod после deploy (`systemctl enable --now daibilet-tc-catalog-sync.timer`).
 
-**Prod @`efc8459`:** deploy-prod-next OK; `daibilet-tc-catalog-sync.timer` enabled, next `2026-07-23 03:20 UTC`; smoke `POST /api/internal/public-cache` warm=light тЖТ 200.
-
----
-
-## 2026-07-22 тАФ Browser smoke 0.2 ╨╖╨░╨║╤А╤Л╤В
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Т Tasktracker/current-state ╨║╨╛╨╗╨╛╨╜╨║╨░ Browser ┬л╨Ъ╤Г╨┐╨╕╤В╤М┬╗ ╨▓╨╕╤Б╨╡╨╗╨░ тП│ ╤Б 2026-07-13 ╨┐╤А╨╕ ╤Г╨╢╨╡ ╨╖╨╡╨╗╤С╨╜╨╛╨╝ API `check:widgets`.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨Ч╨░╨║╤А╤Л╤В╤Л 0.2.1тАУ0.2.4 ╨╕ 0.4.4 (browser) ╨┐╨╛ ╤А╤Г╤З╨╜╨╛╨╝╤Г ╨┐╨╛╨┤╤В╨▓╨╡╤А╨╢╨┤╨╡╨╜╨╕╤О: ╨▓╨╕╨┤╨╢╨╡╤В╤Л TC/TEP ╨╜╨░ prod ╨╛╤В╨║╤А╤Л╨▓╨░╤О╤В╤Б╤П.
-- ╨Ю╨┐╤Ж╨╕╨╛╨╜╨░╨╗╤М╨╜╨░╤П ╤В╨╡╤Б╤В╨╛╨▓╨░╤П ╨┐╨╛╨║╤Г╨┐╨║╨░ тЖТ ExternalOrder: тЬЕ 2026-07-22 (╨╖╨░╨║╤А╤Л╤В╨╛ ╨▓╨╝╨╡╤Б╤В╨╡ ╤Б Admin smoke).
-- Admin smoke 0.3: тЬЕ 2026-07-22.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╨╡╤В.
+**Prod @`efc8459`:** deploy-prod-next OK; `daibilet-tc-catalog-sync.timer` enabled, next `2026-07-23 03:20 UTC`; smoke `POST /api/internal/public-cache` warm=light → 200.
 
 ---
 
-## 2026-07-22 тАФ L.2 Images: next/image + WebP/AVIF
+## 2026-07-22 — Browser smoke 0.2 закрыт
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Hot-path UI (╨║╨░╤В╨░╨╗╨╛╨│, ╨│╨╗╨░╨▓╨╜╨░╤П, city hub, blog, venues) ╨╛╤В╨┤╨░╨▓╨░╨╗ ╤Б╤Л╤А╤Л╨╡ `<img>` JPG/PNG ╤Б TC/TEP CDN ╨▒╨╡╨╖ ╤А╨╡╤Б╨░╨╣╨╖╨░.
-- Prod ╨▒╨╡╨╖ `sharp` тЖТ ╨┤╨╡╤Д╨╛╨╗╤В╨╜╤Л╨╣ Next image optimizer ╤Б╨╗╨░╨▒╤Л╨╣/╨╝╨╡╨┤╨╗╨╡╨╜╨╜╤Л╨╣.
-- ╨е╨╛╤Б╤В╤Л ╨╛╨▒╨╗╨╛╨╢╨╡╨║: `ticketscloud-prod.storage.yandexcloud.net`, `s3.twcstorage.ru`, ╨┐╨╗╤О╤Б ╤Б╤В╨░╨▒╨╕╨╗╤М╨╜╤Л╨╣ `api.teplohod.info`.
+- В Tasktracker/current-state колонка Browser «Купить» висела ⏳ с 2026-07-13 при уже зелёном API `check:widgets`.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `next.config.ts`: `formats` avif/webp, `minimumCacheTTL` 7d, ╤Г╤А╨╡╨╖╨░╨╜╨╜╤Л╨╡ `deviceSizes`/`imageSizes`, `remotePatterns` ╨┤╨╗╤П CDN.
-- `SafeImage.client.tsx` + `IMAGE_SIZES`; ╨╖╨░╨╝╨╡╨╜╨░ `<img>` ╨▓ EventCard/CityCard/blog/hub/heroes/venues/search/favorites.
-- `@daibilet/web` dependency `sharp` ╨┤╨╗╤П prod encode.
+- Закрыты 0.2.1–0.2.4 и 0.4.4 (browser) по ручному подтверждению: виджеты TC/TEP на prod открываются.
+- Опциональная тестовая покупка → ExternalOrder: ✅ 2026-07-22 (закрыто вместе с Admin smoke).
+- Admin smoke 0.3: ✅ 2026-07-22.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Я╨╡╤А╨▓╤Л╨╣ ╤Е╨╛╨╗╨╛╨┤╨╜╤Л╨╣ `/_next/image` ╨╜╨░ VPS ╨┤╨░╤С╤В CPU spike тАФ ╨║╤Н╤И 7d + nginx `proxy_cache` ╨╜╨░ `/` ╤Б╨╝╤П╨│╤З╨░╤О╤В ╨┐╨╛╤Б╨╗╨╡ ╨┐╤А╨╛╨│╤А╨╡╨▓╨░.
-- Inline blog markdown images ╨▒╨╡╨╖ fallback placeholder ╨┐╤А╨╕ 404 (╤А╨░╨╜╤М╤И╨╡ ╤Б╨║╤А╤Л╨▓╨░╨╗╨╕╤Б╤М) тАФ ╤А╨╡╨┤╨║╨╕╨╣ ╨║╨╡╨╣╤Б.
-
-**Prod @`9646968`:** `deploy-prod-next` OK; sharp ╨▓ `apps/web`; proof `Accept: image/avif` тЖТ `content-type: image/avif` ╨┤╨╗╤П hero ╨╕ remote TEP S3; `/events` HTML ╤Б╨╛╨┤╨╡╤А╨╢╨╕╤В `/_next/image?url=тАж`.
+- Нет.
 
 ---
 
-## 2026-07-22 тАФ Prod deploy load + city hub blog @`bb65e4a`
+## 2026-07-22 — L.2 Images: next/image + WebP/AVIF
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Rebase ╨┐╨╛╨▓╨╡╤А╤Е `7787c30` (FAQ city-only / empty directions): ╨║╨╛╨╜╤Д╨╗╨╕╨║╤В╤Л ╨▓ `CityPageView` / Tasktracker / Diary.
-- `curl -I` (HEAD) ╨╜╨░ public API ╨┤╨░╤С╤В 404/`no-store` тАФ ╨╗╨╛╨╢╨╜╤Л╨╣ ╤Б╨╕╨│╨╜╨░╨╗; ╨┐╤А╨╛╨▓╨╡╤А╤П╤В╤М GET.
+- Hot-path UI (каталог, главная, city hub, blog, venues) отдавал сырые `<img>` JPG/PNG с TC/TEP CDN без ресайза.
+- Prod без `sharp` → дефолтный Next image optimizer слабый/медленный.
+- Хосты обложек: `ticketscloud-prod.storage.yandexcloud.net`, `s3.twcstorage.ru`, плюс стабильный `api.teplohod.info`.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- Merge: ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╤Л chip UX P.2kтАУn + H3 ┬л╨з╤В╨╛ ╨║╤Г╨┐╨╕╤В╤М ╤Б╨╡╨╣╤З╨░╤Б┬╗ + ╤В╨╕╨╖╨╡╤А╤Л; Tasktracker P.2o + L.1.
-- `deploy-prod-next` OK @`bb65e4a`. Proof: GET `/api/public/events?limit=50` тЖТ `Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=600`; `?ids=` 200; hub SPB тАФ sticky `#about|#affiche|#sights|#practice|#more` + `/blog/*` teasers.
+- `next.config.ts`: `formats` avif/webp, `minimumCacheTTL` 7d, урезанные `deviceSizes`/`imageSizes`, `remotePatterns` для CDN.
+- `SafeImage.client.tsx` + `IMAGE_SIZES`; замена `<img>` в EventCard/CityCard/blog/hub/heroes/venues/search/favorites.
+- `@daibilet/web` dependency `sharp` для prod encode.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Images webp/`next/image` (╨┐.6 ╨░╤Г╨┤╨╕╤В╨░) тАФ ╨╡╤Й╤С ╨╜╨╡ ╨▓ ╤Н╤В╨╛╨╝ ╤А╨╡╨╗╨╕╨╖╨╡.
+- Первый холодный `/_next/image` на VPS даёт CPU spike — кэш 7d + nginx `proxy_cache` на `/` смягчают после прогрева.
+- Inline blog markdown images без fallback placeholder при 404 (раньше скрывались) — редкий кейс.
 
----
-
-## 2026-07-22 тАФ Load fixes: catalog cache headers, landing refetch, favorites ids
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- Prod `/api/public/events` ╨╕╨┤╤С╤В ╨▓ legacy API (`:4000`), ╨╜╨╡ ╨▓ Next. TS `public-catalog-handler` ╨╛╤В╨▓╨╡╤З╨░╨╗ `Cache-Control: no-store` тЖТ ╨▒╤А╨░╤Г╨╖╨╡╤А/nginx ╨╜╨╡ ╨║╤Н╤И╨╕╤А╨╛╨▓╨░╨╗╨╕ ╨║╨░╤В╨░╨╗╨╛╨│.
-- `LandingPageView` ╨┐╤А╨╕ ╨╜╨░╨╗╨╕╤З╨╕╨╕ SSR `initialPayload` ╨▓╤Б╤С ╤А╨░╨▓╨╜╨╛ ╨┤╨╡╨╗╨░╨╗ `fetch(..., cache: 'no-store')`.
-- `FavoritesPanel` ╤В╤П╨╜╤Г╨╗ `limit=300 no-store`.
-- nginx: `proxy_cache_path` ╨▒╤Л╨╗, ╨╜╨╛ `proxy_cache` ╨▓ `location /` ╨╜╨╡ ╨┐╤А╨╕╨╝╨╡╨╜╤П╨╗╤Б╤П; `limit_req` ╨╜╨░ `daibilet.ru /api/` ╨╛╤В╤Б╤Г╤В╤Б╤В╨▓╨╛╨▓╨░╨╗.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Public handlers тЖТ `sendPublicJson` (`public, max-age=60, s-maxage=300, swr=600`).
-- Next `/api/public/events` тЖТ `getCachedCatalog`.
-- Landing: skip client refetch ╨╡╤Б╨╗╨╕ SSR landing ╤Г╨╢╨╡ ╨╡╤Б╤В╤М.
-- Favorites: `?ids=` (max 50) ╨▒╨╡╨╖ no-store; catalog page sizes 50/100.
-- nginx prod: ╨▓╨║╨╗╤О╤З╤С╨╜ `proxy_cache` ╨╜╨░ `/` + `limit_req` ╨╜╨░ `daibilet.ru /api/`.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- Images webp/avif тАФ ╨╛╤В╨┤╨╡╨╗╤М╨╜╤Л╨╣ ╤В╤А╨╡╨║ (╨┐.6 ╨░╤Г╨┤╨╕╤В╨░).
+**Prod @`9646968`:** `deploy-prod-next` OK; sharp в `apps/web`; proof `Accept: image/avif` → `content-type: image/avif` для hero и remote TEP S3; `/events` HTML содержит `/_next/image?url=…`.
 
 ---
 
-## 2026-07-22 тАФ City hub ├Ч blog phase 1 (editorial teasers)
+## 2026-07-22 — Prod deploy load + city hub blog @`bb65e4a`
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨е╨░╨▒ ╨▒╤Л╨╗ ╨┐╨╛╤Б╨╡╤А╨╡╨┤╨╕╨╜╨╡ ╨╝╨╡╨╢╨┤╤Г ╨▓╨╕╤В╤А╨╕╨╜╨╛╨╣ ╨╕ ╤Б╨┐╤А╨░╨▓╨╛╤З╨╜╨╕╨║╨╛╨╝: brief/travel/FAQ ╨╡╤Б╤В╤М, ╨▒╨╗╨╛╨│ ╨╢╨╕╨╗ ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛ ╨╜╨░ `/blog`.
-- `citySlug` ╤Г ╤Б╤В╨░╤В╨╡╨╣ ╨╖╨░╨┐╨╛╨╗╨╜╨╡╨╜ ╤Б╨╗╨░╨▒╨╛; API `?citySlug=` ╨╜╨╡ ╤П╨▓╨╗╤П╨╡╤В╤Б╤П ╤Б╤В╤А╨╛╨│╨╕╨╝ ╤Д╨╕╨╗╤М╤В╤А╨╛╨╝ тАФ ╨╜╤Г╨╢╨╡╨╜ fallback-╨┐╨╛╨┤╨▒╨╛╤А.
+- Rebase поверх `7787c30` (FAQ city-only / empty directions): конфликты в `CityPageView` / Tasktracker / Diary.
+- `curl -I` (HEAD) на public API даёт 404/`no-store` — ложный сигнал; проверять GET.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨д╨░╨╖╨░ 1: 5 sticky tabs (`#about` `#affiche` `#sights` `#practice` `#more`); ╤Б╤В╨░╤А╤Л╨╡ ╤П╨║╨╛╤А╤П `#travel/#faq/#directions/#venues` ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╤Л ╨▓╨╜╤Г╤В╤А╨╕ ╤А╨╛╨┤╨╕╤В╨╡╨╗╨╡╨╣.
-- SSR: `buildPublicArticlesListDto` + `mergeBlogCards` + `pickCityHubArticles` (╨╗╨╕╨╝╨╕╤В╤Л 2/1/2/1/1, ╨▒╨╡╨╖ ╨┐╨╛╨▓╤В╨╛╤А╨╛╨▓).
-- `CityHubArticleTeaser`: cover/title/excerpt, badges, CTA ┬л╨б╨╝╨╛╤В╤А╨╡╤В╤М ╨▓ ╨░╤Д╨╕╤И╨╡┬╗ (scroll `#affiche`) + ┬л╨Ю╤В╨║╤А╤Л╤В╤М ╨╝╨░╤В╨╡╤А╨╕╨░╨╗┬╗.
-- ╨Я╤Г╤Б╤В╤Л╨╡ ╨▒╨░╨║╨╡╤В╤Л ╨╜╨╡ ╤А╨╡╨╜╨┤╨╡╤А╤П╤В╤Б╤П; ╨╜╨╡ ╨▓╨╛╨╖╨▓╤А╨░╤Й╨░╨╡╨╝ ┬л╨б╤В╨╛╨╕╤В ╨▓╨╜╨╕╨╝╨░╨╜╨╕╤П┬╗ (╤Б╨╜╤П╤В╨╛ ╤А╨░╨╜╨╡╨╡).
+- Merge: сохранены chip UX P.2k–n + H3 «Что купить сейчас» + тизеры; Tasktracker P.2o + L.1.
+- `deploy-prod-next` OK @`bb65e4a`. Proof: GET `/api/public/events?limit=50` → `Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=600`; `?ids=` 200; hub SPB — sticky `#about|#affiche|#sights|#practice|#more` + `/blog/*` teasers.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Mini-row ╤Б╨╛╨▒╤Л╤В╨╕╨╣ ╨╕ ╤В╨╛╤З╨╜╨░╤П CMS-╨┐╤А╨╕╨▓╤П╨╖╨║╨░ citySlug тАФ ╤Д╨░╨╖╤Л 2тАУ3.
+- Images webp/`next/image` (п.6 аудита) — ещё не в этом релизе.
 
 ---
 
-## 2026-07-19 тАФ City hub FAQ: ╤В╨╛╨╗╤М╨║╨╛ city-specific, ╨▒╨╡╨╖ ╨┐╨╗╨░╤В╤Д╨╛╤А╨╝╤Л
+## 2026-07-22 — Load fixes: catalog cache headers, landing refetch, favorites ids
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╨░ `/cities/sankt-peterburg` accordion FAQ ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╗ ╨┐╨╗╨░╤В╤Д╨╛╤А╨╝╨╡╨╜╨╜╤Л╨╡ ╨▓╨╛╨┐╤А╨╛╤Б╤Л: ┬л╨Ъ╨░╨║╨╕╨╡ ╤Ж╨╡╨╜╤ЛтАж┬╗, ┬л╨Ь╨╛╨╢╨╜╨╛ ╨╗╨╕ ╨▓╤Л╨▒╤А╨░╤В╤М ╨┐╨╗╨╛╤Й╨░╨┤╨║╤ГтАж┬╗, ┬л╨Э╤Г╨╢╨╜╨░ ╨╗╨╕ ╤А╨╡╨│╨╕╤Б╤В╤А╨░╤Ж╨╕╤П ╨╜╨░ ╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В╨╡тАж┬╗.
-- `buildCityFaqItems` ╨│╨╡╨╜╨╡╤А╨╕╤А╨╛╨▓╨░╨╗ FAQ ╨┐╤А╨╛ ╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В; `CityPageView` ╨╝╨╡╤А╨╢╨╕╨╗ ╨╡╨│╨╛ ╤Б `cityInfo.faq`.
+- Prod `/api/public/events` идёт в legacy API (`:4000`), не в Next. TS `public-catalog-handler` отвечал `Cache-Control: no-store` → браузер/nginx не кэшировали каталог.
+- `LandingPageView` при наличии SSR `initialPayload` всё равно делал `fetch(..., cache: 'no-store')`.
+- `FavoritesPanel` тянул `limit=300 no-store`.
+- nginx: `proxy_cache_path` был, но `proxy_cache` в `location /` не применялся; `limit_req` на `daibilet.ru /api/` отсутствовал.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `buildCityFaqItems` = ╤В╨╛╨╗╤М╨║╨╛ `cityInfo.faq` (editorial) ╨┤╨╗╤П indexable ╨│╨╛╤А╨╛╨┤╨╛╨▓; ╨▒╨╡╨╖ FAQ тАФ ╨┐╤Г╤Б╤В╨╛╨╣ ╨╝╨░╤Б╤Б╨╕╨▓ тЖТ `#faq` ╤Б╨║╤А╤Л╤В.
-- JSON-LD `FAQPage` тАФ ╤В╨╛╤В ╨╢╨╡ city FAQ, ╨▒╨╡╨╖ platform mix.
-- Default + editorial ╤З╨╡╤А╨╡╨╖ ╨╛╨▒╤Й╨╕╨╣ `CityPageView`.
+- Public handlers → `sendPublicJson` (`public, max-age=60, s-maxage=300, swr=600`).
+- Next `/api/public/events` → `getCachedCatalog`.
+- Landing: skip client refetch если SSR landing уже есть.
+- Favorites: `?ids=` (max 50) без no-store; catalog page sizes 50/100.
+- nginx prod: включён `proxy_cache` на `/` + `limit_req` на `daibilet.ru /api/`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
+
+- Images webp/avif — отдельный трек (п.6 аудита).
+
+---
+
+## 2026-07-22 — City hub × blog phase 1 (editorial teasers)
+
+### Наблюдения
+
+- Хаб был посередине между витриной и справочником: brief/travel/FAQ есть, блог жил отдельно на `/blog`.
+- `citySlug` у статей заполнен слабо; API `?citySlug=` не является строгим фильтром — нужен fallback-подбор.
+
+### Решения
+
+- Фаза 1: 5 sticky tabs (`#about` `#affiche` `#sights` `#practice` `#more`); старые якоря `#travel/#faq/#directions/#venues` сохранены внутри родителей.
+- SSR: `buildPublicArticlesListDto` + `mergeBlogCards` + `pickCityHubArticles` (лимиты 2/1/2/1/1, без повторов).
+- `CityHubArticleTeaser`: cover/title/excerpt, badges, CTA «Смотреть в афише» (scroll `#affiche`) + «Открыть материал».
+- Пустые бакеты не рендерятся; не возвращаем «Стоит внимания» (снято ранее).
+
+### Проблемы
+
+- Mini-row событий и точная CMS-привязка citySlug — фазы 2–3.
+
+---
+
+## 2026-07-19 — City hub FAQ: только city-specific, без платформы
+
+### Наблюдения
+
+- На `/cities/sankt-peterburg` accordion FAQ показывал платформенные вопросы: «Какие цены…», «Можно ли выбрать площадку…», «Нужна ли регистрация на Дайбилете…».
+- `buildCityFaqItems` генерировал FAQ про Дайбилет; `CityPageView` мержил его с `cityInfo.faq`.
+
+### Решения
+
+- `buildCityFaqItems` = только `cityInfo.faq` (editorial) для indexable городов; без FAQ — пустой массив → `#faq` скрыт.
+- JSON-LD `FAQPage` — тот же city FAQ, без platform mix.
+- Default + editorial через общий `CityPageView`.
+
+### Проблемы
 
 - Deploy `deploy-prod-next` OK @`9bc8fa7`.
-- **Proof** `/cities/sankt-peterburg` + `?hub=editorial`: ╨╜╨╡╤В ┬л╤А╨╡╨│╨╕╤Б╤В╤А╨░╤Ж╨╕╤П ╨╜╨░ ╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В╨╡┬╗ / ┬л╨Ъ╨░╨║╨╕╨╡ ╤Ж╨╡╨╜╤ЛтАж┬╗ / ┬л╨Ь╨╛╨╢╨╜╨╛ ╨╗╨╕ ╨▓╤Л╨▒╤А╨░╤В╤М ╨┐╨╗╨╛╤Й╨░╨┤╨║╤ГтАж┬╗; ╨╡╤Б╤В╤М city FAQ (╨Я╨╛╨┤╨╛╤А╨╛╨╢╨╜╨╕╨║, ╤А╨░╨╖╨▓╨╛╨┤╨║╨░ ╨╝╨╛╤Б╤В╨╛╨▓, ╨н╤А╨╝╨╕╤В╨░╨╢); `#faq` + JSON-LD FAQPage ╤Б 3 city questions.
+- **Proof** `/cities/sankt-peterburg` + `?hub=editorial`: нет «регистрация на Дайбилете» / «Какие цены…» / «Можно ли выбрать площадку…»; есть city FAQ (Подорожник, разводка мостов, Эрмитаж); `#faq` + JSON-LD FAQPage с 3 city questions.
 
 ---
 
-## 2026-07-19 тАФ City hub `#directions`: ╤В╨╛╨╗╤М╨║╨╛ chips ╤Б count > 0
+## 2026-07-19 — City hub `#directions`: только chips с count > 0
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╨░ Rostov-╨╜╨░-╨Ф╨╛╨╜╤Г ╨▓ ┬л╨Я╨╛╨┐╤Г╨╗╤П╤А╨╜╤Л╨╡ ╨╜╨░╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╤П┬╗ landings ╤Б ╤З╨╕╤Б╨╗╨╛╨╝ ╨╛╨║ (╨Э╨╛╨▓╤Л╨╣ ╨│╨╛╨┤, ╨б╤В╨╡╨╜╨┤╨░╨┐тАж), ╨░ ┬л╨Ь╨╡╤А╨╛╨┐╤А╨╕╤П╤В╨╕╤П┬╗ / ┬л╨а╨░╨╖╨▓╨╗╨╡╤З╨╡╨╜╨╕╤П┬╗ ╤И╨╗╨╕ ╨▒╨╡╨╖ ╤Б╤З╤С╤В╤З╨╕╨║╨░ тАФ ╨▓╤Л╨│╨╗╤П╨┤╨╡╨╗╨╕ ╨║╨░╨║ ╨╝╤С╤А╤В╨▓╤Л╨╡ ╨┐╨╛╨┤╨▒╨╛╤А╨║╨╕.
-- ╨Ъ╨╛╤А╨╡╨╜╤М: ╨▓ `PopularDirections` category-chips ╤Е╨░╤А╨┤╨║╨╛╨┤╨╕╨╗╨╕ `count: 0`, ╤Е╨╛╤В╤П facet ╨╕╨╖ hub feed ╨╕╨╝╨╡╨╗ ╤А╨╡╨░╨╗╤М╨╜╤Л╨╡ ╤Б╤З╤С╤В╤З╨╕╨║╨╕ (15 / 1).
+- На Rostov-на-Дону в «Популярные направления» landings с числом ок (Новый год, Стендап…), а «Мероприятия» / «Развлечения» шли без счётчика — выглядели как мёртвые подборки.
+- Корень: в `PopularDirections` category-chips хардкодили `count: 0`, хотя facet из hub feed имел реальные счётчики (15 / 1).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `CityPageView` (default + editorial): landings ╨╕ categories ╨▓ `#directions` ╤В╨╛╨╗╤М╨║╨╛ ╨┐╤А╨╕ `count > 0`; category chips ╨▒╨╡╤А╤Г╤В ╤А╨╡╨░╨╗╤М╨╜╤Л╨╣ count; `hasDirections` тАФ ╨┐╨╛ ╤В╨╛╨╝╤Г ╨╢╨╡ ╨┐╤А╨░╨▓╨╕╨╗╤Г.
-- ╨Э╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕ gap date/category chips (╨┐╨░╤А╨░╨╗╨╗╨╡╨╗╤М╨╜╤Л╨╣ ╤Д╨╕╨║╤Б).
+- `CityPageView` (default + editorial): landings и categories в `#directions` только при `count > 0`; category chips берут реальный count; `hasDirections` — по тому же правилу.
+- Не трогали gap date/category chips (параллельный фикс).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Commit `044e441` ╤Г╨╢╨╡ ╨▒╤Л╨╗ ╨▓ origin; ╨┐╤А╨╡╨┤╤Л╨┤╤Г╤Й╨╕╨╣ ╨░╨│╨╡╨╜╤В ╨╖╨░╨▓╨╕╤Б mid-deploy. ╨Ф╨╛╨╢╨░╨╗╨╕: `deploy-prod-next` OK @`044e441`.
-- **Proof** `/cities/rostov-na-donu` + `?hub=editorial`: `#directions` тАФ ╨▓╤Б╨╡ chips ╤Б count > 0 (╨Э╨╛╨▓╤Л╨╣ ╨│╨╛╨┤ 2, ╨б╤В╨╡╨╜╨┤╨░╨┐ 2, ╨Ф╨╡╤В╤П╨╝ 2, ╨Ъ╨╛╨╜╤Ж╨╡╤А╤В╤Л 8, ╨Ь╨╡╤А╨╛╨┐╤А╨╕╤П╤В╨╕╤П 15, ╨а╨░╨╖╨▓╨╗╨╡╤З╨╡╨╜╨╕╤П 1); ╨┐╤Г╤Б╤В╤Л╤Е ╨▒╨╡╨╖ ╤З╨╕╤Б╨╗╨░ ╨╜╨╡╤В.
-
----
-
-## 2026-07-19 тАФ City hub: gap ╨╝╨╡╨╢╨┤╤Г date ╨╕ category chips
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Э╨░ ╨░╤Д╨╕╤И╨╡ city hub date chips ╨╕ category chips ╨▓ ╨╛╨┤╨╜╨╛╨╝ ╤А╤П╨┤╤Г, ╨╜╨╛ ╨╝╨╡╨╢╨┤╤Г ╨│╤А╤Г╨┐╨┐╨░╨╝╨╕ (┬л╨Т╤Л╤Е╨╛╨┤╨╜╤Л╨╡┬╗ тЖФ ┬л╨Т╤Б╨╡ N┬╗) ╤В╨╛╤В ╨╢╨╡ `gap-1.5`, ╤З╤В╨╛ ╨╕ ╨▓╨╜╤Г╤В╤А╨╕ ╨│╤А╤Г╨┐╨┐╤Л тАФ ╨▓╨╕╨╖╤Г╨░╨╗╤М╨╜╨╛ ╤Б╨╗╨╕╨┐╨░╤О╤В╤Б╤П.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨Т `CityPageView` (default + editorial ╤З╨╡╤А╨╡╨╖ ╨╛╨▒╤Й╨╕╨╣ ╨║╨╛╨╝╨┐╨╛╨╜╨╡╨╜╤В): ╤Г ╤А╤П╨┤╨░ ╤Д╨╕╨╗╤М╤В╤А╨╛╨▓ `gap-x-4 gap-y-1.5` ╨╝╨╡╨╢╨┤╤Г ╨│╤А╤Г╨┐╨┐╨░╨╝╨╕; ╨▓╨╜╤Г╤В╤А╨╕ `DateFilterChips` / `CategoryFilter` ╨╛╤Б╤В╨░╨▓╨╗╨╡╨╜ ╨║╨╛╨╝╨┐╨░╨║╤В╨╜╤Л╨╣ `gap-1.5`.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- Deploy prod `@9a36f48` OK. Proof: chunk `/cities/[slug]/page-*.js` ╤Б╨╛╨┤╨╡╤А╨╢╨╕╤В `gap-x-4 gap-y-1.5`; `/cities/murmansk` + `?hub=editorial` тЖТ 200.
+- Commit `044e441` уже был в origin; предыдущий агент завис mid-deploy. Дожали: `deploy-prod-next` OK @`044e441`.
+- **Proof** `/cities/rostov-na-donu` + `?hub=editorial`: `#directions` — все chips с count > 0 (Новый год 2, Стендап 2, Детям 2, Концерты 8, Мероприятия 15, Развлечения 1); пустых без числа нет.
 
 ---
 
-## 2026-07-19 тАФ ╨Р╨┤╤А╨╡╤Б: ┬л╨Я╤А╨╛╤Б╨┐╨╡╨║╤В ╨Ъ╨╛╨╗╤М╤Б╨║╨╕╨╣┬╗ тЖТ ┬л╨Ъ╨╛╨╗╤М╤Б╨║╨╕╨╣ ╨┐╤А╨╛╤Б╨┐╨╡╨║╤В┬╗
+## 2026-07-19 — City hub: gap между date и category chips
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╨░ ╤Е╨░╨▒╨╡ ╨Ь╤Г╤А╨╝╨░╨╜╤Б╨║╨░ ╤Г ╨┐╨╗╨╛╤Й╨░╨┤╨║╨╕ ┬л╨Ь╨╡╨│╨░ ╨Ъ╤А╤Г╨╢╨║╨░┬╗ (`/venues/mega-kruzhka`) ╨▓ ╤Б╨┐╨╕╤Б╨║╨╡ venues ╨▓╤Л╨▓╨╛╨┤╨╕╨╗╤Б╤П ╤Б╤Л╤А╨╛╨╣ `venue.address`: ┬л╨Я╤А╨╛╤Б╨┐╨╡╨║╤В ╨Ъ╨╛╨╗╤М╤Б╨║╨╕╨╣, 158/1┬╗ (╨┐╨╛╤А╤П╨┤╨╛╨║ ╤В╨╕╨┐╨░ ╤Г╨╗╨╕╤Ж╤Л ╨╕╨╖ TC/API).
-- `formatStreetAddress` ╤Г╨╢╨╡ ╤З╨╕╤Б╤В╨╕╨╗ ╨│╨╛╤А╨╛╨┤/╨╕╨╜╨┤╨╡╨║╤Б, ╨╜╨╛ ╨╜╨╡ ╨┐╨╡╤А╨╡╤Б╤В╨░╨▓╨╗╤П╨╗ ┬л╤В╨╕╨┐ + ╨┐╤А╨╕╨╗╨░╨│╨░╤В╨╡╨╗╤М╨╜╨╛╨╡┬╗.
+- На афише city hub date chips и category chips в одном ряду, но между группами («Выходные» ↔ «Все N») тот же `gap-1.5`, что и внутри группы — визуально слипаются.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Т `apps/web|public/src/lib/address.ts`: ╨┤╨╗╤П ╨┐╤А╨╕╨╗╨░╨│╨░╤В╨╡╨╗╤М╨╜╤Л╤Е (-╤Б╨║╨╕╨╣/-╨╜╨░╤П/тАж) ┬л╨Я╤А╨╛╤Б╨┐╨╡╨║╤В X┬╗ / ┬л╨г╨╗╨╕╤Ж╨░ X┬╗ тЖТ ┬лX ╨┐╤А╨╛╤Б╨┐╨╡╨║╤В┬╗ / ┬лX ╤Г╨╗╨╕╤Ж╨░┬╗; ╨│╨╡╨╜╨╕╤В╨╕╨▓╤Л (┬л╨┐╤А╨╛╤Б╨┐╨╡╨║╤В ╨Ь╨╕╤А╨░┬╗, ┬л╤Г╨╗╨╕╤Ж╨░ ╨Ы╨╡╨╜╨╕╨╜╨░┬╗) ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╡╨╝.
-- City hub venues list: `formatStreetAddress(venue.address)` ╨▓╨╝╨╡╤Б╤В╨╛ ╤Б╤Л╤А╨╛╨│╨╛ ╨░╨┤╤А╨╡╤Б╨░.
-- ╨в╨╡╤Б╤В╤Л: `apps/web/src/lib/address.test.ts`.
+- В `CityPageView` (default + editorial через общий компонент): у ряда фильтров `gap-x-4 gap-y-1.5` между группами; внутри `DateFilterChips` / `CategoryFilter` оставлен компактный `gap-1.5`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Deploy prod `@8d65740` OK. Proof `/cities/murmansk` + `/venues/mega-kruzhka`: UI ┬л╨Ъ╨╛╨╗╤М╤Б╨║╨╕╨╣ ╨┐╤А╨╛╤Б╨┐╨╡╨║╤В┬╗; ╨▓ ╨С╨Ф `Venue` address ╤В╨╛╨╢╨╡ ╨╛╨▒╨╜╨╛╨▓╨╗╤С╨╜ (`╨┐╤А╨╛╤Б╨┐╨╡╨║╤В ╨Ъ╨╛╨╗╤М╤Б╨║╨╕╨╣тАж` тЖТ `╨Ъ╨╛╨╗╤М╤Б╨║╨╕╨╣ ╨┐╤А╨╛╤Б╨┐╨╡╨║╤ВтАж`).
+- Deploy prod `@9a36f48` OK. Proof: chunk `/cities/[slug]/page-*.js` содержит `gap-x-4 gap-y-1.5`; `/cities/murmansk` + `?hub=editorial` → 200.
 
 ---
 
-## 2026-07-19 тАФ City hub: ╨▒╨╡╨╖ ╨┐╨╛╨┤╨╖╨░╨│╨╛╨╗╨╛╨▓╨║╨░ ╨▓╤Л╨┤╨░╤З╨╕, chips ╨▓ ╨╛╨┤╨╜╤Г ╤Б╤В╤А╨╛╨║╤Г, ╨▒╨╡╨╖ ┬л╨б╤В╨╛╨╕╤В ╨▓╨╜╨╕╨╝╨░╨╜╨╕╤П┬╗
+## 2026-07-19 — Адрес: «Проспект Кольский» → «Кольский проспект»
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╨┤╨╖╨░╨│╨╛╨╗╨╛╨▓╨╛╨║ ╨░╤Д╨╕╤И╨╕ (┬лN ╤Б╨╛╨▒╤Л╤В╨╕╨╣ ╨▓ ╤В╨╡╨║╤Г╤Й╨╡╨╣ ╨▓╤Л╨┤╨░╤З╨╡. ╨Я╨╛╨▓╤В╨╛╤А╤П╤О╤Й╨╕╨╡╤Б╤ПтАж┬╗) ╤И╤Г╨╝╨╡╨╗ ╨┐╨╛╨┤ H2.
-- Date chips ╨╕ category chips ╤И╨╗╨╕ ╨┤╨▓╤Г╨╝╤П ╤А╤П╨┤╨░╨╝╨╕ ╨╜╨░ desktop.
-- ╨С╨╗╨╛╨║ ┬л╨б╤В╨╛╨╕╤В ╨▓╨╜╨╕╨╝╨░╨╜╨╕╤П ╨▓ {╨│╨╛╤А╨╛╨┤╨╡}┬╗ ╨┤╤Г╨▒╨╗╨╕╤А╨╛╨▓╨░╨╗ ╤В╨╡ ╨╢╨╡ ╨║╨░╤А╤В╨╛╤З╨║╨╕, ╤З╤В╨╛ ╨╕ ╨╛╤Б╨╜╨╛╨▓╨╜╨░╤П ╨░╤Д╨╕╤И╨░ (╨Ь╤Г╤А╨╝╨░╨╜╤Б╨║: ╨б╨▓╨╡╤В╨░ + ╨Ь╨╕╤А╨░╨╢ ╨┤╨▓╨░╨╢╨┤╤Л).
+- На хабе Мурманска у площадки «Мега Кружка» (`/venues/mega-kruzhka`) в списке venues выводился сырой `venue.address`: «Проспект Кольский, 158/1» (порядок типа улицы из TC/API).
+- `formatStreetAddress` уже чистил город/индекс, но не переставлял «тип + прилагательное».
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨г╨▒╤А╨░╨╜ ╨┐╨╛╨┤╨╖╨░╨│╨╛╨╗╨╛╨▓╨╛╨║ ╨▓ `CityCatalogHeader` (default + editorial).
-- Date + category chips: ╨╛╨▒╤Й╨╕╨╣ ╤А╤П╨┤ `flex-wrap` / `md:flex-nowrap` (+ horizontal scroll ╨╜╨░ desktop ╨┐╤А╨╕ ╨┐╨╡╤А╨╡╨┐╨╛╨╗╨╜╨╡╨╜╨╕╨╕).
-- ╨б ╤Е╨░╨▒╨░ ╤Б╨╜╤П╤В `RecommendedEvents` / `rankRecommended` тАФ ╨░╤Д╨╕╤И╨░ `#affiche` ╨╡╨┤╨╕╨╜╤Б╤В╨▓╨╡╨╜╨╜╤Л╨╣ ╤Б╨┐╨╕╤Б╨╛╨║ ╨║╨░╤А╤В╨╛╤З╨╡╨║.
+- В `apps/web|public/src/lib/address.ts`: для прилагательных (-ский/-ная/…) «Проспект X» / «Улица X» → «X проспект» / «X улица»; генитивы («проспект Мира», «улица Ленина») не трогаем.
+- City hub venues list: `formatStreetAddress(venue.address)` вместо сырого адреса.
+- Тесты: `apps/web/src/lib/address.test.ts`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Deploy prod `@2808ed5` OK. Proof `/cities/murmansk`: ╨╜╨╡╤В ┬л╨б╤В╨╛╨╕╤В ╨▓╨╜╨╕╨╝╨░╨╜╨╕╤П┬╗; ╨╜╨╡╤В ┬лN тАж ╨▓ ╤В╨╡╨║╤Г╤Й╨╡╨╣ ╨▓╤Л╨┤╨░╤З╨╡ / ╨Я╨╛╨▓╤В╨╛╤А╤П╤О╤Й╨╕╨╡╤Б╤ПтАж┬╗; `md:flex-nowrap` ╨╜╨░ chips; ╤А╨╛╨▓╨╜╨╛ 2 ╤Г╨╜╨╕╨║╨░╨╗╤М╨╜╤Л╨╡ ╨║╨░╤А╤В╨╛╤З╨║╨╕ (╨б╨▓╨╡╤В╨░ + ╨Ь╨╕╤А╨░╨╢), ╨▒╨╡╨╖ ╨┤╤Г╨▒╨╗╤П.
-
----
-
-## 2026-07-19 тАФ City hub: ╤Б╨╛╨│╨╗╨░╤Б╨╛╨▓╨░╨╜╨╜╤Л╨╡ ╤Б╤З╤С╤В╤З╨╕╨║╨╕ ╤З╨╕╨┐╨╛╨▓ (48 vs 635)
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Э╨░ ╨б╨Я╨▒ ┬л╨Т╤Б╨╡ 48┬╗ ╤А╤П╨┤╨╛╨╝ ╤Б ┬л╨Ь╨╡╤А╨╛╨┐╤А╨╕╤П╤В╨╕╤П 635+┬╗: ╤А╨░╨╖╨╜╤Л╨╡ ╨▒╨░╨╖╤Л.
-- `CITY_SSR_SESSION_LIMIT = 48` тЖТ `payload.sessions`; `city.categories` ╤Б╤З╨╕╤В╨░╨╗╨╕╤Б╤М ╨┐╨╛ ╨▓╤Б╨╡╨╝ `matchedSessions` (~850).
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Backend: `city.categories` = countBy ╨┐╨╛ ╤В╨╛╨╣ ╨╢╨╡ `sessions` slice, ╤З╤В╨╛ ╨▓ payload; hero `stats.events` = full-city.
-- Client: ╤З╨╕╨┐╤Л ╨╕╨╖ `payload.sessions`; ╤З╨╕╤Б╨╗╨╛ ╤В╨╛╨╗╤М╨║╨╛ ╤Г ╨░╨║╤В╨╕╨▓╨╜╨╛╨│╨╛; default title ┬л╨С╨╗╨╕╨╢╨░╨╣╤И╨╕╨╡ ╤Б╨╛╨▒╤Л╤В╨╕╤П┬╗.
-- Popular tags ╤Г╨╢╨╡ ╤Б╨╜╤П╤В╤Л (`5aa84d3`) тАФ ╨╜╨╡ ╨▓╨╛╨╖╨▓╤А╨░╤Й╨░╨╡╨╝.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Ф╨╛: sessions=48, ╨Ь╨╡╤А╨╛╨┐╤А╨╕╤П╤В╨╕╤ПтЙИ635. ╨Я╨╛╤Б╨╗╨╡: sum(categories) тЙд sessions.length.
+- Deploy prod `@8d65740` OK. Proof `/cities/murmansk` + `/venues/mega-kruzhka`: UI «Кольский проспект»; в БД `Venue` address тоже обновлён (`проспект Кольский…` → `Кольский проспект…`).
 
 ---
 
-## 2026-07-19 тАФ City hub: ╨▒╨╡╨╖ popular tags, quieter chips
+## 2026-07-19 — City hub: без подзаголовка выдачи, chips в одну строку, без «Стоит внимания»
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╨░ ╨░╤Д╨╕╤И╨╡ ╤Е╨░╨▒╨░ (╨б╨Я╨▒) ╨▒╨╗╨╛╨║ ┬л╨Я╨╛╨┐╤Г╨╗╤П╤А╨╜╤Л╨╡ ╤В╨╡╨│╨╕┬╗ ╨┤╤Г╨▒╨╗╨╕╤А╨╛╨▓╨░╨╗ ╨▓╨╡╤Б ╤Д╨╕╨╗╤М╤В╤А╨╛╨▓; date chips (navy) ╨╕ category chips (primary blue) ╨▓╤Л╨│╨╗╤П╨┤╨╡╨╗╨╕ ╨║╨░╨║ ╨┤╨▓╨░ ╤В╤П╨╢╤С╨╗╤Л╤Е ╤А╤П╨┤╨░ pills ╨▒╨╡╨╖ ╨╡╨┤╨╕╨╜╨╛╨╣ ╤Б╨╕╤Б╤В╨╡╨╝╤Л.
+- Подзаголовок афиши («N событий в текущей выдаче. Повторяющиеся…») шумел под H2.
+- Date chips и category chips шли двумя рядами на desktop.
+- Блок «Стоит внимания в {городе}» дублировал те же карточки, что и основная афиша (Мурманск: Света + Мираж дважды).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨г╨▒╤А╨░╨╜ `PopularTags` ╤Б city hub affiche (default + editorial ╤З╨╡╤А╨╡╨╖ ╨╛╨▒╤Й╨╕╨╣ `CityPageView`).
-- Date + category chips: ╨╛╨▒╤Й╨╕╨╣ `hubFilterChipClass` тАФ `rounded-md`, ╨╝╨╡╨╜╤М╤И╨╕╨╣ padding, quiet border, ╨╡╨┤╨╕╨╜╤Л╨╣ active (`slate-800` / `zinc-900`).
-- ╨д╨╕╨╗╤М╤В╤А ╨┐╨╛ tag ╤Б ╤Е╨░╨▒╨░ ╤Б╨╜╤П╤В (╤В╨╡╨│╨╕ ╨╛╤Б╤В╨░╤О╤В╤Б╤П ╨╜╨░ event page / ╨┐╨╛╨┤╨▒╨╛╤А╨║╨░╤Е).
+- Убран подзаголовок в `CityCatalogHeader` (default + editorial).
+- Date + category chips: общий ряд `flex-wrap` / `md:flex-nowrap` (+ horizontal scroll на desktop при переполнении).
+- С хаба снят `RecommendedEvents` / `rankRecommended` — афиша `#affiche` единственный список карточек.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Deploy prod `@5aa84d3` OK. Proof `/cities/sankt-peterburg`: ╨╜╨╡╤В ┬л╨Я╨╛╨┐╤Г╨╗╤П╤А╨╜╤Л╨╡ ╤В╨╡╨│╨╕┬╗; chips `rounded-md border px-2.5`; active `slate-800` (╨╜╨╡ primary blue). Editorial `?hub=editorial` тАФ ╤В╨╛╨╢╨╡ ╨▒╨╡╨╖ tag cloud.
+- Deploy prod `@2808ed5` OK. Proof `/cities/murmansk`: нет «Стоит внимания»; нет «N … в текущей выдаче / Повторяющиеся…»; `md:flex-nowrap` на chips; ровно 2 уникальные карточки (Света + Мираж), без дубля.
 
 ---
 
-## 2026-07-19 тАФ City hub editorial template (P.2i experiment)
+## 2026-07-19 — City hub: согласованные счётчики чипов (48 vs 635)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨д╨░╨╖╨░ 1 (`d877813`) тАФ default IA: affiche first + sticky + FAQ accordion.
-- Lovable Vite mock (`city-hub-redesign`) тАФ moodboard only: light zinc, serif H1, poster 4:5 cards; ╨╜╨╡ ╨┐╨╛╤А╤В ╤Б╤В╨╡╨║╨░ (TanStack/bun/shadcn/terracotta).
+- На СПб «Все 48» рядом с «Мероприятия 635+»: разные базы.
+- `CITY_SSR_SESSION_LIMIT = 48` → `payload.sessions`; `city.categories` считались по всем `matchedSessions` (~850).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Я╨░╤А╨░╨╗╨╗╨╡╨╗╤М╨╜╤Л╨╣ template: `hubTemplate: 'editorial' | 'default'`; `CityPageViewEditorial` тЖТ `CityPageView hubTemplate="editorial"`.
-- ╨Т╨║╨╗╤О╤З╨╡╨╜╨╕╨╡: `?hub=editorial` (╨╗╤О╨▒╨╛╨╣ ╨│╨╛╤А╨╛╨┤); `?hub=default` ╤Д╨╛╤А╤Б╨╕╤А╤Г╨╡╤В ╤Д╨░╨╖╤Г 1; optional env `CITY_HUB_EDITORIAL_SLUGS` allowlist (╨╜╨╡ ╤В╤А╨╛╨│╨░╨╡╤В 65 ╨│╨╛╤А╨╛╨┤╨╛╨▓ ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О).
-- Visual: Source Serif 4 H1/H2, zinc-50, compact counters, sticky tabs, affiche poster-cards (`AffichePosterCard`), ╤В╨╡ ╨╢╨╡ API/`cityInfo` ╨┤╨░╨╜╨╜╤Л╨╡.
-- Default phase 1 ╨▒╨╡╨╖ ╤А╨╡╨│╤А╨╡╤Б╤Б╨╕╨╕.
+- Backend: `city.categories` = countBy по той же `sessions` slice, что в payload; hero `stats.events` = full-city.
+- Client: чипы из `payload.sessions`; число только у активного; default title «Ближайшие события».
+- Popular tags уже сняты (`5aa84d3`) — не возвращаем.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
+
+- До: sessions=48, Мероприятия≈635. После: sum(categories) ≤ sessions.length.
+
+---
+
+## 2026-07-19 — City hub: без popular tags, quieter chips
+
+### Наблюдения
+
+- На афише хаба (СПб) блок «Популярные теги» дублировал вес фильтров; date chips (navy) и category chips (primary blue) выглядели как два тяжёлых ряда pills без единой системы.
+
+### Решения
+
+- Убран `PopularTags` с city hub affiche (default + editorial через общий `CityPageView`).
+- Date + category chips: общий `hubFilterChipClass` — `rounded-md`, меньший padding, quiet border, единый active (`slate-800` / `zinc-900`).
+- Фильтр по tag с хаба снят (теги остаются на event page / подборках).
+
+### Проблемы
+
+- Deploy prod `@5aa84d3` OK. Proof `/cities/sankt-peterburg`: нет «Популярные теги»; chips `rounded-md border px-2.5`; active `slate-800` (не primary blue). Editorial `?hub=editorial` — тоже без tag cloud.
+
+---
+
+## 2026-07-19 — City hub editorial template (P.2i experiment)
+
+### Наблюдения
+
+- Фаза 1 (`d877813`) — default IA: affiche first + sticky + FAQ accordion.
+- Lovable Vite mock (`city-hub-redesign`) — moodboard only: light zinc, serif H1, poster 4:5 cards; не порт стека (TanStack/bun/shadcn/terracotta).
+
+### Решения
+
+- Параллельный template: `hubTemplate: 'editorial' | 'default'`; `CityPageViewEditorial` → `CityPageView hubTemplate="editorial"`.
+- Включение: `?hub=editorial` (любой город); `?hub=default` форсирует фазу 1; optional env `CITY_HUB_EDITORIAL_SLUGS` allowlist (не трогает 65 городов по умолчанию).
+- Visual: Source Serif 4 H1/H2, zinc-50, compact counters, sticky tabs, affiche poster-cards (`AffichePosterCard`), те же API/`cityInfo` данные.
+- Default phase 1 без регрессии.
+
+### Проблемы
 
 - Deploy prod `@6efe0d8` OK. Proof:
-  - Default: https://daibilet.ru/cities/sankt-peterburg тАФ dark hero (`border-primary-950`), ╨╜╨╡╤В `font-serif` / `bg-zinc-50`.
-  - Editorial: https://daibilet.ru/cities/sankt-peterburg?hub=editorial тАФ `font-serif` H1, `bg-zinc-50`, poster `aspect-[4/5]`, ╤В╨╛╤В ╨╢╨╡ `#affiche` IA.
+  - Default: https://daibilet.ru/cities/sankt-peterburg — dark hero (`border-primary-950`), нет `font-serif` / `bg-zinc-50`.
+  - Editorial: https://daibilet.ru/cities/sankt-peterburg?hub=editorial — `font-serif` H1, `bg-zinc-50`, poster `aspect-[4/5]`, тот же `#affiche` IA.
 
 ---
 
-## 2026-07-19 тАФ City hub ╤Д╨░╨╖╨░ 1 (P.2f) ╤А╨╡╨░╨╗╨╕╨╖╨╛╨▓╨░╨╜╨░
+## 2026-07-19 — City hub фаза 1 (P.2f) реализована
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Wireframe v1 ╨╖╨░╨║╤А╤Л╤В ╨║╨╛╨┤╨╛╨╝ ╨▓ `CityPageView`: ╨┐╨╛╤А╤П╨┤╨╛╨║ Hero тЖТ sticky tabs тЖТ `#affiche` тЖТ `#directions` тЖТ `#venues` тЖТ `#travel` тЖТ `#sights` тЖТ `#faq` тЖТ `#seo`.
-- Lovable-╤А╨╡╨┐╨╛ ╨╜╨╡ ╨┐╨╛╤А╤В╨╕╤А╨╛╨▓╨░╨╗╨╕ тАФ ╤В╨╛╨╗╤М╨║╨╛ IA/UX ╨▓╤Л╨▓╨╛╨┤╤Л (╨░╤Д╨╕╤И╨░ ╨▓╤Л╤И╨╡ ╨│╨╕╨┤╨░, ╨╛╨┤╨╕╨╜ FAQ accordion, ╨║╨╛╨╝╨┐╨░╨║╤В╨╜╤Л╨╡ ╤Б╤З╤С╤В╤З╨╕╨║╨╕).
+- Wireframe v1 закрыт кодом в `CityPageView`: порядок Hero → sticky tabs → `#affiche` → `#directions` → `#venues` → `#travel` → `#sights` → `#faq` → `#seo`.
+- Lovable-репо не портировали — только IA/UX выводы (афиша выше гида, один FAQ accordion, компактные счётчики).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
 - Sticky tabs + IntersectionObserver scrollspy; mobile horizontal chips.
-- ╨з╨╕╨┐╤Л **╨б╨╡╨│╨╛╨┤╨╜╤П / ╨Т╤Л╤Е╨╛╨┤╨╜╤Л╨╡** ╤З╨╡╤А╨╡╨╖ `datetime` TZ helpers (╨║╨░╨║ ╨╜╨░ event/landing).
-- FAQ: editorial `cityInfo.faq` + generated `faqItems` ╨▓ ╨╛╨┤╨╜╨╛╨╝ accordion (one-open).
-- Alias `#city-schedule` тЖТ `#affiche` (╨╕ ╤Б╤В╨░╤А╤Л╨╡ `#city-*` ╤П╨║╨╛╤А╤П); `cityEventsHref` тЖТ `#affiche`.
-- P.2f тЬЕ; deploy prod ╨┐╨╛╤Б╨╗╨╡ push `feat/next-monorepo`.
+- Чипы **Сегодня / Выходные** через `datetime` TZ helpers (как на event/landing).
+- FAQ: editorial `cityInfo.faq` + generated `faqItems` в одном accordion (one-open).
+- Alias `#city-schedule` → `#affiche` (и старые `#city-*` якоря); `cityEventsHref` → `#affiche`.
+- P.2f ✅; deploy prod после push `feat/next-monorepo`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Deploy prod `@d877813` OK. Proof: `/cities/sankt-peterburg` тАФ ╨┐╨╛╤А╤П╨┤╨╛╨║ `affiche тЖТ directions тЖТ venues тЖТ travel тЖТ sights тЖТ faq тЖТ seo`, sticky nav, ╤З╨╕╨┐╤Л ╨б╨╡╨│╨╛╨┤╨╜╤П/╨Т╤Л╤Е╨╛╨┤╨╜╤Л╨╡, ╨╛╨┤╨╕╨╜ FAQ H2.
-
----
-
-## 2026-07-19 тАФ City SEO title: ╨╕╨╝╨╡╨╜╨╕╤В╨╡╨╗╤М╨╜╤Л╨╣ + ╨┤╨░╤В╨░ ┬л╤Б╨╡╨│╨╛╨┤╨╜╤П┬╗
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Я╨░╤В╤В╨╡╤А╨╜ P.2d ┬л╨б╨╛╨▒╤Л╤В╨╕╤П ╨▓ тАж ╨╜╨░ ╤Б╨╡╨│╨╛╨┤╨╜╤П┬╗ (╨┐╤А╨╡╨┤╨╗╨╛╨╢╨╜╤Л╨╣) ╤Е╤Г╨╢╨╡ ╤Б╤В╨░╤А╨╛╨│╨╛ brand-title ┬л╨У╨╛╤А╨╛╨┤: ╨░╤Д╨╕╤И╨░, ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕ ╨╕ ╨▒╨╕╨╗╨╡╤В╤Л┬╗.
-- ╨Э╤Г╨╢╨╡╨╜ ╤Б╨╕╨│╨╜╨░╨╗ ╨░╨║╤В╤Г╨░╨╗╤М╨╜╨╛╤Б╤В╨╕: ┬л╨╜╨░ ╤Б╨╡╨│╨╛╨┤╨╜╤П, {╨┤╨░╤В╨░}┬╗ (MSK, ╤З╨╡╨╗╨╛╨▓╨╡╨║╨╛╤З╨╕╤В╨░╨╡╨╝╨╛).
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Title standalone hubs: `{City}: ╨░╤Д╨╕╤И╨░, ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕ ╨╕ ╨▒╨╕╨╗╨╡╤В╤Л ╨╜╨░ ╤Б╨╡╨│╨╛╨┤╨╜╤П, {19 ╨╕╤О╨╗╤П} | ╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В` (╨╕╨╝╨╡╨╜╨╕╤В╨╡╨╗╤М╨╜╤Л╨╣ ╨┐╨░╨┤╨╡╨╢).
-- ╨е╨╡╨╗╨┐╨╡╤А `buildCityHubSeoTitle` (web / public / backend DTO + legacy `dto.js`); `generateMetadata` ╨▓╤Б╨╡╨│╨┤╨░ ╤Б╤З╨╕╤В╨░╨╡╤В title ╤Б ╨╢╨╕╨▓╨╛╨╣ ╨┤╨░╤В╨╛╨╣.
-- Description ╨▒╨╡╨╖ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╣ (locative).
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- Deploy prod `@2079e3a` OK. Proof (view-source ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡): `/cities/sankt-peterburg` тЖТ `<title>╨б╨░╨╜╨║╤В-╨Я╨╡╤В╨╡╤А╨▒╤Г╤А╨│: ╨░╤Д╨╕╤И╨░, ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕ ╨╕ ╨▒╨╕╨╗╨╡╤В╤Л ╨╜╨░ ╤Б╨╡╨│╨╛╨┤╨╜╤П, 19 ╨╕╤О╨╗╤П | ╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В</title>`.
+- Deploy prod `@d877813` OK. Proof: `/cities/sankt-peterburg` — порядок `affiche → directions → venues → travel → sights → faq → seo`, sticky nav, чипы Сегодня/Выходные, один FAQ H2.
 
 ---
 
-## 2026-07-19 тАФ City hub wireframe v2 (╤Д╨░╨╖╨░ 2, city-specific)
+## 2026-07-19 — City SEO title: именительный + дата «сегодня»
 
+### Наблюдения
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+- Паттерн P.2d «События в … на сегодня» (предложный) хуже старого brand-title «Город: афиша, экскурсии и билеты».
+- Нужен сигнал актуальности: «на сегодня, {дата}» (MSK, человекочитаемо).
 
-- ╨а╨╕╤Б╨║ ╤Д╨░╨╖╤Л 2: ╨╛╨┤╨╕╨╜ UI ╨╜╨░ 65 ╤Е╨░╨▒╨╛╨▓ ╨▒╨╡╨╖ fingerprint тАФ ╨║╨╛╨┐╨╕╨┐╨░╤Б╤В╨░ ╨╜╨░╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╨╣ ╨╕ CTA.
-- ╨д╨░╨╖╨░ 1 (v1) ╨╖╨░╨║╤А╤Л╨▓╨░╨╡╤В ╨║╨░╤А╨║╨░╤Б: ╨░╤Д╨╕╤И╨░ ╨▓╤Л╤И╨╡, sticky, FAQ accordion, ╤З╨╕╨┐╤Л ╨б╨╡╨│╨╛╨┤╨╜╤П/╨Т╤Л╤Е╨╛╨┤╨╜╤Л╨╡.
-- ╨Я╤А╨╛╨┤╤Г╨║╤В ╤Д╨░╨╖╤Л 2: ╨┐╨╗╨╕╤В╨║╨╕ ╨╜╨░╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╨╣, ╤Г╤Б╨╕╨╗╨╡╨╜╨╕╨╡ ╨░╤Д╨╕╤И╨╕, sightsтЖТ╨░╤Д╨╕╤И╨░ ╤В╨╛╨╗╤М╨║╨╛ ╨┐╤А╨╕ ╤А╨╡╨░╨╗╤М╨╜╨╛╨╣ ╨┐╤А╨╕╨▓╤П╨╖╨║╨╡, venues ╤В╨╛╨┐-N ╨▒╨╡╨╖ ╨║╨░╤А╤В╤Л. ╨д╨░╨╖╨░ 3 (╨┐╨╛╨│╨╛╨┤╨░/╨╝╨╛╤Б╤В╤Л, bento, ╨║╨░╤А╤В╨░, dark ╨б╨Я╨▒) тАФ ╨▓╨╜╨╡ scope.
+### Решения
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+- Title standalone hubs: `{City}: афиша, экскурсии и билеты на сегодня, {19 июля} | Дайбилет` (именительный падеж).
+- Хелпер `buildCityHubSeoTitle` (web / public / backend DTO + legacy `dto.js`); `generateMetadata` всегда считает title с живой датой.
+- Description без изменений (locative).
 
-- ╨Ч╨░╤Д╨╕╨║╤Б╨╕╤А╨╛╨▓╨░╨╜ IA: [city-hub-wireframe-v2.md](./city-hub-wireframe-v2.md) тАФ ╨┐╤А╨╕╨╜╤Ж╨╕╨┐ city-specific (╨╛╨▒╤Й╨╕╨╣ ╨║╨░╤А╨║╨░╤Б + per-city ╨║╨╛╨╜╤Д╨╕╨│).
-- ╨Ъ╨╛╨╜╤Д╨╕╨│-╨╕╨┤╨╡╤П: `featuredDirections[]`, `highlightSeason`, `hideSections?`, `primaryCta?` (╤А╨░╤Б╤И╨╕╤А╨╡╨╜╨╕╨╡ `cityInfo` ╨╕╨╗╨╕ ╤Б╨╛╤Б╨╡╨┤╨╜╨╕╨╣ `cityHubConfig`; ╨▒╨╡╨╖ ╨║╨╛╨┤╨░).
-- Fingerprint-╨┐╤А╨╕╨╝╨╡╤А╤Л: ╨б╨Я╨▒, ╨б╨╛╤З╨╕, ╨Ъ╨░╨╖╨░╨╜╤М, ╨Ь╤Г╤А╨╝╨░╨╜╤Б╨║, ╨Ь╨╛╤Б╨║╨▓╨░.
-- P.2g wireframe тЬЕ; P.2h ╤А╨╡╨░╨╗╨╕╨╖╨░╤Ж╨╕╤П тП│. Docs only, ╨▒╨╡╨╖ deploy.
+### Проблемы
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╨╡╤В (╨╛╨╢╨╕╨┤╨░╨╡╤В code-task P.2h ╨┐╨╛╤Б╨╗╨╡/╨▓╨╜╨░╤Е╨╗╤С╤Б╤В ╤Б P.2f).
+- Deploy prod `@2079e3a` OK. Proof (view-source на сервере): `/cities/sankt-peterburg` → `<title>Санкт-Петербург: афиша, экскурсии и билеты на сегодня, 19 июля | Дайбилет</title>`.
 
 ---
 
-## 2026-07-19 тАФ City hub wireframe v1 (╤Д╨░╨╖╨░ 1)
+## 2026-07-19 — City hub wireframe v2 (фаза 2, city-specific)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
 
-- ╨в╨╡╨║╤Г╤Й╨╕╨╣ `/cities/[slug]` (`CityPageView`): hero тЖТ travel тЖТ sights тЖТ guide FAQ тЖТ ╨╜╨░╨┐╤А╨░╨▓╨╗╨╡╨╜╨╕╤П/venues/tags тЖТ recommended тЖТ **╨░╤Д╨╕╤И╨░ `#city-schedule` ╨▓╨╜╨╕╨╖╤Г** тЖТ SEO тЖТ ╨▓╤В╨╛╤А╨╛╨╣ FAQ тАФ ╨│╨╕╨┤ ╨╝╨╡╤И╨░╨╡╤В ╨┤╨╛╨╣╤В╨╕ ╨┤╨╛ ╨┐╨╛╨║╤Г╨┐╨║╨╕.
-- ╨Ъ╨╛╨╜╤В╨╡╨╜╤В 65 ╤Е╨░╨▒╨╛╨▓ ╨│╨╛╤В╨╛╨▓ ╨┐╨╛ brief/travel/faq; sights ╨╝╨╡╤Б╤В╨░╨╝╨╕ тЪая╕П; ╤Д╨╛╤В╨╛-bento ╨╕ ╨║╨░╤А╤В╨░ ╨╜╨╡ ╨╛╨▒╨╡╤Б╨┐╨╡╤З╨╡╨╜╤Л ╨┤╨░╨╜╨╜╤Л╨╝╨╕.
-- ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М ╤Б╨╛╨│╨╗╨░╤Б╨╛╨▓╨░╨╗ wireframe ╤Д╨░╨╖╤Л 1 **╨▒╨╡╨╖** ╨║╨╛╨┤╨░ Lovable.
+### Наблюдения
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+- Риск фазы 2: один UI на 65 хабов без fingerprint — копипаста направлений и CTA.
+- Фаза 1 (v1) закрывает каркас: афиша выше, sticky, FAQ accordion, чипы Сегодня/Выходные.
+- Продукт фазы 2: плитки направлений, усиление афиши, sights→афиша только при реальной привязке, venues топ-N без карты. Фаза 3 (погода/мосты, bento, карта, dark СПб) — вне scope.
 
-- ╨Ч╨░╤Д╨╕╨║╤Б╨╕╤А╨╛╨▓╨░╨╜ IA: [city-hub-wireframe-v1.md](./city-hub-wireframe-v1.md) тАФ sticky tabs, ╨░╤Д╨╕╤И╨░ ╨▓╤Л╤И╨╡ ╨│╨╕╨┤╨░, FAQ accordion (╨╛╨┤╨╕╨╜ ╨▒╨╗╨╛╨║), ╨║╨╛╨╝╨┐╨░╨║╤В╨╜╤Л╨╡ ╤Б╤З╤С╤В╤З╨╕╨║╨╕, ╤З╨╕╨┐╤Л ╨б╨╡╨│╨╛╨┤╨╜╤П/╨Т╤Л╤Е╨╛╨┤╨╜╤Л╨╡, ╤Б╨▓╨╡╤В╨╗╨░╤П ╨╕╨╖╨┤╨░╤В╨╡╨╗╤М╤Б╨║╨░╤П ╤Б╨╡╤В╨║╨░.
-- ╨п╨║╨╛╤А╤П: `#affiche` (+ alias `#city-schedule`), `#directions`, `#venues`, `#travel`, `#sights`, `#faq`.
-- Out of scope ╤Д╨░╨╖╤Л 1: ╨┐╨╛╨│╨╛╨┤╨░/╨╝╨╛╤Б╤В╤Л, bento sights, ╨║╨░╤А╤В╨░ ╨┐╨╗╨╛╤Й╨░╨┤╨╛╨║, dark redesign 65, ╤В╤С╨╝╨╜╤Л╨╣ ╨░╨║╤Ж╨╡╨╜╤В ╨б╨Я╨▒.
-- ╨Ю╤Ж╨╡╨╜╨║╨░ ╤А╨╡╨░╨╗╨╕╨╖╨░╤Ж╨╕╨╕: **M** (~1тАУ2 eng-╨┤╨╜╤П); wireframe = docs only.
+### Решения
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+- Зафиксирован IA: [city-hub-wireframe-v2.md](./city-hub-wireframe-v2.md) — принцип city-specific (общий каркас + per-city конфиг).
+- Конфиг-идея: `featuredDirections[]`, `highlightSeason`, `hideSections?`, `primaryCta?` (расширение `cityInfo` или соседний `cityHubConfig`; без кода).
+- Fingerprint-примеры: СПб, Сочи, Казань, Мурманск, Москва.
+- P.2g wireframe ✅; P.2h реализация ⏳. Docs only, без deploy.
 
-- ╨Э╨╡╤В (╨╛╨╢╨╕╨┤╨░╨╡╤В ╨╛╤В╨┤╨╡╨╗╤М╨╜╤Л╨╣ code-task ╨┐╨╛╤Б╨╗╨╡ wireframe).
+### Проблемы
 
----
-
-## 2026-07-19 тАФ City SEO: ┬л╨╜╨░ ╤Б╨╡╨│╨╛╨┤╨╜╤П┬╗ ╨▓ title ╤Е╨░╨▒╨╛╨▓
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- Title standalone city hubs: ┬л╨Ь╤Г╤А╨╝╨░╨╜╤Б╨║: ╨░╤Д╨╕╤И╨░, ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕ ╨╕ ╨▒╨╕╨╗╨╡╤В╤Л | ╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В┬╗ тАФ ╨▒╨╡╨╖ ╤Б╨╕╨│╨╜╨░╨╗╨░ ┬л╤Б╨╡╨│╨╛╨┤╨╜╤П┬╗.
-- Description ╤Г╨╢╨╡ ╤Б locative (┬л╨▓ ╨Ь╤Г╤А╨╝╨░╨╜╤Б╨║╨╡┬╗) ╨┐╨╛╤Б╨╗╨╡ P.2c; ╨┤╤Г╨▒╨╗╨╕╤А╨╛╨▓╨░╤В╤М ┬л╨╜╨░ ╤Б╨╡╨│╨╛╨┤╨╜╤П┬╗ ╨▓ description ╨╜╨╡ ╨╜╤Г╨╢╨╜╨╛.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Default `seoTitle`: `╨б╨╛╨▒╤Л╤В╨╕╤П ${entityLabel} ╨╜╨░ ╤Б╨╡╨│╨╛╨┤╨╜╤П | ╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В` (DTO + legacy `dto.js`).
-- `generateMetadata` / client `applyCityMeta` / social-preview fallbacks ╤Б╨╛╨│╨╗╨░╤Б╨╛╨▓╨░╨╜╤Л.
-- Description ╨▒╨╡╨╖ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╣ (locative ╨╛╤Б╤В╨░╤С╤В╤Б╤П, ╨▒╨╡╨╖ ╨▓╤В╨╛╤А╨╛╨│╨╛ ┬л╨╜╨░ ╤Б╨╡╨│╨╛╨┤╨╜╤П┬╗).
-- Deploy prod `@48e6147` (╨▓╨║╨╗╤О╤З╨░╨╡╤В `d49f463` + Suspense/SiteLayout build-fixes).
-- Proof (view-source): `/cities/murmansk` тЖТ `<title>╨б╨╛╨▒╤Л╤В╨╕╤П ╨▓ ╨Ь╤Г╤А╨╝╨░╨╜╤Б╨║╨╡ ╨╜╨░ ╤Б╨╡╨│╨╛╨┤╨╜╤П | ╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В</title>` (locative + ┬л╨╜╨░ ╤Б╨╡╨│╨╛╨┤╨╜╤П┬╗).
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Я╨╡╤А╨▓╤Л╨╣ deploy ╤Г╨┐╤С╤А╤Б╤П ╨▓ `/locations` useSearchParams ╨╕ ╨▓ SiteLayout fallback ╤Б children ╨▓╨╜╨╡ provider тАФ ╨┐╨╛╤З╨╕╨╜╨╡╨╜╨╛ ╨╛╤В╨┤╨╡╨╗╤М╨╜╤Л╨╝╨╕ ╨║╨╛╨╝╨╝╨╕╤В╨░╨╝╨╕.
-- SSH ╨║ prod ╨╜╨╡╤Б╤В╨░╨▒╨╕╨╗╨╡╨╜ (banner timeout); ╨┤╨╡╨┐╨╗╨╛╨╣ ╤З╨╡╤А╨╡╨╖ nohup + poll ╨╗╨╛╨│╨░.
+- Нет (ожидает code-task P.2h после/внахлёст с P.2f).
 
 ---
 
-## 2026-07-19 тАФ Prod: ╨┐╤Г╤Б╤В╤Л╨╡ ╨│╨╗╨░╨▓╨╜╨░╤П ╨╕ `/events` (stats null.name)
+## 2026-07-19 — City hub wireframe v1 (фаза 1)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- `/api/public/stats` тЖТ 500: `Cannot read properties of null (reading 'name')` ╨▓ `destinationSummaryRowsFast` (`publicDestinationForCity` ╨▓╨╛╨╖╨▓╤А╨░╤Й╨░╨╡╤В `null` ╨┤╨╗╤П foreign/unroutable ╨│╨╛╤А╨╛╨┤╨╛╨▓).
-- `getHomePageData` ╤З╨╡╤А╨╡╨╖ `Promise.all` тАФ ╨┐╨░╨┤╨╡╨╜╨╕╨╡ stats ╨╛╨▒╨╜╤Г╨╗╤П╨╗╨╛ ╨▓╨╡╤Б╤М home (editors-pick / rails ╨▒╨╡╨╖ ╨║╨░╤А╤В╨╛╤З╨╡╨║).
-- `/api/public/events` ╨▒╤Л╨╗ ╨╢╨╕╨▓ (2371+); ╨║╨░╤В╨░╨╗╨╛╨│ ╨▒╨╡╨╖ `?city=` ╨╜╨░ ╨║╨╗╨╕╨╡╨╜╤В╨╡ ╤Б╨▒╤А╨░╤Б╤Л╨▓╨░╨╗ SSR ╨▓ ╤Б╨║╨╡╨╗╨╡╤В╨╛╨╜╤Л ╨╜╨░ ╨▓╤А╨╡╨╝╤П city bootstrap.
-- `daibilet-api` / `daibilet-web` active; OOM ╨▓ dmesg ╨╜╨╡╤В; web ╨┐╨╛╨┤ memory high ╨┐╨╛╤Б╨╗╨╡ ╤А╨╡╤Б╤В╨░╤А╤В╨╛╨▓.
+- Текущий `/cities/[slug]` (`CityPageView`): hero → travel → sights → guide FAQ → направления/venues/tags → recommended → **афиша `#city-schedule` внизу** → SEO → второй FAQ — гид мешает дойти до покупки.
+- Контент 65 хабов готов по brief/travel/faq; sights местами ⚠️; фото-bento и карта не обеспечены данными.
+- Пользователь согласовал wireframe фазы 1 **без** кода Lovable.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- Hotfix prod: `dto.js` тАФ null-safe `destination?.name` ╨▓ stats/admin/public rows; restart `daibilet-api` + `daibilet-web`, ╤Б╨▒╤А╨╛╤Б `.next/cache`.
-- Worktree: `getHomePageData` тЖТ `Promise.allSettled`; SiteLayout Suspense fallback ╤Б╨╛╤Е╤А╨░╨╜╤П╨╡╤В `{children}`; CatalogShell ╨╜╨╡ ╨╖╨░╤В╨╕╤А╨░╨╡╤В SSR catalog ╨┐╤А╨╕ city bootstrap.
-- Proof: stats 200 (`events:2487`); home HTML ╤Б `evt_`├Ч30 + ┬л╨Т╤Л╨▒╨╛╤А ╤А╨╡╨┤╨░╨║╤Ж╨╕╨╕┬╗; `/events?city=╨Ь╨╛╤Б╨║╨▓╨░` ╤Б ╨║╨░╤А╤В╨╛╤З╨║╨░╨╝╨╕.
+- Зафиксирован IA: [city-hub-wireframe-v1.md](./city-hub-wireframe-v1.md) — sticky tabs, афиша выше гида, FAQ accordion (один блок), компактные счётчики, чипы Сегодня/Выходные, светлая издательская сетка.
+- Якоря: `#affiche` (+ alias `#city-schedule`), `#directions`, `#venues`, `#travel`, `#sights`, `#faq`.
+- Out of scope фазы 1: погода/мосты, bento sights, карта площадок, dark redesign 65, тёмный акцент СПб.
+- Оценка реализации: **M** (~1–2 eng-дня); wireframe = docs only.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- SiteLayout/CatalogShell/`Promise.allSettled` ╨╖╨░╨║╨╛╨╝╨╝╨╕╤З╨╡╨╜╤Л ╨▓ `feat/next-monorepo` тАФ ╨╜╤Г╨╢╨╡╨╜ web rebuild ╨╜╨░ prod ╨┐╤А╨╕ ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╡╨╝ deploy.
-- ╨Э╨╡ ╨┤╨╡╨┐╨╗╨╛╨╕╤В╤М ╨┐╨╛╨▓╨╡╤А╤Е ╨░╨║╤В╨╕╨▓╨╜╨╛╨│╨╛ favicon-╨░╨│╨╡╨╜╤В╨░ ╨▒╨╡╨╖ ╨║╨╛╨╛╤А╨┤╨╕╨╜╨░╤Ж╨╕╨╕.
-
----
-
-## 2026-07-19 тАФ City hub: events>0 / venues=0 (╨Ь╤Г╤А╨╝╨░╨╜╤Б╨║)
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- `/cities/murmansk`: events=2, venues=0 ╨┐╤А╨╕ ╨╢╨╕╨▓╨╛╨╣ ╨┐╨╗╨╛╤Й╨░╨┤╨║╨╡ ┬л╨Ь╨╡╨│╨░ ╨Ъ╤А╤Г╨╢╨║╨░┬╗ (`venue_5ea93efb186c38b2a9d379bd`, pageStatus=CANDIDATE).
-- ╨б╨╛╨▒╤Л╤В╨╕╤П ╨║╨╛╤А╤А╨╡╨║╤В╨╜╨╛ ╤Б╨▓╤П╨╖╨░╨╜╤Л ╤З╨╡╤А╨╡╨╖ `Event.venueId`; `/venues/mega-kruzhka` ╨╛╤В╨┤╨░╤С╤В events=2.
-- `publicVenueHubRows(limit=500)` ╨▒╨╡╤А╤С╤В top-N ╨┐╨╛ SQL count; ┬л╨Ь╨╡╨│╨░ ╨Ъ╤А╤Г╨╢╨║╨░┬╗ ╨╜╨░ ╤А╨░╨╜╨│╨╡ **511** тЖТ ╨╜╨╡ ╨┐╨╛╨┐╨░╨┤╨░╨╗╨░ ╨▓ hub.
-- `publicVenuesForSessionsFromHub` ╨╕╤Б╨║╨░╨╗ ╤В╨╛╨╗╤М╨║╨╛ ╨▓ hubRows ╨┐╨╛ `venueId` тЖТ ╨┐╤Г╤Б╤В╨╛╨╣ ╤Б╨┐╨╕╤Б╨╛╨║ ╨╕ stats.venues=0.
-- Landings ╤Г╨╢╨╡ ╤Б╤З╨╕╤В╨░╨╗╨╕ venues=1 (╨┤╤А╤Г╨│╨╛╨╣ ╨┐╤Г╤В╤М) тАФ UI ╨▓╤Л╨│╨╗╤П╨┤╨╡╨╗ ╨┐╤А╨╛╤В╨╕╨▓╨╛╤А╨╡╤З╨╕╨▓╨╛.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- `resolvePublicVenuesForSessions`: ╨┐╨╛╤Б╨╗╨╡ hub-match ╨┤╨╛╨│╤А╤Г╨╢╨░╨╡╤В missing `venueId` ╤З╨╡╤А╨╡╨╖ `venueRowsByIds`.
-- Match hub ╤В╨░╨║╨╢╨╡ ╨┐╨╛ ╨╜╨╛╤А╨╝╨░╨╗╨╕╨╖╨╛╨▓╨░╨╜╨╜╨╛╨╝╤Г `venueSlug`.
-- `countDistinctSessionVenues` ╨┤╨╗╤П `city.venues` / `stats.venues` ╨┐╨╛ ╨▓╤Б╨╡╨╝ ╤Б╨╡╤Б╤Б╨╕╤П╨╝ ╨│╨╛╤А╨╛╨┤╨░ (╨╜╨╡ cap display-list).
-- UI: CTA ┬л╨Т╤Б╨╡ ╤Б╨╛╨▒╤Л╤В╨╕╤П┬╗ тАФ `gap-2` + `shrink-0` ╤Г ╨╕╨║╨╛╨╜╨║╨╕ Ticket.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨У╨╗╨╛╨▒╨░╨╗╤М╨╜╤Л╨╣ hub catalogue ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г top-500; city hubs ╨▒╨╛╨╗╤М╤И╨╡ ╨╛╤В ╨╜╨╡╨│╨╛ ╨╜╨╡ ╨╖╨░╨▓╨╕╤Б╤П╤В ╨┤╨╗╤П ╤Б╤З╤С╤В╤З╨╕╨║╨░ ╨┐╨╗╨╛╤Й╨░╨┤╨╛╨║ ╤Б╨╛╨▒╤Л╤В╨╕╨╣.
+- Нет (ожидает отдельный code-task после wireframe).
 
 ---
 
-## 2026-07-19 тАФ City copy: ╨┐╤А╨╡╨┤╨╗╨╛╨╢╨╜╤Л╨╣ ╨┐╨░╨┤╨╡╨╢ (┬л╨▓ ╨Ь╤Г╤А╨╝╨░╨╜╤Б╨║╨╡┬╗)
+## 2026-07-19 — City SEO: «на сегодня» в title хабов
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- UI ╤Е╨░╨▒╨╛╨▓ ╨┐╨╕╤Б╨░╨╗ ┬л╨з╤В╨╛ ╨┐╨╛╤Б╨╝╨╛╤В╤А╨╡╤В╤М ╨▓ ╨│╨╛╤А╨╛╨┤╨╡ ╨Ь╤Г╤А╨╝╨░╨╜╤Б╨║┬╗ / ┬л╨Т╤Б╨╡ ╤Б╨╛╨▒╤Л╤В╨╕╤П ╨▓ ╨│╨╛╤А╨╛╨┤╨╡ тАж┬╗ тАФ ╨│╤А╨░╨╝╨╝╨░╤В╨╕╤З╨╡╤Б╨║╨╕ ╨╜╨╡╨▓╨╡╤А╨╜╨╛.
-- `city-declension` ╨┐╨╛╨║╤А╤Л╨▓╨░╨╗ ~40 ╨│╨╛╤А╨╛╨┤╨╛╨▓; fallback ╨▓ `cityInPrepositional` ╨▒╤Л╨╗ `╨▓ ╨│╨╛╤А╨╛╨┤╨╡ ${name}` ╨┤╨╗╤П ╨╕╨╝╤С╨╜ ╨▒╨╡╨╖ -╨░.
+- Title standalone city hubs: «Мурманск: афиша, экскурсии и билеты | Дайбилет» — без сигнала «сегодня».
+- Description уже с locative («в Мурманске») после P.2c; дублировать «на сегодня» в description не нужно.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨а╨░╤Б╤И╨╕╤А╨╡╨╜ ╤Б╨╗╨╛╨▓╨░╤А╤М `CITY_FORMS` (web + public) + ╤Н╨▓╤А╨╕╤Б╤В╨╕╨║╨░; ╨┤╨╛╨▒╨░╨▓╨╗╨╡╨╜ `inCityPrepositional`.
-- CityPage / city-faq / metadata: `╨▓ ${locative}`, ╨▒╨╡╨╖ ┬л╨▓ ╨│╨╛╤А╨╛╨┤╨╡ X┬╗.
-- `destinationPrepositional` ╨▓ `dto.js` тАФ ╤В╨╛╤В ╨╢╨╡ ╨┐╤А╨╕╨╜╤Ж╨╕╨┐.
+- Default `seoTitle`: `События ${entityLabel} на сегодня | Дайбилет` (DTO + legacy `dto.js`).
+- `generateMetadata` / client `applyCityMeta` / social-preview fallbacks согласованы.
+- Description без изменений (locative остаётся, без второго «на сегодня»).
+- Deploy prod `@48e6147` (включает `d49f463` + Suspense/SiteLayout build-fixes).
+- Proof (view-source): `/cities/murmansk` → `<title>События в Мурманске на сегодня | Дайбилет</title>` (locative + «на сегодня»).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В.
-
----
-
-## 2026-07-19 тАФ City hubs: ╨б╨░╤А╨░╨╜╤Б╨║ brief + ╨Ш╨▓╨░╨╜╨╛╨▓╨╛/╨Ь╤Г╤А╨╝╨░╨╜╤Б╨║ sights
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨г ╨б╨░╤А╨░╨╜╤Б╨║╨░ ╨▒╤Л╨╗╨╕ travel/FAQ/sights, ╨╜╨╛ `brief` ╨▒╤Л╨╗ ╨┐╤Г╤Б╤В╤Л╨╝ тАФ hero ╨┐╨░╨┤╨░╨╗ ╨╜╨░ fallback.
-- ╨Ш╨▓╨░╨╜╨╛╨▓╨╛ ╨╕ ╨Ь╤Г╤А╨╝╨░╨╜╤Б╨║ тАФ ╨┐╨╛╤Б╨╗╨╡╨┤╨╜╨╕╨╡ тЭМ ╨┐╨╛ sights ╨▓ gap-╨╝╨░╤В╤А╨╕╤Ж╨╡ ╤Б╤А╨╡╨┤╨╕ standalone hubs.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨б╨░╤А╨░╨╜╤Б╨║: ╨╖╨░╨┐╨╛╨╗╨╜╨╡╨╜ `brief` (╤В╨╡╨║╤Б╤В ╨▓╨╗╨░╨┤╨╡╨╗╤М╤Ж╨░).
-- ╨Ш╨▓╨░╨╜╨╛╨▓╨╛ / ╨Ь╤Г╤А╨╝╨░╨╜╤Б╨║: ╤В╨╛╨┐-6 `sights[{title,text}]`; ╨╛╨┐╨╡╤З╨░╤В╨║╨░ ┬л╨║╨╛╨╜╤Б╤В╤А╤Г╤Б╤В╤А╤Г╨║╤В╨╕╨▓╨╕╨╖╨╝╨░┬╗ тЖТ ┬л╨║╨╛╨╜╤Б╤В╤А╤Г╨║╤В╨╕╨▓╨╕╨╖╨╝╨░┬╗.
-- ╨Ю╨▒╨╜╨╛╨▓╨╗╤С╨╜ `docs/city-hub-content-gaps.md` (brief 65/65, sights тЭМ = 0).
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╨╡╤В.
+- Первый deploy упёрся в `/locations` useSearchParams и в SiteLayout fallback с children вне provider — починено отдельными коммитами.
+- SSH к prod нестабилен (banner timeout); деплой через nohup + poll лога.
 
 ---
 
-## 2026-07-19 тАФ City hubs: travel + FAQ wave 3 (43 ╨│╨╛╤А╨╛╨┤╨░)
+## 2026-07-19 — Prod: пустые главная и `/events` (stats null.name)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Ч╨░╨║╤А╤Л╤В╤Л ╨▓╤Б╨╡ ╨╛╤Б╤В╨░╨▓╤И╨╕╨╡╤Б╤П gaps ╨┐╨╛ `travel`/`faq`: ╨Р╨▒╨░╨║╨░╨╜тАж╨п╤А╨╛╤Б╨╗╨░╨▓╨╗╤М (43 ╤Е╨░╨▒╨░).
-- ╨Ю╨┐╨╡╤З╨░╤В╨║╨╕: ╨╜╨╛╨▓╨│╨╛╤А╨╛╨┤╤Б╨║╨╕╨╣ ┬л╨╝╨╡╨┤-╤Б╤В╨░╨▓╨╡handling┬╗ тЖТ ┬л╨╝╤С╨┤-╤Б╤В╨░╨▓╨╗╨╡╨╜╤М┬╗; ╨▓╨╛╨╗╨│╨╛╨│╤А╨░╨┤╤Б╨║╨╕╨╣ FAQ ╨╝╨╡╤В╤А╨╛╤В╤А╨░╨╝╨░ ┬л╨╜╨░╨╝╨╡╤В/╨╜╨░ ╨╜╨╡╨╝┬╗ тЖТ ┬л╨╜╨░ ╨╜╨╡╨│╨╛ ╨┐╤А╨╛╨║╨░╤В╨╕╤В╤М╤Б╤П┬╗.
+- `/api/public/stats` → 500: `Cannot read properties of null (reading 'name')` в `destinationSummaryRowsFast` (`publicDestinationForCity` возвращает `null` для foreign/unroutable городов).
+- `getHomePageData` через `Promise.all` — падение stats обнуляло весь home (editors-pick / rails без карточек).
+- `/api/public/events` был жив (2371+); каталог без `?city=` на клиенте сбрасывал SSR в скелетоны на время city bootstrap.
+- `daibilet-api` / `daibilet-web` active; OOM в dmesg нет; web под memory high после рестартов.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ф╨░╨╜╨╜╤Л╨╡ ╨▓ `CITY_INFO` (web + public parity); ╤А╨╡╨╜╨┤╨╡╤А/JSON-LD ╨▒╨╡╨╖ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╣.
-- ╨Ь╨░╤В╤А╨╕╤Ж╨░ `docs/city-hub-content-gaps.md`: travel тЬЕ **65/65**, FAQ тЬЕ **65/65**.
+- Hotfix prod: `dto.js` — null-safe `destination?.name` в stats/admin/public rows; restart `daibilet-api` + `daibilet-web`, сброс `.next/cache`.
+- Worktree: `getHomePageData` → `Promise.allSettled`; SiteLayout Suspense fallback сохраняет `{children}`; CatalogShell не затирает SSR catalog при city bootstrap.
+- Proof: stats 200 (`events:2487`); home HTML с `evt_`×30 + «Выбор редакции»; `/events?city=Москва` с карточками.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В.
-
----
-
-## 2026-07-19 тАФ City hubs: sights + travel/FAQ wave 2 + gaps table
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜╨╛ ╨┐╨╛╨╗╨╡ `sights[{title,text}]`; ╤Б╨╡╨║╤Ж╨╕╤П ┬л╨з╤В╨╛ ╨┐╨╛╤Б╨╝╨╛╤В╤А╨╡╤В╤М┬╗ ╨╜╨░ hub (╨┐╤А╨╕╨╛╤А╨╕╤В╨╡╤В ╨╜╨░╨┤ legacy `mustSee`).
-- Wave 2 travel/FAQ: ╨Ъ╤Г╤А╨│╨░╨╜, ╨Ы╨╕╨┐╨╡╤Ж╨║, ╨Ъ╨╡╨╝╨╡╤А╨╛╨▓╨╛, ╨з╨╕╤В╨░, ╨Ъ╨╕╤А╨╛╨▓, ╨С╨░╤А╨╜╨░╤Г╨╗, ╨з╨╡╨▒╨╛╨║╤Б╨░╤А╤Л (+ ╨б╨░╤А╨░╨╜╤Б╨║ ╨▒╨╡╨╖ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╣).
-- Sights: 15 (╨б╨╝╨╛╨╗╨╡╨╜╤Б╨║тАж╨е╨░╨▒╨░╤А╨╛╨▓╤Б╨║) + 8 (╨Ъ╤Г╤А╨│╨░╨╜тАж╨з╨╡╨▒╨╛╨║╤Б╨░╤А╤Л) = 22 ╤Е╨░╨▒╨░ ╤Б ╤В╨╛╨┐-6.
-- ╨С╨░╤А╨╜╨░╤Г╨╗: ╨╝╤Г╨╖╨╡╨╣ ┬л╨Ь╨╕╤А ╨▓╤А╨╡╨╝╨╡╨╜╨╕┬╗; ╨Ь╨░╨╗╨╛-╨в╨╛╨▒╨╛╨╗╤М╤Б╨║╨░╤П ╨▒╨╡╨╖ ╨┤╤Г╨▒╨╗╤П ┬л╨┐╨╡╤И╨╡╤Е╨╛╨┤╨╜╤Л╨╣┬╗.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- `docs/city-hub-content-gaps.md` тАФ ╨╝╨░╤В╤А╨╕╤Ж╨░ brief/sights/travel/FAQ ╨┐╨╛ ╨▓╤Б╨╡╨╝ 65 standaloneCities.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╨╡╤В.
+- SiteLayout/CatalogShell/`Promise.allSettled` закоммичены в `feat/next-monorepo` — нужен web rebuild на prod при следующем deploy.
+- Не деплоить поверх активного favicon-агента без координации.
 
 ---
 
-## 2026-07-19 тАФ City hubs: travel + FAQ wave 2 (╨Ъ╤Г╤А╨│╨░╨╜тАж╨з╨╡╨▒╨╛╨║╤Б╨░╤А╤Л)
+## 2026-07-19 — City hub: events>0 / venues=0 (Мурманск)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т╤В╨╛╤А╨░╤П ╨┐╨░╤З╨║╨░: ╨Ъ╤Г╤А╨│╨░╨╜, ╨Ы╨╕╨┐╨╡╤Ж╨║ (`lipeck`), ╨Ъ╨╡╨╝╨╡╤А╨╛╨▓╨╛, ╨з╨╕╤В╨░, ╨Ъ╨╕╤А╨╛╨▓ (`kirov-kirovskaya-oblast`), ╨С╨░╤А╨╜╨░╤Г╨╗, ╨з╨╡╨▒╨╛╨║╤Б╨░╤А╤Л; ╨б╨░╤А╨░╨╜╤Б╨║ ╤Г╨╢╨╡ ╨▒╤Л╨╗ ╨▓ wave 1.
-- ╨а╨╡╨╜╨┤╨╡╤А/JSON-LD ╤Г╨╢╨╡ ╨╜╨░ ╨╝╨╡╤Б╤В╨╡ ╤Б wave 1 тАФ ╤В╨╛╨╗╤М╨║╨╛ ╨┤╨░╨╜╨╜╤Л╨╡ `CITY_INFO`.
+- `/cities/murmansk`: events=2, venues=0 при живой площадке «Мега Кружка» (`venue_5ea93efb186c38b2a9d379bd`, pageStatus=CANDIDATE).
+- События корректно связаны через `Event.venueId`; `/venues/mega-kruzhka` отдаёт events=2.
+- `publicVenueHubRows(limit=500)` берёт top-N по SQL count; «Мега Кружка» на ранге **511** → не попадала в hub.
+- `publicVenuesForSessionsFromHub` искал только в hubRows по `venueId` → пустой список и stats.venues=0.
+- Landings уже считали venues=1 (другой путь) — UI выглядел противоречиво.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- +7 ╨│╨╛╤А╨╛╨┤╨╛╨▓ ╤Б `travel`/`faq` (web + public parity); ╨б╨░╤А╨░╨╜╤Б╨║ ╨▒╨╡╨╖ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╣ (╤В╨╡╨║╤Б╤В╤Л ╤Б╨╛╨▓╨┐╨░╨╗╨╕).
+- `resolvePublicVenuesForSessions`: после hub-match догружает missing `venueId` через `venueRowsByIds`.
+- Match hub также по нормализованному `venueSlug`.
+- `countDistinctSessionVenues` для `city.venues` / `stats.venues` по всем сессиям города (не cap display-list).
+- UI: CTA «Все события» — `gap-2` + `shrink-0` у иконки Ticket.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В.
-
----
-
-## 2026-07-19 тАФ City hubs: travel + FAQ (15 ╨│╨╛╤А╨╛╨┤╨╛╨▓)
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Т╨╗╨░╨┤╨╡╨╗╨╡╤Ж ╨┤╨░╨╗ ╨▒╨╗╨╛╨║╨╕ ┬л╨Ъ╨░╨║ ╨┤╨╛╨▒╤А╨░╤В╤М╤Б╤П / ╨╗╤Г╤З╤И╨╕╨╣ ╤Б╨╡╨╖╨╛╨╜┬╗ ╨╕ 3 FAQ ╨╜╨░ ╨│╨╛╤А╨╛╨┤ ╨┤╨╗╤П 15 ╤Е╨░╨▒╨╛╨▓.
-- ╨Т ╨╕╤Б╤Е╨╛╨┤╨╜╨╕╨║╨╡ ╨б╨╝╨╛╨╗╨╡╨╜╤Б╨║╨░ ╨▒╤Л╨╗╨░ ╨╛╨┐╨╡╤З╨░╤В╨║╨░ ┬л╨║╨╛╨╜custom╨╜╤Л╨╣┬╗ тЖТ ╨╕╤Б╨┐╤А╨░╨▓╨╗╨╡╨╜╨╛ ╨╜╨░ ┬л╨║╤Г╤Б╤В╨░╤А╨╜╤Л╨╣ ╨▓╤П╨╗╨╡╨╜╤Л╨╣ ╤Б╨░╤Е╨░╤А┬╗.
-- ╨б╨░╤А╨░╨╜╤Б╨║ ╨╜╨╡ ╨╕╨╝╨╡╨╗ `CITY_INFO.brief` тАФ ╨┤╨╛╨▒╨░╨▓╨╗╨╡╨╜ entry ╤В╨╛╨╗╤М╨║╨╛ ╤Б travel/faq.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨а╨░╤Б╤И╨╕╤А╨╡╨╜ `CityInfoEntry`: optional `travel`, `faq[{q,a}]` ╨▓ `apps/web` + parity `apps/public`.
-- ╨Э╨░ `/cities/{slug}` ╨┐╨╛╤Б╨╗╨╡ hero: ╤Б╨╡╨║╤Ж╨╕╨╕ ┬л╨Ъ╨░╨║ ╨┤╨╛╨▒╤А╨░╤В╤М╤Б╤П ╨╕ ╨║╨╛╨│╨┤╨░ ╨╡╤Е╨░╤В╤М┬╗ ╨╕ ┬л╨з╨░╤Б╤В╤Л╨╡ ╨▓╨╛╨┐╤А╨╛╤Б╤Л┬╗ (╨┐╤А╨╛╤Б╤В╨░╤П ╨▓╤С╤А╤Б╤В╨║╨░).
-- JSON-LD `FAQPage`: ╤А╨╡╨┤╨░╨║╤Ж╨╕╨╛╨╜╨╜╤Л╨╣ FAQ prepend ╨║ ╨▒╨╕╨╗╨╡╤В╨╜╨╛╨╝╤Г ╤З╨╡╤А╨╡╨╖ `buildCityEditorialFaqItems`.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╨╡╤В.
+- Глобальный hub catalogue по-прежнему top-500; city hubs больше от него не зависят для счётчика площадок событий.
 
 ---
 
-## 2026-07-19 тАФ City hubs: ╨╡╤Й╤С 9 brief (╨з╨╕╤В╨░тАж╨е╨░╨▒╨░╤А╨╛╨▓╤Б╨║)
+## 2026-07-19 — City copy: предложный падеж («в Мурманске»)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨з╨╕╤В╨░ ╨▓ ╨╕╤Б╤Е╨╛╨┤╨╜╨╕╨║╨╡ ╨▓╨╗╨░╨┤╨╡╨╗╤М╤Ж╨░ ╨▒╤Л╨╗╨░ ╨┤╨▓╨░╨╢╨┤╤Л (┬л╨У╨╛╤А╨╛╨┤ ╨┐╤А╨╕╨▓╨╗╨╡╨║╨░╨╡╤ВтАж┬╗ / ┬л╨з╨╕╤В╨░ ╨┐╤А╨╕╨▓╨╗╨╡╨║╨░╨╡╤ВтАж┬╗) тАФ ╨╛╤Б╤В╨░╨▓╨╗╨╡╨╜ ╨╛╨┤╨╕╨╜ ╤В╨╡╨║╤Б╤В ╤Б ┬л╨з╨╕╤В╨░ ╨┐╤А╨╕╨▓╨╗╨╡╨║╨░╨╡╤ВтАж┬╗.
-- Prod-slug: `lipeck` (╨╜╨╡ lipetsk), `kirov-kirovskaya-oblast`, `habarovsk` (╨╜╨╡ khabarovsk).
+- UI хабов писал «Что посмотреть в городе Мурманск» / «Все события в городе …» — грамматически неверно.
+- `city-declension` покрывал ~40 городов; fallback в `cityInPrepositional` был `в городе ${name}` для имён без -а.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- +9 `brief` ╨▓ `CITY_INFO` (web + public): chita, kirov-kirovskaya-oblast, kurgan, lipeck, ivanovo, kemerovo, cheboksary, barnaul, habarovsk.
-- ╨Р╨╗╨╕╨░╤Б╤Л: `kirov`тЖТ`kirov-kirovskaya-oblast`, `lipetsk`тЖТ`lipeck`, `khabarovsk`тЖТ`habarovsk`.
-- ╨Ю╨┐╨╡╤З╨░╤В╨║╨░ ┬л╨Ш╨╕╨╜╨┤╤Г╤Б╤В╤А╨╕╨░╨╗╤М╨╜╨╛╨╡┬╗ тЖТ ┬л╨Ш╨╜╨┤╤Г╤Б╤В╤А╨╕╨░╨╗╤М╨╜╨╛╨╡┬╗ (╨Ъ╨╡╨╝╨╡╤А╨╛╨▓╨╛).
+- Расширен словарь `CITY_FORMS` (web + public) + эвристика; добавлен `inCityPrepositional`.
+- CityPage / city-faq / metadata: `в ${locative}`, без «в городе X».
+- `destinationPrepositional` в `dto.js` — тот же принцип.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В.
-
----
-
-## 2026-07-19 тАФ City hubs: brief-╨╛╨┐╨╕╤Б╨░╨╜╨╕╤П 14 ╨░╨┤╨╝╤Ж╨╡╨╜╤В╤А╨╛╨▓
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Ю╨┐╨╕╤Б╨░╨╜╨╕╤П city hub ╤А╨╡╨╜╨┤╨╡╤А╤П╤В╤Б╤П ╨╕╨╖ ╤Б╤В╨░╤В╨╕╤З╨╡╤Б╨║╨╛╨│╨╛ `CITY_INFO.brief` (`apps/web` + ╨┐╨░╤А╨╕╤В╨╡╤В `apps/public`), ╨╜╨╡ ╨╕╨╖ `City.introText` ╨▓ ╨С╨Ф.
-- Hero ╨╜╨░ `/cities/{slug}` ╨▒╨╡╤А╤С╤В `guide?.brief` ╤З╨╡╤А╨╡╨╖ `resolveCityInfo`; SEO-╨▒╨╗╨╛╨║ тАФ `resolveCityBrief` ╨▓ `city-faq.ts`.
-- Prod-slug тЙа ┬л╨╡╤Б╤В╨╡╤Б╤В╨▓╨╡╨╜╨╜╤Л╨╣┬╗ ╤В╤А╨░╨╜╤Б╨╗╨╕╤В: `arhangelsk`, `astrahan`, `yuzhno-sahalinsk`, `blagoveschensk-amurskaya-oblast` (╨Р╨╝╤Г╤А╤Б╨║╨░╤П, ╨╜╨╡ ╨С╨░╤И╨║╨╛╤А╤В╨╛╤Б╤В╨░╨╜).
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜╤Л 14 `brief` ╨▓ `CITY_INFO` (╤Б╨╝╤Л╤Б╨╗ ╤В╨╡╨║╤Б╤В╨╛╨▓ ╨▓╨╗╨░╨┤╨╡╨╗╤М╤Ж╨░, ╤В╨╛╨╜ ╤Б╨░╨╣╤В╨░).
-- ╨Р╨╗╨╕╨░╤Б╤Л: `arkhangelsk`тЖТ`arhangelsk`, `astrakhan`тЖТ`astrahan`, `yuzhno-sakhalinsk`тЖТ`yuzhno-sahalinsk`, `blagoveshchensk`(+`-amurskaya-oblast`)тЖТ`blagoveschensk-amurskaya-oblast`.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╨╡╤В.
+- Нет.
 
 ---
 
-## 2026-07-19 тАФ Geo: ╤Е╨▓╨╛╤Б╤В allowlist + cut ╨╖╨░╤А╤Г╨▒╨╡╨╢╤М╤П
+## 2026-07-19 — City hubs: Саранск brief + Иваново/Мурманск sights
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╤Б╨╗╨╡ expand ╨░╨┤╨╝╤Ж╨╡╨╜╤В╤А╨╛╨▓ ╨╛╤Б╤В╨░╨▓╨░╨╗╨╛╤Б╤М **63** ╨│╨╛╤А╨╛╨┤╨░ ╤Б ╨┐╤А╨╕╤З╨╕╨╜╨╛╨╣ ╤В╨╛╨╗╤М╨║╨╛ `allowlist` (╨┤╤Л╤А╤Л: ╤Б╨╛╨▒╤Л╤В╨╕╤П ╨╜╨╡ ╨▓ city ╨╕ ╨╜╨╡ ╨▓ region destination).
-- ╨Т `cityToRegion` ╨╛╤И╨╕╨▒╨╛╤З╨╜╨╛ ╨▒╤Л╨╗╨╛ `╨Ю╤Б╨░╨║╨░`тЖТ`╨п╨┐╨╛╨╜╨╕╤П` (non-RF ╨┐╨╛╨┐╨░╨┤╨░╨╗╨╛ ╨▓ routing).
-- ╨С╨░╤В╤Г╨╝╨╕ (2 READY) тАФ ╨╖╨░╤А╤Г╨▒╨╡╨╢╤М╨╡, ╨╜╨╡ ╨┤╨╗╤П ╨┐╤Г╨▒╨╗╨╕╤З╨╜╨╛╨│╨╛ ╨║╨░╤В╨░╨╗╨╛╨│╨░ ╨а╨д.
+- У Саранска были travel/FAQ/sights, но `brief` был пустым — hero падал на fallback.
+- Иваново и Мурманск — последние ❌ по sights в gap-матрице среди standalone hubs.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜ `foreignCities` ╨▓ `city-routing.ru.json` (╨С╨░╤В╤Г╨╝╨╕, ╨Ю╤Б╨░╨║╨░); filter ╨▓ `mapGroupedPublicSession` + `isAllowedPublicDestination`.
-- ╨е╨▓╨╛╤Б╤В 63: **59** тЖТ ╤Б╤Г╨▒╤К╨╡╨║╤В ╤З╨╡╤А╨╡╨╖ `cityToRegion`; **╨Ч╨╡╨╗╨╡╨╜╨╛╨│╤А╨░╨┤/╨й╨╡╤А╨▒╨╕╨╜╨║╨░тЖТ╨Ь╨╛╤Б╨║╨▓╨░**, **╨Я╤Г╤И╨║╨╕╨╜тЖТ╨б╨░╨╜╨║╤В-╨Я╨╡╤В╨╡╤А╨▒╤Г╤А╨│**; **╨С╨░╤В╤Г╨╝╨╕** cut; ╨▒╨╡╨╖ ╨╝╨░╨┐╨┐╨╕╨╜╨│╨░ тАФ **0**.
-- `standaloneCities` ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕ (╨╝╨╡╨╗╨║╨╕╨╡ ╨╜╨╡ ╨┤╨╛╨▒╨░╨▓╨╗╤П╨╗╨╕). REGION_HUBS ╤А╨░╤Б╤И╨╕╤А╨╡╨╜ ╨┐╨╛╨┤ ╨╜╨╛╨▓╤Л╨╡ ╤Б╤Г╨▒╤К╨╡╨║╤В╤Л ╤Б ╤Г╨╢╨╡ ╤Б╤Г╤Й╨╡╤Б╤В╨▓╤Г╤О╤Й╨╕╨╝╨╕ ╤Ж╨╡╨╜╤В╤А╨░╨╝╨╕.
+- Саранск: заполнен `brief` (текст владельца).
+- Иваново / Мурманск: топ-6 `sights[{title,text}]`; опечатка «конструструктивизма» → «конструктивизма».
+- Обновлён `docs/city-hub-content-gaps.md` (brief 65/65, sights ❌ = 0).
+
+### Проблемы
+
+- Нет.
+
+---
+
+## 2026-07-19 — City hubs: travel + FAQ wave 3 (43 города)
+
+### Наблюдения
+
+- Закрыты все оставшиеся gaps по `travel`/`faq`: Абакан…Ярославль (43 хаба).
+- Опечатки: новгородский «мед-ставеhandling» → «мёд-ставлень»; волгоградский FAQ метротрама «намет/на нем» → «на него прокатиться».
+
+### Решения
+
+- Данные в `CITY_INFO` (web + public parity); рендер/JSON-LD без изменений.
+- Матрица `docs/city-hub-content-gaps.md`: travel ✅ **65/65**, FAQ ✅ **65/65**.
+
+### Проблемы
+
+- Нет.
+
+---
+
+## 2026-07-19 — City hubs: sights + travel/FAQ wave 2 + gaps table
+
+### Наблюдения
+
+- Добавлено поле `sights[{title,text}]`; секция «Что посмотреть» на hub (приоритет над legacy `mustSee`).
+- Wave 2 travel/FAQ: Курган, Липецк, Кемерово, Чита, Киров, Барнаул, Чебоксары (+ Саранск без изменений).
+- Sights: 15 (Смоленск…Хабаровск) + 8 (Курган…Чебоксары) = 22 хаба с топ-6.
+- Барнаул: музей «Мир времени»; Мало-Тобольская без дубля «пешеходный».
+
+### Решения
+
+- `docs/city-hub-content-gaps.md` — матрица brief/sights/travel/FAQ по всем 65 standaloneCities.
+
+### Проблемы
+
+- Нет.
+
+---
+
+## 2026-07-19 — City hubs: travel + FAQ wave 2 (Курган…Чебоксары)
+
+### Наблюдения
+
+- Вторая пачка: Курган, Липецк (`lipeck`), Кемерово, Чита, Киров (`kirov-kirovskaya-oblast`), Барнаул, Чебоксары; Саранск уже был в wave 1.
+- Рендер/JSON-LD уже на месте с wave 1 — только данные `CITY_INFO`.
+
+### Решения
+
+- +7 городов с `travel`/`faq` (web + public parity); Саранск без изменений (тексты совпали).
+
+### Проблемы
+
+- Нет.
+
+---
+
+## 2026-07-19 — City hubs: travel + FAQ (15 городов)
+
+### Наблюдения
+
+- Владелец дал блоки «Как добраться / лучший сезон» и 3 FAQ на город для 15 хабов.
+- В исходнике Смоленска была опечатка «конcustomный» → исправлено на «кустарный вяленый сахар».
+- Саранск не имел `CITY_INFO.brief` — добавлен entry только с travel/faq.
+
+### Решения
+
+- Расширен `CityInfoEntry`: optional `travel`, `faq[{q,a}]` в `apps/web` + parity `apps/public`.
+- На `/cities/{slug}` после hero: секции «Как добраться и когда ехать» и «Частые вопросы» (простая вёрстка).
+- JSON-LD `FAQPage`: редакционный FAQ prepend к билетному через `buildCityEditorialFaqItems`.
+
+### Проблемы
+
+- Нет.
+
+---
+
+## 2026-07-19 — City hubs: ещё 9 brief (Чита…Хабаровск)
+
+### Наблюдения
+
+- Чита в исходнике владельца была дважды («Город привлекает…» / «Чита привлекает…») — оставлен один текст с «Чита привлекает…».
+- Prod-slug: `lipeck` (не lipetsk), `kirov-kirovskaya-oblast`, `habarovsk` (не khabarovsk).
+
+### Решения
+
+- +9 `brief` в `CITY_INFO` (web + public): chita, kirov-kirovskaya-oblast, kurgan, lipeck, ivanovo, kemerovo, cheboksary, barnaul, habarovsk.
+- Алиасы: `kirov`→`kirov-kirovskaya-oblast`, `lipetsk`→`lipeck`, `khabarovsk`→`habarovsk`.
+- Опечатка «Ииндустриальное» → «Индустриальное» (Кемерово).
+
+### Проблемы
+
+- Нет.
+
+---
+
+## 2026-07-19 — City hubs: brief-описания 14 адмцентров
+
+### Наблюдения
+
+- Описания city hub рендерятся из статического `CITY_INFO.brief` (`apps/web` + паритет `apps/public`), не из `City.introText` в БД.
+- Hero на `/cities/{slug}` берёт `guide?.brief` через `resolveCityInfo`; SEO-блок — `resolveCityBrief` в `city-faq.ts`.
+- Prod-slug ≠ «естественный» транслит: `arhangelsk`, `astrahan`, `yuzhno-sahalinsk`, `blagoveschensk-amurskaya-oblast` (Амурская, не Башкортостан).
+
+### Решения
+
+- Добавлены 14 `brief` в `CITY_INFO` (смысл текстов владельца, тон сайта).
+- Алиасы: `arkhangelsk`→`arhangelsk`, `astrakhan`→`astrahan`, `yuzhno-sakhalinsk`→`yuzhno-sahalinsk`, `blagoveshchensk`(+`-amurskaya-oblast`)→`blagoveschensk-amurskaya-oblast`.
+
+### Проблемы
+
+- Нет.
+
+---
+
+## 2026-07-19 — Geo: хвост allowlist + cut зарубежья
+
+### Наблюдения
+
+- После expand адмцентров оставалось **63** города с причиной только `allowlist` (дыры: события не в city и не в region destination).
+- В `cityToRegion` ошибочно было `Осака`→`Япония` (non-RF попадало в routing).
+- Батуми (2 READY) — зарубежье, не для публичного каталога РФ.
+
+### Решения
+
+- Добавлен `foreignCities` в `city-routing.ru.json` (Батуми, Осака); filter в `mapGroupedPublicSession` + `isAllowedPublicDestination`.
+- Хвост 63: **59** → субъект через `cityToRegion`; **Зеленоград/Щербинка→Москва**, **Пушкин→Санкт-Петербург**; **Батуми** cut; без маппинга — **0**.
+- `standaloneCities` не трогали (мелкие не добавляли). REGION_HUBS расширен под новые субъекты с уже существующими центрами.
 - Docs: `geo-excluded-cities.md`, Tasktracker G.6.
-- **Prod:** deploy-prod-next OK. Proof: `foreignCities`=[╨С╨░╤В╤Г╨╝╨╕,╨Ю╤Б╨░╨║╨░]; destinations city=65 region=36; foreign not in dest; Batumi search items=0; ╨Ь╨Ю/╨Ы╨Ю/╨Ъ╤А╨░╤Б╨╜╨╛╨┤╨░╤А/╨а╨╛╤Б╤В╨╛╨▓/╨С╨░╤И╨║╨╛╤А╤В╨╛╤Б╤В╨░╨╜/╨з╨╡╨╗╤П╨▒╨╕╨╜╤Б╨║/╨б╤В╨░╨▓╤А╨╛╨┐╨╛╨╗╤М/╨Т╨╛╤А╨╛╨╜╨╡╨╢ тАФ ╨╡╤Б╤В╤М.
+- **Prod:** deploy-prod-next OK. Proof: `foreignCities`=[Батуми,Осака]; destinations city=65 region=36; foreign not in dest; Batumi search items=0; МО/ЛО/Краснодар/Ростов/Башкортостан/Челябинск/Ставрополь/Воронеж — есть.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- `╨а╨╡╤Б╨┐╤Г╨▒╨╗╨╕╨║╨░ ╨Ф╨░╨│╨╡╤Б╤В╨░╨╜` (╨Ъ╨░╤Б╨┐╨╕╨╣╤Б╨║) ╨▒╨╡╨╖ hub-╤Ж╨╡╨╜╤В╤А╨░ ╨▓ standalone тАФ ╤А╨╡╨│╨╕╨╛╨╜ ╨╝╨╛╨╢╨╡╤В ╨┐╨╛╤П╨▓╨╕╤В╤М╤Б╤П orphan-╨║╨░╤А╤В╨╛╤З╨║╨╛╨╣; ╨╛╨║ ╨┐╤А╨╕ 1 ╤Б╨╛╨▒╤Л╤В╨╕╨╕.
-
----
-
-## 2026-07-19 тАФ Geo-╨┐╨╛╨╗╨╕╤В╨╕╨║╨░: ╨░╨┤╨╝╤Ж╨╡╨╜╤В╤А╤Л + region buckets + ╨з╨╡╨╗╨╜╤Л
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Т╨╗╨░╨┤╨╡╨╗╨╡╤Ж ╨╖╨░╤Д╨╕╨║╤Б╨╕╤А╨╛╨▓╨░╨╗: ╨Э╨░╨▒╨╡╤А╨╡╨╢╨╜╤Л╨╡ ╨з╨╡╨╗╨╜╤Л = ╨в╨░╤В╨░╤А╤Б╤В╨░╨╜ тЖТ ╨┐╨╛╨┤ ╨║╨░╤А╤В╨╛╤З╨║╨╛╨╣ ╨Ъ╨░╨╖╨░╨╜╨╕ (┬л╤Б╨╛╨▒╤Л╤В╨╕╤П ╨╛╨▒╨╗╨░╤Б╤В╨╕┬╗), ╨╜╨╡ standalone.
-- `cityToRegion` тАФ ╤И╤В╨░╤В╨╜╨░╤П ╤Б╨▓╤С╤А╤В╨║╨░ ╨▓ ╤Б╤Г╨▒╤К╨╡╨║╤В, **╨╜╨╡** ┬л╨┤╤Л╤А╨░┬╗ allowlist.
-- Allowlist: ╨░╨┤╨╝╤Ж╨╡╨╜╤В╤А + saleable тЖТ `standaloneCities` + hub; ╨╜╨╡-╨░╨┤╨╝╤Ж╨╡╨╜╤В╤А тЖТ `cityToRegion`; ╨╝╨╡╨╗╨║╨╕╨╡ ╨┐╨╛╤Б╤С╨╗╨║╨╕ (╨б╨╛╤А╤В╨░╨▓╨░╨╗╨░, ╨Ы╨╡╨▒╤П╨╢╤М╨╡) ╤В╨╛╨╗╤М╨║╨╛ ╨▓ region.
-- ╨С╨░╨│: `isPublicRegionName` ╤П╨║╨╛╤А╨╕╨╗ `$/(тАж|╤А╨╡╤Б╨┐╤Г╨▒╨╗╨╕╨║╨░)$`, ╨░ ┬л╨а╨╡╤Б╨┐╤Г╨▒╨╗╨╕╨║╨░ ╨в╨░╤В╨░╤А╤Б╤В╨░╨╜┬╗ ╨╜╨░╤З╨╕╨╜╨░╨╡╤В╤Б╤П ╤Б ┬л╨а╨╡╤Б╨┐╤Г╨▒╨╗╨╕╨║╨░┬╗ тЖТ ╤А╨╡╨│╨╕╨╛╨╜ ╨╛╤В╤Д╨╕╨╗╤М╤В╤А╨╛╨▓╤Л╨▓╨░╨╗╤Б╤П; `\b` ╨▓ JS ╤Б ╨║╨╕╤А╨╕╨╗╨╗╨╕╤Ж╨╡╨╣ ╨╜╨╡╨╜╨░╨┤╤С╨╢╨╡╨╜.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Regex: `/^╤А╨╡╤Б╨┐╤Г╨▒╨╗╨╕╨║╨░(?:\s|$)/iu` **╨╕╨╗╨╕** ╤Б╤Г╤Д╤Д╨╕╨║╤Б `╨╛╨▒╨╗╨░╤Б╤В╤М|╨║╤А╨░╨╣|╤А╨╡╤Б╨┐╤Г╨▒╨╗╨╕╨║╨░|╨╛╨║╤А╤Г╨│`.
-- `city-routing.ru.json`: +29 ╨░╨┤╨╝╤Ж╨╡╨╜╤В╤А╨╛╨▓ ╨▓ standalone (╨╕╤В╨╛╨│╨╛ 65); ╤А╨░╤Б╤И╨╕╤А╨╡╨╜ `cityToRegion` (╨в╨╛╨╗╤М╤П╤В╤В╨╕тЖТ╨б╨░╨╝╨░╤А╤Б╨║╨░╤П, ╨з╨╡╨╗╨╜╤ЛтЖТ╨в╨░╤В╨░╤А╤Б╤В╨░╨╜, ╨б╨╛╤А╤В╨░╨▓╨░╨╗╨░тЖТ╨Ъ╨░╤А╨╡╨╗╨╕╤П, тАж).
-- `REGION_HUBS` ╤А╨░╤Б╤И╨╕╤А╨╡╨╜ (╨Я╤А╨╕╨╝╨╛╤А╤М╨╡, ╨Р╨╗╤В╨░╨╣, ╨б╨░╨╝╨░╤А╨░, ╨з╨╡╨╗╤П╨▒╨╕╨╜╤Б╨║, ╨С╨░╤И╨║╨╛╤А╤В╨╛╤Б╤В╨░╨╜, тАж) ╨┤╨╗╤П ╤Б╤Б╤Л╨╗╨║╨╕ ┬л+ ╤А╨╡╨│╨╕╨╛╨╜┬╗ ╨┐╨╛╨┤ ╨║╨░╤А╤В╨╛╤З╨║╨╛╨╣ ╤Ж╨╡╨╜╤В╤А╨░.
-- ╨Ф╨╛╨║╤Г╨╝╨╡╨╜╤В╤Л: Project / Tasktracker G.* / geo-excluded-cities.md.
-- **Prod @`6f0fcf7`:** deploy-prod-next OK. Proof: destinations city=65, ╨з╨╡╨╗╨╜╤Л ╨╜╨╡ city; `╨а╨╡╤Б╨┐╤Г╨▒╨╗╨╕╨║╨░ ╨в╨░╤В╨░╤А╤Б╤В╨░╨╜` events=12; `/cities/respublika-tatarstan` ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╡╤В ╨┐╨╗╨╛╤Й╨░╨┤╨║╨╕ ┬л╨Э╨░╨▒╨╡╤А╨╡╨╢╨╜╤Л╨╡ ╨з╨╡╨╗╨╜╤Л┬╗; ╨Т╨╗╨░╨┤╨╕╨▓╨╛╤Б╤В╨╛╨║/╨е╨░╨▒╨░╤А╨╛╨▓╤Б╨║/╨з╨╡╨▒╨╛╨║╤Б╨░╤А╤Л ╨▓ standalone.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨е╨░╨▒╤Л ╨╜╨╛╨▓╤Л╤Е ╨│╨╛╤А╨╛╨┤╨╛╨▓ thin (listing) тАФ ╨╛╨║ ╨┐╨╛ ╨┐╨╛╨╗╨╕╤В╨╕╨║╨╡; ╨║╨╛╨╜╤В╨╡╨╜╤В SEO тАФ ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛ (P.2).
-- ╨в╨╛╤З╨╜╤Л╨╡ `City.title` ╤Б ╤Б╨║╨╛╨▒╨║╨░╨╝╨╕ (`╨Ъ╨╕╤А╨╛╨▓ (╨Ъ╨╕╤А╨╛╨▓╤Б╨║╨░╤П ╨╛╨▒╨╗╨░╤Б╤В╤М)`, `╨С╨╗╨░╨│╨╛╨▓╨╡╤Й╨╡╨╜╤Б╨║ (╨Р╨╝╤Г╤А╤Б╨║╨░╤П ╨╛╨▒╨╗╨░╤Б╤В╤М)`) ╨┤╨╛╨╗╨╢╨╜╤Л ╤Б╨╛╨▓╨┐╨░╨┤╨░╤В╤М ╤Б ╨С╨Ф.
-- SWC: ╨║╨╗╤О╤З `╨Щ╨╛╤И╨║╨░╤А-╨Ю╨╗╨░` ╨▒╨╡╨╖ ╨║╨░╨▓╤Л╤З╨╡╨║ ╨╗╨╛╨╝╨░╨╗ `web:build` тЖТ hotfix `6f0fcf7`.
+- `Республика Дагестан` (Каспийск) без hub-центра в standalone — регион может появиться orphan-карточкой; ок при 1 событии.
 
 ---
 
-## 2026-07-19 тАФ ╨Р╤Г╨┤╨╕╤В ╨│╨╛╤А╨╛╨┤╨╛╨▓ ╨▓╨╜╨╡ public destinations
+## 2026-07-19 — Geo-политика: адмцентры + region buckets + Челны
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Prod: 180 ╨│╨╛╤А╨╛╨┤╨╛╨▓ ╤Б READY ╨╕/╨╕╨╗╨╕ saleable; ╨┐╤Г╨▒╨╗╨╕╤З╨╜╤Л╨╣ ╨║╨░╤В╨░╨╗╨╛╨│ тАФ **36** city destinations (+ 4 region).
-- ╨Ш╤Б╨║╨╗╤О╤З╨╡╨╜╨╛ **144** ╨│╨╛╤А╨╛╨┤╨░: ╤Б╨╝. `docs/geo-excluded-cities.md`.
-- ╨Ф╨╛╨╝╨╕╨╜╨╕╤А╤Г╤О╤Й╨╕╨╡ ╨┐╤А╨╕╤З╨╕╨╜╤Л (╨╜╨░ ╨╝╨╛╨╝╨╡╨╜╤В ╨░╤Г╨┤╨╕╤В╨░): `allowlist` 126, `cityToRegion` 8, `no-saleable` 8, `republic-regex` 1 (╨Э╨░╨▒╨╡╤А╨╡╨╢╨╜╤Л╨╡ ╨з╨╡╨╗╨╜╤Л), `other` 1.
-- API ╨┐╨╛╨┤╤В╨▓╨╡╤А╨╢╨┤╨░╨╡╤В: ┬л╨а╨╡╤Б╨┐╤Г╨▒╨╗╨╕╨║╨░ ╨в╨░╤В╨░╤А╤Б╤В╨░╨╜┬╗ / ┬л╨а╨╡╤Б╨┐╤Г╨▒╨╗╨╕╨║╨░ ╨е╨░╨║╨░╤Б╨╕╤П┬╗ **╨╜╨╡╤В** ╨▓ destinations тАФ `isPublicRegionName` ╤Б ╤П╨║╨╛╤А╨╡╨╝ `$` ╨╜╨╡ ╨╝╨░╤В╤З╨╕╤В ┬л╨а╨╡╤Б╨┐╤Г╨▒╨╗╨╕╨║╨░ тАж┬╗.
+- Владелец зафиксировал: Набережные Челны = Татарстан → под карточкой Казани («события области»), не standalone.
+- `cityToRegion` — штатная свёртка в субъект, **не** «дыра» allowlist.
+- Allowlist: адмцентр + saleable → `standaloneCities` + hub; не-адмцентр → `cityToRegion`; мелкие посёлки (Сортавала, Лебяжье) только в region.
+- Баг: `isPublicRegionName` якорил `$/(…|республика)$`, а «Республика Татарстан» начинается с «Республика» → регион отфильтровывался; `\b` в JS с кириллицей ненадёжен.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ю╤В╤З╤С╤В ╨╖╨░╤Д╨╕╨║╤Б╨╕╤А╨╛╨▓╨░╨╜ ╨▓ `docs/geo-excluded-cities.md`.
-- **╨б╨▓╨╡╤А╤Е ╨░╤Г╨┤╨╕╤В╨░ (╤В╨╛╤В ╨╢╨╡ ╨┤╨╡╨╜╤М):** geo-╨┐╨╛╨╗╨╕╤В╨╕╨║╨░ ╨┐╤А╨╕╨╝╨╡╨╜╨╡╨╜╨░ тАФ ╤Б╨╝. ╨╖╨░╨┐╨╕╤Б╤М ┬лGeo-╨┐╨╛╨╗╨╕╤В╨╕╨║╨░: ╨░╨┤╨╝╤Ж╨╡╨╜╤В╤А╤Л + region buckets + ╨з╨╡╨╗╨╜╤Л┬╗. `cityToRegion` ╨▓ ╤Б╨▓╨╛╨┤╨║╨╡ ╨▒╨╛╨╗╤М╤И╨╡ ╨╜╨╡ ╤В╤А╨░╨║╤В╤Г╨╡╤В╤Б╤П ╨║╨░╨║ ┬л╨┤╤Л╤А╨░┬╗.
+- Regex: `/^республика(?:\s|$)/iu` **или** суффикс `область|край|республика|округ`.
+- `city-routing.ru.json`: +29 адмцентров в standalone (итого 65); расширен `cityToRegion` (Тольятти→Самарская, Челны→Татарстан, Сортавала→Карелия, …).
+- `REGION_HUBS` расширен (Приморье, Алтай, Самара, Челябинск, Башкортостан, …) для ссылки «+ регион» под карточкой центра.
+- Документы: Project / Tasktracker G.* / geo-excluded-cities.md.
+- **Prod @`6f0fcf7`:** deploy-prod-next OK. Proof: destinations city=65, Челны не city; `Республика Татарстан` events=12; `/cities/respublika-tatarstan` показывает площадки «Набережные Челны»; Владивосток/Хабаровск/Чебоксары в standalone.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ~~`republic-regex`~~ тАФ ╨╕╤Б╨┐╤А╨░╨▓╨╗╨╡╨╜╨╛ ╨▓ ╨╖╨░╨┐╨╕╤Б╨╕ geo-╨┐╨╛╨╗╨╕╤В╨╕╨║╨╕ ╨╜╨╕╨╢╨╡ ╨┐╨╛ ╨┤╨╜╨╡╨▓╨╜╨╕╨║╤Г / ╨▓╤Л╤И╨╡ ╨┐╨╛ ╨▓╤А╨╡╨╝╨╡╨╜╨╕.
-
----
-
-## 2026-07-19 тАФ ╨Я╤А╨╛╨┤╤Г╨║╤В╨╛╨▓╨░╤П ╤Б╤В╤А╨░╤В╨╡╨│╨╕╤П: ╨╜╨╡ ╤А╨╡╨║╨╗╨░╨╝╨╕╤А╨╛╨▓╨░╤В╤М ┬л╨┐╤Г╤Б╤В╤Л╤И╨║╤Г┬╗
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨д╨╕╨║╤Б╨░╤Ж╨╕╤П ╨▓╨╗╨░╨┤╨╡╨╗╤М╤Ж╨░: ┬л╨╜╨╡ ╤Е╨╛╤З╤Г ╨┐╨╛╨║╨░ ╤А╨╡╨║╨╗╨░╨╝╨╕╤А╨╛╨▓╨░╤В╤М ╨┐╤Г╤Б╤В╤Л╤И╨║╤Г, ╤Б╨╛╤Б╤А╨╡╨┤╨╛╤В╨╛╤З╤Г╤Б╤М ╨╜╨░ ╤Б╤В╨░╤В╤М╤П╤Е, ╤Е╨░╨▒╨░╤Е, ╤Д╨╕╨╜╨║╨╛╨╜╤В╤Г╤А╨╡┬╗.
-- ╨Т╨╕╤В╤А╨╕╨╜╨░ ╨╡╤Й╤С ╨╜╨╡ ╨│╨╛╤В╨╛╨▓╨░ ╨║ ╨┐╨╗╨░╤В╨╜╤Л╨╝ ╨║╨░╨╜╨░╨╗╨░╨╝: ╤Е╨░╨▒╤Л/╨║╨╛╨╜╤В╨╡╨╜╤В ╨╕ ╨▒╨░╨╖╨╛╨▓╤Л╨╣ ╤Д╨╕╨╜╨║╨╛╨╜╤В╤Г╤А (╨Ы╨Ъ ╨┐╨╛╤Б╤В╨░╨▓╤Й╨╕╨║╨╛╨▓) тАФ ╨┐╤А╨╕╨╛╤А╨╕╤В╨╡╤В╨╜╨╡╨╡ ╤А╨╡╨║╨╗╨░╨╝╤Л.
-- ╨Ь╨░╤Б╤Б╨╛╨▓╨╛╨╡ ╤А╨░╤Б╤И╨╕╤А╨╡╨╜╨╕╨╡ allowlist ╨│╨╛╤А╨╛╨┤╨╛╨▓ ╨▒╨╡╨╖ ╨│╨╛╤В╨╛╨▓╤Л╤Е city hubs ╤А╨░╨╖╨┤╤Г╨▓╨░╨╡╤В ╨║╨░╤В╨░╨╗╨╛╨│ ╨▒╨╡╨╖ SEO/UX-╤П╨║╨╛╤А╤П.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- **╨а╨╡╨║╨╗╨░╨╝╨░ / paid acquisition тАФ ╨╛╤В╨╗╨╛╨╢╨╡╨╜╨░** ╨┤╨╛ ╨│╨╛╤В╨╛╨▓╨╜╨╛╤Б╤В╨╕ ╨▓╨╕╤В╤А╨╕╨╜╤Л: city hubs + ╨║╨╛╨╜╤В╨╡╨╜╤В (AI/╤Б╤В╨░╤В╤М╨╕) + ╨▒╨░╨╖╨╛╨▓╤Л╨╣ finance contour.
-- **╨д╨╛╨║╤Г╤Б ╤Б╨╡╨╣╤З╨░╤Б:** AI/╤Б╤В╨░╤В╤М╨╕, city hubs `/cities/{slug}`, finance contour / ╨Ы╨Ъ ╨┐╨╛╤Б╤В╨░╨▓╤Й╨╕╨║╨╛╨▓.
-- **Allowlist ╨│╨╛╤А╨╛╨┤╨╛╨▓:** ╨╜╨╡ ╤А╨░╨╖╨┤╤Г╨▓╨░╤В╤М ╨╝╨░╤Б╤Б╨╛╨▓╨╛ ╨▒╨╡╨╖ ╤Е╨░╨▒╨╛╨▓; ╨╜╨╛╨▓╤Л╨╡ ╨│╨╛╤А╨╛╨┤╨░ тАФ ╤В╨╛╨╗╤М╨║╨╛ ╤Б ╤Е╨░╨▒╨╛╨╝ (╨╕╨╗╨╕ ╨╛╤Б╨╛╨╖╨╜╨░╨╜╨╜╤Л╨╝ ╨╕╤Б╨║╨╗╤О╤З╨╡╨╜╨╕╨╡╨╝).
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╨╡╤В тАФ ╨┐╤А╨╛╨┤╤Г╨║╤В╨╛╨▓╤Л╨╣ ╨┐╤А╨╕╨╛╤А╨╕╤В╨╡╤В; execution ╨▓ Tasktracker (P.*).
+- Хабы новых городов thin (listing) — ок по политике; контент SEO — отдельно (P.2).
+- Точные `City.title` с скобками (`Киров (Кировская область)`, `Благовещенск (Амурская область)`) должны совпадать с БД.
+- SWC: ключ `Йошкар-Ола` без кавычек ломал `web:build` → hotfix `6f0fcf7`.
 
 ---
 
-## 2026-07-19 тАФ ╨Ъ╨░╤В╨░╨╗╨╛╨│: ╤Г╨╜╨╕╨║╨░╨╗╤М╨╜╤Л╨╡ ╨┐╨╕╨║╤В╨╛╨│╤А╨░╨╝╨╝╤Л ╨║╨░╤В╨╡╨│╨╛╤А╨╕╨╣
+## 2026-07-19 — Аудит городов вне public destinations
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╨░ `/events` ╤З╨╕╨┐╤Л ╨║╨░╤В╨╡╨│╨╛╤А╨╕╨╣: ┬л╨Т╤Б╨╡┬╗ = тЬи, ┬л╨н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕┬╗ = ЁЯЪМ, ╨╛╤Б╤В╨░╨╗╤М╨╜╤Л╨╡ ╤В╨╛╨┐-╨║╨░╤В╨╡╨│╨╛╤А╨╕╨╕ ╨┐╨░╨┤╨░╨╗╨╕ ╨▓ fallback ЁЯОл.
-- ╨Ь╨░╨┐╨┐╨╕╨╜╨│ ╨▓ `apps/web/src/lib/catalog-view-mode.ts` ╨┐╨╛╨║╤А╤Л╨▓╨░╨╗ ╤В╨╛╨╗╤М╨║╨╛ ╨н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕/╨а╨╡╤З╨╜╤Л╨╡/╨Ъ╨╛╨╜╤Ж╨╡╤А╤В╤Л/╨Ф╨╡╤В╤П╨╝; ╨╜╨╡ ╨▒╤Л╨╗╨╛ ┬л╨Ь╤Г╨╖╨╡╨╕ ╨╕ ╨░╤А╤В┬╗, ┬л╨а╨░╨╖╨▓╨╗╨╡╤З╨╡╨╜╨╕╤П┬╗, ┬л╨Ь╨╡╤А╨╛╨┐╤А╨╕╤П╤В╨╕╤П┬╗, ┬л╨Р╨║╤В╨╕╨▓╨╜╤Л╨╣ ╨╛╤В╨┤╤Л╤Е┬╗.
+- Prod: 180 городов с READY и/или saleable; публичный каталог — **36** city destinations (+ 4 region).
+- Исключено **144** города: см. `docs/geo-excluded-cities.md`.
+- Доминирующие причины (на момент аудита): `allowlist` 126, `cityToRegion` 8, `no-saleable` 8, `republic-regex` 1 (Набережные Челны), `other` 1.
+- API подтверждает: «Республика Татарстан» / «Республика Хакасия» **нет** в destinations — `isPublicRegionName` с якорем `$` не матчит «Республика …».
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨а╨░╤Б╤И╨╕╤А╨╡╨╜ `CATEGORY_EMOJI`: ╤Г╨╜╨╕╨║╨░╨╗╤М╨╜╤Л╨╣ emoji ╨╜╨░ ╨║╨░╨╢╨┤╤Г╤О ╤В╨╛╨┐-╨║╨░╤В╨╡╨│╨╛╤А╨╕╤О; ╨╜╨╡╨╕╨╖╨▓╨╡╤Б╤В╨╜╤Л╨╡ тЖТ тЬи (╨╜╨╡ ticket).
-- ╨Я╨░╤А╨╕╤В╨╡╤В ╨▓ legacy `apps/public` CatalogPage.
-- ╨а╨╡╨╜╨┤╨╡╤А ╤З╨╕╨┐╨╛╨▓: `CatalogToolbar.client.tsx` тЖТ `categoryEmoji(item.name)`.
+- Отчёт зафиксирован в `docs/geo-excluded-cities.md`.
+- **Сверх аудита (тот же день):** geo-политика применена — см. запись «Geo-политика: адмцентры + region buckets + Челны». `cityToRegion` в сводке больше не трактуется как «дыра».
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В тАФ ╨▒╨░╨│ ╨╝╨░╨┐╨┐╨╕╨╜╨│╨░, ╨╜╨╡ ╤А╨╡╨╜╨┤╨╡╤А╨░.
-
----
-
-## 2026-07-19 тАФ CI: pnpm missing before setup-node cache
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- Job `validate-build-test` ╨┐╨░╨┤╨░╨╗ ╨╖╨░ ~14тАУ19╤Б ╨╜╨░ `feat/next-monorepo` ╨╕ PR #1 (╤В╨╛╤В ╨╢╨╡ branch, title hero-stats).
-- ╨Ю╤И╨╕╨▒╨║╨░: `Unable to locate executable file: pnpm` ╨╜╨░ ╤И╨░╨│╨╡ `actions/setup-node@v4` ╤Б `cache: pnpm`.
-- ╨Я╨╛╤Б╨╗╨╡ ╤Д╨╕╨║╤Б╨░ ╨┐╨╛╤А╤П╨┤╨║╨░: `backend:typecheck` тАФ `exactOptionalPropertyTypes` / `noUncheckedIndexedAccess` (╨▓╨║╨╗╤О╤З╨╡╨╜╤Л ╨▓ e9d72f1, ╤А╨░╨╜╤М╤И╨╡ CI ╨╜╨╡ ╨┤╨╛╤Е╨╛╨┤╨╕╨╗).
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨Т `.github/workflows/ci.yml` ╨┐╨╛╤Б╤В╨░╨▓╨╕╤В╤М `pnpm/action-setup@v4` **╨┤╨╛** `setup-node` (cache ╤В╤А╨╡╨▒╤Г╨╡╤В pnpm ╨▓ PATH).
-- Widen optional types (`| undefined`) + guards ╨┤╨╗╤П indexed access ╨▓ reviews/auth/catalog/image-url.
-- ╨Ю╤В╨┤╨╡╨╗╤М╨╜╨╛╨╣ ╨▓╨╡╤В╨║╨╕ hero-stats ╨╜╨╡╤В: PR #1 = `feat/next-monorepo`.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Я╨╛╤Б╨╗╨╡ typecheck: `web:build` prerender `/` тЖТ Prisma `Can't reach database server at 127.0.0.1:5437` (hero stats / `getHomePageData` ╨▒╨╡╨╖ catch).
-- Fallback: `getHomePageData` тЖТ empty payloads ╨┐╤А╨╕ ╨╜╨╡╨┤╨╛╤Б╤В╤Г╨┐╨╜╨╛╨╣ ╨С╨Ф (╨║╨░╨║ SiteLayout).
+- ~~`republic-regex`~~ — исправлено в записи geo-политики ниже по дневнику / выше по времени.
 
 ---
 
-## 2026-07-19 тАФ TC on-demand sync `--ids`
+## 2026-07-19 — Продуктовая стратегия: не рекламировать «пустышку»
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Full `tc:sync` ╤В╤П╨╢╤С╨╗╤Л╨╣; ╨┤╨╗╤П ╤В╨╛╤З╨╡╤З╨╜╨╛╨│╨╛ ╨┤╨╛╨▒╨░╨▓╨╗╨╡╨╜╨╕╤П/╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╨╕╤П ╤Б╨╛╨▒╤Л╤В╨╕╨╣ ╨╜╤Г╨╢╨╡╨╜ ╨┐╤Г╤В╤М ╨┐╨╛ ╤Б╨┐╨╕╤Б╨║╤Г Ticketscloud ids.
-- ╨Т proto ╤Г╨╢╨╡ ╨╡╤Б╤В╤М `EventsRequest.ids`; upsert pipeline (`importCatalogEvent`) ╤Г╨╢╨╡ ╨│╨╛╤В╨╛╨▓.
+- Фиксация владельца: «не хочу пока рекламировать пустышку, сосредоточусь на статьях, хабах, финконтуре».
+- Витрина ещё не готова к платным каналам: хабы/контент и базовый финконтур (ЛК поставщиков) — приоритетнее рекламы.
+- Массовое расширение allowlist городов без готовых city hubs раздувает каталог без SEO/UX-якоря.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `npm run tc:sync` тЖТ `scripts/tc-sync.js`: ╨▒╨╡╨╖ ╤Д╨╗╨░╨│╨╛╨▓ = full fetch+import+revalidate; ╤Б `--ids=...` = gRPC by ids тЖТ normalize тЖТ ╤В╨╛╤В ╨╢╨╡ upsert (╨╜╨╡ insert-only).
-- `--dry-run` ╤Б `--ids`: ╤В╨╛╨╗╤М╨║╨╛ fetch+normalize, ╨▒╨╡╨╖ ╨С╨Ф.
-- Shared `scripts/lib/tc-catalog-fetch.js`; `importCatalogEvents(..., { skipMissingFromCatalog: true })` ╨┤╨╗╤П ids-╤А╨╡╨╢╨╕╨╝╨░.
+- **Реклама / paid acquisition — отложена** до готовности витрины: city hubs + контент (AI/статьи) + базовый finance contour.
+- **Фокус сейчас:** AI/статьи, city hubs `/cities/{slug}`, finance contour / ЛК поставщиков.
+- **Allowlist городов:** не раздувать массово без хабов; новые города — только с хабом (или осознанным исключением).
+
+### Проблемы
+
+- Нет — продуктовый приоритет; execution в Tasktracker (P.*).
+
+---
+
+## 2026-07-19 — Каталог: уникальные пиктограммы категорий
+
+### Наблюдения
+
+- На `/events` чипы категорий: «Все» = ✨, «Экскурсии» = 🚌, остальные топ-категории падали в fallback 🎫.
+- Маппинг в `apps/web/src/lib/catalog-view-mode.ts` покрывал только Экскурсии/Речные/Концерты/Детям; не было «Музеи и арт», «Развлечения», «Мероприятия», «Активный отдых».
+
+### Решения
+
+- Расширен `CATEGORY_EMOJI`: уникальный emoji на каждую топ-категорию; неизвестные → ✨ (не ticket).
+- Паритет в legacy `apps/public` CatalogPage.
+- Рендер чипов: `CatalogToolbar.client.tsx` → `categoryEmoji(item.name)`.
+
+### Проблемы
+
+- Нет — баг маппинга, не рендера.
+
+---
+
+## 2026-07-19 — CI: pnpm missing before setup-node cache
+
+### Наблюдения
+
+- Job `validate-build-test` падал за ~14–19с на `feat/next-monorepo` и PR #1 (тот же branch, title hero-stats).
+- Ошибка: `Unable to locate executable file: pnpm` на шаге `actions/setup-node@v4` с `cache: pnpm`.
+- После фикса порядка: `backend:typecheck` — `exactOptionalPropertyTypes` / `noUncheckedIndexedAccess` (включены в e9d72f1, раньше CI не доходил).
+
+### Решения
+
+- В `.github/workflows/ci.yml` поставить `pnpm/action-setup@v4` **до** `setup-node` (cache требует pnpm в PATH).
+- Widen optional types (`| undefined`) + guards для indexed access в reviews/auth/catalog/image-url.
+- Отдельной ветки hero-stats нет: PR #1 = `feat/next-monorepo`.
+
+### Проблемы
+
+- После typecheck: `web:build` prerender `/` → Prisma `Can't reach database server at 127.0.0.1:5437` (hero stats / `getHomePageData` без catch).
+- Fallback: `getHomePageData` → empty payloads при недоступной БД (как SiteLayout).
+
+---
+
+## 2026-07-19 — TC on-demand sync `--ids`
+
+### Наблюдения
+
+- Full `tc:sync` тяжёлый; для точечного добавления/обновления событий нужен путь по списку Ticketscloud ids.
+- В proto уже есть `EventsRequest.ids`; upsert pipeline (`importCatalogEvent`) уже готов.
+
+### Решения
+
+- `npm run tc:sync` → `scripts/tc-sync.js`: без флагов = full fetch+import+revalidate; с `--ids=...` = gRPC by ids → normalize → тот же upsert (не insert-only).
+- `--dry-run` с `--ids`: только fetch+normalize, без БД.
+- Shared `scripts/lib/tc-catalog-fetch.js`; `importCatalogEvents(..., { skipMissingFromCatalog: true })` для ids-режима.
 - Admin: `POST /api/v1/tc/sync?ids=a,b&dry-run=1`.
-- Prod smoke: dry-run + upsert `6a5a15629c0d02f149eb31b7`, `6a4b7eb321d4fca102f90689` тЖТ +2 EventSourceLink (30637тЖТ30639).
+- Prod smoke: dry-run + upsert `6a5a15629c0d02f149eb31b7`, `6a4b7eb321d4fca102f90689` → +2 EventSourceLink (30637→30639).
 - **Prod @6cc137d:** `git pull` + `daibilet-api` restart; `npm run tc:sync -- --help` OK.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Ids-╤А╨╡╨╢╨╕╨╝ ╨┐╨╛╤Б╨╗╨╡ upsert ╨▓╤Б╤С ╨╡╤Й╤С ╨│╨╛╨╜╤П╨╡╤В ╨┐╨╛╨╗╨╜╤Л╨╣ `ProviderLink` resync ╨┐╨╛ source (~6s) тАФ ╨┐╤А╨╕╨╡╨╝╨╗╨╡╨╝╨╛; scoped sync ╨╝╨╛╨╢╨╜╨╛ ╨╛╤В╨╗╨╛╨╢╨╕╤В╤М.
-- ╨Э╨╡ ╨╖╨░╨╝╨╡╨╜╨░ nightly/full sync: ╤Ж╨╡╨╜╤Л/╨┤╨░╤В╤Л ╨╛╤Б╤В╨░╨╗╤М╨╜╤Л╤Е ╤Б╨╛╨▒╤Л╤В╨╕╨╣ ╨╜╨╡ ╨╛╨▒╨╜╨╛╨▓╨╗╤П╤О╤В╤Б╤П.
-
----
-
-## 2026-07-19 тАФ Anti-flash ╨║╨░╤В╨░╨╗╨╛╨│╨░: ╨╜╨╡ ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╤В╤М SSR ┬л╨▓╤Б╨╡ ╨│╨╛╤А╨╛╨┤╨░┬╗
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Т `361dc4c` ╤Г╨╢╨╡ ╨▒╤Л╨╗╨╕ venues/locations + `cityReady`, ╨╜╨╛ ╨╜╨░ `/events` ╨▒╨╡╨╖ `?city=` ╨╛╤Б╤В╨░╨▓╨░╨╗╤Б╤П flash ╨║╨╛╨╜╤В╨╡╨╜╤В╨░: ╨┐╨╛╤Б╨╗╨╡ resolve storage ╨╜╨░ ╨╛╨┤╨╕╨╜ ╨║╨░╨┤╤А ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╗╤Б╤П SSR-╨║╨░╤В╨░╨╗╨╛╨│ ┬л╨▓╤Б╨╡ ╨│╨╛╤А╨╛╨┤╨░┬╗ (toolbar ╤Г╨╢╨╡ ╤Б ╨г╤Д╨╛╨╣), ╨╖╨░╤В╨╡╨╝ client fetch.
-- ╨Я╤А╨╕╤З╨╕╨╜╨░: `useState(initialCatalog)` + `loading=false` ╨┐╤А╨╕ ╨╜╨░╨╗╨╕╤З╨╕╨╕ SSR payload; `cityBootstrapPending` ╤Б╨╜╨╕╨╝╨░╨╗╤Б╤П ╨┤╨╛ ╨╖╨░╨▓╨╡╤А╤И╨╡╨╜╨╕╤П fetch ╤Б effective city.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- `CatalogShell`: SSR catalog ╨┤╨╛╨▓╨╡╤А╤П╨╡╨╝ ╤В╨╛╨╗╤М╨║╨╛ ╨╡╤Б╨╗╨╕ URL ╤Г╨╢╨╡ ╤Б╨╛╨┤╨╡╤А╨╢╨╕╤В `city`; ╨╕╨╜╨░╤З╨╡ ╤Б╤В╨░╤А╤В ╤Б `catalog=null` / skeleton тЖТ fetch ╤Б ╨│╨╛╤А╨╛╨┤╨╛╨╝ ╨╕╨╖ ╤И╨░╨┐╨║╨╕ (`effectiveQueryKey`).
-- Deep-link ╤Б ╤П╨▓╨╜╤Л╨╝ `city=` ╨╕ ╤Б╨▒╤А╨╛╤Б `persistSelectedCity('all')` ╨▒╨╡╨╖ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╣.
-- Venues/Locations ╤Г╨╢╨╡ ╤Д╨╕╨╗╤М╤В╤А╤Г╤О╤В client-side ╨┐╨╛ effective city тАФ ╨╛╤В╨┤╨╡╨╗╤М╨╜╤Л╨╣ SSR-flash ╨╜╨╡ ╨╖╨░╤В╤А╨░╨│╨╕╨▓╨░╨╡╤В.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Я╤А╤П╨╝╨╛╨╣ ╨╖╨░╤Е╨╛╨┤ ╨╜╨░ `/events` ╨▒╨╡╨╖ city: ╨║╤А╨░╤В╨║╨╕╨╣ skeleton ╨▓╨╝╨╡╤Б╤В╨╛ ┬л╨Т╤Б╨╡ ╨│╨╛╤А╨╛╨┤╨░┬╗ (╨╛╨╢╨╕╨┤╨░╨╡╨╝╨╛ ╨▒╨╡╨╖ cookie-SSR).
-- **Prod @4c09cdb:** `deploy-prod-next` OK; `/events`, `/venues`, `/locations` 200. (╨Ъ╨╛╨╝╨╝╨╕╤В ╤Б╨╝╨╡╤И╨░╨╜ ╤Б CI pnpm-fix тАФ anti-flash ╨▓ ╤В╨╛╨╝ ╨╢╨╡ SHA.)
+- Ids-режим после upsert всё ещё гоняет полный `ProviderLink` resync по source (~6s) — приемлемо; scoped sync можно отложить.
+- Не замена nightly/full sync: цены/даты остальных событий не обновляются.
 
 ---
 
-## 2026-07-19 тАФ UX: ╨│╨╛╤А╨╛╨┤ ╤И╨░╨┐╨║╨╕ тЖТ venues/locations + anti-flash `/events`
+## 2026-07-19 — Anti-flash каталога: не показывать SSR «все города»
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╤Б╨╗╨╡ `4772789` ╨│╨╛╤А╨╛╨┤ ╤И╨░╨┐╨║╨╕ ╨┐╨╛╨┐╨░╨┤╨░╨╗ ╨▓ `/events`, ╨╜╨╛ ╤Д╨╕╨╗╤М╤В╤А ╨╜╨░ `/venues` ╨╕ `/locations` ╨╛╤Б╤В╨░╨▓╨░╨╗╤Б╤П ╨╗╨╛╨║╨░╨╗╤М╨╜╤Л╨╝ `useState('all')` ╨╕ ╨╕╨│╨╜╨╛╤А╨╕╤А╨╛╨▓╨░╨╗ ╤И╨░╨┐╨║╤Г.
-- ╨Э╨░ `/events` ╨▒╤Л╨╗ flash: ╨┐╨╡╤А╨▓╤Л╨╣ ╨║╨░╨┤╤А ┬л╨Т╤Б╨╡ ╨│╨╛╤А╨╛╨┤╨░┬╗, ╨╖╨░╤В╨╡╨╝ `router.replace` ╤Б ╨│╨╛╤А╨╛╨┤╨╛╨╝ ╨╕╨╖ `localStorage` тАФ ╨┐╨╛╤В╨╛╨╝╤Г ╤З╤В╨╛ inject ╤И╤С╨╗ ╨▓ `useEffect` ╨┐╨╛╤Б╨╗╨╡ paint, ╨░ ╤В╤Г╨╗╨▒╨░╤А ╤З╨╕╤В╨░╨╗ ╤В╨╛╨╗╤М╨║╨╛ URL.
+- В `361dc4c` уже были venues/locations + `cityReady`, но на `/events` без `?city=` оставался flash контента: после resolve storage на один кадр показывался SSR-каталог «все города» (toolbar уже с Уфой), затем client fetch.
+- Причина: `useState(initialCatalog)` + `loading=false` при наличии SSR payload; `cityBootstrapPending` снимался до завершения fetch с effective city.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ю╨▒╤Й╨╕╨╣ ╨║╨╛╨╜╤В╤Г╤А `CITY_FILTER_PATHS` (`/events`, `/venues`, `/locations`): inject `city=` ╨╕╨╖ storage, nav-╤Б╤Б╤Л╨╗╨║╨╕ ╤Б ╨│╨╛╤А╨╛╨┤╨╛╨╝, ╤Б╨╝╨╡╨╜╨░ ╨▓ ╤И╨░╨┐╨║╨╡ ╨╛╨▒╨╜╨╛╨▓╨╗╤П╨╡╤В query ╤В╨╡╨║╤Г╤Й╨╡╨╣ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л; ╤Б╨▒╤А╨╛╤Б тЖТ `persistSelectedCity('all')`.
-- Anti-flash: `cityReady` + placeholder ┬л╨У╨╛╤А╨╛╨┤тАж┬╗ ╨┤╨╛ resolve; `useLayoutEffect` ╨┤╨╗╤П sync/replace; `CatalogShell` ╨┐╨╛╨┤╤Б╤В╨░╨▓╨╗╤П╨╡╤В effective city ╨┤╨╛ ╨┐╨╛╤П╨▓╨╗╨╡╨╜╨╕╤П ╨▓ URL.
-- Venues/Locations: ╤Д╨╕╨╗╤М╤В╤А ╨│╨╛╤А╨╛╨┤╨░ ╤З╨╡╤А╨╡╨╖ URL `?city=` + storage, ╨║╨░╨║ ╨║╨░╤В╨░╨╗╨╛╨│.
-- ╨Ъ╨╛╨┤ venues/locations+cityReady ╤Б╨╗╤Г╤З╨░╨╣╨╜╨╛ ╤Г╨╡╤Е╨░╨╗ ╨▓ `361dc4c` (docs tc:sync); ╨┤╨╛╨╢╨╕╨╝ anti-flash SSR ╨▓ ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛╨╝ fix-commit.
+- `CatalogShell`: SSR catalog доверяем только если URL уже содержит `city`; иначе старт с `catalog=null` / skeleton → fetch с городом из шапки (`effectiveQueryKey`).
+- Deep-link с явным `city=` и сброс `persistSelectedCity('all')` без изменений.
+- Venues/Locations уже фильтруют client-side по effective city — отдельный SSR-flash не затрагивает.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Я╨╛╨╗╨╜╤Л╨╣ SSR ╨▒╨╡╨╖ cookie ╨▓╤Б╤С ╨╡╤Й╤С ╨╜╨╡ ╨╖╨╜╨░╨╡╤В ╨│╨╛╤А╨╛╨┤ ╨┤╨╛ hydrate тАФ ╨┐╨╛╤Н╤В╨╛╨╝╤Г pending-placeholder, ╨░ ╨╜╨╡ ┬л╨Т╤Б╨╡ ╨│╨╛╤А╨╛╨┤╨░┬╗.
-- Deploy: `deploy-prod-next` ╨┐╨╛╤Б╨╗╨╡ commit.
+- Прямой заход на `/events` без city: краткий skeleton вместо «Все города» (ожидаемо без cookie-SSR).
+- **Prod @4c09cdb:** `deploy-prod-next` OK; `/events`, `/venues`, `/locations` 200. (Коммит смешан с CI pnpm-fix — anti-flash в том же SHA.)
 
 ---
 
-## 2026-07-19 тАФ UX: ╨│╨╛╤А╨╛╨┤ ╤И╨░╨┐╨║╨╕ тЖТ ╤Д╨╕╨╗╤М╤В╤А ╨║╨░╤В╨░╨╗╨╛╨│╨░ `/events`
+## 2026-07-19 — UX: город шапки → venues/locations + anti-flash `/events`
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М: ╨▓ ╤И╨░╨┐╨║╨╡ ╨▓╤Л╨▒╤А╨░╨╜ ╨│╨╛╤А╨╛╨┤ (╨╜╨░╨┐╤А. ╨г╤Д╨░), ╨┐╨╡╤А╨╡╤Е╨╛╨┤ ╨▓ ┬л╨б╨╛╨▒╤Л╤В╨╕╤П┬╗/`/events` ╨╛╤В╨║╤А╤Л╨▓╨░╨╗ ╨║╨░╤В╨░╨╗╨╛╨│ ╨▒╨╡╨╖ `city=` тАФ ╤Д╨╕╨╗╤М╤В╤А ╨│╨╛╤А╨╛╨┤╨░ ╨┐╤А╨╕╤Е╨╛╨┤╨╕╨╗╨╛╤Б╤М ╨▓╤Л╨▒╨╕╤А╨░╤В╤М ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛.
-- ╨У╨╛╤А╨╛╨┤ ╤И╨░╨┐╨║╨╕ ╤Г╨╢╨╡ ╨╢╨╕╨╗ ╨▓ `localStorage` (`daibilet:selected-city`) ╤З╨╡╤А╨╡╨╖ `SelectedCityProvider`, ╨░ ╨║╨░╤В╨░╨╗╨╛╨│ ╤З╨╕╤В╨░╨╗ ╤В╨╛╨╗╤М╨║╨╛ URL `?city=`.
-- ╨б╨╝╨╡╨╜╨░ ╨│╨╛╤А╨╛╨┤╨░ ╨▓ ╤И╨░╨┐╨║╨╡ ╨╜╨░ `/events` ╤Г╨╢╨╡ ╨╛╨▒╨╜╨╛╨▓╨╗╤П╨╗╨░ query тАФ ╨╗╨╛╨╝╨░╨╗╨░╤Б╤М ╨╕╨╝╨╡╨╜╨╜╨╛ ╨╜╨░╨▓╨╕╨│╨░╤Ж╨╕╤П ╨▒╨╡╨╖ ╤П╨▓╨╜╨╛╨│╨╛ `city`.
+- После `4772789` город шапки попадал в `/events`, но фильтр на `/venues` и `/locations` оставался локальным `useState('all')` и игнорировал шапку.
+- На `/events` был flash: первый кадр «Все города», затем `router.replace` с городом из `localStorage` — потому что inject шёл в `useEffect` после paint, а тулбар читал только URL.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Э╨░ `/events` ╨▒╨╡╨╖ `city=` тАФ `router.replace` ╤Б ╨│╨╛╤А╨╛╨┤╨╛╨╝ ╨╕╨╖ storage (`mergeStoredCityIntoEventsParams`); deep-link ╤Б ╨┤╤А╤Г╨│╨╕╨╝ `city=` ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╡╨╝ ╨╕ ╤Б╨╕╨╜╤Е╤А╨╛╨╜╨╕╨╖╨╕╤А╤Г╨╡╨╝ ╨▓ storage.
-- ╨б╤Б╤Л╨╗╨║╨╕ ┬л╨б╨╛╨▒╤Л╤В╨╕╤П┬╗, hero-chips `/eventsтАж`, ╨┐╨╛╨╕╤Б╨║ ╤И╨░╨┐╨║╨╕, ╨╕╨╖╨▒╤А╨░╨╜╨╜╨╛╨╡ тАФ `catalogHrefWithSelectedCity`.
-- ╨б╨▒╤А╨╛╤Б ╨│╨╛╤А╨╛╨┤╨░ ╨▓ ╤В╤Г╨╗╨▒╨░╤А╨╡/╤З╨╕╨┐╨╡ тЖТ `persistSelectedCity('all')`, ╤З╤В╨╛╨▒╤Л auto-inject ╨╜╨╡ ╨▓╨╡╤А╨╜╤Г╨╗ ╨│╨╛╤А╨╛╨┤.
+- Общий контур `CITY_FILTER_PATHS` (`/events`, `/venues`, `/locations`): inject `city=` из storage, nav-ссылки с городом, смена в шапке обновляет query текущей страницы; сброс → `persistSelectedCity('all')`.
+- Anti-flash: `cityReady` + placeholder «Город…» до resolve; `useLayoutEffect` для sync/replace; `CatalogShell` подставляет effective city до появления в URL.
+- Venues/Locations: фильтр города через URL `?city=` + storage, как каталог.
+- Код venues/locations+cityReady случайно уехал в `361dc4c` (docs tc:sync); дожим anti-flash SSR в отдельном fix-commit.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Ъ╨╛╤А╨╛╤В╨║╨╕╨╣ double-fetch ╨▓╨╛╨╖╨╝╨╛╨╢╨╡╨╜ ╨┐╤А╨╕ ╨┐╤А╤П╨╝╨╛╨╝ ╨╖╨░╤Е╨╛╨┤╨╡ ╨╜╨░ `/events` ╨▒╨╡╨╖ city (╤Б╨╜╨░╤З╨░╨╗╨░ ╨▒╨╡╨╖ ╤Д╨╕╨╗╤М╤В╤А╨░, ╨╖╨░╤В╨╡╨╝ replace) тАФ ╨┐╤А╨╕╨╡╨╝╨╗╨╡╨╝╨╛; nav-╤Б╤Б╤Л╨╗╨║╨╕ ╤Б╤А╨░╨╖╤Г ╤Б city.
+- Полный SSR без cookie всё ещё не знает город до hydrate — поэтому pending-placeholder, а не «Все города».
+- Deploy: `deploy-prod-next` после commit.
+
+---
+
+## 2026-07-19 — UX: город шапки → фильтр каталога `/events`
+
+### Наблюдения
+
+- Пользователь: в шапке выбран город (напр. Уфа), переход в «События»/`/events` открывал каталог без `city=` — фильтр города приходилось выбирать отдельно.
+- Город шапки уже жил в `localStorage` (`daibilet:selected-city`) через `SelectedCityProvider`, а каталог читал только URL `?city=`.
+- Смена города в шапке на `/events` уже обновляла query — ломалась именно навигация без явного `city`.
+
+### Решения
+
+- На `/events` без `city=` — `router.replace` с городом из storage (`mergeStoredCityIntoEventsParams`); deep-link с другим `city=` не трогаем и синхронизируем в storage.
+- Ссылки «События», hero-chips `/events…`, поиск шапки, избранное — `catalogHrefWithSelectedCity`.
+- Сброс города в тулбаре/чипе → `persistSelectedCity('all')`, чтобы auto-inject не вернул город.
+
+### Проблемы
+
+- Короткий double-fetch возможен при прямом заходе на `/events` без city (сначала без фильтра, затем replace) — приемлемо; nav-ссылки сразу с city.
 - **Prod @4772789:** `deploy-prod-next` OK, `/events` 200, revalidate tags home/catalog.
 
 ---
 
-## 2026-07-19 тАФ Event page: TZ ╤А╨╡╨│╨╕╨╛╨╜╨░ ╤Б╨╛╨▒╤Л╤В╨╕╤П (= ╨▓╨╕╨┤╨╢╨╡╤В)
+## 2026-07-19 — Event page: TZ региона события (= виджет)
 
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Ъ╨░╤А╤В╨╛╤З╨║╨░ ╨г╤Д╨░ (`тАжlesha-kotoryi-ustroilsyaтАж`): hero/╤Б╨╡╨░╨╜╤Б ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╗╨╕ **16:00** ╨┐╤А╨╕ `startsAt=2026-08-02T13:00:00.000Z` тАФ ╤Н╤В╨╛ **Europe/Moscow**, ╨╜╨╡ ╨╗╨╛╨║╨░╨╗╤М╨╜╨╛╨╡ ╨г╤Д╤Л.
-- ╨Ъ╨░╤В╨░╨╗╨╛╨│/related ╤Г╨╢╨╡ ╤Д╨╛╤А╨╝╨░╤В╨╕╤А╨╛╨▓╨░╨╗╨╕ ╤З╨╡╤А╨╡╨╖ `resolveCityTimeZone` тЖТ `Asia/Yekaterinburg` тЖТ **18:00**; event page (`public-event.dto.ts` `mapSession`) ╨▓╤Л╨╖╤Л╨▓╨░╨╗ `formatDate/formatTime` **╨▒╨╡╨╖** TZ тЖТ default `SITE_TIME_ZONE=Europe/Moscow`.
-- JSON-LD `startDate` ╨╛╤Б╤В╨░╨▓╨░╨╗╤Б╤П ISO UTC (╨║╨╛╤А╤А╨╡╨║╤В╨╜╨╛ ╨║╨░╨║ ╨░╨▒╤Б╨╛╨╗╤О╤В╨╜╤Л╨╣ instant).
-- ╨Ы╨Ъ ┬л╨б╨╡╨░╨╜╤Б: Europe/Moscow┬╗ (`BuyerOrderCard`) тАФ ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛╨╡ ╨┐╤А╨░╨▓╨╕╨╗╨╛ ╨╖╨░╨║╨░╨╖╨╛╨▓, ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕.
+- Карточка Уфа (`…lesha-kotoryi-ustroilsya…`): hero/сеанс показывали **16:00** при `startsAt=2026-08-02T13:00:00.000Z` — это **Europe/Moscow**, не локальное Уфы.
+- Каталог/related уже форматировали через `resolveCityTimeZone` → `Asia/Yekaterinburg` → **18:00**; event page (`public-event.dto.ts` `mapSession`) вызывал `formatDate/formatTime` **без** TZ → default `SITE_TIME_ZONE=Europe/Moscow`.
+- JSON-LD `startDate` оставался ISO UTC (корректно как абсолютный instant).
+- ЛК «Сеанс: Europe/Moscow» (`BuyerOrderCard`) — отдельное правило заказов, не трогали.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ш╤Б╤В╨╛╤З╨╜╨╕╨║ TZ: `resolveCityTimeZone(city, destination)` ╨╕╨╖ `city-timezone` (╨╛╨▓╨╡╤А╤А╨░╨╣╨┤╤Л ╨│╨╛╤А╨╛╨┤╨╛╨▓ + ╤А╨╡╨│╨╕╨╛╨╜╤Л), ╨╜╨╡ browser TZ ╨╕ ╨╜╨╡ forced MSK.
-- `mapSession` + `event.timeZone`; hydrate catalog slots ╨╕ TS mapper ╤В╨╛╨╢╨╡ ╤Б city TZ; TcWidget fallback `toLocale*` ╤Г╨▓╨░╨╢╨░╨╡╤В `session.timeZone`.
-- Unit: `city-timezone-display.test.ts` (╨г╤Д╨░тЖТ18:00 YEKT vs 16:00 MSK).
+- Источник TZ: `resolveCityTimeZone(city, destination)` из `city-timezone` (оверрайды городов + регионы), не browser TZ и не forced MSK.
+- `mapSession` + `event.timeZone`; hydrate catalog slots и TS mapper тоже с city TZ; TcWidget fallback `toLocale*` уважает `session.timeZone`.
+- Unit: `city-timezone-display.test.ts` (Уфа→18:00 YEKT vs 16:00 MSK).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- In-memory `PUBLIC_EVENT_CACHE_MS` (5 ╨╝╨╕╨╜) тАФ ╨┐╨╛╤Б╨╗╨╡ deploy API ╨╜╤Г╨╢╨╡╨╜ restart (╨╕╨╗╨╕ ╨┤╨╛╨╢╨┤╨░╤В╤М╤Б╤П TTL).
-- Proof: slug ╨▓╤Л╤И╨╡ тАФ `timeLabel=18:00`, `timeZone=Asia/Yekaterinburg`, hero ┬л╨С╨╗╨╕╨╢╨░╨╣╤И╨╕╨╣: тАж 18:00┬╗.
-- **Proof prod @9f1f744:** API + HTML тАФ `Asia/Yekaterinburg` / `18:00` (╨▒╤Л╨╗╨╛ MSK `16:00`); JSON-LD `startDate` ╨╛╤Б╤В╨░╤С╤В╤Б╤П `2026-08-02T13:00:00.000Z`.
-
----
-
-## 2026-07-19 тАФ URL: flat paths, SEO ╤З╨╡╤А╨╡╨╖ city hubs
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Ю╨▒╤Б╤Г╨╢╨┤╨░╨╗╤Б╤П city-prefix ╨▓ path (`/{city}/venues/...` ╨╕ ╨░╨╜╨░╨╗╨╛╨│╨╕). ╨г╤Б╤В╨╜╨░╤П ╤Д╨╛╤А╨╝╤Г╨╗╨╕╤А╨╛╨▓╨║╨░ ┬л╤А╨░╨╖╨▓╨╕╨▓╨░╤В╤М ╨┐╨░╨▒╤Л┬╗ ╨▓ ╨║╨╛╨╜╤В╨╡╨║╤Б╤В╨╡ city URL = **╤Е╨░╨▒╤Л** (city hubs), ╨╜╨╡ ╨▒╨░╤А╤Л.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- **URL ╨╛╤Б╤В╨░╤О╤В╤Б╤П flat:** `/events/{slug}`, `/venues/{slug}`, `/cities/{slug}`. City-prefix ╨▓ path **╨╜╨╡** ╨▓╨▓╨╛╨┤╨╕╨╝.
-- SEO-╤Д╨╛╨║╤Г╤Б: ╤А╨░╨╖╨▓╨╕╤В╨╕╨╡ ╨│╨╛╤А╨╛╨┤╤Б╨║╨╕╤Е ╤Е╨░╨▒╨╛╨▓ `/cities/{slug}` + landings; breadcrumbs/JSON-LD ╤Б ╨│╨╛╤А╨╛╨┤╨╛╨╝; sitemap/canonical (╨║╨░╨║ ╨╡╤Б╤В╤М / ╨┤╨╛╤А╨░╤Й╨╕╨▓╨░╤В╤М).
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╨╡╤В: ╤Б╤Е╨╡╨╝╨░ path ╨╜╨╡ ╨╝╨╡╨╜╤П╨╡╤В╤Б╤П тЖТ ╨▒╨╡╨╖ ╨╝╨╕╨│╤А╨░╤Ж╨╕╨╕ URL/╤А╨╡╨┤╨╕╤А╨╡╨║╤В╨╛╨▓.
+- In-memory `PUBLIC_EVENT_CACHE_MS` (5 мин) — после deploy API нужен restart (или дождаться TTL).
+- Proof: slug выше — `timeLabel=18:00`, `timeZone=Asia/Yekaterinburg`, hero «Ближайший: … 18:00».
+- **Proof prod @9f1f744:** API + HTML — `Asia/Yekaterinburg` / `18:00` (было MSK `16:00`); JSON-LD `startDate` остаётся `2026-08-02T13:00:00.000Z`.
 
 ---
 
-## 2026-07-19 тАФ Event page: ╨┤╤Г╨▒╨╗╨╕ ╤З╨╕╨┐╨╛╨▓ ╨▓ ┬л╨в╨╡╨│╨╕┬╗
+## 2026-07-19 — URL: flat paths, SEO через city hubs
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╨░ event page ╤Б╨╡╨║╤Ж╨╕╤П ┬л╨в╨╡╨│╨╕┬╗ ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╗╨░ `╨а╨╛╨║, ╨и╨╛╤Г - ╨┐╤А╨╛╨│╤А╨░╨╝╨╝╨░, ╨а╨╛╨║, ╨и╨╛╤Г - ╨┐╤А╨╛╨│╤А╨░╨╝╨╝╨░` (╨┐╤А╨╕╨╝╨╡╤А: `tc-6969ae12140cc49e8ef266e3-neveroyatnyi-koncert-gruppy-kino`).
-- `/api/public/events/{slug}` ╨╛╤В╨┤╨░╤С╤В ╨╛╨┤╨╕╨╜╨░╨║╨╛╨▓╤Л╨╡ labels ╨╕ ╨▓ `event.tags`, ╨╕ ╨▓ `event.subcategories` (backend `pickCatalogSubcategories` ╨▒╨╡╤А╤С╤В labels ╨╕╨╖ tags, ╨║╨╛╨│╨┤╨░ subcategory-╤Б╨╗╨╛╤П ╨╜╨╡╤В ╨╕╨╗╨╕ ╨╛╨╜ ╤Б╨╛╨▓╨┐╨░╨┤╨░╨╡╤В).
-- UI `EventTags` ╨┤╨╡╨╗╨░╨╗ `[...tags, ...subcategories]` ╨▒╨╡╨╖ dedupe тЖТ ╨▓╨╕╨╖╤Г╨░╨╗╤М╨╜╤Л╨╡ ╨┤╤Г╨▒╨╗╨╕; React `key={tag}` ╤В╨╛╨╢╨╡ ╨║╨╛╨╜╤Д╨╗╨╕╨║╤В╨╛╨▓╨░╨╗.
+- Обсуждался city-prefix в path (`/{city}/venues/...` и аналоги). Устная формулировка «развивать пабы» в контексте city URL = **хабы** (city hubs), не бары.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `uniqueEventTagLabels`: unique ╨┐╨╛ `trim` + `toLocaleLowerCase('ru')`, ╨┐╨╛╤А╤П╨┤╨╛╨║ ╨┐╨╡╤А╨▓╨╛╨│╨╛ ╨▓╤Е╨╛╨╢╨┤╨╡╨╜╨╕╤П, limit 12.
-- `EventTags` ╨╝╨╡╤А╨╢╨╕╤В ╨╛╨▒╨░ ╨╝╨░╤Б╤Б╨╕╨▓╨░ ╤З╨╡╤А╨╡╨╖ ╤Н╤В╨╛╤В ╤Е╨╡╨╗╨┐╨╡╤А.
-- Unit-╤В╨╡╤Б╤В ╨╜╨░ ╨║╨╡╨╣╤Б ╨а╨╛╨║ / ╨и╨╛╤Г - ╨┐╤А╨╛╨│╤А╨░╨╝╨╝╨░.
+- **URL остаются flat:** `/events/{slug}`, `/venues/{slug}`, `/cities/{slug}`. City-prefix в path **не** вводим.
+- SEO-фокус: развитие городских хабов `/cities/{slug}` + landings; breadcrumbs/JSON-LD с городом; sitemap/canonical (как есть / доращивать).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Deploy Next (web-only); API ╨╝╨╡╨╜╤П╤В╤М ╨╜╨╡ ╤В╤А╨╡╨▒╤Г╨╡╤В╤Б╤П тАФ payload ╨║╨╛╤А╤А╨╡╨║╤В╨╡╨╜, ╨▒╨░╨│ ╨╜╨░ merge ╨▓ UI.
-- **Proof prod @9658b9f:** HTML `/events/tc-6969ae12140cc49e8ef266e3-neveroyatnyi-koncert-gruppy-kino` тАФ ╨▓ ╤Б╨╡╨║╤Ж╨╕╨╕ ┬л╨в╨╡╨│╨╕┬╗ ╤А╨╛╨▓╨╜╨╛ 2 `span.rounded-full` (╨а╨╛╨║, ╨и╨╛╤Г - ╨┐╤А╨╛╨│╤А╨░╨╝╨╝╨░), ╨▒╨╡╨╖ ╨┐╨╛╨▓╤В╨╛╤А╨╛╨▓.
+- Нет: схема path не меняется → без миграции URL/редиректов.
 
 ---
 
-## 2026-07-19 тАФ Prod crash: cleanDisplayText is not defined
+## 2026-07-19 — Event page: дубли чипов в «Теги»
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Ъ╨╗╨╕╨╡╨╜╤В╤Б╨║╨╕╨╣ `ReferenceError: cleanDisplayText is not defined` ╨▓ chunk `7198-*.js` ╨╜╨░ event pages (╨╕ SSR digest ╨▓ journal `daibilet-web`).
-- ╨б╨╕╨╝╨┐╤В╨╛╨╝ ╨▓╤Л╨│╨╗╤П╨┤╨╡╨╗ ╨║╨░╨║ ChunkLoadError/502 ╨╜╨░ ╤Б╤В╨░╤В╨╕╨║╨╡ ╨┐╤А╨╕ ╤А╨╡╤Б╤В╨░╤А╤В╨░╤Е Next (OOM / mid-deploy), ╨╜╨╛ ╨║╨╛╤А╨╜╨╡╨▓╨╛╨╣ runtime-╨▒╨░╨│ тАФ ╨╛╤В╤Б╤Г╤В╤Б╤В╨▓╨╕╨╡ ╨╗╨╛╨║╨░╨╗╤М╨╜╨╛╨│╨╛ ╨▒╨╕╨╜╨┤╨╕╨╜╨│╨░ ╤Д╤Г╨╜╨║╤Ж╨╕╨╕.
-- ╨Т `event-page-utils.ts` ╨▒╤Л╨╗ ╤В╨╛╨╗╤М╨║╨╛ `export { cleanDisplayText, тАж } from './event-description-format'` тАФ re-export **╨╜╨╡** ╤Б╨╛╨╖╨┤╨░╤С╤В ╨╗╨╛╨║╨░╨╗╤М╨╜╨╛╨╡ ╨╕╨╝╤П; ╨▓╤Л╨╖╨╛╨▓╤Л `cleanDisplayText(...)` ╨▓╨╜╤Г╤В╤А╨╕ ╤В╨╛╨│╨╛ ╨╢╨╡ ╨╝╨╛╨┤╤Г╨╗╤П ╨┐╨░╨┤╨░╨╗╨╕.
+- На event page секция «Теги» показывала `Рок, Шоу - программа, Рок, Шоу - программа` (пример: `tc-6969ae12140cc49e8ef266e3-neveroyatnyi-koncert-gruppy-kino`).
+- `/api/public/events/{slug}` отдаёт одинаковые labels и в `event.tags`, и в `event.subcategories` (backend `pickCatalogSubcategories` берёт labels из tags, когда subcategory-слоя нет или он совпадает).
+- UI `EventTags` делал `[...tags, ...subcategories]` без dedupe → визуальные дубли; React `key={tag}` тоже конфликтовал.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ч╨░╨╝╨╡╨╜╤С╨╜ bare re-export ╨╜╨░ `import { cleanDisplayText, тАж } from './event-description-format'` + ╤П╨▓╨╜╤Л╨╣ `export { тАж }`.
-- Commit + deploy-prod-next; smoke `/events` ╨╕ event slug ╨┐╨╛╤Б╨╗╨╡ hard refresh.
+- `uniqueEventTagLabels`: unique по `trim` + `toLocaleLowerCase('ru')`, порядок первого вхождения, limit 12.
+- `EventTags` мержит оба массива через этот хелпер.
+- Unit-тест на кейс Рок / Шоу - программа.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- MemoryHigh Next (~1.1G) ╨╜╨░ 3.8Gi ╤Е╨╛╤Б╤В╨╡: ╨┐╤А╨╕ ╨┤╨╡╨┐╨╗╨╛╨╡/╨╜╨░╨│╤А╤Г╨╖╨║╨╡ ╨▓╨╛╨╖╨╝╨╛╨╢╨╜╤Л ╨║╤А╨░╤В╨║╨╕╨╡ 502 ╨╜╨░ `/_next/static` ╨┐╨╛╨║╨░ ╤Б╤В╨░╤В╨╕╨║╨░ ╨┐╤А╨╛╨║╤Б╨╕╤А╤Г╨╡╤В╤Б╤П ╤З╨╡╤А╨╡╨╖ Node. ╨Ю╤В╨┤╨╡╨╗╤М╨╜╨╛ ╤А╨░╤Б╤Б╨╝╨╛╤В╤А╨╡╤В╤М `alias` ╨╜╨░ `.next/static` ╨▓ nginx.
-
----
-
-## 2026-07-19 тАФ ╨Ы╨Ъ ╨╖╨░╨║╨░╨╖╨╛╨▓: 404 / ╨▓╤А╨╡╨╝╤П / truncate
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨б╤Б╤Л╨╗╨║╨░ ╨╕╨╖ ╨╖╨░╨║╨░╨╖╨░ ╨╜╨░ past dated TC slug (`тАж-14-iyulya-21-30`) ╨┤╨░╨▓╨░╨╗╨░ 404/╨┐╤Г╤Б╤В╤Г╤О ╨║╨░╤А╤В╨╛╤З╨║╤Г тЖТ ┬л╨Ю╤Б╤В╨░╨▓╨╕╤В╤М ╨╛╤В╨╖╤Л╨▓┬╗ ╨▒╨╡╤Б╨┐╨╛╨╗╨╡╨╖╨╡╨╜ (resolve ╨╛╤В╨╖╤Л╨▓╨╛╨▓ ╨▒╤Л╨╗ ╤В╨╛╨╗╤М╨║╨╛ ╨┐╨╛ ╤В╨╛╤З╨╜╨╛╨╝╤Г `slug`).
-- ╨Т ╤Б╤В╤А╨╛╨║╨╡ ╨▒╨╕╨╗╨╡╤В╨░ ╨┤╨▓╨╡ ┬л╨│╨╛╨╗╤Л╨╡┬╗ ╨┤╨░╤В╤Л/╨▓╤А╨╡╨╝╨╡╨╜╨╕ ╨▒╨╡╨╖ ╨┐╨╛╨┤╨┐╨╕╤Б╨╡╨╣; `formatDateTime` ╨▒╨╡╨╖ `Europe/Moscow`.
-- ╨С╨╗╨╛╨║ ╨┐╨╛╨║╤Г╨┐╨░╤В╨╡╨╗╤П: `max-w-[170px] truncate` ╨╛╨▒╤А╨╡╨╖╨░╨╗ ┬л╨Ф╨░╤В╨░ ╨┐╨╛╨║╤Г╨┐╨║╨╕┬╗ ╨╜╨░ desktop.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- `buyer-order-event-links.js`: ╨┤╨╗╤П account/public orders ╤А╨╡╨╖╨╛╨╗╨▓ `eventUrl` тЖТ meta-sibling / merge ╤Б ╨▒╨╗╨╕╨╢╨░╨╣╤И╨╕╨╝ ╨▒╤Г╨┤╤Г╤Й╨╕╨╝ ╤Б╨╡╨░╨╜╤Б╨╛╨╝; `eventId` ╨┐╨╛╨║╤Г╨┐╨║╨╕ ╤Б╨╛╤Е╤А╨░╨╜╤П╨╡╨╝ ╨┤╨╗╤П verification.
-- Soft-404 ╨▓ `loadPublicEventDto`: unsaleable slug тЖТ ╨╛╨┤╨╜╨╛╤А╨░╨╖╨╛╨▓╤Л╨╣ hop ╨╜╨░ sibling ╤Б future session.
-- Reviews: `resolveReviewEvent` ╨┐╨╛ id / `tc-{24hex}-*` / slug; `/reviews/write` ╤А╨░╨▒╨╛╤В╨░╨╡╤В ╨┐╨╛ `eventId`+`orderRef` ╨┤╨░╨╢╨╡ ╨▒╨╡╨╖ ╨┐╤Г╨▒╨╗╨╕╤З╨╜╨╛╨╣ ╨║╨░╤А╤В╨╛╤З╨║╨╕ (`forceFormOpen`).
-- UI: ┬л╨б╨╡╨░╨╜╤Б: тАж┬╗ (MSK), ┬л╨Ф╨░╤В╨░ ╨┐╨╛╨║╤Г╨┐╨║╨╕┬╗ ╨▒╨╡╨╖ truncate, ╤И╨╕╤А╨╡ ╨║╨╛╨╗╨╛╨╜╨║╨░ buyer.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- Deploy Next + API ╨┐╨╛╤Б╨╗╨╡ commit.
+- Deploy Next (web-only); API менять не требуется — payload корректен, баг на merge в UI.
+- **Proof prod @9658b9f:** HTML `/events/tc-6969ae12140cc49e8ef266e3-neveroyatnyi-koncert-gruppy-kino` — в секции «Теги» ровно 2 `span.rounded-full` (Рок, Шоу - программа), без повторов.
 
 ---
 
-## 2026-07-19 тАФ Event description: ╨╝╨░╤А╨║╨╡╤А╤Л тЖТ ╤Б╨┐╨╕╤Б╨║╨╕
+## 2026-07-19 — Prod crash: cleanDisplayText is not defined
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╨░ event page plain-text description ╤Б `тЬЕ` / `- ` ╤Б╤Е╨╗╨╛╨┐╤Л╨▓╨░╨╗╤Б╤П ╨▓ ╨╛╨┤╨╜╤Г ╨┐╤А╨╛╤Б╤В╤Л╨╜╤О: `cleanDisplayText` ╨╖╨░╨╝╨╡╨╜╤П╨╗ `\n` ╨╜╨░ ╨┐╤А╨╛╨▒╨╡╨╗╤Л ╨▓╨╜╤Г╤В╤А╨╕ blank-line ╨▒╨╗╨╛╨║╨╛╨▓.
-- ╨н╤В╨░╨╗╨╛╨╜: `tc-699c7af75b4672904c313d52-seks-v-sssr-intimnye-tainy-stolicy-18` тАФ checkmark-╨┐╤Г╨╜╨║╤В╤Л ╨╕ ╨▒╨╗╨╛╨║ ┬л╨Ю╤А╨│╨░╨╜╨╕╨╖╨░╤Ж╨╕╨╛╨╜╨╜╤Л╨╡ ╨┤╨╡╤В╨░╨╗╨╕:┬╗.
+- Клиентский `ReferenceError: cleanDisplayText is not defined` в chunk `7198-*.js` на event pages (и SSR digest в journal `daibilet-web`).
+- Симптом выглядел как ChunkLoadError/502 на статике при рестартах Next (OOM / mid-deploy), но корневой runtime-баг — отсутствие локального биндинга функции.
+- В `event-page-utils.ts` был только `export { cleanDisplayText, … } from './event-description-format'` — re-export **не** создаёт локальное имя; вызовы `cleanDisplayText(...)` внутри того же модуля падали.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ь╨╛╨┤╤Г╨╗╤М `event-description-format.ts`: ╨┤╨╡╤В╨╡╨║╤В line bullets (`тЬЕ`/`тАв`/`-`/`тАУ`/`тАФ`) ╨╕ inline ╨┐╨╛╤Б╨╗╨╡ ╨┤╨▓╨╛╨╡╤В╨╛╤З╨╕╤П; ╤А╨╡╨╜╨┤╨╡╤А `<p>`/`<h3>`/`<ul><li>` ╤Б escape + sanitize.
-- ╨г╨╢╨╡ ╨│╨╛╤В╨╛╨▓╤Л╨╣ HTML ╨╜╨╡ ╨┐╨╡╤А╨╡╤А╨░╨╖╨▒╨╕╤А╨░╨╡╤В╤Б╤П тАФ ╤В╨╛╨╗╤М╨║╨╛ sanitize.
-- `EventDescription` ╨▓╤Б╨╡╨│╨┤╨░ ╤З╨╡╤А╨╡╨╖ `formatEventDescriptionHtml`.
+- Заменён bare re-export на `import { cleanDisplayText, … } from './event-description-format'` + явный `export { … }`.
+- Commit + deploy-prod-next; smoke `/events` и event slug после hard refresh.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Bare `export { cleanDisplayText } from 'тАж'` ╨╜╨╡ ╨┤╨░╨▓╨░╨╗ ╨╗╨╛╨║╨░╨╗╤М╨╜╤Л╨╣ ╨▒╨╕╨╜╨┤╨╕╨╜╨│ тЖТ `ReferenceError` ╨▓ ticket helpers (╤Б╨╝. ╨╖╨░╨┐╨╕╤Б╤М ╨▓╤Л╤И╨╡).
-- **Proof prod:** slug `seks-v-sssrтАж` тАФ RSC HTML ╤Б╨╛╨┤╨╡╤А╨╢╨╕╤В `<ul>` (7 checkmark + 5 org details), ╨╝╨░╤А╨║╨╡╤А╤Л ╤Б╨╜╤П╤В╤Л, ╨░╨▒╨╖╨░╤Ж╤Л/`<h3>` ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╤Л.
-
----
-
-## 2026-07-19 тАФ ╨а╨░╤Б╤И╨╕╤А╨╡╨╜╨╜╤Л╨╡ ╤Д╨╕╨╗╤М╤В╤А╤Л ╨║╨░╤В╨░╨╗╨╛╨│╨░ тЖТ popup
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- `CatalogAdvancedFiltersPanel` ╤А╨░╤Б╨║╤А╤Л╨▓╨░╨╗╤Б╤П inline ╨┐╨╛╨┤ ╤В╤Г╨╗╨▒╨░╤А╨╛╨╝ ╨╕ ╤А╨░╨╖╨┤╤Г╨▓╨░╨╗ `/events`.
-- ╨Я╨╛╨╕╤Б╨║ ╨▓ ╤И╨░╨┐╨║╨╡ ╤Г╨╢╨╡ ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╤В overlay-modal (`HeaderSearch` variant=`overlay`): backdrop, Esc, `role="dialog"`.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨д╨╕╨╗╤М╤В╤А╤Л ╨╛╤В╨║╤А╤Л╨▓╨░╤О╤В╤Б╤П ╨║╨╜╨╛╨┐╨║╨╛╨╣ ┬л╨д╨╕╨╗╤М╤В╤А╤Л┬╗ ╨▓ `CatalogToolbar` ╨║╨░╨║ portal-modal (╤В╨╛╤В ╨╢╨╡ UX, ╤З╤В╨╛ ╨┐╨╛╨╕╤Б╨║).
-- Desktop: ╤Ж╨╡╨╜╤В╤А╨╕╤А╨╛╨▓╨░╨╜╨╜╨░╤П ╨╝╨╛╨┤╨░╨╗╨║╨░ `max-w-2xl`; mobile: bottom sheet (`items-end`, `rounded-t-2xl`, safe-area).
-- Draft + ┬л╨Я╤А╨╕╨╝╨╡╨╜╨╕╤В╤М┬╗ / ┬л╨б╨▒╤А╨╛╤Б╨╕╤В╤М┬╗; Esc + backdrop; focus trap; badge ╤Б ╤З╨╕╤Б╨╗╨╛╨╝ ╨░╨║╤В╨╕╨▓╨╜╤Л╤Е advanced-╤Д╨╕╨╗╤М╤В╤А╨╛╨▓.
-- Query-params (`from`/`to`/`minPrice`/`maxPrice`/`ageMax`/`landing`) ╨▒╨╡╨╖ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╣ ╤Б╤Е╨╡╨╝╤Л; ╤Б╤З╤С╤В╤З╨╕╨║ ╨▒╨╛╨╗╤М╤И╨╡ ╨╜╨╡ ╨▓╨║╨╗╤О╤З╨░╨╡╤В `category` (╨╛╨╜╨░ ╨▓ ╤З╨╕╨┐╨░╤Е ╨║╨░╤В╨╡╨│╨╛╤А╨╕╨╣).
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Я╨╡╤А╨▓╤Л╨╣ `deploy-prod-next.sh`: Next build ╤Г╨┐╨░╨╗ ╨╜╨░ `next-font-manifest.json`; retry ╨┐╨╛╤Б╨╗╨╡ `rm -rf apps/web/.next` ╤Б╨╛╨▒╤А╨░╨╗╤Б╤П, ╨╜╨╛ SSH ╨╛╨▒╨╛╤А╨▓╨░╨╗╤Б╤П ╨┤╨╛ `systemctl start daibilet-web` тЖТ 502. ╨Ф╨╛╨╢╨░╨╗╨╕ ╨▓╤А╤Г╤З╨╜╤Г╤О: start web + smoke `/events` 200. Prod HEAD `be8ee55`.
+- MemoryHigh Next (~1.1G) на 3.8Gi хосте: при деплое/нагрузке возможны краткие 502 на `/_next/static` пока статика проксируется через Node. Отдельно рассмотреть `alias` на `.next/static` в nginx.
 
 ---
 
-## 2026-07-19 тАФ ╨Ь╨╛╨┤╤Г╨╗╤М ╨╛╤В╨╖╤Л╨▓╨╛╨▓ (ExternalOrder / TC)
+## 2026-07-19 — ЛК заказов: 404 / время / truncate
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т Prisma ╤Г╨╢╨╡ ╨▒╤Л╨╗╨╕ `Review*` / `ReviewRequest`, runtime API/UI/cron ╨╛╤В╤Б╤Г╤В╤Б╤В╨▓╨╛╨▓╨░╨╗╨╕.
-- SPBBOATS ╨╖╨░╨┐╤А╨╡╤Й╨░╨╗ ╨╛╤В╨╖╤Л╨▓╤Л ╨┤╨╗╤П TC/TEP; ╤Г ╨░╨│╤А╨╡╨│╨░╤В╨╛╤А╨░ ╨╛╤Б╨╜╨╛╨▓╨╜╨╛╨╣ ╨┐╤Г╤В╤М ╨╜╨░╨╛╨▒╨╛╤А╨╛╤В тАФ ╤З╨╡╤А╨╡╨╖ `ExternalOrder`/tickets.
-- ╨Ъ╨░╤В╨░╨╗╨╛╨│ ╤Г╨╢╨╡ ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╗ ╨┐╤Б╨╡╨▓╨┤╨╛╤А╨╡╨╣╤В╨╕╨╜╨│; JSON-LD Event ╨▒╨╡╨╖ AggregateRating.
+- Ссылка из заказа на past dated TC slug (`…-14-iyulya-21-30`) давала 404/пустую карточку → «Оставить отзыв» бесполезен (resolve отзывов был только по точному `slug`).
+- В строке билета две «голые» даты/времени без подписей; `formatDateTime` без `Europe/Moscow`.
+- Блок покупателя: `max-w-[170px] truncate` обрезал «Дата покупки» на desktop.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Т╨╡╤А╨╕╤Д╨╕╨║╨░╤Ж╨╕╤П: email ╨╕/╨╕╨╗╨╕ ticket/order тЖФ ExternalOrder (done/confirmed) + event match (meta-siblings / mergeGroupKey); deep-link `ReviewRequest.token`.
-- Public: `/reviews/write`, ╨▒╨╗╨╛╨║ ╨╜╨░ event page; displayName ┬л╨Ш╨▓╨░╨╜ ╨Ъ.┬╗, ╨▒╨╡╨╣╨┤╨╢ ┬л╨Я╨╛╨║╤Г╨┐╨║╨░ ╨┐╨╛╨┤╤В╨▓╨╡╤А╨╢╨┤╨╡╨╜╨░┬╗.
-- Admin: `/reviews` тАФ approve/reject/hide.
-- Cron `review-requests` ╨┐╨╛╤Б╨╗╨╡ ╤Б╨╡╤Б╤Б╨╕╨╕; SMTP optional (graceful skip).
-- UI ╨┐╤Б╨╡╨▓╨┤╨╛ 4.5тАУ5.0 ╨┤╨╛ 10; AggregateRating ╤В╨╛╨╗╤М╨║╨╛ ╨┐╤А╨╕ тЙе10 APPROVED.
-- Disputes / ╨Ы╨Ъ ╨┐╨╛╤Б╤В╨░╨▓╤Й╨╕╨║╨░ ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕.
+- `buyer-order-event-links.js`: для account/public orders резолв `eventUrl` → meta-sibling / merge с ближайшим будущим сеансом; `eventId` покупки сохраняем для verification.
+- Soft-404 в `loadPublicEventDto`: unsaleable slug → одноразовый hop на sibling с future session.
+- Reviews: `resolveReviewEvent` по id / `tc-{24hex}-*` / slug; `/reviews/write` работает по `eventId`+`orderRef` даже без публичной карточки (`forceFormOpen`).
+- UI: «Сеанс: …» (MSK), «Дата покупки» без truncate, шире колонка buyer.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨С╨╡╨╖ `SMTP_*` ╨┐╨╕╤Б╤М╨╝╨░ ╨╜╨╡ ╤Г╤Е╨╛╨┤╤П╤В (ReviewRequest ╨▓╤Б╤С ╤А╨░╨▓╨╜╨╛ ╤Б╨╛╨╖╨┤╨░╤С╤В╤Б╤П).
-- Deploy: migrate `20260719150000_review_external_order` + nodemailer ╨┐╤А╨╕ ╨▓╨║╨╗╤О╤З╨╡╨╜╨╕╨╕ SMTP.
-- Commit `1c2b156` ╨╖╨░╨┐╤Г╤И╨╡╨╜ ╨▓ `feat/next-monorepo`; SSH deploy ╤Б ╤Н╤В╨╛╨╣ ╤Б╤А╨╡╨┤╤Л тАФ `Permission denied (publickey)` ╨║ `213.171.7.16`. ╨Э╤Г╨╢╨╡╨╜ ╤А╤Г╤З╨╜╨╛╨╣ `deploy-prod-next.sh` ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡.
+- Deploy Next + API после commit.
 
 ---
 
-## 2026-07-19 тАФ City FAQ + thin noindex (╨┐╤Г╨╜╨║╤В 5)
+## 2026-07-19 — Event description: маркеры → списки
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- City page ╨╕╨╝╨╡╨╗ hero/catalog, ╨╜╨╛ ╨▒╨╡╨╖ FAQ/SEO text ╨╕ ╨▒╨╡╨╖ SSR JSON-LD; `generateMetadata` ╨▓╤Б╨╡╨│╨┤╨░ indexable.
-- ╨Т ╨║╨░╤В╨░╨╗╨╛╨│╨╡ ╨╡╤Б╤В╤М thin-╨│╨╛╤А╨╛╨┤╨░ (1тАУ2 ╤Б╨╛╨▒╤Л╤В╨╕╤П: `abakan`, `orel`, `pskov`) ╤А╤П╨┤╨╛╨╝ ╤Б ╤В╨╛╨╗╤Б╤В╤Л╨╝╨╕ (`moskva` ~668, `sankt-peterburg` ~826).
-- ╨Я╤Г╤Б╤В╨╛╨╣ FAQPage ╨╜╨░ thin-╤Б╤В╤А╨░╨╜╨╕╤Ж╨╡ ╨▓╤А╨╡╨┤╨╡╨╜ ╨┤╨╗╤П SEO.
+- На event page plain-text description с `✅` / `- ` схлопывался в одну простыню: `cleanDisplayText` заменял `\n` на пробелы внутри blank-line блоков.
+- Эталон: `tc-699c7af75b4672904c313d52-seks-v-sssr-intimnye-tainy-stolicy-18` — checkmark-пункты и блок «Организационные детали:».
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `hub-indexability.ts`: city thin ╨╡╤Б╨╗╨╕ `events < 3` (╨╕ ╨╜╨╡ strong); venue thin ╨╡╤Б╨╗╨╕ `events < 1` ╨╕╨╗╨╕ `isIndexable === false`.
-- Strong cities whitelist (`moskva`/`sankt-peterburg`/╨║╤А╤Г╨┐╨╜╤Л╨╡ ╤Е╨░╨▒╤Л) ╨▓╤Б╨╡╨│╨┤╨░ indexable.
-- City FAQ + SEO text ╤В╨╛╨╗╤М╨║╨╛ ╨┤╨╗╤П indexable; SSR `FAQPage` + `BreadcrumbList`; metadata `robots: noindex,follow` ╨┤╨╗╤П thin.
-- Sitemap cities/venues ╤Д╨╕╨╗╤М╤В╤А╤Г╨╡╤В thin.
-- Venue detail ╤В╨╛╨╢╨╡ `robots` + BreadcrumbList SSR.
+- Модуль `event-description-format.ts`: детект line bullets (`✅`/`•`/`-`/`–`/`—`) и inline после двоеточия; рендер `<p>`/`<h3>`/`<ul><li>` с escape + sanitize.
+- Уже готовый HTML не переразбирается — только sanitize.
+- `EventDescription` всегда через `formatEventDescriptionHtml`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- **Proof prod** (deploy `9af7b45`): `/cities/moskva` тАФ `index, follow` + SSR `FAQPage`/`BreadcrumbList` + UI FAQ; `/cities/abakan` тАФ `noindex, follow`, ╨▒╨╡╨╖ FAQPage/FAQ UI; ╨б╨Я╨▒ indexable.
-- ╨Ю╤З╨╡╤А╨╡╨┤╤М ╨┐╤Г╨╜╨║╤В╨╛╨▓ 1тАУ5 ╨╖╨░╨║╤А╤Л╤В╨░.
+- Bare `export { cleanDisplayText } from '…'` не давал локальный биндинг → `ReferenceError` в ticket helpers (см. запись выше).
+- **Proof prod:** slug `seks-v-sssr…` — RSC HTML содержит `<ul>` (7 checkmark + 5 org details), маркеры сняты, абзацы/`<h3>` сохранены.
 
 ---
 
-## 2026-07-19 тАФ Sitemap index + chunks / robots (╨┐╤Г╨╜╨║╤В 4)
+## 2026-07-19 — Расширенные фильтры каталога → popup
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Prod ╨╛╤В╨┤╨░╨▓╨░╨╗ ╨╛╨┤╨╕╨╜ ╨┐╨╗╨╛╤Б╨║╨╕╨╣ `urlset` ╨╜╨░ `/sitemap.xml` (static + cities + eventsтЙд2000 + venuesтЙд1000) тАФ ╤А╨╕╤Б╨║ ╤Г╨┐╨╕╤А╨░╨╜╨╕╤П ╨▓ ╨╗╨╕╨╝╨╕╤В ╨╛╨┤╨╜╨╛╨╣ ╨┐╤А╨╛╤Б╤В╤Л╨╜╨╕ ╨┐╤А╨╕ ╤А╨╛╤Б╤В╨╡ ╨║╨░╤В╨░╨╗╨╛╨│╨░.
-- `robots.txt` ╤Г╨╢╨╡ Allow `/` + Sitemap ╨╜╨░ `/sitemap.xml`; scrapers `liliabots` Disallow; Googlebot/Yandex ╨╜╨╡ ╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╨░╨╗╨╕╤Б╤М.
-- Native Next `generateSitemaps` ╨╜╨╡╤Б╤В╨░╨▒╨╕╨╗╨╡╨╜ ╨┤╨╗╤П ╨║╨╛╤А╨╜╨╡╨▓╨╛╨│╨╛ index тЖТ ╨║╨░╤Б╤В╨╛╨╝╨╜╤Л╨╡ route handlers.
+- `CatalogAdvancedFiltersPanel` раскрывался inline под тулбаром и раздувал `/events`.
+- Поиск в шапке уже использует overlay-modal (`HeaderSearch` variant=`overlay`): backdrop, Esc, `role="dialog"`.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨г╨┤╨░╨╗╤С╨╜ ╨╝╨╛╨╜╨╛╨╗╨╕╤В╨╜╤Л╨╣ `app/sitemap.ts`.
-- Index: `app/sitemap.xml/route.ts` тЖТ `sitemapindex` ╤Б╨╛ ╤Б╤Б╤Л╨╗╨║╨░╨╝╨╕ ╨╜╨░ chunks.
-- Chunks: `app/sitemaps/[chunk]/route.ts` + `lib/sitemap-data.ts` тАФ `static`, `events`, `cities`, `venues`, `landings`, `blog`.
-- Events ╨╕╨╖ public catalog (`hydrateSlots: false`); venues `isIndexable !== false`; blog ╨╕╨╖ `buildPublicArticlesListDto` (╤Г╨╢╨╡ indexable); landings ╨╕╨╖ canonical category/city paths.
-- `robots.ts`: Allow `*` / Googlebot / Yandex; Sitemap тЖТ `https://daibilet.ru/sitemap.xml` (index).
+- Фильтры открываются кнопкой «Фильтры» в `CatalogToolbar` как portal-modal (тот же UX, что поиск).
+- Desktop: центрированная модалка `max-w-2xl`; mobile: bottom sheet (`items-end`, `rounded-t-2xl`, safe-area).
+- Draft + «Применить» / «Сбросить»; Esc + backdrop; focus trap; badge с числом активных advanced-фильтров.
+- Query-params (`from`/`to`/`minPrice`/`maxPrice`/`ageMax`/`landing`) без изменений схемы; счётчик больше не включает `category` (она в чипах категорий).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- City FAQ (╨┐╤Г╨╜╨║╤В 5) ╨╖╨░╨║╤А╤Л╤В ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛╨╣ ╨╖╨░╨┐╨╕╤Б╤М╤О ╨▓╤Л╤И╨╡.
-- **Proof prod** (deploy `4282895`): `/robots.txt`, `/sitemap.xml` (sitemapindex), `/sitemaps/{static,events,cities,venues,landings,blog}.xml` тАФ ╨▓╤Б╨╡ **200**; events chunk ~2394 URL.
+- Первый `deploy-prod-next.sh`: Next build упал на `next-font-manifest.json`; retry после `rm -rf apps/web/.next` собрался, но SSH оборвался до `systemctl start daibilet-web` → 502. Дожали вручную: start web + smoke `/events` 200. Prod HEAD `be8ee55`.
 
 ---
 
-## 2026-07-19 тАФ SSR JSON-LD Event + BreadcrumbList
+## 2026-07-19 — Модуль отзывов (ExternalOrder / TC)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╨░ `/events/[slug]` ╨▒╤Л╨╗ `generateMetadata`, ╨╜╨╛ ╨▓ HTML source ╨╜╨╡ ╨▒╤Л╨╗╨╛ `application/ld+json` ╨┤╨╗╤П Event/Breadcrumbs (╨▓ ╨╛╤В╨╗╨╕╤З╨╕╨╡ ╨╛╤В blog/`layout` WebSite+Organization).
-- UI-╨║╤А╨╛╤И╨║╨╕ ╨▓ hero ╤И╨╗╨╕ ╨║╨░╨║ ╨б╨╛╨▒╤Л╤В╨╕╤П тЖТ ╨У╨╛╤А╨╛╨┤ тЖТ Venue тЖТ Category тАФ ╨╜╨╡ ╤Б╨╛╨▓╨┐╨░╨┤╨░╨╗╨╕ ╤Б Tasktracker 1.2.1.
+- В Prisma уже были `Review*` / `ReviewRequest`, runtime API/UI/cron отсутствовали.
+- SPBBOATS запрещал отзывы для TC/TEP; у агрегатора основной путь наоборот — через `ExternalOrder`/tickets.
+- Каталог уже показывал псевдорейтинг; JSON-LD Event без AggregateRating.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜ shared helper `apps/web/src/lib/structured-data.ts`: `buildEventBreadcrumbs`, `buildBreadcrumbListJsonLd`, `buildEventJsonLd`, `buildEventPageJsonLd`.
-- Event page RSC ╤А╨╡╨╜╨┤╨╡╤А╨╕╤В ╨┤╨▓╨░ SSR `<script type="application/ld+json">`: `@type: Event` (+ `Offer` ╨┐╤А╨╕ ╤Ж╨╡╨╜╨╡) ╨╕ `BreadcrumbList` (╨У╨╗╨░╨▓╨╜╨░╤П тЖТ ╨б╨╛╨▒╤Л╤В╨╕╤П тЖТ ╨У╨╛╤А╨╛╨┤? тЖТ Title).
-- Hero breadcrumbs ╤Б╨╕╨╜╤Е╤А╨╛╨╜╨╕╨╖╨╕╤А╨╛╨▓╨░╨╜╤Л ╤Б ╤В╨╡╨╝ ╨╢╨╡ helper (╨╛╨┤╨╕╨╜ source of truth; ╨║╨╗╨╕╨╡╨╜╤В╤Б╨║╨╕╨╣ LD ╨╜╨╡ ╨┤╤Г╨▒╨╗╨╕╤А╤Г╨╡╤В╤Б╤П).
+- Верификация: email и/или ticket/order ↔ ExternalOrder (done/confirmed) + event match (meta-siblings / mergeGroupKey); deep-link `ReviewRequest.token`.
+- Public: `/reviews/write`, блок на event page; displayName «Иван К.», бейдж «Покупка подтверждена».
+- Admin: `/reviews` — approve/reject/hide.
+- Cron `review-requests` после сессии; SMTP optional (graceful skip).
+- UI псевдо 4.5–5.0 до 10; AggregateRating только при ≥10 APPROVED.
+- Disputes / ЛК поставщика не трогали.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Sitemap (╨┐╤Г╨╜╨║╤В 4 / 2.1.x) ╨╖╨░╨║╤А╤Л╤В ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛╨╣ ╨╖╨░╨┐╨╕╤Б╤М╤О ╨▓╤Л╤И╨╡.
-- City FAQ/BreadcrumbList SSR (1.3.x / 2.2.3) тАФ ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╕╨╣ ╤Н╤В╨░╨┐.
-- **Proof prod:** `https://daibilet.ru/events/retro-locman-ot-zaryadya-1294` тАФ ╨▓ HTML source: `Event` (+ `Offer`), `BreadcrumbList`, ╨┐╨╗╤О╤Б root `WebSite`/`Organization`. Deploy `d8bf381`.
-
----
-
-## 2026-07-19 тАФ ╨а╨╡╨│╤А╨╡╤Б╤Б╨╕╨╛╨╜╨╜╤Л╨╡ ╤В╨╡╤Б╤В╤Л: Teplohod image + TC fake open-date
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨д╨╕╨║╤Б╤Л B.15/B.16 ╤Г╨╢╨╡ ╨▓ prod, ╨╜╨╛ unit-╨┐╨╛╨║╤А╤Л╤В╨╕╨╡ ╨▒╤Л╨╗╨╛ ╤В╨╛╨╜╨║╨╕╨╝; `public-event-widget-fallback.test.ts` ╨╜╨╡ ╨▓╤Е╨╛╨┤╨╕╨╗ ╨▓ `test:ts`.
-- Gate ┬л╤Б╨╕╨╜╤В╨╡╤В╨╕╤З╨╡╤Б╨║╨╕╨╣ widget-slot┬╗ ╨╕ `pickPrimarySessionPurchase` ╨╢╨╕╨╗╨╕ ╨▓╨╜╤Г╤В╤А╨╕ `public-event.dto.ts` ╨▒╨╡╨╖ ╨┐╤А╤П╨╝╨╛╨│╨╛ ╨╕╨╝╨┐╨╛╤А╤В╨░ ╨▓ ╤В╨╡╤Б╤В╨░╤Е.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨Т╤Л╨╜╨╡╤Б╨╡╨╜╤Л ╤З╨╕╤Б╤В╤Л╨╡ ╤Е╨╡╨╗╨┐╨╡╤А╤Л ╨▓ `public-event-widget-fallback.ts`; dto ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╤В ╨╕╤Е.
-- ╨а╨░╤Б╤И╨╕╤А╨╡╨╜╤Л `event-image-url.test.ts` (╨╜╨╡╤В twcstorage/X-Amz ╨▓ ╤А╨╡╨╖╤Г╨╗╤М╤В╨░╤В╨╡, encode, non-TEP untouched) ╨╕ widget-fallback (dated RECURRING/SINGLE, meta-sibling purchase switch).
-- `catalog-availability` + mapper: dated TC тЙа ┬л╨Ю╤В╨║╤А╤Л╤В╨░╤П ╨┤╨░╤В╨░┬╗.
-- `npm test` / `test:ts` ╨▓╨║╨╗╤О╤З╨░╤О╤В ╨╛╨▒╨░ ╤Д╨░╨╣╨╗╨░; suite **57 pass**.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Я╤Г╨╜╨║╤В 3 (JSON-LD) ╨╜╨╡ ╨╜╨░╤З╨░╤В. ╨Ф╨╡╨┐╨╗╨╛╨╣ API ╨╜╨╡ ╨╜╤Г╨╢╨╡╨╜ (╤В╨╛╨╗╤М╨║╨╛ ╤В╨╡╤Б╤В╤Л + extract ╨▒╨╡╨╖ ╤Б╨╝╨╡╨╜╤Л ╨┐╨╛╨▓╨╡╨┤╨╡╨╜╨╕╤П).
+- Без `SMTP_*` письма не уходят (ReviewRequest всё равно создаётся).
+- Deploy: migrate `20260719150000_review_external_order` + nodemailer при включении SMTP.
+- Commit `1c2b156` запушен в `feat/next-monorepo`; SSH deploy с этой среды — `Permission denied (publickey)` к `213.171.7.16`. Нужен ручной `deploy-prod-next.sh` на сервере.
 
 ---
 
-## 2026-07-19 тАФ 0.5.8 SQL read-model ╨┤╨╗╤П admin Events
+## 2026-07-19 — City FAQ + thin noindex (пункт 5)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Hot path: `getCachedAdminGroupedEvents` тЖТ `eventRows(db, null, { lean: true })` тЖТ `groupAdminEventRows` тЖТ filter/slice ╨▓ JS.
-- Cold cache ~25s / OOM ╤А╨╕╤Б╨║ ╨╜╨░ 3.8Gi: Node ╨┤╨╡╤А╨╢╨░╨╗ ╨┐╨╛╨╗╨╜╤Л╨╣ grouped catalog ╨▓ RAM.
-- Public catalog ╤Г╨╢╨╡ hydrate-only-page, ╨╜╨╛ base cache ╨▓╤Б╤С ╨╡╤Й╤С full sessions (╨╛╤В╨┤╨╡╨╗╤М╨╜╤Л╨╣ ╨┐╤Г╨╜╨║╤В).
+- City page имел hero/catalog, но без FAQ/SEO text и без SSR JSON-LD; `generateMetadata` всегда indexable.
+- В каталоге есть thin-города (1–2 события: `abakan`, `orel`, `pskov`) рядом с толстыми (`moskva` ~668, `sankt-peterburg` ~826).
+- Пустой FAQPage на thin-странице вреден для SEO.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Э╨╛╨▓╤Л╨╣ ╨╝╨╛╨┤╤Г╨╗╤М `admin-events-sql-read-model.js`: group key ╨▓ SQL (= `adminEventGroupKey`), LIMIT/OFFSET ╨┐╨╛ ╨│╤А╤Г╨┐╨┐╨░╨╝, ╤Д╨╕╨╗╤М╤В╤А╤Л ╨▓ SQL.
-- `buildAdminEventsList`: SQL page тЖТ hydrate ╤В╨╛╨╗╤М╨║╨╛ sibling ids ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л (`eventRowsByIds`, max 2500) тЖТ `groupAdminEventRows` (exact readiness/override/landingHits).
-- `buildAdminDashboard`: metrics ╨╕╨╖ SQL aggregates (`launch.source=admin_event_groups_sql`), ╨▒╨╡╨╖ full catalog.
-- TTL cache ~45s ╨╜╨░ SQL page variants; invalidate ╨▓╨╝╨╡╤Б╤В╨╡ ╤Б `invalidateAdminGroupedEventsCache`.
-- Startup: ╨┐╨╛╨╗╨╜╤Л╨╣ admin catalog warm **off** ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О (`DAIBILET_ADMIN_STARTUP_WARM=1` ╨┤╨╗╤П Landings SWR).
-- Landings list ╨┐╨╛╨║╨░ ╨╜╨░ ╤Б╤В╨░╤А╨╛╨╝ `getCachedAdminGroupedEvents` (╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╕╨╣ ╤И╨░╨│).
-- ╨в╨╡╤Б╤В╤Л: `admin-events-sql-read-model.test.ts`; bench: `scripts/bench-admin-events-sql.mjs`.
-- **Prod bench @86bd059:** cold SQL page **5.5s** / list **6.2s**, warm list **0.35s**; `rowsLoaded=444` vs raw `30839`; heap╬Ф ~6тАУ7тАпMB. ╨С╤Л╨╗╨╛ cold ~16тАУ25s + full catalog in RAM.
+- `hub-indexability.ts`: city thin если `events < 3` (и не strong); venue thin если `events < 1` или `isIndexable === false`.
+- Strong cities whitelist (`moskva`/`sankt-peterburg`/крупные хабы) всегда indexable.
+- City FAQ + SEO text только для indexable; SSR `FAQPage` + `BreadcrumbList`; metadata `robots: noindex,follow` для thin.
+- Sitemap cities/venues фильтрует thin.
+- Venue detail тоже `robots` + BreadcrumbList SSR.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- SQL readiness/canPublish тАФ ╨░╨┐╨┐╤А╨╛╨║╤Б╨╕╨╝╨░╤Ж╨╕╤П ╨┤╨╗╤П ╤Д╨╕╨╗╤М╤В╤А╨╛╨▓/╨╝╨╡╤В╤А╨╕╨║; ╤Б╤В╤А╨╛╨║╨╕ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л тАФ exact JS.
-- `view=landing_match` ╤Д╨╕╨╗╤М╤В╤А╤Г╨╡╤В ╨┐╨╛ `LandingMatch`, ╨╜╨╡ ╨┐╨╛ ╨┐╨╛╨╗╨╜╨╛╨╝╤Г `LANDING_RULES` engine.
-- Public catalog SQL page + landings match SQL тАФ ╨╡╤Й╤С ╨▓ backlog (╨┐╤Г╨╜╨║╤В 2+).
-- SourceCode enum: ╨╜╤Г╨╢╨╡╨╜ `::text` ╨▓ coalesce ╤Б `''` (╨╕╨╜╨░╤З╨╡ 22P02).
+- **Proof prod** (deploy `9af7b45`): `/cities/moskva` — `index, follow` + SSR `FAQPage`/`BreadcrumbList` + UI FAQ; `/cities/abakan` — `noindex, follow`, без FAQPage/FAQ UI; СПб indexable.
+- Очередь пунктов 1–5 закрыта.
 
 ---
 
-## 2026-07-19 тАФ ╨У╨╗╨░╨▓╨╜╨░╤П: ╨┐╤А╨╛╨┐╨░╨╗╨╕ ╨╛╨▒╨╗╨╛╨╢╨║╨╕ Teplohod (signed S3)
+## 2026-07-19 — Sitemap index + chunks / robots (пункт 4)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╨░ daibilet.ru ╨▓ ┬л╨Т╤Л╨▒╨╛╤А ╤А╨╡╨┤╨░╨║╤Ж╨╕╨╕┬╗ / ┬л╨Ъ╤Г╨┤╨░ ╤Б╤Е╨╛╨┤╨╕╤В╤М┬╗ ╤Б╨╡╤А╤Л╨╡ ╨┐╨╗╨╡╨╣╤Б╤Е╨╛╨╗╨┤╨╡╤А╤Л ╤Г ╤З╨░╤Б╤В╨╕ ╨║╨░╤А╤В╨╛╤З╨╡╨║.
-- ╨а╨░╨▒╨╛╤З╨╕╨╡: `ticketscloud-prod.storage.yandexcloud.net`, ╨╗╨╛╨║╨░╨╗╤М╨╜╤Л╨╡ `/images/cities`, blog covers.
-- ╨С╨╕╤В╤Л╨╡: `s3.twcstorage.ru/teplohod-private/...` ╤Б `X-Amz-Expires=21600` (~6╤З) тАФ ╨┐╨╛╤Б╨╗╨╡ TTL HEAD тЖТ 500/fail, `img.onError` тЖТ ╤Б╨╡╤А╤Л╨╣ ╤Д╨╛╨╜.
-- Live TEP API ╤Б╨╡╨╣╤З╨░╤Б ╨╛╤В╨┤╨░╤С╤В 186/187 first-image ╨║╨░╨║ signed S3; ╤Б╤В╨░╨▒╨╕╨╗╤М╨╜╤Л╨╣ `api.teplohod.info/v1/image?item=EventN&dirtyAlias=тАж` ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г 200.
-- ╨Т ╨С╨Ф: ~186 `Event.imageUrl` ╤Б twcstorage (╨┐╨╛╤Б╨╗╨╡ sync).
+- Prod отдавал один плоский `urlset` на `/sitemap.xml` (static + cities + events≤2000 + venues≤1000) — риск упирания в лимит одной простыни при росте каталога.
+- `robots.txt` уже Allow `/` + Sitemap на `/sitemap.xml`; scrapers `liliabots` Disallow; Googlebot/Yandex не блокировались.
+- Native Next `generateSitemaps` нестабилен для корневого index → кастомные route handlers.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `stabilizeTeplohodImageUrl`: signed S3 тЖТ `https://api.teplohod.info/v1/image?item=EventтАж&dirtyAlias=тАж`.
-- ╨Я╤А╨╕╨╝╨╡╨╜╨╕╤В╤М ╨▓ `pickFirstUsableEventImageUrl` (TS + legacy `dto.js`) ╨╕ ╨▓ `tep-import-fixtures.js` ╨┐╤А╨╕ ╨╖╨░╨┐╨╕╤Б╨╕.
-- One-shot rewrite ╨▓ prod DB + restart API + revalidate home.
+- Удалён монолитный `app/sitemap.ts`.
+- Index: `app/sitemap.xml/route.ts` → `sitemapindex` со ссылками на chunks.
+- Chunks: `app/sitemaps/[chunk]/route.ts` + `lib/sitemap-data.ts` — `static`, `events`, `cities`, `venues`, `landings`, `blog`.
+- Events из public catalog (`hydrateSlots: false`); venues `isIndexable !== false`; blog из `buildPublicArticlesListDto` (уже indexable); landings из canonical category/city paths.
+- `robots.ts`: Allow `*` / Googlebot / Yandex; Sitemap → `https://daibilet.ru/sitemap.xml` (index).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Я╨╛╨║╨░ sync ╨╜╨╡ ╨╛╨▒╨╜╨╛╨▓╨╗╤С╨╜ ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡, ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╕╨╣ `tep:sync` ╤Б╨╜╨╛╨▓╨░ ╨╝╨╛╨│ ╨▒╤Л ╨┐╨╕╤Б╨░╤В╤М signed URL тАФ ╨┐╨╛╤Н╤В╨╛╨╝╤Г ╨┐╨░╤В╤З import ╨╛╨▒╤П╨╖╨░╤В╨╡╨╗╨╡╨╜ ╨▓╨╝╨╡╤Б╤В╨╡ ╤Б serve-time rewrite.
+- City FAQ (пункт 5) закрыт отдельной записью выше.
+- **Proof prod** (deploy `4282895`): `/robots.txt`, `/sitemap.xml` (sitemapindex), `/sitemaps/{static,events,cities,venues,landings,blog}.xml` — все **200**; events chunk ~2394 URL.
+
+---
+
+## 2026-07-19 — SSR JSON-LD Event + BreadcrumbList
+
+### Наблюдения
+
+- На `/events/[slug]` был `generateMetadata`, но в HTML source не было `application/ld+json` для Event/Breadcrumbs (в отличие от blog/`layout` WebSite+Organization).
+- UI-крошки в hero шли как События → Город → Venue → Category — не совпадали с Tasktracker 1.2.1.
+
+### Решения
+
+- Добавлен shared helper `apps/web/src/lib/structured-data.ts`: `buildEventBreadcrumbs`, `buildBreadcrumbListJsonLd`, `buildEventJsonLd`, `buildEventPageJsonLd`.
+- Event page RSC рендерит два SSR `<script type="application/ld+json">`: `@type: Event` (+ `Offer` при цене) и `BreadcrumbList` (Главная → События → Город? → Title).
+- Hero breadcrumbs синхронизированы с тем же helper (один source of truth; клиентский LD не дублируется).
+
+### Проблемы
+
+- Sitemap (пункт 4 / 2.1.x) закрыт отдельной записью выше.
+- City FAQ/BreadcrumbList SSR (1.3.x / 2.2.3) — следующий этап.
+- **Proof prod:** `https://daibilet.ru/events/retro-locman-ot-zaryadya-1294` — в HTML source: `Event` (+ `Offer`), `BreadcrumbList`, плюс root `WebSite`/`Organization`. Deploy `d8bf381`.
+
+---
+
+## 2026-07-19 — Регрессионные тесты: Teplohod image + TC fake open-date
+
+### Наблюдения
+
+- Фиксы B.15/B.16 уже в prod, но unit-покрытие было тонким; `public-event-widget-fallback.test.ts` не входил в `test:ts`.
+- Gate «синтетический widget-slot» и `pickPrimarySessionPurchase` жили внутри `public-event.dto.ts` без прямого импорта в тестах.
+
+### Решения
+
+- Вынесены чистые хелперы в `public-event-widget-fallback.ts`; dto использует их.
+- Расширены `event-image-url.test.ts` (нет twcstorage/X-Amz в результате, encode, non-TEP untouched) и widget-fallback (dated RECURRING/SINGLE, meta-sibling purchase switch).
+- `catalog-availability` + mapper: dated TC ≠ «Открытая дата».
+- `npm test` / `test:ts` включают оба файла; suite **57 pass**.
+
+### Проблемы
+
+- Пункт 3 (JSON-LD) не начат. Деплой API не нужен (только тесты + extract без смены поведения).
+
+---
+
+## 2026-07-19 — 0.5.8 SQL read-model для admin Events
+
+### Наблюдения
+
+- Hot path: `getCachedAdminGroupedEvents` → `eventRows(db, null, { lean: true })` → `groupAdminEventRows` → filter/slice в JS.
+- Cold cache ~25s / OOM риск на 3.8Gi: Node держал полный grouped catalog в RAM.
+- Public catalog уже hydrate-only-page, но base cache всё ещё full sessions (отдельный пункт).
+
+### Решения
+
+- Новый модуль `admin-events-sql-read-model.js`: group key в SQL (= `adminEventGroupKey`), LIMIT/OFFSET по группам, фильтры в SQL.
+- `buildAdminEventsList`: SQL page → hydrate только sibling ids страницы (`eventRowsByIds`, max 2500) → `groupAdminEventRows` (exact readiness/override/landingHits).
+- `buildAdminDashboard`: metrics из SQL aggregates (`launch.source=admin_event_groups_sql`), без full catalog.
+- TTL cache ~45s на SQL page variants; invalidate вместе с `invalidateAdminGroupedEventsCache`.
+- Startup: полный admin catalog warm **off** по умолчанию (`DAIBILET_ADMIN_STARTUP_WARM=1` для Landings SWR).
+- Landings list пока на старом `getCachedAdminGroupedEvents` (следующий шаг).
+- Тесты: `admin-events-sql-read-model.test.ts`; bench: `scripts/bench-admin-events-sql.mjs`.
+- **Prod bench @86bd059:** cold SQL page **5.5s** / list **6.2s**, warm list **0.35s**; `rowsLoaded=444` vs raw `30839`; heapΔ ~6–7 MB. Было cold ~16–25s + full catalog in RAM.
+
+### Проблемы
+
+- SQL readiness/canPublish — аппроксимация для фильтров/метрик; строки страницы — exact JS.
+- `view=landing_match` фильтрует по `LandingMatch`, не по полному `LANDING_RULES` engine.
+- Public catalog SQL page + landings match SQL — ещё в backlog (пункт 2+).
+- SourceCode enum: нужен `::text` в coalesce с `''` (иначе 22P02).
+
+---
+
+## 2026-07-19 — Главная: пропали обложки Teplohod (signed S3)
+
+### Наблюдения
+
+- На daibilet.ru в «Выбор редакции» / «Куда сходить» серые плейсхолдеры у части карточек.
+- Рабочие: `ticketscloud-prod.storage.yandexcloud.net`, локальные `/images/cities`, blog covers.
+- Битые: `s3.twcstorage.ru/teplohod-private/...` с `X-Amz-Expires=21600` (~6ч) — после TTL HEAD → 500/fail, `img.onError` → серый фон.
+- Live TEP API сейчас отдаёт 186/187 first-image как signed S3; стабильный `api.teplohod.info/v1/image?item=EventN&dirtyAlias=…` по-прежнему 200.
+- В БД: ~186 `Event.imageUrl` с twcstorage (после sync).
+
+### Решения
+
+- `stabilizeTeplohodImageUrl`: signed S3 → `https://api.teplohod.info/v1/image?item=Event…&dirtyAlias=…`.
+- Применить в `pickFirstUsableEventImageUrl` (TS + legacy `dto.js`) и в `tep-import-fixtures.js` при записи.
+- One-shot rewrite в prod DB + restart API + revalidate home.
+
+### Проблемы
+
+- Пока sync не обновлён на сервере, следующий `tep:sync` снова мог бы писать signed URL — поэтому патч import обязателен вместе с serve-time rewrite.
 
 ---
 
 
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Ъ╨▓╨╡╤Б╤В ┬л╨Ю╤Б╨╛╨▒╨╛ ╨╛╨┐╨░╤Б╨╡╨╜┬╗ (`тАж6a3d444cтАж`, ╤Б╨╗╨╛╤В 19.07 04:30тАУ06:30 UTC) ╤Г╨╢╨╡ ╨╖╨░╨║╨╛╨╜╤З╨╕╨╗╤Б╤П; ╨▓ TC widget ╨┐╨╛ ╤Н╤В╨╛╨╝╤Г `eventId` тАФ ┬л╨Ь╨╡╤А╨╛╨┐╤А╨╕╤П╤В╨╕╨╡ ╨┐╤А╨╛╤И╨╗╨╛.┬╗
-- Sibling ╤Б ╨▒╤Г╨┤╤Г╤Й╨╡╨╣ ╨┤╨░╤В╨╛╨╣ (`тАж6a3d446fтАж`, 26.07) ╨▓ ╨▓╨╕╨┤╨╢╨╡╤В╨╡ ╨┐╤А╨╛╨┤╨░╤С╤В╤Б╤П ╨╜╨╛╤А╨╝╨░╨╗╤М╨╜╨╛ (╨╜╨╡╤Б╨║╨╛╨╗╤М╨║╨╛ ╤Б╨╗╨╛╤В╨╛╨▓).
-- Meta: `6a3d42ebe5b04d07b3b015fa`. ╨Т ╨С╨Ф ╨┤╨╡╤Б╤П╤В╨║╨╕ RECURRING-╤Б╨╗╨╛╤В╨╛╨▓, ╨╜╨╡ OPEN_DATE.
-- ╨С╨░╨│ UI: ╨┐╨╛╤Б╨╗╨╡ ╤Д╨╕╨╗╤М╤В╤А╨░ ╨┐╤А╨╛╤И╨╡╨┤╤И╨╕╤Е ╤Б╨╡╤Б╤Б╨╕╨╣ `buildWidgetOnlySessions` ╤Б╨╕╨╜╤В╨╡╨╖╨╕╤А╨╛╨▓╨░╨╗ ┬л╨С╨╕╨╗╨╡╤В╤Л ╤Б ╨╛╤В╨║╤А╤Л╤В╨╛╨╣ ╨┤╨░╤В╨╛╨╣┬╗ ╨┤╨╗╤П **╨╗╤О╨▒╨╛╨│╨╛** TicketsCloud тЖТ ╨╛╤В╨║╤А╤Л╨▓╨░╨╗╤Б╤П ╨┐╤А╨╛╤В╤Г╤Е╤И╨╕╨╣ `eventId`.
+- Квест «Особо опасен» (`…6a3d444c…`, слот 19.07 04:30–06:30 UTC) уже закончился; в TC widget по этому `eventId` — «Мероприятие прошло.»
+- Sibling с будущей датой (`…6a3d446f…`, 26.07) в виджете продаётся нормально (несколько слотов).
+- Meta: `6a3d42ebe5b04d07b3b015fa`. В БД десятки RECURRING-слотов, не OPEN_DATE.
+- Баг UI: после фильтра прошедших сессий `buildWidgetOnlySessions` синтезировал «Билеты с открытой датой» для **любого** TicketsCloud → открывался протухший `eventId`.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨б╨╕╨╜╤В╨╡╤В╨╕╤З╨╡╤Б╨║╨╕╨╣ widget-slot ╤В╨╛╨╗╤М╨║╨╛ ╨┤╨╗╤П `OPEN_DATE` / `open_date` (╨╕ ╨▓ `public-event.dto.ts`, ╨╕ ╨▓ legacy `dto.js`).
-- ╨Я╨╛╨┤╤В╤П╨│╨╕╨▓╨░╨╡╨╝ siblings ╨┐╨╛ `EventSourceLink.metaExternalId`, ╤З╤В╨╛╨▒╤Л past slug ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╗ ╨▒╤Г╨┤╤Г╤Й╨╕╨╡ ╤Б╨╡╨░╨╜╤Б╤Л.
-- `pickPrimarySessionPurchase` ╨┐╨╡╤А╨╡╨║╨╗╤О╤З╨░╨╡╤В `externalId` / `purchaseUrl` / widgetPayload ╨╜╨░ ╨▒╨╗╨╕╨╢╨░╨╣╤И╨╕╨╣ ╨┐╤А╨╛╨┤╨░╨▓╨░╨╡╨╝╤Л╨╣ ╤Б╨╗╨╛╤В.
-- ╨в╨╡╤Б╤В: `public-event-widget-fallback.test.ts`. ╨Р╤Г╨┤╨╕╤В ╨▒╨╗╨╛╨│╨░: `scripts/audit-blog-event-links.mjs`.
+- Синтетический widget-slot только для `OPEN_DATE` / `open_date` (и в `public-event.dto.ts`, и в legacy `dto.js`).
+- Подтягиваем siblings по `EventSourceLink.metaExternalId`, чтобы past slug показывал будущие сеансы.
+- `pickPrimarySessionPurchase` переключает `externalId` / `purchaseUrl` / widgetPayload на ближайший продаваемый слот.
+- Тест: `public-event-widget-fallback.test.ts`. Аудит блога: `scripts/audit-blog-event-links.mjs`.
 
-### ╨Ф╨╛╨▒╨╕╨▓╨║╨░ blog dead links (╤В╨╛╤В ╨╢╨╡ ╨┤╨╡╨╜╤М)
+### Добивка blog dead links (тот же день)
 
-- ╨Р╤Г╨┤╨╕╤В `scripts/audit-blog-event-links.mjs`: 82 ╤Г╨╜╨╕╨║╨░╨╗╤М╨╜╤Л╤Е `/events` ╨╕╨╖ MD; ╨┐╨╛╤Б╨╗╨╡ API-╤Д╨╕╨║╤Б╨░ ┬л╨Ю╤Б╨╛╨▒╨╛ ╨╛╨┐╨░╤Б╨╡╨╜┬╗ OK.
-- ╨Я╤А╨╛╤И╨╡╨┤╤И╨╕╨╡ SINGLE ╨▒╨╡╨╖ meta (╨╛╤А╨│╨░╨╜/╨┤╨╢╨░╨╖/╤Б╤В╨╡╨╜╨┤╨░╨┐/╨▒╨░╨╗╨╡╤В/тАж) тЖТ ╤Б╤Б╤Л╨╗╨║╨╕ ╨▓ 8 ╤Б╤В╨░╤В╤М╤П╤Е ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╤Л ╨╜╨░ ╨▒╨╗╨╕╨╢╨░╨╣╤И╨╕╨╡ ╨▒╤Г╨┤╤Г╤Й╨╕╨╡ ╤Б╨╗╨╛╤В╤Л + upsert PUBLISHED.
-- ╨д╨╡╤Б╤В╨╕╨▓╨░╨╗╨╕ ┬л╨С╤Л╨╗╨╕╨╜╨╜╤Л╨╣ ╨▒╨╡╤А╨╡╨│┬╗ / ┬л╨д╤Н╨╜╤В╨╡╨╖╨╕ ╨д╨╡╤Б╤В┬╗: wide-lifetime (┬л╨Ф╨░╤В╤Л ╨▓ ╨▓╨╕╨┤╨╢╨╡╤В╨╡┬╗), ╨╜╨╡ ╨▒╨░╨│ fake open-date.
-
----
-
-## 2026-07-19 тАФ Blog: ╨╛╤В╨╗╨╛╨╢╨╕╤В╤М ╨┐╨╡╤А╨▓╤Л╨╣ inline image ╨┐╨╛╤Б╨╗╨╡ hero
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Э╨░ mobile ╨┐╨╛╤Б╨╗╨╡ cover hero ╤Б╤А╨░╨╖╤Г ╤И╤С╨╗ body `[image]`: float-╤Б╨╡╨║╤Ж╨╕╤П ╤Б╤В╨░╨▓╨╕╨╗╨░ `<img>` ╨┐╨╡╤А╨▓╤Л╨╝ ╨▓ DOM, ╨▓╨╕╨╖╤Г╨░╨╗╤М╨╜╨╛ ╨┤╨▓╨╡ ╨║╨░╤А╤В╨╕╨╜╨║╨╕ ╨┐╨╛╨┤╤А╤П╨┤.
-- ╨в╨╕╨┐╨╕╤З╨╜╤Л╨╣ MD: 1 ╨░╨▒╨╖╨░╤Ж тЖТ `[image]` (╨│╨╕╨┤╤Л); ╨║╨╛╨╗╨╛╨╜╨║╨╕ ╤Г╨╢╨╡ ╨╜╨╕╨╢╨╡ тАФ ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╡╨╝.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- `deferLeadingImageBlock` ╨┐╨╛╤Б╨╗╨╡ `filterDuplicateImageBlocks`: ╨┐╨╡╤А╨▓╤Л╨╣ image ╨┐╨╡╤А╨╡╨╜╨╛╤Б╨╕╤В╤Б╤П ╨┐╨╛╤Б╨╗╨╡ тЙе2 paragraph-╨▒╨╗╨╛╨║╨╛╨▓ (╨▓╨╡╨╖╨┤╨╡, ╨╜╨╡ ╤В╨╛╨╗╤М╨║╨╛ mobile).
-- ╨г╨▒╤А╨░╨╜╨░ ╨▓╨╡╤В╨║╨░ `paragraph + next image` тЖТ float: ╨┐╤А╨╡╨┤╤И╨╡╤Б╤В╨▓╤Г╤О╤Й╨╕╨╣ ╤В╨╡╨║╤Б╤В ╨▒╨╛╨╗╤М╤И╨╡ ╨╜╨╡ ╨╖╨░╤В╤П╨│╨╕╨▓╨░╨╡╤В╤Б╤П ╨┐╨╛╨┤ image-first layout.
-- ╨Я╤А╨░╨▓╨║╨╕ ╨▓ `apps/web` ╨╕ `apps/public` `BlogArticleContent.tsx`.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╨╡╤В: coverтЙаinline ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г ╤З╨╡╤А╨╡╨╖ `filterDuplicateImageBlocks`.
+- Аудит `scripts/audit-blog-event-links.mjs`: 82 уникальных `/events` из MD; после API-фикса «Особо опасен» OK.
+- Прошедшие SINGLE без meta (орган/джаз/стендап/балет/…) → ссылки в 8 статьях обновлены на ближайшие будущие слоты + upsert PUBLISHED.
+- Фестивали «Былинный берег» / «Фэнтези Фест»: wide-lifetime («Даты в виджете»), не баг fake open-date.
 
 ---
 
-## 2026-07-19 тАФ Blog: ╨▓╨╡╤А╨╜╤Г╤В╤М ╤Д╨╛╤В╨╛ ╨▓ ╤Б╤В╨░╤В╤М╨╕ (cover + distinct inline)
+## 2026-07-19 — Blog: отложить первый inline image после hero
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨г ╨▓╤Б╨╡╤Е PUBLISHED ╤Б╤В╨░╤В╨╡╨╣ cover ╨╕ `[image]` ╨▓ MD/DB ╨▒╤Л╨╗╨╕, ╨╜╨╛ ╨▓ HTML body ╨║╨░╤А╤В╨╕╨╜╨║╨░ ╨┐╤А╨╛╨┐╨░╨┤╨░╨╗╨░: `filterDuplicateImageBlocks` ╨▓╤Л╤А╨╡╨╖╨░╨╡╤В inline, ╨╡╤Б╨╗╨╕ `src` ╤Б╨╛╨▓╨┐╨░╨┤╨░╨╡╤В ╤Б `coverImageUrl`.
-- ╨н╤В╨░╨╗╨╛╨╜: `fentezi-fest-bylinnyy-bereg` ╤Г╨╢╨╡ ╨╕╨╝╨╡╨╗ ╨╛╤В╨┤╨╡╨╗╤М╨╜╤Л╨╣ `-inline.jpg` тЖТ ╨╜╨░ ╤Б╤В╤А╨░╨╜╨╕╤Ж╨╡ 2 img.
-- ╨Т `apps/web/public/images/` ╨╜╨╡ ╤Е╨▓╨░╤В╨░╨╗╨╛ sync `muzyka-v-osobnyakah-spb.jpg` (╤Н╤В╨░╨╗╨╛╨╜ ╨▓ `apps/public/...`).
+- На mobile после cover hero сразу шёл body `[image]`: float-секция ставила `<img>` первым в DOM, визуально две картинки подряд.
+- Типичный MD: 1 абзац → `[image]` (гиды); колонки уже ниже — не трогаем.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨б╨│╨╡╨╜╨╡╤А╨╕╤А╨╛╨▓╨░╨╜╤Л ╨░╤В╨╝╨╛╤Б╤Д╨╡╤А╨╜╤Л╨╡ `{slug}-inline.jpg` (╨▒╨╡╨╖ ╤В╨╡╨║╤Б╤В╨░), ╤Б╨╛╤Е╤А╨░╨╜╨╡╨╜╤Л ╨▓ `apps/public/public/images/blog/` (+ ╨╗╨╛╨║╨░╨╗╤М╨╜╤Л╨╣ sync web).
-- Frontmatter: ╤П╨▓╨╜╤Л╨╣ `coverImageUrl`; body `[image]` тЖТ `-inline.jpg`; `blog:sync-bodies`.
-- Commit ╤В╨╛╨╗╤М╨║╨╛ blog-╨░╤А╤В╨╡╤Д╨░╨║╤В╨╛╨▓ (╨╜╨╡ ╤В╤А╨╛╨│╨░╤В╤М ╨┐╨░╤А╨░╨╗╨╗╨╡╨╗╤М╨╜╤Л╨╣ jazz-landing), `deploy-prod-next` + `blog:upsert` ├Ч19.
+- `deferLeadingImageBlock` после `filterDuplicateImageBlocks`: первый image переносится после ≥2 paragraph-блоков (везде, не только mobile).
+- Убрана ветка `paragraph + next image` → float: предшествующий текст больше не затягивается под image-first layout.
+- Правки в `apps/web` и `apps/public` `BlogArticleContent.tsx`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- HIDDEN `bylinnyy-bereg-*` ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г ╨▒╨╡╨╖ cover-╤Д╨░╨╣╨╗╨╛╨▓ ╨╜╨░ ╨┤╨╕╤Б╨║╨╡ (╨╜╨╡ ╨▓ scope PUBLISHED).
-- Internal revalidate endpoint ╨▓╨╡╤А╨╜╤Г╨╗ 401; ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л ╨▓╤Б╤С ╤А╨░╨▓╨╜╨╛ ╨╛╤В╨┤╨░╤О╤В cover+inline ╨┐╨╛╤Б╨╗╨╡ upsert (SSR ╨╕╨╖ Article).
-
-### ╨Ф╨╛╨▒╨╕╨▓╨║╨░ (╤В╨╛╤В ╨╢╨╡ ╨┤╨╡╨╜╤М)
-
-- Prod `@af32532`, `blog:upsert` ├Ч19 PUBLISHED тАФ OK.
-- Smoke: 4 ╤Б╤В╨░╤В╤М╨╕ HTML ╤Б 2├Ч `/images/blog/*` (cover+inline), ╨▓╤Б╨╡ img 200.
-- API `/api/public/articles`: **19/19** ╤Б `coverImageUrl`.
+- Нет: cover≠inline по-прежнему через `filterDuplicateImageBlocks`.
 
 ---
 
-## 2026-07-19 тАФ Home SEO: ╤В╨╛╤З╨╜╤Л╨╣ ╤И╨░╨▒╨╗╨╛╨╜ description
+## 2026-07-19 — Blog: вернуть фото в статьи (cover + distinct inline)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Title ╤Г╨╢╨╡ ╨╛╨║: ┬л╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В тАФ ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕, ╨╝╤Г╨╖╨╡╨╕ ╨╕ ╨╝╨╡╤А╨╛╨┐╤А╨╕╤П╤В╨╕╤П ╨▓ ╨│╨╛╤А╨╛╨┤╨░╤Е ╨а╨╛╤Б╤Б╨╕╨╕┬╗.
-- Description ╨╜╨░ prod ╨▒╤Л╨╗ ╨▓ ╨┤╤А╤Г╨│╨╛╨╝ ╨┐╨╛╤А╤П╨┤╨║╨╡: ┬л╨С╨╕╨╗╨╡╤В╤Л ╨╜╨░ ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕ ╨╕ ╤Б╨╛╨▒╤Л╤В╨╕╤П: тАж ╨Р╤Д╨╕╤И╨░ ╨╝╤Г╨╖╨╡╨╡╨▓тАж┬╗ тАФ ╨╜╤Г╨╢╨╡╨╜ ╤Д╨╕╨║╤Б╨╕╤А╨╛╨▓╨░╨╜╨╜╤Л╨╣ SERP-╤В╨╡╨║╤Б╤В.
+- У всех PUBLISHED статей cover и `[image]` в MD/DB были, но в HTML body картинка пропадала: `filterDuplicateImageBlocks` вырезает inline, если `src` совпадает с `coverImageUrl`.
+- Эталон: `fentezi-fest-bylinnyy-bereg` уже имел отдельный `-inline.jpg` → на странице 2 img.
+- В `apps/web/public/images/` не хватало sync `muzyka-v-osobnyakah-spb.jpg` (эталон в `apps/public/...`).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨и╨░╨▒╨╗╨╛╨╜: `╨Р╤Д╨╕╤И╨░ ╤Б╨╛╨▒╤Л╤В╨╕╨╣, ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╣ ╨╕ ╨╝╨╡╤А╨╛╨┐╤А╨╕╤П╤В╨╕╨╣ ╨▓ ╨│╨╛╤А╨╛╨┤╨░╤Е ╨а╨╛╤Б╤Б╨╕╨╕. ╨С╨╕╨╗╨╡╤В╤Л ╨╛╨╜╨╗╨░╨╣╨╜: ╨Ь╨╛╤Б╨║╨▓╨░ тАФ {n}, ╨б╨░╨╜╨║╤В-╨Я╨╡╤В╨╡╤А╨▒╤Г╤А╨│ тАФ {m}, ╨Ъ╨░╨╖╨░╨╜╤М тАФ {k}, ╨Х╨║╨░╤В╨╡╤А╨╕╨╜╨▒╤Г╤А╨│ тАФ {e}` (╨┤╨╗╨╕╨╜╨╜╨╛╨╡ ╤В╨╕╤А╨╡).
-- Counts ╤В╨╛╨╗╤М╨║╨╛ ╨╢╨╕╨▓╤Л╨╡ ╨╕╨╖ `getHomeDestinations` (slug-╤Е╨░╨▒╤Л); fallback ╨▒╨╡╨╖ ╤Е╨░╤А╨┤╨║╨╛╨┤-╤Ж╨╕╤Д╤А.
-- Title ╨▒╨╡╨╖ ╤Ж╨╕╤Д╤А; layout default + OG/Twitter ╤З╨╡╤А╨╡╨╖ ╤В╨╡ ╨╢╨╡ ╨║╨╛╨╜╤Б╤В╨░╨╜╤В╤Л.
+- Сгенерированы атмосферные `{slug}-inline.jpg` (без текста), сохранены в `apps/public/public/images/blog/` (+ локальный sync web).
+- Frontmatter: явный `coverImageUrl`; body `[image]` → `-inline.jpg`; `blog:sync-bodies`.
+- Commit только blog-артефактов (не трогать параллельный jazz-landing), `deploy-prod-next` + `blog:upsert` ×19.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Counts ╨▓ SERP ╤Б ╨╗╨░╨│╨╛╨╝ ISR (~300s); ╨┐╨╛╤Б╨╗╨╡ deploy ╨╜╤Г╨╢╨╡╨╜ curl title/description ╨╜╨░ prod.
+- HIDDEN `bylinnyy-bereg-*` по-прежнему без cover-файлов на диске (не в scope PUBLISHED).
+- Internal revalidate endpoint вернул 401; страницы всё равно отдают cover+inline после upsert (SSR из Article).
 
----
+### Добивка (тот же день)
 
-## 2026-07-19 тАФ Home SEO title + city counts in description
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- Title ╨▓╨║╨╗╨░╨┤╨║╨╕/default ╨▒╤Л╨╗ ╤Б╨║╤Г╨┤╨╜╤Л╨╣: ┬л╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В тАФ ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕, ╨╝╤Г╨╖╨╡╨╕ ╨╕ ╨▒╨╕╨╗╨╡╤В╤Л┬╗ (~40 ╤Б╨╕╨╝╨▓.), description ╨▒╨╡╨╖ ╨│╨╡╨╛╨│╤А╨░╤Д╨╕╨╕ ╨╕ ╨╛╨▒╤К╤С╨╝╨░ ╨║╨░╤В╨░╨╗╨╛╨│╨░.
-- ╨Э╨░ ╨│╨╗╨░╨▓╨╜╨╛╨╣ ╤Г╨╢╨╡ ╨╡╤Б╤В╤М `getHomeDestinations` (ISR/`unstable_cache`) ╤Б `events` ╨┐╨╛ ╨│╨╛╤А╨╛╨┤╨░╨╝ тАФ ╨╝╨╛╨╢╨╜╨╛ enrichment ╨▒╨╡╨╖ ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛╨│╨╛ API.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Default title тЖТ ┬л╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В тАФ ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕, ╨╝╤Г╨╖╨╡╨╕ ╨╕ ╨╝╨╡╤А╨╛╨┐╤А╨╕╤П╤В╨╕╤П ╨▓ ╨│╨╛╤А╨╛╨┤╨░╤Е ╨а╨╛╤Б╤Б╨╕╨╕┬╗; template `%s | ╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В` ╨▒╨╡╨╖ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╣.
-- Home `generateMetadata`: description/OG/Twitter ╤Б counts ╤В╨╛╨┐-╤Е╨░╨▒╨╛╨▓ (╨Ь╨╛╤Б╨║╨▓╨░, ╨б╨Я╨▒, ╨Ъ╨░╨╖╨░╨╜╤М, ╨Х╨║╨░╤В╨╡╤А╨╕╨╜╨▒╤Г╤А╨│) ╨╕╨╖ destinations; title ╨▒╨╡╨╖ counts (╤З╨╕╤В╨░╨╡╨╝╨╛╤Б╤В╤М тЙд~70).
-- ╨Ъ╨╛╨╜╤Б╤В╨░╨╜╤В╤Л/helper ╨▓ `seo-meta.ts` (`HOME_SEO_TITLE`, `buildHomeSeoDescription`).
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- Counts ╨▓ SERP ╨╛╨▒╨╜╨╛╨▓╨╗╤П╤О╤В╤Б╤П ╤Б ╨╗╨░╨│╨╛╨╝ ISR (~`revalidate` home); ╨┐╤А╨╕ ╨╜╨╡╨┤╨╛╤Б╤В╤Г╨┐╨╜╨╛╤Б╤В╨╕ DB тАФ fallback description ╨▒╨╡╨╖ ╤Ж╨╕╤Д╤А.
+- Prod `@af32532`, `blog:upsert` ×19 PUBLISHED — OK.
+- Smoke: 4 статьи HTML с 2× `/images/blog/*` (cover+inline), все img 200.
+- API `/api/public/articles`: **19/19** с `coverImageUrl`.
 
 ---
 
-## 2026-07-19 тАФ Blog soft-links: ╨║╨░╤В╨░╨╗╨╛╨│ тЖТ ╨╗╨╡╨╜╨┤╨╕╨╜╨│╨╕
+## 2026-07-19 — Home SEO: точный шаблон description
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т `chto-poslushat-jazz` ┬л╨┤╨╢╨░╨╖╨╛╨▓╨╛╨╣ ╨░╤Д╨╕╤И╨╡ ╨Ь╨╛╤Б╨║╨▓╤Л┬╗ ╨▓╨╡╨╗╨░ ╨╜╨░ ╤Б╤Л╤А╨╛╨╣ ╨║╨░╤В╨░╨╗╨╛╨│ `/events?q=╨┤╨╢╨░╨╖&city=moscow`, ╨░ ╨╜╨╡ ╨╜╨░ ╨╗╨╡╨╜╨┤╨╕╨╜╨│ ╨╢╨░╨╜╤А╨░.
-- ╨Ъ╨░╨╜╨╛╨╜: `concertsLandingHref('moscow','jazz')` тЖТ `/kontserty/moscow/?genre=╨Ф╨╢╨░╨╖` (prod 200, landing ┬л╨Ъ╨╛╨╜╤Ж╨╡╤А╤В╤ЛтАж┬╗).
-- ╨Р╤Г╨┤╨╕╤В soft-links ┬л╨░╤Д╨╕╤И╨╡ X / ╨┐╨╛╨┤╨▒╨╛╤А╨║╨╡┬╗: ╨╡╤Й╤С 3 ╤Б╤В╨░╤В╤М╨╕ ╤Б╤Б╤Л╨╗╨░╨╗╨╕╤Б╤М ╨╜╨░ city catalog ╨┐╤А╨╕ ╨╜╨░╨╗╨╕╤З╨╕╨╕ ╤В╨╡╨╝╨░╤В╨╕╤З╨╡╤Б╨║╨╛╨│╨╛ ╨╗╨╡╨╜╨┤╨╕╨╜╨│╨░.
+- Title уже ок: «Дайбилет — экскурсии, музеи и мероприятия в городах России».
+- Description на prod был в другом порядке: «Билеты на экскурсии и события: … Афиша музеев…» — нужен фиксированный SERP-текст.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ч╨░╨╝╨╡╨╜╤Л: jazz тЖТ `/kontserty/moscow/?genre=╨Ф╨╢╨░╨╖`; ╤Б╤В╨╡╨╜╨┤╨░╨┐ ╨б╨Я╨▒ тЖТ `/stendap-i-yumor/`; ╨Ъ╨░╨╖╨░╨╜╤М ╤А╨╡╤З╨╜╤Л╨╡ тЖТ `/rechnye-progulki/kazan/`; ╨░╨▓╤В╨╛╨▒╤Г╤Б╤Л ╨Ь╨б╨Ъ тЖТ `/avtobusnye-ekskursii/moscow/`.
-- `blog:sync-bodies` + prod `blog:upsert` ├Ч4 + `revalidate` paths/tags articles.
-- ╨У╨╛╤А╨╛╨┤╤Б╨║╨╕╨╡ `/cities/{slug}` ╨▓ `afisha-regionalnye-goroda` ╨╛╤Б╤В╨░╨▓╨╗╨╡╨╜╤Л (╨╜╨╡╤В ╤В╨╡╨╝╨░╤В╨╕╤З╨╡╤Б╨║╨╛╨│╨╛ ╨╗╨╡╨╜╨┤╨╕╨╜╨│╨░).
+- Шаблон: `Афиша событий, экскурсий и мероприятий в городах России. Билеты онлайн: Москва — {n}, Санкт-Петербург — {m}, Казань — {k}, Екатеринбург — {e}` (длинное тире).
+- Counts только живые из `getHomeDestinations` (slug-хабы); fallback без хардкод-цифр.
+- Title без цифр; layout default + OG/Twitter через те же константы.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Я╨╛╨╗╨╜╤Л╨╣ `deploy-prod-next.sh` ╨╜╨╡ ╨│╨╛╨╜╤П╨╗╨╕: ╨║╨╛╨╜╤В╨╡╨╜╤В ╤Б╤В╨░╤В╨╡╨╣ ╨╕╨╖ `Article` ╨┐╨╛╤Б╨╗╨╡ upsert; static bodies ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡ ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╤Л SCP ╨┤╨╗╤П ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╡╨│╨╛ ╨▒╨╕╨╗╨┤╨░.
-
----
-
-## 2026-07-19 - Teplohod orders: ╨╛╤В╨╗╨╛╨╢╨╡╨╜╨╛ (╨╜╨╡╤В API ╤Г ╨┐╨░╤А╤В╨╜╤С╤А╨░)
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Я╨░╤А╤В╨╜╤С╤А teplohod.info ╨┐╨╛╨┤╤В╨▓╨╡╤А╨┤╨╕╨╗: **╤Д╤Г╨╜╨║╤Ж╨╕╨╛╨╜╨░╨╗╨░ ╨▓╤Л╨│╤А╤Г╨╖╨║╨╕/API ╨╖╨░╨║╨░╨╖╨╛╨▓ ╨╜╨╡╤В**.
-- ╨Я╨╛╨│╨╛╨╜╤П ╨╖╨░ `TEP_ORDERS_TOKEN` / IP probe / import **╨╛╤Б╤В╨░╨╜╨╛╨▓╨╗╨╡╨╜╨░**. ╨Ъ╨░╤В╨░╨╗╨╛╨│ TEP (IP allowlist, `api.teplohod.info/v1`) ╨▒╨╡╨╖ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╣.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Prod crontab: ╤Б╤В╤А╨╛╨║╨░ `tep-orders-sync` (`*/15`) **╤Г╨┤╨░╨╗╨╡╨╜╨░**; `tc-orders-sync` (`*/10`) ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕.
-- `scripts/tep-sync-orders.js` + `npm run tep:orders` ╨╛╤Б╤В╨░╤О╤В╤Б╤П ╨▓ ╤А╨╡╨┐╨╛ ╨║╨░╨║ **╨╖╨░╨│╨╛╤В╨╛╨▓╨║╨░**, ╨╜╨╡ ╨░╨║╤В╨╕╨▓╨╜╤Л╨╣ prod-path.
-- Docs: ╤Б╤В╨░╤В╤Г╤Б **╨╛╤В╨╗╨╛╨╢╨╡╨╜╨╛ / ╨╜╨╡╤В API**; ╤Д╨╛╤А╨╝╤Г╨╗╨╕╤А╨╛╨▓╨║╨╕ ╨┐╤А╨╛ ┬л╨╜╤Г╨╢╨╡╨╜ TEP_ORDERS_TOKEN ╨║╨░╨║ ╨▒╨╗╨╛╨║╨╡╤А┬╗ ╤Б╨╜╤П╤В╤Л.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Ч╨░╨║╨░╨╖╤Л Teplohod ╨▓ ╨░╨┤╨╝╨╕╨╜╨║╨╡ ╨┐╨╛╤П╨▓╤П╤В╤Б╤П ╤В╨╛╨╗╤М╨║╨╛ ╨╡╤Б╨╗╨╕ ╨┐╨░╤А╤В╨╜╤С╤А ╨┤╨╛╨▒╨░╨▓╨╕╤В API ╨╕╨╗╨╕ ╨╕╨╜╨╛╨╣ ╨║╨░╨╜╨░╨╗. TC orders ╤А╨░╨▒╨╛╤В╨░╤О╤В.
+- Counts в SERP с лагом ISR (~300s); после deploy нужен curl title/description на prod.
 
 ---
 
-# Diary тАФ Daibilet
+## 2026-07-19 — Home SEO title + city counts in description
 
-╨в╨╡╤Е╨╜╨╕╤З╨╡╤Б╨║╨╕╨╣ ╨┤╨╜╨╡╨▓╨╜╨╕╨║ ╨┐╤А╨╛╨╡╨║╤В╨░. ╨д╨╛╤А╨╝╨░╤В ╨╖╨░╨┐╨╕╤Б╨╕: **╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П**, **╨а╨╡╤И╨╡╨╜╨╕╤П**, **╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л**.
+### Наблюдения
+
+- Title вкладки/default был скудный: «Дайбилет — экскурсии, музеи и билеты» (~40 симв.), description без географии и объёма каталога.
+- На главной уже есть `getHomeDestinations` (ISR/`unstable_cache`) с `events` по городам — можно enrichment без отдельного API.
+
+### Решения
+
+- Default title → «Дайбилет — экскурсии, музеи и мероприятия в городах России»; template `%s | Дайбилет` без изменений.
+- Home `generateMetadata`: description/OG/Twitter с counts топ-хабов (Москва, СПб, Казань, Екатеринбург) из destinations; title без counts (читаемость ≤~70).
+- Константы/helper в `seo-meta.ts` (`HOME_SEO_TITLE`, `buildHomeSeoDescription`).
+
+### Проблемы
+
+- Counts в SERP обновляются с лагом ISR (~`revalidate` home); при недоступности DB — fallback description без цифр.
 
 ---
 
-## 2026-07-19 тАФ Teplohod orders sync (╨║╨░╤А╨║╨░╤Б + probe)
+## 2026-07-19 — Blog soft-links: каталог → лендинги
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Ъ╨░╤В╨░╨╗╨╛╨│ TEP (`TEP_API_URL=https://api.teplohod.info/v1`, IP allowlist) ╨╛╤В╨┤╨░╤С╤В `events`/`cities`; ╨▓╤Б╨╡ ╤Г╨│╨░╨┤╨░╨╜╨╜╤Л╨╡ paths `/orders`, `/bookings`, `/sales` ╨╕ ╤В.╨┐. тЖТ **404**.
-- ╨Э╨░ `account.teplohod.info` ╨╢╨╕╨▓╨╛╨╣ REST: `GET /api/orders` ╨╕ `/api/widgets`, `/api/profile`, `/api/events` тЖТ **401 Unauthorized** (endpoint ╨╡╤Б╤В╤М, credentials ╨╜╨╡╤В). ╨Т `.env` prod ╨╜╨╡╤В `TEP_ORDERS_TOKEN` / `TEPLOHOD_API_*`.
-- ╨Я╤Г╨▒╨╗╨╕╤З╨╜╨╛╨╣ ╤Б╤Е╨╡╨╝╤Л ╨╛╤В╨▓╨╡╤В╨░ orders ╤Г ╨┐╨░╤А╤В╨╜╤С╤А╨░ ╨╜╨╡╤В; email-╨┐╨░╤А╤Б╨╕╨╜╨│ ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г ╨╛╤В╨▓╨╡╤А╨│╨╜╤Г╤В.
+- В `chto-poslushat-jazz` «джазовой афише Москвы» вела на сырой каталог `/events?q=джаз&city=moscow`, а не на лендинг жанра.
+- Канон: `concertsLandingHref('moscow','jazz')` → `/kontserty/moscow/?genre=Джаз` (prod 200, landing «Концерты…»).
+- Аудит soft-links «афише X / подборке»: ещё 3 статьи ссылались на city catalog при наличии тематического лендинга.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `scripts/tep-sync-orders.js` + `npm run tep:orders`: upsert ╨▓ `ExternalOrder`/`ExternalTicket` (source `src_teplohod`), ╨╕╨┤╨╡╨╝╨┐╨╛╤В╨╡╨╜╤В╨╜╨╛; ╨▒╨╡╨╖ ╤В╨╛╨║╨╡╨╜╨░ тЖТ `status=BLOCKED` (╨╜╨╡ SUCCESS).
+- Замены: jazz → `/kontserty/moscow/?genre=Джаз`; стендап СПб → `/stendap-i-yumor/`; Казань речные → `/rechnye-progulki/kazan/`; автобусы МСК → `/avtobusnye-ekskursii/moscow/`.
+- `blog:sync-bodies` + prod `blog:upsert` ×4 + `revalidate` paths/tags articles.
+- Городские `/cities/{slug}` в `afisha-regionalnye-goroda` оставлены (нет тематического лендинга).
+
+### Проблемы
+
+- Полный `deploy-prod-next.sh` не гоняли: контент статей из `Article` после upsert; static bodies на сервере обновлены SCP для следующего билда.
+
+---
+
+## 2026-07-19 - Teplohod orders: отложено (нет API у партнёра)
+
+### Наблюдения
+
+- Партнёр teplohod.info подтвердил: **функционала выгрузки/API заказов нет**.
+- Погоня за `TEP_ORDERS_TOKEN` / IP probe / import **остановлена**. Каталог TEP (IP allowlist, `api.teplohod.info/v1`) без изменений.
+
+### Решения
+
+- Prod crontab: строка `tep-orders-sync` (`*/15`) **удалена**; `tc-orders-sync` (`*/10`) не трогали.
+- `scripts/tep-sync-orders.js` + `npm run tep:orders` остаются в репо как **заготовка**, не активный prod-path.
+- Docs: статус **отложено / нет API**; формулировки про «нужен TEP_ORDERS_TOKEN как блокер» сняты.
+
+### Проблемы
+
+- Заказы Teplohod в админке появятся только если партнёр добавит API или иной канал. TC orders работают.
+
+---
+
+# Diary — Daibilet
+
+Технический дневник проекта. Формат записи: **Наблюдения**, **Решения**, **Проблемы**.
+
+---
+
+## 2026-07-19 — Teplohod orders sync (каркас + probe)
+
+### Наблюдения
+
+- Каталог TEP (`TEP_API_URL=https://api.teplohod.info/v1`, IP allowlist) отдаёт `events`/`cities`; все угаданные paths `/orders`, `/bookings`, `/sales` и т.п. → **404**.
+- На `account.teplohod.info` живой REST: `GET /api/orders` и `/api/widgets`, `/api/profile`, `/api/events` → **401 Unauthorized** (endpoint есть, credentials нет). В `.env` prod нет `TEP_ORDERS_TOKEN` / `TEPLOHOD_API_*`.
+- Публичной схемы ответа orders у партнёра нет; email-парсинг по-прежнему отвергнут.
+
+### Решения
+
+- `scripts/tep-sync-orders.js` + `npm run tep:orders`: upsert в `ExternalOrder`/`ExternalTicket` (source `src_teplohod`), идемпотентно; без токена → `status=BLOCKED` (не SUCCESS).
 - Default URL: `https://account.teplohod.info/api/orders`; auth `bearer` / `access-token` / `both`.
-- Cron `deploy/cron/tep-orders-sync.sh` `*/15` ╤А╤П╨┤╨╛╨╝ ╤Б `tc-orders` `*/10` (orders-only, ╨║╨░╤В╨░╨╗╨╛╨│ ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╡╤В).
+- Cron `deploy/cron/tep-orders-sync.sh` `*/15` рядом с `tc-orders` `*/10` (orders-only, каталог не трогает).
 - API: `POST /api/v1/tep/orders/sync` (+ admin alias).
-- ╨Ф╨╛╨║╤Г╨╝╨╡╨╜╤В╨╕╤А╨╛╨▓╨░╨╜ ╤Б╨┐╨╕╤Б╨╛╨║ ╨▓╨╛╨┐╤А╨╛╤Б╨╛╨▓ ╨┐╨░╤А╤В╨╜╤С╤А╤Г (qa + integrations).
+- Документирован список вопросов партнёру (qa + integrations).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Ш╨╝╨┐╨╛╤А╤В **0 ╨╖╨░╨║╨░╨╖╨╛╨▓** ╨┤╨╛ ╨▓╤Л╨┤╨░╤З╨╕ ╤В╨╛╨║╨╡╨╜╨░/╤Б╤Е╨╡╨╝╤Л. ╨Я╨╛╤Б╨╗╨╡ ╤В╨╛╨║╨╡╨╜╨░ ╨╜╤Г╨╢╨╡╨╜ smoke `--dry-run` ╨╕ ╤Б╨▓╨╡╤А╨║╨░ ╨┐╨╛╨╗╨╡╨╣ ╨╝╨░╨┐╨┐╨╕╨╜╨│╨░.
-- ╨Э╨╡╨╕╨╖╨▓╨╡╤Б╤В╨╜╨╛, ╤Д╨╕╨╗╤М╤В╤А╤Г╨╡╤В ╨╗╨╕ account API ╨┐╨╛ `widget_id` / dateFrom тАФ ╨┐╨╡╤А╨╡╨┤╨░╤С╨╝ ╨║╨░╨║ query aliases.
-
----
-
-## 2026-07-19 тАФ Admin: editable Cities + article publishedAt
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- Cities ╨▓ ╨░╨┤╨╝╨╕╨╜╨║╨╡ ╨▒╤Л╨╗╨╕ read-only (`GET /api/admin/cities` + ╨▒╨╡╨╣╨┤╨╢ ┬л╤В╨╛╨╗╤М╨║╨╛ ╤З╤В╨╡╨╜╨╕╨╡┬╗); ╨┐╤Г╨▒╨╗╨╕╤З╨╜╤Л╨╣ ╨║╨░╤В╨░╨╗╨╛╨│ ╨│╨╛╤А╨╛╨┤╨╛╨▓ ╨╢╨╕╨▓╤С╤В ╨╜╨░ Prisma `City` (title/slug/SEO/intro/`isDestination`), ╨▒╨╡╨╖ `isActive`/`sortOrder`.
-- ╨б╤В╨░╤В╤М╨╕: `upsertAdminArticle` ╤Г╨╢╨╡ ╨┐╤А╨╕╨╜╨╕╨╝╨░╨╗ `publishedAt`, ╨╜╨╛ UI ╨╜╨╡ ╨╖╨░╨│╤А╤Г╨╢╨░╨╗/╨╜╨╡ ╤Б╨╛╤Е╤А╨░╨╜╤П╨╗ ╨┐╨╛╨╗╨╡ тАФ ╨╜╨╡╨╗╤М╨╖╤П ╨▒╤Л╨╗╨╛ ╤А╨░╨╖╨╜╨╡╤Б╤В╨╕ ╨┤╨░╤В╤Л ╨▒╨╗╨╛╨│╨░ ╨▒╨╡╨╖ SQL.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- API: `GET/PATCH /api/admin/cities/:id` тАФ update City; slug unique тЖТ 409 `slug_not_unique`; invalidate public caches.
-- Admin Cities: sheet-╤Д╨╛╤А╨╝╨░ (title, slug, SEO, intro, hero, isDestination); ╤А╨╡╨│╨╕╨╛╨╜╤Л ╨▓ ╤Б╨┐╨╕╤Б╨║╨╡ ╨╜╨╡ PATCH (╤В╨╛╨╗╤М╨║╨╛ City).
-- Admin Articles: datetime-local `publishedAt`, ╨║╨╛╨╗╨╛╨╜╨║╨░ ╨┤╨░╤В╤Л ╨▓ ╤Б╨┐╨╕╤Б╨║╨╡; ╨┐╤А╨╕ publish ╨┐╤Г╤Б╤В╨░╤П ╨┤╨░╤В╨░ тЖТ now (UI + backend).
-- Docs: Project/Tasktracker/Diary ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╤Л (B.9/B.10).
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨б╨╝╨╡╨╜╨░ slug ╨│╨╛╤А╨╛╨┤╨░ ╨╗╨╛╨╝╨░╨╡╤В ╤Б╤В╨░╤А╤Л╨╡ `/cities/{old}` URL тАФ ╨╛╨┐╨╡╤А╨░╤В╨╛╤А╤Г ╨╜╤Г╨╢╨╜╨░ ╨╛╤Б╤В╨╛╤А╨╛╨╢╨╜╨╛╤Б╤В╤М; 301 ╨╜╨╡ ╨┤╨╡╨╗╨░╨╡╨╝ ╨▓ ╤Н╤В╨╛╨╝ ╤В╨╕╨║╨╡╤В╨╡.
-- Region rows ╨▓ destination rollup ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г ╨▒╨╡╨╖ ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛╨│╨╛ PATCH.
+- Импорт **0 заказов** до выдачи токена/схемы. После токена нужен smoke `--dry-run` и сверка полей маппинга.
+- Неизвестно, фильтрует ли account API по `widget_id` / dateFrom — передаём как query aliases.
 
 ---
 
-## 2026-07-19 тАФ ╨Я╨╡╤А╨▓╨░╤П ╨║╨╛╨╗╨╛╨╜╨║╨░ ╨Р╨╜╨╜╤Л (╨╛╤Б╨╛╨▒╨╜╤П╨║╨╕ ╨б╨Я╨▒)
+## 2026-07-19 — Admin: editable Cities + article publishedAt
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М ╨┐╤А╨╕╤Б╨╗╨░╨╗ longform ┬л╨Ь╤Г╨╖╤Л╨║╨░ ╤Б ╨░╨┤╤А╨╡╤Б╨╛╨╝тАж┬╗; ╤Б╨╗╤Г╨╢╨╡╨▒╨╜╨░╤П ╤Б╤В╤А╨╛╨║╨░: ╨╝╨░╤В╨╡╤А╨╕╨░╨╗ ╨╝╨╛╨╢╨╜╨╛ ╨┐╤Г╨▒╨╗╨╕╨║╨╛╨▓╨░╤В╤М; ╨┐╨╛╤Б╤В╨╛╤П╨╜╨╜╨░╤П ╤А╤Г╨▒╤А╨╕╨║╨░ тАФ ┬л╨У╨╛╤А╨╛╨┤ ╨║╤А╤Г╨┐╨╜╤Л╨╝ ╨┐╨╗╨░╨╜╨╛╨╝┬╗ (╨▓╨╝╨╡╤Б╤В╨╛ ╨┐╤А╨╡╨╢╨╜╨╡╨│╨╛ ┬л╨Ь╨╡╨╢╨┤╤Г ╤Н╨┐╨╛╤Е╨░╨╝╨╕┬╗).
-- Multi-event тЖТ ╤В╨╛╨╗╤М╨║╨╛ `/events/{slug}`, ╨▒╨╡╨╖ `[buy]`.
-- ╨б╨▓╨╡╤А╨║╨░ READY (prod): ╨Я╨╛╨╗╨╛╨▓╤Ж╨╛╨▓/╨Т╨╕╨▓╨░╨╗╤М╨┤╨╕ 2700тАУ5100 тВ╜; ╨и╤А╤С╨┤╨╡╤А/╨С╨╡╤В╤Е╨╛╨▓╨╡╨╜ ╨╛╤В 2000 тВ╜; ╨Ф╨╡╤А╨╢╨░╨▓╨╕╨╜ ╨┐╤А╨╕ ╤Б╨▓╨╡╤З╨░╤Е ╨╛╤В 3000 тВ╜ тАФ ╤Ж╨╡╨╜╤Л ╨▓ ╤В╨╡╨║╤Б╤В╨╡ ╤Б╨╛╨▓╨┐╨░╨╗╨╕, ╨┐╤А╨░╨▓╨╛╨║ ╨╜╨╡ ╨┐╨╛╤В╤А╨╡╨▒╨╛╨▓╨░╨╗╨╛╤Б╤М.
+- Cities в админке были read-only (`GET /api/admin/cities` + бейдж «только чтение»); публичный каталог городов живёт на Prisma `City` (title/slug/SEO/intro/`isDestination`), без `isActive`/`sortOrder`.
+- Статьи: `upsertAdminArticle` уже принимал `publishedAt`, но UI не загружал/не сохранял поле — нельзя было разнести даты блога без SQL.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ъ╨░╨╜╨╛╨╜ ╨║╨╛╨╗╨╛╨╜╨║╨╕ ╨╛╨▒╨╜╨╛╨▓╨╗╤С╨╜ ╨▓ `02-anna.md` + `personas.json`.
+- API: `GET/PATCH /api/admin/cities/:id` — update City; slug unique → 409 `slug_not_unique`; invalidate public caches.
+- Admin Cities: sheet-форма (title, slug, SEO, intro, hero, isDestination); регионы в списке не PATCH (только City).
+- Admin Articles: datetime-local `publishedAt`, колонка даты в списке; при publish пустая дата → now (UI + backend).
+- Docs: Project/Tasktracker/Diary обновлены (B.9/B.10).
+
+### Проблемы
+
+- Смена slug города ломает старые `/cities/{old}` URL — оператору нужна осторожность; 301 не делаем в этом тикете.
+- Region rows в destination rollup по-прежнему без отдельного PATCH.
+
+---
+
+## 2026-07-19 — Первая колонка Анны (особняки СПб)
+
+### Наблюдения
+
+- Пользователь прислал longform «Музыка с адресом…»; служебная строка: материал можно публиковать; постоянная рубрика — «Город крупным планом» (вместо прежнего «Между эпохами»).
+- Multi-event → только `/events/{slug}`, без `[buy]`.
+- Сверка READY (prod): Половцов/Вивальди 2700–5100 ₽; Шрёдер/Бетховен от 2000 ₽; Державин при свечах от 3000 ₽ — цены в тексте совпали, правок не потребовалось.
+
+### Решения
+
+- Канон колонки обновлён в `02-anna.md` + `personas.json`.
 - Slug `muzyka-v-osobnyakah-spb`, `authorId=anna`, `publishedAt=2026-07-19`.
-- Event-╤Б╤Б╤Л╨╗╨║╨╕: ╨Т╨╕╨▓╨░╨╗╤М╨┤╨╕/╨Я╨╛╨╗╨╛╨▓╤Ж╨╛╨▓ `tc-69d01bfbee2762c27d4c183a-╨▓╨╕╨▓╨░╨╗╤М╨┤╨╕-╨▓╤А╨╡╨╝╨╡╨╜╨░-╨│╨╛╨┤╨░`; ╨и╤А╤С╨┤╨╡╤А `tc-69f1fae720d81aa098c549a2-тАж-╨▒╨╡╤В╤Е╨╛╨▓╨╡╨╜`; ╨Ь╤П╤Б╨╜╨╕╨║╨╛╨▓ `tc-6a392512b8ea7c7883162f0b-╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╤П-╨┐╨╛-╨╛╤Б╨╛╨▒╨╜╤П╨║╤Г-╨╝╤П╤Б╨╜╨╕╨║╨╛╨▓╨░`; ╨Ф╨╡╤А╨╢╨░╨▓╨╕╨╜ `tc-6a43b6be712a5d192f1793c5-╨▓-╤Б╨▓╨╡╤З╨░╤Е-╤И╨╡╨┤╨╡╨▓╤А╤Л-╨║╨╗╨░╤Б╤Б╨╕╨║╨╕-╨▓-╤Г╤Б╨░╨┤╤М╨▒╨╡-╨┤╨╡╤А╨╢╨░╨▓╨╕╨╜╨░`.
-- ╨Ю╨▒╨╗╨╛╨╢╨║╨░ ╤Б╨│╨╡╨╜╨╡╤А╨╕╤А╨╛╨▓╨░╨╜╨░ тЖТ `apps/public/public/images/blog/muzyka-v-osobnyakah-spb.jpg`.
-- Commit тЖТ `deploy-prod-next` тЖТ `blog:upsert --slug=muzyka-v-osobnyakah-spb`.
+- Event-ссылки: Вивальди/Половцов `tc-69d01bfbee2762c27d4c183a-вивальди-времена-года`; Шрёдер `tc-69f1fae720d81aa098c549a2-…-бетховен`; Мясников `tc-6a392512b8ea7c7883162f0b-экскурсия-по-особняку-мясникова`; Державин `tc-6a43b6be712a5d192f1793c5-в-свечах-шедевры-классики-в-усадьбе-державина`.
+- Обложка сгенерирована → `apps/public/public/images/blog/muzyka-v-osobnyakah-spb.jpg`.
+- Commit → `deploy-prod-next` → `blog:upsert --slug=muzyka-v-osobnyakah-spb`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Я╨░╤А╨░╨╗╨╗╨╡╨╗╤М╨╜╤Л╨╣ dirty worktree (admin audit / blog part 2) тАФ ╨▓ ╨║╨╛╨╝╨╝╨╕╤В ╨║╨╛╨╗╨╛╨╜╨║╨╕ ╨Р╨╜╨╜╤Л ╨╜╨╡ ╨▓╨║╨╗╤О╤З╨░╨╗╨╕ ╤З╤Г╨╢╨╕╨╡ ╨┐╤А╨░╨▓╨║╨╕.
-
----
-
-## 2026-07-19 тАФ ╨С╨╗╨╛╨│ ╤З╨░╤Б╤В╤М 2 (7 ╤А╨╡╨┤╨░╨║╤Ж╨╕╨╛╨╜╨╜╤Л╤Е ╨│╨╕╨┤╨╛╨▓)
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М ╨┐╤А╨╕╤Б╨╗╨░╨╗ 7 ╨┐╨╡╤А╨╡╤А╨░╨▒╨╛╤В╨░╨╜╨╜╤Л╤Е evergreen-╤В╨╡╨║╤Б╤В╨╛╨▓ (┬л╤З╨░╤Б╤В╤М 2┬╗).
-- ╨Т╤Б╨╡ multi-event тЖТ ╤В╨╛╨╗╤М╨║╨╛ markdown `/events/{slug}`, ╨▒╨╡╨╖ `[buy]`.
-- `spb-razvod-mostov-kakoi-reis` ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕; ╨╛╨▒╨╜╨╛╨▓╨╗╤С╨╜ ╨║╨╛╨╝╨▒╨╕╨╜╨╕╤А╨╛╨▓╨░╨╜╨╜╤Л╨╣ `spb-rooftop-guide`.
-- ╨Ъ╨╛╨╗╨╛╨╜╨║╨░ ╨Ь╨░╨║╤Б╨░ `fentezi-fest-bylinnyy-bereg` ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨░╤Б╤М.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨Ю╨┐╤Г╨▒╨╗╨╕╨║╨╛╨▓╨░╨╜╤Л slug: `kazan-rechnye-progulki`, `moskva-rechnye-progulki-zaryade`, `spb-rooftop-guide`, `spb-stendap-gid`, `moskva-master-klass-emal`, `myuzikly-teatr-novichok-msk-spb`, `spb-planetarium-gid` (`authorId=editorial`).
-- ╨б╨▓╨╡╤А╨║╨░ READY: ~40 ╤Б╤Б╤Л╨╗╨╛╨║ ╨╜╨░ ╤Б╨╛╨▒╤Л╤В╨╕╤П; ╤Ж╨╡╨╜╤Л ╤Б╤В╨╡╨╜╨┤╨░╨┐╨░/╨▒╨░╨╗╨╡╤В╨░/╨▓╨╛╨╖╤А╨░╤Б╤В╨░ ╨╛╤А╨│╨░╨╜╨░ ╨┐╨╛╨┐╤А╨░╨▓╨╗╨╡╨╜╤Л ╨┐╨╛ ╨░╤Д╨╕╤И╨╡.
-- Commit тЖТ `deploy-prod-next` тЖТ `blog:upsert` ├Ч7.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- READY ╨╜╨░ ╨б╨▓╨╕╤П╨╢╤Б╨║/╨С╨╛╨╗╨│╨░╤А ╨▓ ╨░╤Д╨╕╤И╨╡ ╨╜╨╡╤В тАФ ╨▓ ╤В╨╡╨║╤Б╤В╨╡ ╨╛╤Б╤В╨░╨╗╨╕╤Б╤М ╨▒╨╡╨╖ ╤Б╤Б╤Л╨╗╨╛╨║, ╨╛╤В╤Б╤Л╨╗╨║╨░ ╨║ `/city/kazan`.
-- ╨г ╤З╨░╤Б╤В╨╕ ┬л╤В╤А╨╕ ╤А╨░╨╖╨▓╨╛╨┤╨╜╤Л╤Е┬╗ ╨▓ ╨С╨Ф ╨▒╨╕╤В╤Л╨╡ `priceFromRub=10`; ╨┤╨╗╤П ╨│╨╕╨┤╨░ ╨▓╨╖╤П╤В ╨▓╨░╨╗╨╕╨┤╨╜╤Л╨╣ slug ╤Б 1050 тВ╜.
+- Параллельный dirty worktree (admin audit / blog part 2) — в коммит колонки Анны не включали чужие правки.
 
 ---
 
-## 2026-07-19 тАФ ╨Ч╨░╨║╤А╤Л╤В╨╕╨╡ ╨┤╤Л╤А ╨░╤Г╨┤╨╕╤В╨░ ╨░╨┤╨╝╨╕╨╜╨║╨╕
+## 2026-07-19 — Блог часть 2 (7 редакционных гидов)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Ш╤Б╤В╨╛╤З╨╜╨╕╨║ ╨░╤Г╨┤╨╕╤В╨░: canvas `admin-audit` + Diary 2026-07-14; P0 (╨╗╨╕╨╝╨╕╤В 10k / ╨╝╨╡╤В╤А╨╕╨║╨╕ DashboardтЙаEvents) ╤Г╨╢╨╡ ╨▒╤Л╨╗╨╕ ╨╖╨░╨║╤А╤Л╤В╤Л ╤А╨░╨╜╨╡╨╡ (`eventRows(db, null)` + `getCachedAdminGroupedEvents`).
-- ╨Ю╤Б╤В╨░╨▓╨░╨╗╨╕╤Б╤М P1: detail ╨▒╨╡╨╖ override/source description, nav stubs, localhost:5178 ╨▓ ╨▒╨░╨╜╨┤╨╗╨╡, canPublish тЙа high readiness.
-- ╨Ч╨░╨║╨░╨╖╤Л: 17/18 archived тАФ ╨╜╨╡ ╨▒╨░╨│ sync; `archiveStaleCancelledOrders` ╤Г╨▓╨╛╨┤╨╕╤В cancelled/expired/тАж ╤Б╤В╨░╤А╤И╨╡ 30 ╨┤╨╜╨╡╨╣. Confirmed ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╡╤В.
+- Пользователь прислал 7 переработанных evergreen-текстов («часть 2»).
+- Все multi-event → только markdown `/events/{slug}`, без `[buy]`.
+- `spb-razvod-mostov-kakoi-reis` не трогали; обновлён комбинированный `spb-rooftop-guide`.
+- Колонка Макса `fentezi-fest-bylinnyy-bereg` не трогалась.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `GET /api/admin/events/:id` тЖТ `event` + `override` (LEFT JOIN); UI Content/SEO/Media ╨│╨╕╨┤╤А╨╕╤А╤Г╨╡╤В ╨╕╨╖ detail.
-- Lean `eventRows`: `left(e.description, 4000)` ╨▓╨╝╨╡╤Б╤В╨╛ `null`.
-- `publishGate` ╤Г╤З╨╕╤В╤Л╨▓╨░╨╡╤В high `readinessIssues` тЖТ blockers тЖТ `canPublish=false`.
-- Nav: ╤Г╨▒╤А╨░╨╜╤Л mapping/taxonomy/audit stubs; Cities/Buyers тАФ ╨▒╨╡╨╣╨┤╨╢ ┬л╤В╨╛╨╗╤М╨║╨╛ ╤З╤В╨╡╨╜╨╕╨╡┬╗; Settings ╨▒╨╡╨╖ localhost ╨╕ ╨▒╨╡╨╖ ┬лauth ╨╛╤В╨║╨╗╤О╤З╨╡╨╜╨░┬╗.
-- CORS: ╨┤╨╗╤П `/api/admin` ╨╕ sync/db ╨▒╨╛╨╗╤М╤И╨╡ ╨╜╨╡╤В `Access-Control-Allow-Origin: *`.
-- ╨в╨╡╤Б╤В╤Л: `auth.test.ts`, `publish-gate.test.ts`.
+- Опубликованы slug: `kazan-rechnye-progulki`, `moskva-rechnye-progulki-zaryade`, `spb-rooftop-guide`, `spb-stendap-gid`, `moskva-master-klass-emal`, `myuzikly-teatr-novichok-msk-spb`, `spb-planetarium-gid` (`authorId=editorial`).
+- Сверка READY: ~40 ссылок на события; цены стендапа/балета/возраста органа поправлены по афише.
+- Commit → `deploy-prod-next` → `blog:upsert` ×7.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Я╨╛╨╗╨╜╤Л╨╣ SQL read-model ╨┤╨╗╤П Events (╨▒╨╡╨╖ in-memory group) тАФ ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г perf backlog (0.5.8).
-- ECR ╨╛╤Б╤В╨░╤С╤В╤Б╤П ╤Б╨║╤А╤Л╤В ╨▓ prod (`VITE_DAIBILET_EVENT_CHANGE_REQUESTS` ╨╜╨╡ ╨▓╨║╨╗╤О╤З╨░╨╡╨╝).
+- READY на Свияжск/Болгар в афише нет — в тексте остались без ссылок, отсылка к `/city/kazan`.
+- У части «три разводных» в БД битые `priceFromRub=10`; для гида взят валидный slug с 1050 ₽.
 
 ---
 
-## 2026-07-19 тАФ Blog: ╤В╨╛╨╗╤М╨║╨╛ ╤Б╤Б╤Л╨╗╨║╨╕ ╨▓ multi-event + ╤Б╨▓╨╡╤А╨║╨░ ╤Ж╨╡╨╜/meta
+## 2026-07-19 — Закрытие дыр аудита админки
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨г╤В╨╛╤З╨╜╨╡╨╜╨╕╨╡ ╨┐╤А╨╛╨┤╤Г╨║╤В╨░: ╨▓ ╨╛╨▒╨╖╨╛╤А╨░╤Е ╤Б ╨╜╨╡╤Б╨║╨╛╨╗╤М╨║╨╕╨╝╨╕ ╤Б╨╛╨▒╤Л╤В╨╕╤П╨╝╨╕ тАФ markdown-╤Б╤Б╤Л╨╗╨║╨╕ ╨╜╨░ `/events/{slug}`, ╨▒╨╡╨╖ `[buy]`. Buy ╤В╨╛╨╗╤М╨║╨╛ ╨┤╨╗╤П single-offer ╤Б╤В╨░╤В╨╡╨╣.
-- ╨Т MD ╤З╨░╤Б╤В╨╛ ╨▒╤Л╨╗╨╕ **╨╗╨░╤В╨╕╨╜╤Б╨║╨╕╨╡** ╤Е╨▓╨╛╤Б╤В╤Л slug, ╨▓ prod READY тАФ **╨║╨╕╤А╨╕╨╗╨╗╨╕╤З╨╡╤Б╨║╨╕╨╡** (╤В╨╛╤В ╨╢╨╡ TC id).
-- `priceFromRub=10` ╤Г ╤З╨░╤Б╤В╨╕ ╤А╨╡╨╣╤Б╨╛╨▓ ╨║ ╨Ф╨▓╨╛╤А╤Ж╨╛╨▓╨╛╨╝╤Г/╨в╤А╨╛╨╕╤Ж╨║╨╛╨╝╤Г тАФ ╨░╤А╤В╨╡╤Д╨░╨║╤В; ╤А╨╡╨░╨╗╤М╨╜╤Л╨╣ min offer **1500** / **1300**.
+- Источник аудита: canvas `admin-audit` + Diary 2026-07-14; P0 (лимит 10k / метрики Dashboard≠Events) уже были закрыты ранее (`eventRows(db, null)` + `getCachedAdminGroupedEvents`).
+- Оставались P1: detail без override/source description, nav stubs, localhost:5178 в бандле, canPublish ≠ high readiness.
+- Заказы: 17/18 archived — не баг sync; `archiveStaleCancelledOrders` уводит cancelled/expired/… старше 30 дней. Confirmed не трогает.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨г╨▒╤А╨░╨╜╤Л ╨▓╤Б╨╡ `[buy]` ╨╕╨╖ ╤А╨╡╨┤╨░╨║╤Ж╨╕╨╛╨╜╨╜╤Л╤Е multi-event ╨│╨╕╨┤╨╛╨▓ ╨╕ ╨║╨╛╨╗╨╛╨╜╨║╨╕ ╨Ь╨░╨║╤Б╨░ `fentezi-fest-bylinnyy-bereg` (╨╛╤Б╤В╨░╨╗╨╕╤Б╤М 2 ╤Б╤Б╤Л╨╗╨║╨╕).
-- ╨ж╨╡╨╜╤Л: ╨б╨║╨╗╤П╤А 2500, ╨Ю╤А╨│╨░╨╜ 2000, ╨У╨░╤А╤А╨╕ ╨Я╨╛╤В╤В╨╡╤А from 940, ╨╝╨╛╤Б╤В╤Л 1500, ╨║╨╛╨╝╨╝╤Г╨╜╨░╨╗╨║╨░ 850, ╨в╤А╤Г╨╝╨░╨╜ 400, ╨Ы╨╡╨▒╨╡╨┤╨╕╨╜╨╛╨╡ 2000.
-- ┬л╨ж╨╕╤А╨║ ╨Ь╨░╨║╤Б╨╕╨╝╤Г╤Б┬╗ ╨г╤Д╨░: READY slug ╨╜╨╡╤В тЖТ ╤В╨╡╨║╤Б╤В ╨▒╨╡╨╖ ╤Ж╨╡╨╜╤Л/╤Б╤Б╤Л╨╗╨║╨╕, ╨╛╤В╤Б╤Л╨╗╨║╨░ ╨║ `/cities/ufa`.
-- Meta seoDescription ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╤Л ╨▒╨╡╨╖ ╨▓╤А╨░╨╜╤М╤П ╨┐╨╛ ╤Ж╨╡╨╜╨░╨╝; `blog:sync-bodies` + upsert.
+- `GET /api/admin/events/:id` → `event` + `override` (LEFT JOIN); UI Content/SEO/Media гидрирует из detail.
+- Lean `eventRows`: `left(e.description, 4000)` вместо `null`.
+- `publishGate` учитывает high `readinessIssues` → blockers → `canPublish=false`.
+- Nav: убраны mapping/taxonomy/audit stubs; Cities/Buyers — бейдж «только чтение»; Settings без localhost и без «auth отключена».
+- CORS: для `/api/admin` и sync/db больше нет `Access-Control-Allow-Origin: *`.
+- Тесты: `auth.test.ts`, `publish-gate.test.ts`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨ж╨╕╤А╨║ ╨Ь╨░╨║╤Б╨╕╨╝╤Г╤Б ╨▓ ╨║╨░╤В╨░╨╗╨╛╨│╨╡ ╨╜╨╡ ╨╜╨░╨╣╨┤╨╡╨╜ тАФ ╨╜╨╡ ╨╗╨╕╨╜╨║╤Г╨╡╨╝.
-- ╨Я╨╛╤Б╨╗╨╡ ╨┐╤А╨░╨▓╨╛╨║ ╨╜╤Г╨╢╨╡╨╜ deploy Next (static bodies fallback) + `blog:upsert` ╨▓ Article.
+- Полный SQL read-model для Events (без in-memory group) — по-прежнему perf backlog (0.5.8).
+- ECR остаётся скрыт в prod (`VITE_DAIBILET_EVENT_CHANGE_REQUESTS` не включаем).
 
 ---
 
-## 2026-07-19 тАФ ╨Я╨░╨║╨╡╤В ╤А╨╡╨┤╨░╨║╤Ж╨╕╨╛╨╜╨╜╤Л╤Е ╤Б╤В╨░╤В╨╡╨╣ ╨▒╨╗╨╛╨│╨░ (verbatim)
+## 2026-07-19 — Blog: только ссылки в multi-event + сверка цен/meta
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М ╨┐╤А╨╕╤Б╨╗╨░╨╗ 10 ╨┐╨╡╤А╨╡╤А╨░╨▒╨╛╤В╨░╨╜╨╜╤Л╤Е evergreen-╤В╨╡╨║╤Б╤В╨╛╨▓ (╨▒╨╗╨╛╨║ ┬л╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В: ╨┐╨╡╤А╨╡╤А╨░╨▒╨╛╤В╨░╨╜╨╜╤Л╨╡ ╤Б╤В╨░╤В╤М╨╕ ╨▒╨╗╨╛╨│╨░┬╗).
-- `spb-razvod-mostov-kakoi-reis` ╤А╨░╨╜╨╡╨╡ ╨▒╤Л╨╗ HIDDEN + 301 тЖТ rooftop; ╨╜╤Г╨╢╨╡╨╜ ╤Б╨╜╨╛╨▓╨░ ╨╛╤В╨┤╨╡╨╗╤М╨╜╤Л╨╣ PUBLISHED slug.
-- ╨Ъ╨╛╨╗╨╛╨╜╨║╨░ ╨Ь╨░╨║╤Б╨░ `fentezi-fest-bylinnyy-bereg` ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨░╤Б╤М.
-- ╨б╨▓╨╡╤А╨║╨░ ╤Ж╨╡╨╜ ╤Б prod READY (API): ╨▒╨╛╨╗╤М╤И╨╕╨╜╤Б╤В╨▓╨╛ ╤Б╨╛╨▓╨┐╨░╨╗╨╕; ╤А╨░╤Б╤Е╨╛╨╢╨┤╨╡╨╜╨╕╤П ╨╛╤Б╤В╨░╨▓╨╗╨╡╨╜╤Л ╨▓ ╤В╨╡╨║╤Б╤В╨╡ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П.
+- Уточнение продукта: в обзорах с несколькими событиями — markdown-ссылки на `/events/{slug}`, без `[buy]`. Buy только для single-offer статей.
+- В MD часто были **латинские** хвосты slug, в prod READY — **кириллические** (тот же TC id).
+- `priceFromRub=10` у части рейсов к Дворцовому/Троицкому — артефакт; реальный min offer **1500** / **1300**.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ю╨▒╨╜╨╛╨▓╨╗╨╡╨╜╤Л `content/blog/*.md` + `blog:sync-bodies` + `blog-posts`/`blog-meta` (`authorId=editorial`).
-- ╨б╨╜╤П╤В 301 ╤Б `spb-razvod-mostov-kakoi-reis`; rooftop ╨╛╤Б╤В╨░╤С╤В╤Б╤П ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛╨╣ ╤Б╤В╨░╤В╤М╤С╨╣.
-- `[buy]` ╤В╨╛╨╗╤М╨║╨╛ ╨╜╨░ ╨╜╨░╨╣╨┤╨╡╨╜╨╜╤Л╨╡ READY slug; ╨╝╤П╨│╨║╨╕╨╡ ╤Б╤Б╤Л╨╗╨║╨╕ ╨╜╨░ `/events/тАж`, ╨│╨╛╤А╨╛╨┤╨░ ╨╕ `/bridges-night` / `/vecherinki-na-teplohode`.
-- Commit тЖТ `deploy-prod-next` тЖТ `blog:upsert` ├Ч10.
+- Убраны все `[buy]` из редакционных multi-event гидов и колонки Макса `fentezi-fest-bylinnyy-bereg` (остались 2 ссылки).
+- Цены: Скляр 2500, Орган 2000, Гарри Поттер from 940, мосты 1500, коммуналка 850, Труман 400, Лебединое 2000.
+- «Цирк Максимус» Уфа: READY slug нет → текст без цены/ссылки, отсылка к `/cities/ufa`.
+- Meta seoDescription обновлены без вранья по ценам; `blog:sync-bodies` + upsert.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л / ╤А╨░╤Б╤Е╨╛╨╢╨┤╨╡╨╜╨╕╤П ╤Ж╨╡╨╜ (╤В╨╡╨║╤Б╤В vs ╨║╨░╤А╤В╨╛╤З╨║╨░)
+### Проблемы
 
-| ╨б╨╛╨▒╤Л╤В╨╕╨╡ | ╨Т ╤В╨╡╨║╤Б╤В╨╡ | ╨Э╨░ prod |
+- Цирк Максимус в каталоге не найден — не линкуем.
+- После правок нужен deploy Next (static bodies fallback) + `blog:upsert` в Article.
+
+---
+
+## 2026-07-19 — Пакет редакционных статей блога (verbatim)
+
+### Наблюдения
+
+- Пользователь прислал 10 переработанных evergreen-текстов (блок «Дайбилет: переработанные статьи блога»).
+- `spb-razvod-mostov-kakoi-reis` ранее был HIDDEN + 301 → rooftop; нужен снова отдельный PUBLISHED slug.
+- Колонка Макса `fentezi-fest-bylinnyy-bereg` не трогалась.
+- Сверка цен с prod READY (API): большинство совпали; расхождения оставлены в тексте пользователя.
+
+### Решения
+
+- Обновлены `content/blog/*.md` + `blog:sync-bodies` + `blog-posts`/`blog-meta` (`authorId=editorial`).
+- Снят 301 с `spb-razvod-mostov-kakoi-reis`; rooftop остаётся отдельной статьёй.
+- `[buy]` только на найденные READY slug; мягкие ссылки на `/events/…`, города и `/bridges-night` / `/vecherinki-na-teplohode`.
+- Commit → `deploy-prod-next` → `blog:upsert` ×10.
+
+### Проблемы / расхождения цен (текст vs карточка)
+
+| Событие | В тексте | На prod |
 |---------|----------|---------|
-| ╨Ш╨│╨╛╤А╤М ╨б╨║╨╗╤П╤А Jazz Classic Community | ╨╛╤В 500 тВ╜ | minPrice **2500** |
-| ╨Ю╤А╨│╨░╨╜ ╨▓ ╨Я╨╗╨░╨╜╨╡╤В╨░╤А╨╕╨╕. ╨С╨╡╨╗╤Л╨╡ ╨╜╨╛╤З╨╕ | ╨╛╤В 600 тВ╜ | minPrice **2000** |
-| ╨Ь╤Г╨╖╨╡╨╣ ╨У╨░╤А╤А╨╕ ╨Я╨╛╤В╤В╨╡╤А╨░ (╨┤╨╡╤В╤Б╨║╨╕╨╡) | ╨╛╤В 1390 тВ╜ | ╨║╨░╤А╤В╨╛╤З╨║╨░ ╨╝╤Г╨╖╨╡╤П **940** (╨┤╨╡╤В╤Б╨║╨╕╨╣ ╤В╨░╤А╨╕╤Д ╨╝╨╛╨│ ╨╛╤В╨╗╨╕╤З╨░╤В╤М╤Б╤П) |
-| ╨Ф╨▓╨╛╤А╤Л/╨┐╨░╤А╨░╨┤╨╜╤Л╨╡ ┬л╨▓╤Е╨╛╨┤┬╗ | ╨╛╤В 590 тВ╜ (╤Б╨║╨╕╨┤╨║╨░) | ╨╡╤Б╤В╤М READY ╨╖╨░ 590; ╤Б╨╛╤Б╨╡╨┤╨╜╨╕╨╡ ┬л╨┤╨▓╨╛╤А╤Л ╨Я╨╡╤В╤А╨╛╨│╤А╨░╨┤╤Б╨║╨╛╨╣┬╗ ╨╛╤В **290** |
-| ╨Ъ╨╛╨╝╨╝╤Г╨╜╨░╨╗╨║╨░ ╨▓ ╤Б╨▓╤П╨╖╨║╨╡ ┬л╨┤╨▓╨╛╤А╤Л+╨┐╨░╤А╨░╨┤╨╜╤Л╨╡┬╗ | ╨╛╤В 990 тВ╜ | ╨╛╤В╨┤╨╡╨╗╤М╨╜╨░╤П ┬л╨н╨║╤Б╨║╤Г╤А╤Б╨╕╤П ╨┐╨╛ ╨║╨╛╨╝╨╝╤Г╨╜╨░╨╗╤М╨╜╤Л╨╝┬╗ ╨╛╤В **850** |
-| ╨Э╨╛╤З╨╜╨░╤П ╨┐╤А╨╛╨│╤Г╨╗╨║╨░ ╨║ ╨Ф╨▓╨╛╤А╤Ж╨╛╨▓╨╛╨╝╤Г/╨в╤А╨╛╨╕╤Ж╨║╨╛╨╝╤Г | ╨╛╤В 1100 тВ╜ | ╨▒╨╗╨╕╨╢╨░╨╣╤И╨╕╨╣ READY ┬л╨║ ╨Ф╨▓╨╛╤А╤Ж╨╛╨▓╨╛╨╝╤Г ╨╕ ╨в╤А╨╛╨╕╤Ж╨║╨╛╨╝╤Г┬╗ **1500** |
-| ┬л╨ж╨╕╤А╨║ ╨Ь╨░╨║╤Б╨╕╨╝╤Г╤Б┬╗ (╨г╤Д╨░) | ╨╛╤В 1200 тВ╜ | READY slug **╨╜╨╡ ╨╜╨░╨╣╨┤╨╡╨╜** (╤В╨╡╨║╤Б╤В ╨▒╨╡╨╖ buy) |
+| Игорь Скляр Jazz Classic Community | от 500 ₽ | minPrice **2500** |
+| Орган в Планетарии. Белые ночи | от 600 ₽ | minPrice **2000** |
+| Музей Гарри Поттера (детские) | от 1390 ₽ | карточка музея **940** (детский тариф мог отличаться) |
+| Дворы/парадные «вход» | от 590 ₽ (скидка) | есть READY за 590; соседние «дворы Петроградской» от **290** |
+| Коммуналка в связке «дворы+парадные» | от 990 ₽ | отдельная «Экскурсия по коммунальным» от **850** |
+| Ночная прогулка к Дворцовому/Троицкому | от 1100 ₽ | ближайший READY «к Дворцовому и Троицкому» **1500** |
+| «Цирк Максимус» (Уфа) | от 1200 ₽ | READY slug **не найден** (текст без buy) |
 
 ---
 
-## 2026-07-19 тАФ ╨Ъ╨░╨╜╨╛╨╜ ╨Ь╨░╨║╤Б╨░ ╨╖╨░╤Д╨╕╨║╤Б╨╕╤А╨╛╨▓╨░╨╜: ┬л╨е╨╡╨╣, ╤З╨╕╤В╨░╤В╨╡╨╗╨╕!┬╗
+## 2026-07-19 — Канон Макса зафиксирован: «Хей, читатели!»
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨░╤А╨░╨╗╨╗╨╡╨╗╤М╨╜╤Л╨╣ ╨░╨│╨╡╨╜╤В ╤Д╨╕╨╗╤М╤В╤А╨╛╨▓ ╨▓╨╡╤А╨╜╤Г╨╗ ╤Б╤В╨░╤А╤Л╨╣ ╨║╨░╨╜╨╛╨╜ ┬л╨н╨╣, ╨║╤В╨╛ ╨╜╨░ ╨╝╨░╤А╤И╤А╤Г╤В╨╡!┬╗ / ┬л╨Я╤Г╤В╨╡╤И╨╡╤Б╤В╨▓╤Г╨╣╤В╨╡тАж┬╗ ╨╕ open-air PUBLISHED тАФ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М ╨╛╤В╨▓╨╡╤А╨│.
-- ╨Э╨░ ╨┐╤А╨╛╨┤╨╡ ╨╜╤Г╨╢╨╡╨╜ ╨┐╨╛╨╗╨╜╤Л╨╣ ╤В╨╡╨║╤Б╤В `fentezi-fest-bylinnyy-bereg` + `[buy]` ╨╜╨░ ╨┤╨▓╨░ TC-╤Б╨╛╨▒╤Л╤В╨╕╤П.
+- Параллельный агент фильтров вернул старый канон «Эй, кто на маршруте!» / «Путешествуйте…» и open-air PUBLISHED — пользователь отверг.
+- На проде нужен полный текст `fentezi-fest-bylinnyy-bereg` + `[buy]` на два TC-события.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `01-max.md` / `personas.json` / README: ╨║╨░╨╜╨╛╨╜ ╤В╨╛╨╗╤М╨║╨╛ ┬л╨е╨╡╨╣, ╤З╨╕╤В╨░╤В╨╡╨╗╨╕!┬╗ тЖТ ┬л╨Ь╨╕╤А ╨╗╤Г╤З╤И╨╡ ╨▓╨╕╨┤╨╡╤В╤М ╤Б╨▓╨╛╨╕╨╝╨╕ ╨│╨╗╨░╨╖╨░╨╝╨╕!┬╗; ┬л╨н╨╣тАж┬╗ ╨▓ ╤Б╨┐╨╕╤Б╨║╨╡ ╨╖╨░╨┐╤А╨╡╤Й╤С╨╜╨╜╤Л╤Е.
+- `01-max.md` / `personas.json` / README: канон только «Хей, читатели!» → «Мир лучше видеть своими глазами!»; «Эй…» в списке запрещённых.
 - Upsert: fest PUBLISHED (6699 chars, has_hey/buy/mir), open-air HIDDEN.
 - Prod HTML verified: has_hey=true, has_ey=false, buy labels/slugs present; open-air 404.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Concurrent `next build` ╨╜╨░ 4GB RAM тЖТ ENOENT pages-manifest / OOM; ╨╜╤Г╨╢╨╡╨╜ flock + stop web ╨╜╨░ ╨▓╤А╨╡╨╝╤П ╨▒╨╕╨╗╨┤╨░.
+- Concurrent `next build` на 4GB RAM → ENOENT pages-manifest / OOM; нужен flock + stop web на время билда.
 
 ---
 
-## 2026-07-19 тАФ ╨Я╤А╨╛╨┤-verify: ╨║╨░╨╜╨╛╨╜ ╨Ь╨░╨║╤Б╨░ ╨╜╨░ `fentezi-fest-bylinnyy-bereg`
+## 2026-07-19 — Прод-verify: канон Макса на `fentezi-fest-bylinnyy-bereg`
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Ц╨░╨╗╨╛╨▒╨░: ╨╜╨░ ╨┐╤А╨╛╨┤╨╡ ╤П╨║╨╛╨▒╤Л ╨╡╤Й╤С ┬л╨н╨╣, ╨║╤В╨╛ ╨╜╨░ ╨╝╨░╤А╤И╤А╤Г╤В╨╡┬╗ (╨║╨╛╤А╨╛╤В╨║╨╕╨╣ ╤З╨╡╤А╨╜╨╛╨▓╨╕╨║). Curl + DB ╨┐╨╛╤Б╨╗╨╡ upsert ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╤О╤В ╨┐╨╛╨╗╨╜╤Л╨╣ ╨║╨░╨╜╨╛╨╜.
+- Жалоба: на проде якобы ещё «Эй, кто на маршруте» (короткий черновик). Curl + DB после upsert показывают полный канон.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Я╨╛╨▓╤В╨╛╤А╨╜╤Л╨╣ `blog:upsert --slug=fentezi-fest-bylinnyy-bereg` + revalidate paths/tags.
+- Повторный `blog:upsert --slug=fentezi-fest-bylinnyy-bereg` + revalidate paths/tags.
 - DB: `has_hey=true`, `has_ey=false`, `has_mir=true`, `has_buy=true`, ~6699 chars.
-- `docs/Project.md`: ╨║╨░╨╜╨╛╨╜ ╨Ь╨░╨║╤Б╨░ ╨┐╤А╨╕╨▓╨╡╨┤╤С╨╜ ╨║ ┬л╨е╨╡╨╣, ╤З╨╕╤В╨░╤В╨╡╨╗╨╕!┬╗ / ┬л╨Ь╨╕╤А ╨╗╤Г╤З╤И╨╡ ╨▓╨╕╨┤╨╡╤В╤М ╤Б╨▓╨╛╨╕╨╝╨╕ ╨│╨╗╨░╨╖╨░╨╝╨╕!┬╗.
+- `docs/Project.md`: канон Макса приведён к «Хей, читатели!» / «Мир лучше видеть своими глазами!».
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В (smoke curl OK).
-
----
-
-## 2026-07-19 тАФ ╨д╨╛╤А╨╝╨░╤В ┬л╨а╨╡╨┤╨░╨║╤Ж╨╕╤П┬╗ + rewrite 4 ╨│╨╕╨┤╨╛╨▓
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М ╨╖╨░╤Д╨╕╨║╤Б╨╕╤А╨╛╨▓╨░╨╗ ╨╛╤В╨┤╨╡╨╗╤М╨╜╤Л╨╣ ╤Д╨╛╤А╨╝╨░╤В ╨╛╨▒╤Й╨╕╤Е ╤Б╤В╨░╤В╨╡╨╣ (╨╜╨╡ ╨║╨╛╨╗╨╛╨╜╨║╨╕): ╨▒╨╡╨╖ ╨┐╤А╨╕╨▓╨╡╤В╤Б╤В╨▓╨╕╨╣ ╨┐╨╡╤А╤Б╨╛╨╜, ╨┐╨╛╨╝╨╛╤Й╤М ╨▓ ╨▓╤Л╨▒╨╛╤А╨╡, ╤З╨╡╤Б╤В╨╜╤Л╨╡ ╨╛╨│╨╛╨▓╨╛╤А╨║╨╕, ╤П╤Б╨╜╤Л╨╣ ╨▓╤Л╨▓╨╛╨┤.
-- ╨з╨╡╤В╤Л╤А╨╡ ╤В╨╡╨║╤Б╤В╨░ ╨╜╨░ ╨╖╨░╨╝╨╡╨╜╤Г: ╨║╤А╤Л╤И╨╕+╨╝╨╛╤Б╤В╤Л, ╨┤╨╡╤В╨╕, ╨┤╨╢╨░╨╖, ╨╝╨╡╤Б╤В╨░ ╨▓ ╨╖╨░╨╗╨╡.
-- `spb-rooftop-guide` ╨╕ `spb-razvod-mostov-kakoi-reis` ╨┐╨╡╤А╨╡╤Б╨╡╨║╨░╨╗╨╕╤Б╤М ╨┐╨╛ ╤В╨╡╨╝╨╡ ╨╝╨╛╤Б╤В╨╛╨▓.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨Ф╨╛╨║╤Г╨╝╨╡╨╜╤В ╤Д╨╛╤А╨╝╨░╤В╨░: `docs/ai-journalists/00-editorial.md`.
-- ╨Ю╨▒╨╜╨╛╨▓╨╗╨╡╨╜╤Л MD + ╤Б╤В╨░╤В╨╕╨║╨░ ╨┤╨╗╤П 4 slug; `kuda-poyti-s-detmi` тЖТ `authorId=editorial`.
-- `spb-razvod-mostov-kakoi-reis` тЖТ HIDDEN + 301 ╨▓ `blog/[slug]/page.tsx` тЖТ `/blog/spb-rooftop-guide`.
-- Soft-╤Б╤Б╤Л╨╗╨║╨╕ ╨╜╨░ READY ╤Б╨╛╨▒╤Л╤В╨╕╤П + `[buy]` (MVP ╤Г╨╢╨╡ ╨╡╤Б╤В╤М): ╨║╤А╤Л╤И╨░, 5 ╨╝╨╛╤Б╤В╨╛╨▓, ╨╝╨╛╤А╤П╨║╨╕, ╨┤╨╢╨╡╨╝, ╨б╨║╨╗╤П╤А.
-- `publishedAt` ╨╜╨╡ ╤Б╨▒╤А╨░╤Б╤Л╨▓╨░╨╡╨╝ (upsert coalesce).
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╨╡╤В.
+- Нет (smoke curl OK).
 
 ---
 
-## 2026-07-19 тАФ ╨Ъ╨╛╨╗╨╛╨╜╨║╨░ ╨Ь╨░╨║╤Б╨░: ╨┐╨╛╨╗╨╜╤Л╨╣ ╤В╨╡╨║╤Б╤В + `[buy]` shortcode
+## 2026-07-19 — Формат «Редакция» + rewrite 4 гидов
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Ъ╨╛╤А╨╛╤В╨║╨╕╨╣ ╤З╨╡╤А╨╜╨╛╨▓╨╕╨║ ╨╜╨░ `fentezi-fest-bylinnyy-bereg` (fe99420) ╨╛╤В╨▓╨╡╤А╨│╨╜╤Г╤В: ╨╜╤Г╨╢╨╡╨╜ ╨┐╨╛╨╗╨╜╤Л╨╣ ╨║╨░╨╜╨╛╨╜ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤П (┬л╨е╨╡╨╣, ╤З╨╕╤В╨░╤В╨╡╨╗╨╕!┬╗ тЖТ ┬л╨Ь╨╕╤А ╨╗╤Г╤З╤И╨╡ ╨▓╨╕╨┤╨╡╤В╤М ╤Б╨▓╨╛╨╕╨╝╨╕ ╨│╨╗╨░╨╖╨░╨╝╨╕!┬╗).
-- ╨Э╤Г╨╢╨╜╨░ ╨┐╨╛╨║╤Г╨┐╨║╨░ ╨╕╨╖ ╤Б╤В╨░╤В╤М╨╕ ╨▒╨╡╨╖ MDX: ╨┐╨░╤А╤Б╨╡╤А shortcode ╨║╨░╨║ ╤Г `[CTA]` / `[image]`.
+- Пользователь зафиксировал отдельный формат общих статей (не колонки): без приветствий персон, помощь в выборе, честные оговорки, ясный вывод.
+- Четыре текста на замену: крыши+мосты, дети, джаз, места в зале.
+- `spb-rooftop-guide` и `spb-razvod-mostov-kakoi-reis` пересекались по теме мостов.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Я╨╡╤А╨╡╨╖╨░╨┐╨╕╤Б╨░╨╜ `content/blog/fentezi-fest-bylinnyy-bereg.md` ╨┐╨╛╨╗╨╜╤Л╨╝ ╤В╨╡╨║╤Б╤В╨╛╨╝ ╨Ь╨░╨║╤Б╨░; ╨┤╤Г╨▒╨╗╨╕ (`*-volhov`, `bylinnyy-bereg-fentezi-fest`, `open-air-festy-vyhodnoi-ru`) тЖТ HIDDEN.
-- MVP `[buy slug="тАж" label="тАж"]` тЖТ `BlogBuyButton.client.tsx` тЖТ `LandingPurchaseButton` / fallback `/events/{slug}`.
-- ╨Ъ╨╜╨╛╨┐╨║╨╕: `tc-6a08d60c3aa2e7a8469953dc-bylinnyi-bereg-2026`, `tc-6a0a1d4d69c61af2fb0eb202-fentezi-fest-2026`.
-- ╨Ъ╨░╨╜╨╛╨╜ ╨Ь╨░╨║╤Б╨░ ╨▓ `01-max.md` / `personas.json`: ╨┐╤А╨╕╨▓╨╡╤В╤Б╤В╨▓╨╕╨╡ ┬л╨е╨╡╨╣, ╤З╨╕╤В╨░╤В╨╡╨╗╨╕!┬╗, ╤Д╨╕╨╜╨░╨╗ ┬л╨Ь╨╕╤А ╨╗╤Г╤З╤И╨╡ ╨▓╨╕╨┤╨╡╤В╤М ╤Б╨▓╨╛╨╕╨╝╨╕ ╨│╨╗╨░╨╖╨░╨╝╨╕!┬╗.
+- Документ формата: `docs/ai-journalists/00-editorial.md`.
+- Обновлены MD + статика для 4 slug; `kuda-poyti-s-detmi` → `authorId=editorial`.
+- `spb-razvod-mostov-kakoi-reis` → HIDDEN + 301 в `blog/[slug]/page.tsx` → `/blog/spb-rooftop-guide`.
+- Soft-ссылки на READY события + `[buy]` (MVP уже есть): крыша, 5 мостов, моряки, джем, Скляр.
+- `publishedAt` не сбрасываем (upsert coalesce).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╤В.
-
----
-
-## 2026-07-19 тАФ ╨Ъ╨╛╨╗╨╛╨╜╨║╨░ ╨Ь╨░╨║╤Б╨░: rewrite тЖТ `fentezi-fest-bylinnyy-bereg`
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Я╨╕╨╗╨╛╤В `open-air-festy-vyhodnoi-ru` (╨┐╨╡╤Б╨╛╨║ + ╨Р╨▓╤В╨╛╨┤╤А╨╛╨╝) ╨╛╤В╨▓╨╡╤А╨│╨╜╤Г╤В ╨║╨░╨║ ┬л╨╜╨░╨▒╨╛╤А ╨▒╤Г╨║╨▓┬╗; ╨╜╤Г╨╢╨╜╨░ ╨╛╨┤╨╜╨░ ╤Б╨▓╤П╨╖╨╜╨░╤П ╨╕╤Б╤В╨╛╤А╨╕╤П.
-- ╨Т ╨░╤Д╨╕╤И╨╡ ╨╢╨╕╨▓╤Л╨╡ ╤Б╨╛╨▒╤Л╤В╨╕╤П: ╨С╤Л╨╗╨╕╨╜╨╜╤Л╨╣ ╨С╨╡╤А╨╡╨│ 2026 ╨╕ ╨д╤Н╨╜╤В╨╡╨╖╨╕ ╨д╨╡╤Б╤В 2026 тАФ ╨╛╨┤╨╜╨░ ╨┐╨╗╨╛╤Й╨░╨┤╨║╨░ ╤Г ╨Ч╨░╤Е╨░╤А╤М╨╕╨╜╨╛ (╨Т╨╛╨╗╤Е╨╛╨▓), ╤Б╨╛╤Б╨╡╨┤╨╜╨╕╨╡ ╨┤╨░╤В╤Л, ╨╛╨┤╨╜╨╕ ╨╛╤А╨│╨░╨╜╨╕╨╖╨░╤В╨╛╤А╤Л.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨Э╨╛╨▓╨░╤П ╨║╨╛╨╗╨╛╨╜╨║╨░ `fentezi-fest-bylinnyy-bereg` (╨Ь╨░╨║╤Б): 4 ╨░╨▒╨╖╨░╤Ж╨░ + ╤Д╨╕╨╜╨░╨╗, ~1430 ╨╖╨╜╨░╨║╨╛╨▓ visible; ╨║╨░╨╜╨╛╨╜ ┬л╨н╨╣, ╨║╤В╨╛ ╨╜╨░ ╨╝╨░╤А╤И╤А╤Г╤В╨╡!┬╗ / ┬л╨Я╤Г╤В╨╡╤И╨╡╤Б╤В╨▓╤Г╨╣╤В╨╡. ╨Ю╨╜╨╛ ╤В╨╛╨│╨╛ ╤Б╤В╨╛╨╕╤В┬╗.
-- ╨б╤В╨░╤А╤Л╨╣ `open-air-festy-vyhodnoi-ru` тЖТ `status: HIDDEN` (MD + upsert).
-- ╨Э╨╛╨▓╤Л╨╡ ╨╛╨▒╨╗╨╛╨╢╨║╨░/inline; byline ╨▓ `BlogArticleHero` ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╡╤В `authorName` (╨Ь╨░╨║╤Б), ╨╜╨╡ ╤В╨╕╨┐ ┬л╨Ъ╨╛╨╗╨╛╨╜╨║╨░┬╗.
-- ╨Я╤Г╨▒╨╗╨╕╨║╨░╤Ж╨╕╤П: commit тЖТ push тЖТ `deploy-prod-next.sh` тЖТ `blog:upsert` ╨╛╨▒╨╛╨╕╤Е slug.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- Pseudo-city `regions` ╨┤╨╗╤П ╨Э╨╛╨▓╨│╨╛╤А╨╛╨┤╤Б╨║╨╛╨╣ ╨╛╨▒╨╗╨░╤Б╤В╨╕ ╨▓ ╤Д╨╕╨╗╤М╤В╤А╨╡ ╨▒╨╗╨╛╨│╨░ (╨╜╨╡╤В ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛╨│╨╛ City slug ╨▓ ╨║╨░╤А╤В╨╛╤З╨║╨╡).
+- Нет.
 
 ---
 
-## 2026-07-19 тАФ ╨С╨╗╨╛╨│: ╤Д╨╕╨╗╤М╤В╤А╤Л ╨│╨╛╤А╨╛╨┤+╨░╨▓╤В╨╛╤А + ╨║╨░╨╜╨╛╨╜ ╨┐╤А╨╕╨▓╨╡╤В╤Б╤В╨▓╨╕╤П ╨Ь╨░╨║╤Б╨░
+## 2026-07-19 — Колонка Макса: полный текст + `[buy]` shortcode
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╨░ `/blog` ╨╜╤Г╨╢╨╜╤Л ╤И╨░╤А╨╕╤А╤Г╨╡╨╝╤Л╨╡ ╤Д╨╕╨╗╤М╤В╤А╤Л; ╨╛╤В╨┤╨╡╨╗╤М╨╜╤Л╨╣ ┬л╤В╨╕╨┐ ╤Б╤В╨░╤В╤М╨╕┬╗ ╨┤╤Г╨▒╨╗╨╕╤А╤Г╨╡╤В ╨│╨╛╨╗╨╛╤Б ╨░╨▓╤В╨╛╤А╨░ (╨║╨╛╨╗╨╛╨╜╨║╨░ = ╨Ь╨░╨║╤Б ╨╕ ╤В.╨┐.).
-- ┬л╨Ъ╨░╤Б╨░╤В╨╕╨║╨╕, ╨┐╤А╨╕╨▓╨╡╤В┬╗ ╤Б╨╗╨╕╤И╨║╨╛╨╝ ╨▒╨╗╨╕╨╖╨║╨╛ ╨║ ╨╝╨░╤А╨║╨╡╤А╤Г ╨Я╤В╤Г╤И╨║╨╕╨╜╨░ тАФ ╤А╨╕╤Б╨║ ╨┐╨╗╨░╨│╨╕╨░╤В╨░.
+- Короткий черновик на `fentezi-fest-bylinnyy-bereg` (fe99420) отвергнут: нужен полный канон пользователя («Хей, читатели!» → «Мир лучше видеть своими глазами!»).
+- Нужна покупка из статьи без MDX: парсер shortcode как у `[CTA]` / `[image]`.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- Prisma: `Article.authorId` / `authorName` / `articleType` + ╨╝╨╕╨│╤А╨░╤Ж╨╕╤П ╤Б backfill ╨┐╨╛ slug.
-- UI: ╨┤╨▓╨░ ╤Д╨╕╨╗╤М╤В╤А╨░ тАФ **╨У╨╛╤А╨╛╨┤** ╨╕ **╨Р╨▓╤В╨╛╤А** (╨╕╨╝╨╡╨╜╨░: ╨Ь╨░╨║╤Б, ╨Р╨╜╨╜╨░, ╨Х╨╗╨╡╨╜╨░, ╨а╨╡╨┤╨░╨║╤Ж╨╕╤ПтАж); query `?city=&author=`.
-- ╨Ъ╨░╨╜╨╛╨╜ ╨Ь╨░╨║╤Б╨░: ╨┐╤А╨╕╨▓╨╡╤В╤Б╤В╨▓╨╕╨╡ **┬л╨н╨╣, ╨║╤В╨╛ ╨╜╨░ ╨╝╨░╤А╤И╤А╤Г╤В╨╡!┬╗**; ╨┐╤А╨╛╤Й╨░╨╜╨╕╨╡ ┬л╨Я╤Г╤В╨╡╤И╨╡╤Б╤В╨▓╤Г╨╣╤В╨╡. ╨Ю╨╜╨╛ ╤В╨╛╨│╨╛ ╤Б╤В╨╛╨╕╤В┬╗ ╨╛╤Б╤В╨░╨▓╨╗╨╡╨╜╨╛.
-- ╨Ю╨▒╨╜╨╛╨▓╨╗╨╡╨╜╤Л `01-max.md`, `personas.json`, ╤Б╤В╨░╤В╤М╤П `open-air-festy-vyhodnoi-ru`, upsert/DTO.
+- Перезаписан `content/blog/fentezi-fest-bylinnyy-bereg.md` полным текстом Макса; дубли (`*-volhov`, `bylinnyy-bereg-fentezi-fest`, `open-air-festy-vyhodnoi-ru`) → HIDDEN.
+- MVP `[buy slug="…" label="…"]` → `BlogBuyButton.client.tsx` → `LandingPurchaseButton` / fallback `/events/{slug}`.
+- Кнопки: `tc-6a08d60c3aa2e7a8469953dc-bylinnyi-bereg-2026`, `tc-6a0a1d4d69c61af2fb0eb202-fentezi-fest-2026`.
+- Канон Макса в `01-max.md` / `personas.json`: приветствие «Хей, читатели!», финал «Мир лучше видеть своими глазами!».
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Pseudo-╨│╨╛╤А╨╛╨┤╨░ `regions` / `multi` ╨┤╨╗╤П ╤Д╨╕╨╗╤М╤В╤А╨░ (╨╜╨╡╤В ╤Б╤В╤А╨╛╨║╨╕ ╨▓ `City`) тАФ ╨╝╨░╨┐╨┐╨╕╨╜╨│ ╨▓ DTO ╨┐╨╛ slug.
-
----
-
-## 2026-07-19 тАФ ╨Ъ╨╛╨╗╨╛╨╜╨║╨░ ╨Ь╨░╨║╤Б╨░: `open-air-festy-vyhodnoi-ru`
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Я╨╡╤А╨▓╤Л╨╣ ╨┐╨╕╨╗╨╛╤В ┬л╨Ш╨╖╨╜╨░╨╜╨║╨░ ╨╝╨░╤А╤И╤А╤Г╤В╨░┬╗: open-air ╨▓╤Л╤Е╨╛╨┤╨╜╨╛╨│╨╛ (╨┐╨╡╤Б╤З╨░╨╜╤Л╨╣ ╤Д╨╡╤Б╤В + ╨Р╨▓╤В╨╛╨┤╤А╨╛╨╝ ╨д╨╡╤Б╤В ╨╕╨╖ ╨╢╨╕╨▓╨╛╨╣ ╨░╤Д╨╕╤И╨╕).
-- ╨д╨╛╤А╨╝╨░: 4тАУ5 ╨░╨▒╨╖╨░╤Ж╨╡╨▓, ~1200тАУ1800 ╨╖╨╜╨░╨║╨╛╨▓, ╨╛╨▒╨╗╨╛╨╢╨║╨░ + inline, ╨║╨░╨╜╨╛╨╜ ╨┐╤А╨╕╨▓╨╡╤В╤Б╤В╨▓╨╕╤П/╤Д╨╕╨╜╨░╨╗╨░ ╨Ь╨░╨║╤Б╨░ + ╨┐╤А╨╕╤С╨╝╤Л Perito (╨▓╨╡╤А╨┤╨╕╨║╤В, ╨╕╨╖╨╜╨░╨╜╨║╨░, ╨╗╨░╨╣╤Д╤Е╨░╨║, ╨▓╨╕╨┤╨╢╨╡╤В).
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- MD `content/blog/open-air-festy-vyhodnoi-ru.md` (`authorId=max`); ╨║╨░╤А╤В╨╛╤З╨║╨╕ web+public; `blog:sync-bodies`.
-- ╨Я╨╡╤А╨╡╨┐╨╕╤Б╤М ╨┐╨╛╨┤ ╤Б╤В╨░╨╜╨┤╨░╤А╤В ┬з ┬л╨а╨╡╤Д╨╡╤А╨╡╨╜╤Б Perito┬╗ ╨▓ `01-max.md` (╨░╨╗╤М╤В╨╡╤А╨╜╨░╤В╨╕╨▓╨░ ╤З╨╡╨║╨╗╨╕╤Б╤В╤Г, ┬л╨╜╨╛╤А╨╝ ╨╜╨╛ ╨╜╨╡ ╨╜╨╛╤А╨╝┬╗, ╨╕╨╖╨╜╨░╨╜╨║╨░ ╤А╤П╨┤╨╛╨╝ ╤Б ╨║╨░╨╣╤Д╨╛╨╝, CTA ╨▓ ╨▓╨╕╨┤╨╢╨╡╤В).
-- ╨Ъ╨░╤А╤В╨╕╨╜╨║╨╕ ╨▓ `apps/public/public/images/blog/` (+ sync web).
-- ╨Я╤Г╨▒╨╗╨╕╨║╨░╤Ж╨╕╤П: commit тЖТ push тЖТ `deploy-prod-next.sh` тЖТ `blog:upsert --slug=open-air-festy-vyhodnoi-ru`.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- UI byline ╨┐╨╛ `authorId` ╨╡╤Й╤С ╨╜╨╡╤В тАФ ╨╝╨╡╤В╨░╨┤╨░╨╜╨╜╤Л╨╡ ╤В╨╛╨╗╤М╨║╨╛ ╨▓ frontmatter.
+- Нет.
 
 ---
 
-## 2026-07-19 тАФ ╨а╨╡╤Д╨╡╤А╨╡╨╜╤Б Perito тЖТ ╨║╨╛╨╗╨╛╨╜╨║╨░ ╨Ь╨░╨║╤Б╨░ (╤Б╨╛╨▒╤Л╤В╨╕╤П/╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╕)
+## 2026-07-19 — Колонка Макса: rewrite → `fentezi-fest-bylinnyy-bereg`
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М ╨┤╨░╨╗ ╤А╨╡╤Д╨╡╤А╨╡╨╜╤Б [Perito / ╨Я╤В╤Г╤И╨║╨╕╨╜ тАФ ╨С╨░╨╗╨║╨░╨╜╤Л](https://perito.media/posts/ptushkin-balcans): ╤Б╨╕╨╗╤М╨╜╤Л╨╡ ╤Б╤В╨╛╤А╨╛╨╜╤Л тАФ ╤А╨╕╤В╨╝ ╨║╨╛╤А╨╛╤В╨║╨╕╤Е ╨▒╨╗╨╛╨║╨╛╨▓, ╤З╨╡╤Б╤В╨╜╤Л╨╣ ╨▓╨╡╤А╨┤╨╕╨║╤В, ╨▒╤Л╤В╨╛╨▓╨░╤П ╨┤╨╡╤В╨░╨╗╤М, ╤Д╨╛╤В╨╛ ╨╜╨░ ╤Б╨╡╨║╤Ж╨╕╤О, ╤А╨░╨╖╨│╨╛╨▓╨╛╤А╨╜╤Л╨╣ ╤В╨╛╨╜ ╨▒╨╡╨╖ PR.
-- ╨Э╤Г╨╢╨╜╨╛ ┬л╨▒╨╗╨╕╨╖╨║╨╛, ╨╜╨╛ ╨┐╨╛ ╤Б╨╛╨▒╤Л╤В╨╕╤П╨╝ ╨╕ ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╤П╨╝┬╗, ╨╜╨╡ ╤В╤А╨╡╨▓╨╡╨╗ ╨┐╨╛ ╤Б╤В╤А╨░╨╜╨░╨╝.
+- Пилот `open-air-festy-vyhodnoi-ru` (песок + Автодром) отвергнут как «набор букв»; нужна одна связная история.
+- В афише живые события: Былинный Берег 2026 и Фэнтези Фест 2026 — одна площадка у Захарьино (Волхов), соседние даты, одни организаторы.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Т `docs/ai-journalists/01-max.md` ╨┤╨╛╨▒╨░╨▓╨╗╨╡╨╜╨░ ╤Б╨╡╨║╤Ж╨╕╤П **┬л╨а╨╡╤Д╨╡╤А╨╡╨╜╤Б Perito┬╗**: ╨░╨┤╨░╨┐╤В╨░╤Ж╨╕╤П ╨┐╤А╨╕╤С╨╝╨╛╨▓ (╨╛╤З╨╡╤А╨╡╨┤╤М, ╨│╨╕╨┤, ╨▓╨╕╨┤╨╢╨╡╤В, ╤З╤В╨╛ ╨▓╨╖╤П╤В╤М, ╨╕╨╖╨╜╨░╨╜╨║╨░, ╤Н╨╝╨╛╤Ж╨╕╤П 1.5тАУ2 ╨╝╨╕╨╜).
-- System prompt ╨Ь╨░╨║╤Б╨░: 4тАУ5 ╨░╨▒╨╖╨░╤Ж╨╡╨▓, 1200тАУ1800 ╨╖╨╜╨░╨║╨╛╨▓; README + `personas.json` + `content-blog-plan.md` ╤Б╨╕╨╜╤Е╤А╨╛╨╜╨╕╨╖╨╕╤А╨╛╨▓╨░╨╜╤Л.
-- ╨з╤Г╨╢╨╛╨╣ ╤В╨╡╨║╤Б╤В ╨╜╨╡ ╨║╨╛╨┐╨╕╤А╤Г╨╡╨╝ тАФ ╤В╨╛╨╗╤М╨║╨╛ ╤Д╨╛╤А╨╝╨░ ╨╕ ╤З╨╡╤Б╤В╨╜╨╛╤Б╤В╤М ╤Г╨│╨╗╨░.
+- Новая колонка `fentezi-fest-bylinnyy-bereg` (Макс): 4 абзаца + финал, ~1430 знаков visible; канон «Эй, кто на маршруте!» / «Путешествуйте. Оно того стоит».
+- Старый `open-air-festy-vyhodnoi-ru` → `status: HIDDEN` (MD + upsert).
+- Новые обложка/inline; byline в `BlogArticleHero` показывает `authorName` (Макс), не тип «Колонка».
+- Публикация: commit → push → `deploy-prod-next.sh` → `blog:upsert` обоих slug.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Я╨╕╨╗╨╛╤В `open-air-festy-vyhodnoi-ru` ╤Б╤А╨░╨╖╤Г ╨┐╨╕╤Б╨░╨╗╤Б╤П ╨┐╨╛╨┤ ╨╛╨▒╨╜╨╛╨▓╨╗╤С╨╜╨╜╤Л╨╣ ╨║╨░╨╜╨╛╨╜ (Perito-╨┐╤А╨╕╤С╨╝╤Л + System prompt ╨Ь╨░╨║╤Б╨░).
-
----
-
-## 2026-07-19 тАФ ╨С╨╗╨╛╨│: ╤А╨░╨╖╨╜╨╡╤Б╤В╨╕ publishedAt (7тАУ19 ╨╕╤О╨╗╤П)
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Т╤Б╨╡ 17 PUBLISHED ╤Б╤В╨░╤В╨╡╨╣ ╨╜╨░ prod ╨╕╨╝╨╡╨╗╨╕ ╨┤╨░╤В╤Л ╨╗╨╕╨▒╨╛ ╨╕╤О╨╜╤М╤Б╨║╨╕╨╡ evergreen, ╨╗╨╕╨▒╨╛ ╨┐╨░╤З╨║╤Г ╨╜╨░ 18тАУ19 ╨╕╤О╨╗╤П (4 ╨╜╨╛╨▓╤Л╤Е MD).
-- ╨б╨┐╨╕╤Б╨╛╨║ ╨╜╨░ `/blog` ╤Б╨╛╤А╤В╨╕╤А╤Г╨╡╤В╤Б╤П ╨┐╨╛ `Article.publishedAt` ╨╕╨╖ API; static `date` ╨▓ `blog-posts.ts` тАФ fallback.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨а╨░╨▓╨╜╨╛╨╝╨╡╤А╨╜╨╛-╨╡╤Б╤В╨╡╤Б╤В╨▓╨╡╨╜╨╜╨╛ ╤А╨░╨╖╨╜╨╡╤Б╨╡╨╜╤Л ╨┤╨░╤В╤Л **2026-07-07 тАж 2026-07-19**: evergreen ╤А╨░╨╜╤М╤И╨╡, 4 ╤Б╨▓╨╡╨╢╨╕╤Е ╨│╨╕╨┤╨░ ╨▒╨╗╨╕╨╢╨╡ ╨║ ╤Б╨╡╨│╨╛╨┤╨╜╤П.
-- ╨Ю╨▒╨╜╨╛╨▓╨╗╨╡╨╜╤Л `apps/web` + `apps/public` `blog-posts.ts`, frontmatter ╨▓ `content/blog/*.md`, ╨┐╤А╤П╨╝╨╛╨╣ `UPDATE` ╨╜╨░ prod.
-- `blog:upsert` ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╡╤В ╤Б╤Г╤Й╨╡╤Б╤В╨▓╤Г╤О╤Й╨╕╨╣ `publishedAt` (coalesce) тАФ ╨┤╨╗╤П ╨┤╨░╤В ╨╜╤Г╨╢╨╡╨╜ SQL/admin PATCH.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Я╨╛╤Б╨╗╨╡ UPDATE ╨╜╤Г╨╢╨╡╨╜ revalidate/cache flush ╨┐╤Г╨▒╨╗╨╕╤З╨╜╨╛╨│╨╛ `/api/public/articles` (TTL ╨║╤Н╤И╨░).
+- Pseudo-city `regions` для Новгородской области в фильтре блога (нет отдельного City slug в карточке).
 
 ---
 
-## 2026-07-19 тАФ Favicon: ╨▒╨╕╨╗╨╡╤В ╤Б╨╗╨╕╤И╨║╨╛╨╝ ╨╝╨╡╨╗╨║╨╛ ╨▓╨╛ ╨▓╨║╨╗╨░╨┤╨║╨╡
+## 2026-07-19 — Блог: фильтры город+автор + канон приветствия Макса
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т tab ╨▒╤А╨░╤Г╨╖╨╡╤А╨░ ╤Б╨╕╨╜╨╕╨╣ ╨▒╨╕╨╗╨╡╤В ╨▓╤Л╨│╨╗╤П╨┤╨╡╨╗ ╨║╤А╨╛╤И╨╡╤З╨╜╤Л╨╝: ╨┤╨╕╨░╨│╨╛╨╜╨░╨╗╤М╨╜╤Л╨╣ ╤Б╨╕╨╗╤Г╤Н╤В + ╨▒╨╛╨╗╤М╤И╨╛╨╡ ╨┐╤А╨╛╨╖╤А╨░╤З╨╜╨╛╨╡ ╨┐╨╛╨╗╨╡ (~30тАУ40% ╨╗╨╕╨╜╨╡╨╣╨╜╨╛╨│╨╛ ╤А╨░╨╖╨╝╨╡╤А╨░).
-- ╨н╤В╨╛ ╨╕╨╝╨╡╨╜╨╜╨╛ favicon ╨▓╨║╨╗╨░╨┤╨║╨╕, ╨╜╨╡ Google SERP.
-- ╨Я╨░╤А╨░╨╗╨╗╨╡╨╗╤М╨╜╤Л╨╣ ╨┤╨╡╨┐╨╗╨╛╨╣ ╨╜╨░ 3.8Gi RAM ╨╗╨╛╨╝╨░╨╗ Next (OOM/SIGTERM) тАФ ╤Б╨░╨╣╤В ╨║╤А╨░╤В╨║╨╛ ╨╛╤В╨┤╨░╨▓╨░╨╗ 502, ╨╖╨░╤В╨╡╨╝ ╨▓╨╛╤Б╤Б╤В╨░╨╜╨╛╨▓╨╗╨╡╨╜.
+- На `/blog` нужны шарируемые фильтры; отдельный «тип статьи» дублирует голос автора (колонка = Макс и т.п.).
+- «Касатики, привет» слишком близко к маркеру Птушкина — риск плагиата.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨г╨▓╨╡╨╗╨╕╤З╨╡╨╜ fill (~90% ╨║╨░╨┤╤А╨░); ╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛ ╨╜╨░ prod тАФ ╨│╨╛╤А╨╕╨╖╨╛╨╜╤В╨░╨╗╤М╨╜╤Л╨╣ classic ticket (Flaticon-style, `#4A7FD4`), ╤З╤В╨╛╨▒╤Л ╤Г╨▒╤А╨░╤В╤М ┬л╨┐╤Г╨│╨░╤О╤Й╤Г╤О┬╗ ╨╝╨╡╨╗╨║╤Г╤О ╨┤╨╕╨░╨│╨╛╨╜╨░╨╗╤М.
-- PNG: 32 / 48 / 96 / apple 180 / 192 / 512 + `favicon.ico`; `site.webmanifest` ╤Б 192+512.
-- `layout.tsx` metadata.icons + `manifest: /site.webmanifest`. ╨Я╤А╨╛╨▓╨╡╤А╨╡╨╜╨╛ live: `/favicon-48x48.png`, `/icon-512x512.png`, `/site.webmanifest` тЖТ 200.
+- Prisma: `Article.authorId` / `authorName` / `articleType` + миграция с backfill по slug.
+- UI: два фильтра — **Город** и **Автор** (имена: Макс, Анна, Елена, Редакция…); query `?city=&author=`.
+- Канон Макса: приветствие **«Эй, кто на маршруте!»**; прощание «Путешествуйте. Оно того стоит» оставлено.
+- Обновлены `01-max.md`, `personas.json`, статья `open-air-festy-vyhodnoi-ru`, upsert/DTO.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Ъ╤Н╤И favicon ╨▓ ╨▒╤А╨░╤Г╨╖╨╡╤А╨╡ ╨░╨│╤А╨╡╤Б╤Б╨╕╨▓╨╜╤Л╨╣ тАФ hard refresh / ╨╜╨╛╨▓╨░╤П ╨▓╨║╨╗╨░╨┤╨║╨░.
-- ╨Э╨╡ ╨│╨╛╨╜╤П╤В╤М ╨┤╨▓╨░ `next build`/`deploy-prod-next` ╨╛╨┤╨╜╨╛╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛ ╨╜╨░ prod (OOM).
-
----
-
-## 2026-07-19 тАФ Favicon: ╤Б╨╜╨╛╨▓╨░ 45┬░, ╨╜╨╛ ╨║╤А╤Г╨┐╨╜╤Л╨╣ fill
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Я╨╛╤Б╨╗╨╡ ╨╖╨░╨╝╨╡╨╜╤Л ╨╜╨░ ╨│╨╛╤А╨╕╨╖╨╛╨╜╤В╨░╨╗╤М╨╜╤Л╨╣ Flaticon ticket ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М ╨╛╨╢╨╕╨┤╨░╨╡╤В ╤Б╨╜╨╛╨▓╨░ ╨┐╨╛╨▓╨╛╤А╨╛╤В ~45┬░.
-- ╨У╨╛╤А╨╕╨╖╨╛╨╜╤В╨░╨╗╤М ╨▒╤Л╨╗╨░ ╨╜╨░╨╝╨╡╤А╨╡╨╜╨╜╨╛╨╣ ╤А╨╡╨░╨║╤Ж╨╕╨╡╨╣ ╨╜╨░ ╨╢╨░╨╗╨╛╨▒╤Г ┬л╨┤╨╕╨░╨│╨╛╨╜╨░╨╗╤М ╨╝╨╡╨╗╨║╨░╤П/╨┐╤Г╨│╨░╤О╤Й╨░╤П┬╗, ╨╜╨╡ ╤Д╨╕╨╜╨░╨╗╤М╨╜╤Л╨╝ ╨╛╤В╨║╨░╨╖╨╛╨╝ ╨╛╤В ╤Г╨│╨╗╨░.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨в╨╛╤В ╨╢╨╡ ╤Б╨╕╨╗╤Г╤Н╤В ticket_1912 / `#4A7FD4`, `rotate(45)` + `scale(0.88)` тЖТ AABB ~88тАУ90% ╨║╨░╨┤╤А╨░, ╨╝╨░╨╗╨╛ padding.
-- ╨Я╨╡╤А╨╡╨│╨╡╨╜╨╡╤А╨╕╤А╨╛╨▓╨░╨╜╤Л 32/48/96, apple 180, 192/512, logo-192, ico, svg (`apps/web/public` + legacy `apps/public/public/favicon.svg`).
-- layout/manifest ╨▒╨╡╨╖ ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╨╣.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Э╤Г╨╢╨╡╨╜ hard refresh / ╨╜╨╛╨▓╨░╤П ╨▓╨║╨╗╨░╨┤╨║╨░ ╨╕╨╖тАС╨╖╨░ ╨║╤Н╤И╨░ favicon.
+- Pseudo-города `regions` / `multi` для фильтра (нет строки в `City`) — маппинг в DTO по slug.
 
 ---
 
-## 2026-07-19 тАФ Favicon: ╨╖╨╡╤А╨║╨░╨╗╤М╨╜╤Л╨╣ ╤Г╨│╨╛╨╗ rotate(-45)
+## 2026-07-19 — Колонка Макса: `open-air-festy-vyhodnoi-ru`
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╤Б╨╗╨╡ `rotate(45)` ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М ╤Г╤В╨╛╤З╨╜╨╕╨╗: ╨╜╤Г╨╢╨╜╨░ **╨┤╤А╤Г╨│╨░╤П ╤Б╤В╨╛╤А╨╛╨╜╨░** ╨┤╨╕╨░╨│╨╛╨╜╨░╨╗╨╕ тЖТ `rotate(-45)`.
-- ╨Ъ╤А╤Г╨┐╨╜╤Л╨╣ fill (`scale(0.88)`, ~88тАУ90% ╨║╨░╨┤╤А╨░) ╨╛╤Б╤В╨░╨▓╨╗╤П╨╡╨╝.
+- Первый пилот «Изнанка маршрута»: open-air выходного (песчаный фест + Автодром Фест из живой афиши).
+- Форма: 4–5 абзацев, ~1200–1800 знаков, обложка + inline, канон приветствия/финала Макса + приёмы Perito (вердикт, изнанка, лайфхак, виджет).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- SVG: `translate(24 24) rotate(-45) scale(0.88) translate(-24 -24)` ╨▓ `apps/web/public/favicon.svg` + legacy `apps/public/public/favicon.svg`.
-- ╨Я╨╡╤А╨╡╨│╨╡╨╜╨╡╤А╨╕╤А╨╛╨▓╨░╨╜╤Л PNG 32/48/96, apple 180, 192/512, logo-192 ╨╕ `favicon.ico`.
+- MD `content/blog/open-air-festy-vyhodnoi-ru.md` (`authorId=max`); карточки web+public; `blog:sync-bodies`.
+- Перепись под стандарт § «Референс Perito» в `01-max.md` (альтернатива чеклисту, «норм но не норм», изнанка рядом с кайфом, CTA в виджет).
+- Картинки в `apps/public/public/images/blog/` (+ sync web).
+- Публикация: commit → push → `deploy-prod-next.sh` → `blog:upsert --slug=open-air-festy-vyhodnoi-ru`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Hard refresh / ╨╜╨╛╨▓╨░╤П ╨▓╨║╨╗╨░╨┤╨║╨░ ╨╛╨▒╤П╨╖╨░╤В╨╡╨╗╤М╨╜╤Л тАФ ╨▒╤А╨░╤Г╨╖╨╡╤А╨╜╤Л╨╣ ╨║╤Н╤И favicon ╨╜╨╡ ╨╕╨╜╨▓╨░╨╗╨╕╨┤╨╕╤А╤Г╨╡╤В╤Б╤П ╤Б╨░╨╝.
-
----
-
-## 2026-07-19 тАФ Favicon: ╨╛╨┐╤В╨╕╤З╨╡╤Б╨║╨╛╨╡ ╤Ж╨╡╨╜╤В╤А╨╕╤А╨╛╨▓╨░╨╜╨╕╨╡ ╨┐╨╛╤Б╨╗╨╡ rotate(-45)
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Т╨╛ ╨▓╨║╨╗╨░╨┤╨║╨╡ Chrome ╤Б╨╕╨╜╨╕╨╣ ╨▒╨╕╨╗╨╡╤В ╨╛╤Й╤Г╤Й╨░╨╗╤Б╤П **╤Б╨╝╨╡╤Й╤С╨╜╨╜╤Л╨╝ ╨▓╨╗╨╡╨▓╨╛-╨▓╨▓╨╡╤А╤Е**.
-- AABB ╨┐╨╛╤Б╨╗╨╡ `rotate(-45) scale(0.88)` ╨│╨╡╨╛╨╝╨╡╤В╤А╨╕╤З╨╡╤Б╨║╨╕ ╨┐╨╛ ╤Ж╨╡╨╜╤В╤А╤Г (╤А╨░╨▓╨╜╤Л╨╡ pad), ╨╝╨░╤Б╤Б╨░ ╨┐╨╛╤З╤В╨╕ ╨▓ ╤Ж╨╡╨╜╤В╤А╨╡; ╨▓╨╕╨╖╤Г╨░╨╗╤М╨╜╤Л╨╣ ╤Б╨┤╨▓╨╕╨│ ╨┤╨░╤С╤В ╨╛╨┐╤В╨╕╨║╨░: ╨┐╨╛╨╗╨╜╤Л╨╡ ╤Г╨│╨╗╤Л ╨║╨╛╤А╨╛╤В╨║╨╛╨╣ ╨╛╤Б╨╕ ╤Б╨╝╨╛╤В╤А╤П╤В ╨▓ TL/BR, ╨▓╤Л╤А╨╡╨╖╤Л тАФ ╨▓ BL/TR.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨Ъ╨╛╨╝╨┐╨╡╨╜╤Б╨░╤Ж╨╕╤П ╨┐╨╛╤Б╨╗╨╡ pivot: `translate(24 24) translate(1.2 1.2) rotate(-45) scale(0.88) translate(-24 -24)`.
-- ╨Ю╨▒╨╜╨╛╨▓╨╗╨╡╨╜╤Л SVG (`apps/web/public` + legacy `apps/public/public`) ╨╕ ╨┐╨╡╤А╨╡╨│╨╡╨╜╨╡╤А╨╕╤А╨╛╨▓╨░╨╜╤Л 32/48/96, apple 180, 192/512, logo-192, `favicon.ico`.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- Hard refresh / ╨╜╨╛╨▓╨░╤П ╨▓╨║╨╗╨░╨┤╨║╨░ тАФ ╨║╤Н╤И favicon ╨▓ Chrome ╨╜╨╡ ╤Б╨▒╤А╨░╤Б╤Л╨▓╨░╨╡╤В╤Б╤П ╤Б╨░╨╝.
+- UI byline по `authorId` ещё нет — метаданные только в frontmatter.
 
 ---
 
-## 2026-07-19 тАФ ┬л╨Т╤Л╨▒╨╛╤А ╤А╨╡╨┤╨░╨║╤Ж╨╕╨╕┬╗: ╨┤╨╡╨┤╤Г╨┐ combo-family (╨╜╨╡ ╤Г╨▒╨╕╤А╨░╤В╤М ╤Б╨╡╨║╤Ж╨╕╤О)
+## 2026-07-19 — Референс Perito → колонка Макса (события/экскурсии)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М ╤Г╤В╨╛╤З╨╜╨╕╨╗: ╤Б╨╡╨║╤Ж╨╕╤О ┬л╨Т╤Л╨▒╨╛╤А ╤А╨╡╨┤╨░╨║╤Ж╨╕╨╕┬╗ **╨╛╤Б╤В╨░╨▓╨╕╤В╤М**, ╨╜╨╛ ╨╜╨╡ ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╤В╤М ╨┐╨░╤З╨║╤Г near-duplicate ┬л╨Ъ╨╛╨╝╨▒╨╛ 1/2/5/7┬╗ ╨Ь╤Г╨╖╨╡╨╣ ╨У╨░╤А╤А╨╕ ╨Я╨╛╤В╤В╨╡╤А╨░.
-- ╨г ╨║╨╛╨╝╨▒╨╛ ╤А╨░╨╖╨╜╤Л╨╡ `groupKey` (`ticketscloud|╨║╨╛╨╝╨▒╨╛ N|тАж`), ╨┐╨╛╤Н╤В╨╛╨╝╤Г ╤Б╤В╨░╤А╤Л╨╣ dedup ╨┐╨╛ groupKey/title ╨╜╨╡ ╤Б╤Е╨╗╨╛╨┐╤Л╨▓╨░╨╗ siblings.
-- ╨Я╤А╨╡╨┤╤Л╨┤╤Г╤Й╨░╤П ╨┐╤А╨░╨▓╨║╨░ ╨╛╤И╨╕╨▒╨╛╤З╨╜╨╛ ╨▓╤Л╤А╨╡╨╖╨░╨╗╨░ ╨▓╨╡╤Б╤М ╨▒╨╗╨╛╨║ тАФ ╨╛╤В╨║╨░╤В╨╕╨╗╨╕.
+- Пользователь дал референс [Perito / Птушкин — Балканы](https://perito.media/posts/ptushkin-balcans): сильные стороны — ритм коротких блоков, честный вердикт, бытовая деталь, фото на секцию, разговорный тон без PR.
+- Нужно «близко, но по событиям и экскурсиям», не тревел по странам.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨б╨╡╨║╤Ж╨╕╤П `#editors-pick` ╨▓╨╛╨╖╨▓╤А╨░╤Й╨╡╨╜╨░ ╨▓ `HomePageContent` / legacy `App.tsx`.
-- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜ `sessionFamilyKey`: ╨╜╨░ ╨╛╨┤╨╜╨╛╨╣ ╨┐╨╗╨╛╤Й╨░╨┤╨║╨╡ ╨▓╤Б╨╡ title ╨▓╨╕╨┤╨░ ┬л╨Ъ╨╛╨╝╨▒╨╛тАж┬╗ тЖТ ╨╛╨┤╨╕╨╜ ╤Б╨╗╨╛╤В; `merge|` groupKey ╤В╨╛╨╢╨╡ family.
-- `seenFamilies` ╨▓ shared `HomePickState` ╨┤╨╗╤П editors-pick / home-now / popular.
-- ╨д╨░╨╣╨╗╤Л: `home-showcase-sections.ts`, `home-now-section.ts` (web + public).
+- В `docs/ai-journalists/01-max.md` добавлена секция **«Референс Perito»**: адаптация приёмов (очередь, гид, виджет, что взять, изнанка, эмоция 1.5–2 мин).
+- System prompt Макса: 4–5 абзацев, 1200–1800 знаков; README + `personas.json` + `content-blog-plan.md` синхронизированы.
+- Чужой текст не копируем — только форма и честность угла.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Ф╨╛╨╗╨│╨╛╤Б╤А╨╛╤З╨╜╨╛ ╨╗╤Г╤З╤И╨╡ ╨┐╤А╨╛╤Б╤В╨░╨▓╨╕╤В╤М `mergeGroupKey=harry-potter-spb` ╨▓ override (╤Б╨║╤А╨╕╨┐╤В ╤Г╨╢╨╡ ╨╡╤Б╤В╤М) тАФ ╤В╨╛╨│╨┤╨░ ╨║╨░╤В╨░╨╗╨╛╨│ ╤Б╨░╨╝ ╤Б╤Е╨╗╨╛╨┐╨╜╨╡╤В siblings.
+- Пилот `open-air-festy-vyhodnoi-ru` сразу писался под обновлённый канон (Perito-приёмы + System prompt Макса).
 
 ---
 
-## 2026-07-19 тАФ ╨Ш╨Ш-╨╢╤Г╤А╨╜╨░╨╗╨╕╤Б╤В╤Л: ╨║╨░╨╜╨╛╨╜ ╨Ь╨░╨║╤Б/╨Р╨╜╨╜╨░/╨Х╨╗╨╡╨╜╨░/╨Ш╨│╨╛╤А╤М/╨Р╤А╤В╤Г╤А
+## 2026-07-19 — Блог: разнести publishedAt (7–19 июля)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М ╤Г╤В╨╛╤З╨╜╨╕╨╗: ╨╜╤Г╨╢╨╜╤Л **╨║╨╛╨╗╨╛╨╜╨║╨╕-╤Б╤В╨░╤В╤М╨╕** ╨╕ **╤Б╤В╨╕╨╗╤М ╨┐╨╕╤Б╤М╨╝╨░**, ╨╜╨╡ ┬л╨│╨╛╨╗╨╛╤Б┬╗/╨┐╨╛╨┤╨║╨░╤Б╤В.
-- ╨д╨╕╨╜╨░╨╗╤М╨╜╤Л╨╡ System prompt ╨╖╨░╨╝╨╡╨╜╨╕╨╗╨╕ ╨▓╤Л╨╝╤Л╤И╨╗╨╡╨╜╨╜╤Л╨╡ ╨╕╨╝╨╡╨╜╨░ (╨а╨╛╨┤╨╕╨╛╨╜/╨Р╨│╨╗╨░╤П/тАж) ╨╜╨░ ╨Ь╨░╨║╤Б, ╨Р╨╜╨╜╨░, ╨Х╨╗╨╡╨╜╨░, ╨Ш╨│╨╛╤А╤М, ╨Р╤А╤В╤Г╤А.
-- ╨г `Article` / `BlogPost` ╨╜╨╡╤В ╨┐╨╛╨╗╤П author тАФ byline ╨┐╨╛╨║╨░ ╤З╨╡╤А╨╡╨╖ docs/frontmatter.
+- Все 17 PUBLISHED статей на prod имели даты либо июньские evergreen, либо пачку на 18–19 июля (4 новых MD).
+- Список на `/blog` сортируется по `Article.publishedAt` из API; static `date` в `blog-posts.ts` — fallback.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Я╨╡╤А╨╡╨┐╨╕╤Б╨░╨╜ `docs/ai-journalists/`: `01-max` тАж `05-artur`, `personas.json` v2, README ╨▒╨╡╨╖ ╤В╨╡╤А╨╝╨╕╨╜╨╛╨╗╨╛╨│╨╕╨╕ voice/audio.
-- ╨Т ╨║╨░╨╢╨┤╨╛╨╝ ╨┐╤А╨╛╤Д╨╕╨╗╨╡ ╨║╨░╨╜╨╛╨╜╨╕╤З╨╡╤Б╨║╨╕╨╣ ╨▒╨╗╨╛╨║ `## System prompt` ╨┤╨╛╤Б╨╗╨╛╨▓╨╜╨╛; ╤Б╤В╤А╤Г╨║╤В╤Г╤А╨░ ╨╖╨░╨╝╨╡╤В╨║╨╕ тАФ 4 ╨░╨▒╨╖╨░╤Ж╨░.
-- ╨Ъ╨╛╨╗╨╛╨╜╨║╨╕: ┬л╨Ш╨╖╨╜╨░╨╜╨║╨░ ╨╝╨░╤А╤И╤А╤Г╤В╨░┬╗, ┬л╨Ь╨╡╨╢╨┤╤Г ╤Н╨┐╨╛╤Е╨░╨╝╨╕┬╗, ┬л╨б╨┐╨╛╨║╨╛╨╣╨╜╤Л╨╣ ╨╝╨░╤А╤И╤А╤Г╤В┬╗, ┬л╨Ь╨╡╤Б╤В╨╛ ╤Б╨╕╨╗╤Л┬╗, ┬л╨Э╨░ ╨▓╨║╤Г╤Б┬╗.
-- ╨Я╨╕╨╗╨╛╤В: **╨Р╨╜╨╜╨░** ╨╕╨╗╨╕ **╨Х╨╗╨╡╨╜╨░** тАФ ╨╗╤Г╤З╤И╨╕╨╣ fit ╤Б ╤В╨╡╨║╤Г╤Й╨╡╨╣ ╨░╤Д╨╕╤И╨╡╨╣.
-- ╨Ь╨░╤В╨╡╤А╨╕╨░╨╗ ╨╜╨╡ ╨┐╨╕╤Б╨░╤В╤М, ╨┐╨╛╨║╨░ ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М ╨╜╨╡ ╨┤╨░╤Б╤В ╤В╨╡╨╝╤Г.
+- Равномерно-естественно разнесены даты **2026-07-07 … 2026-07-19**: evergreen раньше, 4 свежих гида ближе к сегодня.
+- Обновлены `apps/web` + `apps/public` `blog-posts.ts`, frontmatter в `content/blog/*.md`, прямой `UPDATE` на prod.
+- `blog:upsert` не трогает существующий `publishedAt` (coalesce) — для дат нужен SQL/admin PATCH.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Fair-use: ╨▓ ╨│╨░╨╣╨┤╨░╤Е ╤В╨╛╨╗╤М╨║╨╛ ╨║╨╛╤А╨╛╤В╨║╨╕╨╡ ╨╝╨░╤А╨║╨╡╤А╤Л/URL; ╨┐╨╛╨╗╨╜╤Л╨╡ ╤З╤Г╨╢╨╕╨╡ ╤В╨╡╨║╤Б╤В╤Л ╨╜╨╡ ╨║╨╛╨┐╨╕╤А╨╛╨▓╨░╤В╤М ╨▓ ╨▒╨╗╨╛╨│.
-- Prisma `authorId` ╨╛╤В╨╗╨╛╨╢╨╡╨╜ ╨┤╨╛ ╤А╨╡╨░╨╗╤М╨╜╤Л╤Е ╨║╨╛╨╗╨╛╨╜╨╛╤З╨╜╤Л╤Е ╨┐╤Г╨▒╨╗╨╕╨║╨░╤Ж╨╕╨╣.
+- После UPDATE нужен revalidate/cache flush публичного `/api/public/articles` (TTL кэша).
 
 ---
 
-## 2026-07-19 тАФ ╨Ш╨Ш-╨╢╤Г╤А╨╜╨░╨╗╨╕╤Б╤В╤Л ╨▒╨╗╨╛╨│╨░: ╨┐╨╡╤А╤Б╨╛╨╜╤Л ╨╕ ╤Б╤В╨╕╨╗╨╡╨▓╤Л╨╡ ╨│╨░╨╣╨┤╤Л (╤З╨╡╤А╨╜╨╛╨▓╨╕╨║ ╨╕╨╝╤С╨╜, superseded)
+## 2026-07-19 — Favicon: билет слишком мелко во вкладке
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╤Г╨╢╨╜╤Л ╨╜╨╡╤Б╨║╨╛╨╗╤М╨║╨╛ ╤Г╤Б╤В╨╛╨╣╤З╨╕╨▓╤Л╤Е ╨╝╨░╨╜╨╡╤А ╨┐╨╕╤Б╤М╨╝╨░ ╨║╨╛╨╗╨╛╨╜╨╛╨║, ╨░ ╨╜╨╡ ╨╡╨┤╨╕╨╜╤Л╨╣ ┬л╨╜╨╡╨╣╤А╨╛-SEO┬╗ ╤В╨╛╨╜.
-- ╨г `Article` / `BlogPost` ╨╜╨╡╤В ╨┐╨╛╨╗╤П author тАФ byline ╨┐╨╛╨║╨░ ╤В╨╛╨╗╤М╨║╨╛ ╤З╨╡╤А╨╡╨╖ docs/frontmatter.
-- ╨в╨╡╨║╤Г╤Й╨╕╨╣ ╨║╨░╤В╨░╨╗╨╛╨│ ╤Б╨╕╨╗╤М╨╜╨╡╨╡ ╨╖╨░╨▓╤П╨╖╨░╨╜ ╨╜╨░ ╨Ь╨б╨Ъ/╨б╨Я╨▒ ╨║╤Г╨╗╤М╤В╤Г╤А╤Г, ╤А╨╡╨║╨╕, ╤Б╨╡╨╝╤М╤О, ╤В╨╡╨░╤В╤А/╨▓╤Л╤Б╤В╨░╨▓╨║╨╕.
+- В tab браузера синий билет выглядел крошечным: диагональный силуэт + большое прозрачное поле (~30–40% линейного размера).
+- Это именно favicon вкладки, не Google SERP.
+- Параллельный деплой на 3.8Gi RAM ломал Next (OOM/SIGTERM) — сайт кратко отдавал 502, затем восстановлен.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Я╨╡╤А╨▓╨╕╤З╨╜╤Л╨╣ ╤З╨╡╤А╨╜╨╛╨▓╨╕╨║ ╤Б ╨╕╨╝╨╡╨╜╨░╨╝╨╕ ╨а╨╛╨┤╨╕╨╛╨╜/╨Р╨│╨╗╨░╤П/╨Ь╨╕╨╗╨░/╨в╨╕╤Е╨╛╨╜/╨Я╨░╨▓╨╡╨╗ тАФ **╨╖╨░╨╝╨╡╨╜╤С╨╜** ╨║╨░╨╜╨╛╨╜╨╛╨╝ ╨Ь╨░╨║╤Б/╨Р╨╜╨╜╨░/╨Х╨╗╨╡╨╜╨░/╨Ш╨│╨╛╤А╤М/╨Р╤А╤В╤Г╤А (╤Б╨╝. ╨╖╨░╨┐╨╕╤Б╤М ╨▓╤Л╤И╨╡).
+- Увеличен fill (~90% кадра); временно на prod — горизонтальный classic ticket (Flaticon-style, `#4A7FD4`), чтобы убрать «пугающую» мелкую диагональ.
+- PNG: 32 / 48 / 96 / apple 180 / 192 / 512 + `favicon.ico`; `site.webmanifest` с 192+512.
+- `layout.tsx` metadata.icons + `manifest: /site.webmanifest`. Проверено live: `/favicon-48x48.png`, `/icon-512x512.png`, `/site.webmanifest` → 200.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨в╨╡╤А╨╝╨╕╨╜ ┬лvoice┬╗ ╨┐╤Г╤В╨░╨╗ ╤Б ╨░╤Г╨┤╨╕╨╛ тАФ ╤Г╨▒╤А╨░╨╜ ╨▓ ╨┐╨╛╨╗╤М╨╖╤Г ┬л╤Б╤В╨╕╨╗╤М ╨┐╨╕╤Б╤М╨╝╨░ / register┬╗.
+- Кэш favicon в браузере агрессивный — hard refresh / новая вкладка.
+- Не гонять два `next build`/`deploy-prod-next` одновременно на prod (OOM).
 
 ---
 
-## 2026-07-19 тАФ Admin group readiness: NO_FUTURE ╨╜╨╡ ╨▒╨╗╨╛╨║╨╕╤А╤Г╨╡╤В ╨┐╤А╨╕ future-sibling
+## 2026-07-19 — Favicon: снова 45°, но крупный fill
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- `groupAdminEventRows` / UI `groupAdminRows` ╨▒╤А╨░╨╗╨╕ `worstReadiness` ╨┐╨╛ siblings: past-only ╤Б╨╗╨╛╤В ╤Б `NO_FUTURE_SESSIONS` ╨║╤А╨░╤Б╨╕╨╗ ╨▓╤Б╤О ╨║╨░╤А╤В╨╛╤З╨║╤Г ╨║╨░╨║ ┬л╨С╨╗╨╛╨║╨╡╤А┬╗, ╨┤╨░╨╢╨╡ ╨╡╤Б╨╗╨╕ ╨▓ ╨│╤А╤Г╨┐╨┐╨╡ ╨╡╤Б╤В╤М ╨▒╤Г╨┤╤Г╤Й╨╕╨╣ ╤Б╨╡╨░╨╜╤Б.
-- Representative `startsAt` = earliest тЖТ ╨┐╨╛╤Б╨╗╨╡ merge ╨╜╨╡╨╗╤М╨╖╤П ╤Б╤Г╨┤╨╕╤В╤М ╨╛ future ╤В╨╛╨╗╤М╨║╨╛ ╨┐╨╛ ╨┐╨╛╨╗╤О ╨│╤А╤Г╨┐╨┐╤Л.
+- После замены на горизонтальный Flaticon ticket пользователь ожидает снова поворот ~45°.
+- Горизонталь была намеренной реакцией на жалобу «диагональ мелкая/пугающая», не финальным отказом от угла.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Я╨╛╤Б╨╗╨╡ ╨│╤А╤Г╨┐╨┐╨╕╤А╨╛╨▓╨║╨╕: `finalizeGroupedAdminReadiness` тАФ ╨╡╤Б╨╗╨╕ ╨▓ ╨│╤А╤Г╨┐╨┐╨╡ ╨▒╤Л╨╗ future-╤Б╨╗╨╛╤В, ╤Г╨▒╤А╨░╤В╤М ╤В╨╛╨╗╤М╨║╨╛ `NO_FUTURE_SESSIONS`; ╨┐╤А╨╛╤З╨╕╨╡ high-issues ╨╛╤Б╤В╨░╨▓╨╗╤П╤О╤В `blocked`.
-- Backend: merge `readinessIssues`/`readinessCodes` + ╤Д╨╗╨░╨│ `_groupHasFutureSession`; admin UI тАФ ╨╖╨╡╤А╨║╨░╨╗╤М╨╜╨░╤П ╨╗╨╛╨│╨╕╨║╨░.
+- Тот же силуэт ticket_1912 / `#4A7FD4`, `rotate(45)` + `scale(0.88)` → AABB ~88–90% кадра, мало padding.
+- Перегенерированы 32/48/96, apple 180, 192/512, logo-192, ico, svg (`apps/web/public` + legacy `apps/public/public/favicon.svg`).
+- layout/manifest без изменений.
+
+### Проблемы
+
+- Нужен hard refresh / новая вкладка из‑за кэша favicon.
+
+---
+
+## 2026-07-19 — Favicon: зеркальный угол rotate(-45)
+
+### Наблюдения
+
+- После `rotate(45)` пользователь уточнил: нужна **другая сторона** диагонали → `rotate(-45)`.
+- Крупный fill (`scale(0.88)`, ~88–90% кадра) оставляем.
+
+### Решения
+
+- SVG: `translate(24 24) rotate(-45) scale(0.88) translate(-24 -24)` в `apps/web/public/favicon.svg` + legacy `apps/public/public/favicon.svg`.
+- Перегенерированы PNG 32/48/96, apple 180, 192/512, logo-192 и `favicon.ico`.
+
+### Проблемы
+
+- Hard refresh / новая вкладка обязательны — браузерный кэш favicon не инвалидируется сам.
+
+---
+
+## 2026-07-19 — Favicon: оптическое центрирование после rotate(-45)
+
+### Наблюдения
+
+- Во вкладке Chrome синий билет ощущался **смещённым влево-вверх**.
+- AABB после `rotate(-45) scale(0.88)` геометрически по центру (равные pad), масса почти в центре; визуальный сдвиг даёт оптика: полные углы короткой оси смотрят в TL/BR, вырезы — в BL/TR.
+
+### Решения
+
+- Компенсация после pivot: `translate(24 24) translate(1.2 1.2) rotate(-45) scale(0.88) translate(-24 -24)`.
+- Обновлены SVG (`apps/web/public` + legacy `apps/public/public`) и перегенерированы 32/48/96, apple 180, 192/512, logo-192, `favicon.ico`.
+
+### Проблемы
+
+- Hard refresh / новая вкладка — кэш favicon в Chrome не сбрасывается сам.
+
+---
+
+## 2026-07-19 — «Выбор редакции»: дедуп combo-family (не убирать секцию)
+
+### Наблюдения
+
+- Пользователь уточнил: секцию «Выбор редакции» **оставить**, но не показывать пачку near-duplicate «Комбо 1/2/5/7» Музей Гарри Поттера.
+- У комбо разные `groupKey` (`ticketscloud|комбо N|…`), поэтому старый dedup по groupKey/title не схлопывал siblings.
+- Предыдущая правка ошибочно вырезала весь блок — откатили.
+
+### Решения
+
+- Секция `#editors-pick` возвращена в `HomePageContent` / legacy `App.tsx`.
+- Добавлен `sessionFamilyKey`: на одной площадке все title вида «Комбо…» → один слот; `merge|` groupKey тоже family.
+- `seenFamilies` в shared `HomePickState` для editors-pick / home-now / popular.
+- Файлы: `home-showcase-sections.ts`, `home-now-section.ts` (web + public).
+
+### Проблемы
+
+- Долгосрочно лучше проставить `mergeGroupKey=harry-potter-spb` в override (скрипт уже есть) — тогда каталог сам схлопнет siblings.
+
+---
+
+## 2026-07-19 — ИИ-журналисты: канон Макс/Анна/Елена/Игорь/Артур
+
+### Наблюдения
+
+- Пользователь уточнил: нужны **колонки-статьи** и **стиль письма**, не «голос»/подкаст.
+- Финальные System prompt заменили вымышленные имена (Родион/Аглая/…) на Макс, Анна, Елена, Игорь, Артур.
+- У `Article` / `BlogPost` нет поля author — byline пока через docs/frontmatter.
+
+### Решения
+
+- Переписан `docs/ai-journalists/`: `01-max` … `05-artur`, `personas.json` v2, README без терминологии voice/audio.
+- В каждом профиле канонический блок `## System prompt` дословно; структура заметки — 4 абзаца.
+- Колонки: «Изнанка маршрута», «Между эпохами», «Спокойный маршрут», «Место силы», «На вкус».
+- Пилот: **Анна** или **Елена** — лучший fit с текущей афишей.
+- Материал не писать, пока пользователь не даст тему.
+
+### Проблемы
+
+- Fair-use: в гайдах только короткие маркеры/URL; полные чужие тексты не копировать в блог.
+- Prisma `authorId` отложен до реальных колоночных публикаций.
+
+---
+
+## 2026-07-19 — ИИ-журналисты блога: персоны и стилевые гайды (черновик имён, superseded)
+
+### Наблюдения
+
+- Нужны несколько устойчивых манер письма колонок, а не единый «нейро-SEO» тон.
+- У `Article` / `BlogPost` нет поля author — byline пока только через docs/frontmatter.
+- Текущий каталог сильнее завязан на МСК/СПб культуру, реки, семью, театр/выставки.
+
+### Решения
+
+- Первичный черновик с именами Родион/Аглая/Мила/Тихон/Павел — **заменён** каноном Макс/Анна/Елена/Игорь/Артур (см. запись выше).
+
+### Проблемы
+
+- Термин «voice» путал с аудио — убран в пользу «стиль письма / register».
+
+---
+
+## 2026-07-19 — Admin group readiness: NO_FUTURE не блокирует при future-sibling
+
+### Наблюдения
+
+- `groupAdminEventRows` / UI `groupAdminRows` брали `worstReadiness` по siblings: past-only слот с `NO_FUTURE_SESSIONS` красил всю карточку как «Блокер», даже если в группе есть будущий сеанс.
+- Representative `startsAt` = earliest → после merge нельзя судить о future только по полю группы.
+
+### Решения
+
+- После группировки: `finalizeGroupedAdminReadiness` — если в группе был future-слот, убрать только `NO_FUTURE_SESSIONS`; прочие high-issues оставляют `blocked`.
+- Backend: merge `readinessIssues`/`readinessCodes` + флаг `_groupHasFutureSession`; admin UI — зеркальная логика.
 - Unit: `apps/backend/src/admin-group-readiness.test.ts`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╤Г╨╢╨╡╨╜ ╨┤╨╡╨┐╨╗╨╛╨╣ **API** (dto.js / admin grouped cache), ╨╕╨╜╨░╤З╨╡ prod ╨┐╤А╨╛╨┤╨╛╨╗╨╢╨╕╤В ╨╛╤В╨┤╨░╨▓╨░╤В╤М ╤Б╤В╨░╤А╤Л╨╣ `worstReadiness`. Admin static тАФ ╨╢╨╡╨╗╨░╤В╨╡╨╗╨╡╨╜ ╨┤╨╗╤П ╨║╨╗╨╕╨╡╨╜╤В╤Б╨║╨╛╨│╨╛ regroup, ╨╜╨╛ source of truth тАФ backend cache.
-
----
-
-## 2026-07-19 тАФ Prod: 4 ╤Б╤В╨░╤В╤М╨╕ + upsert + digest cron
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- Deploy `feat/next-monorepo` тЖТ `/opt/daibilet` (SHA `63b6af3`), Next health OK.
-- `npm run blog:upsert`: 4 ╤Б╤В╨░╤В╤М╨╕ `PUBLISHED` ╨▓ `Article`; ╨┐╤Г╨▒╨╗╨╕╤З╨╜╤Л╨╡ URL `/blog/...` тЖТ 200.
-- ╨Я╨╡╤А╨▓╤Л╨╣ `blog:weekly-digest`: ╤Б╨╛╨╖╨┤╨░╨╜ `afisha-nedeli-2026-07-18` status=`REVIEW`, public 404 (╨╛╨╢╨╕╨┤╨░╨╡╨╝╨╛).
-- Crontab: ╤Б╨╛╤Е╤А╨░╨╜╤С╨╜ `*/10` tc-orders; ╨┤╨╛╨▒╨░╨▓╨╗╨╡╨╜ `0 7 * * 0` blog-weekly-digest.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨Ф╨░╨╣╨┤╨╢╨╡╤Б╤В **╨╜╨╡** ╨┐╤Г╨▒╨╗╨╕╨║╨╛╨▓╨░╤В╤М ╨░╨▓╤В╨╛╨╝╨░╤В╨╛╨╝ тАФ ╤В╨╛╨╜╨║╨╕╨╣ ╤З╨╡╤А╨╜╨╛╨▓╨╕╨║ (2 ╤Б╨╛╨▒╤Л╤В╨╕╤П, ╨╜╤Г╨╢╨╜╨░ ╤А╨╡╨┤╨░╨║╤В╤Г╤А╨░); ╨┐╤Г╨▒╨╗╨╕╨║╨░╤Ж╨╕╤П ╨▓╤А╤Г╤З╨╜╤Г╤О ╨▓ Admin тЖТ ╨С╨╗╨╛╨│.
-- Temp ops-╤Б╨║╤А╨╕╨┐╤В╤Л ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡/╨╗╨╛╨║╨░╨╗╤М╨╜╨╛ ╤Г╨┤╨░╨╗╨╕╤В╤М ╨┐╨╛╤Б╨╗╨╡ ╨┐╤А╨╛╨│╨╛╨╜╨░.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- Digest SQL ╤Б╨╡╨╣╤З╨░╤Б ╤Б╨╗╨░╨▒╨╛ ╨╜╨░╨┐╨╛╨╗╨╜╤П╨╡╤В ╨Ь╨б╨Ъ/╨б╨Я╨▒ (0 capital ╨▓ ╨┐╨╡╤А╨▓╨╛╨╝ ╨┐╤А╨╛╨│╨╛╨╜╨╡) тАФ ╨┤╨╛╨╜╨░╤Б╤В╤А╨╛╨╕╤В╤М ╤Д╨╕╨╗╤М╤В╤А city slug / createdAt ╨▓ ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╡╨╝ ╤Ж╨╕╨║╨╗╨╡.
+- Нужен деплой **API** (dto.js / admin grouped cache), иначе prod продолжит отдавать старый `worstReadiness`. Admin static — желателен для клиентского regroup, но source of truth — backend cache.
 
 ---
 
-## 2026-07-19 тАФ 4 ╤Б╤В╨░╤В╤М╨╕ ╨▒╨╗╨╛╨│╨░ + weekly digest
+## 2026-07-19 — Prod: 4 статьи + upsert + digest cron
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╤П╤В╤Л╨╣ ╨╖╨░╨│╨╛╨╗╨╛╨▓╨╛╨║ (┬л╨Ъ╨░╨║ ╨║╤Г╨┐╨╕╤В╤М ╨▒╨╕╨╗╨╡╤В ╨╜╨░ ╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В╨╡┬╗) ╤Б╨╜╤П╤В ╨┐╨╛ ╤А╨╡╤И╨╡╨╜╨╕╤О ╨┐╤А╨╛╨┤╤Г╨║╤В╨░ тАФ ╨╗╨╕╤И╨╜╨╕╨╣ trust/help.
-- ╨Я╤А╨╛╨┤ ╤З╨╕╤В╨░╨╡╤В ╤Б╤В╨░╤В╤М╨╕ ╨╕╨╖ `Article`; ╤Б╤В╨░╤В╨╕╨║╨░ `blog-posts.ts` тАФ ╨║╨░╤А╤В╨╛╤З╨║╨╕ + SSR fallback; ╨┐╨╛╨╗╨╜╤Л╨╣ ╤В╨╡╨║╤Б╤В ╤А╨░╨╜╤М╤И╨╡ ╨▓ fallback ╤Б╨▓╨╛╨┤╨╕╨╗╤Б╤П ╨║ excerpt.
-- ╨Ю╨▒╨╗╨╛╨╢╨║╨╕ ╤Н╤В╨░╨╗╨╛╨╜╨╜╨╛ ╨╗╨╡╨╢╨░╤В ╨▓ `apps/public/public/images/blog/` ╨╕ ╨║╨╛╨┐╨╕╤А╤Г╤О╤В╤Б╤П ╨▓ Next public.
+- Deploy `feat/next-monorepo` → `/opt/daibilet` (SHA `63b6af3`), Next health OK.
+- `npm run blog:upsert`: 4 статьи `PUBLISHED` в `Article`; публичные URL `/blog/...` → 200.
+- Первый `blog:weekly-digest`: создан `afisha-nedeli-2026-07-18` status=`REVIEW`, public 404 (ожидаемо).
+- Crontab: сохранён `*/10` tc-orders; добавлен `0 7 * * 0` blog-weekly-digest.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ъ╨╛╨╜╤В╨╡╨╜╤В 4 ╤Б╤В╨░╤В╨╡╨╣ ╨▓ `content/blog/*.md`; sync ╤В╨╡╨╗ тЖТ `blog-article-bodies.ts`; upsert тЖТ `npm run blog:upsert`.
-- ╨Ю╨▒╨╗╨╛╨╢╨║╨╕ ╤Б╨│╨╡╨╜╨╡╤А╨╕╤А╨╛╨▓╨░╨╜╤Л (1536├Ч1024), ╨┐╨╛╨┤╨║╨╗╤О╤З╨╡╨╜╤Л ╨┐╨╛ slug.
-- Weekly digest: `scripts/blog-weekly-digest.js` + `deploy/cron/blog-weekly-digest.sh` (╨▓╤Б 07:00), status=`REVIEW`, ╨▒╨╡╨╖ auto-publish.
-- ╨Ф╨╛╨║╤Г╨╝╨╡╨╜╤В╤Л: [content-blog-plan.md](./content-blog-plan.md), [deploy/cron/README.md](../deploy/cron/README.md).
+- Дайджест **не** публиковать автоматом — тонкий черновик (2 события, нужна редактура); публикация вручную в Admin → Блог.
+- Temp ops-скрипты на сервере/локально удалить после прогона.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨С╨╡╨╖ ╨┤╨╡╨┐╨╗╨╛╤П ╨╕ `blog:upsert` ╨╜╨░ prod ╨┐╨╛╨╗╨╜╤Л╨╡ ╤В╨╡╨║╤Б╤В╤Л ╨▓ ╨С╨Ф ╨╜╨╡ ╨┐╨╛╤П╨▓╤П╤В╤Б╤П (SSR fallback ╤Г╨╢╨╡ ╨╛╤В╨┤╨░╤С╤В bodies ╨╕╨╖ ╤Б╤В╨░╤В╨╕╨║╨╕).
-- ╨Я╨╡╤А╨▓╤Л╨╣ cron-╨┐╤А╨╛╨│╨╛╨╜ ╨┤╨░╨╣╨┤╨╢╨╡╤Б╤В╨░ ╨╜╤Г╨╢╨╜╨╛ ╨┐╨╛╤Б╤В╨░╨▓╨╕╤В╤М ╨▓╤А╤Г╤З╨╜╤Г╤О ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡ (`crontab`).
+- Digest SQL сейчас слабо наполняет МСК/СПб (0 capital в первом прогоне) — донастроить фильтр city slug / createdAt в следующем цикле.
 
 ---
 
-## 2026-07-19 тАФ ╨Ш╨╜╨▓╨╡╨╜╤В╨░╤А╤М ╤Б╤В╨░╤В╨╡╨╣ ╨▒╨╗╨╛╨│╨░ (╨░╨╜╤В╨╕╨┤╤Г╨▒╨╗╨╕)
+## 2026-07-19 — 4 статьи блога + weekly digest
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Ф╨▓╨░ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨░ ╨║╨╛╨╜╤В╨╡╨╜╤В╨░: ╤Б╤В╨░╤В╨╕╨║╨░ `apps/web/src/data/blog-posts.ts` ╨╕ prod `Article`.
-- ╨Ч╨░╨┐╤А╨╛╤Б ╨║ ╨С╨Ф ╤Б prod: ╨╕╨╖ `/opt/daibilet/apps/backend` + `NODE_PATH=тАж/node_modules` ╨╕ `.cjs` (package `"type":"module"` ╨╗╨╛╨╝╨░╨╡╤В `require` ╨▓ `.js`; `/tmp` + ╨│╨╛╨╗╤Л╨╣ `pg` тАФ ╨╜╨╡╤В).
-- ╨б╤В╨░╤В╨╕╨║╨░ ╨╕ ╨С╨Ф: ╨┐╨╛ **13** ╤Б╤В╨░╤В╨╡╨╣, ╨╛╨┤╨╕╨╜╨░╨║╨╛╨▓╤Л╨╡ slug; ╨╖╨░╨│╨╛╨╗╨╛╨▓╨║╨╕ ╨▓ ╨С╨Ф ╤З╤Г╤В╤М ╨┤╨╗╨╕╨╜╨╜╨╡╨╡ SEO-╨▓╨░╤А╨╕╨░╨╜╤В╤Л.
-- ╨г╨╢╨╡ ╨╖╨░╨║╤А╤Л╤В╤Л: ╤Б╨╡╨╝╤М╤П, ╨║╨╛╨╜╤Ж╨╡╤А╤В╤Л, ╨┤╨╢╨░╨╖ ╨Ь╨б╨Ъ, ╤А╨╡╨║╨╕ ╨Ь╨б╨Ъ/╨Ъ╨░╨╖╨░╨╜╤М, ╨║╤А╤Л╤И╨╕/╨╝╨╛╤Б╤В╤Л/╨┤╨▓╨╛╤А╤Л/╤Б╤В╨╡╨╜╨┤╨░╨┐/╨┐╨╗╨░╨╜╨╡╤В╨░╤А╨╕╨╣ ╨б╨Я╨▒, ╨░╨▓╤В╨╛╨▒╤Г╤Б ╨Ь╨б╨Ъ, ╤Н╨╝╨░╨╗╤М, ╤А╨╡╨│╨╕╨╛╨╜╤Л.
+- Пятый заголовок («Как купить билет на Дайбилете») снят по решению продукта — лишний trust/help.
+- Прод читает статьи из `Article`; статика `blog-posts.ts` — карточки + SSR fallback; полный текст раньше в fallback сводился к excerpt.
+- Обложки эталонно лежат в `apps/public/public/images/blog/` и копируются в Next public.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Я╤А╨░╨▓╨╕╨╗╨╛ ┬л╨╜╨╡ ╨┐╨╛╨▓╤В╨╛╤А╤П╤В╤М╤Б╤П┬╗ ╨╖╨░╤Д╨╕╨║╤Б╨╕╤А╨╛╨▓╨░╨╜╨╛ ╨▓ [content-blog-plan.md](./content-blog-plan.md): ╨╕╨╜╨▓╨╡╨╜╤В╨░╤А╤М ╨╛╨▒╨╛╨╕╤Е ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨╛╨▓ + 5 ╨╜╨╛╨▓╤Л╤Е ╨╖╨░╨│╨╛╨╗╨╛╨▓╨║╨╛╨▓ ╨▓╨╜╨╡ ╨╖╨░╨║╤А╤Л╤В╤Л╤Е ╨║╨╗╨░╤Б╤В╨╡╤А╨╛╨▓.
-- Temp `tmp-list-articles` ╨┐╨╛╤Б╨╗╨╡ ╨╕╨╜╨▓╨╡╨╜╤В╨░╤А╤П ╤Г╨┤╨░╨╗╤С╨╜ (╨╗╨╛╨║╨░╨╗╤М╨╜╨╛ ╨╕ ╤Б prod).
+- Контент 4 статей в `content/blog/*.md`; sync тел → `blog-article-bodies.ts`; upsert → `npm run blog:upsert`.
+- Обложки сгенерированы (1536×1024), подключены по slug.
+- Weekly digest: `scripts/blog-weekly-digest.js` + `deploy/cron/blog-weekly-digest.sh` (вс 07:00), status=`REVIEW`, без auto-publish.
+- Документы: [content-blog-plan.md](./content-blog-plan.md), [deploy/cron/README.md](../deploy/cron/README.md).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Я╤А╨╕ ╤А╨░╤Б╤Е╨╛╨╢╨┤╨╡╨╜╨╕╨╕ ╤Б╤В╨░╤В╨╕╨║╨░тЖФ╨С╨Ф ╨║╨░╤А╤В╨╛╤З╨║╨╕/SEO ╨╝╨╛╨│╤Г╤В ┬л╨┐╨╗╤Л╤В╤М┬╗ тАФ ╨┐╨╡╤А╨╡╨┤ ╨┐╤Г╨▒╨╗╨╕╨║╨░╤Ж╨╕╨╡╨╣ ╨╜╨╛╨▓╤Л╤Е ╤Б╤В╨░╤В╨╡╨╣ ╤Б╨▓╨╡╤А╤П╤В╤М ╨╛╨▒╨░ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║╨░.
-
----
-
-## 2026-07-19 тАФ ╨п╨╜╨┤╨╡╨║╤Б.╨Ь╨╡╤В╤А╨╕╨║╨░ ╨╜╨░ ╨┐╤Г╨▒╨╗╨╕╤З╨╜╨╛╨╝ Next
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Т `apps/web` ╨╜╨╡ ╨▒╤Л╨╗╨╛ GTM/GA/╨Ь╨╡╤В╤А╨╕╨║╨╕ тАФ ╤В╨╛╨╗╤М╨║╨╛ JSON-LD ╨╕ ╨▓╨╕╨┤╨╢╨╡╤В╤Л TC/TEP.
-- Privacy/Legal ╤Г╨╢╨╡ ╤Г╨┐╨╛╨╝╨╕╨╜╨░╤О╤В ╨п╨╜╨┤╨╡╨║╤Б.╨Ь╨╡╤В╤А╨╕╨║╤Г ╨║╨░╨║ ╨▓╨╛╨╖╨╝╨╛╨╢╨╜╤Л╨╣ ╨╕╨╜╤Б╤В╤А╤Г╨╝╨╡╨╜╤В ╨░╨╜╨░╨╗╨╕╤В╨╕╨║╨╕.
-- Admin (`apps/admin`) тАФ ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛╨╡ ╨┐╤А╨╕╨╗╨╛╨╢╨╡╨╜╨╕╨╡; ╤Б╤З╤С╤В╤З╨╕╨║ ╨╜╤Г╨╢╨╡╨╜ ╤В╨╛╨╗╤М╨║╨╛ ╨╜╨░ daibilet.ru.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨Ъ╨╗╨╕╨╡╨╜╤В╤Б╨║╨╕╨╣ `YandexMetrika` (`next/script` `afterInteractive`) + `<noscript>` pixel ╨▓ root `layout.tsx`.
-- ID: `106786540` (override ╤З╨╡╤А╨╡╨╖ `NEXT_PUBLIC_YANDEX_METRIKA_ID`), init: `ssr`, webvisor, clickmap, ecommerce `dataLayer`, accurateTrackBounce, trackLinks.
-- ╨Я╨░╤В╤В╨╡╤А╨╜ env ╨║╨░╨║ ╤Г ╨▓╨╕╨┤╨╢╨╡╤В╨╛╨▓; ╨▓ admin ╨Ь╨╡╤В╤А╨╕╨║╤Г ╨╜╨╡ ╤Б╤В╨░╨▓╨╕╨╝.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨е╨╕╤В╤Л ╨┐╨╛╤П╨▓╤П╤В╤Б╤П ╨▓ ╨║╨░╨▒╨╕╨╜╨╡╤В╨╡ ╨Ь╨╡╤В╤А╨╕╨║╨╕ ╤В╨╛╨╗╤М╨║╨╛ ╨┐╨╛╤Б╨╗╨╡ ╨┤╨╡╨┐╨╗╨╛╤П Next ╨╜╨░ prod; SPA-╨┐╨╡╤А╨╡╤Е╨╛╨┤╤Л App Router ╨┐╤А╨╕ `ssr:true` ╨╛╨▒╤Л╤З╨╜╨╛ ╨╛╨║, ╨┐╤А╨╕ ╤Б╨╛╨╝╨╜╨╡╨╜╨╕╤П╤Е тАФ ╨┐╤А╨╛╨▓╨╡╤А╨╕╤В╤М ┬л╨╛╨╜╨╗╨░╨╣╨╜┬╗ ╨┐╨╛╤Б╨╗╨╡ ╨║╨╗╨╕╨╡╨╜╤В╤Б╨║╨╛╨╣ ╨╜╨░╨▓╨╕╨│╨░╤Ж╨╕╨╕.
+- Без деплоя и `blog:upsert` на prod полные тексты в БД не появятся (SSR fallback уже отдаёт bodies из статики).
+- Первый cron-прогон дайджеста нужно поставить вручную на сервере (`crontab`).
 
 ---
 
-## 2026-07-19 тАФ ╨б╨║╤А╨╡╨╣╨┐╨╡╤А liliabots.ru ╨║╨╛╨┐╨╕╤А╤Г╨╡╤В ╨░╤Д╨╕╤И╤Г
+## 2026-07-19 — Инвентарь статей блога (антидубли)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т Google ╨▓╤Л╨┤╨░╤З╨╡ `liliabots.ru` ╨╕╨╜╨┤╨╡╨║╤Б╨╕╤А╤Г╨╡╤В ╨║╨░╤А╤В╨╛╤З╨║╨╕ ╤Б ╨▒╤А╨╡╨╜╨┤╨╛╨╝ ┬л╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В┬╗ (title/snippet ╤Б ╤Ж╨╡╨╜╨░╨╝╨╕ ╨╕ ╨┐╨╗╨╛╤Й╨░╨┤╨║╨░╨╝╨╕) тАФ ╨╖╨╡╤А╨║╨░╨╗╨╛/╨┐╨░╤А╤Б╨╡╤А ╨║╨╛╨╜╤В╨╡╨╜╤В╨░.
-- ╨Я╤Г╨▒╨╗╨╕╤З╨╜╤Л╨╣ HTML ╨╕ `/api/public/*` ╨╛╤В╨║╤А╤Л╤В╤Л ╨▒╨╡╨╖ ╤Б╨╡╤Б╤Б╨╕╨╕ (by design MVP); rate limit ╨╜╨░ API ╤Г╨╢╨╡ ╨╡╤Б╤В╤М (60r/m).
+- Два источника контента: статика `apps/web/src/data/blog-posts.ts` и prod `Article`.
+- Запрос к БД с prod: из `/opt/daibilet/apps/backend` + `NODE_PATH=…/node_modules` и `.cjs` (package `"type":"module"` ломает `require` в `.js`; `/tmp` + голый `pg` — нет).
+- Статика и БД: по **13** статей, одинаковые slug; заголовки в БД чуть длиннее SEO-варианты.
+- Уже закрыты: семья, концерты, джаз МСК, реки МСК/Казань, крыши/мосты/дворы/стендап/планетарий СПб, автобус МСК, эмаль, регионы.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `robots.txt`: `User-agent: liliabots|liliabot` тЖТ `Disallow: /`.
-- Nginx: `map $daibilet_block_scraper` + `403` ╨╜╨░ `daibilet.ru` / `api.daibilet.ru` (`patch-prod-nginx-scraper-block.py`).
-- ╨Я╨░╤А╨░╨╗╨╗╨╡╨╗╤М╨╜╨╛: ╨╢╨░╨╗╨╛╨▒╨░ ╨▓ Google ╨╜╨░ ╨║╨╛╨┐╨╕╤А╨╛╨▓╨░╨╜╨╕╨╡ (Remove outdated content / Legal) тАФ UA-╨▒╨╗╨╛╨║ ╨╜╨╡ ╤Г╨┤╨░╨╗╤П╨╡╤В ╤Г╨╢╨╡ ╨┐╤А╨╛╨╕╨╜╨┤╨╡╨║╤Б╨╕╤А╨╛╨▓╨░╨╜╨╜╤Л╨╡ ╤Б╤В╤А╨░╨╜╨╕╤Ж╤Л ╨╖╨╡╤А╨║╨░╨╗╨░.
+- Правило «не повторяться» зафиксировано в [content-blog-plan.md](./content-blog-plan.md): инвентарь обоих источников + 5 новых заголовков вне закрытых кластеров.
+- Temp `tmp-list-articles` после инвентаря удалён (локально и с prod).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨б╨║╤А╨╡╨╣╨┐╨╡╤А ╨╝╨╛╨╢╨╡╤В ╤Е╨╛╨┤╨╕╤В╤М ╤Б ╨┐╨╛╨┤╨┤╨╡╨╗╤М╨╜╤Л╨╝ Chrome UA тАФ ╤В╨╛╨│╨┤╨░ ╨╜╤Г╨╢╨╡╨╜ Cloudflare Bot Fight / WAF ╨╕ ╤Г╨╢╨╡╤Б╤В╨╛╤З╨╡╨╜╨╕╨╡ HTML rate limit.
-
----
-
-## 2026-07-19 тАФ Cron TC orders-only + ╨║╨╛╨╜╤В╨╡╨╜╤В-╨┐╨╗╨░╨╜ ╨▒╨╗╨╛╨│╨░
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Ч╨╡╤А╨║╨░╨╗╨╛ ╨╖╨░╨║╨░╨╖╨╛╨▓ Ticketscloud ╨╜╨░ prod ╨╜╨╡ ╨╛╨▒╨╜╨╛╨▓╨╗╤П╨╗╨╛╤Б╤М ╤Б 13.07 тАФ sync ╤В╨╛╨╗╤М╨║╨╛ ╤А╤Г╤З╨╜╨╛╨╣, ╨▒╨╡╨╖ cron; ╨║╨░╤В╨░╨╗╨╛╨│ (TEP 6╤З) ╨╖╨░╨║╨░╨╖╤Л ╨╜╨╡ ╤В╤П╨╜╨╡╤В.
-- Teplohod orders API ╨▓ ╨╕╨╜╤В╨╡╨│╤А╨░╤Ж╨╕╨╕ ╨╜╨╡ ╨╛╨┐╨╕╤Б╨░╨╜; email-╨┐╨░╤А╤Б╨╕╨╜╨│ ╨╛╤В╨║╨╗╨╛╨╜╤С╨╜ ╨║╨░╨║ MVP-╨┐╤Г╤В╤М.
-- ╨С╨╗╨╛╨│ ╨┤╨░╨▓╨╜╨╛ ╨╜╨╡ ╨╛╨▒╨╜╨╛╨▓╨╗╤П╨╗╤Б╤П; ╨╜╤Г╨╢╨╡╨╜ ╨║╨╛╨╜╤В╨╡╨╜╤В-╨┐╨╗╨░╨╜ ╨╕ ╨╡╨╢╨╡╨╜╨╡╨┤╨╡╨╗╤М╨╜╤Л╨╣ ╨┤╨░╨╣╨┤╨╢╨╡╤Б╤В ╨╜╨╛╨▓╤Л╤Е ╤Б╨╛╨▒╤Л╤В╨╕╨╣.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- `deploy/cron/tc-orders-sync.sh` + crontab `*/10` ╤В╨╛╨╗╤М╨║╨╛ `npm run tc:orders` (`created_at=from,to`, lookback 3 ╨┤╨╜╤П, flock). ╨Ъ╨░╤В╨░╨╗╨╛╨│ ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╡╨╝.
-- Smoke 2026-07-18: ╨╕╨╝╨┐╨╛╤А╤В╨╕╤А╨╛╨▓╨░╨╜ 1 ╨╖╨░╨║╨░╨╖ TC `done` (╨┐╨╡╤А╨▓╨░╤П ╨▓╨╜╨╡╤И╨╜╤П╤П ╨┐╤А╨╛╨┤╨░╨╢╨░) + 1 ╨▒╨╕╨╗╨╡╤В.
-- ╨Ъ╨╛╨╜╤В╨╡╨╜╤В-╨┐╨╗╨░╨╜: [content-blog-plan.md](./content-blog-plan.md) тАФ 5 ╨╖╨░╨│╨╛╨╗╨╛╨▓╨║╨╛╨▓ + ╨┤╨╕╨╖╨░╨╣╨╜ weekly digest тЖТ Article status=`review`.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- TEP-╨┐╤А╨╛╨┤╨░╨╢╨╕ ╨▓ ╨░╨┤╨╝╨╕╨╜╨║╨╡ ╨┐╨╛╤П╨▓╤П╤В╤Б╤П ╤В╨╛╨╗╤М╨║╨╛ ╨┐╨╛╤Б╨╗╨╡ partner orders API.
-- Auto-publish ╨┤╨░╨╣╨┤╨╢╨╡╤Б╤В╨░ ╨▒╨╡╨╖ ╤А╨╡╨┤╨░╨║╤В╨╛╤А╨░ тАФ ╨╜╨╡ ╨▓╨║╨╗╤О╤З╨░╤В╤М.
+- При расхождении статика↔БД карточки/SEO могут «плыть» — перед публикацией новых статей сверять оба источника.
 
 ---
 
-## 2026-07-18 тАФ Google SERP: favicon + WebSite JSON-LD
+## 2026-07-19 — Яндекс.Метрика на публичном Next
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т ╨▓╤Л╨┤╨░╤З╨╡ Google ╤Б╨░╨╣╤В ╨╛╤В╨╛╨▒╤А╨░╨╢╨░╨╗╤Б╤П ╨║╨░╨║ ╤Б╨╡╤А╤Л╨╣ ╨│╨╗╨╛╨▒╤Г╤Б + URL `daibilet.ru` ╨▓╨╝╨╡╤Б╤В╨╛ ┬л╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В┬╗ ╨╕ ╤Ж╨▓╨╡╤В╨╜╨╛╨╣ ╨╕╨║╨╛╨╜╨║╨╕.
-- ╨Э╨░ ╨┐╤А╨╛╨┤╨╡ `GET /favicon.ico` тЖТ **404**; ╨▓ HTML ╨╜╨╡ ╨▒╤Л╨╗╨╛ `link rel="icon"` ╤Б PNG.
-- SSR JSON-LD `WebSite` + `Organization` ╤Г╨╢╨╡ ╨▒╤Л╨╗ ╨▓ `apps/web/app/layout.tsx`, ╨╜╨╛ `Organization.logo` ╤Г╨║╨░╨╖╤Л╨▓╨░╨╗ ╨╜╨░ ╨╜╨╡╤Б╤Г╤Й╨╡╤Б╤В╨▓╤Г╤О╤Й╨╕╨╣ `/favicon.ico`.
-- `robots.txt` ╨╕╨║╨╛╨╜╨║╨╕ ╨╜╨╡ ╨▒╨╗╨╛╨║╨╕╤А╤Г╨╡╤В (`Allow: /`).
-- `og:site_name` / title template (`%s | ╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В`) ╤Г╨╢╨╡ ╨╖╨░╨┤╨░╨╜╤Л ╨▓ root metadata.
+- В `apps/web` не было GTM/GA/Метрики — только JSON-LD и виджеты TC/TEP.
+- Privacy/Legal уже упоминают Яндекс.Метрику как возможный инструмент аналитики.
+- Admin (`apps/admin`) — отдельное приложение; счётчик нужен только на daibilet.ru.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜╤Л ╤Б╤В╨░╨▒╨╕╨╗╤М╨╜╤Л╨╡ PNG: `/favicon-48x48.png`, `/favicon-96x96.png`, `/icon-192x192.png`, `/logo-192x192.png`, `/apple-touch-icon.png` (+ SVG/ICO fallback) ╨▓ `apps/web/public/`.
-- ╨Т root `metadata.icons` тАФ `rel="icon"` type `image/png` (48/96/192) ╨╕ apple-touch.
-- JSON-LD `Organization.logo` тЖТ `https://daibilet.ru/logo-192x192.png` (192├Ч192); `WebSite.name` = ┬л╨Ф╨░╨╣╨▒╨╕╨╗╨╡╤В┬╗, SearchAction ╨╜╨░ `/events?q={search_term_string}`.
-- ╨Ф╨╗╤П ╨┐╨╛╤П╨▓╨╗╨╡╨╜╨╕╤П ╨▓ SERP ╨╜╤Г╨╢╨╡╨╜ ╨┤╨╡╨┐╨╗╨╛╨╣ Next + ╨┐╨╡╤А╨╡╨╛╨▒╤Е╨╛╨┤ Google (╨┤╨╜╨╕/╨╜╨╡╨┤╨╡╨╗╨╕).
+- Клиентский `YandexMetrika` (`next/script` `afterInteractive`) + `<noscript>` pixel в root `layout.tsx`.
+- ID: `106786540` (override через `NEXT_PUBLIC_YANDEX_METRIKA_ID`), init: `ssr`, webvisor, clickmap, ecommerce `dataLayer`, accurateTrackBounce, trackLinks.
+- Паттерн env как у виджетов; в admin Метрику не ставим.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨С╨╡╨╖ commit/push ╤Б╤В╨░╨╜╨┤╨░╤А╤В╨╜╤Л╨╣ `deploy-prod-next.sh` (git pull) ╨┐╤А╨░╨▓╨║╨╕ ╨╜╨╡ ╨┐╨╛╨┤╤Е╨▓╨░╤В╨╕╤В.
+- Хиты появятся в кабинете Метрики только после деплоя Next на prod; SPA-переходы App Router при `ssr:true` обычно ок, при сомнениях — проверить «онлайн» после клиентской навигации.
 
 ---
 
-## 2026-07-18 тАФ ╨а╤Г╤Б╨╕╤Д╨╕╨║╨░╤Ж╨╕╤П UI ╨░╨┤╨╝╨╕╨╜╨║╨╕
+## 2026-07-19 — Скрейпер liliabots.ru копирует афишу
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т╨╛ ╨▓╤Б╨╡╤Е ╤А╨░╨╖╨┤╨╡╨╗╨░╤Е ╨░╨┤╨╝╨╕╨╜╨║╨╕ ╨╛╤Б╤В╨░╨▓╨░╨╗╨╕╤Б╤М ╨░╨╜╨│╨╗╨╕╨╣╤Б╨║╨╕╨╡ ╨▒╨╡╨╣╨┤╨╢╨╕ ╨╕ ╨┐╨╛╨┤╨┐╨╕╤Б╨╕: `imported`, `need attention`, `backend`, `Save`/`Close`, ╤Б╤В╨░╤В╤Г╤Б╤Л `published`/`review`/`auto`, SEO-╨╝╨╡╤В╨║╨╕ `index`/`noindex`, `Override`/`Source`.
+- В Google выдаче `liliabots.ru` индексирует карточки с брендом «Дайбилет» (title/snippet с ценами и площадками) — зеркало/парсер контента.
+- Публичный HTML и `/api/public/*` открыты без сессии (by design MVP); rate limit на API уже есть (60r/m).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Я╨╡╤А╨╡╨▓╨╡╨┤╨╡╨╜╤Л ╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╨╡╨╗╤М╤Б╨║╨╕╨╡ ╤Б╤В╤А╨╛╨║╨╕ ╨▓ ╤Б╤В╤А╨░╨╜╨╕╤Ж╨░╤Е Events, Landings, Articles, Venues, Sources, Mapping, Settings, Dashboard, Change Requests ╨╕ ╨▓ shell/primitives.
-- `StatusBadge` ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╡╤В ╤А╤Г╤Б╤Б╨║╨╕╨╡ ╤Б╤В╨░╤В╤Г╤Б╤Л ╨▓╨╝╨╡╤Б╤В╨╛ ╤Б╤Л╤А╤Л╤Е `live`/`draft`.
+- `robots.txt`: `User-agent: liliabots|liliabot` → `Disallow: /`.
+- Nginx: `map $daibilet_block_scraper` + `403` на `daibilet.ru` / `api.daibilet.ru` (`patch-prod-nginx-scraper-block.py`).
+- Параллельно: жалоба в Google на копирование (Remove outdated content / Legal) — UA-блок не удаляет уже проиндексированные страницы зеркала.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Ш╨╝╨╡╨╜╨░ ╨┐╤А╨╛╨▓╨░╨╣╨┤╨╡╤А╨╛╨▓ (Ticketscloud, Teplohod.info) ╨╕ ╤В╨╡╤Е╨╜╨╕╤З╨╡╤Б╨║╨╕╨╡ slug/SEO-╨┐╨╛╨╗╤П ╨╛╤Б╤В╨░╨▓╨╗╨╡╨╜╤Л ╨║╨░╨║ ╨▒╤А╨╡╨╜╨┤╤Л/╤В╨╡╤А╨╝╨╕╨╜╤Л.
-
----
-
-## 2026-07-18 тАФ Full sync TC+TEP
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- `tc:full-sync` ╨╜╨░ prod ╤Б╨╛╤Е╤А╨░╨╜╨╕╨╗ catalog; `tc-import-catalog` ╤Г╨┐╨░╨╗ ╨╜╨░ `Event_slug_key` тАФ `slugify(...).slice(0,120)` ╨╛╨▒╤А╨╡╨╖╨░╨╗ `externalId` ╤Г ╨┤╨╗╨╕╨╜╨╜╤Л╤Е title.
-- `tep:sync` ╨╖╨░╨▓╨╡╤А╤И╨╕╨╗╤Б╤П: 187 events / 18129 sessions / 18577 ProviderLink.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- `buildEventSlug(title, externalId)` тАФ suffix id ╨▓╤Б╨╡╨│╨┤╨░ ╨▓╨╜╤Г╤В╤А╨╕ 120 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓; ╨┐╨╛╨▓╤В╨╛╤А╨╜╤Л╨╣ `tc:import` ╨┐╨╛╤Б╨╗╨╡ ╤Д╨╕╨║╤Б╨░.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- тАФ
+- Скрейпер может ходить с поддельным Chrome UA — тогда нужен Cloudflare Bot Fight / WAF и ужесточение HTML rate limit.
 
 ---
 
+## 2026-07-19 — Cron TC orders-only + контент-план блога
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨б `md` ╨│╨░╨╝╨▒╤Г╤А╨│╨╡╤А ╤Б╨║╤А╤Л╨▓╨░╨╗╤Б╤П, ╨░ desktop-nav ╨▓╨║╨╗╤О╤З╨░╨╗╤Б╤П, ╨╜╨╛ City/Search тАФ ╤В╨╛╨╗╤М╨║╨╛ ╤Б `lg` тЖТ ╨╜╨░ ╨┐╨╗╨░╨╜╤И╨╡╤В╨╡ ╤И╨░╨┐╨║╨░ ╨┐╨╡╤А╨╡╨┐╨╛╨╗╨╜╤П╨╗╨░╤Б╤М ╨╕ ╨▓╤Л╨│╨╗╤П╨┤╨╡╨╗╨░ ┬л╨╜╨╡╨░╨┤╨░╨┐╤В╨╕╨▓╨╜╨╛╨╣┬╗.
+- Зеркало заказов Ticketscloud на prod не обновлялось с 13.07 — sync только ручной, без cron; каталог (TEP 6ч) заказы не тянет.
+- Teplohod orders API в интеграции не описан; email-парсинг отклонён как MVP-путь.
+- Блог давно не обновлялся; нужен контент-план и еженедельный дайджест новых событий.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ь╨╛╨▒╨╕╨╗╤М╨╜╨╛╨╡ ╨╝╨╡╨╜╤О ╨┤╨╛ `lg`; desktop nav ╤Б `lg`, ╨▓╤В╨╛╤А╨╛╤Б╤В╨╡╨┐╨╡╨╜╨╜╤Л╨╡ ╤Б╤Б╤Л╨╗╨║╨╕ ╤Б `xl`.
-- ╨Э╨░ `<lg` ╨▓ ╤И╨░╨┐╨║╨╡ ╤В╨╛╨╗╤М╨║╨╛ ╨│╨░╨╝╨▒╤Г╤А╨│╨╡╤А + ╨╗╨╛╨│╨╛╤В╨╕╨┐; ╨┐╨╛╨╕╤Б╨║ / FAQ / ╨▓╤Е╨╛╨┤ / ╨╕╨╖╨▒╤А╨░╨╜╨╜╨╛╨╡ тАФ ╨▓ sheet.
-- ╨б `lg` тАФ ╨┐╨╕╨║╤В╨╛╨│╤А╨░╨╝╨╝╤Л ╨┤╨╡╨╣╤Б╤В╨▓╨╕╨╣ ╨▓ ╤И╨░╨┐╨║╨╡ ╨║╨░╨║ ╤А╨░╨╜╤М╤И╨╡.
-- Spacer height: 4rem ╨┤╨╛ lg, 4.5rem ╤Б lg.
+- `deploy/cron/tc-orders-sync.sh` + crontab `*/10` только `npm run tc:orders` (`created_at=from,to`, lookback 3 дня, flock). Каталог не трогаем.
+- Smoke 2026-07-18: импортирован 1 заказ TC `done` (первая внешняя продажа) + 1 билет.
+- Контент-план: [content-blog-plan.md](./content-blog-plan.md) — 5 заголовков + дизайн weekly digest → Article status=`review`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- тАФ
+- TEP-продажи в админке появятся только после partner orders API.
+- Auto-publish дайджеста без редактора — не включать.
+
+---
+
+## 2026-07-18 — Google SERP: favicon + WebSite JSON-LD
+
+### Наблюдения
+
+- В выдаче Google сайт отображался как серый глобус + URL `daibilet.ru` вместо «Дайбилет» и цветной иконки.
+- На проде `GET /favicon.ico` → **404**; в HTML не было `link rel="icon"` с PNG.
+- SSR JSON-LD `WebSite` + `Organization` уже был в `apps/web/app/layout.tsx`, но `Organization.logo` указывал на несуществующий `/favicon.ico`.
+- `robots.txt` иконки не блокирует (`Allow: /`).
+- `og:site_name` / title template (`%s | Дайбилет`) уже заданы в root metadata.
+
+### Решения
+
+- Добавлены стабильные PNG: `/favicon-48x48.png`, `/favicon-96x96.png`, `/icon-192x192.png`, `/logo-192x192.png`, `/apple-touch-icon.png` (+ SVG/ICO fallback) в `apps/web/public/`.
+- В root `metadata.icons` — `rel="icon"` type `image/png` (48/96/192) и apple-touch.
+- JSON-LD `Organization.logo` → `https://daibilet.ru/logo-192x192.png` (192×192); `WebSite.name` = «Дайбилет», SearchAction на `/events?q={search_term_string}`.
+- Для появления в SERP нужен деплой Next + переобход Google (дни/недели).
+
+### Проблемы
+
+- Без commit/push стандартный `deploy-prod-next.sh` (git pull) правки не подхватит.
+
+---
+
+## 2026-07-18 — Русификация UI админки
+
+### Наблюдения
+
+- Во всех разделах админки оставались английские бейджи и подписи: `imported`, `need attention`, `backend`, `Save`/`Close`, статусы `published`/`review`/`auto`, SEO-метки `index`/`noindex`, `Override`/`Source`.
+
+### Решения
+
+- Переведены пользовательские строки в страницах Events, Landings, Articles, Venues, Sources, Mapping, Settings, Dashboard, Change Requests и в shell/primitives.
+- `StatusBadge` по умолчанию показывает русские статусы вместо сырых `live`/`draft`.
+
+### Проблемы
+
+- Имена провайдеров (Ticketscloud, Teplohod.info) и технические slug/SEO-поля оставлены как бренды/термины.
+
+---
+
+## 2026-07-18 — Full sync TC+TEP
+
+### Наблюдения
+
+- `tc:full-sync` на prod сохранил catalog; `tc-import-catalog` упал на `Event_slug_key` — `slugify(...).slice(0,120)` обрезал `externalId` у длинных title.
+- `tep:sync` завершился: 187 events / 18129 sessions / 18577 ProviderLink.
+
+### Решения
+
+- `buildEventSlug(title, externalId)` — suffix id всегда внутри 120 символов; повторный `tc:import` после фикса.
+
+### Проблемы
+
+- —
 
 ---
 
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╤Б╨╗╨╡ `860c818` (restore legacy widgets) ╨╕╨╖ `TeplohodWidget.client.tsx` ╨┐╤А╨╛╨┐╨░╨╗ `bootstrapTeplohodWidgets()` / ╨┐╨╛╨▓╤В╨╛╤А╨╜╤Л╨╣ `TI_Tickets.init`.
-- ╨Э╨░ `/events/[slug]` ╨╛╤Б╤В╨░╨▓╨░╨╗╤Б╤П ╨┐╤Г╤Б╤В╨╛╨╣ `.teplohod-info-wrapper` ╨▒╨╡╨╖ ╨║╨╜╨╛╨┐╨║╨╕ тАФ script ╨│╤А╤Г╨╖╨╕╨╗╤Б╤П, ╨╜╨╛ init ╨┐╨╛╤Б╨╗╨╡ hydration ╨╜╨╡ ╨▓╤Л╨╖╤Л╨▓╨░╨╗╤Б╤П.
-- ╨Э╨░ ╨╗╨╡╨╜╨┤╨╕╨╜╨│╨░╤Е lean DTO ╨▒╨╡╨╖ `purchaseUrl`/`externalId`; `LandingPurchaseButton` ╨╖╨▓╨░╨╗ `getTeplohodWidgetIds` ╨▒╨╡╨╖ ╨┐╨░╤А╤Б╨╕╨╜╨│╨░ `evt_tep_*`.
+- С `md` гамбургер скрывался, а desktop-nav включался, но City/Search — только с `lg` → на планшете шапка переполнялась и выглядела «неадаптивной».
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Т╨╛╤Б╤Б╤В╨░╨╜╨╛╨▓╨╗╨╡╨╜ bootstrap + wait ╨╜╨░ `TI_Tickets.init`, retry mount, fallback ╨╜╨░ `account.teplohod.info`.
-- Event buy card ╨┐╨╡╤А╨╡╨┤╨░╤С╤В `purchaseUrl` ╨▓ embed.
-- ╨Ы╨╡╨╜╨┤╨╕╨╜╨│╨╕: `getTeplohodWidgetIdsFromSession` + `resolveTeplohodCheckoutUrl` (ID ╨╕╨╖ `evt_tep_*`).
-- ╨Ъ╨░╤В╨░╨╗╨╛╨│ `/events` ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г ╨▒╨╡╨╖ widget markup (`suppressPurchaseAnchors`).
+- Мобильное меню до `lg`; desktop nav с `lg`, второстепенные ссылки с `xl`.
+- На `<lg` в шапке только гамбургер + логотип; поиск / FAQ / вход / избранное — в sheet.
+- С `lg` — пиктограммы действий в шапке как раньше.
+- Spacer height: 4rem до lg, 4.5rem с lg.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- тАФ
+- —
 
 ---
 
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╨╗╨╜╤Л╨╣ admin catalog cache (~25s cold) ╨┐╤А╨╕ TTL 60s ╨╖╨░╤Б╤В╨░╨▓╨╗╤П╨╗ Events/Dashboard/Landings ╤Б╨╜╨╛╨▓╨░ ╨╢╨┤╨░╤В╤М ╨┐╤А╨╕ ╨║╨░╨╢╨┤╨╛╨╝ ┬л╨┐╤А╨╛╤В╤Г╤Е╨░╨╜╨╕╨╕┬╗.
-- ╨Я╨╛╤Б╨╗╨╡ SWR ╨║╨░╤В╨░╨╗╨╛╨│╨░: Events/Dashboard ~10тАУ40тАпms, ╨╜╨╛ Landings ~700тАУ800тАпms (`matchesRule` ├Ч rules ├Ч ~3k) ╨╕ Sources ~2.5тАпs (╤В╤П╨╢╤С╨╗╤Л╨╣ SQL).
+- После `860c818` (restore legacy widgets) из `TeplohodWidget.client.tsx` пропал `bootstrapTeplohodWidgets()` / повторный `TI_Tickets.init`.
+- На `/events/[slug]` оставался пустой `.teplohod-info-wrapper` без кнопки — script грузился, но init после hydration не вызывался.
+- На лендингах lean DTO без `purchaseUrl`/`externalId`; `LandingPurchaseButton` звал `getTeplohodWidgetIds` без парсинга `evt_tep_*`.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- Stale-while-revalidate ╨║╨░╤В╨░╨╗╨╛╨│╨░: fresh 5 ╨╝╨╕╨╜, stale ╨┤╨╛ 30 ╨╝╨╕╨╜ + ╤Д╨╛╨╜╨╛╨▓╤Л╨╣ rebuild; soft-invalidate; warm ╨╜╨░ startup.
-- Landings: memo `adminLandingsBaseCache` ╨┐╨╛ `catalogBuiltAt` + fingerprint saved landings; invalidate ╨╜╨░ PATCH landing/match.
-- Sources: SWR fresh 2 ╨╝╨╕╨╜ / stale 10 ╨╝╨╕╨╜; invalidate ╨▓╨╝╨╡╤Б╤В╨╡ ╤Б admin catalog.
-- Warm startup: ╨┐╨╛╤Б╨╗╨╡ grouped cache ╨┐╤А╨╛╨│╤А╨╡╨▓╨░╨╡╨╝ Landings list + Sources.
+- Восстановлен bootstrap + wait на `TI_Tickets.init`, retry mount, fallback на `account.teplohod.info`.
+- Event buy card передаёт `purchaseUrl` в embed.
+- Лендинги: `getTeplohodWidgetIdsFromSession` + `resolveTeplohodCheckoutUrl` (ID из `evt_tep_*`).
+- Каталог `/events` по-прежнему без widget markup (`suppressPurchaseAnchors`).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Я╨╡╤А╨▓╤Л╨╣ cold ╨┐╨╛╤Б╨╗╨╡ hard-expire ╨▓╤Б╤С ╨╡╤Й╤С ╨┤╨╛╤А╨╛╨│╨╛╨╣ тАФ ╤А╨╡╨┤╨║╨╕╨╣ ╨║╨╡╨╣╤Б.
-- Hotfix ╨┐╨╛╤Б╨╗╨╡ `dcada19`: ╨┐╤А╨╕ ╨▓╤Б╤В╨░╨▓╨║╨╡ landings-╨║╤Н╤И╨░ ╨┐╤А╨╛╨┐╨░╨╗ `let adminGroupedEventsCache` тЖТ warm ╨┐╨░╨┤╨░╨╗ ╤Б ReferenceError; ╨▓╨╛╤Б╤Б╤В╨░╨╜╨╛╨▓╨╗╨╡╨╜╨╛.
-
----
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- `eventRows(..., 10000)` ╨╛╨▒╤А╨╡╨╖╨░╨╗ admin Events/Landings; dashboard ╨▒╤А╨░╨╗ saleable public groups тЖТ ╤А╨░╤Б╤Е╨╛╨╢╨┤╨╡╨╜╨╕╨╡ 2526 vs 1353.
-- Lean `description=null` ╨┤╨░╨▓╨░╨╗ ╨╗╨╛╨╢╨╜╤Л╨╣ WEAK_DESCRIPTION ╨┐╨╛╤З╤В╨╕ ╨╜╨░ ╨▓╤Б╤С╨╝ ╨║╨░╤В╨░╨╗╨╛╨│╨╡.
-- ╨Т cache declaration ╤Б╨▓╨╛╨╣╤Б╤В╨▓╨╛ ╨▒╤Л╨╗╨╛ `events`, ╨░ ╨║╨╛╨┤ ╤З╨╕╤В╨░╨╗ `.items` (╨┐╨╛╤Б╨╗╨╡ populate ╨┐╨╕╤Б╨░╨╗╨╛╤Б╤М `items` тАФ ╤Е╤А╤Г╨┐╨║╨╛).
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Admin cache: ╨┐╨╛╨╗╨╜╤Л╨╣ `eventRows(null)`, single-flight promise, ╨║╨╗╤О╤З `items`.
-- Dashboard launch metrics ╨╕╨╖ ╤В╨╛╨│╨╛ ╨╢╨╡ `getCachedAdminGroupedEvents` (`source: admin_event_groups`).
-- Lean: `descriptionLength` ╨┤╨╗╤П readiness; `eventRowsByIds` ╤З╨╡╤А╨╡╨╖ `WHERE id = ANY(...)`.
-- Landing candidates ╨┐╨╡╤А╨╡╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╤О╤В cache.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Я╨╡╤А╨▓╤Л╨╣ cold build admin cache ╨╜╨░ ╨┐╨╛╨╗╨╜╨╛╨╝ ╨║╨░╤В╨░╨╗╨╛╨│╨╡ ╨╝╨╛╨╢╨╡╤В ╨▒╤Л╤В╤М ╨╝╨╡╨┤╨╗╨╡╨╜╨╜╤Л╨╝ (~╤Б╨╡╨║╤Г╨╜╨┤╤Л); ╨║╤Н╤И 60╤Б + single-flight.
+- —
 
 ---
 
-## 2026-07-14 тАФ ╨Я╨╛╨╗╨╜╤Л╨╣ ╨░╤Г╨┤╨╕╤В ╨░╨┤╨╝╨╕╨╜╨║╨╕ (prod)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Т ╤Е╨╛╨┤╨╡ ╨░╤Г╨┤╨╕╤В╨░ `GET /api/admin/events` ╨╕ `/landings` ╨╛╤В╨┤╨░╨▓╨░╨╗╨╕ **500** (`syntax error at or near "text"`): ╨▓ lean `eventRows` SQL template ╤Б╨╗╤Г╤З╨░╨╣╨╜╨╛ ╨┐╨╛╨┐╨░╨╗╨╕ JS `//` ╨║╨╛╨╝╨╝╨╡╨╜╤В╨░╤А╨╕╨╕ ╨┐╨╛╤Б╨╗╨╡ ╤Д╨╕╨║╤Б╨░ override.
-- Admin events cache ╤А╨╡╨╢╨╡╤В `eventRows(..., 10000)` тЖТ `sourceEvents=10000`, `groupedEvents=1353`, ╤В╨╛╨│╨┤╨░ ╨║╨░╨║ dashboard/public ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╤О╤В **2526** ╨│╤А╤Г╨┐╨┐; readiness-╨╝╨╡╤В╤А╨╕╨║╨╕ ╤Б╨┐╨╕╤Б╨║╨░ (needs_attention **1352**) ╨╜╨╡ ╤Б╨╛╨▓╨┐╨░╨┤╨░╤О╤В ╤Б dashboard (**0**).
-- Stub-╨╜╨░╨▓╨╕╨│╨░╤Ж╨╕╤П: mapping / taxonomy / audit-log / settings; ECR API ╨╡╤Б╤В╤М, UI ╨▓ ╨▒╨░╨╜╨┤╨╗╨╡ ╨▓╤Л╨║╨╗╤О╤З╨╡╨╜.
-- Override description ╨▓ lean ╨┐╨╛╤Б╨╗╨╡ ╤Д╨╕╨║╤Б╨░ ╤З╨╕╤В╨░╨╡╤В╤Б╤П (╨┐╤А╨╕╨╝╨╡╤А `evt_tep_370`); source `e.description` ╨▓ lean ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г null.
+- Полный admin catalog cache (~25s cold) при TTL 60s заставлял Events/Dashboard/Landings снова ждать при каждом «протухании».
+- После SWR каталога: Events/Dashboard ~10–40 ms, но Landings ~700–800 ms (`matchesRule` × rules × ~3k) и Sources ~2.5 s (тяжёлый SQL).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- Hotfix `ea27651`: ╤Г╨▒╤А╨░╨╜╤Л JS-╨║╨╛╨╝╨╝╨╡╨╜╤В╨░╤А╨╕╨╕ ╨╕╨╖ SQL; api restart ╨╜╨░ prod тАФ Events/Landings ╤Б╨╜╨╛╨▓╨░ 200.
+- Stale-while-revalidate каталога: fresh 5 мин, stale до 30 мин + фоновый rebuild; soft-invalidate; warm на startup.
+- Landings: memo `adminLandingsBaseCache` по `catalogBuiltAt` + fingerprint saved landings; invalidate на PATCH landing/match.
+- Sources: SWR fresh 2 мин / stale 10 мин; invalidate вместе с admin catalog.
+- Warm startup: после grouped cache прогреваем Landings list + Sources.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Э╨╡╨┐╨╛╨╗╨╜╤Л╨╣ admin-╨║╨░╤В╨░╨╗╨╛╨│ ╨╕╨╖-╨╖╨░ hard limit 10k тАФ P0 ╨║ ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╡╨╝╤Г ╤Д╨╕╨║╤Б╤Г.
-- ╨а╨░╤Б╤Е╨╛╨╢╨┤╨╡╨╜╨╕╨╡ Dashboard vs Events metrics тАФ P0/P1 ╨┤╨╗╤П ╨╛╨┐╨╡╤А╨░╤Ж╨╕╨╛╨╜╨╜╨╛╨╣ ╨┤╨╛╤Б╤В╨╛╨▓╨╡╤А╨╜╨╛╤Б╤В╨╕.
-
----
-
-## 2026-07-14 тАФ Legacy widgets + description overrides + paragraphs
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨б╨╛╨▒╤Б╤В╨▓╨╡╨╜╨╜╨░╤П iframe-╨╝╨╛╨┤╨░╨╗╨║╨░ checkout тАФ ╨╗╨╕╤И╨╜╨╕╨╣ ╨▓╨╡╨╗╨╛╤Б╨╕╨┐╨╡╨┤; ╨▓ legacy (`apps/public`) ╨┐╨╛╨║╤Г╨┐╨║╨░ ╤И╨╗╨░ ╤З╨╡╤А╨╡╨╖ TC `data-tc-event` click ╨╕ Teplohod embed + `.ti-tickets-event-tickets-buy`.
-- Override ╨╛╨┐╨╕╤Б╨░╨╜╨╕╤П ┬л╨╜╨╡ ╤Б╨╛╤Е╤А╨░╨╜╤П╨╗╤Б╤П┬╗: lean `eventRows` ╨╛╨▒╨╜╤Г╨╗╤П╨╗ `override.description` / SEO-╤В╨╡╨║╤Б╤В╤Л тЖТ ContentTab ╨╛╤В╨║╤А╤Л╨▓╨░╨╗╤Б╤П ╨┐╤Г╤Б╤В╤Л╨╝ ╨╕ PATCH ╨╖╨░╤В╨╕╤А╨░╨╗ ╨С╨Ф `null`.
-- ╨Ю╨┐╨╕╤Б╨░╨╜╨╕╤П ┬л╨┐╨╛╨╗╨╛╤В╨╡╨╜╤Ж╨╡╨╝┬╗: ╨▓ Next `splitDescriptionParagraphs` ╨╜╨╡ ╨╕╨╝╨╡╨╗ legacy fallback ╨┐╨╛ ╨╛╨┤╨╕╨╜╨╛╤З╨╜╤Л╨╝ `\n` (╤В╨╛╨╗╤М╨║╨╛ blank lines), ╨╖╨░╤В╨╡╨╝ `cleanDisplayText` ╤Б╤Е╨╗╨╛╨┐╤Л╨▓╨░╨╗ ╨▓╤Б╤С ╨▓ ╨╛╨┤╨╕╨╜ ╨░╨▒╨╖╨░╤Ж.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Purchase CTA ╤Б╨╜╨╛╨▓╨░ ╨╜╨░ legacy-╨▓╨╕╨┤╨╢╨╡╤В╤Л (╨▒╨╡╨╖ CheckoutModal ╨▓ CTA).
-- Lean admin list ╤Б╨╜╨╛╨▓╨░ ╨╛╤В╨┤╨░╤С╤В override text fields; ╨┐╨╛╤Б╨╗╨╡ PATCH ╨╕╨╜╨▓╨░╨╗╨╕╨┤╨╕╤А╤Г╨╡╨╝ `adminGroupedEventsCache`.
-- `splitDescriptionParagraphs` ╨║╨░╨║ ╨▓ legacy (+ soft-wrap join); ╨╖╨░╨│╨╛╨╗╨╛╨▓╨║╨╕ ╤А╨░╨╖╨┤╨╡╨╗╨╛╨▓ тЖТ `<h3>` ╨┐╨╛ ╤Н╨▓╤А╨╕╤Б╤В╨╕╨║╨╡.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- Source `e.description` ╨▓ lean-╤Б╨┐╨╕╤Б╨║╨╡ ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г null (╤В╤П╨╢╤С╨╗╨╛╨╡ ╨┐╨╛╨╗╨╡) тАФ ╨▓ ContentTab ╨┐╨╛╨┤╨┐╨╕╤Б╤М Source ╨╝╨╛╨╢╨╡╤В ╨▒╤Л╤В╤М ╨┐╤Г╤Б╤В╨╛╨╣; override ╨┐╤А╨╕ ╤Н╤В╨╛╨╝ ╤З╨╕╤В╨░╨╡╤В╤Б╤П/╨┐╨╕╤И╨╡╤В╤Б╤П ╨║╨╛╤А╤А╨╡╨║╤В╨╜╨╛.
+- Первый cold после hard-expire всё ещё дорогой — редкий кейс.
+- Hotfix после `dcada19`: при вставке landings-кэша пропал `let adminGroupedEventsCache` → warm падал с ReferenceError; восстановлено.
 
 ---
 
-## 2026-07-14 тАФ Checkout via own iframe modal (TC + TEP)
+### Наблюдения
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+- `eventRows(..., 10000)` обрезал admin Events/Landings; dashboard брал saleable public groups → расхождение 2526 vs 1353.
+- Lean `description=null` давал ложный WEAK_DESCRIPTION почти на всём каталоге.
+- В cache declaration свойство было `events`, а код читал `.items` (после populate писалось `items` — хрупко).
 
-- ╨Т╨╡╨╜╨┤╨╛╤А╨╜╤Л╨╡ tcwidget.js / Teplohod Fancybox ╨╜╨╡╤Б╤В╨░╨▒╨╕╨╗╤М╨╜╤Л ╨▓ Next (synthetic click, style#loader, fallback races).
-- Checkout URL ╨╛╨▒╨╛╨╕╤Е ╨┐╤А╨╛╨▓╨░╨╣╨┤╨╡╤А╨╛╨▓ **╨╝╨╛╨╢╨╜╨╛ ╨▓╤Б╤В╤А╨░╨╕╨▓╨░╤В╤М ╨▓ iframe** (╨╜╨╡╤В X-Frame-Options).
+### Решения
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+- Admin cache: полный `eventRows(null)`, single-flight promise, ключ `items`.
+- Dashboard launch metrics из того же `getCachedAdminGroupedEvents` (`source: admin_event_groups`).
+- Lean: `descriptionLength` для readiness; `eventRowsByIds` через `WHERE id = ANY(...)`.
+- Landing candidates переиспользуют cache.
 
-- `CheckoutModal` + `CheckoutModalButton`: ╨╜╨░╤И╨░ ╨╝╨╛╨┤╨░╨╗╨║╨░ ╤Б iframe ╨╜╨░ `ticketscloud.com/v1/widgets/common` ╨╕ `account.teplohod.info/order/event-order`.
-- Event page / landing / catalog purchase CTA ╨┐╨╡╤А╨╡╨▓╨╡╨┤╨╡╨╜╤Л ╨╜╨░ ╤Н╤В╤Г ╨╝╨╛╨┤╨░╨╗╨║╤Г тАФ ╨┐╤А╨╡╨┤╤Б╨║╨░╨╖╤Г╨╡╨╝╤Л╨╣ UX ╨▒╨╡╨╖ ╨╖╨░╨▓╨╕╤Б╨╕╨╝╨╛╤Б╤В╨╕ ╨╛╤В vendor DOM.
+### Проблемы
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Я╨╛╨┤╤Е╨╛╨┤ ╨╛╤В╨╛╨╖╨▓╨░╨╜: ╨▓╨╡╤А╨╜╤Г╨╗╨╕╤Б╤М ╨║ legacy vendor widgets (╤Б╨╝. ╨╖╨░╨┐╨╕╤Б╤М ╨▓╤Л╤И╨╡).
-
----
-
-## 2026-07-14 тАФ Root cause: TC style#ticketscloud-loader misdetected as spinner
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Т `tcwidget.js` `#ticketscloud-loader` тАФ ╤Н╤В╨╛ **`<style>` ╨▓ `<head>`**, ╨░ ╨╜╨╡ DOM-╤Б╨┐╨╕╨╜╨╜╨╡╤А. ╨Я╨╛╤Б╨╗╨╡ ╨┐╨╡╤А╨▓╨╛╨│╨╛ ╨╖╨░╨┐╤Г╤Б╨║╨░ ╨╛╨╜ ╨╛╤Б╤В╨░╤С╤В╤Б╤П ╨╜╨░╨▓╤Б╨╡╨│╨┤╨░.
-- Next `openTcWidget` ╤Б╤З╨╕╤В╨░╨╗ ╨╡╨│╨╛ ┬лstuck loading┬╗, ╤Б╨╜╨╛╤Б╨╕╨╗ overlay/`dismissTcWidget` ╨╕ ╨╛╤В╨║╤А╤Л╨▓╨░╨╗ popup тАФ TC-╨╝╨╛╨┤╨░╨╗╨║╨░ ╨▓╤Л╨│╨╗╤П╨┤╨╡╨╗╨░ ┬л╨╜╨╡ ╨│╤А╤Г╨╖╨╕╤В╤Б╤П┬╗.
-- Teplohod ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛ ╨╗╨╛╨╝╨░╨╗╨╕ auto-`window.open` ╨╜╨░ account (╤Г╨╢╨╡ ╤З╨╕╨╜╨╕╨╗╨╕); ╨╛╤Б╤В╨░╨▓╨╕╨╗╨╕ Vite-╨┐╨╛╨┤╨╛╨▒╨╜╤Л╨╣ init + ╨▒╨╡╨╖ ╨░╨│╤А╨╡╤Б╤Б╨╕╨▓╨╜╨╛╨│╨╛ dismiss.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Visible = iframe **╨╕╨╗╨╕** `div#tc-widget-overlay` (╨╜╨╡ STYLE).
-- ╨С╨╛╨╗╤М╤И╨╡ ╨╜╨╡ ╤Г╨┤╨░╨╗╤П╨╡╨╝ `style#ticketscloud-loader`; ╨╜╨╡ ╤Б╤З╨╕╤В╨░╨╡╨╝ ╨╡╨│╨╛ stuck.
-- `openTcWidget`: ensure + `ticketsCloudWidget.init` + click; popup fallback ╤В╨╛╨╗╤М╨║╨╛ ╨╡╤Б╨╗╨╕ shell ╨╜╨╡ ╨┐╨╛╤П╨▓╨╕╨╗╤Б╤П ~4╤Б.
-- Teplohod: `async` script + ╨┐╨╛╨▓╤В╨╛╤А╨╜╤Л╨╣ `init` ╨┐╨╛╤Б╨╗╨╡ paint.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- тАФ
+- Первый cold build admin cache на полном каталоге может быть медленным (~секунды); кэш 60с + single-flight.
 
 ---
 
-## 2026-07-14 тАФ Teplohod fancybox killed by account fallback
+## 2026-07-14 — Полный аудит админки (prod)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╨░ event 554 (`тАж-za-1-chas-554`) ╨▓╨╕╨┤╨╢╨╡╤В Teplohod ╤А╨╕╤Б╤Г╨╡╤В ╨║╨╜╨╛╨┐╨║╤Г ┬л╨Ъ╤Г╨┐╨╕╤В╤М ╨▒╨╕╨╗╨╡╤В╤Л┬╗ inline; ╨▓╤Л╨▒╨╛╤А ╨┤╨░╤В/╨║╨░╤В╨╡╨│╨╛╤А╨╕╨╣ ╨┤╨╛╨╗╨╢╨╡╨╜ ╨╛╤В╨║╤А╤Л╨▓╨░╤В╤М╤Б╤П ╨▓ Fancybox-╨╝╨╛╨┤╨░╨╗╨║╨╡.
-- ╨Э╨░╤И `bindTeplohodBuyFallback` ╤З╨╡╤А╨╡╨╖ 2.5s ╨╛╤В╨║╤А╤Л╨▓╨░╨╗ `account.teplohod.info` ╨▓╨╛ ╨▓╨║╨╗╨░╨┤╨║╨╡, ╨╡╤Б╨╗╨╕ Fancybox ╨╡╤Й╤С ╨╜╨╡ ╨┤╨╡╤В╨╡╨║╤В╨╕╨╗╤Б╤П тАФ UX ┬л╨╜╨╡ ╨▓ ╨╝╨╛╨┤╨░╨╗╨║╨╡┬╗ + ╨▓╤В╨╛╤А╨░╤П ╨║╨╜╨╛╨┐╨║╨░ fallback.
-- `openTeplohodPurchase` ╨╝╨╛╨│ ╨╖╨░╨║╤А╤Л╨▓╨░╤В╤М ╨┐╤Г╤Б╤В╨╛╨╣ Fancybox ╨╕ ╤В╨╛╨╢╨╡ ╤Г╨▓╨╛╨┤╨╕╤В╤М ╨▓╨╛ ╨▓╨╜╨╡╤И╨╜╨╕╨╣ checkout.
+- В ходе аудита `GET /api/admin/events` и `/landings` отдавали **500** (`syntax error at or near "text"`): в lean `eventRows` SQL template случайно попали JS `//` комментарии после фикса override.
+- Admin events cache режет `eventRows(..., 10000)` → `sourceEvents=10000`, `groupedEvents=1353`, тогда как dashboard/public показывают **2526** групп; readiness-метрики списка (needs_attention **1352**) не совпадают с dashboard (**0**).
+- Stub-навигация: mapping / taxonomy / audit-log / settings; ECR API есть, UI в бандле выключен.
+- Override description в lean после фикса читается (пример `evt_tep_370`); source `e.description` в lean по-прежнему null.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨г╨▒╤А╨░╨╜ auto-`window.open` ╤Б ╨║╨╗╨╕╨║╨░ buy; fallback-╤Б╤Б╤Л╨╗╨║╨░ ╤В╨╛╨╗╤М╨║╨╛ ╨╡╤Б╨╗╨╕ ╨║╨╜╨╛╨┐╨║╨░ Teplohod ╤В╨░╨║ ╨╕ ╨╜╨╡ ╤Б╨╝╨╛╨╜╤В╨╕╤А╨╛╨▓╨░╨╗╨░╤Б╤М (~8╤Б).
-- `openTeplohodPurchase` ╨▒╨╛╨╗╤М╤И╨╡ ╨╜╨╡ dismiss'╨╕╤В Fancybox; ╨▓╨╜╨╡╤И╨╜╨╕╨╣ URL тАФ last resort.
-- z-index ╨┤╨╗╤П `.fancyboxtkt-*`; parse `event_id` ╨╕╨╖ account checkout URL.
+- Hotfix `ea27651`: убраны JS-комментарии из SQL; api restart на prod — Events/Landings снова 200.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- тАФ
-
----
-
-## 2026-07-14 тАФ TC widget infinite loader again
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Я╨╛╤Б╨╗╨╡ ╨║╨╗╨╕╨║╨░ ┬л╨Ъ╤Г╨┐╨╕╤В╤М┬╗ Ticketscloud ╤А╨╕╤Б╤Г╨╡╤В `#tc-widget-overlay` + `#ticketscloud-loader` ╨┤╨╛ iframe.
-- `isTcWidgetVisible` ╤Б╤З╨╕╤В╨░╨╗ overlay ╤Г╤Б╨┐╨╡╤Е╨╛╨╝ тЖТ fallback ╨╜╨░ `purchaseUrl` ╨╜╨╡ ╤Б╤А╨░╨▒╨░╤В╤Л╨▓╨░╨╗, loader ╨║╤А╤Г╤В╨╕╨╗╤Б╤П ╨▒╨╡╤Б╨║╨╛╨╜╨╡╤З╨╜╨╛.
-- TEP: `ensureTeplohodWidgetScript` ╨╝╨╛╨│ resolve ╨┤╨╛ ╨┐╨╛╤П╨▓╨╗╨╡╨╜╨╕╤П `TI_Tickets.init`.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Visible = ╤А╨╡╨░╨╗╤М╨╜╤Л╨╣ iframe (╨╜╨╡ overlay/loader); stuck loading тЖТ dismiss + popup fallback.
-- Teplohod script wait ╨┤╨╛ `TI_Tickets.init`.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- iframe ╨╝╨╛╨╢╨╡╤В ╨┐╨╛╤П╨▓╨╕╤В╤М╤Б╤П ╨┐╤Г╤Б╤В╤Л╨╝ ╨╕ ╨▓╤Б╤С ╨╡╤Й╤С ╨║╤А╤Г╤В╨╕╤В╤М╤Б╤П тАФ ╨╡╤Б╨╗╨╕ ╨┐╨╛╨▓╤В╨╛╤А╨╕╤В╤Б╤П, ╨┤╨╛╨▒╨░╨▓╨╕╤В╤М ╨┐╤А╨╛╨▓╨╡╤А╨║╤Г contentDocument/timeout ╨▓╨╜╤Г╤В╤А╨╕ iframe.
+- Неполный admin-каталог из-за hard limit 10k — P0 к следующему фиксу.
+- Расхождение Dashboard vs Events metrics — P0/P1 для операционной достоверности.
 
 ---
 
-## 2026-07-14 тАФ Catalog list description restored
+## 2026-07-14 — Legacy widgets + description overrides + paragraphs
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Lean list DTO ╤Г╨▒╤А╨░╨╗ `description` ╨▓╨╝╨╡╤Б╤В╨╡ ╤Б widget URL / full slots; ╨╜╨░ `/events` ╨│╨╛╤А╨╕╨╖╨╛╨╜╤В╨░╨╗╤М╨╜╤Л╨╡ ╨║╨░╤А╤В╨╛╤З╨║╨╕ ╨┐╨╛╤В╨╡╤А╤П╨╗╨╕ excerpt ╨┐╤А╨╕ ╤В╨╛╨╝, ╤З╤В╨╛ UI (`formatListDescription`) ╤Г╨╢╨╡ ╨╡╨│╨╛ ╨╢╨┤╨░╨╗.
-- ╨Ю╤Б╨╜╨╛╨▓╨╜╨╛╨╣ perf-╨▓╤Л╨╕╨│╤А╤Л╤И ╨▒╤Л╨╗ ╨╛╤В ╨▓╨╕╨┤╨╢╨╡╤В╨╛╨▓ ╨▓ list HTML ╨╕ hydrate page-only, ╨╜╨╡ ╨╛╤В ╤Б╨░╨╝╨╛╨│╨╛ ╤В╨╡╨║╤Б╤В╨░ ╨╛╨┐╨╕╤Б╨░╨╜╨╕╤П.
+- Собственная iframe-модалка checkout — лишний велосипед; в legacy (`apps/public`) покупка шла через TC `data-tc-event` click и Teplohod embed + `.ti-tickets-event-tickets-buy`.
+- Override описания «не сохранялся»: lean `eventRows` обнулял `override.description` / SEO-тексты → ContentTab открывался пустым и PATCH затирал БД `null`.
+- Описания «полотенцем»: в Next `splitDescriptionParagraphs` не имел legacy fallback по одиночным `\n` (только blank lines), затем `cleanDisplayText` схлопывал всё в один абзац.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `toPublicCatalogListItem` ╤Б╨╜╨╛╨▓╨░ ╨╛╤В╨┤╨░╤С╤В `description` ╨║╨░╨║ plain-text excerpt (тЙд420 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓, ╨▒╨╡╨╖ HTML).
-- `PublicCatalogListItemDto.description` ╨▓╨╛╨╖╨▓╤А╨░╤Й╤С╨╜ ╨▓ ╨║╨╛╨╜╤В╤А╨░╨║╤В; `EventCardHorizontal` ╤В╨╕╨┐╨╕╨╖╨╕╤А╨╛╨▓╨░╨╜ ╨┐╨╛╨┤ list DTO.
+- Purchase CTA снова на legacy-виджеты (без CheckoutModal в CTA).
+- Lean admin list снова отдаёт override text fields; после PATCH инвалидируем `adminGroupedEventsCache`.
+- `splitDescriptionParagraphs` как в legacy (+ soft-wrap join); заголовки разделов → `<h3>` по эвристике.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Я╨╛╨╗╨╜╤Л╨╣ HTML description ╨▓ list ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г ╨╜╨╡ ╨╜╤Г╨╢╨╡╨╜ (╤А╨░╨╖╨┤╤Г╨▓╨░╨╡╤В JSON); detail ╨╛╤Б╤В╨░╤С╤В╤Б╤П ╨╜╨░ event page.
-
----
-
-## 2026-07-14 тАФ ChunkLoad ╨┐╨╛╤Б╨╗╨╡ redeploy + harden deploy
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Я╨╛╤Б╨╗╨╡ `deploy-prod-next.sh` ╤Б╤В╨░╤А╤Л╨╡ ╨▓╨║╨╗╨░╨┤╨║╨╕ ╨╖╨░╨┐╤А╨░╤И╨╕╨▓╨░╨╗╨╕ chunk hashes ╨┐╤А╨╡╨┤╤Л╨┤╤Г╤Й╨╡╨│╨╛ ╨▒╨╕╨╗╨┤╨░ тЖТ 404 / `ChunkLoadError` (Application error).
-- ╨Р╨║╤В╤Г╨░╨╗╤М╨╜╤Л╨╣ HTML ╤Г╨╢╨╡ ╤Б╤Б╤Л╨╗╨░╨╗╤Б╤П ╨╜╨░ ╨╜╨╛╨▓╤Л╨╡ chunks; ╨┐╤А╨╛╨▒╨╗╨╡╨╝╨░ ╨║╨╗╨╕╨╡╨╜╤В╤Б╨║╨╛╨│╨╛ ╨║╤Н╤И╨░ ╤Б╨╡╤Б╤Б╨╕╨╕, ╨╜╨╡ nginx static proxy.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Prod: `systemctl stop daibilet-web` тЖТ `rm -rf apps/web/.next/cache` тЖТ start тЖТ internal revalidate (home/catalog tags+paths).
-- `deploy-prod-next.sh`: ╨╛╤З╨╕╤Б╤В╨║╨░ `.next/cache` ╨┐╨╡╤А╨╡╨┤ start + post-deploy `POST /api/internal/revalidate`; **re-exec ╨┐╨╛╤Б╨╗╨╡ `git pull`**, ╤З╤В╨╛╨▒╤Л ╤Е╨▓╨╛╤Б╤В ╤Б╨║╤А╨╕╨┐╤В╨░ ╨╜╨╡ ╨╛╤Б╤В╨░╨▓╨░╨╗╤Б╤П ╨╛╤В ╤Б╤В╨░╤А╨╛╨╣ ╨▓╨╡╤А╤Б╨╕╨╕.
-- `ChunkLoadRecovery` ╨▓ root layout: ╨╛╨┤╨╕╨╜ `location.reload()` ╨╜╨░ ChunkLoad / dynamic import failure per session.
-- Prod: ╨╖╨░╨┐╨╛╨╗╨╜╨╡╨╜ ╨┐╤Г╤Б╤В╨╛╨╣ `DAIBILET_NEXT_REVALIDATE_SECRET` (╤А╨░╨╜╤М╤И╨╡ ╨▓╤Б╨╡╨│╨┤╨░ 401).
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- PowerShell+SSH quoting ╨╗╨╛╨╝╨░╨╡╤В Bearer/json ╨▓ one-liner; ╨┤╨╗╤П ad-hoc ╨╗╤Г╤З╤И╨╡ remote Python/scp.
-- ╨Э╨░ prod `DAIBILET_NEXT_REVALIDATE_SECRET` ╨▓ `.env` ╨▒╤Л╨╗ **╨┐╤Г╤Б╤В╤Л╨╝** тЖТ post-sync/deploy revalidate ╨▓╤Б╨╡╨│╨┤╨░ 401; ╤Б╨│╨╡╨╜╨╡╤А╨╕╤А╨╛╨▓╨░╨╜ ╨╕ ╨┐╤А╨╛╨┐╨╕╤Б╨░╨╜ ╨╜╨╛╨▓╤Л╨╣ ╤Б╨╡╨║╤А╨╡╤В, web+api ╨┐╨╡╤А╨╡╨╖╨░╨┐╤Г╤Й╨╡╨╜╤Л.
+- Source `e.description` в lean-списке по-прежнему null (тяжёлое поле) — в ContentTab подпись Source может быть пустой; override при этом читается/пишется корректно.
 
 ---
 
-## 2026-07-14 тАФ Docs + commit + prod deploy (admin pagination + catalog perf)
+## 2026-07-14 — Checkout via own iframe modal (TC + TEP)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Worktree ╤Б╨╛╨┤╨╡╤А╨╢╨░╨╗ ╨░╨┤╨╝╨╕╨╜╤Б╨║╤Г╤О ╨┐╨░╨│╨╕╨╜╨░╤Ж╨╕╤О, compact dashboard, catalog lean DTO, SEO redirects ╨╕ Teplohod checkout fix тАФ ╨▒╨╡╨╖ ╨┐╤Г╤И╨░.
-- ╨Ю╨┤╨╜╨╛╤А╨░╨╖╨╛╨▓╤Л╨╡ `scripts/inspect-*` / `probe-*` / `scrape-*` ╨╜╨╡ ╨▓╤Е╨╛╨┤╤П╤В ╨▓ ╨║╨╛╨╝╨╝╨╕╤В.
+- Вендорные tcwidget.js / Teplohod Fancybox нестабильны в Next (synthetic click, style#loader, fallback races).
+- Checkout URL обоих провайдеров **можно встраивать в iframe** (нет X-Frame-Options).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ф╨╛╨║╤Г╨╝╨╡╨╜╤В╤Л: Project/Tasktracker/Diary/current-state ╨╛╨▒╨╜╨╛╨▓╨╗╨╡╨╜╤Л ╨┐╨╛╨┤ ╨║╨╛╨╜╤В╤А╨░╨║╤В╤Л admin API ╨╕ catalog perf rules.
-- Deploy: `feat/next-monorepo` @ `6175ad5` тЖТ prod (`deploy-prod-next.sh`); nginx wwwтЖТapex 301 ╨┐╤А╨╕╨╝╨╡╨╜╤С╨╜; Next matcher hotfix (static array).
+- `CheckoutModal` + `CheckoutModalButton`: наша модалка с iframe на `ticketscloud.com/v1/widgets/common` и `account.teplohod.info/order/event-order`.
+- Event page / landing / catalog purchase CTA переведены на эту модалку — предсказуемый UX без зависимости от vendor DOM.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- SQL LIMIT read-model (0.5.8) ╨╛╤Б╤В╨░╤С╤В╤Б╤П ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╕╨╝ perf-╨▒╨╗╨╛╨║╨╛╨╝ ╨┐╨╛╤Б╨╗╨╡ warm-cache wins.
-- ╨Э╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡ ╨┐╨╡╤А╨╡╨┤ pull ╨▒╤Л╨╗ stash `pre-deploy-f59d52c` (╨╗╨╛╨║╨░╨╗╤М╨╜╤Л╨╡ hotfix-╤Д╨░╨╣╨╗╤Л) тАФ ╨╜╨╡ ╨┐╨╛╤В╨╡╤А╤П╤В╤М ╨┐╤А╨╕ ╨╜╨╡╨╛╨▒╤Е╨╛╨┤╨╕╨╝╨╛╤Б╤В╨╕.
+- Подход отозван: вернулись к legacy vendor widgets (см. запись выше).
 
 ---
 
-## 2026-07-14 тАФ Catalog/perf + metrics + SEO redirects
+## 2026-07-14 — Root cause: TC style#ticketscloud-loader misdetected as spinner
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- `/api/public/events?limit=50` ╤Б╨╛╨▒╨╕╤А╨░╨╗ ╨▓╨╡╤Б╤М grouped catalog ╨╕ hydrat╨╕╨╗ upcomingSlots ╨┤╨╛ ╤В╤Л╤Б╤П╤З╨╕ ╨║╨░╤А╤В╨╛╤З╨╡╨║, ╨┐╨╛╤В╨╛╨╝ slice.
-- ╨Т HTML `/events` ╨▓ ╨║╨░╨╢╨┤╨╛╨╣ ╨║╨░╤А╤В╨╛╤З╨║╨╡ ╨╢╨╕╨╗╨╕ ╤Б╨║╤А╤Л╤В╤Л╨╡ TC/Teplohod widget-╨▒╨╗╨╛╨║╨╕.
-- Dashboard launch metrics ╤Б╤З╨╕╤В╨░╨╗ raw Event rows, public `/stats` тАФ saleable groupKey.
-- SSR city/landing ╤В╨░╤Й╨╕╨╗╨╕ 160тАУ240 ╨┐╨╛╨╗╨╜╤Л╤Е ╤Б╨╡╤Б╤Б╨╕╨╣ (~1.7тАУ2 ╨Ь╨С HTML).
-- `www.daibilet.ru` ╨╕ ╤Б╤В╨░╤А╤Л╨╡ `/river-cruises` ╨╜╨╡ 301.
+- В `tcwidget.js` `#ticketscloud-loader` — это **`<style>` в `<head>`**, а не DOM-спиннер. После первого запуска он остаётся навсегда.
+- Next `openTcWidget` считал его «stuck loading», сносил overlay/`dismissTcWidget` и открывал popup — TC-модалка выглядела «не грузится».
+- Teplohod отдельно ломали auto-`window.open` на account (уже чинили); оставили Vite-подобный init + без агрессивного dismiss.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- Catalog API: shared cache ╨▒╨╡╨╖ full slot hydrate; hydrate ╤В╨╛╨╗╤М╨║╨╛ page slice; lean list DTO ╨▒╨╡╨╖ widget URL.
-- Catalog cards: `suppressPurchaseAnchors` ╨┐╨╛ ╤Г╨╝╨╛╨╗╤З╨░╨╜╨╕╤О; horizontal ╨▒╨╡╨╖ widget markup.
-- Dashboard launch metrics = public catalog groups (`source: public_catalog_groups`); UI ╨┐╤А╨╡╨┤╨┐╨╛╤З╨╕╤В╨░╨╡╤В `launch.groupedEvents`.
-- City SSR тЙд48 lean items; landing sessions тЙд48 lean.
-- Middleware/next.config: wwwтЖТapex + `/river-cruises`тЖТ`/rechnye-progulki`; `pageTitle`/`og:url` route-specific.
+- Visible = iframe **или** `div#tc-widget-overlay` (не STYLE).
+- Больше не удаляем `style#ticketscloud-loader`; не считаем его stuck.
+- `openTcWidget`: ensure + `ticketsCloudWidget.init` + click; popup fallback только если shell не появился ~4с.
+- Teplohod: `async` script + повторный `init` после paint.
+
+### Проблемы
+
+- —
+
+---
+
+## 2026-07-14 — Teplohod fancybox killed by account fallback
+
+### Наблюдения
+
+- На event 554 (`…-za-1-chas-554`) виджет Teplohod рисует кнопку «Купить билеты» inline; выбор дат/категорий должен открываться в Fancybox-модалке.
+- Наш `bindTeplohodBuyFallback` через 2.5s открывал `account.teplohod.info` во вкладке, если Fancybox ещё не детектился — UX «не в модалке» + вторая кнопка fallback.
+- `openTeplohodPurchase` мог закрывать пустой Fancybox и тоже уводить во внешний checkout.
+
+### Решения
+
+- Убран auto-`window.open` с клика buy; fallback-ссылка только если кнопка Teplohod так и не смонтировалась (~8с).
+- `openTeplohodPurchase` больше не dismiss'ит Fancybox; внешний URL — last resort.
+- z-index для `.fancyboxtkt-*`; parse `event_id` из account checkout URL.
+
+### Проблемы
+
+- —
+
+---
+
+## 2026-07-14 — TC widget infinite loader again
+
+### Наблюдения
+
+- После клика «Купить» Ticketscloud рисует `#tc-widget-overlay` + `#ticketscloud-loader` до iframe.
+- `isTcWidgetVisible` считал overlay успехом → fallback на `purchaseUrl` не срабатывал, loader крутился бесконечно.
+- TEP: `ensureTeplohodWidgetScript` мог resolve до появления `TI_Tickets.init`.
+
+### Решения
+
+- Visible = реальный iframe (не overlay/loader); stuck loading → dismiss + popup fallback.
+- Teplohod script wait до `TI_Tickets.init`.
+
+### Проблемы
+
+- iframe может появиться пустым и всё ещё крутиться — если повторится, добавить проверку contentDocument/timeout внутри iframe.
+
+---
+
+## 2026-07-14 — Catalog list description restored
+
+### Наблюдения
+
+- Lean list DTO убрал `description` вместе с widget URL / full slots; на `/events` горизонтальные карточки потеряли excerpt при том, что UI (`formatListDescription`) уже его ждал.
+- Основной perf-выигрыш был от виджетов в list HTML и hydrate page-only, не от самого текста описания.
+
+### Решения
+
+- `toPublicCatalogListItem` снова отдаёт `description` как plain-text excerpt (≤420 символов, без HTML).
+- `PublicCatalogListItemDto.description` возвращён в контракт; `EventCardHorizontal` типизирован под list DTO.
+
+### Проблемы
+
+- Полный HTML description в list по-прежнему не нужен (раздувает JSON); detail остаётся на event page.
+
+---
+
+## 2026-07-14 — ChunkLoad после redeploy + harden deploy
+
+### Наблюдения
+
+- После `deploy-prod-next.sh` старые вкладки запрашивали chunk hashes предыдущего билда → 404 / `ChunkLoadError` (Application error).
+- Актуальный HTML уже ссылался на новые chunks; проблема клиентского кэша сессии, не nginx static proxy.
+
+### Решения
+
+- Prod: `systemctl stop daibilet-web` → `rm -rf apps/web/.next/cache` → start → internal revalidate (home/catalog tags+paths).
+- `deploy-prod-next.sh`: очистка `.next/cache` перед start + post-deploy `POST /api/internal/revalidate`; **re-exec после `git pull`**, чтобы хвост скрипта не оставался от старой версии.
+- `ChunkLoadRecovery` в root layout: один `location.reload()` на ChunkLoad / dynamic import failure per session.
+- Prod: заполнен пустой `DAIBILET_NEXT_REVALIDATE_SECRET` (раньше всегда 401).
+
+### Проблемы
+
+- PowerShell+SSH quoting ломает Bearer/json в one-liner; для ad-hoc лучше remote Python/scp.
+- На prod `DAIBILET_NEXT_REVALIDATE_SECRET` в `.env` был **пустым** → post-sync/deploy revalidate всегда 401; сгенерирован и прописан новый секрет, web+api перезапущены.
+
+---
+
+## 2026-07-14 — Docs + commit + prod deploy (admin pagination + catalog perf)
+
+### Наблюдения
+
+- Worktree содержал админскую пагинацию, compact dashboard, catalog lean DTO, SEO redirects и Teplohod checkout fix — без пуша.
+- Одноразовые `scripts/inspect-*` / `probe-*` / `scrape-*` не входят в коммит.
+
+### Решения
+
+- Документы: Project/Tasktracker/Diary/current-state обновлены под контракты admin API и catalog perf rules.
+- Deploy: `feat/next-monorepo` @ `6175ad5` → prod (`deploy-prod-next.sh`); nginx www→apex 301 применён; Next matcher hotfix (static array).
+
+### Проблемы
+
+- SQL LIMIT read-model (0.5.8) остаётся следующим perf-блоком после warm-cache wins.
+- На сервере перед pull был stash `pre-deploy-f59d52c` (локальные hotfix-файлы) — не потерять при необходимости.
+
+---
+
+## 2026-07-14 — Catalog/perf + metrics + SEO redirects
+
+### Наблюдения
+
+- `/api/public/events?limit=50` собирал весь grouped catalog и hydratил upcomingSlots до тысячи карточек, потом slice.
+- В HTML `/events` в каждой карточке жили скрытые TC/Teplohod widget-блоки.
+- Dashboard launch metrics считал raw Event rows, public `/stats` — saleable groupKey.
+- SSR city/landing тащили 160–240 полных сессий (~1.7–2 МБ HTML).
+- `www.daibilet.ru` и старые `/river-cruises` не 301.
+
+### Решения
+
+- Catalog API: shared cache без full slot hydrate; hydrate только page slice; lean list DTO без widget URL.
+- Catalog cards: `suppressPurchaseAnchors` по умолчанию; horizontal без widget markup.
+- Dashboard launch metrics = public catalog groups (`source: public_catalog_groups`); UI предпочитает `launch.groupedEvents`.
+- City SSR ≤48 lean items; landing sessions ≤48 lean.
+- Middleware/next.config: www→apex + `/river-cruises`→`/rechnye-progulki`; `pageTitle`/`og:url` route-specific.
 - Warm/revalidate: stats, events page, SPB/MSK, river/bus landings.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Я╨╛╨╗╨╜╤Л╨╣ SQL LIMIT ╨╜╨░ ╨│╤А╤Г╨┐╨┐╨░╤Е (╨▒╨╡╨╖ in-memory filter catalog) ╨▓╤Б╤С ╨╡╤Й╤С ╨▓╨┐╨╡╤А╨╡╨┤╨╕ тАФ ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛ materialized PublicCatalogGroup.
+- Полный SQL LIMIT на группах (без in-memory filter catalog) всё ещё впереди — отдельно materialized PublicCatalogGroup.
 
 ---
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Codex acceptance: ╨╜╨╡ ╤В╨╛╨╗╤М╨║╨╛ client-side slice; API `page/limit/q` тЖТ `{ page, pages, limit, total, rows }`.
-- Gaps: cities ╨▒╨╡╨╖ pager; landings list ╨▒╨╡╨╖ page params; landing detail hard-cap `events.slice(0, 160)` ╨▒╨╡╨╖ ┬л╨Ф╨░╨╗╨╡╨╡┬╗; dashboard ╤А╨░╨╜╤М╤И╨╡ ╨╡╤Й╤С ╨╛╤В╨┤╨░╨▓╨░╨╗ ╨┐╤Г╤Б╤В╤Л╨╡ `*Rows` ╨╝╨░╤Б╤Б╨╕╨▓╤Л (╨╕ importJob).
-- Events/venues/buyers/orders ╤Г╨╢╨╡ ╨╕╨╝╨╡╨╗╨╕ envelope + UI pager, ╨╜╨╛ events/venues ╨▓╤Б╤С ╨╡╤Й╤С filter-after-full-load (╨╜╨╡ SQL OFFSET).
+- Codex acceptance: не только client-side slice; API `page/limit/q` → `{ page, pages, limit, total, rows }`.
+- Gaps: cities без pager; landings list без page params; landing detail hard-cap `events.slice(0, 160)` без «Далее»; dashboard раньше ещё отдавал пустые `*Rows` массивы (и importJob).
+- Events/venues/buyers/orders уже имели envelope + UI pager, но events/venues всё ещё filter-after-full-load (не SQL OFFSET).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- Cities: `destinationSummaryRowsFast` + `page/limit/q` + UI ╨Э╨░╨╖╨░╨┤/╨Ф╨░╨╗╨╡╨╡.
+- Cities: `destinationSummaryRowsFast` + `page/limit/q` + UI Назад/Далее.
 - Landings list/detail: page envelope; detail events paginated (`page/limit/q`); reuse `getCachedAdminGroupedEvents`.
-- Dashboard contract: ╤В╨╛╨╗╤М╨║╨╛ `generatedAt` + `metrics` (compact).
-- hydrateAdminData ╨▒╨╛╨╗╤М╤И╨╡ ╨╜╨╡ ╨╖╨░╤В╨╕╤А╨░╨╡╤В ╨╗╨╛╨║╨░╨╗╤М╨╜╤Л╨╡ row-fallback ╤З╨╡╤А╨╡╨╖ `Object.assign` ╨▓╤Б╨╡╨│╨╛ payload.
+- Dashboard contract: только `generatedAt` + `metrics` (compact).
+- hydrateAdminData больше не затирает локальные row-fallback через `Object.assign` всего payload.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- **Performance blocker (╨╛╤В╨┤╨╡╨╗╤М╨╜╤Л╨╣):** `buildAdminEventsList` / landings match ╨▓╤Б╤С ╨╡╤Й╤С ╤Б╨╛╨▒╨╕╤А╨░╤О╤В ╨┐╨╛╨╗╨╜╤Л╨╣ grouped catalog ╨▓ JS, ╨┐╨╛╤В╨╛╨╝ slice. ╨Э╤Г╨╢╨╡╨╜ Prisma/SQL read-model ╤Б group+filter+page ╨▓ ╨С╨Ф.
-
----
-
-## 2026-07-14 тАФ Teplohod widget fallback тЖТ ┬л╨Ю╤И╨╕╨▒╨║╨░!┬╗
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- ╨Э╨░ ╨┤╨╕╤Б╨║╨╛╤В╨╡╨║╨╡ `event/1375` ╨║╨╗╨╕╨║ ╨┐╨╛ ╨▓╨╕╨┤╨╢╨╡╤В╤Г ╨╛╤В╨║╤А╤Л╨▓╨░╨╗ fallback `https://teplohod.info/event/1375`, ╨░ ╨┐╤Г╨▒╨╗╨╕╤З╨╜╤Л╨╡ `/event/{id}` ╤Г Teplohod ╤Б╨╡╨╣╤З╨░╤Б ╨╛╤В╨┤╨░╤О╤В 404 ┬л╨Ю╤И╨╕╨▒╨║╨░!┬╗.
-- ╨а╨░╨▒╨╛╤З╨╕╨╣ checkout: `https://account.teplohod.info/order/event-order?widget_id=14208&event_id=тАж` (╤В╨╛╤В ╨╢╨╡ URL, ╤З╤В╨╛ ╨▓ fancybox `data-src`).
-- Fallback ╤Б╤А╨░╨▒╨░╤В╤Л╨▓╨░╨╗ ╤З╨╡╤А╨╡╨╖ ~700тАпms, ╨╡╤Б╨╗╨╕ fancybox ╨╡╤Й╤С ╨╜╨╡ ╤Б╨╝╨╛╨╜╤В╨╕╤А╨╛╨▓╨░╨╗╤Б╤П.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- `buildTeplohodUrl` / purchase URLs тЖТ account checkout + `widget_id`.
-- ╨Ш╨│╨╜╨╛╤А ╤Б╤В╨░╤А╤Л╤Е `offerDeeplinkUrl` ╨╜╨░ teplohod.info/event/* ╨┤╨╗╤П TEP.
-- ╨Ъ╨╗╨╕╨╡╨╜╤В: `resolveTeplohodCheckoutUrl`, timeout fallback 2.5тАпs.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Я╤Г╨▒╨╗╨╕╤З╨╜╤Л╨╡ ╨║╨░╤А╤В╨╛╤З╨║╨╕ ╨╜╨░ teplohod.info/event/* ╨╜╨╡╨┤╨╛╤Б╤В╤Г╨┐╨╜╤Л тАФ ╨╖╨░╨▓╨╕╤Б╨╕╨╝╨╛╤Б╤В╤М ╨╛╤В account checkout.
+- **Performance blocker (отдельный):** `buildAdminEventsList` / landings match всё ещё собирают полный grouped catalog в JS, потом slice. Нужен Prisma/SQL read-model с group+filter+page в БД.
 
 ---
 
-## 2026-07-13 тАФ Admin lists: pagination / load
+## 2026-07-14 — Teplohod widget fallback → «Ошибка!»
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Р╨┤╨╝╨╕╨╜╤Б╨║╨╕╨╡ ╤Б╨┐╨╕╤Б╨║╨╕ (orders/buyers/events/landings/venues) ╨│╤А╤Г╨╖╨╕╨╗╨╕ ╨┐╨╛╤З╤В╨╕ ╨▓╤Б╤С ╨▓ ╨┐╨░╨╝╤П╤В╤М: `eventRows(10000)` ╤Б ╨┐╨╛╨╗╨╜╤Л╨╝╨╕ `description`, ╤Г ╨╖╨░╨║╨░╨╖╨╛╨▓ тАФ `jsonb_agg` ╨▓╤Б╨╡╤Е ╨▒╨╕╨╗╨╡╤В╨╛╨▓, ╨┐╨░╨│╨╕╨╜╨░╤Ж╨╕╤П ╨▒╤Л╨╗╨░ ╤В╨╛╨╗╤М╨║╨╛ ╨▓ JS ╨┐╨╛╤Б╨╗╨╡ ╨┐╨╛╨╗╨╜╨╛╨╣ ╨▓╤Л╨▒╨╛╤А╨║╨╕.
-- UI pager ╨╜╨░ Events/Orders ╤Г╨╢╨╡ ╨▒╤Л╨╗, ╨╜╨░ Buyers/Venues тАФ ╨╜╨╡╤В; Landings ╤В╨░╤Й╨╕╨╗╨╕ ╨┐╨╛╨╗╨╜╤Л╨╣ ╨║╨░╤В╨░╨╗╨╛╨│ ╤А╨░╨┤╨╕ ╤Б╤З╤С╤В╤З╨╕╨║╨╛╨▓ ╨┐╤А╨░╨▓╨╕╨╗.
+- На дискотеке `event/1375` клик по виджету открывал fallback `https://teplohod.info/event/1375`, а публичные `/event/{id}` у Teplohod сейчас отдают 404 «Ошибка!».
+- Рабочий checkout: `https://account.teplohod.info/order/event-order?widget_id=14208&event_id=…` (тот же URL, что в fancybox `data-src`).
+- Fallback срабатывал через ~700 ms, если fancybox ещё не смонтировался.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- Orders/Buyers: lean SQL (counts + distinct titles ╨▒╨╡╨╖ ╨┐╨╛╨╗╨╜╨╛╨│╨╛ jsonb ╨▒╨╕╨╗╨╡╤В╨╛╨▓); ╨┤╨╡╤В╨░╨╗╨╕ ╨▒╨╕╨╗╨╡╤В╨╛╨▓ тАФ ╤В╨╛╨╗╤М╨║╨╛ ╨▓ `GET /orders/:id`.
-- Events/Landings: `eventRows(..., { lean: true })` ╨▒╨╡╨╖ description/SEO blob; ╨║╤Н╤И grouped events 60╤Б ╨┤╨╗╤П ╤Б╨┐╨╕╤Б╨║╨░ ╤Б╨╛╨▒╤Л╤В╨╕╨╣.
-- Venues/Buyers: page/limit ╨▓ API + pager ╨▓ UI.
-- ╨Ю╤В╨▓╨╡╤В ╤Б╨┐╨╕╤Б╨║╨░ ╨╖╨░╨║╨░╨╖╨╛╨▓ ╨╜╨╡ ╤В╨░╤Й╨╕╤В tickets payload тАФ sheet ╨╕ ╤В╨░╨║ ╨┐╨╛╨┤╨│╤А╤Г╨╢╨░╨╡╤В detail.
+- `buildTeplohodUrl` / purchase URLs → account checkout + `widget_id`.
+- Игнор старых `offerDeeplinkUrl` на teplohod.info/event/* для TEP.
+- Клиент: `resolveTeplohodCheckoutUrl`, timeout fallback 2.5 s.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Я╨╛╨╗╨╜╨░╤П ╨╖╨░╨╝╨╡╨╜╨░ ╨╜╨░ SQL `LIMIT/OFFSET` ╨┤╨╗╤П events ╨┐╨╛╤Б╨╗╨╡ `groupAdminEventRows` ╨╡╤Й╤С ╨▓╨┐╨╡╤А╨╡╨┤╨╕: ╨┐╨╛╨║╨░ lean + cache, ╤Д╨╕╨╗╤М╤В╤А╤Л ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г ╨╜╨░ ╤Б╨│╤А╤Г╨┐╨┐╨╕╤А╨╛╨▓╨░╨╜╨╜╨╛╨╝ ╨╜╨░╨▒╨╛╤А╨╡.
-- ╨Я╨╛╨╕╤Б╨║╨╛╨▓╤Л╨╣ q ╨┐╨╛ ╨╜╨╛╨╝╨╡╤А╤Г ╨▒╨╕╨╗╨╡╤В╨░ ╨▓ ╤Б╨┐╨╕╤Б╨║╨╡ ╨╖╨░╨║╨░╨╖╨╛╨▓ ╤Б╨╗╨░╨▒╨╡╨╡ (╨╜╨╡╤В ticket ids ╨▓ lean row) тАФ ╨┤╨╡╤В╨░╨╗╨╕ ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г ╨▓ ╨║╨░╤А╤В╨╛╤З╨║╨╡ ╨╖╨░╨║╨░╨╖╨░.
-
----
-
-## 2026-07-11 тАФ Slice 5: help, blog, legal, my-orders
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- Slice 5 ╨┐╨╛╤А╤В╨╕╤А╨╛╨▓╨░╨╜ ╨╕╨╖ Vite `apps/public`: trust pages, FAQ `/help`, ╨▒╨╗╨╛╨│ (static fallback + API), `/my-orders` lookup.
-- Codex (`codex/phase2-foundation`, `229ad3b`) ╨┐╤А╨╛╨┤╨╛╨╗╨╢╨░╨╡╤В Phase 2 backend: schema, Event Change Requests, docs ╨┐╨╛ spbboats; ╨║╨╛╨╝╨╝╨╕╤В `5b18225` ╨┐╨╡╤А╨╡╨▓╨╛╨┤╨╕╤В **`apps/public` ╨╜╨░ Next + proxy** тАФ ╨║╨╛╨╜╤Д╨╗╨╕╨║╤В╤Г╨╡╤В ╤Б Path B (`apps/web`).
-- Client-╨║╨╛╨╝╨┐╨╛╨╜╨╡╨╜╤В╤Л (`HelpPage`, `MyOrdersPage`) ╨╜╨╡ ╨╝╨╛╨│╤Г╤В ╨╕╨╝╨┐╨╛╤А╤В╨╕╤А╨╛╨▓╨░╤В╤М async `SiteLayout` (╤В╤П╨╜╨╡╤В `pg` ╨▓ client bundle).
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Slice 5 тАФ ╤В╨╛╨╗╤М╨║╨╛ `apps/web`, ╨▒╨╡╨╖ merge Codex Next/proxy.
-- `SiteLayout`: try/catch ╨┐╤А╨╕ `buildPublicDestinationsDto` тАФ build ╨▒╨╡╨╖ ╨╗╨╛╨║╨░╨╗╤М╨╜╨╛╨╣ ╨С╨Ф ╨╜╨╡ ╨┐╨░╨┤╨░╨╡╤В.
-- `HelpPage` / `MyOrdersPage`: ╨╛╨▒╤С╤А╤В╨║╨░ `SiteLayout` ╨╜╨░ server `page.tsx`, ╨║╨╛╨╜╤В╨╡╨╜╤В тАФ ╨▓ client view.
-- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜╤Л `public-articles.dto`, `public-orders.dto`, API routes `/api/public/articles`, `/orders`.
-- Header: ╤Б╤Б╤Л╨╗╨║╨░ ┬л╨Я╨╛╨╝╨╛╤Й╤М┬╗; footer: blog, help, legal links.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Ы╨╛╨║╨░╨╗╤М╨╜╤Л╨╣ `pnpm web:build` ╨▒╨╡╨╖ Postgres ╨╜╨░ `:5437` тАФ static pages ╤Б ╨┐╤Г╤Б╤В╤Л╨╝ footer city block (╨╜╨░ prod ╨┐╤А╨╕ build ╨С╨Ф ╨┤╨╛╤Б╤В╤Г╨┐╨╜╨░).
-- Wholesale merge Codex ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г ╨╜╨╡╨▓╨╛╨╖╨╝╨╛╨╢╨╡╨╜ (~429 files diff).
+- Публичные карточки на teplohod.info/event/* недоступны — зависимость от account checkout.
 
 ---
 
-## 2026-07-10 тАФ F3 staging cutover ╨▓╤Л╨┐╨╛╨╗╨╜╨╡╨╜
+## 2026-07-13 — Admin lists: pagination / load
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Staging ╤Б╨╡╤А╨▓╨╡╤А ╨▒╤Л╨╗ ╨╜╨░ `integrate/mvp-launch` + Node 20; ╨┤╨╗╤П F3: Node 22, pnpm, checkout `feat/next-monorepo`.
-- `start-web.sh` ╨▓ systemd ╨┐╨╡╤А╨╡╤Б╨╛╨▒╨╕╤А╨░╨╗ Next ╨┐╤А╨╕ ╨║╨░╨╢╨┤╨╛╨╝ start тАФ ╨╖╨░╨╝╨╡╨╜╤С╨╜ ╨╜╨░ `start-web-prod.sh`.
-- nginx `/api/` тЖТ `:4001` (legacy), `/` тЖТ Next `:3000`.
-- Smoke script ╨┐╨░╨┤╨░╨╗ ╨╕╨╖-╨╖╨░ `pipefail` + pipeline ╨▓╨╜╨╡ `check()` тАФ ╨╕╤Б╨┐╤А╨░╨▓╨╗╨╡╨╜╨╛.
+- Админские списки (orders/buyers/events/landings/venues) грузили почти всё в память: `eventRows(10000)` с полными `description`, у заказов — `jsonb_agg` всех билетов, пагинация была только в JS после полной выборки.
+- UI pager на Events/Orders уже был, на Buyers/Venues — нет; Landings тащили полный каталог ради счётчиков правил.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
+
+- Orders/Buyers: lean SQL (counts + distinct titles без полного jsonb билетов); детали билетов — только в `GET /orders/:id`.
+- Events/Landings: `eventRows(..., { lean: true })` без description/SEO blob; кэш grouped events 60с для списка событий.
+- Venues/Buyers: page/limit в API + pager в UI.
+- Ответ списка заказов не тащит tickets payload — sheet и так подгружает detail.
+
+### Проблемы
+
+- Полная замена на SQL `LIMIT/OFFSET` для events после `groupAdminEventRows` ещё впереди: пока lean + cache, фильтры по-прежнему на сгруппированном наборе.
+- Поисковый q по номеру билета в списке заказов слабее (нет ticket ids в lean row) — детали по-прежнему в карточке заказа.
+
+---
+
+## 2026-07-11 — Slice 5: help, blog, legal, my-orders
+
+### Наблюдения
+
+- Slice 5 портирован из Vite `apps/public`: trust pages, FAQ `/help`, блог (static fallback + API), `/my-orders` lookup.
+- Codex (`codex/phase2-foundation`, `229ad3b`) продолжает Phase 2 backend: schema, Event Change Requests, docs по spbboats; коммит `5b18225` переводит **`apps/public` на Next + proxy** — конфликтует с Path B (`apps/web`).
+- Client-компоненты (`HelpPage`, `MyOrdersPage`) не могут импортировать async `SiteLayout` (тянет `pg` в client bundle).
+
+### Решения
+
+- Slice 5 — только `apps/web`, без merge Codex Next/proxy.
+- `SiteLayout`: try/catch при `buildPublicDestinationsDto` — build без локальной БД не падает.
+- `HelpPage` / `MyOrdersPage`: обёртка `SiteLayout` на server `page.tsx`, контент — в client view.
+- Добавлены `public-articles.dto`, `public-orders.dto`, API routes `/api/public/articles`, `/orders`.
+- Header: ссылка «Помощь»; footer: blog, help, legal links.
+
+### Проблемы
+
+- Локальный `pnpm web:build` без Postgres на `:5437` — static pages с пустым footer city block (на prod при build БД доступна).
+- Wholesale merge Codex по-прежнему невозможен (~429 files diff).
+
+---
+
+## 2026-07-10 — F3 staging cutover выполнен
+
+### Наблюдения
+
+- Staging сервер был на `integrate/mvp-launch` + Node 20; для F3: Node 22, pnpm, checkout `feat/next-monorepo`.
+- `start-web.sh` в systemd пересобирал Next при каждом start — заменён на `start-web-prod.sh`.
+- nginx `/api/` → `:4001` (legacy), `/` → Next `:3000`.
+- Smoke script падал из-за `pipefail` + pipeline вне `check()` — исправлено.
+
+### Решения
 
 - Deploy: `deploy-staging-next.sh`, `patch-staging-next.py`, `daibilet-web-staging.service`.
-- Staging URL: https://staging.daibilet.ru тАФ SSR catalog/landings ╨▓ HTML.
-- Prod cutover тАФ ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╕╨╣ ╤И╨░╨│ (rollback plan ╨╜╤Г╨╢╨╡╨╜).
+- Staging URL: https://staging.daibilet.ru — SSR catalog/landings в HTML.
+- Prod cutover — следующий шаг (rollback plan нужен).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- `/api/health` ╤З╨╡╤А╨╡╨╖ nginx = backend (by design); Next health ╨╜╨░ `:3000` ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛.
-- Widget click тАФ manual smoke.
+- `/api/health` через nginx = backend (by design); Next health на `:3000` отдельно.
+- Widget click — manual smoke.
 
 ---
 
-## 2026-07-10 тАФ Codex audit + split ╤Б╤В╤А╨░╤В╨╡╨│╨╕╤П + ╤Б╤В╨░╤А╤В F3
+## 2026-07-10 — Codex audit + split стратегия + старт F3
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Э╨░ GitHub **╨╜╨╡╤В** ╨▓╨╡╤В╨║╨╕ `codex/phase2-finance-next`; Codex ╤А╨░╨▒╨╛╤В╨░╨╡╤В ╨▓ **`codex/phase2-foundation`** (`229ad3b`, unrelated history ╤Б `feat/next-monorepo`).
-- Codex ╤Б╨┤╨╡╨╗╨░╨╗ Phase 2 schema (~66 models), Event Change Requests, admin queue тАФ **╤Ж╨╡╨╜╨╜╨╛ ╨┤╨╗╤П cherry-pick**.
-- Codex ╤В╨░╨║╨╢╨╡ ╨┐╨╡╤А╨╡╨▓╤С╨╗ **`apps/public` ╨╜╨░ Next ╤Б proxy** ╨╜╨░ `:4000` (`5b18225`) тАФ **╨║╨╛╨╜╤Д╨╗╨╕╨║╤В╤Г╨╡╤В** ╤Б Path B (`apps/web`, full-stack read).
+- На GitHub **нет** ветки `codex/phase2-finance-next`; Codex работает в **`codex/phase2-foundation`** (`229ad3b`, unrelated history с `feat/next-monorepo`).
+- Codex сделал Phase 2 schema (~66 models), Event Change Requests, admin queue — **ценно для cherry-pick**.
+- Codex также перевёл **`apps/public` на Next с proxy** на `:4000` (`5b18225`) — **конфликтует** с Path B (`apps/web`, full-stack read).
 - Cursor F2 complete: `apps/web`, 36 landing SSG paths, parity script.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- **Canonical public Next:** ╤В╨╛╨╗╤М╨║╨╛ `apps/web` ╨╜╨░ `feat/next-monorepo`. Codex Next/proxy **╨╜╨╡ ╨╝╨╡╤А╨╢╨╕╤В╤М**.
-- **╨Ш╨╜╤В╨╡╨│╤А╨░╤Ж╨╕╤П Codex:** cherry-pick schema + event change requests + admin contracts **╨┐╨╛╤Б╨╗╨╡ F3 cutover** ([codex-cherry-pick-plan.md](./codex-cherry-pick-plan.md)).
-- Handoff ╨╛╨▒╨╜╨╛╨▓╨╗╤С╨╜: [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md).
-- F3 ╨░╤А╤В╨╡╤Д╨░╨║╤В╤Л: `deploy-staging-next.sh`, `daibilet-web-staging.service`, `staging-next.conf.snippet`, `launch-staging-smoke-next.sh`.
+- **Canonical public Next:** только `apps/web` на `feat/next-monorepo`. Codex Next/proxy **не мержить**.
+- **Интеграция Codex:** cherry-pick schema + event change requests + admin contracts **после F3 cutover** ([codex-cherry-pick-plan.md](./codex-cherry-pick-plan.md)).
+- Handoff обновлён: [codex-phase2-next-handoff.md](./codex-phase2-next-handoff.md).
+- F3 артефакты: `deploy-staging-next.sh`, `daibilet-web-staging.service`, `staging-next.conf.snippet`, `launch-staging-smoke-next.sh`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Wholesale merge `codex/phase2-foundation` тЖТ guaranteed conflicts (schema, Next app location, lockfile).
-- F3 server-side deploy ╤В╤А╨╡╨▒╤Г╨╡╤В ops ╨╜╨░ staging (213.171.7.16) тАФ ╨╗╨╛╨║╨░╨╗╤М╨╜╨╛ ╤В╨╛╨╗╤М╨║╨╛ scripts/docs.
-
----
-
-## 2026-07-10 тАФ F2 ╨╖╨░╨║╤А╤Л╤В: landings ISR, filters, widgets, parity
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- Legacy landings ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╤О╤В ╤Б╨╗╨╛╨╢╨╜╤Г╤О URL-╤Б╤Е╨╡╨╝╤Г: category-first (`/rechnye-progulki/moscow/`) ╨╕ city-first (`/saint-petersburg/night-bridges/`). ╨Ы╨╛╨│╨╕╨║╨░ ╨┐╨╛╤А╤В╨╕╤А╨╛╨▓╨░╨╜╨░ ╨╕╨╖ `landing-routes.ts` SPA.
-- `buildPublicLandingPage` / `buildPublicLandingPageManaged` ╤Г╨╢╨╡ ╨▓ `dto.js`; ╨┤╨╗╤П Next ╨┤╨╛╤Б╤В╨░╤В╨╛╤З╨╜╨╛ wrapper `public-landing.dto.ts` ╨┐╨╛ ╨░╨╜╨░╨╗╨╛╨│╨╕╨╕ ╤Б venue/city.
-- Next build pre-render╨╕╤В 36 landing paths (9 one-segment + 23 two-segment) ╤Б `revalidate=3600`.
-- ╨Ъ╨░╤В╨░╨╗╨╛╨│ typed DTO ╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╤В `from`/`to` ╨┤╨╗╤П date range; legacy URL тАФ `dateFrom`/`dateTo`. ╨Ь╨░╨┐╨┐╨╕╨╜╨│ ╨┤╨╛╨▒╨░╨▓╨╗╨╡╨╜ ╨▓ `parseCatalogPageQuery`.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- Landings: ISR + `generateStaticParams` ╨┤╨╗╤П top slugs; catch-all `[segment]`/`[segment2]`/`[segment3]` ╤Б `notFound()` ╨┤╨╗╤П ╨╜╨╡-landing ╨┐╤Г╤В╨╡╨╣.
-- Middleware 301: `/landings/*` ╨╕ misordered `/{city}/{category}` тЖТ canonical landing href.
-- Widgets: SSR ╤А╨╡╨╜╨┤╨╡╤А╨╕╤В ╤Ж╨╡╨╜╤Г/╨╛╨┐╨╕╤Б╨░╨╜╨╕╨╡; `PurchaseWidget.client.tsx` тАФ Teplohod тЖТ TC тЖТ external link.
-- Parity: `pnpm backend:next:parity` тАФ ╤А╨░╤Б╤И╨╕╤А╨╡╨╜╨╜╤Л╨╣ catalog (city/date/sort) + landing slugs + optional HTTP compare (`WEB_BASE_URL` vs `LEGACY_BASE_URL`).
-- F3 checklist ╨▓╤Л╨╜╨╡╤Б╨╡╨╜ ╨▓ ╨╛╤В╨┤╨╡╨╗╤М╨╜╤Л╨╣ doc.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- `pnpm` ╨╜╨╡ ╨▓ PATH ╨╜╨░ ╨╜╨╡╨║╨╛╤В╨╛╤А╤Л╤Е Windows-╤Б╤А╨╡╨┤╨░╤Е тАФ ╤Б╨▒╨╛╤А╨║╨░ ╤З╨╡╤А╨╡╨╖ `npm exec pnpm -- web:build`.
-- `/podborki` ╤Б `searchParams` ╨╛╤Б╤В╨░╤С╤В╤Б╤П dynamic (╞Т) ╨╜╨╡╤Б╨╝╨╛╤В╤А╤П ╨╜╨░ `revalidate` тАФ ╨┐╤А╨╕╨╡╨╝╨╗╨╡╨╝╨╛ ╨┤╨╗╤П MVP.
-- ╨Я╨╛╨╗╨╜╤Л╨╣ UI landings (3600 ╤Б╤В╤А╨╛╨║ SPA) ╨╜╨╡ ╨┐╨╛╤А╤В╨╕╤А╨╛╨▓╨░╨╜ тАФ ╤Г╨┐╤А╨╛╤Й╤С╨╜╨╜╤Л╨╣ SSR view + EventCard grid.
+- Wholesale merge `codex/phase2-foundation` → guaranteed conflicts (schema, Next app location, lockfile).
+- F3 server-side deploy требует ops на staging (213.171.7.16) — локально только scripts/docs.
 
 ---
 
-## 2026-07-10 тАФ F2 core: catalog, event, city, venue SSR
+## 2026-07-10 — F2 закрыт: landings ISR, filters, widgets, parity
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Next bundler ╨╗╨╛╨╝╨░╨╗ `createRequire` ╨▓ `db.ts` тАФ ╨╖╨░╨╝╨╡╨╜╤С╨╜ ╨╜╨░ ╨┐╤А╤П╨╝╨╛╨╣ `import pg`.
-- `@daibilet/backend` ╨▓ `transpilePackages`, `pg` ╨▓ `serverExternalPackages`.
+- Legacy landings используют сложную URL-схему: category-first (`/rechnye-progulki/moscow/`) и city-first (`/saint-petersburg/night-bridges/`). Логика портирована из `landing-routes.ts` SPA.
+- `buildPublicLandingPage` / `buildPublicLandingPageManaged` уже в `dto.js`; для Next достаточно wrapper `public-landing.dto.ts` по аналогии с venue/city.
+- Next build pre-renderит 36 landing paths (9 one-segment + 23 two-segment) с `revalidate=3600`.
+- Каталог typed DTO использует `from`/`to` для date range; legacy URL — `dateFrom`/`dateTo`. Маппинг добавлен в `parseCatalogPageQuery`.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- Read path ╤З╨╡╤А╨╡╨╖ `@daibilet/backend/public-read` ╨▒╨╡╨╖ HTTP proxy.
-- Catalog default 100, selector 100/200/300 ╨▓ `@daibilet/contracts/catalog`.
+- Landings: ISR + `generateStaticParams` для top slugs; catch-all `[segment]`/`[segment2]`/`[segment3]` с `notFound()` для не-landing путей.
+- Middleware 301: `/landings/*` и misordered `/{city}/{category}` → canonical landing href.
+- Widgets: SSR рендерит цену/описание; `PurchaseWidget.client.tsx` — Teplohod → TC → external link.
+- Parity: `pnpm backend:next:parity` — расширенный catalog (city/date/sort) + landing slugs + optional HTTP compare (`WEB_BASE_URL` vs `LEGACY_BASE_URL`).
+- F3 checklist вынесен в отдельный doc.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Type casts ╨▓ public-city.dto.ts ╨┤╨╗╤П ╤Б╨╛╨▓╨╝╨╡╤Б╤В╨╕╨╝╨╛╤Б╤В╨╕ ╤Б Next build тАФ ╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛ ╨┤╨╛ F5.
+- `pnpm` не в PATH на некоторых Windows-средах — сборка через `npm exec pnpm -- web:build`.
+- `/podborki` с `searchParams` остаётся dynamic (ƒ) несмотря на `revalidate` — приемлемо для MVP.
+- Полный UI landings (3600 строк SPA) не портирован — упрощённый SSR view + EventCard grid.
 
 ---
 
-## 2026-07-10 тАФ F1: monorepo shell
+## 2026-07-10 — F2 core: catalog, event, city, venue SSR
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Path B ╤Г╤В╨▓╨╡╤А╨╢╨┤╤С╨╜: SEO ╨╜╨╡ ╨╛╤В╨║╨╗╨░╨┤╤Л╨▓╨░╨╡╨╝, full-stack Next.
+- Next bundler ломал `createRequire` в `db.ts` — заменён на прямой `import pg`.
+- `@daibilet/backend` в `transpilePackages`, `pg` в `serverExternalPackages`.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
+
+- Read path через `@daibilet/backend/public-read` без HTTP proxy.
+- Catalog default 100, selector 100/200/300 в `@daibilet/contracts/catalog`.
+
+### Проблемы
+
+- Type casts в public-city.dto.ts для совместимости с Next build — временно до F5.
+
+---
+
+## 2026-07-10 — F1: monorepo shell
+
+### Наблюдения
+
+- Path B утверждён: SEO не откладываем, full-stack Next.
+
+### Решения
 
 - pnpm workspaces, apps/web Next 15, packages/contracts + config.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Prod ╨╛╤Б╤В╨░╤С╤В╤Б╤П ╨╜╨░ Vite ╨┤╨╛ F3 cutover.
+- Prod остаётся на Vite до F3 cutover.
 
 ---
 
-## 2026-07-10 тАФ F3 prod cutover + Post-F3 cherry-pick (slice 1тАУ4)
+## 2026-07-10 — F3 prod cutover + Post-F3 cherry-pick (slice 1–4)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Prod Next ╨╜╨░ **:3001** (staging :3000) тАФ ╨╛╨┤╨╕╨╜ ╤Е╨╛╤Б╤В, ╤А╨░╨╖╨╜╤Л╨╡ ╨┐╨╛╤А╤В╤Л.
+- Prod Next на **:3001** (staging :3000) — один хост, разные порты.
 - Snapshot rollback: `/var/backups/daibilet/pre-next-20260710-185139`.
-- `next build` OOM ╨╜╨░ 3.8GB RAM тАФ workaround: ╨╛╤Б╤В╨░╨╜╨╛╨▓╨╕╤В╤М staging Next ╨╜╨░ ╨▓╤А╨╡╨╝╤П build.
-- Smoke: SSR ╤З╨╡╤А╨╡╨╖ nginx тЬЕ; ╨╗╨╛╨║╨░╨╗╤М╨╜╤Л╨╣ `:3001` health ╨╝╨╛╨╢╨╡╤В ╤Д╨╗╨░╨┐╨░╤В╤М ╨┐╤А╨╕ restart systemd.
-- Codex cherry-pick: 4 migrations + schema 29тЖТ66 models, ECR backend + admin contracts + Vite page.
+- `next build` OOM на 3.8GB RAM — workaround: остановить staging Next на время build.
+- Smoke: SSR через nginx ✅; локальный `:3001` health может флапать при restart systemd.
+- Codex cherry-pick: 4 migrations + schema 29→66 models, ECR backend + admin contracts + Vite page.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
 - Prod nginx patched (`patch-prod-next.py`), `daibilet-web` enabled.
-- Cherry-pick ╤З╨╡╤А╨╡╨╖ `git checkout origin/codex/phase2-foundation -- <paths>` (╨╜╨╡ wholesale merge).
-- Admin UI ╨╖╨░ `VITE_DAIBILET_EVENT_CHANGE_REQUESTS=1`; API routes wired ╨▓ `server-entry.ts`.
-- Codex Next/proxy (`5b18225`) ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г **skip**.
+- Cherry-pick через `git checkout origin/codex/phase2-foundation -- <paths>` (не wholesale merge).
+- Admin UI за `VITE_DAIBILET_EVENT_CHANGE_REQUESTS=1`; API routes wired в `server-entry.ts`.
+- Codex Next/proxy (`5b18225`) по-прежнему **skip**.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- `pnpm db:deploy` ╨╜╨░ staging/prod ╨╡╤Й╤С ╨╜╨╡ ╨▓╤Л╨┐╨╛╨╗╨╜╨╡╨╜ тАФ ╨╜╤Г╨╢╨╡╨╜ backup `5438`/`5437`.
-- `backend:test:ts` ╨╜╨╡ ╨▓╨║╨╗╤О╤З╨░╨╡╤В ECR tests тАФ ╨╖╨░╨┐╤Г╤Б╨║╨░╤В╤М ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛ `tsx --test src/event-change-request-*.test.ts`.
-
----
-
-## 2026-07-10 тАФ Next UI polish (slice 1): design system + shell + home
-
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-
-- F3 data path ╨│╨╛╤В╨╛╨▓, ╨╜╨╛ Next ╨▓╤Л╨│╨╗╤П╨┤╨╡╨╗ ┬л╨│╨╛╨╗╤Л╨╝┬╗: 3 nav-╤Б╤Б╤Л╨╗╨║╨╕, ╨╝╨╕╨╜╨╕╨╝╨░╨╗╤М╨╜╤Л╨╣ footer, ╨┐╤А╨╛╤Б╤В╤Л╨╡ ╨║╨░╤А╤В╨╛╤З╨║╨╕.
-- Vite public ╤Б╨╛╨┤╨╡╤А╨╢╨╕╤В ╨┐╨╛╨╗╨╜╤Л╨╣ design system (~290 ╤Б╤В╤А╨╛╨║ CSS) ╨╕ Header/Footer ╤Б 7 ╤А╨░╨╖╨┤╨╡╨╗╨░╨╝╨╕.
-
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-
-- ╨Я╨╛╤А╤В `globals.css` + tailwind tokens ╨╕╨╖ `apps/public`.
-- Header: fixed blur, mobile sheet, ╨┐╨╛╨╗╨╜╨░╤П nav (events/cities/venues/locations/podborki).
-- Footer: 4 ╨║╨╛╨╗╨╛╨╜╨║╨╕ (╤Б╨╛╨▒╤Л╤В╨╕╤П, ╨│╨╛╤А╨╛╨┤╨░, ╨║╨╛╨╝╨┐╨░╨╜╨╕╤П), email.
-- Home: gradient hero + ╨┐╨╛╨╕╤Б╨║, ╨┐╨╛╨┐╤Г╨╗╤П╤А╨╜╤Л╨╡ ╤Б╨╛╨▒╤Л╤В╨╕╤П, city cards, format tiles, trust block.
-- EventCard: ╤А╨╡╨╣╤В╨╕╨╜╨│, price pill, hover, category chip.
-
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-
-- ╨Я╨╛╨╗╨╜╤Л╨╣ UI parity (landings block renderer, catalog advanced filters, auth/favorites) тАФ ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╕╨╡ slices.
-- `/images/cities/*.png` тАФ static assets ╨╜╨░ nginx, ╨╜╨╡ ╨▓ repo; fallback emoji + `heroImageUrl` ╨╕╨╖ API.
+- `pnpm db:deploy` на staging/prod ещё не выполнен — нужен backup `5438`/`5437`.
+- `backend:test:ts` не включает ECR tests — запускать отдельно `tsx --test src/event-change-request-*.test.ts`.
 
 ---
 
-## 2026-07-11 тАФ Next UI polish (slice 3): event page hero + sticky buy
+## 2026-07-10 — Next UI polish (slice 1): design system + shell + home
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- ╨Я╨╛╤Б╨╗╨╡ slice 1тАУ2 event page ╨╛╤Б╤В╨░╨▓╨░╨╗╨░╤Б╤М ╨╜╨░ ╤Г╨┐╤А╨╛╤Й╤С╨╜╨╜╨╛╨╝ `PurchaseWidget`: ╨▒╨╡╨╖ hero, ╨▒╨╡╨╖ sticky buy card, ╨▒╨╡╨╖ ╤Б╨┐╨╕╤Б╨║╨░ ╤Б╨╡╨░╨╜╤Б╨╛╨▓.
-- Vite `EventPage.tsx` тАФ ╤Н╤В╨░╨╗╨╛╨╜: full-bleed hero, breadcrumbs, mobile CTA, buy card ╤Б ╨║╨░╤В╨╡╨│╨╛╤А╨╕╤П╨╝╨╕/╤Б╨╡╨░╨╜╤Б╨░╨╝╨╕, TC slot-╨║╨╗╨╕╨║╨╕, Teplohod embed.
+- F3 data path готов, но Next выглядел «голым»: 3 nav-ссылки, минимальный footer, простые карточки.
+- Vite public содержит полный design system (~290 строк CSS) и Header/Footer с 7 разделами.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `EventHero` + `EventBuyCard` ╨▓ `EventPage.client.tsx`; ╨╛╨┐╨╕╤Б╨░╨╜╨╕╨╡/╤В╨╡╨│╨╕ тАФ `EventPageSections.tsx`.
-- ╨г╤В╨╕╨╗╨╕╤В╤Л: `event-page-utils.ts` (╤Ж╨╡╨╜╤Л, ╨▓╨╛╨╖╤А╨░╤Б╤В, HTML ╨╛╨┐╨╕╤Б╨░╨╜╨╕╨╡), `event-purchase.ts` (TC targets, purchasable sessions).
+- Порт `globals.css` + tailwind tokens из `apps/public`.
+- Header: fixed blur, mobile sheet, полная nav (events/cities/venues/locations/podborki).
+- Footer: 4 колонки (события, города, компания), email.
+- Home: gradient hero + поиск, популярные события, city cards, format tiles, trust block.
+- EventCard: рейтинг, price pill, hover, category chip.
+
+### Проблемы
+
+- Полный UI parity (landings block renderer, catalog advanced filters, auth/favorites) — следующие slices.
+- `/images/cities/*.png` — static assets на nginx, не в repo; fallback emoji + `heroImageUrl` из API.
+
+---
+
+## 2026-07-11 — Next UI polish (slice 3): event page hero + sticky buy
+
+### Наблюдения
+
+- После slice 1–2 event page оставалась на упрощённом `PurchaseWidget`: без hero, без sticky buy card, без списка сеансов.
+- Vite `EventPage.tsx` — эталон: full-bleed hero, breadcrumbs, mobile CTA, buy card с категориями/сеансами, TC slot-клики, Teplohod embed.
+
+### Решения
+
+- `EventHero` + `EventBuyCard` в `EventPage.client.tsx`; описание/теги — `EventPageSections.tsx`.
+- Утилиты: `event-page-utils.ts` (цены, возраст, HTML описание), `event-purchase.ts` (TC targets, purchasable sessions).
 - `TcWidget.client.tsx`: `TcSessionSlot`, hero/default `TcWidgetButton`, session rows.
-- `TeplohodWidget.client.tsx`: embed ╤Б `#teplohod-widget`, CSS override, hero scroll+click.
-- Layout `/events/[slug]`: hero тЖТ 2-col (content + sticky `top-20`) тЖТ related events.
+- `TeplohodWidget.client.tsx`: embed с `#teplohod-widget`, CSS override, hero scroll+click.
+- Layout `/events/[slug]`: hero → 2-col (content + sticky `top-20`) → related events.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- Slice 4 (landings block renderer) ╨╕ slice 5 (auth/help/legal) тАФ ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╕╨╡.
-- QuickInfo ╨╜╨░ event page ╤Г╨┐╤А╨╛╤Й╤С╨╜ vs Vite (╨▒╨╡╨╖ event-location resolver) тАФ ╨┤╨╛╤Б╤В╨░╤В╨╛╤З╨╜╨╛ ╨┤╨╗╤П functional parity.
+- Slice 4 (landings block renderer) и slice 5 (auth/help/legal) — следующие.
+- QuickInfo на event page упрощён vs Vite (без event-location resolver) — достаточно для functional parity.
 
 ---
 
-## 2026-07-11 тАФ Next UI polish (slice 4): landings content blocks
+## 2026-07-11 — Next UI polish (slice 4): landings content blocks
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Backend (`dto.js`) ╤Г╨╢╨╡ ╨╛╤В╨┤╨░╤С╤В `blocks` (DB `LandingContentBlock` ╨╕╨╗╨╕ `buildDefaultLandingBlocks`).
-- Next `LandingPageView` ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╨╗ ╤В╨╛╨╗╤М╨║╨╛ ╨╖╨░╨│╨╛╨╗╨╛╨▓╨╛╨║ + ╨║╨░╤А╤В╨╛╤З╨║╨╕ ╤Б╨╛╨▒╤Л╤В╨╕╨╣ тАФ ╨▒╨╡╨╖ trust/value/city grid/FAQ.
+- Backend (`dto.js`) уже отдаёт `blocks` (DB `LandingContentBlock` или `buildDefaultLandingBlocks`).
+- Next `LandingPageView` показывал только заголовок + карточки событий — без trust/value/city grid/FAQ.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- `LandingContentBlocks` + `LandingFaqSection` тАФ ╨┐╨╛╤А╤В ╤В╨╕╨┐╨╛╨▓ ╨▒╨╗╨╛╨║╨╛╨▓ ╨╕╨╖ Vite.
-- ╨в╨╕╨┐╨╕╨╖╨░╤Ж╨╕╤П `PublicLandingPageDto.blocks` тЖТ `LandingContentBlockDto[]`.
-- ╨б╨╡╨║╤Ж╨╕╤П ╤Б╨╛╨▒╤Л╤В╨╕╨╣ `#variants` ╨┤╨╗╤П CTA anchor.
+- `LandingContentBlocks` + `LandingFaqSection` — порт типов блоков из Vite.
+- Типизация `PublicLandingPageDto.blocks` → `LandingContentBlockDto[]`.
+- Секция событий `#variants` для CTA anchor.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Я╨╛╨╗╨╜╤Л╨╣ landing parity (hero sticky, filters, bridges/dinner profiles) тАФ ╨╛╤В╨┤╨╡╨╗╤М╨╜╨╛, ╨╜╨╡ slice 4.
+- Полный landing parity (hero sticky, filters, bridges/dinner profiles) — отдельно, не slice 4.
 - Slice 5: auth/pages (`/help`, `/blog`, legal).
 
-## 2026-07-19 тАФ Google Search Console verification
+## 2026-07-19 — Google Search Console verification
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- ╨Э╤Г╨╢╨╡╨╜ HTML-╤Д╨░╨╣╨╗ ╨▓╨╡╤А╨╕╤Д╨╕╨║╨░╤Ж╨╕╨╕ Google ╨┐╨╛ URL `/googleb3313872246ac993.html`, ╨┐╨╛ ╨░╨╜╨░╨╗╨╛╨│╨╕╨╕ ╤Б Yandex (`apps/web/public/yandex_*.html`).
-- ╨б╤В╨░╤В╨╕╨║╨░ Next ╨╛╤В╨┤╨░╤С╤В╤Б╤П ╨╕╨╖ `apps/web/public/`; ╨┤╤Г╨▒╨╗╨╕╤А╨╛╨▓╨░╨╜╨╕╨╡ ╨▓ `apps/public/public/` ╨┤╨╗╤П verify-╤Д╨░╨╣╨╗╨╛╨▓ ╨╜╨╡ ╤В╤А╨╡╨▒╤Г╨╡╤В╤Б╤П.
+### Наблюдения
+- Нужен HTML-файл верификации Google по URL `/googleb3313872246ac993.html`, по аналогии с Yandex (`apps/web/public/yandex_*.html`).
+- Статика Next отдаётся из `apps/web/public/`; дублирование в `apps/public/public/` для verify-файлов не требуется.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- ╨Ф╨╛╨▒╨░╨▓╨╗╨╡╨╜ `apps/web/public/googleb3313872246ac993.html`; commit + deploy ╨╜╨░ prod, ╤З╤В╨╛╨▒╤Л URL ╤Б╤А╨░╨╖╤Г ╨╛╤В╨▓╨╡╤З╨░╨╗ 200.
+### Решения
+- Добавлен `apps/web/public/googleb3313872246ac993.html`; commit + deploy на prod, чтобы URL сразу отвечал 200.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- ╨Э╨╡╤В.
+### Проблемы
+- Нет.
 ---
 
 ## 2026-07-19 - Prod CPU/RAM mitigation (legacy Docker off + systemd limits + TEP spread)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
+### Наблюдения
 
-- Host 3.8Gi: swap ╨▒╤Л╨╗ ╨┐╨╛╤З╤В╨╕ ╨┐╨╛╨╗╨╜╤Л╨╣ (~2Gi used) ╨┐╤А╨╕ ╨╛╨┤╨╜╨╛╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛╨╝ legacy Docker + staging + prod Next/API.
-- Prod ╤В╤А╨░╤Д╨╕╨║: nginx тЖТ systemd `daibilet-web:3001` / `daibilet-api:4000`; ╨С╨Ф prod = `daibilet-tours-postgres:5437`.
-- Legacy compose (frontend/backend/admin/supplier/postgres16/redis) ╨╕ staging (api:4001, postgres:5438, redis) ╨╜╨╡ ╨╛╨▒╤Б╨╗╤Г╨╢╨╕╨▓╨░╨╗╨╕ daibilet.ru / admin.daibilet.ru.
-- TEP auto-sync ╨║╨░╨╢╨┤╤Л╨╡ 360 ╨╝╨╕╨╜ + ╤Б╤А╨░╨╖╤Г warm/revalidate (~30тАУ45s warm) ╨┤╨░╨▓╨░╨╗╨╕ ╨┐╨╕╨║ ╨▓╨╝╨╡╤Б╤В╨╡ ╤Б import (~80тАУ120s).
+- Host 3.8Gi: swap был почти полный (~2Gi used) при одновременном legacy Docker + staging + prod Next/API.
+- Prod трафик: nginx → systemd `daibilet-web:3001` / `daibilet-api:4000`; БД prod = `daibilet-tours-postgres:5437`.
+- Legacy compose (frontend/backend/admin/supplier/postgres16/redis) и staging (api:4001, postgres:5438, redis) не обслуживали daibilet.ru / admin.daibilet.ru.
+- TEP auto-sync каждые 360 мин + сразу warm/revalidate (~30–45s warm) давали пик вместе с import (~80–120s).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 
-- ╨Ю╤Б╤В╨░╨╜╨╛╨▓╨╗╨╡╨╜╤Л (stop + `restart=no`, volumes **╨╜╨╡** ╤Г╨┤╨░╨╗╤П╨╗╨╕╤Б╤М): legacy Docker stack + staging postgres/redis; systemd `daibilet-api-staging` / `daibilet-web-staging` stop+disable.
-- ╨Ю╤Б╤В╨░╨▓╨╗╨╡╨╜: `daibilet-tours-postgres`, `daibilet-web`, `daibilet-api`.
-- systemd MemoryHigh/MemoryMax + `NODE_OPTIONS=--max-old-space-size` (web 896/1400M, api 1024/1536M); drop-ins ╨▓ `deploy/systemd/*.service.d/memory.conf`.
-- TEP: default interval 12h; warm delay 15 min; startup delay 10 min; import ╤З╨╡╤А╨╡╨╖ `nice`; env ╨▓ `deploy/env/prod.env.example`.
-- ╨Ь╨╛╨╜╨╕╤В╨╛╤А╨╕╨╜╨│: `deploy/scripts/watch-tep-sync-load.sh`, `deploy/scripts/oom-watch.sh` (+ hourly cron).
+- Остановлены (stop + `restart=no`, volumes **не** удалялись): legacy Docker stack + staging postgres/redis; systemd `daibilet-api-staging` / `daibilet-web-staging` stop+disable.
+- Оставлен: `daibilet-tours-postgres`, `daibilet-web`, `daibilet-api`.
+- systemd MemoryHigh/MemoryMax + `NODE_OPTIONS=--max-old-space-size` (web 896/1400M, api 1024/1536M); drop-ins в `deploy/systemd/*.service.d/memory.conf`.
+- TEP: default interval 12h; warm delay 15 min; startup delay 10 min; import через `nice`; env в `deploy/env/prod.env.example`.
+- Мониторинг: `deploy/scripts/watch-tep-sync-load.sh`, `deploy/scripts/oom-watch.sh` (+ hourly cron).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
+### Проблемы
 
-- ╨Я╨╛╤Б╨╗╨╡ stop available RAM ╨▓╤Л╤А╨╛╤Б, swap ╤Г╨┐╨░╨╗ ~2GiтЖТ~65Mi тАФ ╨╜╤Г╨╢╨╜╨╛ ╨┐╨╛╨┤╤В╨▓╨╡╤А╨┤╨╕╤В╤М ╤Б╤В╨░╨▒╨╕╨╗╤М╨╜╨╛╤Б╤В╤М ╨┐╨╛╨┤ ╨╗╨╕╨╝╨╕╤В╨░╨╝╨╕ MemoryMax ╨┐╤А╨╕ ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╡╨╝ sync.
-- staging.daibilet.ru ╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛ ╨▒╨╡╨╖ API/DB ╨┤╨╛ ╤П╨▓╨╜╨╛╨│╨╛ start ╨║╨╛╨╜╤В╨╡╨╣╨╜╨╡╤А╨╛╨▓/units.
-- Rollback: `docker start` ╨╜╤Г╨╢╨╜╤Л╤Е ╨║╨╛╨╜╤В╨╡╨╣╨╜╨╡╤А╨╛╨▓; `systemctl enable --now daibilet-*-staging`; ╤Г╨▒╤А╨░╤В╤М drop-ins / ╨▓╨╡╤А╨╜╤Г╤В╤М `TEP_AUTO_SYNC_*`.
+- После stop available RAM вырос, swap упал ~2Gi→~65Mi — нужно подтвердить стабильность под лимитами MemoryMax при следующем sync.
+- staging.daibilet.ru временно без API/DB до явного start контейнеров/units.
+- Rollback: `docker start` нужных контейнеров; `systemctl enable --now daibilet-*-staging`; убрать drop-ins / вернуть `TEP_AUTO_SYNC_*`.
 
 
 ---
 
 ## 2026-07-19 - Admin grouped readiness: future sibling clears NO_FUTURE_SESSIONS
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- ╨Я╨╛╤Б╨╗╨╡ ╨│╤А╤Г╨┐╨┐╨╕╤А╨╛╨▓╨║╨╕ sibling-╤Б╨╛╨▒╤Л╤В╨╕╨╣ past-only ╤Б╨╗╨╛╤В ╤Б `NO_FUTURE_SESSIONS` ╨║╤А╨░╤Б╨╕╨╗ ╨▓╤Б╤О ╨║╨░╤А╤В╨╛╤З╨║╤Г ╨║╨░╨║ blocked, ╨┤╨░╨╢╨╡ ╨╡╤Б╨╗╨╕ ╨▓ ╨│╤А╤Г╨┐╨┐╨╡ ╨╡╤Б╤В╤М future-╤Б╨╡╨░╨╜╤Б.
-- Backend (`groupAdminEventRows` / `finalizeGroupedAdminReadiness`) тАФ source of truth; Admin UI ╨╖╨╡╤А╨║╨░╨╗╨╕╤В ╤В╤Г ╨╢╨╡ ╨╗╨╛╨│╨╕╨║╤Г.
+### Наблюдения
+- После группировки sibling-событий past-only слот с `NO_FUTURE_SESSIONS` красил всю карточку как blocked, даже если в группе есть future-сеанс.
+- Backend (`groupAdminEventRows` / `finalizeGroupedAdminReadiness`) — source of truth; Admin UI зеркалит ту же логику.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- `finalizeGroupedAdminReadiness`: ╨┐╤А╨╕ `groupHasFutureSession` ╤Б╨╜╨╕╨╝╨░╨╡╤В╤Б╤П ╤В╨╛╨╗╤М╨║╨╛ `NO_FUTURE_SESSIONS`; ╨╛╤Б╤В╨░╨╗╤М╨╜╤Л╨╡ high-issues ╨╛╤Б╤В╨░╤О╤В╤Б╤П.
-- ╨Ч╨╡╤А╨║╨░╨╗╨╛ ╨▓ `apps/admin/src/pages/EventsPage.tsx`; unit-╤В╨╡╤Б╤В `admin-group-readiness.test.ts` ╨▓ `test:ts`.
+### Решения
+- `finalizeGroupedAdminReadiness`: при `groupHasFutureSession` снимается только `NO_FUTURE_SESSIONS`; остальные high-issues остаются.
+- Зеркало в `apps/admin/src/pages/EventsPage.tsx`; unit-тест `admin-group-readiness.test.ts` в `test:ts`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- Prod deploy ╨▓╤Л╨┐╨╛╨╗╨╜╨╡╨╜: API `daibilet-api` + admin static `/var/www/daibilet/admin` ╨╜╨░ `bb7fc9c`.
-- Health OK; unit-╤В╨╡╤Б╤В admin-group-readiness 4/4 ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡.
+### Проблемы
+- Prod deploy выполнен: API `daibilet-api` + admin static `/var/www/daibilet/admin` на `bb7fc9c`.
+- Health OK; unit-тест admin-group-readiness 4/4 на сервере.
 
 ---
 
 ## 2026-07-19 - Deploy: grouped readiness fix (API + admin)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- ╨Ч╨░╨┤╨╡╨┐╨╗╨╛╨╡╨╜ `bb7fc9c`: restart `daibilet-api`, Vite build admin тЖТ `/var/www/daibilet/admin`.
-- ╨С╨╡╨╖ ╨┐╨╛╨╗╨╜╨╛╨│╨╛ `deploy-prod-next.sh` (Next web ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕).
-- Health `/api/health` OK; `admin-group-readiness.test.ts` 4/4 pass ╨╜╨░ prod.
+### Наблюдения
+- Задеплоен `bb7fc9c`: restart `daibilet-api`, Vite build admin → `/var/www/daibilet/admin`.
+- Без полного `deploy-prod-next.sh` (Next web не трогали).
+- Health `/api/health` OK; `admin-group-readiness.test.ts` 4/4 pass на prod.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- Source of truth тАФ backend grouping; admin static ╨╛╨▒╨╜╨╛╨▓╨╗╤С╨╜ ╨╖╨╡╤А╨║╨░╨╗╨╛╨╝ UI.
+### Решения
+- Source of truth — backend grouping; admin static обновлён зеркалом UI.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- Auto-stash ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡ ╨┐╨╛╤Б╨╗╨╡ pull (untracked drop-ins ╤Г╨╢╨╡ ╨▓ commit) тАФ ╨╝╨╛╨╢╨╜╨╛ drop; ╨╜╨╡ ╨▓╨╗╨╕╤П╨╡╤В ╨╜╨░ readiness.
+### Проблемы
+- Auto-stash на сервере после pull (untracked drop-ins уже в commit) — можно drop; не влияет на readiness.
 
 ---
 
 ## 2026-07-19 - CPU/RAM audit follow-up (cron +x, TEP isolation, oom-watch)
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- 	c-orders-sync.sh ╨╜╨░ prod ╨▒╤Л╨╗ ╨▒╨╡╨╖ execute bit тЖТ crontab */10 ╨┐╨╕╤Б╨░╨╗ Permission denied.
-- In-process TEP auto-sync + full public warm ╨╜╨░ ╨║╨░╨╢╨┤╨╛╨╝ ╤А╨╡╤Б╤В╨░╤А╤В╨╡ API ╨┤╨░╨▓╨░╨╗╨╕ ╨┐╨╕╨║╨╕ CPU/RAM ╨╜╨░ 3.8Gi.
-- Hourly oom-watch ╨╜╨╡ ╨╗╨╛╨▓╨╕╨╗ ╤А╨╛╤Б╤В swap / ╨┐╤А╨╕╨▒╨╗╨╕╨╢╨╡╨╜╨╕╨╡ ╨║ MemoryHigh ╨╝╨╡╨╢╨┤╤Г ╤З╨░╤Б╨░╨╝╨╕.
+### Наблюдения
+- 	c-orders-sync.sh на prod был без execute bit → crontab */10 писал Permission denied.
+- In-process TEP auto-sync + full public warm на каждом рестарте API давали пики CPU/RAM на 3.8Gi.
+- Hourly oom-watch не ловил рост swap / приближение к MemoryHigh между часами.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- chmod +x ╨╜╨░ cron/scripts ╨▓ git (100755) ╨╕ ╨╜╨░ prod; flock ╨▓ tc-orders ╤Б╨╛╤Е╤А╨░╨╜╤С╨╜.
-- Deploy discipline: ╨║╨╛╨╝╨╝╨╡╨╜╤В╨░╤А╨╕╨╣ ╨▓ deploy-prod-next.sh + README тАФ ╨╛╨┤╨╕╨╜ controlled restart sequence.
-- TEP: TEP_AUTO_SYNC_ENABLED=0 + cron/systemd 	ep-catalog-sync (nice + MemoryMax); in-process fallback ╤Б startup delay 45m + skip-if-fresh 6h.
-- DAIBILET_PUBLIC_STARTUP_WARM=0 тАФ ╨┐╨╛╨╗╨╜╤Л╨╣ warm ╤В╨╛╨╗╤М╨║╨╛ post-sync delayed.
-- oom-watch ╨║╨░╨╢╨┤╤Л╨╡ 5 ╨╝╨╕╨╜; alerts ╨▓ oom-watch-alerts.log ╨┐╤А╨╕ swap>350Mi ╨╕╨╗╨╕ MemoryCurrentтЙе90% MemoryHigh.
-- PG ╨▓ Docker ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕ (optional later, documented).
+### Решения
+- chmod +x на cron/scripts в git (100755) и на prod; flock в tc-orders сохранён.
+- Deploy discipline: комментарий в deploy-prod-next.sh + README — один controlled restart sequence.
+- TEP: TEP_AUTO_SYNC_ENABLED=0 + cron/systemd 	ep-catalog-sync (nice + MemoryMax); in-process fallback с startup delay 45m + skip-if-fresh 6h.
+- DAIBILET_PUBLIC_STARTUP_WARM=0 — полный warm только post-sync delayed.
+- oom-watch каждые 5 мин; alerts в oom-watch-alerts.log при swap>350Mi или MemoryCurrent≥90% MemoryHigh.
+- PG в Docker не трогали (optional later, documented).
 
 ### Prod apply (2026-07-19)
 - Commit 9fb19c3 pulled; cron +x; env TEP_AUTO_SYNC_ENABLED=0, startup delay 45m / skip-if-fresh 6h, DAIBILET_PUBLIC_STARTUP_WARM=0.
 - Crontab: 	c-orders */10, oom-watch */5, 	ep-catalog-sync 20 */12.
 - One restart daibilet-api only. Smoke: API/web health 200; tc-orders ran (no Permission denied); journal: in-process TEP disabled + startup warm skipped.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- ╨Я╨╛╤Б╨╗╨╡ ╤Б╨╝╨╡╨╜╤Л env ╨╜╤Г╨╢╨╡╨╜ **╨╛╨┤╨╕╨╜** restart daibilet-api (╨╜╨╡ ╨┐╨░╤З╨║╨╛╨╣).
-- ╨Я╨╡╤А╨▓╤Л╨╡ ╨╝╨╕╨╜╤Г╤В╤Л ╨┐╨╛╤Б╨╗╨╡ ╨╛╤В╨║╨╗╤О╤З╨╡╨╜╨╕╤П startup public warm тАФ cold cache ╨┤╨╛ ╨┐╨╡╤А╨▓╨╛╨│╨╛ ╤В╤А╨░╤Д╨╕╨║╨░ / post-sync warm.
+### Проблемы
+- После смены env нужен **один** restart daibilet-api (не пачкой).
+- Первые минуты после отключения startup public warm — cold cache до первого трафика / post-sync warm.
 
 
-## 2026-07-19 тАФ Prod: ╨▒╨╕╤В╤Л╨╣ .next mid-deploy + cleanDisplayText
+## 2026-07-19 — Prod: битый .next mid-deploy + cleanDisplayText
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- ╨Я╨╛╤Б╨╗╨╡ ╤Д╨╕╨║╤Б╨░ cleanDisplayText ╨┐╨░╤А╨░╨╗╨╗╨╡╨╗╤М╨╜╤Л╨╣ deploy ╨╛╤Б╤В╨░╨▓╨╕╨╗ .next ╨▒╨╡╨╖ prerender-manifest.json тЖТ daibilet-web crash-loop, ╤Б╨░╨╣╤В 502 / Application error.
-- ╨б╤В╨░╤В╨╕╨║╨░ /_next/static ╤З╨╡╤А╨╡╨╖ proxy ╨╜╨░ Node: ╨┐╤А╨╕ down Next тЖТ 502 ╨╜╨░ chunks.
+### Наблюдения
+- После фикса cleanDisplayText параллельный deploy оставил .next без prerender-manifest.json → daibilet-web crash-loop, сайт 502 / Application error.
+- Статика /_next/static через proxy на Node: при down Next → 502 на chunks.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- `systemctl stop` тЖТ `rm -rf apps/web/.next` тЖТ `pnpm web:build` тЖТ start; `/events` ╨╕ event slug 200, journal ╨▒╨╡╨╖ `cleanDisplayText`.
+### Решения
+- `systemctl stop` → `rm -rf apps/web/.next` → `pnpm web:build` → start; `/events` и event slug 200, journal без `cleanDisplayText`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- ╨Э╨╡╨╗╤М╨╖╤П ╨┐╨░╤А╨░╨╗╨╗╨╡╨╗╨╕╤В╤М ╨┤╨▓╨░ `deploy-prod-next` ╨╜╨░ ╨╛╨┤╨╜╨╛╨╝ ╤Е╨╛╤Б╤В╨╡.
+### Проблемы
+- Нельзя параллелить два `deploy-prod-next` на одном хосте.
 
 
-## 2026-07-22 тАФ ╨Ъ╨╛╨╗╨╛╨╜╨║╨░ ╨Х╨╗╨╡╨╜╤Л: ╨б╨Я╨▒ ╤Б ╤А╨╡╨▒╤С╨╜╨║╨╛╨╝ ╨▓ ╨┤╨╛╨╢╨┤╤М
+## 2026-07-22 — Колонка Елены: СПб с ребёнком в дождь
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- ╨в╨╡╨║╤Б╤В ╨║╨╛╨╗╨╛╨╜╨║╨╕ ╨┐╤А╨╛ ╤З╨╡╤В╤Л╤А╨╡ indoor-╤Д╨╛╤А╨╝╨░╤В╨░ (╨┐╨╗╨░╨╜╨╡╤В╨░╤А╨╕╨╣, ╨Ь╤Г╨╖╨╡╨╣ ╨Ь╨░╤В╤А╨╡╤И╨║╨╕, ╨У╨░╤А╤А╨╕ ╨Я╨╛╤В╤В╨╡╤А, ╨Ю╤Б╨╛╨▒╨╜╤П╨║ ╨Ь╤П╤Б╨╜╨╕╨║╨╛╨▓╨░) + ╨╖╨░╨┐╨░╤Б╨╜╨╛╨╣ outdoor (╨┐╨╡╤Б╤З╨░╨╜╤Л╨╡ ╤Б╨║╤Г╨╗╤М╨┐╤В╤Г╤А╤Л).
-- ╨Я╨╛╤Б╨╗╨╡ pnpm blog:upsert ╤Б╤В╤А╨░╨╜╨╕╤Ж╨░ ╨▓ ╨С╨Ф PUBLISHED, ╨╜╨╛ revalidate ╤Б ╨╗╨╛╨║╨░╨╗╤М╨╜╨╛╨│╨╛ PowerShell ╨╗╨╛╨╝╨░╨╗╤Б╤П ╨╜╨░ Authorization: Bearer (host resolve / 401).
+### Наблюдения
+- Текст колонки про четыре indoor-формата (планетарий, Музей Матрешки, Гарри Поттер, Особняк Мясникова) + запасной outdoor (песчаные скульптуры).
+- После pnpm blog:upsert страница в БД PUBLISHED, но revalidate с локального PowerShell ломался на Authorization: Bearer (host resolve / 401).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- ╨б╤В╨░╤В╤М╤П `spb-s-rebenkom-v-dozhd`, authorId `elena`, citySlug `saint-petersburg`; cover + distinct inline.
-- Soft-links ╨╜╨░ venues/events ╨║╨░╤В╨░╨╗╨╛╨│╨░; deploy-prod-next + upsert.
-- Revalidate ╨╜╨░╨┤╤С╨╢╨╜╨╡╨╡ ╨│╨╛╨╜╤П╤В╤М **╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡** ╤З╨╡╤А╨╡╨╖ SSH + here-doc (curl ╤Б Bearer ╨╕╨╖ .env), ╨╜╨╡ ╨╕╨╖ Windows PowerShell.
-- Smoke 200: page, cover, inline; ╨▓ HTML тАФ ╨Х╨╗╨╡╨╜╨░, ╨з╨╕╤В╨░╨╣╤В╨╡ ╤В╨░╨║╨╢╨╡, ╤Б╤Б╤Л╨╗╨║╨╕ ╨╜╨░ ╤Б╨╛╨▒╤Л╤В╨╕╤П/╤Е╨░╨▒.
+### Решения
+- Статья `spb-s-rebenkom-v-dozhd`, authorId `elena`, citySlug `saint-petersburg`; cover + distinct inline.
+- Soft-links на venues/events каталога; deploy-prod-next + upsert.
+- Revalidate надёжнее гонять **на сервере** через SSH + here-doc (curl с Bearer из .env), не из Windows PowerShell.
+- Smoke 200: page, cover, inline; в HTML — Елена, Читайте также, ссылки на события/хаб.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- ╨н╨║╤А╨░╨╜╨╕╤А╨╛╨▓╨░╨╜╨╕╨╡ Bearer ╨▓ PowerShell ╨┐╤А╨╕ remote curl тАФ ╨╜╨╡ ╨╕╤Б╨┐╨╛╨╗╤М╨╖╨╛╨▓╨░╤В╤М ╨╛╨┤╨╜╨╛╤Б╤В╤А╨╛╤З╨╜╤Л╨╣ ssh ╤Б ╨▓╨╗╨╛╨╢╨╡╨╜╨╜╤Л╨╝╨╕ ╨║╨░╨▓╤Л╤З╨║╨░╨╝╨╕.
+### Проблемы
+- Экранирование Bearer в PowerShell при remote curl — не использовать однострочный ssh с вложенными кавычками.
 
 ### Prod proof (2026-07-23)
-- Deploy `05a5901` + nginx patch; admin SSL тЖТ LE `api.daibilet.ru` cert (SAN includes admin).
-- Smoke: `https://daibilet.ru/events` 200; `https://admin.daibilet.ru/` 401 ╨▒╨╡╨╖ auth / 200 ╤Б Basic Auth (Next dashboard HTML); `/legacy` 200; `/events` `/sources` 200.
-- Public site ╨╜╨╡ ╨╖╨░╤В╤А╨╛╨╜╤Г╤В.
+- Deploy `05a5901` + nginx patch; admin SSL → LE `api.daibilet.ru` cert (SAN includes admin).
+- Smoke: `https://daibilet.ru/events` 200; `https://admin.daibilet.ru/` 401 без auth / 200 с Basic Auth (Next dashboard HTML); `/legacy` 200; `/events` `/sources` 200.
+- Public site не затронут.
 
-## 2026-07-23 - F4.1c: cutover admin.daibilet.ru тЖТ Next
+## 2026-07-23 - F4.1c: cutover admin.daibilet.ru → Next
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- Prod admin ╨▒╤Л╨╗ Vite static root + nginx auth_basic + `/api` тЖТ :4000.
-- Next ╤Г╨╢╨╡ ╨╕╨╝╨╡╨╗ `/admin/*` ╤Б Basic Auth ╨╕ live screens (F4.0тАУF4.1b); deep Events/Landings CRUD ╨╡╤Й╤С ╨╜╨░ Vite.
+### Наблюдения
+- Prod admin был Vite static root + nginx auth_basic + `/api` → :4000.
+- Next уже имел `/admin/*` с Basic Auth и live screens (F4.0–F4.1b); deep Events/Landings CRUD ещё на Vite.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- ╨Т╨░╤А╨╕╨░╨╜╤В B: `admin.daibilet.ru` тЖТ Next proxy; middleware host rewrite `/`тЖТ`/admin`, `/events`тЖТ`/admin/events`.
-- Vite ╨╛╤Б╤В╨░╤С╤В╤Б╤П ╨╜╨░ `admin.daibilet.ru/legacy/` (`VITE_ADMIN_BASE=/legacy/`, basename) ╨┤╨╗╤П override/matches.
-- `NEXT_PUBLIC_VITE_ADMIN_URL` default тЖТ `тАж/legacy`. Nginx patch `patch-prod-admin-next.py`; deploy rsync тЖТ `/var/www/daibilet/legacy`.
+### Решения
+- Вариант B: `admin.daibilet.ru` → Next proxy; middleware host rewrite `/`→`/admin`, `/events`→`/admin/events`.
+- Vite остаётся на `admin.daibilet.ru/legacy/` (`VITE_ADMIN_BASE=/legacy/`, basename) для override/matches.
+- `NEXT_PUBLIC_VITE_ADMIN_URL` default → `…/legacy`. Nginx patch `patch-prod-admin-next.py`; deploy rsync → `/var/www/daibilet/legacy`.
 - Docs: [phase-f4-admin-cutover.md](./phases/phase-f4-admin-cutover.md). Smoke: `scripts/smoke-admin-next-cutover.sh`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- htpasswd ╨╕ ADMIN_* ╨┤╨╛╨╗╨╢╨╜╤Л ╤Б╨╛╨▓╨┐╨░╨┤╨░╤В╤М (╨┤╨▓╨╛╨╣╨╜╨╛╨╣ Basic Auth nginx+Next).
-- Prod deploy ╤Б ╤Н╤В╨╛╨╣ ╨╝╨░╤И╨╕╨╜╤Л ╨╝╨╛╨╢╨╡╤В ╤Г╨┐╨╕╤А╨░╤В╤М╤Б╤П ╨▓ SSH keys - ╨┐╨░╤В╤З ╨┐╤А╨╕╨╝╨╡╨╜╤П╨╡╤В╤Б╤П ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡ ╤З╨╡╤А╨╡╨╖ deploy script.
-- ╨Я╨╛╨╗╨╜╤Л╨╣ retire Vite - ╨┐╨╛╤Б╨╗╨╡ port Events/Landings edit (╨╜╨╡ F4.2 worker).
+### Проблемы
+- htpasswd и ADMIN_* должны совпадать (двойной Basic Auth nginx+Next).
+- Prod deploy с этой машины может упираться в SSH keys - патч применяется на сервере через deploy script.
+- Полный retire Vite - после port Events/Landings edit (не F4.2 worker).
 
-## 2026-07-23 - F4.1b: Sources / Settings ╨▓ Next admin
+## 2026-07-23 - F4.1b: Sources / Settings в Next admin
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- Vite Sources: GET `/api/admin/sources` + POST TC/TEP sync. Sync-health - alias ╨╜╨░ Sources.
-- Vite Settings: ╨╜╨╡╤В `/api/admin/settings`; ╤В╨╛╨╗╤М╨║╨╛ read-only UX (flags/roles/links).
+### Наблюдения
+- Vite Sources: GET `/api/admin/sources` + POST TC/TEP sync. Sync-health - alias на Sources.
+- Vite Settings: нет `/api/admin/settings`; только read-only UX (flags/roles/links).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 - `/admin/sources`: cards + table health, openIssues, last sync; server actions sync Ticketscloud/Teplohod.
-- `/admin/sync-health` тЖТ redirect ╨╜╨░ `/admin/sources`.
-- `/admin/settings`: read-only (auth/API base, imports, public URLs, static feature flags, role stubs). Writable toggles ╨╜╨╡ ╨┤╨╛╨▒╨░╨▓╨╗╤П╨╗╨╕.
-- Nav: Sources ╨╕ Settings ready. SEO public ╤Д╨░╨╣╨╗╤Л ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╗╨╕.
+- `/admin/sync-health` → redirect на `/admin/sources`.
+- `/admin/settings`: read-only (auth/API base, imports, public URLs, static feature flags, role stubs). Writable toggles не добавляли.
+- Nav: Sources и Settings ready. SEO public файлы не трогали.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- Sync POST ╨╝╨╛╨╢╨╡╤В ╨▒╤Л╤В╤М ╨┤╨╛╨╗╨│╨╕╨╝; UI ╨┤╨╡╨╗╨░╨╡╤В form POST ╨╕ ╨╢╨┤╤С╤В redirect. ╨Ф╨╗╤П prod ╨╜╤Г╨╢╨╡╨╜ timeout/proxy ╨║╨░╨║ ╤Г Vite.
-- Cutover admin subdomain (F4.1c) ╨╡╤Й╤С ╨╜╨╡ ╨╜╨░╤З╨░╤В.
+### Проблемы
+- Sync POST может быть долгим; UI делает form POST и ждёт redirect. Для prod нужен timeout/proxy как у Vite.
+- Cutover admin subdomain (F4.1c) ещё не начат.
 
-## 2026-07-23 - F4.1a: Events / Landings / Articles ╨▓ Next admin
+## 2026-07-23 - F4.1a: Events / Landings / Articles в Next admin
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- Vite Events/Landings - ╤В╤П╨╢╤С╨╗╤Л╨╡ sheet/CRUD (override, taxonomy, pin/exclude). Articles CRUD ╨║╨╛╨╝╨┐╨░╨║╤В╨╜╨╡╨╡ ╨╕ ╤Г╨╢╨╡ ╨╜╨░ `/api/admin/articles`.
-- F4.1 ╤Г╨╢╨╡ ╨┤╨░╨╗ server fetch + Basic Auth forward; ╨┐╨╡╤А╨╡╨╕╤Б╨┐╨╛╨╗╤М╨╖╤Г╨╡╨╝ ╨┤╨╗╤П ╤Б╨┐╨╕╤Б╨║╨╛╨▓.
+### Наблюдения
+- Vite Events/Landings - тяжёлые sheet/CRUD (override, taxonomy, pin/exclude). Articles CRUD компактнее и уже на `/api/admin/articles`.
+- F4.1 уже дал server fetch + Basic Auth forward; переиспользуем для списков.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
+### Решения
 - Routes: `/admin/events` (search/view/page), `/admin/landings` + `/admin/landings/[slug]` (read-only sample), `/admin/articles` + `/new` + `/[id]` (save/archive server actions).
-- Event override / landing matches ╨╛╤Б╤В╨░╤О╤В╤Б╤П deep-link ╨▓ Vite ╨┤╨╛ F4.1c.
+- Event override / landing matches остаются deep-link в Vite до F4.1c.
 - Nav shell: Dashboard / Events / Landings / Articles marked ready; pathname-based active state.
-- Deploy ╨╜╨╡ ╨╛╨▒╤П╨╖╨░╤В╨╡╨╗╨╡╨╜ ╨┤╨╗╤П public; ╨┐╤А╨╛╨▓╨╡╤А╨║╨░: ╨╗╨╛╨║╨░╨╗╤М╨╜╨╛ ╤Б API `:4000` + ADMIN_* ╨╕╨╗╨╕ prod `/admin/*` ╨┐╨╛╤Б╨╗╨╡ web deploy.
+- Deploy не обязателен для public; проверка: локально с API `:4000` + ADMIN_* или prod `/admin/*` после web deploy.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- Landing detail API ╤В╤П╨╢╤С╨╗╤Л╨╣ (full grouped catalog) - ╨╜╨░ Next ╨▒╨╡╤А╤С╨╝ ╤В╨╛╨╗╤М╨║╨╛ sample page=1 limit=20.
-- Articles delete ╨╜╨░╨╝╨╡╤А╨╡╨╜╨╜╨╛ ╨╜╨╡ ╨┐╨╛╤А╤В╨╕╨╗╨╕ (╤В╨╛╨╗╤М╨║╨╛ archive); hard-delete ╨╛╤Б╤В╨░╤С╤В╤Б╤П ╨▓ Vite.
+### Проблемы
+- Landing detail API тяжёлый (full grouped catalog) - на Next берём только sample page=1 limit=20.
+- Articles delete намеренно не портили (только archive); hard-delete остаётся в Vite.
 
-## 2026-07-23 - F4.1: live Dashboard ╨▓ Next `/admin`
+## 2026-07-23 - F4.1: live Dashboard в Next `/admin`
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- Vite Dashboard ╤В╤П╨╜╨╡╤В `/api/admin/dashboard`, `/api/admin/sources`, `/api/admin/orders?limit=1` ╤Б same-origin Basic Auth.
-- ╨Э╨░ public Next (`daibilet.ru`) admin API ╨╢╨╕╨▓╤С╤В ╨╜╨░ legacy `:4000`; browser same-origin `/api` ╤Б daibilet.ru ╨╝╨╛╨╢╨╡╤В ╨╛╤В╨╗╨╕╤З╨░╤В╤М╤Б╤П ╨╛╤В admin.daibilet.ru.
+### Наблюдения
+- Vite Dashboard тянет `/api/admin/dashboard`, `/api/admin/sources`, `/api/admin/orders?limit=1` с same-origin Basic Auth.
+- На public Next (`daibilet.ru`) admin API живёт на legacy `:4000`; browser same-origin `/api` с daibilet.ru может отличаться от admin.daibilet.ru.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- Server Component `force-dynamic`: fetch ╨║ `DAIBILET_ADMIN_API_URL` / `DAIBILET_API_INTERNAL_URL` / `DAIBILET_API_URL` (default `http://127.0.0.1:4000`).
-- Authorization ╨╕╨╖ request headers ╨┐╤А╨╛╨▒╤А╨░╤Б╤Л╨▓╨░╨╡╤В╤Б╤П ╨╜╨░ API ╨┐╨╛╤Б╨╗╨╡ middleware Basic Auth.
-- UI parity ╨║╨╗╤О╤З╨╡╨▓╤Л╤Е ╨▒╨╗╨╛╨║╨╛╨▓: top metrics, ╨║╨░╤В╨░╨╗╨╛╨│/launch, SEO, sources, orders. Deep-links ╨╜╨░ Vite admin ╨┤╨╛ port ╤Н╨║╤А╨░╨╜╨╛╨▓.
-- Deploy: ╨▒╨╡╨╖╨╛╨┐╨░╤Б╨╡╨╜ ╨┤╨╗╤П public (╤В╨╛╨╗╤М╨║╨╛ `/admin`); ╨╜╤Г╨╢╨╡╨╜ ADMIN_* ╨▓ env web-╨┐╤А╨╛╤Ж╨╡╤Б╤Б╨░. ╨Х╤Б╨╗╨╕ API env ╨╜╨╡ ╨┐╤А╨╛╨║╨╕╨╜╤Г╤В - ╤Б╤В╤А╨░╨╜╨╕╤Ж╨░ ╨┐╨╛╨║╨░╨╢╨╡╤В ╨▒╨░╨╜╨╜╨╡╤А ╨╛╤И╨╕╨▒╨╛╨║ ╨▒╨╡╨╖ ╨┐╨╛╨╗╨╛╨╝╨║╨╕ ╨▓╨╕╤В╤А╨╕╨╜╤Л.
+### Решения
+- Server Component `force-dynamic`: fetch к `DAIBILET_ADMIN_API_URL` / `DAIBILET_API_INTERNAL_URL` / `DAIBILET_API_URL` (default `http://127.0.0.1:4000`).
+- Authorization из request headers пробрасывается на API после middleware Basic Auth.
+- UI parity ключевых блоков: top metrics, каталог/launch, SEO, sources, orders. Deep-links на Vite admin до port экранов.
+- Deploy: безопасен для public (только `/admin`); нужен ADMIN_* в env web-процесса. Если API env не прокинут - страница покажет баннер ошибок без поломки витрины.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- ╨Я╤А╨╕ ╤В╨╛╨╗╤М╨║╨╛ `ADMIN_PASSWORD_SHA256` ╨▒╨╡╨╖ plaintext ╨╜╨░ web ╨▓╤Б╤С ╤А╨░╨▓╨╜╨╛ ╨╛╨║: ╨▒╤А╨░╤Г╨╖╨╡╤А ╤И╨╗╤С╤В ╨┐╨░╤А╨╛╨╗╤М, Next ╤Д╨╛╤А╨▓╨░╤А╨┤╨╕╤В ╨╖╨░╨│╨╛╨╗╨╛╨▓╨╛╨║.
-- ╨Ы╨╛╨║╨░╨╗╤М╨╜╨╛ ╨▒╨╡╨╖ ╨┐╨╛╨┤╨╜╤П╤В╨╛╨│╨╛ `:4000` dashboard ╨┐╨╛╨║╨░╨╢╨╡╤В errors - ╨╛╨╢╨╕╨┤╨░╨╡╨╝╨╛.
+### Проблемы
+- При только `ADMIN_PASSWORD_SHA256` без plaintext на web всё равно ок: браузер шлёт пароль, Next форвардит заголовок.
+- Локально без поднятого `:4000` dashboard покажет errors - ожидаемо.
 
-## 2026-07-23 - F4 kickoff: admin shell ╨▓ Next
+## 2026-07-23 - F4 kickoff: admin shell в Next
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- F4 ╤А╨░╨╜╨╡╨╡ ╨▒╤Л╨╗ ╤В╨╛╨╗╤М╨║╨╛ ╨▓ backlog (F4.1/F4.2 тП│), ╤А╨╡╨░╨╗╨╕╨╖╨░╤Ж╨╕╨╕ ╨▓ `apps/web` ╨╜╨╡ ╨▒╤Л╨╗╨╛.
-- ╨Ъ╨░╨╜╨╛╨╜ ╨╛╨┐╨╡╤А╨░╤В╨╛╤А╨║╨╕: Vite `apps/admin` ╨╜╨░ admin.daibilet.ru; API admin ╨┐╨╛╨┤ Basic Auth ╨▓ legacy backend.
-- ╨Я╨░╤А╨░╨╗╨╗╨╡╨╗╤М╨╜╨╛ ╨╕╨┤╤Г╤В SEO interlinking ╨╕ catalog tweaks - F4 kickoff ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╡╤В ╨╕╤Е ╤Д╨░╨╣╨╗╤Л.
+### Наблюдения
+- F4 ранее был только в backlog (F4.1/F4.2 ⏳), реализации в `apps/web` не было.
+- Канон операторки: Vite `apps/admin` на admin.daibilet.ru; API admin под Basic Auth в legacy backend.
+- Параллельно идут SEO interlinking и catalog tweaks - F4 kickoff не трогает их файлы.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- ╨Я╨╡╤А╨▓╤Л╨╣ ╨╕╨╜╨║╤А╨╡╨╝╨╡╨╜╤В: `apps/web/app/(admin)/admin` (stub dashboard + shell), Edge Basic Auth ╨▓ `middleware` ╨╜╨░ `/admin`, `robots: noindex`.
-- Credentials contract ╨║╨░╨║ ╤Г backend: `ADMIN_EMAIL`/`ADMIN_USER` + `ADMIN_PASSWORD` ╨╕╨╗╨╕ `ADMIN_PASSWORD_SHA256`.
-- Vite admin ╨╛╤Б╤В╨░╤С╤В╤Б╤П ╨║╨░╨╜╨╛╨╜╨╛╨╝ ╨┤╨╛ cutover; Finance contour ╨╜╨╡ ╤В╤А╨╛╨│╨░╨╡╨╝.
-- ╨б╨╗╨╡╨┤╤Г╤О╤Й╨╕╨╣ ╤И╨░╨│: port DashboardPage ╨╜╨░ live `/api/admin/dashboard`.
+### Решения
+- Первый инкремент: `apps/web/app/(admin)/admin` (stub dashboard + shell), Edge Basic Auth в `middleware` на `/admin`, `robots: noindex`.
+- Credentials contract как у backend: `ADMIN_EMAIL`/`ADMIN_USER` + `ADMIN_PASSWORD` или `ADMIN_PASSWORD_SHA256`.
+- Vite admin остаётся каноном до cutover; Finance contour не трогаем.
+- Следующий шаг: port DashboardPage на live `/api/admin/dashboard`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- Next middleware ╨╜╨░ Edge - ╨╜╨╡╨╗╤М╨╖╤П ╨╕╨╝╨┐╨╛╤А╤В╨╕╤А╨╛╨▓╨░╤В╤М `apps/backend` Node `auth.ts`; ╨┤╤Г╨▒╨╗╨╕╤А╨╛╨▓╨░╨╜ ╨╝╨╕╨╜╨╕╨╝╨░╨╗╤М╨╜╤Л╨╣ Edge helper `admin-basic-auth.ts`.
-- Prod deploy ╤Н╤В╨╛╨│╨╛ ╨╕╨╜╨║╤А╨╡╨╝╨╡╨╜╤В╨░ ╨╛╨┐╤Ж╨╕╨╛╨╜╨░╨╗╨╡╨╜: `/admin` ╨╜╨░ public host ╨▒╨╡╨╖╨╛╨┐╨░╤Б╨╡╨╜ (auth + noindex), ╨╜╨╛ cutover admin subdomain ╨╜╨╡ ╨┤╨╡╨╗╨░╨╡╨╝.
+### Проблемы
+- Next middleware на Edge - нельзя импортировать `apps/backend` Node `auth.ts`; дублирован минимальный Edge helper `admin-basic-auth.ts`.
+- Prod deploy этого инкремента опционален: `/admin` на public host безопасен (auth + noindex), но cutover admin subdomain не делаем.
 
 ## 2026-07-23 - landing matching audit and product priority
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- ╨Т╨╗╨░╨┤╨╡╨╗╨╡╤Ж ╤Г╤В╨▓╨╡╤А╨┤╨╕╨╗ F4 admin тЖТ Next ╨║╨░╨║ ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╕╨╣ ╨║╤А╤Г╨┐╨╜╤Л╨╣ ╨┐╨╛╤В╨╛╨║. Finance contour ╨╛╤В╨╗╨╛╨╢╨╡╨╜, ╨┐╨╛╨║╨░ ╨▓╨╕╤В╤А╨╕╨╜╨░ ╨╕ ╨┐╤А╨╛╨┤╤Г╨║╤В ╨╜╨╡ ╨│╨╛╤В╨╛╨▓╤Л.
-- Prod audit ╨▓╤Б╨╡╤Е ╨░╨║╤В╨╕╨▓╨╜╤Л╤Е landing rules ╨┐╨╛╨║╨░╨╖╨░╨╗ ╤П╨▓╨╜╤Л╨╡ ╤Б╨╡╨╝╨░╨╜╤В╨╕╤З╨╡╤Б╨║╨╕╨╡ ╨╛╤И╨╕╨▒╨║╨╕: ╨║╨╛╨╜╤Ж╨╡╤А╤В ╨╜╨░ ╨║╤А╤Л╤И╨╡ ╨┐╨╛╨┐╨░╨┤╨░╨╗ ╨▓ `rooftops`, ╨░ ╨║╨╛╨╜╤Ж╨╡╤А╤В ╤Б╨╛ ╤Б╤В╨░╤А╤Л╨╝ ╤В╨╡╨│╨╛╨╝ ┬л╨Э╨╛╨▓╤Л╨╣ ╨│╨╛╨┤┬╗ ╨┐╨╛╨┐╨░╨┤╨░╨╗ ╨▓ `new-year`.
-- `bus-tours` ╨╕╤Б╨║╨╗╤О╤З╨░╨╗ ╨║╨╛╤А╤А╨╡╨║╤В╨╜╤Л╨╡ Hop on - hop off ╨╝╨░╤А╤И╤А╤Г╤В╤Л ╨▒╨╡╨╖ ╨╖╨░╨┐╨╛╨╗╨╜╨╡╨╜╨╜╨╛╨╣ ╨┐╨╛╨┤╨║╨░╤В╨╡╨│╨╛╤А╨╕╨╕, ╤Е╨╛╤В╤П ╨╜╨░╨╖╨▓╨░╨╜╨╕╨╡ ╤Б╨╛╨┤╨╡╤А╨╢╨░╨╗╨╛ ╨┤╨╛╤Б╤В╨░╤В╨╛╤З╨╜╤Л╨╡ ╨┐╤А╨╕╨╖╨╜╨░╨║╨╕.
+### Наблюдения
+- Владелец утвердил F4 admin → Next как следующий крупный поток. Finance contour отложен, пока витрина и продукт не готовы.
+- Prod audit всех активных landing rules показал явные семантические ошибки: концерт на крыше попадал в `rooftops`, а концерт со старым тегом «Новый год» попадал в `new-year`.
+- `bus-tours` исключал корректные Hop on - hop off маршруты без заполненной подкатегории, хотя название содержало достаточные признаки.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- `rooftops` ╤В╤А╨╡╨▒╤Г╨╡╤В ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╛╨╜╨╜╤Л╨╣/╨┐╤А╨╛╨│╤Г╨╗╨╛╤З╨╜╤Л╨╣ ╤Б╨╕╨│╨╜╨░╨╗ ╨╕ ╨╕╤Б╨║╨╗╤О╤З╨░╨╡╤В ╨║╨╛╨╜╤Ж╨╡╤А╤В╤Л, ╨╝╤Г╨╖╤Л╨║╤Г, ╨▓╨╡╤З╨╡╤А╨╕╨╜╨║╨╕ ╨╕ ╤Д╤Г╤А╤И╨╡╤В╤Л.
-- `new-year` ╤В╤А╨╡╨▒╤Г╨╡╤В ╤Б╨╡╨╖╨╛╨╜╨╜╤Л╨╣ ╤В╨╡╤А╨╝╨╕╨╜ ╨▓ ╨╖╨░╨│╨╛╨╗╨╛╨▓╨║╨╡, ╨░ ╨╜╨╡ ╤В╨╛╨╗╤М╨║╨╛ ╤Г╤Б╤В╨░╤А╨╡╨▓╤И╨╕╨╣ ╤В╨╡╨│.
-- `bus-tours` ╨▒╨╛╨╗╤М╤И╨╡ ╨╜╨╡ ╤В╤А╨╡╨▒╤Г╨╡╤В ╨╖╨░╨┐╨╛╨╗╨╜╨╡╨╜╨╜╤Г╤О ╨┐╨╛╨┤╨║╨░╤В╨╡╨│╨╛╤А╨╕╤О: ╤Б╤В╤А╨╛╨│╨╕╨╡ ╨░╨▓╤В╨╛╨▒╤Г╤Б╨╜╤Л╨╣ ╨╕ ╨╛╨▒╨╖╨╛╤А╨╜╤Л╨╣ ╤Б╨╕╨│╨╜╨░╨╗╤Л ╨▓ ╨╜╨░╨╖╨▓╨░╨╜╨╕╨╕ ╨╛╤Б╤В╨░╤О╤В╤Б╤П ╨╛╨▒╤П╨╖╨░╤В╨╡╨╗╤М╨╜╤Л╨╝╨╕.
-- ╨Я╨╛╤Б╨╗╨╡ deploy ╨╜╤Г╨╢╨╜╨╛ ╨┐╨╛╨▓╤В╨╛╤А╨╕╤В╤М snapshot/audit ╨▓╤Б╨╡╤Е landing rules ╨╕ ╨▓╤А╤Г╤З╨╜╤Г╤О ╨┐╤А╨╛╤Б╨╝╨╛╤В╤А╨╡╤В╤М ╤И╨╕╤А╨╛╨║╨╕╨╡ ╨║╨░╤В╨╡╨│╨╛╤А╨╕╨╕ `concerts-genre`, `exhibitions`, `unusual-theatres`, `excursions`.
+### Решения
+- `rooftops` требует экскурсионный/прогулочный сигнал и исключает концерты, музыку, вечеринки и фуршеты.
+- `new-year` требует сезонный термин в заголовке, а не только устаревший тег.
+- `bus-tours` больше не требует заполненную подкатегорию: строгие автобусный и обзорный сигналы в названии остаются обязательными.
+- После deploy нужно повторить snapshot/audit всех landing rules и вручную просмотреть широкие категории `concerts-genre`, `exhibitions`, `unusual-theatres`, `excursions`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- ╨Ф╨╛ F5 ╨┐╤А╨░╨▓╨╕╨╗╨░ ╨┤╤Г╨▒╨╗╨╕╤А╤Г╤О╤В╤Б╤П ╨▓ `landing-rules.ts` ╨╕ runtime `dto.js`, ╤З╤В╨╛ ╤Б╨╛╨╖╨┤╨░╤С╤В ╤А╨╕╤Б╨║ ╨┐╨╛╨▓╤В╨╛╤А╨╜╨╛╨│╨╛ drift.
-- ╨Я╨╡╤А╨▓╤Л╨╣ smoke ╨┐╨╛╤Б╨╗╨╡ rule deploy ╨▓╤Л╤П╨▓╨╕╨╗ ╨╡╤Й╤С ╨╛╨┤╨╕╨╜ legacy path: `buildPublicLandingPageManaged` ╤Д╨╕╨╗╤М╤В╤А╨╛╨▓╨░╨╗ `session.landingSlugs`, ╨░ ╨╜╨╡ ╨╕╤Б╨┐╨╛╨╗╨╜╤П╨╗ `matchesRule`. ╨Я╨╛╤Н╤В╨╛╨╝╤Г ╨╗╤О╨▒╨╛╨╡ ╤Г╤Б╤В╨░╤А╨╡╨▓╤И╨╡╨╡ ╨┐╨╛╨╗╨╡ `landingSlugs` ╨╝╨╛╨│╨╗╨╛ ╨▓╨╡╤А╨╜╤Г╤В╤М ╨╜╨╡╤А╨╡╨╗╨╡╨▓╨░╨╜╤В╨╜╤Г╤О ╨▓╤Л╨┤╨░╤З╤Г. Runtime filter ╨┐╨╡╤А╨╡╨▓╨╡╨┤╤С╨╜ ╨╜╨░ `matchesRule`; ╨╜╤Г╨╢╨╡╨╜ ╨║╨╛╤А╤А╨╡╨║╤В╨╕╤А╤Г╤О╤Й╨╕╨╣ ╨┐╨╛╤Б╨╗╨╡╨┤╨╛╨▓╨░╤В╨╡╨╗╤М╨╜╤Л╨╣ deploy.
+### Проблемы
+- До F5 правила дублируются в `landing-rules.ts` и runtime `dto.js`, что создаёт риск повторного drift.
+- Первый smoke после rule deploy выявил ещё один legacy path: `buildPublicLandingPageManaged` фильтровал `session.landingSlugs`, а не исполнял `matchesRule`. Поэтому любое устаревшее поле `landingSlugs` могло вернуть нерелевантную выдачу. Runtime filter переведён на `matchesRule`; нужен корректирующий последовательный deploy.
 
 ## 2026-07-23 - country-tours: source of runtime rules
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- `GET /api/public/landings/country-tours` ╨╜╨░ legacy API `:4000` ╨╕ Next route handler ╨┐╨╛╨╗╤Г╤З╨░╤О╤В landing ╤З╨╡╤А╨╡╨╖ `buildPublicLandingPageManaged` ╨╕╨╖ `apps/backend/src/dto.js`.
-- `LandingMatch` ╨▓ ╤Н╤В╨╛╨╝ ╨┐╤Г╤В╨╕ ╤Е╤А╨░╨╜╨╕╤В ╤В╨╛╨╗╤М╨║╨╛ ╤А╤Г╤З╨╜╤Л╨╡ `PINNED` ╨╕ `EXCLUDED`; ╨░╨▓╤В╨╛╨╝╨░╤В╨╕╤З╨╡╤Б╨║╨╕╨╡ match rows ╨╜╨╡ ╤Д╨╛╤А╨╝╨╕╤А╤Г╤О╤В public ╨▓╤Л╨┤╨░╤З╤Г.
-- Commit `502a282` ╤Г╨╢╨╡╤Б╤В╨╛╤З╨╕╨╗ ╤В╨╛╨╗╤М╨║╨╛ `landing-rules.ts`, ╨┐╨╛╤Н╤В╨╛╨╝╤Г legacy `dto.js` ╨┐╤А╨╛╨┤╨╛╨╗╨╢╨░╨╗ ╨╝╨░╤В╤З╨╕╤В╤М ╨║╨╛╨╜╤Ж╨╡╤А╤В╤Л ╨╕ ╤В╨╡╨░╤В╤А╨░╨╗╤М╨╜╤Л╨╡ ╤Б╨╛╨▒╤Л╤В╨╕╤П ╨┐╨╛ ╤Б╨╗╨╛╨▓╨░╨╝ ┬л╨Я╨╡╤В╨╡╤А╨│╨╛╤Д┬╗, ┬л╨Я╤Г╤И╨║╨╕╨╜┬╗ ╨╕ ╨┤╤А╤Г╨│╨╕╨╝ ╤В╨╛╨┐╨╛╨╜╨╕╨╝╨░╨╝.
+### Наблюдения
+- `GET /api/public/landings/country-tours` на legacy API `:4000` и Next route handler получают landing через `buildPublicLandingPageManaged` из `apps/backend/src/dto.js`.
+- `LandingMatch` в этом пути хранит только ручные `PINNED` и `EXCLUDED`; автоматические match rows не формируют public выдачу.
+- Commit `502a282` ужесточил только `landing-rules.ts`, поэтому legacy `dto.js` продолжал матчить концерты и театральные события по словам «Петергоф», «Пушкин» и другим топонимам.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- ╨б╨╕╨╜╤Е╤А╨╛╨╜╨╕╨╖╨╕╤А╨╛╨▓╨░╨╜╨╛ ╨┐╤А╨░╨▓╨╕╨╗╨╛ `country-tours` ╨▓ `dto.js`: ╨╛╨┤╨╜╨╛╨▓╤А╨╡╨╝╨╡╨╜╨╜╨╛ ╨╛╨▒╤П╨╖╨░╤В╨╡╨╗╤М╨╜╤Л ╤Н╨║╤Б╨║╤Г╤А╤Б╨╕╨╛╨╜╨╜╤Л╨╣ ╨╕ ╨╖╨░╨│╨╛╤А╨╛╨┤╨╜╤Л╨╣/╨╜╨░╨┐╤А╨░╨▓╨╗╨╡╨╜╤З╨╡╤Б╨║╨╕╨╣ ╤Б╨╕╨│╨╜╨░╨╗╤Л.
-- ╨Ф╨╛ F5 ╨╕╨╖╨╝╨╡╨╜╨╡╨╜╨╕╤П landing rules ╨▓ TypeScript ╨╕ `dto.js` ╨▓╨╜╨╛╤Б╤П╤В╤Б╤П ╨┐╨░╤А╨╜╨╛. ╨Я╤А╨╛╨┤╨╛╨▓╤Л╨╣ deploy ╨┤╨╛╨╗╨╢╨╡╨╜ ╨┐╨╡╤А╨╡╨╖╨░╨┐╤Г╤Б╤В╨╕╤В╤М `daibilet-api`, ╤В╨░╨║ ╨║╨░╨║ process ╨╕╤Б╨┐╨╛╨╗╨╜╤П╨╡╤В ╨╕╤Б╤Е╨╛╨┤╨╜╤Л╨╣ ESM `server.js`/`dto.js`.
+### Решения
+- Синхронизировано правило `country-tours` в `dto.js`: одновременно обязательны экскурсионный и загородный/направленческий сигналы.
+- До F5 изменения landing rules в TypeScript и `dto.js` вносятся парно. Продовый deploy должен перезапустить `daibilet-api`, так как process исполняет исходный ESM `server.js`/`dto.js`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- ╨Ы╨╛╨║╨░╨╗╤М╨╜╨░╤П ╨╛╨▒╨╛╨╗╨╛╤З╨║╨░ ╨╜╨╡ ╨╜╨░╤Е╨╛╨┤╨╕╤В `pnpm`, ╨┐╨╛╤Н╤В╨╛╨╝╤Г backend tests/typecheck ╨╝╨╛╨╢╨╜╨╛ ╨┐╨╛╨┤╤В╨▓╨╡╤А╨┤╨╕╤В╤М ╨╜╨░ prod deploy host.
+### Проблемы
+- Локальная оболочка не находит `pnpm`, поэтому backend tests/typecheck можно подтвердить на prod deploy host.
 
 ### Prod proof
-- Commit `a67fa48` ╨╛╤В╨┐╤А╨░╨▓╨╗╨╡╨╜ ╨▓ `feat/next-monorepo`. ╨Я╨╡╤А╨╡╨┤ deploy ╨╛╨▒╨╜╨░╤А╤Г╨╢╨╡╨╜ ╨╕ ╨┤╨╛╨╢╨┤╨░╨╗╨╕╤Б╤М ╨╖╨░╨▓╨╡╤А╤И╨╡╨╜╨╕╤П ╨┤╤А╤Г╨│╨╛╨│╨╛ `deploy-prod-next`; ╨╖╨░╤В╨╡╨╝ ╨▓╤Л╨┐╨╛╨╗╨╜╨╡╨╜ ╨╛╨┤╨╕╨╜ ╨┐╨╛╤Б╨╗╨╡╨┤╨╛╨▓╨░╤В╨╡╨╗╤М╨╜╤Л╨╣ `deploy-prod-next.sh` ╤Б restart API ╨╕ Next build.
-- `GET :4000/api/public/landings/country-tours` ╨╕ `GET :3001/api/public/landings/country-tours` ╨╛╤В╨┤╨░╤О╤В ╨┐╨╛ 3 ╨║╨░╤А╤В╨╛╤З╨║╨╕: ┬л╨в╤Г╤А ╨▓ ╨Т╤Л╨▒╨╛╤А╨│ - ╨и╨▓╨╡╨┤╤Б╨║╨╛╨╡ ╤Б╨╡╤А╨┤╤Ж╨╡ ╨а╨╛╤Б╤Б╨╕╨╕┬╗, ┬л╨Ъ╤Г╤А╤Б ╨╜╨░ ╨Ъ╤А╨╛╨╜╤И╤В╨░╨┤╤В: ╨╕╤Б╤В╨╛╤А╨╕╤П, ╨░╤А╤Е╨╕╤В╨╡╨║╤В╤Г╤А╨░, ╤Д╨╛╤А╤В╤Л ╤Б ╨▓╨╛╨┤╤Л┬╗, ┬л╨н╨║╤Б╨║╤Г╤А╤Б╨╕╤П ╨▓ ╨Я╤Г╤И╨║╨╕╨╜ (╨▒╤Л╨▓╤И╨╡╨╡ ╨ж╨░╤А╤Б╨║╨╛╨╡ ╨б╨╡╨╗╨╛) ╤Б ╨┐╨╛╤Б╨╡╤Й╨╡╨╜╨╕╨╡╨╝ ╨╗╨╕╤Ж╨╡╤П┬╗.
-- ╨Т ╨▓╤Л╨┤╨░╤З╨╡ ╨╜╨╡╤В ┬л╨Я╨╕╨║╨╛╨▓╨╛╨╣ ╨┤╨░╨╝╤Л┬╗, ╨║╨╛╨╜╤Ж╨╡╤А╤В╨╛╨▓ ╨╕ ╨┤╤А╤Г╨│╨╕╤Е ╨║╤Г╨╗╤М╤В╤Г╤А╨╜╤Л╤Е ╤Б╨╛╨▒╤Л╤В╨╕╨╣ ╨┐╨╛ ╤Б╨╛╨▓╨┐╨░╨┤╨╡╨╜╨╕╤О ╤В╨╛╨┐╨╛╨╜╨╕╨╝╨░.
+- Commit `a67fa48` отправлен в `feat/next-monorepo`. Перед deploy обнаружен и дождались завершения другого `deploy-prod-next`; затем выполнен один последовательный `deploy-prod-next.sh` с restart API и Next build.
+- `GET :4000/api/public/landings/country-tours` и `GET :3001/api/public/landings/country-tours` отдают по 3 карточки: «Тур в Выборг - Шведское сердце России», «Курс на Кронштадт: история, архитектура, форты с воды», «Экскурсия в Пушкин (бывшее Царское Село) с посещением лицея».
+- В выдаче нет «Пиковой дамы», концертов и других культурных событий по совпадению топонима.
 
 ## 2026-07-22 - Admin articles: sync to public + archive/delete + author
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- ╨Я╤А╨░╨▓╨║╨╕ Article ╨╕╨╖ ╨░╨┤╨╝╨╕╨╜╨║╨╕ ╨┐╨╕╤Б╨░╨╗╨╕╤Б╤М ╨▓ Postgres, ╨╜╨╛ Next ╨┤╨╡╤А╨╢╨░╨╗ in-memory DTO-╨║╤Н╤И ╤Б╤В╨░╤В╨╡╨╣ 5 ╨╝╨╕╨╜ ╨╕ ╨╜╨╡ ╤А╨╡╨▓╨░╨╗╨╕╨┤╨╕╤А╨╛╨▓╨░╨╗ /blog.
-- HIDDEN/╨░╤А╤Е╨╕╨▓ ╨╝╨╛╨│ ┬л╨▓╨╛╤Б╨║╤А╨╡╤Б╨░╤В╤М┬╗ ╤З╨╡╤А╨╡╨╖ static fallback 
+### Наблюдения
+- Правки Article из админки писались в Postgres, но Next держал in-memory DTO-кэш статей 5 мин и не ревалидировал /blog.
+- HIDDEN/архив мог «воскресать» через static fallback 
 esolveStaticArticle.
-- ╨Т UI ╨╜╨╡ ╨▒╤Л╨╗╨╛ ╨░╨▓╤В╨╛╤А╨░, ╤Г╨┤╨░╨╗╨╡╨╜╨╕╤П ╨╕ ╤П╨▓╨╜╨╛╨│╨╛ ╨░╤А╤Е╨╕╨▓╨░.
+- В UI не было автора, удаления и явного архива.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- clearPublicArticlesDtoCache ╨╜╨░ invalidate + ╨▓ Next /api/internal/revalidate.
-- ╨Я╨╛╤Б╨╗╨╡ create/update/delete: 
+### Решения
+- clearPublicArticlesDtoCache на invalidate + в Next /api/internal/revalidate.
+- После create/update/delete: 
 evalidateNextBlogArticle (/blog, slug, city hub).
-- cmsOwned ╨┤╨╗╤П ╨╜╨╡╨┐╤Г╨▒╨╗╨╕╤З╨╜╤Л╤Е slug - ╨▒╨╡╨╖ static fallback.
-- Admin: ╨║╨╛╨╗╨╛╨╜╨║╨░/╨┐╨╛╨╗╨╡ ╨Р╨▓╤В╨╛╤А, ╨║╨╜╨╛╨┐╨║╨╕ ┬л╨Т ╨░╤А╤Е╨╕╨▓┬╗ (HIDDEN) ╨╕ ┬л╨г╨┤╨░╨╗╨╕╤В╤М┬╗ (DELETE).
+- cmsOwned для непубличных slug - без static fallback.
+- Admin: колонка/поле Автор, кнопки «В архив» (HIDDEN) и «Удалить» (DELETE).
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- ╨Я╨╛╤Б╨╗╨╡ ╨┤╨╡╨┐╨╗╨╛╤П ╨╜╤Г╨╢╨╡╨╜ restart daibilet-api, ╨╕╨╜╨░╤З╨╡ handlers ╨▓ API-╨┐╤А╨╛╤Ж╨╡╤Б╤Б╨╡ ╤Б╤В╨░╤А╤Л╨╡.
+### Проблемы
+- После деплоя нужен restart daibilet-api, иначе handlers в API-процессе старые.
 
 ## 2026-07-22 - Telegram preview: broken AAAA / IPv6
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- ╨б╤В╨░╤В╤М╤П `https://daibilet.ru/blog/kazan-na-vkus-master-klassy` ╨╛╤В╨┤╨░╤С╤В ╨┐╨╛╨╗╨╜╤Л╨╣ OG (title/description/image) ╨┐╨╛ IPv4, cover JPEG 200 OK.
-- ╨Т DNS Timeweb ╨╡╤Б╤В╤М AAAA `2a03:6f01:1:2::ef11`, ╨╜╨╛ ╨╜╨░ VPS ╨╜╨╡╤В ╤А╨░╨▒╨╛╤З╨╡╨│╨╛ global IPv6: eth0 ╤В╨╛╨╗╤М╨║╨╛ link-local, curl ╨┐╨╛ AAAA ╤В╨░╨╣╨╝╨░╤Г╤В╨╕╤В╤Б╤П.
-- Telegram ╨╕ ╤З╨░╤Б╤В╤М ╨║╤А╨░╤Г╨╗╨╡╤А╨╛╨▓ ╨┐╤А╨╡╨┤╨┐╨╛╤З╨╕╤В╨░╤О╤В IPv6 ╨┐╤А╨╕ ╨╜╨░╨╗╨╕╤З╨╕╨╕ AAAA тЖТ ╨┐╤А╨╡╨▓╤М╤О ╤Б╤Б╤Л╨╗╨║╨╕ ╨╜╨╡ ╤Б╤В╤А╨╛╨╕╤В╤Б╤П (╨│╨╛╨╗╤Л╨╣ URL ╨▓ ╤З╨░╤В╨╡).
-- `@WebpageBot` ╨╝╨╛╨╢╨╡╤В ╨▓╨╕╨┤╨╡╤В╤М ╨┐╤А╨╡╨▓╤М╤О (╤З╨░╤Б╤В╨╛ ╤Е╨╛╨┤╨╕╤В ╨┐╨╛ IPv4), ╨░ ╨╛╨▒╤Л╤З╨╜╤Л╨╡ ╤З╨░╤В╤Л - ╨╜╨╡╤В: ╤Н╤В╨╛ ╨╜╨╡ ┬л╨▒╨╗╨╛╨║╨╕╤А╨╛╨▓╨║╨░ ╤Б╨░╨╣╤В╨░┬╗, ╨░ DNS AAAA + negative cache Telegram.
-- ╨Э╨░ 2026-07-22 ╨▓╨╡╤З╨╡╤А╨╛╨╝ AAAA ╨▓╤Б╤С ╨╡╤Й╤С ╨▓ DNS (`dig AAAA daibilet.ru` тЖТ ╤В╨╛╤В ╨╢╨╡ ╨░╨┤╤А╨╡╤Б, curl -6 тЖТ No route to host).
+### Наблюдения
+- Статья `https://daibilet.ru/blog/kazan-na-vkus-master-klassy` отдаёт полный OG (title/description/image) по IPv4, cover JPEG 200 OK.
+- В DNS Timeweb есть AAAA `2a03:6f01:1:2::ef11`, но на VPS нет рабочего global IPv6: eth0 только link-local, curl по AAAA таймаутится.
+- Telegram и часть краулеров предпочитают IPv6 при наличии AAAA → превью ссылки не строится (голый URL в чате).
+- `@WebpageBot` может видеть превью (часто ходит по IPv4), а обычные чаты - нет: это не «блокировка сайта», а DNS AAAA + negative cache Telegram.
+- На 2026-07-22 вечером AAAA всё ещё в DNS (`dig AAAA daibilet.ru` → тот же адрес, curl -6 → No route to host).
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- ╨г╨┤╨░╨╗╨╕╤В╤М AAAA ╤Г `daibilet.ru` / `www` / `api` / `admin` ╨▓ ╨┐╨░╨╜╨╡╨╗╨╕ DNS Timeweb (╨┐╨╛╨║╨░ IPv6 ╨╜╨░ ╤Б╨╡╤А╨▓╨╡╤А╨╡ ╨╜╨╡ ╨╜╨░╤Б╤В╤А╨╛╨╡╨╜), ╨╗╨╕╨▒╨╛ ╨║╨╛╤А╤А╨╡╨║╤В╨╜╨╛ ╨▓╤Л╨┤╨░╤В╤М ╨░╨┤╤А╨╡╤Б ╨╜╨░ eth0 ╨╕ ╨┐╤А╨╛╨▓╨╡╤А╨╕╤В╤М ╨╝╨░╤А╤И╤А╤Г╤В╨╕╨╖╨░╤Ж╨╕╤О.
-- ╨Я╨╛╤Б╨╗╨╡ ╤Б╨╝╨╡╨╜╤Л DNS: TTL ~5-10 ╨╝╨╕╨╜, ╨╖╨░╤В╨╡╨╝ ╨▓ ╤З╨░╤В ╤Б╨╗╨░╤В╤М URL ╤Б `?v=2` (╨╕╨╗╨╕ ╨╜╨╛╨▓╤Л╨╣ URL) - WebpageBot ╤Б╨░╨╝ ╨┐╨╛ ╤Б╨╡╨▒╨╡ ╨║╤Н╤И ╤З╨░╤В╨░ ╨╜╨╡ ╤Б╨▒╤А╨░╤Б╤Л╨▓╨░╨╡╤В.
-- nginx: social bots тЖТ `/api/public/social-preview?path=$uri` (╤З╨╕╤Б╤В╤Л╨╣ OG HTML, ╨▒╨╡╨╖ Next `private, no-store` ╨╕ ╨▒╨╡╨╖ meta refresh).
-- Venue metadata: ╤П╨▓╨╜╤Л╨╡ `twitter:title`/`twitter:description` + fallback description; ╨╕╨╜╨░╤З╨╡ Twitter-╨║╨░╤А╤В╨╛╤З╨║╨░ ╨╜╨░╤Б╨╗╨╡╨┤╨╛╨▓╨░╨╗╨░ title/description ╨│╨╗╨░╨▓╨╜╨╛╨╣.
+### Решения
+- Удалить AAAA у `daibilet.ru` / `www` / `api` / `admin` в панели DNS Timeweb (пока IPv6 на сервере не настроен), либо корректно выдать адрес на eth0 и проверить маршрутизацию.
+- После смены DNS: TTL ~5-10 мин, затем в чат слать URL с `?v=2` (или новый URL) - WebpageBot сам по себе кэш чата не сбрасывает.
+- nginx: social bots → `/api/public/social-preview?path=$uri` (чистый OG HTML, без Next `private, no-store` и без meta refresh).
+- Venue metadata: явные `twitter:title`/`twitter:description` + fallback description; иначе Twitter-карточка наследовала title/description главной.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- ╨Т╨║╨╗╤О╤З╨╡╨╜╨╕╨╡ IPv6 ╨╜╨░ Timeweb ╨▒╨╡╨╖ ╨│╨╗╨╛╨▒╨░╨╗╤М╨╜╨╛╨│╨╛ ╨░╨┤╤А╨╡╤Б╨░ ╨╜╨░ ╨╕╨╜╤В╨╡╤А╤Д╨╡╨╣╤Б╨╡ ╨╛╤Б╤В╨░╨▓╨╗╤П╨╡╤В AAAA ┬л╨╝╤С╤А╤В╨▓╤Л╨╝┬╗ - ╤Е╤Г╨╢╨╡, ╤З╨╡╨╝ ╨╛╤В╤Б╤Г╤В╤Б╤В╨▓╨╕╨╡ AAAA.
-- ╨Я╨╛╨║╨░ AAAA ╨╢╨╕╨▓, ╨┐╤А╨╡╨▓╤М╤О ╨▓ ╤З╨░╤В╨░╤Е ╨▒╤Г╨┤╤Г╤В ╨╜╨╡╤Б╤В╨░╨▒╨╕╨╗╤М╨╜╤Л ╨┤╨░╨╢╨╡ ╨┐╤А╨╕ ╨╕╨┤╨╡╨░╨╗╤М╨╜╤Л╤Е OG.
+### Проблемы
+- Включение IPv6 на Timeweb без глобального адреса на интерфейсе оставляет AAAA «мёртвым» - хуже, чем отсутствие AAAA.
+- Пока AAAA жив, превью в чатах будут нестабильны даже при идеальных OG.
 
-## 2026-07-22 - Orders: TC sets without tickets[] are not ┬лmissing mirror┬╗
+## 2026-07-22 - Orders: TC sets without tickets[] are not «missing mirror»
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- ╨Ч╨░╨║╨░╨╖ TC `113996822` (╨Ш╨│╤А╨╛╨Т╨╡╤З╨╡╤А) status=done, ╨╛╨┐╨╗╨░╤В╨░ 1089 тВ╜, ╨╜╨╛ `tickets: []`.
-- ╨Я╨╛╨╖╨╕╤Ж╨╕╤П ╨▓ `values.sets_values` (┬л╨б 19:00 - ╨Ш╨│╤А╨╛╨Т╨╡╤З╨╡╤А┬╗) - ╤Д╨╛╤А╨╝╨░╤В set/admission, ╨╜╨╡ seat-╨▒╨╕╨╗╨╡╤В.
-- ╨Р╨┤╨╝╨╕╨╜╨║╨░ ╨┐╨╛╨╝╨╡╤З╨░╨╗╨░ ┬л╨Э╨╡╤В ╨▒╨╕╨╗╨╡╤В╨╛╨▓ ╨▓ ╨╖╨╡╤А╨║╨░╨╗╨╡┬╗ ╨╗╨╛╨╢╨╜╨╛.
+### Наблюдения
+- Заказ TC `113996822` (ИгроВечер) status=done, оплата 1089 ₽, но `tickets: []`.
+- Позиция в `values.sets_values` («С 19:00 - ИгроВечер») - формат set/admission, не seat-билет.
+- Админка помечала «Нет билетов в зеркале» ложно.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- `mapAdminOrderRow`: ╨╡╤Б╨╗╨╕ ╨╡╤Б╤В╤М `sets_values`, ╨╜╨╡ ╤Б╤В╨░╨▓╨╕╤В╤М missingArtifact; ╨┐╨╛╨║╨░╨╖╤Л╨▓╨░╤В╤М ╤Б╨╕╨╜╤В╨╡╤В╨╕╤З╨╡╤Б╨║╨╕╨╡ ╨┐╨╛╨╖╨╕╤Ж╨╕╨╕ ╨╜╨░╨▒╨╛╤А╨░.
-- `tc-sync-orders`: ╨┐╤А╨╕ ╨┐╤Г╤Б╤В╨╛╨╝ `tickets[]` ╨┐╨╕╤Б╨░╤В╤М ExternalTicket ╨╕╨╖ `sets_values` ╤Б origin=`set`.
+### Решения
+- `mapAdminOrderRow`: если есть `sets_values`, не ставить missingArtifact; показывать синтетические позиции набора.
+- `tc-sync-orders`: при пустом `tickets[]` писать ExternalTicket из `sets_values` с origin=`set`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- ╨б╤В╨░╤А╤Л╨╡ ╨╖╨░╨║╨░╨╖╤Л ╨▒╨╡╨╖ ╤А╨╡-╤Б╨╕╨╜╨║╨░ ╤Г╨╢╨╡ ╤З╨╕╨╜╤П╤В╤Б╤П ╤Н╨▓╤А╨╕╤Б╤В╨╕╨║╨╛╨╣ ╨▓ DTO; ╨┐╨╛╨╗╨╜╤Л╨╣ backfill ╨╖╨╡╤А╨║╨░╨╗╨░ - ╤З╨╡╤А╨╡╨╖ ╤Б╨╗╨╡╨┤╤Г╤О╤Й╨╕╨╣ orders sync.
+### Проблемы
+- Старые заказы без ре-синка уже чинятся эвристикой в DTO; полный backfill зеркала - через следующий orders sync.
 
 ## 2026-07-22 - Blog: preserve admin textarea line breaks
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- ╨Т ╨░╨┤╨╝╨╕╨╜╨║╨╡ Enter ╨▓ textarea ╤Б╨╛╤Е╤А╨░╨╜╤П╨╗╤Б╤П ╨▓ content, ╨╜╨╛ ╨╜╨░ ╤Б╨░╨╣╤В╨╡ HTML ╤Б╤Е╨╗╨╛╨┐╤Л╨▓╨░╨╗ ╨╛╨┤╨╕╨╜╨╛╤З╨╜╤Л╨╣ \\n ╨▓ ╨┐╤А╨╛╨▒╨╡╨╗ ╨▓╨╜╤Г╤В╤А╨╕ `<p>`.
+### Наблюдения
+- В админке Enter в textarea сохранялся в content, но на сайте HTML схлопывал одиночный \\n в пробел внутри `<p>`.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- `renderInline` ╨▓ BlogArticleContent (web + public): ╨╛╨┤╨╕╨╜╨╛╤З╨╜╤Л╨╣ Enter тЖТ `<br>`, ╨┐╤Г╤Б╤В╨░╤П ╤Б╤В╤А╨╛╨║╨░ ╨┐╨╛-╨┐╤А╨╡╨╢╨╜╨╡╨╝╤Г ╨╜╨╛╨▓╤Л╨╣ ╨░╨▒╨╖╨░╤Ж.
-- ╨Я╨╛╨┤╤Б╨║╨░╨╖╨║╨░ ╨┐╨╛╨┤ ╨┐╨╛╨╗╨╡╨╝ ┬л╨в╨╡╨║╤Б╤В ╤Б╤В╨░╤В╤М╨╕┬╗ ╨▓ ArticlesPage.
+### Решения
+- `renderInline` в BlogArticleContent (web + public): одиночный Enter → `<br>`, пустая строка по-прежнему новый абзац.
+- Подсказка под полем «Текст статьи» в ArticlesPage.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- ╨б╤В╨░╤А╤Л╨╡ MD ╤Б ┬л╨╝╤П╨│╨║╨╛╨╣┬╗ ╤А╨░╨╖╨▒╨╕╨▓╨║╨╛╨╣ ╨┤╨╗╨╕╨╜╨╜╤Л╤Е ╤Б╤В╤А╨╛╨║ ╨╜╨░ 80 ╤Б╨╕╨╝╨▓╨╛╨╗╨╛╨▓ ╤В╨╛╨╢╨╡ ╨┐╨╛╨║╨░╨╢╤Г╤В ╨┐╨╡╤А╨╡╨╜╨╛╤Б╤Л - ╨┐╤А╨╕ ╨╜╨╡╨╛╨▒╤Е╨╛╨┤╨╕╨╝╨╛╤Б╤В╨╕ ╨┐╤А╨░╨▓╨╕╤В╤М ╨▓╤А╤Г╤З╨╜╤Г╤О.
+### Проблемы
+- Старые MD с «мягкой» разбивкой длинных строк на 80 символов тоже покажут переносы - при необходимости править вручную.
 
 ## 2026-07-23 - Infinite reload: ChunkLoadRecovery + nested main
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- ╨Т╨╗╨░╨┤╨╡╨╗╨╡╤Ж: ╤Б╤В╤А╨░╨╜╨╕╤Ж╨░ ┬л╨┐╨╛╤Б╤В╨╛╤П╨╜╨╜╨╛ ╤А╨╡╤Д╤А╨╡╤И╨╕╤В╤Б╤П┬╗. ╨Т╨╛╤Б╨┐╤А╨╛╨╕╨╖╨▓╨╡╨┤╨╡╨╜╨╛ ╨╜╨░ `https://daibilet.ru/blog`: ~18 full document loads / 12 ╤Б.
-- Console: React minified #418 (hydration text mismatch) ╨╕╨╖ chunk `/_next/static/chunks/567e3fde-тАжjs`.
-- ╨Я╨╛╤Б╨╗╨╡ ╨║╨░╨╢╨┤╨╛╨│╨╛ reload nginx ╨╛╤В╨┤╨░╨▓╨░╨╗ 429 ╨╜╨░ ╤Б╤В╨░╤В╨╕╨║╤Г (╤И╤В╨╛╤А╨╝ ╨╖╨░╨┐╤А╨╛╤Б╨╛╨▓).
-- `ChunkLoadRecovery` (harden `a712127`) ╨╝╨░╤В╤З╨╕╨╗ **╨╗╤О╨▒╨╛╨╣** ErrorEvent, ╤Г ╨║╨╛╤В╨╛╤А╨╛╨│╨╛ `event.filename` ╤Б╨╛╨┤╨╡╤А╨╢╨╕╤В `/_next/static/chunks/`, ╨╕ ╨╜╨░ mount ╤Б╤А╨░╨╖╤Г ╤Б╨╜╨╕╨╝╨░╨╗ one-shot ╤Д╨╗╨░╨│ тЖТ ╨▒╨╡╤Б╨║╨╛╨╜╨╡╤З╨╜╤Л╨╣ `location.reload()`.
+### Наблюдения
+- Владелец: страница «постоянно рефрешится». Воспроизведено на `https://daibilet.ru/blog`: ~18 full document loads / 12 с.
+- Console: React minified #418 (hydration text mismatch) из chunk `/_next/static/chunks/567e3fde-…js`.
+- После каждого reload nginx отдавал 429 на статику (шторм запросов).
+- `ChunkLoadRecovery` (harden `a712127`) матчил **любой** ErrorEvent, у которого `event.filename` содержит `/_next/static/chunks/`, и на mount сразу снимал one-shot флаг → бесконечный `location.reload()`.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- `ChunkLoadRecovery`: ╤Г╨▒╤А╨░╤В╤М match ╨┐╨╛ filename; reload ╤В╨╛╨╗╤М╨║╨╛ ╨╜╨░ ╤А╨╡╨░╨╗╤М╨╜╤Л╤Е ChunkLoad/dynamic-import ╤Б╨╛╨╛╨▒╤Й╨╡╨╜╨╕╤П╤Е ╨╕╨╗╨╕ ╨╜╨░ failed `<script src="тАж/_next/static/chunks/тАж">`; ╤Д╨╗╨░╨│ ╤З╨╕╤Б╤В╨╕╤В╤М ╤З╨╡╤А╨╡╨╖ 15 ╤Б ╤Б╤В╨░╨▒╨╕╨╗╤М╨╜╨╛╤Б╤В╨╕, ╨╜╨╡ ╤Б╤А╨░╨╖╤Г ╨╜╨░ mount.
-- ╨г╨▒╤А╨░╤В╤М ╨▓╨╗╨╛╨╢╨╡╨╜╨╜╤Л╨╣ `<main>` ╨▓╨╜╤Г╤В╤А╨╕ `SiteLayout` (blog list/article, podborki, city/venue hubs, trust shell) тАФ ╨╜╨╡╨▓╨░╨╗╨╕╨┤╨╜╤Л╨╣ HTML ╨╕ ╨╕╤Б╤В╨╛╤З╨╜╨╕╨║ hydration #418.
+### Решения
+- `ChunkLoadRecovery`: убрать match по filename; reload только на реальных ChunkLoad/dynamic-import сообщениях или на failed `<script src="…/_next/static/chunks/…">`; флаг чистить через 15 с стабильности, не сразу на mount.
+- Убрать вложенный `<main>` внутри `SiteLayout` (blog list/article, podborki, city/venue hubs, trust shell) — невалидный HTML и источник hydration #418.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- Hydration #418 ╨╜╨░ blog ╨╝╨╛╨╢╨╡╤В ╨╡╤Й╤С ╨╝╨╡╨╗╤М╨║╨░╤В╤М ╨▓ console ╨┤╨╛ ╨┐╨╛╨╗╨╜╨╛╨│╨╛ ╨▓╤Л╤А╨░╨▓╨╜╨╕╨▓╨░╨╜╨╕╤П SSR/client; ╨▒╨╡╨╖ ChunkLoad-╨╗╤Г╨┐╨░ ╤Б╤В╤А╨░╨╜╨╕╤Ж╨░ ╨▒╨╛╨╗╤М╤И╨╡ ╨╜╨╡ ╨║╤А╤Г╤В╨╕╤В╤Б╤П.
+### Проблемы
+- Hydration #418 на blog может ещё мелькать в console до полного выравнивания SSR/client; без ChunkLoad-лупа страница больше не крутится.
 
 ## 2026-07-23 - Chunk 400 / cities/%5Bslug%5D: mid-deploy static via Node
 
-### ╨Э╨░╨▒╨╗╤О╨┤╨╡╨╜╨╕╤П
-- ╨Ъ╨╛╨╜╤Б╨╛╨╗╤М ╨▓╨╗╨░╨┤╨╡╨╗╤М╤Ж╨░: CSS + `cities/%5Bslug%5D/page-*.js` тЖТ **400**, `ChunkLoadError: Loading chunk 804 failed`.
-- Access log: ╨▓ 20:47:00 ╤В╨╡ ╨╢╨╡ URL ╨┤╨░╨╗╨╕ 400; ╤З╨╡╤А╨╡╨╖ ~1 ╨╝╨╕╨╜ (╨┐╨╛╤Б╨╗╨╡ restart web) - 200. 400 ╤В╨░╨║╨╢╨╡ ╨╜╨░ chunks **╨▒╨╡╨╖** ╤Б╨║╨╛╨▒╨╛╨║ тЖТ ╨╜╨╡ WAF ╨╜╨░ `%5B`.
-- Deploy ╨┤╨╡╨╗╨░╨╗ `pnpm web:build` ╨┐╤А╨╕ ╨╢╨╕╨▓╨╛╨╝ `next start` (stop ╨▒╤Л╨╗ ╤В╨╛╨╗╤М╨║╨╛ ╨┐╨╡╤А╨╡╨┤ clear cache) тЖТ mid-build ╨┐╨╡╤А╨╡╨╖╨░╨┐╨╕╤Б╤М `.next/static`.
-- `/_next/static` ╤И╤С╨╗ ╤З╨╡╤А╨╡╨╖ `location /` + Node + `proxy_cache`.
+### Наблюдения
+- Консоль владельца: CSS + `cities/%5Bslug%5D/page-*.js` → **400**, `ChunkLoadError: Loading chunk 804 failed`.
+- Access log: в 20:47:00 те же URL дали 400; через ~1 мин (после restart web) - 200. 400 также на chunks **без** скобок → не WAF на `%5B`.
+- Deploy делал `pnpm web:build` при живом `next start` (stop был только перед clear cache) → mid-build перезапись `.next/static`.
+- `/_next/static` шёл через `location /` + Node + `proxy_cache`.
 
-### ╨а╨╡╤И╨╡╨╜╨╕╤П
-- nginx `location ^~ /_next/static/` тЖТ `alias` ╨╜╨░ `apps/web/.next/static/` (╨╝╨╕╨╜╤Г╤П Node/cache).
+### Решения
+- nginx `location ^~ /_next/static/` → `alias` на `apps/web/.next/static/` (минуя Node/cache).
 - `deploy-prod-next.sh`: **stop web before build**; apply `patch-prod-nginx-next-static.py`.
 
-### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
-- Downtime ╨╜╨░ ╨▓╤А╨╡╨╝╤П `web:build` ╤З╤Г╤В╤М ╨┤╨╗╨╕╨╜╨╜╨╡╨╡; ╨╖╨░╤В╨╛ ╨╜╨╡╤В ╨╛╨║╨╜╨░ 400/ChunkLoad ╨╜╨░ ╨╛╤В╨║╤А╤Л╤В╤Л╤Е ╨▓╨║╨╗╨░╨┤╨║╨░╤Е.
+### Проблемы
+- Downtime на время `web:build` чуть длиннее; зато нет окна 400/ChunkLoad на открытых вкладках.
