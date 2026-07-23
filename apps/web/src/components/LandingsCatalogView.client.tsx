@@ -130,14 +130,14 @@ export function LandingsCatalogView({
           )}
 
           {trending.length ? (
-            <div className="flex h-full min-h-[14rem] flex-col self-stretch rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:min-h-[16rem]">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">В тренде</p>
-              <ul className="space-y-2">
+            <div className="flex h-full min-h-[14rem] flex-col justify-center self-stretch rounded-2xl border border-slate-200 bg-white px-5 py-5 shadow-sm sm:min-h-[16rem]">
+              <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">В тренде</p>
+              <ul className="w-full space-y-2">
                 {trending.map((item, index) => (
                   <li key={item.slug}>
                     <Link
                       href={landingCategoryHref(item.slug, citySlug !== 'all' ? citySlug : undefined)}
-                      className="flex items-start gap-2 rounded-xl px-2 py-1.5 transition hover:bg-slate-50"
+                      className="flex items-start gap-2.5 rounded-xl px-2.5 py-2 transition hover:bg-slate-50"
                     >
                       <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
                         {index + 1}
