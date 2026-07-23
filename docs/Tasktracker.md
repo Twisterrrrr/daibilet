@@ -40,10 +40,11 @@
 | SEO.8a | Editorial polish текстов TOP-15, в первую очередь новые `walking-tours`, `country-tours`, `exhibitions`, `unusual-theatres`, `excursions`, `rooftops` | Высокий | 🔄 seed готов, нужна редакторская вычитка | владелец + агент |
 | SEO.8b | `country-tours`: требовать экскурсионный и направленческий сигналы, исключить культурные события по топонимам | Высокий | ✅ 2026-07-23 | runtime `dto.js` синхронизирован, prod deploy + smoke: 3 экскурсии, без оперы и концертов |
 | SEO.8c | Аудит всех landing rules: исключить мусорные попадания, сверить сэмплы и runtime `dto.js` | Критический | 🔄 2026-07-23 | rules audit в работе; `rooftops`, `new-year`, `bus-tours` требуют deploy/smoke |
-| SEO.9 | Реальные отзывы / телефон 8-800 на контактах | Средний | ⏳ номер pending, email + ИНН/ОГРНИП уже опубликованы | **владелец** |
-| SEO.11 | Порог индекса SEO-листингов | Критический | ✅ оставлен `MIN_LISTING_OFFERS_FOR_INDEX = 6` | агент |
+| SEO.9 | Реальные отзывы / телефон 8-800 на контактах | Средний | ⏳ номер pending; ИНН/ОГРНИП усилены на `/contacts` + футер; телефон не публикуем | **владелец** (номер) / агент (trust UI ✅) |
+| SEO.11 | Порог индекса SEO-листингов | Критический | ✅ `MIN_LISTING_OFFERS_FOR_INDEX = 6` (не поднимать: Екб/Казань thin) | агент |
 | SEO.12 | Внутренняя перелинковка: футер «Популярные направления», event breadcrumbs → CHPU, «Смотрите также» на листингах | Высокий | ✅ 2026-07-23 | агент |
 | SEO.13 | SSR JSON-LD: BreadcrumbList (listing+event) + ItemList только на CHPU landings (non-empty) | Высокий | ✅ 2026-07-23 | агент |
+| SEO.14 | `/podborki` tag cloud → CHPU landings/intent вместо `/events?q=` | Высокий | ✅ 2026-07-23 (топ-24: 23 CHPU / 1 fallback) | агент |
 | SEO.10 | Editorial polish SEO-текстов (убрать шаблонный хвост) | Средний | ⏳ | владелец + агент |
 | P.1 | AI / статьи блога | Средний | ⚠️ deferred vs SEO.1–SEO.7 | — |
 

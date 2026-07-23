@@ -1,7 +1,11 @@
 import { cityToPrepositional, inCityPrepositional } from '@/lib/city-declension';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
 
-/** Порог коммерческой SEO-страницы: ниже - noindex,follow (страница жива для UX). */
+/**
+ * Порог коммерческой SEO-страницы: ниже - noindex,follow (страница жива для UX).
+ * Держим 6: база ~2400 событий, но Екб (~57) и Казань (~51) скромные -
+ * порог 10-12 срежет половину их category×city посадок. Soft-цель = 10.
+ */
 export const MIN_LISTING_OFFERS_FOR_INDEX = 6;
 
 /** Soft quality: ориентир для контент-планов, не жёсткий порог. */

@@ -147,7 +147,9 @@ export function LandingsCatalogView({
         {tags.length ? (
           <section className="mt-12">
             <h2 className="font-display text-xl font-bold text-slate-900">По тегам</h2>
-            <p className="mt-1 text-sm text-slate-500">Уточните тему - откроется каталог с фильтром по тегу</p>
+            <p className="mt-1 text-sm text-slate-500">
+              Уточните тему - откроется тематическая подборка или каталог
+            </p>
             <div className="mt-4 flex flex-wrap gap-2">
               {tags.map((tag) => (
                 <Link
