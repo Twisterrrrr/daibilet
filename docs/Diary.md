@@ -1,3 +1,20 @@
+## 2026-07-24 - SiteHeader: premium glass chrome
+
+### Наблюдения
+
+- Владелец: шапка выглядела плоско относительно обновлённых content pages; нужен premium header без ломки city/search/auth/mobile.
+
+### Решения
+
+- `SiteHeader`: glass (`bg-white/55-70` + `backdrop-blur-xl`), nav tab-tray с active white pill, solid primary «Войти», поиск как chip-слот.
+- `CityPicker` `header`: chip border/bg/shadow (логика picker без изменений). Mobile drawer: тот же tray + CTA Войти.
+
+### Проблемы
+
+- Commit + deploy-prod-next.
+
+---
+
 ## 2026-07-24 - /cities + /blog: photo hero как у venues
 
 ### Наблюдения

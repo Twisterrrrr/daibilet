@@ -106,7 +106,7 @@ export function CityPicker({
       ? 'relative h-11 w-full rounded-xl bg-slate-50 pl-10 pr-8 text-left text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/25'
       : variant === 'compact'
         ? 'relative flex w-full items-center gap-2 rounded-lg py-3 pl-10 pr-10 text-left text-base font-medium text-slate-700 hover:bg-slate-100'
-        : 'inline-flex items-center gap-1 rounded-full px-2 py-1 text-sm font-medium text-slate-600 transition hover:bg-slate-100';
+        : 'inline-flex max-w-full items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white/90 px-3 py-1.5 text-sm font-semibold text-slate-800 shadow-sm outline-none transition hover:border-slate-300 hover:bg-white focus-visible:ring-2 focus-visible:ring-primary/25';
 
   const menu = open
     ? createPortal(

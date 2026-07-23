@@ -93,14 +93,14 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200 bg-white/85 pt-[env(safe-area-inset-top,0px)] backdrop-blur-md">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/60 bg-white/70 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_rgba(15,23,42,0.04)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/55">
         <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-3 lg:py-3.5">
-          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 lg:flex-none lg:gap-5">
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 lg:flex-none lg:gap-4">
             <button
               type="button"
               aria-label="Открыть меню"
               onClick={() => setMobileOpen(true)}
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 lg:hidden"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-700 transition hover:bg-slate-100/80 lg:hidden"
             >
               <Menu className="h-5 w-5" />
             </button>
@@ -115,11 +115,14 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               onChange={onCityChange}
               allLabel="Все города"
               variant="header"
-              className="hidden max-w-[9.5rem] shrink-0 lg:block xl:max-w-none"
+              className="hidden max-w-[9.5rem] shrink-0 lg:block xl:max-w-[12rem]"
             />
           </div>
 
-          <nav aria-label="Основная навигация" className="hidden min-w-0 items-center gap-0.5 lg:flex">
+          <nav
+            aria-label="Основная навигация"
+            className="hidden min-w-0 items-center rounded-xl bg-slate-100/80 p-1 ring-1 ring-slate-200/70 lg:flex"
+          >
             {navLinks.map((item) => {
               const active = isNavActive(pathname, item.href.split('?')[0] || item.href);
               const secondary = item.href.startsWith('/venues') || item.href.startsWith('/locations') || item.href.startsWith('/blog');
@@ -130,9 +133,10 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
                   className={
                     [
                       secondary ? 'hidden xl:inline-flex' : 'inline-flex',
+                      'items-center rounded-lg px-2.5 py-1.5 text-sm transition xl:px-3',
                       active
-                        ? 'rounded-full bg-primary/10 px-2.5 py-1.5 text-sm font-semibold text-primary-600 xl:px-3'
-                        : 'rounded-full px-2.5 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 xl:px-3',
+                        ? 'bg-white font-semibold text-slate-900 shadow-sm'
+                        : 'font-medium text-slate-500 hover:bg-white/60 hover:text-slate-800',
                     ].join(' ')
                   }
                 >
@@ -142,7 +146,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
             })}
           </nav>
 
-          <div className="flex shrink-0 items-center gap-0.5 sm:gap-1.5">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
             <HeaderSearch
               variant="overlay"
               cityFilter={searchCityFilter}
@@ -150,7 +154,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               className="hidden lg:inline-flex"
             />
 
-            <div className="hidden lg:contents">
+            <div className="hidden items-center gap-1 lg:flex">
               <HeaderAuthControls
                 ref={userMenuRef}
                 auth={auth}
@@ -164,7 +168,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
                 href="/help"
                 title="Помощь и FAQ"
                 aria-label="Помощь и FAQ"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100/80 hover:text-slate-900"
               >
                 <HelpCircle className="h-5 w-5" />
               </Link>
@@ -174,7 +178,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
                 aria-label="Избранное"
                 title="Избранное"
                 onClick={() => setFavoritesOpen(true)}
-                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-white transition hover:bg-slate-800"
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm transition hover:bg-slate-800"
               >
                 <Heart className="h-5 w-5" />
               </button>
@@ -225,20 +229,20 @@ const HeaderAuthControls = forwardRef<
           type="button"
           aria-label="Личный кабинет"
           onClick={onToggleUserMenu}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 xl:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/90 bg-white/90 text-slate-700 shadow-sm transition hover:bg-white xl:hidden"
         >
           <User className="h-5 w-5" />
         </button>
         <button
           type="button"
           onClick={onToggleUserMenu}
-          className="hidden items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 xl:inline-flex xl:px-4"
+          className="hidden items-center gap-2 rounded-xl border border-slate-200/90 bg-white/90 px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-white xl:inline-flex xl:px-3.5"
         >
           <User className="h-4 w-4" />
           {auth?.user?.name || 'Кабинет'}
         </button>
         {userMenuOpen ? (
-          <div className="absolute right-0 z-50 mt-1 w-56 rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
+          <div className="absolute right-0 z-50 mt-1.5 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
             {auth?.user?.name ? (
               <div className="border-b border-slate-100 px-3 py-2 text-sm font-medium text-slate-900">{auth.user.name}</div>
             ) : null}
@@ -263,22 +267,13 @@ const HeaderAuthControls = forwardRef<
   }
 
   return (
-    <>
-      <Link
-        href="/login?returnUrl=/account/purchases"
-        aria-label="Войти"
-        className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-700 transition hover:bg-slate-100 xl:hidden"
-      >
-        <User className="h-5 w-5" />
-      </Link>
-      <Link
-        href="/login?returnUrl=/account/purchases"
-        className="hidden items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 xl:inline-flex xl:px-4"
-      >
-        <LogIn className="h-4 w-4" />
-        Войти
-      </Link>
-    </>
+    <Link
+      href="/login?returnUrl=/account/purchases"
+      className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary-600 px-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
+    >
+      <LogIn className="h-4 w-4" />
+      Войти
+    </Link>
   );
 });
 
@@ -311,42 +306,44 @@ function MobileNavSheet({
 }) {
   return (
     <div className="fixed inset-0 z-[60] lg:hidden">
-      <button type="button" aria-label="Закрыть меню" className="absolute inset-0 bg-slate-900/40" onClick={onClose} />
-      <aside className="relative flex h-full w-[min(20rem,88vw)] flex-col bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-4">
+      <button type="button" aria-label="Закрыть меню" className="absolute inset-0 bg-slate-900/45 backdrop-blur-[2px]" onClick={onClose} />
+      <aside className="relative flex h-full w-[min(20rem,88vw)] flex-col bg-white/95 shadow-2xl backdrop-blur-xl">
+        <div className="flex items-center justify-between border-b border-slate-200/80 px-4 py-4">
           <DaibiletLogo textClassName="text-xl" />
-          <button type="button" aria-label="Закрыть" onClick={onClose} className="rounded-full p-2 text-slate-500 hover:bg-slate-100">
+          <button type="button" aria-label="Закрыть" onClick={onClose} className="rounded-xl p-2 text-slate-500 hover:bg-slate-100">
             <X className="h-5 w-5" />
           </button>
         </div>
-        <div className="border-b border-slate-200 px-4 py-3">
+        <div className="border-b border-slate-200/80 px-4 py-3">
           <HeaderSearch
             variant="inline"
             cityFilter={searchCityFilter}
             initialQuery={searchInitialQuery}
-            className="rounded-xl border border-slate-200 bg-slate-50 py-2.5"
+            className="rounded-xl border border-slate-200 bg-slate-50 py-2.5 shadow-sm"
           />
         </div>
         <nav aria-label="Мобильная навигация" className="flex-1 overflow-y-auto p-2">
-          {navLinks.map((item) => (
-            <Link
-              key={item.label}
-              href={item.href}
-              onClick={onClose}
-              className={`block w-full rounded-lg px-4 py-3 text-left text-base font-medium ${
-                isNavActive(pathname, item.href.split('?')[0] || item.href)
-                  ? 'bg-primary/10 font-semibold text-primary-600'
-                  : 'text-slate-700 hover:bg-slate-100'
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
+          <div className="rounded-xl bg-slate-100/70 p-1 ring-1 ring-slate-200/60">
+            {navLinks.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                onClick={onClose}
+                className={`block w-full rounded-lg px-4 py-3 text-left text-base transition ${
+                  isNavActive(pathname, item.href.split('?')[0] || item.href)
+                    ? 'bg-white font-semibold text-slate-900 shadow-sm'
+                    : 'font-medium text-slate-600 hover:bg-white/70 hover:text-slate-900'
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
           <div className="my-2 border-t border-slate-200" />
           <button
             type="button"
             onClick={onOpenFavorites}
-            className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100"
+            className="flex w-full items-center gap-2 rounded-xl px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100"
           >
             <Heart className="h-4 w-4" />
             Избранное
@@ -354,7 +351,7 @@ function MobileNavSheet({
           <Link
             href="/help"
             onClick={onClose}
-            className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100"
+            className="flex w-full items-center gap-2 rounded-xl px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100"
           >
             <HelpCircle className="h-4 w-4" />
             Помощь и FAQ
@@ -371,14 +368,14 @@ function MobileNavSheet({
               }}
               allLabel={cityLabel === 'Все города' ? 'Все города' : cityLabel}
               variant="compact"
-              className="w-full"
+              className="w-full rounded-xl border border-slate-200 bg-white shadow-sm"
             />
           </div>
           <div className="my-2 border-t border-slate-200" />
           {isLoggedIn ? (
             <>
               {auth?.user?.name ? <div className="px-4 py-2 text-sm text-slate-500">{auth.user.name}</div> : null}
-              <Link href="/account/purchases" onClick={onClose} className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100">
+              <Link href="/account/purchases" onClick={onClose} className="flex w-full items-center gap-2 rounded-xl px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100">
                 <User className="h-4 w-4" />
                 Мои покупки
               </Link>
@@ -389,7 +386,7 @@ function MobileNavSheet({
                   onClose();
                   window.location.href = '/';
                 }}
-                className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-rose-600 hover:bg-rose-50"
+                className="flex w-full items-center gap-2 rounded-xl px-4 py-3 text-left text-base font-medium text-rose-600 hover:bg-rose-50"
               >
                 Выйти
               </button>
@@ -398,9 +395,9 @@ function MobileNavSheet({
             <Link
               href="/login?returnUrl=/account/purchases"
               onClick={onClose}
-              className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100"
+              className="mx-2 mt-1 flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-primary-700"
             >
-              <User className="h-4 w-4" />
+              <LogIn className="h-4 w-4" />
               Войти
             </Link>
           )}
