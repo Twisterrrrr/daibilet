@@ -73,7 +73,7 @@
 
 ### Проблемы
 
-- Deploy/migrate на prod после commit (см. SHA в Tasktracker B.27).
+- Нет. Migration `20260724010000_article_is_featured` применена на prod; API отдаёт `isFeatured`. Smoke `/blog`: отдельный Hero + strip, cover preload (`rel=preload as=image`), featured не в magazine cards. Prod HEAD включает `d34fd28` (позже promo sidebar @`72ea839`).
 
 ---
 
