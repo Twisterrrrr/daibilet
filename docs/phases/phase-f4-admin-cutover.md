@@ -16,14 +16,17 @@ admin.daibilet.ru
 
 `daibilet.ru/admin` остаётся доступен на public host (тот же Next `/admin`).
 
-## Gaps (ещё на Vite `/legacy`)
+## Ещё на `/legacy`
 
 - Events: taxonomy / schedule / sales / source tabs (override+moderation+SEO → Next `/admin/events/[id]`)
 - Landings: candidates search, content blocks (SEO + pin/exclude → Next `/admin/landings/[slug]`)
-- Orders / Buyers / Venues / Cities full CRUD
-- ECR page (flag)
+- Orders ticket-link / manual upsert (list+detail → Next `/admin/orders`)
+- Buyers / ECR / Mapping / Reviews
+- (Venues/Cities SEO → Next; rare tools may stay Vite)
 
-Ported on Next: Dashboard, Events list+override/moderation/SEO, Landings list+SEO/matches, Articles CRUD, Sources+sync, Settings read-only.
+Ported on Next: Dashboard, Events list+override, Landings SEO/matches, **Orders list+detail**, **Venues/Cities SEO**, Articles, Sources, Settings.
+
+Soft-retire: [phase-f4-retire-legacy.md](./phase-f4-retire-legacy.md).
 
 ## Auth / SSL
 

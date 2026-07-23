@@ -1,3 +1,25 @@
+## 2026-07-23 - F4.4 Orders/Venues/Cities + soft-retire legacy
+
+### Наблюдения
+
+- После F4.3 daily edit Events/Landings уже в Next; операторский остаток: Orders mirror, Venues/Cities SEO.
+- Полный Vite Events/Orders sheet слишком велик для hard retire в одном инкременте.
+
+### Решения
+
+- Next: `/admin/orders` (+ detail/archive/sync), `/admin/venues/[id]`, `/admin/cities/[id]`.
+- Nav: Orders/Venues/Cities ready.
+- Soft-retire: nginx/docs mark `/legacy` deprecated; Vite build остаётся.
+- Checklist full retire: `docs/phases/phase-f4-retire-legacy.md`.
+- **Vite retire possible: NO** (taxonomy, candidates, ticket-link, ECR без Next-замены).
+
+### Проблемы
+
+- Ticket upsert / unarchive / delete остаются на Vite.
+- Finance не трогали.
+
+---
+
 ## 2026-07-23 - SEO guide batch #1 + blog NOTE callout
 
 ### Наблюдения

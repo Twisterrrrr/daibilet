@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   LayoutTemplate,
   MapPin,
+  Receipt,
   Settings,
 } from 'lucide-react';
 
@@ -24,8 +25,9 @@ type NavItem = {
 const NAV: NavItem[] = [
   { href: '/admin', label: 'Дашборд', icon: LayoutDashboard, ready: true },
   { href: '/admin/events', label: 'События', icon: CalendarDays, ready: true },
-  { href: '/admin/venues', label: 'Площадки', icon: Building2 },
-  { href: '/admin/cities', label: 'Города', icon: MapPin },
+  { href: '/admin/orders', label: 'Заказы', icon: Receipt, ready: true },
+  { href: '/admin/venues', label: 'Площадки', icon: Building2, ready: true },
+  { href: '/admin/cities', label: 'Города', icon: MapPin, ready: true },
   { href: '/admin/landings', label: 'Лендинги', icon: LayoutTemplate, ready: true },
   { href: '/admin/articles', label: 'Блог', icon: BookOpen, ready: true },
   { href: '/admin/sources', label: 'Источники', icon: Download, ready: true },
@@ -75,7 +77,7 @@ export function AdminNextShell({ children }: Props) {
           })}
         </nav>
         <div className="border-t border-slate-200 px-4 py-3 text-xs text-slate-500">
-          F4.3: Events/Landings edits в Next. Остальное deep CRUD: /legacy.
+          F4.4: daily hot path в Next. /legacy deprecated (gaps below).
         </div>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
@@ -86,7 +88,7 @@ export function AdminNextShell({ children }: Props) {
               <h1 className="text-base font-semibold text-slate-900">Операторская оболочка</h1>
             </div>
             <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs text-emerald-800">
-              F4.3 Events/Landings CRUD
+              F4.4 Orders/Venues/Cities
             </span>
           </div>
         </header>

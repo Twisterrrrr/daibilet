@@ -24,7 +24,8 @@ server {{
     auth_basic "Daibilet admin";
     auth_basic_user_file /etc/nginx/.htpasswd-daibilet-admin;
 
-    # Deep CRUD still on Vite SPA (Events override, Landings matches, …).
+    # F4.4: /legacy deprecated soft-retire - keep until taxonomy/candidates/ticket-link replaced.
+    # See docs/phases/phase-f4-retire-legacy.md
     location ^~ /legacy/ {{
         root /var/www/daibilet;
         try_files $uri $uri/ /legacy/index.html;
