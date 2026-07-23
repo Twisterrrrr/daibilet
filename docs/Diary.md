@@ -1,3 +1,21 @@
+## 2026-07-24 - /cities + /blog: photo hero как у venues
+
+### Наблюдения
+
+- Владелец: hero у `/venues` и `/locations` нравится (фото/атмосфера, stats, поиск в hero); `/cities` и `/blog` выглядели как унылый slate strip.
+
+### Решения
+
+- `/cities`: `HeroLayout` `imageOverlay` + `HeroMedia` (slavic-01/04), eyebrow stats (`pluralCities` · `pluralEvents`), поиск + сортировка в белой панели; top tiles + `RussiaMap` ниже hero на `max-w-5xl` (центрирование карточек не откатывали).
+- `/blog` `BlogListHero`: тот же `imageOverlay` + `HeroMedia` (slavic-02/06); search + topic chips внутри hero (чипы как на home: glass на тёмном). Geo H1 и `?q=`/`?topic=` сохранены.
+- Кадры отличны от venues (03/05), чтобы ротатор не дублировал соседние каталоги.
+
+### Проблемы
+
+- Deploy + smoke `/cities` `/blog` после commit.
+
+---
+
 ## 2026-07-24 - /cities: симметрия H1 + сетка (одна ось max-w-5xl)
 
 ### Наблюдения
