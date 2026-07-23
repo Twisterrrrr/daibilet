@@ -1,3 +1,22 @@
+## 2026-07-23 - Batch A: уникальные cover вместо city-placeholder
+
+### Наблюдения
+
+- На prod у гидов batch A (`kazan-2-3-dnya-samostoyatelno-karta`, `ekb-stendap-uralskiy-yumor`, `ekb-uralskiy-mars-bazhovskie-ekskursii`) cover был копией `cities/*.png`.
+- Frontmatter уже указывал `/images/blog/{slug}.jpg`; менять MD не нужно.
+
+### Решения
+
+- Сгенерированы 3 уникальные landscape-обложки (без текста/логотипов) → `apps/public/public/images/blog/{slug}.jpg`.
+- Sync в Next public идёт через `apps/web/scripts/sync-public-assets.mjs` на build.
+- Moscow-spb zip / F4 не трогали.
+
+### Проблемы
+
+- Inline-фото для batch A по-прежнему не сделаны (вне scope этой задачи).
+
+---
+
 ## 2026-07-23 - Fix `[NOTE]` mid-article: nested markdown links
 
 ### Наблюдения
@@ -48,12 +67,12 @@
 
 - Размещены `content/blog/{kazan-2-3-dnya-samostoyatelno-karta,ekb-stendap-uralskiy-yumor,ekb-uralskiy-mars-bazhovskie-ekskursii}.md` (`PUBLISHED`).
 - Карточки в `blog-posts` (web+public), `blog-meta` (+ фильтр `ekaterinburg`), `blog:sync-bodies`.
-- Cover: временный плейсхолдер из `cities/kazan.png` / `ekaterinburg.png` → `/images/blog/{slug}.jpg` (TODO уникальные фото).
+- Cover: `/images/blog/{slug}.jpg` (сначала city-placeholder; позже заменены уникальными фото - см. запись выше).
 - План: `docs/seo-guide-articles-plan.md` - пачка A отмечена размещённой.
 
 ### Проблемы
 
-- Уникальные обложки и inline-фото ещё не сняты/не куплены - city placeholder.
+- Inline-фото для batch A ещё не сделаны (covers закрыты отдельной записью).
 
 ---
 
