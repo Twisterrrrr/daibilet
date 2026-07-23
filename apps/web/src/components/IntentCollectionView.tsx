@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Suspense } from 'react';
 
 import { CatalogShell } from '@/components/CatalogShell.client';
-import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
+import { SectionPageHero } from '@/components/PageBreadcrumbs';
 import type { CatalogIntentDefinition } from '@/lib/catalog-intent-routes';
 import { catalogIntentPath, formatIntentSeoBody, listCatalogIntents } from '@/lib/catalog-intent-routes';
 import type { CatalogPageQuery } from '@/server/catalog-query';
@@ -40,30 +40,32 @@ export async function IntentCollectionView({
 
   return (
     <>
-      <PageBreadcrumbBar items={crumbs} />
-      <div className="container-page py-8">
-        <header className="mb-8 max-w-3xl">
-          <p className="text-sm font-semibold uppercase tracking-wider text-primary-700">Подборка</p>
-          <h1 className="mt-2 text-3xl font-extrabold text-slate-900 md:text-4xl">
+      <SectionPageHero
+        breadcrumbs={crumbs}
+        title={
+          <>
             {intent.label}
             {cityName ? ` · ${cityName}` : ''}
-          </h1>
-          <p className="mt-3 text-base leading-7 text-slate-600">{intent.description}</p>
-          {siblings.length ? (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {siblings.map((item) => (
-                <Link
-                  key={item.intent}
-                  href={catalogIntentPath(item.intent, citySlug)}
-                  className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:border-primary/40 hover:text-primary-700"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          ) : null}
-        </header>
+          </>
+        }
+        description={intent.description}
+      >
+        {siblings.length ? (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {siblings.map((item) => (
+              <Link
+                key={item.intent}
+                href={catalogIntentPath(item.intent, citySlug)}
+                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:border-primary/40 hover:text-primary-700"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        ) : null}
+      </SectionPageHero>
 
+      <div className="container-page py-8">
         <Suspense
           fallback={
             <div className="space-y-6">

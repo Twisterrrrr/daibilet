@@ -179,22 +179,19 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   return (
     <>
-      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
-        <div className="min-w-0 max-w-3xl">
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl">Каталог событий</h1>
-          <p className="mt-2 text-sm text-slate-500">
-            {loading && !catalog ? 'Загрузка…' : null}
-            {catalog ? (
-              <>
-                {pluralEvents(catalog.total)}
-                {catalog.items.length < catalog.total ? ` · показано ${catalog.items.length}` : ''}
-              </>
-            ) : null}
-            {error ? error : null}
-          </p>
-        </div>
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
+        <p className="min-w-0 text-sm text-slate-500">
+          {loading && !catalog ? 'Загрузка…' : null}
+          {catalog ? (
+            <>
+              {pluralEvents(catalog.total)}
+              {catalog.items.length < catalog.total ? ` · показано ${catalog.items.length}` : ''}
+            </>
+          ) : null}
+          {error ? error : null}
+        </p>
 
-        <div className="flex flex-wrap items-center gap-2 sm:ml-auto sm:pt-1">
+        <div className="flex flex-wrap items-center gap-2 sm:ml-auto">
           <div className="relative hidden sm:block">
             <label htmlFor="catalog-page-size" className="sr-only">
               Карточек на странице

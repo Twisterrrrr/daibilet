@@ -68,13 +68,6 @@ export function LandingsCatalogView({
     <>
       <SectionPageHero
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Подборки' }]}
-        gradientClass="from-fuchsia-500 via-primary to-indigo-700"
-        eyebrow={
-          <p className="inline-flex items-center gap-1.5 text-sm font-semibold uppercase tracking-wider text-white/80">
-            <Sparkles className="h-4 w-4" />
-            Тематические подборки
-          </p>
-        }
         title="Подборки событий"
         description="Готовые списки под настроение и повод: вечер, выходные, бюджет или редкие премьеры."
       />

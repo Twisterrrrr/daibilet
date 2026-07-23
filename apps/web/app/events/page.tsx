@@ -2,15 +2,18 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 
 import { CatalogShell } from '@/components/CatalogShell.client';
-import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
+import { SectionPageHero } from '@/components/PageBreadcrumbs';
 import { SiteLayout } from '@/components/SiteLayout';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { catalogQueryCacheKey, parseCatalogPageQuery } from '@/server/catalog-query';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 
 const EVENTS_TITLE = 'События, экскурсии и билеты';
+const EVENTS_H1 = 'Каталог событий';
 const EVENTS_DESCRIPTION =
   'Полный каталог событий Дайбилет: фильтры по городу, дате, категории, цене и подборкам.';
+const EVENTS_SUPPORT =
+  'Экскурсии, концерты, спектакли и билеты - выберите город, дату и формат.';
 
 export const metadata: Metadata = {
   title: pageTitle(EVENTS_TITLE),
@@ -49,7 +52,11 @@ export default async function EventsCatalogPage({ searchParams }: PageProps) {
 
   return (
     <SiteLayout>
-      <PageBreadcrumbBar items={[{ label: 'Главная', href: '/' }, { label: 'События' }]} />
+      <SectionPageHero
+        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'События' }]}
+        title={EVENTS_H1}
+        description={EVENTS_SUPPORT}
+      />
       <div className="container-page py-8">
         <Suspense
           fallback={

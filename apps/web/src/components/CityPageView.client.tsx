@@ -6,17 +6,16 @@ import { ArrowLeft, ArrowRight, Grid3X3, ListFilter, MapPin, Ticket } from 'luci
 import { CityHubArticlesGrid } from '@/components/CityHubArticleTeaser.client';
 import { EventCard } from '@/components/EventCard';
 import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
+import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import Link from 'next/link';
 import { formatStreetAddress } from '@/lib/address';
 import { formatMoney, formatNumber, formatPriceFrom, pluralEvents, pluralVenues } from '@/lib/format';
-import { resolveCityImage } from '@/lib/city-images';
 import type { CityFaqItem } from '@/lib/city-faq';
 import type { CityHubArticlesBuckets } from '@/lib/city-hub-articles';
 import type { CityHubTemplate } from '@/lib/city-hub-template';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { venuePageTemplate } from '@/lib/venue-meta';
-import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { eventHref, sessionVenueHref, venueHref } from '@/lib/routes';
 import { inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
 import { buildCityHubSeoPhrase } from '@/lib/city-hub-seo';
@@ -448,64 +447,14 @@ function CityHeroEditorial({
   guide: CityInfoEntry | null;
   hasTravel: boolean;
 }) {
-  const cityIn = cityInPrepositional(city);
-  const brief =
-    guide?.brief ||
-    `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат, дату и площадку без долгого поиска по разным билетным системам.`;
-
   return (
-    <section id="top" className="border-b border-zinc-200 bg-zinc-50 pt-10 pb-12 sm:pt-12 sm:pb-16">
-      <div className="container-page">
-        <div className="mb-6 flex items-center gap-3 text-xs font-medium uppercase tracking-widest text-zinc-500">
-          <button type="button" onClick={() => navigateHome('top')} className="hover:text-zinc-800">
-            Главная
-          </button>
-          <span aria-hidden="true">·</span>
-          <span className="text-zinc-700">{city.type === 'region' ? 'Направление' : 'Город'}</span>
-          <div className="hidden h-px flex-1 bg-zinc-200 sm:block" />
-        </div>
-        <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
-          <div className="min-w-0 flex-1">
-            <h1 className="font-serif text-5xl font-semibold leading-[0.95] tracking-tight text-zinc-950 sm:text-6xl md:text-7xl lg:text-8xl">
-              {city.name}
-            </h1>
-            <p className="mt-6 max-w-[48ch] text-base leading-relaxed text-pretty text-zinc-600 sm:text-lg">{brief}</p>
-          </div>
-          <div className="flex w-full flex-col gap-4 md:w-auto md:min-w-[240px]">
-            <div className="flex items-baseline justify-between border-b border-zinc-200 pb-2">
-              <span className="text-sm text-zinc-500">Событий</span>
-              <span className="text-xl font-medium tabular-nums text-zinc-950">{formatNumber(stats.events)}</span>
-            </div>
-            <div className="flex items-baseline justify-between border-b border-zinc-200 pb-2">
-              <span className="text-sm text-zinc-500">Площадок</span>
-              <span className="text-xl font-medium tabular-nums text-zinc-950">{formatNumber(stats.venues)}</span>
-            </div>
-            <a
-              href="#affiche"
-              onClick={(event) => {
-                event.preventDefault();
-                scrollToSection('affiche');
-              }}
-              className="mt-2 inline-flex min-h-11 items-center justify-center rounded-full bg-zinc-950 px-6 text-sm font-medium text-white ring-1 ring-zinc-950 transition hover:bg-zinc-800 active:scale-[0.98]"
-            >
-              Смотреть афишу
-            </a>
-            {hasTravel ? (
-              <a
-                href="#travel"
-                onClick={(event) => {
-                  event.preventDefault();
-                  scrollToSection('travel');
-                }}
-                className="inline-flex min-h-10 items-center justify-center text-sm font-medium text-zinc-600 underline-offset-4 hover:text-zinc-950 hover:underline"
-              >
-                Как добраться
-              </a>
-            ) : null}
-          </div>
-        </div>
-      </div>
-    </section>
+    <CityHeroStrip
+      city={city}
+      stats={stats}
+      guide={guide}
+      hasTravel={hasTravel}
+      editorial
+    />
   );
 }
 
@@ -520,85 +469,90 @@ function CityHeroDefault({
   guide: CityInfoEntry | null;
   hasTravel: boolean;
 }) {
-  const heroImage = resolveCityImage({
-    slug: city.slug,
-    sourceSlug: city.sourceSlug,
-    name: city.name,
-  });
+  return <CityHeroStrip city={city} stats={stats} guide={guide} hasTravel={hasTravel} />;
+}
+
+/** Нейтральный strip как у /events, /blog, /podborki - без full-bleed фото. */
+function CityHeroStrip({
+  city,
+  stats,
+  guide,
+  hasTravel,
+  editorial = false,
+}: {
+  city: PublicCityDto;
+  stats: PublicCityPageDto['stats'];
+  guide: CityInfoEntry | null;
+  hasTravel: boolean;
+  editorial?: boolean;
+}) {
   const cityIn = cityInPrepositional(city);
-  const heroFocus = resolveCityImageObjectPosition({
-    slug: city.slug,
-    sourceSlug: city.sourceSlug,
-    name: city.name,
-  });
   const brief =
     guide?.brief ||
     `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат, дату и площадку без долгого поиска по разным билетным системам.`;
 
-  const focusParts = String(heroFocus || 'center 32%').trim().split(/\s+/);
-  const focusX = focusParts[0] || 'center';
-  const focusY = focusParts[1] || '32%';
-
   return (
-    <section
-      id="top"
-      className="relative min-h-[340px] overflow-hidden border-b border-primary-950 bg-[#071525] text-white sm:min-h-[420px] lg:min-h-[480px]"
-    >
-      {/*
-        Mobile: full-bleed.
-        Desktop 16:9: фото справа обычного размера (без scale).
-        Ultrawide: ширина и высота кадра растут плавно после 1600px.
-      */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 lg:inset-y-0 lg:left-auto lg:right-0 lg:w-[min(56vw,50rem)] min-[1600px]:top-1/2 min-[1600px]:bottom-auto min-[1600px]:h-[clamp(100%,calc(100%+18vw-18rem),118%)] min-[1600px]:w-[clamp(50rem,calc(80vw-30rem),70rem)] min-[1600px]:-translate-y-1/2"
-      >
-        <SafeImage
-          src={heroImage}
-          alt=""
-          fill
-          priority
-          sizes="(max-width: 1023px) 100vw, (max-width: 1599px) 56vw, (max-width: 1999px) calc(80vw - 30rem), 70rem"
-          style={{ objectPosition: `${focusX} ${focusY}` }}
-          className="object-cover"
-          fallback={<div className="absolute inset-0 bg-[#0a233c]" />}
-        />
-      </div>
-
-      {/*
-        Цвет → ~50% на стыке → прозрачность. Правая часть кадра без вуали.
-      */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_bottom,#071525_0%,rgba(7,21,37,0.88)_42%,rgba(7,21,37,0.45)_72%,transparent_100%)] lg:bg-[linear-gradient(to_right,#071525_0%,#071525_34%,rgba(7,21,37,0.5)_52%,rgba(7,21,37,0.18)_64%,transparent_76%)]"
+    <div id="top">
+      <PageBreadcrumbBar
+        items={[
+          { label: 'Главная', href: '/' },
+          { label: city.type === 'region' ? 'Направления' : 'Города', href: '/cities' },
+          { label: city.name },
+        ]}
       />
-
-      <div className="container-page relative z-[1] py-12 sm:py-14">
-        <div className="flex items-center gap-2 text-sm text-primary-100/80">
-          <button type="button" onClick={() => navigateHome('top')} className="hover:text-white">
-            Главная
-          </button>
-          <span>/</span>
-          <span className="text-white">{city.name}</span>
-        </div>
-        <div className="mt-5 max-w-2xl lg:max-w-xl xl:max-w-2xl">
-          <h1 className="text-4xl font-extrabold sm:text-5xl">{city.name}</h1>
-          <p className="mt-4 text-base leading-7 text-primary-50/88 sm:text-lg">{brief}</p>
-          <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/80">
-            <span className="font-semibold text-white">{pluralEvents(stats.events)}</span>
-            <span aria-hidden="true" className="text-white/35">
+      <section
+        className={
+          editorial
+            ? 'border-b border-zinc-200 bg-zinc-50'
+            : 'border-b border-slate-200 bg-slate-50'
+        }
+      >
+        <div className="container-page py-8 sm:py-10">
+          <h1
+            className={
+              editorial
+                ? 'font-serif text-4xl font-semibold tracking-tight text-zinc-950 sm:text-5xl'
+                : 'font-display text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl'
+            }
+          >
+            {city.name}
+          </h1>
+          <p
+            className={
+              editorial
+                ? 'mt-3 max-w-2xl text-base leading-relaxed text-zinc-600 sm:text-lg'
+                : 'mt-3 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg'
+            }
+          >
+            {brief}
+          </p>
+          <p
+            className={`mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm ${
+              editorial ? 'text-zinc-500' : 'text-slate-500'
+            }`}
+          >
+            <span className={`font-semibold ${editorial ? 'text-zinc-800' : 'text-slate-700'}`}>
+              {pluralEvents(stats.events)}
+            </span>
+            <span aria-hidden="true" className={editorial ? 'text-zinc-300' : 'text-slate-300'}>
               ·
             </span>
-            <span className="font-semibold text-white">{pluralVenues(stats.venues)}</span>
+            <span className={`font-semibold ${editorial ? 'text-zinc-800' : 'text-slate-700'}`}>
+              {pluralVenues(stats.venues)}
+            </span>
           </p>
-          <div className="mt-6 flex flex-wrap gap-3">
+          <div className="mt-5 flex flex-wrap gap-3">
             <a
               href="#affiche"
               onClick={(event) => {
                 event.preventDefault();
                 scrollToSection('affiche');
               }}
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-primary-700 hover:bg-primary-50"
+              className={
+                editorial
+                  ? 'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-zinc-950 px-5 text-sm font-medium text-white ring-1 ring-zinc-950 transition hover:bg-zinc-800'
+                  : 'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white hover:bg-primary-700'
+              }
             >
               <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
               <span>События {cityIn}</span>
@@ -610,15 +564,19 @@ function CityHeroDefault({
                   event.preventDefault();
                   scrollToSection('travel');
                 }}
-                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-white/25 px-5 text-sm font-semibold text-white hover:bg-white/10"
+                className={
+                  editorial
+                    ? 'inline-flex min-h-11 items-center justify-center rounded-full border border-zinc-300 bg-white px-5 text-sm font-medium text-zinc-700 hover:border-zinc-400'
+                    : 'inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 hover:border-slate-300'
+                }
               >
                 Как добраться
               </a>
             ) : null}
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }
 
