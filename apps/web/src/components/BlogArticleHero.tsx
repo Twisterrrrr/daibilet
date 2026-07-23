@@ -87,7 +87,7 @@ export function BlogArticleHero({
               </h1>
 
               {description ? (
-                <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/88 sm:text-lg sm:leading-[1.55]">
+                <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/88 sm:text-lg sm:leading-[1.55]">
                   {description}
                 </p>
               ) : null}
