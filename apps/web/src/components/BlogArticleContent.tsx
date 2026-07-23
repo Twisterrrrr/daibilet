@@ -10,6 +10,26 @@ import { handleBlogLinkClick } from '@/lib/blog-navigate';
 
 const IMAGE_BLOCK_REGEX = /^\[image\s+side=(left|right)\s+src="([^"]+)"(?:\s+alt="([^"]*)")?\]$/i;
 const MD_IMAGE_LINE_REGEX = /^!\[([^\]]*)\]\(([^)]+)\)$/;
+const QUOTE_ATTRS = String.raw`((?:[^\]"]|"[^"]*")+)`;
+const QUOTE_REGEX = new RegExp(String.raw`^\[QUOTE\s+${QUOTE_ATTRS}\]$`, 'i');
+
+export type ParsedQuote = { text: string; cite?: string };
+
+export function parseQuoteBlock(block: string): ParsedQuote | null {
+  const trimmed = block.trim();
+  const match = trimmed.match(QUOTE_REGEX);
+  if (!match?.[1]) return null;
+  const attrs: Record<string, string> = {};
+  const attrRegex = /(\w+)="([^"]*)"/g;
+  let attrMatch: RegExpExecArray | null;
+  while ((attrMatch = attrRegex.exec(match[1])) !== null) {
+    attrs[attrMatch[1]] = attrMatch[2];
+  }
+  const text = String(attrs.text || '').trim();
+  if (!text) return null;
+  const cite = String(attrs.cite || '').trim();
+  return cite ? { text, cite } : { text };
+}
 
 export type ParsedImageBlock = {
   side: 'left' | 'right';
@@ -46,6 +66,7 @@ type ContentBlock =
   | { type: 'ol'; items: string[] }
   | { type: 'table'; lines: string[] }
   | { type: 'image'; image: ParsedImageBlock }
+  | { type: 'quote'; data: ParsedQuote }
   | { type: 'cta'; data: ReturnType<typeof parseCtaBlock> & object }
   | { type: 'buy'; data: NonNullable<ReturnType<typeof parseBuyBlock>> }
   | { type: 'note'; data: NonNullable<ReturnType<typeof parseNoteBlock>> };
@@ -140,14 +161,20 @@ function isUnorderedListLine(line: string): boolean {
   return line.trim().startsWith('- ');
 }
 
+function isBlockquoteLine(line: string): boolean {
+  return line.trim().startsWith('>');
+}
+
 function isSpecialLine(line: string): boolean {
   const trimmed = line.trim();
   if (!trimmed) return true;
   if (parseCtaBlock(trimmed)) return true;
   if (parseNoteBlock(trimmed)) return true;
+  if (parseQuoteBlock(trimmed)) return true;
   if (parseBuyBlock(trimmed)) return true;
   if (parseImageBlock(trimmed)) return true;
   if (isTableLine(trimmed)) return true;
+  if (isBlockquoteLine(trimmed)) return true;
   if (trimmed.startsWith('## ') || trimmed.startsWith('### ')) return true;
   if (isStandaloneBoldHeading(trimmed)) return true;
   if (isOrderedListLine(trimmed) || isUnorderedListLine(trimmed)) return true;
@@ -191,6 +218,28 @@ export function parseContentBlocks(content: string): ContentBlock[] {
       flushParagraph();
       blocks.push({ type: 'note', data: note });
       index += 1;
+      continue;
+    }
+
+    const quoteShort = parseQuoteBlock(line);
+    if (quoteShort) {
+      flushParagraph();
+      blocks.push({ type: 'quote', data: quoteShort });
+      index += 1;
+      continue;
+    }
+
+    if (isBlockquoteLine(line)) {
+      flushParagraph();
+      const quoteLines: string[] = [];
+      while (index < lines.length) {
+        const quoteLine = lines[index].trim();
+        if (!isBlockquoteLine(quoteLine)) break;
+        quoteLines.push(quoteLine.replace(/^>\s?/, ''));
+        index += 1;
+      }
+      const text = quoteLines.join('\n').trim();
+      if (text) blocks.push({ type: 'quote', data: { text } });
       continue;
     }
 
@@ -361,7 +410,7 @@ function BlogFigure({
 
   return (
     <figure className={className}>
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-slate-200/80 shadow-md">
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm border border-slate-200/70 bg-slate-100 shadow-sm">
         <SafeImage
           src={image.src}
           alt={image.alt}
@@ -370,6 +419,11 @@ function BlogFigure({
           className="object-cover"
         />
       </div>
+      {image.alt ? (
+        <figcaption className="mt-2 text-xs leading-relaxed text-slate-500 sm:text-[0.8rem]">
+          {image.alt}
+        </figcaption>
+      ) : null}
     </figure>
   );
 }
@@ -414,11 +468,26 @@ function renderParagraphNodes(
   return paragraphs.map((text, paragraphIndex) => (
     <p
       key={`${keyPrefix}-p-${paragraphIndex}`}
-      className={paragraphIndex === 0 && isLead ? LEAD_PARAGRAPH_CLASS : PARAGRAPH_CLASS}
+      className={
+        paragraphIndex === 0 && isLead
+          ? `${LEAD_PARAGRAPH_CLASS} blog-dropcap`
+          : PARAGRAPH_CLASS
+      }
     >
       {renderInline(text, `${keyPrefix}-${paragraphIndex}-`)}
     </p>
   ));
+}
+
+function BlogPullQuote({ text, cite }: ParsedQuote) {
+  return (
+    <blockquote className="blog-pullquote my-10 border-l-[3px] border-slate-900 pl-5 sm:my-12 sm:pl-6">
+      <p className="text-xl font-medium leading-[1.35] text-slate-900 sm:text-2xl sm:leading-[1.3]">
+        {renderInline(text, 'quote-')}
+      </p>
+      {cite ? <cite className="mt-3 block text-sm not-italic text-slate-500">- {cite}</cite> : null}
+    </blockquote>
+  );
 }
 
 function BlogFlexRow({
@@ -434,7 +503,7 @@ function BlogFlexRow({
   const contentNode = <div className="min-w-0 flex-1 [&>p+p]:mt-[1.275em]">{children}</div>;
 
   return (
-    <div className="my-8 flex flex-col gap-6 rounded-2xl border border-slate-200/80 bg-slate-50/60 p-4 sm:flex-row sm:items-start sm:gap-8 sm:p-6">
+    <div className="my-8 flex flex-col gap-6 border border-slate-200/70 bg-slate-50/40 p-4 sm:flex-row sm:items-start sm:gap-8 sm:p-5">
       {imageSide === 'left' ? (
         <>
           {imageNode}
@@ -455,9 +524,9 @@ function tableRowsFromBlock(block: Extract<ContentBlock, { type: 'table' }>): st
 }
 
 const PARAGRAPH_CLASS =
-  'text-[1.0625rem] leading-[1.75] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-lg sm:leading-[1.8]';
+  'text-base leading-[1.6] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-[1.0625rem] sm:leading-[1.6]';
 const LEAD_PARAGRAPH_CLASS =
-  'text-[1.0625rem] leading-[1.75] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-lg sm:leading-[1.8]';
+  'text-[1.0625rem] leading-[1.6] text-pretty text-slate-800 [overflow-wrap:break-word] sm:text-lg sm:leading-[1.55]';
 
 function normalizeImageSrc(src: string): string {
   const trimmed = src.trim();
@@ -581,13 +650,17 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(<BlogArticleNote key={`note-${index}`} {...block.data} />);
         isLeadParagraph = false;
         break;
+      case 'quote':
+        nodes.push(<BlogPullQuote key={`quote-${index}`} {...block.data} />);
+        isLeadParagraph = false;
+        break;
       case 'buy':
         nodes.push(<BlogBuyButton key={`buy-${index}`} {...block.data} />);
         isLeadParagraph = false;
         break;
       case 'image':
         nodes.push(
-          <div key={`img-${index}`} className="my-8">
+          <div key={`img-${index}`} className="my-10">
             <BlogFigure image={block.image} className="mx-auto w-full max-w-2xl" />
           </div>,
         );
@@ -597,7 +670,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <h2
             key={`h2-${index}`}
-            className="scroll-mt-24 mb-3 font-display text-[1.35rem] font-bold tracking-tight text-slate-950 sm:text-2xl lg:text-[1.65rem] [&:not(:first-child)]:mt-8 [&:not(:first-child)]:pt-1"
+            className="scroll-mt-24 mb-3 font-serif text-[1.4rem] font-semibold tracking-tight text-slate-950 sm:text-[1.65rem] lg:text-[1.75rem] [&:not(:first-child)]:mt-10 [&:not(:first-child)]:pt-1"
           >
             {block.text}
           </h2>,
@@ -608,7 +681,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <h3
             key={`h3-${index}`}
-            className="scroll-mt-24 mb-2.5 font-display text-lg font-bold tracking-tight text-slate-950 sm:text-xl [&:not(:first-child)]:mt-6"
+            className="scroll-mt-24 mb-2.5 font-serif text-lg font-semibold tracking-tight text-slate-950 sm:text-xl [&:not(:first-child)]:mt-7"
           >
             {block.text}
           </h3>,
@@ -619,7 +692,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <ol
             key={`ol-${index}`}
-            className="my-4 list-decimal space-y-2 pl-6 text-[1.0625rem] leading-[1.75] text-pretty text-slate-800 marker:font-semibold marker:text-primary-600 sm:text-lg sm:leading-[1.8]"
+            className="my-4 list-decimal space-y-2 pl-6 text-base leading-[1.6] text-pretty text-slate-800 marker:font-semibold marker:text-primary-600 sm:text-[1.0625rem]"
           >
             {block.items.map((item, itemIndex) => (
               <li key={itemIndex} className="pl-1">
@@ -634,7 +707,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <ul
             key={`ul-${index}`}
-            className="my-4 list-disc space-y-2 pl-6 text-[1.0625rem] leading-[1.75] text-pretty text-slate-800 marker:text-primary-500 sm:text-lg sm:leading-[1.8]"
+            className="my-4 list-disc space-y-2 pl-6 text-base leading-[1.6] text-pretty text-slate-800 marker:text-primary-500 sm:text-[1.0625rem]"
           >
             {block.items.map((item, itemIndex) => (
               <li key={itemIndex} className="pl-1">
@@ -655,7 +728,10 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         break;
       case 'paragraph':
         nodes.push(
-          <p key={`p-${index}`} className={isLeadParagraph ? LEAD_PARAGRAPH_CLASS : PARAGRAPH_CLASS}>
+          <p
+            key={`p-${index}`}
+            className={isLeadParagraph ? `${LEAD_PARAGRAPH_CLASS} blog-dropcap` : PARAGRAPH_CLASS}
+          >
             {renderInline(block.text, `p-${index}-`)}
           </p>,
         );

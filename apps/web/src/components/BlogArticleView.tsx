@@ -1,14 +1,82 @@
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 import { BlogArticleHero } from '@/components/BlogArticleHero';
 import { BlogArticleContent } from '@/components/BlogArticleContent';
-import { BlogRelatedSidebar } from '@/components/BlogRelatedSidebar';
+import { parseCtaBlock } from '@/components/BlogArticleCta';
+import { BlogRelatedSidebar, type BlogSidebarLink } from '@/components/BlogRelatedSidebar';
 import { SiteLayout } from '@/components/SiteLayout';
 import { BLOG_POSTS } from '@/data/blog-posts';
-import { resolveBlogCityHref } from '@/lib/blog-article-city';
+import {
+  resolveBlogCityEventsHref,
+  resolveBlogCityHref,
+} from '@/lib/blog-article-city';
 import type { BlogArticleDto, BlogCardDto } from '@/lib/blog-utils';
 import { estimateReadMin, formatBlogPublishedAt } from '@/lib/blog-utils';
+
+function buildTopicLinks(article: BlogArticleDto): BlogSidebarLink[] {
+  const links: BlogSidebarLink[] = [];
+  const cityHref = resolveBlogCityHref(article.city, article.citySlug);
+  const eventsHref = resolveBlogCityEventsHref(article.city, article.citySlug);
+
+  if (cityHref && article.city) {
+    links.push({
+      href: cityHref,
+      label: `Афиша ${article.city}`,
+      hint: 'Городской хаб и подборки',
+    });
+  }
+  if (eventsHref && article.city) {
+    links.push({
+      href: eventsHref,
+      label: 'События на выходные',
+      hint: `Ближайшие даты в ${article.city}`,
+    });
+  }
+  if (article.citySlug) {
+    links.push({
+      href: `/blog?city=${encodeURIComponent(article.citySlug)}`,
+      label: 'Ещё материалы по городу',
+      hint: 'Фильтр блога',
+    });
+  }
+  links.push({
+    href: '/podborki',
+    label: 'Подборки Дайбилет',
+    hint: 'Готовые списки событий',
+  });
+
+  const content = String(article.content || '');
+  for (const line of content.split('\n')) {
+    const cta = parseCtaBlock(line.trim());
+    if (cta?.href) {
+      links.unshift({
+        href: cta.href,
+        label: cta.button || cta.title,
+        hint: cta.title,
+      });
+      break;
+    }
+  }
+
+  // Deduplicate by href
+  const seen = new Set<string>();
+  return links.filter((link) => {
+    if (seen.has(link.href)) return false;
+    seen.add(link.href);
+    return true;
+  });
+}
+
+function resolveArticleTag(article: BlogArticleDto): string | null {
+  const staticPost = BLOG_POSTS.find((post) => post.slug === article.slug);
+  if (staticPost?.tag) return staticPost.tag;
+  if (article.articleType === 'column') return 'Колонка';
+  if (article.articleType === 'obzor') return 'Обзор';
+  if (article.articleType === 'digest') return 'Дайджест';
+  if (article.city) return 'Город';
+  return 'Гид';
+}
 
 export function BlogArticleView({
   article,
@@ -23,6 +91,9 @@ export function BlogArticleView({
     BLOG_POSTS.find((post) => post.slug === article.slug)?.date || '',
   );
   const cityLink = resolveBlogCityHref(article.city, article.citySlug);
+  const eventsLink = resolveBlogCityEventsHref(article.city, article.citySlug);
+  const topicLinks = buildTopicLinks(article);
+  const tag = resolveArticleTag(article);
   const breadcrumbs = [
     { label: 'Главная', href: '/' },
     { label: 'Блог', href: '/blog' },
@@ -40,22 +111,81 @@ export function BlogArticleView({
           readMin={readMin}
           city={article.city}
           cityHref={cityLink}
+          tag={tag}
           authorName={article.authorName}
         />
 
         <main className="container-page relative z-10 py-10 sm:py-14">
-          <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_17.5rem] lg:items-start lg:gap-8 xl:grid-cols-[minmax(0,1fr)_19rem] xl:gap-10">
-            <article className="min-w-0 rounded-2xl border border-slate-200/90 bg-white px-5 py-8 shadow-sm sm:px-8 sm:py-10 md:px-10 md:py-11">
+          <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16.5rem] lg:items-start lg:gap-12 xl:grid-cols-[minmax(0,1fr)_18rem] xl:gap-14">
+            <article className="min-w-0 bg-white px-5 py-8 shadow-[0_1px_0_rgba(15,23,42,0.04)] sm:px-9 sm:py-11 md:px-12 md:py-12">
               <BlogArticleContent
                 content={article.content || article.excerpt || ''}
                 coverImageUrl={article.coverImageUrl}
               />
             </article>
 
-            <BlogRelatedSidebar posts={related} className="mt-10 lg:sticky lg:top-24 lg:mt-0" />
+            <BlogRelatedSidebar
+              posts={related}
+              topicLinks={topicLinks}
+              className="mt-12 lg:sticky lg:top-24 lg:mt-0"
+            />
           </div>
 
-          <footer className="mt-10 flex flex-col gap-4 border-t border-slate-200/80 pt-8 sm:flex-row sm:items-center sm:justify-between">
+          {(cityLink || eventsLink || related.length > 0) && (
+            <section className="mt-14 border-t border-slate-300/70 pt-10">
+              <h2 className="font-serif text-2xl font-semibold tracking-tight text-slate-950">
+                Дальше по теме
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
+                Афиша и материалы рядом с этим лонгридом - без виджетов внутри текста.
+              </p>
+
+              <div className="mt-6 flex flex-wrap gap-3">
+                {eventsLink ? (
+                  <Link
+                    href={eventsLink}
+                    className="inline-flex items-center gap-2 border border-slate-900 bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
+                  >
+                    Топ на выходные
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                ) : null}
+                {cityLink && article.city ? (
+                  <Link
+                    href={cityLink}
+                    className="inline-flex items-center gap-2 border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 transition hover:border-slate-500"
+                  >
+                    Хаб {article.city}
+                  </Link>
+                ) : null}
+                <Link
+                  href="/podborki"
+                  className="inline-flex items-center gap-2 border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 transition hover:border-slate-500"
+                >
+                  Подборки
+                </Link>
+              </div>
+
+              {related.length ? (
+                <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {related.slice(0, 3).map((post) => (
+                    <li key={`strip-${post.slug}`}>
+                      <Link href={`/blog/${post.slug}`} className="group block">
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
+                          {[post.tag, post.city].filter(Boolean).join(' · ') || 'Блог'}
+                        </p>
+                        <h3 className="mt-1 font-serif text-base font-semibold leading-snug text-slate-900 group-hover:text-primary-700">
+                          {post.title}
+                        </h3>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </section>
+          )}
+
+          <footer className="mt-10 flex flex-col gap-4 border-t border-slate-300/70 pt-8 sm:flex-row sm:items-center sm:justify-between">
             <Link
               href="/blog"
               className="inline-flex items-center gap-2 text-sm font-semibold text-primary-600 transition hover:text-primary-700"

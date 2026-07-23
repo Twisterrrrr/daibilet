@@ -72,8 +72,8 @@ export function BlogPostCard({
       <div className={['flex flex-1 flex-col', isLarge ? 'p-5 sm:p-6' : isSmall ? 'p-4' : 'p-5'].join(' ')}>
         <h2
           className={[
-            'font-bold leading-snug text-slate-900 group-hover:text-primary-700',
-            isLarge ? 'text-xl sm:text-2xl lg:text-[1.65rem]' : isSmall ? 'text-base sm:text-lg' : 'text-lg',
+            'font-serif font-semibold leading-snug text-slate-900 group-hover:text-primary-700',
+            isLarge ? 'text-xl sm:text-2xl lg:text-[1.75rem]' : isSmall ? 'text-base sm:text-[1.05rem]' : 'text-lg',
           ].join(' ')}
         >
           {post.title}
@@ -81,7 +81,7 @@ export function BlogPostCard({
         <p
           className={[
             'mt-2 flex-1 leading-relaxed text-slate-600',
-            isLarge ? 'line-clamp-4 text-sm sm:text-base' : isSmall ? 'line-clamp-2 text-sm' : 'line-clamp-3 text-sm',
+            isLarge ? 'line-clamp-4 text-sm sm:text-base' : isSmall ? 'line-clamp-2 text-xs sm:text-sm' : 'line-clamp-3 text-sm',
           ].join(' ')}
         >
           {post.excerpt}
@@ -89,7 +89,7 @@ export function BlogPostCard({
         <div
           className={[
             'mt-4 flex flex-wrap items-center gap-3 text-slate-500',
-            isLarge ? 'text-sm' : 'text-xs',
+            isLarge ? 'text-xs sm:text-sm' : 'text-[11px]',
           ].join(' ')}
         >
           {post.authorName || post.authorId ? (

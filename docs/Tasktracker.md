@@ -165,7 +165,7 @@
 | B.17 | Регрессионные unit-тесты B.15+B.16 (image URL + fake open-date / meta purchase) | Высокий | ✅ 2026-07-19 |
 | B.18 | Колонка Артура «На вкус»: `kazan-na-vkus-master-klassy` (МК Эчпочмака + гастроужин) | Критический | ✅ 2026-07-22 @93d3a07 + upsert |
 | B.19 | Колонка Елены: `spb-s-rebenkom-v-dozhd` (СПб с ребёнком в дождь) | Критический | ✅ 2026-07-22 upsert + revalidate |
-| B.20 | `/blog` magazine layout: 2/3+1/3 + зеркало; city hub teasers то же | Высокий | 🔄 |
+| B.20 | `/blog` magazine layout: listing asymmetric + article journal (serif/dropcap/quotes/sidebar) | Высокий | 🔄 |
 
 ---
 
@@ -495,6 +495,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-23 | B.20: blog magazine full scope - listing asymmetric + article serif/dropcap/quotes/topic sidebar |
 | 2026-07-23 | B.20: `/blog` asymmetric magazine grid (large 2/3 + 2 small; mirror); city hub teasers |
 | 2026-07-23 | F4.5: Next taxonomy + ticket-link + landing candidates + Reviews + ECR; Vite remain for schedule/blocks/buyers; retire not yet |
 | 2026-07-23 | F4.6: admin preview статей `/admin/articles/[id]/preview` (noindex, Basic Auth, status+publishedAt banner) |

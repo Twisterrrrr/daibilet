@@ -8,7 +8,7 @@ export type ParsedNote = {
 };
 
 /**
- * Внутри text= часто есть markdown-ссылки `[анкор](url)` — нельзя резать по первому `]`.
+ * Внутри text= часто есть markdown-ссылки `[анкор](url)` - нельзя резать по первому `]`.
  * `(?:[^\]"]|"[^"]*")+` допускает `]` только внутри кавычек атрибутов.
  */
 const NOTE_ATTRS = String.raw`((?:[^\]"]|"[^"]*")+)`;
@@ -84,17 +84,17 @@ function renderNoteInline(text: string): React.ReactNode[] {
 type BlogArticleNoteProps = ParsedNote;
 
 /**
- * Нативная mid-article плашка «Важно» для путеводителей.
- * Markdown в статьях: [NOTE label="Важно" text="… [Ссылка](https://daibilet.ru/…)."]
+ * Magazine inset «Важно» для путеводителей.
+ * Markdown: [NOTE label="Важно" text="… [Ссылка](https://daibilet.ru/…)."]
  */
 export function BlogArticleNote({ label, text }: BlogArticleNoteProps) {
   return (
     <aside
-      className="my-8 rounded-xl border border-amber-200/90 bg-amber-50/90 px-4 py-4 shadow-sm sm:px-5 sm:py-4"
+      className="my-10 border-l-[3px] border-amber-500 bg-amber-50/70 py-4 pl-4 pr-3 sm:my-12 sm:pl-5 sm:pr-4"
       role="note"
     >
-      <p className="text-[0.7rem] font-bold uppercase tracking-[0.12em] text-amber-900/80">{label}</p>
-      <p className="mt-1.5 text-base leading-7 text-amber-950/95 sm:text-[1.05rem] sm:leading-7">
+      <p className="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-amber-900/75">{label}</p>
+      <p className="mt-1.5 text-base leading-[1.55] text-amber-950/95 sm:text-[1.05rem] sm:leading-[1.55]">
         {renderNoteInline(text)}
       </p>
     </aside>

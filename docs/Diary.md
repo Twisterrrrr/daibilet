@@ -17,7 +17,25 @@
 
 ---
 
-## 2026-07-23 - Blog listing magazine layout
+## 2026-07-23 - Blog magazine full scope (listing + article)
+
+### Наблюдения
+
+- Listing уже имел asymmetric grid (`45b013b`); статья оставалась «карточной» с display Grotesk и без journal anatomy.
+- В бренде уже есть Source Serif 4 (`--font-serif`) и Space Grotesk - для longread берём serif, body Inter.
+
+### Решения
+
+- Article: hero с serif H1 + lead; drop cap; pull quotes (`>` и `[QUOTE]`); NOTE как magazine inset; body 16-18px / lh ~1.6.
+- Sidebar: «По теме» (city hub / events / blog filter / CTA из MD) + компактные related.
+- Низ статьи: strip «Дальше по теме» без inline widget.
+- Listing: serif на large titles, больше white space между рядами.
+
+### Проблемы
+
+- Sticky «живые» события из public API / TC widget внутри MD - v2.
+
+---
 
 ### Наблюдения
 

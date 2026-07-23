@@ -104,7 +104,7 @@ export function BlogMagazineGrid({ posts }: { posts: BlogCardDto[] }) {
   const rows = buildMagazineRows(posts);
 
   return (
-    <div className="flex flex-col gap-10 sm:gap-12">
+    <div className="flex flex-col gap-12 sm:gap-14 lg:gap-16">
       {rows.map((row, index) => {
         if (row.kind === 'trio') {
           return (

@@ -33,11 +33,11 @@ export function BlogListView({
         description="Как выбирать события, где сидеть, куда идти с детьми и что послушать в этом сезоне."
       />
 
-      <main className="container-page py-10 sm:py-12">
+      <main className="container-page py-10 sm:py-14">
         <BlogListFiltered posts={posts} initialFilters={filters} />
 
-        <p className="mt-10 text-sm text-slate-500">
-          Новые материалы выходят каждую неделю. А готовые списки событий — в{' '}
+        <p className="mt-12 text-sm text-slate-500">
+          Новые материалы выходят каждую неделю. А готовые списки событий - в{' '}
           <Link href="/podborki" className="font-medium text-primary-600 hover:text-primary-700">
             подборках
           </Link>
