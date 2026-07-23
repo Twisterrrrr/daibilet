@@ -106,17 +106,20 @@ export function HeroLayout({
         {breadcrumbs?.length ? <PageBreadcrumbBar items={breadcrumbs} /> : null}
         <section className={`border-b border-slate-200 ${t.section} ${className}`.trim()}>
           <div className="container-page py-8 sm:py-10">
-            {brand ? <div className={`font-display text-sm font-bold tracking-[0.18em] uppercase ${t.brand}`}>{brand}</div> : null}
-            {eyebrow ? <p className={`text-sm font-semibold uppercase tracking-wider ${t.eyebrow} ${brand ? 'mt-2' : ''}`}>{eyebrow}</p> : null}
-            <h1
-              className={`font-display text-3xl font-extrabold tracking-tight sm:text-4xl ${t.title} ${
-                brand || eyebrow ? 'mt-2' : ''
-              }`}
-            >
-              {title}
-            </h1>
-            {description ? <p className={`mt-3 max-w-2xl text-base leading-relaxed sm:text-lg ${t.description}`}>{description}</p> : null}
-            {children}
+            {/* One centered column: H1 + children share the same max-w axis (no nested left-biased max-w). */}
+            <div className="mx-auto w-full max-w-5xl">
+              {brand ? <div className={`font-display text-sm font-bold tracking-[0.18em] uppercase ${t.brand}`}>{brand}</div> : null}
+              {eyebrow ? <p className={`text-sm font-semibold uppercase tracking-wider ${t.eyebrow} ${brand ? 'mt-2' : ''}`}>{eyebrow}</p> : null}
+              <h1
+                className={`font-display text-3xl font-extrabold tracking-tight sm:text-4xl ${t.title} ${
+                  brand || eyebrow ? 'mt-2' : ''
+                }`}
+              >
+                {title}
+              </h1>
+              {description ? <p className={`mt-3 max-w-2xl text-base leading-relaxed sm:text-lg ${t.description}`}>{description}</p> : null}
+              {children}
+            </div>
           </div>
         </section>
       </>

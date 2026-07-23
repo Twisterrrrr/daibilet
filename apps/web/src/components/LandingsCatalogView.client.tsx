@@ -84,11 +84,11 @@ export function LandingsCatalogView({
         title="Подборки событий"
         description="Готовые списки под настроение и повод: вечер, выходные, бюджет или редкие премьеры."
       >
-        {/* Featured + trending: equal-height, centered content width (not full-bleed 70/30 extremes). */}
+        {/* Featured + trending: equal-height row inside HeroLayout max-w-5xl (same axis as H1). */}
         <div
           className={
             trending.length
-              ? 'mx-auto mt-6 grid w-full max-w-5xl items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(14rem,1fr)] lg:gap-5'
+              ? 'mt-6 grid w-full items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(14rem,1fr)] lg:gap-5'
               : 'mt-6'
           }
         >
@@ -130,7 +130,7 @@ export function LandingsCatalogView({
           )}
 
           {trending.length ? (
-            <div className="flex h-full min-h-[14rem] flex-col rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:min-h-[16rem]">
+            <div className="flex h-full min-h-[14rem] flex-col self-stretch rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:min-h-[16rem]">
               <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">В тренде</p>
               <ul className="space-y-2">
                 {trending.map((item, index) => (

@@ -18,7 +18,7 @@ import {
   type BlogCardDto,
 } from '@/lib/blog-utils';
 
-/** LCP hero: full width on mobile, ~2/3 of max-w-5xl composition on desktop. */
+/** LCP hero: full width of container-page; ~2/3 + aside on desktop. */
 const FEATURED_IMAGE_SIZES = '(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 42vw';
 const SIDEBAR_PROMO_IMAGE = '/images/blog/blog-hero-promo.jpg';
 const SIDEBAR_PROMO_SIZES = '(max-width: 1024px) 100vw, 22vw';
@@ -98,7 +98,7 @@ export function BlogFeaturedHero({
   return (
     <section
       aria-label="Главная статья блога"
-      className="mx-auto mb-8 grid w-full max-w-5xl items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(16rem,1fr)] lg:gap-5"
+      className="mb-8 grid w-full items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(16rem,1fr)] lg:gap-5"
     >
       <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <Link

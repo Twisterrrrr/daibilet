@@ -25,7 +25,7 @@ export function RussiaMap({ className = '' }: { className?: string }) {
 
   return (
     <div
-      className={`flex h-full min-h-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`.trim()}
+      className={`flex h-full min-h-0 flex-col self-stretch overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm ${className}`.trim()}
       role="navigation"
       aria-label="Популярные города"
     >

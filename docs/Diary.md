@@ -1,3 +1,22 @@
+## 2026-07-24 - /cities: симметрия H1 + сетка (одна ось max-w-5xl)
+
+### Наблюдения
+
+- После `d1ccd8a` владелец: левый отступ viewport→карточки меньше правого от aside→край. Причина: H1 на полной `container-page` (`max-w-7xl`), а композиция с вложенным `mx-auto max-w-5xl` - визуально/осево left-biased относительно title. Та же ловушка на `/podborki` (H1 wide, row nested) и `/blog` featured внутри wider parent.
+
+### Решения
+
+- `HeroLayout` `minimal`: один `mx-auto max-w-5xl` вокруг brand/H1/description/**children** - общая ось для `/cities` и `/podborki`.
+- Убран nested `max-w-5xl` у children на `/cities` и `/podborki` (остаётся `items-stretch` grid).
+- `/blog` `BlogFeaturedHero`: убран nested `max-w-5xl` - ряд на ширине того же `container-page`, что и search hero выше.
+- `RussiaMap` / trending: `self-stretch` + flex-col (стрелка/низ aside к низу сетки). Облачную карту не возвращали.
+
+### Проблемы
+
+- Deploy + smoke после commit.
+
+---
+
 ## 2026-07-24 - /cities: top tiles + «Популярные города» без белой дыры
 
 ### Наблюдения

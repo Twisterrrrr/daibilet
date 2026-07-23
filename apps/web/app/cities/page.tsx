@@ -37,12 +37,12 @@ export default async function CitiesIndexPage() {
         title="Города России"
         description="Выберите город - покажем афишу, площадки и подборки с актуальными билетами."
       >
-        {/* Top tiles + popular cities: one centered composition (same spacing as /podborki). */}
+        {/* Top tiles + aside: full width of HeroLayout max-w-5xl column (H1 shares the same axis). */}
         <div
           className={
             topCities.length
-              ? 'mx-auto mt-6 grid w-full max-w-5xl items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(14rem,1fr)] lg:gap-5'
-              : 'mx-auto mt-6 w-full max-w-5xl'
+              ? 'mt-6 grid w-full items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(14rem,1fr)] lg:gap-5'
+              : 'mt-6 w-full'
           }
         >
           {topCities.length ? (
@@ -54,7 +54,7 @@ export default async function CitiesIndexPage() {
               ))}
             </ul>
           ) : null}
-          <RussiaMap className="h-full min-h-[14rem]" />
+          <RussiaMap className="h-full min-h-[14rem] self-stretch" />
         </div>
       </HeroLayout>
       <div className="container-page bg-slate-50 py-10">
