@@ -1,3 +1,40 @@
+## 2026-07-23 - `/blog` large card: ниже cover, длиннее excerpt
+
+### Наблюдения
+
+- Владелец: крупный блок magazine (фото) «не информативно» - слишком tall cover, excerpt в 1-2 строки.
+
+### Решения
+
+- `BlogPostCard` large/mirrored: cover `aspect-[2/1]` вместо `lg:flex-1` (больше не растягивается на row-span-2); текст + chips на `flex-1`.
+- Excerpt large: `line-clamp-6`; на `/blog` excerpt расширяется из lead body (`expandListingExcerpt`, ~420 символов). Small cards без изменений layout.
+- Quick-links chips сохранены.
+
+### Проблемы
+
+- Нет.
+
+---
+
+## 2026-07-23 - Единый нейтральный strip шапок
+
+### Наблюдения
+
+- Владелец: уравнять шапки каталога, статей, города и подборок. У блога уже был strip `bg-slate-50` + H1; у `/podborki` - fuchsia gradient; у city hub - full-bleed photo; у `/events` - H1 внутри контента без strip.
+
+### Решения
+
+- Канон: `SectionPageHero` = `PageBreadcrumbBar` + `bg-slate-50` + H1 `font-display` + короткий support. `gradientClass` deprecated/ignored.
+- Применено: `/events`, `/blog` (`BlogListHero` wrapper), city hub (без фото), `/podborki`, intent pages.
+- `CatalogShell` больше не дублирует H1 - только счётчик + controls.
+- City photo hero снят по явной просьбе уравнять; фото остаётся на карточках города/афише.
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-23 - `/blog` listing: нейтральная шапка
 
 ### Наблюдения

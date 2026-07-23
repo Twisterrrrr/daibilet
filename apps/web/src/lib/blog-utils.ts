@@ -45,6 +45,42 @@ export function estimateReadMin(text?: string | null): number {
   return Math.max(3, Math.round(words / 180));
 }
 
+/** Plain lead from static body for listing teaser (large cards need a full paragraph). */
+function plainLeadFromBody(slug: string): string {
+  const body = BLOG_ARTICLE_BODIES[slug];
+  if (!body) return '';
+  return body
+    .replace(/\[image[^\]]*\]/gi, ' ')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/^#{1,6}\s+.+$/gm, ' ')
+    .replace(/^\|.*$/gm, ' ')
+    .replace(/\*{1,2}([^*]+)\*{1,2}/g, '$1')
+    .replace(/_{1,2}([^_]+)_{1,2}/g, '$1')
+    .replace(/`+/g, '')
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 40 && !/^авторская колонка/i.test(line))
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** Longer listing excerpt: short frontmatter + lead, capped for ~5-6 lines. */
+export function expandListingExcerpt(slug: string, excerpt: string, maxChars = 420): string {
+  const base = String(excerpt || '').trim();
+  const lead = plainLeadFromBody(slug);
+  if (!lead) return base;
+
+  const baseKey = base.slice(0, 48).toLowerCase();
+  const leadHasBase = Boolean(baseKey) && lead.toLowerCase().includes(baseKey);
+  const combined = !base ? lead : leadHasBase ? lead : `${base} ${lead}`;
+  if (combined.length <= maxChars) return combined;
+
+  const sliced = combined.slice(0, maxChars).replace(/\s+\S*$/, '').trim();
+  return sliced || base || lead.slice(0, maxChars);
+}
+
 function enrichCardFields(slug: string, partial: Partial<BlogCardDto>): Pick<
   BlogCardDto,
   'city' | 'citySlug' | 'authorId' | 'authorName' | 'articleType' | 'tag'

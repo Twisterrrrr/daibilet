@@ -92,13 +92,14 @@ export function BlogPostCard({
   ].join(' ');
 
   // Large: article + отдельные ссылки снизу (как city hub), иначе nested <a> ломает разметку.
+  // Cover: fixed 2:1 (не lg:flex-1) - иначе фото съедает высоту row-span-2; текст/chips получают flex-1.
   if (isLarge) {
     return (
       <article className={cardShell}>
         <Link
           href={articleHref}
           aria-label={post.title}
-          className="relative block aspect-[16/10] min-h-[12rem] shrink-0 overflow-hidden bg-slate-200 sm:min-h-[14rem] lg:aspect-auto lg:min-h-[16rem] lg:flex-1"
+          className="relative block aspect-[2/1] min-h-[9.5rem] shrink-0 overflow-hidden bg-slate-200 sm:min-h-[11rem]"
         >
           <SafeImage
             src={post.coverImageUrl}
@@ -114,7 +115,7 @@ export function BlogPostCard({
           />
           <CoverBadges post={post} tag={tag} />
         </Link>
-        <div className="flex min-w-0 flex-col justify-between p-5 sm:p-6">
+        <div className="flex min-w-0 flex-1 flex-col justify-between p-5 sm:p-6">
           <div className="min-w-0">
             <h2 className="font-display text-xl font-bold leading-snug text-slate-900 sm:text-2xl lg:text-[1.75rem]">
               <Link href={articleHref} className="hover:text-primary-700">
@@ -122,7 +123,7 @@ export function BlogPostCard({
               </Link>
             </h2>
             {excerpt ? (
-              <p className="mt-2 line-clamp-4 text-sm leading-relaxed text-slate-600 sm:text-base">
+              <p className="mt-2.5 line-clamp-6 text-sm leading-relaxed text-slate-600 sm:text-base sm:leading-[1.55]">
                 {excerpt}
               </p>
             ) : null}

@@ -4,7 +4,7 @@ import { Suspense } from 'react';
 import { BlogListView } from '@/components/BlogListView';
 import '@/lib/env';
 import { buildBlogListMetadata } from '@/lib/blog-article-seo';
-import { mergeBlogCards } from '@/lib/blog-utils';
+import { expandListingExcerpt, mergeBlogCards } from '@/lib/blog-utils';
 import { buildPublicArticlesListDto } from '@daibilet/backend/public-read';
 
 export const metadata: Metadata = buildBlogListMetadata();
@@ -20,6 +20,13 @@ function firstParam(value: string | string[] | undefined): string | undefined {
   return value;
 }
 
+function withListingExcerpts(posts: ReturnType<typeof mergeBlogCards>) {
+  return posts.map((post) => ({
+    ...post,
+    excerpt: expandListingExcerpt(post.slug, post.excerpt),
+  }));
+}
+
 export default async function BlogPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const filters = {
@@ -27,10 +34,10 @@ export default async function BlogPage({ searchParams }: PageProps) {
     author: firstParam(params.author),
   };
 
-  let posts = mergeBlogCards(null);
+  let posts = withListingExcerpts(mergeBlogCards(null));
   try {
     const payload = await buildPublicArticlesListDto();
-    posts = mergeBlogCards(payload?.articles);
+    posts = withListingExcerpts(mergeBlogCards(payload?.articles));
   } catch {
     // fallback to static posts
   }

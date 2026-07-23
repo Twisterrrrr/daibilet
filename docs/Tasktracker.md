@@ -15,6 +15,7 @@
 | I.2 | Web follow-up: SiteLayout Suspense fallback + CatalogShell SSR keep (rebuild) | Высокий | ⏳ в worktree `daibilet-push` |
 | I.3 | Telegram OG: WebpageBot видит, чаты нет; площадки без title/desc | Критический | 🔄 nginx→social-preview + venue twitter ✅ `1c81cdf`; **блокер: AAAA всё ещё в DNS** |
 | I.4 | Infinite full-page reload (`/blog`+): ChunkLoadRecovery матчил hydration #418 по chunk filename | Критический | ✅ `85b8cfe` + deploy-prod-next |
+| UI.1 | Единый нейтральный strip шапок: `/events`, `/blog`, city hub, `/podborki` (+ intents) | Высокий | 🔄 commit+deploy |
 
 ---
 
@@ -171,6 +172,7 @@
 | B.19 | Колонка Елены: `spb-s-rebenkom-v-dozhd` (СПб с ребёнком в дождь) | Критический | ✅ 2026-07-22 upsert + revalidate |
 | B.20 | `/blog` magazine layout: listing asymmetric + article journal (serif/dropcap/quotes/sidebar) | Высокий | ✅ `a4ecab6` |
 | B.21 | Blog typography: откат Source Serif → site `font-display`; убрать dropcap | Критический | ✅ `230ebc2` (prod includes via `6656adf`+) |
+| B.22 | `/blog` large card: cover 2:1 (не flex-fill) + excerpt ~6 строк из lead | Высокий | 🔄 2026-07-23 |
 
 ---
 
