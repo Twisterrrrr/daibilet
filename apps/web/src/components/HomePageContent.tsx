@@ -24,11 +24,11 @@ import '@/lib/env';
 import { getHomePageData } from '@/server/cached-home-data';
 import { formatMoney, pluralEvents } from '@/lib/format';
 import { buildHomePageSections } from '@/lib/home-page-sections';
-import { pickHomeHeroImage } from '@/lib/home-hero-images';
 import { HOME_FORMAT_TILES, HOME_TRUST_ITEMS } from '@/lib/home-scenarios';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { venueHref } from '@/lib/routes';
 import { venuePageTemplate } from '@/lib/venue-meta';
+import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
 
 function promoGradient(index: number): string {
   const variants = [
@@ -55,19 +55,14 @@ function promoBlockIcon(slug: string, index: number) {
 }
 
 export async function HomePageContent() {
-  // Per-request hero pick (avoids ISR baking one frame for all visitors).
-  // Catalog/stats still come from unstable_cache in getHomePageData.
+  // Per-request boundary so hero banners are not frozen into one ISR frame.
   await connection();
 
-  const { destinationsPayload, catalogPayload, landingsCatalog, venuesPayload, statsPayload } =
-    await getHomePageData();
+  const { destinationsPayload, catalogPayload, landingsCatalog, venuesPayload } = await getHomePageData();
 
   const destinations = destinationsPayload?.destinations ?? [];
   const cities = destinations.filter((item) => item.type === 'city');
   const topCities = [...cities].sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')).slice(0, 8);
-  const totalEvents = statsPayload?.stats?.events ?? 0;
-  const totalVenues = statsPayload?.stats?.venues ?? 0;
-  const cityCount = statsPayload?.stats?.destinations || cities.length;
 
   const sessions = catalogPayload?.items ?? [];
   const { editorsPick, homeNowTabs, popular } = buildHomePageSections(sessions);
@@ -91,17 +86,12 @@ export async function HomePageContent() {
     : [...blogCards].reverse();
   const blogPosts = orderedBlog.slice(0, 4);
   const [featuredBlog, ...restBlog] = blogPosts;
-  const heroImage = pickHomeHeroImage();
+  const heroBanners = await getActiveHeroBanners();
+  const heroFrames = heroFramesFromBanners(heroBanners);
 
   return (
     <>
-      <HomeHero
-        destinations={destinations}
-        totalEvents={totalEvents}
-        totalVenues={totalVenues}
-        cityCount={cityCount}
-        heroImage={heroImage}
-      />
+      <HomeHero destinations={destinations} frames={heroFrames} />
 
       <HomeEventRail
         id="editors-pick"

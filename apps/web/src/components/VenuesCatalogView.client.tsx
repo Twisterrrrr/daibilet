@@ -7,6 +7,8 @@ import { Grid3X3, List, Search } from 'lucide-react';
 
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { InstitutionList } from '@/components/InstitutionListRow.client';
+import { HeroLayout } from '@/components/HeroLayout';
+import { HeroMedia } from '@/components/HeroMedia.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicVenueDto } from '@daibilet/contracts/public';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
@@ -14,6 +16,11 @@ import { formatNumber } from '@/lib/format';
 import { persistSelectedCity } from '@/lib/selected-city';
 import { INSTITUTION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
+
+const VENUES_HERO_FRAMES = [
+  { src: '/images/hero/hero-slavic-03.png', alt: 'Зал музея или театра' },
+  { src: '/images/hero/hero-slavic-05.png', alt: 'Городская площадка' },
+];
 
 type SortMode = 'events' | 'asc' | 'desc';
 type ViewMode = 'cards' | 'list';
@@ -130,63 +137,62 @@ export function VenuesCatalogView({ venues }: { venues: PublicVenueDto[] }) {
 
   return (
     <>
-      <section className="border-b border-slate-200 bg-gradient-to-br from-sky-500 via-primary-600 to-indigo-700 text-white">
-        <div className="container-page py-10 md:py-14">
-          <p className="text-sm font-semibold uppercase tracking-wider text-white/70">
-            {venues.length ? `${formatNumber(venues.length)} площадок` : '0 площадок'}
-            {cityCount ? (
-              <>
-                {' '}
-                · {cityCount} {cityCount === 1 ? 'город' : cityCount >= 2 && cityCount <= 4 ? 'города' : 'городов'}
-              </>
-            ) : null}
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-extrabold sm:text-4xl md:text-5xl">
-            Площадки: музеи, галереи, театры и арт-пространства
-          </h1>
-          <p className="mt-3 max-w-2xl text-white/85">
-            Постоянные экспозиции, временные выставки, вечерние программы. Электронные билеты без очередей.
-          </p>
-
-          <div className="mt-6 flex flex-col gap-3 rounded-2xl bg-white p-3 text-slate-900 shadow-lg sm:flex-row">
-            <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">
-              <Search className="h-4 w-4 text-slate-400" />
-              <input
-                type="search"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Название или район"
-                className="w-full bg-transparent py-2.5 text-sm outline-none placeholder:text-slate-400"
-              />
-            </div>
-            <select
-              value={cityPending ? '' : cityFilter}
-              disabled={cityPending}
-              onChange={(event) => setCityFilter(event.target.value)}
-              className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none disabled:opacity-70"
-            >
-              {cityPending ? <option value="">Город…</option> : null}
-              <option value="all">Все города</option>
-              {cityOptions.map(([city, count]) => (
-                <option key={city} value={city}>
-                  {city} ({count})
-                </option>
-              ))}
-            </select>
-            <select
-              value={sortMode}
-              onChange={(event) => setSortMode(event.target.value as SortMode)}
-              className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none"
-            >
-              {SORT_OPTIONS.map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
+      <HeroLayout
+        variant="imageOverlay"
+        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Площадки' }]}
+        eyebrow={
+          venues.length
+            ? `${formatNumber(venues.length)} площадок${cityCount ? ` · ${cityCount} ${cityCount === 1 ? 'город' : cityCount >= 2 && cityCount <= 4 ? 'города' : 'городов'}` : ''}`
+            : 'Площадки'
+        }
+        title="Музеи, галереи, театры и клубы"
+        description="Постоянные экспозиции, временные выставки, вечерние программы. Электронные билеты без очередей."
+        tone="dark"
+        media={
+          <HeroMedia
+            frames={VENUES_HERO_FRAMES}
+            overlayClassName="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-900/50"
+          />
+        }
+      >
+        <div className="mx-auto mt-6 flex max-w-4xl flex-col gap-3 rounded-2xl bg-white p-3 text-left text-slate-900 shadow-lg sm:flex-row">
+          <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">
+            <Search className="h-4 w-4 text-slate-400" />
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Театр или клуб"
+              className="w-full bg-transparent py-2.5 text-sm outline-none placeholder:text-slate-400"
+            />
           </div>
+          <select
+            value={cityPending ? '' : cityFilter}
+            disabled={cityPending}
+            onChange={(event) => setCityFilter(event.target.value)}
+            className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none disabled:opacity-70"
+          >
+            {cityPending ? <option value="">Город…</option> : null}
+            <option value="all">Все города</option>
+            {cityOptions.map(([city, count]) => (
+              <option key={city} value={city}>
+                {city} ({count})
+              </option>
+            ))}
+          </select>
+          <select
+            value={sortMode}
+            onChange={(event) => setSortMode(event.target.value as SortMode)}
+            className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none"
+          >
+            {SORT_OPTIONS.map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
         </div>
-      </section>
+      </HeroLayout>
 
       <div className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="container-page flex items-center gap-3 py-3">

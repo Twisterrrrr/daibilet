@@ -2,14 +2,18 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
 import { CityPicker } from '@/components/CityPicker.client';
+import { HeroLayout } from '@/components/HeroLayout';
+import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
-import { SectionPageHero } from '@/components/PageBreadcrumbs';
 import { buildCatalogPresetHref, buildCatalogTagHref } from '@/lib/catalog-links';
 import { CATALOG_PRESETS } from '@/lib/catalog-presets';
-import { formatNumber } from '@/lib/format';
+import { formatNumber, pluralEvents } from '@/lib/format';
+import { resolveLandingCardImage } from '@/lib/landing-images';
+import { landingCategoryHref } from '@/lib/landing-routes';
+import { pickPodborkiFeatured, pickPodborkiTrending } from '@/lib/podborki-hero';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 
 type LandingCatalogItem = {
@@ -18,6 +22,7 @@ type LandingCatalogItem = {
   subtitle: string;
   events: number;
   priceFrom?: number | null;
+  layoutVariant?: string | null;
 };
 
 function resolveCitySlug(cities: PublicDestinationDto[], filter: string): string {
@@ -54,6 +59,13 @@ export function LandingsCatalogView({
   const cityName = resolveCityName(cities, city);
   const pickerValue = citySlug === 'all' ? 'all' : cityName;
 
+  const featured = pickPodborkiFeatured(items);
+  const trending = pickPodborkiTrending(items, featured?.slug, 3);
+  const featuredImage = featured ? resolveLandingCardImage(featured.slug) : null;
+  const featuredHref = featured
+    ? landingCategoryHref(featured.slug, citySlug !== 'all' ? citySlug : undefined)
+    : '/events';
+
   const handleCityChange = (value: string) => {
     if (value === 'all') {
       router.push('/podborki');
@@ -66,11 +78,75 @@ export function LandingsCatalogView({
 
   return (
     <>
-      <SectionPageHero
+      <HeroLayout
+        variant="split"
+        splitClassName="lg:grid-cols-[minmax(0,7fr)_minmax(0,3fr)]"
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Подборки' }]}
         title="Подборки событий"
         description="Готовые списки под настроение и повод: вечер, выходные, бюджет или редкие премьеры."
-      />
+        aside={
+          trending.length ? (
+            <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm lg:min-h-full">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-slate-500">В тренде</p>
+              <ul className="space-y-2">
+                {trending.map((item, index) => (
+                  <li key={item.slug}>
+                    <Link
+                      href={landingCategoryHref(item.slug, citySlug !== 'all' ? citySlug : undefined)}
+                      className="flex items-start gap-2 rounded-xl px-2 py-1.5 transition hover:bg-slate-50"
+                    >
+                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
+                        {index + 1}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-semibold text-slate-900">{item.title}</span>
+                        <span className="text-xs text-slate-500">{pluralEvents(item.events)}</span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null
+        }
+      >
+        {featured ? (
+          <Link
+            href={featuredHref}
+            className="group relative mt-6 flex min-h-[14rem] overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm ring-1 ring-slate-900/10 sm:min-h-[16rem]"
+          >
+            {featuredImage ? (
+              <SafeImage
+                src={featuredImage}
+                alt=""
+                fill
+                priority
+                sizes={IMAGE_SIZES.landingBanner}
+                className="object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+              />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-950" />
+            )}
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/35 to-transparent" />
+            <div className="relative z-10 mt-auto flex w-full flex-col gap-2 p-5">
+              <span className="text-xs font-semibold uppercase tracking-wider text-sky-200">Избранная подборка</span>
+              <span className="font-display text-2xl font-extrabold leading-tight sm:text-3xl">{featured.title}</span>
+              <span className="text-sm text-white/80">
+                {pluralEvents(featured.events)}
+                {featured.subtitle ? ` · ${featured.subtitle}` : ''}
+              </span>
+              <span className="inline-flex items-center gap-1 text-sm font-semibold text-white">
+                Смотреть
+                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              </span>
+            </div>
+          </Link>
+        ) : (
+          <div className="mt-6 flex min-h-[12rem] items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white text-sm text-slate-400">
+            Подборки скоро появятся
+          </div>
+        )}
+      </HeroLayout>
 
       <div className="container-page bg-slate-50 py-10 sm:py-12">
         <section>
@@ -140,9 +216,7 @@ export function LandingsCatalogView({
         {tags.length ? (
           <section className="mt-12">
             <h2 className="font-display text-xl font-bold text-slate-900">По тегам</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Уточните тему - откроется тематическая подборка или каталог
-            </p>
+            <p className="mt-1 text-sm text-slate-500">Уточните тему - откроется тематическая подборка или каталог</p>
             <div className="mt-4 flex flex-wrap gap-2">
               {tags.map((tag) => (
                 <Link
@@ -159,9 +233,8 @@ export function LandingsCatalogView({
         ) : null}
 
         <p className="mt-12 text-sm text-slate-500">
-          Всего в каталоге{' '}
-          <span className="font-semibold text-slate-900">{formatNumber(totalEvents)}</span> событий. Ищите подходящее
-          по фильтрам в{' '}
+          Всего в каталоге <span className="font-semibold text-slate-900">{formatNumber(totalEvents)}</span> событий. Ищите
+          подходящее по фильтрам в{' '}
           <Link href="/events" className="font-medium text-primary-600 hover:text-primary-700">
             каталоге
           </Link>

@@ -12,7 +12,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | H.1 | Shared `HeroLayout` + `HeroMedia` (LCP priority) | Критический | ✅ |
-| H.2 | Home imageOverlay/rotator + Prisma `HeroBanner` + admin toggle | Критический | ✅ (migrate/deploy pending) |
+| H.2 | Home imageOverlay/rotator + Prisma `HeroBanner` + admin toggle | Критический | 🔄 commit → migrate `20260724020000_hero_banner` → deploy-prod-next |
 | H.3 | `/cities` split + RF map hover + top tiles ISR 1h | Высокий | ✅ |
 | H.4 | `/podborki` editorial 70/30 featured/trending | Высокий | ✅ |
 | H.5 | `/venues` dark imageOverlay + search | Средний | ✅ MVP |
@@ -196,6 +196,7 @@
 | B.25 | Авторы колонок: brand blue (`text-primary-600`), без бейджа «Колонка» | Высокий | ✅ `ed874cb` prod | агент |
 | B.26 | `/blog` UX: темы, поиск, «Показать ещё», CTA CHPU, дата на large | Высокий | ✅ `bd8ec37` prod | агент |
 | B.27 | Blog Hero: `Article.isFeatured`, informational hero + admin toggle, LCP priority | Критический | 🔄 commit/deploy | агент |
+| B.28 | Blog Featured Hero: CTA-плитка с promo image под «Свежее» (убрать пустоту) | Критический | 🔄 commit → deploy-prod-next | агент |
 
 ---
 

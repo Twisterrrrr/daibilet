@@ -6,6 +6,8 @@ import { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 
 import { LocationCard } from '@/components/LocationCard.client';
+import { HeroLayout } from '@/components/HeroLayout';
+import { RussiaMap } from '@/components/RussiaMap.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicVenueDto } from '@daibilet/contracts/public';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
@@ -102,47 +104,43 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
 
   return (
     <>
-      <section className="border-b border-slate-200 bg-gradient-to-br from-cyan-500 via-sky-600 to-primary-600 text-white">
-        <div className="container-page py-10 md:py-14">
-          <p className="text-sm font-semibold uppercase tracking-wider text-white/70">
-            {venues.length} локаций · {cityCount}{' '}
-            {cityCount === 1 ? 'город' : cityCount >= 2 && cityCount <= 4 ? 'города' : 'городов'}
-          </p>
-          <h1 className="mt-2 font-display text-3xl font-extrabold sm:text-4xl md:text-5xl">
-            Локации: причалы, парки и точки старта
-          </h1>
-          <p className="mt-3 max-w-2xl text-white/85">
-            Куда приходить, как найти, во сколько встреча — чтобы не пропустить свой рейс или экскурсию.
-          </p>
-
-          <div className="mt-6 flex flex-col gap-3 rounded-2xl bg-white p-3 text-slate-900 shadow-lg sm:flex-row">
-            <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">
-              <Search className="h-4 w-4 text-slate-400" />
-              <input
-                type="search"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Название локации или адрес"
-                className="w-full bg-transparent py-2.5 text-sm outline-none placeholder:text-slate-400"
-              />
-            </div>
-            <select
-              value={cityPending ? '' : cityFilter}
-              disabled={cityPending}
-              onChange={(event) => setCityFilter(event.target.value)}
-              className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none disabled:opacity-70"
-            >
-              {cityPending ? <option value="">Город…</option> : null}
-              <option value="all">Все города</option>
-              {cityOptions.map(([city, count]) => (
-                <option key={city} value={city}>
-                  {city} ({count})
-                </option>
-              ))}
-            </select>
+      <HeroLayout
+        variant="withMap"
+        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Локации' }]}
+        eyebrow={`${venues.length} локаций · ${cityCount} ${cityCount === 1 ? 'город' : cityCount >= 2 && cityCount <= 4 ? 'города' : 'городов'}`}
+        title="Причалы, парки и точки старта"
+        description="Куда приходить и как найти место встречи - чтобы не пропустить рейс или экскурсию."
+        tone="light"
+        className="bg-slate-100"
+        aside={<RussiaMap />}
+      >
+        <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-slate-900 shadow-lg sm:flex-row">
+          <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">
+            <Search className="h-4 w-4 text-slate-400" />
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Название локации или адрес"
+              className="w-full bg-transparent py-2.5 text-sm outline-none placeholder:text-slate-400"
+            />
           </div>
+          <select
+            value={cityPending ? '' : cityFilter}
+            disabled={cityPending}
+            onChange={(event) => setCityFilter(event.target.value)}
+            className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none disabled:opacity-70"
+          >
+            {cityPending ? <option value="">Город…</option> : null}
+            <option value="all">Все города</option>
+            {cityOptions.map(([city, count]) => (
+              <option key={city} value={city}>
+                {city} ({count})
+              </option>
+            ))}
+          </select>
         </div>
-      </section>
+      </HeroLayout>
 
       <div className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="container-page flex gap-2 overflow-x-auto py-3">

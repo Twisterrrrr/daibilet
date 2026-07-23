@@ -9,6 +9,7 @@ import {
   CalendarDays,
   ClipboardList,
   Download,
+  Image as ImageIcon,
   LayoutDashboard,
   LayoutTemplate,
   MapPin,
@@ -36,6 +37,7 @@ const NAV: NavItem[] = [
   { href: '/admin/reviews', label: 'Отзывы', icon: MessageSquareQuote, ready: true },
   { href: '/admin/change-requests', label: 'ECR', icon: ClipboardList, ready: true },
   { href: '/admin/articles', label: 'Блог', icon: BookOpen, ready: true },
+  { href: '/admin/hero-banners', label: 'Hero', icon: ImageIcon, ready: true },
   { href: '/admin/sources', label: 'Источники', icon: Download, ready: true },
   { href: '/admin/settings', label: 'Настройки', icon: Settings, ready: true },
 ];

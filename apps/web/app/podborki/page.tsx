@@ -10,6 +10,7 @@ import {
   buildPublicLandingsCatalogDto,
   getPublicCatalogSessions,
 } from '@daibilet/backend/public-read';
+import { prisma } from '@/lib/db';
 
 export const revalidate = 3600;
 
@@ -47,11 +48,27 @@ export default async function PodborkiCatalogPage({ searchParams }: PageProps) {
 
   const tags = collectPopularTags(sessions, 24);
 
+  let layoutBySlug = new Map<string, string | null>();
+  try {
+    const rows = await prisma.landing.findMany({
+      where: { layoutVariant: { in: ['HERO_FEATURED', 'HERO_TRENDING'] } },
+      select: { slug: true, layoutVariant: true },
+    });
+    layoutBySlug = new Map(rows.map((row) => [row.slug, row.layoutVariant]));
+  } catch {
+    layoutBySlug = new Map();
+  }
+
+  const items = (catalog.items ?? []).map((item) => ({
+    ...item,
+    layoutVariant: layoutBySlug.get(item.slug) ?? null,
+  }));
+
   return (
     <SiteLayout>
       <div className="min-h-screen bg-slate-50 text-slate-900">
         <LandingsCatalogView
-          items={catalog.items}
+          items={items}
           city={catalog.city}
           cities={destinationsPayload.destinations}
           tags={tags}

@@ -984,6 +984,20 @@ model Article {
   @@index([citySlug])
 }
 
+/// Home hero rotator frames (CMS-lite). Fallback: static HOME_HERO_IMAGES.
+model HeroBanner {
+  id        String   @id @default(cuid())
+  imageUrl  String
+  title     String
+  link      String?
+  isActive  Boolean  @default(true)
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, sortOrder])
+}
+
 model SeoMeta {
   id            String        @id @default(cuid())
   entityType    SeoEntityType

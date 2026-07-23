@@ -12,7 +12,14 @@ import { pluralCities } from '@/lib/format';
 
 type SortMode = 'events' | 'asc' | 'desc';
 
-export function CitiesCatalogView({ destinations }: { destinations: PublicDestinationDto[] }) {
+export function CitiesCatalogView({
+  destinations,
+  hideIntro = false,
+}: {
+  destinations: PublicDestinationDto[];
+  /** When parent already rendered HeroLayout H1. */
+  hideIntro?: boolean;
+}) {
   const [query, setQuery] = useState('');
   const [sortMode, setSortMode] = useState<SortMode>('events');
 
@@ -48,16 +55,32 @@ export function CitiesCatalogView({ destinations }: { destinations: PublicDestin
     <>
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="min-w-0 flex-1">
-          <div className="flex items-center justify-between gap-3">
-            <h1 className="font-display text-3xl font-bold text-slate-900">Города</h1>
-            <div className="shrink-0 sm:hidden">
-              <CitiesSortControls sortMode={sortMode} onSortModeChange={setSortMode} compact />
+          {hideIntro ? (
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="font-display text-xl font-bold text-slate-900 sm:text-2xl">
+                Все города
+                {cities.length > 0 ? (
+                  <span className="ml-2 text-base font-medium text-slate-500">({pluralCities(cities.length)})</span>
+                ) : null}
+              </h2>
+              <div className="shrink-0 sm:hidden">
+                <CitiesSortControls sortMode={sortMode} onSortModeChange={setSortMode} compact />
+              </div>
             </div>
-          </div>
-          <p className="mt-2 text-lg text-slate-500">
-            {cities.length > 0 ? pluralCities(cities.length) : 'Города'}
-            {' — экскурсии, музеи и мероприятия по всей территории России'}
-          </p>
+          ) : (
+            <>
+              <div className="flex items-center justify-between gap-3">
+                <h1 className="font-display text-3xl font-bold text-slate-900">Города</h1>
+                <div className="shrink-0 sm:hidden">
+                  <CitiesSortControls sortMode={sortMode} onSortModeChange={setSortMode} compact />
+                </div>
+              </div>
+              <p className="mt-2 text-lg text-slate-500">
+                {cities.length > 0 ? pluralCities(cities.length) : 'Города'}
+                {' - экскурсии, музеи и мероприятия по всей территории России'}
+              </p>
+            </>
+          )}
         </div>
         <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
           <input
