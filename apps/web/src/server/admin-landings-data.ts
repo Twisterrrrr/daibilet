@@ -33,9 +33,21 @@ export type AdminLandingsListData = {
 export type AdminLandingDetailData = {
   slug: string;
   title: string;
+  subtitle: string | null;
   status: string;
   description: string | null;
+  seoH1: string;
+  seoTitle: string;
+  seoDescription: string;
+  canonicalUrl: string;
+  isIndexable: boolean;
   eventsTotal: number;
+  metrics: {
+    pinnedEvents: number;
+    excludedEvents: number;
+    autoEvents: number;
+    effectiveEvents: number;
+  };
   sampleEvents: Array<{
     id: string;
     title: string;
@@ -43,6 +55,17 @@ export type AdminLandingDetailData = {
     venue: string;
     readiness: string;
     priceFrom: number | null;
+    manualStatus: string | null;
+    isAutoMatch: boolean;
+    groupEventIds: string[];
+  }>;
+  excludedSample: Array<{
+    id: string;
+    title: string;
+    city: string;
+    venue: string;
+    manualStatus: string | null;
+    groupEventIds: string[];
   }>;
   errors: string[];
 };
@@ -110,21 +133,31 @@ export async function loadAdminLandingsList(searchParams: {
 
 export async function loadAdminLandingDetail(slug: string): Promise<AdminLandingDetailData> {
   const errors: string[] = [];
+  const empty: AdminLandingDetailData = {
+    slug,
+    title: slug,
+    subtitle: null,
+    status: '—',
+    description: null,
+    seoH1: '',
+    seoTitle: '',
+    seoDescription: '',
+    canonicalUrl: `/landings/${slug}`,
+    isIndexable: false,
+    eventsTotal: 0,
+    metrics: { pinnedEvents: 0, excludedEvents: 0, autoEvents: 0, effectiveEvents: 0 },
+    sampleEvents: [],
+    excludedSample: [],
+    errors,
+  };
+
   try {
     const response = await adminApiFetch(
-      `/api/admin/landings/${encodeURIComponent(slug)}?limit=20&page=1`,
+      `/api/admin/landings/${encodeURIComponent(slug)}?limit=40&page=1&excludedLimit=20&excludedPage=1`,
     );
     if (!response.ok) {
       errors.push(`landing detail HTTP ${response.status}`);
-      return {
-        slug,
-        title: slug,
-        status: '—',
-        description: null,
-        eventsTotal: 0,
-        sampleEvents: [],
-        errors,
-      };
+      return { ...empty, errors };
     }
     const payload = (await response.json()) as Record<string, unknown>;
     const landing = (payload.landing && typeof payload.landing === 'object'
@@ -134,43 +167,77 @@ export async function loadAdminLandingDetail(slug: string): Promise<AdminLanding
       string,
       unknown
     >;
+    const seo = (payload.seo && typeof payload.seo === 'object' ? payload.seo : {}) as Record<
+      string,
+      unknown
+    >;
+    const metricsRaw = (payload.metrics && typeof payload.metrics === 'object'
+      ? payload.metrics
+      : {}) as Record<string, unknown>;
     const rows = Array.isArray(payload.events) ? payload.events : [];
+    const excludedRows = Array.isArray(payload.excludedEvents) ? payload.excludedEvents : [];
+
+    const mapEvent = (item: unknown) => {
+      const row = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
+      const groupEventIds = Array.isArray(row.groupEventIds)
+        ? row.groupEventIds.map((id) => String(id))
+        : [String(row.id || '')].filter(Boolean);
+      return {
+        id: String(row.id || ''),
+        title: String(row.title || 'Событие'),
+        city: String(row.city || '—'),
+        venue: String(row.venue || '—'),
+        readiness: String(row.readiness || '—'),
+        priceFrom: row.priceFrom == null ? null : asNumber(row.priceFrom),
+        manualStatus: row.manualStatus != null ? String(row.manualStatus) : null,
+        isAutoMatch: Boolean(row.isAutoMatch),
+        groupEventIds,
+      };
+    };
 
     return {
       slug: String(payload.slug || slug),
       title: String(landing.title || rule.title || slug),
-      status: String(landing.status || '—'),
-      description:
-        landing.description != null
-          ? String(landing.description)
+      subtitle:
+        landing.subtitle != null
+          ? String(landing.subtitle)
           : rule.subtitle != null
             ? String(rule.subtitle)
             : null,
+      status: String(landing.status || 'REVIEW'),
+      description: landing.description != null ? String(landing.description) : null,
+      seoH1: String(seo.h1 || landing.seoH1 || ''),
+      seoTitle: String(seo.title || landing.seoTitle || ''),
+      seoDescription: String(seo.description || landing.seoDescription || ''),
+      canonicalUrl: String(seo.canonicalUrl || landing.canonicalUrl || `/landings/${slug}`),
+      isIndexable: Boolean(
+        landing.isIndexable ??
+          (typeof seo.robots === 'string' ? String(seo.robots).includes('index') : false),
+      ),
       eventsTotal: asNumber(payload.total, rows.length),
-      sampleEvents: rows.slice(0, 20).map((item) => {
-        const row = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
+      metrics: {
+        pinnedEvents: asNumber(metricsRaw.pinnedEvents),
+        excludedEvents: asNumber(metricsRaw.excludedEvents),
+        autoEvents: asNumber(metricsRaw.autoEvents),
+        effectiveEvents: asNumber(metricsRaw.effectiveEvents),
+      },
+      sampleEvents: rows.slice(0, 40).map(mapEvent),
+      excludedSample: excludedRows.slice(0, 20).map((item) => {
+        const mapped = mapEvent(item);
         return {
-          id: String(row.id || ''),
-          title: String(row.title || 'Событие'),
-          city: String(row.city || '—'),
-          venue: String(row.venue || '—'),
-          readiness: String(row.readiness || '—'),
-          priceFrom: row.priceFrom == null ? null : asNumber(row.priceFrom),
+          id: mapped.id,
+          title: mapped.title,
+          city: mapped.city,
+          venue: mapped.venue,
+          manualStatus: mapped.manualStatus,
+          groupEventIds: mapped.groupEventIds,
         };
       }),
       errors,
     };
   } catch (error) {
     errors.push(`landing detail: ${error instanceof Error ? error.message : 'network error'}`);
-    return {
-      slug,
-      title: slug,
-      status: '—',
-      description: null,
-      eventsTotal: 0,
-      sampleEvents: [],
-      errors,
-    };
+    return { ...empty, errors };
   }
 }
 

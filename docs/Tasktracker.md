@@ -443,7 +443,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 ## F4 — Admin → Next (in progress)
 
-**Канон после F4.1c:** `admin.daibilet.ru` → Next `/admin` (host rewrite). Vite deep CRUD: `admin.daibilet.ru/legacy`. См. [phase-f4-admin-cutover.md](./phases/phase-f4-admin-cutover.md).
+**Канон после F4.3:** Events override/moderation/SEO и Landings SEO/matches - Next. Vite `/legacy`: taxonomy, candidates, Orders/Venues/Cities. См. [phase-f4-deep-crud.md](./phases/phase-f4-deep-crud.md).
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
@@ -453,7 +453,8 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | F4.1b | Port Sources / sync-health / Settings | Средний | ✅ 2026-07-23 |
 | F4.1c | Cutover admin.daibilet.ru → Next; Vite deep CRUD at `/legacy` | Высокий | ✅ 2026-07-23 |
 | F4.2 | Sync jobs → apps/worker | Средний | ✅ 2026-07-23 |
-| F4.3 | Port remaining Vite deep CRUD (Events override, Landings matches) → path to retire `/legacy` | Высокий | ⏳ next |
+| F4.3 | Port Events override/moderation + Landings SEO/matches to Next | Высокий | ✅ 2026-07-23 |
+| F4.4 | Remaining `/legacy` (Venues/Cities/Orders or taxonomy) → path to retire Vite | Средний | ⏳ next |
 
 ## F5 — Retire legacy
 
@@ -488,6 +489,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-23 | F4.3: Next Events override/moderation/SEO + Landings SEO/matches; Vite остаётся для taxonomy/candidates/Orders |
 | 2026-07-23 | F4.2: `@daibilet/worker` CLI + cron wrappers → same scripts/*; Admin Sources API unchanged |
 | 2026-07-23 | SEO.16–18: TOP-15 для ручного переобхода (owner); sitemap intents без thin; план 30 путеводителей |
 | 2026-07-23 | F4.1c: admin.daibilet.ru → Next (middleware host rewrite) + Vite `/legacy` for deep CRUD; nginx patch + deploy |

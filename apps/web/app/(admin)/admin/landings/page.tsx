@@ -45,14 +45,14 @@ export default async function AdminLandingsPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">Лендинги</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Список и обзор. Pin/exclude matches и SEO-правка блоков - в Vite admin.
+            SEO + pin/exclude - в Next detail. Candidates search / blocks - Vite `/legacy`.
           </p>
         </div>
         <a
           href={viteAdminHref('/landings')}
           className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
         >
-          Открыть в Vite
+          Vite candidates+
         </a>
       </header>
 
@@ -147,10 +147,10 @@ export default async function AdminLandingsPage({ searchParams }: PageProps) {
                     <td className="px-3 py-2">
                       <div className="flex flex-col gap-1 text-xs">
                         <Link href={`/admin/landings/${encodeURIComponent(row.slug)}`} className="text-sky-700 hover:underline">
-                          Обзор в Next
+                          SEO + matches
                         </Link>
                         <a href={viteAdminHref(`/landings`)} className="text-slate-500 hover:underline">
-                          Matches в Vite
+                          Vite candidates
                         </a>
                         <a
                           href={`${PUBLIC_SITE_BASE.replace(/\/$/, '')}/${encodeURIComponent(row.slug)}`}

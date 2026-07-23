@@ -51,14 +51,14 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">События</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Список из live API. Полный override / moderation / taxonomy - в Vite admin.
+            Override / moderation / SEO - в Next. Taxonomy / расписание - Vite `/legacy`.
           </p>
         </div>
         <a
           href={viteAdminHref('/events')}
           className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
         >
-          Открыть в Vite
+          Vite taxonomy+
         </a>
       </header>
 
@@ -157,11 +157,14 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
                     </td>
                     <td className="px-3 py-2">
                       <div className="flex flex-col gap-1 text-xs">
+                        <Link href={`/admin/events/${encodeURIComponent(row.id)}`} className="text-sky-700 hover:underline">
+                          Override / moderation
+                        </Link>
                         <a
                           href={viteAdminHref(`/events?q=${encodeURIComponent(row.title)}`)}
-                          className="text-sky-700 hover:underline"
+                          className="text-slate-500 hover:underline"
                         >
-                          Править в Vite
+                          Vite taxonomy
                         </a>
                         {row.slug ? (
                           <a

@@ -17,6 +17,30 @@
 
 - Intent `/podborki/besplatno/kazan` может быть thin (&lt; 6) - CTA всё равно канонический intent URL.
 
+## 2026-07-23 - F4.3 Events/Landings deep CRUD → Next
+
+### Наблюдения
+
+- Vite EventsPage ~1539 LOC (8 tabs) и LandingsPage ~802 LOC - полный port в одном инкременте рискован.
+- Операторский hot path: override текстов + статус публикации; pin/exclude + SEO лендинга.
+- Backend PATCH уже готов (`/override`, `/moderation`, `/landings/:slug`, `/matches/:eventId`).
+
+### Решения
+
+- Next `/admin/events/[id]`: Content + SEO + Media override + ModerationPanel (server actions).
+- Next `/admin/landings/[slug]`: SEO form + Pin/Hide/Auto на sample/excluded.
+- List deep-links ведут в Next; Vite ссылки только для taxonomy / candidates.
+- Zod `mergeGroupKey` в override schema (typed path).
+- Docs: `phase-f4-deep-crud.md`; Tasktracker F4.3 ✅; next = F4.4 remaining legacy.
+
+### Проблемы
+
+- canPublish gate на detail - soft (из list q=id); PUBLISHED disabled при blockers.
+- Candidates search и taxonomy остаются на `/legacy` до F4.4.
+- Finance не трогали.
+
+---
+
 ## 2026-07-23 - F4.2 Sync jobs → apps/worker
 
 ### Наблюдения

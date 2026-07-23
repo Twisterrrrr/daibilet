@@ -18,12 +18,12 @@ admin.daibilet.ru
 
 ## Gaps (ещё на Vite `/legacy`)
 
-- Events: override / moderation / taxonomy sheet
-- Landings: pin/exclude matches, SEO blocks editor
-- Orders / Buyers / Venues / Cities full CRUD (Next lists могут появиться позже)
+- Events: taxonomy / schedule / sales / source tabs (override+moderation+SEO → Next `/admin/events/[id]`)
+- Landings: candidates search, content blocks (SEO + pin/exclude → Next `/admin/landings/[slug]`)
+- Orders / Buyers / Venues / Cities full CRUD
 - ECR page (flag)
 
-Ported on Next: Dashboard, Events list, Landings list+sample, Articles CRUD, Sources+sync, Settings read-only.
+Ported on Next: Dashboard, Events list+override/moderation/SEO, Landings list+SEO/matches, Articles CRUD, Sources+sync, Settings read-only.
 
 ## Auth / SSL
 

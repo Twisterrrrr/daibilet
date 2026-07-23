@@ -1,0 +1,77 @@
+'use server';
+
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+
+import { adminApiFetch } from '@/server/admin-api-fetch';
+
+function emptyToNull(value: FormDataEntryValue | null): string | null {
+  const trimmed = String(value || '').trim();
+  return trimmed ? trimmed : null;
+}
+
+export async function saveAdminEventOverrideAction(formData: FormData) {
+  const id = String(formData.get('id') || '').trim();
+  if (!id) throw new Error('missing event id');
+
+  const section = String(formData.get('section') || 'content').trim();
+  let body: Record<string, unknown>;
+
+  if (section === 'seo') {
+    body = {
+      seoH1: emptyToNull(formData.get('seoH1')),
+      seoTitle: emptyToNull(formData.get('seoTitle')),
+      seoDescription: emptyToNull(formData.get('seoDescription')),
+      canonicalPath: emptyToNull(formData.get('canonicalPath')),
+      isIndexable: formData.get('isIndexable') === 'on' || formData.get('isIndexable') === 'true',
+    };
+  } else if (section === 'media') {
+    body = {
+      imageUrl: emptyToNull(formData.get('imageUrl')),
+    };
+  } else {
+    body = {
+      title: emptyToNull(formData.get('title')),
+      shortDescription: emptyToNull(formData.get('shortDescription')),
+      description: emptyToNull(formData.get('description')),
+      mergeGroupKey: emptyToNull(formData.get('mergeGroupKey')),
+    };
+  }
+
+  const response = await adminApiFetch(`/api/admin/events/${encodeURIComponent(id)}/override`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    throw new Error(`override save failed HTTP ${response.status}${text ? `: ${text.slice(0, 200)}` : ''}`);
+  }
+
+  revalidatePath('/admin/events');
+  revalidatePath(`/admin/events/${id}`);
+  redirect(`/admin/events/${encodeURIComponent(id)}?saved=${encodeURIComponent(section)}`);
+}
+
+export async function saveAdminEventModerationAction(formData: FormData) {
+  const id = String(formData.get('id') || '').trim();
+  const editorStatus = String(formData.get('editorStatus') || '').trim().toUpperCase();
+  if (!id) throw new Error('missing event id');
+  if (!editorStatus) throw new Error('missing editorStatus');
+
+  const response = await adminApiFetch(`/api/admin/events/${encodeURIComponent(id)}/moderation`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ editorStatus }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    throw new Error(`moderation save failed HTTP ${response.status}${text ? `: ${text.slice(0, 200)}` : ''}`);
+  }
+
+  revalidatePath('/admin/events');
+  revalidatePath(`/admin/events/${id}`);
+  redirect(`/admin/events/${encodeURIComponent(id)}?moderation=1`);
+}

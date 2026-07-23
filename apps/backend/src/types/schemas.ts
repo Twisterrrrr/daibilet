@@ -90,6 +90,7 @@ export const eventOverridePayloadSchema = z.object({
   canonicalPath: nullableString,
   isIndexable: z.boolean().nullable().optional(),
   editorStatus: publishStatus.nullable().optional(),
+  mergeGroupKey: nullableString,
 });
 
 export const eventModerationPayloadSchema = z.object({
