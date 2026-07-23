@@ -29,7 +29,7 @@
 
 ### Проблемы
 
-- Нет (commit + deploy-prod-next). `/podborki` не меняли.
+- Нет. **Prod @`d1ccd8a` (наш `90f6151`):** `/blog` 200; section `mx-auto max-w-5xl` + thumbs `size-20`; H1 search hero без изменений. `/podborki` не трогали.
 
 ---
 
