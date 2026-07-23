@@ -25,10 +25,11 @@ admin.daibilet.ru
 
 Ported on Next: Dashboard, Events list, Landings list+sample, Articles CRUD, Sources+sync, Settings read-only.
 
-## Auth
+## Auth / SSL
 
-- Nginx htpasswd и `ADMIN_EMAIL`/`ADMIN_PASSWORD` (или SHA256) должны совпадать - браузер шлёт один Basic Auth на UI и API.
-- Next middleware проверяет ADMIN_* даже за nginx.
+- Nginx htpasswd и `ADMIN_EMAIL`/`ADMIN_PASSWORD` должны совпадать.
+- Admin TLS: `/etc/letsencrypt/live/api.daibilet.ru/{fullchain,privkey}.pem` (SAN includes `admin.daibilet.ru`).
+- Не использовать просроченный `/etc/nginx/ssl/subdomains/*` для admin.
 
 ## Deploy
 
