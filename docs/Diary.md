@@ -1,3 +1,21 @@
+## 2026-07-23 - Fix `[NOTE]` mid-article: nested markdown links
+
+### Наблюдения
+
+- На prod `/blog/kazan-2-3-dnya-samostoyatelno-karta` сырой `NOTE label=…` рендерился как одна синяя ссылка.
+- Все 3 guide batch A имеют `[анкор](url)` внутри `text="…"`.
+
+### Решения
+
+- `parseNoteBlock` / `CTA_REGEX`: вместо `[^\]]+` - `(?:[^\]"]|"[^"]*")+`, чтобы `]` внутри кавычек не обрывал блок.
+- Поддержан bare `NOTE label=…` без скобок.
+
+### Проблемы
+
+- Старый regex + inline link-парсер склеивали `[NOTE … [анкор]` в один `<a href=url>` - отсюда «синяя строка».
+
+---
+
 ## 2026-07-23 - F4.5 rare ops (taxonomy / ticket-link / ECR / Reviews)
 
 ### Наблюдения

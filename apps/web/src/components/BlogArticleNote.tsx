@@ -7,17 +7,19 @@ export type ParsedNote = {
   text: string;
 };
 
-const NOTE_REGEX = /^\[NOTE\s+([^\]]+)\]$/i;
+/**
+ * Внутри text= часто есть markdown-ссылки `[анкор](url)` — нельзя резать по первому `]`.
+ * `(?:[^\]"]|"[^"]*")+` допускает `]` только внутри кавычек атрибутов.
+ */
+const NOTE_ATTRS = String.raw`((?:[^\]"]|"[^"]*")+)`;
+const NOTE_REGEX = new RegExp(String.raw`^\[NOTE\s+${NOTE_ATTRS}\]$`, 'i');
+const NOTE_BARE_REGEX = new RegExp(String.raw`^NOTE\s+${NOTE_ATTRS}$`, 'i');
 
-export function parseNoteBlock(block: string): ParsedNote | null {
-  const trimmed = block.trim();
-  const match = trimmed.match(NOTE_REGEX);
-  if (!match) return null;
-
+function parseNoteAttrs(attrsRaw: string): ParsedNote | null {
   const attrs: Record<string, string> = {};
   const attrRegex = /(\w+)="([^"]*)"/g;
   let attrMatch: RegExpExecArray | null;
-  while ((attrMatch = attrRegex.exec(match[1])) !== null) {
+  while ((attrMatch = attrRegex.exec(attrsRaw)) !== null) {
     attrs[attrMatch[1]] = attrMatch[2];
   }
 
@@ -28,6 +30,13 @@ export function parseNoteBlock(block: string): ParsedNote | null {
     label: String(attrs.label || 'Важно').trim() || 'Важно',
     text,
   };
+}
+
+export function parseNoteBlock(block: string): ParsedNote | null {
+  const trimmed = block.trim();
+  const match = trimmed.match(NOTE_REGEX) || trimmed.match(NOTE_BARE_REGEX);
+  if (!match?.[1]) return null;
+  return parseNoteAttrs(match[1]);
 }
 
 /** Inline markdown: links, **bold**, *italic* (как в теле статьи). */

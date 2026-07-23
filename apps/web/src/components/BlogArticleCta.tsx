@@ -42,7 +42,8 @@ export function BlogArticleCta({ title, text, button, href, secondaryButton, sec
 
 export type ParsedCta = BlogArticleCtaProps;
 
-const CTA_REGEX = /^\[CTA\s+([^\]]+)\]$/;
+/** Как у NOTE: `]` внутри quoted attrs (напр. text с markdown-ссылкой) не должен обрывать блок. */
+const CTA_REGEX = /^\[CTA\s+((?:[^\]"]|"[^"]*")+)\]$/;
 
 export function parseCtaBlock(block: string): ParsedCta | null {
   const trimmed = block.trim();
