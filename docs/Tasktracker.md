@@ -15,7 +15,7 @@
 | I.2 | Web follow-up: SiteLayout Suspense fallback + CatalogShell SSR keep (rebuild) | Высокий | ⏳ в worktree `daibilet-push` |
 | I.3 | Telegram OG: WebpageBot видит, чаты нет; площадки без title/desc | Критический | 🔄 nginx→social-preview + venue twitter ✅ `1c81cdf`; **блокер: AAAA всё ещё в DNS** |
 | I.4 | Infinite full-page reload (`/blog`+): ChunkLoadRecovery матчил hydration #418 по chunk filename | Критический | ✅ `85b8cfe` + deploy-prod-next |
-| I.5 | Chunk 400 / `cities/%5Bslug%5D`: mid-build overwrite `.next` + static via Node proxy | Критический | 🔄 nginx static alias + stop-before-build |
+| I.5 | Chunk 400 / `cities/%5Bslug%5D`: mid-build overwrite `.next` + static via Node proxy | Критический | ✅ `ee8daad` + deploy-prod-next |
 | UI.1 | Единый нейтральный strip шапок: `/events`, `/blog`, city hub, `/podborki` (+ intents) | Высокий | ✅ `fc5e309` prod @`db34d03` |
 
 ---
