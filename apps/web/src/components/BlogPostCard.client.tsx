@@ -171,7 +171,7 @@ export function BlogPostCard({
       <div className={['flex flex-1 flex-col', isSmall ? 'p-4' : 'p-5'].join(' ')}>
         <h2
           className={[
-            'font-semibold leading-snug text-slate-900 group-hover:text-primary-700',
+            'font-display font-bold leading-snug text-slate-900 group-hover:text-primary-700',
             isSmall ? 'text-base sm:text-[1.05rem]' : 'text-lg',
           ].join(' ')}
         >

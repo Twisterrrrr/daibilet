@@ -54,15 +54,16 @@ function resolvePrimaryLanding(
 
   if (mapped) {
     if (city && !isLandingCityAllowed(mapped, city)) {
-      // city-scoped landing без города - всё равно даём общий href, если он валиден
-    }
-    const href = landingCategoryHref(mapped, city);
-    if (href) {
-      return {
-        landingSlug: mapped,
-        label: LANDING_BREADCRUMB_LABELS[mapped] || mapped,
-        href,
-      };
+      // skip city-restricted landing when hub city is outside allow-list
+    } else {
+      const href = landingCategoryHref(mapped, city);
+      if (href) {
+        return {
+          landingSlug: mapped,
+          label: LANDING_BREADCRUMB_LABELS[mapped] || mapped,
+          href,
+        };
+      }
     }
   }
 
@@ -101,12 +102,8 @@ export function resolveBlogListingQuickLinks(input: {
   const eventsHref = city ? resolveBlogCityEventsHref(input.city, city) : null;
   const primary = resolvePrimaryLanding(input.slug, input.title, input.tag, city);
 
-  if (primary) {
-    push(primary.href, primary.label);
-    for (const related of resolveRelatedListingLinks(primary.landingSlug, city, 3)) {
-      push(related.href, related.label);
-    }
-  }
+  // 1) CHPU / cta  2) события города  3) хаб  4) related
+  if (primary) push(primary.href, primary.label);
 
   if (eventsHref && input.city) {
     push(eventsHref, `События: ${input.city}`);
@@ -116,6 +113,12 @@ export function resolveBlogListingQuickLinks(input: {
 
   if (cityHref && input.city) {
     push(cityHref, `Афиша ${input.city}`);
+  }
+
+  if (primary) {
+    for (const related of resolveRelatedListingLinks(primary.landingSlug, city, 3)) {
+      push(related.href, related.label);
+    }
   }
 
   if (links.length < limit && city) {
