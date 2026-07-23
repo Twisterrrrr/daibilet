@@ -19,6 +19,7 @@
 | H.6 | `/locations` withMap (map points on list) | Средний | 🔄 stub: RussiaMap + filters; pin map follow-up |
 | H.7 | Video loop asset для home | Низкий | ⏳ нет ассета - rotator images |
 | H.8 | Blog Featured Hero + interactive list H1 + «Свежее»×3 + min price | Высокий | ✅ `b45995c` prod @`c39d124` |
+| H.8b | `/blog` featured+«Свежее»: max-w-5xl composition + square thumbs | Критический | 🔄 commit+deploy |
 
 ---
 

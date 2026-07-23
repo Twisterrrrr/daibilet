@@ -18,10 +18,10 @@ import {
   type BlogCardDto,
 } from '@/lib/blog-utils';
 
-/** LCP hero: ~full width on mobile, ~60% on desktop informational layout. */
-const FEATURED_IMAGE_SIZES = '(max-width: 768px) 100vw, 60vw';
+/** LCP hero: full width on mobile, ~2/3 of max-w-5xl composition on desktop. */
+const FEATURED_IMAGE_SIZES = '(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 42vw';
 const SIDEBAR_PROMO_IMAGE = '/images/blog/blog-hero-promo.jpg';
-const SIDEBAR_PROMO_SIZES = '(max-width: 1024px) 100vw, 28vw';
+const SIDEBAR_PROMO_SIZES = '(max-width: 1024px) 100vw, 22vw';
 const HOT_THUMB_SIZES = '80px';
 
 type BlogFeaturedHeroProps = {
@@ -98,7 +98,7 @@ export function BlogFeaturedHero({
   return (
     <section
       aria-label="Главная статья блога"
-      className="mb-8 grid items-stretch gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(16rem,0.9fr)] lg:gap-8"
+      className="mx-auto mb-8 grid w-full max-w-5xl items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(16rem,1fr)] lg:gap-5"
     >
       <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <Link
@@ -156,11 +156,11 @@ export function BlogFeaturedHero({
 
       {hotPosts.length ? (
         <aside aria-label="Свежие материалы" className="flex h-full flex-col gap-4">
-          <div className="flex min-h-0 flex-1 flex-col">
+          <div className="shrink-0">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
               Свежее
             </p>
-            <ul className="flex flex-1 flex-col divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+            <ul className="divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white">
               {hotPosts.map((post) => {
                 const href = `/blog/${post.slug}`;
                 const cityLabel = cityFilterLabel(post.citySlug, post.city);
@@ -169,11 +169,11 @@ export function BlogFeaturedHero({
                 const tickets = resolveTicketsLine(post, hotMinPrices[post.slug]);
 
                 return (
-                  <li key={post.slug} className="flex-1">
-                    <div className="flex h-full gap-3 px-3 py-3 transition hover:bg-slate-50 sm:px-4">
+                  <li key={post.slug}>
+                    <div className="flex items-center gap-3 px-3 py-3 transition hover:bg-slate-50 sm:px-4">
                       <Link
                         href={href}
-                        className="relative h-20 w-20 shrink-0 overflow-hidden rounded-lg bg-slate-200"
+                        className="relative size-20 shrink-0 overflow-hidden rounded-lg bg-slate-200"
                         aria-hidden
                         tabIndex={-1}
                       >
@@ -218,7 +218,7 @@ export function BlogFeaturedHero({
 
           <Link
             href={sidebarPromo.href}
-            className="group relative mt-auto flex min-h-[9.5rem] flex-[0.85] overflow-hidden rounded-2xl bg-slate-900 text-white"
+            className="group relative mt-auto flex min-h-[9.5rem] flex-1 overflow-hidden rounded-2xl bg-slate-900 text-white"
           >
             <Image
               src={SIDEBAR_PROMO_IMAGE}

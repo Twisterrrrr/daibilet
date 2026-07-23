@@ -1,3 +1,20 @@
+## 2026-07-24 - /blog: featured + «Свежее» без белой дыры
+
+### Наблюдения
+
+- Владелец (скрин): featured и «Свежее» прижаты к краям `container-page` (`max-w-7xl`), посередине огромный gutter; thumbs «Свежее» выглядели крошечными / разъезжались по высоте из-за `flex-1` на строках.
+
+### Решения
+
+- `BlogFeaturedHero`: как на `/podborki` - `mx-auto max-w-5xl` + `2fr / minmax(16rem,1fr)` + `lg:gap-5`. Interactive H1 (`BlogListHero`) не трогали.
+- Thumbs: фиксированный `size-20` (80×80), `items-center` по строке; убраны `flex-1`/`h-full` на li - высота строки = контент + thumb. Promo плитка забирает остаток высоты сайдбара (`flex-1`).
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next). `/podborki` не меняли.
+
+---
+
 ## 2026-07-24 - /podborki: центрирование featured + trending
 
 ### Наблюдения
