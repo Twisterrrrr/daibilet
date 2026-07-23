@@ -1,3 +1,21 @@
+## 2026-07-24 - /cities + /blog: photo hero как у venues
+
+### Наблюдения
+
+- Владелец: hero у `/venues` и `/locations` нравится; `/cities` и `/blog` были унылым slate strip.
+
+### Решения
+
+- `/cities`: `HeroLayout` `imageOverlay` + `HeroMedia` (slavic-01/04), eyebrow stats, поиск+сортировка в белой панели; top tiles + map ниже hero (композиция карточек не откатывали).
+- `/blog` `BlogListHero`: тот же `imageOverlay` + `HeroMedia` (slavic-02/06); search + topic chips внутри (glass chips). Geo H1 и `?q=`/`?topic=` сохранены.
+- Кадры отличны от venues (03/05).
+
+### Проблемы
+
+- Нет. **Prod @`067763d`** (код `8ec241c`): `/cities` `/blog` 200; blog HTML с `hero-slavic-02`; cities frames в page chunk.
+
+---
+
 ## 2026-07-24 - /cities: симметрия tiles+aside (container-page)
 
 ### Наблюдения
