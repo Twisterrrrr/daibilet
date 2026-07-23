@@ -68,12 +68,16 @@ pnpm db:deploy
 # F4.6: do not build/rsync Vite admin to /legacy. Code may remain in monorepo.
 echo "Skipping Vite admin build/deploy (F4.6 hard-retire /legacy)"
 
-pnpm web:build
-
-# Stop web before clearing Next cache so workers don't serve half-deleted artifacts.
+# Stop web BEFORE build. In-place `next build` rewrites apps/web/.next while
+# `next start` is still up → clients see 400/ChunkLoadError on /_next/static
+# (CSS + cities/%5Bslug%5D/page-*.js) until restart finishes.
 if systemctl is-active --quiet "$WEB_SERVICE" 2>/dev/null; then
   systemctl stop "$WEB_SERVICE"
+  echo "Stopped $WEB_SERVICE before web:build (avoid mid-build static 400s)"
 fi
+
+pnpm web:build
+
 rm -rf apps/web/.next/cache
 echo "Cleared apps/web/.next/cache"
 
@@ -89,6 +93,19 @@ fi
 
 sleep 4
 curl -fsS "http://127.0.0.1:${WEB_PORT}/api/health" >/dev/null && echo "Next /api/health OK on :$WEB_PORT"
+
+# Serve /_next/static from disk (bypass Node + proxy_cache) — survives restarts.
+if [[ -f "$APP_DIR/deploy/nginx/patch-prod-nginx-next-static.py" ]]; then
+  if python3 "$APP_DIR/deploy/nginx/patch-prod-nginx-next-static.py"; then
+    if nginx -t 2>/dev/null; then
+      systemctl reload nginx && echo "nginx reloaded (/_next/static alias)"
+    else
+      echo "Warning: nginx -t failed after next-static patch — not reloading"
+    fi
+  else
+    echo "Warning: patch-prod-nginx-next-static.py failed"
+  fi
+fi
 
 # F4.6 nginx: admin.daibilet.ru → Next only (no /legacy)
 if [[ "$APPLY_ADMIN_NGINX_PATCH" == "1" && -f "$APP_DIR/deploy/nginx/patch-prod-admin-next.py" ]]; then

@@ -3632,3 +3632,18 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 
 ### Проблемы
 - Hydration #418 на blog может ещё мелькать в console до полного выравнивания SSR/client; без ChunkLoad-лупа страница больше не крутится.
+
+## 2026-07-23 - Chunk 400 / cities/%5Bslug%5D: mid-deploy static via Node
+
+### Наблюдения
+- Консоль владельца: CSS + `cities/%5Bslug%5D/page-*.js` → **400**, `ChunkLoadError: Loading chunk 804 failed`.
+- Access log: в 20:47:00 те же URL дали 400; через ~1 мин (после restart web) - 200. 400 также на chunks **без** скобок → не WAF на `%5B`.
+- Deploy делал `pnpm web:build` при живом `next start` (stop был только перед clear cache) → mid-build перезапись `.next/static`.
+- `/_next/static` шёл через `location /` + Node + `proxy_cache`.
+
+### Решения
+- nginx `location ^~ /_next/static/` → `alias` на `apps/web/.next/static/` (минуя Node/cache).
+- `deploy-prod-next.sh`: **stop web before build**; apply `patch-prod-nginx-next-static.py`.
+
+### Проблемы
+- Downtime на время `web:build` чуть длиннее; зато нет окна 400/ChunkLoad на открытых вкладках.

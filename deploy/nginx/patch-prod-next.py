@@ -86,6 +86,14 @@ server {{
         proxy_set_header X-Forwarded-Proto $scheme;
     }}
 
+    # Next build artifacts from disk (avoid Node mid-deploy 400 / ChunkLoadError).
+    location ^~ /_next/static/ {{
+        alias /opt/daibilet/apps/web/.next/static/;
+        access_log off;
+        expires 365d;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }}
+
     location / {{
         proxy_pass http://daibilet_web;
         proxy_http_version 1.1;
