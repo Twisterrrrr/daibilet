@@ -41,7 +41,7 @@ outes.ts (паритет с backend publicCitySlug).
 
 ### Проблемы
 
-- Нет (commit + deploy-prod-next).
+- Параллельные mid-deploy на prod валили `.next` (502). Дожали exclusive deploy; **Prod @`15592bf`** (включает SEO `35bc5c6`): web+api active; smoke Place+geo на venue, Event.location.url+price, sitemap 200.
 
 ---
 ## 2026-07-24 - Owner pack: podborki categories, blog rank/cursor, cities hub tags
