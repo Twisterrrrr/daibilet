@@ -2,9 +2,10 @@
 
 ## 2026-07-23 - F4 и качество landing matching
 
-1. **Решение владельца:** следующий крупный поток - F4 admin → Next (kickoff shell `/admin` стартовал). Finance contour / ЛК поставщиков отложен до готовности продукта. До cutover канон - Vite admin; нужен ли отдельный `admin.` vhost на Next раньше полного port UI?
-2. **Канон правил:** до F5 public landing runtime исполняет legacy `dto.js`, а TypeScript `landing-rules.ts` служит typed public path и тестам. Любое изменение правил вносится в оба файла. Нужна ли отдельная генерация rules из единого источника до F5?
-3. **Проверка выдачи:** `LandingMatch` в public path применяется только для ручных `PINNED`/`EXCLUDED`; пересчёт automatic rows не исправляет public выдачу. Нужен ли отдельный автоматический scheduled audit всех landing rules с алертами на характерные мусорные слова?
+1. **Решение владельца:** следующий крупный поток - F4 admin → Next (shell + live dashboard F4.1). Finance contour / ЛК поставщиков отложен до готовности продукта. До cutover канон - Vite admin; нужен ли отдельный `admin.` vhost на Next раньше полного port UI?
+2. **F4.1 env:** достаточно ли `ADMIN_*` из общего `.env` у `daibilet-web`, или явно задавать `DAIBILET_ADMIN_API_URL=http://127.0.0.1:4000` в unit?
+3. **Канон правил:** до F5 public landing runtime исполняет legacy `dto.js`, а TypeScript `landing-rules.ts` служит typed public path и тестам. Любое изменение правил вносится в оба файла. Нужна ли отдельная генерация rules из единого источника до F5?
+4. **Проверка выдачи:** `LandingMatch` в public path применяется только для ручных `PINNED`/`EXCLUDED`; пересчёт automatic rows не исправляет public выдачу. Нужен ли отдельный автоматический scheduled audit всех landing rules с алертами на характерные мусорные слова?
 
 ## 2026-07-23 - SEO-листинги, решения владельца
 

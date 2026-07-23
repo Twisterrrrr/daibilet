@@ -441,8 +441,8 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | F4.0 | Kickoff: `(admin)` route group `/admin`, shell, stub dashboard, Basic Auth middleware | Критический | ✅ 2026-07-23 |
-| F4.1 | Port Dashboard (live `/api/admin/dashboard` + sources) | Высокий | ⏳ next |
-| F4.1a | Port Events / Landings / Articles (операторский CRUD) | Высокий | ⏳ |
+| F4.1 | Port Dashboard (live `/api/admin/dashboard` + sources + orders metrics) | Высокий | ✅ 2026-07-23 |
+| F4.1a | Port Events / Landings / Articles (операторский CRUD) | Высокий | ⏳ next |
 | F4.1b | Port Sources / sync-health / Settings | Средний | ⏳ |
 | F4.1c | Cutover admin.daibilet.ru → Next; retire Vite admin static | Высокий | ⏳ |
 | F4.2 | Sync jobs → apps/worker | Средний | ⏳ (после UI port) |
@@ -480,6 +480,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-23 | F4.1: Next `/admin` live dashboard (dashboard/sources/orders) через server fetch + Basic Auth forward |
 | 2026-07-23 | F4 kickoff: Next `/admin` shell + Basic Auth middleware; Vite admin остаётся каноном |
 | 2026-07-23 | SEO.8b: найдено расхождение `landing-rules.ts` и legacy runtime `dto.js`; синхронизировано правило `country-tours`, prod smoke: 3 экскурсии, без оперы и концертов |
 | 2026-07-23 | SEO.8b: `country-tours` перестал матчить любое событие СПб с топонимом пригорода; теперь нужны одновременно экскурсионный и направленческий сигналы |

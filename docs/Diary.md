@@ -2889,6 +2889,22 @@
 ### Проблемы
 - Экранирование Bearer в PowerShell при remote curl — не использовать однострочный ssh с вложенными кавычками.
 
+## 2026-07-23 - F4.1: live Dashboard в Next `/admin`
+
+### Наблюдения
+- Vite Dashboard тянет `/api/admin/dashboard`, `/api/admin/sources`, `/api/admin/orders?limit=1` с same-origin Basic Auth.
+- На public Next (`daibilet.ru`) admin API живёт на legacy `:4000`; browser same-origin `/api` с daibilet.ru может отличаться от admin.daibilet.ru.
+
+### Решения
+- Server Component `force-dynamic`: fetch к `DAIBILET_ADMIN_API_URL` / `DAIBILET_API_INTERNAL_URL` / `DAIBILET_API_URL` (default `http://127.0.0.1:4000`).
+- Authorization из request headers пробрасывается на API после middleware Basic Auth.
+- UI parity ключевых блоков: top metrics, каталог/launch, SEO, sources, orders. Deep-links на Vite admin до port экранов.
+- Deploy: безопасен для public (только `/admin`); нужен ADMIN_* в env web-процесса. Если API env не прокинут - страница покажет баннер ошибок без поломки витрины.
+
+### Проблемы
+- При только `ADMIN_PASSWORD_SHA256` без plaintext на web всё равно ок: браузер шлёт пароль, Next форвардит заголовок.
+- Локально без поднятого `:4000` dashboard покажет errors - ожидаемо.
+
 ## 2026-07-23 - F4 kickoff: admin shell в Next
 
 ### Наблюдения

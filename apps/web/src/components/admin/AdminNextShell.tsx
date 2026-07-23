@@ -78,8 +78,8 @@ export function AdminNextShell({ children, activePath = '/admin' }: Props) {
               <p className="text-xs text-slate-500 md:hidden">Daibilet Admin Next</p>
               <h1 className="text-base font-semibold text-slate-900">Операторская оболочка</h1>
             </div>
-            <span className="rounded-md border border-amber-200 bg-amber-50 px-2.5 py-1 text-xs text-amber-800">
-              F4 kickoff - shell only
+            <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs text-emerald-800">
+              F4.1 live dashboard
             </span>
           </div>
         </header>

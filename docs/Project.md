@@ -18,7 +18,7 @@
 
 | Приоритет | Фокус | Статус |
 |-----------|--------|--------|
-| 1 | **F4 admin → Next** — перенос admin SPA в Next route group | 🔄 kickoff: shell + auth |
+| 1 | **F4 admin → Next** — перенос admin SPA в Next route group | 🔄 shell + live dashboard |
 | 2 | **Landing matching quality** — правила, аудит выдачи и актуальность событий всех посадок | активный |
 | 3 | **AI / статьи и city hubs** — редакционный контент и SEO-якоря | поддерживающий поток |
 | — | **Finance contour / ЛК поставщиков** | ⚠️ deferred: продукт ещё не готов |
