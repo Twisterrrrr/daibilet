@@ -13,6 +13,7 @@
 - `buildStaticSitemapEntries` стал async: intents (и city-variants приоритетных городов) попадают в sitemap только при ≥ `MIN_LISTING_OFFERS_FOR_INDEX`.
 - План контентной воронки: `docs/seo-guide-articles-plan.md` (+ csv) - 30 тем Казань/Екб/МСК/СПб с CHPU и приоритетом. Полные тексты не пишем пачкой.
 - Sitemap для панелей: `https://daibilet.ru/sitemap.xml` (index).
+- **Prod smoke @`7a8aa6c` (код fix `0fe5140`):** `/sitemaps/static.xml` без thin `/podborki/besplatno`; `/podborki/na-vyhodnye` и соседние indexable intents на месте; landings без Казань/крыш/загородных thin; `/cities/kazan` + `/cities/ekaterinburg` в cities chunk; Екб-стендап в landings.
 
 ### Проблемы
 
@@ -32,6 +33,8 @@
 - Добавлены 6 кадров `hero-slavic-01..06.png` (славянская внешность, позитивные эмоции, разные сцены).
 - Пул `HOME_HERO_IMAGES` (7 шт. с учётом старого selfie); SSR-выбор `pickHomeHeroImage()` + `connection()` на каждый запрос без hydration flash.
 - Alt на русском; `HomeHeroBackground` принимает выбранный сет.
+
+**Prod @`ee002e7`:** deploy-prod-next OK; `/` dynamic; 5 запросов → разные hero (`slavic-01`, selfie, `slavic-05`, …); PNG 200.
 
 ### Проблемы
 
