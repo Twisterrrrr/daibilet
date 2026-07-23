@@ -3,7 +3,7 @@
 ### Наблюдения
 
 - Утверждённый TOP-15 нужен владельцу для ручного переобхода в Яндекс.Вебмастер / GSC - агент в панели не логинится.
-- Landings chunk на prod уже фильтрует thin (&lt; 6 офферов): Казань/крыши/загородные и ряд TOP URL корректно отсутствуют в sitemap.
+- Landings chunk на prod уже фильтрует thin (< 6 офферов): Казань/крыши/загородные и ряд TOP URL корректно отсутствуют в sitemap.
 - Static sitemap слепо включал все `/podborki/{intent}` без проверки офферов: `/podborki/besplatno` был в sitemap при `noindex,follow`.
 - City hubs `/cities/kazan` и `/cities/ekaterinburg` в cities chunk есть; indexable Екб-стендап есть в landings.
 

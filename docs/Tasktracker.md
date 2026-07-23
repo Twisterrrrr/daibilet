@@ -46,6 +46,10 @@
 | SEO.13 | SSR JSON-LD: BreadcrumbList (listing+event) + ItemList только на CHPU landings (non-empty) | Высокий | ✅ 2026-07-23 | агент |
 | SEO.14 | `/podborki` tag cloud → CHPU landings/intent вместо `/events?q=` | Высокий | ✅ 2026-07-23 (топ-24: 23 CHPU / 1 fallback) | агент |
 | SEO.15 | Казань/Екб: падежи + meta-шаблоны listing/hub/event + thin cards (6–7) | Критический | ✅ 2026-07-23 | агент |
+| SEO.16 | Ручной переобход TOP-15 в Яндекс.Вебмастер / GSC | Высокий | ⏳ список URL готов; клики только владелец | **владелец** |
+| SEO.17 | Sitemap: intents без thin (&lt; 6); smoke prod index + landings/static | Высокий | 🔄 fix в коде; нужен deploy + smoke | агент |
+| SEO.18 | План 20-30 путеводителей → CHPU (`docs/seo-guide-articles-plan.md`) | Высокий | ✅ 2026-07-23 план+csv | агент |
+| SEO.19 | Пилотная статья «Казань за 3 дня» → `/ekskursii/kazan` | Средний | ⏳ после утверждения плана | владелец + агент |
 | SEO.10 | Editorial polish SEO-текстов (убрать шаблонный хвост) | Средний | ⏳ | владелец + агент |
 | P.1 | AI / статьи блога | Средний | ⚠️ deferred vs SEO.1–SEO.7 | — |
 
@@ -482,6 +486,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-23 | SEO.16–18: TOP-15 для ручного переобхода (owner); sitemap intents без thin; план 30 путеводителей |
 | 2026-07-23 | F4.1c: admin.daibilet.ru → Next (middleware host rewrite) + Vite `/legacy` for deep CRUD; nginx patch + deploy |
 | 2026-07-23 | F4.1b: Next `/admin/sources` (+ sync trigger, sync-health) и read-only `/admin/settings` |
 | 2026-07-23 | F4.1a: Next `/admin/events|landings|articles` lists; articles create/edit/archive; Vite для deep CRUD |

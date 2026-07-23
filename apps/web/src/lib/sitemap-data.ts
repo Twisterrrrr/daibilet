@@ -16,8 +16,14 @@ import {
   isLandingCityAllowed,
   landingCategoryHref,
 } from '@/lib/landing-routes';
-import { listCatalogIntents, catalogIntentPath } from '@/lib/catalog-intent-routes';
+import {
+  catalogIntentFilterValues,
+  catalogIntentPath,
+  listCatalogIntents,
+} from '@/lib/catalog-intent-routes';
 import { evaluateListingIndexability, MIN_LISTING_OFFERS_FOR_INDEX } from '@/lib/seo-listing-meta';
+import { getCachedCatalog } from '@/server/cached-catalog-data';
+import { parseCatalogPageQuery } from '@/server/catalog-query';
 import { finalizeLandingPayload, fetchLandingPageDto } from '@/server/landing-page';
 
 export const SITEMAP_CHUNKS = [
@@ -76,8 +82,53 @@ function entry(
   };
 }
 
-export function buildStaticSitemapEntries(now = new Date()): SitemapEntry[] {
-  const intentPaths = listCatalogIntents().map((item) => catalogIntentPath(item.intent));
+async function countIntentOffers(intentSlug: string, citySlug?: string | null): Promise<number> {
+  const intent = listCatalogIntents().find((item) => item.intent === intentSlug);
+  if (!intent) return 0;
+  const filters = catalogIntentFilterValues(intent);
+  const pageQuery = parseCatalogPageQuery({
+    city: citySlug || undefined,
+    date: filters.date,
+    minPrice: filters.minPrice != null ? String(filters.minPrice) : undefined,
+    maxPrice: filters.maxPrice != null ? String(filters.maxPrice) : undefined,
+    sort: filters.sort,
+  });
+  try {
+    const catalog = await getCachedCatalog(pageQuery);
+    return catalog?.total ?? catalog?.items?.length ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+/** Intent URLs only when ≥ MIN_LISTING_OFFERS_FOR_INDEX (same rule as pages). */
+export async function buildIndexableIntentSitemapPaths(): Promise<string[]> {
+  const paths = new Set<string>();
+
+  for (const item of listCatalogIntents()) {
+    const offers = await countIntentOffers(item.intent);
+    if (evaluateListingIndexability({ offers, minOffers: MIN_LISTING_OFFERS_FOR_INDEX }).indexable) {
+      paths.add(catalogIntentPath(item.intent));
+    }
+
+    for (const city of PRIORITY_LISTING_CITY_SLUGS) {
+      const cityOffers = await countIntentOffers(item.intent, city);
+      if (
+        evaluateListingIndexability({
+          offers: cityOffers,
+          minOffers: MIN_LISTING_OFFERS_FOR_INDEX,
+        }).indexable
+      ) {
+        paths.add(catalogIntentPath(item.intent, city));
+      }
+    }
+  }
+
+  return [...paths];
+}
+
+export async function buildStaticSitemapEntries(now = new Date()): Promise<SitemapEntry[]> {
+  const intentPaths = await buildIndexableIntentSitemapPaths();
   return [
     entry('/', now, 'hourly', 1),
     entry('/events', now, 'hourly', 0.8),
@@ -200,7 +251,7 @@ export async function buildSitemapChunkEntries(chunk: SitemapChunk): Promise<Sit
   const now = new Date();
   switch (chunk) {
     case 'static':
-      return buildStaticSitemapEntries(now);
+      return await buildStaticSitemapEntries(now);
     case 'events':
       return buildEventsSitemapEntries(now);
     case 'cities':
