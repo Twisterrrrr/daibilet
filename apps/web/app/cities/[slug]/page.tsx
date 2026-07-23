@@ -13,6 +13,7 @@ import {
   buildCityHubSeoTitle,
   buildCityHubSeoTitleCore,
 } from '@/lib/city-hub-seo';
+import { isSeoExpansionCity } from '@/lib/city-declension';
 import { resolveCityImage } from '@/lib/city-images';
 import { evaluateCityIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { mergeBlogCards } from '@/lib/blog-utils';
@@ -41,7 +42,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     isIndexable: city.isIndexable,
   });
 
-  // Живая дата в title (MSK); admin seoTitle без даты не перекрывает паттерн хаба.
+  // Живая дата в title (MSK) для Москвы/СПб; Казань/Екб - шаблон с годом.
+  // admin seoTitle без даты не перекрывает паттерн хаба.
   const hubTitle = buildCityHubSeoTitleCore(city.name);
   const hubTitleFull = buildCityHubSeoTitle(city.name);
   const description = city.seoDescription || buildCityHubSeoDescription(city.name);
@@ -51,9 +53,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     name: city.name,
     heroImageUrl: city.heroImageUrl,
   });
+  const expansionAbsolute = isSeoExpansionCity({
+    name: city.name,
+    slug: city.slug,
+    sourceSlug: city.sourceSlug,
+  });
 
   return {
-    title: pageTitle(hubTitle),
+    title: expansionAbsolute ? { absolute: hubTitle } : pageTitle(hubTitle),
     description,
     alternates: { canonical: path },
     robots: robotsForIndexability(decision.indexable),

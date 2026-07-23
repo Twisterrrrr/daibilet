@@ -58,6 +58,7 @@ export const PRIORITY_LISTING_CITY_SLUGS = [
   'moscow',
   'saint-petersburg',
   'kazan',
+  'ekaterinburg',
 ] as const;
 
 /** Ограничения городов для узких SEO-посадок. */

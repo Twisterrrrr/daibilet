@@ -102,8 +102,10 @@ packages/config   — shared tsconfig/eslint
 
 - **Flat URL:** `/events/{slug}`, `/venues/{slug}`, `/cities/{slug}` — без city-prefix в path (`/{city}/venues/...` и т.п. **отклонено**).
 - **SEO-фокус:** city hubs `/cities/{slug}` + **category×city landings** (`/rechnye-progulki/moscow`, `/stendap-i-yumor/kazan`, …) + intent `/podborki/{intent}`; sitemap + canonical.
-- **Meta (city listing):** `[Категория] в [Городе] [Год] - купить билеты, расписание и цены на Дайбилет` (`seo-listing-meta.ts`).
-- **Thin listing:** &lt; 6 офферов → `noindex,follow` (страница доступна, не в индексе).
+- **Meta (city listing):** обычные города - `[Категория] в [Городе] [Год] - купить билеты…`; Казань/Екатеринбург - `[Категория] в {City_Пр} [Год]: купить билеты…` (`seo-listing-meta.ts`, падежи в `city-declension.ts`).
+- **Meta (city hub Казань/Екб):** `Афиша {City_Род} [Год] - куда сходить…` (`city-hub-seo.ts`).
+- **Meta (event Казань/Екб):** `Билеты на {Title} в {City_Пр} - расписание, цены от {N} руб.` (+ graceful без цены) (`seo-event-meta.ts`).
+- **Thin listing:** &lt; 6 офферов → `noindex,follow`; при ровно 6–7 офферах - доп. карточки смежных категорий (`LandingThinRelatedCards`).
 - **Launch set:** утверждён TOP-15 category×city и intent URL. Для узких направлений действуют ограничения городов: `/progulki-po-krysham/saint-petersburg` и `/zagorodnye-ekskursii/saint-petersburg` не получают московских вариантов. Канонический weekend intent - `/podborki/na-vyhodnye`; старый `na-vyhodnyh` отдаёт permanent redirect.
 - **Контакты:** до подключения номера 8-800 публикуются email, ИНН и ОГРНИП, без подставного телефона.
 - Обычный блог - вторичен относительно SEO-листингов до насыщения ядра посадок.

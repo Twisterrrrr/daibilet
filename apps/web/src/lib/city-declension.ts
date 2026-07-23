@@ -1,3 +1,13 @@
+/** Три падежа для SEO/UI: именительный, родительный, предложный (без предлога). */
+export type CityCases = {
+  /** {City_Им} — Казань, Екатеринбург */
+  nominative: string;
+  /** {City_Род} — Казани, Екатеринбурга */
+  genitive: string;
+  /** {City_Пр} — Казани, Екатеринбурге */
+  prepositional: string;
+};
+
 /** Предложный («в …») и родительный («…») падежи городов. */
 const CITY_FORMS: Record<string, { prep: string; gen: string }> = {
   Абакан: { prep: 'Абакане', gen: 'Абакана' },
@@ -75,6 +85,37 @@ const CITY_FORMS: Record<string, { prep: string; gen: string }> = {
   Ярославль: { prep: 'Ярославле', gen: 'Ярославля' },
 };
 
+/** Slug / alias → именительный (роутинг landings + city hubs). */
+const CITY_NAME_BY_SLUG: Record<string, string> = {
+  moscow: 'Москва',
+  moskva: 'Москва',
+  msk: 'Москва',
+  spb: 'Санкт-Петербург',
+  'saint-petersburg': 'Санкт-Петербург',
+  'sankt-peterburg': 'Санкт-Петербург',
+  peterburg: 'Санкт-Петербург',
+  kazan: 'Казань',
+  ekaterinburg: 'Екатеринбург',
+  'nizhny-novgorod': 'Нижний Новгород',
+  'nizhniy-novgorod': 'Нижний Новгород',
+  samara: 'Самара',
+  volgograd: 'Волгоград',
+  yaroslavl: 'Ярославль',
+  krasnoyarsk: 'Красноярск',
+  perm: 'Пермь',
+  novosibirsk: 'Новосибирск',
+  tver: 'Тверь',
+  rostov: 'Ростов-на-Дону',
+  'rostov-on-don': 'Ростов-на-Дону',
+  'rostov-na-donu': 'Ростов-на-Дону',
+  sochi: 'Сочи',
+  kaliningrad: 'Калининград',
+};
+
+/** Города с отдельными SEO-шаблонами meta (Казань / Екатеринбург). */
+const SEO_EXPANSION_CITY_NAMES = new Set(['Казань', 'Екатеринбург']);
+const SEO_EXPANSION_CITY_SLUGS = new Set(['kazan', 'ekaterinburg']);
+
 /** Эвристика предложного падежа, если города нет в словаре. */
 function inferPrepositional(name: string): string {
   if (/ы$/i.test(name)) return `${name.slice(0, -1)}ах`; // Чебоксары → …ах (fallback)
@@ -106,23 +147,67 @@ function lookupCityForms(city: string): { prep: string; gen: string } | null {
   return CITY_FORMS[normalized] || null;
 }
 
+/** Именительный по slug/alias или имени; иначе исходная строка. */
+export function cityToNominative(cityOrSlug: string): string {
+  const raw = String(cityOrSlug || '').trim();
+  if (!raw) return raw;
+  if (CITY_FORMS[raw]) return raw;
+  const bySlug = CITY_NAME_BY_SLUG[raw.toLowerCase()];
+  if (bySlug) return bySlug;
+  return raw;
+}
+
+/** Полный набор падежей по имени или slug города. */
+export function resolveCityCases(cityOrSlug: string): CityCases {
+  const nominative = cityToNominative(cityOrSlug) || 'город';
+  const forms = lookupCityForms(nominative);
+  return {
+    nominative,
+    genitive: forms?.gen || inferGenitive(nominative),
+    prepositional: forms?.prep || inferPrepositional(nominative),
+  };
+}
+
+/** Казань / Екатеринбург - отдельные формулы Title/Description. */
+export function isSeoExpansionCity(input: {
+  name?: string | null;
+  slug?: string | null;
+  sourceSlug?: string | null;
+} | string | null | undefined): boolean {
+  if (input == null) return false;
+  if (typeof input === 'string') {
+    const raw = input.trim();
+    if (!raw) return false;
+    if (SEO_EXPANSION_CITY_NAMES.has(raw)) return true;
+    const slug = raw.toLowerCase();
+    if (SEO_EXPANSION_CITY_SLUGS.has(slug)) return true;
+    return SEO_EXPANSION_CITY_NAMES.has(cityToNominative(raw));
+  }
+  const name = String(input.name || '').trim();
+  if (name && SEO_EXPANSION_CITY_NAMES.has(name)) return true;
+  for (const candidate of [input.slug, input.sourceSlug]) {
+    const key = String(candidate || '')
+      .trim()
+      .toLowerCase();
+    if (key && SEO_EXPANSION_CITY_SLUGS.has(key)) return true;
+    if (key && SEO_EXPANSION_CITY_NAMES.has(cityToNominative(key))) return true;
+  }
+  return false;
+}
+
 /** «Москве», «Перми», «Мурманске» — без предлога. */
 export function cityToPrepositional(city: string): string {
-  const normalized = city.trim();
-  if (!normalized) return normalized;
-  return lookupCityForms(normalized)?.prep || inferPrepositional(normalized);
+  return resolveCityCases(city).prepositional;
 }
 
 /** «Москвы», «Перми» — без предлога. */
 export function cityToGenitive(city: string): string {
-  const normalized = city.trim();
-  if (!normalized) return normalized;
-  return lookupCityForms(normalized)?.gen || inferGenitive(normalized);
+  return resolveCityCases(city).genitive;
 }
 
 /** «в Москве», «в Мурманске» — никогда «в городе X». */
 export function inCityPrepositional(city: string): string {
-  const normalized = city.trim();
+  const normalized = String(city || '').trim();
   if (!normalized) return 'в городе';
   return `в ${cityToPrepositional(normalized)}`;
 }

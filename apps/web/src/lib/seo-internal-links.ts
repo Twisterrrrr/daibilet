@@ -75,11 +75,19 @@ const CITY_HUB_SLUG_BY_LANDING: Record<string, string> = {
   'sankt-peterburg': 'sankt-peterburg',
   spb: 'sankt-peterburg',
   kazan: 'kazan',
+  ekaterinburg: 'ekaterinburg',
 };
 
 type RelatedLinkSpec =
   | { type: 'landing'; slug: string; label: string }
   | { type: 'intent'; intent: CatalogIntentSlug; label: string };
+
+function relatedSpecsForLanding(landingSlug: string, citySlug?: string | null): RelatedLinkSpec[] {
+  const slug = canonicalLandingSlug(landingSlug);
+  const city = normalizeCitySlug(citySlug);
+  const byLanding = RELATED_LINKS_BY_LANDING[slug] || {};
+  return (city && byLanding[city]) || byLanding['*'] || DEFAULT_RELATED;
+}
 
 /**
  * Смежные ссылки для блока «Смотрите также» на CHPU-листингах.
@@ -350,8 +358,7 @@ export function resolveRelatedListingLinks(
 ): SeoLink[] {
   const slug = canonicalLandingSlug(landingSlug);
   const city = normalizeCitySlug(citySlug);
-  const byLanding = RELATED_LINKS_BY_LANDING[slug] || {};
-  const specs = (city && byLanding[city]) || byLanding['*'] || DEFAULT_RELATED;
+  const specs = relatedSpecsForLanding(slug, city);
 
   const links: SeoLink[] = [];
   const seen = new Set<string>();
@@ -377,4 +384,35 @@ export function resolveRelatedListingLinks(
   }
 
   return links;
+}
+
+/** Смежные category landings (без intent) для thin-карточек. */
+export function resolveRelatedLandingCardTargets(
+  landingSlug: string,
+  citySlug?: string | null,
+  limit = 4,
+): Array<{ slug: string; label: string; href: string }> {
+  const slug = canonicalLandingSlug(landingSlug);
+  const city = normalizeCitySlug(citySlug);
+  const specs = relatedSpecsForLanding(slug, city);
+  const out: Array<{ slug: string; label: string; href: string }> = [];
+  const seen = new Set<string>();
+
+  for (const spec of specs) {
+    if (out.length >= limit) break;
+    if (spec.type !== 'landing') continue;
+    const relatedSlug = canonicalLandingSlug(spec.slug);
+    if (relatedSlug === slug || seen.has(relatedSlug)) continue;
+    if (city && !isLandingCityAllowed(relatedSlug, city)) continue;
+    const href = landingCategoryHref(relatedSlug, city);
+    if (!href) continue;
+    seen.add(relatedSlug);
+    out.push({
+      slug: relatedSlug,
+      label: spec.label || landingBreadcrumbLabel(relatedSlug),
+      href,
+    });
+  }
+
+  return out;
 }

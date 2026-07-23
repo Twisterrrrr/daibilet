@@ -79,6 +79,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   });
   const description = buildCategoryCityMetaDescription({
     seekCategory: intent.label.charAt(0).toLowerCase() + intent.label.slice(1),
+    categoryTitle: intent.label,
     cityName,
   });
   const path = catalogIntentPath(intent.intent, citySlug);

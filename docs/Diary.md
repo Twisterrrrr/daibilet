@@ -1,3 +1,24 @@
+## 2026-07-23 - SEO Казань/Екб: падежи + 3 meta-шаблона + thin cards
+
+### Наблюдения
+
+- Падежи Казани/Екатеринбурга уже были в `city-declension.ts`; не хватало единой API `{City_Им/Род/Пр}` по slug и отдельных формул meta.
+- Порог индекса `MIN_LISTING_OFFERS_FOR_INDEX = 6` оставлен (не поднимать).
+
+### Решения
+
+- `resolveCityCases` / `isSeoExpansionCity` + slug→имя в `city-declension.ts`.
+- Шаблон №1 listing (Казань/Екб): title с `:`, description «Актуальная афиша категории… Daibilet.ru» (`seo-listing-meta.ts`). Москва/СПб без регресса (старый dash / «Ищете…»).
+- Шаблон №2 hub: `Афиша {Род} {Год} - куда сходить…` (`city-hub-seo.ts`).
+- Шаблон №3 event: title с optional «от N руб.» (`seo-event-meta.ts`).
+- Thin trick: при ровно 6–7 офферах - `LandingThinRelatedCards` (3–4 карточки смежных категорий) рядом с «Смотрите также».
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-23 - SEO owner brief: порог 6, теги → CHPU, trust contacts
 
 ### Наблюдения

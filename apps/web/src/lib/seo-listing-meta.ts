@@ -1,4 +1,4 @@
-import { cityToPrepositional, inCityPrepositional } from '@/lib/city-declension';
+import { cityToPrepositional, inCityPrepositional, isSeoExpansionCity } from '@/lib/city-declension';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
 
 /**
@@ -10,6 +10,15 @@ export const MIN_LISTING_OFFERS_FOR_INDEX = 6;
 
 /** Soft quality: ориентир для контент-планов, не жёсткий порог. */
 export const SOFT_LISTING_OFFERS_TARGET = 10;
+
+/**
+ * Thin-content trick: ровно 6 или 7 офферов на indexable CHPU -
+ * дополнительно к «Смотрите также» показываем карточки смежных категорий.
+ */
+export function shouldShowThinRelatedCards(offers: number): boolean {
+  const n = Number(offers) || 0;
+  return n === 6 || n === 7;
+}
 
 export type ListingIndexDecision = {
   indexable: boolean;
@@ -100,8 +109,9 @@ export function listingSeoYear(referenceDate: Date = new Date()): number {
 }
 
 /**
- * Title (absolute, бренд уже внутри):
- * `[Категория] в [Городе] [Год] - купить билеты, расписание и цены на Дайбилет`
+ * Title (absolute, бренд уже внутри).
+ * Казань/Екб: `{Категория} в {City_Пр} {Год}: купить билеты, расписание и цены на Дайбилет`
+ * Остальные: `{Категория} в {City_Пр} {Год} - купить билеты, расписание и цены на Дайбилет`
  */
 export function buildCategoryCityMetaTitle(input: {
   categoryTitle: string;
@@ -111,19 +121,37 @@ export function buildCategoryCityMetaTitle(input: {
   const category = String(input.categoryTitle || '').trim() || 'События';
   const cityPrep = cityToPrepositional(String(input.cityName || '').trim() || 'городе');
   const year = input.year ?? listingSeoYear();
+  if (isSeoExpansionCity(input.cityName)) {
+    return `${category} в ${cityPrep} ${year}: купить билеты, расписание и цены на Дайбилет`;
+  }
   return `${category} в ${cityPrep} ${year} - купить билеты, расписание и цены на Дайбилет`;
 }
 
 /**
- * Description:
- * `Ищете [категорию] в [Городе]? Актуальная афиша на Дайбилет: …`
+ * Description.
+ * Казань/Екб: `Актуальная афиша категории {Категория} в {City_Пр} на {Год} год. … Daibilet.ru!`
+ * Остальные: `Ищете [категорию] в [Городе]? Актуальная афиша на Дайбилет: …`
  */
 export function buildCategoryCityMetaDescription(input: {
   seekCategory: string;
   cityName: string;
+  /** Title-case ярлык категории (для шаблона Казань/Екб). */
+  categoryTitle?: string;
+  year?: number;
 }): string {
+  const cityRaw = String(input.cityName || '').trim() || 'городе';
+  if (isSeoExpansionCity(cityRaw)) {
+    const category =
+      String(input.categoryTitle || input.seekCategory || '').trim() || 'события';
+    const cityPrep = cityToPrepositional(cityRaw);
+    const year = input.year ?? listingSeoYear();
+    return (
+      `Актуальная афиша категории ${category} в ${cityPrep} на ${year} год. ` +
+      `Удобный выбор мест, билеты без наценок и честные отзывы. Заходите и бронируйте на Daibilet.ru!`
+    );
+  }
   const seek = String(input.seekCategory || '').trim() || 'события';
-  const inCity = inCityPrepositional(String(input.cityName || '').trim() || 'городе');
+  const inCity = inCityPrepositional(cityRaw);
   return (
     `Ищете ${seek} ${inCity}? Актуальная афиша на Дайбилет: честные отзывы, удобный выбор мест, билеты без переплат. Заходите и бронируйте!`
   );
@@ -145,7 +173,9 @@ export function buildCategoryCityListingMeta(input: {
     }),
     description: buildCategoryCityMetaDescription({
       seekCategory: labels.seekCategory,
+      categoryTitle: labels.titleCategory,
       cityName: input.cityName,
+      year: input.year,
     }),
   };
 }

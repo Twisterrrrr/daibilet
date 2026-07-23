@@ -9,7 +9,9 @@ import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { toEventPageClientPayload } from '@/lib/event-page-client-props';
 import { eventHref } from '@/lib/routes';
-import { pageTitle, absoluteUrl, buildShareMetadata } from '@/lib/seo-meta';
+import { getTicketPriceRange } from '@/lib/event-page-utils';
+import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
+import { buildEventListingMeta } from '@/lib/seo-event-meta';
 import { buildEventPageJsonLd } from '@/lib/structured-data';
 import { buildPublicEventDto } from '@daibilet/backend/public-read';
 import { prisma } from '@/lib/db';
@@ -28,15 +30,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const event = payload.event;
   const path = event.canonicalPath || eventHref(event);
-  const title = pageTitle(event.seoTitle || event.title);
-  const shareTitle = event.seoTitle?.includes('Дайбилет')
-    ? String(event.seoTitle)
-    : `${title} | Дайбилет`;
+  const priceRange = getTicketPriceRange(payload);
+  const expansionMeta = buildEventListingMeta({
+    eventTitle: event.title,
+    cityName: event.city,
+    citySlug: event.citySlug,
+    sourceCitySlug: event.sourceCitySlug,
+    priceFrom: priceRange?.min ?? event.priceFrom ?? payload.stats?.priceFrom,
+  });
+  const title = pageTitle(expansionMeta?.title || event.seoTitle || event.title);
+  const shareTitle = expansionMeta
+    ? expansionMeta.title
+    : event.seoTitle?.includes('Дайбилет')
+      ? String(event.seoTitle)
+      : `${title} | Дайбилет`;
   const description =
-    event.seoDescription || event.description || `${event.title} - билеты на Дайбилет`;
+    expansionMeta?.description ||
+    event.seoDescription ||
+    event.description ||
+    `${event.title} - билеты на Дайбилет`;
 
   return {
-    title,
+    title: expansionMeta ? { absolute: expansionMeta.title } : title,
     description,
     alternates: {
       canonical: path,
