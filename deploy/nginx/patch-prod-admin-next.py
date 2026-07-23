@@ -70,11 +70,6 @@ server {
 }
 """
 
-pattern = re.compile(
-    r"\nserver\s*\{[^{}]*?server_name\s+admin\.daibilet\.ru;[^{}]*?(?:\{[^{}]*\}[^{}]*?)*\}",
-    re.DOTALL,
-)
-
 # More robust: find server blocks containing admin.daibilet.ru
 def find_admin_blocks(src: str) -> list[tuple[int, int]]:
     ranges: list[tuple[int, int]] = []
