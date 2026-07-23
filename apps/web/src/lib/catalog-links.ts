@@ -55,6 +55,9 @@ const EXACT_TAG_LANDING: Record<string, string> = {
   картины: 'exhibitions',
   'необычные театры': 'unusual-theatres',
   антреприза: 'unusual-theatres',
+  драма: 'unusual-theatres',
+  спектакль: 'unusual-theatres',
+  театр: 'unusual-theatres',
   'тематические вечеринки': 'river-party',
   вечеринка: 'river-party',
   дискотека: 'river-party',
@@ -153,7 +156,7 @@ function heuristicLandingSlug(tag: string): string | null {
   if (/автобус/.test(hay)) return 'bus-tours';
   if (/загород|петергоф|царск|павловск/.test(hay)) return 'country-tours';
   if (/выставк|музе|лекци|картин/.test(hay)) return 'exhibitions';
-  if (/театр|антреприз|спектакл/.test(hay)) return 'unusual-theatres';
+  if (/театр|антреприз|спектакл|драм/.test(hay)) return 'unusual-theatres';
   if (/концерт|рок|джаз|поп|метал|классик|эстрад/.test(hay)) return 'concerts-genre';
   if (/дет|семь|мастер[\s-]?класс/.test(hay)) return 'family-kids';
   if (/экскурс/.test(hay)) return 'excursions';

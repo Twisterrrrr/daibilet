@@ -22,6 +22,11 @@ test('intent-like tags map to /podborki CHPU', () => {
   assert.equal(buildCatalogTagHref('на выходные'), '/podborki/na-vyhodnye');
 });
 
+test('theatre-like tags map to unusual-theatres CHPU', () => {
+  assert.equal(resolveCatalogTagHref('Драма').kind, 'chpu');
+  assert.match(buildCatalogTagHref('Драма', 'moscow'), /\/neobychnye-teatry\/moscow\/?$/);
+});
+
 test('unknown tags fall back to /events?q=', () => {
   const result = resolveCatalogTagHref('Шоу - программа', 'kazan');
   assert.equal(result.kind, 'fallback');
