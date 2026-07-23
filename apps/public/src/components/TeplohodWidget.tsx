@@ -98,7 +98,6 @@ export function TeplohodWidgetEmbed({
         data-id={String(tepWidgetId || DEFAULT_TEP_WIDGET_ID)}
         data-event-id={eventId}
       />
-      <p className="mt-2 text-xs leading-5 text-slate-500">Выберите дату и категорию билета в виджете Teplohod.info.</p>
     </div>
   );
 }

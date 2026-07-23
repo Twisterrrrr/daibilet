@@ -374,10 +374,9 @@ export function TeplohodWidgetEmbed({
           rel="noopener noreferrer"
           className="mt-3 flex w-full items-center justify-center rounded-xl bg-primary-600 px-6 py-3.5 text-base font-medium text-white transition hover:bg-primary-700"
         >
-          Купить билет на teplohod.info
+          Купить билет
         </a>
       ) : null}
-      <p className="mt-2 text-xs leading-5 text-slate-500">Выберите дату и категорию билета в виджете Teplohod.info.</p>
     </div>
   );
 }
