@@ -10196,6 +10196,7 @@ export async function buildPublicArticlesList(db, options = {}) {
     left join "City" c on c.id = a."cityId"
     where a.status = 'PUBLISHED'
       and coalesce(a."isIndexable", true) = true
+      and (a."publishedAt" is null or a."publishedAt" <= now())
       ${whereExtra}
     order by a."publishedAt" desc nulls last, a."updatedAt" desc
     limit $${limitIdx}
@@ -10245,6 +10246,7 @@ export async function buildPublicArticlePage(db, slug) {
       left join "City" c on c.id = a."cityId"
       where a.slug = $1
         and a.status = 'PUBLISHED'
+        and (a."publishedAt" is null or a."publishedAt" <= now())
       limit 1
     `,
     [slug],

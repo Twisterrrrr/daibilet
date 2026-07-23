@@ -14,6 +14,7 @@ date: "23 июля 2026"
 readMin: 10
 imageAlt: "Панорама Казани с Кремлем и набережной"
 coverImageUrl: "/images/blog/kazan-2-3-dnya-samostoyatelno-karta.jpg"
+publishedAt: "2026-07-23T09:00:00+03:00"
 status: PUBLISHED
 ---
 

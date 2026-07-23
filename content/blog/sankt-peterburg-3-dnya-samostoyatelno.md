@@ -10,10 +10,11 @@ authorName: Редакция
 articleType: gid
 tag: Город
 citySlug: saint-petersburg
-date: "23 июля 2026"
+date: "24 июля 2026"
 readMin: 11
 imageAlt: "Маршрут прогулки по центру Санкт-Петербурга"
 coverImageUrl: "/images/blog/sankt-peterburg-3-dnya-samostoyatelno.jpg"
+publishedAt: "2026-07-24T09:00:00+03:00"
 status: PUBLISHED
 ---
 

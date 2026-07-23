@@ -10,10 +10,11 @@ authorName: Редакция
 articleType: gid
 tag: Город
 citySlug: moscow
-date: "23 июля 2026"
+date: "25 июля 2026"
 readMin: 9
 imageAlt: "Вечерний ужин на теплоходе на Москве-реке"
 coverImageUrl: "/images/blog/uzhin-na-teplohode-moskva-kak-vybrat.jpg"
+publishedAt: "2026-07-25T09:00:00+03:00"
 status: PUBLISHED
 ---
 

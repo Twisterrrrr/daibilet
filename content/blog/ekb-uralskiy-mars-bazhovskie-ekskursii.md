@@ -10,10 +10,11 @@ authorName: Редакция
 articleType: gid
 tag: Город
 citySlug: ekaterinburg
-date: "23 июля 2026"
+date: "24 июля 2026"
 readMin: 10
 imageAlt: "Пейзаж Уральского Марса недалеко от Екатеринбурга"
 coverImageUrl: "/images/blog/ekb-uralskiy-mars-bazhovskie-ekskursii.jpg"
+publishedAt: "2026-07-24T09:00:00+03:00"
 status: PUBLISHED
 ---
 

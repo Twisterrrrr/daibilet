@@ -14,6 +14,7 @@ date: "23 июля 2026"
 readMin: 10
 imageAlt: "Панорама Москвы и маршрут прогулки по центру"
 coverImageUrl: "/images/blog/moscow-2-dnya-samostoyatelno-marshrut.jpg"
+publishedAt: "2026-07-23T09:00:00+03:00"
 status: PUBLISHED
 ---
 

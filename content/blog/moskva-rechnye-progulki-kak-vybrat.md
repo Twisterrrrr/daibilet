@@ -10,10 +10,11 @@ authorName: Редакция
 articleType: gid
 tag: Город
 citySlug: moscow
-date: "23 июля 2026"
+date: "24 июля 2026"
 readMin: 9
 imageAlt: "Теплоход на Москве-реке у центра города"
 coverImageUrl: "/images/blog/moskva-rechnye-progulki-kak-vybrat.jpg"
+publishedAt: "2026-07-24T09:00:00+03:00"
 status: PUBLISHED
 ---
 

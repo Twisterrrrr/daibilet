@@ -14,6 +14,7 @@ date: "23 июля 2026"
 readMin: 8
 imageAlt: "Стендап-комик на сцене перед зрителями в Екатеринбурге"
 coverImageUrl: "/images/blog/ekb-stendap-uralskiy-yumor.jpg"
+publishedAt: "2026-07-23T09:00:00+03:00"
 status: PUBLISHED
 ---
 

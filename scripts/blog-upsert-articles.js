@@ -7,6 +7,11 @@
  *   node scripts/blog-upsert-articles.js
  *   node scripts/blog-upsert-articles.js --slug=moskva-kvesty-escape-room
  *   node scripts/blog-upsert-articles.js --status=REVIEW
+ *   node scripts/blog-upsert-articles.js --force-published-at
+ *
+ * Frontmatter `publishedAt` (ISO) задаёт дату публикации / расписания.
+ * Без --force-published-at существующий publishedAt в БД не перезаписывается (coalesce).
+ * С --force-published-at - всегда пишет значение из frontmatter (или now при PUBLISHED).
  *
  * Требует DATABASE_URL (или default local postgres).
  */
@@ -33,6 +38,17 @@ function hasFlag(name) {
 const onlySlug = argValue('slug');
 const statusOverride = argValue('status');
 const dryRun = hasFlag('dry-run');
+const forcePublishedAt = hasFlag('force-published-at');
+
+function resolvePublishedAt(meta, status) {
+  const raw = meta.publishedAt != null ? String(meta.publishedAt).trim() : '';
+  if (raw) {
+    const parsed = new Date(raw);
+    if (!Number.isNaN(parsed.getTime())) return parsed.toISOString();
+  }
+  if (status === 'PUBLISHED') return new Date().toISOString();
+  return null;
+}
 
 const db = createDb(rootDir);
 
@@ -73,17 +89,20 @@ async function upsertArticle(article) {
     : meta.tag === 'Колонка'
       ? 'column'
       : 'gid';
-  const publishedAt = status === 'PUBLISHED' ? new Date().toISOString() : null;
+  const publishedAt = resolvePublishedAt(meta, status);
 
   if (dryRun) {
     console.log(
-      `[dry-run] ${slug} status=${status} city=${meta.citySlug || '-'} author=${authorId} type=${normalizedType} chars=${content.length}`,
+      `[dry-run] ${slug} status=${status} publishedAt=${publishedAt || '-'} force=${forcePublishedAt} city=${meta.citySlug || '-'} author=${authorId} type=${normalizedType} chars=${content.length}`,
     );
     return;
   }
 
   const existing = await db.query(`select id from "Article" where slug = $1 limit 1`, [slug]);
   if (existing.rows[0]?.id) {
+    const publishedAtSql = forcePublishedAt
+      ? `"publishedAt" = $17::timestamptz`
+      : `"publishedAt" = coalesce("publishedAt", $17::timestamptz)`;
     await db.query(
       `
         update "Article"
@@ -103,7 +122,7 @@ async function upsertArticle(article) {
           "seoDescription" = $14,
           "canonicalPath" = $15,
           "isIndexable" = $16,
-          "publishedAt" = coalesce("publishedAt", $17::timestamptz),
+          ${publishedAtSql},
           "updatedAt" = now()
         where id = $1
       `,
@@ -127,7 +146,9 @@ async function upsertArticle(article) {
         publishedAt,
       ],
     );
-    console.log(`updated ${slug} (${status}) author=${authorId} type=${normalizedType}`);
+    console.log(
+      `updated ${slug} (${status}) publishedAt=${publishedAt || '-'} force=${forcePublishedAt} author=${authorId} type=${normalizedType}`,
+    );
     return;
   }
 

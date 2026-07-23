@@ -10,10 +10,11 @@ authorName: Редакция
 articleType: gid
 tag: Город
 citySlug: saint-petersburg
-date: "23 июля 2026"
+date: "25 июля 2026"
 readMin: 10
 imageAlt: "Теплоход на каналах Санкт-Петербурга"
 coverImageUrl: "/images/blog/rechnye-progulki-neva-kanaly-kak-vybrat.jpg"
+publishedAt: "2026-07-25T09:00:00+03:00"
 status: PUBLISHED
 ---
 

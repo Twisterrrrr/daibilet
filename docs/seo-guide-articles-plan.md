@@ -2,7 +2,7 @@
 
 **Дата:** 2026-07-23  
 **Цель:** статьи-гиды → утверждённые category×city / intent посадки.  
-**Статус:** batch #1 (10 шт., Казань + Екб) утверждён; **пачка A (ID 1, 8, 10) размещена 2026-07-23**; **пачка МСК/СПб (ID 11, 12, 18, 19, 30 + концерты СПб) размещена 2026-07-23**; пачка B (остаток batch #1) ждёт тексты GPT.  
+**Статус:** batch #1 (10 шт., Казань + Екб) утверждён; **пачка A + МСК/СПб** загружены в CMS, публикация по **календарю ≤3/день** (см. ниже); пачка B (остаток batch #1) ждёт тексты GPT.  
 **Первая генерация:** эталоны ТЗ №1 (ID 1), №2 (ID 8), №3 (ID 10) - см. `seo-guide-articles-gpt-prompt.md` → «Эталонные ТЗ (3 типа)».
 
 Связанные файлы:
@@ -19,6 +19,7 @@
 - **Загородные:** роут `/zagorodnye-ekskursii/{city}` разрешён только для `saint-petersburg` (`LANDING_ALLOWED_CITY_SLUGS`). Для Казани/Екб в batch #1 CTA = `/ekskursii/{city}` (зафиксировано ниже).
 - Отдельного CHPU «смотровые площадки» нет → CTA = `/ekskursii/ekaterinburg`.
 - Год в H1 / `title` / `seoTitle` / `seoH1` - обновляемый (сейчас **2026**).
+- **Публикация:** максимум **3 статьи в день**; в дневной пачке **миксовать города** (не выкладывать 3 из одного города). Технически: `status: PUBLISHED` + `publishedAt` (ISO); public API / sitemap отдают только `publishedAt <= now`.
 
 ## Batch #1 - приоритет генерации (10 статей)
 
@@ -104,24 +105,33 @@
 
 ## Очередь публикации
 
-1. **Пачка A (эталоны) - размещено 2026-07-23:** ID **1, 8, 10** → `/blog/kazan-2-3-dnya-samostoyatelno-karta`, `/blog/ekb-stendap-uralskiy-yumor`, `/blog/ekb-uralskiy-mars-bazhovskie-ekskursii` (`PUBLISHED`; cover = плейсхолдер city image, TODO уникальные фото).
-2. **Пачка МСК/СПб - размещено 2026-07-23:** ID **11, 12, 18, 19, 30** + `koncerty-peterburg-osobnyak-klub-zal` (вне исходной нумерации) → см. таблицу ниже.
-3. **Пачка B:** остальной batch #1 (ID 2, 3, 4, 5, 6, 7, 9) - универсальный User + строки плана.
-4. Затем остаток batch #2 High/Средний МСК/СПб.
-5. Средний - после editorial polish и насыщения каталога.
+1. **Календарь live (≤3/день, микс городов)** - см. таблицу ниже. Статус в CMS: `PUBLISHED` + `publishedAt`.
+2. **Пачка B:** остальной batch #1 (ID 2, 3, 4, 5, 6, 7, 9) - универсальный User + строки плана; в график публикации - тоже ≤3/день с миксом городов.
+3. Затем остаток batch #2 High/Средний МСК/СПб.
+4. Средний - после editorial polish и насыщения каталога.
+
+## Календарь публикации (пачка A + МСК/СПб)
+
+Время слота: **09:00 Europe/Moscow** (`publishedAt` ISO `+03:00`).
+
+| Дата | Города | Slug (3 шт.) |
+|------|--------|--------------|
+| **2026-07-23** (сегодня, live) | Казань + Екб + Москва | `kazan-2-3-dnya-samostoyatelno-karta`, `ekb-stendap-uralskiy-yumor`, `moscow-2-dnya-samostoyatelno-marshrut` |
+| **2026-07-24** | Екб + СПб + Москва | `ekb-uralskiy-mars-bazhovskie-ekskursii`, `sankt-peterburg-3-dnya-samostoyatelno`, `moskva-rechnye-progulki-kak-vybrat` |
+| **2026-07-25** | Москва + СПб + СПб | `uzhin-na-teplohode-moskva-kak-vybrat`, `rechnye-progulki-neva-kanaly-kak-vybrat`, `koncerty-peterburg-osobnyak-klub-zal` |
 
 ## Пилот размещения
 
-| ID | Slug | URL | Статус | Cover |
-|----|------|-----|--------|-------|
-| 1 | `kazan-2-3-dnya-samostoyatelno-karta` | https://daibilet.ru/blog/kazan-2-3-dnya-samostoyatelno-karta | ✅ размещено | TODO: уникальное фото (сейчас `kazan.png`) |
-| 8 | `ekb-stendap-uralskiy-yumor` | https://daibilet.ru/blog/ekb-stendap-uralskiy-yumor | ✅ размещено | TODO: уникальное фото (сейчас `ekaterinburg.png`) |
-| 10 | `ekb-uralskiy-mars-bazhovskie-ekskursii` | https://daibilet.ru/blog/ekb-uralskiy-mars-bazhovskie-ekskursii | ✅ размещено | TODO: уникальное фото (сейчас `ekaterinburg.png`) |
-| 11 | `moscow-2-dnya-samostoyatelno-marshrut` | https://daibilet.ru/blog/moscow-2-dnya-samostoyatelno-marshrut | ✅ размещено | TODO: уникальное фото (сейчас `moscow.png`) |
-| 12 | `moskva-rechnye-progulki-kak-vybrat` | https://daibilet.ru/blog/moskva-rechnye-progulki-kak-vybrat | ✅ размещено | TODO: уникальное фото (сейчас `moscow.png`) |
-| 18 | `sankt-peterburg-3-dnya-samostoyatelno` | https://daibilet.ru/blog/sankt-peterburg-3-dnya-samostoyatelno | ✅ размещено | TODO: уникальное фото (сейчас `saint-petersburg.png`) |
-| 19 | `rechnye-progulki-neva-kanaly-kak-vybrat` | https://daibilet.ru/blog/rechnye-progulki-neva-kanaly-kak-vybrat | ✅ размещено | TODO: уникальное фото (сейчас `saint-petersburg.png`) |
-| 30 | `uzhin-na-teplohode-moskva-kak-vybrat` | https://daibilet.ru/blog/uzhin-na-teplohode-moskva-kak-vybrat | ✅ размещено | TODO: уникальное фото (сейчас `moscow.png`) |
-| - | `koncerty-peterburg-osobnyak-klub-zal` | https://daibilet.ru/blog/koncerty-peterburg-osobnyak-klub-zal | ✅ размещено | TODO: уникальное фото (сейчас `saint-petersburg.png`) |
+| ID | Slug | URL | publishAt | Статус | Cover |
+|----|------|-----|-----------|--------|-------|
+| 1 | `kazan-2-3-dnya-samostoyatelno-karta` | https://daibilet.ru/blog/kazan-2-3-dnya-samostoyatelno-karta | 2026-07-23 | ✅ live | уникальный jpg (batch A) |
+| 8 | `ekb-stendap-uralskiy-yumor` | https://daibilet.ru/blog/ekb-stendap-uralskiy-yumor | 2026-07-23 | ✅ live | уникальный jpg (batch A) |
+| 11 | `moscow-2-dnya-samostoyatelno-marshrut` | https://daibilet.ru/blog/moscow-2-dnya-samostoyatelno-marshrut | 2026-07-23 | ✅ live | TODO уникальное фото |
+| 10 | `ekb-uralskiy-mars-bazhovskie-ekskursii` | https://daibilet.ru/blog/ekb-uralskiy-mars-bazhovskie-ekskursii | 2026-07-24 | ⏳ schedule | уникальный jpg (batch A) |
+| 18 | `sankt-peterburg-3-dnya-samostoyatelno` | https://daibilet.ru/blog/sankt-peterburg-3-dnya-samostoyatelno | 2026-07-24 | ⏳ schedule | TODO уникальное фото |
+| 12 | `moskva-rechnye-progulki-kak-vybrat` | https://daibilet.ru/blog/moskva-rechnye-progulki-kak-vybrat | 2026-07-24 | ⏳ schedule | TODO уникальное фото |
+| 30 | `uzhin-na-teplohode-moskva-kak-vybrat` | https://daibilet.ru/blog/uzhin-na-teplohode-moskva-kak-vybrat | 2026-07-25 | ⏳ schedule | TODO уникальное фото |
+| 19 | `rechnye-progulki-neva-kanaly-kak-vybrat` | https://daibilet.ru/blog/rechnye-progulki-neva-kanaly-kak-vybrat | 2026-07-25 | ⏳ schedule | TODO уникальное фото |
+| - | `koncerty-peterburg-osobnyak-klub-zal` | https://daibilet.ru/blog/koncerty-peterburg-osobnyak-klub-zal | 2026-07-25 | ⏳ schedule | TODO уникальное фото |
 
 Пачка B (не размещена): ID 2, 3, 4, 5, 6, 7, 9.
