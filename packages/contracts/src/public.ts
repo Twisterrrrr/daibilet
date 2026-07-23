@@ -23,6 +23,14 @@ export interface PublicStatsDto extends ApiEnvelope {
   stats: PublicStatsCounts;
 }
 
+/** Mini-tags on `/cities` cards (CHPU landings or top event categories). */
+export interface PublicDestinationHubTag {
+  slug?: string | null;
+  label: string;
+  events: number;
+  kind: 'landing' | 'category';
+}
+
 export interface PublicDestinationDto {
   id?: string;
   slug?: string;
@@ -32,6 +40,8 @@ export interface PublicDestinationDto {
   events: number;
   venues: number;
   categories: FacetCount[];
+  /** 2-3 popular directions for city micro-hub cards. */
+  hubTags?: PublicDestinationHubTag[];
 }
 
 export interface PublicLandingDto extends SeoFields {

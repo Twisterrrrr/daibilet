@@ -838,6 +838,22 @@ model VenueAlias {
   venue Venue @relation(fields: [venueId], references: [id])
 }
 
+/// UX-группы каталога `/podborki` (карусели): по типу / для кого / сезонное.
+model LandingCategory {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  title     String
+  subtitle  String?
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  landings Landing[]
+
+  @@index([isActive, sortOrder])
+}
+
 model Landing {
   id          String        @id @default(cuid())
   type        LandingType   @default(MULTI_CITY)
@@ -848,6 +864,7 @@ model Landing {
   status      PublishStatus @default(REVIEW)
   cityId      String?
   themeId     String?
+  categoryId  String?
   rules       Json
 
   heroTitle          String?
@@ -876,12 +893,14 @@ model Landing {
 
   city         City?                 @relation(fields: [cityId], references: [id])
   theme        LandingTheme?         @relation(fields: [themeId], references: [id])
+  category     LandingCategory?      @relation(fields: [categoryId], references: [id])
   matches      LandingMatch[]
   blocks       LandingContentBlock[]
   relatedLinks LandingRelatedLink[]
 
   @@index([type, isActive, isIndexable])
   @@index([cityId, slug])
+  @@index([categoryId, sortOrder])
 }
 
 model LandingMatch {
