@@ -109,17 +109,16 @@ export function CitiesCatalogView({ destinations }: { destinations: PublicDestin
 
       {topCities.length ? (
         <div className="border-b border-slate-200 bg-white">
-          <div className="container-page py-8 sm:py-10">
-            <div className="mx-auto grid w-full max-w-5xl items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(14rem,1fr)] lg:gap-5">
-              <ul className="grid h-full grid-cols-2 content-start gap-3 sm:grid-cols-3">
-                {topCities.map((city) => (
-                  <li key={city.slug || city.name}>
-                    <CityCard city={city} />
-                  </li>
-                ))}
-              </ul>
-              <RussiaMap className="h-full min-h-[14rem] self-stretch" />
-            </div>
+          {/* Same content column as «Все города» below - no nested max-w (avoids left-biased row). */}
+          <div className="container-page grid items-stretch gap-4 py-8 sm:py-10 lg:grid-cols-[minmax(0,2fr)_minmax(14rem,1fr)] lg:gap-5">
+            <ul className="grid h-full grid-cols-2 content-start gap-3 sm:grid-cols-3">
+              {topCities.map((city) => (
+                <li key={city.slug || city.name}>
+                  <CityCard city={city} />
+                </li>
+              ))}
+            </ul>
+            <RussiaMap className="h-full min-h-[14rem] self-stretch" />
           </div>
         </div>
       ) : null}
