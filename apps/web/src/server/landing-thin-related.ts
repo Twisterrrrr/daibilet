@@ -60,11 +60,13 @@ export async function loadThinRelatedCardSessions(input: {
   }
 
   // В thin-городах (Екб/Казань) смежные landings часто пустые - добираем из каталога города.
+  // Важно: public catalog фильтрует по имени города («Екатеринбург»), не по landing-slug.
   if (next.length < 3) {
     try {
+      const catalogCity = cityLabel || citySlug;
       const catalog = await buildPublicCatalogDto({
-        city: citySlug,
-        limit: 24,
+        city: catalogCity,
+        limit: 40,
         sort: 'popular',
       });
       const items = (catalog.items || []) as PublicSessionDto[];

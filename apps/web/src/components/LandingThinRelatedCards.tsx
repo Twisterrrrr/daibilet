@@ -92,7 +92,7 @@ export function LandingThinRelatedCards({
         // Fallback: popular catalog for the city (thin cities often lack sibling landings).
         try {
           const response = await fetch(
-            `/api/public/events?city=${encodeURIComponent(citySlug)}&limit=24&sort=popular`,
+            `/api/public/events?city=${encodeURIComponent(cityLabel)}&limit=40&sort=popular`,
           );
           if (response.ok) {
             const data = (await response.json()) as { items?: PublicSessionDto[] };
