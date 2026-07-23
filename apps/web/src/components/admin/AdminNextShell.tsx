@@ -28,8 +28,8 @@ const NAV: NavItem[] = [
   { href: '/admin/cities', label: 'Города', icon: MapPin },
   { href: '/admin/landings', label: 'Лендинги', icon: LayoutTemplate, ready: true },
   { href: '/admin/articles', label: 'Блог', icon: BookOpen, ready: true },
-  { href: '/admin/sources', label: 'Источники', icon: Download },
-  { href: '/admin/settings', label: 'Настройки', icon: Settings },
+  { href: '/admin/sources', label: 'Источники', icon: Download, ready: true },
+  { href: '/admin/settings', label: 'Настройки', icon: Settings, ready: true },
 ];
 
 function isActivePath(pathname: string, href: string) {
@@ -86,7 +86,7 @@ export function AdminNextShell({ children }: Props) {
               <h1 className="text-base font-semibold text-slate-900">Операторская оболочка</h1>
             </div>
             <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs text-emerald-800">
-              F4.1a lists + articles
+              F4.1b sources + settings
             </span>
           </div>
         </header>

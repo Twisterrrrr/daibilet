@@ -444,8 +444,8 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | F4.0 | Kickoff: `(admin)` route group `/admin`, shell, stub dashboard, Basic Auth middleware | Критический | ✅ 2026-07-23 |
 | F4.1 | Port Dashboard (live `/api/admin/dashboard` + sources + orders metrics) | Высокий | ✅ 2026-07-23 |
 | F4.1a | Port Events / Landings / Articles (lists + articles CRUD) | Высокий | ✅ 2026-07-23 |
-| F4.1b | Port Sources / sync-health / Settings | Средний | ⏳ next |
-| F4.1c | Cutover admin.daibilet.ru → Next; retire Vite admin static | Высокий | ⏳ |
+| F4.1b | Port Sources / sync-health / Settings | Средний | ✅ 2026-07-23 |
+| F4.1c | Cutover admin.daibilet.ru → Next; retire Vite admin static | Высокий | ⏳ next |
 | F4.2 | Sync jobs → apps/worker | Средний | ⏳ (после UI port) |
 
 ## F5 — Retire legacy
@@ -481,6 +481,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-23 | F4.1b: Next `/admin/sources` (+ sync trigger, sync-health) и read-only `/admin/settings` |
 | 2026-07-23 | F4.1a: Next `/admin/events|landings|articles` lists; articles create/edit/archive; Vite для deep CRUD |
 | 2026-07-23 | F4.1: Next `/admin` live dashboard (dashboard/sources/orders) через server fetch + Basic Auth forward |
 | 2026-07-23 | F4 kickoff: Next `/admin` shell + Basic Auth middleware; Vite admin остаётся каноном |

@@ -2913,6 +2913,22 @@
 ### Проблемы
 - Экранирование Bearer в PowerShell при remote curl — не использовать однострочный ssh с вложенными кавычками.
 
+## 2026-07-23 - F4.1b: Sources / Settings в Next admin
+
+### Наблюдения
+- Vite Sources: GET `/api/admin/sources` + POST TC/TEP sync. Sync-health - alias на Sources.
+- Vite Settings: нет `/api/admin/settings`; только read-only UX (flags/roles/links).
+
+### Решения
+- `/admin/sources`: cards + table health, openIssues, last sync; server actions sync Ticketscloud/Teplohod.
+- `/admin/sync-health` → redirect на `/admin/sources`.
+- `/admin/settings`: read-only (auth/API base, imports, public URLs, static feature flags, role stubs). Writable toggles не добавляли.
+- Nav: Sources и Settings ready. SEO public файлы не трогали.
+
+### Проблемы
+- Sync POST может быть долгим; UI делает form POST и ждёт redirect. Для prod нужен timeout/proxy как у Vite.
+- Cutover admin subdomain (F4.1c) ещё не начат.
+
 ## 2026-07-23 - F4.1a: Events / Landings / Articles в Next admin
 
 ### Наблюдения
