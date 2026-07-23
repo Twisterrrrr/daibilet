@@ -66,9 +66,9 @@ export function HeroMedia({
           priority
           sizes={IMAGE_SIZES.homeHero}
           onLoad={() => setLoaded(true)}
-          className={`object-cover transition-opacity duration-700 ${active.objectPosition || 'object-center'} ${
-            loaded ? 'opacity-100' : 'opacity-0'
-          }`}
+          className={`object-cover transition-opacity duration-700 ${
+            active.objectPosition || 'object-center'
+          } ${loaded ? 'opacity-100' : 'opacity-0'}`}
         />
       ) : (
         <div className="absolute inset-0 bg-slate-900" />

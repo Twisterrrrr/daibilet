@@ -30,7 +30,7 @@ const HERO_CATEGORY_OPTIONS = [
   { value: 'Речные прогулки', label: 'Речные прогулки' },
 ] as const;
 
-export type HomeHeroFrame = { src: string; alt: string };
+export type HomeHeroFrame = { src: string; alt: string; objectPosition?: string };
 
 type HomeHeroProps = {
   destinations: PublicDestinationDto[];

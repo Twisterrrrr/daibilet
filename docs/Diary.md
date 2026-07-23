@@ -1,4 +1,20 @@
-## 2026-07-24 - /cities: симметрия tiles+aside после photo-hero
+## 2026-07-24 - Home hero: face-safe object-position
+
+### Наблюдения
+
+- На `/` головы/лица «съедались» на разных viewport: `HeroMedia` получал кадры без `objectPosition` и падал в `object-center`.
+
+### Решения
+
+- `heroFramesFromBanners` прокидывает responsive `object-position` (~50% / 22-28% Y) из `home-hero-images`; для CMS HeroBanner (без focusX/Y) - `HOME_HERO_OBJECT_POSITION_DEFAULT`.
+- Venues/cities/blog heroes не трогали (по-прежнему `object-center`).
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next).
+
+---
+
 
 ### Наблюдения
 

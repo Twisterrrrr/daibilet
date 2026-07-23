@@ -11,8 +11,8 @@ type HomeHeroBackgroundProps = {
 
 export function HomeHeroBackground({ image }: HomeHeroBackgroundProps) {
   const [loaded, setLoaded] = React.useState(false);
-  const desktopPos = image.objectPositionDesktop ?? 'md:object-center';
-  const mobilePos = image.objectPositionMobile ?? 'object-cover';
+  const desktopPos = image.objectPositionDesktop ?? 'md:object-[50%_22%]';
+  const mobilePos = image.objectPositionMobile ?? 'object-[50%_28%]';
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
