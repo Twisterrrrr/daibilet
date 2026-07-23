@@ -68,6 +68,8 @@ import {
   warmAdminGroupedEventsCache,
   invalidateAdminGroupedEventsCache,
 } from './dto.js';
+import { buildPublicSearchDto } from './public-search.dto.ts';
+import { loadVenueMapTip } from './public-venue-map-tip.ts';
 import {
   buildSocialPreviewForPath,
   isSocialPreviewAgent,
@@ -375,7 +377,12 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/public/search') {
-      sendPublicJson(response, await withPublicResponseCache(`search:${canonicalSearchParams(url.searchParams)}`, () => buildPublicSearch(db, url.searchParams)));
+      sendPublicJson(
+        response,
+        await withPublicResponseCache(`search-trgm:${canonicalSearchParams(url.searchParams)}`, () =>
+          buildPublicSearchDto(url.searchParams),
+        ),
+      );
       return;
     }
 
@@ -485,6 +492,17 @@ export async function handleRequest(request, response) {
       } catch (error) {
         sendJson(response, { error: error.message || 'unauthorized' }, error.statusCode || 401);
       }
+      return;
+    }
+
+    if (route === 'GET /api/public/venues/map-tip') {
+      const tipId = String(url.searchParams.get('id') || url.searchParams.get('slug') || '').trim();
+      const tip = await loadVenueMapTip(tipId);
+      if (!tip) {
+        sendPublicJson(response, { error: 'not_found' }, 404);
+        return;
+      }
+      sendPublicJson(response, { tip });
       return;
     }
 

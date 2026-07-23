@@ -27,3 +27,4 @@ export {
 export { buildPublicBuyerOrdersDto } from './public-orders.dto.js';
 export { buildPublicStatsDto } from './public-stats.dto.js';
 export { buildPublicSearchDto } from './public-search.dto.js';
+export { loadVenueMapTip } from './public-venue-map-tip.js';
