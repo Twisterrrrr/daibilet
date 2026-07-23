@@ -15,7 +15,7 @@ import {
 
 import type { AdminDashboardPageData, AdminSourceRow } from '@/server/admin-dashboard-data';
 
-const VITE_ADMIN = process.env.NEXT_PUBLIC_VITE_ADMIN_URL || 'https://admin.daibilet.ru';
+const VITE_ADMIN = process.env.NEXT_PUBLIC_VITE_ADMIN_URL || 'https://admin.daibilet.ru/legacy';
 
 function formatNumber(value: number): string {
   return new Intl.NumberFormat('ru-RU').format(Math.max(0, Math.round(value || 0)));

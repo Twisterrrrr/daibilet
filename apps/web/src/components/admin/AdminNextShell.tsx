@@ -75,7 +75,7 @@ export function AdminNextShell({ children }: Props) {
           })}
         </nav>
         <div className="border-t border-slate-200 px-4 py-3 text-xs text-slate-500">
-          Vite admin остаётся каноном на admin.daibilet.ru до полного переноса.
+          Канон: admin.daibilet.ru (Next). Deep CRUD: /legacy (Vite).
         </div>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
@@ -86,7 +86,7 @@ export function AdminNextShell({ children }: Props) {
               <h1 className="text-base font-semibold text-slate-900">Операторская оболочка</h1>
             </div>
             <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs text-emerald-800">
-              F4.1b sources + settings
+              F4.1c admin host cutover
             </span>
           </div>
         </header>

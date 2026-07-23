@@ -8,7 +8,7 @@
 
 ## Цель
 
-Миграция public-сайта на **Next.js 15 App Router** в monorepo (`apps/web`) для **SEO через SSR/ISR**. Public cutover (F3) выполнен. **F4 начат:** shell `/admin` в Next + Basic Auth; канон операторки пока Vite `apps/admin` на admin.daibilet.ru.
+Миграция public-сайта на **Next.js 15 App Router** в monorepo (`apps/web`) для **SEO через SSR/ISR**. Public cutover (F3) выполнен. **F4.1c:** `admin.daibilet.ru` → Next admin (host rewrite); Vite deep CRUD на `/legacy`.
 
 ---
 
@@ -18,7 +18,7 @@
 
 | Приоритет | Фокус | Статус |
 |-----------|--------|--------|
-| 1 | **F4 admin → Next** — перенос admin SPA в Next route group | 🔄 core screens ported; cutover pending |
+| 1 | **F4 admin → Next** — перенос admin SPA в Next route group | ✅ cutover; Vite `/legacy` for deep CRUD |
 | 2 | **Landing matching quality** — правила, аудит выдачи и актуальность событий всех посадок | активный |
 | 3 | **AI / статьи и city hubs** — редакционный контент и SEO-якоря | поддерживающий поток |
 | — | **Finance contour / ЛК поставщиков** | ⚠️ deferred: продукт ещё не готов |
@@ -45,8 +45,8 @@
 ```
 apps/web          — Next 15: public SSR/ISR, Route Handlers, client widgets
 apps/backend      — legacy API + dto.js (sync/writes, admin API)
-apps/admin        — Vite SPA (канон на admin.daibilet.ru до F4 cutover)
-apps/web/app/(admin)/admin — Next admin shell (F4, /admin, Basic Auth)
+apps/admin        — Vite SPA (deep CRUD at admin.daibilet.ru/legacy after F4.1c)
+apps/web/app/(admin)/admin — Next admin (канон на admin.daibilet.ru + /admin)
 apps/public       — Vite SPA (deprecated после F3)
 packages/db       — Prisma schema + client
 packages/contracts — Zod/types, catalog constants
@@ -128,7 +128,7 @@ Cherry-pick из **`codex/phase2-foundation`**: schema, event change requests, a
 | F1 Monorepo shell | ✅ | `pnpm web:build`, health route |
 | F2 Public SSR | ✅ | View Source без JS, parity scripts |
 | F3 Cutover | ✅ | nginx → Next prod (`:3001`) |
-| F4 Admin + worker | 🔄 | shell `/admin` + Basic Auth; port pages; sync → worker |
+| F4 Admin + worker | 🔄 | admin host on Next; Vite `/legacy`; worker pending |
 | F5 Retire dto.js | ⏳ | parity 100%, server.js removed |
 
 Детали: [phases/phase-f-next-fullstack.md](./phases/phase-f-next-fullstack.md), F3: [phases/phase-f3-cutover-checklist.md](./phases/phase-f3-cutover-checklist.md).

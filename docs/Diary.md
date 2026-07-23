@@ -2934,6 +2934,23 @@
 ### Проблемы
 - Экранирование Bearer в PowerShell при remote curl — не использовать однострочный ssh с вложенными кавычками.
 
+## 2026-07-23 - F4.1c: cutover admin.daibilet.ru → Next
+
+### Наблюдения
+- Prod admin был Vite static root + nginx auth_basic + `/api` → :4000.
+- Next уже имел `/admin/*` с Basic Auth и live screens (F4.0–F4.1b); deep Events/Landings CRUD ещё на Vite.
+
+### Решения
+- Вариант B: `admin.daibilet.ru` → Next proxy; middleware host rewrite `/`→`/admin`, `/events`→`/admin/events`.
+- Vite остаётся на `admin.daibilet.ru/legacy/` (`VITE_ADMIN_BASE=/legacy/`, basename) для override/matches.
+- `NEXT_PUBLIC_VITE_ADMIN_URL` default → `…/legacy`. Nginx patch `patch-prod-admin-next.py`; deploy rsync → `/var/www/daibilet/legacy`.
+- Docs: [phase-f4-admin-cutover.md](./phases/phase-f4-admin-cutover.md). Smoke: `scripts/smoke-admin-next-cutover.sh`.
+
+### Проблемы
+- htpasswd и ADMIN_* должны совпадать (двойной Basic Auth nginx+Next).
+- Prod deploy с этой машины может упираться в SSH keys - патч применяется на сервере через deploy script.
+- Полный retire Vite - после port Events/Landings edit (не F4.2 worker).
+
 ## 2026-07-23 - F4.1b: Sources / Settings в Next admin
 
 ### Наблюдения

@@ -438,7 +438,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 ## F4 — Admin → Next (in progress)
 
-**Канон до cutover:** Vite `apps/admin` на admin.daibilet.ru. Next `/admin` - миграционный контур, не ломает public.
+**Канон после F4.1c:** `admin.daibilet.ru` → Next `/admin` (host rewrite). Vite deep CRUD: `admin.daibilet.ru/legacy`. См. [phase-f4-admin-cutover.md](./phases/phase-f4-admin-cutover.md).
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
@@ -446,8 +446,8 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | F4.1 | Port Dashboard (live `/api/admin/dashboard` + sources + orders metrics) | Высокий | ✅ 2026-07-23 |
 | F4.1a | Port Events / Landings / Articles (lists + articles CRUD) | Высокий | ✅ 2026-07-23 |
 | F4.1b | Port Sources / sync-health / Settings | Средний | ✅ 2026-07-23 |
-| F4.1c | Cutover admin.daibilet.ru → Next; retire Vite admin static | Высокий | ⏳ next |
-| F4.2 | Sync jobs → apps/worker | Средний | ⏳ (после UI port) |
+| F4.1c | Cutover admin.daibilet.ru → Next; Vite deep CRUD at `/legacy` | Высокий | ✅ 2026-07-23 |
+| F4.2 | Sync jobs → apps/worker | Средний | ⏳ next |
 
 ## F5 — Retire legacy
 
@@ -482,6 +482,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-23 | F4.1c: admin.daibilet.ru → Next (middleware host rewrite) + Vite `/legacy` for deep CRUD; nginx patch + deploy |
 | 2026-07-23 | F4.1b: Next `/admin/sources` (+ sync trigger, sync-health) и read-only `/admin/settings` |
 | 2026-07-23 | F4.1a: Next `/admin/events|landings|articles` lists; articles create/edit/archive; Vite для deep CRUD |
 | 2026-07-23 | F4.1: Next `/admin` live dashboard (dashboard/sources/orders) через server fetch + Basic Auth forward |

@@ -10,10 +10,12 @@ set -euo pipefail
 
 APP_DIR="${APP_DIR:-/opt/daibilet}"
 ADMIN_DIR="${ADMIN_DIR:-/var/www/daibilet/admin}"
+ADMIN_LEGACY_DIR="${ADMIN_LEGACY_DIR:-/var/www/daibilet/legacy}"
 API_SERVICE="${API_SERVICE:-daibilet-api}"
 WEB_SERVICE="${WEB_SERVICE:-daibilet-web}"
 BRANCH="${BRANCH:-feat/next-monorepo}"
 WEB_PORT="${DAIBILET_WEB_PORT:-3001}"
+APPLY_ADMIN_NGINX_PATCH="${APPLY_ADMIN_NGINX_PATCH:-1}"
 
 cd "$APP_DIR"
 
@@ -48,6 +50,17 @@ grep -q "^NEXT_PUBLIC_TEP_WIDGET_ID=" .env 2>/dev/null || echo "NEXT_PUBLIC_TEP_
 if ! grep -q "^NEXT_PUBLIC_TC_WIDGET_TOKEN=" .env 2>/dev/null; then
   echo "NEXT_PUBLIC_TC_WIDGET_TOKEN=${TICKETSCLOUD_WIDGET_TOKEN:-}" >> .env
 fi
+# F4.1c: deep CRUD Vite under admin.daibilet.ru/legacy
+if ! grep -q "^NEXT_PUBLIC_VITE_ADMIN_URL=" .env 2>/dev/null; then
+  echo "NEXT_PUBLIC_VITE_ADMIN_URL=https://admin.daibilet.ru/legacy" >> .env
+fi
+if ! grep -q "^NEXT_PUBLIC_ADMIN_URL=" .env 2>/dev/null; then
+  echo "NEXT_PUBLIC_ADMIN_URL=https://admin.daibilet.ru" >> .env
+fi
+# Keep DAIBILET_ADMIN_API_URL for server-side admin fetches (default 127.0.0.1:4000).
+if ! grep -q "^DAIBILET_ADMIN_API_URL=" .env 2>/dev/null; then
+  echo "DAIBILET_ADMIN_API_URL=http://127.0.0.1:4000" >> .env
+fi
 
 pnpm db:generate
 pnpm db:deploy
@@ -55,12 +68,17 @@ pnpm db:deploy
 BUILD_NODE_ENV="${BUILD_NODE_ENV:-development}"
 (
   export NODE_ENV="$BUILD_NODE_ENV"
-  VITE_DAIBILET_API_URL="${VITE_DAIBILET_API_URL:-}" \
+  # Vite admin as /legacy/ SPA for deep CRUD after Next cutover.
+  VITE_ADMIN_BASE="/legacy/" \
+  VITE_DAIBILET_API_URL="/api" \
   VITE_DAIBILET_PUBLIC_URL="${PUBLIC_SITE_URL:-https://daibilet.ru}" \
   pnpm --filter @tours/admin build
 )
+mkdir -p "$ADMIN_LEGACY_DIR"
+rsync -a --delete apps/admin/dist/ "$ADMIN_LEGACY_DIR/"
+# Keep previous static root as rollback mirror (optional).
 mkdir -p "$ADMIN_DIR"
-rsync -a --delete apps/admin/dist/ "$ADMIN_DIR/"
+rsync -a --delete apps/admin/dist/ "$ADMIN_DIR/" || true
 
 pnpm web:build
 
@@ -83,6 +101,33 @@ fi
 
 sleep 4
 curl -fsS "http://127.0.0.1:${WEB_PORT}/api/health" >/dev/null && echo "Next /api/health OK on :$WEB_PORT"
+
+# F4.1c nginx: admin.daibilet.ru → Next + /legacy Vite
+if [[ "$APPLY_ADMIN_NGINX_PATCH" == "1" && -f "$APP_DIR/deploy/nginx/patch-prod-admin-next.py" ]]; then
+  if python3 "$APP_DIR/deploy/nginx/patch-prod-admin-next.py"; then
+    if nginx -t 2>/dev/null; then
+      systemctl reload nginx && echo "nginx reloaded (admin Next cutover)"
+    else
+      echo "Warning: nginx -t failed after admin patch — not reloading"
+    fi
+  else
+    echo "Warning: patch-prod-admin-next.py failed"
+  fi
+fi
+
+# Admin smoke (Host rewrite + Basic Auth). Prefer ADMIN_PASSWORD; skip if missing.
+ADMIN_SMOKE_USER="${ADMIN_EMAIL:-${ADMIN_USER:-}}"
+ADMIN_SMOKE_PASS="${ADMIN_PASSWORD:-}"
+if [[ -n "$ADMIN_SMOKE_USER" && -n "$ADMIN_SMOKE_PASS" ]]; then
+  code="$(curl -sS -o /dev/null -w '%{http_code}' -u "${ADMIN_SMOKE_USER}:${ADMIN_SMOKE_PASS}" \
+    -H "Host: admin.daibilet.ru" "http://127.0.0.1:${WEB_PORT}/" || true)"
+  echo "Admin host rewrite smoke HTTP $code (expect 200)"
+  code_legacy="$(curl -sS -o /dev/null -w '%{http_code}' -u "${ADMIN_SMOKE_USER}:${ADMIN_SMOKE_PASS}" \
+    -H "Host: admin.daibilet.ru" "http://127.0.0.1:${WEB_PORT}/admin/events" || true)"
+  echo "Admin /admin/events smoke HTTP $code_legacy (expect 200)"
+else
+  echo "Warning: ADMIN_EMAIL/PASSWORD missing — skip admin Basic Auth smoke"
+fi
 
 # Drop nginx HTML proxy cache so browsers don't get pre-deploy RSC/HTML pointing at deleted chunks.
 if [[ -d /var/cache/nginx/daibilet ]]; then

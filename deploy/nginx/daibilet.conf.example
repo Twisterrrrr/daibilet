@@ -16,6 +16,11 @@ upstream daibilet_api {
     keepalive 32;
 }
 
+upstream daibilet_web {
+    server 127.0.0.1:3001;
+    keepalive 16;
+}
+
 # Force www → apex (HTTP)
 server {
     listen 80;
@@ -102,8 +107,15 @@ server {
     auth_basic "Daibilet admin";
     auth_basic_user_file /etc/nginx/.htpasswd-daibilet-admin;
 
-    root /var/www/daibilet/admin;
-    index index.html;
+    # F4.1c: Vite deep CRUD under /legacy/ (built with VITE_ADMIN_BASE=/legacy/)
+    location ^~ /legacy/ {
+        root /var/www/daibilet;
+        try_files $uri $uri/ /legacy/index.html;
+    }
+
+    location = /legacy {
+        return 302 /legacy/;
+    }
 
     location /api/ {
         proxy_pass http://daibilet_api;
@@ -113,9 +125,19 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header Authorization $http_authorization;
+        proxy_read_timeout 600s;
     }
 
+    # Next apps/web :3001 — middleware rewrites / → /admin, /events → /admin/events
     location / {
-        try_files $uri $uri/ /index.html;
+        proxy_pass http://daibilet_web;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Authorization $http_authorization;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
     }
 }

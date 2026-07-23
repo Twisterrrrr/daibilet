@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { PUBLIC_SITE_BASE, VITE_ADMIN_BASE, viteAdminHref } from '@/lib/admin-ui';
+import { NEXT_ADMIN_BASE, PUBLIC_SITE_BASE, VITE_ADMIN_BASE, viteAdminHref } from '@/lib/admin-ui';
 import { isAdminAuthConfigured, readAdminBasicAuthConfig } from '@/lib/admin-basic-auth';
 import { resolveAdminApiBase } from '@/server/admin-api-fetch';
 
@@ -73,8 +73,8 @@ export default function AdminSettingsPage() {
         <h3 className="text-sm font-semibold text-slate-900">Публичная витрина</h3>
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           <Row label="Публичный сайт" value={PUBLIC_SITE_BASE} />
-          <Row label="Админка (Vite канон)" value={VITE_ADMIN_BASE} />
-          <Row label="Next admin" value={`${PUBLIC_SITE_BASE.replace(/\/$/, '')}/admin`} />
+          <Row label="Админка (Next канон)" value={NEXT_ADMIN_BASE} />
+          <Row label="Vite deep CRUD" value={VITE_ADMIN_BASE} />
           <Row label="Бренд" value="Дайбилет" />
         </div>
       </section>

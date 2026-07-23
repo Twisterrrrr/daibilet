@@ -1,5 +1,8 @@
-export const VITE_ADMIN_BASE = process.env.NEXT_PUBLIC_VITE_ADMIN_URL || 'https://admin.daibilet.ru';
+export const VITE_ADMIN_BASE =
+  process.env.NEXT_PUBLIC_VITE_ADMIN_URL || 'https://admin.daibilet.ru/legacy';
 export const PUBLIC_SITE_BASE = process.env.NEXT_PUBLIC_SITE_URL || 'https://daibilet.ru';
+export const NEXT_ADMIN_BASE =
+  process.env.NEXT_PUBLIC_ADMIN_URL || 'https://admin.daibilet.ru';
 
 export function viteAdminHref(path: string): string {
   const clean = path.startsWith('/') ? path : `/${path}`;

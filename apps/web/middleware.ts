@@ -6,6 +6,7 @@ import {
   isAuthorizedAdminBasicAuth,
   readAdminBasicAuthConfig,
 } from '@/lib/admin-basic-auth';
+import { isAdminHost, rewriteAdminHostPathname } from '@/lib/admin-host';
 import { resolveLegacyLandingRedirect } from '@/lib/landing-routes';
 
 function unauthorizedAdminResponse(realm: string) {
@@ -16,6 +17,13 @@ function unauthorizedAdminResponse(realm: string) {
       'Cache-Control': 'no-store',
     },
   });
+}
+
+async function enforceAdminAuth(request: NextRequest) {
+  const config = readAdminBasicAuthConfig(process.env);
+  const ok = await isAuthorizedAdminBasicAuth(request.headers.get('authorization'), config);
+  if (!ok) return unauthorizedAdminResponse(config.realm);
+  return null;
 }
 
 export async function middleware(request: NextRequest) {
@@ -29,10 +37,27 @@ export async function middleware(request: NextRequest) {
   }
 
   const { pathname } = request.nextUrl;
+
+  // F4.1c: admin.daibilet.ru → rewrite SPA paths onto /admin/*
+  if (isAdminHost(host)) {
+    if (pathname.startsWith('/_next') || pathname.startsWith('/api') || pathname.startsWith('/legacy')) {
+      return NextResponse.next();
+    }
+
+    const denied = await enforceAdminAuth(request);
+    if (denied) return denied;
+
+    const rewritten = rewriteAdminHostPathname(pathname);
+    if (!rewritten) return NextResponse.next();
+
+    const url = request.nextUrl.clone();
+    url.pathname = rewritten;
+    return NextResponse.rewrite(url);
+  }
+
   if (isAdminUiPath(pathname)) {
-    const config = readAdminBasicAuthConfig(process.env);
-    const ok = await isAuthorizedAdminBasicAuth(request.headers.get('authorization'), config);
-    if (!ok) return unauthorizedAdminResponse(config.realm);
+    const denied = await enforceAdminAuth(request);
+    if (denied) return denied;
     return NextResponse.next();
   }
 
@@ -47,9 +72,33 @@ export async function middleware(request: NextRequest) {
 // Static matcher only — Next rejects spread/dynamic arrays in config.matcher.
 export const config = {
   matcher: [
+    '/',
     '/admin',
     '/admin/:path*',
+    '/events',
+    '/events/:path*',
+    '/landings',
     '/landings/:path*',
+    '/articles',
+    '/articles/:path*',
+    '/sources',
+    '/sources/:path*',
+    '/settings',
+    '/settings/:path*',
+    '/orders',
+    '/orders/:path*',
+    '/buyers',
+    '/buyers/:path*',
+    '/venues',
+    '/venues/:path*',
+    '/cities',
+    '/cities/:path*',
+    '/sync-health',
+    '/sync-health/:path*',
+    '/reviews',
+    '/reviews/:path*',
+    '/change-requests',
+    '/change-requests/:path*',
     '/:city/:category',
     '/river-cruises',
     '/river-cruises/:city',
