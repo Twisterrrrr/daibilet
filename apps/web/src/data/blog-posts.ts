@@ -21,6 +21,54 @@ export type BlogPost = {
 /** Обложки - уникальная статика на статью: /images/blog/{slug}.jpg */
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: 'kazan-2-3-dnya-samostoyatelno-karta',
+    title: 'Что посмотреть в Казани за 2-3 дня самостоятельно: готовый маршрут с картой',
+    excerpt:
+      'Спокойный маршрут по Казани на два или три дня: Кремль, улица Баумана, Старо-Татарская слобода, озеро Кабан и современный правый берег.',
+    date: '23 июля 2026',
+    readMin: 10,
+    tag: 'Город',
+    city: 'Казань',
+    citySlug: 'kazan',
+    authorId: 'editorial',
+    authorName: 'Редакция',
+    articleType: 'gid',
+    imageUrl: blogCoverUrl('kazan-2-3-dnya-samostoyatelno-karta'),
+    imageAlt: 'Панорама Казани с Кремлем и набережной',
+  },
+  {
+    slug: 'ekb-stendap-uralskiy-yumor',
+    title: 'Стендап в Екатеринбурге: где послушать уральский юмор и посмеяться',
+    excerpt:
+      'Как выбрать стендап в Екатеринбурге: клубный сет, открытый микрофон или большое шоу, на что смотреть в афише и как покупать билеты без лишних наценок.',
+    date: '23 июля 2026',
+    readMin: 8,
+    tag: 'Город',
+    city: 'Екатеринбург',
+    citySlug: 'ekaterinburg',
+    authorId: 'editorial',
+    authorName: 'Редакция',
+    articleType: 'gid',
+    imageUrl: blogCoverUrl('ekb-stendap-uralskiy-yumor'),
+    imageAlt: 'Стендап-комик на сцене перед зрителями в Екатеринбурге',
+  },
+  {
+    slug: 'ekb-uralskiy-mars-bazhovskie-ekskursii',
+    title: 'Уральский Марс и Бажовские места: топ загородных экскурсий из Екатеринбурга',
+    excerpt:
+      'Как выбрать загородную экскурсию из Екатеринбурга: Уральский Марс, Оленьи ручьи, Ганина Яма и Верхотурье, сравнение своей машины и группового автобуса.',
+    date: '23 июля 2026',
+    readMin: 10,
+    tag: 'Город',
+    city: 'Екатеринбург',
+    citySlug: 'ekaterinburg',
+    authorId: 'editorial',
+    authorName: 'Редакция',
+    articleType: 'gid',
+    imageUrl: blogCoverUrl('ekb-uralskiy-mars-bazhovskie-ekskursii'),
+    imageAlt: 'Пейзаж Уральского Марса недалеко от Екатеринбурга',
+  },
+  {
     slug: 'spb-s-rebenkom-v-dozhd',
     title:
       'Куда сходить с ребёнком в Петербурге в дождь: четыре места без мокрых ног и родительского героизма',

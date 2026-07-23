@@ -20,6 +20,7 @@ export const BLOG_CITY_FILTER_LABELS: Record<string, string> = {
   moscow: 'Москва',
   'saint-petersburg': 'Санкт-Петербург',
   kazan: 'Казань',
+  ekaterinburg: 'Екатеринбург',
   regions: 'Регионы',
   multi: 'Несколько городов',
 };
@@ -158,6 +159,24 @@ const SLUG_META: Record<
     citySlug: 'moscow',
     city: 'Москва',
   },
+  'kazan-2-3-dnya-samostoyatelno-karta': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'kazan',
+    city: 'Казань',
+  },
+  'ekb-stendap-uralskiy-yumor': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'ekaterinburg',
+    city: 'Екатеринбург',
+  },
+  'ekb-uralskiy-mars-bazhovskie-ekskursii': {
+    authorId: 'editorial',
+    articleType: 'gid',
+    citySlug: 'ekaterinburg',
+    city: 'Екатеринбург',
+  },
 };
 
 export function authorLabel(authorId?: string | null): string {
@@ -213,6 +232,9 @@ export function resolveSlugBlogMeta(slug: string): {
   } else if (lower.startsWith('kazan-')) {
     citySlug = 'kazan';
     city = 'Казань';
+  } else if (lower.startsWith('ekb-') || lower.includes('ekaterinburg') || lower.includes('ural')) {
+    citySlug = 'ekaterinburg';
+    city = 'Екатеринбург';
   } else if (lower.includes('regional') || lower.includes('region')) {
     citySlug = 'regions';
     city = 'Регионы';
@@ -243,6 +265,7 @@ export function normalizeBlogCitySlug(
   if (name.includes('москв')) return 'moscow';
   if (name.includes('петербург') || name.includes('санкт')) return 'saint-petersburg';
   if (name.includes('казан')) return 'kazan';
+  if (name.includes('екатеринбург') || name.includes('уральск')) return 'ekaterinburg';
   if (name.includes('регион')) return 'regions';
   return null;
 }

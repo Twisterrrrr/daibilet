@@ -2,7 +2,7 @@
 
 **Дата:** 2026-07-23  
 **Цель:** статьи-гиды → утверждённые category×city / intent посадки.  
-**Статус:** batch #1 (10 шт., Казань + Екб) утверждён владельцем; полные тексты пишет GPT по промпту, Cursor размещает MD.  
+**Статус:** batch #1 (10 шт., Казань + Екб) утверждён; **пачка A (ID 1, 8, 10) размещена в блоге 2026-07-23**; пачка B ждёт тексты GPT.  
 **Первая генерация:** эталоны ТЗ №1 (ID 1), №2 (ID 8), №3 (ID 10) - см. `seo-guide-articles-gpt-prompt.md` → «Эталонные ТЗ (3 типа)».
 
 Связанные файлы:
@@ -104,11 +104,17 @@
 
 ## Очередь публикации
 
-1. **Сейчас - пачка A (эталоны):** ID **1 → 8 → 10** (ТЗ №1 городской, №2 событийный, №3 загородный). В GPT: System + готовый User-template из промпта, **по одной статье за запрос**.
+1. **Пачка A (эталоны) - размещено 2026-07-23:** ID **1, 8, 10** → `/blog/kazan-2-3-dnya-samostoyatelno-karta`, `/blog/ekb-stendap-uralskiy-yumor`, `/blog/ekb-uralskiy-mars-bazhovskie-ekskursii` (`PUBLISHED`; cover = плейсхолдер city image, TODO уникальные фото).
 2. **Пачка B:** остальной batch #1 (ID 2, 3, 4, 5, 6, 7, 9) - универсальный User + строки плана.
 3. Затем batch #2: High МСК/СПб из таблицы выше.
 4. Средний - после editorial polish и насыщения каталога.
 
 ## Пилот размещения
 
-Первая пачка на размещение после генерации: **ID 1 + 8 + 10** (эталоны трёх типов). Тексты в этом тикете не пишем.
+| ID | Slug | URL | Статус | Cover |
+|----|------|-----|--------|-------|
+| 1 | `kazan-2-3-dnya-samostoyatelno-karta` | https://daibilet.ru/blog/kazan-2-3-dnya-samostoyatelno-karta | ✅ размещено | TODO: уникальное фото (сейчас `kazan.png`) |
+| 8 | `ekb-stendap-uralskiy-yumor` | https://daibilet.ru/blog/ekb-stendap-uralskiy-yumor | ✅ размещено | TODO: уникальное фото (сейчас `ekaterinburg.png`) |
+| 10 | `ekb-uralskiy-mars-bazhovskie-ekskursii` | https://daibilet.ru/blog/ekb-uralskiy-mars-bazhovskie-ekskursii | ✅ размещено | TODO: уникальное фото (сейчас `ekaterinburg.png`) |
+
+Пачка B (не размещена): ID 2, 3, 4, 5, 6, 7, 9.

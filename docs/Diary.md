@@ -1,3 +1,23 @@
+## 2026-07-23 - SEO guide пачка A (ID 1, 8, 10) → блог
+
+### Наблюдения
+
+- Архив `daibilet-guides-batch-a.zip`: 3 MD эталона (Казань 2-3 дня, стендап Екб, Уральский Марс).
+- Frontmatter GPT совпал со схемой `content/blog`; длинных тире нет; `[NOTE]` + CTA на подтверждённые CHPU.
+
+### Решения
+
+- Размещены `content/blog/{kazan-2-3-dnya-samostoyatelno-karta,ekb-stendap-uralskiy-yumor,ekb-uralskiy-mars-bazhovskie-ekskursii}.md` (`PUBLISHED`).
+- Карточки в `blog-posts` (web+public), `blog-meta` (+ фильтр `ekaterinburg`), `blog:sync-bodies`.
+- Cover: временный плейсхолдер из `cities/kazan.png` / `ekaterinburg.png` → `/images/blog/{slug}.jpg` (TODO уникальные фото).
+- План: `docs/seo-guide-articles-plan.md` - пачка A отмечена размещённой.
+
+### Проблемы
+
+- Уникальные обложки и inline-фото ещё не сняты/не куплены - city placeholder.
+
+---
+
 ## 2026-07-23 - F4.4 Orders/Venues/Cities + soft-retire legacy
 
 ### Наблюдения
