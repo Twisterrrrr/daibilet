@@ -52,7 +52,7 @@
 
 ### Проблемы
 
-- Нет.
+- Нет. **Prod @`db34d03` (код `fc5e309`):** deploy-prod-next OK; smoke `/events` `/blog` `/cities/sankt-peterburg` `/podborki` - `bg-slate-50` + crumbs + H1, без fuchsia/full-bleed city photo.
 
 ---
 
