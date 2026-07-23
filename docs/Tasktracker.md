@@ -15,7 +15,7 @@
 | H.2 | Home imageOverlay/rotator + Prisma `HeroBanner` + admin toggle | Критический | ✅ `72ea839` prod migrate+deploy |
 | H.3 | `/cities` split + RF map hover + top tiles ISR 1h | Высокий | ✅ |
 | H.3b | `/cities` top tiles + «Популярные города»: max-w-5xl + items-stretch (как podborki) | Критический | ✅ `d1ccd8a` prod |
-| H.4 | `/podborki` editorial 70/30 featured/trending | Высокий | ✅ |
+| H.4 | `/podborki` featured+trending equal-height, centered `max-w-5xl` | Высокий | ✅ `533d40a` prod @`d1ccd8a` |
 | H.5 | `/venues` dark imageOverlay + search | Средний | ✅ MVP |
 | H.6 | `/locations` withMap (map points on list) | Средний | 🔄 stub: RussiaMap + filters; pin map follow-up |
 | H.7 | Video loop asset для home | Низкий | ⏳ нет ассета - rotator images |

@@ -45,7 +45,7 @@
 
 ### Проблемы
 
-- Нет (commit + deploy-prod-next).
+- Нет. **Prod @`d1ccd8a` (код `533d40a`):** `/podborki` 200; HTML содержит `max-w-5xl items-stretch`.
 
 ---
 
