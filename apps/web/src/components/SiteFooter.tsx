@@ -64,12 +64,6 @@ export function SiteFooter({ destinations }: SiteFooterProps) {
                 info@daibilet.ru
               </a>
             </div>
-            <p className="mt-2 text-sm font-medium text-slate-700">
-              ИНН 781125361276 · ОГРНИП 306784709000338
-            </p>
-            <Link href="/requisites" className="mt-1 inline-block text-sm text-slate-500 hover:text-primary-600">
-              Реквизиты
-            </Link>
           </div>
 
           <FooterColumn title="События" links={catalogLinks} />

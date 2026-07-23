@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Building2, HelpCircle, Mail, MapPin, Scale } from 'lucide-react';
+import { Building2, HelpCircle, Mail, Scale } from 'lucide-react';
 
 import { ContactForm } from '@/components/ContactForm';
 
@@ -70,23 +70,6 @@ export function ContactsPageContent() {
                 <Link href="/requisites" className="mt-3 inline-block text-sm font-semibold text-primary-700 hover:underline">
                   Полные реквизиты
                 </Link>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="flex items-start gap-3">
-              <div className="rounded-xl bg-slate-100 p-2.5 text-slate-600">
-                <MapPin className="h-5 w-5" />
-              </div>
-              <div>
-                <h2 className="text-base font-bold text-slate-900">Адрес</h2>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                  193091, Россия, г. Санкт-Петербург, наб. Октябрьская, д. 24, корп. 1, кв. 28
-                </p>
-                <p className="mt-2 text-sm text-slate-500">
-                  Офис для посетителей не ведётся - вопросы по заказам решаем онлайн и по почте.
-                </p>
               </div>
             </div>
           </div>

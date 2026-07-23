@@ -108,7 +108,7 @@ packages/config   — shared tsconfig/eslint
 - **Meta (event Казань/Екб):** `Билеты на {Title} в {City_Пр} - расписание, цены от {N} руб.` (+ graceful без цены) (`seo-event-meta.ts`).
 - **Thin listing:** &lt; 6 офферов → `noindex,follow`; при ровно 6–7 офферах - доп. карточки смежных категорий (`LandingThinRelatedCards`).
 - **Launch set:** утверждён TOP-15 category×city и intent URL. Для узких направлений действуют ограничения городов: `/progulki-po-krysham/saint-petersburg` и `/zagorodnye-ekskursii/saint-petersburg` не получают московских вариантов. Канонический weekend intent - `/podborki/na-vyhodnye`; старый `na-vyhodnyh` отдаёт permanent redirect.
-- **Контакты:** до подключения номера 8-800 публикуются email, ИНН и ОГРНИП, без подставного телефона.
+- **Контакты:** до подключения номера 8-800 публикуются email, ИНН и ОГРНИП на `/contacts` (и полные реквизиты на `/requisites`); в футере только email. Юридический адрес - на `/requisites`, без отдельного блока на contacts.
 - Обычный блог - вторичен относительно SEO-листингов до насыщения ядра посадок.
 
 ---

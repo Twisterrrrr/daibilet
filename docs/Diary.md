@@ -1,3 +1,42 @@
+## 2026-07-24 - Hero-зоны: HeroLayout + home rotator (P0/P1/P2)
+
+### Наблюдения
+
+- Нейтральный `SectionPageHero` уравнял catalog surfaces, но владелец хочет эмоциональный first viewport на home / cities / podborki / venues / locations.
+- Blog magazine Featured Hero - параллельный поток: не трогали `/blog`.
+
+### Решения
+
+- Общий `HeroLayout` (`minimal | withMap | imageOverlay | split | video`) + `HeroMedia` (next/image priority, rotator/video).
+- Prisma `HeroBanner` + migration `20260724020000_hero_banner` (seed 4 баннера) + admin `/admin/hero-banners` toggle isActive.
+- Home: brand-first «Дайбилет», headline «Найдите, куда сходить в эти выходные», поиск Город/Дата/Категория, frames из HeroBanner (fallback static pool).
+- `/cities` split + SVG map RF (МСК/СПб/Казань), top city tiles, revalidate 3600.
+- `/podborki` editorial 70/30: featured banner + trending; роли через `Landing.layoutVariant` HERO_FEATURED/HERO_TRENDING + slug fallback.
+- `/venues` dark imageOverlay + search «театр или клуб»; `/locations` withMap stub (RussiaMap + filters).
+
+### Проблемы
+
+- Local migrate: postgres :5437 down; `prisma.config.ts` jiti/babel broken locally (generate обходили `--schema` без config). Prod: `db:deploy` sequential после generate.
+
+---
+
+## 2026-07-24 - Trust UI: адрес и реквизиты только на contacts/requisites
+
+### Наблюдения
+
+- Владелец: скрыть блок юридического адреса (Октябрьская) и убрать ИНН/ОГРНИП с главной/футера - на `/contacts` достаточно.
+
+### Решения
+
+- `SiteFooter`: убраны строки ИНН/ОГРНИП и отдельная ссылка «Реквизиты» под email (ссылка «Реквизиты» в колонке Компания остаётся).
+- `/contacts`: скрыт блок адреса; организация + ИНН/ОГРНИП и ссылка на `/requisites` сохранены. Полный адрес по-прежнему на `/requisites`.
+
+### Проблемы
+
+- Нет (SHA/deploy - после commit).
+
+---
+
 ## 2026-07-24 - Blog Hero: isFeatured + informational layout (LCP)
 
 ### Наблюдения

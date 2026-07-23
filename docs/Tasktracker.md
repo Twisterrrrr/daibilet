@@ -1,9 +1,24 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-07-23
+**Обновлено:** 2026-07-24
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
+
+---
+
+## Hero UX (2026-07-24)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| H.1 | Shared `HeroLayout` + `HeroMedia` (LCP priority) | Критический | ✅ |
+| H.2 | Home imageOverlay/rotator + Prisma `HeroBanner` + admin toggle | Критический | ✅ (migrate/deploy pending) |
+| H.3 | `/cities` split + RF map hover + top tiles ISR 1h | Высокий | ✅ |
+| H.4 | `/podborki` editorial 70/30 featured/trending | Высокий | ✅ |
+| H.5 | `/venues` dark imageOverlay + search | Средний | ✅ MVP |
+| H.6 | `/locations` withMap (map points on list) | Средний | 🔄 stub: RussiaMap + filters; pin map follow-up |
+| H.7 | Video loop asset для home | Низкий | ⏳ нет ассета - rotator images |
+| H.8 | Blog Featured Hero | Высокий | 🔄 parallel agent - не трогаем |
 
 ---
 
@@ -43,7 +58,7 @@
 | SEO.8a | Editorial polish текстов TOP-15, в первую очередь новые `walking-tours`, `country-tours`, `exhibitions`, `unusual-theatres`, `excursions`, `rooftops` | Высокий | 🔄 seed готов, нужна редакторская вычитка | владелец + агент |
 | SEO.8b | `country-tours`: требовать экскурсионный и направленческий сигналы, исключить культурные события по топонимам | Высокий | ✅ 2026-07-23 | runtime `dto.js` синхронизирован, prod deploy + smoke: 3 экскурсии, без оперы и концертов |
 | SEO.8c | Аудит всех landing rules: исключить мусорные попадания, сверить сэмплы и runtime `dto.js` | Критический | 🔄 2026-07-23 | rules audit в работе; `rooftops`, `new-year`, `bus-tours` требуют deploy/smoke |
-| SEO.9 | Реальные отзывы / телефон 8-800 на контактах | Средний | ⏳ номер pending; ИНН/ОГРНИП усилены на `/contacts` + футер; телефон не публикуем | **владелец** (номер) / агент (trust UI ✅) |
+| SEO.9 | Реальные отзывы / телефон 8-800 на контактах | Средний | ⏳ номер pending; ИНН/ОГРНИП только `/contacts` (+ `/requisites`); адрес скрыт с contacts, полный на `/requisites`; футер без реквизитов; телефон не публикуем | **владелец** (номер) / агент (trust UI ✅) |
 | SEO.11 | Порог индекса SEO-листингов | Критический | ✅ `MIN_LISTING_OFFERS_FOR_INDEX = 6` (не поднимать: Екб/Казань thin) | агент |
 | SEO.12 | Внутренняя перелинковка: футер «Популярные направления», event breadcrumbs → CHPU, «Смотрите также» на листингах | Высокий | ✅ 2026-07-23 | агент |
 | SEO.13 | SSR JSON-LD: BreadcrumbList (listing+event) + ItemList только на CHPU landings (non-empty) | Высокий | ✅ 2026-07-23 | агент |
