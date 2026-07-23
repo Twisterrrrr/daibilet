@@ -16,8 +16,9 @@ server {{
     listen [::]:443 ssl http2;
     server_name admin.daibilet.ru;
 
-    ssl_certificate     /etc/ssl/daibilet.ru.crt;
-    ssl_certificate_key /etc/ssl/daibilet.ru.key;
+    # LE cert for api.daibilet.ru also includes admin.daibilet.ru SAN (valid).
+    ssl_certificate     /etc/letsencrypt/live/api.daibilet.ru/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/api.daibilet.ru/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
 
     auth_basic "Daibilet admin";

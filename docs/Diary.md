@@ -1,3 +1,26 @@
+## 2026-07-23 - SEO: переобход URL + sitemap intents + план путеводителей
+
+### Наблюдения
+
+- Утверждённый TOP-15 нужен владельцу для ручного переобхода в Яндекс.Вебмастер / GSC - агент в панели не логинится.
+- Landings chunk на prod уже фильтрует thin (&lt; 6 офферов): Казань/крыши/загородные и ряд TOP URL корректно отсутствуют в sitemap.
+- Static sitemap слепо включал все `/podborki/{intent}` без проверки офферов: `/podborki/besplatno` был в sitemap при `noindex,follow`.
+- City hubs `/cities/kazan` и `/cities/ekaterinburg` в cities chunk есть; indexable Екб-стендап есть в landings.
+
+### Решения
+
+- Собран копипаст TOP-15 абсолютных URL для переобхода (owner action).
+- `buildStaticSitemapEntries` стал async: intents (и city-variants приоритетных городов) попадают в sitemap только при ≥ `MIN_LISTING_OFFERS_FOR_INDEX`.
+- План контентной воронки: `docs/seo-guide-articles-plan.md` (+ csv) - 30 тем Казань/Екб/МСК/СПб с CHPU и приоритетом. Полные тексты не пишем пачкой.
+- Sitemap для панелей: `https://daibilet.ru/sitemap.xml` (index).
+
+### Проблемы
+
+- Часть TOP-15 сейчас thin (`noindex`) - переобход всё равно имеет смысл, но индексация дождётся ≥ 6 офферов после sync/matching.
+- Отправка sitemap и клики в Вебмастере/GSC - только руками владельца.
+
+---
+
 ## 2026-07-23 - Hero главной: ротация славянских туристов
 
 ### Наблюдения
@@ -2952,6 +2975,11 @@
 
 ### Проблемы
 - Экранирование Bearer в PowerShell при remote curl — не использовать однострочный ssh с вложенными кавычками.
+
+### Prod proof (2026-07-23)
+- Deploy `05a5901` + nginx patch; admin SSL → LE `api.daibilet.ru` cert (SAN includes admin).
+- Smoke: `https://daibilet.ru/events` 200; `https://admin.daibilet.ru/` 401 без auth / 200 с Basic Auth (Next dashboard HTML); `/legacy` 200; `/events` `/sources` 200.
+- Public site не затронут.
 
 ## 2026-07-23 - F4.1c: cutover admin.daibilet.ru → Next
 
