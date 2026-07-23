@@ -196,11 +196,7 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
       </div>
 
       <p className="text-xs text-slate-500">
-        Канон операторки до cutover:{' '}
-        <a href={VITE_ADMIN} className="underline hover:text-slate-800">
-          {VITE_ADMIN}
-        </a>
-        . Next `/admin` - миграционный read-only контур F4.
+        Канон операторки: Next `/admin` (F4.6). Vite `/legacy` hard-retired.
       </p>
     </div>
   );

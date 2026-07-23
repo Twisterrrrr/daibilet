@@ -108,6 +108,8 @@ export const config = {
     '/reviews/:path*',
     '/change-requests',
     '/change-requests/:path*',
+    '/legacy',
+    '/legacy/:path*',
     '/:city/:category',
     '/river-cruises',
     '/river-cruises/:city',
