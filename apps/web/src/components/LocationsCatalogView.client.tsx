@@ -2,10 +2,11 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 import { Search } from 'lucide-react';
 
 import { LocationCard } from '@/components/LocationCard.client';
+import { LocationsCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
 import { HeroLayout } from '@/components/HeroLayout';
 import { RussiaMap } from '@/components/RussiaMap.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
@@ -31,10 +32,12 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
   const [query, setQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [sortMode, setSortMode] = useState<SortMode>('events');
+  const [isPending, startTransition] = useTransition();
 
   const urlCity = searchParams.get('city')?.trim() || '';
   const cityReady = selectedCity?.cityReady ?? true;
   const cityPending = !urlCity && Boolean(selectedCity) && !cityReady;
+  const listPending = cityPending || isPending;
 
   const cityOptions = useMemo(() => {
     const counts = new Map<string, number>();
@@ -62,7 +65,9 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
     if (next === 'all') params.delete('city');
     else params.set('city', next);
     const qs = params.toString();
-    router.replace(qs ? `/locations?${qs}` : '/locations', { scroll: false });
+    startTransition(() => {
+      router.replace(qs ? `/locations?${qs}` : '/locations', { scroll: false });
+    });
   };
 
   const typeOptions = useMemo(() => {
@@ -78,7 +83,7 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
   }, [venues]);
 
   const filteredVenues = useMemo(() => {
-    if (cityPending) return [];
+    if (listPending) return [];
     const normalized = query.trim().toLowerCase();
     const filtered = venues.filter((venue) => {
       if (cityFilter !== 'all' && venue.city !== cityFilter) return false;
@@ -96,7 +101,7 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
       if (sortMode === 'desc') return right.name.localeCompare(left.name, 'ru');
       return left.name.localeCompare(right.name, 'ru');
     });
-  }, [venues, query, cityFilter, typeFilter, sortMode, cityPending]);
+  }, [venues, query, cityFilter, typeFilter, sortMode, listPending]);
 
   const cityCount = cityOptions.length;
   const eventsHref = catalogHrefWithSelectedCity(selectedCity?.cityValue);
@@ -146,7 +151,7 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
         <div className="container-page flex gap-2 overflow-x-auto py-3">
           <button
             type="button"
-            onClick={() => setTypeFilter('all')}
+            onClick={() => startTransition(() => setTypeFilter('all'))}
             className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
               typeFilter === 'all' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
             }`}
@@ -160,7 +165,7 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
               <button
                 key={option.value}
                 type="button"
-                onClick={() => setTypeFilter(active ? 'all' : option.value)}
+                onClick={() => startTransition(() => setTypeFilter(active ? 'all' : option.value))}
                 className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
                   active ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                 }`}
@@ -177,8 +182,8 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
       <div className="container-page py-8">
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
           <h2 className="text-lg font-semibold text-slate-900">
-            {cityPending ? (
-              'Загрузка…'
+            {listPending ? (
+              'Обновляем список…'
             ) : (
               <>
                 Найдено: {formatNumber(filteredVenues.length)}
@@ -204,12 +209,8 @@ export function LocationsCatalogView({ venues }: { venues: PublicVenueDto[] }) {
           </div>
         </div>
 
-        {cityPending ? (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="h-40 animate-pulse rounded-xl bg-slate-100" />
-            ))}
-          </div>
+        {listPending ? (
+          <LocationsCatalogSkeleton />
         ) : filteredVenues.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             {filteredVenues.map((venue) => (

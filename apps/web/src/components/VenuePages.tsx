@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 import { LocationsCatalogView } from '@/components/LocationsCatalogView.client';
 import { VenuesCatalogView } from '@/components/VenuesCatalogView.client';
 import { VenuePageView } from '@/components/VenuePageView.client';
+import { VenueCatalogPageSkeleton } from '@/components/VenueCatalogSkeletons';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { buildPublicVenueDto, buildPublicVenuesDto } from '@daibilet/backend/public-read';
@@ -78,11 +79,11 @@ export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
   return (
     <SiteLayout>
       {family === 'location' ? (
-        <Suspense fallback={<div className="container-page py-10 text-sm text-slate-500">Загрузка локаций…</div>}>
+        <Suspense fallback={<VenueCatalogPageSkeleton family="location" />}>
           <LocationsCatalogView venues={venues} />
         </Suspense>
       ) : (
-        <Suspense fallback={<div className="container-page py-10 text-sm text-slate-500">Загрузка площадок…</div>}>
+        <Suspense fallback={<VenueCatalogPageSkeleton family="institution" />}>
           <VenuesCatalogView venues={venues} />
         </Suspense>
       )}

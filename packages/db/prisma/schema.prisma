@@ -823,6 +823,8 @@ model Venue {
   tripPlanItems   TripPlanItem[]
   reviews         Review[]
   externalReviews ExternalReview[]
+
+  @@index([title])
 }
 
 model VenueAlias {

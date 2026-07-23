@@ -35,6 +35,11 @@ import {
   queryAdminEventGroupsPage,
   queryAdminLaunchMetricsSql,
 } from './admin-events-sql-read-model.js';
+import {
+  applyVenueEventFacetCounts,
+  fetchLeanPublicVenueRows,
+  fetchVenueEventFacetCounts,
+} from './public-venue-lean.ts';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const ACTIVE_SESSION_SQL = `(
@@ -2842,17 +2847,19 @@ export async function buildAdminTaxonomy(db) {
 export async function buildAdminVenuesList(db, searchParams) {
   const limit = clampNumber(searchParams.get('limit'), 1, 200, 80);
   const page = clampNumber(searchParams.get('page'), 1, 100000, 1);
-  const query = String(searchParams.get('q') || '').trim().toLowerCase();
+  const query = String(searchParams.get('q') || '').trim();
   const familyFilter = String(searchParams.get('family') || '').trim().toLowerCase();
-  const rows = await venueRows(db, 2000, { lean: true });
-  const filtered = rows.filter((venue) => {
-    if (query) {
-      const haystack = [venue.name, venue.city, venue.address, venue.proposedKind, venue.pageStatus]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase();
-      if (!haystack.includes(query)) return false;
-    }
+  const rows = await fetchLeanPublicVenueRows(2000, { leanText: true, q: query || undefined });
+  const facets = await fetchVenueEventFacetCounts(rows.map((row) => row.id));
+  const enriched = applyVenueEventFacetCounts(rows, facets).map((row) => {
+    const mapped = {
+      ...row,
+      name: formatPublicVenueTitle(row.name || row.title),
+    };
+    mapped.city = resolvePublicVenueCity(mapped);
+    return applyPublicVenueNormalization(mapped);
+  });
+  const filtered = enriched.filter((venue) => {
     if (!familyFilter) return true;
     const kind = normalizeVenueKindValue(venue.kind || venue.proposedKind);
     const isInstitution = INSTITUTION_VENUE_KINDS.has(kind);
@@ -2873,10 +2880,10 @@ export async function buildAdminVenuesList(db, searchParams) {
     total,
     rows: filtered.slice((safePage - 1) * limit, safePage * limit),
     metrics: {
-      venues: rows.length,
-      candidates: rows.filter((venue) => venue.pageStatus === 'candidate').length,
-      published: rows.filter((venue) => venue.pageStatus === 'published').length,
-      withEvents: rows.filter((venue) => venue.events > 0).length,
+      venues: enriched.length,
+      candidates: enriched.filter((venue) => venue.pageStatus === 'candidate').length,
+      published: enriched.filter((venue) => venue.pageStatus === 'published').length,
+      withEvents: enriched.filter((venue) => venue.events > 0).length,
     },
   };
 }
@@ -6514,16 +6521,19 @@ export async function publicVenueHubRows(db, limit = 500, options = {}) {
     return publicVenueHubCache.rows;
   }
 
-  const [rows, sessions] = await Promise.all([venueRows(db, limit), publicCatalogSessions(db)]);
-  const { activeCounts, waterCounts, busCounts, heroImageFallbacks, nextSessionStartsAt } = buildActiveVenueEventCounts(sessions);
-  const enriched = rows.map((row) => ({
-    ...row,
-    events: activeCounts.get(row.id) || 0,
-    waterEvents: waterCounts.get(row.id) || 0,
-    busEvents: busCounts.get(row.id) || 0,
-    heroImageUrl: resolveVenueHeroImageUrl(row, heroImageFallbacks),
-    nextSessionStartsAt: nextSessionStartsAt.get(row.id) || null,
-  }));
+  // Lean Prisma select + `_count` (active events) - no full catalog session hydrate for tiles.
+  const leanRows = await fetchLeanPublicVenueRows(Math.max(limit, 500), { leanText: false });
+  const facets = await fetchVenueEventFacetCounts(leanRows.map((row) => row.id));
+  const enriched = applyVenueEventFacetCounts(leanRows, facets).map((row) => {
+    const mapped = {
+      ...row,
+      name: formatPublicVenueTitle(row.name || row.title),
+      heroImageUrl: resolveVenueHeroImageUrl(row, null),
+      nextSessionStartsAt: null,
+    };
+    mapped.city = resolvePublicVenueCity(mapped);
+    return applyPublicVenueNormalization(mapped);
+  });
   const merged = mergePublicVenueHubRows(enriched.filter((row) => isPublicVenueHub(row, options)));
   publicVenueHubCache = {
     cacheKey,

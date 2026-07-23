@@ -15,7 +15,24 @@
 
 ---
 
-## 2026-07-24 - /cities + /blog: photo hero как у venues
+## 2026-07-24 - /venues + /locations: lean `_count`, skeletons, title index
+
+### Наблюдения
+
+- Owner tip: каталог площадок/локаций тянул полный `publicCatalogSessions` ради count на плитках; фильтры давали full-page loader; поиск по title без индекса.
+
+### Решения
+
+- `publicVenueHubRows` + admin venues list: Prisma lean `select` + `_count.events` (status not HIDDEN/DRAFT) через `public-venue-lean.ts`; water/bus facets - лёгкий SQL aggregate без hydrate sessions/offers.
+- UI: `VenueCatalogSkeletons` + Suspense fallback; city/type filters через `useTransition` → pulse-карточки вместо жёсткого loader.
+- Schema: `Venue @@index([title])`, migration `20260724030000_venue_title_search_index` (admin/public `contains` по title).
+
+### Проблемы
+
+- Count на плитках теперь active Event rows, не saleable groupKey из каталога - возможны небольшие расхождения цифр vs афиша; DTO shape без изменений.
+- Deploy: `db:deploy` в `deploy-prod-next` подхватит индекс.
+
+---
 
 ### Наблюдения
 
