@@ -58,7 +58,7 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
           href={viteAdminHref('/events')}
           className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
         >
-          Vite taxonomy+
+          Vite (schedule+)
         </a>
       </header>
 
@@ -164,7 +164,7 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
                           href={viteAdminHref(`/events?q=${encodeURIComponent(row.title)}`)}
                           className="text-slate-500 hover:underline"
                         >
-                          Vite taxonomy
+                          Vite schedule
                         </a>
                         {row.slug ? (
                           <a

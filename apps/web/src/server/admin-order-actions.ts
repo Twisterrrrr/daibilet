@@ -42,3 +42,35 @@ export async function archiveAdminOrderAction(formData: FormData) {
   revalidatePath(`/admin/orders/${id}`);
   redirect(`/admin/orders/${encodeURIComponent(id)}?archived=1`);
 }
+
+export async function upsertAdminOrderTicketAction(formData: FormData) {
+  const id = String(formData.get('id') || '').trim();
+  const externalTicketId = String(formData.get('externalTicketId') || '').trim();
+  const status = String(formData.get('status') || 'issued').trim() || 'issued';
+  const eventId = String(formData.get('eventId') || '').trim() || null;
+  const ticketId = String(formData.get('ticketId') || '').trim() || null;
+  if (!id) throw new Error('missing order id');
+  if (!externalTicketId || externalTicketId.length < 2) {
+    throw new Error('ticket number required');
+  }
+
+  const response = await adminApiFetch(`/api/admin/orders/${encodeURIComponent(id)}/tickets`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id: ticketId,
+      externalTicketId,
+      status,
+      eventId,
+    }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    throw new Error(`ticket upsert failed HTTP ${response.status}${text ? `: ${text.slice(0, 200)}` : ''}`);
+  }
+
+  revalidatePath('/admin/orders');
+  revalidatePath(`/admin/orders/${id}`);
+  redirect(`/admin/orders/${encodeURIComponent(id)}?ticket=1`);
+}

@@ -157,6 +157,19 @@ export type AdminEventDetailData = {
   canPublish: boolean | null;
   publishBlockers: string[];
   groupEventIds: string[];
+  classification: {
+    categoryId: string | null;
+    primarySubcategoryId: string | null;
+    subcategoryIds: string[];
+    tagIds: string[];
+  };
+  errors: string[];
+};
+
+export type AdminTaxonomyData = {
+  categories: Array<{ id: string; title: string; slug: string }>;
+  subcategories: Array<{ id: string; categoryId: string; title: string; slug: string }>;
+  tags: Array<{ id: string; title: string; slug: string }>;
   errors: string[];
 };
 
@@ -173,6 +186,15 @@ function emptyOverride(): AdminEventOverride {
     isIndexable: null,
     editorStatus: null,
     mergeGroupKey: null,
+  };
+}
+
+function emptyClassification() {
+  return {
+    categoryId: null as string | null,
+    primarySubcategoryId: null as string | null,
+    subcategoryIds: [] as string[],
+    tagIds: [] as string[],
   };
 }
 
@@ -209,6 +231,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
       canPublish: null,
       publishBlockers: [],
       groupEventIds: [],
+      classification: emptyClassification(),
       errors: ['missing event id'],
     };
   }
@@ -216,6 +239,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
   let canPublish: boolean | null = null;
   let publishBlockers: string[] = [];
   let slug: string | null = null;
+  let classification = emptyClassification();
 
   try {
     const listResponse = await adminApiFetch(
@@ -232,6 +256,15 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
           ? match.publishBlockers.map((item) => String(item))
           : [];
         slug = match.slug != null ? String(match.slug) : null;
+        classification = {
+          categoryId: match.categoryId != null ? String(match.categoryId) : null,
+          primarySubcategoryId:
+            match.primarySubcategoryId != null ? String(match.primarySubcategoryId) : null,
+          subcategoryIds: Array.isArray(match.subcategoryIds)
+            ? match.subcategoryIds.map((item) => String(item))
+            : [],
+          tagIds: Array.isArray(match.tagIds) ? match.tagIds.map((item) => String(item)) : [],
+        };
       }
     }
   } catch {
@@ -254,6 +287,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
         canPublish,
         publishBlockers,
         groupEventIds: [],
+        classification,
         errors,
       };
     }
@@ -286,6 +320,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
       canPublish,
       publishBlockers,
       groupEventIds,
+      classification,
       errors,
     };
   } catch (error) {
@@ -302,7 +337,57 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
       canPublish,
       publishBlockers,
       groupEventIds: [],
+      classification,
       errors,
     };
+  }
+}
+
+export async function loadAdminTaxonomy(): Promise<AdminTaxonomyData> {
+  const errors: string[] = [];
+  try {
+    const response = await adminApiFetch('/api/admin/taxonomy');
+    if (!response.ok) {
+      errors.push(`taxonomy HTTP ${response.status}`);
+      return { categories: [], subcategories: [], tags: [], errors };
+    }
+    const payload = (await response.json()) as Record<string, unknown>;
+    return {
+      categories: Array.isArray(payload.categories)
+        ? payload.categories.map((item) => {
+            const row = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
+            return {
+              id: String(row.id || ''),
+              title: String(row.title || row.slug || ''),
+              slug: String(row.slug || ''),
+            };
+          })
+        : [],
+      subcategories: Array.isArray(payload.subcategories)
+        ? payload.subcategories.map((item) => {
+            const row = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
+            return {
+              id: String(row.id || ''),
+              categoryId: String(row.categoryId || ''),
+              title: String(row.title || row.slug || ''),
+              slug: String(row.slug || ''),
+            };
+          })
+        : [],
+      tags: Array.isArray(payload.tags)
+        ? payload.tags.map((item) => {
+            const row = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
+            return {
+              id: String(row.id || ''),
+              title: String(row.title || row.slug || ''),
+              slug: String(row.slug || ''),
+            };
+          })
+        : [],
+      errors,
+    };
+  } catch (error) {
+    errors.push(`taxonomy: ${error instanceof Error ? error.message : 'network error'}`);
+    return { categories: [], subcategories: [], tags: [], errors };
   }
 }

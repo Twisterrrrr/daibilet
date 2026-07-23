@@ -7,10 +7,12 @@ import {
   BookOpen,
   Building2,
   CalendarDays,
+  ClipboardList,
   Download,
   LayoutDashboard,
   LayoutTemplate,
   MapPin,
+  MessageSquareQuote,
   Receipt,
   Settings,
 } from 'lucide-react';
@@ -29,6 +31,8 @@ const NAV: NavItem[] = [
   { href: '/admin/venues', label: 'Площадки', icon: Building2, ready: true },
   { href: '/admin/cities', label: 'Города', icon: MapPin, ready: true },
   { href: '/admin/landings', label: 'Лендинги', icon: LayoutTemplate, ready: true },
+  { href: '/admin/reviews', label: 'Отзывы', icon: MessageSquareQuote, ready: true },
+  { href: '/admin/change-requests', label: 'ECR', icon: ClipboardList, ready: true },
   { href: '/admin/articles', label: 'Блог', icon: BookOpen, ready: true },
   { href: '/admin/sources', label: 'Источники', icon: Download, ready: true },
   { href: '/admin/settings', label: 'Настройки', icon: Settings, ready: true },
@@ -77,7 +81,7 @@ export function AdminNextShell({ children }: Props) {
           })}
         </nav>
         <div className="border-t border-slate-200 px-4 py-3 text-xs text-slate-500">
-          F4.4: daily hot path в Next. /legacy deprecated (gaps below).
+          F4.5: rare ops в Next. /legacy для schedule/blocks/buyers.
         </div>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
@@ -88,7 +92,7 @@ export function AdminNextShell({ children }: Props) {
               <h1 className="text-base font-semibold text-slate-900">Операторская оболочка</h1>
             </div>
             <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs text-emerald-800">
-              F4.4 Orders/Venues/Cities
+              F4.5 rare ops
             </span>
           </div>
         </header>

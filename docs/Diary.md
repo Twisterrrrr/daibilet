@@ -1,3 +1,24 @@
+## 2026-07-23 - F4.5 rare ops (taxonomy / ticket-link / ECR / Reviews)
+
+### Наблюдения
+
+- Владелец выбрал F4.5 rare ops (не freeze): taxonomy, ticket-link, ECR/Reviews + candidates.
+- API уже был: `/api/admin/taxonomy`, event taxonomy PATCH, order tickets POST, reviews, event-change-requests, landing candidates.
+- Параллельно guides batch A - content/blog не трогали.
+
+### Решения
+
+- Next: taxonomy form на `/admin/events/[id]`; ticket upsert + candidates на orders; candidates search на landings; `/admin/reviews`; `/admin/change-requests` (+ detail).
+- Nav: Отзывы + ECR.
+- Soft-retire checklist обновлён; **Vite hard-retire: NO** (schedule/sales, content blocks, buyers, unarchive/delete).
+
+### Проблемы
+
+- Полный Vite Events sheet (расписание/продажи) и landing blocks editor всё ещё нужны.
+- Finance не трогали.
+
+---
+
 ## 2026-07-23 - SEO guide пачка A (ID 1, 8, 10) → блог
 
 ### Наблюдения

@@ -10,6 +10,20 @@ import { formatAdminNumber, PUBLIC_SITE_BASE, viteAdminHref } from '@/lib/admin-
 
 type Props = {
   detail: AdminLandingDetailData;
+  candidates?: {
+    query: string;
+    rows: Array<{
+      id: string;
+      title: string;
+      city: string;
+      venue: string;
+      readiness: string;
+      manualStatus: string | null;
+      isAutoMatch: boolean;
+      groupEventIds: string[];
+    }>;
+    errors: string[];
+  };
   notice?: string | null;
 };
 
@@ -20,7 +34,7 @@ function matchLabel(status: string | null | undefined) {
   return 'авто';
 }
 
-export function AdminLandingEditor({ detail, notice }: Props) {
+export function AdminLandingEditor({ detail, candidates, notice }: Props) {
   const statusValue =
     detail.status.toUpperCase() === 'PUBLISHED'
       ? 'PUBLISHED'
@@ -42,7 +56,7 @@ export function AdminLandingEditor({ detail, notice }: Props) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">{detail.title}</h2>
           <p className="mt-1 text-sm text-slate-600">
-            SEO + pin/exclude matches. Candidates search / blocks - в Vite.
+            SEO + pin/exclude + candidates search. Content blocks - в Vite.
           </p>
           {detail.subtitle ? <p className="mt-2 max-w-3xl text-sm text-slate-600">{detail.subtitle}</p> : null}
         </div>
@@ -51,7 +65,7 @@ export function AdminLandingEditor({ detail, notice }: Props) {
             href={viteAdminHref('/landings')}
             className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
           >
-            Vite (candidates+)
+            Vite (blocks+)
           </a>
           <a
             href={`${PUBLIC_SITE_BASE.replace(/\/$/, '')}/${encodeURIComponent(detail.slug)}`}
@@ -76,6 +90,39 @@ export function AdminLandingEditor({ detail, notice }: Props) {
         <Metric label="Закреплено" value={detail.metrics.pinnedEvents} />
         <Metric label="Скрыто" value={detail.metrics.excludedEvents} />
       </div>
+
+      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h3 className="text-sm font-semibold text-slate-900">Поиск кандидатов</h3>
+        <p className="mt-1 text-xs text-slate-500">
+          Найди событие и закрепи / исключи без Vite.
+        </p>
+        <form className="mt-3 flex flex-wrap gap-2" method="get">
+          <input
+            name="cq"
+            defaultValue={candidates?.query || ''}
+            placeholder="Название / город / venue..."
+            className="min-w-[220px] flex-1 rounded-md border border-slate-200 px-3 py-2 text-sm"
+          />
+          <button
+            type="submit"
+            className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
+          >
+            Найти
+          </button>
+        </form>
+        {candidates?.errors.length ? (
+          <p className="mt-2 text-xs text-amber-800">{candidates.errors.join(' · ')}</p>
+        ) : null}
+        {candidates?.query ? (
+          <div className="mt-3">
+            <MatchTable
+              slug={detail.slug}
+              title={`Кандидаты: «${candidates.query}»`}
+              events={candidates.rows}
+            />
+          </div>
+        ) : null}
+      </section>
 
       <form
         action={saveAdminLandingSeoAction}

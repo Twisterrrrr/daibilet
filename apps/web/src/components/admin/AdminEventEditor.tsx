@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
+import { AdminEventTaxonomyForm } from '@/components/admin/AdminEventTaxonomyForm';
 import {
   saveAdminEventModerationAction,
   saveAdminEventOverrideAction,
 } from '@/server/admin-event-actions';
-import type { AdminEventDetailData } from '@/server/admin-events-data';
+import type { AdminEventDetailData, AdminTaxonomyData } from '@/server/admin-events-data';
 import { formatAdminNumber, PUBLIC_SITE_BASE, viteAdminHref } from '@/lib/admin-ui';
 
 const MODERATION_STATUSES = [
@@ -18,10 +19,11 @@ const MODERATION_STATUSES = [
 
 type Props = {
   detail: AdminEventDetailData;
+  taxonomy: AdminTaxonomyData;
   notice?: string | null;
 };
 
-export function AdminEventEditor({ detail, notice }: Props) {
+export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
   const override = detail.override;
   const currentStatus = (override.editorStatus || 'REVIEW').toUpperCase();
   const canPublish = detail.canPublish !== false && detail.publishBlockers.length === 0;
@@ -41,7 +43,7 @@ export function AdminEventEditor({ detail, notice }: Props) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">{displayTitle}</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Override текстов + moderation. Taxonomy / расписание / продажи - в Vite.
+            Override + taxonomy + moderation. Расписание / продажи / source - в Vite.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -49,7 +51,7 @@ export function AdminEventEditor({ detail, notice }: Props) {
             href={viteAdminHref(`/events?q=${encodeURIComponent(displayTitle)}`)}
             className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
           >
-            Vite (taxonomy+)
+            Vite (schedule+)
           </a>
           {detail.slug ? (
             <a
@@ -119,6 +121,12 @@ export function AdminEventEditor({ detail, notice }: Props) {
           })}
         </div>
       </section>
+
+      <AdminEventTaxonomyForm
+        eventId={detail.id}
+        classification={detail.classification}
+        taxonomy={taxonomy}
+      />
 
       <form
         action={saveAdminEventOverrideAction}

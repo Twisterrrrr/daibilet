@@ -75,3 +75,39 @@ export async function saveAdminEventModerationAction(formData: FormData) {
   revalidatePath(`/admin/events/${id}`);
   redirect(`/admin/events/${encodeURIComponent(id)}?moderation=1`);
 }
+
+export async function saveAdminEventTaxonomyAction(formData: FormData) {
+  const id = String(formData.get('id') || '').trim();
+  if (!id) throw new Error('missing event id');
+
+  const categoryId = emptyToNull(formData.get('categoryId'));
+  const primarySubcategoryId = emptyToNull(formData.get('primarySubcategoryId'));
+  const subcategoryIds = formData
+    .getAll('subcategoryIds')
+    .map((item) => String(item || '').trim())
+    .filter(Boolean);
+  const tagIds = formData
+    .getAll('tagIds')
+    .map((item) => String(item || '').trim())
+    .filter(Boolean);
+
+  const response = await adminApiFetch(`/api/admin/events/${encodeURIComponent(id)}/taxonomy`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      categoryId,
+      primarySubcategoryId,
+      subcategoryIds,
+      tagIds,
+    }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    throw new Error(`taxonomy save failed HTTP ${response.status}${text ? `: ${text.slice(0, 200)}` : ''}`);
+  }
+
+  revalidatePath('/admin/events');
+  revalidatePath(`/admin/events/${id}`);
+  redirect(`/admin/events/${encodeURIComponent(id)}?saved=taxonomy`);
+}

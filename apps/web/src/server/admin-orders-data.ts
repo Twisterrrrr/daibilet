@@ -217,6 +217,54 @@ export async function loadAdminOrderDetail(orderId: string): Promise<AdminOrderD
   }
 }
 
+export type AdminOrderEventCandidate = {
+  id: string;
+  title: string;
+  city: string | null;
+  venue: string | null;
+  sourceCode: string | null;
+  groupEventIds: string[];
+};
+
+export async function loadAdminOrderEventCandidates(
+  query: string,
+): Promise<{ rows: AdminOrderEventCandidate[]; errors: string[] }> {
+  const errors: string[] = [];
+  const q = query.trim();
+  if (!q) return { rows: [], errors };
+
+  try {
+    const params = new URLSearchParams();
+    params.set('q', q);
+    params.set('limit', '12');
+    const response = await adminApiFetch(`/api/admin/order-event-candidates?${params.toString()}`);
+    if (!response.ok) {
+      errors.push(`candidates HTTP ${response.status}`);
+      return { rows: [], errors };
+    }
+    const payload = (await response.json()) as Record<string, unknown>;
+    const rows = Array.isArray(payload.rows)
+      ? payload.rows.map((item) => {
+          const row = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
+          return {
+            id: String(row.id || ''),
+            title: String(row.title || row.id || ''),
+            city: row.city != null ? String(row.city) : null,
+            venue: row.venue != null ? String(row.venue) : null,
+            sourceCode: row.sourceCode != null ? String(row.sourceCode) : null,
+            groupEventIds: Array.isArray(row.groupEventIds)
+              ? row.groupEventIds.map((value) => String(value))
+              : [],
+          };
+        })
+      : [];
+    return { rows, errors };
+  } catch (error) {
+    errors.push(`candidates: ${error instanceof Error ? error.message : 'network error'}`);
+    return { rows: [], errors };
+  }
+}
+
 function emptyOrders(errors: string[]): AdminOrdersListData {
   return {
     page: 1,

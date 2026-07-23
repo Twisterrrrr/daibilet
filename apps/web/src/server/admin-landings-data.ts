@@ -252,3 +252,59 @@ function emptyLandings(errors: string[]): AdminLandingsListData {
     errors,
   };
 }
+
+export type AdminLandingCandidateRow = {
+  id: string;
+  title: string;
+  city: string;
+  venue: string;
+  readiness: string;
+  manualStatus: string | null;
+  isAutoMatch: boolean;
+  groupEventIds: string[];
+};
+
+export async function loadAdminLandingCandidates(
+  slug: string,
+  query: string,
+): Promise<{ rows: AdminLandingCandidateRow[]; errors: string[] }> {
+  const errors: string[] = [];
+  const q = query.trim();
+  if (!q) return { rows: [], errors };
+
+  try {
+    const params = new URLSearchParams();
+    params.set('q', q);
+    params.set('limit', '20');
+    const response = await adminApiFetch(
+      `/api/admin/landings/${encodeURIComponent(slug)}/candidates?${params.toString()}`,
+    );
+    if (!response.ok) {
+      errors.push(`landing candidates HTTP ${response.status}`);
+      return { rows: [], errors };
+    }
+    const payload = (await response.json()) as Record<string, unknown>;
+    const rows = Array.isArray(payload.rows)
+      ? payload.rows.map((item) => {
+          const row = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
+          const groupEventIds = Array.isArray(row.groupEventIds)
+            ? row.groupEventIds.map((id) => String(id))
+            : [String(row.id || '')].filter(Boolean);
+          return {
+            id: String(row.id || ''),
+            title: String(row.title || 'Событие'),
+            city: String(row.city || '—'),
+            venue: String(row.venue || '—'),
+            readiness: String(row.readiness || '—'),
+            manualStatus: row.manualStatus != null ? String(row.manualStatus) : null,
+            isAutoMatch: Boolean(row.isAutoMatch),
+            groupEventIds,
+          };
+        })
+      : [];
+    return { rows, errors };
+  } catch (error) {
+    errors.push(`landing candidates: ${error instanceof Error ? error.message : 'network error'}`);
+    return { rows: [], errors };
+  }
+}

@@ -1,8 +1,11 @@
 import Link from 'next/link';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
-import { archiveAdminOrderAction } from '@/server/admin-order-actions';
-import { loadAdminOrderDetail } from '@/server/admin-orders-data';
+import { archiveAdminOrderAction, upsertAdminOrderTicketAction } from '@/server/admin-order-actions';
+import {
+  loadAdminOrderDetail,
+  loadAdminOrderEventCandidates,
+} from '@/server/admin-orders-data';
 import { formatAdminDateTime, formatAdminNumber, viteAdminHref } from '@/lib/admin-ui';
 
 export const dynamic = 'force-dynamic';
@@ -20,8 +23,14 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
   const { id: rawId } = await params;
   const id = decodeURIComponent(rawId);
   const rawSearch = await searchParams;
+  const cq = (first(rawSearch.cq) || '').trim();
+  const prefillEventId = (first(rawSearch.eventId) || '').trim();
   const detail = await loadAdminOrderDetail(id);
-  const notice = first(rawSearch.archived) === '1' ? 'Заказ архивирован.' : null;
+  const candidates = cq ? await loadAdminOrderEventCandidates(cq) : { rows: [], errors: [] as string[] };
+
+  let notice: string | null = null;
+  if (first(rawSearch.archived) === '1') notice = 'Заказ архивирован.';
+  if (first(rawSearch.ticket) === '1') notice = 'Билет сохранён / привязан.';
 
   return (
     <div className="space-y-4">
@@ -39,7 +48,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
             {detail.publicCode || detail.externalOrderId}
           </h2>
           <p className="mt-1 text-sm text-slate-600">
-            Read + archive. Ручная привязка билетов/событий - в Vite.
+            Read + archive + ticket-link upsert. Unarchive / delete - в Vite.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -56,9 +65,9 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
           ) : null}
           <a
             href={viteAdminHref('/orders')}
-            className="rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-800"
+            className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
           >
-            Vite tickets+
+            Vite (unarchive+)
           </a>
         </div>
       </header>
@@ -69,7 +78,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
         </div>
       ) : null}
 
-      <AdminApiErrorBanner errors={detail.errors} />
+      <AdminApiErrorBanner errors={[...detail.errors, ...candidates.errors]} />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Info label="Статус" value={detail.status} />
@@ -112,19 +121,22 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
                 <th className="px-3 py-2 font-medium">Номер</th>
                 <th className="px-3 py-2 font-medium">Статус</th>
                 <th className="px-3 py-2 font-medium">Событие</th>
+                <th className="px-3 py-2 font-medium"> </th>
               </tr>
             </thead>
             <tbody>
               {detail.tickets.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-3 py-8 text-center text-slate-500">
+                  <td colSpan={4} className="px-3 py-8 text-center text-slate-500">
                     Нет билетов в зеркале.
                   </td>
                 </tr>
               ) : (
                 detail.tickets.map((ticket) => (
                   <tr key={ticket.id} className="border-b border-slate-100">
-                    <td className="px-3 py-2 font-mono text-xs">{ticket.externalTicketId || ticket.id}</td>
+                    <td className="px-3 py-2 font-mono text-xs">
+                      {ticket.externalTicketId || ticket.id}
+                    </td>
                     <td className="px-3 py-2">{ticket.status}</td>
                     <td className="px-3 py-2">
                       {ticket.eventId ? (
@@ -138,6 +150,14 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
                         ticket.eventTitle || '—'
                       )}
                     </td>
+                    <td className="px-3 py-2 text-right">
+                      <Link
+                        href={`/admin/orders/${encodeURIComponent(detail.id)}?eventId=${encodeURIComponent(ticket.eventId || '')}&editTicket=${encodeURIComponent(ticket.id)}`}
+                        className="text-xs text-sky-700 hover:underline"
+                      >
+                        Править
+                      </Link>
+                    </td>
                   </tr>
                 ))
               )}
@@ -145,7 +165,129 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
           </table>
         </div>
       </section>
+
+      <TicketUpsertForm
+        orderId={detail.id}
+        ticketId={first(rawSearch.editTicket) || ''}
+        defaultTicketNumber={
+          detail.tickets.find((ticket) => ticket.id === first(rawSearch.editTicket))
+            ?.externalTicketId || ''
+        }
+        defaultStatus={
+          detail.tickets.find((ticket) => ticket.id === first(rawSearch.editTicket))?.status ||
+          'issued'
+        }
+        defaultEventId={
+          prefillEventId ||
+          detail.tickets.find((ticket) => ticket.id === first(rawSearch.editTicket))?.eventId ||
+          ''
+        }
+      />
+
+      <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <h3 className="text-sm font-semibold text-slate-900">Поиск события для привязки</h3>
+        <form className="mt-3 flex flex-wrap gap-2" method="get">
+          <input type="hidden" name="editTicket" value={first(rawSearch.editTicket) || ''} />
+          <input
+            name="cq"
+            defaultValue={cq}
+            placeholder="Название / город / venue..."
+            className="min-w-[220px] flex-1 rounded-md border border-slate-200 px-3 py-2 text-sm"
+          />
+          <button
+            type="submit"
+            className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
+          >
+            Найти
+          </button>
+        </form>
+        {cq ? (
+          <ul className="mt-3 divide-y divide-slate-100 rounded-md border border-slate-100">
+            {candidates.rows.length === 0 ? (
+              <li className="px-3 py-4 text-sm text-slate-500">Ничего не найдено.</li>
+            ) : (
+              candidates.rows.map((row) => (
+                <li key={row.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
+                  <div>
+                    <div className="font-medium text-slate-900">{row.title}</div>
+                    <div className="text-xs text-slate-500">
+                      {[row.city, row.venue, row.sourceCode].filter(Boolean).join(' · ')}
+                    </div>
+                  </div>
+                  <Link
+                    href={`/admin/orders/${encodeURIComponent(detail.id)}?cq=${encodeURIComponent(cq)}&eventId=${encodeURIComponent(row.id)}${first(rawSearch.editTicket) ? `&editTicket=${encodeURIComponent(first(rawSearch.editTicket)!)}` : ''}`}
+                    className="rounded-md border border-slate-200 px-2 py-1 text-xs hover:bg-slate-50"
+                  >
+                    Подставить eventId
+                  </Link>
+                </li>
+              ))
+            )}
+          </ul>
+        ) : null}
+      </section>
     </div>
+  );
+}
+
+function TicketUpsertForm({
+  orderId,
+  ticketId,
+  defaultTicketNumber,
+  defaultStatus,
+  defaultEventId,
+}: {
+  orderId: string;
+  ticketId: string;
+  defaultTicketNumber: string;
+  defaultStatus: string;
+  defaultEventId: string;
+}) {
+  return (
+    <form
+      action={upsertAdminOrderTicketAction}
+      className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+    >
+      <input type="hidden" name="id" value={orderId} />
+      {ticketId ? <input type="hidden" name="ticketId" value={ticketId} /> : null}
+      <h3 className="text-sm font-semibold text-slate-900">
+        {ticketId ? 'Обновить билет' : 'Добавить / привязать билет'}
+      </h3>
+      <div className="grid gap-3 md:grid-cols-3">
+        <label className="block space-y-1">
+          <span className="text-xs font-medium text-slate-600">Номер билета</span>
+          <input
+            name="externalTicketId"
+            required
+            defaultValue={defaultTicketNumber}
+            className="w-full rounded-md border border-slate-200 px-3 py-2 font-mono text-sm"
+          />
+        </label>
+        <label className="block space-y-1">
+          <span className="text-xs font-medium text-slate-600">Статус</span>
+          <input
+            name="status"
+            defaultValue={defaultStatus || 'issued'}
+            className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
+          />
+        </label>
+        <label className="block space-y-1">
+          <span className="text-xs font-medium text-slate-600">eventId</span>
+          <input
+            name="eventId"
+            defaultValue={defaultEventId}
+            placeholder="evt_..."
+            className="w-full rounded-md border border-slate-200 px-3 py-2 font-mono text-sm"
+          />
+        </label>
+      </div>
+      <button
+        type="submit"
+        className="rounded-md bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800"
+      >
+        Сохранить ticket-link
+      </button>
+    </form>
   );
 }
 

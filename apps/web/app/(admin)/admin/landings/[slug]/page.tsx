@@ -1,6 +1,9 @@
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
 import { AdminLandingEditor } from '@/components/admin/AdminLandingEditor';
-import { loadAdminLandingDetail } from '@/server/admin-landings-data';
+import {
+  loadAdminLandingCandidates,
+  loadAdminLandingDetail,
+} from '@/server/admin-landings-data';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,12 +29,22 @@ export default async function AdminLandingDetailPage({ params, searchParams }: P
   const { slug: rawSlug } = await params;
   const slug = decodeURIComponent(rawSlug);
   const rawSearch = await searchParams;
-  const data = await loadAdminLandingDetail(slug);
+  const cq = (first(rawSearch.cq) || '').trim();
+  const [data, candidates] = await Promise.all([
+    loadAdminLandingDetail(slug),
+    cq
+      ? loadAdminLandingCandidates(slug, cq)
+      : Promise.resolve({ rows: [], errors: [] as string[] }),
+  ]);
 
   return (
     <div className="space-y-4">
       <AdminApiErrorBanner errors={data.errors} />
-      <AdminLandingEditor detail={data} notice={noticeFromSearch(rawSearch)} />
+      <AdminLandingEditor
+        detail={data}
+        candidates={{ query: cq, rows: candidates.rows, errors: candidates.errors }}
+        notice={noticeFromSearch(rawSearch)}
+      />
     </div>
   );
 }
