@@ -24,7 +24,7 @@ export function createPublicVenueRouteHandler(
       const tipId = String(context.searchParams.get('id') || context.searchParams.get('slug') || '').trim();
       const tip = await loadVenueMapTip(tipId);
       if (!tip) {
-        sendPublicJson(context.response, { error: 'not_found' }, 404);
+        sendPublicJson(context.response, { error: 'not_found' }, { statusCode: 404 });
         return true;
       }
       sendPublicJson(context.response, { tip });

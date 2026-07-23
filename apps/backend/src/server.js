@@ -498,7 +498,7 @@ export async function handleRequest(request, response) {
       const tipId = String(url.searchParams.get('id') || url.searchParams.get('slug') || '').trim();
       const tip = await loadVenueMapTip(tipId);
       if (!tip) {
-        sendPublicJson(response, { error: 'not_found' }, 404);
+        sendPublicJson(response, { error: 'not_found' }, { statusCode: 404 });
         return;
       }
       sendPublicJson(response, { tip });
