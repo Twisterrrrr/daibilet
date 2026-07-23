@@ -6,13 +6,16 @@ import { Clock } from 'lucide-react';
 import { SafeImage } from '@/components/SafeImage.client';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import type { BlogCardDto } from '@/lib/blog-utils';
-import { formatBlogPublishedAt } from '@/lib/blog-utils';
+import { resolveBlogCardDateLabel } from '@/lib/blog-utils';
 import { authorLabel, blogAuthorNameClassName, isColumnArticle } from '@/lib/blog-meta';
-import { resolveBlogListingQuickLinks } from '@/lib/blog-listing-links';
+import {
+  resolveBlogListingCta,
+  resolveBlogListingQuickLinks,
+} from '@/lib/blog-listing-links';
 
 function BlogListRow({ post }: { post: BlogCardDto }) {
   const staticPost = BLOG_POSTS.find((item) => item.slug === post.slug);
-  const dateLabel = formatBlogPublishedAt(post.publishedAt, staticPost?.date || '');
+  const dateLabel = resolveBlogCardDateLabel(post);
   const tag = post.tag || staticPost?.tag || 'Гид';
   const articleHref = `/blog/${post.slug}`;
   const excerpt = String(post.excerpt || '').trim();
@@ -23,6 +26,13 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
     city: post.city,
     citySlug: post.citySlug,
     limit: 3,
+  });
+  const cta = resolveBlogListingCta({
+    slug: post.slug,
+    title: post.title,
+    tag,
+    city: post.city,
+    citySlug: post.citySlug,
   });
 
   const chips: Array<{ key: string; label: string }> = [];
@@ -72,15 +82,15 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
               {post.authorName || authorLabel(post.authorId)}
             </span>
           ) : null}
-          {dateLabel ? <span>{dateLabel}</span> : null}
+          {dateLabel ? <time dateTime={post.publishedAt || undefined}>{dateLabel}</time> : null}
           <span className="inline-flex items-center gap-1">
             <Clock className="h-3.5 w-3.5" aria-hidden />
             {post.readMin} мин
           </span>
         </div>
 
-        {chips.length || quickLinks.length ? (
-          <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Метки и разделы">
+        {chips.length || quickLinks.length || cta ? (
+          <div className="mt-2 flex flex-wrap items-center gap-1.5" aria-label="Метки и разделы">
             {chips.map((chip) => (
               <span
                 key={chip.key}
@@ -98,6 +108,14 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
                 {link.label}
               </Link>
             ))}
+            {cta ? (
+              <Link
+                href={cta.href}
+                className="inline-flex items-center rounded-md bg-slate-900 px-2.5 py-1 text-[11px] font-semibold text-white transition hover:bg-slate-800 sm:text-xs"
+              >
+                {cta.label}
+              </Link>
+            ) : null}
           </div>
         ) : null}
       </div>

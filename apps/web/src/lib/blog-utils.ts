@@ -1,11 +1,13 @@
 import { BLOG_ARTICLE_BODIES } from '@/data/blog-article-bodies';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import { blogCoverUrl } from '@/lib/blog-cover';
+import { resolveBlogPrimaryLandingSlug } from '@/lib/blog-listing-links';
 import {
   authorLabel,
   normalizeBlogCitySlug,
   resolveSlugBlogMeta,
 } from '@/lib/blog-meta';
+import { resolveBlogTopics, type BlogTopicId } from '@/lib/blog-topics';
 
 export type BlogCardDto = {
   slug: string;
@@ -15,11 +17,16 @@ export type BlogCardDto = {
   citySlug?: string | null;
   coverImageUrl: string;
   publishedAt?: string | null;
+  /** Дата редакции для карточек, если publishedAt пустой (из static frontmatter). */
+  editorialDate?: string | null;
   readMin: number;
   tag: string;
   authorId?: string | null;
   authorName?: string | null;
   articleType?: string | null;
+  topics?: BlogTopicId[];
+  /** Нижний регистр: title + excerpt + tag + slug + фрагмент body для поиска на `/blog`. */
+  searchText?: string;
 };
 
 export type BlogArticleDto = {
@@ -109,9 +116,25 @@ export function expandLargeListingCopy(
   return { primary, secondary };
 }
 
+function buildSearchText(input: {
+  slug: string;
+  title: string;
+  excerpt?: string | null;
+  tag?: string | null;
+  city?: string | null;
+}): string {
+  const body = plainLeadFromBody(input.slug).slice(0, 900);
+  return [input.slug, input.title, input.excerpt, input.tag, input.city, body]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function enrichCardFields(slug: string, partial: Partial<BlogCardDto>): Pick<
   BlogCardDto,
-  'city' | 'citySlug' | 'authorId' | 'authorName' | 'articleType' | 'tag'
+  'city' | 'citySlug' | 'authorId' | 'authorName' | 'articleType' | 'tag' | 'topics'
 > {
   const meta = resolveSlugBlogMeta(slug);
   const authorId = partial.authorId || meta.authorId;
@@ -130,6 +153,19 @@ function enrichCardFields(slug: string, partial: Partial<BlogCardDto>): Pick<
           : city
             ? 'Город'
             : 'Гид');
+  const landingSlug = resolveBlogPrimaryLandingSlug(
+    slug,
+    String(partial.title || ''),
+    tag,
+    citySlug,
+  );
+  const topics = resolveBlogTopics({
+    slug,
+    title: partial.title,
+    tag,
+    excerpt: partial.excerpt,
+    landingSlug,
+  });
 
   return {
     city,
@@ -138,12 +174,15 @@ function enrichCardFields(slug: string, partial: Partial<BlogCardDto>): Pick<
     authorName: partial.authorName || authorLabel(authorId),
     articleType,
     tag,
+    topics,
   };
 }
 
 export function staticBlogCards(): BlogCardDto[] {
   return BLOG_POSTS.map((post) => {
     const enriched = enrichCardFields(post.slug, {
+      title: post.title,
+      excerpt: post.excerpt,
       city: post.city,
       citySlug: post.citySlug,
       authorId: post.authorId,
@@ -157,7 +196,15 @@ export function staticBlogCards(): BlogCardDto[] {
       excerpt: post.excerpt,
       coverImageUrl: post.imageUrl,
       publishedAt: null,
+      editorialDate: post.date || null,
       readMin: post.readMin,
+      searchText: buildSearchText({
+        slug: post.slug,
+        title: post.title,
+        excerpt: post.excerpt,
+        tag: enriched.tag,
+        city: enriched.city,
+      }),
       ...enriched,
     };
   });
@@ -181,7 +228,10 @@ export function mergeBlogCards(
 
   return apiArticles.map((article) => {
     const staticPost = BLOG_POSTS.find((item) => item.slug === article.slug);
+    const excerpt = article.excerpt || staticPost?.excerpt || '';
     const enriched = enrichCardFields(article.slug, {
+      title: article.title,
+      excerpt,
       city: article.city ?? staticPost?.city,
       citySlug: article.citySlug ?? staticPost?.citySlug,
       authorId: article.authorId ?? staticPost?.authorId,
@@ -192,10 +242,18 @@ export function mergeBlogCards(
     return {
       slug: article.slug,
       title: article.title,
-      excerpt: article.excerpt || staticPost?.excerpt || '',
+      excerpt,
       coverImageUrl: article.coverImageUrl || blogCoverUrl(article.slug),
       publishedAt: article.publishedAt,
+      editorialDate: staticPost?.date || null,
       readMin: estimateReadMin(article.excerpt || article.title),
+      searchText: buildSearchText({
+        slug: article.slug,
+        title: article.title,
+        excerpt,
+        tag: enriched.tag,
+        city: enriched.city,
+      }),
       ...enriched,
     };
   });
@@ -206,6 +264,8 @@ export function resolveStaticArticle(slug: string): BlogArticleDto | null {
   if (!post) return null;
   const body = BLOG_ARTICLE_BODIES[post.slug];
   const enriched = enrichCardFields(post.slug, {
+    title: post.title,
+    excerpt: post.excerpt,
     city: post.city,
     citySlug: post.citySlug,
     authorId: post.authorId,
@@ -232,12 +292,21 @@ export function resolveStaticArticle(slug: string): BlogArticleDto | null {
 }
 
 export function formatBlogPublishedAt(value?: string | null, fallback = ''): string {
-  if (!value) return fallback;
+  const fb = String(fallback || '').trim();
+  if (!value) return fb;
   try {
-    return new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }).format(new Date(value));
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return fb;
+    return new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }).format(date);
   } catch {
-    return fallback;
+    return fb;
   }
+}
+
+/** Дата на карточке: publishedAt → editorialDate (static) → ''. */
+export function resolveBlogCardDateLabel(post: Pick<BlogCardDto, 'publishedAt' | 'editorialDate' | 'slug'>): string {
+  const staticDate = BLOG_POSTS.find((item) => item.slug === post.slug)?.date || '';
+  return formatBlogPublishedAt(post.publishedAt, post.editorialDate || staticDate || '');
 }
 
 /** Похожие статьи для сайдбара: город → автор → тип → остальные. */

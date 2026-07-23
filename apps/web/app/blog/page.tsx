@@ -32,6 +32,8 @@ export default async function BlogPage({ searchParams }: PageProps) {
   const filters = {
     city: firstParam(params.city),
     author: firstParam(params.author),
+    topic: firstParam(params.topic),
+    q: firstParam(params.q),
   };
 
   let posts = withListingExcerpts(mergeBlogCards(null));

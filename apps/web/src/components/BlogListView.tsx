@@ -8,6 +8,8 @@ import type { BlogCardDto } from '@/lib/blog-utils';
 export type BlogListFilters = {
   city?: string;
   author?: string;
+  topic?: string;
+  q?: string;
 };
 
 export function BlogListView({

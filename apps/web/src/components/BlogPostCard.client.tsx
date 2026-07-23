@@ -1,14 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { Clock } from 'lucide-react';
+import { Calendar, Clock } from 'lucide-react';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import type { BlogCardDto } from '@/lib/blog-utils';
-import { expandLargeListingCopy, formatBlogPublishedAt } from '@/lib/blog-utils';
+import { expandLargeListingCopy, resolveBlogCardDateLabel } from '@/lib/blog-utils';
 import { authorLabel, blogAuthorNameClassName } from '@/lib/blog-meta';
-import { resolveBlogListingQuickLinks } from '@/lib/blog-listing-links';
+import {
+  resolveBlogListingCta,
+  resolveBlogListingQuickLinks,
+} from '@/lib/blog-listing-links';
 
 export type BlogPostCardVariant = 'large' | 'small' | 'default';
 
@@ -33,7 +36,17 @@ function BlogCardMeta({
           {post.authorName || authorLabel(post.authorId)}
         </span>
       ) : null}
-      {dateLabel ? <span>{dateLabel}</span> : null}
+      {dateLabel ? (
+        <span
+          className={[
+            'inline-flex items-center gap-1',
+            isLarge ? 'font-medium text-slate-600' : '',
+          ].join(' ')}
+        >
+          {isLarge ? <Calendar className="h-3.5 w-3.5 shrink-0" aria-hidden /> : null}
+          <time dateTime={post.publishedAt || undefined}>{dateLabel}</time>
+        </span>
+      ) : null}
       <span className="inline-flex items-center gap-1">
         <Clock className={isLarge ? 'h-4 w-4' : 'h-3.5 w-3.5'} />
         {post.readMin} мин
@@ -50,7 +63,7 @@ export function BlogPostCard({
   variant?: BlogPostCardVariant;
 }) {
   const staticPost = BLOG_POSTS.find((item) => item.slug === post.slug);
-  const dateLabel = formatBlogPublishedAt(post.publishedAt, staticPost?.date || '');
+  const dateLabel = resolveBlogCardDateLabel(post);
   const tag = post.tag || staticPost?.tag || 'Гид';
   const isLarge = variant === 'large';
   const isSmall = variant === 'small';
@@ -67,13 +80,22 @@ export function BlogPostCard({
         limit: 4,
       })
     : [];
+  const cta = isLarge
+    ? resolveBlogListingCta({
+        slug: post.slug,
+        title: post.title,
+        tag,
+        city: post.city,
+        citySlug: post.citySlug,
+      })
+    : null;
 
   const cardShell = [
     'group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition',
     'hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md',
   ].join(' ');
 
-  // Large: article + chips под всем текстом (перед meta), иначе nested <a> ломает разметку.
+  // Large: title → текст → chips → CTA → meta с датой (без nested <a>).
   // Cover: fixed 2:1 (не lg:flex-1) - иначе фото съедает высоту row-span-2; текст получает flex-1.
   if (isLarge) {
     const primary = largeCopy?.primary || excerpt;
@@ -124,6 +146,16 @@ export function BlogPostCard({
                   {link.label}
                 </Link>
               ))}
+            </div>
+          ) : null}
+          {cta ? (
+            <div className={quickLinks.length ? 'mt-3' : 'mt-3 border-t border-slate-100 pt-3'}>
+              <Link
+                href={cta.href}
+                className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+              >
+                {cta.label}
+              </Link>
             </div>
           ) : null}
           <BlogCardMeta post={post} dateLabel={dateLabel} isLarge />

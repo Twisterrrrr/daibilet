@@ -1,3 +1,23 @@
+## 2026-07-24 - `/blog` UX: темы, поиск, load more, CTA, дата large
+
+### Наблюдения
+
+- Владелец: на листинге не хватало тем (Стендап/С детьми/Маршруты/Концерты), поиска, пагинации «Показать ещё», CTA на карточках и заметной даты на large.
+
+### Решения
+
+- Темы: `blog-topics.ts` + `?topic=`; чипы на `/blog` (город/автор без дубля).
+- Поиск: строка `?q=` по title/excerpt/tag/body lead (`searchText`).
+- Load more: initial 12, кнопка «Показать ещё».
+- CTA: `resolveBlogListingCta` → «Смотреть расписание» (CHPU) / «К событиям»; large: title → текст → chips → CTA → meta; list: явная кнопка.
+- Дата large: `resolveBlogCardDateLabel` (publishedAt → editorialDate) + Calendar в meta.
+
+### Проблемы
+
+- Deploy/smoke - после commit.
+
+---
+
 ## 2026-07-24 - BlogPostCard large: continuous excerpt above chips
 
 ### Наблюдения

@@ -179,6 +179,7 @@
 | B.24 | `/blog` view toggle: magazine-сетка \| список + localStorage/`?view=` | Высокий | ✅ `0741106` prod via `ed874cb` | агент |
 | B.24b | Blog cards: убрать cover badges (tag/city на фото) | Высокий | ✅ `b542a45` (+ merge B.24) | агент |
 | B.25 | Авторы колонок: brand blue (`text-primary-600`), без бейджа «Колонка» | Высокий | ✅ `ed874cb` prod | агент |
+| B.26 | `/blog` UX: темы, поиск, «Показать ещё», CTA CHPU, дата на large | Высокий | 🔄 in progress | агент |
 
 ---
 
@@ -509,6 +510,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-24 | B.26: `/blog` UX - topics/search/load-more/CTA/date on large |
 | 2026-07-23 | B.25: column authors brand blue on listing + article (no «Колонка» badge) |
 | 2026-07-23 | B.24: `/blog` magazine\|list view toggle + localStorage/`?view=` (merge badges-off) |
 | 2026-07-23 | B.21: blog fonts rollback - Source Serif → Space Grotesk / site default; dropcap off |
