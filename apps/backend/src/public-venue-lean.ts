@@ -94,6 +94,8 @@ function mapLeanVenueRow(row: VenueListRecord, leanText: boolean): LeanPublicVen
     heroImageUrl: row.heroImageUrl,
     city: row.city?.title || 'Не указан',
     address: row.address,
+    latitude: row.latitude,
+    longitude: row.longitude,
     kind,
     proposedKind: String(kind || 'OTHER').toLowerCase(),
     pageStatus,
