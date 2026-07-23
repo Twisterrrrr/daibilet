@@ -2911,6 +2911,22 @@
 ### Проблемы
 - Экранирование Bearer в PowerShell при remote curl — не использовать однострочный ssh с вложенными кавычками.
 
+## 2026-07-23 - F4.1a: Events / Landings / Articles в Next admin
+
+### Наблюдения
+- Vite Events/Landings - тяжёлые sheet/CRUD (override, taxonomy, pin/exclude). Articles CRUD компактнее и уже на `/api/admin/articles`.
+- F4.1 уже дал server fetch + Basic Auth forward; переиспользуем для списков.
+
+### Решения
+- Routes: `/admin/events` (search/view/page), `/admin/landings` + `/admin/landings/[slug]` (read-only sample), `/admin/articles` + `/new` + `/[id]` (save/archive server actions).
+- Event override / landing matches остаются deep-link в Vite до F4.1c.
+- Nav shell: Dashboard / Events / Landings / Articles marked ready; pathname-based active state.
+- Deploy не обязателен для public; проверка: локально с API `:4000` + ADMIN_* или prod `/admin/*` после web deploy.
+
+### Проблемы
+- Landing detail API тяжёлый (full grouped catalog) - на Next берём только sample page=1 limit=20.
+- Articles delete намеренно не портили (только archive); hard-delete остаётся в Vite.
+
 ## 2026-07-23 - F4.1: live Dashboard в Next `/admin`
 
 ### Наблюдения

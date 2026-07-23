@@ -18,5 +18,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
-  return <AdminNextShell activePath="/admin">{children}</AdminNextShell>;
+  return <AdminNextShell>{children}</AdminNextShell>;
 }

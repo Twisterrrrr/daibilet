@@ -115,7 +115,8 @@ Handoff для Codex: [codex-phase2-next-handoff.md](../codex-phase2-next-handof
 
 - [x] Admin route group `(admin)` в Next, Basic Auth middleware (kickoff `/admin` stub)
 - [x] Port Dashboard live metrics (`/api/admin/dashboard` + sources + orders)
-- [ ] Port remaining admin pages from Vite (Events / Landings / Articles next)
+- [x] Port Events / Landings lists + Articles CRUD (F4.1a); Vite for event override / landing matches
+- [ ] Port remaining admin pages from Vite (Sources / Settings next)
 - [ ] Sync jobs → `apps/worker` or Route Handlers + cron
 - [ ] Writes still via ported services (Prisma transactions)
 - [ ] Cutover admin.daibilet.ru → Next; retire Vite static
