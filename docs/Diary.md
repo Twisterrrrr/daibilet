@@ -1,3 +1,20 @@
+## 2026-07-24 - /cities: симметрия tiles+aside (container-page)
+
+### Наблюдения
+
+- Nested `max-w-5xl` под photo-hero снова давал left-bias у сетки и «Популярные города».
+
+### Решения
+
+- `CitiesCatalogView`: tiles+RussiaMap на `container-page grid items-stretch` (ось как «Все города»). Commits `48ab593` + `3b98afe`.
+- `/podborki`: H1+row в `HeroLayout` minimal `max-w-5xl`. `/blog` featured без nested max-w.
+
+### Проблемы
+
+- Нет. Prod web/api active @`15592bf` (ancestor `3b98afe`); `/cities` 200; chunk содержит `container-page grid items-stretch`.
+
+---
+
 ## 2026-07-24 - Owner blind spots: Prisma pool, lean catalog, pg_trgm, map hydration
 
 ### Наблюдения
@@ -77,7 +94,8 @@ outes.ts (паритет с backend publicCitySlug).
 
 ### Проблемы
 
-- Нет (commit + deploy-prod-next).
+- Первый deploy упёрся в параллельные `next build` / OOM на 3.8Gi; после swap+exclusive build prod поднялся.
+- **Prod @`15592bf`** (fix `37678e6`): `/` 200, hero `object-[50%_28%]` + `md:object-[50%_22%]`; `/venues` `/locations` без изменений focus.
 
 ---
 ## 2026-07-24 - /cities: симметрия tiles+aside после photo-hero
@@ -93,7 +111,7 @@ outes.ts (паритет с backend publicCitySlug).
 
 ### Проблемы
 
-- Redeploy.
+- Redeploy: параллельные агенты убивали `next build` (SIGTERM/OOM). Итог: prod web up @`15592bf` (ancestor includes `3b98afe`); source tiles на `container-page grid items-stretch`; `/cities` 200 (CSR bailout - классы в chunk).
 
 ---
 ## 2026-07-24 - Home rails: Harry Potter taboo + cover dedupe
