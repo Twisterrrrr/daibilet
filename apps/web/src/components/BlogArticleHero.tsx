@@ -37,28 +37,28 @@ export function BlogArticleHero({
       <PageBreadcrumbBar items={breadcrumbs} />
       <section className="relative overflow-hidden border-b border-slate-200 bg-slate-950 text-white">
         {/* Mobile strong cover; desktop taller editorial plane */}
-        <div className="relative aspect-[3/4] w-full sm:aspect-[16/11] lg:aspect-auto lg:h-[min(52vw,40rem)]">
+        <div className="relative aspect-[3/4] w-full sm:aspect-[16/11] lg:aspect-auto lg:h-[min(52vw,42rem)]">
           <SafeImage
             src={coverImageUrl}
             alt=""
             fill
             priority
-            sizes={IMAGE_SIZES.blogFeatured}
-            className="object-cover object-center"
-            fallback={<div className="absolute inset-0 bg-gradient-to-br from-amber-600 via-rose-600 to-slate-900" />}
+            sizes={IMAGE_SIZES.homeHero}
+            className="object-cover object-center motion-safe:animate-[blog-hero-ken_1.15s_ease-out_both]"
+            fallback={<div className="absolute inset-0 bg-gradient-to-br from-slate-800 via-amber-900/50 to-slate-950" />}
           />
           <div
             aria-hidden
-            className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-950/20"
+            className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/65 to-slate-950/15"
           />
           <div
             aria-hidden
-            className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-slate-950/95 to-transparent"
+            className="absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-slate-950/95 via-slate-950/55 to-transparent"
           />
           <div className="container-page relative flex h-full flex-col justify-end py-10 sm:py-12 lg:py-16">
-            <div className="max-w-4xl">
+            <div className="max-w-4xl motion-safe:animate-[blog-hero-rise_0.8s_ease-out_0.1s_both]">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="inline-flex items-center gap-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.16em] text-white/75 sm:text-xs">
+                <p className="inline-flex items-center gap-1.5 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-amber-200/85 sm:text-xs">
                   <BookOpen className="h-3.5 w-3.5" />
                   Блог Дайбилет
                 </p>

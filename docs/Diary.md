@@ -1,3 +1,46 @@
+## 2026-07-23 - МСК/СПб covers + magazine `/blog` hero
+
+### Наблюдения
+
+- У 6 гидов МСК/СПб cover был city-placeholder (~95KB, два одинаковых хэша moscow/spb).
+- Batch A (Казань/Екб ×3) уже уникальные - не трогали.
+- Listing `/blog` сидел на generic `SectionPageHero` (amber-rose gradient) - выглядел как раздел-dashboard, не magazine.
+
+### Решения
+
+- Сгенерированы 6 landscape JPG → `apps/public/public/images/blog/{slug}.jpg`; frontmatter уже указывал эти пути.
+- Добавлен `blog-list-hero.jpg` + `BlogListHero`: full-bleed фото, Source Serif H1, бренд eyebrow, kenburns/rise motion.
+- Article hero: чуть выше plane, amber brand eyebrow, full-bleed sizes, те же motion keyframes.
+- F4.6 не трогали.
+
+### Проблемы
+
+- Нет.
+
+---
+
+## 2026-07-23 - Антиспам публикаций: хаос-график + колонки пн
+
+### Наблюдения
+
+- Владелец: равномерные 3/день в 09:00 и статьи-близнецы выглядят как спам для агрегатора.
+- Щит: авторские колонки (Макс / Анна / Елена / Игорь / Артур) - публиковать в **пн**, без SEO-гидов в тот же день.
+- Неопубликованные колонки в репо: `open-air-festy-vyhodnoi-ru` (Макс, была HIDDEN), `bylinnyy-bereg-fentezi-fest-volhov` (Игорь, HIDDEN). Дубль Макса `bylinnyy-bereg-fentezi-fest` оставлен HIDDEN.
+- Live 23.07 (3 гида) не трогали.
+
+### Решения
+
+- Пересобран календарь: 2 (пт) / 1 (сб) / вс-перерыв / пн-колонка / 2 (вт) / 1 (ср); времена 11:15, 16:40, 14:25, 10:35, 11:50, 18:20, 15:10, 12:20 MSK.
+- Микс шаблонов ~⅓ long / ~⅓ top5 / ~⅓ events зафиксирован в plan + GPT-prompt (`template_type`).
+- Frontmatter `publishedAt` у 6 гидов + 2 колонок; upsert prod `--force-published-at`.
+- **Safety marker:** индекс 80–90% - ок; «малоценная» / вне индекса - снизить до 1 гид/день (owner в Вебмастере) - см. `docs/qa.md`.
+
+### Проблемы
+
+- Тексты уже написаны как long (~5–7к); смена template_type для части URL - редакционный долг пачки B / polish, не блокер графика.
+
+---
+
 ## 2026-07-23 - SEO guides: owner anti-AI rewrite (9 шт.)
 
 ### Наблюдения

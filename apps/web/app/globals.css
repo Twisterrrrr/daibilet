@@ -291,3 +291,25 @@
   line-height: inherit;
   text-decoration: none;
 }
+
+@keyframes blog-hero-ken {
+  from {
+    transform: scale(1.06);
+    opacity: 0.72;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes blog-hero-rise {
+  from {
+    transform: translateY(0.85rem);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
