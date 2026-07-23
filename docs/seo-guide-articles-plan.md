@@ -2,7 +2,7 @@
 
 **Дата:** 2026-07-23  
 **Цель:** статьи-гиды → утверждённые category×city / intent посадки.  
-**Статус:** batch #1 (10 шт., Казань + Екб) утверждён; **пачка A + МСК/СПб** загружены в CMS, публикация по **календарю ≤3/день** (см. ниже); пачка B (остаток batch #1) ждёт тексты GPT.  
+**Статус:** batch #1 (10 шт., Казань + Екб) утверждён; **пачка A + МСК/СПб** - тексты владельца (анти-ИИ) в `content/blog/`, CMS `PUBLISHED` + `publishedAt` по календарю ≤3/день; пачка B (остаток batch #1) ждёт тексты GPT.  
 **Первая генерация:** эталоны ТЗ №1 (ID 1), №2 (ID 8), №3 (ID 10) - см. `seo-guide-articles-gpt-prompt.md` → «Эталонные ТЗ (3 типа)».
 
 Связанные файлы:
@@ -124,14 +124,14 @@
 
 | ID | Slug | URL | publishAt | Статус | Cover |
 |----|------|-----|-----------|--------|-------|
-| 1 | `kazan-2-3-dnya-samostoyatelno-karta` | https://daibilet.ru/blog/kazan-2-3-dnya-samostoyatelno-karta | 2026-07-23 | ✅ live | уникальный jpg (batch A) |
-| 8 | `ekb-stendap-uralskiy-yumor` | https://daibilet.ru/blog/ekb-stendap-uralskiy-yumor | 2026-07-23 | ✅ live | уникальный jpg (batch A) |
-| 11 | `moscow-2-dnya-samostoyatelno-marshrut` | https://daibilet.ru/blog/moscow-2-dnya-samostoyatelno-marshrut | 2026-07-23 | ✅ live | TODO уникальное фото |
-| 10 | `ekb-uralskiy-mars-bazhovskie-ekskursii` | https://daibilet.ru/blog/ekb-uralskiy-mars-bazhovskie-ekskursii | 2026-07-24 | ⏳ schedule | уникальный jpg (batch A) |
-| 18 | `sankt-peterburg-3-dnya-samostoyatelno` | https://daibilet.ru/blog/sankt-peterburg-3-dnya-samostoyatelno | 2026-07-24 | ⏳ schedule | TODO уникальное фото |
-| 12 | `moskva-rechnye-progulki-kak-vybrat` | https://daibilet.ru/blog/moskva-rechnye-progulki-kak-vybrat | 2026-07-24 | ⏳ schedule | TODO уникальное фото |
-| 30 | `uzhin-na-teplohode-moskva-kak-vybrat` | https://daibilet.ru/blog/uzhin-na-teplohode-moskva-kak-vybrat | 2026-07-25 | ⏳ schedule | TODO уникальное фото |
-| 19 | `rechnye-progulki-neva-kanaly-kak-vybrat` | https://daibilet.ru/blog/rechnye-progulki-neva-kanaly-kak-vybrat | 2026-07-25 | ⏳ schedule | TODO уникальное фото |
-| - | `koncerty-peterburg-osobnyak-klub-zal` | https://daibilet.ru/blog/koncerty-peterburg-osobnyak-klub-zal | 2026-07-25 | ⏳ schedule | TODO уникальное фото |
+| 1 | `kazan-2-3-dnya-samostoyatelno-karta` | https://daibilet.ru/blog/kazan-2-3-dnya-samostoyatelno-karta | 2026-07-23 | ✅ live (owner rewrite) | уникальный jpg (batch A) |
+| 8 | `ekb-stendap-uralskiy-yumor` | https://daibilet.ru/blog/ekb-stendap-uralskiy-yumor | 2026-07-23 | ✅ live (owner rewrite) | уникальный jpg (batch A) |
+| 11 | `moscow-2-dnya-samostoyatelno-marshrut` | https://daibilet.ru/blog/moscow-2-dnya-samostoyatelno-marshrut | 2026-07-23 | ✅ live (owner rewrite) | TODO уникальное фото |
+| 10 | `ekb-uralskiy-mars-bazhovskie-ekskursii` | https://daibilet.ru/blog/ekb-uralskiy-mars-bazhovskie-ekskursii | 2026-07-24 | ⏳ schedule (owner rewrite) | уникальный jpg (batch A) |
+| 18 | `sankt-peterburg-3-dnya-samostoyatelno` | https://daibilet.ru/blog/sankt-peterburg-3-dnya-samostoyatelno | 2026-07-24 | ⏳ schedule (owner rewrite) | TODO уникальное фото |
+| 12 | `moskva-rechnye-progulki-kak-vybrat` | https://daibilet.ru/blog/moskva-rechnye-progulki-kak-vybrat | 2026-07-24 | ⏳ schedule (owner rewrite) | TODO уникальное фото |
+| 30 | `uzhin-na-teplohode-moskva-kak-vybrat` | https://daibilet.ru/blog/uzhin-na-teplohode-moskva-kak-vybrat | 2026-07-25 | ⏳ schedule (owner rewrite) | TODO уникальное фото |
+| 19 | `rechnye-progulki-neva-kanaly-kak-vybrat` | https://daibilet.ru/blog/rechnye-progulki-neva-kanaly-kak-vybrat | 2026-07-25 | ⏳ schedule (owner rewrite) | TODO уникальное фото |
+| - | `koncerty-peterburg-osobnyak-klub-zal` | https://daibilet.ru/blog/koncerty-peterburg-osobnyak-klub-zal | 2026-07-25 | ⏳ schedule (owner rewrite) | TODO уникальное фото |
 
 Пачка B (не размещена): ID 2, 3, 4, 5, 6, 7, 9.

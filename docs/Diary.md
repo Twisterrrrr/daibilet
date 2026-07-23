@@ -1,3 +1,22 @@
+## 2026-07-23 - SEO guides: owner anti-AI rewrite (9 шт.)
+
+### Наблюдения
+
+- Владелец переписал все 9 гидов (пачка A + МСК/СПб); `validation-report.json` - 5000-7000, NOTE, без em/en dash, без `/events?q=`, articleType gid.
+- Desktop MD были `status: DRAFT` без `publishedAt`; schedule-инфра уже на `PUBLISHED` + future `publishedAt`.
+
+### Решения
+
+- Заменены тела `content/blog/{slug}.md`; covers Казань/Екб сохранены; МСК/СПб placeholders.
+- Статус в репо/CMS: `PUBLISHED` + `publishedAt` по календарю 23/24/25.07 09:00 MSK (не DRAFT - cron не нужен).
+- Карточки `blog-posts` (web+public) + `blog:sync-bodies`; plan отмечен owner rewrite.
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-23 - Blog listing magazine layout
 
 ### Наблюдения
@@ -34,7 +53,7 @@
 
 ### Проблемы
 
-- Нет (finance не трогали).
+- Нет (finance не трогали). **Prod @`b664b84`:** deploy OK; preview без auth → 401; с Basic Auth → 200 + `noindex` + баннер.
 
 ---
 
