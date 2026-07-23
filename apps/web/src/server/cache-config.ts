@@ -12,3 +12,6 @@ export const CATALOG_PAGE_CACHE_TAG = 'catalog-page';
 
 /** Shared Cache-Control for CDN/nginx and browser. */
 export const PUBLIC_CACHE_CONTROL = 'public, s-maxage=300, stale-while-revalidate=600';
+
+/** `unstable_cache` tag for /podborki + venues/locations catalog DTOs. */
+export const PUBLIC_SURFACES_CACHE_TAG = 'public-surfaces';

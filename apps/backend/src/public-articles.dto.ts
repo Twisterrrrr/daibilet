@@ -14,7 +14,11 @@ interface CachedPayload<T> {
 
 export type PublicArticlesListOptions = {
   citySlug?: string | null;
+  /** Rank city posts first, then multi/regions, then others (no hard filter). */
+  rankCitySlug?: string | null;
   includeBroad?: boolean;
+  excludeFeatured?: boolean;
+  cursor?: string | null;
   limit?: number;
 };
 
@@ -30,9 +34,12 @@ function getLegacyDb() {
 
 function listCacheKey(options: PublicArticlesListOptions = {}): string {
   const city = String(options.citySlug || '').trim().toLowerCase() || 'all';
+  const rank = String(options.rankCitySlug || '').trim().toLowerCase() || 'none';
   const broad = options.includeBroad ? '1' : '0';
+  const featured = options.excludeFeatured ? '0' : '1';
+  const cursor = String(options.cursor || '').trim() || 'start';
   const limit = Number(options.limit) || 100;
-  return `list:${city}:${broad}:${limit}`;
+  return `list:${city}:${rank}:${broad}:${featured}:${cursor}:${limit}`;
 }
 
 export function clearPublicArticlesDtoCache(): void {

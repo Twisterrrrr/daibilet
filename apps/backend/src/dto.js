@@ -7420,12 +7420,16 @@ function mapPublicVenueListItem(row) {
   const type = resolvePublicVenueKindFromRow(normalized);
   const name = applyPublicVenueDisplayName(normalized, type);
   const shortDescription = pickPublicVenueLeadText(normalized.shortDescription, normalized.description);
+  const latitude = Number(normalized.latitude);
+  const longitude = Number(normalized.longitude);
   return {
     id: normalized.id,
     slug: publicVenueSlug(normalized.slug, name, normalized.id),
     name,
     city: normalized.city,
     address: normalized.address,
+    latitude: Number.isFinite(latitude) ? latitude : null,
+    longitude: Number.isFinite(longitude) ? longitude : null,
     type,
     template: publicVenuePageTemplate(type),
     pageStatus: normalized.pageStatus,
@@ -7500,6 +7504,57 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   };
 }
 
+/** Short hub chips on `/cities` cards (CHPU landings). */
+const CITY_HUB_LANDING_SHORT = {
+  'river-cruises': 'Речные',
+  'bus-tours': 'Автобусные',
+  'river-party': 'Вечеринки',
+  'bridges-night': 'Мосты',
+  'moscow-dinner-boat': 'Ужин',
+  'moscow-museums': 'Музеи',
+  'spb-yards': 'Дворы',
+  standup: 'Стендап',
+  'family-kids': 'Семьям',
+  'concerts-genre': 'Концерты',
+  'walking-tours': 'Пешие',
+  'country-tours': 'Загород',
+  exhibitions: 'Выставки',
+  'active-sport': 'Активный',
+  rooftops: 'Крыши',
+  planetarium: 'Планетарий',
+  excursions: 'Экскурсии',
+  'unusual-theatres': 'Театр',
+  'new-year': 'Новый год',
+  'salute-9-may': 'Салют',
+};
+
+function buildCityHubTags(bucket) {
+  const landingTags = Array.from(bucket.landings.entries())
+    .map(([slug, events]) => {
+      const rule = LANDING_RULES.find((item) => item.slug === slug);
+      const label = CITY_HUB_LANDING_SHORT[slug] || rule?.chips?.[0] || rule?.title || null;
+      if (!label) return null;
+      return { slug, label, events, kind: 'landing' };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.events - a.events || a.label.localeCompare(b.label, 'ru'))
+    .slice(0, 3);
+
+  if (landingTags.length >= 2) return landingTags;
+
+  const categoryTags = Array.from(bucket.categories.entries())
+    .map(([name, events]) => ({
+      slug: null,
+      label: name,
+      events,
+      kind: 'category',
+    }))
+    .sort((a, b) => b.events - a.events || a.label.localeCompare(b.label, 'ru'))
+    .slice(0, 3 - landingTags.length);
+
+  return [...landingTags, ...categoryTags].slice(0, 3);
+}
+
 export function buildPublicDestinationRowsFromSessions(sessions) {
   const buckets = new Map();
 
@@ -7516,6 +7571,7 @@ export function buildPublicDestinationRowsFromSessions(sessions) {
         events: 0,
         venueIds: new Set(),
         categories: new Map(),
+        landings: new Map(),
       });
     }
 
@@ -7523,6 +7579,11 @@ export function buildPublicDestinationRowsFromSessions(sessions) {
     bucket.events += 1;
     if (session.venueId) bucket.venueIds.add(session.venueId);
     if (session.category) bucket.categories.set(session.category, (bucket.categories.get(session.category) || 0) + 1);
+    const landingSlugs = Array.isArray(session.landingSlugs) ? session.landingSlugs : [];
+    for (const slug of landingSlugs) {
+      if (!slug) continue;
+      bucket.landings.set(slug, (bucket.landings.get(slug) || 0) + 1);
+    }
   }
 
   return Array.from(buckets.values())
@@ -7537,6 +7598,7 @@ export function buildPublicDestinationRowsFromSessions(sessions) {
       categories: Array.from(bucket.categories.entries())
         .map(([name, events]) => ({ name, events }))
         .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')),
+      hubTags: buildCityHubTags(bucket),
     }))
     .filter((bucket) => bucket.events >= PUBLIC_DESTINATION_MIN_EVENTS)
     .filter(isAllowedPublicDestination)
@@ -10175,8 +10237,11 @@ function mapPublicArticleDetail(row) {
 
 export async function buildPublicArticlesList(db, options = {}) {
   const citySlugFilter = canonicalBlogCitySlug(options.citySlug);
+  const rankCitySlug = canonicalBlogCitySlug(options.rankCitySlug);
   const includeBroad = options.includeBroad === true;
-  const limit = Math.min(Math.max(Number(options.limit) || 100, 1), 200);
+  const excludeFeatured = options.excludeFeatured === true;
+  const pageLimit = Math.min(Math.max(Number(options.limit) || 100, 1), 200);
+  const cursorRaw = String(options.cursor || '').trim();
   const aliases = citySlugFilter && !isBroadBlogCitySlug(citySlugFilter)
     ? blogCitySlugAliases(citySlugFilter)
     : [];
@@ -10191,7 +10256,9 @@ export async function buildPublicArticlesList(db, options = {}) {
       ${includeBroad ? ` or coalesce(nullif(a."citySlug", ''), '') in ('multi', 'regions')` : ''}
     )`;
   }
-  params.push(limit);
+  // Wider window for in-memory rank/cursor (blog corpus is small).
+  const fetchLimit = Math.min(200, Math.max(pageLimit * 4, pageLimit + 20));
+  params.push(fetchLimit);
   const limitIdx = params.length;
 
   const { rows } = await db.query(
@@ -10234,10 +10301,58 @@ export async function buildPublicArticlesList(db, options = {}) {
   `,
     params,
   );
+
+  let articles = rows.map(mapPublicArticleRow);
+  if (excludeFeatured) {
+    articles = articles.filter((article) => article.isFeatured !== true);
+  }
+
+  if (rankCitySlug && !isBroadBlogCitySlug(rankCitySlug) && !aliases.length) {
+    const target = rankCitySlug;
+    const score = (slug) => {
+      const value = String(slug || '').trim().toLowerCase();
+      if (value === target) return 100;
+      if (value === 'multi' || value === 'regions') return 40;
+      return 0;
+    };
+    articles = [...articles].sort((a, b) => {
+      const diff = score(b.citySlug) - score(a.citySlug);
+      if (diff !== 0) return diff;
+      const ta = Date.parse(String(a.publishedAt || '')) || 0;
+      const tb = Date.parse(String(b.publishedAt || '')) || 0;
+      if (tb !== ta) return tb - ta;
+      return String(a.title || '').localeCompare(String(b.title || ''), 'ru');
+    });
+  }
+
+  let start = 0;
+  if (cursorRaw) {
+    try {
+      const json = Buffer.from(cursorRaw, 'base64url').toString('utf8');
+      const parsed = JSON.parse(json);
+      const cursorSlug = String(parsed.s || '').trim();
+      if (cursorSlug) {
+        const idx = articles.findIndex((article) => article.slug === cursorSlug);
+        start = idx >= 0 ? idx + 1 : articles.length;
+      }
+    } catch {
+      start = 0;
+    }
+  }
+
+  const page = articles.slice(start, start + pageLimit);
+  const last = page[page.length - 1];
+  const hasMore = start + page.length < articles.length;
+  const nextCursor =
+    hasMore && last
+      ? Buffer.from(JSON.stringify({ p: last.publishedAt || null, s: last.slug }), 'utf8').toString('base64url')
+      : null;
+
   return {
     generatedAt: new Date().toISOString(),
-    total: rows.length,
-    articles: rows.map(mapPublicArticleRow),
+    total: articles.length,
+    nextCursor,
+    articles: page,
   };
 }
 

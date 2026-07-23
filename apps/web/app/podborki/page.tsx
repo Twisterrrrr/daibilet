@@ -3,16 +3,16 @@ import type { Metadata } from 'next';
 import { LandingsCatalogView } from '@/components/LandingsCatalogView.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
-import { collectPopularTags } from '@/lib/catalog-tags';
-import { buildShareMetadata, pageTitle } from '@/lib/seo-meta';
-import {
-  buildPublicDestinationsDto,
-  buildPublicLandingsCatalogDto,
-  getPublicCatalogSessions,
-} from '@daibilet/backend/public-read';
 import { prisma } from '@/lib/db';
+import {
+  PODBORKI_CATEGORIES,
+  type PodborkiCatalogItem,
+  type PodborkiCategoryMeta,
+} from '@/lib/podborki-categories';
+import { buildShareMetadata, pageTitle } from '@/lib/seo-meta';
+import { getCachedDestinations, getCachedLandingsCatalog } from '@/server/cached-public-surfaces';
 
-export const revalidate = 3600;
+export const revalidate = 600;
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -21,7 +21,7 @@ type PageProps = {
 export async function generateMetadata(): Promise<Metadata> {
   const title = pageTitle('Подборки - тематические коллекции событий');
   const description =
-    'Готовые подборки на вечер, выходные и бюджет, популярные запросы и теги - с переходом в каталог с нужными фильтрами.';
+    'Готовые подборки на вечер, выходные и бюджет: по типу событий, для кого и сезонные программы.';
   return {
     title,
     description,
@@ -37,32 +37,70 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PodborkiCatalogPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const city = typeof params.city === 'string' ? params.city : 'all';
-  const urlParams = new URLSearchParams();
-  if (city && city !== 'all') urlParams.set('city', city);
 
-  const [catalog, destinationsPayload, sessions] = await Promise.all([
-    buildPublicLandingsCatalogDto(urlParams),
-    buildPublicDestinationsDto(),
-    getPublicCatalogSessions(),
+  const [catalog, destinationsPayload] = await Promise.all([
+    getCachedLandingsCatalog(city),
+    getCachedDestinations(),
   ]);
 
-  const tags = collectPopularTags(sessions, 24);
-
   let layoutBySlug = new Map<string, string | null>();
+  let categoryBySlug = new Map<string, string | null>();
+  let categories: PodborkiCategoryMeta[] = PODBORKI_CATEGORIES;
   try {
-    const rows = await prisma.landing.findMany({
-      where: { layoutVariant: { in: ['HERO_FEATURED', 'HERO_TRENDING'] } },
-      select: { slug: true, layoutVariant: true },
-    });
-    layoutBySlug = new Map(rows.map((row) => [row.slug, row.layoutVariant]));
+    const [layoutRows, categoryRows, dbCategories] = await Promise.all([
+      prisma.landing.findMany({
+        where: { layoutVariant: { in: ['HERO_FEATURED', 'HERO_TRENDING'] } },
+        select: { slug: true, layoutVariant: true },
+      }),
+      prisma.landing.findMany({
+        where: { categoryId: { not: null } },
+        select: { slug: true, category: { select: { slug: true } } },
+      }),
+      prisma.landingCategory.findMany({
+        where: { isActive: true },
+        orderBy: { sortOrder: 'asc' },
+        select: { slug: true, title: true, subtitle: true, sortOrder: true },
+      }),
+    ]);
+    layoutBySlug = new Map(
+      layoutRows.map((row: { slug: string; layoutVariant: string | null }) => [row.slug, row.layoutVariant]),
+    );
+    categoryBySlug = new Map(
+      categoryRows.map((row: { slug: string; category: { slug: string } | null }) => [
+        row.slug,
+        row.category?.slug ?? null,
+      ]),
+    );
+    if (dbCategories.length) {
+      categories = dbCategories.map(
+        (row: { slug: string; title: string; subtitle: string | null; sortOrder: number }) => ({
+          slug: row.slug as PodborkiCategoryMeta['slug'],
+          title: row.title,
+          subtitle: row.subtitle || '',
+          sortOrder: row.sortOrder,
+        }),
+      );
+    }
   } catch {
     layoutBySlug = new Map();
+    categoryBySlug = new Map();
+    categories = PODBORKI_CATEGORIES;
   }
 
-  const items = (catalog.items ?? []).map((item) => ({
-    ...item,
+  const items: PodborkiCatalogItem[] = (catalog.items ?? []).map((item) => ({
+    slug: item.slug,
+    title: item.title,
+    subtitle: item.subtitle,
+    events: item.events,
+    priceFrom: item.priceFrom,
     layoutVariant: layoutBySlug.get(item.slug) ?? null,
+    categorySlug: categoryBySlug.get(item.slug) ?? null,
   }));
+
+  const totalEvents = destinationsPayload.destinations.reduce(
+    (sum, destination) => sum + (destination.events || 0),
+    0,
+  );
 
   return (
     <SiteLayout>
@@ -71,8 +109,8 @@ export default async function PodborkiCatalogPage({ searchParams }: PageProps) {
           items={items}
           city={catalog.city}
           cities={destinationsPayload.destinations}
-          tags={tags}
-          totalEvents={sessions.length}
+          categories={categories}
+          totalEvents={totalEvents}
         />
       </div>
     </SiteLayout>

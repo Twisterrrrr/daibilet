@@ -10,6 +10,7 @@ import { CITY_CARD_ASPECT_CLASS, cityCardTitleClass } from '@/lib/city-card-styl
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityCardImage } from '@/lib/city-images';
 import type { CityCardRegion } from '@/lib/cityRegionHub';
+import { landingCategoryHref } from '@/lib/landing-routes';
 import { cityHref } from '@/lib/routes';
 import { pluralEvents, pluralVenues } from '@/lib/format';
 
@@ -19,6 +20,35 @@ type CityCardProps = {
   description?: string;
   region?: CityCardRegion | null;
 };
+
+function CityHubTags({ city }: { city: PublicDestinationDto }) {
+  const tags = (city.hubTags || []).slice(0, 3);
+  if (!tags.length) return null;
+  const citySlug = city.slug || city.sourceSlug || undefined;
+
+  return (
+    <ul className="mt-2 flex flex-wrap gap-1.5" aria-label={`Популярные направления: ${city.name}`}>
+      {tags.map((tag) => {
+        const href =
+          tag.kind === 'landing' && tag.slug
+            ? landingCategoryHref(tag.slug, citySlug)
+            : tag.kind === 'category' && tag.label
+              ? `/events?city=${encodeURIComponent(city.name)}&category=${encodeURIComponent(tag.label)}`
+              : cityHref(city);
+        return (
+          <li key={`${tag.kind}:${tag.slug || tag.label}`}>
+            <Link
+              href={href}
+              className="inline-flex max-w-full truncate rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 shadow-sm transition hover:border-primary/40 hover:text-primary-700"
+            >
+              {tag.label}
+            </Link>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
 
 export function CityCard({ city, large = false, description, region }: CityCardProps) {
   const slug = city.slug || city.name;
@@ -61,6 +91,8 @@ export function CityCard({ city, large = false, description, region }: CityCardP
           </div>
         </div>
       </Link>
+
+      <CityHubTags city={city} />
 
       {region && region.eventCount > 0 ? (
         <RegionDestinationLink

@@ -12,7 +12,8 @@ export const metadata: Metadata = {
   alternates: { canonical: '/cities' },
 };
 
-export const revalidate = 3600;
+/** Daily ISR; on-demand revalidateTag/path still works via /api/internal/revalidate. */
+export const revalidate = 86400;
 
 export default async function CitiesIndexPage() {
   let destinations: Awaited<ReturnType<typeof buildPublicDestinationsDto>>['destinations'] = [];

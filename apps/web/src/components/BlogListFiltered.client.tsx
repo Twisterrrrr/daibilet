@@ -7,7 +7,14 @@ import { LayoutGrid, List } from 'lucide-react';
 import { BlogListRows } from '@/components/BlogListRows.client';
 import { BlogMagazineGrid } from '@/components/BlogMagazineGrid.client';
 import type { BlogListFilters } from '@/components/BlogListView';
+import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { BlogCardDto } from '@/lib/blog-utils';
+import { paginateBlogFeedByCursor } from '@/lib/blog-cursor';
+import {
+  filterBlogFeedByCity,
+  rankBlogFeedByCity,
+  resolveBlogRankCitySlug,
+} from '@/lib/blog-feed-rank';
 import { authorLabel, cityFilterLabel } from '@/lib/blog-meta';
 import { parseBlogTopicParam, postMatchesTopic } from '@/lib/blog-topics';
 import {
@@ -118,13 +125,27 @@ export function BlogListFiltered({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const selectedCity = useSelectedCityOptional();
   const [viewMode, setViewModeState] = useState<BlogViewMode>('magazine');
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [cursor, setCursor] = useState<string | null>(null);
+  const [visiblePosts, setVisiblePosts] = useState<BlogCardDto[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
 
-  const city = paramValue(searchParams.get('city') ?? initialFilters?.city);
+  const urlCity = paramValue(searchParams.get('city') ?? initialFilters?.city);
   const author = paramValue(searchParams.get('author') ?? initialFilters?.author);
   const topic = parseBlogTopicParam(searchParams.get('topic') ?? initialFilters?.topic);
   const query = String(searchParams.get('q') ?? initialFilters?.q ?? '').trim();
+
+  const headerRankCity = useMemo(() => {
+    if (urlCity !== 'all') return null;
+    if (!selectedCity?.cityReady || selectedCity.cityValue === 'all') return null;
+    return resolveBlogRankCitySlug(
+      selectedCity.cityValue,
+      selectedCity.selectedDestination?.slug,
+      selectedCity.selectedDestination?.sourceSlug,
+      selectedCity.selectedDestination?.name,
+    );
+  }, [urlCity, selectedCity]);
 
   const cityOptions = useMemo(
     () =>
@@ -146,25 +167,28 @@ export function BlogListFiltered({
   );
 
   const filtered = useMemo(() => {
-    return posts.filter((post) => {
-      if (city !== 'all' && String(post.citySlug || '') !== city) return false;
+    let list = posts.filter((post) => {
       const postAuthor = String(post.authorId || 'editorial');
       if (author !== 'all' && postAuthor !== author) return false;
       if (!postMatchesTopic(post.topics, topic)) return false;
       if (!matchesQuery(post, query)) return false;
       return true;
     });
-  }, [posts, city, author, topic, query]);
-
-  const visiblePosts = useMemo(
-    () => filtered.slice(0, visibleCount),
-    [filtered, visibleCount],
-  );
-  const hasMore = visibleCount < filtered.length;
+    // Explicit dropdown city = hard filter; header city = rank-then-others.
+    if (urlCity !== 'all') {
+      list = filterBlogFeedByCity(list, urlCity);
+    } else if (headerRankCity) {
+      list = rankBlogFeedByCity(list, headerRankCity);
+    }
+    return list;
+  }, [posts, author, topic, query, urlCity, headerRankCity]);
 
   useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
-  }, [city, author, topic, query, viewMode]);
+    const page = paginateBlogFeedByCursor(filtered, { cursor: null, limit: PAGE_SIZE });
+    setCursor(null);
+    setVisiblePosts(page.items);
+    setNextCursor(page.nextCursor);
+  }, [filtered, viewMode]);
 
   useEffect(() => {
     const fromUrl = searchParams.get('view');
@@ -207,7 +231,19 @@ export function BlogListFiltered({
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   }, [pathname, router, viewMode]);
 
-  const hasActive = city !== 'all' || author !== 'all' || topic !== 'all' || Boolean(query);
+  const loadMore = useCallback(() => {
+    if (!nextCursor) return;
+    const page = paginateBlogFeedByCursor(filtered, { cursor: nextCursor, limit: PAGE_SIZE });
+    setCursor(nextCursor);
+    setVisiblePosts((prev) => {
+      const seen = new Set(prev.map((p) => p.slug));
+      return [...prev, ...page.items.filter((item) => !seen.has(item.slug))];
+    });
+    setNextCursor(page.nextCursor);
+  }, [filtered, nextCursor]);
+
+  const hasActive = urlCity !== 'all' || author !== 'all' || topic !== 'all' || Boolean(query);
+  const hasMore = Boolean(nextCursor);
 
   const selectClass =
     'min-w-[10rem] flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100 sm:max-w-[16rem] sm:flex-none';
@@ -217,11 +253,13 @@ export function BlogListFiltered({
       <div className="mb-4 flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:flex-wrap sm:items-center">
         <select
           className={selectClass}
-          value={city}
+          value={urlCity}
           onChange={(event) => setFilter('city', event.target.value)}
           aria-label="Фильтр по городу"
         >
-          <option value="all">Все города</option>
+          <option value="all">
+            {headerRankCity ? `Сначала ${cityFilterLabel(headerRankCity)}` : 'Все города'}
+          </option>
           {cityOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label} ({option.count})
@@ -282,8 +320,9 @@ export function BlogListFiltered({
             <div className="mt-8 flex justify-center">
               <button
                 type="button"
-                onClick={() => setVisibleCount((n) => n + PAGE_SIZE)}
+                onClick={loadMore}
                 className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 transition hover:border-primary/40 hover:bg-primary-50/60 hover:text-primary-800"
+                data-cursor={cursor || undefined}
               >
                 Показать ещё
               </button>

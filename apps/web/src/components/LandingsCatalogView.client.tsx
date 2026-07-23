@@ -8,22 +8,18 @@ import { CityPicker } from '@/components/CityPicker.client';
 import { HeroLayout } from '@/components/HeroLayout';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
-import { buildCatalogPresetHref, buildCatalogTagHref } from '@/lib/catalog-links';
+import { buildCatalogPresetHref } from '@/lib/catalog-links';
 import { CATALOG_PRESETS } from '@/lib/catalog-presets';
 import { formatNumber, pluralEvents } from '@/lib/format';
 import { resolveLandingCardImage } from '@/lib/landing-images';
 import { landingCategoryHref } from '@/lib/landing-routes';
+import {
+  groupPodborkiByCategory,
+  type PodborkiCatalogItem,
+  type PodborkiCategoryMeta,
+} from '@/lib/podborki-categories';
 import { pickPodborkiFeatured, pickPodborkiTrending } from '@/lib/podborki-hero';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
-
-type LandingCatalogItem = {
-  slug: string;
-  title: string;
-  subtitle: string;
-  events: number;
-  priceFrom?: number | null;
-  layoutVariant?: string | null;
-};
 
 function resolveCitySlug(cities: PublicDestinationDto[], filter: string): string {
   if (!filter || filter === 'all') return 'all';
@@ -45,13 +41,13 @@ export function LandingsCatalogView({
   items,
   city,
   cities,
-  tags,
+  categories,
   totalEvents,
 }: {
-  items: LandingCatalogItem[];
+  items: PodborkiCatalogItem[];
   city: string;
   cities: PublicDestinationDto[];
-  tags: Array<{ name: string; events: number }>;
+  categories: PodborkiCategoryMeta[];
   totalEvents: number;
 }) {
   const router = useRouter();
@@ -65,6 +61,8 @@ export function LandingsCatalogView({
   const featuredHref = featured
     ? landingCategoryHref(featured.slug, citySlug !== 'all' ? citySlug : undefined)
     : '/events';
+
+  const sections = groupPodborkiByCategory(items, categories.length ? categories : undefined);
 
   const handleCityChange = (value: string) => {
     if (value === 'all') {
@@ -179,11 +177,11 @@ export function LandingsCatalogView({
             <div className="min-w-0">
               <h2 className="font-display flex items-center gap-2 text-xl font-bold text-slate-900">
                 <Sparkles className="h-5 w-5 text-primary" />
-                Популярные запросы
+                Каталог подборок
               </h2>
               <p className="mt-1 text-sm text-slate-500">
-                Речные прогулки, развод мостов, стендап, автобусные экскурсии и тематические подборки - выберите город
-                для актуального списка.
+                Речные прогулки, развод мостов, стендап и тематические списки - выберите город для актуального
+                набора.
               </p>
             </div>
             <div className="w-full shrink-0 sm:w-auto sm:min-w-[220px]">
@@ -198,10 +196,33 @@ export function LandingsCatalogView({
               </div>
             </div>
           </div>
-          {items.length ? (
-            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {items.map((landing) => (
-                <LandingDirectionCard key={landing.slug} landing={landing} citySlug={citySlug} />
+
+          {sections.length ? (
+            <div className="mt-8 space-y-10">
+              {sections.map((section) => (
+                <div key={section.slug}>
+                  <div className="mb-3 flex items-end justify-between gap-3">
+                    <div className="min-w-0">
+                      <h3 className="font-display text-lg font-bold text-slate-900">{section.title}</h3>
+                      {section.subtitle ? (
+                        <p className="mt-0.5 text-sm text-slate-500">{section.subtitle}</p>
+                      ) : null}
+                    </div>
+                    <span className="shrink-0 text-xs font-medium text-slate-400">
+                      {section.items.length}
+                    </span>
+                  </div>
+                  <div className="horizontal-snap-row -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:px-0">
+                    {section.items.map((landing) => (
+                      <div
+                        key={landing.slug}
+                        className="w-[min(18rem,78vw)] shrink-0 snap-start sm:w-[17.5rem]"
+                      >
+                        <LandingDirectionCard landing={landing} citySlug={citySlug} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           ) : (
@@ -213,31 +234,12 @@ export function LandingsCatalogView({
               </p>
               <p className="mt-1 text-sm text-slate-400">
                 {citySlug === 'all'
-                  ? 'Пока доступны быстрые фильтры и теги ниже'
+                  ? 'Пока доступны быстрые фильтры выше'
                   : 'Попробуйте другой город или смотрите каталог целиком'}
               </p>
             </div>
           )}
         </section>
-
-        {tags.length ? (
-          <section className="mt-12">
-            <h2 className="font-display text-xl font-bold text-slate-900">По тегам</h2>
-            <p className="mt-1 text-sm text-slate-500">Уточните тему - откроется тематическая подборка или каталог</p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {tags.map((tag) => (
-                <Link
-                  key={tag.name}
-                  href={buildCatalogTagHref(tag.name, citySlug !== 'all' ? citySlug : undefined)}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:border-primary/40 hover:text-primary-700"
-                >
-                  #{tag.name}
-                  <span className="text-xs text-slate-400">{formatNumber(tag.events)}</span>
-                </Link>
-              ))}
-            </div>
-          </section>
-        ) : null}
 
         <p className="mt-12 text-sm text-slate-500">
           Всего в каталоге <span className="font-semibold text-slate-900">{formatNumber(totalEvents)}</span> событий. Ищите

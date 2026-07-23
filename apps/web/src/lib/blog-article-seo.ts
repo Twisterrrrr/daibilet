@@ -25,7 +25,7 @@ function resolveBlogShareImage(coverImageUrl?: string | null): string | undefine
 }
 
 export function buildBlogArticleBreadcrumbs(article: BlogArticleDto): Array<{ name: string; path: string }> {
-  const canonicalPath = article.canonicalPath || `/blog/${article.slug}`;
+  const canonicalPath = resolveBlogArticleCanonicalPath(article);
   const cityLink = resolveBlogCityHref(article.city, article.citySlug);
   return [
     { name: 'Главная', path: '/' },
@@ -35,12 +35,38 @@ export function buildBlogArticleBreadcrumbs(article: BlogArticleDto): Array<{ na
   ];
 }
 
+/**
+ * Single canonical for article pages: always `/blog/{slug}`.
+ * Ignores city-scoped query duplicates and non-blog canonicalPath overrides
+ * that would split link equity across city mirrors.
+ */
+export function resolveBlogArticleCanonicalPath(article: Pick<BlogArticleDto, 'slug' | 'canonicalPath'>): string {
+  const slug = String(article.slug || '')
+    .trim()
+    .replace(/^\/+|\/+$/g, '');
+  if (!slug) return '/blog';
+  const raw = String(article.canonicalPath || '').trim();
+  if (raw) {
+    try {
+      const path = raw.startsWith('http') ? new URL(raw).pathname : raw;
+      const normalized = path.replace(/\/+$/, '') || '/';
+      // Accept only same-slug blog paths (no /blog/city/... mirrors).
+      if (normalized === `/blog/${slug}` || normalized === `/blog/${encodeURIComponent(slug)}`) {
+        return `/blog/${slug}`;
+      }
+    } catch {
+      // fall through
+    }
+  }
+  return `/blog/${slug}`;
+}
+
 export function buildBlogArticleMetadata(article: BlogArticleDto): Metadata {
   // layout title template adds "| Дайбилет" - strip brand from seoTitle to avoid double suffix
   const title = pageTitle(article.seoTitle || article.title);
   const shareTitle = `${title} | ${SITE_NAME}`;
   const description = article.seoDescription || article.excerpt || article.title;
-  const canonicalPath = article.canonicalPath || `/blog/${article.slug}`;
+  const canonicalPath = resolveBlogArticleCanonicalPath(article);
   const canonical = absoluteUrl(canonicalPath);
   const image = resolveBlogShareImage(article.coverImageUrl);
   const indexable = article.isIndexable !== false;
@@ -84,7 +110,7 @@ export function buildBlogArticleMetadata(article: BlogArticleDto): Metadata {
 export function buildBlogArticleJsonLd(article: BlogArticleDto): Array<Record<string, unknown>> {
   const title = pageTitle(article.seoTitle || article.title);
   const description = article.seoDescription || article.excerpt || article.title;
-  const canonicalPath = article.canonicalPath || `/blog/${article.slug}`;
+  const canonicalPath = resolveBlogArticleCanonicalPath(article);
   const canonical = absoluteUrl(canonicalPath);
   const image = resolveBlogShareImage(article.coverImageUrl) || (article.coverImageUrl ? absoluteUrl(article.coverImageUrl) : undefined);
   const breadcrumbs = buildBlogArticleBreadcrumbs(article);
