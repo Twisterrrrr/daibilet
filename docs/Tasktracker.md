@@ -14,7 +14,7 @@
 | I.1 | Пустые главная + `/events`: stats 500 (`destination.name` on null) → empty home cascade | Критический | ✅ hotfix `dto.js` + restart API/web |
 | I.2 | Web follow-up: SiteLayout Suspense fallback + CatalogShell SSR keep (rebuild) | Высокий | ⏳ в worktree `daibilet-push` |
 | I.3 | Telegram OG: WebpageBot видит, чаты нет; площадки без title/desc | Критический | 🔄 nginx→social-preview + venue twitter ✅ `1c81cdf`; **блокер: AAAA всё ещё в DNS** |
-| I.4 | Infinite full-page reload (`/blog`+): ChunkLoadRecovery матчил hydration #418 по chunk filename | Критический | 🔄 fix ChunkLoadRecovery + nested `<main>` |
+| I.4 | Infinite full-page reload (`/blog`+): ChunkLoadRecovery матчил hydration #418 по chunk filename | Критический | ✅ `85b8cfe` + deploy-prod-next |
 
 ---
 
