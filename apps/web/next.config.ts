@@ -4,6 +4,12 @@ const nextConfig: NextConfig = {
   // Prod VPS ~4GB: full tsc/eslint during `next build` gets OOM-killed.
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
+  // Cap SSG workers so page-data generation does not OOM on 3.8Gi hosts.
+  experimental: {
+    cpus: 1,
+    staticGenerationMaxConcurrency: 2,
+    staticGenerationMinPagesPerWorker: 10,
+  },
   transpilePackages: ['@daibilet/backend', '@daibilet/db', '@daibilet/contracts'],
   serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'pg'],
   // Image optimizer: WebP/AVIF + long cache to avoid re-encode CPU spikes on small VPS.
