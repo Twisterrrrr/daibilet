@@ -1,4 +1,5 @@
 import { parseSessionStartsAt } from '@/lib/datetime';
+import { isHomeRailTabooSession } from '@/lib/home-rail-taboos';
 import { normalizeSessionImageKey, sessionHasCoverImage, spreadCatalogSessionsByCoverImage, spreadSessionsForGrid } from '@/lib/session-cover-image';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
@@ -77,6 +78,7 @@ function takeUnique(events: PublicSession[], max: number, state: HomePickState):
   const result: PublicSession[] = [];
   for (const event of events) {
     if (!sessionHasCoverImage(event)) continue;
+    if (isHomeRailTabooSession(event)) continue;
     const dedupeKey = sessionDedupeKey(event);
     const familyKey = sessionFamilyKey(event);
     if (state.seenIds.has(event.id) || state.seenTitles.has(dedupeKey) || state.seenFamilies.has(familyKey)) continue;
@@ -108,12 +110,13 @@ export function buildEditorsPickEvents(
   limit = HOME_SHOWCASE_LIMIT,
   state = createHomePickState(),
 ): PublicSession[] {
-  const pinned = sessions.filter(isFeaturedEvent);
-  const pool =
-    pinned.length > 0
-      ? [...pinned].sort((a, b) => popularScore(b) - popularScore(a))
-      : [...sessions].sort((a, b) => popularScore(b) - popularScore(a));
-  return takeUnique(pool, limit, state);
+  // Pin first (taboo / image-dupes skipped), then fill from the rest so rails stay full.
+  const pinned = [...sessions.filter(isFeaturedEvent)].sort((a, b) => popularScore(b) - popularScore(a));
+  const picked = takeUnique(pinned, limit, state);
+  if (picked.length >= limit) return picked;
+
+  const rest = [...sessions].sort((a, b) => popularScore(b) - popularScore(a));
+  return picked.concat(takeUnique(rest, limit - picked.length, state));
 }
 
 export function buildThisWeekEvents(

@@ -1,3 +1,23 @@
+## 2026-07-24 - Home rails: Harry Potter taboo + cover dedupe
+
+### Наблюдения
+
+- На `/` в «Выбор редакции» уходил pinned «Комбо 1» с venue Музей Гарри Поттера (title без «Поттер»).
+- Соседние карточки могли делить одну и ту же обложку (basename после strip query); при pin-only пуле слоты не дозаполнялись.
+
+### Решения
+
+- `home-rail-taboos.ts`: фильтр по title/venue/venueSlug/slug/groupKey (harry potter / гарри поттер / muzei-garri-pottera…).
+- `takeUnique` в editors-pick / home-now / popular (web+public): skip taboo; image key = basename.
+- `buildEditorsPickEvents`: pin first → skip taboo/dupes → fill from остальных кандидатов.
+- `normalizeSessionImageKey` (+ backend catalog twin): strip query, basename; unwrap `/_next/image?url=`.
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next).
+
+---
+
 ## 2026-07-24 - SiteHeader: premium glass chrome
 
 ### Наблюдения

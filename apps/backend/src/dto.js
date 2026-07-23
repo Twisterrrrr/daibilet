@@ -4481,26 +4481,45 @@ function normalizePublicSessionImageKey(imageUrl) {
   const raw = String(imageUrl || '').trim();
   if (!raw) return null;
 
+  if (raw.includes('/_next/image') && /[?&]url=/.test(raw)) {
+    try {
+      const proxy = new URL(raw, 'https://daibilet.ru');
+      const inner = proxy.searchParams.get('url');
+      if (inner) return normalizePublicSessionImageKey(inner);
+    } catch {
+      // fall through
+    }
+  }
+
   let pathname = raw;
-  let hostname = '';
+  let search = '';
   try {
     const parsed = new URL(raw, 'https://daibilet.ru');
     pathname = parsed.pathname;
-    hostname = parsed.hostname.toLowerCase();
+    search = parsed.search || '';
   } catch {
-    pathname = raw.split('?')[0]?.split('#')[0] || raw;
+    const bare = raw.split('#')[0] || raw;
+    const q = bare.indexOf('?');
+    pathname = q >= 0 ? bare.slice(0, q) : bare;
+    search = q >= 0 ? bare.slice(q) : '';
   }
 
   const normalizedPath = pathname.replace(/\/$/, '').toLowerCase();
-  const file = normalizedPath.split('/').filter(Boolean).pop() || '';
+  const file = decodeURIComponent(normalizedPath.split('/').filter(Boolean).pop() || '').toLowerCase();
   if (file && /\.(jpe?g|png|webp|gif|avif|bmp|svg)$/i.test(file)) {
-    if (/^[a-f0-9-]{16,}$/i.test(file.replace(/\.[^.]+$/, '')) || file.length >= 16) {
-      return `img:${file}`;
-    }
-    if (hostname) return `img:${hostname}/${file}`;
+    return `img:${file}`;
   }
 
-  if (hostname) return `${hostname}${normalizedPath}`;
+  if (search) {
+    try {
+      const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
+      const item = params.get('item') || params.get('id') || params.get('key');
+      if (item && item.trim()) return `img:q:${item.trim().toLowerCase()}`;
+    } catch {
+      // fall through
+    }
+  }
+
   return normalizedPath || null;
 }
 

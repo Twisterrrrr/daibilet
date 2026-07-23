@@ -7,6 +7,7 @@ import {
   parseSessionStartsAt,
   resolveSessionTimeZoneForSession,
 } from '@/lib/datetime';
+import { isHomeRailTabooSession } from '@/lib/home-rail-taboos';
 import { spreadCatalogSessionsByCoverImage, normalizeSessionImageKey, sessionHasCoverImage } from '@/lib/session-cover-image';
 import { createHomePickState, sessionFamilyKey, type HomePickState } from '@/lib/home-showcase-sections';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
@@ -81,6 +82,7 @@ function takeUnique(events: PublicSession[], max: number, state: HomePickState):
 
   for (const event of events) {
     if (!sessionHasCoverImage(event)) continue;
+    if (isHomeRailTabooSession(event)) continue;
     const dedupeKey = sessionDedupeKey(event);
     const familyKey = sessionFamilyKey(event);
     if (state.seenIds.has(event.id) || state.seenTitles.has(dedupeKey) || state.seenFamilies.has(familyKey)) continue;
