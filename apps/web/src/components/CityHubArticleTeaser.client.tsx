@@ -15,16 +15,20 @@ export function CityHubArticleTeaser({
   article,
   editorial = false,
   sessions = [],
+  variant = 'default',
 }: {
   article: BlogCardDto;
   editorial?: boolean;
   sessions?: PublicSessionDto[];
+  variant?: 'large' | 'small' | 'default';
 }) {
   const excerpt = String(article.excerpt || '').trim();
   const articleHref = `/blog/${article.slug}`;
+  const isLarge = variant === 'large';
+  const isSmall = variant === 'small';
   const relatedSessions = React.useMemo(
-    () => matchArticleSessions(article, sessions, 3),
-    [article, sessions],
+    () => matchArticleSessions(article, sessions, isSmall ? 2 : 3),
+    [article, sessions, isSmall],
   );
 
   return (
@@ -38,15 +42,17 @@ export function CityHubArticleTeaser({
       <Link
         href={articleHref}
         aria-label={article.title}
-        className={`relative block aspect-[16/10] shrink-0 overflow-hidden ${
-          editorial ? 'bg-zinc-100' : 'bg-slate-100'
-        }`}
+        className={`relative block shrink-0 overflow-hidden ${
+          isLarge
+            ? 'aspect-[16/10] min-h-[11rem] lg:aspect-auto lg:min-h-[16rem] lg:flex-1'
+            : 'aspect-[16/10]'
+        } ${editorial ? 'bg-zinc-100' : 'bg-slate-100'}`}
       >
         <SafeImage
           src={article.coverImageUrl}
           alt=""
           fill
-          sizes={IMAGE_SIZES.blogCard}
+          sizes={isLarge ? IMAGE_SIZES.blogFeatured : IMAGE_SIZES.blogCard}
           className="object-cover object-center transition duration-300 hover:scale-[1.02]"
           fallback={
             <div
@@ -60,12 +66,20 @@ export function CityHubArticleTeaser({
         />
       </Link>
 
-      <div className="flex min-w-0 flex-1 flex-col justify-between p-3.5 sm:p-4">
+      <div
+        className={`flex min-w-0 flex-1 flex-col justify-between ${
+          isLarge ? 'p-4 sm:p-5' : isSmall ? 'p-3 sm:p-3.5' : 'p-3.5 sm:p-4'
+        }`}
+      >
         <div className="min-w-0">
           <h3
-            className={`line-clamp-2 text-sm font-semibold leading-snug sm:text-base ${
-              editorial ? 'text-zinc-950' : 'text-slate-950'
-            }`}
+            className={`font-semibold leading-snug ${
+              isLarge
+                ? 'line-clamp-3 text-base sm:text-lg'
+                : isSmall
+                  ? 'line-clamp-2 text-sm'
+                  : 'line-clamp-2 text-sm sm:text-base'
+            } ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}
           >
             <Link href={articleHref} className="hover:text-primary-700">
               {article.title}
@@ -74,9 +88,13 @@ export function CityHubArticleTeaser({
 
           {excerpt ? (
             <p
-              className={`mt-1.5 line-clamp-3 text-xs leading-relaxed sm:text-sm ${
-                editorial ? 'text-zinc-600' : 'text-slate-600'
-              }`}
+              className={`mt-1.5 leading-relaxed ${
+                isLarge
+                  ? 'line-clamp-3 text-sm'
+                  : isSmall
+                    ? 'line-clamp-2 text-xs'
+                    : 'line-clamp-3 text-xs sm:text-sm'
+              } ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}
             >
               {excerpt}
             </p>
@@ -156,14 +174,47 @@ export function CityHubArticlesGrid({
 }) {
   if (!articles.length) return null;
   const items = articles.slice(0, 3);
+
+  if (items.length === 3) {
+    const [lead, sideA, sideB] = items;
+    return (
+      <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3 lg:grid-rows-2 lg:gap-5">
+        <div className="lg:col-span-2 lg:row-span-2">
+          <CityHubArticleTeaser
+            key={lead!.slug}
+            article={lead!}
+            editorial={editorial}
+            sessions={sessions}
+            variant="large"
+          />
+        </div>
+        <CityHubArticleTeaser
+          key={sideA!.slug}
+          article={sideA!}
+          editorial={editorial}
+          sessions={sessions}
+          variant="small"
+        />
+        <CityHubArticleTeaser
+          key={sideB!.slug}
+          article={sideB!}
+          editorial={editorial}
+          sessions={sessions}
+          variant="small"
+        />
+      </div>
+    );
+  }
+
   return (
-    <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
       {items.map((article) => (
         <CityHubArticleTeaser
           key={article.slug}
           article={article}
           editorial={editorial}
           sessions={sessions}
+          variant={items.length === 1 ? 'large' : 'default'}
         />
       ))}
     </div>

@@ -3,7 +3,7 @@
 import { useCallback, useMemo } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-import { BlogPostCard } from '@/components/BlogPostCard.client';
+import { BlogMagazineGrid } from '@/components/BlogMagazineGrid.client';
 import type { BlogListFilters } from '@/components/BlogListView';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { authorLabel, cityFilterLabel } from '@/lib/blog-meta';
@@ -141,11 +141,7 @@ export function BlogListFiltered({
       </p>
 
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((post) => (
-            <BlogPostCard key={post.slug} post={post} />
-          ))}
-        </div>
+        <BlogMagazineGrid posts={filtered} />
       ) : (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 py-16 text-center text-slate-500">
           <p className="text-lg font-semibold text-slate-700">Ничего не нашли</p>

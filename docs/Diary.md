@@ -1,3 +1,23 @@
+## 2026-07-23 - Blog listing magazine layout
+
+### Наблюдения
+
+- `/blog` был равномерной сеткой 3 колонки - визуально плоско, без ритма.
+- City hub teasers (до 3 шт) тоже шли одинаковыми карточками в ряд.
+
+### Решения
+
+- `BlogMagazineGrid`: desktop блоки по 3 - крупная ~2/3 + две stacked ~1/3, следующий блок зеркально; хвост pair/single аккуратно.
+- `BlogPostCard` variants `large|small|default` (выше cover / крупнее title у large).
+- City hub `CityHubArticlesGrid` при 3 тизерах - тот же 2/3+1/3 ритм.
+- Mobile: single column, крупные карточки.
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-23 - Admin preview статей (draft / scheduled)
 
 ### Наблюдения
@@ -10,11 +30,32 @@
 - Изолированный route `(article-preview)/admin/articles/[id]/preview` - без `AdminNextShell`, тот же `BlogArticleView` + markdown pipeline.
 - Auth: middleware Basic Auth на `/admin/*`; metadata `robots: noindex`.
 - Баннер: «Черновик» / «Запланировано на …» (future `publishedAt`) / статусы review/published/archive.
-- Кнопки «Превью» в list + edit. Поле канона остаётся `publishedAt` (merge со schedule-агентом: DRAFT + future `publishedAt`).
+- Кнопки «Превью» в list + edit. Поле канона остаётся `publishedAt` (schedule-агент: `PUBLISHED` + future `publishedAt`, public filter `publishedAt <= now`).
 
 ### Проблемы
 
 - Нет (finance не трогали).
+
+---
+
+## 2026-07-23 - SEO guides: max 3/day + schedule publishedAt
+
+### Наблюдения
+
+- Владелец: не более 3 статей в день live; остальное в график; в дневной пачке миксовать города.
+- На prod пачка A (3) + МСК/СПб (6) были live разом.
+- Public API фильтровал только `status=PUBLISHED`, без `publishedAt <= now` - future date не скрывал URL.
+
+### Решения
+
+- Runtime: `buildPublicArticlesList` / `buildPublicArticlePage` - условие `(publishedAt is null or publishedAt <= now())`.
+- Календарь 09:00 MSK: 23.07 - Казань/Екб/Москва; 24.07 - Екб/СПб/Москва; 25.07 - Москва/СПб/СПб.
+- Frontmatter `publishedAt` + `blog:upsert --force-published-at`; правило в plan + GPT prompt.
+- Статус остаётся `PUBLISHED` (не DRAFT): расписание через дату, cron не нужен.
+
+### Проблемы
+
+- 25.07 неизбежно 2×СПб (остаток инвентаря 3 МСК + 3 СПб после двух смешанных дней).
 
 ---
 
@@ -31,6 +72,7 @@
 - `PUBLISHED` в `content/blog/` + карточки `blog-posts` (web+public), `blog-meta`, `blog:sync-bodies`.
 - Cover: плейсхолдер `cities/moscow.png` / `saint-petersburg.png` → `/images/blog/{slug}.jpg` (TODO уникальные фото).
 - План `docs/seo-guide-articles-plan.md`: ID 11, 12, 18, 19, 30 + концерты СПб отмечены размещёнными.
+- Позже разнесены по календарю ≤3/день (см. запись выше).
 
 ### Проблемы
 
