@@ -78,7 +78,7 @@ export function BlogArticleHero({
                 ) : null}
               </div>
 
-              <h1 className="font-serif mt-3 max-w-4xl text-[2rem] font-semibold leading-[1.08] tracking-tight text-white sm:text-4xl lg:text-5xl xl:text-[3.35rem]">
+              <h1 className="font-display mt-3 max-w-4xl text-[2rem] font-extrabold leading-[1.08] tracking-tight text-white sm:text-4xl lg:text-5xl xl:text-[3.35rem]">
                 {title}
               </h1>
 

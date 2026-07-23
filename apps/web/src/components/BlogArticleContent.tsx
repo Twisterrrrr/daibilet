@@ -470,7 +470,7 @@ function renderParagraphNodes(
       key={`${keyPrefix}-p-${paragraphIndex}`}
       className={
         paragraphIndex === 0 && isLead
-          ? `${LEAD_PARAGRAPH_CLASS} blog-dropcap`
+          ? LEAD_PARAGRAPH_CLASS
           : PARAGRAPH_CLASS
       }
     >
@@ -481,8 +481,8 @@ function renderParagraphNodes(
 
 function BlogPullQuote({ text, cite }: ParsedQuote) {
   return (
-    <blockquote className="blog-pullquote my-10 border-l-[3px] border-slate-900 pl-5 sm:my-12 sm:pl-6">
-      <p className="text-xl font-medium leading-[1.35] text-slate-900 sm:text-2xl sm:leading-[1.3]">
+    <blockquote className="my-10 border-l-[3px] border-slate-900 pl-5 sm:my-12 sm:pl-6">
+      <p className="font-display text-xl font-semibold leading-[1.35] text-slate-900 sm:text-2xl sm:leading-[1.3]">
         {renderInline(text, 'quote-')}
       </p>
       {cite ? <cite className="mt-3 block text-sm not-italic text-slate-500">- {cite}</cite> : null}
@@ -670,7 +670,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <h2
             key={`h2-${index}`}
-            className="scroll-mt-24 mb-3 font-serif text-[1.4rem] font-semibold tracking-tight text-slate-950 sm:text-[1.65rem] lg:text-[1.75rem] [&:not(:first-child)]:mt-10 [&:not(:first-child)]:pt-1"
+            className="scroll-mt-24 mb-3 font-display text-[1.4rem] font-bold tracking-tight text-slate-950 sm:text-[1.65rem] lg:text-[1.75rem] [&:not(:first-child)]:mt-10 [&:not(:first-child)]:pt-1"
           >
             {block.text}
           </h2>,
@@ -681,7 +681,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <h3
             key={`h3-${index}`}
-            className="scroll-mt-24 mb-2.5 font-serif text-lg font-semibold tracking-tight text-slate-950 sm:text-xl [&:not(:first-child)]:mt-7"
+            className="scroll-mt-24 mb-2.5 font-display text-lg font-bold tracking-tight text-slate-950 sm:text-xl [&:not(:first-child)]:mt-7"
           >
             {block.text}
           </h3>,
@@ -730,7 +730,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         nodes.push(
           <p
             key={`p-${index}`}
-            className={isLeadParagraph ? `${LEAD_PARAGRAPH_CLASS} blog-dropcap` : PARAGRAPH_CLASS}
+            className={isLeadParagraph ? LEAD_PARAGRAPH_CLASS : PARAGRAPH_CLASS}
           >
             {renderInline(block.text, `p-${index}-`)}
           </p>,

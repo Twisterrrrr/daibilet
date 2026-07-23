@@ -133,7 +133,7 @@ export function BlogArticleView({
 
           {(cityLink || eventsLink || related.length > 0) && (
             <section className="mt-14 border-t border-slate-300/70 pt-10">
-              <h2 className="font-serif text-2xl font-semibold tracking-tight text-slate-950">
+              <h2 className="font-display text-2xl font-bold tracking-tight text-slate-950">
                 Дальше по теме
               </h2>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
@@ -174,7 +174,7 @@ export function BlogArticleView({
                         <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
                           {[post.tag, post.city].filter(Boolean).join(' · ') || 'Блог'}
                         </p>
-                        <h3 className="mt-1 font-serif text-base font-semibold leading-snug text-slate-900 group-hover:text-primary-700">
+                        <h3 className="mt-1 font-display text-base font-bold leading-snug text-slate-900 group-hover:text-primary-700">
                           {post.title}
                         </h3>
                       </Link>

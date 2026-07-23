@@ -45,7 +45,7 @@ export function BlogListHero({
                 <BookOpen className="h-3.5 w-3.5" aria-hidden />
                 Блог Дайбилет
               </p>
-              <h1 className="font-serif mt-3 text-[2.15rem] font-semibold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-[3.4rem]">
+              <h1 className="font-display mt-3 text-[2.15rem] font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-[3.4rem]">
                 {title}
               </h1>
               <p className="mt-4 max-w-xl text-base leading-relaxed text-white/88 sm:text-lg sm:leading-[1.55]">

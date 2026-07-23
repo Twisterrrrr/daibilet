@@ -72,7 +72,7 @@ export function BlogRelatedSidebar({
                         {[post.tag, post.city].filter(Boolean).join(' · ')}
                       </p>
                     ) : null}
-                    <h3 className="mt-0.5 line-clamp-3 font-serif text-sm font-semibold leading-snug text-slate-900 group-hover:text-primary-700">
+                    <h3 className="mt-0.5 line-clamp-3 font-display text-sm font-bold leading-snug text-slate-900 group-hover:text-primary-700">
                       {post.title}
                     </h3>
                   </div>

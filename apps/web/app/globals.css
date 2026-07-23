@@ -222,21 +222,6 @@
     display: none;
   }
 
-  /* Blog magazine: drop cap + pull quote */
-  .blog-dropcap::first-letter {
-    float: left;
-    font-family: var(--font-serif);
-    font-size: 3.35em;
-    font-weight: 600;
-    line-height: 0.82;
-    padding-right: 0.1em;
-    padding-top: 0.08em;
-    color: hsl(222 47% 14%);
-  }
-
-  .blog-pullquote {
-    font-family: var(--font-serif);
-  }
 }
 
 .tc-widget-container {

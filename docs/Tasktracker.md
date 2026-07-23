@@ -168,6 +168,7 @@
 | B.18 | Колонка Артура «На вкус»: `kazan-na-vkus-master-klassy` (МК Эчпочмака + гастроужин) | Критический | ✅ 2026-07-22 @93d3a07 + upsert |
 | B.19 | Колонка Елены: `spb-s-rebenkom-v-dozhd` (СПб с ребёнком в дождь) | Критический | ✅ 2026-07-22 upsert + revalidate |
 | B.20 | `/blog` magazine layout: listing asymmetric + article journal (serif/dropcap/quotes/sidebar) | Высокий | ✅ `a4ecab6` |
+| B.21 | Blog typography: откат Source Serif → site `font-display`; убрать dropcap | Критический | 🔄 |
 
 ---
 
@@ -498,6 +499,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-23 | B.21: blog fonts rollback - Source Serif → Space Grotesk / site default; dropcap off |
 | 2026-07-23 | B.20: blog magazine full scope - listing asymmetric + article serif/dropcap/quotes/topic sidebar |
 | 2026-07-23 | B.20: `/blog` asymmetric magazine grid (large 2/3 + 2 small; mirror); city hub teasers |
 | 2026-07-23 | F4.6: schedule/sales/source + blocks preview + buyers + unarchive/delete; Vite `/legacy` hard-retired |

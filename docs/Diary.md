@@ -1,3 +1,21 @@
+## 2026-07-23 - Blog typography: откат Source Serif
+
+### Наблюдения
+
+- Владелец: шрифты в блоге после magazine redesign (`a4ecab6`) «не те» - Source Serif на H1/H2/H3 и listing titles чужеродны относительно остального сайта.
+
+### Решения
+
+- Вернули site default: Space Grotesk (`font-display`) / bold на hero, article H2/H3, cards, sidebar, strip.
+- Убрали drop cap и serif pull-quote; цитаты на `font-display`.
+- Magazine layout (grid/sidebar/quotes anatomy) оставили; Source Serif остаётся для city editorial hub.
+
+### Проблемы
+
+- Нет.
+
+---
+
 ## 2026-07-23 - МСК/СПб covers + magazine `/blog` hero
 
 ### Наблюдения
