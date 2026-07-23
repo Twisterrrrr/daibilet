@@ -1,31 +1,31 @@
-id,title,city,target_chpu,priority
-1,Что посмотреть в Казани за 3 дня самостоятельно,Казань,/ekskursii/kazan,Высокий
-2,Куда сходить в Казани вечером: стендап и живые площадки,Казань,/stendap-i-yumor/kazan,Средний
-3,Речные прогулки в Казани: маршруты у Кремля и по Волге,Казань,/rechnye-progulki/kazan,Высокий
-4,Казань за выходные: готовый план без гида,Казань,/podborki/na-vyhodnye/kazan,Средний
-5,Первый день в Екатеринбурге: что успеть без спешки,Екб,/cities/ekaterinburg,Высокий
-6,Стендап в Екатеринбурге: как выбрать площадку и формат,Екб,/stendap-i-yumor/ekaterinburg,Высокий
-7,Экскурсии по Екатеринбургу: обзорные и тематические маршруты,Екб,/ekskursii/ekaterinburg,Средний
-8,Куда сходить в Екатеринбурге на выходных,Екб,/podborki/na-vyhodnye/ekaterinburg,Средний
-9,Москва за 2 дня: маршрут без очередей и лишней суеты,МСК,/peshie-ekskursii/moscow,Высокий
-10,Речные прогулки по Москве: дневные и вечерние рейсы,МСК,/rechnye-progulki/moscow,Высокий
-11,Стендап в Москве: открытый микрофон или большое шоу,МСК,/stendap-i-yumor/moscow,Высокий
-12,Выставки и музеи Москвы: как выбрать сеанс,МСК,/vystavki-i-muzei/moscow,Высокий
-13,Необычные театры Москвы: иммерсив и камерные форматы,МСК,/neobychnye-teatry/moscow,Средний
-14,Бесплатно в Москве: куда сходить без билета,МСК,/podborki/besplatno/moscow,Средний
-15,Москва на выходных: короткий список идей,МСК,/podborki/na-vyhodnye/moscow,Высокий
-16,Петербург за 3 дня: классика и альтернативные маршруты,СПб,/peshie-ekskursii/saint-petersburg,Высокий
-17,Речные прогулки по Петербургу: Нева каналы и мосты,СПб,/rechnye-progulki/saint-petersburg,Высокий
-18,Экскурсии по крышам Санкт-Петербурга: кому подойдёт формат,СПб,/progulki-po-krysham/saint-petersburg,Высокий
-19,Загородные экскурсии из Петербурга: Петергоф Пушкин и дальше,СПб,/zagorodnye-ekskursii/saint-petersburg,Высокий
-20,Стендап в Петербурге: клубы даты и как выбрать вечер,СПб,/stendap-i-yumor/saint-petersburg,Высокий
-21,Выставки и музеи Петербурга: маршрут на один день,СПб,/vystavki-i-muzei/saint-petersburg,Средний
-22,Необычные театры Петербурга: куда пойти вместо классики,СПб,/neobychnye-teatry/saint-petersburg,Средний
-23,Петербург на выходных: план суббота-воскресенье,СПб,/podborki/na-vyhodnye/saint-petersburg,Высокий
-24,Разводные мосты Петербурга: как увидеть с воды,СПб,/saint-petersburg/night-bridges,Средний
-25,Дворы Петербурга: пешие маршруты по парадным и дворам,СПб,/saint-petersburg/spb-yards,Средний
-26,Автобусные экскурсии по Москве: когда это удобнее пешком,МСК,/avtobusnye-ekskursii/moscow,Средний
-27,Автобусные экскурсии по Петербургу для первого визита,СПб,/avtobusnye-ekskursii/saint-petersburg,Средний
-28,Вечеринки на теплоходе в Москве: формат и как выбрать рейс,МСК,/vecherinki-na-teplohode/moscow,Средний
-29,Что посмотреть в Казани с детьми за один день,Казань,/ekskursii/kazan,Средний
-30,Екатеринбург вечером: стендап концерты и короткие форматы,Екб,/stendap-i-yumor/ekaterinburg,Средний
+id,batch,title,city,citySlug,slug,target_chpu,neighbor_chpu,mid_cta_angle,priority,chpu_note
+1,1,Что посмотреть в Казани за 2-3 дня самостоятельно: готовый маршрут с картой,Казань,kazan,kazan-2-3-dnya-samostoyatelno-karta,/ekskursii/kazan/,/rechnye-progulki/kazan/ ; /podborki/na-vyhodnye/kazan,Пешая экскурсия Кремль + город,Критический,OK excursions
+2,1,Куда съездить из Казани на один день: Свияжск Болгар Голубые озера,Казань,kazan,kazan-za-odin-den-svyazhsk-bolgar-ozera,/ekskursii/kazan/,/rechnye-progulki/kazan/ ; /cities/kazan,Загородный день из Казани,Критический,zagorodnye-ekskursii/kazan недоступен (country-tours только SPB) → ekskursii/kazan
+3,1,Казань с воды: лучшие маршруты речных прогулок по Волге и Казанке 2026,Казань,kazan,kazan-rechnye-progulki-volga-kazanka-2026,/rechnye-progulki/kazan/,/ekskursii/kazan/ ; /podborki/na-vyhodnye/kazan,Речные прогулки,Критический,OK river-cruises
+4,1,Куда сходить в Казани вечером: бары стендапы вечерние огни,Казань,kazan,kazan-vecherom-bary-stendap,/stendap-i-yumor/kazan/,/ekskursii/kazan/ ; /podborki/na-vyhodnye/kazan,Стендап и вечерняя афиша,Критический,OK standup
+5,1,Топ-10 бесплатных локаций Казани: как посмотреть город без бюджета,Казань,kazan,kazan-besplatno-top-10,/podborki/besplatno/kazan,/cities/kazan ; /ekskursii/kazan/,Бесплатные события и локации,Критический,intent besplatno (возможен thin)
+6,1,Красная линия Екатеринбурга за 4 часа: маршрут и точки,Екб,ekaterinburg,ekb-krasnaya-liniya-4-chasa,/ekskursii/ekaterinburg/,/podborki/na-vyhodnye/ekaterinburg ; /cities/ekaterinburg,Обзорные экскурсии / маршрут,Критический,OK excursions
+7,1,Куда сходить в Екатеринбурге на выходных,Екб,ekaterinburg,ekb-na-vyhodnye,/podborki/na-vyhodnye/ekaterinburg,/ekskursii/ekaterinburg/ ; /stendap-i-yumor/ekaterinburg/,Выходные в городе,Критический,intent na-vyhodnye
+8,1,Стендап в Екатеринбурге: площадки и как выбрать вечер,Екб,ekaterinburg,ekb-stendap-gid,/stendap-i-yumor/ekaterinburg/,/podborki/na-vyhodnye/ekaterinburg ; /ekskursii/ekaterinburg/,Стендап,Критический,OK standup
+9,1,Смотровые площадки Екатеринбурга: куда подняться за видом,Екб,ekaterinburg,ekb-smotrovye-ploshchadki,/ekskursii/ekaterinburg/,/podborki/na-vyhodnye/ekaterinburg ; /cities/ekaterinburg,Экскурсии и маршруты с видами,Критический,отдельного CHPU смотровых нет → ekskursii
+10,1,Уральский Марс и Бажовские места: куда съездить из Екатеринбурга,Екб,ekaterinburg,ekb-uralskiy-mars-bazhovskie,/ekskursii/ekaterinburg/,/podborki/na-vyhodnye/ekaterinburg ; /cities/ekaterinburg,Загородные выезды из Екб,Критический,zagorodnye-ekskursii/ekaterinburg недоступен → ekskursii/ekaterinburg
+11,2,Москва за 2 дня: маршрут без очередей и лишней суеты,МСК,moscow,moskva-za-2-dnya,/peshie-ekskursii/moscow/,/rechnye-progulki/moscow/ ; /podborki/na-vyhodnye/moscow,Пешие экскурсии,Высокий,OK
+12,2,Речные прогулки по Москве: дневные и вечерние рейсы,МСК,moscow,moskva-rechnye-progulki,/rechnye-progulki/moscow/,/peshie-ekskursii/moscow/ ; /vecherinki-na-teplohode/moscow/,Речные,Высокий,OK
+13,2,Стендап в Москве: открытый микрофон или большое шоу,МСК,moscow,moskva-stendap,/stendap-i-yumor/moscow/,/podborki/na-vyhodnye/moscow,Стендап,Высокий,OK
+14,2,Выставки и музеи Москвы: как выбрать сеанс,МСК,moscow,moskva-vystavki-muzei,/vystavki-i-muzei/moscow/,/podborki/na-vyhodnye/moscow,Выставки,Высокий,OK
+15,2,Необычные театры Москвы: иммерсив и камерные форматы,МСК,moscow,moskva-neobychnye-teatry,/neobychnye-teatry/moscow/,/vystavki-i-muzei/moscow/,Театры,Средний,OK
+16,2,Бесплатно в Москве: куда сходить без билета,МСК,moscow,moskva-besplatno,/podborki/besplatno/moscow,/peshie-ekskursii/moscow/,Бесплатно,Средний,intent
+17,2,Москва на выходных: короткий список идей,МСК,moscow,moskva-na-vyhodnye,/podborki/na-vyhodnye/moscow,/rechnye-progulki/moscow/ ; /stendap-i-yumor/moscow/,Выходные,Высокий,intent
+18,2,Петербург за 3 дня: классика и альтернативные маршруты,СПб,saint-petersburg,spb-za-3-dnya,/peshie-ekskursii/saint-petersburg/,/rechnye-progulki/saint-petersburg/ ; /podborki/na-vyhodnye/saint-petersburg,Пешие,Высокий,OK
+19,2,Речные прогулки по Петербургу: Нева каналы и мосты,СПб,saint-petersburg,spb-rechnye-progulki,/rechnye-progulki/saint-petersburg/,/peshie-ekskursii/saint-petersburg/ ; /saint-petersburg/night-bridges,Речные,Высокий,OK
+20,2,Экскурсии по крышам Санкт-Петербурга: кому подойдёт формат,СПб,saint-petersburg,spb-kryshi,/progulki-po-krysham/saint-petersburg/,/peshie-ekskursii/saint-petersburg/,Крыши,Высокий,только SPB
+21,2,Загородные экскурсии из Петербурга: Петергоф Пушкин и дальше,СПб,saint-petersburg,spb-zagorodnye,/zagorodnye-ekskursii/saint-petersburg/,/peshie-ekskursii/saint-petersburg/,Загородные,Высокий,country-tours только SPB - OK
+22,2,Стендап в Петербурге: клубы даты и как выбрать вечер,СПб,saint-petersburg,spb-stendap,/stendap-i-yumor/saint-petersburg/,/podborki/na-vyhodnye/saint-petersburg,Стендап,Высокий,OK
+23,2,Выставки и музеи Петербурга: маршрут на один день,СПб,saint-petersburg,spb-vystavki,/vystavki-i-muzei/saint-petersburg/,/podborki/na-vyhodnye/saint-petersburg,Выставки,Средний,OK
+24,2,Необычные театры Петербурга: куда пойти вместо классики,СПб,saint-petersburg,spb-neobychnye-teatry,/neobychnye-teatry/saint-petersburg/,/vystavki-i-muzei/saint-petersburg/,Театры,Средний,OK
+25,2,Петербург на выходных: план суббота-воскресенье,СПб,saint-petersburg,spb-na-vyhodnye,/podborki/na-vyhodnye/saint-petersburg,/rechnye-progulki/saint-petersburg/ ; /stendap-i-yumor/saint-petersburg/,Выходные,Высокий,intent
+26,2,Разводные мосты Петербурга: как увидеть с воды,СПб,saint-petersburg,spb-razvodnye-mosty,/saint-petersburg/night-bridges,/rechnye-progulki/saint-petersburg/,Мосты,Средний,city-scoped
+27,2,Дворы Петербурга: пешие маршруты по парадным и дворам,СПб,saint-petersburg,spb-dvory,/saint-petersburg/spb-yards,/peshie-ekskursii/saint-petersburg/,Дворы,Средний,city-scoped
+28,2,Автобусные экскурсии по Москве: когда это удобнее пешком,МСК,moscow,moskva-avtobusnye,/avtobusnye-ekskursii/moscow/,/peshie-ekskursii/moscow/,Автобус,Средний,OK
+29,2,Автобусные экскурсии по Петербургу для первого визита,СПб,saint-petersburg,spb-avtobusnye,/avtobusnye-ekskursii/saint-petersburg/,/peshie-ekskursii/saint-petersburg/,Автобус,Средний,OK
+30,2,Вечеринки на теплоходе в Москве: формат и как выбрать рейс,МСК,moscow,moskva-vecherinki-teplohod,/vecherinki-na-teplohode/moscow/,/rechnye-progulki/moscow/,Вечеринки,Средний,OK

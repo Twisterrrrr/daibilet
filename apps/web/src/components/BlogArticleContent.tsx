@@ -3,11 +3,13 @@
 import * as React from 'react';
 
 import { BlogArticleCta, parseCtaBlock } from '@/components/BlogArticleCta';
+import { BlogArticleNote, parseNoteBlock } from '@/components/BlogArticleNote';
 import { BlogBuyButton, parseBuyBlock } from '@/components/BlogBuyButton.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { handleBlogLinkClick } from '@/lib/blog-navigate';
 
 const IMAGE_BLOCK_REGEX = /^\[image\s+side=(left|right)\s+src="([^"]+)"(?:\s+alt="([^"]*)")?\]$/i;
+const MD_IMAGE_LINE_REGEX = /^!\[([^\]]*)\]\(([^)]+)\)$/;
 
 export type ParsedImageBlock = {
   side: 'left' | 'right';
@@ -16,13 +18,24 @@ export type ParsedImageBlock = {
 };
 
 export function parseImageBlock(block: string): ParsedImageBlock | null {
-  const match = block.trim().match(IMAGE_BLOCK_REGEX);
-  if (!match) return null;
-  return {
-    side: match[1].toLowerCase() as 'left' | 'right',
-    src: match[2],
-    alt: match[3] || '',
-  };
+  const trimmed = block.trim();
+  const match = trimmed.match(IMAGE_BLOCK_REGEX);
+  if (match) {
+    return {
+      side: match[1].toLowerCase() as 'left' | 'right',
+      src: match[2],
+      alt: match[3] || '',
+    };
+  }
+  const md = trimmed.match(MD_IMAGE_LINE_REGEX);
+  if (md) {
+    return {
+      side: 'left',
+      src: md[2],
+      alt: md[1] || '',
+    };
+  }
+  return null;
 }
 
 type ContentBlock =
@@ -34,7 +47,8 @@ type ContentBlock =
   | { type: 'table'; lines: string[] }
   | { type: 'image'; image: ParsedImageBlock }
   | { type: 'cta'; data: ReturnType<typeof parseCtaBlock> & object }
-  | { type: 'buy'; data: NonNullable<ReturnType<typeof parseBuyBlock>> };
+  | { type: 'buy'; data: NonNullable<ReturnType<typeof parseBuyBlock>> }
+  | { type: 'note'; data: NonNullable<ReturnType<typeof parseNoteBlock>> };
 
 /** Inline markdown на одной строке (без \\n). */
 function renderInlineLine(text: string, keyPrefix = ''): React.ReactNode[] {
@@ -130,6 +144,7 @@ function isSpecialLine(line: string): boolean {
   const trimmed = line.trim();
   if (!trimmed) return true;
   if (parseCtaBlock(trimmed)) return true;
+  if (parseNoteBlock(trimmed)) return true;
   if (parseBuyBlock(trimmed)) return true;
   if (parseImageBlock(trimmed)) return true;
   if (isTableLine(trimmed)) return true;
@@ -167,6 +182,14 @@ export function parseContentBlocks(content: string): ContentBlock[] {
     if (cta) {
       flushParagraph();
       blocks.push({ type: 'cta', data: cta });
+      index += 1;
+      continue;
+    }
+
+    const note = parseNoteBlock(line);
+    if (note) {
+      flushParagraph();
+      blocks.push({ type: 'note', data: note });
       index += 1;
       continue;
     }
@@ -306,6 +329,11 @@ function BlogTable({ rows, className = '' }: { rows: string[][]; className?: str
   );
 }
 
+function isTodoPhotoSrc(src: string): boolean {
+  const value = String(src || '').trim().toLowerCase();
+  return value === 'todo-photo' || value.startsWith('todo-photo');
+}
+
 function BlogFigure({
   image,
   className = 'w-full max-w-md',
@@ -313,6 +341,24 @@ function BlogFigure({
   image: ParsedImageBlock;
   className?: string;
 }) {
+  if (isTodoPhotoSrc(image.src)) {
+    return (
+      <figure className={className}>
+        <div className="flex aspect-[4/3] w-full items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 text-center">
+          <p className="text-sm leading-6 text-slate-500">
+            <span className="font-semibold text-slate-700">Фото TODO</span>
+            {image.alt ? (
+              <>
+                <br />
+                {image.alt}
+              </>
+            ) : null}
+          </p>
+        </div>
+      </figure>
+    );
+  }
+
   return (
     <figure className={className}>
       <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-slate-200/80 shadow-md">
@@ -529,6 +575,10 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
     switch (block.type) {
       case 'cta':
         nodes.push(<BlogArticleCta key={`cta-${index}`} {...block.data} />);
+        isLeadParagraph = false;
+        break;
+      case 'note':
+        nodes.push(<BlogArticleNote key={`note-${index}`} {...block.data} />);
         isLeadParagraph = false;
         break;
       case 'buy':

@@ -1,3 +1,22 @@
+## 2026-07-23 - SEO guide batch #1 + blog NOTE callout
+
+### Наблюдения
+
+- Владелец утвердил 10 путеводителей (5 Казань + 5 Екб) с mid CTA и правилами оформления.
+- `/zagorodnye-ekskursii/{city}` в роутинге разрешён только для `saint-petersburg`; для Казани/Екб CTA загородных тем = `/ekskursii/{city}/`.
+- Отдельного CHPU «смотровые площадки» нет → Екб смотровые CTA = `/ekskursii/ekaterinburg/`.
+- В блоге уже были `[CTA]` / `[buy]` / `[image]`, но не было нативной mid-article плашки «Важно».
+
+### Решения
+
+- Batch #1 зафиксирован в `docs/seo-guide-articles-plan.md` (+ csv); GPT batch-промпт - `docs/seo-guide-articles-gpt-prompt.md`.
+- Добавлен `BlogArticleNote` + парсер `[NOTE label="…" text="…"]` в `BlogArticleContent`; `![alt](TODO-photo)` рендерится как плейсхолдер.
+- Полные 10 текстов не пишем в этом тикете; генерация у владельца в GPT, размещение пачками MD в Cursor.
+
+### Проблемы
+
+- Intent `/podborki/besplatno/kazan` может быть thin (&lt; 6) - CTA всё равно канонический intent URL.
+
 ## 2026-07-23 - F4.2 Sync jobs → apps/worker
 
 ### Наблюдения
