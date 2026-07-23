@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
-import { formatAdminDateTime, formatAdminNumber, viteAdminHref } from '@/lib/admin-ui';
+import { formatAdminDateTime, formatAdminNumber } from '@/lib/admin-ui';
 import { loadAdminEcrList } from '@/server/admin-ecr-data';
 
 export const dynamic = 'force-dynamic';
@@ -40,12 +40,6 @@ export default async function AdminChangeRequestsPage({ searchParams }: PageProp
             Очередь правок: approve / reject / apply. Всего {formatAdminNumber(data.total)}.
           </p>
         </div>
-        <a
-          href={viteAdminHref('/change-requests')}
-          className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-        >
-          Vite
-        </a>
       </header>
 
       <AdminApiErrorBanner errors={data.errors} />

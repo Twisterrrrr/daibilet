@@ -67,6 +67,15 @@ export type AdminLandingDetailData = {
     manualStatus: string | null;
     groupEventIds: string[];
   }>;
+  blocks: Array<{
+    id: string;
+    type: string;
+    variant: string | null;
+    title: string | null;
+    subtitle: string | null;
+    isEnabled: boolean;
+    sortOrder: number;
+  }>;
   errors: string[];
 };
 
@@ -148,6 +157,7 @@ export async function loadAdminLandingDetail(slug: string): Promise<AdminLanding
     metrics: { pinnedEvents: 0, excludedEvents: 0, autoEvents: 0, effectiveEvents: 0 },
     sampleEvents: [],
     excludedSample: [],
+    blocks: [],
     errors,
   };
 
@@ -233,6 +243,20 @@ export async function loadAdminLandingDetail(slug: string): Promise<AdminLanding
           groupEventIds: mapped.groupEventIds,
         };
       }),
+      blocks: Array.isArray(payload.blocks)
+        ? payload.blocks.map((item) => {
+            const row = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
+            return {
+              id: String(row.id || `${row.type || 'block'}`),
+              type: String(row.type || '—'),
+              variant: row.variant != null ? String(row.variant) : null,
+              title: row.title != null ? String(row.title) : null,
+              subtitle: row.subtitle != null ? String(row.subtitle) : null,
+              isEnabled: row.isEnabled !== false,
+              sortOrder: asNumber(row.sortOrder),
+            };
+          })
+        : [],
       errors,
     };
   } catch (error) {

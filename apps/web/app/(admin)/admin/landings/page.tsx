@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
 import { AdminPagination } from '@/components/admin/AdminPagination';
-import { formatAdminNumber, PUBLIC_SITE_BASE, viteAdminHref } from '@/lib/admin-ui';
+import { formatAdminNumber, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
 import { loadAdminLandingsList } from '@/server/admin-landings-data';
 
 export const dynamic = 'force-dynamic';
@@ -45,15 +45,9 @@ export default async function AdminLandingsPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">Лендинги</h2>
           <p className="mt-1 text-sm text-slate-600">
-            SEO + pin/exclude - в Next detail. Candidates search / blocks - Vite `/legacy`.
+            SEO, pin/exclude, candidates и blocks preview - в Next detail.
           </p>
         </div>
-        <a
-          href={viteAdminHref('/landings')}
-          className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-        >
-          Vite candidates+
-        </a>
       </header>
 
       <AdminApiErrorBanner errors={data.errors} />
@@ -149,9 +143,6 @@ export default async function AdminLandingsPage({ searchParams }: PageProps) {
                         <Link href={`/admin/landings/${encodeURIComponent(row.slug)}`} className="text-sky-700 hover:underline">
                           SEO + matches
                         </Link>
-                        <a href={viteAdminHref(`/landings`)} className="text-slate-500 hover:underline">
-                          Vite candidates
-                        </a>
                         <a
                           href={`${PUBLIC_SITE_BASE.replace(/\/$/, '')}/${encodeURIComponent(row.slug)}`}
                           className="text-slate-500 hover:underline"

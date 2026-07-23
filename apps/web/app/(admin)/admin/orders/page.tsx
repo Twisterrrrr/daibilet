@@ -7,7 +7,7 @@ import {
   syncAdminOrdersTcAction,
 } from '@/server/admin-order-actions';
 import { loadAdminOrdersList } from '@/server/admin-orders-data';
-import { formatAdminDateTime, formatAdminNumber, viteAdminHref } from '@/lib/admin-ui';
+import { formatAdminDateTime, formatAdminNumber } from '@/lib/admin-ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,7 +47,7 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">Заказы</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Зеркало TC (оплата у источника). Привязка билетов вручную - Vite `/legacy`.
+            Зеркало TC (оплата у источника). Ticket-link / archive / delete - в detail Next.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -67,12 +67,6 @@ export default async function AdminOrdersPage({ searchParams }: PageProps) {
               Архив отменённых
             </button>
           </form>
-          <a
-            href={viteAdminHref('/orders')}
-            className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-          >
-            Vite tickets+
-          </a>
         </div>
       </header>
 

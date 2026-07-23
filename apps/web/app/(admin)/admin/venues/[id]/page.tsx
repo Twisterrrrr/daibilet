@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
-import { formatAdminNumber, PUBLIC_SITE_BASE, viteAdminHref } from '@/lib/admin-ui';
+import { formatAdminNumber, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
 import { saveAdminVenueAction } from '@/server/admin-venue-actions';
 import { loadAdminVenueDetail } from '@/server/admin-venues-data';
 
@@ -65,12 +65,6 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <a
-            href={viteAdminHref('/venues')}
-            className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-          >
-            Vite
-          </a>
           {detail.slug ? (
             <a
               href={`${PUBLIC_SITE_BASE.replace(/\/$/, '')}/venues/${encodeURIComponent(detail.slug)}`}

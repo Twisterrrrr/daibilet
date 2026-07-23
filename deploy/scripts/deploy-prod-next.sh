@@ -65,20 +65,8 @@ fi
 pnpm db:generate
 pnpm db:deploy
 
-BUILD_NODE_ENV="${BUILD_NODE_ENV:-development}"
-(
-  export NODE_ENV="$BUILD_NODE_ENV"
-  # Vite admin as /legacy/ SPA for deep CRUD after Next cutover.
-  VITE_ADMIN_BASE="/legacy/" \
-  VITE_DAIBILET_API_URL="/api" \
-  VITE_DAIBILET_PUBLIC_URL="${PUBLIC_SITE_URL:-https://daibilet.ru}" \
-  pnpm --filter @tours/admin build
-)
-mkdir -p "$ADMIN_LEGACY_DIR"
-rsync -a --delete apps/admin/dist/ "$ADMIN_LEGACY_DIR/"
-# Keep previous static root as rollback mirror (optional).
-mkdir -p "$ADMIN_DIR"
-rsync -a --delete apps/admin/dist/ "$ADMIN_DIR/" || true
+# F4.6: do not build/rsync Vite admin to /legacy. Code may remain in monorepo.
+echo "Skipping Vite admin build/deploy (F4.6 hard-retire /legacy)"
 
 pnpm web:build
 
@@ -102,11 +90,11 @@ fi
 sleep 4
 curl -fsS "http://127.0.0.1:${WEB_PORT}/api/health" >/dev/null && echo "Next /api/health OK on :$WEB_PORT"
 
-# F4.1c nginx: admin.daibilet.ru → Next + /legacy Vite
+# F4.6 nginx: admin.daibilet.ru → Next only (no /legacy)
 if [[ "$APPLY_ADMIN_NGINX_PATCH" == "1" && -f "$APP_DIR/deploy/nginx/patch-prod-admin-next.py" ]]; then
   if python3 "$APP_DIR/deploy/nginx/patch-prod-admin-next.py"; then
     if nginx -t 2>/dev/null; then
-      systemctl reload nginx && echo "nginx reloaded (admin Next cutover)"
+      systemctl reload nginx && echo "nginx reloaded (admin Next-only, no /legacy)"
     else
       echo "Warning: nginx -t failed after admin patch — not reloading"
     fi
@@ -122,9 +110,15 @@ if [[ -n "$ADMIN_SMOKE_USER" && -n "$ADMIN_SMOKE_PASS" ]]; then
   code="$(curl -sS -o /dev/null -w '%{http_code}' -u "${ADMIN_SMOKE_USER}:${ADMIN_SMOKE_PASS}" \
     -H "Host: admin.daibilet.ru" "http://127.0.0.1:${WEB_PORT}/" || true)"
   echo "Admin host rewrite smoke HTTP $code (expect 200)"
-  code_legacy="$(curl -sS -o /dev/null -w '%{http_code}' -u "${ADMIN_SMOKE_USER}:${ADMIN_SMOKE_PASS}" \
+  code_events="$(curl -sS -o /dev/null -w '%{http_code}' -u "${ADMIN_SMOKE_USER}:${ADMIN_SMOKE_PASS}" \
     -H "Host: admin.daibilet.ru" "http://127.0.0.1:${WEB_PORT}/admin/events" || true)"
-  echo "Admin /admin/events smoke HTTP $code_legacy (expect 200)"
+  echo "Admin /admin/events smoke HTTP $code_events (expect 200)"
+  code_buyers="$(curl -sS -o /dev/null -w '%{http_code}' -u "${ADMIN_SMOKE_USER}:${ADMIN_SMOKE_PASS}" \
+    -H "Host: admin.daibilet.ru" "http://127.0.0.1:${WEB_PORT}/admin/buyers" || true)"
+  echo "Admin /admin/buyers smoke HTTP $code_buyers (expect 200)"
+  code_legacy="$(curl -sS -o /dev/null -w '%{http_code}' -u "${ADMIN_SMOKE_USER}:${ADMIN_SMOKE_PASS}" \
+    -H "Host: admin.daibilet.ru" "http://127.0.0.1:${WEB_PORT}/legacy/" || true)"
+  echo "Admin /legacy smoke HTTP $code_legacy (expect 302 → /admin)"
 else
   echo "Warning: ADMIN_EMAIL/PASSWORD missing — skip admin Basic Auth smoke"
 fi

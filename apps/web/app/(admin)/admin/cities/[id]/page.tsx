@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
-import { PUBLIC_SITE_BASE, viteAdminHref } from '@/lib/admin-ui';
+import { PUBLIC_SITE_BASE } from '@/lib/admin-ui';
 import { saveAdminCityAction } from '@/server/admin-city-actions';
 import { loadAdminCityDetail } from '@/server/admin-cities-data';
 
@@ -40,12 +40,6 @@ export default async function AdminCityDetailPage({ params, searchParams }: Page
           <p className="mt-1 text-sm text-slate-600">SEO / intro / slug карточки города.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <a
-            href={viteAdminHref('/cities')}
-            className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-          >
-            Vite
-          </a>
           {detail.slug ? (
             <a
               href={`${PUBLIC_SITE_BASE.replace(/\/$/, '')}/cities/${encodeURIComponent(detail.slug)}`}

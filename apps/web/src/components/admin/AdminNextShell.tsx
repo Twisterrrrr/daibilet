@@ -15,6 +15,7 @@ import {
   MessageSquareQuote,
   Receipt,
   Settings,
+  Users,
 } from 'lucide-react';
 
 type NavItem = {
@@ -28,6 +29,7 @@ const NAV: NavItem[] = [
   { href: '/admin', label: 'Дашборд', icon: LayoutDashboard, ready: true },
   { href: '/admin/events', label: 'События', icon: CalendarDays, ready: true },
   { href: '/admin/orders', label: 'Заказы', icon: Receipt, ready: true },
+  { href: '/admin/buyers', label: 'Покупатели', icon: Users, ready: true },
   { href: '/admin/venues', label: 'Площадки', icon: Building2, ready: true },
   { href: '/admin/cities', label: 'Города', icon: MapPin, ready: true },
   { href: '/admin/landings', label: 'Лендинги', icon: LayoutTemplate, ready: true },
@@ -69,7 +71,7 @@ export function AdminNextShell({ children }: Props) {
                   active ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100'
                 } ${item.ready ? '' : 'opacity-60'}`}
                 aria-current={active ? 'page' : undefined}
-                title={item.ready ? undefined : 'Экран ещё на Vite admin - заглушка F4'}
+                title={item.ready ? undefined : 'Экран ещё не готов'}
               >
                 <Icon className="h-4 w-4" aria-hidden />
                 <span className="flex-1">{item.label}</span>
@@ -81,7 +83,7 @@ export function AdminNextShell({ children }: Props) {
           })}
         </nav>
         <div className="border-t border-slate-200 px-4 py-3 text-xs text-slate-500">
-          F4.5: rare ops в Next. /legacy для schedule/blocks/buyers.
+          F4.6: Vite `/legacy` retired. Ops в Next.
         </div>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
@@ -92,7 +94,7 @@ export function AdminNextShell({ children }: Props) {
               <h1 className="text-base font-semibold text-slate-900">Операторская оболочка</h1>
             </div>
             <span className="rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs text-emerald-800">
-              F4.5 rare ops
+              F4.6 hard-retire
             </span>
           </div>
         </header>

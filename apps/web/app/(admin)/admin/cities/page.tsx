@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
 import { AdminPagination } from '@/components/admin/AdminPagination';
-import { formatAdminNumber, PUBLIC_SITE_BASE, viteAdminHref } from '@/lib/admin-ui';
+import { formatAdminNumber, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
 import { loadAdminCitiesList } from '@/server/admin-cities-data';
 
 export const dynamic = 'force-dynamic';
@@ -28,15 +28,9 @@ export default async function AdminCitiesPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">Города</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Название, slug, SEO и intro в Next. Регионы/маппинг сложного уровня - Vite при необходимости.
+            Название, slug, SEO и intro в Next.
           </p>
         </div>
-        <a
-          href={viteAdminHref('/cities')}
-          className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-        >
-          Vite cities
-        </a>
       </header>
 
       <AdminApiErrorBanner errors={data.errors} />

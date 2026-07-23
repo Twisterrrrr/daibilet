@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { NEXT_ADMIN_BASE, PUBLIC_SITE_BASE, VITE_ADMIN_BASE, viteAdminHref } from '@/lib/admin-ui';
+import { NEXT_ADMIN_BASE, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
 import { isAdminAuthConfigured, readAdminBasicAuthConfig } from '@/lib/admin-basic-auth';
 import { resolveAdminApiBase } from '@/server/admin-api-fetch';
 
@@ -30,12 +30,6 @@ export default function AdminSettingsPage() {
             Writable toggles не выдумываем.
           </p>
         </div>
-        <a
-          href={viteAdminHref('/settings')}
-          className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-        >
-          Vite settings
-        </a>
       </header>
 
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -74,7 +68,7 @@ export default function AdminSettingsPage() {
         <div className="mt-3 grid gap-2 sm:grid-cols-2">
           <Row label="Публичный сайт" value={PUBLIC_SITE_BASE} />
           <Row label="Админка (Next канон)" value={NEXT_ADMIN_BASE} />
-          <Row label="Vite deep CRUD" value={VITE_ADMIN_BASE} />
+          <Row label="Vite /legacy" value="retired (F4.6)" />
           <Row label="Бренд" value="Дайбилет" />
         </div>
       </section>

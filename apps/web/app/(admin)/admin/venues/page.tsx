@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
 import { AdminPagination } from '@/components/admin/AdminPagination';
-import { formatAdminNumber, viteAdminHref } from '@/lib/admin-ui';
+import { formatAdminNumber } from '@/lib/admin-ui';
 import { loadAdminVenuesList } from '@/server/admin-venues-data';
 
 export const dynamic = 'force-dynamic';
@@ -35,15 +35,9 @@ export default async function AdminVenuesPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">Площадки</h2>
           <p className="mt-1 text-sm text-slate-600">
-            SEO / kind / pageStatus в Next. Сложные geo-правки - при необходимости Vite.
+            SEO / kind / pageStatus в Next.
           </p>
         </div>
-        <a
-          href={viteAdminHref('/venues')}
-          className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-        >
-          Vite venues
-        </a>
       </header>
 
       <AdminApiErrorBanner errors={data.errors} />

@@ -2,12 +2,13 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { AdminEventTaxonomyForm } from '@/components/admin/AdminEventTaxonomyForm';
+import { AdminEventOpsPanels } from '@/components/admin/AdminEventOpsPanels';
 import {
   saveAdminEventModerationAction,
   saveAdminEventOverrideAction,
 } from '@/server/admin-event-actions';
 import type { AdminEventDetailData, AdminTaxonomyData } from '@/server/admin-events-data';
-import { formatAdminNumber, PUBLIC_SITE_BASE, viteAdminHref } from '@/lib/admin-ui';
+import { formatAdminNumber, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
 
 const MODERATION_STATUSES = [
   { status: 'DRAFT', label: 'Черновик' },
@@ -43,16 +44,10 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">{displayTitle}</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Override + taxonomy + moderation. Расписание / продажи / source - в Vite.
+            Override, taxonomy, moderation, расписание, продажи и source - в Next.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <a
-            href={viteAdminHref(`/events?q=${encodeURIComponent(displayTitle)}`)}
-            className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-          >
-            Vite (schedule+)
-          </a>
           {detail.slug ? (
             <a
               href={`${PUBLIC_SITE_BASE.replace(/\/$/, '')}/events/${encodeURIComponent(detail.slug)}`}
@@ -82,6 +77,8 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
         />
         <Metric label="Заказов" value={detail.summary.orders} />
       </div>
+
+      <AdminEventOpsPanels detail={detail} />
 
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">

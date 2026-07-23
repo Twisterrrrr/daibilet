@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
 import { AdminPagination } from '@/components/admin/AdminPagination';
-import { formatAdminDateTime, viteAdminHref } from '@/lib/admin-ui';
+import { formatAdminDateTime } from '@/lib/admin-ui';
 import { moderateAdminReviewAction } from '@/server/admin-review-actions';
 import { loadAdminReviewsList } from '@/server/admin-reviews-data';
 
@@ -38,16 +38,9 @@ export default async function AdminReviewsPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">Отзывы</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Модерация: approve / reject / hide. Очередь:{' '}
-            {data.pendingCount}
+            Модерация: approve / reject / hide. Очередь: {data.pendingCount}
           </p>
         </div>
-        <a
-          href={viteAdminHref('/reviews')}
-          className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-        >
-          Vite
-        </a>
       </header>
 
       {done ? (

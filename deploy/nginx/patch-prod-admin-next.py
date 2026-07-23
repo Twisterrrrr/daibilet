@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""F4.1c: patch admin.daibilet.ru from Vite static root to Next proxy + /legacy Vite SPA."""
+"""F4.6: admin.daibilet.ru → Next only (Vite /legacy hard-retired)."""
 from pathlib import Path
 
 CONF = Path("/etc/nginx/sites-enabled/daibilet.conf")
@@ -24,16 +24,8 @@ server {{
     auth_basic "Daibilet admin";
     auth_basic_user_file /etc/nginx/.htpasswd-daibilet-admin;
 
-    # F4.4: /legacy deprecated soft-retire - keep until taxonomy/candidates/ticket-link replaced.
+    # F4.6: Vite /legacy hard-retired. All admin ops served by Next.
     # See docs/phases/phase-f4-retire-legacy.md
-    location ^~ /legacy/ {{
-        root /var/www/daibilet;
-        try_files $uri $uri/ /legacy/index.html;
-    }}
-
-    location = /legacy {{
-        return 302 /legacy/;
-    }}
 
     location /api/ {{
         proxy_pass http://daibilet_api;
@@ -62,7 +54,6 @@ server {{
 }}
 """
 
-# Also provide HTTP→HTTPS redirect for admin if missing.
 ADMIN_HTTP = """
 server {
     listen 80;
@@ -72,7 +63,7 @@ server {
 }
 """
 
-# More robust: find server blocks containing admin.daibilet.ru
+
 def find_admin_blocks(src: str) -> list[tuple[int, int]]:
     ranges: list[tuple[int, int]] = []
     pos = 0
@@ -85,7 +76,6 @@ def find_admin_blocks(src: str) -> list[tuple[int, int]]:
             start = src.rfind("server {", 0, idx)
         if start == -1:
             raise SystemExit("admin server block start not found")
-        # brace match from start
         i = src.find("{", start)
         depth = 0
         end = None
@@ -106,19 +96,20 @@ def find_admin_blocks(src: str) -> list[tuple[int, int]]:
 
 ranges = find_admin_blocks(text)
 if not ranges:
-    # Append HTTPS admin + HTTP redirect
     text = text.rstrip() + "\n" + ADMIN_HTTP + "\n" + ADMIN_BLOCK + "\n"
-    print("appended admin.daibilet.ru Next+legacy block")
+    print("appended admin.daibilet.ru Next-only block")
 else:
-    # Replace all admin server blocks with single HTTP redirect + HTTPS Next block
-    # Process from end to start to keep indices valid
     for start, end in reversed(ranges):
         text = text[:start] + text[end:]
     text = text.rstrip() + "\n" + ADMIN_HTTP + "\n" + ADMIN_BLOCK + "\n"
-    print(f"replaced {len(ranges)} admin.daibilet.ru server block(s) with Next+legacy")
+    print(f"replaced {len(ranges)} admin.daibilet.ru server block(s) with Next-only")
 
-if "/legacy/" in text and "proxy_pass http://daibilet_web;" in text and "server_name admin.daibilet.ru;" in text:
-    print("admin Next cutover markers present")
+if "/legacy/" in text and "server_name admin.daibilet.ru;" in text:
+    # Safety: strip leftover legacy locations if somehow still present in other fragments.
+    print("warning: /legacy/ still present somewhere in conf after rewrite")
+
+if "proxy_pass http://daibilet_web;" in text and "server_name admin.daibilet.ru;" in text:
+    print("admin Next cutover markers present (no /legacy)")
 
 CONF.write_text(text)
 print(f"wrote {CONF}")

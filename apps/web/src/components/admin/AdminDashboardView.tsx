@@ -15,8 +15,6 @@ import {
 
 import type { AdminDashboardPageData, AdminSourceRow } from '@/server/admin-dashboard-data';
 
-const VITE_ADMIN = process.env.NEXT_PUBLIC_VITE_ADMIN_URL || 'https://admin.daibilet.ru/legacy';
-
 function formatNumber(value: number): string {
   return new Intl.NumberFormat('ru-RU').format(Math.max(0, Math.round(value || 0)));
 }
@@ -29,11 +27,6 @@ function importStatusLabel(status?: string | null) {
   if (normalized === 'paused') return 'пауза';
   if (normalized === 'incomplete') return 'неполно';
   return status || 'статус';
-}
-
-function viteHref(path: string) {
-  const clean = path.startsWith('/') ? path : `/${path}`;
-  return `${VITE_ADMIN.replace(/\/$/, '')}${clean}`;
 }
 
 type Tone = 'default' | 'success' | 'warning' | 'destructive' | 'info';
@@ -65,20 +58,20 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
           <div>
             <h2 className="text-xl font-semibold text-slate-900">Готовность к продажам</h2>
             <p className="mt-1 max-w-2xl text-sm leading-relaxed text-slate-600">
-              Live-метрики с legacy API. Контур оплат остаётся на стороне Ticketscloud и Teplohod.info.
-              Операции CRUD пока в Vite admin.
+              Live-метрики с API. Контур оплат остаётся на стороне Ticketscloud и Teplohod.info.
+              Операции админки - в Next (F4.6, без `/legacy`).
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <a
-              href={viteHref('/sources')}
+              href="/admin/sources"
               className="inline-flex items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
             >
               <RefreshCw className="h-3.5 w-3.5" aria-hidden />
-              Источники (Vite)
+              Источники
             </a>
             <a
-              href={viteHref('/events?view=ready_publish')}
+              href="/admin/events?view=ready_publish"
               className="inline-flex items-center gap-1.5 rounded-md bg-slate-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-slate-800"
             >
               Готовые события
@@ -109,14 +102,14 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
       ) : null}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <TopMetric label="Можно продавать" value={launch.readyForSales} tone="success" href={viteHref('/events')} />
-        <TopMetric label="Карточек событий" value={events} tone="default" href={viteHref('/events')} />
-        <TopMetric label="Активных источников" value={liveSources} tone="success" href={viteHref('/sources')} />
-        <TopMetric label="Площадок" value={venues} tone="info" href={viteHref('/venues')} />
+        <TopMetric label="Можно продавать" value={launch.readyForSales} tone="success" href={'/admin/events'} />
+        <TopMetric label="Карточек событий" value={events} tone="default" href={'/admin/events'} />
+        <TopMetric label="Активных источников" value={liveSources} tone="success" href={'/admin/sources'} />
+        <TopMetric label="Площадок" value={venues} tone="info" href={'/admin/venues'} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-        <Block title="Контроль каталога" href={viteHref('/events')} hrefLabel="К событиям" icon={Layers}>
+        <Block title="Контроль каталога" href={'/admin/events'} hrefLabel="К событиям" icon={Layers}>
           <div className="mb-4 rounded-md border border-slate-200 bg-slate-50 p-3">
             <div className="flex items-center justify-between gap-3">
               <div>
@@ -143,29 +136,29 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <Metric icon={CheckCircle2} label="Можно продавать" value={launch.readyForSales} tone="success" href={viteHref('/events')} />
-            <Metric icon={AlertTriangle} label="Без цены" value={launch.priceBlocked} tone="warning" href={viteHref('/events')} />
+            <Metric icon={CheckCircle2} label="Можно продавать" value={launch.readyForSales} tone="success" href={'/admin/events'} />
+            <Metric icon={AlertTriangle} label="Без цены" value={launch.priceBlocked} tone="warning" href={'/admin/events'} />
             <Metric
               icon={Receipt}
               label="Без покупки"
               value={launch.purchaseBlocked}
               tone={launch.purchaseBlocked ? 'destructive' : 'success'}
-              href={viteHref('/events?view=purchase_blocked')}
+              href={'/admin/events?view=purchase_blocked'}
             />
-            <Metric icon={ImageIcon} label="Без фото" value={launch.noImage} tone="warning" href={viteHref('/events?view=no_image')} />
+            <Metric icon={ImageIcon} label="Без фото" value={launch.noImage} tone="warning" href={'/admin/events?view=no_image'} />
           </div>
         </Block>
 
-        <Block title="Двигатель SEO-трафика" href={viteHref('/landings')} hrefLabel="К лендингам" icon={Megaphone}>
+        <Block title="Двигатель SEO-трафика" href={'/admin/landings'} hrefLabel="К лендингам" icon={Megaphone}>
           <div className="grid grid-cols-2 gap-2">
-            <Metric icon={Megaphone} label="Лендингов" value={metrics.landingRules} tone="info" href={viteHref('/landings')} />
-            <Metric icon={Layers} label="Событий в выборках" value={landingHits} tone="success" href={viteHref('/events?view=landing_match')} />
-            <Metric icon={Building2} label="Хабы площадок" value={venues} href={viteHref('/venues')} />
-            <Metric icon={MapPin} label="Городов/регионов" value={metrics.destinations} href={viteHref('/cities')} />
+            <Metric icon={Megaphone} label="Лендингов" value={metrics.landingRules} tone="info" href={'/admin/landings'} />
+            <Metric icon={Layers} label="Событий в выборках" value={landingHits} tone="success" href={'/admin/events?view=landing_match'} />
+            <Metric icon={Building2} label="Хабы площадок" value={venues} href={'/admin/venues'} />
+            <Metric icon={MapPin} label="Городов/регионов" value={metrics.destinations} href={'/admin/cities'} />
           </div>
         </Block>
 
-        <Block title="Состояние импортов" href={viteHref('/sources')} hrefLabel="К источникам" icon={RefreshCw}>
+        <Block title="Состояние импортов" href={'/admin/sources'} hrefLabel="К источникам" icon={RefreshCw}>
           <div className="space-y-2">
             {sources.length === 0 ? (
               <p className="rounded-md border border-dashed border-slate-300 bg-slate-50 px-3 py-4 text-sm text-slate-500">
@@ -177,23 +170,23 @@ export function AdminDashboardView({ data }: { data: AdminDashboardPageData }) {
               ))
             )}
             <div className="grid grid-cols-2 gap-2 pt-1">
-              <Metric icon={Layers} label="Категорий" value={metrics.categories || 0} href={viteHref('/events')} />
-              <Metric icon={MapPin} label="Городов" value={metrics.cities || metrics.destinations} href={viteHref('/cities')} />
+              <Metric icon={Layers} label="Категорий" value={metrics.categories || 0} href={'/admin/events'} />
+              <Metric icon={MapPin} label="Городов" value={metrics.cities || metrics.destinations} href={'/admin/cities'} />
             </div>
           </div>
         </Block>
 
-        <Block title="Заказы" href={viteHref('/orders')} hrefLabel="К заказам" icon={Receipt}>
+        <Block title="Заказы" href={'/admin/orders'} hrefLabel="К заказам" icon={Receipt}>
           <div className="grid grid-cols-2 gap-2">
-            <Metric icon={Receipt} label="Импортировано" value={orders.imported} href={viteHref('/orders')} />
-            <Metric icon={CheckCircle2} label="Подтверждено" value={orders.confirmed} tone="success" href={viteHref('/orders')} />
-            <Metric icon={Clock} label="В обработке" value={orders.processing} tone="info" href={viteHref('/orders?view=attention')} />
+            <Metric icon={Receipt} label="Импортировано" value={orders.imported} href={'/admin/orders'} />
+            <Metric icon={CheckCircle2} label="Подтверждено" value={orders.confirmed} tone="success" href={'/admin/orders'} />
+            <Metric icon={Clock} label="В обработке" value={orders.processing} tone="info" href={'/admin/orders?view=attention'} />
             <Metric
               icon={AlertTriangle}
               label="Проблемы"
               value={orders.failedIntegration}
               tone="warning"
-              href={viteHref('/orders?view=failed_integration')}
+              href={'/admin/orders?view=failed_integration'}
             />
           </div>
           <div className="mt-3 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">

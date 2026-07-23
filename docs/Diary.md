@@ -13,11 +13,7 @@
 
 ### Проблемы
 
-- Нет.
-
----
-
-## 2026-07-23 - Blog magazine full scope (listing + article)
+- Нет. **Prod @`c5c70bc`:** deploy + upsert ×9 `--force-published-at`; live 23.07 = 3×200 (Казань/Екб/Москва); 24-25.07 = 404 до слота.
 
 ### Наблюдения
 
@@ -151,6 +147,26 @@
 ### Проблемы
 
 - Старый regex + inline link-парсер склеивали `[NOTE … [анкор]` в один `<a href=url>` - отсюда «синяя строка».
+
+---
+
+## 2026-07-23 - F4.6 hard-retire Vite /legacy
+
+### Наблюдения
+
+- Владелец выбрал F4.6: добить schedule/sales/source, landing blocks, buyers (+ unarchive/delete), затем убрать `/legacy`.
+- Landing blocks write API в бэкенде не было (Vite = preview). Mapping inbox / audit-log в Vite уже stub → `/`.
+- Finance / blog content не трогали.
+
+### Решения
+
+- Next: event ops panels; landing blocks preview; `/admin/buyers`; order unarchive + hard delete.
+- Hard-retire: nginx без `/legacy`, deploy без Vite build/rsync, middleware `/legacy` → `/admin`.
+- **Vite retire status: YES** (served SPA). `apps/admin` source может остаться в монорепо.
+
+### Проблемы
+
+- Blocks CRUD write - отдельный future API, если понадобится редактирование состава блоков.
 
 ---
 

@@ -40,8 +40,17 @@ export async function middleware(request: NextRequest) {
 
   // F4.1c: admin.daibilet.ru → rewrite SPA paths onto /admin/*
   if (isAdminHost(host)) {
-    if (pathname.startsWith('/_next') || pathname.startsWith('/api') || pathname.startsWith('/legacy')) {
+    if (pathname.startsWith('/_next') || pathname.startsWith('/api')) {
       return NextResponse.next();
+    }
+
+    // F4.6: /legacy retired → rewrite to Next admin dashboard
+    if (pathname === '/legacy' || pathname.startsWith('/legacy/')) {
+      const denied = await enforceAdminAuth(request);
+      if (denied) return denied;
+      const url = request.nextUrl.clone();
+      url.pathname = '/admin';
+      return NextResponse.redirect(url, 302);
     }
 
     const denied = await enforceAdminAuth(request);

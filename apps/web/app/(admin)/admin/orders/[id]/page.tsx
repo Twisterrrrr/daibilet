@@ -1,12 +1,12 @@
 import Link from 'next/link';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
-import { archiveAdminOrderAction, upsertAdminOrderTicketAction } from '@/server/admin-order-actions';
+import { archiveAdminOrderAction, deleteAdminOrderAction, unarchiveAdminOrderAction, upsertAdminOrderTicketAction } from '@/server/admin-order-actions';
 import {
   loadAdminOrderDetail,
   loadAdminOrderEventCandidates,
 } from '@/server/admin-orders-data';
-import { formatAdminDateTime, formatAdminNumber, viteAdminHref } from '@/lib/admin-ui';
+import { formatAdminDateTime, formatAdminNumber } from '@/lib/admin-ui';
 
 export const dynamic = 'force-dynamic';
 
@@ -30,6 +30,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
 
   let notice: string | null = null;
   if (first(rawSearch.archived) === '1') notice = 'Заказ архивирован.';
+  if (first(rawSearch.unarchived) === '1') notice = 'Заказ разархивирован.';
   if (first(rawSearch.ticket) === '1') notice = 'Билет сохранён / привязан.';
 
   return (
@@ -48,7 +49,7 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
             {detail.publicCode || detail.externalOrderId}
           </h2>
           <p className="mt-1 text-sm text-slate-600">
-            Read + archive + ticket-link upsert. Unarchive / delete - в Vite.
+            Read + archive/unarchive + ticket-link + hard delete. Отдельного DELETE ticket нет (только с заказом).
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -62,13 +63,17 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
                 В архив
               </button>
             </form>
-          ) : null}
-          <a
-            href={viteAdminHref('/orders')}
-            className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-          >
-            Vite (unarchive+)
-          </a>
+          ) : (
+            <form action={unarchiveAdminOrderAction}>
+              <input type="hidden" name="id" value={detail.id} />
+              <button
+                type="submit"
+                className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+              >
+                Из архива
+              </button>
+            </form>
+          )}
         </div>
       </header>
 
@@ -183,6 +188,30 @@ export default async function AdminOrderDetailPage({ params, searchParams }: Pag
           ''
         }
       />
+
+      <section className="rounded-xl border border-rose-200 bg-rose-50 p-4">
+        <h3 className="text-sm font-semibold text-rose-900">Опасная зона</h3>
+        <p className="mt-1 text-xs text-rose-800">
+          Hard delete заказа удалит все билеты зеркала. Для подтверждения введи DELETE.
+        </p>
+        <form action={deleteAdminOrderAction} className="mt-3 flex flex-wrap items-end gap-2">
+          <input type="hidden" name="id" value={detail.id} />
+          <label className="block space-y-1">
+            <span className="text-xs font-medium text-rose-800">Подтверждение</span>
+            <input
+              name="confirm"
+              placeholder="DELETE"
+              className="w-40 rounded-md border border-rose-200 bg-white px-3 py-2 font-mono text-sm"
+            />
+          </label>
+          <button
+            type="submit"
+            className="rounded-md border border-rose-300 bg-white px-3 py-2 text-sm font-medium text-rose-800 hover:bg-rose-100"
+          >
+            Удалить заказ
+          </button>
+        </form>
+      </section>
 
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <h3 className="text-sm font-semibold text-slate-900">Поиск события для привязки</h3>

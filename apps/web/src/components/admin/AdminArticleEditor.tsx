@@ -10,7 +10,7 @@ import {
   ARTICLE_STATUS_OPTIONS,
   type AdminArticleDetail,
 } from '@/server/admin-articles-data';
-import { viteAdminHref } from '@/lib/admin-ui';
+
 
 function toDatetimeLocalValue(iso?: string | null): string {
   if (!iso) return '';
@@ -57,12 +57,6 @@ export function AdminArticleEditor({ mode, article, notice }: Props) {
             >
               Превью
             </Link>
-            <a
-              href={viteAdminHref('/articles')}
-              className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-            >
-              Vite articles
-            </a>
           </div>
         ) : null}
       </header>
@@ -227,7 +221,7 @@ export function AdminArticleEditor({ mode, article, notice }: Props) {
           <input type="hidden" name="publishedAt" value={toDatetimeLocalValue(article?.publishedAt)} />
           {article?.isIndexable ? <input type="hidden" name="isIndexable" value="true" /> : null}
           <p className="text-sm text-slate-600">
-            Архив снимает статью с витрины без hard-delete. Для удаления используйте Vite admin.
+            Архив снимает статью с витрины без hard-delete. Hard-delete доступен кнопкой Удалить ниже.
           </p>
           <button
             type="submit"

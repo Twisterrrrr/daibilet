@@ -29,7 +29,8 @@ export const ADMIN_HOST_SPA_SEGMENTS = new Set([
 export function rewriteAdminHostPathname(pathname: string): string | null {
   if (!pathname || pathname === '/') return '/admin';
   if (pathname.startsWith('/admin')) return null;
-  if (pathname.startsWith('/legacy')) return null;
+  // /legacy handled by middleware redirect (F4.6); do not pass through.
+  if (pathname.startsWith('/legacy')) return '/admin';
   if (pathname.startsWith('/_next')) return null;
   if (pathname.startsWith('/api')) return null;
 

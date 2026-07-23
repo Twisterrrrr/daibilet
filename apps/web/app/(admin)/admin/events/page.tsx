@@ -5,7 +5,6 @@ import { AdminPagination } from '@/components/admin/AdminPagination';
 import {
   formatAdminNumber,
   PUBLIC_SITE_BASE,
-  viteAdminHref,
 } from '@/lib/admin-ui';
 import { loadAdminEventsList } from '@/server/admin-events-data';
 
@@ -51,15 +50,9 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">События</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Override / moderation / SEO - в Next. Taxonomy / расписание - Vite `/legacy`.
+            Список + detail (override, taxonomy, schedule, sales, source) в Next.
           </p>
         </div>
-        <a
-          href={viteAdminHref('/events')}
-          className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-        >
-          Vite (schedule+)
-        </a>
       </header>
 
       <AdminApiErrorBanner errors={data.errors} />
@@ -158,14 +151,8 @@ export default async function AdminEventsPage({ searchParams }: PageProps) {
                     <td className="px-3 py-2">
                       <div className="flex flex-col gap-1 text-xs">
                         <Link href={`/admin/events/${encodeURIComponent(row.id)}`} className="text-sky-700 hover:underline">
-                          Override / moderation
+                          Открыть
                         </Link>
-                        <a
-                          href={viteAdminHref(`/events?q=${encodeURIComponent(row.title)}`)}
-                          className="text-slate-500 hover:underline"
-                        >
-                          Vite schedule
-                        </a>
                         {row.slug ? (
                           <a
                             href={`${PUBLIC_SITE_BASE.replace(/\/$/, '')}/events/${encodeURIComponent(row.slug)}`}

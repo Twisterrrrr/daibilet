@@ -149,11 +149,34 @@ export type AdminEventDetailData = {
   summary: {
     slots: number;
     offers: number;
+    vacant: number;
     priceFrom: number | null;
     soldTickets: number;
     orders: number;
   };
-  /** Soft gate from list row when available (detail API does not return it). */
+  sessions: Array<{
+    id: string;
+    startsAt: string | null;
+    sourceStatus: string | null;
+    priceFrom: number | null;
+    vacant: number;
+    externalId: string | null;
+  }>;
+  offers: Array<{
+    id: string;
+    title: string | null;
+    sourceCode: string | null;
+    priceRub: number | null;
+    active: boolean;
+    widgetUrl: string | null;
+    deeplinkUrl: string | null;
+  }>;
+  sales: {
+    soldTickets: number;
+    orders: number;
+    ticketStatuses: Array<{ status: string; tickets: number }>;
+  };
+  /** Soft gate + source diagnostics from list row when available. */
   canPublish: boolean | null;
   publishBlockers: string[];
   groupEventIds: string[];
@@ -162,6 +185,15 @@ export type AdminEventDetailData = {
     primarySubcategoryId: string | null;
     subcategoryIds: string[];
     tagIds: string[];
+  };
+  source: {
+    sourceLabel: string | null;
+    status: string | null;
+    proposedCategory: string | null;
+    vacant: number | null;
+    offerStatus: string | null;
+    purchaseReady: boolean | null;
+    problems: string[];
   };
   errors: string[];
 };
@@ -198,6 +230,68 @@ function emptyClassification() {
   };
 }
 
+function emptySource() {
+  return {
+    sourceLabel: null as string | null,
+    status: null as string | null,
+    proposedCategory: null as string | null,
+    vacant: null as number | null,
+    offerStatus: null as string | null,
+    purchaseReady: null as boolean | null,
+    problems: [] as string[],
+  };
+}
+
+function emptySummary() {
+  return {
+    slots: 0,
+    offers: 0,
+    vacant: 0,
+    priceFrom: null as number | null,
+    soldTickets: 0,
+    orders: 0,
+  };
+}
+
+function emptySales() {
+  return {
+    soldTickets: 0,
+    orders: 0,
+    ticketStatuses: [] as Array<{ status: string; tickets: number }>,
+  };
+}
+
+function normalizeProblems(match: Record<string, unknown>): string[] {
+  const labels: string[] = [];
+  if (Array.isArray(match.readinessIssues)) {
+    for (const item of match.readinessIssues) {
+      if (item && typeof item === 'object') {
+        const row = item as Record<string, unknown>;
+        if (row.label != null) labels.push(String(row.label));
+        else if (row.code != null) labels.push(String(row.code));
+      } else if (item != null) {
+        labels.push(String(item));
+      }
+    }
+  }
+  if (Array.isArray(match.reasons)) {
+    for (const item of match.reasons) labels.push(String(item));
+  }
+  if (Array.isArray(match.publishBlockers)) {
+    for (const item of match.publishBlockers) labels.push(String(item));
+  }
+  const purchaseReady = match.purchaseReady !== false;
+  const offerStatus = String(match.offerStatus || '').toLowerCase();
+  if (
+    !purchaseReady &&
+    !offerStatus.includes('widget') &&
+    !labels.some((label) => label.toLowerCase().includes('виджет'))
+  ) {
+    labels.push('нет виджета');
+  }
+  return Array.from(new Set(labels.filter(Boolean)));
+}
+
 function normalizeOverride(raw: unknown): AdminEventOverride {
   const row = (raw && typeof raw === 'object' ? raw : {}) as Record<string, unknown>;
   return {
@@ -227,11 +321,15 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
       sourceImageUrl: null,
       slug: null,
       override: emptyOverride(),
-      summary: { slots: 0, offers: 0, priceFrom: null, soldTickets: 0, orders: 0 },
+      summary: emptySummary(),
+      sessions: [],
+      offers: [],
+      sales: emptySales(),
       canPublish: null,
       publishBlockers: [],
       groupEventIds: [],
       classification: emptyClassification(),
+      source: emptySource(),
       errors: ['missing event id'],
     };
   }
@@ -240,6 +338,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
   let publishBlockers: string[] = [];
   let slug: string | null = null;
   let classification = emptyClassification();
+  let source = emptySource();
 
   try {
     const listResponse = await adminApiFetch(
@@ -265,6 +364,22 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
             : [],
           tagIds: Array.isArray(match.tagIds) ? match.tagIds.map((item) => String(item)) : [],
         };
+        source = {
+          sourceLabel: String(
+            match.sourceName || match.source || match.sourceCode || match.sourceLabel || '',
+          ) || null,
+          status: match.status != null ? String(match.status) : null,
+          proposedCategory:
+            match.proposedCategory != null
+              ? String(match.proposedCategory)
+              : match.category != null
+                ? String(match.category)
+                : null,
+          vacant: match.vacant == null ? null : asNumber(match.vacant),
+          offerStatus: match.offerStatus != null ? String(match.offerStatus) : null,
+          purchaseReady: typeof match.purchaseReady === 'boolean' ? match.purchaseReady : null,
+          problems: normalizeProblems(match),
+        };
       }
     }
   } catch {
@@ -283,11 +398,15 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
         sourceImageUrl: null,
         slug,
         override: emptyOverride(),
-        summary: { slots: 0, offers: 0, priceFrom: null, soldTickets: 0, orders: 0 },
+        summary: emptySummary(),
+        sessions: [],
+        offers: [],
+        sales: emptySales(),
         canPublish,
         publishBlockers,
         groupEventIds: [],
         classification,
+        source,
         errors,
       };
     }
@@ -298,8 +417,50 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
     const summaryRaw = (payload.summary && typeof payload.summary === 'object'
       ? payload.summary
       : {}) as Record<string, unknown>;
+    const salesRaw = (payload.sales && typeof payload.sales === 'object'
+      ? payload.sales
+      : {}) as Record<string, unknown>;
     const groupEventIds = Array.isArray(payload.eventIds)
       ? payload.eventIds.map((item) => String(item))
+      : [];
+
+    const sessions = Array.isArray(payload.sessions)
+      ? payload.sessions.map((item) => {
+          const row = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
+          return {
+            id: String(row.id || ''),
+            startsAt: row.startsAt != null ? String(row.startsAt) : null,
+            sourceStatus: row.sourceStatus != null ? String(row.sourceStatus) : null,
+            priceFrom: row.priceFrom == null ? null : asNumber(row.priceFrom),
+            vacant: asNumber(row.vacant),
+            externalId: row.externalId != null ? String(row.externalId) : null,
+          };
+        })
+      : [];
+
+    const offers = Array.isArray(payload.offers)
+      ? payload.offers.map((item) => {
+          const row = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
+          return {
+            id: String(row.id || ''),
+            title: row.title != null ? String(row.title) : null,
+            sourceCode: row.sourceCode != null ? String(row.sourceCode) : null,
+            priceRub: row.priceRub == null ? null : asNumber(row.priceRub),
+            active: row.active !== false,
+            widgetUrl: row.widgetUrl != null ? String(row.widgetUrl) : null,
+            deeplinkUrl: row.deeplinkUrl != null ? String(row.deeplinkUrl) : null,
+          };
+        })
+      : [];
+
+    const ticketStatuses = Array.isArray(salesRaw.ticketStatuses)
+      ? salesRaw.ticketStatuses.map((item) => {
+          const row = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
+          return {
+            status: String(row.status || '—'),
+            tickets: asNumber(row.tickets),
+          };
+        })
       : [];
 
     return {
@@ -311,16 +472,25 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
       slug,
       override: normalizeOverride(payload.override),
       summary: {
-        slots: asNumber(summaryRaw.slots),
-        offers: asNumber(summaryRaw.offers),
+        slots: asNumber(summaryRaw.slots, sessions.length),
+        offers: asNumber(summaryRaw.offers, offers.length),
+        vacant: asNumber(summaryRaw.vacant, source.vacant || 0),
         priceFrom: summaryRaw.priceFrom == null ? null : asNumber(summaryRaw.priceFrom),
-        soldTickets: asNumber(summaryRaw.soldTickets),
-        orders: asNumber(summaryRaw.orders),
+        soldTickets: asNumber(summaryRaw.soldTickets, asNumber(salesRaw.soldTickets)),
+        orders: asNumber(summaryRaw.orders, asNumber(salesRaw.orders)),
+      },
+      sessions,
+      offers,
+      sales: {
+        soldTickets: asNumber(salesRaw.soldTickets, asNumber(summaryRaw.soldTickets)),
+        orders: asNumber(salesRaw.orders, asNumber(summaryRaw.orders)),
+        ticketStatuses,
       },
       canPublish,
       publishBlockers,
       groupEventIds,
       classification,
+      source,
       errors,
     };
   } catch (error) {
@@ -333,11 +503,15 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
       sourceImageUrl: null,
       slug,
       override: emptyOverride(),
-      summary: { slots: 0, offers: 0, priceFrom: null, soldTickets: 0, orders: 0 },
+      summary: emptySummary(),
+      sessions: [],
+      offers: [],
+      sales: emptySales(),
       canPublish,
       publishBlockers,
       groupEventIds: [],
       classification,
+      source,
       errors,
     };
   }

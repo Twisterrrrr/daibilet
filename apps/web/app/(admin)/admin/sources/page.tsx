@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
-import { formatAdminDateTime, formatAdminNumber, viteAdminHref } from '@/lib/admin-ui';
+import { formatAdminDateTime, formatAdminNumber } from '@/lib/admin-ui';
 import { triggerSourceSyncAction } from '@/server/admin-source-actions';
 import {
   loadAdminSourcesPageData,
@@ -34,7 +34,7 @@ export default async function AdminSourcesPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">Источники и sync-health</h2>
           <p className="mt-1 max-w-2xl text-sm text-slate-600">
-            Live `/api/admin/sources`. Ручной sync TC/Teplohod через те же POST endpoints, что Vite.
+            Live `/api/admin/sources`. Ручной sync TC/Teplohod через POST endpoints.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -56,12 +56,6 @@ export default async function AdminSourcesPage({ searchParams }: PageProps) {
               Sync Teplohod
             </button>
           </form>
-          <a
-            href={viteAdminHref('/sources')}
-            className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-          >
-            Vite
-          </a>
         </div>
       </header>
 

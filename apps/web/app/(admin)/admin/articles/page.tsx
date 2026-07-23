@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 import { AdminApiErrorBanner } from '@/components/admin/AdminApiErrorBanner';
-import { formatAdminDateTime, PUBLIC_SITE_BASE, viteAdminHref } from '@/lib/admin-ui';
+import { formatAdminDateTime, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
 import { loadAdminArticlesList } from '@/server/admin-articles-data';
 
 export const dynamic = 'force-dynamic';
@@ -45,7 +45,7 @@ export default async function AdminArticlesPage({ searchParams }: PageProps) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">Блог / статьи</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Список и базовый edit в Next. Полный UX sheet также доступен в Vite.
+            Список и CRUD статей в Next.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -55,12 +55,6 @@ export default async function AdminArticlesPage({ searchParams }: PageProps) {
           >
             Новая статья
           </Link>
-          <a
-            href={viteAdminHref('/articles')}
-            className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-          >
-            Vite
-          </a>
         </div>
       </header>
 

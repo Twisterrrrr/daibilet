@@ -6,7 +6,7 @@ import {
   saveAdminLandingSeoAction,
 } from '@/server/admin-landing-actions';
 import type { AdminLandingDetailData } from '@/server/admin-landings-data';
-import { formatAdminNumber, PUBLIC_SITE_BASE, viteAdminHref } from '@/lib/admin-ui';
+import { formatAdminNumber, PUBLIC_SITE_BASE } from '@/lib/admin-ui';
 
 type Props = {
   detail: AdminLandingDetailData;
@@ -56,17 +56,11 @@ export function AdminLandingEditor({ detail, candidates, notice }: Props) {
         <div>
           <h2 className="text-xl font-semibold text-slate-900">{detail.title}</h2>
           <p className="mt-1 text-sm text-slate-600">
-            SEO + pin/exclude + candidates search. Content blocks - в Vite.
+            SEO + pin/exclude + candidates + content blocks (preview). Write API для blocks пока нет.
           </p>
           {detail.subtitle ? <p className="mt-2 max-w-3xl text-sm text-slate-600">{detail.subtitle}</p> : null}
         </div>
         <div className="flex flex-wrap gap-2">
-          <a
-            href={viteAdminHref('/landings')}
-            className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-          >
-            Vite (blocks+)
-          </a>
           <a
             href={`${PUBLIC_SITE_BASE.replace(/\/$/, '')}/${encodeURIComponent(detail.slug)}`}
             className="rounded-md border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
@@ -90,6 +84,65 @@ export function AdminLandingEditor({ detail, candidates, notice }: Props) {
         <Metric label="Закреплено" value={detail.metrics.pinnedEvents} />
         <Metric label="Скрыто" value={detail.metrics.excludedEvents} />
       </div>
+
+      <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 px-4 py-3">
+          <div>
+            <h3 className="text-sm font-semibold text-slate-900">Контентные блоки</h3>
+            <p className="text-xs text-slate-500">
+              Preview как в Vite. Редактор записи blocks в API не реализован.
+            </p>
+          </div>
+          <span className="rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-xs text-slate-600">
+            {formatAdminNumber(detail.blocks.length)} блоков
+          </span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-left text-sm">
+            <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500">
+              <tr>
+                <th className="px-3 py-2 font-medium">#</th>
+                <th className="px-3 py-2 font-medium">Тип</th>
+                <th className="px-3 py-2 font-medium">Заголовок</th>
+                <th className="px-3 py-2 font-medium">Вариант</th>
+                <th className="px-3 py-2 font-medium">Вкл.</th>
+              </tr>
+            </thead>
+            <tbody>
+              {detail.blocks.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="px-3 py-8 text-center text-slate-500">
+                    Сохранённых блоков нет - сервер отдаст fallback из правила лендинга.
+                  </td>
+                </tr>
+              ) : (
+                [...detail.blocks]
+                  .sort((a, b) => a.sortOrder - b.sortOrder)
+                  .map((block, index) => (
+                    <tr key={block.id || `${block.type}:${index}`} className="border-b border-slate-100">
+                      <td className="px-3 py-2 font-mono text-xs text-slate-500">
+                        {block.sortOrder ?? index}
+                      </td>
+                      <td className="px-3 py-2 font-mono text-xs">{block.type}</td>
+                      <td className="px-3 py-2">
+                        <div className="font-medium">{block.title || '—'}</div>
+                        {block.subtitle ? (
+                          <div className="mt-0.5 text-xs text-slate-500">{block.subtitle}</div>
+                        ) : null}
+                      </td>
+                      <td className="px-3 py-2 font-mono text-xs text-slate-500">
+                        {block.variant || '—'}
+                      </td>
+                      <td className="px-3 py-2 text-xs">
+                        {block.isEnabled ? 'вкл' : 'выкл'}
+                      </td>
+                    </tr>
+                  ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <h3 className="text-sm font-semibold text-slate-900">Поиск кандидатов</h3>

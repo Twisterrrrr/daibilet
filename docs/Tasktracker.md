@@ -445,9 +445,9 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 ---
 
-## F4 — Admin → Next (in progress)
+## F4 — Admin → Next (done)
 
-**Канон после F4.5:** daily + rare ops в Next (Events taxonomy, Orders ticket-link, Landings candidates, Reviews, ECR). `/legacy` **deprecated**, Vite не удалён. Full retire checklist: [phase-f4-retire-legacy.md](./phases/phase-f4-retire-legacy.md).
+**Канон после F4.6:** admin ops в Next; Vite `/legacy` **hard-retired** (не билдится/не раздаётся). Checklist: [phase-f4-retire-legacy.md](./phases/phase-f4-retire-legacy.md).
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
@@ -460,6 +460,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | F4.3 | Port Events override/moderation + Landings SEO/matches to Next | Высокий | ✅ 2026-07-23 |
 | F4.4 | Orders/Venues/Cities in Next + soft-retire `/legacy` (Vite kept for gaps) | Средний | ✅ 2026-07-23 |
 | F4.5 | Remaining rare ops (taxonomy, candidates, ticket-link, ECR/Reviews) | Низкий | ✅ 2026-07-23 |
+| F4.6 | Schedule/sales/source + blocks preview + buyers + unarchive/delete; hard-retire `/legacy` | Высокий | ✅ 2026-07-23 |
 | F4.6 | Admin article preview (`/admin/articles/[id]/preview`, noindex) | Высокий | ✅ 2026-07-23 |
 
 ## F5 — Retire legacy
@@ -497,6 +498,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 |------|-----------|
 | 2026-07-23 | B.20: blog magazine full scope - listing asymmetric + article serif/dropcap/quotes/topic sidebar |
 | 2026-07-23 | B.20: `/blog` asymmetric magazine grid (large 2/3 + 2 small; mirror); city hub teasers |
+| 2026-07-23 | F4.6: schedule/sales/source + blocks preview + buyers + unarchive/delete; Vite `/legacy` hard-retired |
 | 2026-07-23 | F4.5: Next taxonomy + ticket-link + landing candidates + Reviews + ECR; Vite remain for schedule/blocks/buyers; retire not yet |
 | 2026-07-23 | F4.6: admin preview статей `/admin/articles/[id]/preview` (noindex, Basic Auth, status+publishedAt banner) |
 | 2026-07-23 | F4.4: Next Orders/Venues/Cities + soft-retire `/legacy` (Vite remain for taxonomy/candidates/ticket-link); retire not yet |
