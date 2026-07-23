@@ -1,3 +1,19 @@
+## 2026-07-24 - /podborki: центрирование featured + trending
+
+### Наблюдения
+
+- После equal-height 70/30 на полной `container-page` (`max-w-7xl`) колонки уезжали к левому/правому краю; посередине визуальный gutter. Владелец: равномерные отступы от краёв, не прижимать в углы.
+
+### Решения
+
+- `LandingsCatalogView`: сетка `mx-auto max-w-5xl` + `2fr / minmax(14rem,1fr)` + `lg:gap-5`, `items-stretch` сохранён. H1/description остаются на полной ширине контейнера.
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next).
+
+---
+
 ## 2026-07-24 - Blog: interactive H1 + «Свежее»×3
 
 ### Наблюдения
@@ -13,7 +29,7 @@
 
 ### Проблемы
 
-- Нет (commit + deploy ниже).
+- Нет. **Prod @`c39d124` (наш `b45995c`):** `/blog` 200; H1 search hero + `Свежее`×3 thumbs; «Билеты в Екатеринбурге от 200 ₽» из `stats.priceFrom`.
 
 ---
 
