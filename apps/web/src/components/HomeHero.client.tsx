@@ -66,9 +66,19 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
   };
 
   const title = selectedCityName ? (
-    <>Куда сходим в {cityToPrepositional(selectedCityName)}?</>
+    <>
+      Экскурсии и события
+      <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
+        в {cityToPrepositional(selectedCityName)}
+      </span>
+    </>
   ) : (
-    <>Куда сходим в эти выходные?</>
+    <>
+      Экскурсии, музеи и мероприятия
+      <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
+        в городах России
+      </span>
+    </>
   );
 
   return (
@@ -76,7 +86,7 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
       variant={videoSrc ? 'video' : 'imageOverlay'}
       brand="Дайбилет"
       title={title}
-      description="Билеты на экскурсии, речные прогулки и в музеи онлайн более чем в 100 городах России"
+      description="Найдите, куда сходить сегодня, завтра или на выходных - от речных прогулок и музеев до концертов и авторских экскурсий."
       tone="dark"
       media={<HeroMedia frames={frames} videoSrc={videoSrc} />}
     >
