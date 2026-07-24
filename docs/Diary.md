@@ -11,7 +11,7 @@
 
 ### Проблемы
 
-- Нет (commit + deploy-prod-next + smoke).
+- Нет. **Prod @`fbbbaf7`:** deploy-prod-next OK; `/cities` 200; `imageVariant":"top"` ×6 в RSC; ассеты `/images/cities/top/{moscow,saint-petersburg,kazan,ekaterinburg,nizhny-novgorod,samara}.jpg` → 200; каталог остаётся на `/images/cities/*.png`.
 
 ---
 
