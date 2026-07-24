@@ -1,3 +1,28 @@
+## 2026-07-24 - SEO: дубли title (Яндекс/Google отчёт)
+
+### Наблюдения
+
+- Группа из 8 URL с title «Дайбилет — экскурсии, музеи и события» (обход 04-05.07): `/venues`, `/legal`, `/privacy`, `/events?…`.
+- Точная строка совпадает со старым `DEFAULT_TITLE` в `social-preview.js` (и близка к root `HOME_SEO_TITLE`); не с текущим hero H1 («Куда сходим…»).
+- На проде сейчас: `/venues` и `/events` уже имеют свои `<title>`, но `/legal` и `/privacy` наследуют **og:title** с главной из root layout.
+- `/events?category|date=…` делят один static title (metadata без searchParams после bf97706).
+- Два event URL из отчёта (`tc-6a3cdbb7…` / `tc-6a3cdba5…`) сейчас **404**; живые «Золотой век СССР» - разные TC-сессии (с/без трансфера). Дубль title был из шаблона `{title}: билеты и расписание` без даты. 404 события показывают home title через layout default.
+
+### Решения
+
+- `/legal`, `/privacy`: свои title + `buildShareMetadata` (OG/Twitter больше не с home).
+- `/events`: `generateMetadata(searchParams)` → уникальный title по category/date/city/q; filtered → `noindex,follow`, canonical `/events`.
+- Event detail: `buildEventPageMetaTitle` + дата/площадка disambiguator; default seoTitle в DTO тоже с ближайшей датой.
+- `not-found.tsx` со своим title; `HOME_SEO_TITLE` / social-preview DEFAULT без em dash.
+- Тело `/events` по-прежнему без await searchParams (каталог client refetch).
+
+### Проблемы
+
+- `generateMetadata` с searchParams может снова сделать `/events` dynamic (не ○ ISR) - осознанный SEO tradeoff; тяжёлый filtered SSR не вернули.
+- Нужен deploy-prod-next (+ backend если social-preview/DTO на :4000) и переобход в Вебмастере.
+
+---
+
 ## 2026-07-24 - Blog inline: контент был, UI «прятал» фото
 
 ### Наблюдения

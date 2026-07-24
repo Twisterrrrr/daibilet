@@ -1,7 +1,9 @@
 import { cityToPrepositional, isSeoExpansionCity } from '@/lib/city-declension';
 import { listingSeoYear } from '@/lib/seo-listing-meta';
+import { pageTitle } from '@/lib/seo-meta';
 
 const MIN_META_PRICE_RUB = 100;
+const DEFAULT_EVENT_SEO_SUFFIX = 'билеты и расписание';
 
 export function resolveEventMetaMinPrice(priceFrom?: number | null): number | null {
   if (typeof priceFrom !== 'number' || !Number.isFinite(priceFrom)) return null;
@@ -76,4 +78,49 @@ export function buildEventListingMeta(input: {
       year: input.year,
     }),
   };
+}
+
+function includesIgnoreCase(haystack: string, needle: string): boolean {
+  if (!haystack || !needle) return false;
+  return haystack.toLocaleLowerCase('ru-RU').includes(needle.toLocaleLowerCase('ru-RU'));
+}
+
+/**
+ * Title карточки события с disambiguator (дата / площадка / город),
+ * чтобы TC-сессии с одинаковым названием не получали один SERP title.
+ * Возвращает core без `| Дайбилет` (его добавит template / share).
+ */
+export function buildEventPageMetaTitle(input: {
+  eventTitle: string;
+  seoTitle?: string | null;
+  cityName?: string | null;
+  venueName?: string | null;
+  dateLabel?: string | null;
+  timeLabel?: string | null;
+}): string {
+  const eventTitle = String(input.eventTitle || '').trim() || 'Событие';
+  const custom = pageTitle(String(input.seoTitle || '').trim());
+  const dateLabel = String(input.dateLabel || '').trim();
+  const timeLabel = String(input.timeLabel || '').trim();
+  const venueName = String(input.venueName || '').trim();
+  const cityName = String(input.cityName || '').trim();
+
+  const sessionBit = [dateLabel, timeLabel].filter(Boolean).join(', ');
+  const base =
+    custom && custom !== eventTitle && !custom.endsWith(DEFAULT_EVENT_SEO_SUFFIX)
+      ? custom.replace(/\s*:\s*билеты и расписание\s*$/i, '').trim() || custom
+      : eventTitle;
+
+  const extras: string[] = [];
+  if (sessionBit && !includesIgnoreCase(base, dateLabel)) {
+    extras.push(sessionBit);
+  } else if (venueName && !includesIgnoreCase(base, venueName)) {
+    extras.push(venueName);
+  } else if (cityName && !includesIgnoreCase(base, cityName)) {
+    extras.push(cityName);
+  }
+
+  const withExtras = extras.length ? `${base} (${extras.join(', ')})` : base;
+  if (/билеты и расписание/i.test(withExtras)) return pageTitle(withExtras);
+  return `${withExtras}: ${DEFAULT_EVENT_SEO_SUFFIX}`;
 }

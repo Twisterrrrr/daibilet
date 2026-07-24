@@ -4,16 +4,12 @@ import { Suspense } from 'react';
 import { CatalogShell } from '@/components/CatalogShell.client';
 import { EventsCatalogHero } from '@/components/EventsCatalogHero.client';
 import { SiteLayout } from '@/components/SiteLayout';
-import {
-  EVENTS_CATALOG_DESCRIPTION,
-  EVENTS_CATALOG_TITLE,
-  buildEventsCatalogMetadata,
-} from '@/lib/seo-events-catalog-meta';
+import { buildEventsCatalogMetadata } from '@/lib/seo-events-catalog-meta';
 import { catalogQueryCacheKey, parseCatalogPageQuery } from '@/server/catalog-query';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 
 const EVENTS_SUPPORT =
-  'Официальные билеты на экскурсии, концерты и музеи - оплата в виджете организатора.';
+  'Официальные билеты на экскурсии, концерты и музеи более чем в 100 городах России.';
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -83,7 +79,3 @@ export default async function EventsCatalogPage() {
     </SiteLayout>
   );
 }
-
-// Keep named exports discoverable for smoke / docs (title strings).
-void EVENTS_CATALOG_TITLE;
-void EVENTS_CATALOG_DESCRIPTION;

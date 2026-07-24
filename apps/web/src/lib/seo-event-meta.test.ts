@@ -5,6 +5,7 @@ import {
   buildEventCityMetaDescription,
   buildEventCityMetaTitle,
   buildEventListingMeta,
+  buildEventPageMetaTitle,
 } from '@/lib/seo-event-meta';
 
 test('event title with price', () => {
@@ -61,4 +62,27 @@ test('buildEventListingMeta only for expansion cities', () => {
   assert.ok(meta);
   assert.match(meta!.title, /^Билеты на Шоу в Казани/);
   assert.match(meta!.description, /Daibilet\.ru/);
+});
+
+test('event page title adds date disambiguator for twin sessions', () => {
+  const titleA = buildEventPageMetaTitle({
+    eventTitle: 'Экскурсия в галерею «Золотой век СССР. Искусство эпохи». Музей живописца Бориса Семёнова',
+    seoTitle:
+      'Экскурсия в галерею «Золотой век СССР. Искусство эпохи». Музей живописца Бориса Семёнова: билеты и расписание | Дайбилет',
+    venueName: 'Музей',
+    dateLabel: 'сб, 11 июл.',
+    timeLabel: '12:00',
+  });
+  const titleB = buildEventPageMetaTitle({
+    eventTitle: 'Экскурсия в галерею «Золотой век СССР. Искусство эпохи». Музей живописца Бориса Семёнова',
+    seoTitle:
+      'Экскурсия в галерею «Золотой век СССР. Искусство эпохи». Музей живописца Бориса Семёнова: билеты и расписание | Дайбилет',
+    venueName: 'Музей',
+    dateLabel: 'вс, 12 июл.',
+    timeLabel: '14:00',
+  });
+  assert.notEqual(titleA, titleB);
+  assert.match(titleA, /11 июл/);
+  assert.match(titleB, /12 июл/);
+  assert.ok(!titleA.includes('\u2014') && !titleA.includes('\u2013'));
 });

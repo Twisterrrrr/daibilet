@@ -1,7 +1,7 @@
 const SITE_NAME = 'Дайбилет';
 const SITE_ORIGIN = String(process.env.DAIBILET_PUBLIC_URL || 'https://daibilet.ru').replace(/\/+$/, '');
 
-const DEFAULT_TITLE = 'Дайбилет — экскурсии, музеи и события';
+const DEFAULT_TITLE = 'Дайбилет - экскурсии, музеи и мероприятия в городах России';
 const DEFAULT_DESCRIPTION =
   'Билеты на экскурсии, музеи, речные прогулки и события в городах России. Сравнение цен и расписания на Дайбилет.';
 

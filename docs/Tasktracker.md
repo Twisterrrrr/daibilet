@@ -7,6 +7,18 @@
 
 ---
 
+## SEO duplicate titles (2026-07-24)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| SEO.T1 | Уникальные title/OG для `/legal` `/privacy`; fix home og inherit | Критический | ✅ |
+| SEO.T2 | `/events` + filters: dynamic title + noindex на query | Критический | ✅ |
+| SEO.T3 | Event twins: date/venue disambiguator в title | Высокий | ✅ |
+| SEO.T4 | `not-found` metadata; HOME/social-preview без em dash | Высокий | ✅ |
+| SEO.T5 | Deploy + revalidate / переобход Вебмастер | Критический | ⏳ |
+
+---
+
 ## UX: scroll to top (2026-07-24)
 
 | # | Задача | Приоритет | Статус |

@@ -5330,6 +5330,13 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       }]
     : [];
   const publicSessions = sessions.length ? sessions : widgetOnlySessions;
+  if (!event.overrideSeoTitle && !event.seoTitle) {
+    const nearest = publicSessions[0];
+    const dateBit = [nearest?.dateLabel, nearest?.timeLabel].filter(Boolean).join(', ');
+    if (dateBit && nearest?.dateLabel && !String(event.title || '').includes(String(nearest.dateLabel))) {
+      baseEvent.seoTitle = `${event.title} (${dateBit}): билеты и расписание | Дайбилет`;
+    }
+  }
   applyEventPrimaryPurchase(baseEvent, publicSessions, event.sourceCode || primaryOffer?.sourceCode);
   const ticketPrices = buildPublicTicketPrices(publicOffers, publicSessions, baseEvent);
   const relatedCandidates = catalogSessions.filter((session) => {

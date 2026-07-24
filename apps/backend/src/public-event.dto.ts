@@ -329,7 +329,14 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     purchaseProvider: eventPurchase.provider,
     purchaseUrlSource: primaryPurchase.urlSource || eventPurchase.urlSource,
     seoH1: requestedEvent.override?.seoH1 || requestedEvent.seoH1 || title,
-    seoTitle: requestedEvent.override?.seoTitle || requestedEvent.seoTitle || `${title}: билеты и расписание | Дайбилет`,
+    seoTitle: requestedEvent.override?.seoTitle || requestedEvent.seoTitle || (() => {
+      const nearest = sessions[0];
+      const dateBit = [nearest?.dateLabel, nearest?.timeLabel].filter(Boolean).join(', ');
+      const core = dateBit && !String(title).includes(String(nearest?.dateLabel || ''))
+        ? `${title} (${dateBit})`
+        : title;
+      return `${core}: билеты и расписание | Дайбилет`;
+    })(),
     seoDescription: cleanImportedDescription(requestedEvent.override?.seoDescription || requestedEvent.seoDescription) ||
       `Расписание, цены и билеты на ${title}. Покупка через виджет билетной системы.`,
     canonicalPath: requestedEvent.override?.canonicalPath || requestedEvent.canonicalPath || `/events/${publicSlug(representative.slug)}`,

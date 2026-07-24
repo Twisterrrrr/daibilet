@@ -1,14 +1,14 @@
 const SITE_URL = process.env.DAIBILET_SITE_URL || 'https://daibilet.ru';
 
-/** Default home / root title — keep ≤~60–70 chars for SERP; no live counts. */
+/** Default home / root title - keep ≤~60–70 chars for SERP; no live counts. */
 export const HOME_SEO_TITLE =
-  'Дайбилет — экскурсии, музеи и мероприятия в городах России';
+  'Дайбилет - экскурсии, музеи и мероприятия в городах России';
 
-/** Static fallback (layout / build without destinations) — no hardcoded city counts. */
+/** Static fallback (layout / build without destinations) - no hardcoded city counts. */
 export const HOME_SEO_DESCRIPTION_FALLBACK =
   'Афиша событий, экскурсий и мероприятий в городах России. Билеты онлайн.';
 
-/** Fixed hubs + display names for home meta description (em dash —). */
+/** Fixed hubs + display names for home meta description. */
 const HOME_SEO_CITIES = [
   { slug: 'moskva', label: 'Москва' },
   { slug: 'sankt-peterburg', label: 'Санкт-Петербург' },
@@ -33,7 +33,7 @@ export function pageTitle(title: string): string {
 
 /**
  * Home meta description with live city event counts.
- * Template: «Афиша … России. Билеты онлайн: Москва — {n}, Санкт-Петербург — {m}, …»
+ * Template: «Афиша … России. Билеты онлайн: Москва - {n}, Санкт-Петербург - {m}, …»
  */
 export function buildHomeSeoDescription(destinations: DestinationLike[]): string {
   const bySlug = new Map(
@@ -47,7 +47,7 @@ export function buildHomeSeoDescription(destinations: DestinationLike[]): string
     const city = bySlug.get(hub.slug);
     const count = city ? Number(city.events) : 0;
     if (!Number.isFinite(count) || count <= 0) continue;
-    parts.push(`${hub.label} — ${count}`);
+    parts.push(`${hub.label} - ${count}`);
   }
 
   if (!parts.length) return HOME_SEO_DESCRIPTION_FALLBACK;
