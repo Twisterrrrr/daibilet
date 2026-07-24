@@ -82,8 +82,8 @@ export function BlogListHero({ breadcrumbs, guidesCount = 0 }: BlogListHeroProps
   );
 
   const title = cityName
-    ? `Гайды, обзоры и советы по событиям в ${cityToPrepositional(cityName)}`
-    : 'Гайды, обзоры и советы по событиям';
+    ? `Статьи, обзоры и советы по событиям в ${cityToPrepositional(cityName)}`
+    : 'Статьи, обзоры и советы по событиям';
 
   const description = cityName
     ? `Подборки и гиды для ${cityToGenitive(cityName)}: куда сходить, как выбрать билет и что посмотреть в городе.`
@@ -117,7 +117,7 @@ export function BlogListHero({ breadcrumbs, guidesCount = 0 }: BlogListHeroProps
             type="search"
             value={searchDraft}
             onChange={(event) => setSearchDraft(event.target.value)}
-            placeholder="Найти гайд: стендап, маршрут, концерт…"
+            placeholder="Найти статью: стендап, маршрут, концерт…"
             className="w-full rounded-xl bg-transparent py-3.5 pl-11 pr-4 text-base text-slate-900 outline-none placeholder:text-slate-400"
             aria-label="Поиск по статьям блога"
           />

@@ -262,9 +262,9 @@ export async function buildSocialPreviewForPath(db, pathname, builders) {
 
   if (path === '/blog') {
     return {
-      title: `Блог - гайды и советы о событиях | ${SITE_NAME}`,
+      title: `Блог - статьи и советы о событиях | ${SITE_NAME}`,
       description:
-        'Гайды по концертам, театру и городским прогулкам. Как выбрать билет, куда пойти с детьми, что смотреть на этой неделе.',
+        'Статьи по концертам, театру и городским прогулкам. Как выбрать билет, куда пойти с детьми, что смотреть на этой неделе.',
       url: '/blog',
       image: null,
       redirectPath: '/blog',

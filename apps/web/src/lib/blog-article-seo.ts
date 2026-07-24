@@ -154,9 +154,9 @@ export function buildBlogArticleJsonLd(article: BlogArticleDto): Array<Record<st
 
 export function buildBlogListMetadata(): Metadata {
   const canonical = `${SITE_URL}/blog`;
-  const title = pageTitle('Блог - гайды и советы о событиях');
+  const title = pageTitle('Блог - статьи и советы о событиях');
   const description =
-    'Гайды по концертам, театру и городским прогулкам. Как выбрать билет, куда пойти с детьми, что смотреть на этой неделе.';
+    'Статьи по концертам, театру и городским прогулкам. Как выбрать билет, куда пойти с детьми, что смотреть на этой неделе.';
 
   return {
     title,

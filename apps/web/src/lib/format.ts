@@ -47,10 +47,10 @@ export function pluralVenues(count: number): string {
 export function pluralGuides(count: number): string {
   const mod10 = count % 10;
   const mod100 = count % 100;
-  if (mod100 >= 11 && mod100 <= 19) return `${formatNumber(count)} гайдов`;
-  if (mod10 === 1) return `${formatNumber(count)} гайд`;
-  if (mod10 >= 2 && mod10 <= 4) return `${formatNumber(count)} гайда`;
-  return `${formatNumber(count)} гайдов`;
+  if (mod100 >= 11 && mod100 <= 19) return `${formatNumber(count)} статей`;
+  if (mod10 === 1) return `${formatNumber(count)} статья`;
+  if (mod10 >= 2 && mod10 <= 4) return `${formatNumber(count)} статьи`;
+  return `${formatNumber(count)} статей`;
 }
 
 export function roundStatToTen(value?: number | null): number {

@@ -241,7 +241,7 @@ export async function HomePageContent() {
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
                 <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Идеи для поездок и отдыха</h2>
-                <p className="mt-1 text-sm text-slate-500">Гайды и советы перед выбором события</p>
+                <p className="mt-1 text-sm text-slate-500">Статьи и советы перед выбором события</p>
               </div>
               <Link href="/blog" className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:text-primary-700">
                 Все материалы <ArrowRight className="h-4 w-4" />

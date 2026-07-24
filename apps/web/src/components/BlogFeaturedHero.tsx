@@ -54,7 +54,7 @@ function resolveSidebarPromo(featured: BlogCardDto): { href: string; label: stri
 
   return {
     href: '/podborki',
-    label: 'Смотреть все гайды',
+    label: 'Смотреть все статьи',
     kicker: 'Подборки',
   };
 }
