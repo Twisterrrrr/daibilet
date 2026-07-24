@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowRight, Sparkles } from 'lucide-react';
 
 import { CityPicker } from '@/components/CityPicker.client';
@@ -54,8 +55,8 @@ function resolveCityName(cities: PublicDestinationDto[], filter: string): string
 }
 
 export function LandingsCatalogView({
-  items,
-  city,
+  items: initialItems,
+  city: initialCity,
   cities,
   categories,
   totalEvents,
@@ -67,6 +68,68 @@ export function LandingsCatalogView({
   totalEvents: number;
 }) {
   const router = useRouter();
+  const urlSearchParams = useSearchParams();
+  const urlCity = urlSearchParams.get('city')?.trim() || 'all';
+  const city = urlCity !== 'all' ? urlCity : initialCity || 'all';
+
+  const metaBySlug = useMemo(() => {
+    const map = new Map<string, Pick<PodborkiCatalogItem, 'layoutVariant' | 'categorySlug'>>();
+    for (const item of initialItems) {
+      map.set(item.slug, {
+        layoutVariant: item.layoutVariant ?? null,
+        categorySlug: item.categorySlug ?? null,
+      });
+    }
+    return map;
+  }, [initialItems]);
+
+  const [items, setItems] = useState<PodborkiCatalogItem[]>(initialItems);
+
+  useEffect(() => {
+    if (city === 'all' || city === initialCity) {
+      setItems(initialItems);
+      return;
+    }
+
+    const controller = new AbortController();
+    const params = new URLSearchParams({ city });
+    fetch(`/api/public/landings-catalog?${params}`, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error('landings_fetch_failed');
+        return response.json() as Promise<{
+          items?: Array<{
+            slug: string;
+            title: string;
+            subtitle: string;
+            events: number;
+            priceFrom: number | null;
+          }>;
+        }>;
+      })
+      .then((payload) => {
+        setItems(
+          (payload.items ?? []).map((item) => {
+            const meta = metaBySlug.get(item.slug);
+            return {
+              slug: item.slug,
+              title: item.title,
+              subtitle: item.subtitle,
+              events: item.events,
+              priceFrom: item.priceFrom,
+              layoutVariant: meta?.layoutVariant ?? null,
+              categorySlug: meta?.categorySlug ?? null,
+            };
+          }),
+        );
+      })
+      .catch((error) => {
+        if (error instanceof Error && error.name === 'AbortError') return;
+        setItems(initialItems);
+      });
+
+    return () => controller.abort();
+  }, [city, initialCity, initialItems, metaBySlug]);
+
   const citySlug = resolveCitySlug(cities, city);
   const cityName = resolveCityName(cities, city);
   const pickerValue = citySlug === 'all' ? 'all' : cityName;

@@ -27,18 +27,12 @@ export const metadata: Metadata = {
 
 export const revalidate = 300;
 
-type PageProps = {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-};
-
-export default async function EventsCatalogPage({ searchParams }: PageProps) {
-  const raw = await searchParams;
-  let pageQuery: ReturnType<typeof parseCatalogPageQuery>;
-  try {
-    pageQuery = parseCatalogPageQuery(raw);
-  } catch {
-    pageQuery = parseCatalogPageQuery({});
-  }
+/**
+ * Do not await searchParams here - it forces dynamic no-store and kills ISR/CDN HIT.
+ * Default empty catalog is SSR'd; CatalogShell reads URL and refetches client-side.
+ */
+export default async function EventsCatalogPage() {
+  const pageQuery = parseCatalogPageQuery({});
   let initialCatalog: Awaited<ReturnType<typeof getCachedCatalog>> | null = null;
 
   try {

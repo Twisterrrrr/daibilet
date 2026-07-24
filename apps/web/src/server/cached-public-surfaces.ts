@@ -1,6 +1,11 @@
 import { unstable_cache } from 'next/cache';
 
 import '@/lib/env';
+import { prisma } from '@/lib/db';
+import {
+  PODBORKI_CATEGORIES,
+  type PodborkiCategoryMeta,
+} from '@/lib/podborki-categories';
 import {
   buildPublicDestinationsDto,
   buildPublicLandingsCatalogDto,
@@ -15,6 +20,54 @@ const surfaceCacheOptions = {
   revalidate: 600,
   tags: [PUBLIC_SURFACES_CACHE_TAG] as string[],
 };
+
+export type PodborkiMetaPayload = {
+  layoutBySlug: Record<string, string | null>;
+  categoryBySlug: Record<string, string | null>;
+  categories: PodborkiCategoryMeta[];
+};
+
+async function loadPodborkiMeta(): Promise<PodborkiMetaPayload> {
+  try {
+    const [layoutRows, categoryRows, dbCategories] = await Promise.all([
+      prisma.landing.findMany({
+        where: { layoutVariant: { in: ['HERO_FEATURED', 'HERO_TRENDING'] } },
+        select: { slug: true, layoutVariant: true },
+      }),
+      prisma.landing.findMany({
+        where: { categoryId: { not: null } },
+        select: { slug: true, category: { select: { slug: true } } },
+      }),
+      prisma.landingCategory.findMany({
+        where: { isActive: true },
+        orderBy: { sortOrder: 'asc' },
+        select: { slug: true, title: true, subtitle: true, sortOrder: true },
+      }),
+    ]);
+
+    const layoutBySlug: Record<string, string | null> = {};
+    for (const row of layoutRows) layoutBySlug[row.slug] = row.layoutVariant;
+
+    const categoryBySlug: Record<string, string | null> = {};
+    for (const row of categoryRows) categoryBySlug[row.slug] = row.category?.slug ?? null;
+
+    const categories: PodborkiCategoryMeta[] = dbCategories.length
+      ? dbCategories.map((row) => ({
+          slug: row.slug as PodborkiCategoryMeta['slug'],
+          title: row.title,
+          subtitle: row.subtitle || '',
+          sortOrder: row.sortOrder,
+        }))
+      : PODBORKI_CATEGORIES;
+
+    return { layoutBySlug, categoryBySlug, categories };
+  } catch {
+    return { layoutBySlug: {}, categoryBySlug: {}, categories: PODBORKI_CATEGORIES };
+  }
+}
+
+/** Layout/category maps for /podborki - off the per-request Prisma path. */
+export const getCachedPodborkiMeta = unstable_cache(loadPodborkiMeta, ['podborki-meta-v1'], surfaceCacheOptions);
 
 export async function getCachedLandingsCatalog(city = 'all') {
   const key = city && city !== 'all' ? city : 'all';

@@ -1,3 +1,26 @@
+## 2026-07-24 - TTFB checklist: static vs Next + ISR for events/podborki
+
+### Наблюдения
+
+- Owner checklist: сеть vs backend. Prod static `/test.html` TTFB ~10-55ms (HTTP/2), `/` после фикса ~50-90ms HIT `s-maxage=300`.
+- До фикса `/` 10-60s + `no-store` из-за `await connection()` и S3 HEAD fingerprints на request path.
+- `/events` `/podborki` city hub: `await searchParams` → dynamic `no-store` (ƒ), несмотря на `revalidate`.
+- Сервер: 3.8Gi RAM, swap почти пуст, load ~0.5-1.2; next-server ~1Gi RSS. TLS HTTP/2 ok.
+
+### Решения
+
+- nginx `location = /test.html` → `/var/www/daibilet/test.html` (probe).
+- Home: уже `1d0ed0e` (без connection + `getHomeCoverFingerprints` unstable_cache).
+- `/events`: SSR только default catalog; URL-фильтры в `CatalogShell` (client).
+- `/podborki`: SSR city=all + `getCachedPodborkiMeta`; `?city=` refetch client.
+- City hub: убран `searchParams` (?hub= только через allowlist env).
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next + smoke TTFB).
+
+---
+
 ## 2026-07-24 - Home TTFB: убрать connection() + cache fingerprints
 
 ### Наблюдения

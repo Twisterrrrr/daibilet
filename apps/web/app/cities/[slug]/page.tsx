@@ -25,7 +25,6 @@ export const revalidate = 300;
 
 type PageProps = {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -73,9 +72,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function CityPage({ params, searchParams }: PageProps) {
+/**
+ * Do not await searchParams (?hub=) - forces dynamic no-store on every city hub.
+ * Template comes from CITY_HUB_EDITORIAL_SLUGS allowlist; in-memory DTO cache is 5m.
+ */
+export default async function CityPage({ params }: PageProps) {
   const { slug } = await params;
-  const query = await searchParams;
   const decodedSlug = decodeURIComponent(slug);
   const [payload, articlesPayload] = await Promise.all([
     buildPublicCityDto(decodedSlug),
@@ -90,10 +92,7 @@ export default async function CityPage({ params, searchParams }: PageProps) {
   const faqItems = buildCityFaqItems(payload);
   const seoText = buildCitySeoText(payload);
   const jsonLdBlocks = buildCityPageJsonLd(payload);
-  const hubTemplate = resolveCityHubTemplate({
-    slug: decodedSlug,
-    hubQuery: query.hub,
-  });
+  const hubTemplate = resolveCityHubTemplate({ slug: decodedSlug });
   const blogCards = mergeBlogCards(articlesPayload?.articles || null);
   const hubArticles = pickCityHubArticles(
     {
