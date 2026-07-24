@@ -1,4 +1,22 @@
+## 2026-07-24 - `/cities` top tiles: отдельные daytime-превью
+
+### Наблюдения
+
+- Owner: верхние popular-плитки на `/cities` визуально совпадали с каталогом «Все города» (одинаковый night blue cityscape).
+
+### Решения
+
+- Новые уникальные JPG: `apps/public/public/images/cities/top/{slug}.jpg` для SPb, Moscow, Kazan, Ekaterinburg, Nizhny, Samara (дневные landmarks, разные moods).
+- `CityCard` + `resolveCityCardImage(..., { variant: 'top' })`; только hero top-6 на `/cities` берут top-ассеты, каталог ниже оставляет `/images/cities/*.png`.
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next + smoke).
+
+---
+
 ## 2026-07-24 - Cover `ekb-uralskiy-mars-bazhovskie-ekskursii`: карьеры вместо cityscape
+
 
 ### Наблюдения
 

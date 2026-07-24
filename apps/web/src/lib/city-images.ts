@@ -57,16 +57,45 @@ const CITY_CARD_IMAGE_SLUGS = new Set([
   'sortavala',
 ]);
 
+/** Daytime landmark previews for `/cities` top tiles only (not full catalog). */
+const CITY_TOP_PREVIEW_SLUGS = new Set([
+  'saint-petersburg',
+  'moscow',
+  'kazan',
+  'ekaterinburg',
+  'nizhny-novgorod',
+  'samara',
+]);
+
 function isUsableRemoteImage(url: string): boolean {
   return /^https?:\/\//i.test(url) && !url.startsWith('/images/cities/');
 }
 
-export function resolveCityCardImage(city: CityImageSource): string | null {
+function cityCardImageSlug(city: CityImageSource): string {
+  const slug = citySlug(city);
+  return CITY_CARD_IMAGE_ALIASES[slug] || slug;
+}
+
+/** Distinct daytime previews for popular top tiles on `/cities`. */
+export function resolveCityTopPreviewImage(city: CityImageSource): string | null {
+  const imageSlug = cityCardImageSlug(city);
+  if (!CITY_TOP_PREVIEW_SLUGS.has(imageSlug)) return null;
+  return `/images/cities/top/${imageSlug}.jpg`;
+}
+
+export function resolveCityCardImage(
+  city: CityImageSource,
+  options?: { variant?: 'default' | 'top' },
+): string | null {
+  if (options?.variant === 'top') {
+    const top = resolveCityTopPreviewImage(city);
+    if (top) return top;
+  }
+
   const fromApi = city.heroImageUrl?.trim();
   if (fromApi && isUsableRemoteImage(fromApi)) return fromApi;
 
-  const slug = citySlug(city);
-  const imageSlug = CITY_CARD_IMAGE_ALIASES[slug] || slug;
+  const imageSlug = cityCardImageSlug(city);
   if (!CITY_CARD_IMAGE_SLUGS.has(imageSlug)) return null;
   return `/images/cities/${imageSlug}.png`;
 }

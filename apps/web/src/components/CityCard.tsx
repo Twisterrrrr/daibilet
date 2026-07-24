@@ -19,6 +19,8 @@ type CityCardProps = {
   large?: boolean;
   description?: string;
   region?: CityCardRegion | null;
+  /** `top` - daytime landmark previews for `/cities` hero tiles only. */
+  imageVariant?: 'default' | 'top';
 };
 
 function CityHubTags({ city }: { city: PublicDestinationDto }) {
@@ -53,11 +55,14 @@ function CityHubTags({ city }: { city: PublicDestinationDto }) {
   );
 }
 
-export function CityCard({ city, large = false, description, region }: CityCardProps) {
+export function CityCard({ city, large = false, description, region, imageVariant = 'default' }: CityCardProps) {
   const slug = city.slug || city.name;
-  const imageUrl = resolveCityCardImage(city);
+  const imageUrl = resolveCityCardImage(city, { variant: imageVariant });
   const href = cityHref(city);
-  const imageFocus = resolveCityImageObjectPosition({ slug, sourceSlug: city.sourceSlug, name: city.name });
+  const imageFocus =
+    imageVariant === 'top'
+      ? 'center 40%'
+      : resolveCityImageObjectPosition({ slug, sourceSlug: city.sourceSlug, name: city.name });
   const brief = description || '';
 
   return (

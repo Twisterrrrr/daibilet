@@ -52,7 +52,7 @@ export default async function CitiesIndexPage() {
             <ul className="grid h-full grid-cols-2 content-start gap-2.5 sm:grid-cols-3">
               {topCities.map((city) => (
                 <li key={city.slug || city.name} className="min-w-0">
-                  <CityCard city={city} />
+                  <CityCard city={city} imageVariant="top" />
                 </li>
               ))}
             </ul>
