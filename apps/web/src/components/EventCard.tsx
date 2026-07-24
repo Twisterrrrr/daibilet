@@ -244,11 +244,11 @@ export function EventCard({
   );
 
   if (landingActions) {
-    return <article className="event-card">{cardBody}</article>;
+    return <article className="group event-card">{cardBody}</article>;
   }
 
   return (
-    <article className="event-card">
+    <article className="group event-card">
       <Link href={href} className="absolute inset-0 z-[1] rounded-card" aria-label={`Событие: ${session.title}`} />
       {cardBody}
     </article>
@@ -281,7 +281,7 @@ function ShowcaseEventCard({
   const priceLabel = hasPrice ? formatShowcasePriceLabel(session.priceFrom) : 'Скоро';
 
   return (
-    <article className={`event-card ${rail ? 'min-h-[340px]' : ''}`}>
+    <article className={`group event-card ${rail ? 'min-h-[340px]' : ''}`}>
       <Link href={href} className="absolute inset-0 z-[1] rounded-card" aria-label={`Событие: ${session.title}`} />
       <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden bg-surface-muted">
         <SafeImage
