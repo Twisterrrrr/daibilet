@@ -5,34 +5,39 @@ export type BlogFeedCursor = {
   slug: string;
 };
 
-/** Opaque cursor: base64url(JSON). */
-export function encodeBlogFeedCursor(cursor: BlogFeedCursor): string {
-  const payload = JSON.stringify({
-    p: cursor.publishedAt || null,
-    s: cursor.slug,
-  });
-  if (typeof Buffer !== 'undefined') {
-    return Buffer.from(payload, 'utf8').toString('base64url');
-  }
+/** UTF-8 → base64url. No Buffer: client Buffer polyfill lacks encoding `base64url`. */
+function toBase64Url(payload: string): string {
   const bytes = new TextEncoder().encode(payload);
   let binary = '';
   for (const byte of bytes) binary += String.fromCharCode(byte);
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
 }
 
+/** base64url → UTF-8. */
+function fromBase64Url(value: string): string {
+  const padded = value.replace(/-/g, '+').replace(/_/g, '/');
+  const pad = padded.length % 4 === 0 ? '' : '='.repeat(4 - (padded.length % 4));
+  const binary = atob(padded + pad);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) bytes[i] = binary.charCodeAt(i);
+  return new TextDecoder().decode(bytes);
+}
+
+/** Opaque cursor: base64url(JSON). */
+export function encodeBlogFeedCursor(cursor: BlogFeedCursor): string {
+  return toBase64Url(
+    JSON.stringify({
+      p: cursor.publishedAt || null,
+      s: cursor.slug,
+    }),
+  );
+}
+
 export function decodeBlogFeedCursor(raw: string | null | undefined): BlogFeedCursor | null {
   const value = String(raw || '').trim();
   if (!value) return null;
   try {
-    let json: string;
-    if (typeof Buffer !== 'undefined') {
-      json = Buffer.from(value, 'base64url').toString('utf8');
-    } else {
-      const padded = value.replace(/-/g, '+').replace(/_/g, '/');
-      const pad = padded.length % 4 === 0 ? '' : '='.repeat(4 - (padded.length % 4));
-      json = atob(padded + pad);
-    }
-    const parsed = JSON.parse(json) as { p?: string | null; s?: string };
+    const parsed = JSON.parse(fromBase64Url(value)) as { p?: string | null; s?: string };
     const slug = String(parsed.s || '').trim();
     if (!slug) return null;
     return { publishedAt: parsed.p ?? null, slug };

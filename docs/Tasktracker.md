@@ -27,6 +27,7 @@
 | H.8b | `/blog` featured+«Свежее»: max-w-5xl composition + square thumbs | Критический | ✅ `90f6151` prod @`d1ccd8a` |
 | H.8c | `/blog` list hero → imageOverlay + search/chips внутри (уровень venues) | Критический | ✅ `8ec241c` prod @`067763d` |
 | H.8d | `/blog` city rank (header) + cursor pagination + article canonical | Критический | ✅ `44887fb` |
+| H.8e | `/blog` client: base64url Buffer crash → btoa/atob cursor | Критический | 🔄 deploy |
 
 ---
 

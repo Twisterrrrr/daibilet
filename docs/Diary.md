@@ -1,3 +1,21 @@
+## 2026-07-24 - /blog: client crash Unknown encoding base64url
+
+### Наблюдения
+
+- Owner console на `/blog`: `Uncaught TypeError: Unknown encoding: base64url` в `nextCursor` / `publishedAt` (page chunk).
+- Причина: `blog-cursor.ts` из `44887fb` брал ветку `Buffer.toString('base64url')`, когда в клиенте есть Buffer-полифилл без encoding `base64url` (Next/webpack). «Показать ещё» падало; возможен каскад 502.
+
+### Решения
+
+- Encode/decode только через `btoa`/`atob` + base64url replace (+ TextEncoder/Decoder). Без `Buffer` в shared-модуле, который импортирует `BlogListFiltered.client.tsx`.
+- Формат курсора совместим с прежним Node `base64url` (roundtrip совпадает).
+
+### Проблемы
+
+- Нет (commit + deploy).
+
+---
+
 ## 2026-07-24 - /locations hero: убрали fake pin-grid
 
 ### Наблюдения
