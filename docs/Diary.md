@@ -57,26 +57,6 @@
 
 ---
 
-## 2026-07-24 - Owner: photo hero только `/` и `/venues`
-
-### Наблюдения
-
-- Owner: «зачем все hero теперь как на главной?? достаточно было на главной и в площадках!! откати обратно».
-- Photo `imageOverlay` раскатили на `/events`, `/locations`, `/cities`, `/blog` (пакеты `47430af`, `8ec241c` + ultrawide).
-- `/podborki` оставался `minimal` - откат не нужен.
-
-### Решения
-
-- Хирургический restore компонентов до photo-hero: `CatalogShell` + `events/page` (`SectionPageHero` strip), `LocationsCatalogView` (`withMap` + RussiaMap), `cities/page` (`minimal` + top tiles/map) + `CitiesCatalogView` (`hideIntro`), `BlogListHero` (интерактивный search/topics strip).
-- Сохранены: `/` HomeHero photo, `/venues` imageOverlay, ultrawide `*-uw.jpg` для оставшихся photo heroes, копирайт «статьи» в blog hero, cities ISR 86400.
-- Header / afisha sidebar / venue covers - вне scope, не трогали.
-
-### Проблемы
-
-- Нет (commit + deploy-prod-next + smoke).
-
----
-
 ## 2026-07-24 - /venues: вернули cover fallback после lean `_count`
 
 ### Наблюдения
