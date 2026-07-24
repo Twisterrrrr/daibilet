@@ -15,6 +15,7 @@
 ### Проблемы
 
 - HeroLayout full-width уже был в `@8aaf1b1` - вне scope этого фикса.
+- **Prod @`b1b23b5`:** deploy-prod-next OK; `blog:upsert` ×33; smoke: moscow/ekb-stendap/kazan HTML с cover + `-inline` + `-inline-2` (200).
 
 ---
 
