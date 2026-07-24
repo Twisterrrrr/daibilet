@@ -69,7 +69,7 @@ export function BlogPostCard({
   const isSmall = variant === 'small';
   const articleHref = `/blog/${post.slug}`;
   const excerpt = String(post.excerpt || '').trim();
-  const largeCopy = isLarge ? expandLargeListingCopy(post.slug, excerpt) : null;
+  const largeCopy = isLarge ? expandLargeListingCopy(post.slug, excerpt, 900) : null;
   const quickLinks = isLarge
     ? resolveBlogListingQuickLinks({
         slug: post.slug,
@@ -129,12 +129,10 @@ export function BlogPostCard({
             </Link>
           </h2>
           {hasCopy ? (
-            <p className="mt-2.5 flex-1 whitespace-pre-line text-sm leading-relaxed text-slate-600 line-clamp-9 sm:text-base sm:leading-[1.55]">
+            <p className="mt-2.5 whitespace-pre-line text-sm leading-relaxed text-slate-600 line-clamp-[10] sm:text-base sm:leading-[1.55] sm:line-clamp-[12]">
               {[primary, secondary].filter(Boolean).join('\n\n')}
             </p>
-          ) : (
-            <div className="flex-1" />
-          )}
+          ) : null}
           {quickLinks.length ? (
             <div className="mt-3 flex flex-wrap gap-2 border-t border-slate-100 pt-3" aria-label="Связанные разделы">
               {quickLinks.map((link) => (

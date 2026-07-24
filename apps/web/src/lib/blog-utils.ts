@@ -75,7 +75,7 @@ function plainLeadFromBody(slug: string): string {
     .trim();
 }
 
-/** Longer listing excerpt: short frontmatter + lead, capped for ~5-6 lines. */
+/** Longer listing excerpt: short frontmatter + lead, capped for listing cards. */
 export function expandListingExcerpt(slug: string, excerpt: string, maxChars = 420): string {
   const base = String(excerpt || '').trim();
   const lead = plainLeadFromBody(slug);
@@ -90,11 +90,11 @@ export function expandListingExcerpt(slug: string, excerpt: string, maxChars = 4
   return sliced || base || lead.slice(0, maxChars);
 }
 
-/** Split expanded lead into up to two paragraphs for large magazine cards (continuous block above chips). */
+/** Split expanded lead into up to two paragraphs for featured/large cards (fills vertical space above CTAs). */
 export function expandLargeListingCopy(
   slug: string,
   excerpt: string,
-  maxChars = 760,
+  maxChars = 900,
 ): { primary: string; secondary: string } {
   const full = expandListingExcerpt(slug, excerpt, maxChars).trim();
   if (!full) return { primary: '', secondary: '' };

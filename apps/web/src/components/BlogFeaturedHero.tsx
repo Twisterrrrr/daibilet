@@ -15,7 +15,7 @@ import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import { cityToPrepositional } from '@/lib/city-declension';
 import { formatNumber } from '@/lib/format';
 import {
-  expandListingExcerpt,
+  expandLargeListingCopy,
   resolveBlogCardDateLabel,
   type BlogCardDto,
 } from '@/lib/blog-utils';
@@ -62,7 +62,9 @@ export function BlogFeaturedHero({
   afishaFallbackCitySlug,
 }: BlogFeaturedHeroProps) {
   const articleHref = `/blog/${featured.slug}`;
-  const lead = expandListingExcerpt(featured.slug, featured.excerpt, 280);
+  // ~900 chars / 2 абзаца - заполняет высоту рядом с «Свежее»+афиша; было 280 + mt-auto → белая дыра.
+  const largeCopy = expandLargeListingCopy(featured.slug, featured.excerpt, 900);
+  const lead = [largeCopy.primary, largeCopy.secondary].filter(Boolean).join('\n\n');
   const dateLabel = resolveBlogCardDateLabel(featured);
   const scheduleCta = resolveBlogListingCta({
     slug: featured.slug,
@@ -103,7 +105,11 @@ export function BlogFeaturedHero({
               {featured.title}
             </Link>
           </h2>
-          {lead ? <p className="text-sm leading-relaxed text-slate-600 sm:text-base">{lead}</p> : null}
+          {lead ? (
+            <p className="whitespace-pre-line text-sm leading-relaxed text-slate-600 line-clamp-[8] sm:text-base sm:leading-[1.55] sm:line-clamp-[10]">
+              {lead}
+            </p>
+          ) : null}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500 sm:text-sm">
             {featured.authorName || featured.authorId ? (
               <span className={blogAuthorNameClassName(featured.articleType)}>
@@ -112,7 +118,7 @@ export function BlogFeaturedHero({
             ) : null}
             {dateLabel ? <time dateTime={featured.publishedAt || undefined}>{dateLabel}</time> : null}
           </div>
-          <div className="mt-auto flex flex-wrap gap-2 pt-1">
+          <div className="flex flex-wrap gap-2 pt-1">
             <Link
               href={articleHref}
               className="inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-800"
