@@ -17,7 +17,8 @@
 
 ### Проблемы
 
-- Нет (commit + deploy-prod-next + smoke TTFB).
+- **Prod @`bf97706`:** `/` `/events` `/podborki` → ○ ISR `s-maxage=300`, warm TTFB ~50-60ms; static `/test.html` ~58ms.
+- City hub `/cities/[slug]` всё ещё ƒ `no-store` (dynamic segment); warm ~0.15s. Follow-up: `generateStaticParams` / убрать live Date из SSR title.
 
 ---
 
