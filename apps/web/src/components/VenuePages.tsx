@@ -16,7 +16,6 @@ import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { getCachedVenuesCatalog } from '@/server/cached-public-surfaces';
 import { buildVenuePageJsonLd } from '@/lib/structured-data';
 import { resolveVenueSeoTitle } from '@/lib/venue-seo';
-import { toVenueMapMarkers } from '@/server/venue-map-data';
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -98,23 +97,17 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
 
 export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
   let venues: VenueCatalogCard[] = [];
-  let mapMarkers: ReturnType<typeof toVenueMapMarkers> = [];
   try {
     const payload = await getCachedVenuesCatalog(family, 500);
-    const raw = payload.venues ?? [];
-    venues = raw.map(toVenueCatalogCard);
-    if (family === 'location') {
-      mapMarkers = toVenueMapMarkers(raw);
-    }
+    venues = (payload.venues ?? []).map(toVenueCatalogCard);
   } catch {
     venues = [];
-    mapMarkers = [];
   }
   return (
     <SiteLayout>
       {family === 'location' ? (
         <Suspense fallback={<VenueCatalogPageSkeleton family="location" />}>
-          <LocationsCatalogView venues={venues} mapMarkers={mapMarkers} />
+          <LocationsCatalogView venues={venues} />
         </Suspense>
       ) : (
         <Suspense fallback={<VenueCatalogPageSkeleton family="institution" />}>

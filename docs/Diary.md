@@ -1,3 +1,22 @@
+## 2026-07-24 - /locations hero: убрали fake pin-grid
+
+### Наблюдения
+
+- Owner: aside `/locations` - «идея интересная, но реализовано странно»: abstract grid + pins не читаются как география.
+- Leaflet/Mapbox в репо нет; настоящую карту сейчас не вводим.
+
+### Решения
+
+- Aside = тот же спокойный `RussiaMap` («Популярные города»), что на `/cities`.
+- Удалён `LocationsPinMap` (grid stub). `map-tip` API + flat markers helpers оставлены для будущего Leaflet/Mapbox.
+- Hero `withMap` + white header не трогали.
+
+### Проблемы
+
+- Нет (commit + deploy ниже).
+
+---
+
 ## 2026-07-24 - /cities + /blog: photo hero как у venues
 
 ### Наблюдения

@@ -21,7 +21,7 @@
 | H.4 | `/podborki` featured+trending equal-height, centered `max-w-5xl` | Высокий | ✅ `533d40a` prod @`d1ccd8a` |
 | H.4b | `/podborki` tag soup → `LandingCategory` + carousels (by-type/for-whom/seasonal) | Критический | ✅ `30e87fe`+`44887fb` |
 | H.5 | `/venues` dark imageOverlay + search | Средний | ✅ MVP |
-| H.6 | `/locations` withMap (map points on list) | Средний | ✅ pin map: flat markers + `/api/public/venues/map-tip` |
+| H.6 | `/locations` withMap aside | Средний | ✅ `RussiaMap` «Популярные города» (pin-grid stub снят; Leaflet/Mapbox нет) |
 | H.7 | Video loop asset для home | Низкий | ⏳ нет ассета - rotator images |
 | H.8 | Blog Featured Hero + interactive list H1 + «Свежее»×3 + min price | Высокий | ✅ `b45995c` prod @`c39d124` |
 | H.8b | `/blog` featured+«Свежее»: max-w-5xl composition + square thumbs | Критический | ✅ `90f6151` prod @`d1ccd8a` |
@@ -42,7 +42,7 @@
 | PERF.3 | Header search: pg_trgm + synonyms (Meilisearch P2) | Высокий | ✅ `125feab` |
 | PERF.4 | Meilisearch / full-text service | Средний | ⚠️ P2 deferred |
 | PERF.5 | Unify legacy `createDb` Pool with Prisma shared Pool | Средний | ⏳ |
-| H.6b | `/locations` pin map: flat `{id,lat,lng}` props + map-tip API | Высокий | ✅ |
+| H.6b | `/locations` pin map: flat `{id,lat,lng}` + map-tip API | Высокий | ⚠️ API оставлен; UI → `RussiaMap` до реальной карты |
 
 ---
 
