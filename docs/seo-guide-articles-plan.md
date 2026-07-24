@@ -13,6 +13,7 @@
 
 - В copy только обычный дефис `-` (без длинного/среднего тире).
 - **Cover обязателен до `PUBLISHED`:** уникальный GenerateImage → `apps/public/public/images/blog/{slug}.jpg` + `coverImageUrl` / `imageAlt`. City-placeholder (`cities/*.png`) запрещён; без файла на диске не публикуем. Люди на фото: славянская внешность где уместно, позитив, не обязательно в камеру.
+- **Inline-фото в теле обязательны (1-2):** `[image side=… src="/images/blog/{slug}-inline.jpg" alt="…"]` (+ `-inline-2.jpg` при втором). Файлы отличны от cover; без них не публикуем.
 - Каждая статья = 1 главный deep-link на живой CHPU + 1-2 соседних ссылки по смыслу.
 - Mid-article CTA - нативная плашка `[NOTE …]`, не мелкая ссылка только в конце.
 - Thin landing (`noindex` при &lt; 6 офферов) можно упоминать как UX-ссылку; для batch #1 CTA всё равно ведём на рабочие CHPU из таблицы.

@@ -4,6 +4,7 @@ import { BlogArticleCta, parseCtaBlock } from '@/components/BlogArticleCta';
 import { handleBlogLinkClick } from '@/lib/blog-navigate';
 
 const IMAGE_BLOCK_REGEX = /^\[image\s+side=(left|right)\s+src="([^"]+)"(?:\s+alt="([^"]*)")?\]$/i;
+const MD_IMAGE_LINE_REGEX = /^!\[([^\]]*)\]\(([^)]+)\)$/;
 
 export type ParsedImageBlock = {
   side: 'left' | 'right';
@@ -12,13 +13,24 @@ export type ParsedImageBlock = {
 };
 
 export function parseImageBlock(block: string): ParsedImageBlock | null {
-  const match = block.trim().match(IMAGE_BLOCK_REGEX);
-  if (!match) return null;
-  return {
-    side: match[1].toLowerCase() as 'left' | 'right',
-    src: match[2],
-    alt: match[3] || '',
-  };
+  const trimmed = block.trim();
+  const match = trimmed.match(IMAGE_BLOCK_REGEX);
+  if (match) {
+    return {
+      side: match[1].toLowerCase() as 'left' | 'right',
+      src: match[2],
+      alt: match[3] || '',
+    };
+  }
+  const md = trimmed.match(MD_IMAGE_LINE_REGEX);
+  if (md) {
+    return {
+      side: 'left',
+      src: md[2],
+      alt: md[1] || '',
+    };
+  }
+  return null;
 }
 
 type ContentBlock =

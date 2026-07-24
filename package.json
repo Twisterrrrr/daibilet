@@ -65,6 +65,7 @@
     "tc:city-routing": "node scripts/tc-city-routing-summary.js",
     "blog:sync-bodies": "node scripts/blog-sync-static-bodies.js",
     "blog:upsert": "node scripts/blog-upsert-articles.js",
+    "blog:check-inline": "node scripts/blog-check-inline-images.js",
     "blog:weekly-digest": "node scripts/blog-weekly-digest.js",
     "reviews:requests": "node --import tsx scripts/send-review-requests.js",
     "landing:snapshot": "node scripts/landing-snapshot.mjs --write",

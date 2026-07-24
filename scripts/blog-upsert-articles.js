@@ -197,7 +197,21 @@ if (!articles.length) {
   process.exit(1);
 }
 
+/** PUBLISHED guides should keep 1-2 distinct inline images in body (not just cover). */
+function warnMissingInlineImages(article) {
+  const status = String(article.meta?.status || '').toUpperCase();
+  if (status !== 'PUBLISHED') return;
+  const body = String(article.body || '');
+  const shortcodes = body.match(/\[image\s+[^\]]+\]/gi) || [];
+  const mdImgs = body.match(/^!\[[^\]]*\]\([^)]+\)/gm) || [];
+  const count = shortcodes.length + mdImgs.length;
+  if (count < 1) {
+    console.warn(`[warn] ${article.slug}: PUBLISHED without inline [image]/![...](...) in body`);
+  }
+}
+
 for (const article of articles) {
+  warnMissingInlineImages(article);
   await upsertArticle(article);
 }
 

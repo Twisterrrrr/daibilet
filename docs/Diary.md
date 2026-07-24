@@ -1,3 +1,23 @@
+## 2026-07-24 - Blog: обязательные inline-фото в теле статей
+
+### Наблюдения
+
+- Owner: в статьях блога почти нет картинок внутри текста; нужны 1-2 на статью для удержания внимания (cover уже был обязателен).
+- Аудит `content/blog`: 24/33 файла уже имели `[image …]` shortcode + `-inline.jpg`; **9 SEO-гидов** пачки (Москва/СПб/Казань/Екб) опубликованы без inline - GPT-промпт помечал плейсхолдер как «можно один раз».
+- Рендерер `BlogArticleContent` уже поддерживает `[image]` и `![alt](url)`; фильтр `filterDuplicateImageBlocks` вырезает только src === cover.
+
+### Решения
+
+- Правила: `.cursorrules` п.7; `docs/seo-guide-articles-gpt-prompt.md` + plan - inline **обязательны 1-2**; upsert warn + `scripts/blog-check-inline-images.js` (`blog:check-inline`).
+- В 9 гидах: GenerateImage `{slug}-inline.jpg` + `-inline-2.jpg`, шорткоды в MD, sync-bodies; добит missing `bylinnyy-…-inline-2.jpg`.
+- Public `parseImageBlock` - parity с markdown `![]()`.
+
+### Проблемы
+
+- HeroLayout full-width уже был в `@8aaf1b1` - вне scope этого фикса.
+
+---
+
 ## 2026-07-24 - `/cities` top tiles: отдельные daytime-превью
 
 ### Наблюдения
