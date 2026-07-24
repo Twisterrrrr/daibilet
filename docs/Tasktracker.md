@@ -21,13 +21,14 @@
 | H.4 | `/podborki` featured+trending equal-height, centered `max-w-5xl` | Высокий | ✅ `533d40a` prod @`d1ccd8a` |
 | H.4b | `/podborki` tag soup → `LandingCategory` + carousels (by-type/for-whom/seasonal) | Критический | ✅ `30e87fe`+`44887fb` |
 | H.5 | `/venues` dark imageOverlay + search | Средний | ✅ MVP |
-| H.6 | `/locations` withMap aside | Средний | ✅ `RussiaMap` «Популярные города» (pin-grid stub снят; Leaflet/Mapbox нет) |
+| H.5b | `/events` imageOverlay photo hero + search/city/date (как venues) | Критический | 🔄 deploy |
+| H.6 | `/locations` photo hero (imageOverlay) как venues; map не в hero | Критический | 🔄 deploy (pin-grid/RussiaMap aside снят) |
 | H.7 | Video loop asset для home | Низкий | ⏳ нет ассета - rotator images |
 | H.8 | Blog Featured Hero + interactive list H1 + «Свежее»×3 + min price | Высокий | ✅ `b45995c` prod @`c39d124` |
 | H.8b | `/blog` featured+«Свежее»: max-w-5xl composition + square thumbs | Критический | ✅ `90f6151` prod @`d1ccd8a` |
 | H.8c | `/blog` list hero → imageOverlay + search/chips внутри (уровень venues) | Критический | ✅ `8ec241c` prod @`067763d` |
 | H.8d | `/blog` city rank (header) + cursor pagination + article canonical | Критический | ✅ `44887fb` |
-| H.8e | `/blog` client: base64url Buffer crash → btoa/atob cursor | Критический | 🔄 deploy |
+| H.8e | `/blog` client: base64url Buffer crash → btoa/atob cursor | Критический | ✅ `c716a4e` prod |
 
 ---
 
