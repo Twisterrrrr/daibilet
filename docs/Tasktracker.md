@@ -42,6 +42,7 @@
 | H.8f | `/blog` afisha promo: цена/события/chips по geo; full-width после 3 статей фида | Критический | 🚫 owner: не убирать из угла |
 | H.8f-fix | Blog afisha promo: split server `resolveBlogSidebarPromoMap` (pg out of client) | Критический | ✅ `d47c300` prod |
 | H.8g | `/blog`: swap «Свежее»↔Featured; rich Афиша в углу под Fresh; убрать mid-feed strip | Критический | ✅ `9be0a98` prod @`ab1dc94` |
+| H.8h | `/blog` featured/large: длиннее excerpt, без mt-auto/flex-1 дыры над CTA | Критический | 🔄 |
 | H.9 | Ultrawide heroes: min-h + face-safe object-position (home+catalog HeroMedia) | Критический | 🚫 reverted (гигантский hero) |
 | H.9b | Ultrawide: альтернативные 21:9 кадры (`*-uw.jpg`) + `<picture>`, без min-h inflation | Критический | ✅ `a2531f5` prod |
 

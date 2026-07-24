@@ -1,3 +1,22 @@
+## 2026-07-24 - /blog featured: больше текста, без белой дыры над CTA
+
+### Наблюдения
+
+- Owner (скрин featured): большая белая пустота между excerpt и кнопками «Читать» / «Смотреть расписание» - тот же класс бага, что city hub «Зачем ехать» (`mt-auto` / flex stretch при коротком тексте).
+- Featured капал excerpt на 280 символов - заметно короче large magazine card.
+
+### Решения
+
+- `BlogFeaturedHero`: `expandLargeListingCopy` ~900 символов / 2 абзаца, `line-clamp-[8]`/`[10]`; убран `mt-auto` у CTA (кнопки сразу под meta).
+- `BlogPostCard` large: без `flex-1` на excerpt (дыра внутри clamp), copy до 900, `line-clamp-[10]`/`[12]`.
+- `expandLargeListingCopy` default maxChars 760→900.
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next).
+
+---
+
 ## 2026-07-24 - /cities: hubTags в одну строку на top tiles
 
 ### Наблюдения
