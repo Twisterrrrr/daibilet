@@ -4,7 +4,7 @@ import { ChevronRight, Search } from 'lucide-react';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { LocationCard } from '@/components/LocationCard';
-import { formatNumber } from '@/data';
+import { formatCountFloorTenPlus, formatNumber } from '@/data';
 import { API_BASE_URL } from '@/lib/api-base';
 import {
   readCachedLocationVenues,
@@ -134,7 +134,7 @@ export function LocationsCatalogPage() {
       <section className="border-b border-slate-200 bg-gradient-to-br from-cyan-500 via-sky-600 to-primary-600 text-white">
         <div className="container-page py-10 md:py-14">
           <p className="text-sm font-semibold uppercase tracking-wider text-white/70">
-            {venues.length} локаций · {cityCount} {cityCount === 1 ? 'город' : cityCount >= 2 && cityCount <= 4 ? 'города' : 'городов'}
+            {formatCountFloorTenPlus(venues.length)} локаций · {cityCount} {cityCount === 1 ? 'город' : cityCount >= 2 && cityCount <= 4 ? 'города' : 'городов'}
           </p>
           <h1 className="mt-2 font-display text-3xl font-extrabold sm:text-4xl md:text-5xl">Локации: причалы, парки и точки старта</h1>
           <p className="mt-3 max-w-2xl text-white/85">

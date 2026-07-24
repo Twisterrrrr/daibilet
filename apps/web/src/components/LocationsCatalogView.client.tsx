@@ -11,7 +11,7 @@ import { HeroLayout } from '@/components/HeroLayout';
 import { RussiaMap } from '@/components/RussiaMap.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
-import { formatNumber, pluralCities } from '@/lib/format';
+import { formatCountFloorTenPlus, formatNumber, pluralCities } from '@/lib/format';
 import { persistSelectedCity } from '@/lib/selected-city';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 import { LOCATION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
@@ -112,7 +112,7 @@ export function LocationsCatalogView({ venues }: { venues: VenueCatalogCard[] })
       <HeroLayout
         variant="withMap"
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Локации' }]}
-        eyebrow={`${formatNumber(venues.length)} локаций · ${pluralCities(cityCount)}`}
+        eyebrow={`${formatCountFloorTenPlus(venues.length)} локаций · ${pluralCities(cityCount)}`}
         title="Причалы, парки и точки старта"
         description="Куда приходить и как найти место встречи - чтобы не пропустить рейс или экскурсию."
         tone="light"

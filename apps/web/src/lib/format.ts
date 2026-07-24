@@ -60,6 +60,18 @@ export function roundStatToTen(value?: number | null): number {
   return rounded > 0 ? rounded : 10;
 }
 
+/**
+ * Marketing count for catalog eyebrows: floor to decade with `+` when not exact.
+ * 51 → 50+, 55 → 50+, 50 → 50, 9 → 9.
+ */
+export function formatCountFloorTenPlus(value?: number | null): string {
+  const count = Math.max(0, Math.round(value || 0));
+  if (count < 10) return formatNumber(count);
+  const floored = Math.floor(count / 10) * 10;
+  if (count === floored) return formatNumber(count);
+  return `${formatNumber(floored)}+`;
+}
+
 export function formatStatCount(value?: number | null, plusThreshold = 500): string {
   const count = Math.max(0, Math.round(value || 0));
   if (count >= plusThreshold) return `${formatNumber(count)}+`;
