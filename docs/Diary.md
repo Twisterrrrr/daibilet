@@ -53,7 +53,7 @@
 
 ### Проблемы
 
-- Нет (commit + deploy ниже).
+- Нет. **Prod @`ab1dc94` (includes `9be0a98`):** `/blog` smoke OK - swap grid, Fresh+Афиша в углу (цена/weekend/CTA), без mid-feed `blog-afisha-promo`.
 
 ---
 
