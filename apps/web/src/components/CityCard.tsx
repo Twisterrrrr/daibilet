@@ -27,7 +27,10 @@ function CityHubTags({ city }: { city: PublicDestinationDto }) {
   const citySlug = city.slug || city.sourceSlug || undefined;
 
   return (
-    <ul className="mt-2 flex flex-wrap gap-1.5" aria-label={`Популярные направления: ${city.name}`}>
+    <ul
+      className="mt-2 flex min-w-0 flex-nowrap gap-1"
+      aria-label={`Популярные направления: ${city.name}`}
+    >
       {tags.map((tag) => {
         const href =
           tag.kind === 'landing' && tag.slug
@@ -36,10 +39,10 @@ function CityHubTags({ city }: { city: PublicDestinationDto }) {
               ? `/events?city=${encodeURIComponent(city.name)}&category=${encodeURIComponent(tag.label)}`
               : cityHref(city);
         return (
-          <li key={`${tag.kind}:${tag.slug || tag.label}`}>
+          <li key={`${tag.kind}:${tag.slug || tag.label}`} className="min-w-0 shrink">
             <Link
               href={href}
-              className="inline-flex max-w-full truncate rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 shadow-sm transition hover:border-primary/40 hover:text-primary-700"
+              className="inline-flex max-w-full whitespace-nowrap truncate rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold leading-4 text-slate-700 shadow-sm transition hover:border-primary/40 hover:text-primary-700"
             >
               {tag.label}
             </Link>

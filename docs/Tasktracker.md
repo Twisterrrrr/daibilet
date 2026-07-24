@@ -27,6 +27,7 @@
 | H.3c | `/cities`+/`podborki`: H1 и row на одной оси `HeroLayout` max-w-5xl; blog featured = container width | Критический | ✅ |
 | H.3d | `/cities` imageOverlay photo hero + search (как venues); tiles/map ниже на max-w-5xl | Критический | 🚫 owner: откат к `minimal`+tiles/map (до `8ec241c`) |
 | H.3e | `/cities` hub mini-tags (top landings) + ISR 86400 | Критический | ✅ `44887fb` |
+| H.3f | `/cities` hubTags: 3 чипа в одну строку (nowrap + шире tiles vs aside) | Высокий | 🔄 |
 | H.4 | `/podborki` featured+trending equal-height, centered `max-w-5xl` | Высокий | ✅ `533d40a` prod @`d1ccd8a` |
 | H.4b | `/podborki` tag soup → `LandingCategory` + carousels (by-type/for-whom/seasonal) | Критический | ✅ `30e87fe`+`44887fb` |
 | H.5 | `/venues` dark imageOverlay + search | Средний | ✅ MVP |

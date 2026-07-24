@@ -1,3 +1,20 @@
+## 2026-07-24 - /cities: hubTags в одну строку на top tiles
+
+### Наблюдения
+
+- Owner (скрин `/cities`): у СПб/Москва/Казань чипы hubTags переносились на 2 строки (Концерты/Стендап → Экскурсии); нижний ряд укладывал 3 чипа в линию. Карточки казались уже после max-w-5xl + stretch + aside «Популярные города».
+
+### Решения
+
+- `CityHubTags`: max 3, `flex-nowrap` + `whitespace-nowrap`, плотнее padding/text (`px-2 py-0.5 text-[10px]`), `min-w-0 shrink` + truncate.
+- `/cities` grid: чуть шире колонка tiles (`2.35fr` / `0.9fr`, map `minmax(12.5rem,…)`), меньше gap между карточками; aside RussiaMap сохранён.
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next).
+
+---
+
 ## 2026-07-24 - Home rails: content-fingerprint cover dedupe
 
 ### Наблюдения

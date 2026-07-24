@@ -42,14 +42,14 @@ export default async function CitiesIndexPage() {
         <div
           className={
             topCities.length
-              ? 'mt-6 grid w-full items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(14rem,1fr)] lg:gap-5'
+              ? 'mt-6 grid w-full items-stretch gap-3 lg:grid-cols-[minmax(0,2.35fr)_minmax(12.5rem,0.9fr)] lg:gap-4'
               : 'mt-6 w-full'
           }
         >
           {topCities.length ? (
-            <ul className="grid h-full grid-cols-2 content-start gap-3 sm:grid-cols-3">
+            <ul className="grid h-full grid-cols-2 content-start gap-2.5 sm:grid-cols-3">
               {topCities.map((city) => (
-                <li key={city.slug || city.name}>
+                <li key={city.slug || city.name} className="min-w-0">
                   <CityCard city={city} />
                 </li>
               ))}
