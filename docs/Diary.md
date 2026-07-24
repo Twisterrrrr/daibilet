@@ -13,7 +13,7 @@
 
 ### Проблемы
 
-- Нет (commit + deploy-prod-next).
+- Нет. **Prod @fcc79d\** (включает -aaa9d\): \/blog\ 200; featured lead ~894 символа, \line-clamp-[8]/[10]\, без \mt-auto\ у CTA.
 
 ---
 
