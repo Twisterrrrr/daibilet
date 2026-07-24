@@ -180,7 +180,7 @@ export function LandingsCatalogView({
           ))}
         </div>
 
-        {/* Featured + trending: equal-height row inside HeroLayout max-w-5xl (same axis as H1). */}
+        {/* Featured + trending: full container-page width, equal-height row. */}
         <div
           className={
             trending.length

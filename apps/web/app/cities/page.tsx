@@ -40,7 +40,7 @@ export default async function CitiesIndexPage() {
         description="Выберите город - покажем афишу, площадки и подборки с актуальными билетами."
       >
         <CitiesHeroSearch destinations={cities} />
-        {/* Top tiles + aside: full width of HeroLayout max-w-5xl column (H1 shares the same axis). */}
+        {/* Top tiles + aside: full container-page width (same as «Все города» below). */}
         <div
           className={
             topCities.length
