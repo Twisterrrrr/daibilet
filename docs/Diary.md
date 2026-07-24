@@ -1,3 +1,22 @@
+## 2026-07-24 - Cover `ekb-uralskiy-mars-bazhovskie-ekskursii`: карьеры вместо cityscape
+
+### Наблюдения
+
+- Owner screenshot: карточка гида про Уральский Марс показывала синий night cityscape (Храм на Крови / небоскрёбы) - это `cities/ekaterinburg`.
+- На диске уже лежал файл `/images/blog/{slug}.jpg`, но это был PNG под расширением `.jpg` (и/или кэш старого placeholder); `-og.jpg` на prod был 404.
+
+### Решения
+
+- Новая уникальная GenerateImage-обложка: красные глиняные карьеры, бирюзовые озёра, пара туристов со спины, без города.
+- Сохранены настоящий JPEG + `*-og.jpg` 1200x630 в `apps/public/public/images/blog/`.
+- Frontmatter `coverImageUrl` уже указывал верный путь - менять MD/DB не нужно.
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next + smoke карточки).
+
+---
+
 ## 2026-07-24 - Floating «Наверх» на длинных public-страницах
 
 ### Наблюдения
