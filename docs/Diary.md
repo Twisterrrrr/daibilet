@@ -30,7 +30,7 @@
 
 ### Проблемы
 
-- Нет (commit + deploy-prod-next).
+- Нет. **Prod @`bc56bba`** (включает `ff55d9f`): chunk `5216-*` с «Наверх»; smoke `/` `/blog` `/events` `/venues` `/locations` `/podborki` `/cities/sankt-peterburg` → 200.
 
 ---
 
