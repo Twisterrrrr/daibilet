@@ -1,3 +1,20 @@
+## 2026-07-24 - /blog topic chips: scroll к ленте
+
+### Наблюдения
+
+- Owner: клик по фильтрам Стендап/Маршруты/Детям/Концерты ставит `?topic=`, но viewport остаётся в hero - кажется, что кнопки не работают.
+
+### Решения
+
+- `BlogListFiltered`: якорь `id="blog-feed"` + `scroll-mt-24`.
+- `BlogListHero`: после topic click и Enter в поиске - `scrollIntoView({ behavior: 'smooth' })`; active chip `bg-primary-700` + ring/shadow + `aria-pressed`.
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next).
+
+---
+
 ## 2026-07-24 - Hero conversion pack (home/events/catalogs/blog)
 
 ### Наблюдения

@@ -254,7 +254,7 @@ export function BlogListFiltered({
     'min-w-[10rem] flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100 sm:max-w-[16rem] sm:flex-none';
 
   return (
-    <div>
+    <div id="blog-feed" className="scroll-mt-24">
       <div className="mb-4 flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:flex-wrap sm:items-center">
         <select
           className={selectClass}

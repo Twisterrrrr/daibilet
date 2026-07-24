@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { BookOpen, Search } from 'lucide-react';
 
@@ -57,6 +57,17 @@ export function BlogListHero({ breadcrumbs, guidesCount = 0 }: BlogListHeroProps
     setSearchDraft(query);
   }, [query]);
 
+  const scrollToFeed = useCallback(() => {
+    // URL меняется с scroll:false - без явного скролла пользователь остаётся в hero
+    // и думает, что чипы/поиск не работают.
+    requestAnimationFrame(() => {
+      document.getElementById('blog-feed')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    });
+  }, []);
+
   useEffect(() => {
     const trimmed = searchDraft.trim();
     if (trimmed === query) return;
@@ -79,8 +90,24 @@ export function BlogListHero({ breadcrumbs, guidesCount = 0 }: BlogListHeroProps
       else next.set('topic', value);
       const qs = next.toString();
       router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      scrollToFeed();
     },
-    [pathname, router, searchParams],
+    [pathname, router, searchParams, scrollToFeed],
+  );
+
+  const submitSearch = useCallback(
+    (event?: FormEvent<HTMLFormElement>) => {
+      event?.preventDefault();
+      const trimmed = searchDraft.trim();
+      const next = new URLSearchParams(searchParams.toString());
+      next.delete('type');
+      if (!trimmed) next.delete('q');
+      else next.set('q', trimmed);
+      const qs = next.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      scrollToFeed();
+    },
+    [pathname, router, searchDraft, searchParams, scrollToFeed],
   );
 
   const title = cityName
@@ -115,21 +142,23 @@ export function BlogListHero({ breadcrumbs, guidesCount = 0 }: BlogListHeroProps
                   {description}
                 </p>
 
-                <label className="relative mt-5 block">
-                  <span className="sr-only">Поиск по статьям</span>
-                  <Search
-                    className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
-                    aria-hidden
-                  />
-                  <input
-                    type="search"
-                    value={searchDraft}
-                    onChange={(event) => setSearchDraft(event.target.value)}
-                    placeholder="Найти статью: стендап, маршрут, концерт…"
-                    className="w-full rounded-2xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
-                    aria-label="Поиск по статьям блога"
-                  />
-                </label>
+                <form className="relative mt-5 block" onSubmit={submitSearch} role="search">
+                  <label className="block">
+                    <span className="sr-only">Поиск по статьям</span>
+                    <Search
+                      className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400"
+                      aria-hidden
+                    />
+                    <input
+                      type="search"
+                      value={searchDraft}
+                      onChange={(event) => setSearchDraft(event.target.value)}
+                      placeholder="Найти статью: стендап, маршрут, концерт…"
+                      className="w-full rounded-2xl border border-slate-200 bg-white py-3.5 pl-11 pr-4 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
+                      aria-label="Поиск по статьям блога"
+                    />
+                  </label>
+                </form>
 
                 <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Быстрые темы">
                   {topicChips.map((id) => {
@@ -138,10 +167,11 @@ export function BlogListHero({ breadcrumbs, guidesCount = 0 }: BlogListHeroProps
                       <button
                         key={id}
                         type="button"
+                        aria-pressed={active}
                         onClick={() => setTopic(active ? 'all' : id)}
                         className={`rounded-xl px-3.5 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 ${
                           active
-                            ? 'bg-primary-600 text-white'
+                            ? 'bg-primary-700 text-white shadow-md ring-2 ring-primary-700 ring-offset-2'
                             : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-primary-50 hover:text-primary-800 hover:ring-primary-200'
                         }`}
                       >
