@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Anchor, ArrowRight, Briefcase, Bus, Cake, CalendarDays, CheckCircle2, ChevronDown, Clock, Eye, Headphones, Heart, HelpCircle, Lightbulb, MapPin, Mic, Moon, Music, Quote, Search, Shield, Ship, Sparkles, Star, Sun, Tag, Ticket, TrendingUp, Users, UtensilsCrossed, Wallet } from 'lucide-react';
+import { Anchor, ArrowRight, Briefcase, Bus, Cake, CalendarDays, CheckCircle2, ChevronDown, Clock, Eye, Headphones, Heart, HelpCircle, Lightbulb, Mail, MapPin, Mic, Moon, Music, Quote, Search, Shield, Ship, Sparkles, Star, Sun, Tag, Ticket, TrendingUp, Users, UtensilsCrossed, Wallet } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
 import { BridgesLandingGuide, BridgesShipChecklist } from '@/components/landing/BridgesLandingGuide.client';
@@ -1054,7 +1054,7 @@ function LandingHero({
   landingSlug,
   citySlug,
   visibleCount,
-  sessionsCount,
+  sessionsCount: _sessionsCount,
   stats,
   sessionsReady = true,
   todayReference,
@@ -1071,6 +1071,7 @@ function LandingHero({
   todayReference: Date;
   bridgesHeroActions?: React.ReactNode;
 }) {
+  void _sessionsCount;
   const cityName = resolveLandingCityName(citySlug, landingSlug);
   const isBus = profile === 'bus';
   const isRiver = profile === 'river';
@@ -1104,9 +1105,6 @@ function LandingHero({
           : isRiver && !cityName
             ? landing.heroSubtitle || 'От Невы до Енисея — сравните предложения речных прогулок в 12 городах России.'
             : landing.heroSubtitle || landing.subtitle;
-  const soldEstimate = isDinner
-    ? Math.max(visibleCount * 1200, sessionsCount * 480)
-    : Math.max(visibleCount * 1850, sessionsCount * 420);
   const countLabel = isBridges
     ? 'прогулок'
     : isBus && cityName
@@ -1118,7 +1116,6 @@ function LandingHero({
           : isSeasonal
             ? 'программ'
             : 'событий';
-  const ratingLabel = isDinner ? '4.8 / 5' : isSeasonal ? '4.8 / 5' : '4.7 / 5';
   const heroClass = isBridges
     ? 'gradient-bridges-hero text-primary-foreground'
     : isSeasonal && landingSlug.includes('salute')
@@ -1243,7 +1240,21 @@ function LandingHero({
               </>
             )}
           </h1>
-          <p className={`${isBridges ? 'mb-10 max-w-2xl text-lg leading-relaxed text-primary-foreground/75' : 'mb-8 max-w-3xl text-base leading-relaxed text-primary-foreground/80 md:text-lg'}`}>{heroSubtitle}</p>
+          <p className={`${isBridges ? 'mb-6 max-w-2xl text-lg leading-relaxed text-primary-foreground/75' : 'mb-5 max-w-3xl text-base leading-relaxed text-primary-foreground/80 md:text-lg'}`}>{heroSubtitle}</p>
+          <ul className={`mb-8 flex flex-wrap gap-x-5 gap-y-2 text-sm ${isBridges ? 'text-primary-foreground/80' : 'text-primary-foreground/85'}`}>
+            <li className="inline-flex items-center gap-1.5">
+              <Mail className="h-4 w-4 shrink-0" aria-hidden />
+              Билет на email после оплаты
+            </li>
+            <li className="inline-flex items-center gap-1.5">
+              <Shield className="h-4 w-4 shrink-0" aria-hidden />
+              Возврат по правилам организатора
+            </li>
+            <li className="inline-flex items-center gap-1.5">
+              <Ticket className="h-4 w-4 shrink-0" aria-hidden />
+              Электронный вход - без очереди в кассу
+            </li>
+          </ul>
           {bridgesHeroActions}
           {!isBridges ? (
           <div className={`flex flex-wrap gap-3 ${bridgesHeroActions ? 'mt-6' : ''}`}>
@@ -1252,14 +1263,6 @@ function LandingHero({
                 <div className="flex items-center gap-2 rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-medium text-primary-foreground backdrop-blur-sm">
                   <TrendingUp className="h-4 w-4" />
                   {formatNumber(visibleCount)} {countLabel}
-                </div>
-                <div className="flex items-center gap-2 rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-medium text-primary-foreground backdrop-blur-sm">
-                  <Shield className="h-4 w-4" />
-                  {formatNumber(soldEstimate)}+ продано
-                </div>
-                <div className="flex items-center gap-2 rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-medium text-primary-foreground backdrop-blur-sm">
-                  <Star className="h-4 w-4" />
-                  {ratingLabel}
                 </div>
                 {stats.priceFrom ? (
                   <div className="flex items-center gap-2 rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-medium text-primary-foreground backdrop-blur-sm">

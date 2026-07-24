@@ -11,6 +11,7 @@ import { HeroLayout } from '@/components/HeroLayout';
 import { RussiaMap } from '@/components/RussiaMap.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
+import { cityToGenitive, cityToPrepositional } from '@/lib/city-declension';
 import { formatCountFloorTenPlus, formatNumber, pluralCities } from '@/lib/format';
 import { persistSelectedCity } from '@/lib/selected-city';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
@@ -106,6 +107,13 @@ export function LocationsCatalogView({ venues }: { venues: VenueCatalogCard[] })
   const cityCount = cityOptions.length;
   const eventsHref = catalogHrefWithSelectedCity(selectedCity?.cityValue);
   const venuesHref = venueCatalogHrefWithSelectedCity('/venues', selectedCity?.cityValue);
+  const cityName = cityFilter !== 'all' ? cityFilter : null;
+  const heroTitle = cityName
+    ? `Что посмотреть в ${cityToPrepositional(cityName)}`
+    : 'Что посмотреть в первую очередь';
+  const heroDescription = cityName
+    ? `Достопримечательности ${cityToGenitive(cityName)}: точки старта, парки и места встречи с афишей.`
+    : 'Достопримечательности и точки старта - чтобы быстро понять, куда идти в городе.';
 
   return (
     <>
@@ -113,8 +121,8 @@ export function LocationsCatalogView({ venues }: { venues: VenueCatalogCard[] })
         variant="withMap"
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Локации' }]}
         eyebrow={`${formatCountFloorTenPlus(venues.length)} локаций · ${pluralCities(cityCount)}`}
-        title="Причалы, парки и точки старта"
-        description="Куда приходить и как найти место встречи - чтобы не пропустить рейс или экскурсию."
+        title={heroTitle}
+        description={heroDescription}
         tone="light"
         className="bg-slate-100"
         aside={<RussiaMap className="h-full min-h-[14rem]" />}
@@ -145,39 +153,37 @@ export function LocationsCatalogView({ venues }: { venues: VenueCatalogCard[] })
             ))}
           </select>
         </div>
-      </HeroLayout>
 
-      <div className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
-        <div className="container-page flex gap-2 overflow-x-auto py-3">
-          <button
-            type="button"
-            onClick={() => startTransition(() => setTypeFilter('all'))}
-            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
-              typeFilter === 'all' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
-          >
-            <span>📍</span>
-            Все локации
-          </button>
-          {typeOptions.map((option) => {
-            const active = typeFilter === option.value;
-            return (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => startTransition(() => setTypeFilter(active ? 'all' : option.value))}
-                className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  active ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                }`}
-              >
-                <span>{option.emoji}</span>
-                {option.label}
-                <span className="text-xs opacity-75">({option.count})</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
+        {typeOptions.length ? (
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => startTransition(() => setTypeFilter('all'))}
+              className={`inline-flex shrink-0 items-center rounded-full px-4 py-2 text-sm font-semibold transition ${
+                typeFilter === 'all' ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+              }`}
+            >
+              Все локации
+            </button>
+            {typeOptions.map((option) => {
+              const active = typeFilter === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => startTransition(() => setTypeFilter(active ? 'all' : option.value))}
+                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                    active ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
+                  }`}
+                >
+                  {option.label}
+                  <span className="text-xs opacity-75">({option.count})</span>
+                </button>
+              );
+            })}
+          </div>
+        ) : null}
+      </HeroLayout>
 
       <div className="container-page py-8">
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">

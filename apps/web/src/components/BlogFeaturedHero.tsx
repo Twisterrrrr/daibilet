@@ -95,11 +95,10 @@ export function BlogFeaturedHero({
           />
         </Link>
         <div className="flex flex-1 flex-col gap-3 p-5 sm:p-6">
-          {featured.tag ? (
-            <span className="text-xs font-semibold uppercase tracking-wide text-primary-600">
-              {featured.tag}
-            </span>
-          ) : null}
+          <span className="text-xs font-semibold uppercase tracking-wide text-primary-600">
+            Материал недели
+            {featured.tag ? ` · ${featured.tag}` : ''}
+          </span>
           <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             <Link href={articleHref} className="hover:text-primary-700">
               {featured.title}

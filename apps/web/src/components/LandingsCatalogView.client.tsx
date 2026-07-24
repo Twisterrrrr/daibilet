@@ -21,6 +21,22 @@ import {
 import { pickPodborkiFeatured, pickPodborkiTrending } from '@/lib/podborki-hero';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 
+const MOOD_CHIPS: Array<{ label: string; href: string }> = [
+  { label: 'С детьми', href: landingCategoryHref('family-kids') },
+  { label: 'Для двоих', href: '/events?q=романт&sort=popular' },
+  { label: 'Бюджетно', href: buildCatalogPresetHref('cheap') },
+  { label: 'Культура', href: landingCategoryHref('exhibitions') },
+  { label: 'На воде', href: landingCategoryHref('river-cruises') },
+];
+
+function seasonalBannerText(month = new Date().getMonth()): string | null {
+  if (month === 11 || month === 0) return 'Зимой удобнее брать готовые планы: каток, музеи и вечерние программы без долгого выбора.';
+  if (month >= 5 && month <= 7) return 'Летом в приоритете речные прогулки, крыши и длинные вечерние маршруты.';
+  if (month === 4) return 'Май - сезон салютов, прогулок и коротких городских маршрутов на выходные.';
+  if (month >= 8 && month <= 9) return 'Осенью хорошо заходят музеи, театры и камерные вечерние подборки.';
+  return 'Готовые планы под повод: вечер, выходные или поездка в новый город.';
+}
+
 function resolveCitySlug(cities: PublicDestinationDto[], filter: string): string {
   if (!filter || filter === 'all') return 'all';
   const bySlug = cities.find((item) => item.slug === filter || item.sourceSlug === filter);
@@ -54,6 +70,7 @@ export function LandingsCatalogView({
   const citySlug = resolveCitySlug(cities, city);
   const cityName = resolveCityName(cities, city);
   const pickerValue = citySlug === 'all' ? 'all' : cityName;
+  const seasonText = seasonalBannerText();
 
   const featured = pickPodborkiFeatured(items);
   const trending = pickPodborkiTrending(items, featured?.slug, 3);
@@ -79,9 +96,27 @@ export function LandingsCatalogView({
       <HeroLayout
         variant="minimal"
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Подборки' }]}
-        title="Подборки событий"
-        description="Готовые списки под настроение и повод: вечер, выходные, бюджет или редкие премьеры."
+        title="Готовые планы на вечер и выходные"
+        description="Подборки под настроение: для двоих, с детьми, бюджетно или культурно - сразу к билетам."
       >
+        {seasonText ? (
+          <p className="mt-4 max-w-2xl rounded-2xl bg-sky-50 px-4 py-3 text-sm leading-relaxed text-slate-700 ring-1 ring-sky-100">
+            {seasonText}
+          </p>
+        ) : null}
+
+        <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label="Настроение">
+          {MOOD_CHIPS.map((chip) => (
+            <Link
+              key={chip.label}
+              href={chip.href}
+              className="inline-flex rounded-full bg-white px-3.5 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:text-primary-700"
+            >
+              {chip.label}
+            </Link>
+          ))}
+        </div>
+
         {/* Featured + trending: equal-height row inside HeroLayout max-w-5xl (same axis as H1). */}
         <div
           className={
@@ -161,11 +196,8 @@ export function LandingsCatalogView({
               <Link
                 key={preset.slug}
                 href={buildCatalogPresetHref(preset.slug, citySlug !== 'all' ? citySlug : undefined)}
-                className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:border-primary/40 hover:bg-primary/5 hover:text-primary-700"
+                className="inline-flex shrink-0 items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:border-primary/40 hover:bg-primary/5 hover:text-primary-700"
               >
-                <span className="text-base leading-none" aria-hidden>
-                  {preset.emoji}
-                </span>
                 {preset.label}
               </Link>
             ))}
@@ -196,6 +228,7 @@ export function LandingsCatalogView({
               </div>
             </div>
           </div>
+
 
           {sections.length ? (
             <div className="mt-8 space-y-10">

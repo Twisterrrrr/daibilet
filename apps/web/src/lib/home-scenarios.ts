@@ -13,12 +13,13 @@ export type HomeFormatTile = {
   gradient: string;
 };
 
+/** Популярно сейчас - реальные CHPU / фильтры каталога, без emoji. */
 export const HERO_QUICK_CHIPS: HomeQuickChip[] = [
-  { label: 'Сегодня', href: '/events?date=today&sort=time' },
-  { label: 'На выходные', href: '/events?date=weekend&sort=popular' },
-  { label: 'С детьми', href: '/events?q=детям&sort=popular' },
-  { label: 'На воде', href: landingCategoryHref(CANONICAL_LANDING_SLUGS.river) },
+  { label: 'Речные прогулки', href: landingCategoryHref(CANONICAL_LANDING_SLUGS.river) },
   { label: 'Музеи', href: '/events?category=Музеи+и+арт&sort=popular' },
+  { label: 'Roof-туры', href: landingCategoryHref('rooftops') },
+  { label: 'Стендап', href: '/events?q=стендап&sort=popular' },
+  { label: 'Топ недели', href: '/events?sort=popular' },
 ];
 
 export const HOME_FORMAT_TILES: HomeFormatTile[] = [
@@ -55,7 +56,7 @@ export const HOME_TRUST_ITEMS = [
   },
   {
     title: 'Всё в одном месте',
-    text: 'Экскурсии, музеи и мероприятия — с фильтрами по городу, дате и формату.',
+    text: 'Экскурсии, музеи и мероприятия - с фильтрами по городу, дате и формату.',
   },
   {
     title: 'Помогаем выбрать',
@@ -63,6 +64,6 @@ export const HOME_TRUST_ITEMS = [
   },
   {
     title: 'Покупка у организатора',
-    text: 'Оплата — в официальном виджете Ticketscloud или Teplohod.info, не на daibilet.ru.',
+    text: 'Оплата - в официальном виджете Ticketscloud или Teplohod.info, не на daibilet.ru.',
   },
 ] as const;

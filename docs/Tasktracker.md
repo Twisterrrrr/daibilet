@@ -7,6 +7,26 @@
 
 ---
 
+## Hero conversion pack (2026-07-24)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| HC.1 | `/` H1 «Куда сходим в [City_Пр]?» + chips + CTA «Найти билеты» | Критический | ✅ |
+| HC.2 | `/events` strip: гео H1 + матрица Когда/Что + trust (без photo) | Критический | ✅ |
+| HC.3 | Landing trust strip (email / возврат по правилам / e-вход); убраны fake sold/rating | Высокий | ✅ |
+| HC.4 | `/locations` гео H1 + type chips в hero; emoji убраны; withMap сохранён | Высокий | ✅ |
+| HC.5 | `/venues` гео H1 + format toggles в hero; photo сохранён; emoji убраны | Высокий | ✅ |
+| HC.6 | `/cities` live search suggestions + tabs Популярные/А-Я | Высокий | ✅ |
+| HC.7 | `/podborki` emotional H1 + mood chips + seasonal banner; emoji presets off | Высокий | ✅ |
+| HC.8 | `/blog` «Материал недели» + newsletter UI + `/api/public/newsletter` stub | Высокий | ✅ |
+| HC.9 | Event detail: CTA крупнее; scarcity только из real `vacant` | Средний | ✅ partial |
+| HC.10 | Home video muted loop ≤5MB | Низкий | ⚠️ P2 нет ассета |
+| HC.11 | `/venues` «Рядом со мной» geolocation sort | Средний | ⚠️ P2 нет lat/lng на VenueCatalogCard |
+| HC.12 | `/events` featured split / search preview / tourist tags | Средний | ⚠️ P2 |
+| HC.13 | Landing «бесплатная отмена 24ч» | - | 🚫 запрещено политикой (возврат у организатора) |
+
+---
+
 ## Catalog covers policy (2026-07-24)
 
 | # | Задача | Приоритет | Статус |

@@ -66,12 +66,9 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
   };
 
   const title = selectedCityName ? (
-    <>
-      Найдите, куда сходить
-      <span className="block text-sky-100">в {cityToPrepositional(selectedCityName)}</span>
-    </>
+    <>Куда сходим в {cityToPrepositional(selectedCityName)}?</>
   ) : (
-    <>Найдите, куда сходить в эти выходные</>
+    <>Куда сходим в эти выходные?</>
   );
 
   return (
@@ -79,7 +76,7 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
       variant={videoSrc ? 'video' : 'imageOverlay'}
       brand="Дайбилет"
       title={title}
-      description="Город, дата и категория - и вы в каталоге с актуальными билетами."
+      description="Билеты на экскурсии, речные прогулки и в музеи онлайн - оплата у организатора."
       tone="dark"
       media={<HeroMedia frames={frames} videoSrc={videoSrc} />}
     >
@@ -130,7 +127,7 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
             className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 text-sm font-semibold text-white transition hover:bg-slate-800 active:scale-[0.98]"
           >
             <Search className="h-4 w-4" />
-            Найти
+            Найти билеты
           </button>
         </div>
       </form>

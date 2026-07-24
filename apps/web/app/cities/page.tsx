@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { CitiesCatalogView } from '@/components/CitiesCatalogView.client';
+import { CitiesHeroSearch } from '@/components/CitiesHeroSearch.client';
 import { CityCard } from '@/components/CityCard';
 import { HeroLayout } from '@/components/HeroLayout';
 import { RussiaMap } from '@/components/RussiaMap.client';
@@ -38,6 +39,7 @@ export default async function CitiesIndexPage() {
         title="Города России"
         description="Выберите город - покажем афишу, площадки и подборки с актуальными билетами."
       >
+        <CitiesHeroSearch destinations={cities} />
         {/* Top tiles + aside: full width of HeroLayout max-w-5xl column (H1 shares the same axis). */}
         <div
           className={
@@ -58,7 +60,7 @@ export default async function CitiesIndexPage() {
           <RussiaMap className="h-full min-h-[14rem] self-stretch" />
         </div>
       </HeroLayout>
-      <div className="container-page bg-slate-50 py-10">
+      <div id="cities-all" className="container-page scroll-mt-24 bg-slate-50 py-10">
         <CitiesCatalogView destinations={destinations} hideIntro />
       </div>
     </SiteLayout>

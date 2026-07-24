@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { BookOpen, Search } from 'lucide-react';
 
+import { BlogNewsletterSignup } from '@/components/BlogNewsletterSignup.client';
 import { PageBreadcrumbBar, type BreadcrumbItem } from '@/components/PageBreadcrumbs';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import {
@@ -152,7 +153,7 @@ export function BlogListHero({ breadcrumbs, guidesCount = 0 }: BlogListHeroProps
               </div>
 
               {guidesCount > 0 ? (
-                <aside className="hidden lg:flex lg:flex-col lg:items-end lg:justify-center lg:self-stretch">
+                <aside className="hidden lg:flex lg:flex-col lg:items-stretch lg:justify-center lg:self-stretch lg:gap-4">
                   <div className="rounded-2xl bg-white/80 px-5 py-4 text-right ring-1 ring-slate-200/80">
                     <p className="font-display text-3xl font-extrabold tabular-nums text-primary-700">
                       {guidesCount}
@@ -162,8 +163,16 @@ export function BlogListHero({ breadcrumbs, guidesCount = 0 }: BlogListHeroProps
                     </p>
                     <p className="mt-0.5 text-xs text-slate-500">в блоге сейчас</p>
                   </div>
+                  <BlogNewsletterSignup />
                 </aside>
-              ) : null}
+              ) : (
+                <aside className="hidden lg:block">
+                  <BlogNewsletterSignup />
+                </aside>
+              )}
+            </div>
+            <div className="mt-5 lg:hidden">
+              <BlogNewsletterSignup />
             </div>
           </section>
         </div>

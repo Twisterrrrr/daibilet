@@ -1,3 +1,28 @@
+## 2026-07-24 - Hero conversion pack (home/events/catalogs/blog)
+
+### Наблюдения
+
+- Owner brief: conversion heroes на `/`, `/events`, `/cities`, `/podborki`, `/blog`, `/locations`, `/venues` + landing trust; photo только home+venues (остальное strip/minimal/withMap).
+- Политика возврата: «бесплатная отмена за 24ч» нельзя - условия у организатора.
+- Video hero: ассета ≤5MB в репо нет. VenueCatalogCard без lat/lng → «Рядом со мной» нельзя без фейка.
+
+### Решения
+
+- `/`: H1 «Куда сходим в [City_Пр]?», подзаголовок про билеты, chips (речные/музеи/rooftops/стендап/топ), CTA «Найти билеты».
+- `/events`: `EventsCatalogHero` - гео H1, матрица Когда+Что на существующие date/category/q/landing, trust microcopy без photo-overlay.
+- Landings: trust strip (email / возврат по правилам / e-вход); убраны fake «продано» и рейтинг в hero.
+- `/locations` `/venues`: гео H1, type chips в hero, emoji убраны; venues photo сохранён; плашка N площадок / M событий.
+- `/cities`: live suggestions «Казань (N событий)» + якоря Популярные/А-Я.
+- `/podborki`: emotional H1, mood chips, seasonal banner; presets без emoji.
+- `/blog`: «Материал недели», newsletter «Нам по пути» + stub `POST /api/public/newsletter`.
+- Event CTA: крупнее amber кнопка; scarcity только из реального `vacant`.
+
+### Проблемы
+
+- P2: video loop; venues geolocation; events featured split / search preview.
+
+---
+
 ## 2026-07-24 - /blog featured: больше текста, без белой дыры над CTA
 
 ### Наблюдения

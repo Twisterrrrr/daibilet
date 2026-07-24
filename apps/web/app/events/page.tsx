@@ -2,18 +2,17 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 
 import { CatalogShell } from '@/components/CatalogShell.client';
-import { SectionPageHero } from '@/components/PageBreadcrumbs';
+import { EventsCatalogHero } from '@/components/EventsCatalogHero.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { catalogQueryCacheKey, parseCatalogPageQuery } from '@/server/catalog-query';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 
-const EVENTS_TITLE = 'События, экскурсии и билеты';
-const EVENTS_H1 = 'Каталог событий';
+const EVENTS_TITLE = 'Афиша событий - экскурсии и билеты';
 const EVENTS_DESCRIPTION =
-  'Полный каталог событий Дайбилет: фильтры по городу, дате, категории, цене и подборкам.';
+  'Афиша событий Дайбилет: фильтры по городу, дате и формату. Официальные билеты у организатора.';
 const EVENTS_SUPPORT =
-  'Экскурсии, концерты, спектакли и билеты - выберите город, дату и формат.';
+  'Официальные билеты на экскурсии, концерты и музеи - оплата в виджете организатора.';
 
 export const metadata: Metadata = {
   title: pageTitle(EVENTS_TITLE),
@@ -52,11 +51,20 @@ export default async function EventsCatalogPage({ searchParams }: PageProps) {
 
   return (
     <SiteLayout>
-      <SectionPageHero
-        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'События' }]}
-        title={EVENTS_H1}
-        description={EVENTS_SUPPORT}
-      />
+      <Suspense
+        fallback={
+          <div className="border-b border-slate-200 bg-slate-50">
+            <div className="container-page space-y-4 py-8 sm:py-10">
+              <div className="h-10 w-72 max-w-full animate-pulse rounded-lg bg-slate-200" />
+              <div className="h-5 w-full max-w-xl animate-pulse rounded bg-slate-200" />
+              <div className="h-10 w-full max-w-2xl animate-pulse rounded-full bg-slate-200" />
+              <p className="sr-only">{EVENTS_SUPPORT}</p>
+            </div>
+          </div>
+        }
+      >
+        <EventsCatalogHero />
+      </Suspense>
       <div className="container-page py-8">
         <Suspense
           fallback={

@@ -264,7 +264,7 @@ export function EventHeroBuyButton({
       <button
         type="button"
         onClick={scrollToBuyCard}
-        className={`inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-base font-semibold text-white shadow-md shadow-amber-700/30 transition hover:bg-amber-600 active:bg-amber-700 sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`}
+        className={`inline-flex min-h-11 items-center justify-center rounded-xl bg-amber-500 px-6 py-3.5 text-base font-bold text-white shadow-lg shadow-amber-700/35 transition hover:bg-amber-600 active:bg-amber-700 sm:min-h-12 sm:px-7 sm:py-3 sm:text-lg ${wide ? 'w-full' : ''}`}
       >
         {label}
       </button>
@@ -292,7 +292,7 @@ export function EventHeroBuyButton({
           scrollToBuyCard();
           window.setTimeout(() => openTeplohodWidget(), 250);
         }}
-        className={`inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-base font-semibold text-white shadow-md shadow-amber-700/30 transition hover:bg-amber-600 active:bg-amber-700 sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`}
+        className={`inline-flex min-h-11 items-center justify-center rounded-xl bg-amber-500 px-6 py-3.5 text-base font-bold text-white shadow-lg shadow-amber-700/35 transition hover:bg-amber-600 active:bg-amber-700 sm:min-h-12 sm:px-7 sm:py-3 sm:text-lg ${wide ? 'w-full' : ''}`}
       >
         {label}
       </button>
@@ -306,7 +306,7 @@ export function EventHeroBuyButton({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className={`inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-base font-semibold text-white shadow-md shadow-amber-700/30 transition hover:bg-amber-600 active:bg-amber-700 sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`}
+        className={`inline-flex min-h-11 items-center justify-center rounded-xl bg-amber-500 px-6 py-3.5 text-base font-bold text-white shadow-lg shadow-amber-700/35 transition hover:bg-amber-600 active:bg-amber-700 sm:min-h-12 sm:px-7 sm:py-3 sm:text-lg ${wide ? 'w-full' : ''}`}
       >
         {label}
       </a>

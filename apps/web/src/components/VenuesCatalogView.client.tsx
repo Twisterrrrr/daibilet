@@ -13,7 +13,8 @@ import { HeroMedia } from '@/components/HeroMedia.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
-import { formatNumber, pluralCities, pluralVenues } from '@/lib/format';
+import { cityToGenitive } from '@/lib/city-declension';
+import { formatNumber, pluralCities, pluralEvents, pluralVenues } from '@/lib/format';
 import { persistSelectedCity } from '@/lib/selected-city';
 import { INSTITUTION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
@@ -147,6 +148,18 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
   const cityCount = cityOptions.length;
   const eventsHref = catalogHrefWithSelectedCity(selectedCity?.cityValue);
   const locationsHref = venueCatalogHrefWithSelectedCity('/locations', selectedCity?.cityValue);
+  const cityName = cityFilter !== 'all' ? cityFilter : null;
+  const heroTitle = cityName
+    ? `Залы, театры и пространства ${cityToGenitive(cityName)}`
+    : 'Залы, театры и пространства';
+  const scopedVenues = useMemo(() => {
+    if (cityFilter === 'all') return venues;
+    return venues.filter((venue) => venue.city === cityFilter);
+  }, [venues, cityFilter]);
+  const scopedEvents = useMemo(
+    () => scopedVenues.reduce((sum, venue) => sum + (venue.events || 0), 0),
+    [scopedVenues],
+  );
 
   return (
     <>
@@ -160,7 +173,7 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
               : pluralVenues(venues.length)
             : 'Площадки'
         }
-        title="Музеи, галереи, театры и клубы"
+        title={heroTitle}
         description="Постоянные экспозиции, временные выставки, вечерние программы. Электронные билеты без очередей."
         tone="dark"
         media={
@@ -170,6 +183,12 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
           />
         }
       >
+        {!listPending && scopedVenues.length ? (
+          <p className="mx-auto mt-4 max-w-4xl text-sm font-medium text-white/85">
+            В афише {pluralVenues(scopedVenues.length)}
+            {scopedEvents > 0 ? ` · ${pluralEvents(scopedEvents)}` : ''}
+          </p>
+        ) : null}
         <div className="mx-auto mt-6 flex max-w-4xl flex-col gap-3 rounded-2xl bg-white p-3 text-left text-slate-900 shadow-lg sm:flex-row">
           <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">
             <Search className="h-4 w-4 text-slate-400" />
@@ -207,19 +226,18 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
             ))}
           </select>
         </div>
-      </HeroLayout>
 
-      <div className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
-        <div className="container-page flex items-center gap-3 py-3">
-          <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {typeOptions.length ? (
+          <div className="mx-auto mt-4 flex max-w-4xl flex-wrap justify-center gap-2">
             <button
               type="button"
               onClick={() => startTransition(() => setTypeFilter('all'))}
-              className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                typeFilter === 'all' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+              className={`inline-flex h-11 shrink-0 items-center rounded-full px-5 text-sm font-semibold transition ${
+                typeFilter === 'all'
+                  ? 'bg-white text-slate-900'
+                  : 'bg-white/15 text-white ring-1 ring-white/25 hover:bg-white/25'
               }`}
             >
-              <span>✨</span>
               Все места
             </button>
             {typeOptions.map((option) => {
@@ -229,17 +247,23 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
                   key={option.value}
                   type="button"
                   onClick={() => startTransition(() => setTypeFilter(active ? 'all' : option.value))}
-                  className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                    active ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  className={`inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full px-5 text-sm font-semibold transition ${
+                    active
+                      ? 'bg-white text-slate-900'
+                      : 'bg-white/15 text-white ring-1 ring-white/25 hover:bg-white/25'
                   }`}
                 >
-                  <span>{option.emoji}</span>
                   {option.label}
                   <span className="text-xs opacity-75">({option.count})</span>
                 </button>
               );
             })}
           </div>
+        ) : null}
+      </HeroLayout>
+
+      <div className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div className="container-page flex items-center justify-end gap-3 py-3">
 
           <div className="flex shrink-0 overflow-hidden rounded-xl bg-slate-100 p-1" role="radiogroup" aria-label="Вид каталога">
             <button
