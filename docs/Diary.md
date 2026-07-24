@@ -11,7 +11,7 @@
 
 ### Проблемы
 
-- Нет (commit + deploy-prod-next).
+- Нет. **Prod @`292c92b`:** deploy-prod-next OK (параллельный build добил наш SIGTERM 143, финальный deploy поднял web); `/blog` 200; HTML `scroll-mt-24`/`aria-pressed`; chunk с `blog-feed` + `scrollIntoView`.
 
 ---
 
