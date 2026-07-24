@@ -109,11 +109,11 @@ export function LocationsCatalogView({ venues }: { venues: VenueCatalogCard[] })
   const venuesHref = venueCatalogHrefWithSelectedCity('/venues', selectedCity?.cityValue);
   const cityName = cityFilter !== 'all' ? cityFilter : null;
   const heroTitle = cityName
-    ? `Что посмотреть в ${cityToPrepositional(cityName)}`
-    : 'Что посмотреть в первую очередь';
+    ? `Локации и точки сбора в ${cityToPrepositional(cityName)}`
+    : 'Локации и точки сбора';
   const heroDescription = cityName
-    ? `Достопримечательности ${cityToGenitive(cityName)}: точки старта, парки и места встречи с афишей.`
-    : 'Достопримечательности и точки старта - чтобы быстро понять, куда идти в городе.';
+    ? `Причалы, парки и места встречи ${cityToGenitive(cityName)}.`
+    : 'Причалы, парки и места встречи для экскурсий и событий.';
 
   return (
     <>

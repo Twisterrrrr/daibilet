@@ -284,9 +284,9 @@ export async function buildSocialPreviewForPath(db, pathname, builders) {
 
   if (path === '/locations') {
     return {
-      title: `Локации: причалы, парки и точки старта экскурсий | ${SITE_NAME}`,
+      title: `Локации и точки сбора: причалы, парки, места встречи | ${SITE_NAME}`,
       description:
-        'Куда приходить: причалы речных прогулок, парки, точки старта пеших экскурсий, автобусные остановки и встречи в аэропорту.',
+        'Каталог локаций: причалы речных прогулок, парки, точки сбора пеших экскурсий, автобусные остановки и встречи в аэропорту.',
       url: '/locations',
       image: null,
       redirectPath: '/locations',

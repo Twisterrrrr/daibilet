@@ -15,6 +15,7 @@
 | HC.2 | `/events` strip: гео H1 + матрица Когда/Что + trust (без photo) | Критический | ✅ |
 | HC.3 | Landing trust strip (email / возврат по правилам / e-вход); убраны fake sold/rating | Высокий | ✅ |
 | HC.4 | `/locations` гео H1 + type chips в hero; emoji убраны; withMap сохранён | Высокий | ✅ |
+| HC.4b | `/locations` H1 «Локации и точки сбора» (каталог, не tourist CTA) | Высокий | ✅ |
 | HC.5 | `/venues` гео H1 + format toggles в hero; photo сохранён; emoji убраны | Высокий | ✅ |
 | HC.6 | `/cities` live search suggestions + tabs Популярные/А-Я | Высокий | ✅ |
 | HC.7 | `/podborki` emotional H1 + mood chips + seasonal banner; emoji presets off | Высокий | ✅ |
