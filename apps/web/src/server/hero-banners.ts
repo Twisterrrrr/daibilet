@@ -5,7 +5,6 @@ import {
   HOME_HERO_IMAGES,
   HOME_HERO_OBJECT_POSITION_DEFAULT,
   homeHeroObjectPositionClass,
-  ultrawideSrcForHeroSrc,
   type HomeHeroImageSet,
 } from '@/lib/home-hero-images';
 
@@ -22,8 +21,6 @@ export type HomeHeroMediaFrame = {
   alt: string;
   /** Tailwind object-position classes (faces ~top-center). */
   objectPosition: string;
-  /** 21:9 alternate for ultrawide viewports. */
-  ultrawideSrc?: string;
 };
 
 async function loadHeroBannersFromDb(): Promise<PublicHeroBanner[]> {
@@ -55,13 +52,11 @@ export function heroFramesFromBanners(
       src: banner.imageUrl,
       alt: banner.title || fallback.alt,
       objectPosition: HOME_HERO_OBJECT_POSITION_DEFAULT,
-      ultrawideSrc: ultrawideSrcForHeroSrc(banner.imageUrl),
     }));
   }
   return HOME_HERO_IMAGES.map((image) => ({
     src: image.landscape,
     alt: image.alt,
     objectPosition: homeHeroObjectPositionClass(image),
-    ultrawideSrc: image.ultrawide,
   }));
 }

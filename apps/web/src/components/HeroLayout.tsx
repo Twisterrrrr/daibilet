@@ -127,7 +127,7 @@ export function HeroLayout({
   }
 
   // imageOverlay | video | withMap - full-bleed media plane
-  // Высота как до ultrawide min-h фикса: контент + padding. Широкие кадры - в HeroMedia.
+  // Высота: контент + padding (без 70vh / ultrawide min-h inflation).
   return (
     <>
       {breadcrumbs?.length ? <PageBreadcrumbBar items={breadcrumbs} /> : null}

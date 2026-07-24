@@ -1,3 +1,23 @@
+## 2026-07-24 - Ultrawide hero: откат *-uw art-direction
+
+### Наблюдения
+
+- Owner: «зачем так увеличивать фото для ultrawide? раньше же было хорошо».
+- `2004e4b` (70vh min-h) уже отвергнут; `a2531f5` (`*-uw.jpg` через `<picture>`) всё ещё давал ощущение увеличенного/агрессивного crop на широких экранах.
+
+### Решения
+
+- Убрали `<picture>` media-switch на `*-uw.jpg` в `HeroMedia` / `HomeHeroBackground`.
+- На ultrawide тот же landscape, что на обычном desktop; высоты hero без 70vh inflation.
+- Мягкий face-safe `object-position` оставлен. Photo heroes только `/` и `/venues`.
+- Удалены 7 ассетов `*-uw.jpg` из `apps/public/public/images/hero/`.
+
+### Проблемы
+
+- Нет (commit + deploy ниже).
+
+---
+
 ## 2026-07-24 - /blog topic chips: scroll к ленте
 
 ### Наблюдения

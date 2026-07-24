@@ -5,18 +5,13 @@
  *
  * object-position: лица/глаза обычно в верхней трети кадра. При object-cover
  * дефолт center съедает головы на узких/низких viewport - держим focus ~20-30% по Y.
- *
- * Ultrawide (21:9+): базовый пул 1536x1024 (3:2) режется object-cover на тонкой полосе.
- * Для широких viewport подменяем кадр на `ultrawide` (~2560x1080, 21:9) через <picture>,
- * без раздувания min-height секции.
+ * Ultrawide: тот же landscape, без отдельного *-uw кадра (owner: не увеличивать фото).
  */
 
 export type HomeHeroImageSet = {
   id: string;
   landscape: string;
   portrait: string;
-  /** 21:9 кадр для ultrawide / 2xl - иначе object-cover режет 3:2. */
-  ultrawide?: string;
   alt: string;
   /** object-position для md+ (Tailwind, с префиксом md:/lg:…) */
   objectPositionDesktop?: string;
@@ -26,9 +21,6 @@ export type HomeHeroImageSet = {
 
 /** Дефолт для CMS HeroBanner и кадров без явного focus. */
 export const HOME_HERO_OBJECT_POSITION_DEFAULT = 'object-[50%_28%] md:object-[50%_22%]';
-
-/** Media query: широкий кадр вместо 3:2 (см. HeroMedia / HomeHeroBackground). */
-export const HERO_ULTRAWIDE_MEDIA = '(min-aspect-ratio: 21/9), (min-width: 1536px)';
 
 /** Собирает responsive object-position classes для HeroMedia. */
 export function homeHeroObjectPositionClass(
@@ -44,7 +36,6 @@ export const HOME_HERO_IMAGES: readonly HomeHeroImageSet[] = [
     id: 'friends-selfie',
     landscape: '/images/hero/home-hero-friends-selfie.jpg',
     portrait: '/images/hero/home-hero-friends-selfie-mobile.jpg',
-    ultrawide: '/images/hero/home-hero-friends-selfie-uw.jpg',
     alt: 'Друзья улыбаются на городской экскурсии - групповое фото',
     objectPositionDesktop: 'md:object-[55%_28%] lg:object-[52%_24%] 2xl:object-[50%_22%]',
     objectPositionMobile: 'object-[50%_22%]',
@@ -53,7 +44,6 @@ export const HOME_HERO_IMAGES: readonly HomeHeroImageSet[] = [
     id: 'slavic-01',
     landscape: '/images/hero/hero-slavic-01.png',
     portrait: '/images/hero/hero-slavic-01.png',
-    ultrawide: '/images/hero/hero-slavic-01-uw.jpg',
     alt: 'Туристы с улыбкой гуляют по исторической улице города',
     objectPositionDesktop: 'md:object-[50%_26%]',
     objectPositionMobile: 'object-[50%_24%]',
@@ -62,7 +52,6 @@ export const HOME_HERO_IMAGES: readonly HomeHeroImageSet[] = [
     id: 'slavic-02',
     landscape: '/images/hero/hero-slavic-02.png',
     portrait: '/images/hero/hero-slavic-02.png',
-    ultrawide: '/images/hero/hero-slavic-02-uw.jpg',
     alt: 'Пара туристов радуется видам с набережной реки',
     objectPositionDesktop: 'md:object-[45%_26%]',
     objectPositionMobile: 'object-[42%_24%]',
@@ -71,7 +60,6 @@ export const HOME_HERO_IMAGES: readonly HomeHeroImageSet[] = [
     id: 'slavic-03',
     landscape: '/images/hero/hero-slavic-03.png',
     portrait: '/images/hero/hero-slavic-03.png',
-    ultrawide: '/images/hero/hero-slavic-03-uw.jpg',
     alt: 'Друзья с восхищением осматривают зал музея',
     objectPositionDesktop: 'md:object-[50%_28%]',
     objectPositionMobile: 'object-[50%_25%]',
@@ -80,7 +68,6 @@ export const HOME_HERO_IMAGES: readonly HomeHeroImageSet[] = [
     id: 'slavic-04',
     landscape: '/images/hero/hero-slavic-04.png',
     portrait: '/images/hero/hero-slavic-04.png',
-    ultrawide: '/images/hero/hero-slavic-04-uw.jpg',
     alt: 'Туристы любуются вечерними огнями города с набережной',
     objectPositionDesktop: 'md:object-[48%_28%]',
     objectPositionMobile: 'object-[45%_25%]',
@@ -89,7 +76,6 @@ export const HOME_HERO_IMAGES: readonly HomeHeroImageSet[] = [
     id: 'slavic-05',
     landscape: '/images/hero/hero-slavic-05.png',
     portrait: '/images/hero/hero-slavic-05.png',
-    ultrawide: '/images/hero/hero-slavic-05-uw.jpg',
     alt: 'Компания друзей весело гуляет у дворца в солнечный день',
     objectPositionDesktop: 'md:object-[50%_24%]',
     objectPositionMobile: 'object-[50%_22%]',
@@ -98,7 +84,6 @@ export const HOME_HERO_IMAGES: readonly HomeHeroImageSet[] = [
     id: 'slavic-06',
     landscape: '/images/hero/hero-slavic-06.png',
     portrait: '/images/hero/hero-slavic-06.png',
-    ultrawide: '/images/hero/hero-slavic-06-uw.jpg',
     alt: 'Семья туристов с радостью смотрит на речную прогулку',
     objectPositionDesktop: 'md:object-[52%_28%]',
     objectPositionMobile: 'object-[50%_25%]',
@@ -110,22 +95,10 @@ export function objectPositionForHeroSrc(src: string | undefined | null): string
   const path = src?.trim();
   if (!path) return HOME_HERO_OBJECT_POSITION_DEFAULT;
   const match = HOME_HERO_IMAGES.find(
-    (image) =>
-      image.landscape === path || image.portrait === path || image.ultrawide === path,
+    (image) => image.landscape === path || image.portrait === path,
   );
   if (match) return homeHeroObjectPositionClass(match);
   return HOME_HERO_OBJECT_POSITION_DEFAULT;
-}
-
-/** Ultrawide src для пути из пула (landscape/portrait/uw). */
-export function ultrawideSrcForHeroSrc(src: string | undefined | null): string | undefined {
-  const path = src?.trim();
-  if (!path) return undefined;
-  const match = HOME_HERO_IMAGES.find(
-    (image) =>
-      image.landscape === path || image.portrait === path || image.ultrawide === path,
-  );
-  return match?.ultrawide;
 }
 
 /** Случайный кадр на запрос (SSR). */
