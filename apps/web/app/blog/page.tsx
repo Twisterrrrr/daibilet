@@ -5,6 +5,10 @@ import { BlogListView } from '@/components/BlogListView';
 import '@/lib/env';
 import { buildBlogListMetadata } from '@/lib/blog-article-seo';
 import { resolveBlogHotMinPrices } from '@/lib/blog-hot-prices';
+import {
+  resolveBlogSidebarPromoMap,
+  type BlogSidebarPromoDto,
+} from '@/lib/blog-sidebar-promo';
 import { expandListingExcerpt, mergeBlogCards, splitBlogListingHero } from '@/lib/blog-utils';
 import { buildPublicArticlesListDto } from '@daibilet/backend/public-read';
 
@@ -45,17 +49,38 @@ export default async function BlogPage({ searchParams }: PageProps) {
     // fallback to static posts
   }
 
-  const { hot } = splitBlogListingHero(posts);
+  const { featured, hot } = splitBlogListingHero(posts);
   let hotMinPrices: Record<string, number> = {};
+  let afishaPromos: Record<string, BlogSidebarPromoDto> = {};
   try {
     hotMinPrices = await resolveBlogHotMinPrices(hot);
   } catch {
     hotMinPrices = {};
   }
+  try {
+    const promoPosts = [featured, ...hot].filter(Boolean) as typeof hot;
+    afishaPromos = await resolveBlogSidebarPromoMap(promoPosts);
+  } catch {
+    afishaPromos = {};
+  }
 
   return (
-    <Suspense fallback={<BlogListView posts={posts} filters={filters} hotMinPrices={hotMinPrices} />}>
-      <BlogListView posts={posts} filters={filters} hotMinPrices={hotMinPrices} />
+    <Suspense
+      fallback={
+        <BlogListView
+          posts={posts}
+          filters={filters}
+          hotMinPrices={hotMinPrices}
+          afishaPromos={afishaPromos}
+        />
+      }
+    >
+      <BlogListView
+        posts={posts}
+        filters={filters}
+        hotMinPrices={hotMinPrices}
+        afishaPromos={afishaPromos}
+      />
     </Suspense>
   );
 }

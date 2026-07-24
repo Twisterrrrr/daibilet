@@ -4,6 +4,8 @@ import { BlogFeaturedHero } from '@/components/BlogFeaturedHero';
 import { BlogListFiltered } from '@/components/BlogListFiltered.client';
 import { BlogListHero } from '@/components/BlogListHero';
 import { SiteLayout } from '@/components/SiteLayout';
+import { cityFilterLabel } from '@/lib/blog-meta';
+import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { splitBlogListingHero } from '@/lib/blog-utils';
 
@@ -18,12 +20,24 @@ export function BlogListView({
   posts,
   filters,
   hotMinPrices = {},
+  afishaPromos = {},
 }: {
   posts: BlogCardDto[];
   filters?: BlogListFilters;
   hotMinPrices?: Record<string, number>;
+  afishaPromos?: Record<string, BlogSidebarPromoDto>;
 }) {
   const { featured, feed, hot } = splitBlogListingHero(posts);
+  const fallbackCityLabel = featured
+    ? cityFilterLabel(featured.citySlug, featured.city)
+    : null;
+  const afishaFallbackCityName =
+    fallbackCityLabel &&
+    fallbackCityLabel !== 'Регионы' &&
+    fallbackCityLabel !== 'Несколько городов' &&
+    fallbackCityLabel !== 'Без города'
+      ? fallbackCityLabel
+      : featured?.city || null;
 
   return (
     <SiteLayout>
@@ -42,7 +56,13 @@ export function BlogListView({
           />
         ) : null}
 
-        <BlogListFiltered posts={feed} initialFilters={filters} />
+        <BlogListFiltered
+          posts={feed}
+          initialFilters={filters}
+          afishaPromos={afishaPromos}
+          afishaFallbackCityName={afishaFallbackCityName}
+          afishaFallbackCitySlug={featured?.citySlug}
+        />
 
         <p className="mt-12 text-sm text-slate-500">
           Новые материалы выходят каждую неделю. А готовые списки событий - в{' '}

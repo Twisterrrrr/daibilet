@@ -1,5 +1,7 @@
 'use client';
 
+import type { ReactNode } from 'react';
+
 import { BlogPostCard } from '@/components/BlogPostCard.client';
 import type { BlogCardDto } from '@/lib/blog-utils';
 
@@ -100,36 +102,48 @@ function PairRow({
   );
 }
 
-export function BlogMagazineGrid({ posts }: { posts: BlogCardDto[] }) {
+export function BlogMagazineGrid({
+  posts,
+  /** Inserted after the first magazine block (first 1-3 cards). */
+  afterFirstBlock,
+}: {
+  posts: BlogCardDto[];
+  afterFirstBlock?: ReactNode;
+}) {
   const rows = buildMagazineRows(posts);
 
   return (
     <div className="flex flex-col gap-12 sm:gap-14 lg:gap-16">
       {rows.map((row, index) => {
-        if (row.kind === 'trio') {
+        const rowKey =
+          row.kind === 'trio'
+            ? `trio-${row.large.slug}-${index}`
+            : row.kind === 'pair'
+              ? `pair-${row.lead.slug}-${index}`
+              : `single-${row.post.slug}-${index}`;
+
+        const rowNode =
+          row.kind === 'trio' ? (
+            <TrioRow large={row.large} small={row.small} mirror={row.mirror} />
+          ) : row.kind === 'pair' ? (
+            <PairRow lead={row.lead} side={row.side} mirror={row.mirror} />
+          ) : (
+            <div className="max-w-3xl">
+              <BlogPostCard post={row.post} variant="large" />
+            </div>
+          );
+
+        if (index === 0 && afterFirstBlock) {
           return (
-            <TrioRow
-              key={`trio-${row.large.slug}-${index}`}
-              large={row.large}
-              small={row.small}
-              mirror={row.mirror}
-            />
+            <div key={rowKey} className="flex flex-col gap-12 sm:gap-14 lg:gap-16">
+              {rowNode}
+              {afterFirstBlock}
+            </div>
           );
         }
-        if (row.kind === 'pair') {
-          return (
-            <PairRow
-              key={`pair-${row.lead.slug}-${index}`}
-              lead={row.lead}
-              side={row.side}
-              mirror={row.mirror}
-            />
-          );
-        }
+
         return (
-          <div key={`single-${row.post.slug}-${index}`} className="max-w-3xl">
-            <BlogPostCard post={row.post} variant="large" />
-          </div>
+          <div key={rowKey}>{rowNode}</div>
         );
       })}
     </div>

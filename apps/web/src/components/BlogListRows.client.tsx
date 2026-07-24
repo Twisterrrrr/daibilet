@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { Clock } from 'lucide-react';
 
@@ -123,14 +124,33 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
   );
 }
 
-export function BlogListRows({ posts }: { posts: BlogCardDto[] }) {
+export function BlogListRows({
+  posts,
+  /** 1-based: insert node after this many cards (e.g. 3 = under first three). */
+  insertAfter = 0,
+  insert,
+}: {
+  posts: BlogCardDto[];
+  insertAfter?: number;
+  insert?: ReactNode;
+}) {
   return (
     <ul className="flex flex-col gap-3 sm:gap-3.5">
-      {posts.map((post) => (
-        <li key={post.slug}>
-          <BlogListRow post={post} />
-        </li>
-      ))}
+      {posts.flatMap((post, index) => {
+        const nodes = [
+          <li key={post.slug}>
+            <BlogListRow post={post} />
+          </li>,
+        ];
+        if (insert && insertAfter > 0 && index + 1 === insertAfter) {
+          nodes.push(
+            <li key="blog-afisha-promo" className="list-none py-3 sm:py-4">
+              {insert}
+            </li>,
+          );
+        }
+        return nodes;
+      })}
     </ul>
   );
 }

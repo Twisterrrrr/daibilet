@@ -1,3 +1,23 @@
+## 2026-07-24 - /blog afisha promo: под первые 3 статьи фида
+
+### Наблюдения
+
+- Owner: «СОБЫТИЯ ГОРОДА / Афиша: Москва» squashed в сайдбаре под «Свежее» - перенести под первые три статьи основного фида.
+- Сайдбар «Свежее» должен остаться только из 3 свежих карточек.
+
+### Решения
+
+- Убран promo из `BlogFeaturedHero` (aside = только Fresh ×3 + min price).
+- `BlogAfishaPromo` - full-width banner (фото + цена/weekend + 1-2 titles + chips + CTA), geo из header.
+- Вставка: magazine - после первого trio/блока; list - после 3-й строки.
+- Данные те же: `resolveBlogSidebarPromoMap` / `buildPublicCityDto`.
+
+### Проблемы
+
+- Нет (commit + deploy ниже).
+
+---
+
 ## 2026-07-24 - /blog sidebar promo: полезная афиша вместо stock-photo
 
 ### Наблюдения
