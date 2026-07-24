@@ -31,7 +31,8 @@
 | H.8e | `/blog` client: base64url Buffer crash → btoa/atob cursor | Критический | ✅ `c716a4e` prod |
 | H.8f | `/blog` afisha promo: цена/события/chips по geo; full-width после 3 статей фида | Критический | 🔄 |
 | H.8f-fix | Blog afisha promo: split server `resolveBlogSidebarPromoMap` (pg out of client) | Критический | ✅ `d47c300` prod |
-| H.9 | Ultrawide heroes: min-h + face-safe object-position (home+catalog HeroMedia) | Критический | ✅ `2004e4b` prod @`d47c300` |
+| H.9 | Ultrawide heroes: min-h + face-safe object-position (home+catalog HeroMedia) | Критический | 🚫 reverted (гигантский hero) |
+| H.9b | Ultrawide: альтернативные 21:9 кадры (`*-uw.jpg`) + `<picture>`, без min-h inflation | Критический | 🔄 |
 
 ---
 
@@ -40,7 +41,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | P.V1 | `/venues`+`/locations`: lean Prisma `_count` вместо session hydrate для плиток | Высокий | ✅ `9af3910` |
-| P.V1b | Regression: lean hub дропнул event-image cover fallbacks → пустые карточки `/venues` | Критический | 🔄 fix in flight |
+| P.V1b | Regression: lean hub дропнул event-image cover fallbacks → пустые карточки `/venues` | Критический | ✅ `f7e0071` prod |
 | P.V2 | Suspense + pulse skeletons на фильтрах (city/type), без full-page loader | Высокий | ✅ `9af3910` |
 | P.V3 | `Venue @@index([title])` + migrate `20260724030000_venue_title_search_index` | Средний | ✅ `9af3910` (migrate on deploy) |
 | PERF.1 | Prisma singleton `globalThis` + shared pg Pool (`@daibilet/db`) | Критический | ✅ `6ce435a` |
