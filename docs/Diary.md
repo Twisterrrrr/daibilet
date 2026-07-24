@@ -34,7 +34,7 @@
 
 ### Проблемы
 
-- Нет (commit + deploy ниже).
+- Нет. **Prod:** `e43ee4e` + client-bundle fix `d47c300`; deploy-prod-next OK @`5e06ae8` (далее поверх шли ultrawide/venue commits). SSR first paint фида - follow-up `displayPosts`.
 
 ---
 
