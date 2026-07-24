@@ -8,7 +8,7 @@ import {
   resolveSessionTimeZoneForSession,
 } from '@/lib/datetime';
 import { isHomeRailTabooSession } from '@/lib/home-rail-taboos';
-import { spreadCatalogSessionsByCoverImage, normalizeSessionImageKey, sessionHasCoverImage } from '@/lib/session-cover-image';
+import { collectSessionImageDedupeKeys, sessionHasCoverImage, spreadCatalogSessionsByCoverImage } from '@/lib/session-cover-image';
 import { createHomePickState, sessionFamilyKey, type HomePickState } from '@/lib/home-showcase-sections';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
@@ -77,6 +77,14 @@ function sessionDedupeKey(event: PublicSession): string {
   return `title:${String(event.title || '').trim().toLowerCase()}`;
 }
 
+function sessionCoverKeys(event: PublicSession, state: HomePickState): string[] {
+  const keys = collectSessionImageDedupeKeys(event.imageUrl);
+  const url = String(event.imageUrl || '').trim();
+  const fingerprint = url ? state.fingerprints.get(url) : undefined;
+  if (fingerprint) keys.push(fingerprint);
+  return keys;
+}
+
 function takeUnique(events: PublicSession[], max: number, state: HomePickState): PublicSession[] {
   const result: PublicSession[] = [];
 
@@ -86,13 +94,13 @@ function takeUnique(events: PublicSession[], max: number, state: HomePickState):
     const dedupeKey = sessionDedupeKey(event);
     const familyKey = sessionFamilyKey(event);
     if (state.seenIds.has(event.id) || state.seenTitles.has(dedupeKey) || state.seenFamilies.has(familyKey)) continue;
-    const imageKey = normalizeSessionImageKey(event.imageUrl);
-    if (imageKey && state.seenImages.has(imageKey)) continue;
+    const imageKeys = sessionCoverKeys(event, state);
+    if (imageKeys.some((key) => state.seenImages.has(key))) continue;
 
     state.seenIds.add(event.id);
     state.seenTitles.add(dedupeKey);
     state.seenFamilies.add(familyKey);
-    if (imageKey) state.seenImages.add(imageKey);
+    for (const key of imageKeys) state.seenImages.add(key);
     result.push(event);
     if (result.length >= max) break;
   }
@@ -122,7 +130,7 @@ function buildTabPool(sessions: PublicSession[], slotFilter: SlotFilter, state: 
     slotFilter,
   ).map((event) => withTabDisplaySlot(event, slotFilter));
 
-  return spreadCatalogSessionsByCoverImage(takeUnique(matched, TAB_LIMIT, state));
+  return spreadCatalogSessionsByCoverImage(takeUnique(matched, TAB_LIMIT, state), state.fingerprints);
 }
 
 type BuildHomeNowTabsOptions = {
@@ -201,7 +209,10 @@ export function buildHomeNowTabs(sessions: PublicSession[], options: BuildHomeNo
           const rotated = [...sessions.slice(offset), ...sessions.slice(0, offset)];
           fallbackByTab.set(
             def.key,
-            spreadCatalogSessionsByCoverImage(takeUnique(sortByPopular(rotated), TAB_LIMIT, pickState)),
+            spreadCatalogSessionsByCoverImage(
+              takeUnique(sortByPopular(rotated), TAB_LIMIT, pickState),
+              pickState.fingerprints,
+            ),
           );
         }
         events = fallbackByTab.get(def.key) || [];

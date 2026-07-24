@@ -4484,7 +4484,7 @@ function normalizePublicSessionImageKey(imageUrl) {
 
   if (raw.includes('/_next/image') && /[?&]url=/.test(raw)) {
     try {
-      const proxy = new URL(raw, 'https://daibilet.ru');
+      const proxy = new URL(raw.replace(/&amp;/g, '&'), 'https://daibilet.ru');
       const inner = proxy.searchParams.get('url');
       if (inner) return normalizePublicSessionImageKey(inner);
     } catch {
@@ -4495,7 +4495,8 @@ function normalizePublicSessionImageKey(imageUrl) {
   let pathname = raw;
   let search = '';
   try {
-    const parsed = new URL(raw, 'https://daibilet.ru');
+    const parsed = new URL(raw.replace(/&amp;/g, '&'), 'https://daibilet.ru');
+    if (parsed.port === '443' || parsed.port === '80') parsed.port = '';
     pathname = parsed.pathname;
     search = parsed.search || '';
   } catch {
@@ -4507,8 +4508,32 @@ function normalizePublicSessionImageKey(imageUrl) {
 
   const normalizedPath = pathname.replace(/\/$/, '').toLowerCase();
   const file = decodeURIComponent(normalizedPath.split('/').filter(Boolean).pop() || '').toLowerCase();
+  const sizeSuffixRe =
+    /(?:[-_](?:\d{2,4}x\d{2,4}|w\d{2,4}|h\d{2,4}|q\d{2,3}|thumb|small|medium|large|cover|card|preview|resized?))+(?=\.[a-z0-9]+$)/i;
+
+  if (search) {
+    try {
+      const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
+      const dirtyAlias = params.get('dirtyAlias') || params.get('dirty_alias');
+      if (dirtyAlias && dirtyAlias.trim()) {
+        const aliasFile = decodeURIComponent(dirtyAlias.trim()).toLowerCase().split('/').pop() || '';
+        if (aliasFile) {
+          const stripped = aliasFile.replace(sizeSuffixRe, '');
+          return `img:${stripped}`;
+        }
+      }
+    } catch {
+      // fall through
+    }
+  }
+
   if (file && /\.(jpe?g|png|webp|gif|avif|bmp|svg)$/i.test(file)) {
-    return `img:${file}`;
+    const stripped = file.replace(sizeSuffixRe, '');
+    const oid = stripped.match(/^([a-f0-9]{24})\.(jpe?g|png|webp|gif|avif)$/i);
+    if (oid) return `tc-asset:${oid[1].toLowerCase()}`;
+    const teploVariant = stripped.match(/^([a-f0-9]{8,})-\d+\.(jpe?g|png|webp|gif|avif|bmp|svg)$/i);
+    if (teploVariant) return `stem:${teploVariant[1].toLowerCase()}`;
+    return `img:${stripped}`;
   }
 
   if (search) {

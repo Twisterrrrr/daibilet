@@ -1,6 +1,11 @@
 import { parseSessionStartsAt } from '@/lib/datetime';
 import { isHomeRailTabooSession } from '@/lib/home-rail-taboos';
-import { normalizeSessionImageKey, sessionHasCoverImage, spreadCatalogSessionsByCoverImage, spreadSessionsForGrid } from '@/lib/session-cover-image';
+import {
+  collectSessionImageDedupeKeys,
+  sessionHasCoverImage,
+  spreadCatalogSessionsByCoverImage,
+  spreadSessionsForGrid,
+} from '@/lib/session-cover-image';
 import type { PublicSession } from '@/types';
 
 export const HOME_SHOWCASE_LIMIT = 8;
@@ -11,6 +16,8 @@ export type HomePickState = {
   seenTitles: Set<string>;
   seenImages: Set<string>;
   seenFamilies: Set<string>;
+  /** URL → content fingerprint (etag:...), from HEAD at home build time. */
+  fingerprints: Map<string, string>;
 };
 
 function isFeaturedEvent(event: PublicSession): boolean {
@@ -29,7 +36,7 @@ function popularScore(event: PublicSession): number {
 function sessionDedupeKey(event: PublicSession): string {
   const groupKey = String(event.groupKey || '').trim().toLowerCase();
   if (groupKey) return `group:${groupKey}`;
-  return `title:${event.title.trim().toLowerCase()}`;
+  return `title:${String(event.title || '').trim().toLowerCase()}`;
 }
 
 /**
@@ -52,6 +59,7 @@ export function sessionFamilyKey(event: PublicSession): string {
     return `combo-venue:${venueKey}`;
   }
 
+  // Одинаковая площадка + «комбо #» после нормализации цифр
   if (venueKey && title && /\d/.test(title)) {
     const stem = title.replace(/\d+/g, '#').replace(/\s+/g, ' ').trim();
     if (/^комбо(?:\s*#|\s|$)/.test(stem)) {
@@ -68,7 +76,16 @@ export function createHomePickState(seed?: Partial<HomePickState>): HomePickStat
     seenTitles: new Set(seed?.seenTitles),
     seenImages: new Set(seed?.seenImages),
     seenFamilies: new Set(seed?.seenFamilies),
+    fingerprints: seed?.fingerprints ?? new Map(),
   };
+}
+
+function sessionCoverKeys(event: PublicSession, state: HomePickState): string[] {
+  const keys = collectSessionImageDedupeKeys(event.imageUrl);
+  const url = String(event.imageUrl || '').trim();
+  const fingerprint = url ? state.fingerprints.get(url) : undefined;
+  if (fingerprint) keys.push(fingerprint);
+  return keys;
 }
 
 function takeUnique(events: PublicSession[], max: number, state: HomePickState): PublicSession[] {
@@ -79,13 +96,13 @@ function takeUnique(events: PublicSession[], max: number, state: HomePickState):
     const dedupeKey = sessionDedupeKey(event);
     const familyKey = sessionFamilyKey(event);
     if (state.seenIds.has(event.id) || state.seenTitles.has(dedupeKey) || state.seenFamilies.has(familyKey)) continue;
-    const imageKey = normalizeSessionImageKey(event.imageUrl);
-    if (imageKey && state.seenImages.has(imageKey)) continue;
+    const imageKeys = sessionCoverKeys(event, state);
+    if (imageKeys.some((key) => state.seenImages.has(key))) continue;
 
     state.seenIds.add(event.id);
     state.seenTitles.add(dedupeKey);
     state.seenFamilies.add(familyKey);
-    if (imageKey) state.seenImages.add(imageKey);
+    for (const key of imageKeys) state.seenImages.add(key);
     result.push(event);
     if (result.length >= max) break;
   }
@@ -139,13 +156,20 @@ export function buildPopularEvents(
 }
 
 export function buildHomeShowcaseBundles(sessions: PublicSession[], state = createHomePickState()) {
+  const fingerprints = state.fingerprints;
   const editorsPick = spreadCatalogSessionsByCoverImage(
     buildEditorsPickEvents(sessions, HOME_SHOWCASE_LIMIT, state),
+    fingerprints,
   );
   const thisWeek = spreadCatalogSessionsByCoverImage(
     buildThisWeekEvents(sessions, HOME_SHOWCASE_LIMIT, state),
+    fingerprints,
   );
-  const popular = spreadSessionsForGrid(buildPopularEvents(sessions, HOME_POPULAR_LIMIT, state), 3);
+  const popular = spreadSessionsForGrid(
+    buildPopularEvents(sessions, HOME_POPULAR_LIMIT, state),
+    3,
+    fingerprints,
+  );
   return { editorsPick, thisWeek, popular };
 }
 

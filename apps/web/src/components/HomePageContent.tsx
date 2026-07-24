@@ -65,7 +65,7 @@ export async function HomePageContent() {
   const topCities = [...cities].sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')).slice(0, 8);
 
   const sessions = catalogPayload?.items ?? [];
-  const { editorsPick, homeNowTabs, popular } = buildHomePageSections(sessions);
+  const { editorsPick, homeNowTabs, popular } = await buildHomePageSections(sessions);
   const sparseCatalog = sessions.length < 12;
 
   const homeVenues = (venuesPayload?.venues ?? [])

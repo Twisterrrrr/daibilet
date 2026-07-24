@@ -7,6 +7,15 @@
 
 ---
 
+## Home rails cover dedupe (2026-07-24)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| HR.1 | Taboo Harry Potter + basename cover skip (`4e18b60`) | Критический | ✅ |
+| HR.2 | Content fingerprint (ETag) + multi-key URL normalize; refill gaps | Критический | 🔄 |
+
+---
+
 ## Hero UX (2026-07-24)
 
 | # | Задача | Приоритет | Статус |
@@ -16,17 +25,17 @@
 | H.3 | `/cities` split + RF map hover + top tiles ISR 1h | Высокий | ✅ |
 | H.3b | `/cities` top tiles + «Популярные города»: max-w-5xl + items-stretch (как podborki) | Критический | ✅ `d1ccd8a` prod |
 | H.3c | `/cities`+/`podborki`: H1 и row на одной оси `HeroLayout` max-w-5xl; blog featured = container width | Критический | ✅ |
-| H.3d | `/cities` imageOverlay photo hero + search (как venues); tiles/map ниже на max-w-5xl | Критический | ✅ `8ec241c` prod @`067763d` |
+| H.3d | `/cities` imageOverlay photo hero + search (как venues); tiles/map ниже на max-w-5xl | Критический | 🚫 owner: откат к `minimal`+tiles/map (до `8ec241c`) |
 | H.3e | `/cities` hub mini-tags (top landings) + ISR 86400 | Критический | ✅ `44887fb` |
 | H.4 | `/podborki` featured+trending equal-height, centered `max-w-5xl` | Высокий | ✅ `533d40a` prod @`d1ccd8a` |
 | H.4b | `/podborki` tag soup → `LandingCategory` + carousels (by-type/for-whom/seasonal) | Критический | ✅ `30e87fe`+`44887fb` |
 | H.5 | `/venues` dark imageOverlay + search | Средний | ✅ MVP |
-| H.5b | `/events` imageOverlay photo hero + search/city/date (как venues) | Критический | ✅ `47430af` prod |
-| H.6 | `/locations` photo hero (imageOverlay) как venues; map не в hero | Критический | ✅ `47430af` prod |
+| H.5b | `/events` imageOverlay photo hero + search/city/date (как venues) | Критический | 🚫 owner: откат к `SectionPageHero` strip (до `47430af`) |
+| H.6 | `/locations` photo hero (imageOverlay) как venues; map не в hero | Критический | 🚫 owner: откат к `withMap`+RussiaMap (до `47430af`) |
 | H.7 | Video loop asset для home | Низкий | ⏳ нет ассета - rotator images |
 | H.8 | Blog Featured Hero + interactive list H1 + «Свежее»×3 + min price | Высокий | ✅ `b45995c` prod @`c39d124` |
 | H.8b | `/blog` featured+«Свежее»: max-w-5xl composition + square thumbs | Критический | ✅ `90f6151` prod @`d1ccd8a` |
-| H.8c | `/blog` list hero → imageOverlay + search/chips внутри (уровень venues) | Критический | ✅ `8ec241c` prod @`067763d` |
+| H.8c | `/blog` list hero → imageOverlay + search/chips внутри (уровень venues) | Критический | 🚫 owner: откат к interactive strip (до `8ec241c`; «статьи») |
 | H.8d | `/blog` city rank (header) + cursor pagination + article canonical | Критический | ✅ `44887fb` |
 | H.8e | `/blog` client: base64url Buffer crash → btoa/atob cursor | Критический | ✅ `c716a4e` prod |
 | H.8f | `/blog` afisha promo: цена/события/chips по geo; full-width после 3 статей фида | Критический | 🚫 owner: не убирать из угла |

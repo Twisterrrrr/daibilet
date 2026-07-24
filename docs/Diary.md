@@ -1,3 +1,43 @@
+## 2026-07-24 - Home rails: content-fingerprint cover dedupe
+
+### Наблюдения
+
+- Owner: дубли фото на главной всё ещё видны после `4e18b60` (basename-only).
+- Prod «Выбор редакции»: 4 карточки teplohod с разными basename (`7eea401c46-1.jpg`, `c9f7e2bdf1-1.jpeg`, …) имеют один SHA256 и один S3 ETag `8bce469f…` - идентичный бинарник под разными именами.
+
+### Решения
+
+- `collectSessionImageDedupeKeys`: basename + size-suffix strip, TC asset id, dirtyAlias↔file, local `tc-{id}`, teplohod hex-N stem.
+- Home build: `resolveCoverContentFingerprints` (HEAD ETag, in-memory TTL) → `takeUnique` исключает одинаковый контент; gaps заполняются следующими кандидатами.
+- Pool главной: catalog limit 50→80, cache key `home-catalog-v5-cover-dedupe`.
+- Покрыто: Выбор редакции, Куда сходить (все вкладки), Популярное (общий pickState).
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next).
+
+---
+
+## 2026-07-24 - Owner: photo hero только `/` и `/venues`
+
+### Наблюдения
+
+- Owner: «зачем все hero теперь как на главной?? достаточно было на главной и в площадках!! откати обратно».
+- Photo `imageOverlay` раскатили на `/events`, `/locations`, `/cities`, `/blog` (пакеты `47430af`, `8ec241c` + ultrawide).
+- `/podborki` оставался `minimal` - откат не нужен.
+
+### Решения
+
+- Хирургический restore компонентов до photo-hero: `CatalogShell` + `events/page` (`SectionPageHero` strip), `LocationsCatalogView` (`withMap` + RussiaMap), `cities/page` (`minimal` + top tiles/map) + `CitiesCatalogView` (`hideIntro`), `BlogListHero` (интерактивный search/topics strip).
+- Сохранены: `/` HomeHero photo, `/venues` imageOverlay, ultrawide `*-uw.jpg` для оставшихся photo heroes, копирайт «статьи» в blog hero, cities ISR 86400.
+- Header / afisha sidebar / venue covers - вне scope, не трогали.
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next + smoke).
+
+---
+
 ## 2026-07-24 - /blog: вернуть Афишу в угол + swap колонок
 
 ### Наблюдения
@@ -14,6 +54,26 @@
 ### Проблемы
 
 - Нет (commit + deploy ниже).
+
+---
+
+## 2026-07-24 - Owner: photo hero только `/` и `/venues`
+
+### Наблюдения
+
+- Owner: «зачем все hero теперь как на главной?? достаточно было на главной и в площадках!! откати обратно».
+- Photo `imageOverlay` раскатили на `/events`, `/locations`, `/cities`, `/blog` (пакеты `47430af`, `8ec241c` + ultrawide).
+- `/podborki` оставался `minimal` - откат не нужен.
+
+### Решения
+
+- Хирургический restore компонентов до photo-hero: `CatalogShell` + `events/page` (`SectionPageHero` strip), `LocationsCatalogView` (`withMap` + RussiaMap), `cities/page` (`minimal` + top tiles/map) + `CitiesCatalogView` (`hideIntro`), `BlogListHero` (интерактивный search/topics strip).
+- Сохранены: `/` HomeHero photo, `/venues` imageOverlay, ultrawide `*-uw.jpg` для оставшихся photo heroes, копирайт «статьи» в blog hero, cities ISR 86400.
+- Header / afisha sidebar / venue covers - вне scope, не трогали.
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next + smoke).
 
 ---
 
@@ -266,7 +326,7 @@ outes.ts (паритет с backend publicCitySlug).
 
 ### Проблемы
 
-- Нет (commit + deploy ниже).
+- Нет. **Prod @`a2531f5`:** deploy-prod-next OK; sync 7×`*-uw.jpg`; `/` `/events` `/venues` `/locations` 200; `hero-slavic-02-uw.jpg` 200; HTML без `70vh` hero inflation.
 
 ---
 
