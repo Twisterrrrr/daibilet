@@ -33,8 +33,16 @@ import { persistSelectedCity } from '@/lib/selected-city';
 import { parseCatalogPageQuery, searchParamsToRecord, catalogQueryCacheKey } from '@/server/catalog-query';
 
 const EVENTS_HERO_FRAMES = [
-  { src: '/images/hero/hero-slavic-02.png', alt: 'Афиша и билеты на события' },
-  { src: '/images/hero/hero-slavic-06.png', alt: 'Вечернее событие в городе' },
+  {
+    src: '/images/hero/hero-slavic-02.png',
+    ultrawideSrc: '/images/hero/hero-slavic-02-uw.jpg',
+    alt: 'Афиша и билеты на события',
+  },
+  {
+    src: '/images/hero/hero-slavic-06.png',
+    ultrawideSrc: '/images/hero/hero-slavic-06-uw.jpg',
+    alt: 'Вечернее событие в городе',
+  },
 ];
 
 type CatalogShellProps = {

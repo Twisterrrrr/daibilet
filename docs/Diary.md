@@ -232,6 +232,25 @@ outes.ts (паритет с backend publicCitySlug).
 
 ---
 
+## 2026-07-24 - Ultrawide: альтернативные кадры вместо гигантского hero
+
+### Наблюдения
+
+- Owner feedback на `2004e4b`: не нужен гигантский min-h / 70vh на ultrawide - нужны **альтернативные широкие изображения**, чтобы `object-cover` не кромсал 3:2 кадр.
+
+### Решения
+
+- Откат `HERO_LAYOUT_MEDIA_SECTION_CLASS` / content flex min-h (70vh, `100vw/2.35`, 2xl bumps) в `HeroLayout` - высота снова от контента + padding (как до `2004e4b`).
+- Face-safe `object-position` оставлен (пул + `objectPositionForHeroSrc`).
+- Добавлены 21:9 ассеты `*-uw.jpg` (2560x1080) в `public/images/hero/` (web + public sync): cover-crop face-safe из существующего slavic/friends пула.
+- `HeroMedia` / `HomeHeroBackground`: `<picture>` + `media="(min-aspect-ratio: 21/9), (min-width: 1536px)"` → ultrawide src; mobile/desktop 16:9 высоты не трогали.
+
+### Проблемы
+
+- Нет (commit + deploy ниже).
+
+---
+
 ## 2026-07-24 - Ultrawide: hero strip crop (home + catalog)
 
 ### Наблюдения
@@ -242,14 +261,14 @@ outes.ts (паритет с backend publicCitySlug).
 
 ### Решения
 
-- `HeroLayout` media: `2xl` min-h `min(70vh,34rem)` + `@media (min-aspect-ratio: 21/9)` min-h `min(70vh, 100vw/2.35)` / max-h 70vh; контент `flex-1 justify-center`. Mobile без изменений.
-- `HeroMedia`: нет `objectPosition` → `objectPositionForHeroSrc` (пул slavic/friends) или `HOME_HERO_OBJECT_POSITION_DEFAULT` с 2xl/ultrawide Y ~28-32%.
-- Per-frame focus в `home-hero-images` дополнен ultrawide breakpoints.
+- ~~`HeroLayout` media: `2xl` min-h `min(70vh,34rem)` + `@media (min-aspect-ratio: 21/9)` min-h…~~ **REVERTED** - см. запись выше про альтернативные кадры.
+- `HeroMedia`: нет `objectPosition` → `objectPositionForHeroSrc` (пул slavic/friends) или `HOME_HERO_OBJECT_POSITION_DEFAULT` - оставлено.
+- Per-frame focus в `home-hero-images` - ultrawide Y-bumps под tall hero убраны вместе с min-h.
 
 ### Проблемы
 
-- Новые stock не качали; если на 32:9 всё ещё тесно по бокам - следующий шаг art-direction / более широкие кадры.
-- **Prod @`d47c300`** (includes `2004e4b`): deploy-prod-next OK после unblock blog promo (`pg` out of client); `/` `/venues` `/events` 200; CSS с `min-aspect-ratio:21/9` / face-safe object-position.
+- Owner: «а нахрена такой гигантский hero для ultrawide?? я имел в виду нужны альтернативные изображения».
+- **Prod @`d47c300`** (includes `2004e4b`): deploy-prod-next OK; CSS с min-aspect-ratio / tall hero - заменяется следующим деплоем.
 
 ---
 

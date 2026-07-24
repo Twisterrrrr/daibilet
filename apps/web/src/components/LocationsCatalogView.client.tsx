@@ -18,8 +18,16 @@ import { LOCATION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, venueTypeLabel } fro
 import { venueHref } from '@/lib/routes';
 
 const LOCATIONS_HERO_FRAMES = [
-  { src: '/images/hero/hero-slavic-04.png', alt: 'Набережная и точка старта прогулки' },
-  { src: '/images/hero/hero-slavic-01.png', alt: 'Городская локация у воды' },
+  {
+    src: '/images/hero/hero-slavic-04.png',
+    ultrawideSrc: '/images/hero/hero-slavic-04-uw.jpg',
+    alt: 'Набережная и точка старта прогулки',
+  },
+  {
+    src: '/images/hero/hero-slavic-01.png',
+    ultrawideSrc: '/images/hero/hero-slavic-01-uw.jpg',
+    alt: 'Городская локация у воды',
+  },
 ];
 
 type SortMode = 'events' | 'asc' | 'desc';

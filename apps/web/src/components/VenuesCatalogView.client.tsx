@@ -19,8 +19,16 @@ import { INSTITUTION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, venueTypeLabel } 
 import { venueHref } from '@/lib/routes';
 
 const VENUES_HERO_FRAMES = [
-  { src: '/images/hero/hero-slavic-03.png', alt: 'Зал музея или театра' },
-  { src: '/images/hero/hero-slavic-05.png', alt: 'Городская площадка' },
+  {
+    src: '/images/hero/hero-slavic-03.png',
+    ultrawideSrc: '/images/hero/hero-slavic-03-uw.jpg',
+    alt: 'Зал музея или театра',
+  },
+  {
+    src: '/images/hero/hero-slavic-05.png',
+    ultrawideSrc: '/images/hero/hero-slavic-05-uw.jpg',
+    alt: 'Городская площадка',
+  },
 ];
 
 type SortMode = 'events' | 'asc' | 'desc';

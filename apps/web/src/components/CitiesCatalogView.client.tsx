@@ -16,8 +16,16 @@ import { pluralCities, pluralEvents } from '@/lib/format';
 type SortMode = 'events' | 'asc' | 'desc';
 
 const CITIES_HERO_FRAMES = [
-  { src: '/images/hero/hero-slavic-01.png', alt: 'Туристы гуляют по исторической улице' },
-  { src: '/images/hero/hero-slavic-04.png', alt: 'Вечерние огни города с набережной' },
+  {
+    src: '/images/hero/hero-slavic-01.png',
+    ultrawideSrc: '/images/hero/hero-slavic-01-uw.jpg',
+    alt: 'Туристы гуляют по исторической улице',
+  },
+  {
+    src: '/images/hero/hero-slavic-04.png',
+    ultrawideSrc: '/images/hero/hero-slavic-04-uw.jpg',
+    alt: 'Вечерние огни города с набережной',
+  },
 ];
 
 export function CitiesCatalogView({ destinations }: { destinations: PublicDestinationDto[] }) {

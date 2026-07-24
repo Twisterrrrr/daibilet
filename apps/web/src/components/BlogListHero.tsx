@@ -25,8 +25,16 @@ const HERO_TOPIC_LABELS: Partial<Record<BlogTopicId, string>> = {
 const HERO_TOPIC_IDS: BlogTopicId[] = ['standup', 'routes', 'kids', 'concerts'];
 
 const BLOG_HERO_FRAMES = [
-  { src: '/images/hero/hero-slavic-02.png', alt: 'Пара туристов на набережной' },
-  { src: '/images/hero/hero-slavic-06.png', alt: 'Семья на речной прогулке' },
+  {
+    src: '/images/hero/hero-slavic-02.png',
+    ultrawideSrc: '/images/hero/hero-slavic-02-uw.jpg',
+    alt: 'Пара туристов на набережной',
+  },
+  {
+    src: '/images/hero/hero-slavic-06.png',
+    ultrawideSrc: '/images/hero/hero-slavic-06-uw.jpg',
+    alt: 'Семья на речной прогулке',
+  },
 ];
 
 type BlogListHeroProps = {

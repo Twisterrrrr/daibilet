@@ -1,10 +1,6 @@
 import * as React from 'react';
 
 import { PageBreadcrumbBar, type BreadcrumbItem } from '@/components/PageBreadcrumbs';
-import {
-  HERO_LAYOUT_MEDIA_CONTENT_CLASS,
-  HERO_LAYOUT_MEDIA_SECTION_CLASS,
-} from '@/lib/home-hero-images';
 
 export type HeroVariant = 'minimal' | 'withMap' | 'imageOverlay' | 'split' | 'video';
 
@@ -131,17 +127,13 @@ export function HeroLayout({
   }
 
   // imageOverlay | video | withMap - full-bleed media plane
-  // Ultrawide: raise min-height so 3:2 object-cover is not a thin strip that eats faces.
+  // Высота как до ultrawide min-h фикса: контент + padding. Широкие кадры - в HeroMedia.
   return (
     <>
       {breadcrumbs?.length ? <PageBreadcrumbBar items={breadcrumbs} /> : null}
-      <section
-        className={`relative overflow-hidden ${HERO_LAYOUT_MEDIA_SECTION_CLASS} ${t.section} ${className}`.trim()}
-      >
+      <section className={`relative overflow-hidden ${t.section} ${className}`.trim()}>
         {media}
-        <div
-          className={`container-page relative z-10 pb-12 pt-12 sm:pb-16 sm:pt-16 ${HERO_LAYOUT_MEDIA_CONTENT_CLASS}`.trim()}
-        >
+        <div className="container-page relative z-10 pb-12 pt-12 sm:pb-16 sm:pt-16">
           {variant === 'withMap' && aside ? (
             <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(280px,0.85fr)] lg:items-end">
               <div className="min-w-0">
