@@ -11,10 +11,10 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| CC.1 | Policy: нет Event/Venue без cover; после TC/TEP import - promote CDN, иначе generate | Критический | 🔄 |
-| CC.2 | Fix lean venue fallback: принимать `/images/events|venues/*` (не только https) | Критический | 🔄 |
-| CC.3 | `scripts/ensure-catalog-covers.js` + hook в `tc:sync` / `tep:sync` / worker | Критический | 🔄 |
-| CC.4 | Prod backfill: promote + generate пустые hubs (Sortavala и др.) | Критический | ⏳ |
+| CC.1 | Policy: нет Event/Venue без cover; после TC/TEP import - promote CDN, иначе generate | Критический | ✅ `4f11520` |
+| CC.2 | Fix lean venue fallback: принимать `/images/events|venues/*` (не только https) | Критический | ✅ `4f11520` |
+| CC.3 | `scripts/ensure-catalog-covers.js` + hook в `tc:sync` / `tep:sync` / worker | Критический | ✅ `4f11520` |
+| CC.4 | Prod backfill: promote + generate пустые hubs (Sortavala и др.) | Критический | ✅ venues promote 939 + gen 9; events 55 (11 groups); `no_hero=0` / `no_image=0` @`5fcc79d` |
 
 ---
 
@@ -53,7 +53,7 @@
 | H.8f | `/blog` afisha promo: цена/события/chips по geo; full-width после 3 статей фида | Критический | 🚫 owner: не убирать из угла |
 | H.8f-fix | Blog afisha promo: split server `resolveBlogSidebarPromoMap` (pg out of client) | Критический | ✅ `d47c300` prod |
 | H.8g | `/blog`: swap «Свежее»↔Featured; rich Афиша в углу под Fresh; убрать mid-feed strip | Критический | ✅ `9be0a98` prod @`ab1dc94` |
-| H.8h | `/blog` featured/large: длиннее excerpt, без mt-auto/flex-1 дыры над CTA | Критический | ✅ `55aaa9d` |
+| H.8h | `/blog` featured/large: длиннее excerpt, без mt-auto/flex-1 дыры над CTA | Критический | ✅ `55aaa9d` prod @`5fcc79d` |
 | H.9 | Ultrawide heroes: min-h + face-safe object-position (home+catalog HeroMedia) | Критический | 🚫 reverted (гигантский hero) |
 | H.9b | Ultrawide: альтернативные 21:9 кадры (`*-uw.jpg`) + `<picture>`, без min-h inflation | Критический | ✅ `a2531f5` prod |
 

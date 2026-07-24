@@ -13,7 +13,7 @@
 
 ### Проблемы
 
-- Нет. **Prod @fcc79d\** (включает -aaa9d\): \/blog\ 200; featured lead ~894 символа, \line-clamp-[8]/[10]\, без \mt-auto\ у CTA.
+- Нет. **Prod @`5fcc79d`** (включает `55aaa9d`): `/blog` 200; featured lead ~894 символа, `line-clamp-[8]/[10]`, без `mt-auto` у CTA.
 
 ---
 
@@ -51,7 +51,7 @@
 
 ### Проблемы
 
-- Нет (commit + deploy + backfill).
+- Нет. **Prod @`5fcc79d` (includes `4f11520`):** backfill `ensure-catalog-covers` → venues **promoted 939** + **generated 9**; events **55** updated (**11** unique sharp covers). DB: `venues_no_hero=0`, `events_no_image=0`. Sortavala `glavnaya-ploschad-sortavala-*` → local TC jpg. API `/api/public/venues` sample 30/30 with hero. Harry Potter taboo на home не трогали.
 
 ---
 
