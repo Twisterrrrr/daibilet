@@ -14,7 +14,7 @@
 
 ### Проблемы
 
-- Нет (commit + deploy ниже).
+- Нет. **Prod @`982d89c`:** deploy-prod-next OK; `/` `/venues` `/events` 200; HTML/chunks без `*-uw.jpg` / `HERO_ULTRAWIDE`; orphan `apps/web/public/images/hero/*-uw.jpg` сняты с диска; photo frames venues 03/05 без ultrawideSrc.
 
 ---
 
