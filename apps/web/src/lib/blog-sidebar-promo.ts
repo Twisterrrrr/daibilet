@@ -129,45 +129,6 @@ export function buildBlogSidebarPromoFromCityPage(page: PublicCityPageDto): Blog
   };
 }
 
-function collectCitySlugs(posts: BlogCardDto[]): string[] {
-  const slugs = new Set<string>(PRIORITY_LISTING_CITY_SLUGS);
-  for (const post of posts) {
-    const slug = normalizeKnownCitySlug(post.citySlug);
-    if (slug) slugs.add(slug);
-  }
-  return [...slugs];
-}
-
-/**
- * Prefetch sidebar promo payloads keyed by city name + slug (lowercase).
- * Priority cities always included so header geo (Москва и т.п.) hits cache.
- */
-export async function resolveBlogSidebarPromoMap(
-  posts: BlogCardDto[],
-): Promise<Record<string, BlogSidebarPromoDto>> {
-  const result: Record<string, BlogSidebarPromoDto> = {};
-  const slugs = collectCitySlugs(posts);
-  const { buildPublicCityDto } = await import('@daibilet/backend/public-read');
-
-  await Promise.all(
-    slugs.map(async (slug) => {
-      try {
-        const page = await buildPublicCityDto(slug);
-        if (!page) return;
-        const promo = buildBlogSidebarPromoFromCityPage(page);
-        if (!promo) return;
-        for (const key of indexKeys(promo.cityName, promo.citySlug)) {
-          result[key] = promo;
-        }
-      } catch {
-        // city hub may be empty offline
-      }
-    }),
-  );
-
-  return result;
-}
-
 export function lookupBlogSidebarPromo(
   map: Record<string, BlogSidebarPromoDto>,
   candidates: Array<string | null | undefined>,
@@ -179,4 +140,19 @@ export function lookupBlogSidebarPromo(
     if (normalized && map[normalized]) return map[normalized];
   }
   return null;
+}
+
+/** Exported for server prefetch (blog-sidebar-promo.server.ts). */
+export function blogSidebarPromoIndexKeys(cityName: string, citySlug: string): string[] {
+  return indexKeys(cityName, citySlug);
+}
+
+/** Exported for server prefetch (blog-sidebar-promo.server.ts). */
+export function collectBlogSidebarPromoCitySlugs(posts: BlogCardDto[]): string[] {
+  const slugs = new Set<string>(PRIORITY_LISTING_CITY_SLUGS);
+  for (const post of posts) {
+    const slug = normalizeKnownCitySlug(post.citySlug);
+    if (slug) slugs.add(slug);
+  }
+  return [...slugs];
 }

@@ -7,8 +7,8 @@ import { buildBlogListMetadata } from '@/lib/blog-article-seo';
 import { resolveBlogHotMinPrices } from '@/lib/blog-hot-prices';
 import {
   resolveBlogSidebarPromoMap,
-  type BlogSidebarPromoDto,
-} from '@/lib/blog-sidebar-promo';
+} from '@/lib/blog-sidebar-promo.server';
+import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import { expandListingExcerpt, mergeBlogCards, splitBlogListingHero } from '@/lib/blog-utils';
 import { buildPublicArticlesListDto } from '@daibilet/backend/public-read';
 

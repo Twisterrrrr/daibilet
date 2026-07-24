@@ -196,6 +196,22 @@ outes.ts (паритет с backend publicCitySlug).
 
 ---
 
+## 2026-07-24 - Blog afisha promo: pg out of client bundle
+
+### Наблюдения
+
+- `e43ee4e` ломал `next build`: `BlogAfishaPromo.client` тянул `blog-sidebar-promo` с dynamic `public-read` → webpack `Can't resolve 'net'|'tls'` (pg).
+
+### Решения
+
+- `resolveBlogSidebarPromoMap` вынесен в `blog-sidebar-promo.server.ts`; client импортирует только pure helpers/types.
+
+### Проблемы
+
+- Параллельный deploy-prod на e43ee4e падал; web оставался inactive до фикса.
+
+---
+
 ## 2026-07-24 - Ultrawide: hero strip crop (home + catalog)
 
 ### Наблюдения
