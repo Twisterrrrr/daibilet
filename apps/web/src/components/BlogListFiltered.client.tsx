@@ -327,12 +327,12 @@ export function BlogListFiltered({
         <>
           {viewMode === 'list' ? (
             <BlogListRows
-              posts={visiblePosts}
+              posts={displayPosts}
               insertAfter={
-                visiblePosts.length >= AFISHA_AFTER_POSTS ? AFISHA_AFTER_POSTS : 0
+                displayPosts.length >= AFISHA_AFTER_POSTS ? AFISHA_AFTER_POSTS : 0
               }
               insert={
-                visiblePosts.length >= AFISHA_AFTER_POSTS ? (
+                displayPosts.length >= AFISHA_AFTER_POSTS ? (
                   <BlogAfishaPromo
                     promos={afishaPromos}
                     fallbackCityName={afishaFallbackCityName}
@@ -343,9 +343,9 @@ export function BlogListFiltered({
             />
           ) : (
             <BlogMagazineGrid
-              posts={visiblePosts}
+              posts={displayPosts}
               afterFirstBlock={
-                visiblePosts.length > 0 ? (
+                displayPosts.length > 0 ? (
                   <BlogAfishaPromo
                     promos={afishaPromos}
                     fallbackCityName={afishaFallbackCityName}
