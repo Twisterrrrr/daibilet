@@ -7,6 +7,8 @@
  *   hero/      — фон главной
  *   events/    — обложки событий (fallback)
  *   landings/  — промо подборок
+ *   home/      — format/thematic tiles на главной
+ *   venues/    — обложки площадок (если есть)
  *
  * Назначение: apps/web/public/images/
  */
@@ -24,7 +26,7 @@ const sourceRoots = [
   path.join(repoRoot, 'deploy/assets/images'),
 ];
 
-const SUBDIRS = ['blog', 'cities', 'hero', 'events', 'landings'];
+const SUBDIRS = ['blog', 'cities', 'hero', 'events', 'landings', 'home', 'venues'];
 
 function copyDir(sourceDir, targetDir) {
   if (!fs.existsSync(sourceDir)) return 0;

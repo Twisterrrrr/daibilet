@@ -23,7 +23,7 @@
 | CU.8b | Home format + thematic tiles: photo covers вместо градиентов | Высокий | ✅ |
 | CU.8c | EventCard pin lines: адрес/город vs provider secondary | Высокий | ✅ |
 | CU.8d | Home featured blog: white title on dark overlay | Высокий | ✅ |
-| CU.9 | Commit + deploy для owner review | Критический | 🔄 |
+| CU.9 | Commit + deploy для owner review | Критический | ✅ `17a56af` (p2) + `4a69541` (p3-4) |
 | CU.10 | Blog surfaces + search overlay polish | Средний | ✅ |
 | CU.11 | Micro-animations (hover translate/scale) | Низкий | ✅ |
 | CU.2b | Self-host через next/font когда пакет next/font полный на билде | Средний | ⏳ |
