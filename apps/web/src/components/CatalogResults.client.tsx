@@ -36,7 +36,7 @@ export function CatalogResults({ items, viewMode, onViewModeChange }: CatalogRes
   return (
     <>
       {viewMode === 'list' ? (
-        <ul className="mt-4 space-y-3">
+        <ul className="mt-4 space-y-4 sm:space-y-5">
           {items.map((session) => (
             <li key={`${session.id}-${session.startsAt}`}>
               <EventCardHorizontal session={session} />
@@ -46,7 +46,7 @@ export function CatalogResults({ items, viewMode, onViewModeChange }: CatalogRes
       ) : viewMode === 'table' ? (
         <CatalogTable items={items} />
       ) : (
-        <ul className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        <ul className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4">
           {items.map((session) => (
             <li key={`${session.id}-${session.startsAt}`}>
               <EventCard session={session} compact />

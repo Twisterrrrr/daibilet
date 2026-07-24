@@ -23,7 +23,7 @@ export function HomeNowSection({ tabs }: { tabs: HomeNowTab[] }) {
   if (!current) return null;
 
   return (
-    <section id="events" className="bg-slate-50 py-10 sm:py-14">
+    <section id="events" className="section-y bg-surface-muted">
       <div className="container-page min-w-0">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
@@ -88,7 +88,7 @@ export function HomeEventRail({
   if (!events.length) return null;
 
   return (
-    <section id={id} className="py-10 sm:py-14">
+    <section id={id} className="section-y">
       <div className="container-page min-w-0">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>

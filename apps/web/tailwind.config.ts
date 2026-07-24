@@ -17,6 +17,13 @@ const config: Config = {
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        graphite: {
+          DEFAULT: 'hsl(var(--graphite))',
+          muted: 'hsl(var(--graphite-muted))',
+        },
+        surface: {
+          muted: 'hsl(var(--surface-muted))',
+        },
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
@@ -50,13 +57,31 @@ const config: Config = {
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['Manrope', 'Inter', 'system-ui', 'sans-serif'],
         serif: ['Source Serif 4', 'Georgia', 'Times New Roman', 'serif'],
+      },
+      fontSize: {
+        'ui-xs': ['0.75rem', { lineHeight: '1.35' }], /* 12px */
+        'ui-sm': ['0.875rem', { lineHeight: '1.45' }], /* 14px */
+        'heading-sm': ['1.5rem', { lineHeight: '1.25', fontWeight: '700' }], /* 24px */
+        'heading': ['1.75rem', { lineHeight: '1.2', fontWeight: '700' }], /* 28px */
+        'heading-lg': ['2rem', { lineHeight: '1.15', fontWeight: '700' }], /* 32px */
       },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
         sm: 'calc(var(--radius) - 4px)',
+        card: 'var(--radius-card)',
+      },
+      boxShadow: {
+        card: 'var(--shadow-card)',
+        'card-hover': 'var(--shadow-card-hover)',
+      },
+      spacing: {
+        section: 'var(--space-section)',
+        'section-lg': 'var(--space-section-lg)',
+        card: 'var(--space-card)',
+        'card-lg': 'var(--space-card-lg)',
       },
     },
   },

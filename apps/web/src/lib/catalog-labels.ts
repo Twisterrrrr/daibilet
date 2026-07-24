@@ -85,6 +85,15 @@ export function isCatalogSubcategoryLabel(tag: string, category?: string | null)
   return true;
 }
 
+/** Длительность из тегов поставщика (для meta-ряда карточки). */
+export function extractDurationLabel(tags?: string[] | null): string | null {
+  for (const tag of tags || []) {
+    const value = String(tag || '').trim();
+    if (DURATION_TAG_RE.test(value)) return value;
+  }
+  return null;
+}
+
 /** Только подкатегории из taxonomy; если пусто — жанровые теги без правил площадки. */
 export function collectCatalogLabels(
   session: Pick<PublicSessionDto, 'subcategories' | 'tags' | 'category' | 'title' | 'venue'>,

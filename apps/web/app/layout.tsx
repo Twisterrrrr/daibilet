@@ -18,6 +18,10 @@ const LOGO_192 = '/logo-192x192.png';
 const APPLE_TOUCH = '/apple-touch-icon.png';
 const FAVICON_ICO = '/favicon.ico';
 
+/** Clean UI: Manrope (H) + Inter (UI) + Source Serif (legacy editorial). */
+const FONTS_HREF =
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;600;700&display=swap';
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   applicationName: SITE_NAME,
@@ -98,12 +102,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="ru">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href={FONTS_HREF} rel="stylesheet" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
         />
       </head>
-      <body>
+      <body className="font-body">
         <ChunkLoadRecovery />
         {children}
       </body>

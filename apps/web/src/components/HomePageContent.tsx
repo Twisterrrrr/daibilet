@@ -102,7 +102,7 @@ export async function HomePageContent() {
       />
 
       {topCities.length ? (
-        <section id="destinations" className="border-b border-slate-100 py-12 sm:py-16">
+        <section id="destinations" className="section-y border-b border-slate-100">
           <div className="container-page">
             <div className="flex items-end justify-between gap-4">
               <div>
@@ -127,7 +127,7 @@ export async function HomePageContent() {
       {homeNowTabs.length ? <HomeNowSection tabs={homeNowTabs} /> : null}
 
       {popular.length ? (
-        <section className="py-12 sm:py-16">
+        <section className="section-y">
           <div className="container-page">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
@@ -142,7 +142,7 @@ export async function HomePageContent() {
                 Открыть каталог <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            <ul className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            <ul className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
               {popular.map((session) => (
                 <li key={session.id}>
                   <EventCard session={session} />
@@ -153,7 +153,7 @@ export async function HomePageContent() {
         </section>
       ) : null}
 
-      <section id="formats" className="py-12 sm:py-16">
+      <section id="formats" className="section-y">
         <div className="container-page">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
@@ -181,7 +181,7 @@ export async function HomePageContent() {
       </section>
 
       {homeVenues.length ? (
-        <section id="venues" className="border-t border-slate-100 py-12 sm:py-16">
+        <section id="venues" className="section-y border-t border-slate-100">
           <div className="container-page">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
@@ -202,7 +202,7 @@ export async function HomePageContent() {
       ) : null}
 
       {promoLandings.length ? (
-        <section id="landings" className="py-12 sm:py-16">
+        <section id="landings" className="section-y">
           <div className="container-page">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
@@ -235,7 +235,7 @@ export async function HomePageContent() {
       ) : null}
 
       {featuredBlog ? (
-        <section id="blog" className="bg-slate-50 py-12 sm:py-16">
+        <section id="blog" className="section-y bg-surface-muted">
           <div className="container-page">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
@@ -294,7 +294,7 @@ export async function HomePageContent() {
         </section>
       ) : null}
 
-      <section className="py-12 sm:py-16">
+      <section className="section-y">
         <div className="container-page">
           <h2 className="font-display text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Почему выбирают Дайбилет</h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -309,7 +309,7 @@ export async function HomePageContent() {
         </div>
       </section>
 
-      <section id="partner" className="bg-gradient-to-r from-primary-600 to-sky-500 py-12 sm:py-16">
+      <section id="partner" className="section-y bg-gradient-to-r from-primary-600 to-sky-500">
         <div className="container-page">
           <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-between">
             <div className="text-center sm:text-left">

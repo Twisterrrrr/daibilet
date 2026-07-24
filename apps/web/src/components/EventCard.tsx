@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Clock, MapPin, Star, Ticket } from 'lucide-react';
+import { Clock, MapPin, Star, Ticket, Users } from 'lucide-react';
 
 import { EventFavoriteButton } from '@/components/EventFavoriteButton.client';
 import {
@@ -12,7 +12,7 @@ import {
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
-import { collectCatalogLabels } from '@/lib/catalog-labels';
+import { collectCatalogLabels, extractDurationLabel } from '@/lib/catalog-labels';
 import { EventImageBadges } from '@/lib/event-card-badges';
 import {
   collectDisplaySlotLabels,
@@ -28,20 +28,20 @@ import {
 } from '@/lib/event-card-meta';
 import { resolveEventCardObjectPosition } from '@/lib/event-image-focus';
 import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
-import { formatMoneyRange, formatPriceFrom } from '@/lib/format';
+import { formatMoneyRange } from '@/lib/format';
 import { eventHref } from '@/lib/routes';
 
 const SLOT_CHIP_CLASS =
-  'inline-btn inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-full bg-slate-100 px-2.5 text-[10px] font-medium leading-none text-slate-700';
+  'inline-btn inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-md bg-surface-muted px-2.5 text-ui-xs font-medium leading-none text-graphite-muted';
 
 const SLOT_CHIP_PURCHASE_CLASS =
   'transition hover:bg-primary/10 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 
 const DETAILS_LINK_CLASS =
-  'relative z-[2] inline-flex items-center gap-1 text-[10px] font-medium text-primary-600 transition hover:text-primary-700 sm:text-xs';
+  'relative z-[2] inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-ui-xs font-semibold text-white transition hover:bg-primary-700 sm:text-ui-sm';
 
 const TITLE_LINK_CLASS =
-  'relative z-[2] line-clamp-4 text-sm font-semibold leading-relaxed text-slate-900 transition-colors hover:text-primary-600 sm:text-base';
+  'relative z-[2] line-clamp-3 font-display text-ui-sm font-bold leading-snug text-graphite transition-colors hover:text-primary-600 sm:text-base';
 
 type CatalogCardSession = PublicSessionDto | PublicCatalogListItemDto;
 
@@ -75,7 +75,7 @@ export function EventCard({
   });
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const destinationLabel = resolveEventCardDestinationLabel(session);
-  const highlights = collectCatalogLabels(session);
+  const highlights = collectCatalogLabels(session, 2);
   const openDate = isOpenDate(session);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(session.startsAt);
   const nextSessionLabel = openDate ? null : formatEventNextSession(session);
@@ -84,21 +84,19 @@ export function EventCard({
   const sessionMetaLabel = openDate ? null : nextSessionLabel;
   const pseudoRating = resolvePseudoRating(session.groupKey || session.id);
   const locationLabel = resolveEventCardLocationLabel(session);
+  const durationLabel = extractDurationLabel(session.tags);
+  const ageLabel = session.ageLimit?.trim() || null;
   const showSoonBadge = !hasPrice && !openDate && !departingSoonMinutes;
-  const priceBadgeLabel = formatPriceFrom(session.priceFrom);
   const priceFooterLabel = formatMoneyRange(session.priceFrom, session.priceTo);
   const purchase = useCatalogPurchase(session);
   // Catalog list: no hidden widget DOM. Purchase UX lives on event page / landing CTA.
   const showPurchaseWidgets = landingActions && !suppressPurchaseAnchors && purchase.purchaseEnabled;
 
-  const cardClassName =
-    'group flex h-full flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-slate-200/60';
-
   const cardBody = (
     <>
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-slate-100">
+      <div className="relative aspect-[16/9] w-full overflow-hidden bg-surface-muted">
         {landingActions ? (
-          <Link href={href} className="absolute inset-0 z-[1] rounded-t-xl" aria-label={`Страница события: ${session.title}`} />
+          <Link href={href} className="absolute inset-0 z-[1]" aria-label={`Страница события: ${session.title}`} />
         ) : null}
         <SafeImage
           src={session.imageUrl}
@@ -106,64 +104,80 @@ export function EventCard({
           fill
           sizes={IMAGE_SIZES.eventCard}
           style={{ objectPosition: imageObjectPosition }}
-          className="object-cover transition-transform duration-500 group-hover:scale-110"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           fallback={
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-300/80 bg-white/60 shadow-sm">
+            <div className="flex h-full w-full items-center justify-center bg-surface-muted">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 shadow-sm">
                 <div className="h-3.5 w-3.5 rotate-45 rounded-[6px] border border-slate-300/90 bg-slate-200/90" />
               </div>
             </div>
           }
         />
 
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
         <EventImageBadges event={session} showSoonBadge={showSoonBadge} />
         <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
-
-        {hasPrice ? (
-          <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3">
-            <span className="rounded-full bg-primary-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm sm:px-4 sm:py-2 sm:text-sm">
-              {priceBadgeLabel}
-            </span>
-          </div>
-        ) : null}
       </div>
 
-      <div className={`flex flex-1 flex-col ${compact ? 'p-3' : 'p-3 sm:p-4'}`}>
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[10px] text-slate-500 sm:text-xs">
-          <span className="inline-flex shrink-0 items-center gap-0.5">
-            <Star className="h-3 w-3 fill-amber-400 text-amber-400 sm:h-3.5 sm:w-3.5" />
-            <span className="font-medium text-slate-700">{pseudoRating.toFixed(1)}</span>
-          </span>
-          {session.category ? (
-            <span className="truncate rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-normal text-slate-600 sm:text-xs">
-              {session.category}
-            </span>
-          ) : null}
-          {destinationLabel ? (
-            <span className="inline-flex min-w-0 max-w-full items-center gap-0.5 text-slate-500">
-              <MapPin className="h-3 w-3 shrink-0" />
-              <span className="truncate">{destinationLabel}</span>
-            </span>
-          ) : null}
-        </div>
-
-        <h2 className="mt-2">
+      <div className={`flex flex-1 flex-col gap-3 ${compact ? 'p-4' : 'p-4 sm:p-5'}`}>
+        <h2>
           <Link href={href} className={TITLE_LINK_CLASS}>
             {session.title}
           </Link>
         </h2>
 
-        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[10px] text-slate-500 sm:gap-x-3 sm:text-xs">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          <span className="event-card-meta">
+            <Star className="event-card-meta-icon" />
+            <span className="font-medium text-graphite">{pseudoRating.toFixed(1)}</span>
+          </span>
+          {durationLabel ? (
+            <span className="event-card-meta">
+              <Clock className="event-card-meta-icon" />
+              <span className="truncate">{durationLabel}</span>
+            </span>
+          ) : null}
+          {ageLabel ? (
+            <span className="event-card-meta">
+              <Users className="event-card-meta-icon" />
+              <span className="truncate">{ageLabel}</span>
+            </span>
+          ) : null}
+          {destinationLabel ? (
+            <span className="event-card-meta max-w-full">
+              <MapPin className="event-card-meta-icon" />
+              <span className="truncate">{destinationLabel}</span>
+            </span>
+          ) : null}
+        </div>
+
+        {(session.category || highlights.length > 0) && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            {session.category ? (
+              <span className="rounded-md bg-surface-muted px-2 py-0.5 text-ui-xs font-medium text-graphite-muted">
+                {session.category}
+              </span>
+            ) : null}
+            {highlights.map((label) => (
+              <span key={label} className="rounded-md bg-surface-muted px-2 py-0.5 text-ui-xs font-medium text-graphite-muted">
+                {label}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-ui-xs text-graphite-muted">
           {openDate ? (
-            <span className="font-medium text-emerald-600">Билет с открытой датой</span>
+            <span className="font-medium text-success">Билет с открытой датой</span>
           ) : departingSoonMinutes ? (
-            <span className="inline-flex animate-pulse items-center gap-1 font-medium text-orange-600">
-              <Clock className="h-3 w-3" />
+            <span className="inline-flex items-center gap-1 font-medium text-urgency">
+              <Clock className="event-card-meta-icon" />
               Через {departingSoonMinutes} мин
             </span>
           ) : sessionMetaLabel ? (
-            <span className="font-medium text-primary-600">{sessionMetaLabel}</span>
+            <span className="inline-flex items-center gap-1 font-medium text-graphite">
+              <Clock className="event-card-meta-icon" />
+              {sessionMetaLabel}
+            </span>
           ) : (
             <span>
               {session.dateLabel}
@@ -173,19 +187,8 @@ export function EventCard({
           {locationLabel ? <span className="line-clamp-1">{locationLabel}</span> : null}
         </div>
 
-        {highlights.length > 0 ? (
-          <ul className="mt-2 space-y-0.5 text-[10px] leading-relaxed text-slate-600 sm:text-xs">
-            {highlights.map((highlight) => (
-              <li key={highlight} className="flex gap-1.5">
-                <span className="text-primary-500">•</span>
-                <span className="line-clamp-1">{highlight}</span>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-
         {showSlotPills ? (
-          <div className="mt-2 flex flex-wrap items-start gap-1.5">
+          <div className="flex flex-wrap items-start gap-1.5">
             {displaySlotLabels.map((label) =>
               showPurchaseWidgets ? (
                 <CatalogPurchaseChip
@@ -219,19 +222,19 @@ export function EventCard({
           />
         ) : null}
 
-        <div className="mt-auto flex items-center justify-between gap-2 pt-3">
+        <div className="mt-auto flex items-center justify-between gap-3 pt-1">
           {landingActions ? (
             <LandingPurchaseButton
               session={session}
               label={hasPrice ? `Купить от ${formatPriceRub(session.priceFrom)} ₽` : 'Купить'}
-              className="relative z-[2] inline-flex w-full items-center justify-center rounded-lg bg-primary-600 px-3 py-2 text-xs font-semibold text-white hover:bg-primary-700 sm:text-sm"
+              className="relative z-[2] inline-flex w-full items-center justify-center rounded-xl bg-primary-600 px-3 py-2.5 text-ui-sm font-semibold text-white hover:bg-primary-700"
             />
           ) : (
             <>
-              <span className="text-sm font-semibold text-slate-900">{priceFooterLabel}</span>
+              <span className="text-ui-sm font-bold text-graphite sm:text-base">{priceFooterLabel}</span>
               <Link href={href} className={DETAILS_LINK_CLASS}>
-                <Ticket className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                Подробнее →
+                <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} />
+                Подробнее
               </Link>
             </>
           )}
@@ -241,12 +244,12 @@ export function EventCard({
   );
 
   if (landingActions) {
-    return <article className={`relative ${cardClassName}`}>{cardBody}</article>;
+    return <article className="event-card">{cardBody}</article>;
   }
 
   return (
-    <article className={`relative ${cardClassName}`}>
-      <Link href={href} className="absolute inset-0 z-[1] rounded-xl" aria-label={`Событие: ${session.title}`} />
+    <article className="event-card">
+      <Link href={href} className="absolute inset-0 z-[1] rounded-card" aria-label={`Событие: ${session.title}`} />
       {cardBody}
     </article>
   );
@@ -274,77 +277,77 @@ function ShowcaseEventCard({
   const locationLabel = resolveEventCardLocationLabel(session);
   const venueLine = [locationLabel, cityLabel].filter(Boolean).join(' · ');
   const categoryLabel = session.category?.trim() || null;
+  const durationLabel = extractDurationLabel(session.tags);
+  const priceLabel = hasPrice ? formatShowcasePriceLabel(session.priceFrom) : 'Скоро';
 
   return (
-    <article
-      className={`group relative flex h-full cursor-pointer flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-lg hover:shadow-slate-200/60 ${
-        rail ? 'min-h-[340px]' : ''
-      }`}
-    >
-      <Link href={href} className="absolute inset-0 z-[1] rounded-xl" aria-label={`Событие: ${session.title}`} />
-      <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden bg-slate-100">
+    <article className={`event-card ${rail ? 'min-h-[340px]' : ''}`}>
+      <Link href={href} className="absolute inset-0 z-[1] rounded-card" aria-label={`Событие: ${session.title}`} />
+      <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden bg-surface-muted">
         <SafeImage
           src={session.imageUrl}
           alt={session.title}
           fill
           sizes={IMAGE_SIZES.eventCard}
           style={{ objectPosition: imageObjectPosition }}
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           fallback={
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-3xl">
-              🎫
+            <div className="flex h-full w-full items-center justify-center bg-surface-muted text-3xl text-graphite-muted">
+              ·
             </div>
           }
         />
 
         <EventImageBadges event={session} rail={rail} editorsPick={editorsPickBadge} />
         <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
-
-        <div className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3">
-          <span className="rounded-full bg-primary-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm sm:px-4 sm:py-2 sm:text-sm">
-            {hasPrice ? formatShowcasePriceLabel(session.priceFrom) : 'Скоро'}
-          </span>
-        </div>
       </div>
 
-      <div className={`flex min-h-0 flex-1 flex-col text-left ${rail ? 'gap-1.5 p-3' : 'gap-2 p-3 sm:p-4'}`}>
-        {rail ? (
-          <>
-            <div className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-slate-500">
-              <span className="inline-flex items-center gap-0.5">
-                <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                <span className="font-medium text-slate-700">{pseudoRating.toFixed(1)}</span>
-              </span>
-              {categoryLabel ? <span className="font-normal text-slate-600">{categoryLabel}</span> : null}
-            </div>
-            <p className="text-[11px] leading-snug text-slate-500">{dateLabel}</p>
-          </>
-        ) : (
-          <div className="flex w-full items-start justify-between gap-2 text-[10px] text-slate-500 sm:text-xs">
-            <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
-              <span className="inline-flex shrink-0 items-center gap-0.5">
-                <Star className="h-3 w-3 fill-amber-400 text-amber-400 sm:h-3.5 sm:w-3.5" />
-                <span className="font-medium text-slate-700">{pseudoRating.toFixed(1)}</span>
-              </span>
-              {categoryLabel ? <span className="truncate font-normal text-slate-600">{categoryLabel}</span> : null}
-            </div>
-            <span className="shrink-0 text-right font-medium text-slate-500">{dateLabel}</span>
-          </div>
-        )}
-        <h3
-          className={`font-display font-bold leading-snug ${
-            rail ? 'line-clamp-4 text-sm' : 'line-clamp-4 text-sm sm:text-base'
-          }`}
-        >
-          <Link href={href} className={`${TITLE_LINK_CLASS} font-display font-bold`}>
+      <div className={`flex min-h-0 flex-1 flex-col gap-3 text-left ${rail ? 'p-4' : 'p-4 sm:p-5'}`}>
+        <h3 className={`font-display font-bold leading-snug text-graphite ${rail ? 'line-clamp-3 text-ui-sm' : 'line-clamp-3 text-ui-sm sm:text-base'}`}>
+          <Link href={href} className={`${TITLE_LINK_CLASS}`}>
             {session.title}
           </Link>
         </h3>
+
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          <span className="event-card-meta">
+            <Star className="event-card-meta-icon" />
+            <span className="font-medium text-graphite">{pseudoRating.toFixed(1)}</span>
+          </span>
+          {durationLabel ? (
+            <span className="event-card-meta">
+              <Clock className="event-card-meta-icon" />
+              <span className="truncate">{durationLabel}</span>
+            </span>
+          ) : null}
+          {categoryLabel ? (
+            <span className="rounded-md bg-surface-muted px-2 py-0.5 text-ui-xs font-medium text-graphite-muted">
+              {categoryLabel}
+            </span>
+          ) : null}
+        </div>
+
+        <p className="event-card-meta">
+          <Clock className="event-card-meta-icon" />
+          <span>{dateLabel}</span>
+        </p>
+
         {venueLine ? (
-          <p className={`mt-auto text-slate-500 ${rail ? 'line-clamp-2 text-[11px] leading-snug' : 'truncate text-xs sm:text-sm'}`}>
-            {venueLine}
+          <p className={`mt-auto event-card-meta ${rail ? 'line-clamp-2' : 'truncate'}`}>
+            <MapPin className="event-card-meta-icon" />
+            <span>{venueLine}</span>
           </p>
-        ) : null}
+        ) : (
+          <div className="mt-auto" />
+        )}
+
+        <div className="flex items-center justify-between gap-3 pt-1">
+          <span className="text-ui-sm font-bold text-graphite">{priceLabel}</span>
+          <span className="inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-ui-xs font-semibold text-white sm:text-ui-sm">
+            <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} />
+            Подробнее
+          </span>
+        </div>
       </div>
     </article>
   );

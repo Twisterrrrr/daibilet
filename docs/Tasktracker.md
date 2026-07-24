@@ -1,9 +1,26 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-07-24
+**Обновлено:** 2026-07-25
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
+
+---
+
+## Clean & Contextual UI (2026-07-25)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| CU.1 | Токены + tailwind: fonts, radius 16, soft shadow, graphite, surface muted, section spacing | Критический | ✅ |
+| CU.2 | Шрифты Manrope + Inter (+ Source Serif legacy) в root layout (link; next/font follow-up) | Критический | ✅ |
+| CU.2b | Self-host через next/font когда пакет next/font полный на билде | Средний | ⏳ |
+| CU.3 | EventCard / EventCardHorizontal / showcase: Clean UI (фото, meta icons, цена+CTA) | Критический | ✅ |
+| CU.4 | Home rails + `/events` grid/list gap и section-y | Высокий | ✅ |
+| CU.5 | Header / SiteNav / footer под токены | Высокий | ⏳ |
+| CU.6 | Event detail page: воздух, meta, CTA | Высокий | ⏳ |
+| CU.7 | Catalog filters / chips toolbar | Средний | ⏳ |
+| CU.8 | CityCard / InstitutionCard / landing tiles | Средний | ⏳ |
+| CU.9 | Commit + deploy для owner review | Критический | 🔄 |
 
 ---
 

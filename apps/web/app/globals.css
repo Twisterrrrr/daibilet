@@ -1,30 +1,39 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
+    /* 60/30/10: white / graphite surfaces / brand blue CTA */
     --background: 0 0% 100%;
-    --foreground: 222 47% 11%;
+    --foreground: 210 9% 11%; /* #1A1D20 graphite */
     --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
-    --primary: 224 76% 48%;
+    --card-foreground: 210 9% 11%;
+    --primary: 221 83% 53%; /* brand blue ~#2563eb, близко к #0066FF */
     --primary-foreground: 0 0% 100%;
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 222 47% 11%;
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 9% 46%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 224 76% 48%;
+    --secondary: 210 17% 98%; /* #F8F9FA */
+    --secondary-foreground: 210 9% 11%;
+    --muted: 210 17% 98%;
+    --muted-foreground: 215 10% 46%;
+    --border: 214 16% 91%;
+    --input: 214 16% 91%;
+    --ring: 221 83% 53%;
     --urgency: 15 90% 55%;
     --success: 145 60% 42%;
-    --radius: 0.75rem;
-    --gradient-hero: linear-gradient(180deg, hsl(224, 76%, 48%) 0%, hsl(224, 76%, 38%) 100%);
+    --graphite: 210 9% 11%;
+    --graphite-muted: 215 10% 46%;
+    --surface-muted: 210 17% 98%;
+    --radius: 1rem; /* 16px cards */
+    --radius-card: 1rem;
+    --shadow-card: 0 1px 2px hsl(210 9% 11% / 0.04), 0 4px 16px hsl(210 9% 11% / 0.05);
+    --shadow-card-hover: 0 4px 12px hsl(210 9% 11% / 0.07), 0 12px 28px hsl(210 9% 11% / 0.06);
+    --space-section: 4rem; /* 64px */
+    --space-section-lg: 5rem; /* 80px */
+    --space-card: 1rem; /* 16px */
+    --space-card-lg: 1.5rem; /* 24px */
+    --gradient-hero: linear-gradient(180deg, hsl(221, 83%, 53%) 0%, hsl(221, 83%, 42%) 100%);
     --font-body: 'Inter', system-ui, sans-serif;
-    --font-display: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+    --font-display: 'Manrope', 'Inter', system-ui, sans-serif;
     --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
     --site-header-height: 4rem;
     --bridges-gradient-hero: radial-gradient(ellipse 90% 70% at 70% 40%, oklch(0.38 0.14 265 / 0.9), transparent 70%),
@@ -54,6 +63,8 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: var(--font-body);
+    font-size: 0.875rem; /* 14px UI base */
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     padding-left: env(safe-area-inset-left);
@@ -71,7 +82,7 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    @apply font-bold tracking-tight;
+    @apply font-bold tracking-tight text-graphite;
   }
 
   .font-display {
@@ -116,11 +127,11 @@
   }
 
   .catalog-toolbar {
-    @apply border-b border-slate-200 bg-white;
+    @apply border-b border-slate-200/80 bg-white;
   }
 
   .catalog-chip {
-    @apply inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
+    @apply inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
   }
 
   .horizontal-snap-row {
@@ -138,7 +149,7 @@
   }
 
   .horizontal-snap-track {
-    @apply flex w-max flex-nowrap gap-4 snap-x snap-mandatory;
+    @apply flex w-max flex-nowrap gap-5 snap-x snap-mandatory sm:gap-6;
   }
 
   .horizontal-snap-card,
@@ -146,24 +157,50 @@
     @apply w-[300px] shrink-0 snap-start sm:w-[320px];
   }
 
+  .section-y {
+    padding-top: var(--space-section);
+    padding-bottom: var(--space-section);
+  }
+
+  @media (min-width: 640px) {
+    .section-y {
+      padding-top: var(--space-section-lg);
+      padding-bottom: var(--space-section-lg);
+    }
+  }
+
   .gradient-gold {
     background: linear-gradient(135deg, hsl(40 95% 55%) 0%, hsl(42 100% 70%) 100%);
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 active:scale-[0.98] sm:px-6;
+    @apply inline-flex items-center justify-center rounded-xl bg-primary-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-all hover:bg-primary-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600 active:scale-[0.98] sm:px-6;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 shadow-sm transition-all hover:bg-slate-50 active:scale-[0.98] sm:px-6;
+    @apply inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-graphite shadow-sm transition-all hover:bg-surface-muted active:scale-[0.98] sm:px-6;
   }
 
+  /* Clean & Contextual: soft shadow, no hard grey frame */
   .card {
-    @apply overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-shadow hover:shadow-md;
+    @apply overflow-hidden rounded-card bg-white shadow-card transition-shadow hover:shadow-card-hover;
   }
 
   .card-link {
-    @apply block overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-primary/30 hover:shadow-md;
+    @apply block overflow-hidden rounded-card bg-white shadow-card transition hover:shadow-card-hover;
+  }
+
+  .event-card {
+    @apply group relative flex h-full flex-col overflow-hidden rounded-card bg-white shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card-hover;
+  }
+
+  .event-card-meta {
+    @apply inline-flex min-w-0 items-center gap-1 text-xs text-graphite-muted;
+  }
+
+  .event-card-meta-icon {
+    @apply h-3.5 w-3.5 shrink-0 text-graphite-muted;
+    stroke-width: 1.75;
   }
 }
 
@@ -183,8 +220,8 @@
 
   .gradient-salute-hero {
     background:
-      radial-gradient(ellipse 120% 90% at 50% 20%, hsl(224 82% 52% / 0.45) 0%, transparent 55%),
-      linear-gradient(180deg, hsl(224 76% 46%) 0%, hsl(224 72% 36%) 55%, hsl(226 68% 28%) 100%);
+      radial-gradient(ellipse 120% 90% at 50% 20%, hsl(221 83% 52% / 0.45) 0%, transparent 55%),
+      linear-gradient(180deg, hsl(221 83% 48%) 0%, hsl(221 78% 36%) 55%, hsl(226 68% 28%) 100%);
   }
 
   .gradient-bridges-hero {
@@ -230,7 +267,7 @@
 
 .tc-widget-container iframe {
   max-width: 100% !important;
-  border-radius: 12px;
+  border-radius: 16px;
 }
 
 .tc-session-slot {
@@ -240,7 +277,7 @@
   width: 100% !important;
   padding: 10px 12px !important;
   border-radius: 8px !important;
-  background-color: #f8fafc !important;
+  background-color: #f8f9fa !important;
   cursor: pointer !important;
   font-family: inherit !important;
   font-size: inherit !important;

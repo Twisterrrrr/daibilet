@@ -1,3 +1,26 @@
+## 2026-07-25 - Clean & Contextual UI: фундамент + карточки каталога
+
+### Наблюдения
+
+- Owner-бриф Airbnb/Klook/GYG: меньше визуального шума, фото и прозрачные условия.
+- Было: Google Fonts CSS import (Inter + Space Grotesk + Source Serif), карточки с `border-slate-200`, цена-пил на фото, кислотный amber-star, секции `py-12/16`.
+- Lucide уже в проекте - оставляем единый стиль иконок.
+
+### Решения
+
+- `next/font` в локальном lean `node_modules/next` пустой (`font/google` без файлов) - подключили Manrope+Inter+Source Serif через `<link preconnect>` в root layout (эквивалент по визуалу; self-host next/font - follow-up когда пакет полный).
+- Токены 60/30/10: white / graphite `#1A1D20` + surface `#F8F9FA` / brand-blue CTA (`primary-600` #2563eb).
+- Карточки: `rounded-card` 16px, soft shadow без жёсткой рамки, meta Lucide stroke graphite, цена+CTA внизу, padding 16-20, gap 12.
+- Section spacing: класс `.section-y` 64/80px на home rails; grid gap 5→6 на `/` и `/events`.
+- HomeHero копирайт не трогали (параллельный агент).
+
+### Проблемы
+
+- Показ владельцу: нужен commit + deploy-prod-next (UI-only). Локально: `/` и `/events` после `pnpm --filter web dev`.
+- Следующие фазы: header/footer, event detail, filters toolbar, city/venue cards.
+
+---
+
 ## 2026-07-24 - SEO: дубли title (Яндекс/Google отчёт)
 
 ### Наблюдения
