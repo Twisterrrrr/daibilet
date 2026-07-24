@@ -3,6 +3,7 @@ import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { buildPublicDestinationsDto } from '@daibilet/backend/public-read';
 import { Suspense } from 'react';
 
+import { ScrollToTopButton } from '@/components/ScrollToTop.client';
 import { SiteFooter } from '@/components/SiteFooter';
 import { SiteHeader } from '@/components/SiteHeader.client';
 import { SelectedCityProvider } from '@/components/SelectedCityProvider.client';
@@ -28,6 +29,7 @@ export async function SiteLayout({ children }: { children: React.ReactNode }) {
             <SiteHeader destinations={destinations} />
             <main className="flex-1">{children}</main>
             <SiteFooter destinations={destinations} />
+            <ScrollToTopButton />
           </div>
         </SelectedCityProvider>
       </Suspense>

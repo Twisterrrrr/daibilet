@@ -1,3 +1,20 @@
+## 2026-07-24 - Floating «Наверх» на длинных public-страницах
+
+### Наблюдения
+
+- Owner: на хабах, блоге, каталогах не хватает кнопки «Наверх» после длинного скролла.
+
+### Решения
+
+- Один client-компонент `ScrollToTop.client` в `SiteLayout`: появляется после ~1 viewport, smooth scroll (с учётом `prefers-reduced-motion`), `aria-label`, позиция выше mobile bottom chrome (`bottom` + safe-area).
+- Стиль: белая pill + slate border/shadow, без flashy purple; site-wide на всех страницах через `SiteLayout`.
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next).
+
+---
+
 ## 2026-07-24 - /locations hero: каталог, не tourist CTA
 
 ### Наблюдения
