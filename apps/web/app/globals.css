@@ -127,11 +127,19 @@
   }
 
   .catalog-toolbar {
-    @apply border-b border-slate-200/80 bg-white;
+    @apply border-b border-slate-200/60 bg-white;
   }
 
   .catalog-chip {
-    @apply inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
+    @apply inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-medium text-graphite-muted transition hover:bg-surface-muted hover:text-graphite focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50;
+  }
+
+  .catalog-chip-idle {
+    @apply bg-surface-muted text-graphite-muted;
+  }
+
+  .catalog-chip-on {
+    @apply bg-graphite text-white hover:bg-graphite hover:text-white;
   }
 
   .horizontal-snap-row {

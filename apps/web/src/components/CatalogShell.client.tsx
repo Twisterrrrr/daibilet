@@ -179,7 +179,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
 
   return (
     <>
-      <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 border-b border-slate-200 bg-white/95 px-4 py-2.5 backdrop-blur sm:static sm:-mx-6 sm:bg-white sm:px-6 sm:backdrop-blur-none">
+      <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 border-b border-slate-200/60 bg-white/95 px-4 py-3 backdrop-blur sm:static sm:-mx-6 sm:bg-white sm:px-6 sm:py-4 sm:backdrop-blur-none">
         <CatalogToolbar
           facets={facets}
           values={filterValues}
@@ -191,8 +191,8 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       <CatalogActiveFilters values={filterValues} />
 
       {/* Meta слева; sort + view справа (без дубля сортировки) */}
-      <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-3">
-        <p className="min-w-0 text-sm text-slate-500">
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 sm:mt-6">
+        <p className="min-w-0 text-sm text-graphite-muted">
           {loading && !catalog ? 'Загрузка…' : null}
           {catalog ? (
             <>

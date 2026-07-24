@@ -55,34 +55,34 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
   const isTepWidget = Boolean(teplohod);
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/50">
+    <div className="rounded-card bg-white p-6 shadow-card sm:p-7">
       {priceRange ? (
         <div className="flex items-baseline gap-2">
-          <span className="text-3xl font-bold text-slate-900">{formatBuyCardPrice(priceRange)}</span>
-          <span className="text-sm text-slate-400">/ чел.</span>
+          <span className="text-3xl font-bold text-graphite">{formatBuyCardPrice(priceRange)}</span>
+          <span className="text-sm text-graphite-muted">/ чел.</span>
         </div>
       ) : (
-        <p className="text-lg font-semibold text-slate-600">Цена уточняется</p>
+        <p className="text-lg font-semibold text-graphite-muted">Цена уточняется</p>
       )}
 
       {showMultiPurchase ? (
-        <div className="mt-5">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Варианты билетов</h3>
-          <ul className="mt-2.5 space-y-2">
+        <div className="mt-6">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-graphite-muted">Варианты билетов</h3>
+          <ul className="mt-3 space-y-2">
             {purchaseOptions.map((option) => (
               <li
                 key={option.id}
-                className="flex items-start justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-3"
+                className="flex items-start justify-between gap-3 rounded-xl bg-surface-muted px-3.5 py-3"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-slate-900">{option.title}</p>
+                  <p className="text-sm font-semibold text-graphite">{option.title}</p>
                   {option.description ? (
-                    <p className="mt-1 text-xs leading-relaxed text-slate-500">{option.description}</p>
+                    <p className="mt-1 text-xs leading-relaxed text-graphite-muted">{option.description}</p>
                   ) : null}
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-2">
                   {typeof option.priceFrom === 'number' ? (
-                    <span className="text-sm font-bold text-slate-900">{formatPriceRub(option.priceFrom)}</span>
+                    <span className="text-sm font-bold text-graphite">{formatPriceRub(option.priceFrom)}</span>
                   ) : null}
                   {option.externalId ? (
                     <TcOptionBuyButton
@@ -96,19 +96,19 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
           </ul>
         </div>
       ) : ticketCategories.length > 0 ? (
-        <div className="mt-5">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Категории билетов</h3>
-          <ul className="mt-2.5 space-y-2">
+        <div className="mt-6">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-graphite-muted">Категории билетов</h3>
+          <ul className="mt-3 space-y-2.5">
             {ticketCategories.map((row) => (
               <li key={row.key}>
                 <div className="flex items-start justify-between gap-3 text-sm">
                   <div className="min-w-0 flex-1">
-                    <span className="font-medium text-slate-800">{row.name}</span>
+                    <span className="font-medium text-graphite">{row.name}</span>
                     {row.description ? (
-                      <p className="mt-0.5 text-xs leading-relaxed text-slate-500">{row.description}</p>
+                      <p className="mt-0.5 text-xs leading-relaxed text-graphite-muted">{row.description}</p>
                     ) : null}
                   </div>
-                  <span className="shrink-0 font-medium text-slate-900">
+                  <span className="shrink-0 font-medium text-graphite">
                     {formatCategoryPrice(row.minPrice, row.maxPrice)}
                   </span>
                 </div>
@@ -117,19 +117,19 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
           </ul>
         </div>
       ) : priceRange && priceRange.min !== priceRange.max ? (
-        <p className="mt-3 text-sm text-slate-500">Полный список категорий - в виджете при покупке.</p>
+        <p className="mt-3 text-sm text-graphite-muted">Полный список категорий - в виджете при покупке.</p>
       ) : null}
 
       {!showMultiPurchase && visibleSessions.length > 0 ? (
-        <div className="mt-5">
-          <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400">
-            <Calendar className="h-3.5 w-3.5" />
+        <div className="mt-6">
+          <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-graphite-muted">
+            <Calendar className="h-3.5 w-3.5" strokeWidth={1.75} />
             Ближайшие сеансы
           </h3>
           {isTcWidget && !isTepWidget ? (
-            <p className="mt-1 text-[11px] text-slate-400">Нажмите на сеанс для покупки</p>
+            <p className="mt-1 text-[11px] text-graphite-muted">Нажмите на сеанс для покупки</p>
           ) : null}
-          <div className="mt-2.5 space-y-1.5">
+          <div className="mt-3 space-y-1.5">
             {visibleSessions.map((session) =>
               isTcWidget && !isTepWidget ? (
                 <TcSessionSlot
@@ -146,7 +146,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
       ) : null}
 
       {!showMultiPurchase ? (
-        <div className="mt-5">
+        <div className="mt-6">
           {isTepWidget && teplohod ? (
             <TeplohodWidgetEmbed
               tepEventId={teplohod.tepEventId}
@@ -166,7 +166,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
               href={normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-medium text-white transition hover:bg-primary-700"
+              className="btn-primary w-full py-3.5 text-base"
             >
               Купить билет
             </a>
@@ -181,14 +181,14 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
           )}
         </div>
       ) : (
-        <p className="mt-5 text-xs leading-relaxed text-slate-500">
+        <p className="mt-5 text-xs leading-relaxed text-graphite-muted">
           Выберите комплект и нажмите «Купить» напротив нужного варианта - откроется виджет Ticketscloud.
         </p>
       )}
 
-      <div className="mt-4 flex items-center gap-2 rounded-lg bg-slate-50 px-3 py-2">
-        <Shield className="h-4 w-4 text-emerald-500" />
-        <span className="text-xs text-slate-500">
+      <div className="mt-5 flex items-center gap-2 rounded-xl bg-surface-muted px-3 py-2.5">
+        <Shield className="h-4 w-4 text-graphite-muted" strokeWidth={1.75} />
+        <span className="text-xs text-graphite-muted">
           Безопасная оплата в виджете{' '}
           {isTepWidget || String(offerSource || '').toUpperCase().includes('TEPLOHOD')
             ? 'teplohod.info'
@@ -206,28 +206,28 @@ function StaticSessionRow({ session }: { session: EventSession }) {
   const weekday = session.dateLabel?.split(',')[0]?.trim() || '-';
 
   return (
-    <div className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2.5">
+    <div className="flex items-center justify-between rounded-xl bg-surface-muted px-3 py-2.5">
       <div className="flex items-center gap-3">
         {!flexibleSchedule ? (
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-100 text-xs font-bold text-primary-700">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white text-xs font-bold text-primary-700 shadow-sm">
             {weekday}
           </div>
         ) : null}
         <div>
-          <p className="text-sm font-medium text-slate-900">
+          <p className="text-sm font-medium text-graphite">
             {flexibleSchedule ? FLEXIBLE_SCHEDULE_LABEL : session.dateLabel || '-'}
           </p>
           {session.timeLabel && !flexibleSchedule ? (
-            <p className="text-xs text-slate-500">{session.timeLabel}</p>
+            <p className="text-xs text-graphite-muted">{session.timeLabel}</p>
           ) : null}
         </div>
       </div>
       {typeof session.vacant === 'number' && session.vacant > 0 ? (
-        <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-600">
+        <span className="text-xs font-medium text-graphite-muted">
           {formatVacantSeats(session.vacant)}
         </span>
       ) : session.vacant === 0 ? (
-        <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-500">Распродано</span>
+        <span className="text-xs font-medium text-graphite-muted">Распродано</span>
       ) : null}
     </div>
   );
@@ -264,7 +264,7 @@ export function EventHeroBuyButton({
       <button
         type="button"
         onClick={scrollToBuyCard}
-        className={`inline-flex min-h-11 items-center justify-center rounded-xl bg-amber-500 px-6 py-3.5 text-base font-bold text-white shadow-lg shadow-amber-700/35 transition hover:bg-amber-600 active:bg-amber-700 sm:min-h-12 sm:px-7 sm:py-3 sm:text-lg ${wide ? 'w-full' : ''}`}
+        className={`btn-primary min-h-11 px-6 py-3.5 text-base font-semibold sm:min-h-12 sm:px-7 sm:py-3 sm:text-lg ${wide ? 'w-full' : ''}`}
       >
         {label}
       </button>
@@ -292,7 +292,7 @@ export function EventHeroBuyButton({
           scrollToBuyCard();
           window.setTimeout(() => openTeplohodWidget(), 250);
         }}
-        className={`inline-flex min-h-11 items-center justify-center rounded-xl bg-amber-500 px-6 py-3.5 text-base font-bold text-white shadow-lg shadow-amber-700/35 transition hover:bg-amber-600 active:bg-amber-700 sm:min-h-12 sm:px-7 sm:py-3 sm:text-lg ${wide ? 'w-full' : ''}`}
+        className={`btn-primary min-h-11 px-6 py-3.5 text-base font-semibold sm:min-h-12 sm:px-7 sm:py-3 sm:text-lg ${wide ? 'w-full' : ''}`}
       >
         {label}
       </button>
@@ -306,7 +306,7 @@ export function EventHeroBuyButton({
         href={href}
         target="_blank"
         rel="noopener noreferrer"
-        className={`inline-flex min-h-11 items-center justify-center rounded-xl bg-amber-500 px-6 py-3.5 text-base font-bold text-white shadow-lg shadow-amber-700/35 transition hover:bg-amber-600 active:bg-amber-700 sm:min-h-12 sm:px-7 sm:py-3 sm:text-lg ${wide ? 'w-full' : ''}`}
+        className={`btn-primary min-h-11 px-6 py-3.5 text-base font-semibold sm:min-h-12 sm:px-7 sm:py-3 sm:text-lg ${wide ? 'w-full' : ''}`}
       >
         {label}
       </a>
@@ -317,7 +317,7 @@ export function EventHeroBuyButton({
     <button
       type="button"
       onClick={scrollToBuyCard}
-      className={`inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-base font-semibold text-white shadow-md shadow-amber-700/30 transition hover:bg-amber-600 active:bg-amber-700 sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`}
+      className={`btn-primary min-h-10 px-5 py-3 text-base font-semibold sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`}
     >
       {label}
     </button>
@@ -384,30 +384,21 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
 
         <div className="flex items-end justify-between gap-4">
           <div className="max-w-3xl">
-            <div className="flex flex-wrap gap-1.5">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-medium text-white backdrop-blur-sm">
-                {event.category}
-              </span>
-              {ageLimit ? (
-                <span className="inline-flex items-center rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium text-white/90 backdrop-blur-sm">
-                  {ageLimit}
-                </span>
-              ) : null}
-            </div>
+            <p className="text-xs font-medium uppercase tracking-wider text-white/70">{event.category}</p>
             <h1 className="mt-2 text-2xl font-bold leading-tight text-white sm:text-3xl lg:text-4xl">
               {event.seoH1 || event.title}
             </h1>
 
-            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm text-white/80">
+            <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
               {ageLimit ? (
                 <span className="flex items-center gap-1.5">
-                  <Users className="h-4 w-4" />
+                  <Users className="h-4 w-4" strokeWidth={1.75} />
                   {ageLimit}
                 </span>
               ) : null}
               {event.city || event.venue ? (
                 <span className="flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4" />
+                  <MapPin className="h-4 w-4" strokeWidth={1.75} />
                   {venueLink ? (
                     <Link href={venueLink} className="underline decoration-white/30 underline-offset-2 hover:text-white">
                       {event.venue || event.city}
@@ -419,7 +410,7 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
               ) : null}
               {nextSession ? (
                 <span className="flex items-center gap-1.5">
-                  <Calendar className="h-4 w-4" />
+                  <Calendar className="h-4 w-4" strokeWidth={1.75} />
                   {isFlexibleScheduleSession(nextSession) || !nextSession.startsAt
                     ? 'Ближайший рейс - в виджете'
                     : `Ближайший: ${[nextSession.dateLabel, nextSession.timeLabel].filter(Boolean).join(', ')}`}
@@ -428,7 +419,7 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
             </div>
 
             {priceLabel ? (
-              <div className="mt-4 sm:hidden">
+              <div className="mt-5 sm:hidden">
                 <EventHeroBuyButton payload={payload} priceLabel={priceLabel} wide />
               </div>
             ) : null}

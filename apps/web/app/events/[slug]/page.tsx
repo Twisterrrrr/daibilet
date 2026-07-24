@@ -112,9 +112,9 @@ export default async function EventDetailPage({ params }: PageProps) {
       ))}
       <EventHero payload={clientPayload} />
 
-      <div className="container-page py-8">
-        <div className="grid gap-8 lg:grid-cols-3">
-          <div className="space-y-8 lg:col-span-2">
+      <div className="container-page py-10 sm:py-12 lg:py-14">
+        <div className="grid gap-10 lg:grid-cols-3 lg:gap-12">
+          <div className="space-y-10 lg:col-span-2">
             <EventDescription event={event} />
             <EventQuickInfo event={event} />
             <EventTags event={event} />
@@ -123,7 +123,7 @@ export default async function EventDetailPage({ params }: PageProps) {
           </div>
 
           <div className="lg:col-span-1">
-            <div className="lg:sticky lg:top-20" id="buy-card">
+            <div className="lg:sticky lg:top-[calc(var(--site-header-height)+1.25rem)]" id="buy-card">
               <EventBuyCard payload={clientPayload} />
             </div>
           </div>
@@ -131,10 +131,10 @@ export default async function EventDetailPage({ params }: PageProps) {
       </div>
 
       {related?.length ? (
-        <section className="border-t border-slate-200 bg-slate-50 py-12">
+        <section className="border-t border-slate-200/80 bg-surface-muted section-y">
           <div className="container-page">
-            <h2 className="text-2xl font-bold text-slate-900">Похожие события</h2>
-            <ul className="mt-6 grid gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+            <h2 className="text-2xl font-bold text-graphite">Похожие события</h2>
+            <ul className="mt-8 grid gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
               {related.slice(0, 6).map((session) => (
                 <li key={`${session.id}-${session.startsAt}`}>
                   <EventCard session={session} suppressPurchaseAnchors />

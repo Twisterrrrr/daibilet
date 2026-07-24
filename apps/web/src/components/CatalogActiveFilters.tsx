@@ -48,12 +48,12 @@ export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }
 
   return (
     <div
-      className="-mx-4 mt-3 flex items-center gap-2 overflow-x-auto px-4 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mt-3 sm:flex-wrap sm:overflow-visible sm:rounded-xl sm:border sm:border-slate-200 sm:bg-white sm:p-2.5 sm:px-3"
+      className="-mx-4 mt-4 flex items-center gap-2 overflow-x-auto px-4 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mt-4 sm:flex-wrap sm:overflow-visible sm:px-0"
       role="region"
       aria-label="Активные фильтры"
     >
-      <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-500 sm:pl-1 sm:pr-1">
-        <SlidersHorizontal aria-hidden className="h-3.5 w-3.5" />
+      <span className="inline-flex shrink-0 items-center gap-1.5 text-xs font-medium text-graphite-muted">
+        <SlidersHorizontal aria-hidden className="h-3.5 w-3.5" strokeWidth={1.75} />
         <span className="sm:hidden">{chips.length}</span>
         <span className="hidden sm:inline">Активно · {chips.length}</span>
       </span>
@@ -61,18 +61,18 @@ export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }
         <Link
           key={`${chip.key}:${chip.label}`}
           href={buildCatalogHref(clearCatalogFilterKey(values, chip.key))}
-          className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary-700 ring-1 ring-primary/20 transition hover:bg-primary/20"
+          className="inline-flex shrink-0 items-center gap-1 rounded-xl bg-surface-muted px-2.5 py-1.5 text-xs font-medium text-graphite transition hover:bg-slate-200/80"
         >
           {chip.label}
-          <X className="h-3 w-3" aria-hidden />
+          <X className="h-3 w-3" aria-hidden strokeWidth={1.75} />
         </Link>
       ))}
       <Link
         href="/events"
         onClick={() => persistSelectedCity('all')}
-        className="inline-flex shrink-0 items-center gap-1 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-rose-300 hover:bg-rose-50 hover:text-rose-700 sm:ml-auto"
+        className="inline-flex shrink-0 items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-semibold text-graphite-muted transition hover:bg-surface-muted hover:text-graphite sm:ml-auto"
       >
-        <X className="h-3.5 w-3.5" aria-hidden />
+        <X className="h-3.5 w-3.5" aria-hidden strokeWidth={1.75} />
         Сбросить
       </Link>
     </div>

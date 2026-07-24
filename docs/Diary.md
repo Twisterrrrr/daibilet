@@ -1,3 +1,26 @@
+## 2026-07-25 - Clean UI фаза 2: header, event page, filters
+
+### Наблюдения
+
+- Owner одобрил фазу 2 и просит сразу commit + deploy-prod-next + smoke.
+- Фаза 1 (токены + EventCard) уже на ветке (`4fea264` / `04c0c21`). Hero copy зафиксирован: eyebrow Дайбилет; H1 «Экскурсии, музеи…» / city «Экскурсии и события»; subtitle про «Найдите, куда сходить…».
+- Amber CTA на event hero расходился с brand-blue токеном карточек.
+
+### Решения
+
+- Header: sticky glass (`bg-white/95` + blur), лёгкая нижняя линия, graphite hover на иконках Lucide, без тяжёлых рамок в dropdown/mobile sheet.
+- Footer: `surface-muted`, больше воздуха (`py-14/16`), DaibiletLogo, иерархия без «простыни» borders.
+- Event detail: больше whitespace; meta Lucide outline (возраст/длительность/адрес); buy-card `shadow-card` без border-box; CTA hero/widget → `primary-600`; убраны кислотные emerald/red pills и glass chips на фото.
+- Filters: chips `rounded-xl` (не pill-шум), search bar soft shadow, воздух toolbar→grid; advanced panel без тяжёлых borders.
+- SEO metadata / HomeHero copy не трогали.
+
+### Проблемы
+
+- Осталось CU.8: CityCard / InstitutionCard / landing tiles.
+- Smoke на проде после deploy-prod-next: `/`, `/events`, один `/events/[slug]`, header/footer, chips.
+
+---
+
 ## 2026-07-25 - Clean & Contextual UI: фундамент + карточки каталога
 
 ### Наблюдения

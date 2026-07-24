@@ -398,10 +398,10 @@ export function TcWidgetButton({
 
   const fallbackLinkClass =
     variant === 'hero'
-      ? `inline-flex min-h-10 items-center justify-center rounded-xl bg-amber-500 px-5 py-3 text-base font-semibold text-white shadow-md shadow-amber-700/30 transition hover:bg-amber-600 active:bg-amber-700 sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`
+      ? `btn-primary min-h-10 px-5 py-3 text-base font-semibold sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`
       : wide
-        ? 'flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-6 py-3.5 text-base font-medium text-white transition hover:bg-primary-700'
-        : 'inline-flex min-h-10 items-center justify-center rounded-xl bg-primary-600 px-6 py-3.5 text-base font-medium text-white transition hover:bg-primary-700';
+        ? 'btn-primary w-full py-3.5 text-base'
+        : 'btn-primary min-h-10 px-6 py-3.5 text-base';
 
   if (!eventId || !widgetToken) {
     if (purchaseUrl) {
@@ -417,17 +417,14 @@ export function TcWidgetButton({
 
   const sizeClasses =
     variant === 'hero'
-      ? `rounded-xl px-5 py-3 text-base font-semibold shadow-md shadow-amber-700/30 sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`
+      ? `rounded-xl px-5 py-3 text-base font-semibold sm:px-6 sm:py-2.5 ${wide ? 'w-full' : ''}`
       : compact
         ? 'rounded-lg px-3.5 py-2 text-sm font-semibold'
         : wide
           ? 'w-full rounded-xl px-6 py-3.5 text-base font-medium'
           : 'rounded-xl px-6 py-3.5 text-base font-medium';
 
-  const colorClasses =
-    variant === 'hero'
-      ? 'bg-amber-500 text-white transition hover:bg-amber-600 active:bg-amber-700'
-      : 'bg-primary-600 text-white transition hover:bg-primary-700';
+  const colorClasses = 'bg-primary-600 text-white transition hover:bg-primary-700';
 
   const buttonClassName =
     className ||

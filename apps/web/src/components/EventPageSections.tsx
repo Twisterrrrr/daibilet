@@ -1,9 +1,11 @@
 import Link from 'next/link';
-import { HelpCircle, RotateCcw, ShieldCheck, Ticket } from 'lucide-react';
+import { Clock, HelpCircle, MapPin, RotateCcw, ShieldCheck, Ticket, Users } from 'lucide-react';
 
 import type { PublicEventDto } from '@daibilet/contracts/public';
 
+import { extractDurationLabel } from '@/lib/catalog-labels';
 import { formatEventDescriptionHtml } from '@/lib/event-description-format';
+import { formatAgeLimit } from '@/lib/event-page-utils';
 import { uniqueEventTagLabels } from '@/lib/event-tag-labels';
 
 export function EventDescription({ event }: { event: PublicEventDto }) {
@@ -14,9 +16,9 @@ export function EventDescription({ event }: { event: PublicEventDto }) {
 
   return (
     <div>
-      <h2 className="text-lg font-bold text-slate-900">О событии</h2>
+      <h2 className="text-lg font-bold text-graphite">О событии</h2>
       <div
-        className="prose prose-slate mt-4 max-w-none text-sm leading-7 text-slate-600 [&_h3]:mt-5 [&_h3]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-slate-900 [&_li+li]:mt-2 [&_p+p]:mt-5 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5 [&_h3+ul]:mt-2"
+        className="prose prose-slate mt-5 max-w-none text-sm leading-7 text-graphite-muted [&_h3]:mt-5 [&_h3]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-graphite [&_li+li]:mt-2 [&_p+p]:mt-5 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5 [&_h3+ul]:mt-2"
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>
@@ -24,20 +26,30 @@ export function EventDescription({ event }: { event: PublicEventDto }) {
 }
 
 export function EventQuickInfo({ event }: { event: PublicEventDto }) {
-  const items: string[] = [];
-  if (event.venueAddress) items.push(event.venueAddress);
-  if (event.venue && !items.includes(event.venue)) items.push(event.venue);
-  if (event.ageLimit) items.push(`${event.ageLimit}+`);
+  const ageLimit = formatAgeLimit(event.ageLimit);
+  const durationLabel = extractDurationLabel(event.tags);
+  const items: Array<{ icon: typeof MapPin; label: string }> = [];
+
+  if (event.venueAddress) items.push({ icon: MapPin, label: event.venueAddress });
+  else if (event.venue) items.push({ icon: MapPin, label: event.venue });
+  if (durationLabel) items.push({ icon: Clock, label: durationLabel });
+  if (ageLimit) items.push({ icon: Users, label: ageLimit });
 
   if (!items.length) return null;
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-      <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500">Кратко</h2>
-      <ul className="mt-3 space-y-2 text-sm text-slate-700">
-        {items.map((item) => (
-          <li key={item}>{item}</li>
-        ))}
+    <div>
+      <h2 className="text-sm font-semibold uppercase tracking-wider text-graphite-muted">Кратко</h2>
+      <ul className="mt-4 space-y-3">
+        {items.map((item) => {
+          const Icon = item.icon;
+          return (
+            <li key={item.label} className="flex items-start gap-2.5 text-sm text-graphite">
+              <Icon className="mt-0.5 h-4 w-4 shrink-0 text-graphite-muted" strokeWidth={1.75} />
+              <span>{item.label}</span>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );
@@ -52,10 +64,13 @@ export function EventTags({ event }: { event: PublicEventDto }) {
 
   return (
     <div>
-      <h2 className="text-lg font-bold text-slate-900">Теги</h2>
-      <div className="mt-3 flex flex-wrap gap-2">
+      <h2 className="text-lg font-bold text-graphite">Теги</h2>
+      <div className="mt-4 flex flex-wrap gap-2">
         {tags.map((tag) => (
-          <span key={tag.toLocaleLowerCase('ru')} className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs font-medium text-slate-600">
+          <span
+            key={tag.toLocaleLowerCase('ru')}
+            className="rounded-lg bg-surface-muted px-3 py-1.5 text-xs font-medium text-graphite-muted"
+          >
             {tag}
           </span>
         ))}
@@ -74,20 +89,20 @@ const TRUST_LINKS = [
 /** Trust / E-E-A-T strip: путь покупки и поддержка без дублирования thin-контента события. */
 export function EventTrustStrip() {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-slate-50/80 p-5">
-      <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500">Покупка и поддержка</h2>
-      <p className="mt-2 text-sm leading-6 text-slate-600">
+    <section>
+      <h2 className="text-sm font-semibold uppercase tracking-wider text-graphite-muted">Покупка и поддержка</h2>
+      <p className="mt-3 text-sm leading-6 text-graphite-muted">
         Билет оформляется через систему организатора. На Дайбилет - сравнение предложений, карточка события и помощь по
         заказу.
       </p>
-      <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+      <ul className="mt-5 grid gap-2 sm:grid-cols-2">
         {TRUST_LINKS.map(({ href, label, icon: Icon }) => (
           <li key={href}>
             <Link
               href={href}
-              className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-medium text-slate-800 transition hover:border-primary/40 hover:text-primary-700"
+              className="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-medium text-graphite transition hover:bg-surface-muted hover:text-primary-700"
             >
-              <Icon className="h-4 w-4 shrink-0 text-primary-600" />
+              <Icon className="h-4 w-4 shrink-0 text-graphite-muted" strokeWidth={1.75} />
               {label}
             </Link>
           </li>

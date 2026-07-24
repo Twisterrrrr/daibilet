@@ -93,16 +93,16 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200 bg-white pt-[env(safe-area-inset-top,0px)]">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/70 bg-white/95 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.03)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
         <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-3 lg:py-3.5">
           <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 lg:flex-none lg:gap-4">
             <button
               type="button"
               aria-label="Открыть меню"
               onClick={() => setMobileOpen(true)}
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-700 transition hover:bg-slate-100/80 lg:hidden"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-graphite transition hover:bg-surface-muted lg:hidden"
             >
-              <Menu className="h-5 w-5" />
+              <Menu className="h-5 w-5" strokeWidth={1.75} />
             </button>
 
             <Link href="/" className="min-w-0 shrink truncate">
@@ -130,10 +130,10 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
                   className={
                     [
                       secondary ? 'hidden xl:inline-flex' : 'inline-flex',
-                      'items-center px-2.5 py-1.5 text-sm transition xl:px-3',
+                      'items-center rounded-lg px-2.5 py-1.5 text-sm font-medium transition xl:px-3',
                       active
-                        ? 'font-semibold text-slate-900 underline decoration-slate-900/80 decoration-2 underline-offset-[6px]'
-                        : 'font-medium text-slate-500 hover:text-slate-800',
+                        ? 'text-graphite underline decoration-graphite/70 decoration-2 underline-offset-[6px]'
+                        : 'text-graphite-muted hover:bg-surface-muted hover:text-graphite',
                     ].join(' ')
                   }
                 >
@@ -165,9 +165,9 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
                 href="/help"
                 title="Помощь и FAQ"
                 aria-label="Помощь и FAQ"
-                className="inline-flex h-10 w-10 items-center justify-center text-slate-500 transition hover:text-slate-900"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-graphite-muted transition hover:bg-surface-muted hover:text-graphite"
               >
-                <HelpCircle className="h-5 w-5" />
+                <HelpCircle className="h-5 w-5" strokeWidth={1.75} />
               </Link>
 
               <button
@@ -175,9 +175,9 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
                 aria-label="Избранное"
                 title="Избранное"
                 onClick={() => setFavoritesOpen(true)}
-                className="inline-flex h-10 w-10 shrink-0 items-center justify-center text-slate-500 transition hover:text-slate-900"
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-graphite-muted transition hover:bg-surface-muted hover:text-graphite"
               >
-                <Heart className="h-5 w-5" />
+                <Heart className="h-5 w-5" strokeWidth={1.75} />
               </button>
             </div>
           </div>
@@ -226,24 +226,24 @@ const HeaderAuthControls = forwardRef<
           type="button"
           aria-label="Личный кабинет"
           onClick={onToggleUserMenu}
-          className="inline-flex h-10 w-10 items-center justify-center text-slate-500 transition hover:text-slate-900 xl:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-graphite-muted transition hover:bg-surface-muted hover:text-graphite xl:hidden"
         >
-          <User className="h-5 w-5" />
+          <User className="h-5 w-5" strokeWidth={1.75} />
         </button>
         <button
           type="button"
           onClick={onToggleUserMenu}
-          className="hidden items-center gap-2 px-2 py-2 text-sm font-medium text-slate-600 transition hover:text-slate-900 xl:inline-flex"
+          className="hidden items-center gap-2 rounded-lg px-2 py-2 text-sm font-medium text-graphite-muted transition hover:bg-surface-muted hover:text-graphite xl:inline-flex"
         >
-          <User className="h-4 w-4" />
+          <User className="h-4 w-4" strokeWidth={1.75} />
           {auth?.user?.name || 'Кабинет'}
         </button>
         {userMenuOpen ? (
-          <div className="absolute right-0 z-50 mt-1.5 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white py-1 shadow-lg">
+          <div className="absolute right-0 z-50 mt-1.5 w-56 overflow-hidden rounded-card bg-white py-1 shadow-card-hover">
             {auth?.user?.name ? (
-              <div className="border-b border-slate-100 px-3 py-2 text-sm font-medium text-slate-900">{auth.user.name}</div>
+              <div className="border-b border-slate-100/80 px-3 py-2 text-sm font-medium text-graphite">{auth.user.name}</div>
             ) : null}
-            <Link href="/account/purchases" onClick={onCloseUserMenu} className="block px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
+            <Link href="/account/purchases" onClick={onCloseUserMenu} className="block px-3 py-2 text-sm text-graphite-muted hover:bg-surface-muted hover:text-graphite">
               Мои покупки
             </Link>
             <button
@@ -253,7 +253,7 @@ const HeaderAuthControls = forwardRef<
                 onCloseUserMenu();
                 window.location.href = '/';
               }}
-              className="block w-full px-3 py-2 text-left text-sm text-slate-600 hover:bg-slate-50"
+              className="block w-full px-3 py-2 text-left text-sm text-graphite-muted hover:bg-surface-muted hover:text-graphite"
             >
               Выйти
             </button>
@@ -266,9 +266,9 @@ const HeaderAuthControls = forwardRef<
   return (
     <Link
       href="/login?returnUrl=/account/purchases"
-      className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary-600 px-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700"
+      className="inline-flex h-10 items-center gap-2 rounded-xl bg-primary-600 px-3.5 text-sm font-semibold text-white transition hover:bg-primary-700"
     >
-      <LogIn className="h-4 w-4" />
+      <LogIn className="h-4 w-4" strokeWidth={1.75} />
       Войти
     </Link>
   );
@@ -304,19 +304,19 @@ function MobileNavSheet({
   return (
     <div className="fixed inset-0 z-[60] lg:hidden">
       <button type="button" aria-label="Закрыть меню" className="absolute inset-0 bg-slate-900/45 backdrop-blur-[2px]" onClick={onClose} />
-      <aside className="relative flex h-full w-[min(20rem,88vw)] flex-col bg-white/95 shadow-2xl backdrop-blur-xl">
-        <div className="flex items-center justify-between border-b border-slate-200/80 px-4 py-4">
+      <aside className="relative flex h-full w-[min(20rem,88vw)] flex-col bg-white shadow-card-hover">
+        <div className="flex items-center justify-between px-4 py-4">
           <DaibiletLogo textClassName="text-xl" />
-          <button type="button" aria-label="Закрыть" onClick={onClose} className="rounded-xl p-2 text-slate-500 hover:bg-slate-100">
-            <X className="h-5 w-5" />
+          <button type="button" aria-label="Закрыть" onClick={onClose} className="rounded-lg p-2 text-graphite-muted hover:bg-surface-muted hover:text-graphite">
+            <X className="h-5 w-5" strokeWidth={1.75} />
           </button>
         </div>
-        <div className="border-b border-slate-200/80 px-4 py-3">
+        <div className="px-4 pb-3">
           <HeaderSearch
             variant="inline"
             cityFilter={searchCityFilter}
             initialQuery={searchInitialQuery}
-            className="rounded-lg bg-slate-50 py-2.5"
+            className="rounded-xl bg-surface-muted py-2.5"
           />
         </div>
         <nav aria-label="Мобильная навигация" className="flex-1 overflow-y-auto p-2">
@@ -326,36 +326,36 @@ function MobileNavSheet({
                 key={item.label}
                 href={item.href}
                 onClick={onClose}
-                className={`block w-full px-4 py-3 text-left text-base transition ${
+                className={`block w-full rounded-lg px-4 py-3 text-left text-base transition ${
                   isNavActive(pathname, item.href.split('?')[0] || item.href)
-                    ? 'font-semibold text-slate-900'
-                    : 'font-medium text-slate-600 hover:text-slate-900'
+                    ? 'font-semibold text-graphite bg-surface-muted'
+                    : 'font-medium text-graphite-muted hover:bg-surface-muted hover:text-graphite'
                 }`}
               >
                 {item.label}
               </Link>
             ))}
           </div>
-          <div className="my-2 border-t border-slate-200" />
+          <div className="my-3 h-px bg-slate-100" />
           <button
             type="button"
             onClick={onOpenFavorites}
-            className="flex w-full items-center gap-2 rounded-xl px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100"
+            className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-graphite-muted hover:bg-surface-muted hover:text-graphite"
           >
-            <Heart className="h-4 w-4" />
+            <Heart className="h-4 w-4" strokeWidth={1.75} />
             Избранное
           </button>
           <Link
             href="/help"
             onClick={onClose}
-            className="flex w-full items-center gap-2 rounded-xl px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100"
+            className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-graphite-muted hover:bg-surface-muted hover:text-graphite"
           >
-            <HelpCircle className="h-4 w-4" />
+            <HelpCircle className="h-4 w-4" strokeWidth={1.75} />
             Помощь и FAQ
           </Link>
-          <div className="my-2 border-t border-slate-200" />
+          <div className="my-3 h-px bg-slate-100" />
           <div className="px-2 py-2">
-            <p className="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-slate-400">Город</p>
+            <p className="mb-2 px-2 text-xs font-medium uppercase tracking-wide text-graphite-muted">Город</p>
             <CityPicker
               cities={destinations}
               value={cityValue}
@@ -368,12 +368,12 @@ function MobileNavSheet({
               className="w-full"
             />
           </div>
-          <div className="my-2 border-t border-slate-200" />
+          <div className="my-3 h-px bg-slate-100" />
           {isLoggedIn ? (
             <>
-              {auth?.user?.name ? <div className="px-4 py-2 text-sm text-slate-500">{auth.user.name}</div> : null}
-              <Link href="/account/purchases" onClick={onClose} className="flex w-full items-center gap-2 rounded-xl px-4 py-3 text-left text-base font-medium text-slate-700 hover:bg-slate-100">
-                <User className="h-4 w-4" />
+              {auth?.user?.name ? <div className="px-4 py-2 text-sm text-graphite-muted">{auth.user.name}</div> : null}
+              <Link href="/account/purchases" onClick={onClose} className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-graphite-muted hover:bg-surface-muted hover:text-graphite">
+                <User className="h-4 w-4" strokeWidth={1.75} />
                 Мои покупки
               </Link>
               <button
@@ -383,7 +383,7 @@ function MobileNavSheet({
                   onClose();
                   window.location.href = '/';
                 }}
-                className="flex w-full items-center gap-2 rounded-xl px-4 py-3 text-left text-base font-medium text-rose-600 hover:bg-rose-50"
+                className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-graphite-muted hover:bg-surface-muted hover:text-graphite"
               >
                 Выйти
               </button>
@@ -392,9 +392,9 @@ function MobileNavSheet({
             <Link
               href="/login?returnUrl=/account/purchases"
               onClick={onClose}
-              className="mx-2 mt-1 flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-primary-700"
+              className="mx-2 mt-1 flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-base font-semibold text-white transition hover:bg-primary-700"
             >
-              <LogIn className="h-4 w-4" />
+              <LogIn className="h-4 w-4" strokeWidth={1.75} />
               Войти
             </Link>
           )}

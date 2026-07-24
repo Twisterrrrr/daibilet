@@ -16,9 +16,9 @@
 | CU.2b | Self-host через next/font когда пакет next/font полный на билде | Средний | ⏳ |
 | CU.3 | EventCard / EventCardHorizontal / showcase: Clean UI (фото, meta icons, цена+CTA) | Критический | ✅ |
 | CU.4 | Home rails + `/events` grid/list gap и section-y | Высокий | ✅ |
-| CU.5 | Header / SiteNav / footer под токены | Высокий | ⏳ |
-| CU.6 | Event detail page: воздух, meta, CTA | Высокий | ⏳ |
-| CU.7 | Catalog filters / chips toolbar | Средний | ⏳ |
+| CU.5 | Header / SiteNav / footer под токены | Высокий | ✅ |
+| CU.6 | Event detail page: воздух, meta, CTA | Высокий | ✅ |
+| CU.7 | Catalog filters / chips toolbar | Средний | ✅ |
 | CU.8 | CityCard / InstitutionCard / landing tiles | Средний | ⏳ |
 | CU.9 | Commit + deploy для owner review | Критический | 🔄 |
 

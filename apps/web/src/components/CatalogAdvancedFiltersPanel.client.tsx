@@ -31,15 +31,13 @@ const FOCUSABLE =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 const inputCls =
-  'h-11 w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 text-base text-slate-900 outline-none transition hover:border-slate-300 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/30 sm:h-10 sm:text-sm';
+  'h-11 w-full min-w-0 rounded-xl border-0 bg-surface-muted px-3 text-base text-graphite outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/30 sm:h-10 sm:text-sm';
 const chipCls =
-  'inline-btn min-h-10 rounded-full border px-3.5 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:min-h-0 sm:px-2.5 sm:py-1 sm:text-xs';
-const labelCls = 'mb-2 flex items-center gap-1.5 text-sm font-medium text-slate-600 sm:mb-1.5 sm:text-xs';
+  'catalog-chip inline-btn min-h-10 px-3.5 py-2 sm:min-h-0 sm:px-3 sm:py-1.5 sm:text-xs';
+const labelCls = 'mb-2 flex items-center gap-1.5 text-sm font-medium text-graphite-muted sm:mb-1.5 sm:text-xs';
 
 function filterChip(active: boolean) {
-  return active
-    ? `${chipCls} border-primary bg-primary text-white`
-    : `${chipCls} border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50`;
+  return active ? `${chipCls} catalog-chip-on` : `${chipCls} catalog-chip-idle`;
 }
 
 function emptyFilters(): AdvancedCatalogFilters {
@@ -178,22 +176,22 @@ export function CatalogAdvancedFiltersPanel({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative flex max-h-[min(92vh,44rem)] w-full flex-col overflow-hidden rounded-t-2xl border border-slate-200 bg-white shadow-2xl sm:max-h-[min(85vh,40rem)] sm:max-w-2xl sm:rounded-2xl"
+        className="relative flex max-h-[min(92vh,44rem)] w-full flex-col overflow-hidden rounded-t-2xl bg-white shadow-card-hover sm:max-h-[min(85vh,40rem)] sm:max-w-2xl sm:rounded-card"
       >
-        <div className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 sm:px-5">
+        <div className="flex shrink-0 items-center justify-between gap-3 px-4 py-3 sm:px-5">
           <div className="flex min-w-0 items-center gap-2">
-            <SlidersHorizontal aria-hidden className="h-4 w-4 shrink-0 text-slate-500" />
-            <h2 id={titleId} className="truncate text-base font-semibold text-slate-900">
+            <SlidersHorizontal aria-hidden className="h-4 w-4 shrink-0 text-graphite-muted" strokeWidth={1.75} />
+            <h2 id={titleId} className="truncate text-base font-semibold text-graphite">
               Фильтры
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="inline-btn grid h-10 w-10 place-items-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+            className="inline-btn grid h-10 w-10 place-items-center rounded-lg text-graphite-muted transition hover:bg-surface-muted hover:text-graphite focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
             aria-label="Закрыть"
           >
-            <X aria-hidden className="h-5 w-5" />
+            <X aria-hidden className="h-5 w-5" strokeWidth={1.75} />
           </button>
         </div>
 
@@ -386,11 +384,11 @@ export function CatalogAdvancedFiltersPanel({
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 border-t border-slate-100 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-5">
+        <div className="flex shrink-0 items-center gap-2 border-t border-slate-100/80 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-5">
           <button
             type="button"
             onClick={resetDraft}
-            className="inline-btn h-11 min-w-[6.5rem] rounded-xl px-4 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:h-10"
+            className="inline-btn h-11 min-w-[6.5rem] rounded-xl px-4 text-sm font-semibold text-graphite-muted transition hover:bg-surface-muted hover:text-graphite focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:h-10"
           >
             Сбросить
           </button>

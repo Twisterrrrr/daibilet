@@ -136,15 +136,15 @@ export function CatalogToolbar({
   }
 
   return (
-    <div className="space-y-2.5">
+    <div className="space-y-4">
       {/* Единая search bar: Поиск → Дата → Фильтры → Найти */}
       <form
         onSubmit={onSubmit}
-        className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm sm:flex-row sm:items-center sm:gap-1.5 sm:p-1.5"
+        className="flex flex-col gap-2 rounded-card bg-white p-2 shadow-card sm:flex-row sm:items-center sm:gap-1.5 sm:p-1.5"
       >
         <label className="relative min-w-0 flex-1">
           <span className="sr-only">Поиск по событиям</span>
-          <Search aria-hidden className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+          <Search aria-hidden className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-graphite-muted" strokeWidth={1.75} />
           <input
             ref={searchInputRef}
             type="search"
@@ -154,7 +154,7 @@ export function CatalogToolbar({
             placeholder="Название, место или артист"
             aria-label="Поиск по событиям"
             disabled={disabled}
-            className="inline-btn h-11 w-full rounded-xl bg-transparent pl-10 pr-9 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 sm:h-10"
+            className="inline-btn h-11 w-full rounded-xl bg-transparent pl-10 pr-9 text-sm text-graphite outline-none transition placeholder:text-graphite-muted focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-60 sm:h-10"
           />
           {qDraft ? (
             <button
@@ -165,9 +165,9 @@ export function CatalogToolbar({
                 setQDraft('');
                 navigate({ ...filters, q: undefined, page: undefined });
               }}
-              className="inline-btn absolute right-2 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-60"
+              className="inline-btn absolute right-2 top-1/2 grid h-6 w-6 -translate-y-1/2 place-items-center rounded-lg text-graphite-muted hover:bg-surface-muted hover:text-graphite disabled:opacity-60"
             >
-              <X aria-hidden className="h-3.5 w-3.5" />
+              <X aria-hidden className="h-3.5 w-3.5" strokeWidth={1.75} />
             </button>
           ) : null}
         </label>
@@ -186,7 +186,7 @@ export function CatalogToolbar({
                 if (event.target.value === 'custom') return;
                 setDate(event.target.value);
               }}
-              className="h-11 w-full appearance-none rounded-xl bg-slate-50 pl-3 pr-9 text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-70 sm:h-10 sm:bg-transparent sm:hover:bg-slate-50"
+              className="h-11 w-full appearance-none rounded-xl bg-surface-muted pl-3 pr-9 text-sm font-medium text-graphite outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-70 sm:h-10 sm:bg-transparent sm:hover:bg-surface-muted"
             >
               {CATALOG_DATE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -203,7 +203,8 @@ export function CatalogToolbar({
             </select>
             <ChevronDown
               aria-hidden
-              className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+              className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-graphite-muted"
+              strokeWidth={1.75}
             />
           </div>
 
@@ -218,7 +219,7 @@ export function CatalogToolbar({
           <button
             type="submit"
             disabled={disabled}
-            className="inline-btn inline-flex h-11 shrink-0 items-center justify-center rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white transition hover:bg-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 disabled:opacity-60 sm:h-10"
+            className="inline-btn btn-primary h-11 shrink-0 px-4 text-sm disabled:opacity-60 sm:h-10"
           >
             Найти
           </button>
@@ -254,11 +255,11 @@ export function CatalogToolbar({
       />
 
       {/* Одна лента категорий с иконками и counts */}
-      <div className="-mx-4 px-4 sm:mx-0 sm:px-0">
+      <div className="-mx-4 px-4 pt-1 sm:mx-0 sm:px-0">
         <div
           role="tablist"
           aria-label="Категории"
-          className="horizontal-snap-row flex gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="horizontal-snap-row flex gap-2 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
           <CategoryTabs filters={filters} categories={facets.categories} />
         </div>
@@ -280,11 +281,7 @@ function CategoryTabs({
         href={buildCatalogHref({ ...filters, category: undefined, page: undefined })}
         role="tab"
         aria-selected={!filters.category}
-        className={`inline-flex shrink-0 snap-start items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
-          !filters.category
-            ? 'bg-slate-900 text-white shadow-sm'
-            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-        }`}
+        className={`catalog-chip snap-start ${!filters.category ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
       >
         Все
       </Link>
@@ -300,13 +297,11 @@ function CategoryTabs({
             })}
             role="tab"
             aria-selected={active}
-            className={`inline-flex shrink-0 snap-start items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-medium transition ${
-              active ? 'bg-slate-900 text-white shadow-sm' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-            }`}
+            className={`catalog-chip snap-start ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
           >
-            <CategoryTabIcon name={item.name} className={active ? 'text-white/85' : 'text-slate-500'} />
+            <CategoryTabIcon name={item.name} className={active ? 'text-white/85' : 'text-graphite-muted'} />
             <span>{item.name}</span>
-            <span className={`tabular-nums ${active ? 'text-white/65' : 'text-slate-400'}`}>{item.events}</span>
+            <span className={`tabular-nums ${active ? 'text-white/65' : 'text-graphite-muted/80'}`}>{item.events}</span>
           </Link>
         );
       })}
@@ -338,13 +333,13 @@ function FiltersButton({
       className={`relative inline-btn inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-xl px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 disabled:opacity-60 sm:h-10 ${
         open || count > 0
           ? 'bg-primary-600 text-white hover:bg-primary-700'
-          : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
+          : 'bg-surface-muted text-graphite hover:bg-slate-200/80'
       } ${className}`}
     >
-      <SlidersHorizontal aria-hidden className="h-4 w-4" />
+      <SlidersHorizontal aria-hidden className="h-4 w-4" strokeWidth={1.75} />
       <span className="hidden sm:inline">Фильтры</span>
       {count > 0 ? (
-        <span className="grid min-w-5 place-items-center rounded-full bg-white/25 px-1.5 text-xs" aria-label={`Активных фильтров: ${count}`}>
+        <span className="grid min-w-5 place-items-center rounded-md bg-white/25 px-1.5 text-xs" aria-label={`Активных фильтров: ${count}`}>
           {count}
         </span>
       ) : null}

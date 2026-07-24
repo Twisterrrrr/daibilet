@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import { Compass } from 'lucide-react';
 
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
+import { DaibiletLogo } from '@/components/DaibiletLogo';
 import { cityHref } from '@/lib/routes';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { CANONICAL_LANDING_SLUGS } from '@/lib/landing-constants';
@@ -45,21 +45,18 @@ export function SiteFooter({ destinations }: SiteFooterProps) {
   const popularDirections = getFooterPopularDirections();
 
   return (
-    <footer className="border-t border-slate-200 bg-slate-50">
-      <div className="container-page py-12">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+    <footer className="border-t border-slate-200/80 bg-surface-muted">
+      <div className="container-page py-14 sm:py-16">
+        <div className="grid grid-cols-2 gap-10 md:grid-cols-4 md:gap-12">
           <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2">
-              <Compass className="h-6 w-6 text-primary-600" />
-              <span className="text-lg font-bold text-slate-900">
-                Дай<span className="text-primary-600">билет</span>
-              </span>
+            <Link href="/" className="inline-flex">
+              <DaibiletLogo textClassName="text-lg" />
             </Link>
-            <p className="mt-3 text-sm leading-6 text-slate-500">
+            <p className="mt-4 max-w-xs text-sm leading-6 text-graphite-muted">
               Билеты на экскурсии, музеи и мероприятия по городам России.
-              Покупайте онлайн, посещайте лучшее!
+              Покупайте онлайн, посещайте лучшее.
             </p>
-            <div className="mt-4 text-base font-medium text-slate-800">
+            <div className="mt-5 text-sm font-medium text-graphite">
               <a href="mailto:info@daibilet.ru" className="transition-colors hover:text-primary-600">
                 info@daibilet.ru
               </a>
@@ -71,18 +68,18 @@ export function SiteFooter({ destinations }: SiteFooterProps) {
           <FooterColumn title="Компания" links={companyLinks} />
         </div>
 
-        <div className="mt-10 border-t border-slate-200 pt-8">
-          <h3 className="text-sm font-semibold text-slate-900">Популярные направления</h3>
-          <div className="mt-4 grid gap-6 sm:grid-cols-2">
+        <div className="mt-12 pt-10">
+          <h3 className="text-sm font-semibold text-graphite">Популярные направления</h3>
+          <div className="mt-5 grid gap-8 sm:grid-cols-2">
             {popularDirections.map((block) => (
               <div key={block.citySlug}>
-                <p className="text-sm font-medium text-slate-800">{block.cityName}</p>
-                <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1.5">
+                <p className="text-sm font-medium text-graphite">{block.cityName}</p>
+                <ul className="mt-2.5 flex flex-wrap gap-x-4 gap-y-2">
                   {block.links.map((link) => (
                     <li key={`${block.citySlug}:${link.href}`}>
                       <Link
                         href={link.href}
-                        className="text-sm text-slate-500 transition-colors hover:text-primary-600"
+                        className="text-sm text-graphite-muted transition-colors hover:text-primary-600"
                       >
                         {link.label}
                       </Link>
@@ -94,26 +91,26 @@ export function SiteFooter({ destinations }: SiteFooterProps) {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-slate-200 pt-6">
+        <div className="mt-12 border-t border-slate-200/80 pt-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-            <p className="text-sm text-slate-900">&copy; {new Date().getFullYear()} Дайбилет</p>
+            <p className="text-sm text-graphite">&copy; {new Date().getFullYear()} Дайбилет</p>
             <div className="flex flex-col gap-2 text-right sm:ml-auto">
-              <div className="flex flex-wrap justify-end gap-x-4 gap-y-1 sm:gap-x-6">
-                <Link href="/privacy#user-agreement" className="text-sm text-slate-400 hover:text-slate-600">
+              <div className="flex flex-wrap justify-end gap-x-5 gap-y-1.5">
+                <Link href="/privacy#user-agreement" className="text-sm text-graphite-muted hover:text-graphite">
                   Пользовательское соглашение
                 </Link>
-                <Link href="/privacy#privacy-policy" className="text-sm text-slate-400 hover:text-slate-600">
+                <Link href="/privacy#privacy-policy" className="text-sm text-graphite-muted hover:text-graphite">
                   Политика конфиденциальности
                 </Link>
-                <Link href="/offer" className="text-sm text-slate-400 hover:text-slate-600">
+                <Link href="/offer" className="text-sm text-graphite-muted hover:text-graphite">
                   Договор-оферта (для партнёров)
                 </Link>
               </div>
-              <div className="flex flex-wrap justify-end gap-x-4 gap-y-1 sm:gap-x-6">
-                <Link href="/legal#refunds" className="text-sm text-slate-400 hover:text-slate-600">
+              <div className="flex flex-wrap justify-end gap-x-5 gap-y-1.5">
+                <Link href="/legal#refunds" className="text-sm text-graphite-muted hover:text-graphite">
                   Правила возврата
                 </Link>
-                <Link href="/legal#rightsholders" className="text-sm text-slate-400 hover:text-slate-600">
+                <Link href="/legal#rightsholders" className="text-sm text-graphite-muted hover:text-graphite">
                   Правообладателям
                 </Link>
               </div>
@@ -136,13 +133,13 @@ function FooterColumn({
 
   return (
     <div>
-      <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
-      <ul className="mt-3 space-y-2">
+      <h3 className="text-sm font-semibold text-graphite">{title}</h3>
+      <ul className="mt-4 space-y-2.5">
         {links.map((link) => (
           <li key={`${title}:${link.label}`}>
             <Link
               href={link.href}
-              className="text-sm text-slate-500 transition-colors hover:text-primary-600"
+              className="text-sm text-graphite-muted transition-colors hover:text-primary-600"
             >
               {link.label}
             </Link>
