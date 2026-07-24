@@ -14,7 +14,7 @@
 
 ### Проблемы
 
-- Нет (commit + deploy).
+- Нет. **Prod @`47430af`:** deploy-prod-next OK; `/events` 200 + `hero-slavic-02` + «Каталог событий»; `/locations` source `imageOverlay` + frames 04/01 в chunk `7113-*.js`.
 
 ---
 

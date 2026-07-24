@@ -21,8 +21,8 @@
 | H.4 | `/podborki` featured+trending equal-height, centered `max-w-5xl` | Высокий | ✅ `533d40a` prod @`d1ccd8a` |
 | H.4b | `/podborki` tag soup → `LandingCategory` + carousels (by-type/for-whom/seasonal) | Критический | ✅ `30e87fe`+`44887fb` |
 | H.5 | `/venues` dark imageOverlay + search | Средний | ✅ MVP |
-| H.5b | `/events` imageOverlay photo hero + search/city/date (как venues) | Критический | 🔄 deploy |
-| H.6 | `/locations` photo hero (imageOverlay) как venues; map не в hero | Критический | 🔄 deploy (pin-grid/RussiaMap aside снят) |
+| H.5b | `/events` imageOverlay photo hero + search/city/date (как venues) | Критический | ✅ `47430af` prod |
+| H.6 | `/locations` photo hero (imageOverlay) как venues; map не в hero | Критический | ✅ `47430af` prod |
 | H.7 | Video loop asset для home | Низкий | ⏳ нет ассета - rotator images |
 | H.8 | Blog Featured Hero + interactive list H1 + «Свежее»×3 + min price | Высокий | ✅ `b45995c` prod @`c39d124` |
 | H.8b | `/blog` featured+«Свежее»: max-w-5xl composition + square thumbs | Критический | ✅ `90f6151` prod @`d1ccd8a` |
