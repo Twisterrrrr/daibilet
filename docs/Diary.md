@@ -1,3 +1,23 @@
+## 2026-07-24 - /events + /locations: photo hero как у venues
+
+### Наблюдения
+
+- Owner после странной карты на `/locations`: «и hero для каталога тогда уж сделай нормальный».
+- `/events` оставался на `SectionPageHero` (slate strip) без photo overlay.
+- `/locations` `withMap` + abstract pin/RussiaMap в hero не выглядел как нормальный catalog hero; параллельный агент чинит map - не конфликтовать.
+
+### Решения
+
+- `/locations`: `HeroLayout` `imageOverlay` + `HeroMedia` (frames 04/01) + search/city/sort в белой панели (как `/venues`); fake map из hero убран.
+- `/events`: `CatalogShell` `withPhotoHero` - imageOverlay + stats + search/city/date в hero; sticky toolbar compact (категории + advanced filters); sort chips ниже.
+- Intent-подборки без photo hero - прежний `SectionPageHero` + CatalogShell.
+
+### Проблемы
+
+- Нет (commit + deploy).
+
+---
+
 ## 2026-07-24 - /blog: client crash Unknown encoding base64url
 
 ### Наблюдения
