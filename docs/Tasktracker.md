@@ -29,6 +29,8 @@
 | H.8c | `/blog` list hero → imageOverlay + search/chips внутри (уровень venues) | Критический | ✅ `8ec241c` prod @`067763d` |
 | H.8d | `/blog` city rank (header) + cursor pagination + article canonical | Критический | ✅ `44887fb` |
 | H.8e | `/blog` client: base64url Buffer crash → btoa/atob cursor | Критический | ✅ `c716a4e` prod |
+| H.8f | `/blog` sidebar promo: реальная афиша geo (цена, события, chips) | Критический | 🔄 |
+| H.9 | Ultrawide heroes: min-h + face-safe object-position (home+catalog HeroMedia) | Критический | 🔄 |
 
 ---
 
@@ -223,6 +225,7 @@
 | B.26 | `/blog` UX: темы, поиск, «Показать ещё», CTA CHPU, дата на large | Высокий | ✅ `bd8ec37` prod | агент |
 | B.27 | Blog Hero: `Article.isFeatured`, informational hero + admin toggle, LCP priority | Критический | ✅ `72ea839` prod (via d34fd28+) | агент |
 | B.28 | Blog Featured Hero: CTA-плитка с promo image под «Свежее» (убрать пустоту) | Критический | ✅ `72ea839` prod | агент |
+| B.28b | Sidebar promo под «Свежее»: цена/тайтлы/chips по header geo, не stock mic | Критический | 🔄 | агент |
 
 ---
 

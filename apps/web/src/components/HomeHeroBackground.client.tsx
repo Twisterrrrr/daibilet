@@ -3,7 +3,7 @@
 import * as React from 'react';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
-import type { HomeHeroImageSet } from '@/lib/home-hero-images';
+import { homeHeroObjectPositionClass, type HomeHeroImageSet } from '@/lib/home-hero-images';
 
 type HomeHeroBackgroundProps = {
   image: HomeHeroImageSet;
@@ -11,8 +11,7 @@ type HomeHeroBackgroundProps = {
 
 export function HomeHeroBackground({ image }: HomeHeroBackgroundProps) {
   const [loaded, setLoaded] = React.useState(false);
-  const desktopPos = image.objectPositionDesktop ?? 'md:object-[50%_22%]';
-  const mobilePos = image.objectPositionMobile ?? 'object-[50%_28%]';
+  const position = homeHeroObjectPositionClass(image);
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -23,7 +22,7 @@ export function HomeHeroBackground({ image }: HomeHeroBackgroundProps) {
         priority
         sizes={IMAGE_SIZES.homeHero}
         onLoad={() => setLoaded(true)}
-        className={`hidden object-cover transition-opacity duration-700 md:block ${desktopPos} ${
+        className={`hidden object-cover transition-opacity duration-700 md:block ${position} ${
           loaded ? 'opacity-100' : 'opacity-0'
         }`}
       />
@@ -34,7 +33,7 @@ export function HomeHeroBackground({ image }: HomeHeroBackgroundProps) {
         priority
         sizes={IMAGE_SIZES.homeHero}
         onLoad={() => setLoaded(true)}
-        className={`object-cover transition-opacity duration-700 md:hidden ${mobilePos} ${
+        className={`object-cover transition-opacity duration-700 md:hidden ${position} ${
           loaded ? 'opacity-100' : 'opacity-0'
         }`}
       />

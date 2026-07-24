@@ -1,3 +1,23 @@
+## 2026-07-24 - /blog sidebar promo: полезная афиша вместо stock-photo
+
+### Наблюдения
+
+- Owner: плитка под «Свежее» (тёмный mic, «СОБЫТИЯ ГОРОДА», «Афиша: Москва») беззубая - декоративная, без ценности.
+- Город на скрине из header geo; Fresh уже показывает min price по городу статьи.
+
+### Решения
+
+- `BlogSidebarPromo.client` читает header geo (`useSelectedCityOptional`) и показывает prefetch-данные афиши.
+- SSR `resolveBlogSidebarPromoMap`: priority cities + города featured/hot через `buildPublicCityDto` (как Fresh prices).
+- В тайле: «Билеты от N ₽», weekend count, 1-2 ближайших title, chips (landing/category → `/events?city=` или CHPU), cover события или city vibe image.
+- Fallback lite из `selectedDestination` (events + hubTags), если rich promo нет.
+
+### Проблемы
+
+- Нет (commit + deploy ниже).
+
+---
+
 ## 2026-07-24 - /events + /locations: photo hero как у venues
 
 ### Наблюдения
@@ -153,6 +173,26 @@ outes.ts (паритет с backend publicCitySlug).
 ### Проблемы
 
 - Параллельные агенты трогали `dto.js`/Diary - owner-pack SHA `30e87fe` + `44887fb`. Deploy: migrate + deploy-prod-next.
+
+---
+
+## 2026-07-24 - Ultrawide: hero strip crop (home + catalog)
+
+### Наблюдения
+
+- На 21:9 / 32:9 `HeroLayout` imageOverlay сжимался в низкую полосу по контенту; `object-cover` по 3:2 кадрам (1536x1024) оставлял ~15-20% высоты - резал лица/края даже после face-safe focus (`37678e6`).
+- Каталоги (events/venues/locations/cities/blog) шли с `object-center` без пула focus.
+- Более широких ассетов в `/images/hero` нет - только те же 3:2.
+
+### Решения
+
+- `HeroLayout` media: `2xl` min-h `min(70vh,34rem)` + `@media (min-aspect-ratio: 21/9)` min-h `min(70vh, 100vw/2.35)` / max-h 70vh; контент `flex-1 justify-center`. Mobile без изменений.
+- `HeroMedia`: нет `objectPosition` → `objectPositionForHeroSrc` (пул slavic/friends) или `HOME_HERO_OBJECT_POSITION_DEFAULT` с 2xl/ultrawide Y ~28-32%.
+- Per-frame focus в `home-hero-images` дополнен ultrawide breakpoints.
+
+### Проблемы
+
+- Новые stock не качали; если на 32:9 всё ещё тесно по бокам - следующий шаг art-direction / более широкие кадры.
 
 ---
 
