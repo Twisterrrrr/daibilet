@@ -1,3 +1,23 @@
+## 2026-07-24 - Home TTFB: убрать connection() + cache fingerprints
+
+### Наблюдения
+
+- Prod `/` TTFB 4-58s (MISS), `/cities` ~0.1-0.4s HIT при `revalidate=300`.
+- `await connection()` в `HomePageContent` форсировал dynamic `no-store` на каждый запрос.
+- `resolveCoverContentFingerprints` (sync S3 HEAD) шёл на request path вне `unstable_cache` с каталогом.
+
+### Решения
+
+- Убран `connection()` с home; hero уже в `unstable_cache` 300s (`getActiveHeroBanners`).
+- `getHomeCoverFingerprints` - `unstable_cache` 300s + `HOME_PAGE_CACHE_TAG`; HEAD только на miss, не на каждый SSR.
+- Basename + ETag dedupe rails (Harry Potter / unique covers) сохранены.
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next + smoke TTFB).
+
+---
+
 ## 2026-07-24 - Ultrawide hero: откат *-uw art-direction
 
 ### Наблюдения

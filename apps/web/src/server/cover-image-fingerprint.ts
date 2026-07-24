@@ -43,6 +43,8 @@ async function headFingerprint(url: string, timeoutMs: number): Promise<string |
       redirect: 'follow',
       signal: controller.signal,
       headers: { Accept: 'image/*,*/*' },
+      // Caller wraps in unstable_cache; avoid Next Data Cache per-URL HEAD entries.
+      cache: 'no-store',
     });
     if (!response.ok) return null;
     const etag = normalizeEtag(response.headers.get('etag'));

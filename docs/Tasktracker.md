@@ -44,6 +44,7 @@
 |---|--------|-----------|--------|
 | HR.1 | Taboo Harry Potter + basename cover skip (`4e18b60`) | Критический | ✅ |
 | HR.2 | Content fingerprint (ETag) + multi-key URL normalize; refill gaps | Критический | ✅ `ab1dc94` prod |
+| HR.3 | Home TTFB: убрать `connection()` + fingerprints в `unstable_cache` 300s | Критический | 🔄 |
 
 ---
 

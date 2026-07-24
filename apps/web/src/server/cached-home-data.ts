@@ -9,6 +9,7 @@ import {
   buildPublicVenuesDto,
 } from '@daibilet/backend/public-read';
 import { HOME_PAGE_CACHE_TAG, PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
+import { resolveCoverContentFingerprints } from '@/server/cover-image-fingerprint';
 
 export { HOME_PAGE_CACHE_TAG };
 
@@ -63,6 +64,23 @@ export const getHomeCatalog = unstable_cache(
   // Wider pool so cover-content dedupe can refill rails after skipping identical binaries.
   () => buildPublicCatalogDto({ limit: 80, sort: 'popular' }),
   ['home-catalog-v5-cover-dedupe'],
+  homeCacheOptions,
+);
+
+/**
+ * S3 HEAD ETag fingerprints for home rails dedupe.
+ * Kept off the per-request path: same 300s tag/revalidate as catalog.
+ * Returns a plain object (JSON-serializable for unstable_cache).
+ */
+export const getHomeCoverFingerprints = unstable_cache(
+  async (): Promise<Record<string, string>> => {
+    const catalog = await getHomeCatalog();
+    const map = await resolveCoverContentFingerprints(
+      (catalog.items ?? []).map((item) => item.imageUrl),
+    );
+    return Object.fromEntries(map);
+  },
+  ['home-cover-fingerprints-v1'],
   homeCacheOptions,
 );
 

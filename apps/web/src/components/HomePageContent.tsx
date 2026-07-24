@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { connection } from 'next/server';
 import {
   ArrowRight,
   CalendarDays,
@@ -17,11 +16,10 @@ import { HomeEventRail, HomeNowSection } from '@/components/HomeNowSection.clien
 import { HomeHero } from '@/components/HomeHero.client';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
-import { SiteLayout } from '@/components/SiteLayout';
 import { mergeBlogCards } from '@/lib/blog-utils';
 import { buildPublicArticlesListDto } from '@daibilet/backend/public-read';
 import '@/lib/env';
-import { getHomePageData } from '@/server/cached-home-data';
+import { getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
 import { formatMoney, pluralEvents } from '@/lib/format';
 import { buildHomePageSections } from '@/lib/home-page-sections';
 import { HOME_FORMAT_TILES, HOME_TRUST_ITEMS } from '@/lib/home-scenarios';
@@ -55,17 +53,18 @@ function promoBlockIcon(slug: string, index: number) {
 }
 
 export async function HomePageContent() {
-  // Per-request boundary so hero banners are not frozen into one ISR frame.
-  await connection();
-
-  const { destinationsPayload, catalogPayload, landingsCatalog, venuesPayload } = await getHomePageData();
+  // Hero banners: unstable_cache 300s (matches page revalidate). Do not call
+  // connection() here - it forces dynamic no-store and kills CDN/ISR HIT on `/`.
+  const [{ destinationsPayload, catalogPayload, landingsCatalog, venuesPayload }, fingerprintsRecord] =
+    await Promise.all([getHomePageData(), getHomeCoverFingerprints()]);
 
   const destinations = destinationsPayload?.destinations ?? [];
   const cities = destinations.filter((item) => item.type === 'city');
   const topCities = [...cities].sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')).slice(0, 8);
 
   const sessions = catalogPayload?.items ?? [];
-  const { editorsPick, homeNowTabs, popular } = await buildHomePageSections(sessions);
+  const fingerprints = new Map(Object.entries(fingerprintsRecord));
+  const { editorsPick, homeNowTabs, popular } = await buildHomePageSections(sessions, { fingerprints });
   const sparseCatalog = sessions.length < 12;
 
   const homeVenues = (venuesPayload?.venues ?? [])
