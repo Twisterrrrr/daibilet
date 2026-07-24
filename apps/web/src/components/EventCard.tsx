@@ -27,7 +27,11 @@ import {
   resolvePseudoRating,
 } from '@/lib/event-card-meta';
 import { resolveEventCardObjectPosition } from '@/lib/event-image-focus';
-import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
+import {
+  resolveEventCardDestinationLabel,
+  resolveEventCardLocationLabel,
+  resolveEventCardPinLines,
+} from '@/lib/event-location';
 import { formatMoneyRange } from '@/lib/format';
 import { eventHref } from '@/lib/routes';
 
@@ -272,10 +276,8 @@ function ShowcaseEventCard({
   });
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const pseudoRating = resolvePseudoRating(session.groupKey || session.id);
-  const cityLabel = resolveEventCardDestinationLabel(session);
   const dateLabel = rail ? formatShowcaseSessionDateCompact(session) : formatShowcaseSessionDate(session);
-  const locationLabel = resolveEventCardLocationLabel(session);
-  const venueLine = [locationLabel, cityLabel].filter(Boolean).join(' · ');
+  const pinLines = resolveEventCardPinLines(session);
   const categoryLabel = session.category?.trim() || null;
   const durationLabel = extractDurationLabel(session.tags);
   const priceLabel = hasPrice ? formatShowcasePriceLabel(session.priceFrom) : 'Скоро';
@@ -332,11 +334,16 @@ function ShowcaseEventCard({
           <span>{dateLabel}</span>
         </p>
 
-        {venueLine ? (
-          <p className={`mt-auto event-card-meta ${rail ? 'line-clamp-2' : 'truncate'}`}>
-            <MapPin className="event-card-meta-icon" />
-            <span>{venueLine}</span>
-          </p>
+        {pinLines.primary ? (
+          <div className={`mt-auto flex items-start gap-1.5 text-ui-xs text-graphite-muted ${rail ? '' : 'min-w-0'}`}>
+            <MapPin className="event-card-meta-icon mt-0.5" />
+            <div className="min-w-0">
+              <p className={rail ? 'line-clamp-2' : 'truncate'}>{pinLines.primary}</p>
+              {pinLines.secondary ? (
+                <p className={`mt-0.5 ${rail ? 'line-clamp-1' : 'truncate'}`}>{pinLines.secondary}</p>
+              ) : null}
+            </div>
+          </div>
         ) : (
           <div className="mt-auto" />
         )}

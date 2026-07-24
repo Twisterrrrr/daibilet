@@ -56,7 +56,7 @@ export function InstitutionList({
   if (!venues.length) return null;
 
   return (
-    <div className={`overflow-hidden rounded-2xl border border-slate-200 bg-white divide-y divide-slate-100 ${className}`}>
+    <div className={`overflow-hidden rounded-card bg-white shadow-card divide-y divide-slate-100 ${className}`}>
       {venues.map((venue) => (
         <InstitutionListRow key={venue.id} venue={venue} href={hrefFor(venue)} />
       ))}

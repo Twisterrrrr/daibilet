@@ -159,7 +159,7 @@ export function HeaderSearch({
     }
   };
 
-  const inputClasses = `w-full bg-white pl-10 pr-3 text-base text-slate-900 outline-none placeholder:text-slate-400 ${inputClassName}`;
+  const inputClasses = `w-full bg-white pl-10 pr-3 text-base text-graphite outline-none placeholder:text-graphite-muted ${inputClassName}`;
 
   const resultsList =
     resultsOpen && items.length ? (
@@ -167,7 +167,7 @@ export function HeaderSearch({
         className={
           variant === 'overlay'
             ? 'max-h-[min(50vh,24rem)] overflow-y-auto py-1'
-            : 'absolute left-0 right-0 top-full z-50 mt-1 max-h-80 overflow-y-auto rounded-xl border border-slate-200 bg-white py-1 shadow-lg'
+            : 'absolute left-0 right-0 top-full z-50 mt-1.5 max-h-80 overflow-y-auto rounded-card bg-white py-1 shadow-card-hover'
         }
         role="listbox"
       >
@@ -178,7 +178,7 @@ export function HeaderSearch({
               onMouseDown={(event) => event.preventDefault()}
               onClick={() => navigate(item.href)}
               className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors ${
-                index === activeIndex ? 'bg-primary-50' : 'hover:bg-slate-50'
+                index === activeIndex ? 'bg-primary-50' : 'hover:bg-surface-muted'
               }`}
             >
               {item.imageUrl ? (
@@ -192,13 +192,13 @@ export function HeaderSearch({
                   />
                 </span>
               ) : (
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-slate-100 text-xs font-semibold uppercase text-slate-500">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-surface-muted text-xs font-semibold uppercase text-graphite-muted">
                   {item.type === 'city' ? 'Г' : item.type === 'landing' ? 'П' : 'E'}
                 </div>
               )}
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium text-slate-900">{item.label}</span>
-                {item.sublabel ? <span className="block truncate text-xs text-slate-500">{item.sublabel}</span> : null}
+                <span className="block truncate text-sm font-medium text-graphite">{item.label}</span>
+                {item.sublabel ? <span className="block truncate text-xs text-graphite-muted">{item.sublabel}</span> : null}
               </span>
             </button>
           </li>
@@ -212,10 +212,10 @@ export function HeaderSearch({
         <button
           type="button"
           onClick={() => setOverlayOpen(true)}
-          className={`inline-flex h-10 w-10 items-center justify-center text-slate-500 transition hover:text-slate-900 ${className}`}
+          className={`inline-flex h-10 w-10 items-center justify-center rounded-lg text-graphite-muted transition hover:bg-surface-muted hover:text-graphite ${className}`}
           aria-label="Открыть поиск"
         >
-          <Search className="h-5 w-5 shrink-0" />
+          <Search className="h-5 w-5 shrink-0" strokeWidth={1.75} />
         </button>
 
         {overlayOpen ? (
@@ -223,18 +223,18 @@ export function HeaderSearch({
             <button
               type="button"
               aria-label="Закрыть поиск"
-              className="absolute inset-0 bg-slate-900/55 backdrop-blur-[2px]"
+              className="absolute inset-0 bg-slate-900/50 backdrop-blur-[2px]"
               onClick={closeOverlay}
             />
             <div
               ref={rootRef}
-              className="relative w-full max-w-2xl overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl"
+              className="relative w-full max-w-2xl overflow-hidden rounded-card bg-white shadow-card-hover"
               role="dialog"
               aria-modal="true"
               aria-label="Поиск"
             >
-              <div className="relative border-b border-slate-100">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-graphite-muted" strokeWidth={1.75} />
                 <input
                   ref={inputRef}
                   value={query}
@@ -251,17 +251,17 @@ export function HeaderSearch({
                   type="button"
                   onClick={closeOverlay}
                   aria-label="Закрыть"
-                  className="absolute right-3 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100"
+                  className="absolute right-3 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-graphite-muted transition hover:bg-surface-muted hover:text-graphite"
                 >
-                  <X className="h-5 w-5" />
+                  <X className="h-5 w-5" strokeWidth={1.75} />
                 </button>
               </div>
               {resultsList}
               {query.trim().length >= 2 && !items.length ? (
-                <p className="px-4 py-6 text-center text-sm text-slate-500">Ничего не найдено. Нажмите Enter для поиска в каталоге.</p>
+                <p className="px-4 py-6 text-center text-sm text-graphite-muted">Ничего не найдено. Нажмите Enter для поиска в каталоге.</p>
               ) : null}
               {query.trim().length < 2 ? (
-                <p className="px-4 py-4 text-sm text-slate-400">Введите минимум 2 символа или нажмите Enter для каталога.</p>
+                <p className="px-4 py-4 text-sm text-graphite-muted">Введите минимум 2 символа или нажмите Enter для каталога.</p>
               ) : null}
             </div>
           </div>

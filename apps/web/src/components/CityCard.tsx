@@ -44,7 +44,7 @@ function CityHubTags({ city }: { city: PublicDestinationDto }) {
           <li key={`${tag.kind}:${tag.slug || tag.label}`} className="min-w-0 shrink">
             <Link
               href={href}
-              className="inline-flex max-w-full whitespace-nowrap truncate rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-semibold leading-4 text-slate-700 shadow-sm transition hover:border-primary/40 hover:text-primary-700"
+              className="inline-flex max-w-full whitespace-nowrap truncate rounded-lg bg-surface-muted px-2 py-0.5 text-[10px] font-semibold leading-4 text-graphite-muted transition hover:bg-slate-200/80 hover:text-primary-700"
             >
               {tag.label}
             </Link>

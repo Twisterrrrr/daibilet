@@ -1,3 +1,26 @@
+## 2026-07-25 - Clean UI фазы 3-4 + home photo tiles + pin fix
+
+### Наблюдения
+
+- Owner: pin на «Куда сходить сейчас» показывал `("ЯКарелия") адрес · город` одной строкой.
+- Featured blog на home: глобальный `h3 { text-graphite }` перетирал белый title на photo overlay.
+- Блоки «Формат отдыха» и «Тематические подборки» были на кислотных градиентах.
+
+### Решения
+
+- `resolveEventCardPinLines`: primary = адрес/город, secondary = провайдер без `("…")`.
+- Featured blog title/badge → явный `text-white`.
+- 10 JPG в `apps/public/public/images/home/` + photo cover tiles (format + promo) с dark overlay.
+- CU.8/CU.4 polish: CityCard tags, InstitutionCard, BlogPostCard, LandingDirectionCard, HeaderSearch overlay под токены; лёгкий hover translate/scale.
+- next/font self-host: по-прежнему Google Fonts `<link>` (lean next/font без google files) - CU.2b остаётся.
+
+### Проблемы
+
+- JPG ~2MB/шт - приемлемо для smoke; при необходимости follow-up compress/webp.
+- Public `home-scenarios` legacy не трогали (отдельный surface).
+
+---
+
 ## 2026-07-25 - Clean UI фаза 2: header, event page, filters
 
 ### Наблюдения

@@ -134,7 +134,7 @@ export function LandingDirectionCard({
   return (
     <Link
       href={href}
-      className="group relative flex h-56 flex-col justify-end overflow-hidden rounded-2xl bg-slate-900 shadow-sm ring-1 ring-slate-900/10 transition hover:-translate-y-0.5 hover:shadow-xl sm:h-60"
+      className="group relative flex h-56 flex-col justify-end overflow-hidden rounded-card bg-slate-900 shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover sm:h-60"
     >
       {imageUrl ? (
         <SafeImage

@@ -10,11 +10,11 @@ import type { VenueCatalogCard } from '@/lib/venue-map-types';
 import { venueTypeLabel } from '@/lib/venue-meta';
 
 const TYPE_GRADIENT: Record<string, string> = {
-  museum_art_space: 'from-amber-600 via-orange-700 to-slate-900',
-  theater: 'from-rose-600 via-red-800 to-slate-950',
-  concert_hall: 'from-violet-600 via-indigo-800 to-slate-950',
-  bar: 'from-amber-700 via-orange-900 to-slate-950',
-  club_bar_restaurant: 'from-emerald-600 via-teal-800 to-slate-950',
+  museum_art_space: 'from-stone-600 via-amber-800 to-slate-900',
+  theater: 'from-rose-700 via-red-900 to-slate-950',
+  concert_hall: 'from-slate-600 via-slate-800 to-slate-950',
+  bar: 'from-amber-800 via-orange-950 to-slate-950',
+  club_bar_restaurant: 'from-teal-700 via-slate-800 to-slate-950',
 };
 
 type InstitutionCardVenue = VenueCatalogCard;
@@ -34,49 +34,51 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
   return (
     <Link
       href={href}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg hover:shadow-slate-200/50"
+      className="group flex flex-col overflow-hidden rounded-card bg-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover"
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+      <div className="relative aspect-[4/3] overflow-hidden bg-surface-muted">
         <SafeImage
           src={venue.heroImageUrl}
           alt=""
           fill
           sizes={IMAGE_SIZES.institutionCard}
-          className="object-cover transition duration-500 group-hover:scale-105"
+          className="object-cover transition duration-500 group-hover:scale-[1.03]"
           fallback={<div className={`h-full w-full bg-gradient-to-br ${gradient}`} />}
         />
 
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
-          <span className="rounded-full bg-white/95 px-2.5 py-1 text-xs font-semibold text-slate-700 backdrop-blur">
+          <span className="rounded-lg bg-white/95 px-2.5 py-1 text-xs font-semibold text-graphite backdrop-blur">
             {typeLabel}
           </span>
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col p-4">
-        <h3 className="line-clamp-2 text-base font-semibold text-slate-900 group-hover:text-primary-600">{venue.name}</h3>
+      <div className="flex flex-1 flex-col gap-3 p-4 sm:p-5">
+        <h3 className="line-clamp-2 font-display text-base font-semibold text-graphite group-hover:text-primary-600">
+          {venue.name}
+        </h3>
 
-        <div className="mt-2 space-y-1 text-sm text-slate-500">
+        <div className="space-y-1 text-sm text-graphite-muted">
           <div className="flex items-center gap-1.5">
-            <MapPin className="h-3.5 w-3.5 shrink-0" />
+            <MapPin className="h-3.5 w-3.5 shrink-0" strokeWidth={1.75} />
             <span className="truncate">{street || venue.city}</span>
           </div>
         </div>
 
         {venue.shortDescription ? (
-          <p className="mt-3 line-clamp-2 text-xs leading-relaxed text-slate-500">{venue.shortDescription}</p>
+          <p className="line-clamp-2 text-xs leading-relaxed text-graphite-muted">{venue.shortDescription}</p>
         ) : null}
-        {category ? <p className={`text-xs text-slate-500 ${venue.shortDescription ? 'mt-2' : 'mt-3'}`}>В афише: {category}</p> : null}
+        {category ? <p className="text-xs text-graphite-muted">В афише: {category}</p> : null}
 
-        <div className="mt-4 flex items-end justify-between border-t border-slate-100 pt-3">
+        <div className="mt-auto flex items-end justify-between gap-3 pt-1">
           <div>
-            <div className="text-xs text-slate-400">{venue.city}</div>
-            <div className="text-sm font-semibold text-slate-900">
+            <div className="text-xs text-graphite-muted">{venue.city}</div>
+            <div className="text-sm font-semibold text-graphite">
               {venue.events > 0 ? pluralEvents(venue.events) : 'Афиша скоро'}
             </div>
           </div>
-          <span className="inline-flex items-center gap-1 rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white group-hover:bg-primary-600">
-            <Ticket className="h-3.5 w-3.5" />
+          <span className="inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white transition group-hover:bg-primary-700">
+            <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} />
             Афиша
           </span>
         </div>

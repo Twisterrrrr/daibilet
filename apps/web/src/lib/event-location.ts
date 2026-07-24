@@ -6,6 +6,10 @@ import type { PublicSessionDto } from '@daibilet/contracts/public';
 const GENERIC_VENUE_LABEL_RE =
   /^(точка сбора|место сбора|точка встречи|не указано|адрес уточняется|сбор группы|место отправления)$/iu;
 
+/** Prefix like `("ЯКарелия")`, `(«Org»)`, `"Provider"` before an address. */
+const PROVIDER_PREFIX_RE =
+  /^(?:\(\s*[«"']?\s*([^)»"']{2,60}?)\s*[»"']?\s*\)|[«"']\s*([^»"']{2,60}?)\s*[»"'])\s*/u;
+
 function looksLikeStreet(value: string): boolean {
   return /(?:\bul\.|\bпр\.|\bпер\.|наб\.|,\s*д\.|,\s*дом\b|набереж|улиц|просп|площад|линия\b|причал\b)/iu.test(value);
 }
@@ -24,6 +28,25 @@ function normalizeComparableLabel(value: string): string {
     .replace(/\s+/g, ' ');
 }
 
+function cleanProviderName(value: string): string {
+  return String(value || '')
+    .trim()
+    .replace(/^[«"'(\[]+|[\])"'»]+$/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/** Split `("Provider") Address` / quoted org prefixes from the rest of a venue string. */
+export function splitVenueProviderPrefix(raw: string): { provider: string | null; rest: string } {
+  const text = String(raw || '').trim();
+  if (!text) return { provider: null, rest: '' };
+  const match = text.match(PROVIDER_PREFIX_RE);
+  if (!match) return { provider: null, rest: text };
+  const provider = cleanProviderName(match[1] || match[2] || '');
+  const rest = text.slice(match[0].length).trim();
+  return { provider: provider || null, rest };
+}
+
 type EventCardLocationInput = {
   title?: string | null;
   institutionVenue?: string | null;
@@ -35,25 +58,33 @@ type EventCardLocationInput = {
   venueKind?: string | null;
 };
 
+function resolveVenueParts(session: EventCardLocationInput) {
+  const rawVenue = formatPublicVenueTitle(session.venue);
+  const split = splitVenueProviderPrefix(rawVenue);
+  const venueName = split.rest || (split.provider ? '' : rawVenue);
+  const providerFromVenue = split.provider;
+  const address =
+    formatStreetAddress(session.venueAddress, { city: session.city }) ||
+    (venueName && looksLikeStreet(venueName)
+      ? formatStreetAddress(venueName, { city: session.city }) || venueName
+      : '');
+  return { venueName, providerFromVenue, address, rawVenue };
+}
+
 /** Строка локации для карточки события: адрес, если название площадки служебное. */
 export function resolveEventCardLocationLabel(session: EventCardLocationInput): string {
-  const venueName = formatPublicVenueTitle(session.venue);
-  const address = formatStreetAddress(session.venueAddress, { city: session.city });
+  const { venueName, providerFromVenue, address } = resolveVenueParts(session);
   const meetingPoint = isMeetingPointLike({
     type: session.venueKind,
-    name: venueName,
+    name: venueName || providerFromVenue,
     address: session.venueAddress || address,
   });
 
-  if (
-    session.destinationType === 'region' &&
-    address &&
-    isRuralSettlementAddress(address)
-  ) {
+  if (session.destinationType === 'region' && address && isRuralSettlementAddress(address)) {
     return address;
   }
 
-  if (address && (meetingPoint || isGenericVenueLabel(venueName))) {
+  if (address && (meetingPoint || isGenericVenueLabel(venueName) || providerFromVenue)) {
     return address;
   }
 
@@ -68,10 +99,68 @@ export function resolveEventCardLocationLabel(session: EventCardLocationInput): 
   return address || venueName || '';
 }
 
+export type EventCardPinLines = {
+  /** Рядом с pin: город / короткий адрес / «адрес · город». */
+  primary: string;
+  /** Ниже: провайдер / площадка без кривых кавычек. */
+  secondary: string | null;
+};
+
+/**
+ * Две строки для pin на showcase/home rails:
+ * primary - человекочитаемое место; secondary - org/площадка без `("…")`.
+ */
+export function resolveEventCardPinLines(session: EventCardLocationInput): EventCardPinLines {
+  const city = resolveEventCardDestinationLabel(session);
+  const { venueName, providerFromVenue, address } = resolveVenueParts(session);
+  const institution = resolveEventInstitutionLabel(session);
+
+  let primary = '';
+  if (address) {
+    const addressHasCity =
+      city && normalizeComparableLabel(address).includes(normalizeComparableLabel(city));
+    if (addressHasCity || !city) primary = address;
+    else if (address.length <= 42) primary = `${address} · ${city}`;
+    else primary = city || address;
+  } else if (city) {
+    primary = city;
+  } else if (venueName && looksLikeStreet(venueName)) {
+    primary = venueName;
+  } else if (venueName && !isGenericVenueLabel(venueName) && !providerFromVenue) {
+    primary = venueName;
+  }
+
+  const secondaryCandidates = [
+    providerFromVenue,
+    institution && normalizeComparableLabel(institution) !== normalizeComparableLabel(primary)
+      ? institution
+      : null,
+    venueName &&
+    !looksLikeStreet(venueName) &&
+    !isGenericVenueLabel(venueName) &&
+    normalizeComparableLabel(venueName) !== normalizeComparableLabel(primary) &&
+    normalizeComparableLabel(venueName) !== normalizeComparableLabel(address || '')
+      ? venueName
+      : null,
+  ].filter(Boolean) as string[];
+
+  const secondary = secondaryCandidates[0] || null;
+  if (!primary && secondary) {
+    return { primary: secondary, secondary: null };
+  }
+  if (
+    primary &&
+    secondary &&
+    normalizeComparableLabel(primary) === normalizeComparableLabel(secondary)
+  ) {
+    return { primary, secondary: null };
+  }
+  return { primary, secondary };
+}
+
 /** Физический адрес для блока «Адрес» на странице события. */
 export function resolveEventAddressLabel(session: EventCardLocationInput): string {
-  const venueName = formatPublicVenueTitle(session.venue);
-  const address = formatStreetAddress(session.venueAddress, { city: session.city });
+  const { venueName, address } = resolveVenueParts(session);
 
   if (address && normalizeComparableLabel(address) !== normalizeComparableLabel(venueName)) {
     return address;
@@ -87,29 +176,30 @@ export function resolveEventAddressLabel(session: EventCardLocationInput): strin
 /** Название площадки для ссылок и карточек: null, если в поле venue лежит адрес или служебная подпись. */
 export function resolveEventVenueDisplayLabel(session: EventCardLocationInput): string | null {
   const institutionLabel = resolveEventInstitutionLabel(session);
-  const venueName = formatPublicVenueTitle(session.venue);
-  const address = formatStreetAddress(session.venueAddress, { city: session.city });
+  const { venueName, providerFromVenue, address } = resolveVenueParts(session);
   const meetingPoint = isMeetingPointLike({
     type: session.venueKind,
-    name: venueName,
+    name: venueName || providerFromVenue,
     address: session.venueAddress || address,
   });
   const venueIsAddressLike =
     !venueName ||
     isGenericVenueLabel(venueName) ||
     looksLikeStreet(venueName) ||
+    Boolean(providerFromVenue) ||
     (address && normalizeComparableLabel(venueName) === normalizeComparableLabel(address)) ||
     (meetingPoint && Boolean(address));
 
+  if (providerFromVenue && venueIsAddressLike) return providerFromVenue;
   if (institutionLabel && venueIsAddressLike) return institutionLabel;
 
-  if (!venueName || isGenericVenueLabel(venueName)) return institutionLabel || null;
+  if (!venueName || isGenericVenueLabel(venueName)) return providerFromVenue || institutionLabel || null;
 
-  if (looksLikeStreet(venueName)) return institutionLabel || null;
+  if (looksLikeStreet(venueName)) return providerFromVenue || institutionLabel || null;
   if (address && normalizeComparableLabel(venueName) === normalizeComparableLabel(address)) {
-    return institutionLabel || null;
+    return providerFromVenue || institutionLabel || null;
   }
-  if (meetingPoint && address) return institutionLabel || null;
+  if (meetingPoint && address) return providerFromVenue || institutionLabel || null;
 
   return venueName;
 }
@@ -124,7 +214,7 @@ export function abbreviateRegionName(name: string): string {
     .replace(/\s+край$/iu, ' край');
 }
 
-/** Город/регион в meta карточки: для областных событий — «Раменское, Московская обл.». */
+/** Город/регион в meta карточки: для областных событий - «Раменское, Московская обл.». */
 export function resolveEventCardDestinationLabel(session: EventCardLocationInput): string {
   const city = String(session.city || '').trim();
   const destination = String(session.destination || '').trim();

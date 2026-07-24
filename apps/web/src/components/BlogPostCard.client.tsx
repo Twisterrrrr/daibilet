@@ -91,8 +91,8 @@ export function BlogPostCard({
     : null;
 
   const cardShell = [
-    'group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition',
-    'hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md',
+    'group flex h-full flex-col overflow-hidden rounded-card bg-white shadow-card transition duration-300',
+    'hover:-translate-y-0.5 hover:shadow-card-hover',
   ].join(' ');
 
   // Large: title → текст → chips → CTA → meta с датой (без nested <a>).
@@ -123,23 +123,23 @@ export function BlogPostCard({
           />
         </Link>
         <div className="flex min-w-0 flex-1 flex-col p-5 sm:p-6">
-          <h2 className="font-display text-xl font-bold leading-snug text-slate-900 sm:text-2xl lg:text-[1.75rem]">
+          <h2 className="font-display text-xl font-bold leading-snug text-graphite sm:text-2xl lg:text-[1.75rem]">
             <Link href={articleHref} className="hover:text-primary-700">
               {post.title}
             </Link>
           </h2>
           {hasCopy ? (
-            <p className="mt-2.5 whitespace-pre-line text-sm leading-relaxed text-slate-600 line-clamp-[10] sm:text-base sm:leading-[1.55] sm:line-clamp-[12]">
+            <p className="mt-2.5 whitespace-pre-line text-sm leading-relaxed text-graphite-muted line-clamp-[10] sm:text-base sm:leading-[1.55] sm:line-clamp-[12]">
               {[primary, secondary].filter(Boolean).join('\n\n')}
             </p>
           ) : null}
           {quickLinks.length ? (
-            <div className="mt-3 flex flex-wrap gap-2 border-t border-slate-100 pt-3" aria-label="Связанные разделы">
+            <div className="mt-3 flex flex-wrap gap-2 pt-3" aria-label="Связанные разделы">
               {quickLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="inline-flex max-w-full items-center truncate rounded-md border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700 transition hover:border-primary/40 hover:bg-primary-50/70 hover:text-primary-700 sm:text-sm"
+                  className="inline-flex max-w-full items-center truncate rounded-lg bg-surface-muted px-2.5 py-1 text-xs font-medium text-graphite-muted transition hover:bg-slate-200/80 hover:text-primary-700 sm:text-sm"
                 >
                   {link.label}
                 </Link>
@@ -147,10 +147,10 @@ export function BlogPostCard({
             </div>
           ) : null}
           {cta ? (
-            <div className={quickLinks.length ? 'mt-3' : 'mt-3 border-t border-slate-100 pt-3'}>
+            <div className="mt-3">
               <Link
                 href={cta.href}
-                className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="inline-flex items-center justify-center rounded-xl bg-primary-600 px-3.5 py-2 text-sm font-semibold text-white transition hover:bg-primary-700"
               >
                 {cta.label}
               </Link>

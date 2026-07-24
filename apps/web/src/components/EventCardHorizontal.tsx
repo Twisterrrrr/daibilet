@@ -18,7 +18,11 @@ import {
   resolvePseudoRating,
 } from '@/lib/event-card-meta';
 import { resolveEventCardObjectPosition } from '@/lib/event-image-focus';
-import { resolveEventCardDestinationLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
+import {
+  resolveEventCardDestinationLabel,
+  resolveEventCardLocationLabel,
+  resolveEventCardPinLines,
+} from '@/lib/event-location';
 import { formatMoneyRange } from '@/lib/format';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
 
@@ -44,6 +48,8 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
   const pseudoRating = resolvePseudoRating(session.groupKey || session.id);
   const destinationLabel = resolveEventCardDestinationLabel(session);
   const locationLabel = resolveEventCardLocationLabel(session);
+  const pinLines = resolveEventCardPinLines(session);
+  const pinPrimary = pinLines.primary || locationLabel;
   const durationLabel = extractDurationLabel(session.tags);
   const ageLabel = session.ageLimit?.trim() || null;
   const priceFooterLabel = formatMoneyRange(session.priceFrom, session.priceTo);
@@ -127,17 +133,25 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
               {sessionMetaLabel}
             </span>
           ) : null}
-          {locationLabel ? (
+          {pinPrimary ? (
             venueHref ? (
               <Link
                 href={venueHref}
-                className="relative z-[2] line-clamp-1 hover:text-primary-600"
+                className="relative z-[2] min-w-0 hover:text-primary-600"
                 onClick={(event) => event.stopPropagation()}
               >
-                {locationLabel}
+                <span className="line-clamp-1">{pinPrimary}</span>
+                {pinLines.secondary ? (
+                  <span className="mt-0.5 block line-clamp-1">{pinLines.secondary}</span>
+                ) : null}
               </Link>
             ) : (
-              <span className="line-clamp-1">{locationLabel}</span>
+              <span className="min-w-0">
+                <span className="line-clamp-1">{pinPrimary}</span>
+                {pinLines.secondary ? (
+                  <span className="mt-0.5 block line-clamp-1">{pinLines.secondary}</span>
+                ) : null}
+              </span>
             )
           ) : null}
         </div>

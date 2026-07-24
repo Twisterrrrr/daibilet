@@ -19,8 +19,14 @@
 | CU.5 | Header / SiteNav / footer под токены | Высокий | ✅ |
 | CU.6 | Event detail page: воздух, meta, CTA | Высокий | ✅ |
 | CU.7 | Catalog filters / chips toolbar | Средний | ✅ |
-| CU.8 | CityCard / InstitutionCard / landing tiles | Средний | ⏳ |
+| CU.8 | CityCard / InstitutionCard / landing tiles | Средний | ✅ |
+| CU.8b | Home format + thematic tiles: photo covers вместо градиентов | Высокий | ✅ |
+| CU.8c | EventCard pin lines: адрес/город vs provider secondary | Высокий | ✅ |
+| CU.8d | Home featured blog: white title on dark overlay | Высокий | ✅ |
 | CU.9 | Commit + deploy для owner review | Критический | 🔄 |
+| CU.10 | Blog surfaces + search overlay polish | Средний | ✅ |
+| CU.11 | Micro-animations (hover translate/scale) | Низкий | ✅ |
+| CU.2b | Self-host через next/font когда пакет next/font полный на билде | Средний | ⏳ |
 
 ---
 

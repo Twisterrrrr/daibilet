@@ -22,34 +22,23 @@ import '@/lib/env';
 import { getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
 import { formatMoney, pluralEvents } from '@/lib/format';
 import { buildHomePageSections } from '@/lib/home-page-sections';
-import { HOME_FORMAT_TILES, HOME_TRUST_ITEMS } from '@/lib/home-scenarios';
+import { HOME_FORMAT_TILES, HOME_TRUST_ITEMS, resolveHomePromoImage } from '@/lib/home-scenarios';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { venueHref } from '@/lib/routes';
 import { venuePageTemplate } from '@/lib/venue-meta';
 import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
 
-function promoGradient(index: number): string {
-  const variants = [
-    'bg-gradient-to-br from-primary-700 to-primary-950',
-    'bg-gradient-to-br from-emerald-600 to-slate-900',
-    'bg-gradient-to-br from-amber-500 to-orange-700',
-    'bg-gradient-to-br from-sky-600 to-indigo-900',
-    'bg-gradient-to-br from-rose-600 to-slate-900',
-    'bg-gradient-to-br from-violet-600 to-primary-950',
-  ];
-  return variants[index % variants.length];
-}
-
 function promoBlockIcon(slug: string, index: number) {
   const key = String(slug || '').toLowerCase();
-  if (key.includes('bridge')) return <Landmark className="mb-3 h-8 w-8 opacity-80" />;
-  if (key.includes('dinner') || key.includes('ужин')) return <UtensilsCrossed className="mb-3 h-8 w-8 opacity-80" />;
-  if (key.includes('party') || key.includes('disco')) return <CalendarDays className="mb-3 h-8 w-8 opacity-80" />;
-  if (key.includes('bus')) return <MapPin className="mb-3 h-8 w-8 opacity-80" />;
-  if (key.includes('concert')) return <CalendarDays className="mb-3 h-8 w-8 opacity-80" />;
-  if (index % 3 === 0) return <Ship className="mb-3 h-8 w-8 opacity-80" />;
-  if (index % 3 === 1) return <CalendarDays className="mb-3 h-8 w-8 opacity-80" />;
-  return <UtensilsCrossed className="mb-3 h-8 w-8 opacity-80" />;
+  const cls = 'mb-3 h-7 w-7 text-white/90 drop-shadow';
+  if (key.includes('bridge')) return <Landmark className={cls} />;
+  if (key.includes('dinner') || key.includes('ужин')) return <UtensilsCrossed className={cls} />;
+  if (key.includes('party') || key.includes('disco')) return <CalendarDays className={cls} />;
+  if (key.includes('bus')) return <MapPin className={cls} />;
+  if (key.includes('concert')) return <CalendarDays className={cls} />;
+  if (index % 3 === 0) return <Ship className={cls} />;
+  if (index % 3 === 1) return <CalendarDays className={cls} />;
+  return <UtensilsCrossed className={cls} />;
 }
 
 export async function HomePageContent() {
@@ -169,11 +158,22 @@ export async function HomePageContent() {
               <Link
                 key={tile.title}
                 href={tile.href}
-                className={`horizontal-snap-card group relative min-h-[140px] overflow-hidden rounded-xl bg-gradient-to-br p-5 text-white shadow-lg transition hover:scale-[1.02] md:w-auto ${tile.gradient}`}
+                className="horizontal-snap-card group relative min-h-[148px] overflow-hidden rounded-card text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover md:w-auto"
               >
-                <h3 className="text-lg font-bold">{tile.title}</h3>
-                <p className="mt-1 text-sm text-white/80">{tile.subtitle}</p>
-                <ChevronRight className="absolute bottom-4 right-4 h-5 w-5 opacity-70 transition group-hover:translate-x-0.5 group-hover:opacity-100" />
+                <SafeImage
+                  src={tile.imageUrl}
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 70vw, 25vw"
+                  className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                  fallback={<div className={`absolute inset-0 bg-gradient-to-br ${tile.fallbackGradient}`} />}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10" />
+                <div className="relative z-[1] flex h-full min-h-[148px] flex-col justify-end p-5">
+                  <h3 className="text-lg font-bold text-white">{tile.title}</h3>
+                  <p className="mt-1 text-sm text-white/85">{tile.subtitle}</p>
+                  <ChevronRight className="absolute bottom-4 right-4 h-5 w-5 text-white/80 transition group-hover:translate-x-0.5 group-hover:text-white" />
+                </div>
               </Link>
             ))}
           </div>
@@ -207,28 +207,41 @@ export async function HomePageContent() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Тематические подборки</h2>
-                <p className="mt-1 text-sm text-slate-500">Готовые списки под настроение и повод — от прогулок до концертов</p>
+                <p className="mt-1 text-sm text-slate-500">Готовые списки под настроение и повод - от прогулок до концертов</p>
               </div>
               <Link href="/podborki" className="inline-flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-800">
                 Все подборки <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
             <div className="horizontal-snap-row mt-6 flex flex-nowrap gap-3 snap-x snap-mandatory md:grid md:grid-cols-3 md:gap-3 md:overflow-visible md:pb-0">
-              {promoLandings.map((landing, index) => (
-                <Link
-                  key={landing.slug}
-                  href={landingCategoryHref(landing.slug)}
-                  className={`horizontal-snap-card group relative min-h-[168px] overflow-hidden rounded-xl p-5 text-left text-white shadow-lg transition-transform hover:scale-[1.02] sm:min-h-[180px] sm:p-6 md:w-auto ${promoGradient(index)}`}
-                >
-                  {promoBlockIcon(landing.slug, index)}
-                  <h3 className="text-lg font-bold">{landing.title}</h3>
-                  <p className="mt-1 text-sm text-white/80">{landing.subtitle}</p>
-                  <div className="mt-4 text-sm font-semibold">
-                    {pluralEvents(landing.events)} · {formatMoney(landing.priceFrom)}
-                  </div>
-                  <div className="absolute -bottom-4 -right-4 h-24 w-24 rounded-full bg-white/10 transition-transform group-hover:scale-150" />
-                </Link>
-              ))}
+              {promoLandings.map((landing, index) => {
+                const imageUrl = resolveHomePromoImage(landing.slug, landing.title);
+                return (
+                  <Link
+                    key={landing.slug}
+                    href={landingCategoryHref(landing.slug)}
+                    className="horizontal-snap-card group relative min-h-[168px] overflow-hidden rounded-card text-left text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover sm:min-h-[180px] md:w-auto"
+                  >
+                    <SafeImage
+                      src={imageUrl}
+                      alt=""
+                      fill
+                      sizes="(max-width: 768px) 75vw, 33vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                      fallback={<div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-950" />}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/15" />
+                    <div className="relative z-[1] flex h-full min-h-[168px] flex-col justify-end p-5 sm:min-h-[180px] sm:p-6">
+                      {promoBlockIcon(landing.slug, index)}
+                      <h3 className="text-lg font-bold text-white">{landing.title}</h3>
+                      <p className="mt-1 text-sm text-white/85">{landing.subtitle}</p>
+                      <div className="mt-4 text-sm font-semibold text-white">
+                        {pluralEvents(landing.events)} · {formatMoney(landing.priceFrom)}
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -249,7 +262,7 @@ export async function HomePageContent() {
             <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
               <Link
                 href={`/blog/${featuredBlog.slug}`}
-                className="group relative min-h-[240px] overflow-hidden rounded-2xl bg-slate-900 text-white shadow-lg sm:min-h-[280px]"
+                className="group relative min-h-[240px] overflow-hidden rounded-card bg-slate-900 text-white shadow-card sm:min-h-[280px]"
               >
                 <SafeImage
                   src={featuredBlog.coverImageUrl}
@@ -260,9 +273,11 @@ export async function HomePageContent() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                 <div className="relative flex h-full flex-col justify-end p-6">
-                  <span className="inline-flex w-fit rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">{featuredBlog.tag}</span>
-                  <h3 className="mt-3 text-2xl font-bold">{featuredBlog.title}</h3>
-                  <p className="mt-2 line-clamp-2 text-sm text-white/80">{featuredBlog.excerpt}</p>
+                  <span className="inline-flex w-fit rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
+                    {featuredBlog.tag}
+                  </span>
+                  <h3 className="mt-3 text-2xl font-bold text-white">{featuredBlog.title}</h3>
+                  <p className="mt-2 line-clamp-2 text-sm text-white/85">{featuredBlog.excerpt}</p>
                 </div>
               </Link>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
@@ -270,7 +285,7 @@ export async function HomePageContent() {
                   <Link
                     key={post.slug}
                     href={`/blog/${post.slug}`}
-                    className="group flex gap-4 rounded-2xl border border-slate-200 bg-white p-4 transition hover:border-primary/30 hover:shadow-md"
+                    className="group flex gap-4 rounded-card bg-white p-4 shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover"
                   >
                     <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-slate-200">
                       <SafeImage
@@ -299,10 +314,10 @@ export async function HomePageContent() {
           <h2 className="font-display text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Почему выбирают Дайбилет</h2>
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {HOME_TRUST_ITEMS.map(({ title, text }) => (
-              <div key={title} className="rounded-2xl border border-slate-200 bg-white p-5">
+              <div key={title} className="rounded-card bg-white p-5 shadow-card">
                 <CheckCircle2 className="h-6 w-6 text-primary-600" />
-                <h3 className="mt-3 font-semibold text-slate-900">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-600">{text}</p>
+                <h3 className="mt-3 font-semibold text-graphite">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-graphite-muted">{text}</p>
               </div>
             ))}
           </div>
