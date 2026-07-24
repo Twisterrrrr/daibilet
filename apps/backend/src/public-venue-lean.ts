@@ -2,6 +2,8 @@ import type { Prisma, VenueKind } from '@daibilet/db';
 import { prisma } from '@daibilet/db';
 import { join } from '@daibilet/db/sql';
 
+import { pickFirstUsableEventImageUrl } from './event-image-url.js';
+
 /** Non-draft / non-hidden events count for venue list tiles (no session hydrate). */
 export const ACTIVE_VENUE_EVENT_WHERE = {
   status: { notIn: ['HIDDEN', 'DRAFT'] },
@@ -166,6 +168,49 @@ export function applyVenueEventFacetCounts(
     waterEvents: facets.waterCounts.get(row.id) || 0,
     busEvents: facets.busCounts.get(row.id) || 0,
   }));
+}
+
+function isRealPublicHeroCandidate(url: string | null | undefined): boolean {
+  const raw = String(url || '').trim();
+  if (!raw) return false;
+  if (raw.startsWith('/images/cities/')) return false;
+  return /^https?:\/\//i.test(raw);
+}
+
+/**
+ * Lean cover fallbacks for venue tiles: one usable event/override image per venue.
+ * Replaces the old `buildActiveVenueEventCounts(...).heroImageFallbacks` path that
+ * required hydrating full publicCatalogSessions.
+ */
+export async function fetchVenueHeroImageFallbacks(
+  venueIds: string[],
+): Promise<Map<string, string>> {
+  const fallbacks = new Map<string, string>();
+  const ids = [...new Set((venueIds || []).map((id) => String(id || '').trim()).filter(Boolean))];
+  if (!ids.length) return fallbacks;
+
+  const rows = await prisma.$queryRaw<Array<{ venueId: string; imageUrl: string | null }>>`
+    select distinct on (e."venueId")
+      e."venueId" as "venueId",
+      coalesce(nullif(trim(o."imageUrl"), ''), nullif(trim(e."imageUrl"), '')) as "imageUrl"
+    from "Event" e
+    left join "EventOverride" o on o."eventId" = e.id
+    where e."venueId" in (${join(ids)})
+      and e.status not in ('HIDDEN', 'DRAFT')
+      and coalesce(nullif(trim(o."imageUrl"), ''), nullif(trim(e."imageUrl"), '')) is not null
+      and coalesce(nullif(trim(o."imageUrl"), ''), nullif(trim(e."imageUrl"), '')) !~* '^/images/cities/'
+      and coalesce(nullif(trim(o."imageUrl"), ''), nullif(trim(e."imageUrl"), '')) !~* 'placeholder\\.gif'
+    order by e."venueId", e."updatedAt" desc nulls last
+  `;
+
+  for (const row of rows) {
+    if (!row.venueId || fallbacks.has(row.venueId)) continue;
+    const picked = pickFirstUsableEventImageUrl(row.imageUrl);
+    if (!picked || !isRealPublicHeroCandidate(picked)) continue;
+    fallbacks.set(row.venueId, picked);
+  }
+
+  return fallbacks;
 }
 
 export type { VenueKind };

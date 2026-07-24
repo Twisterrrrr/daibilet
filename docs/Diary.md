@@ -1,3 +1,23 @@
+## 2026-07-24 - /venues: вернули cover fallback после lean `_count`
+
+### Наблюдения
+
+- Owner: «площадки не подтягивают изображения» на `/venues`.
+- Prod API: у топ-площадок (`muzei-garri-pottera` и др.) `heroImageUrl: null`, хотя detail page картинку получает через session fallbacks.
+- Регрессия `9af3910`: `publicVenueHubRows` стал вызывать `resolveVenueHeroImageUrl(row, null)` и больше не строил `heroImageFallbacks` из catalog sessions.
+
+### Решения
+
+- Lean SQL `fetchVenueHeroImageFallbacks` в `public-venue-lean.ts`: `DISTINCT ON (venueId)` по Event+EventOverride imageUrl (без hydrate sessions).
+- `publicVenueHubRows` снова резолвит cover через fallbacks только для venues без stored `heroImageUrl`.
+- Detail path не ломался (там fallbacks из sessions остались).
+
+### Проблемы
+
+- Нет (нужен commit + deploy API; cache hub 5 мин сбросится рестартом).
+
+---
+
 ## 2026-07-24 - /blog afisha promo: под первые 3 статьи фида
 
 ### Наблюдения

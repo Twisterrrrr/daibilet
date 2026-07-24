@@ -39,6 +39,7 @@ import {
   applyVenueEventFacetCounts,
   fetchLeanPublicVenueRows,
   fetchVenueEventFacetCounts,
+  fetchVenueHeroImageFallbacks,
 } from './public-venue-lean.ts';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
@@ -6541,13 +6542,21 @@ export async function publicVenueHubRows(db, limit = 500, options = {}) {
   }
 
   // Lean Prisma select + `_count` (active events) - no full catalog session hydrate for tiles.
+  // Hero covers still need event/override fallbacks when Venue.heroImageUrl is empty.
   const leanRows = await fetchLeanPublicVenueRows(Math.max(limit, 500), { leanText: false });
-  const facets = await fetchVenueEventFacetCounts(leanRows.map((row) => row.id));
+  const venueIds = leanRows.map((row) => row.id);
+  const missingHeroIds = leanRows
+    .filter((row) => !pickRealPublicImageUrl(row.heroImageUrl))
+    .map((row) => row.id);
+  const [facets, heroImageFallbacks] = await Promise.all([
+    fetchVenueEventFacetCounts(venueIds),
+    fetchVenueHeroImageFallbacks(missingHeroIds),
+  ]);
   const enriched = applyVenueEventFacetCounts(leanRows, facets).map((row) => {
     const mapped = {
       ...row,
       name: formatPublicVenueTitle(row.name || row.title),
-      heroImageUrl: resolveVenueHeroImageUrl(row, null),
+      heroImageUrl: resolveVenueHeroImageUrl(row, heroImageFallbacks),
       nextSessionStartsAt: null,
     };
     mapped.city = resolvePublicVenueCity(mapped);
