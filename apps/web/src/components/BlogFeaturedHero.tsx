@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Ticket } from 'lucide-react';
 
+import { BlogAfishaPromo } from '@/components/BlogAfishaPromo.client';
 import { resolveBlogCityEventsHref, resolveBlogCityHref } from '@/lib/blog-article-city';
 import {
   authorLabel,
@@ -10,6 +11,7 @@ import {
   cityFilterLabel,
 } from '@/lib/blog-meta';
 import { resolveBlogListingCta } from '@/lib/blog-listing-links';
+import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import { cityToPrepositional } from '@/lib/city-declension';
 import { formatNumber } from '@/lib/format';
 import {
@@ -27,6 +29,9 @@ type BlogFeaturedHeroProps = {
   hotPosts: BlogCardDto[];
   /** slug → min price (city hub or related CHPU). */
   hotMinPrices?: Record<string, number>;
+  afishaPromos?: Record<string, BlogSidebarPromoDto>;
+  afishaFallbackCityName?: string | null;
+  afishaFallbackCitySlug?: string | null;
 };
 
 function resolveTicketsLine(post: BlogCardDto, minPrice?: number) {
@@ -52,6 +57,9 @@ export function BlogFeaturedHero({
   featured,
   hotPosts,
   hotMinPrices = {},
+  afishaPromos = {},
+  afishaFallbackCityName,
+  afishaFallbackCitySlug,
 }: BlogFeaturedHeroProps) {
   const articleHref = `/blog/${featured.slug}`;
   const lead = expandListingExcerpt(featured.slug, featured.excerpt, 280);
@@ -67,9 +75,9 @@ export function BlogFeaturedHero({
   return (
     <section
       aria-label="Главная статья блога"
-      className="mb-8 grid w-full items-stretch gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(16rem,1fr)] lg:gap-5"
+      className="mb-8 grid w-full items-stretch gap-4 lg:grid-cols-[minmax(16rem,1fr)_minmax(0,2fr)] lg:gap-5"
     >
-      <article className="flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <article className="order-1 flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm lg:order-2">
         <Link
           href={articleHref}
           aria-label={featured.title}
@@ -124,64 +132,75 @@ export function BlogFeaturedHero({
       </article>
 
       {hotPosts.length ? (
-        <aside aria-label="Свежие материалы" className="flex h-full flex-col">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
-            Свежее
-          </p>
-          <ul className="divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white">
-            {hotPosts.map((post) => {
-              const href = `/blog/${post.slug}`;
-              const cityLabel = cityFilterLabel(post.citySlug, post.city);
-              const showCity =
-                Boolean(post.citySlug || post.city) && cityLabel !== 'Без города';
-              const tickets = resolveTicketsLine(post, hotMinPrices[post.slug]);
+        <aside
+          aria-label="Свежие материалы"
+          className="order-2 flex h-full flex-col gap-4 lg:order-1"
+        >
+          <div className="shrink-0">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Свежее
+            </p>
+            <ul className="divide-y divide-slate-200 overflow-hidden rounded-2xl border border-slate-200 bg-white">
+              {hotPosts.map((post) => {
+                const href = `/blog/${post.slug}`;
+                const cityLabel = cityFilterLabel(post.citySlug, post.city);
+                const showCity =
+                  Boolean(post.citySlug || post.city) && cityLabel !== 'Без города';
+                const tickets = resolveTicketsLine(post, hotMinPrices[post.slug]);
 
-              return (
-                <li key={post.slug}>
-                  <div className="flex items-center gap-3 px-3 py-3 transition hover:bg-slate-50 sm:px-4">
-                    <Link
-                      href={href}
-                      className="relative size-20 shrink-0 overflow-hidden rounded-lg bg-slate-200"
-                      aria-hidden
-                      tabIndex={-1}
-                    >
-                      <Image
-                        src={post.coverImageUrl}
-                        alt=""
-                        fill
-                        sizes={HOT_THUMB_SIZES}
-                        className="object-cover"
-                      />
-                    </Link>
-                    <div className="flex min-w-0 flex-1 flex-col justify-center gap-1">
-                      {showCity ? (
-                        <span
-                          className={`inline-flex w-fit max-w-full truncate rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 ${blogCityBadgeClassName(post.citySlug)}`}
-                        >
-                          {cityLabel === 'Санкт-Петербург' ? 'Питер' : cityLabel}
-                        </span>
-                      ) : null}
+                return (
+                  <li key={post.slug}>
+                    <div className="flex items-center gap-3 px-3 py-3 transition hover:bg-slate-50 sm:px-4">
                       <Link
                         href={href}
-                        className="line-clamp-2 text-sm font-semibold leading-snug text-slate-900 hover:text-primary-700"
+                        className="relative size-20 shrink-0 overflow-hidden rounded-lg bg-slate-200"
+                        aria-hidden
+                        tabIndex={-1}
                       >
-                        {post.title}
+                        <Image
+                          src={post.coverImageUrl}
+                          alt=""
+                          fill
+                          sizes={HOT_THUMB_SIZES}
+                          className="object-cover"
+                        />
                       </Link>
-                      {tickets ? (
+                      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1">
+                        {showCity ? (
+                          <span
+                            className={`inline-flex w-fit max-w-full truncate rounded-md px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 ${blogCityBadgeClassName(post.citySlug)}`}
+                          >
+                            {cityLabel === 'Санкт-Петербург' ? 'Питер' : cityLabel}
+                          </span>
+                        ) : null}
                         <Link
-                          href={tickets.href}
-                          className="inline-flex items-center gap-1 text-[11px] font-medium text-primary-700 hover:text-primary-800"
+                          href={href}
+                          className="line-clamp-2 text-sm font-semibold leading-snug text-slate-900 hover:text-primary-700"
                         >
-                          <Ticket className="h-3 w-3 shrink-0" aria-hidden />
-                          <span className="line-clamp-1">{tickets.label}</span>
+                          {post.title}
                         </Link>
-                      ) : null}
+                        {tickets ? (
+                          <Link
+                            href={tickets.href}
+                            className="inline-flex items-center gap-1 text-[11px] font-medium text-primary-700 hover:text-primary-800"
+                          >
+                            <Ticket className="h-3 w-3 shrink-0" aria-hidden />
+                            <span className="line-clamp-1">{tickets.label}</span>
+                          </Link>
+                        ) : null}
+                      </div>
                     </div>
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          <BlogAfishaPromo
+            promos={afishaPromos}
+            fallbackCityName={afishaFallbackCityName}
+            fallbackCitySlug={afishaFallbackCitySlug}
+          />
         </aside>
       ) : null}
     </section>

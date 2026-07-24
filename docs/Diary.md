@@ -1,3 +1,22 @@
+## 2026-07-24 - /blog: вернуть Афишу в угол + swap колонок
+
+### Наблюдения
+
+- Owner correction: «я просил поменять местами блоки и афишу в углу сделать более интересной для пользователя, а не убрать».
+- `e43ee4e` ошибочно убрал promo из сайдбара под «Свежее» и вставил mid-feed strip - осталась пустая дыра в углу.
+
+### Решения
+
+- Desktop: колонки swap - «Свежее»+Афиша слева (`lg:order-1`), Featured справа (`lg:order-2`); mobile Featured сверху.
+- `BlogAfishaPromo` снова в углу под Fresh ×3: cover события/city, «Билеты от N», weekend, titles, chips, CTA.
+- Mid-feed вставка из magazine/list убрана (не дублировать).
+
+### Проблемы
+
+- Нет (commit + deploy ниже).
+
+---
+
 ## 2026-07-24 - /venues: вернули cover fallback после lean `_count`
 
 ### Наблюдения

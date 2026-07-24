@@ -4,12 +4,10 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { LayoutGrid, List } from 'lucide-react';
 
-import { BlogAfishaPromo } from '@/components/BlogAfishaPromo.client';
 import { BlogListRows } from '@/components/BlogListRows.client';
 import { BlogMagazineGrid } from '@/components/BlogMagazineGrid.client';
 import type { BlogListFilters } from '@/components/BlogListView';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
-import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { paginateBlogFeedByCursor } from '@/lib/blog-cursor';
 import {
@@ -27,7 +25,6 @@ import {
 } from '@/lib/blog-view-mode';
 
 const PAGE_SIZE = 12;
-const AFISHA_AFTER_POSTS = 3;
 
 function paramValue(value: string | null | undefined, fallback = 'all'): string {
   const raw = String(value || '').trim();
@@ -121,15 +118,9 @@ function ViewModeButton({
 export function BlogListFiltered({
   posts,
   initialFilters,
-  afishaPromos = {},
-  afishaFallbackCityName,
-  afishaFallbackCitySlug,
 }: {
   posts: BlogCardDto[];
   initialFilters?: BlogListFilters;
-  afishaPromos?: Record<string, BlogSidebarPromoDto>;
-  afishaFallbackCityName?: string | null;
-  afishaFallbackCitySlug?: string | null;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -326,34 +317,9 @@ export function BlogListFiltered({
       {filtered.length > 0 ? (
         <>
           {viewMode === 'list' ? (
-            <BlogListRows
-              posts={displayPosts}
-              insertAfter={
-                displayPosts.length >= AFISHA_AFTER_POSTS ? AFISHA_AFTER_POSTS : 0
-              }
-              insert={
-                displayPosts.length >= AFISHA_AFTER_POSTS ? (
-                  <BlogAfishaPromo
-                    promos={afishaPromos}
-                    fallbackCityName={afishaFallbackCityName}
-                    fallbackCitySlug={afishaFallbackCitySlug}
-                  />
-                ) : undefined
-              }
-            />
+            <BlogListRows posts={displayPosts} />
           ) : (
-            <BlogMagazineGrid
-              posts={displayPosts}
-              afterFirstBlock={
-                displayPosts.length > 0 ? (
-                  <BlogAfishaPromo
-                    promos={afishaPromos}
-                    fallbackCityName={afishaFallbackCityName}
-                    fallbackCitySlug={afishaFallbackCitySlug}
-                  />
-                ) : undefined
-              }
-            />
+            <BlogMagazineGrid posts={displayPosts} />
           )}
           {hasMore ? (
             <div className="mt-8 flex justify-center">

@@ -53,16 +53,13 @@ export function BlogListView({
             featured={featured}
             hotPosts={hot}
             hotMinPrices={hotMinPrices}
+            afishaPromos={afishaPromos}
+            afishaFallbackCityName={afishaFallbackCityName}
+            afishaFallbackCitySlug={featured?.citySlug}
           />
         ) : null}
 
-        <BlogListFiltered
-          posts={feed}
-          initialFilters={filters}
-          afishaPromos={afishaPromos}
-          afishaFallbackCityName={afishaFallbackCityName}
-          afishaFallbackCitySlug={featured?.citySlug}
-        />
+        <BlogListFiltered posts={feed} initialFilters={filters} />
 
         <p className="mt-12 text-sm text-slate-500">
           Новые материалы выходят каждую неделю. А готовые списки событий - в{' '}
