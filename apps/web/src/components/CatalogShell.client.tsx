@@ -1,62 +1,39 @@
 'use client';
 
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ChevronDown, Search } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 import { CatalogActiveFilters } from '@/components/CatalogActiveFilters';
 import { CatalogPaginationLinks } from '@/components/CatalogPaginationLinks';
 import { CatalogResults, ViewModeToggle } from '@/components/CatalogResults.client';
 import { CatalogToolbar } from '@/components/CatalogToolbar.client';
-import { HeroLayout } from '@/components/HeroLayout';
-import { HeroMedia } from '@/components/HeroMedia.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
 import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZES } from '@daibilet/contracts/catalog';
 import {
   buildCatalogHref,
-  CATALOG_DATE_OPTIONS,
   CATALOG_SORT_OPTIONS,
   catalogFiltersFromQuery,
   venueCatalogHrefWithSelectedCity,
   type CatalogFilterValues,
 } from '@/lib/catalog-url';
-import { pluralCities, pluralEvents } from '@/lib/format';
+import { pluralEvents } from '@/lib/format';
 import {
   parseCatalogViewMode,
   readStoredCatalogViewMode,
   storeCatalogViewMode,
   type CatalogViewMode,
 } from '@/lib/catalog-view-mode';
-import { persistSelectedCity } from '@/lib/selected-city';
 import { parseCatalogPageQuery, searchParamsToRecord, catalogQueryCacheKey } from '@/server/catalog-query';
-
-const EVENTS_HERO_FRAMES = [
-  {
-    src: '/images/hero/hero-slavic-02.png',
-    ultrawideSrc: '/images/hero/hero-slavic-02-uw.jpg',
-    alt: 'Афиша и билеты на события',
-  },
-  {
-    src: '/images/hero/hero-slavic-06.png',
-    ultrawideSrc: '/images/hero/hero-slavic-06-uw.jpg',
-    alt: 'Вечернее событие в городе',
-  },
-];
 
 type CatalogShellProps = {
   initialCatalog?: PublicCatalogDto | null;
   initialQueryKey?: string;
-  /** Photo hero with search/city/date like /venues (main /events catalog). */
-  withPhotoHero?: boolean;
 };
 
-export function CatalogShell({
-  initialCatalog = null,
-  initialQueryKey = '',
-  withPhotoHero = false,
-}: CatalogShellProps) {
+export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: CatalogShellProps) {
   const router = useRouter();
   const urlSearchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
@@ -66,7 +43,6 @@ export function CatalogShell({
   const [loading, setLoading] = useState(() => !initialCatalog);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewModeState] = useState<CatalogViewMode>('cards');
-  const [qDraft, setQDraft] = useState(() => urlSearchParams.get('q')?.trim() || '');
 
   const cityReady = selectedCity?.cityReady ?? true;
   /** Wait for storage resolve when URL has no city — avoids «Все города» then Уфа. */
@@ -112,10 +88,6 @@ export function CatalogShell({
     if (!filterValues.city || query.city) return queryKey;
     return catalogQueryCacheKey({ ...query, city: filterValues.city });
   }, [filterValues.city, query, queryKey]);
-
-  useEffect(() => {
-    setQDraft(filterValues.q || '');
-  }, [filterValues.q]);
 
   useEffect(() => {
     const fromUrl = urlSearchParams.get('view');
@@ -197,44 +169,6 @@ export function CatalogShell({
     [router, urlSearchParams],
   );
 
-  const navigateFilters = useCallback(
-    (next: CatalogFilterValues) => {
-      router.push(buildCatalogHref(next));
-    },
-    [router],
-  );
-
-  const filterValuesRef = useRef(filterValues);
-  filterValuesRef.current = filterValues;
-
-  useEffect(() => {
-    if (!withPhotoHero) return;
-    const next = qDraft.trim();
-    const current = (filterValuesRef.current.q || '').trim();
-    if (next === current) return;
-    const timer = window.setTimeout(() => {
-      const latest = filterValuesRef.current;
-      navigateFilters({
-        ...latest,
-        q: next || undefined,
-        page: undefined,
-      });
-    }, 350);
-    return () => window.clearTimeout(timer);
-  }, [qDraft, withPhotoHero, navigateFilters]);
-
-  const setCityFilter = useCallback(
-    (next: string) => {
-      persistSelectedCity(next === 'all' ? 'all' : next);
-      navigateFilters({
-        ...filterValuesRef.current,
-        city: next === 'all' ? undefined : next,
-        page: undefined,
-      });
-    },
-    [navigateFilters],
-  );
-
   const facets = catalog?.facets ?? {
     cities: [],
     categories: [],
@@ -243,17 +177,7 @@ export function CatalogShell({
     priceSteps: [],
   };
 
-  const cityCount = facets.cities.length;
-  const heroEyebrow = catalog
-    ? cityCount
-      ? `${pluralEvents(catalog.total)} · ${pluralCities(cityCount)}`
-      : pluralEvents(catalog.total)
-    : 'Афиша';
-
-  const heroDisabled = (loading && !catalog) || cityBootstrapPending;
-  const citySelectValue = cityBootstrapPending ? '' : filterValues.city || 'all';
-
-  const resultsBlock = (
+  return (
     <>
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
         <p className="min-w-0 text-sm text-slate-500">
@@ -304,19 +228,12 @@ export function CatalogShell({
 
       <CatalogActiveFilters values={filterValues} />
 
-      <div
-        className={
-          withPhotoHero
-            ? 'catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 mt-6 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6'
-            : 'catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 mt-6 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:static sm:-mx-6 sm:bg-white sm:px-6 sm:backdrop-blur-none'
-        }
-      >
+      <div className="catalog-toolbar sticky top-[var(--site-header-height)] z-30 -mx-4 mt-6 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur sm:static sm:-mx-6 sm:bg-white sm:px-6 sm:backdrop-blur-none">
         <CatalogToolbar
           facets={facets}
           values={filterValues}
           disabled={(loading && !catalog) || cityBootstrapPending}
           cityReady={cityReady || urlHasCity}
-          compact={withPhotoHero}
         />
       </div>
 
@@ -399,92 +316,6 @@ export function CatalogShell({
           Подборки
         </Link>
       </nav>
-    </>
-  );
-
-  if (!withPhotoHero) {
-    return <>{resultsBlock}</>;
-  }
-
-  return (
-    <>
-      <HeroLayout
-        variant="imageOverlay"
-        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'События' }]}
-        eyebrow={heroEyebrow}
-        title="Каталог событий"
-        description="Экскурсии, концерты, спектакли и билеты - выберите город, дату и формат."
-        tone="dark"
-        media={
-          <HeroMedia
-            frames={EVENTS_HERO_FRAMES}
-            overlayClassName="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-900/50"
-          />
-        }
-      >
-        <form
-          className="mx-auto mt-6 flex max-w-4xl flex-col gap-3 rounded-2xl bg-white p-3 text-left text-slate-900 shadow-lg sm:flex-row"
-          onSubmit={(event) => {
-            event.preventDefault();
-            navigateFilters({
-              ...filterValues,
-              q: qDraft.trim() || undefined,
-              page: undefined,
-            });
-          }}
-        >
-          <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">
-            <Search className="h-4 w-4 shrink-0 text-slate-400" aria-hidden />
-            <input
-              type="search"
-              value={qDraft}
-              onChange={(event) => setQDraft(event.target.value)}
-              placeholder="Название, место или артист"
-              aria-label="Поиск по событиям"
-              disabled={heroDisabled}
-              className="w-full bg-transparent py-2.5 text-sm outline-none placeholder:text-slate-400 disabled:opacity-60"
-            />
-          </div>
-          <select
-            value={citySelectValue}
-            disabled={heroDisabled}
-            onChange={(event) => setCityFilter(event.target.value)}
-            aria-label="Город"
-            className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none disabled:opacity-70"
-          >
-            {cityBootstrapPending ? <option value="">Город…</option> : null}
-            <option value="all">Все города</option>
-            {facets.cities.map((city) => (
-              <option key={city.name} value={city.name}>
-                {city.name} ({city.events})
-              </option>
-            ))}
-          </select>
-          <select
-            value={filterValues.date || 'all'}
-            disabled={heroDisabled}
-            onChange={(event) => {
-              const nextDate = event.target.value;
-              navigateFilters({
-                ...filterValues,
-                q: qDraft.trim() || undefined,
-                date: nextDate === 'all' ? undefined : nextDate,
-                page: undefined,
-              });
-            }}
-            aria-label="Дата"
-            className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none disabled:opacity-70"
-          >
-            {CATALOG_DATE_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </form>
-      </HeroLayout>
-
-      <div className="container-page py-8">{resultsBlock}</div>
     </>
   );
 }
