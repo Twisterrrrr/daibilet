@@ -14,6 +14,7 @@ const HOTSPOTS: MapCity[] = [
   { slug: 'moscow', name: 'Москва', region: 'Центр' },
   { slug: 'saint-petersburg', name: 'Санкт-Петербург', region: 'Северо-Запад' },
   { slug: 'kazan', name: 'Казань', region: 'Поволжье' },
+  { slug: 'ekaterinburg', name: 'Екатеринбург', region: 'Урал' },
 ];
 
 /**

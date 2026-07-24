@@ -93,7 +93,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/60 bg-white/70 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_rgba(15,23,42,0.04)] backdrop-blur-xl supports-[backdrop-filter]:bg-white/55">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200 bg-white pt-[env(safe-area-inset-top,0px)]">
         <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-3 lg:py-3.5">
           <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 lg:flex-none lg:gap-4">
             <button
@@ -119,10 +119,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
             />
           </div>
 
-          <nav
-            aria-label="Основная навигация"
-            className="hidden min-w-0 items-center rounded-xl bg-slate-100/80 p-1 ring-1 ring-slate-200/70 lg:flex"
-          >
+          <nav aria-label="Основная навигация" className="hidden min-w-0 items-center gap-0.5 lg:flex">
             {navLinks.map((item) => {
               const active = isNavActive(pathname, item.href.split('?')[0] || item.href);
               const secondary = item.href.startsWith('/venues') || item.href.startsWith('/locations') || item.href.startsWith('/blog');
@@ -133,10 +130,10 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
                   className={
                     [
                       secondary ? 'hidden xl:inline-flex' : 'inline-flex',
-                      'items-center rounded-lg px-2.5 py-1.5 text-sm transition xl:px-3',
+                      'items-center px-2.5 py-1.5 text-sm transition xl:px-3',
                       active
-                        ? 'bg-white font-semibold text-slate-900 shadow-sm'
-                        : 'font-medium text-slate-500 hover:bg-white/60 hover:text-slate-800',
+                        ? 'font-semibold text-slate-900 underline decoration-slate-900/80 decoration-2 underline-offset-[6px]'
+                        : 'font-medium text-slate-500 hover:text-slate-800',
                     ].join(' ')
                   }
                 >
@@ -168,7 +165,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
                 href="/help"
                 title="Помощь и FAQ"
                 aria-label="Помощь и FAQ"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-xl text-slate-600 transition hover:bg-slate-100/80 hover:text-slate-900"
+                className="inline-flex h-10 w-10 items-center justify-center text-slate-500 transition hover:text-slate-900"
               >
                 <HelpCircle className="h-5 w-5" />
               </Link>
@@ -178,7 +175,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
                 aria-label="Избранное"
                 title="Избранное"
                 onClick={() => setFavoritesOpen(true)}
-                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white shadow-sm transition hover:bg-slate-800"
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center text-slate-500 transition hover:text-slate-900"
               >
                 <Heart className="h-5 w-5" />
               </button>
@@ -229,14 +226,14 @@ const HeaderAuthControls = forwardRef<
           type="button"
           aria-label="Личный кабинет"
           onClick={onToggleUserMenu}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200/90 bg-white/90 text-slate-700 shadow-sm transition hover:bg-white xl:hidden"
+          className="inline-flex h-10 w-10 items-center justify-center text-slate-500 transition hover:text-slate-900 xl:hidden"
         >
           <User className="h-5 w-5" />
         </button>
         <button
           type="button"
           onClick={onToggleUserMenu}
-          className="hidden items-center gap-2 rounded-xl border border-slate-200/90 bg-white/90 px-3 py-2 text-sm font-semibold text-slate-800 shadow-sm transition hover:bg-white xl:inline-flex xl:px-3.5"
+          className="hidden items-center gap-2 px-2 py-2 text-sm font-medium text-slate-600 transition hover:text-slate-900 xl:inline-flex"
         >
           <User className="h-4 w-4" />
           {auth?.user?.name || 'Кабинет'}
@@ -319,20 +316,20 @@ function MobileNavSheet({
             variant="inline"
             cityFilter={searchCityFilter}
             initialQuery={searchInitialQuery}
-            className="rounded-xl border border-slate-200 bg-slate-50 py-2.5 shadow-sm"
+            className="rounded-lg bg-slate-50 py-2.5"
           />
         </div>
         <nav aria-label="Мобильная навигация" className="flex-1 overflow-y-auto p-2">
-          <div className="rounded-xl bg-slate-100/70 p-1 ring-1 ring-slate-200/60">
+          <div>
             {navLinks.map((item) => (
               <Link
                 key={item.label}
                 href={item.href}
                 onClick={onClose}
-                className={`block w-full rounded-lg px-4 py-3 text-left text-base transition ${
+                className={`block w-full px-4 py-3 text-left text-base transition ${
                   isNavActive(pathname, item.href.split('?')[0] || item.href)
-                    ? 'bg-white font-semibold text-slate-900 shadow-sm'
-                    : 'font-medium text-slate-600 hover:bg-white/70 hover:text-slate-900'
+                    ? 'font-semibold text-slate-900'
+                    : 'font-medium text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {item.label}
@@ -368,7 +365,7 @@ function MobileNavSheet({
               }}
               allLabel={cityLabel === 'Все города' ? 'Все города' : cityLabel}
               variant="compact"
-              className="w-full rounded-xl border border-slate-200 bg-white shadow-sm"
+              className="w-full"
             />
           </div>
           <div className="my-2 border-t border-slate-200" />

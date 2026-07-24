@@ -212,11 +212,10 @@ export function HeaderSearch({
         <button
           type="button"
           onClick={() => setOverlayOpen(true)}
-          className={`inline-flex min-w-[2.75rem] items-center gap-2 rounded-xl border border-slate-200/90 bg-white/90 px-3 py-2 text-sm text-slate-500 shadow-sm transition hover:border-slate-300 hover:bg-white hover:text-slate-700 xl:min-w-[10.5rem] ${className}`}
+          className={`inline-flex h-10 w-10 items-center justify-center text-slate-500 transition hover:text-slate-900 ${className}`}
           aria-label="Открыть поиск"
         >
-          <Search className="h-4 w-4 shrink-0 text-slate-400" />
-          <span className="hidden truncate xl:inline">Поиск событий…</span>
+          <Search className="h-5 w-5 shrink-0" />
         </button>
 
         {overlayOpen ? (
