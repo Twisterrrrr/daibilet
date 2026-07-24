@@ -26,7 +26,7 @@ export function CatalogResults({ items, viewMode, onViewModeChange }: CatalogRes
 
   if (!items.length) {
     return (
-      <div className="mt-10 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
+      <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
         <p className="text-lg font-semibold text-slate-800">Ничего не найдено</p>
         <p className="mt-2 text-sm text-slate-500">Попробуйте изменить фильтры или сбросить поиск.</p>
       </div>
@@ -36,7 +36,7 @@ export function CatalogResults({ items, viewMode, onViewModeChange }: CatalogRes
   return (
     <>
       {viewMode === 'list' ? (
-        <ul className="mt-8 space-y-3">
+        <ul className="mt-4 space-y-3">
           {items.map((session) => (
             <li key={`${session.id}-${session.startsAt}`}>
               <EventCardHorizontal session={session} />
@@ -46,7 +46,7 @@ export function CatalogResults({ items, viewMode, onViewModeChange }: CatalogRes
       ) : viewMode === 'table' ? (
         <CatalogTable items={items} />
       ) : (
-        <ul className="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+        <ul className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
           {items.map((session) => (
             <li key={`${session.id}-${session.startsAt}`}>
               <EventCard session={session} compact />
@@ -67,7 +67,7 @@ export function ViewModeToggle({
 }) {
   return (
     <div
-      className="inline-flex h-10 shrink-0 items-center overflow-hidden rounded-xl bg-slate-100 p-1 ring-1 ring-slate-200/80"
+      className="inline-flex h-8 shrink-0 items-center overflow-hidden rounded-lg bg-slate-100 p-0.5 ring-1 ring-slate-200/80"
       role="radiogroup"
       aria-label="Вид каталога"
     >
@@ -103,7 +103,7 @@ function ViewModeButton({
       aria-label={label}
       title={label}
       onClick={onClick}
-      className={`grid h-8 w-8 place-items-center rounded-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
+      className={`grid h-7 w-7 place-items-center rounded-md transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${
         active
           ? 'bg-white text-slate-900 shadow-sm ring-1 ring-slate-200'
           : 'text-slate-500 hover:bg-white/70 hover:text-slate-800'
@@ -116,7 +116,7 @@ function ViewModeButton({
 
 function CatalogTable({ items }: { items: PublicCatalogListItemDto[] }) {
   return (
-    <div className="mt-8 overflow-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+    <div className="mt-4 overflow-auto rounded-lg border border-slate-200 bg-white shadow-sm">
       <table className="w-full min-w-[980px] border-collapse text-sm">
         <thead>
           <tr className="border-b border-slate-200 bg-slate-50 text-left text-xs uppercase text-slate-500">

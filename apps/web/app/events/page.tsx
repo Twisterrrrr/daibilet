@@ -59,12 +59,12 @@ export default async function EventsCatalogPage() {
       >
         <EventsCatalogHero />
       </Suspense>
-      <div className="container-page py-8">
+      <div className="container-page py-3 sm:py-4">
         <Suspense
           fallback={
-            <div className="space-y-6">
-              <div className="h-10 w-64 animate-pulse rounded-lg bg-slate-100" />
-              <div className="h-32 animate-pulse rounded-2xl bg-slate-100" />
+            <div className="space-y-4">
+              <div className="h-11 w-full animate-pulse rounded-xl bg-slate-100" />
+              <div className="h-8 w-full max-w-xl animate-pulse rounded-full bg-slate-100" />
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
                 {Array.from({ length: 8 }).map((_, index) => (
                   <div key={index} className="h-72 animate-pulse rounded-xl bg-slate-100" />

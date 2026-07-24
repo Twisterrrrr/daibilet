@@ -32,6 +32,8 @@ export type HeroLayoutProps = {
   children?: React.ReactNode;
   /** Media renderer - injected to keep RSC shell free of client image rotator. */
   media?: React.ReactNode;
+  /** Tighter vertical padding for catalog pages that need results sooner. */
+  dense?: boolean;
 };
 
 const TONE = {
@@ -68,6 +70,7 @@ export function HeroLayout({
   splitClassName = 'lg:grid-cols-[minmax(0,2fr)_minmax(14rem,1fr)]',
   children,
   media,
+  dense = false,
 }: HeroLayoutProps) {
   const tone = toneProp ?? (variant === 'imageOverlay' || variant === 'video' || variant === 'withMap' ? 'dark' : 'light');
   const t = TONE[tone];
@@ -105,7 +108,7 @@ export function HeroLayout({
       <>
         {breadcrumbs?.length ? <PageBreadcrumbBar items={breadcrumbs} /> : null}
         <section className={`border-b border-slate-200 ${t.section} ${className}`.trim()}>
-          <div className="container-page py-8 sm:py-10">
+          <div className={`container-page ${dense ? 'py-5 sm:py-6' : 'py-8 sm:py-10'}`}>
             {/* One centered column: H1 + children share the same max-w axis (no nested left-biased max-w). */}
             <div className="mx-auto w-full max-w-5xl">
               {brand ? <div className={`font-display text-sm font-bold tracking-[0.18em] uppercase ${t.brand}`}>{brand}</div> : null}
@@ -117,7 +120,15 @@ export function HeroLayout({
               >
                 {title}
               </h1>
-              {description ? <p className={`mt-3 max-w-2xl text-base leading-relaxed sm:text-lg ${t.description}`}>{description}</p> : null}
+              {description ? (
+                <p
+                  className={`max-w-2xl leading-relaxed ${t.description} ${
+                    dense ? 'mt-2 text-sm sm:text-base' : 'mt-3 text-base sm:text-lg'
+                  }`}
+                >
+                  {description}
+                </p>
+              ) : null}
               {children}
             </div>
           </div>

@@ -11,6 +11,8 @@ type LandingFacet = { slug: string; title: string; events: number };
 export type AdvancedCatalogFilters = {
   dateFrom: string;
   dateTo: string;
+  /** Preset date: today | tomorrow | weekend | evening */
+  date?: string;
   minPrice: string;
   maxPrice: string;
   ageMax: number;
@@ -44,6 +46,7 @@ function emptyFilters(): AdvancedCatalogFilters {
   return {
     dateFrom: '',
     dateTo: '',
+    date: '',
     minPrice: 'all',
     maxPrice: 'all',
     ageMax: -1,
@@ -141,10 +144,6 @@ export function CatalogAdvancedFiltersPanel({
     setDraft((prev) => ({ ...prev, ...patch }));
   };
 
-  const setDateRange = (from: string, to: string) => {
-    patchDraft({ dateFrom: from, dateTo: to });
-  };
-
   const isoDay = (date: Date) => date.toISOString().slice(0, 10);
 
   const apply = () => {
@@ -201,6 +200,41 @@ export function CatalogAdvancedFiltersPanel({
         <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 sm:px-5 sm:py-5">
           <div className="grid gap-5 sm:gap-6">
             <section>
+              <div className={labelCls}>Быстрые</div>
+              <div className="flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => {
+                    patchDraft({ date: 'evening', dateFrom: '', dateTo: '' });
+                  }}
+                  className={filterChip(draft.date === 'evening' && !draft.dateFrom && !draft.dateTo)}
+                >
+                  Сегодня вечером
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMinDraft('0');
+                    setMaxDraft('0');
+                  }}
+                  className={filterChip(minDraft === '0' && maxDraft === '0')}
+                >
+                  Бесплатно
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMinDraft('');
+                    setMaxDraft('2000');
+                  }}
+                  className={filterChip(minDraft === '' && maxDraft === '2000')}
+                >
+                  До 2000
+                </button>
+              </div>
+            </section>
+
+            <section>
               <div className={labelCls}>
                 <CalendarIcon aria-hidden className="h-3.5 w-3.5 text-slate-400" />
                 Дата
@@ -210,7 +244,7 @@ export function CatalogAdvancedFiltersPanel({
                   type="date"
                   value={draft.dateFrom}
                   aria-label="Дата с"
-                  onChange={(event) => patchDraft({ dateFrom: event.target.value })}
+                  onChange={(event) => patchDraft({ dateFrom: event.target.value, date: '' })}
                   className={inputCls}
                 />
                 <input
@@ -218,7 +252,7 @@ export function CatalogAdvancedFiltersPanel({
                   value={draft.dateTo}
                   min={draft.dateFrom || undefined}
                   aria-label="Дата по"
-                  onChange={(event) => patchDraft({ dateTo: event.target.value })}
+                  onChange={(event) => patchDraft({ dateTo: event.target.value, date: '' })}
                   className={inputCls}
                 />
               </div>
@@ -236,7 +270,7 @@ export function CatalogAdvancedFiltersPanel({
                       const today = new Date();
                       const to = new Date(today);
                       to.setDate(today.getDate() + item.days);
-                      setDateRange(isoDay(today), isoDay(to));
+                      patchDraft({ dateFrom: isoDay(today), dateTo: isoDay(to), date: '' });
                     }}
                     className={filterChip(false)}
                   >
@@ -279,7 +313,7 @@ export function CatalogAdvancedFiltersPanel({
                 {[
                   { label: 'Бесплатно', min: '0', max: '0' },
                   { label: 'до 1000', min: '', max: '1000' },
-                  { label: '1–3К', min: '1000', max: '3000' },
+                  { label: '1-3К', min: '1000', max: '3000' },
                   { label: '3К+', min: '3000', max: '' },
                 ].map((item) => (
                   <button

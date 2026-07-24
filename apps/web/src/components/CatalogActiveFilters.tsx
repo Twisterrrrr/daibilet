@@ -48,7 +48,7 @@ export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }
 
   return (
     <div
-      className="-mx-4 mb-3 flex items-center gap-2 overflow-x-auto px-4 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mb-4 sm:flex-wrap sm:overflow-visible sm:rounded-2xl sm:border sm:border-slate-200 sm:bg-white sm:p-3 sm:shadow-sm sm:px-3"
+      className="-mx-4 mt-3 flex items-center gap-2 overflow-x-auto px-4 py-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:mt-3 sm:flex-wrap sm:overflow-visible sm:rounded-xl sm:border sm:border-slate-200 sm:bg-white sm:p-2.5 sm:px-3"
       role="region"
       aria-label="Активные фильтры"
     >
