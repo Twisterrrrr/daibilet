@@ -229,6 +229,7 @@ outes.ts (паритет с backend publicCitySlug).
 ### Проблемы
 
 - Новые stock не качали; если на 32:9 всё ещё тесно по бокам - следующий шаг art-direction / более широкие кадры.
+- **Prod @`d47c300`** (includes `2004e4b`): deploy-prod-next OK после unblock blog promo (`pg` out of client); `/` `/venues` `/events` 200; CSS с `min-aspect-ratio:21/9` / face-safe object-position.
 
 ---
 
