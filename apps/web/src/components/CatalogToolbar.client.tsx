@@ -28,6 +28,11 @@ type CatalogToolbarProps = {
   disabled?: boolean;
   /** False until header city from storage is resolved - hide «Все города» flash. */
   cityReady?: boolean;
+  /**
+   * When true, omit search + desktop date (they live in the photo hero).
+   * Keep filters button, date chips (mobile), categories and presets.
+   */
+  compact?: boolean;
 };
 
 const SEARCH_DEBOUNCE_MS = 350;
@@ -49,6 +54,7 @@ export function CatalogToolbar({
   values,
   disabled = false,
   cityReady: _cityReady = true,
+  compact = false,
 }: CatalogToolbarProps) {
   const router = useRouter();
   const filters = useMemo(() => catalogFiltersFromQuery(values), [values]);
@@ -121,7 +127,8 @@ export function CatalogToolbar({
   return (
     <div className="space-y-3">
       <form onSubmit={onSubmit} className="space-y-3">
-        {/* Primary bar: mobile compact / desktop full */}
+        {/* Primary bar: mobile compact / desktop full (hidden when photo hero owns search/date) */}
+        {!compact ? (
         <div className="flex items-center gap-2">
           {/* Mobile collapsed: tap to expand search */}
           {!showMobileSearch ? (
@@ -252,6 +259,7 @@ export function CatalogToolbar({
             ) : null}
           </button>
         </div>
+        ) : null}
       </form>
 
       <CatalogAdvancedFiltersPanel
@@ -293,7 +301,8 @@ export function CatalogToolbar({
         }}
       />
 
-      {/* Mobile: горизонтальный date scroller */}
+      {/* Mobile: горизонтальный date scroller (не нужен, если дата уже в photo hero) */}
+      {!compact ? (
       <div id="catalog-date-scroller" className="-mx-4 px-4 sm:hidden">
         <div
           role="radiogroup"
@@ -322,10 +331,11 @@ export function CatalogToolbar({
           })}
         </div>
       </div>
+      ) : null}
 
       {/* Категории: на mobile сильнее visual weight + snap */}
-      <div className="-mx-4 px-4 sm:mx-0 sm:px-0">
-        <div className="horizontal-snap-row flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="-mx-4 flex items-center gap-2 px-4 sm:mx-0 sm:px-0">
+        <div className="horizontal-snap-row flex min-w-0 flex-1 gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <Link
             href={buildCatalogHref({ ...filters, category: undefined, page: undefined })}
             className={`shrink-0 snap-start rounded-full px-3.5 py-2 text-sm font-semibold transition sm:py-1.5 sm:font-medium ${
@@ -358,6 +368,32 @@ export function CatalogToolbar({
             </Link>
           ))}
         </div>
+        {compact ? (
+          <button
+            type="button"
+            onClick={() => setFiltersOpen(true)}
+            disabled={disabled}
+            aria-expanded={filtersOpen}
+            aria-haspopup="dialog"
+            aria-controls="advanced-filters-panel"
+            className={`relative inline-btn inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-xl px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 disabled:opacity-60 ${
+              filtersOpen || advancedCount > 0
+                ? 'bg-primary-600 text-white hover:bg-primary-700'
+                : 'bg-slate-900 text-white hover:bg-slate-800'
+            }`}
+          >
+            <SlidersHorizontal aria-hidden className="h-4 w-4" />
+            <span className="hidden sm:inline">Фильтры</span>
+            {advancedCount > 0 ? (
+              <span
+                className="grid min-w-5 place-items-center rounded-full bg-white/25 px-1.5 text-xs"
+                aria-label={`Активных фильтров: ${advancedCount}`}
+              >
+                {advancedCount}
+              </span>
+            ) : null}
+          </button>
+        ) : null}
       </div>
 
       {/* Подборки: secondary chips / свёрнуты на mobile */}

@@ -8,7 +8,7 @@ import { Search } from 'lucide-react';
 import { LocationCard } from '@/components/LocationCard.client';
 import { LocationsCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
 import { HeroLayout } from '@/components/HeroLayout';
-import { RussiaMap } from '@/components/RussiaMap.client';
+import { HeroMedia } from '@/components/HeroMedia.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { formatNumber, pluralCities } from '@/lib/format';
@@ -17,12 +17,17 @@ import type { VenueCatalogCard } from '@/lib/venue-map-types';
 import { LOCATION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
 
+const LOCATIONS_HERO_FRAMES = [
+  { src: '/images/hero/hero-slavic-04.png', alt: 'Набережная и точка старта прогулки' },
+  { src: '/images/hero/hero-slavic-01.png', alt: 'Городская локация у воды' },
+];
+
 type SortMode = 'events' | 'asc' | 'desc';
 
 const SORT_OPTIONS: Array<[SortMode, string]> = [
   ['events', 'По афише'],
-  ['asc', 'А–Я'],
-  ['desc', 'Я–А'],
+  ['asc', 'А-Я'],
+  ['desc', 'Я-А'],
 ];
 
 export function LocationsCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
@@ -110,16 +115,26 @@ export function LocationsCatalogView({ venues }: { venues: VenueCatalogCard[] })
   return (
     <>
       <HeroLayout
-        variant="withMap"
+        variant="imageOverlay"
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Локации' }]}
-        eyebrow={`${formatNumber(venues.length)} локаций · ${pluralCities(cityCount)}`}
+        eyebrow={
+          venues.length
+            ? cityCount
+              ? `${formatNumber(venues.length)} локаций · ${pluralCities(cityCount)}`
+              : `${formatNumber(venues.length)} локаций`
+            : 'Локации'
+        }
         title="Причалы, парки и точки старта"
         description="Куда приходить и как найти место встречи - чтобы не пропустить рейс или экскурсию."
-        tone="light"
-        className="bg-slate-100"
-        aside={<RussiaMap className="h-full min-h-[14rem]" />}
+        tone="dark"
+        media={
+          <HeroMedia
+            frames={LOCATIONS_HERO_FRAMES}
+            overlayClassName="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/70 to-slate-900/50"
+          />
+        }
       >
-        <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-slate-900 shadow-lg sm:flex-row">
+        <div className="mx-auto mt-6 flex max-w-4xl flex-col gap-3 rounded-2xl bg-white p-3 text-left text-slate-900 shadow-lg sm:flex-row">
           <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">
             <Search className="h-4 w-4 text-slate-400" />
             <input
@@ -141,6 +156,17 @@ export function LocationsCatalogView({ venues }: { venues: VenueCatalogCard[] })
             {cityOptions.map(([city, count]) => (
               <option key={city} value={city}>
                 {city} ({count})
+              </option>
+            ))}
+          </select>
+          <select
+            value={sortMode}
+            onChange={(event) => setSortMode(event.target.value as SortMode)}
+            className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none"
+          >
+            {SORT_OPTIONS.map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
               </option>
             ))}
           </select>
@@ -191,22 +217,9 @@ export function LocationsCatalogView({ venues }: { venues: VenueCatalogCard[] })
               </>
             )}
           </h2>
-          <div className="flex flex-wrap items-center gap-3">
-            <select
-              value={sortMode}
-              onChange={(event) => setSortMode(event.target.value as SortMode)}
-              className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none"
-            >
-              {SORT_OPTIONS.map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-            <Link href={venuesHref} className="text-sm font-semibold text-primary-600 hover:underline">
-              Площадки: музеи и театры →
-            </Link>
-          </div>
+          <Link href={venuesHref} className="text-sm font-semibold text-primary-600 hover:underline">
+            Площадки: музеи и театры →
+          </Link>
         </div>
 
         {listPending ? (
