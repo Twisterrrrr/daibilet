@@ -17,8 +17,12 @@ export const JOBS = {
   },
   'tep-catalog': {
     id: 'tep-catalog',
-    description: 'Teplohod catalog import + Next home revalidate',
-    scripts: ['scripts/tep-import-fixtures.js', 'scripts/revalidate-next-home.mjs'],
+    description: 'Teplohod catalog import + cover ensure + Next home revalidate',
+    scripts: [
+      'scripts/tep-import-fixtures.js',
+      'scripts/ensure-catalog-covers.js',
+      'scripts/revalidate-next-home.mjs',
+    ],
     passArgs: false,
   },
   'tc-orders': {

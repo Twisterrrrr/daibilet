@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import {
   isPlaceholderEventImageUrl,
+  isUsableCatalogImageUrl,
   pickFirstUsableEventImageUrl,
   stabilizeTeplohodImageUrl,
 } from './event-image-url.js';
@@ -93,4 +94,21 @@ test('pickFirstUsableEventImageUrl returns null when only placeholders remain', 
     ),
     null,
   );
+});
+
+test('isUsableCatalogImageUrl accepts CDN and local events/venues, rejects cities', () => {
+  assert.equal(
+    isUsableCatalogImageUrl(
+      'https://ticketscloud-prod.storage.yandexcloud.net/production/image/x.jpg',
+    ),
+    true,
+  );
+  assert.equal(
+    isUsableCatalogImageUrl('/images/events/tc-6a3cdc3f5ac2fefed3240b7c-sortavala-ussr-museum.jpg'),
+    true,
+  );
+  assert.equal(isUsableCatalogImageUrl('/images/venues/generated/venue-auto-abc.jpg'), true);
+  assert.equal(isUsableCatalogImageUrl('/images/cities/moscow.png'), false);
+  assert.equal(isUsableCatalogImageUrl(''), false);
+  assert.equal(isUsableCatalogImageUrl(null), false);
 });

@@ -2,7 +2,7 @@ import type { Prisma, VenueKind } from '@daibilet/db';
 import { prisma } from '@daibilet/db';
 import { join } from '@daibilet/db/sql';
 
-import { pickFirstUsableEventImageUrl } from './event-image-url.js';
+import { isUsableCatalogImageUrl, pickFirstUsableEventImageUrl } from './event-image-url.js';
 
 /** Non-draft / non-hidden events count for venue list tiles (no session hydrate). */
 export const ACTIVE_VENUE_EVENT_WHERE = {
@@ -171,10 +171,8 @@ export function applyVenueEventFacetCounts(
 }
 
 function isRealPublicHeroCandidate(url: string | null | undefined): boolean {
-  const raw = String(url || '').trim();
-  if (!raw) return false;
-  if (raw.startsWith('/images/cities/')) return false;
-  return /^https?:\/\//i.test(raw);
+  // Prefer provider CDN; also accept local /images/events|venues (TC overrides + generated).
+  return isUsableCatalogImageUrl(url);
 }
 
 /**

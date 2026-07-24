@@ -7257,7 +7257,11 @@ function pickRealPublicImageUrl(value) {
   const url = String(value || '').trim();
   if (!url) return null;
   if (url.startsWith('/images/cities/')) return null;
-  return /^https?:\/\//i.test(url) ? url : null;
+  if (/placeholder\.gif/i.test(url)) return null;
+  if (/^https?:\/\//i.test(url)) return url;
+  // Local TC overrides + generated covers (Sortavala etc.) - not city placeholders.
+  if (/^\/images\/(events|venues)\//i.test(url)) return url;
+  return null;
 }
 
 function resolveVenueHeroImageUrl(row, heroImageFallbacks = null) {

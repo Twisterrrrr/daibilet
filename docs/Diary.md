@@ -34,6 +34,27 @@
 
 ---
 
+## 2026-07-24 - Catalog covers: no empty Event/Venue after import
+
+### Наблюдения
+
+- Owner: на `/venues` карточки без фото (градиент), в т.ч. Sortavala.
+- Prod: **948** visible venues без `heroImageUrl`; у **934** уже есть event CDN/local image; **14** совсем пустые; **55** active events без image.
+- Lean fallback `f7e0071` брал event image, но `isRealPublicHeroCandidate` / `pickRealPublicImageUrl` принимали **только https** - локальные `/images/events/tc-*.jpg` (Sortavala) отбрасывались → градиент.
+
+### Решения
+
+- Policy: после TC/TEP import всегда `ensure-catalog-covers` - сначала promote provider/event image на Venue, generate (sharp SVG→JPEG) только если пусто.
+- Accept `/images/events|venues/*` как usable cover (не `/images/cities/`).
+- Hook: `tc-sync` (full + ids), `tep:sync`, worker `tep-catalog`.
+- Harry Potter taboo на home не трогаем (только rails filter).
+
+### Проблемы
+
+- Нет (commit + deploy + backfill).
+
+---
+
 ## 2026-07-24 - Home rails: content-fingerprint cover dedupe
 
 ### Наблюдения

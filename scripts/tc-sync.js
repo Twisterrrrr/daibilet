@@ -91,6 +91,18 @@ async function runIdsSync(options) {
     skipMissingFromCatalog: true,
   });
 
+  // Persist/promote/generate covers after upsert (CDN first; generate only if empty).
+  const covers = spawnSync(process.execPath, [path.join(rootDir, "scripts", "ensure-catalog-covers.js")], {
+    cwd: rootDir,
+    env: process.env,
+    stdio: "inherit",
+    windowsHide: true,
+  });
+  if (covers.status) {
+    process.exitCode = covers.status;
+    return;
+  }
+
   if (!options.skipRevalidate) {
     const revalidate = spawnSync(process.execPath, [path.join(rootDir, "scripts", "post-catalog-sync-warm.mjs")], {
       cwd: rootDir,
@@ -131,6 +143,8 @@ function runFullSyncPipeline() {
   const steps = [
     ["scripts/tc-full-sync.js"],
     ["scripts/tc-import-catalog.js"],
+    // After import: promote CDN/event images to venues; generate only when truly empty.
+    ["scripts/ensure-catalog-covers.js"],
     // Light revalidate/warm by default; set TC_CATALOG_SYNC_FULL_WARM=1 for nightly full warm.
     ["scripts/post-catalog-sync-warm.mjs"],
   ];

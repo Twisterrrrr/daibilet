@@ -11,6 +11,20 @@ export function isPlaceholderEventImageUrl(imageUrl?: string | null): boolean {
 }
 
 /**
+ * Usable catalog cover for Event/Venue tiles (CDN or local events/venues assets).
+ * City placeholders are never treated as real covers.
+ */
+export function isUsableCatalogImageUrl(imageUrl?: string | null): boolean {
+  const raw = String(imageUrl || '').trim();
+  if (!raw || isPlaceholderEventImageUrl(raw)) return false;
+  if (raw.startsWith('/images/cities/')) return false;
+  if (/^https?:\/\//i.test(raw)) return true;
+  // Local TC overrides + generated covers under /images/events|venues/
+  if (/^\/images\/(events|venues)\//i.test(raw)) return true;
+  return false;
+}
+
+/**
  * Live Teplohod API отдаёт pre-signed S3 URL (`s3.twcstorage.ru/...`, TTL ~6ч).
  * В БД/кэше они протухают → серые карточки на главной.
  * Канон: стабильный прокси `api.teplohod.info/v1/image?item=EventN&dirtyAlias=file`.

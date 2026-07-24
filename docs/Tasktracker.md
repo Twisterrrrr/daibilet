@@ -7,6 +7,17 @@
 
 ---
 
+## Catalog covers policy (2026-07-24)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| CC.1 | Policy: нет Event/Venue без cover; после TC/TEP import - promote CDN, иначе generate | Критический | 🔄 |
+| CC.2 | Fix lean venue fallback: принимать `/images/events|venues/*` (не только https) | Критический | 🔄 |
+| CC.3 | `scripts/ensure-catalog-covers.js` + hook в `tc:sync` / `tep:sync` / worker | Критический | 🔄 |
+| CC.4 | Prod backfill: promote + generate пустые hubs (Sortavala и др.) | Критический | ⏳ |
+
+---
+
 ## Home rails cover dedupe (2026-07-24)
 
 | # | Задача | Приоритет | Статус |
