@@ -201,7 +201,7 @@ function HeroCopy({
         {title}
       </h1>
       {description ? (
-        <p className={`mx-auto mt-4 max-w-2xl text-base sm:text-lg ${t.description} ${centered ? '' : 'mx-0'}`}>{description}</p>
+        <p className={`mx-auto mt-4 max-w-3xl text-base sm:text-lg ${t.description} ${centered ? '' : 'mx-0'}`}>{description}</p>
       ) : null}
     </div>
   );

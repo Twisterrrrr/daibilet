@@ -16,6 +16,8 @@ export const IMAGE_SIZES = {
   /** Full-width city-hub / catalog landing banners */
   landingBanner: '100vw',
   blogCard: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
+  /** Inline body photo (float ~20–28rem or standalone max-w-2xl) */
+  blogInline: '(max-width: 640px) 100vw, (max-width: 1024px) 28rem, 42rem',
   blogThumb: '5rem',
   blogFeatured: '(max-width: 768px) 100vw, 60vw',
   searchThumb: '2.5rem',

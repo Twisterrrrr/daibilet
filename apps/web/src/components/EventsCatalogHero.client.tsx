@@ -36,7 +36,7 @@ export function EventsCatalogHero() {
 
   const description = cityName
     ? `Билеты на экскурсии, концерты и музеи в ${cityToPrepositional(cityName)}.`
-    : 'Билеты на экскурсии, концерты и музеи по России.';
+    : 'Билеты на экскурсии, концерты и музеи более чем в 100 городах России.';
 
   return (
     <HeroLayout

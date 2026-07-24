@@ -422,17 +422,17 @@ function BlogFigure({
 
   return (
     <figure className={className}>
-      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-sm border border-slate-200/70 bg-slate-100 shadow-sm">
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl border border-slate-200/80 bg-slate-100 shadow-md">
         <SafeImage
           src={image.src}
           alt={image.alt}
           fill
-          sizes={IMAGE_SIZES.blogCard}
+          sizes={IMAGE_SIZES.blogInline}
           className="object-cover"
         />
       </div>
       {image.alt ? (
-        <figcaption className="mt-2 text-xs leading-relaxed text-slate-500 sm:text-[0.8rem]">
+        <figcaption className="mt-2.5 text-center text-xs leading-snug text-slate-500 sm:text-sm">
           {image.alt}
         </figcaption>
       ) : null}
@@ -449,12 +449,13 @@ function BlogFloatedSection({
 }) {
   const floatClass =
     image.side === 'left'
-      ? 'sm:float-left sm:mr-5 sm:mb-3'
-      : 'sm:float-right sm:ml-5 sm:mb-3';
+      ? 'sm:float-left sm:mr-6 sm:mb-4'
+      : 'sm:float-right sm:ml-6 sm:mb-4';
 
   return (
-    <div className="my-6 clearfix">
-      <BlogFigure image={image} className={`mb-3 w-full max-w-[15.5rem] sm:max-w-[14.5rem] ${floatClass}`} />
+    <div className="my-8 clearfix">
+      {/* ~md, не magazine-thumb 14.5rem: иначе inline «пропадает» рядом с hero */}
+      <BlogFigure image={image} className={`mb-4 w-full max-w-md sm:max-w-[20rem] md:max-w-md ${floatClass}`} />
       <div className="min-w-0 [&>p+p]:mt-[1.275em]">{children}</div>
     </div>
   );
@@ -615,6 +616,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
   );
   const nodes: React.ReactNode[] = [];
   let isLeadParagraph = true;
+  let bodyImagesRendered = 0;
 
   for (let index = 0; index < blocks.length; index += 1) {
     const block = blocks[index];
@@ -627,6 +629,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         </BlogFlexRow>,
       );
       index += 1;
+      bodyImagesRendered += 1;
       isLeadParagraph = false;
       continue;
     }
@@ -638,6 +641,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
         </BlogFlexRow>,
       );
       index += 1;
+      bodyImagesRendered += 1;
       isLeadParagraph = false;
       continue;
     }
@@ -647,13 +651,28 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
 
     if (block.type === 'image') {
       const { paragraphs, endIndex } = collectParagraphBlocks(blocks, index + 1);
-      if (paragraphs.length > 0) {
+      // Первое inline - полноширинный break (удержание внимания); дальше можно float.
+      const preferStandalone = bodyImagesRendered === 0;
+      if (paragraphs.length > 0 && !preferStandalone) {
         nodes.push(
           <BlogFloatedSection key={`img-p-${index}`} image={block.image}>
             {renderParagraphNodes(paragraphs, `img-p-${index}`, isLeadParagraph)}
           </BlogFloatedSection>,
         );
         index = endIndex;
+        bodyImagesRendered += 1;
+        isLeadParagraph = false;
+        continue;
+      }
+      if (preferStandalone && paragraphs.length > 0) {
+        nodes.push(
+          <div key={`img-${index}`} className="my-10">
+            <BlogFigure image={block.image} className="mx-auto w-full max-w-2xl" />
+          </div>,
+        );
+        nodes.push(...renderParagraphNodes(paragraphs, `img-p-${index}`, isLeadParagraph));
+        index = endIndex;
+        bodyImagesRendered += 1;
         isLeadParagraph = false;
         continue;
       }
@@ -682,6 +701,7 @@ export function renderBlogArticleContent(content: string, coverImageUrl?: string
             <BlogFigure image={block.image} className="mx-auto w-full max-w-2xl" />
           </div>,
         );
+        bodyImagesRendered += 1;
         isLeadParagraph = false;
         break;
       case 'h2':

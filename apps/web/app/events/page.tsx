@@ -4,31 +4,35 @@ import { Suspense } from 'react';
 import { CatalogShell } from '@/components/CatalogShell.client';
 import { EventsCatalogHero } from '@/components/EventsCatalogHero.client';
 import { SiteLayout } from '@/components/SiteLayout';
-import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
+import {
+  EVENTS_CATALOG_DESCRIPTION,
+  EVENTS_CATALOG_TITLE,
+  buildEventsCatalogMetadata,
+} from '@/lib/seo-events-catalog-meta';
 import { catalogQueryCacheKey, parseCatalogPageQuery } from '@/server/catalog-query';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
 
-const EVENTS_TITLE = 'Афиша событий - экскурсии и билеты';
-const EVENTS_DESCRIPTION =
-  'Афиша событий Дайбилет: фильтры по городу, дате и формату. Официальные билеты у организатора.';
 const EVENTS_SUPPORT =
   'Официальные билеты на экскурсии, концерты и музеи - оплата в виджете организатора.';
 
-export const metadata: Metadata = {
-  title: pageTitle(EVENTS_TITLE),
-  description: EVENTS_DESCRIPTION,
-  alternates: { canonical: '/events' },
-  ...buildShareMetadata({
-    title: `${EVENTS_TITLE} | Дайбилет`,
-    description: EVENTS_DESCRIPTION,
-    path: '/events',
-  }),
+type PageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
+
+/**
+ * Metadata читает searchParams (лёгкий путь).
+ * Тело страницы searchParams не ждёт: каталог по фильтрам остаётся client refetch,
+ * чтобы не возвращать тяжёлый SSR filtered catalog (см. bf97706).
+ */
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const raw = await searchParams;
+  return buildEventsCatalogMetadata(raw || {});
+}
 
 export const revalidate = 300;
 
 /**
- * Do not await searchParams here - it forces dynamic no-store and kills ISR/CDN HIT.
+ * Do not await searchParams here - filtered catalog SSR was killing ISR/CDN HIT.
  * Default empty catalog is SSR'd; CatalogShell reads URL and refetches client-side.
  */
 export default async function EventsCatalogPage() {
@@ -79,3 +83,7 @@ export default async function EventsCatalogPage() {
     </SiteLayout>
   );
 }
+
+// Keep named exports discoverable for smoke / docs (title strings).
+void EVENTS_CATALOG_TITLE;
+void EVENTS_CATALOG_DESCRIPTION;

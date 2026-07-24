@@ -76,7 +76,7 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
       variant={videoSrc ? 'video' : 'imageOverlay'}
       brand="Дайбилет"
       title={title}
-      description="Билеты на экскурсии, речные прогулки и в музеи онлайн - оплата у организатора."
+      description="Билеты на экскурсии, речные прогулки и в музеи онлайн более чем в 100 городах России"
       tone="dark"
       media={<HeroMedia frames={frames} videoSrc={videoSrc} />}
     >

@@ -1,3 +1,21 @@
+## 2026-07-24 - Blog inline: контент был, UI «прятал» фото
+
+### Наблюдения
+
+- Повторный owner-запрос «почти нет картинок в статьях». Контент после `@b1b23b5` уже ок: `blog:check-inline` 0/0; live prod HTML содержит 1–2 `-inline` (+ файлы 200).
+- Реальная причина слабого удержания внимания: в `apps/web` `BlogFloatedSection` рендерил float `max-w-[15.5rem]` / `sm:max-w-[14.5rem]` (~232px) - рядом с full-bleed hero картинка выглядела как миниатюра / «её нет».
+
+### Решения
+
+- Float: `max-w-md` / `sm:max-w-[20rem]` / `md:max-w-md`; первое body-image всегда standalone `max-w-2xl`.
+- `IMAGE_SIZES.blogInline` + чуть сильнее frame (rounded-xl / shadow-md).
+
+### Проблемы
+
+- Нужен deploy-prod-next (UI-only; upsert не нужен). Коммит по запросу владельца.
+
+---
+
 ## 2026-07-24 - Blog: обязательные inline-фото в теле статей
 
 ### Наблюдения

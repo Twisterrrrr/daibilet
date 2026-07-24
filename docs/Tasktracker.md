@@ -270,6 +270,7 @@
 | B.11 | Soft-links блога: каталог → лендинги (jazz/standup/river/bus) | Высокий | ✅ 2026-07-19 upsert+revalidate |
 | B.12 | Вернуть фото в статьи: distinct `-inline.jpg` + coverImageUrl + upsert/deploy | Критический | ✅ 2026-07-19 |
 | B.12b | Inline 1-2 в каждую статью (правила + 9 SEO-гидов без body images) | Критический | ✅ 2026-07-24 `@b1b23b5` + upsert |
+| B.12c | Blog inline UI: увеличить float + 1-е фото full-width (не thumb 14.5rem) | Высокий | 🔄 UI ready, нужен deploy |
 | B.13 | Home SEO: title без цифр + description шаблон с живыми counts хабов | Высокий | ✅ 2026-07-19 @789ee67 |
 | B.14 | Blog: defer первого `[image]` после 2 абзацев (не сразу под hero) | Высокий | ✅ 2026-07-19 @8ba0a05 |
 | B.15 | TC: past dated slug → не «открытая дата» / не «Мероприятие прошло»; meta-siblings | Критический | ✅ e9d72f1 + blog slug refresh |
