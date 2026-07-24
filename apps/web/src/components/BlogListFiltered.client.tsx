@@ -253,6 +253,11 @@ export function BlogListFiltered({
 
   const hasActive = urlCity !== 'all' || author !== 'all' || topic !== 'all' || Boolean(query);
   const hasMore = Boolean(nextCursor);
+  /** SSR / first paint: useEffect ещё не заполнил visiblePosts. */
+  const displayPosts =
+    visiblePosts.length > 0
+      ? visiblePosts
+      : paginateBlogFeedByCursor(filtered, { cursor: null, limit: PAGE_SIZE }).items;
 
   const selectClass =
     'min-w-[10rem] flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100 sm:max-w-[16rem] sm:flex-none';
@@ -309,10 +314,10 @@ export function BlogListFiltered({
         <p className="text-sm text-slate-500">
           Найдено: <span className="font-semibold text-slate-800">{filtered.length}</span>
           {posts.length ? <span> из {posts.length}</span> : null}
-          {filtered.length > visiblePosts.length ? (
+          {filtered.length > 0 ? (
             <span className="text-slate-400">
               {' '}
-              (показано {visiblePosts.length})
+              (показано {displayPosts.length})
             </span>
           ) : null}
         </p>
