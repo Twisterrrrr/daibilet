@@ -129,7 +129,7 @@ export function BlogListHero({ breadcrumbs, guidesCount = 0 }: BlogListHeroProps
             aria-label="Поиск по блогу"
             className="rounded-3xl bg-gradient-to-br from-slate-50 via-primary-50/40 to-slate-50 p-5 ring-1 ring-primary-100/70 sm:p-7 lg:p-8"
           >
-            <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.65fr)_minmax(11rem,0.55fr)] lg:gap-8">
+            <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.45fr)_minmax(15rem,18rem)] lg:gap-8">
               <div className="min-w-0">
                 <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-primary-700">
                   <BookOpen className="h-3.5 w-3.5" aria-hidden />
@@ -183,7 +183,7 @@ export function BlogListHero({ breadcrumbs, guidesCount = 0 }: BlogListHeroProps
               </div>
 
               {guidesCount > 0 ? (
-                <aside className="hidden lg:flex lg:flex-col lg:items-stretch lg:justify-center lg:self-stretch lg:gap-4">
+                <aside className="hidden min-w-0 lg:flex lg:flex-col lg:items-stretch lg:justify-center lg:self-stretch lg:gap-4">
                   <div className="rounded-2xl bg-white/80 px-5 py-4 text-right ring-1 ring-slate-200/80">
                     <p className="font-display text-3xl font-extrabold tabular-nums text-primary-700">
                       {guidesCount}
@@ -196,12 +196,12 @@ export function BlogListHero({ breadcrumbs, guidesCount = 0 }: BlogListHeroProps
                   <BlogNewsletterSignup />
                 </aside>
               ) : (
-                <aside className="hidden lg:block">
+                <aside className="hidden min-w-0 lg:block">
                   <BlogNewsletterSignup />
                 </aside>
               )}
             </div>
-            <div className="mt-5 lg:hidden">
+            <div className="mt-5 min-w-0 lg:hidden">
               <BlogNewsletterSignup />
             </div>
           </section>

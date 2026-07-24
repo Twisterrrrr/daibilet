@@ -36,17 +36,18 @@ export function BlogNewsletterSignup() {
   return (
     <form
       onSubmit={onSubmit}
-      className="mt-5 rounded-2xl bg-white/90 p-4 ring-1 ring-slate-200/80 sm:p-5"
+      className="w-full min-w-0 rounded-2xl bg-white/90 p-4 ring-1 ring-slate-200/80 sm:p-5"
       aria-label="Подписка на статьи"
     >
       <p className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-900">
-        <Mail className="h-4 w-4 text-primary-600" aria-hidden />
+        <Mail className="h-4 w-4 shrink-0 text-primary-600" aria-hidden />
         Нам по пути
       </p>
       <p className="mt-1 text-sm leading-relaxed text-slate-600">
         Честные статьи и редкие промокоды - без спама.
       </p>
-      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+      {/* Stacked: sm:flex-row ломался в узком aside (viewport wide, column ~11rem). */}
+      <div className="mt-3 flex min-w-0 flex-col gap-2">
         <label className="sr-only" htmlFor="blog-newsletter-email">
           Email
         </label>
@@ -61,12 +62,12 @@ export function BlogNewsletterSignup() {
             if (status !== 'idle') setStatus('idle');
           }}
           placeholder="ваш@email.ru"
-          className="h-11 flex-1 rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
+          className="box-border h-11 w-full min-w-0 rounded-xl border border-slate-200 bg-white px-3 text-sm outline-none focus:border-primary-400 focus:ring-2 focus:ring-primary-100"
         />
         <button
           type="submit"
           disabled={status === 'loading'}
-          className="inline-flex h-11 items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:opacity-60"
+          className="inline-flex h-11 w-full shrink-0 items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-semibold leading-none text-white transition hover:bg-slate-800 disabled:opacity-60"
         >
           {status === 'loading' ? 'Отправляем…' : 'Нам по пути'}
         </button>
