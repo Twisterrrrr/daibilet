@@ -53,6 +53,7 @@
 ### Проблемы
 
 - Нужен migrate + deploy-prod-next; после деплоя smoke `/` на `cities/top/*.jpg` в ротаторе.
+- **Prod:** migrate `20260725130000` OK; deploy @`70de525`+ (ancestry includes `a0a2cf3`); `/` SSR содержит все 6 `cities/top/*.jpg`; ассеты 200; slavic/selfie в home hero нет.
 
 ---
 
