@@ -52,7 +52,8 @@ export async function HomePageContent() {
   const destinations = destinationsPayload?.destinations ?? [];
   const cities = destinations.filter((item) => item.type === 'city');
   const topCities = [...cities].sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')).slice(0, 8);
-  const liveCities = cities.filter((city) => city.events > 0).length;
+  // Same definition as footer / PublicStatsDto.destinations: cities + regions with events.
+  const liveCities = destinations.filter((item) => (item.events || 0) > 0).length;
   const liveEvents = catalogPayload?.total ?? catalogPayload?.items?.length ?? 0;
   const liveVenues = venuesPayload?.total ?? venuesPayload?.venues?.length ?? 0;
 

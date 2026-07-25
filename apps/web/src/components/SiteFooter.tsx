@@ -43,13 +43,16 @@ export function SiteFooter({ destinations }: SiteFooterProps) {
       href: cityHref(city),
     }));
 
-  // Real catalog social proof from already-loaded destinations (no extra query).
-  const eventsCount = cities.reduce((sum, city) => sum + (city.events || 0), 0);
-  const venuesCount = cities.reduce((sum, city) => sum + (city.venues || 0), 0);
-  const citiesCount = cities.length;
+  // Catalog social proof = public destinations with events (cities + regions).
+  // type==='city' alone is only standaloneCities (~65) and undercounts cityToRegion hubs
+  // that marketing («более чем в 100 городах» / PublicStatsDto.destinations) includes.
+  const catalogDestinations = destinations.filter((item) => (item.events || 0) > 0);
+  const eventsCount = catalogDestinations.reduce((sum, item) => sum + (item.events || 0), 0);
+  const venuesCount = catalogDestinations.reduce((sum, item) => sum + (item.venues || 0), 0);
+  const placesCount = catalogDestinations.length;
   const catalogStatsLine =
-    eventsCount > 0 || venuesCount > 0 || citiesCount > 0
-      ? `${formatNumber(eventsCount)} событий · ${formatNumber(venuesCount)} площадок · ${formatNumber(citiesCount)} городов`
+    eventsCount > 0 || venuesCount > 0 || placesCount > 0
+      ? `${formatNumber(eventsCount)} событий · ${formatNumber(venuesCount)} площадок · ${formatNumber(placesCount)} городов`
       : null;
 
   const popularDirections = getFooterPopularDirections();

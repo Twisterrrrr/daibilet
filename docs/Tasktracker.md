@@ -55,7 +55,7 @@
 | CV.1 | `/events` filters: sticky «Показать N вариантов» + live preview count | Критический | ✅ debounce 350ms; zero CTA: «Нет подходящих событий» (pastel gray) |
 | CV.2 | `/events` grid: interstitial баннеры каждые 8 карточек → гиды/подборки | Высокий | ✅ soft tint + badge «Подборка»/«Из Блога»; compact mobile + click track |
 | CV.2b | Настроить цель `catalog_interstitial_click` в Метрике + триггер/тег в GTM (маркетолог; frontend push уже есть) | Высокий | ⏳ handoff: event id `catalog_interstitial_click`; Метрика JS-событие + GTM Custom Event; код не трогать |
-| CV.3 | Home: live stats (города/события/площадки) + «Как купить» 3 шага | Высокий | ✅ step3 email/SMS/phone; how-to-buy mt-20 + bg-slate-50; social proof = каталожные counts до CV.11 |
+| CV.3 | Home: live stats (города/события/площадки) + «Как купить» 3 шага | Высокий | ✅ step3 email/SMS/phone; how-to-buy mt-20 + bg-slate-50; social proof = destinations с events (city+region, ≈stats.destinations) до CV.11 |
 | CV.4 | Blog: native `[buy]` card (цена + CTA), без «сайт партнёра» | Высокий | ✅ live DTO + no-store; min `от N ₽` + fixed price width; единственный embed-путь (см. CV.8 🚫) |
 | CV.5 | Sort «скидки» в каталоге | Средний | ⚠️ deferred: нет `discount`/`strikePrice` в DTO; ждать sync architecture sprint |
 | CV.6 | Home video hero (HC.10) | Средний | ⚠️ deferred: photo rotator KEEP; stock muted loops 🚫; ждать продакшн-съёмку; реальные МСК/СПб WebP/AVIF |

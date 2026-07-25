@@ -1,3 +1,21 @@
+## 2026-07-26 - Footer city count: cities + regions
+
+### Наблюдения
+
+- Owner: footer «65 городов» vs marketing «более чем в 100» (HOME_TRUST / SEO events).
+- Commit `5306f2f` считал только `type === 'city'` (= `standaloneCities`, 65). Регионы (`cityToRegion` hubs) в destinations есть, но отфильтровывались.
+- Prod `/api/public/destinations`: 65 city + 36 region = **101**; `PublicStatsDto.stats.destinations` = 101.
+
+### Решения
+
+- `SiteFooter` + home live stats: считать destinations с `events > 0` (cities + regions), как stats/HOME_TRUST «100+». Ссылки в колонке «Города» по-прежнему только city.
+
+### Проблемы
+
+- Нет (честный каталожный count, без fake).
+
+---
+
 ## 2026-07-25 - Owner audit: env / robots / CV.9b auth
 
 ### Наблюдения
