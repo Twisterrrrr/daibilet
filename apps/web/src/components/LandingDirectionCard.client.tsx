@@ -147,7 +147,7 @@ export function LandingDirectionCard({
       ) : (
         <div className={`absolute inset-0 bg-gradient-to-br ${landingGradient(landing.slug)} opacity-90`} />
       )}
-      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/15" />
+      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/5" />
       <div className="relative z-[1] p-4 text-white sm:p-5">
         <span className="text-xl" aria-hidden>
           {emoji}

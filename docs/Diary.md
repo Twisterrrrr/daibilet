@@ -1,3 +1,22 @@
+## 2026-07-25 - Home/podborki: все превью на десктопе
+
+### Наблюдения
+
+- Owner: «не вижу всех превью» - «Формат отдыха» и «Тематические подборки» обрезались в ScrollRail; часть плиток выглядела как тёмный solid (сильный overlay / null image на `/podborki`).
+
+### Решения
+
+- Format tiles: `lg:grid-cols-4` без скролла; ScrollRail только `<lg`.
+- Thematic home: `lg:grid-cols-3`; `/podborki` секции «По типу»/«Для кого»: `lg:grid-cols-3 xl:grid-cols-4`.
+- ScrollRail: обе стрелки при overflow (край muted); peek ~14px; стрелки на `top-[33%]` (не поверх title карточки).
+- Overlay светлее; `resolveLandingCardImage` всегда даёт JPG (home fallback); `bg-slate-800` под фото.
+
+### Проблемы
+
+- Параллельный search-bar агент - не откатывать. `apps/web/public/images` gitignored, sync на build.
+
+---
+
 ## 2026-07-25 - Fix empty `/progulki-po-krysham` (rooftops rule)
 
 ### Наблюдения

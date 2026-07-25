@@ -310,8 +310,9 @@ export function LandingsCatalogView({
                       {section.items.length}
                     </span>
                   </div>
+                  {/* Мобилка/планшет: горизонтальный скролл; lg+: сетка без обрезки */}
                   <ScrollRail
-                    className="-mx-4 sm:mx-0"
+                    className="-mx-4 sm:mx-0 lg:hidden"
                     viewportClassName="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:px-0"
                     aria-label={section.title}
                   >
@@ -319,12 +320,19 @@ export function LandingsCatalogView({
                       <div
                         key={landing.slug}
                         data-rail-item
-                        className="w-[min(18rem,78vw)] shrink-0 snap-start sm:w-[17.5rem]"
+                        className="w-[min(18rem,calc(100%-0.875rem))] shrink-0 snap-start sm:w-[17.5rem]"
                       >
                         <LandingDirectionCard landing={landing} citySlug={citySlug} />
                       </div>
                     ))}
                   </ScrollRail>
+                  <ul className="hidden gap-3 lg:grid lg:grid-cols-3 xl:grid-cols-4">
+                    {section.items.map((landing) => (
+                      <li key={landing.slug}>
+                        <LandingDirectionCard landing={landing} citySlug={citySlug} />
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               ))}
             </div>

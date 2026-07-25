@@ -154,8 +154,9 @@ export async function HomePageContent() {
               Все подборки <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
+          {/* lg+: все 4 превью в ряд без скролла; ScrollRail только до lg */}
           <ScrollRail
-            className="mt-6"
+            className="mt-6 lg:hidden"
             viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory"
             aria-label="Форматы отдыха"
           >
@@ -163,25 +164,50 @@ export async function HomePageContent() {
               <Link
                 key={tile.title}
                 href={tile.href}
-                className="horizontal-snap-card group relative min-h-[148px] overflow-hidden rounded-card text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover"
+                className="horizontal-snap-card group relative min-h-[148px] overflow-hidden rounded-card bg-slate-800 text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover"
               >
                 <SafeImage
                   src={tile.imageUrl}
                   alt=""
                   fill
-                  sizes="(max-width: 768px) 70vw, 25vw"
+                  sizes="70vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                   fallback={<div className={`absolute inset-0 bg-gradient-to-br ${tile.fallbackGradient}`} />}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/15" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/5" />
                 <div className="relative z-[1] flex h-full min-h-[148px] flex-col justify-end p-5">
                   <h3 className="text-lg font-bold text-white">{tile.title}</h3>
-                  <p className="mt-1 text-sm text-white/85">{tile.subtitle}</p>
+                  <p className="mt-1 text-sm text-white/90">{tile.subtitle}</p>
                   <ChevronRight className="absolute bottom-4 right-4 h-5 w-5 text-white/80 transition group-hover:translate-x-0.5 group-hover:text-white" />
                 </div>
               </Link>
             ))}
           </ScrollRail>
+          <ul className="mt-6 hidden gap-3 lg:grid lg:grid-cols-4">
+            {HOME_FORMAT_TILES.map((tile) => (
+              <li key={tile.title}>
+                <Link
+                  href={tile.href}
+                  className="group relative flex min-h-[148px] overflow-hidden rounded-card bg-slate-800 text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover"
+                >
+                  <SafeImage
+                    src={tile.imageUrl}
+                    alt=""
+                    fill
+                    sizes="25vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                    fallback={<div className={`absolute inset-0 bg-gradient-to-br ${tile.fallbackGradient}`} />}
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/5" />
+                  <div className="relative z-[1] flex h-full min-h-[148px] w-full flex-col justify-end p-5">
+                    <h3 className="text-lg font-bold text-white">{tile.title}</h3>
+                    <p className="mt-1 text-sm text-white/90">{tile.subtitle}</p>
+                    <ChevronRight className="absolute bottom-4 right-4 h-5 w-5 text-white/80 transition group-hover:translate-x-0.5 group-hover:text-white" />
+                  </div>
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 
@@ -218,8 +244,9 @@ export async function HomePageContent() {
                 Все подборки <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
+            {/* Мобилка: горизонтальный скролл; lg+: сетка 3 колонки (до 6 карточек = 2 ряда) */}
             <ScrollRail
-              className="mt-6"
+              className="mt-6 lg:hidden"
               viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory"
               aria-label="Тематические подборки"
             >
@@ -229,21 +256,21 @@ export async function HomePageContent() {
                   <Link
                     key={landing.slug}
                     href={landingCategoryHref(landing.slug)}
-                    className="horizontal-snap-card group relative min-h-[168px] overflow-hidden rounded-card text-left text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover sm:min-h-[180px]"
+                    className="horizontal-snap-card group relative min-h-[168px] overflow-hidden rounded-card bg-slate-800 text-left text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover sm:min-h-[180px]"
                   >
                     <SafeImage
                       src={imageUrl}
                       alt=""
                       fill
-                      sizes="(max-width: 768px) 75vw, 33vw"
+                      sizes="75vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                       fallback={<div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-950" />}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
                     <div className="relative z-[1] flex h-full min-h-[168px] flex-col justify-end p-5 sm:min-h-[180px] sm:p-6">
                       {promoBlockIcon(landing.slug, index)}
                       <h3 className="text-lg font-bold text-white">{landing.title}</h3>
-                      <p className="mt-1 text-sm text-white/85">{landing.subtitle}</p>
+                      <p className="mt-1 text-sm text-white/90">{landing.subtitle}</p>
                       <div className="mt-4 text-sm font-semibold text-white">
                         {pluralEvents(landing.events)} · {formatMoney(landing.priceFrom)}
                       </div>
@@ -252,6 +279,37 @@ export async function HomePageContent() {
                 );
               })}
             </ScrollRail>
+            <ul className="mt-6 hidden gap-3 lg:grid lg:grid-cols-3">
+              {promoLandings.map((landing, index) => {
+                const imageUrl = resolveHomePromoImage(landing.slug, landing.title);
+                return (
+                  <li key={landing.slug}>
+                    <Link
+                      href={landingCategoryHref(landing.slug)}
+                      className="group relative flex min-h-[168px] overflow-hidden rounded-card bg-slate-800 text-left text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover sm:min-h-[180px]"
+                    >
+                      <SafeImage
+                        src={imageUrl}
+                        alt=""
+                        fill
+                        sizes="33vw"
+                        className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                        fallback={<div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-950" />}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/10" />
+                      <div className="relative z-[1] flex h-full min-h-[168px] w-full flex-col justify-end p-5 sm:min-h-[180px] sm:p-6">
+                        {promoBlockIcon(landing.slug, index)}
+                        <h3 className="text-lg font-bold text-white">{landing.title}</h3>
+                        <p className="mt-1 text-sm text-white/90">{landing.subtitle}</p>
+                        <div className="mt-4 text-sm font-semibold text-white">
+                          {pluralEvents(landing.events)} · {formatMoney(landing.priceFrom)}
+                        </div>
+                      </div>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         </section>
       ) : null}

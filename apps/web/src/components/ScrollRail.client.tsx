@@ -40,6 +40,8 @@ function measureStep(scroller: HTMLElement): number {
 /**
  * Horizontal row with md+ prev/next controls when content overflows.
  * Mobile keeps swipe + thin scrollbar from `.horizontal-snap-row`.
+ * Both arrows stay visible while overflowing (edge buttons muted/disabled).
+ * Arrow Y sits in the photo band (~1/3), not over bottom card titles.
  */
 export function ScrollRail({
   children,
@@ -49,6 +51,7 @@ export function ScrollRail({
   'aria-label': ariaLabel = 'Горизонтальный список',
 }: ScrollRailProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const [overflow, setOverflow] = useState(false);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(false);
 
@@ -56,9 +59,10 @@ export function ScrollRail({
     const el = scrollerRef.current;
     if (!el) return;
     const { scrollLeft, scrollWidth, clientWidth } = el;
-    const overflow = scrollWidth > clientWidth + EDGE_EPS;
-    setCanPrev(overflow && scrollLeft > EDGE_EPS);
-    setCanNext(overflow && scrollLeft + clientWidth < scrollWidth - EDGE_EPS);
+    const hasOverflow = scrollWidth > clientWidth + EDGE_EPS;
+    setOverflow(hasOverflow);
+    setCanPrev(hasOverflow && scrollLeft > EDGE_EPS);
+    setCanNext(hasOverflow && scrollLeft + clientWidth < scrollWidth - EDGE_EPS);
   }, []);
 
   useEffect(() => {
@@ -98,7 +102,8 @@ export function ScrollRail({
     });
   };
 
-  const showControls = canPrev || canNext;
+  const arrowBase =
+    'absolute z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur transition-[opacity,transform,colors] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2 md:inline-flex top-[33%]';
 
   return (
     <div className={`relative min-w-0 ${className}`.trim()} style={style}>
@@ -112,7 +117,7 @@ export function ScrollRail({
         {children}
       </div>
 
-      {showControls ? (
+      {overflow ? (
         <>
           <button
             type="button"
@@ -121,8 +126,10 @@ export function ScrollRail({
             tabIndex={canPrev ? 0 : -1}
             disabled={!canPrev}
             onClick={() => scrollByDir(-1)}
-            className={`absolute left-1 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur transition-[opacity,transform,colors] hover:bg-white hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2 md:inline-flex ${
-              canPrev ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+            className={`${arrowBase} left-1 ${
+              canPrev
+                ? 'pointer-events-auto opacity-100 hover:bg-white hover:text-slate-950'
+                : 'pointer-events-none opacity-40'
             }`}
           >
             <ChevronLeft className="h-5 w-5" aria-hidden />
@@ -134,8 +141,10 @@ export function ScrollRail({
             tabIndex={canNext ? 0 : -1}
             disabled={!canNext}
             onClick={() => scrollByDir(1)}
-            className={`absolute right-1 top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur transition-[opacity,transform,colors] hover:bg-white hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2 md:inline-flex ${
-              canNext ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'
+            className={`${arrowBase} right-1 ${
+              canNext
+                ? 'pointer-events-auto opacity-100 hover:bg-white hover:text-slate-950'
+                : 'pointer-events-none opacity-40'
             }`}
           >
             <ChevronRight className="h-5 w-5" aria-hidden />
