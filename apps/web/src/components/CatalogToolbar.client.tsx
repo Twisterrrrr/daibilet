@@ -140,7 +140,7 @@ export function CatalogToolbar({
       {/* Единая search bar: Поиск → Дата → Фильтры → Найти */}
       <form
         onSubmit={onSubmit}
-        className="flex flex-col gap-2 rounded-card bg-white p-2 shadow-card sm:flex-row sm:items-center sm:gap-1.5 sm:p-1.5"
+        className="flex flex-col gap-2 rounded-card border border-slate-200 bg-white p-2 shadow-sm sm:flex-row sm:items-center sm:gap-1.5 sm:p-1.5"
       >
         <label className="relative min-w-0 flex-1">
           <span className="sr-only">Поиск по событиям</span>
