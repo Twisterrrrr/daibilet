@@ -112,7 +112,7 @@ export function LandingDirectionCard({
             <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-white/55">
               {typeof rank === 'number' ? `Топ-запрос · ${String(rank).padStart(2, '0')}` : 'Топ-запрос'}
             </p>
-            <h3 className="font-display mt-1.5 text-2xl font-bold tracking-tight sm:text-3xl">{landing.title}</h3>
+            <h3 className="font-display mt-1.5 text-2xl font-bold tracking-tight text-white sm:text-3xl">{landing.title}</h3>
             <p className="mt-2 max-w-xl text-sm leading-6 text-white/80 sm:text-[0.95rem]">{landingBenefit(landing)}</p>
             <p className="mt-3 text-sm font-semibold text-white/90">
               {eventsLabel}
@@ -147,12 +147,12 @@ export function LandingDirectionCard({
       ) : (
         <div className={`absolute inset-0 bg-gradient-to-br ${landingGradient(landing.slug)} opacity-90`} />
       )}
-      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-transparent" />
-      <div className="relative p-4 text-white sm:p-5">
+      <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/15" />
+      <div className="relative z-[1] p-4 text-white sm:p-5">
         <span className="text-xl" aria-hidden>
           {emoji}
         </span>
-        <h3 className="font-display mt-1 text-lg font-bold sm:text-xl">{landing.title}</h3>
+        <h3 className="font-display mt-1 text-lg font-bold text-white sm:text-xl">{landing.title}</h3>
         {landing.subtitle ? (
           <p className="mt-1 line-clamp-2 text-xs text-white/80 sm:text-sm">{landing.subtitle}</p>
         ) : null}

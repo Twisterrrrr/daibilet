@@ -209,7 +209,7 @@ export function LandingsCatalogView({
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/35 to-transparent" />
               <div className="relative z-10 mt-auto flex w-full flex-col gap-2 p-5">
                 <span className="text-xs font-semibold uppercase tracking-wider text-sky-200">Избранная подборка</span>
-                <span className="font-display text-2xl font-extrabold leading-tight sm:text-3xl">{featured.title}</span>
+                <span className="font-display text-2xl font-extrabold leading-tight text-white sm:text-3xl">{featured.title}</span>
                 <span className="text-sm text-white/80">
                   {pluralEvents(featured.events)}
                   {featured.subtitle ? ` · ${featured.subtitle}` : ''}

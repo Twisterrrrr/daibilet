@@ -194,7 +194,7 @@ function HeroCopy({
         <p className={`text-sm font-semibold uppercase tracking-wider ${t.eyebrow} ${brand ? 'mt-3' : ''}`}>{eyebrow}</p>
       ) : null}
       <h1
-        className={`font-display text-3xl font-extrabold tracking-tight drop-shadow-[0_2px_14px_rgba(15,23,42,0.55)] sm:text-5xl lg:text-6xl ${t.title} ${
+        className={`font-display text-[1.7rem] font-extrabold tracking-tight drop-shadow-[0_2px_14px_rgba(15,23,42,0.55)] sm:text-4xl md:text-5xl lg:text-[3.25rem] xl:text-6xl ${t.title} ${
           brand || eyebrow ? 'mt-3' : ''
         }`}
       >

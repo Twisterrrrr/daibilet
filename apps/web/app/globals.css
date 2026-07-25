@@ -32,9 +32,10 @@
     --space-card: 1rem; /* 16px */
     --space-card-lg: 1.5rem; /* 24px */
     --gradient-hero: linear-gradient(180deg, hsl(221, 83%, 53%) 0%, hsl(221, 83%, 42%) 100%);
-    --font-body: 'Inter', system-ui, sans-serif;
-    --font-display: 'Manrope', 'Inter', system-ui, sans-serif;
-    --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+    /* next/font CSS variables on <html>; fallbacks for first paint / SSR */
+    --font-body: var(--font-inter), system-ui, sans-serif;
+    --font-display: var(--font-manrope), var(--font-inter), system-ui, sans-serif;
+    --font-serif: var(--font-source-serif), Georgia, 'Times New Roman', serif;
     --site-header-height: 4rem;
     --bridges-gradient-hero: radial-gradient(ellipse 90% 70% at 70% 40%, oklch(0.38 0.14 265 / 0.9), transparent 70%),
       linear-gradient(135deg, oklch(0.22 0.10 265), oklch(0.30 0.13 262));
@@ -77,12 +78,14 @@
     height: calc(var(--site-header-height) + env(safe-area-inset-top, 0px));
   }
 
+  /* Color intentionally NOT set here: photo-overlay cards use text-white;
+     element color would beat inherited utilities and darken titles on photos. */
   h1,
   h2,
   h3,
   h4 {
     font-family: var(--font-display);
-    @apply font-bold tracking-tight text-graphite;
+    @apply font-bold tracking-tight;
   }
 
   .font-display {

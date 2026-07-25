@@ -140,7 +140,7 @@ export function BlogAfishaPromo({
         >
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/70">Афиша</p>
-            <p className="mt-1 font-display text-lg font-bold leading-snug sm:text-xl">Смотреть события</p>
+            <p className="mt-1 font-display text-lg font-bold leading-snug text-white sm:text-xl">Смотреть события</p>
           </div>
           <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/15 backdrop-blur transition group-hover:bg-white/25">
             <ArrowRight className="h-4 w-4" aria-hidden />
@@ -178,7 +178,7 @@ export function BlogAfishaPromo({
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/70">
             События города
           </p>
-          <h2 className="mt-0.5 font-display text-lg font-bold leading-snug sm:text-xl">
+          <h2 className="mt-0.5 font-display text-lg font-bold leading-snug text-white sm:text-xl">
             <Link href={promo.href} className="hover:text-white/95">
               Афиша: {promo.cityName}
             </Link>

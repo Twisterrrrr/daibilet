@@ -67,14 +67,14 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
 
   const title = selectedCityName ? (
     <>
-      Экскурсии и события
+      <span className="lg:whitespace-nowrap">Экскурсии и события</span>
       <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
         в {cityToPrepositional(selectedCityName)}
       </span>
     </>
   ) : (
     <>
-      Экскурсии, музеи и мероприятия
+      <span className="lg:whitespace-nowrap">Экскурсии, музеи и мероприятия</span>
       <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
         в городах России
       </span>

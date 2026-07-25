@@ -16,6 +16,26 @@
 
 ---
 
+## 2026-07-25 - CU.2b next/font + photo title color + hero H1 wrap
+
+### Наблюдения
+
+- Lean `node_modules/next/font/*` был пустым stub dirs; полный `@next/font` (font-data + loaders) восстанавливается из npm tarball next@15.5.20 - пустой `font/google/index.js` у Next 15 нормален (webpack target).
+- Owner скрин: title на photo-карточках `/podborki` («По типу событий» / «Для кого») почти чёрный - глобальный `h1-h4 { text-graphite }` перебивал inheritance `text-white`.
+- Home H1 ломал «Экскурсии, музеи и мероприятия» mid-phrase на 2-3 строки.
+
+### Решения
+
+- `apps/web/src/lib/fonts.ts`: Manrope + Inter + Source Serif 4 через `next/font/google` (CSS vars `--font-manrope|inter|source-serif`); layout без Google Fonts `<link>`; Tailwind `fontFamily` на `var(--font-*)`.
+- globals: убран `text-graphite` с `h1-h4` (остались font-family/bold/tracking); photo titles явно `text-white`; overlay на LandingDirectionCard / home tiles затемнён.
+- HomeHero: первая смысловая строка `lg:whitespace-nowrap`; HeroCopy чуть мягче clamp размера на md.
+
+### Проблемы
+
+- Нужен commit + deploy-prod-next; smoke `/` Network: `/_next/static/media/*` без fonts.googleapis.com; `/podborki` titles белые на фото.
+
+---
+
 ## 2026-07-25 - Clean UI фазы 3-4 + home photo tiles + pin fix
 
 ### Наблюдения
@@ -30,7 +50,7 @@
 - Featured blog title/badge → явный `text-white`.
 - 10 JPG в `apps/public/public/images/home/` + photo cover tiles (format + promo) с dark overlay.
 - CU.8/CU.4 polish: CityCard tags, InstitutionCard, BlogPostCard, LandingDirectionCard, HeaderSearch overlay под токены; лёгкий hover translate/scale.
-- next/font self-host: по-прежнему Google Fonts `<link>` (lean next/font без google files) - CU.2b остаётся.
+- next/font self-host: follow-up CU.2b (закрыт отдельной записью).
 
 ### Проблемы
 

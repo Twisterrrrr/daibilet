@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery';
+import { fontVariableClassName } from '@/lib/fonts';
 import { HOME_SEO_DESCRIPTION_FALLBACK, HOME_SEO_TITLE } from '@/lib/seo-meta';
 
 import './globals.css';
@@ -17,10 +18,6 @@ const ICON_512 = '/icon-512x512.png';
 const LOGO_192 = '/logo-192x192.png';
 const APPLE_TOUCH = '/apple-touch-icon.png';
 const FAVICON_ICO = '/favicon.ico';
-
-/** Clean UI: Manrope (H) + Inter (UI) + Source Serif (legacy editorial). */
-const FONTS_HREF =
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;600;700&display=swap';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -100,17 +97,14 @@ const siteJsonLd = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="ru">
+    <html lang="ru" className={fontVariableClassName}>
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href={FONTS_HREF} rel="stylesheet" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(siteJsonLd) }}
         />
       </head>
-      <body className="font-body">
+      <body className="font-sans">
         <ChunkLoadRecovery />
         {children}
       </body>

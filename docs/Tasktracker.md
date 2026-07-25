@@ -13,7 +13,7 @@
 |---|--------|-----------|--------|
 | CU.1 | Токены + tailwind: fonts, radius 16, soft shadow, graphite, surface muted, section spacing | Критический | ✅ |
 | CU.2 | Шрифты Manrope + Inter (+ Source Serif legacy) в root layout (link; next/font follow-up) | Критический | ✅ |
-| CU.2b | Self-host через next/font когда пакет next/font полный на билде | Средний | ⏳ |
+| CU.2b | Self-host через next/font (Manrope+Inter+Source Serif) | Средний | ✅ |
 | CU.3 | EventCard / EventCardHorizontal / showcase: Clean UI (фото, meta icons, цена+CTA) | Критический | ✅ |
 | CU.4 | Home rails + `/events` grid/list gap и section-y | Высокий | ✅ |
 | CU.5 | Header / SiteNav / footer под токены | Высокий | ✅ |
@@ -27,7 +27,7 @@
 | CU.10 | Blog surfaces + search overlay polish | Средний | ✅ |
 | CU.11 | Micro-animations (hover translate/scale) | Низкий | ✅ |
 | CU.12 | HorizontalScroll / ScrollRail: prev/next на md+ для home rails и `/podborki` | Высокий | 🔄 |
-| CU.2b | Self-host через next/font когда пакет next/font полный на билде | Средний | ⏳ |
+| CU.2b | Self-host через next/font (Manrope+Inter+Source Serif) | Средний | ✅ |
 
 ---
 

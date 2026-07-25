@@ -173,7 +173,7 @@ export async function HomePageContent() {
                   className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                   fallback={<div className={`absolute inset-0 bg-gradient-to-br ${tile.fallbackGradient}`} />}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-black/10" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/15" />
                 <div className="relative z-[1] flex h-full min-h-[148px] flex-col justify-end p-5">
                   <h3 className="text-lg font-bold text-white">{tile.title}</h3>
                   <p className="mt-1 text-sm text-white/85">{tile.subtitle}</p>
@@ -239,7 +239,7 @@ export async function HomePageContent() {
                       className="object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                       fallback={<div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-950" />}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/15" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/20" />
                     <div className="relative z-[1] flex h-full min-h-[168px] flex-col justify-end p-5 sm:min-h-[180px] sm:p-6">
                       {promoBlockIcon(landing.slug, index)}
                       <h3 className="text-lg font-bold text-white">{landing.title}</h3>
@@ -280,7 +280,7 @@ export async function HomePageContent() {
                   sizes={IMAGE_SIZES.blogFeatured}
                   className="object-cover opacity-80 transition duration-500 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/10" />
                 <div className="relative flex h-full flex-col justify-end p-6">
                   <span className="inline-flex w-fit rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur">
                     {featuredBlog.tag}
