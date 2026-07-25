@@ -33,6 +33,7 @@
 ### Проблемы
 
 - Параллельные агенты (fonts / roof landing) - не откатывать их файлы при merge.
+- **Prod @`cf9ccfd`:** deploy-prod-next OK (после коллизии параллельных билдов); `/` и `/podborki` 200; chunks `page-*.js` содержат «Прокрутить вправо»; `fac6863` в ancestry.
 
 ---
 
