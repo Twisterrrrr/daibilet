@@ -117,7 +117,7 @@ export function InstitutionVenueLayout({
                 </span>
               </div>
 
-              <h1 className="mt-4 font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">{title}</h1>
+              <h1 className="mt-4 font-display text-3xl font-extrabold leading-tight text-white sm:text-4xl md:text-5xl">{title}</h1>
 
               <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-white/90">
                 {streetAddress ? (

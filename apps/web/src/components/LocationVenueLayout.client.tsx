@@ -93,7 +93,7 @@ export function LocationVenueLayout({
                   <Waves className="h-3.5 w-3.5" /> {formatNumber(routeCount)} {routeCount === 1 ? 'маршрут' : routeCount >= 2 && routeCount <= 4 ? 'маршрута' : 'маршрутов'}
                 </span>
               </div>
-              <h1 className="mt-4 font-display text-3xl font-extrabold sm:text-4xl md:text-5xl">{title}</h1>
+              <h1 className="mt-4 font-display text-3xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
               {heroLead ? <p className="mt-3 max-w-3xl text-sm text-white/85 sm:text-base">{heroLead}</p> : null}
               <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-white/85">
                 {streetAddress ? (
@@ -126,7 +126,7 @@ export function LocationVenueLayout({
               </span>
               <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">{venue.city}</span>
             </div>
-            <h1 className="mt-4 font-display text-3xl font-extrabold sm:text-4xl md:text-5xl">{title}</h1>
+            <h1 className="mt-4 font-display text-3xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
             <p className="mt-3 max-w-2xl text-white/85">{heroLead}</p>
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
               <span className="inline-flex items-center gap-1.5">
@@ -158,7 +158,7 @@ export function LocationVenueLayout({
               </span>
               <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">{venue.city}</span>
             </div>
-            <h1 className="mt-4 font-display text-3xl font-extrabold sm:text-4xl md:text-5xl">{title}</h1>
+            <h1 className="mt-4 font-display text-3xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
             <p className="mt-3 max-w-2xl text-white/85">{heroLead}</p>
             <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
               <span className="inline-flex items-center gap-1.5">
@@ -195,7 +195,7 @@ export function LocationVenueLayout({
                     </div>
                   </div>
                   <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                    <h1 className="font-display text-2xl font-extrabold sm:text-3xl lg:text-4xl">{title}</h1>
+                    <h1 className="font-display text-2xl font-extrabold text-white sm:text-3xl lg:text-4xl">{title}</h1>
                     <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-white/85">
                       {streetAddress ? (
                         <span className="inline-flex items-center gap-1">

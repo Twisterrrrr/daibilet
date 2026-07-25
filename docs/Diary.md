@@ -43,16 +43,17 @@
 - Lean `node_modules/next/font/*` был пустым stub dirs; полный `@next/font` (font-data + loaders) восстанавливается из npm tarball next@15.5.20 - пустой `font/google/index.js` у Next 15 нормален (webpack target).
 - Owner скрин: title на photo-карточках `/podborki` («По типу событий» / «Для кого») почти чёрный - глобальный `h1-h4 { text-graphite }` перебивал inheritance `text-white`.
 - Home H1 ломал «Экскурсии, музеи и мероприятия» mid-phrase на 2-3 строки.
+- BlogAfishaPromo «Афиша: {город}»: title-ссылка без base `text-white` (только hover) - на navy блоке нечитаема.
 
 ### Решения
 
 - `apps/web/src/lib/fonts.ts`: Manrope + Inter + Source Serif 4 через `next/font/google` (CSS vars `--font-manrope|inter|source-serif`); layout без Google Fonts `<link>`; Tailwind `fontFamily` на `var(--font-*)`.
-- globals: убран `text-graphite` с `h1-h4` (остались font-family/bold/tracking); photo titles явно `text-white`; overlay на LandingDirectionCard / home tiles затемнён.
+- globals: убран `text-graphite` с `h1-h4`; `:where(.text-white|.bg-slate-9*) :is(h1..h4) { color: inherit }`; photo titles явно `text-white`; BlogAfishaPromo Link `text-white`; overlay затемнён.
 - HomeHero: первая смысловая строка `lg:whitespace-nowrap`; HeroCopy чуть мягче clamp размера на md.
 
 ### Проблемы
 
-- Нужен commit + deploy-prod-next; smoke `/` Network: `/_next/static/media/*` без fonts.googleapis.com; `/podborki` titles белые на фото.
+- Нужен commit + deploy-prod-next; smoke `/` Network: `/_next/static/media/*` без fonts.googleapis.com; `/blog` afisha title белый; `/podborki` titles белые на фото.
 
 ---
 

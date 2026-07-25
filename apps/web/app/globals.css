@@ -88,6 +88,11 @@
     @apply font-bold tracking-tight;
   }
 
+  /* Dark / photo surfaces: headings inherit surface text (not body graphite). */
+  :where(.text-white, .bg-slate-900, .bg-slate-950, .bg-graphite, .bg-emerald-900) :is(h1, h2, h3, h4) {
+    color: inherit;
+  }
+
   .font-display {
     font-family: var(--font-display);
   }

@@ -179,7 +179,7 @@ export function BlogAfishaPromo({
             События города
           </p>
           <h2 className="mt-0.5 font-display text-lg font-bold leading-snug text-white sm:text-xl">
-            <Link href={promo.href} className="hover:text-white/95">
+            <Link href={promo.href} className="text-white hover:text-white/95">
               Афиша: {promo.cityName}
             </Link>
           </h2>
@@ -199,7 +199,7 @@ export function BlogAfishaPromo({
           <ul className="space-y-1 text-[13px] leading-snug text-white/85">
             {promo.upcomingTitles.map((title) => (
               <li key={title} className="line-clamp-1">
-                <Link href={promo.href} className="hover:text-white">
+                <Link href={promo.href} className="text-white/85 hover:text-white">
                   {title}
                 </Link>
               </li>
