@@ -38,7 +38,7 @@ export function EventQuickInfo({ event }: { event: PublicEventDto }) {
   if (!items.length) return null;
 
   return (
-    <div>
+    <div className="rounded-card border border-slate-200 bg-white p-4 shadow-card sm:p-5">
       <h2 className="text-sm font-semibold uppercase tracking-wider text-graphite-muted">Кратко</h2>
       <ul className="mt-4 space-y-3">
         {items.map((item) => {
@@ -93,15 +93,12 @@ const TRUST_LINKS = [
   { href: '/offer', label: 'Оферта и условия', icon: ShieldCheck },
 ] as const;
 
-/** Trust / E-E-A-T strip: путь покупки и поддержка без дублирования thin-контента события. */
+/** Trust / E-E-A-T strip: полезные ссылки по покупке и поддержке без middleman-формулировок. */
 export function EventTrustStrip() {
   return (
     <section>
       <h2 className="text-sm font-semibold uppercase tracking-wider text-graphite-muted">Покупка и поддержка</h2>
-      <p className="mt-3 text-sm leading-6 text-graphite-muted">
-        Билет оформляется онлайн. На Дайбилет - сравнение предложений, карточка события и помощь по покупке.
-      </p>
-      <ul className="mt-5 grid gap-2 sm:grid-cols-2">
+      <ul className="mt-4 grid gap-2 sm:grid-cols-2">
         {TRUST_LINKS.map(({ href, label, icon: Icon }) => (
           <li key={href}>
             <Link
