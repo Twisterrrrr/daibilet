@@ -1,3 +1,23 @@
+## 2026-07-25 - Launch Set ready
+
+### Наблюдения
+
+- Owner audit restates launch readiness. Prod known `3e30c8e` уже нёс CV polish (zero CTA, soft banners, human dates, blog min price, how-to-buy spacing).
+- Реальный UI-gap: blog interstitial eyebrow всё ещё «Интересно» вместо «Из Блога».
+- CV.9 logistics: код уже в `714822c` (другой агент) - не дублировали; на prod ещё не выкатан (нужен migrate+deploy).
+
+### Решения
+
+- **Done (код):** CV.1 zero sticky CTA «Нет подходящих событий»; CV.2 soft `#F8F9FA` + badge «Подборка»/«Из Блога»; category tabs dim/disable при 0; landings `<option disabled>` при `events===0`; CV.3 how-to-buy `mt-20`+`bg-slate-50`; CV.4 blog `[buy]` только `от N ₽`; CV.12 human dates; CV.9a-d `@714822c`; docs SEO.9b/20/21 + CV.2b в Tasktracker/qa.
+- **Ops (вне feature-кода):** SEO.9b phone (🚫 ждём 8-800); CV.2b Metrika/GTM кабинет; SEO.20 daily landing audit; SEO.21 monthly tags; CV.9 prod migrate+deploy.
+- **Follow-up:** price chips без facet counts - не блокер.
+
+### Проблемы
+
+- Нет launch-blocker в коде после badge fix. Остальное - ops/owner.
+
+---
+
 ## 2026-07-25 - Owner: закрытие hanging QA (blog / F4 / SEO)
 
 ### Наблюдения
@@ -39,21 +59,21 @@
 
 ---
 
-## 2026-07-25 - CV.9 Venue logistics: local WIP (not merged)
+## 2026-07-25 - CV.9 Venue logistics: shipped (commit)
 
 ### Наблюдения
 
 - Owner закрыл open Q: Yandex iframe без API key; OSM keep на venue pages; address sync-only; slim logistics в event SSR.
-- Реализация CV.9a-d лежит в working tree (другой агент); **не commit / не prod**. Launch Set audit не дублирует и не шипит отдельно.
+- Реализация CV.9a-d в `714822c`. Launch Set audit не дублировал код.
 
 ### Решения
 
-- Спека и контракт полей готовы; ship = отдельный commit + migrate + deploy.
-- OSM→Yandex unify на venue pages - backlog после merge.
+- **CV.9a-d** в git; prod требует migrate `20260725120000_venue_logistics` + deploy-prod-next.
+- OSM→Yandex unify на venue pages - backlog.
 
 ### Проблемы
 
-- Coverage lat/lng неполная (HC.11). Пока WT не merged - public/prod без logistics UI.
+- Coverage lat/lng неполная (HC.11) - modal fallback на external button.
 
 ---
 

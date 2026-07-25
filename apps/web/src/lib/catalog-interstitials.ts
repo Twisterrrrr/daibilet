@@ -46,7 +46,7 @@ export function catalogInterstitialsForCity(citySlug?: string | null): CatalogIn
     },
     {
       id: 'blog',
-      eyebrow: 'Интересно',
+      eyebrow: 'Из Блога',
       title: 'Маршруты и советы',
       description: 'Статьи с картами и ссылками на билеты - удобно перед поездкой.',
       href: '/blog',

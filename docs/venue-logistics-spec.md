@@ -1,7 +1,7 @@
 # Venue logistics («как найти») — CV.9
 
 **Обновлено:** 2026-07-25  
-**Статус:** implemented (CV.9a-d)  
+**Статус:** implemented in git (`714822c`); prod = migrate + deploy  
 **Эпик:** **CV.9** (не путать с **CV.5** - sort «скидки», deferred)
 
 Owner sprint label «Спринт CV.5» в разговоре = logistics; в Tasktracker канон остаётся **CV.9**. **CV.5 discounts не трогаем.**

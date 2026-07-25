@@ -468,11 +468,15 @@ export function CatalogAdvancedFiltersPanel({
                     className={inputCls}
                   >
                     <option value="all">Все подборки</option>
-                    {landings.map((item) => (
-                      <option key={item.slug} value={item.slug}>
-                        {item.title} · {formatNumber(item.events)}
-                      </option>
-                    ))}
+                    {landings.map((item) => {
+                      const empty = item.events <= 0 && draft.landing !== item.slug;
+                      return (
+                        <option key={item.slug} value={item.slug} disabled={empty}>
+                          {item.title} · {formatNumber(item.events)}
+                          {empty ? ' (нет)' : ''}
+                        </option>
+                      );
+                    })}
                   </select>
                 </div>
               ) : null}
