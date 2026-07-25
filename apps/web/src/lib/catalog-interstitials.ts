@@ -19,7 +19,7 @@ export function catalogInterstitialsForCity(citySlug?: string | null): CatalogIn
   return [
     {
       id: 'rooftops',
-      eyebrow: 'Гид',
+      eyebrow: 'Подборка',
       title:
         city === 'sankt-peterburg' || city === 'saint-petersburg'
           ? 'Впервые в Питере?'
@@ -30,7 +30,7 @@ export function catalogInterstitialsForCity(citySlug?: string | null): CatalogIn
     },
     {
       id: 'river',
-      eyebrow: 'На воде',
+      eyebrow: 'Подборка',
       title: 'Речные прогулки',
       description: 'Дневные рейсы, закаты и круизы с ужином - сравните причал и время.',
       href: landingCategoryHref('river-cruises', city),
@@ -38,7 +38,7 @@ export function catalogInterstitialsForCity(citySlug?: string | null): CatalogIn
     },
     {
       id: 'weekend',
-      eyebrow: 'План',
+      eyebrow: 'Подборка',
       title: 'Что посмотреть на выходных',
       description: 'Готовые сценарии под настроение: с детьми, для двоих или большой компанией.',
       href: `/podborki${cityQs}`,
@@ -46,7 +46,7 @@ export function catalogInterstitialsForCity(citySlug?: string | null): CatalogIn
     },
     {
       id: 'blog',
-      eyebrow: 'Блог',
+      eyebrow: 'Интересно',
       title: 'Маршруты и советы',
       description: 'Статьи с картами и ссылками на билеты - удобно перед поездкой.',
       href: '/blog',

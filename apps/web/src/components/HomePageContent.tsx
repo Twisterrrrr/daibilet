@@ -405,7 +405,7 @@ export async function HomePageContent() {
         </div>
       </section>
 
-      <section className="section-y">
+      <section className="section-y mt-20 bg-slate-50">
         <div className="container-page">
           <h2 className="font-display text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
             Как купить билет

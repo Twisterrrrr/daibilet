@@ -150,32 +150,37 @@ export function BlogBuyButton({ slug, label }: ParsedBuyBlock) {
 
   return (
     <aside className="not-prose my-8 overflow-hidden rounded-card border border-slate-200/80 bg-surface-muted/40 shadow-card">
-      <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
-        <div className="min-w-0">
+      <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5 sm:p-5">
+        <div className="min-w-0 flex-1">
           <p className="text-xs font-semibold uppercase tracking-wider text-primary-700">Билет на Дайбилет</p>
           <p className="mt-1 line-clamp-2 text-base font-semibold text-graphite">{title}</p>
           <p className="mt-1 text-sm text-graphite-muted">
-            {priceLabel
-              ? `${priceLabel} - выберите дату и купите онлайн`
-              : status === 'loading'
-                ? 'Загружаем актуальную цену…'
-                : 'Выберите дату и купите билет онлайн'}
+            {status === 'loading' && !priceLabel
+              ? 'Загружаем актуальную цену…'
+              : 'Выберите дату и купите билет онлайн'}
           </p>
         </div>
-        <div className="flex shrink-0 flex-col gap-2 sm:items-end">
-          {status === 'ready' && session ? (
-            <LandingPurchaseButton session={session} label={label} className={BUTTON_CLASS} />
-          ) : (
-            <Link href={href} className={status === 'loading' ? BUTTON_CLASS : FALLBACK_CLASS}>
-              {label}
+        <div className="flex shrink-0 items-center gap-3 sm:gap-4">
+          {priceLabel || status === 'loading' ? (
+            <span className="min-w-[7.5rem] shrink-0 whitespace-nowrap text-right text-base font-semibold tabular-nums text-graphite">
+              {priceLabel || '…'}
+            </span>
+          ) : null}
+          <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+            {status === 'ready' && session ? (
+              <LandingPurchaseButton session={session} label={label} className={BUTTON_CLASS} />
+            ) : (
+              <Link href={href} className={status === 'loading' ? BUTTON_CLASS : FALLBACK_CLASS}>
+                {label}
+              </Link>
+            )}
+            <Link
+              href={href}
+              className="text-sm font-medium text-primary-700 underline decoration-primary/30 underline-offset-[3px] hover:decoration-primary/60"
+            >
+              Подробнее о событии
             </Link>
-          )}
-          <Link
-            href={href}
-            className="text-sm font-medium text-primary-700 underline decoration-primary/30 underline-offset-[3px] hover:decoration-primary/60"
-          >
-            Подробнее о событии
-          </Link>
+          </div>
         </div>
       </div>
     </aside>

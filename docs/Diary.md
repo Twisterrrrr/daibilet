@@ -1,3 +1,51 @@
+## 2026-07-25 - Owner audit: catalog / home / blog / dates
+
+### Наблюдения
+
+- Sticky «Показать N» при нуле всё ещё читалось как «Ничего не найдено»; баннеры в сетке выглядели как тёмные EventCard.
+- Home «Как купить» сливалось с блоками выше/footer; blog `[buy]` мог ломать ряд цена+CTA диапазоном.
+- Системная маска даты на карточках (`сб, 25 июл.`) выглядела машинной.
+
+### Решения
+
+- CV.1: zero CTA `disabled`, pastel gray, текст «Нет подходящих событий».
+- CV.2: interstitial на `#F8F9FA` / accent 5%, corner badge «Подборка»|«Интересно»; analytics без изменений.
+- CV.3: how-to-buy `mt-20` + `bg-slate-50`.
+- CV.4: только `formatPriceFrom` (от N ₽) + min-width у цены рядом с CTA.
+- CV.12: `formatShowcaseSessionDate` → `25 июля, суббота в 07:15`; open-date без часов. CV.5 (скидки) не трогали.
+
+### Проблемы
+
+- Нет (локальные правки, без commit/deploy).
+
+---
+
+## 2026-07-25 - CV.9 Venue logistics: architecture / backlog
+
+### Наблюдения
+
+- Owner назвал работу «Спринт CV.5», но в Tasktracker **CV.5** = sort «скидки» (deferred), **CV.9** = «как найти». Канон эпика logistics = **CV.9**; CV.5 не трогаем.
+- `Venue` уже имеет `address`, `latitude`, `longitude`. Полей metro / way-to-find / parking в Prisma нет.
+- Public venue pages: блок «Как добраться» почти только адрес+город; карта - `OsmMapEmbed` (OSM iframe) + deep-link Яндекс/Google.
+- Next admin `/admin/venues/[id]` и `updateAdminVenue` **не** пишут address/coords/logistics (только SEO/kind/pageStatus/descriptions).
+- `/events/[slug]` venue в hero - `<Link>` на `/venues|locations` (уход со страницы). Паттерн modal уже есть (`CheckoutModal`).
+- HC.11: неполный lat/lng на catalog cards - отдельно; page DTO coords уже резолвятся.
+
+### Решения
+
+- Спека: [venue-logistics-spec.md](./venue-logistics-spec.md). Поля: `metroStation`, `wayToFind` (@db.Text), `parkingInfo`; manual CMS; geocode template 🚫.
+- Подзадачи **CV.9a-d** в Tasktracker (schema → admin → public block → event modal + Yandex iframe).
+- Empty state: скрыть logistics-блок, если нет address и все три новых поля null.
+- Modal на event: logistics + Yandex map-widget iframe; fallback на полную страницу venue; OSM на venue page пока не ломаем.
+- Open Q (Yandex API key? OSM vs Yandex parity? editable address?) - в `qa.md`.
+
+### Проблемы
+
+- Coverage lat/lng на части площадок слабая (карта/modal marker) - не блокер схемы, влияет на UX CV.9d.
+- Два admin surface (Next канон + Vite source) - правки канона Next; Vite только при явной parity-нужде.
+
+---
+
 ## 2026-07-25 - Owner decisions: conversion backlog lock
 
 ### Наблюдения

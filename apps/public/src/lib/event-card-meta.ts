@@ -146,17 +146,21 @@ export function formatShowcaseSessionDate(event: PublicSession): string {
   const timeZone = resolveSessionTimeZoneForSession(event);
   const d = parseSessionStartsAt(event.startsAt);
   if (Number.isNaN(d.getTime())) {
-    return [event.dateLabel, event.timeLabel].filter(Boolean).join(' · ') || '—';
+    const fallback = [event.dateLabel, event.timeLabel].filter(Boolean).join(', ');
+    return fallback || 'Дата уточняется';
   }
-  const day = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short', timeZone })
+  // day+month together → genitive («25 июля»), not nominative «июль»
+  const dayMonth = new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    timeZone,
+  }).format(d);
+  const weekday = new Intl.DateTimeFormat('ru-RU', { weekday: 'long', timeZone })
     .format(d)
-    .replace(/\./g, '')
-    .replace(/\s*г\.?$/i, '');
-  const weekday = new Intl.DateTimeFormat('ru-RU', { weekday: 'short', timeZone })
-    .format(d)
-    .replace(/\./g, '');
+    .toLocaleLowerCase('ru-RU');
   const time = formatSessionTime(event.startsAt, event.timeLabel, timeZone);
-  return time ? `${day} · ${weekday} · ${time}` : `${day} · ${weekday}`;
+  if (!time || time === '—') return `${dayMonth}, ${weekday}`;
+  return `${dayMonth}, ${weekday} в ${time}`;
 }
 
 /** Короткая дата для узких карточек в горизонтальной ленте */
@@ -165,14 +169,17 @@ export function formatShowcaseSessionDateCompact(event: PublicSession): string {
   const timeZone = resolveSessionTimeZoneForSession(event);
   const d = parseSessionStartsAt(event.startsAt);
   if (Number.isNaN(d.getTime())) {
-    return [event.dateLabel, event.timeLabel].filter(Boolean).join(' · ') || '—';
+    const fallback = [event.dateLabel, event.timeLabel].filter(Boolean).join(', ');
+    return fallback || 'Дата уточняется';
   }
-  const day = new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'short', timeZone })
-    .format(d)
-    .replace(/\./g, '')
-    .replace(/\s*г\.?$/i, '');
+  const dayMonth = new Intl.DateTimeFormat('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+    timeZone,
+  }).format(d);
   const time = formatSessionTime(event.startsAt, event.timeLabel, timeZone);
-  return time ? `${day} · ${time}` : day;
+  if (!time || time === '—') return dayMonth;
+  return `${dayMonth} в ${time}`;
 }
 
 export function formatShowcasePriceLabel(priceFrom?: number | null): string {

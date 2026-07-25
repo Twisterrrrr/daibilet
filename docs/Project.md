@@ -1,6 +1,6 @@
 # Project — Daibilet (Next full-stack migration)
 
-**Обновлено:** 2026-07-23
+**Обновлено:** 2026-07-25
 **Ветка migration / prod:** `feat/next-monorepo`  
 **Prod:** Next `apps/web` `:3001` + legacy API `:4000` + Vite admin static
 
@@ -142,6 +142,7 @@ Cherry-pick из **`codex/phase2-foundation`**: schema, event change requests, a
 - **Next 15**, React 19, Tailwind 3
 - **Images:** `next/image` + `sharp` (WebP/AVIF), `SafeImage` wrapper, `remotePatterns` для TC/TEP/S3 CDN
 - **Catalog covers:** после TC/TEP import - `scripts/ensure-catalog-covers.js`: сначала CDN/event image на Venue, иначе unique generate (`/images/{events|venues}/generated/*`). City-placeholder не считается cover. Lean venue fallback принимает https и `/images/events|venues/*`.
+- **Venue logistics (CV.9):** manual CMS `metroStation` / `wayToFind` / `parkingInfo` + блок «как найти» на venue page и modal с `/events/[slug]`; geocode auto-fill 🚫. Спека: [venue-logistics-spec.md](./venue-logistics-spec.md). Не путать с **CV.5** (скидки).
 - **Prisma 7** — schema/migrations; runtime read через dto port
 - **Консистентность:** parity scripts; константы каталога в `@daibilet/contracts`
 - **SEO:** title template `%s | Дайбилет` без дублей; `og:url` route-specific (`seo-meta.ts`); flat entity URLs + city hubs (см. URL / SEO policy выше)

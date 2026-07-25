@@ -249,7 +249,7 @@ export function CatalogAdvancedFiltersPanel({
         ? 'Считаем…'
         : 'Показать варианты'
       : previewTotal === 0
-        ? 'Ничего не найдено'
+        ? 'Нет подходящих событий'
         : `Показать ${pluralVariants(previewTotal)}`;
 
   if (!mounted || !open) return null;
@@ -495,7 +495,7 @@ export function CatalogAdvancedFiltersPanel({
             aria-disabled={previewTotal === 0}
             className={
               previewTotal === 0
-                ? 'inline-btn h-11 flex-1 cursor-not-allowed rounded-xl bg-slate-100 px-4 text-sm font-semibold text-slate-500 sm:h-10'
+                ? 'inline-btn h-11 flex-1 cursor-not-allowed rounded-xl bg-[#F8F9FA] px-4 text-sm font-semibold text-slate-400 ring-1 ring-slate-200/80 sm:h-10'
                 : 'inline-btn btn-primary h-11 flex-1 rounded-xl px-4 text-sm font-semibold sm:h-10'
             }
           >

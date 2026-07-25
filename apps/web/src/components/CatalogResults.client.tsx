@@ -57,20 +57,20 @@ function CatalogInterstitialBanner({ banner }: { banner: CatalogInterstitial }) 
       <Link
         href={banner.href}
         onClick={() => trackCatalogBannerClick(banner.id)}
-        className="group flex max-h-[11.5rem] flex-row items-center justify-between gap-3 overflow-hidden rounded-card bg-gradient-to-br from-slate-900 to-primary-800 px-4 py-3.5 text-white shadow-card transition hover:-translate-y-0.5 hover:shadow-card-hover sm:max-h-none sm:gap-4 sm:p-6"
+        className="group relative flex max-h-[11.5rem] flex-row items-center justify-between gap-3 overflow-hidden rounded-card border border-slate-200/70 bg-[#F8F9FA] px-4 py-3.5 transition hover:border-primary/20 hover:bg-primary/[0.05] sm:max-h-none sm:gap-4 sm:px-6 sm:pb-6 sm:pt-7"
       >
-        <div className="min-w-0 flex-1">
-          <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-white/65 sm:text-xs">
-            {banner.eyebrow}
-          </p>
-          <h3 className="mt-0.5 line-clamp-2 font-display text-base font-bold leading-snug tracking-tight sm:mt-1 sm:line-clamp-none sm:text-2xl">
+        <span className="absolute left-3 top-2.5 rounded-md bg-white px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-primary-700 ring-1 ring-slate-200/80 sm:left-4 sm:top-3 sm:text-xs">
+          {banner.eyebrow}
+        </span>
+        <div className="min-w-0 flex-1 pt-4 sm:pt-5">
+          <h3 className="line-clamp-2 font-display text-base font-bold leading-snug tracking-tight text-graphite sm:line-clamp-none sm:text-2xl">
             {banner.title}
           </h3>
-          <p className="mt-1 hidden max-w-2xl text-sm leading-6 text-white/80 sm:mt-2 sm:block">
+          <p className="mt-1 hidden max-w-2xl text-sm leading-6 text-graphite-muted sm:mt-2 sm:block">
             {banner.description}
           </p>
         </div>
-        <span className="inline-flex shrink-0 items-center gap-1.5 self-center rounded-full bg-white px-3 py-2 text-xs font-semibold text-primary-700 transition group-hover:bg-slate-50 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm">
+        <span className="inline-flex shrink-0 items-center gap-1.5 self-center rounded-xl bg-white px-3 py-2 text-xs font-semibold text-primary-700 ring-1 ring-slate-200/80 transition group-hover:ring-primary/30 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm">
           <span className="max-w-[7.5rem] truncate sm:max-w-none">{banner.cta}</span>
           <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={1.75} />
         </span>

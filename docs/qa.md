@@ -5,8 +5,15 @@
 1. **Home video:** **photo rotator KEEP** до продакшн-съёмки. Stock muted loops **отклонены** (фейковый/дешёвый вид). Предпочтительны реальные фото МСК/СПб в WebP/AVIF. Статус: **HC.10 / CV.6 / H.7** - video hero остаётся **deferred**.
 2. **Social proof «проданные билеты»:** цифра **только** после реального TC order-aggregate. Hardcoded fake counts **запрещены**. До появления данных - только честные каталожные counts (города/события/площадки, CV.3). Future: Order paid count, когда агрегат стабилен (**CV.11** deferred).
 3. **Скидки в каталоге:** сортировку «по акциям» **не строить**, пока в DTO/sync нет `discount` / `strikePrice`. **CV.5** - backlog до sync architecture sprint.
-4. **Venue logistics:** CMS admin-поле **«как найти»** (метро + human landmark text), заполняет админ вручную. Geocode-шаблон из адреса **отклонён**. Venues << events - manual ок (**CV.9**).
+4. **Venue logistics:** CMS admin-поле **«как найти»** (метро + human landmark text), заполняет админ вручную. Geocode-шаблон из адреса **отклонён**. Venues << events - manual ок (**CV.9**; owner label «Спринт CV.5» ≠ Tasktracker **CV.5** discounts). Спека: [venue-logistics-spec.md](./venue-logistics-spec.md).
 5. **Blog auto-embeds:** **только** ручной `[buy slug=…]` или admin custom field (CV.4). Автоподбор по тегам статьи **отклонён** (высокий misfire убивает native conversion) - **CV.8** 🚫.
+
+## 2026-07-25 - Venue logistics CV.9 (open)
+
+1. **Yandex Maps в event-modal:** достаточно ли **iframe** `yandex.ru/map-widget/v1` без JS API key (маркер по lat/lng; fallback query по address), или нужен `NEXT_PUBLIC_YANDEX_MAPS_API_KEY` / Constructor?
+2. **Venue pages:** оставляем текущий **OsmMapEmbed** (OSM) и только в modal ставим Yandex, или выравниваем оба на Yandex в follow-up?
+3. **Admin address:** в CV.9b делать `address` editable в Next form, или только новые logistics-поля (address остаётся sync-only)?
+4. **Event DTO:** logistics через fetch `/api/public/venues/:slug` при открытии modal - ок, или встраивать slim fields в event page payload?
 
 ## 2026-07-25 - Catalog interstitial analytics
 
