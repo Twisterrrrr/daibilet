@@ -13,7 +13,6 @@ import {
 import {
   formatAgeLimit,
   formatBuyCardPrice,
-  formatBuyCardPriceHint,
   formatCategoryPrice,
   formatHeroBuyButtonPrice,
   formatPriceRub,
@@ -54,24 +53,14 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
     sessions,
     primaryOffer,
   );
-  const offerSource = primaryOffer?.sourceCode || event.purchaseProvider || event.sourceCode;
   const isTepWidget = Boolean(teplohod);
-  const priceHint = priceRange ? formatBuyCardPriceHint(priceRange) : null;
-  const showDateStep = visibleSessions.length > 0;
-  const showTariffStep = ticketCategories.length > 0;
-  const dateStep = 1;
-  const tariffStep = showDateStep ? 2 : 1;
-  const buyStep = 1 + (showDateStep ? 1 : 0) + (showTariffStep ? 1 : 0);
 
   return (
-    <div className="rounded-card bg-white p-6 shadow-card sm:p-7">
+    <div className="rounded-card border border-slate-200 bg-white p-6 shadow-card sm:p-7">
       {priceRange ? (
-        <div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-graphite">{formatBuyCardPrice(priceRange)}</span>
-            <span className="text-sm text-graphite-muted">/ чел.</span>
-          </div>
-          {priceHint ? <p className="mt-1 text-xs text-graphite-muted">{priceHint}</p> : null}
+        <div className="flex items-baseline gap-2">
+          <span className="text-3xl font-bold text-graphite">{formatBuyCardPrice(priceRange)}</span>
+          <span className="text-sm text-graphite-muted">/ чел.</span>
         </div>
       ) : (
         <p className="text-lg font-semibold text-graphite-muted">Цена уточняется</p>
@@ -79,10 +68,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
 
       {showMultiPurchase ? (
         <div className="mt-6">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-graphite-muted">
-            Шаг 1. Выберите вариант
-          </h3>
-          <ul className="mt-3 space-y-2">
+          <ul className="space-y-2">
             {purchaseOptions.map((option) => (
               <li
                 key={option.id}
@@ -114,49 +100,9 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
         </div>
       ) : (
         <>
-          {showDateStep ? (
-            allFlexible ? (
-              <div className="mt-6 rounded-xl bg-surface-muted px-3.5 py-3">
-                <h3 className="text-xs font-semibold uppercase tracking-wider text-graphite-muted">
-                  Шаг {dateStep}. Дата
-                </h3>
-                <p className="mt-1.5 text-sm font-medium text-graphite">{FLEXIBLE_SCHEDULE_LABEL}</p>
-                <p className="mt-1 text-xs leading-relaxed text-graphite-muted">
-                  Конкретный день и время выбираете при покупке - приходить в системную дату из каталога не нужно.
-                </p>
-              </div>
-            ) : (
-              <div className="mt-6">
-                <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-graphite-muted">
-                  <Calendar className="h-3.5 w-3.5" strokeWidth={1.75} />
-                  Шаг {dateStep}. Выберите дату
-                </h3>
-                {isTcWidget && !isTepWidget ? (
-                  <p className="mt-1 text-[11px] text-graphite-muted">Нажмите на сеанс, чтобы купить билет</p>
-                ) : null}
-                <div className="mt-3 space-y-1.5">
-                  {visibleSessions.map((session) =>
-                    isTcWidget && !isTepWidget ? (
-                      <TcSessionSlot
-                        key={`${session.id}-${session.startsAt}`}
-                        tcEventId={extractTcEventIdFromSession(session) || tcEventId || ''}
-                        session={session}
-                      />
-                    ) : (
-                      <StaticSessionRow key={`${session.id}-${session.startsAt}`} session={session} />
-                    ),
-                  )}
-                </div>
-              </div>
-            )
-          ) : null}
-
-          {showTariffStep ? (
+          {ticketCategories.length > 0 ? (
             <div className="mt-6">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-graphite-muted">
-                Шаг {tariffStep}. Тарифы
-              </h3>
-              <ul className="mt-3 space-y-2.5">
+              <ul className="space-y-2.5">
                 {ticketCategories.map((row) => (
                   <li key={row.key}>
                     <div className="flex items-start justify-between gap-3 text-sm">
@@ -176,14 +122,41 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
             </div>
           ) : priceRange && priceRange.min !== priceRange.max ? (
             <p className="mt-4 text-sm text-graphite-muted">
-              Расшифровка тарифов откроется в шаге оплаты: взрослый, детский и другие категории.
+              Расшифровка тарифов откроется при оплате: взрослый, детский и другие категории.
             </p>
           ) : null}
 
+          {visibleSessions.length > 0 ? (
+            allFlexible ? (
+              <div className="mt-6 rounded-xl bg-surface-muted px-3.5 py-3">
+                <p className="text-sm font-medium text-graphite">{FLEXIBLE_SCHEDULE_LABEL}</p>
+                <p className="mt-1 text-xs leading-relaxed text-graphite-muted">
+                  Конкретный день и время выбираете при покупке - приходить в системную дату из каталога не нужно.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-6">
+                {isTcWidget && !isTepWidget ? (
+                  <p className="mb-2 text-[11px] text-graphite-muted">Нажмите на сеанс, чтобы купить билет</p>
+                ) : null}
+                <div className="space-y-1.5">
+                  {visibleSessions.map((session) =>
+                    isTcWidget && !isTepWidget ? (
+                      <TcSessionSlot
+                        key={`${session.id}-${session.startsAt}`}
+                        tcEventId={extractTcEventIdFromSession(session) || tcEventId || ''}
+                        session={session}
+                      />
+                    ) : (
+                      <StaticSessionRow key={`${session.id}-${session.startsAt}`} session={session} />
+                    ),
+                  )}
+                </div>
+              </div>
+            )
+          ) : null}
+
           <div className="mt-6">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-graphite-muted">
-              Шаг {buyStep}. Купить билет онлайн
-            </h3>
             {isTepWidget && teplohod ? (
               <TeplohodWidgetEmbed
                 tepEventId={teplohod.tepEventId}
@@ -221,14 +194,9 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
       )}
 
       <div className="mt-5 flex items-center gap-2 rounded-xl bg-surface-muted px-3 py-2.5">
-        <Shield className="h-4 w-4 text-graphite-muted" strokeWidth={1.75} />
+        <Shield className="h-4 w-4 shrink-0 text-graphite-muted" strokeWidth={1.75} />
         <span className="text-xs text-graphite-muted">
-          Безопасная оплата онлайн
-          {isTepWidget || String(offerSource || '').toUpperCase().includes('TEPLOHOD')
-            ? ' через teplohod.info'
-            : isTcWidget || String(offerSource || '').toUpperCase().includes('TC')
-              ? ' через Ticketscloud'
-              : ''}
+          Безопасная покупка через виджет, билет придет на почту
         </span>
       </div>
     </div>

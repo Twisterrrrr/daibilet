@@ -121,14 +121,11 @@ export function formatBuyCardPrice(range: TicketPriceRange): string {
   const min = Math.round(range.min);
   const max = Math.round(range.max);
   if (min === max) return `${formatNumber(min)} ₽`;
-  return `от ${formatNumber(min)} ₽`;
+  return `${formatNumber(min)} - ${formatNumber(max)} ₽`;
 }
 
-export function formatBuyCardPriceHint(range: TicketPriceRange): string | null {
-  const min = Math.round(range.min);
-  const max = Math.round(range.max);
-  if (min === max) return null;
-  return `до ${formatNumber(max)} ₽ в зависимости от тарифа`;
+export function formatBuyCardPriceHint(_range: TicketPriceRange): string | null {
+  return null;
 }
 
 /** Hero CTA intentionally advertises only the minimum available price. */
