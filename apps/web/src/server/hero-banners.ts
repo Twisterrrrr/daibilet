@@ -36,18 +36,18 @@ async function loadHeroBannersFromDb(): Promise<PublicHeroBanner[]> {
   }
 }
 
-export const getActiveHeroBanners = unstable_cache(loadHeroBannersFromDb, ['home-hero-banners-v2'], {
+export const getActiveHeroBanners = unstable_cache(loadHeroBannersFromDb, ['home-hero-banners-v3'], {
   revalidate: 300,
   tags: ['hero-banners'],
 });
 
-/** Frames for HeroMedia: DB banners or static multi-city pool (landmark-safe focus). */
+/** Frames for HeroMedia: DB banners or static emotion pool (face-safe focus). */
 export function heroFramesFromBanners(
   banners: PublicHeroBanner[],
   fallback: HomeHeroImageSet = HOME_HERO_IMAGES[0]!,
 ): HomeHeroMediaFrame[] {
   if (banners.length) {
-    // CMS без focusX/Y: lookup по пути в HOME_HERO_IMAGES, иначе landmark default.
+    // CMS без focusX/Y: lookup по пути в HOME_HERO_IMAGES, иначе face-safe default.
     return banners.map((banner) => ({
       src: banner.imageUrl,
       alt: banner.title || fallback.alt,

@@ -1,10 +1,10 @@
 /**
- * Пул full-bleed hero для главной: узнаваемые кадры разных городов РФ.
- * Эталон: apps/public/public/images/cities/top/ (sync → apps/web/public/images).
+ * Пул full-bleed hero для главной: tourist emotions (люди в городах РФ).
+ * Эталон: apps/public/public/images/home/hero-emotion-*.jpg (sync → apps/web/public/images).
  * Ротатор / CMS HeroBanner берут этот пул; без hydration flash на сервере.
  *
- * object-position: для landmark-кадров без лиц держим фокус ближе к центру
- * (~40-45% Y), чтобы не срезать купола/набережные при object-cover.
+ * object-position: лица/глаза обычно в верхней трети кадра. При object-cover
+ * дефолт center съедает головы на узких/низких viewport - держим focus ~20-30% по Y.
  */
 
 export type HomeHeroImageSet = {
@@ -18,71 +18,71 @@ export type HomeHeroImageSet = {
   objectPositionMobile?: string;
 };
 
-/** Дефолт для CMS HeroBanner и кадров без явного focus. */
-export const HOME_HERO_OBJECT_POSITION_DEFAULT = 'object-[50%_42%] md:object-[50%_40%]';
+/** Дефолт для CMS HeroBanner и кадров без явного focus (face-safe). */
+export const HOME_HERO_OBJECT_POSITION_DEFAULT = 'object-[50%_28%] md:object-[50%_22%]';
 
 /** Собирает responsive object-position classes для HeroMedia. */
 export function homeHeroObjectPositionClass(
   image: Pick<HomeHeroImageSet, 'objectPositionMobile' | 'objectPositionDesktop'>,
 ): string {
-  const mobile = image.objectPositionMobile?.trim() || 'object-[50%_42%]';
-  const desktop = image.objectPositionDesktop?.trim() || 'md:object-[50%_40%]';
+  const mobile = image.objectPositionMobile?.trim() || 'object-[50%_28%]';
+  const desktop = image.objectPositionDesktop?.trim() || 'md:object-[50%_22%]';
   return `${mobile} ${desktop}`.replace(/\s+/g, ' ').trim();
 }
 
-/** Цикл городов: Москва → СПб → Казань → Екатеринбург → Нижний → Самара. */
+/** Цикл эмоций: друзья / музей / круиз / ночь / площадь / набережная. */
 export const HOME_HERO_IMAGES: readonly HomeHeroImageSet[] = [
   {
-    id: 'moscow-red-square',
-    landscape: '/images/cities/top/moscow.jpg',
-    portrait: '/images/cities/top/moscow.jpg',
-    alt: 'Красная площадь и собор Василия Блаженного в Москве',
-    objectPositionDesktop: 'md:object-[50%_42%]',
-    objectPositionMobile: 'object-[48%_40%]',
+    id: 'emotion-friends-embankment',
+    landscape: '/images/home/hero-emotion-01.jpg',
+    portrait: '/images/home/hero-emotion-01.jpg',
+    alt: 'Друзья смеются на набережной во время городской поездки',
+    objectPositionDesktop: 'md:object-[50%_26%]',
+    objectPositionMobile: 'object-[50%_24%]',
   },
   {
-    id: 'spb-hermitage',
-    landscape: '/images/cities/top/saint-petersburg.jpg',
-    portrait: '/images/cities/top/saint-petersburg.jpg',
-    alt: 'Зимний дворец и набережная Невы в Санкт-Петербурге',
-    objectPositionDesktop: 'md:object-[50%_40%]',
-    objectPositionMobile: 'object-[50%_38%]',
+    id: 'emotion-couple-museum',
+    landscape: '/images/home/hero-emotion-02.jpg',
+    portrait: '/images/home/hero-emotion-02.jpg',
+    alt: 'Пара с интересом рассматривает экспозицию в музее',
+    objectPositionDesktop: 'md:object-[48%_28%]',
+    objectPositionMobile: 'object-[45%_26%]',
   },
   {
-    id: 'kazan-kul-sharif',
-    landscape: '/images/cities/top/kazan.jpg',
-    portrait: '/images/cities/top/kazan.jpg',
-    alt: 'Мечеть Кул-Шариф в Казанском кремле',
-    objectPositionDesktop: 'md:object-[48%_42%]',
-    objectPositionMobile: 'object-[45%_40%]',
+    id: 'emotion-family-cruise',
+    landscape: '/images/home/hero-emotion-03.jpg',
+    portrait: '/images/home/hero-emotion-03.jpg',
+    alt: 'Семья радуется речной прогулке по городу',
+    objectPositionDesktop: 'md:object-[52%_28%]',
+    objectPositionMobile: 'object-[50%_26%]',
   },
   {
-    id: 'ekaterinburg-pond',
-    landscape: '/images/cities/top/ekaterinburg.jpg',
-    portrait: '/images/cities/top/ekaterinburg.jpg',
-    alt: 'Набережная городского пруда и небоскрёбы Екатеринбурга',
-    objectPositionDesktop: 'md:object-[52%_44%]',
-    objectPositionMobile: 'object-[50%_42%]',
+    id: 'emotion-night-walk',
+    landscape: '/images/home/hero-emotion-04.jpg',
+    portrait: '/images/home/hero-emotion-04.jpg',
+    alt: 'Друзья в восторге от вечерней прогулки по городу',
+    objectPositionDesktop: 'md:object-[50%_26%]',
+    objectPositionMobile: 'object-[48%_24%]',
   },
   {
-    id: 'nizhny-kremlin',
-    landscape: '/images/cities/top/nizhny-novgorod.jpg',
-    portrait: '/images/cities/top/nizhny-novgorod.jpg',
-    alt: 'Нижегородский кремль и вид на Волгу',
-    objectPositionDesktop: 'md:object-[42%_40%]',
-    objectPositionMobile: 'object-[40%_38%]',
+    id: 'emotion-square-laugh',
+    landscape: '/images/home/hero-emotion-05.jpg',
+    portrait: '/images/home/hero-emotion-05.jpg',
+    alt: 'Подруги смеются на прогулке по исторической площади',
+    objectPositionDesktop: 'md:object-[50%_24%]',
+    objectPositionMobile: 'object-[50%_22%]',
   },
   {
-    id: 'samara-embankment',
-    landscape: '/images/cities/top/samara.jpg',
-    portrait: '/images/cities/top/samara.jpg',
-    alt: 'Набережная Волги и памятник Ладья в Самаре',
-    objectPositionDesktop: 'md:object-[40%_42%]',
-    objectPositionMobile: 'object-[38%_40%]',
+    id: 'emotion-promenade-sunset',
+    landscape: '/images/home/hero-emotion-06.jpg',
+    portrait: '/images/home/hero-emotion-06.jpg',
+    alt: 'Пара наслаждается закатом на современной набережной',
+    objectPositionDesktop: 'md:object-[48%_28%]',
+    objectPositionMobile: 'object-[45%_26%]',
   },
 ] as const;
 
-/** Focus по пути кадра из пула; иначе landmark-safe default. */
+/** Focus по пути кадра из пула; иначе face-safe default. */
 export function objectPositionForHeroSrc(src: string | undefined | null): string {
   const path = src?.trim();
   if (!path) return HOME_HERO_OBJECT_POSITION_DEFAULT;

@@ -1,3 +1,23 @@
+## 2026-07-26 - Home hero: tourist emotions (не landmarks)
+
+### Наблюдения
+
+- Owner: home hero НЕ должен показывать city landmarks/views; нужны tourist emotions - люди в разных городах (славянская внешность, позитив, не обязательно в камеру).
+- Текущий ротатор после `a0a2cf3` крутил `/images/cities/top/*.jpg` (Москва/СПб/Казань…). CMS `HeroBanner` seed перекрывает статический пул.
+
+### Решения
+
+- 6 новых JPG `apps/public/public/images/home/hero-emotion-01..06.jpg` (people-first; landmarks только soft bokeh). `apps/web/public/images` gitignored - sync через `sync-public-assets.mjs`.
+- `HOME_HERO_IMAGES` → emotion pool; face-safe object-position ~20-30% Y (как до landmarks).
+- Migration `20260726010000_home_hero_emotions`: UPDATE/UPSERT seed_01..06 на emotion paths; cache key `home-hero-banners-v3`.
+- Centering overlay из `bcd50e6` (`HeroLayout` text-center) не трогали.
+
+### Проблемы
+
+- Нужен migrate + deploy-prod-next; smoke `/` на `hero-emotion-*.jpg`, без `cities/top` в home hero.
+
+---
+
 ## 2026-07-26 - Footer city count: cities + regions
 
 ### Наблюдения
