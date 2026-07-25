@@ -11,12 +11,12 @@ import {
   Navigation as NavigationIcon,
   Share2,
   Ticket,
-  Train,
   Waves,
 } from 'lucide-react';
 
 import { LocationCard } from '@/components/LocationCard.client';
 import { OsmMapEmbed } from '@/components/OsmMapEmbed';
+import { VenueLogisticsBlock, hasVenueLogisticsContent } from '@/components/VenueLogisticsBlock';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { expandSessionPurchaseVariants, isSessionPurchaseBlocked } from '@/lib/event-purchase';
 import { formatMoney, formatNumber } from '@/lib/format';
@@ -335,25 +335,12 @@ export function LocationVenueLayout({
             </section>
           ) : null}
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-6">
-            <h2 className="text-xl font-bold text-slate-900">Как добраться</h2>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <div className="flex items-start gap-3 rounded-xl border border-slate-100 p-3">
-                <MapPin className="mt-0.5 h-5 w-5 text-primary-600" />
-                <div>
-                  <div className="text-sm font-semibold text-slate-900">Адрес</div>
-                  <div className="text-sm text-slate-600">{streetAddress || `${venue.city} — уточняется`}</div>
-                </div>
-              </div>
-              <div className="flex items-start gap-3 rounded-xl border border-slate-100 p-3">
-                <Train className="mt-0.5 h-5 w-5 text-primary-600" />
-                <div>
-                  <div className="text-sm font-semibold text-slate-900">Город</div>
-                  <div className="text-sm text-slate-600">{venue.city}</div>
-                </div>
-              </div>
-            </div>
-          </section>
+          {hasVenueLogisticsContent(venue) ? (
+            <section className="rounded-2xl border border-slate-200 bg-white p-6">
+              <h2 className="text-xl font-bold text-slate-900">Как добраться</h2>
+              <VenueLogisticsBlock venue={venue} showName={false} className="mt-4" />
+            </section>
+          ) : null}
 
           <details className="group rounded-2xl border border-slate-200 bg-white">
             <summary className="flex cursor-pointer list-none items-center justify-between p-5">

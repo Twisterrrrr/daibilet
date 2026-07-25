@@ -142,7 +142,7 @@ Cherry-pick из **`codex/phase2-foundation`**: schema, event change requests, a
 - **Next 15**, React 19, Tailwind 3
 - **Images:** `next/image` + `sharp` (WebP/AVIF), `SafeImage` wrapper, `remotePatterns` для TC/TEP/S3 CDN
 - **Catalog covers:** после TC/TEP import - `scripts/ensure-catalog-covers.js`: сначала CDN/event image на Venue, иначе unique generate (`/images/{events|venues}/generated/*`). City-placeholder не считается cover. Lean venue fallback принимает https и `/images/events|venues/*`.
-- **Venue logistics (CV.9):** manual CMS `metroStation` / `wayToFind` / `parkingInfo` + блок «как найти» на venue page и modal с `/events/[slug]`; geocode auto-fill 🚫. Спека: [venue-logistics-spec.md](./venue-logistics-spec.md). Не путать с **CV.5** (скидки).
+- **Venue logistics (CV.9):** ✅ shipped - manual CMS `metroStation` / `wayToFind` / `parkingInfo`; блок на venue page; event modal + Yandex iframe (coords) / external button; address sync-only; OSM keep на venue pages (unify deferred). Geocode auto-fill 🚫. Спека: [venue-logistics-spec.md](./venue-logistics-spec.md). Не путать с **CV.5** (скидки).
 - **Prisma 7** — schema/migrations; runtime read через dto port
 - **Консистентность:** parity scripts; константы каталога в `@daibilet/contracts`
 - **SEO:** title template `%s | Дайбилет` без дублей; `og:url` route-specific (`seo-meta.ts`); flat entity URLs + city hubs (см. URL / SEO policy выше)

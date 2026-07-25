@@ -53,18 +53,19 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | CV.1 | `/events` filters: sticky «Показать N вариантов» + live preview count | Критический | ✅ debounce 350ms; zero CTA: «Нет подходящих событий» (pastel gray) |
-| CV.2 | `/events` grid: interstitial баннеры каждые 8 карточек → гиды/подборки | Высокий | ✅ soft tint + badge «Подборка»/«Интересно»; compact mobile + click track |
+| CV.2 | `/events` grid: interstitial баннеры каждые 8 карточек → гиды/подборки | Высокий | ✅ soft tint + badge «Подборка»/«Из Блога»; compact mobile + click track |
+| CV.2b | Настроить цель `catalog_interstitial_click` в Метрике + триггер/тег в GTM (маркетолог; frontend push уже есть) | Высокий | ⏳ handoff: event id `catalog_interstitial_click`; Метрика JS-событие + GTM Custom Event; код не трогать |
 | CV.3 | Home: live stats (города/события/площадки) + «Как купить» 3 шага | Высокий | ✅ step3 email/SMS/phone; how-to-buy mt-20 + bg-slate-50; social proof = каталожные counts до CV.11 |
 | CV.4 | Blog: native `[buy]` card (цена + CTA), без «сайт партнёра» | Высокий | ✅ live DTO + no-store; min `от N ₽` + fixed price width; единственный embed-путь (см. CV.8 🚫) |
 | CV.5 | Sort «скидки» в каталоге | Средний | ⚠️ deferred: нет `discount`/`strikePrice` в DTO; ждать sync architecture sprint |
 | CV.6 | Home video hero (HC.10) | Средний | ⚠️ deferred: photo rotator KEEP; stock muted loops 🚫; ждать продакшн-съёмку; реальные МСК/СПб WebP/AVIF |
 | CV.7 | Podborki listing: inline buy на плитках | Низкий | ⏳ покупка уже на CHPU landing |
 | CV.8 | Blog: auto related events по тегам статьи | Средний | 🚫 rejected: misfire риск убивает native conversion; только manual `[buy]` / admin field |
-| CV.9 | Venue logistics «как найти» (эпик; owner иногда зовёт «Спринт CV.5» - **не** путать с CV.5 discounts) | Высокий | ⏳ design: [venue-logistics-spec.md](./venue-logistics-spec.md); geocode template 🚫; manual CMS |
-| CV.9a | Prisma: `Venue.metroStation` / `wayToFind` / `parkingInfo` + migrate | Высокий | ⏳ |
-| CV.9b | Admin CMS: секция «Логистика» в Next `/admin/venues/[id]` + PATCH (`normalizeVenuePayload` / `updateAdminVenue`) | Высокий | ⏳ |
-| CV.9c | Public DTO + блок логистики на venue page (`VenueLogisticsBlock`; empty hide если нет address и трёх полей) | Высокий | ⏳ |
-| CV.9d | `/events/[slug]`: venue click → modal (логистика + Yandex iframe); fallback link на `/venues|locations` | Средний | ⏳ |
+| CV.9 | Venue logistics «как найти» (эпик; owner иногда зовёт «Спринт CV.5» - **не** путать с CV.5 discounts) | Высокий | 🔄 local WIP uncommitted (CV.9a-d в WT); не дублировать; merge+migrate+deploy отдельно; [venue-logistics-spec.md](./venue-logistics-spec.md) |
+| CV.9a | Prisma: `Venue.metroStation` / `wayToFind` / `parkingInfo` + migrate | Высокий | 🔄 WT: `20260725120000_venue_logistics` |
+| CV.9b | Admin CMS: секция «Логистика» в Next `/admin/venues/[id]` + PATCH (`normalizeVenuePayload` / `updateAdminVenue`); address sync-only readonly | Высокий | 🔄 WT |
+| CV.9c | Public DTO + блок логистики на venue page (`VenueLogisticsBlock`; empty hide если нет address и трёх полей); OSM keep | Высокий | 🔄 WT |
+| CV.9d | `/events/[slug]`: venue click → modal (логистика + Yandex iframe при coords / external button иначе); slim SSR fields; fallback «Страница площадки» | Средний | 🔄 WT |
 | CV.10 | Mood chip «Свидание» на `/podborki` (рядом с «Для двоих») | Низкий | ⏳ |
 | CV.11 | Social proof «проданные билеты» (TC Order paid aggregate) | Средний | ⚠️ deferred: только после реального order-aggregate; hardcoded fake 🚫; до - каталожные counts (CV.3) |
 | CV.12 | Catalog card dates: human mask `25 июля, суббота в 07:15` | Высокий | ✅ open-date без фейковых часов; не путать с CV.5 (скидки) |
@@ -204,11 +205,13 @@
 
 **Сдвиг приоритета:** обычные статьи блога вторичны; фокус на **ЧПУ SEO-листингах** category×city (+ intent `/podborki/...`).
 
-## Решение владельца (2026-07-23)
+## Решение владельца (2026-07-23; lock 2026-07-25)
 
-- Крупный поток **F4 admin → Next** - **in progress** (kickoff 2026-07-23).
-- Текущий launch-фокус параллельно - качество landing matching и актуальность событий во всех посадках.
+- **F4 admin → Next** - ✅ **done (F4.6)**; Vite `/legacy` hard-retired. Канон: Next admin на `admin.daibilet.ru`.
+- Launch-фокус: качество landing matching + актуальность событий; dual-edit `dto.js` + `landing-rules.ts` до F5 (без codegen).
 - Finance contour / ЛК поставщиков отложен: продукт ещё не готов. Изменения Codex finance не трогаем.
+- Blog anti-spam LOCK: хаос-темп гидов при 80–90% index; 1 пн-колонка/нед; Pack B = новый угол, не rewrite 9 longforms.
+- SEO LOCK: TOP-15 editorial focus без URL churn; `MIN_LISTING=6`; CHPU density; телефон только после 8-800.
 
 | # | Задача | Приоритет | Статус | Ownership |
 |---|--------|-----------|--------|-----------|
@@ -219,12 +222,13 @@
 | SEO.5 | Intent ЧПУ `/podborki/{intent}` (+ city) + preset links | Высокий | ✅ | агент |
 | SEO.6 | `/contacts` + footer/sitemap trust | Высокий | ✅ | агент |
 | SEO.7 | Event trust strip | Средний | ✅ | агент |
-| SEO.8 | TOP-15 launch set: водные, стендап, экскурсии, культура, intent; «крыши» только СПб | Высокий | ✅ 2026-07-23 | владелец утвердил, агент внедрил |
+| SEO.8 | TOP-15 launch set: водные, стендап, экскурсии, культура, intent; «крыши» только СПб | Высокий | ✅ 2026-07-23 | владелец утвердил, агент внедрил; editorial focus LOCK, без URL churn |
 | SEO.8a | Editorial polish текстов TOP-15, в первую очередь новые `walking-tours`, `country-tours`, `exhibitions`, `unusual-theatres`, `excursions`, `rooftops` | Высокий | 🔄 seed готов, нужна редакторская вычитка | владелец + агент |
 | SEO.8b | `country-tours`: требовать экскурсионный и направленческий сигналы, исключить культурные события по топонимам | Высокий | ✅ 2026-07-23 | runtime `dto.js` синхронизирован, prod deploy + smoke: 3 экскурсии, без оперы и концертов |
-| SEO.8c | Аудит всех landing rules: исключить мусорные попадания, сверить сэмплы и runtime `dto.js` | Критический | 🔄 2026-07-25 | `rooftops` расширен (смотровые/выход на крышу), city-lock снят с national; deploy/smoke |
-| SEO.9 | Реальные отзывы / телефон 8-800 на контактах | Средний | ⏳ номер pending; ИНН/ОГРНИП только `/contacts` (+ `/requisites`), ОГРНИП с новой строки; адрес скрыт с contacts, полный на `/requisites`; футер без реквизитов; телефон не публикуем | **владелец** (номер) / агент (trust UI ✅) |
-| SEO.11 | Порог индекса SEO-листингов | Критический | ✅ `MIN_LISTING_OFFERS_FOR_INDEX = 6` (не поднимать: Екб/Казань thin) | агент |
+| SEO.8c | Аудит всех landing rules: исключить мусорные попадания, сверить сэмплы и runtime `dto.js` | Критический | 🔄 2026-07-25 | national `/progulki-po-krysham` ✅ (смотровые); остальной rule-audit продолжается |
+| SEO.9 | Trust contacts без телефона (launch policy) | Средний | ✅ политика: футер email only; реквизиты off `/contacts` → `/requisites`; YM Webmaster/Business по ИНН/ОГРНИП | **владелец** (верификация) / агент (UI ✅) |
+| SEO.9b | Телефон 8-800 в header + footer (+ contacts), когда номер одобрен | Высокий | 🚫 blocked: ждём утверждённый 8-800 у владельца; ASAP после approve | **владелец** → агент UI |
+| SEO.11 | Порог индекса SEO-листингов | Критический | ✅ `MIN_LISTING_OFFERS_FOR_INDEX = 6` (не поднимать; soft-цель редакторов = 10) | агент |
 | SEO.12 | Внутренняя перелинковка: футер «Популярные направления», event breadcrumbs → CHPU, «Смотрите также» на листингах | Высокий | ✅ 2026-07-23 | агент |
 | SEO.13 | SSR JSON-LD: BreadcrumbList (listing+event) + ItemList только на CHPU landings (non-empty) | Высокий | ✅ 2026-07-23 | агент |
 | SEO.14 | `/podborki` tag cloud → CHPU landings/intent вместо `/events?q=` | Высокий | ✅ 2026-07-23 (топ-24: 23 CHPU / 1 fallback) | агент |
@@ -232,16 +236,18 @@
 | SEO.16 | Ручной переобход TOP-15 в Яндекс.Вебмастер / GSC | Высокий | ⏳ список URL готов; клики только владелец | **владелец** |
 | SEO.17 | Sitemap: intents без thin (&lt; 6); smoke prod index + landings/static | Высокий | ✅ 2026-07-23 @`0fe5140`+prod | агент |
 | SEO.18 | План 20-30 путеводителей → CHPU (`docs/seo-guide-articles-plan.md`) | Высокий | ✅ 2026-07-23 batch #1 = 10 Казань/Екб | агент |
-| SEO.19 | Batch #1 генерация/размещение 10 гидов (GPT → MD → blog) | Высокий | ⏳ пачка A+МСК/СПб owner rewrite ✅; хаос-календарь ✅ 2026-07-23; B (2-7,9) ждёт тексты | владелец + агент |
+| SEO.19 | Batch #1 генерация/размещение 10 гидов (GPT → MD → blog) | Высокий | ⏳ пачка A+МСК/СПб owner rewrite ✅; хаос-календарь ✅; Pack B = новый commercial угол (top5/events), не rewrite 9 longforms | владелец + агент |
 | SEO.19a | Blog mid-article плашка `[NOTE]` (`BlogArticleNote`) | Высокий | ✅ 2026-07-23; hotfix nested `[link](url)` in text= | агент |
 | SEO.19f | Blog markdown SEO: links/H2/NOTE harden + price accents + tests | Критический | ✅ `4f6cdb3` prod | агент |
 | SEO.19b | Batch A: уникальные cover вместо city-placeholder (3 jpg) | Высокий | ✅ 2026-07-23 | агент |
 | SEO.19b2 | МСК/СПб: уникальные cover ×6 + magazine `/blog` hero | Высокий | ✅ 2026-07-23 | агент |
 | SEO.19b3 | Правило: cover обязателен до PUBLISHED; догенерация missing (bylinnyy ×2) | Критический | ✅ 2026-07-23 | агент |
-| SEO.19c | Публикация гидов: хаос-график + микс городов; `publishedAt` schedule filter | Высокий | ✅ 2026-07-23; антиспам-пересбор вечер | агент |
-| SEO.19d | Owner anti-AI rewrite 9 гидов + upsert по графику | Высокий | ✅ 2026-07-23 | владелец + агент |
-| SEO.19e | Антиспам: пн-колонки + template_type long/top5/events + safety индекс | Высокий | ✅ 2026-07-23 вечер (календарь + docs + upsert) | агент |
-| SEO.10 | Editorial polish SEO-текстов (убрать шаблонный хвост) | Средний | ⏳ | владелец + агент |
+| SEO.19c | Публикация гидов: хаос-график + микс городов; `publishedAt` schedule filter | Высокий | ✅ 2026-07-23; safety: throttle 1/day только если mass «малоценная» (owner Webmaster/GSC) | агент |
+| SEO.19d | Owner anti-AI rewrite 9 гидов + upsert по графику | Высокий | ✅ 2026-07-23; LOCK: повторный rewrite 9 longforms не делаем | владелец + агент |
+| SEO.19e | Антиспам: пн-колонки + template_type long/top5/events + safety индекс | Высокий | ✅ LOCK 2026-07-25: 1 колонка/нед; HIDDEN backlog не жечь быстрее | агент |
+| SEO.20 | Landing garbage audit: daily cron scan cache/DB (encoding / stopwords / CAPS / empty tags) → Telegram alert | Высокий | ⏳ | агент |
+| SEO.21 | Tags dictionary monthly sprint: analyzer (>6–8 live events + Wordstat >0) → admin one-click promote query-fallback → CHPU + meta + sitemap (не ad-hoc) | Средний | ⏳ monthly ops | агент + владелец (approve) |
+| SEO.10 | Editorial polish SEO-текстов (убрать шаблонный хвост); URL/mapping TOP-15 не трогать | Средний | ⏳ | владелец + агент |
 | P.1 | AI / статьи блога | Средний | ⚠️ deferred vs SEO.1–SEO.7 | — |
 
 ---
@@ -696,6 +702,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-25 | Owner QA close (blog/F4/SEO): SEO.20 daily garbage audit ⏳ High; SEO.21 monthly tag promote ⏳ Medium; SEO.9b phone 🚫 blocked; SEO.9 launch policy ✅ |
 | 2026-07-24 | B.26: `/blog` UX - topics/search/load-more/CTA/date on large |
 | 2026-07-23 | B.25: column authors brand blue on listing + article (no «Колонка» badge) |
 | 2026-07-23 | B.24: `/blog` magazine\|list view toggle + localStorage/`?view=` (merge badges-off) |

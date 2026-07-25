@@ -811,6 +811,9 @@ model Venue {
   address          String?
   latitude         Float?
   longitude        Float?
+  metroStation     String?
+  wayToFind        String?         @db.Text
+  parkingInfo      String?
   kind             VenueKind       @default(OTHER)
   pageStatus       VenuePageStatus @default(NONE)
   createdAt        DateTime        @default(now())

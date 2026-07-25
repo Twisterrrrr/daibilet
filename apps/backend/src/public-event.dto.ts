@@ -310,6 +310,17 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     venue: requestedEvent.venue?.title || 'Не указано',
     venueAddress: requestedEvent.venue?.address || null,
     venueKind: requestedEvent.venue?.kind || 'OTHER',
+    venueLatitude:
+      requestedEvent.venue?.latitude == null || !Number.isFinite(requestedEvent.venue.latitude)
+        ? null
+        : Number(requestedEvent.venue.latitude),
+    venueLongitude:
+      requestedEvent.venue?.longitude == null || !Number.isFinite(requestedEvent.venue.longitude)
+        ? null
+        : Number(requestedEvent.venue.longitude),
+    venueMetroStation: requestedEvent.venue?.metroStation || null,
+    venueWayToFind: requestedEvent.venue?.wayToFind || null,
+    venueParkingInfo: requestedEvent.venue?.parkingInfo || null,
     ageLimit: requestedEvent.ageLimit,
     priceFrom,
     vacant: targetCatalogSession?.vacant ?? requestedEvent.ticketsVacant,

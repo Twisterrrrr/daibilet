@@ -24,10 +24,10 @@ import {
   isFlexibleScheduleSession,
   scrollToBuyCard,
 } from '@/lib/event-page-utils';
-import { venueHref } from '@/lib/routes';
 import { buildEventBreadcrumbs } from '@/lib/structured-data';
 import { resolveEventHeroObjectPosition } from '@/lib/event-image-focus';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { EventVenueTrigger } from '@/components/EventVenueModal.client';
 import { getTeplohodWidgetIds, openTeplohodWidget, TeplohodWidgetEmbed } from '@/components/TeplohodWidget.client';
 import { normalizeTcPurchaseUrl, TcOptionBuyButton, TcSessionSlot, TcWidgetButton } from '@/components/TcWidget.client';
 
@@ -372,9 +372,7 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
     id: event.id,
   });
   const nextSession = pickRepresentativeSession((payload.sessions ?? []) as EventSession[]);
-  const venueLink = event.venue
-    ? venueHref({ id: event.venueId || event.venueSlug || event.venue, slug: event.venueSlug, name: event.venue, type: event.venueKind })
-    : null;
+  const canOpenVenueModal = Boolean(event.venue && (event.venueId || event.venueSlug));
   const breadcrumbs = buildEventBreadcrumbs(event);
 
   return (
@@ -433,10 +431,13 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
               {event.city || event.venue ? (
                 <span className="flex items-center gap-1.5">
                   <MapPin className="h-4 w-4" strokeWidth={1.75} />
-                  {venueLink ? (
-                    <Link href={venueLink} className="underline decoration-white/30 underline-offset-2 hover:text-white">
+                  {canOpenVenueModal ? (
+                    <EventVenueTrigger
+                      event={event}
+                      className="underline decoration-white/30 underline-offset-2 hover:text-white"
+                    >
                       {event.venue || event.city}
-                    </Link>
+                    </EventVenueTrigger>
                   ) : (
                     event.city
                   )}

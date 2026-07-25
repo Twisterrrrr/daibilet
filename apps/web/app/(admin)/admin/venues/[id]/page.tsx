@@ -169,6 +169,45 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
             />
           </Field>
+
+          <fieldset className="space-y-3 rounded-lg border border-slate-200 bg-slate-50/60 p-3">
+            <legend className="px-1 text-sm font-semibold text-slate-900">Логистика</legend>
+            {detail.address ? (
+              <div className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700">
+                <div className="text-xs font-medium text-slate-500">Адрес (только sync, не редактируется)</div>
+                <div className="mt-1">{detail.address}</div>
+              </div>
+            ) : (
+              <p className="text-xs text-slate-500">Адрес приходит из sync и здесь не редактируется.</p>
+            )}
+            <Field label="Метро">
+              <input
+                name="metroStation"
+                defaultValue={detail.metroStation || ''}
+                placeholder="Например: Невский проспект"
+                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+              />
+            </Field>
+            <Field label="Как найти">
+              <textarea
+                name="wayToFind"
+                rows={4}
+                defaultValue={detail.wayToFind || ''}
+                placeholder="Ориентир у входа, какой выход из метро, как пройти"
+                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+              />
+            </Field>
+            <Field label="Парковка">
+              <textarea
+                name="parkingInfo"
+                rows={2}
+                defaultValue={detail.parkingInfo || ''}
+                placeholder="Где оставить машину"
+                className="w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+              />
+            </Field>
+          </fieldset>
+
           <Field label="SEO description">
             <textarea
               name="seoDescription"

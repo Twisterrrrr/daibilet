@@ -8,39 +8,43 @@
 4. **Venue logistics:** CMS admin-поле **«как найти»** (метро + human landmark text), заполняет админ вручную. Geocode-шаблон из адреса **отклонён**. Venues << events - manual ок (**CV.9**; owner label «Спринт CV.5» ≠ Tasktracker **CV.5** discounts). Спека: [venue-logistics-spec.md](./venue-logistics-spec.md).
 5. **Blog auto-embeds:** **только** ручной `[buy slug=…]` или admin custom field (CV.4). Автоподбор по тегам статьи **отклонён** (высокий misfire убивает native conversion) - **CV.8** 🚫.
 
-## 2026-07-25 - Venue logistics CV.9 (open)
+## 2026-07-25 - Venue logistics CV.9 — ЗАКРЫТО
 
-1. **Yandex Maps в event-modal:** достаточно ли **iframe** `yandex.ru/map-widget/v1` без JS API key (маркер по lat/lng; fallback query по address), или нужен `NEXT_PUBLIC_YANDEX_MAPS_API_KEY` / Constructor?
-2. **Venue pages:** оставляем текущий **OsmMapEmbed** (OSM) и только в modal ставим Yandex, или выравниваем оба на Yandex в follow-up?
-3. **Admin address:** в CV.9b делать `address` editable в Next form, или только новые logistics-поля (address остаётся sync-only)?
-4. **Event DTO:** logistics через fetch `/api/public/venues/:slug` при открытии modal - ок, или встраивать slim fields в event page payload?
+1. **Yandex Maps в event-modal:** iframe `yandex.ru/map-widget/v1` **без** JS API key; маркер `pt={lng},{lat}`. Без coords - кнопка «Открыть адрес на Яндекс.Картах» (external `text=`), без iframe text-search (captcha). `NEXT_PUBLIC_YANDEX_MAPS_API_KEY` не нужен.
+2. **Venue pages:** оставляем **OsmMapEmbed** (OSM) на MVP. Выравнивание обоих на Yandex - **deferred backlog**.
+3. **Admin address:** только новые logistics-поля editable; `address` остаётся **sync-only** (readonly display).
+4. **Event DTO:** slim logistics fields встроены в event page SSR payload (0ms modal). Fetch при клике **не** делаем.
 
-## 2026-07-25 - Catalog interstitial analytics
+## 2026-07-25 - Catalog interstitial analytics — ЗАКРЫТО
 
-1. **GTM / Metrika goals:** клиент шлёт `catalog_interstitial_click` (dataLayer + ym reachGoal при наличии `NEXT_PUBLIC_YANDEX_METRIKA_ID`). Нужен ли отдельный trigger/goal в кабинетах, или достаточно raw push?
+1. **GTM / Metrika goals:** frontend raw push **корректен и готов** (`dataLayer` + `ym('reachGoal', …)` при `NEXT_PUBLIC_YANDEX_METRIKA_ID`). **Решение owner:** в кабинетах нужна настройка цели/триггера - без неё события не попадут в отчёты конверсий.
+   - **Яндекс.Метрика:** Цели → JavaScript-событие → id ровно `catalog_interstitial_click` (case-sensitive). Без цели `reachGoal` игнорируется в conversion reports.
+   - **GTM:** Custom Event trigger с именем `catalog_interstitial_click` + Tag (GA4/pixel) на него. Без trigger `dataLayer` push отбрасывается.
+   - **Handoff маркетологу:** event id `catalog_interstitial_click` - настройка кабинетов ~2 мин. Код трекинга не трогать, пока не сломан. Задача: **CV.2b** (⏳ в Tasktracker).
 
-## 2026-07-23 - Антиспам блога / индекс (owner)
+## 2026-07-23 - Антиспам блога / индекс (owner) — ЗАКРЫТО (lock 2026-07-25)
 
-1. **Safety marker (гиды):** если Яндекс/GSC индексирует **80–90%** опубликованных URL гидов - темп хаос-графика ок. Если массово «малоценная» / не в индекс - **снизить до 1 гид/день** и пересмотреть шаблоны. Действие только владельца в Вебмастере / GSC.
-2. **Пн-колонки:** достаточно ли 1 колонки/неделю как антиспам-щит, или чередовать персон чаще после исчерпания HIDDEN-бэклога?
-3. **Template mix:** текущие 9 текстов в основном longform - нужен ли owner rewrite под `top5`/`events` объёмы, или достаточно нового угла в пачке B?
+1. **Guide indexing tempo:** ✅ **ЗАКРЫТО.** KEEP хаос-график, пока YM/GSC index **80–90%**. Owner мониторит **еженедельно**. Триггер throttle: массовая «малоценная» / excluded → **1 гид/день** + переработка шаблонов с большим числом commercial DTO-блоков. Кабинеты трогает только владелец.
+2. **Пн-колонки:** ✅ **ЗАКРЫТО.** KEEP **1/неделю**. HIDDEN-бэклог **не** жечь быстрее (риск AI-spam).
+3. **Template mix:** ✅ **ЗАКРЫТО.** Rewrite существующих **9 longreads не делаем**. Pack B = **новый угол** для top5/events: purchase intent, цены, карты - не вода и не перепись уже вышедших.
 
-## 2026-07-23 - F4 и качество landing matching
+## 2026-07-23 - F4 и качество landing matching — ЗАКРЫТО (lock 2026-07-25)
 
-1. **Решение владельца:** следующий крупный поток - F4 admin → Next (shell + live dashboard F4.1). Finance contour / ЛК поставщиков отложен до готовности продукта. До cutover канон - Vite admin; нужен ли отдельный `admin.` vhost на Next раньше полного port UI?
-2. **F4.1 env:** достаточно ли `ADMIN_*` из общего `.env` у `daibilet-web`, или явно задавать `DAIBILET_ADMIN_API_URL=http://127.0.0.1:4000` в unit?
-3. **Канон правил:** до F5 public landing runtime исполняет legacy `dto.js`, а TypeScript `landing-rules.ts` служит typed public path и тестам. Любое изменение правил вносится в оба файла. Нужна ли отдельная генерация rules из единого источника до F5?
-4. **Проверка выдачи:** `LandingMatch` в public path применяется только для ручных `PINNED`/`EXCLUDED`; пересчёт automatic rows не исправляет public выдачу. Нужен ли отдельный автоматический scheduled audit всех landing rules с алертами на характерные мусорные слова?
+Контекст: **F4.6 выполнен** (2026-07-23) - Next admin live на `admin.daibilet.ru`, Vite `/legacy` hard-retired. Pre-cutover ответы ниже сохранены как lasting rules / история.
 
-## 2026-07-23 - SEO-листинги, решения владельца
+1. **Отдельный `admin.` vhost Next до полного port UI:** ✅ **ЗАКРЫТО / superseded (F4.6).** Решение 2026-07-23: early vhost **не нужен**; Vite был каноном до cutover; Next shell (F4.1) - только при критической массе UI. Сейчас канон - Next admin only. Finance / ЛК поставщиков отложены (P.3).
+2. **F4.1 env:** ✅ **ЗАКРЫТО.** Явный `DAIBILET_ADMIN_API_URL=http://127.0.0.1:4000` в systemd/docker unit admin - **не** shared env `daibilet-web`. См. [phase-f4-admin-cutover.md](./phases/phase-f4-admin-cutover.md).
+3. **Rules single-source codegen:** ✅ **ЗАКРЫТО.** **Не** до F5. Регламент: ручной dual-update `dto.js` + `landing-rules.ts`.
+4. **Scheduled landing garbage audit:** ✅ **ЗАКРЫТО = ДА.** Daily cron: scan cache/DB на encoding / stopwords / CAPS / empty tags → Telegram alert. Задача: **SEO.20** (High ⏳). `LandingMatch` PINNED/EXCLUDED не заменяет пересчёт automatic rows в public path.
 
-1. **Стартовое ядро:** утверждён TOP-15 URL. Приоритет редакторских текстов - эти 15 страниц.
-2. **Крыши:** city-URL `/progulki-po-krysham/saint-petersburg` остаётся СПб-only (Москва не в sitemap city-path). Национальный `/progulki-po-krysham` с 2026-07-25 показывает ближайший релевант (смотровые / выход на крышу), пока в sync нет SPB roof-туров.
-3. **Телефон:** пока не публикуем. Слот для 8-800 или городского номера pending у владельца, launch не блокирует. На `/contacts` - email, ИНН и ОГРНИП; в футере только email (реквизиты убраны 2026-07-24 по запросу владельца). **Gap:** без телефона Яндекс в нише билетов может маркировать как «однодневку» - закрывается только реальным 8-800 от владельца.
-4. **Порог индекса:** `MIN_LISTING_OFFERS_FOR_INDEX = 6` критичен из-за масштаба Екб (~57) / Казань (~51) vs СПб/Москва; повышать до 10-12 нельзя. Soft-цель контента = 10.
-5. **SEO-тексты:** seed принят как MVP для launch set. Нужна последующая редакторская вычитка без изменения URL и правил.
-6. **Карточки каталога:** текста для роботов мало - ок на сейчас; SEO-вес на CHPU-листингах, не раздувать card copy.
-7. **Теги `/podborki`:** клики переведены на CHPU где возможно; остаётся gap по редким/служебным тегам (query fallback). Нужно ли периодически расширять словарь по новым топ-тегам из sync?
+## 2026-07-23 - SEO-листинги, решения владельца — ЗАКРЫТО (lock 2026-07-25)
+
+1. **Стартовое ядро:** ✅ **ЗАКРЫТО.** Editorial focus - **TOP-15 URL**; остальное seed MVP. Structure/review as-is - **без URL/mapping changes** (сохраняем индексацию).
+2. **Крыши:** ✅ **ЗАКРЫТО (2026-07-25).** National `/progulki-po-krysham` → смотровые / выход на крышу (ближайший релевантный scope). Почему: пустые «крыши СПб» на national были бы thin content. City-URL `/progulki-po-krysham/saint-petersburg` = СПб-only. Москва в sitemap city-path не добавляется.
+3. **Телефон:** ✅ **ЗАКРЫТО (политика launch).** Launch **без телефона**; футер - **только email**; реквизиты **не** на `/contacts` (Jul 24) - на `/requisites`. Временный щит: верификация **Яндекс.Вебмастер / Бизнес** по **ИНН/ОГРНИП**. Когда **8-800** одобрен → ASAP header+footer (**SEO.9b** 🚫 blocked на номер). Launch не блокирует.
+4. **Порог индекса:** ✅ **ЗАКРЫТО.** `MIN_LISTING_OFFERS_FOR_INDEX = 6` KEEP (Екб/Казань). Soft-цель content ops = **10**; порог **не поднимать** сейчас.
+5. **SEO-тексты / карточки:** ✅ **ЗАКРЫТО.** Карточки каталога лёгкие; SEO-вес на **CHPU listings**. Editorial polish TOP-15 без смены URL (**SEO.8a** / **SEO.10**).
+6. **Теги `/podborki`:** ✅ **ЗАКРЫТО = ДА (monthly, не ad-hoc).** Авто-analyzer раз в месяц: теги с **>6–8 live events** + Wordstat >0 → admin one-click promote (query-fallback → CHPU + meta + sitemap). Задача: **SEO.21** (Medium ⏳, monthly sprint).
 
 ---
 
@@ -56,12 +60,14 @@
 
 ## 2026-07-19 — после аудита админки
 
-1. **Admin landings / public catalog SQL:** Events list уже на SQL group page (0.5.8). Когда переводим landings match и `GET /api/public/events` с in-memory full catalog на SQL/materialized groups?
-2. **Роли / ACL:** Basic Auth + один `ADMIN_EMAIL` достаточно до F4, или нужен второй операторский аккаунт раньше?
-3. **ECR:** включать `VITE_DAIBILET_EVENT_CHANGE_REQUESTS` после первого реального change-request, или держать до Phase 2 supplier flow?
+Часть контекста устарела после F4.6 (Next admin live); вопросы ниже ещё актуальны как tech debt / ops.
+
+1. **Admin landings / public catalog SQL:** Events list уже на SQL group page (0.5.8). Когда переводим landings match и `GET /api/public/events` с in-memory full catalog на SQL/materialized groups? (см. Project.md perf debt; F5 соседствует)
+2. **Роли / ACL:** Basic Auth + один `ADMIN_EMAIL` достаточно после F4, или нужен второй операторский аккаунт раньше Phase G?
+3. **ECR:** включать `VITE_DAIBILET_EVENT_CHANGE_REQUESTS` / Next ECR UI после первого реального change-request, или держать до Phase 2 supplier flow?
 4. **Архив заказов:** оставляем auto-archive cancelled ≥30d, или нужен отдельный sync «живых» confirmed из TC/TEP чтобы active-список не выглядел пустым?
 5. **Lean description 4000:** хватает для ContentTab Source, или редакторам нужен полный текст только из `:id` (уже есть)?
-6. **landing_match filter:** SQL quick-filter сейчас смотрит `LandingMatch` rows (не полный rule-engine). Нужен ли parity с `LANDING_RULES` hits в фильтре?
+6. **landing_match filter:** SQL quick-filter сейчас смотрит `LandingMatch` rows (не полный rule-engine). Нужен ли parity с `LANDING_RULES` hits в фильтре? (пересекается с SEO.20 audit)
 
 ## Ранее
 

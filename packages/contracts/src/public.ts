@@ -166,6 +166,9 @@ export interface PublicVenueDto extends SeoFields {
   address?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  metroStation?: string | null;
+  wayToFind?: string | null;
+  parkingInfo?: string | null;
   type: string;
   pageStatus?: string | null;
   description?: string | null;
@@ -215,6 +218,12 @@ export interface PublicEventDto extends SeoFields, PurchaseFields {
   venue: string;
   venueAddress?: string | null;
   venueKind: string;
+  /** Slim logistics from linked Venue - event modal SSR (CV.9d), no fetch on click. */
+  venueLatitude?: number | null;
+  venueLongitude?: number | null;
+  venueMetroStation?: string | null;
+  venueWayToFind?: string | null;
+  venueParkingInfo?: string | null;
   ageLimit?: string | null;
   priceFrom?: number | null;
   vacant?: number | null;

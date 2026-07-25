@@ -15,6 +15,7 @@ import {
 
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { OsmMapEmbed } from '@/components/OsmMapEmbed';
+import { VenueLogisticsBlock, hasVenueLogisticsContent } from '@/components/VenueLogisticsBlock';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatMoney, formatNumber } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
@@ -260,15 +261,17 @@ export function InstitutionVenueLayout({
           <div className="space-y-4">
             <div className="rounded-2xl border border-slate-200 bg-white p-5">
               <div className="text-sm font-semibold text-slate-900">Как добраться</div>
-              <div className="mt-3 space-y-2 text-sm text-slate-700">
-                <div className="flex items-start gap-2">
+              {hasVenueLogisticsContent(venue) ? (
+                <VenueLogisticsBlock venue={venue} showName={false} className="mt-3" />
+              ) : (
+                <div className="mt-3 flex items-start gap-2 text-sm text-slate-700">
                   <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
-                  {streetAddress || `${venue.city} — адрес уточняется`}
+                  {streetAddress || `${venue.city} - адрес уточняется`}
                 </div>
-                <div className="flex items-start gap-2">
-                  <Ticket className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
-                  {formatNumber(stats.events)} событий · от {formatMoney(stats.priceFrom)}
-                </div>
+              )}
+              <div className="mt-3 flex items-start gap-2 text-sm text-slate-700">
+                <Ticket className="mt-0.5 h-4 w-4 shrink-0 text-primary-600" />
+                {formatNumber(stats.events)} событий · от {formatMoney(stats.priceFrom)}
               </div>
               {hasMap ? (
                 <a

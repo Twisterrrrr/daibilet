@@ -1,3 +1,62 @@
+## 2026-07-25 - Owner: закрытие hanging QA (blog / F4 / SEO)
+
+### Наблюдения
+
+- В `qa.md` висели блоки 2026-07-23 (антиспам блога, F4 landing matching, SEO-листинги), хотя F4.6 уже done и часть SEO уже внедрена (rooftops national, TOP-15, `MIN_LISTING=6`). Нужны lasting rules в docs без feature-кода + явные follow-up задачи.
+- CV.2b Metrika/GTM handoff по interstitial уже зафиксирован отдельно и остаётся ⏳ у маркетолога.
+
+### Решения
+
+- **Blog anti-spam:** KEEP хаос-темп при YM/GSC 80–90% (owner weekly); throttle 1/day + commercial DTO в шаблонах только при mass «малоценная»/excluded. Пн-колонки 1/нед, HIDDEN не жечь. Pack B = новый угол (intent/цены/карты), не rewrite 9 longreads.
+- **F4/matching:** early admin.vhost был не нужен (Vite до cutover) → сейчас Next after F4.6. Env: явный `DAIBILET_ADMIN_API_URL` в unit admin (не shared web). Codegen правил - не до F5 (dual `dto.js` + `landing-rules.ts`). Daily garbage audit (encoding/stopwords/CAPS/empty tags → Telegram) → **SEO.20** High ⏳.
+- **SEO commercial:** TOP-15 editorial only, URL/mapping freeze. National rooftops → смотровые (thin empty SPB roofs). Launch без телефона; footer email; реквизиты off contacts → `/requisites`; YM Webmaster/Business по ИНН/ОГРНИП; **SEO.9b** 🚫 до 8-800 (ASAP после approve). MIN_LISTING=6 KEEP; soft 10. Cards light / SEO на CHPU. Monthly tag promote (не ad-hoc) → **SEO.21** Medium ⏳.
+
+### Проблемы
+
+- SEO.9b blocked на одобрение 8-800 у владельца.
+- SEO.20 / SEO.21 - только backlog, реализация не стартовала.
+- SEO.8c шире rooftops: полный rule-audit ещё 🔄.
+- CV.2b по-прежнему ждёт настройки цели/триггера в кабинетах.
+
+---
+
+## 2026-07-25 - Catalog interstitial analytics handoff
+
+### Наблюдения
+
+- Frontend уже пушит `catalog_interstitial_click` через `ym reachGoal` + `dataLayer` (CV.2). В `qa.md` висел вопрос: хватает ли raw push или нужны цель/триггер в кабинетах.
+
+### Решения
+
+- Owner: raw push **ok / done**; отчёты конверсий требуют настройки в кабинетах.
+- Метрика: Цель → JS-событие → id `catalog_interstitial_click` (строго, case-sensitive).
+- GTM: Custom Event trigger `catalog_interstitial_click` + Tag (GA4/pixel).
+- Handoff маркетологу: один event id, ~2 мин в кабинетах. Код трекинга не менять. Задача **CV.2b** в Tasktracker.
+
+### Проблемы
+
+- Пока цель/триггер не созданы - клики по interstitial не видны в conversion reports (события уходят, но кабинет их не считает).
+
+---
+
+## 2026-07-25 - CV.9 Venue logistics: local WIP (not merged)
+
+### Наблюдения
+
+- Owner закрыл open Q: Yandex iframe без API key; OSM keep на venue pages; address sync-only; slim logistics в event SSR.
+- Реализация CV.9a-d лежит в working tree (другой агент); **не commit / не prod**. Launch Set audit не дублирует и не шипит отдельно.
+
+### Решения
+
+- Спека и контракт полей готовы; ship = отдельный commit + migrate + deploy.
+- OSM→Yandex unify на venue pages - backlog после merge.
+
+### Проблемы
+
+- Coverage lat/lng неполная (HC.11). Пока WT не merged - public/prod без logistics UI.
+
+---
+
 ## 2026-07-25 - Owner audit: catalog / home / blog / dates
 
 ### Наблюдения
@@ -9,7 +68,7 @@
 ### Решения
 
 - CV.1: zero CTA `disabled`, pastel gray, текст «Нет подходящих событий».
-- CV.2: interstitial на `#F8F9FA` / accent 5%, corner badge «Подборка»|«Интересно»; analytics без изменений.
+- CV.2: interstitial на `#F8F9FA` / accent 5%, corner badge «Подборка»|«Из Блога» (было «Интересно»); analytics без изменений.
 - CV.3: how-to-buy `mt-20` + `bg-slate-50`.
 - CV.4: только `formatPriceFrom` (от N ₽) + min-width у цены рядом с CTA.
 - CV.12: `formatShowcaseSessionDate` → `25 июля, суббота в 07:15`; open-date без часов. CV.5 (скидки) не трогали.

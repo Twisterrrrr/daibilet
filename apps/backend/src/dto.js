@@ -2920,6 +2920,9 @@ export async function buildAdminVenueDetail(db, venueId) {
           venue.address,
           venue.latitude,
           venue.longitude,
+          venue."metroStation",
+          venue."wayToFind",
+          venue."parkingInfo",
           venue.kind,
           venue."pageStatus",
           city.title as city
@@ -2982,6 +2985,9 @@ export async function updateAdminVenue(db, venueId, payload) {
         "isIndexable" = $10,
         kind = $11::"VenueKind",
         "pageStatus" = $12::"VenuePageStatus",
+        "metroStation" = $13,
+        "wayToFind" = $14,
+        "parkingInfo" = $15,
         "updatedAt" = now()
       where id = $1
       returning id
@@ -2999,6 +3005,9 @@ export async function updateAdminVenue(db, venueId, payload) {
       Boolean(next.isIndexable),
       next.kind || 'OTHER',
       next.pageStatus || 'NONE',
+      next.metroStation ?? null,
+      next.wayToFind ?? null,
+      next.parkingInfo ?? null,
     ],
   );
 
@@ -4745,6 +4754,9 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
       address: normalizedVenue.address,
       latitude: venueCoordinates?.latitude ?? null,
       longitude: venueCoordinates?.longitude ?? null,
+      metroStation: canonicalVenue.metroStation || null,
+      wayToFind: canonicalVenue.wayToFind || null,
+      parkingInfo: canonicalVenue.parkingInfo || null,
       type: resolvedType,
       template: publicVenuePageTemplate(resolvedType),
       pageStatus: canonicalVenue.pageStatus,
@@ -5020,6 +5032,11 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
         venue.title as venue,
         venue.address as "venueAddress",
         venue.kind as "venueKind",
+        venue.latitude as "venueLatitude",
+        venue.longitude as "venueLongitude",
+        venue."metroStation" as "venueMetroStation",
+        venue."wayToFind" as "venueWayToFind",
+        venue."parkingInfo" as "venueParkingInfo",
         source.code as "sourceCode",
         source.name as "sourceName",
         source_link."externalId",
@@ -5039,7 +5056,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
       left join "Source" source on source.id = source_link."sourceId"
       left join "EventOverride" override on override."eventId" = e.id
       where e.id = $1 or e.slug = $1
-      group by e.id, cat.title, city.id, city.title, city.slug, city."isDestination", region.id, region.slug, region.title, venue.id, venue.slug, venue.title, venue.address, venue.kind, source.code, source.name, source_link."externalId", override.id
+      group by e.id, cat.title, city.id, city.title, city.slug, city."isDestination", region.id, region.slug, region.title, venue.id, venue.slug, venue.title, venue.address, venue.kind, venue.latitude, venue.longitude, venue."metroStation", venue."wayToFind", venue."parkingInfo", source.code, source.name, source_link."externalId", override.id
       limit 1
     `,
       [eventLocator],
@@ -5252,6 +5269,11 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     venue: event.venue || 'Не указано',
     venueAddress: event.venueAddress,
     venueKind: event.venueKind || 'OTHER',
+    venueLatitude: event.venueLatitude == null || !Number.isFinite(Number(event.venueLatitude)) ? null : Number(event.venueLatitude),
+    venueLongitude: event.venueLongitude == null || !Number.isFinite(Number(event.venueLongitude)) ? null : Number(event.venueLongitude),
+    venueMetroStation: event.venueMetroStation || null,
+    venueWayToFind: event.venueWayToFind || null,
+    venueParkingInfo: event.venueParkingInfo || null,
     ageLimit: event.ageLimit,
     priceFrom: eventPriceFrom,
     vacant: targetPublicSession?.vacant ?? event.ticketsVacant,
@@ -6094,7 +6116,19 @@ function normalizeVenuePayload(payload) {
   }
 
   const normalized = {};
-  for (const key of ['title', 'description', 'shortDescription', 'heroImageUrl', 'seoH1', 'seoTitle', 'seoDescription', 'canonicalPath']) {
+  for (const key of [
+    'title',
+    'description',
+    'shortDescription',
+    'heroImageUrl',
+    'seoH1',
+    'seoTitle',
+    'seoDescription',
+    'canonicalPath',
+    'metroStation',
+    'wayToFind',
+    'parkingInfo',
+  ]) {
     if (!Object.prototype.hasOwnProperty.call(payload, key)) continue;
     normalized[key] = normalizeNullableString(payload[key]);
   }
@@ -6645,6 +6679,9 @@ const PUBLIC_VENUE_ROW_SELECT = `
     venue.address,
     venue.latitude,
     venue.longitude,
+    venue."metroStation",
+    venue."wayToFind",
+    venue."parkingInfo",
     venue.kind,
     venue."pageStatus",
     city.title as city

@@ -114,6 +114,9 @@ export interface AdminVenueRowDto extends SeoFields {
   address?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  metroStation?: string | null;
+  wayToFind?: string | null;
+  parkingInfo?: string | null;
   description?: string | null;
   shortDescription?: string | null;
   heroImageUrl?: string | null;

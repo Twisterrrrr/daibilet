@@ -35,6 +35,9 @@ export type AdminVenueDetailData = {
   slug: string | null;
   city: string;
   address: string | null;
+  metroStation: string | null;
+  wayToFind: string | null;
+  parkingInfo: string | null;
   shortDescription: string | null;
   description: string | null;
   heroImageUrl: string | null;
@@ -118,6 +121,9 @@ export async function loadAdminVenueDetail(venueId: string): Promise<AdminVenueD
     slug: null,
     city: '—',
     address: null,
+    metroStation: null,
+    wayToFind: null,
+    parkingInfo: null,
     shortDescription: null,
     description: null,
     heroImageUrl: null,
@@ -148,6 +154,9 @@ export async function loadAdminVenueDetail(venueId: string): Promise<AdminVenueD
       slug: payload.slug != null ? String(payload.slug) : null,
       city: String(payload.city || '—'),
       address: payload.address != null ? String(payload.address) : null,
+      metroStation: payload.metroStation != null ? String(payload.metroStation) : null,
+      wayToFind: payload.wayToFind != null ? String(payload.wayToFind) : null,
+      parkingInfo: payload.parkingInfo != null ? String(payload.parkingInfo) : null,
       shortDescription: payload.shortDescription != null ? String(payload.shortDescription) : null,
       description: payload.description != null ? String(payload.description) : null,
       heroImageUrl: payload.heroImageUrl != null ? String(payload.heroImageUrl) : null,
