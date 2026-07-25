@@ -23,7 +23,7 @@ import {
   resolveEventCardLocationLabel,
   resolveEventCardPinLines,
 } from '@/lib/event-location';
-import { formatMoneyRange } from '@/lib/format';
+import { formatPriceFrom } from '@/lib/format';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
 
 const SLOT_CHIP_CLASS =
@@ -37,7 +37,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
     id: session.id,
   });
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
-  const highlights = collectCatalogLabels(session).slice(0, 2);
+  const highlights = collectCatalogLabels(session, 1);
   const openDate = isOpenDate(session);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(session.startsAt);
   const nextSessionLabel = openDate ? null : formatEventNextSession(session);
@@ -52,7 +52,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
   const pinPrimary = pinLines.primary || locationLabel;
   const durationLabel = extractDurationLabel(session.tags);
   const ageLabel = session.ageLimit?.trim() || null;
-  const priceFooterLabel = formatMoneyRange(session.priceFrom, session.priceTo);
+  const priceFooterLabel = formatPriceFrom(session.priceFrom);
   const venueHref = sessionVenueHref(session);
 
   return (
@@ -176,7 +176,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
             className="relative z-[2] inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-ui-xs font-semibold text-white transition hover:bg-primary-700 sm:text-ui-sm"
           >
             <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} />
-            Подробнее
+            Купить билет
           </Link>
         </div>
       </div>

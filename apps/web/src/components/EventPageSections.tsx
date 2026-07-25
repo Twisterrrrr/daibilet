@@ -3,7 +3,7 @@ import { Clock, HelpCircle, MapPin, RotateCcw, ShieldCheck, Ticket, Users } from
 
 import type { PublicEventDto } from '@daibilet/contracts/public';
 
-import { extractDurationLabel } from '@/lib/catalog-labels';
+import { collectCatalogLabels, extractDurationLabel } from '@/lib/catalog-labels';
 import { formatEventDescriptionHtml } from '@/lib/event-description-format';
 import { formatAgeLimit } from '@/lib/event-page-utils';
 import { uniqueEventTagLabels } from '@/lib/event-tag-labels';
@@ -56,10 +56,17 @@ export function EventQuickInfo({ event }: { event: PublicEventDto }) {
 }
 
 export function EventTags({ event }: { event: PublicEventDto }) {
-  const rawTags = Array.isArray(event.tags) ? event.tags : [];
-  const rawSubcategories = Array.isArray(event.subcategories) ? event.subcategories : [];
-  // API often mirrors genre labels into both tags and subcategories — merge without dupes.
-  const tags = uniqueEventTagLabels([...rawTags, ...rawSubcategories], 12);
+  const labels = collectCatalogLabels(
+    {
+      category: event.category,
+      subcategories: Array.isArray(event.subcategories) ? event.subcategories : [],
+      tags: Array.isArray(event.tags) ? event.tags : [],
+      title: event.title,
+      venue: event.venue,
+    },
+    6,
+  );
+  const tags = uniqueEventTagLabels(labels, 6);
   if (!tags.length) return null;
 
   return (
@@ -92,8 +99,7 @@ export function EventTrustStrip() {
     <section>
       <h2 className="text-sm font-semibold uppercase tracking-wider text-graphite-muted">Покупка и поддержка</h2>
       <p className="mt-3 text-sm leading-6 text-graphite-muted">
-        Билет оформляется через систему организатора. На Дайбилет - сравнение предложений, карточка события и помощь по
-        заказу.
+        Билет оформляется онлайн. На Дайбилет - сравнение предложений, карточка события и помощь по покупке.
       </p>
       <ul className="mt-5 grid gap-2 sm:grid-cols-2">
         {TRUST_LINKS.map(({ href, label, icon: Icon }) => (

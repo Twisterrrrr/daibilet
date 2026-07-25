@@ -489,7 +489,7 @@ function CityHeroStrip({
   const cityIn = cityInPrepositional(city);
   const brief =
     guide?.brief ||
-    `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат, дату и площадку без долгого поиска по разным билетным системам.`;
+    `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат и дату - и покупайте билет онлайн на Дайбилете.`;
 
   return (
     <div id="top">
@@ -1400,7 +1400,7 @@ function CitySeoTextSection({
           >
             {buildCityHubSeoPhrase(cityName)}
           </h2>
-          <p className={`mt-4 text-sm leading-7 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>{text}</p>
+          <p className={`mt-3 max-w-2xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>{text}</p>
         </div>
       </div>
     </section>

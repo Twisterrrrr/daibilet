@@ -6,7 +6,7 @@ export const HOME_SEO_TITLE =
 
 /** Static fallback (layout / build without destinations) - no hardcoded city counts. */
 export const HOME_SEO_DESCRIPTION_FALLBACK =
-  'Афиша событий, экскурсий и мероприятий в городах России. Билеты онлайн.';
+  'Купите билеты на экскурсии, музеи и мероприятия онлайн. Афиша городов России на Дайбилет.';
 
 /** Fixed hubs + display names for home meta description. */
 const HOME_SEO_CITIES = [
@@ -33,7 +33,7 @@ export function pageTitle(title: string): string {
 
 /**
  * Home meta description with live city event counts.
- * Template: «Афиша … России. Билеты онлайн: Москва - {n}, Санкт-Петербург - {m}, …»
+ * Lead with purchase CTA - never with middleman / widget disclaimer.
  */
 export function buildHomeSeoDescription(destinations: DestinationLike[]): string {
   const bySlug = new Map(
@@ -52,7 +52,7 @@ export function buildHomeSeoDescription(destinations: DestinationLike[]): string
 
   if (!parts.length) return HOME_SEO_DESCRIPTION_FALLBACK;
 
-  return `Афиша событий, экскурсий и мероприятий в городах России. Билеты онлайн: ${parts.join(', ')}`;
+  return `Купите билеты на экскурсии, музеи и мероприятия онлайн: ${parts.join(', ')}. Афиша городов России на Дайбилет.`;
 }
 
 export function absoluteUrl(pathname: string): string {

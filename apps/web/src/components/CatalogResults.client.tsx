@@ -7,7 +7,7 @@ import { EventCard } from '@/components/EventCard';
 import { EventCardHorizontal } from '@/components/EventCardHorizontal';
 import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
 import {
-  formatMoneyRange,
+  formatPriceFrom,
   formatNumber,
 } from '@/lib/format';
 import { formatShowcaseSessionDate } from '@/lib/event-card-meta';
@@ -20,15 +20,24 @@ type CatalogResultsProps = {
   items: PublicCatalogListItemDto[];
   viewMode: CatalogViewMode;
   onViewModeChange: (mode: CatalogViewMode) => void;
+  clearHref?: string;
 };
 
-export function CatalogResults({ items, viewMode, onViewModeChange }: CatalogResultsProps) {
+export function CatalogResults({ items, viewMode, onViewModeChange, clearHref = '/events' }: CatalogResultsProps) {
 
   if (!items.length) {
     return (
       <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
         <p className="text-lg font-semibold text-slate-800">Ничего не найдено</p>
-        <p className="mt-2 text-sm text-slate-500">Попробуйте изменить фильтры или сбросить поиск.</p>
+        <p className="mt-2 text-sm text-slate-500">
+          По этим фильтрам событий нет. Сбросьте поиск или выберите другую дату и категорию.
+        </p>
+        <Link
+          href={clearHref}
+          className="mt-5 inline-flex h-10 items-center justify-center rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700"
+        >
+          Сбросить фильтры
+        </Link>
       </div>
     );
   }
@@ -163,7 +172,7 @@ function CatalogTable({ items }: { items: PublicCatalogListItemDto[] }) {
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 align-top text-slate-700">{formatShowcaseSessionDate(session)}</td>
                 <td className="whitespace-nowrap px-4 py-3 align-top font-semibold text-slate-950">
-                  {formatMoneyRange(session.priceFrom, session.priceTo)}
+                  {formatPriceFrom(session.priceFrom)}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 align-top">
                   <span className="inline-flex items-center gap-1 text-slate-700">

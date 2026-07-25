@@ -259,6 +259,7 @@ export function CatalogAdvancedFiltersPanel({
                   { label: 'Сегодня', days: 0 },
                   { label: 'Завтра', days: 1 },
                   { label: 'Неделя', days: 7 },
+                  { label: '2 недели', days: 14 },
                   { label: 'Месяц', days: 30 },
                 ].map((item) => (
                   <button

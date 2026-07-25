@@ -8,7 +8,7 @@ export function formatMoneyRange(from?: number | null, to?: number | null): stri
   if (!from || from < MIN_DISPLAY_PRICE_RUB) return 'Цена уточняется';
   const min = Math.round(from);
   const max = to && to >= MIN_DISPLAY_PRICE_RUB ? Math.round(to) : min;
-  if (max > min) return `${formatNumber(min)} – ${formatNumber(max)} ₽`;
+  if (max > min) return `${formatNumber(min)} - ${formatNumber(max)} ₽`;
   return `${formatNumber(min)} ₽`;
 }
 

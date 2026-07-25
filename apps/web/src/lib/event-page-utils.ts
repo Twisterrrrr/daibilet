@@ -32,11 +32,13 @@ export function isFlexibleScheduleSession(session: {
 }): boolean {
   const kind = String(session.kind || '').toUpperCase();
   if (kind === 'OPEN_DATE') return true;
-  if (!session.startsAt) return true;
   const sourceStatus = String(session.sourceStatus || '').toLowerCase();
   if (sourceStatus === 'widget' || sourceStatus === 'open_date') return true;
   const label = `${session.dateLabel || ''} ${session.timeLabel || ''}`.toLowerCase();
-  return label.includes('виджет') || label.includes('выберите время') || label.includes('при покупке');
+  if (label.includes('открыт')) return true;
+  if (label.includes('виджет') || label.includes('выберите время') || label.includes('при покупке')) return true;
+  if (!session.startsAt) return true;
+  return false;
 }
 
 export function formatVacantSeats(count: number): string {
@@ -119,7 +121,14 @@ export function formatBuyCardPrice(range: TicketPriceRange): string {
   const min = Math.round(range.min);
   const max = Math.round(range.max);
   if (min === max) return `${formatNumber(min)} ₽`;
-  return `${formatNumber(min)} - ${formatNumber(max)} ₽`;
+  return `от ${formatNumber(min)} ₽`;
+}
+
+export function formatBuyCardPriceHint(range: TicketPriceRange): string | null {
+  const min = Math.round(range.min);
+  const max = Math.round(range.max);
+  if (min === max) return null;
+  return `до ${formatNumber(max)} ₽ в зависимости от тарифа`;
 }
 
 /** Hero CTA intentionally advertises only the minimum available price. */

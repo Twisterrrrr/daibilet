@@ -32,6 +32,20 @@
 
 ---
 
+## UX conversion fixes (2026-07-25)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.1 | City hub: CTA без «билетного оператора» + короткий SEO-блок | Критический | ✅ |
+| UX.2 | `/events`: clamp page, conditional facets, empty-state reset | Критический | ✅ |
+| UX.3 | `/events`: сквозной date picker + preset «2 недели» | Высокий | ✅ |
+| UX.4 | Карточки: теги без площадки/судна; CTA «Купить билет»; цена «от» | Высокий | ✅ |
+| UX.5 | Event detail: шаги покупки, open-date UX, тарифы/hint цены | Критический | ✅ |
+| UX.6 | Landing SEO copy без «у оператора» (`seo-listing-texts`) | Средний | ⏳ |
+| UX.7 | Home SERP: meta «Купите билеты» + nosnippet partner/footer; help FAQ soften | Критический | ✅ |
+
+---
+
 ## SEO duplicate titles (2026-07-24)
 
 | # | Задача | Приоритет | Статус |

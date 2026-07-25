@@ -52,7 +52,7 @@ export function SiteFooter({ destinations }: SiteFooterProps) {
             <Link href="/" className="inline-flex">
               <DaibiletLogo textClassName="text-lg" />
             </Link>
-            <p className="mt-4 max-w-xs text-sm leading-6 text-graphite-muted">
+            <p className="mt-4 max-w-xs text-sm leading-6 text-graphite-muted" data-nosnippet>
               Билеты на экскурсии, музеи и мероприятия по городам России.
               Покупайте онлайн, посещайте лучшее.
             </p>

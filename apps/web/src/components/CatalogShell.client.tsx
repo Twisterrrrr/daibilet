@@ -169,6 +169,20 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     [router, urlSearchParams],
   );
 
+  useEffect(() => {
+    if (!catalog || loading) return;
+    const limit = Math.max(catalog.limit || CATALOG_PAGE_SIZE_DEFAULT, 1);
+    const totalPages = Math.max(1, Math.ceil(catalog.total / limit));
+    if (query.page <= totalPages) return;
+    router.replace(
+      buildCatalogHref({
+        ...filterValues,
+        page: totalPages > 1 ? totalPages : undefined,
+      }),
+      { scroll: false },
+    );
+  }, [catalog, loading, query.page, filterValues, router]);
+
   const facets = catalog?.facets ?? {
     cities: [],
     categories: [],
@@ -281,12 +295,20 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           items={catalog?.items ?? []}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
+          clearHref={buildCatalogHref({
+            city: filterValues.city,
+            sort: filterValues.sort,
+            limit: filterValues.limit,
+          })}
         />
       )}
 
       {catalog ? (
         <CatalogPaginationLinks
-          page={query.page}
+          page={Math.min(
+            query.page,
+            Math.max(1, Math.ceil((catalog.total || 0) / Math.max(catalog.limit || CATALOG_PAGE_SIZE_DEFAULT, 1))),
+          )}
           total={catalog.total}
           limit={catalog.limit}
           searchParams={searchParamsRecord}

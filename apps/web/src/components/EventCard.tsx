@@ -32,7 +32,7 @@ import {
   resolveEventCardLocationLabel,
   resolveEventCardPinLines,
 } from '@/lib/event-location';
-import { formatMoneyRange } from '@/lib/format';
+import { formatPriceFrom } from '@/lib/format';
 import { eventHref } from '@/lib/routes';
 
 const SLOT_CHIP_CLASS =
@@ -79,7 +79,7 @@ export function EventCard({
   });
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const destinationLabel = resolveEventCardDestinationLabel(session);
-  const highlights = collectCatalogLabels(session, 2);
+  const highlights = collectCatalogLabels(session, 1);
   const openDate = isOpenDate(session);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(session.startsAt);
   const nextSessionLabel = openDate ? null : formatEventNextSession(session);
@@ -91,7 +91,7 @@ export function EventCard({
   const durationLabel = extractDurationLabel(session.tags);
   const ageLabel = session.ageLimit?.trim() || null;
   const showSoonBadge = !hasPrice && !openDate && !departingSoonMinutes;
-  const priceFooterLabel = formatMoneyRange(session.priceFrom, session.priceTo);
+  const priceFooterLabel = formatPriceFrom(session.priceFrom);
   const purchase = useCatalogPurchase(session);
   // Catalog list: no hidden widget DOM. Purchase UX lives on event page / landing CTA.
   const showPurchaseWidgets = landingActions && !suppressPurchaseAnchors && purchase.purchaseEnabled;
@@ -238,7 +238,7 @@ export function EventCard({
               <span className="text-ui-sm font-bold text-graphite sm:text-base">{priceFooterLabel}</span>
               <Link href={href} className={DETAILS_LINK_CLASS}>
                 <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} />
-                Подробнее
+                Купить билет
               </Link>
             </>
           )}
@@ -352,7 +352,7 @@ function ShowcaseEventCard({
           <span className="text-ui-sm font-bold text-graphite">{priceLabel}</span>
           <span className="inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-ui-xs font-semibold text-white sm:text-ui-sm">
             <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} />
-            Подробнее
+            Купить билет
           </span>
         </div>
       </div>

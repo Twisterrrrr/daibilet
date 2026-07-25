@@ -3,7 +3,6 @@ import type { PublicCityPageDto } from '@daibilet/contracts/public';
 import { cityToGenitive, inCityPrepositional } from '@/lib/city-declension';
 import { formatNumber, formatPriceFrom } from '@/lib/format';
 import { resolveCityBrief, resolveCityInfo } from '@/lib/cityInfo';
-import { buildCityHubSeoPhrase } from '@/lib/city-hub-seo';
 import { evaluateCityIndexability } from '@/lib/hub-indexability';
 
 export type CityFaqItem = {
@@ -36,8 +35,8 @@ export function buildCityFaqItems(payload: PublicCityPageDto): CityFaqItem[] {
 }
 
 /**
- * Видимый SEO-текст внизу хаба (`#seo`).
- * Brief + ключевая фраза (как в title) + живые счётчики — не только meta.
+ * Короткий human-first блок внизу хаба (`#seo`).
+ * Без «прослойки к оператору» и без SEO-простыни: brief + счётчики + CTA покупки.
  */
 export function buildCitySeoText(payload: PublicCityPageDto): string | null {
   const decision = evaluateCityIndexability({
@@ -55,16 +54,13 @@ export function buildCitySeoText(payload: PublicCityPageDto): string | null {
   const events = payload.stats?.events ?? city.events ?? 0;
   const venues = payload.stats?.venues ?? city.venues ?? 0;
   const priceFrom = payload.stats?.priceFrom;
-  const phrase = buildCityHubSeoPhrase(city.name);
 
   const parts = [
-    brief,
-    `${phrase}: события, концерты, музеи, экскурсии и шоу ${inCity}. На Дайбилете можно сравнить даты и площадки и купить билеты онлайн.`,
+    brief || `Афиша и билеты ${inCity}: экскурсии, музеи, концерты и шоу на одной витрине.`,
     events > 0
-      ? `В афише ${cityGen} на Дайбилете — ${formatNumber(events)} ${pluralEventsWord(events)}${venues > 0 ? ` и ${formatNumber(venues)} ${pluralVenuesWord(venues)}` : ''} ${inCity}.`
+      ? `Сейчас в каталоге ${cityGen} - ${formatNumber(events)} ${pluralEventsWord(events)}${venues > 0 ? ` на ${formatNumber(venues)} ${pluralVenuesWord(venues)}` : ''}.`
       : null,
-    priceFrom && priceFrom > 0 ? `Билеты ${formatPriceFrom(priceFrom)}.` : null,
-    'Сравнивайте даты и площадки, затем переходите к оплате у билетного оператора.',
+    priceFrom && priceFrom > 0 ? `Билеты ${formatPriceFrom(priceFrom)}. Купите билет онлайн за пару кликов.` : 'Выберите событие и купите билет онлайн.',
   ].filter(Boolean);
 
   return parts.join(' ');

@@ -266,5 +266,5 @@ export function isFlexibleScheduleSession(session: {
   const sourceStatus = String(session.sourceStatus || '').toLowerCase();
   if (sourceStatus === 'widget' || sourceStatus === 'open_date') return true;
   const label = `${session.dateLabel || ''} ${session.timeLabel || ''}`.toLowerCase();
-  return label.includes('виджет') || label.includes('выберите время') || label.includes('при покупке');
+  return label.includes('виджет') || label.includes('выберите время') || label.includes('при покупке') || label.includes('открыт');
 }

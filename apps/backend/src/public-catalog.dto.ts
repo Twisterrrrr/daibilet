@@ -68,22 +68,25 @@ export async function buildPublicCatalogDto(query: PublicCatalogQuery): Promise<
   const byIds = Boolean(query.ids?.length);
   // Favorites / ids lookup: allow sessions without cover; normal catalog stays cover-gated.
   const sourceSessions = byIds ? sessions : sessions.filter(sessionHasCoverImage);
-  const facets = buildCatalogFacets(byIds ? sessions.filter(sessionHasCoverImage) : sourceSessions);
   const filtered = sourceSessions.filter((session) => matchesCatalogQuery(session, query));
   const sorted = sortCatalogSessions(filtered, query.sort || 'time');
   const defaultLimit = byIds ? Math.min(Math.max(query.ids!.length, 1), CATALOG_PAGE_SIZE_MAX) : CATALOG_PAGE_SIZE_DEFAULT;
   const limit = clampNumber(query.limit, 1, CATALOG_PAGE_SIZE_MAX, defaultLimit);
-  const offset = clampNumber(query.offset, 0, 100000, 0);
+  const total = sorted.length;
+  const maxOffset = total > 0 ? Math.floor((total - 1) / limit) * limit : 0;
+  const offset = Math.min(clampNumber(query.offset, 0, 100000, 0), maxOffset);
   const pageRows = sorted.slice(offset, offset + limit);
   const hydratedPage = await hydrateCatalogUpcomingSlots(pageRows, LIST_SLOT_PREVIEW_LIMIT);
   const items = hydratedPage.map(toPublicCatalogListItem);
+  // Facets are conditional: each dimension counts against sibling filters (not the full catalog).
+  const facets = buildConditionalCatalogFacets(sourceSessions, query);
 
   return {
     generatedAt: new Date().toISOString(),
-    total: sorted.length,
+    total,
     offset,
     limit,
-    hasMore: offset + items.length < sorted.length,
+    hasMore: offset + items.length < total,
     items,
     facets,
   };
@@ -482,29 +485,54 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
   `);
 }
 
-function matchesCatalogQuery(session: PublicSessionDto, query: PublicCatalogQuery): boolean {
+function matchesCatalogQuery(
+  session: PublicSessionDto,
+  query: PublicCatalogQuery,
+  ignore: Partial<Record<'city' | 'category' | 'landing' | 'date' | 'price' | 'age' | 'q', boolean>> = {},
+): boolean {
   if (query.ids?.length) {
     const keys = new Set(query.ids);
     if (!keys.has(session.id) && !(session.groupKey && keys.has(session.groupKey))) return false;
   }
   const destination = query.destination;
   if (destination && destination !== 'all' && session.destination !== destination) return false;
-  if (query.city && query.city !== 'all' && session.city !== query.city && session.destination !== query.city) return false;
   if (
+    !ignore.city &&
+    query.city &&
+    query.city !== 'all' &&
+    session.city !== query.city &&
+    session.destination !== query.city
+  ) {
+    return false;
+  }
+  if (
+    !ignore.category &&
     query.category &&
     query.category !== 'all' &&
     session.category !== query.category &&
     !pickCatalogSubcategories(session).includes(query.category)
-  ) return false;
+  ) {
+    return false;
+  }
   if (query.tag && query.tag !== 'all' && !session.tags.includes(query.tag)) return false;
-  if (query.landing && query.landing !== 'all' && !(session.landingSlugs || []).includes(query.landing)) return false;
-  if (query.date && query.date !== 'all' && !matchesCatalogDate(session, query.date)) return false;
+  if (
+    !ignore.landing &&
+    query.landing &&
+    query.landing !== 'all' &&
+    !(session.landingSlugs || []).includes(query.landing)
+  ) {
+    return false;
+  }
+  if (!ignore.date && query.date && query.date !== 'all' && !matchesCatalogDate(session, query.date)) return false;
 
   const maxPrice = query.maxPrice ?? query.priceMax;
-  if (!matchesCatalogPrice(session, query.minPrice, maxPrice)) return false;
-  if (query.ageMax != null && query.ageMax >= 0 && !matchesCatalogAgeLimit(session, query.ageMax)) return false;
-  if (!matchesDateRange(session.startsAt, query.from, query.to, session)) return false;
+  if (!ignore.price && !matchesCatalogPrice(session, query.minPrice, maxPrice)) return false;
+  if (!ignore.age && query.ageMax != null && query.ageMax >= 0 && !matchesCatalogAgeLimit(session, query.ageMax)) {
+    return false;
+  }
+  if (!ignore.date && !matchesDateRange(session.startsAt, query.from, query.to, session)) return false;
 
+  if (ignore.q) return true;
   const search = query.q?.trim().toLowerCase();
   if (!search) return true;
   return [session.title, session.city, session.destination, session.venue, session.category, ...(session.subcategories || []), ...session.tags]
@@ -514,24 +542,39 @@ function matchesCatalogQuery(session: PublicSessionDto, query: PublicCatalogQuer
     .includes(search);
 }
 
-function buildCatalogFacets(sessions: PublicSessionDto[]): PublicCatalogDto['facets'] {
+function buildConditionalCatalogFacets(
+  sessions: PublicSessionDto[],
+  query: PublicCatalogQuery,
+): PublicCatalogDto['facets'] {
+  const forCities = sessions.filter((session) => matchesCatalogQuery(session, query, { city: true }));
+  const forCategories = sessions.filter((session) => matchesCatalogQuery(session, query, { category: true }));
+  const forLandings = sessions.filter((session) => matchesCatalogQuery(session, query, { landing: true }));
+  const forPrice = sessions.filter((session) => matchesCatalogQuery(session, query, { price: true }));
+  const forSubcategories = forCategories;
+
   return {
-    cities: countCatalogValues(sessions.map((session) => session.destination || session.city))
+    cities: countCatalogValues(forCities.map((session) => session.destination || session.city))
       .filter(([name, events]) => name !== 'Не указан' && events >= 1)
       .map(([name, events]) => ({ name, events })),
-    categories: countCatalogValues(sessions.map((session) => session.category))
+    categories: countCatalogValues(forCategories.map((session) => session.category))
+      .filter(([, events]) => events >= 1)
       .map(([name, events]) => ({ name, events })),
-    subcategories: countCatalogValues(sessions.flatMap((session) => pickCatalogSubcategories(session, 8)))
-      .filter(([name]) => name.length <= 32)
+    subcategories: countCatalogValues(forSubcategories.flatMap((session) => pickCatalogSubcategories(session, 8)))
+      .filter(([name, events]) => name.length <= 32 && events >= 1)
       .slice(0, 24)
       .map(([name, events]) => ({ name, events })),
-    landings: countCatalogValues(sessions.flatMap((session) => session.landingSlugs || []))
+    landings: countCatalogValues(forLandings.flatMap((session) => session.landingSlugs || []))
+      .filter(([, events]) => events >= 1)
       .map(([slug, events]) => {
         const rule = findLandingRule(slug);
         return { slug, title: rule?.title || humanizeSlug(slug), events };
       }),
-    priceSteps: buildCatalogPriceSteps(sessions),
+    priceSteps: buildCatalogPriceSteps(forPrice),
   };
+}
+
+function buildCatalogFacets(sessions: PublicSessionDto[]): PublicCatalogDto['facets'] {
+  return buildConditionalCatalogFacets(sessions, {});
 }
 
 function sortCatalogSessions(sessions: PublicSessionDto[], sort: NonNullable<PublicCatalogQuery['sort']>): PublicSessionDto[] {

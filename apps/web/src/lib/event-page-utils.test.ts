@@ -32,7 +32,7 @@ test('hero CTA shows only the lowest ticket price', () => {
 
   assert.deepEqual(range, { min: 1_000, max: 3_000 });
   assert.equal(formatHeroBuyButtonPrice(range!), 'от 1 000 ₽');
-  assert.equal(formatBuyCardPrice(range!), '1 000 - 3 000 ₽');
+  assert.equal(formatBuyCardPrice(range!), 'от 1 000 ₽');
 });
 
 test('single exact ticket price has no range in buy card', () => {
