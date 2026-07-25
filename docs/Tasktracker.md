@@ -27,7 +27,7 @@
 | CU.10 | Blog surfaces + search overlay polish | Средний | ✅ |
 | CU.11 | Micro-animations (hover translate/scale) | Низкий | ✅ |
 | CU.12 | HorizontalScroll / ScrollRail: prev/next на md+ для home rails и `/podborki` | Высокий | ✅ `fac6863` (prod @`cf9ccfd`) |
-| CU.13 | Home/podborki: на lg+ сетка всех превью (format 4 / thematic 3), без обрезки карусели; фото fallback | Высокий | 🔄 |
+| CU.13 | Home/podborki: на lg+ сетка всех превью (format 4 / thematic 3), без обрезки карусели; фото fallback | Высокий | ✅ `5d11482` |
 | CU.2b | Self-host через next/font (Manrope+Inter+Source Serif) | Средний | ✅ |
 
 ---

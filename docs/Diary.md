@@ -14,6 +14,7 @@
 ### Проблемы
 
 - Параллельный search-bar агент - не откатывать. `apps/web/public/images` gitignored, sync на build.
+- **Prod @`5d11482`:** deploy-prod-next OK; `/` 200; HTML `lg:grid-cols-4` + `lg:grid-cols-3`; 4× format + promo JPG 200; `home/` sync 10 файлов.
 
 ---
 
