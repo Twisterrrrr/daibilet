@@ -212,7 +212,7 @@ Daily scan saleable public catalog texts (`title`/`description` + override) на
 
 - Команда: `pnpm audit:listings` (`scripts/audit-listings.js`; `--dry-run`).
 - Cron: `deploy/cron/audit-listings.sh` → `0 4 * * *` (см. `deploy/cron/README.md`). Без `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` — warn + skip.
-- Словарь: `apps/backend/src/listing-garbage-config.ts` (`скидк*` намеренно не ловим).
+- Словарь: `apps/backend/src/listing-garbage-config.ts` (`скидк*` нет; CAPS soft ≥70% upper в title; HTML-теги только в title).
 
 ---
 
