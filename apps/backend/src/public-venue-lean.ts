@@ -21,6 +21,9 @@ export type LeanPublicVenueRow = {
   address: string | null;
   latitude: number | null;
   longitude: number | null;
+  metroStation: string | null;
+  wayToFind: string | null;
+  parkingInfo: string | null;
   kind: VenueKind;
   proposedKind: string;
   pageStatus: string;
@@ -40,6 +43,9 @@ const venueListSelect = {
   address: true,
   latitude: true,
   longitude: true,
+  metroStation: true,
+  wayToFind: true,
+  parkingInfo: true,
   kind: true,
   pageStatus: true,
   city: { select: { title: true } },
@@ -98,6 +104,9 @@ function mapLeanVenueRow(row: VenueListRecord, leanText: boolean): LeanPublicVen
     address: row.address,
     latitude: row.latitude,
     longitude: row.longitude,
+    metroStation: row.metroStation,
+    wayToFind: leanText ? null : row.wayToFind,
+    parkingInfo: row.parkingInfo,
     kind,
     proposedKind: String(kind || 'OTHER').toLowerCase(),
     pageStatus,
