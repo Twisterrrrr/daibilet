@@ -1,3 +1,21 @@
+## 2026-07-25 - /venues type chips + hero center align
+
+### Наблюдения
+
+- В hero `/venues` type chips (`flex-wrap justify-center`) последний чип «Клуб / ресторан (N)» уходил один на вторую строку.
+- Параллельно готов uncommitted home/centered-hero align в `HeroLayout` - объединили в один коммит.
+
+### Решения
+
+- `VenuesCatalogView`: `horizontal-snap-row` + `flex-nowrap` + `w-max min-w-full justify-center` - одна линия со скроллом при overflow, центрирование когда помещаются; чуть плотнее `px-4` / `h-10` / `max-w-5xl`.
+- `HeroLayout` centered: колонка `max-w-5xl items-center`; `HeroCopy` остаётся `max-w-3xl` + `text-balance` / tracking compensation для brand.
+
+### Проблемы
+
+- На очень узких экранах нужен swipe по ряду (ожидаемо); orphan-wrap снят.
+
+---
+
 ## 2026-07-25 - Launch Set ready
 
 ### Наблюдения

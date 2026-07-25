@@ -226,36 +226,38 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
         </div>
 
         {typeOptions.length ? (
-          <div className="mx-auto mt-4 flex max-w-4xl flex-wrap justify-center gap-2">
-            <button
-              type="button"
-              onClick={() => startTransition(() => setTypeFilter('all'))}
-              className={`inline-flex h-11 shrink-0 items-center rounded-full px-5 text-sm font-semibold transition ${
-                typeFilter === 'all'
-                  ? 'bg-white text-slate-900'
-                  : 'bg-white/15 text-white ring-1 ring-white/25 hover:bg-white/25'
-              }`}
-            >
-              Все места
-            </button>
-            {typeOptions.map((option) => {
-              const active = typeFilter === option.value;
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => startTransition(() => setTypeFilter(active ? 'all' : option.value))}
-                  className={`inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full px-5 text-sm font-semibold transition ${
-                    active
-                      ? 'bg-white text-slate-900'
-                      : 'bg-white/15 text-white ring-1 ring-white/25 hover:bg-white/25'
-                  }`}
-                >
-                  {option.label}
-                  <span className="text-xs opacity-75">({option.count})</span>
-                </button>
-              );
-            })}
+          <div className="horizontal-snap-row mx-auto mt-4 max-w-5xl touch-pan-x pb-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="flex w-max min-w-full flex-nowrap justify-center gap-1.5 px-1">
+              <button
+                type="button"
+                onClick={() => startTransition(() => setTypeFilter('all'))}
+                className={`inline-flex h-10 shrink-0 snap-start items-center rounded-full px-4 text-sm font-semibold transition ${
+                  typeFilter === 'all'
+                    ? 'bg-white text-slate-900'
+                    : 'bg-white/15 text-white ring-1 ring-white/25 hover:bg-white/25'
+                }`}
+              >
+                Все места
+              </button>
+              {typeOptions.map((option) => {
+                const active = typeFilter === option.value;
+                return (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => startTransition(() => setTypeFilter(active ? 'all' : option.value))}
+                    className={`inline-flex h-10 shrink-0 snap-start items-center gap-1 rounded-full px-4 text-sm font-semibold transition ${
+                      active
+                        ? 'bg-white text-slate-900'
+                        : 'bg-white/15 text-white ring-1 ring-white/25 hover:bg-white/25'
+                    }`}
+                  >
+                    {option.label}
+                    <span className="text-xs opacity-75">({option.count})</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         ) : null}
       </HeroLayout>
