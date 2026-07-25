@@ -9,8 +9,8 @@
 
 - Конфиг `apps/backend/src/listing-garbage-config.ts` + audit `listing-garbage-audit.ts` + `telegram.ts` (API `https://api.telegram.org/bot{token}/sendMessage`).
 - CLI `scripts/audit-listings.js` / `pnpm audit:listings`; фильтр ≈ saleable public catalog (status, schedule, purchaseReady, price≥100); slim select id/title/description/slug (+ override).
-- Mojibake: `\uFFFD` + UTF-8-as-Latin1 `[ÐÑ][\u0080-\u00FF]`; `скидк*` **пропущен** (документ).
-- Cron wrapper `deploy/cron/audit-listings.sh` + README; установка crontab на prod отдельно (⏳), не в deploy-prod-next.
+- Mojibake: `\uFFFD` + UTF-8-as-Latin1 `[ÐÑ][\u0080-\u00FF]`; `скидк*` **пропущен**; CAPS - soft (≥70% upper Cyrillic в title); HTML-теги только в title (description CMS tags игнор).
+- Cron wrapper `deploy/cron/audit-listings.sh` + README; установка crontab на prod отдельно (⏳), не в deploy-prod-next. Telegram env на prod пока **missing**.
 
 ### Проблемы
 

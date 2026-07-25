@@ -172,8 +172,10 @@ export function scanListingRows(
   const findings: ListingAuditFinding[] = [];
 
   for (const event of events) {
-    const textToCheck = `${event.title || ''}\n${event.description || ''}`;
-    const hits = findListingGarbageHits(textToCheck);
+    const hits = findListingGarbageHits({
+      title: event.title,
+      description: event.description,
+    });
     if (hits.length === 0) continue;
     findings.push({
       id: event.id,

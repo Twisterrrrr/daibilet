@@ -3,6 +3,8 @@ import test from 'node:test';
 
 import {
   findListingGarbageHits,
+  findListingGarbageHitsInText,
+  hasCapsLockSpam,
   STOP_WORDS_REGEXP,
   textHasListingGarbage,
 } from './listing-garbage-config.js';
@@ -12,7 +14,7 @@ import {
 } from './listing-garbage-audit.js';
 import { escapeTelegramHtml } from './telegram.js';
 
-test('STOP_WORDS_REGEXP covers CTA / HTML / CAPS / encoding (not empty /[]/)', () => {
+test('STOP_WORDS_REGEXP covers CTA / HTML / encoding (not empty /[]/)', () => {
   assert.ok(STOP_WORDS_REGEXP.length >= 6);
   for (const re of STOP_WORDS_REGEXP) {
     assert.ok(re instanceof RegExp);
@@ -22,27 +24,63 @@ test('STOP_WORDS_REGEXP covers CTA / HTML / CAPS / encoding (not empty /[]/)', (
 });
 
 test('findListingGarbageHits catches CTA offsite (partner e/ё)', () => {
-  const a = findListingGarbageHits('Билеты на сайте партнера TicketCloud');
+  const a = findListingGarbageHitsInText('Билеты на сайте партнера TicketCloud');
   assert.ok(a.some((h) => h.ruleId === 'cta_partner_site'));
 
-  const b = findListingGarbageHits('Смотрите на сайте партнёра');
+  const b = findListingGarbageHitsInText('Смотрите на сайте партнёра');
   assert.ok(b.some((h) => h.ruleId === 'cta_partner_site'));
 
   assert.ok(textHasListingGarbage('Купите билет прямо сейчас'));
   assert.ok(textHasListingGarbage('Нажмите сюда для оплаты'));
 });
 
-test('findListingGarbageHits catches HTML parasites and CAPS', () => {
-  assert.ok(findListingGarbageHits('Цена&nbsp;от 500').some((h) => h.reason === 'html_parasite'));
-  assert.ok(findListingGarbageHits('Текст <br> дальше').some((h) => h.reason === 'html_parasite'));
-  assert.ok(findListingGarbageHits('ВНИМАНИЕ акция').some((h) => h.reason === 'caps_lock'));
-  assert.equal(findListingGarbageHits('Москва').some((h) => h.reason === 'caps_lock'), false);
+test('HTML tags only in title; entities in title or description', () => {
+  assert.ok(
+    findListingGarbageHits({ title: 'Цена&nbsp;от 500', description: null }).some(
+      (h) => h.reason === 'html_parasite',
+    ),
+  );
+  assert.ok(
+    findListingGarbageHits({ title: 'Круиз <br> ночной', description: null }).some(
+      (h) => h.ruleId === 'html_tag_in_title',
+    ),
+  );
+  // Partner CMS HTML in description is expected - do not alert on <p>/<br>
+  assert.equal(
+    findListingGarbageHits({
+      title: 'Обычный круиз',
+      description: '<p>Отправление в 19:00</p><br>На борту ужин',
+    }).length,
+    0,
+  );
+  assert.ok(
+    findListingGarbageHits({
+      title: 'Обычный круиз',
+      description: 'Цена&nbsp;от 500',
+    }).some((h) => h.ruleId === 'html_entity'),
+  );
+});
+
+test('CAPS: soft shout on title only, not single shouted word', () => {
+  assert.equal(hasCapsLockSpam('ВНИМАНИЕ акция на билеты сегодня вечером'), false);
+  assert.equal(hasCapsLockSpam('Москва'), false);
+  assert.ok(hasCapsLockSpam('ВЕЧЕРНИЙ МУЗЫКАЛЬНЫЙ КРУИЗ НА ТЕПЛОХОДЕ С ДИ ДЖЕЕМ'));
+  assert.equal(
+    findListingGarbageHits({
+      title: 'ЗОЛОТОЙ маршрут по Москве-реке вечером',
+      description: null,
+    }).some((h) => h.reason === 'caps_lock'),
+    false,
+  );
 });
 
 test('findListingGarbageHits catches replacement char and UTF-8-as-Latin1 mojibake', () => {
-  assert.ok(findListingGarbageHits('Сломанный\uFFFDтекст').some((h) => h.ruleId === 'replacement_char'));
-  // "п" as UTF-8 bytes C3 83? Actually "Ð¿" is classic mojibake for "п"
-  assert.ok(findListingGarbageHits('Ð¿Ñ€Ð¸Ð²ÐµÑ‚').some((h) => h.reason === 'broken_encoding'));
+  assert.ok(
+    findListingGarbageHitsInText('Сломанный\uFFFDтекст').some((h) => h.ruleId === 'replacement_char'),
+  );
+  assert.ok(
+    findListingGarbageHitsInText('Ð¿Ñ€Ð¸Ð²ÐµÑ‚').some((h) => h.reason === 'broken_encoding'),
+  );
 });
 
 test('скидк is intentionally NOT matched (too noisy)', () => {
@@ -54,7 +92,7 @@ test('scanListingRows + telegram message cap at 10', () => {
   const events = Array.from({ length: 12 }, (_, i) => ({
     id: `id-${i}`,
     slug: `slug-${i}`,
-    title: `ВНИМАНИЕ событие ${i}`,
+    title: 'ВЕЧЕРНИЙ МУЗЫКАЛЬНЫЙ КРУИЗ НА ТЕПЛОХОДЕ С ДИ ДЖЕЕМ ПО РЕКЕ',
     description: null,
   }));
   const findings = scanListingRows(events, 'https://daibilet.ru');
