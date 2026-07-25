@@ -1,3 +1,23 @@
+## 2026-07-25 - Fix empty `/progulki-po-krysham` (rooftops rule)
+
+### Наблюдения
+
+- Prod `GET /api/public/landings/rooftops` → `events:0`. DB: нет строки `Landing` slug=rooftops; `LandingMatch`=0.
+- В каталоге нет SPB roof-туров: все «крыша» в СПб - концерты/вечеринки (правильно excluded). Ближайший релевант: смотровые Москва-Сити + музейный «выход на крышу» (Красноярск).
+- Правило было `city: Санкт-Петербург` + title-only `экскурс|прогулк|тур` - национальная витрина оставалась пустой.
+
+### Решения
+
+- `landing-rules.ts` + runtime `dto.js`: убран city-lock; title-сигналы + `смотр|посещени`; required group `крыш|руф|смотр`; tags +`Смотровые площадки`; exclude +джаз/стендап.
+- City-URL `/progulki-po-krysham/saint-petersburg` по-прежнему только СПб (ALLOWLIST + filterSessionsByCity). Москва в sitemap city-path не добавляется.
+- SEO seed для национального rooftops; тесты расширены.
+
+### Проблемы
+
+- SPB city-landing может остаться thin/empty до появления реальных экскурсий по крышам Питера в sync.
+
+---
+
 ## 2026-07-25 - ScrollRail: prev/next для горизонтальных рядов
 
 ### Наблюдения

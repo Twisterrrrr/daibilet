@@ -79,9 +79,25 @@ test('keeps rooftop tours separate from concerts and parties', () => {
     city: 'Санкт-Петербург',
   }, rooftops), true);
   assert.equal(matchesLandingRule({
+    title: 'СМОТРОВАЯ ПЛОЩАДКА «ВЫШЕ ТОЛЬКО ЛЮБОВЬ». 92 ЭТАЖ',
+    category: 'Развлечения',
+    tags: ['Смотровые площадки'],
+    city: 'Москва',
+  }, rooftops), true);
+  assert.equal(matchesLandingRule({
+    title: 'Летняя экскурсия «Архитектура музея с выходом на крышу»',
+    category: 'Музеи и арт',
+    city: 'Красноярск',
+  }, rooftops), true);
+  assert.equal(matchesLandingRule({
     title: 'Концерт на крыше Невского',
     category: 'Музыка',
     city: 'Санкт-Петербург',
+  }, rooftops), false);
+  assert.equal(matchesLandingRule({
+    title: 'Панорамная экскурсия по центру на автобусе',
+    category: 'Экскурсии',
+    city: 'Москва',
   }, rooftops), false);
 });
 

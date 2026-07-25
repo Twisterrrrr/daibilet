@@ -107,7 +107,7 @@ packages/config   — shared tsconfig/eslint
 - **Meta (city hub Казань/Екб):** `Афиша {City_Род} [Год] - куда сходить…` (`city-hub-seo.ts`).
 - **Meta (event Казань/Екб):** `Билеты на {Title} в {City_Пр} - расписание, цены от {N} руб.` (+ graceful без цены) (`seo-event-meta.ts`).
 - **Thin listing:** &lt; 6 офферов → `noindex,follow`; при ровно 6–7 офферах - доп. карточки смежных категорий (`LandingThinRelatedCards`).
-- **Launch set:** утверждён TOP-15 category×city и intent URL. Для узких направлений действуют ограничения городов: `/progulki-po-krysham/saint-petersburg` и `/zagorodnye-ekskursii/saint-petersburg` не получают московских вариантов. Канонический weekend intent - `/podborki/na-vyhodnye`; старый `na-vyhodnyh` отдаёт permanent redirect.
+- **Launch set:** утверждён TOP-15 category×city и intent URL. Для узких направлений действуют ограничения городов: `/progulki-po-krysham/saint-petersburg` и `/zagorodnye-ekskursii/saint-petersburg` не получают московских вариантов (city-path allowlist). Национальный `/progulki-po-krysham` может показывать смотровые/выход на крышу из других городов, если SPB roof-туров в каталоге нет. Канонический weekend intent - `/podborki/na-vyhodnye`; старый `na-vyhodnyh` отдаёт permanent redirect.
 - **Контакты:** до подключения номера 8-800 публикуются email, ИНН и ОГРНИП на `/contacts` (и полные реквизиты на `/requisites`); в футере только email. Юридический адрес - на `/requisites`, без отдельного блока на contacts.
 - Обычный блог - вторичен относительно SEO-листингов до насыщения ядра посадок.
 
