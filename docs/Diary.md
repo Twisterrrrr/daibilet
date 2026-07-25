@@ -18,6 +18,25 @@
 
 ---
 
+## 2026-07-25 - CV.9e: hide empty metro UI
+
+### Наблюдения
+
+- Owner: `metroStation` nullable; пустое метро нельзя показывать как «🚇 -» / blank row с иконкой.
+- `LocationCard` всегда рисовал Train + city - ложный metro UI без `metroStation`.
+
+### Решения
+
+- `VenueLogisticsBlock.nonEmptyLogisticsText`: trim + hide `-`/`—`/`–`; metro/wayToFind/parking независимо.
+- `LocationCard` (web): Train только при non-empty `metroStation`; public LocationCard - убран fake Train.
+- DTO: `normalizeNullableString` для logistics в public venue/event payload; list item отдаёт `metroStation`.
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next).
+
+---
+
 ## 2026-07-25 - Home hero: multi-city rotator
 
 ### Наблюдения
