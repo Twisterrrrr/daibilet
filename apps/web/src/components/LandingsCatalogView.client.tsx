@@ -9,6 +9,7 @@ import { CityPicker } from '@/components/CityPicker.client';
 import { HeroLayout } from '@/components/HeroLayout';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
+import { ScrollRail } from '@/components/ScrollRail.client';
 import { buildCatalogPresetHref } from '@/lib/catalog-links';
 import { CATALOG_PRESETS } from '@/lib/catalog-presets';
 import { formatNumber, pluralEvents } from '@/lib/format';
@@ -254,17 +255,18 @@ export function LandingsCatalogView({
       <div className="container-page bg-slate-50 py-10 sm:py-12">
         <section>
           <h2 className="font-display text-xl font-bold text-slate-900">Быстрые подборки</h2>
-          <div className="mt-3 flex flex-nowrap gap-2 overflow-x-auto pb-0.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <ScrollRail className="mt-3" viewportClassName="flex flex-nowrap gap-2 pb-0.5" aria-label="Быстрые подборки">
             {CATALOG_PRESETS.map((preset) => (
               <Link
                 key={preset.slug}
                 href={buildCatalogPresetHref(preset.slug, citySlug !== 'all' ? citySlug : undefined)}
+                data-rail-item
                 className="inline-flex shrink-0 items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:border-primary/40 hover:bg-primary/5 hover:text-primary-700"
               >
                 {preset.label}
               </Link>
             ))}
-          </div>
+          </ScrollRail>
         </section>
 
         <section className="mt-12">
@@ -308,16 +310,21 @@ export function LandingsCatalogView({
                       {section.items.length}
                     </span>
                   </div>
-                  <div className="horizontal-snap-row -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:px-0">
+                  <ScrollRail
+                    className="-mx-4 sm:mx-0"
+                    viewportClassName="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:px-0"
+                    aria-label={section.title}
+                  >
                     {section.items.map((landing) => (
                       <div
                         key={landing.slug}
+                        data-rail-item
                         className="w-[min(18rem,78vw)] shrink-0 snap-start sm:w-[17.5rem]"
                       >
                         <LandingDirectionCard landing={landing} citySlug={citySlug} />
                       </div>
                     ))}
-                  </div>
+                  </ScrollRail>
                 </div>
               ))}
             </div>

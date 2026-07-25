@@ -5,6 +5,7 @@ import { ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { EventCard } from '@/components/EventCard';
+import { ScrollRail } from '@/components/ScrollRail.client';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 import { buildCatalogHref } from '@/lib/catalog-url';
 import type { HomeNowTab, HomeNowTabKey } from '@/lib/home-now-section';
@@ -56,7 +57,7 @@ export function HomeNowSection({ tabs }: { tabs: HomeNowTab[] }) {
           })}
         </div>
 
-        <div className="horizontal-snap-row mt-5 touch-pan-x" key={current.key}>
+        <ScrollRail key={current.key} className="mt-5" aria-label={current.title}>
           <div className="horizontal-snap-track">
             {current.events.map((event) => (
               <div key={`${current.key}-${event.id}-${event.startsAt}`} className="showcase-rail-card">
@@ -64,7 +65,7 @@ export function HomeNowSection({ tabs }: { tabs: HomeNowTab[] }) {
               </div>
             ))}
           </div>
-        </div>
+        </ScrollRail>
       </div>
     </section>
   );
@@ -99,7 +100,7 @@ export function HomeEventRail({
             Смотреть все <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
-        <div className="horizontal-snap-row mt-5 touch-pan-x">
+        <ScrollRail className="mt-5" aria-label={title}>
           <div className="horizontal-snap-track">
             {events.map((event) => (
               <div key={event.id} className="showcase-rail-card">
@@ -107,7 +108,7 @@ export function HomeEventRail({
               </div>
             ))}
           </div>
-        </div>
+        </ScrollRail>
       </div>
     </section>
   );

@@ -16,6 +16,7 @@ import { HomeEventRail, HomeNowSection } from '@/components/HomeNowSection.clien
 import { HomeHero } from '@/components/HomeHero.client';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { ScrollRail } from '@/components/ScrollRail.client';
 import { mergeBlogCards } from '@/lib/blog-utils';
 import { buildPublicArticlesListDto } from '@daibilet/backend/public-read';
 import '@/lib/env';
@@ -153,12 +154,16 @@ export async function HomePageContent() {
               Все подборки <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="horizontal-snap-row mt-6 flex flex-nowrap gap-3 snap-x snap-mandatory md:grid md:grid-cols-4 md:gap-3 md:overflow-visible md:pb-0">
+          <ScrollRail
+            className="mt-6"
+            viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory"
+            aria-label="Форматы отдыха"
+          >
             {HOME_FORMAT_TILES.map((tile) => (
               <Link
                 key={tile.title}
                 href={tile.href}
-                className="horizontal-snap-card group relative min-h-[148px] overflow-hidden rounded-card text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover md:w-auto"
+                className="horizontal-snap-card group relative min-h-[148px] overflow-hidden rounded-card text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover"
               >
                 <SafeImage
                   src={tile.imageUrl}
@@ -176,7 +181,7 @@ export async function HomePageContent() {
                 </div>
               </Link>
             ))}
-          </div>
+          </ScrollRail>
         </div>
       </section>
 
@@ -213,14 +218,18 @@ export async function HomePageContent() {
                 Все подборки <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            <div className="horizontal-snap-row mt-6 flex flex-nowrap gap-3 snap-x snap-mandatory md:grid md:grid-cols-3 md:gap-3 md:overflow-visible md:pb-0">
+            <ScrollRail
+              className="mt-6"
+              viewportClassName="flex flex-nowrap gap-3 snap-x snap-mandatory"
+              aria-label="Тематические подборки"
+            >
               {promoLandings.map((landing, index) => {
                 const imageUrl = resolveHomePromoImage(landing.slug, landing.title);
                 return (
                   <Link
                     key={landing.slug}
                     href={landingCategoryHref(landing.slug)}
-                    className="horizontal-snap-card group relative min-h-[168px] overflow-hidden rounded-card text-left text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover sm:min-h-[180px] md:w-auto"
+                    className="horizontal-snap-card group relative min-h-[168px] overflow-hidden rounded-card text-left text-white shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-card-hover sm:min-h-[180px]"
                   >
                     <SafeImage
                       src={imageUrl}
@@ -242,7 +251,7 @@ export async function HomePageContent() {
                   </Link>
                 );
               })}
-            </div>
+            </ScrollRail>
           </div>
         </section>
       ) : null}

@@ -26,6 +26,7 @@
 | CU.9 | Commit + deploy для owner review | Критический | ✅ `17a56af` (p2) + `4a69541` (p3-4) |
 | CU.10 | Blog surfaces + search overlay polish | Средний | ✅ |
 | CU.11 | Micro-animations (hover translate/scale) | Низкий | ✅ |
+| CU.12 | HorizontalScroll / ScrollRail: prev/next на md+ для home rails и `/podborki` | Высокий | 🔄 |
 | CU.2b | Self-host через next/font когда пакет next/font полный на билде | Средний | ⏳ |
 
 ---

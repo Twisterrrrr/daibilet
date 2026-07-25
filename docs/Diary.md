@@ -1,3 +1,21 @@
+## 2026-07-25 - ScrollRail: prev/next для горизонтальных рядов
+
+### Наблюдения
+
+- Owner: на десктопе в подборках / rails неясно, как скроллить вправо (overflow-x без явного UX).
+
+### Решения
+
+- Новый `ScrollRail.client.tsx`: md+ ChevronLeft/Right, только при overflow; hide на краях; smooth scroll ~1 карточка.
+- Подключено: HomeEventRail / HomeNowSection, home format+promo tiles, `/podborki` категории и быстрые chips.
+- Мобиле: swipe + thin scrollbar; кнопки `hidden md:inline-flex`. Не трогали hero copy / tmp-*.
+
+### Проблемы
+
+- Параллельные агенты (fonts / roof landing) - не откатывать их файлы при merge.
+
+---
+
 ## 2026-07-25 - Clean UI фазы 3-4 + home photo tiles + pin fix
 
 ### Наблюдения
