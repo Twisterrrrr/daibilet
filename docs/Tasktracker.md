@@ -245,7 +245,7 @@
 | SEO.19c | Публикация гидов: хаос-график + микс городов; `publishedAt` schedule filter | Высокий | ✅ 2026-07-23; safety: throttle 1/day только если mass «малоценная» (owner Webmaster/GSC) | агент |
 | SEO.19d | Owner anti-AI rewrite 9 гидов + upsert по графику | Высокий | ✅ 2026-07-23; LOCK: повторный rewrite 9 longforms не делаем | владелец + агент |
 | SEO.19e | Антиспам: пн-колонки + template_type long/top5/events + safety индекс | Высокий | ✅ LOCK 2026-07-25: 1 колонка/нед; HIDDEN backlog не жечь быстрее | агент |
-| SEO.20 | Landing garbage audit: daily cron scan cache/DB (encoding / stopwords / CAPS / empty tags) → Telegram alert | Высокий | ⏳ | агент |
+| SEO.20 | Listing garbage audit: daily scan saleable public events (encoding / stopwords / CAPS / HTML) → Telegram | Высокий | ✅ код `pnpm audit:listings`; ⏳ cron 04:00 на prod (owner) | агент |
 | SEO.21 | Tags dictionary monthly sprint: analyzer (>6–8 live events + Wordstat >0) → admin one-click promote query-fallback → CHPU + meta + sitemap (не ad-hoc) | Средний | ⏳ monthly ops | агент + владелец (approve) |
 | SEO.10 | Editorial polish SEO-текстов (убрать шаблонный хвост); URL/mapping TOP-15 не трогать | Средний | ⏳ | владелец + агент |
 | P.1 | AI / статьи блога | Средний | ⚠️ deferred vs SEO.1–SEO.7 | — |
@@ -702,6 +702,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-25 | SEO.20 listing garbage audit: код ✅ (`pnpm audit:listings` + Telegram helper); cron 04:00 на prod ⏳ owner |
 | 2026-07-25 | Owner QA close (blog/F4/SEO): SEO.20 daily garbage audit ⏳ High; SEO.21 monthly tag promote ⏳ Medium; SEO.9b phone 🚫 blocked; SEO.9 launch policy ✅ |
 | 2026-07-24 | B.26: `/blog` UX - topics/search/load-more/CTA/date on large |
 | 2026-07-23 | B.25: column authors brand blue on listing + article (no «Колонка» badge) |

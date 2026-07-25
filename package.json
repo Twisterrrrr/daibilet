@@ -70,6 +70,7 @@
     "reviews:requests": "node --import tsx scripts/send-review-requests.js",
     "landing:snapshot": "node scripts/landing-snapshot.mjs --write",
     "landing:audit": "node scripts/landing-audit.mjs",
+    "audit:listings": "node --import tsx scripts/audit-listings.js",
     "tep:landing-diagnose": "node scripts/tep-landing-diagnose.mjs",
     "tep:import-fixtures": "node scripts/tep-import-fixtures.js",
     "covers:ensure": "node scripts/ensure-catalog-covers.js",

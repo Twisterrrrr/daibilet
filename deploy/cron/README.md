@@ -111,6 +111,24 @@ crontab -e
 - Лог: `/var/log/daibilet/blog-weekly-digest.log`
 - Ручной прогон: `cd /opt/daibilet && npm run blog:weekly-digest` (или `--dry-run`).
 
+## Prod: SEO.20 listing garbage audit (daily → Telegram)
+
+Скан saleable public catalog (`title`/`description`, с учётом `EventOverride`) на CTA offsite / HTML-паразиты / CAPS / mojibake → один сводный алерт в Telegram (cap 10 + count).
+
+```bash
+chmod +x /opt/daibilet/deploy/cron/audit-listings.sh
+crontab -e
+```
+
+```
+0 4 * * * APP_DIR=/opt/daibilet /opt/daibilet/deploy/cron/audit-listings.sh >> /var/log/daibilet/audit-listings.log 2>&1
+```
+
+- Env: `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` в `/opt/daibilet/.env`. Без них скрипт отрабатывает и пишет warn (алерт skip).
+- Ручной: `cd /opt/daibilet && pnpm audit:listings` / `--dry-run`.
+- Лог: `/var/log/daibilet/audit-listings.log`
+- Cron на prod ставить отдельно (не вшит в deploy-prod-next): нужен owner approval + проверка Telegram env.
+
 ## Prod: review-request emails (после сессии)
 
 Просьба оставить отзыв покупателям с email в `ExternalOrder` (сессия 1–2 дня назад).

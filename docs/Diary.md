@@ -1,3 +1,23 @@
+## 2026-07-25 - SEO.20 listing garbage audit
+
+### Наблюдения
+
+- Owner plan (pseudocode) имел битый Telegram URL (`telegram.org{token}`) и пустой regex `/[]/`; `is_active` нет в Prisma `Event`.
+- Скидочный `/скидк[аиоу]/i` слишком шумный для легитимных описаний партнёров.
+
+### Решения
+
+- Конфиг `apps/backend/src/listing-garbage-config.ts` + audit `listing-garbage-audit.ts` + `telegram.ts` (API `https://api.telegram.org/bot{token}/sendMessage`).
+- CLI `scripts/audit-listings.js` / `pnpm audit:listings`; фильтр ≈ saleable public catalog (status, schedule, purchaseReady, price≥100); slim select id/title/description/slug (+ override).
+- Mojibake: `\uFFFD` + UTF-8-as-Latin1 `[ÐÑ][\u0080-\u00FF]`; `скидк*` **пропущен** (документ).
+- Cron wrapper `deploy/cron/audit-listings.sh` + README; установка crontab на prod отдельно (⏳), не в deploy-prod-next.
+
+### Проблемы
+
+- Без Telegram env скрипт warn+skip (ок для dry-run). Prod cron - после проверки env владельцем.
+
+---
+
 ## 2026-07-25 - /venues type chips + hero center align
 
 ### Наблюдения
@@ -27,7 +47,7 @@
 ### Решения
 
 - **Done (код):** CV.1 zero sticky CTA «Нет подходящих событий»; CV.2 soft `#F8F9FA` + badge «Подборка»/«Из Блога»; category tabs dim/disable при 0; landings `<option disabled>` при `events===0`; CV.3 how-to-buy `mt-20`+`bg-slate-50`; CV.4 blog `[buy]` только `от N ₽`; CV.12 human dates; CV.9a-d `@714822c`; docs SEO.9b/20/21 + CV.2b в Tasktracker/qa.
-- **Ops (вне feature-кода):** SEO.9b phone (🚫 ждём 8-800); CV.2b Metrika/GTM кабинет; SEO.20 daily landing audit; SEO.21 monthly tags; CV.9 prod migrate+deploy.
+- **Ops (вне feature-кода):** SEO.9b phone (🚫 ждём 8-800); CV.2b Metrika/GTM кабинет; SEO.20 код ✅ / cron ⏳; SEO.21 monthly tags; CV.9 prod migrate+deploy.
 - **Follow-up:** price chips без facet counts - не блокер.
 
 ### Проблемы
@@ -52,7 +72,7 @@
 ### Проблемы
 
 - SEO.9b blocked на одобрение 8-800 у владельца.
-- SEO.20 / SEO.21 - только backlog, реализация не стартовала.
+- SEO.20 код готов (`audit:listings`); cron на prod ⏳. SEO.21 - backlog.
 - SEO.8c шире rooftops: полный rule-audit ещё 🔄.
 - CV.2b по-прежнему ждёт настройки цели/триггера в кабинетах.
 

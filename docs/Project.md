@@ -206,6 +206,14 @@ Cron: `deploy/cron/review-requests.sh` (ежедневно 10:00; вс — `--re
 
 SMTP (без env — graceful skip + лог URL): `SMTP_HOST`, `SMTP_FROM`, опционально `SMTP_USER`/`SMTP_PASS`/`SMTP_PORT`. Для отправки нужен `nodemailer` в `apps/backend`.
 
+### Listing garbage audit (SEO.20)
+
+Daily scan saleable public catalog texts (`title`/`description` + override) на CTA offsite / HTML-паразиты / CAPS / mojibake → Telegram.
+
+- Команда: `pnpm audit:listings` (`scripts/audit-listings.js`; `--dry-run`).
+- Cron: `deploy/cron/audit-listings.sh` → `0 4 * * *` (см. `deploy/cron/README.md`). Без `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` — warn + skip.
+- Словарь: `apps/backend/src/listing-garbage-config.ts` (`скидк*` намеренно не ловим).
+
 ---
 
 ## Блог / контент-ops
