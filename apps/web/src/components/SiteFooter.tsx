@@ -2,6 +2,7 @@ import Link from 'next/link';
 
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { DaibiletLogo } from '@/components/DaibiletLogo';
+import { formatNumber } from '@/lib/format';
 import { cityHref } from '@/lib/routes';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { CANONICAL_LANDING_SLUGS } from '@/lib/landing-constants';
@@ -33,14 +34,23 @@ type SiteFooterProps = {
 };
 
 export function SiteFooter({ destinations }: SiteFooterProps) {
-  const cityLinks = destinations
-    .filter((item) => item.type === 'city')
+  const cities = destinations.filter((item) => item.type === 'city');
+  const cityLinks = [...cities]
     .sort((a, b) => b.events - a.events)
     .slice(0, 8)
     .map((city) => ({
       label: city.name,
       href: cityHref(city),
     }));
+
+  // Real catalog social proof from already-loaded destinations (no extra query).
+  const eventsCount = cities.reduce((sum, city) => sum + (city.events || 0), 0);
+  const venuesCount = cities.reduce((sum, city) => sum + (city.venues || 0), 0);
+  const citiesCount = cities.length;
+  const catalogStatsLine =
+    eventsCount > 0 || venuesCount > 0 || citiesCount > 0
+      ? `${formatNumber(eventsCount)} событий · ${formatNumber(venuesCount)} площадок · ${formatNumber(citiesCount)} городов`
+      : null;
 
   const popularDirections = getFooterPopularDirections();
 
@@ -56,6 +66,11 @@ export function SiteFooter({ destinations }: SiteFooterProps) {
               Билеты на экскурсии, музеи и мероприятия по городам России.
               Покупайте онлайн, посещайте лучшее.
             </p>
+            {catalogStatsLine ? (
+              <p className="mt-3 max-w-xs text-sm text-graphite-muted" data-nosnippet>
+                {catalogStatsLine}
+              </p>
+            ) : null}
             <div className="mt-5 text-sm font-medium text-graphite">
               <a href="mailto:info@daibilet.ru" className="transition-colors hover:text-primary-600">
                 info@daibilet.ru
