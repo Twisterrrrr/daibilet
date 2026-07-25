@@ -1,4 +1,4 @@
-import { Clock, MapPin, Train } from 'lucide-react';
+import { Clock, MapPin } from 'lucide-react';
 
 import { formatStreetAddress } from '@/lib/address';
 import { pluralEvents, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
@@ -51,11 +51,6 @@ export function LocationCard({
         <div className="mt-2 flex items-center gap-1.5 text-sm text-slate-500">
           <MapPin className="h-3.5 w-3.5 shrink-0" />
           <span className="truncate">{street}</span>
-        </div>
-
-        <div className="mt-1 flex items-center gap-1.5 text-sm text-slate-500">
-          <Train className="h-3.5 w-3.5 shrink-0 opacity-40" />
-          <span className="truncate text-slate-400">{venue.city}</span>
         </div>
 
         {nextSlot ? (

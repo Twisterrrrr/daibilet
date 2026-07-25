@@ -318,9 +318,18 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
       requestedEvent.venue?.longitude == null || !Number.isFinite(requestedEvent.venue.longitude)
         ? null
         : Number(requestedEvent.venue.longitude),
-    venueMetroStation: requestedEvent.venue?.metroStation || null,
-    venueWayToFind: requestedEvent.venue?.wayToFind || null,
-    venueParkingInfo: requestedEvent.venue?.parkingInfo || null,
+    venueMetroStation: (() => {
+      const text = String(requestedEvent.venue?.metroStation ?? '').trim();
+      return text || null;
+    })(),
+    venueWayToFind: (() => {
+      const text = String(requestedEvent.venue?.wayToFind ?? '').trim();
+      return text || null;
+    })(),
+    venueParkingInfo: (() => {
+      const text = String(requestedEvent.venue?.parkingInfo ?? '').trim();
+      return text || null;
+    })(),
     ageLimit: requestedEvent.ageLimit,
     priceFrom,
     vacant: targetCatalogSession?.vacant ?? requestedEvent.ticketsVacant,

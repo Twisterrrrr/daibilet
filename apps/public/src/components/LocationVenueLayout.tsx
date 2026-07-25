@@ -9,7 +9,6 @@ import {
   Navigation,
   Share2,
   Ticket,
-  Train,
   Waves,
 } from 'lucide-react';
 
@@ -341,16 +340,18 @@ export function LocationVenueLayout({
                 <MapPin className="mt-0.5 h-5 w-5 text-primary-600" />
                 <div>
                   <div className="text-sm font-semibold text-slate-900">Адрес</div>
-                  <div className="text-sm text-slate-600">{streetAddress || `${venue.city} — уточняется`}</div>
+                  <div className="text-sm text-slate-600">{streetAddress || `${venue.city} - уточняется`}</div>
                 </div>
               </div>
-              <div className="flex items-start gap-3 rounded-xl border border-slate-100 p-3">
-                <Train className="mt-0.5 h-5 w-5 text-primary-600" />
-                <div>
-                  <div className="text-sm font-semibold text-slate-900">Город</div>
-                  <div className="text-sm text-slate-600">{venue.city}</div>
+              {venue.city ? (
+                <div className="flex items-start gap-3 rounded-xl border border-slate-100 p-3">
+                  <MapPin className="mt-0.5 h-5 w-5 text-primary-600" />
+                  <div>
+                    <div className="text-sm font-semibold text-slate-900">Город</div>
+                    <div className="text-sm text-slate-600">{venue.city}</div>
+                  </div>
                 </div>
-              </div>
+              ) : null}
             </div>
           </section>
 

@@ -1,3 +1,42 @@
+## 2026-07-25 - Owner audit: env / robots / CV.9b auth
+
+### Наблюдения
+
+- F4.6: admin уже Next (`admin.daibilet.ru` + `/admin`, Vite `/legacy` retired).
+- `NEXT_PUBLIC_*`: только widget/analytics/URL (TC widget token, TEP widget id, Metrika id, site/admin URL). Секреты (`DATABASE_URL`, `TICKETSCLOUD_API_TOKEN`, `ADMIN_PASSWORD*`, `TELEGRAM_*`, JWT) - без `NEXT_PUBLIC_`.
+- Middleware: Basic Auth на `/admin*` и host `admin.daibilet.ru` до render; layout `noindex`. В `robots.ts` не было `Disallow: /admin/`.
+- CV.9b: PATCH logistics → `/api/admin/venues/[id]` через `adminApiFetch` (forward Basic Auth); backend `isProtectedPath` = все `/api/admin*`. Public - только GET.
+
+### Решения
+
+- Safe pattern: client-only публичные идентификаторы → `NEXT_PUBLIC_*`; server secrets / partner API tokens → без префикса (только Node/API).
+- `apps/web/app/robots.ts`: добавить `Disallow: /admin/` (defense-in-depth к Basic Auth + noindex). `admin.daibilet.ru` отдельно закрыт auth middleware.
+
+### Проблемы
+
+- Нет: случайного `NEXT_PUBLIC_` на секретах не найдено; logistics write не был на публичном route.
+
+---
+
+## 2026-07-25 - CV.9e: hide empty metro UI
+
+### Наблюдения
+
+- Owner: `metroStation` nullable; пустое метро нельзя показывать как «🚇 -» / blank row с иконкой.
+- `LocationCard` всегда рисовал Train + city - ложный metro UI без `metroStation`.
+
+### Решения
+
+- `VenueLogisticsBlock.nonEmptyLogisticsText`: trim + hide `-`/`—`/`–`; metro/wayToFind/parking независимо.
+- `LocationCard` (web): Train только при non-empty `metroStation`; public LocationCard - убран fake Train.
+- DTO: `normalizeNullableString` для logistics в public venue/event payload; list item отдаёт `metroStation`.
+
+### Проблемы
+
+- Нет (commit + deploy-prod-next).
+
+---
+
 ## 2026-07-25 - Home hero: multi-city rotator
 
 ### Наблюдения

@@ -6,6 +6,7 @@ import { formatStreetAddress } from '@/lib/address';
 import { pluralEvents } from '@/lib/format';
 import { venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
 import type { PublicVenueDto } from '@daibilet/contracts/public';
+import { nonEmptyLogisticsText } from '@/components/VenueLogisticsBlock';
 
 const TYPE_GRADIENT: Record<string, string> = {
   pier: 'from-sky-500 via-cyan-600 to-indigo-700',
@@ -22,7 +23,7 @@ export function LocationCard({
   href,
   nextSlot,
 }: {
-  venue: Pick<PublicVenueDto, 'name' | 'city' | 'events' | 'type' | 'address'>;
+  venue: Pick<PublicVenueDto, 'name' | 'city' | 'events' | 'type' | 'address' | 'metroStation'>;
   href: string;
   nextSlot?: string | null;
 }) {
@@ -30,6 +31,7 @@ export function LocationCard({
   const typeLabel = venueTypeLabel(venue.type);
   const gradient = TYPE_GRADIENT[venue.type] || 'from-sky-500 via-primary-600 to-indigo-600';
   const street = formatStreetAddress(venue.address, { city: venue.city }) || venue.city;
+  const metro = nonEmptyLogisticsText(venue.metroStation);
 
   return (
     <Link
@@ -56,10 +58,12 @@ export function LocationCard({
           <span className="truncate">{street}</span>
         </div>
 
-        <div className="mt-1 flex items-center gap-1.5 text-sm text-slate-500">
-          <Train className="h-3.5 w-3.5 shrink-0 opacity-40" />
-          <span className="truncate text-slate-400">{venue.city}</span>
-        </div>
+        {metro ? (
+          <div className="mt-1 flex items-center gap-1.5 text-sm text-slate-500">
+            <Train className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">{metro}</span>
+          </div>
+        ) : null}
 
         {nextSlot ? (
           <div className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">

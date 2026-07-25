@@ -65,8 +65,9 @@
 | CV.9 | Venue logistics «как найти» (эпик; owner иногда зовёт «Спринт CV.5» - **не** путать с CV.5 discounts) | Высокий | ✅ `714822c` CV.9a-d; OSM→Yandex unify deferred; [venue-logistics-spec.md](./venue-logistics-spec.md); prod = migrate+deploy |
 | CV.9a | Prisma: `Venue.metroStation` / `wayToFind` / `parkingInfo` + migrate | Высокий | ✅ `20260725120000_venue_logistics` |
 | CV.9b | Admin CMS: секция «Логистика» в Next `/admin/venues/[id]` + PATCH (`normalizeVenuePayload` / `updateAdminVenue`); address sync-only readonly | Высокий | ✅ |
-| CV.9c | Public DTO + блок логистики на venue page (`VenueLogisticsBlock`; empty hide если нет address и трёх полей); OSM keep | Высокий | ✅ |
+| CV.9c | Public DTO + блок логистики на venue page (`VenueLogisticsBlock`; empty hide если нет address и трёх полей); OSM keep | Высокий | ✅ + owner: hide empty metro/way/parking independently |
 | CV.9d | `/events/[slug]`: venue click → modal (логистика + Yandex iframe при coords / external button иначе); slim SSR fields; fallback «Страница площадки» | Средний | ✅ |
+| CV.9e | Guard: null/whitespace `metroStation` → no metro UI (иконка+label); same for wayToFind/parking; LocationCard без fake Train | Высокий | ✅ |
 | CV.10 | Mood chip «Свидание» на `/podborki` (рядом с «Для двоих») | Низкий | ⏳ |
 | CV.11 | Social proof «проданные билеты» (TC Order paid aggregate) | Средний | ⚠️ deferred: только после реального order-aggregate; hardcoded fake 🚫; до - каталожные counts (CV.3) |
 | CV.12 | Catalog card dates: human mask `25 июля, суббота в 07:15` | Высокий | ✅ open-date без фейковых часов; не путать с CV.5 (скидки) |
@@ -595,7 +596,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| 2.1.1 | `apps/web/app/robots.ts` | Высокий | ✅ 2026-07-19 |
+| 2.1.1 | `apps/web/app/robots.ts` (+ `Disallow: /admin/` owner audit 2026-07-25) | Высокий | ✅ 2026-07-19 / fix 2026-07-25 |
 | 2.1.2 | `app/sitemap.xml` — index → chunks | Высокий | ✅ 2026-07-19 |
 | 2.1.3 | Sitemap chunk: `/events/*` (catalog public) | Высокий | ✅ 2026-07-19 |
 | 2.1.4 | Sitemap chunk: `/cities/*` | Высокий | ✅ 2026-07-19 |

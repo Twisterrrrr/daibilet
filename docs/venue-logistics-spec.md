@@ -100,9 +100,11 @@ venueParkingInfo?: string | null;
 Показывать блок логистики, если есть **хотя бы одно** из:
 
 - non-empty `address`
-- `metroStation` / `wayToFind` / `parkingInfo`
+- non-empty (trim) `metroStation` / `wayToFind` / `parkingInfo`
 
-Если все три logistics null **и** нет address - **скрыть весь блок**.
+Если все три logistics null/whitespace **и** нет address - **скрыть весь блок**.
+
+**Owner rule (nullable metro):** если `metroStation` пустой / null / только пробелы - **полностью скрыть** строку метро (иконка + label + value). Никогда не показывать пустой «🚇 -» / blank row. То же независимо для `wayToFind` и `parkingInfo`.
 
 Карта в modal: iframe только при lat/lng; иначе external button при наличии address.
 
@@ -114,9 +116,9 @@ venueParkingInfo?: string | null;
 
 1. **Название** площадки (опционально)
 2. **Адрес** (`formatStreetAddress`)
-3. **Метро** - если `metroStation`
-4. **Как найти** - `wayToFind`
-5. **Парковка** - `parkingInfo`
+3. **Метро** - только если `metroStation` после trim непустой
+4. **Как найти** - только если `wayToFind` непустой
+5. **Парковка** - только если `parkingInfo` непустой
 
 Карта на venue page: существующий **`OsmMapEmbed`** + внешние ссылки Яндекс/Google. Унификация OSM→Yandex - backlog.
 
