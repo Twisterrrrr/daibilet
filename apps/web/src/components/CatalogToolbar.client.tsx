@@ -7,6 +7,7 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 
 import { CatalogAdvancedFiltersPanel } from '@/components/CatalogAdvancedFiltersPanel.client';
 import { CategoryTabIcon } from '@/components/CategoryTabIcon';
+import { displayCatalogLabel } from '@/lib/catalog-labels';
 
 import type { PublicCatalogDto } from '@daibilet/contracts/public';
 import {
@@ -43,6 +44,8 @@ export function CatalogToolbar({
   const searchInputRef = useRef<HTMLInputElement>(null);
   const advancedCount = countAdvancedFilters(filters);
   const activeDate = filters.from || filters.to ? '' : filters.date || 'all';
+  const hasCustomRange = Boolean(filters.from || filters.to);
+  const singleDay = filters.from && (!filters.to || filters.to === filters.from) ? filters.from : '';
 
   useEffect(() => {
     setQDraft(filters.q || '');
@@ -89,6 +92,29 @@ export function CatalogToolbar({
       to: undefined,
       page: undefined,
       sort: nextDate === 'today' || nextDate === 'tomorrow' || nextDate === 'evening' ? 'time' : filters.sort,
+    });
+  };
+
+  const setExactDay = (isoDay: string) => {
+    if (!isoDay) {
+      navigate({
+        ...filters,
+        q: qDraft.trim() || undefined,
+        date: undefined,
+        from: undefined,
+        to: undefined,
+        page: undefined,
+      });
+      return;
+    }
+    navigate({
+      ...filters,
+      q: qDraft.trim() || undefined,
+      date: undefined,
+      from: isoDay,
+      to: isoDay,
+      page: undefined,
+      sort: 'time',
     });
   };
 
@@ -173,14 +199,14 @@ export function CatalogToolbar({
         </label>
 
         <div className="flex items-center gap-1.5 sm:contents">
-          <div className="relative min-w-0 flex-1 sm:w-44 sm:flex-none">
+          <div className="relative min-w-0 flex-1 sm:w-40 sm:flex-none">
             <label htmlFor="catalog-date" className="sr-only">
-              Дата
+              Когда
             </label>
             <select
               id="catalog-date"
               name="date"
-              value={filters.from || filters.to ? 'custom' : activeDate || 'all'}
+              value={hasCustomRange ? 'custom' : activeDate || 'all'}
               disabled={disabled}
               onChange={(event) => {
                 if (event.target.value === 'custom') return;
@@ -193,7 +219,7 @@ export function CatalogToolbar({
                   {option.label}
                 </option>
               ))}
-              {filters.from || filters.to ? (
+              {hasCustomRange ? (
                 <option value="custom">
                   {filters.from && filters.to && filters.from !== filters.to
                     ? `${filters.from} - ${filters.to}`
@@ -207,6 +233,18 @@ export function CatalogToolbar({
               strokeWidth={1.75}
             />
           </div>
+
+          <label className="relative min-w-[9.5rem] flex-none sm:w-36">
+            <span className="sr-only">Точная дата</span>
+            <input
+              type="date"
+              value={singleDay}
+              disabled={disabled}
+              onChange={(event) => setExactDay(event.target.value)}
+              aria-label="Выбрать дату в календаре"
+              className="h-11 w-full rounded-xl bg-surface-muted px-2.5 text-sm font-medium text-graphite outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/50 disabled:opacity-70 sm:h-10"
+            />
+          </label>
 
           <FiltersButton
             open={filtersOpen}
@@ -275,6 +313,12 @@ function CategoryTabs({
   filters: CatalogFilterValues;
   categories: Array<{ name: string; events: number }>;
 }) {
+  const byName = new Map(categories.map((item) => [item.name, item]));
+  if (filters.category && !byName.has(filters.category)) {
+    byName.set(filters.category, { name: filters.category, events: 0 });
+  }
+  const visible = [...byName.values()].filter((item) => item.events > 0 || filters.category === item.name);
+
   return (
     <>
       <Link
@@ -285,8 +329,26 @@ function CategoryTabs({
       >
         Все
       </Link>
-      {categories.map((item) => {
+      {visible.map((item) => {
         const active = filters.category === item.name;
+        const empty = item.events <= 0;
+        const label = displayCatalogLabel(item.name);
+        if (empty && !active) {
+          return (
+            <span
+              key={item.name}
+              role="tab"
+              aria-selected={false}
+              aria-disabled="true"
+              title="Нет событий при текущих фильтрах"
+              className="catalog-chip snap-start cursor-not-allowed opacity-40"
+            >
+              <CategoryTabIcon name={label} className="text-graphite-muted" />
+              <span>{label}</span>
+              <span className="tabular-nums text-graphite-muted/80">0</span>
+            </span>
+          );
+        }
         return (
           <Link
             key={item.name}
@@ -297,10 +359,12 @@ function CategoryTabs({
             })}
             role="tab"
             aria-selected={active}
-            className={`catalog-chip snap-start ${active ? 'catalog-chip-on' : 'catalog-chip-idle'}`}
+            className={`catalog-chip snap-start ${
+              active ? 'catalog-chip-on' : empty ? 'catalog-chip-idle opacity-50' : 'catalog-chip-idle'
+            }`}
           >
-            <CategoryTabIcon name={item.name} className={active ? 'text-white/85' : 'text-graphite-muted'} />
-            <span>{item.name}</span>
+            <CategoryTabIcon name={label} className={active ? 'text-white/85' : 'text-graphite-muted'} />
+            <span>{label}</span>
             <span className={`tabular-nums ${active ? 'text-white/65' : 'text-graphite-muted/80'}`}>{item.events}</span>
           </Link>
         );

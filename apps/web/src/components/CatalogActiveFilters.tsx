@@ -9,6 +9,7 @@ import {
   clearCatalogFilterKey,
   type CatalogFilterValues,
 } from '@/lib/catalog-url';
+import { displayCatalogLabel } from '@/lib/catalog-labels';
 import { persistSelectedCity } from '@/lib/selected-city';
 
 export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }) {
@@ -16,7 +17,7 @@ export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }
 
   if (values.q?.trim()) chips.push({ key: 'q', label: `«${values.q.trim()}»` });
   // Город только в хедере - не дублируем чипом (сброс города через селектор в шапке).
-  if (values.category) chips.push({ key: 'category', label: values.category });
+  if (values.category) chips.push({ key: 'category', label: displayCatalogLabel(values.category) });
   if (values.landing) chips.push({ key: 'landing', label: values.landing });
   if (values.date) {
     const dateLabels: Record<string, string> = {

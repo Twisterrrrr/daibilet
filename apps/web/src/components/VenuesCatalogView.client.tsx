@@ -22,7 +22,7 @@ import { venueHref } from '@/lib/routes';
 const VENUES_HERO_FRAMES = [
   {
     src: '/images/hero/hero-slavic-03.png',
-    alt: 'Зал музея или театра',
+    alt: 'Музей или театр',
   },
   {
     src: '/images/hero/hero-slavic-05.png',
@@ -148,8 +148,8 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
   const locationsHref = venueCatalogHrefWithSelectedCity('/locations', selectedCity?.cityValue);
   const cityName = cityFilter !== 'all' ? cityFilter : null;
   const heroTitle = cityName
-    ? `Залы, театры и пространства ${cityToGenitive(cityName)}`
-    : 'Залы, театры и пространства';
+    ? `Музеи, театры и пространства ${cityToGenitive(cityName)}`
+    : 'Музеи, театры и пространства';
   const scopedVenues = useMemo(() => {
     if (cityFilter === 'all') return venues;
     return venues.filter((venue) => venue.city === cityFilter);

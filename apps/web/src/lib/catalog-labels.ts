@@ -1,5 +1,17 @@
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
+/** Display-only aliases: API/slug ключ не трогаем, в UI показываем канон. */
+const CATALOG_LABEL_DISPLAY_ALIASES: Record<string, string> = {
+  Залы: 'Музеи',
+  залы: 'Музеи',
+};
+
+export function displayCatalogLabel(label: string): string {
+  const value = String(label || '').trim();
+  if (!value) return value;
+  return CATALOG_LABEL_DISPLAY_ALIASES[value] || value;
+}
+
 const WATER_CATALOG_HINT_RE =
   /(водн(?:ые|ая)?\s+экскурси|речн(?:ая|ые)?|реч(?:ной|ная)\s+порт|теплоход|катер|яхт|лодк|причал|речные\s+прогулки)/i;
 const BUS_CATALOG_LABEL_RE = /автобус/i;
@@ -37,6 +49,7 @@ const UTILITY_TAG_RE =
   /^(wc|туалет|кондиционер|аудиосистема|аудиогид|wi-?fi|бар|кафе|кафе-бар|парковка|гардероб|кондиционирование)$/i;
 const DURATION_TAG_RE = /^\d+\s*(минут|мин\.?|час|часа|часов)\s*$/i;
 const VESSEL_TAG_RE = /^(теплоход|катер|яхт|судно|лодк)\s*:/i;
+const VENUE_LABEL_TAG_RE = /^(площадка|локация|место|venue|причал)\s*:/i;
 const VENUE_POLICY_TAG_RE = /^(можно|нельзя|разрешено|запрещено)(?:\s|$)/i;
 
 export function isUtilityCatalogTag(tag: string): boolean {
@@ -46,6 +59,7 @@ export function isUtilityCatalogTag(tag: string): boolean {
   if (UTILITY_TAG_RE.test(lower)) return true;
   if (DURATION_TAG_RE.test(lower)) return true;
   if (VESSEL_TAG_RE.test(lower)) return true;
+  if (VENUE_LABEL_TAG_RE.test(lower)) return true;
   if (/^причал\b/i.test(lower)) return true;
   if (value.length > 42) return true;
   return false;
@@ -85,6 +99,21 @@ export function isCatalogSubcategoryLabel(tag: string, category?: string | null)
   return true;
 }
 
+function looksLikeVenueNameTag(label: string, venue?: string | null): boolean {
+  const value = String(label || '').trim();
+  if (!value) return true;
+  if (VENUE_LABEL_TAG_RE.test(value)) return true;
+  const venueName = String(venue || '').trim();
+  if (!venueName) return false;
+  const labelLower = value.toLowerCase();
+  const venueLower = venueName.toLowerCase();
+  if (labelLower === venueLower) return true;
+  if (labelLower.includes(venueLower) || venueLower.includes(labelLower)) return true;
+  // «Дельфин, Москва-29» / vessel board names mixed into tags
+  if (/москва-\d+/i.test(value) || /,\s*москва/i.test(value)) return true;
+  return false;
+}
+
 /** Длительность из тегов поставщика (для meta-ряда карточки). */
 export function extractDurationLabel(tags?: string[] | null): string | null {
   for (const tag of tags || []) {
@@ -105,19 +134,25 @@ export function collectCatalogLabels(
 
   for (const label of session.subcategories || []) {
     const value = String(label || '').trim();
-    if (!isCatalogSubcategoryLabel(value, session.category) || seen.has(value)) continue;
+    if (!isCatalogSubcategoryLabel(value, session.category)) continue;
+    if (looksLikeVenueNameTag(value, session.venue)) continue;
     if (isConflictingTransportCatalogLabel(value, transport)) continue;
-    seen.add(value);
-    labels.push(value);
+    const shown = displayCatalogLabel(value);
+    if (seen.has(shown)) continue;
+    seen.add(shown);
+    labels.push(shown);
     if (labels.length >= limit) return labels;
   }
 
   for (const tag of session.tags || []) {
     const value = String(tag || '').trim();
-    if (!isCatalogSubcategoryLabel(value, session.category) || seen.has(value)) continue;
+    if (!isCatalogSubcategoryLabel(value, session.category)) continue;
+    if (looksLikeVenueNameTag(value, session.venue)) continue;
     if (isConflictingTransportCatalogLabel(value, transport)) continue;
-    seen.add(value);
-    labels.push(value);
+    const shown = displayCatalogLabel(value);
+    if (seen.has(shown)) continue;
+    seen.add(shown);
+    labels.push(shown);
     if (labels.length >= limit) break;
   }
 

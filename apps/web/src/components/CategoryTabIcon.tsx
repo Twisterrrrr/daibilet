@@ -14,6 +14,7 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
   Экскурсии: Tent,
   'Музеи и арт': Landmark,
   Музеи: Landmark,
+  Залы: Landmark,
   Мероприятия: Ticket,
   Развлечения: Sparkles,
   'Активный отдых': Bike,

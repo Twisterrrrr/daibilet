@@ -21,6 +21,7 @@ import {
   type PodborkiCategoryMeta,
 } from '@/lib/podborki-categories';
 import { pickPodborkiFeatured, pickPodborkiTrending } from '@/lib/podborki-hero';
+import { balancedTileGridClass } from '@/lib/balanced-tile-grid';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 
 const MOOD_CHIPS: Array<{ label: string; href: string }> = [
@@ -326,7 +327,12 @@ export function LandingsCatalogView({
                       </div>
                     ))}
                   </ScrollRail>
-                  <ul className="hidden gap-3 lg:grid lg:grid-cols-3 xl:grid-cols-4">
+                  <ul
+                    className={`hidden gap-3 lg:grid ${balancedTileGridClass(section.items.length, {
+                      lg: 3,
+                      xl: 4,
+                    })}`}
+                  >
                     {section.items.map((landing) => (
                       <li key={landing.slug}>
                         <LandingDirectionCard landing={landing} citySlug={citySlug} />

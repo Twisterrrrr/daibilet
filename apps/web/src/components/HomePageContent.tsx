@@ -24,6 +24,7 @@ import { getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-
 import { formatMoney, pluralEvents } from '@/lib/format';
 import { buildHomePageSections } from '@/lib/home-page-sections';
 import { HOME_FORMAT_TILES, HOME_TRUST_ITEMS, resolveHomePromoImage } from '@/lib/home-scenarios';
+import { balancedTileGridClass } from '@/lib/balanced-tile-grid';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { venueHref } from '@/lib/routes';
 import { venuePageTemplate } from '@/lib/venue-meta';
@@ -183,7 +184,7 @@ export async function HomePageContent() {
               </Link>
             ))}
           </ScrollRail>
-          <ul className="mt-6 hidden gap-3 lg:grid lg:grid-cols-4">
+          <ul className={`mt-6 hidden gap-3 lg:grid ${balancedTileGridClass(HOME_FORMAT_TILES.length, { lg: 4 })}`}>
             {HOME_FORMAT_TILES.map((tile) => (
               <li key={tile.title}>
                 <Link
@@ -223,7 +224,7 @@ export async function HomePageContent() {
                 Все площадки <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className={`mt-6 grid gap-4 sm:grid-cols-2 ${balancedTileGridClass(homeVenues.length, { lg: 4 })}`}>
               {homeVenues.map((venue) => (
                 <InstitutionCard key={venue.id} venue={venue} href={venueHref(venue)} />
               ))}
@@ -279,7 +280,7 @@ export async function HomePageContent() {
                 );
               })}
             </ScrollRail>
-            <ul className="mt-6 hidden gap-3 lg:grid lg:grid-cols-3">
+            <ul className={`mt-6 hidden gap-3 lg:grid ${balancedTileGridClass(promoLandings.length, { lg: 3 })}`}>
               {promoLandings.map((landing, index) => {
                 const imageUrl = resolveHomePromoImage(landing.slug, landing.title);
                 return (
@@ -379,7 +380,9 @@ export async function HomePageContent() {
       <section className="section-y">
         <div className="container-page">
           <h2 className="font-display text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Почему выбирают Дайбилет</h2>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div
+            className={`mt-8 grid gap-4 sm:grid-cols-2 ${balancedTileGridClass(HOME_TRUST_ITEMS.length, { lg: 4 })}`}
+          >
             {HOME_TRUST_ITEMS.map(({ title, text }) => (
               <div key={title} className="rounded-card bg-white p-5 shadow-card">
                 <CheckCircle2 className="h-6 w-6 text-primary-600" />
@@ -391,7 +394,8 @@ export async function HomePageContent() {
         </div>
       </section>
 
-      <section id="partner" className="section-y bg-gradient-to-r from-primary-600 to-sky-500">
+      {/* B2B-блок: data-nosnippet чтобы не попадал в SERP вместо meta description */}
+      <section id="partner" className="section-y bg-gradient-to-r from-primary-600 to-sky-500" data-nosnippet>
         <div className="container-page">
           <div className="flex flex-col items-center gap-6 sm:flex-row sm:justify-between">
             <div className="text-center sm:text-left">
