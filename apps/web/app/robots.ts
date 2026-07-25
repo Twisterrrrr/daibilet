@@ -12,16 +12,19 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/account/', '/login'],
+        // /admin on daibilet.ru; admin.daibilet.ru is also Basic Auth + noindex layout
+        disallow: ['/account/', '/login', '/admin/'],
       },
-      // Explicit allow for major crawlers (do not block Googlebot / Yandex)
+      // Explicit allow for major crawlers (do not block Googlebot / Yandex site-wide)
       {
         userAgent: 'Googlebot',
         allow: '/',
+        disallow: ['/account/', '/login', '/admin/'],
       },
       {
         userAgent: 'Yandex',
         allow: '/',
+        disallow: ['/account/', '/login', '/admin/'],
       },
       // Known content scrapers (mirror sites like liliabots.ru)
       {

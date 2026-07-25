@@ -1,5 +1,11 @@
 # qa.md — открытые вопросы
 
+## 2026-07-25 - Env isolation / robots / admin auth (owner audit) — ЗАКРЫТО
+
+1. **`NEXT_PUBLIC_` secrets?** ✅ Нет accidental expose. Разрешено только: `NEXT_PUBLIC_TC_WIDGET_TOKEN` (client widget embed, ≠ `TICKETSCLOUD_API_TOKEN`), `NEXT_PUBLIC_TEP_WIDGET_ID`, `NEXT_PUBLIC_YANDEX_METRIKA_ID`, `NEXT_PUBLIC_SITE_URL` / `NEXT_PUBLIC_ADMIN_URL` / `NEXT_PUBLIC_VITE_ADMIN_URL`. DB / Telegram / admin passwords / partner API tokens - **без** `NEXT_PUBLIC_`.
+2. **robots `/admin`?** ✅ Дополнено `Disallow: /admin/` в `apps/web/app/robots.ts`. UI уже: middleware Basic Auth + layout `noindex`. Host `admin.daibilet.ru` - тот же Next + auth до HTML.
+3. **CV.9b write auth?** ✅ PATCH только `/api/admin/venues/[id]` + Basic Auth (как UI). Public venues API - read-only GET.
+
 ## 2026-07-25 - Conversion surfaces (owner) — ЗАКРЫТО
 
 1. **Home video:** **photo rotator KEEP** до продакшн-съёмки. Stock muted loops **отклонены** (фейковый/дешёвый вид). Предпочтительны реальные фото МСК/СПб в WebP/AVIF. Статус: **HC.10 / CV.6 / H.7** - video hero остаётся **deferred**.
