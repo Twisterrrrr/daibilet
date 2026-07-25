@@ -1,3 +1,22 @@
+## 2026-07-25 - Home hero: multi-city rotator
+
+### Наблюдения
+
+- Owner: на `/` hero крутит только питерские кадры (Исаакий и т.п.).
+- Причина: seed `HeroBanner` (`home-hero-friends-selfie`, `hero-slavic-01/04/06`) перекрывает статический `HOME_HERO_IMAGES`; почти все slavic - СПб.
+
+### Решения
+
+- `HOME_HERO_IMAGES` → 6 landmark JPG из `cities/top/`: Москва, СПб, Казань, Екатеринбург, Нижний, Самара (уже на диске, без stock video).
+- Migration `20260725130000_home_hero_multi_city`: UPDATE seed_01..04 + INSERT seed_05/06; cache key `home-hero-banners-v2`.
+- `heroFramesFromBanners`: focus через `objectPositionForHeroSrc` (landmark ~40-45% Y); centering overlay из `bcd50e6` не трогали.
+
+### Проблемы
+
+- Нужен migrate + deploy-prod-next; после деплоя smoke `/` на `cities/top/*.jpg` в ротаторе.
+
+---
+
 ## 2026-07-25 - SEO.20 listing garbage audit
 
 ### Наблюдения

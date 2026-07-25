@@ -3,8 +3,8 @@ import { unstable_cache } from 'next/cache';
 import { prisma } from '@/lib/db';
 import {
   HOME_HERO_IMAGES,
-  HOME_HERO_OBJECT_POSITION_DEFAULT,
   homeHeroObjectPositionClass,
+  objectPositionForHeroSrc,
   type HomeHeroImageSet,
 } from '@/lib/home-hero-images';
 
@@ -36,22 +36,22 @@ async function loadHeroBannersFromDb(): Promise<PublicHeroBanner[]> {
   }
 }
 
-export const getActiveHeroBanners = unstable_cache(loadHeroBannersFromDb, ['home-hero-banners-v1'], {
+export const getActiveHeroBanners = unstable_cache(loadHeroBannersFromDb, ['home-hero-banners-v2'], {
   revalidate: 300,
   tags: ['hero-banners'],
 });
 
-/** Frames for HeroMedia: DB banners or static pool (with face-safe object-position). */
+/** Frames for HeroMedia: DB banners or static multi-city pool (landmark-safe focus). */
 export function heroFramesFromBanners(
   banners: PublicHeroBanner[],
   fallback: HomeHeroImageSet = HOME_HERO_IMAGES[0]!,
 ): HomeHeroMediaFrame[] {
   if (banners.length) {
-    // HeroBanner CMS пока без focusX/focusY - top-center default, чтобы не срезать головы.
+    // CMS без focusX/Y: lookup по пути в HOME_HERO_IMAGES, иначе landmark default.
     return banners.map((banner) => ({
       src: banner.imageUrl,
       alt: banner.title || fallback.alt,
-      objectPosition: HOME_HERO_OBJECT_POSITION_DEFAULT,
+      objectPosition: objectPositionForHeroSrc(banner.imageUrl),
     }));
   }
   return HOME_HERO_IMAGES.map((image) => ({
