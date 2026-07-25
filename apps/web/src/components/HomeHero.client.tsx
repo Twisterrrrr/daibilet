@@ -67,14 +67,14 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
 
   const title = selectedCityName ? (
     <>
-      <span className="lg:whitespace-nowrap">Экскурсии и события</span>
+      <span className="block">Экскурсии и события</span>
       <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
         в {cityToPrepositional(selectedCityName)}
       </span>
     </>
   ) : (
     <>
-      <span className="lg:whitespace-nowrap">Экскурсии, музеи и мероприятия</span>
+      <span className="block">Экскурсии, музеи и мероприятия</span>
       <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
         в городах России
       </span>
@@ -92,9 +92,9 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
     >
       <form
         onSubmit={onSubmit}
-        className="mx-auto mt-8 max-w-5xl rounded-2xl bg-white p-2 text-left shadow-2xl shadow-slate-950/30"
+        className="mt-8 w-full max-w-5xl rounded-2xl bg-white p-2 text-left shadow-2xl shadow-slate-950/30"
       >
-        <div className="grid grid-cols-1 gap-2 md:grid-cols-[minmax(140px,1.1fr)_minmax(120px,0.85fr)_minmax(140px,1.1fr)_auto]">
+        <div className="grid w-full grid-cols-1 gap-2 md:grid-cols-[minmax(140px,1.1fr)_minmax(120px,0.85fr)_minmax(140px,1.1fr)_auto]">
           <CityPicker
             cities={destinations}
             value={destination}
@@ -142,7 +142,7 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
         </div>
       </form>
 
-      <div className="mx-auto mt-4 flex max-w-5xl flex-wrap items-center justify-center gap-2">
+      <div className="mt-4 flex w-full max-w-5xl flex-wrap items-center justify-center gap-2">
         {HERO_QUICK_CHIPS.map((chip) => {
           let href = chip.href;
           if (chip.href.startsWith('/events')) {

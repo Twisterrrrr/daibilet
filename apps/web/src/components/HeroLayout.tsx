@@ -154,7 +154,7 @@ export function HeroLayout({
               <div className="min-w-0">{aside}</div>
             </div>
           ) : (
-            <div className="mx-auto max-w-3xl text-center">
+            <div className="mx-auto flex w-full max-w-5xl flex-col items-center text-center">
               <HeroCopy brand={brand} eyebrow={eyebrow} title={title} description={description} t={t} centered />
               {children}
             </div>
@@ -180,12 +180,14 @@ function HeroCopy({
   t: (typeof TONE)['light'] | (typeof TONE)['dark'];
   centered?: boolean;
 }) {
-  const align = centered ? 'text-center' : '';
+  const align = centered ? 'w-full max-w-3xl text-center' : '';
   return (
     <div className={align}>
       {brand ? (
         <div
-          className={`font-display text-base font-bold tracking-[0.2em] uppercase drop-shadow-[0_2px_12px_rgba(15,23,42,0.45)] sm:text-lg ${t.brand}`}
+          className={`font-display text-base font-bold tracking-[0.2em] uppercase drop-shadow-[0_2px_12px_rgba(15,23,42,0.45)] sm:text-lg ${t.brand} ${
+            centered ? 'pl-[0.2em]' : ''
+          }`}
         >
           {brand}
         </div>
@@ -194,14 +196,14 @@ function HeroCopy({
         <p className={`text-sm font-semibold uppercase tracking-wider ${t.eyebrow} ${brand ? 'mt-3' : ''}`}>{eyebrow}</p>
       ) : null}
       <h1
-        className={`font-display text-[1.7rem] font-extrabold tracking-tight drop-shadow-[0_2px_14px_rgba(15,23,42,0.55)] sm:text-4xl md:text-5xl lg:text-[3.25rem] xl:text-6xl ${t.title} ${
+        className={`font-display text-balance text-[1.7rem] font-extrabold tracking-tight drop-shadow-[0_2px_14px_rgba(15,23,42,0.55)] sm:text-4xl md:text-5xl lg:text-[3.25rem] xl:text-6xl ${t.title} ${
           brand || eyebrow ? 'mt-3' : ''
         }`}
       >
         {title}
       </h1>
       {description ? (
-        <p className={`mx-auto mt-4 max-w-3xl text-base sm:text-lg ${t.description} ${centered ? '' : 'mx-0'}`}>{description}</p>
+        <p className={`mx-auto mt-4 max-w-3xl text-pretty text-base sm:text-lg ${t.description} ${centered ? '' : 'mx-0'}`}>{description}</p>
       ) : null}
     </div>
   );
