@@ -15,6 +15,7 @@
 ### Проблемы
 
 - Нужен migrate + deploy-prod-next; smoke `/` на `hero-emotion-*.jpg`, без `cities/top` в home hero.
+- **Prod @`cd82827`:** migrate `20260726010000` OK; deploy-prod-next OK; `/` SSR содержит все 6 `home/hero-emotion-*.jpg`; ассеты 200; `cities/top` в home hero нет; centering `items-center text-center` сохранён.
 
 ---
 
