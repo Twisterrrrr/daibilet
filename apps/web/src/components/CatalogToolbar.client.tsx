@@ -46,6 +46,15 @@ export function CatalogToolbar({
   const activeDate = filters.from || filters.to ? '' : filters.date || 'all';
   const hasCustomRange = Boolean(filters.from || filters.to);
   const singleDay = filters.from && (!filters.to || filters.to === filters.from) ? filters.from : '';
+  const previewContext = useMemo(
+    () => ({
+      q: qDraft.trim() || filters.q,
+      city: filters.city,
+      category: filters.category,
+      sort: filters.sort,
+    }),
+    [qDraft, filters.q, filters.city, filters.category, filters.sort],
+  );
 
   useEffect(() => {
     setQDraft(filters.q || '');
@@ -142,6 +151,7 @@ export function CatalogToolbar({
             landing: filters.landing || 'all',
           }}
           landings={facets.landings}
+          previewContext={previewContext}
           onApply={(next) => {
             applyAdvanced(navigate, filters, qDraft, next);
             setFiltersOpen(false);
@@ -276,6 +286,7 @@ export function CatalogToolbar({
           landing: filters.landing || 'all',
         }}
         landings={facets.landings}
+        previewContext={previewContext}
         onApply={(next) => {
           applyAdvanced(navigate, filters, qDraft, next);
           setFiltersOpen(false);

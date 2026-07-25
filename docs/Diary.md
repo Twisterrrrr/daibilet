@@ -1,3 +1,26 @@
+## 2026-07-25 - Owner decisions: conversion backlog lock
+
+### Наблюдения
+
+- В `qa.md` висели 5 открытых Q по video / sold tickets / скидкам / venue logistics / blog auto-embeds - владелец закрыл решениями.
+- Stock muted video и hardcoded «продано N» выглядят дёшево и бьют доверие сильнее, чем отсутствие social proof.
+- Auto-match событий по тегам блога даёт высокий misfire и убивает эффект native `[buy]` (CV.4).
+
+### Решения
+
+- **Home video (HC.10 / CV.6 / H.7):** KEEP photo rotator до продакшн-съёмки; stock muted loops 🚫; предпочтение - реальные фото МСК/СПб WebP/AVIF; video hero deferred.
+- **Social proof sold (CV.11):** только после реального TC Order aggregate; до - честные каталожные counts (CV.3); fake counts 🚫.
+- **Catalog discounts (CV.5):** не строить sort до `discount`/`strikePrice` в DTO; backlog до sync architecture sprint.
+- **Venue «как найти» (CV.9):** CMS admin-поле (метро + ориентир), manual; geocode template из адреса 🚫.
+- **Blog auto-embeds (CV.8):** 🚫 rejected; только manual `[buy slug=…]` / admin custom field.
+
+### Проблемы
+
+- Нет продакшн video-ассета и нет стабильного public Order paid aggregate.
+- `discount`/`strikePrice` отсутствуют в sync DTO - блокер CV.5 до architecture sprint.
+
+---
+
 ## 2026-07-25 - Owner: сетки без сироты + «Залы»→«Музеи»
 
 ### Наблюдения
@@ -17,7 +40,51 @@
 
 ---
 
-## 2026-07-25 - Home SERP: убрать «покупка у организатора» из сниппета
+## 2026-07-25 - Conversion surfaces: каталог / home / blog
+
+### Наблюдения
+
+- Owner brief по 5 поверхностям: `/events`, `/`, `/podborki`, `/blog`, `/venues`.
+- Gap: mobile filters уже bottom sheet, но без live count; сетка монотонна; home без how-it-works; blog `[buy]` был кнопкой с «сайт партнёра».
+- Fake «15 000 проданных» / «24/7 Telegram» / скидки без DTO - не внедряем (HC.3).
+
+### Решения
+
+- CV.1: draft preview `GET /api/public/events?limit=1` → sticky «Показать N вариантов».
+- CV.2: interstitial баннеры каждые 8 карточек (rooftops / river / podborki / blog).
+- CV.3: live counts + блок «Как купить билет» (3 шага).
+- CV.4: `[buy]` → native card с ценой и CTA.
+- Video / скидки / auto related events / venue logistics - в backlog CV.5-CV.9.
+
+### Проблемы
+
+- Preview count бьёт catalog API на каждый draft-change (debounce 280ms) - ок для MVP.
+- Без video-ассета hero остаётся photo (HeroMedia уже умеет videoSrc).
+
+---
+
+## 2026-07-25 - CV express QA + hotfix
+
+### Наблюдения
+
+- Debounce preview был 280ms (ниже целевых 300-400); zero-CTA disabled, но visually primary+opacity.
+- Interstitial на mobile выше карточки (колонка + description); клики без аналитики.
+- Шаг 3 «Как купить» акцентировал «не распечатывать»; email/SMS были размазаны по шагам.
+- Blog `[buy]`: цена уже с live DTO; при недоступном виджете терялись title/price.
+
+### Решения
+
+- CV.1: debounce 350ms + abort; zero CTA нейтральный gray «Ничего не найдено».
+- CV.2: compact mobile banner (max-h ~11.5rem, description hidden); `trackCatalogBannerClick` → dataLayer/ym.
+- CV.3: шаг 3 - email + SMS + смартфон на входе; без printer-fear.
+- CV.4: `cache: 'no-store'` + показ live title/price даже в fallback.
+
+### Проблемы
+
+- Нет (hotfix без commit).
+
+---
+
 
 ### Наблюдения
 

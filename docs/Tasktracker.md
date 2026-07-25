@@ -46,6 +46,26 @@
 
 ---
 
+## Conversion surfaces pack (2026-07-25)
+
+Стратегия по 5 поверхностям (owner brief). Fake sold/rating запрещены (HC.3). Owner lock 2026-07-25: см. `qa.md` (закрыто) + Diary.
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| CV.1 | `/events` filters: sticky «Показать N вариантов» + live preview count | Критический | ✅ debounce 350ms, zero CTA gray |
+| CV.2 | `/events` grid: interstitial баннеры каждые 8 карточек → гиды/подборки | Высокий | ✅ compact mobile + click track |
+| CV.3 | Home: live stats (города/события/площадки) + «Как купить» 3 шага | Высокий | ✅ step3 email/SMS/phone; social proof = только каталожные counts до CV.11 |
+| CV.4 | Blog: native `[buy]` card (цена + CTA), без «сайт партнёра» | Высокий | ✅ live DTO + no-store; единственный embed-путь (см. CV.8 🚫) |
+| CV.5 | Sort «скидки» в каталоге | Средний | ⚠️ deferred: нет `discount`/`strikePrice` в DTO; ждать sync architecture sprint |
+| CV.6 | Home video hero (HC.10) | Средний | ⚠️ deferred: photo rotator KEEP; stock muted loops 🚫; ждать продакшн-съёмку; реальные МСК/СПб WebP/AVIF |
+| CV.7 | Podborki listing: inline buy на плитках | Низкий | ⏳ покупка уже на CHPU landing |
+| CV.8 | Blog: auto related events по тегам статьи | Средний | 🚫 rejected: misfire риск убивает native conversion; только manual `[buy]` / admin field |
+| CV.9 | Venue CMS «как найти» (метро + human landmark, manual fill) | Средний | ⏳ owner: CMS admin-поле; geocode template из адреса 🚫; map+today board уже есть |
+| CV.10 | Mood chip «Свидание» на `/podborki` (рядом с «Для двоих») | Низкий | ⏳ |
+| CV.11 | Social proof «проданные билеты» (TC Order paid aggregate) | Средний | ⚠️ deferred: только после реального order-aggregate; hardcoded fake 🚫; до - каталожные counts (CV.3) |
+
+---
+
 ## SEO duplicate titles (2026-07-24)
 
 | # | Задача | Приоритет | Статус |
@@ -81,7 +101,7 @@
 | HC.7 | `/podborki` emotional H1 + mood chips + seasonal banner; emoji presets off | Высокий | ✅ |
 | HC.8 | `/blog` «Материал недели» + newsletter UI + `/api/public/newsletter` stub | Высокий | ✅ |
 | HC.9 | Event detail: CTA крупнее; scarcity только из real `vacant` | Средний | ✅ partial |
-| HC.10 | Home video muted loop ≤5MB | Низкий | ⚠️ P2 нет ассета |
+| HC.10 | Home video muted loop ≤5MB | Низкий | ⚠️ deferred (owner 2026-07-25): photo rotator KEEP; stock muted loops 🚫; ждать продакшн-съёмку (=CV.6) |
 | HC.11 | `/venues` «Рядом со мной» geolocation sort | Средний | ⚠️ P2 нет lat/lng на VenueCatalogCard |
 | HC.12 | `/events` featured split / search preview / tourist tags | Средний | ⚠️ P2 |
 | HC.13 | Landing «бесплатная отмена 24ч» | - | 🚫 запрещено политикой (возврат у организатора) |
@@ -128,7 +148,7 @@
 | H.5 | `/venues` dark imageOverlay + search | Средний | ✅ MVP |
 | H.5b | `/events` imageOverlay photo hero + search/city/date (как venues) | Критический | 🚫 owner: откат к `SectionPageHero` strip (до `47430af`) |
 | H.6 | `/locations` photo hero (imageOverlay) как venues; map не в hero | Критический | 🚫 owner: откат к `withMap`+RussiaMap (до `47430af`) |
-| H.7 | Video loop asset для home | Низкий | ⏳ нет ассета - rotator images |
+| H.7 | Video loop asset для home | Низкий | ⚠️ deferred (owner 2026-07-25): rotator KEEP; stock loops 🚫; =HC.10/CV.6 |
 | H.8 | Blog Featured Hero + interactive list H1 + «Свежее»×3 + min price | Высокий | ✅ `b45995c` prod @`c39d124` |
 | H.8b | `/blog` featured+«Свежее»: max-w-5xl composition + square thumbs | Критический | ✅ `90f6151` prod @`d1ccd8a` |
 | H.8c | `/blog` list hero → imageOverlay + search/chips внутри (уровень venues) | Критический | 🚫 owner: откат к interactive strip (до `8ec241c`; «статьи») |

@@ -1,5 +1,17 @@
 # qa.md — открытые вопросы
 
+## 2026-07-25 - Conversion surfaces (owner) — ЗАКРЫТО
+
+1. **Home video:** **photo rotator KEEP** до продакшн-съёмки. Stock muted loops **отклонены** (фейковый/дешёвый вид). Предпочтительны реальные фото МСК/СПб в WebP/AVIF. Статус: **HC.10 / CV.6 / H.7** - video hero остаётся **deferred**.
+2. **Social proof «проданные билеты»:** цифра **только** после реального TC order-aggregate. Hardcoded fake counts **запрещены**. До появления данных - только честные каталожные counts (города/события/площадки, CV.3). Future: Order paid count, когда агрегат стабилен (**CV.11** deferred).
+3. **Скидки в каталоге:** сортировку «по акциям» **не строить**, пока в DTO/sync нет `discount` / `strikePrice`. **CV.5** - backlog до sync architecture sprint.
+4. **Venue logistics:** CMS admin-поле **«как найти»** (метро + human landmark text), заполняет админ вручную. Geocode-шаблон из адреса **отклонён**. Venues << events - manual ок (**CV.9**).
+5. **Blog auto-embeds:** **только** ручной `[buy slug=…]` или admin custom field (CV.4). Автоподбор по тегам статьи **отклонён** (высокий misfire убивает native conversion) - **CV.8** 🚫.
+
+## 2026-07-25 - Catalog interstitial analytics
+
+1. **GTM / Metrika goals:** клиент шлёт `catalog_interstitial_click` (dataLayer + ym reachGoal при наличии `NEXT_PUBLIC_YANDEX_METRIKA_ID`). Нужен ли отдельный trigger/goal в кабинетах, или достаточно raw push?
+
 ## 2026-07-23 - Антиспам блога / индекс (owner)
 
 1. **Safety marker (гиды):** если Яндекс/GSC индексирует **80–90%** опубликованных URL гидов - темп хаос-графика ок. Если массово «малоценная» / не в индекс - **снизить до 1 гид/день** и пересмотреть шаблоны. Действие только владельца в Вебмастере / GSC.

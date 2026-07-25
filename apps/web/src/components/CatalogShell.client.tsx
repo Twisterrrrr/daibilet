@@ -295,6 +295,7 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
           items={catalog?.items ?? []}
           viewMode={viewMode}
           onViewModeChange={setViewMode}
+          city={filterValues.city}
           clearHref={buildCatalogHref({
             city: filterValues.city,
             sort: filterValues.sort,

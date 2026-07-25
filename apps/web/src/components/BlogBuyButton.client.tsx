@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
 import { canOpenCatalogPurchase } from '@/lib/event-card-meta';
+import { formatPriceFrom } from '@/lib/format';
 import type { PublicEventPageDto, PublicSessionDto } from '@daibilet/contracts/public';
 
 export type ParsedBuyBlock = {
@@ -111,6 +112,7 @@ export function BlogBuyButton({ slug, label }: ParsedBuyBlock) {
         const res = await fetch(`/api/public/events/${encodeURIComponent(slug)}`, {
           signal: controller.signal,
           headers: { Accept: 'application/json' },
+          cache: 'no-store',
         });
         if (!res.ok) {
           if (!cancelled) setStatus('fallback');
@@ -119,7 +121,11 @@ export function BlogBuyButton({ slug, label }: ParsedBuyBlock) {
         const payload = (await res.json()) as PublicEventPageDto;
         const mapped = eventToSession(payload);
         if (!mapped || !canOpenCatalogPurchase(mapped)) {
-          if (!cancelled) setStatus('fallback');
+          if (!cancelled) {
+            // Still show live title/price when purchase widget is unavailable.
+            if (mapped) setSession(mapped);
+            setStatus('fallback');
+          }
           return;
         }
         if (!cancelled) {
@@ -138,22 +144,40 @@ export function BlogBuyButton({ slug, label }: ParsedBuyBlock) {
     };
   }, [slug]);
 
+  const priceLabel =
+    typeof session?.priceFrom === 'number' ? formatPriceFrom(session.priceFrom) : null;
+  const title = session?.title?.trim() || 'Событие из статьи';
+
   return (
-    <aside className="my-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-      {status === 'ready' && session ? (
-        <LandingPurchaseButton session={session} label={label} className={BUTTON_CLASS} />
-      ) : (
-        <Link href={href} className={status === 'loading' ? BUTTON_CLASS : FALLBACK_CLASS}>
-          {status === 'loading' ? label : `${label} →`}
-        </Link>
-      )}
-      <Link
-        href={href}
-        className="text-sm font-medium text-primary-700 underline decoration-primary/30 underline-offset-[3px] hover:decoration-primary/60"
-      >
-        Карточка события
-      </Link>
-      <p className="w-full text-xs text-slate-500">Покупка на сайте партнёра</p>
+    <aside className="not-prose my-8 overflow-hidden rounded-card border border-slate-200/80 bg-surface-muted/40 shadow-card">
+      <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-wider text-primary-700">Билет на Дайбилет</p>
+          <p className="mt-1 line-clamp-2 text-base font-semibold text-graphite">{title}</p>
+          <p className="mt-1 text-sm text-graphite-muted">
+            {priceLabel
+              ? `${priceLabel} - выберите дату и купите онлайн`
+              : status === 'loading'
+                ? 'Загружаем актуальную цену…'
+                : 'Выберите дату и купите билет онлайн'}
+          </p>
+        </div>
+        <div className="flex shrink-0 flex-col gap-2 sm:items-end">
+          {status === 'ready' && session ? (
+            <LandingPurchaseButton session={session} label={label} className={BUTTON_CLASS} />
+          ) : (
+            <Link href={href} className={status === 'loading' ? BUTTON_CLASS : FALLBACK_CLASS}>
+              {label}
+            </Link>
+          )}
+          <Link
+            href={href}
+            className="text-sm font-medium text-primary-700 underline decoration-primary/30 underline-offset-[3px] hover:decoration-primary/60"
+          >
+            Подробнее о событии
+          </Link>
+        </div>
+      </div>
     </aside>
   );
 }

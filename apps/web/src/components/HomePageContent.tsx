@@ -21,9 +21,9 @@ import { mergeBlogCards } from '@/lib/blog-utils';
 import { buildPublicArticlesListDto } from '@daibilet/backend/public-read';
 import '@/lib/env';
 import { getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
-import { formatMoney, pluralEvents } from '@/lib/format';
+import { formatMoney, formatNumber, pluralCities, pluralEvents } from '@/lib/format';
 import { buildHomePageSections } from '@/lib/home-page-sections';
-import { HOME_FORMAT_TILES, HOME_TRUST_ITEMS, resolveHomePromoImage } from '@/lib/home-scenarios';
+import { HOME_FORMAT_TILES, HOME_HOW_IT_WORKS, HOME_TRUST_ITEMS, resolveHomePromoImage } from '@/lib/home-scenarios';
 import { balancedTileGridClass } from '@/lib/balanced-tile-grid';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { venueHref } from '@/lib/routes';
@@ -52,6 +52,9 @@ export async function HomePageContent() {
   const destinations = destinationsPayload?.destinations ?? [];
   const cities = destinations.filter((item) => item.type === 'city');
   const topCities = [...cities].sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')).slice(0, 8);
+  const liveCities = cities.filter((city) => city.events > 0).length;
+  const liveEvents = catalogPayload?.total ?? catalogPayload?.items?.length ?? 0;
+  const liveVenues = venuesPayload?.total ?? venuesPayload?.venues?.length ?? 0;
 
   const sessions = catalogPayload?.items ?? [];
   const fingerprints = new Map(Object.entries(fingerprintsRecord));
@@ -376,6 +379,53 @@ export async function HomePageContent() {
           </div>
         </section>
       ) : null}
+
+      <section className="section-y bg-surface-muted/60">
+        <div className="container-page">
+          <div className="grid gap-6 rounded-card bg-white p-6 shadow-card sm:grid-cols-3 sm:p-8">
+            <div>
+              <p className="font-display text-3xl font-bold tracking-tight text-graphite sm:text-4xl">
+                {formatNumber(liveCities)}
+              </p>
+              <p className="mt-1 text-sm text-graphite-muted">{pluralCities(liveCities)} с афишей</p>
+            </div>
+            <div>
+              <p className="font-display text-3xl font-bold tracking-tight text-graphite sm:text-4xl">
+                {formatNumber(liveEvents)}
+              </p>
+              <p className="mt-1 text-sm text-graphite-muted">{pluralEvents(liveEvents)} онлайн</p>
+            </div>
+            <div>
+              <p className="font-display text-3xl font-bold tracking-tight text-graphite sm:text-4xl">
+                {formatNumber(Math.max(liveVenues, homeVenues.length))}
+              </p>
+              <p className="mt-1 text-sm text-graphite-muted">площадок в каталоге</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="section-y">
+        <div className="container-page">
+          <h2 className="font-display text-center text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+            Как купить билет
+          </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-6 text-graphite-muted">
+            Три шага от выбора до входа - билет сразу на телефон.
+          </p>
+          <ol className="mt-8 grid gap-4 sm:grid-cols-3">
+            {HOME_HOW_IT_WORKS.map((item) => (
+              <li key={item.step} className="rounded-card bg-white p-5 shadow-card">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary-600 text-sm font-bold text-white">
+                  {item.step}
+                </span>
+                <h3 className="mt-4 font-semibold text-graphite">{item.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-graphite-muted">{item.text}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
 
       <section className="section-y">
         <div className="container-page">

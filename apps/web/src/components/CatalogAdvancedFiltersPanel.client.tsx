@@ -4,7 +4,7 @@ import * as React from 'react';
 import { createPortal } from 'react-dom';
 import { Calendar as CalendarIcon, SlidersHorizontal, Users, Wallet, X } from 'lucide-react';
 
-import { formatNumber } from '@/lib/format';
+import { formatNumber, pluralEvents } from '@/lib/format';
 
 type LandingFacet = { slug: string; title: string; events: number };
 
@@ -19,6 +19,14 @@ export type AdvancedCatalogFilters = {
   landing: string;
 };
 
+/** Context from toolbar (not edited inside the sheet) for live result preview. */
+export type CatalogFilterPreviewContext = {
+  q?: string;
+  city?: string;
+  category?: string;
+  sort?: string;
+};
+
 export const AGE_FILTER_OPTIONS = [
   { value: 0, label: '0+' },
   { value: 6, label: '6+' },
@@ -29,6 +37,8 @@ export const AGE_FILTER_OPTIONS = [
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+const PREVIEW_DEBOUNCE_MS = 350;
 
 const inputCls =
   'h-11 w-full min-w-0 rounded-xl border-0 bg-surface-muted px-3 text-base text-graphite outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/30 sm:h-10 sm:text-sm';
@@ -52,10 +62,51 @@ function emptyFilters(): AdvancedCatalogFilters {
   };
 }
 
+function buildPreviewQuery(
+  context: CatalogFilterPreviewContext,
+  draft: AdvancedCatalogFilters,
+  minDraft: string,
+  maxDraft: string,
+): string {
+  const params = new URLSearchParams();
+  params.set('limit', '1');
+  if (context.q?.trim()) params.set('q', context.q.trim());
+  if (context.city) params.set('city', context.city);
+  if (context.category) params.set('category', context.category);
+  if (context.sort && context.sort !== 'time') params.set('sort', context.sort);
+
+  const hasRange = Boolean(draft.dateFrom || draft.dateTo);
+  if (hasRange) {
+    if (draft.dateFrom) params.set('from', draft.dateFrom);
+    if (draft.dateTo) params.set('to', draft.dateTo);
+  } else if (draft.date) {
+    params.set('date', draft.date);
+  }
+
+  const minPrice = minDraft.trim() ? Number(minDraft.trim()) : NaN;
+  const maxPrice = maxDraft.trim() ? Number(maxDraft.trim()) : NaN;
+  if (Number.isFinite(minPrice)) params.set('minPrice', String(minPrice));
+  if (Number.isFinite(maxPrice)) params.set('maxPrice', String(maxPrice));
+  if (draft.ageMax >= 0) params.set('ageMax', String(draft.ageMax));
+  if (draft.landing && draft.landing !== 'all') params.set('landing', draft.landing);
+
+  return params.toString();
+}
+
+function pluralVariants(count: number): string {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod100 >= 11 && mod100 <= 19) return `${formatNumber(count)} вариантов`;
+  if (mod10 === 1) return `${formatNumber(count)} вариант`;
+  if (mod10 >= 2 && mod10 <= 4) return `${formatNumber(count)} варианта`;
+  return `${formatNumber(count)} вариантов`;
+}
+
 export function CatalogAdvancedFiltersPanel({
   open,
   filters,
   landings,
+  previewContext,
   onApply,
   onClose,
   onReset,
@@ -63,6 +114,7 @@ export function CatalogAdvancedFiltersPanel({
   open: boolean;
   filters: AdvancedCatalogFilters;
   landings: LandingFacet[];
+  previewContext?: CatalogFilterPreviewContext;
   onApply: (next: AdvancedCatalogFilters) => void;
   onClose: () => void;
   onReset: () => void;
@@ -71,6 +123,8 @@ export function CatalogAdvancedFiltersPanel({
   const [draft, setDraft] = React.useState(filters);
   const [minDraft, setMinDraft] = React.useState(filters.minPrice === 'all' ? '' : filters.minPrice);
   const [maxDraft, setMaxDraft] = React.useState(filters.maxPrice === 'all' ? '' : filters.maxPrice);
+  const [previewTotal, setPreviewTotal] = React.useState<number | null>(null);
+  const [previewLoading, setPreviewLoading] = React.useState(false);
   const dialogRef = React.useRef<HTMLDivElement>(null);
   const titleId = React.useId();
 
@@ -138,6 +192,35 @@ export function CatalogAdvancedFiltersPanel({
     };
   }, [open, onClose]);
 
+  React.useEffect(() => {
+    if (!open) return;
+    const controller = new AbortController();
+    setPreviewLoading(true);
+    const timer = window.setTimeout(() => {
+      const qs = buildPreviewQuery(previewContext || {}, draft, minDraft, maxDraft);
+      fetch(`/api/public/events?${qs}`, { signal: controller.signal })
+        .then(async (response) => {
+          if (!response.ok) throw new Error('preview_failed');
+          return response.json() as Promise<{ total?: number }>;
+        })
+        .then((payload) => {
+          setPreviewTotal(typeof payload.total === 'number' ? payload.total : 0);
+        })
+        .catch((error) => {
+          if (error instanceof Error && error.name === 'AbortError') return;
+          setPreviewTotal(null);
+        })
+        .finally(() => {
+          if (!controller.signal.aborted) setPreviewLoading(false);
+        });
+    }, PREVIEW_DEBOUNCE_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [open, draft, minDraft, maxDraft, previewContext]);
+
   const patchDraft = (patch: Partial<AdvancedCatalogFilters>) => {
     setDraft((prev) => ({ ...prev, ...patch }));
   };
@@ -159,6 +242,15 @@ export function CatalogAdvancedFiltersPanel({
     setMaxDraft('');
     onReset();
   };
+
+  const applyLabel =
+    previewTotal == null
+      ? previewLoading
+        ? 'Считаем…'
+        : 'Показать варианты'
+      : previewTotal === 0
+        ? 'Ничего не найдено'
+        : `Показать ${pluralVariants(previewTotal)}`;
 
   if (!mounted || !open) return null;
 
@@ -184,6 +276,9 @@ export function CatalogAdvancedFiltersPanel({
             <h2 id={titleId} className="truncate text-base font-semibold text-graphite">
               Фильтры
             </h2>
+            {previewTotal != null && !previewLoading ? (
+              <span className="truncate text-xs text-graphite-muted">{pluralEvents(previewTotal)}</span>
+            ) : null}
           </div>
           <button
             type="button"
@@ -385,7 +480,7 @@ export function CatalogAdvancedFiltersPanel({
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2 border-t border-slate-100/80 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-5">
+        <div className="sticky bottom-0 flex shrink-0 items-center gap-2 border-t border-slate-100/80 bg-white px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-5">
           <button
             type="button"
             onClick={resetDraft}
@@ -396,9 +491,15 @@ export function CatalogAdvancedFiltersPanel({
           <button
             type="button"
             onClick={apply}
-            className="inline-btn btn-primary h-11 flex-1 rounded-xl px-4 text-sm font-semibold sm:h-10"
+            disabled={previewTotal === 0}
+            aria-disabled={previewTotal === 0}
+            className={
+              previewTotal === 0
+                ? 'inline-btn h-11 flex-1 cursor-not-allowed rounded-xl bg-slate-100 px-4 text-sm font-semibold text-slate-500 sm:h-10'
+                : 'inline-btn btn-primary h-11 flex-1 rounded-xl px-4 text-sm font-semibold sm:h-10'
+            }
           >
-            Применить
+            {applyLabel}
           </button>
         </div>
       </div>

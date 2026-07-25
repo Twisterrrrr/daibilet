@@ -1,30 +1,91 @@
 'use client';
 
 import Link from 'next/link';
-import { Star, Grid3X3, List, Table2 } from 'lucide-react';
+import { ArrowRight, Star, Grid3X3, List, Table2 } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
 import { EventCardHorizontal } from '@/components/EventCardHorizontal';
 import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
-import {
-  formatPriceFrom,
-  formatNumber,
-} from '@/lib/format';
-import { formatShowcaseSessionDate } from '@/lib/event-card-meta';
+import { trackCatalogBannerClick } from '@/lib/catalog-analytics';
+import { formatPriceFrom, formatNumber } from '@/lib/format';
+import { formatShowcaseSessionDate, resolvePseudoRating } from '@/lib/event-card-meta';
 import { resolveEventCardDestinationLabel } from '@/lib/event-location';
-import { resolvePseudoRating } from '@/lib/event-card-meta';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
 import type { CatalogViewMode } from '@/lib/catalog-view-mode';
+import {
+  CATALOG_INTERSTITIAL_EVERY,
+  catalogInterstitialsForCity,
+  type CatalogInterstitial,
+} from '@/lib/catalog-interstitials';
 
 type CatalogResultsProps = {
   items: PublicCatalogListItemDto[];
   viewMode: CatalogViewMode;
   onViewModeChange: (mode: CatalogViewMode) => void;
   clearHref?: string;
+  city?: string | null;
 };
 
-export function CatalogResults({ items, viewMode, onViewModeChange, clearHref = '/events' }: CatalogResultsProps) {
+type CatalogGridEntry =
+  | { kind: 'event'; session: PublicCatalogListItemDto }
+  | { kind: 'banner'; banner: CatalogInterstitial };
 
+function buildCatalogGridEntries(
+  items: PublicCatalogListItemDto[],
+  city?: string | null,
+): CatalogGridEntry[] {
+  const banners = catalogInterstitialsForCity(city);
+  if (!banners.length || items.length < CATALOG_INTERSTITIAL_EVERY) {
+    return items.map((session) => ({ kind: 'event' as const, session }));
+  }
+
+  const entries: CatalogGridEntry[] = [];
+  let bannerIndex = 0;
+  items.forEach((session, index) => {
+    entries.push({ kind: 'event', session });
+    if ((index + 1) % CATALOG_INTERSTITIAL_EVERY === 0 && bannerIndex < banners.length) {
+      entries.push({ kind: 'banner', banner: banners[bannerIndex]! });
+      bannerIndex += 1;
+    }
+  });
+  return entries;
+}
+
+function CatalogInterstitialBanner({ banner }: { banner: CatalogInterstitial }) {
+  return (
+    <li className="sm:col-span-2 xl:col-span-4">
+      <Link
+        href={banner.href}
+        onClick={() => trackCatalogBannerClick(banner.id)}
+        className="group flex max-h-[11.5rem] flex-row items-center justify-between gap-3 overflow-hidden rounded-card bg-gradient-to-br from-slate-900 to-primary-800 px-4 py-3.5 text-white shadow-card transition hover:-translate-y-0.5 hover:shadow-card-hover sm:max-h-none sm:gap-4 sm:p-6"
+      >
+        <div className="min-w-0 flex-1">
+          <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-white/65 sm:text-xs">
+            {banner.eyebrow}
+          </p>
+          <h3 className="mt-0.5 line-clamp-2 font-display text-base font-bold leading-snug tracking-tight sm:mt-1 sm:line-clamp-none sm:text-2xl">
+            {banner.title}
+          </h3>
+          <p className="mt-1 hidden max-w-2xl text-sm leading-6 text-white/80 sm:mt-2 sm:block">
+            {banner.description}
+          </p>
+        </div>
+        <span className="inline-flex shrink-0 items-center gap-1.5 self-center rounded-full bg-white px-3 py-2 text-xs font-semibold text-primary-700 transition group-hover:bg-slate-50 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm">
+          <span className="max-w-[7.5rem] truncate sm:max-w-none">{banner.cta}</span>
+          <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={1.75} />
+        </span>
+      </Link>
+    </li>
+  );
+}
+
+export function CatalogResults({
+  items,
+  viewMode,
+  onViewModeChange: _onViewModeChange,
+  clearHref = '/events',
+  city,
+}: CatalogResultsProps) {
   if (!items.length) {
     return (
       <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
@@ -42,6 +103,8 @@ export function CatalogResults({ items, viewMode, onViewModeChange, clearHref = 
     );
   }
 
+  const gridEntries = viewMode === 'cards' ? buildCatalogGridEntries(items, city) : null;
+
   return (
     <>
       {viewMode === 'list' ? (
@@ -56,11 +119,15 @@ export function CatalogResults({ items, viewMode, onViewModeChange, clearHref = 
         <CatalogTable items={items} />
       ) : (
         <ul className="mt-4 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-4">
-          {items.map((session) => (
-            <li key={`${session.id}-${session.startsAt}`}>
-              <EventCard session={session} compact />
-            </li>
-          ))}
+          {gridEntries!.map((entry) =>
+            entry.kind === 'banner' ? (
+              <CatalogInterstitialBanner key={`banner-${entry.banner.id}`} banner={entry.banner} />
+            ) : (
+              <li key={`${entry.session.id}-${entry.session.startsAt}`}>
+                <EventCard session={entry.session} compact />
+              </li>
+            ),
+          )}
         </ul>
       )}
     </>
