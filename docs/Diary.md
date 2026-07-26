@@ -1,3 +1,25 @@
+## 2026-07-26 - Landing ContextWidget (CV.L4 thin) + NY H1 coord
+
+### Наблюдения
+
+- Owner расширил матрицу ContextWidget: planetarium, rooftops, zagorodnye, vecherinki, detyam, novyj-god.
+- Lovable предлагал Prisma `Category.widgetData` + `app/[city]/[category]` - несовместимо с CHPU landings и политикой no-fake-rating.
+- Parallel agent уже правил NY H1 без «сегодня, дата» в `landing-seo` / seasonal / route metadata.
+
+### Решения
+
+- Config `data/landing-context-widgets.ts` по canonical slug; UI `LandingContextWidget` text-first chips (Clean UI); soft client filter по match.
+- Wire в `LandingPageView` после `#variants`.
+- План обновлён: матрица + JSON shape; запрет Prisma Category.widgetData.
+- NY SEO diff от parallel agent включён в тот же deploy slice.
+
+### Проблемы
+
+- Follow-up CV.L4b: yards/dinner/standup/museums.
+- Нужен push + deploy-prod-next.
+
+---
+
 ## 2026-07-26 - Fix NY landing H1 «сегодня, дата»
 
 ### Наблюдения

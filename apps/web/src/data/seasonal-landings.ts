@@ -158,7 +158,7 @@ export const SEASONAL_LANDINGS: Record<string, SeasonalLandingMeta> = {
     slug: 'new-year',
     kind: 'seasonal',
     breadcrumbLabel: 'Новый год',
-    nationalHeroTitle: 'Отмечаем Новый год - ёлки, шоу и праздничные программы',
+    nationalHeroTitle: 'Новый год в России: экскурсии, каникулы и праздничные программы',
     nationalHeroSubtitle:
       'Ваш главный гид по созданию праздничного настроения и планированию зимних каникул. Страница необходима всем, кто хочет заранее и без суеты забронировать лучшие места на самые дефицитные январские события.',
     nationalIntro:

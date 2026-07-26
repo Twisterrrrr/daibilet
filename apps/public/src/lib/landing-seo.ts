@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { getSeasonalLanding } from '@/data/seasonal-landings';
 import { formatBridgesSeoDescription, formatBridgesSeoTitle } from '@/lib/bridges-seo';
+import { cityToPrepositional } from '@/lib/city-declension';
 import { canonicalLandingSlug, isBridgesNightLandingSlug, isRiverPartyLandingSlug } from '@/lib/landing-slugs';
 import type { LandingProfileKind } from '@/lib/landing-copy';
 import {
@@ -84,6 +85,20 @@ function buildH1Parts(base: string, short: string, suffix: string) {
   };
 }
 
+/** Сезонные/праздничные H1 без «сегодня, DD месяца». */
+function buildStaticH1Parts(base: string, suffix: string) {
+  const cleaned = base.replace(/\s*сегодня[^:]*$/i, '').trim();
+  const h1Lead = cleaned;
+  const h1Today = '';
+  const h1Tail = `: ${suffix}`;
+  return {
+    h1Lead,
+    h1Today,
+    h1Tail,
+    h1: `${h1Lead}${h1Tail}`,
+  };
+}
+
 function seoResult(
   base: string,
   short: string,
@@ -92,6 +107,15 @@ function seoResult(
   description: string,
 ): LandingSeo {
   return { ...buildH1Parts(base, short, suffix), title, description };
+}
+
+function staticSeoResult(
+  base: string,
+  suffix: string,
+  title: string,
+  description: string,
+): LandingSeo {
+  return { ...buildStaticH1Parts(base, suffix), title, description };
 }
 
 export function resolveLandingSeo(input: LandingSeoInput): LandingSeo {
@@ -195,28 +219,53 @@ export function resolveLandingSeo(input: LandingSeoInput): LandingSeo {
   if (profile === 'seasonal') {
     const meta = getSeasonalLanding(slug);
     const label = meta?.breadcrumbLabel || input.landingTitle;
-    if (cityName && meta) {
-      const cityPrepSeasonal = input.cityPrep || cityName;
-      return seoResult(
-        `${label} в ${cityPrepSeasonal}`,
-        short,
-        'точки обзора и экскурсии',
-        `${label} — ${cityName} сегодня: купить билеты, афиша на ${full}`,
-        `Актуальная афиша программ «${label}» в ${cityName} на сегодня. ` +
+
+    // Новый год / зимние праздники: без «сегодня, дата» и без «точек обзора» (это салют).
+    if (slug === 'new-year') {
+      if (cityName) {
+        const cityPrep = cityToPrepositional(cityName);
+        return staticSeoResult(
+          `Новый год в ${cityPrep}`,
+          'куда сходить и купить билеты',
+          `Новый год в ${cityPrep}: куда сходить и купить билеты | Дайбилет`,
+          `Новогодние ёлки, шоу, экскурсии и праздничные программы в ${cityPrep}. ` +
+            eventsPhrase(events, 'программ') +
+            pricePhrase(priceFrom) +
+            'Сравните даты и оформите билет онлайн на Дайбилет!',
+        );
+      }
+      return staticSeoResult(
+        'Новый год в России',
+        'экскурсии, каникулы и праздничные программы',
+        'Новый год в России: экскурсии, каникулы и праздничные программы | Дайбилет',
+        'Новогодние ёлки, шоу, круизы и праздничные программы по городам России. ' +
           eventsPhrase(events, 'программ') +
           pricePhrase(priceFrom) +
-          'Лучшие точки обзора и экскурсии. Покупайте онлайн на Дайбилет!',
+          'Сравните варианты и купите билеты онлайн на Дайбилет!',
       );
     }
-    return seoResult(
+
+    // Салют 9 мая и прочие сезонные: тоже без «сегодня» (дата праздника != календарный today).
+    if (cityName) {
+      const cityPrep = cityToPrepositional(cityName);
+      return staticSeoResult(
+        `${label} в ${cityPrep}`,
+        'лучшие точки обзора и экскурсии',
+        `${label} в ${cityName}: точки обзора и экскурсии | Дайбилет`,
+        `Программы «${label}» в ${cityName}: точки обзора, речные и автобусные экскурсии. ` +
+          eventsPhrase(events, 'программ') +
+          pricePhrase(priceFrom) +
+          'Сравните варианты и купите билеты онлайн на Дайбилет!',
+      );
+    }
+    return staticSeoResult(
       label,
-      short,
       'лучшие точки обзора и экскурсии',
-      `${label} сегодня — купить билеты, афиша на ${full}`,
-      `Актуальная афиша «${label}» на сегодня. ` +
+      `${label}: лучшие точки обзора и экскурсии | Дайбилет`,
+      `Программы «${label}»: экскурсии и точки обзора в городах России. ` +
         eventsPhrase(events, 'программ') +
         pricePhrase(priceFrom) +
-        'Сравнение экскурсий и точек обзора в городах России. Покупайте онлайн на Дайбилет!',
+        'Сравните варианты и купите билеты онлайн на Дайбилет!',
     );
   }
 

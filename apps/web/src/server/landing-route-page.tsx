@@ -3,11 +3,13 @@ import { notFound } from 'next/navigation';
 
 import { LandingPageView } from '@/components/LandingPageView.client';
 import { SiteLayout } from '@/components/SiteLayout';
+import { getSeasonalLanding } from '@/data/seasonal-landings';
 import '@/lib/env';
 import { resolveLandingCityName } from '@/lib/landing-city';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
 import { resolveLandingCardImage } from '@/lib/landing-images';
 import { landingCategoryHref, resolveLandingRouteFromLocation } from '@/lib/landing-routes';
+import { resolveLandingSeo } from '@/lib/landing-seo';
 import {
   buildCategoryCityListingMeta,
   evaluateListingIndexability,
@@ -58,6 +60,17 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
     title = listingMeta.title;
     description = listingMeta.description;
     shareTitle = listingMeta.title;
+  } else if (getSeasonalLanding(slug)) {
+    const seo = resolveLandingSeo({
+      slug,
+      profile: 'seasonal',
+      landingTitle: landing.title,
+      stats: finalized.stats,
+      landingEvents: landing.events,
+    });
+    title = pageTitle(seo.title);
+    shareTitle = seo.title.includes('Дайбилет') ? seo.title : `${title} | Дайбилет`;
+    description = seo.description;
   } else {
     title = pageTitle(landing.seoTitle || landing.title);
     shareTitle = String(landing.seoTitle || '').includes('Дайбилет')

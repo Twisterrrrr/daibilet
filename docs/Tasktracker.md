@@ -11,7 +11,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| SEO.NY1 | NY/seasonal H1: убрать «сегодня, дата»; festive framing без «точек обзора» | Критический | 🔄 commit+deploy |
+| SEO.NY1 | NY/seasonal H1: убрать «сегодня, дата»; festive framing без «точек обзора» | Критический | 🔄 commit+deploy (hash after push) |
 
 ---
 
@@ -114,7 +114,8 @@
 | CV.L1 | Micro-badges из tags/subcategories/title на schedule rows + EventCard(`landingActions`); dinner badge chips; скрыть fake ★ на этих поверхностях | Критический | ✅ helper `landing-card-badges.ts` |
 | CV.L2 | Date chips UX для concert/standup (sticky horizontal, slots без reload) | Высокий | ⏳ chips уже есть на default; polish |
 | CV.L3 | River section tabs day/night/dinner (bridges patterns → shared) | Высокий | ⏳ |
-| CV.L4 | ContextWidget per type (yards/dinner/standup/museums) - config, не хардкод page | Средний | ⏳ |
+| CV.L4 | ContextWidget config по slug (owner matrix: planetarium/rooftops/country-tours/river-party/family-kids/new-year); text-first chips; no Prisma Category.widgetData | Средний | ✅ thin |
+| CV.L4b | ContextWidget follow-up: yards / dinner / standup / museums | Средний | ⏳ |
 | CV.L5 | Empty-state cross-sell на соседние CHPU / city hub | Средний | ⏳ partial dinner/river |
 | CV.L6 | Map start points (Yandex) yards/bridges - после logistics | Низкий | ⏳ later |
 | CV.L-debt | Cleanup legacy hardcoded `LandingReviews` / bridges meta ratings | Средний | ⏳ не в L1 |
