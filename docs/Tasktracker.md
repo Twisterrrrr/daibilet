@@ -11,9 +11,9 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| PERF.L1 | Landings ISR: убрать `await searchParams` в `[segment]`/`[segment2]`/`[segment3]`; genre с URL на клиенте | Критический | 🔄 commit+deploy |
-| PERF.L2 | `publicCatalogSessions` SWR (fresh 5м / stale 30м + soft-invalidate), зеркало TS DTO | Критический | 🔄 commit+deploy |
-| PERF.L3 | Slim SSR: fallback `buildPublicLandingPage` → lean cards + slice 48 (как managed) | Высокий | 🔄 commit+deploy |
+| PERF.L1 | Landings ISR: убрать `await searchParams` в `[segment]`/`[segment2]`/`[segment3]`; genre с URL на клиенте | Критический | ✅ `c433652` prod (`s-maxage=3600` + HIT) |
+| PERF.L2 | `publicCatalogSessions` SWR (fresh 5м / stale 30м + soft-invalidate), зеркало TS DTO | Критический | ✅ `c433652` prod |
+| PERF.L3 | Slim SSR: fallback `buildPublicLandingPage` → lean cards + slice 48 (как managed) | Высокий | ✅ `c433652`; `/rechnye-progulki` ~231KB (было ~705KB) |
 | PERF.L4 | `/events` generateMetadata без searchParams (SEO tradeoff vs ISR) | Средний | ⚠️ deferred; body уже без await |
 
 ---

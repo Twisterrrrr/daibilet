@@ -16,7 +16,8 @@
 
 ### Проблемы
 
-- Нужен exclusive deploy + curl Cache-Control / x-nextjs-cache / TTFB на `/`, `/novyj-god`, `/rechnye-progulki`, `/neobychnye-teatry/ekaterinburg`.
+- **Prod @`c433652`:** exclusive `deploy-prod-next` EXIT:0; build: `● /[segment]` / `● /[segment]/[segment2]` с `revalidate=1h` (было ƒ no-store).
+- Smoke curl (warm): landings `Cache-Control: s-maxage=3600` + `x-nextjs-cache: HIT`; TTFB ~0.12–0.20с. `/rechnye-progulki` raw ~231KB (было ~705KB). `/` cold MISS ~12с после deploy, затем HIT ~0.12–0.14с (`s-maxage=300`).
 
 ---
 
