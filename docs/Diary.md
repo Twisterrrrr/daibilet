@@ -94,7 +94,8 @@
 
 ### Проблемы
 
-- Нужен commit + exclusive deploy-prod-next + smoke HTML на диапазон.
+- ~~Нужен commit + exclusive deploy-prod-next + smoke HTML на диапазон.~~ ✅ prod: `990-2 490 ₽`, API `priceTo:2490`.
+- Fake social proof (soldEstimate / 4.7) остаётся - BR.PR2.
 
 ---
 
