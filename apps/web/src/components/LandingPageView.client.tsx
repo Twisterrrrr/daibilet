@@ -1657,20 +1657,20 @@ function LandingDinnerFilters({
           <button
             type="button"
             onClick={() => setDinnerBadgeFilter('all')}
-            className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
-              dinnerBadgeFilter === 'all'
-                ? 'border-primary bg-primary text-primary-foreground'
-                : 'border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-primary'
-            }`}
-          >
-            Все форматы
-          </button>
+              className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                dinnerBadgeFilter === 'all'
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-primary'
+              }`}
+            >
+              Все форматы
+            </button>
           {badgeFacets.map((facet) => (
             <button
               key={facet.id}
               type="button"
               onClick={() => setDinnerBadgeFilter(dinnerBadgeFilter === facet.id ? 'all' : facet.id)}
-              className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+              className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                 dinnerBadgeFilter === facet.id
                   ? 'border-primary bg-primary text-primary-foreground'
                   : 'border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-primary'
@@ -2677,7 +2677,7 @@ function LandingFilters({
       key={value}
       type="button"
       onClick={() => setCategory(value)}
-      className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
+      className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
         active
           ? 'border-primary bg-primary text-primary-foreground'
           : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
@@ -2699,7 +2699,7 @@ function LandingFilters({
       key={value}
       type="button"
       onClick={() => selectCity(value)}
-      className={`whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
+      className={`inline-flex min-h-11 items-center whitespace-nowrap rounded-lg border px-3.5 py-1.5 text-sm font-medium transition-all ${
         active
           ? 'border-primary bg-primary text-primary-foreground'
           : 'border-border bg-background text-foreground hover:border-primary/40 hover:text-primary'
@@ -3408,12 +3408,30 @@ function LandingEventsTable({ groups }: { groups: EventGroup[] }) {
 }
 
 function LandingEventsGrid({ groups }: { groups: EventGroup[] }) {
+  const PAGE = 48;
+  const [visible, setVisible] = React.useState(PAGE);
+  const shown = groups.slice(0, visible);
+  const hasMore = groups.length > visible;
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {groups.slice(0, 60).map((group) => (
-        <EventCard key={group.key} session={group.representative} compact landingActions />
-      ))}
-      {!groups.length ? <EmptyFilteredState /> : null}
+    <div className="space-y-4">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {shown.map((group) => (
+          <EventCard key={group.key} session={group.representative} compact landingActions />
+        ))}
+        {!groups.length ? <EmptyFilteredState /> : null}
+      </div>
+      {hasMore ? (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => setVisible((current) => current + PAGE)}
+            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-border bg-background px-5 text-sm font-semibold text-foreground hover:border-primary/40 hover:text-primary"
+          >
+            Показать ещё
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -43,3 +43,25 @@ test('salute keeps viewpoint framing but skips сегодня', () => {
   assert.equal(/сегодня/i.test(seo.h1), false);
   assert.equal(seo.h1Today, '');
 });
+
+test('pricePhrase never invents от 100 without real priceFrom', () => {
+  const withoutPrice = resolveLandingSeo({
+    slug: 'standup',
+    profile: 'default',
+    landingTitle: 'Стендап',
+    cityName: 'Москва',
+    referenceDate: new Date('2026-07-26T12:00:00+03:00'),
+  });
+  assert.equal(/от\s+100\s+рублей/i.test(withoutPrice.description), false);
+  assert.equal(/от\s+\d+\s+рублей/i.test(withoutPrice.description), false);
+
+  const withPrice = resolveLandingSeo({
+    slug: 'standup',
+    profile: 'default',
+    landingTitle: 'Стендап',
+    cityName: 'Москва',
+    stats: { priceFrom: 1200, events: 12 },
+    referenceDate: new Date('2026-07-26T12:00:00+03:00'),
+  });
+  assert.match(withPrice.description, /от 1200 рублей/);
+});

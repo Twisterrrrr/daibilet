@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  appendRealPriceToDescription,
   buildCategoryCityListingMeta,
   buildCategoryCityMetaDescription,
   buildCategoryCityMetaTitle,
@@ -70,6 +71,31 @@ test('listing meta bundles labels', () => {
   });
   assert.equal(meta.labels.titleCategory, 'Концерты');
   assert.match(meta.title, /^Концерты в Москве 2026/);
+});
+
+test('listing meta appends real priceFrom only', () => {
+  const withPrice = buildCategoryCityListingMeta({
+    landingSlug: 'standup',
+    cityName: 'Москва',
+    year: 2026,
+    priceFrom: 990,
+  });
+  assert.match(withPrice.description, /Цены от 990 рублей/);
+
+  const noFake = buildCategoryCityListingMeta({
+    landingSlug: 'standup',
+    cityName: 'Москва',
+    year: 2026,
+    priceFrom: null,
+  });
+  assert.equal(/Цены от/i.test(noFake.description), false);
+});
+
+test('appendRealPriceToDescription skips inventing and duplicates', () => {
+  assert.equal(appendRealPriceToDescription('База.', null), 'База.');
+  assert.equal(appendRealPriceToDescription('База.', 0), 'База.');
+  assert.equal(appendRealPriceToDescription('База от 500 рублей.', 900), 'База от 500 рублей.');
+  assert.equal(appendRealPriceToDescription('База.', 750), 'База. Цены от 750 рублей.');
 });
 
 test('thin listing threshold default 6', () => {

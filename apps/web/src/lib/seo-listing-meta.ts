@@ -207,6 +207,6 @@ export function appendRealPriceToDescription(
   const base = String(description || '').trim();
   const price = Number(priceFrom);
   if (!base || !Number.isFinite(price) || price <= 0) return base;
-  if (/\bот\s+\d[\d\s]*\s*руб/i.test(base)) return base;
+  if (/(?:^|[^\wА-Яа-яЁё])от\s+\d[\d\s]*\s*руб/i.test(base)) return base;
   return `${base} Цены от ${Math.round(price)} рублей.`;
 }

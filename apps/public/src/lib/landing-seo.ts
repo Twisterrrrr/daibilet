@@ -48,9 +48,11 @@ export type LandingSeo = {
   description: string;
 };
 
-function roundPrice(price?: number | null): number {
-  if (!price || price <= 0) return 100;
-  return Math.round(price);
+/** Только реальная цена оффера; без fallback «от 100» (не выдумываем). */
+export function formatRealPriceRub(price?: number | null): number | null {
+  const value = Number(price);
+  if (!Number.isFinite(value) || value <= 0) return null;
+  return Math.round(value);
 }
 
 function resolveEventsCount(input: LandingSeoInput): number {
@@ -68,7 +70,8 @@ function eventsPhrase(count: number, unit: string): string {
 }
 
 function pricePhrase(price?: number | null): string {
-  const value = roundPrice(price ?? null);
+  const value = formatRealPriceRub(price);
+  if (value == null) return '';
   return `от ${value} рублей. `;
 }
 

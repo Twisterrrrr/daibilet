@@ -1,3 +1,26 @@
+## 2026-07-26 - SEO technical launch checklist (vs Lovable sample)
+
+### Наблюдения
+
+- Owner checklist + Lovable `generateMetadata` для `[city]/[category]` - sample с багами (canonical template, fake rating sort, wrong genitive). В Daibilet уже CHPU landings + `seo-listing-meta` + sitemap chunks.
+- `landing-seo.pricePhrase` всегда писал «от 100 рублей» при отсутствии `priceFrom` - выдуманная цена в description.
+- robots disallow не включал `/api/`. National metadata часто брал только CMS seoTitle без `resolveLandingSeo`/stats.
+- Параллельные агенты трогали EmptyState/Metrika/ContextWidget - правки SEO в robots, landing-seo, landing-route-page, seo-listing-meta, globals chips; LandingPageView только chips + «Показать ещё».
+
+### Решения
+
+- Чеклист: `docs/seo-launch-checklist.md` + Tasktracker SEO.LC1–LC6.
+- `formatRealPriceRub` / `appendRealPriceToDescription`; city×category meta с реальным priceFrom; national через `resolveLandingSeo` + профиль.
+- robots `CRAWL_DISALLOW`: `/api/`, account, admin, login, reviews/write.
+- Landing grid page=48 + «Показать ещё»; catalog/landing chips `min-h-11`.
+
+### Проблемы
+
+- Owner: sitemap в Вебмастере + переобход TOP (SEO.IN2/IN3) - вне кода.
+- Deploy после merge с параллельными landing-коммитами.
+
+---
+
 ## 2026-07-26 - Owner CRO: Metrika goals + empty-state + optimistic UI
 
 ### Наблюдения

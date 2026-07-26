@@ -6,25 +6,34 @@ const SITE_URL = (
   'https://daibilet.ru'
 ).replace(/\/$/, '');
 
+const CRAWL_DISALLOW = [
+  '/api/',
+  '/account/',
+  '/login',
+  '/admin/',
+  '/reviews/write',
+] as const;
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
         userAgent: '*',
         allow: '/',
-        // /admin on daibilet.ru; admin.daibilet.ru is also Basic Auth + noindex layout
-        disallow: ['/account/', '/login', '/admin/'],
+        // /admin on daibilet.ru; admin.daibilet.ru is also Basic Auth + noindex layout.
+        // Checkout success is external (partner iframe); account purchases covered by /account/.
+        disallow: [...CRAWL_DISALLOW],
       },
       // Explicit allow for major crawlers (do not block Googlebot / Yandex site-wide)
       {
         userAgent: 'Googlebot',
         allow: '/',
-        disallow: ['/account/', '/login', '/admin/'],
+        disallow: [...CRAWL_DISALLOW],
       },
       {
         userAgent: 'Yandex',
         allow: '/',
-        disallow: ['/account/', '/login', '/admin/'],
+        disallow: [...CRAWL_DISALLOW],
       },
       // Known content scrapers (mirror sites like liliabots.ru)
       {

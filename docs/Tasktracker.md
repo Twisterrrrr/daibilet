@@ -26,6 +26,21 @@
 
 ---
 
+## SEO technical launch checklist (2026-07-26)
+
+Полная таблица: [seo-launch-checklist.md](./seo-launch-checklist.md). Lovable Category-модель / sample `[city]/[category]` - не принимать.
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| SEO.LC1 | Audit robots/sitemap/canonical/meta/H1/CWV vs owner checklist | Критический | ✅ |
+| SEO.LC2 | robots: Disallow `/api/` (+ account/admin/login/reviews/write) | Высокий | ✅ |
+| SEO.LC3 | Meta: реальный `priceFrom` only; убрать invent «от 100» в `landing-seo` | Критический | ✅ |
+| SEO.LC4 | National + city×category metadata через `buildLandingMetadata` / `seo-listing-meta` | Высокий | ✅ |
+| SEO.LC5 | Landing grid «Показать ещё» (page 48) + chip touch ~44px | Средний | ✅ |
+| SEO.LC6 | Owner: Webmaster sitemap + reindex TOP | Высокий | ⏳ **владелец** (IN2/IN3) |
+
+---
+
 ## Event buy-card tariffs (2026-07-26)
 
 | # | Задача | Приоритет | Статус |

@@ -5,12 +5,19 @@ import { LandingPageView } from '@/components/LandingPageView.client';
 import { SiteLayout } from '@/components/SiteLayout';
 import { getSeasonalLanding } from '@/data/seasonal-landings';
 import '@/lib/env';
+import type { LandingProfileKind } from '@/lib/landing-copy';
 import { resolveLandingCityName } from '@/lib/landing-city';
-import { canonicalLandingSlug } from '@/lib/landing-constants';
+import {
+  canonicalLandingSlug,
+  isBridgesNightLandingSlug,
+  isRiverCruisesLandingSlug,
+  isRiverPartyLandingSlug,
+} from '@/lib/landing-constants';
 import { resolveLandingCardImage } from '@/lib/landing-images';
 import { landingCategoryHref, resolveLandingRouteFromLocation } from '@/lib/landing-routes';
 import { resolveLandingSeo } from '@/lib/landing-seo';
 import {
+  appendRealPriceToDescription,
   buildCategoryCityListingMeta,
   evaluateListingIndexability,
   robotsForListingIndexability,
@@ -31,6 +38,18 @@ function readSearchParam(params: SearchParams, key: string): string | undefined 
   return undefined;
 }
 
+/** Профиль SEO/UI для лендинга - зеркало LandingPageView.getLandingProfile. */
+function resolveLandingProfileKind(slug: string): LandingProfileKind {
+  const key = canonicalLandingSlug(slug);
+  if (isBridgesNightLandingSlug(key)) return 'bridges';
+  if (getSeasonalLanding(key)) return 'seasonal';
+  if (isRiverPartyLandingSlug(key)) return 'default';
+  if (key.includes('bus')) return 'bus';
+  if (key.includes('dinner') || key.includes('ужин')) return 'dinner';
+  if (isRiverCruisesLandingSlug(key)) return 'river';
+  return 'default';
+}
+
 export async function buildLandingMetadata(pathname: string): Promise<Metadata> {
   const route = resolveLandingRouteFromLocation(pathname);
   if (!route) return { title: pageTitle('Подборка') };
@@ -45,7 +64,9 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
   const canonical = landingCategoryHref(slug, route.citySlug);
   const cityName = resolveLandingCityName(route.citySlug);
   const offers = finalized.stats?.events ?? 0;
+  const priceFrom = finalized.stats?.priceFrom ?? null;
   const indexDecision = evaluateListingIndexability({ offers });
+  const profile = resolveLandingProfileKind(slug);
 
   let title: string;
   let description: string | undefined;
@@ -56,34 +77,39 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
       landingSlug: slug,
       cityName,
       fallbackTitle: landing.title,
+      priceFrom,
     });
     title = listingMeta.title;
     description = listingMeta.description;
     shareTitle = listingMeta.title;
-  } else if (getSeasonalLanding(slug)) {
+  } else {
     const seo = resolveLandingSeo({
       slug,
-      profile: 'seasonal',
+      profile,
       landingTitle: landing.title,
       stats: finalized.stats,
       landingEvents: landing.events,
     });
-    title = pageTitle(seo.title);
-    shareTitle = seo.title.includes('Дайбилет') ? seo.title : `${title} | Дайбилет`;
-    description = seo.description;
-  } else {
-    title = pageTitle(landing.seoTitle || landing.title);
-    shareTitle = String(landing.seoTitle || '').includes('Дайбилет')
-      ? String(landing.seoTitle)
-      : `${title} | Дайбилет`;
-    description = landing.seoDescription || landing.subtitle || undefined;
+    // CMS overrides when present; иначе шаблон resolveLandingSeo (с реальной ценой).
+    const cmsTitle = String(landing.seoTitle || '').trim();
+    const cmsDescription = String(landing.seoDescription || '').trim();
+    title = pageTitle(cmsTitle || seo.title);
+    shareTitle = cmsTitle.includes('Дайбилет')
+      ? cmsTitle
+      : seo.title.includes('Дайбилет')
+        ? seo.title
+        : `${title} | Дайбилет`;
+    description = appendRealPriceToDescription(
+      cmsDescription || seo.description || landing.subtitle || '',
+      cmsDescription ? priceFrom : null,
+    );
   }
 
   const image = landing.imageUrl || resolveLandingCardImage(slug);
 
   return {
     title: cityName ? { absolute: title } : title,
-    description,
+    description: description || undefined,
     alternates: {
       canonical,
     },
