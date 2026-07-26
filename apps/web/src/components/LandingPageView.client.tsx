@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Anchor, ArrowRight, Briefcase, Bus, Cake, CalendarDays, CheckCircle2, ChevronDown, Clock, Eye, Headphones, Heart, HelpCircle, Lightbulb, Mail, MapPin, Mic, Moon, Music, Quote, Search, Shield, Ship, Sparkles, Star, Sun, Tag, Ticket, TrendingUp, Users, UtensilsCrossed, Wallet } from 'lucide-react';
+import { Anchor, ArrowRight, Briefcase, Bus, Cake, CalendarDays, CheckCircle2, ChevronDown, Clock, Eye, Headphones, Heart, HelpCircle, Lightbulb, Mail, MapPin, Mic, Moon, Music, Search, Shield, Ship, Sparkles, Star, Sun, Tag, Ticket, TrendingUp, Users, UtensilsCrossed, Wallet } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
 import { BridgesLandingGuide, BridgesShipChecklist } from '@/components/landing/BridgesLandingGuide.client';
@@ -12,6 +12,11 @@ import {
   BridgesScheduleStrip,
   BridgesTonightTips,
 } from '@/components/landing/BridgesLandingSelling.client';
+import {
+  LandingHeroCtaBlock,
+  resolveLandingHeroPrimaryLabel,
+  resolveLandingHeroTheme,
+} from '@/components/landing/LandingHeroCtaBlock.client';
 import { BridgesScheduleSection } from '@/components/landing/BridgesScheduleSection.client';
 import { LandingCityLocations } from '@/components/landing/LandingCityLocations.client';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
@@ -848,13 +853,13 @@ export function LandingPageView({
             stats={payload.stats}
             sessionsReady={sessionsReady}
             todayReference={todayReference}
+            onScrollToSchedule={() => scrollToSchedule()}
             bridgesHeroActions={
               profile === 'bridges' ? (
                 <BridgesHeroBlock
                   priceFrom={payload.stats.priceFrom ?? null}
                   priceTo={payload.stats.priceTo ?? null}
                   visibleCount={allGroups.length}
-                  soldEstimate={Math.max(allGroups.length * 1850, payload.sessions.length * 420)}
                   sessionsReady={sessionsReady}
                   onPickTour={() => scrollToSchedule()}
                   onViewSchedule={() => document.getElementById('bridges-lift-schedule')?.scrollIntoView({ behavior: 'smooth' })}
@@ -863,10 +868,7 @@ export function LandingPageView({
             }
             seasonalHeroActions={
               profile === 'seasonal' && resolveSeasonalCountdownKind(slug) ? (
-                <SeasonalHeroCountdown
-                  kind={resolveSeasonalCountdownKind(slug)!}
-                  onViewSchedule={() => scrollToSchedule()}
-                />
+                <SeasonalHeroCountdown kind={resolveSeasonalCountdownKind(slug)!} />
               ) : undefined
             }
           />
@@ -1142,6 +1144,7 @@ function LandingHero({
   stats,
   sessionsReady = true,
   todayReference,
+  onScrollToSchedule,
   bridgesHeroActions,
   seasonalHeroActions,
 }: {
@@ -1154,6 +1157,7 @@ function LandingHero({
   stats: PublicLandingPageDto['stats'];
   sessionsReady?: boolean;
   todayReference: Date;
+  onScrollToSchedule?: () => void;
   bridgesHeroActions?: React.ReactNode;
   seasonalHeroActions?: React.ReactNode;
 }) {
@@ -1175,7 +1179,7 @@ function LandingHero({
     buildLandingSeoInput(landing, landingSlug, profile, citySlug, stats, todayReference),
   );
   const countdownKind = isSeasonal ? resolveSeasonalCountdownKind(landingSlug) : null;
-  const useAtmosphereHero = isBridges || Boolean(countdownKind);
+  const heroTheme = resolveLandingHeroTheme({ profile, landingSlug, countdownKind });
   const heroSubtitle = isBridges
     ? BRIDGES_LANDING.heroSubtitle
     : useCopy && landingCopy?.lead
@@ -1187,51 +1191,37 @@ function LandingHero({
     : isBus && cityName && busGuide?.heroSubtitle
       ? busGuide.heroSubtitle
       : isBus && !cityName
-        ? landing.heroSubtitle || 'От Калининграда до Сочи — сравните автобусные экскурсии в 11 городах России.'
+        ? landing.heroSubtitle || 'От Калининграда до Сочи - сравните автобусные экскурсии в 11 городах России.'
         : isRiver && cityName && riverGuide?.heroSubtitle
           ? riverGuide.heroSubtitle
           : isRiver && !cityName
-            ? landing.heroSubtitle || 'От Невы до Енисея — сравните предложения речных прогулок в 12 городах России.'
+            ? landing.heroSubtitle || 'От Невы до Енисея - сравните предложения речных прогулок в 12 городах России.'
             : landing.heroSubtitle || landing.subtitle;
   const countLabel = isBridges
-    ? 'прогулок'
+    ? 'рейсов ночью'
     : isBus && cityName
       ? 'рейсов'
       : isBus
         ? 'экскурсий'
         : isRiver && cityName
           ? 'прогулок'
-          : isSeasonal
-            ? 'программ'
-            : 'событий';
-  const heroClass = isBridges
-    ? 'gradient-bridges-hero text-primary-foreground landing-hero-atmosphere'
-    : countdownKind === 'new-year'
-      ? 'gradient-newyear-hero text-primary-foreground landing-hero-atmosphere'
-      : countdownKind === 'salute-may9'
-        ? 'gradient-salute-hero text-primary-foreground landing-hero-atmosphere'
-        : isSeasonal && landingSlug.includes('salute')
-          ? 'gradient-salute-hero'
-          : 'gradient-hero-lovable';
-  const heroGlow =
-    countdownKind === 'new-year'
-      ? 'var(--newyear-hero-glow)'
-      : isBridges || countdownKind
-        ? 'var(--landing-hero-glow)'
-        : null;
+          : isDinner
+            ? 'ужинов'
+            : isSeasonal
+              ? 'программ'
+              : 'вариантов';
+  const primaryLabel = resolveLandingHeroPrimaryLabel(profile);
 
   return (
-    <section className={`relative overflow-hidden ${heroClass}`}>
-      {heroGlow ? (
-        <div className="pointer-events-none absolute inset-0 opacity-40" aria-hidden>
-          <div
-            className="absolute left-1/2 top-24 h-96 w-[120%] -translate-x-1/2 rounded-[50%] blur-3xl"
-            style={{ backgroundColor: isBridges ? 'var(--bridges-hero-glow)' : heroGlow }}
-          />
-        </div>
-      ) : null}
-      <div className={`relative container-page ${useAtmosphereHero ? 'pb-16 pt-10 md:pt-14' : 'py-16 md:py-24'}`}>
-        <div className={useAtmosphereHero ? 'max-w-5xl' : 'max-w-4xl'}>
+    <section className={`relative overflow-hidden ${heroTheme.className}`}>
+      <div className="pointer-events-none absolute inset-0 opacity-40" aria-hidden>
+        <div
+          className="absolute left-1/2 top-24 h-96 w-[120%] -translate-x-1/2 rounded-[50%] blur-3xl"
+          style={{ backgroundColor: isBridges ? 'var(--bridges-hero-glow)' : heroTheme.glow }}
+        />
+      </div>
+      <div className="relative container-page pb-16 pt-10 md:pt-14">
+        <div className="max-w-5xl">
           <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-primary-foreground/70">
             <span className="flex items-center gap-2">
               <a href="/" className="transition-colors hover:text-primary-foreground">Главная</a>
@@ -1321,7 +1311,7 @@ function LandingHero({
               </span>
             ) : null}
           </nav>
-          <h1 className={`mb-5 font-semibold leading-tight tracking-tight text-primary-foreground ${useAtmosphereHero ? 'max-w-4xl text-3xl md:text-4xl lg:text-5xl' : 'mb-4 text-3xl font-extrabold md:text-5xl'}`}>
+          <h1 className="mb-5 max-w-4xl text-3xl font-semibold leading-tight tracking-tight text-primary-foreground md:text-4xl lg:text-5xl">
             {isBridges ? (
               <>
                 <span className="block">{landingSeo.h1Lead.trim()}</span>
@@ -1340,8 +1330,8 @@ function LandingHero({
               </>
             )}
           </h1>
-          <p className={`${useAtmosphereHero ? 'mb-6 max-w-2xl text-lg leading-relaxed text-primary-foreground/75' : 'mb-5 max-w-3xl text-base leading-relaxed text-primary-foreground/80 md:text-lg'}`}>{heroSubtitle}</p>
-          <ul className={`mb-8 flex flex-wrap gap-x-5 gap-y-2 text-sm ${useAtmosphereHero ? 'text-primary-foreground/80' : 'text-primary-foreground/85'}`}>
+          <p className="mb-6 max-w-2xl text-lg leading-relaxed text-primary-foreground/75">{heroSubtitle}</p>
+          <ul className="mb-8 flex flex-wrap gap-x-5 gap-y-2 text-sm text-primary-foreground/80">
             <li className="inline-flex items-center gap-1.5">
               <Mail className="h-4 w-4 shrink-0" aria-hidden />
               Билет на email после оплаты
@@ -1356,27 +1346,23 @@ function LandingHero({
             </li>
           </ul>
           {bridgesHeroActions}
-          {seasonalHeroActions}
-          {!isBridges ? (
-          <div className={`flex flex-wrap gap-3 ${bridgesHeroActions || seasonalHeroActions ? 'mt-6' : ''}`}>
-            {sessionsReady ? (
-              <>
-                <div className="flex items-center gap-2 rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-medium text-primary-foreground backdrop-blur-sm">
-                  <TrendingUp className="h-4 w-4" />
-                  {formatNumber(visibleCount)} {countLabel}
-                </div>
-                {stats.priceFrom ? (
-                  <div className="flex items-center gap-2 rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-medium text-primary-foreground backdrop-blur-sm">
-                    от {formatMoney(stats.priceFrom).replace(/^от\s+/i, '')}
-                  </div>
-                ) : null}
-              </>
-            ) : (
-              <div className="rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-medium text-primary-foreground/90 backdrop-blur-sm">
-                Загружаем актуальное расписание…
-              </div>
-            )}
-          </div>
+          {seasonalHeroActions ? <div className="mb-6">{seasonalHeroActions}</div> : null}
+          {!isBridges && onScrollToSchedule ? (
+            <LandingHeroCtaBlock
+              priceFrom={stats.priceFrom ?? null}
+              priceTo={stats.priceTo ?? null}
+              visibleCount={visibleCount}
+              countLabel={countLabel}
+              sessionsReady={sessionsReady}
+              primaryLabel={primaryLabel}
+              secondaryLabel={isSeasonal && !citySlug ? 'К городам' : undefined}
+              onPrimary={onScrollToSchedule}
+              onSecondary={
+                isSeasonal && !citySlug
+                  ? () => document.getElementById('landing-cities')?.scrollIntoView({ behavior: 'smooth' })
+                  : undefined
+              }
+            />
           ) : null}
         </div>
       </div>
@@ -1466,7 +1452,7 @@ function LandingSeasonalCitiesGrid({ landingSlug }: { landingSlug: string }) {
   if (!meta?.cityOrder.length) return null;
 
   return (
-    <div className="py-8">
+    <div id="landing-cities" className="scroll-mt-24 py-8">
       <div className="space-y-4 rounded-xl border border-border bg-card p-6">
         <h3 className="text-lg font-semibold text-foreground">{meta.breadcrumbLabel} по городам</h3>
         <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -3115,81 +3101,11 @@ function LandingReviews({
   profile?: LandingProfile;
   landingSlug?: string;
 }) {
-  const reviews = defaultLandingReviews(landingSlug || landing.slug, profile);
-  return (
-    <section id="reviews" className="py-16">
-      <h2 className="mb-2 text-center text-2xl font-bold text-foreground md:text-3xl">Отзывы пассажиров</h2>
-      <p className="mb-10 text-center text-muted-foreground">Что говорят наши гости</p>
-      <div className="grid gap-6 md:grid-cols-3">
-        {reviews.map((review) => (
-          <div key={review.author} className="flex flex-col rounded-xl border border-border bg-card p-6 transition-shadow hover:shadow-md">
-            <Quote className="mb-3 h-7 w-7 text-primary/20" />
-            <p className="mb-4 flex-1 text-sm leading-relaxed text-foreground/80">{review.text}</p>
-            <div className="flex items-center justify-between border-t border-border pt-3">
-              <span className="text-sm font-medium text-foreground">{review.author}</span>
-              <div className="flex gap-0.5">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <Star
-                    key={index}
-                    className={`h-3.5 w-3.5 ${index < ('stars' in review ? review.stars ?? 5 : 5) ? 'fill-yellow-400 text-yellow-400' : 'text-border'}`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function defaultLandingReviews(slug: string, profile?: LandingProfile) {
-  const key = slug.toLowerCase();
-  if (profile === 'bridges') return BRIDGES_LANDING.reviews;
-  if (profile === 'seasonal') {
-    const meta = getSeasonalLanding(key);
-    if (meta?.reviews.length) return meta.reviews;
-  }
-  if (profile === 'dinner' || key.includes('dinner')) {
-    return [
-      { text: 'Ужин на «Ривер Палас» — лучший вечер в Москве! Кремль с воды, живой джаз, потрясающая еда.', author: 'Анна К.', stars: 5 },
-      { text: 'Романтический круиз на «Риверсайд» — идеальный подарок для жены. Просекко, закат, панорамные окна.', author: 'Дмитрий С.', stars: 5 },
-      { text: 'VIP-ужин на «Монархе» — другой уровень. Дегустационный сет и персональный сомелье.', author: 'Марина П.', stars: 5 },
-      { text: 'Фуршет на «Нео» — весело, вкусно, демократично. Отличный вариант для компании.', author: 'Игорь Л.', stars: 4 },
-    ];
-  }
-  if (key.includes('bus')) {
-    return [
-      { text: 'Hop-on/hop-off в Москве — идеальный первый день. Увидели всё за одну поездку!', author: 'Анна К.', stars: 5 },
-      { text: 'Ночной Петербург с мостами — атмосферно. Гид рассказывал так, что мурашки.', author: 'Дмитрий С.', stars: 5 },
-      { text: 'Куршская коса из Калининграда — лучшая экскурсия в жизни. Дюны нереальные!', author: 'Ольга М.', stars: 5 },
-      { text: 'Мамаев курган — до слёз. Обязательно берите экскурсию, без гида половину не поймёте.', author: 'Игорь Л.', stars: 5 },
-      { text: 'Граница Европы и Азии — забавное фото, а экскурсия по Екатеринбургу — настоящее открытие!', author: 'Марина П.', stars: 5 },
-      { text: 'Красная Поляна из Сочи — от моря до гор за час. Дети в восторге!', author: 'Павел Н.', stars: 5 },
-    ];
-  }
-  if (profile === 'river' || isRiverCruisesLandingSlug(slug) || key.includes('bridge')) {
-    return [
-      { text: 'Прогулка по Москве-реке — обязательный пункт для гостей столицы! Кремль с воды — совсем другое впечатление.', author: 'Анна К.', stars: 5 },
-      { text: 'Разводные мосты с теплохода — магия Петербурга. Бронируйте заранее, места разлетаются!', author: 'Дмитрий С.', stars: 5 },
-      { text: 'Круиз до Свияжска из Казани — целое приключение на день. Рекомендую!', author: 'Марина П.', stars: 5 },
-      { text: 'Жигулёвские горы с воды — потрясающе. Самара недооценена туристами!', author: 'Игорь Л.', stars: 5 },
-      { text: 'Енисей впечатляет масштабом. Совсем другие реки в Сибири — мощные, широкие.', author: 'Елена Б.', stars: 5 },
-      { text: 'Казачий круиз по Дону — вкусная кухня, живая музыка, южный колорит!', author: 'Павел Н.', stars: 5 },
-    ];
-  }
-  if (key.includes('salute')) {
-    return [
-      { text: 'Смотрели салют с теплохода — фейерверк отражается в воде, 360° обзор.', author: 'Наталья М.' },
-      { text: 'Автобусный тур перед салютом — и экскурсия, и лучшие точки обзора.', author: 'Алексей Р.' },
-      { text: 'Третий год подряд на салюте с воды — каждый раз как в первый.', author: 'Максим Л.' },
-    ];
-  }
-  return [
-    { text: 'Удобно сравнить варианты по времени и цене в одном месте.', author: 'Ирина В.' },
-    { text: 'Билет купили через виджет за пару минут — всё прошло без сюрпризов.', author: 'Павел Н.' },
-    { text: 'Нашли подходящий сеанс на сегодня — не пришлось обходить десятки сайтов.', author: 'Сергей К.' },
-  ];
+  // CV.L-debt: hide hardcoded fake reviews until real approved Review rows exist.
+  void landing;
+  void profile;
+  void landingSlug;
+  return null;
 }
 
 function LandingSchemaJsonLd({ groups, cityName }: { groups: EventGroup[]; cityName?: string | null }) {

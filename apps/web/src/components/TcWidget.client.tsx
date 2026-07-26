@@ -13,6 +13,12 @@ import {
 } from '@/lib/event-page-utils';
 import { trackSelectTickets } from '@/lib/catalog-analytics';
 import { TeplohodWidgetButton, getTeplohodWidgetIdsFromSession } from '@/components/TeplohodWidget.client';
+import {
+  beginPurchaseOpening,
+  completePurchaseOpening,
+  failPurchaseOpening,
+  isPurchaseOpeningActive,
+} from '@/components/PurchaseOpeningFeedback.client';
 
 const TC_WIDGET_SCRIPT_URL = 'https://ticketscloud.com/static/scripts/widget/tcwidget.js';
 const TC_WIDGET_TOKEN = process.env.NEXT_PUBLIC_TC_WIDGET_TOKEN?.trim() || '';
@@ -172,30 +178,115 @@ function openTcPurchaseUrl(purchaseUrl?: string | null) {
   const popup = window.open(normalized, 'tc_widget', 'width=960,height=760,scrollbars=yes,resizable=yes');
   return Boolean(popup);
 }
+
+function isTcWidgetVisible() {
+  if (typeof document === 'undefined') return false;
+  return Boolean(
+    document.querySelector('.tc-widget-frame_popup') ||
+      document.getElementById('tc-widget-overlay') ||
+      document.querySelector('.tc-widget-container iframe') ||
+      document.querySelector('iframe[src*="ticketscloud"]') ||
+      document.getElementById('ticketscloud-loader'),
+  );
+}
+
+function waitForTcWidgetVisible(timeoutMs = 2500) {
+  return new Promise<boolean>((resolve) => {
+    if (isTcWidgetVisible()) {
+      resolve(true);
+      return;
+    }
+
+    const deadline = Date.now() + timeoutMs;
+    const observer = new MutationObserver(() => {
+      if (isTcWidgetVisible()) {
+        observer.disconnect();
+        resolve(true);
+      } else if (Date.now() >= deadline) {
+        observer.disconnect();
+        resolve(false);
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+    window.setTimeout(() => {
+      observer.disconnect();
+      resolve(isTcWidgetVisible());
+    }, timeoutMs);
+  });
+}
+
+export type OpenTcWidgetResult = 'widget' | 'popup' | 'none';
+
 export async function openTcWidget(options: {
   trigger: HTMLButtonElement | null;
   purchaseUrl?: string | null;
-}) {
+}): Promise<OpenTcWidgetResult> {
   const { trigger, purchaseUrl } = options;
 
   if (purchaseUrl && !trigger) {
-    openTcPurchaseUrl(purchaseUrl);
-    return;
+    return openTcPurchaseUrl(purchaseUrl) ? 'popup' : 'none';
   }
 
   try {
     await ensureTcWidgetScript();
   } catch {
-    openTcPurchaseUrl(purchaseUrl);
-    return;
+    return openTcPurchaseUrl(purchaseUrl) ? 'popup' : 'none';
   }
 
   if (trigger) {
     trigger.click();
-    return;
+    if (await waitForTcWidgetVisible(2800)) return 'widget';
+    // Second attempt: some TC builds ignore the first synthetic click after late script bind.
+    trigger.click();
+    if (await waitForTcWidgetVisible(1600)) return 'widget';
   }
 
-  openTcPurchaseUrl(purchaseUrl);
+  return openTcPurchaseUrl(purchaseUrl) ? 'popup' : 'none';
+}
+
+async function runTcPurchaseFlow(options: {
+  trigger: HTMLButtonElement | null;
+  purchaseUrl?: string | null;
+  eventId: string;
+  source: string;
+}) {
+  if (isPurchaseOpeningActive()) return;
+
+  const fallbackUrl = normalizeTcPurchaseUrl(options.purchaseUrl) || options.purchaseUrl || null;
+  const run = async () => {
+    const result = await openTcWidget({
+      trigger: options.trigger,
+      purchaseUrl: options.purchaseUrl,
+    });
+    if (result === 'widget' || result === 'popup') {
+      completePurchaseOpening();
+      return;
+    }
+    failPurchaseOpening({
+      message: 'Открываем оплату… Не вышло автоматически. Нажмите «Открыть оплату» или повторите.',
+      fallbackUrl,
+      onRetry: () => {
+        void run();
+      },
+    });
+  };
+
+  beginPurchaseOpening({
+    message: 'Открываем оплату…',
+    fallbackUrl,
+    onRetry: () => {
+      void run();
+    },
+  });
+
+  trackSelectTickets({
+    eventId: options.eventId,
+    provider: 'ticketscloud',
+    source: options.source,
+  });
+
+  await run();
 }
 
 function formatSessionLabels(session: {
@@ -266,14 +357,14 @@ export function TcSessionSlot({
     <>
       <button
         type="button"
-        className="tc-session-slot flex w-full items-center justify-between rounded-lg bg-slate-50 px-3 py-2.5 text-left transition hover:bg-slate-100"
+        className="tc-session-slot relative z-[2] flex w-full items-center justify-between rounded-lg bg-slate-50 px-3 py-2.5 text-left transition hover:bg-slate-100 active:scale-[0.99]"
         onClick={() => {
-          trackSelectTickets({
+          void runTcPurchaseFlow({
+            trigger: hiddenTriggerRef.current,
+            purchaseUrl: session.purchaseUrl,
             eventId,
-            provider: 'ticketscloud',
             source: 'tc_session_slot',
           });
-          void openTcWidget({ trigger: hiddenTriggerRef.current, purchaseUrl: session.purchaseUrl });
         }}
       >
         <div className="flex items-center gap-3">
@@ -436,15 +527,18 @@ export function TcWidgetButton({
     className ||
     `tc-buy-btn inline-flex min-h-10 items-center justify-center gap-2 ${colorClasses} ${sizeClasses} ${wide ? 'w-full' : ''}`;
 
+  const [busy, setBusy] = React.useState(false);
+
   const handleClick = () => {
-    trackSelectTickets({
-      eventId,
-      provider: 'ticketscloud',
-      source: 'tc_widget_button',
-    });
-    void openTcWidget({
+    if (busy || isPurchaseOpeningActive()) return;
+    setBusy(true);
+    void runTcPurchaseFlow({
       trigger: hiddenButtonRef.current,
       purchaseUrl: targets[0]?.purchaseUrl || purchaseUrl,
+      eventId,
+      source: 'tc_widget_button',
+    }).finally(() => {
+      window.setTimeout(() => setBusy(false), 400);
     });
   };
 
@@ -452,10 +546,12 @@ export function TcWidgetButton({
     <>
       <button
         type="button"
-        className={buttonClassName}
+        className={`${buttonClassName}${busy ? ' pointer-events-none opacity-80' : ''}`}
         onClick={handleClick}
+        aria-busy={busy}
+        disabled={busy}
       >
-        {label}
+        {busy ? 'Открываем…' : label}
       </button>
       <button
         ref={hiddenButtonRef}

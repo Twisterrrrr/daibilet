@@ -1,3 +1,45 @@
+## 2026-07-26 - CV.L-Hero rollout: atmosphere for ALL landing profiles
+
+### Наблюдения
+
+- Owner: после thin CV.L-Hero (только SeasonalHeroCountdown + CSS tokens) bus/river/dinner/default всё ещё выглядели как плоский `gradient-hero-lovable` - gap vs night-bridges.
+- `useAtmosphereHero = isBridges || countdownKind` блокировал rollout.
+
+### Решения
+
+- Shared `LandingHeroCtaBlock` + `resolveLandingHeroTheme`: dark atmosphere + amber CTA «от min» + honest stats (count + price range) для bus/river/dinner/seasonal/default (+ slug themes rooftop/planetarium/stage/family/country/party).
+- Bridges: Palace hours countdown без изменений; fake ★/sold уже сняты.
+- Seasonal: countdown days only; CTA в shared block.
+- Buy UX: `PurchaseOpeningHost` + TC/Teplohod optimistic «Открываем оплату…» (продолжение).
+
+### Проблемы
+
+- CV.L-Order (перестановка Tips→Schedule→…) ещё as-is.
+- Browser MCP click-smoke недоступен в среде - нужен prod smoke после exclusive deploy.
+
+---
+
+## 2026-07-26 - Landing buy: optimistic «Открываем оплату…» + honest bridges stats
+
+### Наблюдения
+
+- После `c984d8a` (pointer-events-none на `.tc-widget-trigger`) клики доходят, но UX всё ещё «мёртвый»: `await ensureTcWidgetScript` до 8с без UI; popup fallback после await часто блокируется браузером → silent no-op.
+- Prod HTML night-bridges уже содержал `pointer-events-none` / `tc-widget-trigger`, но fake ★4.7 / «билетов продано» ещё на месте.
+
+### Решения
+
+- `PurchaseOpeningHost` + imperative begin/fail/complete: мгновенный shell «Открываем оплату…», double-tap guard, retry + deep-link fallback.
+- `openTcWidget` ждёт видимый TC shell (MutationObserver), retry click, иначе popup; TC/Teplohod кнопки показывают «Открываем…».
+- Bridges hero: убраны fake sold/4.7 - только рейсы + диапазон цен; `LandingReviews` скрыт (CV.L-debt) до real `Review`.
+- Vendor overlays z-index выше opening shell (100050).
+
+### Проблемы
+
+- Browser MCP в этой среде не открыл вкладку для click-smoke - проверка через exclusive deploy + curl/manual.
+- CV.L-Order (перестановка блоков 1-7) и L2/L3/L4b контент - ещё open.
+
+---
+
 ## 2026-07-26 - Bridges hero CTA: от min, range only in stats
 
 ### Наблюдения

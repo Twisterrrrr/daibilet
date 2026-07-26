@@ -196,7 +196,8 @@ UI: `LandingContextWidget.client.tsx` - chips Clean UI (border, text, без emo
 
 ### CV.L-debt - Fake reviews / social proof (Средний)
 
-- Убрать `defaultLandingReviews` / bridges sold+4.7 из UI; показывать Reviews только из `Review`.
+- ✅ UI hide: `LandingReviews` → null; bridges hero без sold/4.7 (только рейсы + диапазон цен).
+- ⏳ Wire real approved `Review` rows when data exists; delete dead `BRIDGES_LANDING.reviews` / seasonal hardcoded copy later.
 
 ---
 
@@ -210,7 +211,7 @@ UI: `LandingContextWidget.client.tsx` - chips Clean UI (border, text, без emo
 
 ## Порядок внедрения (owner)
 
-1. **CV.L-Hero** (typography/atmosphere + days countdown seasonal) 🔄  
+1. **CV.L-Hero** (typography/atmosphere + days countdown seasonal) ✅ all profiles  
 2. CV.L-Order (reorder 1-7)  
 3. Content briefs → paste (`landing-content-gpt-briefs.md`)  
 4. L2 date chips polish  
@@ -218,6 +219,6 @@ UI: `LandingContextWidget.client.tsx` - chips Clean UI (border, text, без emo
 6. L4 follow-up  
 7. L5 empty (частично ✅)  
 8. L6 maps  
-9. CV.L-debt reviews hide/real  
+9. CV.L-debt reviews hide/real - hide ✅; real Review wire ⏳  
 
 Master template = **инкрементально** вытаскивать паттерны bridges в shared hooks/components, а не один большой rewrite.

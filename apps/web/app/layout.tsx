@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery';
+import { PurchaseOpeningHost } from '@/components/PurchaseOpeningFeedback.client';
 import { fontVariableClassName } from '@/lib/fonts';
 import { HOME_SEO_DESCRIPTION_FALLBACK, HOME_SEO_TITLE } from '@/lib/seo-meta';
 
@@ -106,6 +107,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body className="font-sans">
         <ChunkLoadRecovery />
+        <PurchaseOpeningHost />
         {children}
       </body>
     </html>

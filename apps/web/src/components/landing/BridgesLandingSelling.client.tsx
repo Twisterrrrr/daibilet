@@ -76,7 +76,6 @@ export function BridgesHeroBlock({
   priceFrom,
   priceTo,
   visibleCount,
-  soldEstimate,
   sessionsReady,
   onPickTour,
   onViewSchedule,
@@ -84,7 +83,6 @@ export function BridgesHeroBlock({
   priceFrom: number | null;
   priceTo?: number | null;
   visibleCount: number;
-  soldEstimate: number;
   sessionsReady: boolean;
   onPickTour: () => void;
   onViewSchedule: () => void;
@@ -104,7 +102,7 @@ export function BridgesHeroBlock({
           <button
             type="button"
             onClick={onPickTour}
-            className="inline-btn inline-flex items-center gap-2 rounded-full bridges-cta-gradient px-6 py-3 text-sm font-semibold text-white transition hover:brightness-105"
+            className="inline-btn inline-flex items-center gap-2 rounded-full bridges-cta-gradient px-6 py-3 text-sm font-semibold text-white transition hover:brightness-105 active:scale-[0.98]"
           >
             {priceCtaLabel ? `Выбрать рейс · ${priceCtaLabel}` : 'Выбрать рейс'}
             <ArrowRight className="h-4 w-4" />
@@ -112,21 +110,18 @@ export function BridgesHeroBlock({
           <button
             type="button"
             onClick={onViewSchedule}
-            className="inline-btn rounded-full border border-primary-foreground/25 px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary-foreground/10"
+            className="inline-btn rounded-full border border-primary-foreground/25 px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary-foreground/10 active:scale-[0.98]"
           >
             Смотреть график разводки
           </button>
         </div>
       </div>
 
-      <dl className="mt-12 grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-6 md:grid-cols-4">
+      <dl className="mt-12 grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-6 md:grid-cols-2 md:max-w-lg">
         {sessionsReady ? (
           <>
             {[
               { value: formatNumber(visibleCount), label: 'рейсов ночью', nowrap: false },
-              // soldEstimate / 4.7 - marketing placeholders, not live sales/ratings
-              { value: `${formatNumber(soldEstimate)}+`, label: 'билетов продано', nowrap: false },
-              { value: '4.7', label: 'средний рейтинг', nowrap: false },
               { value: priceRangeLabel || '—', label: priceStatLabel, nowrap: true },
             ].map((item) => (
               <div key={item.label}>

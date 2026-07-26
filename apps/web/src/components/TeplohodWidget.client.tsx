@@ -3,6 +3,12 @@
 import * as React from 'react';
 
 import { trackSelectTickets } from '@/lib/catalog-analytics';
+import {
+  beginPurchaseOpening,
+  completePurchaseOpening,
+  failPurchaseOpening,
+  isPurchaseOpeningActive,
+} from '@/components/PurchaseOpeningFeedback.client';
 
 const DEFAULT_TEP_WIDGET_ID = process.env.NEXT_PUBLIC_TEP_WIDGET_ID?.trim() || '14208';
 const TEP_WIDGET_SCRIPT_URL = 'https://api.teplohod.info/v1/widget/widget.js';
@@ -38,10 +44,10 @@ const TEP_WIDGET_CSS = `
 .teplohod-info-wrapper .ti-tickets-event-tickets-buy-closed {
   display: none !important;
 }
-/* Keep Teplohod Fancybox above Next layout chrome */
+/* Keep Teplohod Fancybox above Next layout chrome + purchase opening shell */
 .fancyboxtkt-container,
 .fancyboxtkt-bg {
-  z-index: 10050 !important;
+  z-index: 100050 !important;
 }
 `;
 
@@ -399,30 +405,44 @@ export function openTeplohodWidget(wrapperId = 'teplohod-widget') {
     .finally(() => window.setTimeout(() => tryClick(), 150));
 }
 
-export function openTeplohodPurchase(options: { wrapperId?: string; purchaseUrl?: string | null }) {
+export type OpenTeplohodPurchaseResult = 'widget' | 'popup' | 'none';
+
+export async function openTeplohodPurchase(options: {
+  wrapperId?: string;
+  purchaseUrl?: string | null;
+}): Promise<OpenTeplohodPurchaseResult> {
   const wrapperId = options.wrapperId || 'teplohod-widget';
 
-  void ensureTeplohodWidgetScript()
-    .then(() => bootstrapTeplohodWidgets())
-    .finally(async () => {
-      openTeplohodWidget(wrapperId);
-      await new Promise((r) => window.setTimeout(r, 400));
-      const hasContent = await waitForTeplohodFancyboxContent(4500);
-      if (hasContent) return;
+  try {
+    await ensureTeplohodWidgetScript();
+    await bootstrapTeplohodWidgets();
+  } catch {
+    if (options.purchaseUrl) {
+      const popup = window.open(options.purchaseUrl, '_blank', 'noopener,noreferrer');
+      return popup ? 'popup' : 'none';
+    }
+    return 'none';
+  }
 
-      const button = document.querySelector<HTMLElement>(`#${wrapperId} .ti-tickets-event-tickets-buy`);
-      const fancyboxOpen = document.querySelector('.fancyboxtkt-container, .fancyboxtkt-slide');
-      if (!button && !fancyboxOpen && options.purchaseUrl) {
-        window.open(options.purchaseUrl, '_blank', 'noopener,noreferrer');
-        return;
-      }
-      if (fancyboxOpen && !hasContent) {
-        dismissTeplohodFancybox();
-        if (options.purchaseUrl) {
-          window.open(options.purchaseUrl, '_blank', 'noopener,noreferrer');
-        }
-      }
-    });
+  openTeplohodWidget(wrapperId);
+  await new Promise((r) => window.setTimeout(r, 400));
+  const hasContent = await waitForTeplohodFancyboxContent(4500);
+  if (hasContent) return 'widget';
+
+  const button = document.querySelector<HTMLElement>(`#${wrapperId} .ti-tickets-event-tickets-buy`);
+  const fancyboxOpen = document.querySelector('.fancyboxtkt-container, .fancyboxtkt-slide');
+  if (!button && !fancyboxOpen && options.purchaseUrl) {
+    const popup = window.open(options.purchaseUrl, '_blank', 'noopener,noreferrer');
+    return popup ? 'popup' : 'none';
+  }
+  if (fancyboxOpen && !hasContent) {
+    dismissTeplohodFancybox();
+    if (options.purchaseUrl) {
+      const popup = window.open(options.purchaseUrl, '_blank', 'noopener,noreferrer');
+      return popup ? 'popup' : 'none';
+    }
+  }
+  return 'none';
 }
 
 export function TeplohodWidgetButton({
@@ -441,6 +461,7 @@ export function TeplohodWidgetButton({
   purchaseUrl?: string | null;
 }) {
   const containerId = React.useId().replace(/:/g, '');
+  const [busy, setBusy] = React.useState(false);
   const eventId = normalizeTeplohodEventId(tepEventId);
   const checkoutUrl =
     purchaseUrl ||
@@ -460,12 +481,39 @@ export function TeplohodWidgetButton({
   }
 
   const handleClick = () => {
+    if (busy || isPurchaseOpeningActive()) return;
+
+    const run = async () => {
+      const result = await openTeplohodPurchase({ wrapperId: containerId, purchaseUrl: checkoutUrl });
+      if (result === 'widget' || result === 'popup') {
+        completePurchaseOpening();
+        return;
+      }
+      failPurchaseOpening({
+        message: 'Открываем оплату… Не вышло автоматически. Нажмите «Открыть оплату» или повторите.',
+        fallbackUrl: checkoutUrl || null,
+        onRetry: () => {
+          void run();
+        },
+      });
+    };
+
+    setBusy(true);
+    beginPurchaseOpening({
+      message: 'Открываем оплату…',
+      fallbackUrl: checkoutUrl || null,
+      onRetry: () => {
+        void run();
+      },
+    });
     trackSelectTickets({
       eventId,
       provider: 'teplohod',
       source: 'teplohod_widget_button',
     });
-    openTeplohodPurchase({ wrapperId: containerId, purchaseUrl: checkoutUrl });
+    void run().finally(() => {
+      window.setTimeout(() => setBusy(false), 400);
+    });
   };
 
   return (
@@ -483,8 +531,14 @@ export function TeplohodWidgetButton({
           showFallbackButton={false}
         />
       </div>
-      <button type="button" onClick={handleClick} className={className}>
-        {label}
+      <button
+        type="button"
+        onClick={handleClick}
+        className={`${className}${busy ? ' pointer-events-none opacity-80' : ''}`}
+        aria-busy={busy}
+        disabled={busy}
+      >
+        {busy ? 'Открываем…' : label}
       </button>
     </>
   );

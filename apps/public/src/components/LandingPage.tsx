@@ -884,7 +884,6 @@ export function LandingPage({ slug: rawSlug, citySlug }: { slug: string; citySlu
                   priceFrom={payload.stats.priceFrom ?? null}
                   priceTo={payload.stats.priceTo ?? null}
                   visibleCount={allGroups.length}
-                  soldEstimate={Math.max(allGroups.length * 1850, payload.sessions.length * 420)}
                   sessionsReady={sessionsReady}
                   onPickTour={() => scrollToSchedule()}
                   onViewSchedule={() => document.getElementById('bridges-lift-schedule')?.scrollIntoView({ behavior: 'smooth' })}
