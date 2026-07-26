@@ -62,6 +62,17 @@ if ! grep -q "^DAIBILET_ADMIN_API_URL=" .env 2>/dev/null; then
   echo "DAIBILET_ADMIN_API_URL=http://127.0.0.1:4000" >> .env
 fi
 
+# IndexNow (Yandex/Bing): generate once before web restart so EnvironmentFile picks it up.
+if [[ -f .env ]] && ! grep -q '^INDEXNOW_KEY=' .env 2>/dev/null; then
+  GENERATED_INDEXNOW_KEY="$(openssl rand -hex 16 2>/dev/null || python3 -c 'import secrets; print(secrets.token_hex(16))')"
+  echo "INDEXNOW_KEY=${GENERATED_INDEXNOW_KEY}" >> .env
+  echo "Generated INDEXNOW_KEY and appended to .env"
+fi
+if [[ -f .env ]]; then
+  INDEXNOW_KEY="$(grep -E '^INDEXNOW_KEY=' .env | head -n1 | cut -d= -f2- | sed 's/^["'\'']//;s/["'\'']$//' || true)"
+  export INDEXNOW_KEY
+fi
+
 pnpm db:generate
 pnpm db:deploy
 
@@ -158,8 +169,20 @@ if [[ -n "$REVALIDATE_SECRET" ]]; then
     -d '{"tags":["home-page","catalog-page"],"paths":["/","/events","/cities/sankt-peterburg","/cities/moscow","/rechnye-progulki","/avtobusnye-ekskursii","/api/public/stats"]}' \
     && echo "Post-deploy revalidate OK" \
     || echo "Warning: post-deploy revalidate failed"
+
+  # IndexNow: curated TOP paths only (not full catalog). Requires INDEXNOW_KEY in web env.
+  if [[ -n "${INDEXNOW_KEY:-}" ]]; then
+    curl -fsS -X POST "http://127.0.0.1:${WEB_PORT}/api/internal/indexnow" \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer ${REVALIDATE_SECRET}" \
+      -d '{"deployWarm":true,"reason":"deploy-prod-next"}' \
+      && echo "Post-deploy IndexNow OK" \
+      || echo "Warning: post-deploy IndexNow failed"
+  else
+    echo "Warning: INDEXNOW_KEY missing — skip IndexNow notify"
+  fi
 else
-  echo "Warning: DAIBILET_NEXT_REVALIDATE_SECRET missing — skip revalidate"
+  echo "Warning: DAIBILET_NEXT_REVALIDATE_SECRET missing — skip revalidate/IndexNow"
 fi
 
 echo "F3 prod deploy complete → ${PUBLIC_SITE_URL:-https://daibilet.ru} (branch: $BRANCH, Next :$WEB_PORT)"

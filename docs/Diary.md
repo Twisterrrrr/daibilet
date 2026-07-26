@@ -1,3 +1,26 @@
+## 2026-07-26 - SEO.IN1 IndexNow (Yandex / Bing)
+
+### Наблюдения
+
+- Письмо Яндекс.Вебмастера: ускорить индекс через IndexNow, Sitemap, Метрику, Переобход.
+- IndexNow в репо не было (ни key file, ни notify).
+- Sitemap уже есть: `/sitemap.xml` (index + chunks) и ссылка в `robots.ts` → `Sitemap: https://daibilet.ru/sitemap.xml`.
+- Метрика уже заложена (ID `106786540` / `NEXT_PUBLIC_YANDEX_METRIKA_ID`) - код не изобретали.
+
+### Решения
+
+- `INDEXNOW_KEY` (server-only) → `GET /{key}.txt`; POST batch на `yandex.com/indexnow` + `api.indexnow.org`.
+- Триггеры без спама каталогом: `/api/internal/revalidate` (paths HTML), article publish/update (через revalidate blog paths), deploy-warm curated TOP (`INDEXNOW_DEPLOY_PATHS` + `/api/internal/indexnow`).
+- Debounce 2s in-process; cap 64 URL/request; skip `/api` `/admin` `/account`.
+- Deploy: сгенерировать `INDEXNOW_KEY` в `.env` один раз до рестарта web.
+
+### Проблемы
+
+- Owner: в Вебмастере проверить/добавить sitemap; после deploy - Переобход TOP-15 (SEO.16 / SEO.IN3).
+- Нужен commit + deploy-prod-next; smoke: `/{key}.txt` = key; IndexNow log OK.
+
+---
+
 ## 2026-07-26 - EventBuyCard: только детский тариф вместо диапазона
 
 ### Наблюдения

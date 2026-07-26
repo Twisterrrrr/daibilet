@@ -1,6 +1,7 @@
 import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
 
+import { notifyIndexNowForPaths } from '@/lib/indexnow';
 import { HOME_PAGE_CACHE_TAG } from '@/server/cache-config';
 import { clearPublicArticlesDtoCache } from '@daibilet/backend/public-read';
 
@@ -9,6 +10,8 @@ export const dynamic = 'force-dynamic';
 type RevalidateBody = {
   tags?: string[];
   paths?: string[];
+  /** Skip IndexNow (rare); default notifies changed HTML paths. */
+  skipIndexNow?: boolean;
 };
 
 function isAuthorized(request: Request): boolean {
@@ -50,10 +53,16 @@ export async function POST(request: Request) {
     revalidatePath(path);
   }
 
+  // Batch IndexNow for HTML paths only (skips /api/*). Debounced in-process.
+  if (!body.skipIndexNow) {
+    notifyIndexNowForPaths(paths, 'revalidate');
+  }
+
   return NextResponse.json({
     ok: true,
     revalidatedTags: tags,
     revalidatedPaths: paths,
+    indexNowQueued: !body.skipIndexNow,
     at: new Date().toISOString(),
   });
 }
