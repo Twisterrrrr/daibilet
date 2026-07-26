@@ -29,6 +29,7 @@ import {
   resolveSeasonalCountdownKind,
   SeasonalHeroCountdown,
 } from '@/components/landing/SeasonalHeroCountdown.client';
+import { resolveLandingContentPack } from '@/data/landing-content-packs';
 import { resolveLandingContextWidget } from '@/data/landing-context-widgets';
 import {
   collectLandingBadgeFacets,
@@ -798,11 +799,14 @@ export function LandingPageView({
       if (profile === 'dinner' && !sessionMatchesLandingBadge(session, dinnerBadgeFilter)) return false;
       if (contextChip) {
         const normalize = (value: string) => value.toLowerCase().replace(/ё/g, 'е');
-        const needle = normalize(contextChip);
+        const needles = normalize(contextChip)
+          .split(/[,;]+/)
+          .map((part) => part.trim())
+          .filter(Boolean);
         const text = normalize(
           [session.title, session.category, ...(session.tags || []), ...(session.subcategories || [])].join(' '),
         );
-        if (!text.includes(needle)) return false;
+        if (needles.length && !needles.some((needle) => text.includes(needle))) return false;
       }
       if ((profile === 'bus' || profile === 'river' || profile === 'seasonal' || profile === 'bridges') && !matchesTimeSlotFilter(session, timeSlot)) return false;
       if (profile !== 'bridges' && !matchesDateFilter(session, dateFilter)) return false;
@@ -817,6 +821,7 @@ export function LandingPageView({
   const groups = React.useMemo(() => sortEventGroups(groupLandingSessions(filteredSessions), sort), [filteredSessions, sort]);
   const cityName = resolveLandingCityName(citySlug, slug);
   const contextWidget = React.useMemo(() => resolveLandingContextWidget(slug), [slug]);
+  const contentPack = React.useMemo(() => resolveLandingContentPack(slug), [slug]);
   const bridgesRows = React.useMemo(() => {
     if (profile !== 'bridges' || !sessionsReady) return [];
     const upcoming = filterUpcomingBridgeGroups(allGroups);
@@ -871,6 +876,15 @@ export function LandingPageView({
           />
           {profile === 'bridges' ? <BridgesScheduleStrip /> : null}
           {profile === 'bridges' ? <BridgesTonightTips /> : null}
+          {contextWidget ? (
+            <div className="container-page">
+              <LandingContextWidget
+                config={contextWidget}
+                activeChip={contextChip}
+                onChipSelect={setContextChip}
+              />
+            </div>
+          ) : null}
           {profile === 'seasonal' && !citySlug && seasonalMeta?.nationalIntro ? (
             <section className="container-page pb-4 pt-8">
               <p className="max-w-3xl text-lg leading-relaxed text-muted-foreground">{seasonalMeta.nationalIntro}</p>
@@ -912,10 +926,10 @@ export function LandingPageView({
             ? dinnerCityGuide(cityName, citySlug)!.scheduleTitle
               : profile === 'seasonal' && seasonalMeta
               ? cityName
-                ? `${seasonalMeta.scheduleTitle} — ${cityName}`
+                ? `${seasonalMeta.scheduleTitle} - ${cityName}`
                 : seasonalMeta.scheduleTitle
               : cityName
-                ? `Расписание событий — ${cityName}`
+                ? `Расписание событий - ${cityName}`
                 : 'Расписание событий'}
         </h2>
         )}
@@ -1033,15 +1047,6 @@ export function LandingPageView({
               </>
             ) : null}
           </section>
-          {contextWidget ? (
-            <div className="container-page">
-              <LandingContextWidget
-                config={contextWidget}
-                activeChip={contextChip}
-                onChipSelect={setContextChip}
-              />
-            </div>
-          ) : null}
           <div className="container-page">
             {citySlug && cityName ? (
               <>
@@ -1082,11 +1087,30 @@ export function LandingPageView({
             {!isLovableLanding(profile) ? (
               <LandingContentBlocks blocks={payload.blocks || []} landing={payload.landing} stats={payload.stats} />
             ) : null}
-            {profile === 'default' || profile === 'bridges' ? (
-              <LandingHowToChoose landing={payload.landing} stats={payload.stats} profile={profile} />
+            {profile === 'default' || profile === 'bridges' || profile === 'seasonal' || contentPack ? (
+              <LandingHowToChoose
+                landing={payload.landing}
+                stats={payload.stats}
+                profile={profile}
+                contentPack={contentPack}
+              />
             ) : null}
-            <LandingFaq landing={payload.landing} blocks={payload.blocks || []} profile={profile} citySlug={citySlug} landingSlug={slug} />
-            {profile === 'bridges' ? <BridgesShipChecklist /> : null}
+            <LandingFaq
+              landing={payload.landing}
+              blocks={payload.blocks || []}
+              profile={profile}
+              citySlug={citySlug}
+              landingSlug={slug}
+              contentPack={contentPack}
+            />
+            {profile === 'bridges' ? (
+              <BridgesShipChecklist />
+            ) : contentPack?.checklist?.length ? (
+              <LandingAttentionChecklist
+                title={contentPack.checklistTitle}
+                items={contentPack.checklist}
+              />
+            ) : null}
             <LandingReviews landing={payload.landing} profile={profile} landingSlug={slug} />
             {profile === 'bridges' ? (
               <div className="border-t border-border pt-12">
@@ -2175,29 +2199,51 @@ function LandingMiniList({ title, items, empty }: { title: string; items: Array<
   );
 }
 
-function LandingHowToChoose({ landing, stats, profile = 'default' }: { landing: PublicLandingDto; stats: PublicLandingPageDto['stats']; profile?: LandingProfile }) {
+function LandingHowToChoose({
+  landing,
+  stats,
+  profile = 'default',
+  contentPack = null,
+}: {
+  landing: PublicLandingDto;
+  stats: PublicLandingPageDto['stats'];
+  profile?: LandingProfile;
+  contentPack?: ReturnType<typeof resolveLandingContentPack>;
+}) {
   const key = `${landing.slug} ${landing.title}`.toLowerCase();
   const isRiver = profile === 'bridges' || isRiverCruisesLandingSlug(landing.slug) || key.includes('bridge') || key.includes('мост');
   const topVenues = topEntries(stats.venues, 3).map(([name]) => name).join(', ');
+  const packSteps = contentPack?.howToSteps?.length
+    ? contentPack.howToSteps.map((step) => ({
+        icon: <CheckCircle2 className="h-6 w-6 text-primary" />,
+        title: step.title,
+        text: step.text,
+      }))
+    : null;
 
-  const steps = isRiver
-    ? [
-        { icon: <Clock className="h-6 w-6 text-primary" />, title: 'Выберите время', text: 'Самые зрелищные рейсы стартуют в 23:30–00:30, когда мосты разводятся один за другим.' },
-        { icon: <MapPin className="h-6 w-6 text-primary" />, title: 'Определите причал', text: topVenues ? `Популярные: ${topVenues}. Ближайший к вам причал сэкономит время.` : 'Выберите удобную точку отправления на набережной.' },
-        { icon: <Ship className="h-6 w-6 text-primary" />, title: 'Сравните теплоходы', text: 'Обратите внимание на вместимость, наличие крытой палубы и бортового кафе.' },
-        { icon: <Wallet className="h-6 w-6 text-primary" />, title: 'Сравните цены', text: `Цены от ${formatMoney(stats.priceFrom).replace(/^от\s+/i, '')}. Ищите пометку «Оптимальный выбор» — лучшее соотношение цены и рейтинга.` },
-      ]
-    : [
-        { icon: <Clock className="h-6 w-6 text-primary" />, title: 'Выберите дату', text: 'Используйте фильтры «сегодня», «завтра» и «вечером» для быстрого поиска.' },
-        { icon: <MapPin className="h-6 w-6 text-primary" />, title: 'Уточните город', text: Object.keys(stats.cities).length > 1 ? 'Начните с города, затем сравните площадки и маршруты.' : 'Проверьте адрес старта и удобство маршрута.' },
-        { icon: <Star className="h-6 w-6 text-primary" />, title: 'Сравните рейтинг', text: 'Смотрите отзывы и количество проданных билетов у организаторов.' },
-        { icon: <Wallet className="h-6 w-6 text-primary" />, title: 'Сравните цены', text: `В подборке цена от ${formatMoney(stats.priceFrom).replace(/^от\s+/i, '')}. Оплата — в виджете организатора.` },
-      ];
+  const steps =
+    packSteps ||
+    (isRiver
+      ? [
+          { icon: <Clock className="h-6 w-6 text-primary" />, title: 'Выберите время', text: 'Самые зрелищные рейсы стартуют в 23:30-00:30, когда мосты разводятся один за другим.' },
+          { icon: <MapPin className="h-6 w-6 text-primary" />, title: 'Определите причал', text: topVenues ? `Популярные: ${topVenues}. Ближайший к вам причал сэкономит время.` : 'Выберите удобную точку отправления на набережной.' },
+          { icon: <Ship className="h-6 w-6 text-primary" />, title: 'Сравните теплоходы', text: 'Обратите внимание на вместимость, наличие крытой палубы и бортового кафе.' },
+          { icon: <Wallet className="h-6 w-6 text-primary" />, title: 'Сравните цены', text: `Цены от ${formatMoney(stats.priceFrom).replace(/^от\s+/i, '')}. Смотрите маршрут, причал и комфорт борта.` },
+        ]
+      : [
+          { icon: <Clock className="h-6 w-6 text-primary" />, title: 'Выберите дату', text: 'Используйте фильтры «сегодня», «завтра» и «вечером» для быстрого поиска.' },
+          { icon: <MapPin className="h-6 w-6 text-primary" />, title: 'Уточните город', text: Object.keys(stats.cities).length > 1 ? 'Начните с города, затем сравните площадки и маршруты.' : 'Проверьте адрес старта и удобство маршрута.' },
+          { icon: <Ticket className="h-6 w-6 text-primary" />, title: 'Сверьте формат', text: 'Читайте возраст, длительность и что входит в билет до оплаты.' },
+          { icon: <Wallet className="h-6 w-6 text-primary" />, title: 'Сравните цены', text: `В подборке цена от ${formatMoney(stats.priceFrom).replace(/^от\s+/i, '')}. Оплата - в виджете организатора.` },
+        ]);
+
+  const title = contentPack?.howToTitle || (isRiver ? 'Как выбрать прогулку' : 'Как выбрать событие');
+  const lead = contentPack?.howToLead || (isRiver ? '4 простых шага к идеальному рейсу' : '4 простых шага к удобной покупке');
 
   return (
     <section id="how-to-choose" className="py-16">
-      <h2 className="mb-2 text-center text-2xl font-bold text-foreground md:text-3xl">Как выбрать прогулку</h2>
-      <p className="mb-10 text-center text-muted-foreground">4 простых шага к идеальному рейсу</p>
+      <h2 className="mb-2 text-center text-2xl font-bold text-foreground md:text-3xl">{title}</h2>
+      <p className="mb-10 text-center text-muted-foreground">{lead}</p>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {steps.map((step, index) => (
           <div key={step.title} className="rounded-xl border border-border bg-card p-6 text-center transition-shadow hover:shadow-md">
@@ -2212,26 +2258,52 @@ function LandingHowToChoose({ landing, stats, profile = 'default' }: { landing: 
   );
 }
 
+function LandingAttentionChecklist({ title, items }: { title: string; items: string[] }) {
+  return (
+    <section id="attention-checklist" className="py-12">
+      <div className="mb-6 flex items-center justify-center gap-2">
+        <CheckCircle2 className="h-5 w-5 text-primary" />
+        <h2 className="text-2xl font-bold text-foreground md:text-3xl">{title}</h2>
+      </div>
+      <ul className="mx-auto grid max-w-3xl gap-3">
+        {items.map((item) => (
+          <li key={item} className="flex gap-3 rounded-xl border border-border bg-card px-4 py-3 text-sm leading-relaxed text-muted-foreground">
+            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 function LandingFaq({
   landing,
   blocks,
   profile,
   citySlug,
   landingSlug,
+  contentPack = null,
 }: {
   landing: PublicLandingDto;
   blocks: LandingContentBlock[];
   profile: LandingProfile;
   citySlug?: string;
   landingSlug?: string;
+  contentPack?: ReturnType<typeof resolveLandingContentPack>;
 }) {
   const faqBlock = blocks.find((block) => block.type === 'FAQ');
   const slugKey = landingSlug || landing.slug;
   const items: Array<Record<string, string | number>> = faqBlock
     ? blockItems(faqBlock)
-    : defaultLandingFaq(slugKey, profile, citySlug).map((item) => ({ question: item.question, answer: item.answer }));
+    : (contentPack?.faq?.length
+        ? contentPack.faq
+        : defaultLandingFaq(slugKey, profile, citySlug)
+      ).map((item) => ({ question: item.question, answer: item.answer }));
   const seasonalMeta = profile === 'seasonal' ? getSeasonalLanding(slugKey) : null;
-  const faqSubtitle = profile === 'dinner'
+  const faqSubtitle = contentPack?.faqSubtitle
+    ? contentPack.faqSubtitle
+    : profile === 'dinner'
     ? 'Ответы на популярные вопросы об ужинах на теплоходе'
     : profile === 'bus'
       ? 'Ответы на популярные вопросы об автобусных экскурсиях'

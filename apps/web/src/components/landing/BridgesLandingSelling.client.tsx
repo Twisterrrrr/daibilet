@@ -189,12 +189,10 @@ export function BridgesScheduleStrip() {
 }
 
 export function BridgesTonightTips() {
-  const tips = [
-    { id: 'warm' as const, text: 'Берите тёплую одежду — на воде холоднее' },
-    { id: 'pier' as const, text: 'Приходите на причал за 20–30 минут' },
-    { id: 'book' as const, text: 'Бронируйте заранее в сезон белых ночей' },
-    { id: 'shore' as const, text: 'Проверьте в описании рейса, на какой берег вернётесь после разводки' },
-  ];
+  const tips = BRIDGES_LANDING.tonightTips.map((text, index) => ({
+    id: `tip-${index}`,
+    text,
+  }));
 
   return (
     <section className="container-page py-10 md:py-14">
@@ -206,20 +204,9 @@ export function BridgesTonightTips() {
         </p>
       </div>
       <div className="rounded-2xl border border-[oklch(0.72_0.17_55/0.2)] bg-[oklch(0.72_0.17_55/0.05)] p-6 md:p-8">
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:grid-rows-2 sm:gap-x-6 sm:gap-y-4">
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-4">
           {tips.map((tip) => (
-            <li
-              key={tip.id}
-              className={`flex items-start gap-3 text-sm text-foreground/90 ${
-                tip.id === 'warm'
-                  ? 'sm:col-start-1 sm:row-start-1'
-                  : tip.id === 'pier'
-                    ? 'sm:col-start-2 sm:row-start-1'
-                    : tip.id === 'book'
-                      ? 'sm:col-start-2 sm:row-start-2'
-                      : 'sm:col-start-1 sm:row-start-2'
-              }`}
-            >
+            <li key={tip.id} className="flex items-start gap-3 text-sm text-foreground/90">
               <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[oklch(0.72_0.17_55)]" />
               {tip.text}
             </li>
@@ -261,7 +248,7 @@ export function BridgesScenarioPicker({ onScrollToSchedule }: { onScrollToSchedu
   return (
     <section id="bridges-scenarios" className="container-page py-10">
       <h2 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">Какой рейс выбрать?</h2>
-      <p className="mb-6 max-w-2xl text-muted-foreground">Не все ночные прогулки одинаковы — выберите сценарий, затем сравните конкретные рейсы в расписании.</p>
+      <p className="mb-6 max-w-2xl text-muted-foreground">Не все ночные прогулки одинаковы - выберите сценарий, затем сравните конкретные рейсы в расписании.</p>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {SCENARIOS.map((item) => (
           <button
@@ -356,7 +343,7 @@ export function BridgesFeaturedSection({
       <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold text-foreground md:text-3xl">Популярные рейсы</h2>
-          <p className="mt-1 text-muted-foreground">Проверенные варианты для быстрого выбора — полный каталог ниже.</p>
+          <p className="mt-1 text-muted-foreground">Проверенные варианты для быстрого выбора - полный каталог ниже.</p>
         </div>
         <a href="#variants" className="text-sm font-semibold text-primary hover:text-primary/80">
           Все билеты →

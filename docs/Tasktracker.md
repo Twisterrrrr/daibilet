@@ -162,8 +162,8 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 |---|--------|-----------|--------|
 | CV.L-Buy | Restore clickable landing buy CTAs (TC trigger overlay) | Критический | ✅ `TcWidget` off-screen + `pointer-events:none` |
 | CV.L-Hero | Hero-first: bridges selling strip на все профили; NY countdown+CTA; **4 stats обязательны** | Критический | ✅ 4-col strip restored + NY layout |
-| CV.L-Order | Reorder секций к owner 1-7 на всех профилях | Высокий | ⏳ |
-| CV.L-Content | Контент tips/how-to/FAQ/checklist по GPT briefs (owner assign) | Высокий | ⏳ briefs ready |
+| CV.L-Order | Reorder секций к owner 1-7 на всех профилях | Высокий | ✅ CW/Tips before schedule; howTo→FAQ→checklist→reviews |
+| CV.L-Content | Контент tips/how-to/FAQ/checklist по GPT briefs (owner assign) | Высокий | ✅ packs A-G wired (`landing-content-packs` + CW + bridges/NY) |
 | CV.L1 | Micro-badges из tags/subcategories/title на schedule rows + EventCard(`landingActions`); dinner badge chips; скрыть fake ★ на этих поверхностях | Критический | ✅ helper `landing-card-badges.ts` |
 | CV.L2 | Date chips UX для concert/standup (sticky horizontal, slots без reload) | Высокий | ⏳ chips уже есть на default; polish |
 | CV.L3 | River section tabs day/night/dinner (bridges patterns → shared) | Высокий | ⏳ |

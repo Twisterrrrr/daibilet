@@ -1,3 +1,24 @@
+## 2026-07-26 - CV.L-Content: GPT packs A-G (NY…bridges)
+
+### Наблюдения
+
+- Owner вставил JSON для new-year, planetarium, rooftops, country-tours, river-party, family-kids, bridges-night.
+- Канон блоков: Hero → Tips/CW → Schedule → How-to → FAQ → Checklist → Reviews(real only).
+- Fake reviews в seasonal/bridges data больше не рендерятся (`LandingReviews` = null).
+
+### Решения
+
+- `landing-content-packs.ts`: howTo/FAQ/checklist по slug; CW tips обновлены в `landing-context-widgets.ts`.
+- NY FAQ в `seasonal-landings`; bridges tips/howTo/FAQ/checklist в `bridges-landing` + TonightTips/ShipChecklist.
+- `LandingPageView`: CW перед расписанием; HowTo/FAQ/checklist из pack; chip match OR по запятым; без рейтинга/sold в default how-to.
+- Дефис `-` only; family FAQ «30-45 минут».
+
+### Проблемы
+
+- Exclusive deploy после `2f3ccd9` (4-stat strip) + этот контент; smoke `/novyj-god`, planetarium, night-bridges.
+
+---
+
 ## 2026-07-26 - Owner lock: полный selling strip Hero (4 колонки)
 
 ### Наблюдения
