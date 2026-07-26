@@ -518,6 +518,7 @@ const EMPTY_LANDING_STATS: PublicLandingPage['stats'] = {
   categories: {},
   venues: {},
   priceFrom: null,
+  priceTo: null,
 };
 
 function buildLandingShellPage(slug: string, citySlug?: string): PublicLandingPage | null {

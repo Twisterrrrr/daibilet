@@ -515,6 +515,7 @@ const EMPTY_LANDING_STATS: PublicLandingPageDto['stats'] = {
   categories: {},
   venues: {},
   priceFrom: null,
+  priceTo: null,
 };
 
 function buildLandingShellPage(slug: string, citySlug?: string): PublicLandingPageDto | null {
@@ -652,15 +653,20 @@ export function LandingPageView({
     setContextChip(null);
     setTimeSlot('');
     setCategory(resolveConcertGenreTag(initialGenre) || 'all');
-    setApiPayload(initialCachedPayload);
+    setApiPayload(
+      initialCachedPayload?.landing
+        ? finalizeLandingPayload(initialCachedPayload, slug, resolveLandingCityName(citySlug, slug))
+        : initialCachedPayload,
+    );
     setSessionsError(null);
     setIsSessionsLoading(!initialCachedPayload?.sessions?.length);
   }, [slug, citySlug, initialCachedPayload]);
 
   React.useEffect(() => {
     // SSR already hydrated the landing — do not force a no-store remount fetch.
+    // Still finalize so city filter recomputes priceFrom/priceTo for hero stats.
     if (initialCachedPayload?.landing) {
-      setApiPayload(initialCachedPayload);
+      setApiPayload(finalizeLandingPayload(initialCachedPayload, slug, resolveLandingCityName(citySlug, slug)));
       setIsSessionsLoading(false);
       setSessionsError(null);
       return;

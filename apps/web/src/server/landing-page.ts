@@ -1,6 +1,7 @@
 import type { PublicLandingPageDto } from '@daibilet/contracts/public';
 import { buildPublicLandingPageDto } from '@daibilet/backend/public-read';
 
+import { resolveSessionPriceRange } from '@/lib/event-card-meta';
 import { landingFetchCandidates } from '@/lib/landing-constants';
 import { filterSessionsByCity, filterSessionsByGenre, resolveLandingCityName } from '@/lib/landing-city';
 
@@ -26,6 +27,7 @@ export function finalizeLandingPayload(
   const cityName = resolveLandingCityName(citySlug);
   let sessions = filterSessionsByCity(payload.sessions, cityName, citySlug);
   sessions = filterSessionsByGenre(sessions, genre);
+  const { priceFrom, priceTo } = resolveSessionPriceRange(sessions);
 
   return {
     ...payload,
@@ -35,6 +37,8 @@ export function finalizeLandingPayload(
       ...payload.stats,
       events: sessions.length,
       sessions: sessions.length,
+      priceFrom,
+      priceTo,
     },
   };
 }

@@ -1,3 +1,23 @@
+## 2026-07-26 - Bridges hero price range (night-bridges)
+
+### Наблюдения
+
+- Owner: на `/saint-petersburg/night-bridges` label «ДИАПАЗОН ЦЕН», value только `990 ₽`. API sessions: 990..2490, но `stats.priceTo` отсутствовал.
+- SSR `finalizeLandingPayload` не пересчитывал min/max; клиент пропускал refetch при hydrated landing.
+- «18 500+ билетов» и «4.7 рейтинг» - hardcoded marketing (`soldEstimate = groups*1850`, константа 4.7).
+
+### Решения
+
+- Backend landing stats: `priceTo = max(prices)`; SSR/client finalize через `resolveSessionPriceRange`.
+- `formatMoneyRange`: `990-2 490 ₽` / `от 990 ₽`; label `диапазон цен` только при min≠max, иначе `цена от`.
+- Fake social proof не убирали (scope) - только комментарий в hero.
+
+### Проблемы
+
+- Нужен commit + exclusive deploy-prod-next + smoke HTML на диапазон.
+
+---
+
 ## 2026-07-26 - SEO technical launch checklist (vs Lovable sample)
 
 ### Наблюдения

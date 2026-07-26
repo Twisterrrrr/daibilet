@@ -2,7 +2,7 @@ import { ArrowRight, Clock, Compass, Heart, MapPin, Sparkles, Star, Wallet } fro
 import * as React from 'react';
 
 import { BRIDGES_LANDING } from '@/data/bridges-landing';
-import { formatMoneyRange, formatNumber } from '@/data';
+import { formatMoneyRange, formatNumber, moneyRangeStatLabel } from '@/data';
 import type { BridgesScheduleRow } from '@/lib/bridges-session-utils';
 
 const PALACE_BRIDGE_LIFT_HOUR = 1;
@@ -89,6 +89,7 @@ export function BridgesHeroBlock({
 }) {
   const countdown = usePalaceBridgeCountdown();
   const priceLabel = priceFrom ? formatMoneyRange(priceFrom, priceTo) : null;
+  const priceStatLabel = moneyRangeStatLabel(priceFrom, priceTo);
 
   return (
     <div className="space-y-0">
@@ -119,9 +120,10 @@ export function BridgesHeroBlock({
           <>
             {[
               { value: formatNumber(visibleCount), label: 'рейсов ночью', nowrap: false },
+              // soldEstimate / 4.7 - marketing placeholders, not live sales/ratings
               { value: `${formatNumber(soldEstimate)}+`, label: 'билетов продано', nowrap: false },
               { value: '4.7', label: 'средний рейтинг', nowrap: false },
-              { value: priceLabel || '—', label: 'диапазон цен', nowrap: true },
+              { value: priceLabel || '—', label: priceStatLabel, nowrap: true },
             ].map((item) => (
               <div key={item.label}>
                 <dt

@@ -4882,6 +4882,7 @@ export async function buildPublicLandingPage(db, landingSlug) {
       categories,
       venues,
       priceFrom: prices.length ? Math.min(...prices) : null,
+      priceTo: prices.length ? Math.max(...prices) : null,
     },
   };
 }
@@ -4990,8 +4991,10 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
       categories,
       venues,
       priceFrom: prices.length ? Math.min(...prices) : null,
+      priceTo: prices.length ? Math.max(...prices) : null,
     },
   };
+}
 }
 
 export async function buildPublicEventPage(db, eventSlugOrId) {
