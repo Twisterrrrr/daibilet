@@ -109,7 +109,7 @@
     font-family: var(--font-serif);
   }
 
-  button:not(.inline-btn):not(.event-favorite-btn),
+  button:not(.inline-btn):not(.event-favorite-btn):not(.tc-widget-trigger),
   select {
     min-height: 44px;
   }
@@ -327,16 +327,24 @@
   box-shadow: 0 0 0 1px #bfdbfe !important;
 }
 
+/* Hidden TC vendor hook: must never intercept clicks on visible buy CTAs.
+   Catalog already used off-screen + pointer-events-none; landings did not. */
 .tc-widget-trigger {
-  position: absolute !important;
+  position: fixed !important;
+  left: -9999px !important;
+  top: 0 !important;
   overflow: hidden !important;
   width: 1px !important;
   height: 1px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
   padding: 0 !important;
-  margin: -1px !important;
+  margin: 0 !important;
   border: 0 !important;
   clip: rect(0, 0, 0, 0) !important;
   white-space: nowrap !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .tc-buy-btn {

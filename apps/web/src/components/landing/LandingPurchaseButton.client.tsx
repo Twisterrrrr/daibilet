@@ -10,7 +10,7 @@ import { extractTcEventIdFromSession } from '@/lib/event-purchase';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
 const DEFAULT_BUTTON_CLASS =
-  'inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98]';
+  'relative z-[2] inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98]';
 
 const SOLD_OUT_CLASS =
   'inline-flex cursor-not-allowed items-center justify-center gap-1.5 whitespace-nowrap rounded-lg bg-muted px-4 py-2 text-sm font-semibold text-muted-foreground';
@@ -36,6 +36,10 @@ export function LandingPurchaseButton({
 }: LandingPurchaseButtonProps) {
   const purchaseUrl = resolvePurchaseUrl(session);
   const resolvedLabel = showArrow && typeof label === 'string' ? `${label} →` : label;
+  const resolvedClassName =
+    className === DEFAULT_BUTTON_CLASS || /\bz-\[/.test(className)
+      ? className
+      : `relative z-[2] ${className}`;
 
   if (disabled) {
     return (
@@ -65,7 +69,7 @@ export function LandingPurchaseButton({
         tcEventId={ticketscloud.tcEventId}
         purchaseUrl={purchaseUrl}
         label={resolvedLabel}
-        className={className}
+        className={resolvedClassName}
       />
     );
   }
@@ -77,14 +81,14 @@ export function LandingPurchaseButton({
         tepWidgetId={teplohod.tepWidgetId}
         purchaseUrl={teplohodCheckoutUrl}
         label={resolvedLabel}
-        className={className}
+        className={resolvedClassName}
       />
     );
   }
 
   if (teplohodCheckoutUrl) {
     return (
-      <a href={teplohodCheckoutUrl} target="_blank" rel="noopener noreferrer" className={className}>
+      <a href={teplohodCheckoutUrl} target="_blank" rel="noopener noreferrer" className={resolvedClassName}>
         {resolvedLabel}
       </a>
     );

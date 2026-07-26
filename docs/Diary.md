@@ -1,3 +1,24 @@
+## 2026-07-26 - Landing buy CTAs not clickable (TC trigger overlay)
+
+### Наблюдения
+
+- На лендингах («Купить» / «Выбрать» / widget open) CTA выглядят нормально, но клики не доходят до React `onClick` / виджет не открывается.
+- Каталог уже прятал `.tc-widget-trigger` как `pointer-events-none fixed -left-[9999px]`; `TcWidgetButton` / `TcSessionSlot` на лендингах оставляли только CSS `position:absolute` + clip.
+- Глобальный `button { min-height: 44px }` + intrinsic width по тексту лейбла раздували невидимый hit-box; N триггеров на schedule (desktop+mobile) перекрывали видимые кнопки.
+- Analytics `select_tickets` (66676a0), ContextWidget, badges - не root cause.
+
+### Решения
+
+- Выровняли hidden TC triggers с каталогом: off-screen + `pointer-events: none` в web/public.
+- Усилили `.tc-widget-trigger` в globals (fixed, min 0, pointer-events none) и исключили из touch min-height rule.
+- `LandingPurchaseButton`: всегда `relative z-[2]` на видимом CTA (defense in depth). Goals `select_tickets` по-прежнему в `handleClick` до `openTcWidget`.
+
+### Проблемы
+
+- Prod landings кратко отдавали 502 во время чужих exclusive deploys (service stop mid-build). Smoke после deploy обязателен.
+
+---
+
 ## 2026-07-26 - Night-bridges SEO lead: wall of text + triple pad
 
 ### Наблюдения

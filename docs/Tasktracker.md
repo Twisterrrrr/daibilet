@@ -150,6 +150,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
+| CV.L-Buy | Restore clickable landing buy CTAs (TC trigger overlay) | Критический | ✅ `TcWidget` off-screen + `pointer-events:none` |
 | CV.L-Hero | Hero-first: typography/atmosphere tokens + seasonal days countdown (не hours-to-bridge); не трогать bridges price stats | Критический | 🔄 thin: NY/salute days + CSS tokens |
 | CV.L-Order | Reorder секций к owner 1-7 на всех профилях | Высокий | ⏳ |
 | CV.L-Content | Контент tips/how-to/FAQ/checklist по GPT briefs (owner assign) | Высокий | ⏳ briefs ready |

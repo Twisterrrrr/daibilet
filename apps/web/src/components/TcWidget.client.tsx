@@ -302,7 +302,7 @@ export function TcSessionSlot({
         type="button"
         data-tc-event={eventId}
         data-tc-token={widgetToken}
-        className="tc-widget-trigger"
+        className="tc-widget-trigger pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0"
         aria-hidden="true"
         tabIndex={-1}
       >
@@ -462,7 +462,7 @@ export function TcWidgetButton({
         type="button"
         data-tc-event={eventId}
         data-tc-token={widgetToken}
-        className="tc-widget-trigger"
+        className="tc-widget-trigger pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0"
         aria-hidden="true"
         tabIndex={-1}
       >
