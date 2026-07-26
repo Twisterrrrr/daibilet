@@ -22,7 +22,6 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | BR.SEO1 | Night-bridges SEO lead: full width + абзацы + дедуп pad ×3; sanitize seed | Высокий | ✅ |
-| BR.PR2 | Flag fake «билетов продано» / «4.7 рейтинг» (не в scope фикса цены) | Средний | ✅ removed |
 | BR.SEO2 | Проверка остальных landings с тем же pad в `seo-listing-texts` | Высокий | ✅ cleaned all + runtime sanitize |
 
 ---
@@ -32,7 +31,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | BR.PR1 | Hero stats: real min-max `priceTo` + honest label; CTA only «от min» | Критический | ✅ `ae3c86c`/`6fe5ede`/`f02889e`; prod smoke `priceTo:2490`, hero `990-2 490 ₽` |
-| BR.PR2 | Flag fake «билетов продано» / «4.7 рейтинг» (не в scope фикса цены) | Средний | ✅ removed (honest рейсы + диапазон цен) |
+| BR.PR2 | Hero 4-stat strip (события/sold/4.7/диапазон) - owner lock, **не обрезать** | Критический | ✅ restored 2026-07-26 (откат ошибочного trim) |
 
 ---
 
@@ -162,7 +161,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | CV.L-Buy | Restore clickable landing buy CTAs (TC trigger overlay) | Критический | ✅ `TcWidget` off-screen + `pointer-events:none` |
-| CV.L-Hero | Hero-first: typography/atmosphere + CTA row all profiles; seasonal days; bridges Palace hours | Критический | ✅ `LandingHeroCtaBlock` + theme tokens |
+| CV.L-Hero | Hero-first: bridges selling strip на все профили; NY countdown+CTA; **4 stats обязательны** | Критический | ✅ 4-col strip restored + NY layout |
 | CV.L-Order | Reorder секций к owner 1-7 на всех профилях | Высокий | ⏳ |
 | CV.L-Content | Контент tips/how-to/FAQ/checklist по GPT briefs (owner assign) | Высокий | ⏳ briefs ready |
 | CV.L1 | Micro-badges из tags/subcategories/title на schedule rows + EventCard(`landingActions`); dinner badge chips; скрыть fake ★ на этих поверхностях | Критический | ✅ helper `landing-card-badges.ts` |
@@ -173,7 +172,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | CV.L5 | Empty-state cross-sell на соседние CHPU / city hub | Высокий | ✅ `LandingEmptyState` + related hits при 0; catalog empty polish |
 | CV.L5b | Optimistic UI: favorites heart + verify landing filter chips local | Средний | ✅ favorites local-first optimistic; chips уже client filter |
 | CV.L6 | Map start points (Yandex) yards/bridges - после logistics | Низкий | ⏳ later |
-| CV.L-debt | Cleanup legacy hardcoded `LandingReviews` / bridges meta ratings; hide Reviews until real `Review` | Средний | ✅ hide + bridges fake stats off; real Review ⏳ |
+| CV.L-debt | Cleanup legacy `LandingReviews` ниже fold; hero 4-stat strip = owner-approved selling (не debt) | Средний | ⏳ Reviews hide until real; strip ✅ |
 
 ---
 

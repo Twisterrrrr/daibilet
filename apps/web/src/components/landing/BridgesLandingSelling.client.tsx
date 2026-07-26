@@ -4,7 +4,7 @@ import { ArrowRight, Clock, Compass, Heart, MapPin, Sparkles, Star, Wallet } fro
 import * as React from 'react';
 
 import { BRIDGES_LANDING } from '@/data/bridges-landing';
-import { formatMoneyRange, formatNumber, formatPriceFrom, moneyRangeStatLabel } from '@/lib/format';
+import { formatMoneyRange, formatNumber, formatPriceFrom } from '@/lib/format';
 import type { BridgesScheduleRow } from '@/lib/bridges-session-utils';
 
 const PALACE_BRIDGE_LIFT_HOUR = 1;
@@ -76,6 +76,7 @@ export function BridgesHeroBlock({
   priceFrom,
   priceTo,
   visibleCount,
+  soldEstimate,
   sessionsReady,
   onPickTour,
   onViewSchedule,
@@ -83,15 +84,15 @@ export function BridgesHeroBlock({
   priceFrom: number | null;
   priceTo?: number | null;
   visibleCount: number;
+  soldEstimate: number;
   sessionsReady: boolean;
   onPickTour: () => void;
   onViewSchedule: () => void;
 }) {
   const countdown = usePalaceBridgeCountdown();
-  // CTA: only «от min»; min–max lives in the «диапазон цен» stat cell
+  // CTA: «от min»; полный min–max - в 4-й ячейке «диапазон цен»
   const priceCtaLabel = priceFrom ? formatPriceFrom(priceFrom) : null;
   const priceRangeLabel = priceFrom ? formatMoneyRange(priceFrom, priceTo) : null;
-  const priceStatLabel = moneyRangeStatLabel(priceFrom, priceTo);
 
   return (
     <div className="space-y-0">
@@ -117,12 +118,14 @@ export function BridgesHeroBlock({
         </div>
       </div>
 
-      <dl className="mt-12 grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-6 md:grid-cols-2 md:max-w-lg">
+      <dl className="mt-12 grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-6 md:grid-cols-4">
         {sessionsReady ? (
           <>
             {[
               { value: formatNumber(visibleCount), label: 'рейсов ночью', nowrap: false },
-              { value: priceRangeLabel || '—', label: priceStatLabel, nowrap: true },
+              { value: `${formatNumber(soldEstimate)}+`, label: 'билетов продано', nowrap: false },
+              { value: '4.7', label: 'средний рейтинг', nowrap: false },
+              { value: priceRangeLabel || '—', label: 'диапазон цен', nowrap: true },
             ].map((item) => (
               <div key={item.label}>
                 <dt

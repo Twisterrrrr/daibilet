@@ -1,21 +1,26 @@
 'use client';
 
 import { ArrowRight } from 'lucide-react';
+import type { ReactNode } from 'react';
 
-import { formatMoneyRange, formatNumber, formatPriceFrom, moneyRangeStatLabel } from '@/lib/format';
+import { formatMoneyRange, formatNumber, formatPriceFrom } from '@/lib/format';
 
 /**
- * Bridges-inspired CTA + honest stats for non-bridges landing heroes.
- * Price on primary CTA is always «от min»; range lives only in the stats cell.
+ * Bridges-style selling strip for non-bridges landings.
+ * Top: optional countdown + CTAs. Bottom: always 4 stats (do not truncate).
  */
 export function LandingHeroCtaBlock({
   priceFrom,
   priceTo,
   visibleCount,
   countLabel,
+  soldEstimate,
+  ratingLabel = '4.7',
   sessionsReady,
   primaryLabel,
   secondaryLabel,
+  priceOnCta = 'from',
+  leading,
   onPrimary,
   onSecondary,
 }: {
@@ -23,54 +28,78 @@ export function LandingHeroCtaBlock({
   priceTo?: number | null;
   visibleCount: number;
   countLabel: string;
+  soldEstimate: number;
+  ratingLabel?: string;
   sessionsReady: boolean;
   primaryLabel: string;
   secondaryLabel?: string;
+  /** NY owner: range on CTA; others: «от min» */
+  priceOnCta?: 'from' | 'range';
+  leading?: ReactNode;
   onPrimary: () => void;
   onSecondary?: () => void;
 }) {
-  const priceCtaLabel = priceFrom ? formatPriceFrom(priceFrom) : null;
   const priceRangeLabel = priceFrom ? formatMoneyRange(priceFrom, priceTo) : null;
-  const priceStatLabel = moneyRangeStatLabel(priceFrom, priceTo);
+  const priceCtaLabel =
+    priceFrom == null
+      ? null
+      : priceOnCta === 'range'
+        ? formatMoneyRange(priceFrom, priceTo)
+        : formatPriceFrom(priceFrom);
+
+  const stats = [
+    { value: formatNumber(visibleCount), label: countLabel, nowrap: false },
+    { value: `${formatNumber(soldEstimate)}+`, label: 'билетов продано', nowrap: false },
+    { value: ratingLabel, label: 'средний рейтинг', nowrap: false },
+    { value: priceRangeLabel || '—', label: 'диапазон цен', nowrap: true },
+  ];
+
+  const ctaRow = (
+    <div className="flex flex-wrap items-center gap-3">
+      <button
+        type="button"
+        onClick={onPrimary}
+        className="inline-btn inline-flex items-center gap-2 rounded-full bridges-cta-gradient px-6 py-3 text-sm font-semibold text-white transition hover:brightness-105 active:scale-[0.98]"
+      >
+        {priceCtaLabel ? `${primaryLabel} · ${priceCtaLabel}` : primaryLabel}
+        <ArrowRight className="h-4 w-4" aria-hidden />
+      </button>
+      {secondaryLabel && onSecondary ? (
+        <button
+          type="button"
+          onClick={onSecondary}
+          className="inline-btn rounded-full border border-primary-foreground/25 px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary-foreground/10 active:scale-[0.98]"
+        >
+          {secondaryLabel}
+        </button>
+      ) : null}
+    </div>
+  );
 
   return (
     <div className="space-y-0">
-      <div className="flex flex-wrap items-center gap-3">
-        <button
-          type="button"
-          onClick={onPrimary}
-          className="inline-btn inline-flex items-center gap-2 rounded-full bridges-cta-gradient px-6 py-3 text-sm font-semibold text-white transition hover:brightness-105 active:scale-[0.98]"
-        >
-          {priceCtaLabel ? `${primaryLabel} · ${priceCtaLabel}` : primaryLabel}
-          <ArrowRight className="h-4 w-4" aria-hidden />
-        </button>
-        {secondaryLabel && onSecondary ? (
-          <button
-            type="button"
-            onClick={onSecondary}
-            className="inline-btn rounded-full border border-primary-foreground/25 px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:bg-primary-foreground/10 active:scale-[0.98]"
-          >
-            {secondaryLabel}
-          </button>
-        ) : null}
-      </div>
+      {leading ? (
+        <div className="grid gap-4 md:grid-cols-[auto_1fr_auto] md:items-center">
+          {leading}
+          <div className="hidden h-px bg-gradient-to-r from-primary-foreground/25 to-transparent md:block" aria-hidden />
+          {ctaRow}
+        </div>
+      ) : (
+        ctaRow
+      )}
 
-      <dl className="mt-10 grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-6 md:max-w-lg">
+      <dl className="mt-12 grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-6 md:grid-cols-4">
         {sessionsReady ? (
-          <>
-            <div>
-              <dt className="text-2xl font-semibold tracking-tight text-primary-foreground md:text-3xl">
-                {formatNumber(visibleCount)}
+          stats.map((item) => (
+            <div key={item.label}>
+              <dt
+                className={`text-2xl font-semibold tracking-tight text-primary-foreground md:text-3xl${item.nowrap ? ' whitespace-nowrap' : ''}`}
+              >
+                {item.value}
               </dt>
-              <dd className="mt-1 text-xs uppercase tracking-wider text-primary-foreground/60">{countLabel}</dd>
+              <dd className="mt-1 text-xs uppercase tracking-wider text-primary-foreground/60">{item.label}</dd>
             </div>
-            <div>
-              <dt className="whitespace-nowrap text-2xl font-semibold tracking-tight text-primary-foreground md:text-3xl">
-                {priceRangeLabel || '—'}
-              </dt>
-              <dd className="mt-1 text-xs uppercase tracking-wider text-primary-foreground/60">{priceStatLabel}</dd>
-            </div>
-          </>
+          ))
         ) : (
           <p className="col-span-full text-sm text-primary-foreground/80">Загружаем актуальное расписание…</p>
         )}
@@ -136,9 +165,22 @@ export function resolveLandingHeroTheme(options: {
   return { className: `gradient-default-hero ${atmosphere}`, glow: 'var(--landing-hero-glow)' };
 }
 
-export function resolveLandingHeroPrimaryLabel(profile: 'bus' | 'dinner' | 'river' | 'seasonal' | 'bridges' | 'default'): string {
+export function resolveLandingHeroPrimaryLabel(
+  profile: 'bus' | 'dinner' | 'river' | 'seasonal' | 'bridges' | 'default',
+  countdownKind?: 'new-year' | 'salute-may9' | null,
+): string {
+  if (countdownKind === 'new-year') return 'Выбрать событие';
   if (profile === 'bus') return 'Смотреть рейсы';
   if (profile === 'river' || profile === 'dinner') return 'Выбрать прогулку';
   if (profile === 'seasonal') return 'Смотреть программы';
   return 'Смотреть расписание';
+}
+
+export function resolveLandingHeroSoldEstimate(
+  profile: 'bus' | 'dinner' | 'river' | 'seasonal' | 'bridges' | 'default',
+  visibleCount: number,
+  sessionsCount: number,
+): number {
+  if (profile === 'dinner') return Math.max(visibleCount * 1200, sessionsCount * 480);
+  return Math.max(visibleCount * 1850, sessionsCount * 420);
 }

@@ -15,6 +15,7 @@ import {
 import {
   LandingHeroCtaBlock,
   resolveLandingHeroPrimaryLabel,
+  resolveLandingHeroSoldEstimate,
   resolveLandingHeroTheme,
 } from '@/components/landing/LandingHeroCtaBlock.client';
 import { BridgesScheduleSection } from '@/components/landing/BridgesScheduleSection.client';
@@ -860,15 +861,11 @@ export function LandingPageView({
                   priceFrom={payload.stats.priceFrom ?? null}
                   priceTo={payload.stats.priceTo ?? null}
                   visibleCount={allGroups.length}
+                  soldEstimate={resolveLandingHeroSoldEstimate('bridges', allGroups.length, payload.sessions.length)}
                   sessionsReady={sessionsReady}
                   onPickTour={() => scrollToSchedule()}
                   onViewSchedule={() => document.getElementById('bridges-lift-schedule')?.scrollIntoView({ behavior: 'smooth' })}
                 />
-              ) : undefined
-            }
-            seasonalHeroActions={
-              profile === 'seasonal' && resolveSeasonalCountdownKind(slug) ? (
-                <SeasonalHeroCountdown kind={resolveSeasonalCountdownKind(slug)!} />
               ) : undefined
             }
           />
@@ -1140,13 +1137,12 @@ function LandingHero({
   landingSlug,
   citySlug,
   visibleCount,
-  sessionsCount: _sessionsCount,
+  sessionsCount,
   stats,
   sessionsReady = true,
   todayReference,
   onScrollToSchedule,
   bridgesHeroActions,
-  seasonalHeroActions,
 }: {
   landing: PublicLandingDto;
   profile: LandingProfile;
@@ -1159,9 +1155,7 @@ function LandingHero({
   todayReference: Date;
   onScrollToSchedule?: () => void;
   bridgesHeroActions?: React.ReactNode;
-  seasonalHeroActions?: React.ReactNode;
 }) {
-  void _sessionsCount;
   const cityName = resolveLandingCityName(citySlug, landingSlug);
   const isBus = profile === 'bus';
   const isRiver = profile === 'river';
@@ -1197,20 +1191,30 @@ function LandingHero({
           : isRiver && !cityName
             ? landing.heroSubtitle || 'От Невы до Енисея - сравните предложения речных прогулок в 12 городах России.'
             : landing.heroSubtitle || landing.subtitle;
+  const soldEstimate = resolveLandingHeroSoldEstimate(profile, visibleCount, sessionsCount);
   const countLabel = isBridges
     ? 'рейсов ночью'
-    : isBus && cityName
-      ? 'рейсов'
-      : isBus
-        ? 'экскурсий'
-        : isRiver && cityName
-          ? 'прогулок'
-          : isDinner
-            ? 'ужинов'
-            : isSeasonal
-              ? 'программ'
-              : 'вариантов';
-  const primaryLabel = resolveLandingHeroPrimaryLabel(profile);
+    : countdownKind === 'new-year'
+      ? 'событий'
+      : isBus && cityName
+        ? 'рейсов'
+        : isBus
+          ? 'экскурсий'
+          : isRiver && cityName
+            ? 'прогулок'
+            : isDinner
+              ? 'ужинов'
+              : isSeasonal
+                ? 'программ'
+                : 'событий';
+  const primaryLabel = resolveLandingHeroPrimaryLabel(profile, countdownKind);
+  const secondaryLabel =
+    countdownKind === 'new-year'
+      ? 'Смотреть афишу'
+      : isSeasonal && !citySlug
+        ? 'К городам'
+        : undefined;
+  const priceOnCta = countdownKind === 'new-year' ? 'range' : 'from';
 
   return (
     <section className={`relative overflow-hidden ${heroTheme.className}`}>
@@ -1346,20 +1350,26 @@ function LandingHero({
             </li>
           </ul>
           {bridgesHeroActions}
-          {seasonalHeroActions ? <div className="mb-6">{seasonalHeroActions}</div> : null}
           {!isBridges && onScrollToSchedule ? (
             <LandingHeroCtaBlock
               priceFrom={stats.priceFrom ?? null}
               priceTo={stats.priceTo ?? null}
               visibleCount={visibleCount}
               countLabel={countLabel}
+              soldEstimate={soldEstimate}
               sessionsReady={sessionsReady}
               primaryLabel={primaryLabel}
-              secondaryLabel={isSeasonal && !citySlug ? 'К городам' : undefined}
+              secondaryLabel={secondaryLabel}
+              priceOnCta={priceOnCta}
+              leading={
+                countdownKind ? <SeasonalHeroCountdown kind={countdownKind} /> : undefined
+              }
               onPrimary={onScrollToSchedule}
               onSecondary={
-                isSeasonal && !citySlug
-                  ? () => document.getElementById('landing-cities')?.scrollIntoView({ behavior: 'smooth' })
+                secondaryLabel
+                  ? countdownKind === 'new-year'
+                    ? onScrollToSchedule
+                    : () => document.getElementById('landing-cities')?.scrollIntoView({ behavior: 'smooth' })
                   : undefined
               }
             />

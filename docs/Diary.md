@@ -1,3 +1,23 @@
+## 2026-07-26 - Owner lock: полный selling strip Hero (4 колонки)
+
+### Наблюдения
+
+- Owner: кусок countdown+CTA+4 stats на night-bridges - самый продающий; агенты ошибочно обрезали нижнюю полосу до 2 колонок (`md:max-w-lg`).
+- Для НГ нужен тот же каркас: «До Нового Года / N дней» → «Выбрать событие · min-max» + «Смотреть афишу»; снизу 4 стата.
+- На прочих лендингах верхний countdown может отсутствовать, **нижние 4 колонки обрезать нельзя**.
+
+### Решения
+
+- `BridgesHeroBlock`: восстановлены sold + 4.7 + диапазон (`md:grid-cols-4`); CTA bridges остаётся «от min».
+- `LandingHeroCtaBlock`: full 4-stat strip; optional `leading` countdown; NY `priceOnCta=range`, labels «Выбрать событие» / «Смотреть афишу».
+- Plan/Tasktracker: hero social-proof strip = owner lock (не путать с секцией Отзывы / real Review).
+
+### Проблемы
+
+- Нужен exclusive deploy; BUY optimistic shell - отдельно если ещё не на prod.
+
+---
+
 ## 2026-07-26 - CV.L-Hero rollout: atmosphere for ALL landing profiles
 
 ### Наблюдения

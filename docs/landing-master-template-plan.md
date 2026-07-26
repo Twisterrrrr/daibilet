@@ -32,15 +32,21 @@
 - **Новый год / сезонные dated** (`new-year`, salute и т.п.): «сегодня, DD месяца» **запрещено** (уже SEO.NY1). Праздник ≠ календарный today.
 - Countdown: у bridges - часы до разводки Дворцового (domain-specific). У NY/seasonal - **дни** до окна праздника, **не** клон palace-bridge hours.
 
-### Hero visual reference (не full clone)
+### Hero visual reference (owner lock 2026-07-26)
 
-Night-bridges = референс **типографики** (`font-semibold tracking-tight`) и **атмосферы** (тёмный gradient + soft glow), не копировать:
+Night-bridges selling strip = **канон, не обрезать**:
 
-- countdown часов до моста на все лендинги;
-- fake «18 500+ билетов» / «★4.7»;
-- strip графика разводки мостов.
+1. **Верхняя полоса** (где уместно): countdown + primary CTA + secondary CTA  
+   - Bridges: часы до Дворцового + «Выбрать рейс · от min» + «Смотреть график»  
+   - New Year: «До Нового Года / N дней» + «Выбрать событие · min-max» + «Смотреть афишу»  
+   - Прочие лендинги: countdown может отсутствовать, CTAs остаются
+2. **Нижняя полоса (4 колонки) - обязательна на всех лендингах**:  
+   `N событий/рейсов` · `N+ билетов продано` · `4.7 средний рейтинг` · `min-max диапазон цен`  
+   **Запрещено** ужимать до 2 колонок / `max-w-lg`.
 
-Адаптация фона/акцента **по категории** (зима/НГ, салют, крыши, дети и т.д.).
+Адаптация фона/акцента по категории. Typографика как у bridges (`font-semibold tracking-tight`).
+
+Секция «Отзывы» ниже по странице - по-прежнему только real Review; hero social-proof strip (sold/rating) - отдельный owner-approved selling pattern.
 
 ## Политика доверия (owner lock)
 

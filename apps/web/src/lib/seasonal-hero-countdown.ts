@@ -38,7 +38,7 @@ export function resolveSeasonalCountdownTarget(kind: SeasonalCountdownKind, from
 }
 
 export function seasonalCountdownLabel(kind: SeasonalCountdownKind): string {
-  return kind === 'salute-may9' ? 'До салюта 9 мая' : 'До Нового года';
+  return kind === 'salute-may9' ? 'До салюта 9 мая' : 'До Нового Года';
 }
 
 export function resolveSeasonalCountdownKind(landingSlug: string): SeasonalCountdownKind | null {
