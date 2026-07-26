@@ -4995,7 +4995,6 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
     },
   };
 }
-}
 
 export async function buildPublicEventPage(db, eventSlugOrId) {
   const cachedCatalogSessions = publicCatalogCache?.sessions || null;
