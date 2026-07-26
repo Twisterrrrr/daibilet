@@ -37,7 +37,8 @@
 
 ### Проблемы
 
-- Нужен commit + deploy API/web; smoke slug выше на диапазон `750 - 1 100 ₽` и список взрослых/льготных/детских категорий.
+- Full `deploy-prod-next` OOM (137) на `next build` static gen - для этого фикса достаточно `git pull` + `systemctl restart daibilet-api` (web rebuild не нужен).
+- Smoke API после restart: `ticketPrices` = Основной 18+ 1100 / Детский 750 / Льготный 950; range 750-1100. Prod @`98aec73`.
 
 ---
 
