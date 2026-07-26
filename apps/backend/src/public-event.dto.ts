@@ -171,6 +171,14 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     ...metaGroupMembers.map((member) => member.id),
   ])];
   const representative = eventsById.get(targetCatalogSession?.id || purchaseGroupEventIds[0] || '') || requestedEvent;
+  // Tariff/offer rows must come from the page event (and merge peers), not from
+  // hundreds of dated TC siblings. Ordering the whole meta-group by price ASC +
+  // take 32 keeps only the cheapest child tariffs and drops adult/other categories.
+  const tariffOfferEventIds = [...new Set([
+    requestedEvent.id,
+    representative.id,
+    ...mergeGroupMembers.map((member) => member.id),
+  ])];
 
   const now = new Date();
   const [sessionRows, offerRows] = await Promise.all([
@@ -198,13 +206,13 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     ),
     prisma.eventOffer.findMany({
       where: {
-        eventId: { in: offerScopeEventIds },
+        eventId: { in: tariffOfferEventIds },
         active: true,
         priceRub: { gte: MIN_DISPLAY_PRICE_RUB },
       },
       include: offerInclude,
       orderBy: [{ priceRub: 'asc' }, { id: 'asc' }],
-      take: 32,
+      take: 64,
     }),
   ]);
 

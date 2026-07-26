@@ -5130,6 +5130,14 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     ]);
   }
 
+  // Ticket tariffs must be loaded from the page event (and merge peers), not from
+  // the entire dated TC sibling group. price ASC + limit 32 across hundreds of
+  // slots only returns child tariffs and hides adult/other categories.
+  const tariffOfferEventIds = uniqueValues([
+    event.id,
+    representativeRow.id || event.id,
+  ]);
+
   const [sessionsResult, offersResult] = await Promise.all([
     db.query(
       `
@@ -5196,9 +5204,9 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
           coalesce((offer.payload->>'sortOrder')::int, 9999),
           offer."priceRub" asc nulls last,
           offer.id asc
-        limit 32
+        limit 64
       `,
-      [groupEventIds, MIN_DISPLAY_PRICE_RUB],
+      [tariffOfferEventIds, MIN_DISPLAY_PRICE_RUB],
     ),
   ]);
 

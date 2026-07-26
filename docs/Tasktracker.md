@@ -1,9 +1,18 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-07-25
+**Обновлено:** 2026-07-26
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
+
+---
+
+## Event buy-card tariffs (2026-07-26)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| BT.1 | Public event DTO: offers из page event, не cheapest-32 по meta-группе | Критический | ✅ |
+| BT.2 | Smoke TC «Реки и каналы»: диапазон + все категории в buy-card | Критический | 🔄 deploy |
 
 ---
 

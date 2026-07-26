@@ -1,3 +1,23 @@
+## 2026-07-26 - EventBuyCard: только детский тариф вместо диапазона
+
+### Наблюдения
+
+- Prod slug `tc-6a172122e12fa44141b31b60-reki-i-kanaly-obzornaya-vodnaya-progulka-po-sankt-peterburgu`: UI показывал только `750 ₽` и категорию «Детский до 12 лет».
+- В БД у события есть полный набор тарифов: Детский 750 / Льготный 950 / Основной 18+ 1100 (плюс служебные 10 ₽ ниже `MIN_DISPLAY_PRICE_RUB`).
+- `/api/public/events/{slug}` отдавал только child в `ticketPrices`/`offers`. Каталог при этом знал `priceFrom:750` / `priceTo:1350`.
+
+### Решения
+
+- Корневая причина: `EventOffer` грузились по всей meta/group сессий (сотни sibling eventId) с `orderBy priceRub ASC` + `take 32` → в окно попадали только дешёвые детские офферы.
+- `tariffOfferEventIds` = requested + representative + merge peers; sessions по-прежнему по полной группе. Лимит offers 64.
+- Правки: `public-event.dto.ts` + legacy `dto.js`. Frontend `getTicketPriceRange` / grouping уже корректны при полном DTO.
+
+### Проблемы
+
+- Нужен commit + deploy API/web; smoke slug выше на диапазон `750 - 1 100 ₽` и список взрослых/льготных/детских категорий.
+
+---
+
 ## 2026-07-26 - Event description: wall-of-text regression
 
 ### Наблюдения
