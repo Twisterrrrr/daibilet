@@ -1,9 +1,20 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-07-26
+**Обновлено:** 2026-07-27
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
+
+---
+
+## Landing SSR perf (2026-07-27)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| PERF.L1 | Landings ISR: убрать `await searchParams` в `[segment]`/`[segment2]`/`[segment3]`; genre с URL на клиенте | Критический | 🔄 commit+deploy |
+| PERF.L2 | `publicCatalogSessions` SWR (fresh 5м / stale 30м + soft-invalidate), зеркало TS DTO | Критический | 🔄 commit+deploy |
+| PERF.L3 | Slim SSR: fallback `buildPublicLandingPage` → lean cards + slice 48 (как managed) | Высокий | 🔄 commit+deploy |
+| PERF.L4 | `/events` generateMetadata без searchParams (SEO tradeoff vs ISR) | Средний | ⚠️ deferred; body уже без await |
 
 ---
 

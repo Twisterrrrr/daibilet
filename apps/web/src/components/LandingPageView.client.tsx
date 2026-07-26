@@ -636,7 +636,13 @@ export function LandingPageView({
   const [isSessionsLoading, setIsSessionsLoading] = React.useState(() => !initialCachedPayload?.sessions?.length);
   const [sessionsError, setSessionsError] = React.useState<string | null>(null);
   const [city, setCity] = React.useState('all');
-  const [category, setCategory] = React.useState(() => resolveConcertGenreTag(initialGenre) || 'all');
+  const [category, setCategory] = React.useState(() => {
+    // Prefer URL on client so SSR can skip searchParams (ISR).
+    if (typeof window !== 'undefined' && isConcertsGenreLanding(rawSlug)) {
+      return readLandingGenreFromUrl();
+    }
+    return resolveConcertGenreTag(initialGenre) || 'all';
+  });
   const [dateFilter, setDateFilter] = React.useState<DateFilter>(defaultLandingDateFilter(profile));
   const [sort, setSort] = React.useState<SortFilter>(profile === 'bus' || profile === 'dinner' ? 'price' : 'time');
   const [menuFilter, setMenuFilter] = React.useState<MenuFilter>('all');
@@ -663,7 +669,9 @@ export function LandingPageView({
     setDinnerBadgeFilter('all');
     setContextChip(null);
     setTimeSlot('');
-    setCategory(resolveConcertGenreTag(initialGenre) || 'all');
+    setCategory(
+      isConcertsGenreLanding(slug) ? readLandingGenreFromUrl() : resolveConcertGenreTag(initialGenre) || 'all',
+    );
     setApiPayload(
       initialCachedPayload?.landing
         ? finalizeLandingPayload(initialCachedPayload, slug, resolveLandingCityName(citySlug, slug))
@@ -671,7 +679,7 @@ export function LandingPageView({
     );
     setSessionsError(null);
     setIsSessionsLoading(!initialCachedPayload?.sessions?.length);
-  }, [slug, citySlug, initialCachedPayload]);
+  }, [slug, citySlug, initialCachedPayload, initialGenre]);
 
   React.useEffect(() => {
     // SSR already hydrated the landing — do not force a no-store remount fetch.

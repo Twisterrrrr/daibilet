@@ -58,6 +58,8 @@ const ACTIVE_SESSION_SQL = `(
 )`;
 const PUBLIC_DESTINATION_MIN_EVENTS = 1;
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
+/** Stale-while-revalidate window: serve expired catalog instantly, rebuild in background. */
+const PUBLIC_CATALOG_STALE_MS = Number(process.env.PUBLIC_CATALOG_STALE_MS || 30 * 60 * 1000);
 const CATALOG_TAG_DISPLAY_LIMIT = 4;
 
 function orderedEventTagsSql(eventIdSql = 'e.id') {
@@ -445,10 +447,14 @@ export function clearPublicDataCaches() {
   publicDestinationsCache = null;
   publicHomePreviewCache = null;
   publicEventRowsCache = null;
-  publicCatalogCache = null;
+  // Soft-invalidate catalog: keep last sessions for SWR while rebuild runs.
+  if (publicCatalogCache?.sessions) {
+    publicCatalogCache = { ...publicCatalogCache, expiresAt: 0 };
+  } else {
+    publicCatalogCache = null;
+  }
   publicStatsCache = null;
   publicEventRowsBuildPromise = null;
-  publicCatalogBuildPromise = null;
   publicVenueHubCache = null;
   publicVenueCatalogLists = null;
 }
@@ -4850,11 +4856,13 @@ export async function buildPublicLandingPage(db, landingSlug) {
   if (!rule) return null;
 
   const catalogSessions = await publicCatalogSessions(db);
-  const sessions = filterSessionsForLandingRule(catalogSessions, rule);
-  const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
-  const cities = countBy(sessions.map((event) => event.destination || event.city).filter(Boolean));
-  const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
-  const venues = countBy(sessions.map((event) => event.venue).filter(Boolean));
+  const matchedSessions = filterSessionsForLandingRule(catalogSessions, rule);
+  // Lean SSR: same card budget as managed path - avoid dumping full catalog into HTML/RSC.
+  const sessions = matchedSessions.slice(0, 48).map((session) => toPublicCatalogListItem(session));
+  const prices = matchedSessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
+  const cities = countBy(matchedSessions.map((event) => event.destination || event.city).filter(Boolean));
+  const categories = countBy(matchedSessions.map((event) => event.category).filter(Boolean));
+  const venues = countBy(matchedSessions.map((event) => event.venue).filter(Boolean));
 
   return {
     generatedAt: new Date().toISOString(),
@@ -4864,11 +4872,11 @@ export async function buildPublicLandingPage(db, landingSlug) {
       subtitle: rule.subtitle,
       city: rule.city || null,
       chips: rule.chips || [],
-      events: sessions.length,
+      events: matchedSessions.length,
       venues: Object.keys(venues).length,
       priceFrom: prices.length ? Math.min(...prices) : null,
       imageUrl: null,
-      strength: sessions.length >= 20 ? 'ready' : sessions.length > 0 ? 'seed' : 'empty',
+      strength: matchedSessions.length >= 20 ? 'ready' : matchedSessions.length > 0 ? 'seed' : 'empty',
       seoTitle: `${rule.title}: афиша, расписание и билеты | Дайбилет`,
       seoDescription: `${rule.subtitle}. Табличный выбор по датам, городам, площадкам и цене.`,
     },
@@ -4876,8 +4884,8 @@ export async function buildPublicLandingPage(db, landingSlug) {
     relatedLandings: buildPublicLandings(sessions).filter((landing) => landing.slug !== rule.slug && landing.events > 0),
     blocks: buildDefaultLandingBlocks(rule, sessions),
     stats: {
-      events: sessions.length,
-      sessions: sessions.length,
+      events: matchedSessions.length,
+      sessions: matchedSessions.length,
       cities,
       categories,
       venues,
@@ -8416,39 +8424,63 @@ async function publicSessions(db, limit) {
 
 export async function publicCatalogSessions(db, forceRefresh = false) {
   const now = Date.now();
-  if (!forceRefresh && publicCatalogCache && publicCatalogCache.expiresAt > now) {
-    return publicCatalogCache.sessions;
-  }
-  if (!forceRefresh && publicCatalogBuildPromise) {
-    return publicCatalogBuildPromise;
-  }
+  const cached = publicCatalogCache;
 
   if (forceRefresh) {
-    publicCatalogCache = null;
+    if (cached?.sessions) {
+      publicCatalogCache = { ...cached, expiresAt: 0, staleUntil: 0 };
+    }
+    return schedulePublicCatalogRebuild(db, 'force-refresh');
+  }
+
+  // Fresh hit.
+  if (cached?.sessions && now < cached.expiresAt) {
+    return cached.sessions;
+  }
+
+  // Stale-while-revalidate: serve previous catalog immediately, refresh in background.
+  if (cached?.sessions && now < cached.staleUntil) {
+    void schedulePublicCatalogRebuild(db, 'swr');
+    return cached.sessions;
+  }
+
+  return schedulePublicCatalogRebuild(db, cached?.sessions ? 'hard-expire' : 'cold');
+}
+
+function schedulePublicCatalogRebuild(db, reason = 'refresh') {
+  if (publicCatalogBuildPromise) return publicCatalogBuildPromise;
+
+  publicCatalogBuildPromise = (async () => {
+    const startedAt = Date.now();
+    try {
+      const rows = await publicCatalogSessionsFast(db);
+      const now = Date.now();
+      publicCatalogCache = {
+        expiresAt: now + Math.max(30_000, PUBLIC_CATALOG_CACHE_MS),
+        staleUntil: now + Math.max(60_000, PUBLIC_CATALOG_STALE_MS),
+        sessions: rows,
+        destinationIndex: buildDestinationSessionIndex(rows),
+        venueIndex: buildVenueSessionIndex(rows),
+        slugIndex: buildCatalogSlugIndex(rows),
+        catalogFacets: buildCatalogFacets(rows.filter(sessionHasCoverImage)),
+        builtAt: now,
+      };
+      console.log(
+        `Public catalog cache rebuilt (${reason}): ${rows.length} sessions in ${now - startedAt}ms`,
+      );
+      return rows;
+    } finally {
+      publicCatalogBuildPromise = null;
+    }
+  })().catch((error) => {
     publicCatalogBuildPromise = null;
-  }
+    console.warn(
+      `Public catalog cache rebuild failed (${reason}): ${error instanceof Error ? error.message : String(error)}`,
+    );
+    throw error;
+  });
 
-  const buildPromise = (async () => {
-    const rows = await publicCatalogSessionsFast(db);
-
-    publicCatalogCache = {
-      expiresAt: Date.now() + PUBLIC_CATALOG_CACHE_MS,
-      sessions: rows,
-      destinationIndex: buildDestinationSessionIndex(rows),
-      venueIndex: buildVenueSessionIndex(rows),
-      slugIndex: buildCatalogSlugIndex(rows),
-      catalogFacets: buildCatalogFacets(rows.filter(sessionHasCoverImage)),
-    };
-
-    return rows;
-  })();
-
-  publicCatalogBuildPromise = buildPromise;
-  try {
-    return await buildPromise;
-  } finally {
-    if (publicCatalogBuildPromise === buildPromise) publicCatalogBuildPromise = null;
-  }
+  return publicCatalogBuildPromise;
 }
 
 async function publicCatalogSessionsFast(db) {
@@ -9082,7 +9114,11 @@ async function publicEventRows(db, forceRefresh = false) {
   if (forceRefresh) {
     publicEventRowsCache = null;
     publicEventRowsBuildPromise = null;
-    publicCatalogCache = null;
+    if (publicCatalogCache?.sessions) {
+      publicCatalogCache = { ...publicCatalogCache, expiresAt: 0 };
+    } else {
+      publicCatalogCache = null;
+    }
     publicHomeCache = null;
   }
 

@@ -1,3 +1,25 @@
+## 2026-07-27 - PERF.L1–L3: landings ISR + catalog SWR
+
+### Наблюдения
+
+- Speed audit: warm landings ~0.15–0.25с, но выбросы TTFB ~10–13с (`/rechnye-progulki`) на том же dynamic SSR-пути.
+- `await searchParams` в `app/[segment]/**/page.tsx` форсировал `Cache-Control: private, no-store`, убивая `revalidate=3600` (нет `s-maxage` / `x-nextjs-cache: HIT`).
+- `publicCatalogSessions` TTL 5 мин без SWR: после expiry запрос ждал полный rebuild (секунды).
+- Fallback `buildPublicLandingPage` (без managed Landing) сериализовал весь matched catalog в RSC; managed уже lean+slice 48.
+
+### Решения
+
+- Landings: page/generateMetadata без `searchParams`; genre/tag читает `LandingPageView` с URL (concerts-genre).
+- Catalog: SWR fresh 5м / stale 30м (`PUBLIC_CATALOG_STALE_MS`), soft-invalidate в `clearPublicDataCaches`; то же в `public-catalog.dto.ts`.
+- Fallback landing DTO: `toPublicCatalogListItem` + `.slice(0, 48)`; stats по полному matched count.
+- `/events` metadata с searchParams оставлен (SEO tradeoff, PERF.L4 deferred).
+
+### Проблемы
+
+- Нужен exclusive deploy + curl Cache-Control / x-nextjs-cache / TTFB на `/`, `/novyj-god`, `/rechnye-progulki`, `/neobychnye-teatry/ekaterinburg`.
+
+---
+
 ## 2026-07-26 - CV.L-Content: GPT packs A-G (NY…bridges)
 
 ### Наблюдения

@@ -26,6 +26,8 @@ import type { PurchaseProvider } from './types/common.js';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
+/** Stale-while-revalidate window: serve expired catalog instantly, rebuild in background. */
+const PUBLIC_CATALOG_STALE_MS = Number(process.env.PUBLIC_CATALOG_STALE_MS || 30 * 60 * 1000);
 const CATALOG_CARD_SLOT_TARGET = 4;
 const CATALOG_HYDRATED_SLOT_LIMIT = 8;
 
@@ -49,15 +51,22 @@ type PublicCatalogRow = PublicCatalogMappingRow;
 
 interface CatalogCache {
   expiresAt: number;
+  staleUntil: number;
   sessions: PublicSessionDto[];
+  builtAt?: number;
 }
 
 let catalogCache: CatalogCache | null = null;
 let catalogBuildPromise: Promise<PublicSessionDto[]> | null = null;
 
 export function clearPublicCatalogDtoCache(): void {
-  catalogCache = null;
-  catalogBuildPromise = null;
+  // Soft-invalidate for SWR: keep last sessions while rebuild runs.
+  if (catalogCache?.sessions) {
+    catalogCache = { ...catalogCache, expiresAt: 0 };
+  } else {
+    catalogCache = null;
+  }
+  // Do not clear in-flight rebuild - callers may still await it.
 }
 
 const LIST_SLOT_PREVIEW_LIMIT = 3;
@@ -98,39 +107,68 @@ export async function getPublicCatalogSessions(
 ): Promise<PublicSessionDto[]> {
   const hydrateSlots = options.hydrateSlots !== false;
   const now = Date.now();
-  if (!forceRefresh && catalogCache && catalogCache.expiresAt > now) {
-    return hydrateSlots ? hydrateCatalogUpcomingSlots(catalogCache.sessions) : catalogCache.sessions;
-  }
-  if (!forceRefresh && catalogBuildPromise) {
-    const sessions = await catalogBuildPromise;
+  const cached = catalogCache;
+
+  if (forceRefresh) {
+    if (cached?.sessions) {
+      catalogCache = { ...cached, expiresAt: 0, staleUntil: 0 };
+    }
+    const sessions = await schedulePublicCatalogDtoRebuild('force-refresh');
     return hydrateSlots ? hydrateCatalogUpcomingSlots(sessions) : sessions;
   }
 
-  if (forceRefresh) clearPublicCatalogDtoCache();
+  if (cached?.sessions && now < cached.expiresAt) {
+    return hydrateSlots ? hydrateCatalogUpcomingSlots(cached.sessions) : cached.sessions;
+  }
 
-  const buildPromise = Promise.all([loadPublicCatalogRows(), loadPinnedEventIds()]).then(async ([rows, pinnedEventIds]) => {
-    // Do not hydrate all slots into the shared cache — that made every limit=50 cold build pay for thousands of slots.
-    const sessions = filterCatalogSessions(
-      dedupeCrossSourceCatalogSessions(
-        regroupMappedPublicCatalogSessions(
-          rows.map((row) => mapGroupedPublicSession(row, pinnedEventIds)).filter(Boolean),
+  // Stale-while-revalidate: serve previous catalog immediately, refresh in background.
+  if (cached?.sessions && now < cached.staleUntil) {
+    void schedulePublicCatalogDtoRebuild('swr');
+    return hydrateSlots ? hydrateCatalogUpcomingSlots(cached.sessions) : cached.sessions;
+  }
+
+  const sessions = await schedulePublicCatalogDtoRebuild(cached?.sessions ? 'hard-expire' : 'cold');
+  return hydrateSlots ? hydrateCatalogUpcomingSlots(sessions) : sessions;
+}
+
+function schedulePublicCatalogDtoRebuild(reason: string): Promise<PublicSessionDto[]> {
+  if (catalogBuildPromise) return catalogBuildPromise;
+
+  catalogBuildPromise = (async () => {
+    const startedAt = Date.now();
+    try {
+      const [rows, pinnedEventIds] = await Promise.all([loadPublicCatalogRows(), loadPinnedEventIds()]);
+      // Do not hydrate all slots into the shared cache — that made every limit=50 cold build pay for thousands of slots.
+      const sessions = filterCatalogSessions(
+        dedupeCrossSourceCatalogSessions(
+          regroupMappedPublicCatalogSessions(
+            rows.map((row) => mapGroupedPublicSession(row, pinnedEventIds)).filter(Boolean),
+          ),
         ),
-      ),
+      );
+      const now = Date.now();
+      catalogCache = {
+        expiresAt: now + Math.max(30_000, PUBLIC_CATALOG_CACHE_MS),
+        staleUntil: now + Math.max(60_000, PUBLIC_CATALOG_STALE_MS),
+        sessions,
+        builtAt: now,
+      };
+      console.log(
+        `Public catalog DTO cache rebuilt (${reason}): ${sessions.length} sessions in ${now - startedAt}ms`,
+      );
+      return sessions;
+    } finally {
+      catalogBuildPromise = null;
+    }
+  })().catch((error) => {
+    catalogBuildPromise = null;
+    console.warn(
+      `Public catalog DTO cache rebuild failed (${reason}): ${error instanceof Error ? error.message : String(error)}`,
     );
-    catalogCache = {
-      expiresAt: Date.now() + PUBLIC_CATALOG_CACHE_MS,
-      sessions,
-    };
-    return sessions;
+    throw error;
   });
 
-  catalogBuildPromise = buildPromise;
-  try {
-    const sessions = await buildPromise;
-    return hydrateSlots ? hydrateCatalogUpcomingSlots(sessions) : sessions;
-  } finally {
-    if (catalogBuildPromise === buildPromise) catalogBuildPromise = null;
-  }
+  return catalogBuildPromise;
 }
 
 async function loadPinnedEventIds(): Promise<Set<string>> {

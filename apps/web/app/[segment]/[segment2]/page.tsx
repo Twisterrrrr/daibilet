@@ -7,7 +7,6 @@ export const revalidate = 3600;
 
 type PageProps = {
   params: Promise<{ segment: string; segment2: string }>;
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export async function generateStaticParams() {
@@ -19,8 +18,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return buildLandingMetadata(`/${segment}/${segment2}`);
 }
 
-export default async function LandingTwoSegmentPage({ params, searchParams }: PageProps) {
+/**
+ * Do not await searchParams - genre/tag filters are client-side.
+ * Awaiting searchParams forces Cache-Control: private, no-store and kills ISR.
+ */
+export default async function LandingTwoSegmentPage({ params }: PageProps) {
   const { segment, segment2 } = await params;
-  const query = await searchParams;
-  return LandingRoutePage({ pathname: `/${segment}/${segment2}`, searchParams: query });
+  return LandingRoutePage({ pathname: `/${segment}/${segment2}` });
 }

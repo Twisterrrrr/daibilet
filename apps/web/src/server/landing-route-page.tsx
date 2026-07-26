@@ -29,15 +29,6 @@ import { loadThinRelatedCardSessions } from '@/server/landing-thin-related';
 
 export const revalidate = 3600;
 
-type SearchParams = Record<string, string | string[] | undefined>;
-
-function readSearchParam(params: SearchParams, key: string): string | undefined {
-  const value = params[key];
-  if (typeof value === 'string') return value;
-  if (Array.isArray(value) && value[0]) return value[0];
-  return undefined;
-}
-
 /** Профиль SEO/UI для лендинга - зеркало LandingPageView.getLandingProfile. */
 function resolveLandingProfileKind(slug: string): LandingProfileKind {
   const key = canonicalLandingSlug(slug);
@@ -58,8 +49,8 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
   const payload = await fetchLandingPageDto(slug);
   if (!payload?.landing) return { title: pageTitle('Подборка') };
 
-  const genre = undefined;
-  const finalized = finalizeLandingPayload(payload, slug, route.citySlug, genre);
+  // Genre/tag live only on client (?genre=) so generateMetadata stays ISR-safe.
+  const finalized = finalizeLandingPayload(payload, slug, route.citySlug);
   const landing = finalized.landing;
   const canonical = landingCategoryHref(slug, route.citySlug);
   const cityName = resolveLandingCityName(route.citySlug);
@@ -123,13 +114,7 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
   };
 }
 
-export async function LandingRoutePage({
-  pathname,
-  searchParams,
-}: {
-  pathname: string;
-  searchParams: SearchParams;
-}) {
+export async function LandingRoutePage({ pathname }: { pathname: string }) {
   const route = resolveLandingRouteFromLocation(pathname);
   if (!route) notFound();
 
@@ -137,8 +122,8 @@ export async function LandingRoutePage({
   const payload = await fetchLandingPageDto(slug);
   if (!payload?.landing) notFound();
 
-  const genre = readSearchParam(searchParams, 'genre') || readSearchParam(searchParams, 'tag');
-  const finalized = finalizeLandingPayload(payload, slug, route.citySlug, genre);
+  // No searchParams on server: keeps revalidate/ISR (s-maxage). Genre from URL on client.
+  const finalized = finalizeLandingPayload(payload, slug, route.citySlug);
   const canonical = landingCategoryHref(slug, route.citySlug);
   const offerCount = finalized.stats?.events ?? finalized.sessions?.length ?? 0;
   const thinRelatedSessions = route.citySlug
@@ -170,7 +155,6 @@ export async function LandingRoutePage({
         slug={slug}
         citySlug={route.citySlug}
         initialPayload={finalized}
-        genre={genre}
         thinRelatedSessions={thinRelatedSessions}
       />
     </SiteLayout>
