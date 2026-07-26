@@ -2294,12 +2294,15 @@ function LandingFaq({
 }) {
   const faqBlock = blocks.find((block) => block.type === 'FAQ');
   const slugKey = landingSlug || landing.slug;
-  const items: Array<Record<string, string | number>> = faqBlock
-    ? blockItems(faqBlock)
-    : (contentPack?.faq?.length
-        ? contentPack.faq
-        : defaultLandingFaq(slugKey, profile, citySlug)
-      ).map((item) => ({ question: item.question, answer: item.answer }));
+  // Owner GPT packs win over thin CMS FAQ blocks when present.
+  const items: Array<Record<string, string | number>> = contentPack?.faq?.length
+    ? contentPack.faq.map((item) => ({ question: item.question, answer: item.answer }))
+    : faqBlock
+      ? blockItems(faqBlock)
+      : defaultLandingFaq(slugKey, profile, citySlug).map((item) => ({
+          question: item.question,
+          answer: item.answer,
+        }));
   const seasonalMeta = profile === 'seasonal' ? getSeasonalLanding(slugKey) : null;
   const faqSubtitle = contentPack?.faqSubtitle
     ? contentPack.faqSubtitle
