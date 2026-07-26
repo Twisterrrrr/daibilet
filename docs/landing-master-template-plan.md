@@ -2,7 +2,7 @@
 
 Дата: 2026-07-26  
 Ветка: `feat/next-monorepo`  
-Статус: план + L1 ✅ + L4 ContextWidget thin (owner matrix)
+Статус: план + L1 ✅ + L4 ContextWidget thin + **owner block order lock** + фаза **CV.L-Hero** (первая)
 
 ## Цель
 
@@ -10,11 +10,44 @@
 **Не** изобретать параллельный роутинг `app/[city]/[category]` и **не** подменять CHPU landings.  
 **Не** добавлять Prisma `Category.widgetData` / новую модель Category ради виджета - только config по landing slug.
 
+## Owner-locked порядок блоков (канон)
+
+Единый порядок секций на всех CHPU-лендингах (после полной унификации):
+
+| # | Блок | Назначение |
+|---|------|------------|
+| 1 | **Hero** | H1, lead, trust strip, category-adapted atmosphere; для dated/seasonal - countdown **в днях** |
+| 2 | **Советы** | Короткие практические tips (не SEO-простыня) |
+| 3 | **Расписание** | Listings / schedule + фильтры |
+| 4 | **Как выбрать событие** | How-to steps без fake рейтинга |
+| 5 | **Частые вопросы** | FAQ |
+| 6 | **На что обратить внимание** | Checklist / attention |
+| 7 | **Отзывы** | Только **реальные** `Review` (approved). Иначе **скрыть** секцию |
+
+Доп. блоки (сравнение мостов, see-also, SEO bottom, cities grid) - после канона или в profile-specific хвосте, не ломая порядок 1-7.
+
+### H1 и «сегодня, дата»
+
+- **Night-bridges** (`profile=bridges`): H1 с «сегодня, 26 июля» **осознанно** - страница про расписание на текущую ночь; дату оставляем.
+- **Новый год / сезонные dated** (`new-year`, salute и т.п.): «сегодня, DD месяца» **запрещено** (уже SEO.NY1). Праздник ≠ календарный today.
+- Countdown: у bridges - часы до разводки Дворцового (domain-specific). У NY/seasonal - **дни** до окна праздника, **не** клон palace-bridge hours.
+
+### Hero visual reference (не full clone)
+
+Night-bridges = референс **типографики** (`font-semibold tracking-tight`) и **атмосферы** (тёмный gradient + soft glow), не копировать:
+
+- countdown часов до моста на все лендинги;
+- fake «18 500+ билетов» / «★4.7»;
+- strip графика разводки мостов.
+
+Адаптация фона/акцента **по категории** (зима/НГ, салют, крыши, дети и т.д.).
+
 ## Политика доверия (owner lock)
 
 - Запрещены fake ★ / «N отзывов» / sold-count / hardcoded 4.5 без реального агрегата (см. HC.3, CV.11).
 - Разрешены: реальные `Review` (approved), бейджи из **тегов / subcategory / title / landing rules**, «Хит» / «Выбор Дайбилет» только из реальных сигналов (`sessionCount`, `landingSlugs`, editors-pick).
 - `Event.rating` / `reviewsCount` в Prisma **нет** - миграция **не** делается в MVP. AggregateRating на event page уже строится из `Review` при пороге - это отдельный путь, не карточка лендинга.
+- Секция «Отзывы» на лендинге: показывать только при наличии реальных approved reviews по лендингу/событиям; hardcoded `defaultLandingReviews` / `BRIDGES_LANDING.reviews` / `seasonal.reviews` - **debt (CV.L-debt)**, до фикса лучше hide.
 
 ## Карта папок / компонентов (as-is)
 
@@ -26,6 +59,7 @@
 | Bridges schedule | `apps/web/src/components/landing/BridgesScheduleSection.client.tsx` | route chips + cruise cards |
 | Bridges utils | `apps/web/src/lib/bridges-session-utils.ts` | route kind, feature tags, badges |
 | Bridges copy | `apps/web/src/data/bridges-landing.ts` | FAQ / meta / (legacy reviews - долг) |
+| Seasonal countdown | `apps/web/src/lib/seasonal-hero-countdown.ts` + `SeasonalHeroCountdown.client.tsx` | days countdown (NY / dated) |
 | ContextWidget | `apps/web/src/data/landing-context-widgets.ts` + `LandingContextWidget.client.tsx` | config по slug, text-first chips |
 | Micro-badges | `apps/web/src/lib/landing-card-badges.ts` | tags/subcategories → badges |
 | Purchase CTA | `apps/web/src/components/landing/LandingPurchaseButton.client.tsx` | widget open |
@@ -34,8 +68,36 @@
 | Card (catalog/landing) | `apps/web/src/components/EventCard.tsx` | `landingActions` buy CTA |
 | DTO | `packages/contracts/src/public.ts` → `PublicSessionDto` | `category`, `subcategories?`, `tags[]` |
 | CHPU paths | `apps/web/src/lib/landing-routes.ts` | path ↔ canonical slug |
+| GPT briefs | `docs/landing-content-gpt-briefs.md` | готовые промпты на контент-дыры |
 
 **Факт:** основной список на лендингах - `LandingScheduleList` / `LandingDinnerScheduleList` / `BridgesScheduleSection`, а не grid `EventCard`. `LandingEventsGrid` почти мёртвый код - не переписывать каталог через UnifiedEventCard.
+
+## Gap: профили vs канон 1-7
+
+| Профиль | Типичные slug | 1 Hero | 2 Советы | 3 Расписание | 4 Как выбрать | 5 FAQ | 6 Attention | 7 Отзывы |
+|---------|---------------|--------|----------|--------------|---------------|-------|-------------|----------|
+| **bridges** | `bridges-night` | ✅ atmosphere + **часы** countdown | ⚠️ после strip разводки (порядок нарушен) | ✅ | ✅ | ✅ | ✅ `BridgesShipChecklist` | ⚠️ **fake** hardcoded |
+| **seasonal** | `new-year`, salute | ⚠️ / ✅ NY: atmosphere + **дни**; salute: свой gradient | ⚠️ city tips / intro, не единый блок | ✅ | ❌ нет `LandingHowToChoose` | ✅ | ❌ | ⚠️ **fake** из `seasonal-landings` |
+| **default** | planetarium, rooftops, country-tours, river-party, family-kids, … | ⚠️ flat `gradient-hero-lovable` | ⚠️ tips внутри ContextWidget (после schedule) | ✅ | ✅ | ✅ generic/partial | ❌ | ⚠️ **fake** generic |
+| **dinner** | moscow-dinner-boat | ⚠️ lovable | ⚠️ intro, не tips-блок | ✅ | ❌ | ✅ | ❌ | ⚠️ **fake** |
+| **bus** | bus-tours + city | ⚠️ lovable | ⚠️ city guide tips | ✅ | ❌ | ✅ | ❌ | ⚠️ **fake** |
+| **river** | river-cruises + city | ⚠️ lovable | ⚠️ city guide tips | ✅ | ❌ | ✅ | ❌ | ⚠️ **fake** |
+
+Легенда: ✅ ок · ⚠️ частично / не тот порядок / fake · ❌ отсутствует.
+
+### Ключевые slug (owner matrix) - краткий gap контента
+
+| Slug | Tips | How-to | FAQ | Checklist | Reviews real | Hero atmosphere |
+|------|------|--------|-----|-----------|--------------|-----------------|
+| bridges-night (ref) | ✅ | ✅ river-ish | ✅ | ✅ | ❌ fake | ✅ эталон |
+| new-year | ⚠️ ContextWidget tips | ❌ | ✅ thin | ❌ | ❌ fake | ✅ CV.L-Hero thin (дни) |
+| planetarium | ⚠️ CW tips | ❌ dedicated | ⚠️ generic default | ❌ | ❌ | ❌ |
+| rooftops | ⚠️ CW tips | ❌ | ⚠️ generic | ❌ | ❌ | ❌ |
+| country-tours | ⚠️ CW tips | ❌ | ⚠️ generic | ❌ | ❌ | ❌ |
+| river-party | ⚠️ CW tips | ✅ default how-to | ⚠️ party FAQ partial | ❌ | ❌ | ❌ |
+| family-kids | ⚠️ CW tips | ✅ | ✅ kids FAQ | ❌ | ❌ | ❌ |
+
+Промпты на закрытие дыр: [`docs/landing-content-gpt-briefs.md`](./landing-content-gpt-briefs.md).
 
 ## Что уже есть (не дублировать)
 
@@ -45,23 +107,8 @@
 - Dinner: menu + sunset/night chips + L1 badge chips.
 - Empty-state partial: dinner reset; river/seasonal free alternatives при малом числе групп.
 - Hit / recommend на image badges каталога из real signals.
-- NY H1: без «сегодня, DD месяца» (`resolveLandingSeo` static seasonal) - координация с parallel agent.
-
-## Бейджи без миграции (источники)
-
-Из `PublicSessionDto` + title:
-
-| Badge | Сигнал |
-|-------|--------|
-| Пешеходная | title/tags/subcategories: пешеход, пешком, walking |
-| Автобусная | автобус, hop-on, city tour, обзорн |
-| Групповая | групп, сборн |
-| Индивидуальная | индивидуальн, private, 1-4 чел |
-| Ужин / сет / фуршет | ужин, сет, фуршет |
-| VIP / живая музыка / гид / открытая палуба | соответствующие keywords |
-| Хит | `sessionCount >= 4` или `landingSlugs.length > 0` (как `isHitEvent`) |
-
-Не выводить псевдо-рейтинг `resolvePseudoRating` / `estimateRating` на лендинг-карточках.
+- NY H1: без «сегодня, DD месяца» (`resolveLandingSeo` static seasonal) - SEO.NY1 ✅.
+- Bridges hero price min-max: parallel/agent `BR.PR1` (`ae3c86c`) - **не пересекаться** в CV.L-Hero с правками stats bridges.
 
 ---
 
@@ -101,13 +148,22 @@ type LandingContextWidgetConfig = {
 
 Файл: `apps/web/src/data/landing-context-widgets.ts`.  
 UI: `LandingContextWidget.client.tsx` - chips Clean UI (border, text, без emoji/icon row).  
-Монтаж: `LandingPageView` после `#variants`, до see-also / FAQ.
-
-Lovable `Category.widgetData` + `app/[city]/[category]` - **отклонены**: виджет привязан к CHPU landing slug.
+Монтаж (as-is): после `#variants`. **Цель канона:** tips/советы **до** расписания; ContextWidget chips можно оставить у schedule как фильтр-помощник.
 
 ---
 
-## Фазы CV.L1–L6
+## Фазы (порядок после owner lock)
+
+### CV.L-Hero - Hero-first unification (Критический) 🔄 thin
+
+1. Shared typography + atmosphere tokens (inspired by night-bridges, per-category variants).
+2. Seasonal / New Year: countdown **в днях** до праздничного окна (не hours-to-bridge).
+3. Не трогать bridges price-range / soldEstimate stats, пока `BR.PR1` / parallel agent открыт или только что смержен.
+4. Follow-up: atmosphere для default matrix (planetarium, rooftops, …) без клона countdown.
+
+### CV.L-Order - Reorder sections to owner 1-7 (Высокий) ⏳
+
+- Tips before schedule; How-to на seasonal/bus/river/dinner; Checklist shared; Reviews hide-until-real.
 
 ### CV.L1 - Micro-badges на карточках расписания (Критический) ✅
 
@@ -138,6 +194,10 @@ Lovable `Category.widgetData` + `app/[city]/[category]` - **отклонены**
 
 - После venue logistics (CV.9). Yards / bridges pier map.
 
+### CV.L-debt - Fake reviews / social proof (Средний)
+
+- Убрать `defaultLandingReviews` / bridges sold+4.7 из UI; показывать Reviews только из `Review`.
+
 ---
 
 ## Явные запреты
@@ -146,15 +206,18 @@ Lovable `Category.widgetData` + `app/[city]/[category]` - **отклонены**
 2. **NO** prisma migration для `rating`/`reviewsCount` / `Category.widgetData` в этом треке.
 3. **NO** параллельный `app/[city]/[category]` вместо CHPU.
 4. **NO** fake social proof в новых блоках; legacy `LandingReviews` - CV.L-debt.
+5. **NO** клон palace-bridge hour-countdown на NY/seasonal/прочие категории.
 
-## Порядок внедрения
+## Порядок внедрения (owner)
 
-1. L1 badges ✅  
-2. L4 ContextWidget owner matrix ✅ thin  
-3. L2 polish date chips  
-4. L3 river tabs  
-5. L4 follow-up (yards/dinner/standup/museums)  
-6. L5 empty cross-sell  
-7. L6 maps  
+1. **CV.L-Hero** (typography/atmosphere + days countdown seasonal) 🔄  
+2. CV.L-Order (reorder 1-7)  
+3. Content briefs → paste (`landing-content-gpt-briefs.md`)  
+4. L2 date chips polish  
+5. L3 river tabs  
+6. L4 follow-up  
+7. L5 empty (частично ✅)  
+8. L6 maps  
+9. CV.L-debt reviews hide/real  
 
 Master template = **инкрементально** вытаскивать паттерны bridges в shared hooks/components, а не один большой rewrite.

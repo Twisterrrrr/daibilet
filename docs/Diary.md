@@ -1,3 +1,26 @@
+## 2026-07-26 - Owner UX: Hero-first landing unification (CV.L-Hero)
+
+### Наблюдения
+
+- Owner стартует унификацию с Hero: typography + atmosphere как у night-bridges, адаптировать по категории; для NY/seasonal countdown в **днях**, не клон часов до Дворцового.
+- Канон блоков: Hero → Советы → Расписание → Как выбрать → FAQ → Attention → Отзывы (только real).
+- Bridges H1 «сегодня, дата» - осознанно (ночное расписание); NY уже без даты (SEO.NY1).
+- Parallel/agent bridges price-range уже в `ae3c86c` (BR.PR1) - CV.L-Hero не трогал bridges stats / soldEstimate.
+
+### Решения
+
+- План: owner block order + gap table профилей в `landing-master-template-plan.md`.
+- GPT briefs (RU): `docs/landing-content-gpt-briefs.md` на tips/how-to/FAQ/checklist; reviews не генерировать.
+- Thin Hero: `SeasonalHeroCountdown` (дни до НГ / 9 мая) + CSS tokens `gradient-newyear-hero` / `landing-hero-atmosphere`; wire в seasonal hero.
+- Reviews: documented hide-until-`Review` (CV.L-debt); fake не изобретали.
+
+### Проблемы
+
+- Порядок секций ещё as-is (tips часто после schedule / внутри ContextWidget) - CV.L-Order.
+- Deploy отложен: не конфликтовать с bridges price deploy; smoke `/novyj-god` после merge.
+
+---
+
 ## 2026-07-26 - Bridges hero price range (night-bridges)
 
 ### Наблюдения

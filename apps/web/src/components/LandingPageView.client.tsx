@@ -19,6 +19,10 @@ import { LandingStickyHeader } from '@/components/landing/LandingStickyHeader.cl
 import { LandingCardBadgeRow } from '@/components/landing/LandingCardBadgeRow';
 import { LandingContextWidget } from '@/components/landing/LandingContextWidget.client';
 import { LandingEmptyState } from '@/components/landing/LandingEmptyState.client';
+import {
+  resolveSeasonalCountdownKind,
+  SeasonalHeroCountdown,
+} from '@/components/landing/SeasonalHeroCountdown.client';
 import { resolveLandingContextWidget } from '@/data/landing-context-widgets';
 import {
   collectLandingBadgeFacets,
@@ -857,6 +861,14 @@ export function LandingPageView({
                 />
               ) : undefined
             }
+            seasonalHeroActions={
+              profile === 'seasonal' && resolveSeasonalCountdownKind(slug) ? (
+                <SeasonalHeroCountdown
+                  kind={resolveSeasonalCountdownKind(slug)!}
+                  onViewSchedule={() => scrollToSchedule()}
+                />
+              ) : undefined
+            }
           />
           {profile === 'bridges' ? <BridgesScheduleStrip /> : null}
           {profile === 'bridges' ? <BridgesTonightTips /> : null}
@@ -1131,6 +1143,7 @@ function LandingHero({
   sessionsReady = true,
   todayReference,
   bridgesHeroActions,
+  seasonalHeroActions,
 }: {
   landing: PublicLandingDto;
   profile: LandingProfile;
@@ -1142,6 +1155,7 @@ function LandingHero({
   sessionsReady?: boolean;
   todayReference: Date;
   bridgesHeroActions?: React.ReactNode;
+  seasonalHeroActions?: React.ReactNode;
 }) {
   void _sessionsCount;
   const cityName = resolveLandingCityName(citySlug, landingSlug);
@@ -1160,6 +1174,8 @@ function LandingHero({
   const landingSeo = resolveLandingSeo(
     buildLandingSeoInput(landing, landingSlug, profile, citySlug, stats, todayReference),
   );
+  const countdownKind = isSeasonal ? resolveSeasonalCountdownKind(landingSlug) : null;
+  const useAtmosphereHero = isBridges || Boolean(countdownKind);
   const heroSubtitle = isBridges
     ? BRIDGES_LANDING.heroSubtitle
     : useCopy && landingCopy?.lead
@@ -1189,23 +1205,33 @@ function LandingHero({
             ? 'программ'
             : 'событий';
   const heroClass = isBridges
-    ? 'gradient-bridges-hero text-primary-foreground'
-    : isSeasonal && landingSlug.includes('salute')
-      ? 'gradient-salute-hero'
-      : 'gradient-hero-lovable';
+    ? 'gradient-bridges-hero text-primary-foreground landing-hero-atmosphere'
+    : countdownKind === 'new-year'
+      ? 'gradient-newyear-hero text-primary-foreground landing-hero-atmosphere'
+      : countdownKind === 'salute-may9'
+        ? 'gradient-salute-hero text-primary-foreground landing-hero-atmosphere'
+        : isSeasonal && landingSlug.includes('salute')
+          ? 'gradient-salute-hero'
+          : 'gradient-hero-lovable';
+  const heroGlow =
+    countdownKind === 'new-year'
+      ? 'var(--newyear-hero-glow)'
+      : isBridges || countdownKind
+        ? 'var(--landing-hero-glow)'
+        : null;
 
   return (
     <section className={`relative overflow-hidden ${heroClass}`}>
-      {isBridges ? (
+      {heroGlow ? (
         <div className="pointer-events-none absolute inset-0 opacity-40" aria-hidden>
           <div
             className="absolute left-1/2 top-24 h-96 w-[120%] -translate-x-1/2 rounded-[50%] blur-3xl"
-            style={{ backgroundColor: 'var(--bridges-hero-glow)' }}
+            style={{ backgroundColor: isBridges ? 'var(--bridges-hero-glow)' : heroGlow }}
           />
         </div>
       ) : null}
-      <div className={`relative container-page ${isBridges ? 'pb-16 pt-10 md:pt-14' : 'py-16 md:py-24'}`}>
-        <div className={isBridges ? 'max-w-5xl' : 'max-w-4xl'}>
+      <div className={`relative container-page ${useAtmosphereHero ? 'pb-16 pt-10 md:pt-14' : 'py-16 md:py-24'}`}>
+        <div className={useAtmosphereHero ? 'max-w-5xl' : 'max-w-4xl'}>
           <nav className="mb-6 flex flex-wrap items-center gap-2 text-sm text-primary-foreground/70">
             <span className="flex items-center gap-2">
               <a href="/" className="transition-colors hover:text-primary-foreground">Главная</a>
@@ -1295,7 +1321,7 @@ function LandingHero({
               </span>
             ) : null}
           </nav>
-          <h1 className={`mb-5 font-semibold leading-tight tracking-tight text-primary-foreground ${isBridges ? 'max-w-4xl text-3xl md:text-4xl lg:text-5xl' : 'mb-4 text-3xl font-extrabold md:text-5xl'}`}>
+          <h1 className={`mb-5 font-semibold leading-tight tracking-tight text-primary-foreground ${useAtmosphereHero ? 'max-w-4xl text-3xl md:text-4xl lg:text-5xl' : 'mb-4 text-3xl font-extrabold md:text-5xl'}`}>
             {isBridges ? (
               <>
                 <span className="block">{landingSeo.h1Lead.trim()}</span>
@@ -1314,8 +1340,8 @@ function LandingHero({
               </>
             )}
           </h1>
-          <p className={`${isBridges ? 'mb-6 max-w-2xl text-lg leading-relaxed text-primary-foreground/75' : 'mb-5 max-w-3xl text-base leading-relaxed text-primary-foreground/80 md:text-lg'}`}>{heroSubtitle}</p>
-          <ul className={`mb-8 flex flex-wrap gap-x-5 gap-y-2 text-sm ${isBridges ? 'text-primary-foreground/80' : 'text-primary-foreground/85'}`}>
+          <p className={`${useAtmosphereHero ? 'mb-6 max-w-2xl text-lg leading-relaxed text-primary-foreground/75' : 'mb-5 max-w-3xl text-base leading-relaxed text-primary-foreground/80 md:text-lg'}`}>{heroSubtitle}</p>
+          <ul className={`mb-8 flex flex-wrap gap-x-5 gap-y-2 text-sm ${useAtmosphereHero ? 'text-primary-foreground/80' : 'text-primary-foreground/85'}`}>
             <li className="inline-flex items-center gap-1.5">
               <Mail className="h-4 w-4 shrink-0" aria-hidden />
               Билет на email после оплаты
@@ -1330,8 +1356,9 @@ function LandingHero({
             </li>
           </ul>
           {bridgesHeroActions}
+          {seasonalHeroActions}
           {!isBridges ? (
-          <div className={`flex flex-wrap gap-3 ${bridgesHeroActions ? 'mt-6' : ''}`}>
+          <div className={`flex flex-wrap gap-3 ${bridgesHeroActions || seasonalHeroActions ? 'mt-6' : ''}`}>
             {sessionsReady ? (
               <>
                 <div className="flex items-center gap-2 rounded-full bg-primary-foreground/15 px-4 py-2 text-sm font-medium text-primary-foreground backdrop-blur-sm">

@@ -135,10 +135,15 @@
 ## Landing master template / CRO (2026-07-26)
 
 Эталон: Night Bridges. Инкрементально вытаскивать паттерны в shared hooks/components. План: [landing-master-template-plan.md](./landing-master-template-plan.md).  
-Запреты: no UnifiedEventCard rewrite каталога; no `app/[city]/[category]`; no fake ★; no prisma rating migration без Review aggregate.
+GPT-брифы на контент-дыры: [landing-content-gpt-briefs.md](./landing-content-gpt-briefs.md).  
+Owner-locked порядок: Hero → Советы → Расписание → Как выбрать → FAQ → Attention → Отзывы (только real).  
+Запреты: no UnifiedEventCard rewrite каталога; no `app/[city]/[category]`; no fake ★; no prisma rating migration без Review aggregate; no clone palace-bridge hours на NY.
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
+| CV.L-Hero | Hero-first: typography/atmosphere tokens + seasonal days countdown (не hours-to-bridge); не трогать bridges price stats | Критический | 🔄 thin: NY/salute days + CSS tokens |
+| CV.L-Order | Reorder секций к owner 1-7 на всех профилях | Высокий | ⏳ |
+| CV.L-Content | Контент tips/how-to/FAQ/checklist по GPT briefs (owner assign) | Высокий | ⏳ briefs ready |
 | CV.L1 | Micro-badges из tags/subcategories/title на schedule rows + EventCard(`landingActions`); dinner badge chips; скрыть fake ★ на этих поверхностях | Критический | ✅ helper `landing-card-badges.ts` |
 | CV.L2 | Date chips UX для concert/standup (sticky horizontal, slots без reload) | Высокий | ⏳ chips уже есть на default; polish |
 | CV.L3 | River section tabs day/night/dinner (bridges patterns → shared) | Высокий | ⏳ |
@@ -147,7 +152,7 @@
 | CV.L5 | Empty-state cross-sell на соседние CHPU / city hub | Высокий | ✅ `LandingEmptyState` + related hits при 0; catalog empty polish |
 | CV.L5b | Optimistic UI: favorites heart + verify landing filter chips local | Средний | ✅ favorites local-first optimistic; chips уже client filter |
 | CV.L6 | Map start points (Yandex) yards/bridges - после logistics | Низкий | ⏳ later |
-| CV.L-debt | Cleanup legacy hardcoded `LandingReviews` / bridges meta ratings | Средний | ⏳ не в L1 |
+| CV.L-debt | Cleanup legacy hardcoded `LandingReviews` / bridges meta ratings; hide Reviews until real `Review` | Средний | ⏳ не в L-Hero |
 
 ---
 
