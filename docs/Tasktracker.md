@@ -11,7 +11,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| SEO.NY1 | NY/seasonal H1: убрать «сегодня, дата»; festive framing без «точек обзора» | Критический | 🔄 commit+deploy (hash after push) |
+| SEO.NY1 | NY/seasonal H1: убрать «сегодня, дата»; festive framing без «точек обзора» | Критический | ✅ `c008a52`/`776cad9` prod smoke `/novyj-god` |
 
 ---
 
