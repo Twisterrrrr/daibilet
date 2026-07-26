@@ -7,6 +7,14 @@
 
 ---
 
+## Seasonal landing H1 (2026-07-26)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| SEO.NY1 | NY/seasonal H1: убрать «сегодня, дата»; festive framing без «точек обзора» | Критический | 🔄 commit+deploy |
+
+---
+
 ## IndexNow / Yandex Webmaster (2026-07-26)
 
 | # | Задача | Приоритет | Статус |
@@ -93,6 +101,23 @@
 | CV.10 | Mood chip «Свидание» на `/podborki` (рядом с «Для двоих») | Низкий | ⏳ |
 | CV.11 | Social proof «проданные билеты» (TC Order paid aggregate) | Средний | ⚠️ deferred: только после реального order-aggregate; hardcoded fake 🚫; до - каталожные counts (CV.3) |
 | CV.12 | Catalog card dates: human mask `25 июля, суббота в 07:15` | Высокий | ✅ open-date без фейковых часов; не путать с CV.5 (скидки) |
+
+---
+
+## Landing master template / CRO (2026-07-26)
+
+Эталон: Night Bridges. Инкрементально вытаскивать паттерны в shared hooks/components. План: [landing-master-template-plan.md](./landing-master-template-plan.md).  
+Запреты: no UnifiedEventCard rewrite каталога; no `app/[city]/[category]`; no fake ★; no prisma rating migration без Review aggregate.
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| CV.L1 | Micro-badges из tags/subcategories/title на schedule rows + EventCard(`landingActions`); dinner badge chips; скрыть fake ★ на этих поверхностях | Критический | ✅ helper `landing-card-badges.ts` |
+| CV.L2 | Date chips UX для concert/standup (sticky horizontal, slots без reload) | Высокий | ⏳ chips уже есть на default; polish |
+| CV.L3 | River section tabs day/night/dinner (bridges patterns → shared) | Высокий | ⏳ |
+| CV.L4 | ContextWidget per type (yards/dinner/standup/museums) - config, не хардкод page | Средний | ⏳ |
+| CV.L5 | Empty-state cross-sell на соседние CHPU / city hub | Средний | ⏳ partial dinner/river |
+| CV.L6 | Map start points (Yandex) yards/bridges - после logistics | Низкий | ⏳ later |
+| CV.L-debt | Cleanup legacy hardcoded `LandingReviews` / bridges meta ratings | Средний | ⏳ не в L1 |
 
 ---
 

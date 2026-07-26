@@ -1,3 +1,47 @@
+## 2026-07-26 - Fix NY landing H1 «сегодня, дата»
+
+### Наблюдения
+
+- На `/novyj-god` H1 был абсурден: «Новый год сегодня, 26 июля: лучшие точки обзора и экскурсии».
+- `resolveLandingSeo` для `profile=seasonal` всегда клеил `сегодня, {date}` и суффикс «точки обзора» (шаблон салюта).
+
+### Решения
+
+- Сезонные лендинги: `buildStaticH1Parts` без даты.
+- `new-year`: национальный «Новый год в России: экскурсии, каникулы и праздничные программы»; city «Новый год в {Пр}: куда сходить и купить билеты».
+- Meta title/description для NY без «сегодня»; SSR metadata через `resolveLandingSeo`.
+- `salute-9-may` сохраняет «точки обзора», тоже без «сегодня».
+
+### Проблемы
+
+- Нет.
+
+---
+
+## 2026-07-26 - Landing master template (CRO L1)
+
+### Наблюдения
+
+- Owner: унифицировать лендинги вокруг Night Bridges; Lovable-промпты адаптировать к CHPU + `LandingPageView`, без параллельного `app/[city]/[category]`.
+- Основной список на лендингах - schedule rows (`LandingScheduleList` / dinner / bridges), не `EventCard` grid (`LandingEventsGrid` почти мёртв).
+- `PublicSessionDto` уже даёт `tags` / `subcategories` / `category` - бейджи без schema migration.
+- На schedule rows жили fake ★ через `estimateRating` / `estimateReviewCount` (и bridges cruise cards) - противоречит HC.3 / CV.11.
+
+### Решения
+
+- План: `docs/landing-master-template-plan.md` (CV.L1–L6).
+- L1: `landing-card-badges.ts` + `LandingCardBadgeRow`; показ на schedule/dinner rows и `EventCard` при `landingActions`; dinner horizontal badge chips (client filter); fake ★ сняты с этих поверхностей.
+- Trust strip в hero уже есть - отдельный TrustBlock не добавляли.
+- Prisma `Event.rating` не трогаем; «Хит» только из `sessionCount` / `landingSlugs`.
+
+### Проблемы
+
+- Legacy `LandingReviews` + bridges hardcoded ratings / sort «По рейтингу» на части профилей - долг CV.L-debt / L2+.
+- Bridges cruise cards всё ещё показывают pseudo-rating - вне thin L1.
+- Нужен commit + deploy-prod-next для smoke dinner/standup/yards.
+
+---
+
 ## 2026-07-26 - SEO.IN1 IndexNow (Yandex / Bing)
 
 ### Наблюдения

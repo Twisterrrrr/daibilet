@@ -13,7 +13,9 @@ import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButto
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 import { collectCatalogLabels, extractDurationLabel } from '@/lib/catalog-labels';
+import { LandingCardBadgeRow } from '@/components/landing/LandingCardBadgeRow';
 import { EventImageBadges } from '@/lib/event-card-badges';
+import { deriveLandingCardBadges } from '@/lib/landing-card-badges';
 import {
   collectDisplaySlotLabels,
   formatEventNextSession,
@@ -86,7 +88,9 @@ export function EventCard({
   const displaySlotLabels = collectDisplaySlotLabels(session);
   const showSlotPills = displaySlotLabels.length > 0;
   const sessionMetaLabel = openDate ? null : nextSessionLabel;
-  const pseudoRating = resolvePseudoRating(session.groupKey || session.id);
+  // Landings: no fake ★ - only real micro-badges from tags/subcategories/title.
+  const pseudoRating = landingActions ? null : resolvePseudoRating(session.groupKey || session.id);
+  const landingBadges = landingActions ? deriveLandingCardBadges(session) : [];
   const locationLabel = resolveEventCardLocationLabel(session);
   const durationLabel = extractDurationLabel(session.tags);
   const ageLabel = session.ageLimit?.trim() || null;
@@ -130,10 +134,12 @@ export function EventCard({
         </h2>
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-          <span className="event-card-meta">
-            <Star className="event-card-meta-icon" />
-            <span className="font-medium text-graphite">{pseudoRating.toFixed(1)}</span>
-          </span>
+          {pseudoRating != null ? (
+            <span className="event-card-meta">
+              <Star className="event-card-meta-icon" />
+              <span className="font-medium text-graphite">{pseudoRating.toFixed(1)}</span>
+            </span>
+          ) : null}
           {durationLabel ? (
             <span className="event-card-meta">
               <Clock className="event-card-meta-icon" />
@@ -154,7 +160,9 @@ export function EventCard({
           ) : null}
         </div>
 
-        {(session.category || highlights.length > 0) && (
+        {landingBadges.length > 0 ? (
+          <LandingCardBadgeRow badges={landingBadges} />
+        ) : (session.category || highlights.length > 0) ? (
           <div className="flex flex-wrap items-center gap-1.5">
             {session.category ? (
               <span className="rounded-md bg-surface-muted px-2 py-0.5 text-ui-xs font-medium text-graphite-muted">
@@ -167,7 +175,7 @@ export function EventCard({
               </span>
             ))}
           </div>
-        )}
+        ) : null}
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-ui-xs text-graphite-muted">
           {openDate ? (

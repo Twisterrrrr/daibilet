@@ -16,6 +16,13 @@ import { BridgesScheduleSection } from '@/components/landing/BridgesScheduleSect
 import { LandingCityLocations } from '@/components/landing/LandingCityLocations.client';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
 import { LandingStickyHeader } from '@/components/landing/LandingStickyHeader.client';
+import { LandingCardBadgeRow } from '@/components/landing/LandingCardBadgeRow';
+import {
+  collectLandingBadgeFacets,
+  deriveLandingCardBadges,
+  sessionMatchesLandingBadge,
+  type LandingCardBadgeId,
+} from '@/lib/landing-card-badges';
 import {
   CANONICAL_LANDING_SLUGS,
   canonicalLandingSlug,
@@ -89,6 +96,7 @@ type ViewMode = 'list' | 'table' | 'cards';
 type LandingProfile = 'bus' | 'dinner' | 'river' | 'seasonal' | 'bridges' | 'default';
 type MenuFilter = 'all' | 'set' | 'buffet';
 type DinnerTimeFilter = 'all' | 'sunset' | 'night';
+type DinnerBadgeFilter = LandingCardBadgeId | 'all';
 type TimeSlotFilter = '' | 'morning' | 'day' | 'evening' | 'night';
 const MIN_DISPLAY_PRICE_RUB = 100;
 
@@ -461,11 +469,15 @@ function createSyntheticLanding(slug: string, cityName: string | null): PublicLa
       title: meta.breadcrumbLabel,
       subtitle: meta.nationalHeroSubtitle,
       heroTitle: cityGuide
-        ? `${meta.breadcrumbLabel} в ${cityGuide.cityNameDative} — лучшие точки обзора и экскурсии`
+        ? slug === 'new-year'
+          ? `Новый год в ${cityGuide.cityNameDative}: куда сходить и купить билеты`
+          : `${meta.breadcrumbLabel} в ${cityGuide.cityNameDative}: лучшие точки обзора и экскурсии`
         : meta.nationalHeroTitle,
       heroSubtitle: cityGuide?.heroSubtitle || meta.nationalHeroSubtitle,
       seoTitle: cityGuide
-        ? `${meta.breadcrumbLabel} — ${cityGuide.cityName} | Дайбилет`
+        ? slug === 'new-year'
+          ? `Новый год в ${cityGuide.cityNameDative}: куда сходить и купить билеты | Дайбилет`
+          : `${meta.breadcrumbLabel} в ${cityGuide.cityName}: точки обзора и экскурсии | Дайбилет`
         : `${meta.nationalHeroTitle} | Дайбилет`,
       seoDescription: meta.nationalHeroSubtitle,
       events: 0,
@@ -613,6 +625,7 @@ export function LandingPageView({
   const [sort, setSort] = React.useState<SortFilter>(profile === 'bus' || profile === 'dinner' ? 'price' : 'time');
   const [menuFilter, setMenuFilter] = React.useState<MenuFilter>('all');
   const [dinnerTimeFilter, setDinnerTimeFilter] = React.useState<DinnerTimeFilter>('all');
+  const [dinnerBadgeFilter, setDinnerBadgeFilter] = React.useState<DinnerBadgeFilter>('all');
   const [timeSlot, setTimeSlot] = React.useState<TimeSlotFilter>('');
   const [mobileCtaVisible, setMobileCtaVisible] = React.useState(false);
 
@@ -630,6 +643,7 @@ export function LandingPageView({
     setDateFilter(defaultLandingDateFilter(nextProfile));
     setMenuFilter('all');
     setDinnerTimeFilter('all');
+    setDinnerBadgeFilter('all');
     setTimeSlot('');
     setCategory(resolveConcertGenreTag(initialGenre) || 'all');
     setApiPayload(initialCachedPayload);
@@ -759,11 +773,12 @@ export function LandingPageView({
       if (category !== 'all' && session.category !== category && !session.tags.includes(category)) return false;
       if (profile === 'dinner' && !matchesMenuFilter(session, menuFilter)) return false;
       if (profile === 'dinner' && !matchesDinnerTimeFilter(session, dinnerTimeFilter)) return false;
+      if (profile === 'dinner' && !sessionMatchesLandingBadge(session, dinnerBadgeFilter)) return false;
       if ((profile === 'bus' || profile === 'river' || profile === 'seasonal' || profile === 'bridges') && !matchesTimeSlotFilter(session, timeSlot)) return false;
       if (profile !== 'bridges' && !matchesDateFilter(session, dateFilter)) return false;
       return true;
     });
-  }, [category, city, dateFilter, menuFilter, dinnerTimeFilter, timeSlot, payload, profile, sessionsReady]);
+  }, [category, city, dateFilter, menuFilter, dinnerTimeFilter, dinnerBadgeFilter, timeSlot, payload, profile, sessionsReady]);
 
   const allGroups = React.useMemo(
     () => (payload && sessionsReady ? groupLandingSessions(payload.sessions) : []),
@@ -879,15 +894,19 @@ export function LandingPageView({
                 groupsCount={groups.length}
                 menuFilter={menuFilter}
                 dinnerTimeFilter={dinnerTimeFilter}
+                dinnerBadgeFilter={dinnerBadgeFilter}
+                badgeFacets={collectLandingBadgeFacets(payload.sessions)}
                 setDateFilter={setDateFilter}
                 setSort={setSort}
                 setMenuFilter={setMenuFilter}
                 setDinnerTimeFilter={setDinnerTimeFilter}
+                setDinnerBadgeFilter={setDinnerBadgeFilter}
                 reset={() => {
                   setDateFilter('all');
                   setSort('price');
                   setMenuFilter('all');
                   setDinnerTimeFilter('all');
+                  setDinnerBadgeFilter('all');
                   setCategory('all');
                 }}
               />
@@ -928,6 +947,7 @@ export function LandingPageView({
                 setSort('price');
                 setMenuFilter('all');
                 setDinnerTimeFilter('all');
+                setDinnerBadgeFilter('all');
                 setCategory('all');
               }} />
             ) : profile === 'bridges' ? (
@@ -1235,7 +1255,9 @@ function LandingHero({
             ) : (
               <>
                 {landingSeo.h1Lead}
-                <span className="whitespace-nowrap">{landingSeo.h1Today}</span>
+                {landingSeo.h1Today ? (
+                  <span className="whitespace-nowrap">{landingSeo.h1Today}</span>
+                ) : null}
                 {landingSeo.h1Tail}
               </>
             )}
@@ -1466,10 +1488,13 @@ function LandingDinnerFilters({
   groupsCount,
   menuFilter,
   dinnerTimeFilter,
+  dinnerBadgeFilter,
+  badgeFacets,
   setDateFilter,
   setSort,
   setMenuFilter,
   setDinnerTimeFilter,
+  setDinnerBadgeFilter,
   reset,
 }: {
   dateFilter: DateFilter;
@@ -1477,15 +1502,17 @@ function LandingDinnerFilters({
   groupsCount: number;
   menuFilter: MenuFilter;
   dinnerTimeFilter: DinnerTimeFilter;
+  dinnerBadgeFilter: DinnerBadgeFilter;
+  badgeFacets: Array<{ id: LandingCardBadgeId; label: string }>;
   setDateFilter: (value: DateFilter) => void;
   setSort: (value: SortFilter) => void;
   setMenuFilter: (value: MenuFilter) => void;
   setDinnerTimeFilter: (value: DinnerTimeFilter) => void;
+  setDinnerBadgeFilter: (value: DinnerBadgeFilter) => void;
   reset: () => void;
 }) {
   const sortTabs: Array<{ label: string; value: SortFilter }> = [
     { label: 'По цене', value: 'price' },
-    { label: 'По рейтингу', value: 'rating' },
     { label: 'По времени', value: 'time' },
   ];
   const dateLabel = dateFilter === 'today' ? 'Сегодня' : dateFilter === 'tomorrow' ? 'Завтра' : null;
@@ -1578,6 +1605,36 @@ function LandingDinnerFilters({
           </button>
         </div>
       </div>
+
+      {badgeFacets.length ? (
+        <div className="flex gap-1.5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <button
+            type="button"
+            onClick={() => setDinnerBadgeFilter('all')}
+            className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+              dinnerBadgeFilter === 'all'
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-primary'
+            }`}
+          >
+            Все форматы
+          </button>
+          {badgeFacets.map((facet) => (
+            <button
+              key={facet.id}
+              type="button"
+              onClick={() => setDinnerBadgeFilter(dinnerBadgeFilter === facet.id ? 'all' : facet.id)}
+              className={`shrink-0 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                dinnerBadgeFilter === facet.id
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-primary'
+              }`}
+            >
+              {facet.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       <div className="space-y-2 lg:hidden">
         <div className="flex items-center gap-1.5">
@@ -1682,6 +1739,7 @@ function LandingDinnerScheduleRow({ group, isOptimal }: { group: EventGroup; isO
   const shipName = session.tags?.find((tag) => /теплоход|катер|яхт|palace|ривер|монарх|нео/i.test(tag)) || group.title;
   const menu = extractMenuLabel(session.tags);
   const format = extractFormatLabel(session.tags);
+  const badges = deriveLandingCardBadges(session);
   const href = eventHref(session);
   const priceLabel = group.priceFrom ? formatMoney(group.priceFrom).replace(/^от\s+/i, '') : 'Купить';
   const vacant = session.vacant ?? group.vacant;
@@ -1705,6 +1763,7 @@ function LandingDinnerScheduleRow({ group, isOptimal }: { group: EventGroup; isO
           <div className="truncate text-sm text-muted-foreground">
             <a href={href} className="hover:text-primary">{group.title}</a>
           </div>
+          <LandingCardBadgeRow badges={badges} className="mt-1.5" />
         </div>
         <div className="text-sm text-foreground">{menu}</div>
         <div className="text-sm font-semibold text-foreground">{priceLabel}</div>
@@ -1727,6 +1786,7 @@ function LandingDinnerScheduleRow({ group, isOptimal }: { group: EventGroup; isO
         <div className="text-sm text-muted-foreground">
           <a href={href} className="hover:text-primary">{group.title}</a>
         </div>
+        <LandingCardBadgeRow badges={badges} />
         <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
           <span>{menu}</span>
           <span>{time}</span>
@@ -2792,8 +2852,7 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
   const duration = extractDurationTag(session.tags);
   const vacant = session.vacant ?? group.vacant;
   const soldOut = typeof vacant === 'number' && vacant <= 0;
-  const rating = estimateRating(group);
-  const reviewCount = estimateReviewCount(group);
+  const badges = deriveLandingCardBadges(session);
   const isBus = profile === 'bus';
   const shipName = isBus
     ? session.tags?.find((tag) => /city sightseeing|hop-on|оператор/i.test(tag)) || null
@@ -2850,11 +2909,8 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
                 {shipName}
               </span>
             ) : null}
-            <span className="flex items-center gap-1">
-              <Star className="h-3.5 w-3.5 text-yellow-500" />
-              {rating} ({reviewCount})
-            </span>
           </div>
+          <LandingCardBadgeRow badges={badges} />
           {amenities.length ? (
             <div className="flex items-center gap-1.5">
               {amenities.map((item) => (
@@ -2903,8 +2959,8 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
         <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
           {duration ? <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{duration}</span> : null}
           {group.venue ? <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{group.venue}</span> : null}
-          <span className="flex items-center gap-1"><Star className="h-3 w-3 text-yellow-500" />{rating} ({reviewCount})</span>
         </div>
+        <LandingCardBadgeRow badges={badges} />
         <div className="flex items-center justify-between gap-3">
           {!soldOut && typeof vacant === 'number' ? (
             <div className={`flex items-center gap-1 text-xs font-medium ${vacantClass}`}>
@@ -2925,15 +2981,6 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
       </div>
     </div>
   );
-}
-
-function estimateRating(group: EventGroup): string {
-  const base = 4.3 + Math.min(group.sessions.length, 12) * 0.05;
-  return Math.min(4.9, base).toFixed(1);
-}
-
-function estimateReviewCount(group: EventGroup): number {
-  return 80 + group.sessions.length * 37 + (group.title.length % 50) * 3;
 }
 
 function extractDurationTag(tags: string[]): string | null {
