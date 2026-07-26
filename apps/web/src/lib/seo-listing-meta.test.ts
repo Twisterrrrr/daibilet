@@ -7,6 +7,8 @@ import {
   buildCategoryCityMetaTitle,
   evaluateListingIndexability,
   MIN_LISTING_OFFERS_FOR_INDEX,
+  shouldLoadEmptyRelatedHits,
+  shouldLoadRelatedHitSessions,
   shouldShowThinRelatedCards,
 } from '@/lib/seo-listing-meta';
 
@@ -82,4 +84,12 @@ test('thin related cards only for exactly 6 or 7 offers', () => {
   assert.equal(shouldShowThinRelatedCards(6), true);
   assert.equal(shouldShowThinRelatedCards(7), true);
   assert.equal(shouldShowThinRelatedCards(8), false);
+});
+
+test('empty related hits load for 0 offers and thin 6–7', () => {
+  assert.equal(shouldLoadEmptyRelatedHits(0), true);
+  assert.equal(shouldLoadEmptyRelatedHits(1), false);
+  assert.equal(shouldLoadRelatedHitSessions(0), true);
+  assert.equal(shouldLoadRelatedHitSessions(6), true);
+  assert.equal(shouldLoadRelatedHitSessions(5), false);
 });

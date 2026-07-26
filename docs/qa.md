@@ -21,12 +21,18 @@
 3. **Admin address:** только новые logistics-поля editable; `address` остаётся **sync-only** (readonly display).
 4. **Event DTO:** slim logistics fields встроены в event page SSR payload (0ms modal). Fetch при клике **не** делаем.
 
-## 2026-07-25 - Catalog interstitial analytics — ЗАКРЫТО
+## 2026-07-25 - Catalog interstitial analytics — ЗАКРЫТО (расширено 2026-07-26)
 
 1. **GTM / Metrika goals:** frontend raw push **корректен и готов** (`dataLayer` + `ym('reachGoal', …)` при `NEXT_PUBLIC_YANDEX_METRIKA_ID`). **Решение owner:** в кабинетах нужна настройка цели/триггера - без неё события не попадут в отчёты конверсий.
-   - **Яндекс.Метрика:** Цели → JavaScript-событие → id ровно `catalog_interstitial_click` (case-sensitive). Без цели `reachGoal` игнорируется в conversion reports.
-   - **GTM:** Custom Event trigger с именем `catalog_interstitial_click` + Tag (GA4/pixel) на него. Без trigger `dataLayer` push отбрасывается.
-   - **Handoff маркетологу:** event id `catalog_interstitial_click` - настройка кабинетов ~2 мин. Код трекинга не трогать, пока не сломан. Задача: **CV.2b** (⏳ в Tasktracker).
+   - **Яндекс.Метрика:** Цели → JavaScript-событие → id ровно (case-sensitive):
+     - `catalog_interstitial_click` (CV.2b)
+     - `product_card_click` (CV.2c) - клик карточки события
+     - `select_tickets` (CV.2d) - клик Купить / открытие виджета
+     - `purchase_success` (CV.2e) - создать заранее; **код пока НЕ шлёт** (нет widget success / thank-you)
+   - **GTM:** Custom Event trigger с тем же именем + Tag. Без trigger `dataLayer` push отбрасывается.
+   - **Purchase meaning:** оплата в виджете провайдера (Ticketscloud / Teplohod), не «редирект в виджет». Клиентский fake purchase запрещён.
+   - **Webvisor (CV.2f):** первый месяц - ежедневно 10-15 мин просмотр сессий воронки card→виджет (процесс маркетолога).
+   - Задачи: **CV.2b–CV.2f** в Tasktracker.
 
 ## 2026-07-23 - Антиспам блога / индекс (owner) — ЗАКРЫТО (lock 2026-07-25)
 

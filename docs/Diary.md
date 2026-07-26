@@ -1,3 +1,27 @@
+## 2026-07-26 - Owner CRO: Metrika goals + empty-state + optimistic UI
+
+### Наблюдения
+
+- До спринта в коде был только `catalog_interstitial_click` (CV.2b). Воронка card → виджет → оплата не инструментирована.
+- Покупка уходит во внешний виджет Ticketscloud / Teplohod; thank-you page и стабильный client callback успеха отсутствуют. Fake `purchase_success` на redirect в виджет - запрещён.
+- Пустые лендинги (0 сессий / жёсткие фильтры) давали dead-end «Ничего не найдено» / «По этим фильтрам вариантов нет».
+- Favorites уже localStorage-first (нет backend sync). Filter chips на лендингах уже клиентский `useMemo` (мгновенно).
+
+### Решения
+
+- Расширен `catalog-analytics.ts`: goals `product_card_click`, `select_tickets`, `purchase_success` (helper ready), `catalog_interstitial_click`. Wired: EventCard(s), TC/Teplohod buy, catalog purchase open.
+- **Purchase semantics:** `select_tickets` = открытие виджета / CTA купить. `purchase_success` = только после реального сигнала (widget callback / thank-you / server pixel) - сейчас не шлётся.
+- Маркетолог: создать JS-цели с id ровно как выше + Webvisor 10-15 мин/день первый месяц (CV.2c-f).
+- `LandingEmptyState` + SSR related hits при offerCount=0 (`shouldLoadEmptyRelatedHits`); catalog empty с линками на речные/подборки.
+- Favorites: optimistic setState + rollback on storage error. Chips: audit OK, без переписывания.
+
+### Проблемы
+
+- Нужен push + deploy-prod-next для prod smoke воронки.
+- `purchase_success` остаётся ops/engineering follow-up, когда появится TC success hook или thank-you URL.
+
+---
+
 ## 2026-07-26 - Landing ContextWidget (CV.L4 thin) + NY H1 coord
 
 ### Наблюдения

@@ -17,6 +17,7 @@ import {
   canOpenCatalogPurchase,
   resolvePurchaseSessionForSlot,
 } from '@/lib/event-card-meta';
+import { trackSelectTickets } from '@/lib/catalog-analytics';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
 function stopCardNavigation(event: React.MouseEvent) {
@@ -54,6 +55,17 @@ export function useCatalogPurchase(session: PublicSessionDto) {
       const target = slotLabel ? resolvePurchaseSessionForSlot(session, slotLabel) : session;
       const targetPurchaseUrl = target.widgetUrl || target.purchaseUrl || target.deeplinkUrl || null;
       const targetTeplohod = getTeplohodWidgetIdsFromSession(target) || teplohod;
+
+      trackSelectTickets({
+        eventId: target.id || session.id,
+        slug: target.slug || session.slug,
+        provider: targetTeplohod?.tepEventId
+          ? 'teplohod'
+          : extractTcEventIdFromSession(target) || getTcWidgetIds(target)?.tcEventId
+            ? 'ticketscloud'
+            : 'external',
+        source: 'catalog_purchase',
+      });
 
       if (targetTeplohod?.tepEventId) {
         setTeplohodEventId(String(targetTeplohod.tepEventId));

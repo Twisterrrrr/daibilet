@@ -35,6 +35,7 @@ import {
   resolveEventCardPinLines,
 } from '@/lib/event-location';
 import { formatPriceFrom } from '@/lib/format';
+import { trackProductCardClick } from '@/lib/catalog-analytics';
 import { eventHref } from '@/lib/routes';
 
 const SLOT_CHIP_CLASS =
@@ -104,7 +105,18 @@ export function EventCard({
     <>
       <div className="relative aspect-[16/9] w-full overflow-hidden bg-surface-muted">
         {landingActions ? (
-          <Link href={href} className="absolute inset-0 z-[1]" aria-label={`Страница события: ${session.title}`} />
+          <Link
+            href={href}
+            className="absolute inset-0 z-[1]"
+            aria-label={`Страница события: ${session.title}`}
+            onClick={() =>
+              trackProductCardClick({
+                eventId: session.id,
+                slug: session.slug,
+                source: 'landing_card',
+              })
+            }
+          />
         ) : null}
         <SafeImage
           src={session.imageUrl}
@@ -128,7 +140,17 @@ export function EventCard({
 
       <div className={`flex flex-1 flex-col gap-3 ${compact ? 'p-4' : 'p-4 sm:p-5'}`}>
         <h2>
-          <Link href={href} className={TITLE_LINK_CLASS}>
+          <Link
+            href={href}
+            className={TITLE_LINK_CLASS}
+            onClick={() =>
+              trackProductCardClick({
+                eventId: session.id,
+                slug: session.slug,
+                source: landingActions ? 'landing_card_title' : 'event_card_title',
+              })
+            }
+          >
             {session.title}
           </Link>
         </h2>
@@ -244,7 +266,17 @@ export function EventCard({
           ) : (
             <>
               <span className="text-ui-sm font-bold text-graphite sm:text-base">{priceFooterLabel}</span>
-              <Link href={href} className={DETAILS_LINK_CLASS}>
+              <Link
+                href={href}
+                className={DETAILS_LINK_CLASS}
+                onClick={() =>
+                  trackProductCardClick({
+                    eventId: session.id,
+                    slug: session.slug,
+                    source: 'event_card_cta',
+                  })
+                }
+              >
                 <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} />
                 Купить билет
               </Link>
@@ -259,9 +291,22 @@ export function EventCard({
     return <article className="group event-card">{cardBody}</article>;
   }
 
+  const onCardNavigate = () => {
+    trackProductCardClick({
+      eventId: session.id,
+      slug: session.slug,
+      source: 'event_card',
+    });
+  };
+
   return (
     <article className="group event-card">
-      <Link href={href} className="absolute inset-0 z-[1] rounded-card" aria-label={`Событие: ${session.title}`} />
+      <Link
+        href={href}
+        className="absolute inset-0 z-[1] rounded-card"
+        aria-label={`Событие: ${session.title}`}
+        onClick={onCardNavigate}
+      />
       {cardBody}
     </article>
   );
@@ -292,7 +337,18 @@ function ShowcaseEventCard({
 
   return (
     <article className={`group event-card ${rail ? 'min-h-[340px]' : ''}`}>
-      <Link href={href} className="absolute inset-0 z-[1] rounded-card" aria-label={`Событие: ${session.title}`} />
+      <Link
+        href={href}
+        className="absolute inset-0 z-[1] rounded-card"
+        aria-label={`Событие: ${session.title}`}
+        onClick={() =>
+          trackProductCardClick({
+            eventId: session.id,
+            slug: session.slug,
+            source: rail ? 'showcase_rail' : 'showcase_card',
+          })
+        }
+      />
       <div className="relative aspect-[16/9] w-full shrink-0 overflow-hidden bg-surface-muted">
         <SafeImage
           src={session.imageUrl}

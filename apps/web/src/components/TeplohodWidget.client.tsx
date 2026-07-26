@@ -2,6 +2,8 @@
 
 import * as React from 'react';
 
+import { trackSelectTickets } from '@/lib/catalog-analytics';
+
 const DEFAULT_TEP_WIDGET_ID = process.env.NEXT_PUBLIC_TEP_WIDGET_ID?.trim() || '14208';
 const TEP_WIDGET_SCRIPT_URL = 'https://api.teplohod.info/v1/widget/widget.js';
 
@@ -458,6 +460,11 @@ export function TeplohodWidgetButton({
   }
 
   const handleClick = () => {
+    trackSelectTickets({
+      eventId,
+      provider: 'teplohod',
+      source: 'teplohod_widget_button',
+    });
     openTeplohodPurchase({ wrapperId: containerId, purchaseUrl: checkoutUrl });
   };
 

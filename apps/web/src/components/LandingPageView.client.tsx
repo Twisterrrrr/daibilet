@@ -18,6 +18,7 @@ import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButto
 import { LandingStickyHeader } from '@/components/landing/LandingStickyHeader.client';
 import { LandingCardBadgeRow } from '@/components/landing/LandingCardBadgeRow';
 import { LandingContextWidget } from '@/components/landing/LandingContextWidget.client';
+import { LandingEmptyState } from '@/components/landing/LandingEmptyState.client';
 import { resolveLandingContextWidget } from '@/data/landing-context-widgets';
 import {
   collectLandingBadgeFacets,
@@ -956,18 +957,40 @@ export function LandingPageView({
             ) : sessionsError ? (
               <ScheduleErrorState message={sessionsError} />
             ) : profile === 'dinner' ? (
-              <LandingDinnerScheduleList groups={groups} onReset={() => {
-                setDateFilter('today');
-                setSort('price');
-                setMenuFilter('all');
-                setDinnerTimeFilter('all');
-                setDinnerBadgeFilter('all');
-                setCategory('all');
-              }} />
+              <LandingDinnerScheduleList
+                groups={groups}
+                onReset={() => {
+                  setDateFilter('today');
+                  setSort('price');
+                  setMenuFilter('all');
+                  setDinnerTimeFilter('all');
+                  setDinnerBadgeFilter('all');
+                  setCategory('all');
+                }}
+                emptyKind={allGroups.length === 0 ? 'zero' : 'filtered'}
+                cityName={cityName}
+                relatedSessions={thinRelatedSessions}
+                relatedLinks={citySlug ? resolveRelatedListingLinks(slug, citySlug) : []}
+              />
             ) : profile === 'bridges' ? (
               <BridgesScheduleSection groups={groups} sort={sort} setSort={setSort} />
             ) : (
-            <LandingScheduleList groups={groups} profile={profile} />
+            <LandingScheduleList
+              groups={groups}
+              profile={profile}
+              emptyKind={allGroups.length === 0 ? 'zero' : 'filtered'}
+              cityName={cityName}
+              relatedSessions={thinRelatedSessions}
+              relatedLinks={citySlug ? resolveRelatedListingLinks(slug, citySlug) : []}
+              onReset={() => {
+                setCity(cityName || 'all');
+                setCategory('all');
+                setDateFilter(defaultLandingDateFilter(profile));
+                setSort(profile === 'bus' ? 'price' : 'time');
+                setTimeSlot('');
+                setContextChip(null);
+              }}
+            />
             )}
             {!isSessionsLoading && profile === 'bus' && citySlug && cityName ? (
               <>
@@ -1722,17 +1745,30 @@ function LandingDinnerFilters({
   );
 }
 
-function LandingDinnerScheduleList({ groups, onReset }: { groups: EventGroup[]; onReset: () => void }) {
+function LandingDinnerScheduleList({
+  groups,
+  onReset,
+  emptyKind = 'filtered',
+  cityName,
+  relatedSessions = [],
+  relatedLinks = [],
+}: {
+  groups: EventGroup[];
+  onReset: () => void;
+  emptyKind?: 'zero' | 'filtered';
+  cityName?: string | null;
+  relatedSessions?: PublicSessionDto[];
+  relatedLinks?: import('@/lib/seo-internal-links').SeoLink[];
+}) {
   if (!groups.length) {
     return (
-      <div className="space-y-4 py-16 text-center">
-        <p className="text-muted-foreground">Нет рейсов на выбранную дату</p>
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <button type="button" onClick={onReset} className="rounded-lg border border-primary px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/5">
-            Сбросить фильтры
-          </button>
-        </div>
-      </div>
+      <LandingEmptyState
+        kind={emptyKind}
+        cityName={cityName}
+        relatedSessions={relatedSessions}
+        relatedLinks={relatedLinks}
+        onReset={onReset}
+      />
     );
   }
 
@@ -2828,8 +2864,34 @@ function LandingFilters({
   );
 }
 
-function LandingScheduleList({ groups, profile }: { groups: EventGroup[]; profile: LandingProfile }) {
-  if (!groups.length) return <EmptyFilteredState />;
+function LandingScheduleList({
+  groups,
+  profile,
+  emptyKind = 'filtered',
+  cityName,
+  relatedSessions = [],
+  relatedLinks = [],
+  onReset,
+}: {
+  groups: EventGroup[];
+  profile: LandingProfile;
+  emptyKind?: 'zero' | 'filtered';
+  cityName?: string | null;
+  relatedSessions?: PublicSessionDto[];
+  relatedLinks?: import('@/lib/seo-internal-links').SeoLink[];
+  onReset?: () => void;
+}) {
+  if (!groups.length) {
+    return (
+      <LandingEmptyState
+        kind={emptyKind}
+        cityName={cityName}
+        relatedSessions={relatedSessions}
+        relatedLinks={relatedLinks}
+        onReset={onReset}
+      />
+    );
+  }
   return (
     <div className="space-y-3">
       {groups.map((group, index) => (
@@ -3471,15 +3533,7 @@ function ChipRow({ items, active, onChange }: { items: Array<{ label: string; va
 }
 
 function EmptyFilteredState() {
-  return (
-    <div className="grid min-h-[220px] place-items-center p-6 text-center">
-      <div>
-        <Search className="mx-auto h-7 w-7 text-slate-300" />
-        <div className="mt-3 text-sm font-semibold text-slate-950">По этим фильтрам вариантов нет</div>
-        <div className="mt-1 text-sm text-slate-500">Снимите город, формат или дату.</div>
-      </div>
-    </div>
-  );
+  return <LandingEmptyState kind="filtered" />;
 }
 
 function LandingScheduleSkeleton({ profile }: { profile: LandingProfile }) {

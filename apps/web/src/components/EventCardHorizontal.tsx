@@ -24,6 +24,7 @@ import {
   resolveEventCardPinLines,
 } from '@/lib/event-location';
 import { formatPriceFrom } from '@/lib/format';
+import { trackProductCardClick } from '@/lib/catalog-analytics';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
 
 const SLOT_CHIP_CLASS =
@@ -57,7 +58,18 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
 
   return (
     <article className="group relative flex flex-col overflow-hidden rounded-card bg-white shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-card-hover sm:flex-row">
-      <Link href={href} className="absolute inset-0 z-[1] rounded-card" aria-label={`Событие: ${session.title}`} />
+      <Link
+        href={href}
+        className="absolute inset-0 z-[1] rounded-card"
+        aria-label={`Событие: ${session.title}`}
+        onClick={() =>
+          trackProductCardClick({
+            eventId: session.id,
+            slug: session.slug,
+            source: 'event_card_horizontal',
+          })
+        }
+      />
       <div className="relative aspect-video w-full shrink-0 overflow-hidden bg-surface-muted sm:min-w-[20rem] sm:w-80 sm:aspect-auto sm:self-stretch">
         <SafeImage
           src={session.imageUrl}

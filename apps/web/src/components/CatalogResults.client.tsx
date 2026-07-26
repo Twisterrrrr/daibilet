@@ -88,17 +88,31 @@ export function CatalogResults({
 }: CatalogResultsProps) {
   if (!items.length) {
     return (
-      <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
-        <p className="text-lg font-semibold text-slate-800">Ничего не найдено</p>
-        <p className="mt-2 text-sm text-slate-500">
-          По этим фильтрам событий нет. Сбросьте поиск или выберите другую дату и категорию.
+      <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center sm:p-10">
+        <p className="text-lg font-semibold text-slate-800">Сейчас по этим фильтрам событий нет</p>
+        <p className="mt-2 text-sm leading-6 text-slate-500">
+          Сбросьте поиск или посмотрите ТОП популярных - речные прогулки и подборки города.
         </p>
-        <Link
-          href={clearHref}
-          className="mt-5 inline-flex h-10 items-center justify-center rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700"
-        >
-          Сбросить фильтры
-        </Link>
+        <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+          <Link
+            href={clearHref}
+            className="inline-flex h-10 items-center justify-center rounded-xl bg-primary-600 px-4 text-sm font-semibold text-white hover:bg-primary-700"
+          >
+            Сбросить фильтры
+          </Link>
+          <Link
+            href="/rechnye-progulki"
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-700"
+          >
+            Речные прогулки
+          </Link>
+          <Link
+            href="/podborki"
+            className="inline-flex h-10 items-center justify-center rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:border-primary-300 hover:text-primary-700"
+          >
+            Подборки
+          </Link>
+        </div>
       </div>
     );
   }

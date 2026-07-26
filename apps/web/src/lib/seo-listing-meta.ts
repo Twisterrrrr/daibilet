@@ -20,6 +20,16 @@ export function shouldShowThinRelatedCards(offers: number): boolean {
   return n === 6 || n === 7;
 }
 
+/** Пустая секция (0 активных): SSR/CSR related hits для empty-state cross-sell. */
+export function shouldLoadEmptyRelatedHits(offers: number): boolean {
+  return (Number(offers) || 0) === 0;
+}
+
+/** Загрузка related hit sessions: thin (6–7) или полный empty (0). */
+export function shouldLoadRelatedHitSessions(offers: number): boolean {
+  return shouldShowThinRelatedCards(offers) || shouldLoadEmptyRelatedHits(offers);
+}
+
 export type ListingIndexDecision = {
   indexable: boolean;
   thin: boolean;
@@ -162,8 +172,19 @@ export function buildCategoryCityListingMeta(input: {
   cityName: string;
   fallbackTitle?: string | null;
   year?: number;
+  /** Реальный min priceFrom из офферов; без выдуманных цен. */
+  priceFrom?: number | null;
 }): { title: string; description: string; labels: ListingCategoryLabels } {
   const labels = resolveListingCategoryLabels(input.landingSlug, input.fallbackTitle);
+  const description = appendRealPriceToDescription(
+    buildCategoryCityMetaDescription({
+      seekCategory: labels.seekCategory,
+      categoryTitle: labels.titleCategory,
+      cityName: input.cityName,
+      year: input.year,
+    }),
+    input.priceFrom,
+  );
   return {
     labels,
     title: buildCategoryCityMetaTitle({
@@ -171,11 +192,21 @@ export function buildCategoryCityListingMeta(input: {
       cityName: input.cityName,
       year: input.year,
     }),
-    description: buildCategoryCityMetaDescription({
-      seekCategory: labels.seekCategory,
-      categoryTitle: labels.titleCategory,
-      cityName: input.cityName,
-      year: input.year,
-    }),
+    description,
   };
+}
+
+/**
+ * Добавляет «Цены от N рублей.» только при реальном priceFrom > 0.
+ * Не дублирует, если в тексте уже есть «от N».
+ */
+export function appendRealPriceToDescription(
+  description: string,
+  priceFrom?: number | null,
+): string {
+  const base = String(description || '').trim();
+  const price = Number(priceFrom);
+  if (!base || !Number.isFinite(price) || price <= 0) return base;
+  if (/\bот\s+\d[\d\s]*\s*руб/i.test(base)) return base;
+  return `${base} Цены от ${Math.round(price)} рублей.`;
 }

@@ -11,6 +11,7 @@ import {
   formatVacantSeats,
   isFlexibleScheduleSession,
 } from '@/lib/event-page-utils';
+import { trackSelectTickets } from '@/lib/catalog-analytics';
 import { TeplohodWidgetButton, getTeplohodWidgetIdsFromSession } from '@/components/TeplohodWidget.client';
 
 const TC_WIDGET_SCRIPT_URL = 'https://ticketscloud.com/static/scripts/widget/tcwidget.js';
@@ -267,6 +268,11 @@ export function TcSessionSlot({
         type="button"
         className="tc-session-slot flex w-full items-center justify-between rounded-lg bg-slate-50 px-3 py-2.5 text-left transition hover:bg-slate-100"
         onClick={() => {
+          trackSelectTickets({
+            eventId,
+            provider: 'ticketscloud',
+            source: 'tc_session_slot',
+          });
           void openTcWidget({ trigger: hiddenTriggerRef.current, purchaseUrl: session.purchaseUrl });
         }}
       >
@@ -431,6 +437,11 @@ export function TcWidgetButton({
     `tc-buy-btn inline-flex min-h-10 items-center justify-center gap-2 ${colorClasses} ${sizeClasses} ${wide ? 'w-full' : ''}`;
 
   const handleClick = () => {
+    trackSelectTickets({
+      eventId,
+      provider: 'ticketscloud',
+      source: 'tc_widget_button',
+    });
     void openTcWidget({
       trigger: hiddenButtonRef.current,
       purchaseUrl: targets[0]?.purchaseUrl || purchaseUrl,

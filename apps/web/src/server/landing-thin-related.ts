@@ -3,7 +3,7 @@ import { buildPublicCatalogDto } from '@daibilet/backend/public-read';
 
 import { filterSessionsByCity, resolveLandingCityName } from '@/lib/landing-city';
 import { resolveRelatedLandingCardTargets } from '@/lib/seo-internal-links';
-import { shouldShowThinRelatedCards } from '@/lib/seo-listing-meta';
+import { shouldLoadRelatedHitSessions } from '@/lib/seo-listing-meta';
 import { fetchLandingPageDto } from '@/server/landing-page';
 
 function pickSessionForCard(sessions: PublicSessionDto[]): PublicSessionDto | null {
@@ -22,7 +22,7 @@ function sessionKey(session: Pick<PublicSessionDto, 'id' | 'slug' | 'groupKey'>)
   return session.groupKey || session.id || session.slug;
 }
 
-/** SSR thin-cards: 3–4 сессии смежных категорий того же города при 6–7 офферах. */
+/** SSR related hits: 3–4 сессии смежных категорий / bestsellers при 0 или 6–7 офферах. */
 export async function loadThinRelatedCardSessions(input: {
   landingSlug: string;
   citySlug?: string | null;
@@ -30,7 +30,7 @@ export async function loadThinRelatedCardSessions(input: {
   /** Сессии текущего листинга - не дублируем в блоке. */
   excludeSessions?: PublicSessionDto[];
 }): Promise<PublicSessionDto[]> {
-  if (!shouldShowThinRelatedCards(input.offerCount)) return [];
+  if (!shouldLoadRelatedHitSessions(input.offerCount)) return [];
   const citySlug = String(input.citySlug || '').trim();
   if (!citySlug) return [];
 
@@ -61,7 +61,8 @@ export async function loadThinRelatedCardSessions(input: {
 
   // В thin-городах (Екб/Казань) смежные landings часто пустые - добираем из каталога города.
   // Важно: public catalog фильтрует по имени города («Екатеринбург»), не по landing-slug.
-  if (next.length < 3) {
+  const minHits = input.offerCount === 0 ? 1 : 3;
+  if (next.length < minHits) {
     try {
       const catalogCity = cityLabel || citySlug;
       const catalog = await buildPublicCatalogDto({
@@ -82,5 +83,5 @@ export async function loadThinRelatedCardSessions(input: {
     }
   }
 
-  return next.length >= 3 ? next.slice(0, 4) : [];
+  return next.length >= minHits ? next.slice(0, 4) : [];
 }
