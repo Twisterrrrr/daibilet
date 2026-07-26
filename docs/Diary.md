@@ -1,3 +1,22 @@
+## 2026-07-26 - Night-bridges SEO lead: wall of text + triple pad
+
+### Наблюдения
+
+- Owner: `/saint-petersburg/night-bridges` SEO-блок «Разводные мосты: ночные рейсы» - стена текста, не на всю ширину container, финальная фраза про карточку события ×3.
+- Корневая причина: seed `seo-listing-texts.ts` дотягивали pad-предложением до ~1000 символов (на части листингов 1-3×); UI `LandingSeoBottom` держал `max-w-3xl` внутри уже `container-page`.
+
+### Решения
+
+- Убрали pad из всех seed body; night-bridges переписали на 3 абзаца; остальные нарезали через `\n\n`.
+- `sanitizeSeoListingBody` / `splitSeoListingParagraphs` - runtime защита от повторного glue; `LandingSeoBottom` на полную ширину контейнера (`max-w-none`, без `max-w-3xl`).
+- Не трогали `LandingPageView` (parallel seasonal/buy-button) - только SEO data + SeoBottom.
+
+### Проблемы
+
+- Deploy отложен: dirty `LandingPageView`/`globals.css` у другого агента; exclusive deploy после их merge/smoke.
+
+---
+
 ## 2026-07-26 - Owner UX: Hero-first landing unification (CV.L-Hero)
 
 ### Наблюдения

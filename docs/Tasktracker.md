@@ -7,6 +7,15 @@
 
 ---
 
+## Bridges SEO lead / on-page copy (2026-07-26)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| BR.SEO1 | Night-bridges SEO lead: full width + абзацы + дедуп pad ×3; sanitize seed | Высокий | ✅ commit; deploy pending |
+| BR.SEO2 | Проверка остальных landings с тем же pad в `seo-listing-texts` | Высокий | ✅ cleaned all + runtime sanitize |
+
+---
+
 ## Bridges hero price range (2026-07-26)
 
 | # | Задача | Приоритет | Статус |

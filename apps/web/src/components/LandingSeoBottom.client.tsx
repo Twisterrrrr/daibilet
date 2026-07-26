@@ -1,6 +1,9 @@
 'use client';
 
-import { resolveSeoListingText } from '@/data/seo-listing-texts';
+import {
+  resolveSeoListingText,
+  splitSeoListingParagraphs,
+} from '@/data/seo-listing-texts';
 import { buildLandingOnPageSeoText, type LandingSeoInput } from '@/lib/landing-seo';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
 
@@ -14,6 +17,7 @@ type LandingSeoBottomProps = {
 
 /**
  * On-page SEO блок строго под выдачей: editorial seed → fallback-шаблон.
+ * Ширина = content container (без max-w, родитель уже container-page).
  */
 export function LandingSeoBottom({
   landingSlug,
@@ -26,17 +30,16 @@ export function LandingSeoBottom({
   const editorial = resolveSeoListingText(canonicalLandingSlug(landingSlug), citySlug);
   const heading = editorial?.heading || 'Подробнее о направлении';
   const body = editorial?.body || buildLandingOnPageSeoText(seoInput);
-  if (!body) return null;
+  const paragraphs = splitSeoListingParagraphs(body);
+  if (!paragraphs.length) return null;
 
   return (
-    <section id="seo" className="border-t border-slate-100 py-12">
-      <div className="mx-auto max-w-3xl">
-        <h2 className="text-xl font-bold text-slate-900 md:text-2xl">{heading}</h2>
-        <div className="mt-4 space-y-4 text-sm leading-7 text-slate-600 md:text-base">
-          {body.split(/\n+/).map((paragraph, index) => (
-            <p key={index}>{paragraph.trim()}</p>
-          ))}
-        </div>
+    <section id="seo" className="w-full border-t border-slate-100 py-12">
+      <h2 className="text-xl font-bold text-slate-900 md:text-2xl">{heading}</h2>
+      <div className="mt-4 max-w-none space-y-4 text-sm leading-7 text-slate-600 md:text-base">
+        {paragraphs.map((paragraph, index) => (
+          <p key={index}>{paragraph}</p>
+        ))}
       </div>
     </section>
   );
