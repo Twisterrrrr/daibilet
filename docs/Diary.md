@@ -1,3 +1,20 @@
+## 2026-07-26 - Bridges hero CTA: от min, range only in stats
+
+### Наблюдения
+
+- После BR.PR1 (`ae3c86c`) оранжевая CTA «Выбрать рейс» показывала min-max (`990-2 490 ₽`) - owner хочет range только в стате «ДИАПАЗОН ЦЕН».
+
+### Решения
+
+- `BridgesHeroBlock` / sticky CTA: `formatPriceFrom` (`от {min} ₽`); stats cell: `formatMoneyRange` + `moneyRangeStatLabel`.
+- Не пересекались с buy-button agent (TC trigger overlay) - только price label helpers / BridgesLandingSelling.
+
+### Проблемы
+
+- Deploy pending после merge.
+
+---
+
 ## 2026-07-26 - Landing buy CTAs not clickable (TC trigger overlay)
 
 ### Наблюдения

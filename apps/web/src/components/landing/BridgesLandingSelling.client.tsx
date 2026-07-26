@@ -4,7 +4,7 @@ import { ArrowRight, Clock, Compass, Heart, MapPin, Sparkles, Star, Wallet } fro
 import * as React from 'react';
 
 import { BRIDGES_LANDING } from '@/data/bridges-landing';
-import { formatMoneyRange, formatNumber, moneyRangeStatLabel } from '@/lib/format';
+import { formatMoneyRange, formatNumber, formatPriceFrom, moneyRangeStatLabel } from '@/lib/format';
 import type { BridgesScheduleRow } from '@/lib/bridges-session-utils';
 
 const PALACE_BRIDGE_LIFT_HOUR = 1;
@@ -90,7 +90,9 @@ export function BridgesHeroBlock({
   onViewSchedule: () => void;
 }) {
   const countdown = usePalaceBridgeCountdown();
-  const priceLabel = priceFrom ? formatMoneyRange(priceFrom, priceTo) : null;
+  // CTA: only «от min»; min–max lives in the «диапазон цен» stat cell
+  const priceCtaLabel = priceFrom ? formatPriceFrom(priceFrom) : null;
+  const priceRangeLabel = priceFrom ? formatMoneyRange(priceFrom, priceTo) : null;
   const priceStatLabel = moneyRangeStatLabel(priceFrom, priceTo);
 
   return (
@@ -104,7 +106,7 @@ export function BridgesHeroBlock({
             onClick={onPickTour}
             className="inline-btn inline-flex items-center gap-2 rounded-full bridges-cta-gradient px-6 py-3 text-sm font-semibold text-white transition hover:brightness-105"
           >
-            {priceLabel ? `Выбрать рейс · ${priceLabel}` : 'Выбрать рейс'}
+            {priceCtaLabel ? `Выбрать рейс · ${priceCtaLabel}` : 'Выбрать рейс'}
             <ArrowRight className="h-4 w-4" />
           </button>
           <button
@@ -125,7 +127,7 @@ export function BridgesHeroBlock({
               // soldEstimate / 4.7 - marketing placeholders, not live sales/ratings
               { value: `${formatNumber(soldEstimate)}+`, label: 'билетов продано', nowrap: false },
               { value: '4.7', label: 'средний рейтинг', nowrap: false },
-              { value: priceLabel || '—', label: priceStatLabel, nowrap: true },
+              { value: priceRangeLabel || '—', label: priceStatLabel, nowrap: true },
             ].map((item) => (
               <div key={item.label}>
                 <dt
@@ -434,7 +436,7 @@ export function BridgesMobileStickyCta({
         className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
       >
         <Star className="h-4 w-4" />
-        {priceFrom ? `Показать рейсы ${formatMoneyRange(priceFrom, priceTo)}` : 'Выбрать рейс'}
+        {priceFrom ? `Показать рейсы ${formatPriceFrom(priceFrom)}` : 'Выбрать рейс'}
       </a>
     </div>
   );

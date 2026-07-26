@@ -20,7 +20,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| BR.PR1 | Hero stats: real min-max `priceTo` + honest label (не «диапазон» для одной цены) | Критический | 🔄 commit/deploy |
+| BR.PR1 | Hero stats: real min-max `priceTo` + honest label; CTA only «от min» | Критический | ✅ commit; deploy pending |
 | BR.PR2 | Flag fake «билетов продано» / «4.7 рейтинг» (не в scope фикса цены) | Средний | ⏳ debt |
 
 ---

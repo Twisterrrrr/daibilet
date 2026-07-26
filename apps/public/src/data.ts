@@ -297,6 +297,13 @@ export function formatMoney(value?: number | null): string {
   return `от ${formatNumber(Math.round(value))}\u00a0₽`;
 }
 
+/** Primary buy / CTA: always «от min», never min–max. */
+export function formatPriceFrom(value?: number | null): string {
+  if (!value || value <= 0) return 'Цена уточняется';
+  return `от ${formatNumber(Math.round(value))} ₽`;
+}
+
+/** Stats / comparison: min-max when different, else «от min». Not for primary buy CTAs. */
 export function formatMoneyRange(from?: number | null, to?: number | null): string {
   if (!from || from <= 0) return '—';
   const min = Math.round(from);
