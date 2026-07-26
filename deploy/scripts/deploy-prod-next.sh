@@ -72,6 +72,12 @@ if [[ -f .env ]]; then
   INDEXNOW_KEY="$(grep -E '^INDEXNOW_KEY=' .env | head -n1 | cut -d= -f2- | sed 's/^["'\'']//;s/["'\'']$//' || true)"
   export INDEXNOW_KEY
 fi
+# Host key at /{key}.txt (Yandex default) + stable /indexnow-key.txt route after build.
+if [[ -n "${INDEXNOW_KEY:-}" ]]; then
+  printf '%s' "$INDEXNOW_KEY" > "apps/web/public/${INDEXNOW_KEY}.txt"
+  printf '%s' "$INDEXNOW_KEY" > "apps/web/public/indexnow-key.txt"
+  echo "Wrote IndexNow key files under apps/web/public/"
+fi
 
 pnpm db:generate
 pnpm db:deploy

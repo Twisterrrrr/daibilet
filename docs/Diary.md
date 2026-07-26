@@ -9,15 +9,15 @@
 
 ### Решения
 
-- `INDEXNOW_KEY` (server-only) → `GET /{key}.txt`; POST batch на `yandex.com/indexnow` + `api.indexnow.org`.
+- `INDEXNOW_KEY` (server-only) → `GET /indexnow-key.txt` (+ `/{key}.txt` via public file); POST batch на `yandex.com/indexnow` + `api.indexnow.org`.
 - Триггеры без спама каталогом: `/api/internal/revalidate` (paths HTML), article publish/update (через revalidate blog paths), deploy-warm curated TOP (`INDEXNOW_DEPLOY_PATHS` + `/api/internal/indexnow`).
 - Debounce 2s in-process; cap 64 URL/request; skip `/api` `/admin` `/account`.
-- Deploy: сгенерировать `INDEXNOW_KEY` в `.env` один раз до рестарта web.
+- Deploy: сгенерировать `INDEXNOW_KEY` в `.env` один раз до рестарта web; keyLocation = `/indexnow-key.txt` (стабильный path, без clash с `[segment]`).
 
 ### Проблемы
 
 - Owner: в Вебмастере проверить/добавить sitemap; после deploy - Переобход TOP-15 (SEO.16 / SEO.IN3).
-- Нужен commit + deploy-prod-next; smoke: `/{key}.txt` = key; IndexNow log OK.
+- Первый deploy: динамический `/{key}.txt` route handler проигрывал `[segment]` (HTML 404) - fixed stable `/indexnow-key.txt` + public `/{key}.txt`.
 
 ---
 

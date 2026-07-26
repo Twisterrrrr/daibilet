@@ -11,7 +11,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| SEO.IN1 | IndexNow: key file `/{key}.txt` + notify Yandex/Bing on revalidate / article publish / deploy-warm (без спама каталогом) | Критический | 🔄 deploy |
+| SEO.IN1 | IndexNow: key file `/indexnow-key.txt` + `/{key}.txt` + notify Yandex/Bing on revalidate / article publish / deploy-warm (без спама каталогом) | Критический | ✅ `96fd5a9`+fix; prod key 200; IndexNow 202 |
 | SEO.IN2 | Owner: добавить sitemap `https://daibilet.ru/sitemap.xml` в Яндекс.Вебмастер (если ещё нет) | Высокий | ⏳ **владелец** |
 | SEO.IN3 | Owner: Переобход TOP-15 URL после deploy (Вебмастер → Индексирование → Переобход) | Высокий | ⏳ **владелец** (см. SEO.16) |
 | SEO.IN4 | Метрика уже на сайте (ID 106786540) - не трогать код; цели CV.2b отдельно | — | ✅ already |

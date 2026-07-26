@@ -1,7 +1,7 @@
 /**
  * IndexNow (Yandex + Bing-compatible) - notify search engines of changed URLs.
  * Secret: INDEXNOW_KEY (server-only, never NEXT_PUBLIC_).
- * Key file: https://{host}/{INDEXNOW_KEY}.txt
+ * Key file: https://{host}/indexnow-key.txt (stable keyLocation; also /{key}.txt via public file on deploy).
  */
 
 const INDEXNOW_ENDPOINTS = [
@@ -75,7 +75,8 @@ export function getIndexNowKey(): string | null {
 export function getIndexNowKeyLocation(siteUrl = getSiteUrl()): string | null {
   const key = getIndexNowKey();
   if (!key) return null;
-  return `${siteUrl.replace(/\/$/, '')}/${key}.txt`;
+  // Stable path avoids clash with app/[segment] catch-all.
+  return `${siteUrl.replace(/\/$/, '')}/indexnow-key.txt`;
 }
 
 export function pathsToAbsoluteUrls(
@@ -188,7 +189,10 @@ export async function submitIndexNow(
     return { ok: false, skipped: true, reason: 'bad_site_url' };
   }
 
-  const keyLocation = `${siteUrl.replace(/\/$/, '')}/${key}.txt`;
+  const keyLocation = getIndexNowKeyLocation(siteUrl);
+  if (!keyLocation) {
+    return { ok: false, skipped: true, reason: 'missing_key' };
+  }
   const body = JSON.stringify({
     host,
     key,
