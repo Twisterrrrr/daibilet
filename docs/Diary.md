@@ -60,6 +60,7 @@
 ### Проблемы
 
 - Нужен commit + deploy-prod-next; smoke URL выше на `<ul>`/`<p>` (не wall-of-text).
+- **Prod:** fix `f92b1d6` в ancestry HEAD `09bdff9`; smoke Kremlin cruise: 4×`<p>` + `<ul>` 7 landmarks (Зарядье…Дом Музыки), без wall-of-text `Москвы: Парящий`. Параллельные buy-card/IndexNow деплои валили web mid-build (OOM/SIGTERM) - финальный healthy web поднялся поверх.
 
 ---
 
