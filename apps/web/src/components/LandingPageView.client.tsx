@@ -17,6 +17,8 @@ import { LandingCityLocations } from '@/components/landing/LandingCityLocations.
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
 import { LandingStickyHeader } from '@/components/landing/LandingStickyHeader.client';
 import { LandingCardBadgeRow } from '@/components/landing/LandingCardBadgeRow';
+import { LandingContextWidget } from '@/components/landing/LandingContextWidget.client';
+import { resolveLandingContextWidget } from '@/data/landing-context-widgets';
 import {
   collectLandingBadgeFacets,
   deriveLandingCardBadges,
@@ -49,7 +51,8 @@ import {
   pickComparisonRows,
 } from '@/lib/bridges-session-utils';
 import { resolveLandingCopy, shouldUseLandingCopy } from '@/lib/landing-copy';
-import { applyLandingSeoMeta, resolveLandingSeo, useLandingTodayReference } from '@/lib/landing-seo';
+import { applyLandingSeoMeta, resolveLandingSeo } from '@/lib/landing-seo';
+import { useLandingTodayReference } from '@/lib/use-landing-today-reference';
 import { buildCategoryCityListingMeta } from '@/lib/seo-listing-meta';
 import { LandingSeoBottom, landingBlocksHaveSeoText } from '@/components/LandingSeoBottom.client';
 import { LandingSeeAlso } from '@/components/LandingSeeAlso';
@@ -626,6 +629,7 @@ export function LandingPageView({
   const [menuFilter, setMenuFilter] = React.useState<MenuFilter>('all');
   const [dinnerTimeFilter, setDinnerTimeFilter] = React.useState<DinnerTimeFilter>('all');
   const [dinnerBadgeFilter, setDinnerBadgeFilter] = React.useState<DinnerBadgeFilter>('all');
+  const [contextChip, setContextChip] = React.useState<string | null>(null);
   const [timeSlot, setTimeSlot] = React.useState<TimeSlotFilter>('');
   const [mobileCtaVisible, setMobileCtaVisible] = React.useState(false);
 
@@ -644,6 +648,7 @@ export function LandingPageView({
     setMenuFilter('all');
     setDinnerTimeFilter('all');
     setDinnerBadgeFilter('all');
+    setContextChip(null);
     setTimeSlot('');
     setCategory(resolveConcertGenreTag(initialGenre) || 'all');
     setApiPayload(initialCachedPayload);
@@ -774,11 +779,19 @@ export function LandingPageView({
       if (profile === 'dinner' && !matchesMenuFilter(session, menuFilter)) return false;
       if (profile === 'dinner' && !matchesDinnerTimeFilter(session, dinnerTimeFilter)) return false;
       if (profile === 'dinner' && !sessionMatchesLandingBadge(session, dinnerBadgeFilter)) return false;
+      if (contextChip) {
+        const normalize = (value: string) => value.toLowerCase().replace(/ё/g, 'е');
+        const needle = normalize(contextChip);
+        const text = normalize(
+          [session.title, session.category, ...(session.tags || []), ...(session.subcategories || [])].join(' '),
+        );
+        if (!text.includes(needle)) return false;
+      }
       if ((profile === 'bus' || profile === 'river' || profile === 'seasonal' || profile === 'bridges') && !matchesTimeSlotFilter(session, timeSlot)) return false;
       if (profile !== 'bridges' && !matchesDateFilter(session, dateFilter)) return false;
       return true;
     });
-  }, [category, city, dateFilter, menuFilter, dinnerTimeFilter, dinnerBadgeFilter, timeSlot, payload, profile, sessionsReady]);
+  }, [category, city, dateFilter, menuFilter, dinnerTimeFilter, dinnerBadgeFilter, contextChip, timeSlot, payload, profile, sessionsReady]);
 
   const allGroups = React.useMemo(
     () => (payload && sessionsReady ? groupLandingSessions(payload.sessions) : []),
@@ -786,6 +799,7 @@ export function LandingPageView({
   );
   const groups = React.useMemo(() => sortEventGroups(groupLandingSessions(filteredSessions), sort), [filteredSessions, sort]);
   const cityName = resolveLandingCityName(citySlug, slug);
+  const contextWidget = React.useMemo(() => resolveLandingContextWidget(slug), [slug]);
   const bridgesRows = React.useMemo(() => {
     if (profile !== 'bridges' || !sessionsReady) return [];
     const upcoming = filterUpcomingBridgeGroups(allGroups);
@@ -979,6 +993,15 @@ export function LandingPageView({
               </>
             ) : null}
           </section>
+          {contextWidget ? (
+            <div className="container-page">
+              <LandingContextWidget
+                config={contextWidget}
+                activeChip={contextChip}
+                onChipSelect={setContextChip}
+              />
+            </div>
+          ) : null}
           <div className="container-page">
             {citySlug && cityName ? (
               <>
