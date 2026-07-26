@@ -25,6 +25,7 @@
 | BUY.1 | Hidden TC triggers не перекрывают CTA (`pointer-events-none`) | Критический | ✅ `c984d8a` |
 | BUY.2 | Optimistic shell «Открываем оплату…» + retry/fallback TC+Teplohod | Критический | ✅ код готов; deploy с CV.L-Hero |
 | BUY.3 | Bridges: убрать fake ★4.7 / sold-count; hide fake Reviews | Высокий | ✅ |
+| BUY.4 | TEP open: не ждать `window.TI_Tickets` (IIFE); fast-path click + preload script | Критический | ✅ код; prod measure: shell~20ms, direct iframe~50ms, broken path~21s |
 
 ---
 

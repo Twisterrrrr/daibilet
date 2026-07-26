@@ -1,3 +1,27 @@
+## 2026-07-27 - TEP widget open latency on landings
+
+### Наблюдения
+
+- Prod `/rechnye-progulki/moscow`: 43 TEP CTA, 0 TC. Script `widget.js` ~471KB vs TC `tcwidget.js` ~21KB.
+- После load: 86 hidden embeds + buy-links, но `window.TI_Tickets` всегда `undefined` (IIFE).
+- Наш `openTeplohodPurchase` ждал `TI_Tickets.init` до 8с → shell ~20мс, vendor fail ~21с.
+- Прямой click по `.ti-tickets-event-tickets-buy` → fancybox iframe ~50мс.
+- Параллельно 86 XHR `account.teplohod.info/widget/embed/...` (waterfall ~секунды на page load).
+
+### Решения
+
+- `ensureTeplohodWidgetScript`: resolve на `onload`, без ожидания private API.
+- `openTeplohodPurchase`: fast-path click по готовой buy-link; убран artificial 400ms sleep.
+- Prefetch: `link rel=preload` + script inject на mount/hover (`prefetchTeplohodWidgetScript`).
+- Lazy-embed отложен (vendor без public `init` не гарантирует late mount).
+
+### Проблемы
+
+- 86 embeds / XHR на большом лендинге остаются (отдельный follow-up: IntersectionObserver / shared host).
+- Browser MCP tab недоступен; замеры через puppeteer-core + Chrome.
+
+---
+
 ## 2026-07-27 - PERF.L1–L3: landings ISR + catalog SWR
 
 ### Наблюдения

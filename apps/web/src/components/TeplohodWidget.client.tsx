@@ -51,16 +51,10 @@ const TEP_WIDGET_CSS = `
 }
 `;
 
-type TeplohodWidgetWindow = Window & {
-  TI_Tickets?: {
-    init?: () => void;
-    widget?: {
-      init?: () => void;
-      prefetch?: () => Promise<unknown>;
-    };
-  };
-};
-
+/**
+ * Teplohod widget.js is an IIFE: `TI_Tickets` is NOT on window.
+ * Readiness = script tag loaded + (optional) buy-link markup injected by the vendor.
+ */
 let widgetScriptPromise: Promise<void> | null = null;
 let bootstrapPromise: Promise<boolean> | null = null;
 
@@ -78,6 +72,15 @@ function extractTeplohodEventIdFromUrl(url: string) {
   );
 }
 
+function isTeplohodScriptInjected() {
+  if (typeof document === 'undefined') return false;
+  return Boolean(
+    document.querySelector(
+      'script[data-daibilet-teplohod-widget="true"], script[src*="teplohod.info/v1/widget/widget.js"]',
+    ),
+  );
+}
+
 function resetStuckTeplohodContainers() {
   if (typeof document === 'undefined') return;
   document.querySelectorAll('.teplohod-info-wrapper').forEach((element) => {
@@ -88,47 +91,35 @@ function resetStuckTeplohodContainers() {
   });
 }
 
-function waitForTeplohodApi(timeoutMs = 8000) {
-  if (typeof window === 'undefined') return Promise.resolve(false);
-  const tickets = (window as TeplohodWidgetWindow).TI_Tickets;
-  if (tickets?.init) return Promise.resolve(true);
-
-  return new Promise<boolean>((resolve) => {
-    const started = Date.now();
-    const tick = () => {
-      if ((window as TeplohodWidgetWindow).TI_Tickets?.init) {
-        resolve(true);
-        return;
-      }
-      if (Date.now() - started >= timeoutMs) {
-        resolve(false);
-        return;
-      }
-      window.setTimeout(tick, 50);
-    };
-    tick();
-  });
+function findTeplohodBuyButton(wrapperId?: string | null) {
+  if (typeof document === 'undefined') return null;
+  if (wrapperId) {
+    let safeId = wrapperId;
+    try {
+      safeId = CSS.escape(wrapperId);
+    } catch {
+      safeId = wrapperId.replace(/([^a-zA-Z0-9_-])/g, '\\$1');
+    }
+    const scoped = document.querySelector<HTMLElement>(`#${safeId} .ti-tickets-event-tickets-buy`);
+    if (scoped) return scoped;
+  }
+  return null;
 }
 
-/** Full Teplohod bootstrap: required after hydration / SPA navigation. */
+/**
+ * Vendor script self-inits inside an IIFE. We only ensure the script tag is present;
+ * re-scan stuck wrappers so late-mounted embeds get another pass when possible.
+ */
 export function bootstrapTeplohodWidgets() {
   if (typeof window === 'undefined') return Promise.resolve(false);
 
   if (bootstrapPromise) return bootstrapPromise;
 
   bootstrapPromise = (async () => {
-    const ready = await waitForTeplohodApi();
-    const tickets = (window as TeplohodWidgetWindow).TI_Tickets;
-    if (!ready || !tickets?.init) return false;
-
+    await ensureTeplohodWidgetScript();
     resetStuckTeplohodContainers();
-    try {
-      tickets.init();
-      tickets.widget?.init?.();
-      return true;
-    } catch {
-      return false;
-    }
+    // Script auto-binds .teplohod-info-wrapper; nothing public to call.
+    return isTeplohodScriptInjected();
   })().finally(() => {
     window.setTimeout(() => {
       bootstrapPromise = null;
@@ -180,11 +171,12 @@ function waitForTeplohodFancyboxContent(timeoutMs = 5000) {
   });
 }
 
+/** Prefetch/load vendor widget.js once. Does not wait for private TI_Tickets (IIFE). */
 export function ensureTeplohodWidgetScript() {
   if (typeof document === 'undefined') return Promise.resolve();
 
-  if (document.querySelector('script[data-daibilet-teplohod-widget="true"]')) {
-    return (widgetScriptPromise || Promise.resolve()).then(() => waitForTeplohodApi()).then(() => undefined);
+  if (isTeplohodScriptInjected()) {
+    return widgetScriptPromise || Promise.resolve();
   }
 
   widgetScriptPromise = new Promise<void>((resolve, reject) => {
@@ -192,14 +184,53 @@ export function ensureTeplohodWidgetScript() {
     script.src = TEP_WIDGET_SCRIPT_URL;
     script.async = true;
     script.dataset.daibiletTeplohodWidget = 'true';
-    script.onload = () => {
-      void waitForTeplohodApi().then(() => resolve());
-    };
+    script.onload = () => resolve();
     script.onerror = () => reject(new Error('teplohod widget script failed'));
     document.body.appendChild(script);
   });
 
   return widgetScriptPromise;
+}
+
+/** Idle/hover prefetch for landings - same as TC mount preload. */
+export function prefetchTeplohodWidgetScript() {
+  if (typeof document !== 'undefined' && !document.querySelector('link[data-daibilet-tep-preload="true"]')) {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'script';
+    link.href = TEP_WIDGET_SCRIPT_URL;
+    link.dataset.daibiletTepPreload = 'true';
+    document.head.appendChild(link);
+  }
+  return ensureTeplohodWidgetScript().catch(() => undefined);
+}
+
+function waitForTeplohodBuyButton(wrapperId: string, timeoutMs = 4000) {
+  return new Promise<HTMLElement | null>((resolve) => {
+    const existing = findTeplohodBuyButton(wrapperId);
+    if (existing) {
+      resolve(existing);
+      return;
+    }
+
+    const deadline = Date.now() + timeoutMs;
+    const root = document.getElementById(wrapperId) || document.body;
+    const observer = new MutationObserver(() => {
+      const button = findTeplohodBuyButton(wrapperId);
+      if (button) {
+        observer.disconnect();
+        resolve(button);
+      } else if (Date.now() >= deadline) {
+        observer.disconnect();
+        resolve(null);
+      }
+    });
+    observer.observe(root, { childList: true, subtree: true });
+    window.setTimeout(() => {
+      observer.disconnect();
+      resolve(findTeplohodBuyButton(wrapperId));
+    }, timeoutMs);
+  });
 }
 
 type TeplohodWidgetPayload = {
@@ -391,18 +422,24 @@ export function TeplohodWidgetEmbed({
 
 export function openTeplohodWidget(wrapperId = 'teplohod-widget') {
   const tryClick = (attempt = 0) => {
-    const button = document.querySelector<HTMLElement>(`#${wrapperId} .ti-tickets-event-tickets-buy`);
+    const button = findTeplohodBuyButton(wrapperId);
     if (button) {
       button.click();
       return true;
     }
-    if (attempt < 24) window.setTimeout(() => tryClick(attempt + 1), 150);
+    if (attempt < 24) window.setTimeout(() => tryClick(attempt + 1), 100);
     return false;
   };
 
+  const existing = findTeplohodBuyButton(wrapperId);
+  if (existing) {
+    existing.click();
+    return;
+  }
+
   void ensureTeplohodWidgetScript()
     .then(() => bootstrapTeplohodWidgets())
-    .finally(() => window.setTimeout(() => tryClick(), 150));
+    .finally(() => window.setTimeout(() => tryClick(), 50));
 }
 
 export type OpenTeplohodPurchaseResult = 'widget' | 'popup' | 'none';
@@ -412,6 +449,13 @@ export async function openTeplohodPurchase(options: {
   purchaseUrl?: string | null;
 }): Promise<OpenTeplohodPurchaseResult> {
   const wrapperId = options.wrapperId || 'teplohod-widget';
+
+  // Fast path: vendor buy link already injected (common on landings after idle/hover arm).
+  const readyButton = findTeplohodBuyButton(wrapperId);
+  if (readyButton) {
+    readyButton.click();
+    if (await waitForTeplohodFancyboxContent(3500)) return 'widget';
+  }
 
   try {
     await ensureTeplohodWidgetScript();
@@ -424,18 +468,21 @@ export async function openTeplohodPurchase(options: {
     return 'none';
   }
 
-  openTeplohodWidget(wrapperId);
-  await new Promise((r) => window.setTimeout(r, 400));
-  const hasContent = await waitForTeplohodFancyboxContent(4500);
-  if (hasContent) return 'widget';
+  const button = findTeplohodBuyButton(wrapperId) || (await waitForTeplohodBuyButton(wrapperId, 3500));
+  if (button) {
+    button.click();
+    if (await waitForTeplohodFancyboxContent(3500)) return 'widget';
+  } else {
+    openTeplohodWidget(wrapperId);
+    if (await waitForTeplohodFancyboxContent(3500)) return 'widget';
+  }
 
-  const button = document.querySelector<HTMLElement>(`#${wrapperId} .ti-tickets-event-tickets-buy`);
   const fancyboxOpen = document.querySelector('.fancyboxtkt-container, .fancyboxtkt-slide');
-  if (!button && !fancyboxOpen && options.purchaseUrl) {
+  if (!findTeplohodBuyButton(wrapperId) && !fancyboxOpen && options.purchaseUrl) {
     const popup = window.open(options.purchaseUrl, '_blank', 'noopener,noreferrer');
     return popup ? 'popup' : 'none';
   }
-  if (fancyboxOpen && !hasContent) {
+  if (fancyboxOpen && !(await waitForTeplohodFancyboxContent(500))) {
     dismissTeplohodFancybox();
     if (options.purchaseUrl) {
       const popup = window.open(options.purchaseUrl, '_blank', 'noopener,noreferrer');
@@ -469,6 +516,11 @@ export function TeplohodWidgetButton({
       tepEventId: eventId,
       tepWidgetId,
     });
+
+  React.useEffect(() => {
+    if (!eventId) return;
+    void prefetchTeplohodWidgetScript();
+  }, [eventId]);
 
   if (!eventId) return null;
 
@@ -534,6 +586,9 @@ export function TeplohodWidgetButton({
       <button
         type="button"
         onClick={handleClick}
+        onPointerEnter={() => {
+          void prefetchTeplohodWidgetScript();
+        }}
         className={`${className}${busy ? ' pointer-events-none opacity-80' : ''}`}
         aria-busy={busy}
         disabled={busy}
