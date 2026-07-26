@@ -15,7 +15,8 @@
 
 ### Проблемы
 
-- Exclusive deploy после `2f3ccd9` (4-stat strip) + этот контент; smoke `/novyj-god`, planetarium, night-bridges.
+- Exclusive deploy: prod HEAD `b083a7e` (contains `2f3ccd9` 4-stat + content packs). Smoke OK: `/novyj-god`, `/saint-petersburg/planetarium`, `/saint-petersburg/night-bridges`.
+- Follow-up: GPT FAQ имел приоритет ниже CMS FAQ block - fixed `b083a7e` (pack wins).
 
 ---
 
