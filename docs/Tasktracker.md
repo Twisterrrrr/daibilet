@@ -7,6 +7,18 @@
 
 ---
 
+## Ops: TC catalog sync reliability (2026-07-27)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| SYNC.1 | `deploy/cron/tc-catalog-sync.sh` executable (`100755`) - nightly 203/EXEC | Критический | ✅ prod chmod + git filemode |
+| SYNC.2 | systemd: `NODE_OPTIONS=--max-old-space-size=1536`, MemoryMax≥2G (catalog JSON ~245MB) | Критический | ✅ prod unit + repo `deploy/systemd/` |
+| SYNC.3 | `tc-sync` / worker: fail when child killed by signal (OOM masked SUCCESS) | Критический | ✅ code; **deploy на prod ⏳** |
+| SYNC.4 | Verify next nightly 03:20: real `importedEvents` + non-zero import, not fetch-only | Критический | ⏳ after SYNC.3 deploy |
+| SYNC.5 | TEP full sync (habit) | Высокий | ✅ 2026-07-26 22:22Z ~307с / 214 events / 20566 links |
+
+---
+
 ## Landing SSR perf (2026-07-27)
 
 | # | Задача | Приоритет | Статус |
@@ -14,7 +26,8 @@
 | PERF.L1 | Landings ISR: убрать `await searchParams` в `[segment]`/`[segment2]`/`[segment3]`; genre с URL на клиенте | Критический | ✅ `c433652` prod (`s-maxage=3600` + HIT) |
 | PERF.L2 | `publicCatalogSessions` SWR (fresh 5м / stale 30м + soft-invalidate), зеркало TS DTO | Критический | ✅ `c433652` prod |
 | PERF.L3 | Slim SSR: fallback `buildPublicLandingPage` → lean cards + slice 48 (как managed) | Высокий | ✅ `c433652`; `/rechnye-progulki` ~231KB (было ~705KB) |
-| PERF.L4 | `/events` generateMetadata без searchParams (SEO tradeoff vs ISR) | Средний | ⚠️ deferred; body уже без await |
+| PERF.L4 | `/events` generateMetadata без searchParams (SEO tradeoff vs ISR) | Средний | ⚠️ deferred; body уже без await; warm audit: всё ещё `private, no-store`, TTFB ~0.3с |
+| PERF.L5 | `/progulki-po-krysham` warm всегда `x-nextjs-cache: MISS` при s-maxage=3600 | Низкий | ⏳ anomaly (TTFB OK ~0.12с) |
 
 ---
 
@@ -25,7 +38,10 @@
 | BUY.1 | Hidden TC triggers не перекрывают CTA (`pointer-events-none`) | Критический | ✅ `c984d8a` |
 | BUY.2 | Optimistic shell «Открываем оплату…» + retry/fallback TC+Teplohod | Критический | ✅ код готов; deploy с CV.L-Hero |
 | BUY.3 | Bridges: убрать fake ★4.7 / sold-count; hide fake Reviews | Высокий | ✅ |
-| BUY.4 | TEP open: не ждать `window.TI_Tickets` (IIFE); fast-path click + preload script | Критический | ✅ код; prod measure: shell~20ms, direct iframe~50ms, broken path~21s |
+| BUY.4 | TEP open: не ждать `window.TI_Tickets` (IIFE); fast-path click + preload script | Критический | ✅ `ac91b0f` на prod (2026-07-27) |
+| BUY.5 | TEP: lazy/shared embed на лендингах (убрать N×XHR `widget/embed`) | Высокий | ⏳ follow-up после Owner audit |
+| BUY.6 | TEP: `TeplohodWidgetEmbed` всегда через `resolveTeplohodCheckoutUrl` (не raw purchaseUrl) | Средний | ⏳ latent defense |
+| BUY.7 | Owner site-wide TEP link audit (landings/event/home/dinner/party) | Высокий | ✅ 2026-07-27: broken patterns не найдены; см. Diary |
 
 ---
 

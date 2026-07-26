@@ -1,3 +1,27 @@
+## 2026-07-27 - Owner audit: TEP widgets site-wide
+
+### Наблюдения
+
+- Prod HEAD `ac91b0f` (BUY.4) задеплоен; `daibilet-web` active; в бандле нет `TI_Tickets`, есть `ti-tickets-event-tickets-buy` / fancybox selectors.
+- Поверхности: `LandingPurchaseButton` → `TeplohodWidgetButton` (лендинги, EventCard landingActions, blog buy, bridges); event page `TeplohodWidgetEmbed` + hero `openTeplohodWidget`; `CatalogPurchaseAnchors` есть в коде, но `suppressPurchaseAnchors=true` по умолчанию и нигде не снимается → на catalog/home hidden TEP DOM не монтируется.
+- Lean list DTO (`toPublicCatalogListItem`) намеренно без `purchaseUrl`/`widgetUrl`; лендинги опираются на `purchaseProvider=TEPLOHOD` + `evt_tep_*` → client `resolveTeplohodCheckoutUrl` (`account.teplohod.info/order/event-order?widget_id&event_id`).
+- Spot-check prod: river Moscow 46 TEP, dinner `/moscow/dinner-boat` 12 TEP, party 28 TEP, home data 24 TEP ids; event-683: `data-event-id="683"`, wrapper, checkout с `event_id=683`, dead `teplohod.info/event/*` = 0. `/uzhin-na-teplohode` → 404 (канон `/moscow/dinner-boat`). SPB river: 1 TEP (`evt_tep_1378`).
+- Ложный алерт «URL без event_id»: в RSC `\\u0026event_id=` обрезался простым regex до `\`.
+
+### Решения
+
+- Конкурирующий exclusive deploy не стартовали (в полёте был `deploy-tep-open` → EXIT:0).
+- Код не трогали: явных broken buy-link на проде нет; N×hidden embed остаётся known follow-up.
+
+### Проблемы
+
+- P1 perf: каждый `TeplohodWidgetButton` монтирует hidden embed → ~2× CTA на лендинге (list + card) → десятки XHR embed.
+- P2 latent: `TeplohodWidgetEmbed` берёт raw `purchaseUrl` раньше `resolveTeplohodCheckoutUrl` (если когда-то придёт URL только с `widget_id`).
+- P2 footgun: `extractTcEventIdFromSession` умеет вернуть tep id; TC-path сейчас gated `getTcWidgetIds`/provider.
+- P3: `/uzhin-na-teplohode` 404; SPB river почти без TEP (контент/фильтр, не виджет).
+
+---
+
 ## 2026-07-27 - TEP widget open latency on landings
 
 ### Наблюдения
@@ -19,6 +43,28 @@
 
 - 86 embeds / XHR на большом лендинге остаются (отдельный follow-up: IntersectionObserver / shared host).
 - Browser MCP tab недоступен; замеры через puppeteer-core + Chrome.
+
+---
+
+## 2026-07-27 - Owner audit: speed + pre-finance + full sync
+
+### Наблюдения
+
+- Warm speed после PERF.L1–L3 (`c433652`): landings `s-maxage=3600` + `x-nextjs-cache: HIT`, TTFB ~0.11–0.14с (median). `/` `s-maxage=300` HIT ~0.13с. `/rechnye-progulki` больше не outlier (~0.11с / 231KB).
+- Остаточный `no-store`: только `/events` (PERF.L4: `generateMetadata` ждёт `searchParams`) - warm TTFB ~0.23–0.35с, size ~660KB. `/progulki-po-krysham` стабильно `MISS` при `s-maxage=3600` (TTFB всё равно ~0.12–0.13с) - anomaly, не blocker.
+- Full sync habit: **TEP** ✅ (~307с, 214 events, providerLinks 20566, light revalidate + IndexNow). **TC** fetch ✅ (21155 events / catalog ~245MB), import ⛔: (1) `tc-catalog-sync.sh` без `+x` → nightly 23–26.07 часто `203/EXEC`; (2) import OOM на JSON.parse при MemoryMax=900M → `spawnSync` status=null маскировал SUCCESS; (3) daytime import с heap 1536 + stop-web зависал `idle in transaction` ~30+ мин и блокировал `tc:orders` - abort, web restored.
+- Последний **реальный** TC import с `importedEvents:22106`: **2026-07-24 21:00 UTC**. Dual-edit `landing-rules.ts`↔`dto.js` **не** часть catalog sync (только ручной регламент до F5).
+
+### Решения
+
+- Prod hotfix: `chmod +x` tc-catalog-sync.sh; systemd unit `NODE_OPTIONS=--max-old-space-size=1536`, MemoryHigh/Max 1600M/2000M, TimeoutStartSec=45min.
+- Code: fail-on-signal в `scripts/tc-sync.js` + `apps/worker/src/run-job.mjs`; git filemode `100755` на tc-catalog-sync.sh; unit в `deploy/systemd/`.
+- Pre-финконтур: не стартовать Phase G, пока widget-first контур (TC orders cron, admin ExternalOrder, buy UX, legal/privacy, no fake metrics) стабилен; `purchase_success` без widget callback - не слать fake.
+
+### Проблемы
+
+- Nightly TC import после 24.07 фактически битый (OOM / noexec) при зелёном exitCode - нужна проверка после ближайшего 03:20 с новым MemoryMax/heap.
+- Daytime full TC import на 3.8Gi конкурирует с api/orders - только maintenance window / stop-web + без overlap orders.
 
 ---
 

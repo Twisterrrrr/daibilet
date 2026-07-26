@@ -17,11 +17,14 @@ Environment=APP_DIR=/opt/daibilet
 Environment=TC_SYNC_NICE=15
 # Nightly: keep warm light unless explicitly overridden in drop-in / env file.
 Environment=TC_CATALOG_SYNC_FULL_WARM=0
+# Catalog JSON ~250MB; import JSON.parse needs headroom beyond default ~512MB heap.
+Environment=NODE_OPTIONS=--max-old-space-size=1536
 Nice=15
 IOSchedulingClass=best-effort
 IOSchedulingPriority=7
-MemoryHigh=700M
-MemoryMax=900M
+# Host is 3.8Gi; leave room for api. Prefer nightly when web can be light.
+MemoryHigh=1600M
+MemoryMax=2000M
 ExecStart=/opt/daibilet/deploy/cron/tc-catalog-sync.sh
 StandardOutput=append:/var/log/daibilet/tc-catalog-sync.log
 StandardError=append:/var/log/daibilet/tc-catalog-sync.log

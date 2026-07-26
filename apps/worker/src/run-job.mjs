@@ -53,7 +53,8 @@ export function runJob(jobId, extraArgs = [], opts = {}) {
     if (result.error) {
       throw result.error;
     }
-    if (result.status !== 0) {
+    // spawnSync: OOM/SIGABRT → status=null, signal set. `status !== 0` alone masks false SUCCESS.
+    if (result.status !== 0 || result.signal) {
       const code = result.status ?? 1;
       console.error(
         JSON.stringify({
@@ -61,6 +62,7 @@ export function runJob(jobId, extraArgs = [], opts = {}) {
           job: job.id,
           script: rel,
           exitCode: code,
+          signal: result.signal || null,
           at: new Date().toISOString(),
         }),
       );

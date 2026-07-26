@@ -156,8 +156,13 @@ function runFullSyncPipeline() {
       stdio: "inherit",
       windowsHide: true,
     });
-    if (result.status) {
-      process.exit(result.status);
+    // OOM/SIGABRT → status=null + signal set; treat as failure (was masking false SUCCESS).
+    if (result.error || result.status || result.signal) {
+      const code = result.status ?? 1;
+      if (result.signal) {
+        console.error(`[tc-sync] ${script} killed by signal ${result.signal}`);
+      }
+      process.exit(code);
     }
   }
 }

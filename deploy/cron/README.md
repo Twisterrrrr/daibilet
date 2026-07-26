@@ -33,10 +33,12 @@ systemctl list-timers | grep tc-catalog
 |---------|-------|
 | Schedule | nightly 03:20 |
 | Isolation | flock + nice 15 + ionice best-effort |
-| Memory | MemoryHigh 700M / MemoryMax 900M (systemd) |
+| Memory | MemoryHigh 1600M / MemoryMax 2000M (systemd); `NODE_OPTIONS=--max-old-space-size=1536` (catalog JSON ~245MB) |
+| Script | **must be executable** (`chmod +x deploy/cron/tc-catalog-sync.sh`) - иначе timer `203/EXEC` |
 | Post-sync | light Next revalidate + light API warm (`TC_CATALOG_SYNC_FULL_WARM=0`) |
 | Full warm | set `TC_CATALOG_SYNC_FULL_WARM=1` in service drop-in if needed |
 | Log | `/var/log/daibilet/tc-catalog-sync.log` |
+| Verify | после run ищи `importedEvents` в логе; fetch-only + OOM + `worker.job.done exitCode:0` = баг (fixed fail-on-signal) |
 
 ## Prod: Ticketscloud orders-only (обязательно для зеркала заказов)
 
