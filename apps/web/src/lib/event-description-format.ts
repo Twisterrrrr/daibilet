@@ -79,6 +79,21 @@ export function stripListItemPrefix(line: string): string {
   return String(line || '').trim().replace(LIST_ITEM_PREFIX_RE, '').trim();
 }
 
+/**
+ * Partner feeds (esp. Teplohod) often emit landmark/enum lines without `-`/`•` markers.
+ * Short lines without sentence punctuation, after soft-wrap join, are enumeration candidates.
+ */
+export function isPlainEnumerationLine(line: string): boolean {
+  const text = String(line || '').trim();
+  if (!text) return false;
+  if (isListItemLine(text)) return false;
+  if (text.length > 80) return false;
+  if (/[.!?…]$/u.test(text)) return false;
+  if (/:$/u.test(text)) return false;
+  if (isDescriptionSectionHeading(text)) return false;
+  return true;
+}
+
 export function parseInlineListAfterColon(line: string): { intro: string; items: string[] } | null {
   const text = String(line || '').trim();
   const match = text.match(INLINE_LIST_AFTER_COLON_RE);
@@ -124,7 +139,12 @@ function pushIntroBeforeList(blocks: EventDescriptionBlock[], intro: string) {
 
 /**
  * Parse plain-text event description into paragraphs, section headings and lists.
- * Recognizes line bullets (✅ / • / - / –) and inline "Label: - a - b" forms.
+ * Recognizes line bullets (✅ / • / - / –), marker-less enumeration runs, and
+ * inline "Label: - a - b" forms.
+ *
+ * Important: after soft-wrap join, remaining newlines are structural. Do NOT
+ * merge consecutive lines via cleanDisplayText - that collapses Teplohod-style
+ * landmark lists and paragraph breaks into a single wall of text.
  */
 export function parseEventDescriptionBlocks(text: string): EventDescriptionBlock[] {
   const normalized = joinSoftWrappedLines(String(text || '').replace(/\r\n?/g, '\n')).trim();
@@ -157,6 +177,24 @@ export function parseEventDescriptionBlocks(text: string): EventDescriptionBlock
       continue;
     }
 
+    if (isPlainEnumerationLine(line)) {
+      const items: string[] = [];
+      let j = i;
+      while (j < lines.length) {
+        const current = lines[j].trim();
+        if (!current) break;
+        if (isListItemLine(current)) break;
+        if (!isPlainEnumerationLine(current)) break;
+        items.push(current);
+        j += 1;
+      }
+      if (items.length >= 2) {
+        blocks.push({ type: 'list', items });
+        i = j;
+        continue;
+      }
+    }
+
     const inline = parseInlineListAfterColon(line);
     if (inline) {
       pushIntroBeforeList(blocks, inline.intro);
@@ -165,30 +203,8 @@ export function parseEventDescriptionBlocks(text: string): EventDescriptionBlock
       continue;
     }
 
-    const paraLines: string[] = [];
-    while (i < lines.length) {
-      const current = lines[i].trim();
-      if (!current) {
-        i += 1;
-        break;
-      }
-      if (isListItemLine(current)) break;
-      if (parseInlineListAfterColon(current)) break;
-      paraLines.push(current);
-      i += 1;
-    }
-
-    const joined = cleanDisplayText(paraLines.join('\n'));
-    if (!joined) continue;
-
-    const joinedInline = parseInlineListAfterColon(joined);
-    if (joinedInline) {
-      pushIntroBeforeList(blocks, joinedInline.intro);
-      blocks.push({ type: 'list', items: joinedInline.items });
-      continue;
-    }
-
-    pushParagraphOrHeading(blocks, joined);
+    pushParagraphOrHeading(blocks, line);
+    i += 1;
   }
 
   return blocks;

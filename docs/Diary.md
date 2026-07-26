@@ -1,3 +1,24 @@
+## 2026-07-26 - Event description: wall-of-text regression
+
+### Наблюдения
+
+- Owner: описания событий снова «простыня» - нет H3/UL/абзацев. Эталон: `kremlevskaya-obzornaya-rechnaya-progulka-po-centru-moskvy-ot-prichala-novospasskii-most-1112`.
+- Фича списков была в `18e5f8f` (`formatEventDescriptionHtml`), но `parseEventDescriptionBlocks` после soft-wrap **склеивал все подряд идущие non-bullet строки** через `cleanDisplayText` → один `<p>`.
+- Teplohod отдаёт landmark-списки **без** маркеров `-`/`•`/`✅` - только короткие строки после двоеточия; старый пайплайн их не видел как UL.
+- Не путать с параллельным buy-card агентом (цены/trust footer).
+
+### Решения
+
+- Не мержить consecutive lines в один paragraph: после soft-wrap каждая структурная строка = block.
+- `isPlainEnumerationLine`: 2+ коротких строк без `.!?` → `<ul><li>`; H3/маркерные списки/sanitize HTML path без изменений.
+- Тесты: Kremlin-sample + section headings; XSS sanitize сохранён.
+
+### Проблемы
+
+- Нужен commit + deploy-prod-next; smoke URL выше на `<ul>`/`<p>` (не wall-of-text).
+
+---
+
 ## 2026-07-26 - Home hero: tourist emotions (не landmarks)
 
 ### Наблюдения

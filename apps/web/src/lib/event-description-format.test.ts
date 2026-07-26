@@ -72,3 +72,43 @@ test('existing HTML is sanitized and not re-parsed into lists', () => {
   const withScript = '<p>Ok</p><script>alert(1)</script><ul><li>A</li></ul>';
   assert.equal(formatEventDescriptionHtml(withScript), '<p>Ok</p><ul><li>A</li></ul>');
 });
+
+/** Teplohod-style: landmark lines without bullet markers + paragraph breaks via single newlines. */
+const KREMLIN_CRUISE_SAMPLE = `Обзорная речная прогулка от Новоспасского моста – это не просто способ увидеть Москву. За 2 час 30 минут прогулки вы сможете дважды увидеть лучшие достопримечательности Москвы:
+ Парящий мост парка Зарядье
+ Московский Кремль
+ Собор Василия Блаженного
+ Храм Христа Спасителя
+ Памятник Петру Первому
+ ЦПКиО им. Горького
+ Московский Дом Музыки
+ Прогулка на теплоходе позволит вам увидеть множество известных достопримечательностей Москвы.
+ Для вашего удобства предлагается два варианта билетов - с вкуснейшим ланчем и без питания.
+ Время в пути кругового маршрута составляет 2 часа 30 минут.`;
+
+test('marker-less landmark lines become ul/li and paragraphs stay split', () => {
+  const blocks = parseEventDescriptionBlocks(KREMLIN_CRUISE_SAMPLE);
+  assert.equal(blocks[0]?.type, 'paragraph');
+  assert.match((blocks[0] as { text: string }).text, /достопримечательности Москвы:$/);
+  assert.equal(blocks[1]?.type, 'list');
+  assert.equal((blocks[1] as { items: string[] }).items.length, 7);
+  assert.equal((blocks[1] as { items: string[] }).items[0], 'Парящий мост парка Зарядье');
+  assert.equal((blocks[1] as { items: string[] }).items[6], 'Московский Дом Музыки');
+  assert.equal(blocks[2]?.type, 'paragraph');
+  assert.match((blocks[2] as { text: string }).text, /Прогулка на теплоходе/);
+  assert.equal(blocks[3]?.type, 'paragraph');
+  assert.equal(blocks[4]?.type, 'paragraph');
+
+  const html = formatEventDescriptionHtml(KREMLIN_CRUISE_SAMPLE);
+  assert.match(html, /<ul><li>Парящий мост парка Зарядье<\/li>/);
+  assert.match(html, /<li>Московский Кремль<\/li>/);
+  assert.equal((html.match(/<p>/g) || []).length, 4);
+  assert.doesNotMatch(html, /Москвы: Парящий/);
+});
+
+test('section headings render as h3', () => {
+  const html = formatEventDescriptionHtml('Программа\nПервый абзац про маршрут.\nВключено\n- аудиогид\n- ланч');
+  assert.match(html, /<h3>Программа<\/h3>/);
+  assert.match(html, /<h3>Включено<\/h3>/);
+  assert.match(html, /<ul><li>аудиогид<\/li><li>ланч<\/li><\/ul>/);
+});
