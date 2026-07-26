@@ -193,7 +193,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
         </>
       )}
 
-      <div className="mt-5 flex items-center gap-2 rounded-xl bg-surface-muted px-3 py-2.5">
+      <div className="mt-5 flex items-center justify-center gap-2 rounded-xl bg-surface-muted px-3 py-2.5 text-center">
         <Shield className="h-4 w-4 shrink-0 text-graphite-muted" strokeWidth={1.75} />
         <span className="text-xs text-graphite-muted">
           Безопасная покупка через виджет
