@@ -1,3 +1,26 @@
+## 2026-07-27 - Prod 404: Былинный Берег (past event + search)
+
+### Наблюдения
+
+- URL `/events/tc-6a08d60c3aa2e7a8469953dc-былинныи-берег-2026` (и latin/short варианты) → HTTP 404.
+- В prod DB событие есть: `evt_6a08d60c3aa2e7a8469953dc`, status `READY`, slug с кириллицей `былинныи` (без й).
+- Session: `2026-07-24 06:00` → `2026-07-25 21:00` (UTC). Сегодня 2026-07-27 → прошло.
+- `buildPublicEventDto` → `isSaleableEventForPublic` false → `null` → Next `notFound()`. Это не slug/encoding bug.
+- Каталог `/api/public/events?q=былинный` уже не отдаёт past; header search `/api/public/search` отдавал мёртвую ссылку.
+- Блог `fentezi-fest-bylinnyy-bereg` ≠ TC event; Fantasy Fest (`6a0a1d4d…`) жив (200).
+
+### Решения
+
+- Search: фильтр upcoming/saleable session в `public-search.dto.ts` (align с gate страницы).
+- Blog: убрать deep-link на прошедший Былинный берег, вести на Fantasy Fest (latin slug).
+- Архив past-event page вместо 404 - решение owner (сейчас by design).
+
+### Проблемы
+
+- SEO soft-404 для `isIndexable` past events остаётся, пока нет archive mode.
+
+---
+
 ## 2026-07-27 - Fix: 2ГИС route URL (directions)
 
 ### Наблюдения

@@ -329,6 +329,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | PERF.1 | Prisma singleton `globalThis` + shared pg Pool (`@daibilet/db`) | Критический | ✅ `6ce435a` |
 | PERF.2 | Lean catalog DTOs + `unstable_cache` 600s для podborki/venues/locations (Redis follow-up) | Высокий | ✅ partial; landings rule-match sessions ещё в DTO |
 | PERF.3 | Header search: pg_trgm + synonyms (Meilisearch P2) | Высокий | ✅ `125feab` |
+| PERF.3b | Header search: не отдавать past/non-saleable events (404 trap) | Критический | ✅ 2026-07-27 |
 | PERF.4 | Meilisearch / full-text service | Средний | ⚠️ P2 deferred |
 | PERF.5 | Unify legacy `createDb` Pool with Prisma shared Pool | Средний | ⏳ |
 | H.6b | `/locations` pin map: flat `{id,lat,lng}` + map-tip API | Высокий | ⚠️ API оставлен; UI → `RussiaMap` до реальной карты |

@@ -179,6 +179,10 @@ export async function buildPublicSearchDto(
   };
 }
 
+/**
+ * Align header search with `/events/[slug]` saleable gate (`hasUpcomingOrOpenSchedule`):
+ * past / wide-lifetime-only rows must not deep-link to pages that return null → 404.
+ */
 async function searchEventsTrgm(
   term: string,
   like: string,
@@ -187,6 +191,7 @@ async function searchEventsTrgm(
 ): Promise<TrgmRow[]> {
   try {
     if (cityFilter && cityFilter !== 'all') {
+      const cityLike = `%${cityFilter}%`;
       return await prisma.$queryRaw<TrgmRow[]>`
         select
           e.id,
@@ -203,6 +208,22 @@ async function searchEventsTrgm(
         left join "City" c on c.id = e."primaryCityId"
         left join "Venue" v on v.id = e."venueId"
         where e.status not in ('HIDDEN', 'DRAFT')
+          and exists (
+            select 1
+            from "EventSession" s
+            where s."eventId" = e.id
+              and (
+                e.kind = 'OPEN_DATE'
+                or lower(coalesce(s."sourceStatus", '')) in ('open_date', 'widget')
+                or s."startsAt" >= now() - interval '15 minutes'
+                or (
+                  s."startsAt" < now()
+                  and s."endsAt" is not null
+                  and s."endsAt" >= now()
+                  and s."endsAt" - s."startsAt" <= interval '36 hours'
+                )
+              )
+          )
           and (
             lower(e.title) % ${term}
             or lower(e.title) like ${like}
@@ -210,7 +231,7 @@ async function searchEventsTrgm(
           and (
             lower(coalesce(c.title, '')) = ${cityFilter}
             or lower(coalesce(c.slug, '')) = ${cityFilter}
-            or lower(coalesce(c.title, '')) like ${'%' + cityFilter + '%'}
+            or lower(coalesce(c.title, '')) like ${cityLike}
           )
         order by score desc, e.title asc
         limit ${limit}
@@ -233,6 +254,22 @@ async function searchEventsTrgm(
       left join "City" c on c.id = e."primaryCityId"
       left join "Venue" v on v.id = e."venueId"
       where e.status not in ('HIDDEN', 'DRAFT')
+        and exists (
+          select 1
+          from "EventSession" s
+          where s."eventId" = e.id
+            and (
+              e.kind = 'OPEN_DATE'
+              or lower(coalesce(s."sourceStatus", '')) in ('open_date', 'widget')
+              or s."startsAt" >= now() - interval '15 minutes'
+              or (
+                s."startsAt" < now()
+                and s."endsAt" is not null
+                and s."endsAt" >= now()
+                and s."endsAt" - s."startsAt" <= interval '36 hours'
+              )
+            )
+        )
         and (
           lower(e.title) % ${term}
           or lower(e.title) like ${like}
@@ -251,10 +288,32 @@ async function searchEventsIlikeFallback(
   cityFilter: string,
   limit: number,
 ): Promise<TrgmRow[]> {
+  const now = new Date();
+  const grace = new Date(now.getTime() - 15 * 60 * 1000);
   const rows = await prisma.event.findMany({
     where: {
       status: { notIn: ['HIDDEN', 'DRAFT'] },
       title: { contains: like.replace(/%/g, ''), mode: 'insensitive' },
+      OR: [
+        { kind: 'OPEN_DATE' },
+        {
+          sessions: {
+            some: {
+              OR: [
+                { sourceStatus: { equals: 'open_date', mode: 'insensitive' } },
+                { sourceStatus: { equals: 'widget', mode: 'insensitive' } },
+                { startsAt: { gte: grace } },
+                {
+                  AND: [
+                    { startsAt: { lt: now } },
+                    { endsAt: { gte: now } },
+                  ],
+                },
+              ],
+            },
+          },
+        },
+      ],
       ...(cityFilter && cityFilter !== 'all'
         ? {
             primaryCity: {
@@ -272,13 +331,41 @@ async function searchEventsIlikeFallback(
       slug: true,
       title: true,
       imageUrl: true,
+      kind: true,
       primaryCity: { select: { title: true } },
       venue: { select: { title: true } },
+      sessions: {
+        select: { startsAt: true, endsAt: true, sourceStatus: true },
+        take: 8,
+      },
     },
-    take: limit,
+    take: Math.max(limit * 3, 12),
     orderBy: { title: 'asc' },
   });
-  return rows.map((row: {
+  const saleable = rows.filter((row: {
+    kind: string;
+    sessions: Array<{ startsAt: Date | null; endsAt: Date | null; sourceStatus: string | null }>;
+  }) => {
+    if (String(row.kind).toUpperCase() === 'OPEN_DATE') return true;
+    return row.sessions.some((session) => {
+      const status = String(session.sourceStatus || '').toLowerCase();
+      if (status === 'open_date' || status === 'widget') return true;
+      const startsAt = session.startsAt ? session.startsAt.getTime() : NaN;
+      const endsAt = session.endsAt ? session.endsAt.getTime() : NaN;
+      if (Number.isFinite(startsAt) && startsAt >= grace.getTime()) return true;
+      if (
+        Number.isFinite(startsAt) &&
+        Number.isFinite(endsAt) &&
+        startsAt < now.getTime() &&
+        endsAt >= now.getTime() &&
+        endsAt - startsAt <= 36 * 60 * 60 * 1000
+      ) {
+        return true;
+      }
+      return false;
+    });
+  });
+  return saleable.slice(0, limit).map((row: {
     id: string;
     slug: string;
     title: string;
