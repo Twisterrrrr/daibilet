@@ -53,7 +53,7 @@ export async function revalidateNextBlogArticle({
   }
 
   return revalidateNextPaths({
-    tags: ['articles'],
+    tags: ['articles', 'blog-page'],
     paths: [...paths],
     reason,
   });

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 import { BlogFeaturedHero } from '@/components/BlogFeaturedHero';
 import { BlogListFiltered } from '@/components/BlogListFiltered.client';
@@ -41,10 +42,7 @@ export function BlogListView({
 
   return (
     <SiteLayout>
-      <BlogListHero
-        breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Блог' }]}
-        guidesCount={posts.length}
-      />
+      <BlogListHero breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Блог' }]} />
 
       {/* div, not nested <main>: SiteLayout already wraps children in <main> */}
       <div className="container-page py-10 sm:py-14">
@@ -59,7 +57,20 @@ export function BlogListView({
           />
         ) : null}
 
-        <BlogListFiltered posts={feed} initialFilters={filters} />
+        <Suspense
+          fallback={
+            <div className="space-y-4">
+              <div className="h-10 w-full max-w-xl animate-pulse rounded-xl bg-slate-200" />
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index} className="h-64 animate-pulse rounded-2xl bg-slate-200" />
+                ))}
+              </div>
+            </div>
+          }
+        >
+          <BlogListFiltered posts={feed} initialFilters={filters} />
+        </Suspense>
 
         <p className="mt-12 text-sm text-slate-500">
           Новые материалы выходят каждую неделю. А готовые списки событий - в{' '}

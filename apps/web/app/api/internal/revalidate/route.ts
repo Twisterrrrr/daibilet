@@ -2,7 +2,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
 
 import { notifyIndexNowForPaths } from '@/lib/indexnow';
-import { HOME_PAGE_CACHE_TAG } from '@/server/cache-config';
+import { BLOG_PAGE_CACHE_TAG, HOME_PAGE_CACHE_TAG } from '@/server/cache-config';
 import {
   clearPublicArticlesDtoCache,
   clearPublicEventDtoCache,
