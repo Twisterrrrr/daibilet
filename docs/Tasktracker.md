@@ -26,8 +26,10 @@
 | PERF.L1 | Landings ISR: убрать `await searchParams` в `[segment]`/`[segment2]`/`[segment3]`; genre с URL на клиенте | Критический | ✅ `c433652` prod (`s-maxage=3600` + HIT) |
 | PERF.L2 | `publicCatalogSessions` SWR (fresh 5м / stale 30м + soft-invalidate), зеркало TS DTO | Критический | ✅ `c433652` prod |
 | PERF.L3 | Slim SSR: fallback `buildPublicLandingPage` → lean cards + slice 48 (как managed) | Высокий | ✅ `c433652`; `/rechnye-progulki` ~231KB (было ~705KB) |
-| PERF.L4 | `/events` generateMetadata без searchParams (SEO tradeoff vs ISR) | Средний | ⚠️ deferred; body уже без await; warm audit: всё ещё `private, no-store`, TTFB ~0.3с |
+| PERF.L4 | `/events` generateMetadata без searchParams (SEO tradeoff vs ISR) | Средний | ✅ metadata без `await searchParams`; канон `/events` |
 | PERF.L5 | `/progulki-po-krysham` warm всегда `x-nextjs-cache: MISS` при s-maxage=3600 | Низкий | ⏳ anomaly (TTFB OK ~0.12с) |
+| PERF.E1 | `/events/[slug]` ISR: `generateStaticParams([])` + `unstable_cache` DTO/rating; shared metadata+page | Критический | 🔄 ship |
+| PERF.D1 | Deploy: reap orphan `jest-worker` / leftover `next build` (PPID=1, cwd under `/opt/daibilet`) | Критический | 🔄 ship |
 
 ---
 

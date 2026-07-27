@@ -14,19 +14,30 @@ import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { buildEventListingMeta, buildEventPageMetaTitle } from '@/lib/seo-event-meta';
 import { buildEventPageJsonLd } from '@/lib/structured-data';
 import { pickRepresentativeSession } from '@/lib/event-purchase';
-import { buildPublicEventDto } from '@daibilet/backend/public-read';
-import { prisma } from '@/lib/db';
-import { shouldEmitAggregateRating } from '@/lib/review-rating';
+import {
+  getCachedEventAggregateRating,
+  getCachedPublicEventDto,
+} from '@/server/cached-event-data';
 
 export const revalidate = 300;
+/** Allow on-demand ISR for slugs not prebuilt (empty generateStaticParams). */
+export const dynamicParams = true;
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
+/**
+ * Empty list: do not SSG thousands of events at build (OOM on 3.8Gi).
+ * Combined with revalidate + unstable_cache → first request fills Full Route Cache.
+ */
+export function generateStaticParams() {
+  return [] as Array<{ slug: string }>;
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const payload = await buildPublicEventDto(decodeURIComponent(slug));
+  const payload = await getCachedPublicEventDto(slug);
   if (!payload?.event) return { title: pageTitle('Событие не найдено') };
 
   const event = payload.event;
@@ -75,30 +86,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function EventDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const payload = await buildPublicEventDto(decodeURIComponent(slug));
+  const payload = await getCachedPublicEventDto(slug);
   if (!payload?.event) notFound();
 
   const { event, related } = payload;
   const clientPayload = toEventPageClientPayload(payload);
-
-  let aggregate: { ratingValue: number; reviewCount: number } | null = null;
-  try {
-    const approved = await prisma.review.findMany({
-      where: { eventId: event.id, status: 'APPROVED' },
-      select: { rating: true },
-    });
-    const reviewCount = approved.length;
-    const avgRating =
-      reviewCount > 0
-        ? Math.round((approved.reduce((sum, row) => sum + row.rating, 0) / reviewCount) * 10) / 10
-        : 0;
-    if (shouldEmitAggregateRating(reviewCount, avgRating)) {
-      aggregate = { ratingValue: avgRating, reviewCount };
-    }
-  } catch {
-    // Migration not applied yet / DB unavailable — keep Event JSON-LD without AggregateRating.
-  }
-
+  const aggregate = await getCachedEventAggregateRating(event.id);
   const jsonLdBlocks = buildEventPageJsonLd(payload, { aggregateRating: aggregate });
 
   return (

@@ -10,6 +10,9 @@ export const HOME_PAGE_CACHE_TAG = 'home-page';
 /** `unstable_cache` tag for /events catalog SSR + API slices. */
 export const CATALOG_PAGE_CACHE_TAG = 'catalog-page';
 
+/** `unstable_cache` tag for /events/[slug] DTO + aggregate rating. */
+export const EVENT_PAGE_CACHE_TAG = 'event-page';
+
 /** Shared Cache-Control for CDN/nginx and browser. */
 export const PUBLIC_CACHE_CONTROL = 'public, s-maxage=300, stale-while-revalidate=600';
 

@@ -85,6 +85,59 @@ pnpm db:deploy
 # F4.6: do not build/rsync Vite admin to /legacy. Code may remain in monorepo.
 echo "Skipping Vite admin build/deploy (F4.6 hard-retire /legacy)"
 
+# Reap orphan next-build / jest-worker processes left by aborted deploys (PPID=1).
+# Safe: only kill when cwd is under APP_DIR (or cmdline clearly daibilet web build).
+reap_orphan_next_build_workers() {
+  local phase="${1:-}"
+  local killed=0
+  local pid ppid cwd cmd
+  echo "Reap orphan next-build workers (${phase}) under ${APP_DIR}..."
+  while read -r pid ppid cmd; do
+    [[ -n "${pid:-}" ]] || continue
+    [[ "${ppid}" == "1" ]] || continue
+    case " ${cmd} " in
+      *'jest-worker'*|*'next/dist/build'*|*'next build'*|*'pnpm'*'web:build'*|*'npm'*'web:build'*) ;;
+      *) continue ;;
+    esac
+    cwd="$(readlink -f "/proc/${pid}/cwd" 2>/dev/null || true)"
+    if [[ -n "${cwd}" ]]; then
+      case "${cwd}" in
+        "${APP_DIR}"|"${APP_DIR}"/*) ;;
+        *) continue ;;
+      esac
+    else
+      # No /proc cwd (rare) — require daibilet path in cmdline.
+      case " ${cmd} " in
+        *'/opt/daibilet'*|*'apps/web'*) ;;
+        *) continue ;;
+      esac
+    fi
+    echo "  kill orphan pid=${pid} ppid=${ppid} cmd=${cmd}"
+    kill "${pid}" 2>/dev/null || true
+    killed=$((killed + 1))
+  done < <(ps -eo pid=,ppid=,args= 2>/dev/null || true)
+  # Give workers a moment, then SIGKILL leftovers matching same filter.
+  if [[ "${killed}" -gt 0 ]]; then
+    sleep 2
+    while read -r pid ppid cmd; do
+      [[ -n "${pid:-}" ]] || continue
+      [[ "${ppid}" == "1" ]] || continue
+      case " ${cmd} " in
+        *'jest-worker'*|*'next/dist/build'*|*'next build'*) ;;
+        *) continue ;;
+      esac
+      cwd="$(readlink -f "/proc/${pid}/cwd" 2>/dev/null || true)"
+      case "${cwd}" in
+        "${APP_DIR}"|"${APP_DIR}"/*) ;;
+        *) continue ;;
+      esac
+      echo "  SIGKILL leftover pid=${pid}"
+      kill -9 "${pid}" 2>/dev/null || true
+    done < <(ps -eo pid=,ppid=,args= 2>/dev/null || true)
+  fi
+  echo "Reap done (${phase}): signaled ${killed} orphan(s)"
+}
+
 # Stop web BEFORE build. In-place `next build` rewrites apps/web/.next while
 # `next start` is still up → clients see 400/ChunkLoadError on /_next/static
 # (CSS + cities/%5Bslug%5D/page-*.js) until restart finishes.
@@ -93,7 +146,11 @@ if systemctl is-active --quiet "$WEB_SERVICE" 2>/dev/null; then
   echo "Stopped $WEB_SERVICE before web:build (avoid mid-build static 400s)"
 fi
 
+reap_orphan_next_build_workers "pre-build"
+
 pnpm web:build
+
+reap_orphan_next_build_workers "post-build"
 
 rm -rf apps/web/.next/cache
 echo "Cleared apps/web/.next/cache"
@@ -172,7 +229,7 @@ if [[ -n "$REVALIDATE_SECRET" ]]; then
   curl -fsS -X POST "http://127.0.0.1:${WEB_PORT}/api/internal/revalidate" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${REVALIDATE_SECRET}" \
-    -d '{"tags":["home-page","catalog-page"],"paths":["/","/events","/cities/sankt-peterburg","/cities/moscow","/rechnye-progulki","/avtobusnye-ekskursii","/api/public/stats"]}' \
+    -d '{"tags":["home-page","catalog-page","event-page"],"paths":["/","/events","/cities/sankt-peterburg","/cities/moscow","/rechnye-progulki","/avtobusnye-ekskursii","/api/public/stats"]}' \
     && echo "Post-deploy revalidate OK" \
     || echo "Warning: post-deploy revalidate failed"
 

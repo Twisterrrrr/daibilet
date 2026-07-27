@@ -11,18 +11,12 @@ import { getCachedCatalog } from '@/server/cached-catalog-data';
 const EVENTS_SUPPORT =
   'Официальные билеты на экскурсии, концерты и музеи более чем в 100 городах России.';
 
-type PageProps = {
-  searchParams: Promise<Record<string, string | string[] | undefined>>;
-};
-
 /**
- * Metadata читает searchParams (лёгкий путь).
- * Тело страницы searchParams не ждёт: каталог по фильтрам остаётся client refetch,
- * чтобы не возвращать тяжёлый SSR filtered catalog (см. bf97706).
+ * PERF.L4: do not await searchParams in metadata - forces private, no-store on `/events`.
+ * Filtered titles stay client/UX-only; canonical SEO is unfiltered `/events`.
  */
-export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
-  const raw = await searchParams;
-  return buildEventsCatalogMetadata(raw || {});
+export async function generateMetadata(): Promise<Metadata> {
+  return buildEventsCatalogMetadata({});
 }
 
 export const revalidate = 300;

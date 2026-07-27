@@ -5,7 +5,7 @@ import { revalidateNextPaths } from './revalidate-next-blog.js';
  */
 export async function revalidateNextHome(reason = 'manual') {
   return revalidateNextPaths({
-    tags: ['home-page', 'catalog-page'],
+    tags: ['home-page', 'catalog-page', 'event-page'],
     paths: [
       '/',
       '/events',

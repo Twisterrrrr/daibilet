@@ -1,3 +1,50 @@
+## 2026-07-27 - Event page ISR + deploy orphan jest-worker reap
+
+### Наблюдения
+
+- `/events/[slug]` имел `revalidate=300`, но без `generateStaticParams` и без Next Data Cache на Prisma DTO → cold SSR + `Cache-Control: private, no-store` (нет `x-nextjs-cache`).
+- Metadata и page вызывали `buildPublicEventDto` дважды; page ещё ходил в `prisma.review` без cache.
+- `/events` list: `generateMetadata` ждал `searchParams` → no-store (PERF.L4).
+- Orphan `jest-worker` (PPID=1) от aborted `next build` жгли CPU/RAM часами.
+
+### Решения
+
+- PERF.E1: `generateStaticParams() => []` + `dynamicParams=true`; `getCachedPublicEventDto` / `getCachedEventAggregateRating` через `unstable_cache` (tag `event-page`, 300s); общий helper для metadata+page.
+- PERF.L4: metadata `/events` без `await searchParams` (канон unfiltered).
+- PERF.D1: `deploy-prod-next.sh` reap orphan jest-worker/next-build с PPID=1 и cwd under `/opt/daibilet` до/после `web:build`.
+- Revalidate: tag `event-page` + `clearPublicEventDtoCache` в internal revalidate.
+
+### Проблемы
+
+- Smoke Cache-Control / HIT / orphan ps после exclusive deploy.
+
+---
+
+## 2026-07-27 - Prod latency: orphan next-build workers + event no-store (RAM 8GB?)
+
+### Наблюдения
+
+- Owner: «очень долгий ответ» даже на `/events/[slug]`. Вопрос: апгрейд до 8GB?
+- **Box:** 2 vCPU / **3.8Gi** RAM, swap 2G+4G. В момент аудита: used ~3.0Gi, **available ~0.5Gi**, swap used **1.3–1.4Gi**, load 2.8–3.4, `vmstat` si ~0.9–1.5 MB/s (thrashing), idle ~0%.
+- **RSS:** `next-server` ~840–970Mi; `daibilet-api` (server-entry) ~350–630Mi; **два orphan `jest-worker` (PPID=1)** с `npm_lifecycle_event=build`, cwd=`apps/web`, живые **>25ч** с Jul 26 06:52/06:56: **~91% CPU каждый**, RSS **~700Mi + ~565Mi**.
+- OOM за ~30д: **112** `Out of memory: Killed` (пики Jul 12–13 и cascade Jul 18: next-server и api). `oom-watch.sh` крутится каждые 5 мин.
+- **TTFB (до kill):** `/` HIT s-maxage=300 ~0.14с; landing ISR ok; **event cold 1.5–2.6с**, warm 0.17–0.30с; везде на events **`Cache-Control: private, no-store`** (нет `x-nextjs-cache`). `/events` list тоже no-store (`generateMetadata` + `searchParams`).
+- Код: `events/[slug]` имеет `revalidate=300`, но **нет `generateStaticParams`**, DTO/prisma без `unstable_cache` → фактический **dynamic SSR**. `buildPublicEventDto` дважды (metadata+page), in-process Map 5 мин; cold тянет `getPublicCatalogSessions()`.
+- **После `kill` orphan workers:** available **~1.8–2.0Gi**, swap used ~0.6Gi, idle **100%**, warm event TTFB **~0.15–0.19с**. no-store на events остаётся.
+
+### Решения
+
+- Немедленный ops-fix: убить orphan jest-worker от оборванного `next build` (не деплой). Deploy должен reap child workers / не оставлять build PPID=1.
+- Вердикт **8GB:** **YES, но не first step и не вместо ISR.** Steady-state после чистки на 3.8Gi терпим (~2Gi available); **8GB WHEN** нужны concurrent TC import/build без stop-web и чтобы убрать хронические OOM (112/мес). Больше swap alone не лечит CPU thrash.
+- Альтернативы/приоритет: (1) reap orphan build + exclusive deploy flock; (2) ISR/`unstable_cache` для event detail + убрать searchParams из metadata `/events` или смириться с list no-store; (3) не гонять full TC sync днём рядом с web; (4) отдельный API/worker host позже; (5) апгрейд RAM как capacity insurance.
+
+### Проблемы
+
+- Event pages структурно без CDN/ISR HIT → каждый cold slug = тяжёлый SSR; под CPU pressure это секунды.
+- Повтор orphan workers при следующем mid-deploy kill снова съест box.
+
+---
+
 ## 2026-07-27 - TEP purchase shell: false fail over open Fancybox
 
 ### Наблюдения

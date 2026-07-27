@@ -3,7 +3,10 @@ import { NextResponse } from 'next/server';
 
 import { notifyIndexNowForPaths } from '@/lib/indexnow';
 import { HOME_PAGE_CACHE_TAG } from '@/server/cache-config';
-import { clearPublicArticlesDtoCache } from '@daibilet/backend/public-read';
+import {
+  clearPublicArticlesDtoCache,
+  clearPublicEventDtoCache,
+} from '@daibilet/backend/public-read';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,9 +39,14 @@ export async function POST(request: Request) {
     body = {};
   }
 
-  // Next SSR keeps its own in-memory article DTO cache - clear on every revalidate.
+  // Next SSR keeps its own in-memory DTO caches - clear on every revalidate.
   try {
     clearPublicArticlesDtoCache();
+  } catch {
+    /* ignore if module unavailable in this runtime */
+  }
+  try {
+    clearPublicEventDtoCache();
   } catch {
     /* ignore if module unavailable in this runtime */
   }
