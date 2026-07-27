@@ -1,3 +1,24 @@
+## 2026-07-27 - Blog: снять open-air с Hero, перепрошить Макса (Акунин)
+
+### Наблюдения
+
+- Owner: колонка `open-air-festy-vyhodnoi-ru` («ужас какой») - сленг Птушкина/Perito не зашёл; нужна другая статья в Blog Hero и литературный register Макса (в духе Акунина).
+
+### Решения
+
+- `open-air-festy-vyhodnoi-ru` → `status: HIDDEN` (MD + migration upsert).
+- Blog Hero (`isFeatured`) → `fentezi-fest-bylinnyy-bereg` (фесты на выходные, cover + inline, longform).
+- Полный rewrite `fentezi-fest-bylinnyy-bereg.md`: изящная проза, «вы», без сленга и штампов.
+- `01-max.md` + `personas.json`: прототип Борис Акунин вместо Птушкина; убраны канон «Хей, читатели!» / «Мир лучше видеть…».
+- Migration `20260727120000_blog_featured_fentezi`: isFeatured swap + HIDDEN open-air.
+- Исправлены карточки `blog-posts.ts` (web+public) для fentezi (были чужие title/excerpt).
+
+### Проблемы
+
+- Commit → deploy-prod-next → migrate → `blog:upsert` ×2 slug + revalidate `/blog`.
+
+---
+
 ## 2026-07-27 - Event description: TC comma lists and section headings
 
 ### Наблюдения

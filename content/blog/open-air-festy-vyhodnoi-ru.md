@@ -10,7 +10,7 @@ author: Макс
 column: "Изнанка маршрута"
 persona: Макс
 articleType: column
-style_prototypes: Антон Птушкин
+style_prototypes: Борис Акунин
 disclaimer: "Вымышленный автор колонки Дайбилет; стиль письма вдохновлён публичными образцами, не impersonation."
 citySlug: saint-petersburg
 tag: Колонка
@@ -19,7 +19,7 @@ readMin: 2
 imageAlt: "Open-air фестиваль песчаных скульптур под летним солнцем"
 coverImageUrl: "/images/blog/open-air-festy-vyhodnoi-ru.jpg"
 publishedAt: "2026-07-27T10:35:00+03:00"
-status: PUBLISHED
+status: HIDDEN
 ---
 
 Эй, кто на маршруте! Утро выходного - и ты уже не в метро, а на открытой площадке: песок под кроссовками, солнце в лоб, кофе навынос и очередь у входа. Пахнет пылью и летом. Это open-air. Не зал с кондиционером - воздух, ноги в движении и ощущение, что день точно не зря.

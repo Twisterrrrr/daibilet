@@ -1,6 +1,6 @@
 {
-  "version": 2,
-  "updatedAt": "2026-07-19",
+  "version": 3,
+  "updatedAt": "2026-07-27",
   "disclaimer": "Вымышленные авторы колонок-статей Дайбилет (текст, не аудио). Стиль письма / register вдохновлён публичными образцами (style_prototypes); не impersonation.",
   "cmsNote": {
     "articleHasAuthorField": true,
@@ -8,7 +8,7 @@
     "fields": ["authorId", "authorName", "articleType"],
     "publicFilters": ["city", "author"],
     "greetingCanon": {
-      "max": "Хей, читатели!"
+      "max": "без фиксированного приветствия - вход через сцену или наблюдение"
     }
   },
   "personas": [
@@ -18,15 +18,15 @@
       "column": "Изнанка маршрута",
       "role": "budget-active-travel",
       "doc": "01-max.md",
-      "register": "разговорный, короткие предложения, сленг, цены",
-      "address": "ty-folk",
+      "register": "изящная литературная проза, лёгкая ирония, точная лексика",
+      "address": "vy",
       "ctaTone": "soft",
-      "closingPhrase": "Мир лучше видеть своими глазами!",
-      "greetingPhrase": "Хей, читатели!",
-      "structure": "4-5 paragraphs base / longform when editorial provides full text",
-      "style_prototypes": ["Антон Птушкин"],
-      "editorial_reference": "https://perito.media/posts/ptushkin-balcans",
-      "topics": ["Алтай", "Камчатка", "сплавы", "джип-туры", "open-air", "фесты", "выездные экскурсии", "молодёжный отдых"],
+      "closingPhrase": "без штампа - короткий литературный финал по смыслу текста",
+      "greetingPhrase": "без фиксированного приветствия - вход через сцену или наблюдение",
+      "structure": "4-6 абзацев / longform с H2 при необходимости",
+      "style_prototypes": ["Борис Акунин"],
+      "editorial_reference": "литературная проза с иронией и наблюдательностью, без сленга и ИИ-штампов",
+      "topics": ["Алтай", "Камчатка", "сплавы", "джип-туры", "open-air", "фесты", "выездные экскурсии", "выходные"],
       "pilotFit": "low-medium"
     },
     {
