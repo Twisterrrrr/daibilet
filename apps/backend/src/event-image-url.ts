@@ -34,7 +34,7 @@ export function stabilizeTeplohodImageUrl(imageUrl?: string | null): string | nu
   if (!raw) return null;
 
   const signedMatch = raw.match(
-    /teplohod-private\/images\/cache\/Events\/(Event\d+)\/([^/?#]+)/i,
+    /teplohod-(?:private|public)\/images\/cache\/Events\/(Event\d+)\/([^/?#]+)/i,
   );
   const item = signedMatch?.[1];
   const dirtyAlias = signedMatch?.[2];

@@ -26,6 +26,14 @@ const eventsOnly = args.has('--events-only');
 
 const db = createDb(rootDir);
 
+/** SQL: true when column is not a usable catalog cover (empty, city placeholder, TEP stub). */
+const EVENT_IMAGE_UNUSABLE_SQL = (column) => `(
+  coalesce(nullif(trim(${column}), ''), '') = ''
+  or ${column} ~* '^/images/cities/'
+  or ${column} ~* 'placeholder\\.gif'
+  or ${column} ~* 'api\\.teplohod\\.info/v1/image\\?item=&'
+)`;
+
 const stats = {
   dryRun,
   eventsGenerated: 0,
@@ -49,8 +57,8 @@ async function ensureEventCovers() {
     left join "Category" c on c.id = e."categoryId"
     left join "City" city on city.id = e."primaryCityId"
     where e.status not in ('HIDDEN', 'DRAFT')
-      and coalesce(nullif(trim(e."imageUrl"), ''), '') = ''
-      and coalesce(nullif(trim(o."imageUrl"), ''), '') = ''
+      and ${EVENT_IMAGE_UNUSABLE_SQL('e."imageUrl"')}
+      and ${EVENT_IMAGE_UNUSABLE_SQL('o."imageUrl"')}
     order by e.title, e.id
   `);
 
@@ -84,7 +92,7 @@ async function ensureEventCovers() {
           update "Event"
           set "imageUrl" = $2, "updatedAt" = now()
           where id = $1
-            and coalesce(nullif(trim("imageUrl"), ''), '') = ''
+            and ${EVENT_IMAGE_UNUSABLE_SQL('"imageUrl"')}
         `,
         [id, imageUrl],
       );

@@ -64,6 +64,15 @@ test('stabilizeTeplohodImageUrl matches path without query string', () => {
   );
 });
 
+test('stabilizeTeplohodImageUrl converts teplohod-public cache URLs', () => {
+  const input =
+    'https://s3.twcstorage.ru/teplohod-public/images/cache/Events/Event1250/42ade58be1-1.jpg';
+  assert.equal(
+    stabilizeTeplohodImageUrl(input),
+    'https://api.teplohod.info/v1/image?item=Event1250&dirtyAlias=42ade58be1-1.jpg',
+  );
+});
+
 test('pickFirstUsableEventImageUrl prefers stabilized cover over placeholder', () => {
   assert.equal(
     pickFirstUsableEventImageUrl(

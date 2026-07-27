@@ -47,7 +47,7 @@
     "tc:catalog": "node scripts/tc-sample-catalog.js",
     "tc:count": "node scripts/tc-count-events.js",
     "tc:full-sync": "node scripts/tc-full-sync.js",
-    "tc:import": "node scripts/tc-import-catalog.js",
+    "tc:import": "node scripts/tc-import-catalog.js && node scripts/ensure-catalog-covers.js",
     "tc:sync": "node scripts/tc-sync.js",
     "tc:sync:help": "node scripts/tc-sync.js --help",
     "check:widgets": "node scripts/widget-readiness-check.mjs",

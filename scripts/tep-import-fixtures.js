@@ -708,7 +708,7 @@ function stabilizeTeplohodImageUrl(imageUrl) {
   const raw = String(imageUrl || '').trim();
   if (!raw) return null;
   const signedMatch = raw.match(
-    /teplohod-private\/images\/cache\/Events\/(Event\d+)\/([^/?#]+)/i,
+    /teplohod-(?:private|public)\/images\/cache\/Events\/(Event\d+)\/([^/?#]+)/i,
   );
   if (signedMatch) {
     const item = signedMatch[1];
