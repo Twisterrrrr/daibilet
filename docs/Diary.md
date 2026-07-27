@@ -35,7 +35,10 @@
 
 ### Проблемы
 
-- Smoke Cache-Control / HIT / orphan ps после exclusive deploy.
+- ~~Smoke Cache-Control / HIT / orphan ps после exclusive deploy.~~ ✅ Prod @`c799c31` EXIT:0.
+  - `/events/[slug]`: cold `x-nextjs-cache: MISS` ~1360ms → warm **HIT** ~16–19ms; `Cache-Control: s-maxage=300, stale-while-revalidate=…`
+  - Build: `● /events/[slug]`, `○ /events` (5m); `/events` list HIT.
+  - Reap pre/post signaled 0; post-deploy orphan jest-worker PPID=1 = 0.
 
 ---
 
