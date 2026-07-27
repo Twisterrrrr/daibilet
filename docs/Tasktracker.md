@@ -510,6 +510,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | B.28 | Blog Featured Hero: CTA-плитка с promo image под «Свежее» (убрать пустоту) | Критический | ✅ `72ea839` prod | агент |
 | B.28b | Afisha promo: цена/тайтлы/chips по header geo; полоса под 3 первыми статьями фида | Критический | 🚫 owner: афиша должна быть в углу | агент |
 | B.28c | Owner fix: swap колонок + rich Афиша в углу под «Свежее» (не mid-feed) | Критический | ✅ `9be0a98` prod @`ab1dc94` | агент |
+| B.29 | Pack B GPT brief: 9 гидов + 2 колонки Макса (`blog-content-gpt-briefs.md`) | Высокий | ⏳ brief ✅ 2026-07-27; тексты GPT → owner review → agent publish | владелец + агент |
 
 ---
 
