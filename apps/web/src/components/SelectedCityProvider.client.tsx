@@ -120,7 +120,7 @@ export function SelectedCityProvider({
         else params.set('city', name);
         params.delete('page');
         const query = params.toString();
-        router.push(query ? `${path}?${query}` : path);
+        router.replace(query ? `${path}?${query}` : path, { scroll: false });
         return;
       }
 

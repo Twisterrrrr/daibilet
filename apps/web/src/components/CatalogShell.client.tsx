@@ -61,8 +61,6 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     }
   }, [searchParamsRecord]);
 
-  const queryKey = useMemo(() => catalogQueryCacheKey(query), [query]);
-
   const filterValues = useMemo(() => {
     const base = catalogFiltersFromQuery({
       q: query.q,
@@ -79,15 +77,17 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
       ageMax: query.ageMax,
       page: query.page,
     });
-    if (base.city || !cityReady || !selectedCity || selectedCity.cityValue === 'all') return base;
+    // Header city picker is source of truth once resolved — URL catches up via router.replace.
+    if (!cityReady || !selectedCity) return base;
+    if (selectedCity.cityValue === 'all') return { ...base, city: undefined };
     return { ...base, city: selectedCity.cityValue };
   }, [query, cityReady, selectedCity]);
 
-  /** Effective query key including header-city inject (before URL catches up). */
-  const effectiveQueryKey = useMemo(() => {
-    if (!filterValues.city || query.city) return queryKey;
-    return catalogQueryCacheKey({ ...query, city: filterValues.city });
-  }, [filterValues.city, query, queryKey]);
+  /** Effective query key from resolved filters (header city may lead URL by one frame). */
+  const effectiveQueryKey = useMemo(
+    () => catalogQueryCacheKey({ ...query, city: filterValues.city }),
+    [query, filterValues.city],
+  );
 
   useEffect(() => {
     const fromUrl = urlSearchParams.get('view');
@@ -126,9 +126,8 @@ export function CatalogShell({ initialCatalog = null, initialQueryKey = '' }: Ca
     setError(null);
 
     const params = new URLSearchParams(urlSearchParams.toString());
-    if (!params.get('city')?.trim() && filterValues.city) {
-      params.set('city', filterValues.city);
-    }
+    if (filterValues.city) params.set('city', filterValues.city);
+    else params.delete('city');
     const qs = params.toString();
     fetch(`/api/public/events${qs ? `?${qs}` : ''}`, { signal: controller.signal })
       .then(async (response) => {
