@@ -12,6 +12,7 @@
 - `openTeplohodPurchase`: один click; ждать buy-link до ~4.5с; никогда не dismiss открытый Fancybox; popup только если checkout не виден.
 - `failPurchaseOpening`: если vendor checkout уже в DOM - `complete` вместо fail.
 - Smoke: `.tmp-measure/smoke-tep-no-fail.mjs` (CTA → checkout, fail shell не остаётся).
+- Prod exclusive deploy `EXIT:0` @`b02f657`; smoke: moscow 57ms, `/sankt-peterburg/night-bridges` 43ms, `/rechnye-progulki/sankt-peterburg` 41ms; `failAt=null`, iframe `account.teplohod.info`.
 
 ### Проблемы
 
