@@ -16,6 +16,7 @@
 | SYNC.3 | `tc-sync` / worker: fail when child killed by signal (OOM masked SUCCESS) | Критический | ✅ code; **deploy на prod ⏳** |
 | SYNC.4 | Verify next nightly 03:20: real `importedEvents` + non-zero import, not fetch-only | Критический | 🔄 timer ✅; **2026-07-27 03:20Z** `importedEvents:21145` exitCode:0; **28.07** ⏳ post-check `verify-tc-catalog-sync.sh`; alert в `tc-catalog-sync.sh` |
 | SYNC.5 | TEP full sync (habit) | Высокий | ✅ 2026-07-26 22:22Z ~307с / 214 events / 20566 links |
+| VENUE.L1 | Lumiere Hall enue_54cabc2b9cb5385a9f65b95a: 404 hub (MEETING_POINT/NONE) - ensure script + TC import guard | Критический | ✅ 6e17cce prod + ensure DB | агент |
 
 ---
 
@@ -511,6 +512,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | B.28b | Afisha promo: цена/тайтлы/chips по header geo; полоса под 3 первыми статьями фида | Критический | 🚫 owner: афиша должна быть в углу | агент |
 | B.28c | Owner fix: swap колонок + rich Афиша в углу под «Свежее» (не mid-feed) | Критический | ✅ `9be0a98` prod @`ab1dc94` | агент |
 | B.29 | Pack B GPT brief: 9 гидов + 2 колонки Макса (`blog-content-gpt-briefs.md`) | Высокий | ⏳ brief ✅ 2026-07-27; тексты GPT → owner review → agent publish | владелец + агент |
+| B.30 | Pack C GPT brief: 9 гидов по региональным городам (НН, Самара, Уфа, Нск, Сочи, Ростов, Красноярск, Калининград, Ярославль) | Высокий | ⏳ brief ✅ 2026-07-27; тексты GPT → owner review → agent publish | владелец + агент |
 
 ---
 

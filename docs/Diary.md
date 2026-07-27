@@ -5870,3 +5870,18 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 
 ### ╨Я╤А╨╛╨▒╨╗╨╡╨╝╤Л
 - Downtime ╨╜╨░ ╨▓╤А╨╡╨╝╤П `web:build` ╤З╤Г╤В╤М ╨┤╨╗╨╕╨╜╨╜╨╡╨╡; ╨╖╨░╤В╨╛ ╨╜╨╡╤В ╨╛╨║╨╜╨░ 400/ChunkLoad ╨╜╨░ ╨╛╤В╨║╤А╤Л╤В╤Л╤Е ╨▓╨║╨╗╨░╨┤╨║╨░╤Е.
+
+## 2026-07-27 - Venue: Lumiere Hall hub 404
+
+### Наблюдения
+- /venues/art-prostranstvo-lyumer-holl-g-moskva-54cabc2b9cb5385a9f65b95a отдавала 404: TC import ставил MEETING_POINT + pageStatus=NONE, площадка выпадала из public hub.
+
+### Решения
+- guessVenueType: арт-пространство / Lumiere / иммерсив -> museum_art.
+- 	c-import-catalog: не понижать institution kinds при upsert.
+- scripts/ensure-lumiere-hall-venue.js + override адреса; prod apply -> MUSEUM_ART_SPACE, CANDIDATE, title «Арт-пространство Люмьер Холл».
+- Deploy 6e17cce, revalidate path venue-page.
+
+### Проблемы
+- Slug lyumer - техническая транслитерация; display title содержит «Люмьер».
+
