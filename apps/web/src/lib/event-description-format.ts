@@ -35,7 +35,7 @@ export function isDescriptionSectionHeading(line: string): boolean {
   if (!text || text.length > 72) return false;
   if (/[.!?…]$/u.test(text)) return false;
   if (
-    /^(?:о маршруте|о событии|программа|включено|в стоимость входит|важно|маршрут|что вас ждёт|что вас ждет|условия|описание|подробнее|внимание|для кого|как добраться|расписание)$/iu.test(
+    /^(?:о маршруте|о событии|программа|включено|в стоимость входит|важно|маршрут|что вас ждёт|что вас ждет|условия|описание|подробнее|внимание|для кого|как добраться|расписание|основные достопримечательности|достопримечательности|организационные детали|что включено|что входит|продолжительность|продолжительность прогулки)$/iu.test(
       text,
     )
   ) {
@@ -103,6 +103,54 @@ export function parseInlineListAfterColon(line: string): { intro: string; items:
   const parts = rest.split(INLINE_BULLET_SPLIT_RE).map((part) => stripListItemPrefix(part)).filter(Boolean);
   if (parts.length < 2) return null;
   return { intro, items: parts };
+}
+
+/** TC feeds: "…увидеть X, Y, Z и многие другие…" on one line. */
+const COMMA_LIST_INTRO_RE = /^(.+?(?:увидеть|узнаете|посетите|осмотрите|пройдёте|пройдете))\s+(.+)$/iu;
+const LABEL_VALUE_LINE_RE = /^([A-ZА-ЯЁ][^:]{1,44}):\s*(.+)$/u;
+const ATTENTION_LINE_RE = /^Внимание!\s*(.+)$/iu;
+
+export function parseCommaSeparatedListAfterIntro(line: string): { intro: string; items: string[] } | null {
+  const text = String(line || '').trim();
+  const match = text.match(COMMA_LIST_INTRO_RE);
+  if (!match) return null;
+  const intro = cleanDisplayText(match[1]);
+  let rest = match[2].trim().replace(/\.\s*$/, '');
+  rest = rest.replace(/\s+и\s+(?:многие\s+другие|другие|пр\.?)\s+[^,]*$/iu, '');
+  const rawItems = rest.split(/,\s*/).map((part) => part.trim()).filter(Boolean);
+  if (rawItems.length < 3) return null;
+  const items = [...rawItems];
+  const last = items[items.length - 1];
+  const andSplit = last.match(/^(.+?)\s+и\s+(.+)$/u);
+  if (andSplit) {
+    items[items.length - 1] = andSplit[1].trim();
+    items.push(andSplit[2].trim());
+  }
+  return { intro: `${intro}:`, items: items.filter(Boolean) };
+}
+
+export function parseLabelValueLine(line: string): { label: string; value: string } | null {
+  const text = String(line || '').trim();
+  const match = text.match(LABEL_VALUE_LINE_RE);
+  if (!match) return null;
+  const label = cleanDisplayText(match[1]);
+  const value = cleanDisplayText(match[2]);
+  if (!label || !value || label.length > 44) return null;
+  return { label, value };
+}
+
+export function parseAttentionLine(line: string): { body: string } | null {
+  const text = String(line || '').trim();
+  const match = text.match(ATTENTION_LINE_RE);
+  if (!match) return null;
+  const body = cleanDisplayText(match[1]);
+  return body ? { body } : null;
+}
+
+function normalizeUserFacingCopy(text: string): string {
+  return String(text || '')
+    .replace(/[\u2013\u2014\u2212–—]/g, '-')
+    .replace(/\s+-\s+/g, ' - ');
 }
 
 export type EventDescriptionBlock =
@@ -203,6 +251,31 @@ export function parseEventDescriptionBlocks(text: string): EventDescriptionBlock
       continue;
     }
 
+    const commaList = parseCommaSeparatedListAfterIntro(line);
+    if (commaList) {
+      const intro = cleanDisplayText(commaList.intro);
+      if (intro) blocks.push({ type: 'paragraph', text: intro });
+      blocks.push({ type: 'list', items: commaList.items });
+      i += 1;
+      continue;
+    }
+
+    const attention = parseAttentionLine(line);
+    if (attention) {
+      blocks.push({ type: 'heading', text: 'Внимание' });
+      blocks.push({ type: 'paragraph', text: attention.body });
+      i += 1;
+      continue;
+    }
+
+    const labelValue = parseLabelValueLine(line);
+    if (labelValue) {
+      blocks.push({ type: 'heading', text: labelValue.label });
+      blocks.push({ type: 'paragraph', text: labelValue.value });
+      i += 1;
+      continue;
+    }
+
     pushParagraphOrHeading(blocks, line);
     i += 1;
   }
@@ -214,13 +287,15 @@ function renderBlocksToHtml(blocks: EventDescriptionBlock[]): string {
   return blocks
     .map((block) => {
       if (block.type === 'heading') {
-        return `<h3>${escapeEventHtml(block.text)}</h3>`;
+        return `<h3>${escapeEventHtml(normalizeUserFacingCopy(block.text))}</h3>`;
       }
       if (block.type === 'list') {
-        const items = block.items.map((item) => `<li>${escapeEventHtml(item)}</li>`).join('');
+        const items = block.items
+          .map((item) => `<li>${escapeEventHtml(normalizeUserFacingCopy(item))}</li>`)
+          .join('');
         return `<ul>${items}</ul>`;
       }
-      return `<p>${escapeEventHtml(block.text)}</p>`;
+      return `<p>${escapeEventHtml(normalizeUserFacingCopy(block.text))}</p>`;
     })
     .join('');
 }

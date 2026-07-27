@@ -1,3 +1,26 @@
+## 2026-07-27 - Event description: TC comma lists and section headings
+
+### Наблюдения
+
+- Owner: `tc-6a172134…reki-i-kanaly…` на prod выглядел как «сырое» описание: только `<p>`, без H3/UL.
+- Фикс `f92b1d6` (Teplohod marker-less newline lists) на prod работает - formatter вызывается в `EventDescription` SSR.
+- Ticketscloud отдаёт другой формат: заголовок секции без двоеточия (`Основные достопримечательности`), список достопримечательностей одной строкой через запятую, длинные `Маршрут:` / `Продолжительность:`.
+- `tc-sync` перезаписывает `Event.description` сырьём (`description = excluded.description`); admin override защищён `EventOverride.description` + `event-import-guard.js`. Форматирование - только at render time, persist formatted HTML не нужен.
+
+### Решения
+
+- `parseCommaSeparatedListAfterIntro`: «…увидеть X, Y, Z и многие другие…» → `<p>` intro + `<ul>`.
+- `parseLabelValueLine`: длинные `Label: value` → `<h3>` + `<p>` (Маршрут, Продолжительность).
+- `parseAttentionLine`: `Внимание! …` → `<h3>Внимание</h3>` + абзац.
+- Расширен whitelist заголовков (`основные достопримечательности`, …); em-dash → `-` в user-facing copy.
+- Тесты: TC river sample + regression Kremlin Teplohod UL.
+
+### Проблемы
+
+- Commit + deploy-prod-next; smoke `tc-6a172134…` + Kremlin cruise на `<h3>`/`<ul>`.
+
+---
+
 ## 2026-07-27 - Roadmap batch: SYNC.4, SEO handoff, Metrika, BUY.5 lazy TEP
 
 ### Наблюдения
