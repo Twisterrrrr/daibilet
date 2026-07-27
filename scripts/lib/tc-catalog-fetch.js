@@ -236,7 +236,9 @@ function guessVenueType(venue, category, tags, event) {
     .toLowerCase();
 
   if (matches(text, ["театр", "teatr"])) return "theater";
-  if (matches(text, ["музей", "галере", "выстав"])) return "museum_art";
+  if (matches(text, ["музей", "галере", "выстав", "арт-пространств", "art space", "lumiere", "люмьер", "иммерсив", "мультимедиа"])) {
+    return "museum_art";
+  }
   if (matches(text, ["клуб", "club", "бар", "ресторан", "cafe", "кафе"])) return "club_restaurant";
   if (matches(text, ["концерт", "филармони", "зал", "дом музыки", "дк ", "дворец культуры"])) return "concert_hall";
   if (matches(text, ["причал", "набереж", "теплоход", "катер", "канал", "река"])) return "pier_water";

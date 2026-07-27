@@ -243,7 +243,11 @@ async function importCatalogEvent(client, event, summary) {
           address = excluded.address,
           latitude = excluded.latitude,
           longitude = excluded.longitude,
-          kind = excluded.kind,
+          kind = case
+            when "Venue".kind in ('MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'ATTRACTION')
+            then "Venue".kind
+            else excluded.kind
+          end,
           "pageStatus" = case when "Venue"."pageStatus" = 'PUBLISHED' then "Venue"."pageStatus" else excluded."pageStatus" end,
           "updatedAt" = now()
         returning id
