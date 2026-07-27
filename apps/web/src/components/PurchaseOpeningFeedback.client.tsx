@@ -55,11 +55,38 @@ export function completePurchaseOpening() {
   emit();
 }
 
+function isVendorCheckoutVisible() {
+  if (typeof document === 'undefined') return false;
+  if (document.body.classList.contains('fancyboxtkt-active')) return true;
+  if (document.body.classList.contains('fancybox-active')) return true;
+  return Boolean(
+    document.querySelector(
+      [
+        '.fancyboxtkt-container',
+        '.fancyboxtkt-slide',
+        '.fancyboxtkt-bg',
+        '.fancybox-container',
+        '.fancybox-slide',
+        'iframe[src*="account.teplohod.info"]',
+        'iframe[src*="teplohod.info/order"]',
+        '#tc-widget-overlay',
+        '.tc-widget-frame_popup',
+        'iframe[src*="ticketscloud"]',
+      ].join(', '),
+    ),
+  );
+}
+
 export function failPurchaseOpening(options?: {
   message?: string;
   fallbackUrl?: string | null;
   onRetry?: (() => void) | null;
 }) {
+  // Race guard: vendor modal already visible → never show fail toast over it.
+  if (isVendorCheckoutVisible()) {
+    completePurchaseOpening();
+    return;
+  }
   state = {
     phase: 'failed',
     message: options?.message || 'Не удалось открыть оплату. Попробуйте ещё раз.',

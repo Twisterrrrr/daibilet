@@ -46,10 +46,18 @@ const TEP_WIDGET_CSS = `
 }
 /* Keep Teplohod Fancybox above Next layout chrome + purchase opening shell */
 .fancyboxtkt-container,
-.fancyboxtkt-bg {
+.fancyboxtkt-bg,
+.fancybox-container,
+.fancybox-bg {
   z-index: 100050 !important;
 }
 `;
+
+/** Vendor may use custom fancyboxtkt-* or stock fancybox-* class names. */
+const TEP_FANCYBOX_ROOT =
+  '.fancyboxtkt-container, .fancyboxtkt-slide, .fancyboxtkt-bg, .fancybox-container, .fancybox-slide, .fancybox-bg';
+const TEP_FANCYBOX_IFRAME =
+  '.fancyboxtkt-container iframe, .fancyboxtkt-slide iframe, .fancybox-container iframe, .fancybox-slide iframe, iframe[src*="account.teplohod.info"], iframe[src*="teplohod.info/order"], iframe[data-src*="account.teplohod.info"]';
 
 /**
  * Teplohod widget.js is an IIFE: `TI_Tickets` is NOT on window.
@@ -134,39 +142,31 @@ function containerHasWidgetMarkup(container: HTMLElement | null) {
   return Boolean(container.querySelector('.ti-tickets-event-tickets-buy, .ti-tickets-widget, iframe'));
 }
 
-function dismissTeplohodFancybox() {
-  if (typeof document === 'undefined') return;
-  document.querySelector('.fancyboxtkt-container')?.remove();
-  document.querySelector('.fancyboxtkt-slide')?.remove();
-  document.querySelector('.fancyboxtkt-bg')?.remove();
-  document.body.classList.remove('fancyboxtkt-active');
+/** True when Teplohod Fancybox / account checkout iframe is already on screen. */
+export function isTeplohodCheckoutOpen() {
+  if (typeof document === 'undefined') return false;
+  if (document.body.classList.contains('fancyboxtkt-active')) return true;
+  if (document.body.classList.contains('fancybox-active')) return true;
+  return Boolean(document.querySelector(`${TEP_FANCYBOX_ROOT}, ${TEP_FANCYBOX_IFRAME}`));
 }
 
-function waitForTeplohodFancyboxContent(timeoutMs = 5000) {
+function waitForTeplohodCheckout(timeoutMs = 5000) {
   return new Promise<boolean>((resolve) => {
-    const hasContent = () => {
-      const frame = document.querySelector('.fancyboxtkt-container iframe, .fancyboxtkt-slide iframe');
-      return Boolean(frame);
-    };
-    if (hasContent()) {
+    if (isTeplohodCheckoutOpen()) {
       resolve(true);
       return;
     }
 
-    const deadline = Date.now() + timeoutMs;
     const observer = new MutationObserver(() => {
-      if (hasContent()) {
+      if (isTeplohodCheckoutOpen()) {
         observer.disconnect();
         resolve(true);
-      } else if (Date.now() >= deadline) {
-        observer.disconnect();
-        resolve(false);
       }
     });
-    observer.observe(document.body, { childList: true, subtree: true });
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
     window.setTimeout(() => {
       observer.disconnect();
-      resolve(hasContent());
+      resolve(isTeplohodCheckoutOpen());
     }, timeoutMs);
   });
 }
@@ -321,8 +321,7 @@ function bindTeplohodBuyFallback(container: HTMLElement, purchaseUrl?: string | 
     if (!buyButton || !container.contains(buyButton)) return;
 
     window.setTimeout(() => {
-      const fancyboxOpen = document.querySelector('.fancyboxtkt-container, .fancyboxtkt-slide');
-      if (!fancyboxOpen) {
+      if (!isTeplohodCheckoutOpen()) {
         window.open(purchaseUrl, '_blank', 'noopener,noreferrer');
       }
     }, 700);
@@ -450,44 +449,37 @@ export async function openTeplohodPurchase(options: {
 }): Promise<OpenTeplohodPurchaseResult> {
   const wrapperId = options.wrapperId || 'teplohod-widget';
 
-  // Fast path: vendor buy link already injected (common on landings after idle/hover arm).
-  const readyButton = findTeplohodBuyButton(wrapperId);
-  if (readyButton) {
-    readyButton.click();
-    if (await waitForTeplohodFancyboxContent(3500)) return 'widget';
-  }
+  // Already visible (retry / race) → success, do not click again or dismiss.
+  if (isTeplohodCheckoutOpen()) return 'widget';
 
-  try {
-    await ensureTeplohodWidgetScript();
-    await bootstrapTeplohodWidgets();
-  } catch {
-    if (options.purchaseUrl) {
-      const popup = window.open(options.purchaseUrl, '_blank', 'noopener,noreferrer');
-      return popup ? 'popup' : 'none';
+  let button = findTeplohodBuyButton(wrapperId);
+  if (!button) {
+    try {
+      await ensureTeplohodWidgetScript();
+      await bootstrapTeplohodWidgets();
+    } catch {
+      // Script failed — last resort popup below.
     }
-    return 'none';
+    // Embed XHR waterfall on large landings: wait briefly for this card's buy-link.
+    button = findTeplohodBuyButton(wrapperId) || (await waitForTeplohodBuyButton(wrapperId, 4500));
   }
 
-  const button = findTeplohodBuyButton(wrapperId) || (await waitForTeplohodBuyButton(wrapperId, 3500));
   if (button) {
+    // Single click only — a second click can toggle/close Fancybox.
     button.click();
-    if (await waitForTeplohodFancyboxContent(3500)) return 'widget';
+    if (await waitForTeplohodCheckout(5000)) return 'widget';
   } else {
     openTeplohodWidget(wrapperId);
-    if (await waitForTeplohodFancyboxContent(3500)) return 'widget';
+    if (await waitForTeplohodCheckout(5000)) return 'widget';
   }
 
-  const fancyboxOpen = document.querySelector('.fancyboxtkt-container, .fancyboxtkt-slide');
-  if (!findTeplohodBuyButton(wrapperId) && !fancyboxOpen && options.purchaseUrl) {
+  // Late paint after timeout observer disconnect.
+  if (isTeplohodCheckoutOpen()) return 'widget';
+
+  // Popup only when nothing is visible. Never dismiss an open Fancybox.
+  if (options.purchaseUrl) {
     const popup = window.open(options.purchaseUrl, '_blank', 'noopener,noreferrer');
     return popup ? 'popup' : 'none';
-  }
-  if (fancyboxOpen && !(await waitForTeplohodFancyboxContent(500))) {
-    dismissTeplohodFancybox();
-    if (options.purchaseUrl) {
-      const popup = window.open(options.purchaseUrl, '_blank', 'noopener,noreferrer');
-      return popup ? 'popup' : 'none';
-    }
   }
   return 'none';
 }
@@ -537,7 +529,7 @@ export function TeplohodWidgetButton({
 
     const run = async () => {
       const result = await openTeplohodPurchase({ wrapperId: containerId, purchaseUrl: checkoutUrl });
-      if (result === 'widget' || result === 'popup') {
+      if (result === 'widget' || result === 'popup' || isTeplohodCheckoutOpen()) {
         completePurchaseOpening();
         return;
       }

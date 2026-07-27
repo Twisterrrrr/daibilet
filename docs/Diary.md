@@ -1,3 +1,24 @@
+## 2026-07-27 - TEP purchase shell: false fail over open Fancybox
+
+### Наблюдения
+
+- Owner UX: shell «Не вышло автоматически» при том, что Fancybox TEP («Шаг 1 из 4») открывается (bridges / night-bridges).
+- Root cause: `waitForTeplohodFancyboxContent` требовал iframe внутри `.fancyboxtkt-*`; при контейнере без iframe (или late paint) путь делал второй click / `dismissTeplohodFancybox` + `window.open` вне user-gesture → `none` → fail toast поверх живого виджета.
+- Prod был на `ac91b0f` (BUY.4 fast-path) - детекция успеха всё ещё узкая.
+
+### Решения
+
+- Success = `.fancyboxtkt-*` / `.fancybox-*` / `iframe[src*="account.teplohod.info"]` / body `fancyboxtkt-active`.
+- `openTeplohodPurchase`: один click; ждать buy-link до ~4.5с; никогда не dismiss открытый Fancybox; popup только если checkout не виден.
+- `failPurchaseOpening`: если vendor checkout уже в DOM - `complete` вместо fail.
+- Smoke: `.tmp-measure/smoke-tep-no-fail.mjs` (CTA → checkout, fail shell не остаётся).
+
+### Проблемы
+
+- N×hidden embed XHR на больших лендингах (BUY.5) по-прежнему удлиняет first-arm buy-link.
+
+---
+
 ## 2026-07-27 - Owner audit: TEP widgets site-wide
 
 ### Наблюдения
