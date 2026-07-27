@@ -18,7 +18,7 @@ export function EventDescription({ event }: { event: PublicEventDto }) {
     <div>
       <h2 className="text-lg font-bold text-graphite">О событии</h2>
       <div
-        className="prose prose-slate mt-5 max-w-none text-sm leading-7 text-graphite-muted [&_h3]:mt-5 [&_h3]:mb-2 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-graphite [&_li+li]:mt-2 [&_p+p]:mt-5 [&_ul]:mb-3 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5 [&_h3+ul]:mt-2"
+        className="prose prose-slate mt-5 max-w-none text-sm leading-7 text-graphite-muted [&_h3]:mt-5 [&_h3]:mb-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-graphite [&_li+li]:mt-2 [&_p+p]:mt-5 [&_ul]:mb-4 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5 [&_h3+ul]:mt-2"
         dangerouslySetInnerHTML={{ __html: html }}
       />
     </div>
