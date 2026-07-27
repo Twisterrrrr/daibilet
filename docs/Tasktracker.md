@@ -25,7 +25,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| PERF.B1 | /blog ISR: cached list 300s, Suspense shell, minimal hero (no newsletter) | Критический | ⏳ 88585ec + 1024610 → prod deploy | агент |
+| PERF.B1 | /blog ISR: cached list 300s, Suspense shell, minimal hero (no newsletter) | Критический | ✅ 88585ec prod: s-maxage=300 HIT, TTFB ~0.10s (было ~1.08s no-cache) | агент |
 
 ---
 
@@ -519,7 +519,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | B.28b | Afisha promo: цена/тайтлы/chips по header geo; полоса под 3 первыми статьями фида | Критический | 🚫 owner: афиша должна быть в углу | агент |
 | B.28c | Owner fix: swap колонок + rich Афиша в углу под «Свежее» (не mid-feed) | Критический | ✅ `9be0a98` prod @`ab1dc94` | агент |
 | B.29 | Pack B GPT brief: 9 гидов + 2 колонки Макса (`blog-content-gpt-briefs.md`) | Высокий | ⏳ brief ✅ 2026-07-27; тексты GPT → owner review → agent publish | владелец + агент |
-| B.30 | Pack C GPT brief: 9 гидов по региональным городам (НН, Самара, Уфа, Нск, Сочи, Ростов, Красноярск, Калининград, Ярославль) | Высокий | ⏳ brief + автономные промпты (Downloads) сверены 2026-07-27; workflow фото + чеклист в `blog-content-gpt-briefs.md`; тексты GPT → owner review → agent publish | владелец + агент |
+| B.30 | Pack C: 9 гидов + 2 колонки Макса (1024610) | Высокий | ✅ контент+images; log:upsert prod; slug 404 до publishedAt | владелец + агент |
 | B.31 | Blog inline images: подпись (figcaption/alt) скрыта по умолчанию, показ при hover | Средний | ✅ 2026-07-27 `BlogFigure` web+public: `group-hover` + `@media(hover:hover)`, `title`+`alt` на img | агент |
 
 ---
