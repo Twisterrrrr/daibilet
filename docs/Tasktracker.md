@@ -30,9 +30,9 @@
 | PERF.L5 | `/progulki-po-krysham` warm всегда `x-nextjs-cache: MISS` при s-maxage=3600 | Низкий | ⏳ anomaly (TTFB OK ~0.12с) |
 | PERF.E1 | `/events/[slug]` ISR: `generateStaticParams([])` + `unstable_cache` DTO/rating; shared metadata+page | Критический | ✅ `c799c31` prod: cold MISS ~1.4с → warm HIT ~16ms |
 | PERF.D1 | Deploy: reap orphan `jest-worker` / leftover `next build` (PPID=1, cwd under `/opt/daibilet`) | Критический | ✅ `c799c31` deploy reap pre/post; orphan=0 |
-| PERF.OOM1 | `next.config`: `workerThreads: false`, `productionBrowserSourceMaps: false` | Критический | 🔄 ship |
-| PERF.OOM2 | `web:build` heap cap 2560Mi (`next-build.mjs` + deploy NODE_OPTIONS) | Критический | 🔄 ship |
-| PERF.OOM3 | Prod `vm.swappiness=10` idempotent in deploy | Высокий | 🔄 ship |
+| PERF.OOM1 | `next.config`: `workerThreads: false`, `productionBrowserSourceMaps: false` | Критический | ✅ `073f1d3` prod |
+| PERF.OOM2 | `web:build` heap cap 2560Mi (`next-build.mjs` + deploy NODE_OPTIONS) | Критический | ✅ prod deploy EXIT:0 |
+| PERF.OOM3 | Prod `vm.swappiness=10` idempotent in deploy | Высокий | ✅ prod sysctl=10 |
 
 ---
 

@@ -14,6 +14,7 @@
 ### Проблемы
 
 - Deploy smoke после ship; при нехватке RAM на build — снизить concurrency, не только heap.
+- **Prod @`9da574d` (includes `073f1d3`):** deploy EXIT:0; `vm.swappiness=10`; build `NODE_OPTIONS=2560`; event `s-maxage=300` (не no-store).
 
 ---
 
