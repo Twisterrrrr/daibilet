@@ -400,34 +400,106 @@ async function importCatalogEvent(client, event, summary) {
     rowStats.sessions += 1;
   }
 
-  if (priceFromRub != null) {
-    await client.query(
-      `
-        insert into "EventOffer" (
-          id, "eventId", "sourceCode", title, "priceRub", "widgetUrl", payload, active
-        )
-        values ($1, $2, 'TICKETSCLOUD', $3, $4, $5, $6::jsonb, true)
-        on conflict (id) do update set
-          title = excluded.title,
-          "priceRub" = excluded."priceRub",
-          "widgetUrl" = excluded."widgetUrl",
-          payload = excluded.payload,
-          active = excluded.active
-      `,
-      [
-        id("offer", externalId),
-        eventId,
-        "Ticketscloud widget",
-        priceFromRub,
-        widgetUrl,
-        JSON.stringify({ source: "ticketscloud", externalId }),
-      ],
-    );
-    rowStats.offers += 1;
-    rowStats.hasWidgetUrl = Boolean(widgetUrl);
-  }
+  await upsertTicketscloudOffers(client, {
+    eventId,
+    externalId,
+    event,
+    priceFromRub,
+    widgetUrl,
+    rowStats,
+  });
 
   return rowStats;
+}
+
+async function upsertTicketscloudOffers(client, { eventId, externalId, event, priceFromRub, widgetUrl, rowStats }) {
+  const ticketSets = Array.isArray(event.ticketSets) ? event.ticketSets : [];
+  const namedSets = ticketSets
+    .map((set, index) => {
+      const prices = (set.prices || []).filter((price) => Number.isFinite(price) && price >= 100);
+      if (!prices.length) return null;
+      const setId = set.id != null ? String(set.id) : String(index);
+      return {
+        setId,
+        title: String(set.name || "Билет").trim() || "Билет",
+        priceRub: Math.min(...prices),
+        sortOrder: index,
+      };
+    })
+    .filter(Boolean);
+
+  if (namedSets.length) {
+    await client.query(
+      `
+        update "EventOffer"
+        set active = false
+        where "eventId" = $1
+          and lower(coalesce(title, '')) like '%ticketscloud widget%'
+      `,
+      [eventId],
+    );
+
+    for (const set of namedSets) {
+      await client.query(
+        `
+          insert into "EventOffer" (
+            id, "eventId", "sourceCode", title, "priceRub", "widgetUrl", payload, active
+          )
+          values ($1, $2, 'TICKETSCLOUD', $3, $4, $5, $6::jsonb, true)
+          on conflict (id) do update set
+            title = excluded.title,
+            "priceRub" = excluded."priceRub",
+            "widgetUrl" = excluded."widgetUrl",
+            payload = excluded.payload,
+            active = excluded.active
+        `,
+        [
+          id("offer", `${externalId}_${set.setId}`),
+          eventId,
+          set.title,
+          set.priceRub,
+          widgetUrl,
+          JSON.stringify({
+            source: "ticketscloud",
+            externalId,
+            setId: set.setId,
+            sortOrder: set.sortOrder,
+          }),
+        ],
+      );
+      rowStats.offers += 1;
+    }
+
+    rowStats.hasWidgetUrl = Boolean(widgetUrl);
+    return;
+  }
+
+  if (priceFromRub == null) return;
+
+  await client.query(
+    `
+      insert into "EventOffer" (
+        id, "eventId", "sourceCode", title, "priceRub", "widgetUrl", payload, active
+      )
+      values ($1, $2, 'TICKETSCLOUD', $3, $4, $5, $6::jsonb, true)
+      on conflict (id) do update set
+        title = excluded.title,
+        "priceRub" = excluded."priceRub",
+        "widgetUrl" = excluded."widgetUrl",
+        payload = excluded.payload,
+        active = excluded.active
+    `,
+    [
+      id("offer", externalId),
+      eventId,
+      "Ticketscloud widget",
+      priceFromRub,
+      widgetUrl,
+      JSON.stringify({ source: "ticketscloud", externalId }),
+    ],
+  );
+  rowStats.offers += 1;
+  rowStats.hasWidgetUrl = Boolean(widgetUrl);
 }
 
 async function ensureSource(client) {
