@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import {
+  collectDisplaySlotLabels,
   formatShowcaseSessionDate,
   formatShowcaseSessionDateCompact,
 } from './event-card-meta.ts';
@@ -52,4 +53,50 @@ test('formatShowcaseSessionDate: no abbreviated system mask', () => {
   assert.ok(!label.includes('июл.'));
   assert.ok(!label.includes('сб'));
   assert.ok(!label.includes('·'));
+});
+
+test('collectDisplaySlotLabels: empty when only primary slot', () => {
+  const labels = collectDisplaySlotLabels(
+    session({
+      startsAt: '2026-07-30T16:30:00Z',
+      upcomingSlots: [
+        {
+          eventId: 'evt-1',
+          startsAt: '2026-07-30T16:30:00Z',
+          dateLabel: 'чт, 30 июл.',
+          timeLabel: '19:30',
+        },
+      ],
+    }),
+  );
+  assert.deepEqual(labels, []);
+});
+
+test('collectDisplaySlotLabels: excludes primary, returns alternatives up to 4', () => {
+  const labels = collectDisplaySlotLabels(
+    session({
+      startsAt: '2026-07-30T16:30:00Z',
+      upcomingSlots: [
+        {
+          eventId: 'evt-1',
+          startsAt: '2026-07-30T16:30:00Z',
+          dateLabel: 'чт, 30 июл.',
+          timeLabel: '19:30',
+        },
+        {
+          eventId: 'evt-2',
+          startsAt: '2026-07-31T16:30:00Z',
+          dateLabel: 'пт, 31 июл.',
+          timeLabel: '19:30',
+        },
+        {
+          eventId: 'evt-3',
+          startsAt: '2026-08-01T16:30:00Z',
+          dateLabel: 'сб, 1 авг.',
+          timeLabel: '19:30',
+        },
+      ],
+    }),
+  );
+  assert.deepEqual(labels, ['пт, 31 июл., 19:30', 'сб, 1 авг., 19:30']);
 });

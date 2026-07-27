@@ -54,13 +54,24 @@ export function collectDisplaySlotTimes(event: PublicSession, options?: { todayO
   return slots;
 }
 
-/** Подписи слотов «дата, время» — до 4 ближайших сеансов для карточки каталога. */
+function isSameSessionStart(left?: string | null, right?: string | null): boolean {
+  if (!left || !right) return false;
+  const leftMs = parseSessionStartsAt(left).getTime();
+  const rightMs = parseSessionStartsAt(right).getTime();
+  return Number.isFinite(leftMs) && leftMs === rightMs;
+}
+
+/** Альтернативные слоты для чипов карточки — до 4 сеансов, кроме primary (event.startsAt). */
 export function collectDisplaySlotLabels(event: PublicSession, limit = CATALOG_DISPLAY_SLOT_LIMIT): string[] {
   const seen = new Set<string>();
   const labels: string[] = [];
   const timeZone = resolveSessionTimeZoneForSession(event);
+  const primaryStartsAt = event.startsAt;
 
   for (const slot of collectUpcomingSlotRows(event)) {
+    if (primaryStartsAt && slot.startsAt && isSameSessionStart(slot.startsAt, primaryStartsAt)) {
+      continue;
+    }
     const date = slot.dateLabel?.trim();
     const time = slot.timeLabel?.trim() || (slot.startsAt ? formatSessionTime(slot.startsAt, null, timeZone) : '');
     const label = date && time ? `${date}, ${time}` : date || time;
@@ -68,11 +79,6 @@ export function collectDisplaySlotLabels(event: PublicSession, limit = CATALOG_D
     seen.add(label);
     labels.push(label);
     if (labels.length >= limit) break;
-  }
-
-  if (!labels.length && event.startsAt) {
-    const fallback = formatEventNextSession(event);
-    if (fallback) labels.push(fallback);
   }
 
   return labels;
