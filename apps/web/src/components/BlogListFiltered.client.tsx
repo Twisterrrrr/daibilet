@@ -7,14 +7,9 @@ import { LayoutGrid, List } from 'lucide-react';
 import { BlogListRows } from '@/components/BlogListRows.client';
 import { BlogMagazineGrid } from '@/components/BlogMagazineGrid.client';
 import type { BlogListFilters } from '@/components/BlogListView';
-import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { paginateBlogFeedByCursor } from '@/lib/blog-cursor';
-import {
-  filterBlogFeedByCity,
-  rankBlogFeedByCity,
-  resolveBlogRankCitySlug,
-} from '@/lib/blog-feed-rank';
+import { filterBlogFeedByCity } from '@/lib/blog-feed-rank';
 import { authorLabel, cityFilterLabel } from '@/lib/blog-meta';
 import { parseBlogTopicParam, postMatchesTopic } from '@/lib/blog-topics';
 import {
@@ -117,15 +112,22 @@ function ViewModeButton({
 
 export function BlogListFiltered({
   posts,
+  allPosts,
   initialFilters,
+  headerCitySlug = null,
+  hasLocalPosts = true,
 }: {
   posts: BlogCardDto[];
+  /** Full blog list for city filter dropdown counts (without hero split). */
+  allPosts?: BlogCardDto[];
   initialFilters?: BlogListFilters;
+  headerCitySlug?: string | null;
+  hasLocalPosts?: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const selectedCity = useSelectedCityOptional();
+  const cityOptionsSource = allPosts?.length ? allPosts : posts;
   const [viewMode, setViewModeState] = useState<BlogViewMode>('magazine');
   const [cursor, setCursor] = useState<string | null>(null);
   const [visiblePosts, setVisiblePosts] = useState<BlogCardDto[]>([]);
@@ -136,34 +138,23 @@ export function BlogListFiltered({
   const topic = parseBlogTopicParam(searchParams.get('topic') ?? initialFilters?.topic);
   const query = String(searchParams.get('q') ?? initialFilters?.q ?? '').trim();
 
-  const headerRankCity = useMemo(() => {
-    if (urlCity !== 'all') return null;
-    if (!selectedCity?.cityReady || selectedCity.cityValue === 'all') return null;
-    return resolveBlogRankCitySlug(
-      selectedCity.cityValue,
-      selectedCity.selectedDestination?.slug,
-      selectedCity.selectedDestination?.sourceSlug,
-      selectedCity.selectedDestination?.name,
-    );
-  }, [urlCity, selectedCity]);
-
   const cityOptions = useMemo(
     () =>
-      buildOptions(posts, (post) => {
+      buildOptions(cityOptionsSource, (post) => {
         const value = String(post.citySlug || '').trim();
         if (!value) return null;
         return { value, label: cityFilterLabel(value, post.city) };
       }),
-    [posts],
+    [cityOptionsSource],
   );
 
   const authorOptions = useMemo(
     () =>
-      buildOptions(posts, (post) => {
+      buildOptions(cityOptionsSource, (post) => {
         const value = String(post.authorId || 'editorial').trim() || 'editorial';
         return { value, label: post.authorName || authorLabel(value) };
       }),
-    [posts],
+    [cityOptionsSource],
   );
 
   const filtered = useMemo(() => {
@@ -174,14 +165,14 @@ export function BlogListFiltered({
       if (!matchesQuery(post, query)) return false;
       return true;
     });
-    // Explicit dropdown city = hard filter; header city = rank-then-others.
+    // Explicit dropdown city = hard filter; header city = hard filter only when local posts exist.
     if (urlCity !== 'all') {
       list = filterBlogFeedByCity(list, urlCity);
-    } else if (headerRankCity) {
-      list = rankBlogFeedByCity(list, headerRankCity);
+    } else if (headerCitySlug && hasLocalPosts) {
+      list = filterBlogFeedByCity(list, headerCitySlug);
     }
     return list;
-  }, [posts, author, topic, query, urlCity, headerRankCity]);
+  }, [posts, author, topic, query, urlCity, headerCitySlug, hasLocalPosts]);
 
   useEffect(() => {
     const page = paginateBlogFeedByCursor(filtered, { cursor: null, limit: PAGE_SIZE });
@@ -262,9 +253,7 @@ export function BlogListFiltered({
           onChange={(event) => setFilter('city', event.target.value)}
           aria-label="Фильтр по городу"
         >
-          <option value="all">
-            {headerRankCity ? `Сначала ${cityFilterLabel(headerRankCity)}` : 'Все города'}
-          </option>
+          <option value="all">Все города</option>
           {cityOptions.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label} ({option.count})

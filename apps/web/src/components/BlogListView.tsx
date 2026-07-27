@@ -1,14 +1,8 @@
-import Link from 'next/link';
-import { Suspense } from 'react';
-
-import { BlogFeaturedHero } from '@/components/BlogFeaturedHero';
-import { BlogListFiltered } from '@/components/BlogListFiltered.client';
-import { BlogListHero } from '@/components/BlogListHero';
+import { BlogListingBody } from '@/components/BlogListingBody.client';
 import { SiteLayout } from '@/components/SiteLayout';
-import { cityFilterLabel } from '@/lib/blog-meta';
 import type { BlogSidebarPromoDto } from '@/lib/blog-sidebar-promo';
 import type { BlogCardDto } from '@/lib/blog-utils';
-import { splitBlogListingHero } from '@/lib/blog-utils';
+import type { BreadcrumbItem } from '@/components/PageBreadcrumbs';
 
 export type BlogListFilters = {
   city?: string;
@@ -28,58 +22,17 @@ export function BlogListView({
   hotMinPrices?: Record<string, number>;
   afishaPromos?: Record<string, BlogSidebarPromoDto>;
 }) {
-  const { featured, feed, hot } = splitBlogListingHero(posts);
-  const fallbackCityLabel = featured
-    ? cityFilterLabel(featured.citySlug, featured.city)
-    : null;
-  const afishaFallbackCityName =
-    fallbackCityLabel &&
-    fallbackCityLabel !== 'Регионы' &&
-    fallbackCityLabel !== 'Несколько городов' &&
-    fallbackCityLabel !== 'Без города'
-      ? fallbackCityLabel
-      : featured?.city || null;
+  const breadcrumbs: BreadcrumbItem[] = [{ label: 'Главная', href: '/' }, { label: 'Блог' }];
 
   return (
     <SiteLayout>
-      <BlogListHero breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Блог' }]} />
-
-      {/* div, not nested <main>: SiteLayout already wraps children in <main> */}
-      <div className="container-page py-10 sm:py-14">
-        {featured ? (
-          <BlogFeaturedHero
-            featured={featured}
-            hotPosts={hot}
-            hotMinPrices={hotMinPrices}
-            afishaPromos={afishaPromos}
-            afishaFallbackCityName={afishaFallbackCityName}
-            afishaFallbackCitySlug={featured?.citySlug}
-          />
-        ) : null}
-
-        <Suspense
-          fallback={
-            <div className="space-y-4">
-              <div className="h-10 w-full max-w-xl animate-pulse rounded-xl bg-slate-200" />
-              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                {Array.from({ length: 6 }).map((_, index) => (
-                  <div key={index} className="h-64 animate-pulse rounded-2xl bg-slate-200" />
-                ))}
-              </div>
-            </div>
-          }
-        >
-          <BlogListFiltered posts={feed} initialFilters={filters} />
-        </Suspense>
-
-        <p className="mt-12 text-sm text-slate-500">
-          Новые материалы выходят каждую неделю. А готовые списки событий - в{' '}
-          <Link href="/podborki" className="font-medium text-primary-600 hover:text-primary-700">
-            подборках
-          </Link>
-          .
-        </p>
-      </div>
+      <BlogListingBody
+        posts={posts}
+        breadcrumbs={breadcrumbs}
+        initialFilters={filters}
+        hotMinPrices={hotMinPrices}
+        afishaPromos={afishaPromos}
+      />
     </SiteLayout>
   );
 }

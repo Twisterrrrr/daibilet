@@ -5,7 +5,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Search } from 'lucide-react';
 
 import { HeroLayout } from '@/components/HeroLayout';
-import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import {
   BLOG_TOPIC_ORDER,
   blogTopicLabel,
@@ -24,20 +23,14 @@ const HERO_TOPIC_IDS: BlogTopicId[] = ['standup', 'routes', 'kids', 'concerts'];
 
 type BlogListHeroProps = {
   breadcrumbs: BreadcrumbItem[];
+  /** Geo copy only when the selected city has published posts (see BlogListingBody). */
+  cityName?: string | null;
 };
 
-export function BlogListHero({ breadcrumbs }: BlogListHeroProps) {
+export function BlogListHero({ breadcrumbs, cityName = null }: BlogListHeroProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const selectedCity = useSelectedCityOptional();
-
-  const cityReady = selectedCity?.cityReady ?? true;
-  const cityName =
-    cityReady && selectedCity?.cityValue !== 'all'
-      ? selectedCity?.selectedDestination?.name ||
-        (selectedCity?.cityLabel !== 'Все города' ? selectedCity?.cityLabel : null)
-      : null;
 
   const topic = parseBlogTopicParam(searchParams.get('topic'));
   const query = String(searchParams.get('q') || '').trim();

@@ -2,8 +2,17 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { decodeBlogFeedCursor, encodeBlogFeedCursor, paginateBlogFeedByCursor } from './blog-cursor.ts';
-import { rankBlogFeedByCity } from './blog-feed-rank.ts';
+import { filterBlogFeedByCity, rankBlogFeedByCity } from './blog-feed-rank.ts';
 import { groupPodborkiByCategory } from './podborki-categories.ts';
+
+test('filterBlogFeedByCity: empty for city without published posts', () => {
+  const posts = [
+    { slug: 'a', citySlug: 'moscow' },
+    { slug: 'b', citySlug: 'saint-petersburg' },
+  ];
+  const local = filterBlogFeedByCity(posts, 'kaliningrad');
+  assert.equal(local.length, 0);
+});
 
 test('rankBlogFeedByCity: city first then others (no drop)', () => {
   const ranked = rankBlogFeedByCity(

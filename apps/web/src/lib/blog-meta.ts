@@ -21,6 +21,7 @@ export const BLOG_CITY_FILTER_LABELS: Record<string, string> = {
   'saint-petersburg': 'Санкт-Петербург',
   kazan: 'Казань',
   ekaterinburg: 'Екатеринбург',
+  kaliningrad: 'Калининград',
   regions: 'Регионы',
   multi: 'Несколько городов',
 };
