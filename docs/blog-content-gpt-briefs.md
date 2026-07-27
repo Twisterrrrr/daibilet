@@ -770,7 +770,7 @@ GPT **не** генерирует файлы изображений. Cover и in
 1. Получить MD от owner (`status: DRAFT`) или сгенерировать по промпту A/K.
 2. **Cover:** GenerateImage по теме статьи и `imageAlt` → сохранить `{slug}.jpg`.
 3. **Inline:** 1-2 (или больше по промпту) отдельных GenerateImage - другой ракурс/сцена, не дублировать cover → `-inline.jpg`, `-inline-2.jpg`.
-4. Проверить shortcodes в body: пути совпадают с файлами на диске; `alt` осмысленный (станет подписью при hover, см. ниже).
+4. Проверить shortcodes в body: пути совпадают с файлами на диске; `alt` осмысленный (a11y/SEO, см. ниже).
 5. Положить MD в `content/blog/{slug}.md`.
 6. Перед `PUBLISHED`: все JPG на диске, `npm run blog:check-inline` (если есть), `blog:sync-bodies` → deploy → `blog:upsert`.
 
@@ -790,15 +790,13 @@ GPT **не** генерирует файлы изображений. Cover и in
 
 ---
 
-## UI: подписи под inline-фото (hover)
+## UI: inline-фото (без подписи в интерфейсе)
 
 Рендер: `BlogArticleContent` → `BlogFigure` (`apps/web` и `apps/public`).
 
-- Подпись берётся из `alt` в shortcode `[image … alt="…"]`.
-- На `<img>` / `SafeImage`: `alt` + `title` (нативный tooltip и screen readers).
-- `<figcaption>`: `aria-hidden="true"` (дубль alt не озвучивается), скрыт на устройствах с hover до наведения на figure.
-- CSS: `group` на `<figure>`, figcaption `opacity-0` → `group-hover:opacity-100` только при `@media (hover: hover)`; на touch без hover подпись **всегда видна**.
-- Keyboard: `group-focus-within:opacity-100` на hover-устройствах.
+- Текст из `alt` в shortcode `[image … alt="…"]` **не показывается** под фото в UI (ни по умолчанию, ни при hover).
+- На `<img>` / `SafeImage`: `alt` + `title` для screen readers, SEO и нативного tooltip при наведении на само изображение.
+- `<figcaption>` не рендерится.
 
 ---
 
