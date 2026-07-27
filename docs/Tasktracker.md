@@ -148,7 +148,7 @@
 | UX.5 | Event detail: шаги покупки, open-date UX, тарифы/hint цены | Критический | ✅ |
 | UX.6 | Landing SEO copy без «у оператора» (`seo-listing-texts`) | Средний | ⏳ |
 | UX.7 | Home SERP: meta «Купите билеты» + nosnippet partner/footer; help FAQ soften | Критический | ✅ |
-| UX.8 | Event description: H3/UL/абзацы (Teplohod marker-less + TC comma lists) | Критический | ✅ `f92b1d6` Teplohod; TC comma/label fix pending deploy |
+| UX.8 | Event description: H3/UL/абзацы (Teplohod marker-less + TC comma lists) | Критический | ✅ `f92b1d6` Teplohod; TC fix `f5d85f6` prod smoke 4×h3 + ul |
 
 ---
 

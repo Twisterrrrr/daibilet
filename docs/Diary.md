@@ -18,6 +18,7 @@
 ### Проблемы
 
 - Commit + deploy-prod-next; smoke `tc-6a172134…` + Kremlin cruise на `<h3>`/`<ul>`.
+- **Prod @`f5d85f6`:** deploy EXIT:0; `tc-6a172134…` SSR 4×`<h3>` + `<ul>` 15 landmarks; Kremlin cruise regression 3×`<ul>` 4×`<p>`.
 
 ---
 
