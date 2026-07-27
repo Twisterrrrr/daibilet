@@ -4,8 +4,10 @@ const nextConfig: NextConfig = {
   // Prod VPS ~4GB: full tsc/eslint during `next build` gets OOM-killed.
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
+  productionBrowserSourceMaps: false,
   // Cap SSG workers so page-data generation does not OOM on 3.8Gi hosts.
   experimental: {
+    workerThreads: false,
     cpus: 1,
     staticGenerationMaxConcurrency: 2,
     staticGenerationMinPagesPerWorker: 10,

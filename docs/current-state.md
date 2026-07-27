@@ -60,7 +60,7 @@ pnpm deploy:preflight
 
 # prod Next
 BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
-NODE_OPTIONS='--max-old-space-size=1536' pnpm web:build   # при OOM
+`pnpm web:build` caps heap at 2560Mi (`apps/web/scripts/next-build.mjs`); deploy sets the same via `NODE_OPTIONS`. Prod `vm.swappiness=10` (idempotent in `deploy-prod-next.sh`). Manual OOM retry: `NODE_OPTIONS='--max-old-space-size=1536' pnpm web:build`
 
 # smoke
 PUBLIC_BASE=https://daibilet.ru API_BASE=http://127.0.0.1:4000 WEB_BASE=http://127.0.0.1:3001 \

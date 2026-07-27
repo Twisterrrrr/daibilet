@@ -19,6 +19,29 @@ APPLY_ADMIN_NGINX_PATCH="${APPLY_ADMIN_NGINX_PATCH:-1}"
 
 cd "$APP_DIR"
 
+# 4GB VPS: prefer cache reclaim over aggressive swap (idempotent; no-op without root).
+apply_vm_swappiness() {
+  local target=10
+  command -v sysctl >/dev/null 2>&1 || return 0
+  local current
+  current="$(sysctl -n vm.swappiness 2>/dev/null || true)"
+  if [[ -n "$current" && "$current" != "$target" ]]; then
+    sysctl -w "vm.swappiness=${target}" 2>/dev/null \
+      || echo "Note: vm.swappiness runtime set skipped (no root?)"
+  fi
+  if [[ -r /etc/sysctl.conf ]] && ! grep -qE '^[[:space:]]*vm\.swappiness[[:space:]]*=' /etc/sysctl.conf 2>/dev/null; then
+    if [[ -w /etc/sysctl.conf ]]; then
+      echo "vm.swappiness=${target}" >> /etc/sysctl.conf
+      echo "Persisted vm.swappiness=${target} in /etc/sysctl.conf"
+    elif command -v sudo >/dev/null 2>&1; then
+      echo "vm.swappiness=${target}" | sudo tee -a /etc/sysctl.conf >/dev/null 2>&1 \
+        && echo "Persisted vm.swappiness=${target} via sudo" \
+        || echo "Note: vm.swappiness persist skipped (no sudo?)"
+    fi
+  fi
+}
+apply_vm_swappiness
+
 if [[ -f ".env" ]]; then
   sed -i 's/^ADMIN_AUTH_REALM=Daibilet admin/ADMIN_AUTH_REALM="Daibilet admin"/' .env 2>/dev/null || true
   set -a
@@ -148,6 +171,9 @@ fi
 
 reap_orphan_next_build_workers "pre-build"
 
+# Heap cap for `next build` on 2-core / 4GB hosts (also set in apps/web/scripts/next-build.mjs).
+export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=2560}"
+echo "web:build NODE_OPTIONS=${NODE_OPTIONS}"
 pnpm web:build
 
 reap_orphan_next_build_workers "post-build"

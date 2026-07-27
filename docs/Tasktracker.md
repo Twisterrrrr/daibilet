@@ -28,8 +28,11 @@
 | PERF.L3 | Slim SSR: fallback `buildPublicLandingPage` → lean cards + slice 48 (как managed) | Высокий | ✅ `c433652`; `/rechnye-progulki` ~231KB (было ~705KB) |
 | PERF.L4 | `/events` generateMetadata без searchParams (SEO tradeoff vs ISR) | Средний | ✅ metadata без `await searchParams`; канон `/events` |
 | PERF.L5 | `/progulki-po-krysham` warm всегда `x-nextjs-cache: MISS` при s-maxage=3600 | Низкий | ⏳ anomaly (TTFB OK ~0.12с) |
-| PERF.E1 | `/events/[slug]` ISR: `generateStaticParams([])` + `unstable_cache` DTO/rating; shared metadata+page | Критический | 🔄 ship |
-| PERF.D1 | Deploy: reap orphan `jest-worker` / leftover `next build` (PPID=1, cwd under `/opt/daibilet`) | Критический | 🔄 ship |
+| PERF.E1 | `/events/[slug]` ISR: `generateStaticParams([])` + `unstable_cache` DTO/rating; shared metadata+page | Критический | ✅ `c799c31` |
+| PERF.D1 | Deploy: reap orphan `jest-worker` / leftover `next build` (PPID=1, cwd under `/opt/daibilet`) | Критический | ✅ `c799c31` |
+| PERF.OOM1 | `next.config`: `workerThreads: false`, `productionBrowserSourceMaps: false` | Критический | 🔄 ship |
+| PERF.OOM2 | `web:build` heap cap 2560Mi (`next-build.mjs` + deploy NODE_OPTIONS) | Критический | 🔄 ship |
+| PERF.OOM3 | Prod `vm.swappiness=10` idempotent in deploy | Высокий | 🔄 ship |
 
 ---
 

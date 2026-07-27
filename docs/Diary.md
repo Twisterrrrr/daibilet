@@ -1,3 +1,22 @@
+## 2026-07-27 - PERF.OOM: build memory tuning (4GB VPS)
+
+### Наблюдения
+
+- `next build` на 2 vCPU / 3.8Gi: OOM (137) при static gen; orphan jest-worker уже закрыт PERF.D1.
+- `cpus: 1` и `staticGenerationMaxConcurrency: 2` были в next.config; не хватало `workerThreads: false`, source maps off, явного heap cap.
+
+### Решения
+
+- PERF.OOM1: `next.config.ts` — `workerThreads: false`, `productionBrowserSourceMaps: false` (сохранены PERF SSG flags).
+- PERF.OOM2: `apps/web/scripts/next-build.mjs` + deploy `NODE_OPTIONS=--max-old-space-size=2560` перед `web:build`.
+- PERF.OOM3: `deploy-prod-next.sh` — idempotent `vm.swappiness=10` (+ persist `/etc/sysctl.conf` если root/sudo).
+
+### Проблемы
+
+- Deploy smoke после ship; при нехватке RAM на build — снизить concurrency, не только heap.
+
+---
+
 ## 2026-07-27 - Event page ISR + deploy orphan jest-worker reap
 
 ### Наблюдения
