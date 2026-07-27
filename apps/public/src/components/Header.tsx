@@ -98,7 +98,7 @@ export function Header({ cityLabel, onSection, onDestination }: HeaderProps) {
               <Menu className="h-5 w-5" />
             </button>
 
-            <button type="button" onClick={goHome} className="shrink-0">
+            <button type="button" onClick={goHome} className="shrink-0 -translate-y-[3px]">
               <DaibiletLogo />
             </button>
 

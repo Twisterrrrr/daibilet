@@ -105,7 +105,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               <Menu className="h-5 w-5" strokeWidth={1.75} />
             </button>
 
-            <Link href="/" className="min-w-0 shrink truncate">
+            <Link href="/" className="min-w-0 shrink -translate-y-[3px] truncate">
               <DaibiletLogo textClassName="text-lg sm:text-xl lg:text-2xl" />
             </Link>
 
