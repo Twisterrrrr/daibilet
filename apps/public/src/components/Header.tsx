@@ -87,8 +87,8 @@ export function Header({ cityLabel, onSection, onDestination }: HeaderProps) {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200 bg-white/85 backdrop-blur-md pt-[env(safe-area-inset-top,0px)]">
-        <div className="container-page flex items-center justify-between gap-3 py-3 md:py-4">
-          <div className="flex min-w-0 items-center gap-3 lg:gap-6">
+        <div className="container-page flex items-center justify-between gap-3 py-3 md:py-4 lg:items-end">
+          <div className="flex min-w-0 items-center gap-3 lg:items-end lg:gap-6">
             <button
               type="button"
               aria-label="Открыть меню"
@@ -105,7 +105,7 @@ export function Header({ cityLabel, onSection, onDestination }: HeaderProps) {
             <HeaderCitySelector cityLabel={cityLabel} onDestination={onDestination} onNavigate={navigate} />
           </div>
 
-          <nav aria-label="Основная навигация" className="hidden items-center gap-1 md:flex">
+          <nav aria-label="Основная навигация" className="hidden items-center gap-1 md:flex lg:items-end">
             {NAV_LINKS.map((item) => (
               <button
                 key={item.href}
@@ -113,8 +113,8 @@ export function Header({ cityLabel, onSection, onDestination }: HeaderProps) {
                 onClick={() => navigate(item.href)}
                 className={
                   isNavActive(item.href)
-                    ? 'rounded-full bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary-600'
-                    : 'rounded-full px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100'
+                    ? 'rounded-full bg-primary/10 px-3 py-1.5 text-sm font-semibold text-primary-600 lg:py-0'
+                    : 'rounded-full px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 lg:py-0'
                 }
               >
                 {item.label}
@@ -122,7 +122,7 @@ export function Header({ cityLabel, onSection, onDestination }: HeaderProps) {
             ))}
           </nav>
 
-          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2 lg:self-center">
             <HeaderAuthControls
               ref={userMenuRef}
               auth={auth}
