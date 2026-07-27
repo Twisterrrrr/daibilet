@@ -40,5 +40,23 @@ if command -v ionice >/dev/null 2>&1; then
   cmd=(ionice -c2 -n7 "${cmd[@]}")
 fi
 
+set +e
 "${cmd[@]}"
-echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) done worker tc-catalog"
+SYNC_EXIT=$?
+set -e
+echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) done worker tc-catalog exit=${SYNC_EXIT}"
+
+if [[ "$SYNC_EXIT" -ne 0 ]]; then
+  exit "$SYNC_EXIT"
+fi
+
+# Fail cron/timer when import count missing (fetch-only / masked OOM success).
+if ! tail -80 "$LOG_DIR/tc-catalog-sync.log" | grep -qE '"importedEvents"[[:space:]]*:[[:space:]]*[1-9][0-9]*'; then
+  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) ALERT: tc-catalog finished exit=0 but importedEvents missing or zero in recent log" >&2
+  exit 1
+fi
+
+if ! tail -20 "$LOG_DIR/tc-catalog-sync.log" | grep -qE '"exitCode"[[:space:]]*:[[:space:]]*0'; then
+  echo "$(date -u +%Y-%m-%dT%H:%M:%SZ) ALERT: worker.job.done exitCode!=0 in recent log" >&2
+  exit 1
+fi

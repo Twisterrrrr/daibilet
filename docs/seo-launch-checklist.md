@@ -28,8 +28,8 @@
 | 5.1 | Filter chips: overflow-x-auto | ✅ | landing filter rows + `.horizontal-snap-row` / catalog chips |
 | 5.2 | Touch target ~44px | ✅ | `.catalog-chip` + landing city/genre/dinner chips `min-h-11` |
 | 5.3 | Нет горизонтального скролла страницы | ✅ | `html/body overflow-x: clip` в `globals.css` |
-| M.1 | Sitemap в Яндекс.Вебмастер | ⏳ | владелец (SEO.IN2) |
-| M.2 | Переобход TOP URL после deploy | ⏳ | владелец (SEO.IN3 / SEO.16) |
+| M.1 | Sitemap в Яндекс.Вебмастер | ⏳ | владелец (`docs/webmaster-top15-checklist.md`) |
+| M.2 | Переобход TOP URL после deploy | ⏳ | владелец (`docs/webmaster-top15-checklist.md`) |
 | M.3 | IndexNow key + notify | ✅ | см. Tasktracker SEO.IN1 |
 
 ## Заметки

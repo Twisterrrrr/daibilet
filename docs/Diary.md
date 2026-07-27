@@ -1,3 +1,26 @@
+## 2026-07-27 - Roadmap batch: SYNC.4, SEO handoff, Metrika, BUY.5 lazy TEP
+
+### Наблюдения
+
+- **SYNC.4:** prod timer `daibilet-tc-catalog-sync.timer` active; LAST **2026-07-27 03:20:01 UTC** → `importedEvents:21145`, `worker.job.done exitCode:0` (~4m40s). NEXT **2026-07-28 03:20 UTC**. Script `+x`, `NODE_OPTIONS=--max-old-space-size=1536` в unit.
+- **SEO.IN2/IN3:** `robots.txt` на prod ссылается на `https://daibilet.ru/sitemap.xml`. Переобход и добавление sitemap в кабинеты - только владелец.
+- **CV.2b-e:** код шлёт 3 цели (`product_card_click`, `select_tickets`, `catalog_interstitial_click`); `purchase_success` намеренно не шлётся без widget callback.
+- **BUY.5:** каждый `TeplohodWidgetButton` монтировал hidden `TeplohodWidgetEmbed` → N× XHR `widget/embed` на крупных лендингах (~86 на river moscow).
+
+### Решения
+
+- SYNC: `deploy/scripts/verify-tc-catalog-sync.sh` (утренний post-check); `tc-catalog-sync.sh` exit 1 если в хвосте лога нет `importedEvents>0` или `exitCode:0`.
+- SEO: `docs/webmaster-top15-checklist.md` - sitemap GSC/Вебмастер + TOP-15 URL + пошаговый переобход.
+- Metrika: `docs/metrika-goals-checklist.md` - goal ids, wired files, CODE vs MARKETER, Webvisor SOP.
+- BUY.5: `TeplohodWidgetButton` prop `lazyEmbed=true` (default) - embed только на первый клик; script prefetch на hover сохранён; `openTeplohodPurchase` / Fancybox fixes (ac91b0f/b02f657) без изменений.
+
+### Проблемы
+
+- **28.07 03:20 UTC** ещё не прошёл - утром 28.07 запустить `verify-tc-catalog-sync.sh` на prod.
+- Deploy BUY.5 + sync script alert после commit.
+
+---
+
 ## 2026-07-27 - PERF.OOM: build memory tuning (4GB VPS)
 
 ### Наблюдения

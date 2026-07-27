@@ -14,7 +14,7 @@
 | SYNC.1 | `deploy/cron/tc-catalog-sync.sh` executable (`100755`) - nightly 203/EXEC | Критический | ✅ prod chmod + git filemode |
 | SYNC.2 | systemd: `NODE_OPTIONS=--max-old-space-size=1536`, MemoryMax≥2G (catalog JSON ~245MB) | Критический | ✅ prod unit + repo `deploy/systemd/` |
 | SYNC.3 | `tc-sync` / worker: fail when child killed by signal (OOM masked SUCCESS) | Критический | ✅ code; **deploy на prod ⏳** |
-| SYNC.4 | Verify next nightly 03:20: real `importedEvents` + non-zero import, not fetch-only | Критический | ⏳ after SYNC.3 deploy |
+| SYNC.4 | Verify next nightly 03:20: real `importedEvents` + non-zero import, not fetch-only | Критический | 🔄 timer ✅; **2026-07-27 03:20Z** `importedEvents:21145` exitCode:0; **28.07** ⏳ post-check `verify-tc-catalog-sync.sh`; alert в `tc-catalog-sync.sh` |
 | SYNC.5 | TEP full sync (habit) | Высокий | ✅ 2026-07-26 22:22Z ~307с / 214 events / 20566 links |
 
 ---
@@ -45,7 +45,7 @@
 | BUY.3 | Bridges: убрать fake ★4.7 / sold-count; hide fake Reviews | Высокий | ✅ |
 | BUY.4 | TEP open: не ждать `window.TI_Tickets` (IIFE); fast-path click + preload script | Критический | ✅ `ac91b0f` на prod (2026-07-27) |
 | BUY.4b | TEP: Fancybox/iframe = success; не fail/dismiss если виджет уже виден; wait buy-link | Критический | ✅ `b02f657` prod; smoke moscow/bridges/SPB river ~40–57ms, fail shell=0 |
-| BUY.5 | TEP: lazy/shared embed на лендингах (убрать N×XHR `widget/embed`) | Высокий | ⏳ follow-up после Owner audit |
+| BUY.5 | TEP: lazy/shared embed на лендингах (убрать N×XHR `widget/embed`) | Высокий | ✅ `TeplohodWidgetButton` lazyEmbed on first click; `LandingPurchaseButton` |
 | BUY.6 | TEP: `TeplohodWidgetEmbed` всегда через `resolveTeplohodCheckoutUrl` (не raw purchaseUrl) | Средний | ⏳ latent defense |
 | BUY.7 | Owner site-wide TEP link audit (landings/event/home/dinner/party) | Высокий | ✅ 2026-07-27: broken patterns не найдены; см. Diary |
 
@@ -82,8 +82,8 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | SEO.IN1 | IndexNow: key file `/indexnow-key.txt` + `/{key}.txt` + notify Yandex/Bing on revalidate / article publish / deploy-warm (без спама каталогом) | Критический | ✅ `96fd5a9` / fix `683455d` / `d355b62`; prod key 200; Yandex IndexNow 202 |
-| SEO.IN2 | Owner: добавить sitemap `https://daibilet.ru/sitemap.xml` в Яндекс.Вебмастер (если ещё нет) | Высокий | ⏳ **владелец** |
-| SEO.IN3 | Owner: Переобход TOP-15 URL после deploy (Вебмастер → Индексирование → Переобход) | Высокий | ⏳ **владелец** (см. SEO.16) |
+| SEO.IN2 | Owner: добавить sitemap `https://daibilet.ru/sitemap.xml` в Яндекс.Вебмастер (если ещё нет) | Высокий | ⏳ **владелец** (чеклист `docs/webmaster-top15-checklist.md`) |
+| SEO.IN3 | Owner: Переобход TOP-15 URL после deploy (Вебмастер → Индексирование → Переобход) | Высокий | ⏳ **владелец** (см. `docs/webmaster-top15-checklist.md`) |
 | SEO.IN4 | Метрика уже на сайте (ID 106786540) - не трогать код; цели CV.2b отдельно | — | ✅ already |
 
 ---
@@ -160,11 +160,11 @@
 |---|--------|-----------|--------|
 | CV.1 | `/events` filters: sticky «Показать N вариантов» + live preview count | Критический | ✅ debounce 350ms; zero CTA: «Нет подходящих событий» (pastel gray) |
 | CV.2 | `/events` grid: interstitial баннеры каждые 8 карточек → гиды/подборки | Высокий | ✅ soft tint + badge «Подборка»/«Из Блога»; compact mobile + click track |
-| CV.2b | Настроить цель `catalog_interstitial_click` в Метрике + триггер/тег в GTM (маркетолог; frontend push уже есть) | Высокий | ⏳ handoff: event id `catalog_interstitial_click`; Метрика JS-событие + GTM Custom Event; код не трогать |
-| CV.2c | Метрика: цель `product_card_click` (клик карточки события) - маркетолог создаёт JS-событие | Критический | ⏳ handoff: код шлёт `ym reachGoal` + dataLayer; создать цель в кабинете |
-| CV.2d | Метрика: цель `select_tickets` (клик Купить / открытие виджета TC\|Teplohod) - маркетолог | Критический | ⏳ handoff: intent к оплате, не факт оплаты |
-| CV.2e | Метрика: цель `purchase_success` - маркетолог может создать заранее; **код НЕ шлёт** без callback виджета / thank-you / webhook | Высокий | ⏳ documented: purchase = оплата у провайдера; клиентского success нет |
-| CV.2f | Webvisor SOP (маркетолог): первый месяц ежедневно 10-15 мин просмотр сессий воронки card→виджет | Высокий | ⏳ процесс, не код |
+| CV.2b | Настроить цель `catalog_interstitial_click` в Метрике + триггер/тег в GTM (маркетолог; frontend push уже есть) | Высокий | ⏳ handoff: `docs/metrika-goals-checklist.md`; код ✅ |
+| CV.2c | Метрика: цель `product_card_click` (клик карточки события) - маркетолог создаёт JS-событие | Критический | ⏳ handoff: код ✅ (`EventCard`); см. `docs/metrika-goals-checklist.md` |
+| CV.2d | Метрика: цель `select_tickets` (клик Купить / открытие виджета TC\|Teplohod) - маркетолог | Критический | ⏳ handoff: код ✅ (`TcWidget`/`TeplohodWidget`); см. checklist |
+| CV.2e | Метрика: цель `purchase_success` - маркетолог может создать заранее; **код НЕ шлёт** без callback виджета / thank-you / webhook | Высокий | ⏳ documented `docs/metrika-goals-checklist.md`; код ❌ |
+| CV.2f | Webvisor SOP (маркетолог): первый месяц ежедневно 10-15 мин просмотр сессий воронки card→виджет | Высокий | ⏳ SOP в `docs/metrika-goals-checklist.md` §5 |
 | CV.3 | Home: live stats (города/события/площадки) + «Как купить» 3 шага | Высокий | ✅ step3 email/SMS/phone; how-to-buy mt-20 + bg-slate-50; social proof = destinations с events (city+region, ≈stats.destinations) до CV.11 |
 | CV.4 | Blog: native `[buy]` card (цена + CTA), без «сайт партнёра» | Высокий | ✅ live DTO + no-store; min `от N ₽` + fixed price width; единственный embed-путь (см. CV.8 🚫) |
 | CV.5 | Sort «скидки» в каталоге | Средний | ⚠️ deferred: нет `discount`/`strikePrice` в DTO; ждать sync architecture sprint |
@@ -371,7 +371,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | SEO.13 | SSR JSON-LD: BreadcrumbList (listing+event) + ItemList только на CHPU landings (non-empty) | Высокий | ✅ 2026-07-23 | агент |
 | SEO.14 | `/podborki` tag cloud → CHPU landings/intent вместо `/events?q=` | Высокий | ✅ 2026-07-23 (топ-24: 23 CHPU / 1 fallback) | агент |
 | SEO.15 | Казань/Екб: падежи + meta-шаблоны listing/hub/event + thin cards (6–7) | Критический | ✅ 2026-07-23 | агент |
-| SEO.16 | Ручной переобход TOP-15 в Яндекс.Вебмастер / GSC | Высокий | ⏳ список URL готов; клики только владелец | **владелец** |
+| SEO.16 | Ручной переобход TOP-15 в Яндекс.Вебмастер / GSC | Высокий | ⏳ `docs/webmaster-top15-checklist.md`; клики только владелец | **владелец** |
 | SEO.17 | Sitemap: intents без thin (&lt; 6); smoke prod index + landings/static | Высокий | ✅ 2026-07-23 @`0fe5140`+prod | агент |
 | SEO.18 | План 20-30 путеводителей → CHPU (`docs/seo-guide-articles-plan.md`) | Высокий | ✅ 2026-07-23 batch #1 = 10 Казань/Екб | агент |
 | SEO.19 | Batch #1 генерация/размещение 10 гидов (GPT → MD → blog) | Высокий | ⏳ пачка A+МСК/СПб owner rewrite ✅; хаос-календарь ✅; Pack B = новый commercial угол (top5/events), не rewrite 9 longforms | владелец + агент |

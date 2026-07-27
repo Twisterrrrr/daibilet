@@ -82,6 +82,7 @@ export function LandingPurchaseButton({
         purchaseUrl={teplohodCheckoutUrl}
         label={resolvedLabel}
         className={resolvedClassName}
+        lazyEmbed
       />
     );
   }

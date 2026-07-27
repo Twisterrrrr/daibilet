@@ -39,6 +39,8 @@ systemctl list-timers | grep tc-catalog
 | Full warm | set `TC_CATALOG_SYNC_FULL_WARM=1` in service drop-in if needed |
 | Log | `/var/log/daibilet/tc-catalog-sync.log` |
 | Verify | после run ищи `importedEvents` в логе; fetch-only + OOM + `worker.job.done exitCode:0` = баг (fixed fail-on-signal) |
+| Post-check | утром после 03:20 UTC: `deploy/scripts/verify-tc-catalog-sync.sh` (или grep log на `importedEvents` + `exitCode:0`) |
+| Alert | `tc-catalog-sync.sh` exit 1 если в хвосте лога нет `importedEvents` > 0 или `exitCode!=0` |
 
 ## Prod: Ticketscloud orders-only (обязательно для зеркала заказов)
 

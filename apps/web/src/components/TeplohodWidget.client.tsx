@@ -484,6 +484,13 @@ export async function openTeplohodPurchase(options: {
   return 'none';
 }
 
+/** One animation frame after React commit - enough for lazy-mounted embed DOM. */
+function waitForEmbedPaint() {
+  return new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+  });
+}
+
 export function TeplohodWidgetButton({
   tepEventId,
   tepWidgetId,
@@ -491,6 +498,7 @@ export function TeplohodWidgetButton({
   disabled = false,
   className = 'inline-flex min-h-10 w-full items-center justify-center rounded-xl bg-primary px-6 py-3 text-base font-semibold text-white transition hover:bg-primary/90',
   purchaseUrl,
+  lazyEmbed = true,
 }: {
   tepEventId: string | number;
   tepWidgetId?: string | number | null;
@@ -498,9 +506,14 @@ export function TeplohodWidgetButton({
   disabled?: boolean;
   className?: string;
   purchaseUrl?: string | null;
+  /** When true (default), hidden embed mounts on first click only - avoids N× widget/embed XHR on landings. */
+  lazyEmbed?: boolean;
 }) {
   const containerId = React.useId().replace(/:/g, '');
+  const embedWrapperId = `${containerId}__embed`;
   const [busy, setBusy] = React.useState(false);
+  const [embedMounted, setEmbedMounted] = React.useState(!lazyEmbed);
+  const embedMountedRef = React.useRef(!lazyEmbed);
   const eventId = normalizeTeplohodEventId(tepEventId);
   const checkoutUrl =
     purchaseUrl ||
@@ -510,11 +523,18 @@ export function TeplohodWidgetButton({
     });
 
   React.useEffect(() => {
-    if (!eventId) return;
+    if (!eventId || lazyEmbed) return;
     void prefetchTeplohodWidgetScript();
-  }, [eventId]);
+  }, [eventId, lazyEmbed]);
 
   if (!eventId) return null;
+
+  const ensureEmbedMounted = async () => {
+    if (!lazyEmbed || embedMountedRef.current) return;
+    embedMountedRef.current = true;
+    setEmbedMounted(true);
+    await waitForEmbedPaint();
+  };
 
   if (disabled) {
     return (
@@ -528,6 +548,7 @@ export function TeplohodWidgetButton({
     if (busy || isPurchaseOpeningActive()) return;
 
     const run = async () => {
+      await ensureEmbedMounted();
       const result = await openTeplohodPurchase({ wrapperId: containerId, purchaseUrl: checkoutUrl });
       if (result === 'widget' || result === 'popup' || isTeplohodCheckoutOpen()) {
         completePurchaseOpening();
@@ -562,19 +583,21 @@ export function TeplohodWidgetButton({
 
   return (
     <>
-      <div
-        id={containerId}
-        className="pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0"
-        aria-hidden="true"
-      >
-        <TeplohodWidgetEmbed
-          tepEventId={eventId}
-          tepWidgetId={tepWidgetId}
-          wrapperId={`${containerId}__embed`}
-          purchaseUrl={checkoutUrl}
-          showFallbackButton={false}
-        />
-      </div>
+      {embedMounted ? (
+        <div
+          id={containerId}
+          className="pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0"
+          aria-hidden="true"
+        >
+          <TeplohodWidgetEmbed
+            tepEventId={eventId}
+            tepWidgetId={tepWidgetId}
+            wrapperId={embedWrapperId}
+            purchaseUrl={checkoutUrl}
+            showFallbackButton={false}
+          />
+        </div>
+      ) : null}
       <button
         type="button"
         onClick={handleClick}
