@@ -1,3 +1,22 @@
+## 2026-07-27 - Blog: list ISR cache, hero minimal, pack C deploy
+
+### Наблюдения
+
+- /blog на prod до деплоя: Cache-Control private no-cache, TTFB ~1.08s; hero со stat card и подпиской newsletter.
+- Pack C (11 статей + hover captions) уже в 1024610; остался код perf + HeroLayout как у cities.
+
+### Решения
+
+- cached-blog-data.ts + unstable_cache 300s, tag blog-list, без await searchParams на page shell.
+- BlogListHero -> HeroLayout minimal; убраны подписка и stat card; skeleton в BlogListView/page.
+- revalidate-next-blog.js + internal revalidate route: tag blog-list.
+
+### Проблемы
+
+- После push: deploy-prod-next.sh, затем npm run blog:upsert на prod для pack C MD.
+
+---
+
 ## 2026-07-27 - Blog: снять open-air с Hero, перепрошить Макса (Акунин)
 
 ### Наблюдения

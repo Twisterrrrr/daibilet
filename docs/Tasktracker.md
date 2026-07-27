@@ -22,6 +22,13 @@
 
 ## Landing SSR perf (2026-07-27)
 
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| PERF.B1 | /blog ISR: cached list 300s, Suspense shell, minimal hero (no newsletter) | Критический | ⏳ 88585ec + 1024610 → prod deploy | агент |
+
+---
+
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | PERF.L1 | Landings ISR: убрать `await searchParams` в `[segment]`/`[segment2]`/`[segment3]`; genre с URL на клиенте | Критический | ✅ `c433652` prod (`s-maxage=3600` + HIT) |
