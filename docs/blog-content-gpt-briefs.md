@@ -8,10 +8,11 @@
 
 | Тип | Кол-во | Назначение |
 |-----|--------|------------|
-| Редакционные гиды | 9 | Разные углы: город, выходные, семья, концерты, река, поддержка SEO-лендингов |
-| Колонки Макса | 2 | Авторский голос, литературный наблюдатель (Akunin-like), не SEO-лонгриды |
+| Pack B: редакционные гиды | 9 | МСК / СПб / Казань / Екб: выходные, семья, концерты, река, SEO-лендинги |
+| Pack B: колонки Макса | 2 | Авторский голос, литературный наблюдатель (Akunin-like), не SEO-лонгриды |
+| Pack C: региональные гиды | 9 | Другие города с живым каталогом (НН, Самара, Уфа, Нск, Сочи, Ростов, Красноярск, Калининград, Ярославль) |
 
-**Не дублировать** slug и кластеры из [content-blog-plan.md](./content-blog-plan.md) (инвентарь 33 MD + закрытые кластеры). Pack B = **новый угол** (intent / цены / карты), не rewrite 9 longforms.
+**Не дублировать** slug и кластеры из [content-blog-plan.md](./content-blog-plan.md) (инвентарь 33 MD + закрытые кластеры). Pack B/C = **новый угол** (intent / цены / карты), не rewrite 9 longforms. Pack C не повторяет Pack B по тем же 4 городам.
 
 ---
 
@@ -106,7 +107,7 @@ authorId: editorial
 authorName: Редакция
 articleType: gid
 tag: Город | Семья | Концерты | Река | Выходные
-citySlug: moscow | saint-petersburg | kazan | ekaterinburg
+citySlug: moscow | saint-petersburg | kazan | ekaterinburg | nizhny-novgorod | samara | ufa | novosibirsk | sochi | rostov-on-don | krasnoyarsk | kaliningrad | yaroslavl
 date: "ДД месяц ГГГГ"
 readMin: 7-12
 imageAlt: "…"
@@ -151,7 +152,32 @@ status: DRAFT
 
 ---
 
-## Промпты: 9 гидов (редакция)
+## Календарь пачки C: другие города (хаос, MSK)
+
+Старт после Pack B. Приоритет - города с **живым каталогом** (см. `tmp-catalog-events-cache.json`, `STRONG_CITY_SLUGS`, `/cities` hub). В **пн** SEO-гиды не ставить.
+
+| Дата | Время | Тип | Slug | Промпт |
+|------|-------|-----|------|--------|
+| 2026-08-15 пт | 11:35 | top5 | `nn-stendap-impprov-pyat-voprosov` | A10 |
+| 2026-08-16 сб | 15:55 | long | `samara-vykhodnye-dva-dnya-bez-gonki` | A11 |
+| 2026-08-17 вс | - | - | - | **перерыв** |
+| 2026-08-18 пн | - | - | - | **перерыв** (день колонки) |
+| 2026-08-19 вт | 10:50 | events | `ufa-teatr-vecher-kak-vybrat` | A12 |
+| 2026-08-19 вт | 17:25 | top5 | `rostov-vecher-pyat-sposobov` | A13 |
+| 2026-08-20 ср | 14:15 | long | `novosibirsk-vykhodnye-chto-posmotret` | A14 |
+| 2026-08-21 чт | - | - | - | **перерыв** (опционально) |
+| 2026-08-22 пт | 12:40 | events | `sochi-vecher-koncert-ili-stendap` | A15 |
+| 2026-08-23 сб | 16:05 | long | `kaliningrad-dva-dnya-samostoyatelno` | A16 |
+| 2026-08-24 вс | - | - | - | **перерыв** |
+| 2026-08-25 пн | - | - | - | **перерыв** (день колонки) |
+| 2026-08-26 вт | 11:20 | events | `krasnoyarsk-odin-den-ekskursii` | A17 |
+| 2026-08-26 вт | 18:30 | top5 | `yaroslavl-zolotoe-koltso-vykhodnye` | A18 |
+
+Микс шаблонов Pack C: 3× `long`, 3× `top5`, 3× `events`. Города не из четвёрки Pack B (МСК / СПб / Казань / Екб).
+
+---
+
+## Промпты: 9 гидов Pack B (редакция)
 
 Для каждого: один раз System (seo-guide-articles-gpt-prompt + блок тона выше), затем User ниже **по одному**.
 
@@ -393,6 +419,236 @@ events 3500-5500. editorial. DRAFT.
 
 ---
 
+## Промпты: 9 гидов Pack C - другие города (редакция)
+
+Критерий отбора городов: **≥15 событий** в каталоге (кэш 2026-07-27), `isDestination` / strong city, CHPU `/cities/{slug}/` и хотя бы один листинг (`/stendap/`, `/ekskursii/`, `/koncerty/` и т.д.). Не дублировать `afisha-regionalnye-goroda` (там - мультигородской обзор; здесь - один город, другой угол).
+
+### A10 - Нижний Новгород, стендап и импровизация (`nn-stendap-impprov-pyat-voprosov`)
+
+| Поле | Значение |
+|------|----------|
+| Угол | Purchase intent / comedy formats |
+| template_type | `top5` |
+| citySlug | `nizhny-novgorod` |
+| Целевой CHPU | `/stendap/nizhny-novgorod/` |
+| Соседние | `/cities/nizhny-novgorod/`, `/koncerty/nizhny-novgorod/` |
+| readMin | 7 |
+
+```
+template_type: top5
+Title: Стендап и импровизация в Нижнем Новгороде: 5 вопросов перед покупкой билета
+slug: nn-stendap-impprov-pyat-voprosov
+citySlug: nizhny-novgorod
+Целевой CHPU: https://daibilet.ru/stendap/nizhny-novgorod/
+Соседние: https://daibilet.ru/cities/nizhny-novgorod/
+
+Акцент: чеклист перед оплатой - открытый микрофон vs headliner, импровизация vs готовый стендап, возраст, бар vs зал, возврат по правилам организатора.
+Не переписывать afisha-regionalnye-goroda (там НН - один из трёх городов в обзоре).
+Структура: 5 вопросов-ответов в narrative flow; NOTE с CTA на stendap/nizhny-novgorod.
+top5 ~3000 знаков без пробелов. editorial. DRAFT. Inline 1-2. Дефис только "-".
+```
+
+### A11 - Самара, выходные без гонки (`samara-vykhodnye-dva-dnya-bez-gonki`)
+
+| Поле | Значение |
+|------|----------|
+| Угол | City guide / weekend |
+| template_type | `long` |
+| citySlug | `samara` |
+| Целевой CHPU | `/cities/samara/` |
+| Соседние | `/ekskursii/samara/`, `/rechnye-progulki/samara/` |
+| readMin | 10 |
+
+```
+template_type: long
+Title: Самара на выходные: два дня без гонки по набережной и центру
+slug: samara-vykhodnye-dva-dnya-bez-gonki
+citySlug: samara
+Целевой CHPU: https://daibilet.ru/cities/samara/
+Соседние: https://daibilet.ru/ekskursii/samara/
+
+Акцент: самостоятельный weekend - набережная Волги, один музейный блок, вечерний формат (концерт или прогулка). Не обзор всех достопримечательностей подряд.
+Структура: лид (ошибка - весь город за день); H2 День 1 набережная + центр; H2 День 2 один кластер (музей ИЛИ экскурсия ИЛИ речной слот); H2 Вечер: афиша без выдуманных событий; H2 Логистика и бюджет; вывод кому какой weekend.
+NOTE после H2 День 1: CTA на афишу Самары.
+long 5000-7000 знаков. editorial. DRAFT.
+```
+
+### A12 - Уфа, театральный вечер (`ufa-teatr-vecher-kak-vybrat`)
+
+| Поле | Значение |
+|------|----------|
+| Угол | Theater / evening formats |
+| template_type | `events` |
+| citySlug | `ufa` |
+| Целевой CHPU | `/cities/ufa/` |
+| Соседние | `/neobychnye-teatry/ufa/`, `/detyam-i-semyam/ufa/` |
+| readMin | 8 |
+
+```
+template_type: events
+Title: Театральный вечер в Уфе: как выбрать спектакль, не ошибившись с жанром
+slug: ufa-teatr-vecher-kak-vybrat
+citySlug: ufa
+Целевой CHPU: https://daibilet.ru/cities/ufa/
+Соседние: https://daibilet.ru/neobychnye-teatry/ufa/
+
+Акцент: выбор постановки по описанию, возрасту и настроению; не переписывать блок про Уфу в afisha-regionalnye-goroda.
+Структура: лид; H2 Камерный зал vs большая сцена; H2 Семейный спектакль vs взрослый; H2 Что смотреть в карточке события; H2 Приход и дресс-код; H2 Если спектакль не зашёл (честные оговорки); вывод.
+NOTE: CTA на афишу Уфы или neobychnye-teatry/ufa.
+events 3500-5500. editorial. DRAFT.
+```
+
+### A13 - Ростов-на-Дону, пять вечерних форматов (`rostov-vecher-pyat-sposobov`)
+
+| Поле | Значение |
+|------|----------|
+| Угол | Evening picks / top5 |
+| template_type | `top5` |
+| citySlug | `rostov-on-don` |
+| Целевой CHPU | `/cities/rostov-on-don/` |
+| Соседние | `/stendap/rostov-on-don/`, `/koncerty/rostov-on-don/` |
+| readMin | 7 |
+
+```
+template_type: top5
+Title: Ростов-на-Дону вечером: 5 способов провести время после работы
+slug: rostov-vecher-pyat-sposobov
+citySlug: rostov-on-don
+Целевой CHPU: https://daibilet.ru/cities/rostov-on-don/
+Соседние: https://daibilet.ru/koncerty/rostov-on-don/
+
+Акцент: короткая подборка форматов (стендап, концерт, мероприятие, семейное шоу, иммерсив) - не полный гид по городу.
+Структура: лид 1-2 абзаца; 5 пунктов (формат + кому + оговорка); без SEO-мусора "№1 лучший".
+NOTE после пункта 3: CTA на афишу Ростова.
+top5 ~3000. editorial. DRAFT.
+```
+
+### A14 - Новосибирск, выходные (`novosibirsk-vykhodnye-chto-posmotret`)
+
+| Поле | Значение |
+|------|----------|
+| Угол | City guide / weekend |
+| template_type | `long` |
+| citySlug | `novosibirsk` |
+| Целевой CHPU | `/cities/novosibirsk/` |
+| Соседние | `/ekskursii/novosibirsk/`, `/podborki/na-vyhodnye/novosibirsk` |
+| readMin | 9 |
+
+```
+template_type: long
+Title: Новосибирск на выходные: что посмотреть за два дня без спешки
+slug: novosibirsk-vykhodnye-chto-posmotret
+citySlug: novosibirsk
+Целевой CHPU: https://daibilet.ru/cities/novosibirsk/
+Соседние: https://daibilet.ru/ekskursii/novosibirsk/
+
+Акцент: два дня в крупном региональном центре - центр, один культурный блок, вечерняя афиша. Учесть расстояния и холодный сезон (одежда, indoor fallback).
+Структура long: лид; H2 Суббота: прогулка + музей/экскурсия; H2 Воскресенье: один дальний слот или концерт; H2 Транспорт и еда; H2 Если погода плохая; вывод.
+NOTE: CTA на podborki/na-vyhodnye/novosibirsk или cities/novosibirsk.
+long 5000-7000. editorial. DRAFT.
+```
+
+### A15 - Сочи, вечерний выбор (`sochi-vecher-koncert-ili-stendap`)
+
+| Поле | Значение |
+|------|----------|
+| Угол | Resort evening / events |
+| template_type | `events` |
+| citySlug | `sochi` |
+| Целевой CHPU | `/koncerty/sochi/` |
+| Соседние | `/stendap/sochi/`, `/cities/sochi/` |
+| readMin | 8 |
+
+```
+template_type: events
+Title: Вечер в Сочи: концерт, стендап или шоу - как выбрать формат отдыхающему
+slug: sochi-vecher-koncert-ili-stendap
+citySlug: sochi
+Целевой CHPU: https://daibilet.ru/koncerty/sochi/
+Соседние: https://daibilet.ru/stendap/sochi/
+
+Акцент: турист в курортном городе - вечер после пляжа/гор, не пляжный гид. Сравнение форматов, сезонность, дорога до площадки.
+Структура: лид; H2 Концерт vs стендап vs семейное шоу; H2 Район и дорога (центр vs Адлер - без выдуманных адресов); H2 С детьми; H2 Билет в день мероприятия; вывод.
+NOTE: CTA на koncerty/sochi.
+events 3500-5500. editorial. DRAFT.
+```
+
+### A16 - Калининград, два дня (`kaliningrad-dva-dnya-samostoyatelno`)
+
+| Поле | Значение |
+|------|----------|
+| Угол | City guide / self-guided |
+| template_type | `long` |
+| citySlug | `kaliningrad` |
+| Целевой CHPU | `/cities/kaliningrad/` |
+| Соседние | `/peshie-ekskursii/kaliningrad/`, `/ekskursii/kaliningrad/` |
+| readMin | 10 |
+
+```
+template_type: long
+Title: Калининград за два дня: самостоятельный маршрут без экскурсионного автобуса
+slug: kaliningrad-dva-dnya-samostoyatelno
+citySlug: kaliningrad
+Целевой CHPU: https://daibilet.ru/cities/kaliningrad/
+Соседние: https://daibilet.ru/peshie-ekskursii/kaliningrad/
+
+Акцент: короткая поездка в калининградский анклав - исторический центр + один тематический блок; когда имеет смысл пешая экскурсия с гидом.
+Структура long: лид; H2 День 1 остров Канта и окрестности; H2 День 2 музей или пешая экскурсия; H2 Вечер и афиша; таблица "самостоятельно / с гидом"; вывод.
+NOTE: CTA на peshie-ekskursii/kaliningrad.
+long 5000-7000. editorial. DRAFT.
+```
+
+### A17 - Красноярск, экскурсии на один день (`krasnoyarsk-odin-den-ekskursii`)
+
+| Поле | Значение |
+|------|----------|
+| Угол | Excursions / day trip |
+| template_type | `events` |
+| citySlug | `krasnoyarsk` |
+| Целевой CHPU | `/ekskursii/krasnoyarsk/` |
+| Соседние | `/cities/krasnoyarsk/`, `/peshie-ekskursii/krasnoyarsk/` |
+| readMin | 8 |
+
+```
+template_type: events
+Title: Красноярск: один день с экскурсией - город, заповедник или промышленный маршрут
+slug: krasnoyarsk-odin-den-ekskursii
+citySlug: krasnoyarsk
+Целевой CHPU: https://daibilet.ru/ekskursii/krasnoyarsk/
+Соседние: https://daibilet.ru/cities/krasnoyarsk/
+
+Акцент: выбор формата однодневной программы (обзорная, природная, тематическая) - не общий путеводитель по Сибири.
+Структура: лид; H2 Обзорная по городу; H2 Природный или загородный слот; H2 Промышленный/тематический формат; H2 Что входит в билет; H2 Сезон и одежда; вывод.
+NOTE: CTA на ekskursii/krasnoyarsk.
+events 3500-5500. editorial. DRAFT.
+```
+
+### A18 - Ярославль, Золотое кольцо (`yaroslavl-zolotoe-koltso-vykhodnye`)
+
+| Поле | Значение |
+|------|----------|
+| Угол | Golden Ring / weekend top5 |
+| template_type | `top5` |
+| citySlug | `yaroslavl` |
+| Целевой CHPU | `/cities/yaroslavl/` |
+| Соседние | `/ekskursii/yaroslavl/`, `/peshie-ekskursii/yaroslavl/` |
+| readMin | 7 |
+
+```
+template_type: top5
+Title: Ярославль на выходные: 5 форматов Золотого кольца без туристического конвейера
+slug: yaroslavl-zolotoe-koltso-vykhodnye
+citySlug: yaroslavl
+Целевой CHPU: https://daibilet.ru/cities/yaroslavl/
+Соседние: https://daibilet.ru/ekskursii/yaroslavl/
+
+Акцент: короткая поездка в Ярославль - пешая экскурсия, обзорная, вечерний концерт, семейный формат, один музейный слот. Не лонгрид по всем храмам.
+Структура: 5 пунктов с подзаголовками; NOTE с CTA на ekskursii/yaroslavl.
+top5 ~3000. editorial. DRAFT. Inline 1-2.
+```
+
+---
+
 ## Промпты: 2 колонки Макса
 
 Литературный наблюдатель (Akunin-like): ирония, деталь быта, «детектив взгляда» на город/маршрут. **Не** копировать стиль Акунина дословно.
@@ -430,7 +686,7 @@ slug: moskva-parki-open-air-vyhodnye
 title: Open-air в московских парках: шум, плед и почему билет лучше брать раньше
 citySlug: moscow
 Тема: выходной open-air / концерт в парке - толпа, звук с края, погода, что взять.
-Мягкий CTA: афиша Москвы или подборка вечерних форматов.
+Мягкий CTA (абзац 3-4): [афиша Москвы](https://daibilet.ru/cities/moscow/) или [подборка rooftops](https://daibilet.ru/podborki/rooftops/moscow/).
 Можно 1 [buy slug=…] только если в задании дали конкретный READY slug - иначе только ссылка на CHPU.
 Frontmatter: authorId max, authorName Макс, articleType column, tag Колонка.
 Верни только Markdown. DRAFT.
@@ -453,9 +709,96 @@ title: Один день в Уральских горах: автобус, тр�
 citySlug: ekaterinburg
 Тема: выездной день из Екб - автобус, гид, тропа, изнанка (укачивание, обувь, обед в дороге).
 Литературный наблюдатель: детали как «улики», лёгкая ирония, без пафоса «душа России».
-CTA: мягко на афишу Екатеринбурга / экскурсии региона.
+CTA (абзац 3-4): мягко на [афишу Екатеринбурга](https://daibilet.ru/cities/ekaterinburg/). Другой экскурсионный CHPU не придумывать - только если owner даст точную ссылку.
 authorId max. column. DRAFT. Inline 1-2. Канон приветствия/финала.
 ```
+
+---
+
+## Автономные промпты (полная версия A10-A18, K1-K2)
+
+Краткие User-блоки ниже - для пачечной генерации с общим System. **Полные автономные промпты** (все правила внутри каждого блока, готовы к copy-paste в GPT без сверки с другими секциями) - в файле владельца `daibilet_prompts_A10-A18_K1-K2.md`.
+
+Сверка 2026-07-27: slug, углы, CHPU и календарь Pack C совпадают с этим документом. В Downloads дополнительно зафиксированы:
+
+- точные тексты `[NOTE …]` и место вставки (см. таблицу ниже);
+- явный запрет дублировать `afisha-regionalnye-goroda` в каждом промпте Pack C;
+- для колонок K1/K2: запрет `[buy]`, канон «Хей, читатели!» / «Мир лучше видеть своими глазами!», объём 1200-1800 знаков с пробелами;
+- K1: альтернативный CHPU `https://daibilet.ru/podborki/rooftops/moscow/`;
+- K2: не придумывать экскурсионный CHPU - только `https://daibilet.ru/cities/ekaterinburg/`, пока owner не даст другой.
+
+### Точные NOTE по Pack C (из автономных промптов)
+
+| Промпт | После блока | Шорткод NOTE |
+|--------|-------------|--------------|
+| A10 | 3-й вопрос | `[NOTE label="Совет" text="Сравните доступные форматы в разделе [Стендап в Нижнем Новгороде](https://daibilet.ru/stendap/nizhny-novgorod/) перед оплатой билета."]` |
+| A11 | H2 «День 1» | `[NOTE label="Совет" text="Перед поездкой посмотрите актуальные форматы в разделе [Афиша Самары](https://daibilet.ru/cities/samara/), чтобы выбрать один вечерний слот без перегруженного расписания."]` |
+| A12 | H2 «Что смотреть в карточке» | `[NOTE label="Совет" text="Для нестандартного вечера сравните постановки в разделе [Необычные театры Уфы](https://daibilet.ru/neobychnye-teatry/ufa/)."]` |
+| A13 | 3-й пункт | `[NOTE label="Совет" text="Сверьте форматы и время начала в разделе [Афиша Ростова-на-Дону](https://daibilet.ru/cities/rostov-on-don/), прежде чем строить вечер."]` |
+| A14 | H2 «Суббота» | `[NOTE label="Совет" text="Проверьте идеи на ближайшие даты в подборке [Новосибирск на выходные](https://daibilet.ru/podborki/na-vyhodnye/novosibirsk/), а затем оставьте в плане только один вечерний формат."]` |
+| A15 | H2 «Район и дорога» | `[NOTE label="Совет" text="Начните выбор с раздела [Концерты в Сочи](https://daibilet.ru/koncerty/sochi/) и сразу проверьте район площадки."]` |
+| A16 | H2 «День 1» | `[NOTE label="Совет" text="Если хочется не просто пройти маршрут, а понять его контекст, посмотрите [Пешие экскурсии по Калининграду](https://daibilet.ru/peshie-ekskursii/kaliningrad/)."]` |
+| A17 | H2 «Природный или загородный» | `[NOTE label="Совет" text="Сравните длительность и состав программы в разделе [Экскурсии в Красноярске](https://daibilet.ru/ekskursii/krasnoyarsk/) до покупки билета."]` |
+| A18 | 3-й пункт | `[NOTE label="Совет" text="Чтобы не собирать маршрут из случайных точек, сначала сравните [Экскурсии в Ярославле](https://daibilet.ru/ekskursii/yaroslavl/)."]` |
+
+Pack B (A1-A9) и краткие User-блоки K1/K2 в этом файле остаются каноном для batch-режима. Для одиночной генерации без System - использовать полные блоки из Downloads.
+
+---
+
+## Workflow генерации фото (агент)
+
+GPT **не** генерирует файлы изображений. Cover и inline создаёт **агент** (Cursor GenerateImage) после того, как owner сдал текст DRAFT.
+
+### Пути и frontmatter
+
+| Тип | Файл на диске | Frontmatter / shortcode |
+|-----|---------------|-------------------------|
+| Cover | `apps/public/public/images/blog/{slug}.jpg` | `coverImageUrl: "/images/blog/{slug}.jpg"` + `imageAlt: "…"` |
+| Inline 1 | `apps/public/public/images/blog/{slug}-inline.jpg` | `[image side=left\|right src="/images/blog/{slug}-inline.jpg" alt="…"]` |
+| Inline 2 | `apps/public/public/images/blog/{slug}-inline-2.jpg` | `[image side=… src="/images/blog/{slug}-inline-2.jpg" alt="…"]` |
+| Inline 3+ | `{slug}-inline-3.jpg` и т.д. | только если промпт явно требует больше двух |
+
+Правила `.cursorrules` п.6-7:
+
+- Cover обязателен для любой статьи; запрещены city-placeholder (`cities/*.png`).
+- Inline 1-2 обязательны в body до `PUBLISHED`; `src` inline **≠** cover (`filterDuplicateImageBlocks` вырежет совпадение).
+- Люди на фото: славянская внешность где уместно, позитив, не обязательно в камеру.
+- Каждый файл - **уникальный** GenerateImage, не копия cover и не stock-placeholder.
+
+### Порядок работы агента на одну статью
+
+1. Получить MD от owner (`status: DRAFT`) или сгенерировать по промпту A/K.
+2. **Cover:** GenerateImage по теме статьи и `imageAlt` → сохранить `{slug}.jpg`.
+3. **Inline:** 1-2 (или больше по промпту) отдельных GenerateImage - другой ракурс/сцена, не дублировать cover → `-inline.jpg`, `-inline-2.jpg`.
+4. Проверить shortcodes в body: пути совпадают с файлами на диске; `alt` осмысленный (станет подписью при hover, см. ниже).
+5. Положить MD в `content/blog/{slug}.md`.
+6. Перед `PUBLISHED`: все JPG на диске, `npm run blog:check-inline` (если есть), `blog:sync-bodies` → deploy → `blog:upsert`.
+
+Без cover **и** inline на диске агент не переводит в `PUBLISHED`.
+
+### Промпт GenerateImage (шаблон)
+
+```
+Фотореалистичное изображение для статьи блога о {тема}, город {город}.
+Сцена: {конкретная сцена из alt}.
+Стиль: естественный свет, без текста и водяных знаков на кадре.
+Люди (если есть): славянская внешность, позитивное настроение.
+Формат: горизонтальный 4:3, editorial travel/lifestyle.
+```
+
+Для inline - другой ракурс или деталь, чем на cover (зал крупным планом vs панорама города и т.п.).
+
+---
+
+## UI: подписи под inline-фото (hover)
+
+Рендер: `BlogArticleContent` → `BlogFigure` (`apps/web` и `apps/public`).
+
+- Подпись берётся из `alt` в shortcode `[image … alt="…"]`.
+- На `<img>` / `SafeImage`: `alt` + `title` (нативный tooltip и screen readers).
+- `<figcaption>`: `aria-hidden="true"` (дубль alt не озвучивается), скрыт на устройствах с hover до наведения на figure.
+- CSS: `group` на `<figure>`, figcaption `opacity-0` → `group-hover:opacity-100` только при `@media (hover: hover)`; на touch без hover подпись **всегда видна**.
+- Keyboard: `group-focus-within:opacity-100` на hover-устройствах.
 
 ---
 
@@ -463,10 +806,10 @@ authorId max. column. DRAFT. Inline 1-2. Канон приветствия/фи�
 
 1. **Подготовка:** открыть этот файл + [content-blog-plan.md](./content-blog-plan.md) (антидубли).
 2. **GPT:** вставить System (гиды - из seo-guide-articles-gpt-prompt; колонки - System K выше) **один раз**.
-3. **По одной статье:** копировать User A1…A9 или K1/K2. **Не** смешивать несколько тем в одном запросе.
+3. **По одной статье:** копировать User A1…A9, A10…A18 (Pack C) или K1/K2. **Не** смешивать несколько тем в одном запросе.
 4. **Сохранить** ответ как `{slug}.md` без markdown-ограждений ``` вокруг файла.
 5. **Вычитка:** анти-ИИ чеклист из seo-guide-articles-gpt-prompt; проверить дефис `-`; убрать выдуманные цены/slug.
-6. **Сдать агенту:** «размести пачку B, слоты из blog-content-gpt-briefs» + файлы или paste MD.
+6. **Сдать агенту:** «размести пачку B/C, слоты из blog-content-gpt-briefs» + файлы или paste MD.
 7. **Агент:** `content/blog/{slug}.md`, cover + inline JPG, `blog:sync-bodies`, deploy, `blog:upsert`, `publishedAt` по календарю.
 8. **Featured (опционально):** после выхода сильного материала - toggle в admin `isFeatured`.
 9. **Мониторинг:** раз в неделю YM/GSC; при mass «малоценная» - throttle 1 гид/день (owner).
@@ -490,3 +833,33 @@ authorId max. column. DRAFT. Inline 1-2. Канон приветствия/фи�
 - [ ] Нет `—` / `–` в пользовательском тексте
 - [ ] `status: PUBLISHED` + `publishedAt` MSK по календарю
 - [ ] `blog:upsert` на prod после deploy
+
+---
+
+## Чеклист генерации по статье (Pack C + колонки)
+
+Для каждой из 11 статей (A10-A18 + K1-K2) - отдельный проход. Тексты не генерировать пачкой без OK owner.
+
+| # | Промпт | slug | Cover | Inline 1 | Inline 2 | Слот MSK |
+|---|--------|------|-------|----------|----------|----------|
+| 1 | A10 | `nn-stendap-impprov-pyat-voprosov` | `{slug}.jpg` | `-inline.jpg` | `-inline-2.jpg` | 2026-08-15 11:35 |
+| 2 | A11 | `samara-vykhodnye-dva-dnya-bez-gonki` | idem | idem | idem | 2026-08-16 15:55 |
+| 3 | A12 | `ufa-teatr-vecher-kak-vybrat` | idem | idem | idem | 2026-08-19 10:50 |
+| 4 | A13 | `rostov-vecher-pyat-sposobov` | idem | idem | idem | 2026-08-19 17:25 |
+| 5 | A14 | `novosibirsk-vykhodnye-chto-posmotret` | idem | idem | idem | 2026-08-20 14:15 |
+| 6 | A15 | `sochi-vecher-koncert-ili-stendap` | idem | idem | idem | 2026-08-22 12:40 |
+| 7 | A16 | `kaliningrad-dva-dnya-samostoyatelno` | idem | idem | idem | 2026-08-23 16:05 |
+| 8 | A17 | `krasnoyarsk-odin-den-ekskursii` | idem | idem | idem | 2026-08-26 11:20 |
+| 9 | A18 | `yaroslavl-zolotoe-koltso-vykhodnye` | idem | idem | idem | 2026-08-26 18:30 |
+| 10 | K1 | `moskva-parki-open-air-vyhodnye` | idem | idem | idem | 2026-08-04 10:40 |
+| 11 | K2 | `ural-den-v-gorah-max` | idem | idem | idem | 2026-08-11 11:10 |
+
+**На статью:**
+
+- [ ] GPT или owner: MD `status: DRAFT`, NOTE по таблице выше (Pack C)
+- [ ] GenerateImage → cover `{slug}.jpg` + `imageAlt` в frontmatter
+- [ ] GenerateImage → `-inline.jpg` (другая сцена, не cover)
+- [ ] GenerateImage → `-inline-2.jpg` (если в body два shortcode)
+- [ ] Shortcodes `[image side=… src=… alt=…]` совпадают с файлами
+- [ ] `content/blog/{slug}.md` в репо
+- [ ] Owner OK текста → `publishedAt` по слоту → `PUBLISHED` → sync/deploy/upsert

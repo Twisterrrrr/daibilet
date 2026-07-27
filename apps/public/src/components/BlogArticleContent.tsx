@@ -312,15 +312,19 @@ function BlogFigure({
   className?: string;
 }) {
   return (
-    <figure className={className}>
+    <figure className={`group ${className}`}>
       <img
         src={image.src}
         alt={image.alt}
+        title={image.alt || undefined}
         loading="lazy"
         className="aspect-[4/3] w-full rounded-xl border border-slate-200/80 object-cover shadow-md"
       />
       {image.alt ? (
-        <figcaption className="mt-2.5 text-center text-xs leading-snug text-slate-500 sm:text-sm">
+        <figcaption
+          aria-hidden="true"
+          className="mt-2.5 text-center text-xs leading-snug text-slate-500 opacity-100 transition-opacity duration-200 sm:text-sm [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-within:opacity-100"
+        >
           {image.alt}
         </figcaption>
       ) : null}
