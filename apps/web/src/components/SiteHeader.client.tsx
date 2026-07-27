@@ -94,8 +94,8 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/70 bg-white/95 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.03)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
-        <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-3 lg:items-end lg:py-3.5">
-          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 lg:flex-none lg:items-end lg:gap-4">
+        <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-3 lg:py-3.5">
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 lg:flex-none lg:gap-4">
             <button
               type="button"
               aria-label="Открыть меню"
@@ -119,7 +119,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
             />
           </div>
 
-          <nav aria-label="Основная навигация" className="hidden min-w-0 items-center gap-0.5 lg:flex lg:items-end">
+          <nav aria-label="Основная навигация" className="hidden min-w-0 items-center gap-0.5 lg:flex">
             {navLinks.map((item) => {
               const active = isNavActive(pathname, item.href.split('?')[0] || item.href);
               const secondary = item.href.startsWith('/venues') || item.href.startsWith('/locations') || item.href.startsWith('/blog');
@@ -130,7 +130,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
                   className={
                     [
                       secondary ? 'hidden xl:inline-flex' : 'inline-flex',
-                      'items-center rounded-lg px-2.5 py-1.5 text-sm font-medium transition lg:py-0 xl:px-3',
+                      'items-center rounded-lg px-2.5 py-1.5 text-sm font-medium transition xl:px-3',
                       active
                         ? 'text-graphite underline decoration-graphite/70 decoration-2 underline-offset-[6px]'
                         : 'text-graphite-muted hover:bg-surface-muted hover:text-graphite',
@@ -143,7 +143,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
             })}
           </nav>
 
-          <div className="flex shrink-0 items-center gap-1 sm:gap-1.5 lg:self-center">
+          <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
             <HeaderSearch
               variant="overlay"
               cityFilter={searchCityFilter}
