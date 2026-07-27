@@ -187,6 +187,7 @@
 | CV.9c | Public DTO + блок логистики на venue page (`VenueLogisticsBlock`; empty hide если нет address и трёх полей); OSM keep | Высокий | ✅ + owner: hide empty metro/way/parking independently |
 | CV.9d | `/events/[slug]`: venue click → modal (логистика + Yandex iframe при coords / external button иначе); slim SSR fields; fallback «Страница площадки» | Средний | ✅ |
 | CV.9e | Guard: null/whitespace `metroStation` → no metro UI (иконка+label); same for wayToFind/parking; LocationCard без fake Train | Высокий | ✅ |
+| CV.9f | Venue route CTA: Google Maps → 2ГИС (`build2gisRouteUrl`, lon,lat) | Средний | ✅ 2026-07-27 |
 | CV.10 | Mood chip «Свидание» на `/podborki` (рядом с «Для двоих») | Низкий | ⏳ |
 | CV.11 | Social proof «проданные билеты» (TC Order paid aggregate) | Средний | ⚠️ deferred: только после реального order-aggregate; hardcoded fake 🚫; до - каталожные counts (CV.3) |
 | CV.12 | Catalog card dates: human mask `25 июля, суббота в 07:15` | Высокий | ✅ open-date без фейковых часов; не путать с CV.5 (скидки) |

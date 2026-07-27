@@ -21,6 +21,7 @@ import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { expandSessionPurchaseVariants, isSessionPurchaseBlocked } from '@/lib/event-purchase';
 import { formatMoney, formatNumber } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
+import { build2gisRouteUrl } from '@/lib/maps';
 import type { VenueEventGroup } from '@/lib/venue-program';
 import { normalizeVenueKind, resolveLocationVenueCopy, venueTypeIcon, venueTypeLabel } from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/lib/routes';
@@ -239,12 +240,12 @@ export function LocationVenueLayout({
                         <NavigationIcon className="h-4 w-4" /> Открыть в Яндекс.Картах
                       </a>
                       <a
-                        href={`https://www.google.com/maps/dir/?api=1&destination=${venue.latitude},${venue.longitude}`}
+                        href={build2gisRouteUrl(venue.latitude!, venue.longitude!)}
                         target="_blank"
                         rel="noreferrer"
                         className="pointer-events-auto inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-bold text-slate-900 shadow-lg ring-1 ring-slate-200 hover:bg-slate-50"
                       >
-                        <Car className="h-4 w-4" /> Построить маршрут
+                        <Car className="h-4 w-4" /> Маршрут в 2ГИС
                       </a>
                     </div>
                   ) : null}
@@ -451,12 +452,12 @@ function LocationMapStrip({ venue }: { venue: PublicVenueDto }) {
               <NavigationIcon className="h-4 w-4" /> Яндекс.Карты
             </a>
             <a
-              href={`https://www.google.com/maps/dir/?api=1&destination=${venue.latitude},${venue.longitude}`}
+              href={build2gisRouteUrl(venue.latitude!, venue.longitude!)}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-slate-200 hover:bg-slate-50"
             >
-              <Car className="h-4 w-4" /> Построить маршрут
+              <Car className="h-4 w-4" /> Маршрут в 2ГИС
             </a>
           </div>
         </div>

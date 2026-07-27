@@ -1,3 +1,23 @@
+## 2026-07-27 - Venue routes: Google Maps → 2ГИС
+
+### Наблюдения
+
+- На страницах площадок (`LocationVenueLayout` / `InstitutionVenueLayout`, web + public) кнопка маршрута вела на Google `maps/dir`.
+- Рядом уже был labeled deep-link «Яндекс.Карты»; Google в UX не назывался.
+- Для РФ аудитории 2ГИС предпочтительнее Google Maps.
+
+### Решения
+
+- Заменили destination URL на `https://2gis.ru/routeSearch/rsType/car/to/{lon},{lat}` (порядок lon,lat).
+- Хелпер `build2gisRouteUrl(lat, lng)` в `apps/web` и `apps/public` (`lib/maps.ts`).
+- Подпись кнопки: «Маршрут в 2ГИС» (по аналогии с Яндексом). Кнопки «открыть на карте» / Яндекс не трогали.
+
+### Проблемы
+
+- Нет. После commit - deploy-prod-next на `feat/next-monorepo`.
+
+---
+
 ## 2026-07-27 - Blog: list ISR cache, hero minimal, pack C deploy
 
 ### Наблюдения
@@ -877,7 +897,7 @@
 
 - Owner назвал работу «Спринт CV.5», но в Tasktracker **CV.5** = sort «скидки» (deferred), **CV.9** = «как найти». Канон эпика logistics = **CV.9**; CV.5 не трогаем.
 - `Venue` уже имеет `address`, `latitude`, `longitude`. Полей metro / way-to-find / parking в Prisma нет.
-- Public venue pages: блок «Как добраться» почти только адрес+город; карта - `OsmMapEmbed` (OSM iframe) + deep-link Яндекс/Google.
+- Public venue pages: блок «Как добраться» почти только адрес+город; карта - `OsmMapEmbed` (OSM iframe) + deep-link Яндекс / маршрут 2ГИС.
 - Next admin `/admin/venues/[id]` и `updateAdminVenue` **не** пишут address/coords/logistics (только SEO/kind/pageStatus/descriptions).
 - `/events/[slug]` venue в hero - `<Link>` на `/venues|locations` (уход со страницы). Паттерн modal уже есть (`CheckoutModal`).
 - HC.11: неполный lat/lng на catalog cards - отдельно; page DTO coords уже резолвятся.

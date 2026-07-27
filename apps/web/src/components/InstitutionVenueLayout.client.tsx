@@ -19,6 +19,7 @@ import { VenueLogisticsBlock, hasVenueLogisticsContent } from '@/components/Venu
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatMoney, formatNumber } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
+import { build2gisRouteUrl } from '@/lib/maps';
 import { institutionTypeEmoji, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/lib/routes';
 import type { PublicSessionDto, PublicVenueDto, PublicVenuePageDto } from '@daibilet/contracts/public';
@@ -305,13 +306,13 @@ export function InstitutionVenueLayout({
                     Яндекс.Карты
                   </a>
                   <a
-                    href={`https://www.google.com/maps/dir/?api=1&destination=${venue.latitude},${venue.longitude}`}
+                    href={build2gisRouteUrl(venue.latitude!, venue.longitude!)}
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
                   >
                     <Car className="h-3.5 w-3.5" />
-                    Маршрут
+                    Маршрут в 2ГИС
                   </a>
                 </div>
               </div>

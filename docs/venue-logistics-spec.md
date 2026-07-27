@@ -120,7 +120,7 @@ venueParkingInfo?: string | null;
 4. **Как найти** - только если `wayToFind` непустой
 5. **Парковка** - только если `parkingInfo` непустой
 
-Карта на venue page: существующий **`OsmMapEmbed`** + внешние ссылки Яндекс/Google. Унификация OSM→Yandex - backlog.
+Карта на venue page: существующий **`OsmMapEmbed`** + внешние ссылки Яндекс (открыть на карте) и 2ГИС (маршрут `to/{lon},{lat}`). Унификация OSM→Yandex - backlog.
 
 ---
 
