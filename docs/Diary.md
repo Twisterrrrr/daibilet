@@ -17,7 +17,7 @@
 ### Проблемы
 
 - **28.07 03:20 UTC** ещё не прошёл - утром 28.07 запустить `verify-tc-catalog-sync.sh` на prod.
-- Deploy BUY.5 + sync script alert после commit.
+- Deploy BUY.5 + sync script alert после commit. ✅ prod @`59fd4d8` EXIT:0 (2026-07-27).
 
 ---
 

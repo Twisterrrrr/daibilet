@@ -45,7 +45,7 @@
 | BUY.3 | Bridges: убрать fake ★4.7 / sold-count; hide fake Reviews | Высокий | ✅ |
 | BUY.4 | TEP open: не ждать `window.TI_Tickets` (IIFE); fast-path click + preload script | Критический | ✅ `ac91b0f` на prod (2026-07-27) |
 | BUY.4b | TEP: Fancybox/iframe = success; не fail/dismiss если виджет уже виден; wait buy-link | Критический | ✅ `b02f657` prod; smoke moscow/bridges/SPB river ~40–57ms, fail shell=0 |
-| BUY.5 | TEP: lazy/shared embed на лендингах (убрать N×XHR `widget/embed`) | Высокий | ✅ `TeplohodWidgetButton` lazyEmbed on first click; `LandingPurchaseButton` |
+| BUY.5 | TEP: lazy/shared embed на лендингах (убрать N×XHR `widget/embed`) | Высокий | ✅ `59fd4d8` prod deploy |
 | BUY.6 | TEP: `TeplohodWidgetEmbed` всегда через `resolveTeplohodCheckoutUrl` (не raw purchaseUrl) | Средний | ⏳ latent defense |
 | BUY.7 | Owner site-wide TEP link audit (landings/event/home/dinner/party) | Высокий | ✅ 2026-07-27: broken patterns не найдены; см. Diary |
 
