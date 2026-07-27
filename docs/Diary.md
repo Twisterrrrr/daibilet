@@ -1,3 +1,19 @@
+## 2026-07-27 - Fix: 2ГИС route URL (directions)
+
+### Наблюдения
+
+- Prod-регрессия после смены Google→2ГИС: `routeSearch/rsType/car/to/{lon},{lat}` редиректит на `/spb` без точки назначения.
+
+### Решения
+
+- URL: `https://2gis.ru/directions/tab/car/points/|{lon},{lat}` (актуальная схема directions, from пустой).
+
+### Проблемы
+
+- Старый `routeSearch` на вебе 2ГИС больше не прокидывает координаты.
+
+---
+
 ## 2026-07-27 - Venue routes: Google Maps → 2ГИС
 
 ### Наблюдения
