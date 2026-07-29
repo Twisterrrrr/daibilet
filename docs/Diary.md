@@ -1,3 +1,18 @@
+
+## 2026-07-29 - Fix TEP/TC widget overlays + column badge
+
+### Наблюдения
+- На /events Fancybox TEP открывался под PurchaseOpeningHost / venue modal и был некликабелен.
+- На лендингах CTA мог уходить в битый TC-path из-за tep id в extractTcEventIdFromSession; fail-shell блокировал повторные клики.
+- Owner: бейдж колонок «От автора», курсивная подпись в конце статьи.
+
+### Решения
+- Vendor Fancybox/TC z-index 2147483000; venue modal z-99980; shell auto-dismiss при появлении checkout; isPurchaseOpeningActive только opening.
+- LandingPurchaseButton: TEP первым; extractTcEventIdFromSession не возвращает teplohod ids.
+- Column UI: badge «От автора» + signature `{name}, штатный корреспондент Дайбилет`; .cursorrules п.8.
+
+### Проблемы
+- Локальный worktree daibilet-push с битым git object store - коммит из свежего clone.
 ## 2026-07-27 - Prod 404: Былинный Берег (past event + search)
 
 ### Наблюдения

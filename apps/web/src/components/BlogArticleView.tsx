@@ -11,6 +11,12 @@ import {
   resolveBlogCityEventsHref,
   resolveBlogCityHref,
 } from '@/lib/blog-article-city';
+import {
+  COLUMN_BADGE_LABEL,
+  columnAuthorSignature,
+  isColumnArticle,
+  normalizeBlogTagLabel,
+} from '@/lib/blog-meta';
 import type { BlogArticleDto, BlogCardDto } from '@/lib/blog-utils';
 import { estimateReadMin, formatBlogPublishedAt } from '@/lib/blog-utils';
 
@@ -70,9 +76,10 @@ function buildTopicLinks(article: BlogArticleDto): BlogSidebarLink[] {
 
 function resolveArticleTag(article: BlogArticleDto): string | null {
   const staticPost = BLOG_POSTS.find((post) => post.slug === article.slug);
-  // Колонка: без бейджа типа - сигнал только цвет имени автора.
-  if (article.articleType === 'column' || staticPost?.tag === 'Колонка') return null;
-  if (staticPost?.tag) return staticPost.tag;
+  if (isColumnArticle(article.articleType) || staticPost?.tag === 'Колонка' || staticPost?.tag === COLUMN_BADGE_LABEL) {
+    return COLUMN_BADGE_LABEL;
+  }
+  if (staticPost?.tag) return normalizeBlogTagLabel(staticPost.tag, article.articleType);
   if (article.articleType === 'obzor') return 'Обзор';
   if (article.articleType === 'digest') return 'Дайджест';
   if (article.city) return 'Город';
@@ -95,6 +102,8 @@ export function BlogArticleView({
   const eventsLink = resolveBlogCityEventsHref(article.city, article.citySlug);
   const topicLinks = buildTopicLinks(article);
   const tag = resolveArticleTag(article);
+  const isColumn = isColumnArticle(article.articleType) || tag === COLUMN_BADGE_LABEL;
+  const authorSign = isColumn ? columnAuthorSignature(article.authorName) : null;
   const breadcrumbs = [
     { label: 'Главная', href: '/' },
     { label: 'Блог', href: '/blog' },
@@ -125,6 +134,11 @@ export function BlogArticleView({
                 content={article.content || article.excerpt || ''}
                 coverImageUrl={article.coverImageUrl}
               />
+              {authorSign ? (
+                <p className="mt-10 border-t border-slate-200/80 pt-6 text-sm italic leading-relaxed text-slate-600">
+                  {authorSign}
+                </p>
+              ) : null}
             </article>
 
             <BlogRelatedSidebar
@@ -175,7 +189,12 @@ export function BlogArticleView({
                     <li key={`strip-${post.slug}`}>
                       <Link href={`/blog/${post.slug}`} className="group block">
                         <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-500">
-                          {[post.tag === 'Колонка' ? null : post.tag, post.city]
+                          {[
+                            normalizeBlogTagLabel(post.tag, post.articleType) === COLUMN_BADGE_LABEL
+                              ? COLUMN_BADGE_LABEL
+                              : normalizeBlogTagLabel(post.tag, post.articleType),
+                            post.city,
+                          ]
                             .filter(Boolean)
                             .join(' · ') || 'Блог'}
                         </p>

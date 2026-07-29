@@ -92,7 +92,7 @@ export function EventVenueModal({ open, onClose, event }: EventVenueModalProps) 
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[100000] flex items-center justify-center p-3 sm:p-6"
+      className="fixed inset-0 z-[99980] flex items-center justify-center p-3 sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-label={title}

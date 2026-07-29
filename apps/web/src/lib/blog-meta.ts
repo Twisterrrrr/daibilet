@@ -9,9 +9,12 @@ export const BLOG_AUTHOR_LABELS: Record<string, string> = {
   editorial: 'Редакция',
 };
 
+/** Публичный бейдж колонки (не «Колонка»). */
+export const COLUMN_BADGE_LABEL = 'От автора';
+
 export const BLOG_ARTICLE_TYPE_LABELS: Record<string, string> = {
   gid: 'Гид',
-  column: 'Колонка',
+  column: COLUMN_BADGE_LABEL,
   digest: 'Дайджест',
   obzor: 'Обзор',
 };
@@ -245,6 +248,22 @@ export function isColumnArticle(articleType?: string | null): boolean {
     .trim()
     .toLowerCase();
   return type === 'column' || type === 'kolonka';
+}
+
+/** Нормализует тег листинга: устаревшее «Колонка» → «От автора». */
+export function normalizeBlogTagLabel(tag?: string | null, articleType?: string | null): string | null {
+  if (isColumnArticle(articleType)) return COLUMN_BADGE_LABEL;
+  const raw = String(tag || '').trim();
+  if (!raw) return null;
+  if (raw === 'Колонка' || raw.toLowerCase() === 'column') return COLUMN_BADGE_LABEL;
+  return raw;
+}
+
+/** Курсивная подпись в конце колонки. */
+export function columnAuthorSignature(authorName?: string | null): string | null {
+  const name = String(authorName || '').trim();
+  if (!name || name === 'Редакция') return null;
+  return `${name}, штатный корреспондент Дайбилет`;
 }
 
 /** Имя автора колонки - brand blue; «Редакция» и прочие - нейтральный slate. */

@@ -8,7 +8,7 @@ import { SafeImage } from '@/components/SafeImage.client';
 import { BLOG_POSTS } from '@/data/blog-posts';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { resolveBlogCardDateLabel } from '@/lib/blog-utils';
-import { authorLabel, blogAuthorNameClassName, isColumnArticle } from '@/lib/blog-meta';
+import { authorLabel, blogAuthorNameClassName, normalizeBlogTagLabel } from '@/lib/blog-meta';
 import {
   resolveBlogListingCta,
   resolveBlogListingQuickLinks,
@@ -37,9 +37,9 @@ function BlogListRow({ post }: { post: BlogCardDto }) {
   });
 
   const chips: Array<{ key: string; label: string }> = [];
-  // Без бейджа «Колонка» - сигнал только цвет имени автора.
-  if (tag && tag !== 'Колонка' && !isColumnArticle(post.articleType)) {
-    chips.push({ key: `tag-${tag}`, label: tag });
+  const displayTag = normalizeBlogTagLabel(tag, post.articleType);
+  if (displayTag) {
+    chips.push({ key: `tag-${displayTag}`, label: displayTag });
   }
   if (post.city) chips.push({ key: `city-${post.city}`, label: post.city });
 

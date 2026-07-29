@@ -49,12 +49,6 @@ export function LandingPurchaseButton({
     );
   }
 
-  const tcEventId = extractTcEventIdFromSession(session);
-  const ticketscloud = getTcWidgetIds({
-    externalId: tcEventId,
-    widgetProvider: session.purchaseProvider || session.offerSourceCode,
-    purchaseUrl: session.purchaseUrl,
-  });
   const teplohod = getTeplohodWidgetIdsFromSession(session);
   const teplohodCheckoutUrl =
     resolveTeplohodCheckoutUrl({
@@ -63,17 +57,8 @@ export function LandingPurchaseButton({
       tepWidgetId: teplohod?.tepWidgetId,
     }) || purchaseUrl;
 
-  if (ticketscloud?.tcEventId && tcEventId) {
-    return (
-      <TcWidgetButton
-        tcEventId={ticketscloud.tcEventId}
-        purchaseUrl={purchaseUrl}
-        label={resolvedLabel}
-        className={resolvedClassName}
-      />
-    );
-  }
-
+  // TEP first: extractTcEventIdFromSession can return tep numeric ids, which must not
+  // steal the CTA into a broken TicketsCloud path on river/landings.
   if (teplohod?.tepEventId) {
     return (
       <TeplohodWidgetButton
@@ -83,6 +68,24 @@ export function LandingPurchaseButton({
         label={resolvedLabel}
         className={resolvedClassName}
         lazyEmbed
+      />
+    );
+  }
+
+  const tcEventId = extractTcEventIdFromSession(session);
+  const ticketscloud = getTcWidgetIds({
+    externalId: tcEventId,
+    widgetProvider: session.purchaseProvider || session.offerSourceCode,
+    purchaseUrl: session.purchaseUrl,
+  });
+
+  if (ticketscloud?.tcEventId && tcEventId) {
+    return (
+      <TcWidgetButton
+        tcEventId={ticketscloud.tcEventId}
+        purchaseUrl={purchaseUrl}
+        label={resolvedLabel}
+        className={resolvedClassName}
       />
     );
   }

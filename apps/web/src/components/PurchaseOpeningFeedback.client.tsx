@@ -36,6 +36,20 @@ function getSnapshot() {
   return state;
 }
 
+const VENDOR_CHECKOUT_SELECTOR = [
+  '.fancyboxtkt-container',
+  '.fancyboxtkt-slide',
+  '.fancyboxtkt-bg',
+  '.fancybox-container',
+  '.fancybox-slide',
+  '.fancybox__container',
+  'iframe[src*="account.teplohod.info"]',
+  'iframe[src*="teplohod.info/order"]',
+  '#tc-widget-overlay',
+  '.tc-widget-frame_popup',
+  'iframe[src*="ticketscloud"]',
+].join(', ');
+
 export function beginPurchaseOpening(options?: {
   message?: string;
   fallbackUrl?: string | null;
@@ -59,22 +73,7 @@ function isVendorCheckoutVisible() {
   if (typeof document === 'undefined') return false;
   if (document.body.classList.contains('fancyboxtkt-active')) return true;
   if (document.body.classList.contains('fancybox-active')) return true;
-  return Boolean(
-    document.querySelector(
-      [
-        '.fancyboxtkt-container',
-        '.fancyboxtkt-slide',
-        '.fancyboxtkt-bg',
-        '.fancybox-container',
-        '.fancybox-slide',
-        'iframe[src*="account.teplohod.info"]',
-        'iframe[src*="teplohod.info/order"]',
-        '#tc-widget-overlay',
-        '.tc-widget-frame_popup',
-        'iframe[src*="ticketscloud"]',
-      ].join(', '),
-    ),
-  );
+  return Boolean(document.querySelector(VENDOR_CHECKOUT_SELECTOR));
 }
 
 export function failPurchaseOpening(options?: {
@@ -96,8 +95,9 @@ export function failPurchaseOpening(options?: {
   emit();
 }
 
+/** Only block new clicks while the opening spinner is up - not after fail dialog. */
 export function isPurchaseOpeningActive() {
-  return state.phase !== 'idle';
+  return state.phase === 'opening';
 }
 
 /**
@@ -119,6 +119,31 @@ export function PurchaseOpeningHost() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
+  }, [snap.phase]);
+
+  // Vendor checkout painted under our shell → dismiss immediately so Fancybox is clickable.
+  React.useEffect(() => {
+    if (snap.phase !== 'opening') return;
+    if (isVendorCheckoutVisible()) {
+      completePurchaseOpening();
+      return;
+    }
+    const observer = new MutationObserver(() => {
+      if (isVendorCheckoutVisible()) completePurchaseOpening();
+    });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['class', 'style'],
+    });
+    const poll = window.setInterval(() => {
+      if (isVendorCheckoutVisible()) completePurchaseOpening();
+    }, 120);
+    return () => {
+      observer.disconnect();
+      window.clearInterval(poll);
+    };
   }, [snap.phase]);
 
   if (!mounted || snap.phase === 'idle') return null;

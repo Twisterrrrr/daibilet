@@ -17,9 +17,9 @@ type BlogArticleHeroProps = {
   city?: string | null;
   cityHref?: string | null;
   tag?: string | null;
-  /** Имя автора колонки (не тип «Колонка»). */
+  /** Имя автора колонки. */
   authorName?: string | null;
-  /** articleType === 'column' → brand blue имя, без бейджа типа. */
+  /** articleType === 'column' → brand blue имя + бейдж «От автора». */
   articleType?: string | null;
 };
 

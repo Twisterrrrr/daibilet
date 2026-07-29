@@ -284,7 +284,7 @@ export function cityHubArticleBadges(article: BlogCardDto): string[] {
   const badges: string[] = [];
   const type = String(article.articleType || '').toLowerCase();
   if (type === 'obzor') badges.push('Обзор');
-  else if (type === 'column') badges.push('Колонка');
+  else if (type === 'column') badges.push('От автора');
   else if (type === 'digest') badges.push('Дайджест');
   else badges.push('Гид');
 

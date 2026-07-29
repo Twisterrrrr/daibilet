@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { normalizeBlogTagLabel } from '@/lib/blog-meta';
 import type { BlogCardDto } from '@/lib/blog-utils';
 
 export type BlogSidebarLink = {
@@ -54,7 +55,7 @@ export function BlogRelatedSidebar({
           </p>
           <ul className="mt-3 space-y-4">
             {posts.map((post) => {
-              const metaLabel = [post.tag === 'Колонка' ? null : post.tag, post.city]
+              const metaLabel = [normalizeBlogTagLabel(post.tag, post.articleType), post.city]
                 .filter(Boolean)
                 .join(' · ');
               return (

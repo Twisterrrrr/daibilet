@@ -147,7 +147,7 @@ function enrichCardFields(slug: string, partial: Partial<BlogCardDto>): Pick<
   const tag =
     partial.tag ||
     (articleType === 'column'
-      ? 'Колонка'
+      ? 'От автора'
       : articleType === 'obzor'
         ? 'Обзор'
         : articleType === 'digest'

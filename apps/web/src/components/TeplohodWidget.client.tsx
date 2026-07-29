@@ -44,12 +44,20 @@ const TEP_WIDGET_CSS = `
 .teplohod-info-wrapper .ti-tickets-event-tickets-buy-closed {
   display: none !important;
 }
-/* Keep Teplohod Fancybox above Next layout chrome + purchase opening shell */
+/* Keep Teplohod Fancybox above Next chrome + purchase opening shell (z-99990) */
 .fancyboxtkt-container,
 .fancyboxtkt-bg,
+.fancyboxtkt-inner,
+.fancyboxtkt-slide,
+.fancyboxtkt-content,
 .fancybox-container,
-.fancybox-bg {
-  z-index: 100050 !important;
+.fancybox-bg,
+.fancybox-inner,
+.fancybox-slide,
+.fancybox-content,
+.fancybox__container,
+.fancybox__backdrop {
+  z-index: 2147483000 !important;
 }
 `;
 
@@ -108,7 +116,9 @@ function findTeplohodBuyButton(wrapperId?: string | null) {
     } catch {
       safeId = wrapperId.replace(/([^a-zA-Z0-9_-])/g, '\\$1');
     }
-    const scoped = document.querySelector<HTMLElement>(`#${safeId} .ti-tickets-event-tickets-buy`);
+    const scoped = document.querySelector<HTMLElement>(
+      `#${safeId} .ti-tickets-event-tickets-buy, #${safeId}__embed .ti-tickets-event-tickets-buy`,
+    );
     if (scoped) return scoped;
   }
   return null;
@@ -549,7 +559,11 @@ export function TeplohodWidgetButton({
 
     const run = async () => {
       await ensureEmbedMounted();
-      const result = await openTeplohodPurchase({ wrapperId: containerId, purchaseUrl: checkoutUrl });
+      // Scope to outer host id (contains `#…__embed .teplohod-info-wrapper`).
+      const result = await openTeplohodPurchase({
+        wrapperId: containerId,
+        purchaseUrl: checkoutUrl,
+      });
       if (result === 'widget' || result === 'popup' || isTeplohodCheckoutOpen()) {
         completePurchaseOpening();
         return;

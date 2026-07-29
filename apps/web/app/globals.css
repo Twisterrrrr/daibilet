@@ -416,12 +416,26 @@
   pointer-events: none !important;
 }
 
-/* Vendor payment shells must sit above PurchaseOpeningHost (z-99990). */
+/* Vendor payment shells must sit above PurchaseOpeningHost (z-99990)
+   and EventVenueModal (z-99980). Teplohod Fancybox defaults are often ~9xxx
+   and otherwise render under our opening shell (unclickable). */
 .tc-widget-frame_popup,
 #tc-widget-overlay,
 .tc-widget-container,
-#ticketscloud-loader {
-  z-index: 100050 !important;
+#ticketscloud-loader,
+.fancyboxtkt-container,
+.fancyboxtkt-bg,
+.fancyboxtkt-inner,
+.fancyboxtkt-slide,
+.fancyboxtkt-content,
+.fancybox-container,
+.fancybox-bg,
+.fancybox-inner,
+.fancybox-slide,
+.fancybox-content,
+.fancybox__container,
+.fancybox__backdrop {
+  z-index: 2147483000 !important;
 }
 
 .tc-buy-btn {

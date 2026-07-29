@@ -38,11 +38,9 @@ export function extractTcEventIdFromSession(session: {
   const fromTcQuery = purchaseUrl.match(/[?&]event=([^&]+)/)?.[1];
   if (fromTcQuery) return decodeURIComponent(fromTcQuery);
 
-  const fromTepPath = purchaseUrl.match(/teplohod\.info\/event\/(\d+)/i)?.[1];
-  if (fromTepPath) return fromTepPath;
-
-  const fromTepId = String(session.eventId || session.id || '').match(/^evt_tep_(\d+)$/i)?.[1];
-  if (fromTepId) return fromTepId;
+  // Teplohod ids must not be treated as TicketsCloud event ids (breaks landings /events buy).
+  if (/teplohod\.info/i.test(purchaseUrl)) return null;
+  if (/^evt_tep_/i.test(String(session.eventId || session.id || ''))) return null;
 
   const raw = String(session.eventId || session.id || '').trim();
   const match = raw.match(/^(?:evt_|sess_)?([a-f0-9]+)$/i);
@@ -52,7 +50,12 @@ export function extractTcEventIdFromSession(session: {
 function isTeplohodPurchaseSession(session: PurchaseSession): boolean {
   const purchaseUrl = String(session.purchaseUrl || session.widgetUrl || '');
   const provider = String(session.purchaseProvider || session.offerSourceCode || '').toUpperCase();
-  return provider.includes('TEPLOHOD') || provider.includes('TEP') || purchaseUrl.includes('teplohod.info');
+  return (
+    provider.includes('TEPLOHOD') ||
+    provider.includes('TEP') ||
+    purchaseUrl.includes('teplohod.info') ||
+    /^evt_tep_/i.test(String(session.id || session.eventId || ''))
+  );
 }
 
 export function isSessionPurchaseBlocked(session: PurchaseSession): boolean {
@@ -63,7 +66,9 @@ export function isSessionPurchaseBlocked(session: PurchaseSession): boolean {
     return true;
   }
   if (session.purchaseReady === false) return true;
-  if (isTeplohodPurchaseSession(session) && Boolean(session.purchaseUrl || session.widgetUrl)) return false;
+  if (isTeplohodPurchaseSession(session) && Boolean(session.purchaseUrl || session.widgetUrl || /^evt_tep_/i.test(String(session.id || session.eventId || '')))) {
+    return false;
+  }
   if (session.vacant === 0) return true;
   if (!session.purchaseUrl && session.purchaseReady !== true) return true;
   return false;
