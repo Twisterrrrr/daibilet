@@ -118,7 +118,7 @@ export function BridgesHeroBlock({
         </div>
       </div>
 
-      <dl className="mt-12 grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-6 md:grid-cols-4">
+      <dl className="mt-16 grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-8 md:mt-20 md:grid-cols-4 md:pt-10">
         {sessionsReady ? (
           <>
             {[
