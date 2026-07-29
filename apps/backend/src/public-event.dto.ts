@@ -129,7 +129,9 @@ export async function buildPublicEventDto(
 }
 
 async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = true): Promise<PublicEventPageDto | null> {
-  const catalogSessions = await getPublicCatalogSessions();
+  // Related/group lookup only - do NOT hydrate upcomingSlots for all ~2600 catalog rows
+  // (default hydrateSlots=true caused multi-second cold TTFB on /events/[slug]).
+  const catalogSessions = await getPublicCatalogSessions(false, { hydrateSlots: false });
   const requestedSlug = publicSlug(eventSlugOrId);
   const targetCatalogSession = catalogSessions.find((session) =>
     session.id === eventSlugOrId ||
