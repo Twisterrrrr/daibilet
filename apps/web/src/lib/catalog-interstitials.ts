@@ -32,7 +32,7 @@ export function catalogInterstitialsForCity(citySlug?: string | null): CatalogIn
       id: 'river',
       eyebrow: 'Подборка',
       title: 'Речные прогулки',
-      description: 'Дневные рейсы, закаты и круизы с ужином - сравните причал и время.',
+      description: 'Дневные рейсы, закаты и круизы с ужином - сравнивайте цены, причалы и время отправления',
       href: landingCategoryHref('river-cruises', city),
       cta: 'Выбрать рейс',
     },
