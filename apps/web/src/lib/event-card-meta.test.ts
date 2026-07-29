@@ -3,6 +3,8 @@ import test from 'node:test';
 
 import {
   collectDisplaySlotLabels,
+  collectDisplaySlotPreview,
+  formatCatalogSlotChipLabel,
   formatShowcaseSessionDate,
   formatShowcaseSessionDateCompact,
 } from './event-card-meta.ts';
@@ -55,6 +57,20 @@ test('formatShowcaseSessionDate: no abbreviated system mask', () => {
   assert.ok(!label.includes('·'));
 });
 
+test('formatCatalogSlotChipLabel: day short month time without weekday', () => {
+  const label = formatCatalogSlotChipLabel(
+    session({ startsAt: '2026-07-30T08:20:00Z' }),
+    {
+      startsAt: '2026-07-30T10:20:00Z',
+      dateLabel: 'чт, 30 июл.',
+      timeLabel: '13:20',
+    },
+  );
+  assert.equal(label, '30 июл, 13:20');
+  assert.ok(!label.includes('чт'));
+  assert.ok(!label.includes('.'));
+});
+
 test('collectDisplaySlotLabels: empty when only primary slot', () => {
   const labels = collectDisplaySlotLabels(
     session({
@@ -72,7 +88,7 @@ test('collectDisplaySlotLabels: empty when only primary slot', () => {
   assert.deepEqual(labels, []);
 });
 
-test('collectDisplaySlotLabels: excludes primary, returns alternatives up to 4', () => {
+test('collectDisplaySlotLabels: excludes primary, compact format up to 4', () => {
   const labels = collectDisplaySlotLabels(
     session({
       startsAt: '2026-07-30T16:30:00Z',
@@ -98,5 +114,32 @@ test('collectDisplaySlotLabels: excludes primary, returns alternatives up to 4',
       ],
     }),
   );
-  assert.deepEqual(labels, ['пт, 31 июл., 19:30', 'сб, 1 авг., 19:30']);
+  assert.deepEqual(labels, ['31 июл, 19:30', '1 авг, 19:30']);
+});
+
+test('collectDisplaySlotPreview: moreCount after limit', () => {
+  const slots = Array.from({ length: 6 }, (_, index) => ({
+    eventId: `evt-${index + 2}`,
+    startsAt: `2026-08-0${index + 1}T16:30:00Z`,
+    dateLabel: `${index + 1} авг.`,
+    timeLabel: '19:30',
+  }));
+  const preview = collectDisplaySlotPreview(
+    session({
+      startsAt: '2026-07-30T16:30:00Z',
+      upcomingSlots: [
+        {
+          eventId: 'evt-1',
+          startsAt: '2026-07-30T16:30:00Z',
+          dateLabel: 'чт, 30 июл.',
+          timeLabel: '19:30',
+        },
+        ...slots,
+      ],
+    }),
+    3,
+  );
+  assert.equal(preview.labels.length, 3);
+  assert.equal(preview.moreCount, 3);
+  assert.ok(preview.labels.every((label) => !label.includes('чт') && !label.includes('пт')));
 });

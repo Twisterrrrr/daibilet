@@ -9,13 +9,14 @@ import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contr
 import { collectCatalogLabels, extractDurationLabel } from '@/lib/catalog-labels';
 import { EventImageBadges } from '@/lib/event-card-badges';
 import {
-  collectDisplaySlotLabels,
+  collectAllDisplaySlotLabels,
   formatEventNextSession,
   formatListDescription,
   getDepartingSoonMinutes,
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
   resolvePseudoRating,
+  WIDE_DISPLAY_SLOT_LIMIT,
 } from '@/lib/event-card-meta';
 import { resolveEventCardObjectPosition } from '@/lib/event-image-focus';
 import {
@@ -42,8 +43,10 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
   const openDate = isOpenDate(session);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(session.startsAt);
   const nextSessionLabel = openDate ? null : formatEventNextSession(session);
-  const displaySlotLabels = collectDisplaySlotLabels(session);
+  const displaySlotLabels = collectAllDisplaySlotLabels(session);
   const showSlotPills = displaySlotLabels.length > 0;
+  const wideSlotLabels = displaySlotLabels.slice(0, WIDE_DISPLAY_SLOT_LIMIT);
+  const wideSlotMore = Math.max(0, displaySlotLabels.length - WIDE_DISPLAY_SLOT_LIMIT);
   const sessionMetaLabel = openDate ? null : nextSessionLabel;
   const descriptionText = formatListDescription(session.description);
   const pseudoRating = resolvePseudoRating(session.groupKey || session.id);
@@ -170,12 +173,15 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
 
         {descriptionText ? <p className="line-clamp-2 text-ui-xs text-graphite-muted sm:text-ui-sm">{descriptionText}</p> : null}
         {showSlotPills ? (
-          <div className="flex flex-wrap items-start gap-1.5">
-            {displaySlotLabels.map((label) => (
+          <div className="flex flex-nowrap items-center gap-1.5 overflow-hidden">
+            {wideSlotLabels.map((label) => (
               <span key={label} className={SLOT_CHIP_CLASS}>
                 {label}
               </span>
             ))}
+            {wideSlotMore > 0 ? (
+              <span className={`${SLOT_CHIP_CLASS} text-graphite-muted`}>ещё {wideSlotMore}</span>
+            ) : null}
           </div>
         ) : null}
 

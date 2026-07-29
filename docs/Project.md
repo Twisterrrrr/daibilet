@@ -77,7 +77,7 @@ packages/config   — shared tsconfig/eslint
 
 ## Public catalog (perf rules)
 
-- List DTO lean: без widget URL / полного `upcomingSlots`; slot preview ≤3.
+- List DTO lean: без widget URL / полного `upcomingSlots`; slot preview: узкая карточка ≤4 (2×2), широкая ≤3 в ряд, формат `30 июл, 13:20`.
 - Slot hydrate только для запрошенной страницы `limit`, не для всего кэша.
 - Карточки `/events`: без TC/Teplohod widget markup — виджет только на странице события / landing CTA.
 - City/landing SSR: ≤48 lean cards.

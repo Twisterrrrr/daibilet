@@ -1,4 +1,20 @@
 
+## 2026-07-29 - EventCard: meta под фото + слоты 2×2 / 3 в ряд
+
+### Наблюдения
+- Owner (mobile screenshot): строка ★ / длительность / город была под названием; ожидание - сразу под фото над title (как в list/`EventCardHorizontal`).
+- В git с Clean UI title всегда был выше meta на вертикальной карточке; Horizontal уже meta→title. `33df97f` только прятал meta на compact mobile, порядок не менял.
+- Слоты: flex-wrap давал то 2 в ряд, то столбик; weekday в `dateLabel` съедал ширину.
+
+### Решения
+- `EventCard`: порядок Image → meta → title → tags → schedule/address → slots → footer. Schedule+адрес из mobile UX сохранены; tags на compact mobile по-прежнему `hidden sm:flex`.
+- Слоты: узкая/`compact` - 2 на mobile, 2×2 до 4 на sm+; широкая/default + Horizontal - до 3 в одну линию; формат `30 июл, 13:20` без weekday; «ещё N».
+
+### Проблемы
+- Нет. Коммит/пуш/deploy через `daibilet-deploy-fix`.
+
+---
+
 ## 2026-07-29 - Blog cards: mid-sentence «...» от flex-1 + line-clamp
 
 ### Наблюдения

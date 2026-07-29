@@ -5,6 +5,55 @@ import type { PublicSession } from '@/types';
 export const LOW_TICKETS_THRESHOLD = 20;
 export const MIN_DISPLAY_PRICE_RUB = 100;
 export const CATALOG_DISPLAY_SLOT_LIMIT = 4;
+export const WIDE_DISPLAY_SLOT_LIMIT = 3;
+export const COMPACT_MOBILE_SLOT_LIMIT = 2;
+
+export type DisplaySlotPreview = {
+  labels: string[];
+  moreCount: number;
+};
+
+type SlotLabelSource = {
+  startsAt?: string | null;
+  dateLabel?: string | null;
+  timeLabel?: string | null;
+};
+
+/** Компактная дата чипа: `30 июл, 13:20` без дня недели. */
+export function formatCatalogSlotChipLabel(event: PublicSession, slot: SlotLabelSource): string {
+  const timeZone = resolveSessionTimeZoneForSession(event);
+  const time =
+    slot.timeLabel?.trim() ||
+    (slot.startsAt ? formatSessionTime(slot.startsAt, null, timeZone) : '') ||
+    '';
+
+  let datePart = '';
+  if (slot.startsAt) {
+    const d = parseSessionStartsAt(slot.startsAt);
+    if (Number.isFinite(d.getTime())) {
+      datePart = new Intl.DateTimeFormat('ru-RU', {
+        day: 'numeric',
+        month: 'short',
+        timeZone,
+      })
+        .format(d)
+        .replace(/\./g, '')
+        .replace(/\u00a0/g, ' ')
+        .trim();
+    }
+  }
+  if (!datePart && slot.dateLabel) {
+    datePart = slot.dateLabel
+      .trim()
+      .replace(/\./g, '')
+      .replace(/^[а-яёa-z]{1,3},\s*/iu, '')
+      .replace(/\u00a0/g, ' ')
+      .trim();
+  }
+
+  if (datePart && time) return `${datePart}, ${time}`;
+  return datePart || time;
+}
 
 function collectUpcomingSlotRows(event: PublicSession) {
   const now = Date.now() - 60_000;
@@ -61,27 +110,39 @@ function isSameSessionStart(left?: string | null, right?: string | null): boolea
   return Number.isFinite(leftMs) && leftMs === rightMs;
 }
 
-/** Альтернативные слоты для чипов карточки — до 4 сеансов, кроме primary (event.startsAt). */
-export function collectDisplaySlotLabels(event: PublicSession, limit = CATALOG_DISPLAY_SLOT_LIMIT): string[] {
+/** Все альтернативные слоты для чипов (кроме primary), компактный формат без дня недели. */
+export function collectAllDisplaySlotLabels(event: PublicSession): string[] {
   const seen = new Set<string>();
   const labels: string[] = [];
-  const timeZone = resolveSessionTimeZoneForSession(event);
   const primaryStartsAt = event.startsAt;
 
   for (const slot of collectUpcomingSlotRows(event)) {
     if (primaryStartsAt && slot.startsAt && isSameSessionStart(slot.startsAt, primaryStartsAt)) {
       continue;
     }
-    const date = slot.dateLabel?.trim();
-    const time = slot.timeLabel?.trim() || (slot.startsAt ? formatSessionTime(slot.startsAt, null, timeZone) : '');
-    const label = date && time ? `${date}, ${time}` : date || time;
+    const label = formatCatalogSlotChipLabel(event, slot);
     if (!label || seen.has(label)) continue;
     seen.add(label);
     labels.push(label);
-    if (labels.length >= limit) break;
   }
 
   return labels;
+}
+
+export function collectDisplaySlotPreview(
+  event: PublicSession,
+  limit = CATALOG_DISPLAY_SLOT_LIMIT,
+): DisplaySlotPreview {
+  const all = collectAllDisplaySlotLabels(event);
+  return {
+    labels: all.slice(0, Math.max(0, limit)),
+    moreCount: Math.max(0, all.length - Math.max(0, limit)),
+  };
+}
+
+/** Альтернативные слоты для чипов карточки — до `limit` сеансов, кроме primary. */
+export function collectDisplaySlotLabels(event: PublicSession, limit = CATALOG_DISPLAY_SLOT_LIMIT): string[] {
+  return collectDisplaySlotPreview(event, limit).labels;
 }
 
 export function hasMultipleCatalogSlots(event: PublicSession): boolean {

@@ -17,7 +17,9 @@ import { LandingCardBadgeRow } from '@/components/landing/LandingCardBadgeRow';
 import { EventImageBadges } from '@/lib/event-card-badges';
 import { deriveLandingCardBadges } from '@/lib/landing-card-badges';
 import {
-  collectDisplaySlotLabels,
+  collectAllDisplaySlotLabels,
+  COMPACT_MOBILE_SLOT_LIMIT,
+  CATALOG_DISPLAY_SLOT_LIMIT,
   formatEventNextSession,
   formatPriceRub,
   formatShowcasePriceLabel,
@@ -27,6 +29,7 @@ import {
   isOpenDate,
   MIN_DISPLAY_PRICE_RUB,
   resolvePseudoRating,
+  WIDE_DISPLAY_SLOT_LIMIT,
 } from '@/lib/event-card-meta';
 import { resolveEventCardObjectPosition } from '@/lib/event-image-focus';
 import {
@@ -41,6 +44,9 @@ import { eventHref } from '@/lib/routes';
 const SLOT_CHIP_CLASS =
   'inline-btn inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-md bg-surface-muted px-2.5 text-ui-xs font-medium leading-none text-graphite-muted';
 
+const SLOT_CHIP_GRID_CLASS =
+  'inline-btn inline-flex h-6 min-h-6 w-full min-w-0 items-center justify-center truncate rounded-md bg-surface-muted px-2 text-ui-xs font-medium leading-none text-graphite-muted';
+
 const SLOT_CHIP_PURCHASE_CLASS =
   'transition hover:bg-primary/10 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 
@@ -49,6 +55,9 @@ const DETAILS_LINK_CLASS =
 
 const TITLE_LINK_CLASS =
   'relative z-[2] line-clamp-3 font-display text-ui-sm font-bold leading-snug text-graphite transition-colors hover:text-primary-600 sm:text-base';
+
+const SLOT_MORE_CHIP_CLASS = `${SLOT_CHIP_CLASS} text-graphite-muted`;
+const SLOT_MORE_CHIP_GRID_CLASS = `${SLOT_CHIP_GRID_CLASS} text-graphite-muted`;
 
 type CatalogCardSession = PublicSessionDto | PublicCatalogListItemDto;
 
@@ -86,8 +95,8 @@ export function EventCard({
   const openDate = isOpenDate(session);
   const departingSoonMinutes = openDate ? null : getDepartingSoonMinutes(session.startsAt);
   const nextSessionLabel = openDate ? null : formatEventNextSession(session);
-  const displaySlotLabels = collectDisplaySlotLabels(session);
-  const showSlotPills = displaySlotLabels.length > 0;
+  const allSlotLabels = collectAllDisplaySlotLabels(session);
+  const showSlotPills = allSlotLabels.length > 0;
   const sessionMetaLabel = openDate ? null : nextSessionLabel;
   // Landings: no fake ★ - only real micro-badges from tags/subcategories/title.
   const pseudoRating = landingActions ? null : resolvePseudoRating(session.groupKey || session.id);
@@ -139,6 +148,36 @@ export function EventCard({
       </div>
 
       <div className={`flex flex-1 flex-col ${compact ? 'gap-2.5 p-3.5 sm:gap-3 sm:p-4' : 'gap-3 p-4 sm:p-5'}`}>
+        {/* Meta сразу под фото, над названием (как ожидает owner / как в list-карточке). */}
+        {pseudoRating != null || durationLabel || ageLabel || destinationLabel ? (
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            {pseudoRating != null ? (
+              <span className="event-card-meta">
+                <Star className="event-card-meta-icon" />
+                <span className="font-medium text-graphite">{pseudoRating.toFixed(1)}</span>
+              </span>
+            ) : null}
+            {durationLabel ? (
+              <span className="event-card-meta">
+                <Clock className="event-card-meta-icon" />
+                <span className="truncate">{durationLabel}</span>
+              </span>
+            ) : null}
+            {ageLabel ? (
+              <span className="event-card-meta">
+                <Users className="event-card-meta-icon" />
+                <span className="truncate">{ageLabel}</span>
+              </span>
+            ) : null}
+            {destinationLabel ? (
+              <span className="event-card-meta max-w-full">
+                <MapPin className="event-card-meta-icon" />
+                <span className="truncate">{destinationLabel}</span>
+              </span>
+            ) : null}
+          </div>
+        ) : null}
+
         <h2>
           <Link
             href={href}
@@ -154,38 +193,6 @@ export function EventCard({
             {session.title}
           </Link>
         </h2>
-
-        {/* Desktop / landing: full meta. Mobile catalog: keep light - avoid rating+duration+city wall. */}
-        <div
-          className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 ${
-            compact && !landingActions ? 'hidden sm:flex' : ''
-          }`}
-        >
-          {pseudoRating != null ? (
-            <span className="event-card-meta">
-              <Star className="event-card-meta-icon" />
-              <span className="font-medium text-graphite">{pseudoRating.toFixed(1)}</span>
-            </span>
-          ) : null}
-          {durationLabel ? (
-            <span className="event-card-meta">
-              <Clock className="event-card-meta-icon" />
-              <span className="truncate">{durationLabel}</span>
-            </span>
-          ) : null}
-          {ageLabel ? (
-            <span className="event-card-meta">
-              <Users className="event-card-meta-icon" />
-              <span className="truncate">{ageLabel}</span>
-            </span>
-          ) : null}
-          {destinationLabel ? (
-            <span className="event-card-meta max-w-full">
-              <MapPin className="event-card-meta-icon" />
-              <span className="truncate">{destinationLabel}</span>
-            </span>
-          ) : null}
-        </div>
 
         {landingBadges.length > 0 ? (
           <LandingCardBadgeRow badges={landingBadges} />
@@ -229,9 +236,6 @@ export function EventCard({
                 {session.timeLabel ? `, ${session.timeLabel}` : ''}
               </span>
             )}
-            {durationLabel && compact && !landingActions ? (
-              <span className="text-graphite-muted sm:hidden">· {durationLabel}</span>
-            ) : null}
           </div>
           {locationLabel ? (
             <p className="line-clamp-1 text-ui-xs text-graphite-muted">
@@ -244,25 +248,13 @@ export function EventCard({
         </div>
 
         {showSlotPills ? (
-          <div className="flex flex-wrap items-start gap-1.5">
-            {(compact && !landingActions ? displaySlotLabels.slice(0, 2) : displaySlotLabels).map((label) =>
-              showPurchaseWidgets ? (
-                <CatalogPurchaseChip
-                  key={label}
-                  session={session}
-                  label={label}
-                  className={`${SLOT_CHIP_CLASS} ${SLOT_CHIP_PURCHASE_CLASS}`}
-                  onOpen={purchase.openPurchase}
-                >
-                  {label}
-                </CatalogPurchaseChip>
-              ) : (
-                <span key={label} className={SLOT_CHIP_CLASS}>
-                  {label}
-                </span>
-              ),
-            )}
-          </div>
+          <EventCardSlotChips
+            session={session}
+            labels={allSlotLabels}
+            narrow={compact}
+            showPurchaseWidgets={showPurchaseWidgets}
+            onOpenPurchase={purchase.openPurchase}
+          />
         ) : null}
 
         {showPurchaseWidgets ? (
@@ -331,6 +323,79 @@ export function EventCard({
       />
       {cardBody}
     </article>
+  );
+}
+
+function EventCardSlotChips({
+  session,
+  labels,
+  narrow,
+  showPurchaseWidgets,
+  onOpenPurchase,
+}: {
+  session: CatalogCardSession;
+  labels: string[];
+  narrow: boolean;
+  showPurchaseWidgets: boolean;
+  onOpenPurchase: (slotLabel: string) => void;
+}) {
+  const renderChip = (label: string, grid: boolean) => {
+    const chipClass = `${grid ? SLOT_CHIP_GRID_CLASS : SLOT_CHIP_CLASS}${
+      showPurchaseWidgets ? ` ${SLOT_CHIP_PURCHASE_CLASS}` : ''
+    }`;
+    if (showPurchaseWidgets) {
+      return (
+        <CatalogPurchaseChip
+          key={label}
+          session={session}
+          label={label}
+          className={chipClass}
+          onOpen={onOpenPurchase}
+        >
+          {label}
+        </CatalogPurchaseChip>
+      );
+    }
+    return (
+      <span key={label} className={chipClass}>
+        {label}
+      </span>
+    );
+  };
+
+  const renderMore = (moreCount: number, grid: boolean) =>
+    moreCount > 0 ? (
+      <span className={grid ? SLOT_MORE_CHIP_GRID_CLASS : SLOT_MORE_CHIP_CLASS}>ещё {moreCount}</span>
+    ) : null;
+
+  if (narrow) {
+    const mobileLabels = labels.slice(0, COMPACT_MOBILE_SLOT_LIMIT);
+    const mobileMore = Math.max(0, labels.length - COMPACT_MOBILE_SLOT_LIMIT);
+    const gridLabels = labels.slice(0, CATALOG_DISPLAY_SLOT_LIMIT);
+    const gridMore = Math.max(0, labels.length - CATALOG_DISPLAY_SLOT_LIMIT);
+
+    return (
+      <>
+        <div className="grid grid-cols-2 gap-1.5 sm:hidden">
+          {mobileLabels.map((label) => renderChip(label, true))}
+          {renderMore(mobileMore, true)}
+        </div>
+        <div className="hidden grid-cols-2 gap-1.5 sm:grid">
+          {gridLabels.map((label) => renderChip(label, true))}
+          {renderMore(gridMore, true)}
+        </div>
+      </>
+    );
+  }
+
+  const wideLabels = labels.slice(0, WIDE_DISPLAY_SLOT_LIMIT);
+  const wideMore = Math.max(0, labels.length - WIDE_DISPLAY_SLOT_LIMIT);
+
+  return (
+    <div className="flex flex-nowrap items-center gap-1.5 overflow-hidden">
+      {wideLabels.map((label) => renderChip(label, false))}
+      {renderMore(wideMore, false)}
+    </div>
   );
 }
 
