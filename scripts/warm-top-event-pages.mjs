@@ -47,7 +47,7 @@ async function listSlugs(limit) {
     const { rows } = await client.query(
       `SELECT e.slug
        FROM "Event" e
-       WHERE e.status = 'PUBLISHED'
+       WHERE e.status IN ('READY', 'PUBLISHED')
          AND e."isIndexable" = true
          AND e.slug IS NOT NULL
          AND e.slug <> ''

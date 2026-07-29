@@ -16,7 +16,7 @@ export async function listTopEventSlugsForSsg(limit = eventSsgTopN()): Promise<s
   try {
     const rows = await prisma.event.findMany({
       where: {
-        status: 'PUBLISHED',
+        status: { in: ['READY', 'PUBLISHED'] },
         isIndexable: true,
         slug: { not: '' },
         OR: [
