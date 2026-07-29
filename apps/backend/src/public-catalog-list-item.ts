@@ -1,6 +1,7 @@
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 
-const LIST_SLOT_PREVIEW_LIMIT = 3;
+/** Primary schedule line + up to 4 chip slots (2×2). Was 3 → chips excluded primary → only 2 visible. */
+export const LIST_SLOT_PREVIEW_LIMIT = 5;
 /** Enough for line-clamp-3 on catalog cards without shipping full HTML blobs. */
 const LIST_DESCRIPTION_MAX_CHARS = 420;
 

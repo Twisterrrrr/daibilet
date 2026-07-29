@@ -1,3 +1,22 @@
+## 2026-07-29 - EventCard 2×2: реальный корень - API cap 3
+
+### Наблюдения
+- Owner: «не починил» второй ряд слотов после `618fdd6` (UI limit 4).
+- Prod SPB `f7b9b0d`: UI уже `COMPACT_MOBILE_SLOT_LIMIT=4` + grid 2×2; API всё ещё режет слоты.
+- `/api/public/events`: max `upcomingSlots.length=3` при `sessionCount` 20-63.
+- Двойной cap: `hydrateCatalogUpcomingSlots(..., LIST_SLOT_PREVIEW_LIMIT=3)` + `toPublicCatalogListItem` `slice(0, 3)`.
+- Чипы исключают primary (`collectAllDisplaySlotLabels`) → из 3 слотов API остаётся **2 чипа** = один ряд 2×2.
+
+### Решения
+- `LIST_SLOT_PREVIEW_LIMIT = 5` (export из list-item, import в catalog dto).
+- `CATALOG_CARD_SLOT_TARGET = 5` (hydrate до primary+4 chips).
+- UI/format без изменений: узкие 2×2 до 4, wide 3 в ряд, `30 июл, 13:20`.
+
+### Проблемы
+- Поднимать только UI-лимит бесполезно, пока list DTO режет до 3.
+
+---
+
 ## 2026-07-29 - Event page perf: owner отложил на post-MSK
 
 ### Наблюдения

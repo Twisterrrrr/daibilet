@@ -190,7 +190,8 @@
 | CU.8 | CityCard / InstitutionCard / landing tiles | Средний | ✅ |
 | CU.8b | Home format + thematic tiles: photo covers вместо градиентов | Высокий | ✅ |
 | CU.8c | EventCard pin lines: адрес/город vs provider secondary | Высокий | ✅ |
-| CU.8e | EventCard: meta под фото; слоты 2×2/3 в ряд, формат без weekday | Высокий | ✅ |
+| CU.8e | EventCard: meta под фото; слоты 2×2/3 в ряд, формат без weekday | Высокий | ✅ UI `618fdd6`; API slots 5 `LIST_SLOT_PREVIEW` |
+| CU.8e2 | Catalog API: upcomingSlots 3→5 (hydrate+list-item), иначе чипы без primary = max 2 | Критический | 🔄 |
 | CU.8d | Home featured blog: white title on dark overlay | Высокий | ✅ |
 | CU.9 | Commit + deploy для owner review | Критический | ✅ `17a56af` (p2) + `4a69541` (p3-4) |
 | CU.10 | Blog surfaces + search overlay polish | Средний | ✅ |

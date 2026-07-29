@@ -17,7 +17,7 @@ import {
   timeBucket,
 } from './dto.js';
 import { findLandingRule } from './landing-rules.js';
-import { toPublicCatalogListItem } from './public-catalog-list-item.js';
+import { LIST_SLOT_PREVIEW_LIMIT, toPublicCatalogListItem } from './public-catalog-list-item.js';
 import { providerForSource } from './provider-purchase.js';
 import type { PublicCatalogMappingRow } from './public-catalog.mapper.js';
 import type { PublicCatalogDto, PublicSessionDto } from './types/public.js';
@@ -28,7 +28,8 @@ const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
 /** Stale-while-revalidate window: serve expired catalog instantly, rebuild in background. */
 const PUBLIC_CATALOG_STALE_MS = Number(process.env.PUBLIC_CATALOG_STALE_MS || 30 * 60 * 1000);
-const CATALOG_CARD_SLOT_TARGET = 4;
+/** Hydrate enough slots for EventCard 2×2 chips after primary is excluded from chips. */
+const CATALOG_CARD_SLOT_TARGET = 5;
 const CATALOG_HYDRATED_SLOT_LIMIT = 8;
 
 /** Keep in sync with catalogGroupTitleSqlExpression() in dto.js */
@@ -68,8 +69,6 @@ export function clearPublicCatalogDtoCache(): void {
   }
   // Do not clear in-flight rebuild - callers may still await it.
 }
-
-const LIST_SLOT_PREVIEW_LIMIT = 3;
 
 export async function buildPublicCatalogDto(query: PublicCatalogQuery): Promise<PublicCatalogDto> {
   // Base catalog cache omits heavy slot hydration; hydrate only the requested page.
