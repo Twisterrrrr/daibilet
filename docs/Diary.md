@@ -1,4 +1,20 @@
-## 2026-07-29 - EventCard 2×2: реальный корень - API cap 3
+## 2026-07-30 - TC: не виджет в виджете (CheckoutModal)
+
+### Наблюдения
+- Owner screenshot (Антон Борисов / стендап): поверх нативного TC UI видна наша оболочка CheckoutModal («Покупка билета», «В новой вкладке», footer «Не открывается?»).
+- BUY.8/BUY.9 временно открывали `ticketscloud.com/v1/widgets/common` в iframe внутри нашей модалки - TC уже полный виджет со своим header/close/promo.
+- TEP `account.teplohod.info/order/...` - обычная страница, не самодостаточный popup-виджет, iframe-shell уместен.
+
+### Решения
+- TC: снова `tcwidget.js` (`openTcWidget` / `TcWidgetButton` / `TcSessionSlot`); fallback только `_blank`/popup URL без фейкового chrome вокруг чужой модалки.
+- TEP: `CheckoutModal` оставляем (event + landing).
+- Комментарий в `CheckoutModal`: TEP-only; не оборачивать TC widgets/common.
+
+### Проблемы
+- Нужен prod deploy + smoke TC event (Борисов) и один TEP river CTA.
+
+---
+
 
 ### Наблюдения
 - Owner: «не починил» второй ряд слотов после `618fdd6` (UI limit 4).

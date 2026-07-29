@@ -12,7 +12,8 @@ type CheckoutModalProps = {
 };
 
 /**
- * Instant checkout shell: modal paints on click, iframe loads vendor URL.
+ * Iframe shell for full-page vendor checkout (TEP account.teplohod.info).
+ * Do NOT wrap TicketsCloud widgets/common here - TC already ships a complete modal via tcwidget.js.
  * Footer deep-link stays as fallback when X-Frame-Options / CSP blocks embed.
  */
 export function CheckoutModal({ open, onClose, checkoutUrl, title = 'Покупка билета' }: CheckoutModalProps) {

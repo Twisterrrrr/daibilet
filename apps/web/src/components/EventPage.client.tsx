@@ -34,9 +34,10 @@ import {
   resolveTeplohodCheckoutUrl,
 } from '@/components/TeplohodWidget.client';
 import {
-  buildTcCheckoutUrl,
   normalizeTcPurchaseUrl,
+  TcOptionBuyButton,
   TcSessionSlot,
+  TcWidgetButton,
 } from '@/components/TcWidget.client';
 
 type EventSession = PublicEventPageDto['sessions'][number] & {
@@ -57,7 +58,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
   const visibleSessions = listPurchasableSessionVariants(sessions as EventSession[]).slice(0, 5);
   const allFlexible =
     visibleSessions.length > 0 && visibleSessions.every((session) => isFlexibleScheduleSession(session));
-  const { tcEventId, purchaseUrl, isTcWidget } = resolveTcPurchaseTarget(
+  const { tcEventId, purchaseUrl, isTcWidget, purchaseTargets } = resolveTcPurchaseTarget(
     event,
     sessions,
     primaryOffer,
@@ -74,10 +75,6 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
       event.widgetUrl ||
       null
     : null;
-  const tcCheckoutUrl =
-    !isTepWidget && isTcWidget && tcEventId
-      ? buildTcCheckoutUrl({ tcEventId, purchaseUrl }) || purchaseUrl || null
-      : null;
   const buyButtonClass = 'btn-primary w-full py-3.5 text-base';
 
   return (
@@ -109,37 +106,18 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
                   {typeof option.priceFrom === 'number' ? (
                     <span className="text-sm font-bold text-graphite">{formatPriceRub(option.priceFrom)}</span>
                   ) : null}
-                  {(() => {
-                    const optionCheckoutUrl =
-                      buildTcCheckoutUrl({
-                        tcEventId: option.externalId ? String(option.externalId) : null,
-                        purchaseUrl: option.purchaseUrl || option.widgetUrl,
-                      }) ||
-                      option.purchaseUrl ||
-                      option.widgetUrl ||
-                      null;
-                    if (!optionCheckoutUrl) return null;
-                    return (
-                      <CheckoutModalButton
-                        checkoutUrl={optionCheckoutUrl}
-                        label="Купить"
-                        className="inline-flex shrink-0 items-center justify-center rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-primary-700"
-                        onOpen={() =>
-                          trackSelectTickets({
-                            eventId: String(option.externalId || event.id),
-                            provider: option.purchaseUrl?.includes('teplohod') ? 'teplohod' : 'ticketscloud',
-                            source: 'event_buy_card_option',
-                          })
-                        }
-                      />
-                    );
-                  })()}
+                  {option.externalId ? (
+                    <TcOptionBuyButton
+                      tcEventId={String(option.externalId)}
+                      purchaseUrl={option.purchaseUrl || option.widgetUrl}
+                    />
+                  ) : null}
                 </div>
               </li>
             ))}
           </ul>
           <p className="mt-5 text-xs leading-relaxed text-graphite-muted">
-            Нажмите «Купить» напротив нужного варианта - откроется окно оплаты.
+            Нажмите «Купить» напротив нужного варианта - откроется виджет оплаты.
           </p>
         </div>
       ) : (
@@ -214,32 +192,23 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
                   })
                 }
               />
-            ) : tcCheckoutUrl ? (
-              <CheckoutModalButton
-                checkoutUrl={tcCheckoutUrl}
+            ) : isTcWidget && tcEventId ? (
+              <TcWidgetButton
+                tcEventId={tcEventId}
+                purchaseUrl={purchaseUrl}
+                purchaseTargets={purchaseTargets}
                 label="Купить билет"
-                className={buyButtonClass}
-                onOpen={() =>
-                  trackSelectTickets({
-                    eventId: String(tcEventId || event.id),
-                    provider: 'ticketscloud',
-                    source: 'event_buy_card',
-                  })
-                }
+                wide
               />
             ) : purchaseUrl ? (
-              <CheckoutModalButton
-                checkoutUrl={normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl}
-                label="Купить билет"
+              <a
+                href={normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className={buyButtonClass}
-                onOpen={() =>
-                  trackSelectTickets({
-                    eventId: String(event.id),
-                    provider: String(event.purchaseProvider || event.widgetProvider || 'unknown'),
-                    source: 'event_buy_card_url',
-                  })
-                }
-              />
+              >
+                Купить билет
+              </a>
             ) : (
               <button
                 type="button"
@@ -256,7 +225,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
       <div className="mt-5 flex items-center justify-center gap-2 rounded-xl bg-surface-muted px-3 py-2.5 text-center">
         <Shield className="h-4 w-4 shrink-0 text-graphite-muted" strokeWidth={1.75} />
         <span className="text-xs text-graphite-muted">
-          Безопасная покупка на сайте
+          Безопасная покупка через виджет
         </span>
       </div>
     </div>
@@ -315,7 +284,7 @@ export function EventHeroBuyButton({
   const showMultiPurchase = purchaseOptions.length >= 2;
   const teplohod = getTeplohodWidgetIds(event);
   const primaryOffer = offers.find((offer) => offer.active !== false) || offers[0] || null;
-  const { tcEventId, purchaseUrl, isTcWidget } = resolveTcPurchaseTarget(
+  const { tcEventId, purchaseUrl, isTcWidget, purchaseTargets } = resolveTcPurchaseTarget(
     event,
     sessions,
     primaryOffer,
@@ -332,16 +301,26 @@ export function EventHeroBuyButton({
       event.widgetUrl ||
       null
     : null;
-  const tcCheckoutUrl =
-    !teplohod && isTcWidget && tcEventId
-      ? buildTcCheckoutUrl({ tcEventId, purchaseUrl }) || purchaseUrl || null
-      : null;
 
   if (showMultiPurchase) {
     return (
       <button type="button" onClick={scrollToBuyCard} className={heroClass}>
         {label}
       </button>
+    );
+  }
+
+  // TC native widget before TEP modal: avoid iframe chrome around ticketscloud UI.
+  if (isTcWidget && tcEventId && !teplohod) {
+    return (
+      <TcWidgetButton
+        tcEventId={tcEventId}
+        purchaseUrl={purchaseUrl}
+        purchaseTargets={purchaseTargets}
+        label={label}
+        wide={wide}
+        variant="hero"
+      />
     );
   }
 
@@ -362,37 +341,12 @@ export function EventHeroBuyButton({
     );
   }
 
-  if (tcCheckoutUrl) {
-    return (
-      <CheckoutModalButton
-        checkoutUrl={tcCheckoutUrl}
-        label={label}
-        className={heroClass}
-        onOpen={() =>
-          trackSelectTickets({
-            eventId: String(tcEventId || event.id),
-            provider: 'ticketscloud',
-            source: 'event_hero_buy',
-          })
-        }
-      />
-    );
-  }
-
   if (purchaseUrl) {
+    const href = normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl;
     return (
-      <CheckoutModalButton
-        checkoutUrl={normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl}
-        label={label}
-        className={heroClass}
-        onOpen={() =>
-          trackSelectTickets({
-            eventId: String(event.id),
-            provider: String(event.purchaseProvider || event.widgetProvider || 'unknown'),
-            source: 'event_hero_buy_url',
-          })
-        }
-      />
+      <a href={href} target="_blank" rel="noopener noreferrer" className={heroClass}>
+        {label}
+      </a>
     );
   }
 

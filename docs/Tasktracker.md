@@ -109,8 +109,9 @@
 | BUY.5 | TEP: lazy/shared embed на лендингах (убрать N×XHR `widget/embed`) | Высокий | ✅ `59fd4d8` prod deploy |
 | BUY.6 | TEP: `TeplohodWidgetEmbed` всегда через `resolveTeplohodCheckoutUrl` (не raw purchaseUrl) | Средний | ⏳ latent defense |
 | BUY.7 | Owner site-wide TEP link audit (landings/event/home/dinner/party) | Высокий | ✅ 2026-07-27: broken patterns не найдены; см. Diary |
-| BUY.8 | Landing buy: instant CheckoutModal iframe (TEP/TC), без Fancybox/`_blank` primary | Критический | ✅ `0401536` prod; SSG concurrency `272efeb` |
-| BUY.9 | Event page buy: CheckoutModal (TEP/TC hero+card+slots), без embed/`window.open` primary | Критический | 🔄 |
+| BUY.8 | Landing buy: TEP → CheckoutModal iframe; TC → native tcwidget (не iframe-в-iframe) | Критический | 🔄 BUY.8b |
+| BUY.8b | TC: убрать CheckoutModal вокруг widgets/common (event/landing/CTA) | Критический | 🔄 |
+| BUY.9 | Event page: TEP → CheckoutModal; TC → TcWidgetButton/slots (native) | Критический | 🔄 BUY.8b |
 
 ---
 

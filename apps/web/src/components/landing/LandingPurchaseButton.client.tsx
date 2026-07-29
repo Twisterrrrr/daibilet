@@ -1,7 +1,7 @@
 'use client';
 
 import { CheckoutModalButton } from '@/components/CheckoutModal.client';
-import { buildTcCheckoutUrl, getTcWidgetIds } from '@/components/TcWidget.client';
+import { TcWidgetButton, getTcWidgetIds } from '@/components/TcWidget.client';
 import {
   getTeplohodWidgetIdsFromSession,
   resolveTeplohodCheckoutUrl,
@@ -60,7 +60,7 @@ export function LandingPurchaseButton({
 
   // TEP first: extractTcEventIdFromSession can return tep numeric ids, which must not
   // steal the CTA into a broken TicketsCloud path on river/landings.
-  // Instant modal iframe - no lazy embed / Fancybox / window.open primary path.
+  // TEP account page → CheckoutModal iframe (full page, not a nested widget chrome).
   if (teplohod?.tepEventId && teplohodCheckoutUrl) {
     return (
       <CheckoutModalButton
@@ -85,27 +85,16 @@ export function LandingPurchaseButton({
     purchaseUrl: session.purchaseUrl,
   });
 
+  // TC: native tcwidget.js modal only - never wrap widgets/common in CheckoutModal.
   if (ticketscloud?.tcEventId && tcEventId) {
-    const tcCheckoutUrl = buildTcCheckoutUrl({
-      tcEventId: ticketscloud.tcEventId,
-      purchaseUrl,
-    });
-    if (tcCheckoutUrl) {
-      return (
-        <CheckoutModalButton
-          checkoutUrl={tcCheckoutUrl}
-          label={resolvedLabel}
-          className={resolvedClassName}
-          onOpen={() =>
-            trackSelectTickets({
-              eventId: tcEventId,
-              provider: 'ticketscloud',
-              source: 'landing_purchase_button',
-            })
-          }
-        />
-      );
-    }
+    return (
+      <TcWidgetButton
+        tcEventId={ticketscloud.tcEventId}
+        purchaseUrl={purchaseUrl}
+        label={resolvedLabel}
+        className={resolvedClassName}
+      />
+    );
   }
 
   if (teplohodCheckoutUrl) {
@@ -127,18 +116,9 @@ export function LandingPurchaseButton({
 
   if (purchaseUrl) {
     return (
-      <CheckoutModalButton
-        checkoutUrl={purchaseUrl}
-        label={resolvedLabel}
-        className={resolvedClassName}
-        onOpen={() =>
-          trackSelectTickets({
-            eventId: session.id,
-            provider: session.purchaseProvider || 'unknown',
-            source: 'landing_purchase_button_url',
-          })
-        }
-      />
+      <a href={purchaseUrl} target="_blank" rel="noopener noreferrer" className={resolvedClassName}>
+        {resolvedLabel}
+      </a>
     );
   }
 
