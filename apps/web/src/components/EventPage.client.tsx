@@ -26,9 +26,18 @@ import {
 import { buildEventBreadcrumbs } from '@/lib/structured-data';
 import { resolveEventHeroObjectPosition } from '@/lib/event-image-focus';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { CheckoutModalButton } from '@/components/CheckoutModal.client';
 import { EventVenueTrigger } from '@/components/EventVenueModal.client';
-import { getTeplohodWidgetIds, openTeplohodWidget, TeplohodWidgetEmbed } from '@/components/TeplohodWidget.client';
-import { normalizeTcPurchaseUrl, TcOptionBuyButton, TcSessionSlot, TcWidgetButton } from '@/components/TcWidget.client';
+import { trackSelectTickets } from '@/lib/catalog-analytics';
+import {
+  getTeplohodWidgetIds,
+  resolveTeplohodCheckoutUrl,
+} from '@/components/TeplohodWidget.client';
+import {
+  buildTcCheckoutUrl,
+  normalizeTcPurchaseUrl,
+  TcSessionSlot,
+} from '@/components/TcWidget.client';
 
 type EventSession = PublicEventPageDto['sessions'][number] & {
   dateLabel?: string | null;
@@ -48,12 +57,28 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
   const visibleSessions = listPurchasableSessionVariants(sessions as EventSession[]).slice(0, 5);
   const allFlexible =
     visibleSessions.length > 0 && visibleSessions.every((session) => isFlexibleScheduleSession(session));
-  const { tcEventId, purchaseUrl, isTcWidget, purchaseTargets } = resolveTcPurchaseTarget(
+  const { tcEventId, purchaseUrl, isTcWidget } = resolveTcPurchaseTarget(
     event,
     sessions,
     primaryOffer,
   );
   const isTepWidget = Boolean(teplohod);
+  const tepCheckoutUrl = teplohod
+    ? resolveTeplohodCheckoutUrl({
+        purchaseUrl: purchaseUrl || event.purchaseUrl || event.widgetUrl,
+        tepEventId: teplohod.tepEventId,
+        tepWidgetId: teplohod.tepWidgetId,
+      }) ||
+      purchaseUrl ||
+      event.purchaseUrl ||
+      event.widgetUrl ||
+      null
+    : null;
+  const tcCheckoutUrl =
+    !isTepWidget && isTcWidget && tcEventId
+      ? buildTcCheckoutUrl({ tcEventId, purchaseUrl }) || purchaseUrl || null
+      : null;
+  const buyButtonClass = 'btn-primary w-full py-3.5 text-base';
 
   return (
     <div className="rounded-card border border-slate-200 bg-white p-6 shadow-card sm:p-7">
@@ -84,18 +109,37 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
                   {typeof option.priceFrom === 'number' ? (
                     <span className="text-sm font-bold text-graphite">{formatPriceRub(option.priceFrom)}</span>
                   ) : null}
-                  {option.externalId ? (
-                    <TcOptionBuyButton
-                      tcEventId={String(option.externalId)}
-                      purchaseUrl={option.purchaseUrl || option.widgetUrl}
-                    />
-                  ) : null}
+                  {(() => {
+                    const optionCheckoutUrl =
+                      buildTcCheckoutUrl({
+                        tcEventId: option.externalId ? String(option.externalId) : null,
+                        purchaseUrl: option.purchaseUrl || option.widgetUrl,
+                      }) ||
+                      option.purchaseUrl ||
+                      option.widgetUrl ||
+                      null;
+                    if (!optionCheckoutUrl) return null;
+                    return (
+                      <CheckoutModalButton
+                        checkoutUrl={optionCheckoutUrl}
+                        label="Купить"
+                        className="inline-flex shrink-0 items-center justify-center rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-primary-700"
+                        onOpen={() =>
+                          trackSelectTickets({
+                            eventId: String(option.externalId || event.id),
+                            provider: option.purchaseUrl?.includes('teplohod') ? 'teplohod' : 'ticketscloud',
+                            source: 'event_buy_card_option',
+                          })
+                        }
+                      />
+                    );
+                  })()}
                 </div>
               </li>
             ))}
           </ul>
           <p className="mt-5 text-xs leading-relaxed text-graphite-muted">
-            Нажмите «Купить» напротив нужного варианта - откроется виджет оплаты.
+            Нажмите «Купить» напротив нужного варианта - откроется окно оплаты.
           </p>
         </div>
       ) : (
@@ -157,29 +201,45 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
           ) : null}
 
           <div className="mt-6">
-            {isTepWidget && teplohod ? (
-              <TeplohodWidgetEmbed
-                tepEventId={teplohod.tepEventId}
-                tepWidgetId={teplohod.tepWidgetId}
-                purchaseUrl={purchaseUrl || event.purchaseUrl || event.widgetUrl}
-              />
-            ) : isTcWidget && tcEventId ? (
-              <TcWidgetButton
-                tcEventId={tcEventId}
-                purchaseUrl={purchaseUrl}
-                purchaseTargets={purchaseTargets}
+            {isTepWidget && tepCheckoutUrl ? (
+              <CheckoutModalButton
+                checkoutUrl={tepCheckoutUrl}
                 label="Купить билет"
-                wide
+                className={buyButtonClass}
+                onOpen={() =>
+                  trackSelectTickets({
+                    eventId: String(teplohod?.tepEventId || event.id),
+                    provider: 'teplohod',
+                    source: 'event_buy_card',
+                  })
+                }
+              />
+            ) : tcCheckoutUrl ? (
+              <CheckoutModalButton
+                checkoutUrl={tcCheckoutUrl}
+                label="Купить билет"
+                className={buyButtonClass}
+                onOpen={() =>
+                  trackSelectTickets({
+                    eventId: String(tcEventId || event.id),
+                    provider: 'ticketscloud',
+                    source: 'event_buy_card',
+                  })
+                }
               />
             ) : purchaseUrl ? (
-              <a
-                href={normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary w-full py-3.5 text-base"
-              >
-                Купить билет
-              </a>
+              <CheckoutModalButton
+                checkoutUrl={normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl}
+                label="Купить билет"
+                className={buyButtonClass}
+                onOpen={() =>
+                  trackSelectTickets({
+                    eventId: String(event.id),
+                    provider: String(event.purchaseProvider || event.widgetProvider || 'unknown'),
+                    source: 'event_buy_card_url',
+                  })
+                }
+              />
             ) : (
               <button
                 type="button"
@@ -196,7 +256,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
       <div className="mt-5 flex items-center justify-center gap-2 rounded-xl bg-surface-muted px-3 py-2.5 text-center">
         <Shield className="h-4 w-4 shrink-0 text-graphite-muted" strokeWidth={1.75} />
         <span className="text-xs text-graphite-muted">
-          Безопасная покупка через виджет
+          Безопасная покупка на сайте
         </span>
       </div>
     </div>
@@ -255,63 +315,84 @@ export function EventHeroBuyButton({
   const showMultiPurchase = purchaseOptions.length >= 2;
   const teplohod = getTeplohodWidgetIds(event);
   const primaryOffer = offers.find((offer) => offer.active !== false) || offers[0] || null;
-  const { tcEventId, purchaseUrl, isTcWidget, purchaseTargets } = resolveTcPurchaseTarget(
+  const { tcEventId, purchaseUrl, isTcWidget } = resolveTcPurchaseTarget(
     event,
     sessions,
     primaryOffer,
   );
+  const heroClass = `btn-primary min-h-11 px-6 py-3.5 text-base font-semibold sm:min-h-12 sm:px-7 sm:py-3 sm:text-lg ${wide ? 'w-full' : ''}`;
+  const tepCheckoutUrl = teplohod
+    ? resolveTeplohodCheckoutUrl({
+        purchaseUrl: purchaseUrl || event.purchaseUrl || event.widgetUrl,
+        tepEventId: teplohod.tepEventId,
+        tepWidgetId: teplohod.tepWidgetId,
+      }) ||
+      purchaseUrl ||
+      event.purchaseUrl ||
+      event.widgetUrl ||
+      null
+    : null;
+  const tcCheckoutUrl =
+    !teplohod && isTcWidget && tcEventId
+      ? buildTcCheckoutUrl({ tcEventId, purchaseUrl }) || purchaseUrl || null
+      : null;
 
   if (showMultiPurchase) {
     return (
-      <button
-        type="button"
-        onClick={scrollToBuyCard}
-        className={`btn-primary min-h-11 px-6 py-3.5 text-base font-semibold sm:min-h-12 sm:px-7 sm:py-3 sm:text-lg ${wide ? 'w-full' : ''}`}
-      >
+      <button type="button" onClick={scrollToBuyCard} className={heroClass}>
         {label}
       </button>
     );
   }
 
-  if (isTcWidget && tcEventId) {
+  if (tepCheckoutUrl) {
     return (
-      <TcWidgetButton
-        tcEventId={tcEventId}
-        purchaseUrl={purchaseUrl}
-        purchaseTargets={purchaseTargets}
+      <CheckoutModalButton
+        checkoutUrl={tepCheckoutUrl}
         label={label}
-        wide={wide}
-        variant="hero"
+        className={heroClass}
+        onOpen={() =>
+          trackSelectTickets({
+            eventId: String(teplohod?.tepEventId || event.id),
+            provider: 'teplohod',
+            source: 'event_hero_buy',
+          })
+        }
       />
     );
   }
 
-  if (teplohod) {
+  if (tcCheckoutUrl) {
     return (
-      <button
-        type="button"
-        onClick={() => {
-          scrollToBuyCard();
-          window.setTimeout(() => openTeplohodWidget(), 250);
-        }}
-        className={`btn-primary min-h-11 px-6 py-3.5 text-base font-semibold sm:min-h-12 sm:px-7 sm:py-3 sm:text-lg ${wide ? 'w-full' : ''}`}
-      >
-        {label}
-      </button>
+      <CheckoutModalButton
+        checkoutUrl={tcCheckoutUrl}
+        label={label}
+        className={heroClass}
+        onOpen={() =>
+          trackSelectTickets({
+            eventId: String(tcEventId || event.id),
+            provider: 'ticketscloud',
+            source: 'event_hero_buy',
+          })
+        }
+      />
     );
   }
 
   if (purchaseUrl) {
-    const href = normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl;
     return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={`btn-primary min-h-11 px-6 py-3.5 text-base font-semibold sm:min-h-12 sm:px-7 sm:py-3 sm:text-lg ${wide ? 'w-full' : ''}`}
-      >
-        {label}
-      </a>
+      <CheckoutModalButton
+        checkoutUrl={normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl}
+        label={label}
+        className={heroClass}
+        onOpen={() =>
+          trackSelectTickets({
+            eventId: String(event.id),
+            provider: String(event.purchaseProvider || event.widgetProvider || 'unknown'),
+            source: 'event_hero_buy_url',
+          })
+        }
+      />
     );
   }
 

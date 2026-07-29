@@ -115,6 +115,22 @@
 
 ---
 
+## 2026-07-29 - Event page buy: CheckoutModal (не `_blank`)
+
+### Наблюдения
+- Owner URL `/events/...-910` (`evt_tep_910`, TEPLOHOD): «открывается не в модалке» - новая вкладка.
+- Root: event page держал `TeplohodWidgetEmbed` + hero `openTeplohodWidget`; при сбое Fancybox `bindTeplohodBuyFallback` → `window.open` через 700ms. Лендинги уже на `CheckoutModal` (BUY.8).
+
+### Решения
+- `EventBuyCard` / `EventHeroBuyButton` → `CheckoutModalButton` с `resolveTeplohodCheckoutUrl` / `buildTcCheckoutUrl` (как landing).
+- `TcSessionSlot` / `TcWidgetButton` → тот же `CheckoutModal` (iframe + «В новой вкладке»); z-index модалки `2147483000`.
+- Landing `LandingPurchaseButton` без изменений.
+
+### Проблемы
+- Catalog hidden-anchor path (`openTcWidget`) ещё может popup - follow-up; event page smoke: `...-910`.
+
+---
+
 ## 2026-07-29 - Landing buy: instant CheckoutModal iframe
 
 ### Наблюдения

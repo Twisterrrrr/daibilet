@@ -12,13 +12,7 @@ import {
   isFlexibleScheduleSession,
 } from '@/lib/event-page-utils';
 import { trackSelectTickets } from '@/lib/catalog-analytics';
-import { TeplohodWidgetButton, getTeplohodWidgetIdsFromSession } from '@/components/TeplohodWidget.client';
-import {
-  beginPurchaseOpening,
-  completePurchaseOpening,
-  failPurchaseOpening,
-  isPurchaseOpeningActive,
-} from '@/components/PurchaseOpeningFeedback.client';
+import { CheckoutModal } from '@/components/CheckoutModal.client';
 
 const TC_WIDGET_SCRIPT_URL = 'https://ticketscloud.com/static/scripts/widget/tcwidget.js';
 const TC_WIDGET_TOKEN = process.env.NEXT_PUBLIC_TC_WIDGET_TOKEN?.trim() || '';
@@ -245,50 +239,6 @@ export async function openTcWidget(options: {
   return openTcPurchaseUrl(purchaseUrl) ? 'popup' : 'none';
 }
 
-async function runTcPurchaseFlow(options: {
-  trigger: HTMLButtonElement | null;
-  purchaseUrl?: string | null;
-  eventId: string;
-  source: string;
-}) {
-  if (isPurchaseOpeningActive()) return;
-
-  const fallbackUrl = normalizeTcPurchaseUrl(options.purchaseUrl) || options.purchaseUrl || null;
-  const run = async () => {
-    const result = await openTcWidget({
-      trigger: options.trigger,
-      purchaseUrl: options.purchaseUrl,
-    });
-    if (result === 'widget' || result === 'popup') {
-      completePurchaseOpening();
-      return;
-    }
-    failPurchaseOpening({
-      message: 'Открываем оплату… Не вышло автоматически. Нажмите «Открыть оплату» или повторите.',
-      fallbackUrl,
-      onRetry: () => {
-        void run();
-      },
-    });
-  };
-
-  beginPurchaseOpening({
-    message: 'Открываем оплату…',
-    fallbackUrl,
-    onRetry: () => {
-      void run();
-    },
-  });
-
-  trackSelectTickets({
-    eventId: options.eventId,
-    provider: 'ticketscloud',
-    source: options.source,
-  });
-
-  await run();
-}
-
 function formatSessionLabels(session: {
   startsAt?: string | null;
   dateLabel?: string | null;
@@ -337,19 +287,18 @@ export function TcSessionSlot({
     purchaseUrl?: string | null;
   };
 }) {
-  const hiddenTriggerRef = React.useRef<HTMLButtonElement | null>(null);
+  const [checkoutOpen, setCheckoutOpen] = React.useState(false);
   const eventId = String(extractTcEventIdFromSession(session) || tcEventId || '').trim();
-  const widgetToken = resolveTcWidgetToken(session.purchaseUrl);
+  const checkoutUrl =
+    buildTcCheckoutUrl({ tcEventId: eventId, purchaseUrl: session.purchaseUrl }) ||
+    normalizeTcPurchaseUrl(session.purchaseUrl) ||
+    session.purchaseUrl ||
+    null;
   const fmt = formatSessionLabels(session);
   const vacant = session.vacant ?? 0;
   const flexibleSchedule = isFlexibleScheduleSession(session);
 
-  React.useEffect(() => {
-    if (!eventId || !widgetToken) return;
-    void ensureTcWidgetScript().catch(() => undefined);
-  }, [eventId, widgetToken]);
-
-  if (!eventId || !widgetToken) {
+  if (!eventId || !checkoutUrl) {
     return <StaticSessionRow session={session} purchaseUrl={session.purchaseUrl} />;
   }
 
@@ -359,12 +308,12 @@ export function TcSessionSlot({
         type="button"
         className="tc-session-slot relative z-[2] flex w-full items-center justify-between rounded-lg bg-slate-50 px-3 py-2.5 text-left transition hover:bg-slate-100 active:scale-[0.99]"
         onClick={() => {
-          void runTcPurchaseFlow({
-            trigger: hiddenTriggerRef.current,
-            purchaseUrl: session.purchaseUrl,
+          trackSelectTickets({
             eventId,
+            provider: 'ticketscloud',
             source: 'tc_session_slot',
           });
+          setCheckoutOpen(true);
         }}
       >
         <div className="flex items-center gap-3">
@@ -388,17 +337,11 @@ export function TcSessionSlot({
           <span className="shrink-0 rounded-full bg-red-50 px-2.5 py-1 text-xs text-red-500">Распродано</span>
         )}
       </button>
-      <button
-        ref={hiddenTriggerRef}
-        type="button"
-        data-tc-event={eventId}
-        data-tc-token={widgetToken}
-        className="tc-widget-trigger pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0"
-        aria-hidden="true"
-        tabIndex={-1}
-      >
-        {fmt.date} {fmt.time}
-      </button>
+      <CheckoutModal
+        open={checkoutOpen}
+        onClose={() => setCheckoutOpen(false)}
+        checkoutUrl={checkoutUrl}
+      />
     </>
   );
 }
@@ -480,18 +423,21 @@ export function TcWidgetButton({
   variant?: 'default' | 'hero';
   className?: string;
 }) {
-  const hiddenButtonRef = React.useRef<HTMLButtonElement | null>(null);
+  const [checkoutOpen, setCheckoutOpen] = React.useState(false);
   const eventId = String(tcEventId || '').trim();
-  const widgetToken = resolveTcWidgetToken(purchaseUrl);
   const targets = React.useMemo(() => {
     if (purchaseTargets?.length) return purchaseTargets;
     return eventId ? [{ tcEventId: eventId, purchaseUrl }] : [];
   }, [eventId, purchaseUrl, purchaseTargets]);
-
-  React.useEffect(() => {
-    if (!eventId || !widgetToken) return;
-    void ensureTcWidgetScript().catch(() => undefined);
-  }, [eventId, widgetToken]);
+  const primaryPurchaseUrl = targets[0]?.purchaseUrl || purchaseUrl;
+  const checkoutUrl =
+    buildTcCheckoutUrl({
+      tcEventId: targets[0]?.tcEventId || eventId,
+      purchaseUrl: primaryPurchaseUrl,
+    }) ||
+    normalizeTcPurchaseUrl(primaryPurchaseUrl) ||
+    primaryPurchaseUrl ||
+    null;
 
   const fallbackLinkClass =
     variant === 'hero'
@@ -500,17 +446,7 @@ export function TcWidgetButton({
         ? 'btn-primary w-full py-3.5 text-base'
         : 'btn-primary min-h-10 px-6 py-3.5 text-base';
 
-  if (!eventId || !widgetToken) {
-    if (purchaseUrl) {
-      const href = normalizeTcPurchaseUrl(purchaseUrl) || purchaseUrl;
-      return (
-        <a href={href} target="_blank" rel="noopener noreferrer" className={className || fallbackLinkClass}>
-          {label}
-        </a>
-      );
-    }
-    return null;
-  }
+  if (!checkoutUrl) return null;
 
   const sizeClasses =
     variant === 'hero'
@@ -527,43 +463,23 @@ export function TcWidgetButton({
     className ||
     `tc-buy-btn inline-flex min-h-10 items-center justify-center gap-2 ${colorClasses} ${sizeClasses} ${wide ? 'w-full' : ''}`;
 
-  const [busy, setBusy] = React.useState(false);
-
-  const handleClick = () => {
-    if (busy || isPurchaseOpeningActive()) return;
-    setBusy(true);
-    void runTcPurchaseFlow({
-      trigger: hiddenButtonRef.current,
-      purchaseUrl: targets[0]?.purchaseUrl || purchaseUrl,
-      eventId,
-      source: 'tc_widget_button',
-    }).finally(() => {
-      window.setTimeout(() => setBusy(false), 400);
-    });
-  };
-
   return (
     <>
       <button
         type="button"
-        className={`${buttonClassName}${busy ? ' pointer-events-none opacity-80' : ''}`}
-        onClick={handleClick}
-        aria-busy={busy}
-        disabled={busy}
-      >
-        {busy ? 'Открываем…' : label}
-      </button>
-      <button
-        ref={hiddenButtonRef}
-        type="button"
-        data-tc-event={eventId}
-        data-tc-token={widgetToken}
-        className="tc-widget-trigger pointer-events-none fixed -left-[9999px] top-0 h-px w-px overflow-hidden opacity-0"
-        aria-hidden="true"
-        tabIndex={-1}
+        className={buttonClassName || fallbackLinkClass}
+        onClick={() => {
+          trackSelectTickets({
+            eventId: String(targets[0]?.tcEventId || eventId),
+            provider: 'ticketscloud',
+            source: 'tc_widget_button',
+          });
+          setCheckoutOpen(true);
+        }}
       >
         {label}
       </button>
+      <CheckoutModal open={checkoutOpen} onClose={() => setCheckoutOpen(false)} checkoutUrl={checkoutUrl} />
     </>
   );
 }

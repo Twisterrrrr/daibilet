@@ -96,6 +96,7 @@
 | BUY.6 | TEP: `TeplohodWidgetEmbed` всегда через `resolveTeplohodCheckoutUrl` (не raw purchaseUrl) | Средний | ⏳ latent defense |
 | BUY.7 | Owner site-wide TEP link audit (landings/event/home/dinner/party) | Высокий | ✅ 2026-07-27: broken patterns не найдены; см. Diary |
 | BUY.8 | Landing buy: instant CheckoutModal iframe (TEP/TC), без Fancybox/`_blank` primary | Критический | ✅ `0401536` prod; SSG concurrency `272efeb` |
+| BUY.9 | Event page buy: CheckoutModal (TEP/TC hero+card+slots), без embed/`window.open` primary | Критический | 🔄 |
 
 ---
 
