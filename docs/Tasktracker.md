@@ -14,7 +14,7 @@
 | BLOG.P1 | Причесать все blog MD кроме 5 owner-rewrites | Высокий | ✅ 37 PUBLISHED |
 | BLOG.P2 | Cover + 1-2 inline на диске для PUBLISHED | Критический | ✅ missing=0 |
 | BLOG.P3 | HIDDEN: bylinnyy-bereg-fentezi-fest, open-air-festy-vyhodnoi-ru | Низкий | ⚠️ без тяжёлой переписки |
-| BLOG.P4 | Deploy prod после push feat/next-monorepo | Высокий | 🔄 |
+| BLOG.P4 | Deploy prod после push feat/next-monorepo | Высокий | ✅ `13f0e18` prod |
 
 ---
 
