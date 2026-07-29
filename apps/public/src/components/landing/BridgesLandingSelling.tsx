@@ -92,8 +92,8 @@ export function BridgesHeroBlock({
   const priceStatLabel = moneyRangeStatLabel(priceFrom, priceTo);
 
   return (
-    <div className="space-y-0">
-      <div className="grid gap-4 md:grid-cols-[auto_1fr_auto] md:items-center">
+    <div>
+      <div className="mb-8 grid gap-4 md:grid-cols-[auto_1fr_auto] md:items-center">
         <BridgesCountdownCard hours={countdown.hours} minutes={countdown.minutes} inSeason={countdown.inSeason} />
         <div className="hidden h-px bg-gradient-to-r from-primary-foreground/25 to-transparent md:block" aria-hidden />
         <div className="flex flex-wrap items-center gap-3">
@@ -115,7 +115,7 @@ export function BridgesHeroBlock({
         </div>
       </div>
 
-      <dl className="mt-16 grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-8 md:mt-20 md:max-w-lg md:grid-cols-2 md:pt-10">
+      <dl className="grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-6 md:max-w-lg md:grid-cols-2">
         {sessionsReady ? (
           <>
             {[

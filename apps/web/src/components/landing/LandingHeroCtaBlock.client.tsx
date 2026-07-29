@@ -77,18 +77,18 @@ export function LandingHeroCtaBlock({
   );
 
   return (
-    <div className="space-y-0">
+    <div>
       {leading ? (
-        <div className="grid gap-4 md:grid-cols-[auto_1fr_auto] md:items-center">
+        <div className="mb-8 grid gap-4 md:grid-cols-[auto_1fr_auto] md:items-center">
           {leading}
           <div className="hidden h-px bg-gradient-to-r from-primary-foreground/25 to-transparent md:block" aria-hidden />
           {ctaRow}
         </div>
       ) : (
-        ctaRow
+        <div className="mb-8">{ctaRow}</div>
       )}
 
-      <dl className="mt-16 grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-8 md:mt-20 md:grid-cols-4 md:pt-10">
+      <dl className="grid grid-cols-2 gap-4 border-t border-primary-foreground/15 pt-6 md:grid-cols-4">
         {sessionsReady ? (
           stats.map((item) => (
             <div key={item.label}>
