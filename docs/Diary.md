@@ -1,3 +1,18 @@
+## 2026-07-29 - Event page perf: owner отложил на post-MSK
+
+### Наблюдения
+- Cold `/events/[slug]` всё ещё тяжёлый из-за catalog path; quick win `hydrateSlots: false` уже в коде (`132b6a6`).
+- Follow-ups: warm top-100–300, `generateStaticParams` top-N, развязка event DTO от full catalog.
+
+### Решения
+- Owner: не делать до переезда prod на МСК VPS. Задачи PERF.E3–E5 / E4b в Tasktracker с меткой «после переезда на МСК».
+- PERF.E3 на МСК: выкатить/проверить; E4/E4b - первые quick wins после cutover; E5 - средний приоритет, крупнее.
+
+### Проблемы
+- Пока DNS на СПб - verify cold TTFB post-hydrateSlots на live prod не в приоритете относительно MIG.*.
+
+---
+
 ## 2026-07-29 - SSH МСК + снимок перед переездом СПб→МСК
 
 ### Наблюдения

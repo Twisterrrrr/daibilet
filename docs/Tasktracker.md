@@ -25,6 +25,20 @@
 
 ---
 
+## Event page perf (после переезда на МСК) (2026-07-29)
+
+**Блокер/зависимость:** все пункты ниже - **после переезда на МСК** (после MIG.7 / DNS cutover). Не блокируют сам переезд. Owner 2026-07-29: отложено post-MSK.
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| PERF.E2 | Diagnose `/events`→`/events/[slug]` slow nav (TTFB cold 1.5–7.5с) | Критический | ✅ root cause: on-demand ISR + catalog hydrate в event DTO |
+| PERF.E3 | `buildPublicEventDto`: `getPublicCatalogSessions(..., { hydrateSlots: false })` | Высокий | ✅ код `132b6a6`; ⏳ **после переезда на МСК**: выкатить/проверить cold TTFB |
+| PERF.E4 | Warm top-100–300 популярных `/events/[slug]` после deploy/sync | Высокий | ⏳ **после переезда на МСК** |
+| PERF.E4b | `generateStaticParams` только top-N (не все ~2600; OOM-safe) | Высокий | ⏳ **после переезда на МСК** |
+| PERF.E5 | Event page без full catalog: slug → DB + related отдельно | Средний | ⏳ **после переезда на МСК** (крупнее, PERF.E5-style) |
+
+---
+
 ## Landing match: concerts vs bus tours (2026-07-29)
 
 | # | Задача | Приоритет | Статус |
