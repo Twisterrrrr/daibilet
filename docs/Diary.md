@@ -1,4 +1,41 @@
 
+## 2026-07-29 - Landing buy: instant CheckoutModal iframe
+
+### Наблюдения
+- Owner: «Купить» на лендингах не должен ждать lazy embed → Fancybox → `window.open(_blank)`.
+- `account.teplohod.info/order/event-order` без `X-Frame-Options` / `frame-ancestors` в ответе HEAD - iframe допустим.
+- `ticketscloud.com` homepage: `Content-Security-Policy: frame-ancestors 'none'`; widget URL может отличаться - в модалке всегда CTA «В новой вкладке».
+- В репо уже был неподключённый `CheckoutModal.client.tsx` (с 2a75cea).
+
+### Решения
+- `LandingPurchaseButton` → `CheckoutModalButton` с `resolveTeplohodCheckoutUrl` / `buildTcCheckoutUrl` (без TeplohodWidgetButton / TcWidgetButton на лендингах).
+- Modal: мгновенный shell «Открываем оплату…», iframe, Escape/backdrop, z-100000; через 4.5s без onLoad - баннер + deep-link; footer всегда.
+- Event page hero / vendor embed path без изменений; catalog cards без `landingActions` по-прежнему ведут на event page.
+
+### Проблемы
+- Если TC widget URL тоже с `frame-ancestors 'none'`, iframe будет пустым после onLoad - UX опирается на «Открыть в новой вкладке». Нужен smoke на живом TC-лендинге.
+
+---
+
+## 2026-07-29 - Prod Network: /_next/image 500/504 + reviews 404
+
+### Наблюдения
+- Owner DevTools на daibilet.ru @`33df97f`: много `/_next/image` 500/504 (GCS, api.teplohod.info, локальные `/images/events`) и `GET /api/reviews/events/...-706` → 404.
+- `ticketscloud-prod.storage.googleapis.com` не в `remotePatterns` → Next `"url" parameter is not allowed` (400); в каталоге чаще yandex twin.
+- TEP без `dirtyAlias` → upstream HTML 400 → Next `"upstream response is invalid"`.
+- 504/502 в nginx: `upstream timed out` / `recv() failed` на next-server во время/после UX-deploy (cold image cache + ~1GB RSS next на 3.8Gi VPS).
+- Reviews route живой: по `evt_tep_706` 200; по public latin slug 404, потому что в DB slug кириллический (`sourceSlug`).
+
+### Решения
+- `remotePatterns`: добавить `ticketscloud-prod.storage.googleapis.com`.
+- `resolveReviewEvent`: TEP public slug → `evt_tep_{id}` + match `publicSlugLite`.
+- `isPlaceholderEventImageUrl`: TEP URL без `dirtyAlias` считать placeholder (не гнать в optimizer).
+
+### Проблемы
+- Пик 504 после рестарта next остаётся capacity-проблемой; нужен deploy фиксов + при необходимости unoptimized/CDN bypass для тяжёлых remote covers.
+
+---
+
 ## 2026-07-29 - Fix TEP/TC widget overlays + column badge
 
 ### Наблюдения

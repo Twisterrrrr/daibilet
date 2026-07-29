@@ -1,11 +1,12 @@
 'use client';
 
-import { TcWidgetButton, getTcWidgetIds } from '@/components/TcWidget.client';
+import { CheckoutModalButton } from '@/components/CheckoutModal.client';
+import { buildTcCheckoutUrl, getTcWidgetIds } from '@/components/TcWidget.client';
 import {
-  TeplohodWidgetButton,
   getTeplohodWidgetIdsFromSession,
   resolveTeplohodCheckoutUrl,
 } from '@/components/TeplohodWidget.client';
+import { trackSelectTickets } from '@/lib/catalog-analytics';
 import { extractTcEventIdFromSession } from '@/lib/event-purchase';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
 
@@ -59,15 +60,20 @@ export function LandingPurchaseButton({
 
   // TEP first: extractTcEventIdFromSession can return tep numeric ids, which must not
   // steal the CTA into a broken TicketsCloud path on river/landings.
-  if (teplohod?.tepEventId) {
+  // Instant modal iframe - no lazy embed / Fancybox / window.open primary path.
+  if (teplohod?.tepEventId && teplohodCheckoutUrl) {
     return (
-      <TeplohodWidgetButton
-        tepEventId={teplohod.tepEventId}
-        tepWidgetId={teplohod.tepWidgetId}
-        purchaseUrl={teplohodCheckoutUrl}
+      <CheckoutModalButton
+        checkoutUrl={teplohodCheckoutUrl}
         label={resolvedLabel}
         className={resolvedClassName}
-        lazyEmbed
+        onOpen={() =>
+          trackSelectTickets({
+            eventId: String(teplohod.tepEventId),
+            provider: 'teplohod',
+            source: 'landing_purchase_button',
+          })
+        }
       />
     );
   }
@@ -80,21 +86,59 @@ export function LandingPurchaseButton({
   });
 
   if (ticketscloud?.tcEventId && tcEventId) {
-    return (
-      <TcWidgetButton
-        tcEventId={ticketscloud.tcEventId}
-        purchaseUrl={purchaseUrl}
-        label={resolvedLabel}
-        className={resolvedClassName}
-      />
-    );
+    const tcCheckoutUrl = buildTcCheckoutUrl({
+      tcEventId: ticketscloud.tcEventId,
+      purchaseUrl,
+    });
+    if (tcCheckoutUrl) {
+      return (
+        <CheckoutModalButton
+          checkoutUrl={tcCheckoutUrl}
+          label={resolvedLabel}
+          className={resolvedClassName}
+          onOpen={() =>
+            trackSelectTickets({
+              eventId: tcEventId,
+              provider: 'ticketscloud',
+              source: 'landing_purchase_button',
+            })
+          }
+        />
+      );
+    }
   }
 
   if (teplohodCheckoutUrl) {
     return (
-      <a href={teplohodCheckoutUrl} target="_blank" rel="noopener noreferrer" className={resolvedClassName}>
-        {resolvedLabel}
-      </a>
+      <CheckoutModalButton
+        checkoutUrl={teplohodCheckoutUrl}
+        label={resolvedLabel}
+        className={resolvedClassName}
+        onOpen={() =>
+          trackSelectTickets({
+            eventId: session.id,
+            provider: 'teplohod',
+            source: 'landing_purchase_button_fallback',
+          })
+        }
+      />
+    );
+  }
+
+  if (purchaseUrl) {
+    return (
+      <CheckoutModalButton
+        checkoutUrl={purchaseUrl}
+        label={resolvedLabel}
+        className={resolvedClassName}
+        onOpen={() =>
+          trackSelectTickets({
+            eventId: session.id,
+            provider: session.purchaseProvider || 'unknown',
+            source: 'landing_purchase_button_url',
+          })
+        }
+      />
     );
   }
 
