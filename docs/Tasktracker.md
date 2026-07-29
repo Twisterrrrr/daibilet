@@ -121,7 +121,7 @@
 | BUY.7 | Owner site-wide TEP link audit (landings/event/home/dinner/party) | Высокий | ✅ 2026-07-27: broken patterns не найдены; см. Diary |
 | BUY.8 | Landing buy: TEP → CheckoutModal iframe; TC → native tcwidget (не iframe-в-iframe) | Критический | ✅ `988ae7e` |
 | BUY.8b | TC: убрать CheckoutModal вокруг widgets/common (event/landing/CTA) | Критический | ✅ `988ae7e` |
-| BUY.8c | TC: z-index - overlay ниже iframe shell (2147482990 / 2147483000) + liftTcWidgetLayers | Критический | 🔄 |
+| BUY.8c | TC: z-index - overlay ниже iframe shell (2147482990 / 2147483000) + liftTcWidgetLayers | Критический | ✅ `2ec37f4` prod |
 | BUY.9 | Event page: TEP → CheckoutModal; TC → TcWidgetButton/slots (native) | Критический | ✅ `988ae7e` |
 
 ---

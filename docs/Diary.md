@@ -12,7 +12,7 @@
 - `PurchaseOpeningFeedback`: детект shell через `:has(iframe.tc-widget-frame_popup)`.
 
 ### Проблемы
-- Нужен prod smoke URL мавзолея после deploy.
+- ~~Нужен prod smoke URL мавзолея после deploy.~~ ✅ `2ec37f4` live: CSS `2147482990` + `:has(iframe.tc-widget-frame_popup)`, JS `liftTcWidgetLayers`, HTTP 200.
 
 ---
 
