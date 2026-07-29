@@ -25,7 +25,7 @@
 
 ### Решения
 - `EventCard`: порядок Image → meta → title → tags → schedule/address → slots → footer. Schedule+адрес из mobile UX сохранены; tags на compact mobile по-прежнему `hidden sm:flex`.
-- Слоты: узкая/`compact` - 2 на mobile, 2×2 до 4 на sm+; широкая/default + Horizontal - до 3 в одну линию; формат `30 июл, 13:20` без weekday; «ещё N».
+- Слоты: узкая/`compact` - 2×2 до 4 и на mobile, и на sm+; широкая/default + Horizontal - до 3 в одну линию; формат `30 июл, 13:20` без weekday; «ещё N».
 
 ### Проблемы
 - Нет. Коммит/пуш/deploy через `daibilet-deploy-fix`.

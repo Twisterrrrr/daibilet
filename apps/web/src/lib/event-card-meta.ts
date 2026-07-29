@@ -8,8 +8,8 @@ export const MIN_DISPLAY_PRICE_RUB = 100;
 export const CATALOG_DISPLAY_SLOT_LIMIT = 4;
 /** Широкая/featured карточка: одна горизонтальная линия. */
 export const WIDE_DISPLAY_SLOT_LIMIT = 3;
-/** Compact mobile: не больше 2 чипов. */
-export const COMPACT_MOBILE_SLOT_LIMIT = 2;
+/** Compact mobile: owner wants the same 2×2 preview up to 4 slots. */
+export const COMPACT_MOBILE_SLOT_LIMIT = 4;
 
 export type DisplaySlotPreview = {
   labels: string[];

@@ -6,7 +6,7 @@ export const LOW_TICKETS_THRESHOLD = 20;
 export const MIN_DISPLAY_PRICE_RUB = 100;
 export const CATALOG_DISPLAY_SLOT_LIMIT = 4;
 export const WIDE_DISPLAY_SLOT_LIMIT = 3;
-export const COMPACT_MOBILE_SLOT_LIMIT = 2;
+export const COMPACT_MOBILE_SLOT_LIMIT = 4;
 
 export type DisplaySlotPreview = {
   labels: string[];
