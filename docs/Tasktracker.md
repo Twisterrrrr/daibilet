@@ -1,9 +1,20 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-07-27
+**Обновлено:** 2026-07-29
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
+
+---
+
+## Blog content polish (2026-07-29)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| BLOG.P1 | Причесать все blog MD кроме 5 owner-rewrites | Высокий | ✅ 37 PUBLISHED |
+| BLOG.P2 | Cover + 1-2 inline на диске для PUBLISHED | Критический | ✅ missing=0 |
+| BLOG.P3 | HIDDEN: bylinnyy-bereg-fentezi-fest, open-air-festy-vyhodnoi-ru | Низкий | ⚠️ без тяжёлой переписки |
+| BLOG.P4 | Deploy prod после push feat/next-monorepo | Высокий | 🔄 |
 
 ---
 

@@ -1,4 +1,21 @@
 
+## 2026-07-29 - Blog polish batch (все кроме 5 owner)
+
+### Наблюдения
+- Owner уже переписал 5 статей (Сочи, Калининград, Красноярск, Ярославль, Нева/каналы) - их не трогали.
+- Остальные PUBLISHED материалы в `content/blog` приведены к тому же редакционному тону: короче лиды, без AI-штампов, только дефис `-`, 1-2 inline-шорткода.
+- У ~19 постов не хватало cover/inline файлов на диске при `PUBLISHED` в frontmatter.
+
+### Решения
+- Причёсаны 37 PUBLISHED (и затронутые тексты) статей; 2 HIDDEN оставлены без тяжёлой переписки.
+- Сгенерированы недостающие cover + inline (+ inline-2) в `apps/public/public/images/blog/{slug}*.jpg`.
+- Коммит/пуш через чистый clone `daibilet-deploy-fix` (object store в temp-push сломан).
+
+### Проблемы
+- Claude CLI в среде не вызывался: полировка агентами Cursor в духе owner-samples + editorial persona guides.
+
+---
+
 ## 2026-07-29 - Landing buy: instant CheckoutModal iframe
 
 ### Наблюдения
