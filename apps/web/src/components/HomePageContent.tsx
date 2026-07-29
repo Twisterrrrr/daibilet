@@ -11,8 +11,7 @@ import {
 } from 'lucide-react';
 
 import { CityCard } from '@/components/CityCard';
-import { EventCard } from '@/components/EventCard';
-import { HomeEventRail, HomeNowSection } from '@/components/HomeNowSection.client';
+import { HomeCityAwareSections } from '@/components/HomeCityAwareSections.client';
 import { HomeHero } from '@/components/HomeHero.client';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
@@ -21,8 +20,7 @@ import { mergeBlogCards } from '@/lib/blog-utils';
 import { buildPublicArticlesListDto } from '@daibilet/backend/public-read';
 import '@/lib/env';
 import { getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
-import { formatMoney, formatNumber, pluralCities, pluralEvents } from '@/lib/format';
-import { buildHomePageSections } from '@/lib/home-page-sections';
+import { formatMoney, formatNumber, pluralEvents } from '@/lib/format';
 import { HOME_FORMAT_TILES, HOME_HOW_IT_WORKS, HOME_TRUST_ITEMS, resolveHomePromoImage } from '@/lib/home-scenarios';
 import { balancedTileGridClass } from '@/lib/balanced-tile-grid';
 import { landingCategoryHref } from '@/lib/landing-routes';
@@ -59,7 +57,6 @@ export async function HomePageContent() {
 
   const sessions = catalogPayload?.items ?? [];
   const fingerprints = new Map(Object.entries(fingerprintsRecord));
-  const { editorsPick, homeNowTabs, popular } = await buildHomePageSections(sessions, { fingerprints });
   const sparseCatalog = sessions.length < 12;
 
   const homeVenues = (venuesPayload?.venues ?? [])
@@ -87,66 +84,34 @@ export async function HomePageContent() {
     <>
       <HomeHero destinations={destinations} frames={heroFrames} />
 
-      <HomeEventRail
-        id="editors-pick"
-        title="Выбор редакции"
-        subtitle="Закреплённые в подборках и сильные предложения с ближайшими датами"
-        href="/events?sort=popular"
-        events={editorsPick}
-        editorsPickBadge
-      />
-
-      {topCities.length ? (
-        <section id="destinations" className="section-y border-b border-slate-100">
-          <div className="container-page">
-            <div className="flex items-end justify-between gap-4">
-              <div>
-                <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Популярные города</h2>
-                <p className="mt-1 text-sm text-slate-500">Выберите город — покажем афишу и подборки</p>
+      <HomeCityAwareSections
+        sessions={sessions}
+        fingerprints={Object.fromEntries(fingerprints)}
+        sparseCatalog={sparseCatalog}
+      >
+        {topCities.length ? (
+          <section id="destinations" className="section-y border-b border-slate-100">
+            <div className="container-page">
+              <div className="flex items-end justify-between gap-4">
+                <div>
+                  <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Популярные города</h2>
+                  <p className="mt-1 text-sm text-slate-500">Выберите город — покажем афишу и подборки</p>
+                </div>
+                <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
+                  Все города →
+                </Link>
               </div>
-              <Link href="/cities" className="shrink-0 text-sm font-semibold text-primary-600 hover:text-primary-700">
-                Все города →
-              </Link>
+              <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+                {topCities.map((city) => (
+                  <li key={city.slug || city.name}>
+                    <CityCard city={city} />
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
-              {topCities.map((city) => (
-                <li key={city.slug || city.name}>
-                  <CityCard city={city} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      ) : null}
-
-      {homeNowTabs.length ? <HomeNowSection tabs={homeNowTabs} /> : null}
-
-      {popular.length ? (
-        <section className="section-y">
-          <div className="container-page">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
-                  {sparseCatalog ? 'Рекомендуем начать с этого' : 'Популярное сейчас'}
-                </h2>
-                <p className="mt-1 text-sm text-slate-500">
-                  {sparseCatalog ? 'Сильные предложения из текущего каталога' : 'Конкретные события с ближайшими датами'}
-                </p>
-              </div>
-              <Link href="/events?sort=popular" className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:text-primary-700">
-                Открыть каталог <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <ul className="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
-              {popular.map((session) => (
-                <li key={session.id}>
-                  <EventCard session={session} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      ) : null}
+          </section>
+        ) : null}
+      </HomeCityAwareSections>
 
       <section id="formats" className="section-y">
         <div className="container-page">
@@ -388,13 +353,13 @@ export async function HomePageContent() {
               <p className="font-display text-3xl font-bold tracking-tight text-graphite sm:text-4xl">
                 {formatNumber(liveCities)}
               </p>
-              <p className="mt-1 text-sm text-graphite-muted">{pluralCities(liveCities)} с афишей</p>
+              <p className="mt-1 text-sm text-graphite-muted">городов с афишей</p>
             </div>
             <div>
               <p className="font-display text-3xl font-bold tracking-tight text-graphite sm:text-4xl">
                 {formatNumber(liveEvents)}
               </p>
-              <p className="mt-1 text-sm text-graphite-muted">{pluralEvents(liveEvents)} онлайн</p>
+              <p className="mt-1 text-sm text-graphite-muted">событий онлайн</p>
             </div>
             <div>
               <p className="font-display text-3xl font-bold tracking-tight text-graphite sm:text-4xl">

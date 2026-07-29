@@ -6,12 +6,15 @@ import { useEffect, useState } from 'react';
 
 import { EventCard } from '@/components/EventCard';
 import { ScrollRail } from '@/components/ScrollRail.client';
+import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import type { PublicSessionDto } from '@daibilet/contracts/public';
-import { buildCatalogHref } from '@/lib/catalog-url';
+import { catalogHrefWithSelectedCity, type CatalogFilterValues } from '@/lib/catalog-url';
 import type { HomeNowTab, HomeNowTabKey } from '@/lib/home-now-section';
 import { pickDefaultHomeNowTab } from '@/lib/home-now-section';
 
 export function HomeNowSection({ tabs }: { tabs: HomeNowTab[] }) {
+  const selectedCity = useSelectedCityOptional();
+  const cityValue = selectedCity?.cityReady ? selectedCity.cityValue : 'all';
   const [activeTab, setActiveTab] = useState<HomeNowTabKey>(() => pickDefaultHomeNowTab(tabs));
   const current = tabs.find((tab) => tab.key === activeTab) || tabs[0];
 
@@ -23,6 +26,11 @@ export function HomeNowSection({ tabs }: { tabs: HomeNowTab[] }) {
 
   if (!current) return null;
 
+  const moreHref = catalogHrefWithSelectedCity(
+    cityValue,
+    current.catalogQuery as CatalogFilterValues,
+  );
+
   return (
     <section id="events" className="section-y bg-surface-muted">
       <div className="container-page min-w-0">
@@ -32,7 +40,7 @@ export function HomeNowSection({ tabs }: { tabs: HomeNowTab[] }) {
             <p className="mt-1 text-sm text-slate-500">{current.subtitle}</p>
           </div>
           <Link
-            href={buildCatalogHref(current.catalogQuery)}
+            href={moreHref}
             className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:text-primary-700"
           >
             {current.title} <ArrowRight className="h-4 w-4" />

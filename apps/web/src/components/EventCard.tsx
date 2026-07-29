@@ -138,7 +138,7 @@ export function EventCard({
         <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
       </div>
 
-      <div className={`flex flex-1 flex-col gap-3 ${compact ? 'p-4' : 'p-4 sm:p-5'}`}>
+      <div className={`flex flex-1 flex-col ${compact ? 'gap-2.5 p-3.5 sm:gap-3 sm:p-4' : 'gap-3 p-4 sm:p-5'}`}>
         <h2>
           <Link
             href={href}
@@ -155,7 +155,12 @@ export function EventCard({
           </Link>
         </h2>
 
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        {/* Desktop / landing: full meta. Mobile catalog: keep light - avoid rating+duration+city wall. */}
+        <div
+          className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 ${
+            compact && !landingActions ? 'hidden sm:flex' : ''
+          }`}
+        >
           {pseudoRating != null ? (
             <span className="event-card-meta">
               <Star className="event-card-meta-icon" />
@@ -185,7 +190,11 @@ export function EventCard({
         {landingBadges.length > 0 ? (
           <LandingCardBadgeRow badges={landingBadges} />
         ) : (session.category || highlights.length > 0) ? (
-          <div className="flex flex-wrap items-center gap-1.5">
+          <div
+            className={`flex flex-wrap items-center gap-1.5 ${
+              compact && !landingActions ? 'hidden sm:flex' : ''
+            }`}
+          >
             {session.category ? (
               <span className="rounded-md bg-surface-muted px-2 py-0.5 text-ui-xs font-medium text-graphite-muted">
                 {session.category}
@@ -199,31 +208,44 @@ export function EventCard({
           </div>
         ) : null}
 
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-ui-xs text-graphite-muted">
-          {openDate ? (
-            <span className="font-medium text-success">Билет с открытой датой</span>
-          ) : departingSoonMinutes ? (
-            <span className="inline-flex items-center gap-1 font-medium text-urgency">
-              <Clock className="event-card-meta-icon" />
-              Через {departingSoonMinutes} мин
-            </span>
-          ) : sessionMetaLabel ? (
-            <span className="inline-flex items-center gap-1 font-medium text-graphite">
-              <Clock className="event-card-meta-icon" />
-              {sessionMetaLabel}
-            </span>
-          ) : (
-            <span>
-              {session.dateLabel}
-              {session.timeLabel ? ` · ${session.timeLabel}` : ''}
-            </span>
-          )}
-          {locationLabel ? <span className="line-clamp-1">{locationLabel}</span> : null}
+        {/* Primary schedule line */}
+        <div className="flex flex-col gap-1">
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-ui-xs sm:text-ui-sm">
+            {openDate ? (
+              <span className="font-semibold text-success">Билет с открытой датой</span>
+            ) : departingSoonMinutes ? (
+              <span className="inline-flex items-center gap-1 font-semibold text-urgency">
+                <Clock className="event-card-meta-icon" />
+                Через {departingSoonMinutes} мин
+              </span>
+            ) : sessionMetaLabel ? (
+              <span className="inline-flex items-center gap-1 font-semibold text-graphite">
+                <Clock className="event-card-meta-icon" />
+                {sessionMetaLabel}
+              </span>
+            ) : (
+              <span className="font-semibold text-graphite">
+                {session.dateLabel}
+                {session.timeLabel ? `, ${session.timeLabel}` : ''}
+              </span>
+            )}
+            {durationLabel && compact && !landingActions ? (
+              <span className="text-graphite-muted sm:hidden">· {durationLabel}</span>
+            ) : null}
+          </div>
+          {locationLabel ? (
+            <p className="line-clamp-1 text-ui-xs text-graphite-muted">
+              <span className="inline-flex max-w-full items-center gap-1">
+                <MapPin className="event-card-meta-icon shrink-0" />
+                <span className="truncate">{locationLabel}</span>
+              </span>
+            </p>
+          ) : null}
         </div>
 
         {showSlotPills ? (
           <div className="flex flex-wrap items-start gap-1.5">
-            {displaySlotLabels.map((label) =>
+            {(compact && !landingActions ? displaySlotLabels.slice(0, 2) : displaySlotLabels).map((label) =>
               showPurchaseWidgets ? (
                 <CatalogPurchaseChip
                   key={label}
