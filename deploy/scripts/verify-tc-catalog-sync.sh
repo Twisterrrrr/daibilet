@@ -22,20 +22,25 @@ else
   systemctl list-timers daibilet-tc-catalog-sync.timer --no-pager | sed -n '1,3p'
 fi
 
-RECENT="$(tail -120 "$LOG_FILE")"
+# Slice from last start marker for today (full run, not a short tail window).
+RUN_SLICE="$(awk -v day="$TODAY_UTC" '
+  index($0, day) && /start worker tc-catalog/ { buf = ""; found = 1 }
+  found { buf = buf $0 ORS }
+  END { printf "%s", buf }
+' "$LOG_FILE")"
 
-if ! grep -q "${TODAY_UTC}" <<<"$RECENT"; then
-  echo "FAIL: no log lines for ${TODAY_UTC} - nightly run may not have started yet" >&2
+if [[ -z "$RUN_SLICE" ]]; then
+  echo "FAIL: no start marker for ${TODAY_UTC} - nightly run may not have started yet" >&2
   exit 1
 fi
 
-if ! grep -qE '"importedEvents"[[:space:]]*:[[:space:]]*[1-9][0-9]*' <<<"$RECENT"; then
-  echo "FAIL: importedEvents missing or zero in recent log" >&2
+if ! grep -qE '"importedEvents"[[:space:]]*:[[:space:]]*[1-9][0-9]*' <<<"$RUN_SLICE"; then
+  echo "FAIL: importedEvents missing or zero in today's run slice" >&2
   exit 1
 fi
 
-IMPORTED="$(grep -oE '"importedEvents"[[:space:]]*:[[:space:]]*[0-9]+' <<<"$RECENT" | tail -1 | grep -oE '[0-9]+$' || true)"
-EXIT_LINE="$(grep -E '"event":"worker\.job\.done".*"job":"tc-catalog"' <<<"$RECENT" | tail -1 || true)"
+IMPORTED="$(grep -oE '"importedEvents"[[:space:]]*:[[:space:]]*[0-9]+' <<<"$RUN_SLICE" | tail -1 | grep -oE '[0-9]+$' || true)"
+EXIT_LINE="$(grep -E '"event":"worker\.job\.done".*"job":"tc-catalog"' <<<"$RUN_SLICE" | tail -1 || true)"
 
 if [[ -z "$EXIT_LINE" ]] || ! grep -qE '"exitCode"[[:space:]]*:[[:space:]]*0' <<<"$EXIT_LINE"; then
   echo "FAIL: latest worker.job.done missing or exitCode!=0" >&2

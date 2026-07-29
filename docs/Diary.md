@@ -1,3 +1,19 @@
+## 2026-07-29 - TC catalog sync: false ALERT importedEvents
+
+### Наблюдения
+- Nightly `tc-catalog-sync.sh` писал ALERT `importedEvents missing` при реальном успехе (worker exit 0, `importedEvents` есть в полном логе).
+- Проверка делала `tail -80` / `tail -20` по shared `/var/log/daibilet/tc-catalog-sync.log`; covers/warm/revalidate после импорта выталкивали JSON summary из окна.
+
+### Решения
+- `deploy/cron/tc-catalog-sync.sh`: stdout/stderr воркера в per-run `RUN_LOG`, проверка `importedEvents` и `exitCode` по нему + `SYNC_EXIT`; затем `cat` в stdout для systemd/cron append.
+- `deploy/scripts/verify-tc-catalog-sync.sh`: срез лога от последнего `start worker tc-catalog` за сегодня (awk), без `tail -120`.
+- TEP cron без аналогичного `tail -80` check - не меняли.
+
+### Проблемы
+- Нужен pull/deploy скрипта на `/opt/daibilet`, иначе следующий nightly снова ловит старый false alert.
+
+---
+
 ## 2026-07-29 - Концерты: исключить автобусные туры
 
 ### Наблюдения
