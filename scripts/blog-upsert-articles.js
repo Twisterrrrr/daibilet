@@ -50,6 +50,17 @@ function resolvePublishedAt(meta, status) {
   return null;
 }
 
+/** Убирает «Колонка Имя:» / «Авторская колонка Имя:» из SEO/excerpt. */
+function stripColumnMetaPrefix(text) {
+  const raw = String(text || '').trim();
+  if (!raw) return '';
+  const stripped = raw
+    .replace(/^(?:Авторская\s+)?[Кк]олонка\s+\p{Lu}[^:]{0,80}:\s*/u, '')
+    .trim();
+  if (!stripped || stripped === raw) return raw;
+  return stripped.charAt(0).toLocaleUpperCase('ru-RU') + stripped.slice(1);
+}
+
 const db = createDb(rootDir);
 
 async function resolveCityId(citySlug) {
@@ -64,12 +75,13 @@ async function upsertArticle(article) {
   const meta = article.meta;
   const slug = article.slug;
   const title = meta.title || slug;
-  const excerpt = meta.excerpt || null;
+  const excerpt = stripColumnMetaPrefix(meta.excerpt) || null;
   const content = article.body;
   const coverImageUrl = meta.coverImageUrl || `/images/blog/${slug}.jpg`;
   const status = String(statusOverride || meta.status || 'PUBLISHED').toUpperCase();
   const seoTitle = meta.seoTitle || `${title} | Дайбилет`;
-  const seoDescription = meta.seoDescription || excerpt;
+  const seoDescription =
+    stripColumnMetaPrefix(meta.seoDescription) || excerpt;
   const seoH1 = meta.seoH1 || title;
   const canonicalPath = meta.canonicalPath || `/blog/${slug}`;
   const isIndexable = status === 'PUBLISHED';

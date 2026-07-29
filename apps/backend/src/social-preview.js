@@ -15,6 +15,17 @@ function cityHubSeoTitleFallback(cityName) {
   return `${name}: афиша, экскурсии и билеты на сегодня, ${short} | ${SITE_NAME}`;
 }
 
+/** Убирает «Колонка Имя:» из meta description статей. */
+function stripColumnMetaPrefix(text) {
+  const raw = String(text || '').trim();
+  if (!raw) return '';
+  const stripped = raw
+    .replace(/^(?:Авторская\s+)?[Кк]олонка\s+\p{Lu}[^:]{0,80}:\s*/u, '')
+    .trim();
+  if (!stripped || stripped === raw) return raw;
+  return stripped.charAt(0).toLocaleUpperCase('ru-RU') + stripped.slice(1);
+}
+
 function venueSeoTitleFallback(venueName) {
   const name = String(venueName || '').trim() || 'Площадка';
   const short = new Intl.DateTimeFormat('ru-RU', {
@@ -235,7 +246,10 @@ export async function buildSocialPreviewForPath(db, pathname, builders) {
         : cover;
     return {
       title: article.seoTitle || article.title,
-      description: article.seoDescription || article.excerpt || article.title,
+      description:
+        stripColumnMetaPrefix(article.seoDescription) ||
+        stripColumnMetaPrefix(article.excerpt) ||
+        article.title,
       url: canonicalPath,
       image: shareImage,
       redirectPath: canonicalPath,

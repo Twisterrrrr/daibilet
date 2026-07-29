@@ -266,6 +266,20 @@ export function columnAuthorSignature(authorName?: string | null): string | null
   return `${name}, штатный корреспондент Дайбилет`;
 }
 
+/**
+ * Убирает SEO/excerpt-префикс вида «Колонка Макса:» / «Авторская колонка Анны:».
+ * Не трогает фразы вроде «Колонка о том, как…» (без имени с заглавной).
+ */
+export function stripColumnMetaPrefix(text?: string | null): string {
+  const raw = String(text || '').trim();
+  if (!raw) return '';
+  const stripped = raw
+    .replace(/^(?:Авторская\s+)?[Кк]олонка\s+\p{Lu}[^:]{0,80}:\s*/u, '')
+    .trim();
+  if (!stripped || stripped === raw) return raw;
+  return stripped.charAt(0).toLocaleUpperCase('ru-RU') + stripped.slice(1);
+}
+
 /** Имя автора колонки - brand blue; «Редакция» и прочие - нейтральный slate. */
 export function blogAuthorNameClassName(
   articleType?: string | null,

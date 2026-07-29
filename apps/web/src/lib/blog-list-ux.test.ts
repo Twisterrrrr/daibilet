@@ -2,8 +2,15 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { resolveBlogListingCta } from './blog-listing-links';
+import { stripColumnMetaPrefix } from './blog-meta';
 import { resolveBlogTopics, parseBlogTopicParam } from './blog-topics';
-import { resolveBlogCardDateLabel, splitBlogListingHero, staticBlogCards } from './blog-utils';
+import {
+  expandListingExcerpt,
+  expandLargeListingCopy,
+  resolveBlogCardDateLabel,
+  splitBlogListingHero,
+  staticBlogCards,
+} from './blog-utils';
 
 test('blog topics: standup / kids / routes / concerts', () => {
   assert.deepEqual(resolveBlogTopics({ slug: 'spb-stendap-gid', title: 'Стендап' }), ['standup']);
@@ -61,4 +68,39 @@ test('splitBlogListingHero: featured out of feed, fallback latest', () => {
   assert.equal(split.featured?.slug, flaggedSlug);
   assert.ok(!split.feed.some((p) => p.slug === flaggedSlug));
   assert.ok(!split.hot.some((p) => p.slug === flaggedSlug));
+});
+
+test('stripColumnMetaPrefix removes author column labels', () => {
+  assert.equal(
+    stripColumnMetaPrefix('Колонка Макса: билеты и кемпинг на Волхове'),
+    'Билеты и кемпинг на Волхове',
+  );
+  assert.equal(
+    stripColumnMetaPrefix('Колонка Игоря «Место силы»: фестивали на берегу'),
+    'Фестивали на берегу',
+  );
+  assert.equal(
+    stripColumnMetaPrefix('Авторская колонка Анны: классика в особняках'),
+    'Классика в особняках',
+  );
+  assert.equal(
+    stripColumnMetaPrefix('Колонка о том, как устроен вечер: звук с края'),
+    'Колонка о том, как устроен вечер: звук с края',
+  );
+});
+
+test('expandListingExcerpt does not mash excerpt with body', () => {
+  const excerpt =
+    'Два фестиваля на берегу Волхова у Захарьино: историческая реконструкция и ролевой карнавал.';
+  const listing = expandListingExcerpt('fentezi-fest-bylinnyy-bereg', excerpt, 420);
+  assert.equal(listing, excerpt);
+});
+
+test('expandLargeListingCopy prefers body without concatenating excerpt', () => {
+  const excerpt = 'Короткий excerpt для карточки.';
+  const copy = expandLargeListingCopy('fentezi-fest-bylinnyy-bereg', excerpt, 900);
+  const joined = [copy.primary, copy.secondary].filter(Boolean).join(' ');
+  assert.ok(joined.length > 0);
+  assert.ok(!joined.startsWith(excerpt));
+  assert.ok(!joined.includes(`${excerpt} `));
 });

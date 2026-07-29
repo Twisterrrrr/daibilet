@@ -1,8 +1,17 @@
 import type { Metadata } from 'next';
 
 import { resolveBlogCityHref } from '@/lib/blog-article-city';
+import { stripColumnMetaPrefix } from '@/lib/blog-meta';
 import type { BlogArticleDto } from '@/lib/blog-utils';
 import { pageTitle } from '@/lib/seo-meta';
+
+function resolveBlogMetaDescription(article: BlogArticleDto): string {
+  return (
+    stripColumnMetaPrefix(article.seoDescription) ||
+    stripColumnMetaPrefix(article.excerpt) ||
+    article.title
+  );
+}
 
 const SITE_URL = (process.env.DAIBILET_SITE_URL || 'https://daibilet.ru').replace(/\/$/, '');
 const SITE_NAME = 'Дайбилет';
@@ -65,7 +74,7 @@ export function buildBlogArticleMetadata(article: BlogArticleDto): Metadata {
   // layout title template adds "| Дайбилет" - strip brand from seoTitle to avoid double suffix
   const title = pageTitle(article.seoTitle || article.title);
   const shareTitle = `${title} | ${SITE_NAME}`;
-  const description = article.seoDescription || article.excerpt || article.title;
+  const description = resolveBlogMetaDescription(article);
   const canonicalPath = resolveBlogArticleCanonicalPath(article);
   const canonical = absoluteUrl(canonicalPath);
   const image = resolveBlogShareImage(article.coverImageUrl);
@@ -109,7 +118,7 @@ export function buildBlogArticleMetadata(article: BlogArticleDto): Metadata {
 
 export function buildBlogArticleJsonLd(article: BlogArticleDto): Array<Record<string, unknown>> {
   const title = pageTitle(article.seoTitle || article.title);
-  const description = article.seoDescription || article.excerpt || article.title;
+  const description = resolveBlogMetaDescription(article);
   const canonicalPath = resolveBlogArticleCanonicalPath(article);
   const canonical = absoluteUrl(canonicalPath);
   const image = resolveBlogShareImage(article.coverImageUrl) || (article.coverImageUrl ? absoluteUrl(article.coverImageUrl) : undefined);

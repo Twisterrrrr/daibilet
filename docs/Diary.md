@@ -1,4 +1,20 @@
 
+## 2026-07-29 - Blog excerpt UX + column SEO desc
+
+### Наблюдения
+- Owner: на `/blog/[slug]` excerpt дублировал лид body; на `/blog` large/featured склеивали excerpt + lead (`expandListingExcerpt`).
+- Meta description колонок начинался с «Колонка {Имя}:» / «Авторская колонка {Имя}:».
+
+### Решения
+- Article hero без `description` (excerpt только для listing/SEO).
+- Listing: excerpt only; large/featured - body OR excerpt, без склейки.
+- `stripColumnMetaPrefix` в SEO metadata, social-preview, upsert; почищены frontmatter/static cards.
+
+### Проблемы
+- В temp `daibilet-push` object store сломан - коммит/пуш/deploy через `daibilet-deploy-fix`.
+
+---
+
 ## 2026-07-29 - Blog polish batch (все кроме 5 owner)
 
 ### Наблюдения

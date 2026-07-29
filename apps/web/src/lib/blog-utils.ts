@@ -6,6 +6,7 @@ import {
   authorLabel,
   normalizeBlogCitySlug,
   resolveSlugBlogMeta,
+  stripColumnMetaPrefix,
 } from '@/lib/blog-meta';
 import { resolveBlogTopics, type BlogTopicId } from '@/lib/blog-topics';
 
@@ -75,28 +76,36 @@ function plainLeadFromBody(slug: string): string {
     .trim();
 }
 
-/** Longer listing excerpt: short frontmatter + lead, capped for listing cards. */
-export function expandListingExcerpt(slug: string, excerpt: string, maxChars = 420): string {
-  const base = String(excerpt || '').trim();
-  const lead = plainLeadFromBody(slug);
-  if (!lead) return base;
-
-  const baseKey = base.slice(0, 48).toLowerCase();
-  const leadHasBase = Boolean(baseKey) && lead.toLowerCase().includes(baseKey);
-  const combined = !base ? lead : leadHasBase ? lead : `${base} ${lead}`;
-  if (combined.length <= maxChars) return combined;
-
-  const sliced = combined.slice(0, maxChars).replace(/\s+\S*$/, '').trim();
-  return sliced || base || lead.slice(0, maxChars);
+function truncateAtWord(text: string, maxChars: number): string {
+  const value = String(text || '').trim();
+  if (!value) return '';
+  if (value.length <= maxChars) return value;
+  return value.slice(0, maxChars).replace(/\s+\S*$/, '').trim() || value.slice(0, maxChars);
 }
 
-/** Split expanded lead into up to two paragraphs for featured/large cards (fills vertical space above CTAs). */
+/**
+ * Listing teaser: excerpt only (never mash with body lead).
+ * Body lead is a fallback when frontmatter excerpt is empty.
+ */
+export function expandListingExcerpt(slug: string, excerpt: string, maxChars = 420): string {
+  const base = stripColumnMetaPrefix(excerpt);
+  if (base) return truncateAtWord(base, maxChars);
+  const lead = plainLeadFromBody(slug);
+  return lead ? truncateAtWord(lead, maxChars) : '';
+}
+
+/**
+ * Large / featured cards: body preview OR excerpt, never concatenated.
+ * Prefer body lead to fill magazine space; fall back to clean excerpt.
+ */
 export function expandLargeListingCopy(
   slug: string,
   excerpt: string,
   maxChars = 900,
 ): { primary: string; secondary: string } {
-  const full = expandListingExcerpt(slug, excerpt, maxChars).trim();
+  const lead = plainLeadFromBody(slug);
+  const base = stripColumnMetaPrefix(excerpt);
+  const full = truncateAtWord(lead || base, maxChars).trim();
   if (!full) return { primary: '', secondary: '' };
   if (full.length < 280) return { primary: full, secondary: '' };
 
@@ -318,7 +327,7 @@ export function resolveStaticArticle(slug: string): BlogArticleDto | null {
     authorName: enriched.authorName,
     articleType: enriched.articleType,
     seoTitle: `${post.title} | Блог Дайбилет`,
-    seoDescription: post.excerpt,
+    seoDescription: stripColumnMetaPrefix(post.excerpt),
     canonicalPath: `/blog/${post.slug}`,
     isIndexable: true,
   };

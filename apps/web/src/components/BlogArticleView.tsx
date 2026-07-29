@@ -115,7 +115,6 @@ export function BlogArticleView({
         <BlogArticleHero
           breadcrumbs={breadcrumbs}
           title={article.title}
-          description={article.excerpt}
           coverImageUrl={article.coverImageUrl}
           publishedLabel={publishedLabel}
           readMin={readMin}

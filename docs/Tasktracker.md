@@ -15,6 +15,8 @@
 | BLOG.P2 | Cover + 1-2 inline на диске для PUBLISHED | Критический | ✅ missing=0 |
 | BLOG.P3 | HIDDEN: bylinnyy-bereg-fentezi-fest, open-air-festy-vyhodnoi-ru | Низкий | ⚠️ без тяжёлой переписки |
 | BLOG.P4 | Deploy prod после push feat/next-monorepo | Высокий | ✅ `13f0e18` prod |
+| BLOG.P5 | Excerpt UX: listing only / no mash; article без excerpt block | Критический | ✅ |
+| BLOG.P6 | SEO desc: strip «Колонка {Имя}:» | Высокий | ✅ |
 
 ---
 
