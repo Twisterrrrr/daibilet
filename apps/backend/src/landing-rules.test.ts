@@ -69,6 +69,34 @@ test('requires an excursion signal for country tours', () => {
   }
 });
 
+test('excludes bus tours from concerts even when title has music keywords', () => {
+  const concerts = findLandingRule('concerts-genre');
+  assert.ok(concerts);
+
+  assert.equal(matchesLandingRule({
+    title: 'Вечерняя симфония Петербурга - на автобусе',
+    category: 'Экскурсии',
+    tags: ['Автобусные туры'],
+    subcategories: ['Автобусные туры'],
+    venue: 'Точка сбора',
+    city: 'Санкт-Петербург',
+  }, concerts), false);
+
+  assert.equal(matchesLandingRule({
+    title: 'Панорамная экскурсия по центру на автобусе',
+    category: 'Экскурсии',
+    tags: ['Автобусные экскурсии'],
+    city: 'Москва',
+  }, concerts), false);
+
+  assert.equal(matchesLandingRule({
+    title: 'Симфонический концерт в филармонии',
+    category: 'Музыка',
+    tags: ['Классика', 'Симфоническая музыка'],
+    city: 'Санкт-Петербург',
+  }, concerts), true);
+});
+
 test('keeps rooftop tours separate from concerts and parties', () => {
   const rooftops = findLandingRule('rooftops');
   assert.ok(rooftops);

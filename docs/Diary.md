@@ -1,3 +1,20 @@
+## 2026-07-29 - Концерты: исключить автобусные туры
+
+### Наблюдения
+
+- На /kontserty (concerts-genre) в ленте был автобусный тур Вечерняя симфония Петербурга - на автобусе (	c-6a4276fc65a592a5d04b0e1a-vechernyaya-simfoniya-peterburga-na-avtobuse).
+- Категория Экскурсии, тег/subcategory Автобусные туры; матч шёл по keyword симфон в title.
+
+### Решения
+
+- Dual-edit landing-rules.ts + runtime dto.js: для concerts-genre excludeTags Автобусные туры / Автобусные экскурсии, excludeKeywords автобус/автобусн (+ venue в excludeKeywordFields).
+- Тест: bus + «симфония» не попадает в концерты; обычный симфонический концерт остаётся.
+
+### Проблемы
+
+- До F5 правила всё ещё дублируются вручную в dto.js.
+
+---
 
 ## 2026-07-29 - EventCard: meta под фото + слоты 2×2 / 3 в ряд
 

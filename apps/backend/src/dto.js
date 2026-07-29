@@ -327,9 +327,18 @@ const LANDING_RULES = [
     tags: ['Рок', 'Джаз', 'Классика', 'Поп', 'Эстрада', 'Металл', 'Альтернатива', 'Электронная музыка', 'Хип-хоп', 'Орган', 'Симфоническая музыка', 'Инди'],
     keywords: ['концерт', 'live', 'симфон', 'оркестр', 'филармон'],
     keywordScope: 'content',
-    excludeTags: ['Юмор', 'Stand up', 'Комедия', 'Импровизация', 'TV комики'],
-    excludeKeywords: ['стендап', 'stand up', 'комеди', 'юмор', 'импров'],
-    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'subcategory'],
+    // Bus tours leak via music keywords (e.g. «симфония … на автобусе»); keep them on bus-tours.
+    excludeTags: [
+      'Юмор',
+      'Stand up',
+      'Комедия',
+      'Импровизация',
+      'TV комики',
+      'Автобусные туры',
+      'Автобусные экскурсии',
+    ],
+    excludeKeywords: ['стендап', 'stand up', 'комеди', 'юмор', 'импров', 'автобус', 'автобусн'],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'subcategory', 'venue'],
   },
   {
     slug: 'moscow-museums',
@@ -8895,7 +8904,6 @@ function isPlaceholderEventImageUrl(imageUrl) {
   const lower = raw.toLowerCase();
   if (lower.includes('placeholder.gif')) return true;
   if (/api\.teplohod\.info\/v1\/image\?item=&/i.test(raw)) return true;
-  if (/api\.teplohod\.info\/v1\/image\?/i.test(raw) && !/dirtyAlias=/i.test(raw)) return true;
   return false;
 }
 

@@ -7,6 +7,14 @@
 
 ---
 
+## Landing match: concerts vs bus tours (2026-07-29)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| LAND.C1 | /kontserty: исключить автобусные туры (тег/«на автобусе») из concerts-genre | Высокий | ✅ dual-edit dto.js + landing-rules.ts |
+
+---
+
 ## Blog content polish (2026-07-29)
 
 | # | Задача | Приоритет | Статус |
