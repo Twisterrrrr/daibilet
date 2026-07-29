@@ -418,8 +418,7 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
           )
         end as "groupKey"
       from normalized
-      where "priceFrom" >= ${MIN_DISPLAY_PRICE_RUB}
-        and "purchaseReady" = true
+      where "purchaseReady" = true
         and lower(coalesce("sourceStatus", '')) not in ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden')
         and (
           "startsAt" is not null

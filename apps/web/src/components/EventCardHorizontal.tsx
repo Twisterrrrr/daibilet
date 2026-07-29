@@ -56,7 +56,7 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
   const pinPrimary = pinLines.primary || locationLabel;
   const durationLabel = extractDurationLabel(session.tags);
   const ageLabel = session.ageLimit?.trim() || null;
-  const priceFooterLabel = formatPriceFrom(session.priceFrom);
+  const priceFooterLabel = hasPrice ? formatPriceFrom(session.priceFrom) : null;
   const venueHref = sessionVenueHref(session);
 
   return (
@@ -186,9 +186,11 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
         ) : null}
 
         <div className="mt-auto flex items-center justify-between gap-4 pt-1">
-          <span className="shrink-0 text-ui-sm font-bold text-graphite sm:text-base">
-            {hasPrice ? priceFooterLabel : 'Скоро'}
-          </span>
+          {priceFooterLabel ? (
+            <span className="shrink-0 text-ui-sm font-bold text-graphite sm:text-base">{priceFooterLabel}</span>
+          ) : (
+            <span />
+          )}
           <Link
             href={href}
             className="relative z-[2] inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-ui-xs font-semibold text-white transition hover:bg-primary-700 sm:text-ui-sm"

@@ -1308,9 +1308,11 @@ function AffichePosterCard({ session }: { session: PublicSessionDto }) {
         <h3 className="mb-1 text-lg font-medium leading-tight text-balance text-zinc-900">{session.title}</h3>
         {session.venue ? <p className="mb-3 line-clamp-2 text-sm text-zinc-500">{session.venue}</p> : null}
         <div className="mt-auto flex items-center justify-between gap-3">
-          <span className="text-sm font-medium text-zinc-900">
-            {hasPrice ? formatPriceFrom(session.priceFrom) : 'Цена уточняется'}
-          </span>
+          {hasPrice ? (
+            <span className="text-sm font-medium text-zinc-900">{formatPriceFrom(session.priceFrom)}</span>
+          ) : (
+            <span />
+          )}
           <span className="relative z-[2] text-sm font-medium text-zinc-700 underline-offset-4 group-hover:underline">
             Билеты
           </span>

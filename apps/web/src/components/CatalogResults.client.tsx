@@ -8,7 +8,7 @@ import { EventCardHorizontal } from '@/components/EventCardHorizontal';
 import type { PublicCatalogListItemDto } from '@daibilet/contracts/public';
 import { trackCatalogBannerClick } from '@/lib/catalog-analytics';
 import { formatPriceFrom, formatNumber } from '@/lib/format';
-import { formatShowcaseSessionDate, resolvePseudoRating } from '@/lib/event-card-meta';
+import { formatShowcaseSessionDate, MIN_DISPLAY_PRICE_RUB, resolvePseudoRating } from '@/lib/event-card-meta';
 import { resolveEventCardDestinationLabel } from '@/lib/event-location';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
 import type { CatalogViewMode } from '@/lib/catalog-view-mode';
@@ -253,7 +253,9 @@ function CatalogTable({ items }: { items: PublicCatalogListItemDto[] }) {
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 align-top text-slate-700">{formatShowcaseSessionDate(session)}</td>
                 <td className="whitespace-nowrap px-4 py-3 align-top font-semibold text-slate-950">
-                  {formatPriceFrom(session.priceFrom)}
+                  {typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB
+                    ? formatPriceFrom(session.priceFrom)
+                    : '—'}
                 </td>
                 <td className="whitespace-nowrap px-4 py-3 align-top">
                   <span className="inline-flex items-center gap-1 text-slate-700">

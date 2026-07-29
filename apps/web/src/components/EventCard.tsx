@@ -104,8 +104,9 @@ export function EventCard({
   const locationLabel = resolveEventCardLocationLabel(session);
   const durationLabel = extractDurationLabel(session.tags);
   const ageLabel = session.ageLimit?.trim() || null;
-  const showSoonBadge = !hasPrice && !openDate && !departingSoonMinutes;
-  const priceFooterLabel = formatPriceFrom(session.priceFrom);
+  // Missing display price (<100 / null) is not "soon" - event can still be on sale.
+  const showSoonBadge = false;
+  const priceFooterLabel = hasPrice ? formatPriceFrom(session.priceFrom) : null;
   const purchase = useCatalogPurchase(session);
   // Catalog list: no hidden widget DOM. Purchase UX lives on event page / landing CTA.
   const showPurchaseWidgets = landingActions && !suppressPurchaseAnchors && purchase.purchaseEnabled;
@@ -279,7 +280,11 @@ export function EventCard({
             />
           ) : (
             <>
-              <span className="text-ui-sm font-bold text-graphite sm:text-base">{priceFooterLabel}</span>
+              {priceFooterLabel ? (
+                <span className="text-ui-sm font-bold text-graphite sm:text-base">{priceFooterLabel}</span>
+              ) : (
+                <span />
+              )}
               <Link
                 href={href}
                 className={DETAILS_LINK_CLASS}
@@ -420,7 +425,7 @@ function ShowcaseEventCard({
   const pinLines = resolveEventCardPinLines(session);
   const categoryLabel = session.category?.trim() || null;
   const durationLabel = extractDurationLabel(session.tags);
-  const priceLabel = hasPrice ? formatShowcasePriceLabel(session.priceFrom) : 'Скоро';
+  const priceLabel = hasPrice ? formatShowcasePriceLabel(session.priceFrom) : null;
 
   return (
     <article className={`group event-card ${rail ? 'min-h-[340px]' : ''}`}>
@@ -500,7 +505,7 @@ function ShowcaseEventCard({
         )}
 
         <div className="flex items-center justify-between gap-3 pt-1">
-          <span className="text-ui-sm font-bold text-graphite">{priceLabel}</span>
+          {priceLabel ? <span className="text-ui-sm font-bold text-graphite">{priceLabel}</span> : <span />}
           <span className="inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-ui-xs font-semibold text-white sm:text-ui-sm">
             <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} />
             Купить билет

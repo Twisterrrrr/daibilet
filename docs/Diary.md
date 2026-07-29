@@ -1,4 +1,20 @@
-## 2026-07-30 - TC: не виджет в виджете (CheckoutModal)
+## 2026-07-30 - Saleable ≠ display price (≥100)
+
+### Наблюдения
+- Owner clarification: «не писать цены в карточках, если ниже 100р» - не «не запускать в продажу».
+- Public sale gate (`isSaleableEventForPublic` + SQL `saleable` CTE + lean catalog filter) требовал `priceFrom >= 100` → события с null/low display price (~61 «Без цены») не попадали в каталог/лендинги даже при виджете и расписании.
+
+### Решения
+- `isSaleable` / catalog include: widget + upcoming/open schedule; цена опциональна.
+- `hasDisplayPrice` / UI: «от N ₽» только при ≥100; иначе CTA без цены («Купить» / «Купить билет»), без «Бесплатно»/«Скоро»/«Цена уточняется».
+- Admin chip `priceBlocked` / «Без цены» оставлен как метрика display-price gap, не block from sale.
+- SEO/meta: по-прежнему не выдумывать «от 100» (`formatRealPriceRub` / `appendRealPriceToDescription`).
+
+### Проблемы
+- Из ~61 «Без цены» в каталог вернутся те, у кого purchaseReady + расписание; без виджета/сессий по-прежнему отсекаются.
+
+---
+
 
 ### Наблюдения
 - Owner screenshot (Антон Борисов / стендап): поверх нативного TC UI видна наша оболочка CheckoutModal («Покупка билета», «В новой вкладке», footer «Не открывается?»).
@@ -1035,7 +1051,7 @@
 ### Решения
 
 - Конфиг `apps/backend/src/listing-garbage-config.ts` + audit `listing-garbage-audit.ts` + `telegram.ts` (API `https://api.telegram.org/bot{token}/sendMessage`).
-- CLI `scripts/audit-listings.js` / `pnpm audit:listings`; фильтр ≈ saleable public catalog (status, schedule, purchaseReady, price≥100); slim select id/title/description/slug (+ override).
+- CLI `scripts/audit-listings.js` / `pnpm audit:listings`; фильтр ≈ saleable public catalog (status, schedule, purchaseReady; display price optional); slim select id/title/description/slug (+ override).
 - Mojibake: `\uFFFD` + UTF-8-as-Latin1 `[ÐÑ][\u0080-\u00FF]`; `скидк*` **пропущен**; CAPS - soft (≥70% upper Cyrillic в title); HTML-теги только в title (description CMS tags игнор).
 - Cron wrapper `deploy/cron/audit-listings.sh` + README; установка crontab на prod отдельно (⏳), не в deploy-prod-next. Telegram env на prod пока **missing**.
 

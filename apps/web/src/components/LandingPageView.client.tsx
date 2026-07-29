@@ -1862,7 +1862,10 @@ function LandingDinnerScheduleRow({ group, isOptimal }: { group: EventGroup; isO
   const format = extractFormatLabel(session.tags);
   const badges = deriveLandingCardBadges(session);
   const href = eventHref(session);
-  const priceLabel = group.priceFrom ? formatMoney(group.priceFrom).replace(/^от\s+/i, '') : 'Купить';
+  const priceLabel =
+    typeof group.priceFrom === 'number' && group.priceFrom >= MIN_DISPLAY_PRICE_RUB
+      ? formatMoney(group.priceFrom).replace(/^от\s+/i, '')
+      : 'Купить';
   const vacant = session.vacant ?? group.vacant;
   const soldOut = typeof vacant === 'number' && vacant <= 0;
   const buyButtonClass =
@@ -3062,7 +3065,10 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
   const locationLabel = resolveEventCardLocationLabel(session);
   const amenities = amenityIcons(session.tags);
   const href = eventHref(session);
-  const priceLabel = group.priceFrom ? formatMoney(group.priceFrom).replace(/^от\s+/i, '') : 'Купить';
+  const priceLabel =
+    typeof group.priceFrom === 'number' && group.priceFrom >= MIN_DISPLAY_PRICE_RUB
+      ? formatMoney(group.priceFrom).replace(/^от\s+/i, '')
+      : 'Купить';
   const buyButtonClass =
     'inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 active:scale-[0.98]';
   const buyButtonClassMobile = 'inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground active:scale-[0.98]';

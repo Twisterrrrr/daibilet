@@ -549,15 +549,21 @@ function buildLaunchMetrics(events) {
     needsAttention: events.filter(
       (event) => event.status === 'needs_review' || event.readiness === 'review' || event.readiness === 'blocked',
     ).length,
-    priceBlocked: events.filter((event) => event.priceFrom == null).length,
+    priceBlocked: events.filter((event) => event.priceFrom == null).length, // display-price gap (<100/null), not public sale block
     purchaseBlocked: events.filter((event) => !event.purchaseReady).length,
     noImage: events.filter((event) => !event.hasImage).length,
     landingMatched: events.filter((event) => (event.landingHits || []).length > 0).length,
   };
 }
 
+/** Public listing/sale gate: schedule + purchase widget. Display price (≥100) is optional. */
 export function isSaleableEventForPublic(event) {
-  return Boolean(hasUpcomingOrOpenSchedule(event) && event.purchaseReady && Number.isFinite(event.priceFrom) && event.priceFrom >= MIN_DISPLAY_PRICE_RUB);
+  return Boolean(hasUpcomingOrOpenSchedule(event) && event.purchaseReady);
+}
+
+/** True when price is safe to show on cards/meta (≥ MIN_DISPLAY_PRICE_RUB). */
+export function hasDisplayPrice(priceFrom) {
+  return Number.isFinite(priceFrom) && Number(priceFrom) >= MIN_DISPLAY_PRICE_RUB;
 }
 
 export async function buildAdminCitiesList(db, searchParams = new URLSearchParams()) {
@@ -7838,8 +7844,7 @@ async function destinationSummaryRowsFast(db) {
             lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
           ) as "groupKey"
         from normalized
-        where "priceFrom" >= $1
-          and "purchaseReady" = true
+        where "purchaseReady" = true
           and lower(coalesce("sourceStatus", '')) not in ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden')
           and (
             "startsAt" is not null
@@ -8673,8 +8678,7 @@ async function publicCatalogSessionsFast(db) {
             lower(regexp_replace(trim(coalesce(venue, '')), '\\s+', ' ', 'g'))
           ) as "groupKey"
         from normalized
-        where "priceFrom" >= $1
-          and "purchaseReady" = true
+        where "purchaseReady" = true
           and lower(coalesce("sourceStatus", '')) not in ('widget_blocked', 'paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden')
           and (
             "startsAt" is not null
@@ -9108,7 +9112,7 @@ export function mapGroupedPublicSession(row, pinnedEventIds = new Set()) {
 }
 
 function isSaleablePublicSession(session) {
-  return Boolean(session.purchaseReady && Number.isFinite(session.priceFrom) && session.priceFrom >= MIN_DISPLAY_PRICE_RUB);
+  return Boolean(session.purchaseReady);
 }
 
 async function publicEventRows(db, forceRefresh = false) {
@@ -9293,7 +9297,7 @@ async function publicEventRowsLean(db, limit) {
         tags,
       };
     })
-    .filter((row) => hasUpcomingOrOpenSchedule(row) && row.purchaseReady && Number.isFinite(row.priceFrom) && row.priceFrom >= MIN_DISPLAY_PRICE_RUB);
+    .filter((row) => hasUpcomingOrOpenSchedule(row) && row.purchaseReady);
 }
 
 function parseCatalogAgeLimit(value) {

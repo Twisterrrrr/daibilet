@@ -36,10 +36,18 @@ test('hasUpcomingOrOpenSchedule rejects stale wide-lifetime rows', () => {
   assert.equal(hasUpcomingOrOpenSchedule({ kind: 'SINGLE', startsAt: started, endsAt: ends }), false);
 });
 
-test('isSaleableForPublicCatalog requires widget-ready schedule and price', () => {
+test('isSaleableForPublicCatalog requires widget-ready schedule; price optional', () => {
   const future = new Date(Date.now() + 3_600_000).toISOString();
   assert.equal(
     isSaleableForPublicCatalog({ kind: 'SINGLE', startsAt: future, purchaseReady: true, priceFrom: 500 }),
+    true,
+  );
+  assert.equal(
+    isSaleableForPublicCatalog({ kind: 'SINGLE', startsAt: future, purchaseReady: true, priceFrom: null }),
+    true,
+  );
+  assert.equal(
+    isSaleableForPublicCatalog({ kind: 'SINGLE', startsAt: future, purchaseReady: true, priceFrom: 10 }),
     true,
   );
   assert.equal(

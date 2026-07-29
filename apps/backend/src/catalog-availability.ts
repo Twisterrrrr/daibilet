@@ -88,14 +88,11 @@ export function hasUpcomingOrOpenSchedule(row: CatalogScheduleRow): boolean {
   return false;
 }
 
-export function isSaleableForPublicCatalog(
-  row: CatalogSaleableRow,
-  minPrice = MIN_DISPLAY_PRICE_RUB,
-): boolean {
-  return Boolean(
-    hasUpcomingOrOpenSchedule(row) &&
-    row.purchaseReady &&
-    Number.isFinite(row.priceFrom) &&
-    Number(row.priceFrom) >= minPrice,
-  );
+export function hasDisplayPrice(priceFrom?: number | null, minPrice = MIN_DISPLAY_PRICE_RUB): boolean {
+  return Number.isFinite(priceFrom) && Number(priceFrom) >= minPrice;
+}
+
+/** Listing/sale gate: schedule + purchase. Display price (≥100) is optional. */
+export function isSaleableForPublicCatalog(row: CatalogSaleableRow): boolean {
+  return Boolean(hasUpcomingOrOpenSchedule(row) && row.purchaseReady);
 }

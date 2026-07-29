@@ -249,8 +249,12 @@ export function formatShowcaseSessionDateCompact(event: PublicSession): string {
   return `${dayMonth} в ${time}`;
 }
 
+export function hasDisplayPrice(priceFrom?: number | null): boolean {
+  return typeof priceFrom === 'number' && Number.isFinite(priceFrom) && priceFrom >= MIN_DISPLAY_PRICE_RUB;
+}
+
 export function formatShowcasePriceLabel(priceFrom?: number | null): string {
-  if (!priceFrom || priceFrom < MIN_DISPLAY_PRICE_RUB) return 'Бесплатно';
+  if (!hasDisplayPrice(priceFrom)) return '';
   return `от ${formatPriceRub(priceFrom)} ₽`;
 }
 

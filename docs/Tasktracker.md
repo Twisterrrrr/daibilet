@@ -1,9 +1,19 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-07-29
+**Обновлено:** 2026-07-30
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
+
+---
+
+## Catalog sale vs display price (2026-07-30)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| CAT.DP1 | Owner: saleable = widget+schedule; не требовать priceFrom≥100 для каталога | Критический | ✅ |
+| CAT.DP2 | Карточки/таблицы: не показывать «от N ₽» / fake price при null или &lt;100 | Критический | ✅ |
+| CAT.DP3 | Admin «Без цены» = display-price gap (мониторинг), не block from sale | Средний | ✅ note |
 
 ---
 

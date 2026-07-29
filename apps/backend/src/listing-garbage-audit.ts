@@ -145,8 +145,7 @@ export async function fetchSaleablePublicListingRows(): Promise<ListingAuditEven
     )
     select id, slug, title, description
     from priced
-    where "priceFrom" >= ${MIN_DISPLAY_PRICE_RUB}
-      and "purchaseReady" = true
+    where "purchaseReady" = true
       and lower(coalesce("sourceStatus", '')) not in (${raw(blocked)})
       and (
         "startsAt" is not null

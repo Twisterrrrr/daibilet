@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { LandingPurchaseButton } from '@/components/landing/LandingPurchaseButton.client';
 import { canOpenCatalogPurchase } from '@/lib/event-card-meta';
 import { formatPriceFrom } from '@/lib/format';
+import { MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import type { PublicEventPageDto, PublicSessionDto } from '@daibilet/contracts/public';
 
 export type ParsedBuyBlock = {
@@ -145,7 +146,9 @@ export function BlogBuyButton({ slug, label }: ParsedBuyBlock) {
   }, [slug]);
 
   const priceLabel =
-    typeof session?.priceFrom === 'number' ? formatPriceFrom(session.priceFrom) : null;
+    typeof session?.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB
+      ? formatPriceFrom(session.priceFrom)
+      : null;
   const title = session?.title?.trim() || 'Событие из статьи';
 
   return (
