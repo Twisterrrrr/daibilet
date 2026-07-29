@@ -1,4 +1,19 @@
 
+## 2026-07-29 - Blog cards: mid-sentence «...» от flex-1 + line-clamp
+
+### Наблюдения
+- Owner (скрин `/blog`): в карточках «почему...» / «не...» посреди фразы, хотя текст продолжается на следующей строке.
+- Excerpt в MD без троеточий; JS-truncate тоже не добавляет `...`.
+
+### Решения
+- `BlogPostCard` default/small: убрать `flex-1` с `<p class="line-clamp-*">`, spacer `<div className="flex-1" />` отдельно (как уже для large в H.8h).
+- Meta остаётся внизу карточки; ellipsis только при реальном overflow на последней видимой строке clamp.
+
+### Проблемы
+- Нет. Коммит/пуш/deploy через `daibilet-deploy-fix` (push worktree сломан).
+
+---
+
 ## 2026-07-29 - Blog excerpt UX + column SEO desc
 
 ### Наблюдения

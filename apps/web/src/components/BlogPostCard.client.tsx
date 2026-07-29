@@ -195,15 +195,16 @@ export function BlogPostCard({
         {excerpt ? (
           <p
             className={[
-              'mt-2 flex-1 leading-relaxed text-slate-600',
+              // Не ставить flex-1 на line-clamp: бокс растёт выше N строк,
+              // и браузер рисует «...» посреди фразы, хотя текст ещё виден ниже.
+              'mt-2 leading-relaxed text-slate-600',
               isSmall ? 'line-clamp-2 text-xs sm:text-sm' : 'line-clamp-3 text-sm',
             ].join(' ')}
           >
             {excerpt}
           </p>
-        ) : (
-          <div className="flex-1" />
-        )}
+        ) : null}
+        <div className="flex-1" />
         <BlogCardMeta post={post} dateLabel={dateLabel} isLarge={false} />
       </div>
     </Link>
