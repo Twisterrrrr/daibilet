@@ -95,7 +95,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
     <>
       <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/70 bg-white/95 pt-[env(safe-area-inset-top,0px)] shadow-[0_1px_0_hsl(210_9%_11%/0.03)] backdrop-blur-md supports-[backdrop-filter]:bg-white/90">
         <div className="container-page flex min-h-[var(--site-header-height)] items-center justify-between gap-2 py-2.5 sm:gap-3 sm:py-3 lg:py-3.5">
-          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3 lg:flex-none lg:gap-4">
+          <div className="flex min-w-0 flex-1 flex-nowrap items-center gap-2 sm:gap-3 lg:flex-none lg:gap-4">
             <button
               type="button"
               aria-label="Открыть меню"
@@ -105,7 +105,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               <Menu className="h-5 w-5" strokeWidth={1.75} />
             </button>
 
-            <Link href="/" className="min-w-0 shrink translate-y-[3mm] truncate">
+            <Link href="/" className="inline-flex shrink-0 items-center">
               <DaibiletLogo textClassName="text-lg sm:text-xl lg:text-2xl" />
             </Link>
 
