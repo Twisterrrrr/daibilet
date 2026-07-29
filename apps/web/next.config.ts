@@ -9,8 +9,9 @@ const nextConfig: NextConfig = {
   experimental: {
     workerThreads: false,
     cpus: 1,
-    staticGenerationMaxConcurrency: 2,
-    staticGenerationMinPagesPerWorker: 10,
+    // Concurrency 2 raced MODULE_NOT_FOUND on [segment]/sitemaps during SSG on 3.8Gi VPS.
+    staticGenerationMaxConcurrency: 1,
+    staticGenerationMinPagesPerWorker: 20,
   },
   transpilePackages: ['@daibilet/backend', '@daibilet/db', '@daibilet/contracts'],
   serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'pg'],
