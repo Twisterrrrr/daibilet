@@ -47,6 +47,7 @@ const VENDOR_CHECKOUT_SELECTOR = [
   'iframe[src*="teplohod.info/order"]',
   '#tc-widget-overlay',
   '.tc-widget-frame_popup',
+  'body > div:has(iframe.tc-widget-frame_popup)',
   'iframe[src*="ticketscloud"]',
 ].join(', ');
 

@@ -1,3 +1,21 @@
+## 2026-07-30 - TC widget z-index: overlay above iframe shell
+
+### Наблюдения
+- Owner FURY на `/events/tc-699c76d7…-mavzolei-lenina…`: нативный TC снова «не выше всех».
+- BUY.8b (`988ae7e`) уже убрал CheckoutModal вокруг TC; баг stacking остался отдельно.
+- `tcwidget.js`: backdrop `#tc-widget-overlay` (inline ~1e9+3) + classless fixed shell (inline ~1e9+4) с `iframe.tc-widget-frame_popup`.
+- Наш CSS поднимал `#tc-widget-overlay` до `2147483000 !important`, а shell оставался на inline `1000000004` → затемнение TC поверх iframe, клики/видимость «под» chrome.
+
+### Решения
+- `globals.css`: overlay `2147482990`; shell через `body > div:has(iframe.tc-widget-frame_popup)` + frame = `2147483000`; Fancybox отдельно.
+- `TcWidget.client`: `liftTcWidgetLayers()` при появлении виджета (+ re-lift 50/300ms).
+- `PurchaseOpeningFeedback`: детект shell через `:has(iframe.tc-widget-frame_popup)`.
+
+### Проблемы
+- Нужен prod smoke URL мавзолея после deploy.
+
+---
+
 ## 2026-07-30 - Saleable ≠ display price (≥100)
 
 ### Наблюдения

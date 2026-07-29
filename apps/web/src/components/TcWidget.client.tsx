@@ -178,20 +178,51 @@ function openTcPurchaseUrl(purchaseUrl?: string | null) {
   return Boolean(popup);
 }
 
+const TC_FRAME_Z = '2147483000';
+const TC_OVERLAY_Z = '2147482990';
+
+/** Keep TC backdrop under the iframe shell; both above Daibilet chrome (z-99990). */
+function liftTcWidgetLayers() {
+  if (typeof document === 'undefined') return;
+
+  const overlay = document.getElementById('tc-widget-overlay');
+  if (overlay instanceof HTMLElement) {
+    overlay.style.setProperty('z-index', TC_OVERLAY_Z, 'important');
+  }
+
+  const frames = document.querySelectorAll<HTMLElement>(
+    'iframe.tc-widget-frame_popup, iframe[src*="ticketscloud"]',
+  );
+  frames.forEach((frame) => {
+    let node: HTMLElement | null = frame.parentElement;
+    while (node && node !== document.body) {
+      const position = window.getComputedStyle(node).position;
+      if (position === 'fixed' || position === 'absolute') {
+        if (node.id === 'tc-widget-overlay') {
+          node.style.setProperty('z-index', TC_OVERLAY_Z, 'important');
+        } else {
+          node.style.setProperty('z-index', TC_FRAME_Z, 'important');
+        }
+      }
+      node = node.parentElement;
+    }
+  });
+}
+
 function isTcWidgetVisible() {
   if (typeof document === 'undefined') return false;
   return Boolean(
     document.querySelector('.tc-widget-frame_popup') ||
       document.getElementById('tc-widget-overlay') ||
       document.querySelector('.tc-widget-container iframe') ||
-      document.querySelector('iframe[src*="ticketscloud"]') ||
-      document.getElementById('ticketscloud-loader'),
+      document.querySelector('iframe[src*="ticketscloud"]'),
   );
 }
 
 function waitForTcWidgetVisible(timeoutMs = 2500) {
   return new Promise<boolean>((resolve) => {
     if (isTcWidgetVisible()) {
+      liftTcWidgetLayers();
       resolve(true);
       return;
     }
@@ -199,6 +230,7 @@ function waitForTcWidgetVisible(timeoutMs = 2500) {
     const deadline = Date.now() + timeoutMs;
     const observer = new MutationObserver(() => {
       if (isTcWidgetVisible()) {
+        liftTcWidgetLayers();
         observer.disconnect();
         resolve(true);
       } else if (Date.now() >= deadline) {
@@ -207,9 +239,10 @@ function waitForTcWidgetVisible(timeoutMs = 2500) {
       }
     });
 
-    observer.observe(document.body, { childList: true, subtree: true });
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
     window.setTimeout(() => {
       observer.disconnect();
+      if (isTcWidgetVisible()) liftTcWidgetLayers();
       resolve(isTcWidgetVisible());
     }, timeoutMs);
   });
@@ -235,10 +268,21 @@ export async function openTcWidget(options: {
 
   if (trigger) {
     trigger.click();
-    if (await waitForTcWidgetVisible(2800)) return 'widget';
+    if (await waitForTcWidgetVisible(2800)) {
+      liftTcWidgetLayers();
+      // Vendor may rewrite inline z-index after paint - re-lift briefly.
+      window.setTimeout(liftTcWidgetLayers, 50);
+      window.setTimeout(liftTcWidgetLayers, 300);
+      return 'widget';
+    }
     // Second attempt: some TC builds ignore the first synthetic click after late script bind.
     trigger.click();
-    if (await waitForTcWidgetVisible(1600)) return 'widget';
+    if (await waitForTcWidgetVisible(1600)) {
+      liftTcWidgetLayers();
+      window.setTimeout(liftTcWidgetLayers, 50);
+      window.setTimeout(liftTcWidgetLayers, 300);
+      return 'widget';
+    }
   }
 
   return openTcPurchaseUrl(purchaseUrl) ? 'popup' : 'none';

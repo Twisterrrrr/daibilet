@@ -419,10 +419,6 @@
 /* Vendor payment shells must sit above PurchaseOpeningHost (z-99990)
    and EventVenueModal (z-99980). Teplohod Fancybox defaults are often ~9xxx
    and otherwise render under our opening shell (unclickable). */
-.tc-widget-frame_popup,
-#tc-widget-overlay,
-.tc-widget-container,
-#ticketscloud-loader,
 .fancyboxtkt-container,
 .fancyboxtkt-bg,
 .fancyboxtkt-inner,
@@ -435,6 +431,24 @@
 .fancybox-content,
 .fancybox__container,
 .fancybox__backdrop {
+  z-index: 2147483000 !important;
+}
+
+/*
+  TicketsCloud popup: #tc-widget-overlay (backdrop, vendor inline ~1e9+3) +
+  classless fixed shell (inline ~1e9+4) holding iframe.tc-widget-frame_popup.
+  Raising ONLY the overlay via !important put the dimmer ABOVE the iframe
+  shell - widget looked "under" chrome / was unclickable.
+*/
+#tc-widget-overlay {
+  z-index: 2147482990 !important;
+}
+body > div:has(iframe.tc-widget-frame_popup),
+body > div:has(iframe[src*='ticketscloud']) {
+  z-index: 2147483000 !important;
+}
+.tc-widget-frame_popup,
+.tc-widget-container {
   z-index: 2147483000 !important;
 }
 
