@@ -6,6 +6,8 @@ export function isPlaceholderEventImageUrl(imageUrl?: string | null): boolean {
   const lower = raw.toLowerCase();
   if (lower.includes('placeholder.gif')) return true;
   if (/api\.teplohod\.info\/v1\/image\?item=&/i.test(raw)) return true;
+  // Without dirtyAlias upstream returns HTML 400; next/image then fails with "upstream response is invalid".
+  if (/api\.teplohod\.info\/v1\/image\?/i.test(raw) && !/dirtyAlias=/i.test(raw)) return true;
 
   return false;
 }

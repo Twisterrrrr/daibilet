@@ -21,7 +21,9 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [64, 96, 128, 256, 384],
     remotePatterns: [
+      // TC CDN: catalog historically used both Yandex and GCS hostnames for the same bucket.
       { protocol: 'https', hostname: 'ticketscloud-prod.storage.yandexcloud.net' },
+      { protocol: 'https', hostname: 'ticketscloud-prod.storage.googleapis.com' },
       { protocol: 'https', hostname: 's3.twcstorage.ru' },
       { protocol: 'https', hostname: 'api.teplohod.info' },
       { protocol: 'https', hostname: 'daibilet.ru' },

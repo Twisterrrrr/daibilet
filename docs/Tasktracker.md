@@ -428,7 +428,9 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | P.2p | **City hub × blog phase 2** — mini-row до 3 сессий на тизере (keyword match по уже загруженным sessions) | Высокий | ✅ `824bafc` |
 | P.2q | **City hub × blog phase 3** — CMS `Article.citySlug`, фильтр API по городу, picker CMS-first | Высокий | ✅ 2026-07-22 |
 | L.1 | Catalog API: public Cache-Control + Next `getCachedCatalog`; favorites `?ids=`; landing skip no-store; page sizes 50/100 | Критический | ✅ `bb65e4a` prod; nginx proxy_cache+limit_req ✅ |
-| L.2 | Images: `next/image` + WebP/AVIF (`SafeImage`), remotePatterns TC/TEP/S3, sharp, hot-path cards/heroes | Высокий | ✅ `9646968` prod proof AVIF `/_next/image` |
+| L.2 | Images: `next/image` + WebP/AVIF (`SafeImage`), remotePatterns TC/TEP/S3, sharp, hot-path cards/heroes | Высокий | ✅ `9646968`; follow-up: GCS hostname + TEP dirtyAlias placeholder (код в deploy-fix, ждут deploy) |
+| L.2b | Prod `/_next/image` 400/504: `googleapis` remotePatterns; TEP без dirtyAlias; cold-cache после UX `33df97f` | Критический | 🔧 код готов, нужен deploy |
+| R.4b | Reviews `GET .../events/:publicSlug` 404 на кириллическом DB slug (TEP) | Высокий | 🔧 `resolveReviewEvent` → `evt_tep_{id}` + publicSlugLite |
 | L.3 | TC catalog sync load: nightly timer + flock/nice/ionice; `--ids` ProviderLink filter; RawImport payloadHash skip; light warm | Критический | ✅ `efc8459` prod; timer next 03:20 UTC |
 | P.3 | **Finance contour / ЛК поставщиков** — базовый контур | Высокий | ⏳ |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |

@@ -86,6 +86,16 @@ test('pickFirstUsableEventImageUrl prefers stabilized cover over placeholder', (
     isPlaceholderEventImageUrl('https://api.teplohod.info/v1/image?item=&dirtyAlias=x.gif'),
     true,
   );
+  assert.equal(
+    isPlaceholderEventImageUrl('https://api.teplohod.info/v1/image?item=Event1111'),
+    true,
+  );
+  assert.equal(
+    isPlaceholderEventImageUrl(
+      'https://api.teplohod.info/v1/image?item=Event706&dirtyAlias=3d8c76e5e4-1.png',
+    ),
+    false,
+  );
 });
 
 test('pickFirstUsableEventImageUrl never persists signed S3 as Event.imageUrl candidate', () => {
