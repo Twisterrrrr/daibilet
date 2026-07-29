@@ -23,8 +23,8 @@ export function catalogInterstitialsForCity(citySlug?: string | null): CatalogIn
       title:
         city === 'sankt-peterburg' || city === 'saint-petersburg'
           ? 'Впервые в Питере?'
-          : 'Куда сходить с высоты',
-      description: 'Подборка прогулок по крышам и смотровых - без хаоса в поиске.',
+          : 'Посмотреть на город с высоты',
+      description: 'Подборка прогулок по крышам и смотровым площадкам в разных городах России',
       href: landingCategoryHref('rooftops', city),
       cta: 'Смотреть гид',
     },
