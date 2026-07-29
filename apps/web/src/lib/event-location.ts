@@ -6,6 +6,10 @@ import type { PublicSessionDto } from '@daibilet/contracts/public';
 const GENERIC_VENUE_LABEL_RE =
   /^(точка сбора|место сбора|точка встречи|не указано|адрес уточняется|сбор группы|место отправления)$/iu;
 
+/** Teplohod/TC feed placeholders used as venue titles (not real places). */
+const BOOKING_PLATFORM_VENUE_RE =
+  /^(?:место\s+отправления\s+)?(?:teplohod|теплоход|tickets?\s*cloud|тикетс?\s*клауд)$/iu;
+
 /** Prefix like `("ЯКарелия")`, `(«Org»)`, `"Provider"` before an address. */
 const PROVIDER_PREFIX_RE =
   /^(?:\(\s*[«"']?\s*([^)»"']{2,60}?)\s*[»"']?\s*\)|[«"']\s*([^»"']{2,60}?)\s*[»"'])\s*/u;
@@ -14,11 +18,20 @@ function looksLikeStreet(value: string): boolean {
   return /(?:\bul\.|\bпр\.|\bпер\.|наб\.|,\s*д\.|,\s*дом\b|набереж|улиц|просп|площад|линия\b|причал\b)/iu.test(value);
 }
 
-function isGenericVenueLabel(value: string): boolean {
+/** True for empty / service / booking-platform venue titles (hide in UI). */
+export function isGenericVenueLabel(value: string): boolean {
   const text = String(value || '').trim();
   if (!text) return true;
   if (GENERIC_VENUE_LABEL_RE.test(text)) return true;
+  if (BOOKING_PLATFORM_VENUE_RE.test(text)) return true;
   return text.length <= 3;
+}
+
+/** Category/tag that is a ticket provider name, not a ship/bus label. */
+export function isBookingPlatformLabel(value?: string | null): boolean {
+  const text = String(value || '').trim();
+  if (!text) return false;
+  return BOOKING_PLATFORM_VENUE_RE.test(text);
 }
 
 function normalizeComparableLabel(value: string): string {
@@ -96,7 +109,8 @@ export function resolveEventCardLocationLabel(session: EventCardLocationInput): 
     return venueName;
   }
 
-  return address || venueName || '';
+  // Do not leak generic / «Место отправления Teplohod» placeholders into UI.
+  return address || '';
 }
 
 export type EventCardPinLines = {
@@ -190,10 +204,14 @@ export function resolveEventVenueDisplayLabel(session: EventCardLocationInput): 
     (address && normalizeComparableLabel(venueName) === normalizeComparableLabel(address)) ||
     (meetingPoint && Boolean(address));
 
-  if (providerFromVenue && venueIsAddressLike) return providerFromVenue;
+  if (providerFromVenue && venueIsAddressLike && !isBookingPlatformLabel(providerFromVenue)) {
+    return providerFromVenue;
+  }
   if (institutionLabel && venueIsAddressLike) return institutionLabel;
 
-  if (!venueName || isGenericVenueLabel(venueName)) return providerFromVenue || institutionLabel || null;
+  if (!venueName || isGenericVenueLabel(venueName)) {
+    return (!isBookingPlatformLabel(providerFromVenue) && providerFromVenue) || institutionLabel || null;
+  }
 
   if (looksLikeStreet(venueName)) return providerFromVenue || institutionLabel || null;
   if (address && normalizeComparableLabel(venueName) === normalizeComparableLabel(address)) {

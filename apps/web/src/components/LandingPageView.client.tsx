@@ -99,6 +99,7 @@ import {
   sessionMatchesTimeSlot,
 } from '@/lib/datetime';
 import { isOpenDate, FLEXIBLE_SCHEDULE_LABEL, isFlexibleScheduleSession, resolveSessionPriceRange } from '@/lib/event-card-meta';
+import { isBookingPlatformLabel, resolveEventCardLocationLabel } from '@/lib/event-location';
 import { formatVacantSeats } from '@/lib/event-page-utils';
 import { eventHref, sessionVenueHref } from '@/lib/routes';
 import type { PublicLandingDto, PublicLandingPageDto, PublicSessionDto } from '@daibilet/contracts/public';
@@ -3051,9 +3052,14 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
   const soldOut = typeof vacant === 'number' && vacant <= 0;
   const badges = deriveLandingCardBadges(session);
   const isBus = profile === 'bus';
-  const shipName = isBus
+  const rawShipName = isBus
     ? session.tags?.find((tag) => /city sightseeing|hop-on|оператор/i.test(tag)) || null
     : session.tags?.find((tag) => /теплоход|катер|яхт/i.test(tag)) || session.category;
+  const shipName =
+    rawShipName && !isBookingPlatformLabel(rawShipName) && !/^место\s+отправления/i.test(rawShipName)
+      ? rawShipName
+      : null;
+  const locationLabel = resolveEventCardLocationLabel(session);
   const amenities = amenityIcons(session.tags);
   const href = eventHref(session);
   const priceLabel = group.priceFrom ? formatMoney(group.priceFrom).replace(/^от\s+/i, '') : 'Купить';
@@ -3094,10 +3100,10 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
                 {duration}
               </span>
             ) : null}
-            {group.venue ? (
+            {locationLabel ? (
               <span className="flex items-center gap-1">
                 <MapPin className="h-3.5 w-3.5" />
-                {group.venue}
+                {locationLabel}
               </span>
             ) : null}
             {shipName ? (
@@ -3155,7 +3161,7 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
         </div>
         <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
           {duration ? <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{duration}</span> : null}
-          {group.venue ? <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{group.venue}</span> : null}
+          {locationLabel ? <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{locationLabel}</span> : null}
         </div>
         <LandingCardBadgeRow badges={badges} />
         <div className="flex items-center justify-between gap-3">
@@ -3427,13 +3433,15 @@ function LandingEventsTable({ groups }: { groups: EventGroup[] }) {
               </td>
               <td className="max-w-[240px] px-4 py-3 align-top text-slate-600">
                 {(() => {
+                  const locationLabel = resolveEventCardLocationLabel(group.representative);
+                  if (!locationLabel) return <span className="text-slate-400">—</span>;
                   const venueLink = sessionVenueHref(group.representative);
                   return venueLink ? (
                     <a href={venueLink} className="hover:text-primary-700">
-                      {group.venue}
+                      {locationLabel}
                     </a>
                   ) : (
-                    group.venue
+                    locationLabel
                   );
                 })()}
               </td>
