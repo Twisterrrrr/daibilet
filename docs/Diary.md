@@ -82,6 +82,42 @@
 
 ---
 
+## 2026-07-30 - MSK cutover live + build/PERF event pages
+
+### Наблюдения
+- DNS A `daibilet.ru` → `201.24.125.184` (публичные резолверы); post-smoke `/` `/events` `/blog` landings stats = 200 с МСК.
+- PERF.E3 на МСК: cold event TTFB ~0.12–0.17с, warm ~8ms (`hydrateSlots: false` уже в DTO).
+- `next build` на МСК ранее падал на fonts.googleapis DNS - деплой через pull+build с heap 5120 / cpus retune.
+
+### Решения
+- Build retune: без `cpus:1`/`workerThreads:false`, SSG concurrency 2, heap 5120Mi.
+- PERF.E4b: `generateStaticParams` top-N (default 200, `EVENT_SSG_TOP_N`).
+- PERF.E4: `scripts/warm-top-event-pages.mjs` + hook в `deploy-prod-next.sh`.
+- PERF.E5 отложен (архитектура event без full catalog).
+
+### Проблемы
+- AAAA СПб / IPv6 на МСК - follow-up.
+- СПб hot-standby ещё держим (MIG.8).
+
+---
+
+## 2026-07-30 - MSK cutover prep + build limits retune
+
+### Наблюдения
+- МСК standby готов: PG restore, код `2ec37f4`, `.next` со СПб, TLS/nginx, cron; smoke через `--resolve …201.24.125.184` = 200.
+- DNS `daibilet.ru` всё ещё `213.171.7.16` (СПб) - cutover ждёт панель Timeweb.
+- `next build` на МСК падал на `getaddrinfo EAI_AGAIN fonts.googleapis.com` (исходящий DNS/фильтр); обошли копией `.next` со СПб.
+- Лимиты `cpus:1` / heap 2560Mi с SPB 3.8Gi на МСК 8Gi будут тормозить деплой.
+
+### Решения
+- Retune (локально, до push): убрать `workerThreads:false`+`cpus:1`; `staticGenerationMaxConcurrency: 2`; heap/`NODE_OPTIONS` build → 5120Mi (`next-build.mjs` + `deploy-prod-next.sh`).
+- PERF.E3–E5 уже в Tasktracker; после DNS - verify E3, затем warm/top-N/E5.
+
+### Проблемы
+- Без смены A-записей на `201.24.125.184` трафик остаётся на СПб.
+
+---
+
 ## 2026-07-29 - SSH МСК + снимок перед переездом СПб→МСК
 
 ### Наблюдения

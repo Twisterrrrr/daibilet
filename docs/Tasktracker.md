@@ -23,15 +23,25 @@
 |---|--------|-----------|--------|
 | MIG.0 | SSH МСК на новом IP `201.24.125.184` (`daibilet-msk`) | Критический | ✅ |
 | MIG.1 | Задокументировать снимок СПб/МСК + план cutover | Высокий | ✅ docs |
-| MIG.2 | Postgres Docker `:5437` на МСК + restore dump со СПб | Критический | ⏳ |
-| MIG.3 | Pull `/opt/daibilet` до prod HEAD + deploy-prod-next | Критический | ⏳ |
-| MIG.4 | TLS (443) + nginx parity со СПб | Критический | ⏳ |
-| MIG.5 | Cron/timers (tc-catalog-sync и др.) на МСК | Высокий | ⏳ |
-| MIG.6 | Smoke на МСК (hosts/IP) до DNS | Критический | ⏳ |
-| MIG.7 | DNS A `daibilet.ru`/`www` → МСК + post-smoke | Критический | ⏳ |
+| MIG.2 | Postgres Docker `:5437` на МСК + restore dump со СПб | Критический | ✅ |
+| MIG.3 | Код `2ec37f4` + `.next` со СПб (build на МСК упёрся в fonts.googleapis DNS) | Критический | ✅ |
+| MIG.4 | TLS (443) + nginx parity со СПб | Критический | ✅ |
+| MIG.5 | Cron/timers (tc-catalog-sync и др.) на МСК | Высокий | ✅ |
+| MIG.6 | Smoke на МСК (IP/`--resolve`) до DNS | Критический | ✅ |
+| MIG.7 | DNS A `daibilet.ru`/`www` → `201.24.125.184` + post-smoke | Критический | ✅ 2026-07-30 |
 | MIG.8 | СПб hot-standby 24-48ч, затем decommission | Средний | ⏳ |
+| PERF.OOM4 | MSK: снять `cpus:1`/`workerThreads:false`, heap build 5120Mi | Высокий | ✅ |
 
 План: [migration-spb-to-msk.md](./migration-spb-to-msk.md)
+
+## PERF event pages (после DNS на МСК)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| PERF.E3 | `hydrateSlots: false` в event DTO | Высокий | ✅ код; ⏳ verify cold TTFB на МСК |
+| PERF.E4 | Warm top-100–300 `/events/[slug]` после deploy/sync | Высокий | ⏳ |
+| PERF.E4b | `generateStaticParams` только top-N | Высокий | ⏳ |
+| PERF.E5 | Event page без full catalog (slug→DB + related) | Средний | ⏳ крупнее |
 
 ---
 
@@ -42,10 +52,10 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | PERF.E2 | Diagnose `/events`→`/events/[slug]` slow nav (TTFB cold 1.5–7.5с) | Критический | ✅ root cause: on-demand ISR + catalog hydrate в event DTO |
-| PERF.E3 | `buildPublicEventDto`: `getPublicCatalogSessions(..., { hydrateSlots: false })` | Высокий | ✅ код `132b6a6`; ⏳ **после переезда на МСК**: выкатить/проверить cold TTFB |
-| PERF.E4 | Warm top-100–300 популярных `/events/[slug]` после deploy/sync | Высокий | ⏳ **после переезда на МСК** |
-| PERF.E4b | `generateStaticParams` только top-N (не все ~2600; OOM-safe) | Высокий | ⏳ **после переезда на МСК** |
-| PERF.E5 | Event page без full catalog: slug → DB + related отдельно | Средний | ⏳ **после переезда на МСК** (крупнее, PERF.E5-style) |
+| PERF.E3 | `buildPublicEventDto`: `getPublicCatalogSessions(..., { hydrateSlots: false })` | Высокий | ✅ код; cold TTFB МСК ~0.12–0.17с → warm ~8ms (2026-07-30) |
+| PERF.E4 | Warm top-100–300 популярных `/events/[slug]` после deploy/sync | Высокий | ✅ `scripts/warm-top-event-pages.mjs` + deploy hook |
+| PERF.E4b | `generateStaticParams` только top-N (не все ~2600; OOM-safe) | Высокий | ✅ top-N default 200 (`EVENT_SSG_TOP_N`) |
+| PERF.E5 | Event page без full catalog: slug → DB + related отдельно | Средний | ⏳ крупнее |
 
 ---
 

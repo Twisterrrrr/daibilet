@@ -1,16 +1,13 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  // Prod VPS ~4GB: full tsc/eslint during `next build` gets OOM-killed.
+  // MSK prod ~8Gi / 4 CPU: allow parallel build. (SPB 3.8Gi used cpus:1 + workerThreads:false.)
   eslint: { ignoreDuringBuilds: true },
   typescript: { ignoreBuildErrors: true },
   productionBrowserSourceMaps: false,
-  // Cap SSG workers so page-data generation does not OOM on 3.8Gi hosts.
   experimental: {
-    workerThreads: false,
-    cpus: 1,
-    // Concurrency 2 raced MODULE_NOT_FOUND on [segment]/sitemaps during SSG on 3.8Gi VPS.
-    staticGenerationMaxConcurrency: 1,
+    // Soft cap: full default can still race MODULE_NOT_FOUND on sitemaps; 2 is safer than 1 on 8Gi.
+    staticGenerationMaxConcurrency: 2,
     staticGenerationMinPagesPerWorker: 20,
   },
   transpilePackages: ['@daibilet/backend', '@daibilet/db', '@daibilet/contracts'],

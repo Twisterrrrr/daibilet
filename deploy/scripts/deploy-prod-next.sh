@@ -172,7 +172,8 @@ fi
 reap_orphan_next_build_workers "pre-build"
 
 # Heap cap for `next build` on 2-core / 4GB hosts (also set in apps/web/scripts/next-build.mjs).
-export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=2560}"
+# MSK ~8Gi: 5120Mi build heap (was 2560 on SPB 3.8Gi). Override via NODE_OPTIONS if needed.
+export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=5120}"
 echo "web:build NODE_OPTIONS=${NODE_OPTIONS}"
 pnpm web:build
 
@@ -258,6 +259,15 @@ if [[ -n "$REVALIDATE_SECRET" ]]; then
     -d '{"tags":["home-page","catalog-page","event-page"],"paths":["/","/events","/cities/sankt-peterburg","/cities/moscow","/rechnye-progulki","/avtobusnye-ekskursii","/api/public/stats"]}' \
     && echo "Post-deploy revalidate OK" \
     || echo "Warning: post-deploy revalidate failed"
+
+  # PERF.E4: warm top-N event pages into Full Route Cache (default 200).
+  if [[ "${SKIP_EVENT_WARM:-0}" != "1" ]]; then
+    echo "Warming top event pages (EVENT_SSG_TOP_N=${EVENT_SSG_TOP_N:-200})..."
+    DAIBILET_WEB_PORT="$WEB_PORT" \
+      node "$APP_DIR/scripts/warm-top-event-pages.mjs" \
+      && echo "Top event warm OK" \
+      || echo "Warning: top event warm failed"
+  fi
 
   # IndexNow: curated TOP paths only (not full catalog). Requires INDEXNOW_KEY in web env.
   if [[ -n "${INDEXNOW_KEY:-}" ]]; then

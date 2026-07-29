@@ -1,9 +1,9 @@
 # Текущее состояние Daibilet
 
-**Обновлено:** 2026-07-29  
+**Обновлено:** 2026-07-30  
 **Ветка:** `feat/next-monorepo`  
-**Prod live (DNS):** `213.171.7.16` (СПб) · Next `:3001` · API `:4000` · PG Docker `:5437` · TLS nginx  
-**Цель переезда (МСК):** `201.24.125.184` · `ssh daibilet-msk` · стек web/api/nginx есть, **без PG/TLS** · план: [migration-spb-to-msk.md](./migration-spb-to-msk.md)
+**Prod live (DNS):** `201.24.125.184` (МСК `msk-1-vm-5a5i`) · Next `:3001` · API `:4000` · PG Docker `:5437` · TLS nginx  
+**Standby (не DNS):** `213.171.7.16` (СПб) - держать 24–48ч · план: [migration-spb-to-msk.md](./migration-spb-to-msk.md)
 
 > Детальные чеклисты: [Tasktracker.md](./Tasktracker.md)  
 > Эталонные slug виджетов: [widget-etalon-slugs.md](./widget-etalon-slugs.md)
@@ -79,7 +79,7 @@ pnpm deploy:preflight
 
 # prod Next
 BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
-`pnpm web:build` caps heap at 2560Mi (`apps/web/scripts/next-build.mjs`); deploy sets the same via `NODE_OPTIONS`. Prod `vm.swappiness=10` (idempotent in `deploy-prod-next.sh`). Manual OOM retry: `NODE_OPTIONS='--max-old-space-size=1536' pnpm web:build`
+`pnpm web:build` default heap **5120Mi** on MSK (`apps/web/scripts/next-build.mjs` + deploy `NODE_OPTIONS`). Legacy SPB used 2560Mi. Override: `NODE_OPTIONS='--max-old-space-size=2560' pnpm web:build`. Prod `vm.swappiness=10` (idempotent in `deploy-prod-next.sh`).
 
 # smoke
 PUBLIC_BASE=https://daibilet.ru API_BASE=http://127.0.0.1:4000 WEB_BASE=http://127.0.0.1:3001 \

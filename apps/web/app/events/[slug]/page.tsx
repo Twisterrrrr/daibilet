@@ -18,9 +18,10 @@ import {
   getCachedEventAggregateRating,
   getCachedPublicEventDto,
 } from '@/server/cached-event-data';
+import { listTopEventSlugsForSsg } from '@/server/top-event-slugs';
 
 export const revalidate = 300;
-/** Allow on-demand ISR for slugs not prebuilt (empty generateStaticParams). */
+/** Allow on-demand ISR for slugs not prebuilt. */
 export const dynamicParams = true;
 
 type PageProps = {
@@ -28,11 +29,12 @@ type PageProps = {
 };
 
 /**
- * Empty list: do not SSG thousands of events at build (OOM on 3.8Gi).
- * Combined with revalidate + unstable_cache → first request fills Full Route Cache.
+ * Prebuild top-N popular/upcoming events (MSK 8Gi). Rest fill via ISR on first hit.
+ * Cap: EVENT_SSG_TOP_N (default 200, max 500).
  */
-export function generateStaticParams() {
-  return [] as Array<{ slug: string }>;
+export async function generateStaticParams() {
+  const slugs = await listTopEventSlugsForSsg();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
