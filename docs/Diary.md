@@ -1,3 +1,22 @@
+## 2026-07-29 - SSH МСК + снимок перед переездом СПб→МСК
+
+### Наблюдения
+- Старый МСК IP `81.19.135.200`: ICMP OK, TCP 22 с дома и LTE = `filtered`; на eth0 tcpdump во время проб = 0 packets при живом sshd `:22`, ufw off, INPUT ACCEPT.
+- Timeweb сменил публичный IP на `201.24.125.184` (hostname `msk-1-vm-5a5i`). SSH с ключом `daibilet_msk80_key` OK; локальный alias `daibilet-msk`.
+- СПб prod `213.171.7.16` остаётся DNS live (`daibilet.ru`), git `618fdd6`, PG Docker healthy, TLS OK, RAM 3.8 Gi.
+- МСК уже имеет `/opt/daibilet` (git `8588ccf`), `daibilet-web`/`daibilet-api`/`nginx` active, RAM 7.8 Gi; **нет** Postgres/`5437`, **нет** `:443`/letsencrypt; API stats local 500.
+- Локальный клон `daibilet-push` с битым `.git` (пропал HEAD/часть objects); рабочий клон для коммитов - `daibilet-deploy-fix`.
+
+### Решения
+- Документы: `docs/migration-spb-to-msk.md`, обновлены `current-state.md` / Tasktracker / эта запись.
+- Cutover не начинать, пока на МСК нет PG+restore, TLS и SHA ≥ prod.
+
+### Проблемы
+- DNS/трафик ещё на СПб; МСК - тёплый standby, не prod.
+- Не коммитить `.env` и дампы БД.
+
+---
+
 ## 2026-07-29 - TC catalog sync: false ALERT importedEvents
 
 ### Наблюдения

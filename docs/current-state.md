@@ -1,11 +1,30 @@
 # Текущее состояние Daibilet
 
-**Обновлено:** 2026-07-14  
-**Ветка migration / prod Next:** `feat/next-monorepo`  
-**Prod:** `213.171.7.16` · Next `:3001` · legacy API `:4000` · admin Vite static
+**Обновлено:** 2026-07-29  
+**Ветка:** `feat/next-monorepo`  
+**Prod live (DNS):** `213.171.7.16` (СПб) · Next `:3001` · API `:4000` · PG Docker `:5437` · TLS nginx  
+**Цель переезда (МСК):** `201.24.125.184` · `ssh daibilet-msk` · стек web/api/nginx есть, **без PG/TLS** · план: [migration-spb-to-msk.md](./migration-spb-to-msk.md)
 
 > Детальные чеклисты: [Tasktracker.md](./Tasktracker.md)  
 > Эталонные slug виджетов: [widget-etalon-slugs.md](./widget-etalon-slugs.md)
+
+---
+
+## Инфра-снимок перед переездом СПб → МСК (2026-07-29)
+
+| | СПб prod | МСК цель |
+|--|----------|----------|
+| IP | `213.171.7.16` | `201.24.125.184` (бывш. `81.19.135.200` снят - TCP22 filtered) |
+| SSH | `daibilet_staging_key` | `daibilet_msk80_key` / alias `daibilet-msk` |
+| Git `/opt/daibilet` | `618fdd6` | `8588ccf` (отстаёт) |
+| RAM / disk | 3.8 Gi / 49G ~55% | 7.8 Gi / 77G ~8% |
+| web + api + nginx | ✅ | ✅ |
+| Postgres `:5437` | ✅ Docker healthy | ❌ нет контейнера |
+| TLS `:443` | ✅ | ❌ нет certbot/letsencrypt |
+| `https://daibilet.ru` | ✅ 200 (DNS сюда) | не в DNS |
+| API `/api/public/stats` local | OK | 500 (нет БД) |
+
+**Готовность к DNS-cutover:** нет. Нужны PG+restore, pull HEAD, TLS, nginx parity, smoke - см. чеклист в migration-doc.
 
 ---
 

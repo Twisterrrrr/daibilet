@@ -1,9 +1,27 @@
 # Tasktracker — Daibilet
 
 **Обновлено:** 2026-07-29
-**Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
+**Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
+
+---
+
+## Infra: переезд prod СПб → МСК (2026-07-29)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| MIG.0 | SSH МСК на новом IP `201.24.125.184` (`daibilet-msk`) | Критический | ✅ |
+| MIG.1 | Задокументировать снимок СПб/МСК + план cutover | Высокий | ✅ docs |
+| MIG.2 | Postgres Docker `:5437` на МСК + restore dump со СПб | Критический | ⏳ |
+| MIG.3 | Pull `/opt/daibilet` до prod HEAD + deploy-prod-next | Критический | ⏳ |
+| MIG.4 | TLS (443) + nginx parity со СПб | Критический | ⏳ |
+| MIG.5 | Cron/timers (tc-catalog-sync и др.) на МСК | Высокий | ⏳ |
+| MIG.6 | Smoke на МСК (hosts/IP) до DNS | Критический | ⏳ |
+| MIG.7 | DNS A `daibilet.ru`/`www` → МСК + post-smoke | Критический | ⏳ |
+| MIG.8 | СПб hot-standby 24-48ч, затем decommission | Средний | ⏳ |
+
+План: [migration-spb-to-msk.md](./migration-spb-to-msk.md)
 
 ---
 
