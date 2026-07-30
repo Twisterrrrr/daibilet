@@ -441,6 +441,7 @@ export function mapSupplierPortalIdentity(row: SupplierPortalRow): SupplierPorta
     legalName: row.legalName || row.legalProfile?.legalName || null,
     status: String(row.status),
     kind: String(row.kind),
+    integrationMode: String(row.integrationMode),
     defaultCatalogMode: String(row.defaultCatalogMode),
     paymentMode: String(row.paymentMode),
     pspFeeMode: String(row.pspFeeMode),

@@ -527,6 +527,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | L.3 | TC catalog sync load: nightly timer + flock/nice/ionice; `--ids` ProviderLink filter; RawImport payloadHash skip; light warm | Критический | ✅ `efc8459` prod; timer next 03:20 UTC |
 | P.3 | **Finance contour / ЛК поставщиков** — базовый контур | Высокий | ⏳ |
 | P.3a | **Venue admission products** — входные билеты площадок без фейкового события (`AdmissionProduct` / `AdmissionOffer`) | Высокий | 🔄 schema + readiness helper |
+| P.3b | **Supplier integration modes** — импортные билетные системы / внутренние продажи / API-sync | Высокий | 🔄 schema + DTO policy |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
 | P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |
 

@@ -474,6 +474,7 @@ export interface AdminSupplierRowDto {
   email?: string | null;
   phone?: string | null;
   websiteUrl?: string | null;
+  integrationMode: string;
   defaultCatalogMode: string;
   paymentMode: string;
   pspFeeMode: string;

@@ -6700,3 +6700,22 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 - Added backend readiness tests for active supplier, valid offers, 100 RUB minimum, validity windows and rolling validity.
 
 ---
+
+## 2026-07-30 - Phase 2: Supplier integration modes
+
+### Decisions
+
+- Added a separate supplier connection axis: `Supplier.integrationMode`.
+- Kept `defaultCatalogMode` for sales flow only: widget, internal checkout or hybrid.
+- Defined three LC modes from legacy/product thinking:
+  - `IMPORTED_TICKETING_SYSTEM`: read-only mirror for TC/Teplohod-like imported suppliers.
+  - `INTERNAL_SALES`: Daibilet-owned catalog and checkout for museums, galleries and direct suppliers.
+  - `API_SYNC`: partner API / own ticket system with route/webhook configuration and sync health.
+- Added a pure policy helper so admin/supplier UI can derive editability from one place instead of hardcoding rules per page.
+
+### Boundaries
+
+- Admin UI labels and API route configuration screens are still next slices.
+- Disabling supplier output in public catalog should be handled as a control-plane action over supplier/event visibility, not by deleting imported rows.
+
+---

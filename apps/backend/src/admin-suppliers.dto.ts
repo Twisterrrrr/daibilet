@@ -17,6 +17,7 @@ const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 100;
 
 type SupplierStatus = string;
+type SupplierIntegrationMode = string;
 type SupplierCatalogMode = string;
 type PaymentMode = string;
 type PspFeeMode = string;
@@ -45,6 +46,7 @@ type SupplierBaseRow = {
   phone?: string | null;
   websiteUrl?: string | null;
   yookassaShopId?: string | null;
+  integrationMode: SupplierIntegrationMode;
   defaultCatalogMode: string;
   paymentMode: string;
   pspFeeMode: string;
@@ -315,6 +317,7 @@ export function mapAdminSupplierRow(row: SupplierBaseRow, aggregates: SupplierAg
     email: row.email || null,
     phone: row.phone || null,
     websiteUrl: row.websiteUrl || null,
+    integrationMode: String(row.integrationMode),
     defaultCatalogMode: String(row.defaultCatalogMode),
     paymentMode: String(row.paymentMode),
     pspFeeMode: String(row.pspFeeMode),

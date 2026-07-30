@@ -159,6 +159,12 @@ enum SupplierRole {
   VIEWER
 }
 
+enum SupplierIntegrationMode {
+  IMPORTED_TICKETING_SYSTEM
+  INTERNAL_SALES
+  API_SYNC
+}
+
 enum SupplierCatalogMode {
   WIDGET_ONLY
   INTERNAL_CHECKOUT
@@ -1193,12 +1199,12 @@ model ExternalTicket {
 }
 
 model Supplier {
-  id                   String              @id @default(cuid())
-  slug                 String              @unique
+  id                   String                  @id @default(cuid())
+  slug                 String                  @unique
   title                String
   legalName            String?
-  kind                 SupplierKind        @default(LEGAL_ENTITY)
-  status               SupplierStatus      @default(DRAFT)
+  kind                 SupplierKind            @default(LEGAL_ENTITY)
+  status               SupplierStatus          @default(DRAFT)
   inn                  String?
   kpp                  String?
   ogrn                 String?
@@ -1206,19 +1212,20 @@ model Supplier {
   phone                String?
   websiteUrl           String?
   yookassaShopId       String?
-  defaultCatalogMode   SupplierCatalogMode @default(WIDGET_ONLY)
-  paymentMode          PaymentMode         @default(SINGLE_MERCHANT)
-  agentSchemeEnabled   Boolean             @default(false)
-  splitEnabled         Boolean             @default(false)
-  pspFeeMode           PspFeeMode          @default(PLATFORM_PAYS)
-  defaultCommissionBps Int                 @default(0)
+  integrationMode      SupplierIntegrationMode @default(IMPORTED_TICKETING_SYSTEM)
+  defaultCatalogMode   SupplierCatalogMode     @default(WIDGET_ONLY)
+  paymentMode          PaymentMode             @default(SINGLE_MERCHANT)
+  agentSchemeEnabled   Boolean                 @default(false)
+  splitEnabled         Boolean                 @default(false)
+  pspFeeMode           PspFeeMode              @default(PLATFORM_PAYS)
+  defaultCommissionBps Int                     @default(0)
   payoutBankName       String?
   payoutBankBic        String?
   payoutAccount        String?
   payoutCorrAccount    String?
   notes                String?
-  createdAt            DateTime            @default(now())
-  updatedAt            DateTime            @updatedAt
+  createdAt            DateTime                @default(now())
+  updatedAt            DateTime                @updatedAt
 
   users               SupplierUser[]
   venues              SupplierVenue[]
@@ -1245,6 +1252,7 @@ model Supplier {
   externalReviews     ExternalReview[]
 
   @@index([status])
+  @@index([integrationMode])
   @@index([inn])
 }
 

@@ -81,6 +81,7 @@ test('maps supplier row with finance and event aggregates for admin list', () =>
       phone: null,
       websiteUrl: null,
       yookassaShopId: 'shop_123',
+      integrationMode: 'INTERNAL_SALES',
       defaultCatalogMode: 'HYBRID',
       paymentMode: 'SINGLE_MERCHANT',
       pspFeeMode: 'PLATFORM_PAYS',
@@ -147,6 +148,7 @@ test('maps supplier row with finance and event aggregates for admin list', () =>
   );
 
   assert.equal(dto.events.total, 2);
+  assert.equal(dto.integrationMode, 'INTERNAL_SALES');
   assert.equal(dto.events.internalCheckout, 2);
   assert.equal(dto.orders.fulfilled, 3);
   assert.equal(dto.finance.ledgerBalanceKopecks, 264000);
