@@ -507,6 +507,14 @@ Status update 2026-07-30 (catalog ↔ finance projection):
 - optional m2m token is supported through `DAIBILET_FINANCE_PROJECTION_TOKEN` / `FINANCE_PROJECTION_TOKEN`;
 - catalog UI/client remains a Cursor-owned consumer step and must keep TC/TEP widgets untouched.
 
+### Phase 2.4a: supplier LC UX/UI
+
+- UX brief is locked in [supplier-lc-ux-brief.md](./supplier-lc-ux-brief.md).
+- Designer profile: senior RU product designer for B2B SaaS / fintech кабинеты, not a landing-page designer.
+- Figma can start now because read contracts are available; production LC polish follows STUB path smoke.
+- Codex implementation target is `apps/supplier` on finance `.159`.
+- Main flow: login/team → onboarding/requisites → events/slots/drafts → prices/canSell → PurchaseProjection orders → payouts/reports/documents.
+
 ### Phase 2.5: supplier LC MVP
 
 - ✅ read-first supplier dashboard: `GET /api/supplier/dashboard`;

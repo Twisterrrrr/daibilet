@@ -1,3 +1,18 @@
+## 2026-07-30 — Supplier LC UX/UI brief
+
+### Наблюдения
+
+- Read-first `apps/supplier` уже есть, но текущий UI ближе к техническому кабинету и не должен становиться финальным UX сам по себе.
+- Для поставщиков нужны паттерны B2B SaaS / fintech: таблицы, статусы, side panels, onboarding checklist, финансы и документы, а не лендинговая композиция.
+
+### Решения
+
+- Зафиксирован [supplier-lc-ux-brief.md](./supplier-lc-ux-brief.md) как ТЗ для senior RU product designer и как будущий acceptance contract для вёрстки.
+- Основной flow: вход/команда → onboarding/реквизиты → входные билеты и события → слоты/цены/canSell → заказы PurchaseProjection → финансы/выплаты/отчеты/документы.
+- Figma можно заказывать сейчас, потому что read API уже есть; production polish ЛК поставщика идет после STUB smoke path.
+
+---
+
 ## 2026-07-30 — Catalog ↔ Finance: public projection APIs
 
 ### Наблюдения
