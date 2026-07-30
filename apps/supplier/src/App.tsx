@@ -5,17 +5,20 @@ import type {
   SupplierPortalDashboardDto,
   SupplierPortalAdmissionsListDto,
   SupplierPortalAdmissionStubPurchaseResultDto,
+  SupplierPortalAdmissionYooKassaPurchaseResultDto,
+  SupplierPortalBankAccountUpdateRequestDto,
   SupplierPortalAuthDto,
   SupplierPortalEventsListDto,
   SupplierPortalFinanceDto,
   SupplierPortalIdentityDto,
+  SupplierPortalLegalProfileUpdateRequestDto,
   SupplierPortalMeDto,
   SupplierPortalOrdersListDto,
   SupplierPortalProfileDto,
   SupplierPortalReviewsListDto,
   SupplierPortalSessionSupplierDto,
 } from '@daibilet/contracts/supplier';
-import { SUPPLIER_ACCESS_TOKEN_STORAGE_KEY, supplierGet, supplierPost } from '@/lib/api';
+import { SUPPLIER_ACCESS_TOKEN_STORAGE_KEY, supplierGet, supplierPatch, supplierPost } from '@/lib/api';
 
 const STORAGE_KEY = 'daibilet_supplier_key';
 
@@ -534,6 +537,9 @@ function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
   const [smokeBusyProductId, setSmokeBusyProductId] = React.useState<string | null>(null);
   const [smokeResult, setSmokeResult] = React.useState<SupplierPortalAdmissionStubPurchaseResultDto | null>(null);
   const [smokeError, setSmokeError] = React.useState<string | null>(null);
+  const [yooKassaBusyProductId, setYooKassaBusyProductId] = React.useState<string | null>(null);
+  const [yooKassaResult, setYooKassaResult] = React.useState<SupplierPortalAdmissionYooKassaPurchaseResultDto | null>(null);
+  const [yooKassaError, setYooKassaError] = React.useState<string | null>(null);
 
   async function createSmokePurchase(product: SupplierPortalAdmissionsListDto['items'][number]) {
     const offer = product.offers.find((item) => item.active && item.priceRub != null && item.priceRub >= 100) ||
@@ -573,6 +579,46 @@ function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
     }
   }
 
+  async function createYooKassaSmokePurchase(product: SupplierPortalAdmissionsListDto['items'][number]) {
+    const offer = product.offers.find((item) => item.active && item.priceRub != null && item.priceRub >= 100) ||
+      product.offers.find((item) => item.active) ||
+      product.offers[0] ||
+      null;
+    if (!offer) {
+      setYooKassaError('У входного билета нет категории для проверки YooKassa.');
+      return;
+    }
+
+    setYooKassaBusyProductId(product.id);
+    setYooKassaError(null);
+    setYooKassaResult(null);
+    try {
+      const result = await supplierPost<SupplierPortalAdmissionYooKassaPurchaseResultDto>(
+        `/api/supplier/admissions/${encodeURIComponent(product.id)}/yookassa-purchase`,
+        {
+          admissionOfferId: offer.id,
+          quantity: 1,
+          buyer: {
+            email: `yookassa+${Date.now()}@daibilet.ru`,
+            name: 'Тестовый покупатель',
+            phone: null,
+          },
+          idempotencyKey: `supplier-lc-admission-yookassa-${product.id}-${Date.now()}`,
+        },
+        undefined,
+        supplierKey,
+      );
+      setYooKassaResult(result);
+      reload();
+    } catch (error) {
+      setYooKassaError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setYooKassaBusyProductId(null);
+    }
+  }
+
+  const yooKassaCheckoutUrl = yooKassaResult?.order.checkoutUrl || yooKassaResult?.order.payment.confirmationUrl || null;
+
   return (
     <div className="page-stack">
       <PageTitle title="Входные билеты" description="Билеты с открытой датой и входные продукты площадок: музеи, арт-пространства, выставки, аттракционы. Можно проверить тестовую продажу без реальной оплаты." action={<RefreshButton onClick={reload} />} />
@@ -586,6 +632,23 @@ function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
         <div className="notice-panel error">
           <strong>Не удалось создать тестовую продажу</strong>
           <span>{smokeError}</span>
+        </div>
+      ) : null}
+      {yooKassaResult ? (
+        <div className="notice-panel success">
+          <strong>YooKassa sandbox-заказ создан: {yooKassaResult.order.publicCode}</strong>
+          <span>{yooKassaResult.order.subject.admissionProductTitle} · {formatMoney(yooKassaResult.order.totals.totalKopecks)}</span>
+          {yooKassaCheckoutUrl ? (
+            <div className="notice-actions">
+              <a className="link-button" href={yooKassaCheckoutUrl} target="_blank" rel="noreferrer">Открыть оплату</a>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+      {yooKassaError ? (
+        <div className="notice-panel error">
+          <strong>Не удалось создать YooKassa sandbox-заказ</strong>
+          <span>{yooKassaError}</span>
         </div>
       ) : null}
       {data ? (
@@ -606,16 +669,26 @@ function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
               <div key="offers"><span>{product.offers.filter((offer) => offer.active).length} активных</span><small>{product.offers.map((offer) => offer.title || 'билет').join(', ') || '-'}</small></div>,
               formatRub(product.priceFromRub),
               <IssueList key="health" compact issues={[...product.health.blockers, ...product.health.warnings]} empty="готово" />,
-              <button
-                key="action"
-                type="button"
-                className="table-action-button"
-                disabled={!product.readiness.canSell || smokeBusyProductId === product.id}
-                onClick={() => void createSmokePurchase(product)}
-                title={product.readiness.canSell ? 'Создать STUB-заказ без реальной оплаты' : 'Сначала закройте блокеры готовности'}
-              >
-                {smokeBusyProductId === product.id ? 'Создаем...' : 'Тестовая продажа'}
-              </button>,
+              <div key="action" className="table-actions">
+                <button
+                  type="button"
+                  className="table-action-button"
+                  disabled={!product.readiness.canSell || smokeBusyProductId === product.id}
+                  onClick={() => void createSmokePurchase(product)}
+                  title={product.readiness.canSell ? 'Создать STUB-заказ без реальной оплаты' : 'Сначала закройте блокеры готовности'}
+                >
+                  {smokeBusyProductId === product.id ? 'Создаем...' : 'STUB'}
+                </button>
+                <button
+                  type="button"
+                  className="table-action-button secondary"
+                  disabled={!product.readiness.canSell || yooKassaBusyProductId === product.id}
+                  onClick={() => void createYooKassaSmokePurchase(product)}
+                  title={product.readiness.canSell ? 'Создать sandbox-платеж YooKassa' : 'Сначала закройте блокеры готовности'}
+                >
+                  {yooKassaBusyProductId === product.id ? 'Создаем...' : 'YooKassa'}
+                </button>
+              </div>,
             ])}
           />
         ) : null}
@@ -790,31 +863,15 @@ function ProfilePage({ supplierKey }: { supplierKey: string }) {
       <SettingsNav />
       <div className="two-column">
         <section className="panel">
-          <div className="panel-header"><h2>Юридический профиль</h2></div>
-          <DefinitionList rows={[
-            ['Статус', data.legal.status || '-'],
-            ['Юрлицо', data.legal.legalName || '-'],
-            ['ИНН', data.legal.inn || '-'],
-            ['КПП', data.legal.kpp || '-'],
-            ['Налоговый режим', data.legal.taxMode || '-'],
-            ['Email финансов', data.legal.financeEmail || '-'],
-          ]} />
+          <div className="panel-header">
+            <h2>Юридический профиль</h2>
+            <StatusPill tone={data.legal.status === 'VERIFIED' ? 'success' : data.legal.status === 'REJECTED' ? 'danger' : 'warning'}>{legalStatusLabel(data.legal.status)}</StatusPill>
+          </div>
+          <SupplierLegalProfileForm profile={data} supplierKey={supplierKey} onSaved={reload} />
         </section>
         <section className="panel">
-          <div className="panel-header"><h2>Счета</h2></div>
-          {data.bankAccounts.length ? (
-            <div className="compact-list">
-              {data.bankAccounts.map((account) => (
-                <div key={account.id} className="compact-row">
-                  <div>
-                    <strong>{account.bankName || 'Банк не указан'}</strong>
-                    <span>{account.accountMask || '-'}</span>
-                  </div>
-                  {account.isPrimary ? <StatusPill tone="success">основной</StatusPill> : null}
-                </div>
-              ))}
-            </div>
-          ) : <EmptyInline text="Счета не добавлены." />}
+          <div className="panel-header"><h2>Основной счет</h2></div>
+          <SupplierBankAccountForm profile={data} supplierKey={supplierKey} onSaved={reload} />
         </section>
       </div>
       <section className="panel">
@@ -825,6 +882,266 @@ function ProfilePage({ supplierKey }: { supplierKey: string }) {
       </section>
     </div>
   );
+}
+
+type LegalFormState = {
+  legalName: string;
+  legalAddress: string;
+  inn: string;
+  kpp: string;
+  ogrn: string;
+  taxMode: SupplierPortalLegalProfileUpdateRequestDto['taxMode'];
+  isVatPayer: boolean;
+  defaultVatRate: string;
+  signerFullName: string;
+  signerPosition: string;
+  financeEmail: string;
+  docsEmail: string;
+};
+
+function SupplierLegalProfileForm({
+  profile,
+  supplierKey,
+  onSaved,
+}: {
+  profile: SupplierPortalProfileDto;
+  supplierKey: string;
+  onSaved: () => void;
+}) {
+  const [form, setForm] = React.useState<LegalFormState>(() => legalFormFromProfile(profile));
+  const [saving, setSaving] = React.useState(false);
+  const [message, setMessage] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    setForm(legalFormFromProfile(profile));
+  }, [profile.generatedAt]);
+
+  function update<K extends keyof LegalFormState>(key: K, value: LegalFormState[K]) {
+    setForm((current) => ({ ...current, [key]: value }));
+  }
+
+  async function save(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSaving(true);
+    setMessage(null);
+    setError(null);
+    try {
+      await supplierPatch<SupplierPortalProfileDto>('/api/supplier/profile/legal', buildLegalProfilePayload(form), undefined, supplierKey);
+      setMessage('Реквизиты сохранены и отправлены на проверку.');
+      onSaved();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <form className="settings-form" onSubmit={(event) => void save(event)}>
+      {message ? <div className="form-note success">{message}</div> : null}
+      {error ? <div className="form-note error">{error}</div> : null}
+      <label className="form-field span-2">
+        <span>Юрлицо</span>
+        <input value={form.legalName} onChange={(event) => update('legalName', event.target.value)} required />
+      </label>
+      <label className="form-field span-2">
+        <span>Юридический адрес</span>
+        <input value={form.legalAddress} onChange={(event) => update('legalAddress', event.target.value)} />
+      </label>
+      <label className="form-field">
+        <span>ИНН</span>
+        <input value={form.inn} onChange={(event) => update('inn', event.target.value)} inputMode="numeric" />
+      </label>
+      <label className="form-field">
+        <span>КПП</span>
+        <input value={form.kpp} onChange={(event) => update('kpp', event.target.value)} inputMode="numeric" />
+      </label>
+      <label className="form-field">
+        <span>ОГРН</span>
+        <input value={form.ogrn} onChange={(event) => update('ogrn', event.target.value)} inputMode="numeric" />
+      </label>
+      <label className="form-field">
+        <span>Налоговый режим</span>
+        <select value={form.taxMode || 'OSNO'} onChange={(event) => update('taxMode', event.target.value as LegalFormState['taxMode'])}>
+          <option value="OSNO">ОСНО</option>
+          <option value="USN_6">УСН 6%</option>
+          <option value="USN_15">УСН 15%</option>
+          <option value="AUSN">АУСН</option>
+          <option value="NPD">НПД</option>
+        </select>
+      </label>
+      <label className="form-field checkbox-field">
+        <input type="checkbox" checked={form.isVatPayer} onChange={(event) => update('isVatPayer', event.target.checked)} />
+        <span>Плательщик НДС</span>
+      </label>
+      <label className="form-field">
+        <span>Ставка НДС</span>
+        <input value={form.defaultVatRate} onChange={(event) => update('defaultVatRate', event.target.value)} inputMode="numeric" placeholder="20" />
+      </label>
+      <label className="form-field">
+        <span>Подписант</span>
+        <input value={form.signerFullName} onChange={(event) => update('signerFullName', event.target.value)} />
+      </label>
+      <label className="form-field">
+        <span>Должность</span>
+        <input value={form.signerPosition} onChange={(event) => update('signerPosition', event.target.value)} />
+      </label>
+      <label className="form-field">
+        <span>Email финансов</span>
+        <input value={form.financeEmail} onChange={(event) => update('financeEmail', event.target.value)} type="email" />
+      </label>
+      <label className="form-field">
+        <span>Email документов</span>
+        <input value={form.docsEmail} onChange={(event) => update('docsEmail', event.target.value)} type="email" />
+      </label>
+      <div className="form-actions span-2">
+        <button type="submit" className="primary-button" disabled={saving}>{saving ? 'Сохраняем...' : 'Сохранить реквизиты'}</button>
+      </div>
+    </form>
+  );
+}
+
+type BankFormState = {
+  bankName: string;
+  bik: string;
+  accountNumber: string;
+  correspondentAccount: string;
+};
+
+function SupplierBankAccountForm({
+  profile,
+  supplierKey,
+  onSaved,
+}: {
+  profile: SupplierPortalProfileDto;
+  supplierKey: string;
+  onSaved: () => void;
+}) {
+  const primaryAccount = profile.bankAccounts.find((account) => account.isPrimary) || profile.bankAccounts[0] || null;
+  const [form, setForm] = React.useState<BankFormState>(() => bankFormFromAccount(primaryAccount));
+  const [saving, setSaving] = React.useState(false);
+  const [message, setMessage] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    setForm(bankFormFromAccount(primaryAccount));
+  }, [profile.generatedAt, primaryAccount?.id]);
+
+  function update<K extends keyof BankFormState>(key: K, value: BankFormState[K]) {
+    setForm((current) => ({ ...current, [key]: value }));
+  }
+
+  async function save(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSaving(true);
+    setMessage(null);
+    setError(null);
+    try {
+      await supplierPatch<SupplierPortalProfileDto>('/api/supplier/profile/bank-account', buildBankAccountPayload(form, primaryAccount?.id || null), undefined, supplierKey);
+      setMessage('Основной счет сохранен и отправлен на проверку.');
+      onSaved();
+    } catch (error) {
+      setError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <form className="settings-form" onSubmit={(event) => void save(event)}>
+      {message ? <div className="form-note success">{message}</div> : null}
+      {error ? <div className="form-note error">{error}</div> : null}
+      {primaryAccount ? (
+        <div className="form-readonly span-2">
+          <span>Сейчас в профиле</span>
+          <strong>{primaryAccount.bankName || 'Банк не указан'} · {primaryAccount.accountMask || 'счет скрыт'}</strong>
+        </div>
+      ) : null}
+      <label className="form-field span-2">
+        <span>Банк</span>
+        <input value={form.bankName} onChange={(event) => update('bankName', event.target.value)} />
+      </label>
+      <label className="form-field">
+        <span>БИК</span>
+        <input value={form.bik} onChange={(event) => update('bik', event.target.value)} inputMode="numeric" />
+      </label>
+      <label className="form-field">
+        <span>Расчетный счет</span>
+        <input value={form.accountNumber} onChange={(event) => update('accountNumber', event.target.value)} inputMode="numeric" placeholder={primaryAccount?.accountMask || ''} />
+      </label>
+      <label className="form-field span-2">
+        <span>Корреспондентский счет</span>
+        <input value={form.correspondentAccount} onChange={(event) => update('correspondentAccount', event.target.value)} inputMode="numeric" placeholder={primaryAccount?.correspondentMask || ''} />
+      </label>
+      <div className="form-actions span-2">
+        <button type="submit" className="primary-button" disabled={saving}>{saving ? 'Сохраняем...' : 'Сохранить счет'}</button>
+      </div>
+    </form>
+  );
+}
+
+function legalFormFromProfile(profile: SupplierPortalProfileDto): LegalFormState {
+  return {
+    legalName: profile.legal.legalName || profile.supplier.legalName || profile.supplier.title,
+    legalAddress: profile.legal.legalAddress || '',
+    inn: profile.legal.inn || '',
+    kpp: profile.legal.kpp || '',
+    ogrn: profile.legal.ogrn || '',
+    taxMode: (profile.legal.taxMode as LegalFormState['taxMode']) || 'OSNO',
+    isVatPayer: Boolean(profile.legal.isVatPayer),
+    defaultVatRate: profile.legal.defaultVatRate == null ? '' : String(profile.legal.defaultVatRate),
+    signerFullName: profile.legal.signerFullName || '',
+    signerPosition: profile.legal.signerPosition || '',
+    financeEmail: profile.legal.financeEmail || profile.supplier.email || '',
+    docsEmail: profile.legal.docsEmail || '',
+  };
+}
+
+function bankFormFromAccount(account: SupplierPortalProfileDto['bankAccounts'][number] | null): BankFormState {
+  return {
+    bankName: account?.bankName || '',
+    bik: account?.bik || '',
+    accountNumber: '',
+    correspondentAccount: '',
+  };
+}
+
+function buildLegalProfilePayload(form: LegalFormState): SupplierPortalLegalProfileUpdateRequestDto {
+  return {
+    legalName: form.legalName.trim(),
+    legalAddress: cleanFormString(form.legalAddress),
+    inn: cleanFormString(form.inn),
+    kpp: cleanFormString(form.kpp),
+    ogrn: cleanFormString(form.ogrn),
+    taxMode: form.taxMode || 'OSNO',
+    isVatPayer: form.isVatPayer,
+    defaultVatRate: form.defaultVatRate.trim() ? Math.trunc(Number(form.defaultVatRate)) : null,
+    signerFullName: cleanFormString(form.signerFullName),
+    signerPosition: cleanFormString(form.signerPosition),
+    financeEmail: cleanFormString(form.financeEmail),
+    docsEmail: cleanFormString(form.docsEmail),
+  };
+}
+
+function buildBankAccountPayload(
+  form: BankFormState,
+  bankAccountId: string | null,
+): SupplierPortalBankAccountUpdateRequestDto {
+  const payload: SupplierPortalBankAccountUpdateRequestDto = {
+    bankAccountId,
+    isPrimary: true,
+    bankName: cleanFormString(form.bankName),
+    bik: cleanFormString(form.bik),
+  };
+  if (form.accountNumber.trim()) payload.accountNumber = form.accountNumber.trim();
+  if (form.correspondentAccount.trim()) payload.correspondentAccount = form.correspondentAccount.trim();
+  return payload;
+}
+
+function cleanFormString(value: string): string | null {
+  const text = value.trim();
+  return text || null;
 }
 
 function TeamPage({ supplierKey }: { supplierKey: string }) {
@@ -1190,8 +1507,8 @@ function payoutStatusLabel(value: string): string {
 function legalStatusLabel(value?: string | null): string {
   const labels: Record<string, string> = {
     DRAFT: 'черновик',
-    REVIEW: 'на проверке',
-    APPROVED: 'проверено',
+    INCOMPLETE: 'на проверке',
+    VERIFIED: 'проверено',
     REJECTED: 'нужны правки',
   };
   if (!value) return 'не заполнено';

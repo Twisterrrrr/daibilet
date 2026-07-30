@@ -43,9 +43,11 @@ import { createPublicFinanceProjectionRouteHandler } from './public-finance-proj
 import { buildPublicVenueDto, buildPublicVenuesDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
 import { createPublicVenueRouteHandler } from './public-venue-handler.js';
 import { createPublicReadStackWarmer } from './public-warmup.js';
+import { createSupplierAdmissionYooKassaPurchaseRouteHandler } from './supplier-admission-yookassa-purchase-handler.js';
 import { createSupplierAdmissionStubPurchaseRouteHandler } from './supplier-admission-stub-purchase-handler.js';
 import { createSupplierAuthRouteHandler, resolveSupplierPortalSearchParams } from './supplier-auth-handler.js';
 import { createSupplierPortalRouteHandler } from './supplier-portal-handler.js';
+import { createSupplierProfileWriteRouteHandler } from './supplier-profile-write-handler.js';
 import {
   buildSupplierPortalDashboardDto,
   buildSupplierPortalEventsListDto,
@@ -168,6 +170,12 @@ const server = startServer({
       }),
       createSupplierAuthRouteHandler({ db }),
       createSupplierAdmissionStubPurchaseRouteHandler({
+        resolveSearchParams: resolveSupplierPortalSearchParams,
+      }),
+      createSupplierAdmissionYooKassaPurchaseRouteHandler({
+        resolveSearchParams: resolveSupplierPortalSearchParams,
+      }),
+      createSupplierProfileWriteRouteHandler({
         resolveSearchParams: resolveSupplierPortalSearchParams,
       }),
       createSupplierPortalRouteHandler({

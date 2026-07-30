@@ -55,11 +55,11 @@ packages/config   — shared tsconfig/eslint
 
 **Write/sync path:** legacy `server.js` / sync scripts; после sync — `invalidatePublicCaches({ warm: true })` + Next revalidate.
 
-**Phase 2 finance path:** `CheckoutOrder` / `Payment` / `FulfillmentItem` остаются в `apps/backend` для write-операций, public по умолчанию остается widget-first. Для YooKassa sandbox добавлен reaper зависших оплат: `pnpm backend:checkout:yookassa:reconcile -- --apply`.
+**Phase 2 finance path:** `CheckoutOrder` / `Payment` / `FulfillmentItem` остаются в `apps/backend` для write-операций, public по умолчанию остается widget-first. Supplier LC умеет делать `AdmissionProduct` smoke через STUB и YooKassa sandbox, но широкий public CTA остается закрыт контрактом projection/canSell. Для YooKassa sandbox добавлен reaper зависших оплат: `pnpm backend:checkout:yookassa:reconcile -- --apply`.
 
 **Venue admission path:** музеи, арт-площадки, зоопарки, парки и другие места с входными билетами продаются через `AdmissionProduct` / `AdmissionOffer`, а не через фейковые события. `Event` остается для афиши и расписания; `AdmissionProduct` живет на странице площадки и может участвовать в city/home blocks как самостоятельный продаваемый объект.
 
-**Supplier LC modes:** `Supplier.integrationMode` отделяет тип подключения от способа продажи: `IMPORTED_TICKETING_SYSTEM` = read-only зеркало импортов, `INTERNAL_SALES` = продажи и каталог внутри Daibilet, `API_SYNC` = внешняя система с настройкой routes/webhooks и health.
+**Supplier LC modes:** `Supplier.integrationMode` отделяет тип подключения от способа продажи: `IMPORTED_TICKETING_SYSTEM` = read-only зеркало импортов, `INTERNAL_SALES` = продажи и каталог внутри Daibilet, `API_SYNC` = внешняя система с настройкой routes/webhooks и health. Реквизиты поставщика пишутся через supplier-scoped onboarding flow: юрпрофиль и основной счет после правок переводятся в `INCOMPLETE` для проверки админом.
 
 ---
 

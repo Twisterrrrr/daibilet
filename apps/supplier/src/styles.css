@@ -393,6 +393,35 @@ small {
   color: var(--text);
 }
 
+.notice-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.link-button,
+.primary-button {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-control);
+  background: var(--accent);
+  color: #ffffff;
+  cursor: pointer;
+  padding: 8px 12px;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.primary-button:disabled {
+  cursor: default;
+  opacity: 0.62;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
@@ -657,6 +686,23 @@ td span {
   background: #255fbf;
 }
 
+.table-action-button.secondary {
+  border-color: var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+}
+
+.table-action-button.secondary:hover:not(:disabled) {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
 .status-pill {
   display: inline-flex;
   width: fit-content;
@@ -820,6 +866,102 @@ td span {
   font-size: 13px;
 }
 
+.settings-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.form-field,
+.checkbox-field,
+.form-readonly,
+.form-note {
+  grid-column: span 1;
+}
+
+.span-2,
+.form-note {
+  grid-column: 1 / -1;
+}
+
+.form-field {
+  display: grid;
+  gap: 6px;
+}
+
+.form-field span,
+.form-readonly span {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.form-field input,
+.form-field select {
+  min-height: 39px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  color: var(--text);
+  padding: 8px 10px;
+  font: inherit;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+  border-color: rgba(47, 111, 221, 0.55);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(47, 111, 221, 0.12);
+}
+
+.checkbox-field {
+  display: flex;
+  min-height: 39px;
+  align-items: center;
+  gap: 9px;
+  padding-top: 19px;
+}
+
+.checkbox-field input {
+  width: 16px;
+  height: 16px;
+}
+
+.form-readonly {
+  display: grid;
+  gap: 3px;
+  border-radius: var(--radius-control);
+  background: var(--surface-alt);
+  padding: 10px 12px;
+}
+
+.form-readonly strong {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.form-note {
+  border-radius: var(--radius-control);
+  padding: 9px 11px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.form-note.success {
+  background: rgba(35, 134, 86, 0.08);
+  color: var(--success);
+}
+
+.form-note.error {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
 .dev-access-card {
   display: grid;
   gap: 10px;
@@ -887,7 +1029,8 @@ td span {
   .page-title,
   .two-column,
   .readiness-summary,
-  .workflow-strip {
+  .workflow-strip,
+  .settings-form {
     display: grid;
     grid-template-columns: 1fr;
   }

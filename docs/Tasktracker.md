@@ -54,7 +54,8 @@
 | P.3e5 | **Supplier LC shell v1** — legacy-v2 inspired light shell: grouped nav, readiness, admissions/events/orders, finance/docs/settings | Высокий | ✅ `apps/supplier` UI shell |
 | P.3e6 | **Supplier LC auth bridge** — `SiteUser` + active `SupplierUser`, login/me/logout, dev-only supplier query fallback | Высокий | ✅ auth API + supplier login UI |
 | P.3e7 | **Supplier LC admission smoke** — тестовая продажа `AdmissionProduct` из ЛК поставщика → `CheckoutOrder`/ledger/orders projection | Высокий | ✅ supplier-scoped endpoint + UI action |
-| P.3f | **YooKassa: venue admission** | Высокий | ⏳ после smoke STUB admission |
+| P.3f | **YooKassa: venue admission** | Высокий | 🔄 supplier-scoped sandbox smoke endpoint + UI action; real sandbox env on `.159` next |
+| P.3f1 | **Supplier onboarding write-flow** — юрпрофиль + основной счет из ЛК, статус реквизитов на проверку | Высокий | ✅ backend PATCH + supplier UI forms |
 | P.3g | **Supplier write flows** — создание/редактирование admission и событий через заявки | Средний | ⏳ после первых тестовых поставщиков |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
 | P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |

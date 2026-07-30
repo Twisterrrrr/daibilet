@@ -68,6 +68,30 @@ export async function supplierPost<T>(
   return payload as T;
 }
 
+export async function supplierPatch<T>(
+  apiPath: string,
+  body: unknown,
+  accessToken?: string,
+  supplierKey = '',
+): Promise<T> {
+  const token = accessToken || readStoredAccessToken();
+  const response = await fetch(supplierApiUrl(apiPath, supplierKey), {
+    method: 'PATCH',
+    credentials: 'same-origin',
+    cache: 'no-store',
+    headers: {
+      'content-type': 'application/json',
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(body ?? {}),
+  });
+  const payload = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(payload?.message || payload?.error || `HTTP ${response.status}`);
+  }
+  return payload as T;
+}
+
 function readStoredAccessToken(): string {
   if (typeof window === 'undefined') return '';
   return window.localStorage.getItem(SUPPLIER_ACCESS_TOKEN_STORAGE_KEY) || '';

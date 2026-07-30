@@ -1,6 +1,6 @@
 import type { Readiness, ReadinessIssue } from './common.js';
 import type { AdmissionProductsListDto } from './admission.js';
-import type { StubCheckoutBuyerDto, StubCheckoutResultDto } from './checkout.js';
+import type { StubCheckoutBuyerDto, StubCheckoutResultDto, YooKassaCheckoutResultDto } from './checkout.js';
 
 export interface SupplierPortalIdentityDto {
   id: string;
@@ -174,6 +174,16 @@ export interface SupplierPortalAdmissionStubPurchaseRequestDto {
 
 export type SupplierPortalAdmissionStubPurchaseResultDto = StubCheckoutResultDto;
 
+export interface SupplierPortalAdmissionYooKassaPurchaseRequestDto {
+  admissionOfferId?: string | null;
+  quantity?: number;
+  buyer?: Partial<StubCheckoutBuyerDto> | null;
+  idempotencyKey?: string | null;
+  returnUrl?: string | null;
+}
+
+export type SupplierPortalAdmissionYooKassaPurchaseResultDto = YooKassaCheckoutResultDto;
+
 export interface SupplierPortalSessionPreviewDto {
   id: string;
   eventId: string;
@@ -336,6 +346,30 @@ export interface SupplierPortalProfileDto {
     startsAt: string | null;
     endsAt: string | null;
   }>;
+}
+
+export interface SupplierPortalLegalProfileUpdateRequestDto {
+  legalName?: string;
+  legalAddress?: string | null;
+  inn?: string | null;
+  kpp?: string | null;
+  ogrn?: string | null;
+  taxMode?: 'OSNO' | 'USN_6' | 'USN_15' | 'AUSN' | 'NPD';
+  isVatPayer?: boolean;
+  defaultVatRate?: number | null;
+  signerFullName?: string | null;
+  signerPosition?: string | null;
+  financeEmail?: string | null;
+  docsEmail?: string | null;
+}
+
+export interface SupplierPortalBankAccountUpdateRequestDto {
+  bankAccountId?: string | null;
+  bankName?: string | null;
+  bik?: string | null;
+  accountNumber?: string | null;
+  correspondentAccount?: string | null;
+  isPrimary?: boolean;
 }
 
 export interface SupplierPortalDashboardDto {

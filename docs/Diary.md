@@ -2960,3 +2960,26 @@
 
 - `GET /api/admin/orders` currently reads imported `ExternalOrder` rows, while STUB/YooKassa checkout writes `CheckoutOrder`.
 - Before enabling real internal sales, add a unified purchase projection for admin, supplier LC and buyer account so internal checkout orders are visible operationally.
+
+---
+
+## 2026-07-31 - Phase G: supplier onboarding writes and YooKassa admission smoke
+
+### Decisions
+
+- Added supplier-scoped YooKassa sandbox smoke for `AdmissionProduct` from the supplier LC.
+- Kept it behind existing YooKassa runtime config: `DAIBILET_YOOKASSA_CHECKOUT=1` + YooKassa sandbox credentials are required; otherwise readiness returns a blocker.
+- Added supplier onboarding write-flow for legal profile and primary bank account.
+- Supplier edits do not mark requisites as verified; legal profile moves to `INCOMPLETE`, clears previous verification/rejection fields and waits for admin review.
+- Bank account numbers remain masked in the read DTO; the supplier can submit a new full account number without exposing stored raw values back to UI.
+
+### Verification Plan
+
+- Backend typecheck and supplier typecheck.
+- DB-aware tests for supplier-scoped YooKassa admission smoke and requisites write-flow.
+- On `.159`: seed supplier, login to supplier LC, save requisites, run STUB smoke, then run YooKassa sandbox smoke only after env is enabled.
+
+### Next
+
+- Add admin review/approval UI for `SupplierLegalProfile` after sandbox flow is stable.
+- Connect real YooKassa sandbox credentials on `.159` and run one admission payment smoke end to end.
