@@ -18,6 +18,10 @@
     "./order": "./src/order.ts",
     "./public": "./src/public.ts",
     "./catalog": "./src/catalog.ts",
+    "./checkout": {
+      "types": "./src/checkout.ts",
+      "default": "./src/checkout.ts"
+    },
     "./schemas": {
       "types": "./src/schemas.ts",
       "default": "./src/schemas.ts"

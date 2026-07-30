@@ -20,7 +20,7 @@ export function sendJson(response: ServerResponse, payload: unknown, options: Js
   response.writeHead(options.statusCode || 200, {
     'access-control-allow-origin': '*',
     'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
-    'access-control-allow-headers': 'content-type, authorization',
+    'access-control-allow-headers': 'content-type, authorization, idempotency-key',
     'content-type': 'application/json; charset=utf-8',
     'cache-control': options.cacheControl || 'no-store',
   });
@@ -38,7 +38,7 @@ export function sendEmpty(response: ServerResponse, statusCode: number): void {
   response.writeHead(statusCode, {
     'access-control-allow-origin': '*',
     'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
-    'access-control-allow-headers': 'content-type, authorization',
+    'access-control-allow-headers': 'content-type, authorization, idempotency-key',
   });
   response.end();
 }
@@ -47,7 +47,7 @@ export function sendAuthRequired(response: ServerResponse, config: Pick<AdminAut
   response.writeHead(401, {
     'access-control-allow-origin': '*',
     'access-control-allow-methods': 'GET, PATCH, POST, OPTIONS',
-    'access-control-allow-headers': 'content-type, authorization',
+    'access-control-allow-headers': 'content-type, authorization, idempotency-key',
     'www-authenticate': `Basic realm="${config.realm}", charset="UTF-8"`,
     'content-type': 'application/json; charset=utf-8',
     'cache-control': 'no-store',

@@ -14,6 +14,7 @@ import { buildAdminOrdersListDto } from './admin-orders.dto.js';
 import { createAdminSuppliersRouteHandler } from './admin-suppliers-handler.js';
 import { buildAdminSupplierDetailDto, buildAdminSuppliersListDto } from './admin-suppliers.dto.js';
 import { createAdminAuthConfig } from './auth.js';
+import { createStubCheckoutRouteHandler } from './checkout-stub-handler.js';
 import { readBackendEnv } from './env.js';
 import { updateAdminEventOverride, updateAdminLandingMatch, upsertAdminOrderTicket } from './dto.js';
 import { buildPublicCatalogDto, clearPublicCatalogDtoCache, getPublicCatalogSessions } from './public-catalog.dto.js';
@@ -142,6 +143,7 @@ const server = startServer({
         buildFinance: buildSupplierPortalFinanceDto,
         buildReviewsList: buildSupplierPortalReviewsListDto,
       }),
+      createStubCheckoutRouteHandler(),
       createPublicReviewsRouteHandler(),
       createAdminReviewsRouteHandler(),
     ],

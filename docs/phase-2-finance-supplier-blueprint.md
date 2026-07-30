@@ -357,6 +357,23 @@ Status 2026-07-22:
 - payment webhook idempotency;
 - fulfillment item issuance.
 
+Status 2026-07-22:
+
+- done: STUB checkout contract in `@daibilet/contracts/checkout`;
+- done: public backend route `POST /api/checkout/stub`;
+- done: `DAIBILET_STUB_CHECKOUT=1` is required to create stub orders in every non-test environment;
+- done: checkout creates `CheckoutOrder`, `CheckoutItem`, `Payment(provider=MANUAL)`, `FulfillmentItem(provider=STUB)` and `SupplierLedgerEntry`;
+- done: internal checkout is allowed only for `purchaseFlow=PLATFORM`, `managementMode=DAIBILET_MANAGED`, active supplier, manual active offer and a concrete future session or `OPEN_DATE`;
+- done: imported TC/Teplohod events remain blocked from this path;
+- done: idempotency is stored through `IdempotencyKey(scope=CHECKOUT_CREATE)`;
+- done: `pnpm backend:checkout:seed-stub` creates one local manual open-date smoke product; add `-- --order` to create a STUB order directly;
+- note: real YooKassa payment and fiscal receipt are intentionally not created in STUB mode.
+
+Venue admission note:
+
+- for MVP, museum/gallery/attraction entrance tickets can be represented as a manual `OPEN_DATE` event linked to the venue and classified as `VENUE_ADMISSION` in checkout DTO;
+- long-term SPBBOATS-compatible model should add a separate `VenueAdmissionProduct` / venue-level offer layer, because some venues sell admission without a concrete event.
+
 ### Phase 2.4: orders and buyer account
 
 - unified purchase read-model;
