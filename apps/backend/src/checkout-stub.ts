@@ -192,10 +192,11 @@ export async function createStubCheckoutOrder(
 
   const normalizedPayload = normalizeStubCheckoutPayload(payload);
   const event = await loadStubCheckoutEvent(normalizedPayload);
+  const eventOfferId = normalizedPayload.offerId || '';
   const [offer, session] = await Promise.all([
     event
       ? prisma.eventOffer.findFirst({
-          where: { id: normalizedPayload.offerId, eventId: event.id },
+          where: { id: eventOfferId, eventId: event.id },
           select: stubCheckoutOfferSelect,
         })
       : Promise.resolve(null),
@@ -266,6 +267,7 @@ export async function createStubCheckoutOrder(
       const item = await tx.checkoutItem.create({
         data: {
           checkoutOrderId: order.id,
+          subjectType,
           supplierId: supplier.id,
           eventId: event.id,
           sessionId: session?.id || null,
@@ -283,6 +285,8 @@ export async function createStubCheckoutOrder(
             mode: 'STUB',
             subjectType,
             eventSlug: event.slug,
+            admissionProductId: null,
+            admissionOfferId: null,
             offerId: offer.id,
             sessionId: session?.id || null,
           },
@@ -689,6 +693,10 @@ function mapStubCheckoutResult(input: {
         eventSlug: input.event.slug,
         eventTitle: input.event.title,
         eventKind: String(input.event.kind),
+        admissionProductId: null,
+        admissionProductSlug: null,
+        admissionProductTitle: null,
+        admissionProductType: null,
         cityId: input.event.primaryCity?.id || null,
         citySlug: input.event.primaryCity?.slug || null,
         cityTitle: input.event.primaryCity?.title || null,

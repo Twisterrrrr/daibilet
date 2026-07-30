@@ -2664,3 +2664,26 @@
 - Added pure action-classification tests; full typecheck/test pass is the next verification step for this block.
 
 ---
+
+## 2026-07-30 - Phase 2: Venue admission products
+
+### Decisions
+
+- Fixed the SPBBOATS lesson for Daibilet: a venue can sell admission without being converted into a fake `OPEN_DATE` event.
+- Added a first-class `AdmissionProduct` / `AdmissionOffer` layer for museums, galleries, art spaces, zoos, parks, observation decks, attractions and similar venues.
+- Kept the page strategy as one adaptive venue template: admission block appears only when admission products exist; event programme remains a separate block.
+- Added `CheckoutItem.subjectType` so buyer account, supplier LC and finance reports can distinguish `EVENT` from `VENUE_ADMISSION`.
+- Kept imported TC/Teplohod events untouched; admission starts as manual/platform-managed supplier inventory.
+
+### Boundaries
+
+- Public UI, admin editor and real admission checkout are the next slice.
+- Existing manual open-date event checkout remains supported during transition.
+- No full SPBBOATS catalog reset was imported.
+
+### Verification
+
+- Prisma schema validates and client generation passes with the new admission models.
+- Added backend readiness tests for active supplier, valid offers, 100 RUB minimum, validity windows and rolling validity.
+
+---

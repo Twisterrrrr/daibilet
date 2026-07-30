@@ -57,6 +57,8 @@ packages/config   — shared tsconfig/eslint
 
 **Phase 2 finance path:** `CheckoutOrder` / `Payment` / `FulfillmentItem` остаются в `apps/backend` для write-операций, public по умолчанию остается widget-first. Для YooKassa sandbox добавлен reaper зависших оплат: `pnpm backend:checkout:yookassa:reconcile -- --apply`.
 
+**Venue admission path:** музеи, арт-площадки, зоопарки, парки и другие места с входными билетами продаются через `AdmissionProduct` / `AdmissionOffer`, а не через фейковые события. `Event` остается для афиши и расписания; `AdmissionProduct` живет на странице площадки и может участвовать в city/home blocks как самостоятельный продаваемый объект.
+
 ---
 
 ## Admin API contract (2026-07-14)
