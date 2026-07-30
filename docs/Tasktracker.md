@@ -909,7 +909,8 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | F5.0 | Карта зависимостей dto.js → Prisma ([f5-retire-dto-map.md](./phases/f5-retire-dto-map.md)) | Высокий | ✅ doc 2026-07-30 |
 | F5.1 | Public helpers + catalog datetime/subcategories из TS; grouping в dto (bridge) | Высокий | ✅ 2026-07-30 |
 | F5.2 | Landing match single source (`landing-rules.ts`); dto без дубля rules | Высокий | ✅ 2026-07-30 |
-| F5.3 | Retire server.js / TS flags | Средний | ⏳ |
+| F5.3a | Catalog grouping + city destination helpers в TS (`public-catalog-grouping`, `public-destination`) | Высокий | ✅ 2026-07-30 |
+| F5.3b | Venue pages + `publicVenueHubRows` + server.js admin (bridge dto.js) | Средний | ⏳ |
 
 ---
 

@@ -120,7 +120,10 @@ const knownSessionCities = [
   'Владимир', 'Пермь', 'Тверь', 'Сочи', 'Тула',
 ].sort((left, right) => right.length - left.length);
 
-export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSessionDto | null {
+export function mapGroupedPublicSession(
+  row: PublicCatalogMappingRow,
+  pinnedEventIds: Set<string> = new Set(),
+): PublicSessionDto | null {
   const tags = row.tags || [];
   const subcategories = pickCatalogSubcategories({
     category: row.category,
@@ -171,12 +174,14 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
 
   const openDate = isOpenDateCatalogRow(row);
   const startsAt = openDate || !row.startsAt ? '' : toIsoString(row.startsAt);
+  const groupEventIds = (row.groupEventIds || [row.id]).slice(0, 12);
+  const manualLandingStatus = groupEventIds.some((id) => pinnedEventIds.has(id)) ? 'PINNED' : null;
   const session: PublicSessionDto = {
     id: row.id,
     slug: publicSlug(row.slug),
     sourceSlug: row.slug,
     groupKey: row.groupKey,
-    groupEventIds: (row.groupEventIds || [row.id]).slice(0, 12),
+    groupEventIds,
     groupedEventsCount: row.groupedEventsCount || 1,
     sessionCount: row.sessionCount || upcomingSlots.length || 1,
     upcomingSlots,
@@ -231,6 +236,7 @@ export function mapGroupedPublicSession(row: PublicCatalogMappingRow): PublicSes
     startsAt: session.startsAt,
     upcomingSlots,
   });
+  session.manualLandingStatus = manualLandingStatus;
   return session;
 }
 

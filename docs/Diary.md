@@ -1,17 +1,36 @@
-## 2026-07-30 - ERR_HTTP2_PROTOCOL_ERROR после F5 deploy (nginx cache dir)
+## 2026-07-30 - F5.3a catalog grouping + city destination TS
 
 ### Наблюдения
-- Браузер: `net::ERR_HTTP2_PROTOCOL_ERROR` на https://daibilet.ru после deploy commit `2e5f87d`.
-- nginx error.log: сотни `[crit] mkdir() "/var/cache/nginx/daibilet/X" failed (2: No such file or directory) while reading upstream` на HTTP/2.0 и HTTP/1.1.
-- `/var/cache/nginx/daibilet/` отсутствовал (purge deploy ~06:28 UTC удалил каталог целиком, не только содержимое).
-- `daibilet-web` / `daibilet-api` running; upstream Next отвечает 200 при прямом curl.
+- `public-catalog.dto.ts` тянул grouping (`mapGroupedPublicSession`, `regroup*`, `dedupe*`, `sessionHasCoverImage`) из `dto.js`.
+- `public-city.dto.ts` тянул destination helpers (`publicDestinationFromSession`, `lookupDestinationCatalogSessions`, `buildPublicDestinationRowsFromSessions`, SEO) из `dto.js`.
+- Venue hub (`publicVenueHubRows`, `resolvePublicVenuesForSessions`, `buildPublicVenuePage`) остаётся в dto.js - слишком связан с legacy DB + `mapPublicVenueListItem`.
 
 ### Решения
-- Prod MSK: `mkdir -p /var/cache/nginx/daibilet && chown www-data:www-data`, `nginx -t && systemctl reload nginx`.
-- `deploy-prod-next.sh`: перед purge всегда `mkdir -p` + `chown`, чтобы purge не оставлял битый proxy_cache.
+- Новые модули: `public-catalog-grouping.ts` (regroup/dedupe/cover + shared purchase-block helpers), `public-destination.ts` (city/destination pure helpers).
+- `public-catalog.mapper.ts`: `mapGroupedPublicSession(row, pinnedEventIds)` с `manualLandingStatus`.
+- `dto.js` re-export для admin/legacy; внутренние helpers (`normalizeGroupPart`, `sessionGroupIds`, …) импортируются из grouping TS.
+- Тесты: `public-catalog-grouping.test.ts`, `public-destination.test.ts`.
 
 ### Проблемы
-- Локальный curl на Windows без HTTP/2; верификация HTTP/2 - по nginx log (нет новых mkdir после 08:08) + внешний curl HTTP/1.1 200 на `/`, `/_next/static/*`, `/podborki`.
+- `public-city-venues.test.ts` hub-case всё ещё импортирует `dto.js` (нужен полный workspace `@daibilet/db`).
+- F5.3b: venue catalog/page builders + `server.js` routes.
+
+## 2026-07-30 - ERR_HTTP2_PROTOCOL_ERROR после F5 deploy (nginx cache race)
+
+### Наблюдения
+- Браузер: `net::ERR_HTTP2_PROTOCOL_ERROR` на https://daibilet.ru после deploy ~07:57 UTC.
+- nginx error.log: `[crit] mkdir()/unlink() "/var/cache/nginx/daibilet/..." failed (2: No such file or directory) while reading upstream` на HTTP/2.0.
+- access.log: `GET / HTTP/2.0" 200 0` - ответ 200 с нулевым телом (битый HTTP/2 stream).
+- Deploy `deploy-prod-next.sh` делал `rm -rf /var/cache/nginx/daibilet/*` без reload nginx - старые worker'ы продолжали писать в удалённые пути cache.
+- `/_next/static/*` на диске OK (`apps/web/.next/static/`); chunks отдают 200. Ошибка `layout.css` - ложный HEAD от диагностики (файл переименован в hash-css).
+
+### Решения
+- Prod MSK: восстановлен `/var/cache/nginx/daibilet` (mkdir + chown www-data), `nginx -t && systemctl reload nginx`.
+- Добавлен `/etc/tmpfiles.d/nginx-daibilet-cache.conf` для автосоздания cache dir после reboot.
+- `deploy-prod-next.sh`: reload nginx ДО и ПОСЛЕ purge proxy cache, чтобы worker'ы не писали в удалённые пути.
+
+### Проблемы
+- Отдельно: upstream timeout на `/_next/image` и RSC prefetch при нагрузке (не HTTP/2 protocol error).
 
 ---
 

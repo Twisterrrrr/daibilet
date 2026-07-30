@@ -70,8 +70,45 @@ import {
 } from './landing-rules.ts';
 import { pickCatalogSubcategories } from './public-catalog.mapper.ts';
 import { buildPublicLandings as buildPublicLandingsFromSessions } from './public-city-landings.ts';
+import {
+  canonicalSessionPierKey,
+  dedupeCrossSourceCatalogSessions,
+  isPublicSessionPurchaseBlocked,
+  maxNullableNumber,
+  minNullableNumber,
+  normalizeGroupPart,
+  regroupMappedPublicCatalogSessions,
+  resolveCatalogDisplayTitle,
+  sessionHasCoverImage,
+  shouldPromoteGroupedRepresentative,
+  sumNullableNumbers,
+  uniqueSlots,
+  uniqueValues,
+  sessionGroupIds,
+} from './public-catalog-grouping.ts';
+import { mapGroupedPublicSession } from './public-catalog.mapper.ts';
+import {
+  buildCityHubSeoTitle,
+  buildPublicDestinationRowsFromSessions,
+  countDistinctSessionVenues,
+  destinationPrepositional,
+  lookupDestinationCatalogSessions,
+  publicDestinationFromSession,
+} from './public-destination.ts';
 
 export { pickCatalogSubcategories };
+export {
+  dedupeCrossSourceCatalogSessions,
+  mapGroupedPublicSession,
+  regroupMappedPublicCatalogSessions,
+  sessionHasCoverImage,
+  buildCityHubSeoTitle,
+  buildPublicDestinationRowsFromSessions,
+  countDistinctSessionVenues,
+  destinationPrepositional,
+  lookupDestinationCatalogSessions,
+  publicDestinationFromSession,
+};
 
 export {
   hasDisplayPrice,
@@ -3053,111 +3090,10 @@ function publicEventGroupKey(event) {
   ].join('|');
 }
 
-export function regroupMappedPublicCatalogSessions(sessions) {
-  const groups = new Map();
-
-  for (const session of sessions) {
-    const key = session.groupKey;
-    if (!key) {
-      groups.set(`id:${session.id}`, session);
-      continue;
-    }
-
-    const slotFromSession = session.startsAt
-      ? {
-          eventId: session.id,
-          startsAt: session.startsAt,
-          dateLabel: session.dateLabel,
-          timeLabel: session.timeLabel,
-          purchaseUrl: session.purchaseUrl,
-          sourceStatus: session.sourceStatus || null,
-          purchaseReady: session.purchaseReady,
-          vacant: session.vacant ?? null,
-        }
-      : null;
-    const current = groups.get(key);
-
-    if (!current) {
-      groups.set(key, {
-        ...session,
-        groupEventIds: uniqueValues(session.groupEventIds || [session.id]),
-        groupedEventsCount: session.groupedEventsCount || 1,
-        sessionCount: session.sessionCount || (slotFromSession ? 1 : 0),
-        upcomingSlots: uniqueSlots(
-          (session.upcomingSlots || []).concat(slotFromSession ? [slotFromSession] : []),
-        ),
-      });
-      continue;
-    }
-
-    current.groupEventIds = uniqueValues(current.groupEventIds.concat(session.groupEventIds || [session.id]));
-    current.groupedEventsCount = current.groupEventIds.length;
-    current.sessionCount = (current.sessionCount || 0) + (session.sessionCount || (slotFromSession ? 1 : 0));
-    current.upcomingSlots = uniqueSlots(
-      (current.upcomingSlots || []).concat(session.upcomingSlots || []).concat(slotFromSession ? [slotFromSession] : []),
-    );
-    current.priceFrom = minNullableNumber([current.priceFrom, session.priceFrom]);
-    current.priceTo = maxNullableNumber([current.priceTo, session.priceTo, session.priceFrom]);
-    current.vacant = sumNullableNumbers([current.vacant, session.vacant]);
-    current.tags = uniqueValues((current.tags || []).concat(session.tags || []));
-    current.title = mergeCatalogDisplayTitle(current.title, session.title, current.venue || session.venue);
-    if (session.manualLandingStatus === 'PINNED') current.manualLandingStatus = 'PINNED';
-
-    if (shouldPromoteGroupedRepresentative(current, session)) {
-      const merged = {
-        groupKey: key,
-        groupEventIds: current.groupEventIds,
-        groupedEventsCount: current.groupedEventsCount,
-        sessionCount: current.sessionCount,
-        upcomingSlots: current.upcomingSlots,
-        priceFrom: current.priceFrom,
-        priceTo: current.priceTo,
-        vacant: current.vacant,
-        tags: current.tags,
-        manualLandingStatus: current.manualLandingStatus,
-      };
-      Object.assign(current, session, merged);
-    }
-  }
-
-  return Array.from(groups.values())
-    .map((session) => ({
-      ...session,
-      title: resolveCatalogDisplayTitle(session.title, session.venue),
-      groupedEventsCount: session.groupEventIds?.length || session.groupedEventsCount || 1,
-      sessionCount: session.sessionCount || session.upcomingSlots?.length || 1,
-      upcomingSlots: uniqueSlots(session.upcomingSlots || []).sort(
-        (a, b) => new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime(),
-      ),
-    }))
-    .sort((a, b) => {
-      const aTime = a.startsAt ? new Date(a.startsAt).getTime() : Number.POSITIVE_INFINITY;
-      const bTime = b.startsAt ? new Date(b.startsAt).getTime() : Number.POSITIVE_INFINITY;
-      return aTime - bTime || String(a.title).localeCompare(String(b.title), 'ru');
-    });
-}
-
 const KNOWN_PIER_ADDRESS_PATTERNS = [
   { key: 'sinopskaya-10', test: (text) => /синопск/.test(text) && /\b10\b/.test(text) },
   { key: 'fontanka-53', test: (text) => /фонтанк/.test(text) && /\b53\b/.test(text) },
 ];
-
-function sessionWidgetProvider(session) {
-  const code = String(session.offerSourceCode || session.purchaseProvider || session.sourceCode || '').toUpperCase();
-  if (code.includes('TEPLOHOD')) return 'TEPLOHOD';
-  if (code.includes('TICKETSCLOUD') || code === 'TC') return 'TICKETSCLOUD';
-  const url = String(session.purchaseUrl || '').toLowerCase();
-  if (url.includes('teplohod.info')) return 'TEPLOHOD';
-  if (url.includes('ticketscloud')) return 'TICKETSCLOUD';
-  const groupKey = String(session.groupKey || '').toLowerCase();
-  if (groupKey.startsWith('teplohod')) return 'TEPLOHOD';
-  if (groupKey.startsWith('ticketscloud')) return 'TICKETSCLOUD';
-  return null;
-}
-
-function isWidgetProviderSession(session) {
-  return sessionWidgetProvider(session) != null;
-}
 
 function canonicalPierLocationKey(name, address) {
   const text = normalizeVenueTextKey(`${name || ''} ${address || ''}`);
@@ -3175,143 +3111,6 @@ function canonicalPierLocationKey(name, address) {
   return null;
 }
 
-function canonicalSessionPierKey(session) {
-  return canonicalPierLocationKey(session.venue, session.venueAddress);
-}
-
-function normalizeCrossSourceTourTitle(title) {
-  let text = String(title || '')
-    .toLowerCase()
-    .replace(/[«»"'“”]/g, ' ')
-    .replace(
-      /^(?:(?:обзорная|ночная|утренняя|авторская|детская|вечерняя)\s+)?(?:экскурсия|развлекательно\s*-\s*познавательная\s+программа)\s+/i,
-      '',
-    )
-    .replace(/\s+с\s+гидом\b/g, '')
-    .replace(/,\s*или\s+.+/g, '')
-    .replace(/\s+\d+\+\s*$/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  return normalizeVenueTextKey(text);
-}
-
-function crossSourceTitlesMatch(leftTitle, rightTitle) {
-  const left = normalizeCrossSourceTourTitle(leftTitle);
-  const right = normalizeCrossSourceTourTitle(rightTitle);
-  if (!left || !right) return false;
-  if (left === right) return true;
-  if (left.includes(right) || right.includes(left)) return true;
-
-  const leftTokens = new Set(left.split(' ').filter((token) => token.length > 3));
-  const rightTokens = new Set(right.split(' ').filter((token) => token.length > 3));
-  if (!leftTokens.size || !rightTokens.size) return false;
-
-  let overlap = 0;
-  for (const token of leftTokens) {
-    if (rightTokens.has(token)) overlap += 1;
-  }
-
-  const minSize = Math.min(leftTokens.size, rightTokens.size);
-  return overlap >= 2 && overlap / minSize >= 0.6;
-}
-
-function crossSourceProviderScore(session) {
-  let score = 0;
-  if (sessionWidgetProvider(session) === 'TEPLOHOD') score += 100;
-  if (sessionWidgetProvider(session) === 'TICKETSCLOUD') score += 10;
-  if (session.purchaseReady !== false) score += 50;
-  if ((session.upcomingSlots || []).length > 0) score += 5;
-  if (session.imageUrl) score += 3;
-  if (session.manualLandingStatus === 'PINNED') score += 1000;
-  if (!isPublicSessionPurchaseBlocked(session)) score += 20;
-  return score;
-}
-
-function preferCrossSourceRepresentative(current, candidate) {
-  return crossSourceProviderScore(candidate) > crossSourceProviderScore(current);
-}
-
-function publicCrossSourceCatalogKey(session) {
-  const city = normalizeGroupPart(resolvePublicSessionCity(session));
-  const pier = canonicalSessionPierKey(session) || normalizeGroupPart(session.venue);
-  const title = normalizeCrossSourceTourTitle(session.title);
-  return `${city}|${pier}|${title}`;
-}
-
-function mergeCrossSourceSessions(current, candidate) {
-  const winner = preferCrossSourceRepresentative(current, candidate) ? candidate : current;
-  const mergedGroupEventIds = uniqueValues(
-    sessionGroupIds(current).concat(sessionGroupIds(candidate)),
-  );
-
-  return {
-    ...winner,
-    groupKey: publicCrossSourceCatalogKey(winner),
-    groupEventIds: mergedGroupEventIds,
-    groupedEventsCount: mergedGroupEventIds.length,
-    priceFrom: minNullableNumber([current.priceFrom, candidate.priceFrom]),
-    priceTo: maxNullableNumber([current.priceTo, candidate.priceTo, current.priceFrom, candidate.priceFrom]),
-    vacant: sumNullableNumbers([current.vacant, candidate.vacant]),
-    manualLandingStatus:
-      current.manualLandingStatus === 'PINNED' || candidate.manualLandingStatus === 'PINNED' ? 'PINNED' : null,
-  };
-}
-
-export function dedupeCrossSourceCatalogSessions(sessions) {
-  const passthrough = [];
-  const pierSessions = [];
-
-  for (const session of sessions || []) {
-    if (isWidgetProviderSession(session) && canonicalSessionPierKey(session)) {
-      pierSessions.push(session);
-    } else {
-      passthrough.push(session);
-    }
-  }
-
-  const used = new Set();
-  const merged = [];
-
-  for (let index = 0; index < pierSessions.length; index += 1) {
-    if (used.has(index)) continue;
-
-    let current = pierSessions[index];
-    used.add(index);
-    const pierKey = canonicalSessionPierKey(current);
-
-    for (let otherIndex = index + 1; otherIndex < pierSessions.length; otherIndex += 1) {
-      if (used.has(otherIndex)) continue;
-      const other = pierSessions[otherIndex];
-      if (canonicalSessionPierKey(other) !== pierKey) continue;
-      if (sessionWidgetProvider(current) === sessionWidgetProvider(other)) continue;
-      if (!crossSourceTitlesMatch(current.title, other.title)) continue;
-      current = mergeCrossSourceSessions(current, other);
-      used.add(otherIndex);
-    }
-
-    merged.push(current);
-  }
-
-  return passthrough.concat(merged);
-}
-
-function uniqueSlots(slots) {
-  const seen = new Set();
-  const result = [];
-  for (const slot of slots || []) {
-    const key = `${slot.startsAt || ''}|${slot.eventId || ''}`;
-    if (!slot.startsAt || seen.has(key)) continue;
-    seen.add(key);
-    result.push(slot);
-  }
-  return result;
-}
-
-function sessionGroupIds(session) {
-  return uniqueValues([session?.id, ...(session?.groupEventIds || [])]);
-}
-
 function primaryOfferMap(offers) {
   const map = new Map();
   const sorted = [...offers].sort((a, b) => {
@@ -3326,13 +3125,6 @@ function primaryOfferMap(offers) {
   }
 
   return map;
-}
-
-function normalizeGroupPart(value) {
-  return String(value || '')
-    .trim()
-    .toLowerCase()
-    .replace(/\s+/g, ' ');
 }
 
 function isDateLikeCatalogTitle(title) {
@@ -3360,35 +3152,6 @@ function normalizeCatalogGroupTitle(rawTitle) {
   return text;
 }
 
-function resolveCatalogDisplayTitle(rawTitle, venue) {
-  const normalized = normalizeCatalogGroupTitle(rawTitle);
-  if (normalized.length >= 3 && !isDateLikeCatalogTitle(normalized)) {
-    return formatPublicEventTitle(normalized);
-  }
-
-  const cleanRaw = String(rawTitle || '').replace(/\s+/g, ' ').trim();
-  if (cleanRaw && !isDateLikeCatalogTitle(cleanRaw)) return formatPublicEventTitle(cleanRaw);
-
-  const venueTitle = formatPublicVenueTitle(venue) || String(venue || '').trim();
-  if (venueTitle && venueTitle !== 'Не указано') return formatPublicEventTitle(venueTitle);
-
-  return formatPublicEventTitle(cleanRaw || 'Событие');
-}
-
-function mergeCatalogDisplayTitle(currentTitle, candidateTitle, venue) {
-  const candidates = [currentTitle, candidateTitle].filter(Boolean);
-  for (const raw of candidates) {
-    const normalized = normalizeCatalogGroupTitle(raw);
-    if (normalized.length >= 3 && !isDateLikeCatalogTitle(normalized)) {
-      return formatPublicEventTitle(normalized);
-    }
-  }
-  for (const raw of candidates) {
-    if (raw && !isDateLikeCatalogTitle(raw)) return formatPublicEventTitle(String(raw).trim());
-  }
-  return resolveCatalogDisplayTitle(candidates[0], venue);
-}
-
 const CATALOG_GROUP_TITLE_SOURCE_SQL = `coalesce(nullif(trim("overrideTitle"), ''), title)`;
 
 function catalogGroupTitleSqlExpression(column = CATALOG_GROUP_TITLE_SOURCE_SQL) {
@@ -3408,27 +3171,8 @@ function catalogGroupTitleSqlExpression(column = CATALOG_GROUP_TITLE_SOURCE_SQL)
   )`;
 }
 
-function uniqueValues(values) {
-  return Array.from(new Set(values.filter(Boolean)));
-}
-
-function maxNullableNumber(values) {
-  const numbers = values.filter((value) => Number.isFinite(value) && value >= MIN_DISPLAY_PRICE_RUB);
-  return numbers.length ? Math.max(...numbers) : null;
-}
-
-function minNullableNumber(values) {
-  const numbers = values.filter((value) => Number.isFinite(value) && value >= MIN_DISPLAY_PRICE_RUB);
-  return numbers.length ? Math.min(...numbers) : null;
-}
-
 function displayPriceFrom(...values) {
   return minNullableNumber(values);
-}
-
-function sumNullableNumbers(values) {
-  const numbers = values.filter((value) => Number.isFinite(value));
-  return numbers.length ? numbers.reduce((sum, value) => sum + value, 0) : null;
 }
 
 function maxSeverity(left, right) {
@@ -4260,13 +4004,6 @@ function buildCatalogFacets(sessions) {
   };
 }
 
-export function sessionHasCoverImage(session) {
-  const url = String(session?.imageUrl || '').trim();
-  if (!url) return false;
-  if (url.startsWith('/images/cities/')) return false;
-  return true;
-}
-
 function normalizePublicSessionImageKey(imageUrl) {
   const raw = String(imageUrl || '').trim();
   if (!raw) return null;
@@ -4554,17 +4291,6 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
       priceFrom: prices.length ? Math.min(...prices) : null,
     },
   };
-}
-
-/** «Санкт-Петербург: афиша, экскурсии и билеты на сегодня, 19 июля | Дайбилет» */
-export function buildCityHubSeoTitle(cityName, reference = new Date()) {
-  const name = String(cityName || '').trim() || 'Город';
-  const short = new Intl.DateTimeFormat('ru-RU', {
-    day: 'numeric',
-    month: 'long',
-    timeZone: 'Europe/Moscow',
-  }).format(reference);
-  return `${name}: афиша, экскурсии и билеты на сегодня, ${short} | Дайбилет`;
 }
 
 export async function buildPublicCityPage(db, citySlugOrId) {
@@ -5418,36 +5144,6 @@ function extractTcExternalIdFromPurchaseUrl(url) {
   if (!url) return null;
   const match = String(url).match(/[?&]event=([^&]+)/);
   return match ? decodeURIComponent(match[1]) : null;
-}
-
-function isPublicSessionPurchaseBlocked(session) {
-  const statuses = [session.sourceStatus, session.eventSourceStatus].map((value) => String(value || '').toLowerCase());
-  if (!session.startsAt && !isOpenDateCatalogRow(session)) return true;
-  if (statuses.some((status) => ['paused', 'suspended', 'stopped', 'cancelled', 'canceled', 'draft', 'hidden'].includes(status))) {
-    return true;
-  }
-  if (session.purchaseReady === false) return true;
-  const purchaseUrl = session.purchaseUrl || session.widgetUrl || session.offerWidgetUrl || null;
-  const provider = String(session.purchaseProvider || session.offerSourceCode || session.sourceCode || '').toUpperCase();
-  if (
-    (provider.includes('TEPLOHOD') || provider.includes('TEP') || String(purchaseUrl).includes('teplohod.info')) &&
-    session.purchaseReady !== false &&
-    purchaseUrl
-  ) {
-    return false;
-  }
-  if (session.vacant === 0) return true;
-  return false;
-}
-
-function shouldPromoteGroupedRepresentative(current, candidate) {
-  if (!candidate?.startsAt) return false;
-  const currentBlocked = isPublicSessionPurchaseBlocked(current);
-  const candidateBlocked = isPublicSessionPurchaseBlocked(candidate);
-  if (currentBlocked && !candidateBlocked) return true;
-  if (!currentBlocked && candidateBlocked) return false;
-  if (!current.startsAt) return true;
-  return new Date(candidate.startsAt) < new Date(current.startsAt);
 }
 
 function pickPrimaryPurchasableSession(sessions) {
@@ -7399,56 +7095,6 @@ function buildCityHubTags(bucket) {
   return [...landingTags, ...categoryTags].slice(0, 3);
 }
 
-export function buildPublicDestinationRowsFromSessions(sessions) {
-  const buckets = new Map();
-
-  for (const session of sessions) {
-    const destination = publicDestinationFromSession(session);
-    if (!destination.name || destination.name === 'Не указан') continue;
-    if (!buckets.has(destination.name)) {
-      buckets.set(destination.name, {
-        id: destination.id,
-        slug: destination.slug,
-        sourceSlug: destination.sourceSlug,
-        name: destination.name,
-        type: destination.type,
-        events: 0,
-        venueIds: new Set(),
-        categories: new Map(),
-        landings: new Map(),
-      });
-    }
-
-    const bucket = buckets.get(destination.name);
-    bucket.events += 1;
-    if (session.venueId) bucket.venueIds.add(session.venueId);
-    if (session.category) bucket.categories.set(session.category, (bucket.categories.get(session.category) || 0) + 1);
-    const landingSlugs = Array.isArray(session.landingSlugs) ? session.landingSlugs : [];
-    for (const slug of landingSlugs) {
-      if (!slug) continue;
-      bucket.landings.set(slug, (bucket.landings.get(slug) || 0) + 1);
-    }
-  }
-
-  return Array.from(buckets.values())
-    .map((bucket) => ({
-      id: bucket.id,
-      slug: bucket.slug,
-      sourceSlug: bucket.sourceSlug,
-      name: bucket.name,
-      type: bucket.type,
-      events: bucket.events,
-      venues: bucket.venueIds.size,
-      categories: Array.from(bucket.categories.entries())
-        .map(([name, events]) => ({ name, events }))
-        .sort((a, b) => b.events - a.events || a.name.localeCompare(b.name, 'ru')),
-      hubTags: buildCityHubTags(bucket),
-    }))
-    .filter((bucket) => bucket.events >= PUBLIC_DESTINATION_MIN_EVENTS)
-    .filter(isAllowedPublicDestination)
-    .sort(destinationSort);
-}
-
 async function destinationRows(db) {
   const sessions = await publicCatalogSessions(db);
   return buildPublicDestinationRowsFromSessions(sessions);
@@ -7654,21 +7300,6 @@ function publicDestinationForCity(row) {
   return buildPublicDestinationRecord(row, routed);
 }
 
-export function publicDestinationFromSession(session) {
-  const name = cleanDisplayName(session.destination) || cleanDisplayName(session.city) || 'Не указан';
-  let type = session.destinationType === 'region' ? 'region' : 'city';
-  if (type === 'city' && isPublicRegionName(name)) type = 'region';
-  if (type === 'region' && STANDALONE_CITY_NAMES.has(name)) type = 'city';
-  const slug = publicCitySlug(name);
-  return {
-    id: type === 'region' ? `region_${slug}` : session.cityId || `city_${slug}`,
-    slug,
-    sourceSlug: type === 'region' ? slug : session.sourceCitySlug || slug,
-    name,
-    type,
-  };
-}
-
 const CITY_SLUG_CANONICAL = {
   moscow: 'moskva',
   moskva: 'moskva',
@@ -7851,38 +7482,6 @@ function lookupCatalogSessionBySlug(slugOrId, catalogSessions = null) {
         (session.groupEventIds || []).includes(value),
     ) || null
   );
-}
-
-export function lookupDestinationCatalogSessions(citySlugOrId, requestedSlug, catalogSessions) {
-  const index = publicCatalogCache?.destinationIndex;
-  if (index) {
-    for (const key of [requestedSlug, String(citySlugOrId || '').toLowerCase(), canonicalCitySlug(citySlugOrId)].filter(Boolean)) {
-      const hit = index.get(String(key).toLowerCase());
-      if (hit?.length) return hit;
-    }
-  }
-
-  return catalogSessions.filter((session) => matchesPublicDestinationPage(session, citySlugOrId, requestedSlug));
-}
-
-export function countDistinctSessionVenues(sessions) {
-  const keys = new Set();
-  for (const session of sessions || []) {
-    if (session?.venueId) {
-      keys.add(`id:${session.venueId}`);
-      continue;
-    }
-    const slug = normalizePublicVenueSlugKey(session?.venueSlug || '');
-    if (slug) {
-      keys.add(`slug:${slug}`);
-      continue;
-    }
-    const name = cleanDisplayName(session?.venue);
-    if (name && name !== 'Не указано') {
-      keys.add(`name:${cleanDisplayName(session?.city) || ''}|${name.toLowerCase()}`);
-    }
-  }
-  return keys.size;
 }
 
 function sessionVenueIds(sessions) {
@@ -8080,69 +7679,6 @@ function destinationSortGroup(name, type) {
     'Алтайский край': '13-barnaul',
   };
   return groups[name] || `90-${type}-${name}`;
-}
-
-export function destinationPrepositional(destination) {
-  const bySlug = {
-    'sankt-peterburg': 'в Санкт-Петербурге',
-    'saint-petersburg': 'в Санкт-Петербурге',
-    moscow: 'в Москве',
-    moskva: 'в Москве',
-    'moskovskaya-oblast': 'в Московской области',
-    'leningradskaya-oblast': 'в Ленинградской области',
-    'krasnodarskiy-kray': 'в Краснодарском крае',
-    'krasnoyarskiy-kray': 'в Красноярском крае',
-    'respublika-tatarstan': 'в Республике Татарстан',
-    'respublika-hakasiya': 'в Республике Хакасии',
-    'respublika-bashkortostan': 'в Республике Башкортостан',
-    'respublika-kareliya': 'в Республике Карелия',
-    'ulyanovskaya-oblast': 'в Ульяновской области',
-    'habarovskiy-kray': 'в Хабаровском крае',
-    'primorskiy-kray': 'в Приморском крае',
-    'altayskiy-kray': 'в Алтайском крае',
-    'samarskaya-oblast': 'в Самарской области',
-    'chelyabinskaya-oblast': 'в Челябинской области',
-    'kemerovskaya-oblast': 'в Кемеровской области',
-    'rostovskaya-oblast': 'в Ростовской области',
-    'sverdlovskaya-oblast': 'в Свердловской области',
-    'nizhegorodskaya-oblast': 'в Нижегородской области',
-    'orenburgskaya-oblast': 'в Оренбургской области',
-    'tulskaya-oblast': 'в Тульской области',
-    'vologodskaya-oblast': 'в Вологодской области',
-    'stavropolskiy-kray': 'в Ставропольском крае',
-    'kaliningradskaya-oblast': 'в Калининградской области',
-    'kaluzhskaya-oblast': 'в Калужской области',
-    'yaroslavskaya-oblast': 'в Ярославской области',
-    'amurskaya-oblast': 'в Амурской области',
-    'hanty-mansiyskiy-avtonomnyy-okrug': 'в Ханты-Мансийском автономном округе',
-  };
-  if (bySlug[destination.slug]) return bySlug[destination.slug];
-
-  const name = cleanDisplayName(destination.name);
-  if (!name) return 'в выбранном направлении';
-  if (destination.type === 'region') return `в регионе ${name}`;
-  // Предложный падеж: «в Мурманске», не «в городе Мурманск»
-  if (name.endsWith('ы')) return `в ${name.slice(0, -1)}ах`;
-  if (name.endsWith('а')) return `в ${name.slice(0, -1)}е`;
-  if (name.endsWith('я')) return `в ${name.slice(0, -1)}е`;
-  if (name.endsWith('ь')) return `в ${name.slice(0, -1)}и`;
-  if (name.endsWith('о')) return `в ${name.slice(0, -1)}е`;
-  if (/[еуюэ]$/i.test(name)) return `в ${name}`;
-  const known = {
-    Москва: 'в Москве',
-    'Санкт-Петербург': 'в Санкт-Петербурге',
-    Мурманск: 'в Мурманске',
-    Орёл: 'в Орле',
-    Орел: 'в Орле',
-    Казань: 'в Казани',
-    Сочи: 'в Сочи',
-    'Нижний Новгород': 'в Нижнем Новгороде',
-    'Ростов-на-Дону': 'в Ростове-на-Дону',
-    'Улан-Удэ': 'в Улан-Удэ',
-    Чебоксары: 'в Чебоксарах',
-  };
-  if (known[name]) return known[name];
-  return `в ${name}е`;
 }
 
 async function publicSessions(db, limit) {
@@ -8688,105 +8224,6 @@ function resolvePublicSessionCity(row) {
   if (canonical) return routeCityToPublicDisplayName(canonical);
   if (raw && raw !== 'Не указан') return routeCityToPublicDisplayName(raw);
   return routeCityToPublicDisplayName(inferred || raw || 'Не указан');
-}
-
-export function mapGroupedPublicSession(row, pinnedEventIds = new Set()) {
-  const tags = row.tags || [];
-  const displayCity = resolvePublicSessionDisplayCity(row);
-  if (isForeignPublicCity(displayCity) || isForeignPublicCity(row.city)) return null;
-  const groupCity = resolvePublicSessionCity(row);
-  if (!groupCity) return null;
-  const destination = publicDestinationForCity({ ...row, city: row.city || displayCity });
-  if (!destination) return null;
-  const fallbackWidgetUrl = buildProviderWidgetUrl(row);
-  const purchase = purchaseInfo(row);
-  const purchaseUrl = purchase.url || fallbackWidgetUrl;
-  const groupEventIds = (row.groupEventIds || [row.id]).slice(0, 12);
-  const manualLandingStatus = groupEventIds.some((id) => pinnedEventIds.has(id)) ? 'PINNED' : null;
-  const schedule = publicSessionScheduleLabels(row);
-  const timeZone = schedule.timeZone || resolveCityTimeZone(displayCity, destination?.name);
-  const upcomingSlots = (Array.isArray(row.upcomingSlots) ? row.upcomingSlots : [])
-    .filter((slot) => slot?.startsAt)
-    .slice(0, 12)
-    .map((slot) => {
-      const slotPurchase = purchaseInfo({
-        sourceCode: slot.sourceCode || row.sourceCode,
-        offerSourceCode: slot.offerSourceCode || row.offerSourceCode || row.sourceCode,
-        offerWidgetUrl: slot.offerWidgetUrl,
-        offerDeeplinkUrl: slot.offerDeeplinkUrl,
-        externalId: slot.externalId || row.externalId,
-      });
-      return {
-        eventId: slot.eventId,
-        startsAt: normalizeStartsAt(slot.startsAt),
-        dateLabel: formatDate(slot.startsAt, timeZone),
-        timeLabel: formatTime(slot.startsAt, timeZone),
-        purchaseUrl: slotPurchase.url || purchaseUrl,
-        sourceStatus: slot.sourceStatus || row.sourceStatus || null,
-        purchaseReady: slotPurchase.ready,
-        vacant: slot.vacant ?? row.vacant ?? null,
-      };
-    });
-
-  const ruleEvent = buildLandingRuleEvent({ ...row, city: displayCity }, tags, destination, row.category || 'unknown');
-  const institutionContext = shouldResolveInstitutionFromTitle({ venueKind: row.venueKind, venue: row.venue })
-    ? resolveContextInstitutionFromTitle(row.overrideTitle || row.title)
-    : null;
-  const session = {
-    id: row.id,
-    slug: publicEventSlug(row.slug),
-    sourceSlug: row.slug,
-    groupKey: publicEventGroupKey({ ...row, city: groupCity }),
-    groupEventIds,
-    groupedEventsCount: row.groupedEventsCount || 1,
-    sessionCount: row.sessionCount || upcomingSlots.length || 1,
-    upcomingSlots,
-    title: resolveCatalogDisplayTitle(row.overrideTitle || row.title, row.venue),
-    cityId: row.cityId,
-    citySlug: destination.slug,
-    sourceCitySlug: row.citySlug,
-    city: displayCity,
-    destination: destination.name,
-    destinationType: destination.type,
-    venueId: row.venueId,
-    venueSlug: row.venueId ? publicVenueSlug(row.venueSlug, row.venue, row.venueId) : row.venueSlug,
-    venue: formatPublicVenueTitle(row.venue) || 'Не указано',
-    venueAddress: row.venueAddress || null,
-    venueKind: row.venueKind || 'OTHER',
-    institutionVenue: institutionContext?.displayName || null,
-    offerTitle: row.offerTitle,
-    offerSourceCode: row.offerSourceCode,
-    purchaseUrl,
-    widgetUrl: row.offerWidgetUrl || fallbackWidgetUrl,
-    deeplinkUrl: row.offerDeeplinkUrl || null,
-    purchaseReady: purchase.ready,
-    purchaseMode: purchase.mode,
-    purchaseProvider: purchase.provider,
-    purchaseUrlSource: purchase.urlSource,
-    category: row.category || 'unknown',
-    sourceCategory: row.category || 'unknown',
-    kind: row.kind || null,
-    sourceStatus: row.sourceStatus || null,
-    subcategories: ruleEvent.subcategories,
-    tags: sliceCatalogTags(tags),
-    startsAt: schedule.startsAt || '',
-    dateLabel: schedule.dateLabel,
-    timeLabel: schedule.timeLabel,
-    timeBucket: schedule.timeBucket,
-    timeZone,
-    priceFrom: row.priceFrom,
-    priceTo: row.priceTo ?? row.priceFrom,
-    vacant: row.vacant,
-    ageLimit: row.ageLimit ?? null,
-    imageUrl: resolvePublicSessionImageUrl(row),
-    description: publicListDescription(row),
-  };
-
-  return {
-    ...session,
-    landingSlugs: resolveLandingSlugsForSession(ruleEvent, { startsAt: row.startsAt, upcomingSlots }),
-    manualLandingStatus,
-  };
 }
 
 function isSaleablePublicSession(session) {

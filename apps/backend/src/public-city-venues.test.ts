@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { countDistinctSessionVenues, publicVenuesForSessionsFromHub } from './dto.js';
+import { countDistinctSessionVenues } from './public-destination.js';
+import { publicVenuesForSessionsFromHub } from './dto.js';
 
 test('countDistinctSessionVenues prefers venueId over slug/name', () => {
   const count = countDistinctSessionVenues([
