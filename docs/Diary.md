@@ -1,3 +1,27 @@
+## 2026-07-30 - Event covers: empty cards / Volna / evt-auto 404
+
+### Наблюдения
+- Публичный каталог API: **2485** карточек; в выборке 100 - **0** empty / city-placeholder; sample TC+TEP HEAD = 200.
+- БД future active sessions (distinct Event): **~21739**; `imageUrl` null/empty = **0**, city placeholder = **0**.
+- Проблема была не «нет URL», а **битые локальные** `/images/events/generated/evt-auto-*.jpg` (файла нет на MSK nginx alias) при том что `sessionHasCoverImage` их принимает.
+- До фикса: **24** future events на evt-auto (14 distinct URL). У «Волны» (`evt_tep_1511`) был stub; sibling `evt_tep_866/867` уже с живым TEP CDN.
+- MSK egress: `api.teplohod.info` / `fonts.googleapis.com` / часто `daibilet.ru` - **DNS fail** с хоста (INC.504.1). Браузеры клиентов TEP картинки грузят.
+- Blog «Афиша: Москва» (агент 62ef91d7): отдельно - prefer remote/city cover вместо evt-auto; `moscow.png` = 200.
+
+### Решения
+- SQL: 8 events с durable venue CDN вместо evt-auto; Volna → `Event866` dirtyAlias cover.
+- На диск MSK: regenerate 6 missing evt-auto JPEG (оставшиеся 16 events / 6 URL).
+- Backend `pickFirstUsableEventImageUrl`: сначала durable (CDN/venue/tc), ephemeral evt-auto - после.
+- Frontend: `resolveEventCardFallbackImage` → city card в EventCard (код в workspace).
+- API restart с обновлённым `event-image-url.ts` / `dto.js`. Web: failed `next build` (Google Fonts) → restore `.next` из backup, service up.
+
+### Проблемы
+- Frontend fallback **не** в prod bundle до успешного web build вне MSK egress или с self-hosted fonts.
+- TEP sync с MSK не обновит свежие обложки, пока DNS/egress не починят.
+- `ensure-catalog-covers` должен деплоить generated files вместе с DB URL (сейчас URL без файла = серые карточки).
+
+---
+
 ## 2026-07-30 - City hub: hide empty/false river landings (ЕКБ)
 
 ### Наблюдения
@@ -12,7 +36,8 @@
 - Фильтр чипов: только `events > 0` после city-scoped rematch.
 
 ### Проблемы
-- Нужен MSK deploy API (`landing-rules` + `public-city-landings`) и web (hub config/directions).
+- ~~Нужен MSK deploy API~~: scp `public-city-landings.ts` + restart `daibilet-api`; smoke `/api/public/cities/ekaterinburg` - **без** river-cruises/river-party.
+- Web source scp'd (config/directions); для belt-and-suspenders water-gate в бандле нужен next rebuild (API fix уже скрывает чипы).
 
 ---
 
