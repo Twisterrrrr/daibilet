@@ -83,10 +83,12 @@ const stubCheckoutSessionSelect = {
   capacitySold: true,
 } satisfies Prisma.EventSessionSelect;
 
-type StubCheckoutEventRow = Prisma.EventGetPayload<{ include: typeof stubCheckoutEventInclude }>;
-type StubCheckoutOfferRow = Prisma.EventOfferGetPayload<{ select: typeof stubCheckoutOfferSelect }>;
-type StubCheckoutSessionRow = Prisma.EventSessionGetPayload<{ select: typeof stubCheckoutSessionSelect }>;
-type StubCheckoutSupplierRow = NonNullable<StubCheckoutEventRow['supplier']> | StubCheckoutEventRow['supplierLinks'][number]['supplier'];
+export type StubCheckoutEventRow = Prisma.EventGetPayload<{ include: typeof stubCheckoutEventInclude }>;
+export type StubCheckoutOfferRow = Prisma.EventOfferGetPayload<{ select: typeof stubCheckoutOfferSelect }>;
+export type StubCheckoutSessionRow = Prisma.EventSessionGetPayload<{ select: typeof stubCheckoutSessionSelect }>;
+export type StubCheckoutSupplierRow =
+  | NonNullable<StubCheckoutEventRow['supplier']>
+  | StubCheckoutEventRow['supplierLinks'][number]['supplier'];
 
 interface StubCheckoutValidationInput {
   enabled: boolean;
@@ -353,7 +355,7 @@ export async function createStubCheckoutOrder(
   }
 }
 
-const checkoutOrderResultSelect = {
+export const checkoutOrderResultSelect = {
   id: true,
   publicCode: true,
   status: true,
@@ -365,7 +367,7 @@ const checkoutOrderResultSelect = {
   buyerPhone: true,
 } satisfies Prisma.CheckoutOrderSelect;
 
-const checkoutItemResultSelect = {
+export const checkoutItemResultSelect = {
   id: true,
   status: true,
   supplierId: true,
@@ -373,7 +375,7 @@ const checkoutItemResultSelect = {
   quantity: true,
 } satisfies Prisma.CheckoutItemSelect;
 
-const paymentResultSelect = {
+export const paymentResultSelect = {
   id: true,
   status: true,
   amountKopecks: true,
@@ -381,7 +383,7 @@ const paymentResultSelect = {
   paidAt: true,
 } satisfies Prisma.PaymentSelect;
 
-const fulfillmentResultSelect = {
+export const fulfillmentResultSelect = {
   id: true,
   status: true,
   provider: true,
@@ -519,7 +521,7 @@ function validateSession(
   }
 }
 
-async function loadStubCheckoutEvent(payload: StubCheckoutCreateDto): Promise<StubCheckoutEventRow | null> {
+export async function loadStubCheckoutEvent(payload: StubCheckoutCreateDto): Promise<StubCheckoutEventRow | null> {
   const eventId = cleanString(payload.eventId);
   const eventSlug = cleanString(payload.eventSlug);
   if (!eventId && !eventSlug) return null;
@@ -529,13 +531,13 @@ async function loadStubCheckoutEvent(payload: StubCheckoutCreateDto): Promise<St
   });
 }
 
-function resolveStubCheckoutSupplier(event: StubCheckoutEventRow): StubCheckoutSupplierRow | null {
+export function resolveStubCheckoutSupplier(event: StubCheckoutEventRow): StubCheckoutSupplierRow | null {
   if (event.supplier) return event.supplier;
   const primaryLink = event.supplierLinks.find((link) => link.isPrimary) || event.supplierLinks[0] || null;
   return primaryLink?.supplier || null;
 }
 
-function normalizeStubCheckoutPayload(payload: StubCheckoutCreateDto): StubCheckoutCreateDto {
+export function normalizeStubCheckoutPayload(payload: StubCheckoutCreateDto): StubCheckoutCreateDto {
   return {
     ...payload,
     eventId: cleanString(payload.eventId),
@@ -558,7 +560,7 @@ function normalizeStubCheckoutPayload(payload: StubCheckoutCreateDto): StubCheck
   };
 }
 
-async function decrementCapacity(
+export async function decrementCapacity(
   tx: Prisma.TransactionClient,
   event: StubCheckoutEventRow,
   session: StubCheckoutSessionRow | null,
@@ -600,7 +602,7 @@ async function decrementCapacity(
   }
 }
 
-async function createUniquePublicCode(tx: Prisma.TransactionClient): Promise<string> {
+export async function createUniquePublicCode(tx: Prisma.TransactionClient): Promise<string> {
   for (let attempt = 0; attempt < 20; attempt += 1) {
     const code = String(randomInt(1000000, 10000000));
     const existing = await tx.checkoutOrder.findUnique({ where: { publicCode: code }, select: { id: true } });
@@ -609,7 +611,7 @@ async function createUniquePublicCode(tx: Prisma.TransactionClient): Promise<str
   throw new StubCheckoutError('IDEMPOTENCY_CONFLICT', 409);
 }
 
-async function writeSupplierLedgerEntries(
+export async function writeSupplierLedgerEntries(
   tx: Prisma.TransactionClient,
   input: {
     supplierId: string;
@@ -618,8 +620,10 @@ async function writeSupplierLedgerEntries(
     paymentId: string;
     publicCode: string;
     totals: StubCheckoutTotalsDto;
+    mode?: 'STUB' | 'YOOKASSA';
   },
 ): Promise<void> {
+  const mode = input.mode || 'STUB';
   const entries: Prisma.SupplierLedgerEntryCreateManyInput[] = [
     {
       supplierId: input.supplierId,
@@ -631,8 +635,8 @@ async function writeSupplierLedgerEntries(
       checkoutOrderId: input.orderId,
       checkoutItemId: input.itemId,
       paymentId: input.paymentId,
-      note: `STUB sale ${input.publicCode}`,
-      metaJson: { mode: 'STUB' },
+      note: `${mode} sale ${input.publicCode}`,
+      metaJson: { mode },
     },
   ];
   if (input.totals.commissionKopecks > 0) {
@@ -646,8 +650,8 @@ async function writeSupplierLedgerEntries(
       checkoutOrderId: input.orderId,
       checkoutItemId: input.itemId,
       paymentId: input.paymentId,
-      note: `STUB commission ${input.publicCode}`,
-      metaJson: { mode: 'STUB' },
+      note: `${mode} commission ${input.publicCode}`,
+      metaJson: { mode },
     });
   }
   await tx.supplierLedgerEntry.createMany({ data: entries });
@@ -826,12 +830,12 @@ function cleanString(value: string | null | undefined): string | null {
   return cleaned ? cleaned : null;
 }
 
-function normalizeIdempotencyKey(value: string | null | undefined): string | null {
+export function normalizeIdempotencyKey(value: string | null | undefined): string | null {
   const cleaned = cleanString(value);
   if (!cleaned) return null;
   return cleaned.slice(0, 120);
 }
 
-function toIso(value: Date | null | undefined): string | null {
+export function toIso(value: Date | null | undefined): string | null {
   return value ? value.toISOString() : null;
 }

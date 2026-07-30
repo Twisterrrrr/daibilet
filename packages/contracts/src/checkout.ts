@@ -1,4 +1,5 @@
 export type StubCheckoutMode = 'STUB';
+export type YooKassaCheckoutMode = 'YOOKASSA';
 export type CheckoutSubjectType = 'EVENT' | 'VENUE_ADMISSION';
 
 export type StubCheckoutIssueSeverity = 'low' | 'medium' | 'high';
@@ -23,7 +24,11 @@ export type StubCheckoutIssueCode =
   | 'NOT_ENOUGH_CAPACITY'
   | 'SALES_NOT_STARTED'
   | 'SALES_CLOSED'
-  | 'OPEN_DATE_NOT_ACTIVE';
+  | 'OPEN_DATE_NOT_ACTIVE'
+  | 'YOOKASSA_CHECKOUT_DISABLED'
+  | 'YOOKASSA_CONFIG_MISSING'
+  | 'YOOKASSA_PAYMENT_FAILED'
+  | 'YOOKASSA_WEBHOOK_PAYMENT_NOT_FOUND';
 
 export interface StubCheckoutIssueDto {
   code: StubCheckoutIssueCode;
@@ -49,6 +54,10 @@ export interface StubCheckoutCreateDto {
     phone?: string | null;
   } | null;
   idempotencyKey?: string | null;
+}
+
+export interface YooKassaCheckoutCreateDto extends StubCheckoutCreateDto {
+  returnUrl?: string | null;
 }
 
 export interface StubCheckoutTotalsDto {
@@ -118,9 +127,53 @@ export interface StubCheckoutResultDto {
   warnings: StubCheckoutIssueDto[];
 }
 
+export interface YooKassaCheckoutOrderDto extends Omit<StubCheckoutOrderDto, 'payment' | 'fulfillment'> {
+  checkoutUrl: string | null;
+  expiresAt: string | null;
+  payment: {
+    id: string;
+    provider: 'YOOKASSA';
+    status: string;
+    amountKopecks: number;
+    providerPaymentId: string | null;
+    confirmationUrl: string | null;
+    paidAt: string | null;
+  };
+  fulfillment: {
+    id: string;
+    status: string;
+    provider: 'INTERNAL';
+    purchaseFlow: 'PLATFORM';
+  };
+}
+
+export interface YooKassaCheckoutResultDto {
+  generatedAt: string;
+  mode: YooKassaCheckoutMode;
+  order: YooKassaCheckoutOrderDto;
+  warnings: StubCheckoutIssueDto[];
+}
+
+export interface YooKassaWebhookResultDto {
+  generatedAt: string;
+  event: string;
+  providerPaymentId: string | null;
+  paymentStatus: string | null;
+  orderId: string | null;
+  publicCode: string | null;
+  result: 'processed' | 'duplicate' | 'ignored' | 'not_found';
+}
+
 export interface StubCheckoutErrorDto {
   error: 'stub_checkout_error';
   code: StubCheckoutIssueCode | 'IDEMPOTENCY_IN_PROGRESS' | 'IDEMPOTENCY_CONFLICT';
+  message: string;
+  issues: StubCheckoutIssueDto[];
+}
+
+export interface YooKassaCheckoutErrorDto {
+  error: 'yookassa_checkout_error';
+  code: StubCheckoutIssueCode | 'IDEMPOTENCY_REQUIRED' | 'IDEMPOTENCY_IN_PROGRESS' | 'IDEMPOTENCY_CONFLICT';
   message: string;
   issues: StubCheckoutIssueDto[];
 }
