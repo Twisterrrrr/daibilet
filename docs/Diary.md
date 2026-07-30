@@ -2754,3 +2754,27 @@
 
 - Start backend and smoke the HTTP endpoints in admin/supplier UI.
 - Connect the same admission validation path to YooKassa only after the HTTP/UI smoke is green.
+
+---
+
+## 2026-07-30 - Phase G: YooKassa admission checkout path
+
+### Decisions
+
+- Added a real YooKassa checkout path for `VENUE_ADMISSION`; venue entry tickets no longer need to be represented as fake open-date events for the payment path.
+- Reused the same admission validation as STUB checkout: active supplier, `PLATFORM`, `DAIBILET_MANAGED`, active manual offer, price >= 100 RUB, validity and stock checks.
+- YooKassa admission orders create `CheckoutItem.subjectType=VENUE_ADMISSION` with `admissionProductId` and `admissionOfferId`.
+- YooKassa metadata now carries admission product, admission offer, venue and city identifiers for reconciliation/support.
+- Pending/cancelled/expired YooKassa admission orders release `AdmissionProduct.ticketsVacant` through the same reserved-capacity reaper.
+
+### Verification
+
+- `pnpm backend:typecheck` passed.
+- `pnpm --filter @daibilet/contracts typecheck` passed.
+- Targeted DB smoke passed with fake YooKassa response: admission order was created, stock decremented once, and idempotent replay returned the same order.
+- `pnpm backend:test:ts` passed: 118 passed, 2 DB-dependent skipped.
+
+### Next
+
+- Start backend and smoke `POST /api/checkout/yookassa` for `phase-g-test-museum-entry` through HTTP.
+- Then run YooKassa sandbox with real LC credentials on the finance server.

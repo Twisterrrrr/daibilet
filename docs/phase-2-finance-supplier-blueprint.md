@@ -473,6 +473,7 @@ Venue admission note:
 - admin and supplier LC should manage admission products separately from event schedule, because venue admission usually has validity rules and ticket categories rather than slots.
 - Phase G local smoke seed exists: `pnpm backend:checkout:seed-stub-admission` creates supplier `phase-g-test-museum`, venue `phase-g-test-museum`, admission product `phase-g-test-museum-entry` and adult/discount offers.
 - Phase G STUB smoke: `pnpm backend:checkout:seed-stub-admission -- --order` creates/replays a `VENUE_ADMISSION` order with idempotency key `phase-g-admission-smoke-001`; stock reset requires explicit `-- --reset-capacity`.
+- Phase G YooKassa path is wired at backend level for `VENUE_ADMISSION`: order/payment/fulfillment rows keep admission product and offer ids, YooKassa metadata carries admission identifiers, and cancelled/expired pending orders release admission stock.
 
 ### Phase 2.4: orders and buyer account
 

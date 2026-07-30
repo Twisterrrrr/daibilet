@@ -3,6 +3,7 @@ import test from 'node:test';
 import { prisma } from '@daibilet/db';
 import {
   applyYooKassaWebhookPayload,
+  buildYooKassaAdmissionPaymentCreatePayload,
   buildYooKassaPaymentCreatePayload,
   classifyYooKassaReconcileAction,
   createYooKassaCheckoutOrder,
@@ -12,6 +13,7 @@ import {
   mapYooKassaPaymentStatus,
   readYooKassaRuntimeConfig,
   reconcileExpiredYooKassaCheckouts,
+  validateYooKassaAdmissionCheckoutReadiness,
   validateYooKassaCheckoutReadiness,
 } from './checkout-yookassa.js';
 
@@ -113,6 +115,51 @@ test('builds redirect payment payload without leaking internal raw objects', () 
   });
 });
 
+test('builds admission redirect payment payload with venue admission metadata', () => {
+  const payload = buildYooKassaAdmissionPaymentCreatePayload({
+    order: {
+      id: 'order_1',
+      publicCode: '7654321',
+      buyerEmail: 'buyer@daibilet.ru',
+      buyerPhone: '+79990000000',
+    },
+    product: {
+      id: 'adp_1',
+      slug: 'museum-entry',
+      title: 'Museum entry',
+      venueId: 'venue_1',
+      cityId: 'city_1',
+    },
+    offer: {
+      id: 'ado_1',
+      title: 'Adult',
+    },
+    totals: {
+      currency: 'RUB',
+      unitPriceKopecks: 70000,
+      subtotalKopecks: 70000,
+      discountKopecks: 0,
+      totalKopecks: 70000,
+      commissionKopecks: 7000,
+      netKopecks: 63000,
+    },
+    returnUrl: 'https://daibilet.ru/purchases/7654321?payment=yookassa',
+  });
+
+  assert.deepEqual(payload.amount, { value: '700.00', currency: 'RUB' });
+  assert.deepEqual(payload.metadata, {
+    source: 'daibilet',
+    subjectType: 'VENUE_ADMISSION',
+    checkoutOrderId: 'order_1',
+    publicCode: '7654321',
+    admissionProductId: 'adp_1',
+    admissionProductSlug: 'museum-entry',
+    admissionOfferId: 'ado_1',
+    venueId: 'venue_1',
+    cityId: 'city_1',
+  });
+});
+
 test('maps YooKassa statuses into local payment statuses', () => {
   assert.equal(mapYooKassaPaymentStatus('pending'), 'PENDING');
   assert.equal(mapYooKassaPaymentStatus('waiting_for_capture'), 'WAITING_FOR_CAPTURE');
@@ -171,6 +218,19 @@ test('adds YooKassa config blockers on top of checkout readiness', () => {
   assert.equal(issues[0]?.code, 'YOOKASSA_CHECKOUT_DISABLED');
 });
 
+test('adds YooKassa config blockers on top of admission checkout readiness', () => {
+  const issues = validateYooKassaAdmissionCheckoutReadiness({
+    config: readYooKassaRuntimeConfig({ NODE_ENV: 'test' } as NodeJS.ProcessEnv),
+    now,
+    product: admissionProductFixture(),
+    offer: admissionOfferFixture({ priceRub: 700 }),
+    supplier: supplierFixture(),
+    quantity: 1,
+  });
+
+  assert.equal(issues[0]?.code, 'YOOKASSA_CHECKOUT_DISABLED');
+});
+
 test('ignores malformed YooKassa webhook payload without touching DB', async () => {
   const result = await applyYooKassaWebhookPayload({}, {
     config: readYooKassaRuntimeConfig({ NODE_ENV: 'test', DAIBILET_YOOKASSA_VERIFY_WEBHOOK: '0' } as NodeJS.ProcessEnv),
@@ -179,6 +239,178 @@ test('ignores malformed YooKassa webhook payload without touching DB', async () 
 
   assert.equal(result.result, 'ignored');
   assert.equal(result.providerPaymentId, null);
+});
+
+test('YooKassa admission checkout creates pending payment and preserves idempotency', async (t) => {
+  if (!await canReachDatabase()) {
+    t.skip('database is not available');
+    return;
+  }
+
+  const suffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const cityId = `city_yk_admission_${suffix}`;
+  const venueId = `venue_yk_admission_${suffix}`;
+  const supplierId = `sup_yk_admission_${suffix}`;
+  const productId = `adp_yk_admission_${suffix}`;
+  const offerId = `ado_yk_admission_${suffix}`;
+  const idempotencyKey = `yk-admission-${suffix}`;
+
+  try {
+    await prisma.city.create({
+      data: {
+        id: cityId,
+        slug: `yookassa-admission-city-${suffix}`,
+        title: 'YooKassa admission city',
+      },
+    });
+    await prisma.venue.create({
+      data: {
+        id: venueId,
+        slug: `yookassa-admission-venue-${suffix}`,
+        title: 'YooKassa admission venue',
+        cityId,
+        kind: 'MUSEUM_ART_SPACE',
+      },
+    });
+    await prisma.supplier.create({
+      data: {
+        id: supplierId,
+        slug: `yookassa-admission-supplier-${suffix}`,
+        title: 'YooKassa admission supplier',
+        status: 'ACTIVE',
+        integrationMode: 'INTERNAL_SALES',
+        defaultCatalogMode: 'INTERNAL_CHECKOUT',
+        defaultCommissionBps: 1000,
+      },
+    });
+    await prisma.admissionProduct.create({
+      data: {
+        id: productId,
+        slug: `yookassa-admission-product-${suffix}`,
+        title: 'YooKassa admission product',
+        type: 'MUSEUM_ENTRY',
+        status: 'PUBLISHED',
+        purchaseFlow: 'PLATFORM',
+        managementMode: 'DAIBILET_MANAGED',
+        sourceCode: 'MANUAL',
+        priceFromRub: 700,
+        ticketsVacant: 5,
+        validityMode: 'OPEN_DATE',
+        venueId,
+        cityId,
+        supplierId,
+      },
+    });
+    await prisma.admissionOffer.create({
+      data: {
+        id: offerId,
+        admissionProductId: productId,
+        sourceCode: 'MANUAL',
+        title: 'Adult',
+        priceRub: 700,
+        active: true,
+      },
+    });
+
+    const fakeFetch = async () => new Response(JSON.stringify({
+      id: `pay_${suffix}`,
+      status: 'pending',
+      amount: { value: '700.00', currency: 'RUB' },
+      confirmation: {
+        type: 'redirect',
+        confirmation_url: `https://yookassa.test/pay/${suffix}`,
+      },
+    }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+
+    const result = await createYooKassaCheckoutOrder({
+      subjectType: 'VENUE_ADMISSION',
+      admissionProductId: productId,
+      admissionOfferId: offerId,
+      quantity: 1,
+      buyer: {
+        email: 'buyer@daibilet.ru',
+        name: 'Buyer',
+        phone: '+79990000000',
+      },
+      idempotencyKey,
+    }, {
+      config: readYooKassaRuntimeConfig({
+        NODE_ENV: 'test',
+        DAIBILET_YOOKASSA_CHECKOUT: '1',
+        YOOKASSA_SHOP_ID: 'shop_123',
+        YOOKASSA_SECRET_KEY: 'test_secret',
+        PUBLIC_SITE_URL: 'https://daibilet.ru',
+      } as NodeJS.ProcessEnv),
+      fetchImpl: fakeFetch,
+      now,
+    });
+
+    assert.equal(result.mode, 'YOOKASSA');
+    assert.equal(result.order.subject.type, 'VENUE_ADMISSION');
+    assert.equal(result.order.subject.admissionProductId, productId);
+    assert.equal(result.order.item.offerId, offerId);
+    assert.equal(result.order.payment.status, 'PENDING');
+    assert.equal(result.order.payment.providerPaymentId, `pay_${suffix}`);
+    assert.equal(result.order.payment.confirmationUrl, `https://yookassa.test/pay/${suffix}`);
+
+    const afterFirst = await prisma.admissionProduct.findUnique({
+      where: { id: productId },
+      select: { ticketsVacant: true },
+    });
+    assert.equal(afterFirst?.ticketsVacant, 4);
+
+    const replay = await createYooKassaCheckoutOrder({
+      subjectType: 'VENUE_ADMISSION',
+      admissionProductId: productId,
+      admissionOfferId: offerId,
+      quantity: 1,
+      buyer: {
+        email: 'buyer@daibilet.ru',
+        name: 'Buyer',
+        phone: '+79990000000',
+      },
+      idempotencyKey,
+    }, {
+      config: readYooKassaRuntimeConfig({
+        NODE_ENV: 'test',
+        DAIBILET_YOOKASSA_CHECKOUT: '1',
+        YOOKASSA_SHOP_ID: 'shop_123',
+        YOOKASSA_SECRET_KEY: 'test_secret',
+        PUBLIC_SITE_URL: 'https://daibilet.ru',
+      } as NodeJS.ProcessEnv),
+      fetchImpl: fakeFetch,
+      now,
+    });
+    assert.equal(replay.order.id, result.order.id);
+    assert.equal(replay.order.publicCode, result.order.publicCode);
+
+    const afterReplay = await prisma.admissionProduct.findUnique({
+      where: { id: productId },
+      select: { ticketsVacant: true },
+    });
+    assert.equal(afterReplay?.ticketsVacant, 4);
+  } finally {
+    await prisma.supplierLedgerEntry.deleteMany({ where: { supplierId } });
+    await prisma.fulfillmentItem.deleteMany({
+      where: { order: { items: { some: { admissionProductId: productId } } } },
+    });
+    await prisma.payment.deleteMany({
+      where: { order: { items: { some: { admissionProductId: productId } } } },
+    });
+    await prisma.checkoutItem.deleteMany({ where: { admissionProductId: productId } });
+    await prisma.checkoutOrder.deleteMany({
+      where: { items: { none: {} }, buyerEmail: 'buyer@daibilet.ru' },
+    });
+    await prisma.idempotencyKey.deleteMany({ where: { key: idempotencyKey } });
+    await prisma.admissionOffer.deleteMany({ where: { admissionProductId: productId } });
+    await prisma.admissionProduct.deleteMany({ where: { id: productId } });
+    await prisma.supplier.deleteMany({ where: { id: supplierId } });
+    await prisma.venue.deleteMany({ where: { id: venueId } });
+    await prisma.city.deleteMany({ where: { id: cityId } });
+  }
 });
 
 test('reconcile expires local YooKassa order without provider id and releases capacity once', async (t) => {
@@ -363,6 +595,56 @@ function supplierFixture(overrides: Record<string, unknown> = {}) {
     title: 'Supplier',
     status: 'ACTIVE',
     defaultCommissionBps: 1000,
+    ...overrides,
+  } as never;
+}
+
+function admissionProductFixture(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 'adp_1',
+    slug: 'museum-entry',
+    title: 'Museum entry',
+    type: 'MUSEUM_ENTRY',
+    status: 'PUBLISHED',
+    purchaseFlow: 'PLATFORM',
+    managementMode: 'DAIBILET_MANAGED',
+    salesStartsAt: null,
+    salesEndsAt: null,
+    validFrom: null,
+    validTo: null,
+    validDaysAfterPurchase: null,
+    validityMode: 'OPEN_DATE',
+    ticketsVacant: 20,
+    supplier: supplierFixture(),
+    venue: {
+      id: 'venue_1',
+      slug: 'museum',
+      title: 'Museum',
+      kind: 'MUSEUM_ART_SPACE',
+      city: {
+        id: 'city_1',
+        slug: 'moskva',
+        title: 'Москва',
+      },
+    },
+    city: {
+      id: 'city_1',
+      slug: 'moskva',
+      title: 'Москва',
+    },
+    ...overrides,
+  } as never;
+}
+
+function admissionOfferFixture(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 'ado_1',
+    admissionProductId: 'adp_1',
+    sourceCode: 'MANUAL',
+    title: 'Adult',
+    priceRub: 1000,
+    active: true,
+    capacityTotal: null,
     ...overrides,
   } as never;
 }

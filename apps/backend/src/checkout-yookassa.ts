@@ -19,8 +19,11 @@ import {
   classifyStubCheckoutSubject,
   computeStubCheckoutTotals,
   createUniquePublicCode,
+  decrementAdmissionCapacity,
   decrementCapacity,
   fulfillmentResultSelect,
+  isAdmissionCheckoutPayload,
+  loadStubCheckoutAdmissionProduct,
   loadStubCheckoutEvent,
   normalizeIdempotencyKey,
   normalizeStubCheckoutPayload,
@@ -28,8 +31,11 @@ import {
   resolveStubCheckoutSupplier,
   StubCheckoutError,
   toIso,
+  validateStubAdmissionCheckoutReadiness,
   validateStubCheckoutReadiness,
   writeSupplierLedgerEntries,
+  type StubCheckoutAdmissionOfferRow,
+  type StubCheckoutAdmissionProductRow,
   type StubCheckoutEventRow,
   type StubCheckoutOfferRow,
   type StubCheckoutSessionRow,
@@ -156,6 +162,15 @@ export async function createYooKassaCheckoutOrder(
   }
 
   const normalizedPayload = normalizeStubCheckoutPayload(payload);
+  if (isAdmissionCheckoutPayload(normalizedPayload)) {
+    return createYooKassaAdmissionCheckoutOrder(normalizedPayload, {
+      idempotencyKey,
+      now,
+      config,
+      ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}),
+    });
+  }
+
   const payloadHash = hashYooKassaCheckoutPayload(normalizedPayload);
   const event = await loadStubCheckoutEvent(normalizedPayload);
   const eventOfferId = normalizedPayload.offerId || '';
@@ -355,6 +370,192 @@ export async function createYooKassaCheckoutOrder(
   }
 }
 
+async function createYooKassaAdmissionCheckoutOrder(
+  normalizedPayload: YooKassaCheckoutCreateDto,
+  options: {
+    idempotencyKey: string;
+    now: Date;
+    config: YooKassaRuntimeConfig;
+    fetchImpl?: FetchLike;
+  },
+): Promise<YooKassaCheckoutResultDto> {
+  const { config, idempotencyKey, now } = options;
+  const payloadHash = hashYooKassaCheckoutPayload(normalizedPayload);
+  const product = await loadStubCheckoutAdmissionProduct(normalizedPayload);
+  const offer = product && normalizedPayload.admissionOfferId
+    ? await prisma.admissionOffer.findFirst({
+        where: { id: normalizedPayload.admissionOfferId, admissionProductId: product.id },
+        select: yookassaAdmissionOfferSelect,
+      })
+    : null;
+  const supplier = product?.supplier || null;
+  const issues = validateYooKassaAdmissionCheckoutReadiness({
+    config,
+    now,
+    product,
+    offer,
+    supplier,
+    quantity: normalizedPayload.quantity,
+  });
+  const blocking = issues.filter((issue) => issue.severity === 'high');
+  if (blocking.length) {
+    throw new YooKassaCheckoutError(blocking[0]?.code || 'ADMISSION_PRODUCT_NOT_FOUND', 422, issues);
+  }
+  if (!product || !offer || !supplier) {
+    throw new YooKassaCheckoutError('ADMISSION_PRODUCT_NOT_FOUND', 404, issues);
+  }
+
+  const replayedAfterValidation = await reserveYooKassaIdempotencyKey(idempotencyKey, product.id, payloadHash);
+  if (replayedAfterValidation) return replayedAfterValidation;
+
+  const totals = computeStubCheckoutTotals({
+    priceRub: offer.priceRub || 0,
+    quantity: normalizedPayload.quantity,
+    commissionBps: supplier.defaultCommissionBps || 0,
+  });
+  const expiresAt = new Date(now.getTime() + PAYMENT_CONFIRMATION_TTL_MINUTES * 60 * 1000);
+  let created: CreatedYooKassaCheckoutRows | null = null;
+
+  try {
+    created = await loadCreatedRowsForIdempotencyKey(idempotencyKey);
+    if (!created) {
+      created = await prisma.$transaction(async (tx) => {
+        await decrementAdmissionCapacity(tx, product, normalizedPayload.quantity);
+        const publicCode = await createUniquePublicCode(tx);
+        const order = await tx.checkoutOrder.create({
+          data: {
+            publicCode,
+            status: 'PENDING_PAYMENT',
+            currency: 'RUB',
+            subtotalKopecks: totals.subtotalKopecks,
+            discountKopecks: totals.discountKopecks,
+            totalKopecks: totals.totalKopecks,
+            commissionKopecks: totals.commissionKopecks,
+            buyerEmail: normalizedPayload.buyer.email,
+            buyerPhone: normalizedPayload.buyer.phone,
+            buyerName: normalizedPayload.buyer.name,
+            buyerSnapshot: {
+              mode: 'YOOKASSA',
+              buyer: {
+                email: normalizedPayload.buyer.email,
+                name: normalizedPayload.buyer.name,
+                phone: normalizedPayload.buyer.phone,
+              },
+              subjectType: 'VENUE_ADMISSION',
+            } satisfies Prisma.InputJsonObject,
+            expiresAt,
+          },
+          select: yookassaOrderResultSelect,
+        });
+        const item = await tx.checkoutItem.create({
+          data: {
+            checkoutOrderId: order.id,
+            subjectType: 'VENUE_ADMISSION',
+            supplierId: supplier.id,
+            admissionProductId: product.id,
+            admissionOfferId: offer.id,
+            title: product.title,
+            ticketTitle: offer.title,
+            status: 'RESERVED',
+            quantity: normalizedPayload.quantity,
+            unitPriceKopecks: totals.unitPriceKopecks,
+            totalKopecks: totals.totalKopecks,
+            commissionKopecks: totals.commissionKopecks,
+            attendeeName: normalizedPayload.attendee?.name || normalizedPayload.buyer.name,
+            attendeePhone: normalizedPayload.attendee?.phone || normalizedPayload.buyer.phone,
+            providerPayload: {
+              mode: 'YOOKASSA',
+              subjectType: 'VENUE_ADMISSION',
+              admissionProductId: product.id,
+              admissionProductSlug: product.slug,
+              admissionOfferId: offer.id,
+            },
+          },
+          select: yookassaItemResultSelect,
+        });
+        const payment = await tx.payment.create({
+          data: {
+            checkoutOrderId: order.id,
+            provider: 'YOOKASSA',
+            status: 'CREATED',
+            amountKopecks: totals.totalKopecks,
+            currency: 'RUB',
+            idempotenceKey: idempotencyKey,
+          },
+          select: yookassaPaymentResultSelect,
+        });
+        const fulfillment = await tx.fulfillmentItem.create({
+          data: {
+            checkoutOrderId: order.id,
+            checkoutItemId: item.id,
+            lineItemIndex: 0,
+            admissionOfferId: offer.id,
+            purchaseFlow: 'PLATFORM',
+            provider: 'INTERNAL',
+            status: 'PENDING',
+            amountKopecks: totals.totalKopecks,
+            providerData: {
+              mode: 'YOOKASSA',
+              publicCode,
+              subjectType: 'VENUE_ADMISSION',
+              admissionProductId: product.id,
+            },
+          },
+          select: yookassaFulfillmentResultSelect,
+        });
+        return { order, item, payment, fulfillment };
+      });
+      await markYooKassaIdempotencyLocalRows(idempotencyKey, created.order.id, created.payment.id, payloadHash);
+    }
+    if (created.payment.providerPaymentId && created.payment.confirmationUrl) {
+      const result = mapYooKassaAdmissionCheckoutResult({
+        created,
+        product,
+        offer,
+        supplier,
+        totals,
+        warnings: issues.filter((issue) => issue.severity !== 'high'),
+      });
+      await markYooKassaIdempotencySucceeded(idempotencyKey, created.order.id, result);
+      return result;
+    }
+    const paymentObject = await createYooKassaPayment({
+      config,
+      ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}),
+      idempotenceKey: idempotencyKey,
+      body: buildYooKassaAdmissionPaymentCreatePayload({
+        order: created.order,
+        product,
+        offer,
+        totals,
+        returnUrl: buildYooKassaReturnUrl(config.returnBaseUrl, created.order.publicCode),
+      }),
+    });
+    const persisted = await persistCreatedYooKassaAdmissionPayment({
+      created,
+      paymentObject,
+      supplier,
+      totals,
+    });
+    const result = mapYooKassaAdmissionCheckoutResult({
+      created: persisted,
+      product,
+      offer,
+      supplier,
+      totals,
+      warnings: issues.filter((issue) => issue.severity !== 'high'),
+    });
+    await markYooKassaIdempotencySucceeded(idempotencyKey, persisted.order.id, result);
+    return result;
+  } catch (error) {
+    await markYooKassaIdempotencyFailed(idempotencyKey, created?.order.id || product.id);
+    if (created) await markYooKassaCreateAttemptErrored(created, error);
+    if (error instanceof YooKassaCheckoutError) throw error;
+    if (error instanceof StubCheckoutError) throw new YooKassaCheckoutError(error.code, error.statusCode, error.issues);
+    throw new YooKassaCheckoutError('YOOKASSA_PAYMENT_FAILED', 502, [], errorToMessage(error));
+  }
+}
+
 export function validateYooKassaCheckoutReadiness(input: {
   config: YooKassaRuntimeConfig;
   now: Date;
@@ -370,6 +571,30 @@ export function validateYooKassaCheckoutReadiness(input: {
     event: input.event,
     offer: input.offer,
     session: input.session,
+    supplier: input.supplier,
+    quantity: input.quantity,
+  });
+  if (!input.config.enabled) {
+    issues.unshift(issue('YOOKASSA_CHECKOUT_DISABLED', 'YooKassa checkout выключен', 'high'));
+  } else if (!input.config.shopId || !input.config.secretKey) {
+    issues.unshift(issue('YOOKASSA_CONFIG_MISSING', 'Не заданы shop id или secret key YooKassa', 'high'));
+  }
+  return issues;
+}
+
+export function validateYooKassaAdmissionCheckoutReadiness(input: {
+  config: YooKassaRuntimeConfig;
+  now: Date;
+  product: StubCheckoutAdmissionProductRow | null;
+  offer: StubCheckoutAdmissionOfferRow | null;
+  supplier: StubCheckoutSupplierRow | null;
+  quantity: number;
+}): StubCheckoutIssueDto[] {
+  const issues = validateStubAdmissionCheckoutReadiness({
+    enabled: true,
+    now: input.now,
+    product: input.product,
+    offer: input.offer,
     supplier: input.supplier,
     quantity: input.quantity,
   });
@@ -408,6 +633,39 @@ export function buildYooKassaPaymentCreatePayload(input: {
       eventSlug: input.event.slug,
       offerId: input.offer.id,
       sessionId: input.session?.id || null,
+    },
+    merchant_customer_id: input.order.buyerEmail || input.order.buyerPhone || undefined,
+  };
+}
+
+export function buildYooKassaAdmissionPaymentCreatePayload(input: {
+  order: Pick<CreatedYooKassaCheckoutRows['order'], 'id' | 'publicCode' | 'buyerEmail' | 'buyerPhone'>;
+  product: Pick<StubCheckoutAdmissionProductRow, 'id' | 'slug' | 'title' | 'venueId' | 'cityId'>;
+  offer: Pick<StubCheckoutAdmissionOfferRow, 'id' | 'title'>;
+  totals: StubCheckoutTotalsDto;
+  returnUrl: string;
+}): Record<string, unknown> {
+  return {
+    amount: {
+      value: formatKopecksForYooKassa(input.totals.totalKopecks),
+      currency: 'RUB',
+    },
+    capture: true,
+    confirmation: {
+      type: 'redirect',
+      return_url: input.returnUrl,
+    },
+    description: trimForYooKassaDescription(`Daibilet admission ${input.order.publicCode}`),
+    metadata: {
+      source: 'daibilet',
+      subjectType: 'VENUE_ADMISSION',
+      checkoutOrderId: input.order.id,
+      publicCode: input.order.publicCode,
+      admissionProductId: input.product.id,
+      admissionProductSlug: input.product.slug,
+      admissionOfferId: input.offer.id,
+      venueId: input.product.venueId,
+      cityId: input.product.cityId,
     },
     merchant_customer_id: input.order.buyerEmail || input.order.buyerPhone || undefined,
   };
@@ -945,6 +1203,66 @@ async function persistCreatedYooKassaPayment(input: {
   return created;
 }
 
+async function persistCreatedYooKassaAdmissionPayment(input: {
+  created: CreatedYooKassaCheckoutRows;
+  paymentObject: YooKassaPaymentObject;
+  supplier: StubCheckoutSupplierRow;
+  totals: StubCheckoutTotalsDto;
+}): Promise<CreatedYooKassaCheckoutRows> {
+  const providerStatus = mapYooKassaPaymentStatus(input.paymentObject.status);
+  const confirmationUrl = input.paymentObject.confirmation?.confirmation_url || null;
+  const payment = await prisma.payment.update({
+    where: { id: input.created.payment.id },
+    data: {
+      status: providerStatus,
+      providerPaymentId: input.paymentObject.id,
+      confirmationUrl,
+      rawPayload: input.paymentObject as unknown as Prisma.InputJsonValue,
+      ...(providerStatus === 'SUCCEEDED'
+        ? { paidAt: new Date(), capturedAt: new Date() }
+        : {}),
+      ...(providerStatus === 'CANCELLED'
+        ? { cancelledAt: new Date(), error: stringifyYooKassaCancellation(input.paymentObject) }
+        : {}),
+    },
+    select: yookassaPaymentResultSelect,
+  });
+  const order = await prisma.checkoutOrder.update({
+    where: { id: input.created.order.id },
+    data: {
+      checkoutUrl: confirmationUrl,
+      ...(providerStatus === 'SUCCEEDED'
+        ? { status: 'CONFIRMED', paidAt: new Date(), confirmedAt: new Date() }
+        : {}),
+      ...(providerStatus === 'CANCELLED'
+        ? { status: 'CANCELLED', cancelledAt: new Date() }
+        : {}),
+    },
+    select: yookassaOrderResultSelect,
+  });
+  const created = { ...input.created, order, payment };
+  if (providerStatus === 'SUCCEEDED') {
+    return finalizeYooKassaPaidCheckout({
+      created,
+      supplier: input.supplier,
+      totals: input.totals,
+    });
+  }
+  if (providerStatus === 'CANCELLED') {
+    await prisma.$transaction(async (tx) => {
+      await tx.fulfillmentItem.updateMany({
+        where: { checkoutOrderId: input.created.order.id },
+        data: {
+          status: 'CANCELLED',
+          lastError: stringifyYooKassaCancellation(input.paymentObject),
+        },
+      });
+      await releaseReservedCapacityInTransaction(tx, input.created.order.id);
+    });
+  }
+  return created;
+}
+
 async function applyYooKassaPaymentObject(
   paymentObject: YooKassaPaymentObject,
   options: { now: Date },
@@ -1222,6 +1540,7 @@ async function releaseReservedCapacityInTransaction(tx: Prisma.TransactionClient
       id: true,
       eventId: true,
       sessionId: true,
+      admissionProductId: true,
       quantity: true,
     },
   });
@@ -1246,6 +1565,14 @@ async function releaseReservedCapacityInTransaction(tx: Prisma.TransactionClient
     if (item.eventId) {
       await tx.event.updateMany({
         where: { id: item.eventId, ticketsVacant: { not: null } },
+        data: {
+          ticketsVacant: { increment: item.quantity },
+        },
+      });
+    }
+    if (item.admissionProductId) {
+      await tx.admissionProduct.updateMany({
+        where: { id: item.admissionProductId, ticketsVacant: { not: null } },
         data: {
           ticketsVacant: { increment: item.quantity },
         },
@@ -1365,6 +1692,83 @@ function mapYooKassaCheckoutResult(input: {
   };
 }
 
+function mapYooKassaAdmissionCheckoutResult(input: {
+  created: CreatedYooKassaCheckoutRows;
+  product: StubCheckoutAdmissionProductRow;
+  offer: StubCheckoutAdmissionOfferRow;
+  supplier: StubCheckoutSupplierRow;
+  totals: StubCheckoutTotalsDto;
+  warnings: StubCheckoutIssueDto[];
+}): YooKassaCheckoutResultDto {
+  const publicCode = input.created.order.publicCode || input.created.order.id.slice(-7);
+  const city = input.product.city || input.product.venue.city || null;
+  return {
+    generatedAt: new Date().toISOString(),
+    mode: 'YOOKASSA',
+    order: {
+      id: input.created.order.id,
+      publicCode,
+      status: input.created.order.status,
+      createdAt: input.created.order.createdAt.toISOString(),
+      paidAt: toIso(input.created.order.paidAt),
+      confirmedAt: toIso(input.created.order.confirmedAt),
+      checkoutUrl: input.created.order.checkoutUrl,
+      expiresAt: toIso(input.created.order.expiresAt),
+      buyer: {
+        email: input.created.order.buyerEmail || '',
+        name: input.created.order.buyerName || null,
+        phone: input.created.order.buyerPhone || null,
+      },
+      subject: {
+        type: 'VENUE_ADMISSION',
+        eventId: null,
+        eventSlug: null,
+        eventTitle: null,
+        eventKind: null,
+        admissionProductId: input.product.id,
+        admissionProductSlug: input.product.slug,
+        admissionProductTitle: input.product.title,
+        admissionProductType: String(input.product.type),
+        cityId: city?.id || null,
+        citySlug: city?.slug || null,
+        cityTitle: city?.title || null,
+        venueId: input.product.venue.id,
+        venueSlug: input.product.venue.slug,
+        venueTitle: input.product.venue.title,
+      },
+      item: {
+        id: input.created.item.id,
+        supplierId: input.created.item.supplierId || input.supplier.id,
+        supplierTitle: input.supplier.title,
+        offerId: input.offer.id,
+        offerTitle: input.offer.title || null,
+        sessionId: null,
+        startsAt: null,
+        quantity: input.created.item.quantity,
+        ticketTitle: input.created.item.ticketTitle || input.offer.title || null,
+        status: input.created.item.status,
+      },
+      totals: input.totals,
+      payment: {
+        id: input.created.payment.id,
+        provider: 'YOOKASSA',
+        status: input.created.payment.status,
+        amountKopecks: input.created.payment.amountKopecks,
+        providerPaymentId: input.created.payment.providerPaymentId,
+        confirmationUrl: input.created.payment.confirmationUrl,
+        paidAt: toIso(input.created.payment.paidAt),
+      },
+      fulfillment: {
+        id: input.created.fulfillment.id,
+        status: input.created.fulfillment.status,
+        provider: 'INTERNAL',
+        purchaseFlow: 'PLATFORM',
+      },
+    },
+    warnings: input.warnings,
+  };
+}
+
 function extractYooKassaWebhookEvent(payload: unknown): {
   eventType: string;
   paymentId: string | null;
@@ -1391,9 +1795,13 @@ function buildYooKassaReturnUrl(baseUrl: string, publicCode: string | null): str
 
 function hashYooKassaCheckoutPayload(payload: YooKassaCheckoutCreateDto): string {
   const stablePayload = {
+    subjectType: cleanString(payload.subjectType),
     eventId: cleanString(payload.eventId),
     eventSlug: cleanString(payload.eventSlug),
+    admissionProductId: cleanString(payload.admissionProductId),
+    admissionProductSlug: cleanString(payload.admissionProductSlug),
     offerId: cleanString(payload.offerId),
+    admissionOfferId: cleanString(payload.admissionOfferId),
     sessionId: cleanString(payload.sessionId),
     quantity: Math.trunc(Number(payload.quantity || 0)),
     buyerEmail: cleanString(payload.buyer?.email)?.toLowerCase() || '',
@@ -1669,6 +2077,16 @@ const yookassaOfferSelect = {
   active: true,
   capacityTotal: true,
 } satisfies Prisma.EventOfferSelect;
+
+const yookassaAdmissionOfferSelect = {
+  id: true,
+  admissionProductId: true,
+  sourceCode: true,
+  title: true,
+  priceRub: true,
+  active: true,
+  capacityTotal: true,
+} satisfies Prisma.AdmissionOfferSelect;
 
 const yookassaSessionSelect = {
   id: true,
