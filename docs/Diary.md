@@ -1,3 +1,26 @@
+## 2026-07-30 - MIG.9 Phase 3 partial: Codex finance host `.159` beyond P0–2
+
+### Наблюдения
+- Inspection agent `e2ac1fb7` на Diligent Polydeuces `85.193.80.159`: Codex продвинул host за Phase 0–2.
+- Docker `daibilet-finance-postgres` на `127.0.0.1:5437` - migrations + seed smoke OK.
+- systemd `daibilet-finance-api` слушает `127.0.0.1:4100`.
+- nginx HTTP: `supplier.daibilet.ru` / `checkout.daibilet.ru` / `finance.daibilet.ru` → supplier dist + `/api` → `:4100`.
+- Git: `/opt/daibilet-finance/app` на `codex/phase2-finance-supplier` @ `d2477ae`.
+- STUB checkout **on**, YooKassa **off**; TLS ещё нет.
+- Codex SSH key на хосте; MSK catalog `.184` не затронут.
+- DNS stub A для finance hostnames всё ещё owner TODO (Timeweb).
+
+### Решения
+- Docs-only sync: [spb-finance-host.md](./spb-finance-host.md), [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md), Tasktracker MIG.9.2–9.3.
+- **Не** SSH-менять `.159` пока Codex активен; **не** трогать MSK.
+- Следующий owner-блокер: DNS stub A → затем certbot TLS → Phase 5 YooKassa.
+
+### Проблемы
+- Без DNS stub нельзя закрыть TLS / публичный smoke HTTPS.
+- Параллельный agent SSH на finance host рискует конфликтом с Codex - координация обязательна.
+
+---
+
 ## 2026-07-30 - Event covers: empty cards / Volna / evt-auto 404
 
 ### Наблюдения
@@ -16,7 +39,8 @@
 - API restart с обновлённым `event-image-url.ts` / `dto.js`. Web: failed `next build` (Google Fonts) → restore `.next` из backup, service up.
 
 ### Проблемы
-- Frontend fallback **не** в prod bundle до успешного web build вне MSK egress или с self-hosted fonts.
+- ~~Frontend fallback не в prod bundle~~ ✅ SPB `pnpm web:build` @`205f36c` → MSK `BUILD_ID=upzsYYlMO145GFc83zNSH` (без build на MSK). Smoke: Волна `Event866` CDN; `/events` sample CDN, не серые.
+- Параллельные агенты гоняли `restore-next.sh` / `redeploy-next.sh` (откат на `nR2dEtI6`) - артефакты sidelined, guard на `/tmp/redeploy-next.sh`.
 - TEP sync с MSK не обновит свежие обложки, пока DNS/egress не починят.
 - `ensure-catalog-covers` должен деплоить generated files вместе с DB URL (сейчас URL без файла = серые карточки).
 
@@ -65,14 +89,17 @@
 - В `afishaPromos.moscow.imageUrl` был `/images/events/generated/evt-auto-3287bba11438.jpg` (первый session cover из city page).
 - Прямой URL: **404** (файла нет в `/opt/daibilet/apps/web/public/images/events/generated/` - только ручные `evt-cover-*`). nginx `location ^~ /images/` → alias web/public.
 - `BlogAfishaPromo` использовал сырой `next/image` без SafeImage / unoptimized для `/images/*`.
+- Fallback на teplohod CDN через `/_next/image` на MSK → **504** (egress мёртв).
 
 ### Решения
-- Hotfix MSK: сгенерирован JPEG через sharp в path evt-auto; сброшен `.next/cache/images`; restart web → `/_next/image` 200.
-- Код: `buildBlogSidebarPromoFromCityPage` предпочитает remote https cover, иначе `resolveCityCardImage` (не локальные evt-auto).
-- `BlogAfishaPromo` → `SafeImage` (bypass optimizer для `/images/*` и ticketscloud CDN).
+- Hotfix: JPEG evt-auto через sharp + сброс image cache (symptomatic).
+- Код: sidebar предпочитает `resolveCityCardImage` (`/images/cities/{slug}.png`), remote только fallback; `BlogAfishaPromo` → `SafeImage`.
+- Deploy: build на SPB `.16` (fonts) → scp `.next` tarball на MSK `BUILD_ID=kkULngvTnDkN3AMjjxotB`; revalidate `blog-page`.
+- Proof: moscow `imageUrl=/images/cities/moscow.png`, optimizer 200.
 
 ### Проблемы
-- DB/ensure-catalog-covers пишет `evt-auto-*` в imageUrl, но файлы не всегда попадают на MSK web/public после sync/deploy.
+- MSK `pnpm web:build` без webpack font-cache падает на `fonts.googleapis.com` (EAI_AGAIN) - только SPB/CI build.
+- Параллельный `systemctl stop daibilet-web` на MSK мешал restore; нужен single-flight deploy.
 
 ---
 

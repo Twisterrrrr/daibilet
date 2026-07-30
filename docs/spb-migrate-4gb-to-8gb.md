@@ -11,7 +11,7 @@
 |------------------|-----|----------|-------------|
 | **Friendly Pheasant** | `201.24.125.184` | catalog / prod | **battle catalog:** public, admin, import, SEO, TC/Teplohod catalog |
 | **Intelligent Hoopoe** | `213.171.7.16` | old SPB 4 ГБ (post-MIG.8) | **temporary** finance/staging/build scaffolding → **retire** after smoke on `.159` |
-| **Diligent Polydeuces** | `85.193.80.159` | new SPB 8 ГБ | **battle finance:** primary finance / supplier / buyer checkout |
+| **Diligent Polydeuces** | `85.193.80.159` | Phase 3 partial (API+HTTP; no TLS) | **battle finance:** primary finance / supplier / buyer checkout |
 
 **Коротко:** `.184` = battle catalog · `.159` = battle finance · `.16` = scaffolding, then demolish.
 
@@ -135,14 +135,19 @@ Host daibilet-spb8 spb8 daibilet-finance
 ### Phase 2 - Postgres finance (primary)
 
 - [x] **Fresh** Docker volume `daibilet-finance-pg-data` + DB `daibilet_finance` (не catalog dump); container `daibilet-finance-postgres`, bind `127.0.0.1:5437`.
+- [x] Migrations + seed smoke (Codex, inspection 2026-07-30).
 - [ ] Optional staging PG отдельно (`:5438`).
 - [x] Leftover catalog volume на `.16` - только forensic / migration source (не трогали).
 
-### Phase 3 - Finance app + domains
+### Phase 3 - Finance app + domains (partial - Codex active)
 
-- [ ] Deploy finance/checkout/supplier runtime на `.159`.
-- [ ] nginx + TLS для **`checkout.daibilet.ru`** (primary), `supplier.daibilet.ru`, optional `finance-api.daibilet.ru` / `pay.daibilet.ru` alias.
+- [x] Deploy finance runtime: `/opt/daibilet-finance/app` · `codex/phase2-finance-supplier` @ `d2477ae`.
+- [x] systemd `daibilet-finance-api` на `127.0.0.1:4100`.
+- [x] nginx **HTTP** vhosts: `supplier.daibilet.ru` / `checkout.daibilet.ru` / `finance.daibilet.ru` → supplier dist + `/api` → `:4100`.
+- [x] STUB checkout **on**; YooKassa **off**.
+- [ ] TLS (certbot) - **после** DNS stub A от owner.
 - [ ] Catalog `.184` → checkout links / API base URL на finance host (env), без shared DB.
+- [ ] **Не** SSH-менять `.159` параллельно с Codex; **не** трогать MSK.
 
 ### Phase 4 - Staging/build scaffolding (temporary on `.159`)
 
@@ -193,13 +198,13 @@ Host daibilet-spb8 spb8 daibilet-finance
 
 - [x] Phase 0 SSH + firewall (DNS stub ⏳ owner)
 - [x] Phase 1 base stack
-- [x] Phase 2 finance PG fresh (empty, localhost)
-- [ ] Phase 3 finance app + `checkout` / `supplier` TLS
+- [x] Phase 2 finance PG fresh + migrations/seed smoke
+- [~] Phase 3 finance app + HTTP vhosts (TLS ⏳ after DNS)
 - [ ] Phase 4 optional staging/build move
 - [ ] Phase 5 YooKassa new webhook + keep old until confirmed
 - [ ] Phase 6 smoke
 - [ ] Phase 7 backup + retire `.16`
-- [ ] Docs lock: `spb-finance-host.md` + `current-state.md` + Project architecture (partial update 2026-07-30)
+- [x] Docs lock: `spb-finance-host.md` + MIG.9 tracker (TLS/DNS cutover ещё open)
 
 ---
 
@@ -218,14 +223,15 @@ Grep hitlist после retire: `spb-finance-host.md`, `current-state.md`, `depl
 ## 8. Следующий физический шаг
 
 ```bash
-# DNS stub в Timeweb (owner):
+# DNS stub в Timeweb (owner) - БЛОКЕР TLS:
 # A checkout.daibilet.ru → 85.193.80.159
 # A supplier.daibilet.ru → 85.193.80.159
+# A finance.daibilet.ru → 85.193.80.159   # уже в nginx HTTP
 # optional A finance-api.daibilet.ru → 85.193.80.159
 # НЕ трогать apex/www/api/admin → .184
 
-ssh daibilet-spb8   # уже работает
-# дальше Phase 3: finance/checkout app + certbot после DNS
+# Codex активен на .159 - не параллельный SSH-деплой без координации.
+# После DNS: certbot TLS → затем Phase 5 YooKassa (сейчас off; STUB checkout on).
 ```
 
-Phase 0–2 на `.159` сделаны 2026-07-30. YooKassa live / payment secrets - не выдумывать.
+Phase 0–2 ✅; Phase 3 partial (API `:4100` + HTTP nginx, no TLS) - Codex @ `d2477ae`. YooKassa live / payment secrets - не выдумывать.

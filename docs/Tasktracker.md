@@ -50,13 +50,13 @@
 | MIG.6 | Smoke на МСК (IP/`--resolve`) до DNS | Критический | ✅ |
 | MIG.7 | DNS A `daibilet.ru`/`www` → `201.24.125.184` + post-smoke | Критический | ✅ 2026-07-30 |
 | MIG.8 | СПб: stop public web/api + TC timer + crontab sync; PG snapshot; host → finance+staging | Средний | ✅ 2026-07-30 · [spb-finance-host.md](./spb-finance-host.md) |
-| MIG.9 | Role lock: `.184` catalog · `.159` battle finance · `.16` retire after smoke | Высокий | 🔒 docs 2026-07-30 · [spb-finance-host.md](./spb-finance-host.md) |
-| MIG.9.0 | Phase 0: SSH/firewall `.159` + DNS stub `checkout`/`supplier`/(opt `finance-api`) | Критический | ✅ SSH/UFW 2026-07-30 · DNS stub ⏳ owner Timeweb |
+| MIG.9 | Role lock: `.184` catalog · `.159` battle finance · `.16` retire after smoke | Высокий | 🔒 docs 2026-07-30 · Codex beyond P0–2 · [spb-finance-host.md](./spb-finance-host.md) |
+| MIG.9.0 | Phase 0: SSH/firewall `.159` + DNS stub `checkout`/`supplier`/`finance` | Критический | ✅ SSH/UFW 2026-07-30 · DNS stub ⏳ owner Timeweb |
 | MIG.9.1 | Phase 1: base stack docker/nginx/node на `.159` | Высокий | ✅ 2026-07-30 |
-| MIG.9.2 | Phase 2: fresh finance PG на `.159` (не catalog dump) | Критический | ✅ empty PG `:5437` localhost 2026-07-30 |
-| MIG.9.3 | Phase 3: finance app + TLS `checkout.daibilet.ru` (primary), `supplier.daibilet.ru` | Критический | ⏳ |
+| MIG.9.2 | Phase 2: fresh finance PG на `.159` (не catalog dump) | Критический | ✅ PG `:5437` + migrations/seed smoke 2026-07-30 |
+| MIG.9.3 | Phase 3: finance app + HTTP/TLS `checkout`/`supplier`/`finance` | Критический | 🔄 partial: API `:4100` + nginx HTTP; TLS ⏳ · Codex `d2477ae` · STUB on / YooKassa off |
 | MIG.9.4 | Phase 4: optional staging/build scaffolding на `.159` (не justification для `.16`) | Средний | ⏳ |
-| MIG.9.5 | Phase 5: YooKassa webhook → новый finance API; старый держать до smoke | Критический | ⏳ |
+| MIG.9.5 | Phase 5: YooKassa webhook → новый finance API; старый держать до smoke | Критический | ⏳ YooKassa off |
 | MIG.9.6 | Phase 6: smoke checkout/supplier/webhook; catalog `.184` без cutover | Критический | ⏳ |
 | MIG.9.7 | Phase 7: backup `.16` + retention 7–14d + retire Intelligent Hoopoe | Высокий | ⏳ |
 | PERF.OOM4 | MSK: снять `cpus:1`/`workerThreads:false`, heap build 5120Mi | Высокий | ✅ |
@@ -381,8 +381,8 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | CC.4 | Prod backfill: promote + generate пустые hubs (Sortavala и др.) | Критический | ✅ venues promote 939 + gen 9; events 55 (11 groups); `no_hero=0` / `no_image=0` @`5fcc79d` |
 | CC.5 | Prod audit 2026-07-30: empty/city=0; 24 evt-auto (8→CDN venue, 16 files on disk); Volna→TEP866 | Критический | ✅ data+API on MSK |
 | CC.6 | Backend: durable CDN/venue before ephemeral `evt-auto` in `pickFirstUsableEventImageUrl` | Высокий | ✅ code on MSK API |
-| CC.7 | Frontend EventCard city fallback on SafeImage error | Высокий | ⏳ code in workspace; MSK `next build` blocked by egress/fonts |
-| CC.8 | MSK egress: TEP sync + `next/font` Google Fonts (rebuild web) | Высокий | ⏳ blocked INC.504.1 |
+| CC.7 | Frontend EventCard city fallback on SafeImage error | Высокий | ✅ `205f36c` SPB build → MSK `BUILD_ID=upzsYYlMO145GFc83zNSH` |
+| CC.8 | MSK egress: TEP sync + `next/font` Google Fonts (rebuild web) | Высокий | ⏳ blocked INC.504.1; web rebuild via SPB workaround |
 
 ---
 
@@ -973,6 +973,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-30 | MIG.9.3 🔄 Codex на `.159`: `daibilet-finance-api` `:4100`, nginx HTTP supplier/checkout/finance, PG migrations+seed; TLS/DNS stub ⏳; MSK не трогали |
 | 2026-07-30 | MIG.9.0–9.2 ✅ Diligent Polydeuces `.159`: SSH `daibilet_spb_finance`, UFW, docker/nginx/node/pnpm, empty finance PG; DNS stub ⏳ |
 | 2026-07-30 | MIG.9 🔒 role lock: `.184` catalog · `.159` battle finance · `.16` retire; phases 9.0–9.7 + checkout DNS |
 | 2026-07-30 | MIG.9 ⏳ план (superseded by role lock): СПб 4ГБ→8ГБ; catalog MSK |
