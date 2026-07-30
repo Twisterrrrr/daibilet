@@ -75,7 +75,7 @@
 | CF.0 | Docs lock: boundary + projection matrix + don'ts | Критический | ✅ 2026-07-30 | Cursor |
 | CF.P0 | **PurchaseProjection**: admin (External+Checkout), buyer «Мои покупки», supplier CheckoutItems | Критический | ✅ finance `.159` @ `00aa9dcf` / smoke 2026-07-30 | Codex |
 | CF.P0b | Gate: no wide internal sales CTA на `.184` until catalog client+UI | Критический | 🔓 client+UI shipped; wide YooKassa still off; CTA only `canSell` | both |
-| CF.P1 | Finance public read APIs: supplier / venue summary / AdmissionProduct list+detail (`canSell`) | Высокий | ✅ `.159` @ `0c1e464` smoke 200 | Codex |
+| CF.P1 | Finance public read APIs: supplier / venue summary / AdmissionProduct list+detail (`canSell`) | Высокий | ✅ `.159` @ `0c1e464` + harden `114dd391` (DTO/canSell/PLATFORM tests + runbook) | Codex |
 | CF.P1b | Catalog read client → finance (`FINANCE_API_BASE_URL` + Host + 3s timeout) | Высокий | ✅ `finance-projection-client.ts` | Cursor |
 | CF.P1c | Service auth catalog↔finance (m2m) - token code ready, env unset | Высокий | ⏳ optional | owner+Cursor |
 | CF.P2 | Venue page блок «Входные билеты» (test museum) | Высокий | ✅ UI; slug bridge `phase-g-test-museum` если нет в catalog | Cursor |
@@ -993,6 +993,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-30 | CF.P1 harden ✅ Codex `114dd391`: public DTO guards (no paymentMode/ids; checkoutPath⇔canSell; PLATFORM) + finance-159-smoke-runbook; `.184` untouched |
 | 2026-07-30 | CF.P1b+P2 ✅ catalog finance client + venue/city admission UI; CTA canSell; env FINANCE_*; P2c `/events` later; slug bridge test museum |
 | 2026-07-30 | CF.P0+P1 ✅ deploy `.159` @ `0c1e464`: PurchaseProjection + public admission APIs; STUB smoke `7649542` idempotent; YooKassa off (no creds); next CF.P1b/P2 Cursor |
 | 2026-07-30 | CF.0 ✅ lock catalog↔finance projection ([catalog-finance-projection.md](./catalog-finance-projection.md)); CF.P0–P3 backlog; qa checkout/projection/auth |

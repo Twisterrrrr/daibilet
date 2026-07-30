@@ -1,3 +1,21 @@
+## 2026-07-30 - Codex CF.P1 contract harden `114dd391`
+
+### Наблюдения
+- Codex на `codex/phase2-finance-supplier`: `114dd391 test: guard finance projection contract`.
+- Regression: public DTO не светит `paymentMode`, provider/source ids, checkout/internal order ids.
+- Guards: `checkoutPath` только при `canSell === true`; public admission держит `purchaseFlow=PLATFORM`.
+- Runbook `.159`: `docs/finance-159-smoke-runbook.md` (finance tree) связан с каноном catalog-finance-projection.
+- Проверки: backend/contracts `tsc --noEmit`, `public-finance-projection.test.ts`. Worktree чистый; `.184` / TC/TEP/widgets/secrets не трогали.
+
+### Решения
+- Принято как hardening поверх P0/P1 - runtime redeploy `.159` не обязателен (tests+docs), tip commit для handoff = `114dd391`.
+- Catalog UI уже зеркалит canSell/checkoutPath; контрактные тесты на finance снижают риск регрессии API.
+
+### Проблемы
+- Runbook пока только в finance worktree - в monorepo catalog указана ссылка, файл не дублировали.
+
+---
+
 ## 2026-07-30 - CF.P1b+P2 catalog admission UI + finance projection client
 
 ### Наблюдения
@@ -12,9 +30,10 @@
 - Wide YooKassa по-прежнему off; STUB на finance.
 
 ### Проблемы
-- Catalog venue со slug `phase-g-test-museum` может отсутствовать - без slug bridge venue page 404, city hub `/cities/moskva` может показать блок если MSK→.159:80 доступен.
-- DNS `checkout.daibilet.ru` / TLS ещё owner; без DNS browser CTA на default host может не резолвиться.
-- Если MSK не достучится до `.159` - UI пустой (fail-soft), код всё равно на месте.
+- Catalog venue со slug `phase-g-test-museum` отсутствует в MSK Postgres (0 rows) - нужен slug bridge / seed venue.
+- **MSK → finance `.159`:** curl timeout 3s - сеть/firewall, live projection с catalog fail-soft пустой.
+- DNS `checkout.daibilet.ru` / TLS ещё owner; GitHub DNS на MSK тоже мёртв (deploy через SPB scp `.next`).
+- Deploy: `8fa3d00b` + hotfix `0989c2b3` (ISR: `next.revalidate:60` вместо `cache:no-store`); MSK `BUILD_ID=4eAVTHv8N2eeWrzHSw76F`; FINANCE_* в `/opt/daibilet/.env`.
 
 ---
 

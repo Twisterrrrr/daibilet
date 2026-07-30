@@ -5,7 +5,7 @@
 **Product blueprint:** [phase-2-finance-supplier-blueprint.md](./phase-2-finance-supplier-blueprint.md)  
 **Branches:** catalog docs / consumer на `feat/next-monorepo`; finance runtime Codex на `.159` (`codex/phase2-finance-supplier`); admission foundation Cursor на `cursor/phase-g-admission-checkout`.
 
-Этот документ - **канон границы** между каталогом и финконтуром. **CF.P0+P1 на finance `.159` закрыты** (`0c1e464`); **CF.P1b+P2 catalog client/UI** - на `feat/next-monorepo` (deploy MSK + slug bridge для test museum).
+Этот документ - **канон границы** между каталогом и финконтуром. **CF.P0+P1 на finance `.159` закрыты** (`0c1e464` + contract harden `114dd391`); **CF.P1b+P2 catalog client/UI** - на `feat/next-monorepo` (deploy MSK + slug bridge для test museum). Smoke ops: finance branch `docs/finance-159-smoke-runbook.md` (ссылается сюда).
 
 ---
 
@@ -179,13 +179,14 @@ Venue page может иметь admission **независимо** от афи�
 
 | Check | Result |
 |-------|--------|
-| Git | `codex/phase2-finance-supplier` @ `0c1e464` (ff `d2477ae`→`0c1e464`) |
+| Git | `codex/phase2-finance-supplier` @ `114dd391` (runtime API still `0c1e464`+; harden = contract tests) |
 | Health | `GET /api/health` → 200 |
 | Public list/detail/venue/supplier | 200; seed `phase-g-test-museum-entry`; `canSell=true`; `checkoutPath` set; **no** `paymentMode` |
+| Contract guards (`114dd391`) | public DTO без `paymentMode` / provider·source ids / checkout·internal order ids; `checkoutPath` только при `canSell===true`; admission `purchaseFlow=PLATFORM` |
 | STUB admission | `POST /api/checkout/stub` → 201 `publicCode=7649542`; idempotent retry same code |
 | PurchaseProjection | admin+buyer+supplier rows see STUB order |
 | YooKassa | **off** (`DAIBILET_YOOKASSA_CHECKOUT=0`); `YOOKASSA_SHOP_ID` / `SECRET_KEY` **missing** |
-| MSK `.184` | не трогали |
+| MSK `.184` | CF.P1b+P2 code deployed (`BUILD_ID=4eAVTHv8N2eeWrzHSw76F`); FINANCE_* env set; **MSK→.159 timeout**; no catalog venue `phase-g-test-museum` |
 
 ---
 
@@ -195,7 +196,7 @@ Venue page может иметь admission **независимо** от афи�
 |-----|-----|------|-------|--------|
 | **P0** | CF.P0 | **PurchaseProjection** on finance | Codex | ✅ deployed `.159` |
 | **P0** | CF.P0b | Gate: no wide CTA on `.184` until catalog client+UI ready | both | 🔒 still gated |
-| **P1** | CF.P1 | Finance **public read** projection endpoints | Codex | ✅ deployed `.159` |
+| **P1** | CF.P1 | Finance **public read** projection endpoints | Codex | ✅ deployed `.159` + contract tests `114dd391` |
 | **P1** | CF.P1b | Catalog read client + env (`FINANCE_API_BASE_URL`, service auth) | Cursor | ✅ code + deploy env hook |
 | **P1** | CF.P1c | m2m token on `.159` + catalog | owner + Cursor | ⏳ optional token code ready; env unset |
 | **P2** | CF.P2 | Venue page admission block (test museum) | Cursor | ✅ code (needs catalog venue slug `phase-g-test-museum`) |
