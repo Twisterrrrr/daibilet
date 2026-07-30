@@ -940,6 +940,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | C.3.2 | Supplier LC read-first API/app shell | Высокий | ✅ 2026-07-22 (`/api/supplier/*`, `apps/supplier`) |
 | C.3.3 | STUB checkout на одном ручном событии | Высокий | ✅ 2026-07-22 (`POST /api/checkout/stub`) |
 | C.3.4 | YooKassa sandbox checkout + webhook | Высокий | ✅ 2026-07-30 backend; live smoke через ЛК ожидает |
+| C.3.5 | YooKassa pending-payment reaper/reconcile | Высокий | ✅ 2026-07-30 CLI; cron/systemd wiring + live smoke ожидают |
 
 ---
 

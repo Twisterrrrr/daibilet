@@ -25,6 +25,7 @@
     "admin-events:parity": "tsx scripts/admin-events-parity.ts",
     "admin-orders:parity": "tsx scripts/admin-orders-parity.ts",
     "checkout:seed-stub": "tsx scripts/seed-stub-checkout-event.ts",
+    "checkout:yookassa:reconcile": "tsx scripts/reconcile-yookassa-checkout.ts",
     "tep:fixture-bridge": "node ../../scripts/teplohod-fixture-bridge.js"
   },
   "engines": {

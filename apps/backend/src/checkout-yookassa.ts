@@ -7,6 +7,9 @@ import type {
   YooKassaCheckoutErrorDto,
   YooKassaCheckoutOrderDto,
   YooKassaCheckoutResultDto,
+  YooKassaReconcileAction,
+  YooKassaReconcileOrderDto,
+  YooKassaReconcileResultDto,
   YooKassaWebhookResultDto,
 } from '@daibilet/contracts/checkout';
 import { prisma, type Prisma } from '@daibilet/db';
@@ -84,6 +87,8 @@ interface CreatedYooKassaCheckoutRows {
   payment: Prisma.PaymentGetPayload<{ select: typeof yookassaPaymentResultSelect }>;
   fulfillment: Prisma.FulfillmentItemGetPayload<{ select: typeof yookassaFulfillmentResultSelect }>;
 }
+
+type YooKassaReconcileCandidate = Prisma.CheckoutOrderGetPayload<{ select: typeof yookassaReconcileCandidateSelect }>;
 
 export class YooKassaCheckoutError extends Error {
   readonly statusCode: number;
@@ -423,6 +428,83 @@ export function mapYooKassaPaymentStatus(status: string): LocalPaymentStatus {
   }
 }
 
+export function classifyYooKassaReconcileAction(input: {
+  hasLocalPayment: boolean;
+  localExpired: boolean;
+  providerPaymentId: string | null;
+  remoteStatus?: string | null;
+  failed?: boolean;
+}): YooKassaReconcileAction {
+  if (input.failed) return 'FAILED';
+  if (!input.hasLocalPayment) return 'SKIPPED_NO_PAYMENT';
+  if (!input.localExpired) return 'SKIPPED_NOT_EXPIRED';
+  if (!input.providerPaymentId) return 'LOCAL_EXPIRED_WITHOUT_PROVIDER_PAYMENT';
+  switch (input.remoteStatus) {
+    case 'succeeded':
+      return 'REMOTE_SUCCEEDED';
+    case 'canceled':
+      return 'REMOTE_CANCELLED';
+    case 'waiting_for_capture':
+      return 'REMOTE_WAITING';
+    case 'pending':
+      return 'REMOTE_PENDING';
+    default:
+      return 'REMOTE_FAILED';
+  }
+}
+
+export async function reconcileExpiredYooKassaCheckouts(
+  options: {
+    now?: Date;
+    limit?: number;
+    dryRun?: boolean;
+    graceMinutes?: number;
+    orderId?: string | null;
+    config?: YooKassaRuntimeConfig;
+    fetchImpl?: FetchLike;
+  } = {},
+): Promise<YooKassaReconcileResultDto> {
+  const now = options.now || new Date();
+  const dryRun = options.dryRun !== false;
+  const limit = normalizeReconcileLimit(options.limit);
+  const graceMinutes = Math.max(0, Math.trunc(options.graceMinutes ?? 5));
+  const expiredBefore = new Date(now.getTime() - graceMinutes * 60 * 1000);
+  const config = options.config || readYooKassaRuntimeConfig();
+  const candidates = await prisma.checkoutOrder.findMany({
+    where: {
+      ...(options.orderId ? { id: options.orderId } : {}),
+      status: 'PENDING_PAYMENT',
+      expiresAt: { lte: expiredBefore },
+      payments: {
+        some: {
+          provider: 'YOOKASSA',
+          status: { in: ['CREATED', 'PENDING', 'WAITING_FOR_CAPTURE', 'FAILED'] },
+        },
+      },
+    },
+    orderBy: { expiresAt: 'asc' },
+    take: limit,
+    select: yookassaReconcileCandidateSelect,
+  });
+  const orders: YooKassaReconcileOrderDto[] = [];
+
+  for (const candidate of candidates) {
+    orders.push(await reconcileYooKassaCandidate(candidate, {
+      config,
+      dryRun,
+      ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}),
+      now,
+    }));
+  }
+
+  return summarizeYooKassaReconcileResult({
+    generatedAt: now.toISOString(),
+    dryRun,
+    limit,
+    orders,
+  });
+}
+
 export async function applyYooKassaWebhookPayload(
   payload: unknown,
   options: {
@@ -485,6 +567,175 @@ export async function applyYooKassaWebhookPayload(
     });
     throw error;
   }
+}
+
+async function reconcileYooKassaCandidate(
+  candidate: YooKassaReconcileCandidate,
+  options: {
+    now: Date;
+    dryRun: boolean;
+    config: YooKassaRuntimeConfig;
+    fetchImpl?: FetchLike;
+  },
+): Promise<YooKassaReconcileOrderDto> {
+  const localPayment = candidate.payments[0] || null;
+  const base = {
+    orderId: candidate.id,
+    publicCode: candidate.publicCode || null,
+    paymentId: localPayment?.id || null,
+    providerPaymentId: localPayment?.providerPaymentId || null,
+    beforeOrderStatus: String(candidate.status || ''),
+    afterOrderStatus: String(candidate.status || ''),
+    beforePaymentStatus: localPayment ? String(localPayment.status || '') : null,
+    afterPaymentStatus: localPayment ? String(localPayment.status || '') : null,
+    remoteStatus: null,
+  };
+  const localExpired = Boolean(candidate.expiresAt && candidate.expiresAt <= options.now);
+  if (!localPayment) {
+    return {
+      ...base,
+      action: classifyYooKassaReconcileAction({
+        hasLocalPayment: false,
+        localExpired,
+        providerPaymentId: null,
+      }),
+      reason: 'No local YooKassa payment row is attached to the pending order.',
+    };
+  }
+  if (!localExpired) {
+    return {
+      ...base,
+      action: classifyYooKassaReconcileAction({
+        hasLocalPayment: true,
+        localExpired,
+        providerPaymentId: localPayment.providerPaymentId || null,
+      }),
+      reason: 'Order is still inside the local payment window.',
+    };
+  }
+  if (!localPayment.providerPaymentId) {
+    if (!options.dryRun) {
+      await expireLocalUnboundYooKassaOrder({
+        orderId: candidate.id,
+        paymentId: localPayment.id,
+        now: options.now,
+      });
+    }
+    const after = options.dryRun
+      ? { orderStatus: String(candidate.status || ''), paymentStatus: String(localPayment.status || '') }
+      : await loadYooKassaOrderPaymentStatus(candidate.id, localPayment.id);
+    return {
+      ...base,
+      afterOrderStatus: after.orderStatus,
+      afterPaymentStatus: after.paymentStatus,
+      action: 'LOCAL_EXPIRED_WITHOUT_PROVIDER_PAYMENT',
+      reason: options.dryRun
+        ? 'Would expire local order because provider payment id was never persisted.'
+        : 'Expired local order because provider payment id was never persisted.',
+    };
+  }
+
+  try {
+    const paymentObject = await getYooKassaPayment({
+      config: options.config,
+      ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}),
+      paymentId: localPayment.providerPaymentId,
+    });
+    const action = classifyYooKassaReconcileAction({
+      hasLocalPayment: true,
+      localExpired,
+      providerPaymentId: localPayment.providerPaymentId,
+      remoteStatus: paymentObject.status,
+    });
+    if (!options.dryRun) {
+      await applyYooKassaPaymentObject(paymentObject, { now: options.now });
+    }
+    const after = options.dryRun
+      ? { orderStatus: String(candidate.status || ''), paymentStatus: String(localPayment.status || '') }
+      : await loadYooKassaOrderPaymentStatus(candidate.id, localPayment.id);
+    return {
+      ...base,
+      afterOrderStatus: after.orderStatus,
+      afterPaymentStatus: after.paymentStatus,
+      remoteStatus: paymentObject.status || null,
+      action,
+      reason: reasonForYooKassaReconcileAction(action, options.dryRun),
+    };
+  } catch (error) {
+    return {
+      ...base,
+      action: 'FAILED',
+      reason: errorToMessage(error),
+    };
+  }
+}
+
+async function expireLocalUnboundYooKassaOrder(input: {
+  orderId: string;
+  paymentId: string;
+  now: Date;
+}): Promise<boolean> {
+  const expired = await prisma.$transaction(async (tx) => {
+    const orderUpdate = await tx.checkoutOrder.updateMany({
+      where: {
+        id: input.orderId,
+        status: 'PENDING_PAYMENT',
+      },
+      data: {
+        status: 'EXPIRED',
+        cancelledAt: input.now,
+        checkoutUrl: null,
+      },
+    });
+    if (orderUpdate.count !== 1) return false;
+    await tx.payment.updateMany({
+      where: {
+        id: input.paymentId,
+        provider: 'YOOKASSA',
+        providerPaymentId: null,
+        status: { in: ['CREATED', 'PENDING', 'WAITING_FOR_CAPTURE', 'FAILED'] },
+      },
+      data: {
+        status: 'FAILED',
+        cancelledAt: input.now,
+        error: 'expired_without_provider_payment_id',
+      },
+    });
+    await tx.fulfillmentItem.updateMany({
+      where: {
+        checkoutOrderId: input.orderId,
+        status: { in: ['PENDING', 'RESERVING', 'RESERVED', 'FAILED'] },
+      },
+      data: {
+        status: 'CANCELLED',
+        lastError: 'Payment expired before YooKassa provider payment id was persisted.',
+      },
+    });
+    await releaseReservedCapacityInTransaction(tx, input.orderId);
+    return true;
+  });
+  return expired;
+}
+
+async function loadYooKassaOrderPaymentStatus(orderId: string, paymentId: string): Promise<{
+  orderStatus: string | null;
+  paymentStatus: string | null;
+}> {
+  const order = await prisma.checkoutOrder.findUnique({
+    where: { id: orderId },
+    select: {
+      status: true,
+      payments: {
+        where: { id: paymentId },
+        take: 1,
+        select: { status: true },
+      },
+    },
+  });
+  return {
+    orderStatus: order ? String(order.status || '') : null,
+    paymentStatus: order?.payments[0] ? String(order.payments[0].status || '') : null,
+  };
 }
 
 async function reserveYooKassaWebhookDedupe(input: {
@@ -677,10 +928,6 @@ async function persistCreatedYooKassaPayment(input: {
   }
   if (providerStatus === 'CANCELLED') {
     await prisma.$transaction(async (tx) => {
-      await tx.checkoutItem.updateMany({
-        where: { checkoutOrderId: input.created.order.id },
-        data: { status: 'CANCELLED' },
-      });
       await tx.fulfillmentItem.updateMany({
         where: { checkoutOrderId: input.created.order.id },
         data: {
@@ -688,8 +935,8 @@ async function persistCreatedYooKassaPayment(input: {
           lastError: stringifyYooKassaCancellation(input.paymentObject),
         },
       });
+      await releaseReservedCapacityInTransaction(tx, input.created.order.id);
     });
-    await releaseReservedCapacity(input.created.order.id);
   }
   return created;
 }
@@ -791,6 +1038,7 @@ async function applyYooKassaPaymentObject(
   }
 
   if (providerStatus === 'CANCELLED' || providerStatus === 'FAILED') {
+    const shouldReleaseCapacity = !wasTerminal && !['CONFIRMED', 'FULFILLED'].includes(String(payment.order.status));
     await prisma.$transaction(async (tx) => {
       await tx.payment.update({
         where: { id: payment.id },
@@ -809,10 +1057,6 @@ async function applyYooKassaPaymentObject(
             cancelledAt: providerStatus === 'CANCELLED' ? options.now : payment.order.cancelledAt,
           },
         });
-        await tx.checkoutItem.updateMany({
-          where: { checkoutOrderId: orderId },
-          data: { status: 'CANCELLED' },
-        });
         await tx.fulfillmentItem.updateMany({
           where: { checkoutOrderId: orderId },
           data: {
@@ -820,11 +1064,9 @@ async function applyYooKassaPaymentObject(
             lastError: stringifyYooKassaCancellation(paymentObject),
           },
         });
+        if (shouldReleaseCapacity) await releaseReservedCapacityInTransaction(tx, orderId);
       }
     });
-    if (!wasTerminal && !['CONFIRMED', 'FULFILLED'].includes(String(payment.order.status))) {
-      await releaseReservedCapacity(orderId);
-    }
     return {
       result: 'processed',
       paymentDbId: payment.id,
@@ -955,10 +1197,6 @@ async function failCreatedYooKassaCheckout(created: CreatedYooKassaCheckoutRows,
         cancelledAt: new Date(),
       },
     });
-    await tx.checkoutItem.update({
-      where: { id: created.item.id },
-      data: { status: 'CANCELLED' },
-    });
     await tx.fulfillmentItem.update({
       where: { id: created.fulfillment.id },
       data: {
@@ -966,40 +1204,50 @@ async function failCreatedYooKassaCheckout(created: CreatedYooKassaCheckoutRows,
         lastError: errorToMessage(error),
       },
     });
+    await releaseReservedCapacityInTransaction(tx, created.order.id);
   });
-  await releaseReservedCapacity(created.order.id);
 }
 
-async function releaseReservedCapacity(orderId: string): Promise<void> {
-  const items = await prisma.checkoutItem.findMany({
-    where: { checkoutOrderId: orderId },
+async function releaseReservedCapacityInTransaction(tx: Prisma.TransactionClient, orderId: string): Promise<void> {
+  const items = await tx.checkoutItem.findMany({
+    where: {
+      checkoutOrderId: orderId,
+      status: 'RESERVED',
+    },
     select: {
+      id: true,
       eventId: true,
       sessionId: true,
       quantity: true,
     },
   });
-  await prisma.$transaction(async (tx) => {
-    for (const item of items) {
-      if (item.sessionId) {
-        await tx.eventSession.updateMany({
-          where: { id: item.sessionId, ticketsVacant: { not: null } },
-          data: {
-            ticketsVacant: { increment: item.quantity },
-            capacitySold: { decrement: item.quantity },
-          },
-        });
-      }
-      if (item.eventId) {
-        await tx.event.updateMany({
-          where: { id: item.eventId, ticketsVacant: { not: null } },
-          data: {
-            ticketsVacant: { increment: item.quantity },
-          },
-        });
-      }
+  for (const item of items) {
+    const claimed = await tx.checkoutItem.updateMany({
+      where: {
+        id: item.id,
+        status: 'RESERVED',
+      },
+      data: { status: 'CANCELLED' },
+    });
+    if (claimed.count !== 1) continue;
+    if (item.sessionId) {
+      await tx.eventSession.updateMany({
+        where: { id: item.sessionId, ticketsVacant: { not: null } },
+        data: {
+          ticketsVacant: { increment: item.quantity },
+          capacitySold: { decrement: item.quantity },
+        },
+      });
     }
-  });
+    if (item.eventId) {
+      await tx.event.updateMany({
+        where: { id: item.eventId, ticketsVacant: { not: null } },
+        data: {
+          ticketsVacant: { increment: item.quantity },
+        },
+      });
+    }
+  }
 }
 
 async function confirmFirstCheckoutItem(tx: Prisma.TransactionClient, orderId: string, now: Date) {
@@ -1279,6 +1527,72 @@ async function markYooKassaIdempotencyFailed(key: string | null, eventId: string
   });
 }
 
+function summarizeYooKassaReconcileResult(input: {
+  generatedAt: string;
+  dryRun: boolean;
+  limit: number;
+  orders: YooKassaReconcileOrderDto[];
+}): YooKassaReconcileResultDto {
+  const summary: YooKassaReconcileResultDto = {
+    generatedAt: input.generatedAt,
+    dryRun: input.dryRun,
+    limit: input.limit,
+    checked: input.orders.length,
+    processed: 0,
+    succeeded: 0,
+    cancelled: 0,
+    expired: 0,
+    failed: 0,
+    skipped: 0,
+    orders: input.orders,
+  };
+  for (const order of input.orders) {
+    if (order.action === 'SKIPPED_NOT_EXPIRED' || order.action === 'SKIPPED_NO_PAYMENT') {
+      summary.skipped += 1;
+      continue;
+    }
+    if (order.action === 'FAILED') {
+      summary.failed += 1;
+      continue;
+    }
+    if (!input.dryRun) summary.processed += 1;
+    if (order.action === 'REMOTE_SUCCEEDED') summary.succeeded += 1;
+    if (order.action === 'REMOTE_CANCELLED') summary.cancelled += 1;
+    if (order.action === 'LOCAL_EXPIRED_WITHOUT_PROVIDER_PAYMENT') summary.expired += 1;
+    if (order.action === 'REMOTE_FAILED') summary.failed += 1;
+  }
+  return summary;
+}
+
+function reasonForYooKassaReconcileAction(action: YooKassaReconcileAction, dryRun: boolean): string {
+  const prefix = dryRun ? 'Would apply: ' : '';
+  switch (action) {
+    case 'REMOTE_SUCCEEDED':
+      return `${prefix}remote YooKassa payment succeeded.`;
+    case 'REMOTE_CANCELLED':
+      return `${prefix}remote YooKassa payment was cancelled.`;
+    case 'REMOTE_FAILED':
+      return `${prefix}remote YooKassa status maps to local failed payment.`;
+    case 'REMOTE_WAITING':
+      return `${prefix}remote YooKassa payment is waiting for capture; capacity remains reserved.`;
+    case 'REMOTE_PENDING':
+      return `${prefix}remote YooKassa payment is still pending; capacity remains reserved.`;
+    case 'LOCAL_EXPIRED_WITHOUT_PROVIDER_PAYMENT':
+      return `${prefix}local order can be expired because provider payment id is missing.`;
+    case 'SKIPPED_NOT_EXPIRED':
+      return 'Order is not expired yet.';
+    case 'SKIPPED_NO_PAYMENT':
+      return 'Order has no local YooKassa payment row.';
+    case 'FAILED':
+      return 'Reconcile failed.';
+  }
+}
+
+function normalizeReconcileLimit(value: number | undefined): number {
+  if (!Number.isFinite(value)) return 50;
+  return Math.min(500, Math.max(1, Math.trunc(Number(value))));
+}
+
 function totalsFromOrderAndItem(
   order: Pick<CreatedYooKassaCheckoutRows['order'], 'currency' | 'subtotalKopecks' | 'discountKopecks' | 'totalKopecks' | 'commissionKopecks'>,
   item: Pick<CreatedYooKassaCheckoutRows['item'], 'unitPriceKopecks'>,
@@ -1386,3 +1700,20 @@ const yookassaPaymentResultSelect = {
 const yookassaFulfillmentResultSelect = {
   ...fulfillmentResultSelect,
 } satisfies Prisma.FulfillmentItemSelect;
+
+const yookassaReconcileCandidateSelect = {
+  id: true,
+  publicCode: true,
+  status: true,
+  expiresAt: true,
+  payments: {
+    where: { provider: 'YOOKASSA' },
+    orderBy: { createdAt: 'desc' },
+    take: 1,
+    select: {
+      id: true,
+      status: true,
+      providerPaymentId: true,
+    },
+  },
+} satisfies Prisma.CheckoutOrderSelect;

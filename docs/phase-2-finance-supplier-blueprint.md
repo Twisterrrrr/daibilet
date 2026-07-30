@@ -381,8 +381,9 @@ Status 2026-07-30:
 - done: `Idempotency-Key` is mandatory for `POST /api/checkout/yookassa` and is bound to the checkout payload;
 - done: checkout redirect return URL is generated from server config, not accepted from arbitrary client input;
 - done: route has a lightweight origin allowlist and in-memory rate limit; nginx/app-level production rate limits are still required;
+- done: reconciliation/reaper CLI for expired `CheckoutOrder(PENDING_PAYMENT)` rows; remote YooKassa status is applied when `providerPaymentId` exists, and local reservations without provider id are expired safely.
 - note: fiscal receipts are still not sent automatically; this must be enabled only after YooKassa/54-FZ settings and operator flow are approved.
-- next before broad public enable: reconciliation/reaper job for abandoned `CheckoutOrder(PENDING_PAYMENT)` rows with expired `expiresAt`.
+- next before broad public enable: run live sandbox smoke, wire a scheduled server job for `pnpm backend:checkout:yookassa:reconcile -- --apply`, and add operator review for remote `pending` / `waiting_for_capture` payments that stay non-terminal for too long.
 
 Sandbox env:
 

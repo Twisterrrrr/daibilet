@@ -34,6 +34,7 @@
     "worker": "pnpm --filter @daibilet/worker start",
     "worker:health": "pnpm --filter @daibilet/worker health",
     "backend:checkout:seed-stub": "pnpm --filter @daibilet/backend checkout:seed-stub",
+    "backend:checkout:yookassa:reconcile": "corepack pnpm --filter @daibilet/backend checkout:yookassa:reconcile",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:validate": "pnpm --filter @daibilet/db db:validate",

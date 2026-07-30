@@ -164,6 +164,45 @@ export interface YooKassaWebhookResultDto {
   result: 'processed' | 'duplicate' | 'ignored' | 'not_found';
 }
 
+export type YooKassaReconcileAction =
+  | 'REMOTE_SUCCEEDED'
+  | 'REMOTE_CANCELLED'
+  | 'REMOTE_FAILED'
+  | 'REMOTE_WAITING'
+  | 'REMOTE_PENDING'
+  | 'LOCAL_EXPIRED_WITHOUT_PROVIDER_PAYMENT'
+  | 'SKIPPED_NOT_EXPIRED'
+  | 'SKIPPED_NO_PAYMENT'
+  | 'FAILED';
+
+export interface YooKassaReconcileOrderDto {
+  orderId: string;
+  publicCode: string | null;
+  paymentId: string | null;
+  providerPaymentId: string | null;
+  beforeOrderStatus: string | null;
+  afterOrderStatus: string | null;
+  beforePaymentStatus: string | null;
+  afterPaymentStatus: string | null;
+  remoteStatus: string | null;
+  action: YooKassaReconcileAction;
+  reason: string | null;
+}
+
+export interface YooKassaReconcileResultDto {
+  generatedAt: string;
+  dryRun: boolean;
+  limit: number;
+  checked: number;
+  processed: number;
+  succeeded: number;
+  cancelled: number;
+  expired: number;
+  failed: number;
+  skipped: number;
+  orders: YooKassaReconcileOrderDto[];
+}
+
 export interface StubCheckoutErrorDto {
   error: 'stub_checkout_error';
   code: StubCheckoutIssueCode | 'IDEMPOTENCY_IN_PROGRESS' | 'IDEMPOTENCY_CONFLICT';
