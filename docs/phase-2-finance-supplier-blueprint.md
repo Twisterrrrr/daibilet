@@ -483,6 +483,14 @@ Venue admission note:
 - manual operational notes;
 - no technical ids in UI.
 
+Status 2026-07-30:
+
+- gap found during finance server smoke: `POST /api/checkout/stub` creates `CheckoutOrder`, but current admin orders API still reads imported `ExternalOrder`;
+- next required slice before enabling real internal checkout: `PurchaseProjection` DTO/API that combines `CheckoutOrder` and `ExternalOrder` into one operator/buyer/supplier view;
+- admin should see internal orders with public code, buyer, subject, payment, fulfillment and supplier split, without raw provider/source ids;
+- supplier LC should see only its own `CheckoutItem` rows and payout/commission state;
+- buyer account should show both widget/imported purchases and Daibilet checkout purchases under "Мои покупки".
+
 ### Phase 2.5: supplier LC MVP
 
 - ✅ read-first supplier dashboard: `GET /api/supplier/dashboard`;

@@ -2778,3 +2778,36 @@
 
 - Start backend and smoke `POST /api/checkout/yookassa` for `phase-g-test-museum-entry` through HTTP.
 - Then run YooKassa sandbox with real LC credentials on the finance server.
+
+---
+
+## 2026-07-30 - Phase G: finance server bootstrap
+
+### Decisions
+
+- Bootstrapped the isolated finance/supplier contour on the new 8GB SPb server `85.193.80.159`.
+- Kept TC/Teplohod out of this server on purpose: imported ticketing systems stay in the catalog contour, while finance handles only managed suppliers, admissions, internal checkout, orders and supplier LC.
+- Deployed branch `codex/phase2-finance-supplier` into `/opt/daibilet-finance/app`.
+- Reused the local finance Postgres container `daibilet-finance-postgres` on `127.0.0.1:5437`.
+- Added systemd service `daibilet-finance-api.service` on `127.0.0.1:4100`.
+- Added nginx HTTP site for future `supplier.daibilet.ru`, `finance.daibilet.ru` and `checkout.daibilet.ru`; SSL is deferred until DNS points to the server.
+- YooKassa remains disabled in server env until real sandbox credentials are placed explicitly.
+
+### Verification
+
+- `pnpm install --frozen-lockfile` passed on the server.
+- `pnpm db:generate` and `pnpm db:deploy` passed; 21 migrations applied to `daibilet_finance`.
+- `pnpm backend:typecheck` passed on the server.
+- `pnpm supplier:typecheck` passed on the server.
+- Seeded supplier `phase-g-test-museum`, venue `phase-g-test-museum` and admission product `phase-g-test-museum-entry`.
+- `pnpm supplier:build` passed; supplier shell bundle is available in `apps/supplier/dist`.
+- `GET /api/health` works through direct localhost and nginx host-header smoke.
+- Admin admission read API returns the test admission product with `canSell=true`.
+- Supplier admission read API returns the same product behind admin basic auth.
+- Listing health returns `review` only because the test product has no image.
+- STUB checkout through nginx created confirmed admission order public code `3313354`.
+
+### Found Gap
+
+- `GET /api/admin/orders` currently reads imported `ExternalOrder` rows, while STUB/YooKassa checkout writes `CheckoutOrder`.
+- Before enabling real internal sales, add a unified purchase projection for admin, supplier LC and buyer account so internal checkout orders are visible operationally.
