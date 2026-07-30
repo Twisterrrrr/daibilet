@@ -130,7 +130,7 @@ test('pickCityHubArticles: explicit CMS citySlug wins over title heuristics', ()
   assert.ok(allSlugs(onMsk).includes('msk-about-spb-word'));
 });
 
-test('matchArticleSessions: prefers keyword hits over quality fallback', () => {
+test('matchArticleSessions: prefers keyword hits', () => {
   const article = card({
     slug: 'spb-rooftop',
     title: 'Крыши и open-air Петербурга',
@@ -161,7 +161,7 @@ test('matchArticleSessions: prefers keyword hits over quality fallback', () => {
   assert.equal(matched[0]?.id, '2');
 });
 
-test('matchArticleSessions: falls back to quality when no keywords hit', () => {
+test('matchArticleSessions: empty when no keywords hit (no quality fallback)', () => {
   const article = card({
     slug: 'generic-tips',
     title: 'Как выбрать формат',
@@ -183,5 +183,71 @@ test('matchArticleSessions: falls back to quality when no keywords hit', () => {
     },
   ];
   const matched = matchArticleSessions(article, sessions, 1);
-  assert.equal(matched[0]?.id, 'rich');
+  assert.equal(matched.length, 0);
+});
+
+test('matchArticleSessions: ekb countryside guide does not attach standup', () => {
+  const article = card({
+    slug: 'ekb-uralskiy-mars-bazhovskie-ekskursii',
+    title: 'Уральский Марс и Бажовские места: топ загородных экскурсий из Екатеринбурга',
+    excerpt:
+      'Как выбрать выезд из Екатеринбурга: карьеры Уральского Марса, Оленьи ручьи, бажовская Сысерть.',
+    articleType: 'gid',
+    citySlug: 'ekaterinburg',
+  });
+  const sessions = [
+    {
+      id: 'standup-1',
+      title: 'Стендап открытый микрофон',
+      category: 'Стендап',
+      tags: ['стендап', 'юмор'],
+      startsAt: '2026-07-24T18:00:00Z',
+      imageUrl: '/s1.jpg',
+      priceFrom: 500,
+    },
+    {
+      id: 'standup-2',
+      title: 'Большой стендап концерт',
+      category: 'Юмор',
+      tags: ['standup'],
+      startsAt: '2026-07-25T19:00:00Z',
+      imageUrl: '/s2.jpg',
+      priceFrom: 1500,
+    },
+    {
+      id: 'tour-1',
+      title: 'Экскурсия к Уральскому Марсу',
+      category: 'Экскурсии',
+      tags: ['загород', 'экскурсия'],
+      startsAt: '2026-07-26T10:00:00Z',
+      priceFrom: 2000,
+    },
+  ];
+  const matched = matchArticleSessions(article, sessions, 4);
+  assert.deepEqual(
+    matched.map((s) => s.id),
+    ['tour-1'],
+  );
+});
+
+test('matchArticleSessions: rejects orthogonal topic even on weak keyword overlap', () => {
+  const article = card({
+    slug: 'ekb-uralskiy-mars-bazhovskie-ekskursii',
+    title: 'Уральский Марс и Бажовские места',
+    excerpt: 'Загородные экскурсии из Екатеринбурга',
+    citySlug: 'ekaterinburg',
+  });
+  const sessions = [
+    {
+      id: 'standup-city',
+      title: 'Стендап в Екатеринбурге',
+      category: 'Стендап',
+      tags: ['стендап'],
+      startsAt: '2026-07-24T18:00:00Z',
+      imageUrl: '/s.jpg',
+      priceFrom: 800,
+    },
+  ];
+  const matched = matchArticleSessions(article, sessions, 3);
+  assert.equal(matched.length, 0);
 });

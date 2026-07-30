@@ -290,6 +290,7 @@
 | CV.6c | Home hero tourist emotions (people-first, не landmarks) | Высокий | ✅ `home/hero-emotion-0{1-6}.jpg` + HeroBanner migrate `20260726010000` |
 | CV.7 | Podborki listing: inline buy на плитках | Низкий | ⏳ покупка уже на CHPU landing |
 | CV.8 | Blog: auto related events по тегам статьи | Средний | 🚫 rejected: misfire риск убивает native conversion; только manual `[buy]` / admin field |
+| CV.8a | City hub «Зачем ехать»: related sessions без quality fallback + topic intersect | Высокий | ✅ `matchArticleSessions` empty-on-miss; standup≠tours; tests |
 | CV.9 | Venue logistics «как найти» (эпик; owner иногда зовёт «Спринт CV.5» - **не** путать с CV.5 discounts) | Высокий | ✅ `714822c` CV.9a-d; OSM→Yandex unify deferred; [venue-logistics-spec.md](./venue-logistics-spec.md); prod = migrate+deploy |
 | CV.9a | Prisma: `Venue.metroStation` / `wayToFind` / `parkingInfo` + migrate | Высокий | ✅ `20260725120000_venue_logistics` |
 | CV.9b | Admin CMS: секция «Логистика» в Next `/admin/venues/[id]` + PATCH (`normalizeVenuePayload` / `updateAdminVenue`); address sync-only readonly | Высокий | ✅ |

@@ -1,5 +1,6 @@
 import type { BlogCardDto } from './blog-utils.ts';
 import { normalizeBlogCitySlug } from './blog-meta.ts';
+import { resolveBlogTopics, type BlogTopicId } from './blog-topics.ts';
 
 export type CityHubArticleBucket =
   | 'about'
@@ -341,22 +342,50 @@ function articleKeywords(article: BlogCardDto): string[] {
     .slice(0, 10);
 }
 
-function scoreArticleSession(session: CityHubSessionMatchInput, keywords: string[]): number {
-  if (!keywords.length) return 0;
-  const text = normalizeText(
+function sessionHaystack(session: CityHubSessionMatchInput): string {
+  return normalizeText(
     [session.title, session.category, session.venue, ...(session.tags || []), ...(session.subcategories || [])].join(
       ' ',
     ),
   );
+}
+
+function scoreArticleSession(session: CityHubSessionMatchInput, keywords: string[]): number {
+  if (!keywords.length) return 0;
+  const text = sessionHaystack(session);
   return keywords.reduce((score, keyword) => score + (text.includes(keyword) ? 1 : 0), 0);
 }
 
-function sessionQualityScore(session: CityHubSessionMatchInput): number {
-  let score = 0;
-  if (session.imageUrl) score += 3;
-  if (typeof session.priceFrom === 'number' && session.priceFrom >= 100) score += 2;
-  if (session.tags?.length) score += 1;
-  return score;
+/** Сильные сигналы категории события - для отсева ортогональных тем. */
+const SESSION_TOPIC_RE: Array<{ topic: BlogTopicId; re: RegExp }> = [
+  { topic: 'standup', re: /стендап|standup|stendap|комик|open\s*mic|открыт(ый|ого)\s+микрофон|юмор/i },
+  { topic: 'kids', re: /детск|для\s+детей|семь|0\+|6\+|family|kids/i },
+  { topic: 'concerts', re: /концерт|джаз|jazz|музык|рок[- ]?групп/i },
+  { topic: 'river', re: /речн|теплоход|прогулка\s+на\s+воде|каналы/i },
+  { topic: 'tours', re: /экскурси|обзорн|автобус|загород|квест|escape|двор|парадн|маршрут/i },
+  { topic: 'routes', re: /пешеходн|самостоятельн|маршрут\s+на\s+\d/i },
+];
+
+function detectSessionTopics(session: CityHubSessionMatchInput): BlogTopicId[] {
+  const raw = [session.title, session.category, ...(session.tags || []), ...(session.subcategories || [])]
+    .filter(Boolean)
+    .join(' ');
+  const found = new Set<BlogTopicId>();
+  for (const rule of SESSION_TOPIC_RE) {
+    if (rule.re.test(raw)) found.add(rule.topic);
+  }
+  return [...found];
+}
+
+/**
+ * Если у статьи есть явные темы и у события тоже - требуем пересечение.
+ * Иначе стендап может пролезть по слабому keyword (город/«места»).
+ */
+function isSessionTopicCompatible(articleTopics: BlogTopicId[], session: CityHubSessionMatchInput): boolean {
+  if (!articleTopics.length) return true;
+  const sessionTopics = detectSessionTopics(session);
+  if (!sessionTopics.length) return true;
+  return sessionTopics.some((topic) => articleTopics.includes(topic));
 }
 
 function startsAtMs(session: CityHubSessionMatchInput): number {
@@ -365,8 +394,9 @@ function startsAtMs(session: CityHubSessionMatchInput): number {
 }
 
 /**
- * До 3 сессий хаба под тизер статьи: keyword match, иначе quality fallback.
- * Только уже загруженные sessions города — без новых запросов.
+ * До N сессий хаба под тизер статьи: только keyword + совместимость тем.
+ * Без quality fallback: лучше пустой список, чем чужие события (стендап у гайда про экскурсии).
+ * Только уже загруженные sessions города - без новых запросов.
  */
 export function matchArticleSessions<T extends CityHubSessionMatchInput>(
   article: BlogCardDto,
@@ -375,23 +405,22 @@ export function matchArticleSessions<T extends CityHubSessionMatchInput>(
 ): T[] {
   if (!sessions.length || limit <= 0) return [];
   const keywords = articleKeywords(article);
-  const matched = sessions
+  if (!keywords.length) return [];
+
+  const articleTopics = resolveBlogTopics({
+    slug: article.slug,
+    title: article.title,
+    tag: article.tag,
+    excerpt: article.excerpt,
+  });
+
+  return sessions
     .map((session) => ({ session, score: scoreArticleSession(session, keywords) }))
-    .filter((item) => item.score > 0)
+    .filter((item) => item.score > 0 && isSessionTopicCompatible(articleTopics, item.session))
     .sort((left, right) => {
       if (right.score !== left.score) return right.score - left.score;
       return startsAtMs(left.session) - startsAtMs(right.session);
     })
     .slice(0, limit)
     .map((item) => item.session);
-
-  if (matched.length) return matched;
-
-  return [...sessions]
-    .sort((a, b) => {
-      const quality = sessionQualityScore(b) - sessionQualityScore(a);
-      if (quality) return quality;
-      return startsAtMs(a) - startsAtMs(b);
-    })
-    .slice(0, limit);
 }

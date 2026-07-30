@@ -1,3 +1,20 @@
+## 2026-07-30 - City hub «Зачем ехать»: no wrong related events
+
+### Наблюдения
+- Жалоба: карточка `ekb-uralskiy-mars-bazhovskie-ekskursii` на хабе Екб показывала только стендап под тизером.
+- `CityHubArticleTeaser` → `matchArticleSessions`: при 0 keyword hits был **quality fallback** по всей афише города (фото + цена) - для Екб это стендап.
+- Frontmatter статьи без relatedEventIds; mapping `country-tours` / topic `tours` корректны - баг в матчере, не в MD.
+
+### Решения
+- Убран quality fallback: нет совпадений → пустой список (лучше без ссылок, чем чужие).
+- Доп. фильтр: если у статьи и у события есть детектируемые темы - требуем пересечение (стендап vs tours).
+- Тесты: empty-on-miss + ekb countryside vs standup.
+
+### Проблемы
+- Нужен web deploy (SPB build → MSK), иначе prod ещё со старым fallback.
+
+---
+
 ## 2026-07-30 - MIG.9 Phase 0–2: Diligent Polydeuces `85.193.80.159` provisioned
 
 ### Наблюдения
