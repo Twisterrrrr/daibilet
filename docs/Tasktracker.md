@@ -50,10 +50,19 @@
 | MIG.6 | Smoke на МСК (IP/`--resolve`) до DNS | Критический | ✅ |
 | MIG.7 | DNS A `daibilet.ru`/`www` → `201.24.125.184` + post-smoke | Критический | ✅ 2026-07-30 |
 | MIG.8 | СПб: stop public web/api + TC timer + crontab sync; PG snapshot; host → finance+staging | Средний | ✅ 2026-07-30 · [spb-finance-host.md](./spb-finance-host.md) |
-| MIG.9 | СПб 4 ГБ → 8 ГБ (`213.171.7.16` → `85.193.80.159`): finance+staging+build; catalog остаётся на МСК | Средний | ⏳ план · [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md) |
+| MIG.9 | Role lock: `.184` catalog · `.159` battle finance · `.16` retire after smoke | Высокий | 🔒 docs 2026-07-30 · [spb-finance-host.md](./spb-finance-host.md) |
+| MIG.9.0 | Phase 0: SSH/firewall `.159` + DNS stub `checkout`/`supplier`/(opt `finance-api`) | Критический | ⏳ |
+| MIG.9.1 | Phase 1: base stack docker/nginx/node на `.159` | Высокий | ⏳ |
+| MIG.9.2 | Phase 2: fresh finance PG на `.159` (не catalog dump) | Критический | ⏳ |
+| MIG.9.3 | Phase 3: finance app + TLS `checkout.daibilet.ru` (primary), `supplier.daibilet.ru` | Критический | ⏳ |
+| MIG.9.4 | Phase 4: optional staging/build scaffolding на `.159` (не justification для `.16`) | Средний | ⏳ |
+| MIG.9.5 | Phase 5: YooKassa webhook → новый finance API; старый держать до smoke | Критический | ⏳ |
+| MIG.9.6 | Phase 6: smoke checkout/supplier/webhook; catalog `.184` без cutover | Критический | ⏳ |
+| MIG.9.7 | Phase 7: backup `.16` + retention 7–14d + retire Intelligent Hoopoe | Высокий | ⏳ |
 | PERF.OOM4 | MSK: снять `cpus:1`/`workerThreads:false`, heap build 5120Mi | Высокий | ✅ |
 
-План: [migration-spb-to-msk.md](./migration-spb-to-msk.md) · SPB upsizing: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md)
+План: [migration-spb-to-msk.md](./migration-spb-to-msk.md) · roles/MIG.9: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md) · [spb-finance-host.md](./spb-finance-host.md)  
+Домены finance: **`checkout.daibilet.ru`** (канон-предложение), optional `pay.daibilet.ru` alias, `supplier.daibilet.ru`, maybe `finance-api.daibilet.ru` ([qa.md](./qa.md)).
 
 ## PERF event pages (после DNS на МСК)
 
@@ -959,7 +968,8 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
-| 2026-07-30 | MIG.9 ⏳ план: СПб 4ГБ→8ГБ finance/staging/build (`85.193.80.159`); catalog MSK |
+| 2026-07-30 | MIG.9 🔒 role lock: `.184` catalog · `.159` battle finance · `.16` retire; phases 9.0–9.7 + checkout DNS |
+| 2026-07-30 | MIG.9 ⏳ план (superseded by role lock): СПб 4ГБ→8ГБ; catalog MSK |
 | 2026-07-30 | Prod 504 MSK: restart web+nginx; INC.504.1-4 mitigations ⏳ Medium |
 | 2026-07-30 | MIG.8 ✅ СПб public/sync off; PERF.E5 event без catalog; SEO-хвост about/crumbs/variants; F5.0 map |
 | 2026-07-25 | SEO.20 listing garbage audit: код ✅ (`pnpm audit:listings` + Telegram helper); cron 04:00 на prod ⏳ owner |

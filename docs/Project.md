@@ -1,8 +1,8 @@
 # Project — Daibilet (Next full-stack migration)
 
-**Обновлено:** 2026-07-25
+**Обновлено:** 2026-07-30  
 **Ветка migration / prod:** `feat/next-monorepo`  
-**Prod:** Next `apps/web` `:3001` + legacy API `:4000` + Vite admin static
+**Prod catalog:** Next `apps/web` `:3001` + legacy API `:4000` на МСК `201.24.125.184`
 
 ---
 
@@ -21,7 +21,7 @@
 | 1 | **F4 admin → Next** — перенос admin SPA в Next route group | ✅ F4.6; `/legacy` retired |
 | 2 | **Landing matching quality** — правила, аудит выдачи и актуальность событий всех посадок | активный |
 | 3 | **AI / статьи и city hubs** — редакционный контент и SEO-якоря | поддерживающий поток |
-| — | **Finance contour / ЛК поставщиков** | ⚠️ deferred: продукт ещё не готов |
+| — | **Finance contour / ЛК поставщиков** | ⚠️ продукт deferred; **host roles locked** → `.159` battle finance ([spb-finance-host.md](./spb-finance-host.md)) |
 | — | **Реклама / paid** | ⚠️ отложена до готовности витрины (хабы + контент + базовый финконтур) |
 
 **Allowlist городов (geo-политика 2026-07-19):**
@@ -56,6 +56,19 @@ packages/config   — shared tsconfig/eslint
 **Read path:** `@daibilet/backend/public-read` → `public-*.dto.ts` (+ lean catalog list-item). Landing page DTO использует legacy `dto.js` как источник данных и правил. `apps/backend/src/landing-rules.ts` должен оставаться синхронен с `dto.js` до F5.
 
 **Write/sync path:** legacy `server.js` / sync scripts; после sync — `invalidatePublicCaches({ warm: true })` + Next revalidate.
+
+### Host roles (lock 2026-07-30)
+
+| Server | IP | Role |
+|--------|-----|------|
+| Friendly Pheasant | `201.24.125.184` | **battle catalog** - public, admin, import, SEO, TC/Teplohod catalog |
+| Diligent Polydeuces | `85.193.80.159` | **battle finance** - checkout, supplier LK, orders/purchases, YooKassa |
+| Intelligent Hoopoe | `213.171.7.16` | temporary staging/build scaffolding → **retire** after finance smoke |
+
+- Catalog ↔ finance: **только API**, без shared money/catalog DB.
+- Checkout primary hostname: **`checkout.daibilet.ru`** (optional alias `pay.daibilet.ru` - см. qa.md); также `supplier.daibilet.ru`, optional `finance-api.daibilet.ru`.
+- `.184` не переезжает на СПб; ops на catalog - perf/DTO/SSR/DNS only.
+- План: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md) · [spb-finance-host.md](./spb-finance-host.md).
 
 ---
 

@@ -1,4 +1,28 @@
-## 2026-07-30 - MIG.9 план: СПб 4 ГБ → 8 ГБ (finance/staging/build)
+## 2026-07-30 - Decision: lock host roles (catalog / finance / retire)
+
+### Наблюдения
+- Owner подтвердил матрицу ролей: не «слепо заменить 4 ГБ на 8 ГБ», а разделить battle catalog и battle finance.
+- Friendly Pheasant `201.24.125.184` уже battle catalog (MIG.7/8); AAAA снят owner.
+- Intelligent Hoopoe `213.171.7.16` - временный scaffolding (staging/build/config reserve, migration source).
+- Diligent Polydeuces `85.193.80.159` - целевой primary finance/supplier/checkout.
+
+### Решения
+- **Lock:** `.184` = battle catalog · `.159` = battle finance · `.16` = scaffolding → demolish after smoke.
+- Catalog ↔ finance только через API; TC/Teplohod import остаётся на catalog; orders/purchases/suppliers - на finance.
+- DNS finance: primary **`checkout.daibilet.ru`**, `supplier.daibilet.ru`, maybe `finance-api.daibilet.ru`; `pay.daibilet.ru` - optional alias (qa).
+- YooKassa webhook → новый finance API; старый держать до confirmed smoke, затем отключить.
+- `.184` не трогать как prod catalog (только perf/DTO/SSR/DNS). Серверы пока **не** мигрировать - docs only.
+- Docs: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md), [spb-finance-host.md](./spb-finance-host.md), Project host roles, Tasktracker MIG.9.0–9.7.
+- Следующий ops-шаг: SSH Phase 0 на `.159` + DNS stub A для checkout/supplier.
+
+### Проблемы
+- SSH/firewall на `.159` ещё не проверены.
+- Имя checkout vs pay ещё открыто в qa (рекомендация - checkout).
+- Продуктовый finance runtime (Phase G) ещё не готов - host roles зафиксированы заранее.
+
+---
+
+## 2026-07-30 - MIG.9 план: СПб 4 ГБ → 8 ГБ (superseded by role lock)
 
 ### Наблюдения
 - Owner: новый VPS Diligent Polydeuces `85.193.80.159` (~8 ГБ). Старый Intelligent Hoopoe `213.171.7.16` (~4 ГБ) после MIG.8 = finance+staging+build, не public.
@@ -6,9 +30,9 @@
 - В `deploy/scripts` IP `213.171.7.16` не захардкожен (скрипты on-host); IP в docs/runbooks (`deploy-staging.md`, `deploy-timeweb.md`, phases).
 
 ### Решения
-- План: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md). Цель - заменить роли 4 ГБ на 8 ГБ; apex `daibilet.ru` не трогать.
+- Первичный план upsizing: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md). **Уточнено тем же днём:** finance primary на `.159`, не blind replace всех ролей; см. decision record выше.
 - Finance PG - отдельный volume; не restore catalog dump как money DB.
-- Tasktracker MIG.9 (Средний). Следующий шаг: SSH на `85.193.80.159` (Phase 0).
+- Tasktracker MIG.9 → фазы 9.0–9.7. Следующий шаг: SSH на `85.193.80.159` (Phase 0).
 
 ### Проблемы
 - SSH ключ/firewall на новом боксе ещё не проверены с этой среды.

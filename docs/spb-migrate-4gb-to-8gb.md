@@ -1,14 +1,25 @@
-# Миграция СПб: 4 ГБ → 8 ГБ (finance / staging / build)
+# Миграция СПб: finance primary на 8 ГБ (MIG.9)
 
 **Дата плана:** 2026-07-30  
+**Lock ролей:** 2026-07-30 (owner confirmed)  
 **Ветка docs:** `feat/next-monorepo`  
 **Связанные:** [spb-finance-host.md](./spb-finance-host.md) · [migration-spb-to-msk.md](./migration-spb-to-msk.md) · [phase-2-finance-supplier-blueprint.md](./phase-2-finance-supplier-blueprint.md)
 
-| Роль | Хост Timeweb | IP | RAM | SSH key (факт) |
-|------|--------------|-----|-----|----------------|
-| **Источник (старый СПб)** | Intelligent Hoopoe | `213.171.7.16` | ~3.8 Gi | `daibilet_staging_key` |
-| **Цель (новый СПб)** | Diligent Polydeuces | `85.193.80.159` | ~8 Gi | TBD (Phase 0) |
-| **Catalog / prod (НЕ трогать)** | Friendly Pheasant МСК | `201.24.125.184` | ~7.8 Gi | `daibilet_msk80_key` / `daibilet-msk` |
+## Canonical role matrix
+
+| Server (Timeweb) | IP | Role now | Target role |
+|------------------|-----|----------|-------------|
+| **Friendly Pheasant** | `201.24.125.184` | catalog / prod | **battle catalog:** public, admin, import, SEO, TC/Teplohod catalog |
+| **Intelligent Hoopoe** | `213.171.7.16` | old SPB 4 ГБ (post-MIG.8) | **temporary** finance/staging/build scaffolding → **retire** after smoke on `.159` |
+| **Diligent Polydeuces** | `85.193.80.159` | new SPB 8 ГБ | **battle finance:** primary finance / supplier / buyer checkout |
+
+**Коротко:** `.184` = battle catalog · `.159` = battle finance · `.16` = scaffolding, then demolish.
+
+| SSH key (факт) | Host |
+|----------------|------|
+| `daibilet_msk80_key` / `daibilet-msk` | `201.24.125.184` |
+| `daibilet_staging_key` | `213.171.7.16` |
+| TBD (Phase 0) | `85.193.80.159` |
 
 ---
 
@@ -16,28 +27,43 @@
 
 ### Goal
 
-Перенести **только роли старого СПб после MIG.8** на новый 8 ГБ VPS, затем вывести 4 ГБ из эксплуатации:
-
-1. **Finance host** - отдельный Postgres (и позже Phase G / ЛК поставщиков), не catalog MSK.
-2. **Staging** - Next + API (`/opt/daibilet-staging`, units `daibilet-*-staging`).
-3. **Build host** - `pnpm web:build` → tarball/scp `.next` на МСК (когда MSK egress к GitHub/fonts недоступен).
-4. nginx + TLS для **staging / admin-finance hostnames only**.
-5. Retire `213.171.7.16` после smoke + snapshot retention.
+1. Поднять **`85.193.80.159` как primary finance/supplier/checkout** (не «слепо перенести все роли 4 ГБ»).
+2. Держать **`201.24.125.184` как battle catalog** - только perf / DTO / SSR / DNS hygiene (AAAA уже снят owner).
+3. Использовать **`213.171.7.16` временно:** staging/build, nginx/systemd reserve, migration source; после smoke на `.159` - backup и удаление VM.
+4. Связь **catalog ↔ finance только через API** (без shared mess / shared money DB).
+5. YooKassa webhook → новый finance API; старый webhook держать до подтверждения, затем отключить.
 
 ### Non-goals (явно)
 
-- **Не** переносить public catalog / `daibilet.ru` / `www` / `api.daibilet.ru` / `admin.daibilet.ru` на новый СПб.
-- **Не** включать TC/TEP catalog sync / orders cron на СПб (source of truth = МСК; MIG.8 остаётся в силе).
+- **Не** трогать `201.24.125.184` как prod catalog (не cutover catalog на СПб).
+- **Не** переносить public catalog / apex `daibilet.ru` / `www` / `api.daibilet.ru` / `admin.daibilet.ru` на `.159`.
+- **Не** включать TC/TEP **catalog** sync / catalog orders cron на finance host (source of truth каталога = МСК).
 - **Не** деплоить finance runtime на МСК catalog host.
-- **Не** смешивать finance PG volume с catalog dump MSK / со старым `daibilet-tours-postgres` как live money DB без изоляции.
-- **Не** трогать DNS apex `daibilet.ru` / `www` (остаются на `201.24.125.184`).
-- Optional later (отдельный тикет): sync-worker на новом СПб → запись в MSK PG, **только если** MSK egress остаётся сломан.
+- **Не** смешивать finance PG с catalog dump MSK / leftover `daibilet-tours-postgres` как live money DB.
+- **Не** «просто заменить 4 ГБ на 8 ГБ один-в-один» без разделения: finance = primary на `.159`; staging/build на `.159` только пока удобно как scaffolding, не как оправдание держать `.16` forever.
+
+### Architecture split (API-only)
+
+| Contour | Host | Owns |
+|---------|------|------|
+| **Catalog** | `.184` | events, venues, public SSR/ISR, admin catalog, TC/Teplohod **import/sync**, SEO |
+| **Finance** | `.159` | buyer checkout, orders/purchases, suppliers LK, YooKassa webhooks, finance API |
+| Bridge | HTTPS API | catalog показывает события → checkout уходит на finance host; нет shared DB volume |
+
+Целевые DNS на finance (stub до cutover):
+
+| Hostname | Назначение | Примечание |
+|----------|------------|------------|
+| **`checkout.daibilet.ru`** | buyer checkout (primary suggestion) | рекомендовать как канон |
+| `pay.daibilet.ru` | optional alias | см. [qa.md](./qa.md) |
+| `supplier.daibilet.ru` | ЛК поставщиков | |
+| `finance-api.daibilet.ru` | optional dedicated API hostname | maybe |
 
 ---
 
 ## 2. Inventory: что живёт на `213.171.7.16` сегодня (после MIG.8)
 
-Источник истины: [spb-finance-host.md](./spb-finance-host.md) + снимок MIG.8 в Diary 2026-07-30.
+Источник: [spb-finance-host.md](./spb-finance-host.md) + снимок MIG.8 в Diary 2026-07-30.
 
 ### Services / systemd
 
@@ -46,7 +72,7 @@
 | `daibilet-web` / `daibilet-api` (public) | **stop + disable** (MIG.8) |
 | `daibilet-tc-catalog-sync.timer` | **stop + disable** |
 | `daibilet-*-staging` | **disabled** (не поднимать без запроса; код/юниты на диске) |
-| `nginx` | **running** (будущий staging/finance vhost) |
+| `nginx` | **running** (reserve / migration source) |
 | `docker` | **running** |
 
 ### Docker / Postgres
@@ -56,7 +82,7 @@
 | Контейнер | `daibilet-tours-postgres` (`postgres:17-alpine`) |
 | Port | host `:5437` |
 | Volume | `daibilet_daibilet-postgres-data` |
-| Назначение сейчас | leftover catalog snapshot host; **не** live money DB |
+| Назначение сейчас | leftover catalog snapshot; **не** live money DB |
 | Snapshots MIG.8 | `/root/backups/daibilet-pg-mig8-20260730.dump` (+ sha256), volume `.tgz` |
 
 ### Paths / code
@@ -68,43 +94,26 @@
 | `/var/www/daibilet/*` | static/admin staging/prod leftovers |
 | `/root/backups/` | PG dumps, crontab backup |
 
-### nginx / TLS
+### Crontab / secrets
 
-- nginx active; Let's Encrypt certs historically for `daibilet.ru` / staging hostnames на этом IP.
-- После MIG.8 public DNS уже на МСК - certs на 4 ГБ нужны только для staging/finance vhosts при cutover DNS.
+- Prod catalog jobs закомментированы `# MIG.8 disabled`.
+- На `.159`: **не** раскомментировать catalog/orders sync.
+- Secrets: `/opt/daibilet/.env`, staging `.env`, certs - не в git; finance secrets - отдельный `.env`.
 
-### Crontab
+### Build role (временный)
 
-- Prod jobs (tc-orders, tep-catalog, blog digest, reviews, oom-watch) закомментированы `# MIG.8 disabled`.
-- Backup: `/root/backups/crontab-before-mig8-20260730.txt`.
-- На 8 ГБ: **не** раскомментировать catalog/orders sync.
-
-### SSH / keys
-
-- Client: `%USERPROFILE%\.ssh\daibilet_staging_key` → `root@213.171.7.16`.
-- На сервере: `/root/.ssh/authorized_keys` (скопировать публичный ключ на 8 ГБ в Phase 0).
-- Deploy-скрипты в repo **не хардкодят IP** - выполняются **на** хосте; IP сидит в docs / локальном SSH config / ручных `ssh root@…`.
-
-### Build role (факт ops)
-
-- `pnpm web:build` на СПб → scp `.next` + sources на МСК `201.24.125.184` (offline deploy при мёртвом MSK egress).
-- Heap: на 3.8 Gi historically 2560Mi; на 8 Gi можно 5120Mi как на МСК.
-
-### Secrets (не в git)
-
-- `/opt/daibilet/.env`, `/opt/daibilet-staging/.env`
-- certbot/letsencrypt private keys
-- Любые finance secrets (когда появятся) - отдельный `.env`, не catalog.
+- Пока MSK egress к GitHub/fonts мёртв: `pnpm web:build` на СПб → scp `.next` на МСК.
+- После cutover finance: build может жить на `.159` как temporary scaffolding или уйти в CI - не держать `.16` ради build.
 
 ---
 
-## 3. Ordered phases
+## 3. Ordered phases (MIG.9)
 
-### Phase 0 - Access
+### Phase 0 - Access на `.159` (первый физический шаг)
 
-- [ ] Timeweb: убедиться, что `85.193.80.159` (Diligent Polydeuces) в нужном регионе СПб, firewall/panel: TCP **22**, **80**, **443** inbound.
-- [ ] SSH: добавить `daibilet_staging_key` (или новый `daibilet_spb8_key`) в `authorized_keys` на 8 ГБ.
-- [ ] Локальный SSH alias, например:
+- [ ] Timeweb: firewall `85.193.80.159` - TCP **22**, **80**, **443**.
+- [ ] SSH: ключ в `authorized_keys` на 8 ГБ (`daibilet_staging_key` или `daibilet_spb8_key`).
+- [ ] Alias:
 
 ```text
 Host daibilet-spb8 spb8
@@ -115,82 +124,53 @@ Host daibilet-spb8 spb8
 ```
 
 - [ ] Smoke: `ssh daibilet-spb8 'uname -a; free -h; df -h /'`.
-- [ ] Hostname: зафиксировать guest hostname (Timeweb) в этом файле и в `current-state.md` после cutover.
-- [ ] **Не** менять DNS prod.
+- [ ] **DNS stub (ещё без cutover traffic):** подготовить A-записи `checkout` / `supplier` / optional `finance-api` → `85.193.80.159` (можно низкий TTL; TLS после подтверждения имени).
+- [ ] **Не** менять apex / catalog DNS на `.184`.
 
-### Phase 1 - Base stack
+### Phase 1 - Base stack на `.159`
 
-- [ ] Ubuntu packages: `docker.io` / compose plugin, `nginx`, `certbot`, `git`, `curl`, `rsync`, `build-essential`.
-- [ ] Node via **corepack** + `pnpm@11.7.0` (как в deploy-скриптах).
-- [ ] `vm.swappiness=10` (как в `deploy-prod-next.sh`).
-- [ ] UFW optional: allow 22/80/443 only; не блокировать SSH до проверки.
-- [ ] Каталоги: `/opt/daibilet`, `/opt/daibilet-staging`, `/root/backups`, `/var/www/daibilet`.
+- [ ] docker / nginx / certbot / git / rsync / Node via corepack + `pnpm@11.7.0`.
+- [ ] `vm.swappiness=10`; каталоги `/opt/daibilet-finance` (или согласованный path), `/opt/daibilet-staging`, `/root/backups`.
 
-### Phase 2 - Postgres finance
+### Phase 2 - Postgres finance (primary)
 
-**Правило:** finance DB **отдельный** volume/DB name. Catalog leftover dump - не live money.
+- [ ] **Fresh** Docker volume `daibilet-finance-pg-data` + DB `daibilet_finance` (не catalog dump).
+- [ ] Optional staging PG отдельно (`:5438`).
+- [ ] Leftover catalog volume на `.16` - только forensic / migration source.
 
-Вариант A (предпочтительно для finance greenfield):
+### Phase 3 - Finance app + domains
 
-- [ ] Поднять Docker Postgres `:5437` (или отдельный порт, напр. `:5439`) с **новым** volume `daibilet-finance-pg-data`.
-- [ ] Создать DB `daibilet_finance` (имя зафиксировать в `.env.example` finance).
-- [ ] Пустой schema / migrate Phase G когда код готов - **не** restore catalog dump как finance.
+- [ ] Deploy finance/checkout/supplier runtime на `.159`.
+- [ ] nginx + TLS для **`checkout.daibilet.ru`** (primary), `supplier.daibilet.ru`, optional `finance-api.daibilet.ru` / `pay.daibilet.ru` alias.
+- [ ] Catalog `.184` → checkout links / API base URL на finance host (env), без shared DB.
 
-Вариант B (если на 4 ГБ уже есть отдельные finance данные):
+### Phase 4 - Staging/build scaffolding (temporary on `.159`)
 
-- [ ] `pg_dump -Fc` только finance DB со старого хоста → scp → `pg_restore` на 8 ГБ.
-- [ ] Проверить, что dump **не** содержит catalog MSK secrets reuse без ротации.
+- [ ] При необходимости перенести staging/build с `.16` на `.159` (reserve), **не** как justification держать dual finance forever.
+- [ ] Build → scp to MSK `201.24.125.184` пока нужен offline deploy.
 
-Staging DB (опционально в этой же фазе или Phase 3):
+### Phase 5 - YooKassa + DNS cutover finance
 
-- [ ] Отдельный контейнер/порт (`deploy/docker-compose.staging-db.yml` → `:5438` / `daibilet_staging`) - не шарить с finance.
+- [ ] Webhook YooKassa → **новый** finance API на `.159`.
+- [ ] Старый webhook (если был на `.16` / elsewhere) **оставить** до smoke confirmed.
+- [ ] После smoke: отключить старый webhook.
+- [ ] DNS finance hostnames → `85.193.80.159` (не apex catalog).
 
-Leftover catalog volume на 4 ГБ:
+### Phase 6 - Smoke
 
-- [ ] Не поднимать как source of truth; при необходимости держать dump только для forensic / rollback N дней.
+- [ ] Checkout HTTPS + health finance API.
+- [ ] Supplier login smoke (когда UI готов).
+- [ ] Test payment / webhook delivery на новый endpoint.
+- [ ] Catalog `.184`: events/venues OK; buy CTA → finance host.
+- [ ] На `.159` **нет** active TC/TEP **catalog** sync timers.
+- [ ] Apex `daibilet.ru` всё ещё `201.24.125.184`.
 
-### Phase 3 - Staging Next / API
+### Phase 7 - Retire `.16`
 
-- [ ] `git clone` / rsync `/opt/daibilet-staging` с 4 ГБ или fresh clone `feat/next-monorepo`.
-- [ ] Скопировать staging `.env` (поправить `DATABASE_URL` на local staging PG).
-- [ ] Установить systemd: `deploy/systemd/daibilet-api-staging.service`, `daibilet-web-staging.service`.
-- [ ] nginx vhost для `staging.daibilet.ru` (и при необходимости staging-admin) → proxy Next/API staging ports.
-- [ ] `BRANCH=feat/next-monorepo ./deploy/scripts/deploy-staging-next.sh` (или `deploy-staging.sh`).
-- [ ] Локальный smoke: `curl -fsS http://127.0.0.1:<web>/api/health` до DNS cutover (`--resolve` / hosts).
-
-### Phase 4 - Build host + deploy docs/scripts IP hygiene
-
-- [ ] `/opt/daibilet` на 8 ГБ: same branch SHA, `pnpm install`, проверка `pnpm web:build` с heap 5120Mi.
-- [ ] Проверить scp/rsync path до МСК: `root@201.24.125.184:/opt/daibilet` (ключ с 8 ГБ на MSK authorized_keys).
-- [ ] Обновить **локальный** SSH config / runbooks: build host = `85.193.80.159`.
-- [ ] Обновить docs с хардкодом `213.171.7.16` (список ниже) - после cutover.
-- [ ] Deploy scripts в `deploy/scripts/*.sh` IP не содержат - менять не обязательно; при появлении wrapper'ов с IP - сразу на `85.193.80.159`.
-
-### Phase 5 - DNS (только staging / finance hostnames)
-
-Переключать **только** записи, которые сейчас (или будут) указывать на старый СПб:
-
-- [ ] `staging.daibilet.ru` (и www-staging, если есть) → `85.193.80.159`
-- [ ] Любой будущий `finance.*` / `admin-finance.*` / supplier LK hostname → `85.193.80.159`
-- [ ] TLS: `certbot` на 8 ГБ для этих имён после DNS (или DNS-01 заранее)
-- [ ] **Не** трогать: `daibilet.ru`, `www`, `api.daibilet.ru`, `admin.daibilet.ru` (= МСК)
-
-### Phase 6 - Cutover smoke
-
-- [ ] Staging HTTPS 200 + `/api/health` + Basic Auth admin staging
-- [ ] Finance PG: connect from app / `psql` (если уже есть schema)
-- [ ] Build: `pnpm web:build` на 8 ГБ → scp tarball на МСК → `systemctl restart daibilet-web` на МСК → public smoke `https://daibilet.ru/`
-- [ ] Убедиться: на 8 ГБ **нет** active `daibilet-tc-catalog-sync.timer` / catalog crontab
-- [ ] Убедиться: public DNS A `daibilet.ru` всё ещё `201.24.125.184`
-
-### Phase 7 - Disable 4 ГБ, snapshot retention
-
-- [ ] Stop docker PG / nginx на `213.171.7.16` (или оставить read-only snapshot host)
-- [ ] Финальный `pg_dump` + volume tar + sha256 → скачать off-box или держать на 8 ГБ `/root/backups/`
-- [ ] Timeweb: snapshot/backup диска 4 ГБ, **хранить N = 7–14 дней**
-- [ ] Отключить автопродление / power-off VM после N дней (owner decision)
-- [ ] Обновить `docs/spb-finance-host.md`, `docs/current-state.md`: canonical SPB = `85.193.80.159`
-- [ ] Grep по репо: не должно остаться «живых» runbook-ссылок на `213.171.7.16` как на active host (архивные даты в Diary OK)
+- [ ] Final backup с `213.171.7.16` (PG dump / volume / configs) → off-box или `/root/backups` на `.159`.
+- [ ] Stop services on `.16`; Timeweb snapshot retention **7–14 дней**.
+- [ ] Delete / power-off VM после retention (owner).
+- [ ] Docs: canonical SPB finance = `85.193.80.159`; `.16` только historical.
 
 ---
 
@@ -198,75 +178,48 @@ Leftover catalog volume на 4 ГБ:
 
 | Ситуация | Действие |
 |----------|----------|
-| Phase 0–1 fail | Чинить 8 ГБ; 4 ГБ не трогать |
-| Staging на 8 ГБ сломан после DNS | A-запись staging вернуть на `213.171.7.16`; поднять staging units на 4 ГБ |
-| Finance PG corrupt на 8 ГБ | Restore из dump; DNS finance hostname на 4 ГБ если там ещё живой volume |
-| Build на 8 ГБ OOM/fail | Временно build снова на 4 ГБ или на MSK (если egress OK) / CI |
-| Случайно сменили apex DNS | Немедленно A `daibilet.ru`/`www` → `201.24.125.184`; не использовать 8 ГБ как catalog |
-| Нужен полный откат миграции ролей | Оставить 4 ГБ powered on до конца retention; не delete disk в день cutover |
+| Phase 0–1 fail | Чинить `.159`; `.16` и `.184` не трогать |
+| Finance smoke fail | DNS finance hostname вернуть / оставить stub; webhook оставить на старом endpoint |
+| YooKassa dual period | Оба webhook до confirmed; затем только `.159` |
+| Build fail на `.159` | Временно build на `.16` или MSK/CI |
+| Случайно сменили apex | Немедленно A → `201.24.125.184` |
+| Нужен откат retire | Не delete disk `.16` в день cutover |
 
-Правило: **catalog/prod всегда откатывается на МСК**, не на СПб.
+Правило: **catalog/prod всегда на МСК**; **finance battle всегда целится на `.159`**.
 
 ---
 
-## 5. Master checklist (кратко)
+## 5. Master checklist
 
-- [ ] Phase 0 access SSH/firewall
-- [ ] Phase 1 docker/node/nginx/certbot
-- [ ] Phase 2 finance PG (fresh или dump) + optional staging PG
-- [ ] Phase 3 staging Next/API + nginx
-- [ ] Phase 4 build host + scp to MSK
-- [ ] Phase 5 DNS staging/finance only
+- [ ] Phase 0 SSH + firewall + DNS stub
+- [ ] Phase 1 base stack
+- [ ] Phase 2 finance PG fresh
+- [ ] Phase 3 finance app + `checkout` / `supplier` TLS
+- [ ] Phase 4 optional staging/build move
+- [ ] Phase 5 YooKassa new webhook + keep old until confirmed
 - [ ] Phase 6 smoke
-- [ ] Phase 7 retire 4 ГБ + retention N days
-- [ ] Docs: `spb-finance-host.md` + `current-state.md` + IP grep
+- [ ] Phase 7 backup + retire `.16`
+- [ ] Docs lock: `spb-finance-host.md` + `current-state.md` + Project architecture
 
 ---
 
-## 6. Скрипты и docs с `213.171.7.16` (обновить после cutover)
+## 6. Docs / scripts hygiene
 
-### `deploy/scripts` (код)
+**`deploy/scripts`:** хардкода IP нет (on-host). Обновлять IP в runbooks после cutover.
 
-**Хардкода IP нет.** Скрипты рассчитаны на запуск на сервере (`APP_DIR=/opt/...`). Обновлять IP не требуется, пока не появятся remote-SSH wrappers.
-
-Имеет смысл держать на 8 ГБ те же entrypoints:
-
-- `deploy/scripts/deploy-staging-next.sh`
-- `deploy/scripts/deploy-staging.sh`
-- `deploy/scripts/deploy-prod-next.sh` (на МСК; build может идти на СПб 8 ГБ отдельно)
-- `deploy/scripts/restore-staging-db.sh`
-- `deploy/systemd/daibilet-*-staging.service`
-
-### Docs / runbooks (grep hitlist)
-
-| Файл | Заметка |
-|------|---------|
-| `docs/spb-finance-host.md` | canonical host → `85.193.80.159` после Phase 7 |
-| `docs/current-state.md` | строка «СПб (не public)» |
-| `docs/migration-spb-to-msk.md` | исторический снимок; добавить footnote «SPB roles → 8GB» |
-| `docs/deploy-timeweb.md` | устаревший prod IP; пометить archive / MSK |
-| `docs/deploy-staging.md` | `ssh root@…` |
-| `docs/phases/phase-f3-cutover-checklist.md` | ssh example |
-| `docs/phases/phase-d-deploy-parity.md` | ssh example |
-| `docs/integrations.md` | Teplohod allowlist IP → новый СПб **или** MSK (prod sync) |
-| `docs/mentor-review.md` | whitelist note |
-| `docs/geo-excluded-cities.md` | audit date context |
-| `docs/checkpoint-2026-07-10-mvp-launch.md` | historical |
-
-Teplohod/TicketsCloud **allowlist**: prod sync сейчас с МСК - новый СПб IP добавлять в whitelist партнёра только если с него снова пойдут боевые sync (обычно не нужно после MIG.8).
+Grep hitlist после retire: `spb-finance-host.md`, `current-state.md`, `deploy-staging.md`, phases, `integrations.md` (Teplohod allowlist - только если sync снова со СПб; обычно нет).
 
 ---
 
 ## 7. Рекомендация одной строкой
 
-**Новый 8 ГБ = замена ролей старого СПб (finance + staging + build); catalog/prod остаётся на МСК `201.24.125.184`.**
+**`.184` = battle catalog · `.159` = battle finance (checkout/supplier) · `.16` = temporary scaffolding → delete after smoke.**
 
 ## 8. Следующий физический шаг
 
 ```bash
 ssh root@85.193.80.159
-# или после Phase 0 alias:
-ssh daibilet-spb8
+# + DNS stub A: checkout.daibilet.ru / supplier.daibilet.ru → 85.193.80.159
 ```
 
-Проверить: ключ принят, `free -h` ~8 Gi, открыты 22/80/443 в панели Timeweb.
+Проверить: ключ принят, `free -h` ~8 Gi, открыты 22/80/443. Серверы **ещё не мигрировать** до явного ops-старта Phase 0+.

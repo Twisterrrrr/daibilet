@@ -1,5 +1,14 @@
 # qa.md — открытые вопросы
 
+## 2026-07-30 - Finance host DNS / domains (открыто)
+
+Контекст: host roles **locked** (`.184` catalog · `.159` battle finance · `.16` retire). Серверы ещё не мигрированы. См. [spb-finance-host.md](./spb-finance-host.md).
+
+1. **Checkout hostname:** рекомендовать **`checkout.daibilet.ru`** как primary. Нужен ли alias **`pay.daibilet.ru`** (CNAME/A на тот же `.159`) для коротких ссылок / маркетинга, или один канон без alias?
+2. **`finance-api.daibilet.ru`:** отдельный hostname для API/webhooks, или API под `checkout.` / path на том же vhost?
+3. **`supplier.daibilet.ru`:** подтвердить имя ЛК (vs `partners.` / `cabinet.`) до выпуска TLS/DNS stub.
+4. **YooKassa webhook URL:** финальный path на новом finance API (и окно dual-webhook со старым endpoint) - зафиксировать перед Phase 5.
+
 ## 2026-07-25 - Env isolation / robots / admin auth (owner audit) — ЗАКРЫТО
 
 1. **`NEXT_PUBLIC_` secrets?** ✅ Нет accidental expose. Разрешено только: `NEXT_PUBLIC_TC_WIDGET_TOKEN` (client widget embed, ≠ `TICKETSCLOUD_API_TOKEN`), `NEXT_PUBLIC_TEP_WIDGET_ID`, `NEXT_PUBLIC_YANDEX_METRIKA_ID`, `NEXT_PUBLIC_SITE_URL` / `NEXT_PUBLIC_ADMIN_URL` / `NEXT_PUBLIC_VITE_ADMIN_URL`. DB / Telegram / admin passwords / partner API tokens - **без** `NEXT_PUBLIC_`.
