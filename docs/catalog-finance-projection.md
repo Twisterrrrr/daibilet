@@ -5,7 +5,7 @@
 **Product blueprint:** [phase-2-finance-supplier-blueprint.md](./phase-2-finance-supplier-blueprint.md)  
 **Branches:** catalog docs / consumer на `feat/next-monorepo`; finance runtime Codex на `.159` (`codex/phase2-finance-supplier`); admission foundation Cursor на `cursor/phase-g-admission-checkout`.
 
-Этот документ - **канон границы** между каталогом и финконтуром. UI/checkout на catalog **не** реализовывать шире docs, пока не закрыты P0–P1 ниже.
+Этот документ - **канон границы** между каталогом и финконтуром. **CF.P0+P1 на finance `.159` закрыты** (`0c1e464`); UI/CTA на catalog `.184` - только после CF.P1b/P2 (Cursor).
 
 ---
 
@@ -133,7 +133,7 @@ Venue page может иметь admission **независимо** от афи�
 | Buyer «Мои покупки» | свои External + Checkout без technical jargon |
 | Supplier LC | свои `CheckoutItem` (+ later linked external if product says so) |
 
-**Until PurchaseProjection exists: no wide real internal sales** (только sandbox/STUB smoke на finance, без раскатки CTA на prod catalog).
+**PurchaseProjection на finance есть** (STUB smoke OK). **Wide real internal sales / catalog CTA всё ещё запрещены** до CF.P1b+P2 и отдельного YooKassa sandbox gate.
 
 ---
 
@@ -153,61 +153,88 @@ Venue page может иметь admission **независимо** от афи�
 | Finance host API `:4100` + nginx HTTP | ✅ Codex on `.159` |
 | Seed `test-museum` / `test-museum-ticket` | ✅ script |
 
-### 7.2 Missing for catalog consumer (P1)
+### 7.2 Catalog consumer gap (после finance P0+P1)
 
 | Piece | Status |
 |-------|--------|
-| Public finance read APIs: supplier / venue admission summary / AdmissionProduct list+detail | ❌ нет `/api/public/admission*` |
-| Catalog HTTP client → finance projection (auth, base URL, cache) | ❌ |
+| Public finance read APIs: supplier / venue admission summary / AdmissionProduct list+detail | ✅ на `.159` @ `0c1e464` (`/api/public/admission*` + `/api/public/finance/...`) |
+| Catalog HTTP client → finance projection (auth, base URL, cache) | ❌ **CF.P1b Cursor** |
 | Projection sync frequency / cache invalidation contract | ❌ (открыто в qa) |
-| Venue page «Входные билеты» на prod catalog | ❌ UI not on feat HEAD |
-| City hub museums/admission section gated by published count | ❌ |
-| Separate admission card type in `/events` | ❌ |
-| CTA → `checkout.daibilet.ru` only when `canSell` | ❌ |
+| Venue page «Входные билеты» на prod catalog | ❌ **CF.P2 Cursor** |
+| City hub museums/admission section gated by published count | ❌ **CF.P2b** |
+| Separate admission card type in `/events` | ❌ **CF.P2c** |
+| CTA → `checkout.daibilet.ru` only when `canSell` | ❌ **CF.P2d** |
 
-### 7.3 PurchaseProjection (P0)
+### 7.3 PurchaseProjection (P0) - finance DB
 
 | Piece | Status |
 |-------|--------|
-| Unified DTO ExternalOrder + CheckoutOrder | ❌ (blueprint Phase 2.4 only) |
-| Admin orders include CheckoutOrder | ❌ ExternalOrdersPage only |
-| Buyer account includes CheckoutOrder | ❌ `buildAccountPurchases` = ExternalOrder email filter |
-| Supplier LC already CheckoutItem | ✅ partial (не unified projection) |
-| Cross-DB link External (catalog) ↔ Checkout (finance) | ❌ separate DBs after host split |
+| Unified DTO ExternalOrder + CheckoutOrder (finance host) | ✅ `purchase-projection.ts` @ `00aa9dcf` |
+| Admin orders include CheckoutOrder | ✅ `sourceKind=internal`, `sourceCode=MANUAL` |
+| Buyer account includes CheckoutOrder | ✅ `GET /api/account/purchases` |
+| Supplier LC CheckoutItem projection | ✅ `loadSupplierCheckoutPurchaseRows` |
+| Cross-DB link External (catalog `.184`) ↔ Checkout (finance `.159`) | ❌ separate DBs; catalog fan-in later |
+
+### 7.4 Deploy / smoke on `.159` (2026-07-30, Cursor)
+
+| Check | Result |
+|-------|--------|
+| Git | `codex/phase2-finance-supplier` @ `0c1e464` (ff `d2477ae`→`0c1e464`) |
+| Health | `GET /api/health` → 200 |
+| Public list/detail/venue/supplier | 200; seed `phase-g-test-museum-entry`; `canSell=true`; `checkoutPath` set; **no** `paymentMode` |
+| STUB admission | `POST /api/checkout/stub` → 201 `publicCode=7649542`; idempotent retry same code |
+| PurchaseProjection | admin+buyer+supplier rows see STUB order |
+| YooKassa | **off** (`DAIBILET_YOOKASSA_CHECKOUT=0`); `YOOKASSA_SHOP_ID` / `SECRET_KEY` **missing** |
+| MSK `.184` | не трогали |
 
 ---
 
 ## 8. Prioritized backlog
 
-| Pri | ID | Task | Owner |
-|-----|-----|------|-------|
-| **P0** | CF.P0 | **PurchaseProjection** contract + APIs (admin all, buyer purchases, supplier CheckoutItems) | Codex finance |
-| **P0** | CF.P0b | Gate: no wide internal sales CTA on `.184` until P0 smoke | both |
-| **P1** | CF.P1 | Finance **public read** projection endpoints (supplier/venue/admission) | Codex |
-| **P1** | CF.P1b | Catalog read client + env (`FINANCE_API_BASE_URL`, service auth) | Cursor |
-| **P1** | CF.P1c | Auth between catalog↔finance (m2m) - решить в qa | owner + Codex |
-| **P2** | CF.P2 | Venue page admission block (test museum) | Cursor |
-| **P2** | CF.P2b | City hub museums/admission when published | Cursor |
-| **P2** | CF.P2c | Events catalog separate admission card type | Cursor |
-| **P2** | CF.P2d | CTA → Daibilet checkout; TC/TEP widgets untouched | Cursor |
-| **P3** | CF.P3 | TLS + DNS stub; YooKassa on; admin+supplier see STUB order | Codex + owner |
+| Pri | ID | Task | Owner | Status |
+|-----|-----|------|-------|--------|
+| **P0** | CF.P0 | **PurchaseProjection** on finance | Codex | ✅ deployed `.159` |
+| **P0** | CF.P0b | Gate: no wide CTA on `.184` until catalog client+UI ready | both | 🔒 still gated |
+| **P1** | CF.P1 | Finance **public read** projection endpoints | Codex | ✅ deployed `.159` |
+| **P1** | CF.P1b | Catalog read client + env (`FINANCE_API_BASE_URL`, service auth) | Cursor | ⏳ **next** |
+| **P1** | CF.P1c | m2m token on `.159` + catalog | owner + Cursor | ⏳ optional token code ready; env unset |
+| **P2** | CF.P2 | Venue page admission block (test museum) | Cursor | ⏳ |
+| **P2** | CF.P2b | City hub museums/admission when published | Cursor | ⏳ |
+| **P2** | CF.P2c | Events catalog separate admission card type | Cursor | ⏳ |
+| **P2** | CF.P2d | CTA → Daibilet checkout; TC/TEP widgets untouched | Cursor | ⏳ |
+| **P3** | CF.P3 | TLS + DNS stub; YooKassa sandbox; keep STUB | Codex + owner | ⏳ credentials missing |
 
 ---
 
-## 9. Acceptance (when implementing - not now)
+## 9. Acceptance (catalog UI - Cursor P2)
 
-1. Venue page: admission block for test museum.
+1. Venue page: admission block for test museum via finance projection.
 2. City hub: museums/admission when published products exist.
-3. Admission CTA → Daibilet checkout (not TC widget).
-4. STUB/YooKassa internal order visible in admin + supplier LC (via PurchaseProjection).
+3. Admission CTA → Daibilet checkout (not TC widget); only if `canSell`.
+4. STUB/YooKassa internal order visible in admin + supplier LC (via PurchaseProjection) - **STUB verified on finance**.
 5. TC/TEP widgets unbroken on imported events.
 
 ---
 
 ## 10. Next implement step (ownership)
 
-1. **Codex (сейчас):** спроектировать и реализовать `PurchaseProjection` на finance DB / API; публичные read endpoints §3; не трогать TC secrets; не писать в catalog DB.
-2. **Cursor (после P0 contract freeze):** catalog client + venue/city UI по projection; merge phase-g без поломки Next public handlers; widgets regression smoke.
-3. **Owner:** DNS A stub `checkout`/`supplier` → `.159`, затем TLS.
+1. **Cursor (сейчас / P2):** CF.P1b catalog HTTP client → `.159` public projection; затем venue/city admission UI; CTA только при `canSell`; widgets regression; не писать в finance DB.
+2. **YooKassa (не сейчас):** нужны `YOOKASSA_SHOP_ID` + `YOOKASSA_SECRET_KEY` (sandbox), DNS/TLS webhook URL на finance, reconcile job; **не** ставить `DAIBILET_YOOKASSA_CHECKOUT=1` пока STUB smoke и credentials не готовы. STUB оставить `=1`.
+3. **Owner:** DNS A stub `checkout`/`supplier` → `.159`, затем TLS; optional set `DAIBILET_FINANCE_PROJECTION_TOKEN` on finance + catalog.
 
-Docs-only lock на этой ветке **не** включает полный UI/checkout.
+---
+
+## 11. YooKassa readiness checklist (sandbox only)
+
+| Step | Need | Status on `.159` |
+|------|------|------------------|
+| Keep STUB | `DAIBILET_STUB_CHECKOUT=1` | ✅ |
+| Flag off until ready | `DAIBILET_YOOKASSA_CHECKOUT=0` | ✅ |
+| Shop credentials | `YOOKASSA_SHOP_ID`, `YOOKASSA_SECRET_KEY` | ❌ missing |
+| API / return URL | `YOOKASSA_API_URL`, `YOOKASSA_RETURN_BASE_URL` | return set; API URL missing |
+| Webhook verify | `DAIBILET_YOOKASSA_VERIFY_WEBHOOK=1` + public HTTPS webhook | ❌ no TLS/DNS yet |
+| Webhook host | register → finance (`checkout`/`finance` `.159`), **not** catalog `.184` | ⏳ |
+| Reconcile | scheduled `backend:checkout:yookassa:reconcile -- --apply` | ⏳ |
+| Smoke | one `VENUE_ADMISSION` sandbox payment + PurchaseProjection visible | ⏳ after credentials |
+
+**Do not** enable wide YooKassa or catalog CTA until checklist + P1b/P2 path ready.

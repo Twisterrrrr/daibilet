@@ -54,7 +54,7 @@
 | MIG.9.0 | Phase 0: SSH/firewall `.159` + DNS stub `checkout`/`supplier`/`finance` | Критический | ✅ SSH/UFW 2026-07-30 · DNS stub ⏳ owner Timeweb |
 | MIG.9.1 | Phase 1: base stack docker/nginx/node на `.159` | Высокий | ✅ 2026-07-30 |
 | MIG.9.2 | Phase 2: fresh finance PG на `.159` (не catalog dump) | Критический | ✅ PG `:5437` + migrations/seed smoke 2026-07-30 |
-| MIG.9.3 | Phase 3: finance app + HTTP/TLS `checkout`/`supplier`/`finance` | Критический | 🔄 partial: API `:4100` + nginx HTTP; TLS ⏳ · Codex `d2477ae` · STUB on / YooKassa off |
+| MIG.9.3 | Phase 3: finance app + HTTP/TLS `checkout`/`supplier`/`finance` | Критический | 🔄 API `:4100` + nginx HTTP @ `0c1e464` · P0+P1 smoke ✅ · TLS ⏳ · STUB on / YooKassa off |
 | MIG.9.4 | Phase 4: optional staging/build scaffolding на `.159` (не justification для `.16`) | Средний | ⏳ |
 | MIG.9.5 | Phase 5: YooKassa webhook → новый finance API; старый держать до smoke | Критический | ⏳ YooKassa off |
 | MIG.9.6 | Phase 6: smoke checkout/supplier/webhook; catalog `.184` без cutover | Критический | ⏳ |
@@ -73,16 +73,16 @@
 | # | Задача | Приоритет | Статус | Owner |
 |---|--------|-----------|--------|-------|
 | CF.0 | Docs lock: boundary + projection matrix + don'ts | Критический | ✅ 2026-07-30 | Cursor |
-| CF.P0 | **PurchaseProjection**: admin (External+Checkout), buyer «Мои покупки», supplier CheckoutItems | Критический | ⏳ | Codex |
-| CF.P0b | Gate: no wide internal sales CTA на `.184` until PurchaseProjection smoke | Критический | ⏳ | both |
-| CF.P1 | Finance public read APIs: supplier / venue summary / AdmissionProduct list+detail (`canSell`) | Высокий | ⏳ partial admin/supplier on phase-g; **нет** public | Codex |
-| CF.P1b | Catalog read client → finance (`FINANCE_API_BASE_URL` + cache) | Высокий | ⏳ | Cursor |
-| CF.P1c | Service auth catalog↔finance (m2m) - решение в qa | Высокий | ⏳ | owner+Codex |
+| CF.P0 | **PurchaseProjection**: admin (External+Checkout), buyer «Мои покупки», supplier CheckoutItems | Критический | ✅ finance `.159` @ `00aa9dcf` / smoke 2026-07-30 | Codex |
+| CF.P0b | Gate: no wide internal sales CTA на `.184` until catalog client+UI | Критический | 🔒 gate holds (finance smoke OK; catalog CTA still off) | both |
+| CF.P1 | Finance public read APIs: supplier / venue summary / AdmissionProduct list+detail (`canSell`) | Высокий | ✅ `.159` @ `0c1e464` smoke 200 | Codex |
+| CF.P1b | Catalog read client → finance (`FINANCE_API_BASE_URL` + cache) | Высокий | ⏳ **next Cursor** | Cursor |
+| CF.P1c | Service auth catalog↔finance (m2m) - token code ready, env unset | Высокий | ⏳ optional | owner+Cursor |
 | CF.P2 | Venue page блок «Входные билеты» (test museum) | Высокий | ⏳ | Cursor |
 | CF.P2b | City hub museums/admission при published | Высокий | ⏳ | Cursor |
 | CF.P2c | `/events`: отдельный card type admission (не slotted event) | Средний | ⏳ | Cursor |
 | CF.P2d | CTA → checkout.daibilet.ru; TC/TEP widgets regression | Высокий | ⏳ | Cursor |
-| CF.P3 | STUB/YooKassa order видим admin+supplier LC через PurchaseProjection | Высокий | ⏳ STUB on `.159`; unified read ❌ | Codex |
+| CF.P3 | STUB/YooKassa order видим admin+supplier LC через PurchaseProjection | Высокий | 🔄 STUB visible via PP ✅; YooKassa credentials ❌ | Codex |
 
 ## PERF event pages (после DNS на МСК)
 
@@ -993,6 +993,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-30 | CF.P0+P1 ✅ deploy `.159` @ `0c1e464`: PurchaseProjection + public admission APIs; STUB smoke `7649542` idempotent; YooKassa off (no creds); next CF.P1b/P2 Cursor |
 | 2026-07-30 | CF.0 ✅ lock catalog↔finance projection ([catalog-finance-projection.md](./catalog-finance-projection.md)); CF.P0–P3 backlog; qa checkout/projection/auth |
 | 2026-07-30 | MIG.9.3 🔄 Codex на `.159`: `daibilet-finance-api` `:4100`, nginx HTTP supplier/checkout/finance, PG migrations+seed; TLS/DNS stub ⏳; MSK не трогали |
 | 2026-07-30 | MIG.9.0–9.2 ✅ Diligent Polydeuces `.159`: SSH `daibilet_spb_finance`, UFW, docker/nginx/node/pnpm, empty finance PG; DNS stub ⏳ |

@@ -16,19 +16,21 @@
 
 SSH: MSK `daibilet_msk80_key` / `daibilet-msk` · `.16` `daibilet_staging_key` · `.159` `daibilet_spb_finance` (alias `daibilet-spb8` / `spb8` / `daibilet-finance`). Codex также имеет свой SSH-ключ на `.159` (активный деплой - **не** перебивать параллельным SSH без координации).
 
-### Состояние `.159` (2026-07-30, inspection e2ac1fb7 - beyond Phase 0–2)
+### Состояние `.159` (2026-07-30, Cursor deploy P0+P1)
 
 | Компонент | Статус |
 |-----------|--------|
 | SSH / UFW | OK; allow 22/80/443; deny public 5432/5437 |
 | docker / nginx / certbot / Node22 / pnpm 11.7 | installed |
 | Paths | `/opt/daibilet-finance`, `/opt/daibilet-staging`, `/opt/daibilet`, `/root/backups` |
-| Git app | `/opt/daibilet-finance/app` · ветка `codex/phase2-finance-supplier` @ `d2477ae` |
+| Git app | `/opt/daibilet-finance/app` · ветка `codex/phase2-finance-supplier` @ `0c1e464` |
 | Finance PG | `daibilet-finance-postgres` · `127.0.0.1:5437` · migrations + seed smoke OK |
-| Finance API | systemd `daibilet-finance-api` · `127.0.0.1:4100` |
+| Finance API | systemd `daibilet-finance-api` · `127.0.0.1:4100` · health 200 |
+| Public projection | ✅ `/api/public/admission-products*` / venues / suppliers (+ `/finance/` aliases) |
+| PurchaseProjection | ✅ admin/buyer/supplier read STUB checkout orders |
 | nginx HTTP | `supplier.daibilet.ru` / `checkout.daibilet.ru` / `finance.daibilet.ru` → supplier dist + `/api` → `:4100` |
 | TLS | **нет** (HTTP only; certbot после DNS stub) |
-| Checkout / YooKassa | STUB checkout **on** · YooKassa **off** |
+| Checkout / YooKassa | STUB **on** · YooKassa **off** (shop id/secret missing) |
 | MSK catalog `.184` | не затронут |
 | DNS stub checkout/supplier/finance | ⏳ owner Timeweb (ещё TODO) |
 

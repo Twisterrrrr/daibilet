@@ -1,3 +1,26 @@
+## 2026-07-30 - Deploy CF.P0+P1 на finance `.159` + STUB smoke
+
+### Наблюдения
+- Codex ветка `codex/phase2-finance-supplier`: `00aa9dcf` PurchaseProjection, `0c1e4648` public finance projection APIs.
+- Хост был на `d2477ae`; ff-pull → `0c1e464`, restart `daibilet-finance-api`, health 200.
+- Public APIs 200: list/detail/venue/supplier + `/api/public/finance/...`; seed `phase-g-test-museum-entry`, `canSell=true`, `checkoutPath` есть, `paymentMode` нет.
+- STUB: `POST /api/checkout/stub` → order `7649542` CONFIRMED; idempotent retry тот же `publicCode`.
+- PurchaseProjection: admin `sourceKind=internal`, buyer email hit, supplier LC 3 admission rows включая smoke.
+- YooKassa: `DAIBILET_YOOKASSA_CHECKOUT=0`; `YOOKASSA_SHOP_ID`/`SECRET_KEY` отсутствуют - флаг не включали.
+- MSK catalog `.184` / TC/TEP не трогали. Projection token env unset (open read OK для smoke).
+
+### Решения
+- Runtime на `.159` только из Codex tree; docs sync на `feat/next-monorepo`.
+- CF.P0/P1 → ✅ на finance; CF.P0b gate на catalog CTA остаётся; next = Cursor CF.P1b + P2 UI.
+- YooKassa: checklist only (§11 catalog-finance-projection); STUB оставить включённым.
+
+### Проблемы
+- Без DNS/TLS нельзя зарегистрировать публичный YooKassa webhook на finance.
+- Catalog ещё без HTTP client к finance - UI admission на `.184` рано.
+- Dual-DB External(catalog)↔Checkout(finance) fan-in для buyer/admin на catalog host ещё не решён.
+
+---
+
 ## 2026-07-30 - Lock: catalog ↔ finance projection contour
 
 ### Наблюдения
