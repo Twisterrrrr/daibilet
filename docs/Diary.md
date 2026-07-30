@@ -1,3 +1,27 @@
+## 2026-07-30 — Phase 2: unified purchase projection
+
+### Наблюдения
+
+- После STUB checkout внутренние покупки писались в `CheckoutOrder`, но админка заказов и buyer account продолжали читать в основном `ExternalOrder`.
+- Для MVP нельзя смешивать оба контура в одну таблицу БД: внешний заказ остается зеркалом билетной системы, внутренний checkout остается платежным источником Daibilet.
+
+### Решения
+
+- Добавлен unified read-model `purchase-projection`: он объединяет `CheckoutOrder` и `ExternalOrder` в DTO "покупки" для админки и покупателя.
+- `GET /api/admin/orders` теперь показывает внутренние покупки как `sourceKind=internal`, `sourceCode=MANUAL`, `sourceLabel=Дайбилет`, сохраняя внешние TC/Teplohod заказы в той же таблице.
+- `GET /api/account/purchases` перехвачен typed handler и возвращает внутренние + внешние покупки одного покупателя.
+- Supplier LC orders/dashboard переведены на checkout projection по `CheckoutItem.supplierId`, чтобы поставщик видел свои внутренние продажи без отдельной таблицы заказов поставщика.
+
+### Проверки
+
+- `apps/backend/node_modules/.bin/tsc.CMD --noEmit` — OK.
+- `apps/backend/node_modules/.bin/tsx.CMD --test src/purchase-projection.test.ts` — OK.
+- `apps/backend/node_modules/.bin/tsx.CMD --test src/supplier-portal.dto.test.ts src/purchase-projection.test.ts` — OK.
+- Полный `pnpm backend:typecheck` локально блокируется engine policy: в консоли Node `v24.14.0`, проект ожидает `>=22.13.0 <23`.
+- PowerShell на этой машине иногда показывает UTF-8 как mojibake при `Get-Content`; проверять реальные строки лучше через `rg` или запускать с UTF-8 output encoding.
+
+---
+
 ## 2026-07-30 — Phase 2: admission products + supplier read-first
 
 ### Наблюдения

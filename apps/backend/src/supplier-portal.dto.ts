@@ -16,6 +16,7 @@ import type {
 import { prisma, type Prisma } from '@daibilet/db';
 import { loadAdmissionProductsList } from './admission-products.dto.js';
 import { resolveSupplierCheckoutReadiness } from './admin-suppliers.dto.js';
+import { loadSupplierCheckoutPurchaseRows } from './purchase-projection.js';
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 100;
@@ -232,7 +233,7 @@ export async function buildSupplierPortalDashboardDto(
   const [aggregates, upcomingSessions, latestOrders, attentionEvents] = await Promise.all([
     loadSupplierPortalAggregates(supplier.id),
     loadUpcomingSessions(supplier.id, 5),
-    loadSupplierOrderRows(supplier.id, new URLSearchParams({ limit: '5' })),
+    loadSupplierCheckoutPurchaseRows(supplier.id, new URLSearchParams({ limit: '5' })),
     loadSupplierEventRows(supplier.id, new URLSearchParams({ limit: '25' })),
   ]);
   const attentionAdmissions = await loadAdmissionProductsList(
@@ -328,7 +329,7 @@ export async function buildSupplierPortalOrdersListDto(
   searchParams: URLSearchParams = new URLSearchParams(),
 ): Promise<SupplierPortalOrdersListDto> {
   const supplier = await resolveSupplierPortal(searchParams);
-  return loadSupplierOrderRows(supplier.id, searchParams);
+  return loadSupplierCheckoutPurchaseRows(supplier.id, searchParams);
 }
 
 export async function buildSupplierPortalFinanceDto(

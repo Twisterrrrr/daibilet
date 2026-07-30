@@ -1,4 +1,5 @@
 import type { Server } from 'node:http';
+import { createAccountPurchasesRouteHandler } from './account-purchases-handler.js';
 import {
   buildAdminAdmissionProductsListDto,
   buildAdminVenueAdmissionProductsListDto,
@@ -158,6 +159,7 @@ const server = startServer({
         buildFinance: buildSupplierPortalFinanceDto,
         buildReviewsList: buildSupplierPortalReviewsListDto,
       }),
+      createAccountPurchasesRouteHandler({ db }),
       createStubCheckoutRouteHandler(),
       createYooKassaCheckoutRouteHandler(),
       createPublicReviewsRouteHandler(),

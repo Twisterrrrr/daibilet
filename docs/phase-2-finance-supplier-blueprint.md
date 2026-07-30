@@ -491,6 +491,14 @@ Status 2026-07-30:
 - supplier LC should see only its own `CheckoutItem` rows and payout/commission state;
 - buyer account should show both widget/imported purchases and Daibilet checkout purchases under "Мои покупки".
 
+Status update 2026-07-30:
+
+- done: `PurchaseProjection` DTO/API combines `CheckoutOrder` and `ExternalOrder` into one operator/buyer/supplier read model;
+- `GET /api/admin/orders` includes internal Daibilet checkout purchases as `sourceKind=internal`, `sourceCode=MANUAL`, while keeping imported widget orders as `sourceKind=external`;
+- `GET /api/account/purchases` returns both widget/imported purchases and Daibilet checkout purchases under one buyer feed;
+- supplier LC orders/dashboard read internal sales from `CheckoutItem.supplierId`, not from a separate supplier-order table;
+- next gate before real admission checkout: STUB smoke on one live-like supplier/admission product, then YooKassa sandbox for `VENUE_ADMISSION`.
+
 ### Phase 2.5: supplier LC MVP
 
 - ✅ read-first supplier dashboard: `GET /api/supplier/dashboard`;
