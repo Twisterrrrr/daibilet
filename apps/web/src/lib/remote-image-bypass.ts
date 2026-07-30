@@ -7,6 +7,7 @@ const CLIENT_FETCH_HOST_SUFFIXES = [
   'yandexcloud.net',
   'twcstorage.ru',
   'googleapis.com',
+  'amazonaws.com',
 ] as const;
 
 const CLIENT_FETCH_HOST_INCLUDES = ['ticketscloud'] as const;

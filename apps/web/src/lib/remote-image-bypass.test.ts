@@ -37,6 +37,14 @@ describe('shouldBypassNextImageOptimizer', () => {
     ).toBe(true);
   });
 
+  it('bypasses amazonaws S3 URLs', () => {
+    expect(
+      shouldBypassNextImageOptimizer(
+        'https://bucket.s3.eu-central-1.amazonaws.com/path/to/image.jpg',
+      ),
+    ).toBe(true);
+  });
+
   it('keeps daibilet own-domain images on optimizer path', () => {
     expect(shouldBypassNextImageOptimizer('https://daibilet.ru/some/other/path.jpg')).toBe(false);
   });
