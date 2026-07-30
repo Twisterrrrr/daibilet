@@ -1,3 +1,27 @@
+## 2026-07-30 — Supplier LC admission STUB smoke
+
+### Наблюдения
+
+- Backend уже умел создавать STUB checkout для `AdmissionProduct` / `AdmissionOffer`, но поставщик видел только read-first картину.
+- Для первого операционного smoke важнее проверить весь путь продажи, чем сразу открывать широкую публичную кнопку в catalog.
+
+### Решения
+
+- Добавлен supplier-scoped write endpoint: `POST /api/supplier/admissions/:id/stub-purchase`.
+- Endpoint берёт текущего поставщика из supplier auth bridge, проверяет принадлежность admission-продукта поставщику, выбирает ручной активный offer и создаёт STUB-заказ через общий checkout service.
+- В `apps/supplier` во вкладке «Входные билеты» появилась кнопка «Тестовая продажа» для `canSell` продуктов; после создания заказа ЛК обновляет список и показывает номер/сумму.
+- Query fallback для POST сохранён только для local/dev smoke; production path должен идти через `SiteUser` + `SupplierUser` Bearer token.
+
+### Проверки
+
+- `pnpm --config.engine-strict=false --filter @daibilet/contracts typecheck` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/backend typecheck` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/supplier typecheck` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/supplier build` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/backend exec tsx --test src/supplier-admission-stub-purchase-handler.test.ts` — SKIP без `DATABASE_URL` в локальной копии; тест готов к live dev/staging DB.
+
+---
+
 ## 2026-07-30 — Supplier LC auth bridge
 
 ### Наблюдения

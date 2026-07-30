@@ -43,6 +43,7 @@ import { createPublicFinanceProjectionRouteHandler } from './public-finance-proj
 import { buildPublicVenueDto, buildPublicVenuesDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
 import { createPublicVenueRouteHandler } from './public-venue-handler.js';
 import { createPublicReadStackWarmer } from './public-warmup.js';
+import { createSupplierAdmissionStubPurchaseRouteHandler } from './supplier-admission-stub-purchase-handler.js';
 import { createSupplierAuthRouteHandler, resolveSupplierPortalSearchParams } from './supplier-auth-handler.js';
 import { createSupplierPortalRouteHandler } from './supplier-portal-handler.js';
 import {
@@ -166,6 +167,9 @@ const server = startServer({
         invalidatePublicCaches,
       }),
       createSupplierAuthRouteHandler({ db }),
+      createSupplierAdmissionStubPurchaseRouteHandler({
+        resolveSearchParams: resolveSupplierPortalSearchParams,
+      }),
       createSupplierPortalRouteHandler({
         resolveSearchParams: resolveSupplierPortalSearchParams,
         buildDashboard: buildSupplierPortalDashboardDto,

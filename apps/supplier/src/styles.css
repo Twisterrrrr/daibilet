@@ -324,6 +324,7 @@ small {
 }
 
 .ghost-button:disabled,
+.table-action-button:disabled,
 .login-form button:disabled {
   cursor: default;
   opacity: 0.62;
@@ -366,6 +367,30 @@ small {
   margin: 7px 0 0;
   color: var(--text-soft);
   line-height: 1.5;
+}
+
+.notice-panel {
+  display: grid;
+  gap: 4px;
+  border-radius: var(--radius-panel);
+  padding: 12px 14px;
+  font-size: 14px;
+}
+
+.notice-panel.success {
+  border: 1px solid rgba(35, 134, 86, 0.22);
+  background: rgba(35, 134, 86, 0.08);
+  color: var(--success);
+}
+
+.notice-panel.error {
+  border: 1px solid rgba(203, 61, 61, 0.22);
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.notice-panel span {
+  color: var(--text);
 }
 
 .stats-grid {
@@ -610,6 +635,26 @@ td strong,
 td span {
   display: block;
   max-width: 360px;
+}
+
+.table-action-button {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-control);
+  background: var(--accent);
+  color: #ffffff;
+  cursor: pointer;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.table-action-button:hover:not(:disabled) {
+  background: #255fbf;
 }
 
 .status-pill {

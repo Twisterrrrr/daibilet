@@ -4,6 +4,7 @@ import { NavLink, Navigate, Route, Routes, useSearchParams } from 'react-router-
 import type {
   SupplierPortalDashboardDto,
   SupplierPortalAdmissionsListDto,
+  SupplierPortalAdmissionStubPurchaseResultDto,
   SupplierPortalAuthDto,
   SupplierPortalEventsListDto,
   SupplierPortalFinanceDto,
@@ -530,10 +531,63 @@ function EventsPage({ supplierKey }: { supplierKey: string }) {
 
 function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
   const { data, loading, error, reload } = useSupplierResource<SupplierPortalAdmissionsListDto>('/api/supplier/admissions?limit=50', supplierKey);
+  const [smokeBusyProductId, setSmokeBusyProductId] = React.useState<string | null>(null);
+  const [smokeResult, setSmokeResult] = React.useState<SupplierPortalAdmissionStubPurchaseResultDto | null>(null);
+  const [smokeError, setSmokeError] = React.useState<string | null>(null);
+
+  async function createSmokePurchase(product: SupplierPortalAdmissionsListDto['items'][number]) {
+    const offer = product.offers.find((item) => item.active && item.priceRub != null && item.priceRub >= 100) ||
+      product.offers.find((item) => item.active) ||
+      product.offers[0] ||
+      null;
+    if (!offer) {
+      setSmokeError('У входного билета нет категории для тестовой продажи.');
+      return;
+    }
+
+    setSmokeBusyProductId(product.id);
+    setSmokeError(null);
+    setSmokeResult(null);
+    try {
+      const result = await supplierPost<SupplierPortalAdmissionStubPurchaseResultDto>(
+        `/api/supplier/admissions/${encodeURIComponent(product.id)}/stub-purchase`,
+        {
+          admissionOfferId: offer.id,
+          quantity: 1,
+          buyer: {
+            email: `smoke+${Date.now()}@daibilet.ru`,
+            name: 'Тестовый покупатель',
+            phone: null,
+          },
+          idempotencyKey: `supplier-lc-admission-smoke-${product.id}-${Date.now()}`,
+        },
+        undefined,
+        supplierKey,
+      );
+      setSmokeResult(result);
+      reload();
+    } catch (error) {
+      setSmokeError(error instanceof Error ? error.message : String(error));
+    } finally {
+      setSmokeBusyProductId(null);
+    }
+  }
 
   return (
     <div className="page-stack">
-      <PageTitle title="Входные билеты" description="Билеты с открытой датой и входные продукты площадок: музеи, арт-пространства, выставки, аттракционы. Пока только чтение и контроль готовности." action={<RefreshButton onClick={reload} />} />
+      <PageTitle title="Входные билеты" description="Билеты с открытой датой и входные продукты площадок: музеи, арт-пространства, выставки, аттракционы. Можно проверить тестовую продажу без реальной оплаты." action={<RefreshButton onClick={reload} />} />
+      {smokeResult ? (
+        <div className="notice-panel success">
+          <strong>Тестовая продажа создана: заказ {smokeResult.order.publicCode}</strong>
+          <span>{smokeResult.order.subject.admissionProductTitle} · {smokeResult.order.item.ticketTitle || 'билет'} · {formatMoney(smokeResult.order.totals.totalKopecks)}</span>
+        </div>
+      ) : null}
+      {smokeError ? (
+        <div className="notice-panel error">
+          <strong>Не удалось создать тестовую продажу</strong>
+          <span>{smokeError}</span>
+        </div>
+      ) : null}
       {data ? (
         <div className="stats-grid">
           <StatCard label="Всего" value={data.metrics.total} hint={`${data.metrics.published} опубликовано`} />
@@ -544,7 +598,7 @@ function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
       <DataState loading={loading} error={error} onRetry={reload} hasData={Boolean(data?.items.length)}>
         {data ? (
           <Table
-            columns={['Билет', 'Площадка', 'Срок действия', 'Категории', 'Цена', 'Готовность']}
+            columns={['Билет', 'Площадка', 'Срок действия', 'Категории', 'Цена', 'Готовность', 'Действия']}
             rows={data.items.map((product) => [
               <div key="product"><strong>{product.title}</strong><small>{product.purchaseFlow === 'PLATFORM' ? 'внутренние продажи' : 'витрина'}</small></div>,
               <div key="venue"><span>{product.venue.title}</span><small>{product.city.title || '-'}</small></div>,
@@ -552,6 +606,16 @@ function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
               <div key="offers"><span>{product.offers.filter((offer) => offer.active).length} активных</span><small>{product.offers.map((offer) => offer.title || 'билет').join(', ') || '-'}</small></div>,
               formatRub(product.priceFromRub),
               <IssueList key="health" compact issues={[...product.health.blockers, ...product.health.warnings]} empty="готово" />,
+              <button
+                key="action"
+                type="button"
+                className="table-action-button"
+                disabled={!product.readiness.canSell || smokeBusyProductId === product.id}
+                onClick={() => void createSmokePurchase(product)}
+                title={product.readiness.canSell ? 'Создать STUB-заказ без реальной оплаты' : 'Сначала закройте блокеры готовности'}
+              >
+                {smokeBusyProductId === product.id ? 'Создаем...' : 'Тестовая продажа'}
+              </button>,
             ])}
           />
         ) : null}

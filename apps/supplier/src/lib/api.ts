@@ -48,9 +48,10 @@ export async function supplierPost<T>(
   apiPath: string,
   body: unknown,
   accessToken?: string,
+  supplierKey = '',
 ): Promise<T> {
   const token = accessToken || readStoredAccessToken();
-  const response = await fetch(supplierApiUrl(apiPath, ''), {
+  const response = await fetch(supplierApiUrl(apiPath, supplierKey), {
     method: 'POST',
     credentials: 'same-origin',
     cache: 'no-store',

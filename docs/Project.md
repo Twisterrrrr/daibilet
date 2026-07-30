@@ -274,6 +274,7 @@ Supplier LC read-first slice added:
 - app: `apps/supplier` Vite shell on local port `5179`;
 - security: supplier auth uses `SiteUser` + active `SupplierUser` links via `POST /api/supplier/auth/login`, `GET /api/supplier/auth/me`, `POST /api/supplier/auth/logout`; query-param supplier access is dev-only unless explicitly enabled;
 - scope: read-only dashboard, events, internal checkout orders, ledger/payout snapshot, reviews and legal/bank profile.
+- supplier smoke action: `POST /api/supplier/admissions/:id/stub-purchase` creates a supplier-scoped STUB order for a saleable `AdmissionProduct` and makes it visible in supplier orders/finance.
 
 STUB checkout slice added:
 
@@ -282,8 +283,9 @@ STUB checkout slice added:
 - creates internal `CheckoutOrder`, `CheckoutItem`, `Payment(provider=MANUAL)`, `FulfillmentItem(provider=STUB)` and supplier ledger rows;
 - guardrail: every non-test environment requires `DAIBILET_STUB_CHECKOUT=1`, imported/source-managed TC/Teplohod events are blocked;
 - supported sale subject now: one manual `DAIBILET_MANAGED` event with explicit manual offers and either a concrete future session or `OPEN_DATE`;
-- venue admission MVP: museum/gallery/attraction admission is represented as an `OPEN_DATE` event linked to venue; later this should become a separate venue-level product model.
+- venue admission MVP: museum/gallery/attraction admission is represented as a separate `AdmissionProduct` / `AdmissionOffer` linked to venue, not as a fake event slot.
 - smoke seed: `pnpm backend:checkout:seed-stub` creates a local manual open-date product; `pnpm backend:checkout:seed-stub -- --order` also creates a STUB internal order.
+- admission smoke seed: `pnpm backend:checkout:seed-stub-admission`; with `-- --order` it creates a STUB `VENUE_ADMISSION` order.
 
 YooKassa sandbox backend slice added:
 

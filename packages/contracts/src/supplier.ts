@@ -1,5 +1,6 @@
 import type { Readiness, ReadinessIssue } from './common.js';
 import type { AdmissionProductsListDto } from './admission.js';
+import type { StubCheckoutBuyerDto, StubCheckoutResultDto } from './checkout.js';
 
 export interface SupplierPortalIdentityDto {
   id: string;
@@ -163,6 +164,15 @@ export interface SupplierPortalEventsListDto {
 export interface SupplierPortalAdmissionsListDto extends AdmissionProductsListDto {
   supplier: SupplierPortalIdentityDto;
 }
+
+export interface SupplierPortalAdmissionStubPurchaseRequestDto {
+  admissionOfferId?: string | null;
+  quantity?: number;
+  buyer?: Partial<StubCheckoutBuyerDto> | null;
+  idempotencyKey?: string | null;
+}
+
+export type SupplierPortalAdmissionStubPurchaseResultDto = StubCheckoutResultDto;
 
 export interface SupplierPortalSessionPreviewDto {
   id: string;
