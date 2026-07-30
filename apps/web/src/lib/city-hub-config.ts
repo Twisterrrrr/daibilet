@@ -1,0 +1,113 @@
+/**
+ * Per-city IA config for city hubs (wireframe v2 / task 1.3.7).
+ * Контент brief/travel/sights остаётся в cityInfo; здесь только layout и перелинковка.
+ */
+
+export type CityHubSection = 'directions' | 'venues' | 'travel' | 'sights' | 'seo';
+
+export type FeaturedDirectionConfig = {
+  id: string;
+  label: string;
+  landingSlug?: string;
+  categoryKey?: string;
+  href?: string;
+  emphasis?: 'primary' | 'default';
+};
+
+export type CityHubConfig = {
+  featuredDirections?: FeaturedDirectionConfig[];
+  highlightSeason?: { label: string; monthsHint?: string };
+  hideSections?: CityHubSection[];
+  primaryCta?: { label: string; target: '#affiche' | '#directions' | string };
+  sectionOrderAfterAffiche?: Array<'directions' | 'venues' | 'travel' | 'sights'>;
+  venuesTopN?: number;
+};
+
+const SLUG_ALIASES: Record<string, string> = {
+  moskva: 'moscow',
+  'sankt-peterburg': 'saint-petersburg',
+  'nizhniy-novgorod': 'nizhny-novgorod',
+  'velikiy-novgorod': 'veliky-novgorod',
+  'rostov-on-don': 'rostov-na-donu',
+};
+
+export const CITY_HUB_CONFIG: Record<string, CityHubConfig> = {
+  'saint-petersburg': {
+    highlightSeason: { label: 'Белые ночи', monthsHint: 'май-июль' },
+    primaryCta: { label: 'Круизы и прогулки', target: '#directions' },
+    featuredDirections: [
+      { id: 'river', label: 'Речные прогулки', landingSlug: 'river-cruises', emphasis: 'primary' },
+      { id: 'palaces', label: 'Дворцы и Петергоф', landingSlug: 'country-tours' },
+      { id: 'museums', label: 'Музеи', landingSlug: 'moscow-museums', categoryKey: 'Музеи' },
+      { id: 'bridges', label: 'Развод мостов', landingSlug: 'bridges-night' },
+      { id: 'yards', label: 'Дворы и крыши', landingSlug: 'spb-yards' },
+      { id: 'standup', label: 'Стендап', landingSlug: 'standup' },
+    ],
+    venuesTopN: 10,
+  },
+  moscow: {
+    primaryCta: { label: 'События в Москве', target: '#affiche' },
+    featuredDirections: [
+      { id: 'theatre', label: 'Театр', categoryKey: 'Театр', emphasis: 'primary' },
+      { id: 'concerts', label: 'Концерты', landingSlug: 'concerts-genre' },
+      { id: 'river', label: 'Речные прогулки', landingSlug: 'river-cruises' },
+      { id: 'museums', label: 'Музеи', landingSlug: 'moscow-museums' },
+      { id: 'bus', label: 'Автобусные экскурсии', landingSlug: 'bus-tours' },
+      { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
+    ],
+    sectionOrderAfterAffiche: ['directions', 'venues', 'travel', 'sights'],
+    venuesTopN: 12,
+  },
+  sochi: {
+    highlightSeason: { label: 'Бархатный сезон', monthsHint: 'сентябрь-ноябрь' },
+    primaryCta: { label: 'Афиша Сочи', target: '#affiche' },
+    featuredDirections: [
+      { id: 'sea', label: 'Море и набережная', categoryKey: 'Экскурсии', emphasis: 'primary' },
+      { id: 'krasnaya', label: 'Красная Поляна', categoryKey: 'Активный отдых' },
+      { id: 'concerts', label: 'Концерты', landingSlug: 'concerts-genre' },
+      { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
+    ],
+    venuesTopN: 8,
+  },
+  kazan: {
+    highlightSeason: { label: 'Летний сезон', monthsHint: 'май-сентябрь' },
+    primaryCta: { label: 'События в Казани', target: '#affiche' },
+    featuredDirections: [
+      { id: 'kremlin', label: 'Кремль и центр', categoryKey: 'Экскурсии', emphasis: 'primary' },
+      { id: 'walking', label: 'Пешие прогулки', landingSlug: 'walking-tours' },
+      { id: 'standup', label: 'Стендап', landingSlug: 'standup' },
+      { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
+    ],
+    venuesTopN: 8,
+  },
+  'sankt-peterburg': {
+    highlightSeason: { label: 'Белые ночи', monthsHint: 'май-июль' },
+    primaryCta: { label: 'Круизы и прогулки', target: '#directions' },
+    featuredDirections: [
+      { id: 'river', label: 'Речные прогулки', landingSlug: 'river-cruises', emphasis: 'primary' },
+      { id: 'palaces', label: 'Дворцы и Петергоф', landingSlug: 'country-tours' },
+      { id: 'bridges', label: 'Развод мостов', landingSlug: 'bridges-night' },
+      { id: 'yards', label: 'Дворы и крыши', landingSlug: 'spb-yards' },
+    ],
+    venuesTopN: 10,
+  },
+};
+
+export function normalizeCityHubSlug(slug: string | null | undefined): string {
+  const raw = String(slug || '').trim().toLowerCase();
+  if (!raw) return '';
+  return SLUG_ALIASES[raw] || raw;
+}
+
+export function resolveCityHubConfig(slug: string | null | undefined): CityHubConfig | null {
+  const normalized = normalizeCityHubSlug(slug);
+  if (!normalized) return null;
+  return CITY_HUB_CONFIG[normalized] || CITY_HUB_CONFIG[slug?.trim().toLowerCase() || ''] || null;
+}
+
+export function isCityHubSectionHidden(
+  config: CityHubConfig | null,
+  section: CityHubSection,
+): boolean {
+  return Boolean(config?.hideSections?.includes(section));
+}

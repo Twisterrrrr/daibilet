@@ -19,6 +19,8 @@ import { venuePageTemplate } from '@/lib/venue-meta';
 import { eventHref, sessionVenueHref, venueHref } from '@/lib/routes';
 import { inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
 import { buildCityHubSeoPhrase } from '@/lib/city-hub-seo';
+import { isCityHubSectionHidden, resolveCityHubConfig } from '@/lib/city-hub-config';
+import { matchSightAfficheLink, resolveFeaturedDirections } from '@/lib/city-hub-directions';
 import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
 import { isOpenDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import {
@@ -136,18 +138,32 @@ export function CityPageView({
     return Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
   }, [payload]);
   const guide = city ? cityGuideFor(city) : null;
+  const hubConfig = React.useMemo(() => resolveCityHubConfig(slug), [slug]);
   const unifiedFaq = React.useMemo(() => mergeCityFaqItems(guide?.faq, faqItems), [faqItems, guide?.faq]);
+  const featuredDirections = React.useMemo(
+    () =>
+      resolveFeaturedDirections({
+        config: hubConfig,
+        landings: payload?.landings || [],
+        categories,
+        citySlug: city?.slug || city?.sourceSlug || slug,
+      }),
+    [hubConfig, payload?.landings, categories, city?.slug, city?.sourceSlug, slug],
+  );
 
   const hasDirections = Boolean(
-    (payload?.landings?.some((landing) => Number(landing.events) > 0) ?? false) ||
-      categories.some(([, count]) => count > 0),
+    !isCityHubSectionHidden(hubConfig, 'directions') &&
+      (featuredDirections.length > 0 ||
+        (payload?.landings?.some((landing) => Number(landing.events) > 0) ?? false) ||
+        categories.some(([, count]) => count > 0)),
   );
-  const hasVenues = Boolean(payload?.venues?.length);
-  const hasTravel = Boolean(guide?.travel?.trim());
+  const hasVenues = Boolean(!isCityHubSectionHidden(hubConfig, 'venues') && payload?.venues?.length);
+  const hasTravel = Boolean(!isCityHubSectionHidden(hubConfig, 'travel') && guide?.travel?.trim());
   const hasSights = Boolean(
-    guide?.sights?.length ||
-      guide?.mustSee?.length ||
-      (contentReady && (categories.length > 0 || (payload?.venues?.length || 0) > 0)),
+    !isCityHubSectionHidden(hubConfig, 'sights') &&
+      (guide?.sights?.length ||
+        guide?.mustSee?.length ||
+        (contentReady && (categories.length > 0 || (payload?.venues?.length || 0) > 0))),
   );
   const hasFaq = unifiedFaq.length > 0;
   const hasSeo = Boolean(seoText);
@@ -199,6 +215,7 @@ export function CityPageView({
               stats={payload.stats}
               guide={guide}
               hasTravel={hasTravel}
+              hubConfig={hubConfig}
               editorial={editorial}
             />
             <CityStickyTabs tabs={tabs} editorial={editorial} />
@@ -239,6 +256,7 @@ export function CityPageView({
                 guide={guide}
                 categories={categories}
                 venues={payload.venues}
+                landings={payload.landings}
                 allowFallback={contentReady}
                 editorial={editorial}
                 articles={sightsArticles}
@@ -310,6 +328,7 @@ export function CityPageView({
                 guide={guide}
                 categories={categories}
                 venues={payload.venues}
+                landings={payload.landings}
                 allowFallback={contentReady}
                 editorial={editorial}
                 articles={sightsArticles}
@@ -375,7 +394,7 @@ export function CityPageView({
                   <>
                     <PopularDirections
                       city={city}
-                      landings={payload.landings}
+                      featuredDirections={featuredDirections}
                       categories={categories}
                       editorial={editorial}
                       nested
@@ -385,7 +404,13 @@ export function CityPageView({
                         scrollToSection('affiche');
                       }}
                     />
-                    <VenueHighlights city={city} venues={payload.venues} editorial={editorial} nested />
+                    <VenueHighlights
+                      city={city}
+                      venues={payload.venues}
+                      topN={hubConfig?.venuesTopN}
+                      editorial={editorial}
+                      nested
+                    />
                   </>
                 ) : (
                   <CityContentLoadingState />
@@ -422,18 +447,36 @@ function CityHero({
   stats,
   guide,
   hasTravel,
+  hubConfig = null,
   editorial = false,
 }: {
   city: PublicCityDto;
   stats: PublicCityPageDto['stats'];
   guide: CityInfoEntry | null;
   hasTravel: boolean;
+  hubConfig?: ReturnType<typeof resolveCityHubConfig>;
   editorial?: boolean;
 }) {
   if (editorial) {
-    return <CityHeroEditorial city={city} stats={stats} guide={guide} hasTravel={hasTravel} />;
+    return (
+      <CityHeroEditorial
+        city={city}
+        stats={stats}
+        guide={guide}
+        hasTravel={hasTravel}
+        hubConfig={hubConfig}
+      />
+    );
   }
-  return <CityHeroDefault city={city} stats={stats} guide={guide} hasTravel={hasTravel} />;
+  return (
+    <CityHeroDefault
+      city={city}
+      stats={stats}
+      guide={guide}
+      hasTravel={hasTravel}
+      hubConfig={hubConfig}
+    />
+  );
 }
 
 function CityHeroEditorial({
@@ -441,11 +484,13 @@ function CityHeroEditorial({
   stats,
   guide,
   hasTravel,
+  hubConfig = null,
 }: {
   city: PublicCityDto;
   stats: PublicCityPageDto['stats'];
   guide: CityInfoEntry | null;
   hasTravel: boolean;
+  hubConfig?: ReturnType<typeof resolveCityHubConfig>;
 }) {
   return (
     <CityHeroStrip
@@ -453,6 +498,7 @@ function CityHeroEditorial({
       stats={stats}
       guide={guide}
       hasTravel={hasTravel}
+      hubConfig={hubConfig}
       editorial
     />
   );
@@ -463,13 +509,17 @@ function CityHeroDefault({
   stats,
   guide,
   hasTravel,
+  hubConfig = null,
 }: {
   city: PublicCityDto;
   stats: PublicCityPageDto['stats'];
   guide: CityInfoEntry | null;
   hasTravel: boolean;
+  hubConfig?: ReturnType<typeof resolveCityHubConfig>;
 }) {
-  return <CityHeroStrip city={city} stats={stats} guide={guide} hasTravel={hasTravel} />;
+  return (
+    <CityHeroStrip city={city} stats={stats} guide={guide} hasTravel={hasTravel} hubConfig={hubConfig} />
+  );
 }
 
 /** Нейтральный strip как у /events, /blog, /podborki - без full-bleed фото. */
@@ -478,18 +528,24 @@ function CityHeroStrip({
   stats,
   guide,
   hasTravel,
+  hubConfig = null,
   editorial = false,
 }: {
   city: PublicCityDto;
   stats: PublicCityPageDto['stats'];
   guide: CityInfoEntry | null;
   hasTravel: boolean;
+  hubConfig?: ReturnType<typeof resolveCityHubConfig>;
   editorial?: boolean;
 }) {
   const cityIn = cityInPrepositional(city);
   const brief =
     guide?.brief ||
     `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат и дату - и покупайте билет онлайн на Дайбилете.`;
+  const primaryCta = hubConfig?.primaryCta;
+  const primaryTarget = primaryCta?.target || '#affiche';
+  const primaryLabel = primaryCta?.label || `События ${cityIn}`;
+  const seasonChip = hubConfig?.highlightSeason;
 
   return (
     <div id="top">
@@ -526,6 +582,18 @@ function CityHeroStrip({
           >
             {brief}
           </p>
+          {seasonChip ? (
+            <p className={`mt-3 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+              <span
+                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
+                  editorial ? 'bg-zinc-200 text-zinc-800' : 'bg-primary-50 text-primary-800'
+                }`}
+              >
+                {seasonChip.label}
+                {seasonChip.monthsHint ? ` (${seasonChip.monthsHint})` : ''}
+              </span>
+            </p>
+          ) : null}
           <p
             className={`mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm ${
               editorial ? 'text-zinc-500' : 'text-slate-500'
@@ -542,21 +610,35 @@ function CityHeroStrip({
             </span>
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <a
-              href="#affiche"
-              onClick={(event) => {
-                event.preventDefault();
-                scrollToSection('affiche');
-              }}
-              className={
-                editorial
-                  ? 'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-zinc-950 px-5 text-sm font-medium text-white ring-1 ring-zinc-950 transition hover:bg-zinc-800'
-                  : 'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white hover:bg-primary-700'
-              }
-            >
-              <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
-              <span>События {cityIn}</span>
-            </a>
+            {primaryTarget.startsWith('#') ? (
+              <a
+                href={primaryTarget}
+                onClick={(event) => {
+                  event.preventDefault();
+                  scrollToSection(primaryTarget.replace(/^#/, ''));
+                }}
+                className={
+                  editorial
+                    ? 'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-zinc-950 px-5 text-sm font-medium text-white ring-1 ring-zinc-950 transition hover:bg-zinc-800'
+                    : 'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white hover:bg-primary-700'
+                }
+              >
+                <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>{primaryLabel}</span>
+              </a>
+            ) : (
+              <Link
+                href={primaryTarget}
+                className={
+                  editorial
+                    ? 'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-zinc-950 px-5 text-sm font-medium text-white ring-1 ring-zinc-950 transition hover:bg-zinc-800'
+                    : 'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white hover:bg-primary-700'
+                }
+              >
+                <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span>{primaryLabel}</span>
+              </Link>
+            )}
             {hasTravel ? (
               <a
                 href="#travel"
@@ -794,14 +876,14 @@ function CityLoadingState({ editorial = false }: { editorial?: boolean }) {
 
 function PopularDirections({
   city,
-  landings,
+  featuredDirections,
   categories,
   onCategory,
   editorial = false,
   nested = false,
 }: {
   city: PublicCityDto;
-  landings: PublicLandingDto[];
+  featuredDirections: ReturnType<typeof resolveFeaturedDirections>;
   categories: Array<[string, number]>;
   onCategory: (category: string) => void;
   editorial?: boolean;
@@ -809,21 +891,27 @@ function PopularDirections({
 }) {
   const cityIn = cityInPrepositional(city);
   const citySlug = city.slug || city.sourceSlug || undefined;
-  const landingItems = landings
-    .filter((landing) => Number(landing.events) > 0)
-    .slice(0, 6)
-    .map((landing) => ({
-      slug: landing.slug,
-      title: landing.title,
-      subtitle: landing.subtitle || null,
-      events: landing.events,
-      priceFrom: landing.priceFrom ?? null,
+  const landingItems = featuredDirections
+    .filter((item) => item.slug && item.events > 0)
+    .map((item) => ({
+      slug: item.slug!,
+      title: item.title,
+      subtitle: item.subtitle || null,
+      events: item.events,
+      priceFrom: item.priceFrom ?? null,
     }));
   const landingTitles = new Set(landingItems.map((item) => item.title.trim().toLowerCase()));
-  const categoryItems = categories
-    .filter(([, count]) => count > 0)
-    .filter(([name]) => !landingTitles.has(name.trim().toLowerCase()))
-    .slice(0, Math.max(0, 6 - Math.min(landingItems.length, 3)));
+  const categoryItems = featuredDirections
+    .filter((item) => item.categoryKey && item.events > 0)
+    .filter((item) => !landingTitles.has(item.title.trim().toLowerCase()))
+    .map((item) => [item.categoryKey!, item.events] as [string, number])
+    .concat(
+      categories
+        .filter(([, count]) => count > 0)
+        .filter(([name]) => !landingTitles.has(name.trim().toLowerCase()))
+        .filter(([name]) => !featuredDirections.some((item) => item.categoryKey === name)),
+    )
+    .slice(0, Math.max(0, 6 - landingItems.length));
 
   if (!landingItems.length && !categoryItems.length) return null;
 
@@ -906,6 +994,7 @@ function CitySightsSection({
   guide,
   categories,
   venues,
+  landings = [],
   allowFallback = false,
   editorial = false,
   articles = [],
@@ -915,6 +1004,7 @@ function CitySightsSection({
   guide: CityInfoEntry | null;
   categories: Array<[string, number]>;
   venues: PublicVenueDto[];
+  landings?: PublicLandingDto[];
   allowFallback?: boolean;
   editorial?: boolean;
   articles?: BlogCardDto[];
@@ -931,6 +1021,14 @@ function CitySightsSection({
         : [];
   if (!places.length && !articles.length) return null;
   const cityIn = cityInPrepositional(city);
+  const citySlug = city.slug || city.sourceSlug || undefined;
+  const landingRows = landings.map((landing) => ({
+    slug: landing.slug,
+    title: landing.title,
+    subtitle: landing.subtitle,
+    events: landing.events,
+    priceFrom: landing.priceFrom,
+  }));
 
   return (
     <section
@@ -957,7 +1055,15 @@ function CitySightsSection({
             Точки, с которых удобно начать знакомство с городом.
           </p>
           <ol className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {places.slice(0, 6).map((place, index) => (
+            {places.slice(0, 6).map((place, index) => {
+              const afficheLink = matchSightAfficheLink({
+                sightName: place.name,
+                sightDesc: place.desc,
+                landings: landingRows,
+                categories,
+                citySlug,
+              });
+              return (
               <li key={`${place.name}:${index}`} className="flex gap-3">
                 <span
                   className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
@@ -969,9 +1075,35 @@ function CitySightsSection({
                 <div>
                   <div className={`font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>{place.name}</div>
                   <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>{place.desc}</p>
+                  {afficheLink ? (
+                    afficheLink.href.startsWith('#') ? (
+                      <a
+                        href={afficheLink.href}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          scrollToSection(afficheLink.href.replace(/^#/, ''));
+                        }}
+                        className={`mt-2 inline-flex text-sm font-semibold ${
+                          editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
+                        }`}
+                      >
+                        {afficheLink.label} →
+                      </a>
+                    ) : (
+                      <Link
+                        href={afficheLink.href}
+                        className={`mt-2 inline-flex text-sm font-semibold ${
+                          editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
+                        }`}
+                      >
+                        {afficheLink.label} →
+                      </Link>
+                    )
+                  ) : null}
                 </div>
               </li>
-            ))}
+            );
+            })}
           </ol>
         </>
       ) : null}
@@ -1050,11 +1182,13 @@ function CityTravelSection({
 function VenueHighlights({
   city,
   venues,
+  topN = 6,
   editorial = false,
   nested = false,
 }: {
   city: PublicCityDto;
   venues: PublicVenueDto[];
+  topN?: number;
   editorial?: boolean;
   nested?: boolean;
 }) {
@@ -1062,7 +1196,7 @@ function VenueHighlights({
   const cityIn = cityInPrepositional(city);
   const institutions = venues.filter((venue) => venuePageTemplate(venue.type) !== 'location');
   const locations = venues.filter((venue) => venuePageTemplate(venue.type) === 'location');
-  const featured = [...institutions, ...locations].slice(0, 6);
+  const featured = [...institutions, ...locations].slice(0, Math.max(1, topN));
 
   return (
     <section
