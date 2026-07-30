@@ -59,6 +59,8 @@ packages/config   — shared tsconfig/eslint
 
 **Venue admission path:** музеи, арт-площадки, зоопарки, парки и другие места с входными билетами продаются через `AdmissionProduct` / `AdmissionOffer`, а не через фейковые события. `Event` остается для афиши и расписания; `AdmissionProduct` живет на странице площадки и может участвовать в city/home blocks как самостоятельный продаваемый объект.
 
+**Supplier LC modes:** `Supplier.integrationMode` отделяет тип подключения от способа продажи: `IMPORTED_TICKETING_SYSTEM` = read-only зеркало импортов, `INTERNAL_SALES` = продажи и каталог внутри Daibilet, `API_SYNC` = внешняя система с настройкой routes/webhooks и health.
+
 ---
 
 ## Admin API contract (2026-07-14)

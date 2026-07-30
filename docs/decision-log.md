@@ -114,6 +114,18 @@
 
 ---
 
+## 2026-07-30 — Supplier integration modes
+
+**Решение:** Тип подключения поставщика фиксируется отдельным `Supplier.integrationMode`: `IMPORTED_TICKETING_SYSTEM`, `INTERNAL_SALES`, `API_SYNC`.
+
+**Почему:** `defaultCatalogMode` говорит только о способе покупки, но не объясняет, кто владеет каталогом и что можно делать в ЛК. Для импортных билетных систем нужен read-only LC, для музеев и галерей с внутренними продажами — editable контур, для партнерских API — экран маршрутов, health и синхронизации.
+
+**Граница:** Не смешивать source ownership, checkout flow и supplier permissions в одно поле. Отключение вывода событий импортного поставщика в каталоге — отдельный control-plane слой, не удаление данных импорта.
+
+**Статус:** Введены Prisma enum/field, migration, DTO field и backend policy helper.
+
+---
+
 ## Отложено (не в MVP runtime)
 
 | Тема | Причина отложения |

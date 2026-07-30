@@ -7,6 +7,7 @@ export interface SupplierPortalIdentityDto {
   legalName: string | null;
   status: string;
   kind: string;
+  integrationMode: string;
   defaultCatalogMode: string;
   paymentMode: string;
   pspFeeMode: string;

@@ -25,6 +25,7 @@ async function main() {
     where: { slug: 'stub-daibilet-supplier' },
     update: {
       status: 'ACTIVE',
+      integrationMode: 'INTERNAL_SALES',
       defaultCatalogMode: 'INTERNAL_CHECKOUT',
       defaultCommissionBps: 1000,
       email: 'supplier-stub@daibilet.ru',
@@ -35,6 +36,7 @@ async function main() {
       title: 'Daibilet STUB supplier',
       legalName: 'Daibilet STUB supplier',
       status: 'ACTIVE',
+      integrationMode: 'INTERNAL_SALES',
       defaultCatalogMode: 'INTERNAL_CHECKOUT',
       paymentMode: 'SINGLE_MERCHANT',
       defaultCommissionBps: 1000,
