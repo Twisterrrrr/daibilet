@@ -19,8 +19,8 @@
 | INC.504.6 | nginx proxy_cache SWR: `background_update` + TTL 30m (browser clear ≠ cold Next) | Критический | ✅ |
 | INC.504.7 | City hub ISR: `unstable_cache` + `generateStaticParams` (было no-store / 20-30с) | Критический | ✅ |
 | INC.504.8 | Cron/warm hub pages (`/`, `/events`, top cities) каждые N мин | Высокий | ✅ cron `*/3` + deploy hook |
-| INC.504.9 | Compact `/api/public/home` DTO + cache-control (было ~1.2MB no-store) | Критический | 🔄 |
-| INC.504.10 | City SSR: secondary timeout 3s + perf marks; lighten events list DTO | Критический | 🔄 |
+| INC.504.9 | Compact `/api/public/home` DTO + cache-control (было ~1.2MB no-store) | Критический | ✅ |
+| INC.504.10 | City SSR: secondary timeout 3s + perf marks; lighten events list DTO | Критический | ✅ |
 | INC.504.11 | AAAA IPv6: проверить маршрут до MSK или снять AAAA в Timeweb | Высокий | ⏳ |
 
 См. Diary 2026-07-30 «Prod 504: daibilet-web hang» и «Cold TTFB после browser cache clear».
