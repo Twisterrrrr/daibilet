@@ -1,3 +1,53 @@
+## 2026-07-30 - INC.504.2: nginx bypass `/images/*` (MSK prod)
+
+### Наблюдения
+- Локальные PNG/JPG (`/images/cities/*`, blog covers) шли через `/_next/image` и упирались в зависший web + dead outbound TCP на МСК.
+- Статика лежит на диске: `apps/public/public/images` → `sync-public-assets.mjs` → `apps/web/public/images` при build.
+
+### Решения
+- `deploy/nginx/patch-prod-nginx-images-static.py`: `location ^~ /images/` → alias `/opt/daibilet/apps/web/public/images/`, expires 30d.
+- `deploy-prod-next.sh`: патч при каждом deploy вместе с `/_next/static`.
+- `SafeImage`: `unoptimized` для `src` с префиксом `/images/` - HTML не генерирует `/_next/image` для локальной статики.
+- Tasktracker: INC.504.2 ✅; INC.504.5 (dual SWR dto.js + public-catalog.dto.ts) → F5.3b.
+
+### Проблемы
+- Remote covers (TC CDN, teplohod) по-прежнему через optimizer - нужен INC.504.1 egress/DNS.
+
+## 2026-07-30 - Prod 504: daibilet-web hang (MSK)
+
+### Наблюдения
+- Пользователи и nginx: массовые **504** на https://daibilet.ru (MSK `201.24.125.184`).
+- `daibilet-web` (Next `:3001`) завис: RSS **~1.1G** при systemd **MemoryMax=1G** - процесс в давлении OOM, ответы не отдавались.
+- `journalctl`: синхронный **SWR catalog rebuild** блокировал event loop **49-219 с** на запросах к каталогу/лендингам.
+- `/_next/image`: upstream timeout на remote covers (**api.teplohod.info**, **ticketscloud** CDN) - дополнительная нагрузка на зависший web.
+- Исходящий **DNS/HTTPS с МСК** по-прежнему фильтруется провайдером (см. Diary 2026-07-30 city hub rollout, агент `403122a2`) - IndexNow/Yandex/github недоступны; часть image fetch тоже страдает.
+- PostgreSQL: эпизодические **connection drops** под нагрузкой (digest в journal при рестарте/shutdown).
+
+### Решения
+- Ops hotfix (агент `5a577127`): `systemctl restart daibilet-web` + `nginx -t && systemctl reload nginx`.
+- После рестарта: главная и ключевые маршруты снова **200**; 504 сняты.
+
+### Проблемы
+- **Риск рецидива:** без mitigations тот же сценарий повторится при очередном долгом SWR rebuild + image optimizer + memory pressure.
+- Follow-up в Tasktracker (Medium): тикет Timeweb egress/DNS; nginx bypass `/_next/image` для локальных `/images/*`; пересмотр MemoryMax web; async/non-blocking SWR rebuild.
+
+## 2026-07-30 - City hub 1.3.7 rollout (65 standaloneCities)
+
+### Наблюдения
+- `CITY_HUB_CONFIG` расширен с 4 пилотных + alias на все 65 `standaloneCities`: per-city `highlightSeason`, `primaryCta`, `featuredDirections` (landing-rules slugs + `categoryKey` API-fallback), `venuesTopN` 8-12.
+- Генератор `scripts/gen-city-hub-rollout.mjs` + merge; unit `city-hub-config.test.ts` - 6 тестов OK (coverage 65 slugs, landing slug allowlist).
+- MSK prod DNS: `resolv.conf` уже 8.8.8.8/1.1.1.1, но UDP/TCP :53 к внешним резолверам timeout; curl github.com:443 тоже timeout - исходящий трафик фильтруется на уровне провайдера, не misconfig ОС.
+- MSK `git HEAD` остаётся `20d10eb`; `git fetch origin` невозможен без offline-доставки.
+
+### Решения
+- Rollout конфигов: курортные/прибрежные - chip курортного сезона; Золотое кольцо - «Золотая осень» + walking-tours; речные - `river-cruises`; крупные города venuesTopN 10-12.
+- `docs/city-hub-content-gaps.md` - секция sights без affiche CTA для 6 городов с ⚠️ sights.
+- Offline deploy на МСК (когда github недоступен): (1) build на СПб или CI, (2) `scp` source diff + `.next` tarball, (3) на МСК `git update-ref refs/remotes/origin/feat/next-monorepo HEAD` или git-shim skip fetch/pull, (4) `deploy-prod-next.sh` с `PATH=/tmp/msk-git-shim:$PATH`, (5) nginx cache purge + revalidate hub paths. См. `tmp-msk-deploy-offline.sh`, Diary 2026-07-30 pilot deploy.
+
+### Проблемы
+- DNS на МСК не чинится сменой nameserver - нужен тикет Timeweb на исходящий DNS/HTTPS или постоянный offline pipeline до cutover сети.
+- Prod deploy rollout 1.3.7 ждёт offline-сборку (HEAD локально ≠ `acf8291` на origin).
+
 ## 2026-07-30 - City hub 1.3.7 pilot deploy (MSK prod)
 
 ### Наблюдения

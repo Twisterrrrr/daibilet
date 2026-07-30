@@ -43,6 +43,7 @@ export function SafeImage({
   fallback = null,
   onError,
   className,
+  unoptimized,
   ...props
 }: SafeImageProps) {
   const [failed, setFailed] = React.useState(false);
@@ -56,11 +57,15 @@ export function SafeImage({
     return <>{fallback}</>;
   }
 
+  // Local repo static (/images/*) is served by nginx alias on prod — skip /_next/image.
+  const isLocalStatic = normalized.startsWith('/images/');
+
   return (
     <Image
       src={normalized}
       alt={alt}
       className={className}
+      unoptimized={isLocalStatic || unoptimized}
       onError={(event) => {
         setFailed(true);
         onError?.(event);

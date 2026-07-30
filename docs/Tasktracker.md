@@ -7,6 +7,20 @@
 
 ---
 
+## Infra: prod 504 incident (2026-07-30)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| INC.504.1 | MSK egress/DNS: тикет Timeweb на исходящий UDP/TCP :53 и HTTPS (github, IndexNow, remote image hosts) | Средний | ⏳ |
+| INC.504.2 | nginx: прямой bypass `/images/*` static, без `/_next/image` для локальных файлов | Средний | ✅ |
+| INC.504.3 | Пересмотр `daibilet-web` MemoryMax / heap (1G limit vs ~1.1G RSS под catalog SWR) | Средний | ⏳ |
+| INC.504.4 | SWR catalog rebuild: non-blocking / async (не блокировать event loop 49-219с) | Средний | ⏳ |
+| INC.504.5 | Dual catalog SWR cache (`dto.js` + `public-catalog.dto.ts`) - merge/unify в F5.3b | Средний | ⏳ |
+
+См. Diary 2026-07-30 «Prod 504: daibilet-web hang».
+
+---
+
 ## Catalog sale vs display price (2026-07-30)
 
 | # | Задача | Приоритет | Статус |
@@ -805,7 +819,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 1.3.5 | Hero, categories, venues, events grid | — | ✅ |
 | 1.3.5a | City hub: venues=0 при events>0 (hub top-500 miss) | Критический | ✅ 2026-07-19 |
 | 1.3.6 | `generateMetadata` | — | ✅ |
-| 1.3.7 | Развивать city hubs `/cities/{slug}` (контент, перелинковка, landings) | Высокий | 🔄 пилот 4 города prod @`4bb9b38` (MSK); rollout 65 ⏳ |
+| 1.3.7 | Развивать city hubs `/cities/{slug}` (контент, перелинковка, landings) | Высокий | ✅ rollout 65 hubs `city-hub-config` (пилот 4 + 61); prod deploy ⏳ |
 | 1.3.8 | City-prefix в path venues/events (`/{city}/venues/...`) | — | 🚫 отклонено 2026-07-19 (flat URL) |
 
 ### 1.4 Прочие public routes
@@ -938,6 +952,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-30 | Prod 504 MSK: restart web+nginx; INC.504.1-4 mitigations ⏳ Medium |
 | 2026-07-30 | MIG.8 ✅ СПб public/sync off; PERF.E5 event без catalog; SEO-хвост about/crumbs/variants; F5.0 map |
 | 2026-07-25 | SEO.20 listing garbage audit: код ✅ (`pnpm audit:listings` + Telegram helper); cron 04:00 на prod ⏳ owner |
 | 2026-07-25 | Owner QA close (blog/F4/SEO): SEO.20 daily garbage audit ⏳ High; SEO.21 monthly tag promote ⏳ Medium; SEO.9b phone 🚫 blocked; SEO.9 launch policy ✅ |

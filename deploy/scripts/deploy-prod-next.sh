@@ -195,16 +195,22 @@ fi
 sleep 4
 curl -fsS "http://127.0.0.1:${WEB_PORT}/api/health" >/dev/null && echo "Next /api/health OK on :$WEB_PORT"
 
-# Serve /_next/static from disk (bypass Node + proxy_cache) — survives restarts.
-if [[ -f "$APP_DIR/deploy/nginx/patch-prod-nginx-next-static.py" ]]; then
-  if python3 "$APP_DIR/deploy/nginx/patch-prod-nginx-next-static.py"; then
-    if nginx -t 2>/dev/null; then
-      systemctl reload nginx && echo "nginx reloaded (/_next/static alias)"
+# Serve /images/* and /_next/static from disk (bypass Node + proxy_cache).
+NGINX_STATIC_PATCHED=0
+for _patch in patch-prod-nginx-images-static.py patch-prod-nginx-next-static.py; do
+  if [[ -f "$APP_DIR/deploy/nginx/$_patch" ]]; then
+    if python3 "$APP_DIR/deploy/nginx/$_patch"; then
+      NGINX_STATIC_PATCHED=1
     else
-      echo "Warning: nginx -t failed after next-static patch — not reloading"
+      echo "Warning: $_patch failed"
     fi
+  fi
+done
+if [[ "$NGINX_STATIC_PATCHED" == "1" ]]; then
+  if nginx -t 2>/dev/null; then
+    systemctl reload nginx && echo "nginx reloaded (/images + /_next/static alias)"
   else
-    echo "Warning: patch-prod-nginx-next-static.py failed"
+    echo "Warning: nginx -t failed after static alias patch — not reloading"
   fi
 fi
 

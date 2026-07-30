@@ -86,6 +86,14 @@ server {{
         proxy_set_header X-Forwarded-Proto $scheme;
     }}
 
+    # Local static images from disk (bypass /_next/image optimizer).
+    location ^~ /images/ {{
+        alias /opt/daibilet/apps/web/public/images/;
+        access_log off;
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000";
+    }}
+
     # Next build artifacts from disk (avoid Node mid-deploy 400 / ChunkLoadError).
     location ^~ /_next/static/ {{
         alias /opt/daibilet/apps/web/.next/static/;
