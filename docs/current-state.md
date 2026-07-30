@@ -4,6 +4,7 @@
 **Ветка:** `feat/next-monorepo`  
 **Prod live (DNS):** `201.24.125.184` (МСК `msk-1-vm-5a5i`) · Next `:3001` · API `:4000` · PG Docker `:5437` · TLS nginx · **catalog truth**  
 **Роли (lock 2026-07-30):** `.184` battle catalog · `.159` battle finance (target) · `.16` temporary scaffolding → retire · [spb-finance-host.md](./spb-finance-host.md) · [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md)  
+**Catalog ↔ finance projection (lock 2026-07-30):** [catalog-finance-projection.md](./catalog-finance-projection.md) · P0 PurchaseProjection · P1 public read client · P2 venue/city UI · no wide internal sales until P0  
 **СПб 4 ГБ:** `213.171.7.16` Intelligent Hoopoe - MIG.8 ✅ off public; reserve until finance smoke on `.159`  
 **СПб 8 ГБ:** `85.193.80.159` Diligent Polydeuces - primary finance/checkout/supplier (MIG.9 ⏳, servers not cut over yet)
 

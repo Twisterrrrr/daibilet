@@ -1,13 +1,32 @@
 # qa.md — открытые вопросы
 
-## 2026-07-30 - Finance host DNS / domains (открыто)
+## 2026-07-30 - Catalog ↔ finance projection / checkout domain (открыто)
 
-Контекст: host roles **locked** (`.184` catalog · `.159` battle finance · `.16` retire). Серверы ещё не мигрированы. См. [spb-finance-host.md](./spb-finance-host.md).
+Контекст: граница **locked** в [catalog-finance-projection.md](./catalog-finance-projection.md). Hosts: [spb-finance-host.md](./spb-finance-host.md).
+
+### Checkout domain & DNS
 
 1. **Checkout hostname:** рекомендовать **`checkout.daibilet.ru`** как primary. Нужен ли alias **`pay.daibilet.ru`** (CNAME/A на тот же `.159`) для коротких ссылок / маркетинга, или один канон без alias?
 2. **`finance-api.daibilet.ru`:** отдельный hostname для API/webhooks, или API под `checkout.` / path на том же vhost?
 3. **`supplier.daibilet.ru`:** подтвердить имя ЛК (vs `partners.` / `cabinet.`) до выпуска TLS/DNS stub.
 4. **YooKassa webhook URL:** финальный path на новом finance API (и окно dual-webhook со старым endpoint) - зафиксировать перед Phase 5.
+
+### PurchaseProjection / dual order sources
+
+5. **Checkout domain model:** после split DB - `CheckoutOrder` только на finance; `ExternalOrder` остаётся на catalog. Как buyer/admin видят оба контура: (A) finance агрегирует External через catalog read API, (B) catalog агрегирует Checkout через finance API, (C) отдельный BFF? Рекомендация архитектора: **(B)** для buyer UI на catalog + admin proxy; supplier LC читает finance напрямую.
+6. **PurchaseProjection identity:** общий `publicCode` / buyer email+phone match достаточно для MVP, или нужен явный `siteUserId` bridge catalog↔finance до первой внутренней продажи?
+7. **ExternalOrder на finance?** Копировать mirror на finance **запрещено** без contract. Подтвердить: External остаётся catalog-only; projection - read fan-in, не dual-write.
+
+### Projection sync & auth
+
+8. **Sync frequency:** catalog читает finance admission/supplier projection: on-request (SSR fetch + short cache), cron materialize в catalog read-tables, или edge cache? Для MVP рекомендовать **SSR/ISR fetch + short TTL (≤5–15 мин)** без writes в catalog DB.
+9. **Service auth catalog→finance:** m2m (`Authorization: Bearer` shared secret / JWT), IP allowlist `.184`→`.159`, или Cloudflare Access? Нужен выбор до P1 client.
+10. **Public vs internal projection routes:** одни и те же DTO за CDN, или `/api/public/projection/*` без PII и `/api/internal/projection/*` с service auth для admin?
+
+### Product display
+
+11. **Порог city hub:** сколько published AdmissionProduct / venues нужно, чтобы показывать блок museums/admission на `/cities/[slug]` (например ≥3)?
+12. **Карточка в `/events`:** отдельная вкладка/фильтр «Входные билеты» vs mixed feed с `cardType=ADMISSION` - что предпочтительнее для SEO?
 
 ## 2026-07-25 - Env isolation / robots / admin auth (owner audit) — ЗАКРЫТО
 

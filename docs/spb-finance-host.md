@@ -38,9 +38,19 @@ SSH: MSK `daibilet_msk80_key` / `daibilet-msk` · `.16` `daibilet_staging_key` �
 
 | Contour | Host | Owns |
 |---------|------|------|
-| Catalog | `.184` | events, venues, SSR/ISR, admin catalog, TC/TEP **import**, SEO |
-| Finance | `.159` | checkout, orders/purchases, suppliers, YooKassa webhooks, finance API |
-| Bridge | HTTPS API | catalog UI → checkout на finance; **без** shared money/catalog DB mess |
+| Catalog | `.184` | events, venues, SSR/ISR, admin catalog, TC/TEP **import** + widgets + ExternalOrder mirror, SEO |
+| Finance | `.159` | INTERNAL_SALES / DAIBILET_MANAGED: suppliers, AdmissionProduct, checkout, CheckoutOrder, supplier LC, YooKassa webhooks, finance API |
+| Bridge | HTTPS API / read projection | catalog UI читает public projection; checkout CTA → finance; **без** shared money/catalog DB mess |
+
+**Канон projection (lock 2026-07-30):** [catalog-finance-projection.md](./catalog-finance-projection.md)
+
+### Hard rules (catalog ↔ finance)
+
+1. Finance **не** импортирует TC/TEP и **не** участвует в catalog sync; **нет** TC/TEP secrets на `.159`.
+2. Catalog **не** пишет и **не** читает finance Postgres напрямую - только API/read projection.
+3. Finance **не** пишет в catalog DB без явного projection/sync contract.
+4. AdmissionProduct CTA → Daibilet checkout; импортные events → provider widget (не YooKassa).
+5. Wide internal sales **запрещены**, пока нет `PurchaseProjection` (admin + buyer + supplier LC).
 
 ### Target finance DNS (stub → cutover)
 
@@ -92,9 +102,10 @@ Apex `daibilet.ru` / `www` / `api` / `admin` каталога остаются �
 1. **Не** трогать `.184` как battle catalog - только perf/DTO/SSR/DNS AAAA hygiene (AAAA уже снят owner).
 2. **Не** включать TC/TEP catalog sync на СПб finance - source of truth каталога = МСК.
 3. Finance PG на `.159` - **отдельный** volume/DB; не restore catalog dump как money DB.
-4. Catalog ↔ finance **только API**; orders/purchases/suppliers живут на finance.
-5. YooKassa: webhook → новый finance API; старый держать до smoke; затем отключить.
+4. Catalog ↔ finance **только API / projection**; internal orders/purchases/suppliers живут на finance; ExternalOrder mirror остаётся на catalog до явного bridge.
+5. YooKassa: только internal/PLATFORM path; webhook → новый finance API; старый держать до smoke; затем отключить. **Не** для TC/TEP widgets.
 6. После smoke на `.159`: backup `.16` и удаление VM (retention 7–14 дней).
 7. Public DNS apex остаётся на `201.24.125.184`.
+8. Ownership: Cursor = catalog/widgets; Codex = finance/admission/checkout на `.159`. См. [catalog-finance-projection.md](./catalog-finance-projection.md).
 
 См. [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md).

@@ -1,3 +1,26 @@
+## 2026-07-30 - Lock: catalog ↔ finance projection contour
+
+### Наблюдения
+- Owner зафиксировал канон: TC/Teplohod на catalog `.184`; finance `.159` владеет INTERNAL_SALES / AdmissionProduct / checkout; catalog читает только API/projection.
+- На `cursor/phase-g-admission-checkout`: admin/supplier admission read, STUB checkout admission, `canSell` readiness - есть. Public `/api/public/admission*` и catalog client - нет.
+- `feat/next-monorepo` HEAD без AdmissionProduct schema (phase-g ещё не merge).
+- Admin orders + buyer «Мои покупки» = только `ExternalOrder`; supplier LC orders = `CheckoutItem`. Единого `PurchaseProjection` нет.
+- Codex на `.159` (`d2477ae`): finance API `:4100`, STUB on, YooKassa off; TC secrets на finance не класть.
+
+### Решения
+- Docs lock: [catalog-finance-projection.md](./catalog-finance-projection.md); обновлены [spb-finance-host.md](./spb-finance-host.md), Project, Tasktracker CF.P0–P3, qa.
+- **P0** PurchaseProjection (Codex) до wide internal sales.
+- **P1** finance public read + catalog client (Codex / Cursor).
+- **P2** venue/city/events UI admission (Cursor) после projection.
+- Не ломать TC/TEP widgets; не YooKassa на imported events; не писать finance→catalog DB без contract.
+
+### Проблемы
+- Dual-DB после split: External на catalog, Checkout на finance - нужен явный fan-in (qa §5–7).
+- Service auth и TTL projection ещё открыты (qa §8–10).
+- Полный UI/checkout на catalog сейчас **не** делать - только docs + gap.
+
+---
+
 ## 2026-07-30 - MIG.9 Phase 3 partial: Codex finance host `.159` beyond P0–2
 
 ### Наблюдения

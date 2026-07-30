@@ -58,6 +58,9 @@
 
 | Документ | Описание |
 |----------|----------|
+| [catalog-finance-projection.md](./catalog-finance-projection.md) | **Lock:** граница catalog ↔ finance, projection matrix, PurchaseProjection gap |
+| [spb-finance-host.md](./spb-finance-host.md) | Host roles `.184` / `.159` / `.16` |
+| [phase-2-finance-supplier-blueprint.md](./phase-2-finance-supplier-blueprint.md) | Phase G product / checkout / supplier LC |
 | [integrations.md](./integrations.md) | Ticketscloud, Teplohod |
 | [ticketscloud-import.md](./ticketscloud-import.md) | TC import |
 | [event-extraction.md](./event-extraction.md) | Правила извлечения событий |

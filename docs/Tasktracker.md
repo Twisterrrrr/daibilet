@@ -64,6 +64,26 @@
 План: [migration-spb-to-msk.md](./migration-spb-to-msk.md) · roles/MIG.9: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md) · [spb-finance-host.md](./spb-finance-host.md)  
 Домены finance: **`checkout.daibilet.ru`** (канон-предложение), optional `pay.daibilet.ru` alias, `supplier.daibilet.ru`, maybe `finance-api.daibilet.ru` ([qa.md](./qa.md)).
 
+---
+
+## Catalog ↔ finance projection (lock 2026-07-30)
+
+Канон: [catalog-finance-projection.md](./catalog-finance-projection.md). UI/checkout на catalog **не** раскатывать до P0.
+
+| # | Задача | Приоритет | Статус | Owner |
+|---|--------|-----------|--------|-------|
+| CF.0 | Docs lock: boundary + projection matrix + don'ts | Критический | ✅ 2026-07-30 | Cursor |
+| CF.P0 | **PurchaseProjection**: admin (External+Checkout), buyer «Мои покупки», supplier CheckoutItems | Критический | ⏳ | Codex |
+| CF.P0b | Gate: no wide internal sales CTA на `.184` until PurchaseProjection smoke | Критический | ⏳ | both |
+| CF.P1 | Finance public read APIs: supplier / venue summary / AdmissionProduct list+detail (`canSell`) | Высокий | ⏳ partial admin/supplier on phase-g; **нет** public | Codex |
+| CF.P1b | Catalog read client → finance (`FINANCE_API_BASE_URL` + cache) | Высокий | ⏳ | Cursor |
+| CF.P1c | Service auth catalog↔finance (m2m) - решение в qa | Высокий | ⏳ | owner+Codex |
+| CF.P2 | Venue page блок «Входные билеты» (test museum) | Высокий | ⏳ | Cursor |
+| CF.P2b | City hub museums/admission при published | Высокий | ⏳ | Cursor |
+| CF.P2c | `/events`: отдельный card type admission (не slotted event) | Средний | ⏳ | Cursor |
+| CF.P2d | CTA → checkout.daibilet.ru; TC/TEP widgets regression | Высокий | ⏳ | Cursor |
+| CF.P3 | STUB/YooKassa order видим admin+supplier LC через PurchaseProjection | Высокий | ⏳ STUB on `.159`; unified read ❌ | Codex |
+
 ## PERF event pages (после DNS на МСК)
 
 | # | Задача | Приоритет | Статус |
@@ -973,6 +993,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-30 | CF.0 ✅ lock catalog↔finance projection ([catalog-finance-projection.md](./catalog-finance-projection.md)); CF.P0–P3 backlog; qa checkout/projection/auth |
 | 2026-07-30 | MIG.9.3 🔄 Codex на `.159`: `daibilet-finance-api` `:4100`, nginx HTTP supplier/checkout/finance, PG migrations+seed; TLS/DNS stub ⏳; MSK не трогали |
 | 2026-07-30 | MIG.9.0–9.2 ✅ Diligent Polydeuces `.159`: SSH `daibilet_spb_finance`, UFW, docker/nginx/node/pnpm, empty finance PG; DNS stub ⏳ |
 | 2026-07-30 | MIG.9 🔒 role lock: `.184` catalog · `.159` battle finance · `.16` retire; phases 9.0–9.7 + checkout DNS |

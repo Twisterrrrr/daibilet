@@ -65,10 +65,12 @@ packages/config   — shared tsconfig/eslint
 | Diligent Polydeuces | `85.193.80.159` | **battle finance** - checkout, supplier LK, orders/purchases, YooKassa |
 | Intelligent Hoopoe | `213.171.7.16` | temporary staging/build scaffolding → **retire** after finance smoke |
 
-- Catalog ↔ finance: **только API**, без shared money/catalog DB.
+- Catalog ↔ finance: **только API / read projection**, без shared money/catalog DB и без ad-hoc writes finance→catalog.
 - Checkout primary hostname: **`checkout.daibilet.ru`** (optional alias `pay.daibilet.ru` - см. qa.md); также `supplier.daibilet.ru`, optional `finance-api.daibilet.ru`.
 - `.184` не переезжает на СПб; ops на catalog - perf/DTO/SSR/DNS only.
-- План: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md) · [spb-finance-host.md](./spb-finance-host.md).
+- TC/Teplohod widgets + secrets остаются на catalog; finance владеет INTERNAL_SALES / AdmissionProduct / CheckoutOrder.
+- **Канон границы и gap:** [catalog-finance-projection.md](./catalog-finance-projection.md) · host roles: [spb-finance-host.md](./spb-finance-host.md) · migrate: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md).
+- P0 blocker wide internal sales: единый `PurchaseProjection` (admin + buyer + supplier LC). До него - только finance sandbox/STUB.
 
 ---
 
