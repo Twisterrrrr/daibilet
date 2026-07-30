@@ -3,6 +3,7 @@
 **Locked:** 2026-07-30  
 **Hosts:** catalog `.184` (MSK) · finance `.159` (SPB) — см. [spb-finance-host.md](./spb-finance-host.md)  
 **Product blueprint:** [phase-2-finance-supplier-blueprint.md](./phase-2-finance-supplier-blueprint.md)  
+**Finance smoke:** [finance-159-smoke-runbook.md](./finance-159-smoke-runbook.md)
 **Branches:** catalog docs / consumer на `feat/next-monorepo`; finance runtime Codex на `.159` (`codex/phase2-finance-supplier`); admission foundation Cursor на `cursor/phase-g-admission-checkout`.
 
 Этот документ - **канон границы** между каталогом и финконтуром. UI/checkout на catalog **не** реализовывать шире docs, пока не закрыты P0–P1 ниже.

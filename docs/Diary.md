@@ -23,6 +23,13 @@
 - `packages/contracts/node_modules/.bin/tsc.CMD --noEmit` — OK.
 - `apps/backend/node_modules/.bin/tsx.CMD --test src/public-finance-projection.test.ts src/purchase-projection.test.ts` — OK.
 
+### Status update
+
+- Cursor принял P0/P1 finance side и продолжает CF.P1b/P2 на catalog `feat/next-monorepo`.
+- Добавлен regression guard: public projection не должен отдавать `paymentMode`, provider/source ids, checkout/internal order ids.
+- Добавлен guard: `checkoutPath` появляется только при `canSell === true`, при этом `purchaseFlow` должен оставаться `PLATFORM`.
+- Добавлен [finance-159-smoke-runbook.md](./finance-159-smoke-runbook.md) для DNS/TLS/env/projection/STUB/YooKassa gate на `.159`.
+
 ---
 
 ## 2026-07-30 — Phase 2: unified purchase projection

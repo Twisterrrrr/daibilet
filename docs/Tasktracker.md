@@ -49,6 +49,7 @@
 | P.3e | **Checkout STUB: venue admission** | Высокий | ✅ admissionProduct/admissionOffer path + capacity decrement |
 | P.3e1 | **Unified purchase projection** — `CheckoutOrder` + `ExternalOrder` в admin orders, supplier LC и buyer account | Критический | ✅ backend read-model + typed account handler + tests |
 | P.3e2 | **Public finance projection APIs** — admission list/detail, venue admission summary, supplier projection, optional m2m auth | Критический | ✅ finance API + contracts + tests |
+| P.3e3 | **Finance projection guardrails** — no public payment/provider/internal ids, CTA only when `canSell && checkoutPath` | Высокий | ✅ regression tests + `.159` smoke runbook |
 | P.3f | **YooKassa: venue admission** | Высокий | ⏳ после smoke STUB admission |
 | P.3g | **Supplier write flows** — создание/редактирование admission и событий через заявки | Средний | ⏳ после первых тестовых поставщиков |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
