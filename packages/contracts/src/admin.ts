@@ -1,4 +1,6 @@
+import type { AdmissionProductDto } from './admission.js';
 import type { PurchaseFields, Readiness, ReadinessIssue, SeoFields, Severity, SourceCode } from './common.js';
+import type { ListingHealthDto } from './listing-health.js';
 
 export interface AdminDashboardLaunchMetrics {
   groupedEvents: number;
@@ -421,6 +423,14 @@ export interface AdminSupplierEventsSummaryDto {
   supplierSelfService: number;
 }
 
+export interface AdminSupplierAdmissionsSummaryDto {
+  total: number;
+  published: number;
+  platform: number;
+  canSell: number;
+  needsAttention: number;
+}
+
 export interface AdminSupplierOrdersSummaryDto {
   totalItems: number;
   reserved: number;
@@ -481,6 +491,7 @@ export interface AdminSupplierRowDto {
   ownerUsersCount: number;
   legal: AdminSupplierLegalSummaryDto;
   events: AdminSupplierEventsSummaryDto;
+  admissions: AdminSupplierAdmissionsSummaryDto;
   orders: AdminSupplierOrdersSummaryDto;
   finance: AdminSupplierFinanceSummaryDto;
   reviews: AdminSupplierReviewSummaryDto;
@@ -540,11 +551,30 @@ export interface AdminSupplierDetailDto extends AdminSupplierRowDto {
     managementMode: string;
     priceFromRub?: number | null;
   }>;
+  admissionProductsSample: AdmissionProductDto[];
   recentLedgerEntries: Array<{
     id: string;
     type: string;
     amountKopecks: number;
     note?: string | null;
     createdAt: string;
+  }>;
+}
+
+export interface AdminListingHealthOverviewDto {
+  generatedAt: string;
+  metrics: {
+    total: number;
+    ready: number;
+    review: number;
+    blocked: number;
+    averageScore: number;
+  };
+  items: Array<{
+    entityType: 'EVENT' | 'VENUE' | 'ADMISSION_PRODUCT';
+    entityId: string;
+    title: string;
+    slug: string | null;
+    health: ListingHealthDto;
   }>;
 }

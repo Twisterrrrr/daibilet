@@ -14,6 +14,7 @@ import type {
   SupplierPortalSummaryDto,
 } from '@daibilet/contracts/supplier';
 import { prisma, type Prisma } from '@daibilet/db';
+import { loadAdmissionProductsList } from './admission-products.dto.js';
 import { resolveSupplierCheckoutReadiness } from './admin-suppliers.dto.js';
 
 const DEFAULT_LIMIT = 50;
@@ -158,6 +159,8 @@ type SupplierOrderRow = Prisma.CheckoutItemGetPayload<{
     event: { select: { id: true; slug: true; title: true } };
     session: { select: { id: true; startsAt: true } };
     offer: { select: { id: true; title: true } };
+    admissionProduct: { select: { id: true; slug: true; title: true } };
+    admissionOffer: { select: { id: true; title: true } };
   };
 }>;
 
@@ -173,6 +176,7 @@ interface SupplierPortalAggregates {
   reviewAverage: number | null;
   reviewsNeedingResponse: number;
   reviewDisputes: number;
+  admissionGroups: AdmissionGroupAggregate[];
 }
 
 type EventGroupAggregate = {
@@ -215,6 +219,12 @@ type ReviewGroupAggregate = {
   _count: { _all: number };
 };
 
+type AdmissionGroupAggregate = {
+  status: string;
+  purchaseFlow: string;
+  _count: { _all: number };
+};
+
 export async function buildSupplierPortalDashboardDto(
   searchParams: URLSearchParams = new URLSearchParams(),
 ): Promise<SupplierPortalDashboardDto> {
@@ -225,6 +235,10 @@ export async function buildSupplierPortalDashboardDto(
     loadSupplierOrderRows(supplier.id, new URLSearchParams({ limit: '5' })),
     loadSupplierEventRows(supplier.id, new URLSearchParams({ limit: '25' })),
   ]);
+  const attentionAdmissions = await loadAdmissionProductsList(
+    new URLSearchParams({ limit: '25' }),
+    { supplierId: supplier.id },
+  );
   const summary = summarizeSupplierPortal(aggregates);
   const readiness = resolveSupplierPortalReadiness(supplier, summary);
 
@@ -236,6 +250,7 @@ export async function buildSupplierPortalDashboardDto(
     upcomingSessions,
     latestOrders: latestOrders.items,
     eventsNeedingAttention: attentionEvents.items.filter((event) => event.readinessIssues.length > 0).slice(0, 5),
+    admissionsNeedingAttention: attentionAdmissions.items.filter((product) => product.health.status !== 'ready').slice(0, 5),
   };
 }
 
@@ -459,6 +474,7 @@ export function summarizeSupplierPortal(aggregates: SupplierPortalAggregates): S
     orders: summarizeSupplierPortalOrders(aggregates),
     finance: summarizeSupplierPortalFinance(aggregates),
     reviews: summarizeSupplierPortalReviews(aggregates),
+    admissions: summarizeSupplierPortalAdmissions(aggregates),
   };
 }
 
@@ -537,15 +553,19 @@ export function mapSupplierPortalOrderRow(row: SupplierOrderRow): SupplierPortal
     id: row.id,
     orderId: row.order.id,
     publicCode: row.order.publicCode || shortCode(row.order.id),
+    subjectType: String(row.subjectType),
     status: String(row.order.status),
     itemStatus: String(row.status),
     title: row.title,
     eventId: row.event?.id || row.eventId || null,
     eventSlug: row.event?.slug || null,
     eventTitle: row.event?.title || null,
+    admissionProductId: row.admissionProduct?.id || row.admissionProductId || null,
+    admissionProductSlug: row.admissionProduct?.slug || null,
+    admissionProductTitle: row.admissionProduct?.title || null,
     sessionId: row.session?.id || row.sessionId || null,
     startsAt: toIso(row.session?.startsAt),
-    ticketTitle: row.ticketTitle || row.offer?.title || null,
+    ticketTitle: row.ticketTitle || row.offer?.title || row.admissionOffer?.title || null,
     quantity: row.quantity,
     unitPriceKopecks: row.unitPriceKopecks,
     totalKopecks: row.totalKopecks,
@@ -588,6 +608,7 @@ async function loadSupplierPortalAggregates(supplierId: string): Promise<Supplie
     reviewAverage,
     approvedReviews,
     reviewDisputes,
+    admissionGroups,
   ] = await prisma.$transaction([
     prisma.event.groupBy({
       by: ['status', 'purchaseFlow', 'managementMode'],
@@ -642,6 +663,11 @@ async function loadSupplierPortalAggregates(supplierId: string): Promise<Supplie
     prisma.reviewDispute.count({
       where: { supplierId, status: 'MODERATOR_REVIEW' },
     }),
+    prisma.admissionProduct.groupBy({
+      by: ['status', 'purchaseFlow'],
+      where: { supplierId },
+      _count: { _all: true },
+    }),
   ]);
 
   return {
@@ -656,6 +682,7 @@ async function loadSupplierPortalAggregates(supplierId: string): Promise<Supplie
     reviewAverage: reviewAverage._avg.rating,
     reviewsNeedingResponse: approvedReviews.filter((review) => !review.supplierResponse).length,
     reviewDisputes,
+    admissionGroups: admissionGroups as AdmissionGroupAggregate[],
   };
 }
 
@@ -723,6 +750,8 @@ async function loadSupplierOrderRows(
         event: { select: { id: true, slug: true, title: true } },
         session: { select: { id: true, startsAt: true } },
         offer: { select: { id: true, title: true } },
+        admissionProduct: { select: { id: true, slug: true, title: true } },
+        admissionOffer: { select: { id: true, title: true } },
       },
     }),
     prisma.checkoutItem.count({ where }),
@@ -845,7 +874,7 @@ function resolveSupplierPortalReadiness(
     activeCommissionRules,
     defaultCommissionBps: supplier.defaultCommissionBps || 0,
     yookassaShopId: supplier.yookassaShopId || null,
-    internalCheckoutEvents: summary.events.internalCheckout + summary.events.hybrid,
+    internalCheckoutEvents: summary.events.internalCheckout + summary.events.hybrid + summary.admissions.platform,
   });
 }
 
@@ -885,6 +914,27 @@ function summarizeSupplierPortalEvents(aggregates: SupplierPortalAggregates): Su
       if (row.purchaseFlow === 'PLATFORM') summary.internalCheckout += count;
       if (row.purchaseFlow === 'EXTERNAL') summary.widgetOnly += count;
     }
+  }
+
+  return summary;
+}
+
+function summarizeSupplierPortalAdmissions(aggregates: SupplierPortalAggregates): SupplierPortalSummaryDto['admissions'] {
+  const summary: SupplierPortalSummaryDto['admissions'] = {
+    total: 0,
+    published: 0,
+    platform: 0,
+    canSell: 0,
+    needsAttention: 0,
+  };
+
+  for (const row of aggregates.admissionGroups) {
+    const count = row._count._all;
+    summary.total += count;
+    if (row.status === 'PUBLISHED') summary.published += count;
+    if (row.purchaseFlow === 'PLATFORM') summary.platform += count;
+    if (row.status === 'PUBLISHED' && row.purchaseFlow === 'PLATFORM') summary.canSell += count;
+    if (row.status !== 'PUBLISHED' || row.purchaseFlow !== 'PLATFORM') summary.needsAttention += count;
   }
 
   return summary;

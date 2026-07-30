@@ -193,6 +193,45 @@ Supplier app можно делать отдельным `apps/supplier`, но н
 - requisites;
 - team.
 
+## Реализация 2026-07-30: admission + listing health + supplier read-first
+
+В ветке `codex/phase2-finance-supplier` добавлен следующий слой Phase 2 без включения полноценного финконтура:
+
+- `AdmissionProduct` / `AdmissionOffer` используются как самостоятельные входные билеты площадки без фейкового события.
+- Admin API:
+  - `GET /api/admin/admission-products`;
+  - `GET /api/admin/venues/:id/admission-products`;
+  - `GET /api/admin/listing-health`.
+- Supplier API:
+  - `GET /api/supplier/admissions`.
+- Admin UI:
+  - карточка площадки получила блок "Входные билеты";
+  - карточка поставщика показывает admission sample и учитывает входные билеты в readiness.
+- Supplier app:
+  - добавлен раздел "Входные билеты";
+  - dashboard показывает количество admission-продуктов и проблемные карточки.
+- Listing Health:
+  - общий explainable score для `EVENT`, `VENUE`, `ADMISSION_PRODUCT`;
+  - правила не черный ящик: high issue блокирует продажу/публикацию, medium/low переводят в review.
+- Checkout STUB:
+  - поддерживает `subjectType=VENUE_ADMISSION`;
+  - принимает `admissionProductId/admissionProductSlug` + `admissionOfferId`;
+  - атомарно списывает `AdmissionProduct.ticketsVacant`, если лимит задан;
+  - пишет `CheckoutOrder`, `CheckoutItem`, `Payment`, `FulfillmentItem`, supplier ledger.
+- Supplier order projection:
+  - позиции заказа теперь различают `EVENT` и `VENUE_ADMISSION`;
+  - supplier UI показывает admission-продукт вместо пустого события.
+- API_SYNC foundation:
+  - добавлены `SupplierIntegration`, `SupplierIntegrationRun`, `SupplierIntegrationIssue`;
+  - capability matrix описывает возможности провайдера, неизвестные capability считаются `false`.
+
+Ограничения текущего слоя:
+
+- Yookassa checkout пока остается event-oriented; admission path подключен только к STUB.
+- Нет write UI для создания admission-продукта поставщиком.
+- Нет полноценной auth-модели Supplier LC: текущий supplier selector остается read-first/dev-friendly.
+- Listing Health пока on-read, без материализации в отдельной таблице.
+
 ## Ближайший backlog
 
 ### Phase 2.0: DB contracts

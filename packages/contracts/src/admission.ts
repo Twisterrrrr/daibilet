@@ -1,4 +1,5 @@
 import type { ReadinessIssue } from './common.js';
+import type { ListingHealthDto } from './listing-health.js';
 
 export type AdmissionProductType =
   | 'MUSEUM_ENTRY'
@@ -76,10 +77,36 @@ export interface AdmissionProductDto {
     status: string | null;
   };
   offers: AdmissionOfferDto[];
+  readiness: AdmissionProductReadinessDto;
+  health: ListingHealthDto;
 }
 
 export interface AdmissionProductReadinessDto {
   canSell: boolean;
   blockers: Array<ReadinessIssue & { code: AdmissionProductReadinessCode | string }>;
   warnings: Array<ReadinessIssue & { code: AdmissionProductReadinessCode | string }>;
+}
+
+export interface AdmissionProductsListDto {
+  generatedAt: string;
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+  filters: {
+    q: string | null;
+    status: string | null;
+    supplierId: string | null;
+    venueId: string | null;
+    cityId: string | null;
+    type: AdmissionProductType | string | null;
+  };
+  metrics: {
+    total: number;
+    published: number;
+    canSell: number;
+    needsAttention: number;
+    blocked: number;
+  };
+  items: AdmissionProductDto[];
 }

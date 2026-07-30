@@ -1,3 +1,26 @@
+## 2026-07-30 — Phase 2: admission products + supplier read-first
+
+### Наблюдения
+
+- Первые поставщики Phase 2 могут быть музеями и арт-площадками: им нужна продажа входного билета на странице площадки, не обязательно событие/афиша.
+- Legacy SPBBOATS полезен не схемой целиком, а правилами: supplier read-first, order projection, listing health, capacity hold, provider capabilities.
+
+### Решения
+
+- Добавлен admission read model: `GET /api/admin/admission-products`, `GET /api/admin/venues/:id/admission-products`, `GET /api/supplier/admissions`.
+- Admin venue sheet получил блок "Входные билеты"; Supplier LC получил отдельный раздел "Входные билеты".
+- Listing Health вынесен в общий backend-модуль для `EVENT`, `VENUE`, `ADMISSION_PRODUCT`.
+- STUB checkout поддерживает `VENUE_ADMISSION` по `admissionProductId/admissionProductSlug` + `admissionOfferId`; capacity decrement атомарный по `AdmissionProduct.ticketsVacant`.
+- API_SYNC foundation: `SupplierIntegration`, `SupplierIntegrationRun`, `SupplierIntegrationIssue` + capability matrix с default-false.
+
+### Проблемы
+
+- Yookassa admission path пока не включен: сначала нужен smoke STUB на одном ручном admission-продукте.
+- Admin build в текущей локальной среде падает на PostCSS/caniuse-lite (`../../data/browsers`), но admin typecheck проходит.
+- Локально Node v24.14.0, проект ожидает Node `>=22.13.0 <23`; проверки запускались с `PNPM_CONFIG_ENGINE_STRICT=false`.
+
+---
+
 ## 2026-07-22 — Prod deploy load + city hub blog @`bb65e4a`
 
 ### Наблюдения

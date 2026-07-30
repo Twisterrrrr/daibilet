@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { adminFetch } from '@/lib/admin-api';
 import { Building2, Globe2, Image, Loader2, MapPin, Save, Search, Ticket } from 'lucide-react';
+import type { AdmissionProductsListDto } from '@daibilet/contracts/admission';
 
 import { DataTableShell, PageHeader, StatusBadge } from '@/components/admin/primitives';
 import { Badge } from '@/components/ui/badge';
@@ -154,6 +155,8 @@ export function VenuesPage() {
   const [loadError, setLoadError] = React.useState<string | null>(null);
   const [selectedVenue, setSelectedVenue] = React.useState<AdminVenueRow | null>(null);
   const [venueDetail, setVenueDetail] = React.useState<AdminVenueDetail | null>(null);
+  const [admissionProducts, setAdmissionProducts] = React.useState<AdmissionProductsListDto | null>(null);
+  const [admissionLoadError, setAdmissionLoadError] = React.useState<string | null>(null);
   const [draft, setDraft] = React.useState<VenueDraft>(() => emptyDraft());
   const [isDetailLoading, setIsDetailLoading] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
@@ -204,16 +207,26 @@ export function VenuesPage() {
   async function openVenue(venue: AdminVenueRow) {
     setSelectedVenue(venue);
     setVenueDetail(null);
+    setAdmissionProducts(null);
+    setAdmissionLoadError(null);
     setSaveError(null);
     setIsDetailLoading(true);
 
     try {
-      const response = await adminFetch(`/api/admin/venues/${encodeURIComponent(venue.id)}`, { cache: 'no-store' });
+      const [response, admissionsResponse] = await Promise.all([
+        adminFetch(`/api/admin/venues/${encodeURIComponent(venue.id)}`, { cache: 'no-store' }),
+        adminFetch(`/api/admin/venues/${encodeURIComponent(venue.id)}/admission-products?limit=25`, { cache: 'no-store' }),
+      ]);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const detail = (await response.json()) as AdminVenueDetail | null;
       if (!detail) throw new Error('Площадка не найдена');
       setVenueDetail(detail);
       setSelectedVenue(detailToRow(detail, venue));
+      if (admissionsResponse.ok) {
+        setAdmissionProducts((await admissionsResponse.json()) as AdmissionProductsListDto);
+      } else {
+        setAdmissionLoadError(`HTTP ${admissionsResponse.status}`);
+      }
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : String(error));
     } finally {
@@ -366,6 +379,8 @@ export function VenuesPage() {
         venue={selectedVenue}
         detail={venueDetail}
         draft={draft}
+        admissionProducts={admissionProducts}
+        admissionLoadError={admissionLoadError}
         isDetailLoading={isDetailLoading}
         isSaving={isSaving}
         saveError={saveError}
@@ -375,6 +390,8 @@ export function VenuesPage() {
           if (!open) {
             setSelectedVenue(null);
             setVenueDetail(null);
+            setAdmissionProducts(null);
+            setAdmissionLoadError(null);
             setSaveError(null);
           }
         }}
@@ -396,6 +413,8 @@ function VenueSheet(props: {
   venue: AdminVenueRow | null;
   detail: AdminVenueDetail | null;
   draft: VenueDraft;
+  admissionProducts: AdmissionProductsListDto | null;
+  admissionLoadError: string | null;
   isDetailLoading: boolean;
   isSaving: boolean;
   saveError: string | null;
@@ -403,7 +422,7 @@ function VenueSheet(props: {
   onSave: () => void;
   onOpenChange: (open: boolean) => void;
 }) {
-  const { venue, detail, draft, isDetailLoading, isSaving, saveError, onDraftChange, onSave, onOpenChange } = props;
+  const { venue, detail, draft, admissionProducts, admissionLoadError, isDetailLoading, isSaving, saveError, onDraftChange, onSave, onOpenChange } = props;
   const imageUrl = draft.heroImageUrl || detail?.heroImageUrl;
 
   return (
@@ -508,6 +527,54 @@ function VenueSheet(props: {
                       {!detail.events.length ? <div className="py-6 text-sm text-muted-foreground">Событий пока нет.</div> : null}
                     </div>
                   </section>
+
+                  <section className="rounded-lg border border-border p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <Ticket className="h-4 w-4 text-muted-foreground" />
+                        <h3 className="text-sm font-semibold">Входные билеты</h3>
+                      </div>
+                      {admissionProducts ? <Badge variant="outline">{formatNumber(admissionProducts.total)}</Badge> : null}
+                    </div>
+                    {admissionLoadError ? (
+                      <div className="mt-3 rounded-md border border-warning/30 bg-warning/10 px-3 py-2 text-xs text-warning-foreground">
+                        Не удалось загрузить входные билеты: {admissionLoadError}
+                      </div>
+                    ) : null}
+                    <div className="mt-3 divide-y divide-border">
+                      {admissionProducts?.items.map((product) => (
+                        <div key={product.id} className="grid gap-2 py-3 text-sm md:grid-cols-[1fr_130px_90px_150px]">
+                          <div className="min-w-0">
+                            <div className="truncate font-medium">{product.title}</div>
+                            <div className="mt-1 text-xs text-muted-foreground">
+                              {admissionTypeLabel(product.type)} · {validityLabel(product.validityMode)}
+                            </div>
+                          </div>
+                          <div className="text-xs text-muted-foreground">{validityPeriod(product)}</div>
+                          <div className="text-xs text-muted-foreground">{formatMoney(product.priceFromRub)}</div>
+                          <div className="flex flex-wrap gap-1">
+                            {product.health.status === 'ready' ? (
+                              <Badge variant="outline" className="border-success/30 bg-success/10 text-success">
+                                готово
+                              </Badge>
+                            ) : (
+                              [...product.health.blockers, ...product.health.warnings].slice(0, 2).map((issue) => (
+                                <Badge
+                                  key={issue.code}
+                                  variant="outline"
+                                  className={issue.severity === 'high' ? 'border-destructive/30 bg-destructive/10 text-destructive' : 'border-warning/30 bg-warning/10 text-warning-foreground'}
+                                >
+                                  {issue.label}
+                                </Badge>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                      {admissionProducts && !admissionProducts.items.length ? <div className="py-6 text-sm text-muted-foreground">Входных билетов пока нет.</div> : null}
+                      {!admissionProducts && !admissionLoadError ? <div className="py-6 text-sm text-muted-foreground">Загружаю входные билеты...</div> : null}
+                    </div>
+                  </section>
                 </div>
 
                 <div className="space-y-4">
@@ -587,4 +654,44 @@ function EditableField(props: { label: string; value: string; onChange: (value: 
       )}
     </Field>
   );
+}
+
+function admissionTypeLabel(value: string): string {
+  const labels: Record<string, string> = {
+    MUSEUM_ENTRY: 'Музей',
+    GALLERY_ENTRY: 'Галерея',
+    ART_SPACE_ENTRY: 'Арт-пространство',
+    EXHIBITION_ENTRY: 'Выставка',
+    OBSERVATION_ENTRY: 'Обзорная площадка',
+    PARK_ENTRY: 'Парк',
+    ATTRACTION_ENTRY: 'Аттракцион',
+    ZOO_ENTRY: 'Зоопарк',
+    AQUARIUM_ENTRY: 'Океанариум',
+    COMPLEX_ENTRY: 'Комплексный билет',
+    OTHER: 'Входной билет',
+  };
+  return labels[value] || value;
+}
+
+function validityLabel(value: string): string {
+  const labels: Record<string, string> = {
+    OPEN_DATE: 'открытая дата',
+    FIXED_WINDOW: 'период',
+    VALID_DAYS_AFTER_PURCHASE: 'после покупки',
+  };
+  return labels[value] || value;
+}
+
+function validityPeriod(product: {
+  validFrom: string | null;
+  validTo: string | null;
+  validDaysAfterPurchase: number | null;
+}): string {
+  if (product.validDaysAfterPurchase) return `${product.validDaysAfterPurchase} дн.`;
+  const from = product.validFrom ? formatDateTime(product.validFrom) : null;
+  const to = product.validTo ? formatDateTime(product.validTo) : null;
+  if (from && to) return `${from} — ${to}`;
+  if (from) return `с ${from}`;
+  if (to) return `до ${to}`;
+  return 'без срока';
 }

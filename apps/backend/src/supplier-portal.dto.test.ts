@@ -115,6 +115,10 @@ test('summarizes supplier control-plane aggregates', () => {
     reviewAverage: 4.5,
     reviewsNeedingResponse: 2,
     reviewDisputes: 1,
+    admissionGroups: [
+      { status: 'PUBLISHED', purchaseFlow: 'PLATFORM', _count: { _all: 2 } },
+      { status: 'REVIEW', purchaseFlow: 'PLATFORM', _count: { _all: 1 } },
+    ],
   });
 
   assert.equal(summary.events.total, 3);
@@ -122,6 +126,10 @@ test('summarizes supplier control-plane aggregates', () => {
   assert.equal(summary.events.hybrid, 2);
   assert.equal(summary.events.widgetOnly, 1);
   assert.equal(summary.orders.fulfilled, 3);
+  assert.equal(summary.admissions.total, 3);
+  assert.equal(summary.admissions.platform, 3);
+  assert.equal(summary.admissions.canSell, 2);
+  assert.equal(summary.admissions.needsAttention, 1);
   assert.equal(summary.reviews.approved, 4);
   assert.equal(summary.reviews.needsResponse, 2);
 });
@@ -130,6 +138,7 @@ test('maps supplier order rows with short numeric fallback code', () => {
   const dto = mapSupplierPortalOrderRow({
     id: 'item_1',
     checkoutOrderId: 'order_1234567890',
+    subjectType: 'EVENT',
     supplierId: 'sup_1',
     eventId: 'evt_1',
     sessionId: 'ses_1',
@@ -161,9 +170,12 @@ test('maps supplier order rows with short numeric fallback code', () => {
     event: { id: 'evt_1', slug: 'manual-event', title: 'Manual event' },
     session: { id: 'ses_1', startsAt: new Date('2026-08-01T12:00:00.000Z') },
     offer: { id: 'off_1', title: 'Adult' },
+    admissionProduct: null,
+    admissionOffer: null,
   } as any);
 
   assert.equal(dto.publicCode, '4567890');
+  assert.equal(dto.subjectType, 'EVENT');
   assert.equal(dto.status, 'FULFILLED');
   assert.equal(dto.ticketTitle, 'Adult');
   assert.equal(dto.totalKopecks, 300_000);

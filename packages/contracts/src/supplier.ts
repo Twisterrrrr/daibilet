@@ -1,4 +1,5 @@
 import type { Readiness, ReadinessIssue } from './common.js';
+import type { AdmissionProductsListDto } from './admission.js';
 
 export interface SupplierPortalIdentityDto {
   id: string;
@@ -37,6 +38,13 @@ export interface SupplierPortalSummaryDto {
     daibiletManaged: number;
     supplierDrafts: number;
     supplierSelfService: number;
+  };
+  admissions: {
+    total: number;
+    published: number;
+    platform: number;
+    canSell: number;
+    needsAttention: number;
   };
   orders: {
     totalItems: number;
@@ -124,6 +132,10 @@ export interface SupplierPortalEventsListDto {
   items: SupplierPortalEventRowDto[];
 }
 
+export interface SupplierPortalAdmissionsListDto extends AdmissionProductsListDto {
+  supplier: SupplierPortalIdentityDto;
+}
+
 export interface SupplierPortalSessionPreviewDto {
   id: string;
   eventId: string;
@@ -140,12 +152,16 @@ export interface SupplierPortalOrderRowDto {
   id: string;
   orderId: string;
   publicCode: string | null;
+  subjectType: string;
   status: string;
   itemStatus: string;
   title: string;
   eventId: string | null;
   eventSlug: string | null;
   eventTitle: string | null;
+  admissionProductId: string | null;
+  admissionProductSlug: string | null;
+  admissionProductTitle: string | null;
   sessionId: string | null;
   startsAt: string | null;
   ticketTitle: string | null;
@@ -292,4 +308,5 @@ export interface SupplierPortalDashboardDto {
   upcomingSessions: SupplierPortalSessionPreviewDto[];
   latestOrders: SupplierPortalOrderRowDto[];
   eventsNeedingAttention: SupplierPortalEventRowDto[];
+  admissionsNeedingAttention: AdmissionProductsListDto['items'];
 }
