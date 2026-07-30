@@ -38,7 +38,8 @@ export const CITY_HUB_CONFIG: Record<string, CityHubConfig> = {
     featuredDirections: [
       { id: 'river', label: 'Речные прогулки', landingSlug: 'river-cruises', emphasis: 'primary' },
       { id: 'palaces', label: 'Дворцы и Петергоф', landingSlug: 'country-tours' },
-      { id: 'museums', label: 'Музеи', landingSlug: 'moscow-museums', categoryKey: 'Музеи' },
+      // SPb uses national `exhibitions` landing; moscow-museums is MSK-only and must not hide museums.
+      { id: 'museums', label: 'Музеи', landingSlug: 'exhibitions', categoryKey: 'Музеи и арт' },
       { id: 'bridges', label: 'Развод мостов', landingSlug: 'bridges-night' },
       { id: 'yards', label: 'Дворы и крыши', landingSlug: 'spb-yards' },
       { id: 'standup', label: 'Стендап', landingSlug: 'standup' },
@@ -51,7 +52,7 @@ export const CITY_HUB_CONFIG: Record<string, CityHubConfig> = {
       { id: 'theatre', label: 'Театр', categoryKey: 'Театр', emphasis: 'primary' },
       { id: 'concerts', label: 'Концерты', landingSlug: 'concerts-genre' },
       { id: 'river', label: 'Речные прогулки', landingSlug: 'river-cruises' },
-      { id: 'museums', label: 'Музеи', landingSlug: 'moscow-museums' },
+      { id: 'museums', label: 'Музеи', landingSlug: 'moscow-museums', categoryKey: 'Музеи и арт' },
       { id: 'bus', label: 'Автобусные экскурсии', landingSlug: 'bus-tours' },
       { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
     ],
@@ -79,17 +80,6 @@ export const CITY_HUB_CONFIG: Record<string, CityHubConfig> = {
       { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
     ],
     venuesTopN: 8,
-  },
-  'sankt-peterburg': {
-    highlightSeason: { label: 'Белые ночи', monthsHint: 'май-июль' },
-    primaryCta: { label: 'Круизы и прогулки', target: '#directions' },
-    featuredDirections: [
-      { id: 'river', label: 'Речные прогулки', landingSlug: 'river-cruises', emphasis: 'primary' },
-      { id: 'palaces', label: 'Дворцы и Петергоф', landingSlug: 'country-tours' },
-      { id: 'bridges', label: 'Развод мостов', landingSlug: 'bridges-night' },
-      { id: 'yards', label: 'Дворы и крыши', landingSlug: 'spb-yards' },
-    ],
-    venuesTopN: 10,
   },
 };
 

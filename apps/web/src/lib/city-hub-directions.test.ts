@@ -1,0 +1,58 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+
+import { resolveCityHubConfig } from './city-hub-config.ts';
+import { resolveFeaturedDirections } from './city-hub-directions.ts';
+
+test('SPb museums resolve via exhibitions landing, not moscow-museums', () => {
+  const config = resolveCityHubConfig('sankt-peterburg');
+  const rows = resolveFeaturedDirections({
+    config,
+    landings: [
+      { slug: 'river-cruises', title: 'Речные прогулки', events: 26 },
+      { slug: 'exhibitions', title: 'Выставки и музеи', events: 54 },
+      { slug: 'bridges-night', title: 'Разводные мосты', events: 10 },
+    ],
+    categories: [
+      ['Экскурсии', 18],
+      ['Музеи и арт', 4],
+    ],
+    citySlug: 'sankt-peterburg',
+  });
+
+  const museums = rows.find((row) => row.id === 'museums');
+  assert.ok(museums, 'museums direction must be present');
+  assert.equal(museums?.slug, 'exhibitions');
+  assert.equal(museums?.label, 'Музеи');
+});
+
+test('museums fall back to category when landing slug missing for city', () => {
+  const rows = resolveFeaturedDirections({
+    config: {
+      featuredDirections: [
+        { id: 'museums', label: 'Музеи', landingSlug: 'moscow-museums', categoryKey: 'Музеи и арт' },
+      ],
+    },
+    landings: [{ slug: 'river-cruises', title: 'Речные', events: 5 }],
+    categories: [['Музеи и арт', 7]],
+    citySlug: 'sankt-peterburg',
+    limit: 1,
+  });
+
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0]?.id, 'museums');
+  assert.equal(rows[0]?.categoryKey, 'Музеи и арт');
+  assert.equal(rows[0]?.events, 7);
+});
+
+test('soft category match: Музеи config vs Музеи и арт API', () => {
+  const rows = resolveFeaturedDirections({
+    config: {
+      featuredDirections: [{ id: 'museums', label: 'Музеи', categoryKey: 'Музеи' }],
+    },
+    landings: [],
+    categories: [['Музеи и арт', 3]],
+  });
+
+  assert.equal(rows[0]?.categoryKey, 'Музеи и арт');
+});

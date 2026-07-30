@@ -8,6 +8,11 @@ test('resolveCityHubConfig normalizes sankt-peterburg alias', () => {
   assert.ok(config?.featuredDirections?.length);
   assert.equal(config?.primaryCta?.label, 'Круизы и прогулки');
   assert.equal(config?.highlightSeason?.label, 'Белые ночи');
+  assert.ok(config?.featuredDirections?.some((item) => item.id === 'museums'));
+  assert.equal(
+    config?.featuredDirections?.find((item) => item.id === 'museums')?.landingSlug,
+    'exhibitions',
+  );
 });
 
 test('resolveCityHubConfig returns moscow venuesTopN', () => {

@@ -65,9 +65,10 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
     openCatalog();
   };
 
+  // City and national share the same lead line so «музеи» does not disappear when a city is selected.
   const title = selectedCityName ? (
     <>
-      <span className="block">Экскурсии и события</span>
+      <span className="block">Экскурсии, музеи и мероприятия</span>
       <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
         в {cityToPrepositional(selectedCityName)}
       </span>

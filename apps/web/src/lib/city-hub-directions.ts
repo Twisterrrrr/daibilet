@@ -27,6 +27,31 @@ function landingBySlug(landings: LandingLike[], slug: string): LandingLike | nul
   return landings.find((item) => item.slug.trim().toLowerCase() === needle) || null;
 }
 
+function resolveCategoryDirection(
+  item: FeaturedDirectionConfig,
+  categories: Array<[string, number]>,
+): ResolvedFeaturedDirection | null {
+  if (!item.categoryKey) return null;
+  const needle = item.categoryKey.trim().toLowerCase();
+  const match =
+    categories.find(([name]) => name.trim().toLowerCase() === needle) ||
+    // Soft match: config «Музеи» vs API «Музеи и арт»
+    categories.find(([name]) => {
+      const n = name.trim().toLowerCase();
+      return n.includes(needle) || needle.includes(n);
+    });
+  if (!match || match[1] <= 0) return null;
+  return {
+    id: item.id,
+    label: item.label,
+    title: item.label,
+    events: match[1],
+    categoryKey: match[0],
+    href: item.href,
+    emphasis: item.emphasis,
+  };
+}
+
 function resolveDirectionFromConfig(
   item: FeaturedDirectionConfig,
   landings: LandingLike[],
@@ -35,32 +60,25 @@ function resolveDirectionFromConfig(
 ): ResolvedFeaturedDirection | null {
   if (item.landingSlug) {
     const landing = landingBySlug(landings, item.landingSlug);
-    if (!landing || Number(landing.events) <= 0) return null;
-    return {
-      id: item.id,
-      label: item.label,
-      slug: landing.slug,
-      title: item.label || landing.title,
-      subtitle: landing.subtitle ?? null,
-      events: landing.events,
-      priceFrom: landing.priceFrom ?? null,
-      href: item.href || landingCategoryHref(landing.slug, citySlug),
-      emphasis: item.emphasis,
-    };
-  }
-
-  if (item.categoryKey) {
-    const match = categories.find(([name]) => name.trim().toLowerCase() === item.categoryKey!.trim().toLowerCase());
-    if (!match || match[1] <= 0) return null;
-    return {
-      id: item.id,
-      label: item.label,
-      title: item.label,
-      events: match[1],
-      categoryKey: match[0],
-      href: item.href,
-      emphasis: item.emphasis,
-    };
+    if (landing && Number(landing.events) > 0) {
+      return {
+        id: item.id,
+        label: item.label,
+        slug: landing.slug,
+        title: item.label || landing.title,
+        subtitle: landing.subtitle ?? null,
+        events: landing.events,
+        priceFrom: landing.priceFrom ?? null,
+        href: item.href || landingCategoryHref(landing.slug, citySlug),
+        emphasis: item.emphasis,
+      };
+    }
+    // Landing missing/empty for this city - fall back to category so museums etc. stay visible.
+    const categoryFallback = resolveCategoryDirection(item, categories);
+    if (categoryFallback) return categoryFallback;
+  } else {
+    const categoryRow = resolveCategoryDirection(item, categories);
+    if (categoryRow) return categoryRow;
   }
 
   if (item.href) {
@@ -136,7 +154,8 @@ export function resolveFeaturedDirections(input: {
 }
 
 const SIGHT_LANDING_HINTS: Array<{ pattern: RegExp; landingSlug: string; label: string }> = [
-  { pattern: /эрмитаж|дворец|музей|галере/i, landingSlug: 'moscow-museums', label: 'Музеи и выставки' },
+  { pattern: /эрмитаж|дворец|музей|галере|выставк/i, landingSlug: 'exhibitions', label: 'Музеи и выставки' },
+  { pattern: /эрмитаж|дворец|музей|галере|выставк/i, landingSlug: 'moscow-museums', label: 'Музеи и выставки' },
   { pattern: /нева|река|круиз|прогулк|причал|теплоход/i, landingSlug: 'river-cruises', label: 'Речные прогулки' },
   { pattern: /мост|развод/i, landingSlug: 'bridges-night', label: 'Развод мостов' },
   { pattern: /петергоф|дворец|загород/i, landingSlug: 'country-tours', label: 'Загородные экскурсии' },

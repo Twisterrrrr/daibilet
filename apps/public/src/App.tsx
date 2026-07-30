@@ -387,7 +387,7 @@ function HomeHero({
           <h1 className="font-display text-3xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
             {selectedCityName ? (
               <>
-                Экскурсии и события
+                Экскурсии, музеи и мероприятия
                 <span className="block bg-gradient-to-r from-sky-200 to-white bg-clip-text text-transparent">
                   в {cityToPrepositional(selectedCityName)}
                 </span>

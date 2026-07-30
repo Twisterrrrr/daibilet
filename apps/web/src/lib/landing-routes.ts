@@ -1,4 +1,4 @@
-import { canonicalLandingSlug, CANONICAL_LANDING_SLUGS } from '@/lib/landing-constants';
+import { canonicalLandingSlug, CANONICAL_LANDING_SLUGS } from './landing-constants';
 
 export const LANDING_CATEGORY_PATH_BY_SLUG: Record<string, string> = {
   'river-cruises': 'rechnye-progulki',
