@@ -1,4 +1,5 @@
-import { createHash } from 'node:crypto';
+import { randomBytes, scrypt } from 'node:crypto';
+import { promisify } from 'node:util';
 import { prisma } from '@daibilet/db';
 import { createStubCheckoutOrder } from '../src/checkout-stub.js';
 
@@ -13,14 +14,19 @@ const productSlug = 'phase-g-test-museum-entry';
 const adultOfferId = 'ado_phase_g_test_museum_adult';
 const childOfferId = 'ado_phase_g_test_museum_child';
 
-function sha256(value: string): string {
-  return createHash('sha256').update(value).digest('hex');
+const scryptAsync = promisify(scrypt);
+
+async function hashPassword(value: string): Promise<string> {
+  const salt = randomBytes(16).toString('hex');
+  const derived = await scryptAsync(value, salt, 64) as Buffer;
+  return `scrypt:${salt}:${derived.toString('hex')}`;
 }
 
 async function main() {
   const createOrder = process.argv.includes('--order');
   const resetCapacity = process.argv.includes('--reset-capacity');
   const validTo = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+  const ownerPasswordHash = await hashPassword('supplier123');
 
   const city = await prisma.city.upsert({
     where: { slug: citySlug },
@@ -38,6 +44,7 @@ async function main() {
   const owner = await prisma.siteUser.upsert({
     where: { email: 'supplier-test@daibilet.ru' },
     update: {
+      passwordHash: ownerPasswordHash,
       name: 'Тестовый поставщик',
       phone: '+79990000001',
       isActive: true,
@@ -45,7 +52,7 @@ async function main() {
     create: {
       id: ownerUserId,
       email: 'supplier-test@daibilet.ru',
-      passwordHash: sha256('supplier123'),
+      passwordHash: ownerPasswordHash,
       name: 'Тестовый поставщик',
       phone: '+79990000001',
       isActive: true,
