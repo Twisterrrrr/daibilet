@@ -1,3 +1,20 @@
+## 2026-07-30 - ERR_HTTP2_PROTOCOL_ERROR после F5 deploy (nginx cache dir)
+
+### Наблюдения
+- Браузер: `net::ERR_HTTP2_PROTOCOL_ERROR` на https://daibilet.ru после deploy commit `2e5f87d`.
+- nginx error.log: сотни `[crit] mkdir() "/var/cache/nginx/daibilet/X" failed (2: No such file or directory) while reading upstream` на HTTP/2.0 и HTTP/1.1.
+- `/var/cache/nginx/daibilet/` отсутствовал (purge deploy ~06:28 UTC удалил каталог целиком, не только содержимое).
+- `daibilet-web` / `daibilet-api` running; upstream Next отвечает 200 при прямом curl.
+
+### Решения
+- Prod MSK: `mkdir -p /var/cache/nginx/daibilet && chown www-data:www-data`, `nginx -t && systemctl reload nginx`.
+- `deploy-prod-next.sh`: перед purge всегда `mkdir -p` + `chown`, чтобы purge не оставлял битый proxy_cache.
+
+### Проблемы
+- Локальный curl на Windows без HTTP/2; верификация HTTP/2 - по nginx log (нет новых mkdir после 08:08) + внешний curl HTTP/1.1 200 на `/`, `/_next/static/*`, `/podborki`.
+
+---
+
 ## 2026-07-30 - F5.1 + F5.2 landing/catalog TS
 
 ### Наблюдения

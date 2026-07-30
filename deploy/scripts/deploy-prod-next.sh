@@ -242,9 +242,19 @@ else
 fi
 
 # Drop nginx HTML proxy cache so browsers don't get pre-deploy RSC/HTML pointing at deleted chunks.
+# Reload first so old workers stop writing to cache paths, then clear, then reload again.
+# Clearing cache while workers are active causes mkdir/unlink crit errors and HTTP/2 protocol errors.
+mkdir -p /var/cache/nginx/daibilet
+chown www-data:www-data /var/cache/nginx/daibilet
 if [[ -d /var/cache/nginx/daibilet ]]; then
+  if nginx -t 2>/dev/null; then
+    systemctl reload nginx && sleep 1
+  fi
   rm -rf /var/cache/nginx/daibilet/* || true
   echo "Cleared nginx proxy cache /var/cache/nginx/daibilet"
+  if nginx -t 2>/dev/null; then
+    systemctl reload nginx && echo "nginx reloaded after proxy cache clear"
+  fi
 fi
 
 # Bust ISR / unstable_cache after deploy (same tags/paths as backend revalidate-next-home).
