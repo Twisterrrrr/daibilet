@@ -379,6 +379,10 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | CC.2 | Fix lean venue fallback: принимать `/images/events|venues/*` (не только https) | Критический | ✅ `4f11520` |
 | CC.3 | `scripts/ensure-catalog-covers.js` + hook в `tc:sync` / `tep:sync` / worker | Критический | ✅ `4f11520` |
 | CC.4 | Prod backfill: promote + generate пустые hubs (Sortavala и др.) | Критический | ✅ venues promote 939 + gen 9; events 55 (11 groups); `no_hero=0` / `no_image=0` @`5fcc79d` |
+| CC.5 | Prod audit 2026-07-30: empty/city=0; 24 evt-auto (8→CDN venue, 16 files on disk); Volna→TEP866 | Критический | ✅ data+API on MSK |
+| CC.6 | Backend: durable CDN/venue before ephemeral `evt-auto` in `pickFirstUsableEventImageUrl` | Высокий | ✅ code on MSK API |
+| CC.7 | Frontend EventCard city fallback on SafeImage error | Высокий | ⏳ code in workspace; MSK `next build` blocked by egress/fonts |
+| CC.8 | MSK egress: TEP sync + `next/font` Google Fonts (rebuild web) | Высокий | ⏳ blocked INC.504.1 |
 
 ---
 

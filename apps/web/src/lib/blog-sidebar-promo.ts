@@ -75,14 +75,19 @@ export function buildBlogSidebarPromoFromCityPage(page: PublicCityPageDto): Blog
     if (upcomingTitles.length >= MAX_TITLES) break;
   }
 
-  const coverSession = sessions.find((session) => sessionHasCoverImage(session));
+  // Prefer stable city card art for the sidebar. Event/CDN covers often 404 on
+  // MSK disk (evt-auto-*) or 504 via /_next/image when egress to teplohod/TC is dead.
   const cityImage = resolveCityCardImage({
     slug: city.slug,
     sourceSlug: city.sourceSlug,
     name: cityName,
     heroImageUrl: null,
   });
-  const imageUrl = coverSession?.imageUrl?.trim() || cityImage || null;
+  const remoteCoverSession = sessions.find((session) => {
+    const url = String(session.imageUrl || '').trim();
+    return sessionHasCoverImage(session) && /^https?:\/\//i.test(url);
+  });
+  const imageUrl = cityImage || remoteCoverSession?.imageUrl?.trim() || null;
 
   const chips: BlogSidebarPromoChip[] = [];
   const landings = [...(page.landings || [])]

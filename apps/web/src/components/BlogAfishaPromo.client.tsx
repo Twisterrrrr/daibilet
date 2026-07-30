@@ -1,10 +1,10 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Ticket } from 'lucide-react';
 
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
+import { SafeImage } from '@/components/SafeImage.client';
 import { catalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { resolveCityCardImage } from '@/lib/city-images';
 import { formatNumber, pluralEvents } from '@/lib/format';
@@ -126,12 +126,13 @@ export function BlogAfishaPromo({
         aria-label="Афиша"
         className="group relative mt-auto flex min-h-[11rem] flex-1 overflow-hidden rounded-2xl bg-slate-900 text-white shadow-sm"
       >
-        <Image
+        <SafeImage
           src={FALLBACK_IMAGE}
           alt=""
           fill
           sizes={SIDEBAR_IMAGE_SIZES}
           className="object-cover opacity-80 transition duration-500 group-hover:scale-105"
+          fallback={<div className="absolute inset-0 bg-slate-800" aria-hidden />}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/10" />
         <Link
@@ -163,12 +164,22 @@ export function BlogAfishaPromo({
         aria-label={`Афиша: ${promo.cityName}`}
         className="relative block aspect-[5/3] w-full shrink-0 overflow-hidden"
       >
-        <Image
+        <SafeImage
           src={imageSrc}
           alt=""
           fill
           sizes={SIDEBAR_IMAGE_SIZES}
           className="object-cover transition duration-500 hover:scale-105"
+          fallback={
+            <SafeImage
+              src={FALLBACK_IMAGE}
+              alt=""
+              fill
+              sizes={SIDEBAR_IMAGE_SIZES}
+              className="object-cover"
+              fallback={<div className="absolute inset-0 bg-slate-800" aria-hidden />}
+            />
+          }
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent" />
       </Link>

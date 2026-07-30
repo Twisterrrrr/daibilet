@@ -32,6 +32,7 @@ import {
   WIDE_DISPLAY_SLOT_LIMIT,
 } from '@/lib/event-card-meta';
 import { resolveEventCardObjectPosition } from '@/lib/event-image-focus';
+import { resolveEventCardFallbackImage } from '@/lib/event-card-image';
 import {
   resolveEventCardDestinationLabel,
   resolveEventCardLocationLabel,
@@ -85,6 +86,14 @@ export function EventCard({
     sourceSlug: 'sourceSlug' in session ? session.sourceSlug : undefined,
     id: session.id,
   });
+  const imageFallbackSrc = resolveEventCardFallbackImage(session);
+  const emptyImageFallback = (
+    <div className="flex h-full w-full items-center justify-center bg-surface-muted">
+      <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 shadow-sm">
+        <div className="h-3.5 w-3.5 rotate-45 rounded-[6px] border border-slate-300/90 bg-slate-200/90" />
+      </div>
+    </div>
+  );
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const destinationLabel = resolveEventCardDestinationLabel(session);
   const highlights = collectCatalogLabels(session, 1);
@@ -132,11 +141,18 @@ export function EventCard({
           style={{ objectPosition: imageObjectPosition }}
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           fallback={
-            <div className="flex h-full w-full items-center justify-center bg-surface-muted">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 shadow-sm">
-                <div className="h-3.5 w-3.5 rotate-45 rounded-[6px] border border-slate-300/90 bg-slate-200/90" />
-              </div>
-            </div>
+            imageFallbackSrc && imageFallbackSrc !== session.imageUrl ? (
+              <SafeImage
+                src={imageFallbackSrc}
+                alt={session.title}
+                fill
+                sizes={IMAGE_SIZES.eventCard}
+                className="object-cover"
+                fallback={emptyImageFallback}
+              />
+            ) : (
+              emptyImageFallback
+            )
           }
         />
 
@@ -411,6 +427,12 @@ function ShowcaseEventCard({
     sourceSlug: 'sourceSlug' in session ? session.sourceSlug : undefined,
     id: session.id,
   });
+  const imageFallbackSrc = resolveEventCardFallbackImage(session);
+  const emptyImageFallback = (
+    <div className="flex h-full w-full items-center justify-center bg-surface-muted text-3xl text-graphite-muted">
+      ·
+    </div>
+  );
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const pseudoRating = resolvePseudoRating(session.groupKey || session.id);
   const dateLabel = rail ? formatShowcaseSessionDateCompact(session) : formatShowcaseSessionDate(session);
@@ -442,9 +464,18 @@ function ShowcaseEventCard({
           style={{ objectPosition: imageObjectPosition }}
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           fallback={
-            <div className="flex h-full w-full items-center justify-center bg-surface-muted text-3xl text-graphite-muted">
-              ·
-            </div>
+            imageFallbackSrc && imageFallbackSrc !== session.imageUrl ? (
+              <SafeImage
+                src={imageFallbackSrc}
+                alt={session.title}
+                fill
+                sizes={IMAGE_SIZES.eventCard}
+                className="object-cover"
+                fallback={emptyImageFallback}
+              />
+            ) : (
+              emptyImageFallback
+            )
           }
         />
 

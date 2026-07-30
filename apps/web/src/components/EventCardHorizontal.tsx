@@ -19,6 +19,7 @@ import {
   WIDE_DISPLAY_SLOT_LIMIT,
 } from '@/lib/event-card-meta';
 import { resolveEventCardObjectPosition } from '@/lib/event-image-focus';
+import { resolveEventCardFallbackImage } from '@/lib/event-card-image';
 import {
   resolveEventCardDestinationLabel,
   resolveEventCardLocationLabel,
@@ -38,6 +39,8 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
     sourceSlug: 'sourceSlug' in session ? session.sourceSlug : undefined,
     id: session.id,
   });
+  const imageFallbackSrc = resolveEventCardFallbackImage(session);
+  const emptyImageFallback = <div className="flex h-full w-full items-center justify-center bg-surface-muted" />;
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const highlights = collectCatalogLabels(session, 1);
   const openDate = isOpenDate(session);
@@ -81,7 +84,20 @@ export function EventCardHorizontal({ session }: { session: PublicCatalogListIte
           sizes={IMAGE_SIZES.eventCardHorizontal}
           style={{ objectPosition: imageObjectPosition }}
           className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-          fallback={<div className="flex h-full w-full items-center justify-center bg-surface-muted" />}
+          fallback={
+            imageFallbackSrc && imageFallbackSrc !== session.imageUrl ? (
+              <SafeImage
+                src={imageFallbackSrc}
+                alt={session.title}
+                fill
+                sizes={IMAGE_SIZES.eventCardHorizontal}
+                className="object-cover"
+                fallback={emptyImageFallback}
+              />
+            ) : (
+              emptyImageFallback
+            )
+          }
         />
         <EventImageBadges event={session} rail recommendVariant="compact" />
         <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />

@@ -131,3 +131,15 @@ test('isUsableCatalogImageUrl accepts CDN and local events/venues, rejects citie
   assert.equal(isUsableCatalogImageUrl(''), false);
   assert.equal(isUsableCatalogImageUrl(null), false);
 });
+
+test('pickFirstUsableEventImageUrl prefers venue CDN over ephemeral evt-auto stub', () => {
+  const venue =
+    'https://api.teplohod.info/v1/image?item=Event172&dirtyAlias=25a679c595-1.jpg';
+  assert.equal(
+    pickFirstUsableEventImageUrl(
+      '/images/events/generated/evt-auto-3287bba11438.jpg',
+      venue,
+    ),
+    venue,
+  );
+});

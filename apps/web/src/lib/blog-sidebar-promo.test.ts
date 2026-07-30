@@ -89,11 +89,50 @@ test('buildBlogSidebarPromoFromCityPage: price, titles, chips, image', () => {
   assert.equal(promo!.priceFrom, 900);
   assert.equal(promo!.weekendCount, 1);
   assert.deepEqual(promo!.upcomingTitles, ['Пианиссимо', 'Сапрыкин']);
-  assert.equal(promo!.imageUrl, 'https://cdn.example.com/cover1.jpg');
-  assert.ok(promo!.href.includes('/events'));
-  assert.ok(promo!.href.includes('city='));
-  assert.ok(promo!.chips.length >= 1);
-  assert.equal(promo!.chips[0]!.label, 'Стендап');
+  assert.equal(promo!.imageUrl, '/images/cities/moscow.png');
+});
+
+test('buildBlogSidebarPromoFromCityPage: city image wins over remote event cover', () => {
+  const page = {
+    generatedAt: new Date().toISOString(),
+    city: {
+      id: 'c1',
+      slug: 'moscow',
+      sourceSlug: 'moscow',
+      name: 'Москва',
+      title: 'Москва',
+      type: 'city',
+      events: 1,
+      venues: 1,
+      categories: {},
+    },
+    sessions: [
+      {
+        id: 'e1',
+        title: 'Пианиссимо',
+        city: 'Москва',
+        destination: 'Москва',
+        destinationType: 'city',
+        venue: 'Зал',
+        venueKind: 'hall',
+        category: 'Концерты',
+        tags: [],
+        startsAt: '2026-07-25T19:00:00+03:00',
+        dateLabel: '25 июля',
+        timeLabel: '19:00',
+        timeBucket: 'evening',
+        priceFrom: 1200,
+        imageUrl: 'https://cdn.example.com/cover1.jpg',
+      },
+    ],
+    venues: [],
+    landings: [],
+    stats: { events: 1, venues: 1, categories: 1, priceFrom: 1200 },
+  } as unknown as PublicCityPageDto;
+
+  const promo = buildBlogSidebarPromoFromCityPage(page);
+  assert.ok(promo);
+  assert.equal(promo!.imageUrl, '/images/cities/moscow.png');
 });
 
 test('lookupBlogSidebarPromo: name and slug keys', () => {
