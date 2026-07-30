@@ -941,7 +941,9 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 |---|--------|-----------|--------|
 | C.1 | Cherry-pick Phase 2 schema + ECR | Критический | ✅ |
 | C.2 | Admin EventChangeRequestsPage | Средний | ✅ (flag) |
-| C.3 | Phase G finance runtime / ЛК поставщиков (P.3) | Высокий | ⏳ (продуктовый фокус; не ждать F5 целиком) |
+| C.3 | Phase G finance runtime / ЛК поставщиков (P.3) | Высокий | 🔄 ветка `cursor/phase-g-admission-checkout` (cherry-pick 9 commits) |
+| C.3.6 | Cursor integration: cherry-pick `0030fdb..4d2deaad` на `feat/next-monorepo` | Критический | ✅ 2026-07-30 branch `cursor/phase-g-admission-checkout` |
+| C.3.7 | Seed admission smoke (`test-museum` / `test-museum-ticket`) | Высокий | ✅ script `checkout:seed-admission`; DB smoke ⏳ |
 | C.3.1 | Admin Supplier Control Plane: contracts + Prisma read API + admin table | Высокий | ✅ 2026-07-22 (`/api/admin/suppliers`, `/suppliers`) |
 | C.3.1a | Admin Event Schedule API + Schedule tab: mode/open-date + create/update/cancel/restore slots | High | done 2026-07-22 (`/api/admin/events/:id/schedule`) |
 | C.3.2 | Supplier LC read-first API/app shell | Высокий | ✅ 2026-07-22 (`/api/supplier/*`, `apps/supplier`) |

@@ -545,3 +545,14 @@ Venue admission note:
 7. Reports/payouts.
 
 Так мы не закопаемся в финтех до того, как увидим первый управляемый внутренний заказ.
+
+## Cursor integration status (2026-07-30)
+
+- **Base branch:** `feat/next-monorepo` @ `d55bff8`
+- **Integration branch:** `cursor/phase-g-admission-checkout`
+- **Codex commits:** cherry-pick chain `0030fdb` (supplier control plane) through `4d2deaad` (admission read APIs + listing health)
+- **Conflict policy:** keep Next/public catalog handlers; take Codex for finance/supplier/admission backend, admin, supplier app, contracts, Prisma
+- **Migrations (additive):** `20260730120000_venue_admission_products`, `20260730123000_supplier_integration_mode`, `20260730132000_supplier_integrations`
+- **Smoke seed:** `pnpm backend:checkout:seed-admission` (supplier `test-museum`, product `test-museum-ticket`, offers Adult 500 / Concession 250)
+- **Before YooKassa admission (P.3f):** STUB HTTP smoke on finance DB (SPB per MIG.8), idempotent checkout verify, YooKassa credentials + webhook on admission path
+

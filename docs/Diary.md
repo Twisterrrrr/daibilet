@@ -1,4 +1,22 @@
-## 2026-07-30 - UX: home venues city filter + catalog city chip
+## 2026-07-30 - Phase G: cherry-pick admission/supplier foundation на feat/next-monorepo
+
+### Наблюдения
+- Одиночный cherry-pick `4d2deaad` недостаточен: commit зависит от цепочки `0030fdb..4d2deaad` (9 коммитов Codex `phase2-finance-supplier`).
+- На `feat/next-monorepo` многие finance-файлы были удалены/перенесены - конфликты modify/delete и `package.json` test:ts.
+- Локально Docker Desktop не запущен - `db:deploy`, seed и HTTP smoke заблокированы без Postgres.
+
+### Решения
+- Ветка `cursor/phase-g-admission-checkout` от `d55bff8` (`feat/next-monorepo`).
+- Cherry-pick всей цепочки Phase G; конфликты: Cursor public test list + Codex finance routes/contracts/schema.
+- `server-entry.ts`: сохранены public TS handlers + добавлены admin/supplier/checkout/admission routes.
+- Seed: `apps/backend/scripts/seed-admission-test-data.ts` (`test-museum`, `test-museum-ticket`, offers Adult 500 / Concession 250).
+- Миграции additive: `20260730120000_venue_admission_products`, `20260730123000_supplier_integration_mode`, `20260730132000_supplier_integrations`.
+
+### Проблемы
+- `backend:typecheck` / `db:typecheck` падают на pre-existing strict/pg issues (не блокер Phase G unit tests).
+- HTTP smoke STUB admission и `db:deploy` требуют локальный Postgres + `.env`.
+- До YooKassa admission: live smoke P.3f, cron reconcile wiring, finance DB на SPB (MIG.8) отдельно от catalog prod.
+
 
 ### Наблюдения
 - На главной события фильтруются в `HomeCityAwareSections` по `SelectedCityProvider`, а блок «Популярные места и площадки» рендерился статически из SSR без учёта города.
