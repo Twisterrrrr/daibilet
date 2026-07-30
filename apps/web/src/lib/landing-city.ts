@@ -1,4 +1,4 @@
-import type { PublicSessionDto } from '@daibilet/contracts/public';
+import type { PublicSessionDto, PublicVenueDto } from '@daibilet/contracts/public';
 
 const LANDING_CITY_SLUGS: Record<string, string> = {
   moscow: 'Москва',
@@ -64,6 +64,46 @@ export function filterSessionsByCity(
   }
   if (!cityName) return sessions;
   return sessions.filter((session) => resolveSessionCityName(session) === cityName);
+}
+
+export function filterVenuesByCity(
+  venues: PublicVenueDto[],
+  cityName: string | null,
+  citySlug?: string | null,
+): PublicVenueDto[] {
+  const slug = String(citySlug || '')
+    .trim()
+    .toLowerCase();
+  const resolvedName = cityName || (slug ? LANDING_CITY_SLUGS[slug] : null);
+  if (!resolvedName && !slug) return venues;
+
+  const aliases = new Set<string>();
+  if (slug) {
+    for (const [key, name] of Object.entries(LANDING_CITY_SLUGS)) {
+      if (name === resolvedName) aliases.add(key);
+    }
+    aliases.add(slug);
+  }
+
+  return venues.filter((venue) => {
+    const venueCity = String(venue.city || '').trim();
+    if (!venueCity || venueCity === 'Не указан') return false;
+    if (resolvedName && venueCity === resolvedName) return true;
+    if (slug) {
+      const venueSlug = venueCity
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, '-');
+      if (aliases.has(venueSlug)) return true;
+    }
+    return false;
+  });
+}
+
+export function resolveCatalogCityLabel(city?: string | null): string | null {
+  const raw = String(city || '').trim();
+  if (!raw || raw === 'all') return null;
+  return resolveLandingCityName(raw) || raw;
 }
 
 export function filterSessionsByGenre(sessions: PublicSessionDto[], genre?: string | null): PublicSessionDto[] {

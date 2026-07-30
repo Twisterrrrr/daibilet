@@ -13,7 +13,7 @@ import {
 import { CityCard } from '@/components/CityCard';
 import { HomeCityAwareSections } from '@/components/HomeCityAwareSections.client';
 import { HomeHero } from '@/components/HomeHero.client';
-import { InstitutionCard } from '@/components/InstitutionCard.client';
+import { HomeVenuesSection } from '@/components/HomeVenuesSection.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
 import { mergeBlogCards } from '@/lib/blog-utils';
@@ -24,8 +24,6 @@ import { formatMoney, formatNumber, pluralEvents } from '@/lib/format';
 import { HOME_FORMAT_TILES, HOME_HOW_IT_WORKS, HOME_TRUST_ITEMS, resolveHomePromoImage } from '@/lib/home-scenarios';
 import { balancedTileGridClass } from '@/lib/balanced-tile-grid';
 import { landingCategoryHref } from '@/lib/landing-routes';
-import { venueHref } from '@/lib/routes';
-import { venuePageTemplate } from '@/lib/venue-meta';
 import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
 
 function promoBlockIcon(slug: string, index: number) {
@@ -59,10 +57,7 @@ export async function HomePageContent() {
   const fingerprints = new Map(Object.entries(fingerprintsRecord));
   const sparseCatalog = sessions.length < 12;
 
-  const homeVenues = (venuesPayload?.venues ?? [])
-    .filter((venue) => venuePageTemplate(venue.type) === 'institution' && venue.events >= 3 && venue.address)
-    .sort((a, b) => b.events - a.events)
-    .slice(0, 8);
+  const allVenues = venuesPayload?.venues ?? [];
 
   const promoLandings = (landingsCatalog?.items || []).filter((item) => item.events > 0).slice(0, 6);
   let blogCards = mergeBlogCards(null);
@@ -181,26 +176,7 @@ export async function HomePageContent() {
         </div>
       </section>
 
-      {homeVenues.length ? (
-        <section id="venues" className="section-y border-t border-slate-100">
-          <div className="container-page">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <h2 className="font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Популярные места и площадки</h2>
-                <p className="mt-1 text-sm text-slate-500">Музеи, театры, концертные залы и культурные пространства</p>
-              </div>
-              <Link href="/venues" className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:text-primary-700">
-                Все площадки <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-            <div className={`mt-6 grid gap-4 sm:grid-cols-2 ${balancedTileGridClass(homeVenues.length, { lg: 4 })}`}>
-              {homeVenues.map((venue) => (
-                <InstitutionCard key={venue.id} venue={venue} href={venueHref(venue)} />
-              ))}
-            </div>
-          </div>
-        </section>
-      ) : null}
+      <HomeVenuesSection venues={allVenues} />
 
       {promoLandings.length ? (
         <section id="landings" className="section-y">
@@ -363,7 +339,7 @@ export async function HomePageContent() {
             </div>
             <div>
               <p className="font-display text-3xl font-bold tracking-tight text-graphite sm:text-4xl">
-                {formatNumber(Math.max(liveVenues, homeVenues.length))}
+                {formatNumber(liveVenues)}
               </p>
               <p className="mt-1 text-sm text-graphite-muted">площадок в каталоге</p>
             </div>

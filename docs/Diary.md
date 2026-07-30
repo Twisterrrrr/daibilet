@@ -1,3 +1,33 @@
+## 2026-07-30 - UX: home venues city filter + catalog city chip
+
+### Наблюдения
+- На главной события фильтруются в `HomeCityAwareSections` по `SelectedCityProvider`, а блок «Популярные места и площадки» рендерился статически из SSR без учёта города.
+- В каталоге `/events` активный город был только в хедере; в блоке активных фильтров чипа не было.
+
+### Решения
+- `HomeVenuesSection.client.tsx`: клиентский блок площадок с `filterVenuesByCity` (по аналогии с событиями).
+- `landing-city.ts`: `filterVenuesByCity`, `resolveCatalogCityLabel`.
+- `CatalogActiveFilters`: чип города с сбросом через `persistSelectedCity('all')`.
+- Тесты: `landing-city.test.ts` (3 кейса).
+
+### Проблемы
+- Нет.
+
+## 2026-07-30 - INC.504.3: teplohod/CDN bypass Next image optimizer
+
+### Наблюдения
+- После INC.504.2 локальные `/images/*` обходят `/_next/image`, но обложки teplohod/ticketscloud по-прежнему шли через optimizer.
+- MSK outbound TCP/HTTPS мёртв - сервер не может fetch `api.teplohod.info` → 504 на `/_next/image?url=...`.
+
+### Решения
+- `remote-image-bypass.ts`: allowlist teplohod.info, ticketscloud, yandexcloud.net, twcstorage.ru, googleapis.com, amazonaws.com.
+- `SafeImage`: `unoptimized` для этих хостов - браузер грузит CDN напрямую.
+- Deploy: build на SPB `213.171.7.16` @`827ea93`, scp `.next` + sources на MSK, restart `daibilet-web`.
+- MSK `BUILD_ID=BAG8dYUqDRmaw8j-CtlR0`; homepage: 0× `/_next/image?url=...teplohod`, bypass в chunk `5216-*.js`.
+
+### Проблемы
+- Egress/DNS на MSK не починен - только client-side fetch для внешних CDN.
+
 ## 2026-07-30 - PERF.E5 regression: event 404 (Latin slug / Cyrillic DB)
 
 ### Наблюдения
@@ -95,7 +125,24 @@
 ### Проблемы
 - (закрыто deploy-записью выше) Web deploy 1.3.7 на MSK @`4bb9b38`.
 
-## 2026-07-30 - F5.3a catalog grouping + city destination TS
+## 2026-07-30 - F5.3b venue public read в TS
+
+### Наблюдения
+- `public-city.dto.ts` / `public-venue.dto.ts` импортировали `publicVenueHubRows`, `resolvePublicVenuesForSessions`, `buildPublicVenuePage`, `buildPublicVenuesCatalog` из `dto.js`.
+- Hub tiles уже на Prisma lean (`public-venue-lean.ts`); page/catalog тянули legacy `publicCatalogSessions(db)`.
+
+### Решения
+- Новый модуль `public-venue-read.ts`: hub rows, resolve для city hubs, venue page/catalog, map/list helpers, warm cache (`warmPublicVenueCatalogCache`).
+- Catalog sessions в TS-пути: `getPublicCatalogSessions()` вместо `publicCatalogSessions(db)` (без venue index cache).
+- `dto.js` re-export + `clearPublicVenueReadCache()` в `clearPublicDataCaches`; admin/legacy (`server.js`, warm) без изменения контрактов.
+- `public-city.dto.ts`, `public-venue.dto.ts` → `./public-venue-read.js`.
+- Тесты: `public-venue-read.test.ts`; `public-city-venues.test.ts` без dto.js.
+- Web: `city-hub-seo.test.ts` - relative import `./city-hub-seo.ts`; цепочка `city-hub-seo.ts` / `datetime.ts` / `seo-listing-meta.ts` на relative imports для `node:test`.
+
+### Проблемы
+- Public read ещё через dto.js: `public-landing.dto`, `public-articles.dto`, `public-stats.dto`, `public-orders.dto`, `server.js` routes.
+- F5.3c: server.js admin TS routes.
+
 
 ### Наблюдения
 - `public-catalog.dto.ts` тянул grouping (`mapGroupedPublicSession`, `regroup*`, `dedupe*`, `sessionHasCoverImage`) из `dto.js`.

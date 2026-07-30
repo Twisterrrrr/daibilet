@@ -10,13 +10,21 @@ import {
   type CatalogFilterValues,
 } from '@/lib/catalog-url';
 import { displayCatalogLabel } from '@/lib/catalog-labels';
+import { resolveCatalogCityLabel } from '@/lib/landing-city';
 import { persistSelectedCity } from '@/lib/selected-city';
 
 export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }) {
-  const chips: Array<{ key: keyof CatalogFilterValues; label: string }> = [];
+  const chips: Array<{ key: keyof CatalogFilterValues; label: string; onClear?: () => void }> = [];
 
   if (values.q?.trim()) chips.push({ key: 'q', label: `«${values.q.trim()}»` });
-  // Город только в хедере - не дублируем чипом (сброс города через селектор в шапке).
+  const cityLabel = resolveCatalogCityLabel(values.city);
+  if (cityLabel) {
+    chips.push({
+      key: 'city',
+      label: cityLabel,
+      onClear: () => persistSelectedCity('all'),
+    });
+  }
   if (values.category) chips.push({ key: 'category', label: displayCatalogLabel(values.category) });
   if (values.landing) chips.push({ key: 'landing', label: values.landing });
   if (values.date) {
@@ -62,6 +70,7 @@ export function CatalogActiveFilters({ values }: { values: CatalogFilterValues }
         <Link
           key={`${chip.key}:${chip.label}`}
           href={buildCatalogHref(clearCatalogFilterKey(values, chip.key))}
+          onClick={chip.onClear}
           className="inline-flex shrink-0 items-center gap-1 rounded-xl bg-surface-muted px-2.5 py-1.5 text-xs font-medium text-graphite transition hover:bg-slate-200/80"
         >
           {chip.label}
