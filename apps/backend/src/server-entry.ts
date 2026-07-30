@@ -1,16 +1,29 @@
 import type { Server } from 'node:http';
+import {
+  buildAdminAdmissionProductsListDto,
+  buildAdminVenueAdmissionProductsListDto,
+  buildSupplierPortalAdmissionProductsListDto,
+} from './admission-products.dto.js';
+import { createAdminAdmissionProductsRouteHandler } from './admin-admission-products-handler.js';
 import { buildAdminEventChangeRequestDetailDto, buildAdminEventChangeRequestsDto } from './admin-event-change-requests.dto.js';
 import { createAdminEventChangeRequestsRouteHandler } from './admin-event-change-requests-handler.js';
+import { createAdminEventScheduleRouteHandler } from './admin-event-schedule-handler.js';
 import { createAdminEventsRouteHandler } from './admin-events-handler.js';
 import { createAdminEventsReadRouteHandler } from './admin-events-read-handler.js';
 import { buildAdminEventDetailDto, buildAdminEventsListDto } from './admin-events.dto.js';
 import { applyApprovedEventChangeRequest } from './event-change-request-applier.js';
 import { reviewEventChangeRequest } from './event-change-request-review.js';
 import { createAdminLandingsRouteHandler } from './admin-landings-handler.js';
+import { buildAdminListingHealthOverviewDto } from './admin-listing-health.dto.js';
+import { createAdminListingHealthRouteHandler } from './admin-listing-health-handler.js';
 import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
 import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler.js';
 import { buildAdminOrdersListDto } from './admin-orders.dto.js';
+import { createAdminSuppliersRouteHandler } from './admin-suppliers-handler.js';
+import { buildAdminSupplierDetailDto, buildAdminSuppliersListDto } from './admin-suppliers.dto.js';
 import { createAdminAuthConfig } from './auth.js';
+import { createStubCheckoutRouteHandler } from './checkout-stub-handler.js';
+import { createYooKassaCheckoutRouteHandler } from './checkout-yookassa-handler.js';
 import { readBackendEnv } from './env.js';
 import { updateAdminEventOverride, updateAdminLandingMatch, upsertAdminOrderTicket } from './dto.js';
 import { buildPublicCatalogDto, clearPublicCatalogDtoCache, getPublicCatalogSessions } from './public-catalog.dto.js';
@@ -23,6 +36,15 @@ import { createPublicEventRouteHandler } from './public-event-handler.js';
 import { buildPublicVenueDto, buildPublicVenuesDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
 import { createPublicVenueRouteHandler } from './public-venue-handler.js';
 import { createPublicReadStackWarmer } from './public-warmup.js';
+import { createSupplierPortalRouteHandler } from './supplier-portal-handler.js';
+import {
+  buildSupplierPortalDashboardDto,
+  buildSupplierPortalEventsListDto,
+  buildSupplierPortalFinanceDto,
+  buildSupplierPortalOrdersListDto,
+  buildSupplierPortalProfileDto,
+  buildSupplierPortalReviewsListDto,
+} from './supplier-portal.dto.js';
 import {
   db,
   handleRequest,
@@ -94,6 +116,20 @@ const server = startServer({
         buildEventsList: buildAdminEventsListDto,
         buildEventDetail: buildAdminEventDetailDto,
       }),
+      createAdminSuppliersRouteHandler({
+        buildSuppliersList: buildAdminSuppliersListDto,
+        buildSupplierDetail: buildAdminSupplierDetailDto,
+      }),
+      createAdminAdmissionProductsRouteHandler({
+        buildAdmissionProductsList: buildAdminAdmissionProductsListDto,
+        buildVenueAdmissionProductsList: buildAdminVenueAdmissionProductsListDto,
+      }),
+      createAdminListingHealthRouteHandler({
+        buildListingHealthOverview: buildAdminListingHealthOverviewDto,
+      }),
+      createAdminEventScheduleRouteHandler({
+        invalidatePublicCaches,
+      }),
       createAdminOrdersRouteHandler({
         db,
         upsertAdminOrderTicket,
@@ -115,6 +151,17 @@ const server = startServer({
         applyEventChangeRequest: applyApprovedEventChangeRequest,
         invalidatePublicCaches,
       }),
+      createSupplierPortalRouteHandler({
+        buildDashboard: buildSupplierPortalDashboardDto,
+        buildProfile: buildSupplierPortalProfileDto,
+        buildEventsList: buildSupplierPortalEventsListDto,
+        buildAdmissionsList: buildSupplierPortalAdmissionProductsListDto,
+        buildOrdersList: buildSupplierPortalOrdersListDto,
+        buildFinance: buildSupplierPortalFinanceDto,
+        buildReviewsList: buildSupplierPortalReviewsListDto,
+      }),
+      createStubCheckoutRouteHandler(),
+      createYooKassaCheckoutRouteHandler(),
       createPublicReviewsRouteHandler(),
       createAdminReviewsRouteHandler(),
     ],

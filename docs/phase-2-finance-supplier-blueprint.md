@@ -95,6 +95,31 @@ SPBBOATS использовал `PurchaseFlow`:
 
 Редактирование критичных данных ограничено: payment settings и налоговая модель только через admin.
 
+### Supplier integration modes
+
+ЛК поставщика имеет отдельную ось `Supplier.integrationMode`, которая не заменяет `defaultCatalogMode`.
+
+`defaultCatalogMode` отвечает на вопрос "где покупатель платит": `WIDGET_ONLY`, `INTERNAL_CHECKOUT`, `HYBRID`.
+
+`integrationMode` отвечает на вопрос "как поставщик подключен и кто владеет каталогом":
+
+1. `IMPORTED_TICKETING_SYSTEM` — билетная система или источник с импортируемыми событиями.
+   - Каталог source-managed.
+   - ЛК поставщика read-only: события, продажи и статусы показываются как зеркало.
+   - Редактирование контента/расписания/цен поставщиком запрещено.
+   - Админ может позже получить control plane для отключения вывода событий поставщика в каталоге без удаления импорта.
+
+2. `INTERNAL_SALES` — поставщик продает через Daibilet.
+   - Каталог Daibilet-managed.
+   - Поставщик может вести свои события, входные билеты площадок, категории билетов и заказы в рамках permissions/moderation.
+   - Финконтур, YooKassa, fulfillment, buyer account, ledger и отчеты идут через Daibilet.
+
+3. `API_SYNC` — у поставщика есть свой сайт или билетная система, и нужен обмен по API.
+   - Каталог partner-api-managed.
+   - ЛК поставщика показывает статус синхронизации и настройки routes/webhooks.
+   - Ручное редактирование карточек ограничено: источник истины находится во внешней системе.
+   - Конкретные endpoint routes, auth, расписание sync и error health — отдельный следующий слой.
+
 ### Reviews
 
 Берем ограничение:
@@ -167,6 +192,45 @@ Supplier app можно делать отдельным `apps/supplier`, но н
 - finance summary;
 - requisites;
 - team.
+
+## Реализация 2026-07-30: admission + listing health + supplier read-first
+
+В ветке `codex/phase2-finance-supplier` добавлен следующий слой Phase 2 без включения полноценного финконтура:
+
+- `AdmissionProduct` / `AdmissionOffer` используются как самостоятельные входные билеты площадки без фейкового события.
+- Admin API:
+  - `GET /api/admin/admission-products`;
+  - `GET /api/admin/venues/:id/admission-products`;
+  - `GET /api/admin/listing-health`.
+- Supplier API:
+  - `GET /api/supplier/admissions`.
+- Admin UI:
+  - карточка площадки получила блок "Входные билеты";
+  - карточка поставщика показывает admission sample и учитывает входные билеты в readiness.
+- Supplier app:
+  - добавлен раздел "Входные билеты";
+  - dashboard показывает количество admission-продуктов и проблемные карточки.
+- Listing Health:
+  - общий explainable score для `EVENT`, `VENUE`, `ADMISSION_PRODUCT`;
+  - правила не черный ящик: high issue блокирует продажу/публикацию, medium/low переводят в review.
+- Checkout STUB:
+  - поддерживает `subjectType=VENUE_ADMISSION`;
+  - принимает `admissionProductId/admissionProductSlug` + `admissionOfferId`;
+  - атомарно списывает `AdmissionProduct.ticketsVacant`, если лимит задан;
+  - пишет `CheckoutOrder`, `CheckoutItem`, `Payment`, `FulfillmentItem`, supplier ledger.
+- Supplier order projection:
+  - позиции заказа теперь различают `EVENT` и `VENUE_ADMISSION`;
+  - supplier UI показывает admission-продукт вместо пустого события.
+- API_SYNC foundation:
+  - добавлены `SupplierIntegration`, `SupplierIntegrationRun`, `SupplierIntegrationIssue`;
+  - capability matrix описывает возможности провайдера, неизвестные capability считаются `false`.
+
+Ограничения текущего слоя:
+
+- Yookassa checkout пока остается event-oriented; admission path подключен только к STUB.
+- Нет write UI для создания admission-продукта поставщиком.
+- Нет полноценной auth-модели Supplier LC: текущий supplier selector остается read-first/dev-friendly.
+- Listing Health пока on-read, без материализации в отдельной таблице.
 
 ## Ближайший backlog
 
@@ -327,6 +391,27 @@ Implemented admin moderation/read API slice 2026-07-10:
 - supplier events/venues;
 - readiness for internal checkout.
 
+Статус 2026-07-22:
+
+- ✅ contracts + Prisma read API: `GET /api/admin/suppliers`, `GET /api/admin/suppliers/:id`;
+- ✅ admin page `/suppliers` с readiness, событиями, заказами, ledger/finance summary и отзывами;
+- ✅ readiness guardrails покрыты unit-тестом;
+- ⏳ write actions отложены: создание/редактирование поставщика, legal/bank update, payment settings update.
+
+### Phase 2.2b: event schedule management
+
+Checkout sells a concrete ticket category on a concrete slot, or an open-date product. Before enabling STUB/YooKassa checkout, admin must be able to inspect and edit manual schedules without touching imported TC/Teplohod schedules.
+
+Status 2026-07-22:
+
+- done: contracts for admin event schedule DTO, sessions and offers;
+- done: backend routes `GET/PATCH /api/admin/events/:id/schedule`;
+- done: backend routes to create, update, cancel and restore sessions;
+- done: guardrails for `SOURCE_MANAGED`, `scheduleLocked`, `SINGLE`, `RECURRING`, `OPEN_DATE`, duplicate starts and capacity below sold;
+- done: every schedule mutation writes `EventChangeLog` and invalidates public caches;
+- done: minimal admin Schedule tab in event detail can unlock manual schedule, save mode, create slots, cancel and restore slots;
+- next: Offers editor, recurrence-rule generator, then STUB checkout.
+
 ### Phase 2.3: checkout sandbox
 
 - one manual/internal event;
@@ -335,6 +420,57 @@ Implemented admin moderation/read API slice 2026-07-10:
 - then YooKassa sandbox;
 - payment webhook idempotency;
 - fulfillment item issuance.
+
+Status 2026-07-22:
+
+- done: STUB checkout contract in `@daibilet/contracts/checkout`;
+- done: public backend route `POST /api/checkout/stub`;
+- done: `DAIBILET_STUB_CHECKOUT=1` is required to create stub orders in every non-test environment;
+- done: checkout creates `CheckoutOrder`, `CheckoutItem`, `Payment(provider=MANUAL)`, `FulfillmentItem(provider=STUB)` and `SupplierLedgerEntry`;
+- done: internal checkout is allowed only for `purchaseFlow=PLATFORM`, `managementMode=DAIBILET_MANAGED`, active supplier, manual active offer and a concrete future session or `OPEN_DATE`;
+- done: imported TC/Teplohod events remain blocked from this path;
+- done: idempotency is stored through `IdempotencyKey(scope=CHECKOUT_CREATE)`;
+- done: `pnpm backend:checkout:seed-stub` creates one local manual open-date smoke product; add `-- --order` to create a STUB order directly;
+- note: real YooKassa payment and fiscal receipt are intentionally not created in STUB mode.
+
+Status 2026-07-30:
+
+- done: YooKassa sandbox backend contour added next to STUB, not instead of widget-first sales;
+- done: public backend route `POST /api/checkout/yookassa`;
+- done: webhook route `POST /api/checkout/yookassa/webhook`;
+- done: YooKassa create-payment flow creates local `CheckoutOrder(PENDING_PAYMENT)`, `CheckoutItem(RESERVED)`, `Payment(provider=YOOKASSA)` and `FulfillmentItem(PENDING)`;
+- done: payment `succeeded` webhook confirms order, item and fulfillment and writes supplier ledger entries idempotently;
+- done: payment `canceled` / failed path cancels local order and releases reserved capacity when possible;
+- done: every non-test environment requires `DAIBILET_YOOKASSA_CHECKOUT=1` plus `YOOKASSA_SHOP_ID` and `YOOKASSA_SECRET_KEY`;
+- done: `Idempotency-Key` is mandatory for `POST /api/checkout/yookassa` and is bound to the checkout payload;
+- done: checkout redirect return URL is generated from server config, not accepted from arbitrary client input;
+- done: route has a lightweight origin allowlist and in-memory rate limit; nginx/app-level production rate limits are still required;
+- done: reconciliation/reaper CLI for expired `CheckoutOrder(PENDING_PAYMENT)` rows; remote YooKassa status is applied when `providerPaymentId` exists, and local reservations without provider id are expired safely.
+- note: fiscal receipts are still not sent automatically; this must be enabled only after YooKassa/54-FZ settings and operator flow are approved.
+- next before broad public enable: run live sandbox smoke, wire a scheduled server job for `pnpm backend:checkout:yookassa:reconcile -- --apply`, and add operator review for remote `pending` / `waiting_for_capture` payments that stay non-terminal for too long.
+
+Sandbox env:
+
+```bash
+DAIBILET_YOOKASSA_CHECKOUT=1
+DAIBILET_YOOKASSA_VERIFY_WEBHOOK=1
+YOOKASSA_SHOP_ID=...
+YOOKASSA_SECRET_KEY=...
+YOOKASSA_RETURN_BASE_URL=https://daibilet.ru
+```
+
+Webhook to register in YooKassa LC:
+
+```text
+https://api.daibilet.ru/api/checkout/yookassa/webhook
+```
+
+Venue admission note:
+
+- legacy bridge remains supported: an existing manual `OPEN_DATE` event linked to a venue can still be classified as `VENUE_ADMISSION` in checkout DTO;
+- target model is now explicit: museum/gallery/attraction entrance tickets are `AdmissionProduct` / `AdmissionOffer` records linked to `Venue`, `City` and `Supplier`;
+- public venue pages should render admission as a separate "Входные билеты" block, while theatre/gallery/museum events stay in the programme/affiche block;
+- admin and supplier LC should manage admission products separately from event schedule, because venue admission usually has validity rules and ticket categories rather than slots.
 
 ### Phase 2.4: orders and buyer account
 
@@ -346,12 +482,14 @@ Implemented admin moderation/read API slice 2026-07-10:
 
 ### Phase 2.5: supplier LC MVP
 
-- read-first supplier dashboard;
-- orders;
-- reviews;
-- balance;
-- reports/documents;
-- team and requisites.
+- ✅ read-first supplier dashboard: `GET /api/supplier/dashboard`;
+- ✅ supplier events read model: `GET /api/supplier/events`;
+- ✅ internal checkout order items: `GET /api/supplier/orders`;
+- ✅ balance/ledger/payout snapshot: `GET /api/supplier/finance`;
+- ✅ reviews queue: `GET /api/supplier/reviews`;
+- ✅ legal/bank/profile snapshot: `GET /api/supplier/profile`;
+- ✅ `apps/supplier` app shell;
+- reports/documents write flows are deferred until real finance operations start.
 
 ### Phase 2.6: reviews MVP
 
@@ -407,3 +545,14 @@ Implemented admin moderation/read API slice 2026-07-10:
 7. Reports/payouts.
 
 Так мы не закопаемся в финтех до того, как увидим первый управляемый внутренний заказ.
+
+## Cursor integration status (2026-07-30)
+
+- **Base branch:** `feat/next-monorepo` @ `d55bff8`
+- **Integration branch:** `cursor/phase-g-admission-checkout`
+- **Codex commits:** cherry-pick chain `0030fdb` (supplier control plane) through `4d2deaad` (admission read APIs + listing health)
+- **Conflict policy:** keep Next/public catalog handlers; take Codex for finance/supplier/admission backend, admin, supplier app, contracts, Prisma
+- **Migrations (additive):** `20260730120000_venue_admission_products`, `20260730123000_supplier_integration_mode`, `20260730132000_supplier_integrations`
+- **Smoke seed:** `pnpm backend:checkout:seed-admission` (supplier `test-museum`, product `test-museum-ticket`, offers Adult 500 / Concession 250)
+- **Before YooKassa admission (P.3f):** STUB HTTP smoke on finance DB (SPB per MIG.8), idempotent checkout verify, YooKassa credentials + webhook on admission path
+

@@ -102,6 +102,30 @@
 
 ---
 
+## 2026-07-30 — Venue admission products
+
+**Решение:** Входные билеты площадок заводятся как отдельные `AdmissionProduct` / `AdmissionOffer`, а не как фейковые `OPEN_DATE` события.
+
+**Почему:** Первые управляемые поставщики — музеи и арт-площадки. Им нужно продавать входной билет со страницы площадки, даже если нет отдельного события или расписания. SPBBOATS сначала использовал `OPEN_DATE` event как мостик, но целевая схема была venue-level admission.
+
+**Граница:** `Event` остаётся для афиши, выставок, экскурсий, концертов и импортов TC/Teplohod. `AdmissionProduct` используется для самостоятельного входа на площадку: музей, галерея, зоопарк, парк, смотровая, аттракцион и похожие сценарии.
+
+**Статус:** Введены Prisma-модели, миграция, checkout subject marker и backend readiness helper. Public/admin UI и реальный checkout admission-продукта — следующий slice.
+
+---
+
+## 2026-07-30 — Supplier integration modes
+
+**Решение:** Тип подключения поставщика фиксируется отдельным `Supplier.integrationMode`: `IMPORTED_TICKETING_SYSTEM`, `INTERNAL_SALES`, `API_SYNC`.
+
+**Почему:** `defaultCatalogMode` говорит только о способе покупки, но не объясняет, кто владеет каталогом и что можно делать в ЛК. Для импортных билетных систем нужен read-only LC, для музеев и галерей с внутренними продажами — editable контур, для партнерских API — экран маршрутов, health и синхронизации.
+
+**Граница:** Не смешивать source ownership, checkout flow и supplier permissions в одно поле. Отключение вывода событий импортного поставщика в каталоге — отдельный control-plane слой, не удаление данных импорта.
+
+**Статус:** Введены Prisma enum/field, migration, DTO field и backend policy helper.
+
+---
+
 ## Отложено (не в MVP runtime)
 
 | Тема | Причина отложения |

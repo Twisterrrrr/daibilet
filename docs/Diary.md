@@ -1,4 +1,22 @@
-## 2026-07-30 - UX: home venues city filter + catalog city chip
+## 2026-07-30 - Phase G: cherry-pick admission/supplier foundation на feat/next-monorepo
+
+### Наблюдения
+- Одиночный cherry-pick `4d2deaad` недостаточен: commit зависит от цепочки `0030fdb..4d2deaad` (9 коммитов Codex `phase2-finance-supplier`).
+- На `feat/next-monorepo` многие finance-файлы были удалены/перенесены - конфликты modify/delete и `package.json` test:ts.
+- Локально Docker Desktop не запущен - `db:deploy`, seed и HTTP smoke заблокированы без Postgres.
+
+### Решения
+- Ветка `cursor/phase-g-admission-checkout` от `d55bff8` (`feat/next-monorepo`).
+- Cherry-pick всей цепочки Phase G; конфликты: Cursor public test list + Codex finance routes/contracts/schema.
+- `server-entry.ts`: сохранены public TS handlers + добавлены admin/supplier/checkout/admission routes.
+- Seed: `apps/backend/scripts/seed-admission-test-data.ts` (`test-museum`, `test-museum-ticket`, offers Adult 500 / Concession 250).
+- Миграции additive: `20260730120000_venue_admission_products`, `20260730123000_supplier_integration_mode`, `20260730132000_supplier_integrations`.
+
+### Проблемы
+- `backend:typecheck` / `db:typecheck` падают на pre-existing strict/pg issues (не блокер Phase G unit tests).
+- HTTP smoke STUB admission и `db:deploy` требуют локальный Postgres + `.env`.
+- До YooKassa admission: live smoke P.3f, cron reconcile wiring, finance DB на SPB (MIG.8) отдельно от catalog prod.
+
 
 ### Наблюдения
 - На главной события фильтруются в `HomeCityAwareSections` по `SelectedCityProvider`, а блок «Популярные места и площадки» рендерился статически из SSR без учёта города.
@@ -6529,3 +6547,193 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 - Slug lyumer - техническая транслитерация; display title содержит «Люмьер».
 
 
+---
+
+## 2026-07-22 — Phase 2: Admin Supplier Control Plane
+
+### Наблюдения
+- В SPBBOATS полезны инварианты, но не весь тяжелый контур: ticket category отдельно от слота, импортные расписания read-only, checkout идемпотентный, финансы строятся поверх ledger.
+- В Daibilet уже есть Prisma foundation: `Supplier`, `SupplierUser`, `CheckoutOrder`, `CheckoutItem`, `Payment`, `RefundRequest`, `Payout`, `SupplierLedgerEntry`, `SupplierReport`, `SupplierDocument`, `Review`.
+- Поэтому первый шаг фазы 2 лучше делать не новой миграцией и не включением YooKassa, а управляемым экраном готовности поставщиков.
+
+### Решения
+- Добавлен contract layer для `AdminSuppliersListDto` / `AdminSupplierDetailDto`.
+- Добавлен Prisma-backed backend read-model:
+  - `GET /api/admin/suppliers`
+  - `GET /api/admin/suppliers/:id`
+- Добавлена admin page `/suppliers`: поиск, фильтр статуса, таблица, detail drawer, readiness, события, заказы, ledger/finance summary, отзывы.
+- Readiness блокирует internal checkout, если нет активного поставщика, владельца ЛК, verified legal profile, основного счета, комиссии или YooKassa shop id.
+
+### Проблемы
+- Реальные платежи не включены: это сознательно, Phase 1 widget-first не трогаем.
+- Общий backend typecheck в текущей ветке падает на существующих строгих ошибках `public-catalog.mapper.test.ts` и `public-city-venues.test.ts`; новый supplier unit test проходит.
+- Следующий шаг: supplier LC read-first API/app shell или STUB checkout на одном manual/internal событии.
+## 2026-07-22 — Phase 2: Admin Event Schedule API
+
+### Observations
+
+- Phase 2 checkout cannot safely sell an abstract event. It needs either a concrete `EventSession` slot plus ticket category, or an `OPEN_DATE` product.
+- SPBBOATS invariant stays: imported TC/Teplohod schedules are source-managed and read-only; manual/Daibilet-managed schedules can be edited through admin.
+
+### Decisions
+
+- Added admin contracts and backend routes for `GET/PATCH /api/admin/events/:id/schedule`.
+- Added session operations: create, update, cancel and restore.
+- Guardrails cover `SOURCE_MANAGED`, `scheduleLocked`, `SINGLE`, `RECURRING`, `OPEN_DATE`, duplicate start times and capacity below already sold tickets.
+- Every schedule mutation writes `EventChangeLog` and invalidates public caches.
+
+### Problems
+
+- Minimal admin Schedule tab is connected; Offers editor and recurrence-rule generator are still next.
+- Full backend typecheck still fails on pre-existing strict issues in `public-catalog.mapper.test.ts` and `public-city-venues.test.ts`; new schedule tests pass.
+
+---
+
+## 2026-07-22 — Phase 2: Supplier LC read-first API/app shell
+
+### Decisions
+
+- Added supplier-facing contracts (`SupplierPortal*Dto`) separate from admin supplier DTOs.
+- Added protected read-only backend endpoints:
+  - `GET /api/supplier/me` / `GET /api/supplier/profile`
+  - `GET /api/supplier/dashboard`
+  - `GET /api/supplier/events`
+  - `GET /api/supplier/orders`
+  - `GET /api/supplier/finance`
+  - `GET /api/supplier/reviews`
+- Supplier identity is currently resolved by `supplierId`, `slug` or `supplier` query param; real supplier auth replaces this later.
+- `/api/supplier/*` is protected by the production Basic Auth guard to avoid leaking buyer/order PII before supplier auth exists.
+- Added `apps/supplier` Vite/React shell with Dashboard, Events, Orders, Finance, Reviews and Profile.
+
+### Verification
+
+- `@daibilet/contracts typecheck` passed.
+- `@daibilet/supplier` typecheck and Vite build passed.
+- Targeted backend tests passed for supplier portal, admin supplier readiness and schedule management.
+- Full backend typecheck still has the pre-existing strict test errors in `public-catalog.mapper.test.ts` and `public-city-venues.test.ts`.
+
+### Next
+
+- STUB checkout on one manual `DAIBILET_MANAGED` event with explicit ticket offers and concrete session/open-date policy.
+
+---
+
+## 2026-07-22 - Phase 2: STUB checkout backend sandbox
+
+### Decisions
+
+- Added `@daibilet/contracts/checkout` for STUB checkout request/result/error DTOs.
+- Added public backend route `POST /api/checkout/stub`.
+- Creation in every non-test environment is explicitly gated by `DAIBILET_STUB_CHECKOUT=1`.
+- STUB checkout writes the internal contour only: `CheckoutOrder`, `CheckoutItem`, `Payment(provider=MANUAL)`, `FulfillmentItem(provider=STUB)` and supplier ledger entries.
+- No real payment, no YooKassa call and no fiscal receipt are created in this mode.
+- Added `pnpm backend:checkout:seed-stub` for a local manual open-date smoke product; `-- --order` creates a direct STUB checkout order.
+
+### Guardrails
+
+- Event must be `purchaseFlow=PLATFORM`, `managementMode=DAIBILET_MANAGED`, `READY` or `PUBLISHED`.
+- Supplier must be active and attached.
+- Offer must be active, `sourceCode=MANUAL` and price must be at least 100 RUB.
+- `SINGLE` / `RECURRING` events require a concrete future active session.
+- `OPEN_DATE` events can be sold without a session.
+- Imported/source-managed TC/Teplohod events are blocked.
+
+### Venue admission
+
+- MVP path: museum/gallery/attraction admission can use a manual `OPEN_DATE` event linked to venue and appears as `VENUE_ADMISSION` in checkout DTO.
+- Later schema path: separate venue-level admission products, because legacy SPBBOATS allowed museums and art galleries to sell admission without an event binding.
+
+---
+
+## 2026-07-30 - Phase 2: YooKassa sandbox backend
+
+### Decisions
+
+- Added YooKassa sandbox route `POST /api/checkout/yookassa` next to STUB checkout.
+- Added YooKassa webhook route `POST /api/checkout/yookassa/webhook`.
+- YooKassa checkout creates local `CheckoutOrder(PENDING_PAYMENT)`, `CheckoutItem(RESERVED)`, `Payment(provider=YOOKASSA)` and `FulfillmentItem(PENDING)` before redirecting buyer to YooKassa.
+- Webhook `payment.succeeded` confirms order/item/fulfillment and writes supplier ledger entries idempotently.
+- Webhook cancel/fail path cancels local order and releases reserved capacity when possible.
+- Runtime is gated by `DAIBILET_YOOKASSA_CHECKOUT=1` plus `YOOKASSA_SHOP_ID` and `YOOKASSA_SECRET_KEY`.
+- `Idempotency-Key` is mandatory and payload-bound for YooKassa checkout creation.
+- YooKassa `return_url` is generated from server config, not trusted from arbitrary client input.
+- Webhook dedupe retries `IN_PROGRESS` / failed attempts instead of dropping them as duplicates.
+
+### Boundaries
+
+- Widget-first MVP remains unchanged for imported TC/Teplohod events.
+- Fiscal receipts are not sent automatically yet; this needs YooKassa/54-FZ settings and an operator-approved flow.
+- Live sandbox smoke is pending until LC credentials are present in the target environment.
+- Production must still add nginx/app-level rate limits for `/api/checkout/*`; backend has only a lightweight in-memory guard.
+- Before broad public enable, add reconciliation/reaper for abandoned pending YooKassa orders whose `expiresAt` has passed.
+
+### Verification
+
+- Focused checkout tests passed for STUB + YooKassa pure logic.
+- Backend typecheck passed after the new route/service wiring.
+
+---
+
+## 2026-07-30 - Phase 2: YooKassa pending-payment reconcile
+
+### Decisions
+
+- Added a YooKassa reconcile/reaper service for expired `CheckoutOrder(PENDING_PAYMENT)` rows.
+- Added CLI command `pnpm backend:checkout:yookassa:reconcile`; it defaults to dry-run, can target one order with `-- --order-id=...`, and mutates only with `-- --apply`.
+- Reconcile reads remote YooKassa payment status when `providerPaymentId` exists and applies the same local state logic as webhooks.
+- Local orders without a persisted `providerPaymentId` can be expired after the grace window, releasing reserved capacity through a guarded order-status transition.
+- Capacity release is claimed by `CheckoutItem.status=RESERVED` inside the same transaction, so repeated cancel/reconcile paths do not return seats twice.
+- No public reconcile endpoint was added; server cron/systemd timer is the safer first operational path.
+
+### Boundaries
+
+- Remote `pending` / `waiting_for_capture` does not release capacity yet; it remains reserved until YooKassa reports a terminal status or a later explicit cancel flow is added.
+- Live sandbox smoke and production scheduling are still required before enabling YooKassa checkout broadly.
+
+### Verification
+
+- Added pure action-classification tests; full typecheck/test pass is the next verification step for this block.
+
+---
+
+## 2026-07-30 - Phase 2: Venue admission products
+
+### Decisions
+
+- Fixed the SPBBOATS lesson for Daibilet: a venue can sell admission without being converted into a fake `OPEN_DATE` event.
+- Added a first-class `AdmissionProduct` / `AdmissionOffer` layer for museums, galleries, art spaces, zoos, parks, observation decks, attractions and similar venues.
+- Kept the page strategy as one adaptive venue template: admission block appears only when admission products exist; event programme remains a separate block.
+- Added `CheckoutItem.subjectType` so buyer account, supplier LC and finance reports can distinguish `EVENT` from `VENUE_ADMISSION`.
+- Kept imported TC/Teplohod events untouched; admission starts as manual/platform-managed supplier inventory.
+
+### Boundaries
+
+- Public UI, admin editor and real admission checkout are the next slice.
+- Existing manual open-date event checkout remains supported during transition.
+- No full SPBBOATS catalog reset was imported.
+
+### Verification
+
+- Prisma schema validates and client generation passes with the new admission models.
+- Added backend readiness tests for active supplier, valid offers, 100 RUB minimum, validity windows and rolling validity.
+
+---
+
+## 2026-07-30 - Phase 2: Supplier integration modes
+
+### Decisions
+
+- Added a separate supplier connection axis: `Supplier.integrationMode`.
+- Kept `defaultCatalogMode` for sales flow only: widget, internal checkout or hybrid.
+- Defined three LC modes from legacy/product thinking:
+  - `IMPORTED_TICKETING_SYSTEM`: read-only mirror for TC/Teplohod-like imported suppliers.
+  - `INTERNAL_SALES`: Daibilet-owned catalog and checkout for museums, galleries and direct suppliers.
+  - `API_SYNC`: partner API / own ticket system with route/webhook configuration and sync health.
+- Added a pure policy helper so admin/supplier UI can derive editability from one place instead of hardcoding rules per page.
+
+### Boundaries
+
+- Admin UI labels and API route configuration screens are still next slices.
+- Disabling supplier output in public catalog should be handled as a control-plane action over supplier/event visibility, not by deleting imported rows.
+
+---

@@ -27,6 +27,16 @@ export const backendEnvSchema = z.object({
   TEP_API_URL: z.string().optional(),
   TEP_WIDGET_ID: z.string().optional(),
   TEP_WIDGET_BASE_URL: z.string().optional(),
+  DAIBILET_STUB_CHECKOUT: z.string().optional(),
+  DAIBILET_YOOKASSA_CHECKOUT: z.string().optional(),
+  DAIBILET_YOOKASSA_VERIFY_WEBHOOK: z.string().optional(),
+  YOOKASSA_SHOP_ID: z.string().optional(),
+  YOOKASSA_STORE_ID: z.string().optional(),
+  YOOKASSA_SECRET_KEY: z.string().optional(),
+  YOOKASSA_API_KEY: z.string().optional(),
+  YOOKASSA_API_URL: z.string().optional(),
+  YOOKASSA_RETURN_BASE_URL: z.string().optional(),
+  PUBLIC_SITE_URL: z.string().optional(),
 });
 
 export type BackendEnv = z.infer<typeof backendEnvSchema>;

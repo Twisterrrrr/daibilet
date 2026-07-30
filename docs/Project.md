@@ -57,6 +57,12 @@ packages/config   — shared tsconfig/eslint
 
 **Write/sync path:** legacy `server.js` / sync scripts; после sync — `invalidatePublicCaches({ warm: true })` + Next revalidate.
 
+**Phase 2 finance path:** `CheckoutOrder` / `Payment` / `FulfillmentItem` остаются в `apps/backend` для write-операций, public по умолчанию остается widget-first. Для YooKassa sandbox добавлен reaper зависших оплат: `pnpm backend:checkout:yookassa:reconcile -- --apply`.
+
+**Venue admission path:** музеи, арт-площадки, зоопарки, парки и другие места с входными билетами продаются через `AdmissionProduct` / `AdmissionOffer`, а не через фейковые события. `Event` остается для афиши и расписания; `AdmissionProduct` живет на странице площадки и может участвовать в city/home blocks как самостоятельный продаваемый объект.
+
+**Supplier LC modes:** `Supplier.integrationMode` отделяет тип подключения от способа продажи: `IMPORTED_TICKETING_SYSTEM` = read-only зеркало импортов, `INTERNAL_SALES` = продажи и каталог внутри Daibilet, `API_SYNC` = внешняя система с настройкой routes/webhooks и health.
+
 ---
 
 ## Admin API contract (2026-07-14)
@@ -263,3 +269,55 @@ Daily scan saleable public catalog texts (`title`/`description` + override) на
 - [ai-journalists/README.md](./ai-journalists/README.md) — ИИ-колонки / персоны
 - [decision-log.md](./decision-log.md) — архитектурные решения
 - [current-state.md](./current-state.md) — оперативный статус
+
+---
+
+## Phase 2 Supplier Control Plane (2026-07-22)
+
+Schedule foundation added in the same phase:
+
+- backend: `GET/PATCH /api/admin/events/:id/schedule`;
+- backend: create/update/cancel/restore slots under `/api/admin/events/:id/schedule/sessions`;
+- admin: minimal Schedule tab in event detail for manual mode, slot creation and cancel/restore actions;
+- guardrail: TC/Teplohod `SOURCE_MANAGED` schedules stay read-only; manual schedules support `SINGLE`, `RECURRING` and `OPEN_DATE`;
+- checkout dependency: STUB/YooKassa can be enabled only after the event has a clear slot/open-date model and ticket offers.
+
+Первый безопасный срез финконтура сделан как read/control-plane foundation, без включения реальной оплаты:
+
+- backend: `GET /api/admin/suppliers`, `GET /api/admin/suppliers/:id`;
+- contracts: `AdminSuppliersListDto`, `AdminSupplierDetailDto`, readiness-коды;
+- admin: страница `/suppliers` с поиском, статусами, readiness, событиями, заказами, финсводкой;
+- guardrail: внутренний checkout нельзя считать готовым без активного поставщика, владельца ЛК, verified legal profile, основного банковского счета, комиссии и YooKassa shop id.
+
+Это не меняет Phase 1 widget-first: TC/Teplohod продажи остаются через виджеты, `ExternalOrder` остается отдельным контуром.
+
+Supplier LC read-first slice added:
+
+- contracts: `SupplierPortal*Dto`;
+- backend: protected `GET /api/supplier/me|profile|dashboard|events|orders|finance|reviews`;
+- app: `apps/supplier` Vite shell on local port `5179`;
+- security: until real supplier auth exists, `/api/supplier/*` is protected by the same production Basic Auth guard as admin;
+- scope: read-only dashboard, events, internal checkout orders, ledger/payout snapshot, reviews and legal/bank profile.
+
+STUB checkout slice added:
+
+- backend: `POST /api/checkout/stub`;
+- contracts: `@daibilet/contracts/checkout`;
+- creates internal `CheckoutOrder`, `CheckoutItem`, `Payment(provider=MANUAL)`, `FulfillmentItem(provider=STUB)` and supplier ledger rows;
+- guardrail: every non-test environment requires `DAIBILET_STUB_CHECKOUT=1`, imported/source-managed TC/Teplohod events are blocked;
+- supported sale subject now: one manual `DAIBILET_MANAGED` event with explicit manual offers and either a concrete future session or `OPEN_DATE`;
+- venue admission MVP: museum/gallery/attraction admission is represented as an `OPEN_DATE` event linked to venue; later this should become a separate venue-level product model.
+- smoke seed: `pnpm backend:checkout:seed-stub` creates a local manual open-date product; `pnpm backend:checkout:seed-stub -- --order` also creates a STUB internal order.
+
+YooKassa sandbox backend slice added:
+
+- backend: `POST /api/checkout/yookassa`;
+- backend: `POST /api/checkout/yookassa/webhook`;
+- creates pending internal `CheckoutOrder`, reserved `CheckoutItem`, `Payment(provider=YOOKASSA)` and pending `FulfillmentItem`;
+- payment create uses YooKassa redirect confirmation URL and `Idempotence-Key`;
+- webhook `payment.succeeded` confirms local order/item/fulfillment and writes supplier ledger entries;
+- webhook cancel/fail path cancels local order and releases reserved capacity when possible;
+- guardrail: every non-test environment requires `DAIBILET_YOOKASSA_CHECKOUT=1` plus YooKassa credentials;
+- fiscal receipts are still deferred until YooKassa/54-FZ settings and operator process are approved.
+
+Next Phase 2 step: live YooKassa sandbox smoke through LC credentials, then small public checkout UI for platform events and buyer account unification.

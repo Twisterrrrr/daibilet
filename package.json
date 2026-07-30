@@ -33,6 +33,9 @@
     "backend:admin-orders:parity": "pnpm --filter @daibilet/backend admin-orders:parity",
     "worker": "pnpm --filter @daibilet/worker start",
     "worker:health": "pnpm --filter @daibilet/worker health",
+    "backend:checkout:seed-stub": "pnpm --filter @daibilet/backend checkout:seed-stub",
+    "backend:checkout:seed-admission": "pnpm --filter @daibilet/backend checkout:seed-admission",
+    "backend:checkout:yookassa:reconcile": "corepack pnpm --filter @daibilet/backend checkout:yookassa:reconcile",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:validate": "pnpm --filter @daibilet/db db:validate",
@@ -85,7 +88,10 @@
     "admin:data": "node scripts/build-admin-prototype-data.js",
     "admin:serve": "pnpm --filter @tours/admin dev",
     "admin:dev": "pnpm --filter @tours/admin dev",
-    "admin:build": "pnpm --filter @tours/admin build"
+    "admin:build": "pnpm --filter @tours/admin build",
+    "supplier:dev": "pnpm --filter @daibilet/supplier dev",
+    "supplier:build": "pnpm --filter @daibilet/supplier build",
+    "supplier:typecheck": "pnpm --filter @daibilet/supplier typecheck"
   },
   "keywords": [],
   "author": "",

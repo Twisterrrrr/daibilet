@@ -526,6 +526,13 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | R.4b | Reviews `GET .../events/:publicSlug` 404 на кириллическом DB slug (TEP) | Высокий | 🔧 `resolveReviewEvent` → `evt_tep_{id}` + publicSlugLite |
 | L.3 | TC catalog sync load: nightly timer + flock/nice/ionice; `--ids` ProviderLink filter; RawImport payloadHash skip; light warm | Критический | ✅ `efc8459` prod; timer next 03:20 UTC |
 | P.3 | **Finance contour / ЛК поставщиков** — базовый контур | Высокий | ⏳ |
+| P.3a | **Venue admission products** — входные билеты площадок без фейкового события (`AdmissionProduct` / `AdmissionOffer`) | Высокий | ✅ schema + readiness + admin/supplier read API + venue UI |
+| P.3b | **Supplier integration modes** — импортные билетные системы / внутренние продажи / API-sync | Высокий | ✅ schema + DTO policy + capability matrix foundation |
+| P.3c | **Listing Health** для Event / Venue / AdmissionProduct | Высокий | ✅ backend rules + admin overview API |
+| P.3d | **Supplier LC read-first: admissions** | Высокий | ✅ раздел "Входные билеты" + dashboard counters |
+| P.3e | **Checkout STUB: venue admission** | Высокий | ✅ admissionProduct/admissionOffer path + capacity decrement |
+| P.3f | **YooKassa: venue admission** | Высокий | ⏳ после smoke STUB admission |
+| P.3g | **Supplier write flows** — создание/редактирование admission и событий через заявки | Средний | ⏳ после первых тестовых поставщиков |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
 | P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |
 
@@ -934,7 +941,15 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 |---|--------|-----------|--------|
 | C.1 | Cherry-pick Phase 2 schema + ECR | Критический | ✅ |
 | C.2 | Admin EventChangeRequestsPage | Средний | ✅ (flag) |
-| C.3 | Phase G finance runtime / ЛК поставщиков (P.3) | Высокий | ⏳ (продуктовый фокус; не ждать F5 целиком) |
+| C.3 | Phase G finance runtime / ЛК поставщиков (P.3) | Высокий | 🔄 ветка `cursor/phase-g-admission-checkout` (cherry-pick 9 commits) |
+| C.3.6 | Cursor integration: cherry-pick `0030fdb..4d2deaad` на `feat/next-monorepo` | Критический | ✅ 2026-07-30 branch `cursor/phase-g-admission-checkout` |
+| C.3.7 | Seed admission smoke (`test-museum` / `test-museum-ticket`) | Высокий | ✅ script `checkout:seed-admission`; DB smoke ⏳ |
+| C.3.1 | Admin Supplier Control Plane: contracts + Prisma read API + admin table | Высокий | ✅ 2026-07-22 (`/api/admin/suppliers`, `/suppliers`) |
+| C.3.1a | Admin Event Schedule API + Schedule tab: mode/open-date + create/update/cancel/restore slots | High | done 2026-07-22 (`/api/admin/events/:id/schedule`) |
+| C.3.2 | Supplier LC read-first API/app shell | Высокий | ✅ 2026-07-22 (`/api/supplier/*`, `apps/supplier`) |
+| C.3.3 | STUB checkout на одном ручном событии | Высокий | ✅ 2026-07-22 (`POST /api/checkout/stub`) |
+| C.3.4 | YooKassa sandbox checkout + webhook | Высокий | ✅ 2026-07-30 backend; live smoke через ЛК ожидает |
+| C.3.5 | YooKassa pending-payment reaper/reconcile | Высокий | ✅ 2026-07-30 CLI; cron/systemd wiring + live smoke ожидают |
 
 ---
 
@@ -996,4 +1011,3 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 ## Google Search Console verification
 - [x] **Критический** — файл `googleb3313872246ac993.html` в `apps/web/public/`, deploy prod, curl 200 (2026-07-19)
-
