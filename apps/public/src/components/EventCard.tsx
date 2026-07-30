@@ -159,7 +159,7 @@ export function EventCard({
         ) : null}
 
         {showSlotPills ? (
-          <div className="mt-2 flex flex-wrap items-start gap-1.5">
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5">
             {displaySlotLabels.map((label) => (
               <span
                 key={label}

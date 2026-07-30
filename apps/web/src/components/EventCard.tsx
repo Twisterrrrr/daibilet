@@ -44,9 +44,6 @@ import { eventHref } from '@/lib/routes';
 const SLOT_CHIP_CLASS =
   'inline-btn inline-flex h-6 min-h-6 shrink-0 items-center justify-center rounded-md bg-surface-muted px-2.5 text-ui-xs font-medium leading-none text-graphite-muted';
 
-const SLOT_CHIP_GRID_CLASS =
-  'inline-btn inline-flex h-6 min-h-6 w-full min-w-0 items-center justify-center truncate rounded-md bg-surface-muted px-2 text-ui-xs font-medium leading-none text-graphite-muted';
-
 const SLOT_CHIP_PURCHASE_CLASS =
   'transition hover:bg-primary/10 hover:text-primary-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40';
 
@@ -57,7 +54,6 @@ const TITLE_LINK_CLASS =
   'relative z-[2] line-clamp-3 font-display text-ui-sm font-bold leading-snug text-graphite transition-colors hover:text-primary-600 sm:text-base';
 
 const SLOT_MORE_CHIP_CLASS = `${SLOT_CHIP_CLASS} text-graphite-muted`;
-const SLOT_MORE_CHIP_GRID_CLASS = `${SLOT_CHIP_GRID_CLASS} text-graphite-muted`;
 
 type CatalogCardSession = PublicSessionDto | PublicCatalogListItemDto;
 
@@ -344,10 +340,8 @@ function EventCardSlotChips({
   showPurchaseWidgets: boolean;
   onOpenPurchase: (slotLabel: string) => void;
 }) {
-  const renderChip = (label: string, grid: boolean) => {
-    const chipClass = `${grid ? SLOT_CHIP_GRID_CLASS : SLOT_CHIP_CLASS}${
-      showPurchaseWidgets ? ` ${SLOT_CHIP_PURCHASE_CLASS}` : ''
-    }`;
+  const renderChip = (label: string) => {
+    const chipClass = `${SLOT_CHIP_CLASS}${showPurchaseWidgets ? ` ${SLOT_CHIP_PURCHASE_CLASS}` : ''}`;
     if (showPurchaseWidgets) {
       return (
         <CatalogPurchaseChip
@@ -368,10 +362,8 @@ function EventCardSlotChips({
     );
   };
 
-  const renderMore = (moreCount: number, grid: boolean) =>
-    moreCount > 0 ? (
-      <span className={grid ? SLOT_MORE_CHIP_GRID_CLASS : SLOT_MORE_CHIP_CLASS}>ещё {moreCount}</span>
-    ) : null;
+  const renderMore = (moreCount: number) =>
+    moreCount > 0 ? <span className={SLOT_MORE_CHIP_CLASS}>ещё {moreCount}</span> : null;
 
   if (narrow) {
     const mobileLabels = labels.slice(0, COMPACT_MOBILE_SLOT_LIMIT);
@@ -381,13 +373,13 @@ function EventCardSlotChips({
 
     return (
       <>
-        <div className="grid grid-cols-2 gap-1.5 sm:hidden">
-          {mobileLabels.map((label) => renderChip(label, true))}
-          {renderMore(mobileMore, true)}
+        <div className="flex flex-wrap items-center justify-center gap-1.5 sm:hidden">
+          {mobileLabels.map((label) => renderChip(label))}
+          {renderMore(mobileMore)}
         </div>
-        <div className="hidden grid-cols-2 gap-1.5 sm:grid">
-          {gridLabels.map((label) => renderChip(label, true))}
-          {renderMore(gridMore, true)}
+        <div className="hidden flex-wrap items-center justify-center gap-1.5 sm:flex">
+          {gridLabels.map((label) => renderChip(label))}
+          {renderMore(gridMore)}
         </div>
       </>
     );
@@ -398,8 +390,8 @@ function EventCardSlotChips({
 
   return (
     <div className="flex flex-nowrap items-center gap-1.5 overflow-hidden">
-      {wideLabels.map((label) => renderChip(label, false))}
-      {renderMore(wideMore, false)}
+      {wideLabels.map((label) => renderChip(label))}
+      {renderMore(wideMore)}
     </div>
   );
 }
