@@ -939,6 +939,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | C.3.1a | Admin Event Schedule API + Schedule tab: mode/open-date + create/update/cancel/restore slots | High | done 2026-07-22 (`/api/admin/events/:id/schedule`) |
 | C.3.2 | Supplier LC read-first API/app shell | Высокий | ✅ 2026-07-22 (`/api/supplier/*`, `apps/supplier`) |
 | C.3.3 | STUB checkout на одном ручном событии | Высокий | ✅ 2026-07-22 (`POST /api/checkout/stub`) |
+| C.3.4 | YooKassa sandbox checkout + webhook | Высокий | ✅ 2026-07-30 backend; live smoke через ЛК ожидает |
 
 ---
 

@@ -369,6 +369,37 @@ Status 2026-07-22:
 - done: `pnpm backend:checkout:seed-stub` creates one local manual open-date smoke product; add `-- --order` to create a STUB order directly;
 - note: real YooKassa payment and fiscal receipt are intentionally not created in STUB mode.
 
+Status 2026-07-30:
+
+- done: YooKassa sandbox backend contour added next to STUB, not instead of widget-first sales;
+- done: public backend route `POST /api/checkout/yookassa`;
+- done: webhook route `POST /api/checkout/yookassa/webhook`;
+- done: YooKassa create-payment flow creates local `CheckoutOrder(PENDING_PAYMENT)`, `CheckoutItem(RESERVED)`, `Payment(provider=YOOKASSA)` and `FulfillmentItem(PENDING)`;
+- done: payment `succeeded` webhook confirms order, item and fulfillment and writes supplier ledger entries idempotently;
+- done: payment `canceled` / failed path cancels local order and releases reserved capacity when possible;
+- done: every non-test environment requires `DAIBILET_YOOKASSA_CHECKOUT=1` plus `YOOKASSA_SHOP_ID` and `YOOKASSA_SECRET_KEY`;
+- done: `Idempotency-Key` is mandatory for `POST /api/checkout/yookassa` and is bound to the checkout payload;
+- done: checkout redirect return URL is generated from server config, not accepted from arbitrary client input;
+- done: route has a lightweight origin allowlist and in-memory rate limit; nginx/app-level production rate limits are still required;
+- note: fiscal receipts are still not sent automatically; this must be enabled only after YooKassa/54-FZ settings and operator flow are approved.
+- next before broad public enable: reconciliation/reaper job for abandoned `CheckoutOrder(PENDING_PAYMENT)` rows with expired `expiresAt`.
+
+Sandbox env:
+
+```bash
+DAIBILET_YOOKASSA_CHECKOUT=1
+DAIBILET_YOOKASSA_VERIFY_WEBHOOK=1
+YOOKASSA_SHOP_ID=...
+YOOKASSA_SECRET_KEY=...
+YOOKASSA_RETURN_BASE_URL=https://daibilet.ru
+```
+
+Webhook to register in YooKassa LC:
+
+```text
+https://api.daibilet.ru/api/checkout/yookassa/webhook
+```
+
 Venue admission note:
 
 - for MVP, museum/gallery/attraction entrance tickets can be represented as a manual `OPEN_DATE` event linked to the venue and classified as `VENUE_ADMISSION` in checkout DTO;

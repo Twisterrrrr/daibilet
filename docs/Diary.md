@@ -6626,3 +6626,32 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 - Later schema path: separate venue-level admission products, because legacy SPBBOATS allowed museums and art galleries to sell admission without an event binding.
 
 ---
+
+## 2026-07-30 - Phase 2: YooKassa sandbox backend
+
+### Decisions
+
+- Added YooKassa sandbox route `POST /api/checkout/yookassa` next to STUB checkout.
+- Added YooKassa webhook route `POST /api/checkout/yookassa/webhook`.
+- YooKassa checkout creates local `CheckoutOrder(PENDING_PAYMENT)`, `CheckoutItem(RESERVED)`, `Payment(provider=YOOKASSA)` and `FulfillmentItem(PENDING)` before redirecting buyer to YooKassa.
+- Webhook `payment.succeeded` confirms order/item/fulfillment and writes supplier ledger entries idempotently.
+- Webhook cancel/fail path cancels local order and releases reserved capacity when possible.
+- Runtime is gated by `DAIBILET_YOOKASSA_CHECKOUT=1` plus `YOOKASSA_SHOP_ID` and `YOOKASSA_SECRET_KEY`.
+- `Idempotency-Key` is mandatory and payload-bound for YooKassa checkout creation.
+- YooKassa `return_url` is generated from server config, not trusted from arbitrary client input.
+- Webhook dedupe retries `IN_PROGRESS` / failed attempts instead of dropping them as duplicates.
+
+### Boundaries
+
+- Widget-first MVP remains unchanged for imported TC/Teplohod events.
+- Fiscal receipts are not sent automatically yet; this needs YooKassa/54-FZ settings and an operator-approved flow.
+- Live sandbox smoke is pending until LC credentials are present in the target environment.
+- Production must still add nginx/app-level rate limits for `/api/checkout/*`; backend has only a lightweight in-memory guard.
+- Before broad public enable, add reconciliation/reaper for abandoned pending YooKassa orders whose `expiresAt` has passed.
+
+### Verification
+
+- Focused checkout tests passed for STUB + YooKassa pure logic.
+- Backend typecheck passed after the new route/service wiring.
+
+---

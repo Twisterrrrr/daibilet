@@ -303,4 +303,15 @@ STUB checkout slice added:
 - venue admission MVP: museum/gallery/attraction admission is represented as an `OPEN_DATE` event linked to venue; later this should become a separate venue-level product model.
 - smoke seed: `pnpm backend:checkout:seed-stub` creates a local manual open-date product; `pnpm backend:checkout:seed-stub -- --order` also creates a STUB internal order.
 
-Next Phase 2 step: wire a small public checkout UI for platform events, then YooKassa sandbox and buyer account unification.
+YooKassa sandbox backend slice added:
+
+- backend: `POST /api/checkout/yookassa`;
+- backend: `POST /api/checkout/yookassa/webhook`;
+- creates pending internal `CheckoutOrder`, reserved `CheckoutItem`, `Payment(provider=YOOKASSA)` and pending `FulfillmentItem`;
+- payment create uses YooKassa redirect confirmation URL and `Idempotence-Key`;
+- webhook `payment.succeeded` confirms local order/item/fulfillment and writes supplier ledger entries;
+- webhook cancel/fail path cancels local order and releases reserved capacity when possible;
+- guardrail: every non-test environment requires `DAIBILET_YOOKASSA_CHECKOUT=1` plus YooKassa credentials;
+- fiscal receipts are still deferred until YooKassa/54-FZ settings and operator process are approved.
+
+Next Phase 2 step: live YooKassa sandbox smoke through LC credentials, then small public checkout UI for platform events and buyer account unification.
