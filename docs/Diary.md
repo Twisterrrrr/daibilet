@@ -1,3 +1,17 @@
+## 2026-07-30 - PERF.E5 regression: event 404 (Latin slug / Cyrillic DB)
+
+### Наблюдения
+- `/events/retro-locman-ot-zaryadya-1294` (и другие TEP с latin public slug) отдавали 404: `resolveEvent` в `public-event.dto.ts` не находил `evt_tep_1294`, потому что fallback сканировал только последние 20k events по `updatedAt`.
+- В БД slug кириллический (`рэтро-лоцман-от-зарядья-1294`), публичный URL - транслит.
+
+### Решения
+- `resolveEvent`: lookup по `canonicalPath`, `evt_tep_{tail}` + `publicSlug` match, suffix `endsWith` до 20k scan.
+- Экспорт helpers (`publicSlug`, `extractEventTrailingLookupToken`, `buildTepEventIdFromTrailingToken`) + unit `public-event.dto.test.ts`.
+- MSK hotfix: scp `public-event.dto.ts`, restart `daibilet-api`.
+
+### Проблемы
+- 20k scan остаётся last resort - при росте каталога рассмотреть индекс/transliterated slug column.
+
 ## 2026-07-30 - INC.504.2: nginx bypass `/images/*` (MSK prod)
 
 ### Наблюдения

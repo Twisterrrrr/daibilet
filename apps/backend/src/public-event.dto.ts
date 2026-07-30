@@ -438,12 +438,46 @@ async function resolveEvent(eventSlugOrId: string): Promise<EventRecord | null> 
     if (suffixEvent) return suffixEvent;
   }
 
+  // PERF.E5 fallback: DB slug is often Cyrillic/source while public URLs use transliterated slug.
+  // Scanning only the latest 20k rows misses stale catalog rows (34k+ events on prod).
+  if (requestedSlug) {
+    const byCanonical = await prisma.event.findFirst({
+      where: {
+        OR: [
+          { canonicalPath: `/events/${requestedSlug}` },
+          { override: { is: { canonicalPath: `/events/${requestedSlug}` } } },
+        ],
+      },
+      include: eventInclude,
+    });
+    if (byCanonical) return byCanonical;
+  }
+
+  const trailingToken = extractEventTrailingLookupToken(eventSlugOrId);
+  if (trailingToken) {
+    const byTepId = await prisma.event.findFirst({
+      where: { id: buildTepEventIdFromTrailingToken(trailingToken) },
+      include: eventInclude,
+    });
+    if (byTepId && publicSlug(byTepId.slug) === requestedSlug) return byTepId;
+
+    const suffixCandidates = await prisma.event.findMany({
+      where: { slug: { endsWith: `-${trailingToken}` } },
+      select: { id: true, slug: true },
+      take: 32,
+    });
+    const matched = suffixCandidates.find((candidate) => publicSlug(candidate.slug) === requestedSlug);
+    if (matched) {
+      return prisma.event.findUnique({ where: { id: matched.id }, include: eventInclude });
+    }
+  }
+
   const candidates = await prisma.event.findMany({
     select: { id: true, slug: true },
     orderBy: { updatedAt: 'desc' },
     take: 20000,
   });
-  const match = candidates.find((candidate) => publicSlug(candidate.slug) === publicSlug(eventSlugOrId));
+  const match = candidates.find((candidate) => publicSlug(candidate.slug) === requestedSlug);
   return match ? prisma.event.findUnique({ where: { id: match.id }, include: eventInclude }) : null;
 }
 
@@ -1266,7 +1300,7 @@ function resolveOfferTicketDescription(offer: MappedOffer, normalizedTitle: stri
   return null;
 }
 
-function publicSlug(value: string): string {
+export function publicSlug(value: string): string {
   const letters: Record<string, string> = {
     а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y',
     к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f',
@@ -1274,6 +1308,18 @@ function publicSlug(value: string): string {
   };
   return String(value || '').trim().toLowerCase().split('').map((character) => letters[character] ?? character)
     .join('').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').replace(/-{2,}/g, '-');
+}
+
+export function extractEventTrailingLookupToken(eventSlugOrId: string): string | null {
+  return eventSlugOrId.match(/-([a-z0-9]+)$/i)?.[1] ?? null;
+}
+
+export function buildTepEventIdFromTrailingToken(token: string): string {
+  return `evt_tep_${token}`;
+}
+
+export function matchesPublicEventSlug(requestedSlug: string, dbSlug: string): boolean {
+  return publicSlug(dbSlug) === publicSlug(requestedSlug);
 }
 
 function isDefined<T>(value: T | null | undefined): value is T {
