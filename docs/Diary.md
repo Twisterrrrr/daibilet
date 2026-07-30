@@ -2729,3 +2729,28 @@
 - Disabling supplier output in public catalog should be handled as a control-plane action over supplier/event visibility, not by deleting imported rows.
 
 ---
+
+## 2026-07-30 - Phase G: admission smoke supplier seed
+
+### Decisions
+
+- Added `apps/backend/scripts/seed-stub-admission.ts` and `pnpm backend:checkout:seed-stub-admission`.
+- The seed creates a repeatable internal-sales supplier profile, owner user, verified legal profile, primary bank account, museum venue, `AdmissionProduct` and two `AdmissionOffer` rows.
+- Test slugs are stable: supplier `phase-g-test-museum`, venue `phase-g-test-museum`, admission product `phase-g-test-museum-entry`.
+- Capacity is not reset on repeat runs by default; use `-- --reset-capacity` explicitly when a clean smoke stock is needed.
+- `-- --order` creates/replays a STUB `VENUE_ADMISSION` checkout with idempotency key `phase-g-admission-smoke-001`.
+
+### Verification
+
+- Applied local dev migrations through `pnpm db:deploy`.
+- Seed created the supplier, venue and admission product in local dev DB.
+- STUB smoke created order public code `7262496` with `CheckoutItem.subjectType=VENUE_ADMISSION`.
+- Replaying the same idempotency key returned the same order and left `AdmissionProduct.ticketsVacant=99`.
+- SQL verification found `Payment.status=SUCCEEDED`, `FulfillmentItem.status=CONFIRMED` and 2 supplier ledger entries.
+- `pnpm backend:typecheck` passed.
+- `pnpm backend:test:ts` passed: 116 passed, 1 DB-dependent skipped.
+
+### Next
+
+- Start backend and smoke the HTTP endpoints in admin/supplier UI.
+- Connect the same admission validation path to YooKassa only after the HTTP/UI smoke is green.

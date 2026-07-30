@@ -32,6 +32,7 @@
     "backend:admin-events:parity": "pnpm --filter @daibilet/backend admin-events:parity",
     "backend:admin-orders:parity": "pnpm --filter @daibilet/backend admin-orders:parity",
     "backend:checkout:seed-stub": "pnpm --filter @daibilet/backend checkout:seed-stub",
+    "backend:checkout:seed-stub-admission": "pnpm --filter @daibilet/backend checkout:seed-stub-admission",
     "backend:checkout:yookassa:reconcile": "corepack pnpm --filter @daibilet/backend checkout:yookassa:reconcile",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",

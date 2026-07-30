@@ -471,6 +471,8 @@ Venue admission note:
 - target model is now explicit: museum/gallery/attraction entrance tickets are `AdmissionProduct` / `AdmissionOffer` records linked to `Venue`, `City` and `Supplier`;
 - public venue pages should render admission as a separate "Входные билеты" block, while theatre/gallery/museum events stay in the programme/affiche block;
 - admin and supplier LC should manage admission products separately from event schedule, because venue admission usually has validity rules and ticket categories rather than slots.
+- Phase G local smoke seed exists: `pnpm backend:checkout:seed-stub-admission` creates supplier `phase-g-test-museum`, venue `phase-g-test-museum`, admission product `phase-g-test-museum-entry` and adult/discount offers.
+- Phase G STUB smoke: `pnpm backend:checkout:seed-stub-admission -- --order` creates/replays a `VENUE_ADMISSION` order with idempotency key `phase-g-admission-smoke-001`; stock reset requires explicit `-- --reset-capacity`.
 
 ### Phase 2.4: orders and buyer account
 
