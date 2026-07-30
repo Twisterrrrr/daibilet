@@ -3,6 +3,7 @@ import { NavLink, Navigate, Route, Routes, useSearchParams } from 'react-router-
 
 import type {
   SupplierPortalDashboardDto,
+  SupplierPortalAdmissionsListDto,
   SupplierPortalEventsListDto,
   SupplierPortalFinanceDto,
   SupplierPortalOrdersListDto,
@@ -16,10 +17,11 @@ const STORAGE_KEY = 'daibilet_supplier_key';
 const NAV_ITEMS = [
   { to: '/', label: 'Дашборд', icon: '01' },
   { to: '/events', label: 'События', icon: '02' },
-  { to: '/orders', label: 'Заказы', icon: '03' },
-  { to: '/finance', label: 'Финансы', icon: '04' },
-  { to: '/reviews', label: 'Отзывы', icon: '05' },
-  { to: '/profile', label: 'Реквизиты', icon: '06' },
+  { to: '/admissions', label: 'Входные билеты', icon: '03' },
+  { to: '/orders', label: 'Заказы', icon: '04' },
+  { to: '/finance', label: 'Финансы', icon: '05' },
+  { to: '/reviews', label: 'Отзывы', icon: '06' },
+  { to: '/profile', label: 'Реквизиты', icon: '07' },
 ];
 
 type ResourceState<T> = {
@@ -88,6 +90,7 @@ export function App() {
             <Routes>
               <Route index element={<DashboardPage supplierKey={supplierKey} />} />
               <Route path="events" element={<EventsPage supplierKey={supplierKey} />} />
+              <Route path="admissions" element={<AdmissionsPage supplierKey={supplierKey} />} />
               <Route path="orders" element={<OrdersPage supplierKey={supplierKey} />} />
               <Route path="finance" element={<FinancePage supplierKey={supplierKey} />} />
               <Route path="reviews" element={<ReviewsPage supplierKey={supplierKey} />} />
@@ -137,6 +140,7 @@ function DashboardPage({ supplierKey }: { supplierKey: string }) {
 
   const finance = data.summary.finance;
   const events = data.summary.events;
+  const admissions = data.summary.admissions;
   const orders = data.summary.orders;
   const reviews = data.summary.reviews;
 
@@ -150,6 +154,7 @@ function DashboardPage({ supplierKey }: { supplierKey: string }) {
 
       <div className="stats-grid">
         <StatCard label="Событий" value={events.total} hint={`${events.published} опубликовано`} />
+        <StatCard label="Входных билетов" value={admissions.total} hint={`${admissions.canSell} готовы к продаже`} />
         <StatCard label="Позиции заказов" value={orders.totalItems} hint={formatMoney(orders.grossKopecks)} />
         <StatCard label="Баланс ledger" value={formatMoney(finance.ledgerBalanceKopecks)} hint={`выплачено ${formatMoney(finance.paidPayoutsKopecks)}`} />
         <StatCard label="Отзывы" value={reviews.total} hint={reviews.averageRating ? `рейтинг ${reviews.averageRating.toFixed(1)}` : 'рейтинга пока нет'} />
@@ -206,6 +211,19 @@ function DashboardPage({ supplierKey }: { supplierKey: string }) {
           ) : (
             <EmptyInline text="Критичных замечаний нет." />
           )}
+          {data.admissionsNeedingAttention.length ? (
+            <div className="compact-list" style={{ marginTop: 12 }}>
+              {data.admissionsNeedingAttention.map((product) => (
+                <div key={product.id} className="compact-row">
+                  <div>
+                    <strong>{product.title}</strong>
+                    <span>{[...product.health.blockers, ...product.health.warnings].map((issue) => issue.label).join(', ')}</span>
+                  </div>
+                  <StatusPill tone={product.health.status === 'blocked' ? 'danger' : 'warning'}>{product.health.score}</StatusPill>
+                </div>
+              ))}
+            </div>
+          ) : null}
         </section>
       </div>
     </div>
@@ -237,6 +255,38 @@ function EventsPage({ supplierKey }: { supplierKey: string }) {
   );
 }
 
+function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
+  const { data, loading, error, reload } = useSupplierResource<SupplierPortalAdmissionsListDto>('/api/supplier/admissions?limit=50', supplierKey);
+
+  return (
+    <div className="page-stack">
+      <PageTitle title="Входные билеты" description="Open-date и входные продукты площадок: музеи, арт-пространства, выставки, аттракционы. Пока только чтение и контроль готовности." action={<RefreshButton onClick={reload} />} />
+      {data ? (
+        <div className="stats-grid">
+          <StatCard label="Всего" value={data.metrics.total} hint={`${data.metrics.published} опубликовано`} />
+          <StatCard label="Можно продавать" value={data.metrics.canSell} hint="без блокеров" />
+          <StatCard label="Требуют внимания" value={data.metrics.needsAttention} hint={`${data.metrics.blocked} заблокированы`} />
+        </div>
+      ) : null}
+      <DataState loading={loading} error={error} onRetry={reload} hasData={Boolean(data?.items.length)}>
+        {data ? (
+          <Table
+            columns={['Билет', 'Площадка', 'Срок действия', 'Категории', 'Цена', 'Готовность']}
+            rows={data.items.map((product) => [
+              <div key="product"><strong>{product.title}</strong><small>{product.slug}</small></div>,
+              <div key="venue"><span>{product.venue.title}</span><small>{product.city.title || '-'}</small></div>,
+              <div key="validity"><span>{validityLabel(product.validityMode)}</span><small>{validityPeriod(product)}</small></div>,
+              <div key="offers"><span>{product.offers.filter((offer) => offer.active).length} активных</span><small>{product.offers.map((offer) => offer.title || 'билет').join(', ') || '-'}</small></div>,
+              formatRub(product.priceFromRub),
+              <IssueList key="health" compact issues={[...product.health.blockers, ...product.health.warnings]} empty="готово" />,
+            ])}
+          />
+        ) : null}
+      </DataState>
+    </div>
+  );
+}
+
 function OrdersPage({ supplierKey }: { supplierKey: string }) {
   const { data, loading, error, reload } = useSupplierResource<SupplierPortalOrdersListDto>('/api/supplier/orders?limit=50', supplierKey);
 
@@ -249,7 +299,7 @@ function OrdersPage({ supplierKey }: { supplierKey: string }) {
             columns={['Заказ', 'Событие', 'Покупатель', 'Билеты', 'Сумма', 'Статус']}
             rows={data.items.map((order) => [
               <div key="order"><strong>{order.publicCode || '-'}</strong><small>{formatDateTime(order.createdAt)}</small></div>,
-              <div key="event"><span>{order.eventTitle || order.title}</span><small>{formatDateTime(order.startsAt)}</small></div>,
+              <div key="event"><span>{order.eventTitle || order.admissionProductTitle || order.title}</span><small>{order.subjectType === 'VENUE_ADMISSION' ? 'входной билет' : formatDateTime(order.startsAt)}</small></div>,
               <div key="buyer"><span>{order.buyerName || '-'}</span><small>{order.buyerEmail || ''}</small></div>,
               <div key="tickets"><span>{order.quantity} шт.</span><small>{order.ticketTitle || '-'}</small></div>,
               formatMoney(order.totalKopecks),
@@ -570,6 +620,29 @@ function ledgerTypeLabel(value: string): string {
     FEE_RECHARGE: 'комиссия PSP',
   };
   return labels[value] || value;
+}
+
+function validityLabel(value: string): string {
+  const labels: Record<string, string> = {
+    OPEN_DATE: 'Открытая дата',
+    FIXED_WINDOW: 'Период',
+    VALID_DAYS_AFTER_PURCHASE: 'После покупки',
+  };
+  return labels[value] || value;
+}
+
+function validityPeriod(product: {
+  validFrom: string | null;
+  validTo: string | null;
+  validDaysAfterPurchase: number | null;
+}): string {
+  if (product.validDaysAfterPurchase) return `${product.validDaysAfterPurchase} дн. после покупки`;
+  const from = product.validFrom ? formatDateTime(product.validFrom) : null;
+  const to = product.validTo ? formatDateTime(product.validTo) : null;
+  if (from && to) return `${from} — ${to}`;
+  if (from) return `с ${from}`;
+  if (to) return `до ${to}`;
+  return 'без ограничения';
 }
 
 function formatPercentBps(value: number): string {

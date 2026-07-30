@@ -6,6 +6,7 @@ export interface SupplierPortalRouteHandlerDependencies {
   buildDashboard: (searchParams: URLSearchParams) => Promise<unknown>;
   buildProfile: (searchParams: URLSearchParams) => Promise<unknown>;
   buildEventsList: (searchParams: URLSearchParams) => Promise<unknown>;
+  buildAdmissionsList: (searchParams: URLSearchParams) => Promise<unknown>;
   buildOrdersList: (searchParams: URLSearchParams) => Promise<unknown>;
   buildFinance: (searchParams: URLSearchParams) => Promise<unknown>;
   buildReviewsList: (searchParams: URLSearchParams) => Promise<unknown>;
@@ -27,6 +28,11 @@ export function createSupplierPortalRouteHandler(deps: SupplierPortalRouteHandle
 
     if (context.pathname === '/api/supplier/events') {
       sendJson(context.response, await deps.buildEventsList(context.searchParams));
+      return true;
+    }
+
+    if (context.pathname === '/api/supplier/admissions') {
+      sendJson(context.response, await deps.buildAdmissionsList(context.searchParams));
       return true;
     }
 

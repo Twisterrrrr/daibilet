@@ -12,9 +12,13 @@ const nullableString = z.preprocess(
 );
 
 const stubCheckoutCreatePayloadSchema = z.object({
+  subjectType: z.enum(['EVENT', 'VENUE_ADMISSION']).nullable().optional(),
   eventId: nullableString,
   eventSlug: nullableString,
-  offerId: z.string().trim().min(1),
+  admissionProductId: nullableString,
+  admissionProductSlug: nullableString,
+  offerId: nullableString,
+  admissionOfferId: nullableString,
   sessionId: nullableString,
   quantity: z.coerce.number().int().min(1).max(10),
   buyer: z.object({
@@ -27,9 +31,17 @@ const stubCheckoutCreatePayloadSchema = z.object({
     phone: nullableString,
   }).nullable().optional(),
   idempotencyKey: nullableString,
-}).refine((payload) => Boolean(payload.eventId || payload.eventSlug), {
+}).refine((payload) => Boolean(payload.eventId || payload.eventSlug || payload.admissionProductId || payload.admissionProductSlug), {
   path: ['eventId'],
-  message: 'eventId or eventSlug is required',
+  message: 'eventId/eventSlug or admissionProductId/admissionProductSlug is required',
+}).refine((payload) => {
+  if (payload.admissionProductId || payload.admissionProductSlug || payload.subjectType === 'VENUE_ADMISSION') {
+    return Boolean(payload.admissionOfferId);
+  }
+  return Boolean(payload.offerId);
+}, {
+  path: ['offerId'],
+  message: 'offerId is required for events, admissionOfferId is required for admission products',
 });
 
 export function createStubCheckoutRouteHandler(): TypedRouteHandler {

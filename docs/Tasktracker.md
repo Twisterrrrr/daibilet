@@ -526,8 +526,13 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | R.4b | Reviews `GET .../events/:publicSlug` 404 на кириллическом DB slug (TEP) | Высокий | 🔧 `resolveReviewEvent` → `evt_tep_{id}` + publicSlugLite |
 | L.3 | TC catalog sync load: nightly timer + flock/nice/ionice; `--ids` ProviderLink filter; RawImport payloadHash skip; light warm | Критический | ✅ `efc8459` prod; timer next 03:20 UTC |
 | P.3 | **Finance contour / ЛК поставщиков** — базовый контур | Высокий | ⏳ |
-| P.3a | **Venue admission products** — входные билеты площадок без фейкового события (`AdmissionProduct` / `AdmissionOffer`) | Высокий | 🔄 schema + readiness helper |
-| P.3b | **Supplier integration modes** — импортные билетные системы / внутренние продажи / API-sync | Высокий | 🔄 schema + DTO policy |
+| P.3a | **Venue admission products** — входные билеты площадок без фейкового события (`AdmissionProduct` / `AdmissionOffer`) | Высокий | ✅ schema + readiness + admin/supplier read API + venue UI |
+| P.3b | **Supplier integration modes** — импортные билетные системы / внутренние продажи / API-sync | Высокий | ✅ schema + DTO policy + capability matrix foundation |
+| P.3c | **Listing Health** для Event / Venue / AdmissionProduct | Высокий | ✅ backend rules + admin overview API |
+| P.3d | **Supplier LC read-first: admissions** | Высокий | ✅ раздел "Входные билеты" + dashboard counters |
+| P.3e | **Checkout STUB: venue admission** | Высокий | ✅ admissionProduct/admissionOffer path + capacity decrement |
+| P.3f | **YooKassa: venue admission** | Высокий | ⏳ после smoke STUB admission |
+| P.3g | **Supplier write flows** — создание/редактирование admission и событий через заявки | Средний | ⏳ после первых тестовых поставщиков |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
 | P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |
 

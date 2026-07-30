@@ -1,4 +1,10 @@
 import type { Server } from 'node:http';
+import {
+  buildAdminAdmissionProductsListDto,
+  buildAdminVenueAdmissionProductsListDto,
+  buildSupplierPortalAdmissionProductsListDto,
+} from './admission-products.dto.js';
+import { createAdminAdmissionProductsRouteHandler } from './admin-admission-products-handler.js';
 import { buildAdminEventChangeRequestDetailDto, buildAdminEventChangeRequestsDto } from './admin-event-change-requests.dto.js';
 import { createAdminEventChangeRequestsRouteHandler } from './admin-event-change-requests-handler.js';
 import { createAdminEventScheduleRouteHandler } from './admin-event-schedule-handler.js';
@@ -8,6 +14,8 @@ import { buildAdminEventDetailDto, buildAdminEventsListDto } from './admin-event
 import { applyApprovedEventChangeRequest } from './event-change-request-applier.js';
 import { reviewEventChangeRequest } from './event-change-request-review.js';
 import { createAdminLandingsRouteHandler } from './admin-landings-handler.js';
+import { buildAdminListingHealthOverviewDto } from './admin-listing-health.dto.js';
+import { createAdminListingHealthRouteHandler } from './admin-listing-health-handler.js';
 import { createAdminOrdersRouteHandler } from './admin-orders-handler.js';
 import { createAdminOrdersReadRouteHandler } from './admin-orders-read-handler.js';
 import { buildAdminOrdersListDto } from './admin-orders.dto.js';
@@ -112,6 +120,13 @@ const server = startServer({
         buildSuppliersList: buildAdminSuppliersListDto,
         buildSupplierDetail: buildAdminSupplierDetailDto,
       }),
+      createAdminAdmissionProductsRouteHandler({
+        buildAdmissionProductsList: buildAdminAdmissionProductsListDto,
+        buildVenueAdmissionProductsList: buildAdminVenueAdmissionProductsListDto,
+      }),
+      createAdminListingHealthRouteHandler({
+        buildListingHealthOverview: buildAdminListingHealthOverviewDto,
+      }),
       createAdminEventScheduleRouteHandler({
         invalidatePublicCaches,
       }),
@@ -140,6 +155,7 @@ const server = startServer({
         buildDashboard: buildSupplierPortalDashboardDto,
         buildProfile: buildSupplierPortalProfileDto,
         buildEventsList: buildSupplierPortalEventsListDto,
+        buildAdmissionsList: buildSupplierPortalAdmissionProductsListDto,
         buildOrdersList: buildSupplierPortalOrdersListDto,
         buildFinance: buildSupplierPortalFinanceDto,
         buildReviewsList: buildSupplierPortalReviewsListDto,

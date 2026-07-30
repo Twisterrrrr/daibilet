@@ -144,10 +144,20 @@ test('maps supplier row with finance and event aggregates for admin list', () =>
       disputeGroups: new Map(),
       reviewGroups: new Map(),
       reviewAverages: new Map(),
+      admissionGroups: new Map([
+        [
+          'sup_1',
+          [
+            { supplierId: 'sup_1', status: 'PUBLISHED', purchaseFlow: 'PLATFORM', _count: { _all: 1 } },
+          ],
+        ],
+      ]),
     } as any,
   );
 
   assert.equal(dto.events.total, 2);
+  assert.equal(dto.admissions.total, 1);
+  assert.equal(dto.admissions.canSell, 1);
   assert.equal(dto.integrationMode, 'INTERNAL_SALES');
   assert.equal(dto.events.internalCheckout, 2);
   assert.equal(dto.orders.fulfilled, 3);

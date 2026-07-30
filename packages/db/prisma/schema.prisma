@@ -165,6 +165,14 @@ enum SupplierIntegrationMode {
   API_SYNC
 }
 
+enum SupplierIntegrationStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ERROR
+  ARCHIVED
+}
+
 enum SupplierCatalogMode {
   WIDGET_ONLY
   INTERNAL_CHECKOUT
@@ -1250,10 +1258,70 @@ model Supplier {
   reviewResponses     ReviewSupplierResponse[]
   reviewDisputes      ReviewDispute[]
   externalReviews     ExternalReview[]
+  integrations        SupplierIntegration[]
 
   @@index([status])
   @@index([integrationMode])
   @@index([inn])
+}
+
+model SupplierIntegration {
+  id                String                    @id @default(cuid())
+  supplierId        String
+  providerCode      String
+  title             String
+  status            SupplierIntegrationStatus @default(DRAFT)
+  sourceCode        SourceCode?
+  baseUrl           String?
+  capabilities      Json?
+  configJson        Json?
+  secretRef         String?
+  lastSuccessAt     DateTime?
+  lastFailureAt     DateTime?
+  consecutiveErrors Int                       @default(0)
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  supplier Supplier                   @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  runs     SupplierIntegrationRun[]
+  issues   SupplierIntegrationIssue[]
+
+  @@unique([supplierId, providerCode])
+  @@index([status])
+  @@index([sourceCode])
+  @@index([supplierId, status])
+}
+
+model SupplierIntegrationRun {
+  id            String     @id @default(cuid())
+  integrationId String
+  status        SyncStatus @default(RUNNING)
+  mode          String
+  startedAt     DateTime   @default(now())
+  finishedAt    DateTime?
+  stats         Json?
+  error         String?
+
+  integration SupplierIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@index([integrationId, startedAt])
+  @@index([status, startedAt])
+}
+
+model SupplierIntegrationIssue {
+  id            String    @id @default(cuid())
+  integrationId String
+  code          String
+  severity      String
+  message       String
+  payload       Json?
+  createdAt     DateTime  @default(now())
+  resolvedAt    DateTime?
+
+  integration SupplierIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+
+  @@index([integrationId, resolvedAt])
+  @@index([severity, createdAt])
 }
 
 model SupplierLegalProfile {

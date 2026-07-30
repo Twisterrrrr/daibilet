@@ -209,6 +209,11 @@ export function SuppliersPage() {
               <div className="mt-1 text-xs text-muted-foreground">
                 {formatNumber(supplier.events.internalCheckout + supplier.events.hybrid)} с checkout
               </div>
+              {supplier.admissions.total ? (
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {formatNumber(supplier.admissions.total)} входных билетов
+                </div>
+              ) : null}
             </td>
             <td className="px-4 py-3 text-sm">
               <div>{formatNumber(supplier.orders.totalItems)} позиций</div>
@@ -309,6 +314,24 @@ function SupplierDetailSheet({ supplier, onOpenChange }: { supplier: AdminSuppli
                       ))
                     ) : (
                       <div className="text-sm text-muted-foreground">Событий пока нет.</div>
+                    )}
+                  </div>
+                </Card>
+
+                <Card className="border-border p-4">
+                  <h3 className="text-sm font-semibold">Входные билеты</h3>
+                  <div className="mt-3 space-y-2">
+                    {supplier.admissionProductsSample.length ? (
+                      supplier.admissionProductsSample.slice(0, 8).map((product) => (
+                        <div key={product.id} className="rounded-md bg-secondary px-3 py-2 text-sm">
+                          <div className="font-medium">{product.title}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {product.status} · {product.purchaseFlow} · {product.priceFromRub != null ? `от ${formatMoney(product.priceFromRub * 100)}` : 'цена не задана'}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-sm text-muted-foreground">Входных билетов пока нет.</div>
                     )}
                   </div>
                 </Card>

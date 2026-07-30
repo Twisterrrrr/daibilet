@@ -4,6 +4,8 @@ import {
   classifyStubCheckoutSubject,
   computeStubCheckoutTotals,
   isStubCheckoutEnabled,
+  isAdmissionCheckoutPayload,
+  validateStubAdmissionCheckoutReadiness,
   validateStubCheckoutReadiness,
 } from './checkout-stub.js';
 
@@ -95,6 +97,41 @@ test('blocks too-low manual ticket prices and missing active supplier', () => {
   assert.deepEqual(issues.map((issue) => issue.code), ['SUPPLIER_NOT_CONFIGURED', 'PRICE_TOO_LOW']);
 });
 
+test('detects admission checkout payloads explicitly', () => {
+  assert.equal(isAdmissionCheckoutPayload({ admissionProductSlug: 'museum-entry' } as any), true);
+  assert.equal(isAdmissionCheckoutPayload({ subjectType: 'VENUE_ADMISSION' } as any), true);
+  assert.equal(isAdmissionCheckoutPayload({ eventSlug: 'manual-event' } as any), false);
+});
+
+test('allows Daibilet-managed admission product with manual offer', () => {
+  const issues = validateStubAdmissionCheckoutReadiness({
+    enabled: true,
+    now,
+    product: admissionProductFixture(),
+    offer: admissionOfferFixture({ priceRub: 700 }),
+    supplier: supplierFixture(),
+    quantity: 2,
+  });
+
+  assert.deepEqual(issues, []);
+});
+
+test('blocks admission product with external checkout and imported offer', () => {
+  const issues = validateStubAdmissionCheckoutReadiness({
+    enabled: true,
+    now,
+    product: admissionProductFixture({ purchaseFlow: 'EXTERNAL' }),
+    offer: admissionOfferFixture({ sourceCode: 'TICKETSCLOUD' }),
+    supplier: supplierFixture(),
+    quantity: 1,
+  });
+
+  assert.deepEqual(issues.map((issue) => issue.code), [
+    'ADMISSION_PRODUCT_NOT_INTERNAL_CHECKOUT',
+    'ADMISSION_OFFER_NOT_MANUAL',
+  ]);
+});
+
 function eventFixture(overrides: Record<string, unknown> = {}) {
   return {
     id: 'evt_1',
@@ -113,6 +150,40 @@ function eventFixture(overrides: Record<string, unknown> = {}) {
     supplierLinks: [],
     venue: null,
     primaryCity: null,
+    ...overrides,
+  } as never;
+}
+
+function admissionProductFixture(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 'adm_1',
+    slug: 'museum-entry',
+    title: 'Museum entry',
+    type: 'MUSEUM_ENTRY',
+    status: 'READY',
+    purchaseFlow: 'PLATFORM',
+    managementMode: 'DAIBILET_MANAGED',
+    salesStartsAt: null,
+    salesEndsAt: null,
+    validFrom: null,
+    validTo: null,
+    ticketsVacant: 20,
+    supplier: supplierFixture(),
+    venue: { id: 'ven_1', slug: 'museum', title: 'Museum', kind: 'MUSEUM_ART_SPACE', city: null },
+    city: null,
+    ...overrides,
+  } as never;
+}
+
+function admissionOfferFixture(overrides: Record<string, unknown> = {}) {
+  return {
+    id: 'adm_offer_1',
+    admissionProductId: 'adm_1',
+    sourceCode: 'MANUAL',
+    title: 'Adult',
+    priceRub: 1000,
+    active: true,
+    capacityTotal: null,
     ...overrides,
   } as never;
 }

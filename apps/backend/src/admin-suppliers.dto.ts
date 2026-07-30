@@ -1,5 +1,6 @@
 import type {
   AdminSupplierDetailDto,
+  AdminSupplierAdmissionsSummaryDto,
   AdminSupplierEventsSummaryDto,
   AdminSupplierFinanceSummaryDto,
   AdminSupplierLegalSummaryDto,
@@ -12,6 +13,7 @@ import type {
 } from '@daibilet/contracts/admin';
 import type { ReadinessIssue } from '@daibilet/contracts/common';
 import { prisma, type Prisma } from '@daibilet/db';
+import { mapAdmissionProductDto } from './admission-products.dto.js';
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 100;
@@ -100,6 +102,7 @@ interface SupplierAggregates {
   disputeGroups: Map<string, CountByStatusAggregate[]>;
   reviewGroups: Map<string, ReviewGroupAggregate[]>;
   reviewAverages: Map<string, number | null>;
+  admissionGroups: Map<string, AdmissionGroupAggregate[]>;
 }
 
 type EventGroupAggregate = {
@@ -146,6 +149,13 @@ type CountByStatusAggregate = {
 type ReviewGroupAggregate = {
   supplierId: string | null;
   status: string;
+  _count: { _all: number };
+};
+
+type AdmissionGroupAggregate = {
+  supplierId: string | null;
+  status: string;
+  purchaseFlow: string;
   _count: { _all: number };
 };
 
@@ -217,7 +227,7 @@ export async function buildAdminSupplierDetailDto(idOrSlug: string): Promise<Adm
 
   const aggregates = await loadSupplierAggregates([supplier.id]);
   const row = mapAdminSupplierRow(supplier, aggregates);
-  const [eventsSample, recentLedgerEntries] = await prisma.$transaction([
+  const [eventsSample, admissionProductsSample, recentLedgerEntries] = await prisma.$transaction([
     prisma.event.findMany({
       where: { supplierId: supplier.id },
       orderBy: { updatedAt: 'desc' },
@@ -230,6 +240,50 @@ export async function buildAdminSupplierDetailDto(idOrSlug: string): Promise<Adm
         purchaseFlow: true,
         managementMode: true,
         priceFromRub: true,
+      },
+    }),
+    prisma.admissionProduct.findMany({
+      where: { supplierId: supplier.id },
+      orderBy: [{ updatedAt: 'desc' }, { id: 'asc' }],
+      take: 10,
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        shortTitle: true,
+        description: true,
+        shortDescription: true,
+        type: true,
+        status: true,
+        purchaseFlow: true,
+        managementMode: true,
+        imageUrl: true,
+        priceFromRub: true,
+        ticketsVacant: true,
+        validityMode: true,
+        validFrom: true,
+        validTo: true,
+        validDaysAfterPurchase: true,
+        salesStartsAt: true,
+        salesEndsAt: true,
+        cityId: true,
+        venueId: true,
+        supplierId: true,
+        city: { select: { id: true, slug: true, title: true } },
+        venue: { select: { id: true, slug: true, title: true, kind: true } },
+        supplier: { select: { id: true, slug: true, title: true, status: true } },
+        offers: {
+          orderBy: [{ active: 'desc' }, { priceRub: 'asc' }, { id: 'asc' }],
+          select: {
+            id: true,
+            title: true,
+            priceRub: true,
+            oldPriceRub: true,
+            active: true,
+            capacityTotal: true,
+            groupSize: true,
+          },
+        },
       },
     }),
     prisma.supplierLedgerEntry.findMany({
@@ -276,6 +330,7 @@ export async function buildAdminSupplierDetailDto(idOrSlug: string): Promise<Adm
       managementMode: String(event.managementMode),
       priceFromRub: event.priceFromRub,
     })),
+    admissionProductsSample: admissionProductsSample.map((product) => mapAdmissionProductDto(product)),
     recentLedgerEntries: recentLedgerEntries.map((entry) => ({
       id: entry.id,
       type: String(entry.type),
@@ -291,6 +346,7 @@ export function mapAdminSupplierRow(row: SupplierBaseRow, aggregates: SupplierAg
   const ownerUsersCount = users.filter((user) => ['OWNER', 'ADMIN'].includes(String(user.role))).length;
   const legal = mapLegal(row.legalProfile);
   const events = summarizeEvents(row.id, aggregates);
+  const admissions = summarizeAdmissions(row.id, aggregates);
   const orders = summarizeOrders(row.id, aggregates);
   const finance = summarizeFinance(row.id, aggregates);
   const reviews = summarizeReviews(row.id, aggregates);
@@ -304,7 +360,7 @@ export function mapAdminSupplierRow(row: SupplierBaseRow, aggregates: SupplierAg
     activeCommissionRules,
     defaultCommissionBps: row.defaultCommissionBps || 0,
     yookassaShopId: row.yookassaShopId ?? null,
-    internalCheckoutEvents: events.internalCheckout + events.hybrid,
+    internalCheckoutEvents: events.internalCheckout + events.hybrid + admissions.platform,
   });
 
   return {
@@ -327,6 +383,7 @@ export function mapAdminSupplierRow(row: SupplierBaseRow, aggregates: SupplierAg
     ownerUsersCount,
     legal,
     events,
+    admissions,
     orders,
     finance,
     reviews,
@@ -426,6 +483,7 @@ async function loadSupplierAggregates(supplierIds: string[]): Promise<SupplierAg
     disputeGroups,
     reviewGroups,
     reviewAverages,
+    admissionGroups,
   ] = await prisma.$transaction([
     prisma.event.groupBy({
       by: ['supplierId', 'status', 'purchaseFlow', 'managementMode'],
@@ -473,6 +531,11 @@ async function loadSupplierAggregates(supplierIds: string[]): Promise<SupplierAg
       where: { supplierId: { in: supplierIds }, status: 'APPROVED' },
       _avg: { rating: true },
     }),
+    prisma.admissionProduct.groupBy({
+      by: ['supplierId', 'status', 'purchaseFlow'],
+      where: { supplierId: { in: supplierIds } },
+      _count: { _all: true },
+    }),
   ]);
 
   return {
@@ -489,6 +552,7 @@ async function loadSupplierAggregates(supplierIds: string[]): Promise<SupplierAg
         .filter((row) => row.supplierId)
         .map((row) => [row.supplierId as string, row._avg.rating]),
     ),
+    admissionGroups: groupBySupplier(admissionGroups as AdmissionGroupAggregate[]),
   };
 }
 
@@ -503,6 +567,7 @@ function emptyAggregates(): SupplierAggregates {
     disputeGroups: new Map(),
     reviewGroups: new Map(),
     reviewAverages: new Map(),
+    admissionGroups: new Map(),
   };
 }
 
@@ -540,6 +605,27 @@ function summarizeEvents(supplierId: string, aggregates: SupplierAggregates): Ad
     if (row.catalogMode === 'HYBRID') summary.hybrid += count;
     if (row.catalogMode === 'WIDGET_ONLY') summary.widgetOnly += count;
     addManagementCount(summary, row.managementMode, count);
+  }
+
+  return summary;
+}
+
+function summarizeAdmissions(supplierId: string, aggregates: SupplierAggregates): AdminSupplierAdmissionsSummaryDto {
+  const summary: AdminSupplierAdmissionsSummaryDto = {
+    total: 0,
+    published: 0,
+    platform: 0,
+    canSell: 0,
+    needsAttention: 0,
+  };
+
+  for (const row of aggregates.admissionGroups.get(supplierId) || []) {
+    const count = row._count._all;
+    summary.total += count;
+    if (row.status === 'PUBLISHED') summary.published += count;
+    if (row.purchaseFlow === 'PLATFORM') summary.platform += count;
+    if (row.status === 'PUBLISHED' && row.purchaseFlow === 'PLATFORM') summary.canSell += count;
+    if (row.status !== 'PUBLISHED' || row.purchaseFlow !== 'PLATFORM') summary.needsAttention += count;
   }
 
   return summary;

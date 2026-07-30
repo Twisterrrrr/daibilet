@@ -83,12 +83,53 @@ const stubCheckoutSessionSelect = {
   capacitySold: true,
 } satisfies Prisma.EventSessionSelect;
 
+const stubCheckoutAdmissionProductInclude = {
+  supplier: {
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      status: true,
+      defaultCommissionBps: true,
+    },
+  },
+  venue: {
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      kind: true,
+      city: { select: { id: true, slug: true, title: true } },
+    },
+  },
+  city: {
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+    },
+  },
+} satisfies Prisma.AdmissionProductInclude;
+
+const stubCheckoutAdmissionOfferSelect = {
+  id: true,
+  admissionProductId: true,
+  sourceCode: true,
+  title: true,
+  priceRub: true,
+  active: true,
+  capacityTotal: true,
+} satisfies Prisma.AdmissionOfferSelect;
+
 export type StubCheckoutEventRow = Prisma.EventGetPayload<{ include: typeof stubCheckoutEventInclude }>;
 export type StubCheckoutOfferRow = Prisma.EventOfferGetPayload<{ select: typeof stubCheckoutOfferSelect }>;
 export type StubCheckoutSessionRow = Prisma.EventSessionGetPayload<{ select: typeof stubCheckoutSessionSelect }>;
+export type StubCheckoutAdmissionProductRow = Prisma.AdmissionProductGetPayload<{ include: typeof stubCheckoutAdmissionProductInclude }>;
+export type StubCheckoutAdmissionOfferRow = Prisma.AdmissionOfferGetPayload<{ select: typeof stubCheckoutAdmissionOfferSelect }>;
 export type StubCheckoutSupplierRow =
   | NonNullable<StubCheckoutEventRow['supplier']>
-  | StubCheckoutEventRow['supplierLinks'][number]['supplier'];
+  | StubCheckoutEventRow['supplierLinks'][number]['supplier']
+  | NonNullable<StubCheckoutAdmissionProductRow['supplier']>;
 
 interface StubCheckoutValidationInput {
   enabled: boolean;
@@ -96,6 +137,15 @@ interface StubCheckoutValidationInput {
   event: StubCheckoutEventRow | null;
   offer: StubCheckoutOfferRow | null;
   session: StubCheckoutSessionRow | null;
+  supplier: StubCheckoutSupplierRow | null;
+  quantity: number;
+}
+
+interface StubAdmissionCheckoutValidationInput {
+  enabled: boolean;
+  now: Date;
+  product: StubCheckoutAdmissionProductRow | null;
+  offer: StubCheckoutAdmissionOfferRow | null;
   supplier: StubCheckoutSupplierRow | null;
   quantity: number;
 }
@@ -191,6 +241,10 @@ export async function createStubCheckoutOrder(
   }
 
   const normalizedPayload = normalizeStubCheckoutPayload(payload);
+  if (isAdmissionCheckoutPayload(normalizedPayload)) {
+    return createStubAdmissionCheckoutOrder(normalizedPayload, { idempotencyKey, now });
+  }
+
   const event = await loadStubCheckoutEvent(normalizedPayload);
   const eventOfferId = normalizedPayload.offerId || '';
   const [offer, session] = await Promise.all([
@@ -359,6 +413,164 @@ export async function createStubCheckoutOrder(
   }
 }
 
+async function createStubAdmissionCheckoutOrder(
+  normalizedPayload: StubCheckoutCreateDto,
+  options: { idempotencyKey?: string | null; now?: Date } = {},
+): Promise<StubCheckoutResultDto> {
+  const now = options.now || new Date();
+  const idempotencyKey = normalizeIdempotencyKey(options.idempotencyKey || normalizedPayload.idempotencyKey);
+  const product = await loadStubCheckoutAdmissionProduct(normalizedPayload);
+  const offer = product && normalizedPayload.admissionOfferId
+    ? await prisma.admissionOffer.findFirst({
+        where: { id: normalizedPayload.admissionOfferId, admissionProductId: product.id },
+        select: stubCheckoutAdmissionOfferSelect,
+      })
+    : null;
+  const supplier = product?.supplier || null;
+  const issues = validateStubAdmissionCheckoutReadiness({
+    enabled: isStubCheckoutEnabled(),
+    now,
+    product,
+    offer,
+    supplier,
+    quantity: normalizedPayload.quantity,
+  });
+  const blocking = issues.filter((issue) => issue.severity === 'high');
+  if (blocking.length) throw new StubCheckoutError(blocking[0]?.code || 'ADMISSION_PRODUCT_NOT_FOUND', 422, issues);
+  if (!product || !offer || !supplier) throw new StubCheckoutError('ADMISSION_PRODUCT_NOT_FOUND', 404, issues);
+
+  const replayedResult = await reserveIdempotencyKey(idempotencyKey, product.id);
+  if (replayedResult) return replayedResult;
+
+  try {
+    const subjectType: CheckoutSubjectType = 'VENUE_ADMISSION';
+    const totals = computeStubCheckoutTotals({
+      priceRub: offer.priceRub || 0,
+      quantity: normalizedPayload.quantity,
+      commissionBps: supplier.defaultCommissionBps || 0,
+    });
+    const created = await prisma.$transaction(async (tx) => {
+      await decrementAdmissionCapacity(tx, product, normalizedPayload.quantity);
+      const publicCode = await createUniquePublicCode(tx);
+      const order = await tx.checkoutOrder.create({
+        data: {
+          publicCode,
+          status: 'CONFIRMED',
+          currency: 'RUB',
+          subtotalKopecks: totals.subtotalKopecks,
+          discountKopecks: totals.discountKopecks,
+          totalKopecks: totals.totalKopecks,
+          commissionKopecks: totals.commissionKopecks,
+          buyerEmail: normalizedPayload.buyer.email,
+          buyerPhone: normalizedPayload.buyer.phone,
+          buyerName: normalizedPayload.buyer.name,
+          buyerSnapshot: {
+            mode: 'STUB',
+            buyer: {
+              email: normalizedPayload.buyer.email,
+              name: normalizedPayload.buyer.name,
+              phone: normalizedPayload.buyer.phone,
+            },
+            subjectType,
+          } satisfies Prisma.InputJsonObject,
+          checkoutUrl: `/purchases/${publicCode}`,
+          paidAt: now,
+          confirmedAt: now,
+        },
+        select: checkoutOrderResultSelect,
+      });
+      const item = await tx.checkoutItem.create({
+        data: {
+          checkoutOrderId: order.id,
+          subjectType,
+          supplierId: supplier.id,
+          admissionProductId: product.id,
+          admissionOfferId: offer.id,
+          title: product.title,
+          ticketTitle: offer.title,
+          status: 'CONFIRMED',
+          quantity: normalizedPayload.quantity,
+          unitPriceKopecks: totals.unitPriceKopecks,
+          totalKopecks: totals.totalKopecks,
+          commissionKopecks: totals.commissionKopecks,
+          attendeeName: normalizedPayload.attendee?.name || normalizedPayload.buyer.name,
+          attendeePhone: normalizedPayload.attendee?.phone || normalizedPayload.buyer.phone,
+          providerPayload: {
+            mode: 'STUB',
+            subjectType,
+            admissionProductId: product.id,
+            admissionProductSlug: product.slug,
+            admissionOfferId: offer.id,
+          },
+          issuedAt: now,
+        },
+        select: checkoutItemResultSelect,
+      });
+      const payment = await tx.payment.create({
+        data: {
+          checkoutOrderId: order.id,
+          provider: 'MANUAL',
+          status: 'SUCCEEDED',
+          amountKopecks: totals.totalKopecks,
+          currency: 'RUB',
+          providerPaymentId: `stub_${publicCode}`,
+          idempotenceKey: idempotencyKey,
+          paidAt: now,
+          capturedAt: now,
+          rawPayload: {
+            mode: 'STUB',
+            subjectType,
+            note: 'No real payment and no fiscal receipt.',
+          },
+        },
+        select: paymentResultSelect,
+      });
+      const fulfillment = await tx.fulfillmentItem.create({
+        data: {
+          checkoutOrderId: order.id,
+          checkoutItemId: item.id,
+          lineItemIndex: 0,
+          admissionOfferId: offer.id,
+          purchaseFlow: 'PLATFORM',
+          provider: 'STUB',
+          status: 'CONFIRMED',
+          amountKopecks: totals.totalKopecks,
+          providerData: {
+            mode: 'STUB',
+            publicCode,
+            subjectType,
+            admissionProductId: product.id,
+          },
+        },
+        select: fulfillmentResultSelect,
+      });
+      await writeSupplierLedgerEntries(tx, {
+        supplierId: supplier.id,
+        orderId: order.id,
+        itemId: item.id,
+        paymentId: payment.id,
+        publicCode,
+        totals,
+      });
+      return { order, item, payment, fulfillment };
+    });
+
+    const result = mapStubAdmissionCheckoutResult({
+      created,
+      product,
+      offer,
+      supplier,
+      totals,
+      warnings: issues.filter((issue) => issue.severity !== 'high'),
+    });
+    await markIdempotencySucceeded(idempotencyKey, created.order.id, result);
+    return result;
+  } catch (error) {
+    await markIdempotencyFailed(idempotencyKey, product.id);
+    throw error;
+  }
+}
+
 export const checkoutOrderResultSelect = {
   id: true,
   publicCode: true,
@@ -433,6 +645,50 @@ export function validateStubCheckoutReadiness(input: StubCheckoutValidationInput
   return issues;
 }
 
+export function validateStubAdmissionCheckoutReadiness(
+  input: StubAdmissionCheckoutValidationInput,
+): StubCheckoutIssueDto[] {
+  const issues: StubCheckoutIssueDto[] = [];
+  if (!input.enabled) issues.push(issue('STUB_CHECKOUT_DISABLED', 'STUB checkout выключен', 'high'));
+  if (input.quantity < MIN_QUANTITY || input.quantity > MAX_QUANTITY) {
+    issues.push(issue('QUANTITY_OUT_OF_RANGE', 'Количество билетов вне допустимого диапазона', 'high'));
+  }
+  if (!input.product) {
+    issues.push(issue('ADMISSION_PRODUCT_NOT_FOUND', 'Входной билет не найден', 'high'));
+    return issues;
+  }
+
+  if (!['READY', 'PUBLISHED'].includes(String(input.product.status))) {
+    issues.push(issue('ADMISSION_PRODUCT_NOT_PUBLIC', 'Входной билет не готов к продаже', 'high'));
+  }
+  if (String(input.product.purchaseFlow) !== 'PLATFORM') {
+    issues.push(issue('ADMISSION_PRODUCT_NOT_INTERNAL_CHECKOUT', 'Входной билет не подключен к checkout Daibilet', 'high'));
+  }
+  if (String(input.product.managementMode) !== 'DAIBILET_MANAGED') {
+    issues.push(issue('ADMISSION_PRODUCT_NOT_MANAGED_BY_DAIBILET', 'Входной билет не ведется Daibilet вручную', 'high'));
+  }
+  if (!input.supplier || String(input.supplier.status) !== 'ACTIVE') {
+    issues.push(issue('SUPPLIER_NOT_CONFIGURED', 'Поставщик не активен или не привязан', 'high'));
+  }
+  if (input.product.salesStartsAt && input.product.salesStartsAt > input.now) {
+    issues.push(issue('SALES_NOT_STARTED', 'Продажи еще не начались', 'high'));
+  }
+  if (input.product.salesEndsAt && input.product.salesEndsAt < input.now) {
+    issues.push(issue('SALES_CLOSED', 'Продажи закрыты', 'high'));
+  }
+  if (input.product.validFrom && input.product.validFrom > input.now) {
+    issues.push(issue('ADMISSION_VALIDITY_NOT_ACTIVE', 'Входной билет еще не действует', 'high'));
+  }
+  if (input.product.validTo && input.product.validTo < input.now) {
+    issues.push(issue('ADMISSION_VALIDITY_NOT_ACTIVE', 'Срок действия входного билета истек', 'high'));
+  }
+  if (input.product.ticketsVacant != null && input.product.ticketsVacant < input.quantity) {
+    issues.push(issue('NOT_ENOUGH_CAPACITY', 'Недостаточно доступных билетов', 'high'));
+  }
+  validateAdmissionOffer(input.offer, issues);
+  return issues;
+}
+
 export function computeStubCheckoutTotals(input: {
   priceRub: number;
   quantity: number;
@@ -474,6 +730,22 @@ function validateOffer(offer: StubCheckoutOfferRow | null, issues: StubCheckoutI
   if (!offer.active) issues.push(issue('OFFER_INACTIVE', 'Категория билета выключена', 'high'));
   if (String(offer.sourceCode) !== 'MANUAL') {
     issues.push(issue('OFFER_NOT_MANUAL', 'Категория билета не ручная', 'high'));
+  }
+  if (offer.priceRub == null) {
+    issues.push(issue('MISSING_PRICE', 'Цена билета не задана', 'high'));
+  } else if (offer.priceRub < MIN_PRICE_RUB) {
+    issues.push(issue('PRICE_TOO_LOW', 'Цена билета ниже 100 рублей', 'high'));
+  }
+}
+
+function validateAdmissionOffer(offer: StubCheckoutAdmissionOfferRow | null, issues: StubCheckoutIssueDto[]): void {
+  if (!offer) {
+    issues.push(issue('ADMISSION_OFFER_NOT_FOUND', 'Категория входного билета не найдена', 'high'));
+    return;
+  }
+  if (!offer.active) issues.push(issue('ADMISSION_OFFER_INACTIVE', 'Категория входного билета выключена', 'high'));
+  if (String(offer.sourceCode) !== 'MANUAL') {
+    issues.push(issue('ADMISSION_OFFER_NOT_MANUAL', 'Категория входного билета не ручная', 'high'));
   }
   if (offer.priceRub == null) {
     issues.push(issue('MISSING_PRICE', 'Цена билета не задана', 'high'));
@@ -535,6 +807,18 @@ export async function loadStubCheckoutEvent(payload: StubCheckoutCreateDto): Pro
   });
 }
 
+export async function loadStubCheckoutAdmissionProduct(
+  payload: StubCheckoutCreateDto,
+): Promise<StubCheckoutAdmissionProductRow | null> {
+  const productId = cleanString(payload.admissionProductId);
+  const productSlug = cleanString(payload.admissionProductSlug);
+  if (!productId && !productSlug) return null;
+  return prisma.admissionProduct.findFirst({
+    where: productId ? { id: productId } : { slug: productSlug || '' },
+    include: stubCheckoutAdmissionProductInclude,
+  });
+}
+
 export function resolveStubCheckoutSupplier(event: StubCheckoutEventRow): StubCheckoutSupplierRow | null {
   if (event.supplier) return event.supplier;
   const primaryLink = event.supplierLinks.find((link) => link.isPrimary) || event.supplierLinks[0] || null;
@@ -544,9 +828,13 @@ export function resolveStubCheckoutSupplier(event: StubCheckoutEventRow): StubCh
 export function normalizeStubCheckoutPayload(payload: StubCheckoutCreateDto): StubCheckoutCreateDto {
   return {
     ...payload,
+    subjectType: payload.subjectType || null,
     eventId: cleanString(payload.eventId),
     eventSlug: cleanString(payload.eventSlug),
+    admissionProductId: cleanString(payload.admissionProductId),
+    admissionProductSlug: cleanString(payload.admissionProductSlug),
     offerId: cleanString(payload.offerId) || '',
+    admissionOfferId: cleanString(payload.admissionOfferId),
     sessionId: cleanString(payload.sessionId),
     quantity: Math.trunc(Number(payload.quantity || 0)),
     buyer: {
@@ -562,6 +850,15 @@ export function normalizeStubCheckoutPayload(payload: StubCheckoutCreateDto): St
       : null,
     idempotencyKey: normalizeIdempotencyKey(payload.idempotencyKey),
   };
+}
+
+export function isAdmissionCheckoutPayload(payload: StubCheckoutCreateDto): boolean {
+  return Boolean(
+    payload.subjectType === 'VENUE_ADMISSION' ||
+      cleanString(payload.admissionProductId) ||
+      cleanString(payload.admissionProductSlug) ||
+      cleanString(payload.admissionOfferId),
+  );
 }
 
 export async function decrementCapacity(
@@ -604,6 +901,24 @@ export async function decrementCapacity(
     });
     if (updated.count !== 1) throw new StubCheckoutError('NOT_ENOUGH_CAPACITY', 409);
   }
+}
+
+export async function decrementAdmissionCapacity(
+  tx: Prisma.TransactionClient,
+  product: StubCheckoutAdmissionProductRow,
+  quantity: number,
+): Promise<void> {
+  if (product.ticketsVacant == null) return;
+  const updated = await tx.admissionProduct.updateMany({
+    where: {
+      id: product.id,
+      ticketsVacant: { gte: quantity },
+    },
+    data: {
+      ticketsVacant: { decrement: quantity },
+    },
+  });
+  if (updated.count !== 1) throw new StubCheckoutError('NOT_ENOUGH_CAPACITY', 409);
 }
 
 export async function createUniquePublicCode(tx: Prisma.TransactionClient): Promise<string> {
@@ -712,6 +1027,80 @@ function mapStubCheckoutResult(input: {
         offerTitle: input.offer.title || null,
         sessionId: input.session?.id || null,
         startsAt: toIso(input.session?.startsAt),
+        quantity: input.created.item.quantity,
+        ticketTitle: input.created.item.ticketTitle || input.offer.title || null,
+        status: input.created.item.status,
+      },
+      totals: input.totals,
+      payment: {
+        id: input.created.payment.id,
+        provider: 'MANUAL',
+        status: input.created.payment.status,
+        amountKopecks: input.created.payment.amountKopecks,
+        providerPaymentId: input.created.payment.providerPaymentId,
+        paidAt: toIso(input.created.payment.paidAt),
+      },
+      fulfillment: {
+        id: input.created.fulfillment.id,
+        status: input.created.fulfillment.status,
+        provider: 'STUB',
+        purchaseFlow: 'PLATFORM',
+      },
+    },
+    warnings: input.warnings,
+  };
+}
+
+function mapStubAdmissionCheckoutResult(input: {
+  created: StubCheckoutCreatedRows;
+  product: StubCheckoutAdmissionProductRow;
+  offer: StubCheckoutAdmissionOfferRow;
+  supplier: StubCheckoutSupplierRow;
+  totals: StubCheckoutTotalsDto;
+  warnings: StubCheckoutIssueDto[];
+}): StubCheckoutResultDto {
+  const publicCode = input.created.order.publicCode || input.created.order.id.slice(-7);
+  const city = input.product.city || input.product.venue.city || null;
+  return {
+    generatedAt: new Date().toISOString(),
+    mode: 'STUB',
+    order: {
+      id: input.created.order.id,
+      publicCode,
+      status: input.created.order.status,
+      createdAt: input.created.order.createdAt.toISOString(),
+      paidAt: toIso(input.created.order.paidAt),
+      confirmedAt: toIso(input.created.order.confirmedAt),
+      buyer: {
+        email: input.created.order.buyerEmail || '',
+        name: input.created.order.buyerName || null,
+        phone: input.created.order.buyerPhone || null,
+      },
+      subject: {
+        type: 'VENUE_ADMISSION',
+        eventId: null,
+        eventSlug: null,
+        eventTitle: null,
+        eventKind: null,
+        admissionProductId: input.product.id,
+        admissionProductSlug: input.product.slug,
+        admissionProductTitle: input.product.title,
+        admissionProductType: String(input.product.type),
+        cityId: city?.id || null,
+        citySlug: city?.slug || null,
+        cityTitle: city?.title || null,
+        venueId: input.product.venue.id,
+        venueSlug: input.product.venue.slug,
+        venueTitle: input.product.venue.title,
+      },
+      item: {
+        id: input.created.item.id,
+        supplierId: input.created.item.supplierId || input.supplier.id,
+        supplierTitle: input.supplier.title,
+        offerId: input.offer.id,
+        offerTitle: input.offer.title || null,
+        sessionId: null,
+        startsAt: null,
         quantity: input.created.item.quantity,
         ticketTitle: input.created.item.ticketTitle || input.offer.title || null,
         status: input.created.item.status,
