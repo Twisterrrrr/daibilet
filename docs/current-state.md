@@ -3,7 +3,7 @@
 **Обновлено:** 2026-07-30  
 **Ветка:** `feat/next-monorepo`  
 **Prod live (DNS):** `201.24.125.184` (МСК `msk-1-vm-5a5i`) · Next `:3001` · API `:4000` · PG Docker `:5437` · TLS nginx · **catalog truth**  
-**СПб (не public):** `213.171.7.16` — MIG.8 ✅: web/api/sync сняты; PG+nginx для finance+staging · [spb-finance-host.md](./spb-finance-host.md)
+**СПб (не public):** `213.171.7.16` (4 ГБ) - MIG.8 ✅ finance+staging+build · план переезда на `85.193.80.159` (8 ГБ) · [spb-finance-host.md](./spb-finance-host.md) · [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md)
 
 > Детальные чеклисты: [Tasktracker.md](./Tasktracker.md)  
 > Эталонные slug виджетов: [widget-etalon-slugs.md](./widget-etalon-slugs.md)

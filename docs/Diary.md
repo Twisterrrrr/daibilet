@@ -1,3 +1,38 @@
+## 2026-07-30 - MIG.9 план: СПб 4 ГБ → 8 ГБ (finance/staging/build)
+
+### Наблюдения
+- Owner: новый VPS Diligent Polydeuces `85.193.80.159` (~8 ГБ). Старый Intelligent Hoopoe `213.171.7.16` (~4 ГБ) после MIG.8 = finance+staging+build, не public.
+- Каталог/DNS prod уже на МСК `201.24.125.184`. Перенос catalog на новый СПб откатил бы MIG.7/8 и риск dual-source.
+- В `deploy/scripts` IP `213.171.7.16` не захардкожен (скрипты on-host); IP в docs/runbooks (`deploy-staging.md`, `deploy-timeweb.md`, phases).
+
+### Решения
+- План: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md). Цель - заменить роли 4 ГБ на 8 ГБ; apex `daibilet.ru` не трогать.
+- Finance PG - отдельный volume; не restore catalog dump как money DB.
+- Tasktracker MIG.9 (Средний). Следующий шаг: SSH на `85.193.80.159` (Phase 0).
+
+### Проблемы
+- SSH ключ/firewall на новом боксе ещё не проверены с этой среды.
+- Teplohod allowlist: менять IP только если sync снова пойдёт со СПб (после MIG.8 обычно нет).
+
+---
+
+## 2026-07-30 - Perf: compact /api/public/home + city SSR hang
+
+### Наблюдения
+- `GET /api/public/home` ~1.2MB (`no-store`): 180 полных sessions с description/groupEventIds/per-slot purchaseUrl.
+- City HTML зависал на cold catalog rebuild (20-200с) + secondary articles; при stop web на время MSK-build - массовые 502 (robots/favicon/cities).
+- AAAA `2a03:6f00:a::2:fa87` есть в DNS; curl -6 с Windows без IPv6 не резолвит - проверить маршрутизацию с dual-stack клиентов.
+
+### Решения
+- Compact home card DTO (`toPublicHomeCardSession`) + `sendPublicJson`/`withPublicResponseCache` для `/api/public/home`.
+- Events list: description≤200, slots≤4 без per-slot purchaseUrl; cache keys bumped (`catalog-page-v2-lean`, city/home).
+- City page: articles timeout 3s + allSettled; city DTO: timeout venue hubs/resolve/city-record; `DAIBILET_PERF_LOG=1` marks.
+- Middleware: early bail для static/robots/sitemap/favicon/image extensions.
+
+### Проблемы
+- Cold catalog rebuild (dual SWR) всё ещё главный риск first miss после restart - INC.504.4/5.
+- AAAA: ops-задача Timeweb (проверить IPv6 до 201.24.125.184 или снять AAAA).
+
 ## 2026-07-30 - Cold TTFB ~15-30с после browser cache clear
 
 ### Наблюдения

@@ -19,6 +19,9 @@
 | INC.504.6 | nginx proxy_cache SWR: `background_update` + TTL 30m (browser clear ≠ cold Next) | Критический | ✅ |
 | INC.504.7 | City hub ISR: `unstable_cache` + `generateStaticParams` (было no-store / 20-30с) | Критический | ✅ |
 | INC.504.8 | Cron/warm hub pages (`/`, `/events`, top cities) каждые N мин | Высокий | ✅ cron `*/3` + deploy hook |
+| INC.504.9 | Compact `/api/public/home` DTO + cache-control (было ~1.2MB no-store) | Критический | 🔄 |
+| INC.504.10 | City SSR: secondary timeout 3s + perf marks; lighten events list DTO | Критический | 🔄 |
+| INC.504.11 | AAAA IPv6: проверить маршрут до MSK или снять AAAA в Timeweb | Высокий | ⏳ |
 
 См. Diary 2026-07-30 «Prod 504: daibilet-web hang» и «Cold TTFB после browser cache clear».
 
@@ -47,9 +50,10 @@
 | MIG.6 | Smoke на МСК (IP/`--resolve`) до DNS | Критический | ✅ |
 | MIG.7 | DNS A `daibilet.ru`/`www` → `201.24.125.184` + post-smoke | Критический | ✅ 2026-07-30 |
 | MIG.8 | СПб: stop public web/api + TC timer + crontab sync; PG snapshot; host → finance+staging | Средний | ✅ 2026-07-30 · [spb-finance-host.md](./spb-finance-host.md) |
+| MIG.9 | СПб 4 ГБ → 8 ГБ (`213.171.7.16` → `85.193.80.159`): finance+staging+build; catalog остаётся на МСК | Средний | ⏳ план · [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md) |
 | PERF.OOM4 | MSK: снять `cpus:1`/`workerThreads:false`, heap build 5120Mi | Высокий | ✅ |
 
-План: [migration-spb-to-msk.md](./migration-spb-to-msk.md)
+План: [migration-spb-to-msk.md](./migration-spb-to-msk.md) · SPB upsizing: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md)
 
 ## PERF event pages (после DNS на МСК)
 
@@ -955,6 +959,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-30 | MIG.9 ⏳ план: СПб 4ГБ→8ГБ finance/staging/build (`85.193.80.159`); catalog MSK |
 | 2026-07-30 | Prod 504 MSK: restart web+nginx; INC.504.1-4 mitigations ⏳ Medium |
 | 2026-07-30 | MIG.8 ✅ СПб public/sync off; PERF.E5 event без catalog; SEO-хвост about/crumbs/variants; F5.0 map |
 | 2026-07-25 | SEO.20 listing garbage audit: код ✅ (`pnpm audit:listings` + Telegram helper); cron 04:00 на prod ⏳ owner |

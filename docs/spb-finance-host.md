@@ -1,8 +1,9 @@
 # СПб host — finance + staging (после MIG.8)
 
 **Обновлено:** 2026-07-30  
-**Host:** `213.171.7.16` (`daibilet_staging_key`)  
-**Роль:** не public prod. Каталог / TC / TEP sync / orders — **только МСК**.
+**Host (текущий 4 ГБ):** `213.171.7.16` Intelligent Hoopoe (`daibilet_staging_key`)  
+**Цель (8 ГБ, план):** `85.193.80.159` Diligent Polydeuces - см. [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md)  
+**Роль:** не public prod. Каталог / TC / TEP sync / orders - **только МСК**.
 
 ---
 
@@ -40,4 +41,5 @@
 3. Public DNS (`daibilet.ru`) остаётся на МСК `201.24.125.184`.
 4. IPv6 AAAA на МСК — только после открытия TCP 80/443 в панели Timeweb.
 
-См. [migration-spb-to-msk.md](./migration-spb-to-msk.md), Phase G: [phase-2-finance-supplier-blueprint.md](./phase-2-finance-supplier-blueprint.md).
+См. [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), Phase G: [phase-2-finance-supplier-blueprint.md](./phase-2-finance-supplier-blueprint.md).
+
