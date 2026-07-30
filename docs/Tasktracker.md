@@ -484,7 +484,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | SEO.8 | TOP-15 launch set: водные, стендап, экскурсии, культура, intent; «крыши» только СПб | Высокий | ✅ 2026-07-23 | владелец утвердил, агент внедрил; editorial focus LOCK, без URL churn |
 | SEO.8a | Editorial polish текстов TOP-15, в первую очередь новые `walking-tours`, `country-tours`, `exhibitions`, `unusual-theatres`, `excursions`, `rooftops` | Высокий | 🔄 seed готов, нужна редакторская вычитка | владелец + агент |
 | SEO.8b | `country-tours`: требовать экскурсионный и направленческий сигналы, исключить культурные события по топонимам | Высокий | ✅ 2026-07-23 | runtime `dto.js` синхронизирован, prod deploy + smoke: 3 экскурсии, без оперы и концертов |
-| SEO.8c | Аудит всех landing rules: исключить мусорные попадания, сверить сэмплы и runtime `dto.js` | Критический | 🔄 2026-07-25 | national `/progulki-po-krysham` ✅ (смотровые); остальной rule-audit продолжается |
+| SEO.8c | Аудит всех landing rules: исключить мусорные попадания, сверить сэмплы и runtime `dto.js` | Критический | 🔄 2026-07-30 | national `/progulki-po-krysham` ✅; `river-cruises` EKB Ben Hall false-match ✅ (катер⊂Екатеринбург); остальной rule-audit продолжается |
 | SEO.9 | Trust contacts без телефона (launch policy) | Средний | ✅ политика: футер email only; реквизиты off `/contacts` → `/requisites`; YM Webmaster/Business по ИНН/ОГРНИП | **владелец** (верификация) / агент (UI ✅) |
 | SEO.9b | Телефон 8-800 в header + footer (+ contacts), когда номер одобрен | Высокий | 🚫 blocked: ждём утверждённый 8-800 у владельца; ASAP после approve | **владелец** → агент UI |
 | SEO.11 | Порог индекса SEO-листингов | Критический | ✅ `MIN_LISTING_OFFERS_FOR_INDEX = 6` (не поднимать; soft-цель редакторов = 10) | агент |

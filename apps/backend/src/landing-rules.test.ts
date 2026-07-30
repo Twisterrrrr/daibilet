@@ -23,6 +23,45 @@ test('matches a focused river landing and rejects unrelated transport', () => {
   }, river), false);
 });
 
+test('rejects Ben Hall concert false-positive via Екатеринбург→катер substring', () => {
+  const river = findLandingRule('river-cruises');
+  assert.ok(river);
+
+  assert.equal(matchesLandingRule({
+    title: '/ Екатеринбург/ Костя Кулясов гр. АнимациЯ/ Все хиты/animaciya.online',
+    venue: 'Ben Hall',
+    category: 'Мероприятия',
+    tags: ['Рок'],
+    subcategories: ['Рок'],
+    city: 'Екатеринбург',
+  }, river), false);
+
+  assert.equal(matchesLandingRule({
+    title: 'Концерт рок-группы в Екатеринбурге',
+    venue: 'Ben Hall',
+    category: 'Музыка',
+    tags: ['Рок'],
+    city: 'Екатеринбург',
+  }, river), false);
+
+  // Real boat stem still matches without subcategory.
+  assert.equal(matchesLandingRule({
+    title: 'Обзорная прогулка на катере по каналам',
+    category: 'Экскурсии',
+    tags: [],
+    city: 'Санкт-Петербург',
+  }, river), true);
+
+  // Moscow/SPb subcategory path stays intact.
+  assert.equal(matchesLandingRule({
+    title: 'Речная прогулка по Москве-реке',
+    category: 'Экскурсии',
+    tags: ['Речные прогулки'],
+    subcategories: ['Речные прогулки'],
+    city: 'Москва',
+  }, river), true);
+});
+
 test('keeps city and venue landing constraints strict', () => {
   assert.deepEqual(
     matchingLandingSlugs({

@@ -1,3 +1,58 @@
+## 2026-07-30 - River landing: ЕКБ concert false match
+
+### Наблюдения
+- `/rechnye-progulki/ekaterinburg`: единственный «рейс» - sold-out концерт Ben Hall «АнимациЯ / Костя Кулясов».
+- Root cause: keyword `катер` как substring внутри `Екатеринбург` в title (`includes`).
+
+### Решения
+- `landing-rules.ts`: word-start stem match (`textHasKeywordStem`) - `катер`≠Екатеринбург, `катера` ok.
+- `river-cruises`: убран bare `прогулк`; boat/pier stems + excludes (концерт/рок/стендап/анимаци/ben hall).
+- SEO fallback «по Екатеринбургу» через BUS_CITY_META dative (web).
+- Tests: Ben Hall false-positive + MSK/SPb river keep.
+
+### Проблемы
+- Нужен MSK `scp landing-rules.ts` + `systemctl restart daibilet-api` (+ cache warm).
+
+---
+
+## 2026-07-30 - Blog sidebar «Афиша: Москва» broken image
+
+### Наблюдения
+- https://daibilet.ru/blog: карточка `BlogAfishaPromo` «Афиша: Москва» - пустая тёмная область / broken image; cover статей ок.
+- В `afishaPromos.moscow.imageUrl` был `/images/events/generated/evt-auto-3287bba11438.jpg` (первый session cover из city page).
+- Прямой URL: **404** (файла нет в `/opt/daibilet/apps/web/public/images/events/generated/` - только ручные `evt-cover-*`). nginx `location ^~ /images/` → alias web/public.
+- `BlogAfishaPromo` использовал сырой `next/image` без SafeImage / unoptimized для `/images/*`.
+
+### Решения
+- Hotfix MSK: сгенерирован JPEG через sharp в path evt-auto; сброшен `.next/cache/images`; restart web → `/_next/image` 200.
+- Код: `buildBlogSidebarPromoFromCityPage` предпочитает remote https cover, иначе `resolveCityCardImage` (не локальные evt-auto).
+- `BlogAfishaPromo` → `SafeImage` (bypass optimizer для `/images/*` и ticketscloud CDN).
+
+### Проблемы
+- DB/ensure-catalog-covers пишет `evt-auto-*` в imageUrl, но файлы не всегда попадают на MSK web/public после sync/deploy.
+
+---
+
+## 2026-07-30 - Home city H1 + museums regression
+
+### Наблюдения
+- Owner: «почему H1 для города на главной поменяли? где музеи?»
+- City H1 был «Экскурсии и события в {City}» (Clean UI lock 2026-07-25) - без слова «музеи», в отличие от national «Экскурсии, музеи и мероприятия».
+- Более ранний HC.1: «Куда сходим в [City_Пр]?» - уже superseded Clean UI.
+- На главной чип/плитка «Музеи» на месте (`HERO_QUICK_CHIPS` / `HOME_FORMAT_TILES`); d55bff8/33df97f/5f37dc6/7e254f8 H1 не трогали.
+- City hub 1.3.7 (`4bb9b38`): SPb museums указывали на `moscow-museums` (нет в payload СПб) → плитка «Музеи» отваливалась; `categoryKey` не срабатывал как fallback.
+
+### Решения
+- HomeHero (web + legacy public): city H1 = «Экскурсии, музеи и мероприятия / в {City}» - как national lead.
+- SPb featured museums → `exhibitions` + `Музеи и арт`; удалён дубль `sankt-peterburg` без музеев.
+- `resolveDirectionFromConfig`: при пустом landing → fallback на category (soft match).
+- Тесты: `city-hub-directions.test.ts`, assert museums в config.
+
+### Проблемы
+- Нужен web deploy, чтобы H1/museums на prod обновились.
+
+---
+
 ## 2026-07-30 - City hub «Зачем ехать»: no wrong related events
 
 ### Наблюдения

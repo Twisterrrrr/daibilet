@@ -60,10 +60,32 @@ export const LANDING_RULES: LandingRule[] = [
     subtitle: 'Теплоходы, катера, реки и каналы',
     chips: ['теплоход', 'катер', 'причалы'],
     tags: ['Водные экскурсии', 'Реки и каналы', 'На теплоходе', 'Водная экскурсия', 'На катере', 'Теплоходные экскурсии', 'Речные прогулки'],
-    keywords: ['теплоход', 'катер', 'река', 'речн', 'канал', 'причал', 'прогулк'],
+    // No bare «прогулк»: walking tours leak. Boat/pier stems only (word-start match).
+    keywords: ['теплоход', 'катер', 'река', 'речн', 'канал', 'причал', 'яхт', 'корабл', 'судн', 'лодк', 'круиз', 'водн'],
     keywordScope: 'content',
     requiredAnySubcategories: ['Водные экскурсии', 'Речные прогулки'],
-    excludeKeywords: ['автобус', 'пешеход', 'парадн', 'двор', 'коммунал', 'мастер-класс', 'квест', 'концерт', 'вечеринк', 'дискотек'],
+    // Concerts/pubs/standup are not river trips; «катер» inside «Екатеринбург» is blocked by word-start match.
+    excludeKeywords: [
+      'автобус',
+      'пешеход',
+      'парадн',
+      'двор',
+      'коммунал',
+      'мастер-класс',
+      'квест',
+      'концерт',
+      'вечеринк',
+      'дискотек',
+      'стендап',
+      'stand up',
+      'комеди',
+      'юмор',
+      'рок',
+      'хит',
+      'анимаци',
+      'ben hall',
+    ],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory', 'tag'],
   },
   {
     slug: 'river-party',
@@ -557,10 +579,29 @@ function moscowHour(value: string | Date): number {
   return Number(hourPart?.value);
 }
 
+/** Stem OK (`катер`→`катера`), mid-word no (`катер` inside `екатеринбург`). */
+function textHasKeywordStem(text: string, keyword: string): boolean {
+  const normalized = keyword.toLowerCase();
+  if (!normalized) return false;
+  let from = 0;
+  while (from <= text.length) {
+    const idx = text.indexOf(normalized, from);
+    if (idx < 0) return false;
+    const before = idx === 0 ? '' : text[idx - 1];
+    if (!before || !isKeywordWordChar(before)) return true;
+    from = idx + 1;
+  }
+  return false;
+}
+
+function isKeywordWordChar(ch: string): boolean {
+  return /[0-9a-zà-öø-ÿа-яё_]/i.test(ch);
+}
+
 function firstKeywordMatch(fields: KeywordField[], keywords: string[]): KeywordMatch | null {
   for (const keyword of keywords) {
     const normalized = keyword.toLowerCase();
-    const field = fields.find((item) => item.text.includes(normalized));
+    const field = fields.find((item) => textHasKeywordStem(item.text, normalized));
     if (field) return { keyword, field: field.field };
   }
   return null;
@@ -571,7 +612,7 @@ function matchingKeywordMatches(fields: KeywordField[], keywords: string[]): Key
   const seen = new Set<string>();
   for (const keyword of keywords) {
     const normalized = keyword.toLowerCase();
-    const field = fields.find((item) => item.text.includes(normalized));
+    const field = fields.find((item) => textHasKeywordStem(item.text, normalized));
     if (!field) continue;
     const key = `${field.field}:${keyword}`;
     if (seen.has(key)) continue;

@@ -297,7 +297,10 @@ function extractFormatLabel(tags: string[]): string {
 function resolveLandingCityPrep(cityName: string | null, profile: LandingProfile, landingSlug: string): string | null {
   if (!cityName) return profile === 'bus' || profile === 'river' ? 'России' : null;
   if (profile === 'bus') return BUS_CITY_META[cityName]?.prepositional || cityName;
-  if (profile === 'river') return riverCityGuide(cityName)?.cityNameDative || cityName;
+  // Dative for «по …»; river guides cover pier cities, BUS_CITY_META covers EKB etc.
+  if (profile === 'river') {
+    return riverCityGuide(cityName)?.cityNameDative || BUS_CITY_META[cityName]?.prepositional || cityName;
+  }
   if (profile === 'seasonal') {
     return seasonalCityGuide(landingSlug, cityName)?.cityNameDative || cityName;
   }
@@ -457,7 +460,7 @@ function createSyntheticLanding(slug: string, cityName: string | null): PublicLa
 
   if (profile === 'river') {
     const riverGuide = cityName ? riverCityGuide(cityName) : null;
-    const prep = riverGuide?.cityNameDative || cityName || 'России';
+    const prep = riverGuide?.cityNameDative || BUS_CITY_META[cityName]?.prepositional || cityName || 'России';
     return {
       slug,
       title: cityName ? `Речные прогулки — ${cityName}` : 'Речные прогулки',
