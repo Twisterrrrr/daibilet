@@ -27,6 +27,22 @@ async function enforceAdminAuth(request: NextRequest) {
 }
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Static / SEO assets must skip admin host rewrite and landing redirect work.
+  if (
+    pathname.startsWith('/_next/static') ||
+    pathname.startsWith('/_next/image') ||
+    pathname === '/favicon.ico' ||
+    pathname === '/robots.txt' ||
+    pathname === '/sitemap.xml' ||
+    pathname.startsWith('/sitemaps/') ||
+    pathname.startsWith('/images/') ||
+    /\.(?:ico|png|jpe?g|gif|webp|svg|css|js|map|txt|xml|woff2?|ttf|eot)$/i.test(pathname)
+  ) {
+    return NextResponse.next();
+  }
+
   const host = request.headers.get('host')?.toLowerCase() || '';
   if (host === 'www.daibilet.ru' || host.startsWith('www.daibilet.ru:')) {
     const url = request.nextUrl.clone();
@@ -35,8 +51,6 @@ export async function middleware(request: NextRequest) {
     url.port = '';
     return NextResponse.redirect(url, 301);
   }
-
-  const { pathname } = request.nextUrl;
 
   // F4.1c: admin.daibilet.ru → rewrite SPA paths onto /admin/*
   if (isAdminHost(host)) {

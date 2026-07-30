@@ -63,7 +63,7 @@ export const getHomeDestinations = unstable_cache(
 export const getHomeCatalog = unstable_cache(
   // Wider pool so cover-content dedupe can refill rails after skipping identical binaries.
   () => buildPublicCatalogDto({ limit: 80, sort: 'popular' }),
-  ['home-catalog-v5-cover-dedupe'],
+  ['home-catalog-v6-lean'],
   homeCacheOptions,
 );
 

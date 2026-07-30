@@ -15,7 +15,7 @@ const catalogCacheOptions = {
 
 export async function getCachedCatalog(query: PublicCatalogQuery): Promise<Awaited<ReturnType<typeof buildPublicCatalogDto>>> {
   const key = catalogQueryCacheKey(query);
-  const cached = unstable_cache(() => buildPublicCatalogDto(query), ['catalog-page-v1', key], {
+  const cached = unstable_cache(() => buildPublicCatalogDto(query), ['catalog-page-v2-lean', key], {
     ...catalogCacheOptions,
     tags: [...catalogCacheOptions.tags, `catalog-query-${key}`],
   });

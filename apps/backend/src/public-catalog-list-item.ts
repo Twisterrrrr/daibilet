@@ -1,11 +1,13 @@
 import type { PublicCatalogListItemDto, PublicSessionDto } from '@daibilet/contracts/public';
 
-/** Primary schedule line + up to 4 chip slots (2×2). Was 3 → chips excluded primary → only 2 visible. */
-export const LIST_SLOT_PREVIEW_LIMIT = 5;
-/** Enough for line-clamp-3 on catalog cards without shipping full HTML blobs. */
-const LIST_DESCRIPTION_MAX_CHARS = 420;
+/** Chip slots for catalog cards (2×2 after primary). Cap keeps list payloads small. */
+export const LIST_SLOT_PREVIEW_LIMIT = 4;
+/** line-clamp-2 cards: short plain excerpt only (full body stays on event page). */
+const LIST_DESCRIPTION_MAX_CHARS = 200;
+/** Homepage /home card sessions: nearest slots without per-slot widget URLs. */
+export const HOME_SLOT_PREVIEW_LIMIT = 3;
 
-/** Lean catalog card DTO: truncated slots + description; keeps purchase URLs for CTA (landings/catalog buy). */
+/** Lean catalog card DTO: truncated slots + description; top-level purchase URLs for CTA. */
 export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalogListItemDto {
   const item: PublicCatalogListItemDto = {
     id: session.id,
@@ -22,12 +24,11 @@ export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalo
     timeLabel: session.timeLabel,
     timeBucket: session.timeBucket,
     upcomingSlots: (session.upcomingSlots || []).slice(0, LIST_SLOT_PREVIEW_LIMIT).map((slot) => ({
-      id: slot.id,
-      eventId: slot.eventId,
+      ...(slot.id ? { id: slot.id } : {}),
+      ...(slot.eventId ? { eventId: slot.eventId } : {}),
       startsAt: slot.startsAt,
       dateLabel: slot.dateLabel,
       timeLabel: slot.timeLabel,
-      ...(slot.purchaseUrl ? { purchaseUrl: slot.purchaseUrl } : {}),
       ...(slot.vacant != null ? { vacant: slot.vacant } : {}),
     })),
   };
@@ -52,12 +53,54 @@ export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalo
   if (session.purchaseUrl != null) item.purchaseUrl = session.purchaseUrl;
   if (session.widgetUrl != null) item.widgetUrl = session.widgetUrl;
   if (session.deeplinkUrl != null) item.deeplinkUrl = session.deeplinkUrl;
-  if (session.purchaseUrlSource != null) item.purchaseUrlSource = session.purchaseUrlSource;
 
   const description = toListDescriptionExcerpt(session.description);
   if (description) item.description = description;
 
   return item;
+}
+
+/**
+ * Compact homepage card session for GET /api/public/home.
+ * Drops full description, groupEventIds, landingSlugs, debug/source fields,
+ * and per-slot purchase/widget URLs (nearest CTA stays at top level).
+ */
+export function toPublicHomeCardSession(session: PublicSessionDto): PublicCatalogListItemDto {
+  const base = toPublicCatalogListItem(session);
+  return {
+    id: base.id,
+    title: base.title,
+    city: base.city,
+    destination: base.destination,
+    destinationType: base.destinationType,
+    venue: base.venue,
+    venueKind: base.venueKind,
+    category: base.category,
+    tags: base.tags,
+    startsAt: base.startsAt,
+    dateLabel: base.dateLabel,
+    timeLabel: base.timeLabel,
+    timeBucket: base.timeBucket,
+    upcomingSlots: (session.upcomingSlots || []).slice(0, HOME_SLOT_PREVIEW_LIMIT).map((slot) => ({
+      startsAt: slot.startsAt,
+      dateLabel: slot.dateLabel,
+      timeLabel: slot.timeLabel,
+      ...(slot.vacant != null ? { vacant: slot.vacant } : {}),
+    })),
+    ...(base.slug != null ? { slug: base.slug } : {}),
+    ...(base.citySlug != null ? { citySlug: base.citySlug } : {}),
+    ...(base.venueSlug != null ? { venueSlug: base.venueSlug } : {}),
+    ...(base.subcategories?.length ? { subcategories: base.subcategories } : {}),
+    ...(base.priceFrom != null ? { priceFrom: base.priceFrom } : {}),
+    ...(base.priceTo != null ? { priceTo: base.priceTo } : {}),
+    ...(base.vacant != null ? { vacant: base.vacant } : {}),
+    ...(base.imageUrl != null ? { imageUrl: base.imageUrl } : {}),
+    ...(base.purchaseReady != null ? { purchaseReady: base.purchaseReady } : {}),
+    ...(base.purchaseMode != null ? { purchaseMode: base.purchaseMode } : {}),
+    ...(base.purchaseProvider != null ? { purchaseProvider: base.purchaseProvider } : {}),
+    ...(base.purchaseUrl != null ? { purchaseUrl: base.purchaseUrl } : {}),
+    ...(base.widgetUrl != null ? { widgetUrl: base.widgetUrl } : {}),
+  };
 }
 
 function toListDescriptionExcerpt(value?: string | null): string | null {

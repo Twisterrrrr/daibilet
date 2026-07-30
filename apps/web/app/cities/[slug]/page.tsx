@@ -30,9 +30,39 @@ export const revalidate = 300;
 /** Allow on-demand ISR for slugs not prebuilt. */
 export const dynamicParams = true;
 
+/** Secondary hub blocks must not hang HTML (articles/blog). */
+const CITY_SECONDARY_TIMEOUT_MS = 3000;
+
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
+
+function cityPerfEnabled() {
+  return process.env.DAIBILET_PERF_LOG === '1';
+}
+
+function cityPerfMark(label: string, startedAt: number, extra?: Record<string, unknown>) {
+  if (!cityPerfEnabled()) return;
+  const payload = extra ? ` ${JSON.stringify(extra)}` : '';
+  console.log(`[perf:city] ${label}: ${Date.now() - startedAt}ms${payload}`);
+}
+
+async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T, label: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((resolve) => {
+        timer = setTimeout(() => {
+          if (cityPerfEnabled()) console.log(`[perf:city] ${label}: timeout ${ms}ms → fallback`);
+          resolve(fallback);
+        }, ms);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
 
 /**
  * Prebuild top-N city hubs when CITY_SSG_TOP_N>0. Default 0 (MSK memory-safe).
@@ -90,19 +120,45 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 /**
  * Do not await searchParams (?hub=) - forces dynamic no-store on every city hub.
  * Template comes from CITY_HUB_EDITORIAL_SLUGS allowlist; Next Data Cache via getCached*.
+ * Articles are secondary: timeout hides related, never blocks HTML for 60s.
  */
 export default async function CityPage({ params }: PageProps) {
+  const pageStartedAt = Date.now();
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
-  const [payload, articlesPayload] = await Promise.all([
-    getCachedPublicCityDto(decodedSlug),
-    getCachedCityHubArticles(decodedSlug).catch(() => null),
+
+  const cityStartedAt = Date.now();
+  const articlesStartedAt = Date.now();
+  const [payloadResult, articlesResult] = await Promise.allSettled([
+    getCachedPublicCityDto(decodedSlug).then((value) => {
+      cityPerfMark('city-dto', cityStartedAt, {
+        sessions: value?.sessions?.length ?? 0,
+        venues: value?.venues?.length ?? 0,
+        landings: value?.landings?.length ?? 0,
+      });
+      return value;
+    }),
+    withTimeout(
+      getCachedCityHubArticles(decodedSlug).catch(() => null),
+      CITY_SECONDARY_TIMEOUT_MS,
+      null,
+      'articles',
+    ).then((value) => {
+      cityPerfMark('articles', articlesStartedAt, { count: value?.articles?.length ?? 0 });
+      return value;
+    }),
   ]);
+
+  const payload = payloadResult.status === 'fulfilled' ? payloadResult.value : null;
+  const articlesPayload = articlesResult.status === 'fulfilled' ? articlesResult.value : null;
   if (!payload?.city) notFound();
 
+  const faqStartedAt = Date.now();
   const faqItems = buildCityFaqItems(payload);
   const seoText = buildCitySeoText(payload);
   const jsonLdBlocks = buildCityPageJsonLd(payload);
+  cityPerfMark('faq-seo-jsonld', faqStartedAt, { jsonLd: jsonLdBlocks.length });
+
   const hubTemplate = resolveCityHubTemplate({ slug: decodedSlug });
   const blogCards = mergeBlogCards(articlesPayload?.articles || null);
   const hubArticles = pickCityHubArticles(
@@ -114,6 +170,7 @@ export default async function CityPage({ params }: PageProps) {
     blogCards,
   );
   const View = hubTemplate === 'editorial' ? CityPageViewEditorial : CityPageView;
+  cityPerfMark('page-total', pageStartedAt, { slug: decodedSlug, hubArticles: hubArticles.length });
 
   return (
     <>

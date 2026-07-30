@@ -112,7 +112,7 @@ export interface PublicCatalogListItemDto extends PurchaseFields {
   sessionCount?: number;
   upcomingSlots?: Array<
     Pick<DateTimeSlot, 'id' | 'eventId' | 'startsAt' | 'dateLabel' | 'timeLabel'> &
-      Pick<PurchaseFields, 'purchaseUrl'> & { vacant?: number | null }
+      Partial<Pick<PurchaseFields, 'purchaseUrl'>> & { vacant?: number | null }
   >;
   title: string;
   citySlug?: string | null;

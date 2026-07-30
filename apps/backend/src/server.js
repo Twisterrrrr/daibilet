@@ -278,8 +278,20 @@ export async function handleRequest(request, response) {
     }
 
     if (route === 'GET /api/public/home') {
-      if (url.searchParams.get('refresh') === '1') invalidatePublicCaches('public home refresh');
-      sendJson(response, await withDataFallback(() => buildPublicHome(db), 'apps/public/data.js', 'PUBLIC_DATA'));
+      if (url.searchParams.get('refresh') === '1') {
+        invalidatePublicCaches('public home refresh');
+        sendPublicJson(
+          response,
+          await withDataFallback(() => buildPublicHome(db), 'apps/public/data.js', 'PUBLIC_DATA'),
+        );
+        return;
+      }
+      sendPublicJson(
+        response,
+        await withPublicResponseCache('home', () =>
+          withDataFallback(() => buildPublicHome(db), 'apps/public/data.js', 'PUBLIC_DATA'),
+        ),
+      );
       return;
     }
 

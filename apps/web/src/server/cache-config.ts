@@ -17,7 +17,7 @@ export const EVENT_PAGE_CACHE_TAG = 'event-page';
 export const CITY_PAGE_CACHE_TAG = 'city-page';
 
 /** Shared Cache-Control for CDN/nginx and browser. */
-export const PUBLIC_CACHE_CONTROL = 'public, s-maxage=300, stale-while-revalidate=600';
+export const PUBLIC_CACHE_CONTROL = 'public, max-age=60, s-maxage=300, stale-while-revalidate=600';
 
 /** `unstable_cache` tag for /podborki + venues/locations catalog DTOs. */
 export const PUBLIC_SURFACES_CACHE_TAG = 'public-surfaces';

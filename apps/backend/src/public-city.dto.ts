@@ -30,7 +30,36 @@ const PUBLIC_CITY_CACHE_MS = 5 * 60 * 1000;
 /** Stale-while-revalidate: serve expired city page while rebuild runs. */
 const PUBLIC_CITY_STALE_MS = Number(process.env.PUBLIC_CITY_STALE_MS || 30 * 60 * 1000);
 const CITY_SSR_SESSION_LIMIT = 48;
+/** Venues/landings enrichment must not block city HTML for tens of seconds. */
+const CITY_SECONDARY_TIMEOUT_MS = Number(process.env.DAIBILET_CITY_SECONDARY_TIMEOUT_MS || 3000);
 const projectRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
+
+function cityPerfEnabled() {
+  return process.env.DAIBILET_PERF_LOG === '1';
+}
+
+function cityPerfMark(label: string, startedAt: number, extra?: Record<string, unknown>) {
+  if (!cityPerfEnabled()) return;
+  const payload = extra ? ` ${JSON.stringify(extra)}` : '';
+  console.log(`[perf:city-dto] ${label}: ${Date.now() - startedAt}ms${payload}`);
+}
+
+async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T, label: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((resolve) => {
+        timer = setTimeout(() => {
+          if (cityPerfEnabled()) console.log(`[perf:city-dto] ${label}: timeout ${ms}ms → fallback`);
+          resolve(fallback);
+        }, ms);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
 
 export interface PublicDestinationsDto {
   generatedAt: string;
@@ -136,12 +165,18 @@ function scheduleCityPageRebuild(
   if (!forceRefresh && inflight) return inflight;
 
   const build = (async () => {
+    const buildStartedAt = Date.now();
     const requestedSlug = String(citySlugOrId || '').toLowerCase();
     const legacyDb = getLegacyDb();
+    const catalogStartedAt = Date.now();
     const [catalogSessions, venueHubRows] = await Promise.all([
       getPublicCatalogSessions(forceRefresh, { hydrateSlots: false }),
-      publicVenueHubRows(legacyDb, 500),
+      withTimeout(publicVenueHubRows(legacyDb, 500), CITY_SECONDARY_TIMEOUT_MS, [], 'venue-hubs'),
     ]);
+    cityPerfMark('catalog+venues-hub', catalogStartedAt, {
+      sessions: catalogSessions.length,
+      venueHubs: venueHubRows.length,
+    });
     const matchedSessions = lookupDestinationCatalogSessions(
       citySlugOrId,
       requestedSlug,
@@ -155,12 +190,30 @@ function scheduleCityPageRebuild(
         staleUntil: builtAt + PUBLIC_CITY_STALE_MS,
         payload,
       });
+      cityPerfMark('empty', buildStartedAt, { slug: cacheKey });
       return payload;
     }
 
     const destination = publicDestinationFromSession(matchedSessions[0]);
     const sessions = matchedSessions.slice(0, CITY_SSR_SESSION_LIMIT).map((session) => toPublicCatalogListItem(session));
-    const venues = await resolvePublicVenuesForSessions(legacyDb, matchedSessions, venueHubRows, 24);
+    const mapStartedAt = Date.now();
+    const [venues, cityRecord] = await Promise.all([
+      withTimeout(
+        resolvePublicVenuesForSessions(legacyDb, matchedSessions, venueHubRows, 24),
+        CITY_SECONDARY_TIMEOUT_MS,
+        [],
+        'resolve-venues',
+      ),
+      destination.type === 'city' && matchedSessions[0]?.cityId
+        ? withTimeout(
+            prisma.city.findUnique({ where: { id: matchedSessions[0].cityId } }),
+            CITY_SECONDARY_TIMEOUT_MS,
+            null,
+            'city-record',
+          )
+        : Promise.resolve(null),
+    ]);
+    cityPerfMark('venues+city-record', mapStartedAt, { venues: venues.length });
     const venueCount = countDistinctSessionVenues(matchedSessions);
     const prices = matchedSessions
       .map((session: PublicSessionDto) => session.priceFrom)
@@ -176,9 +229,6 @@ function scheduleCityPageRebuild(
     );
     const landings = (buildPublicLandings(matchedSessions) as PublicLandingDto[]).filter((landing) => landing.events > 0);
     const entityLabel = destinationPrepositional(destination);
-    const cityRecord = destination.type === 'city' && matchedSessions[0]?.cityId
-      ? await prisma.city.findUnique({ where: { id: matchedSessions[0].cityId } })
-      : null;
 
     const payload: PublicCityPageDto = {
       generatedAt: new Date().toISOString(),
@@ -213,6 +263,13 @@ function scheduleCityPageRebuild(
       expiresAt: builtAt + PUBLIC_CITY_CACHE_MS,
       staleUntil: builtAt + PUBLIC_CITY_STALE_MS,
       payload,
+    });
+    cityPerfMark('built', buildStartedAt, {
+      slug: cacheKey,
+      matched: matchedSessions.length,
+      sessions: sessions.length,
+      venues: venues.length,
+      landings: landings.length,
     });
     return payload;
   })();

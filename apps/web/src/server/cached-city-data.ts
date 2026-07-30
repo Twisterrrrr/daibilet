@@ -32,7 +32,7 @@ export async function getCachedPublicCityDto(slug: string) {
 
   const cached = unstable_cache(
     () => buildPublicCityDto(key),
-    ['public-city-dto-v1', key],
+    ['public-city-dto-v2-lean', key],
     cityCacheOptions,
   );
   return cached();

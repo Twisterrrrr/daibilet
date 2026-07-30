@@ -22,7 +22,7 @@ import {
   shouldResolveInstitutionFromTitle,
 } from './event-venue-context.js';
 import { formatPublicEventTitle } from './event-title-normalize.ts';
-import { toPublicCatalogListItem } from './public-catalog-list-item.ts';
+import { toPublicCatalogListItem, toPublicHomeCardSession } from './public-catalog-list-item.ts';
 import { enrichBuyerOrdersWithEventLinks } from './buyer-order-event-links.js';
 import {
   blogCitySlugAliases,
@@ -3537,7 +3537,11 @@ export async function buildPublicHome(db) {
     publicCatalogSessions(db),
     publicVenues(db, 36),
   ]);
-  const sessions = catalogSessions.slice(0, 180);
+  // Compact card DTO only - full session blobs made /api/public/home ~1.2MB.
+  const sessions = catalogSessions
+    .filter(sessionHasCoverImage)
+    .slice(0, 180)
+    .map((session) => toPublicHomeCardSession(session));
   const landings = buildPublicLandings(catalogSessions);
 
   const payload = {
@@ -3617,7 +3621,10 @@ export async function buildPublicHomePreview(db) {
   const catalogSessions = await publicCatalogSessions(db);
   const payload = {
     generatedAt: new Date().toISOString(),
-    sessions: catalogSessions.filter(sessionHasCoverImage).slice(0, PUBLIC_HOME_PREVIEW_LIMIT),
+    sessions: catalogSessions
+      .filter(sessionHasCoverImage)
+      .slice(0, PUBLIC_HOME_PREVIEW_LIMIT)
+      .map((session) => toPublicHomeCardSession(session)),
     landings: buildPublicLandings(catalogSessions),
   };
 
