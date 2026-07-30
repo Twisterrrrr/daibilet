@@ -2790,7 +2790,8 @@
 - Deployed branch `codex/phase2-finance-supplier` into `/opt/daibilet-finance/app`.
 - Reused the local finance Postgres container `daibilet-finance-postgres` on `127.0.0.1:5437`.
 - Added systemd service `daibilet-finance-api.service` on `127.0.0.1:4100`.
-- Added nginx HTTP site for future `supplier.daibilet.ru`, `finance.daibilet.ru` and `checkout.daibilet.ru`; SSL is deferred until DNS points to the server.
+- Added nginx site for `supplier.daibilet.ru`, `pay.daibilet.ru` and `finance-api.daibilet.ru`.
+- Issued Let's Encrypt certificate for all three finance domains; certbot renewal is enabled.
 - YooKassa remains disabled in server env until real sandbox credentials are placed explicitly.
 
 ### Verification
@@ -2801,7 +2802,7 @@
 - `pnpm supplier:typecheck` passed on the server.
 - Seeded supplier `phase-g-test-museum`, venue `phase-g-test-museum` and admission product `phase-g-test-museum-entry`.
 - `pnpm supplier:build` passed; supplier shell bundle is available in `apps/supplier/dist`.
-- `GET /api/health` works through direct localhost and nginx host-header smoke.
+- `GET /api/health` works through direct localhost and HTTPS nginx smoke on `supplier.daibilet.ru`, `pay.daibilet.ru` and `finance-api.daibilet.ru`.
 - Admin admission read API returns the test admission product with `canSell=true`.
 - Supplier admission read API returns the same product behind admin basic auth.
 - Listing health returns `review` only because the test product has no image.
