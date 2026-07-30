@@ -1,4 +1,5 @@
 import type { CityHubConfig, FeaturedDirectionConfig } from './city-hub-config.ts';
+import { normalizeCityHubSlug } from './city-hub-config.ts';
 import { landingCategoryHref } from './landing-routes.ts';
 
 export type LandingLike = {
@@ -8,6 +9,51 @@ export type LandingLike = {
   events: number;
   priceFrom?: number | null;
 };
+
+/** Water / boat landings - only surface on hubs with real water inventory (or when count>0 after rematch). */
+const WATER_LANDING_SLUGS = new Set([
+  'river-cruises',
+  'river-party',
+  'bridges-night',
+  'moscow-dinner-boat',
+]);
+
+/** Cities where boat/river landings are expected; landlocked hubs never auto-promote them. */
+const WATER_LANDING_CITY_SLUGS = new Set([
+  'moscow',
+  'moskva',
+  'saint-petersburg',
+  'sankt-peterburg',
+  'kazan',
+  'nizhny-novgorod',
+  'nizhniy-novgorod',
+  'samara',
+  'volgograd',
+  'rostov-na-donu',
+  'astrahan',
+  'yaroslavl',
+  'sochi',
+  'kaliningrad',
+  'vladivostok',
+  'saratov',
+  'tver',
+  'ulyanovsk',
+  'kostroma',
+  'ryazan',
+  'cheboksary',
+  'perm',
+]);
+
+export function isWaterLandingAllowedForCity(
+  landingSlug: string | null | undefined,
+  citySlug?: string | null,
+): boolean {
+  const slug = String(landingSlug || '').trim().toLowerCase();
+  if (!slug || !WATER_LANDING_SLUGS.has(slug)) return true;
+  const city = normalizeCityHubSlug(citySlug);
+  if (!city) return true;
+  return WATER_LANDING_CITY_SLUGS.has(city);
+}
 
 export type ResolvedFeaturedDirection = {
   id: string;
@@ -60,7 +106,11 @@ function resolveDirectionFromConfig(
 ): ResolvedFeaturedDirection | null {
   if (item.landingSlug) {
     const landing = landingBySlug(landings, item.landingSlug);
-    if (landing && Number(landing.events) > 0) {
+    if (
+      landing &&
+      Number(landing.events) > 0 &&
+      isWaterLandingAllowedForCity(landing.slug, citySlug)
+    ) {
       return {
         id: item.id,
         label: item.label,
@@ -124,6 +174,7 @@ export function resolveFeaturedDirections(input: {
 
   const landingFallback = input.landings
     .filter((landing) => Number(landing.events) > 0)
+    .filter((landing) => isWaterLandingAllowedForCity(landing.slug, input.citySlug))
     .filter((landing) => !usedLandingSlugs.has(landing.slug))
     .slice(0, Math.max(0, limit - resolved.length))
     .map((landing) => ({
@@ -181,7 +232,11 @@ export function matchSightAfficheLink(input: {
   for (const hint of SIGHT_LANDING_HINTS) {
     if (!hint.pattern.test(hay)) continue;
     const landing = landingBySlug(input.landings, hint.landingSlug);
-    if (landing && Number(landing.events) > 0) {
+    if (
+      landing &&
+      Number(landing.events) > 0 &&
+      isWaterLandingAllowedForCity(landing.slug, input.citySlug)
+    ) {
       return {
         href: landingCategoryHref(landing.slug, input.citySlug),
         label: hint.label,

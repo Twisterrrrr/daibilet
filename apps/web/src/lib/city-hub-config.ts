@@ -81,6 +81,18 @@ export const CITY_HUB_CONFIG: Record<string, CityHubConfig> = {
     ],
     venuesTopN: 8,
   },
+  // Landlocked: no river-cruises / river-party in curated chips (count>0 still gates fallbacks).
+  ekaterinburg: {
+    highlightSeason: { label: 'Уральское лето', monthsHint: 'июнь-август' },
+    primaryCta: { label: 'События в Екатеринбурге', target: '#affiche' },
+    featuredDirections: [
+      { id: 'standup', label: 'Стендап', landingSlug: 'standup', emphasis: 'primary' },
+      { id: 'concerts', label: 'Концерты', landingSlug: 'concerts-genre' },
+      { id: 'theatre', label: 'Театр', landingSlug: 'unusual-theatres', categoryKey: 'Театр' },
+      { id: 'family', label: 'Семейные', landingSlug: 'family-kids' },
+    ],
+    venuesTopN: 10,
+  },
 };
 
 export function normalizeCityHubSlug(slug: string | null | undefined): string {

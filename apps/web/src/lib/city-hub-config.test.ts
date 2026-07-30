@@ -30,3 +30,15 @@ test('isCityHubSectionHidden respects hideSections', () => {
 test('unknown slug returns null config', () => {
   assert.equal(resolveCityHubConfig('unknown-city-slug-xyz'), null);
 });
+
+test('ekaterinburg hub config has no river featuredDirections', () => {
+  const config = resolveCityHubConfig('ekaterinburg');
+  assert.ok(config?.featuredDirections?.length);
+  assert.equal(
+    config?.featuredDirections?.some((item) =>
+      ['river-cruises', 'river-party'].includes(String(item.landingSlug || '')),
+    ),
+    false,
+  );
+  assert.ok(config?.featuredDirections?.some((item) => item.id === 'standup'));
+});

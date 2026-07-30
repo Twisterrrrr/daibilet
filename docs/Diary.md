@@ -1,3 +1,21 @@
+## 2026-07-30 - City hub: hide empty/false river landings (ЕКБ)
+
+### Наблюдения
+- Хаб Екатеринбурга в «Топ-запросы» показывал «Речные прогулки» (8) и «Вечеринки на теплоходе» (4).
+- City scoping был верный (сессии города), но counts - ложные: keyword `катер` ⊂ `Екатеринбург` + stale `landingSlugs`.
+- Конфиг хаба не курировал ЕКБ → fallback лил все landings с events>0.
+
+### Решения
+- `buildPublicLandings`: live rematch через `matchingLandingSlugs` (не доверять stale landingSlugs при наличии title/tags).
+- `city-hub-config` ekaterinburg без river; `resolveFeaturedDirections` не авто-промоутит water landings для сухопутных городов.
+- Согласовано с tighten `river-cruises` (word-start stem + excludes).
+- Фильтр чипов: только `events > 0` после city-scoped rematch.
+
+### Проблемы
+- Нужен MSK deploy API (`landing-rules` + `public-city-landings`) и web (hub config/directions).
+
+---
+
 ## 2026-07-30 - River landing: ЕКБ concert false match
 
 ### Наблюдения

@@ -56,3 +56,45 @@ test('soft category match: Музеи config vs Музеи и арт API', () =>
 
   assert.equal(rows[0]?.categoryKey, 'Музеи и арт');
 });
+
+test('ekaterinburg config never hardcodes river; false river counts stay hidden', () => {
+  const config = resolveCityHubConfig('ekaterinburg');
+  assert.ok(config);
+  assert.equal(
+    config?.featuredDirections?.some((item) => item.landingSlug === 'river-cruises'),
+    false,
+  );
+
+  const rows = resolveFeaturedDirections({
+    config,
+    landings: [
+      { slug: 'river-cruises', title: 'Речные прогулки', events: 8 },
+      { slug: 'river-party', title: 'Вечеринки на теплоходе', events: 4 },
+      { slug: 'standup', title: 'Стендап', events: 29 },
+      { slug: 'concerts-genre', title: 'Концерты', events: 20 },
+    ],
+    categories: [['Театр', 5]],
+    citySlug: 'ekaterinburg',
+  });
+
+  assert.equal(rows.some((row) => row.slug === 'river-cruises'), false);
+  assert.equal(rows.some((row) => row.slug === 'river-party'), false);
+  assert.ok(rows.some((row) => row.slug === 'standup'));
+  assert.ok(rows.every((row) => !row.slug || row.events > 0));
+});
+
+test('empty city landing counts are never shown as top-queries chips', () => {
+  const rows = resolveFeaturedDirections({
+    config: null,
+    landings: [
+      { slug: 'river-cruises', title: 'Речные прогулки', events: 0 },
+      { slug: 'standup', title: 'Стендап', events: 12 },
+    ],
+    categories: [],
+    citySlug: 'ekaterinburg',
+  });
+
+  assert.equal(rows.some((row) => row.slug === 'river-cruises'), false);
+  assert.equal(rows[0]?.slug, 'standup');
+  assert.equal(rows[0]?.events, 12);
+});
