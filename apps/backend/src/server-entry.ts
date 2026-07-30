@@ -43,6 +43,7 @@ import { createPublicFinanceProjectionRouteHandler } from './public-finance-proj
 import { buildPublicVenueDto, buildPublicVenuesDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
 import { createPublicVenueRouteHandler } from './public-venue-handler.js';
 import { createPublicReadStackWarmer } from './public-warmup.js';
+import { createSupplierAuthRouteHandler, resolveSupplierPortalSearchParams } from './supplier-auth-handler.js';
 import { createSupplierPortalRouteHandler } from './supplier-portal-handler.js';
 import {
   buildSupplierPortalDashboardDto,
@@ -164,7 +165,9 @@ const server = startServer({
         applyEventChangeRequest: applyApprovedEventChangeRequest,
         invalidatePublicCaches,
       }),
+      createSupplierAuthRouteHandler({ db }),
       createSupplierPortalRouteHandler({
+        resolveSearchParams: resolveSupplierPortalSearchParams,
         buildDashboard: buildSupplierPortalDashboardDto,
         buildProfile: buildSupplierPortalProfileDto,
         buildEventsList: buildSupplierPortalEventsListDto,

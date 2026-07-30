@@ -272,7 +272,7 @@ Supplier LC read-first slice added:
 - contracts: `SupplierPortal*Dto`;
 - backend: protected `GET /api/supplier/me|profile|dashboard|events|orders|finance|reviews`;
 - app: `apps/supplier` Vite shell on local port `5179`;
-- security: until real supplier auth exists, `/api/supplier/*` is protected by the same production Basic Auth guard as admin;
+- security: supplier auth uses `SiteUser` + active `SupplierUser` links via `POST /api/supplier/auth/login`, `GET /api/supplier/auth/me`, `POST /api/supplier/auth/logout`; query-param supplier access is dev-only unless explicitly enabled;
 - scope: read-only dashboard, events, internal checkout orders, ledger/payout snapshot, reviews and legal/bank profile.
 
 STUB checkout slice added:

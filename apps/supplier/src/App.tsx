@@ -4,14 +4,17 @@ import { NavLink, Navigate, Route, Routes, useSearchParams } from 'react-router-
 import type {
   SupplierPortalDashboardDto,
   SupplierPortalAdmissionsListDto,
+  SupplierPortalAuthDto,
   SupplierPortalEventsListDto,
   SupplierPortalFinanceDto,
   SupplierPortalIdentityDto,
+  SupplierPortalMeDto,
   SupplierPortalOrdersListDto,
   SupplierPortalProfileDto,
   SupplierPortalReviewsListDto,
+  SupplierPortalSessionSupplierDto,
 } from '@daibilet/contracts/supplier';
-import { supplierGet } from '@/lib/api';
+import { SUPPLIER_ACCESS_TOKEN_STORAGE_KEY, supplierGet, supplierPost } from '@/lib/api';
 
 const STORAGE_KEY = 'daibilet_supplier_key';
 
@@ -52,6 +55,9 @@ type ResourceState<T> = {
 
 export function App() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [accessToken, setAccessToken] = React.useState(() => window.localStorage.getItem(SUPPLIER_ACCESS_TOKEN_STORAGE_KEY) || '');
+  const [authSession, setAuthSession] = React.useState<SupplierPortalMeDto | null>(null);
+  const [authLoading, setAuthLoading] = React.useState(Boolean(accessToken));
   const [supplierKey, setSupplierKeyState] = React.useState(() => {
     const fromUrl = searchParams.get('supplier') || searchParams.get('slug') || searchParams.get('supplierId');
     if (fromUrl) return fromUrl;
@@ -69,6 +75,57 @@ export function App() {
     next.delete('supplierId');
     setSearchParams(next, { replace: true });
   }, [searchParams, setSearchParams]);
+
+  const clearAuthSession = React.useCallback(() => {
+    setAccessToken('');
+    setAuthSession(null);
+    window.localStorage.removeItem(SUPPLIER_ACCESS_TOKEN_STORAGE_KEY);
+  }, []);
+
+  React.useEffect(() => {
+    if (!accessToken) {
+      setAuthLoading(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    setAuthLoading(true);
+    supplierGet<SupplierPortalMeDto>('/api/supplier/auth/me', supplierKey, controller.signal, accessToken)
+      .then((session) => {
+        setAuthSession(session);
+        if (!supplierKey.trim()) setSupplierKey(session.currentSupplier.id);
+      })
+      .catch(() => {
+        clearAuthSession();
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setAuthLoading(false);
+      });
+
+    return () => controller.abort();
+  }, [accessToken, clearAuthSession, setSupplierKey, supplierKey]);
+
+  const handleLogin = React.useCallback((payload: SupplierPortalAuthDto) => {
+    window.localStorage.setItem(SUPPLIER_ACCESS_TOKEN_STORAGE_KEY, payload.accessToken);
+    setAccessToken(payload.accessToken);
+    setAuthSession({
+      user: payload.user,
+      suppliers: payload.suppliers,
+      currentSupplier: payload.currentSupplier,
+    });
+    setSupplierKey(payload.currentSupplier.id);
+  }, [setSupplierKey]);
+
+  const handleLogout = React.useCallback(() => {
+    const token = accessToken;
+    clearAuthSession();
+    setSupplierKey('');
+    if (token) {
+      void supplierPost('/api/supplier/auth/logout', {}, token).catch(() => undefined);
+    }
+  }, [accessToken, clearAuthSession, setSupplierKey]);
+
+  const hasSupplierAccess = Boolean(supplierKey.trim());
 
   return (
     <div className="app-shell">
@@ -108,14 +165,21 @@ export function App() {
             <h1>Личный кабинет поставщика</h1>
           </div>
           <div className="topbar-actions">
-            <span className="session-pill">Сеанс</span>
-            <SupplierSelector value={supplierKey} onChange={setSupplierKey} />
+            <span className="session-pill">{authSession ? authSession.user.email : 'Сеанс'}</span>
+            <SupplierAccessControl
+              session={authSession}
+              value={supplierKey}
+              onChange={setSupplierKey}
+              onLogout={handleLogout}
+            />
           </div>
         </header>
 
         <main className="content">
-          {!supplierKey.trim() ? (
-            <EmptySetup />
+          {authLoading ? (
+            <LoadingState label="Проверяем сеанс..." />
+          ) : !hasSupplierAccess ? (
+            <LoginSetup onLogin={handleLogin} onDevSupplier={setSupplierKey} />
           ) : (
             <Routes>
               <Route index element={<DashboardPage supplierKey={supplierKey} />} />
@@ -162,6 +226,94 @@ function SupplierSelector({ value, onChange }: { value: string; onChange: (value
         <button type="submit">Открыть</button>
       </div>
     </form>
+  );
+}
+
+function SupplierAccessControl({
+  session,
+  value,
+  onChange,
+  onLogout,
+}: {
+  session: SupplierPortalMeDto | null;
+  value: string;
+  onChange: (value: string) => void;
+  onLogout: () => void;
+}) {
+  if (!session) return value.trim() ? <SupplierSelector value={value} onChange={onChange} /> : null;
+
+  return (
+    <div className="supplier-session-control">
+      <label htmlFor="supplier-session-select">Поставщик</label>
+      <div className="session-control-row">
+        <select
+          id="supplier-session-select"
+          value={value || session.currentSupplier.id}
+          onChange={(event) => onChange(event.target.value)}
+        >
+          {session.suppliers.map((supplier) => (
+            <option key={supplier.id} value={supplier.id}>
+              {supplier.title}
+            </option>
+          ))}
+        </select>
+        <button type="button" className="ghost-button" onClick={onLogout}>Выйти</button>
+      </div>
+    </div>
+  );
+}
+
+function LoginSetup({
+  onLogin,
+  onDevSupplier,
+}: {
+  onLogin: (payload: SupplierPortalAuthDto) => void;
+  onDevSupplier: (value: string) => void;
+}) {
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
+
+  const submit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      onLogin(await supplierPost<SupplierPortalAuthDto>('/api/supplier/auth/login', { email, password }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Не удалось войти.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="login-layout">
+      <section className="login-card">
+        <div className="setup-mark">ЛК</div>
+        <h2>Вход поставщика</h2>
+        <p>Используйте email пользователя, которому администратор выдал доступ к поставщику.</p>
+        <form className="login-form" onSubmit={submit}>
+          <label>
+            <span>Email</span>
+            <input value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" type="email" required />
+          </label>
+          <label>
+            <span>Пароль</span>
+            <input value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" type="password" required />
+          </label>
+          {error ? <div className="form-error">{error}</div> : null}
+          <button type="submit" disabled={loading}>{loading ? 'Проверяем...' : 'Войти'}</button>
+        </form>
+      </section>
+
+      <section className="dev-access-card">
+        <h3>Локальная проверка</h3>
+        <p>Для dev smoke можно открыть кабинет по коду поставщика. В production этот путь закрывается backend.</p>
+        <SupplierSelector value="" onChange={onDevSupplier} />
+      </section>
+    </div>
   );
 }
 
@@ -744,16 +896,6 @@ function ErrorState({ title, error, onRetry }: { title: string; error: string; o
       <strong>{title}</strong>
       <span>{error}</span>
       <button type="button" onClick={onRetry}>Повторить</button>
-    </div>
-  );
-}
-
-function EmptySetup() {
-  return (
-    <div className="setup-card">
-      <div className="setup-mark">ЛК</div>
-      <h2>Укажите поставщика</h2>
-      <p>Пока полноценный вход поставщика не включен, кабинет открывает данные по указанному поставщику. В production доступ дополнительно закрывается на уровне сервера.</p>
     </div>
   );
 }

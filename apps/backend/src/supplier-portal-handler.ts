@@ -3,6 +3,7 @@ import type { RouteContext } from './routing.js';
 import type { TypedRouteHandler } from './validated-handler.js';
 
 export interface SupplierPortalRouteHandlerDependencies {
+  resolveSearchParams?: (context: RouteContext) => Promise<URLSearchParams>;
   buildDashboard: (searchParams: URLSearchParams) => Promise<unknown>;
   buildProfile: (searchParams: URLSearchParams) => Promise<unknown>;
   buildEventsList: (searchParams: URLSearchParams) => Promise<unknown>;
@@ -15,42 +16,30 @@ export interface SupplierPortalRouteHandlerDependencies {
 export function createSupplierPortalRouteHandler(deps: SupplierPortalRouteHandlerDependencies): TypedRouteHandler {
   return async (context: RouteContext) => {
     if (context.method !== 'GET') return false;
+    if (!context.pathname.startsWith('/api/supplier/')) return false;
+    if (context.pathname.startsWith('/api/supplier/auth/')) return false;
 
-    if (context.pathname === '/api/supplier/me' || context.pathname === '/api/supplier/profile') {
-      sendJson(context.response, await deps.buildProfile(context.searchParams));
-      return true;
-    }
+    const buildPayload = resolveSupplierPortalBuilder(context.pathname, deps);
+    if (!buildPayload) return false;
 
-    if (context.pathname === '/api/supplier/dashboard') {
-      sendJson(context.response, await deps.buildDashboard(context.searchParams));
-      return true;
-    }
-
-    if (context.pathname === '/api/supplier/events') {
-      sendJson(context.response, await deps.buildEventsList(context.searchParams));
-      return true;
-    }
-
-    if (context.pathname === '/api/supplier/admissions') {
-      sendJson(context.response, await deps.buildAdmissionsList(context.searchParams));
-      return true;
-    }
-
-    if (context.pathname === '/api/supplier/orders') {
-      sendJson(context.response, await deps.buildOrdersList(context.searchParams));
-      return true;
-    }
-
-    if (context.pathname === '/api/supplier/finance') {
-      sendJson(context.response, await deps.buildFinance(context.searchParams));
-      return true;
-    }
-
-    if (context.pathname === '/api/supplier/reviews') {
-      sendJson(context.response, await deps.buildReviewsList(context.searchParams));
-      return true;
-    }
-
-    return false;
+    const searchParams = deps.resolveSearchParams
+      ? await deps.resolveSearchParams(context)
+      : context.searchParams;
+    sendJson(context.response, await buildPayload(searchParams));
+    return true;
   };
+}
+
+function resolveSupplierPortalBuilder(
+  pathname: string,
+  deps: SupplierPortalRouteHandlerDependencies,
+): ((searchParams: URLSearchParams) => Promise<unknown>) | null {
+  if (pathname === '/api/supplier/me' || pathname === '/api/supplier/profile') return deps.buildProfile;
+  if (pathname === '/api/supplier/dashboard') return deps.buildDashboard;
+  if (pathname === '/api/supplier/events') return deps.buildEventsList;
+  if (pathname === '/api/supplier/admissions') return deps.buildAdmissionsList;
+  if (pathname === '/api/supplier/orders') return deps.buildOrdersList;
+  if (pathname === '/api/supplier/finance') return deps.buildFinance;
+  if (pathname === '/api/supplier/reviews') return deps.buildReviewsList;
+  return null;
 }

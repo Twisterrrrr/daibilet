@@ -1,3 +1,31 @@
+## 2026-07-30 — Supplier LC auth bridge
+
+### Наблюдения
+
+- В схеме уже есть правильная связка `SiteUser` → `SupplierUser` → `Supplier`.
+- `apps/supplier` больше не должен в production открывать кабинет только по query-param supplier key.
+- Admin Basic Auth не подходит для поставщика: он вызывает browser basic prompt и смешивает админский доступ с пользовательским ЛК.
+
+### Решения
+
+- Добавлены supplier auth endpoints в typed backend:
+  - `POST /api/supplier/auth/login`;
+  - `GET /api/supplier/auth/me`;
+  - `POST /api/supplier/auth/logout`.
+- Login использует существующий `SiteUser` email/password и разрешает вход только при активной связи `SupplierUser` с неархивным поставщиком.
+- Supplier read endpoints получают `supplierId` из Bearer token; query fallback (`supplier`, `supplierId`, `slug`) остается только для dev/local smoke или при явном `DAIBILET_SUPPLIER_QUERY_FALLBACK=1`.
+- `apps/supplier` получил форму входа, token-aware API client, selector доступных поставщиков и logout.
+
+### Проверки
+
+- `pnpm --config.engine-strict=false --filter @daibilet/contracts typecheck` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/backend typecheck` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/supplier typecheck` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/backend exec tsx --test src/auth.test.ts src/supplier-auth-handler.test.ts src/supplier-portal.dto.test.ts` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/supplier build` — OK.
+
+---
+
 ## 2026-07-30 — Supplier LC shell v1
 
 ### Наблюдения

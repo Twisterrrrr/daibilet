@@ -42,7 +42,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -254,25 +255,29 @@ small {
   box-shadow: inset 0 0 0 1px var(--border);
 }
 
-.supplier-selector {
+.supplier-selector,
+.supplier-session-control {
   display: grid;
   gap: 5px;
   width: min(390px, 42vw);
 }
 
-.supplier-selector label {
+.supplier-selector label,
+.supplier-session-control label {
   color: var(--text-muted);
   font-size: 11px;
   font-weight: 700;
 }
 
-.selector-row {
+.selector-row,
+.session-control-row {
   display: grid;
   grid-template-columns: minmax(160px, 1fr) auto;
   gap: 8px;
 }
 
-.selector-row input {
+.selector-row input,
+.session-control-row select {
   min-width: 0;
   height: 36px;
   border: 1px solid var(--border-strong);
@@ -283,6 +288,12 @@ small {
 }
 
 .selector-row input:focus {
+  border-color: rgba(47, 111, 221, 0.55);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(47, 111, 221, 0.12);
+}
+
+.session-control-row select:focus {
   border-color: rgba(47, 111, 221, 0.55);
   outline: 0;
   box-shadow: 0 0 0 3px rgba(47, 111, 221, 0.12);
@@ -310,6 +321,12 @@ small {
   border-color: var(--accent);
   background: var(--accent);
   color: #ffffff;
+}
+
+.ghost-button:disabled,
+.login-form button:disabled {
+  cursor: default;
+  opacity: 0.62;
 }
 
 .ghost-button:hover,
@@ -678,6 +695,96 @@ td span {
   font-weight: 800;
 }
 
+.login-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 520px) minmax(260px, 360px);
+  gap: 18px;
+  align-items: start;
+}
+
+.login-card,
+.dev-access-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.login-card {
+  display: grid;
+  gap: 12px;
+  padding: 28px;
+}
+
+.login-card h2,
+.login-card p,
+.dev-access-card h3,
+.dev-access-card p {
+  margin: 0;
+}
+
+.login-card p,
+.dev-access-card p {
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+.login-form {
+  display: grid;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.login-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.login-form input {
+  height: 40px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-control);
+  color: var(--text);
+  padding: 9px 11px;
+}
+
+.login-form input:focus {
+  border-color: rgba(47, 111, 221, 0.55);
+  outline: 0;
+  box-shadow: 0 0 0 3px rgba(47, 111, 221, 0.12);
+}
+
+.login-form button {
+  min-height: 40px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-control);
+  background: var(--accent);
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.form-error {
+  border-radius: var(--radius-control);
+  background: var(--danger-soft);
+  color: var(--danger);
+  padding: 9px 11px;
+  font-size: 13px;
+}
+
+.dev-access-card {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+}
+
+.dev-access-card .supplier-selector {
+  width: 100%;
+}
+
 .chip-row {
   display: flex;
   flex-wrap: wrap;
@@ -746,7 +853,8 @@ td span {
     align-items: stretch;
   }
 
-  .supplier-selector {
+  .supplier-selector,
+  .supplier-session-control {
     width: 100%;
   }
 
@@ -766,7 +874,9 @@ td span {
   }
 
   .stats-grid,
-  .selector-row {
+  .selector-row,
+  .session-control-row,
+  .login-layout {
     grid-template-columns: 1fr;
   }
 }

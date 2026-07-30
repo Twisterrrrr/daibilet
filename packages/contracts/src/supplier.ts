@@ -19,6 +19,34 @@ export interface SupplierPortalIdentityDto {
   websiteUrl: string | null;
 }
 
+export interface SupplierPortalUserDto {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+}
+
+export interface SupplierPortalSessionSupplierDto {
+  id: string;
+  slug: string;
+  title: string;
+  status: string;
+  role: string;
+}
+
+export interface SupplierPortalAuthDto {
+  accessToken: string;
+  user: SupplierPortalUserDto;
+  suppliers: SupplierPortalSessionSupplierDto[];
+  currentSupplier: SupplierPortalSessionSupplierDto;
+}
+
+export interface SupplierPortalMeDto {
+  user: SupplierPortalUserDto;
+  suppliers: SupplierPortalSessionSupplierDto[];
+  currentSupplier: SupplierPortalSessionSupplierDto;
+}
+
 export interface SupplierPortalReadinessDto {
   status: Readiness;
   canEnableInternalCheckout: boolean;
