@@ -3,6 +3,8 @@
 import Image, { type ImageProps } from 'next/image';
 import * as React from 'react';
 
+import { shouldBypassNextImageOptimizer } from '@/lib/remote-image-bypass';
+
 export const IMAGE_SIZES = {
   /** Catalog / home event cards in grids */
   eventCard: '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw',
@@ -57,15 +59,15 @@ export function SafeImage({
     return <>{fallback}</>;
   }
 
-  // Local repo static (/images/*) is served by nginx alias on prod — skip /_next/image.
-  const isLocalStatic = normalized.startsWith('/images/');
+  // Local /images/* and external CDNs (teplohod, ticketscloud): browser fetches directly.
+  const bypassOptimizer = shouldBypassNextImageOptimizer(normalized);
 
   return (
     <Image
       src={normalized}
       alt={alt}
       className={className}
-      unoptimized={isLocalStatic || unoptimized}
+      unoptimized={bypassOptimizer || unoptimized}
       onError={(event) => {
         setFailed(true);
         onError?.(event);
