@@ -50,7 +50,8 @@
 | P.3e1 | **Unified purchase projection** — `CheckoutOrder` + `ExternalOrder` в admin orders, supplier LC и buyer account | Критический | ✅ backend read-model + typed account handler + tests |
 | P.3e2 | **Public finance projection APIs** — admission list/detail, venue admission summary, supplier projection, optional m2m auth | Критический | ✅ finance API + contracts + tests |
 | P.3e3 | **Finance projection guardrails** — no public payment/provider/internal ids, CTA only when `canSell && checkoutPath` | Высокий | ✅ regression tests + `.159` smoke runbook |
-| P.3e4 | **Supplier LC UX/UI brief** — Figma handoff for B2B/fintech cabinet, then `apps/supplier` implementation | Высокий | ✅ UX brief; Figma next |
+| P.3e4 | **Supplier LC UX/UI brief** — Figma handoff for B2B/fintech cabinet, then `apps/supplier` implementation | Высокий | ✅ UX brief |
+| P.3e5 | **Supplier LC shell v1** — legacy-v2 inspired light shell: grouped nav, readiness, admissions/events/orders, finance/docs/settings | Высокий | ✅ `apps/supplier` UI shell |
 | P.3f | **YooKassa: venue admission** | Высокий | ⏳ после smoke STUB admission |
 | P.3g | **Supplier write flows** — создание/редактирование admission и событий через заявки | Средний | ⏳ после первых тестовых поставщиков |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
