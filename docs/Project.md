@@ -269,4 +269,14 @@ Supplier LC read-first slice added:
 - security: until real supplier auth exists, `/api/supplier/*` is protected by the same production Basic Auth guard as admin;
 - scope: read-only dashboard, events, internal checkout orders, ledger/payout snapshot, reviews and legal/bank profile.
 
-Next Phase 2 step: STUB checkout for one manual `DAIBILET_MANAGED` event with explicit offers and either a concrete session or open-date policy.
+STUB checkout slice added:
+
+- backend: `POST /api/checkout/stub`;
+- contracts: `@daibilet/contracts/checkout`;
+- creates internal `CheckoutOrder`, `CheckoutItem`, `Payment(provider=MANUAL)`, `FulfillmentItem(provider=STUB)` and supplier ledger rows;
+- guardrail: every non-test environment requires `DAIBILET_STUB_CHECKOUT=1`, imported/source-managed TC/Teplohod events are blocked;
+- supported sale subject now: one manual `DAIBILET_MANAGED` event with explicit manual offers and either a concrete future session or `OPEN_DATE`;
+- venue admission MVP: museum/gallery/attraction admission is represented as an `OPEN_DATE` event linked to venue; later this should become a separate venue-level product model.
+- smoke seed: `pnpm backend:checkout:seed-stub` creates a local manual open-date product; `pnpm backend:checkout:seed-stub -- --order` also creates a STUB internal order.
+
+Next Phase 2 step: wire a small public checkout UI for platform events, then YooKassa sandbox and buyer account unification.

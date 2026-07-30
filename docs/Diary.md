@@ -2586,3 +2586,30 @@
 - STUB checkout on one manual `DAIBILET_MANAGED` event with explicit ticket offers and concrete session/open-date policy.
 
 ---
+
+## 2026-07-22 - Phase 2: STUB checkout backend sandbox
+
+### Decisions
+
+- Added `@daibilet/contracts/checkout` for STUB checkout request/result/error DTOs.
+- Added public backend route `POST /api/checkout/stub`.
+- Creation in every non-test environment is explicitly gated by `DAIBILET_STUB_CHECKOUT=1`.
+- STUB checkout writes the internal contour only: `CheckoutOrder`, `CheckoutItem`, `Payment(provider=MANUAL)`, `FulfillmentItem(provider=STUB)` and supplier ledger entries.
+- No real payment, no YooKassa call and no fiscal receipt are created in this mode.
+- Added `pnpm backend:checkout:seed-stub` for a local manual open-date smoke product; `-- --order` creates a direct STUB checkout order.
+
+### Guardrails
+
+- Event must be `purchaseFlow=PLATFORM`, `managementMode=DAIBILET_MANAGED`, `READY` or `PUBLISHED`.
+- Supplier must be active and attached.
+- Offer must be active, `sourceCode=MANUAL` and price must be at least 100 RUB.
+- `SINGLE` / `RECURRING` events require a concrete future active session.
+- `OPEN_DATE` events can be sold without a session.
+- Imported/source-managed TC/Teplohod events are blocked.
+
+### Venue admission
+
+- MVP path: museum/gallery/attraction admission can use a manual `OPEN_DATE` event linked to venue and appears as `VENUE_ADMISSION` in checkout DTO.
+- Later schema path: separate venue-level admission products, because legacy SPBBOATS allowed museums and art galleries to sell admission without an event binding.
+
+---

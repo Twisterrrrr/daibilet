@@ -31,6 +31,7 @@
     "backend:next:parity": "pnpm --filter @daibilet/backend next:parity",
     "backend:admin-events:parity": "pnpm --filter @daibilet/backend admin-events:parity",
     "backend:admin-orders:parity": "pnpm --filter @daibilet/backend admin-orders:parity",
+    "backend:checkout:seed-stub": "pnpm --filter @daibilet/backend checkout:seed-stub",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:validate": "pnpm --filter @daibilet/db db:validate",

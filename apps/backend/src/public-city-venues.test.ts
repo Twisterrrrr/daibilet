@@ -31,6 +31,7 @@ test('publicVenuesForSessionsFromHub matches hub rows outside slug-only sessions
     24,
   );
   assert.equal(byId.length, 1);
+  assert.ok(byId[0]);
   assert.equal(byId[0].id, 'venue_5ea93efb186c38b2a9d379bd');
 
   const bySlug = publicVenuesForSessionsFromHub(
