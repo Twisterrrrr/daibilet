@@ -16,8 +16,11 @@
 | INC.504.3 | Пересмотр `daibilet-web` MemoryMax / heap (1G limit vs ~1.1G RSS под catalog SWR) | Средний | ⏳ |
 | INC.504.4 | SWR catalog rebuild: non-blocking / async (не блокировать event loop 49-219с) | Средний | ⏳ |
 | INC.504.5 | Dual catalog SWR cache (`dto.js` + `public-catalog.dto.ts`) - merge/unify в F5.3b | Средний | ⏳ |
+| INC.504.6 | nginx proxy_cache SWR: `background_update` + TTL 30m (browser clear ≠ cold Next) | Критический | ✅ |
+| INC.504.7 | City hub ISR: `unstable_cache` + `generateStaticParams` (было no-store / 20-30с) | Критический | ✅ |
+| INC.504.8 | Cron/warm hub pages (`/`, `/events`, top cities) каждые N мин | Высокий | 🔄 |
 
-См. Diary 2026-07-30 «Prod 504: daibilet-web hang».
+См. Diary 2026-07-30 «Prod 504: daibilet-web hang» и «Cold TTFB после browser cache clear».
 
 ---
 

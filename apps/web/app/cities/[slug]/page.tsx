@@ -20,17 +20,32 @@ import { evaluateCityIndexability, robotsForIndexability } from '@/lib/hub-index
 import { mergeBlogCards } from '@/lib/blog-utils';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { buildCityPageJsonLd } from '@/lib/structured-data';
-import { buildPublicArticlesListDto, buildPublicCityDto } from '@daibilet/backend/public-read';
+import {
+  getCachedCityHubArticles,
+  getCachedPublicCityDto,
+  listTopCitySlugsForSsg,
+} from '@/server/cached-city-data';
 
 export const revalidate = 300;
+/** Allow on-demand ISR for slugs not prebuilt. */
+export const dynamicParams = true;
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
+/**
+ * Prebuild top-N city hubs when CITY_SSG_TOP_N>0. Default 0 (MSK memory-safe).
+ * Rest fill via ISR on first hit (unstable_cache + dynamicParams).
+ */
+export async function generateStaticParams() {
+  const slugs = await listTopCitySlugsForSsg();
+  return slugs.map((slug) => ({ slug }));
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const payload = await buildPublicCityDto(decodeURIComponent(slug));
+  const payload = await getCachedPublicCityDto(decodeURIComponent(slug));
   if (!payload?.city) return { title: pageTitle('Город не найден') };
 
   const city = payload.city;
@@ -42,8 +57,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     isIndexable: city.isIndexable,
   });
 
-  // Живая дата в title (MSK) для Москвы/СПб; Казань/Екб - шаблон с годом.
-  // admin seoTitle без даты не перекрывает паттерн хаба.
+  // Date baked at cache build time (unstable_cache 300s) - do not call connection()/Date live.
   const hubTitle = buildCityHubSeoTitleCore(city.name);
   const hubTitleFull = buildCityHubSeoTitle(city.name);
   const description = city.seoDescription || buildCityHubSeoDescription(city.name);
@@ -75,18 +89,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 /**
  * Do not await searchParams (?hub=) - forces dynamic no-store on every city hub.
- * Template comes from CITY_HUB_EDITORIAL_SLUGS allowlist; in-memory DTO cache is 5m.
+ * Template comes from CITY_HUB_EDITORIAL_SLUGS allowlist; Next Data Cache via getCached*.
  */
 export default async function CityPage({ params }: PageProps) {
   const { slug } = await params;
   const decodedSlug = decodeURIComponent(slug);
   const [payload, articlesPayload] = await Promise.all([
-    buildPublicCityDto(decodedSlug),
-    buildPublicArticlesListDto({
-      citySlug: decodedSlug,
-      includeBroad: true,
-      limit: 40,
-    }).catch(() => null),
+    getCachedPublicCityDto(decodedSlug),
+    getCachedCityHubArticles(decodedSlug).catch(() => null),
   ]);
   if (!payload?.city) notFound();
 

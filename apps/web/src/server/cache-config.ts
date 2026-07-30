@@ -13,6 +13,9 @@ export const CATALOG_PAGE_CACHE_TAG = 'catalog-page';
 /** `unstable_cache` tag for /events/[slug] DTO + aggregate rating. */
 export const EVENT_PAGE_CACHE_TAG = 'event-page';
 
+/** `unstable_cache` tag for /cities/[slug] DTO + hub articles. */
+export const CITY_PAGE_CACHE_TAG = 'city-page';
+
 /** Shared Cache-Control for CDN/nginx and browser. */
 export const PUBLIC_CACHE_CONTROL = 'public, s-maxage=300, stale-while-revalidate=600';
 

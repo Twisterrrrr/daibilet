@@ -1,3 +1,20 @@
+## 2026-07-30 - Cold TTFB ~15-30с после browser cache clear
+
+### Наблюдения
+- Warm `/` / `/events`: nginx `X-Cache-Status: HIT`, TTFB ~0.01-0.17с. Browser clear сам по себе не должен бить cold Next.
+- Причина 15с: nginx `proxy_cache_valid 5m` без `proxy_cache_background_update` → после TTL первый запрос ждал Next; при miss ISR/home тянул cold catalog (~20с DTO + dual rebuild).
+- `/cities/sankt-peterburg`: всегда `Cache-Control: private, no-store` (нет `generateStaticParams` / `unstable_cache`), cold TTFB 23-32с даже повторно.
+- Dual SWR: `Public catalog DTO cache` + `Public catalog cache` (dto.js) параллельно 12-90с.
+
+### Решения
+- nginx MSK hotfix: `proxy_cache_valid 200 30m`, `proxy_cache_background_update on`, `inactive=120m`, `lock_timeout 5s` (не `expired` - токена нет в nginx).
+- City hub: `cached-city-data.ts` (`unstable_cache` + tag `city-page`), `generateStaticParams`/`dynamicParams`, SWR в `public-city.dto.ts`.
+- `scripts/warm-hub-pages.mjs` + hook в `deploy-prod-next.sh`; cron warm на MSK.
+
+### Проблемы
+- Dual catalog merge (INC.504.5) ещё не сделан - первый cold после purge/restart всё ещё тяжёлый.
+- City first ISR miss без warm всё ещё может ждать catalog rebuild.
+
 ## 2026-07-30 - UX: home venues city filter + catalog city chip
 
 ### Наблюдения

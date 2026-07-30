@@ -272,7 +272,7 @@ if [[ -n "$REVALIDATE_SECRET" ]]; then
   curl -fsS -X POST "http://127.0.0.1:${WEB_PORT}/api/internal/revalidate" \
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer ${REVALIDATE_SECRET}" \
-    -d '{"tags":["home-page","catalog-page","event-page"],"paths":["/","/events","/cities/sankt-peterburg","/cities/moscow","/rechnye-progulki","/avtobusnye-ekskursii","/api/public/stats"]}' \
+    -d '{"tags":["home-page","catalog-page","event-page","city-page"],"paths":["/","/events","/cities/sankt-peterburg","/cities/moscow","/rechnye-progulki","/avtobusnye-ekskursii","/api/public/stats"]}' \
     && echo "Post-deploy revalidate OK" \
     || echo "Warning: post-deploy revalidate failed"
 
@@ -283,6 +283,15 @@ if [[ -n "$REVALIDATE_SECRET" ]]; then
       node "$APP_DIR/scripts/warm-top-event-pages.mjs" \
       && echo "Top event warm OK" \
       || echo "Warning: top event warm failed"
+  fi
+
+  # Hub HTML warm: /, /events, top cities (nginx + Next Full Route Cache).
+  if [[ "${SKIP_HUB_WARM:-0}" != "1" ]]; then
+    echo "Warming hub pages..."
+    DAIBILET_WEB_PORT="$WEB_PORT" \
+      node "$APP_DIR/scripts/warm-hub-pages.mjs" \
+      && echo "Hub warm OK" \
+      || echo "Warning: hub warm failed"
   fi
 
   # IndexNow: curated TOP paths only (not full catalog). Requires INDEXNOW_KEY in web env.

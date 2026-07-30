@@ -2,9 +2,10 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { NextResponse } from 'next/server';
 
 import { notifyIndexNowForPaths } from '@/lib/indexnow';
-import { BLOG_PAGE_CACHE_TAG, HOME_PAGE_CACHE_TAG } from '@/server/cache-config';
+import { BLOG_PAGE_CACHE_TAG, CITY_PAGE_CACHE_TAG, HOME_PAGE_CACHE_TAG } from '@/server/cache-config';
 import {
   clearPublicArticlesDtoCache,
+  clearPublicCityDtoCache,
   clearPublicEventDtoCache,
 } from '@daibilet/backend/public-read';
 
@@ -47,6 +48,11 @@ export async function POST(request: Request) {
   }
   try {
     clearPublicEventDtoCache();
+  } catch {
+    /* ignore if module unavailable in this runtime */
+  }
+  try {
+    clearPublicCityDtoCache();
   } catch {
     /* ignore if module unavailable in this runtime */
   }
