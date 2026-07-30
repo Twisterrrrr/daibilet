@@ -496,7 +496,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | P.2f | Реализация wireframe v1 в `apps/web` (`CityPageView`) | Высокий | ✅ `d877813` prod |
 | P.2f1 | City hub chips: счётчики = выдача (не full-city); лёгкие чипы без «Популярных тегов» | Высокий | ✅ `721bf10` prod |
 | P.2g | **Wireframe city hub v2** — IA фазы 2 (city-specific направления, конфиг) | Высокий | ✅ [city-hub-wireframe-v2.md](./city-hub-wireframe-v2.md) |
-| P.2h | Реализация wireframe v2 в `apps/web` (плитки направлений, top-N venues, sights CTA) | Высокий | ⏳ после P.2g / внахлёст с P.2f |
+| P.2h | Реализация wireframe v2 в `apps/web` (плитки направлений, top-N venues, sights CTA) | Высокий | 🔄 пилот СПб/Мск/Сочи/Казань 2026-07-30 |
 | P.2i | **Editorial hub template** (Lovable moodboard) — параллельный visual `?hub=editorial` | Средний | ✅ `6efe0d8` prod |
 | P.2j | City hub affiche: убрать «Популярные теги»; компактные date/category chips | Высокий | ✅ `5aa84d3` prod |
 | P.2k | City hub affiche UX: скрыть подзаголовок счётчика; date+category в одну строку (desktop); убрать «Стоит внимания» (дубль афиши) | Высокий | ✅ `2808ed5` prod proof murmansk |
@@ -805,7 +805,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 1.3.5 | Hero, categories, venues, events grid | — | ✅ |
 | 1.3.5a | City hub: venues=0 при events>0 (hub top-500 miss) | Критический | ✅ 2026-07-19 |
 | 1.3.6 | `generateMetadata` | — | ✅ |
-| 1.3.7 | Развивать city hubs `/cities/{slug}` (контент, перелинковка, landings) | Высокий | ⏳ |
+| 1.3.7 | Развивать city hubs `/cities/{slug}` (контент, перелинковка, landings) | Высокий | 🔄 пилот 4 города prod @`4bb9b38` (MSK); rollout 65 ⏳ |
 | 1.3.8 | City-prefix в path venues/events (`/{city}/venues/...`) | — | 🚫 отклонено 2026-07-19 (flat URL) |
 
 ### 1.4 Прочие public routes

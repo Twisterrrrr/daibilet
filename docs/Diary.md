@@ -1,3 +1,36 @@
+## 2026-07-30 - City hub 1.3.7 pilot deploy (MSK prod)
+
+### Наблюдения
+- Commit `4bb9b38` в `feat/next-monorepo`: `city-hub-config`, `city-hub-directions`, `CityPageView`, unit-тесты.
+- MSK `git fetch` github.com = `Could not resolve host` - код и `.next` доставлены offline (scp source + tarball со СПб build host).
+- СПб `213.171.7.16`: `pnpm web:build` @`4bb9b38`, tarball 93M → МСК `201.24.125.184`.
+- Prod smoke (external curl): `/` + `/cities/{sankt-peterburg,moscow,sochi,kazan}` = 200; HTML SPB hub содержит chip «Белые ночи (май-июль)», CTA «Круизы и прогулки», `#directions`.
+- Journal: image upstream timeouts, IndexNow timeout к yandex/api.indexnow (исходящий DNS), Prisma digest на shutdown старого web - не блокер после restart.
+
+### Решения
+- МСК deploy без `deploy-prod-next.sh` full pull/build: stop web → extract `.next` → restart api/web → nginx cache purge → revalidate paths pilot hubs.
+- `BUILD_ID=SaMk82QKT-soddKQ5jcua` на МСК.
+
+### Проблемы
+- `deploy-prod-next.sh` на МСК пока требует рабочий github DNS или offline shim - follow-up.
+- Rollout `city-hub-config` на остальные 65 standaloneCities - следующий шаг.
+
+## 2026-07-30 - City hub 1.3.7 / P.2h wireframe v2 (пилот)
+
+### Наблюдения
+- Wireframe v2 согласован в docs, но в коде все 65 хабов рендерили одинаковый fallback направлений (топ landings API без per-city курации).
+- Sights не имели CTA на афишу/landing без явной привязки - ок по v2, но не было и позитивного матча при живых landings.
+
+### Решения
+- `apps/web/src/lib/city-hub-config.ts` - per-city `featuredDirections`, `highlightSeason`, `primaryCta`, `venuesTopN`, `hideSections`.
+- `city-hub-directions.ts` - `resolveFeaturedDirections` (конфиг ⋈ API, count>0), `matchSightAfficheLink` (CTA только при live landing/category).
+- `CityPageView`: hero chip сезона + primary CTA из конфига; `#directions` через curated tiles; sights CTA; venues top-N.
+- Пилотные конфиги: `saint-petersburg`/`sankt-peterburg`, `moscow`, `sochi`, `kazan`. Остальные города - прежний API fallback.
+- Unit: `city-hub-config.test.ts` (4).
+
+### Проблемы
+- (закрыто deploy-записью выше) Web deploy 1.3.7 на MSK @`4bb9b38`.
+
 ## 2026-07-30 - F5.3a catalog grouping + city destination TS
 
 ### Наблюдения
