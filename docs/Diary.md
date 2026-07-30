@@ -109,7 +109,7 @@
 - Тесты: empty-on-miss + ekb countryside vs standup.
 
 ### Проблемы
-- Нужен web deploy (SPB build → MSK), иначе prod ещё со старым fallback.
+- Web deploy: SPB build `nR2dEtI6h8GwICxzMBmtX` → MSK (relay via local). На MSK были параллельные перезаписи `.next` - финально locked redeploy @16:27 UTC.
 
 ---
 
