@@ -21,6 +21,8 @@ import { inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
 import { buildCityHubSeoPhrase } from '@/lib/city-hub-seo';
 import { isCityHubSectionHidden, resolveCityHubConfig } from '@/lib/city-hub-config';
 import { matchSightAfficheLink, resolveFeaturedDirections } from '@/lib/city-hub-directions';
+import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
+import { resolveCityImage } from '@/lib/city-images';
 import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
 import { isOpenDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import {
@@ -522,7 +524,7 @@ function CityHeroDefault({
   );
 }
 
-/** Нейтральный strip как у /events, /blog, /podborki - без full-bleed фото. */
+/** Option A: full-bleed night skyline when city PNG exists; иначе нейтральный strip. */
 function CityHeroStrip({
   city,
   stats,
@@ -538,6 +540,7 @@ function CityHeroStrip({
   hubConfig?: ReturnType<typeof resolveCityHubConfig>;
   editorial?: boolean;
 }) {
+  const [heroImageFailed, setHeroImageFailed] = React.useState(false);
   const cityIn = cityInPrepositional(city);
   const brief =
     guide?.brief ||
@@ -546,6 +549,83 @@ function CityHeroStrip({
   const primaryTarget = primaryCta?.target || '#affiche';
   const primaryLabel = primaryCta?.label || `События ${cityIn}`;
   const seasonChip = hubConfig?.highlightSeason;
+  const heroImage = resolveCityImage({
+    slug: city.slug,
+    sourceSlug: city.sourceSlug,
+    name: city.name,
+    heroImageUrl: city.heroImageUrl,
+  });
+
+  React.useEffect(() => {
+    setHeroImageFailed(false);
+  }, [heroImage]);
+
+  const showPhoto = Boolean(heroImage && !heroImageFailed);
+  const heroFocus = resolveCityImageObjectPosition({
+    slug: city.slug,
+    sourceSlug: city.sourceSlug,
+    name: city.name,
+  });
+
+  const titleClass = showPhoto
+    ? editorial
+      ? 'font-serif text-4xl font-semibold tracking-tight text-white sm:text-5xl'
+      : 'font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl'
+    : editorial
+      ? 'font-serif text-4xl font-semibold tracking-tight text-zinc-950 sm:text-5xl'
+      : 'font-display text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl';
+
+  const briefClass = showPhoto
+    ? 'mt-3 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg'
+    : editorial
+      ? 'mt-3 max-w-2xl text-base leading-relaxed text-zinc-600 sm:text-lg'
+      : 'mt-3 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg';
+
+  const seasonChipClass = showPhoto
+    ? 'inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/25'
+    : editorial
+      ? 'inline-flex items-center rounded-full bg-zinc-200 px-3 py-1 text-xs font-semibold text-zinc-800'
+      : 'inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-800';
+
+  const statsClass = showPhoto
+    ? 'mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/70'
+    : editorial
+      ? 'mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500'
+      : 'mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500';
+
+  const statsStrongClass = showPhoto
+    ? 'font-semibold text-white'
+    : editorial
+      ? 'font-semibold text-zinc-800'
+      : 'font-semibold text-slate-700';
+
+  const statsDotClass = showPhoto ? 'text-white/35' : editorial ? 'text-zinc-300' : 'text-slate-300';
+
+  const primaryCtaClass = showPhoto
+    ? editorial
+      ? 'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-medium text-zinc-950 ring-1 ring-white transition hover:bg-white/90'
+      : 'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-slate-900 hover:bg-white/90'
+    : editorial
+      ? 'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-zinc-950 px-5 text-sm font-medium text-white ring-1 ring-zinc-950 transition hover:bg-zinc-800'
+      : 'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white hover:bg-primary-700';
+
+  const secondaryCtaClass = showPhoto
+    ? editorial
+      ? 'inline-flex min-h-11 items-center justify-center rounded-full border border-white/35 bg-white/10 px-5 text-sm font-medium text-white backdrop-blur-sm hover:bg-white/15'
+      : 'inline-flex min-h-11 items-center justify-center rounded-lg border border-white/35 bg-white/10 px-5 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/15'
+    : editorial
+      ? 'inline-flex min-h-11 items-center justify-center rounded-full border border-zinc-300 bg-white px-5 text-sm font-medium text-zinc-700 hover:border-zinc-400'
+      : 'inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 hover:border-slate-300';
+
+  const sectionClass = showPhoto
+    ? 'relative min-h-[280px] overflow-hidden border-b border-slate-950 sm:min-h-[320px] md:min-h-[360px]'
+    : editorial
+      ? 'border-b border-zinc-200 bg-zinc-50'
+      : 'border-b border-slate-200 bg-slate-50';
+
+  const contentClass = showPhoto
+    ? 'container-page relative z-[1] flex min-h-[280px] flex-col justify-end py-8 sm:min-h-[320px] sm:py-10 md:min-h-[360px]'
+    : 'container-page py-8 sm:py-10';
 
   return (
     <div id="top">
@@ -556,105 +636,76 @@ function CityHeroStrip({
           { label: city.name },
         ]}
       />
-      <section
-        className={
-          editorial
-            ? 'border-b border-zinc-200 bg-zinc-50'
-            : 'border-b border-slate-200 bg-slate-50'
-        }
-      >
-        <div className="container-page py-8 sm:py-10">
-          <h1
-            className={
-              editorial
-                ? 'font-serif text-4xl font-semibold tracking-tight text-zinc-950 sm:text-5xl'
-                : 'font-display text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl'
-            }
-          >
-            {city.name}
-          </h1>
-          <p
-            className={
-              editorial
-                ? 'mt-3 max-w-2xl text-base leading-relaxed text-zinc-600 sm:text-lg'
-                : 'mt-3 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg'
-            }
-          >
-            {brief}
-          </p>
-          {seasonChip ? (
-            <p className={`mt-3 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-              <span
-                className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${
-                  editorial ? 'bg-zinc-200 text-zinc-800' : 'bg-primary-50 text-primary-800'
-                }`}
-              >
-                {seasonChip.label}
-                {seasonChip.monthsHint ? ` (${seasonChip.monthsHint})` : ''}
-              </span>
-            </p>
-          ) : null}
-          <p
-            className={`mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm ${
-              editorial ? 'text-zinc-500' : 'text-slate-500'
-            }`}
-          >
-            <span className={`font-semibold ${editorial ? 'text-zinc-800' : 'text-slate-700'}`}>
-              {pluralEvents(stats.events)}
-            </span>
-            <span aria-hidden="true" className={editorial ? 'text-zinc-300' : 'text-slate-300'}>
-              ·
-            </span>
-            <span className={`font-semibold ${editorial ? 'text-zinc-800' : 'text-slate-700'}`}>
-              {pluralVenues(stats.venues)}
-            </span>
-          </p>
-          <div className="mt-5 flex flex-wrap gap-3">
-            {primaryTarget.startsWith('#') ? (
-              <a
-                href={primaryTarget}
-                onClick={(event) => {
-                  event.preventDefault();
-                  scrollToSection(primaryTarget.replace(/^#/, ''));
-                }}
-                className={
-                  editorial
-                    ? 'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-zinc-950 px-5 text-sm font-medium text-white ring-1 ring-zinc-950 transition hover:bg-zinc-800'
-                    : 'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white hover:bg-primary-700'
-                }
-              >
-                <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
-                <span>{primaryLabel}</span>
-              </a>
-            ) : (
-              <Link
-                href={primaryTarget}
-                className={
-                  editorial
-                    ? 'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-zinc-950 px-5 text-sm font-medium text-white ring-1 ring-zinc-950 transition hover:bg-zinc-800'
-                    : 'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white hover:bg-primary-700'
-                }
-              >
-                <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
-                <span>{primaryLabel}</span>
-              </Link>
-            )}
-            {hasTravel ? (
-              <a
-                href="#travel"
-                onClick={(event) => {
-                  event.preventDefault();
-                  scrollToSection('travel');
-                }}
-                className={
-                  editorial
-                    ? 'inline-flex min-h-11 items-center justify-center rounded-full border border-zinc-300 bg-white px-5 text-sm font-medium text-zinc-700 hover:border-zinc-400'
-                    : 'inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 hover:border-slate-300'
-                }
-              >
-                Как добраться
-              </a>
+      <section className={sectionClass}>
+        {showPhoto ? (
+          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+            <SafeImage
+              src={heroImage}
+              alt=""
+              fill
+              priority
+              sizes={IMAGE_SIZES.landingBanner}
+              style={{ objectPosition: heroFocus }}
+              onError={() => setHeroImageFailed(true)}
+              className="object-cover"
+            />
+            {/* Scrim слева под текст: slate, без purple/sky tint. */}
+            <div className="absolute inset-0 bg-slate-950/20" />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 from-[6%] via-slate-950/55 via-[42%] to-slate-950/15 to-[88%]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-transparent to-slate-950/10" />
+          </div>
+        ) : null}
+        <div className={contentClass}>
+          <div className="max-w-2xl">
+            <h1 className={titleClass}>{city.name}</h1>
+            <p className={briefClass}>{brief}</p>
+            {seasonChip ? (
+              <p className={`mt-3 text-sm ${showPhoto ? 'text-white/70' : editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                <span className={seasonChipClass}>
+                  {seasonChip.label}
+                  {seasonChip.monthsHint ? ` (${seasonChip.monthsHint})` : ''}
+                </span>
+              </p>
             ) : null}
+            <p className={statsClass}>
+              <span className={statsStrongClass}>{pluralEvents(stats.events)}</span>
+              <span aria-hidden="true" className={statsDotClass}>
+                ·
+              </span>
+              <span className={statsStrongClass}>{pluralVenues(stats.venues)}</span>
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              {primaryTarget.startsWith('#') ? (
+                <a
+                  href={primaryTarget}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    scrollToSection(primaryTarget.replace(/^#/, ''));
+                  }}
+                  className={primaryCtaClass}
+                >
+                  <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>{primaryLabel}</span>
+                </a>
+              ) : (
+                <Link href={primaryTarget} className={primaryCtaClass}>
+                  <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
+                  <span>{primaryLabel}</span>
+                </Link>
+              )}
+              {hasTravel ? (
+                <a
+                  href="#travel"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    scrollToSection('travel');
+                  }}
+                  className={secondaryCtaClass}
+                >
+                  Как добраться
+                </a>
+              ) : null}
+            </div>
           </div>
         </div>
       </section>
