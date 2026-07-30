@@ -15,6 +15,7 @@ import { evaluateVenueIndexability, robotsForIndexability } from '@/lib/hub-inde
 import { venueHref } from '@/lib/routes';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { getCachedVenuesCatalog } from '@/server/cached-public-surfaces';
+import { fetchVenueAdmissionProducts } from '@/server/finance-projection-client';
 import { buildVenuePageJsonLd } from '@/lib/structured-data';
 import { resolveVenueSeoTitle } from '@/lib/venue-seo';
 
@@ -120,16 +121,23 @@ export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
 }
 
 export async function VenueDetailPage({ slug }: { slug: string }) {
-  const payload = await buildPublicVenueDto(decodeURIComponent(slug));
+  const decodedSlug = decodeURIComponent(slug);
+  const payload = await buildPublicVenueDto(decodedSlug);
   if (!payload?.venue) notFound();
 
+  const venueSlugForFinance = String(payload.venue.slug || decodedSlug).trim();
+  const admission = await fetchVenueAdmissionProducts(venueSlugForFinance);
   const jsonLdBlocks = buildVenuePageJsonLd(payload);
 
   return (
     <>
       <JsonLdScripts blocks={jsonLdBlocks} idPrefix="venue-jsonld" />
       <SiteLayout>
-        <VenuePageView slug={decodeURIComponent(slug)} initialPayload={payload} />
+        <VenuePageView
+          slug={decodedSlug}
+          initialPayload={payload}
+          admissionProducts={admission.items}
+        />
       </SiteLayout>
     </>
   );

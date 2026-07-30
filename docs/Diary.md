@@ -1,3 +1,23 @@
+## 2026-07-30 - CF.P1b+P2 catalog admission UI + finance projection client
+
+### Наблюдения
+- Finance `.159` public APIs уже live; с MSK/локали для IP нужен `Host: finance-api.daibilet.ru`.
+- На catalog `feat/next-monorepo`: HTTP client `apps/web/src/server/finance-projection-client.ts` (AbortSignal 3s, fail-soft), mapper/tests, `AdmissionProductCard`, `VenueAdmissionBlock`, `CityAdmissionBlock`.
+- Venue SSR join по `Venue.slug` → `/api/public/venues/:slug/admission-products`. City hub: `citySlug` + `CITY_ADMISSION_MIN_PUBLISHED` (default 1).
+- CTA только при `canSell=true` → `FINANCE_CHECKOUT_BASE_URL` + `checkoutPath`. TC/TEP widgets / event slots не трогали; admission не в `/events` feed (P2c later).
+- Seed finance: product `phase-g-test-museum-entry`, venue `phase-g-test-museum`, city `moskva`.
+
+### Решения
+- Env: `FINANCE_API_BASE_URL`, optional `FINANCE_API_HOST`, `FINANCE_CHECKOUT_BASE_URL`, optional projection token; deploy-prod-next.sh дописывает defaults.
+- Wide YooKassa по-прежнему off; STUB на finance.
+
+### Проблемы
+- Catalog venue со slug `phase-g-test-museum` может отсутствовать - без slug bridge venue page 404, city hub `/cities/moskva` может показать блок если MSK→.159:80 доступен.
+- DNS `checkout.daibilet.ru` / TLS ещё owner; без DNS browser CTA на default host может не резолвиться.
+- Если MSK не достучится до `.159` - UI пустой (fail-soft), код всё равно на месте.
+
+---
+
 ## 2026-07-30 - Deploy CF.P0+P1 на finance `.159` + STUB smoke
 
 ### Наблюдения

@@ -74,14 +74,14 @@
 |---|--------|-----------|--------|-------|
 | CF.0 | Docs lock: boundary + projection matrix + don'ts | Критический | ✅ 2026-07-30 | Cursor |
 | CF.P0 | **PurchaseProjection**: admin (External+Checkout), buyer «Мои покупки», supplier CheckoutItems | Критический | ✅ finance `.159` @ `00aa9dcf` / smoke 2026-07-30 | Codex |
-| CF.P0b | Gate: no wide internal sales CTA на `.184` until catalog client+UI | Критический | 🔒 gate holds (finance smoke OK; catalog CTA still off) | both |
+| CF.P0b | Gate: no wide internal sales CTA на `.184` until catalog client+UI | Критический | 🔓 client+UI shipped; wide YooKassa still off; CTA only `canSell` | both |
 | CF.P1 | Finance public read APIs: supplier / venue summary / AdmissionProduct list+detail (`canSell`) | Высокий | ✅ `.159` @ `0c1e464` smoke 200 | Codex |
-| CF.P1b | Catalog read client → finance (`FINANCE_API_BASE_URL` + cache) | Высокий | ⏳ **next Cursor** | Cursor |
+| CF.P1b | Catalog read client → finance (`FINANCE_API_BASE_URL` + Host + 3s timeout) | Высокий | ✅ `finance-projection-client.ts` | Cursor |
 | CF.P1c | Service auth catalog↔finance (m2m) - token code ready, env unset | Высокий | ⏳ optional | owner+Cursor |
-| CF.P2 | Venue page блок «Входные билеты» (test museum) | Высокий | ⏳ | Cursor |
-| CF.P2b | City hub museums/admission при published | Высокий | ⏳ | Cursor |
-| CF.P2c | `/events`: отдельный card type admission (не slotted event) | Средний | ⏳ | Cursor |
-| CF.P2d | CTA → checkout.daibilet.ru; TC/TEP widgets regression | Высокий | ⏳ | Cursor |
+| CF.P2 | Venue page блок «Входные билеты» (test museum) | Высокий | ✅ UI; slug bridge `phase-g-test-museum` если нет в catalog | Cursor |
+| CF.P2b | City hub museums/admission при published | Высокий | ✅ `CityAdmissionBlock` (default min=1) | Cursor |
+| CF.P2c | `/events`: отдельный card type admission (не slotted event) | Средний | ⏳ card есть; feed later | Cursor |
+| CF.P2d | CTA → checkout.daibilet.ru; TC/TEP widgets regression | Высокий | ✅ canSell gate; widgets untouched | Cursor |
 | CF.P3 | STUB/YooKassa order видим admin+supplier LC через PurchaseProjection | Высокий | 🔄 STUB visible via PP ✅; YooKassa credentials ❌ | Codex |
 
 ## PERF event pages (после DNS на МСК)
@@ -993,6 +993,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-30 | CF.P1b+P2 ✅ catalog finance client + venue/city admission UI; CTA canSell; env FINANCE_*; P2c `/events` later; slug bridge test museum |
 | 2026-07-30 | CF.P0+P1 ✅ deploy `.159` @ `0c1e464`: PurchaseProjection + public admission APIs; STUB smoke `7649542` idempotent; YooKassa off (no creds); next CF.P1b/P2 Cursor |
 | 2026-07-30 | CF.0 ✅ lock catalog↔finance projection ([catalog-finance-projection.md](./catalog-finance-projection.md)); CF.P0–P3 backlog; qa checkout/projection/auth |
 | 2026-07-30 | MIG.9.3 🔄 Codex на `.159`: `daibilet-finance-api` `:4100`, nginx HTTP supplier/checkout/finance, PG migrations+seed; TLS/DNS stub ⏳; MSK не трогали |

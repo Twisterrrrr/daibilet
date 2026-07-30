@@ -25,6 +25,7 @@ import {
   getCachedPublicCityDto,
   listTopCitySlugsForSsg,
 } from '@/server/cached-city-data';
+import { loadCityAdmissionBlock } from '@/server/finance-projection-client';
 
 export const revalidate = 300;
 /** Allow on-demand ISR for slugs not prebuilt. */
@@ -129,7 +130,8 @@ export default async function CityPage({ params }: PageProps) {
 
   const cityStartedAt = Date.now();
   const articlesStartedAt = Date.now();
-  const [payloadResult, articlesResult] = await Promise.allSettled([
+  const admissionStartedAt = Date.now();
+  const [payloadResult, articlesResult, admissionResult] = await Promise.allSettled([
     getCachedPublicCityDto(decodedSlug).then((value) => {
       cityPerfMark('city-dto', cityStartedAt, {
         sessions: value?.sessions?.length ?? 0,
@@ -147,10 +149,20 @@ export default async function CityPage({ params }: PageProps) {
       cityPerfMark('articles', articlesStartedAt, { count: value?.articles?.length ?? 0 });
       return value;
     }),
+    withTimeout(
+      loadCityAdmissionBlock(decodedSlug).catch(() => null),
+      CITY_SECONDARY_TIMEOUT_MS,
+      null,
+      'admission',
+    ).then((value) => {
+      cityPerfMark('admission', admissionStartedAt, { count: value?.items?.length ?? 0 });
+      return value;
+    }),
   ]);
 
   const payload = payloadResult.status === 'fulfilled' ? payloadResult.value : null;
   const articlesPayload = articlesResult.status === 'fulfilled' ? articlesResult.value : null;
+  const admission = admissionResult.status === 'fulfilled' ? admissionResult.value : null;
   if (!payload?.city) notFound();
 
   const faqStartedAt = Date.now();
@@ -182,6 +194,7 @@ export default async function CityPage({ params }: PageProps) {
           faqItems={faqItems}
           seoText={seoText}
           hubArticles={hubArticles}
+          admission={admission}
         />
       </SiteLayout>
     </>

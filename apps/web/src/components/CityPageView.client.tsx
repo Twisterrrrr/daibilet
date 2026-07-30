@@ -4,6 +4,7 @@ import * as React from 'react';
 import { ArrowLeft, ArrowRight, Grid3X3, ListFilter, MapPin, Ticket } from 'lucide-react';
 
 import { CityHubArticlesGrid } from '@/components/CityHubArticleTeaser.client';
+import { CityAdmissionBlock } from '@/components/CityAdmissionBlock';
 import { EventCard } from '@/components/EventCard';
 import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
 import { PageBreadcrumbBar } from '@/components/PageBreadcrumbs';
@@ -15,6 +16,7 @@ import type { CityFaqItem } from '@/lib/city-faq';
 import type { CityHubArticlesBuckets } from '@/lib/city-hub-articles';
 import type { CityHubTemplate } from '@/lib/city-hub-template';
 import type { BlogCardDto } from '@/lib/blog-utils';
+import type { FinanceAdmissionListResult } from '@/lib/finance-projection';
 import { venuePageTemplate } from '@/lib/venue-meta';
 import { eventHref, sessionVenueHref, venueHref } from '@/lib/routes';
 import { inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
@@ -64,6 +66,7 @@ export function CityPageView({
   seoText = null,
   hubTemplate = 'default',
   hubArticles = null,
+  admission = null,
 }: {
   slug: string;
   initialPayload: PublicCityPageDto | null;
@@ -72,6 +75,7 @@ export function CityPageView({
   /** `editorial` — параллельный Lovable-like visual; default = фаза 1 wireframe. */
   hubTemplate?: CityHubTemplate;
   hubArticles?: CityHubArticlesBuckets | null;
+  admission?: FinanceAdmissionListResult | null;
 }) {
   const editorial = hubTemplate === 'editorial';
   const [payload, setPayload] = React.useState<PublicCityPageDto | null>(initialPayload);
@@ -406,6 +410,14 @@ export function CityPageView({
                         scrollToSection('affiche');
                       }}
                     />
+                    {admission && admission.items.length > 0 ? (
+                      <CityAdmissionBlock
+                        admission={admission}
+                        cityName={city.name}
+                        editorial={editorial}
+                        nested
+                      />
+                    ) : null}
                     <VenueHighlights
                       city={city}
                       venues={payload.venues}

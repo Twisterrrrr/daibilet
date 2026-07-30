@@ -1,11 +1,11 @@
 # Catalog ↔ Finance projection (canonical lock)
 
 **Locked:** 2026-07-30  
-**Hosts:** catalog `.184` (MSK) · finance `.159` (SPB) — см. [spb-finance-host.md](./spb-finance-host.md)  
+**Hosts:** catalog `.184` (MSK) · finance `.159` (SPB) - см. [spb-finance-host.md](./spb-finance-host.md)  
 **Product blueprint:** [phase-2-finance-supplier-blueprint.md](./phase-2-finance-supplier-blueprint.md)  
 **Branches:** catalog docs / consumer на `feat/next-monorepo`; finance runtime Codex на `.159` (`codex/phase2-finance-supplier`); admission foundation Cursor на `cursor/phase-g-admission-checkout`.
 
-Этот документ - **канон границы** между каталогом и финконтуром. **CF.P0+P1 на finance `.159` закрыты** (`0c1e464`); UI/CTA на catalog `.184` - только после CF.P1b/P2 (Cursor).
+Этот документ - **канон границы** между каталогом и финконтуром. **CF.P0+P1 на finance `.159` закрыты** (`0c1e464`); **CF.P1b+P2 catalog client/UI** - на `feat/next-monorepo` (deploy MSK + slug bridge для test museum).
 
 ---
 
@@ -158,12 +158,12 @@ Venue page может иметь admission **независимо** от афи�
 | Piece | Status |
 |-------|--------|
 | Public finance read APIs: supplier / venue admission summary / AdmissionProduct list+detail | ✅ на `.159` @ `0c1e464` (`/api/public/admission*` + `/api/public/finance/...`) |
-| Catalog HTTP client → finance projection (auth, base URL, cache) | ❌ **CF.P1b Cursor** |
-| Projection sync frequency / cache invalidation contract | ❌ (открыто в qa) |
-| Venue page «Входные билеты» на prod catalog | ❌ **CF.P2 Cursor** |
-| City hub museums/admission section gated by published count | ❌ **CF.P2b** |
-| Separate admission card type in `/events` | ❌ **CF.P2c** |
-| CTA → `checkout.daibilet.ru` only when `canSell` | ❌ **CF.P2d** |
+| Catalog HTTP client → finance projection (auth, base URL, cache) | ✅ **CF.P1b** `apps/web/src/server/finance-projection-client.ts` (3s timeout, fail-soft) |
+| Projection sync frequency / cache invalidation contract | ❌ (открыто в qa; MVP = SSR fetch `cache: no-store`) |
+| Venue page «Входные билеты» на prod catalog | ✅ **CF.P2** `VenueAdmissionBlock` (slug join) |
+| City hub museums/admission section gated by published count | ✅ **CF.P2b** `CityAdmissionBlock` (`CITY_ADMISSION_MIN_PUBLISHED`, default 1) |
+| Separate admission card type in `/events` | ⏳ **CF.P2c** (card component есть: `AdmissionProductCard`; не в `/events` feed) |
+| CTA → `checkout.daibilet.ru` only when `canSell` | ✅ **CF.P2d** `resolveAdmissionCheckoutUrl` + gate |
 
 ### 7.3 PurchaseProjection (P0) - finance DB
 
@@ -196,12 +196,12 @@ Venue page может иметь admission **независимо** от афи�
 | **P0** | CF.P0 | **PurchaseProjection** on finance | Codex | ✅ deployed `.159` |
 | **P0** | CF.P0b | Gate: no wide CTA on `.184` until catalog client+UI ready | both | 🔒 still gated |
 | **P1** | CF.P1 | Finance **public read** projection endpoints | Codex | ✅ deployed `.159` |
-| **P1** | CF.P1b | Catalog read client + env (`FINANCE_API_BASE_URL`, service auth) | Cursor | ⏳ **next** |
+| **P1** | CF.P1b | Catalog read client + env (`FINANCE_API_BASE_URL`, service auth) | Cursor | ✅ code + deploy env hook |
 | **P1** | CF.P1c | m2m token on `.159` + catalog | owner + Cursor | ⏳ optional token code ready; env unset |
-| **P2** | CF.P2 | Venue page admission block (test museum) | Cursor | ⏳ |
-| **P2** | CF.P2b | City hub museums/admission when published | Cursor | ⏳ |
-| **P2** | CF.P2c | Events catalog separate admission card type | Cursor | ⏳ |
-| **P2** | CF.P2d | CTA → Daibilet checkout; TC/TEP widgets untouched | Cursor | ⏳ |
+| **P2** | CF.P2 | Venue page admission block (test museum) | Cursor | ✅ code (needs catalog venue slug `phase-g-test-museum`) |
+| **P2** | CF.P2b | City hub museums/admission when published | Cursor | ✅ code (citySlug join, e.g. `moskva`) |
+| **P2** | CF.P2c | Events catalog separate admission card type | Cursor | ⏳ card ready; `/events` feed later |
+| **P2** | CF.P2d | CTA → Daibilet checkout; TC/TEP widgets untouched | Cursor | ✅ canSell gate |
 | **P3** | CF.P3 | TLS + DNS stub; YooKassa sandbox; keep STUB | Codex + owner | ⏳ credentials missing |
 
 ---
@@ -218,7 +218,7 @@ Venue page может иметь admission **независимо** от афи�
 
 ## 10. Next implement step (ownership)
 
-1. **Cursor (сейчас / P2):** CF.P1b catalog HTTP client → `.159` public projection; затем venue/city admission UI; CTA только при `canSell`; widgets regression; не писать в finance DB.
+1. **Cursor (после P2 code):** deploy catalog web на MSK с `FINANCE_API_BASE_URL` (+ `FINANCE_API_HOST` если IP); slug bridge catalog venue ↔ finance `phase-g-test-museum`; CF.P2c `/events` feed optional; widgets regression; не писать в finance DB.
 2. **YooKassa (не сейчас):** нужны `YOOKASSA_SHOP_ID` + `YOOKASSA_SECRET_KEY` (sandbox), DNS/TLS webhook URL на finance, reconcile job; **не** ставить `DAIBILET_YOOKASSA_CHECKOUT=1` пока STUB smoke и credentials не готовы. STUB оставить `=1`.
 3. **Owner:** DNS A stub `checkout`/`supplier` → `.159`, затем TLS; optional set `DAIBILET_FINANCE_PROJECTION_TOKEN` on finance + catalog.
 

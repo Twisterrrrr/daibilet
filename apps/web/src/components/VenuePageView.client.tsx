@@ -6,9 +6,11 @@ import { ArrowLeft, Grid3X3, ListFilter } from 'lucide-react';
 import { EventCard } from '@/components/EventCard';
 import { InstitutionVenueLayout } from '@/components/InstitutionVenueLayout.client';
 import { LocationVenueLayout } from '@/components/LocationVenueLayout.client';
+import { VenueAdmissionBlock } from '@/components/VenueAdmissionBlock';
 import type { PublicVenueDto, PublicVenuePageDto } from '@daibilet/contracts/public';
 import { formatMoney, formatNumber } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
+import type { FinanceAdmissionProduct } from '@/lib/finance-projection';
 import {
   buildVenueDateOptions,
   buildVenueProgramGroups,
@@ -21,7 +23,15 @@ import {
 import { venuePageTemplate } from '@/lib/venue-meta';
 import { eventHref } from '@/lib/routes';
 
-export function VenuePageView({ slug, initialPayload }: { slug: string; initialPayload: PublicVenuePageDto | null }) {
+export function VenuePageView({
+  slug,
+  initialPayload,
+  admissionProducts = [],
+}: {
+  slug: string;
+  initialPayload: PublicVenuePageDto | null;
+  admissionProducts?: FinanceAdmissionProduct[];
+}) {
   const [payload, setPayload] = React.useState<PublicVenuePageDto | null>(initialPayload);
   const [contentReady, setContentReady] = React.useState(() => Boolean(initialPayload?.sessions?.length));
   const [error, setError] = React.useState<string | null>(null);
@@ -114,7 +124,14 @@ export function VenuePageView({ slug, initialPayload }: { slug: string; initialP
                 sessions={contentReady ? payload.sessions : []}
                 relatedVenues={contentReady ? payload.relatedVenues : []}
                 pagePayload={payload}
+                admissionProducts={admissionProducts}
               />
+            ) : null}
+
+            {!isInstitutionPage && admissionProducts.length > 0 ? (
+              <div className="container-page py-6">
+                <VenueAdmissionBlock products={admissionProducts} />
+              </div>
             ) : null}
 
             {contentReady ? (

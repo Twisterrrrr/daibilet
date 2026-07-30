@@ -14,11 +14,13 @@ import {
 
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { OsmMapEmbed } from '@/components/OsmMapEmbed';
+import { VenueAdmissionBlock } from '@/components/VenueAdmissionBlock';
 import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
 import { VenueLogisticsBlock, hasVenueLogisticsContent } from '@/components/VenueLogisticsBlock';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatMoney, formatNumber } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
+import type { FinanceAdmissionProduct } from '@/lib/finance-projection';
 import { build2gisRouteUrl } from '@/lib/maps';
 import { institutionTypeEmoji, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
 import { eventHref, venueHref } from '@/lib/routes';
@@ -45,12 +47,14 @@ export function InstitutionVenueLayout({
   sessions,
   relatedVenues,
   pagePayload,
+  admissionProducts = [],
 }: {
   venue: PublicVenueDto;
   stats: PublicVenuePageDto['stats'];
   sessions: PublicSessionDto[];
   relatedVenues: PublicVenueDto[];
   pagePayload: PublicVenuePageDto;
+  admissionProducts?: FinanceAdmissionProduct[];
 }) {
   const title = venue.seoH1 || venue.title || venue.name;
   const streetAddress = formatStreetAddress(venue.address, { city: venue.city });
@@ -160,10 +164,11 @@ export function InstitutionVenueLayout({
       <nav className="sticky top-[var(--site-header-height)] z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="container-page flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {[
-            ['#venue-program', 'Афиша и билеты'],
-            ['#about', 'О месте'],
-            ['#practical', 'Адрес и карта'],
-            ['#faq', 'Вопросы'],
+            ...(admissionProducts.length ? [['#venue-admission', 'Входные билеты'] as const] : []),
+            ['#venue-program', 'Афиша и билеты'] as const,
+            ['#about', 'О месте'] as const,
+            ['#practical', 'Адрес и карта'] as const,
+            ['#faq', 'Вопросы'] as const,
           ].map(([href, label]) => (
             <a
               key={href}
@@ -178,6 +183,8 @@ export function InstitutionVenueLayout({
 
       <div className="container-page grid grid-cols-[minmax(0,1fr)] gap-8 py-8 lg:grid-cols-3">
         <div className="space-y-8 lg:col-span-2">
+          {admissionProducts.length > 0 ? <VenueAdmissionBlock products={admissionProducts} /> : null}
+
           {nextSessions.length > 0 ? (
             <section className="rounded-2xl border border-slate-200 bg-white p-6">
               <div className="flex items-baseline justify-between gap-3">
