@@ -56,11 +56,13 @@ async function financeFetchJson(
   const url = `${base}${path}`;
 
   try {
+    // ISR-compatible: do not use cache:'no-store' / revalidate:0 on SSG city hubs
+    // (Next throws static-to-dynamic at runtime). Keep short timeout + soft empty.
     const response = await fetch(url, {
       method: 'GET',
       headers: buildHeaders(env),
       signal: AbortSignal.timeout(FINANCE_PROJECTION_TIMEOUT_MS),
-      cache: 'no-store',
+      next: { revalidate: 60 },
     });
     if (!response.ok) return null;
     return (await response.json()) as unknown;
