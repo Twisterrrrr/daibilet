@@ -43,9 +43,13 @@ export interface StubCheckoutBuyerDto {
 }
 
 export interface StubCheckoutCreateDto {
+  subjectType?: CheckoutSubjectType | null;
   eventId?: string | null;
   eventSlug?: string | null;
-  offerId: string;
+  admissionProductId?: string | null;
+  admissionProductSlug?: string | null;
+  offerId?: string | null;
+  admissionOfferId?: string | null;
   sessionId?: string | null;
   quantity: number;
   buyer: StubCheckoutBuyerDto;
@@ -80,10 +84,14 @@ export interface StubCheckoutOrderDto {
   buyer: StubCheckoutBuyerDto;
   subject: {
     type: CheckoutSubjectType;
-    eventId: string;
-    eventSlug: string;
-    eventTitle: string;
-    eventKind: string;
+    eventId: string | null;
+    eventSlug: string | null;
+    eventTitle: string | null;
+    eventKind: string | null;
+    admissionProductId: string | null;
+    admissionProductSlug: string | null;
+    admissionProductTitle: string | null;
+    admissionProductType: string | null;
     cityId: string | null;
     citySlug: string | null;
     cityTitle: string | null;

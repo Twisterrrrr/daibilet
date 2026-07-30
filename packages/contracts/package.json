@@ -12,6 +12,10 @@
       "types": "./src/admin.ts",
       "default": "./src/admin.ts"
     },
+    "./admission": {
+      "types": "./src/admission.ts",
+      "default": "./src/admission.ts"
+    },
     "./common": "./src/common.ts",
     "./db": "./src/db.ts",
     "./landing": "./src/landing.ts",

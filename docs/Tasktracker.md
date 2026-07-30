@@ -526,6 +526,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | R.4b | Reviews `GET .../events/:publicSlug` 404 на кириллическом DB slug (TEP) | Высокий | 🔧 `resolveReviewEvent` → `evt_tep_{id}` + publicSlugLite |
 | L.3 | TC catalog sync load: nightly timer + flock/nice/ionice; `--ids` ProviderLink filter; RawImport payloadHash skip; light warm | Критический | ✅ `efc8459` prod; timer next 03:20 UTC |
 | P.3 | **Finance contour / ЛК поставщиков** — базовый контур | Высокий | ⏳ |
+| P.3a | **Venue admission products** — входные билеты площадок без фейкового события (`AdmissionProduct` / `AdmissionOffer`) | Высокий | 🔄 schema + readiness helper |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
 | P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |
 

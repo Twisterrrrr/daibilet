@@ -49,6 +49,26 @@ enum VenuePageStatus {
   HIDDEN
 }
 
+enum AdmissionProductType {
+  MUSEUM_ENTRY
+  GALLERY_ENTRY
+  ART_SPACE_ENTRY
+  EXHIBITION_ENTRY
+  OBSERVATION_ENTRY
+  PARK_ENTRY
+  ATTRACTION_ENTRY
+  ZOO_ENTRY
+  AQUARIUM_ENTRY
+  COMPLEX_ENTRY
+  OTHER
+}
+
+enum AdmissionValidityMode {
+  OPEN_DATE
+  FIXED_WINDOW
+  VALID_DAYS_AFTER_PURCHASE
+}
+
 enum LandingType {
   CITY
   MULTI_CITY
@@ -170,6 +190,11 @@ enum CheckoutItemStatus {
   FULFILLED
   CANCELLED
   REFUNDED
+}
+
+enum CheckoutSubjectKind {
+  EVENT
+  VENUE_ADMISSION
 }
 
 enum PaymentProvider {
@@ -587,7 +612,6 @@ model Event {
   @@index([venueId])
   @@index([categoryId])
   @@index([supplierId, status])
-  @@index([title])
 }
 
 model EventOverride {
@@ -680,6 +704,94 @@ model EventOffer {
   @@index([sourceCode])
 }
 
+model AdmissionProduct {
+  id                     String                @id @default(cuid())
+  slug                   String                @unique
+  title                  String
+  shortTitle             String?
+  description            String?
+  shortDescription       String?
+  type                   AdmissionProductType  @default(OTHER)
+  status                 PublishStatus         @default(REVIEW)
+  purchaseFlow           PurchaseFlow          @default(PLATFORM)
+  managementMode         EventManagementMode   @default(DAIBILET_MANAGED)
+  sourceCode             SourceCode            @default(MANUAL)
+  sourceStatus           String?
+  imageUrl               String?
+  seoH1                  String?
+  seoTitle               String?
+  seoDescription         String?
+  canonicalPath          String?
+  isIndexable            Boolean               @default(true)
+  priceFromRub           Int?
+  ticketsVacant          Int?
+  defaultCapacityTotal   Int?
+  validityMode           AdmissionValidityMode @default(OPEN_DATE)
+  validFrom              DateTime?
+  validTo                DateTime?
+  validDaysAfterPurchase Int?
+  salesStartsAt          DateTime?
+  salesEndsAt            DateTime?
+  cityId                 String?
+  venueId                String
+  categoryId             String?
+  primarySubcategoryId   String?
+  supplierId             String?
+  createdByType          EventActorType        @default(SYSTEM)
+  createdBySiteUserId    String?
+  moderatedBySiteUserId  String?
+  moderatedAt            DateTime?
+  moderationComment      String?
+  createdAt              DateTime              @default(now())
+  updatedAt              DateTime              @updatedAt
+
+  city               City?                    @relation(fields: [cityId], references: [id], onDelete: SetNull)
+  venue              Venue                    @relation(fields: [venueId], references: [id], onDelete: Cascade)
+  category           Category?                @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  primarySubcategory Subcategory?             @relation(fields: [primarySubcategoryId], references: [id], onDelete: SetNull)
+  supplier           Supplier?                @relation("PrimarySupplierAdmissionProducts", fields: [supplierId], references: [id], onDelete: SetNull)
+  createdBy          SiteUser?                @relation("AdmissionProductCreatedBy", fields: [createdBySiteUserId], references: [id], onDelete: SetNull)
+  moderatedBy        SiteUser?                @relation("AdmissionProductModeratedBy", fields: [moderatedBySiteUserId], references: [id], onDelete: SetNull)
+  offers             AdmissionOffer[]
+  checkoutItems      CheckoutItem[]
+  commissionRules    SupplierCommissionRule[]
+
+  @@index([status])
+  @@index([type, status])
+  @@index([purchaseFlow])
+  @@index([managementMode, status])
+  @@index([cityId])
+  @@index([venueId, status])
+  @@index([categoryId])
+  @@index([supplierId, status])
+  @@index([validityMode, status])
+}
+
+model AdmissionOffer {
+  id                 String     @id @default(cuid())
+  admissionProductId String
+  sourceCode         SourceCode
+  title              String?
+  priceRub           Int?
+  oldPriceRub        Int?
+  capacityTotal      Int?
+  groupSize          Int        @default(1)
+  weekdayMask        Int?
+  widgetUrl          String?
+  deeplinkUrl        String?
+  payload            Json?
+  active             Boolean    @default(true)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+
+  admissionProduct AdmissionProduct  @relation(fields: [admissionProductId], references: [id], onDelete: Cascade)
+  checkoutItems    CheckoutItem[]
+  fulfillmentItems FulfillmentItem[]
+
+  @@index([admissionProductId, active, priceRub])
+  @@index([sourceCode])
+}
+
 model ProviderLink {
   id               String             @id @default(cuid())
   sourceId         String
@@ -716,9 +828,10 @@ model Category {
   title    String
   position Int    @default(0)
 
-  events          Event[]
-  subcategories   Subcategory[]
-  commissionRules SupplierCommissionRule[]
+  events            Event[]
+  admissionProducts AdmissionProduct[]
+  subcategories     Subcategory[]
+  commissionRules   SupplierCommissionRule[]
 }
 
 model Subcategory {
@@ -728,9 +841,10 @@ model Subcategory {
   title      String
   position   Int    @default(0)
 
-  category      Category           @relation(fields: [categoryId], references: [id])
-  primaryEvents Event[]
-  events        EventSubcategory[]
+  category                 Category           @relation(fields: [categoryId], references: [id])
+  primaryEvents            Event[]
+  primaryAdmissionProducts AdmissionProduct[]
+  events                   EventSubcategory[]
 }
 
 model EventSubcategory {
@@ -787,12 +901,13 @@ model City {
   canonicalPath  String?
   isDestination  Boolean @default(false)
 
-  region    Region?    @relation(fields: [regionId], references: [id])
-  venues    Venue[]
-  events    Event[]
-  landings  Landing[]
-  articles  Article[]
-  tripPlans TripPlan[]
+  region            Region?            @relation(fields: [regionId], references: [id])
+  venues            Venue[]
+  events            Event[]
+  admissionProducts AdmissionProduct[]
+  landings          Landing[]
+  articles          Article[]
+  tripPlans         TripPlan[]
 }
 
 model Venue {
@@ -811,24 +926,20 @@ model Venue {
   address          String?
   latitude         Float?
   longitude        Float?
-  metroStation     String?
-  wayToFind        String?         @db.Text
-  parkingInfo      String?
   kind             VenueKind       @default(OTHER)
   pageStatus       VenuePageStatus @default(NONE)
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
 
-  city            City?            @relation(fields: [cityId], references: [id])
-  events          Event[]
-  aliases         VenueAlias[]
-  providerLinks   ProviderLink[]
-  supplierLinks   SupplierVenue[]
-  tripPlanItems   TripPlanItem[]
-  reviews         Review[]
-  externalReviews ExternalReview[]
-
-  @@index([title])
+  city              City?              @relation(fields: [cityId], references: [id])
+  events            Event[]
+  admissionProducts AdmissionProduct[]
+  aliases           VenueAlias[]
+  providerLinks     ProviderLink[]
+  supplierLinks     SupplierVenue[]
+  tripPlanItems     TripPlanItem[]
+  reviews           Review[]
+  externalReviews   ExternalReview[]
 }
 
 model VenueAlias {
@@ -842,22 +953,6 @@ model VenueAlias {
   venue Venue @relation(fields: [venueId], references: [id])
 }
 
-/// UX-группы каталога `/podborki` (карусели): по типу / для кого / сезонное.
-model LandingCategory {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  title     String
-  subtitle  String?
-  sortOrder Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  landings Landing[]
-
-  @@index([isActive, sortOrder])
-}
-
 model Landing {
   id          String        @id @default(cuid())
   type        LandingType   @default(MULTI_CITY)
@@ -868,7 +963,6 @@ model Landing {
   status      PublishStatus @default(REVIEW)
   cityId      String?
   themeId     String?
-  categoryId  String?
   rules       Json
 
   heroTitle          String?
@@ -897,14 +991,12 @@ model Landing {
 
   city         City?                 @relation(fields: [cityId], references: [id])
   theme        LandingTheme?         @relation(fields: [themeId], references: [id])
-  category     LandingCategory?      @relation(fields: [categoryId], references: [id])
   matches      LandingMatch[]
   blocks       LandingContentBlock[]
   relatedLinks LandingRelatedLink[]
 
   @@index([type, isActive, isIndexable])
   @@index([cityId, slug])
-  @@index([categoryId, sortOrder])
 }
 
 model LandingMatch {
@@ -982,8 +1074,6 @@ model Article {
   content        String?
   coverImageUrl  String?
   cityId         String?
-  /// Редакционный citySlug блога (moscow|saint-petersburg|multi|regions|…).
-  citySlug       String?
   /// ИИ-автор / редакция: max|anna|elena|igor|artur|editorial
   authorId       String?
   authorName     String?
@@ -994,8 +1084,6 @@ model Article {
   seoDescription String?
   canonicalPath  String?
   isIndexable    Boolean       @default(false)
-  /// Единственная статья в Blog Hero на /blog (last-wins при set true).
-  isFeatured     Boolean       @default(false)
   publishedAt    DateTime?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
@@ -1003,24 +1091,8 @@ model Article {
   city City? @relation(fields: [cityId], references: [id])
 
   @@index([status, isIndexable, publishedAt])
-  @@index([isFeatured])
   @@index([authorId])
   @@index([articleType])
-  @@index([citySlug])
-}
-
-/// Home hero rotator frames (CMS-lite). Fallback: static HOME_HERO_IMAGES.
-model HeroBanner {
-  id        String   @id @default(cuid())
-  imageUrl  String
-  title     String
-  link      String?
-  isActive  Boolean  @default(true)
-  sortOrder Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([isActive, sortOrder])
 }
 
 model SeoMeta {
@@ -1060,6 +1132,8 @@ model SiteUser {
   createdEvents               Event[]              @relation("EventCreatedBy")
   submittedEvents             Event[]              @relation("EventSubmittedBy")
   moderatedEvents             Event[]              @relation("EventModeratedBy")
+  createdAdmissionProducts    AdmissionProduct[]   @relation("AdmissionProductCreatedBy")
+  moderatedAdmissionProducts  AdmissionProduct[]   @relation("AdmissionProductModeratedBy")
   createdEventChangeRequests  EventChangeRequest[] @relation("EventChangeRequestCreatedBy")
   reviewedEventChangeRequests EventChangeRequest[] @relation("EventChangeRequestReviewedBy")
   eventChangeLogs             EventChangeLog[]     @relation("EventChangeLogActor")
@@ -1150,6 +1224,7 @@ model Supplier {
   venues              SupplierVenue[]
   events              SupplierEvent[]
   ownedEvents         Event[]                  @relation("PrimarySupplierEvents")
+  admissionProducts   AdmissionProduct[]       @relation("PrimarySupplierAdmissionProducts")
   eventChangeRequests EventChangeRequest[]
   eventChangeLogs     EventChangeLog[]
   commissionRules     SupplierCommissionRule[]
@@ -1336,27 +1411,30 @@ model EventChangeLog {
 }
 
 model SupplierCommissionRule {
-  id              String          @id @default(cuid())
-  supplierId      String?
-  eventId         String?
-  categoryId      String?
-  scope           CommissionScope @default(SUPPLIER)
-  title           String?
-  percentBps      Int             @default(0)
-  fixedFeeKopecks Int             @default(0)
-  priority        Int             @default(0)
-  startsAt        DateTime?
-  endsAt          DateTime?
-  isActive        Boolean         @default(true)
-  createdAt       DateTime        @default(now())
-  updatedAt       DateTime        @updatedAt
+  id                 String          @id @default(cuid())
+  supplierId         String?
+  eventId            String?
+  admissionProductId String?
+  categoryId         String?
+  scope              CommissionScope @default(SUPPLIER)
+  title              String?
+  percentBps         Int             @default(0)
+  fixedFeeKopecks    Int             @default(0)
+  priority           Int             @default(0)
+  startsAt           DateTime?
+  endsAt             DateTime?
+  isActive           Boolean         @default(true)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
 
-  supplier Supplier? @relation(fields: [supplierId], references: [id], onDelete: Cascade)
-  event    Event?    @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  category Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  supplier         Supplier?         @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  event            Event?            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  admissionProduct AdmissionProduct? @relation(fields: [admissionProductId], references: [id], onDelete: Cascade)
+  category         Category?         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@index([supplierId, isActive])
   @@index([eventId, isActive])
+  @@index([admissionProductId, isActive])
   @@index([categoryId, isActive])
   @@index([scope, priority])
 }
@@ -1403,32 +1481,37 @@ model CheckoutOrder {
 }
 
 model CheckoutItem {
-  id                String             @id @default(cuid())
-  checkoutOrderId   String
-  supplierId        String?
-  eventId           String?
-  sessionId         String?
-  offerId           String?
-  externalTicketId  String?            @unique
-  title             String
-  ticketTitle       String?
-  status            CheckoutItemStatus @default(DRAFT)
-  quantity          Int                @default(1)
-  unitPriceKopecks  Int                @default(0)
-  totalKopecks      Int                @default(0)
-  commissionKopecks Int                @default(0)
-  attendeeName      String?
-  attendeePhone     String?
-  providerPayload   Json?
-  issuedAt          DateTime?
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  id                 String              @id @default(cuid())
+  checkoutOrderId    String
+  subjectType        CheckoutSubjectKind @default(EVENT)
+  supplierId         String?
+  eventId            String?
+  sessionId          String?
+  offerId            String?
+  admissionProductId String?
+  admissionOfferId   String?
+  externalTicketId   String?             @unique
+  title              String
+  ticketTitle        String?
+  status             CheckoutItemStatus  @default(DRAFT)
+  quantity           Int                 @default(1)
+  unitPriceKopecks   Int                 @default(0)
+  totalKopecks       Int                 @default(0)
+  commissionKopecks  Int                 @default(0)
+  attendeeName       String?
+  attendeePhone      String?
+  providerPayload    Json?
+  issuedAt           DateTime?
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
 
   order            CheckoutOrder     @relation(fields: [checkoutOrderId], references: [id], onDelete: Cascade)
   supplier         Supplier?         @relation(fields: [supplierId], references: [id])
   event            Event?            @relation(fields: [eventId], references: [id])
   session          EventSession?     @relation(fields: [sessionId], references: [id])
   offer            EventOffer?       @relation(fields: [offerId], references: [id])
+  admissionProduct AdmissionProduct? @relation(fields: [admissionProductId], references: [id])
+  admissionOffer   AdmissionOffer?   @relation(fields: [admissionOfferId], references: [id])
   externalTicket   ExternalTicket?   @relation(fields: [externalTicketId], references: [id])
   payoutItems      PayoutItem[]
   tripPlanItems    TripPlanItem[]
@@ -1440,6 +1523,9 @@ model CheckoutItem {
   @@index([eventId])
   @@index([sessionId])
   @@index([offerId])
+  @@index([subjectType])
+  @@index([admissionProductId])
+  @@index([admissionOfferId])
 }
 
 model FulfillmentItem {
@@ -1448,6 +1534,7 @@ model FulfillmentItem {
   checkoutItemId       String?           @unique
   lineItemIndex        Int               @default(0)
   offerId              String?
+  admissionOfferId     String?
   purchaseFlow         PurchaseFlow
   provider             String            @default("INTERNAL")
   status               FulfillmentStatus @default(PENDING)
@@ -1467,10 +1554,12 @@ model FulfillmentItem {
 
   order          CheckoutOrder   @relation(fields: [checkoutOrderId], references: [id], onDelete: Cascade)
   checkoutItem   CheckoutItem?   @relation(fields: [checkoutItemId], references: [id], onDelete: SetNull)
+  admissionOffer AdmissionOffer? @relation(fields: [admissionOfferId], references: [id], onDelete: SetNull)
   refundRequests RefundRequest[]
 
   @@index([checkoutOrderId])
   @@index([offerId])
+  @@index([admissionOfferId])
   @@index([purchaseFlow, status])
   @@index([provider])
   @@index([status, nextRetryAt])

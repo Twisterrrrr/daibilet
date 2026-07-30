@@ -403,8 +403,10 @@ https://api.daibilet.ru/api/checkout/yookassa/webhook
 
 Venue admission note:
 
-- for MVP, museum/gallery/attraction entrance tickets can be represented as a manual `OPEN_DATE` event linked to the venue and classified as `VENUE_ADMISSION` in checkout DTO;
-- long-term SPBBOATS-compatible model should add a separate `VenueAdmissionProduct` / venue-level offer layer, because some venues sell admission without a concrete event.
+- legacy bridge remains supported: an existing manual `OPEN_DATE` event linked to a venue can still be classified as `VENUE_ADMISSION` in checkout DTO;
+- target model is now explicit: museum/gallery/attraction entrance tickets are `AdmissionProduct` / `AdmissionOffer` records linked to `Venue`, `City` and `Supplier`;
+- public venue pages should render admission as a separate "Входные билеты" block, while theatre/gallery/museum events stay in the programme/affiche block;
+- admin and supplier LC should manage admission products separately from event schedule, because venue admission usually has validity rules and ticket categories rather than slots.
 
 ### Phase 2.4: orders and buyer account
 
