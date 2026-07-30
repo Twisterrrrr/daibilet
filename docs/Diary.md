@@ -1,3 +1,28 @@
+## 2026-07-30 - MIG.9 Phase 0–2: Diligent Polydeuces `85.193.80.159` provisioned
+
+### Наблюдения
+- SSH с Windows: ключ `~/.ssh/daibilet_spb_finance` (ed25519, comment `daibilet-finance-159`) принят; `daibilet_staging_key` / MSK key - Permission denied.
+- Hostname VM: `spb-3-vm-ukly`; Ubuntu 24.04.4; RAM 7.8 Gi; disk `/` 77G (~2G used → ~3G после стека).
+- Egress OK: `curl -I https://github.com` → HTTP/2 200; `dig ticketscloud.ru` → `95.129.232.92`; teplohod.info резолвится.
+- Timeweb API token в env локальной среды нет - DNS A stub не выставлен из агента.
+- `.184` и `.16` не трогались.
+
+### Решения
+- UFW active: allow 22/80/443; deny 5432/5437 public; default deny incoming.
+- Base: docker 29.6 + compose plugin, nginx, certbot, git, curl, dnsutils, Node 22.23 + corepack `pnpm@11.7.0`, `vm.swappiness=10`.
+- Каталоги: `/opt/daibilet-finance`, `/opt/daibilet-staging`, `/opt/daibilet`, `/root/backups`.
+- Fresh finance Postgres: container `daibilet-finance-postgres` (`postgres:17-alpine`), volume `daibilet-finance-pg-data`, DB `daibilet_finance`, bind **только** `127.0.0.1:5437` (не catalog dump). Credentials: `/opt/daibilet-finance/postgres/.env` mode 600 on host (не в git).
+- Local SSH alias: `Host daibilet-spb8 spb8 daibilet-finance` → `IdentityFile ~/.ssh/daibilet_spb_finance`.
+- Docs SSH matrix: `.159` = `daibilet_spb_finance`.
+- **Не** деплоили YooKassa / finance app / TLS domains.
+
+### Проблемы
+- DNS stub A ещё нужен owner в Timeweb: `checkout.daibilet.ru`, `supplier.daibilet.ru` (opt `finance-api.daibilet.ru`) → `85.193.80.159`; apex/catalog DNS не менять.
+- Timeweb panel firewall (если отдельно от UFW) - подтвердить 22/80/443 со стороны панели.
+- Phase 3+: finance runtime + TLS + checkout links с catalog; YooKassa webhook позже, без invent secrets.
+
+---
+
 ## 2026-07-30 - Decision: lock host roles (catalog / finance / retire)
 
 ### Наблюдения

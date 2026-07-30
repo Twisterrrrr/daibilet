@@ -10,11 +10,22 @@
 |--------|-----|----------|-------------|
 | Friendly Pheasant (МСК) | `201.24.125.184` | catalog / prod | **battle catalog:** public, admin, import, SEO, TC/Teplohod catalog |
 | Intelligent Hoopoe (СПб 4 ГБ) | `213.171.7.16` | post-MIG.8 leftover | **temporary** staging/build/config reserve + migration source → **retire** |
-| Diligent Polydeuces (СПб 8 ГБ) | `85.193.80.159` | empty / provisioning | **battle finance:** primary finance, supplier LK, buyer checkout |
+| Diligent Polydeuces (СПб 8 ГБ) | `85.193.80.159` | Phase 0–2 base + empty finance PG | **battle finance:** primary finance, supplier LK, buyer checkout |
 
 **Коротко:** `.184` = battle catalog · `.159` = battle finance · `.16` = scaffolding then demolish.
 
-SSH: MSK `daibilet_msk80_key` / `daibilet-msk` · `.16` `daibilet_staging_key` · `.159` TBD Phase 0.
+SSH: MSK `daibilet_msk80_key` / `daibilet-msk` · `.16` `daibilet_staging_key` · `.159` `daibilet_spb_finance` (alias `daibilet-spb8` / `spb8` / `daibilet-finance`).
+
+### Состояние `.159` (2026-07-30, Phase 0–2)
+
+| Компонент | Статус |
+|-----------|--------|
+| SSH / UFW | OK; allow 22/80/443; deny public 5432/5437 |
+| docker / nginx / certbot / Node22 / pnpm 11.7 | installed |
+| Paths | `/opt/daibilet-finance`, `/opt/daibilet-staging`, `/opt/daibilet`, `/root/backups` |
+| Finance PG | `daibilet-finance-postgres` · volume `daibilet-finance-pg-data` · DB `daibilet_finance` · `127.0.0.1:5437` · secrets on-host `.env` |
+| Finance app / TLS / YooKassa | **не** задеплоены |
+| DNS stub checkout/supplier | ⏳ owner Timeweb |
 
 ---
 

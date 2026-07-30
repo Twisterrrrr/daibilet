@@ -19,7 +19,7 @@
 |----------------|------|
 | `daibilet_msk80_key` / `daibilet-msk` | `201.24.125.184` |
 | `daibilet_staging_key` | `213.171.7.16` |
-| TBD (Phase 0) | `85.193.80.159` |
+| `daibilet_spb_finance` (`daibilet-finance-159`) | `85.193.80.159` |
 
 ---
 
@@ -111,32 +111,32 @@
 
 ### Phase 0 - Access на `.159` (первый физический шаг)
 
-- [ ] Timeweb: firewall `85.193.80.159` - TCP **22**, **80**, **443**.
-- [ ] SSH: ключ в `authorized_keys` на 8 ГБ (`daibilet_staging_key` или `daibilet_spb8_key`).
-- [ ] Alias:
+- [x] Timeweb/UFW на `85.193.80.159`: TCP **22**, **80**, **443** (UFW active 2026-07-30; panel firewall - confirm owner).
+- [x] SSH: `daibilet_spb_finance` в `authorized_keys` (comment `daibilet-finance-159`).
+- [x] Alias:
 
 ```text
-Host daibilet-spb8 spb8
+Host daibilet-spb8 spb8 daibilet-finance
     HostName 85.193.80.159
     User root
-    IdentityFile ~/.ssh/daibilet_staging_key
+    IdentityFile ~/.ssh/daibilet_spb_finance
     IdentitiesOnly yes
 ```
 
-- [ ] Smoke: `ssh daibilet-spb8 'uname -a; free -h; df -h /'`.
-- [ ] **DNS stub (ещё без cutover traffic):** подготовить A-записи `checkout` / `supplier` / optional `finance-api` → `85.193.80.159` (можно низкий TTL; TLS после подтверждения имени).
-- [ ] **Не** менять apex / catalog DNS на `.184`.
+- [x] Smoke: hostname `spb-3-vm-ukly`, Ubuntu 24.04, ~7.8 Gi RAM, `/` 77G.
+- [ ] **DNS stub (ещё без cutover traffic):** A-записи `checkout` / `supplier` / optional `finance-api` → `85.193.80.159` (Timeweb panel; API token недоступен агенту).
+- [x] **Не** менять apex / catalog DNS на `.184`.
 
 ### Phase 1 - Base stack на `.159`
 
-- [ ] docker / nginx / certbot / git / rsync / Node via corepack + `pnpm@11.7.0`.
-- [ ] `vm.swappiness=10`; каталоги `/opt/daibilet-finance` (или согласованный path), `/opt/daibilet-staging`, `/root/backups`.
+- [x] docker / nginx / certbot / git / rsync / Node 22 + corepack `pnpm@11.7.0`.
+- [x] `vm.swappiness=10`; каталоги `/opt/daibilet-finance`, `/opt/daibilet-staging`, `/opt/daibilet`, `/root/backups`.
 
 ### Phase 2 - Postgres finance (primary)
 
-- [ ] **Fresh** Docker volume `daibilet-finance-pg-data` + DB `daibilet_finance` (не catalog dump).
+- [x] **Fresh** Docker volume `daibilet-finance-pg-data` + DB `daibilet_finance` (не catalog dump); container `daibilet-finance-postgres`, bind `127.0.0.1:5437`.
 - [ ] Optional staging PG отдельно (`:5438`).
-- [ ] Leftover catalog volume на `.16` - только forensic / migration source.
+- [x] Leftover catalog volume на `.16` - только forensic / migration source (не трогали).
 
 ### Phase 3 - Finance app + domains
 
@@ -191,15 +191,15 @@ Host daibilet-spb8 spb8
 
 ## 5. Master checklist
 
-- [ ] Phase 0 SSH + firewall + DNS stub
-- [ ] Phase 1 base stack
-- [ ] Phase 2 finance PG fresh
+- [x] Phase 0 SSH + firewall (DNS stub ⏳ owner)
+- [x] Phase 1 base stack
+- [x] Phase 2 finance PG fresh (empty, localhost)
 - [ ] Phase 3 finance app + `checkout` / `supplier` TLS
 - [ ] Phase 4 optional staging/build move
 - [ ] Phase 5 YooKassa new webhook + keep old until confirmed
 - [ ] Phase 6 smoke
 - [ ] Phase 7 backup + retire `.16`
-- [ ] Docs lock: `spb-finance-host.md` + `current-state.md` + Project architecture
+- [ ] Docs lock: `spb-finance-host.md` + `current-state.md` + Project architecture (partial update 2026-07-30)
 
 ---
 
@@ -218,8 +218,14 @@ Grep hitlist после retire: `spb-finance-host.md`, `current-state.md`, `depl
 ## 8. Следующий физический шаг
 
 ```bash
-ssh root@85.193.80.159
-# + DNS stub A: checkout.daibilet.ru / supplier.daibilet.ru → 85.193.80.159
+# DNS stub в Timeweb (owner):
+# A checkout.daibilet.ru → 85.193.80.159
+# A supplier.daibilet.ru → 85.193.80.159
+# optional A finance-api.daibilet.ru → 85.193.80.159
+# НЕ трогать apex/www/api/admin → .184
+
+ssh daibilet-spb8   # уже работает
+# дальше Phase 3: finance/checkout app + certbot после DNS
 ```
 
-Проверить: ключ принят, `free -h` ~8 Gi, открыты 22/80/443. Серверы **ещё не мигрировать** до явного ops-старта Phase 0+.
+Phase 0–2 на `.159` сделаны 2026-07-30. YooKassa live / payment secrets - не выдумывать.

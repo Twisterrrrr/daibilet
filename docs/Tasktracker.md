@@ -51,9 +51,9 @@
 | MIG.7 | DNS A `daibilet.ru`/`www` → `201.24.125.184` + post-smoke | Критический | ✅ 2026-07-30 |
 | MIG.8 | СПб: stop public web/api + TC timer + crontab sync; PG snapshot; host → finance+staging | Средний | ✅ 2026-07-30 · [spb-finance-host.md](./spb-finance-host.md) |
 | MIG.9 | Role lock: `.184` catalog · `.159` battle finance · `.16` retire after smoke | Высокий | 🔒 docs 2026-07-30 · [spb-finance-host.md](./spb-finance-host.md) |
-| MIG.9.0 | Phase 0: SSH/firewall `.159` + DNS stub `checkout`/`supplier`/(opt `finance-api`) | Критический | ⏳ |
-| MIG.9.1 | Phase 1: base stack docker/nginx/node на `.159` | Высокий | ⏳ |
-| MIG.9.2 | Phase 2: fresh finance PG на `.159` (не catalog dump) | Критический | ⏳ |
+| MIG.9.0 | Phase 0: SSH/firewall `.159` + DNS stub `checkout`/`supplier`/(opt `finance-api`) | Критический | ✅ SSH/UFW 2026-07-30 · DNS stub ⏳ owner Timeweb |
+| MIG.9.1 | Phase 1: base stack docker/nginx/node на `.159` | Высокий | ✅ 2026-07-30 |
+| MIG.9.2 | Phase 2: fresh finance PG на `.159` (не catalog dump) | Критический | ✅ empty PG `:5437` localhost 2026-07-30 |
 | MIG.9.3 | Phase 3: finance app + TLS `checkout.daibilet.ru` (primary), `supplier.daibilet.ru` | Критический | ⏳ |
 | MIG.9.4 | Phase 4: optional staging/build scaffolding на `.159` (не justification для `.16`) | Средний | ⏳ |
 | MIG.9.5 | Phase 5: YooKassa webhook → новый finance API; старый держать до smoke | Критический | ⏳ |
@@ -968,6 +968,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-30 | MIG.9.0–9.2 ✅ Diligent Polydeuces `.159`: SSH `daibilet_spb_finance`, UFW, docker/nginx/node/pnpm, empty finance PG; DNS stub ⏳ |
 | 2026-07-30 | MIG.9 🔒 role lock: `.184` catalog · `.159` battle finance · `.16` retire; phases 9.0–9.7 + checkout DNS |
 | 2026-07-30 | MIG.9 ⏳ план (superseded by role lock): СПб 4ГБ→8ГБ; catalog MSK |
 | 2026-07-30 | Prod 504 MSK: restart web+nginx; INC.504.1-4 mitigations ⏳ Medium |
