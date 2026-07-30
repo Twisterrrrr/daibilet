@@ -55,6 +55,8 @@ packages/config   — shared tsconfig/eslint
 
 **Write/sync path:** legacy `server.js` / sync scripts; после sync — `invalidatePublicCaches({ warm: true })` + Next revalidate.
 
+**Phase 2 finance path:** `CheckoutOrder` / `Payment` / `FulfillmentItem` остаются в `apps/backend` для write-операций, public по умолчанию остается widget-first. Для YooKassa sandbox добавлен reaper зависших оплат: `pnpm backend:checkout:yookassa:reconcile -- --apply`.
+
 ---
 
 ## Admin API contract (2026-07-14)

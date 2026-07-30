@@ -2642,3 +2642,25 @@
 - Backend typecheck passed after the new route/service wiring.
 
 ---
+
+## 2026-07-30 - Phase 2: YooKassa pending-payment reconcile
+
+### Decisions
+
+- Added a YooKassa reconcile/reaper service for expired `CheckoutOrder(PENDING_PAYMENT)` rows.
+- Added CLI command `pnpm backend:checkout:yookassa:reconcile`; it defaults to dry-run, can target one order with `-- --order-id=...`, and mutates only with `-- --apply`.
+- Reconcile reads remote YooKassa payment status when `providerPaymentId` exists and applies the same local state logic as webhooks.
+- Local orders without a persisted `providerPaymentId` can be expired after the grace window, releasing reserved capacity through a guarded order-status transition.
+- Capacity release is claimed by `CheckoutItem.status=RESERVED` inside the same transaction, so repeated cancel/reconcile paths do not return seats twice.
+- No public reconcile endpoint was added; server cron/systemd timer is the safer first operational path.
+
+### Boundaries
+
+- Remote `pending` / `waiting_for_capture` does not release capacity yet; it remains reserved until YooKassa reports a terminal status or a later explicit cancel flow is added.
+- Live sandbox smoke and production scheduling are still required before enabling YooKassa checkout broadly.
+
+### Verification
+
+- Added pure action-classification tests; full typecheck/test pass is the next verification step for this block.
+
+---
