@@ -33,6 +33,13 @@ import { buildPublicCityDto, buildPublicDestinationsDto, clearPublicCityDtoCache
 import { createPublicCityRouteHandler } from './public-city-handler.js';
 import { buildPublicEventDto, clearPublicEventDtoCache } from './public-event.dto.js';
 import { createPublicEventRouteHandler } from './public-event-handler.js';
+import {
+  buildPublicAdmissionProductDetailDto,
+  buildPublicAdmissionProductsListDto,
+  buildPublicSupplierProjectionDto,
+  buildPublicVenueAdmissionProductsDto,
+} from './public-finance-projection.dto.js';
+import { createPublicFinanceProjectionRouteHandler } from './public-finance-projection-handler.js';
 import { buildPublicVenueDto, buildPublicVenuesDto, clearPublicVenueDtoCache } from './public-venue.dto.js';
 import { createPublicVenueRouteHandler } from './public-venue-handler.js';
 import { createPublicReadStackWarmer } from './public-warmup.js';
@@ -105,6 +112,13 @@ const server = startServer({
         enabled: publicFlags.venue,
         buildVenues: buildPublicVenuesDto,
         buildVenue: buildPublicVenueDto,
+      }),
+      createPublicFinanceProjectionRouteHandler({
+        projectionToken: env.DAIBILET_FINANCE_PROJECTION_TOKEN || env.FINANCE_PROJECTION_TOKEN || null,
+        buildAdmissionProductsList: buildPublicAdmissionProductsListDto,
+        buildAdmissionProductDetail: buildPublicAdmissionProductDetailDto,
+        buildVenueAdmissionProducts: buildPublicVenueAdmissionProductsDto,
+        buildSupplierProjection: buildPublicSupplierProjectionDto,
       }),
       createAdminOrdersReadRouteHandler({
         enabled: adminFlags.orders,

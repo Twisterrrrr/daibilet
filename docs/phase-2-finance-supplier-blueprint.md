@@ -499,6 +499,14 @@ Status update 2026-07-30:
 - supplier LC orders/dashboard read internal sales from `CheckoutItem.supplierId`, not from a separate supplier-order table;
 - next gate before real admission checkout: STUB smoke on one live-like supplier/admission product, then YooKassa sandbox for `VENUE_ADMISSION`.
 
+Status update 2026-07-30 (catalog ↔ finance projection):
+
+- public admission read APIs are available on finance backend: list/detail, venue admission summary, supplier projection;
+- public DTO includes `canSell`, `checkoutPath`, public venue/city/supplier refs, active offers and min price;
+- public DTO does not expose `paymentMode`, provider ids or checkout order ids;
+- optional m2m token is supported through `DAIBILET_FINANCE_PROJECTION_TOKEN` / `FINANCE_PROJECTION_TOKEN`;
+- catalog UI/client remains a Cursor-owned consumer step and must keep TC/TEP widgets untouched.
+
 ### Phase 2.5: supplier LC MVP
 
 - ✅ read-first supplier dashboard: `GET /api/supplier/dashboard`;

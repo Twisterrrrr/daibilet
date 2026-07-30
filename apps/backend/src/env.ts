@@ -14,6 +14,8 @@ export const backendEnvSchema = z.object({
   DAIBILET_TS_ADMIN_EVENTS: z.string().optional(),
   DAIBILET_TS_ADMIN_ORDERS: z.string().optional(),
   DAIBILET_PUBLIC_PREWARM_BEFORE_LISTEN: z.string().optional(),
+  DAIBILET_FINANCE_PROJECTION_TOKEN: z.string().optional(),
+  FINANCE_PROJECTION_TOKEN: z.string().optional(),
   ADMIN_EMAIL: z.string().min(1).optional(),
   ADMIN_USER: z.string().min(1).optional(),
   ADMIN_PASSWORD: z.string().optional(),

@@ -60,6 +60,19 @@ export const publicCatalogQuerySchema = paginationQuerySchema.extend({
   limit: z.coerce.number().int().min(1).max(100).optional(),
 });
 
+export const publicFinanceProjectionQuerySchema = paginationQuerySchema.extend({
+  q: optionalString,
+  city: optionalString,
+  citySlug: optionalString,
+  venue: optionalString,
+  venueSlug: optionalString,
+  supplier: optionalString,
+  supplierSlug: optionalString,
+  type: optionalString,
+  refresh: optionalFlag,
+  limit: z.coerce.number().int().min(1).max(100).optional(),
+});
+
 export const adminEventsQuerySchema = paginationQuerySchema.extend({
   q: optionalString,
   source: optionalString,
@@ -201,6 +214,7 @@ export const orderTicketPayloadSchema = z.object({
 });
 
 export type PublicCatalogQuery = z.infer<typeof publicCatalogQuerySchema>;
+export type PublicFinanceProjectionQuery = z.infer<typeof publicFinanceProjectionQuerySchema>;
 export type AdminEventsQuery = z.infer<typeof adminEventsQuerySchema>;
 export type AdminOrdersQuery = z.infer<typeof adminOrdersQuerySchema>;
 export type LookupQuery = z.infer<typeof lookupQuerySchema>;

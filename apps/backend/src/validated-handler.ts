@@ -9,6 +9,7 @@ import {
   lookupQuerySchema,
   paginationQuerySchema,
   publicCatalogQuerySchema,
+  publicFinanceProjectionQuerySchema,
   searchQuerySchema,
 } from './types/schemas.js';
 import { isRequestValidationError, parseSearchParams } from './validation.js';
@@ -85,6 +86,17 @@ function validateSafeRouteQuery(context: RouteContext): void {
   const route = context.route;
   if (route === 'GET /api/public/events') {
     parseSearchParams(publicCatalogQuerySchema, context.searchParams);
+    return;
+  }
+
+  if (
+    route === 'GET /api/public/admission-products' ||
+    route === 'GET /api/public/finance/admission-products' ||
+    /^GET \/api\/public(?:\/finance)?\/admission-products\/[^/]+$/.test(route) ||
+    /^GET \/api\/public(?:\/finance)?\/venues\/[^/]+\/admission-products$/.test(route) ||
+    /^GET \/api\/public(?:\/finance)?\/suppliers\/[^/]+$/.test(route)
+  ) {
+    parseSearchParams(publicFinanceProjectionQuerySchema, context.searchParams);
     return;
   }
 

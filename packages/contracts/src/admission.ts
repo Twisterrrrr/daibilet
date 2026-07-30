@@ -110,3 +110,100 @@ export interface AdmissionProductsListDto {
   };
   items: AdmissionProductDto[];
 }
+
+export interface PublicAdmissionSupplierDto {
+  id: string;
+  slug: string;
+  title: string;
+  status: string;
+  integrationMode: string;
+  defaultCatalogMode: string;
+}
+
+export interface PublicAdmissionVenueDto {
+  id: string;
+  slug: string;
+  title: string;
+  kind: string;
+  citySlug: string | null;
+  cityTitle: string | null;
+}
+
+export interface PublicAdmissionOfferDto {
+  id: string;
+  title: string | null;
+  priceRub: number | null;
+  oldPriceRub: number | null;
+  groupSize: number;
+  capacityTotal: number | null;
+}
+
+export interface PublicAdmissionProductDto {
+  id: string;
+  slug: string;
+  title: string;
+  shortTitle: string | null;
+  shortDescription: string | null;
+  imageUrl: string | null;
+  type: AdmissionProductType | string;
+  purchaseFlow: string;
+  managementMode: string;
+  validityMode: AdmissionValidityMode | string;
+  validFrom: string | null;
+  validTo: string | null;
+  validDaysAfterPurchase: number | null;
+  salesStartsAt: string | null;
+  salesEndsAt: string | null;
+  priceFromRub: number | null;
+  ticketsVacant: number | null;
+  canSell: boolean;
+  checkoutPath: string | null;
+  city: {
+    id: string | null;
+    slug: string | null;
+    title: string | null;
+  };
+  venue: PublicAdmissionVenueDto;
+  supplier: PublicAdmissionSupplierDto;
+  offers: PublicAdmissionOfferDto[];
+}
+
+export interface PublicAdmissionSummaryDto {
+  published: number;
+  canSell: number;
+  priceFromRub: number | null;
+  venues: number;
+  suppliers: number;
+}
+
+export interface PublicAdmissionProductsListDto {
+  generatedAt: string;
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+  filters: {
+    q: string | null;
+    citySlug: string | null;
+    venueSlug: string | null;
+    supplierSlug: string | null;
+    type: AdmissionProductType | string | null;
+  };
+  summary: PublicAdmissionSummaryDto;
+  items: PublicAdmissionProductDto[];
+}
+
+export interface PublicVenueAdmissionProductsDto {
+  generatedAt: string;
+  venue: PublicAdmissionVenueDto;
+  total: number;
+  summary: PublicAdmissionSummaryDto;
+  items: PublicAdmissionProductDto[];
+}
+
+export interface PublicSupplierProjectionDto {
+  generatedAt: string;
+  supplier: PublicAdmissionSupplierDto;
+  admissionSummary: PublicAdmissionSummaryDto;
+  admissionProducts: PublicAdmissionProductDto[];
+}

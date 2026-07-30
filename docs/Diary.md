@@ -1,3 +1,30 @@
+## 2026-07-30 — Catalog ↔ Finance: public projection APIs
+
+### Наблюдения
+
+- Канон границы зафиксирован в `docs/catalog-finance-projection.md`: catalog `.184` читает finance `.159` только через HTTPS projection API, без прямого доступа к finance DB.
+- Admission products нельзя смешивать с импортными event slots: для каталога нужен отдельный public card/summary contract.
+
+### Решения
+
+- Добавлен public finance projection contract в `@daibilet/contracts/admission`.
+- Finance backend отдаёт:
+  - `GET /api/public/admission-products`;
+  - `GET /api/public/admission-products/:slug`;
+  - `GET /api/public/venues/:slug/admission-products`;
+  - `GET /api/public/suppliers/:slug`;
+  - finance-prefix aliases `/api/public/finance/...`.
+- DTO отдаёт только опубликованные admission-продукты активных поставщиков, `canSell`, `checkoutPath`, публичные venue/city/supplier поля; `paymentMode` и checkout ids наружу не выводятся.
+- Добавлена optional m2m-auth: `DAIBILET_FINANCE_PROJECTION_TOKEN` или `FINANCE_PROJECTION_TOKEN`; без токена dev остаётся открытым.
+
+### Проверки
+
+- `apps/backend/node_modules/.bin/tsc.CMD --noEmit` — OK.
+- `packages/contracts/node_modules/.bin/tsc.CMD --noEmit` — OK.
+- `apps/backend/node_modules/.bin/tsx.CMD --test src/public-finance-projection.test.ts src/purchase-projection.test.ts` — OK.
+
+---
+
 ## 2026-07-30 — Phase 2: unified purchase projection
 
 ### Наблюдения
