@@ -90,6 +90,9 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
 
       {showMultiPurchase ? (
         <div className="mt-6">
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-graphite-muted">
+            Варианты билетов
+          </h2>
           <ul className="space-y-2">
             {purchaseOptions.map((option) => (
               <li

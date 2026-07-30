@@ -2,8 +2,8 @@
 
 **Обновлено:** 2026-07-30  
 **Ветка:** `feat/next-monorepo`  
-**Prod live (DNS):** `201.24.125.184` (МСК `msk-1-vm-5a5i`) · Next `:3001` · API `:4000` · PG Docker `:5437` · TLS nginx  
-**Standby (не DNS):** `213.171.7.16` (СПб) - держать 24–48ч · план: [migration-spb-to-msk.md](./migration-spb-to-msk.md)
+**Prod live (DNS):** `201.24.125.184` (МСК `msk-1-vm-5a5i`) · Next `:3001` · API `:4000` · PG Docker `:5437` · TLS nginx · **catalog truth**  
+**СПб (не public):** `213.171.7.16` — MIG.8 ✅: web/api/sync сняты; PG+nginx для finance+staging · [spb-finance-host.md](./spb-finance-host.md)
 
 > Детальные чеклисты: [Tasktracker.md](./Tasktracker.md)  
 > Эталонные slug виджетов: [widget-etalon-slugs.md](./widget-etalon-slugs.md)
@@ -33,9 +33,9 @@
 | Этап | Фокус | Прогресс | Блокер закрытия |
 |------|--------|----------|-----------------|
 | **0** | Post-cutover hardening: smoke, widgets, admin, backfill | **✅** | Browser + Admin smoke ✅ 2026-07-22; TEP orders ⏸ (нет API у партнёра) |
-| **1** | Public parity: поиск, breadcrumbs, city FAQ/SEO | **~70%** 🔄 | event/city structured data |
-| **2** | SEO foundation: sitemap + SSR JSON-LD | **~70%** 🔄 | sitemap index+chunks ✅; JSON-LD event ✅; city FAQ ⏳ |
-| **3+** | Admin Next, dto retire, Phase G finance | ⏳ | После 0–2 |
+| **1** | Public parity: поиск, breadcrumbs, city FAQ/SEO | **~90%** 🔄 | about/crumbs/multi ✅; 1.3.7 editorial ongoing |
+| **2** | SEO foundation: sitemap + SSR JSON-LD | **~90%** 🔄 | venue LD ✅; Rich Results smoke ⏳ |
+| **3+** | F5 dto retire, Phase G finance (СПб host) | ⏳ | F5.0 map ✅; runtime после E5 |
 
 **Легенда статусов:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
 

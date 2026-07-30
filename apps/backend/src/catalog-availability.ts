@@ -96,3 +96,6 @@ export function hasDisplayPrice(priceFrom?: number | null, minPrice = MIN_DISPLA
 export function isSaleableForPublicCatalog(row: CatalogSaleableRow): boolean {
   return Boolean(hasUpcomingOrOpenSchedule(row) && row.purchaseReady);
 }
+
+/** Alias kept for dto.js / event DTO call sites (F5.1). */
+export const isSaleableEventForPublic = isSaleableForPublicCatalog;

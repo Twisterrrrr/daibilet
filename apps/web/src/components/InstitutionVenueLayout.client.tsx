@@ -5,7 +5,6 @@ import {
   Car,
   CheckCircle2,
   ChevronDown,
-  ChevronRight,
   HelpCircle,
   MapPin,
   Navigation as NavigationIcon,
@@ -15,6 +14,7 @@ import {
 
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { OsmMapEmbed } from '@/components/OsmMapEmbed';
+import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
 import { VenueLogisticsBlock, hasVenueLogisticsContent } from '@/components/VenueLogisticsBlock';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatMoney, formatNumber } from '@/lib/format';
@@ -44,11 +44,13 @@ export function InstitutionVenueLayout({
   stats,
   sessions,
   relatedVenues,
+  pagePayload,
 }: {
   venue: PublicVenueDto;
   stats: PublicVenuePageDto['stats'];
   sessions: PublicSessionDto[];
   relatedVenues: PublicVenueDto[];
+  pagePayload: PublicVenuePageDto;
 }) {
   const title = venue.seoH1 || venue.title || venue.name;
   const streetAddress = formatStreetAddress(venue.address, { city: venue.city });
@@ -78,17 +80,7 @@ export function InstitutionVenueLayout({
   return (
     <div className="bg-slate-50 pb-24 lg:pb-0">
       <div className="border-b border-slate-200 bg-white">
-        <div className="container-page flex items-center gap-1.5 py-3 text-sm text-slate-500">
-          <a href="/" className="hover:text-primary-600">
-            Главная
-          </a>
-          <ChevronRight className="h-3.5 w-3.5" />
-          <a href="/venues" className="hover:text-primary-600">
-            Площадки
-          </a>
-          <ChevronRight className="h-3.5 w-3.5" />
-          <span className="text-slate-900">{venue.city}</span>
-        </div>
+        <VenueBreadcrumbsNav payload={pagePayload} />
       </div>
 
       <section className="relative overflow-hidden bg-slate-900 text-white">

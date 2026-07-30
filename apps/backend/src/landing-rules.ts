@@ -313,8 +313,36 @@ export const LANDING_RULES: LandingRule[] = [
   },
 ];
 
+/** Legacy URL aliases → canonical landing slug (single source for dto + Next). */
+export const LANDING_SLUG_ALIASES: Record<string, string[]> = {
+  'river-cruises': ['river-walks', 'river-cruise', 'river'],
+  'river-party': ['party-boat', 'river-disco', 'boat-party'],
+  'bridges-night': ['razvodnye-mosty', 'bridges', 'spb-bridges-night', 'bridges_night', 'night-bridges'],
+  'bus-tours': ['bus-sightseeing', 'bus'],
+  'spb-yards': ['spb-paradnye', 'yards-spb', 'dory-paradnye'],
+  'family-kids': ['kids-family', 'detyam'],
+  'concerts-genre': ['concerts', 'concerts-genres'],
+  'moscow-museums': ['moscow-museums-workshops'],
+  'active-sport': ['active-extreme', 'autosport'],
+};
+
+export function resolveLandingRuleBySlug(landingSlug: string): LandingRule | undefined {
+  const key = String(landingSlug || '').trim().toLowerCase().replace(/_/g, '-');
+  const direct = LANDING_RULES.find((item) => item.slug === key);
+  if (direct) return direct;
+  return LANDING_RULES.find((item) => (LANDING_SLUG_ALIASES[item.slug] || []).includes(key));
+}
+
+export function sessionMatchesLandingSlug(
+  session: { landingSlugs?: string[] | null },
+  canonicalSlug: string,
+): boolean {
+  const slugs = new Set([canonicalSlug, ...(LANDING_SLUG_ALIASES[canonicalSlug] || [])]);
+  return (session.landingSlugs || []).some((value) => slugs.has(String(value || '').toLowerCase()));
+}
+
 export function findLandingRule(slug: string): LandingRule | undefined {
-  return LANDING_RULES.find((rule) => rule.slug === slug);
+  return resolveLandingRuleBySlug(slug);
 }
 
 export function matchingLandingSlugs(candidate: LandingMatchCandidate): string[] {

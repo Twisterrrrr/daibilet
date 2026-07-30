@@ -6,6 +6,7 @@ import { LocationsCatalogView } from '@/components/LocationsCatalogView.client';
 import { VenuesCatalogView } from '@/components/VenuesCatalogView.client';
 import { VenuePageView } from '@/components/VenuePageView.client';
 import { VenueCatalogPageSkeleton } from '@/components/VenueCatalogSkeletons';
+import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { buildPublicVenueDto } from '@daibilet/backend/public-read';
@@ -125,15 +126,11 @@ export async function VenueDetailPage({ slug }: { slug: string }) {
   const jsonLdBlocks = buildVenuePageJsonLd(payload);
 
   return (
-    <SiteLayout>
-      {jsonLdBlocks.map((block, index) => (
-        <script
-          key={`venue-jsonld-${index}`}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }}
-        />
-      ))}
-      <VenuePageView slug={decodeURIComponent(slug)} initialPayload={payload} />
-    </SiteLayout>
+    <>
+      <JsonLdScripts blocks={jsonLdBlocks} idPrefix="venue-jsonld" />
+      <SiteLayout>
+        <VenuePageView slug={decodeURIComponent(slug)} initialPayload={payload} />
+      </SiteLayout>
+    </>
   );
 }

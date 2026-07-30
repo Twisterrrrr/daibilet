@@ -19,6 +19,7 @@ const catalogLinks = [
 ];
 
 const companyLinks = [
+  { label: 'О проекте', href: '/about' },
   { label: 'Блог', href: '/blog' },
   { label: 'Контакты', href: '/contacts' },
   { label: 'Помощь', href: '/help' },

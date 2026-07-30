@@ -5,6 +5,7 @@ import { EventCard } from '@/components/EventCard';
 import { EventBuyCard, EventHero } from '@/components/EventPage.client';
 import { EventDescription, EventQuickInfo, EventTags, EventTrustStrip } from '@/components/EventPageSections';
 import { ReviewSection } from '@/components/ReviewSection';
+import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { toEventPageClientPayload } from '@/lib/event-page-client-props';
@@ -97,48 +98,45 @@ export default async function EventDetailPage({ params }: PageProps) {
   const jsonLdBlocks = buildEventPageJsonLd(payload, { aggregateRating: aggregate });
 
   return (
-    <SiteLayout>
-      {jsonLdBlocks.map((block, index) => (
-        <script
-          key={`event-jsonld-${index}`}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }}
-        />
-      ))}
-      <EventHero payload={clientPayload} />
+    <>
+      {/* Outside SiteLayout client boundary so crawlers see scripts in View Source */}
+      <JsonLdScripts blocks={jsonLdBlocks} idPrefix="event-jsonld" />
+      <SiteLayout>
+        <EventHero payload={clientPayload} />
 
-      <div className="container-page py-10 sm:py-12 lg:py-14">
-        <div className="grid gap-10 lg:grid-cols-3 lg:gap-12">
-          <div className="space-y-10 lg:col-span-2">
-            <EventDescription event={event} />
-            <EventQuickInfo event={event} />
-            <EventTags event={event} />
-            <EventTrustStrip />
-            <ReviewSection eventId={event.id} eventSlug={event.slug} />
-          </div>
+        <div className="container-page py-10 sm:py-12 lg:py-14">
+          <div className="grid gap-10 lg:grid-cols-3 lg:gap-12">
+            <div className="space-y-10 lg:col-span-2">
+              <EventDescription event={event} />
+              <EventQuickInfo event={event} />
+              <EventTags event={event} />
+              <EventTrustStrip />
+              <ReviewSection eventId={event.id} eventSlug={event.slug} />
+            </div>
 
-          <div className="lg:col-span-1">
-            <div className="lg:sticky lg:top-[calc(var(--site-header-height)+1.25rem)]" id="buy-card">
-              <EventBuyCard payload={clientPayload} />
+            <div className="lg:col-span-1">
+              <div className="lg:sticky lg:top-[calc(var(--site-header-height)+1.25rem)]" id="buy-card">
+                <EventBuyCard payload={clientPayload} />
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {related?.length ? (
-        <section className="border-t border-slate-200/80 bg-surface-muted section-y">
-          <div className="container-page">
-            <h2 className="text-2xl font-bold text-graphite">Похожие события</h2>
-            <ul className="mt-8 grid gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
-              {related.slice(0, 6).map((session) => (
-                <li key={`${session.id}-${session.startsAt}`}>
-                  <EventCard session={session} suppressPurchaseAnchors />
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-      ) : null}
-    </SiteLayout>
+        {related?.length ? (
+          <section className="border-t border-slate-200/80 bg-surface-muted section-y">
+            <div className="container-page">
+              <h2 className="text-2xl font-bold text-graphite">Похожие события</h2>
+              <ul className="mt-8 grid gap-5 sm:grid-cols-2 sm:gap-6 xl:grid-cols-3">
+                {related.slice(0, 6).map((session) => (
+                  <li key={`${session.id}-${session.startsAt}`}>
+                    <EventCard session={session} suppressPurchaseAnchors />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        ) : null}
+      </SiteLayout>
+    </>
   );
 }

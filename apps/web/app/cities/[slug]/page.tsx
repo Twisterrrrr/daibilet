@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { CityPageView } from '@/components/CityPageView.client';
 import { CityPageViewEditorial } from '@/components/CityPageViewEditorial.client';
+import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import { buildCityFaqItems, buildCitySeoText } from '@/lib/city-faq';
@@ -105,21 +106,17 @@ export default async function CityPage({ params }: PageProps) {
   const View = hubTemplate === 'editorial' ? CityPageViewEditorial : CityPageView;
 
   return (
-    <SiteLayout>
-      {jsonLdBlocks.map((block, index) => (
-        <script
-          key={`city-jsonld-${index}`}
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(block) }}
+    <>
+      <JsonLdScripts blocks={jsonLdBlocks} idPrefix="city-jsonld" />
+      <SiteLayout>
+        <View
+          slug={decodedSlug}
+          initialPayload={payload}
+          faqItems={faqItems}
+          seoText={seoText}
+          hubArticles={hubArticles}
         />
-      ))}
-      <View
-        slug={decodedSlug}
-        initialPayload={payload}
-        faqItems={faqItems}
-        seoText={seoText}
-        hubArticles={hubArticles}
-      />
-    </SiteLayout>
+      </SiteLayout>
+    </>
   );
 }

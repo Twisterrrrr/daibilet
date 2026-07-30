@@ -3,6 +3,7 @@ import test from 'node:test';
 import {
   hasUpcomingOrOpenSchedule,
   isOpenDateCatalogRow,
+  isSaleableEventForPublic,
   isSaleableForPublicCatalog,
 } from './catalog-availability.js';
 
@@ -54,4 +55,5 @@ test('isSaleableForPublicCatalog requires widget-ready schedule; price optional'
     isSaleableForPublicCatalog({ kind: 'SINGLE', startsAt: future, purchaseReady: false, priceFrom: 500 }),
     false,
   );
+  assert.equal(isSaleableEventForPublic, isSaleableForPublicCatalog);
 });

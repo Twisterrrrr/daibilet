@@ -1,3 +1,84 @@
+## 2026-07-30 - F5.1 + F5.2 landing/catalog TS
+
+### Наблюдения
+- `dto.js` держал ~260 строк дубля `LANDING_RULES` + matchers (~200 строк) параллельно `landing-rules.ts`.
+- `public-catalog.dto` тянул datetime/subcategories из dto при наличии TS-модулей.
+
+### Решения
+- F5.2: `landing-rules.ts` + `LANDING_SLUG_ALIASES`, `resolveLandingRuleBySlug`, `sessionMatchesLandingSlug`; dto импортирует rules/matchers; `buildPublicLandings` → `public-city-landings.ts`.
+- F5.1: catalog datetime → `public-datetime`; subcategories → `public-catalog.mapper`; city landings без dto.
+- JsonLd/SEO фикс (event/help вне SiteLayout) + smoke `scripts/smoke-rich-results.mjs`.
+
+### Проблемы
+- `mapGroupedPublicSession` / city venue hub ещё в dto.js (F5.3).
+
+---
+
+### Наблюдения
+- Prod Next на МСК снова залипал на `:3001` (catalog SWR) - `systemctl restart daibilet-web` вернул ответы.
+- Event/help JSON-LD были только в RSC flight (escaped), не в View Source: `<script ld+json>` внутри `SiteLayout` → client boundary (`SiteProviders`/`SelectedCityProvider`). City/venue иногда проходили, event/help - нет.
+- www → non-www: nginx 301 на `https://daibilet.ru/` (2.3.1 ok).
+
+### Решения
+- SEO: `JsonLdScripts` вне `SiteLayout` (event/help/city/venue); smoke `scripts/smoke-rich-results.mjs` (walk `@graph`).
+- F5.1: канон saleable/price в `catalog-availability.ts` (`isSaleableEventForPublic` alias); datetime → `public-datetime.ts`; offers → `public-offers.ts`; `dto.js` импортирует/реэкспортирует; `public-event.dto.ts` без saleable/datetime/offers из dto.js.
+- Tasktracker: 2.2.5/2.3.1; F5.1 🔄 (helpers done; catalog/city/venue builders ещё из dto.js).
+
+### Проблемы
+- Полный F5.1 (pure Prisma public catalog/city/venue) остаётся следующим шагом.
+- При выносе datetime случайно перезаписали существующий `public-datetime.ts` без `prismaWallTimeToIso` → API crash loop; сразу смержили Prisma wall-time helpers + datetime API; API снова `200`.
+- `.next` SEO-fixкс собран на СПб и выкачен на МСК; localhost smoke: home/city/help/event/venue LD ok.
+
+---
+## 2026-07-30 - Landing buy CTA missing (lean DTO stripped URLs)
+
+### Наблюдения
+- На всех лендингах пропали рабочие кнопки покупки: `toPublicCatalogListItem` отдавал lean-карточки без `purchaseUrl`/`widgetUrl`, а `LandingPurchaseButton` без URL не открывает TC/TEP виджет.
+
+### Решения
+- Вернули purchase URL fields (+ slot.purchaseUrl) в `public-catalog-list-item.ts`.
+- Rebuild `.next` на СПб → deploy МСК; smoke: river/bus payload снова с `purchaseUrl`/`widgetUrl`/`account.teplohod`.
+
+### Проблемы
+- Таблица `Landing` пуста и на МСК, и на СПб (0 rows) - managed landings API 404; rule-based path из dto.js работает.
+
+---
+
+## 2026-07-30 - PERF.E5 + SEO-хвост Этап 1–2
+
+### Наблюдения
+- Event DTO всё ещё тянул `getPublicCatalogSessions` ради related/group/landing - дорого на cold.
+- Venue JSON-LD Place уже был; UI-крошки venues/locations обрывались на городе без title.
+
+### Решения
+- PERF.E5: `loadPublicEventDto` без full catalog; related через `loadRelatedSessionsFromDb` (city/category + upcoming).
+- `/about`, footer link; `VenueBreadcrumbsNav`; heading «Варианты билетов»; Tasktracker 1.1.4/1.2.6/1.4.1/1.4.4/2.2.4/PERF.E5.
+- F5.0 карта: [phases/f5-retire-dto-map.md](./phases/f5-retire-dto-map.md).
+
+### Проблемы
+- API PERF.E5 live на МСК: cold/refresh event ~0.14–0.50с, cache ~2ms, related=12. Next SSR event page подхватит после `web:build`/deploy.
+- Web UI (about/crumbs/variants): source на `/opt/daibilet`, live HTML после rebuild.
+- F5.1+ не стартовали (по плану после E5).
+
+---
+
+## 2026-07-30 - MIG.8: СПб decommission public → finance+staging host
+
+### Наблюдения
+- DNS prod уже на МСК; СПб всё ещё крутил web/api + `daibilet-tc-catalog-sync.timer` + crontab (tep-catalog, tc-orders, reviews, blog digest) — риск двойного sync в разные PG.
+
+### Решения
+- Snapshot: `/root/backups/daibilet-pg-mig8-20260730.dump` (27M, sha256) + `daibilet-pg-volume-mig8-20260730.tgz`.
+- `systemctl stop/disable` `daibilet-web`, `daibilet-api`, `daibilet-tc-catalog-sync.timer`.
+- Crontab prod-jobs закомментированы `# MIG.8 disabled`; backup `crontab-before-mig8-20260730.txt`.
+- PG Docker + nginx оставлены. Catalog truth = МСК. Docs: [spb-finance-host.md](./spb-finance-host.md).
+
+### Проблемы
+- Staging units по-прежнему disabled (подъём только по явному запросу).
+- Finance PG должен быть отдельным volume, не shared с catalog MSK.
+
+---
+
 ## 2026-07-30 - TC widget z-index: overlay above iframe shell
 
 ### Наблюдения
@@ -6266,4 +6347,5 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 
 ### Проблемы
 - Slug lyumer - техническая транслитерация; display title содержит «Люмьер».
+
 

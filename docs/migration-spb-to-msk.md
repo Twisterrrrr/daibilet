@@ -90,9 +90,10 @@ Host daibilet-msk msk
 
 ### C. После стабилизации
 
-1. ⏳ Обновить docs (`current-state.md`) - prod IP = МСК.
+1. ✅ Обновить docs (`current-state.md`) - prod IP = МСК.
 2. ⏳ Обновить deploy-скрипты/CI secrets, если захардкожен `213.171.7.16`.
-3. ⏳ Отвязать/удалить старые floating IP (`81.19.135.200`, затем СПб при полном отказе от него).
+3. ✅ MIG.8 (2026-07-30): СПб public web/api + TC timer + crontab catalog/orders sync сняты; PG snapshot в `/root/backups/`; host = finance+staging ([spb-finance-host.md](./spb-finance-host.md)). IP СПб не удалять.
+4. ⏳ Отвязать старый floating IP `81.19.135.200` в панели при необходимости.
 
 ---
 

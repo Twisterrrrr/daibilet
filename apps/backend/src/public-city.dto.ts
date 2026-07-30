@@ -3,7 +3,6 @@ import { fileURLToPath } from 'node:url';
 import { prisma } from '@daibilet/db';
 import {
   buildPublicDestinationRowsFromSessions,
-  buildPublicLandings,
   buildCityHubSeoTitle,
   destinationPrepositional,
   lookupDestinationCatalogSessions,
@@ -12,6 +11,7 @@ import {
   resolvePublicVenuesForSessions,
   countDistinctSessionVenues,
 } from './dto.js';
+import { buildPublicLandings } from './public-city-landings.js';
 import { createDb } from './db.js';
 import { getPublicCatalogSessions } from './public-catalog.dto.js';
 import { toPublicCatalogListItem } from './public-catalog-list-item.js';

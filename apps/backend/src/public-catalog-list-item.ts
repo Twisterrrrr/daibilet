@@ -5,7 +5,7 @@ export const LIST_SLOT_PREVIEW_LIMIT = 5;
 /** Enough for line-clamp-3 on catalog cards without shipping full HTML blobs. */
 const LIST_DESCRIPTION_MAX_CHARS = 420;
 
-/** Lean catalog card DTO: no widget URLs, truncated slots; keeps list description excerpt. */
+/** Lean catalog card DTO: truncated slots + description; keeps purchase URLs for CTA (landings/catalog buy). */
 export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalogListItemDto {
   const item: PublicCatalogListItemDto = {
     id: session.id,
@@ -22,9 +22,13 @@ export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalo
     timeLabel: session.timeLabel,
     timeBucket: session.timeBucket,
     upcomingSlots: (session.upcomingSlots || []).slice(0, LIST_SLOT_PREVIEW_LIMIT).map((slot) => ({
+      id: slot.id,
+      eventId: slot.eventId,
       startsAt: slot.startsAt,
       dateLabel: slot.dateLabel,
       timeLabel: slot.timeLabel,
+      ...(slot.purchaseUrl ? { purchaseUrl: slot.purchaseUrl } : {}),
+      ...(slot.vacant != null ? { vacant: slot.vacant } : {}),
     })),
   };
 
@@ -45,6 +49,10 @@ export function toPublicCatalogListItem(session: PublicSessionDto): PublicCatalo
   if (session.purchaseReady != null) item.purchaseReady = session.purchaseReady;
   if (session.purchaseMode != null) item.purchaseMode = session.purchaseMode;
   if (session.purchaseProvider != null) item.purchaseProvider = session.purchaseProvider;
+  if (session.purchaseUrl != null) item.purchaseUrl = session.purchaseUrl;
+  if (session.widgetUrl != null) item.widgetUrl = session.widgetUrl;
+  if (session.deeplinkUrl != null) item.deeplinkUrl = session.deeplinkUrl;
+  if (session.purchaseUrlSource != null) item.purchaseUrlSource = session.purchaseUrlSource;
 
   const description = toListDescriptionExcerpt(session.description);
   if (description) item.description = description;

@@ -3,10 +3,12 @@ import { prisma } from '@daibilet/db';
 import {
   hasUpcomingOrOpenSchedule,
   isOpenDateCatalogRow,
+  isSaleableEventForPublic,
   isWideLifetimeSession,
 } from './catalog-availability.js';
 import { resolveCityTimeZone } from './city-timezone.js';
-import { dedupePublicOffers, formatDate, formatTime, isSaleableEventForPublic, normalizeStartsAt, preferNamedTicketOffers, timeBucket } from './dto.js';
+import { formatDate, formatTime, normalizeStartsAt, timeBucket } from './public-datetime.js';
+import { dedupePublicOffers, preferNamedTicketOffers } from './public-offers.js';
 import { findLandingRule, matchingLandingSlugs } from './landing-rules.js';
 import {
   buildProviderWidgetPayload,
@@ -16,7 +18,6 @@ import {
   resolveSessionPurchaseExternalId,
 } from './provider-purchase.js';
 import type { PurchaseProvider } from './types/common.js';
-import { getPublicCatalogSessions } from './public-catalog.dto.js';
 import { pickFirstUsableEventImageUrl } from './event-image-url.js';
 import {
   pickPrimarySessionPurchase,
@@ -129,38 +130,18 @@ export async function buildPublicEventDto(
 }
 
 async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = true): Promise<PublicEventPageDto | null> {
-  // Related/group lookup only - do NOT hydrate upcomingSlots for all ~2600 catalog rows
-  // (default hydrateSlots=true caused multi-second cold TTFB on /events/[slug]).
-  const catalogSessions = await getPublicCatalogSessions(false, { hydrateSlots: false });
+  // PERF.E5: resolve by slug/id via Prisma - do NOT load full public catalog (~2600 rows).
   const requestedSlug = publicSlug(eventSlugOrId);
-  const targetCatalogSession = catalogSessions.find((session) =>
-    session.id === eventSlugOrId ||
-    session.sourceSlug === eventSlugOrId ||
-    session.slug === requestedSlug ||
-    (session.groupEventIds || []).includes(eventSlugOrId)
-  );
-
-  const requestedEvent = await resolveEvent(eventSlugOrId, targetCatalogSession);
+  const requestedEvent = await resolveEvent(eventSlugOrId);
   if (!requestedEvent) return null;
-  const groupEventIds = targetCatalogSession?.groupEventIds?.length
-    ? targetCatalogSession.groupEventIds
-    : [requestedEvent.id];
-  const groupEvents = await prisma.event.findMany({
-    where: { id: { in: groupEventIds } },
-    include: eventInclude,
-  });
-  const eventsById = new Map(groupEvents.map((event) => [event.id, event]));
-  if (!eventsById.has(requestedEvent.id)) eventsById.set(requestedEvent.id, requestedEvent);
   const mergeGroupMembers = await loadMergeGroupMembers(requestedEvent);
-  for (const member of mergeGroupMembers) {
-    eventsById.set(member.id, member);
-  }
   const metaGroupMembers = await loadMetaGroupMembers(requestedEvent);
-  for (const member of metaGroupMembers) {
-    eventsById.set(member.id, member);
-  }
+  const eventsById = new Map<string, EventRecord>([[requestedEvent.id, requestedEvent]]);
+  for (const member of mergeGroupMembers) eventsById.set(member.id, member);
+  for (const member of metaGroupMembers) eventsById.set(member.id, member);
   const mergedGroupEvents = [...eventsById.values()];
-  const purchaseProvider = pickGroupPurchaseProvider(targetCatalogSession, mergedGroupEvents, requestedEvent);
+  const groupEventIds = [...eventsById.keys()];
+  const purchaseProvider = pickGroupPurchaseProvider(undefined, mergedGroupEvents, requestedEvent);
   const purchaseGroupEventIds = filterGroupEventIdsByPurchaseProvider(
     groupEventIds,
     eventsById,
@@ -172,7 +153,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     ...mergeGroupMembers.map((member) => member.id),
     ...metaGroupMembers.map((member) => member.id),
   ])];
-  const representative = eventsById.get(targetCatalogSession?.id || purchaseGroupEventIds[0] || '') || requestedEvent;
+  const representative = eventsById.get(purchaseGroupEventIds[0] || '') || requestedEvent;
   // Tariff/offer rows must come from the page event (and merge peers), not from
   // hundreds of dated TC siblings. Ordering the whole meta-group by price ASC +
   // take 32 keeps only the cheapest child tariffs and drops adult/other categories.
@@ -252,7 +233,7 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     eventSourceCode,
     eventPurchase,
     eventPurchaseUrl,
-    targetCatalogSession,
+    undefined,
   );
   const sessions = dedupePublicEventSessionsByStartsAt(
     publicSessions.length ? publicSessions : widgetOnlySessions,
@@ -266,15 +247,14 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     title: requestedEvent.override?.title || requestedEvent.title,
     venue: requestedEvent.venue?.title || null,
   });
-  const destination = eventDestination(requestedEvent, targetCatalogSession);
+  const destination = eventDestination(requestedEvent);
   const priceFrom = displayPriceFrom(
-    targetCatalogSession?.priceFrom,
     requestedEvent.priceFromRub,
     ...sessions.map((session) => session.priceFrom),
     ...offers.map((offer) => offer.priceRub),
   );
   const title = formatPublicEventTitle(requestedEvent.override?.title || requestedEvent.title);
-  const landingSlugs = targetCatalogSession?.landingSlugs || matchingLandingSlugs({
+  const landingSlugs = matchingLandingSlugs({
     title,
     category: requestedEvent.category?.title || null,
     sourceCategory: requestedEvent.category?.title || null,
@@ -342,15 +322,15 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
     })(),
     ageLimit: requestedEvent.ageLimit,
     priceFrom,
-    vacant: targetCatalogSession?.vacant ?? requestedEvent.ticketsVacant,
+    vacant: requestedEvent.ticketsVacant,
     eventType: requestedEvent.kind.toLowerCase(),
     landingSlugs,
-    groupKey: targetCatalogSession?.groupKey || eventGroupKey(requestedEvent, requestedIdentity),
+    groupKey: eventGroupKey(requestedEvent, requestedIdentity),
     groupEventIds: [...new Set([
       ...groupEventIds,
       ...metaGroupMembers.map((member) => member.id),
     ])],
-    sessionCount: targetCatalogSession?.sessionCount || sessions.length,
+    sessionCount: sessions.length,
     purchaseUrl: primaryPurchase.purchaseUrl,
     widgetUrl: representativeOffer?.widgetUrl || primaryPurchase.purchaseUrl,
     deeplinkUrl: representativeOffer?.deeplinkUrl || null,
@@ -374,13 +354,13 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
   };
   const ticketPrices = buildTicketPrices(offers, sessions, event);
   const purchaseOptions = await buildMergedPurchaseOptions(mergedGroupEvents, offers, requestedEvent, eventPurchaseUrl);
-  const related = relatedSessions(catalogSessions, groupEventIds, requestedEvent, 12);
+  const related = await loadRelatedSessionsFromDb(requestedEvent, groupEventIds, 12);
   const priceValues = [event.priceFrom, ...sessions.map((session) => session.priceFrom)]
     .filter((value): value is number => Number.isFinite(value) && Number(value) >= MIN_DISPLAY_PRICE_RUB);
   const vacantValues = sessions.map((session) => session.vacant)
     .filter((value): value is number => Number.isFinite(value));
 
-  const scheduleSource = sessionRows[0] || sessions[0] || targetCatalogSession;
+  const scheduleSource = sessionRows[0] || sessions[0];
   const scheduleSourceStatus = scheduleSource && 'sourceStatus' in scheduleSource
     ? scheduleSource.sourceStatus
     : requestedEvent.sourceStatus;
@@ -416,26 +396,27 @@ async function loadPublicEventDto(eventSlugOrId: string, allowSoftRedirect = tru
       chips: rule.chips,
     })),
     stats: {
-      sessions: targetCatalogSession?.sessionCount || sessions.length,
+      sessions: sessions.length,
       priceFrom: priceValues.length ? Math.min(...priceValues) : null,
       vacant: vacantValues.length ? vacantValues.reduce((sum, value) => sum + value, 0) : null,
     },
   };
 }
 
-async function resolveEvent(
-  eventSlugOrId: string,
-  catalogSession?: PublicSessionDto,
-): Promise<EventRecord | null> {
+async function resolveEvent(eventSlugOrId: string): Promise<EventRecord | null> {
   const direct = await prisma.event.findFirst({
     where: { OR: [{ id: eventSlugOrId }, { slug: eventSlugOrId }] },
     include: eventInclude,
   });
   if (direct) return direct;
 
-  if (catalogSession?.id) {
-    const catalogEvent = await prisma.event.findUnique({ where: { id: catalogSession.id }, include: eventInclude });
-    if (catalogEvent) return catalogEvent;
+  const requestedSlug = publicSlug(eventSlugOrId);
+  if (requestedSlug && requestedSlug !== eventSlugOrId) {
+    const byPublicSlug = await prisma.event.findFirst({
+      where: { slug: requestedSlug },
+      include: eventInclude,
+    });
+    if (byPublicSlug) return byPublicSlug;
   }
 
   const tcPrefixMatch = eventSlugOrId.match(/^tc-([a-f0-9]{24})-/i);
@@ -522,7 +503,7 @@ function buildWidgetOnlySessions(
   _sourceCode: string | null,
   purchase: ReturnType<typeof purchaseInfo>,
   purchaseUrl: string | null,
-  catalogSession?: PublicSessionDto,
+  _catalogSession?: PublicSessionDto,
 ): PublicEventSession[] {
   if (!shouldSynthesizeWidgetOnlySession({
     sessionsLength: sessions.length,
@@ -541,8 +522,8 @@ function buildWidgetOnlySessions(
     timeLabel: 'Выберите время',
     timeBucket: 'day',
     sourceStatus: 'widget',
-    priceFrom: displayPriceFrom(catalogSession?.priceFrom, event.priceFromRub),
-    vacant: catalogSession?.vacant ?? event.ticketsVacant,
+    priceFrom: displayPriceFrom(event.priceFromRub),
+    vacant: event.ticketsVacant,
     purchaseUrl,
     purchaseReady: true,
     purchaseUrlSource: purchase.urlSource,
@@ -1010,37 +991,110 @@ function buildTicketPrices(
   }).slice(0, 32);
 }
 
-function relatedSessions(
-  sessions: PublicSessionDto[],
-  groupEventIds: string[],
+/** PERF.E5: related cards without full catalog - same city or category, upcoming only. */
+async function loadRelatedSessionsFromDb(
   event: EventRecord,
+  excludeEventIds: string[],
   limit: number,
-): PublicSessionDto[] {
-  const groupIds = new Set(groupEventIds);
-  return sessions.filter((session) =>
-    !(session.groupEventIds || [session.id]).some((id) => groupIds.has(id)) &&
-    (session.cityId === event.primaryCityId || session.category === event.category?.title)
-  ).slice(0, limit);
+): Promise<PublicSessionDto[]> {
+  const exclude = new Set(excludeEventIds);
+  const now = new Date();
+  const cityOrCategory: Prisma.EventWhereInput[] = [];
+  if (event.primaryCityId) cityOrCategory.push({ primaryCityId: event.primaryCityId });
+  if (event.categoryId) cityOrCategory.push({ categoryId: event.categoryId });
+  if (!cityOrCategory.length) return [];
+
+  const rows = await prisma.event.findMany({
+    where: {
+      id: { notIn: [...exclude] },
+      status: { in: ['READY', 'PUBLISHED'] },
+      OR: cityOrCategory,
+      sessions: {
+        some: {
+          OR: [{ startsAt: { gte: now } }, { endsAt: { gte: now } }],
+        },
+      },
+    },
+    include: {
+      primaryCity: { include: { region: true } },
+      venue: true,
+      category: true,
+      override: true,
+      sessions: {
+        where: {
+          OR: [{ startsAt: { gte: now } }, { endsAt: { gte: now } }],
+        },
+        orderBy: { startsAt: 'asc' },
+        take: 1,
+      },
+    },
+    orderBy: { updatedAt: 'desc' },
+    take: limit * 3,
+  });
+
+  const related: PublicSessionDto[] = [];
+  for (const row of rows) {
+    if (exclude.has(row.id)) continue;
+    const next = row.sessions[0];
+    if (!next) continue;
+    const city = row.primaryCity;
+    const destName =
+      city?.isDestination === false && city.region
+        ? city.region.title
+        : city?.title || 'Не указан';
+    const destSlug = city?.isDestination === false && city.region
+      ? publicSlug(city.region.title)
+      : city?.slug
+        ? publicSlug(city.slug)
+        : publicSlug(destName);
+    const destType: 'city' | 'region' =
+      city?.isDestination === false && city.region ? 'region' : 'city';
+    const timeZone = resolveCityTimeZone(city?.title, destName);
+    const startsAt = normalizeStartsAt(next.startsAt) || '';
+    related.push({
+      id: row.id,
+      slug: publicSlug(row.slug),
+      sourceSlug: row.slug,
+      title: formatPublicEventTitle(row.override?.title || row.title),
+      cityId: row.primaryCityId,
+      citySlug: destSlug,
+      sourceCitySlug: city?.slug || null,
+      city: city?.title || 'Не указан',
+      destination: destName,
+      destinationType: destType,
+      venueId: row.venueId,
+      venueSlug: row.venue?.slug || null,
+      venue: row.venue?.title || 'Не указано',
+      venueKind: row.venue?.kind || 'OTHER',
+      category: row.category?.title || 'События',
+      tags: [],
+      kind: row.kind.toLowerCase(),
+      startsAt,
+      dateLabel: formatDate(next.startsAt, timeZone),
+      timeLabel: formatTime(next.startsAt, timeZone),
+      timeBucket: timeBucket(next.startsAt, timeZone),
+      timeZone,
+      priceFrom: displayPriceFrom(row.priceFromRub, next.priceFromRub),
+      vacant: next.ticketsVacant ?? row.ticketsVacant,
+      imageUrl: pickFirstUsableEventImageUrl(row.override?.imageUrl, row.imageUrl, row.venue?.heroImageUrl),
+      purchaseReady: true,
+    });
+    if (related.length >= limit) break;
+  }
+  return related;
 }
 
-function eventDestination(event: EventRecord, catalogSession?: PublicSessionDto): {
+function eventDestination(event: EventRecord): {
   name: string;
   slug: string;
   type: 'city' | 'region';
 } {
-  if (catalogSession) {
-    return {
-      name: catalogSession.destination,
-      slug: catalogSession.citySlug || publicSlug(catalogSession.destination),
-      type: catalogSession.destinationType,
-    };
-  }
   const city = event.primaryCity;
   if (city?.isDestination === false && city.region) {
     return { name: city.region.title, slug: publicSlug(city.region.title), type: 'region' };
   }
   const name = city?.title || 'Не указан';
-  return { name, slug: publicSlug(name), type: 'city' };
+  return { name, slug: city?.slug ? publicSlug(city.slug) : publicSlug(name), type: 'city' };
 }
 
 function eventSubcategories(event: EventRecord): string[] {

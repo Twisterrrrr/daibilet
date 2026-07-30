@@ -29,7 +29,7 @@
 | MIG.5 | Cron/timers (tc-catalog-sync и др.) на МСК | Высокий | ✅ |
 | MIG.6 | Smoke на МСК (IP/`--resolve`) до DNS | Критический | ✅ |
 | MIG.7 | DNS A `daibilet.ru`/`www` → `201.24.125.184` + post-smoke | Критический | ✅ 2026-07-30 |
-| MIG.8 | СПб hot-standby 24-48ч, затем decommission | Средний | ⏳ |
+| MIG.8 | СПб: stop public web/api + TC timer + crontab sync; PG snapshot; host → finance+staging | Средний | ✅ 2026-07-30 · [spb-finance-host.md](./spb-finance-host.md) |
 | PERF.OOM4 | MSK: снять `cpus:1`/`workerThreads:false`, heap build 5120Mi | Высокий | ✅ |
 
 План: [migration-spb-to-msk.md](./migration-spb-to-msk.md)
@@ -38,10 +38,10 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| PERF.E3 | `hydrateSlots: false` в event DTO | Высокий | ✅ код; ⏳ verify cold TTFB на МСК |
-| PERF.E4 | Warm top-100–300 `/events/[slug]` после deploy/sync | Высокий | ⏳ |
-| PERF.E4b | `generateStaticParams` только top-N | Высокий | ⏳ |
-| PERF.E5 | Event page без full catalog (slug→DB + related) | Средний | ⏳ крупнее |
+| PERF.E3 | `hydrateSlots: false` в event DTO | Высокий | ✅ cold TTFB МСК ~0.12–0.17с → warm ~8ms |
+| PERF.E4 | Warm top-100–300 `/events/[slug]` после deploy/sync | Высокий | ✅ `scripts/warm-top-event-pages.mjs` + deploy hook |
+| PERF.E4b | `generateStaticParams` только top-N | Высокий | ✅ top-N default 200 (`EVENT_SSG_TOP_N`) |
+| PERF.E5 | Event page без full catalog (slug→DB + related) | Средний | ✅ 2026-07-30 |
 
 ---
 
@@ -55,7 +55,7 @@
 | PERF.E3 | `buildPublicEventDto`: `getPublicCatalogSessions(..., { hydrateSlots: false })` | Высокий | ✅ код; cold TTFB МСК ~0.12–0.17с → warm ~8ms (2026-07-30) |
 | PERF.E4 | Warm top-100–300 популярных `/events/[slug]` после deploy/sync | Высокий | ✅ `scripts/warm-top-event-pages.mjs` + deploy hook |
 | PERF.E4b | `generateStaticParams` только top-N (не все ~2600; OOM-safe) | Высокий | ✅ top-N default 200 (`EVENT_SSG_TOP_N`) |
-| PERF.E5 | Event page без full catalog: slug → DB + related отдельно | Средний | ⏳ крупнее |
+| PERF.E5 | Event page без full catalog: slug → DB + related отдельно | Средний | ✅ 2026-07-30 `public-event.dto` без `getPublicCatalogSessions` |
 
 ---
 
@@ -780,7 +780,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 1.1.1 | Port `HeaderSearch` → `apps/web` SiteHeader | Высокий | ✅ |
 | 1.1.2 | `/api/public/search` parity (debounce, keyboard nav) | Высокий | ✅ |
 | 1.1.3 | Mobile: search в drawer | Средний | ✅ |
-| 1.1.4 | Страница `/about` | Низкий | ⏳ |
+| 1.1.4 | Страница `/about` | Низкий | ✅ 2026-07-30 |
 
 ### 1.2 Event page
 
@@ -791,7 +791,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 1.2.3 | SSR JSON-LD: `BreadcrumbList` | Высокий | ✅ |
 | 1.2.4 | `generateMetadata` | — | ✅ |
 | 1.2.5 | Sticky buy card + TC/TEP widgets | — | ✅ |
-| 1.2.6 | Мультисобытие «Варианты билетов» | Средний | 🔄 |
+| 1.2.6 | Мультисобытие «Варианты билетов» | Средний | ✅ heading + purchaseOptions (≥2) |
 
 ### 1.3 City page
 
@@ -812,10 +812,10 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| 1.4.1 | Venues / locations breadcrumbs | Средний | 🔄 частично |
+| 1.4.1 | Venues / locations breadcrumbs | Средний | ✅ UI = `VenueBreadcrumbsNav` + JSON-LD |
 | 1.4.2 | `/help` FAQ + JSON-LD | — | ✅ |
 | 1.4.3 | Landings JSON-LD (client) | — | ✅ |
-| 1.4.4 | Фильтр cross-transport subcategories в карточках | Средний | 🔄 |
+| 1.4.4 | Фильтр cross-transport subcategories в карточках | Средний | ✅ `pickCatalogSubcategories` / transport conflict |
 
 ---
 
@@ -841,8 +841,8 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 2.2.1 | Shared helper `lib/structured-data.ts` | Высокий | ✅ |
 | 2.2.2 | Event page LD+JSON в RSC (View Source) | Высокий | ✅ |
 | 2.2.3 | City page LD+JSON в RSC | Высокий | ✅ 2026-07-19 |
-| 2.2.4 | Venue page LD+JSON | Средний | ⏳ |
-| 2.2.5 | Google Rich Results / validator smoke | Низкий | ⏳ |
+| 2.2.4 | Venue page LD+JSON | Средний | ✅ `buildVenuePageJsonLd` Place+BreadcrumbList |
+| 2.2.5 | Google Rich Results / validator smoke | Низкий | ✅ 2026-07-30 `smoke-rich-results.mjs` + JsonLd вне SiteLayout; MSK View Source Event/FAQ/Place ok |
 | 2.2.6 | Root WebSite/Organization JSON-LD + Google favicon PNG (48/96/192) | Высокий | ✅ 2026-07-19 deploy prod |
 | 2.2.7 | Favicon fill ~90%: 32/48/96/180/192/512 + site.webmanifest | Высокий | ✅ |
 | 2.2.8 | Favicon: Flaticon ticket_1912 → бренд `#4A7FD4`, classic horizontal | Высокий | ✅ 2026-07-19 deploy prod |
@@ -854,7 +854,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| 2.3.1 | www → non-www (nginx) audit | Средний | ⏳ |
+| 2.3.1 | www → non-www (nginx) audit | Средний | ✅ 2026-07-30 `www`→301 `https://daibilet.ru/` |
 | 2.3.2 | `noindex` для thin city/venue | Средний | ✅ 2026-07-19 |
 | 2.3.3 | staging `noindex` | — | ✅ |
 
@@ -906,8 +906,10 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| F5.1 | dto.js read → pure Prisma | Высокий | ⏳ |
-| F5.2 | Retire server.js / TS flags | Средний | ⏳ |
+| F5.0 | Карта зависимостей dto.js → Prisma ([f5-retire-dto-map.md](./phases/f5-retire-dto-map.md)) | Высокий | ✅ doc 2026-07-30 |
+| F5.1 | Public helpers + catalog datetime/subcategories из TS; grouping в dto (bridge) | Высокий | ✅ 2026-07-30 |
+| F5.2 | Landing match single source (`landing-rules.ts`); dto без дубля rules | Высокий | ✅ 2026-07-30 |
+| F5.3 | Retire server.js / TS flags | Средний | ⏳ |
 
 ---
 
@@ -935,6 +937,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-30 | MIG.8 ✅ СПб public/sync off; PERF.E5 event без catalog; SEO-хвост about/crumbs/variants; F5.0 map |
 | 2026-07-25 | SEO.20 listing garbage audit: код ✅ (`pnpm audit:listings` + Telegram helper); cron 04:00 на prod ⏳ owner |
 | 2026-07-25 | Owner QA close (blog/F4/SEO): SEO.20 daily garbage audit ⏳ High; SEO.21 monthly tag promote ⏳ Medium; SEO.9b phone 🚫 blocked; SEO.9 launch policy ✅ |
 | 2026-07-24 | B.26: `/blog` UX - topics/search/load-more/CTA/date on large |

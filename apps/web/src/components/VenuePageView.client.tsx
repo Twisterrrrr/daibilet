@@ -105,6 +105,7 @@ export function VenuePageView({ slug, initialPayload }: { slug: string; initialP
                 sessions={contentReady ? payload.sessions : []}
                 routeGroups={contentReady ? allRouteGroups : []}
                 relatedVenues={contentReady ? payload.relatedVenues : []}
+                pagePayload={payload}
               />
             ) : isInstitutionPage ? (
               <InstitutionVenueLayout
@@ -112,6 +113,7 @@ export function VenuePageView({ slug, initialPayload }: { slug: string; initialP
                 stats={payload.stats}
                 sessions={contentReady ? payload.sessions : []}
                 relatedVenues={contentReady ? payload.relatedVenues : []}
+                pagePayload={payload}
               />
             ) : null}
 

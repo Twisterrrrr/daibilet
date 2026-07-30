@@ -8,14 +8,12 @@ import {
 import { resolveCityTimeZone } from './city-timezone.js';
 import {
   dedupeCrossSourceCatalogSessions,
-  formatDate,
-  formatTime,
   mapGroupedPublicSession,
-  pickCatalogSubcategories,
   regroupMappedPublicCatalogSessions,
   sessionHasCoverImage,
-  timeBucket,
 } from './dto.js';
+import { formatDate, formatTime, timeBucket } from './public-datetime.js';
+import { pickCatalogSubcategories } from './public-catalog.mapper.js';
 import { findLandingRule } from './landing-rules.js';
 import { LIST_SLOT_PREVIEW_LIMIT, toPublicCatalogListItem } from './public-catalog-list-item.js';
 import { providerForSource } from './provider-purchase.js';

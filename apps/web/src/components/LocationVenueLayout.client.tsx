@@ -5,7 +5,6 @@ import {
   Anchor,
   Car,
   ChevronDown,
-  ChevronRight,
   Clock,
   MapPin,
   Navigation as NavigationIcon,
@@ -16,6 +15,7 @@ import {
 
 import { LocationCard } from '@/components/LocationCard.client';
 import { OsmMapEmbed } from '@/components/OsmMapEmbed';
+import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
 import { VenueLogisticsBlock, hasVenueLogisticsContent } from '@/components/VenueLogisticsBlock';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { expandSessionPurchaseVariants, isSessionPurchaseBlocked } from '@/lib/event-purchase';
@@ -33,12 +33,14 @@ export function LocationVenueLayout({
   sessions,
   routeGroups = [],
   relatedVenues,
+  pagePayload,
 }: {
   venue: PublicVenueDto;
   stats: PublicVenuePageDto['stats'];
   sessions: PublicSessionDto[];
   routeGroups?: VenueEventGroup[];
   relatedVenues: PublicVenueDto[];
+  pagePayload: PublicVenuePageDto;
 }) {
   const title = venue.seoH1 || venue.title || venue.name;
   const streetAddress = formatStreetAddress(venue.address, { city: venue.city });
@@ -55,17 +57,7 @@ export function LocationVenueLayout({
   return (
     <div className="bg-slate-50">
       <div className="border-b border-slate-200 bg-white">
-        <div className="container-page flex items-center gap-1.5 py-3 text-sm text-slate-500">
-          <a href="/" className="hover:text-primary-600">
-            Главная
-          </a>
-          <ChevronRight className="h-3.5 w-3.5" />
-          <a href="/locations" className="hover:text-primary-600">
-            Локации
-          </a>
-          <ChevronRight className="h-3.5 w-3.5" />
-          <span className="text-slate-900">{venue.city}</span>
-        </div>
+        <VenueBreadcrumbsNav payload={pagePayload} />
       </div>
 
       {isPier ? (
