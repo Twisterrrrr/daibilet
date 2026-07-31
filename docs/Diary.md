@@ -1,3 +1,19 @@
+## 2026-07-31 - Docs: ТЗ geo-autolink + «Собери свой день»
+
+### Наблюдения
+- Owner запросил ТЗ на geo-автопривязку экскурсий к локациям и отдельно на фичу «Собери свой день».
+- Канон Location↔Excursion уже в коде: `EventVenueRouteItem` STOP, `Event.venueId`=старт, public `stopEvents` vs `nearbyEvents` (~300 м) без merge.
+
+### Решения
+- Зафиксированы draft ТЗ: [tz-geo-venue-route-autolink.md](./tz-geo-venue-route-autolink.md) (пороги 150/300/500, dry-run/apply, admin suggest) и [tz-soberi-svoy-den.md](./tz-soberi-svoy-den.md) (localStorage, score STOP>start>nearby, noindex, без комбо в MVP).
+- Связь: geo-autolink = Phase 0 dependency качества «Собери свой день».
+- Tasktracker: LE.8/LE.9, DR.1/DR.2. Docs-only: commit+push, без web deploy.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-07-31 - City hero HERO3p: adaptive right gutter ladder
 
 ### Наблюдения
