@@ -72,6 +72,18 @@ const CITY_SLUG_ALIASES = {
   chelyabinsk: ['chelyabinsk', 'челябинск'],
   ryazan: ['ryazan', 'рязань'],
   stavropol: ['stavropol', 'ставрополь'],
+  tomsk: ['tomsk', 'томск'],
+  ulyanovsk: ['ulyanovsk', 'ульяновск'],
+  izhevsk: ['izhevsk', 'ижевск'],
+  orel: ['orel', 'oryol', 'орёл', 'орел'],
+  orenburg: ['orenburg', 'оренбург'],
+  abakan: ['abakan', 'абакан'],
+  pskov: ['pskov', 'псков'],
+  sevastopol: ['sevastopol', 'севастополь'],
+  simferopol: ['simferopol', 'симферополь'],
+  penza: ['penza', 'пенза'],
+  volgograd: ['volgograd', 'волгоград'],
+  arhangelsk: ['arhangelsk', 'arkhangelsk', 'архангельск'],
 };
 
 const CITY_TITLE_ALIASES = {
@@ -106,6 +118,18 @@ const CITY_TITLE_ALIASES = {
   chelyabinsk: ['Челябинск'],
   ryazan: ['Рязань'],
   stavropol: ['Ставрополь'],
+  tomsk: ['Томск'],
+  ulyanovsk: ['Ульяновск'],
+  izhevsk: ['Ижевск'],
+  orel: ['Орёл', 'Орел'],
+  orenburg: ['Оренбург'],
+  abakan: ['Абакан'],
+  pskov: ['Псков'],
+  sevastopol: ['Севастополь'],
+  simferopol: ['Симферополь'],
+  penza: ['Пенза'],
+  volgograd: ['Волгоград'],
+  arhangelsk: ['Архангельск'],
 };
 
 const dryRun = process.argv.includes('--dry-run') || !process.argv.includes('--apply');

@@ -1,3 +1,19 @@
+## 2026-08-01 - Must-see editorial batch4 (12 городов, 72 точки)
+
+### Наблюдения
+- Owner: Томск, Ульяновск, Ижевск, Орёл, Оренбург, Абакан, Псков, Севастополь, Симферополь, Пенза, Волгоград, Архангельск (по 6).
+- У Архангельска в cityInfo был пустой `mustSee` (только sights) - без slug нельзя было линковать хаб.
+
+### Решения
+- `must-see-editorial.json` → 252; batch4 артефакт 72; aliases batch4 в enrich.
+- `cityInfo.arhangelsk.mustSee` с 6 slug (в т.ч. insert 6 Venue на MSK).
+- MSK apply: 66 update + 6 insert; API restart; smoke 12/12 hookFact owner-тексты.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-01 - Must-see editorial batch3 (10 городов, 57 точек)
 
 ### Наблюдения
