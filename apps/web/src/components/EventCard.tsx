@@ -378,7 +378,7 @@ function EventCardSlotChips({
     );
   };
 
-  /** 2-up grid: equal column slots; last odd chip centered across both cols. */
+  /** 2-up grid: fill L→R; odd remainder / single stay in left column (same inset as left of a pair). */
   const renderSlotGrid = (sliceLabels: string[], moreCount: number, className: string) => {
     const items: Array<{ key: string; node: ReactNode }> = sliceLabels.map((label) => ({
       key: label,
@@ -390,20 +390,13 @@ function EventCardSlotChips({
         node: <span className={SLOT_MORE_CHIP_CLASS}>ещё {moreCount}</span>,
       });
     }
-    const count = items.length;
     return (
       <div className={`grid grid-cols-2 gap-1.5 ${className}`}>
-        {items.map((item, index) => {
-          const isLoneOnRow = count % 2 === 1 && index === count - 1;
-          return (
-            <div
-              key={item.key}
-              className={isLoneOnRow ? 'col-span-2 flex justify-center' : 'flex justify-center'}
-            >
-              {item.node}
-            </div>
-          );
-        })}
+        {items.map((item) => (
+          <div key={item.key} className="flex justify-center">
+            {item.node}
+          </div>
+        ))}
       </div>
     );
   };
