@@ -37,6 +37,7 @@
 | UX.HERO1 | Cap city PNG ≤110% (`1024px*1.1`) + `object-contain` (не height-upscale) | Критический | ✅ MSK `ikMw9FRXSb-HNgZKjaLxM` (без commit) |
 | UX.HERO1b | Не дать следующему MSK rebuild затереть source `1.2` поверх | Высокий | ⏳ commit или scp source перед каждым web build |
 | UX.HERO2 | CLS: fixed night hero `h-*` + city skeleton/loading match SSR/hydrate | Критический | ✅ MSK `yvt23s2J2qJustslJex5K` (без commit) |
+| UX.HERO3 | Ultrawide sides: mirror ~10% + stretch + navy fade `#0b1220` (не flat crop) | Высокий | ✅ source `8d7952ff` + live BUILD `lGrO-MIR8XMZLXbCJH6fh` |
 
 ## /podborki city filter (2026-07-31)
 
