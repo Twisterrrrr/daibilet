@@ -9,6 +9,7 @@
 - `scripts/data/must-see-editorial.json` + `scripts/enrich-must-see-editorial.js`: пишем `hookFact` / `description` / `wayToFind` / coords / address / metroStation; `shortDescription` только если пусто.
 - MSK apply: 69 update. Hide stubs `vdnh-8af81f3a0643`, `spas-na-krovi-995a65eafe4e`.
 - `dto.js`: explicit CMS kinds (`outdoor_location` / `attraction` / theater / museum*) побеждают meeting_point heuristic до проверки «памятник» в тексте.
+- Pier-merge key: только `причал|пристань` (не голые «набережные») - иначе must-see променады проигрывали pier-близнецам.
 - Smoke API: 69/69 OK_with_hook, 0 NULL, 0 slug mismatch. API restart на MSK.
 
 ### Проблемы
