@@ -42,6 +42,7 @@
 | VK.11 | Editorial enrich must-see top-12 cities (hookFact/about/way/coords/address/metro) | Высокий | ✅ 69 MSK; shortDescription preserve; CMS kind guard; ATTRACTION twins HIDDEN |
 | VK.12 | Editorial enrich batch2: Омск/Уфа/Новгород/Тверь/Краснодар/Сочи/Тюмень/Воронеж/Ростов (53) | Высокий | ✅ 53 update MSK; база 122; shortDescription preserve |
 | VK.12b | Ростов: Центральный рынок (Старый базар) editorial #6 | Средний | ✅ MSK; база 123 |
+| VK.13 | Editorial enrich batch3: Влад/Вологда/Иркутск/Пермь/Сортавала/Саратов/Улан-Удэ/Челябинск/Рязань/Ставрополь (57) | Высокий | ✅ 57 MSK; база 180 |
 | VK.13 | Editorial enrich batch3: Вл/Вологда/Ирк/Пермь/Сортавала/Саратов/УУ/Чел/Ряз/Ставр (57) | Высокий | ✅ MSK; база 180 |
 
 ## Finance supplier LC smoke (.159) 2026-07-31
