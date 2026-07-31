@@ -65,7 +65,7 @@ function CityNightHeroSkeleton() {
           style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
           aria-hidden
         >
-          {/* HERO3f: leftGrad to photo edge → 16:9 at right-[20%] → right gutter soft→navy→black. */}
+          {/* HERO3g: leftGrad to photo edge (#0a174b→black) → 16:9 at right-[20%] → right gutter soft→navy→black. */}
           <div
             className={CITY_NIGHT_HERO.leftFillDesktop}
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}

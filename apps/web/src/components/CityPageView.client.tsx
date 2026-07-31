@@ -538,7 +538,7 @@ function CityHeroDefault({
   );
 }
 
-/** HERO3f: 16:9 photo at right-[20%] + navy fades from photo edges; иначе нейтральный strip. */
+/** HERO3g: 16:9 photo at right-[20%] + owner-swatch navy (#0a174b) fades from photo edges; иначе нейтральный strip. */
 function CityHeroStrip({
   city,
   stats,
@@ -657,7 +657,7 @@ function CityHeroStrip({
             style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
             aria-hidden
           >
-            {/* 1) LeftGrad to photo edge (navy→black left). 2) Photo 16:9 at right-[20%]. 3) Right gutter soft→navy→black. */}
+            {/* 1) LeftGrad to photo edge (#0a174b→black left). 2) Photo 16:9 at right-[20%]. 3) Right gutter soft→navy→black. */}
             <div
               className={CITY_NIGHT_HERO.leftFillDesktop}
               style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}

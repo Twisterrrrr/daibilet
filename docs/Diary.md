@@ -1,3 +1,22 @@
+## 2026-07-31 - City hero HERO3g: owner swatch navy `#0a174b`
+
+### Наблюдения
+- Owner приложил скрин photo-edge цвета: доминирующий navy ≈ `#0a174b` (рядом `#0B194B`), не near-black `#000c2a`.
+- HERO3f с `#000c2a` / `#010d2d` визуально читался как «только чёрный» - стоп у фото слишком тёмный.
+
+### Решения
+- Канон `CITY_NIGHT_HERO.navy = #0a174b`, mid `#050e28`.
+- Left: `#000 → #050e28 → #0a174b` у края фото; right gutter: soft → `#0a174b` → mid → `#000` на правом краю.
+- Section/underlay base `#0a174b` (не flat black). Skeleton/CityPageView comments sync.
+
+### Проблемы
+- Нет.
+
+### Deploy
+- Commit + push + SPB→MSK atomic (см. запись после smoke).
+
+---
+
 ## 2026-07-31 - Owner: авто-commit/deploy для продуктовых итераций
 
 ### Наблюдения

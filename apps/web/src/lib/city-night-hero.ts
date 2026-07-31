@@ -1,5 +1,5 @@
 /**
- * Fixed city night-hero shell (HERO3f: restore 16:9 + navy fades from photo edges).
+ * Fixed city night-hero shell (HERO3g: owner swatch navy at photo edges).
  * Shared by CityPageView SSR/hydrate and city loading skeleton so first HTML
  * and client paint claim the same height (no CLS jump).
  *
@@ -14,10 +14,13 @@
  * Text/CTA stay left above media; no scrim over type.
  */
 export const CITY_NIGHT_HERO = {
-  /** Sample midnight navy (owner swatch; not teal-ish #050a12). */
-  navy: '#000c2a',
-  /** Mid stop toward black. */
-  navyMid: '#010d2d',
+  /**
+   * Owner swatch (sampled photo-edge navy ≈ #0a174b / #0B194B).
+   * Not near-black #000c2a - that read as flat black on screen.
+   */
+  navy: '#0a174b',
+  /** Mid stop toward black (still blue-tinted). */
+  navyMid: '#050e28',
   /** Deep black letterbox / far-end fill. */
   navyDeep: '#000000',
   /**
@@ -25,7 +28,7 @@ export const CITY_NIGHT_HERO = {
    * black appears only at gradient ends.
    */
   section:
-    'relative h-[280px] overflow-hidden border-b border-[#000c2a] bg-[#000c2a] sm:h-[320px] md:h-[360px]',
+    'relative h-[280px] overflow-hidden border-b border-[#0a174b] bg-[#0a174b] sm:h-[320px] md:h-[360px]',
   /** Text + CTA column; fills fixed section height. Above media layer (z-0). */
   content: 'container-page relative z-[1] flex h-full min-h-0 flex-col justify-end py-8 sm:py-10',
   /** Copy column: full width on mobile; left safe zone on md+ (photo + gutter own the right). */
@@ -46,15 +49,15 @@ export const CITY_NIGHT_HERO = {
   leftFillDesktop:
     'absolute inset-y-0 left-0 hidden md:block md:right-[calc(20%+min(56%,640px))]',
   fadeLeftDesktop:
-    'linear-gradient(to right, #000000 0%, #010d2d 22%, #000c2a 48%, #000c2a 100%)',
+    'linear-gradient(to right, #000000 0%, #050e28 30%, #0a174b 58%, #0a174b 100%)',
   /** Mobile: denser left navy under copy; photo reads weaker through the fill. */
   fadeLeftMobile:
-    'linear-gradient(to right, #000c2a 0%, #000000 42%, rgba(0,12,42,0.92) 68%, rgba(0,12,42,0.55) 85%, transparent 100%)',
+    'linear-gradient(to right, #0a174b 0%, #000000 42%, rgba(10,23,75,0.92) 68%, rgba(10,23,75,0.55) 85%, transparent 100%)',
   /**
    * Right gutter only (right:0; width 20%): from photo's right edge going right -
    * ~3.5% soft into navy, then navy → black at section rim.
    */
   rightGutter: 'absolute inset-y-0 right-0 hidden w-[20%] md:block',
   fadeRightGutter:
-    'linear-gradient(to right, transparent 0%, #000c2a 3.5%, #000c2a 14%, #010d2d 45%, #000000 100%)',
+    'linear-gradient(to right, transparent 0%, #0a174b 3.5%, #0a174b 18%, #050e28 48%, #000000 100%)',
 } as const;
