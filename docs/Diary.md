@@ -82,6 +82,22 @@
 
 ---
 
+## 2026-07-31 - City hero HERO3c: golden-ratio без зеркал
+
+### Наблюдения
+- Зеркальные бока (HERO3/3b) усложняли layout и на ultrawide всё равно выглядели как «письмо»; нужен простой CSS-слой по φ.
+
+### Решения
+- Убраны `CityHeroMirrorWing` / `sideMirror*` полностью; skeleton sync без mirror placeholders.
+- Композиция: base `#050a12` + left fade (`38.2%→61.8%` desktop / сильнее на mobile) + right fade `#010204` + фото справа `w-[38.2%]` (`object-cover`, city focus).
+- Copy/CTA в `contentInner` ~`md:max-w-[55%]`; градиенты только в media `z-0` под контентом (не scrim поверх текста).
+- Высоты прежние `h-[280|320|360]`. Commit + atomic catalog deploy (SPB build -> MSK `.next` swap).
+
+### Проблемы
+- Redeploy pending / in progress.
+
+---
+
 ## 2026-07-31 - City hero mirror: откат stretch + fix layout
 
 ### Наблюдения
@@ -94,6 +110,7 @@
 
 ### Проблемы
 - Только local; MSK live ещё на старом stretch-mirror - нужен redeploy после проверки.
+- **Superseded** HERO3c (golden-ratio, без зеркал).
 
 ---
 

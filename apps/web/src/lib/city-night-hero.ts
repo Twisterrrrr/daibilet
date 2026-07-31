@@ -1,40 +1,35 @@
 /**
- * Fixed city night-hero shell.
+ * Fixed city night-hero shell (HERO3c: golden-ratio, no side mirrors).
  * Shared by CityPageView SSR/hydrate and city loading skeleton so first HTML
  * and client paint claim the same height (no CLS jump).
  *
  * Heights are fixed (`h-*`), not `min-h-*`: content / font swap must not grow the box.
- * Image frame cap: city PNG ~1024px × 1.1, object-contain (no height upscale).
- * Ultrawide sides: narrow mirrored ~10% strips next to the photo (fade to transparent);
- * leftover viewport gutters are plain navy CSS - never stretch the mirror.
+ * Composition: navy base + left φ fade + right edge fade + photo on the right (~38.2%).
+ * Text/CTA stay in the left safe zone (~55%); gradients live in z-0 under content (not a scrim over type).
  */
 export const CITY_NIGHT_HERO = {
-  /** Brand night letterbox (navy, not purple). */
-  navy: '#0b1220',
-  /**
-   * Capped hero image width (≈1024px × 1.1). Used in calcs for frame + mirror strips.
-   * Keep in sync with imageFrame max-width.
-   */
-  imageWidth: 'min(100%, calc(1024px * 1.1))',
-  /** Outer section: full-bleed navy; mirror strips stay next to the photo only. */
+  /** Spec navy letterbox (not purple). */
+  navy: '#050a12',
+  /** Deep edge fade on the right. */
+  navyDeep: '#010204',
+  /** Outer section: full-bleed navy; photo never stretches across ultrawide gutters. */
   section:
-    'relative h-[280px] overflow-hidden border-b border-[#0b1220] bg-[#0b1220] sm:h-[320px] md:h-[360px]',
+    'relative h-[280px] overflow-hidden border-b border-[#050a12] bg-[#050a12] sm:h-[320px] md:h-[360px]',
   /** Text + CTA column; fills fixed section height. Above media layer (z-0). */
   content: 'container-page relative z-[1] flex h-full min-h-0 flex-col justify-end py-8 sm:py-10',
-  /** Centered image box ≤110% of ~1024px intrinsic width. */
-  imageFrame:
-    'absolute inset-y-0 left-1/2 z-[1] h-full w-[min(100%,calc(1024px*1.1))] max-w-[min(100%,calc(1024px*1.1))] -translate-x-1/2',
-  imageSizes: '(max-width: 1126px) 100vw, 1126px',
+  /** Copy column: full width on mobile; ~55% golden safe zone from md. */
+  contentInner: 'w-full max-w-2xl md:max-w-[55%]',
   /**
-   * Mirror strip = 10% of capped image width (NOT the leftover viewport gutter).
-   * Wings sit immediately left/right of the photo; outside them navy CSS shows through.
+   * Photo band: full-bleed cover on narrow screens (strong left fade keeps type readable);
+   * from md - right φ strip (~38.2% width), object-cover within the band.
    */
-  sideMirrorWidth: 'calc(min(100%, calc(1024px * 1.1)) * 0.1)',
-  /**
-   * Left wing: flush to the left edge of the centered image frame.
-   * `left = 50% - halfImage - mirrorWidth` = `50% - 0.6 * imageWidth`.
-   */
-  leftMirrorLeft: 'calc(50% - min(100%, calc(1024px * 1.1)) * 0.6)',
-  /** Right wing: flush to the right edge of the centered image frame. */
-  rightMirrorLeft: 'calc(50% + min(100%, calc(1024px * 1.1)) * 0.5)',
+  photoFrame: 'absolute inset-0 md:inset-y-0 md:left-auto md:right-0 md:w-[38.2%]',
+  imageSizes: '(max-width: 767px) 100vw, 38.2vw',
+  /** Desktop left φ fade: solid navy through 38.2%, clear by 61.8%. */
+  fadeLeftDesktop: 'linear-gradient(to right, #050a12 0%, #050a12 38.2%, transparent 61.8%)',
+  /** Mobile: heavier navy under copy so cover photo cannot wash out title/CTA. */
+  fadeLeftMobile:
+    'linear-gradient(to right, #050a12 0%, #050a12 52%, rgba(5,10,18,0.85) 74%, transparent 100%)',
+  /** Soft right-edge vignette. */
+  fadeRight: 'linear-gradient(to left, #010204 0%, transparent 20%)',
 } as const;

@@ -62,37 +62,23 @@ function CityNightHeroSkeleton() {
       <section className={CITY_NIGHT_HERO.section}>
         <div
           className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-          style={{
-            background: `linear-gradient(90deg, ${CITY_NIGHT_HERO.navy} 0%, #0a1628 50%, ${CITY_NIGHT_HERO.navy} 100%)`,
-          }}
+          style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
           aria-hidden
         >
-          {/* Mirror-strip placeholders (~10% image width), flush to photo - match live geometry. */}
+          {/* Photo-band placeholder (no mirrors) - match live golden-ratio geometry. */}
+          <div className={`${CITY_NIGHT_HERO.photoFrame} bg-white/[0.06]`} />
           <div
-            className="absolute inset-y-0 overflow-hidden"
-            style={{
-              width: CITY_NIGHT_HERO.sideMirrorWidth,
-              left: CITY_NIGHT_HERO.leftMirrorLeft,
-              WebkitMaskImage: 'linear-gradient(to left, #000 0%, transparent 100%)',
-              maskImage: 'linear-gradient(to left, #000 0%, transparent 100%)',
-              backgroundColor: 'rgba(255,255,255,0.06)',
-            }}
+            className="absolute inset-0 md:hidden"
+            style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}
           />
           <div
-            className="absolute inset-y-0 overflow-hidden"
-            style={{
-              width: CITY_NIGHT_HERO.sideMirrorWidth,
-              left: CITY_NIGHT_HERO.rightMirrorLeft,
-              WebkitMaskImage: 'linear-gradient(to right, #000 0%, transparent 100%)',
-              maskImage: 'linear-gradient(to right, #000 0%, transparent 100%)',
-              backgroundColor: 'rgba(255,255,255,0.06)',
-            }}
+            className="absolute inset-0 hidden md:block"
+            style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
           />
-          <div className={CITY_NIGHT_HERO.imageFrame} />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0b1220]/70 via-[#0b1220]/30 to-transparent" />
+          <div className="absolute inset-0" style={{ backgroundImage: CITY_NIGHT_HERO.fadeRight }} />
         </div>
         <div className={CITY_NIGHT_HERO.content}>
-          <div className="max-w-2xl">
+          <div className={CITY_NIGHT_HERO.contentInner}>
             <div className="h-10 max-w-md animate-pulse rounded bg-white/22 sm:h-12" />
             <div className="mt-3 h-4 max-w-xl animate-pulse rounded bg-white/16" />
             <div className="mt-2 h-4 max-w-lg animate-pulse rounded bg-white/12" />

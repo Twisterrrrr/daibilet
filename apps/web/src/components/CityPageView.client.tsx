@@ -26,7 +26,8 @@ import { matchSightAfficheLink, resolveFeaturedDirections } from '@/lib/city-hub
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
-import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
+import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
+import { resolveCityInfo, type CityInfoEntry, type CityMustSeeItem } from '@/lib/cityInfo';
 import { isOpenDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import {
   collectSessionStartsAtTimes,
@@ -537,62 +538,7 @@ function CityHeroDefault({
   );
 }
 
-/** Vertical component of object-position for mirror wings (X is edge-locked). */
-function heroFocusY(objectPosition: string): string {
-  const parts = objectPosition.trim().split(/\s+/);
-  return parts[1] || 'center';
-}
-
-/**
- * Narrow side strip next to the hero photo: mirror the outer ~10% edge,
- * fade to transparent toward the outer edge (navy CSS shows through beyond).
- * Does NOT stretch across the leftover viewport gutter.
- */
-function CityHeroMirrorWing({
-  side,
-  src,
-  focusY,
-}: {
-  side: 'left' | 'right';
-  src: string;
-  focusY: string;
-}) {
-  const isLeft = side === 'left';
-  return (
-    <div
-      className="absolute inset-y-0 overflow-hidden"
-      style={{
-        width: CITY_NIGHT_HERO.sideMirrorWidth,
-        left: isLeft ? CITY_NIGHT_HERO.leftMirrorLeft : CITY_NIGHT_HERO.rightMirrorLeft,
-        // Opaque next to photo → transparent at outer edge (no navy overlay paint).
-        WebkitMaskImage: isLeft
-          ? 'linear-gradient(to left, #000 0%, transparent 100%)'
-          : 'linear-gradient(to right, #000 0%, transparent 100%)',
-        maskImage: isLeft
-          ? 'linear-gradient(to left, #000 0%, transparent 100%)'
-          : 'linear-gradient(to right, #000 0%, transparent 100%)',
-      }}
-    >
-      <div className="absolute inset-0" style={{ transform: 'scaleX(-1)' }}>
-        {/* Wing = 10% of image; img width 1000% of wing = full image, edge-locked. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={src}
-          alt=""
-          draggable={false}
-          className={`pointer-events-none absolute inset-y-0 h-full max-w-none ${isLeft ? 'left-0' : 'right-0'}`}
-          style={{
-            width: '1000%',
-            objectFit: 'cover',
-            objectPosition: isLeft ? `left ${focusY}` : `right ${focusY}`,
-          }}
-        />
-      </div>
-    </div>
-  );
-}
-
-/** Option A: full-bleed night skyline when city PNG exists; иначе нейтральный strip. */
+/** Option A: golden-ratio night skyline when city PNG exists; иначе нейтральный strip. */
 function CityHeroStrip({
   city,
   stats,
@@ -708,20 +654,11 @@ function CityHeroStrip({
         {nightShell ? (
           <div
             className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-            style={{
-              // Section media layer only - navy CSS fills gutters beyond mirror strips.
-              background: `linear-gradient(90deg, ${CITY_NIGHT_HERO.navy} 0%, #0a1628 50%, ${CITY_NIGHT_HERO.navy} 100%)`,
-            }}
+            style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
             aria-hidden
           >
-            {showPhoto ? (
-              <>
-                <CityHeroMirrorWing side="left" src={heroImage!} focusY={heroFocusY(heroFocus)} />
-                <CityHeroMirrorWing side="right" src={heroImage!} focusY={heroFocusY(heroFocus)} />
-              </>
-            ) : null}
-            {/* Center: city PNG (~1024px) ≤ +10%; object-contain - без height-upscale. */}
-            <div className={CITY_NIGHT_HERO.imageFrame}>
+            {/* Right φ photo band (full-bleed cover on mobile). Gradients below sit under content z-[1]. */}
+            <div className={CITY_NIGHT_HERO.photoFrame}>
               {showPhoto ? (
                 <SafeImage
                   src={heroImage}
@@ -731,17 +668,23 @@ function CityHeroStrip({
                   sizes={CITY_NIGHT_HERO.imageSizes}
                   style={{ objectPosition: heroFocus }}
                   onError={() => setHeroImageFailed(true)}
-                  className="object-contain object-center"
+                  className="object-cover object-center"
                 />
               ) : null}
             </div>
-            {/* Soft scrim for title legibility - stays inside z-0 media layer (not over page). */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0b1220]/70 via-[#0b1220]/30 to-transparent" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0b1220]/40 via-transparent to-transparent" />
+            <div
+              className="absolute inset-0 md:hidden"
+              style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}
+            />
+            <div
+              className="absolute inset-0 hidden md:block"
+              style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
+            />
+            <div className="absolute inset-0" style={{ backgroundImage: CITY_NIGHT_HERO.fadeRight }} />
           </div>
         ) : null}
         <div className={contentClass}>
-          <div className="max-w-2xl">
+          <div className={nightShell ? CITY_NIGHT_HERO.contentInner : 'max-w-2xl'}>
             <h1 className={titleClass}>{city.name}</h1>
             <p className={briefClass}>{brief}</p>
             {seasonChip ? (
@@ -979,16 +922,22 @@ function CityLoadingState({ editorial = false }: { editorial?: boolean }) {
       <section className={CITY_NIGHT_HERO.section} aria-busy="true" aria-label="Загрузка">
         <div
           className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-          style={{
-            background: `linear-gradient(90deg, ${CITY_NIGHT_HERO.navy} 0%, #0a1628 50%, ${CITY_NIGHT_HERO.navy} 100%)`,
-          }}
+          style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
           aria-hidden
         >
-          <div className={CITY_NIGHT_HERO.imageFrame} />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0b1220]/70 via-[#0b1220]/30 to-transparent" />
+          <div className={`${CITY_NIGHT_HERO.photoFrame} bg-white/[0.04]`} />
+          <div
+            className="absolute inset-0 md:hidden"
+            style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}
+          />
+          <div
+            className="absolute inset-0 hidden md:block"
+            style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
+          />
+          <div className="absolute inset-0" style={{ backgroundImage: CITY_NIGHT_HERO.fadeRight }} />
         </div>
         <div className={CITY_NIGHT_HERO.content}>
-          <div className="max-w-2xl">
+          <div className={CITY_NIGHT_HERO.contentInner}>
             <div className={`h-10 max-w-md rounded sm:h-12 ${editorial ? 'bg-white/20' : 'bg-white/22'}`} />
             <div className="mt-3 h-4 max-w-xl rounded bg-white/16" />
             <div className="mt-2 h-4 max-w-lg rounded bg-white/12" />
@@ -1147,9 +1096,16 @@ function CitySightsSection({
   articles?: BlogCardDto[];
   sessions?: PublicSessionDto[];
 }) {
-  const fromSights = guide?.sights?.map((item) => ({ name: item.title, desc: item.text })) || [];
+  const fromSights: CityMustSeeItem[] =
+    guide?.sights?.map((item) => ({
+      name: item.title,
+      desc: item.text,
+      href: item.href,
+      venueSlug: item.venueSlug,
+      locationSlug: item.locationSlug,
+    })) || [];
   const fromMustSee = guide?.mustSee?.length ? guide.mustSee : [];
-  const places = fromSights.length
+  const places: CityMustSeeItem[] = fromSights.length
     ? fromSights
     : fromMustSee.length
       ? fromMustSee
@@ -1166,6 +1122,10 @@ function CitySightsSection({
     events: landing.events,
     priceFrom: landing.priceFrom,
   }));
+  const titleClass = `font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`;
+  const titleLinkClass = `${titleClass} underline-offset-2 hover:underline ${
+    editorial ? 'hover:text-zinc-700' : 'hover:text-primary-800'
+  }`;
 
   return (
     <section
@@ -1200,6 +1160,7 @@ function CitySightsSection({
                 categories,
                 citySlug,
               });
+              const placeHref = resolveCityPlaceTitleHref(place, venues);
               return (
               <li key={`${place.name}:${index}`} className="flex gap-3">
                 <span
@@ -1210,7 +1171,13 @@ function CitySightsSection({
                   {index + 1}
                 </span>
                 <div>
-                  <div className={`font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>{place.name}</div>
+                  {placeHref ? (
+                    <Link href={placeHref} className={titleLinkClass}>
+                      {place.name}
+                    </Link>
+                  ) : (
+                    <div className={titleClass}>{place.name}</div>
+                  )}
                   <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>{place.desc}</p>
                   {afficheLink ? (
                     afficheLink.href.startsWith('#') ? (
@@ -1820,14 +1787,19 @@ function matchesCityDateFilter(session: PublicSessionDto, filter: DateFilter): b
   });
 }
 
-function buildFallbackMustSee(city: PublicCityDto, categories: Array<[string, number]>, venues: PublicVenueDto[]) {
-  const categoryPlaces = categories.slice(0, 3).map(([name, count]) => ({
+function buildFallbackMustSee(
+  city: PublicCityDto,
+  categories: Array<[string, number]>,
+  venues: PublicVenueDto[],
+): CityMustSeeItem[] {
+  const categoryPlaces: CityMustSeeItem[] = categories.slice(0, 3).map(([name, count]) => ({
     name,
     desc: `${pluralEvents(count)} в каталоге города ${city.name}: удобно начать выбор с этой категории.`,
   }));
-  const venuePlaces = venues.slice(0, 3).map((venue) => ({
+  const venuePlaces: CityMustSeeItem[] = venues.slice(0, 3).map((venue) => ({
     name: venue.name,
     desc: `${pluralEvents(venue.events)} на странице площадки. Проверьте расписание, цену и ближайшие даты.`,
+    href: venueHref(venue),
   }));
   return [...categoryPlaces, ...venuePlaces];
 }
