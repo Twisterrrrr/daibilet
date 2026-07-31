@@ -1,5 +1,5 @@
 /**
- * City night-hero shell (HERO3k: real CSS mask-image on photo, not navy overlay).
+ * City night-hero shell (HERO3m: light navy at photo seam, deepen toward rim).
  * Shared by CityPageView SSR/hydrate and city loading skeleton so first HTML
  * and client paint claim the same shell (no CLS jump on short copy).
  *
@@ -8,31 +8,35 @@
  * Desktop (md+): fixed `h-[360px]` + `justify-end` letterbox (16:9 / gutter unchanged).
  *
  * Desktop stacking (media z-0, content z-1):
- *  1. leftGrad panel ends at photo left edge (lighter navy mid → base at photo edge)
+ *  1. leftGrad: deepen toward section LEFT rim; light `#122868` plateau at photo edge
  *  2. photo frame at right-[20%] height-driven 16:9 (not 5:4 / not md:w-[20%] needle)
- *  3. `.city-hero-photo-mask` on photo wrapper (pixels → alpha 0 ~25–28% L/R)
- *  4. right gutter w-[20%] (soft ~7% → navy → slightly deeper navy at section rim)
+ *  3. `.city-hero-photo-mask` on photo wrapper (wider soft alpha ~38% L/R)
+ *  4. right gutter w-[20%]: light at photo → deepen toward section RIGHT rim
  *
  * Mobile: full-bleed photo + same side mask + dense left overlay (readability).
  * Text/CTA stay left above media; no scrim over type.
  * Overlay navy on photo was rejected (seams remain) - mask only in globals.css.
- * Never slam edges to pure #000 - seams must stay blue (owner 2026-07-31).
+ *
+ * Canon (owner 2026-07-31 clarification after HERO3l):
+ *  - Photo-edge seam = light blue (`#122868`), never near-black mid / `#000`.
+ *  - Darker stops (`#0d1f5c`, `#0a174b`) only farther from the photo (outer rims).
+ *  - HERO3l wrongly focused on outer rims; dirty band was at photo↔navy junction.
  */
 export const CITY_NIGHT_HERO = {
   /**
-   * Lighter navy base (owner: `#0a174b` read almost black on screen).
-   * Lifted toward `#0d1f5c` / `#122868` - same family, clearly blue.
+   * Light navy base - photo-edge / section underlay under mask alpha.
+   * Owner: `#0a174b` as full base read almost black next to the photo.
    */
   navy: '#122868',
-  /** Mid stop - still navy, not gray / not near-black. */
+  /** Mid deepen - use away from photo, not at the seam. */
   navyMid: '#0d1f5c',
   /**
-   * Deepest edge stop = owner photo-edge swatch `#0a174b`.
-   * Never `#000` / `#000000` - black rims made L/R seams read as black.
+   * Deepest stop for OUTER section rims only (not photo-edge).
+   * Blue family (`#0a174b` / `#0B1B48`), never `#000` / `#050e28` at the seam.
    */
   navyDeep: '#0a174b',
   /**
-   * Outer section: lighter navy base so mask alpha reveals blue (not black).
+   * Outer section: light navy so mask alpha reveals blue (not black) at photo edges.
    * Mobile/sm: min-height (can grow); md+: fixed height for 16:9 letterbox.
    */
   section:
@@ -56,21 +60,21 @@ export const CITY_NIGHT_HERO = {
     'city-hero-photo-mask absolute inset-0 md:inset-y-0 md:left-auto md:right-[20%] md:h-full md:w-auto md:aspect-[16/9] md:max-w-[min(56%,640px)]',
   imageSizes: '(max-width: 767px) 100vw, min(56vw, 640px)',
   /**
-   * Desktop left fill: from section left to photo left edge
-   * (`right = gutter 20% + photo max width`). Deep navy far left → base at photo edge.
+   * Desktop left fill: section left → photo left edge.
+   * Deepen toward OUTER left rim; long light `#122868` plateau at photo seam.
    */
   leftFillDesktop:
     'absolute inset-y-0 left-0 hidden md:block md:right-[calc(20%+min(56%,640px))]',
   fadeLeftDesktop:
-    'linear-gradient(to right, #0a174b 0%, #0d1f5c 32%, #122868 62%, #122868 100%)',
-  /** Mobile: denser left navy under copy; photo reads weaker through the fill. */
+    'linear-gradient(to right, #0a174b 0%, #0B1B48 20%, #0d1f5c 40%, #122868 58%, #122868 100%)',
+  /** Mobile: denser left navy under copy; soft into photo (no near-black at seam). */
   fadeLeftMobile:
-    'linear-gradient(to right, #122868 0%, #0d1f5c 42%, rgba(18,40,104,0.92) 68%, rgba(18,40,104,0.55) 85%, transparent 100%)',
+    'linear-gradient(to right, #122868 0%, #0d1f5c 38%, rgba(18,40,104,0.88) 66%, rgba(18,40,104,0.45) 84%, transparent 100%)',
   /**
-   * Right gutter only (right:0; width 20%): from photo's right edge going right -
-   * soft into navy (~7%), then navy → slightly deeper navy at section rim (no #000).
+   * Right gutter only (right:0; width 20%): photo right edge → section right rim.
+   * Soft into light navy at photo, then deepen toward outer rim (no `#000`).
    */
   rightGutter: 'absolute inset-y-0 right-0 hidden w-[20%] md:block',
   fadeRightGutter:
-    'linear-gradient(to right, transparent 0%, rgba(18,40,104,0.4) 2.5%, #122868 7%, #122868 35%, #0d1f5c 65%, #0a174b 100%)',
+    'linear-gradient(to right, transparent 0%, rgba(18,40,104,0.35) 2%, #122868 6%, #122868 42%, #0d1f5c 68%, #0B1B48 86%, #0a174b 100%)',
 } as const;

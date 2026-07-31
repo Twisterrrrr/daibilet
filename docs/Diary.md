@@ -1,3 +1,24 @@
+## 2026-07-31 - City hero HERO3m: light at photo seam, deepen toward rim
+
+### Наблюдения
+- HERO3l (`77d0e282` / BUILD `jHtvwxZAR2TRG9YhqGoVj`) не то: убрали тёмное с **внешних** краёв секции.
+- Owner хотел убрать тёмный/«грязный» стык **ближе к картинке** (фото↔navy), либо сильнее прозрачность краёв фото.
+- Канон: у photo-edge - светлый синий `#122868`; тёмные stops только дальше от фото (к rim).
+
+### Решения
+- `fadeLeftDesktop`: `#0a174b`/`#0B1B48` у outer left → длинный plateau `#122868` у photo edge.
+- `fadeRightGutter`: soft → `#122868` у photo → deepen `#0d1f5c`/`#0B1B48`/`#0a174b` к правому rim.
+- `.city-hero-photo-mask`: alpha fade расширен ~28% → ~38% L/R, мягче steps (меньше dirty band).
+- Направление градиентов **не инвертировали** (уже light@photo / deep@rim); усилили plateau + mask.
+
+### Проблемы
+- Нет.
+
+### Deploy
+- Commit + push + SPB→MSK (BUILD_ID после smoke `/cities/samara`).
+
+---
+
 ## 2026-07-31 - City hero HERO3l: lighter navy, no black rims
 
 ### Наблюдения

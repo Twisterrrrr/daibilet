@@ -538,7 +538,7 @@ function CityHeroDefault({
   );
 }
 
-/** HERO3g: 16:9 photo at right-[20%] + lighter navy (#122868) soft fades L/R photo edges; иначе нейтральный strip. */
+/** HERO3m: 16:9 at right-[20%] + light #122868 at photo seam (deepen only toward outer rims); иначе нейтральный strip. */
 function CityHeroStrip({
   city,
   stats,
@@ -657,7 +657,7 @@ function CityHeroStrip({
             style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
             aria-hidden
           >
-            {/* 1) LeftGrad to photo edge. 2) Photo 16:9 + .city-hero-photo-mask (alpha L/R). 3) Right gutter soft→navy (no #000 rim). */}
+            {/* 1) LeftGrad: deep at outer left → light #122868 at photo. 2) Photo + wide .city-hero-photo-mask. 3) Right gutter: light at photo → deep at rim. */}
             <div
               className={CITY_NIGHT_HERO.leftFillDesktop}
               style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
