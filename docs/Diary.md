@@ -1,3 +1,22 @@
+## 2026-07-31 - City hero HERO3p: adaptive right gutter ladder
+
+### Наблюдения
+- После HERO3o (`md:4%` / `lg:10%`) на ультрашироком фото уехало вправо и прилипало к rim.
+- Mid (как НН раньше) должен оставаться ближе к правому краю без navy-дыры; xl+ нужен заметный gutter (~16-20%).
+
+### Решения
+- Лестница right-%: `md:4%` → `lg:10%` → `xl:16%` → `2xl:20%`.
+- `leftFillDesktop` calc и `rightGutter` width синхронизированы под те же %.
+- Soft fade md+ и mobile full-bleed без изменений; mask не возвращали; `md:right-[20%]` не восстанавливали (только 2xl).
+
+### Проблемы
+- Нет.
+
+### Deploy
+- Commit + push + SPB→MSK atomic `.next` (BUILD_ID после smoke). Finance `.159` не трогали.
+
+---
+
 ## 2026-07-31 - Location page: hide empty excursion UI
 
 ### Наблюдения

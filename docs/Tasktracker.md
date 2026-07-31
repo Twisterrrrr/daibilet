@@ -79,6 +79,7 @@
 | UX.HERO3m | Photo-edge light `#122868` plateau; deepen only toward outer rims; wider ~38% photo mask | Критический | ❌ superseded → HERO3n (mask too wide; mobile bad) |
 | UX.HERO3n | Drop `.city-hero-photo-mask`; soft edge fade md-only ~15%; keep `#122868` panels + pt-16/mt-5/16:9/right-20% | Критический | ✅ `c2e2f4c4` MSK **BUILD_ID=`yZkioNIzo_sXcC2xFFbmy`** |
 | UX.HERO3o | Photo closer to right: `md:right-[4%]` / `lg:right-[10%]` (+ leftFill/rightGutter sync); kill mid-width navy hole | Критический | ✅ `c814ca54` MSK **BUILD_ID=`_uJZrw56NXeR2mgb5NxaB`** |
+| UX.HERO3p | Adaptive right gutter: md4 / lg10 / xl16 / 2xl20 (+ leftFill/rightGutter sync); ultrawide air without mid hole | Критический | 🔄 in progress |
 
 ## /podborki city filter (2026-07-31)
 
