@@ -16,6 +16,7 @@
 | LE.3 | Admin UI STOP-форма + venue hookFact | Высокий | ✅ |
 | LE.4 | Public DTO: stopEvents / nearbyEvents (300м) / venueStops / hookFact | Высокий | ✅ |
 | LE.5 | UI: LocationCard / park-like layout / Event «Маршрут / места» | Высокий | ✅ |
+| LE.5b | Hide empty excursion UI on location page (hero 0 + empty block) | Высокий | ✅ `3271bfcb` BUILD `slptXB74NiKJwSUqiCO7t` |
 | LE.6 | Seed Пермь must-see (6 slugs) + cityInfo slug | Средний | ✅ DB MSK 6 rows; cityInfo slug; listing 🚫 без hub-gate deploy |
 | LE.7 | Deploy migrate + контент STOP-связей экскурсий | Высокий | ⏳ |
 

@@ -13,7 +13,8 @@
 - Нет.
 
 ### Deploy
-- (BUILD_ID после SPB→MSK)
+- Commit `3271bfcb` → push → SPB build → MSK atomic `.next` **BUILD_ID=`slptXB74NiKJwSUqiCO7t`**.
+- Smoke `/locations/samara-samarskaya-naberezhnaya`: no `0 экскурсий` / CTA / empty-block; есть «О локации», share, «Рядом ещё точки».
 
 ---
 
