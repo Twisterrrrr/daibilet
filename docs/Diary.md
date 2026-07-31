@@ -13,7 +13,8 @@
 - Нет.
 
 ### Deploy
-- Commit + push + SPB→MSK atomic `.next` (BUILD_ID после smoke). Finance `.159` не трогали.
+- Commit `5e15123a` (+ comment-guard `ae05a327`) → push → SPB build → MSK atomic `.next` **BUILD_ID=`Z3MIKd0glXMUeTfnLRgU8`**.
+- Smoke `/cities/nizhny-novgorod`: `right-[4%]` / `lg:right-[10%]` / `xl:right-[16%]` / `2xl:right-[20%]`; soft edge fade; 16:9; no mask / `#000000` / `md:right-[20%]`. Finance `.159` не трогали.
 
 ---
 
