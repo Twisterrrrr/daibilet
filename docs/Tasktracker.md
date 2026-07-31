@@ -70,7 +70,7 @@
 | UX.HERO3d | City hero: photo ~20% right + opaque left `#000c2a→#000` + right soft 3.5%→navy→black; без зеркал | Критический | ❌ superseded → HERO3e (`md:w-[20%]` = иголка + wrong grad) |
 | UX.HERO3e | City hero: photo `right-[20%]` aspect-[5/4] + leftGrad black→navy under + right gutter 20%; без зеркал | Критический | ❌ superseded → HERO3f (5:4 + flat black base отвергнуты owner) |
 | UX.HERO3f | City hero: 16:9 at `right-[20%]` + leftGrad to photo edge (navy→black) + right soft→navy→black; base `#000c2a` | Критический | ✅ commit `092fa703` MSK `BUILD_ID=r39aqSMuoLnZ4xDmPwZLc` |
-| UX.HERO3g | Owner navy `#0a174b` + mobile equal py; photo edge soft fade (seam navy↔photo) | Критический | ⏳ photo-edge fade |
+| UX.HERO3g | Owner navy `#0a174b` + mobile equal py; photo edge soft fade (seam navy↔photo) | Критический | ✅ `49d7c616` MSK `BUILD_ID=8DwUkz2XCFh58Z20GVN_p` |
 
 ## /podborki city filter (2026-07-31)
 
