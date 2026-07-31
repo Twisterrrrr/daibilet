@@ -1,3 +1,20 @@
+## 2026-07-31 - City admission title + pay CTA host
+
+### Наблюдения
+- Owner: блок города «Музеи и входные билеты» спорный (museums+galleries vs museums+exhibitions); seed `shortDescription` светил «STUB checkout».
+- CTA «Оформить» должен вести на `pay.daibilet.ru/checkout/admissions/{slug}` (STUB/YooKassa на finance), не на `checkout.daibilet.ru`.
+
+### Решения
+- UI: заголовок **«Музеи и арт-галереи»**, subtitle «Входные билеты без сеанса в афише».
+- Mapper: `sanitizeAdmissionShortDescription` прячет seed-копирайт со `STUB`; `resolveAdmissionCheckoutUrl` default/rewrite → `https://pay.daibilet.ru` (+ `NEXT_PUBLIC_*` в deploy-prod-next / .env.example).
+- Deploy MSK: SPB build → **BUILD_ID=`lGrO-MIR8XMZLXbCJH6fh`**; env MSK уже `FINANCE_*` / `NEXT_PUBLIC_FINANCE_CHECKOUT_BASE_URL=https://pay.daibilet.ru`.
+- Smoke: HTML без `checkout.daibilet.ru` / без `STUB`; RSC `canSell=true`, `checkoutPath=/checkout/admissions/phase-g-test-museum-entry`, `shortDescription:null`; city chunk содержит «Музеи и арт-галереи» + bake `pay.daibilet.ru`.
+
+### Проблемы
+- Блок admission в HTML появляется после client `contentReady` - raw curl без hydrate не видит «Оформить»/href, только flight payload + JS chunks.
+
+---
+
 ## 2026-07-31 - Menu routes: brand loading shells
 
 ### Наблюдения
@@ -62,6 +79,25 @@
 ### Проблемы
 - INC.504.5 (unify dual cache) открыт.
 - Child spawn на cold first-hit после purge всё ещё может ждать disk до `PUBLIC_CATALOG_COLD_AWAIT_MS` (8с) - лучше держать cron disk тёплым.
+
+---
+
+## 2026-07-31 - City hero ultrawide: mirrored edge wings
+
+### Наблюдения
+- На ultrawide боковые поля hero выглядели как hard crop / плоский slate letterbox вокруг PNG ≤110%.
+- Lock: main photo не upscale >10% (`calc(1024px*1.1)` + `object-contain`); night navy, не purple.
+
+### Решения
+- `CITY_NIGHT_HERO`: navy `#0b1220`, `sideGutterWidth`, fixed `h-[280|320|360]`.
+- `CityHeroMirrorWing`: зеркало ~10% края (`width:1000%` + `scaleX(-1)`), stretch в gutter, linear fade в `#0b1220`.
+- SSR/skeleton sync: `SiteChromeSkeleton` city + `CityLoadingState` на том же shell.
+- Source scp `.16`+`.184`; build SPB → tar `.next` → MSK. Live chunk: `sideGutterWidth` / `scaleX(-1)` / `1000%` / `1024px*1.1` / `object-contain`.
+- **BUILD_ID (MSK live)=`lGrO-MIR8XMZLXbCJH6fh`** (после нашего `Sn6QB83fgrq84VIhFOftI` disk перезаписали параллельным rebuild с тем же source-патчем). Smoke `/cities/saint-petersburg` 200. Без commit.
+
+### Проблемы
+- Параллельные web rebuild на MSK снова сменили BUILD_ID mid-deploy; фича в live chunk сохранена.
+- Commit не делали - риск отката git-only rebuild без scp source.
 
 ---
 
