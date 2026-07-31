@@ -1,3 +1,21 @@
+## 2026-07-31 - Menu routes: brand loading shells
+
+### Наблюдения
+- Home/city shell уже был (`SiteChromeSkeleton` + `app/loading.tsx`); клики по главному меню (События/Города/Площадки/Локации/Подборки/Блог) всё ещё могли давать пустой soft-nav кадр.
+- `/blog`: внешний Suspense вокруг `BlogListView` (с `SiteLayout`) при bailout `useSearchParams` в `BlogListHero` подменял весь chrome на bare skeleton.
+- На MSK параллельные `web:build` (editors-pick / slot-grid) крутили `.next`; mid-build web падал без `prerender-manifest.json`.
+
+### Решения
+- `loading.tsx` → `SiteChromeSkeleton` на `/events`, `/cities`, `/venues`(+`[slug]`), `/locations`(+`[slug]`), `/podborki`(+`[intent]`/`[city]`), `/blog` (плюс уже были `/` и `/cities/[slug]`).
+- Blog: убран outer Suspense; `BlogListHero` в своём Suspense под SiteLayout. Podborki: pulse-скелет вместо текста «Загружаем…». Em-dash в aria-label skeleton → дефис.
+- Source scp (без CityPageView/EventCard overwrite) + exclusive build; live chunks loading на всех menu routes. Smoke HTML: header+«Дайбилет»+aria-busy, не spacer-only. **BUILD_ID=`HL2bMp0TxgnzWNKKehZgG`** (slot-grid rebuild подхватил shell source). Без commit.
+
+### Проблемы
+- Residual `BAILOUT_TO_CLIENT_SIDE_RENDERING` в hidden slot остаётся (как на home) - first paint уже с chrome.
+- Параллельные MSK builds без flock продолжают гонять `.next` - нужен deploy lock (PERF.D1 discipline).
+
+---
+
 ## 2026-07-31 - City hero thrash: confirmed overwrite, live restored to 1.1
 
 ### Наблюдения
@@ -24,6 +42,25 @@
 
 ### Проблемы
 - Риск отката при git-only rebuild без этого diff.
+
+---
+
+## 2026-07-31 - INC.504.4: catalog SWR rebuild off Next event-loop
+
+### Наблюдения
+- Recurring hang `daibilet-web`: `Public catalog DTO cache rebuilt (swr): 2619 sessions in ~170s` на том же event-loop, что и request path → 502/slow; orphan `jest-worker` PPID=1 усиливает CPU/RAM pressure.
+- SWR уже делал `void schedule*` в окне stale, но (1) hard-expire всё ещё `await` rebuild; (2) background inline rebuild всё равно монополизирует loop; (3) dual cache Next DTO vs API `dto.js`.
+
+### Решения
+- `public-catalog.dto.ts`: forever soft-SWR (есть sessions → никогда не await rebuild на request path); disk snapshot `var/cache/public-catalog-dto.json`; mode `child|inline|off` (`DAIBILET_CATALOG_REBUILD_MODE`, web default `child` via `DAIBILET_WEB_PORT` / systemd); cold await cap 8s; chunked map + setImmediate в inline.
+- Cron `deploy/cron/daibilet-catalog-dto-cache` (*/4 flock 180s) + `scripts/rebuild-public-catalog-dto-cache.mjs`; post-TC-sync warm тоже пишет disk (не ломая TC sync).
+- `dto.js` publicCatalogSessions: soft-expire тоже void schedule (не await hard-expire).
+- `scripts/reap-orphan-jest-workers.sh` + cron */10; systemd web `DAIBILET_CATALOG_REBUILD_MODE=child`.
+- Next подхватит DTO-фикс после web bake (transpilePackages); до bake: reap orphans + cron disk/reap.
+
+### Проблемы
+- Пока старый Next bundle: inline SWR rebuild в web ещё возможен до redeploy.
+- INC.504.5 (unify dual cache) открыт.
 
 ---
 

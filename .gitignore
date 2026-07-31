@@ -41,3 +41,6 @@ Thumbs.db
 .vscode/
 __pycache__/
 *.pyc
+
+# Runtime disk caches (INC.504.4 catalog DTO snapshot)
+var/cache/

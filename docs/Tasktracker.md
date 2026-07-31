@@ -64,7 +64,7 @@
 | INC.504.1 | MSK egress SG: был self-loop (Daring Aquila); owner **Fair Snipe** TCP 80/443 → `.159` ✅; `github.com` с MSK тоже 200 - шире только-finance; полный outbound audit optional | Критический | 🔄 partially open 2026-07-31 (finance+github OK) |
 | INC.504.2 | nginx: прямой bypass `/images/*` static, без `/_next/image` для локальных файлов | Средний | ✅ |
 | INC.504.3 | Пересмотр daibilet-web MemoryMax/heap + OOMPolicy=continue (High 1.5G / Max 2G / heap 1280 на 7.8Gi) | Критический | done 2026-07-31 MSK live |
-| INC.504.4 | SWR catalog rebuild: non-blocking / async (не блокировать event loop 49-219с) | Средний | ⏳ |
+| INC.504.4 | SWR catalog rebuild: non-blocking / async (не блокировать event loop 49-219с) | Критический | ✅ code: disk+child/cron+forever-SWR+reap; ⏳ MSK web bake for Next bundle |
 | INC.504.5 | Dual catalog SWR cache (`dto.js` + `public-catalog.dto.ts`) - merge/unify в F5.3b | Средний | ⏳ |
 | INC.504.6 | nginx proxy_cache SWR: `background_update` + TTL 30m (browser clear ≠ cold Next) | Критический | ✅ |
 | INC.504.7 | City hub ISR: `unstable_cache` + `generateStaticParams` (было no-store / 20-30с) | Критический | ✅ |
@@ -148,6 +148,7 @@ Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SECRET_KEY=<set>` ✅ · *
 | PERF.V1 | Venue/location ISR (`getCachedPublicVenueDto`) + admission timeout + no client refetch on 0 sessions | Высокий | ✅ 2026-07-31 MSK BUILD `wltP0t9QlQrxpn1a72LW0`; warm ~0.05–0.19с; cold first ~15с = catalog rebuild owner |
 | PERF.NAV1 | Soft-nav click lag: `NavigationProgress` + `SiteLayout`→`getCachedDestinations` + `staleTimes` | Высокий | ✅ 2026-07-31 MSK `Cm6zKdDCV2gLnM4H88VZt` |
 | PERF.FCP1 | Home/city blank 2-3s: isolate `useSearchParams` + `SiteChromeSkeleton` / `loading.tsx` (не empty spacer) | Критический | ✅ 2026-07-31 MSK: body paints brand+skeleton; TTFB warm ~0.17с HIT `s-maxage=300`; BUILD `ysb9LiafxuxE8ptQkYg6t` |
+| PERF.FCP2 | Menu routes brand shells: `/events` `/cities` `/venues` `/locations` `/podborki` `/blog` (+slugs) `loading.tsx` + blog Suspense fix | Критический | ✅ 2026-07-31 MSK smoke OK_CHROME; BUILD `HL2bMp0TxgnzWNKKehZgG` (без commit) |
 
 ---
 

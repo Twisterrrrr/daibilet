@@ -1,4 +1,7 @@
 import { spawn } from 'node:child_process';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZE_MAX } from '@daibilet/contracts/catalog';
 import { prisma } from '@daibilet/db';
 import { raw, sql } from '@daibilet/db/sql';
@@ -40,6 +43,7 @@ const PUBLIC_CATALOG_MAP_CHUNK = Math.max(20, Number(process.env.PUBLIC_CATALOG_
 /** Hydrate enough slots for EventCard 2×2 chips after primary is excluded from chips. */
 const CATALOG_CARD_SLOT_TARGET = 5;
 const CATALOG_HYDRATED_SLOT_LIMIT = 8;
+const PROJECT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
 /** Keep in sync with catalogGroupTitleSqlExpression() in dto.js */
 const CATALOG_GROUP_TITLE_SQL = `regexp_replace(
@@ -222,9 +226,21 @@ async function awaitCatalogRebuild(reason: string): Promise<PublicSessionDto[]> 
   }
 }
 
+function resolveTsxBinary(): string {
+  const binName = process.platform === 'win32' ? 'tsx.cmd' : 'tsx';
+  const candidates = [
+    path.join(PROJECT_ROOT, 'node_modules', '.bin', binName),
+    path.join(PROJECT_ROOT, 'apps', 'backend', 'node_modules', '.bin', binName),
+  ];
+  for (const candidate of candidates) {
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return binName;
+}
+
 function spawnCatalogRebuildChild(reason: string): void {
   const now = Date.now();
-  // Coalesce bursts: one spawn per minute unless force path cleared the flag via await.
+  // Coalesce bursts: one spawn per minute unless force/cold needs a new attempt.
   if (now - catalogChildSpawnedAt < 60_000 && reason !== 'force-refresh' && reason !== 'cold') {
     return;
   }
@@ -232,11 +248,12 @@ function spawnCatalogRebuildChild(reason: string): void {
 
   const script = resolveCatalogRebuildScriptPath();
   const lockPath = resolveCatalogRebuildLockPath();
-  const command = process.platform === 'win32' ? process.execPath : 'flock';
+  const tsxBin = resolveTsxBinary();
+  const command = process.platform === 'win32' ? tsxBin : 'flock';
   const childArgs =
     process.platform === 'win32'
       ? [script, `--reason=${reason}`]
-      : ['-n', lockPath, 'timeout', '--kill-after=15s', '180s', process.execPath, script, `--reason=${reason}`];
+      : ['-n', lockPath, 'timeout', '--kill-after=15s', '180s', tsxBin, script, `--reason=${reason}`];
 
   try {
     const child = spawn(command, childArgs, {
