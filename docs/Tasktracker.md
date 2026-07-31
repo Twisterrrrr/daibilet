@@ -75,7 +75,7 @@
 | UX.HERO3j | Mobile gap after lead before tag/stats/CTA (`mt-5 md:mt-3`) | Высокий | ✅ `55253504` MSK `BUILD_ID=U0vFfMpCCjrvys2yhOxCI` |
 | UX.HERO3k | Real `mask-image` on photo (`.city-hero-photo-mask` in globals.css); drop navy overlay | Критический | ✅ `0db07eb3` MSK **BUILD_ID=`9A0T7hjLeA1YtvBHDt7d8`** |
 | UX.HERO3l | Lighter navy base `#122868` / mid `#0d1f5c`; no `#000` rim stops under mask | Критический | ❌ superseded → HERO3m (wrong: fixed outer rims, not photo seam) |
-| UX.HERO3m | Photo-edge light `#122868` plateau; deepen only toward outer rims; wider ~38% photo mask | Критический | 🔄 in progress |
+| UX.HERO3m | Photo-edge light `#122868` plateau; deepen only toward outer rims; wider ~38% photo mask | Критический | ✅ `1b1873a9` MSK **BUILD_ID=`-PTytb5araL9R7DTMqQjD`** |
 
 ## /podborki city filter (2026-07-31)
 

@@ -15,7 +15,8 @@
 - Нет.
 
 ### Deploy
-- Commit + push + SPB→MSK (BUILD_ID после smoke `/cities/samara`).
+- Commit `1b1873a9` → push → SPB build → MSK atomic `.next` **BUILD_ID=`-PTytb5araL9R7DTMqQjD`**.
+- Smoke `/cities/samara`: leftGrad ends `#122868 100%`; right `#122868`→`#0a174b` rim; mask `#000 38%`; hex `0B1B48` present; no `#000000`.
 
 ---
 
