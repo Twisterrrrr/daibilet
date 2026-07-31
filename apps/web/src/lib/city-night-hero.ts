@@ -1,5 +1,5 @@
 /**
- * City night-hero shell (HERO3g navy + mobile equal py).
+ * City night-hero shell (HERO3g navy + mobile equal py + photo edge soft fade).
  * Shared by CityPageView SSR/hydrate and city loading skeleton so first HTML
  * and client paint claim the same shell (no CLS jump on short copy).
  *
@@ -10,7 +10,8 @@
  * Desktop stacking (media z-0, content z-1):
  *  1. leftGrad panel ends at photo left edge (navy at edge → black only at far left)
  *  2. photo frame at right-[20%] height-driven 16:9 (not 5:4 / not md:w-[20%] needle)
- *  3. right gutter w-[20%] (soft ~3–4% → navy → black at section rim)
+ *  3. photo edge soft fade (left ~12% navy→transparent; light right into gutter)
+ *  4. right gutter w-[20%] (soft ~3–4% → navy → black at section rim)
  *
  * Mobile: full-bleed photo + dense left overlay (unchanged readability).
  * Text/CTA stay left above media; no scrim over type.
@@ -49,6 +50,15 @@ export const CITY_NIGHT_HERO = {
   photoFrame:
     'absolute inset-0 md:inset-y-0 md:left-auto md:right-[20%] md:h-full md:w-auto md:aspect-[16/9] md:max-w-[min(56%,640px)]',
   imageSizes: '(max-width: 767px) 100vw, min(56vw, 640px)',
+  /**
+   * Soft left/right edge fade over the photo (md+ only).
+   * Kills the hard vertical seam at navy↔photo without a long milky band
+   * (~12% left / ~6% right of photo width ≈ 48–80px on typical 16:9 frame).
+   */
+  photoEdgeFade:
+    'city-hero-photo-edge-fade pointer-events-none absolute inset-0 z-[1] hidden md:block',
+  fadePhotoEdges:
+    'linear-gradient(to right, #0a174b 0%, rgba(10,23,75,0.78) 3%, rgba(10,23,75,0.35) 7%, rgba(10,23,75,0.1) 11%, transparent 15%, transparent 90%, rgba(10,23,75,0.18) 95%, rgba(10,23,75,0.5) 100%)',
   /**
    * Desktop left fill: from section left to photo left edge
    * (`right = gutter 20% + photo max width`). Navy at photo edge → black only far left.
