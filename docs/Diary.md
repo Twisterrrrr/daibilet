@@ -8,11 +8,12 @@
 ### Решения
 - `must-see-editorial.json` → 390; batch6 артефакт 78; aliases batch6 в enrich (`lipeck`, `habarovsk`, `yuzhno-sahalinsk`).
 - `cityInfo` mustSee заполнен для 13 ключей; slugify ь/ъ → пусто (канон seed).
-- MSK apply: **32 insert + 46 update**; API restart; smoke 13/13 owner HookFact (Ипатьевский, ледокол Ленин, крепостная стена, Мать-Покровительница и др.).
-- Commit + push + SPB→MSK atomic web (hub mustSee).
+- MSK apply: **32 insert + 46 update**; soft-sign twin-slug **29× HIDDEN**; API restart; smoke owner HookFact.
+- Commits `5b5c3da` + `ebf0398` → SPB build → MSK atomic `.next` **BUILD_ID=`-qqq_t2f_YXevgHdjOf7E`**. Smoke `/cities/kostroma` (Ипатьевский), `/venues/kostroma-muzey-syra` 200.
 
 ### Проблемы
-- Черновик JSON сначала ушёл с placeholder HookFact - пересобран из owner-текстов перед apply.
+- Черновик JSON сначала ушёл с placeholder HookFact - пересобран из owner-текстов перед apply (`ebf0398`).
+- Два прохода soft-sign slugify дали twin Venue; канон без soft-дефисов, twins HIDDEN.
 
 ---
 
