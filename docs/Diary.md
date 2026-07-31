@@ -1,3 +1,50 @@
+## 2026-07-31 - Owner: авто-commit/deploy для продуктовых итераций
+
+### Наблюдения
+- Owner отменил ask-first commit для UI/product итераций: после рабочего локального результата агент сам commit + push; web deploy (SPB build → MSK atomic swap) если затронут live runtime/UI. Docs-only handoff = commit+push без deploy.
+
+### Решения
+- Обновлён `.cursorrules` правило 1 + блок жёстких запретов (finance `.159` / YooKassa / supplier LC / no force-push / no wide CTA / no secrets).
+
+### Проблемы
+- Нет.
+
+---
+
+## 2026-07-31 - City hub article cards: bus ≠ river related links
+
+### Наблюдения
+- Скрин: `moskva-avtobusnaya-obzornaya` («Автобусная обзорная…») на city hub показывала речные («Адмирал», теплоходы) рядом с корректной карточкой ужина на теплоходе.
+- `CityHubArticleTeaser` → `matchArticleSessions`: статья topic=`tours`, речная сессия детектилась как `river`+`tours` (слово «обзорн/экскурси») и проходила intersect по `tours`; плюс слабые keyword hits («обзорная», «Москва»).
+
+### Решения
+- Exclusive-вертикали: session с `river`/`standup`/`concerts` без той же темы у статьи → reject (не через общий `tours`).
+- Vertical require: если в статье «автобус» / «теплоход|речн» - у session должен быть тот же сигнал.
+- Тесты: moscow bus vs river; river dinner vs bus.
+
+### Проблемы
+- Нет relatedEventIds/editorial override в коде - чинили только автоматчер. Commit/deploy по просьбе.
+
+---
+
+## 2026-07-31 - City hero HERO3f: 16:9 + navy fades from photo edges
+
+### Наблюдения
+- Owner: «верни оригинальные пропорции» + «где синий градиент? вижу только чёрный».
+- HERO3e ошибочно поставил `md:aspect-[5/4]` (пример из промпта); до этого aspect не было (`md:w-[20%]`), owner ожидает landscape **16:9**.
+- Синий пропал: section/underlay `bg/#000`, leftGrad full-bleed с navy-стопом у **правого края секции** (не у фото) + 0–40% solid black → визуально «только чёрный».
+
+### Решения
+- Photo: `md:aspect-[16/9]` + `max-w-[min(56%,640px)]` (height-driven, `right-[20%]` сохранён).
+- Left fill: `right-[calc(20%+min(56%,640px))]` до края фото; grad `to right #000 → #010d2d → #000c2a` (navy у фото, чёрный только слева).
+- Right gutter: soft ~3.5% → `#000c2a` → `#010d2d` → `#000` на краю.
+- Section/underlay base снова `#000c2a` (не flat black). Skeleton sync.
+
+### Проблемы
+- Локально готово; **commit/deploy MSK только по просьбе owner**.
+
+---
+
 ## 2026-07-31 - Owner: где новые локации в каталоге?
 
 ### Наблюдения
