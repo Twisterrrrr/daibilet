@@ -13,7 +13,8 @@
 - Нет.
 
 ### Deploy
-- Commit + push + SPB→MSK (BUILD_ID после smoke). Smoke `/cities/samara`: HTML `122868` / `0d1f5c`; нет flat `#000`/`#000000` в hero gradients.
+- Commit `77d0e282` → push → SPB build → MSK atomic `.next` **BUILD_ID=`jHtvwxZAR2TRG9YhqGoVj`**.
+- Smoke `/cities/samara`: HTML `122868` / `0d1f5c` / `0a174b`; нет `#000000`; styles `background-color:#122868` + gradients without black rims; `city-hero-photo-mask` + CSS_MASK_OK.
 
 ---
 
