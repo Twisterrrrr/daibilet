@@ -20,7 +20,7 @@
  *
  * Rollback (owner 2026-07-31): HERO3k/m `.city-hero-photo-mask` (~25→38% L/R) was too
  * wide and looked wrong on mobile. Keep light navy panels; keep pt-16 / mt-5 / 16:9;
- * do not restore hard md:right-[20%] on all md+ (2xl-only 20% is OK).
+ * do not restore hard 20% gutter on all md+ (2xl-only 20% is OK).
  */
 export const CITY_NIGHT_HERO = {
   /**
@@ -55,7 +55,7 @@ export const CITY_NIGHT_HERO = {
    *   md:  right-[4%]   (mid-width - no navy hole)
    *   lg:  right-[10%]
    *   xl:  right-[16%]
-   *   2xl: right-[20%]  (ultrawide air; not hard md:20%)
+   *   2xl: right-[20%]  (ultrawide air; not hard mid-width 20%)
    * Never md:w-[20%] / flush-only right-0 needle on all sizes.
    * Never aspect-[5/4] - HERO3e experiment; original landscape is 16:9.
    * No `.city-hero-photo-mask` - owner rejected wide alpha fade on photo.
