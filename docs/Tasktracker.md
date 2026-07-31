@@ -38,6 +38,7 @@
 | VK.8 | Content places в каталогах /venues|/locations без events | Высокий | ✅ в репо; 🚫 live MSK dto.js без import hub-gate → listing/page null |
 | VK.9 | Bulk seed mustSee → Venue + cityInfo slug (`seed-cityinfo-must-see-venues.js`) | Высокий | ✅ MSK apply: skip-no-city 0 (было 216); aliases latin→кирилл slug; cityInfo 246 slug dirty |
 | VK.10 | Deploy+restart MSK API (dto hub-gate) + smoke Perm 6 in /locations|/venues | Критический | ⏳ blocker видимости для owner |
+| VK.11 | Editorial enrich must-see top-12 cities (hookFact/about/way/coords/address/metro) | Высокий | ✅ 69 MSK; shortDescription preserve; CMS kind guard; ATTRACTION twins HIDDEN |
 
 ## Finance supplier LC smoke (.159) 2026-07-31
 

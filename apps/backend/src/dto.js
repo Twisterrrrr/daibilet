@@ -7498,9 +7498,15 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
     return 'bus';
   }
 
-  // Explicit CMS kinds win over «памятник» meeting-point heuristics (Важные места).
+  // Explicit CMS/content kinds win over «памятник» / набережная / пивоварня heuristics (must-see).
   if (stored === 'park') return 'park';
   if (stored === 'monument') return 'monument';
+  if (stored === 'outdoor_location') return 'outdoor_location';
+  if (stored === 'attraction') return 'attraction';
+  if (stored === 'theater') return 'theater';
+  if (stored === 'museum_art_space' || stored === 'museum' || stored === 'art_space') {
+    return finalizeMuseumArtPublicKind(stored, name, address, { id, slug, shortDescription, description });
+  }
 
   if (
     inferred === 'meeting_point' ||

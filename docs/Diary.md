@@ -1,3 +1,21 @@
+## 2026-07-31 - Must-see editorial enrich (12 городов, 69 точек)
+
+### Наблюдения
+- Owner дал HookFact / О локации / Как добраться / coords / адрес / метро для топ must-see (СПб, Москва, Казань, Калининград, Владимир, Ярославль, Екатеринбург, НН, Новосибирск, Красноярск, Тула, Самара).
+- `shortDescription` карточек cityInfo уже был - нельзя затирать.
+- Часть страниц API возвращала `null`: в `description`/`short` слово «памятник» роняло kind в `meeting_point`; ATTRACTION-дубли (ВДНХ, Спас) выигрывали merge по events.
+
+### Решения
+- `scripts/data/must-see-editorial.json` + `scripts/enrich-must-see-editorial.js`: пишем `hookFact` / `description` / `wayToFind` / coords / address / metroStation; `shortDescription` только если пусто.
+- MSK apply: 69 update. Hide stubs `vdnh-8af81f3a0643`, `spas-na-krovi-995a65eafe4e`.
+- `dto.js`: explicit CMS kinds (`outdoor_location` / `attraction` / theater / museum*) побеждают meeting_point heuristic до проверки «памятник» в тексте.
+- Smoke API: 69/69 OK_with_hook, 0 NULL, 0 slug mismatch. API restart на MSK.
+
+### Проблемы
+- Набережные всё ещё в pier-merge key по «набереж» - следить, если появятся pier-близнецы с events.
+
+---
+
 ## 2026-07-31 - LE.9 Admin suggest + DR.2 share `?day=`
 
 ### Наблюдения
@@ -13,7 +31,8 @@
 - Качество suggest упирается в coverage lat/lng у PUBLISHED/CANDIDATE venues.
 
 ### Deploy
-- (заполняется после push/SPB→MSK)
+- Commit `998361cb` → push → SPB build → MSK atomic `.next` **BUILD_ID=`-sKmVUBgu0IedqpkrxVaW`** + `systemctl restart daibilet-api`.
+- Smoke MSK: `/my-day` 200 + noindex + «Мой день»; `/api/day-route/matches` 200; API stats 200. Finance `.159` не трогали.
 
 ---
 
