@@ -13,7 +13,8 @@
 - У Перми почти нет candidate venues с lat/lng + PUBLISHED/CANDIDATE → dry-run бедный; нужно coords seed / geo Phase C editorial.
 
 ### Deploy
-- Commit + push + SPB→MSK (BUILD_ID ниже после smoke).
+- Commit `2a83331d` → push → SPB build → MSK atomic `.next` **BUILD_ID=`baXnUSpZjxRiogKVC7Y6s`**.
+- Smoke MSK: `/` 200, `/my-day` 200 + `noindex, nofollow` + «Мой день», `/api/day-route/matches` 200. Finance `.159` не трогали.
 
 ---
 
