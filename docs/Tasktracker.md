@@ -68,7 +68,7 @@
 | UX.HERO3b | Mirror strips ~10% image width рядом с фото + fade→transparent; gutters = navy CSS | Критический | ❌ superseded → HERO3c |
 | UX.HERO3c | Golden-ratio city hero: navy `#050a12` + left φ fade + right edge fade + photo ~38.2% right; без зеркал | Критический | ❌ superseded → HERO3d (φ отвергнут владельцем) |
 | UX.HERO3d | City hero: photo ~20% right + opaque left `#000c2a→#000` + right soft 3.5%→navy→black; без зеркал | Критический | ❌ superseded → HERO3e (`md:w-[20%]` = иголка + wrong grad) |
-| UX.HERO3e | City hero: photo `right-[20%]` aspect-[5/4] + leftGrad black→navy under + right gutter 20%; без зеркал | Критический | ⏳ commit + MSK atomic deploy |
+| UX.HERO3e | City hero: photo `right-[20%]` aspect-[5/4] + leftGrad black→navy under + right gutter 20%; без зеркал | Критический | ✅ commit `1a75ad81` MSK `BUILD_ID=wJR6Y559Vh3KmnXskIdsC` |
 
 ## /podborki city filter (2026-07-31)
 

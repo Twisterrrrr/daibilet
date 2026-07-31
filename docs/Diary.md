@@ -30,6 +30,7 @@
 
 ### Проблемы
 - Owner ждёт visual на MSK - atomic deploy после commit.
+- **Deployed:** commit `1a75ad81` → SPB build → MSK atomic `.next` **BUILD_ID=`wJR6Y559Vh3KmnXskIdsC`**. Smoke moscow chunk: `right-[20%]`, `aspect-[5/4]`, grad `#000→#000c2a`, нет `md:w-[20%]`.
 
 ---
 
