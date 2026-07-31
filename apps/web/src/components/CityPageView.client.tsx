@@ -657,7 +657,7 @@ function CityHeroStrip({
             style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
             aria-hidden
           >
-            {/* 1) LeftGrad: deep at outer left → light #122868 at photo. 2) Photo + wide .city-hero-photo-mask. 3) Right gutter: light at photo → deep at rim. */}
+            {/* 1) LeftGrad → light #122868 at photo. 2) Photo + soft edge fade md-only. 3) Right gutter light→deep rim. No alpha-mask. */}
             <div
               className={CITY_NIGHT_HERO.leftFillDesktop}
               style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
@@ -675,6 +675,11 @@ function CityHeroStrip({
                   className="object-cover object-center"
                 />
               ) : null}
+              {/* Soft L+R edge fade (~15% each, md+) - no CSS mask-image on mobile full-bleed. */}
+              <div
+                className={CITY_NIGHT_HERO.photoEdgeFade}
+                style={{ backgroundImage: CITY_NIGHT_HERO.fadePhotoEdges }}
+              />
             </div>
             <div
               className="absolute inset-0 md:hidden"

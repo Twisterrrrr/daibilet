@@ -1,3 +1,22 @@
+## 2026-07-31 - City hero HERO3n: drop alpha-mask (rollback)
+
+### Наблюдения
+- Owner: HERO3m mask (~38% L/R) слишком большой; на mobile странно режет full-bleed.
+- «Почти супер» было до alpha-mask (HERO3k); нужен откат mask/overlay на фото, не весь hero.
+
+### Решения
+- Убран `.city-hero-photo-mask` из `photoFrame` и правило из `globals.css`.
+- Вернули лёгкий soft edge fade (~15% L/R) как overlay, **только md+** (`hidden md:block`) - mobile full-bleed без L/R прозрачности.
+- Сохранены: light navy `#122868` панели (без `#000` slam), `pt-16`, `mt-5`, 16:9, `right-[20%]`.
+
+### Проблемы
+- Нет.
+
+### Deploy
+- Commit → push → SPB build → MSK atomic `.next` (BUILD_ID после smoke).
+
+---
+
 ## 2026-07-31 - City hero HERO3m: light at photo seam, deepen toward rim
 
 ### Наблюдения

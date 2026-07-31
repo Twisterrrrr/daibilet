@@ -1,5 +1,5 @@
 /**
- * City night-hero shell (HERO3m: light navy at photo seam, deepen toward rim).
+ * City night-hero shell (HERO3n: drop alpha-mask; light soft edge fade md-only).
  * Shared by CityPageView SSR/hydrate and city loading skeleton so first HTML
  * and client paint claim the same shell (no CLS jump on short copy).
  *
@@ -10,21 +10,18 @@
  * Desktop stacking (media z-0, content z-1):
  *  1. leftGrad: deepen toward section LEFT rim; light `#122868` plateau at photo edge
  *  2. photo frame at right-[20%] height-driven 16:9 (not 5:4 / not md:w-[20%] needle)
- *  3. `.city-hero-photo-mask` on photo wrapper (wider soft alpha ~38% L/R)
+ *  3. soft navy↔transparent edge fade on photo (~15% L/R, md+ only - not CSS mask-image)
  *  4. right gutter w-[20%]: light at photo → deepen toward section RIGHT rim
  *
- * Mobile: full-bleed photo + same side mask + dense left overlay (readability).
+ * Mobile: full-bleed photo (no L/R alpha mask) + dense left overlay for readability.
  * Text/CTA stay left above media; no scrim over type.
- * Overlay navy on photo was rejected (seams remain) - mask only in globals.css.
  *
- * Canon (owner 2026-07-31 clarification after HERO3l):
- *  - Photo-edge seam = light blue (`#122868`), never near-black mid / `#000`.
- *  - Darker stops (`#0d1f5c`, `#0a174b`) only farther from the photo (outer rims).
- *  - HERO3l wrongly focused on outer rims; dirty band was at photo↔navy junction.
+ * Rollback (owner 2026-07-31): HERO3k/m `.city-hero-photo-mask` (~25→38% L/R) was too
+ * wide and looked wrong on mobile. Keep light navy panels; keep pt-16 / mt-5 / 16:9 / right-[20%].
  */
 export const CITY_NIGHT_HERO = {
   /**
-   * Light navy base - photo-edge / section underlay under mask alpha.
+   * Light navy base - photo-edge / section underlay.
    * Owner: `#0a174b` as full base read almost black next to the photo.
    */
   navy: '#122868',
@@ -36,7 +33,7 @@ export const CITY_NIGHT_HERO = {
    */
   navyDeep: '#0a174b',
   /**
-   * Outer section: light navy so mask alpha reveals blue (not black) at photo edges.
+   * Outer section: light navy base.
    * Mobile/sm: min-height (can grow); md+: fixed height for 16:9 letterbox.
    */
   section:
@@ -52,13 +49,22 @@ export const CITY_NIGHT_HERO = {
   /**
    * Photo band: full-bleed cover on narrow screens;
    * from md - height-driven 16:9 box parked at right-[20%] (20% gutter empty to the right).
-   * Class `city-hero-photo-mask` (globals.css) applies real mask-image L/R alpha.
    * Never md:w-[20%] / right-0 - that collapses into a thin needle strip.
    * Never aspect-[5/4] - HERO3e experiment; original landscape is 16:9.
+   * No `.city-hero-photo-mask` - owner rejected wide alpha fade on photo.
    */
   photoFrame:
-    'city-hero-photo-mask absolute inset-0 md:inset-y-0 md:left-auto md:right-[20%] md:h-full md:w-auto md:aspect-[16/9] md:max-w-[min(56%,640px)]',
+    'absolute inset-0 md:inset-y-0 md:left-auto md:right-[20%] md:h-full md:w-auto md:aspect-[16/9] md:max-w-[min(56%,640px)]',
   imageSizes: '(max-width: 767px) 100vw, min(56vw, 640px)',
+  /**
+   * Soft left/right edge fade over the photo (md+ only).
+   * Light navy overlay → transparent (~15% each side). Hidden on mobile so
+   * full-bleed photo is not cut by L/R transparency.
+   */
+  photoEdgeFade:
+    'city-hero-photo-edge-fade pointer-events-none absolute inset-0 z-[1] hidden md:block',
+  fadePhotoEdges:
+    'linear-gradient(to right, #122868 0%, rgba(18,40,104,0.78) 3%, rgba(18,40,104,0.35) 7%, rgba(18,40,104,0.1) 11%, transparent 15%, transparent 85%, rgba(18,40,104,0.1) 89%, rgba(18,40,104,0.35) 93%, rgba(18,40,104,0.78) 97%, #122868 100%)',
   /**
    * Desktop left fill: section left → photo left edge.
    * Deepen toward OUTER left rim; long light `#122868` plateau at photo seam.
