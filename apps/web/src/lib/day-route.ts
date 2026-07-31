@@ -14,6 +14,7 @@ export type DayRouteVenueItem = {
   title: string;
   city?: string | null;
   cityId?: string | null;
+  citySlug?: string | null;
   href?: string | null;
   imageUrl?: string | null;
 };
@@ -162,4 +163,49 @@ export function dayRouteMatchScore(covered: {
   const start = covered.start?.length ?? 0;
   const nearby = covered.nearby?.length ?? 0;
   return 3 * stop + 2 * start + 1 * nearby;
+}
+
+/** Full coverage count for UI «N из M» = STOP + start (nearby не полное покрытие). */
+export function dayRouteFullCoveredCount(covered: {
+  stop?: string[];
+  start?: string[];
+}): number {
+  return (covered.stop?.length ?? 0) + (covered.start?.length ?? 0);
+}
+
+function venueCityKey(venue: Pick<DayRouteVenueItem, 'cityId' | 'city'>): string | null {
+  if (venue.cityId) return `id:${venue.cityId}`;
+  const title = String(venue.city || '')
+    .trim()
+    .toLowerCase();
+  return title ? `title:${title}` : null;
+}
+
+/** True if selected points span more than one city (ids or titles). */
+export function dayRouteHasMixedCities(venues: DayRouteVenueItem[]): boolean {
+  const keys = new Set<string>();
+  for (const venue of venues) {
+    const key = venueCityKey(venue);
+    if (key) keys.add(key);
+  }
+  return keys.size > 1;
+}
+
+/** Dominant city slug for afisha CTA (most frequent citySlug among points). */
+export function dayRouteDominantCitySlug(venues: DayRouteVenueItem[]): string | null {
+  const counts = new Map<string, number>();
+  for (const venue of venues) {
+    const slug = String(venue.citySlug || '').trim();
+    if (!slug) continue;
+    counts.set(slug, (counts.get(slug) || 0) + 1);
+  }
+  let best: string | null = null;
+  let bestCount = 0;
+  for (const [slug, count] of counts) {
+    if (count > bestCount) {
+      best = slug;
+      bestCount = count;
+    }
+  }
+  return best;
 }

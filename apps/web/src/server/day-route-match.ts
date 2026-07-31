@@ -14,6 +14,7 @@ export type DayRouteMatchVenue = {
   title: string;
   cityId: string | null;
   cityTitle: string | null;
+  citySlug: string | null;
   latitude: number | null;
   longitude: number | null;
   heroImageUrl: string | null;
@@ -59,7 +60,7 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
       latitude: true,
       longitude: true,
       heroImageUrl: true,
-      city: { select: { title: true } },
+      city: { select: { title: true, slug: true } },
     },
   });
 
@@ -86,6 +87,7 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
     title: v.title,
     cityId: v.cityId,
     cityTitle: v.city?.title ?? null,
+    citySlug: v.city?.slug ?? null,
     latitude: v.latitude,
     longitude: v.longitude,
     heroImageUrl: v.heroImageUrl,

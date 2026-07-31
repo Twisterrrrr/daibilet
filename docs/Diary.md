@@ -1,4 +1,21 @@
+## 2026-07-31 - Day-route polish MVP (`/my-day`)
+
+### Наблюдения
+- Owner: polish «Собери свой день» без coords/STOP/finance; badge был только `lg:flex` - на мобилке счётчик пропадал.
+- «N из M» раньше считал nearby как полное покрытие - против ТЗ (`coveragePct` = STOP+start).
+
+### Решения
+- `/my-day`: empty states (0 точек / 0 матчей), лимит 2-8, multi-city warning, бейджи в маршруте/старт/рядом/нет, toast «Скопировано», mobile padding.
+- Header: `DayRouteBadge` всегда в sticky + «Мой день» в mobile sheet; live sync через `DAY_ROUTE_CHANGED_EVENT` / storage.
+- Unit: `day-route.test.ts` (parse/share/mixed/hydrate helpers) + score tests.
+
+### Проблемы
+- Качество матча всё ещё упирается в Phase 0 STOP/coords (параллельный чат).
+
+---
+
 ## 2026-07-31 - Must-see editorial enrich (12 городов, 69 точек)
+
 
 ### Наблюдения
 - Owner дал HookFact / О локации / Как добраться / coords / адрес / метро для топ must-see (СПб, Москва, Казань, Калининград, Владимир, Ярославль, Екатеринбург, НН, Новосибирск, Красноярск, Тула, Самара).

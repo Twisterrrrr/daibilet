@@ -23,13 +23,16 @@ export function DayRouteBadge({ className = '' }: { className?: string }) {
   return (
     <Link
       href="/my-day"
-      title="Мой день"
+      title={count ? `Мой день · ${count}` : 'Мой день'}
       aria-label={count ? `Мой день, ${count} точек` : 'Мой день'}
-      className={`relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-graphite-muted transition hover:bg-surface-muted hover:text-graphite ${className}`}
+      className={`relative inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg px-2 text-graphite-muted transition hover:bg-surface-muted hover:text-graphite sm:px-2.5 ${className}`}
     >
       <Route className="h-5 w-5" strokeWidth={1.75} />
+      <span className="hidden text-xs font-semibold sm:inline">
+        {count > 0 ? `Маршрут · ${count}` : 'Маршрут'}
+      </span>
       {count > 0 ? (
-        <span className="absolute -right-0.5 -top-0.5 inline-flex min-w-[1.1rem] items-center justify-center rounded-full bg-emerald-600 px-1 text-[10px] font-bold leading-4 text-white">
+        <span className="absolute -right-0.5 -top-0.5 inline-flex min-w-[1.1rem] items-center justify-center rounded-full bg-emerald-600 px-1 text-[10px] font-bold leading-4 text-white sm:hidden">
           {count}
         </span>
       ) : null}

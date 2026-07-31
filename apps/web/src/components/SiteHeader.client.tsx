@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Heart, HelpCircle, LogIn, Menu, User, X } from 'lucide-react';
+import { Heart, HelpCircle, LogIn, Menu, Route, User, X } from 'lucide-react';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 
 import { CityPicker } from '@/components/CityPicker.client';
@@ -158,6 +158,9 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               className="hidden lg:inline-flex"
             />
 
+            {/* Day-route counter: visible on mobile sticky header (not only lg). */}
+            <DayRouteBadge />
+
             <div className="hidden items-center gap-1 lg:flex">
               <HeaderAuthControls
                 ref={userMenuRef}
@@ -176,8 +179,6 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               >
                 <HelpCircle className="h-5 w-5" strokeWidth={1.75} />
               </Link>
-
-              <DayRouteBadge />
 
               <button
                 type="button"
@@ -346,6 +347,14 @@ function MobileNavSheet({
             ))}
           </div>
           <div className="my-3 h-px bg-slate-100" />
+          <Link
+            href="/my-day"
+            onClick={onClose}
+            className="flex w-full items-center gap-2 rounded-lg px-4 py-3 text-left text-base font-medium text-graphite-muted hover:bg-surface-muted hover:text-graphite"
+          >
+            <Route className="h-4 w-4" strokeWidth={1.75} />
+            Мой день
+          </Link>
           <button
             type="button"
             onClick={onOpenFavorites}

@@ -208,6 +208,7 @@ export function LocationVenueLayout({
                   slug: venue.slug,
                   title: venue.title || venue.name,
                   city: venue.city,
+                  citySlug: venue.citySlug,
                   href: venueHref(venue),
                   imageUrl: venue.heroImageUrl,
                 }}
@@ -486,6 +487,7 @@ function LocationVenueSidebar({ venue, relatedVenues }: { venue: PublicVenueDto;
             slug: venue.slug,
             title: venue.title || venue.name,
             city: venue.city,
+            citySlug: venue.citySlug,
             href: venueHref(venue),
             imageUrl: venue.heroImageUrl,
           }}
