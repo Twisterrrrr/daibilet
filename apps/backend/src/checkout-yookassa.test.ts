@@ -241,6 +241,98 @@ test('ignores malformed YooKassa webhook payload without touching DB', async () 
   assert.equal(result.providerPaymentId, null);
 });
 
+test('YooKassa webhook stores provider event id and dedupes replay', async (t) => {
+  if (!await canReachDatabase()) {
+    t.skip('database is not available');
+    return;
+  }
+
+  const suffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const providerEventId = `notif_${suffix}`;
+  const providerPaymentId = `pay_webhook_${suffix}`;
+
+  try {
+    const payload = {
+      id: providerEventId,
+      type: 'notification',
+      event: 'payment.succeeded',
+      object: {
+        id: providerPaymentId,
+        status: 'succeeded',
+      },
+    };
+    const config = readYooKassaRuntimeConfig({
+      NODE_ENV: 'test',
+      DAIBILET_YOOKASSA_VERIFY_WEBHOOK: '0',
+    } as NodeJS.ProcessEnv);
+
+    const first = await applyYooKassaWebhookPayload(payload, { config, now });
+    assert.equal(first.result, 'not_found');
+    assert.equal(first.providerPaymentId, providerPaymentId);
+
+    const journal = await prisma.processedWebhookEvent.findFirst({
+      where: { providerEventId },
+      select: { eventType: true, result: true },
+    });
+    assert.equal(journal?.eventType, 'payment.succeeded');
+    assert.equal(journal?.result, 'not_found');
+
+    const replay = await applyYooKassaWebhookPayload(payload, { config, now });
+    assert.equal(replay.result, 'duplicate');
+    assert.equal(replay.providerPaymentId, providerPaymentId);
+  } finally {
+    await prisma.processedWebhookEvent.deleteMany({ where: { providerEventId } });
+  }
+});
+
+test('YooKassa webhook rejects mismatched payment object id', async (t) => {
+  if (!await canReachDatabase()) {
+    t.skip('database is not available');
+    return;
+  }
+
+  const suffix = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+  const providerEventId = `notif_mismatch_${suffix}`;
+
+  try {
+    await assert.rejects(
+      () => applyYooKassaWebhookPayload({
+        id: providerEventId,
+        event: 'payment.succeeded',
+        object: {
+          id: `pay_wrong_${suffix}`,
+          status: 'succeeded',
+        },
+      }, {
+        config: readYooKassaRuntimeConfig({
+          NODE_ENV: 'test',
+          DAIBILET_YOOKASSA_VERIFY_WEBHOOK: '1',
+          DAIBILET_YOOKASSA_CHECKOUT: '1',
+          YOOKASSA_SHOP_ID: 'shop_123',
+          YOOKASSA_SECRET_KEY: 'test_secret',
+        } as NodeJS.ProcessEnv),
+        fetchImpl: async () => new Response(JSON.stringify({
+          id: `pay_verified_${suffix}`,
+          status: 'succeeded',
+        }), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
+        now,
+      }),
+      (error: unknown) => isYooKassaCheckoutError(error) && error.code === 'YOOKASSA_PAYMENT_FAILED',
+    );
+
+    const journal = await prisma.processedWebhookEvent.findFirst({
+      where: { providerEventId },
+      select: { result: true },
+    });
+    assert.equal(journal?.result, 'FAILED');
+  } finally {
+    await prisma.processedWebhookEvent.deleteMany({ where: { providerEventId } });
+  }
+});
+
 test('YooKassa admission checkout creates pending payment and preserves idempotency', async (t) => {
   if (!await canReachDatabase()) {
     t.skip('database is not available');

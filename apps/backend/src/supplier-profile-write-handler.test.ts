@@ -69,8 +69,8 @@ test('supplier onboarding write-flow updates legal profile and primary bank acco
     assert.equal(bankProfile.bankAccounts.length, 1);
     assert.equal(bankProfile.bankAccounts[0]?.bankName, 'Тест Банк');
     assert.equal(bankProfile.bankAccounts[0]?.bik, '044525225');
-    assert.equal(bankProfile.bankAccounts[0]?.accountMask, '************0001');
-    assert.equal(bankProfile.bankAccounts[0]?.correspondentMask, '************0225');
+    assert.equal(bankProfile.bankAccounts[0]?.accountMask, '****************0001');
+    assert.equal(bankProfile.bankAccounts[0]?.correspondentMask, '****************0225');
     assert.equal(bankProfile.bankAccounts[0]?.isPrimary, true);
   } finally {
     const legal = await prisma.supplierLegalProfile.findUnique({

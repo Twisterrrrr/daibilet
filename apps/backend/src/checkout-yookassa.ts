@@ -790,7 +790,7 @@ export async function applyYooKassaWebhookPayload(
     };
   }
 
-  const dedupeKey = `yookassa:${event.eventType}:${event.paymentId}:${event.status || 'unknown'}`;
+  const dedupeKey = buildYooKassaWebhookDedupeKey(event);
   const duplicateResult = await reserveYooKassaWebhookDedupe({
     dedupeKey,
     event,
@@ -805,6 +805,7 @@ export async function applyYooKassaWebhookPayload(
           paymentId: event.paymentId,
         })
       : event.paymentObject;
+    assertYooKassaWebhookPaymentMatches(event, paymentObject);
     const result = await applyYooKassaPaymentObject(paymentObject, { now });
     await prisma.processedWebhookEvent.update({
       where: { dedupeKey },
@@ -1008,7 +1009,7 @@ async function reserveYooKassaWebhookDedupe(input: {
     await prisma.processedWebhookEvent.create({
       data: {
         dedupeKey: input.dedupeKey,
-        providerEventId: input.event.paymentId || '',
+        providerEventId: input.event.providerEventId || input.dedupeKey,
         provider: 'YOOKASSA',
         eventType: input.event.eventType,
         payload: input.event.rawPayload as Prisma.InputJsonValue,
@@ -1770,6 +1771,7 @@ function mapYooKassaAdmissionCheckoutResult(input: {
 }
 
 function extractYooKassaWebhookEvent(payload: unknown): {
+  providerEventId: string | null;
   eventType: string;
   paymentId: string | null;
   status: string | null;
@@ -1780,12 +1782,28 @@ function extractYooKassaWebhookEvent(payload: unknown): {
   const object = asRecord(rawPayload.object);
   const paymentObject = object as unknown as YooKassaPaymentObject;
   return {
+    providerEventId: cleanString(rawPayload.id) || cleanString(rawPayload.event_id) || cleanString(rawPayload.notification_id),
     eventType: cleanString(rawPayload.event) || 'payment.unknown',
     paymentId: cleanString(object.id),
     status: cleanString(object.status),
     paymentObject,
     rawPayload,
   };
+}
+
+function buildYooKassaWebhookDedupeKey(event: ReturnType<typeof extractYooKassaWebhookEvent>): string {
+  if (event.providerEventId) return `yookassa:event:${event.providerEventId}`;
+  return `yookassa:${event.eventType}:${event.paymentId}:${event.status || 'unknown'}`;
+}
+
+function assertYooKassaWebhookPaymentMatches(
+  event: ReturnType<typeof extractYooKassaWebhookEvent>,
+  paymentObject: YooKassaPaymentObject,
+): void {
+  const actualPaymentId = cleanString(paymentObject.id);
+  if (!actualPaymentId || actualPaymentId !== event.paymentId) {
+    throw new YooKassaCheckoutError('YOOKASSA_PAYMENT_FAILED', 400, [], 'YooKassa webhook payment id mismatch');
+  }
 }
 
 function buildYooKassaReturnUrl(baseUrl: string, publicCode: string | null): string {

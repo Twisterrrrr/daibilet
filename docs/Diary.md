@@ -1,3 +1,25 @@
+## 2026-07-31 — YooKassa webhook hardening
+
+### Наблюдения
+
+- Cursor обновил `origin/feat/next-monorepo`: Location↔Excursion и city hero handoff теперь в Git; catalog deploy остаётся зоной Cursor/.184.
+- В finance-контуре webhook уже умел делать S2S-проверку платежа через YooKassa API, но журнал `ProcessedWebhookEvent` записывал `providerEventId` как payment id и не проверял mismatch между webhook object id и verified payment id.
+
+### Решения
+
+- Dedupe webhook теперь строится по provider event id, если он есть; fallback остался `eventType + paymentId + status`.
+- `ProcessedWebhookEvent.providerEventId` хранит id уведомления, а при его отсутствии — стабильный dedupe key.
+- После S2S fetch/или raw object webhook проверяется совпадение payment id; mismatch уходит в `YOOKASSA_PAYMENT_FAILED` и помечает webhook journal как `FAILED`.
+- Уточнены тесты маскировки 20-значных банковских счетов поставщика: показываем только последние 4 цифры.
+
+### Проверки
+
+- `pnpm --filter @daibilet/backend typecheck` — OK.
+- `DATABASE_URL=postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet pnpm --filter @daibilet/backend test:ts` — OK, 130/130.
+- Catalog audit worktree: `origin/feat/next-monorepo@5e15123a`, `@daibilet/db db:validate` — OK; backend catalog tests — OK, 106/106. `@daibilet/web typecheck` остаётся красным из-за общего typed DTO долга, не из-за Location-only блока.
+
+---
+
 ## 2026-07-30 — Supplier LC admission STUB smoke
 
 ### Наблюдения
