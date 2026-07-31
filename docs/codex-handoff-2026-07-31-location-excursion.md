@@ -1,9 +1,14 @@
 # Codex handoff — Location↔Excursion + city hero (2026-07-31)
 
-**Cursor verify (локально):** `HEAD=b7244a46` · ветка `feat/next-monorepo` · **ahead origin на 16 commits — НЕ запушено.**  
-**MSK live web BUILD:** `wJR6Y559Vh3KmnXskIdsC` (HERO3e). API/web active.
+**Cursor verify:** `HEAD=3269e663` · `feat/next-monorepo` **= origin** (pushed).
+**MSK live web BUILD:** `rfbOzJz7w-ZJXYy22hhbX` (cityInfo mustSee slugs @`d87256d2`; handoff docs @`3269e663`). Prev HERO3e: `wJR6Y559Vh3KmnXskIdsC` (@`1a75ad81`).
 
-## Что накодили (Cursor) — в локальном git / частично на MSK
+### Delta post-handoff (после push + cityInfo deploy)
+- `d87256d2`: cityInfo mustSee slug-патч web+public (~246) закоммичен; seed `seed-cityinfo-must-see-venues.js` в git.
+- MSK: bulk seed ~246 must-see; smoke `/cities/moscow#sights` - title-links на venue/location.
+- Caveat (Diary): Moscow must-see entity привязаны к latin `moskva`, не к кирилл. `москва` (дубль City title=Москва).
+
+## Что накодили (Cursor) - в локальном git / частично на MSK
 
 - **EventVenueRouteItem** / **RouteItemRole** (`STOP` | `START` | `NEARBY_HUB`), table `event_venue_route_items`, **Venue.hookFact**
 - Миграции: `20260731130000_venue_kind_park_monument`, `20260731140000_event_venue_route_items_hook_fact`
@@ -13,7 +18,7 @@
 - Hub-gate: content places без events в `/venues`|/locations`
 - Seed: `scripts/seed-perm-must-see-venues.js` + `scripts/seed-cityinfo-must-see-venues.js` (aliases кириллица)
 - City «Главные места» slug fields; bulk must-see в MSK DB (~246)
-- City hero **HERO3e** (aspect photo, `right-[20%]` gutter, navy→black) — LIVE `wJR6Y559Vh3KmnXskIdsC`
+- City hero **HERO3e** (aspect photo, `right-[20%]` gutter, navy→black) - LIVE `wJR6Y559Vh3KmnXskIdsC`
 
 ## Canon
 
@@ -48,9 +53,8 @@ Smoke:
 
 ## Блокер для Codex прямо сейчас
 
-1. **Push не сделан** (`ahead 16`). Без push Codex не увидит код в origin.
-2. Локально dirty (не в HEAD): `cityInfo.ts` web+public со slug’ами must-see + untracked `seed-cityinfo-must-see-venues.js` — нужен commit до push.
-3. Editorial: STOP-связи на живых экскурсиях ещё почти пустые (`event_venue_route_items` count на MSK не проверяли без psql; API stopEvents=0 на spot-check).
+1. ~~Push / dirty cityInfo~~ - снято (`3269e663` на origin; live BUILD `rfbOzJz7w…`).
+2. Editorial: STOP-связи на живых экскурсиях почти пустые (`event_venue_route_items` / API `stopEvents=0` на spot-check).
 
 ## Не делать
 
