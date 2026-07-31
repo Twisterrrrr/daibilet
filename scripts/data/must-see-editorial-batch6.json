@@ -325,7 +325,7 @@
     "metroStation": null
   },
   {
-    "slug": "murmansk-memorial-zaschitnikam-sovetskogo-zapolyarya-v-gody-velikoy-otechestvennoy-voyny-alesha",
+    "slug": "murmansk-memorial-zaschitnikam-sovetskogo-zapolyarya-v-gody-velikoy-otechestvenno",
     "cityKey": "murmansk",
     "title": "Мемориал «Защитникам Советского Заполярья в годы Великой Отечественной войны» («Алёша»)",
     "shortDescription": "35-метровый воин на сопке с панорамой Кольского залива",
@@ -650,7 +650,7 @@
     "metroStation": null
   },
   {
-    "slug": "tambov-spaso-preobrazhenskiy-kafedral-nyy-sobor",
+    "slug": "tambov-spaso-preobrazhenskiy-kafedralnyy-sobor",
     "cityKey": "tambov",
     "title": "Спасо-Преображенский кафедральный собор",
     "shortDescription": "Старейший каменный храм области с восстановленной 84-метровой колокольней",
@@ -702,7 +702,7 @@
     "metroStation": null
   },
   {
-    "slug": "habarovsk-naberezhnaya-admirala-nevel-skogo-i-habarovskiy-utes",
+    "slug": "habarovsk-naberezhnaya-admirala-nevelskogo-i-habarovskiy-utes",
     "cityKey": "habarovsk",
     "title": "Набережная Адмирала Невельского и Хабаровский утес",
     "shortDescription": "Парадная набережная Амура со смотровой площадкой на знаменитом утесе",
@@ -780,7 +780,7 @@
     "metroStation": null
   },
   {
-    "slug": "cheboksary-monument-mat-pokrovitel-nitsa",
+    "slug": "cheboksary-monument-mat-pokrovitelnitsa",
     "cityKey": "cheboksary",
     "title": "Монумент «Мать-Покровительница»",
     "shortDescription": "46-метровый символ Чувашии на холме над Чебоксарским заливом",
@@ -806,7 +806,7 @@
     "metroStation": null
   },
   {
-    "slug": "cheboksary-bul-var-kuptsa-efremova",
+    "slug": "cheboksary-bulvar-kuptsa-efremova",
     "cityKey": "cheboksary",
     "title": "Бульвар Купца Ефремова",
     "shortDescription": "Чувашский Арбат с купеческими особняками, музеями и уличной жизнью",
@@ -832,7 +832,7 @@
     "metroStation": null
   },
   {
-    "slug": "cheboksary-chuvashskiy-natsional-nyy-muzey",
+    "slug": "cheboksary-chuvashskiy-natsionalnyy-muzey",
     "cityKey": "cheboksary",
     "title": "Чувашский национальный музей",
     "shortDescription": "Сокровищница истории и культуры чувашского народа на Красной площади",
@@ -845,7 +845,7 @@
     "metroStation": null
   },
   {
-    "slug": "cheboksary-vvedenskiy-kafedral-nyy-sobor",
+    "slug": "cheboksary-vvedenskiy-kafedralnyy-sobor",
     "cityKey": "cheboksary",
     "title": "Введенский кафедральный собор",
     "shortDescription": "Древнейший каменный храм Чувашии с фресками и Казанской иконой",
@@ -858,7 +858,7 @@
     "metroStation": null
   },
   {
-    "slug": "chita-muzey-dekabristov-mihaylo-arhangel-skaya-tserkov",
+    "slug": "chita-muzey-dekabristov-mihaylo-arhangelskaya-tserkov",
     "cityKey": "chita",
     "title": "Музей декабристов (Михайло-Архангельская церковь)",
     "shortDescription": "Деревянная церковь XVIII века и мемориал декабристам Забайкалья",
@@ -884,7 +884,7 @@
     "metroStation": null
   },
   {
-    "slug": "chita-kafedral-nyy-sobor-kazanskoy-ikony-bozhiey-materi",
+    "slug": "chita-kafedralnyy-sobor-kazanskoy-ikony-bozhiey-materi",
     "cityKey": "chita",
     "title": "Кафедральный собор Казанской иконы Божией Матери",
     "shortDescription": "Крупный лазурно-белый собор Забайкалья с девятью золочеными куполами",
@@ -962,7 +962,7 @@
     "metroStation": null
   },
   {
-    "slug": "yuzhno-sahalinsk-muzeyno-memorial-nyy-kompleks-pobeda",
+    "slug": "yuzhno-sahalinsk-muzeyno-memorialnyy-kompleks-pobeda",
     "cityKey": "yuzhno-sahalinsk",
     "title": "Музейно-мемориальный комплекс «Победа»",
     "shortDescription": "Интерактивный военно-исторический комплекс о событиях 1945 года на Сахалине",
@@ -975,7 +975,7 @@
     "metroStation": null
   },
   {
-    "slug": "yuzhno-sahalinsk-kafedral-nyy-sobor-rozhdestva-hristova",
+    "slug": "yuzhno-sahalinsk-kafedralnyy-sobor-rozhdestva-hristova",
     "cityKey": "yuzhno-sahalinsk",
     "title": "Кафедральный собор Рождества Христова",
     "shortDescription": "77-метровый белокаменный собор с мозаиками на площади Победы",

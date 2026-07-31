@@ -3,16 +3,16 @@
 ### Наблюдения
 - Owner: Кострома, Курган, Курск, Липецк, Мурманск, Саранск, Смоленск, Сыктывкар, Тамбов, Хабаровск, Чебоксары, Чита, Южно-Сахалинск (по 6).
 - У всех 13 городов `mustSee` был пустым - нужны slug + insert Venue.
-- Owner-координаты с ошибкой города: «Коми пасы» (56.x) и Чувашский нацмузей (54.x/Саранск) - исправлены на локальные.
+- Owner-координаты с ошибкой города: «Коми пасы» (56.x/Йошкар-Ола) и Чувашский нацмузей (54.x/Саранск) - исправлены на локальные (~61.67/50.84 и ~56.14/47.25).
 
 ### Решения
-- `must-see-editorial.json` → 390; batch6 артефакт 78; aliases batch6 в enrich.
-- `cityInfo` mustSee заполнен для 13 ключей (в т.ч. `lipeck`, `habarovsk`, `yuzhno-sahalinsk`).
-- MSK apply: 78 insert; API restart; smoke hookFact ok (slug `slice(0,72)` для Илизарова/Алёши/орлов).
-- Commit + push + SPB→MSK atomic (BUILD_ID после smoke).
+- `must-see-editorial.json` → 390; batch6 артефакт 78; aliases batch6 в enrich (`lipeck`, `habarovsk`, `yuzhno-sahalinsk`).
+- `cityInfo` mustSee заполнен для 13 ключей; slugify ь/ъ → пусто (канон seed).
+- MSK apply: **32 insert + 46 update**; API restart; smoke 13/13 owner HookFact (Ипатьевский, ледокол Ленин, крепостная стена, Мать-Покровительница и др.).
+- Commit + push + SPB→MSK atomic web (hub mustSee).
 
 ### Проблемы
-- Seed slugify: `map[ch]||ch` превращает мягкий знак в дефис (как в batch5 `podvor-e`) - оставляем как канон.
+- Черновик JSON сначала ушёл с placeholder HookFact - пересобран из owner-текстов перед apply.
 
 ---
 
