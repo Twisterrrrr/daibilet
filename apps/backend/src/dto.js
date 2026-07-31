@@ -6410,7 +6410,8 @@ function normalizePublicVenueMergeKey(name, city, address) {
   const title = normalizeVenueTextKey(canonicalVenueMergeTitle(name));
   const cityKey = normalizeVenueTextKey(city || 'не указан');
 
-  if (/причал|набереж/i.test(`${name || ''} ${address || ''}`)) {
+  // Только реальные причалы/пристани. Городские набережные-променады - outdoor must-see, не pier-merge.
+  if (/причал|пристань/i.test(`${name || ''} ${address || ''}`)) {
     const pierKey = canonicalPierLocationKey(name, address);
     if (pierKey) return `pier|${cityKey}|${pierKey}`;
     return `pier|${cityKey}|${title}`;
