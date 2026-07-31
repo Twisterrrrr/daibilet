@@ -16,7 +16,7 @@
 | LE.3 | Admin UI STOP-форма + venue hookFact | Высокий | ✅ |
 | LE.4 | Public DTO: stopEvents / nearbyEvents (300м) / venueStops / hookFact | Высокий | ✅ |
 | LE.5 | UI: LocationCard / park-like layout / Event «Маршрут / места» | Высокий | ✅ |
-| LE.6 | Seed Пермь must-see (6 slugs) + cityInfo slug | Средний | ✅ script; cityInfo already |
+| LE.6 | Seed Пермь must-see (6 slugs) + cityInfo slug | Средний | ✅ DB MSK 6 rows; cityInfo slug; listing 🚫 без hub-gate deploy |
 | LE.7 | Deploy migrate + контент STOP-связей экскурсий | Высокий | ⏳ |
 
 ## Venue kinds: park + monument (2026-07-31)
@@ -29,8 +29,10 @@
 | VK.4 | Admin kind options (Vite + Next admin) | Средний | ✅ |
 | VK.5 | City hub copy «Важные места» (не «Важные локации») | Низкий | ⏳ если секция ещё не переименована |
 | VK.6 | Future: park admission (Монрепо и т.п.) - не в MVP catalog/finance mix | Средний | ⚠️ deferred (см. qa.md) |
-| VK.7 | City hub «Главные места»: title → venue/location href | Высокий | ✅ model + UI Link; SPB Эрмитаж; Пермь 6 slugs |
-| VK.8 | Content places в каталогах /venues|/locations без events | Высокий | ✅ hub gate + lean union + monument≠meeting_point; UI title Link |
+| VK.7 | City hub «Главные места»: title → venue/location href | Высокий | ✅ model + UI Link; SPB Эрмитаж; Пермь 6 slugs; 239 mustSee ещё без slug |
+| VK.8 | Content places в каталогах /venues|/locations без events | Высокий | ✅ в репо; 🚫 live MSK dto.js без import hub-gate → listing/page null |
+| VK.9 | Bulk seed mustSee → Venue + cityInfo slug (`seed-cityinfo-must-see-venues.js`) | Высокий | ✅ script; ⏳ apply после deploy hub-gate API |
+| VK.10 | Deploy+restart MSK API (dto hub-gate) + smoke Perm 6 in /locations|/venues | Критический | ⏳ blocker видимости для owner |
 
 ## Finance supplier LC smoke (.159) 2026-07-31
 
@@ -65,7 +67,8 @@
 | UX.HERO3 | Ultrawide sides: mirror ~10% + stretch + navy fade `#0b1220` (не flat crop) | Высокий | ❌ откат: stretch на весь gutter + scrim поверх текста |
 | UX.HERO3b | Mirror strips ~10% image width рядом с фото + fade→transparent; gutters = navy CSS | Критический | ❌ superseded → HERO3c |
 | UX.HERO3c | Golden-ratio city hero: navy `#050a12` + left φ fade + right edge fade + photo ~38.2% right; без зеркал | Критический | ❌ superseded → HERO3d (φ отвергнут владельцем) |
-| UX.HERO3d | City hero: photo ~20% right + opaque left `#000c2a→#000` + right soft 3.5%→navy→black; без зеркал | Критический | ⏳ owner approve → commit+MSK deploy |
+| UX.HERO3d | City hero: photo ~20% right + opaque left `#000c2a→#000` + right soft 3.5%→navy→black; без зеркал | Критический | ❌ superseded → HERO3e (`md:w-[20%]` = иголка + wrong grad) |
+| UX.HERO3e | City hero: photo `right-[20%]` aspect-[5/4] + leftGrad black→navy under + right gutter 20%; без зеркал | Критический | ⏳ commit + MSK atomic deploy |
 
 ## /podborki city filter (2026-07-31)
 

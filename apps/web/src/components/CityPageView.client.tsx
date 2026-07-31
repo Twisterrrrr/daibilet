@@ -538,7 +538,7 @@ function CityHeroDefault({
   );
 }
 
-/** HERO3d: ~20% right photo + opaque left midnight fill when city PNG exists; иначе нейтральный strip. */
+/** HERO3e: aspect photo at right-[20%] + leftGrad under + right gutter; иначе нейтральный strip. */
 function CityHeroStrip({
   city,
   stats,
@@ -654,10 +654,14 @@ function CityHeroStrip({
         {nightShell ? (
           <div
             className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-            style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
+            style={{ backgroundColor: CITY_NIGHT_HERO.navyDeep }}
             aria-hidden
           >
-            {/* Right ~20% photo (full-bleed cover on mobile). Gradients under content z-[1]. */}
+            {/* 1) Full-bleed leftGrad under photo (black→navy). 2) Photo at right-[20%]. 3) Right gutter. */}
+            <div
+              className={CITY_NIGHT_HERO.leftFillDesktop}
+              style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
+            />
             <div className={CITY_NIGHT_HERO.photoFrame}>
               {showPhoto ? (
                 <SafeImage
@@ -677,10 +681,9 @@ function CityHeroStrip({
               style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}
             />
             <div
-              className={CITY_NIGHT_HERO.leftFillDesktop}
-              style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
+              className={CITY_NIGHT_HERO.rightGutter}
+              style={{ backgroundImage: CITY_NIGHT_HERO.fadeRightGutter }}
             />
-            <div className="absolute inset-0" style={{ backgroundImage: CITY_NIGHT_HERO.fadeRight }} />
           </div>
         ) : null}
         <div className={contentClass}>
@@ -922,19 +925,22 @@ function CityLoadingState({ editorial = false }: { editorial?: boolean }) {
       <section className={CITY_NIGHT_HERO.section} aria-busy="true" aria-label="Загрузка">
         <div
           className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-          style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
+          style={{ backgroundColor: CITY_NIGHT_HERO.navyDeep }}
           aria-hidden
         >
+          <div
+            className={CITY_NIGHT_HERO.leftFillDesktop}
+            style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
+          />
           <div className={`${CITY_NIGHT_HERO.photoFrame} bg-white/[0.04]`} />
           <div
             className="absolute inset-0 md:hidden"
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}
           />
           <div
-            className={CITY_NIGHT_HERO.leftFillDesktop}
-            style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
+            className={CITY_NIGHT_HERO.rightGutter}
+            style={{ backgroundImage: CITY_NIGHT_HERO.fadeRightGutter }}
           />
-          <div className="absolute inset-0" style={{ backgroundImage: CITY_NIGHT_HERO.fadeRight }} />
         </div>
         <div className={CITY_NIGHT_HERO.content}>
           <div className={CITY_NIGHT_HERO.contentInner}>

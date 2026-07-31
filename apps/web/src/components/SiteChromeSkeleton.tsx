@@ -62,20 +62,23 @@ function CityNightHeroSkeleton() {
       <section className={CITY_NIGHT_HERO.section}>
         <div
           className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-          style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
+          style={{ backgroundColor: CITY_NIGHT_HERO.navyDeep }}
           aria-hidden
         >
-          {/* Photo-band placeholder (no mirrors) - match live HERO3d ~20% geometry. */}
+          {/* HERO3e: leftGrad under → aspect photo at right-[20%] → right gutter. */}
+          <div
+            className={CITY_NIGHT_HERO.leftFillDesktop}
+            style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
+          />
           <div className={`${CITY_NIGHT_HERO.photoFrame} bg-white/[0.06]`} />
           <div
             className="absolute inset-0 md:hidden"
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}
           />
           <div
-            className={CITY_NIGHT_HERO.leftFillDesktop}
-            style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
+            className={CITY_NIGHT_HERO.rightGutter}
+            style={{ backgroundImage: CITY_NIGHT_HERO.fadeRightGutter }}
           />
-          <div className="absolute inset-0" style={{ backgroundImage: CITY_NIGHT_HERO.fadeRight }} />
         </div>
         <div className={CITY_NIGHT_HERO.content}>
           <div className={CITY_NIGHT_HERO.contentInner}>

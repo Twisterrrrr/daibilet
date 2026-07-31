@@ -1,3 +1,38 @@
+## 2026-07-31 - Owner: где новые локации в каталоге?
+
+### Наблюдения
+- Live MSK web BUILD_ID=`cUv55TBxYLmFcxlC_1Eev` (HERO3c) - не признак hub-gate.
+- MSK DB: 6 Perm must-see Venue **есть** (PARK/MONUMENT/…, PUBLISHED|CANDIDATE, migrate 20260731* applied, hookFact ok).
+- Live API: `/api/public/venues?city=Пермь` → только 4 event-venues (бары/ДК); must-see **не в listing**. Page `/api/public/venues/{slug}` → `null` (нет address-profile exception / нет content-place gate в **running** dto.js).
+- На диске `/opt/daibilet/apps/backend/src/public-venue-hub-gate.js` лежит (11:42), но **live dto.js (09:37) его не импортирует**; `isPublicVenueHub` всё ещё `events<=0 → false`. API process с 09:47.
+- cityInfo mustSee: **246** пунктов / **7** со slug (Пермь 6 + Эрмитаж); **239** без entity slug.
+
+### Решения
+- Без deploy backend hub-gate (dto + restart) seed Москвы/др. в каталоге не появится - seed MSK bulk **не делали**.
+- Добавлен `scripts/seed-cityinfo-must-see-venues.js` (dry-run / `--apply` / `--write-cityinfo`).
+- План: 1) deploy+restart API с content-place gate 2) apply seed 3) write cityInfo slugs 4) web rebuild если нужны кликабельные titles.
+
+### Проблемы
+- Owner видит gap: «взять из главных мест» сделано частично (Пермь entity+slug в репо), но live listing gate не выкачен → каталог пуст по content places.
+
+---
+
+## 2026-07-31 - City hero HERO3e: aspect photo + right gutter 20%
+
+### Наблюдения
+- HERO3d `md:w-[20%] md:right-0` дал тонкую «иголку» flush справа; градиент был наоборот (navy слева, чёрный у фото).
+
+### Решения
+- HERO3e: photo `md:right-[20%]` + `h-full w-auto aspect-[5/4] max-w-[min(48%,560px)]` (ширина от высоты, не viewport %).
+- Left fill full-bleed under photo: `to right #000 → #000c2a` (navy у левого края фото).
+- Right gutter `right:0 w-[20%]`: transparent 3.5% → navy → black.
+- Stacking: leftGrad → photo → rightGutter; content z-1 без scrim.
+
+### Проблемы
+- Owner ждёт visual на MSK - atomic deploy после commit.
+
+---
+
 ## 2026-07-31 - City hero HERO3d: 20% photo, midnight `#000c2a`
 
 ### Наблюдения
