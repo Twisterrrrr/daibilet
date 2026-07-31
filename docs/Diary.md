@@ -13,7 +13,8 @@
 - Нет.
 
 ### Deploy
-- Commit + push + SPB→MSK (BUILD_ID после smoke).
+- Commit `0cfe8aa2` → push → SPB build → MSK atomic `.next` **BUILD_ID=`E_ATa3U0g3Km35xQ8KFac`**.
+- Smoke `/cities/saint-petersburg`: `city-hero-photo-edge-fade`, right mirror `transparent 85%` / `rgba(…,0.78) 97%`, `pt-16`/`pb-8`, `#0a174b`, `16/9`, `right-[20%]`.
 
 ---
 
