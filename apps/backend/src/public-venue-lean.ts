@@ -3,6 +3,7 @@ import { prisma } from '@daibilet/db';
 import { join } from '@daibilet/db/sql';
 
 import { isUsableCatalogImageUrl, pickFirstUsableEventImageUrl } from './event-image-url.js';
+import { CONTENT_PLACE_STORED_KINDS } from './public-venue-hub-gate.js';
 
 /** Non-draft / non-hidden events count for venue list tiles (no session hydrate). */
 export const ACTIVE_VENUE_EVENT_WHERE = {
@@ -63,6 +64,8 @@ type VenueListRecord = Prisma.VenueGetPayload<{ select: typeof venueListSelect }
 /**
  * Lean venue rows for /venues + /locations catalog tiles.
  * Uses Prisma `select` + `_count` instead of include(events/offers/sessions).
+ * Also unions content places (park/monument/museum/…) with PUBLISHED|CANDIDATE
+ * so zero-event must-see entities are not dropped by the top-N event sort.
  */
 export async function fetchLeanPublicVenueRows(
   limit = 500,
@@ -81,14 +84,39 @@ export async function fetchLeanPublicVenueRows(
     ];
   }
 
-  const rows = await prisma.venue.findMany({
-    where,
-    select: venueListSelect,
-    orderBy: [{ events: { _count: 'desc' } }, { title: 'asc' }],
-    take,
-  });
+  const contentKinds = [...CONTENT_PLACE_STORED_KINDS] as VenueKind[];
+  const [rows, contentRows] = await Promise.all([
+    prisma.venue.findMany({
+      where,
+      select: venueListSelect,
+      orderBy: [{ events: { _count: 'desc' } }, { title: 'asc' }],
+      take,
+    }),
+    q
+      ? Promise.resolve([] as VenueListRecord[])
+      : prisma.venue.findMany({
+          where: {
+            pageStatus: { in: ['PUBLISHED', 'CANDIDATE'] },
+            kind: { in: contentKinds },
+            OR: [
+              { shortDescription: { not: null } },
+              { hookFact: { not: null } },
+              { description: { not: null } },
+            ],
+          },
+          select: venueListSelect,
+          orderBy: [{ title: 'asc' }],
+          take: Math.min(take, 400),
+        }),
+  ]);
 
-  return (rows as VenueListRecord[]).map((row) => mapLeanVenueRow(row, options.leanText === true));
+  const byId = new Map<string, VenueListRecord>();
+  for (const row of rows as VenueListRecord[]) byId.set(row.id, row);
+  for (const row of contentRows as VenueListRecord[]) {
+    if (!byId.has(row.id)) byId.set(row.id, row);
+  }
+
+  return [...byId.values()].map((row) => mapLeanVenueRow(row, options.leanText === true));
 }
 
 function mapLeanVenueRow(row: VenueListRecord, leanText: boolean): LeanPublicVenueRow {
