@@ -77,6 +77,8 @@ type SupplierLegalProfileRow = {
   inn?: string | null;
   taxMode?: string | null;
   isVatPayer?: boolean | null;
+  verifiedAt?: Date | string | null;
+  rejectionComment?: string | null;
   bankAccounts?: Array<{ id: string; isPrimary: boolean }>;
 };
 
@@ -724,6 +726,8 @@ function mapLegal(profile?: SupplierLegalProfileRow | null): AdminSupplierLegalS
     inn: profile?.inn || null,
     taxMode: profile?.taxMode || null,
     isVatPayer: profile?.isVatPayer ?? null,
+    verifiedAt: toIso(profile?.verifiedAt),
+    rejectionComment: profile?.rejectionComment || null,
     hasPrimaryBankAccount: Boolean(profile?.bankAccounts?.some((account) => account.isPrimary)),
   };
 }

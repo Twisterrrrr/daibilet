@@ -309,6 +309,7 @@ export interface SupplierPortalProfileDto {
     signerPosition: string | null;
     financeEmail: string | null;
     docsEmail: string | null;
+    verifiedAt: string | null;
     rejectionComment: string | null;
   };
   bankAccounts: Array<{

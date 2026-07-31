@@ -1,6 +1,6 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-07-22  
+**Обновлено:** 2026-08-01
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
@@ -57,6 +57,7 @@
 | P.3f | **YooKassa: venue admission** | Высокий | 🔄 supplier-scoped sandbox smoke endpoint + UI action; real sandbox env on `.159` next |
 | P.3f1 | **Supplier onboarding write-flow** — юрпрофиль + основной счет из ЛК, статус реквизитов на проверку | Высокий | ✅ backend PATCH + supplier UI forms |
 | P.3f2 | **YooKassa webhook hardening** — provider event id, replay dedupe, payment id mismatch guard | Высокий | ✅ backend + DB tests |
+| P.3f3 | **Admin legal approve/reject + Supplier LC polish** — модерация реквизитов, readiness callout, лаконичные заказы | Высокий | ✅ backend route + admin/supplier UI + tests |
 | P.3g | **Supplier write flows** — создание/редактирование admission и событий через заявки | Средний | ⏳ после первых тестовых поставщиков |
 | P.4 | **Реклама / paid acquisition** — до готовности витрины | — | ⚠️ deferred |
 | P.5 | **Allowlist городов** — адмцентры с saleable → standalone; остальные → cityToRegion (не «дыра») | Высокий | ✅ 2026-07-19 geo policy |

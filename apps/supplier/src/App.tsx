@@ -357,15 +357,7 @@ function DashboardPage({ supplierKey }: { supplierKey: string }) {
         <WorkflowStep label="Выплаты" value={finance.paidPayoutsKopecks ? formatMoney(finance.paidPayoutsKopecks) : 'позже'} tone={finance.paidPayoutsKopecks ? 'success' : 'neutral'} />
       </div>
 
-      <section className="panel">
-        <div className="panel-header">
-          <h2>Готовность к внутренним продажам</h2>
-          <StatusPill tone={data.readiness.canEnableInternalCheckout ? 'success' : 'warning'}>
-            {data.readiness.canEnableInternalCheckout ? 'можно включать' : 'нужны настройки'}
-          </StatusPill>
-        </div>
-        <IssueList issues={[...data.readiness.blockers, ...data.readiness.warnings]} empty="Блокеров не найдено." />
-      </section>
+      <SaleReadinessPanel readiness={data.readiness} />
 
       <div className="two-column">
         <section className="panel">
@@ -434,8 +426,6 @@ function ReadinessPage({ supplierKey }: { supplierKey: string }) {
   if (error && !data) return <ErrorState title="Не удалось загрузить готовность" error={error} onRetry={reload} />;
   if (!data) return null;
 
-  const supplierIssues = [...data.readiness.blockers, ...data.readiness.warnings];
-
   return (
     <div className="page-stack">
       <PageTitle
@@ -462,13 +452,7 @@ function ReadinessPage({ supplierKey }: { supplierKey: string }) {
         </div>
       </div>
 
-      <section className="panel">
-        <div className="panel-header">
-          <h2>Поставщик</h2>
-          <StatusPill tone={readinessTone(data.readiness.status)}>{readinessStatusLabel(data.readiness.status)}</StatusPill>
-        </div>
-        <IssueList issues={supplierIssues} empty="Блокеров по поставщику нет." />
-      </section>
+      <SaleReadinessPanel readiness={data.readiness} />
 
       <section className="panel">
         <div className="panel-header"><h2>События</h2></div>
@@ -699,21 +683,37 @@ function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
 
 function OrdersPage({ supplierKey }: { supplierKey: string }) {
   const { data, loading, error, reload } = useSupplierResource<SupplierPortalOrdersListDto>('/api/supplier/orders?limit=50', supplierKey);
+  const paidItems = data?.items.filter((order) => ['PAID', 'CONFIRMED', 'FULFILLED'].includes(order.status)).length ?? 0;
+  const pendingItems = data?.items.filter((order) => order.status === 'PENDING_PAYMENT').length ?? 0;
+  const grossKopecks = data?.items.reduce((sum, order) => sum + order.totalKopecks, 0) ?? 0;
 
   return (
     <div className="page-stack">
-      <PageTitle title="Заказы" description="Позиции внутренних продаж. Заказы через внешние виджеты остаются в билетных системах." action={<RefreshButton onClick={reload} />} />
+      <PageTitle title="Заказы" description="Покупки через внутренний контур Дайбилет: статус оплаты, покупатель, билет и сумма." action={<RefreshButton onClick={reload} />} />
+      {data ? (
+        <div className="stats-grid">
+          <StatCard label="Позиции" value={data.total} hint={`на странице ${data.items.length}`} />
+          <StatCard label="Оплачено" value={paidItems} hint="ожидают выдачи или уже выданы" />
+          <StatCard label="Ожидают оплату" value={pendingItems} hint="можно сверить позже" />
+          <StatCard label="Сумма" value={formatMoney(grossKopecks)} hint="по текущей выдаче" />
+        </div>
+      ) : null}
       <DataState loading={loading} error={error} onRetry={reload} hasData={Boolean(data?.items.length)}>
         {data ? (
           <Table
-            columns={['Заказ', 'Событие', 'Покупатель', 'Билеты', 'Сумма', 'Статус']}
+            columns={['Заказ', 'Покупка', 'Покупатель', 'Сумма / статус']}
             rows={data.items.map((order) => [
-              <div key="order"><strong>{order.publicCode || '-'}</strong><small>{formatDateTime(order.createdAt)}</small></div>,
-              <div key="event"><span>{order.eventTitle || order.admissionProductTitle || order.title}</span><small>{order.subjectType === 'VENUE_ADMISSION' ? 'входной билет' : formatDateTime(order.startsAt)}</small></div>,
-              <div key="buyer"><span>{order.buyerName || '-'}</span><small>{order.buyerEmail || ''}</small></div>,
-              <div key="tickets"><span>{order.quantity} шт.</span><small>{order.ticketTitle || '-'}</small></div>,
-              formatMoney(order.totalKopecks),
-              <StatusPill key="status" tone={order.status === 'FULFILLED' || order.status === 'CONFIRMED' ? 'success' : 'neutral'}>{orderStatusLabel(order.status)}</StatusPill>,
+              <div key="order"><strong>№ {order.publicCode || compactCode(order.orderId || order.id)}</strong><small>{formatDateTime(order.createdAt)}</small></div>,
+              <div key="event">
+                <span>{order.eventTitle || order.admissionProductTitle || order.title}</span>
+                <small>{order.subjectType === 'VENUE_ADMISSION' ? 'входной билет' : formatDateTime(order.startsAt)} · {order.quantity} шт. · {order.ticketTitle || 'билет'}</small>
+              </div>,
+              <div key="buyer"><span>{order.buyerName || order.buyerEmail || order.buyerPhone || '-'}</span><small>{[order.buyerEmail, order.buyerPhone].filter(Boolean).join(' · ')}</small></div>,
+              <div key="status" className="order-status-cell">
+                <strong>{formatMoney(order.totalKopecks)}</strong>
+                <StatusPill tone={orderStatusTone(order.status)}>{orderStatusLabel(order.status)}</StatusPill>
+                <small>{order.paidAt ? `оплачен ${formatDateTime(order.paidAt)}` : orderStatusLabel(order.itemStatus)}</small>
+              </div>,
             ])}
           />
         ) : null}
@@ -784,7 +784,7 @@ function DocumentsPage({ supplierKey }: { supplierKey: string }) {
         <section className="panel">
           <div className="panel-header">
             <h2>Профиль для документов</h2>
-            <StatusPill tone={legal?.status === 'APPROVED' ? 'success' : 'warning'}>{legalStatusLabel(legal?.status)}</StatusPill>
+            <StatusPill tone={legalStatusTone(legal?.status)}>{legalStatusLabel(legal?.status)}</StatusPill>
           </div>
           <DefinitionList rows={[
             ['Поставщик', supplier?.title || '-'],
@@ -792,6 +792,7 @@ function DocumentsPage({ supplierKey }: { supplierKey: string }) {
             ['ИНН', legal?.inn || '-'],
             ['Email документов', legal?.docsEmail || legal?.financeEmail || '-'],
             ['Подписант', legal?.signerFullName || '-'],
+            ['Проверено', legal?.verifiedAt ? formatDateTime(legal.verifiedAt) : '-'],
           ]} />
         </section>
 
@@ -861,11 +862,12 @@ function ProfilePage({ supplierKey }: { supplierKey: string }) {
     <div className="page-stack">
       <PageTitle title="Реквизиты" description="Юридический профиль, банковские счета, команда и площадки." action={<RefreshButton onClick={reload} />} />
       <SettingsNav />
+      <LegalProfileNotice profile={data} />
       <div className="two-column">
         <section className="panel">
           <div className="panel-header">
             <h2>Юридический профиль</h2>
-            <StatusPill tone={data.legal.status === 'VERIFIED' ? 'success' : data.legal.status === 'REJECTED' ? 'danger' : 'warning'}>{legalStatusLabel(data.legal.status)}</StatusPill>
+            <StatusPill tone={legalStatusTone(data.legal.status)}>{legalStatusLabel(data.legal.status)}</StatusPill>
           </div>
           <SupplierLegalProfileForm profile={data} supplierKey={supplierKey} onSaved={reload} />
         </section>
@@ -1281,6 +1283,64 @@ function ErrorState({ title, error, onRetry }: { title: string; error: string; o
   );
 }
 
+function SaleReadinessPanel({ readiness }: { readiness: SupplierPortalDashboardDto['readiness'] }) {
+  const issues = [...readiness.blockers, ...readiness.warnings];
+  const tone = readinessTone(readiness.status);
+
+  return (
+    <section className={`panel sale-readiness-panel ${tone}`}>
+      <div className="sale-readiness-copy">
+        <span className="eyebrow">Готовность к продаже</span>
+        <h2>{readinessHeadline(readiness)}</h2>
+        <p>{readinessNextStep(readiness)}</p>
+      </div>
+      <div className="sale-readiness-side">
+        <StatusPill tone={tone}>{readinessStatusLabel(readiness.status)}</StatusPill>
+        <IssueList issues={issues} empty="Блокеров нет. Можно готовить включение продаж." />
+      </div>
+    </section>
+  );
+}
+
+function LegalProfileNotice({ profile }: { profile: SupplierPortalProfileDto }) {
+  const legal = profile.legal;
+  const primaryAccount = profile.bankAccounts.find((account) => account.isPrimary) || null;
+
+  if (legal.status === 'VERIFIED') {
+    return (
+      <div className="notice-panel success">
+        <strong>Реквизиты проверены</strong>
+        <span>Внутренние продажи можно включать, если товары, комиссия и YooKassa тоже готовы. Любое изменение реквизитов снова отправит профиль на проверку.</span>
+      </div>
+    );
+  }
+
+  if (legal.status === 'REJECTED') {
+    return (
+      <div className="notice-panel error">
+        <strong>Нужны правки</strong>
+        <span>{legal.rejectionComment || 'Администратор вернул реквизиты на доработку.'}</span>
+      </div>
+    );
+  }
+
+  if (legal.status === 'INCOMPLETE') {
+    return (
+      <div className="notice-panel warning">
+        <strong>Реквизиты на проверке</strong>
+        <span>{primaryAccount ? `Основной счет: ${primaryAccount.bankName || 'банк не указан'} · ${primaryAccount.accountMask || 'счет скрыт'}.` : 'Добавьте основной счет, чтобы администратор мог одобрить профиль.'}</span>
+      </div>
+    );
+  }
+
+  return (
+    <div className="notice-panel neutral">
+      <strong>Заполните юридический профиль</strong>
+      <span>После сохранения реквизитов и банковского счета профиль уйдет на проверку администратору.</span>
+    </div>
+  );
+}
+
 function EmptyInline({ text }: { text: string }) {
   return <div className="empty-inline">{text}</div>;
 }
@@ -1444,6 +1504,7 @@ function managementModeLabel(value: string): string {
   const labels: Record<string, string> = {
     SOURCE_MANAGED: 'из источника',
     DAIBILET_MANAGED: 'управляется в Дайбилет',
+    SUPPLIER_DRAFTS: 'черновики поставщика',
     SUPPLIER_SELF_SERVICE: 'управляет поставщик',
   };
   return labels[value] || value;
@@ -1477,9 +1538,25 @@ function readinessTone(value: string): 'success' | 'warning' | 'danger' | 'neutr
   return 'neutral';
 }
 
+function readinessHeadline(readiness: SupplierPortalDashboardDto['readiness']): string {
+  if (readiness.canEnableInternalCheckout && readiness.warnings.length === 0) return 'Продажи можно включать';
+  if (readiness.canEnableInternalCheckout) return 'Продажи можно включать после короткой проверки';
+  if (readiness.blockers.length === 1) return readiness.blockers[0]?.label || 'Есть один блокер';
+  return `Есть ${readiness.blockers.length} блокера`;
+}
+
+function readinessNextStep(readiness: SupplierPortalDashboardDto['readiness']): string {
+  const firstBlocker = readiness.blockers[0];
+  if (firstBlocker) return `Следующий шаг: ${firstBlocker.label.toLowerCase()}.`;
+  const firstWarning = readiness.warnings[0];
+  if (firstWarning) return `Можно продолжать, но лучше проверить: ${firstWarning.label.toLowerCase()}.`;
+  return 'Все базовые условия выполнены. Осталось провести smoke оплаты и открыть продажу на нужных карточках.';
+}
+
 function orderStatusLabel(value: string): string {
   const labels: Record<string, string> = {
     DRAFT: 'черновик',
+    RESERVED: 'зарезервирован',
     PENDING_PAYMENT: 'ожидает оплату',
     PAID: 'оплачен',
     CONFIRMED: 'подтвержден',
@@ -1490,6 +1567,13 @@ function orderStatusLabel(value: string): string {
     FAILED: 'ошибка',
   };
   return labels[value] || value;
+}
+
+function orderStatusTone(value: string): 'success' | 'warning' | 'danger' | 'neutral' {
+  if (['PAID', 'CONFIRMED', 'FULFILLED'].includes(value)) return 'success';
+  if (['PENDING_PAYMENT', 'RESERVED', 'DRAFT'].includes(value)) return 'warning';
+  if (['FAILED', 'EXPIRED'].includes(value)) return 'danger';
+  return 'neutral';
 }
 
 function payoutStatusLabel(value: string): string {
@@ -1513,6 +1597,19 @@ function legalStatusLabel(value?: string | null): string {
   };
   if (!value) return 'не заполнено';
   return labels[value] || value;
+}
+
+function legalStatusTone(value?: string | null): 'success' | 'warning' | 'danger' | 'neutral' {
+  if (value === 'VERIFIED') return 'success';
+  if (value === 'REJECTED') return 'danger';
+  if (value === 'INCOMPLETE') return 'warning';
+  return 'neutral';
+}
+
+function compactCode(value: string): string {
+  const digits = value.replace(/\D/g, '');
+  if (digits.length >= 6) return digits.slice(-7);
+  return value.slice(-7) || '-';
 }
 
 function roleLabel(value: string): string {

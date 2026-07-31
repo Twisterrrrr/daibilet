@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { AlertTriangle, Building2, CheckCircle2, RefreshCcw, Search, WalletCards } from 'lucide-react';
+import { AlertTriangle, Building2, CheckCircle2, RefreshCcw, Search, WalletCards, XCircle } from 'lucide-react';
 
 import type { AdminSupplierDetailDto, AdminSupplierRowDto, AdminSuppliersListDto } from '@daibilet/contracts/admin';
 import { DataTableShell, EmptyState, PageHeader, QuickFilterBar, StatusBadge } from '@/components/admin/primitives';
@@ -10,7 +10,7 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent } from '@/components/ui/sheet';
 import { adminFetch } from '@/lib/admin-api';
-import { formatNumber } from '@/data';
+import { formatDateTime, formatNumber } from '@/data';
 
 const PAGE_SIZE = 50;
 
@@ -50,6 +50,8 @@ export function SuppliersPage() {
   const [loadError, setLoadError] = React.useState<string | null>(null);
   const [selected, setSelected] = React.useState<AdminSupplierDetailDto | null>(null);
   const [detailLoading, setDetailLoading] = React.useState(false);
+  const [legalActionBusy, setLegalActionBusy] = React.useState<'approve' | 'reject' | null>(null);
+  const [legalActionError, setLegalActionError] = React.useState<string | null>(null);
   const [reloadTick, setReloadTick] = React.useState(0);
 
   const q = params.get('q') ?? '';
@@ -119,11 +121,47 @@ export function SuppliersPage() {
         if (!response.ok) throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
         return body as AdminSupplierDetailDto;
       })
-      .then((detail) => setSelected(detail))
+      .then((detail) => {
+        setLegalActionError(null);
+        setSelected(detail);
+      })
       .catch((error) => {
         window.alert(error instanceof Error ? error.message : String(error));
       })
       .finally(() => setDetailLoading(false));
+  }, []);
+
+  const reviewLegalProfile = React.useCallback(async (supplierId: string, action: 'approve' | 'reject') => {
+    let adminComment: string | null = null;
+    if (action === 'reject') {
+      const value = window.prompt('Комментарий для поставщика: что нужно исправить в реквизитах?');
+      if (value === null) return;
+      adminComment = value.trim();
+      if (!adminComment) {
+        window.alert('Для отклонения нужен короткий комментарий.');
+        return;
+      }
+    }
+
+    setLegalActionBusy(action);
+    setLegalActionError(null);
+    try {
+      const response = await adminFetch(`/api/admin/suppliers/${encodeURIComponent(supplierId)}/legal/${action}`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(adminComment ? { adminComment } : {}),
+      });
+      const body = await response.json().catch(() => null);
+      if (!response.ok) throw new Error(body?.message || body?.error || `HTTP ${response.status}`);
+      setSelected(body as AdminSupplierDetailDto);
+      setReloadTick((value) => value + 1);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      setLegalActionError(message);
+      window.alert(message);
+    } finally {
+      setLegalActionBusy(null);
+    }
   }, []);
 
   const quickFilters = STATUS_FILTERS.map((item) => ({
@@ -139,7 +177,7 @@ export function SuppliersPage() {
         meta={
           <>
             <Badge variant="outline">{formatNumber(payload.metrics.total)} всего</Badge>
-            <Badge variant="outline">{formatNumber(payload.metrics.checkoutReady)} готовы к checkout</Badge>
+            <Badge variant="outline">{formatNumber(payload.metrics.checkoutReady)} готовы к продаже</Badge>
             <Badge variant="outline">{formatNumber(payload.metrics.needsAttention)} требуют внимания</Badge>
           </>
         }
@@ -154,7 +192,7 @@ export function SuppliersPage() {
       <div className="grid gap-2 lg:grid-cols-4">
         <Counter title="Активные" value={payload.metrics.active} tone="success" />
         <Counter title="На проверке" value={payload.metrics.review} tone="warning" />
-        <Counter title="Checkout ready" value={payload.metrics.checkoutReady} tone="info" />
+        <Counter title="Готовы к продаже" value={payload.metrics.checkoutReady} tone="info" />
         <Counter title="Блокеры" value={payload.metrics.needsAttention} tone="danger" />
       </div>
 
@@ -251,12 +289,32 @@ export function SuppliersPage() {
         </div>
       </div>
 
-      <SupplierDetailSheet supplier={selected} onOpenChange={(open) => !open && setSelected(null)} />
+      <SupplierDetailSheet
+        supplier={selected}
+        legalActionBusy={legalActionBusy}
+        legalActionError={legalActionError}
+        onLegalAction={reviewLegalProfile}
+        onOpenChange={(open) => !open && setSelected(null)}
+      />
     </div>
   );
 }
 
-function SupplierDetailSheet({ supplier, onOpenChange }: { supplier: AdminSupplierDetailDto | null; onOpenChange: (open: boolean) => void }) {
+function SupplierDetailSheet({
+  supplier,
+  legalActionBusy,
+  legalActionError,
+  onLegalAction,
+  onOpenChange,
+}: {
+  supplier: AdminSupplierDetailDto | null;
+  legalActionBusy: 'approve' | 'reject' | null;
+  legalActionError: string | null;
+  onLegalAction: (supplierId: string, action: 'approve' | 'reject') => void;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const hasLegalProfile = Boolean(supplier?.legal.legalName || supplier?.legal.inn);
+
   return (
     <Sheet open={Boolean(supplier)} onOpenChange={onOpenChange}>
       <SheetContent className="w-[min(920px,96vw)] overflow-y-auto sm:max-w-[920px]">
@@ -273,15 +331,46 @@ function SupplierDetailSheet({ supplier, onOpenChange }: { supplier: AdminSuppli
             <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
               <div className="space-y-4">
                 <Card className="border-border p-4">
-                  <h3 className="text-sm font-semibold">Юридический контур</h3>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <h3 className="text-sm font-semibold">Юридический контур</h3>
+                    <StatusBadge status={legalStatusTone(supplier.legal.status)} label={legalStatusLabel(supplier.legal.status)} />
+                  </div>
                   <dl className="mt-3 grid gap-2 text-sm">
-                    <DetailTerm label="Статус" value={supplier.legal.status || '-'} />
+                    <DetailTerm label="Статус" value={legalStatusLabel(supplier.legal.status)} />
                     <DetailTerm label="ИНН" value={supplier.legal.inn || '-'} />
-                    <DetailTerm label="Налоговый режим" value={supplier.legal.taxMode || '-'} />
+                    <DetailTerm label="Налоговый режим" value={taxModeLabel(supplier.legal.taxMode)} />
                     <DetailTerm label="Основной счет" value={supplier.legal.hasPrimaryBankAccount ? 'есть' : 'нет'} />
                     <DetailTerm label="YooKassa" value={supplier.yookassaShopId || '-'} />
                     <DetailTerm label="Комиссия по умолчанию" value={`${supplier.defaultCommissionBps / 100}%`} />
+                    {supplier.legal.verifiedAt ? <DetailTerm label="Проверено" value={formatDateTime(supplier.legal.verifiedAt)} /> : null}
                   </dl>
+                  {supplier.legal.rejectionComment ? (
+                    <div className="mt-3 rounded-md border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                      {supplier.legal.rejectionComment}
+                    </div>
+                  ) : null}
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      disabled={!hasLegalProfile || legalActionBusy !== null || supplier.legal.status === 'VERIFIED'}
+                      onClick={() => onLegalAction(supplier.id, 'approve')}
+                    >
+                      <CheckCircle2 className="h-4 w-4" />
+                      {legalActionBusy === 'approve' ? 'Одобряем...' : 'Одобрить реквизиты'}
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      disabled={!hasLegalProfile || legalActionBusy !== null}
+                      onClick={() => onLegalAction(supplier.id, 'reject')}
+                    >
+                      <XCircle className="h-4 w-4" />
+                      {legalActionBusy === 'reject' ? 'Отклоняем...' : 'Отклонить'}
+                    </Button>
+                  </div>
+                  {legalActionError ? <div className="mt-3 text-xs text-destructive">{legalActionError}</div> : null}
                 </Card>
 
                 <Card className="border-border p-4">
@@ -308,7 +397,7 @@ function SupplierDetailSheet({ supplier, onOpenChange }: { supplier: AdminSuppli
                         <div key={event.id} className="rounded-md bg-secondary px-3 py-2 text-sm">
                           <div className="font-medium">{event.title}</div>
                           <div className="text-xs text-muted-foreground">
-                            {event.status} · {event.purchaseFlow} · {event.managementMode}
+                            {supplierStatusLabel(event.status)} · {purchaseFlowLabel(event.purchaseFlow)} · {managementModeLabel(event.managementMode)}
                           </div>
                         </div>
                       ))
@@ -326,7 +415,7 @@ function SupplierDetailSheet({ supplier, onOpenChange }: { supplier: AdminSuppli
                         <div key={product.id} className="rounded-md bg-secondary px-3 py-2 text-sm">
                           <div className="font-medium">{product.title}</div>
                           <div className="text-xs text-muted-foreground">
-                            {product.status} · {product.purchaseFlow} · {product.priceFromRub != null ? `от ${formatMoney(product.priceFromRub * 100)}` : 'цена не задана'}
+                            {supplierStatusLabel(product.status)} · {purchaseFlowLabel(product.purchaseFlow)} · {product.priceFromRub != null ? `от ${formatMoney(product.priceFromRub * 100)}` : 'цена не задана'}
                           </div>
                         </div>
                       ))
@@ -392,7 +481,7 @@ function ReadinessPills({ supplier }: { supplier: AdminSupplierRowDto }) {
     return (
       <div className="flex flex-wrap gap-1.5">
         <Badge variant="outline" className="border-success/30 bg-success/10 text-success">
-          checkout можно
+          продажи можно
         </Badge>
         {supplier.readiness.warnings.map((issue) => (
           <Badge key={issue.code} variant="outline" className="border-warning/30 bg-warning/10 text-warning-foreground">
@@ -451,6 +540,8 @@ function statusCount(payload: AdminSuppliersListDto, status: string): number {
 function supplierStatusTone(status: string): 'draft' | 'ready' | 'live' | 'paused' | 'archived' | 'incomplete' | 'error' {
   if (status === 'ACTIVE') return 'live';
   if (status === 'REVIEW') return 'ready';
+  if (status === 'PUBLISHED') return 'live';
+  if (status === 'HIDDEN') return 'paused';
   if (status === 'PAUSED') return 'paused';
   if (status === 'ARCHIVED') return 'archived';
   return 'draft';
@@ -460,11 +551,63 @@ function supplierStatusLabel(status: string): string {
   const labels: Record<string, string> = {
     DRAFT: 'Черновик',
     REVIEW: 'На проверке',
+    READY: 'Готово',
+    PUBLISHED: 'Опубликовано',
+    HIDDEN: 'Скрыто',
     ACTIVE: 'Активен',
     PAUSED: 'Пауза',
     ARCHIVED: 'Архив',
   };
   return labels[status] || status;
+}
+
+function legalStatusTone(status?: string | null): 'draft' | 'ready' | 'live' | 'paused' | 'archived' | 'incomplete' | 'error' {
+  if (status === 'VERIFIED') return 'live';
+  if (status === 'REJECTED') return 'error';
+  if (status === 'INCOMPLETE') return 'incomplete';
+  return 'draft';
+}
+
+function legalStatusLabel(status?: string | null): string {
+  const labels: Record<string, string> = {
+    DRAFT: 'Черновик',
+    INCOMPLETE: 'На проверке',
+    VERIFIED: 'Проверено',
+    REJECTED: 'Нужны правки',
+  };
+  if (!status) return 'Не заполнено';
+  return labels[status] || status;
+}
+
+function taxModeLabel(value?: string | null): string {
+  const labels: Record<string, string> = {
+    OSNO: 'ОСНО',
+    USN_6: 'УСН 6%',
+    USN_15: 'УСН 15%',
+    AUSN: 'АУСН',
+    NPD: 'Самозанятый',
+  };
+  if (!value) return '-';
+  return labels[value] || value;
+}
+
+function purchaseFlowLabel(value: string): string {
+  const labels: Record<string, string> = {
+    WIDGET: 'Виджет',
+    PLATFORM: 'Daibilet',
+    HYBRID: 'Гибрид',
+  };
+  return labels[value] || value;
+}
+
+function managementModeLabel(value: string): string {
+  const labels: Record<string, string> = {
+    SOURCE_MANAGED: 'Источник',
+    DAIBILET_MANAGED: 'Daibilet',
+    SUPPLIER_DRAFTS: 'Черновики поставщика',
+    SUPPLIER_SELF_SERVICE: 'Поставщик',
+  };
+  return labels[value] || value;
 }
 
 function catalogModeLabel(value: string): string {

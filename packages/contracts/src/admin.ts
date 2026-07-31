@@ -468,6 +468,8 @@ export interface AdminSupplierLegalSummaryDto {
   inn?: string | null;
   taxMode?: string | null;
   isVatPayer?: boolean | null;
+  verifiedAt?: string | null;
+  rejectionComment?: string | null;
   hasPrimaryBankAccount: boolean;
 }
 

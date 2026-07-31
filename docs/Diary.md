@@ -1,3 +1,30 @@
+## 2026-08-01 — Admin legal review + Supplier LC polish
+
+### Наблюдения
+
+- Supplier LC уже позволял поставщику заполнить юридический профиль и основной счет, но у администратора не было управляемого approve/reject действия.
+- `SupplierLegalProfile.status` уже содержит нужную модель (`DRAFT`, `INCOMPLETE`, `VERIFIED`, `REJECTED`), поэтому новая миграция БД не нужна.
+- В supplier UI готовность к продаже и заказы были рабочими, но местами читались как сырое API: отдельные статусы и причины были видны, но следующий шаг не был достаточно явным.
+
+### Решения
+
+- Добавлен admin endpoint: `POST /api/admin/suppliers/:id/legal/approve` и `POST /api/admin/suppliers/:id/legal/reject`.
+- Approve требует заполненные юрлицо, ИНН и основной банковский счет с БИК/расчетным счетом; reject требует комментарий для поставщика.
+- В `SupplierLegalProfile.metaJson` сохраняется легкий `lastLegalReview` + история последних проверок с масками счетов, без полного банковского номера.
+- Admin suppliers detail получил кнопки "Одобрить реквизиты" / "Отклонить", русские статусы и дату проверки.
+- Supplier LC получил более заметный блок "Готовность к продаже", понятный notice по реквизитам и упрощенную таблицу заказов: номер, покупка, покупатель, сумма/статус.
+
+### Проверки
+
+- `pnpm --config.engine-strict=false --filter @daibilet/backend typecheck` — OK.
+- `pnpm --config.engine-strict=false --filter @tours/admin typecheck` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/supplier typecheck` — OK.
+- `DATABASE_URL=postgresql://daibilet:daibilet@127.0.0.1:5437/daibilet pnpm --config.engine-strict=false --filter @daibilet/backend exec tsx --test src/admin-supplier-legal-review.test.ts src/supplier-profile-write-handler.test.ts` — OK.
+- `pnpm --config.engine-strict=false --filter @daibilet/supplier build` — OK.
+- `pnpm --config.engine-strict=false --filter @tours/admin build` — blocked локальной установкой `lucide-react`: в `node_modules` отсутствует `dist/esm/icons/index.js`; `typecheck` админки при этом проходит. Локально активен Node `v24.14.0`, проект ожидает `>=22.13.0 <23`.
+
+---
+
 ## 2026-07-31 — YooKassa webhook hardening
 
 ### Наблюдения

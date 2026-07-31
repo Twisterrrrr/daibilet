@@ -389,6 +389,18 @@ small {
   color: var(--danger);
 }
 
+.notice-panel.warning {
+  border: 1px solid rgba(169, 104, 0, 0.24);
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.notice-panel.neutral {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-soft);
+}
+
 .notice-panel span {
   color: var(--text);
 }
@@ -460,6 +472,47 @@ small {
 
 .panel {
   padding: 18px;
+}
+
+.sale-readiness-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.sale-readiness-panel.success {
+  border-color: rgba(22, 130, 74, 0.22);
+  background: linear-gradient(135deg, #ffffff 0%, #f2fbf6 100%);
+}
+
+.sale-readiness-panel.warning {
+  border-color: rgba(169, 104, 0, 0.26);
+  background: linear-gradient(135deg, #ffffff 0%, #fff9e9 100%);
+}
+
+.sale-readiness-panel.danger {
+  border-color: rgba(189, 45, 45, 0.2);
+  background: linear-gradient(135deg, #ffffff 0%, #fff6f6 100%);
+}
+
+.sale-readiness-copy h2 {
+  margin: 5px 0 7px;
+  font-size: 20px;
+  line-height: 1.18;
+}
+
+.sale-readiness-copy p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+.sale-readiness-side {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
 }
 
 .panel-header {
@@ -613,6 +666,16 @@ small {
 td div {
   display: grid;
   gap: 3px;
+}
+
+.order-status-cell {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+}
+
+.order-status-cell strong {
+  font-size: 15px;
 }
 
 .compact-row span,
@@ -1029,6 +1092,7 @@ td span {
   .page-title,
   .two-column,
   .readiness-summary,
+  .sale-readiness-panel,
   .workflow-strip,
   .settings-form {
     display: grid;

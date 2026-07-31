@@ -278,6 +278,7 @@ export async function buildSupplierPortalProfileDto(
       signerPosition: legal?.signerPosition || null,
       financeEmail: legal?.financeEmail || supplier.email || null,
       docsEmail: legal?.docsEmail || null,
+      verifiedAt: toIso(legal?.verifiedAt),
       rejectionComment: legal?.rejectionComment || null,
     },
     bankAccounts: (legal?.bankAccounts || []).map((account) => ({

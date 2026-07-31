@@ -65,6 +65,7 @@ import {
   startServer,
 } from './server.js';
 import { createAdminReviewsRouteHandler, createPublicReviewsRouteHandler } from './reviews-handler.js';
+import { reviewSupplierLegalProfile } from './admin-supplier-legal-review.js';
 import { createValidatedHandler } from './validated-handler.js';
 
 const env = readBackendEnv();
@@ -136,6 +137,7 @@ const server = startServer({
       createAdminSuppliersRouteHandler({
         buildSuppliersList: buildAdminSuppliersListDto,
         buildSupplierDetail: buildAdminSupplierDetailDto,
+        reviewSupplierLegalProfile,
       }),
       createAdminAdmissionProductsRouteHandler({
         buildAdmissionProductsList: buildAdminAdmissionProductsListDto,
