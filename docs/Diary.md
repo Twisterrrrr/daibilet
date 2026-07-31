@@ -1,3 +1,22 @@
+## 2026-07-31 - City hero HERO3l: lighter navy, no black rims
+
+### Наблюдения
+- Owner Самара: фон читается почти чёрным; красные X на L/R швах + круг на mid panel.
+- Base `#0a174b` + stops `#000` / `#050e28` на leftGrad и right gutter «чернили» края под mask alpha.
+
+### Решения
+- `CITY_NIGHT_HERO`: base `#122868`, mid `#0d1f5c`, deep `#0a174b` (owner swatch как самый тёмный stop).
+- Убраны `#000` / `#000000` из fadeLeftDesktop / fadeLeftMobile / fadeRightGutter.
+- `.city-hero-photo-mask` alpha без изменений (mask `#000` = opaque, не цвет фона).
+
+### Проблемы
+- Нет.
+
+### Deploy
+- Commit + push + SPB→MSK (BUILD_ID после smoke). Smoke `/cities/samara`: HTML `122868` / `0d1f5c`; нет flat `#000`/`#000000` в hero gradients.
+
+---
+
 ## 2026-07-31 - City hero HERO3k: real mask-image (не overlay)
 
 ### Наблюдения
