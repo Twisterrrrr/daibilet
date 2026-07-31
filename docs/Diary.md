@@ -13,7 +13,8 @@
 - Нет.
 
 ### Deploy
-- Commit → push → SPB build → MSK atomic `.next` (BUILD_ID после smoke). Smoke: HTML/`globals` содержат `city-hero-photo-mask` + `mask-image`.
+- Commit `0db07eb3` → push → SPB build → MSK atomic `.next` **BUILD_ID=`9A0T7hjLeA1YtvBHDt7d8`**.
+- Smoke `/cities/samara`: HTML `city-hero-photo-mask`; CSS bundle `-webkit-mask-image`/`mask-image`; old `city-hero-photo-edge-fade` отсутствует; mobile gap `mt-5` на месте.
 
 ---
 
