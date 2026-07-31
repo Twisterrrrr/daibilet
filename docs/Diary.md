@@ -1,3 +1,22 @@
+## 2026-07-31 - City hero HERO3o: photo closer to right rim
+
+### Наблюдения
+- Owner (скрин Нижний Новгород, mid-width): огромная пустая navy зона справа от фото.
+- HERO3n держал жёсткий `md:right-[20%]` на всех md+ - на mid-width «дыра» справа.
+
+### Решения
+- Photo gutter breakpoint-specific: `md:right-[4%]` / `lg:right-[10%]` (вместо hard 20%).
+- `leftFillDesktop` calc и `rightGutter` width синхронизированы (`4%` / `10%`).
+- Soft edge fade md+ и mobile full-bleed без изменений; mask не возвращали.
+
+### Проблемы
+- Нет.
+
+### Deploy
+- (заполняется после SPB→MSK)
+
+---
+
 ## 2026-07-31 - City hero HERO3n: drop alpha-mask (rollback)
 
 ### Наблюдения

@@ -1,23 +1,25 @@
 /**
- * City night-hero shell (HERO3n: drop alpha-mask; light soft edge fade md-only).
+ * City night-hero shell (HERO3o: mid-width photo flush-er to right edge).
  * Shared by CityPageView SSR/hydrate and city loading skeleton so first HTML
  * and client paint claim the same shell (no CLS jump on short copy).
  *
  * Mobile: `min-h-*` + asymmetric `pt-16 pb-8` / `justify-center` so title has
  * ~2× air above (owner: top cramped after equal py); bottom stays comfortable.
- * Desktop (md+): fixed `h-[360px]` + `justify-end` letterbox (16:9 / gutter unchanged).
+ * Desktop (md+): fixed `h-[360px]` + `justify-end` letterbox (16:9 unchanged).
  *
  * Desktop stacking (media z-0, content z-1):
  *  1. leftGrad: deepen toward section LEFT rim; light `#122868` plateau at photo edge
- *  2. photo frame at right-[20%] height-driven 16:9 (not 5:4 / not md:w-[20%] needle)
+ *  2. photo frame height-driven 16:9; gutter md:right-[4%] / lg:right-[10%]
+ *     (HERO3n hard right-[20%] left a huge navy hole on mid-width)
  *  3. soft navy↔transparent edge fade on photo (~15% L/R, md+ only - not CSS mask-image)
- *  4. right gutter w-[20%]: light at photo → deepen toward section RIGHT rim
+ *  4. right gutter matches photo right-%: light at photo → deepen toward section RIGHT rim
  *
  * Mobile: full-bleed photo (no L/R alpha mask) + dense left overlay for readability.
  * Text/CTA stay left above media; no scrim over type.
  *
  * Rollback (owner 2026-07-31): HERO3k/m `.city-hero-photo-mask` (~25→38% L/R) was too
- * wide and looked wrong on mobile. Keep light navy panels; keep pt-16 / mt-5 / 16:9 / right-[20%].
+ * wide and looked wrong on mobile. Keep light navy panels; keep pt-16 / mt-5 / 16:9;
+ * do not restore hard right-[20%] on all md+.
  */
 export const CITY_NIGHT_HERO = {
   /**
@@ -48,13 +50,15 @@ export const CITY_NIGHT_HERO = {
   contentInner: 'w-full max-w-2xl md:max-w-[72%]',
   /**
    * Photo band: full-bleed cover on narrow screens;
-   * from md - height-driven 16:9 box parked at right-[20%] (20% gutter empty to the right).
-   * Never md:w-[20%] / right-0 - that collapses into a thin needle strip.
+   * from md - height-driven 16:9 box near the right rim:
+   *   md: right-[4%]  (mid-width - kill the navy hole from former 20%)
+   *   lg: right-[10%] (a bit of air on wide desktop)
+   * Never md:w-[20%] / flush-only right-0 needle on all sizes.
    * Never aspect-[5/4] - HERO3e experiment; original landscape is 16:9.
    * No `.city-hero-photo-mask` - owner rejected wide alpha fade on photo.
    */
   photoFrame:
-    'absolute inset-0 md:inset-y-0 md:left-auto md:right-[20%] md:h-full md:w-auto md:aspect-[16/9] md:max-w-[min(56%,640px)]',
+    'absolute inset-0 md:inset-y-0 md:left-auto md:right-[4%] md:h-full md:w-auto md:aspect-[16/9] md:max-w-[min(56%,640px)] lg:right-[10%]',
   imageSizes: '(max-width: 767px) 100vw, min(56vw, 640px)',
   /**
    * Soft left/right edge fade over the photo (md+ only).
@@ -68,19 +72,21 @@ export const CITY_NIGHT_HERO = {
   /**
    * Desktop left fill: section left → photo left edge.
    * Deepen toward OUTER left rim; long light `#122868` plateau at photo seam.
+   * right calc must track photoFrame right-% + max photo width.
    */
   leftFillDesktop:
-    'absolute inset-y-0 left-0 hidden md:block md:right-[calc(20%+min(56%,640px))]',
+    'absolute inset-y-0 left-0 hidden md:block md:right-[calc(4%+min(56%,640px))] lg:right-[calc(10%+min(56%,640px))]',
   fadeLeftDesktop:
     'linear-gradient(to right, #0a174b 0%, #0B1B48 20%, #0d1f5c 40%, #122868 58%, #122868 100%)',
   /** Mobile: denser left navy under copy; soft into photo (no near-black at seam). */
   fadeLeftMobile:
     'linear-gradient(to right, #122868 0%, #0d1f5c 38%, rgba(18,40,104,0.88) 66%, rgba(18,40,104,0.45) 84%, transparent 100%)',
   /**
-   * Right gutter only (right:0; width 20%): photo right edge → section right rim.
+   * Right gutter only (right:0; width matches photo right-%):
+   * photo right edge → section right rim.
    * Soft into light navy at photo, then deepen toward outer rim (no `#000`).
    */
-  rightGutter: 'absolute inset-y-0 right-0 hidden w-[20%] md:block',
+  rightGutter: 'absolute inset-y-0 right-0 hidden w-[4%] md:block lg:w-[10%]',
   fadeRightGutter:
     'linear-gradient(to right, transparent 0%, rgba(18,40,104,0.35) 2%, #122868 6%, #122868 42%, #0d1f5c 68%, #0B1B48 86%, #0a174b 100%)',
 } as const;

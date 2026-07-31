@@ -538,7 +538,7 @@ function CityHeroDefault({
   );
 }
 
-/** HERO3m: 16:9 at right-[20%] + light #122868 at photo seam (deepen only toward outer rims); иначе нейтральный strip. */
+/** HERO3o: 16:9 at md:right-[4%] / lg:right-[10%] + light #122868 at photo seam; иначе нейтральный strip. */
 function CityHeroStrip({
   city,
   stats,
