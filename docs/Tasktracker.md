@@ -7,6 +7,17 @@
 
 ---
 
+## Venue kinds: park + monument (2026-07-31)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| VK.1 | Prisma `VenueKind`: `PARK` + `MONUMENT` + migrate | Высокий | ✅ `20260731130000_venue_kind_park_monument` |
+| VK.2 | Public kinds `park`/`monument`: labels, filters, crumbs, cards, map/search location href | Высокий | ✅ |
+| VK.3 | Backend resolve/infer: park from name; monument только CMS (не ломать meeting_point «памятник …») | Высокий | ✅ |
+| VK.4 | Admin kind options (Vite + Next admin) | Средний | ✅ |
+| VK.5 | City hub copy «Важные места» (не «Важные локации») | Низкий | ⏳ если секция ещё не переименована |
+| VK.6 | Future: park admission (Монрепо и т.п.) - не в MVP catalog/finance mix | Средний | ⚠️ deferred (см. qa.md) |
+
 ## Finance supplier LC smoke (.159) 2026-07-31
 
 | # | Задача | Приоритет | Статус |
@@ -37,7 +48,8 @@
 | UX.HERO1 | Cap city PNG ≤110% (`1024px*1.1`) + `object-contain` (не height-upscale) | Критический | ✅ MSK `ikMw9FRXSb-HNgZKjaLxM` (без commit) |
 | UX.HERO1b | Не дать следующему MSK rebuild затереть source `1.2` поверх | Высокий | ⏳ commit или scp source перед каждым web build |
 | UX.HERO2 | CLS: fixed night hero `h-*` + city skeleton/loading match SSR/hydrate | Критический | ✅ MSK `yvt23s2J2qJustslJex5K` (без commit) |
-| UX.HERO3 | Ultrawide sides: mirror ~10% + stretch + navy fade `#0b1220` (не flat crop) | Высокий | ✅ source `8d7952ff` + live BUILD `lGrO-MIR8XMZLXbCJH6fh` |
+| UX.HERO3 | Ultrawide sides: mirror ~10% + stretch + navy fade `#0b1220` (не flat crop) | Высокий | ❌ откат: stretch на весь gutter + scrim поверх текста |
+| UX.HERO3b | Mirror strips ~10% image width рядом с фото + fade→transparent; gutters = navy CSS | Критический | 🔧 local (без commit/deploy) |
 
 ## /podborki city filter (2026-07-31)
 

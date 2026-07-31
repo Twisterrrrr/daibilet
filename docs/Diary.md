@@ -82,6 +82,21 @@
 
 ---
 
+## 2026-07-31 - City hero mirror: откат stretch + fix layout
+
+### Наблюдения
+- Предыдущий UX.HERO3 растягивал зеркала на весь leftover gutter (`sideGutterWidth`) и клал scrim `z-[2]` поверх заголовка (текст «под фильтром»).
+
+### Решения
+- Откат stretch: `sideMirrorWidth` = 10% ширины картинки, крылья flush к `imageFrame`; снаружи - navy CSS gradient секции.
+- Fade зеркала через `mask-image` → transparent (без upscale / без paint поверх page).
+- Media layer `z-0`, content `z-[1]` - scrim не перекрывает текст.
+
+### Проблемы
+- Только local; MSK live ещё на старом stretch-mirror - нужен redeploy после проверки.
+
+---
+
 ## 2026-07-31 - City hero ultrawide: mirrored edge wings
 
 ### Наблюдения
@@ -98,6 +113,7 @@
 ### Проблемы
 - Параллельные web rebuild на MSK снова сменили BUILD_ID mid-deploy; фича в live chunk сохранена.
 - Commit не делали - риск отката git-only rebuild без scp source.
+- **Позже откатили stretch** (см. запись выше / UX.HERO3b).
 
 ---
 

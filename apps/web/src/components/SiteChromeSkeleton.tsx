@@ -61,26 +61,35 @@ function CityNightHeroSkeleton() {
       </div>
       <section className={CITY_NIGHT_HERO.section}>
         <div
-          className="pointer-events-none absolute inset-0 overflow-hidden"
-          style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
+          className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+          style={{
+            background: `linear-gradient(90deg, ${CITY_NIGHT_HERO.navy} 0%, #0a1628 50%, ${CITY_NIGHT_HERO.navy} 100%)`,
+          }}
           aria-hidden
         >
-          <div className="absolute inset-0" style={{ backgroundColor: CITY_NIGHT_HERO.navy }} />
-          {/* Gutter placeholders (width 0 on narrow); match live hero shell geometry. */}
+          {/* Mirror-strip placeholders (~10% image width), flush to photo - match live geometry. */}
           <div
-            className="absolute inset-y-0 left-0 overflow-hidden"
-            style={{ width: CITY_NIGHT_HERO.sideGutterWidth }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-[#0b1220] from-[12%] via-[#0b1220]/75 to-transparent" />
-          </div>
+            className="absolute inset-y-0 overflow-hidden"
+            style={{
+              width: CITY_NIGHT_HERO.sideMirrorWidth,
+              left: CITY_NIGHT_HERO.leftMirrorLeft,
+              WebkitMaskImage: 'linear-gradient(to left, #000 0%, transparent 100%)',
+              maskImage: 'linear-gradient(to left, #000 0%, transparent 100%)',
+              backgroundColor: 'rgba(255,255,255,0.06)',
+            }}
+          />
           <div
-            className="absolute inset-y-0 right-0 overflow-hidden"
-            style={{ width: CITY_NIGHT_HERO.sideGutterWidth }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-l from-[#0b1220] from-[12%] via-[#0b1220]/75 to-transparent" />
-          </div>
+            className="absolute inset-y-0 overflow-hidden"
+            style={{
+              width: CITY_NIGHT_HERO.sideMirrorWidth,
+              left: CITY_NIGHT_HERO.rightMirrorLeft,
+              WebkitMaskImage: 'linear-gradient(to right, #000 0%, transparent 100%)',
+              maskImage: 'linear-gradient(to right, #000 0%, transparent 100%)',
+              backgroundColor: 'rgba(255,255,255,0.06)',
+            }}
+          />
           <div className={CITY_NIGHT_HERO.imageFrame} />
-          <div className="absolute inset-0 z-[2] bg-gradient-to-r from-[#0b1220]/85 from-[6%] via-[#0b1220]/55 via-[42%] to-[#0b1220]/15 to-[88%]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0b1220]/70 via-[#0b1220]/30 to-transparent" />
         </div>
         <div className={CITY_NIGHT_HERO.content}>
           <div className="max-w-2xl">

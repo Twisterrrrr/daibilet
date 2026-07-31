@@ -544,8 +544,9 @@ function heroFocusY(objectPosition: string): string {
 }
 
 /**
- * Ultrawide side: mirror outer ~10% of the photo, stretch into the gutter,
- * fade linearly into navy at the viewport edge (no hard crop / flat fill).
+ * Narrow side strip next to the hero photo: mirror the outer ~10% edge,
+ * fade to transparent toward the outer edge (navy CSS shows through beyond).
+ * Does NOT stretch across the leftover viewport gutter.
  */
 function CityHeroMirrorWing({
   side,
@@ -559,11 +560,21 @@ function CityHeroMirrorWing({
   const isLeft = side === 'left';
   return (
     <div
-      className={`absolute inset-y-0 overflow-hidden ${isLeft ? 'left-0' : 'right-0'}`}
-      style={{ width: CITY_NIGHT_HERO.sideGutterWidth }}
+      className="absolute inset-y-0 overflow-hidden"
+      style={{
+        width: CITY_NIGHT_HERO.sideMirrorWidth,
+        left: isLeft ? CITY_NIGHT_HERO.leftMirrorLeft : CITY_NIGHT_HERO.rightMirrorLeft,
+        // Opaque next to photo → transparent at outer edge (no navy overlay paint).
+        WebkitMaskImage: isLeft
+          ? 'linear-gradient(to left, #000 0%, transparent 100%)'
+          : 'linear-gradient(to right, #000 0%, transparent 100%)',
+        maskImage: isLeft
+          ? 'linear-gradient(to left, #000 0%, transparent 100%)'
+          : 'linear-gradient(to right, #000 0%, transparent 100%)',
+      }}
     >
       <div className="absolute inset-0" style={{ transform: 'scaleX(-1)' }}>
-        {/* Decorative wing only - stretch/crop via CSS width 1000% (= ~10% slice). */}
+        {/* Wing = 10% of image; img width 1000% of wing = full image, edge-locked. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={src}
@@ -577,13 +588,6 @@ function CityHeroMirrorWing({
           }}
         />
       </div>
-      <div
-        className={
-          isLeft
-            ? 'absolute inset-0 bg-gradient-to-r from-[#0b1220] from-[12%] via-[#0b1220]/75 to-transparent'
-            : 'absolute inset-0 bg-gradient-to-l from-[#0b1220] from-[12%] via-[#0b1220]/75 to-transparent'
-        }
-      />
     </div>
   );
 }
@@ -703,12 +707,13 @@ function CityHeroStrip({
       <section className={sectionClass}>
         {nightShell ? (
           <div
-            className="pointer-events-none absolute inset-0 overflow-hidden"
-            style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
+            className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+            style={{
+              // Section media layer only - navy CSS fills gutters beyond mirror strips.
+              background: `linear-gradient(90deg, ${CITY_NIGHT_HERO.navy} 0%, #0a1628 50%, ${CITY_NIGHT_HERO.navy} 100%)`,
+            }}
             aria-hidden
           >
-            {/* Full-bleed navy base; ultrawide gutters get mirrored edge strips. */}
-            <div className="absolute inset-0" style={{ backgroundColor: CITY_NIGHT_HERO.navy }} />
             {showPhoto ? (
               <>
                 <CityHeroMirrorWing side="left" src={heroImage!} focusY={heroFocusY(heroFocus)} />
@@ -730,10 +735,9 @@ function CityHeroStrip({
                 />
               ) : null}
             </div>
-            {/* Scrim слева под текст: navy, без purple/sky tint. */}
-            <div className="absolute inset-0 z-[2] bg-[#0b1220]/20" />
-            <div className="absolute inset-0 z-[2] bg-gradient-to-r from-[#0b1220]/85 from-[6%] via-[#0b1220]/55 via-[42%] to-[#0b1220]/15 to-[88%]" />
-            <div className="absolute inset-0 z-[2] bg-gradient-to-t from-[#0b1220]/55 via-transparent to-[#0b1220]/10" />
+            {/* Soft scrim for title legibility - stays inside z-0 media layer (not over page). */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0b1220]/70 via-[#0b1220]/30 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0b1220]/40 via-transparent to-transparent" />
           </div>
         ) : null}
         <div className={contentClass}>
@@ -974,12 +978,14 @@ function CityLoadingState({ editorial = false }: { editorial?: boolean }) {
       </div>
       <section className={CITY_NIGHT_HERO.section} aria-busy="true" aria-label="Загрузка">
         <div
-          className="pointer-events-none absolute inset-0 overflow-hidden"
-          style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
+          className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+          style={{
+            background: `linear-gradient(90deg, ${CITY_NIGHT_HERO.navy} 0%, #0a1628 50%, ${CITY_NIGHT_HERO.navy} 100%)`,
+          }}
           aria-hidden
         >
           <div className={CITY_NIGHT_HERO.imageFrame} />
-          <div className="absolute inset-0 z-[2] bg-gradient-to-r from-[#0b1220]/85 from-[6%] via-[#0b1220]/55 via-[42%] to-[#0b1220]/15 to-[88%]" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0b1220]/70 via-[#0b1220]/30 to-transparent" />
         </div>
         <div className={CITY_NIGHT_HERO.content}>
           <div className="max-w-2xl">
