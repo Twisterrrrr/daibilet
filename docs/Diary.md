@@ -32,7 +32,8 @@
 - Нет.
 
 ### Deploy
-- (заполняется после SPB→MSK)
+- Commit `c814ca54` → push → SPB build → MSK atomic `.next` **BUILD_ID=`_uJZrw56NXeR2mgb5NxaB`**.
+- Smoke `/cities/nizhny-novgorod`: `right-[4%]` / `lg:right-[10%]` / `w-[4%]` / `lg:w-[10%]`; no `right-[20%]`; soft `city-hero-photo-edge-fade`; 16:9; `pt-16`; no mask / `#000000`. Finance `.159` не трогали.
 
 ---
 
