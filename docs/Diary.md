@@ -41,7 +41,11 @@
 - Section/underlay base снова `#000c2a` (не flat black). Skeleton sync.
 
 ### Проблемы
-- Owner сказал «давай» - commit + push + MSK deploy в этом прогоне.
+- Owner сказал «давай» - commit + push + MSK deploy выполнен.
+
+### Deploy
+- Commits: `092fa703` (HERO3f + exclusive verticals), `b1691614` (handoff); parallel `a50d1657` (.cursorrules).
+- SPB build → MSK atomic `.next` **BUILD_ID=`r39aqSMuoLnZ4xDmPwZLc`**. Smoke `/cities/moscow`: `#000c2a` / `16/9` / `right-[20%]` в HTML; related links client-side (SSR карточка автобуса без event href - соседняя речная карточка ожидаема).
 
 ---
 

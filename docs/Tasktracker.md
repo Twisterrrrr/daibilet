@@ -69,7 +69,7 @@
 | UX.HERO3c | Golden-ratio city hero: navy `#050a12` + left φ fade + right edge fade + photo ~38.2% right; без зеркал | Критический | ❌ superseded → HERO3d (φ отвергнут владельцем) |
 | UX.HERO3d | City hero: photo ~20% right + opaque left `#000c2a→#000` + right soft 3.5%→navy→black; без зеркал | Критический | ❌ superseded → HERO3e (`md:w-[20%]` = иголка + wrong grad) |
 | UX.HERO3e | City hero: photo `right-[20%]` aspect-[5/4] + leftGrad black→navy under + right gutter 20%; без зеркал | Критический | ❌ superseded → HERO3f (5:4 + flat black base отвергнуты owner) |
-| UX.HERO3f | City hero: 16:9 at `right-[20%]` + leftGrad to photo edge (navy→black) + right soft→navy→black; base `#000c2a` | Критический | 🟡 commit/push; MSK deploy in flight |
+| UX.HERO3f | City hero: 16:9 at `right-[20%]` + leftGrad to photo edge (navy→black) + right soft→navy→black; base `#000c2a` | Критический | ✅ commit `092fa703` MSK `BUILD_ID=r39aqSMuoLnZ4xDmPwZLc` |
 
 ## /podborki city filter (2026-07-31)
 
