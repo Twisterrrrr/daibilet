@@ -10,11 +10,18 @@ import { HeroLayout } from '@/components/HeroLayout';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
+import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { buildCatalogPresetHref } from '@/lib/catalog-links';
 import { CATALOG_PRESETS } from '@/lib/catalog-presets';
 import { formatNumber, pluralEvents } from '@/lib/format';
 import { resolveLandingCardImage } from '@/lib/landing-images';
-import { landingCategoryHref } from '@/lib/landing-routes';
+import {
+  landingCategoryHref,
+  landingMatchesBoundCity,
+  mergePodborkiCityCatalogItems,
+  resolveLandingBoundCitySlug,
+} from '@/lib/landing-routes';
+import { resolveLandingCityName } from '@/lib/landing-city';
 import {
   groupPodborkiByCategory,
   type PodborkiCatalogItem,
@@ -31,6 +38,11 @@ const MOOD_CHIPS: Array<{ label: string; href: string }> = [
   { label: 'Культура', href: landingCategoryHref('exhibitions') },
   { label: 'На воде', href: landingCategoryHref('river-cruises') },
 ];
+
+const EMPTY_CITY_COPY = {
+  title: 'Пока готовых подборок по выбранному городу еще нет',
+  hint: 'Город уже в афише, а подборка еще на разогреве - загляните позже или смените город в шапке.',
+} as const;
 
 function seasonalBannerText(month = new Date().getMonth()): string | null {
   if (month === 11 || month === 0) return 'Зимой удобнее брать готовые планы: каток, музеи и вечерние программы без долгого выбора.';
@@ -71,78 +83,103 @@ export function LandingsCatalogView({
 }) {
   const router = useRouter();
   const urlSearchParams = useSearchParams();
-  const urlCity = urlSearchParams.get('city')?.trim() || 'all';
-  const city = urlCity !== 'all' ? urlCity : initialCity || 'all';
+  const selectedCity = useSelectedCityOptional();
+  const urlCity = urlSearchParams.get('city')?.trim() || '';
 
-  const metaBySlug = useMemo(() => {
-    const map = new Map<string, Pick<PodborkiCatalogItem, 'layoutVariant' | 'categorySlug'>>();
-    for (const item of initialItems) {
-      map.set(item.slug, {
-        layoutVariant: item.layoutVariant ?? null,
-        categorySlug: item.categorySlug ?? null,
-      });
-    }
-    return map;
-  }, [initialItems]);
+  const headerCityFilter =
+    selectedCity?.cityReady && selectedCity.cityValue !== 'all'
+      ? selectedCity.selectedDestination?.slug ||
+        selectedCity.selectedDestination?.sourceSlug ||
+        selectedCity.cityValue
+      : '';
 
-  const [items, setItems] = useState<PodborkiCatalogItem[]>(initialItems);
+  const cityRaw = urlCity && urlCity !== 'all' ? urlCity : headerCityFilter || initialCity || 'all';
+  const citySlug = resolveCitySlug(cities, cityRaw === 'all' ? 'all' : cityRaw);
+  const cityName = resolveCityName(cities, cityRaw === 'all' ? 'all' : cityRaw);
+  const pickerValue = citySlug === 'all' ? 'all' : cityName;
+  const seasonText = seasonalBannerText();
+  const citySelected = citySlug !== 'all';
+  // landings-catalog scopes by session.city / destination (RU name) or citySlug aliases
+  // like moskva / sankt-peterburg - not SEO latin moscow / saint-petersburg.
+  const apiCityParam = citySelected
+    ? (cityName !== 'all' ? cityName : citySlug)
+    : '';
+
+  const [cityScopedItems, setCityScopedItems] = useState<PodborkiCatalogItem[] | null>(null);
+  const [cityCatalogLoading, setCityCatalogLoading] = useState(false);
 
   useEffect(() => {
-    if (city === 'all' || city === initialCity) {
-      setItems(initialItems);
+    if (!citySelected || !apiCityParam) {
+      setCityScopedItems(null);
+      setCityCatalogLoading(false);
       return;
     }
 
     const controller = new AbortController();
-    const params = new URLSearchParams({ city });
+    setCityCatalogLoading(true);
+    const params = new URLSearchParams({ city: apiCityParam });
+
     fetch(`/api/public/landings-catalog?${params}`, { signal: controller.signal })
-      .then(async (response) => {
-        if (!response.ok) throw new Error('landings_fetch_failed');
-        return response.json() as Promise<{
-          items?: Array<{
-            slug: string;
-            title: string;
-            subtitle: string;
-            events: number;
-            priceFrom: number | null;
-          }>;
-        }>;
-      })
-      .then((payload) => {
-        setItems(
-          (payload.items ?? []).map((item) => {
+      .then((response) => (response.ok ? response.json() : null))
+      .then(
+        (
+          payload: {
+            items?: Array<{
+              slug: string;
+              title: string;
+              subtitle?: string | null;
+              events: number;
+              priceFrom?: number | null;
+            }>;
+          } | null,
+        ) => {
+          if (!payload?.items) return;
+          const metaBySlug = new Map(initialItems.map((item) => [item.slug, item]));
+          const mapped: PodborkiCatalogItem[] = payload.items.map((item) => {
             const meta = metaBySlug.get(item.slug);
             return {
               slug: item.slug,
               title: item.title,
-              subtitle: item.subtitle,
+              subtitle: item.subtitle ?? meta?.subtitle ?? null,
               events: item.events,
-              priceFrom: item.priceFrom,
+              priceFrom: item.priceFrom ?? meta?.priceFrom ?? null,
               layoutVariant: meta?.layoutVariant ?? null,
               categorySlug: meta?.categorySlug ?? null,
             };
-          }),
-        );
+          });
+          setCityScopedItems(mergePodborkiCityCatalogItems(initialItems, mapped, citySlug));
+        },
+      )
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+        // Fallback: city-bound only until next successful fetch.
+        setCityScopedItems(initialItems.filter((item) => landingMatchesBoundCity(item.slug, citySlug)));
       })
-      .catch((error) => {
-        if (error instanceof Error && error.name === 'AbortError') return;
-        setItems(initialItems);
+      .finally(() => {
+        if (!controller.signal.aborted) setCityCatalogLoading(false);
       });
 
     return () => controller.abort();
-  }, [city, initialCity, initialItems, metaBySlug]);
+  }, [apiCityParam, citySelected, citySlug, initialItems]);
 
-  const citySlug = resolveCitySlug(cities, city);
-  const cityName = resolveCityName(cities, city);
-  const pickerValue = citySlug === 'all' ? 'all' : cityName;
-  const seasonText = seasonalBannerText();
+  // While city catalog loads: city-bound only (avoid flash of full national list).
+  const items = useMemo(() => {
+    if (!citySelected) return initialItems;
+    if (cityScopedItems) return cityScopedItems;
+    return initialItems.filter((item) => landingMatchesBoundCity(item.slug, citySlug));
+  }, [cityScopedItems, citySelected, citySlug, initialItems]);
 
   const featured = pickPodborkiFeatured(items);
   const trending = pickPodborkiTrending(items, featured?.slug, 3);
   const featuredImage = featured ? resolveLandingCardImage(featured.slug) : null;
   const featuredHref = featured
-    ? landingCategoryHref(featured.slug, citySlug !== 'all' ? citySlug : undefined)
+    ? landingCategoryHref(featured.slug, citySelected ? citySlug : undefined)
     : '/events';
+  const featuredBoundName = featured
+    ? resolveLandingCityName(resolveLandingBoundCitySlug(featured.slug) || '')
+    : null;
+  const featuredCityName =
+    featuredBoundName || (citySelected ? resolveLandingCityName(citySlug) : null);
 
   const sections = groupPodborkiByCategory(items, categories.length ? categories : undefined);
 
@@ -208,6 +245,11 @@ export function LandingsCatalogView({
                 <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-950" />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-900/35 to-transparent" />
+              {featuredCityName ? (
+                <span className="absolute left-3 top-3 z-[2] inline-flex items-center rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-900 shadow-sm backdrop-blur-sm">
+                  {featuredCityName}
+                </span>
+              ) : null}
               <div className="relative z-10 mt-auto flex w-full flex-col gap-2 p-5">
                 <span className="text-xs font-semibold uppercase tracking-wider text-sky-200">Избранная подборка</span>
                 <span className="font-display text-2xl font-extrabold leading-tight text-white sm:text-3xl">{featured.title}</span>
@@ -222,8 +264,12 @@ export function LandingsCatalogView({
               </div>
             </Link>
           ) : (
-            <div className="flex min-h-[12rem] h-full items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white text-sm text-slate-400">
-              Подборки скоро появятся
+            <div className="flex min-h-[12rem] h-full items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 text-center text-sm text-slate-500">
+              {cityCatalogLoading
+                ? 'Подбираем подборки по городу…'
+                : citySelected
+                  ? EMPTY_CITY_COPY.title
+                  : 'Подборки скоро появятся'}
             </div>
           )}
 
@@ -231,22 +277,33 @@ export function LandingsCatalogView({
             <div className="flex h-full min-h-[14rem] flex-col justify-center self-stretch rounded-2xl border border-slate-200 bg-white px-5 py-5 shadow-sm sm:min-h-[16rem]">
               <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">В тренде</p>
               <ul className="w-full space-y-2">
-                {trending.map((item, index) => (
-                  <li key={item.slug}>
-                    <Link
-                      href={landingCategoryHref(item.slug, citySlug !== 'all' ? citySlug : undefined)}
-                      className="flex items-start gap-2.5 rounded-xl px-2.5 py-2 transition hover:bg-slate-50"
-                    >
-                      <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
-                        {index + 1}
-                      </span>
-                      <span className="min-w-0">
-                        <span className="block truncate text-sm font-semibold text-slate-900">{item.title}</span>
-                        <span className="text-xs text-slate-500">{pluralEvents(item.events)}</span>
-                      </span>
-                    </Link>
-                  </li>
-                ))}
+                {trending.map((item, index) => {
+                  const boundName = resolveLandingCityName(resolveLandingBoundCitySlug(item.slug) || '');
+                  const badgeName = boundName || (citySelected ? resolveLandingCityName(citySlug) : null);
+                  return (
+                    <li key={item.slug}>
+                      <Link
+                        href={landingCategoryHref(item.slug, citySelected ? citySlug : undefined)}
+                        className="flex items-start gap-2.5 rounded-xl px-2.5 py-2 transition hover:bg-slate-50"
+                      >
+                        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-600">
+                          {index + 1}
+                        </span>
+                        <span className="min-w-0">
+                          <span className="flex flex-wrap items-center gap-1.5">
+                            <span className="truncate text-sm font-semibold text-slate-900">{item.title}</span>
+                            {badgeName ? (
+                              <span className="inline-flex shrink-0 rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-semibold text-primary-800">
+                                {badgeName}
+                              </span>
+                            ) : null}
+                          </span>
+                          <span className="text-xs text-slate-500">{pluralEvents(item.events)}</span>
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ) : null}
@@ -260,7 +317,7 @@ export function LandingsCatalogView({
             {CATALOG_PRESETS.map((preset) => (
               <Link
                 key={preset.slug}
-                href={buildCatalogPresetHref(preset.slug, citySlug !== 'all' ? citySlug : undefined)}
+                href={buildCatalogPresetHref(preset.slug, citySelected ? citySlug : undefined)}
                 data-rail-item
                 className="inline-flex shrink-0 items-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm transition hover:border-primary/40 hover:bg-primary/5 hover:text-primary-700"
               >
@@ -295,7 +352,6 @@ export function LandingsCatalogView({
             </div>
           </div>
 
-
           {sections.length ? (
             <div className="mt-8 space-y-10">
               {sections.map((section) => (
@@ -323,7 +379,11 @@ export function LandingsCatalogView({
                         data-rail-item
                         className="w-[min(18rem,calc(100%-0.875rem))] shrink-0 snap-start sm:w-[17.5rem]"
                       >
-                        <LandingDirectionCard landing={landing} citySlug={citySlug} />
+                        <LandingDirectionCard
+                          landing={landing}
+                          citySlug={citySlug}
+                          showFilterCityBadge={citySelected}
+                        />
                       </div>
                     ))}
                   </ScrollRail>
@@ -335,7 +395,11 @@ export function LandingsCatalogView({
                   >
                     {section.items.map((landing) => (
                       <li key={landing.slug}>
-                        <LandingDirectionCard landing={landing} citySlug={citySlug} />
+                        <LandingDirectionCard
+                          landing={landing}
+                          citySlug={citySlug}
+                          showFilterCityBadge={citySelected}
+                        />
                       </li>
                     ))}
                   </ul>
@@ -344,15 +408,19 @@ export function LandingsCatalogView({
             </div>
           ) : (
             <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-white py-12 text-center">
-              <p className="text-lg text-slate-500">
-                {citySlug === 'all'
-                  ? 'Популярные запросы скоро появятся'
-                  : `В ${cityName} пока нет подборок с событиями`}
+              <p className="text-lg text-slate-600">
+                {cityCatalogLoading
+                  ? 'Подбираем подборки по городу…'
+                  : citySelected
+                    ? EMPTY_CITY_COPY.title
+                    : 'Популярные запросы скоро появятся'}
               </p>
               <p className="mt-1 text-sm text-slate-400">
-                {citySlug === 'all'
-                  ? 'Пока доступны быстрые фильтры выше'
-                  : 'Попробуйте другой город или смотрите каталог целиком'}
+                {cityCatalogLoading
+                  ? 'Считаем события в выбранном городе'
+                  : citySelected
+                    ? EMPTY_CITY_COPY.hint
+                    : 'Пока доступны быстрые фильтры выше'}
               </p>
             </div>
           )}

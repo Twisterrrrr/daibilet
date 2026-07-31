@@ -46,7 +46,7 @@ export async function buildLandingMetadata(pathname: string): Promise<Metadata> 
   if (!route) return { title: pageTitle('Подборка') };
 
   const slug = canonicalLandingSlug(route.landingSlug);
-  const payload = await fetchLandingPageDto(slug);
+  const payload = await fetchLandingPageDto(slug, route.citySlug);
   if (!payload?.landing) return { title: pageTitle('Подборка') };
 
   // Genre/tag live only on client (?genre=) so generateMetadata stays ISR-safe.
@@ -119,7 +119,7 @@ export async function LandingRoutePage({ pathname }: { pathname: string }) {
   if (!route) notFound();
 
   const slug = canonicalLandingSlug(route.landingSlug);
-  const payload = await fetchLandingPageDto(slug);
+  const payload = await fetchLandingPageDto(slug, route.citySlug);
   if (!payload?.landing) notFound();
 
   // No searchParams on server: keeps revalidate/ISR (s-maxage). Genre from URL on client.

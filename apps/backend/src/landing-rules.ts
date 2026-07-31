@@ -158,18 +158,57 @@ export const LANDING_RULES: LandingRule[] = [
     title: 'Автобусные обзорные экскурсии',
     subtitle: 'Городские маршруты и обзорные программы',
     chips: ['автобус', 'обзорная', 'город'],
-    tags: ['Автобусные туры', 'Автобусные экскурсии'],
-    keywords: ['автобус', 'автобусн', 'обзорн', 'сити тур', 'city tour'],
-    requiredAnyVenueKeywords: ['туристическ', 'yutong', 'city sightseeing', 'hop on', 'hop-off', 'hop off'],
-    requiredTitleKeywordGroups: [
-      ['обзорн', 'экскурс', 'двухэтажн', 'hop on', 'city tour', 'сити тур'],
+    tags: [
+      'Автобусные туры',
+      'Автобусные экскурсии',
+      'Автобусный тур',
+      'Автобусная экскурсия',
+      'Обзорная экскурсия',
     ],
+    keywords: [
+      'автобус',
+      'автобусн',
+      'обзорн',
+      'двухэтажн',
+      'сити тур',
+      'city tour',
+      'hop on',
+      'hop-off',
+      'hop off',
+    ],
+    // Tag / subcategory / hop-on venue = fast path; иначе автобусный + экскурсионный сигнал в content.
+    requiredAnySubcategories: [
+      'Автобусные туры',
+      'Автобусные экскурсии',
+      'Автобусный тур',
+      'Автобусная экскурсия',
+    ],
+    requiredAnyVenueKeywords: ['туристическ', 'yutong', 'city sightseeing', 'hop on', 'hop-off', 'hop off'],
     requiredKeywordGroups: [
-      ['автобус', 'автобусн', 'двухэтажн', 'туристическ', 'yutong', 'hop on', 'city tour', 'сити тур'],
-      ['обзорн', 'экскурс', 'hop on', 'city tour', 'сити тур'],
+      ['автобус', 'автобусн', 'двухэтажн', 'yutong', 'hop on', 'hop-off', 'hop off', 'city tour', 'сити тур'],
+      ['экскурс', 'обзорн', 'hop on', 'city tour', 'сити тур', 'двухэтажн'],
     ],
     excludeTags: ['Водные экскурсии', 'На теплоходе', 'На катере', 'Реки и каналы'],
-    excludeKeywords: ['теплоход', 'катер', 'лодк', 'корабл', 'причал', 'река', 'канал', 'нева', 'мост', 'пешеход', 'пешком', 'фест', 'фестиваль'],
+    excludeKeywords: [
+      'теплоход',
+      'катер',
+      'лодк',
+      'корабл',
+      'причал',
+      'река',
+      'канал',
+      'нева',
+      'мост',
+      'пешеход',
+      'пешком',
+      'фест',
+      'фестиваль',
+      // Pure transfers / airport shuttles - not sightseeing.
+      'трансфер',
+      'transfer',
+      'аэропорт',
+      'такси',
+    ],
     excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory'],
   },
   {
@@ -206,10 +245,24 @@ export const LANDING_RULES: LandingRule[] = [
     chips: ['детям', 'семья', 'цирк'],
     tags: ['Детям', 'Детская анимация', 'Шоу для детей', 'Цирк', 'Детское шоу'],
     requiredAnySubcategories: ['Детям', 'Детская анимация', 'Шоу для детей'],
-    keywords: ['детск', 'семейн', 'цирк', 'анимац', 'для детей', 'ёлк', 'елк'],
+    // No bare «анимац»: rock band «АнимациЯ» matched via stem. Kids keep tags/«для детей».
+    keywords: ['детск', 'семейн', 'цирк', 'для детей', 'ёлк', 'елк'],
     keywordScope: 'content',
-    excludeKeywords: ['18+', 'stand up', 'стендап', 'комеди', 'юмор'],
-    excludeKeywordFields: ['title', 'category', 'sourceCategory'],
+    // Band «АнимациЯ» (Кулясов); bare «анимация» would kill kids shows - use band markers + Рок.
+    excludeTags: ['Рок'],
+    excludeKeywords: [
+      '18+',
+      'stand up',
+      'стендап',
+      'комеди',
+      'юмор',
+      'кулясов',
+      'animaciya',
+      'гр. анимаци',
+      'гр.анимаци',
+      'рок',
+    ],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'tag', 'subcategory'],
   },
   {
     slug: 'concerts-genre',
@@ -238,21 +291,52 @@ export const LANDING_RULES: LandingRule[] = [
     subtitle: 'Выставки, экскурсии и творческие занятия',
     city: 'Москва',
     chips: ['музеи', 'мастер-класс', 'творчество'],
-    tags: ['Музеи', 'Мастер-класс', 'Мастер-классы', 'Выставки', 'Искусство', 'Творчество'],
+    // city is a filter only (global matcher); requiredAny* keep museum/workshop signal.
+    tags: ['Музеи', 'Мастер-класс', 'Мастер-классы', 'Выставки'],
     requiredAnySubcategories: ['Музеи', 'Мастер-класс', 'Мастер-классы', 'Выставки'],
-    keywords: ['мастер-класс', 'музе', 'выставк', 'эмаль'],
+    keywords: ['мастер-класс', 'музе', 'выставк', 'эмаль', 'галере', 'экспозиц'],
     keywordScope: 'content',
-    excludeKeywords: ['автобус', 'автобусн', 'теплоход', 'речн'],
-    excludeKeywordFields: ['title', 'venue', 'subcategory'],
+    requiredAnyKeywords: ['мастер-класс', 'музе', 'выставк', 'эмаль', 'галере', 'экспозиц'],
+    excludeTags: ['Юмор', 'Stand up', 'Комедия', 'Импровизация', 'TV комики'],
+    excludeKeywords: [
+      'автобус',
+      'автобусн',
+      'теплоход',
+      'речн',
+      'стендап',
+      'stand up',
+      'stand-up',
+      'standup',
+      'комеди',
+      'юмор',
+      'open mic',
+      'open-mic',
+      'открытый микрофон',
+      'импров',
+      'клубный стендап',
+    ],
+    excludeKeywordFields: ['title', 'category', 'sourceCategory', 'venue', 'subcategory', 'tag'],
   },
   {
     slug: 'walking-tours',
     title: 'Пешие экскурсии',
     subtitle: 'Авторские прогулки, маршруты по районам и истории города',
     chips: ['пешком', 'гид', 'маршрут'],
-    tags: ['Пешеходные экскурсии', 'Пешие экскурсии', 'Авторские экскурсии'],
-    keywords: ['пешеход', 'пешком', 'прогулк', 'walking'],
+    tags: [
+      'Пешеходные экскурсии',
+      'Пешие экскурсии',
+      'Авторские экскурсии',
+      'Пешеходная экскурсия',
+      'Авторская экскурсия',
+    ],
+    keywords: ['пешеход', 'пешком', 'пешая', 'пешие', 'прогулк', 'walking', 'авторск'],
     keywordScope: 'content',
+    requiredAnySubcategories: [
+      'Пешеходные экскурсии',
+      'Пешие экскурсии',
+      'Авторские экскурсии',
+      'Пешеходная экскурсия',
+    ],
     excludeKeywords: ['автобус', 'теплоход', 'катер', 'речн'],
   },
   {
@@ -262,13 +346,52 @@ export const LANDING_RULES: LandingRule[] = [
     chips: ['за город', 'пригороды', 'дворцы'],
     city: 'Санкт-Петербург',
     tags: ['Загородные экскурсии', 'Экскурсии в пригороды'],
-    keywords: ['загород', 'пригород', 'петергоф', 'пушкин', 'павловск', 'кронштадт', 'выборг'],
-    keywordScope: 'content',
-    requiredKeywordGroups: [
-      ['экскурс'],
-      ['загород', 'пригород', 'петергоф', 'пушкин', 'павловск', 'кронштадт', 'выборг'],
+    keywords: [
+      'загород',
+      'пригород',
+      'петергоф',
+      'пушкин',
+      'царск',
+      'павловск',
+      'кронштадт',
+      'выборг',
+      'гатчин',
+      'ораниенбаум',
+      'ломоносов',
+      'стрельн',
+      'репино',
+      'сестрорецк',
+      'шлиссельбург',
+      'петергофск',
+      'царское село',
     ],
-    excludeKeywords: ['теплоход', 'катер', 'речн'],
+    // full: топоним часто в destination/venue, не только в title (content scope режет это).
+    keywordScope: 'full',
+    requiredAnySubcategories: ['Загородные экскурсии', 'Экскурсии в пригороды'],
+    // Экскурсионный сигнал (не только stem «экскурс») + топоним пригорода / загород.
+    requiredKeywordGroups: [
+      ['экскурс', 'тур', 'выезд', 'маршрут'],
+      [
+        'загород',
+        'пригород',
+        'петергоф',
+        'пушкин',
+        'царск',
+        'павловск',
+        'кронштадт',
+        'выборг',
+        'гатчин',
+        'ораниенбаум',
+        'ломоносов',
+        'стрельн',
+        'репино',
+        'сестрорецк',
+        'шлиссельбург',
+        'петергофск',
+        'царское село',
+      ],
+    ],
+    excludeKeywords: ['теплоход', 'катер', 'речн', 'концерт', 'спектакл', 'стендап', 'stand up'],
   },
   {
     slug: 'exhibitions',
@@ -300,16 +423,26 @@ export const LANDING_RULES: LandingRule[] = [
   },
   {
     slug: 'rooftops',
-    title: 'Прогулки по крышам и смотровые',
-    subtitle: 'Экскурсии на крыши, панорамы и смотровые площадки',
-    chips: ['крыши', 'панорамы', 'смотровые'],
-    // Национальная витрина: city-URL (/saint-petersburg) режет сессии на фронте.
-    // В каталоге сейчас нет SPB roof-туров - ближайший релевант: смотровые и выход на крышу.
-    tags: ['Экскурсии по крышам', 'Крыши', 'Смотровые площадки'],
-    keywords: ['крыш', 'руф', 'панорам', 'смотр'],
+    title: 'Смотровые площадки и крыши',
+    subtitle: 'Смотровые, панорамы, Москва-Сити и прогулки по крышам',
+    chips: ['смотровые', 'панорамы', 'крыши'],
+    // Национальная витрина (Москва смотровые / Сити + СПб крыши). City-URL не lock на SPb.
+    tags: ['Экскурсии по крышам', 'Крыши', 'Смотровые площадки', 'Смотровая площадка'],
+    keywords: [
+      'крыш',
+      'руф',
+      'панорам',
+      'смотр',
+      'москва-сити',
+      'moscow city',
+      'observation',
+    ],
     keywordScope: 'content',
-    requiredTitleKeywordGroups: [['экскурс', 'прогулк', 'тур', 'посещени', 'смотр']],
-    requiredKeywordGroups: [['крыш', 'руф', 'смотр']],
+    requiredAnySubcategories: ['Экскурсии по крышам', 'Крыши', 'Смотровые площадки', 'Смотровая площадка'],
+    requiredTitleKeywordGroups: [
+      ['экскурс', 'прогулк', 'тур', 'посещени', 'смотр', 'площадк', 'панорам', 'сити'],
+    ],
+    requiredKeywordGroups: [['крыш', 'руф', 'смотр', 'москва-сити', 'moscow city']],
     excludeKeywords: [
       'теплоход',
       'катер',
@@ -321,6 +454,8 @@ export const LANDING_RULES: LandingRule[] = [
       'джаз',
       'стендап',
       'stand up',
+      'автобус',
+      'автобусн',
     ],
   },
   {
@@ -460,6 +595,8 @@ export function explainLandingRuleMatch(
   for (const tag of tagSignals.slice(0, 4)) reasons.push(`тег: ${tag}`);
   for (const match of keywordSignals.slice(0, 4)) reasons.push(`слово(${match.field}): ${match.keyword}`);
 
+  // City is only a filter (wrong city → blocker above). It must never be a sufficient
+  // positive signal: otherwise any city-scoped rule without requiredAny* floods the landing.
   const hasRequiredSignal = Boolean(
     rule.requiredAnyTags ||
     rule.requiredAnyKeywords ||
@@ -467,8 +604,14 @@ export function explainLandingRuleMatch(
     rule.requiredTitleKeywordGroups ||
     rule.requiredKeywordGroups,
   );
+  const hasPositiveSignal = Boolean(
+    tagSignals.length ||
+    keywordSignals.length ||
+    hasRequiredSignal ||
+    rule.venue,
+  );
   return {
-    matches: Boolean(tagSignals.length || keywordSignals.length || hasRequiredSignal || rule.city || rule.venue),
+    matches: hasPositiveSignal,
     reasons: uniqueValues(reasons).slice(0, 10),
     blockers: [],
   };

@@ -11,13 +11,19 @@ import { getTicketPriceRange, isFlexibleScheduleSession } from '@/lib/event-page
 import { evaluateCityIndexability } from '@/lib/hub-indexability';
 import { resolveLandingCityName } from '@/lib/landing-city';
 import { landingCategoryHref } from '@/lib/landing-routes';
-import { cityHref, eventHref, venueHref, venuePageTemplate } from '@/lib/routes';
+import { cityHref, eventHref, venueHref } from '@/lib/routes';
+import { resolveVenueBreadcrumbRegion } from '@/lib/cityRegionHub';
 import {
   cityHubPathFromLandingCity,
   landingBreadcrumbLabel,
   resolveEventLandingForBreadcrumb,
 } from '@/lib/seo-internal-links';
 import { absoluteUrl } from '@/lib/seo-meta';
+import {
+  resolvePublicVenueType,
+  venueTypeBreadcrumbPlural,
+  venueTypeCatalogHref,
+} from '@/lib/venue-meta';
 
 const SITE_URL = (process.env.DAIBILET_SITE_URL || 'https://daibilet.ru').replace(/\/$/, '');
 const SITE_NAME = 'Дайбилет';
@@ -327,21 +333,55 @@ export function buildCityPageJsonLd(payload: PublicCityPageDto): Array<Record<st
   return blocks;
 }
 
+/**
+ * Хлебные крошки площадки / локации:
+ * - крупный город: Главная → Город → Тип → Title
+ * - мелкий с region: Главная → Область → Город → Тип → Title
+ * Без промежуточного «Площадки» / «Локации». Ссылка типа → хаб города
+ * (фильтр `?type=` в UI каталога пока не URL-driven). Регион → `/cities/{regionSlug}`.
+ */
 export function buildVenueBreadcrumbs(payload: PublicVenuePageDto): StructuredBreadcrumb[] {
   const venue = payload.venue;
   const path = venue.canonicalPath || venueHref(venue);
-  const catalogPath = venuePageTemplate(venue.type) === 'location' ? '/locations' : '/venues';
-  const crumbs: StructuredBreadcrumb[] = [
-    { name: 'Главная', path: '/' },
-    { name: catalogPath === '/locations' ? 'Локации' : 'Площадки', path: catalogPath },
-  ];
-  if (venue.city && venue.city !== 'Не указан') {
+  const venueTitle = venue.seoH1 || venue.title || venue.name;
+  const publicType = resolvePublicVenueType(venue.type, venueTitle);
+  const crumbs: StructuredBreadcrumb[] = [{ name: 'Главная', path: '/' }];
+
+  const hasCity = Boolean(venue.city && venue.city !== 'Не указан');
+  const cityPath = hasCity
+    ? cityHref({
+        name: venue.city,
+        slug: venue.citySlug,
+      })
+    : null;
+
+  const region = resolveVenueBreadcrumbRegion({
+    city: venue.city,
+    citySlug: venue.citySlug,
+    regionSlug: venue.regionSlug,
+    regionTitle: venue.regionTitle,
+  });
+  if (region) {
     crumbs.push({
-      name: venue.city,
-      path: cityHref({ name: venue.city }),
+      name: region.name,
+      path: cityHref({ name: region.name, slug: region.slug }),
     });
   }
-  crumbs.push({ name: venue.seoH1 || venue.title || venue.name, path });
+
+  if (hasCity && cityPath) {
+    crumbs.push({ name: venue.city, path: cityPath });
+  }
+
+  crumbs.push({
+    name: venueTypeBreadcrumbPlural(publicType, venueTitle),
+    path: venueTypeCatalogHref({
+      type: publicType,
+      name: venueTitle,
+      city: hasCity ? venue.city : null,
+    }),
+  });
+
+  crumbs.push({ name: venueTitle, path });
   return crumbs;
 }
 

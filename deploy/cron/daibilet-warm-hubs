@@ -1,0 +1,6 @@
+# Keep hub HTML warm so browser cache clear hits nginx/Next warm paths
+# Install: cp deploy/cron/daibilet-warm-hubs /etc/cron.d/daibilet-warm-hubs && chmod 644 ...
+# flock: no pile-up; timeout 90s hard kill of whole run
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+*/3 * * * * root mkdir -p /var/lock /var/log/daibilet && /usr/bin/flock -n /var/lock/daibilet-warm-hubs.lock /usr/bin/timeout --kill-after=15s 90s /usr/bin/env bash -lc 'cd /opt/daibilet && DAIBILET_WEB_PORT=3001 /usr/bin/node scripts/warm-hub-pages.mjs' >>/var/log/daibilet/warm-hubs.log 2>&1

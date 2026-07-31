@@ -107,10 +107,11 @@ describe('structured-data landing/event', () => {
         name: 'Эрмитаж',
         title: 'Эрмитаж',
         city: 'Санкт-Петербург',
+        citySlug: 'sankt-peterburg',
         address: 'Дворцовая наб., 34',
         latitude: 59.9398,
         longitude: 30.3146,
-        type: 'institution',
+        type: 'museum_art_space',
         events: 12,
         categories: {},
       },
@@ -124,9 +125,11 @@ describe('structured-data landing/event', () => {
     assert.equal((blocks[0].address as any).streetAddress, 'Дворцовая наб., 34');
     assert.equal((blocks[0].geo as any).latitude, 59.9398);
     assert.equal(blocks[1]['@type'], 'BreadcrumbList');
+    const crumbNames = ((blocks[1] as any).itemListElement || []).map((item: any) => item.name);
+    assert.deepEqual(crumbNames, ['Главная', 'Санкт-Петербург', 'Музеи', 'Эрмитаж']);
   });
 
-  it('location venue breadcrumbs and Place use /locations', () => {
+  it('location venue breadcrumbs are city-first with type plural', () => {
     const blocks = buildVenuePageJsonLd({
       ok: true,
       venue: {
@@ -134,7 +137,8 @@ describe('structured-data landing/event', () => {
         slug: 'prichal-admiralteyskaya',
         name: 'Причал Адмиралтейская',
         city: 'Санкт-Петербург',
-        type: 'location',
+        citySlug: 'sankt-peterburg',
+        type: 'pier',
         events: 5,
         categories: {},
       },
@@ -145,9 +149,118 @@ describe('structured-data landing/event', () => {
     assert.equal(blocks[0]['@type'], 'Place');
     assert.equal(blocks[0].url, 'https://daibilet.ru/locations/prichal-admiralteyskaya');
     const crumbNames = ((blocks[1] as any).itemListElement || []).map((item: any) => item.name);
-    assert.equal(crumbNames[1], 'Локации');
+    assert.deepEqual(crumbNames, ['Главная', 'Санкт-Петербург', 'Причалы', 'Причал Адмиралтейская']);
   });
 
+  it('admin-center venue breadcrumbs skip region (Tula)', () => {
+    const blocks = buildVenuePageJsonLd({
+      ok: true,
+      venue: {
+        id: 'v3',
+        slug: 'muzey-tula',
+        name: 'Музей оружия',
+        city: 'Тула',
+        citySlug: 'tula',
+        regionSlug: 'tulskaya-oblast',
+        regionTitle: 'Тульская область',
+        type: 'museum_art_space',
+        events: 3,
+        categories: {},
+        canonicalPath: '/venues/muzey-tula',
+      },
+      sessions: [],
+      relatedVenues: [],
+      stats: { events: 3, categories: 1 },
+    } as any);
+    const crumbs = (blocks[1] as any).itemListElement || [];
+    assert.deepEqual(
+      crumbs.map((item: any) => item.name),
+      ['Главная', 'Тула', 'Музеи', 'Музей оружия'],
+    );
+    assert.equal(crumbs[2].item, 'https://daibilet.ru/venues?type=museum&city=%D0%A2%D1%83%D0%BB%D0%B0');
+  });
+
+  it('non-admin small town breadcrumbs insert region before city', () => {
+    const blocks = buildVenuePageJsonLd({
+      ok: true,
+      venue: {
+        id: 'v3b',
+        slug: 'muzey-aleksin',
+        name: 'Музей Алексина',
+        city: 'Алексин',
+        citySlug: 'aleksin',
+        regionSlug: 'tulskaya-oblast',
+        regionTitle: 'Тульская область',
+        type: 'museum',
+        events: 1,
+        categories: {},
+        canonicalPath: '/venues/muzey-aleksin',
+      },
+      sessions: [],
+      relatedVenues: [],
+      stats: { events: 1, categories: 1 },
+    } as any);
+    const crumbs = (blocks[1] as any).itemListElement || [];
+    assert.deepEqual(
+      crumbs.map((item: any) => item.name),
+      ['Главная', 'Тульская область', 'Алексин', 'Музеи', 'Музей Алексина'],
+    );
+    assert.equal(crumbs[1].item, 'https://daibilet.ru/cities/tulskaya-oblast');
+  });
+
+  it('moscow venue breadcrumbs skip region; type crumb is ?type=museum', () => {
+    const blocks = buildVenuePageJsonLd({
+      ok: true,
+      venue: {
+        id: 'v4',
+        slug: 'tretyakovka',
+        name: 'Третьяковская галерея',
+        city: 'Москва',
+        citySlug: 'moscow',
+        regionSlug: 'moskovskaya-oblast',
+        regionTitle: 'Московская область',
+        type: 'museum_art_space',
+        events: 10,
+        categories: {},
+        canonicalPath: '/venues/tretyakovka',
+      },
+      sessions: [],
+      relatedVenues: [],
+      stats: { events: 10, categories: 1 },
+    } as any);
+    const crumbs = (blocks[1] as any).itemListElement || [];
+    assert.deepEqual(
+      crumbs.map((item: any) => item.name),
+      ['Главная', 'Москва', 'Музеи', 'Третьяковская галерея'],
+    );
+    assert.equal(crumbs[2].item, 'https://daibilet.ru/venues?type=museum&city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0');
+  });
+
+  it('art space breadcrumbs use Арт-пространства and ?type=art_space', () => {
+    const blocks = buildVenuePageJsonLd({
+      ok: true,
+      venue: {
+        id: 'v5',
+        slug: 'galereya-glazunova',
+        name: 'Галерея Ильи Глазунова',
+        city: 'Москва',
+        citySlug: 'moscow',
+        type: 'museum_art_space',
+        events: 2,
+        categories: {},
+        canonicalPath: '/venues/galereya-glazunova',
+      },
+      sessions: [],
+      relatedVenues: [],
+      stats: { events: 2, categories: 1 },
+    } as any);
+    const crumbs = (blocks[1] as any).itemListElement || [];
+    assert.deepEqual(
+      crumbs.map((item: any) => item.name),
+      ['Главная', 'Москва', 'Арт-пространства', 'Галерея Ильи Глазунова'],
+    );
+    assert.equal(crumbs[2].item, 'https://daibilet.ru/venues?type=art_space&city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0');
+  });
   it('event JSON-LD Place links to venue CHPU when slug present', () => {
     const blocks = buildEventPageJsonLd({
       ok: true,

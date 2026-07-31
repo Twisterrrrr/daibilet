@@ -196,7 +196,7 @@ export function shouldShowAdmissionCta(product: Pick<FinanceAdmissionProduct, 'c
 
 /**
  * Resolve checkout URL for browser navigation.
- * Relative checkoutPath → FINANCE_CHECKOUT_BASE_URL (default https://checkout.daibilet.ru).
+ * Relative checkoutPath → FINANCE_CHECKOUT_BASE_URL (default https://pay.daibilet.ru).
  */
 export function resolveAdmissionCheckoutUrl(
   checkoutPath: string | null | undefined,
@@ -207,10 +207,13 @@ export function resolveAdmissionCheckoutUrl(
 
   if (/^https?:\/\//i.test(path)) return path;
 
+  // Direct process.env.NEXT_PUBLIC_* so Next inlines it into client bundles.
+  const bakedPublic = process.env.NEXT_PUBLIC_FINANCE_CHECKOUT_BASE_URL;
   const base = (
     env.FINANCE_CHECKOUT_BASE_URL ||
     env.NEXT_PUBLIC_FINANCE_CHECKOUT_BASE_URL ||
-    'https://checkout.daibilet.ru'
+    bakedPublic ||
+    'https://pay.daibilet.ru'
   )
     .trim()
     .replace(/\/$/, '');

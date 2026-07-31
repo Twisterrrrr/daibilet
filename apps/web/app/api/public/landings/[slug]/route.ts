@@ -7,9 +7,10 @@ export const revalidate = 300;
 
 type RouteContext = { params: Promise<{ slug: string }> };
 
-export async function GET(_request: Request, context: RouteContext) {
+export async function GET(request: Request, context: RouteContext) {
   const { slug } = await context.params;
-  const payload = await buildPublicLandingPageDto(decodeURIComponent(slug));
+  const city = new URL(request.url).searchParams.get('city');
+  const payload = await buildPublicLandingPageDto(decodeURIComponent(slug), false, city);
   if (!payload?.landing) {
     return publicJsonResponse({ error: 'not_found' }, { status: 404 });
   }

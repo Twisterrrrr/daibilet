@@ -378,7 +378,24 @@ function sessionMatchesCity(session: PublicSessionDto, cityName: string): boolea
   return resolveSessionCityName(session) === cityName;
 }
 
-function filterSessionsByCity(sessions: PublicSessionDto[], cityName: string | null): PublicSessionDto[] {
+function filterSessionsByCity(
+  sessions: PublicSessionDto[],
+  cityName: string | null,
+  citySlug?: string | null,
+): PublicSessionDto[] {
+  const slug = String(citySlug || '')
+    .trim()
+    .toLowerCase();
+  if (slug) {
+    return sessions.filter((session) => {
+      const sessionSlug = String(session.citySlug || '')
+        .trim()
+        .toLowerCase();
+      if (sessionSlug && sessionSlug === slug) return true;
+      if (cityName && sessionMatchesCity(session, cityName)) return true;
+      return false;
+    });
+  }
   if (!cityName) return sessions;
   return sessions.filter((session) => sessionMatchesCity(session, cityName));
 }
@@ -513,13 +530,31 @@ function createSyntheticLanding(slug: string, cityName: string | null): PublicLa
   } as PublicLandingDto;
 }
 
-function finalizeLandingPayload(payload: PublicLandingPageDto, slug: string, cityName: string | null): PublicLandingPageDto {
-  const sessions = filterSessionsByCity(payload.sessions, cityName);
+function finalizeLandingPayload(payload: PublicLandingPageDto, slug: string, cityName: string | null, citySlug?: string | null): PublicLandingPageDto {
+  const sessions = filterSessionsByCity(payload.sessions, cityName, citySlug);
+  const apiEvents = Number(payload.stats?.events);
+  const filteredSame = sessions.length === payload.sessions.length;
+  const useApiCount = Number.isFinite(apiEvents) && apiEvents >= sessions.length && filteredSame;
+  const eventCount = useApiCount ? apiEvents : sessions.length;
   return {
     ...payload,
-    landing: payload.landing.slug === slug ? payload.landing : { ...payload.landing, slug },
+    landing: {
+      ...(payload.landing.slug === slug ? payload.landing : { ...payload.landing, slug }),
+      events: eventCount,
+    },
     sessions,
-    stats: buildLandingStats(sessions),
+    stats: {
+      ...buildLandingStats(sessions),
+      events: eventCount,
+      sessions: eventCount,
+      // Prefer API price band when we kept uncapped count and did not refilter rows.
+      ...(useApiCount
+        ? {
+            priceFrom: payload.stats?.priceFrom ?? null,
+            priceTo: payload.stats?.priceTo ?? null,
+          }
+        : {}),
+    },
   };
 }
 
@@ -678,7 +713,7 @@ export function LandingPageView({
     );
     setApiPayload(
       initialCachedPayload?.landing
-        ? finalizeLandingPayload(initialCachedPayload, slug, resolveLandingCityName(citySlug, slug))
+        ? finalizeLandingPayload(initialCachedPayload, slug, resolveLandingCityName(citySlug, slug), citySlug)
         : initialCachedPayload,
     );
     setSessionsError(null);
@@ -689,7 +724,7 @@ export function LandingPageView({
     // SSR already hydrated the landing — do not force a no-store remount fetch.
     // Still finalize so city filter recomputes priceFrom/priceTo for hero stats.
     if (initialCachedPayload?.landing) {
-      setApiPayload(finalizeLandingPayload(initialCachedPayload, slug, resolveLandingCityName(citySlug, slug)));
+      setApiPayload(finalizeLandingPayload(initialCachedPayload, slug, resolveLandingCityName(citySlug, slug), citySlug));
       setIsSessionsLoading(false);
       setSessionsError(null);
       return;
@@ -701,7 +736,13 @@ export function LandingPageView({
 
     setIsSessionsLoading(true);
     setSessionsError(null);
-    fetch(`/api/public/landings/${encodeURIComponent(slug)}`, { signal: controller.signal })
+    const landingParams = new URLSearchParams();
+    if (citySlug) landingParams.set('city', citySlug);
+    const landingQuery = landingParams.toString();
+    fetch(
+      `/api/public/landings/${encodeURIComponent(slug)}${landingQuery ? `?${landingQuery}` : ''}`,
+      { signal: controller.signal },
+    )
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         return (await response.json()) as PublicLandingPageDto | null;
@@ -709,7 +750,7 @@ export function LandingPageView({
       .then((data) => {
         if (disposed) return;
         if (data?.landing) {
-          const resolved = finalizeLandingPayload(data, slug, resolveLandingCityName(citySlug, slug));
+          const resolved = finalizeLandingPayload(data, slug, resolveLandingCityName(citySlug, slug), citySlug);
           setApiPayload(resolved);
           setSessionsError(null);
           return;

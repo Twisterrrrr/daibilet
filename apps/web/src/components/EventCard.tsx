@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import Link from 'next/link';
 import { Clock, MapPin, Star, Ticket, Users } from 'lucide-react';
 
@@ -36,7 +37,6 @@ import { resolveEventCardFallbackImage } from '@/lib/event-card-image';
 import {
   resolveEventCardDestinationLabel,
   resolveEventCardLocationLabel,
-  resolveEventCardPinLines,
 } from '@/lib/event-location';
 import { formatPriceFrom } from '@/lib/format';
 import { trackProductCardClick } from '@/lib/catalog-analytics';
@@ -378,8 +378,35 @@ function EventCardSlotChips({
     );
   };
 
-  const renderMore = (moreCount: number) =>
-    moreCount > 0 ? <span className={SLOT_MORE_CHIP_CLASS}>ещё {moreCount}</span> : null;
+  /** 2-up grid: equal column slots; last odd chip centered across both cols. */
+  const renderSlotGrid = (sliceLabels: string[], moreCount: number, className: string) => {
+    const items: Array<{ key: string; node: ReactNode }> = sliceLabels.map((label) => ({
+      key: label,
+      node: renderChip(label),
+    }));
+    if (moreCount > 0) {
+      items.push({
+        key: `__more_${moreCount}`,
+        node: <span className={SLOT_MORE_CHIP_CLASS}>ещё {moreCount}</span>,
+      });
+    }
+    const count = items.length;
+    return (
+      <div className={`grid grid-cols-2 gap-1.5 ${className}`}>
+        {items.map((item, index) => {
+          const isLoneOnRow = count % 2 === 1 && index === count - 1;
+          return (
+            <div
+              key={item.key}
+              className={isLoneOnRow ? 'col-span-2 flex justify-center' : 'flex justify-center'}
+            >
+              {item.node}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   if (narrow) {
     const mobileLabels = labels.slice(0, COMPACT_MOBILE_SLOT_LIMIT);
@@ -389,14 +416,8 @@ function EventCardSlotChips({
 
     return (
       <>
-        <div className="flex flex-wrap items-center justify-center gap-1.5 sm:hidden">
-          {mobileLabels.map((label) => renderChip(label))}
-          {renderMore(mobileMore)}
-        </div>
-        <div className="hidden flex-wrap items-center justify-center gap-1.5 sm:flex">
-          {gridLabels.map((label) => renderChip(label))}
-          {renderMore(gridMore)}
-        </div>
+        {renderSlotGrid(mobileLabels, mobileMore, 'sm:hidden')}
+        {renderSlotGrid(gridLabels, gridMore, 'hidden sm:grid')}
       </>
     );
   }
@@ -407,9 +428,27 @@ function EventCardSlotChips({
   return (
     <div className="flex flex-nowrap items-center gap-1.5 overflow-hidden">
       {wideLabels.map((label) => renderChip(label))}
-      {renderMore(wideMore)}
+      {wideMore > 0 ? <span className={SLOT_MORE_CHIP_CLASS}>ещё {wideMore}</span> : null}
     </div>
   );
+}
+
+function normalizeCardLabel(value: string): string {
+  return String(value || '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+}
+
+/** Venue/pier for showcase cards - never city alone and never a title duplicate. */
+function resolveShowcaseLocationLine(session: CatalogCardSession, cityLabel: string | null): string | null {
+  const locationLabel = resolveEventCardLocationLabel(session);
+  if (!locationLabel) return null;
+  const locationNorm = normalizeCardLabel(locationLabel);
+  if (!locationNorm) return null;
+  if (cityLabel && locationNorm === normalizeCardLabel(cityLabel)) return null;
+  if (locationNorm === normalizeCardLabel(session.title)) return null;
+  return locationLabel;
 }
 
 function ShowcaseEventCard({
@@ -436,13 +475,13 @@ function ShowcaseEventCard({
   const hasPrice = typeof session.priceFrom === 'number' && session.priceFrom >= MIN_DISPLAY_PRICE_RUB;
   const pseudoRating = resolvePseudoRating(session.groupKey || session.id);
   const dateLabel = rail ? formatShowcaseSessionDateCompact(session) : formatShowcaseSessionDate(session);
-  const pinLines = resolveEventCardPinLines(session);
+  const cityLabel = resolveEventCardDestinationLabel(session) || null;
+  const locationLine = resolveShowcaseLocationLine(session, cityLabel);
   const categoryLabel = session.category?.trim() || null;
-  const durationLabel = extractDurationLabel(session.tags);
   const priceLabel = hasPrice ? formatShowcasePriceLabel(session.priceFrom) : null;
 
   return (
-    <article className={`group event-card ${rail ? 'min-h-[340px]' : ''}`}>
+    <article className="group event-card">
       <Link
         href={href}
         className="absolute inset-0 z-[1] rounded-card"
@@ -483,51 +522,64 @@ function ShowcaseEventCard({
         <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
       </div>
 
-      <div className={`flex min-h-0 flex-1 flex-col gap-3 text-left ${rail ? 'p-4' : 'p-4 sm:p-5'}`}>
-        <h3 className={`font-display font-bold leading-snug text-graphite ${rail ? 'line-clamp-3 text-ui-sm' : 'line-clamp-3 text-ui-sm sm:text-base'}`}>
-          <Link href={href} className={`${TITLE_LINK_CLASS}`}>
+      <div
+        className={`flex min-h-0 flex-1 flex-col text-left ${
+          rail ? 'gap-1.5 p-3.5' : 'gap-2 p-4 sm:p-5'
+        }`}
+      >
+        <h3
+          className={`font-display font-bold leading-snug text-graphite ${
+            rail ? 'line-clamp-2 text-ui-sm' : 'line-clamp-3 text-ui-sm sm:text-base'
+          }`}
+        >
+          <Link
+            href={href}
+            className="relative z-[2] transition-colors hover:text-primary-600"
+          >
             {session.title}
           </Link>
         </h3>
 
-        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        {/* ★ rating · Type · City - one compact meta row */}
+        <div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1">
           <span className="event-card-meta">
             <Star className="event-card-meta-icon" />
             <span className="font-medium text-graphite">{pseudoRating.toFixed(1)}</span>
           </span>
-          {durationLabel ? (
-            <span className="event-card-meta">
-              <Clock className="event-card-meta-icon" />
-              <span className="truncate">{durationLabel}</span>
-            </span>
-          ) : null}
           {categoryLabel ? (
-            <span className="rounded-md bg-surface-muted px-2 py-0.5 text-ui-xs font-medium text-graphite-muted">
-              {categoryLabel}
-            </span>
+            <>
+              <span className="text-ui-xs text-graphite-muted" aria-hidden>
+                ·
+              </span>
+              <span className="rounded-md bg-surface-muted px-2 py-0.5 text-ui-xs font-medium text-graphite-muted">
+                {categoryLabel}
+              </span>
+            </>
+          ) : null}
+          {cityLabel ? (
+            <>
+              <span className="text-ui-xs text-graphite-muted" aria-hidden>
+                ·
+              </span>
+              <span className="truncate text-ui-xs text-graphite-muted">{cityLabel}</span>
+            </>
           ) : null}
         </div>
 
-        <p className="event-card-meta">
-          <Clock className="event-card-meta-icon" />
-          <span>{dateLabel}</span>
-        </p>
+        <div className="flex min-w-0 flex-col gap-0.5">
+          <p className="event-card-meta">
+            <Clock className="event-card-meta-icon" />
+            <span className="truncate">{dateLabel}</span>
+          </p>
+          {locationLine ? (
+            <p className="event-card-meta">
+              <MapPin className="event-card-meta-icon shrink-0" />
+              <span className="truncate">{locationLine}</span>
+            </p>
+          ) : null}
+        </div>
 
-        {pinLines.primary ? (
-          <div className={`mt-auto flex items-start gap-1.5 text-ui-xs text-graphite-muted ${rail ? '' : 'min-w-0'}`}>
-            <MapPin className="event-card-meta-icon mt-0.5" />
-            <div className="min-w-0">
-              <p className={rail ? 'line-clamp-2' : 'truncate'}>{pinLines.primary}</p>
-              {pinLines.secondary ? (
-                <p className={`mt-0.5 ${rail ? 'line-clamp-1' : 'truncate'}`}>{pinLines.secondary}</p>
-              ) : null}
-            </div>
-          </div>
-        ) : (
-          <div className="mt-auto" />
-        )}
-
-        <div className="flex items-center justify-between gap-3 pt-1">
+        <div className="mt-auto flex items-center justify-between gap-3 pt-1">
           {priceLabel ? <span className="text-ui-sm font-bold text-graphite">{priceLabel}</span> : <span />}
           <span className="inline-flex items-center gap-1 rounded-lg bg-primary-600 px-3 py-1.5 text-ui-xs font-semibold text-white sm:text-ui-sm">
             <Ticket className="h-3.5 w-3.5" strokeWidth={1.75} />

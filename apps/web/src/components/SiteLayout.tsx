@@ -1,29 +1,32 @@
 import '@/lib/env';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
-import { buildPublicDestinationsDto } from '@daibilet/backend/public-read';
 import { Suspense } from 'react';
 
 import { ScrollToTopButton } from '@/components/ScrollToTop.client';
+import { SiteChromeSkeleton } from '@/components/SiteChromeSkeleton';
 import { SiteFooter } from '@/components/SiteFooter';
 import { SiteHeader } from '@/components/SiteHeader.client';
 import { SelectedCityProvider } from '@/components/SelectedCityProvider.client';
 import { SiteProviders } from '@/components/SiteProviders.client';
+import { getCachedDestinations } from '@/server/cached-public-surfaces';
 
 export async function SiteLayout({ children }: { children: React.ReactNode }) {
   let destinations: PublicDestinationDto[] = [];
   try {
-    const payload = await buildPublicDestinationsDto();
+    // Next Data Cache (not raw buildPublicDestinationsDto): SiteLayout is inlined
+    // into every page RSC, so soft nav used to rebuild destinations on cold workers.
+    const payload = await getCachedDestinations();
     destinations = payload?.destinations ?? [];
   } catch {
     // SSR/build without DB — footer city links stay empty until runtime with DB.
   }
 
-  // Suspense wraps SelectedCityProvider (useSearchParams). Fallback must NOT render
-  // page children — HomeHero etc. call useSelectedCity and will throw outside the provider
-  // during static generation / suspend.
+  // SelectedCityProvider isolates useSearchParams in an inner Suspense hole so
+  // header + page can SSR. Fallback keeps brand chrome if anything still suspends
+  // (never empty spacer — that caused the 2-3s blank open on daibilet.ru).
   return (
     <SiteProviders>
-      <Suspense fallback={<div aria-hidden="true" className="site-header-spacer" />}>
+      <Suspense fallback={<SiteChromeSkeleton variant="page" />}>
         <SelectedCityProvider destinations={destinations}>
           <div className="flex min-h-screen flex-col bg-background">
             <SiteHeader destinations={destinations} />

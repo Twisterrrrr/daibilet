@@ -44,7 +44,7 @@ export async function loadThinRelatedCardSessions(input: {
   for (const target of targets) {
     if (next.length >= 4) break;
     try {
-      const payload = await fetchLandingPageDto(target.slug);
+      const payload = await fetchLandingPageDto(target.slug, citySlug);
       if (!payload?.sessions?.length) continue;
       const citySessions = filterSessionsByCity(payload.sessions, cityLabel, citySlug).filter(
         (session) => !seen.has(sessionKey(session)),

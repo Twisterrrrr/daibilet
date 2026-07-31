@@ -31,7 +31,8 @@ export async function getCachedPublicEventDto(slug: string) {
 
   const cached = unstable_cache(
     () => buildPublicEventDto(key),
-    ['public-event-dto-v1', key],
+    // v2: invalidate stale single-session pages after meta-group slot merge.
+    ['public-event-dto-v2', key],
     eventCacheOptions,
   );
   return cached();

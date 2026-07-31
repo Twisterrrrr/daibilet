@@ -50,10 +50,11 @@ test('pathHrefWithSelectedCity builds city query on arbitrary path', () => {
   assert.equal(pathHrefWithSelectedCity('/locations', 'all', { q: 'парк' }), '/locations?q=%D0%BF%D0%B0%D1%80%D0%BA');
 });
 
-test('isCityFilterPath covers events venues locations', () => {
+test('isCityFilterPath covers events venues locations podborki', () => {
   assert.equal(isCityFilterPath('/events'), true);
   assert.equal(isCityFilterPath('/venues'), true);
   assert.equal(isCityFilterPath('/locations'), true);
+  assert.equal(isCityFilterPath('/podborki'), true);
   assert.equal(isCityFilterPath('/cities'), false);
   assert.equal(isCityFilterPath('/events/slug'), true);
 });

@@ -33,14 +33,19 @@ export function VenuePageView({
   admissionProducts?: FinanceAdmissionProduct[];
 }) {
   const [payload, setPayload] = React.useState<PublicVenuePageDto | null>(initialPayload);
-  const [contentReady, setContentReady] = React.useState(() => Boolean(initialPayload?.sessions?.length));
+  const [contentReady, setContentReady] = React.useState(() =>
+    // CF.P2e: admission-only institutions have zero sessions but still need SSR layout/CTA.
+    Boolean(initialPayload?.venue),
+  );
   const [error, setError] = React.useState<string | null>(null);
   const [category, setCategory] = React.useState('all');
   const [dateFilter, setDateFilter] = React.useState<VenueDateFilter>('smart');
   const [mode, setMode] = React.useState<'cards' | 'table'>('cards');
 
   React.useEffect(() => {
-    if (initialPayload?.sessions?.length) return;
+    // SSR already hydrated (including admission-only institutions with 0 sessions).
+    // Do not re-fetch /api/public/venues on every mount - that raced cold DTO and felt like a hang.
+    if (initialPayload?.venue) return;
     const controller = new AbortController();
     fetch(`/api/public/venues/${encodeURIComponent(slug)}`, { signal: controller.signal })
       .then(async (response) => {
@@ -59,7 +64,7 @@ export function VenuePageView({
         setError(requestError instanceof Error ? requestError.message : 'Страница не найдена');
       });
     return () => controller.abort();
-  }, [slug, initialPayload?.sessions?.length]);
+  }, [slug, initialPayload?.venue]);
 
   const baseSessions = React.useMemo(() => {
     if (!payload) return [];

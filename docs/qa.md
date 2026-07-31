@@ -6,21 +6,31 @@
 
 ### Checkout domain & DNS
 
-1. **Checkout hostname:** рекомендовать **`checkout.daibilet.ru`** как primary. Нужен ли alias **`pay.daibilet.ru`** (CNAME/A на тот же `.159`) для коротких ссылок / маркетинга, или один канон без alias?
-2. **`finance-api.daibilet.ru`:** отдельный hostname для API/webhooks, или API под `checkout.` / path на том же vhost?
-3. **`supplier.daibilet.ru`:** подтвердить имя ЛК (vs `partners.` / `cabinet.`) до выпуска TLS/DNS stub.
-4. **YooKassa webhook URL:** финальный path на новом finance API (и окно dual-webhook со старым endpoint) - зафиксировать перед Phase 5.
+1. **Checkout hostname:** **`pay.daibilet.ru`** - канон ✅ (A → `.159`, TLS+nginx на finance). Alias **`checkout.daibilet.ru`** не обязателен / не создан.
+2. **`finance-api.daibilet.ru`:** ✅ отдельный hostname для API/projection/webhooks (DNS+TLS). Path на `pay` не обязателен.
+3. **`supplier.daibilet.ru`:** ✅ DNS + TLS (вместе с `pay` / `finance-api`). Alias partners/cabinet не нужен.
+4. **YooKassa webhook URL:** ✅ **LOCKED 2026-07-31 (Codex).** Canon: `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`. `pay.daibilet.ru` = user checkout/return only. Dual-webhook 3-7d **только** если были живые платежи/вебхуки на старом endpoint; иначе skip. Register в ЮKassa - после egress + sandbox smoke.
+
+### Owner minimum (обновлено 2026-07-31)
+
+- Timeweb allow **MSK `.184` → finance `.159`** ✅ (Fair Snipe)
+- YooKassa secrets на `.159`: `SHOP_ID` + `SECRET_KEY=<set>` ✅ (Cursor; never chat/git). **`DAIBILET_YOOKASSA_CHECKOUT=1`** (egress PASS 2026-07-31)
+- **Blocker:** Diligent Polydeuces **outbound 443 + DNS** с `.159` (сейчас DNS timeout → YooKassa/GitHub FAIL)
+- SSH для Codex: ключ `daibilet_spb_finance` / pubkey в `authorized_keys`
+- Webhook register в кабинете ЮKassa - после egress green
+
+`.16` (Intelligent Hoopoe) нужен только как **build/reserve** до MIG.9.4/.9.6, затем retire (MIG.9.7). Apex DNS уже на `.184`.
 
 ### PurchaseProjection / dual order sources
 
 5. **Checkout domain model:** после split DB - `CheckoutOrder` только на finance; `ExternalOrder` остаётся на catalog. Как buyer/admin видят оба контура: (A) finance агрегирует External через catalog read API, (B) catalog агрегирует Checkout через finance API, (C) отдельный BFF? Рекомендация архитектора: **(B)** для buyer UI на catalog + admin proxy; supplier LC читает finance напрямую.
-6. **PurchaseProjection identity:** общий `publicCode` / buyer email+phone match достаточно для MVP, или нужен явный `siteUserId` bridge catalog↔finance до первой внутренней продажи?
-7. **ExternalOrder на finance?** Копировать mirror на finance **запрещено** без contract. Подтвердить: External остаётся catalog-only; projection - read fan-in, не dual-write.
+6. **PurchaseProjection identity:** ✅ **LOCKED (Codex).** MVP = `publicCode` + buyer email/phone. `siteUserId` bridge до первой внутренней продажи не обязателен (buyer account v2).
+7. **ExternalOrder на finance?** ✅ **LOCKED.** External остаётся catalog-only; projection - read fan-in, не dual-write / не mirror copy.
 
 ### Projection sync & auth
 
 8. **Sync frequency:** catalog читает finance admission/supplier projection: on-request (SSR fetch + short cache), cron materialize в catalog read-tables, или edge cache? Для MVP рекомендовать **SSR/ISR fetch + short TTL (≤5–15 мин)** без writes в catalog DB.
-9. **Service auth catalog→finance:** m2m (`Authorization: Bearer` shared secret / JWT), IP allowlist `.184`→`.159`, или Cloudflare Access? Нужен выбор до P1 client.
+9. **Service auth catalog→finance:** ✅ **LOCKED 2026-07-31 (Codex).** Рекомендация: **m2m Bearer** token (не IP-only). ETA 0.5-1d когда owner даст token в env. IP allowlist - дополнение, не единственный контроль.
 10. **Public vs internal projection routes:** одни и те же DTO за CDN, или `/api/public/projection/*` без PII и `/api/internal/projection/*` с service auth для admin?
 
 ### Product display

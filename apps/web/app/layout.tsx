@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 
 import { ChunkLoadRecovery } from '@/components/ChunkLoadRecovery';
+import { NavigationProgress } from '@/components/NavigationProgress.client';
 import { PurchaseOpeningHost } from '@/components/PurchaseOpeningFeedback.client';
 import { fontVariableClassName } from '@/lib/fonts';
 import { HOME_SEO_DESCRIPTION_FALLBACK, HOME_SEO_TITLE } from '@/lib/seo-meta';
@@ -108,6 +110,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="font-sans">
         <ChunkLoadRecovery />
         <PurchaseOpeningHost />
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         {children}
       </body>
     </html>

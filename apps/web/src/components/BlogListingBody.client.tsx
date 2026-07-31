@@ -56,10 +56,23 @@ export function BlogListingBody({
 
   return (
     <>
-      <BlogListHero
-        breadcrumbs={breadcrumbs}
-        cityName={cityReady && hasLocalPosts ? cityName : null}
-      />
+      <Suspense
+        fallback={
+          <div className="border-b border-slate-200 bg-slate-50">
+            <div className="container-page space-y-4 py-8 sm:py-10">
+              <div className="h-4 w-32 animate-pulse rounded bg-slate-200" />
+              <div className="h-10 w-full max-w-2xl animate-pulse rounded-lg bg-slate-200" />
+              <div className="h-5 w-full max-w-xl animate-pulse rounded bg-slate-200" />
+              <div className="h-11 w-full max-w-xl animate-pulse rounded-2xl bg-slate-200" />
+            </div>
+          </div>
+        }
+      >
+        <BlogListHero
+          breadcrumbs={breadcrumbs}
+          cityName={cityReady && hasLocalPosts ? cityName : null}
+        />
+      </Suspense>
 
       <div className="container-page py-10 sm:py-14">
         {featured ? (

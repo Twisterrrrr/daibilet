@@ -34,7 +34,7 @@ export const LANDING_BREADCRUMB_LABELS: Record<string, string> = {
   exhibitions: 'Выставки и музеи',
   'unusual-theatres': 'Необычные театры',
   excursions: 'Экскурсии',
-  rooftops: 'Экскурсии по крышам',
+  rooftops: 'Смотровые площадки',
   'new-year': 'Новый год',
   'salute-9-may': 'Салют 9 мая',
   'moscow-museums': 'Музеи и выставки',
@@ -102,7 +102,7 @@ const RELATED_LINKS_BY_LANDING: Record<string, Record<string, RelatedLinkSpec[]>
       { type: 'intent', intent: 'besplatno', label: 'Бесплатные события' },
     ],
     'saint-petersburg': [
-      { type: 'landing', slug: 'rooftops', label: 'Экскурсии по крышам' },
+      { type: 'landing', slug: 'rooftops', label: 'Смотровые площадки' },
       { type: 'landing', slug: 'standup', label: 'Стендап-шоу' },
       { type: 'intent', intent: 'na-vyhodnye', label: 'Куда сходить на выходных' },
       { type: 'landing', slug: 'walking-tours', label: 'Пешие экскурсии' },
@@ -122,7 +122,7 @@ const RELATED_LINKS_BY_LANDING: Record<string, Record<string, RelatedLinkSpec[]>
     ],
     'saint-petersburg': [
       { type: 'landing', slug: 'river-cruises', label: 'Речные прогулки' },
-      { type: 'landing', slug: 'rooftops', label: 'Экскурсии по крышам' },
+      { type: 'landing', slug: 'rooftops', label: 'Смотровые площадки' },
       { type: 'intent', intent: 'na-vyhodnye', label: 'Куда сходить на выходных' },
       { type: 'landing', slug: 'walking-tours', label: 'Пешие экскурсии' },
     ],
@@ -153,7 +153,7 @@ const RELATED_LINKS_BY_LANDING: Record<string, Record<string, RelatedLinkSpec[]>
       { type: 'landing', slug: 'bus-tours', label: 'Автобусные экскурсии' },
     ],
     'saint-petersburg': [
-      { type: 'landing', slug: 'rooftops', label: 'Экскурсии по крышам' },
+      { type: 'landing', slug: 'rooftops', label: 'Смотровые площадки' },
       { type: 'landing', slug: 'river-cruises', label: 'Речные прогулки' },
       { type: 'landing', slug: 'standup', label: 'Стендап и юмор' },
       { type: 'intent', intent: 'na-vyhodnye', label: 'Куда сходить на выходных' },
@@ -255,7 +255,7 @@ export function getFooterPopularDirections(): FooterPopularCityBlock[] {
       citySlug: 'saint-petersburg',
       links: [
         { label: 'Речные прогулки', href: landingCategoryHref('river-cruises', 'saint-petersburg') },
-        { label: 'Экскурсии по крышам', href: landingCategoryHref('rooftops', 'saint-petersburg') },
+        { label: 'Смотровые площадки', href: landingCategoryHref('rooftops', 'moscow') },
         { label: 'Стендап', href: landingCategoryHref('standup', 'saint-petersburg') },
         { label: 'Выходные в Питере', href: catalogIntentPath('na-vyhodnye', 'saint-petersburg') },
       ],

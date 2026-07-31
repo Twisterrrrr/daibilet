@@ -53,12 +53,14 @@ async function warmOne(base, host, routePath) {
   const url = `${base.replace(/\/$/, '')}${routePath}`;
   const t0 = Date.now();
   try {
+    const fetchTimeoutMs = Number(process.env.WARM_FETCH_TIMEOUT_MS || 15000);
     const res = await fetch(url, {
       headers: {
         'user-agent': 'daibilet-warm-hub-pages',
         ...(host ? { host } : {}),
       },
       redirect: 'follow',
+      signal: AbortSignal.timeout(fetchTimeoutMs),
     });
     const ms = Date.now() - t0;
     const cache = res.headers.get('x-nextjs-cache') || res.headers.get('x-cache-status') || '-';

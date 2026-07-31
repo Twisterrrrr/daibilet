@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
     // Soft cap: full default can still race MODULE_NOT_FOUND on sitemaps; 2 is safer than 1 on 8Gi.
     staticGenerationMaxConcurrency: 2,
     staticGenerationMinPagesPerWorker: 20,
+    // Client router cache: avoid refetching dynamic RSC on every back/forward / revisit
+    // (default dynamic staleTime is 0 → soft nav always waits on a new flight).
+    staleTimes: {
+      dynamic: 30,
+      static: 180,
+    },
   },
   transpilePackages: ['@daibilet/backend', '@daibilet/db', '@daibilet/contracts'],
   serverExternalPackages: ['@prisma/client', '@prisma/adapter-pg', 'pg'],

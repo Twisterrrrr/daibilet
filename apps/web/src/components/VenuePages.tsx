@@ -9,15 +9,39 @@ import { VenueCatalogPageSkeleton } from '@/components/VenueCatalogSkeletons';
 import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
-import { buildPublicVenueDto } from '@daibilet/backend/public-read';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 import { evaluateVenueIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { venueHref } from '@/lib/routes';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
 import { getCachedVenuesCatalog } from '@/server/cached-public-surfaces';
+import { getCachedPublicVenueDto } from '@/server/cached-venue-data';
 import { fetchVenueAdmissionProducts } from '@/server/finance-projection-client';
+import type { FinanceAdmissionListResult } from '@/lib/finance-projection';
 import { buildVenuePageJsonLd } from '@/lib/structured-data';
 import { resolveVenueSeoTitle } from '@/lib/venue-seo';
+
+/** Admission must not hang venue HTML when finance is slow. */
+const VENUE_ADMISSION_TIMEOUT_MS = 2500;
+
+const EMPTY_ADMISSION: FinanceAdmissionListResult = {
+  items: [],
+  summary: { published: 0, canSell: 0 },
+  total: 0,
+};
+
+async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      promise,
+      new Promise<T>((resolve) => {
+        timer = setTimeout(() => resolve(fallback), ms);
+      }),
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -71,7 +95,7 @@ export async function generateVenueListMetadata(
 }
 
 export async function generateVenueDetailMetadata(slug: string): Promise<Metadata> {
-  const payload = await buildPublicVenueDto(decodeURIComponent(slug));
+  const payload = await getCachedPublicVenueDto(decodeURIComponent(slug));
   if (!payload?.venue) return { title: 'Площадка не найдена' };
   const venue = payload.venue;
   const decision = evaluateVenueIndexability({
@@ -122,11 +146,23 @@ export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
 
 export async function VenueDetailPage({ slug }: { slug: string }) {
   const decodedSlug = decodeURIComponent(slug);
-  const payload = await buildPublicVenueDto(decodedSlug);
+
+  // Parallel: DTO (ISR Data Cache) + finance admission (hard timeout, fail-soft).
+  // Finance keyed by URL slug - same join key as catalog Venue.slug.
+  const [payloadResult, admissionResult] = await Promise.allSettled([
+    getCachedPublicVenueDto(decodedSlug),
+    withTimeout(
+      fetchVenueAdmissionProducts(decodedSlug),
+      VENUE_ADMISSION_TIMEOUT_MS,
+      EMPTY_ADMISSION,
+    ),
+  ]);
+
+  const payload = payloadResult.status === 'fulfilled' ? payloadResult.value : null;
   if (!payload?.venue) notFound();
 
-  const venueSlugForFinance = String(payload.venue.slug || decodedSlug).trim();
-  const admission = await fetchVenueAdmissionProducts(venueSlugForFinance);
+  const admission =
+    admissionResult.status === 'fulfilled' ? admissionResult.value : EMPTY_ADMISSION;
   const jsonLdBlocks = buildVenuePageJsonLd(payload);
 
   return (

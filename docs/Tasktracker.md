@@ -1,27 +1,78 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-07-30
+**Обновлено:** 2026-07-31
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
 
 ---
 
+## Finance supplier LC smoke (.159) 2026-07-31
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| FIN.LC1 | Deploy Codex supplier series (>=147eb436 content) на `.159` | Критический | done `c105264` (patch am; origin tip still 0c1e464) |
+| FIN.LC2 | STUB admission purchase smoke (supplier + /api/checkout/stub) | Критический | done 201 CONFIRMED |
+| FIN.LC3 | YooKassa sandbox purchase smoke (confirmationUrl) | Критический | 🔄 egress PASS; CHECKOUT=1; smoke YOOKASSA_PAYMENT_FAILED (shopId/secret) |
+| FIN.LC4 | Owner: SG Diligent Polydeuces outbound 443 (+ DNS) | Критический | 🚫 FAIL 2026-07-31 (resolv 127.0.0.53 timeout; yookassa/github 000) |
+| FIN.LC5 | YOOKASSA_SECRET_KEY на `.159` + CHECKOUT=1 after egress | Критический | ✅ key `<set>`; CHECKOUT=1 after egress PASS 2026-07-31 |
+| FIN.LC6 | Codex SSH access (daibilet_spb_finance / pubkey) | Критический | ⏳ owner: Cursor has key; Codex needs same |
+| FIN.W1 | Week1: YooKassa+webhook/reconcile+runbook (4-5d after D0) | Критический | 🔄 D0=egress green 2026-07-31; CHECKOUT=1 |
+| FIN.W2 | Week2: supplier LC + admin legal/bank approve + capacity reaper | Высокий | ⏳ |
+| FIN.W3 | Week3: controlled catalog path + ledger MVP + m2m Bearer | Высокий | ⏳ wide CTA still out |
+| FIN.W4 | Week4: harden, scheduled reconcile, docs, smoke matrix | Средний | ⏳ |
+
+## City hub top-query vs landing counts (2026-07-31)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| HUB.TQ1 | City-scope landing sessions before SSR `slice(48)` + shared helper | Критический | ✅ |
+| HUB.TQ2 | Pass `?city=` / citySlug through landing DTO, Next API, SSR, client fetch | Критический | ✅ |
+| HUB.TQ3 | Deploy MSK api+web, smoke Самара standup/family/concerts | Высокий | ✅ BUILD `ysb9LiafxuxE8ptQkYg6t`; 4/5/17 aligned |
+
+## City hub hero ultrawide (2026-07-31)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.HERO1 | Cap city PNG ≤110% (`1024px*1.1`) + `object-contain` (не height-upscale) | Критический | ✅ MSK `ikMw9FRXSb-HNgZKjaLxM` (без commit) |
+| UX.HERO1b | Не дать следующему MSK rebuild затереть source `1.2` поверх | Высокий | ⏳ commit или scp source перед каждым web build |
+| UX.HERO2 | CLS: fixed night hero `h-*` + city skeleton/loading match SSR/hydrate | Критический | ✅ MSK `yvt23s2J2qJustslJex5K` (без commit) |
+
+## /podborki city filter (2026-07-31)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| POD.CF1 | Ослабить strict city filter: national/multi видны при ≥1 event в городе + city-bound | Критический | ✅ |
+| POD.CF2 | Refetch landings-catalog?city= + merge helpers + тесты | Критический | ✅ |
+| POD.CF3 | SelectedCityProvider: sync header city → MULTI_CITY path | Высокий | ✅ |
+| POD.CF4 | Deploy web MSK (без commit) | Высокий | ✅ BUILD_ID=`vo1CLfHKIo9X2CDMkkHPA` → later overwritten; hero fix `ikMw9FRXSb-HNgZKjaLxM` |
+
+
+## UX: event page hang / 502 (2026-07-31)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.EVT1 | Diagnose slow event URL (curl cold/warm, cache headers, journal) | Критический | ✅ root: web hung + catalog SWR 170с + orphan build workers; не no-store |
+| UX.EVT2 | Restart daibilet-web + reap orphan jest-workers; warm URL | Критический | ✅ BUILD `CMV69QaA_nTH1z_YVhn1m`; cold~0.94с / warm~0.01с HIT |
+| UX.EVT3 | `events/[slug]/loading.tsx` shell | Средний | ✅ в workspace; ⏳ next web deploy |
+| UX.EVT4 | Confirm event DTO `unstable_cache` v2 + revalidate 300 (не finance SSR) | Высокий | ✅ уже в проде; finance на event page нет |
+
 ## Infra: prod 504 incident (2026-07-30)
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| INC.504.1 | MSK egress/DNS: тикет Timeweb на исходящий UDP/TCP :53 и HTTPS (github, IndexNow, remote image hosts) | Средний | ⏳ |
+| INC.504.1 | MSK egress SG: был self-loop (Daring Aquila); owner **Fair Snipe** TCP 80/443 → `.159` ✅; `github.com` с MSK тоже 200 - шире только-finance; полный outbound audit optional | Критический | 🔄 partially open 2026-07-31 (finance+github OK) |
 | INC.504.2 | nginx: прямой bypass `/images/*` static, без `/_next/image` для локальных файлов | Средний | ✅ |
-| INC.504.3 | Пересмотр `daibilet-web` MemoryMax / heap (1G limit vs ~1.1G RSS под catalog SWR) | Средний | ⏳ |
+| INC.504.3 | Пересмотр daibilet-web MemoryMax/heap + OOMPolicy=continue (High 1.5G / Max 2G / heap 1280 на 7.8Gi) | Критический | done 2026-07-31 MSK live |
 | INC.504.4 | SWR catalog rebuild: non-blocking / async (не блокировать event loop 49-219с) | Средний | ⏳ |
 | INC.504.5 | Dual catalog SWR cache (`dto.js` + `public-catalog.dto.ts`) - merge/unify в F5.3b | Средний | ⏳ |
 | INC.504.6 | nginx proxy_cache SWR: `background_update` + TTL 30m (browser clear ≠ cold Next) | Критический | ✅ |
 | INC.504.7 | City hub ISR: `unstable_cache` + `generateStaticParams` (было no-store / 20-30с) | Критический | ✅ |
-| INC.504.8 | Cron/warm hub pages (`/`, `/events`, top cities) каждые N мин | Высокий | ✅ cron `*/3` + deploy hook |
+| INC.504.8 | Cron warm-hub: flock + timeout 90s + per-fetch 15s (anti pile-up) | Критический | done 2026-07-31 MSK live |
 | INC.504.9 | Compact `/api/public/home` DTO + cache-control (было ~1.2MB no-store) | Критический | ✅ |
 | INC.504.10 | City SSR: secondary timeout 3s + perf marks; lighten events list DTO | Критический | ✅ |
 | INC.504.11 | AAAA IPv6: проверить маршрут до MSK или снять AAAA в Timeweb | Высокий | ⏳ |
+| INC.504.12 | MSK hang/504 2026-07-31: MemoryMax exhaustion + warm-hub pile-up; finance timeout hot-patch 3s->2.5s; harden systemd/cron | Критический | mitigated on `.184` (rebuild still to bake finance 2500) |
 
 См. Diary 2026-07-30 «Prod 504: daibilet-web hang» и «Cold TTFB после browser cache clear».
 
@@ -51,18 +102,19 @@
 | MIG.7 | DNS A `daibilet.ru`/`www` → `201.24.125.184` + post-smoke | Критический | ✅ 2026-07-30 |
 | MIG.8 | СПб: stop public web/api + TC timer + crontab sync; PG snapshot; host → finance+staging | Средний | ✅ 2026-07-30 · [spb-finance-host.md](./spb-finance-host.md) |
 | MIG.9 | Role lock: `.184` catalog · `.159` battle finance · `.16` retire after smoke | Высокий | 🔒 docs 2026-07-30 · Codex beyond P0–2 · [spb-finance-host.md](./spb-finance-host.md) |
-| MIG.9.0 | Phase 0: SSH/firewall `.159` + DNS stub `checkout`/`supplier`/`finance` | Критический | ✅ SSH/UFW 2026-07-30 · DNS stub ⏳ owner Timeweb |
+| MIG.9.0 | Phase 0: SSH/firewall `.159` + DNS A `pay`/`supplier`/`finance-api` → `.159` | Критический | ✅ SSH/UFW + DNS A + TLS SAN 2026-07-30 (`checkout`/`finance.` не нужны) |
 | MIG.9.1 | Phase 1: base stack docker/nginx/node на `.159` | Высокий | ✅ 2026-07-30 |
 | MIG.9.2 | Phase 2: fresh finance PG на `.159` (не catalog dump) | Критический | ✅ PG `:5437` + migrations/seed smoke 2026-07-30 |
-| MIG.9.3 | Phase 3: finance app + HTTP/TLS `checkout`/`supplier`/`finance` | Критический | 🔄 API `:4100` + nginx HTTP @ `0c1e464` · P0+P1 smoke ✅ · TLS ⏳ · STUB on / YooKassa off |
+| MIG.9.3 | Phase 3: finance app + HTTP/TLS `pay`/`supplier`/`finance-api` | Критический | 🔄 API `:4100` + nginx · TLS ✅ LE SAN pay/supplier/finance-api · STUB on / YooKassa off |
 | MIG.9.4 | Phase 4: optional staging/build scaffolding на `.159` (не justification для `.16`) | Средний | ⏳ |
-| MIG.9.5 | Phase 5: YooKassa webhook → новый finance API; старый держать до smoke | Критический | ⏳ YooKassa off |
-| MIG.9.6 | Phase 6: smoke checkout/supplier/webhook; catalog `.184` без cutover | Критический | ⏳ |
+| MIG.9.5 | Phase 5: YooKassa webhook → finance-api canon; dual only if prior live | Критический | 🔒 URL locked; VERIFY=0; register after egress+smoke |
+| MIG.9.6 | Phase 6: smoke `pay`/`supplier`/webhook; catalog `.184` без cutover | Критический | ⏳ |
 | MIG.9.7 | Phase 7: backup `.16` + retention 7–14d + retire Intelligent Hoopoe | Высокий | ⏳ |
 | PERF.OOM4 | MSK: снять `cpus:1`/`workerThreads:false`, heap build 5120Mi | Высокий | ✅ |
 
 План: [migration-spb-to-msk.md](./migration-spb-to-msk.md) · roles/MIG.9: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md) · [spb-finance-host.md](./spb-finance-host.md)  
-Домены finance: **`checkout.daibilet.ru`** (канон-предложение), optional `pay.daibilet.ru` alias, `supplier.daibilet.ru`, maybe `finance-api.daibilet.ru` ([qa.md](./qa.md)).
+Домены finance (**канон**): **`pay.daibilet.ru`** (buyer) · `supplier.daibilet.ru` · `finance-api.daibilet.ru` - DNS+TLS ✅. Alias `checkout.` / `finance.` не обязательны ([qa.md](./qa.md)).  
+Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SECRET_KEY=<set>` ✅ · **egress `.159` outbound 443+DNS** 🚫 · Codex SSH · webhook register after smoke. `.16` = build/reserve до MIG.9.4/.9.6, затем retire.
 
 ---
 
@@ -77,12 +129,13 @@
 | CF.P0b | Gate: no wide internal sales CTA на `.184` until catalog client+UI | Критический | 🔓 client+UI shipped; wide YooKassa still off; CTA only `canSell` | both |
 | CF.P1 | Finance public read APIs: supplier / venue summary / AdmissionProduct list+detail (`canSell`) | Высокий | ✅ `.159` @ `0c1e464` + harden `114dd391` (DTO/canSell/PLATFORM tests + runbook) | Codex |
 | CF.P1b | Catalog read client → finance (`FINANCE_API_BASE_URL` + Host + 3s timeout) | Высокий | ✅ `finance-projection-client.ts` | Cursor |
-| CF.P1c | Service auth catalog↔finance (m2m) - token code ready, env unset | Высокий | ⏳ optional | owner+Cursor |
+| CF.P1c | Service auth catalog↔finance (m2m Bearer - Codex lock) | Высокий | ⏳ env unset; ETA 0.5-1d | owner+Cursor |
 | CF.P2 | Venue page блок «Входные билеты» (test museum) | Высокий | ✅ UI; slug bridge `phase-g-test-museum` если нет в catalog | Cursor |
 | CF.P2b | City hub museums/admission при published | Высокий | ✅ `CityAdmissionBlock` (default min=1) | Cursor |
 | CF.P2c | `/events`: отдельный card type admission (не slotted event) | Средний | ⏳ card есть; feed later | Cursor |
-| CF.P2d | CTA → checkout.daibilet.ru; TC/TEP widgets regression | Высокий | ✅ canSell gate; widgets untouched | Cursor |
-| CF.P3 | STUB/YooKassa order видим admin+supplier LC через PurchaseProjection | Высокий | 🔄 STUB visible via PP ✅; YooKassa credentials ❌ | Codex |
+| CF.P2d | CTA → `pay.daibilet.ru`; TC/TEP widgets regression | Высокий | ✅ canSell gate; widgets untouched; env `FINANCE_CHECKOUT_BASE_URL` → pay | Cursor |
+| CF.P2e | Catalog venue slug bridge `phase-g-test-museum` на MSK PG | Средний | ✅ seeded 2026-07-31 (`ven_phase_g_test_museum_catalog`, PUBLISHED, `isIndexable=false`); script `ensure-phase-g-test-museum-venue.js`; Next venue HTML после web rebuild (dto admission-only gate) | Cursor |
+| CF.P3 | STUB/YooKassa order видим admin+supplier LC через PurchaseProjection | Высокий | 🔄 STUB ✅; secrets `<set>`; CHECKOUT=0; egress ❌; wide CTA out | Codex |
 
 ## PERF event pages (после DNS на МСК)
 
@@ -92,6 +145,9 @@
 | PERF.E4 | Warm top-100–300 `/events/[slug]` после deploy/sync | Высокий | ✅ `scripts/warm-top-event-pages.mjs` + deploy hook |
 | PERF.E4b | `generateStaticParams` только top-N | Высокий | ✅ top-N default 200 (`EVENT_SSG_TOP_N`) |
 | PERF.E5 | Event page без full catalog (slug→DB + related) | Средний | ✅ 2026-07-30 |
+| PERF.V1 | Venue/location ISR (`getCachedPublicVenueDto`) + admission timeout + no client refetch on 0 sessions | Высокий | ✅ 2026-07-31 MSK BUILD `wltP0t9QlQrxpn1a72LW0`; warm ~0.05–0.19с; cold first ~15с = catalog rebuild owner |
+| PERF.NAV1 | Soft-nav click lag: `NavigationProgress` + `SiteLayout`→`getCachedDestinations` + `staleTimes` | Высокий | ✅ 2026-07-31 MSK `Cm6zKdDCV2gLnM4H88VZt` |
+| PERF.FCP1 | Home/city blank 2-3s: isolate `useSearchParams` + `SiteChromeSkeleton` / `loading.tsx` (не empty spacer) | Критический | ✅ 2026-07-31 MSK: body paints brand+skeleton; TTFB warm ~0.17с HIT `s-maxage=300`; BUILD `ysb9LiafxuxE8ptQkYg6t` |
 
 ---
 
@@ -114,6 +170,8 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | LAND.C1 | /kontserty: исключить автобусные туры (тег/«на автобусе») из concerts-genre | Высокий | ✅ dual-edit dto.js + landing-rules.ts |
+| LAND.M1 | moscow-museums: city-alone match → standup leak; requiredAnyKeywords + exclude standup | Высокий | ✅ 2026-07-31 API 699→61, standup 0; scp+restart |
+| LAND.M2 | Global matcher: `rule.city` не sufficient match (filter only); city-alone unit test | Критический | ✅ 2026-07-31 MSK deploy; museums 61, yards 9, bus 48, country 5, standup 530 |
 
 ---
 
@@ -139,7 +197,8 @@
 | SYNC.3 | `tc-sync` / worker: fail when child killed by signal (OOM masked SUCCESS) | Критический | ✅ code; **deploy на prod ⏳** |
 | SYNC.4 | Verify next nightly 03:20: real `importedEvents` + non-zero import, not fetch-only | Критический | 🔄 timer ✅; **2026-07-27 03:20Z** `importedEvents:21145` exitCode:0; **28.07** ⏳ post-check `verify-tc-catalog-sync.sh`; alert в `tc-catalog-sync.sh` |
 | SYNC.5 | TEP full sync (habit) | Высокий | ✅ 2026-07-26 22:22Z ~307с / 214 events / 20566 links |
-| VENUE.L1 | Lumiere Hall enue_54cabc2b9cb5385a9f65b95a: 404 hub (MEETING_POINT/NONE) - ensure script + TC import guard | Критический | ✅ 6e17cce prod + ensure DB | агент |
+| VENUE.L1 | Lumiere Hall 
+enue_54cabc2b9cb5385a9f65b95a: 404 hub (MEETING_POINT/NONE) - ensure script + TC import guard | Критический | ✅ 6e17cce prod + ensure DB | агент |
 
 ---
 
@@ -505,10 +564,12 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | SEO.5 | Intent ЧПУ `/podborki/{intent}` (+ city) + preset links | Высокий | ✅ | агент |
 | SEO.6 | `/contacts` + footer/sitemap trust | Высокий | ✅ | агент |
 | SEO.7 | Event trust strip | Средний | ✅ | агент |
-| SEO.8 | TOP-15 launch set: водные, стендап, экскурсии, культура, intent; «крыши» только СПб | Высокий | ✅ 2026-07-23 | владелец утвердил, агент внедрил; editorial focus LOCK, без URL churn |
+| SEO.8 | TOP-15 launch set: водные, стендап, экскурсии, культура, intent; «крыши» только СПб | Высокий | ✅ 2026-07-23; **2026-07-31 amend:** rooftops national (снят SPb-only URL lock) | владелец утвердил, агент внедрил; editorial focus LOCK, без URL churn |
 | SEO.8a | Editorial polish текстов TOP-15, в первую очередь новые `walking-tours`, `country-tours`, `exhibitions`, `unusual-theatres`, `excursions`, `rooftops` | Высокий | 🔄 seed готов, нужна редакторская вычитка | владелец + агент |
-| SEO.8b | `country-tours`: требовать экскурсионный и направленческий сигналы, исключить культурные события по топонимам | Высокий | ✅ 2026-07-23 | runtime `dto.js` синхронизирован, prod deploy + smoke: 3 экскурсии, без оперы и концертов |
-| SEO.8c | Аудит всех landing rules: исключить мусорные попадания, сверить сэмплы и runtime `dto.js` | Критический | 🔄 2026-07-30 | national `/progulki-po-krysham` ✅; `river-cruises` EKB Ben Hall false-match ✅ (катер⊂Екатеринбург); остальной rule-audit продолжается |
+| SEO.8b | `country-tours`: требовать экскурсионный и направленческий сигналы, исключить культурные события по топонимам | Высокий | ✅ 2026-07-23; **widen 2026-07-31** топонимы+тур/выезд | runtime SoT `landing-rules.ts` |
+| SEO.8c | Аудит всех landing rules: исключить мусорные попадания, сверить сэмплы и runtime `dto.js` | Критический | ✅ 2026-07-31 | bus/country/rooftops/walking widen ✅ unit; owner hand-smoke; museum-one-off landings **rejected** |
+| SEO.8d | Owner product lock: landings = top queries; no single-museum/franchise; no бесплатно; city-scoped top-query после match smoke | Критический | ✅ strategy 2026-07-31 | Diary + Tasktracker; next proposals text-only |
+| SEO.8e | Widen match: bus-tours / country-tours / rooftops (+ light walking); deploy API MSK + hand-smoke | Критический | ✅ 2026-07-31 web `mg7oABb2zIKygPpGUlRlV`; `/progulki-po-krysham/moscow` 200 | bus 17→48; country 5 (catalog thin); rooftops 6+label; walking 46→68; stats uncapped |
 | SEO.9 | Trust contacts без телефона (launch policy) | Средний | ✅ политика: футер email only; реквизиты off `/contacts` → `/requisites`; YM Webmaster/Business по ИНН/ОГРНИП | **владелец** (верификация) / агент (UI ✅) |
 | SEO.9b | Телефон 8-800 в header + footer (+ contacts), когда номер одобрен | Высокий | 🚫 blocked: ждём утверждённый 8-800 у владельца; ASAP после approve | **владелец** → агент UI |
 | SEO.11 | Порог индекса SEO-листингов | Критический | ✅ `MIN_LISTING_OFFERS_FOR_INDEX = 6` (не поднимать; soft-цель редакторов = 10) | агент |
@@ -868,6 +929,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | 1.4.1 | Venues / locations breadcrumbs | Средний | ✅ UI = `VenueBreadcrumbsNav` + JSON-LD |
+| 1.4.1a | Breadcrumb IA: admin-center без области; museum vs art_space; type→`?type=` | Высокий | ✅ 2026-07-31 (public split; Prisma enum TODO) |
 | 1.4.2 | `/help` FAQ + JSON-LD | — | ✅ |
 | 1.4.3 | Landings JSON-LD (client) | — | ✅ |
 | 1.4.4 | Фильтр cross-transport subcategories в карточках | Средний | ✅ `pickCatalogSubcategories` / transport conflict |
@@ -993,13 +1055,19 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-07-31 | Finance sprint Codex lock: webhook finance-api canon; dual-webhook skip-unless-live; verify S2S ETA 1-2d; reconcile manual→timer; STUB admin/dev; ledger MVP no payouts; m2m Bearer; return pay/.../result; wide CTA out; W1-4 plan. Secret `<set>` on `.159` (Cursor); CHECKOUT=0; egress DNS FAIL (FIN.LC4) |
+| 2026-07-31 | .159 egress PASS (yookassa 401); CHECKOUT=1; purchase smoke YOOKASSA_PAYMENT_FAILED (keys) |
+| 2026-07-31 | SEO.8e web deploy rooftops Moscow URL: landing-routes allowlist (no SPb-only lock) → SPB build → MSK `.next` `mg7oABb2zIKygPpGUlRlV`; smoke `/progulki-po-krysham` + `/moscow` 200 |
+| 2026-07-31 | INC.504.1: root cause Timeweb SG **Daring Aquila** (≈ `.184`) - egress self-loop; fix TCP→`.159` + DNS any; owner pending; Diary + spb-finance-host |
+| 2026-07-30 | Docs sync: MIG.9.0 DNS+TLS ✅ (`pay`/`supplier`/`finance-api`); канон checkout=`pay`; owner min = MSK→.159 + YooKassa secrets + webhook; MIG.9.5–9.7 остаются ⏳; CF.P2e slug bridge agent-next |
 | 2026-07-30 | CF.P1 harden ✅ Codex `114dd391`: public DTO guards (no paymentMode/ids; checkoutPath⇔canSell; PLATFORM) + finance-159-smoke-runbook; `.184` untouched |
+| 2026-07-31 | MSK→finance PASS (Fair Snipe); INC.504.1 partially open (github 200); FINANCE_API_BASE_URL HTTPS; CF.P2e venue seeded; city hub admission RSC smoke |
 | 2026-07-30 | CF.P1b+P2 ✅ catalog finance client + venue/city admission UI; CTA canSell; env FINANCE_*; P2c `/events` later; slug bridge test museum |
 | 2026-07-30 | CF.P0+P1 ✅ deploy `.159` @ `0c1e464`: PurchaseProjection + public admission APIs; STUB smoke `7649542` idempotent; YooKassa off (no creds); next CF.P1b/P2 Cursor |
 | 2026-07-30 | CF.0 ✅ lock catalog↔finance projection ([catalog-finance-projection.md](./catalog-finance-projection.md)); CF.P0–P3 backlog; qa checkout/projection/auth |
-| 2026-07-30 | MIG.9.3 🔄 Codex на `.159`: `daibilet-finance-api` `:4100`, nginx HTTP supplier/checkout/finance, PG migrations+seed; TLS/DNS stub ⏳; MSK не трогали |
-| 2026-07-30 | MIG.9.0–9.2 ✅ Diligent Polydeuces `.159`: SSH `daibilet_spb_finance`, UFW, docker/nginx/node/pnpm, empty finance PG; DNS stub ⏳ |
-| 2026-07-30 | MIG.9 🔒 role lock: `.184` catalog · `.159` battle finance · `.16` retire; phases 9.0–9.7 + checkout DNS |
+| 2026-07-30 | MIG.9.3 TLS ✅: LE SAN `supplier`+`pay`+`finance-api`, HTTP→HTTPS, certbot.timer; `checkout`/`finance` без DNS - не выпускаем |
+| 2026-07-30 | MIG.9.0–9.2 ✅ Diligent Polydeuces `.159`: SSH `daibilet_spb_finance`, UFW, docker/nginx/node/pnpm, empty finance PG; DNS A pay/supplier/finance-api ✅ (после) |
+| 2026-07-30 | MIG.9 🔒 role lock: `.184` catalog · `.159` battle finance · `.16` retire; phases 9.0–9.7 + pay DNS |
 | 2026-07-30 | MIG.9 ⏳ план (superseded by role lock): СПб 4ГБ→8ГБ; catalog MSK |
 | 2026-07-30 | Prod 504 MSK: restart web+nginx; INC.504.1-4 mitigations ⏳ Medium |
 | 2026-07-30 | MIG.8 ✅ СПб public/sync off; PERF.E5 event без catalog; SEO-хвост about/crumbs/variants; F5.0 map |
@@ -1013,6 +1081,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | 2026-07-23 | B.20: `/blog` asymmetric magazine grid (large 2/3 + 2 small; mirror); city hub teasers |
 | 2026-07-23 | F4.6: schedule/sales/source + blocks preview + buyers + unarchive/delete; Vite `/legacy` hard-retired |
 | 2026-07-23 | F4.5: Next taxonomy + ticket-link + landing candidates + Reviews + ECR; Vite remain for schedule/blocks/buyers; retire not yet |
+| 2026-07-31 | SEO.8d/8e: owner lock (top-query landings, no museum-one-off, no бесплатно); widen bus/country/rooftops/walking in `landing-rules.ts`; rooftops URL unlock |
 | 2026-07-23 | F4.6: admin preview статей `/admin/articles/[id]/preview` (noindex, Basic Auth, status+publishedAt banner) |
 | 2026-07-23 | F4.4: Next Orders/Venues/Cities + soft-retire `/legacy` (Vite remain for taxonomy/candidates/ticket-link); retire not yet |
 | 2026-07-23 | F4.3: Next Events override/moderation/SEO + Landings SEO/matches; Vite остаётся для taxonomy/candidates/Orders |
@@ -1045,4 +1114,5 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 ## Google Search Console verification
 - [x] **Критический** — файл `googleb3313872246ac993.html` в `apps/web/public/`, deploy prod, curl 200 (2026-07-19)
+
 

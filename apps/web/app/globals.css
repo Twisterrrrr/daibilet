@@ -2,6 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes nav-progress {
+  0% {
+    transform: scaleX(0.12);
+  }
+  50% {
+    transform: scaleX(0.7);
+  }
+  100% {
+    transform: scaleX(0.92);
+  }
+}
+
+.nav-progress-bar {
+  animation: nav-progress 1.4s ease-out forwards;
+  transform-origin: left center;
+}
+
+html[data-nav-pending='1'] {
+  cursor: progress;
+}
+
 @layer base {
   :root {
     /* 60/30/10: white / graphite surfaces / brand blue CTA */

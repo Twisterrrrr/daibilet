@@ -86,13 +86,13 @@ if ! grep -q "^DAIBILET_ADMIN_API_URL=" .env 2>/dev/null; then
 fi
 # CF.P1b/P2: finance projection from catalog web SSR (fail-soft if unreachable)
 if ! grep -q "^FINANCE_API_BASE_URL=" .env 2>/dev/null; then
-  echo "FINANCE_API_BASE_URL=http://85.193.80.159" >> .env
+  echo "FINANCE_API_BASE_URL=https://finance-api.daibilet.ru" >> .env
 fi
 if ! grep -q "^FINANCE_API_HOST=" .env 2>/dev/null; then
   echo "FINANCE_API_HOST=finance-api.daibilet.ru" >> .env
 fi
 if ! grep -q "^FINANCE_CHECKOUT_BASE_URL=" .env 2>/dev/null; then
-  echo "FINANCE_CHECKOUT_BASE_URL=http://checkout.daibilet.ru" >> .env
+  echo "FINANCE_CHECKOUT_BASE_URL=https://pay.daibilet.ru" >> .env
 fi
 
 # IndexNow (Yandex/Bing): generate once before web restart so EnvironmentFile picks it up.

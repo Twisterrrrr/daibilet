@@ -34,15 +34,20 @@ export function extractTcEventIdFromSession(session: {
   eventId?: string | null;
   purchaseUrl?: string | null;
 }) {
+  // Prefer session/event id: meta-group siblings may inherit a sibling's offer widget URL
+  // (same ?event=), which would collapse distinct slots to one TicketsCloud id.
+  const raw = String(session.eventId || session.id || '').trim();
+  const fromId = raw.match(/^(?:evt_|sess_)?([a-f0-9]{20,})$/i);
+  if (fromId) return fromId[1];
+
   const purchaseUrl = String(session.purchaseUrl || '');
   const fromTcQuery = purchaseUrl.match(/[?&]event=([^&]+)/)?.[1];
   if (fromTcQuery) return decodeURIComponent(fromTcQuery);
 
   // Teplohod ids must not be treated as TicketsCloud event ids (breaks landings /events buy).
   if (/teplohod\.info/i.test(purchaseUrl)) return null;
-  if (/^evt_tep_/i.test(String(session.eventId || session.id || ''))) return null;
+  if (/^evt_tep_/i.test(raw)) return null;
 
-  const raw = String(session.eventId || session.id || '').trim();
   const match = raw.match(/^(?:evt_|sess_)?([a-f0-9]+)$/i);
   return match ? match[1] : raw || null;
 }

@@ -1,18 +1,28 @@
 # Миграция prod: СПб → МСК
 
-**Дата снимка:** 2026-07-29  
+**Дата снимка:** 2026-07-29 · **Статус cutover:** 2026-07-30 ✅  
 **Цель:** перенести живой prod с Timeweb СПб на Timeweb МСК (Friendly Pheasant) без длительного даунтайма.
 
-Связанные документы: [current-state.md](./current-state.md), [Diary.md](./Diary.md), [Tasktracker.md](./Tasktracker.md).
+Связанные документы: [current-state.md](./current-state.md), [Diary.md](./Diary.md), [Tasktracker.md](./Tasktracker.md), [spb-finance-host.md](./spb-finance-host.md).
+
+### Текущее (после MIG.7/MIG.8, 2026-07-30)
+
+| Роль | IP | Факт |
+|------|-----|------|
+| **Battle catalog (МСК)** | `201.24.125.184` | Apex DNS `daibilet.ru` / `www` → сюда; TLS+PG+web/api live |
+| **Leftover СПб 4 ГБ** | `213.171.7.16` | Public web/api сняты; **build/reserve** до MIG.9.4/.9.6 → retire (не apex DNS) |
+| **Battle finance (СПб 8 ГБ)** | `85.193.80.159` | `pay` / `supplier` / `finance-api` DNS+TLS ✅ |
+
+Исторический снимок 2026-07-29 ниже сохранён как audit trail (на момент снимка apex ещё указывал на `.16`).
 
 ---
 
-## Серверы (факт на 2026-07-29)
+## Серверы (факт на 2026-07-29) - snapshot
 
-| Роль | Хост | IP | SSH | Статус |
+| Роль | Хост | IP | SSH | Статус (на дату снимка) |
 |------|------|-----|-----|--------|
-| **Prod live (СПб)** | `6726557-ls758282.twc1.net` | `213.171.7.16` | `root` + `%USERPROFILE%\.ssh\daibilet_staging_key` | DNS `daibilet.ru` → сюда; стек полный |
-| **Цель (МСК)** | `msk-1-vm-5a5i` | `201.24.125.184` | `ssh daibilet-msk` (`daibilet_msk80_key`) | SSH OK; код есть; **БД/TLS нет** |
+| **Prod live (СПб)** | `6726557-ls758282.twc1.net` | `213.171.7.16` | `root` + `%USERPROFILE%\.ssh\daibilet_staging_key` | *тогда* DNS apex → сюда; стек полный · **сейчас** leftover build/reserve |
+| **Цель (МСК)** | `msk-1-vm-5a5i` | `201.24.125.184` | `ssh daibilet-msk` (`daibilet_msk80_key`) | *тогда* SSH OK; код есть; БД/TLS нет · **сейчас** battle catalog + apex DNS |
 | ~~Старый МСК IP~~ | - | ~~`81.19.135.200`~~ | - | Снят: снаружи TCP 22 был `filtered` (TSPU/путь); IP заменён |
 
 Локальный SSH alias (клиент):
@@ -83,16 +93,16 @@ Host daibilet-msk msk
 
 ### B. Cutover DNS
 
-1. ⏳ TTL заранее снизить (если ещё не низкий).
-2. ⏳ A-записи `daibilet.ru` / `www` → `201.24.125.184`.
-3. ⏳ Проверка снаружи: HTTPS 200, виджеты, IndexNow/Webmaster при необходимости.
-4. ⏳ СПб оставить read-only/hot standby на 24-48ч (не удалять IP сразу).
+1. ✅ TTL заранее снизить (если ещё не низкий).
+2. ✅ A-записи `daibilet.ru` / `www` → `201.24.125.184` (MIG.7, 2026-07-30).
+3. ✅ Проверка снаружи: HTTPS 200 post-cutover (см. Tasktracker MIG.7).
+4. ✅ СПб public снят (MIG.8); IP `.16` оставлен как build/reserve до finance smoke (MIG.9.4/.9.6), не удалять сразу.
 
 ### C. После стабилизации
 
 1. ✅ Обновить docs (`current-state.md`) - prod IP = МСК.
 2. ⏳ Обновить deploy-скрипты/CI secrets, если захардкожен `213.171.7.16`.
-3. ✅ MIG.8 (2026-07-30): СПб public web/api + TC timer + crontab catalog/orders sync сняты; PG snapshot в `/root/backups/`; host = finance+staging ([spb-finance-host.md](./spb-finance-host.md)). IP СПб не удалять.
+3. ✅ MIG.8 (2026-07-30): СПб public web/api + TC timer + crontab catalog/orders sync сняты; PG snapshot в `/root/backups/`; `.16` = leftover build/reserve ([spb-finance-host.md](./spb-finance-host.md)). IP СПб не удалять до MIG.9.7.
 4. ⏳ Отвязать старый floating IP `81.19.135.200` в панели при необходимости.
 
 ---

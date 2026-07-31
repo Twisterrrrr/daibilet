@@ -16,7 +16,7 @@ import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@
 import { cityToGenitive } from '@/lib/city-declension';
 import { formatNumber, pluralCities, pluralEvents, pluralVenues } from '@/lib/format';
 import { persistSelectedCity } from '@/lib/selected-city';
-import { INSTITUTION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
+import { INSTITUTION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, resolvePublicVenueType, venueTypeLabel } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
 
 const VENUES_HERO_FRAMES = [
@@ -56,12 +56,13 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
   const searchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
   const [query, setQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState('all');
   const [sortMode, setSortMode] = useState<SortMode>('events');
   const [viewMode, setViewMode] = useState<ViewMode>('cards');
   const [isPending, startTransition] = useTransition();
 
   const urlCity = searchParams.get('city')?.trim() || '';
+  const rawType = searchParams.get('type')?.trim() || '';
+  const typeFilter = rawType ? normalizeVenueKind(rawType) : 'all';
   const cityReady = selectedCity?.cityReady ?? true;
   const cityPending = !urlCity && Boolean(selectedCity) && !cityReady;
   const listPending = cityPending || isPending;
@@ -110,10 +111,20 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
     });
   };
 
+  const setTypeFilter = (next: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (next === 'all') params.delete('type');
+    else params.set('type', next);
+    const qs = params.toString();
+    startTransition(() => {
+      router.replace(qs ? `/venues?${qs}` : '/venues', { scroll: false });
+    });
+  };
+
   const typeOptions = useMemo(() => {
     const counts = new Map<string, number>();
     for (const venue of venues) {
-      const key = normalizeVenueKind(venue.type);
+      const key = resolvePublicVenueType(venue.type, venue.name);
       counts.set(key, (counts.get(key) || 0) + 1);
     }
     return INSTITUTION_CATALOG_TYPE_OPTIONS.filter((option) => counts.has(option.value)).map((option) => ({
@@ -127,9 +138,9 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
     const normalized = query.trim().toLowerCase();
     const list = venues.filter((venue) => {
       if (cityFilter !== 'all' && venue.city !== cityFilter) return false;
-      if (typeFilter !== 'all' && normalizeVenueKind(venue.type) !== typeFilter) return false;
+      if (typeFilter !== 'all' && resolvePublicVenueType(venue.type, venue.name) !== typeFilter) return false;
       if (!normalized) return true;
-      return [venue.name, venue.city, venue.address, venue.shortDescription, venueTypeLabel(venue.type)]
+      return [venue.name, venue.city, venue.address, venue.shortDescription, venueTypeLabel(venue.type, venue.name)]
         .filter(Boolean)
         .join(' ')
         .toLowerCase()
@@ -230,7 +241,7 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
             <div className="flex w-max min-w-full flex-nowrap justify-center gap-1.5 px-1">
               <button
                 type="button"
-                onClick={() => startTransition(() => setTypeFilter('all'))}
+                onClick={() => setTypeFilter('all')}
                 className={`inline-flex h-10 shrink-0 snap-start items-center rounded-full px-4 text-sm font-semibold transition ${
                   typeFilter === 'all'
                     ? 'bg-white text-slate-900'
@@ -245,7 +256,7 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
                   <button
                     key={option.value}
                     type="button"
-                    onClick={() => startTransition(() => setTypeFilter(active ? 'all' : option.value))}
+                    onClick={() => setTypeFilter(active ? 'all' : option.value)}
                     className={`inline-flex h-10 shrink-0 snap-start items-center gap-1 rounded-full px-4 text-sm font-semibold transition ${
                       active
                         ? 'bg-white text-slate-900'

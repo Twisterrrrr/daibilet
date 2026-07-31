@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { Heart, HelpCircle, LogIn, Menu, User, X } from 'lucide-react';
 import { forwardRef, useEffect, useRef, useState } from 'react';
 
@@ -36,20 +36,27 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [favoritesOpen, setFavoritesOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [authMounted, setAuthMounted] = useState(false);
+  const [searchInitialQuery, setSearchInitialQuery] = useState('');
   const userMenuRef = useRef<HTMLDivElement>(null);
   const auth = useUserAuthOptional();
   const selectedCity = useSelectedCityOptional();
 
-  const urlCity = searchParams.get('city');
-
   useEffect(() => {
     setAuthMounted(true);
   }, []);
+
+  // Avoid useSearchParams here: it CSR-bailouts the whole SiteLayout tree.
+  useEffect(() => {
+    if (!pathname.startsWith('/events')) {
+      setSearchInitialQuery('');
+      return;
+    }
+    setSearchInitialQuery(new URLSearchParams(window.location.search).get('q') || '');
+  }, [pathname]);
 
   const cityLabel = selectedCity?.cityLabel ?? 'Все города';
   const cityValue = selectedCity?.cityValue ?? 'all';
@@ -88,8 +95,7 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
   }, [favoritesOpen, mobileOpen]);
 
   const isLoggedIn = authMounted && Boolean(auth?.isLoggedIn);
-  const searchCityFilter = urlCity || (cityValue !== 'all' ? cityValue : undefined);
-  const searchInitialQuery = pathname.startsWith('/events') ? searchParams.get('q') || '' : '';
+  const searchCityFilter = cityValue !== 'all' ? cityValue : undefined;
 
   return (
     <>

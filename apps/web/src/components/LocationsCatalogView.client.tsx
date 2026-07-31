@@ -15,7 +15,7 @@ import { cityToGenitive, cityToPrepositional } from '@/lib/city-declension';
 import { formatCountFloorTenPlus, formatNumber, pluralCities } from '@/lib/format';
 import { persistSelectedCity } from '@/lib/selected-city';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
-import { LOCATION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, venueTypeLabel } from '@/lib/venue-meta';
+import { LOCATION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, resolvePublicVenueType, venueTypeLabel } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
 
 type SortMode = 'events' | 'asc' | 'desc';
@@ -31,11 +31,12 @@ export function LocationsCatalogView({ venues }: { venues: VenueCatalogCard[] })
   const searchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
   const [query, setQuery] = useState('');
-  const [typeFilter, setTypeFilter] = useState('all');
   const [sortMode, setSortMode] = useState<SortMode>('events');
   const [isPending, startTransition] = useTransition();
 
   const urlCity = searchParams.get('city')?.trim() || '';
+  const rawType = searchParams.get('type')?.trim() || '';
+  const typeFilter = rawType ? normalizeVenueKind(rawType) : 'all';
   const cityReady = selectedCity?.cityReady ?? true;
   const cityPending = !urlCity && Boolean(selectedCity) && !cityReady;
   const listPending = cityPending || isPending;
@@ -71,10 +72,20 @@ export function LocationsCatalogView({ venues }: { venues: VenueCatalogCard[] })
     });
   };
 
+  const setTypeFilter = (next: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (next === 'all') params.delete('type');
+    else params.set('type', next);
+    const qs = params.toString();
+    startTransition(() => {
+      router.replace(qs ? `/locations?${qs}` : '/locations', { scroll: false });
+    });
+  };
+
   const typeOptions = useMemo(() => {
     const counts = new Map<string, number>();
     for (const venue of venues) {
-      const key = normalizeVenueKind(venue.type);
+      const key = resolvePublicVenueType(venue.type, venue.name);
       counts.set(key, (counts.get(key) || 0) + 1);
     }
     return LOCATION_CATALOG_TYPE_OPTIONS.filter((option) => counts.has(option.value)).map((option) => ({
@@ -88,9 +99,9 @@ export function LocationsCatalogView({ venues }: { venues: VenueCatalogCard[] })
     const normalized = query.trim().toLowerCase();
     const filtered = venues.filter((venue) => {
       if (cityFilter !== 'all' && venue.city !== cityFilter) return false;
-      if (typeFilter !== 'all' && normalizeVenueKind(venue.type) !== typeFilter) return false;
+      if (typeFilter !== 'all' && resolvePublicVenueType(venue.type, venue.name) !== typeFilter) return false;
       if (!normalized) return true;
-      return [venue.name, venue.city, venue.address, venue.shortDescription, venueTypeLabel(venue.type)]
+      return [venue.name, venue.city, venue.address, venue.shortDescription, venueTypeLabel(venue.type, venue.name)]
         .filter(Boolean)
         .join(' ')
         .toLowerCase()
@@ -158,7 +169,7 @@ export function LocationsCatalogView({ venues }: { venues: VenueCatalogCard[] })
           <div className="mt-4 flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => startTransition(() => setTypeFilter('all'))}
+              onClick={() => setTypeFilter('all')}
               className={`inline-flex shrink-0 items-center rounded-full px-4 py-2 text-sm font-semibold transition ${
                 typeFilter === 'all' ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
               }`}
@@ -171,7 +182,7 @@ export function LocationsCatalogView({ venues }: { venues: VenueCatalogCard[] })
                 <button
                   key={option.value}
                   type="button"
-                  onClick={() => startTransition(() => setTypeFilter(active ? 'all' : option.value))}
+                  onClick={() => setTypeFilter(active ? 'all' : option.value)}
                   className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition ${
                     active ? 'bg-slate-900 text-white' : 'bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50'
                   }`}

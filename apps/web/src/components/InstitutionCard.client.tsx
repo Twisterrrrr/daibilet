@@ -7,9 +7,11 @@ import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatStreetAddress } from '@/lib/address';
 import { pluralEvents } from '@/lib/format';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
-import { venueTypeLabel } from '@/lib/venue-meta';
+import { resolvePublicVenueType, venueTypeLabel } from '@/lib/venue-meta';
 
 const TYPE_GRADIENT: Record<string, string> = {
+  museum: 'from-stone-600 via-amber-800 to-slate-900',
+  art_space: 'from-violet-700 via-fuchsia-900 to-slate-950',
   museum_art_space: 'from-stone-600 via-amber-800 to-slate-900',
   theater: 'from-rose-700 via-red-900 to-slate-950',
   concert_hall: 'from-slate-600 via-slate-800 to-slate-950',
@@ -26,8 +28,9 @@ function topCategory(venue: InstitutionCardVenue): string | null {
 }
 
 export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; href: string }) {
-  const typeLabel = venueTypeLabel(venue.type);
-  const gradient = TYPE_GRADIENT[venue.type] || 'from-slate-700 via-slate-800 to-slate-950';
+  const publicType = resolvePublicVenueType(venue.type, venue.name);
+  const typeLabel = venueTypeLabel(publicType, venue.name);
+  const gradient = TYPE_GRADIENT[publicType] || 'from-slate-700 via-slate-800 to-slate-950';
   const street = formatStreetAddress(venue.address, { city: venue.city });
   const category = topCategory(venue);
 

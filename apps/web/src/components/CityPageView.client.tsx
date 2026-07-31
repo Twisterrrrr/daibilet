@@ -25,6 +25,7 @@ import { isCityHubSectionHidden, resolveCityHubConfig } from '@/lib/city-hub-con
 import { matchSightAfficheLink, resolveFeaturedDirections } from '@/lib/city-hub-directions';
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityImage } from '@/lib/city-images';
+import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
 import { isOpenDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import {
@@ -536,6 +537,57 @@ function CityHeroDefault({
   );
 }
 
+/** Vertical component of object-position for mirror wings (X is edge-locked). */
+function heroFocusY(objectPosition: string): string {
+  const parts = objectPosition.trim().split(/\s+/);
+  return parts[1] || 'center';
+}
+
+/**
+ * Ultrawide side: mirror outer ~10% of the photo, stretch into the gutter,
+ * fade linearly into navy at the viewport edge (no hard crop / flat fill).
+ */
+function CityHeroMirrorWing({
+  side,
+  src,
+  focusY,
+}: {
+  side: 'left' | 'right';
+  src: string;
+  focusY: string;
+}) {
+  const isLeft = side === 'left';
+  return (
+    <div
+      className={`absolute inset-y-0 overflow-hidden ${isLeft ? 'left-0' : 'right-0'}`}
+      style={{ width: CITY_NIGHT_HERO.sideGutterWidth }}
+    >
+      <div className="absolute inset-0" style={{ transform: 'scaleX(-1)' }}>
+        {/* Decorative wing only - stretch/crop via CSS width 1000% (= ~10% slice). */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt=""
+          draggable={false}
+          className={`pointer-events-none absolute inset-y-0 h-full max-w-none ${isLeft ? 'left-0' : 'right-0'}`}
+          style={{
+            width: '1000%',
+            objectFit: 'cover',
+            objectPosition: isLeft ? `left ${focusY}` : `right ${focusY}`,
+          }}
+        />
+      </div>
+      <div
+        className={
+          isLeft
+            ? 'absolute inset-0 bg-gradient-to-r from-[#0b1220] from-[12%] via-[#0b1220]/75 to-transparent'
+            : 'absolute inset-0 bg-gradient-to-l from-[#0b1220] from-[12%] via-[#0b1220]/75 to-transparent'
+        }
+      />
+    </div>
+  );
+}
+
 /** Option A: full-bleed night skyline when city PNG exists; иначе нейтральный strip. */
 function CityHeroStrip({
   city,
@@ -572,6 +624,8 @@ function CityHeroStrip({
     setHeroImageFailed(false);
   }, [heroImage]);
 
+  /** Layout lock from first paint: image error must not collapse night shell (CLS). */
+  const nightShell = Boolean(heroImage);
   const showPhoto = Boolean(heroImage && !heroImageFailed);
   const heroFocus = resolveCityImageObjectPosition({
     slug: city.slug,
@@ -579,7 +633,7 @@ function CityHeroStrip({
     name: city.name,
   });
 
-  const titleClass = showPhoto
+  const titleClass = nightShell
     ? editorial
       ? 'font-serif text-4xl font-semibold tracking-tight text-white sm:text-5xl'
       : 'font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl'
@@ -587,33 +641,33 @@ function CityHeroStrip({
       ? 'font-serif text-4xl font-semibold tracking-tight text-zinc-950 sm:text-5xl'
       : 'font-display text-3xl font-extrabold tracking-tight text-slate-900 sm:text-4xl';
 
-  const briefClass = showPhoto
+  const briefClass = nightShell
     ? 'mt-3 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg'
     : editorial
       ? 'mt-3 max-w-2xl text-base leading-relaxed text-zinc-600 sm:text-lg'
       : 'mt-3 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg';
 
-  const seasonChipClass = showPhoto
+  const seasonChipClass = nightShell
     ? 'inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/25'
     : editorial
       ? 'inline-flex items-center rounded-full bg-zinc-200 px-3 py-1 text-xs font-semibold text-zinc-800'
       : 'inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-800';
 
-  const statsClass = showPhoto
+  const statsClass = nightShell
     ? 'mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/70'
     : editorial
       ? 'mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500'
       : 'mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500';
 
-  const statsStrongClass = showPhoto
+  const statsStrongClass = nightShell
     ? 'font-semibold text-white'
     : editorial
       ? 'font-semibold text-zinc-800'
       : 'font-semibold text-slate-700';
 
-  const statsDotClass = showPhoto ? 'text-white/35' : editorial ? 'text-zinc-300' : 'text-slate-300';
+  const statsDotClass = nightShell ? 'text-white/35' : editorial ? 'text-zinc-300' : 'text-slate-300';
 
-  const primaryCtaClass = showPhoto
+  const primaryCtaClass = nightShell
     ? editorial
       ? 'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-medium text-zinc-950 ring-1 ring-white transition hover:bg-white/90'
       : 'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-white px-5 text-sm font-semibold text-slate-900 hover:bg-white/90'
@@ -621,7 +675,7 @@ function CityHeroStrip({
       ? 'inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-zinc-950 px-5 text-sm font-medium text-white ring-1 ring-zinc-950 transition hover:bg-zinc-800'
       : 'inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 text-sm font-semibold text-white hover:bg-primary-700';
 
-  const secondaryCtaClass = showPhoto
+  const secondaryCtaClass = nightShell
     ? editorial
       ? 'inline-flex min-h-11 items-center justify-center rounded-full border border-white/35 bg-white/10 px-5 text-sm font-medium text-white backdrop-blur-sm hover:bg-white/15'
       : 'inline-flex min-h-11 items-center justify-center rounded-lg border border-white/35 bg-white/10 px-5 text-sm font-semibold text-white backdrop-blur-sm hover:bg-white/15'
@@ -629,15 +683,13 @@ function CityHeroStrip({
       ? 'inline-flex min-h-11 items-center justify-center rounded-full border border-zinc-300 bg-white px-5 text-sm font-medium text-zinc-700 hover:border-zinc-400'
       : 'inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700 hover:border-slate-300';
 
-  const sectionClass = showPhoto
-    ? 'relative min-h-[280px] overflow-hidden border-b border-slate-950 sm:min-h-[320px] md:min-h-[360px]'
+  const sectionClass = nightShell
+    ? CITY_NIGHT_HERO.section
     : editorial
       ? 'border-b border-zinc-200 bg-zinc-50'
       : 'border-b border-slate-200 bg-slate-50';
 
-  const contentClass = showPhoto
-    ? 'container-page relative z-[1] flex min-h-[280px] flex-col justify-end py-8 sm:min-h-[320px] sm:py-10 md:min-h-[360px]'
-    : 'container-page py-8 sm:py-10';
+  const contentClass = nightShell ? CITY_NIGHT_HERO.content : 'container-page py-8 sm:py-10';
 
   return (
     <div id="top">
@@ -649,22 +701,39 @@ function CityHeroStrip({
         ]}
       />
       <section className={sectionClass}>
-        {showPhoto ? (
-          <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-            <SafeImage
-              src={heroImage}
-              alt=""
-              fill
-              priority
-              sizes={IMAGE_SIZES.landingBanner}
-              style={{ objectPosition: heroFocus }}
-              onError={() => setHeroImageFailed(true)}
-              className="object-cover"
-            />
-            {/* Scrim слева под текст: slate, без purple/sky tint. */}
-            <div className="absolute inset-0 bg-slate-950/20" />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/85 from-[6%] via-slate-950/55 via-[42%] to-slate-950/15 to-[88%]" />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/55 via-transparent to-slate-950/10" />
+        {nightShell ? (
+          <div
+            className="pointer-events-none absolute inset-0 overflow-hidden"
+            style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
+            aria-hidden
+          >
+            {/* Full-bleed navy base; ultrawide gutters get mirrored edge strips. */}
+            <div className="absolute inset-0" style={{ backgroundColor: CITY_NIGHT_HERO.navy }} />
+            {showPhoto ? (
+              <>
+                <CityHeroMirrorWing side="left" src={heroImage!} focusY={heroFocusY(heroFocus)} />
+                <CityHeroMirrorWing side="right" src={heroImage!} focusY={heroFocusY(heroFocus)} />
+              </>
+            ) : null}
+            {/* Center: city PNG (~1024px) ≤ +10%; object-contain - без height-upscale. */}
+            <div className={CITY_NIGHT_HERO.imageFrame}>
+              {showPhoto ? (
+                <SafeImage
+                  src={heroImage}
+                  alt=""
+                  fill
+                  priority
+                  sizes={CITY_NIGHT_HERO.imageSizes}
+                  style={{ objectPosition: heroFocus }}
+                  onError={() => setHeroImageFailed(true)}
+                  className="object-contain object-center"
+                />
+              ) : null}
+            </div>
+            {/* Scrim слева под текст: navy, без purple/sky tint. */}
+            <div className="absolute inset-0 z-[2] bg-[#0b1220]/20" />
+            <div className="absolute inset-0 z-[2] bg-gradient-to-r from-[#0b1220]/85 from-[6%] via-[#0b1220]/55 via-[42%] to-[#0b1220]/15 to-[88%]" />
+            <div className="absolute inset-0 z-[2] bg-gradient-to-t from-[#0b1220]/55 via-transparent to-[#0b1220]/10" />
           </div>
         ) : null}
         <div className={contentClass}>
@@ -672,7 +741,7 @@ function CityHeroStrip({
             <h1 className={titleClass}>{city.name}</h1>
             <p className={briefClass}>{brief}</p>
             {seasonChip ? (
-              <p className={`mt-3 text-sm ${showPhoto ? 'text-white/70' : editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+              <p className={`mt-3 text-sm ${nightShell ? 'text-white/70' : editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
                 <span className={seasonChipClass}>
                   {seasonChip.label}
                   {seasonChip.monthsHint ? ` (${seasonChip.monthsHint})` : ''}
@@ -733,6 +802,8 @@ function CityStickyTabs({
   editorial?: boolean;
 }) {
   const [activeId, setActiveId] = React.useState(tabs[0]?.id || 'affiche');
+  /** Пока идёт programmatic smooth-scroll - не даём observer перебить activeId. */
+  const scrollLockUntilRef = React.useRef(0);
 
   React.useEffect(() => {
     if (!tabs.length) return;
@@ -743,6 +814,7 @@ function CityStickyTabs({
 
     const observer = new IntersectionObserver(
       (entries) => {
+        if (Date.now() < scrollLockUntilRef.current) return;
         const visible = entries
           .filter((entry) => entry.isIntersecting)
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
@@ -785,6 +857,7 @@ function CityStickyTabs({
               href={`#${tab.id}`}
               onClick={(event) => {
                 event.preventDefault();
+                scrollLockUntilRef.current = Date.now() + 1200;
                 setActiveId(tab.id);
                 scrollToSection(tab.id);
                 if (typeof window !== 'undefined') {
@@ -889,47 +962,42 @@ function CityScheduleLoadingState() {
 }
 
 function CityLoadingState({ editorial = false }: { editorial?: boolean }) {
-  if (editorial) {
-    return (
-      <>
-        <section className="border-b border-zinc-200 bg-zinc-50">
-          <div className="container-page py-12 sm:py-16">
-            <div className="h-3 w-40 rounded bg-zinc-200" />
-            <div className="mt-8 h-16 max-w-xl rounded bg-zinc-200/80" />
-            <div className="mt-6 h-5 max-w-md rounded bg-zinc-200/60" />
-          </div>
-        </section>
-        <section className="container-page py-10">
-          <div className="h-8 w-56 rounded bg-zinc-100" />
-          <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="aspect-[4/5] rounded-xl bg-zinc-100" />
-            ))}
-          </div>
-        </section>
-      </>
-    );
-  }
-
+  // Same fixed night shell as CityHeroStrip / SiteChromeSkeleton city - no py-only jump.
   return (
     <>
-      <section className="bg-gradient-to-br from-primary-700 via-primary-800 to-primary-950 text-white">
-        <div className="container-page py-14 sm:py-16">
-          <div className="h-4 w-44 rounded bg-white/20" />
-          <div className="mt-8 h-12 max-w-xl rounded bg-white/22" />
-          <div className="mt-4 h-5 max-w-2xl rounded bg-white/16" />
-          <div className="mt-3 h-5 max-w-lg rounded bg-white/16" />
-          <div className="mt-7 flex gap-3">
-            <div className="h-11 w-64 rounded-lg bg-white/24" />
-            <div className="h-11 w-48 rounded-lg bg-white/12" />
+      <div className="border-b border-slate-200 bg-white">
+        <div className="container-page flex min-h-11 items-center gap-1.5 py-3" aria-hidden>
+          <div className="h-3 w-16 rounded bg-slate-200/80" />
+          <div className="h-3 w-3 rounded bg-slate-100" />
+          <div className="h-3 w-20 rounded bg-slate-200/70" />
+        </div>
+      </div>
+      <section className={CITY_NIGHT_HERO.section} aria-busy="true" aria-label="Загрузка">
+        <div
+          className="pointer-events-none absolute inset-0 overflow-hidden"
+          style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
+          aria-hidden
+        >
+          <div className={CITY_NIGHT_HERO.imageFrame} />
+          <div className="absolute inset-0 z-[2] bg-gradient-to-r from-[#0b1220]/85 from-[6%] via-[#0b1220]/55 via-[42%] to-[#0b1220]/15 to-[88%]" />
+        </div>
+        <div className={CITY_NIGHT_HERO.content}>
+          <div className="max-w-2xl">
+            <div className={`h-10 max-w-md rounded sm:h-12 ${editorial ? 'bg-white/20' : 'bg-white/22'}`} />
+            <div className="mt-3 h-4 max-w-xl rounded bg-white/16" />
+            <div className="mt-2 h-4 max-w-lg rounded bg-white/12" />
+            <div className="mt-5 flex gap-3">
+              <div className="h-11 w-44 rounded-lg bg-white/24" />
+              <div className="h-11 w-36 rounded-lg bg-white/12" />
+            </div>
           </div>
         </div>
       </section>
       <section className="container-page py-10">
-        <div className="h-6 w-64 rounded bg-slate-100" />
+        <div className={`h-6 w-64 rounded ${editorial ? 'bg-zinc-100' : 'bg-slate-100'}`} />
         <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, index) => (
-            <div key={index} className="h-32 rounded-lg bg-slate-50" />
+            <div key={index} className={`h-32 rounded-lg ${editorial ? 'bg-zinc-100' : 'bg-slate-50'}`} />
           ))}
         </div>
       </section>
@@ -1793,9 +1861,17 @@ function resolveSectionId(hash: string): string {
 
 function scrollToSection(id: string) {
   const targetId = resolveSectionId(id);
-  window.setTimeout(() => {
-    document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 0);
+  const run = () => {
+    const el = document.getElementById(targetId);
+    if (!el) return false;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return true;
+  };
+  // rAF + retry: секции/картинки ещё двигают layout сразу после клика.
+  window.requestAnimationFrame(() => {
+    if (run()) return;
+    window.setTimeout(run, 120);
+  });
 }
 
 function navigateHome(section: string) {

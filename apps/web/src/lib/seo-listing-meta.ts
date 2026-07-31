@@ -91,7 +91,7 @@ const CATEGORY_LABELS: Record<string, ListingCategoryLabels> = {
   exhibitions: { titleCategory: 'Выставки и музеи', seekCategory: 'выставки и музеи' },
   'unusual-theatres': { titleCategory: 'Необычные театры', seekCategory: 'необычные театры' },
   excursions: { titleCategory: 'Экскурсии', seekCategory: 'экскурсии' },
-  rooftops: { titleCategory: 'Прогулки по крышам', seekCategory: 'экскурсии по крышам' },
+  rooftops: { titleCategory: 'Смотровые площадки', seekCategory: 'смотровые площадки' },
   'new-year': { titleCategory: 'Новогодние события', seekCategory: 'новогодние события' },
   'salute-9-may': { titleCategory: 'Салют 9 мая', seekCategory: 'салют 9 мая' },
   'moscow-museums': { titleCategory: 'Музеи и выставки', seekCategory: 'музеи и выставки' },

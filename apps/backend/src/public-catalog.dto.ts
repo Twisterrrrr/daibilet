@@ -1,3 +1,4 @@
+import { spawn } from 'node:child_process';
 import { CATALOG_PAGE_SIZE_DEFAULT, CATALOG_PAGE_SIZE_MAX } from '@daibilet/contracts/catalog';
 import { prisma } from '@daibilet/db';
 import { raw, sql } from '@daibilet/db/sql';
@@ -6,6 +7,13 @@ import {
   isSaleableForPublicCatalog,
 } from './catalog-availability.js';
 import { resolveCityTimeZone } from './city-timezone.js';
+import {
+  loadPublicCatalogDiskCache,
+  resolveCatalogRebuildLockPath,
+  resolveCatalogRebuildMode,
+  resolveCatalogRebuildScriptPath,
+  writePublicCatalogDiskCache,
+} from './public-catalog-disk-cache.js';
 import {
   dedupeCrossSourceCatalogSessions,
   regroupMappedPublicCatalogSessions,
@@ -23,8 +31,12 @@ import type { PurchaseProvider } from './types/common.js';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PUBLIC_CATALOG_CACHE_MS = 5 * 60 * 1000;
-/** Stale-while-revalidate window: serve expired catalog instantly, rebuild in background. */
+/** Soft TTL for background refresh; past this we still serve memory/disk and refresh async (INC.504.4). */
 const PUBLIC_CATALOG_STALE_MS = Number(process.env.PUBLIC_CATALOG_STALE_MS || 30 * 60 * 1000);
+/** Max wait for cold/force rebuild before returning whatever cache exists. */
+const PUBLIC_CATALOG_COLD_AWAIT_MS = Number(process.env.PUBLIC_CATALOG_COLD_AWAIT_MS || 8_000);
+const PUBLIC_CATALOG_CHILD_WAIT_MS = Number(process.env.PUBLIC_CATALOG_CHILD_WAIT_MS || 190_000);
+const PUBLIC_CATALOG_MAP_CHUNK = Math.max(20, Number(process.env.PUBLIC_CATALOG_MAP_CHUNK || 80));
 /** Hydrate enough slots for EventCard 2×2 chips after primary is excluded from chips. */
 const CATALOG_CARD_SLOT_TARGET = 5;
 const CATALOG_HYDRATED_SLOT_LIMIT = 8;
@@ -56,6 +68,7 @@ interface CatalogCache {
 
 let catalogCache: CatalogCache | null = null;
 let catalogBuildPromise: Promise<PublicSessionDto[]> | null = null;
+let catalogChildSpawnedAt = 0;
 
 export function clearPublicCatalogDtoCache(): void {
   // Soft-invalidate for SWR: keep last sessions while rebuild runs.
@@ -103,52 +116,208 @@ export async function getPublicCatalogSessions(
 ): Promise<PublicSessionDto[]> {
   const hydrateSlots = options.hydrateSlots !== false;
   const now = Date.now();
-  const cached = catalogCache;
 
   if (forceRefresh) {
-    if (cached?.sessions) {
-      catalogCache = { ...cached, expiresAt: 0, staleUntil: 0 };
+    if (catalogCache?.sessions) {
+      catalogCache = { ...catalogCache, expiresAt: 0, staleUntil: 0 };
     }
-    const sessions = await schedulePublicCatalogDtoRebuild('force-refresh');
+    const sessions = await awaitCatalogRebuild('force-refresh');
     return hydrateSlots ? hydrateCatalogUpcomingSlots(sessions) : sessions;
   }
+
+  promoteDiskCacheIfNewer();
+  const cached = catalogCache;
 
   if (cached?.sessions && now < cached.expiresAt) {
     return hydrateSlots ? hydrateCatalogUpcomingSlots(cached.sessions) : cached.sessions;
   }
 
-  // Stale-while-revalidate: serve previous catalog immediately, refresh in background.
-  if (cached?.sessions && now < cached.staleUntil) {
-    void schedulePublicCatalogDtoRebuild('swr');
+  // INC.504.4: if we have ANY previous sessions (even past staleUntil), never await rebuild
+  // on the request path - serve stale and refresh in background (child/cron preferred).
+  if (cached?.sessions?.length) {
+    const reason = now < (cached.staleUntil || 0) ? 'swr' : 'soft-expire';
+    triggerBackgroundCatalogRebuild(reason);
     return hydrateSlots ? hydrateCatalogUpcomingSlots(cached.sessions) : cached.sessions;
   }
 
-  const sessions = await schedulePublicCatalogDtoRebuild(cached?.sessions ? 'hard-expire' : 'cold');
+  const sessions = await awaitCatalogRebuild('cold');
   return hydrateSlots ? hydrateCatalogUpcomingSlots(sessions) : sessions;
 }
 
-function schedulePublicCatalogDtoRebuild(reason: string): Promise<PublicSessionDto[]> {
+function promoteDiskCacheIfNewer(): void {
+  const disk = loadPublicCatalogDiskCache();
+  if (!disk?.sessions?.length) return;
+  const memBuiltAt = catalogCache?.builtAt || 0;
+  if (disk.builtAt <= memBuiltAt && catalogCache?.sessions?.length) return;
+  catalogCache = {
+    expiresAt: disk.expiresAt,
+    staleUntil: disk.staleUntil,
+    sessions: disk.sessions,
+    builtAt: disk.builtAt,
+  };
+}
+
+function triggerBackgroundCatalogRebuild(reason: string): void {
+  const mode = resolveCatalogRebuildMode();
+  if (mode === 'off') return;
+  if (catalogBuildPromise) return;
+
+  if (mode === 'child') {
+    spawnCatalogRebuildChild(reason);
+    return;
+  }
+
+  void scheduleInlineCatalogRebuild(reason);
+}
+
+async function awaitCatalogRebuild(reason: string): Promise<PublicSessionDto[]> {
+  const mode = resolveCatalogRebuildMode();
+
+  if (mode === 'off') {
+    promoteDiskCacheIfNewer();
+    if (catalogCache?.sessions?.length) return catalogCache.sessions;
+    throw new Error(`Public catalog rebuild mode=off and no disk/memory cache (${reason})`);
+  }
+
+  if (mode === 'child') {
+    const beforeBuiltAt = catalogCache?.builtAt || loadPublicCatalogDiskCache()?.builtAt || 0;
+    spawnCatalogRebuildChild(reason);
+    const waitMs = reason === 'force-refresh' ? PUBLIC_CATALOG_CHILD_WAIT_MS : PUBLIC_CATALOG_COLD_AWAIT_MS;
+    const sessions = await pollDiskCatalogUntil(beforeBuiltAt, waitMs);
+    if (sessions?.length) return sessions;
+    // Keep waiting in background for child; request path must not block ~170s.
+    if (catalogCache?.sessions?.length) return catalogCache.sessions;
+    const late = await pollDiskCatalogUntil(beforeBuiltAt, Math.min(2_000, waitMs));
+    if (late?.length) return late;
+    throw new Error(`Public catalog child rebuild not ready within ${waitMs}ms (${reason})`);
+  }
+
+  const rebuild = scheduleInlineCatalogRebuild(reason);
+  if (!Number.isFinite(PUBLIC_CATALOG_COLD_AWAIT_MS) || PUBLIC_CATALOG_COLD_AWAIT_MS <= 0) {
+    return rebuild;
+  }
+
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      rebuild,
+      new Promise<PublicSessionDto[]>((_, reject) => {
+        timer = setTimeout(() => {
+          reject(new Error(`Public catalog inline rebuild exceeded ${PUBLIC_CATALOG_COLD_AWAIT_MS}ms (${reason})`));
+        }, PUBLIC_CATALOG_COLD_AWAIT_MS);
+      }),
+    ]);
+  } catch (error) {
+    if (catalogCache?.sessions?.length) {
+      console.warn(
+        `Public catalog cold await fallback to stale (${reason}): ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+      return catalogCache.sessions;
+    }
+    throw error;
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+function spawnCatalogRebuildChild(reason: string): void {
+  const now = Date.now();
+  // Coalesce bursts: one spawn per minute unless force path cleared the flag via await.
+  if (now - catalogChildSpawnedAt < 60_000 && reason !== 'force-refresh' && reason !== 'cold') {
+    return;
+  }
+  catalogChildSpawnedAt = now;
+
+  const script = resolveCatalogRebuildScriptPath();
+  const lockPath = resolveCatalogRebuildLockPath();
+  const command = process.platform === 'win32' ? process.execPath : 'flock';
+  const childArgs =
+    process.platform === 'win32'
+      ? [script, `--reason=${reason}`]
+      : ['-n', lockPath, 'timeout', '--kill-after=15s', '180s', process.execPath, script, `--reason=${reason}`];
+
+  try {
+    const child = spawn(command, childArgs, {
+      detached: true,
+      stdio: 'ignore',
+      env: {
+        ...process.env,
+        // Child must build inline in its own process, not spawn another child.
+        DAIBILET_CATALOG_REBUILD_MODE: 'inline',
+        // Avoid inheriting web-port heuristic if parent is Next.
+        DAIBILET_WEB_PORT: '',
+        NEXT_RUNTIME: '',
+      },
+    });
+    child.unref();
+    console.log(`Public catalog DTO rebuild spawned (${reason}) pid=${child.pid ?? 'n/a'}`);
+  } catch (error) {
+    console.warn(
+      `Public catalog child spawn failed (${reason}), falling back to inline: ${
+        error instanceof Error ? error.message : String(error)
+      }`,
+    );
+    void scheduleInlineCatalogRebuild(reason);
+  }
+}
+
+async function pollDiskCatalogUntil(beforeBuiltAt: number, waitMs: number): Promise<PublicSessionDto[] | null> {
+  const deadline = Date.now() + Math.max(0, waitMs);
+  while (Date.now() <= deadline) {
+    promoteDiskCacheIfNewer();
+    if (catalogCache?.builtAt && catalogCache.builtAt > beforeBuiltAt && catalogCache.sessions?.length) {
+      return catalogCache.sessions;
+    }
+    await sleep(250);
+  }
+  promoteDiskCacheIfNewer();
+  if (catalogCache?.builtAt && catalogCache.builtAt > beforeBuiltAt && catalogCache.sessions?.length) {
+    return catalogCache.sessions;
+  }
+  return null;
+}
+
+function scheduleInlineCatalogRebuild(reason: string): Promise<PublicSessionDto[]> {
   if (catalogBuildPromise) return catalogBuildPromise;
 
   catalogBuildPromise = (async () => {
     const startedAt = Date.now();
     try {
       const [rows, pinnedEventIds] = await Promise.all([loadPublicCatalogRows(), loadPinnedEventIds()]);
+      // Yield between chunks so inline rebuild (API/cron child) does not monopolize the event loop.
+      const mapped: PublicSessionDto[] = [];
+      for (let i = 0; i < rows.length; i += PUBLIC_CATALOG_MAP_CHUNK) {
+        const chunk = rows.slice(i, i + PUBLIC_CATALOG_MAP_CHUNK);
+        for (const row of chunk) {
+          const session = mapGroupedPublicSession(row, pinnedEventIds);
+          if (session) mapped.push(session);
+        }
+        if (i + PUBLIC_CATALOG_MAP_CHUNK < rows.length) {
+          await sleep(0);
+        }
+      }
       // Do not hydrate all slots into the shared cache — that made every limit=50 cold build pay for thousands of slots.
       const sessions = filterCatalogSessions(
-        dedupeCrossSourceCatalogSessions(
-          regroupMappedPublicCatalogSessions(
-            rows.map((row) => mapGroupedPublicSession(row, pinnedEventIds)).filter(Boolean),
-          ),
-        ),
+        dedupeCrossSourceCatalogSessions(regroupMappedPublicCatalogSessions(mapped)),
       );
       const now = Date.now();
+      const expiresAt = now + Math.max(30_000, PUBLIC_CATALOG_CACHE_MS);
+      const staleUntil = now + Math.max(60_000, PUBLIC_CATALOG_STALE_MS);
       catalogCache = {
-        expiresAt: now + Math.max(30_000, PUBLIC_CATALOG_CACHE_MS),
-        staleUntil: now + Math.max(60_000, PUBLIC_CATALOG_STALE_MS),
+        expiresAt,
+        staleUntil,
         sessions,
         builtAt: now,
       };
+      writePublicCatalogDiskCache({
+        version: 1,
+        builtAt: now,
+        expiresAt,
+        staleUntil,
+        sessions,
+      });
       console.log(
         `Public catalog DTO cache rebuilt (${reason}): ${sessions.length} sessions in ${now - startedAt}ms`,
       );
@@ -165,6 +334,13 @@ function schedulePublicCatalogDtoRebuild(reason: string): Promise<PublicSessionD
   });
 
   return catalogBuildPromise;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    if (ms <= 0) setImmediate(resolve);
+    else setTimeout(resolve, ms);
+  });
 }
 
 async function loadPinnedEventIds(): Promise<Set<string>> {

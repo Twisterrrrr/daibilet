@@ -92,7 +92,7 @@ test('resolveAdmissionCheckoutUrl: absolute and relative', () => {
   );
   assert.equal(
     resolveAdmissionCheckoutUrl('/checkout/admissions/x', {}),
-    'https://checkout.daibilet.ru/checkout/admissions/x',
+    'https://pay.daibilet.ru/checkout/admissions/x',
   );
   assert.equal(resolveAdmissionCheckoutUrl(null, {}), null);
   assert.equal(resolveAdmissionCheckoutUrl('', {}), null);

@@ -1,6 +1,14 @@
 'use client';
 
-import { createContext, useCallback, useContext, useLayoutEffect, useMemo, useState } from 'react';
+import {
+  Suspense,
+  createContext,
+  useCallback,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
@@ -8,18 +16,20 @@ import { buildCatalogHref } from '@/lib/catalog-url';
 import { resolveLandingCityName } from '@/lib/landing-city';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
 import {
-  landingCategoryHref,
-  MULTI_CITY_LANDING_SLUGS,
-  normalizeKnownCitySlug,
-  resolveLandingRouteFromLocation,
-} from '@/lib/landing-routes';
-import {
   isCityFilterPath,
   matchDestination,
   mergeStoredCityIntoSearchParams,
   persistSelectedCity,
+  readStoredSelectedCity,
   resolveCityLabel,
 } from '@/lib/selected-city';
+import {
+  landingCategoryHref,
+  isLandingCityAllowed,
+  MULTI_CITY_LANDING_SLUGS,
+  normalizeKnownCitySlug,
+  resolveLandingRouteFromLocation,
+} from '@/lib/landing-routes';
 
 type SelectedCityContextValue = {
   cityValue: string;
@@ -36,7 +46,30 @@ function catalogPathBase(pathname: string): string {
   const path = pathname.replace(/\/$/, '') || '/';
   if (path.startsWith('/venues')) return '/venues';
   if (path.startsWith('/locations')) return '/locations';
+  if (path.startsWith('/podborki')) return '/podborki';
   return '/events';
+}
+
+function readClientSearchParams(): URLSearchParams {
+  if (typeof window === 'undefined') return new URLSearchParams();
+  return new URLSearchParams(window.location.search);
+}
+
+/**
+ * Isolates useSearchParams in its own Suspense hole so SiteLayout chrome + page
+ * HTML can SSR. Without this, Next bails the whole tree to client render
+ * (blank site-header-spacer for 2-3s on first paint).
+ */
+function CitySearchParamsBridge({
+  onParams,
+}: {
+  onParams: (params: URLSearchParams) => void;
+}) {
+  const searchParams = useSearchParams();
+  useLayoutEffect(() => {
+    onParams(new URLSearchParams(searchParams.toString()));
+  }, [onParams, searchParams]);
+  return null;
 }
 
 export function SelectedCityProvider({
@@ -48,10 +81,15 @@ export function SelectedCityProvider({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const urlCity = searchParams.get('city');
+  const [urlCity, setUrlCity] = useState<string | null>(null);
+  const [searchParamsKey, setSearchParamsKey] = useState('');
   const [cityLabel, setCityLabel] = useState('Все города');
   const [cityReady, setCityReady] = useState(false);
+
+  const onParams = useCallback((params: URLSearchParams) => {
+    setUrlCity(params.get('city'));
+    setSearchParamsKey(params.toString());
+  }, []);
 
   // Sync before paint so the first meaningful filter render already has the stored city.
   useLayoutEffect(() => {
@@ -84,11 +122,34 @@ export function SelectedCityProvider({
     const path = pathname.replace(/\/$/, '') || '/';
     if (path !== base) return;
 
-    const merged = mergeStoredCityIntoSearchParams(destinations, new URLSearchParams(searchParams.toString()));
+    const current = searchParamsKey
+      ? new URLSearchParams(searchParamsKey)
+      : readClientSearchParams();
+    const merged = mergeStoredCityIntoSearchParams(destinations, current);
     if (!merged) return;
     const query = merged.toString();
     router.replace(query ? `${base}?${query}` : base, { scroll: false });
-  }, [destinations, pathname, router, searchParams]);
+  }, [destinations, pathname, router, searchParamsKey]);
+
+  // Multi-city national landing without city segment — sync header city into path (like ?city= on catalogs).
+  useLayoutEffect(() => {
+    const landingRoute = resolveLandingRouteFromLocation(pathname);
+    if (!landingRoute) return;
+    const slug = canonicalLandingSlug(landingRoute.landingSlug);
+    if (!MULTI_CITY_LANDING_SLUGS.has(slug)) return;
+    if (landingRoute.citySlug) return;
+
+    const stored = readStoredSelectedCity(destinations);
+    if (!stored) return;
+    const matched = matchDestination(destinations, stored);
+    const citySlug =
+      normalizeKnownCitySlug(matched?.slug) ||
+      normalizeKnownCitySlug(matched?.sourceSlug) ||
+      normalizeKnownCitySlug(stored);
+    if (!citySlug || !isLandingCityAllowed(slug, citySlug)) return;
+
+    router.replace(landingCategoryHref(slug, citySlug), { scroll: false });
+  }, [destinations, pathname, router]);
 
   // Keep storage aligned with an explicit catalog city (including deep-links).
   useLayoutEffect(() => {
@@ -96,6 +157,17 @@ export function SelectedCityProvider({
     const matched = matchDestination(destinations, urlCity);
     if (matched) persistSelectedCity(matched.name);
   }, [destinations, pathname, urlCity]);
+
+  // Persist city from multi-city landing path into header storage.
+  useLayoutEffect(() => {
+    const landingRoute = resolveLandingRouteFromLocation(pathname);
+    if (!landingRoute?.citySlug) return;
+    if (!MULTI_CITY_LANDING_SLUGS.has(canonicalLandingSlug(landingRoute.landingSlug))) return;
+    const matched =
+      matchDestination(destinations, landingRoute.citySlug) ||
+      matchDestination(destinations, resolveLandingCityName(landingRoute.citySlug));
+    if (matched?.name) persistSelectedCity(matched.name);
+  }, [destinations, pathname]);
 
   const cityValue = cityLabel === 'Все города' ? 'all' : cityLabel;
   const selectedDestination = useMemo(
@@ -114,8 +186,10 @@ export function SelectedCityProvider({
       }
 
       const path = pathname.replace(/\/$/, '') || '/';
-      if (path === '/events' || path === '/venues' || path === '/locations') {
-        const params = new URLSearchParams(searchParams.toString());
+      if (path === '/events' || path === '/venues' || path === '/locations' || path === '/podborki') {
+        const params = searchParamsKey
+          ? new URLSearchParams(searchParamsKey)
+          : readClientSearchParams();
         if (name === 'all') params.delete('city');
         else params.set('city', name);
         params.delete('page');
@@ -151,7 +225,7 @@ export function SelectedCityProvider({
         }),
       );
     },
-    [destinations, pathname, router, searchParams],
+    [destinations, pathname, router, searchParamsKey],
   );
 
   const value = useMemo(
@@ -159,7 +233,14 @@ export function SelectedCityProvider({
     [cityValue, cityLabel, cityReady, selectedDestination, setCity],
   );
 
-  return <SelectedCityContext.Provider value={value}>{children}</SelectedCityContext.Provider>;
+  return (
+    <SelectedCityContext.Provider value={value}>
+      <Suspense fallback={null}>
+        <CitySearchParamsBridge onParams={onParams} />
+      </Suspense>
+      {children}
+    </SelectedCityContext.Provider>
+  );
 }
 
 export function useSelectedCity(): SelectedCityContextValue {

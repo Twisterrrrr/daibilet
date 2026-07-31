@@ -163,6 +163,11 @@ export interface PublicVenueDto extends SeoFields {
   name: string;
   title?: string;
   city: string;
+  /** CHPU города для крошек / ссылок. */
+  citySlug?: string | null;
+  /** Область / край / республика из City.region (для мелких городов в крошках). */
+  regionSlug?: string | null;
+  regionTitle?: string | null;
   address?: string | null;
   latitude?: number | null;
   longitude?: number | null;

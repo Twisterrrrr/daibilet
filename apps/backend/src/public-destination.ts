@@ -72,7 +72,7 @@ const CITY_HUB_LANDING_SHORT: Record<string, string> = {
   'country-tours': 'Загород',
   exhibitions: 'Выставки',
   'active-sport': 'Активный',
-  rooftops: 'Крыши',
+  rooftops: 'Смотровые',
   planetarium: 'Планетарий',
   excursions: 'Экскурсии',
   'unusual-theatres': 'Театр',

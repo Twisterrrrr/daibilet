@@ -535,7 +535,12 @@ export async function handleRequest(request, response) {
     const publicLandingMatch = request.method === 'GET' ? url.pathname.match(/^\/api\/public\/landings\/([^/]+)$/) : null;
     if (publicLandingMatch) {
       const landingSlug = decodeURIComponent(publicLandingMatch[1]);
-      sendPublicJson(response, await withPublicResponseCache(`landing:${landingSlug}`, () => buildPublicLandingPageWithFallback(db, landingSlug)));
+      const cityFilter = String(url.searchParams.get('city') || '').trim().toLowerCase();
+      const cacheKey = cityFilter && cityFilter !== 'all' ? `landing:${landingSlug}:${cityFilter}` : `landing:${landingSlug}`;
+      sendPublicJson(
+        response,
+        await withPublicResponseCache(cacheKey, () => buildPublicLandingPageWithFallback(db, landingSlug, cityFilter)),
+      );
       return;
     }
 
@@ -1041,10 +1046,12 @@ function scheduleStaleOrderArchive() {
   console.log('Stale cancelled-order archive enabled: every 6h, threshold 30d');
 }
 
-async function buildPublicLandingPageWithFallback(db, landingSlug) {
-  const managed = await buildPublicLandingPageManaged(db, landingSlug);
+async function buildPublicLandingPageWithFallback(db, landingSlug, cityFilter = '') {
+  const city = String(cityFilter || '').trim().toLowerCase();
+  const cityArg = city && city !== 'all' ? city : '';
+  const managed = await buildPublicLandingPageManaged(db, landingSlug, cityArg);
   if (managed) return managed;
-  return buildPublicLandingPage(db, landingSlug);
+  return buildPublicLandingPage(db, landingSlug, cityArg);
 }
 
 export async function warmPublicCaches(reason) {

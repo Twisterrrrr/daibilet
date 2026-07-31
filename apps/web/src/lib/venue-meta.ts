@@ -5,6 +5,8 @@ import { formatNumber } from '@/lib/format';
 export type VenuePageTemplate = 'institution' | 'location';
 
 export const INSTITUTION_KINDS = new Set([
+  'museum',
+  'art_space',
   'museum_art_space',
   'theater',
   'concert_hall',
@@ -13,7 +15,10 @@ export const INSTITUTION_KINDS = new Set([
 ]);
 
 const VENUE_TYPE_LABELS: Record<string, string> = {
-  museum_art_space: 'Музей / галерея',
+  museum: 'Музей',
+  art_space: 'Арт-пространство',
+  /** Legacy DB enum MUSEUM_ART_SPACE до split в public kind. */
+  museum_art_space: 'Музей',
   theater: 'Театр',
   concert_hall: 'Концертный зал',
   bar: 'Бар',
@@ -24,8 +29,75 @@ const VENUE_TYPE_LABELS: Record<string, string> = {
   outdoor_location: 'Открытая локация',
   sport_activity_space: 'Спорт / активность',
   attraction: 'Достопримечательность',
+  meeting_point: 'Точка сбора',
+  online: 'Онлайн',
   other: 'Локация',
 };
+
+/** Множественное число для сегмента крошек: Главная > Город > {Type} > Title. */
+const VENUE_TYPE_BREADCRUMB_PLURALS: Record<string, string> = {
+  museum: 'Музеи',
+  art_space: 'Арт-пространства',
+  museum_art_space: 'Музеи',
+  theater: 'Театры',
+  concert_hall: 'Концертные залы',
+  bar: 'Бары',
+  club_bar_restaurant: 'Клубы и рестораны',
+  pier: 'Причалы',
+  pier_water: 'Причалы',
+  bus: 'Автобусы',
+  venue: 'Площадки',
+  outdoor_location: 'Открытые локации',
+  sport_activity_space: 'Спорт и активность',
+  attraction: 'Достопримечательности',
+  meeting_point: 'Точки сбора',
+  online: 'Онлайн',
+  other: 'Локации',
+  /** Legacy template aliases (session.venueKind / тесты). */
+  institution: 'Площадки',
+  location: 'Локации',
+};
+
+/**
+ * Public split MUSEUM_ART_SPACE → museum | art_space (crumbs + ?type=).
+ * DB enum пока один; TODO: Prisma MUSEUM / ART_SPACE + backfill.
+ * Третьяковка → museum; «Галерея …» / арт-пространство → art_space.
+ */
+export function classifyMuseumOrArtSpace(name?: string | null, extraText?: string | null): 'museum' | 'art_space' {
+  const text = `${name || ''} ${extraText || ''}`.toLowerCase();
+  // Explicit overrides: Erarta (legacy ART_SPACE) stays art_space despite «Музей» in title.
+  if (/эрарта|\berarta\b|ven_spbboats_erarta/i.test(text)) return 'art_space';
+  if (/музей\s+современного\s+искусств/i.test(text)) return 'art_space';
+  if (/арт[-\s]?пространств|art[-\s]?space|иммерсив|люмьер|глазунов/i.test(text)) return 'art_space';
+  if (/галере/i.test(text) && !/музей|третьяков|эрмитаж|пушкинск|русск(?:ий|ого)\s+музей/i.test(text)) {
+    return 'art_space';
+  }
+  return 'museum';
+}
+
+/** Нормализует public type для крошек/фильтров (split museum_art_space). */
+export function resolvePublicVenueType(type?: string | null, name?: string | null): string {
+  const key = normalizeVenueKind(type);
+  if (key === 'museum' || key === 'art_space') return key;
+  if (key === 'museum_art_space') return classifyMuseumOrArtSpace(name);
+  return key;
+}
+
+/** Href сегмента типа в крошках: /venues?type=museum&city=… */
+export function venueTypeCatalogHref(input: {
+  type?: string | null;
+  name?: string | null;
+  city?: string | null;
+}): string {
+  const publicType = resolvePublicVenueType(input.type, input.name);
+  const template = venuePageTemplate(publicType);
+  const base = template === 'location' ? '/locations' : '/venues';
+  const params = new URLSearchParams();
+  params.set('type', publicType);
+  const city = String(input.city || '').trim();
+  if (city && city !== 'Не указан') params.set('city', city);
+  return `${base}?${params.toString()}`;
+}
 
 export function normalizeVenueKind(type?: string | null): string {
   return String(type || 'other')
@@ -53,10 +125,17 @@ export function isMeetingPointLike(input: {
   return /место сбора|место встречи|точка сбора|точка встречи|площадка:|^метро\b|^м\.(?:\s|«|"|')|\bм\.\s*(?:«|[а-яё])|\bу метро\b|около метро|у памятник|памятник|\bпам\.|у пам\.|\bу пам\b|пл\.\s*у пам/u.test(name);
 }
 
-export function venueTypeLabel(type?: string | null): string {
-  const key = normalizeVenueKind(type);
+export function venueTypeLabel(type?: string | null, name?: string | null): string {
+  const key = resolvePublicVenueType(type, name);
   if (key === 'pier_water') return VENUE_TYPE_LABELS.pier;
   return VENUE_TYPE_LABELS[key] || VENUE_TYPE_LABELS.other;
+}
+
+/** Plural nominative для middle-сегмента breadcrumbs (не generic «Площадки»). */
+export function venueTypeBreadcrumbPlural(type?: string | null, name?: string | null): string {
+  const key = resolvePublicVenueType(type, name);
+  if (VENUE_TYPE_BREADCRUMB_PLURALS[key]) return VENUE_TYPE_BREADCRUMB_PLURALS[key];
+  return venuePageTemplate(key) === 'location' ? 'Локации' : 'Площадки';
 }
 
 export function venueTypeIcon(type?: string | null): LucideIcon {
@@ -69,6 +148,8 @@ export function venueTypeIcon(type?: string | null): LucideIcon {
 
 export function venuePageTemplate(type?: string | null): VenuePageTemplate {
   const key = normalizeVenueKind(type);
+  if (key === 'institution') return 'institution';
+  if (key === 'location') return 'location';
   if (INSTITUTION_KINDS.has(key)) return 'institution';
   return 'location';
 }
@@ -111,8 +192,10 @@ export function resolveLocationVenueCopy(venue: {
 }
 
 export function institutionTypeEmoji(type?: string | null): string {
-  const key = normalizeVenueKind(type);
+  const key = resolvePublicVenueType(type);
   const map: Record<string, string> = {
+    museum: '🏛️',
+    art_space: '🎨',
     museum_art_space: '🏛️',
     theater: '🎭',
     concert_hall: '🎼',
@@ -123,7 +206,8 @@ export function institutionTypeEmoji(type?: string | null): string {
 }
 
 export const CATALOG_TYPE_OPTIONS: Array<{ value: string; label: string; template: VenuePageTemplate }> = [
-  { value: 'museum_art_space', label: 'Музей / галерея', template: 'institution' },
+  { value: 'museum', label: 'Музеи', template: 'institution' },
+  { value: 'art_space', label: 'Арт-пространства', template: 'institution' },
   { value: 'theater', label: 'Театр', template: 'institution' },
   { value: 'concert_hall', label: 'Концертный зал', template: 'institution' },
   { value: 'bar', label: 'Бар', template: 'institution' },

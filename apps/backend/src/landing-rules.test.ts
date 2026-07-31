@@ -94,6 +94,16 @@ test('requires an excursion signal for country tours', () => {
     subcategories: ['Автобусный тур'],
     city: 'Санкт-Петербург',
   }, countryTours), true);
+  assert.equal(matchesLandingRule({
+    title: 'Выезд в Гатчину: дворцы и парк',
+    category: 'Экскурсии',
+    city: 'Санкт-Петербург',
+  }, countryTours), true);
+  assert.equal(matchesLandingRule({
+    title: 'Царское Село и Екатерининский дворец',
+    category: 'Экскурсии',
+    city: 'Санкт-Петербург',
+  }, countryTours), true);
 
   for (const candidate of [
     { title: 'Концерт в Большом Петергофском дворце', category: 'Музыка' },
@@ -106,6 +116,31 @@ test('requires an excursion signal for country tours', () => {
       city: candidate.city || 'Санкт-Петербург',
     }, countryTours), false, candidate.title);
   }
+});
+
+test('widens bus tours via tags without hop-on venue', () => {
+  const bus = findLandingRule('bus-tours');
+  assert.ok(bus);
+
+  assert.equal(matchesLandingRule({
+    title: 'Ночной Петербург на автобусе',
+    category: 'Экскурсии',
+    tags: ['Автобусные экскурсии'],
+    city: 'Санкт-Петербург',
+  }, bus), true);
+
+  assert.equal(matchesLandingRule({
+    title: 'Панорамная программа по центру',
+    category: 'Экскурсии',
+    subcategories: ['Автобусные экскурсии'],
+    city: 'Москва',
+  }, bus), true);
+
+  assert.equal(matchesLandingRule({
+    title: 'Трансфер в аэропорт на автобусе',
+    category: 'Транспорт',
+    city: 'Москва',
+  }, bus), false);
 });
 
 test('excludes bus tours from concerts even when title has music keywords', () => {
@@ -149,6 +184,11 @@ test('keeps rooftop tours separate from concerts and parties', () => {
     title: 'СМОТРОВАЯ ПЛОЩАДКА «ВЫШЕ ТОЛЬКО ЛЮБОВЬ». 92 ЭТАЖ',
     category: 'Развлечения',
     tags: ['Смотровые площадки'],
+    city: 'Москва',
+  }, rooftops), true);
+  assert.equal(matchesLandingRule({
+    title: 'Билеты на смотровую Москва-Сити',
+    category: 'Развлечения',
     city: 'Москва',
   }, rooftops), true);
   assert.equal(matchesLandingRule({
@@ -218,4 +258,120 @@ test('applies canonical subcategory rules and Moscow-time schedule', () => {
     category: 'Экскурсии',
     city: 'Москва',
   }).includes('bus-tours'), true);
+});
+
+test('city alone is never a sufficient landing match', () => {
+  const museums = findLandingRule('moscow-museums');
+  const yards = findLandingRule('spb-yards');
+  const dinner = findLandingRule('moscow-dinner-boat');
+  const country = findLandingRule('country-tours');
+  const bridges = findLandingRule('bridges-night');
+  assert.ok(museums && yards && dinner && country && bridges);
+
+  const moscowGeneric = {
+    title: 'Вечер в городе',
+    category: 'Развлечения',
+    tags: [] as string[],
+    city: 'Москва',
+  };
+  const spbGeneric = {
+    title: 'Вечер в городе',
+    category: 'Развлечения',
+    tags: [] as string[],
+    city: 'Санкт-Петербург',
+  };
+
+  assert.equal(matchesLandingRule(moscowGeneric, museums), false);
+  assert.equal(matchesLandingRule(moscowGeneric, dinner), false);
+  assert.equal(matchesLandingRule(spbGeneric, yards), false);
+  assert.equal(matchesLandingRule(spbGeneric, country), false);
+  assert.equal(matchesLandingRule({
+    ...spbGeneric,
+    title: 'Ночная прогулка',
+    startsAt: '2026-07-10T19:30:00.000Z',
+  }, bridges), false);
+});
+
+test('moscow-museums requires museum signal and excludes standup', () => {
+  const museums = findLandingRule('moscow-museums');
+  assert.ok(museums);
+
+  assert.equal(matchesLandingRule({
+    title: 'Мастер-класс по росписи в технике горячая эмаль',
+    category: 'Мастер-классы',
+    tags: ['Мастер-классы'],
+    subcategories: ['Мастер-классы'],
+    city: 'Москва',
+  }, museums), true);
+
+  assert.equal(matchesLandingRule({
+    title: 'Династии и шедевры в Третьяковской галерее',
+    category: 'Экскурсии',
+    tags: ['Музеи'],
+    subcategories: ['Музеи'],
+    city: 'Москва',
+  }, museums), true);
+
+  // City alone must not match (was the standup leak root cause).
+  assert.equal(matchesLandingRule({
+    title: 'Стендап по-Женски',
+    category: 'Развлечения',
+    tags: ['Юмор'],
+    subcategories: ['Юмор'],
+    venue: 'Руки Вверх Бар',
+    city: 'Москва',
+  }, museums), false);
+
+  assert.equal(matchesLandingRule({
+    title: 'Вечерний Stand Up',
+    category: 'Мероприятия',
+    tags: ['Stand up'],
+    subcategories: ['Stand up'],
+    venue: 'Comedy Hub Club',
+    city: 'Москва',
+  }, museums), false);
+
+  assert.equal(matchesLandingRule({
+    title: 'Самвел Гиновян. Сольный Стендап-концерт',
+    category: 'Мероприятия',
+    tags: ['Stand up'],
+    city: 'Москва',
+  }, museums), false);
+});
+
+test('family-kids excludes band АнимациЯ but keeps kids animation', () => {
+  const family = findLandingRule('family-kids');
+  assert.ok(family);
+
+  assert.equal(matchesLandingRule({
+    title: '/ Самара / Костя Кулясов гр. АнимациЯ / Все хиты /',
+    category: 'Концерты',
+    tags: ['Рок'],
+    subcategories: ['Рок'],
+    city: 'Самара',
+  }, family), false);
+
+  assert.equal(matchesLandingRule({
+    title: '/ Екатеринбург/ Костя Кулясов гр. АнимациЯ/ Все хиты/animaciya.online',
+    category: 'Мероприятия',
+    tags: ['Рок'],
+    city: 'Екатеринбург',
+  }, family), false);
+
+  assert.equal(matchesLandingRule({
+    title: 'АнимациЯ',
+    category: 'Мероприятия',
+    tags: ['Рок'],
+    subcategories: ['Рок'],
+    venue: 'Клуб "Космонавт"',
+    city: 'Санкт-Петербург',
+  }, family), false);
+
+  assert.equal(matchesLandingRule({
+    title: 'Детская анимация и шоу для малышей',
+    category: 'Шоу',
+    tags: ['Детская анимация'],
+    subcategories: ['Детская анимация'],
+    city: 'Самара',
+  }, family), true);
 });

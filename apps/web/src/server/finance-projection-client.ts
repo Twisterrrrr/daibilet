@@ -12,7 +12,7 @@ import {
   type FinanceAdmissionProduct,
 } from '@/lib/finance-projection';
 
-export const FINANCE_PROJECTION_TIMEOUT_MS = 3000;
+export const FINANCE_PROJECTION_TIMEOUT_MS = 2500;
 
 export type FinanceProjectionEnv = NodeJS.ProcessEnv | Record<string, string | undefined>;
 

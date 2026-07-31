@@ -26,6 +26,20 @@ function getLegacyDb() {
   return legacyDb;
 }
 
+function normalizeLandingCityKey(cityFilter?: string | null): string {
+  return String(cityFilter || '')
+    .trim()
+    .toLowerCase();
+}
+
+function landingPageCacheKey(landingSlug: string, cityFilter?: string | null): string {
+  const slug = String(landingSlug || '')
+    .trim()
+    .toLowerCase();
+  const city = normalizeLandingCityKey(cityFilter);
+  return city && city !== 'all' ? `${slug}::${city}` : slug;
+}
+
 export function clearPublicLandingDtoCache(): void {
   pageCache.clear();
   catalogCache.clear();
@@ -34,17 +48,20 @@ export function clearPublicLandingDtoCache(): void {
 export async function buildPublicLandingPageDto(
   landingSlug: string,
   forceRefresh = false,
+  cityFilter?: string | null,
 ): Promise<PublicLandingPageDto | null> {
-  const cacheKey = String(landingSlug || '').trim().toLowerCase();
+  const cacheKey = landingPageCacheKey(landingSlug, cityFilter);
   const cached = pageCache.get(cacheKey);
   if (!forceRefresh && cached && cached.expiresAt > Date.now()) return cached.payload;
   if (forceRefresh) pageCache.delete(cacheKey);
 
+  const city = normalizeLandingCityKey(cityFilter);
+  const cityArg = city && city !== 'all' ? city : '';
   const db = getLegacyDb();
-  const managed = await buildPublicLandingPageManaged(db, landingSlug);
+  const managed = await buildPublicLandingPageManaged(db, landingSlug, cityArg);
   const payload = managed?.sessions?.length
     ? (managed as PublicLandingPageDto)
-    : ((await buildPublicLandingPage(db, landingSlug)) as PublicLandingPageDto | null);
+    : ((await buildPublicLandingPage(db, landingSlug, cityArg)) as PublicLandingPageDto | null);
 
   pageCache.set(cacheKey, { expiresAt: Date.now() + PUBLIC_LANDING_CACHE_MS, payload });
   return payload;

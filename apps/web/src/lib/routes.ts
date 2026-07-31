@@ -58,9 +58,24 @@ export function venueSlug(venue: VenueRouteSource): string {
 }
 
 export function venuePageTemplate(type?: string | null): 'institution' | 'location' {
-  const value = String(type || '').toLowerCase();
-  if (value.includes('location') || value.includes('причал') || value.includes('теплоход')) return 'location';
-  return 'institution';
+  const value = String(type || '')
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, '_');
+  /** session.venueKind / legacy aliases. */
+  if (value === 'institution') return 'institution';
+  if (value === 'location' || value.includes('причал') || value.includes('теплоход')) return 'location';
+  const institutionKinds = new Set([
+    'museum',
+    'art_space',
+    'museum_art_space',
+    'theater',
+    'concert_hall',
+    'bar',
+    'club_bar_restaurant',
+  ]);
+  if (institutionKinds.has(value)) return 'institution';
+  return 'location';
 }
 
 export function venueCatalogHref(template: 'institution' | 'location' = 'institution'): string {

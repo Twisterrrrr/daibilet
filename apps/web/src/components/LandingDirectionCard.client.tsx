@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, MapPin } from 'lucide-react';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { formatPriceFrom, pluralEvents } from '@/lib/format';
+import { resolveLandingCityName } from '@/lib/landing-city';
 import { resolveLandingCardImage } from '@/lib/landing-images';
-import { landingCategoryHref } from '@/lib/landing-routes';
+import { landingCategoryHref, resolveLandingBoundCitySlug } from '@/lib/landing-routes';
 
 export type LandingDirectionCardItem = {
   slug: string;
@@ -64,24 +65,59 @@ function landingBenefit(landing: LandingDirectionCardItem): string {
   return 'Готовый список с ценами, датами и площадками - без долгого поиска по афише.';
 }
 
+function LandingCityBadge({
+  slug,
+  filterCitySlug,
+  showFilterCityBadge,
+}: {
+  slug: string;
+  filterCitySlug?: string | null;
+  showFilterCityBadge?: boolean;
+}) {
+  const boundSlug = resolveLandingBoundCitySlug(slug);
+  const boundName = boundSlug ? resolveLandingCityName(boundSlug) : null;
+  const filterName =
+    !boundName && showFilterCityBadge && filterCitySlug && filterCitySlug !== 'all'
+      ? resolveLandingCityName(filterCitySlug)
+      : null;
+  const cityName = boundName || filterName;
+  if (!cityName) return null;
+  return (
+    <span className="inline-flex w-fit max-w-full items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 text-[10px] font-semibold leading-none text-slate-900 shadow-sm backdrop-blur-sm sm:px-2.5 sm:py-1 sm:text-[11px]">
+      <MapPin className="h-3 w-3 shrink-0 text-primary-700" aria-hidden />
+      <span className="truncate">{cityName}</span>
+    </span>
+  );
+}
+
 /** Та же сущность, что в «Подборки» (`/podborki`): плитка или широкий баннер для city hub. */
 export function LandingDirectionCard({
   landing,
   citySlug,
   variant = 'tile',
   rank,
+  showFilterCityBadge = false,
 }: {
   landing: LandingDirectionCardItem;
   citySlug?: string | null;
   variant?: 'tile' | 'banner';
   /** 1-based порядок в топе запросов (для баннера). */
   rank?: number;
+  /** Show selected-city badge on national landings when catalog is city-filtered. */
+  showFilterCityBadge?: boolean;
 }) {
   const emoji = LANDING_EMOJI[landing.slug] || '✨';
   const imageUrl = resolveLandingCardImage(landing.slug);
   const href = landingCategoryHref(landing.slug, citySlug && citySlug !== 'all' ? citySlug : undefined);
   const priceLabel = formatLandingPrice(landing.priceFrom);
   const eventsLabel = pluralEvents(landing.events);
+  const cityBadge = (
+    <LandingCityBadge
+      slug={landing.slug}
+      filterCitySlug={citySlug}
+      showFilterCityBadge={showFilterCityBadge}
+    />
+  );
 
   if (variant === 'banner') {
     return (
@@ -109,9 +145,12 @@ export function LandingDirectionCard({
 
         <div className="relative z-[1] flex w-full flex-col justify-center gap-3 px-5 py-6 sm:px-7 sm:py-7 lg:flex-row lg:items-end lg:justify-between lg:gap-8">
           <div className="min-w-0 max-w-2xl">
-            <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-white/55">
-              {typeof rank === 'number' ? `Топ-запрос · ${String(rank).padStart(2, '0')}` : 'Топ-запрос'}
-            </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-white/55">
+                {typeof rank === 'number' ? `Топ-запрос · ${String(rank).padStart(2, '0')}` : 'Топ-запрос'}
+              </p>
+              {cityBadge}
+            </div>
             <h3 className="font-display mt-1.5 text-2xl font-bold tracking-tight text-white sm:text-3xl">{landing.title}</h3>
             <p className="mt-2 max-w-xl text-sm leading-6 text-white/80 sm:text-[0.95rem]">{landingBenefit(landing)}</p>
             <p className="mt-3 text-sm font-semibold text-white/90">
@@ -148,6 +187,7 @@ export function LandingDirectionCard({
         <div className={`absolute inset-0 bg-gradient-to-br ${landingGradient(landing.slug)} opacity-90`} />
       )}
       <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/5" />
+      {cityBadge ? <div className="absolute left-2 top-2 z-[2] sm:left-3 sm:top-3">{cityBadge}</div> : null}
       <div className="relative z-[1] p-4 text-white sm:p-5">
         <span className="text-xl" aria-hidden>
           {emoji}

@@ -71,6 +71,11 @@ import {
 import { pickCatalogSubcategories } from './public-catalog.mapper.ts';
 import { buildPublicLandings as buildPublicLandingsFromSessions } from './public-city-landings.ts';
 import {
+  LANDING_PAGE_SESSION_LIMIT,
+  scopePublicCatalogSessions,
+  selectLandingPageSessions,
+} from './public-landing-page-sessions.ts';
+import {
   canonicalSessionPierKey,
   dedupeCrossSourceCatalogSessions,
   isPublicSessionPurchaseBlocked,
@@ -3881,16 +3886,7 @@ const PROMO_CITY_LANDING_BOOSTS = {
   'москва': ['moscow-dinner-boat', 'moscow-museums'],
 };
 
-function scopePublicCatalogSessions(sessions, cityFilter) {
-  const key = String(cityFilter || '').trim().toLowerCase();
-  if (!key || key === 'all') return sessions;
-  return sessions.filter((session) => {
-    const cityName = String(session.city || '').toLowerCase();
-    const destination = String(session.destination || '').toLowerCase();
-    const citySlug = String(session.citySlug || session.sourceCitySlug || '').toLowerCase();
-    return cityName === key || destination === key || citySlug === key;
-  });
-}
+export { LANDING_PAGE_SESSION_LIMIT, scopePublicCatalogSessions, selectLandingPageSessions };
 
 function buildSortedPublicLandings(sessions, cityFilter = '') {
   return sortPromoLandings(
@@ -4177,8 +4173,17 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
       Boolean(String(venue.address || '').trim()) &&
       Boolean(String(venue.description || venue.shortDescription || '').trim());
     const status = String(venue.pageStatus || '').toUpperCase();
-    const isLocationPage = publicVenuePageTemplate(resolvePublicVenueKindFromRow(venue)) === 'location';
-    if (!(isLocationPage && hasProfile && status !== 'NONE' && status !== 'HIDDEN')) {
+    const pageTemplate = publicVenuePageTemplate(resolvePublicVenueKindFromRow(venue));
+    const isLocationPage = pageTemplate === 'location';
+    // CF.P2: museum/theatre admission can exist without event sessions in catalog.
+    const allowAdmissionOnlyInstitution =
+      pageTemplate === 'institution' && hasProfile && status === 'PUBLISHED';
+    if (
+      !(
+        (isLocationPage && hasProfile && status !== 'NONE' && status !== 'HIDDEN') ||
+        allowAdmissionOnlyInstitution
+      )
+    ) {
       return null;
     }
   }
@@ -4263,6 +4268,11 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
       name: normalizedVenue.name,
       title: normalizedVenue.name,
       city: normalizedVenue.city || 'Не указан',
+      citySlug:
+        normalizeNullableString(canonicalVenue.citySlug) ||
+        (normalizedVenue.city && normalizedVenue.city !== 'Не указан' ? publicCitySlug(normalizedVenue.city) : null),
+      regionSlug: normalizeNullableString(canonicalVenue.regionSlug),
+      regionTitle: normalizeNullableString(canonicalVenue.regionTitle),
       address: normalizedVenue.address,
       latitude: venueCoordinates?.latitude ?? null,
       longitude: venueCoordinates?.longitude ?? null,
@@ -4346,14 +4356,17 @@ export async function buildPublicCityPage(db, citySlugOrId) {
   };
 }
 
-export async function buildPublicLandingPage(db, landingSlug) {
+export async function buildPublicLandingPage(db, landingSlug, cityFilter = '') {
   const rule = resolveLandingRuleBySlug(landingSlug);
   if (!rule) return null;
 
   const catalogSessions = await publicCatalogSessions(db);
-  const matchedSessions = filterSessionsForLandingRule(catalogSessions, rule);
-  // Lean SSR: same card budget as managed path - avoid dumping full catalog into HTML/RSC.
-  const sessions = matchedSessions.slice(0, 48).map((session) => toPublicCatalogListItem(session));
+  const { matchedSessions, pageSessions, matchCount } = selectLandingPageSessions(
+    filterSessionsForLandingRule(catalogSessions, rule),
+    cityFilter,
+  );
+  // Lean SSR: city-scoped first, then card budget - avoid national top-N starving city URLs.
+  const sessions = pageSessions.map((session) => toPublicCatalogListItem(session));
   const prices = matchedSessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const cities = countBy(matchedSessions.map((event) => event.destination || event.city).filter(Boolean));
   const categories = countBy(matchedSessions.map((event) => event.category).filter(Boolean));
@@ -4367,11 +4380,11 @@ export async function buildPublicLandingPage(db, landingSlug) {
       subtitle: rule.subtitle,
       city: rule.city || null,
       chips: rule.chips || [],
-      events: matchedSessions.length,
+      events: matchCount,
       venues: Object.keys(venues).length,
       priceFrom: prices.length ? Math.min(...prices) : null,
       imageUrl: null,
-      strength: matchedSessions.length >= 20 ? 'ready' : matchedSessions.length > 0 ? 'seed' : 'empty',
+      strength: matchCount >= 20 ? 'ready' : matchCount > 0 ? 'seed' : 'empty',
       seoTitle: `${rule.title}: афиша, расписание и билеты | Дайбилет`,
       seoDescription: `${rule.subtitle}. Табличный выбор по датам, городам, площадкам и цене.`,
     },
@@ -4379,8 +4392,8 @@ export async function buildPublicLandingPage(db, landingSlug) {
     relatedLandings: buildPublicLandings(sessions).filter((landing) => landing.slug !== rule.slug && landing.events > 0),
     blocks: buildDefaultLandingBlocks(rule, sessions),
     stats: {
-      events: matchedSessions.length,
-      sessions: matchedSessions.length,
+      events: matchCount,
+      sessions: matchCount,
       cities,
       categories,
       venues,
@@ -4390,7 +4403,7 @@ export async function buildPublicLandingPage(db, landingSlug) {
   };
 }
 
-export async function buildPublicLandingPageManaged(db, landingSlug) {
+export async function buildPublicLandingPageManaged(db, landingSlug, cityFilter = '') {
   const rule = resolveLandingRuleBySlug(landingSlug);
   if (!rule) return null;
 
@@ -4436,19 +4449,21 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
   const pinnedIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'PINNED').map((row) => row.eventId));
   const excludedIds = new Set(manualRows.filter((row) => row.reasons?.manualStatus === 'EXCLUDED').map((row) => row.eventId));
   const manualByEventId = new Map(manualRows.map((row) => [row.eventId, row]));
-  const sessions = catalogSessions
+  const ruleMatchedSessions = catalogSessions
     .filter((session) => {
       const ids = sessionGroupIds(session);
       if (ids.some((id) => excludedIds.has(id))) return false;
       if (ids.some((id) => pinnedIds.has(id))) return true;
       return matchesLandingRule(session, rule) && sessionMatchesLandingSchedule(session, rule);
     })
-    .slice(0, 48)
     .map((session) => {
       const pinned = sessionGroupIds(session).some((id) => pinnedIds.has(id));
-      const scheduled = pinned ? session : applyLandingScheduleToSession(session, rule);
+      return pinned ? session : applyLandingScheduleToSession(session, rule) || session;
+    });
+  const { matchedSessions, pageSessions, matchCount } = selectLandingPageSessions(ruleMatchedSessions, cityFilter);
+  const sessions = pageSessions.map((session) => {
       const base = {
-        ...(scheduled || session),
+        ...session,
         manualLandingStatus: sessionGroupIds(session).map((id) => manualByEventId.get(id)?.reasons?.manualStatus).find(Boolean) || null,
       };
       // Lean SSR card for landing grids (keeps purchase URLs for CTA; truncates slots/description).
@@ -4457,10 +4472,10 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
         manualLandingStatus: base.manualLandingStatus,
       };
     });
-  const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
-  const cities = countBy(sessions.map((event) => event.destination || event.city).filter(Boolean));
-  const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
-  const venues = countBy(sessions.map((event) => event.venue).filter(Boolean));
+  const prices = matchedSessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
+  const cities = countBy(matchedSessions.map((event) => event.destination || event.city).filter(Boolean));
+  const categories = countBy(matchedSessions.map((event) => event.category).filter(Boolean));
+  const venues = countBy(matchedSessions.map((event) => event.venue).filter(Boolean));
   const landing = mapLandingRecord(landingRecord, rule);
   const seo = mapLandingSeo(landingRecord, rule);
 
@@ -4473,11 +4488,11 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
       subtitle: landing.subtitle,
       city: rule.city || null,
       chips: rule.chips || [],
-      events: sessions.length,
+      events: matchCount,
       venues: Object.keys(venues).length,
       priceFrom: prices.length ? Math.min(...prices) : null,
       imageUrl: null,
-      strength: sessions.length >= 20 ? 'ready' : sessions.length > 0 ? 'seed' : 'empty',
+      strength: matchCount >= 20 ? 'ready' : matchCount > 0 ? 'seed' : 'empty',
       seoH1: seo.h1,
       seoTitle: seo.title,
       seoDescription: seo.description,
@@ -4488,8 +4503,8 @@ export async function buildPublicLandingPageManaged(db, landingSlug) {
     relatedLandings: buildPublicLandings(sessions).filter((landingItem) => landingItem.slug !== rule.slug && landingItem.events > 0),
     blocks: blockRows.length ? blockRows.map(mapLandingBlock) : buildDefaultLandingBlocks(rule, sessions),
     stats: {
-      events: sessions.length,
-      sessions: sessions.length,
+      events: matchCount,
+      sessions: matchCount,
       cities,
       categories,
       venues,
@@ -6134,9 +6149,13 @@ const PUBLIC_VENUE_ROW_SELECT = `
     venue."parkingInfo",
     venue.kind,
     venue."pageStatus",
-    city.title as city
+    city.title as city,
+    city.slug as "citySlug",
+    region.slug as "regionSlug",
+    region.title as "regionTitle"
   from "Venue" venue
   left join "City" city on city.id = venue."cityId"
+  left join "Region" region on region.id = city."regionId"
 `;
 
 async function resolvePublicVenueRow(db, venueSlugOrId) {
@@ -6585,7 +6604,49 @@ async function venueRows(db, limit, options = {}) {
 
 const PUBLIC_VENUE_HUB_EXCLUDED_KINDS = new Set(['MEETING_POINT', 'ONLINE']);
 
-const INSTITUTION_VENUE_KINDS = new Set(['MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'BAR']);
+const INSTITUTION_VENUE_KINDS = new Set([
+  'MUSEUM_ART_SPACE',
+  'MUSEUM',
+  'ART_SPACE',
+  'THEATER',
+  'CONCERT_HALL',
+  'CLUB_BAR_RESTAURANT',
+  'BAR',
+]);
+
+/**
+ * Public split MUSEUM_ART_SPACE → museum | art_space (crumbs + catalog ?type=).
+ * DB enum остаётся MUSEUM_ART_SPACE; TODO: Prisma MUSEUM / ART_SPACE + backfill.
+ */
+function classifyMuseumOrArtSpace(name, address, shortDescription, description, idOrSlug) {
+  const text = [name, address, shortDescription, description, idOrSlug].filter(Boolean).join(' ').toLowerCase();
+  // Explicit overrides: Erarta (legacy ART_SPACE) stays art_space despite «Музей» in title.
+  if (/эрарта|\berarta\b|ven_spbboats_erarta/i.test(text)) return 'art_space';
+  if (/музей\s+современного\s+искусств/i.test(text)) return 'art_space';
+  if (/арт[-\s]?пространств|art[-\s]?space|иммерсив|люмьер|глазунов/i.test(text)) return 'art_space';
+  if (/галере/i.test(text) && !/музей|третьяков|эрмитаж|пушкинск|русск(?:ий|ого)\s+музей/i.test(text)) {
+    return 'art_space';
+  }
+  return 'museum';
+}
+
+function finalizeMuseumArtPublicKind(kind, name, address, options = {}) {
+  const key = String(kind || '')
+    .trim()
+    .toLowerCase()
+    .replace(/-/g, '_');
+  if (key === 'museum' || key === 'art_space') return key;
+  if (key === 'museum_art_space') {
+    return classifyMuseumOrArtSpace(
+      name,
+      address,
+      options.shortDescription,
+      options.description,
+      [options.id, options.slug].filter(Boolean).join(' '),
+    );
+  }
+  return key;
+}
 
 function normalizeVenueKindValue(value) {
   return String(value || 'OTHER')
@@ -6849,12 +6910,14 @@ function isBarLikeVenue(name, address) {
 function inferPublicVenueKindFromName(name, address) {
   const text = venueNameAddressText(name, address);
   if (MEETING_POINT_TEXT_RE.test(text)) return 'meeting_point';
-  if (/смотров(?:ая|ой|ую|ые)\s+площадк/i.test(text)) return 'museum_art_space';
+  if (/смотров(?:ая|ой|ую|ые)\s+площадк/i.test(text)) return 'museum';
   if (hasBusLikeText(name, address)) return 'bus';
   if (hasStrongPierLocationText(name, address)) return 'pier';
   if (/турбаз|база отдыха|глэмпинг/i.test(text)) return 'outdoor_location';
   if (/театр|teatr/i.test(text)) return 'theater';
-  if (/музей|галере|выстав/i.test(text)) return 'museum_art_space';
+  if (/музей|галере|выстав|арт[-\s]?пространств|art[-\s]?space|иммерсив/i.test(text)) {
+    return classifyMuseumOrArtSpace(name, address, null, null);
+  }
   if (isBarLikeVenue(name, address)) return 'bar';
   if (/банкет|\bзал\b|hall|концерт|филармони|дворец/i.test(text)) return 'concert_hall';
   if (/клуб|\bclub\b|ресторан|кафе/i.test(text)) return 'club_bar_restaurant';
@@ -6872,7 +6935,7 @@ function canonicalStoredVenueKind(storedKind) {
 function resolvePublicVenueKind(storedKind, name, address, options = {}) {
   const stored = canonicalStoredVenueKind(storedKind);
   const inferred = inferPublicVenueKindFromName(name, address);
-  const { shortDescription, description, waterEvents = 0, busEvents = 0, totalEvents = 0 } = options;
+  const { id, slug, shortDescription, description, waterEvents = 0, busEvents = 0, totalEvents = 0 } = options;
   const text = venueNameAddressText(name, address);
   const busByAllEvents =
     hasBusOnlyEvents(busEvents, totalEvents) && !/teplohod|теплоход|причал|пристань/i.test(text);
@@ -6894,7 +6957,7 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
   if (barOrClub) return barOrClub;
 
   if (isViewingPlatformLikeVenue(name, address, shortDescription, description)) {
-    return 'museum_art_space';
+    return 'museum';
   }
 
   if (
@@ -6908,18 +6971,18 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
   }
 
   if (INSTITUTION_VENUE_KINDS.has(normalizeVenueKindValue(storedKind))) {
-    return stored;
+    return finalizeMuseumArtPublicKind(stored, name, address, { id, slug, shortDescription, description });
   }
 
   if (stored === 'other' || stored === 'venue') {
-    return inferred;
+    return finalizeMuseumArtPublicKind(inferred, name, address, { id, slug, shortDescription, description });
   }
 
   if (stored === 'theater' && inferred !== 'theater') {
-    return inferred;
+    return finalizeMuseumArtPublicKind(inferred, name, address, { id, slug, shortDescription, description });
   }
 
-  return stored;
+  return finalizeMuseumArtPublicKind(stored, name, address, { id, slug, shortDescription, description });
 }
 
 function resolvePublicVenueKindFromRow(row) {
@@ -6930,6 +6993,8 @@ function resolvePublicVenueKindFromRow(row) {
   });
   const storedKind = override?.kind || row.kind || row.proposedKind;
   return resolvePublicVenueKind(storedKind, row.name || row.title, row.address, {
+    id: row.id,
+    slug: row.slug,
     shortDescription: row.shortDescription,
     description: row.description,
     waterEvents: Number(row.waterEvents || 0),
@@ -7067,7 +7132,7 @@ const CITY_HUB_LANDING_SHORT = {
   'country-tours': 'Загород',
   exhibitions: 'Выставки',
   'active-sport': 'Активный',
-  rooftops: 'Крыши',
+  rooftops: 'Смотровые',
   planetarium: 'Планетарий',
   excursions: 'Экскурсии',
   'unusual-theatres': 'Театр',
@@ -7709,13 +7774,14 @@ export async function publicCatalogSessions(db, forceRefresh = false) {
     return cached.sessions;
   }
 
-  // Stale-while-revalidate: serve previous catalog immediately, refresh in background.
-  if (cached?.sessions && now < cached.staleUntil) {
-    void schedulePublicCatalogRebuild(db, 'swr');
+  // INC.504.4: serve ANY previous sessions immediately (even past staleUntil); never await
+  // hard-expire rebuild on the request path - refresh runs in background single-flight.
+  if (cached?.sessions?.length) {
+    void schedulePublicCatalogRebuild(db, now < (cached.staleUntil || 0) ? 'swr' : 'soft-expire');
     return cached.sessions;
   }
 
-  return schedulePublicCatalogRebuild(db, cached?.sessions ? 'hard-expire' : 'cold');
+  return schedulePublicCatalogRebuild(db, 'cold');
 }
 
 function schedulePublicCatalogRebuild(db, reason = 'refresh') {
@@ -8879,8 +8945,7 @@ function filterSessionsForLandingRule(sessions, rule) {
   return sessions
     .filter((session) => matchesLandingRule(session, rule) && sessionMatchesLandingSchedule(session, rule))
     .map((session) => applyLandingScheduleToSession(session, rule))
-    .filter(Boolean)
-    .slice(0, 48);
+    .filter(Boolean);
 }
 
 function resolveLandingSlugsForSession(ruleEvent, sessionDraft, rules = LANDING_RULES) {

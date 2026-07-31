@@ -1,3 +1,483 @@
+## 2026-07-31 - City hero thrash: confirmed overwrite, live restored to 1.1
+
+### Наблюдения
+- Editorial/slot-grid MSK rebuilds снова крутили .next (web stop mid-flight). Заявленный CMV69QaA_nTH1z_YVhn1m уже не live.
+- Паттерн подтверждён: поздние MSK pnpm web:build без git-commit hero-diff откатывают UI, если source на билде старый.
+
+### Решения
+- Source CityPageView.client.tsx + city-night-hero.ts (+ SiteChromeSkeleton через CITY_NIGHT_HERO) синхронизированы local = SPB .16 = MSK /opt/daibilet (md5 match).
+- Live после concurrent slot-grid build: **BUILD_ID=HL2bMp0TxgnzWNKKehZgG**; chunk page-699de4d723a324bd.js: 1024px*1.1 + object-contain, **zero** 1.2.
+- Smoke /cities/saint-petersburg и /cities/moskva = 200 (local+public); nginx cache purged.
+
+### Проблемы
+- Commit hero-fix всё ещё не в git - следующий rebuild с чистого git снова может затереть. Нужен commit + scp source перед любым build.
+
+## 2026-07-31 - EventCard slot pills: 2-col grid distribution
+
+### Наблюдения
+- Owner: пилюли дат («31 июл, 15:00») на карточке при wrap слипались по центру (пара на 1-й строке + одиночный на 2-й).
+- Нужно: на строке с 2+ слотами - равные отступы от краёв; одиночный на строке - по центру.
+
+### Решения
+- `EventCardSlotChips` (compact): `grid grid-cols-2`; последний нечётный - `col-span-2 justify-center`. Wide/nowrap не трогали.
+- Source scp MSK+SPB; rebuild MSK exclusive flock. **BUILD_ID=`HL2bMp0TxgnzWNKKehZgG`**. Editorial/showcase markers сохранены. Без commit.
+
+### Проблемы
+- Риск отката при git-only rebuild без этого diff.
+
+---
+
+## 2026-07-31 - Event page forever-load / 502 (web hung)
+
+### Наблюдения
+- URL `/events/tc-6a3bbc8b78fb6e98b319d8a5-tvoe-daleko-leto-vo-dvore`: public HEAD → **502** (~7с cold), `:3001` connection refused.
+- `daibilet-web` в `deactivating` / MemoryHigh 1.4G; nginx `recv() failed` + `Connection refused` upstream.
+- Перед падением: `Public catalog DTO cache rebuilt (swr): 2619 sessions in 170385ms`; DB `Connection terminated unexpectedly`; orphan `jest-worker` PPID=1 (~96% CPU ×2) от mid-build.
+- Не `no-store`: после подъёма event page `Cache-Control: s-maxage=300`, `x-nextjs-cache` MISS→HIT. Finance на event SSR нет. `public-event-dto-v2` + `revalidate=300` уже на месте.
+
+### Решения
+- `systemctl restart daibilet-web` (после mid-restart `.next` без `prerender-manifest` → crash-loop, пока параллельный build не дописал артефакты).
+- Reap orphan jest-workers PPID=1 cwd `/opt/daibilet` → RAM available 0.98Gi→5.5Gi.
+- Warm URL; `loading.tsx` для `events/[slug]` добавлен в workspace (deploy следующего web build).
+- After: `:3001` cold ~0.94с MISS / warm ~0.014с HIT; public warm ~0.06с HIT. BUILD_ID=`CMV69QaA_nTH1z_YVhn1m`.
+
+### Проблемы
+- INC.504.4: catalog SWR rebuild 170с на event-loop всё ещё launch-risk.
+- Параллельные `next build` на MSK ломают `.next` mid-restart - нужен exclusive lock + reap (PERF.D1).
+
+---
+
+## 2026-07-31 - City night hero: CLS / HTML vs hydrate height mismatch
+
+### Наблюдения
+- Owner: стартовый размер hero в HTML не совпадал с гидратированным Next (прыжок / CLS).
+- Причины: (1) `min-h-[280/320/360]` рос от контента/шрифтов; (2) `SiteChromeSkeleton` / city `loading` / `CityLoadingState` - короткий `py-10` strip vs night shell; (3) `onError` картинки переключал shell на короткий strip без фото.
+
+### Решения
+- Общий `CITY_NIGHT_HERO` (`city-night-hero.ts`): фиксированные `h-[280|320|360]`, imageFrame `1024px*1.1`, `object-contain`.
+- `CityPageView`: layout lock через `nightShell = Boolean(heroImage)` (ошибка PNG не схлопывает высоту).
+- `SiteChromeSkeleton variant="city"` + `cities/[slug]/loading.tsx` + `CityLoadingState` на том же shell.
+- Deploy MSK без commit (SPB build → tar `.next`). **BUILD_ID=`yvt23s2J2qJustslJex5K`**. Local `/cities/saint-petersburg` 200; HTML содержит `h-[280|320|360]` + `1024px*1.1`, без `min-h-[280]`; page chunk `object-contain` + те же классы.
+
+### Проблемы
+- Commit не делали - риск отката git-only rebuild на MSK.
+
+---
+
+## 2026-07-31 - Home FCP: blank 2-3s from useSearchParams CSR bailout
+
+### Наблюдения
+- Owner: открытие daibilet.ru - пауза 2-3с, потом страница. Curl warm `/`: TTFB ~0.15-0.22с, `x-nextjs-cache: HIT`, `s-maxage=300`, nginx HIT - не cold SSR и не nginx wait.
+- HTML ~508KB, но в `<body>` только `BAILOUT_TO_CLIENT_SIDE_RENDERING` + пустой `site-header-spacer`. Контент в RSC scripts; first paint ждал JS (CSR bailout из `useSearchParams` в `SelectedCityProvider`/`SiteHeader` внутри `SiteLayout` Suspense).
+- ISR на `/` уже был; псевдо-HTML = paintable chrome до hydrate, не отдельный static index вне Next.
+
+### Решения
+- `CitySearchParamsBridge` + inner Suspense в `SelectedCityProvider`; убрать `useSearchParams` из `SiteHeader`/`NavigationProgress`.
+- `SiteChromeSkeleton` (бренд «Дайбилет» + pulse) как fallback `SiteLayout` Suspense; `app/loading.tsx` + `cities/[slug]/loading.tsx`.
+- Deploy MSK: source scp + rebuild (конкурирующие `next build` убивали процесс / ломали `.next`; web кратков временно из-за missing `prerender-manifest.json`, восстановлен).
+- After: body сразу `<header>` + logo + skeleton (`aria-busy`); warm TTFB ~0.17-0.22с HIT `s-maxage=300`. BUILD на диске после восстановления `ysb9LiafxuxE8ptQkYg6t`.
+
+### Проблемы
+- Полный SSR main всё ещё за Suspense/`$?` (скелет → контент после JS/stream); 1 residual BAILOUT в hidden slot. Долгосрочно: route-group layout с SiteLayout вне page.
+- Commit не делали - риск отката при следующем git-only rebuild.
+- На MSK параллельные агенты `next build` (PPID=1 workers) - нужен lock/reap (PERF.D1).
+
+---
+
+## 2026-07-31 - City hub top-query counts ≠ city landing
+
+### Наблюдения
+- Баг: хаб Самары «Топ-запросы» показывал standup **4**, family **6→5**, concerts **17**, а city-URL лендинга отдавал другие цифры (часто **1 / 4 / 0**).
+- Root cause: `buildPublicLandingPage*` сначала брал национальный match, потом `slice(0, 48)`, а `finalizeLandingPayload` фильтровал по городу уже урезанный список. Региональные офферы вне national top-48 пропадали из stats/grid.
+- Карточки хаба / `landings-catalog?city=` считали по полному city-scoped rematch - источник правды для count.
+
+### Решения
+- Helper `selectLandingPageSessions` (`public-landing-page-sessions.ts`): **city-scope → затем SSR cap 48**; `stats.events` / `landing.events` = uncapped `matchCount`.
+- API/DTO/`?city=` на `/api/public/landings/:slug`; SSR `fetchLandingPageDto(slug, citySlug)`; client fetch с `?city=`.
+- `finalizeLandingPayload` сохраняет uncapped API stats, если фильтр не отбросил строки.
+- Unit: `select-landing-page-sessions.test.ts`. Deploy MSK: api restart + web **BUILD_ID=`ysb9LiafxuxE8ptQkYg6t`**. Без commit.
+
+### Проблемы
+- Smoke Самара after: hub/catalog/API/HTML standup **4**, family **5**, concerts **17** (совпадают). Pre-fix landing filter from national top-48: ~1 / ~4 / **0**.
+
+---
+
+## 2026-07-31 - City hub hero: restore + harden 110% ultrawide cap
+
+### Наблюдения
+- Owner: фото города на ultrawide снова увеличивалось сильнее +10%.
+- Live MSK chunk (`BUILD vo1CLfHKIo9X2CDMkkHPA`, podborki deploy) содержал `1024px*1.2` + `object-cover` - предыдущий фикс `7uLbKp6GCdnYtn2PkrTGx` (`1.1`) был перезаписан поздним rebuild с устаревшим source на `.184`.
+- На SPB `.16` source уже был `1.1`, на MSK source оставался `1.2`. Дополнительно `object-cover` + `fill`/`h-full` мог апскейлить кадр по высоте hero выше 110% intrinsic.
+
+### Решения
+- `CityPageView.client.tsx`: `w/max-w = min(100%, calc(1024px*1.1))` (без `w-full` сверх cap), `object-contain object-center`, sizes `1126px`, letterbox-градиенты сохранены.
+- Source scp на `.16` + `.184`; build SPB → tar `.next` → MSK; nginx purge; restart `daibilet-web`.
+- **BUILD_ID=`ikMw9FRXSb-HNgZKjaLxM`**. Smoke `/cities/saint-petersburg` 200; live chunk `page-cde89f…` содержит `1024px*1.1` + `object-contain` (нет `1.2`).
+
+### Проблемы
+- Commit не делали. Риск: следующий MSK rebuild из git без этого diff снова откатит - нужен commit или дисциплина scp source перед build.
+
+---
+
+## 2026-07-31 - Finance sprint lock + YooKassa secret on `.159`
+
+### Наблюдения
+- Owner вставил ответы Codex: границы, webhook URL, verify/reconcile, dual-run STUB, ledger MVP, m2m Bearer, return URL, week plan W1-4.
+- Локальный файл `F:\coding\daibilet-repo\.env` отсутствовал; источник - `.env.txt` (SHOP_ID=1424801; SECRET_KEY meta present). Значение секрета не логировали.
+- На `.159` до merge уже были строки YooKassa; Cursor сделал безопасный scp+python merge, `chmod 600`, restart `daibilet-finance-api`, health 200.
+- Egress smoke: `api.yookassa.ru` и `github.com` → HTTP 000, curl exit 28 (Resolving timed out); `nslookup` к `127.0.0.53` - communications error. Health localhost 200.
+- `DAIBILET_YOOKASSA_CHECKOUT` оставлен `0`; `VERIFY_WEBHOOK=0`; STUB=1. Create-payment smoke не запускали.
+- Codex SSH на `.159` не авторизуется - нужен ключ `daibilet_spb_finance` / pubkey от owner.
+
+### Решения
+- Канон зафиксирован в `catalog-finance-projection.md` §11-12, `qa.md`, `Tasktracker` FIN.LC*/W1-4, MIG.9.5.
+- Webhook: `https://finance-api.daibilet.ru/api/checkout/yookassa/webhook`; pay = user surface; dual-webhook skip если не было live payments.
+- Wide catalog CTA out. TC/TEP secrets off finance.
+- Owner blocker: Diligent Polydeuces outbound **443 + DNS**. После green - flip CHECKOUT=1 и Week 1 create-payment.
+
+### Проблемы
+- Egress/DNS с `.159` мёртв - Week 1 blocked несмотря на `SECRET_KEY=<set>`.
+- Локальный путь owner назвал `.env`, фактически `.env.txt` - сверить кабинет ЮKassa (sandbox vs live prefix) без paste в чат.
+
+---
+
+
+
+## 2026-07-31 - INC.504.12: MSK Next hang / nginx 504 (MemoryMax + warm-hub pile-up)
+
+### Наблюдения
+- После SIGKILL restart сайт снова 200. До этого: hung Next (`daibilet-web`), cgroup **MemoryMax ~1.3G / available 0B**, RSS ~1.2G; pile-up `warm-hub-pages.mjs` (cron `*/3` без flock); venue SSR тормозил на finance fetch.
+- Хост MSK `.184`: **7.8Gi RAM**, swap 0. Старые лимиты (High 1100M / Max 1400M / heap 896) были узки для catalog SWR + SSR.
+
+### Решения
+- systemd drop-in `daibilet-web.service.d/memory.conf`: **MemoryHigh=1500M**, **MemoryMax=2G**, heap **1280**, **MemoryAccounting=yes**, **OOMPolicy=continue** (не OOM-kill весь box; unit уже `Restart=always`). Watchdog не ставили (Next без sd_notify).
+- `/etc/cron.d/daibilet-warm-hubs`: **flock -n** `/var/lock/daibilet-warm-hubs.lock` + **timeout 90s** (--kill-after 15s). Скрипт: per-fetch AbortSignal 15s + total deadline 75s. Застрявших процессов на момент фикса не было; smoke warm 12/12 ok.
+- Finance projection: в live chunk было `AbortSignal.timeout(3e3)`; **hot-patch 2500** в `.next/server/chunks/1876.js` + source ts на диске. Полный web rebuild всё ещё желателен, чтобы не потерять патч при следующем деплое из старого артефакта.
+- `.16` не трогали. Commit не делали. Backup: `/root/daibilet-harden-backup-20260731T082459Z`.
+
+### Проблемы
+- Cold venue сразу после restart мог упереться в таймаут curl 20s (после прогрева `/venues/phase-g-test-museum` -> 200 ~0.08s). Постоянные Memory: **High 1.5G / Max 2G / heap 1280** при 7.8Gi host.
+
+
+## 2026-07-31 - Landing matcher: city is filter, not match
+
+### Наблюдения
+- Follow-up после moscow-museums: в `explainLandingRuleMatch` финальный `matches` всё ещё был `… || rule.city` - любой city-scoped rule без blockers и без requiredAny* заливал весь городской inventory.
+- Рискованные правила с `city` и слабым/отсутствующим positive signal: **spb-yards** (только `requiredAnySubcategories` в fast-path, без requiredAnyKeywords/groups) и исторически **moscow-museums** (уже заткнут per-rule). Остальные city-rules уже с required*: bridges-night, moscow-dinner-boat, country-tours.
+
+### Решения
+- Global fix в `landing-rules.ts`: city только сужает (wrong city → blocker); sufficient positive = tags/keywords/required*/venue. `rule.city` убран из финального OR.
+- Unit test `city alone is never a sufficient landing match` для museums/yards/dinner/country/bridges.
+- MSK: `scp landing-rules.ts` + `systemctl restart daibilet-api`. Web rebuild не нужен.
+- Smoke API: moscow-museums **61** (standup 0), bus-tours **48**, country-tours **5**, standup **530**, spb-yards **9**, bridges-night **10**, moscow-dinner-boat **11**, river **136**, rooftops **6**.
+
+### Проблемы
+- Нет: per-rule museum one-off не плодили. Commit по запросу.
+
+## 2026-07-31 - moscow-museums: standup leak
+
+### Наблюдения
+- На `/moscow/moscow-museums` и `GET /api/public/landings/moscow-museums` в выдаче были стендап-шоу (Comedy Hub, «Стендап по-Женски», Гиновян и т.п.).
+- Root cause: в `explainLandingRuleMatch` при отсутствии blockers финальный `matches` = true из‑за `rule.city` даже без тегов/keywords. У `moscow-museums` был `city: Москва`, но не было `requiredAnyKeywords` → весь московский inventory (~699).
+- Теги `Искусство`/`Творчество` в rule.tags расширяли fast-path без музейного сигнала.
+
+### Решения
+- `landing-rules.ts`: `requiredAnyKeywords` (музе/выставк/мастер-класс/галере/экспозиц/эмаль); tags сужены до Музеи/Мастер-класс(ы)/Выставки; `excludeTags` Юмор/Stand up/Комедия/…; `excludeKeywords` стендап/comedy/open mic/юмор/…
+- MSK: `scp landing-rules.ts` + `systemctl restart daibilet-api`. Web rebuild не нужен (листинг с API).
+- Smoke API: events **699→61**, standup в sessions **5→0**; все 48 page sessions museum-ish. Commit не делали.
+
+### Проблемы
+- HubTags/destinations в HTML ещё могут показывать старый count `moscow-museums` (~683) до SWR catalog refresh - на карточки листинга не влияет.
+
+## 2026-07-31 - Erarta art_space override (crumbs)
+
+### Наблюдения
+- Title «Музей современного искусства Эрарта» ловил ветку museum в `classifyMuseumOrArtSpace` (есть «Музей»).
+- Hot `dto.js` чинил только `daibilet-api`; Next бандлит classifier в `.next/server/chunks` - web API/HTML оставались museum до патча чанков + purge ISR.
+
+### Решения
+- Source: override `эрарта|erarta|ven_spbboats_erarta` + `музей современного искусства` → `art_space` (web `venue-meta.ts` + backend `dto.js`, id/slug в finalize).
+- MSK: hot `dto.js` + restart api; hot patch chunks `1592/279/8700`; rm prerender erarta/ermitazh + `revalidateTag(venue-page)` + restart web.
+- Smoke: erarta crumbs `Арт-пространства` / `?type=art_space`; ermitazh `Музеи` / `museum`; pages 200. Full web rebuild не делали (SPB build host отдельно). Finance не трогали.
+
+### Проблемы
+- ISR HIT держал старые HTML до явного удаления `.next/server/app/venues/{erarta,ermitazh}.*`.
+
+## 2026-07-31 - Landing match widen (owner product lock)
+
+### Наблюдения
+- Owner lock: сначала **расширить matching** существующих landings (bus/country/rooftops), hand-smoke; **не** плодить лендинги под один музей/франшизу (Гарри Поттер, Матрёшка и т.п.); **besplatno/бесплатно** не строить; landings = **top search queries**, не inventory dump; city-scoped top-query (стендап в Казани и т.п.) - постепенно после match-fix.
+- Prod: `bus-tours` ~17 vs тысячи с автобусными тегами; `country-tours` (СПб) ~5 vs ~1.5k title-хитов по пригородам; `rooftops` был SPb-only в `LANDING_ALLOWED_CITY_SLUGS`, хотя rule уже national (Москва смотровые).
+
+### Решения
+- `landing-rules.ts` (SoT; dto импортирует):
+  - **bus-tours:** убран `requiredTitleKeywordGroups`; fast path по subcategory/tag + venue hop-on; группы автобусный+экскурсионный в content; exclude трансфер/аэропорт/такси.
+  - **country-tours:** топонимы (Гатчина, Царское, Ораниенбаум, Ломоносов, Стрельна, Репино, …); экскурсионный сигнал `экскурс|тур|выезд|маршрут`; exclude концерт/спектакль/стендап.
+  - **rooftops:** display «Смотровые площадки и крыши»; keywords Москва-Сити; subcategory fast path; exclude автобусные панорамы.
+  - **walking-tours:** лёгкий widen (subcategory/tags + пешая/авторск).
+- Front: снят SPb-only lock `rooftops` из `LANDING_ALLOWED_CITY_SLUGS`; SEO label «Смотровые площадки».
+- Стратегия зафиксирована: top-query landings; no single-museum; no бесплатно; next = city-scoped top queries после smoke.
+
+### Проблемы
+- Matching live на MSK: `scp landing-rules.ts` + `dto.js` + restart `daibilet-api`.
+- Live counts после fix (API `:4000`): bus **17→48**, country **5→5** (в public catalog мало sellable загородных СПб; «~1.5k» было raw title inventory), rooftops **6** (title «Смотровые…»; уже Мск+СПб+Красноярск), walking **46→68** (снят скрытый cap `slice(0,48)` со stats).
+- City-URL `/progulki-po-krysham/moscow` - после web rebuild (`landing-routes` unlock). National matching уже API.
+- Commit не делали (по запросу).
+
+---
+
+## 2026-07-31 - City hub hero: ultrawide upscale 20% → 10%
+
+### Наблюдения
+- City PNG ~1024px на ultrawide при `max-w calc(1024px*1.2)` (+20%) выглядел слишком мыльным.
+
+### Решения
+- `CityPageView.client.tsx`: cap `1024px*1.1` (+10%); side fill slate gradient без изменений.
+- Build SPB `.16` → MSK `.184` **BUILD_ID=`7uLbKp6GCdnYtn2PkrTGx`**; nginx purge + restart `daibilet-web`.
+- Smoke `/cities/saint-petersburg` и `/cities/moskva` = 200; chunk содержит `1024px*1.1`.
+
+### Проблемы
+- Нет. Commit не делали (по запросу).
+
+---
+
+## 2026-07-31 - /podborki: federal landings stay visible for city filter
+
+### Наблюдения
+- Strict `landingMatchesBoundCity` на `/podborki` скрывал MULTI_CITY/national (речные, автобусные, стендап…) при городе в шапке → пустой empty для Казани и др.
+- City-scoped URL уже есть (`/avtobusnye-ekskursii/moscow`); `finalizeLandingPayload` фильтрует сессии по path-city; SelectedCityProvider уже умел менять город на MULTI_CITY path.
+
+### Решения
+- Каталог: refetch `/api/public/landings-catalog?city=` + `mergePodborkiCityCatalogItems` (city-bound ∪ national с ≥1 event в городе).
+- Helpers: `landingMatchesCatalogCity`, `mergePodborkiCityCatalogItems`; тесты в `landing-bound-city.test.ts`.
+- Карточки: href → city-scoped; бейдж города на national при фильтре.
+- SelectedCityProvider: national MULTI_CITY без сегмента города → `replace` на `/{slug}/{city}` из storage (как `?city=` на каталогах).
+- Empty только если нет city-bound и нет national с матчами по городу.
+
+### Проблемы
+- Deploy MSK: build на `.184` → **BUILD_ID=`vo1CLfHKIo9X2CDMkkHPA`**; smoke `/podborki` 200; `landings-catalog?city=moscow|Москва|kazan` непустой. Без commit.
+- Сопутствующий фикс: `scopePublicCatalogSessions` нормализует SEO slug (`moscow`↔`moskva`).
+
+---
+
+## 2026-07-31 - /podborki: city badge + strict header-city filter
+
+### Наблюдения
+- Подборки с `rule.city` / CITY path (`moscow-museums`, `spb-yards`, …) на карточках не отличались от федеральных.
+- `?city=` на `/podborki` раньше пересчитывал лендинги по событиям города (включая MULTI_CITY); owner: при городе в шапке - только имеющиеся по нему city-bound.
+- `/podborki` не был в `CITY_FILTER_PATHS` - хедер не синкал URL.
+
+### Решения
+- Бейдж города на `LandingDirectionCard` (+ featured/trending) через `resolveLandingBoundCitySlug`.
+- Strict filter: выбранный город → только city-scoped / single-city allowlist; национальные скрыты.
+- Empty: «Пока готовых подборок по выбранному городу еще нет» + лёгкий hint с дефисом.
+- `/podborki` в `CITY_FILTER_PATHS` + `SelectedCityProvider` sync как у `/events`.
+
+### Проблемы
+- Для Казани и большинства городов список может быть пустым до появления city-bound посадок - ожидаемо при strict.
+- Deploy MSK: build SPB `.16` → scp `.next` → **BUILD_ID=`wxRQ2b31UHjLd4G3Fu_PY`**; smoke `/podborki` 200.
+
+---
+
+## 2026-07-31 - SPBBOATS seed: Эрмитаж + Эрарта на MSK catalog
+
+### Наблюдения
+- SoT legacy: `F:\coding\SPBBOATS\packages\backend\prisma\seed-venues.ts` (не `D:\coding\…`).
+- В SPb-блоке сида явная арт-площадка: `erarta` (`venueType: ART_SPACE`). Других `GALLERY` в СПб нет.
+- В MSK PG уже был TC-venue `gosudarstvennyi-ermitazh-*` kind=`CONCERT_HALL` CANDIDATE + 34 Event - не трогали.
+- City SoT slug на MSK: `санкт-петербург` (`city_498817`); latin `sankt-peterburg` в таблице отсутствует.
+
+### Решения
+- Upsert catalog venues: `ermitazh` / `erarta`, ids `ven_spbboats_ermitazh` / `ven_spbboats_erarta`, kind `MUSEUM_ART_SPACE`, `PUBLISHED`, `isIndexable=true`.
+- Скрипт: `scripts/ensure-spb-hermitage-erarta-venues.js` (паттерн CF.P2e).
+- Finance / AdmissionProduct / YooKassa: не сидили (контент-сид). `phase-g-test-museum` не меняли.
+- Smoke: API+public HTML 200 на `/venues/ermitazh` и `/venues/erarta`.
+
+### Проблемы
+- `heroImageUrl` пустой (как в SPBBOATS seed `imageUrl: null`) - не битый URL; cover backfill через `ensure-catalog-covers` позже по желанию.
+- Public crumbs для Эрарты = «Музеи» (в title есть «Музей»), хотя legacy type = ART_SPACE.
+
+---
+
+## 2026-07-31 - Venue page slow: no-store SSR + admission-only client refetch
+
+### Наблюдения
+- Report: `/venues/phase-g-test-museum` again slow. Warm before fix: Windows TTFB ~0.17-0.32с, MSK local `:3001` ~0.03с, finance HTTPS ~0.10-0.15с (`FINANCE_API_BASE_URL=https://…` already OK; AbortSignal timeout 3s already).
+- Root: venue/location HTML был `Cache-Control: private, no-store` (Prisma DTO без `unstable_cache`) vs city hubs ISR `s-maxage`. Каждый hit = full SSR; cold catalog rebuild в том же Next-процессе ~11-23с → выбросы TTFB.
+- Доп.: `VenuePageView` client refetch `/api/public/venues/:slug` когда `sessions.length===0` (admission-only) - лишний cold DTO после paint (nginx: page 06:15:25 → API 06:15:31).
+- Memory: next-server ~830-940MB / MemoryMax 1.3G; catalog SWR каждые ~3мин.
+
+### Решения
+- `getCachedPublicVenueDto` (`unstable_cache` tag `venue-page`, revalidate 300) + пустой `generateStaticParams` → route `●` ISR.
+- Venue SSR: `Promise.allSettled` DTO∥finance + hard timeout admission 2.5s (fail-soft); finance fetch timeout 2.5s.
+- Client: skip refetch if `initialPayload?.venue` (в т.ч. 0 sessions).
+- Deploy: build SPB `.16` → MSK **BUILD_ID=`wltP0t9QlQrxpn1a72LW0`**.
+- After: headers `s-maxage=60` (лимит от finance `revalidate:60`) + `x-nextjs-prerender:1`. Cold first Windows TTFB ~15.2с (ISR fill); warm Windows ~0.16-0.19с; MSK public ~0.05-0.07с; local ~5-27ms. Admission slug в HTML есть.
+
+### Проблемы
+- Первый hit после deploy/expire всё ещё может быть 10-20с (cold catalog в web-процессе) - owner: вынести catalog rebuild из request path / shared cache с `daibilet-api`, не держать 2.7k sessions rebuild на critical path venue HTML.
+- `s-maxage=60` вместо 300 из-за finance fetch revalidate - можно поднять finance `next.revalidate` до 300 если admission TTL ок.
+
+---
+
+## 2026-07-31 - Soft-nav click lag (2-3с без transition)
+
+### Наблюдения
+- Owner: клик по Link - 2-3с «тишины» до смены экрана; отдельно от cold `/venues/phase-g-test-museum`.
+- Curl prod: warm HTML/RSC TTFB обычно ~0.15-0.4с (`/`, `/cities/moskva`, `/events`, `/blog`). Venue HTML cold был ~5с, warm ~0.18с (finance timeout 2.5с уже fail-soft).
+- Prefetch dynamic/no-store: `Next-Router-Prefetch: 1` на blog slug → stub ~225B; полный flight только по клику (~100KB+).
+- `prefetch={false}` в коде нет. Sticky city-hub scroll lock 1.2с - только hash-tabs, не глобальные Link.
+- Нет pending UI: App Router держит старый экран до RSC; root `loading.tsx` нельзя - `SiteLayout` внутри page, skeleton снял бы header.
+- `SiteLayout` на каждом page RSC звал сырой `buildPublicDestinationsDto()` (есть `getCachedDestinations`, но layout его не использовал).
+
+### Решения
+- `SiteLayout` → `getCachedDestinations()` (Next Data Cache).
+- `NavigationProgress`: top bar + `cursor: progress` сразу на same-origin `<a>` click.
+- `experimental.staleTimes` dynamic 30s / static 180s - меньше повторных flight на revisit.
+- SEO: SSR HTML/metadata без изменений.
+
+### Проблемы
+- Долгосрочно: вынести `SiteLayout` в shared route-group layout, тогда segment `loading.tsx` сможет менять только `<main>`.
+- Cold venue / finance - зона другого агента; не дублировать deploy поверх их BUILD_ID без merge.
+- **Deploy MSK:** SPB build → scp `.next` → initially `BUILD_ID=Cm6zKdDCV2gLnM4H88VZt`; source patches на диске. Позже другой агент пересобрал → `wxRQ2b31UHjLd4G3Fu_PY`, но `NavigationProgress` / `nav-progress-bar` / `getCachedDestinations` остались в бандле (layout chunk + CSS). Local `:3001` home/events/city 200 warm; venue cold ещё ~7с (не этот фикс).
+
+---
+
+## 2026-07-31 - Venue breadcrumbs IA: admin centers + museum/art_space split
+
+### Наблюдения
+- Owner lock: регион в крошках только для не-адм. центров; Москва/СПб уже major; расширить на все адм. центры (Тула и т.п.).
+- В `City` нет `isAdminCenter` - ориентир `REGION_HUBS` (столица субъекта) + match city к центру `regionSlug`/`regionTitle`.
+- Prisma `VenueKind` один: `MUSEUM_ART_SPACE`. Полный enum-split = миграции на MSK/SPB; для crumbs+`?type=` достаточно public kind.
+- Каталог `/venues` синхронизировал `city` в URL, но `type` жил только в React state - клик по type-крошке не работал.
+
+### Решения
+- `isAdminCenterVenueBreadcrumbCity` + `resolveVenueBreadcrumbRegion`: адм. центры без сегмента области; мелкие города с `regionSlug` - `Главная → Область → Город → Тип → Title`.
+- Public split: `museum` / `art_space` через `classifyMuseumOrArtSpace` (web + dto.js). DB остаётся `MUSEUM_ART_SPACE`. TODO: Prisma `MUSEUM`/`ART_SPACE` + one-time backfill.
+- Примеры: Третьяковка → Музеи; Галерея Ильи Глазунова / Люмьер → Арт-пространства.
+- Type-крошка: `/venues?type=museum&city=…` / `/venues?type=art_space&city=…` (locations аналогично). URL sync `type` в Venues/LocationsCatalogView.
+- Plurals: museum→Музеи, art_space→Арт-пространства.
+- Тесты: cityRegionHub.breadcrumb, venue-meta.museum-art, seo-internal-links (21 pass).
+
+### Проблемы
+- Без Prisma migrate классификация по title - временный слой (явный TODO), не «навсегда-эвристика» как единственный источник истины.
+- Deploy MSK 2026-07-31: build SPB `.16` → tar `.next` → MSK `.184` **BUILD_ID=`wsO4c6SUFXGLWeK2ojk2V`** + hot `dto.js` + restart api/web. Smoke: Glazunov crumbs `Главная → Москва → Арт-пространства` + `/venues?type=art_space&city=Москва`; API `?type=museum|art_space` OK. Finance `.159` не трогали.
+
+---
+
+
+### Наблюдения
+- Catalog API :4000 для phase-g-test-museum уже 200 (dto gate), но Next SSR/HTML был на старом BUILD_ID=cr6GiiddmDKWVErJYCLNj → public /venues/phase-g-test-museum 404.
+- NEXT_PUBLIC_FINANCE_CHECKOUT_BASE_URL на MSK отсутствовал; client resolve падал на default checkout.daibilet.ru (и без static inline process.env.NEXT_PUBLIC_*).
+- Admission-only institution: contentReady инициализировался только от sessions.length → SSR не рендерил layout/CTA при нуле сессий.
+
+### Решения
+- MSK .env: FINANCE_API_BASE_URL=https://finance-api.daibilet.ru, FINANCE_CHECKOUT_BASE_URL=https://pay.daibilet.ru, NEXT_PUBLIC_FINANCE_CHECKOUT_BASE_URL=https://pay.daibilet.ru.
+- Build на SPB .16 с dto gate + finance-projection default/inline pay.daibilet.ru + fix VenuePageView contentReady → Boolean(initialPayload?.venue).
+- Deploy: tar .next → MSK /opt/daibilet/apps/web/.next, nginx cache purge, restart daibilet-web. **MSK BUILD_ID=IMlQ1owRKXfLEBRmnSN_T**.
+- Smoke: /venues/phase-g-test-museum 200, enue-admission + CTA https://pay.daibilet.ru/checkout/admissions/phase-g-test-museum-entry; city moskva 200 с canSell в projection payload.
+
+### Проблемы
+- City hub SSR HTML может не содержать data-block=city-admission (client/editorial path), но canSell и product slug в payload есть. Finance .159 / YooKassa не трогали.## 2026-07-31 - Finance .159: Codex supplier+YooKassa smoke handoff
+
+### Наблюдения
+- Deploy на SPB finance `.159` (`/opt/daibilet-finance/app`): ветка `codex/phase2-finance-supplier`.
+- Remote tip был `0c1e464`; коммит `147eb436` (supplier YooKassa smoke + onboarding writes) не был на origin tip. На сервер залиты patches `0c1e464..147eb436` (offline: у finance нет egress в интернет / GitHub).
+- Deployed SHA на сервере: `c105264` (содержание = серия до `147eb436`; hash другой из-за committer при `git am`).
+- `pnpm db:generate` OK; `db:deploy` OK (pending=0) с `DATABASE_URL` из `.env`.
+- Seed `backend:checkout:seed-stub-admission -- --reset-capacity` OK (`phase-g-test-museum`).
+- Backend typecheck + `supplier:build` OK; nginx reload; API health 200.
+- STUB smoke OK: login supplier-test@daibilet.ru; admissions list; POST stub-purchase -> 201 CONFIRMED; public `/api/checkout/stub` -> 201.
+- YooKassa smoke не выполнен: `YOOKASSA_SECRET_KEY` отсутствует в `.env`; `DAIBILET_YOOKASSA_CHECKOUT` оставлен `0`. Endpoint отвечает `YOOKASSA_CHECKOUT_DISABLED` (ожидаемо).
+- Egress finance `.159`: DNS/TCP наружу FAIL (api.yookassa.ru resolve timeout; 8.8.8.8:53 timeout; 1.1.1.1:443 timeout). Catalog `.184` не трогали.
+
+### Решения
+- Env на finance API: `DAIBILET_STUB_CHECKOUT=1`, `DAIBILET_YOOKASSA_CHECKOUT=0`, `DAIBILET_YOOKASSA_VERIFY_WEBHOOK=0`, `YOOKASSA_SHOP_ID=1424801`, `YOOKASSA_RETURN_BASE_URL=https://supplier.daibilet.ru`; добавлен `USER_JWT_SECRET` (был пуст - login 503).
+- `pnpm-lock.yaml` откатан к `0c1e464` на сервере (offline-compatible; без registry).
+- Catalog MSK / TC/TEP / wide CTA / YooKassa на `.184` - без изменений.
+
+### Проблемы
+- Owner: Timeweb SG Diligent Polydeuces / finance `.159` - outbound TCP 443 -> 0.0.0.0/0 (или YooKassa) + DNS; иначе sandbox YooKassa и git fetch невозможны.
+- Owner: вставить sandbox `YOOKASSA_SECRET_KEY` (test_...) в `/opt/daibilet-finance/app/.env`, затем `DAIBILET_YOOKASSA_CHECKOUT=1`, restart API, smoke yookassa-purchase + при необходимости `pnpm backend:checkout:yookassa:reconcile -- --apply --grace-minutes=0`.
+
+---
+
+## 2026-07-31 - MSK→finance PASS + CF.P2e slug bridge
+
+### Наблюдения
+- Owner открыл Timeweb SG **Fair Snipe**: MSK `.184` egress TCP `80`/`443` → finance `.159`. Ранее self-loop был у **Daring Aquila**.
+- С MSK: TCP `:443` OK; `https://finance-api.daibilet.ru/api/health` → 200 (~0.1–0.3с); DNS OK.
+- `curl https://github.com` с MSK → **200** - egress шире, чем только `.159` (INC.504.1 частично закрыт; полный outbound audit ещё не делали).
+- Было: `FINANCE_API_BASE_URL=http://85.193.80.159` + `FINANCE_API_HOST=finance-api.daibilet.ru` → HTTP Host даёт 301 HTTPS. Стало: `FINANCE_API_BASE_URL=https://finance-api.daibilet.ru`; `FINANCE_API_HOST` закомментирован (не нужен при hostname URL); `FINANCE_CHECKOUT_BASE_URL=https://pay.daibilet.ru`; `daibilet-web`/`daibilet-api` restarted.
+- CF.P2e: в MSK PG не было `Venue.slug=phase-g-test-museum`. Seed: id `ven_phase_g_test_museum_catalog`, city `city_524901`/`moskva`, kind `MUSEUM_ART_SPACE`, `pageStatus=PUBLISHED`, `isIndexable=false`. Скрипт: `scripts/ensure-phase-g-test-museum-venue.js`.
+- Gate `buildPublicVenuePage`: institution без sessions раньше → null. Hotfix `dto.js` на MSK + в repo: PUBLISHED institution с address+description допускается (admission-only). API `:4000` → venue OK. Next `.next` bundle ещё со старым gate → `/venues/phase-g-test-museum` 404 до web rebuild.
+- Smoke city hub `/cities/moskva` (Next `:3001` + public HTTPS): после `revalidate` в RSC есть `phase-g-test-museum-entry`, `checkoutPath`, `canSell`, «Тестовый музей» - finance fetch **не timeout**, projection non-empty. UI-блок `city-admission` за `contentReady` (клиент). Stale Full Route / nginx cache без revalidate может отдавать старый HTML без admission.
+
+### Решения
+- Step 1 network (MSK→finance) **closed**.
+- Env hygiene HTTPS на catalog; deploy-prod-next defaults обновлены на `https://finance-api.daibilet.ru` / `https://pay.daibilet.ru`.
+- CF.P2e DB seed done; venue HTML CTA после следующего web deploy с dto gate.
+
+### Проблемы
+- Next venue page ждёт rebuild (бандл не подхватывает live `dto.js`).
+- CTA URL на клиенте: `resolveAdmissionCheckoutUrl` читает `FINANCE_CHECKOUT_BASE_URL` (не `NEXT_PUBLIC_*`) - в browser может падать на default `checkout.daibilet.ru` (STUB smoke follow-up).
+- YooKassa secrets по-прежнему owner-only.
+
+---
+
+## 2026-07-31 - MSK Timeweb SG: egress self-loop (Daring Aquila)
+
+### Наблюдения
+- MSK→finance `.159` всё ещё **FAIL** (TCP/DNS timeout).
+- В панели Timeweb SG **«Daring Aquila»** = MSK catalog `.184` (имя панели; в каноне хост - Friendly Pheasant).
+- Outbound destination только `201.24.125.184` (self-loop); DNS `:53` тоже на self.
+
+### Решения
+- Нужный egress: TCP `80`/`443` → `85.193.80.159`; DNS `:53` → `0.0.0.0/0`. UFW на finance `.159` OK.
+- Правка SG - **owner action pending**.
+- **Update later 2026-07-31:** owner открыл **Fair Snipe** egress → `.159`; см. запись «MSK→finance PASS» выше. Daring Aquila self-loop - historical.
+
+### Проблемы
+- Catalog projection к finance live не заработает, пока Aquila egress не откроют. *(superseded: Fair Snipe PASS)*
+
+---
+
+## 2026-07-30 - Owner minimum locked (agents closed DNS/TLS)
+
+### Наблюдения
+- Агенты закрыли что могли без секретов и без destroy: DNS A + TLS SAN для `pay` / `supplier` / `finance-api` → `.159` ✅; apex `daibilet.ru` → MSK `.184` ✅.
+- Канон buyer checkout = **`pay.daibilet.ru`** (не `checkout.`); API Host = **`finance-api.daibilet.ru`** (не `finance.`).
+- Owner minimum остаётся: Timeweb allow **MSK→`.159`** (TCP timeout), YooKassa sandbox secrets, webhook decision/register.
+- Старый СПб `.16` нужен только как **build/reserve** до MIG.9.4/.9.6, затем retire (MIG.9.7). Не apex.
+- Catalog venue `phase-g-test-museum` на MSK PG отсутствует; готового seed-скрипта нет → live seed = SSH+DB write = **agent-next**, не трогать MSK из docs-pass.
+
+### Решения
+- Docs sync: Tasktracker MIG.9.0 DNS/TLS ✅; MIG.9.5–9.7 **не** done; [migration-spb-to-msk.md](./migration-spb-to-msk.md) current apex → `.184`; projection/qa/spb-finance-host выровнены на pay/finance-api.
+- CF.P2e = agent-next slug bridge; без invent secrets и без server destroy.
+
+### Проблемы
+- MSK→`.159` сеть и YooKassa credentials - только owner.
+- Default в коде `resolveAdmissionCheckoutUrl` ещё `checkout.daibilet.ru` - на prod задавать `FINANCE_CHECKOUT_BASE_URL=https://pay.daibilet.ru`.
+
+---
+
+## 2026-07-30 - CF.P2 deploy follow-up: MSK↛finance TCP
+
+### Наблюдения
+- [Implement catalog finance P2 UI](1d8013fd-f5b1-4402-90db-d0a6c4822b46): client+UI+MSK env; later web BUILD `1vHgjub` (ultrawide hero) поверх.
+- С MSK `.184` TCP к `.159:80` и `:443` - **timeout** (не nginx Host/301). UFW на `.159` 80/443 open; HTTPS health локально OK.
+- TLS на finance уже есть (certbot: supplier/pay/finance-api); HTTP→HTTPS redirect для этих hostnames.
+- Catalog venue `phase-g-test-museum` в MSK PG по-прежнему нет - slug bridge open.
+
+### Решения
+- Live admission на catalog не заработает без сети MSK→`.159` (Timeweb allow / private net) + slug bridge.
+- После сети: `FINANCE_API_BASE_URL` лучше на `https://finance-api.daibilet.ru` (или HTTP internal vhost без 301), Host/IP-only сейчас бессмысленны при TCP fail.
+
+### Проблемы
+- MSK egress/filter между ВМ Timeweb - тот же класс, что INC.504 outbound DNS.
+
+---
+
 ## 2026-07-30 - Codex CF.P1 contract harden `114dd391`
 
 ### Наблюдения
@@ -6855,5 +7335,23 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 
 ### Проблемы
 - Slug lyumer - техническая транслитерация; display title содержит «Люмьер».
+
+
+
+
+## 2026-07-31 - Finance .159 egress PASS; CHECKOUT=1
+
+### Наблюдения
+- Owner обновил finance SG outbound: UDP 53 → 8.8.8.8; TCP → все адреса (все TCP порты); UDP 53 → все адреса.
+- Re-verify с Diligent Polydeuces 85.193.80.159: https://api.yookassa.ru/v3/payments → **401** (PASS connectivity), dns ~0.004s / total ~0.07s; TCP 443 → 1.1.1.1 OK; /api/health ok.
+- В .env: DAIBILET_YOOKASSA_CHECKOUT=1 (STUB=DAIBILET_STUB_CHECKOUT=1, VERIFY=DAIBILET_YOOKASSA_VERIFY_WEBHOOK=0); YOOKASSA_SECRET_KEY=<set>; systemctl restart daibilet-finance-api → active.
+- Optional phase-g smoke: supplier login OK; POST yookassa-purchase → **YOOKASSA_PAYMENT_FAILED** (shopId/secret mismatch на стороне ЮKassa; egress до API уже жив).
+
+### Решения
+- Week1 checkout flag включён после egress green.
+- Дальше: сверить SHOP_ID/SECRET_KEY с кабинетом ЮKassa (sandbox), затем FIN.LC3 confirmationUrl smoke.
+
+### Проблемы
+- Purchase smoke не дал confirmationUrl: ошибка ключей магазина, не сети.
 
 

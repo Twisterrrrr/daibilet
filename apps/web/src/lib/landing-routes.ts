@@ -61,10 +61,9 @@ export const PRIORITY_LISTING_CITY_SLUGS = [
   'ekaterinburg',
 ] as const;
 
-/** Ограничения городов для узких SEO-посадок. */
+/** Ограничения городов для узких SEO-посадок. rooftops - national (СПб крыши + Мск смотровые). */
 export const LANDING_ALLOWED_CITY_SLUGS: Partial<Record<string, readonly string[]>> = {
   'country-tours': ['saint-petersburg'],
-  rooftops: ['saint-petersburg'],
 };
 
 export const CITY_SCOPED_LANDING_SLUGS = new Set<string>(Object.keys(CITY_LANDING_PATH_BY_SLUG));
@@ -150,6 +149,78 @@ export function isCityScopedLanding(slug: string): boolean {
 export function isLandingCityAllowed(landingSlug: string, citySlug: string): boolean {
   const allowed = LANDING_ALLOWED_CITY_SLUGS[canonicalLandingSlug(landingSlug)];
   return !allowed || allowed.includes(citySlug);
+}
+
+/**
+ * City permanently tied to a landing (CITY-scoped path or single-city allowlist).
+ * Used for card badges and strict `/podborki` city filter.
+ */
+export function resolveLandingBoundCitySlug(landingSlug: string): string | null {
+  const slug = canonicalLandingSlug(landingSlug);
+  if (CITY_SCOPED_LANDING_SLUGS.has(slug)) {
+    return normalizeKnownCitySlug(DEFAULT_CITY_BY_LANDING_SLUG[slug]) || null;
+  }
+  const allowed = LANDING_ALLOWED_CITY_SLUGS[slug];
+  if (allowed?.length === 1) {
+    return normalizeKnownCitySlug(allowed[0]) || null;
+  }
+  return null;
+}
+
+/** True when landing is city-bound and matches the selected header/catalog city. */
+export function landingMatchesBoundCity(landingSlug: string, citySlug: string | null | undefined): boolean {
+  const selected = normalizeKnownCitySlug(citySlug);
+  if (!selected) return false;
+  const bound = resolveLandingBoundCitySlug(landingSlug);
+  return Boolean(bound && bound === selected);
+}
+
+/**
+ * Catalog visibility for a selected city:
+ * - city-bound → only that city;
+ * - national/multi → city allowlist + (≥1 event when `events` is provided).
+ */
+export function landingMatchesCatalogCity(
+  landingSlug: string,
+  citySlug: string | null | undefined,
+  options?: { events?: number },
+): boolean {
+  const selected = normalizeKnownCitySlug(citySlug);
+  if (!selected) return false;
+
+  const bound = resolveLandingBoundCitySlug(landingSlug);
+  if (bound) return bound === selected;
+
+  if (!isLandingCityAllowed(landingSlug, selected)) return false;
+
+  if (options && Object.prototype.hasOwnProperty.call(options, 'events')) {
+    return (options.events ?? 0) > 0;
+  }
+
+  return true;
+}
+
+/** Merge city-scoped API items with city-bound cards from the national SSR list. */
+export function mergePodborkiCityCatalogItems<T extends { slug: string; events: number }>(
+  nationalItems: T[],
+  cityScopedItems: T[],
+  citySlug: string | null | undefined,
+): T[] {
+  const selected = normalizeKnownCitySlug(citySlug);
+  if (!selected) return nationalItems;
+
+  const bySlug = new Map<string, T>();
+  for (const item of cityScopedItems) {
+    if (landingMatchesCatalogCity(item.slug, selected, { events: item.events })) {
+      bySlug.set(item.slug, item);
+    }
+  }
+  for (const item of nationalItems) {
+    if (landingMatchesBoundCity(item.slug, selected) && !bySlug.has(item.slug)) {
+      bySlug.set(item.slug, item);
+    }
+  }
+  return [...bySlug.values()];
 }
 
 export type LandingRouteTarget = {

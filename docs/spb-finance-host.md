@@ -1,8 +1,10 @@
 # СПб / finance host — canonical roles (lock 2026-07-30)
 
-**Обновлено:** 2026-07-30  
+**Обновлено:** 2026-07-31  
 **План миграции:** [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md)  
 **Phase G product:** [phase-2-finance-supplier-blueprint.md](./phase-2-finance-supplier-blueprint.md)
+
+**MSK Timeweb SG:** панель **Fair Snipe** (2026-07-31) - egress TCP `80`/`443` → finance `.159` ✅ (раньше self-loop был у **Daring Aquila** ≈ Friendly Pheasant `.184`). DNS `:53` any рекомендуется. Step 1 network MSK→finance **closed**.
 
 ## Role matrix (canonical)
 
@@ -10,7 +12,7 @@
 |--------|-----|----------|-------------|
 | Friendly Pheasant (МСК) | `201.24.125.184` | catalog / prod | **battle catalog:** public, admin, import, SEO, TC/Teplohod catalog |
 | Intelligent Hoopoe (СПб 4 ГБ) | `213.171.7.16` | post-MIG.8 leftover | **temporary** staging/build/config reserve + migration source → **retire** |
-| Diligent Polydeuces (СПб 8 ГБ) | `85.193.80.159` | Phase 3 partial: finance API + HTTP vhosts (Codex) | **battle finance:** primary finance, supplier LK, buyer checkout |
+| Diligent Polydeuces (СПб 8 ГБ) | `85.193.80.159` | Phase 3: finance API + TLS vhosts (Codex) | **battle finance:** primary finance, supplier LK, buyer checkout (`pay`) |
 
 **Коротко:** `.184` = battle catalog · `.159` = battle finance · `.16` = scaffolding then demolish.
 
@@ -23,16 +25,16 @@ SSH: MSK `daibilet_msk80_key` / `daibilet-msk` · `.16` `daibilet_staging_key` �
 | SSH / UFW | OK; allow 22/80/443; deny public 5432/5437 |
 | docker / nginx / certbot / Node22 / pnpm 11.7 | installed |
 | Paths | `/opt/daibilet-finance`, `/opt/daibilet-staging`, `/opt/daibilet`, `/root/backups` |
-| Git app | `/opt/daibilet-finance/app` · ветка `codex/phase2-finance-supplier` @ `0c1e464` |
+| Git app | `/opt/daibilet-finance/app` · ветка `codex/phase2-finance-supplier` @ `0c1e464` runtime (+ tip `114dd391` contract tests; redeploy optional) |
 | Finance PG | `daibilet-finance-postgres` · `127.0.0.1:5437` · migrations + seed smoke OK |
 | Finance API | systemd `daibilet-finance-api` · `127.0.0.1:4100` · health 200 |
 | Public projection | ✅ `/api/public/admission-products*` / venues / suppliers (+ `/finance/` aliases) |
 | PurchaseProjection | ✅ admin/buyer/supplier read STUB checkout orders |
-| nginx HTTP | `supplier.daibilet.ru` / `checkout.daibilet.ru` / `finance.daibilet.ru` → supplier dist + `/api` → `:4100` |
-| TLS | **нет** (HTTP only; certbot после DNS stub) |
+| nginx HTTP | `supplier` / `pay` / `finance-api` → supplier dist + `/api` → `:4100` |
+| TLS | ✅ Let's Encrypt SAN: `supplier` + `pay` + `finance-api` (cert `supplier.daibilet.ru`); HTTP→HTTPS |
 | Checkout / YooKassa | STUB **on** · YooKassa **off** (shop id/secret missing) |
-| MSK catalog `.184` | не затронут |
-| DNS stub checkout/supplier/finance | ⏳ owner Timeweb (ещё TODO) |
+| MSK catalog `.184` | CF.P1b+P2 live; `FINANCE_API_BASE_URL=https://finance-api.daibilet.ru`; MSK→finance **PASS** (Fair Snipe); CF.P2e venue seeded |
+| DNS stub | ✅ `pay` / `supplier` / `finance-api` → `.159`; `checkout` / `finance` не созданы (не обязательны) |
 
 ---
 
@@ -54,17 +56,17 @@ SSH: MSK `daibilet_msk80_key` / `daibilet-msk` · `.16` `daibilet_staging_key` �
 4. AdmissionProduct CTA → Daibilet checkout; импортные events → provider widget (не YooKassa).
 5. Wide internal sales **запрещены**, пока нет `PurchaseProjection` (admin + buyer + supplier LC).
 
-### Target finance DNS (stub → cutover)
+### Target finance DNS (locked 2026-07-30)
 
-| Hostname | Role |
-|----------|------|
-| **`checkout.daibilet.ru`** | buyer checkout (**primary suggestion**) |
-| `pay.daibilet.ru` | optional alias (открытый вопрос в [qa.md](./qa.md)) |
-| `supplier.daibilet.ru` | ЛК поставщиков |
-| `finance.daibilet.ru` | finance host vhost (уже в nginx HTTP на `.159`) |
-| `finance-api.daibilet.ru` | optional dedicated API |
+| Hostname | Role | DNS+TLS |
+|----------|------|---------|
+| **`pay.daibilet.ru`** | buyer checkout (**канон**) | ✅ A → `.159` · LE SAN |
+| `checkout.daibilet.ru` | optional alias | ❌ не создан (не обязателен) |
+| `supplier.daibilet.ru` | ЛК поставщиков | ✅ |
+| `finance-api.daibilet.ru` | API / projection / webhooks Host | ✅ |
+| `finance.daibilet.ru` | legacy/опциональный vhost | ❌ не создан (не обязателен) |
 
-Apex `daibilet.ru` / `www` / `api` / `admin` каталога остаются на `.184`.
+Apex `daibilet.ru` / `www` / `api` / `admin` каталога остаются на `.184` (не на `.16`).
 
 ---
 

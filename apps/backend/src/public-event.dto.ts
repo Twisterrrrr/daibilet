@@ -1,5 +1,6 @@
 import type { Prisma } from '@daibilet/db';
 import { prisma } from '@daibilet/db';
+import { join } from '@daibilet/db/sql';
 import {
   hasUpcomingOrOpenSchedule,
   isOpenDateCatalogRow,
@@ -504,6 +505,17 @@ function mapSession(
     offerDeeplinkUrl: offer?.deeplinkUrl,
     externalId,
   });
+  // TC meta-group siblings often inherit the representative offer widgetUrl (same event=).
+  // Rebuild from this session's externalId so each slot opens its own TicketsCloud event.
+  const rebuiltPurchaseUrl = buildProviderWidgetUrl({
+    sourceCode,
+    offerSourceCode: offer?.sourceCode,
+    externalId,
+  });
+  const resolvedPurchaseUrl =
+    (providerForSource(sourceCode) === 'TICKETSCLOUD' && rebuiltPurchaseUrl) ||
+    purchase.url ||
+    eventPurchaseUrl;
   const openDate = requestedEvent.kind === 'OPEN_DATE' || session.sourceStatus?.toLowerCase() === 'open_date';
   const wideLifetime = isWideLifetimeSession(session.startsAt, session.endsAt);
   const startsAt = openDate || wideLifetime ? null : normalizeStartsAt(session.startsAt);
@@ -525,8 +537,8 @@ function mapSession(
     sourceStatus: session.sourceStatus,
     priceFrom: displayPriceFrom(session.priceFromRub, offer?.priceRub),
     vacant: session.ticketsVacant,
-    purchaseUrl: purchase.url || eventPurchaseUrl,
-    purchaseReady: purchase.ready || Boolean(eventPurchaseUrl),
+    purchaseUrl: resolvedPurchaseUrl,
+    purchaseReady: purchase.ready || Boolean(resolvedPurchaseUrl),
     purchaseUrlSource: purchase.urlSource,
   };
 }
@@ -721,15 +733,36 @@ async function loadMetaGroupMembers(requestedEvent: EventRecord): Promise<EventR
   )];
   if (!metaIds.length) return [];
 
-  const links = await prisma.eventSourceLink.findMany({
-    where: {
-      metaExternalId: { in: metaIds },
-      eventId: { not: requestedEvent.id },
-    },
-    select: { eventId: true },
-    take: 200,
-  });
-  const eventIds = [...new Set(links.map((link) => link.eventId))];
+  // Critical: do NOT take an arbitrary 200 EventSourceLink rows - for large meta products
+  // (600+ dated TC children) that sample often has zero upcoming sessions, so the event
+  // page shows only the current slug's single slot. Prefer nearest future siblings.
+  const upcomingRows = await prisma.$queryRaw<Array<{ eventId: string }>>`
+    SELECT s."eventId" AS "eventId"
+    FROM "EventSession" s
+    INNER JOIN "EventSourceLink" sl ON sl."eventId" = s."eventId"
+    INNER JOIN "Event" e ON e.id = s."eventId"
+    WHERE sl."metaExternalId" IN (${join(metaIds)})
+      AND e.status NOT IN ('HIDDEN', 'DRAFT')
+      AND s."eventId" <> ${requestedEvent.id}
+      AND (
+        s."startsAt" >= NOW() - INTERVAL '15 minutes'
+        OR (s."endsAt" IS NOT NULL AND s."endsAt" >= NOW())
+      )
+    ORDER BY s."startsAt" ASC NULLS LAST, s.id ASC
+    LIMIT 48
+  `;
+  let eventIds = [...new Set(upcomingRows.map((row) => row.eventId))];
+  if (!eventIds.length) {
+    const links = await prisma.eventSourceLink.findMany({
+      where: {
+        metaExternalId: { in: metaIds },
+        eventId: { not: requestedEvent.id },
+      },
+      select: { eventId: true },
+      take: 48,
+    });
+    eventIds = [...new Set(links.map((link) => link.eventId))];
+  }
   if (!eventIds.length) return [];
 
   return prisma.event.findMany({
