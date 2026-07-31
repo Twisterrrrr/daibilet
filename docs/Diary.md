@@ -8,6 +8,7 @@
 - `must-see-editorial.json` → 312; batch5 артефакт 60; aliases batch5 в enrich.
 - `cityInfo` mustSee заполнен для 10 ключей (в т.ч. `blagoveschensk-amurskaya-oblast`, `kirov-kirovskaya-oblast`, `yoshkar-ola`, `astrahan`).
 - MSK apply: 60 insert; API restart; smoke 10/10 owner HookFact.
+- Commit `378b6e1` → push → SPB build → MSK atomic `.next` **BUILD_ID=`CtYJ2QqOPWHTXK4oaaEZ_`**. Smoke `/cities/astrahan` (mustSee «Астраханский кремль»), `/locations/astrahan-astrahanskiy-kreml`.
 
 ### Проблемы
 - Нет.
