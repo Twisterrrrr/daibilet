@@ -13,6 +13,7 @@ import {
   Waves,
 } from 'lucide-react';
 
+import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { LocationCard } from '@/components/LocationCard.client';
 import { OsmMapEmbed } from '@/components/OsmMapEmbed';
 import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
@@ -191,16 +192,27 @@ export function LocationVenueLayout({
                 ) : null}
               </div>
             ) : null}
-            {hasStopExcursions ? (
-              <div className="mt-6">
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              {hasStopExcursions ? (
                 <a
                   href="#venue-stop-events"
                   className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-6 py-2.5 text-sm font-bold text-emerald-950 hover:bg-emerald-50"
                 >
                   Посмотреть экскурсии
                 </a>
-              </div>
-            ) : null}
+              ) : null}
+              <AddToDayRouteButton
+                variant="dark"
+                venue={{
+                  id: venue.id,
+                  slug: venue.slug,
+                  title: venue.title || venue.name,
+                  city: venue.city,
+                  href: venueHref(venue),
+                  imageUrl: venue.heroImageUrl,
+                }}
+              />
+            </div>
           </div>
         </section>
           {hasMap ? <LocationMapStrip venue={venue} /> : null}
@@ -466,6 +478,18 @@ function LocationVenueSidebar({ venue, relatedVenues }: { venue: PublicVenueDto;
             </button>
           </div>
         ) : null}
+
+        <AddToDayRouteButton
+          className="w-full min-h-12 rounded-2xl px-4 py-3 text-sm"
+          venue={{
+            id: venue.id,
+            slug: venue.slug,
+            title: venue.title || venue.name,
+            city: venue.city,
+            href: venueHref(venue),
+            imageUrl: venue.heroImageUrl,
+          }}
+        />
 
         <button
           type="button"

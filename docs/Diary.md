@@ -1,3 +1,22 @@
+## 2026-07-31 - Geo autolink CLI + «Собери свой день» MVP
+
+### Наблюдения
+- Owner: делать оба ТЗ; Phase A geo CLI сначала, затем Phase B day-route.
+- MSK dry-run `--city=perm`: 143 events, 1 candidate venue с coords/pageStatus (мало coords у must-see) → 1 medium suggest; apply не гоняли.
+
+### Решения
+- CLI `scripts/suggest-venue-route-links.js` + `scripts/lib/venue-route-geo.js`: haversine/bbox, пороги 150/300/500, merge STOP only, никогда не трогает `Event.venueId`, не пишет START/NEARBY_HUB.
+- Unit: `scripts/venue-route-geo.test.mjs`, `apps/web/src/lib/day-route-score.test.ts`.
+- Day-route: localStorage `dayRoute`, `AddToDayRouteButton`, header badge, `/my-day` noindex, `GET /api/day-route/matches` (score 3*STOP+2*start+1*nearby). Без комбо/finance.
+
+### Проблемы
+- У Перми почти нет candidate venues с lat/lng + PUBLISHED/CANDIDATE → dry-run бедный; нужно coords seed / geo Phase C editorial.
+
+### Deploy
+- Commit + push + SPB→MSK (BUILD_ID ниже после smoke).
+
+---
+
 ## 2026-07-31 - Docs: ТЗ geo-autolink + «Собери свой день»
 
 ### Наблюдения

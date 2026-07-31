@@ -19,9 +19,9 @@
 | LE.5b | Hide empty excursion UI on location page (hero 0 + empty block) | Высокий | ✅ `3271bfcb` BUILD `slptXB74NiKJwSUqiCO7t` |
 | LE.6 | Seed Пермь must-see (6 slugs) + cityInfo slug | Средний | ✅ DB MSK 6 rows; cityInfo slug; listing 🚫 без hub-gate deploy |
 | LE.7 | Deploy migrate + контент STOP-связей экскурсий | Высокий | ⏳ |
-| LE.8 | Geo autolink ТЗ → CLI dry-run/apply (пороги 150/300/500, merge STOP, `Event.venueId` не трогать) | Высокий | ⏳ ТЗ [tz-geo-venue-route-autolink.md](./tz-geo-venue-route-autolink.md) |
+| LE.8 | Geo autolink ТЗ → CLI dry-run/apply (пороги 150/300/500, merge STOP, `Event.venueId` не трогать) | Высокий | ✅ CLI + unit + MSK dry-run perm; LE.9 admin UI ещё ⏳ |
 | LE.9 | Admin «Подобрать рядом» + merge apply endpoint (suggest UI) | Средний | ⏳ после LE.8 |
-| DR.1 | «Собери свой день» MVP: кнопка + localStorage + match API (STOP>start>nearby), noindex, без комбо | Высокий | ⏳ ТЗ [tz-soberi-svoy-den.md](./tz-soberi-svoy-den.md); Phase 0 = LE.8 + STOP-наполнение |
+| DR.1 | «Собери свой день» MVP: кнопка + localStorage + match API (STOP>start>nearby), noindex, без комбо | Высокий | ✅ button/storage/match/`/my-day`; STOP-наполнение городов ещё слабо |
 | DR.2 | Day-route Phase 1.5 share `?day=` noindex + Phase 2 auth sync | Средний | ⏳ после DR.1 |
 
 ## Venue kinds: park + monument (2026-07-31)

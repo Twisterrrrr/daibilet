@@ -7,6 +7,7 @@ import { forwardRef, useEffect, useRef, useState } from 'react';
 
 import { CityPicker } from '@/components/CityPicker.client';
 import { DaibiletLogo } from '@/components/DaibiletLogo';
+import { DayRouteBadge } from '@/components/DayRouteBadge.client';
 import { FavoritesPanel } from '@/components/FavoritesPanel.client';
 import { HeaderSearch } from '@/components/HeaderSearch.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
@@ -175,6 +176,8 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               >
                 <HelpCircle className="h-5 w-5" strokeWidth={1.75} />
               </Link>
+
+              <DayRouteBadge />
 
               <button
                 type="button"
