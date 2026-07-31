@@ -72,6 +72,7 @@
 | UX.HERO3f | City hero: 16:9 at `right-[20%]` + leftGrad to photo edge (navy→black) + right soft→navy→black; base `#000c2a` | Критический | ✅ commit `092fa703` MSK `BUILD_ID=r39aqSMuoLnZ4xDmPwZLc` |
 | UX.HERO3g | Owner navy `#0a174b` + mobile equal py; photo edge soft fade (seam navy↔photo) | Критический | ✅ `49d7c616` MSK `BUILD_ID=8DwUkz2XCFh58Z20GVN_p` |
 | UX.HERO3i | Right photo-edge fade ≈ left (~15%) + mobile `pt-16 pb-8` / `sm:pt-20 sm:pb-10` | Критический | ✅ `0cfe8aa2` MSK `BUILD_ID=E_ATa3U0g3Km35xQ8KFac` |
+| UX.HERO3j | Mobile gap after lead before tag/stats/CTA (`mt-5 md:mt-3`) | Высокий | 🔄 commit+deploy |
 
 ## /podborki city filter (2026-07-31)
 

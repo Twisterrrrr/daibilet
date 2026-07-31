@@ -604,10 +604,10 @@ function CityHeroStrip({
       : 'inline-flex items-center rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-primary-800';
 
   const statsClass = nightShell
-    ? 'mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/70'
+    ? 'flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-white/70'
     : editorial
-      ? 'mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500'
-      : 'mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500';
+      ? 'flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-zinc-500'
+      : 'flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-slate-500';
 
   const statsStrongClass = nightShell
     ? 'font-semibold text-white'
@@ -695,52 +695,54 @@ function CityHeroStrip({
           <div className={nightShell ? CITY_NIGHT_HERO.contentInner : 'max-w-2xl'}>
             <h1 className={titleClass}>{city.name}</h1>
             <p className={briefClass}>{brief}</p>
-            {seasonChip ? (
-              <p className={`mt-3 text-sm ${nightShell ? 'text-white/70' : editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-                <span className={seasonChipClass}>
-                  {seasonChip.label}
-                  {seasonChip.monthsHint ? ` (${seasonChip.monthsHint})` : ''}
-                </span>
-              </p>
-            ) : null}
-            <p className={statsClass}>
-              <span className={statsStrongClass}>{pluralEvents(stats.events)}</span>
-              <span aria-hidden="true" className={statsDotClass}>
-                ·
-              </span>
-              <span className={statsStrongClass}>{pluralVenues(stats.venues)}</span>
-            </p>
-            <div className="mt-5 flex flex-wrap gap-3">
-              {primaryTarget.startsWith('#') ? (
-                <a
-                  href={primaryTarget}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    scrollToSection(primaryTarget.replace(/^#/, ''));
-                  }}
-                  className={primaryCtaClass}
-                >
-                  <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  <span>{primaryLabel}</span>
-                </a>
-              ) : (
-                <Link href={primaryTarget} className={primaryCtaClass}>
-                  <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  <span>{primaryLabel}</span>
-                </Link>
-              )}
-              {hasTravel ? (
-                <a
-                  href="#travel"
-                  onClick={(event) => {
-                    event.preventDefault();
-                    scrollToSection('travel');
-                  }}
-                  className={secondaryCtaClass}
-                >
-                  Как добраться
-                </a>
+            <div className="mt-5 md:mt-3">
+              {seasonChip ? (
+                <p className={`text-sm ${nightShell ? 'text-white/70' : editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                  <span className={seasonChipClass}>
+                    {seasonChip.label}
+                    {seasonChip.monthsHint ? ` (${seasonChip.monthsHint})` : ''}
+                  </span>
+                </p>
               ) : null}
+              <p className={`${seasonChip ? 'mt-3 ' : ''}${statsClass}`}>
+                <span className={statsStrongClass}>{pluralEvents(stats.events)}</span>
+                <span aria-hidden="true" className={statsDotClass}>
+                  ·
+                </span>
+                <span className={statsStrongClass}>{pluralVenues(stats.venues)}</span>
+              </p>
+              <div className="mt-5 flex flex-wrap gap-3">
+                {primaryTarget.startsWith('#') ? (
+                  <a
+                    href={primaryTarget}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      scrollToSection(primaryTarget.replace(/^#/, ''));
+                    }}
+                    className={primaryCtaClass}
+                  >
+                    <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span>{primaryLabel}</span>
+                  </a>
+                ) : (
+                  <Link href={primaryTarget} className={primaryCtaClass}>
+                    <Ticket className="h-4 w-4 shrink-0" aria-hidden="true" />
+                    <span>{primaryLabel}</span>
+                  </Link>
+                )}
+                {hasTravel ? (
+                  <a
+                    href="#travel"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      scrollToSection('travel');
+                    }}
+                    className={secondaryCtaClass}
+                  >
+                    Как добраться
+                  </a>
+                ) : null}
+              </div>
             </div>
           </div>
         </div>
@@ -957,7 +959,7 @@ function CityLoadingState({ editorial = false }: { editorial?: boolean }) {
             <div className={`h-10 max-w-md rounded sm:h-12 ${editorial ? 'bg-white/20' : 'bg-white/22'}`} />
             <div className="mt-3 h-4 max-w-xl rounded bg-white/16" />
             <div className="mt-2 h-4 max-w-lg rounded bg-white/12" />
-            <div className="mt-5 flex gap-3">
+            <div className="mt-5 md:mt-3 flex gap-3">
               <div className="h-11 w-44 rounded-lg bg-white/24" />
               <div className="h-11 w-36 rounded-lg bg-white/12" />
             </div>

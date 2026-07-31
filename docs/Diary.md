@@ -1,3 +1,20 @@
+## 2026-07-31 - City hero: mobile gap after lead
+
+### Наблюдения
+- Owner СПб mobile: после brief сразу tag «Белые ночи» - мало воздуха перед tag/stats/CTA.
+
+### Решения
+- Meta-блок (tag+stats+CTA): `mt-5 md:mt-3` после lead; desktop без раздувания.
+- Skeleton `CityLoadingState` + `SiteChromeSkeleton`: CTA row `mt-5 md:mt-3`. Fades/navy/`pt-16` без изменений.
+
+### Проблемы
+- Нет.
+
+### Deploy
+- Commit → push → SPB build → MSK atomic `.next` (BUILD_ID после smoke).
+
+---
+
 ## 2026-07-31 - City hero: right edge fade + mobile top padding
 
 ### Наблюдения

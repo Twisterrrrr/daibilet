@@ -90,7 +90,7 @@ function CityNightHeroSkeleton() {
             <div className="h-10 max-w-md animate-pulse rounded bg-white/22 sm:h-12" />
             <div className="mt-3 h-4 max-w-xl animate-pulse rounded bg-white/16" />
             <div className="mt-2 h-4 max-w-lg animate-pulse rounded bg-white/12" />
-            <div className="mt-5 flex gap-3">
+            <div className="mt-5 md:mt-3 flex gap-3">
               <span className="h-11 w-44 animate-pulse rounded-lg bg-white/24" />
               <span className="h-11 w-36 animate-pulse rounded-lg bg-white/12" />
             </div>
