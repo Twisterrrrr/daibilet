@@ -32,7 +32,8 @@
 - Нет.
 
 ### Deploy
-- Commit + push + SPB→MSK atomic (см. запись после smoke).
+- Commit `cebe4133` → push → SPB build → MSK atomic `.next` **BUILD_ID=`C7lHo3iG3HDEDn8xbDvHt`**.
+- Smoke `/cities/moscow`: grads `#000→#050e28→#0a174b` / right `#0a174b→#050e28→#000`; `#000c2a` отсутствует; flat `#000` base нет.
 
 ---
 
