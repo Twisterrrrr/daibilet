@@ -30,7 +30,8 @@
 - Нет.
 
 ### Deploy
-- Commit `55253504` → push; web deploy вместе с HERO3k.
+- Commit `55253504` → push → SPB build → MSK atomic `.next` **BUILD_ID=`U0vFfMpCCjrvys2yhOxCI`**.
+- Smoke `/cities/saint-petersburg`: `mt-5 md:mt-3`, `pt-16`, `#0a174b`, `city-hero-photo-edge-fade`.
 
 ---
 
