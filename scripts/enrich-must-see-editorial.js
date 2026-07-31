@@ -84,6 +84,26 @@ const CITY_SLUG_ALIASES = {
   penza: ['penza', 'пенза'],
   volgograd: ['volgograd', 'волгоград'],
   arhangelsk: ['arhangelsk', 'arkhangelsk', 'архангельск'],
+  astrahan: ['astrahan', 'astrakhan', 'астрахань'],
+  barnaul: ['barnaul', 'барнаул'],
+  belgorod: ['belgorod', 'белгород'],
+  'blagoveschensk-amurskaya-oblast': [
+    'blagoveschensk-amurskaya-oblast',
+    'blagoveshchensk-amurskaya-oblast',
+    'благовещенск-амурская-область',
+    'благовещенск',
+  ],
+  bryansk: ['bryansk', 'брянск'],
+  ivanovo: ['ivanovo', 'иваново'],
+  'yoshkar-ola': ['yoshkar-ola', 'иошкар-ола', 'йошкар-ола'],
+  kaluga: ['kaluga', 'калуга'],
+  kemerovo: ['kemerovo', 'кемерово'],
+  'kirov-kirovskaya-oblast': [
+    'kirov-kirovskaya-oblast',
+    'kirov',
+    'киров-кировская-область',
+    'киров',
+  ],
 };
 
 const CITY_TITLE_ALIASES = {
@@ -130,6 +150,16 @@ const CITY_TITLE_ALIASES = {
   penza: ['Пенза'],
   volgograd: ['Волгоград'],
   arhangelsk: ['Архангельск'],
+  astrahan: ['Астрахань'],
+  barnaul: ['Барнаул'],
+  belgorod: ['Белгород'],
+  'blagoveschensk-amurskaya-oblast': ['Благовещенск (Амурская область)', 'Благовещенск'],
+  bryansk: ['Брянск'],
+  ivanovo: ['Иваново'],
+  'yoshkar-ola': ['Йошкар-Ола'],
+  kaluga: ['Калуга'],
+  kemerovo: ['Кемерово'],
+  'kirov-kirovskaya-oblast': ['Киров'],
 };
 
 const dryRun = process.argv.includes('--dry-run') || !process.argv.includes('--apply');

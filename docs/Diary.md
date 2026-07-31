@@ -1,3 +1,19 @@
+## 2026-08-01 - Must-see editorial batch5 (10 городов, 60 точек)
+
+### Наблюдения
+- Owner: Астрахань, Барнаул, Белгород, Благовещенск, Брянск, Иваново, Йошкар-Ола, Калуга, Кемерово, Киров (по 6).
+- У всех 10 городов `mustSee` был пустым (только sights) - нужны slug + insert Venue.
+
+### Решения
+- `must-see-editorial.json` → 312; batch5 артефакт 60; aliases batch5 в enrich.
+- `cityInfo` mustSee заполнен для 10 ключей (в т.ч. `blagoveschensk-amurskaya-oblast`, `kirov-kirovskaya-oblast`, `yoshkar-ola`, `astrahan`).
+- MSK apply: 60 insert; API restart; smoke 10/10 owner HookFact.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-01 - Must-see editorial batch4 (12 городов, 72 точки)
 
 ### Наблюдения
