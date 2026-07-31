@@ -26,7 +26,6 @@ import { matchSightAfficheLink, resolveFeaturedDirections } from '@/lib/city-hub
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
-import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
 import { resolveCityInfo, type CityInfoEntry, type CityMustSeeItem } from '@/lib/cityInfo';
 import { isOpenDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import {
@@ -1123,9 +1122,6 @@ function CitySightsSection({
     priceFrom: landing.priceFrom,
   }));
   const titleClass = `font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`;
-  const titleLinkClass = `${titleClass} underline-offset-2 hover:underline ${
-    editorial ? 'hover:text-zinc-700' : 'hover:text-primary-800'
-  }`;
 
   return (
     <section
@@ -1160,7 +1156,6 @@ function CitySightsSection({
                 categories,
                 citySlug,
               });
-              const placeHref = resolveCityPlaceTitleHref(place, venues);
               return (
               <li key={`${place.name}:${index}`} className="flex gap-3">
                 <span
@@ -1171,13 +1166,7 @@ function CitySightsSection({
                   {index + 1}
                 </span>
                 <div>
-                  {placeHref ? (
-                    <Link href={placeHref} className={titleLinkClass}>
-                      {place.name}
-                    </Link>
-                  ) : (
-                    <div className={titleClass}>{place.name}</div>
-                  )}
+                  <div className={titleClass}>{place.name}</div>
                   <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>{place.desc}</p>
                   {afficheLink ? (
                     afficheLink.href.startsWith('#') ? (
