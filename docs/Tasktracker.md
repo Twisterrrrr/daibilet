@@ -68,7 +68,8 @@
 | UX.HERO3b | Mirror strips ~10% image width рядом с фото + fade→transparent; gutters = navy CSS | Критический | ❌ superseded → HERO3c |
 | UX.HERO3c | Golden-ratio city hero: navy `#050a12` + left φ fade + right edge fade + photo ~38.2% right; без зеркал | Критический | ❌ superseded → HERO3d (φ отвергнут владельцем) |
 | UX.HERO3d | City hero: photo ~20% right + opaque left `#000c2a→#000` + right soft 3.5%→navy→black; без зеркал | Критический | ❌ superseded → HERO3e (`md:w-[20%]` = иголка + wrong grad) |
-| UX.HERO3e | City hero: photo `right-[20%]` aspect-[5/4] + leftGrad black→navy under + right gutter 20%; без зеркал | Критический | ✅ commit `1a75ad81` MSK `BUILD_ID=wJR6Y559Vh3KmnXskIdsC` |
+| UX.HERO3e | City hero: photo `right-[20%]` aspect-[5/4] + leftGrad black→navy under + right gutter 20%; без зеркал | Критический | ❌ superseded → HERO3f (5:4 + flat black base отвергнуты owner) |
+| UX.HERO3f | City hero: 16:9 at `right-[20%]` + leftGrad to photo edge (navy→black) + right soft→navy→black; base `#000c2a` | Критический | 🟡 commit/push; MSK deploy in flight |
 
 ## /podborki city filter (2026-07-31)
 
@@ -403,6 +404,7 @@ enue_54cabc2b9cb5385a9f65b95a: 404 hub (MEETING_POINT/NONE) - ensure script + TC
 | CV.7 | Podborki listing: inline buy на плитках | Низкий | ⏳ покупка уже на CHPU landing |
 | CV.8 | Blog: auto related events по тегам статьи | Средний | 🚫 rejected: misfire риск убивает native conversion; только manual `[buy]` / admin field |
 | CV.8a | City hub «Зачем ехать»: related sessions без quality fallback + topic intersect | Высокий | ✅ `matchArticleSessions` empty-on-miss; standup≠tours; tests |
+| CV.8b | City hub cards: bus/river vertical gate (не подсовывать теплоходы в автобусную статью) | Высокий | ✅ exclusive topics + vertical require; tests `moskva-avtobusnaya-obzornaya` |
 | CV.9 | Venue logistics «как найти» (эпик; owner иногда зовёт «Спринт CV.5» - **не** путать с CV.5 discounts) | Высокий | ✅ `714822c` CV.9a-d; OSM→Yandex unify deferred; [venue-logistics-spec.md](./venue-logistics-spec.md); prod = migrate+deploy |
 | CV.9a | Prisma: `Venue.metroStation` / `wayToFind` / `parkingInfo` + migrate | Высокий | ✅ `20260725120000_venue_logistics` |
 | CV.9b | Admin CMS: секция «Логистика» в Next `/admin/venues/[id]` + PATCH (`normalizeVenuePayload` / `updateAdminVenue`); address sync-only readonly | Высокий | ✅ |

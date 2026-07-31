@@ -361,9 +361,32 @@ const SESSION_TOPIC_RE: Array<{ topic: BlogTopicId; re: RegExp }> = [
   { topic: 'standup', re: /стендап|standup|stendap|комик|open\s*mic|открыт(ый|ого)\s+микрофон|юмор/i },
   { topic: 'kids', re: /детск|для\s+детей|семь|0\+|6\+|family|kids/i },
   { topic: 'concerts', re: /концерт|джаз|jazz|музык|рок[- ]?групп/i },
-  { topic: 'river', re: /речн|теплоход|прогулка\s+на\s+воде|каналы/i },
+  { topic: 'river', re: /речн|теплоход|прогулка\s+на\s+воде|каналы|катер|причал|водн/i },
   { topic: 'tours', re: /экскурси|обзорн|автобус|загород|квест|escape|двор|парадн|маршрут/i },
   { topic: 'routes', re: /пешеходн|самостоятельн|маршрут\s+на\s+\d/i },
+];
+
+/**
+ * Вертикали, которые нельзя подмешивать «через» общий tours/routes.
+ * Пример бага: автобусная статья (topic=tours) + речная «обзорная экскурсия» (river+tours)
+ * проходили intersect по tours и показывали теплоходы под автобусным тизером.
+ */
+const EXCLUSIVE_SESSION_TOPICS: ReadonlySet<BlogTopicId> = new Set([
+  'river',
+  'standup',
+  'concerts',
+]);
+
+/** Если статья явно про вертикаль - событие обязано нести тот же сигнал (не только «обзорная/Москва»). */
+const ARTICLE_VERTICAL_REQUIREMENTS: Array<{ articleRe: RegExp; sessionRe: RegExp }> = [
+  {
+    articleRe: /автобус|hop[\s-]?on|двухэтажн/i,
+    sessionRe: /автобус|hop[\s-]?on|hop[\s-]?off|двухэтажн|city\s*tour|yutong|сити\s*тур/i,
+  },
+  {
+    articleRe: /речн|теплоход|ужин\s+на\s+теплоход|москв[еа]-рек|каналы/i,
+    sessionRe: /речн|теплоход|катер|причал|водн|каналы|нева/i,
+  },
 ];
 
 function detectSessionTopics(session: CityHubSessionMatchInput): BlogTopicId[] {
@@ -377,14 +400,46 @@ function detectSessionTopics(session: CityHubSessionMatchInput): BlogTopicId[] {
   return [...found];
 }
 
+function articleHaystack(article: BlogCardDto): string {
+  return [article.slug, article.title, article.tag, article.excerpt].filter(Boolean).join(' ');
+}
+
+function sessionMatchesArticleVertical(article: BlogCardDto, session: CityHubSessionMatchInput): boolean {
+  const articleText = articleHaystack(article);
+  const sessionText = [
+    session.title,
+    session.category,
+    session.venue,
+    ...(session.tags || []),
+    ...(session.subcategories || []),
+  ]
+    .filter(Boolean)
+    .join(' ');
+
+  for (const rule of ARTICLE_VERTICAL_REQUIREMENTS) {
+    if (rule.articleRe.test(articleText) && !rule.sessionRe.test(sessionText)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 /**
  * Если у статьи есть явные темы и у события тоже - требуем пересечение.
  * Иначе стендап может пролезть по слабому keyword (город/«места»).
+ * Exclusive-вертикали (река/стендап/концерт) не проходят «через» общий tours.
  */
 function isSessionTopicCompatible(articleTopics: BlogTopicId[], session: CityHubSessionMatchInput): boolean {
   if (!articleTopics.length) return true;
   const sessionTopics = detectSessionTopics(session);
   if (!sessionTopics.length) return true;
+
+  for (const topic of sessionTopics) {
+    if (EXCLUSIVE_SESSION_TOPICS.has(topic) && !articleTopics.includes(topic)) {
+      return false;
+    }
+  }
+
   return sessionTopics.some((topic) => articleTopics.includes(topic));
 }
 
@@ -394,8 +449,8 @@ function startsAtMs(session: CityHubSessionMatchInput): number {
 }
 
 /**
- * До N сессий хаба под тизер статьи: только keyword + совместимость тем.
- * Без quality fallback: лучше пустой список, чем чужие события (стендап у гайда про экскурсии).
+ * До N сессий хаба под тизер статьи: keyword + совместимость тем + вертикальный сигнал.
+ * Без quality fallback: лучше пустой список, чем чужие события (стендап/река у автобусной статьи).
  * Только уже загруженные sessions города - без новых запросов.
  */
 export function matchArticleSessions<T extends CityHubSessionMatchInput>(
@@ -416,7 +471,12 @@ export function matchArticleSessions<T extends CityHubSessionMatchInput>(
 
   return sessions
     .map((session) => ({ session, score: scoreArticleSession(session, keywords) }))
-    .filter((item) => item.score > 0 && isSessionTopicCompatible(articleTopics, item.session))
+    .filter(
+      (item) =>
+        item.score > 0 &&
+        isSessionTopicCompatible(articleTopics, item.session) &&
+        sessionMatchesArticleVertical(article, item.session),
+    )
     .sort((left, right) => {
       if (right.score !== left.score) return right.score - left.score;
       return startsAtMs(left.session) - startsAtMs(right.session);

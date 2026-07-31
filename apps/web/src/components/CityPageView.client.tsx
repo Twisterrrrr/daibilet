@@ -538,7 +538,7 @@ function CityHeroDefault({
   );
 }
 
-/** HERO3e: aspect photo at right-[20%] + leftGrad under + right gutter; иначе нейтральный strip. */
+/** HERO3f: 16:9 photo at right-[20%] + navy fades from photo edges; иначе нейтральный strip. */
 function CityHeroStrip({
   city,
   stats,
@@ -654,10 +654,10 @@ function CityHeroStrip({
         {nightShell ? (
           <div
             className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-            style={{ backgroundColor: CITY_NIGHT_HERO.navyDeep }}
+            style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
             aria-hidden
           >
-            {/* 1) Full-bleed leftGrad under photo (black→navy). 2) Photo at right-[20%]. 3) Right gutter. */}
+            {/* 1) LeftGrad to photo edge (navy→black left). 2) Photo 16:9 at right-[20%]. 3) Right gutter soft→navy→black. */}
             <div
               className={CITY_NIGHT_HERO.leftFillDesktop}
               style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
@@ -925,7 +925,7 @@ function CityLoadingState({ editorial = false }: { editorial?: boolean }) {
       <section className={CITY_NIGHT_HERO.section} aria-busy="true" aria-label="Загрузка">
         <div
           className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-          style={{ backgroundColor: CITY_NIGHT_HERO.navyDeep }}
+          style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
           aria-hidden
         >
           <div

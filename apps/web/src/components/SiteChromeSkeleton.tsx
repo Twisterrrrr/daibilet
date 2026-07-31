@@ -62,10 +62,10 @@ function CityNightHeroSkeleton() {
       <section className={CITY_NIGHT_HERO.section}>
         <div
           className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
-          style={{ backgroundColor: CITY_NIGHT_HERO.navyDeep }}
+          style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
           aria-hidden
         >
-          {/* HERO3e: leftGrad under → aspect photo at right-[20%] → right gutter. */}
+          {/* HERO3f: leftGrad to photo edge → 16:9 at right-[20%] → right gutter soft→navy→black. */}
           <div
             className={CITY_NIGHT_HERO.leftFillDesktop}
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}

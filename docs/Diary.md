@@ -41,7 +41,7 @@
 - Section/underlay base снова `#000c2a` (не flat black). Skeleton sync.
 
 ### Проблемы
-- Локально готово; **commit/deploy MSK только по просьбе owner**.
+- Owner сказал «давай» - commit + push + MSK deploy в этом прогоне.
 
 ---
 

@@ -251,3 +251,84 @@ test('matchArticleSessions: rejects orthogonal topic even on weak keyword overla
   const matched = matchArticleSessions(article, sessions, 3);
   assert.equal(matched.length, 0);
 });
+
+test('matchArticleSessions: moscow bus guide does not attach river cruises', () => {
+  const article = card({
+    slug: 'moskva-avtobusnaya-obzornaya',
+    title: 'Автобусная обзорная экскурсия по Москве: как выбрать маршрут',
+    excerpt: 'Классика с гидом, Hop-On Hop-Off или вечерний маршрут - как выбрать обзорную экскурсию по Москве.',
+    articleType: 'obzor',
+    citySlug: 'moscow',
+  });
+  const sessions = [
+    {
+      id: 'river-obzor',
+      title: 'Обзорная речная прогулка по центру Москвы',
+      category: 'Речные прогулки',
+      tags: ['речные', 'обзорная'],
+      startsAt: '2026-08-01T12:00:00Z',
+      priceFrom: 900,
+    },
+    {
+      id: 'river-admiral',
+      title: 'Ужин на теплоходе Адмирал',
+      category: 'Речные прогулки',
+      tags: ['теплоход'],
+      startsAt: '2026-08-01T18:00:00Z',
+      priceFrom: 3500,
+    },
+    {
+      id: 'bus-classic',
+      title: 'Автобусная обзорная экскурсия по Москве',
+      category: 'Экскурсии',
+      tags: ['автобусные'],
+      startsAt: '2026-08-02T10:00:00Z',
+      priceFrom: 1200,
+    },
+    {
+      id: 'bus-hop',
+      title: 'Hop-on hop-off двухэтажный автобус по Москве',
+      category: 'Экскурсии',
+      tags: ['автобус'],
+      startsAt: '2026-08-02T11:00:00Z',
+      priceFrom: 2000,
+    },
+  ];
+  const matched = matchArticleSessions(article, sessions, 4);
+  assert.deepEqual(
+    matched.map((s) => s.id),
+    ['bus-classic', 'bus-hop'],
+  );
+});
+
+test('matchArticleSessions: river dinner guide keeps river and rejects bus', () => {
+  const article = card({
+    slug: 'uzhin-na-teplohode-moskva-kak-vybrat',
+    title: 'Ужин на теплоходе в Москве: как выбрать',
+    excerpt: 'Форматы, причалы и цены на ужин с видом на Москву-реку.',
+    citySlug: 'moscow',
+  });
+  const sessions = [
+    {
+      id: 'river-admiral',
+      title: 'Ужин на теплоходе Адмирал',
+      category: 'Речные прогулки',
+      tags: ['теплоход'],
+      startsAt: '2026-08-01T18:00:00Z',
+      priceFrom: 3500,
+    },
+    {
+      id: 'bus-classic',
+      title: 'Автобусная обзорная экскурсия по Москве',
+      category: 'Экскурсии',
+      tags: ['автобусные', 'обзорная'],
+      startsAt: '2026-08-02T10:00:00Z',
+      priceFrom: 1200,
+    },
+  ];
+  const matched = matchArticleSessions(article, sessions, 3);
+  assert.deepEqual(
+    matched.map((s) => s.id),
+    ['river-admiral'],
+  );
+});
