@@ -8,6 +8,7 @@
 - `must-see-editorial.json` → 252; batch4 артефакт 72; aliases batch4 в enrich.
 - `cityInfo.arhangelsk.mustSee` с 6 slug (в т.ч. insert 6 Venue на MSK).
 - MSK apply: 66 update + 6 insert; API restart; smoke 12/12 hookFact owner-тексты.
+- Commit `031cfff` → push → SPB build → MSK atomic `.next` **BUILD_ID=`jv6nKn9t5UJhx8Wsd3_3l`**. Smoke `/cities/arhangelsk` 200 (mustSee «Малые Корелы»), `/locations/tomsk-lagernyy-sad` 200.
 
 ### Проблемы
 - Нет.
