@@ -13,7 +13,8 @@
 - Нет.
 
 ### Deploy
-- Commit → push → SPB build → MSK atomic `.next` (BUILD_ID после smoke).
+- Commit `c2e2f4c4` → push → SPB build → MSK atomic `.next` **BUILD_ID=`yZkioNIzo_sXcC2xFFbmy`**.
+- Smoke `/cities/samara`: no `city-hero-photo-mask`; soft `city-hero-photo-edge-fade`; `#122868` panels; 16:9 / `right-[20%]` / `pt-16`; no `#000000`.
 
 ---
 

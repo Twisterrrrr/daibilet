@@ -76,7 +76,7 @@
 | UX.HERO3k | Real `mask-image` on photo (`.city-hero-photo-mask` in globals.css); drop navy overlay | Критический | ✅ `0db07eb3` MSK **BUILD_ID=`9A0T7hjLeA1YtvBHDt7d8`** |
 | UX.HERO3l | Lighter navy base `#122868` / mid `#0d1f5c`; no `#000` rim stops under mask | Критический | ❌ superseded → HERO3m (wrong: fixed outer rims, not photo seam) |
 | UX.HERO3m | Photo-edge light `#122868` plateau; deepen only toward outer rims; wider ~38% photo mask | Критический | ❌ superseded → HERO3n (mask too wide; mobile bad) |
-| UX.HERO3n | Drop `.city-hero-photo-mask`; soft edge fade md-only ~15%; keep `#122868` panels + pt-16/mt-5/16:9/right-20% | Критический | ⏳ commit+deploy |
+| UX.HERO3n | Drop `.city-hero-photo-mask`; soft edge fade md-only ~15%; keep `#122868` panels + pt-16/mt-5/16:9/right-20% | Критический | ✅ `c2e2f4c4` MSK **BUILD_ID=`yZkioNIzo_sXcC2xFFbmy`** |
 
 ## /podborki city filter (2026-07-31)
 
