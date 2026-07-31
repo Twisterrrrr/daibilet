@@ -3,7 +3,7 @@ import { prisma } from '@daibilet/db';
 import { join } from '@daibilet/db/sql';
 
 import { isUsableCatalogImageUrl, pickFirstUsableEventImageUrl } from './event-image-url.js';
-import { CONTENT_PLACE_STORED_KINDS } from './public-venue-hub-gate.js';
+import { CONTENT_PLACE_DB_KINDS } from './public-venue-hub-gate.js';
 
 /** Non-draft / non-hidden events count for venue list tiles (no session hydrate). */
 export const ACTIVE_VENUE_EVENT_WHERE = {
@@ -84,7 +84,7 @@ export async function fetchLeanPublicVenueRows(
     ];
   }
 
-  const contentKinds = [...CONTENT_PLACE_STORED_KINDS] as VenueKind[];
+  const contentKinds = [...CONTENT_PLACE_DB_KINDS] as VenueKind[];
   const [rows, contentRows] = await Promise.all([
     prisma.venue.findMany({
       where,
