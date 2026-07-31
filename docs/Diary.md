@@ -1,3 +1,16 @@
+## 2026-08-01 - Rostov must-see #6: Центральный рынок
+
+### Наблюдения
+- Owner дослал 6-ю точку Ростова: `rostov-na-donu-tsentral-nyy-rynok-staryy-bazar` (ранее batch2 был 5/6).
+
+### Решения
+- Добавлен editorial в `must-see-editorial.json` / batch2; MSK apply + API restart; база 123.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-07-31 - Must-see editorial batch2 (9 городов, 53 точки)
 
 ### Наблюдения

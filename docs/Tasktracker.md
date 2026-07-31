@@ -41,6 +41,7 @@
 | VK.10 | Deploy+restart MSK API (dto hub-gate) + smoke Perm 6 in /locations|/venues | Критический | ⏳ blocker видимости для owner |
 | VK.11 | Editorial enrich must-see top-12 cities (hookFact/about/way/coords/address/metro) | Высокий | ✅ 69 MSK; shortDescription preserve; CMS kind guard; ATTRACTION twins HIDDEN |
 | VK.12 | Editorial enrich batch2: Омск/Уфа/Новгород/Тверь/Краснодар/Сочи/Тюмень/Воронеж/Ростов (53) | Высокий | ✅ 53 update MSK; база 122; shortDescription preserve |
+| VK.12b | Ростов: Центральный рынок (Старый базар) editorial #6 | Средний | ✅ MSK; база 123 |
 
 ## Finance supplier LC smoke (.159) 2026-07-31
 
