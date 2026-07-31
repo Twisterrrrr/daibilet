@@ -27,6 +27,7 @@ import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import { resolveCityInfo, type CityInfoEntry, type CityMustSeeItem } from '@/lib/cityInfo';
+import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
 import { isOpenDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import {
   collectSessionStartsAtTimes,
@@ -537,7 +538,7 @@ function CityHeroDefault({
   );
 }
 
-/** Option A: golden-ratio night skyline when city PNG exists; иначе нейтральный strip. */
+/** HERO3d: ~20% right photo + opaque left midnight fill when city PNG exists; иначе нейтральный strip. */
 function CityHeroStrip({
   city,
   stats,
@@ -656,7 +657,7 @@ function CityHeroStrip({
             style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
             aria-hidden
           >
-            {/* Right φ photo band (full-bleed cover on mobile). Gradients below sit under content z-[1]. */}
+            {/* Right ~20% photo (full-bleed cover on mobile). Gradients under content z-[1]. */}
             <div className={CITY_NIGHT_HERO.photoFrame}>
               {showPhoto ? (
                 <SafeImage
@@ -676,7 +677,7 @@ function CityHeroStrip({
               style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}
             />
             <div
-              className="absolute inset-0 hidden md:block"
+              className={CITY_NIGHT_HERO.leftFillDesktop}
               style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
             />
             <div className="absolute inset-0" style={{ backgroundImage: CITY_NIGHT_HERO.fadeRight }} />
@@ -930,7 +931,7 @@ function CityLoadingState({ editorial = false }: { editorial?: boolean }) {
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}
           />
           <div
-            className="absolute inset-0 hidden md:block"
+            className={CITY_NIGHT_HERO.leftFillDesktop}
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
           />
           <div className="absolute inset-0" style={{ backgroundImage: CITY_NIGHT_HERO.fadeRight }} />
@@ -1156,6 +1157,7 @@ function CitySightsSection({
                 categories,
                 citySlug,
               });
+              const placeHref = resolveCityPlaceTitleHref(place, venues);
               return (
               <li key={`${place.name}:${index}`} className="flex gap-3">
                 <span
@@ -1166,7 +1168,13 @@ function CitySightsSection({
                   {index + 1}
                 </span>
                 <div>
-                  <div className={titleClass}>{place.name}</div>
+                  {placeHref ? (
+                    <Link href={placeHref} className={`${titleClass} underline-offset-2 hover:underline`}>
+                      {place.name}
+                    </Link>
+                  ) : (
+                    <div className={titleClass}>{place.name}</div>
+                  )}
                   <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>{place.desc}</p>
                   {afficheLink ? (
                     afficheLink.href.startsWith('#') ? (

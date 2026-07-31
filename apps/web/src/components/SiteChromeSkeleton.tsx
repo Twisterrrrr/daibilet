@@ -65,14 +65,14 @@ function CityNightHeroSkeleton() {
           style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
           aria-hidden
         >
-          {/* Photo-band placeholder (no mirrors) - match live golden-ratio geometry. */}
+          {/* Photo-band placeholder (no mirrors) - match live HERO3d ~20% geometry. */}
           <div className={`${CITY_NIGHT_HERO.photoFrame} bg-white/[0.06]`} />
           <div
             className="absolute inset-0 md:hidden"
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}
           />
           <div
-            className="absolute inset-0 hidden md:block"
+            className={CITY_NIGHT_HERO.leftFillDesktop}
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
           />
           <div className="absolute inset-0" style={{ backgroundImage: CITY_NIGHT_HERO.fadeRight }} />

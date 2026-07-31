@@ -29,7 +29,8 @@
 | VK.4 | Admin kind options (Vite + Next admin) | Средний | ✅ |
 | VK.5 | City hub copy «Важные места» (не «Важные локации») | Низкий | ⏳ если секция ещё не переименована |
 | VK.6 | Future: park admission (Монрепо и т.п.) - не в MVP catalog/finance mix | Средний | ⚠️ deferred (см. qa.md) |
-| VK.7 | City hub «Главные места»: title → venue/location href | Высокий | ✅ model `href`/`venueSlug`/`locationSlug` + UI Link; SPB Эрмитаж; Пермь slugs + seed script |
+| VK.7 | City hub «Главные места»: title → venue/location href | Высокий | ✅ model + UI Link; SPB Эрмитаж; Пермь 6 slugs |
+| VK.8 | Content places в каталогах /venues|/locations без events | Высокий | ✅ hub gate + lean union + monument≠meeting_point; UI title Link |
 
 ## Finance supplier LC smoke (.159) 2026-07-31
 
@@ -63,7 +64,8 @@
 | UX.HERO2 | CLS: fixed night hero `h-*` + city skeleton/loading match SSR/hydrate | Критический | ✅ MSK `yvt23s2J2qJustslJex5K` (без commit) |
 | UX.HERO3 | Ultrawide sides: mirror ~10% + stretch + navy fade `#0b1220` (не flat crop) | Высокий | ❌ откат: stretch на весь gutter + scrim поверх текста |
 | UX.HERO3b | Mirror strips ~10% image width рядом с фото + fade→transparent; gutters = navy CSS | Критический | ❌ superseded → HERO3c |
-| UX.HERO3c | Golden-ratio city hero: navy `#050a12` + left φ fade + right edge fade + photo ~38.2% right; без зеркал | Критический | ✅ MSK cUv55TBxYLmFcxlC_1Eev (commit f170d747) |
+| UX.HERO3c | Golden-ratio city hero: navy `#050a12` + left φ fade + right edge fade + photo ~38.2% right; без зеркал | Критический | ❌ superseded → HERO3d (φ отвергнут владельцем) |
+| UX.HERO3d | City hero: photo ~20% right + opaque left `#000c2a→#000` + right soft 3.5%→navy→black; без зеркал | Критический | ⏳ owner approve → commit+MSK deploy |
 
 ## /podborki city filter (2026-07-31)
 

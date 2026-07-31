@@ -1,4 +1,36 @@
-## 2026-07-31 - Codex handoff Location↔Excursion + HERO3c
+## 2026-07-31 - City hero HERO3d: 20% photo, midnight `#000c2a`
+
+### Наблюдения
+- Владелец отверг HERO3c golden-ratio (~38.2%): фото должно быть ~20% справа; navy семпла - deep midnight `#000c2a` / `#010d2d`, не teal-ish `#050a12`.
+
+### Решения
+- `CITY_NIGHT_HERO`: photo `md:w-[20%]`, left opaque panel `w-[80%]` (`#000c2a → #000`, без soft fade в фото), right `to left: #000 → #000c2a → transparent 3.5%`; mobile denser left fill.
+- Layers в `CityPageView` / `SiteChromeSkeleton` / loading: base + photo + leftFill + fadeRight; текст `z-[1]`, без scrim. Owner: выкатывай.
+
+### Проблемы
+- Deploy: atomic `.next` swap MSK после commit (см. BUILD_ID в Tasktracker после smoke).
+
+---
+
+## 2026-07-31 - Content places in /venues|/locations hub (0 events)
+
+### Наблюдения
+- Owner: mustSee «Главные места» должны линковаться и **появляться в каталогах** `/venues` (institution) / `/locations` (location) по kind.
+- Каталог строился через `publicVenueHubRows` → `isPublicVenueHub` с `requireEvents` по умолчанию true: CANDIDATE/PUBLISHED парки/памятники/музеи без сессий отфильтровывались.
+- Доп. блокер: `isMeetingPointLikeRow` ловил «памятник» в title даже при CMS kind `MONUMENT`.
+- Lean top-500 по `_count.events` мог не подтягивать zero-event content places.
+
+### Решения
+- Gate: `public-venue-hub-gate.js` - content kinds (park/monument/outdoor/attraction/museum*/theater) + PUBLISHED|CANDIDATE + minimal profile (title + shortDescription|hookFact|description) → hub без events.
+- `isMeetingPointLikeRow`: явный resolved kind ≠ venue/other не считается meeting_point по тексту.
+- Lean fetch: union content DB kinds PUBLISHED|CANDIDATE.
+- Venue page 0 sessions: allow content-place profile без обязательного address.
+- City hub UI: title → `resolveCityPlaceTitleHref` (Link). Explicit slugs: SPB Эрмитаж; Пермь 6; остальные - soft-match по venues города или gap до seed.
+
+### Проблемы
+- Soft-match MSK/др. mustSee без entity slug в cityInfo - нужны seed/CMS; gate готов, как только entity появится.
+
+---
 
 ### Наблюдения
 - Cursor закрыл Location↔Excursion Phase A/B + HERO3c (MSK live `cUv55TBxYLmFcxlC_1Eev`); prod migrate/STOP-контент ещё у Codex/owner.
