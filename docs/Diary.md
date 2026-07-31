@@ -1,3 +1,22 @@
+## 2026-07-31 - City hero: soft photo-edge fade (navy↔photo seam)
+
+### Наблюдения
+- Owner скрин СПб: жёсткий вертикальный шов на левом краю фото (navy панель `#0a174b` стыкуется с фото без blend).
+- LeftGrad/right gutter уже плавные; режется именно кромка самого изображения.
+
+### Решения
+- `CITY_NIGHT_HERO.photoEdgeFade` + `fadePhotoEdges`: overlay на фото (md+), navy→transparent ~12–15% слева и лёгкий fade справа в gutter.
+- Класс-маркер `city-hero-photo-edge-fade` для smoke.
+- Подключено в CityPageView + CityLoadingState + SiteChromeSkeleton. Mobile py / 16:9 / `right-[20%]` / `#0a174b` без отката.
+
+### Проблемы
+- Нет.
+
+### Deploy
+- Commit + push + SPB→MSK atomic (BUILD_ID после smoke).
+
+---
+
 ## 2026-07-31 - City hero mobile: equal top/bottom padding
 
 ### Наблюдения
