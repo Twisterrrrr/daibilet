@@ -25,7 +25,7 @@ export function VenueAdmissionBlock({ products, className = '' }: Props) {
         <div>
           <h2 className="text-xl font-bold text-slate-900">Входные билеты</h2>
           <p className="mt-1 text-sm text-slate-600">
-            Билет без сеанса в афише - отдельная покупка на Дайбилет.
+            Билет без сеанса в афише - покупка на Дайбилет.
           </p>
         </div>
       </div>

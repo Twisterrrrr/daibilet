@@ -3,4 +3,4 @@
 # Install: cp deploy/cron/daibilet-catalog-dto-cache /etc/cron.d/daibilet-catalog-dto-cache && chmod 644 ...
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-*/4 * * * * root mkdir -p /var/lock /var/log/daibilet /opt/daibilet/var/cache && /usr/bin/flock -n /var/lock/daibilet-catalog-dto.lock /usr/bin/timeout --kill-after=15s 180s /usr/bin/env bash -lc 'cd /opt/daibilet && set -a && [ -f .env ] && . ./.env && set +a && DAIBILET_CATALOG_REBUILD_MODE=inline /opt/daibilet/node_modules/.bin/tsx scripts/rebuild-public-catalog-dto-cache.mjs --reason=cron' >>/var/log/daibilet/catalog-dto-cache.log 2>&1
+*/4 * * * * root mkdir -p /var/lock /var/log/daibilet /opt/daibilet/var/cache && /usr/bin/flock -n /var/lock/daibilet-catalog-dto.lock /usr/bin/timeout --kill-after=15s 180s /usr/bin/env bash -lc 'cd /opt/daibilet && set -a && [ -f .env ] && . ./.env && set +a && DAIBILET_CATALOG_REBUILD_MODE=inline /opt/daibilet/apps/backend/node_modules/.bin/tsx scripts/rebuild-public-catalog-dto-cache.mjs --reason=cron' >>/var/log/daibilet/catalog-dto-cache.log 2>&1

@@ -37,9 +37,9 @@ export function CityAdmissionBlock({
             <Landmark className="h-5 w-5" />
           </div>
           <div>
-            <h2 className={headingClass}>Музеи и входные билеты</h2>
+            <h2 className={headingClass}>Музеи и арт-галереи</h2>
             <p className={`mt-1 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-              Открытая дата и вход без сеанса в афише
+              Входные билеты без сеанса в афише
               {cityName ? ` - ${cityName}` : ''}.
               {priceLabel ? ` Цены ${priceLabel}.` : ''}
             </p>

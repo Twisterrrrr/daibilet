@@ -79,16 +79,35 @@ test('shouldShowAdmissionCta: only when canSell true', () => {
   assert.equal(shouldShowAdmissionCta({ canSell: false }), false);
 });
 
+test('mapAdmissionProduct: strips STUB seed shortDescription', () => {
+  const mapped = mapAdmissionProduct({
+    ...sampleProduct,
+    shortDescription: 'Open-date входной билет для проверки STUB checkout.',
+  });
+  assert.ok(mapped);
+  assert.equal(mapped.shortDescription, null);
+});
+
 test('resolveAdmissionCheckoutUrl: absolute and relative', () => {
   assert.equal(
     resolveAdmissionCheckoutUrl('https://checkout.example/path', {}),
     'https://checkout.example/path',
   );
   assert.equal(
+    resolveAdmissionCheckoutUrl('https://checkout.daibilet.ru/checkout/admissions/x', {}),
+    'https://pay.daibilet.ru/checkout/admissions/x',
+  );
+  assert.equal(
     resolveAdmissionCheckoutUrl('/checkout/admissions/x', {
       FINANCE_CHECKOUT_BASE_URL: 'http://85.193.80.159',
     }),
     'http://85.193.80.159/checkout/admissions/x',
+  );
+  assert.equal(
+    resolveAdmissionCheckoutUrl('/checkout/admissions/x', {
+      FINANCE_CHECKOUT_BASE_URL: 'https://checkout.daibilet.ru',
+    }),
+    'https://pay.daibilet.ru/checkout/admissions/x',
   );
   assert.equal(
     resolveAdmissionCheckoutUrl('/checkout/admissions/x', {}),

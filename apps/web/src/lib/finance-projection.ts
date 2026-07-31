@@ -64,6 +64,9 @@ export const CITY_ADMISSION_MIN_PUBLISHED_DEFAULT = 1;
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 
+/** Buyer checkout host (canon). Alias checkout.daibilet.ru is not used. */
+export const FINANCE_CHECKOUT_BASE_URL_DEFAULT = 'https://pay.daibilet.ru';
+
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   return value as Record<string, unknown>;
@@ -86,6 +89,27 @@ function asNumber(value: unknown): number | null {
 
 function asBoolean(value: unknown): boolean {
   return value === true;
+}
+
+/**
+ * Hide finance-seed / internal stub copy from buyer UI.
+ * Seed shortDescription may contain «STUB checkout» - do not invent marketing replacement.
+ */
+export function sanitizeAdmissionShortDescription(
+  value: string | null | undefined,
+): string | null {
+  const text = typeof value === 'string' ? value.trim() : '';
+  if (!text) return null;
+  if (/\bSTUB\b/i.test(text)) return null;
+  return text;
+}
+
+/** Rewrite legacy checkout. host → pay. on absolute URLs. */
+export function normalizeFinanceCheckoutAbsoluteUrl(url: string): string {
+  return url.replace(
+    /^(https?:\/\/)checkout\.daibilet\.ru(?=[:/]|$)/i,
+    `$1pay.daibilet.ru`,
+  );
 }
 
 function mapRef(raw: unknown): FinanceAdmissionRef | null {
@@ -145,7 +169,7 @@ export function mapAdmissionProduct(raw: unknown): FinanceAdmissionProduct | nul
     slug,
     title,
     shortTitle: asString(row.shortTitle),
-    shortDescription: asString(row.shortDescription),
+    shortDescription: sanitizeAdmissionShortDescription(asString(row.shortDescription)),
     imageUrl: asString(row.imageUrl),
     type,
     purchaseFlow: asString(row.purchaseFlow),
@@ -196,7 +220,8 @@ export function shouldShowAdmissionCta(product: Pick<FinanceAdmissionProduct, 'c
 
 /**
  * Resolve checkout URL for browser navigation.
- * Relative checkoutPath → FINANCE_CHECKOUT_BASE_URL (default https://pay.daibilet.ru).
+ * Relative checkoutPath → FINANCE_CHECKOUT_BASE_URL / NEXT_PUBLIC_* (default pay.daibilet.ru).
+ * Absolute legacy checkout.daibilet.ru → rewritten to pay.daibilet.ru.
  */
 export function resolveAdmissionCheckoutUrl(
   checkoutPath: string | null | undefined,
@@ -205,18 +230,19 @@ export function resolveAdmissionCheckoutUrl(
   const path = typeof checkoutPath === 'string' ? checkoutPath.trim() : '';
   if (!path) return null;
 
-  if (/^https?:\/\//i.test(path)) return path;
+  if (/^https?:\/\//i.test(path)) return normalizeFinanceCheckoutAbsoluteUrl(path);
 
   // Direct process.env.NEXT_PUBLIC_* so Next inlines it into client bundles.
   const bakedPublic = process.env.NEXT_PUBLIC_FINANCE_CHECKOUT_BASE_URL;
-  const base = (
+  const baseRaw = (
     env.FINANCE_CHECKOUT_BASE_URL ||
     env.NEXT_PUBLIC_FINANCE_CHECKOUT_BASE_URL ||
     bakedPublic ||
-    'https://pay.daibilet.ru'
+    FINANCE_CHECKOUT_BASE_URL_DEFAULT
   )
     .trim()
     .replace(/\/$/, '');
+  const base = normalizeFinanceCheckoutAbsoluteUrl(baseRaw);
 
   if (!base) return path.startsWith('/') ? path : `/${path}`;
   return `${base}${path.startsWith('/') ? path : `/${path}`}`;

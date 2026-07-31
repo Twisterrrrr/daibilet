@@ -197,7 +197,12 @@ async function awaitCatalogRebuild(reason: string): Promise<PublicSessionDto[]> 
   }
 
   const rebuild = scheduleInlineCatalogRebuild(reason);
-  if (!Number.isFinite(PUBLIC_CATALOG_COLD_AWAIT_MS) || PUBLIC_CATALOG_COLD_AWAIT_MS <= 0) {
+  // Cron/CLI force-refresh must wait for full rebuild; cold request-path stays capped.
+  if (
+    reason === 'force-refresh' ||
+    !Number.isFinite(PUBLIC_CATALOG_COLD_AWAIT_MS) ||
+    PUBLIC_CATALOG_COLD_AWAIT_MS <= 0
+  ) {
     return rebuild;
   }
 
@@ -229,8 +234,8 @@ async function awaitCatalogRebuild(reason: string): Promise<PublicSessionDto[]> 
 function resolveTsxBinary(): string {
   const binName = process.platform === 'win32' ? 'tsx.cmd' : 'tsx';
   const candidates = [
-    path.join(PROJECT_ROOT, 'node_modules', '.bin', binName),
     path.join(PROJECT_ROOT, 'apps', 'backend', 'node_modules', '.bin', binName),
+    path.join(PROJECT_ROOT, 'node_modules', '.bin', binName),
   ];
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) return candidate;

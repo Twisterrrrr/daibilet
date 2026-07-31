@@ -94,6 +94,7 @@ packages/config   — shared tsconfig/eslint
 
 - List DTO lean: без widget URL / полного `upcomingSlots`; slot preview: узкая карточка ≤4 (2×2), широкая ≤3 в ряд, формат `30 июл, 13:20`.
 - Slot hydrate только для запрошенной страницы `limit`, не для всего кэша.
+- **INC.504.4:** full catalog rebuild (~2.6k sessions) **не** на Next request event-loop. Web: `DAIBILET_CATALOG_REBUILD_MODE=child` + disk snapshot `var/cache/public-catalog-dto.json` (cron `*/4` flock / post-TC-sync). Request path: forever soft-SWR (есть sessions → serve stale, background only).
 - Карточки `/events`: без TC/Teplohod widget markup — виджет только на странице события / landing CTA.
 - City/landing SSR: ≤48 lean cards.
 - Redirects: `www` → apex; `/river-cruises` → `/rechnye-progulki`.

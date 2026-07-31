@@ -94,6 +94,16 @@ fi
 if ! grep -q "^FINANCE_CHECKOUT_BASE_URL=" .env 2>/dev/null; then
   echo "FINANCE_CHECKOUT_BASE_URL=https://pay.daibilet.ru" >> .env
 fi
+if ! grep -q "^NEXT_PUBLIC_FINANCE_CHECKOUT_BASE_URL=" .env 2>/dev/null; then
+  echo "NEXT_PUBLIC_FINANCE_CHECKOUT_BASE_URL=https://pay.daibilet.ru" >> .env
+fi
+# Prefer pay host if a leftover checkout. alias is still in .env
+if grep -qE '^FINANCE_CHECKOUT_BASE_URL=.*checkout\.daibilet\.ru' .env 2>/dev/null; then
+  sed -i 's|^FINANCE_CHECKOUT_BASE_URL=.*|FINANCE_CHECKOUT_BASE_URL=https://pay.daibilet.ru|' .env
+fi
+if grep -qE '^NEXT_PUBLIC_FINANCE_CHECKOUT_BASE_URL=.*checkout\.daibilet\.ru' .env 2>/dev/null; then
+  sed -i 's|^NEXT_PUBLIC_FINANCE_CHECKOUT_BASE_URL=.*|NEXT_PUBLIC_FINANCE_CHECKOUT_BASE_URL=https://pay.daibilet.ru|' .env
+fi
 
 # IndexNow (Yandex/Bing): generate once before web restart so EnvironmentFile picks it up.
 if [[ -f .env ]] && ! grep -q '^INDEXNOW_KEY=' .env 2>/dev/null; then

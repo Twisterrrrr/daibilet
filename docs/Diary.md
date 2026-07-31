@@ -57,10 +57,11 @@
 - `dto.js` publicCatalogSessions: soft-expire тоже void schedule (не await hard-expire).
 - `scripts/reap-orphan-jest-workers.sh` + cron */10; systemd web `DAIBILET_CATALOG_REBUILD_MODE=child`.
 - Next подхватит DTO-фикс после web bake (transpilePackages); до bake: reap orphans + cron disk/reap.
+- **MSK live 2026-07-31:** disk snapshot 2622 sessions / 13M; cron catalog-dto + reap-jest; systemd drop-in `DAIBILET_CATALOG_REBUILD_MODE=child`; web bake **BUILD_ID=`GMlh5-uhf-R2iVlZbSFXY`**; smoke `:3001` home warm ~0.07с / events ~0.01с; API forever-SWR via dto.js restart.
 
 ### Проблемы
-- Пока старый Next bundle: inline SWR rebuild в web ещё возможен до redeploy.
 - INC.504.5 (unify dual cache) открыт.
+- Child spawn на cold first-hit после purge всё ещё может ждать disk до `PUBLIC_CATALOG_COLD_AWAIT_MS` (8с) - лучше держать cron disk тёплым.
 
 ---
 
