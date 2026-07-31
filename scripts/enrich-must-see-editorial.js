@@ -62,6 +62,16 @@ const CITY_SLUG_ALIASES = {
   tyumen: ['tyumen', 'тюмень'],
   voronezh: ['voronezh', 'воронеж'],
   'rostov-na-donu': ['rostov-na-donu', 'rostov-on-don', 'ростов-на-дону'],
+  vladivostok: ['vladivostok', 'владивосток'],
+  vologda: ['vologda', 'вологда'],
+  irkutsk: ['irkutsk', 'иркутск'],
+  perm: ['perm', 'permi', 'пермь'],
+  sortavala: ['sortavala', 'сортавала'],
+  saratov: ['saratov', 'саратов'],
+  'ulan-ude': ['ulan-ude', 'улан-удэ', 'улан-уде'],
+  chelyabinsk: ['chelyabinsk', 'челябинск'],
+  ryazan: ['ryazan', 'рязань'],
+  stavropol: ['stavropol', 'ставрополь'],
 };
 
 const CITY_TITLE_ALIASES = {
@@ -86,6 +96,16 @@ const CITY_TITLE_ALIASES = {
   tyumen: ['Тюмень'],
   voronezh: ['Воронеж'],
   'rostov-na-donu': ['Ростов-на-Дону'],
+  vladivostok: ['Владивосток'],
+  vologda: ['Вологда'],
+  irkutsk: ['Иркутск'],
+  perm: ['Пермь'],
+  sortavala: ['Сортавала'],
+  saratov: ['Саратов'],
+  'ulan-ude': ['Улан-Удэ'],
+  chelyabinsk: ['Челябинск'],
+  ryazan: ['Рязань'],
+  stavropol: ['Ставрополь'],
 };
 
 const dryRun = process.argv.includes('--dry-run') || !process.argv.includes('--apply');

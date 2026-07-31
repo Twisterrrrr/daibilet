@@ -1,3 +1,18 @@
+## 2026-08-01 - Must-see editorial batch3 (10 городов, 57 точек)
+
+### Наблюдения
+- Owner: Владивосток(5), Вологда(6), Иркутск(5), Пермь(6), Сортавала(6), Саратов(6), Улан-Удэ(5), Челябинск(6), Рязань(6), Ставрополь(6).
+- У Перми slug без city-prefix (`permskaya-galereya`, `naberezhnaya-kamy`, …).
+
+### Решения
+- `must-see-editorial.json` → 180; batch3 артефакт 57; aliases в enrich-скрипте.
+- MSK apply 57 + API restart.
+
+### Проблемы
+- Локальный workspace временно пропал с диска - re-clone `feat/next-monorepo` @`4bd5df9` перед batch3.
+
+---
+
 ## 2026-08-01 - Rostov must-see #6: Центральный рынок
 
 ### Наблюдения
