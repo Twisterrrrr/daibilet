@@ -1,3 +1,22 @@
+## 2026-07-31 - Location page: hide empty excursion UI
+
+### Наблюдения
+- Owner (скрин «Самарская набережная»): на точке без STOP-экскурсий показывались «0 экскурсий», CTA «Посмотреть экскурсии» и empty-block «Пока нет привязанных…».
+- Nearby («Рядом») - отдельный блок; не путать со stopEvents.
+
+### Решения
+- `LocationVenueLayout.client.tsx` (web): hero count + CTA только при `stopEvents.length` / `stopEventCount` > 0.
+- Секция `#venue-stop-events` рендерится только если есть stopEvents или nearbyEvents; empty state убран.
+- Public-дубль без этого UI не трогали. City hero файлы не трогали.
+
+### Проблемы
+- Нет.
+
+### Deploy
+- (BUILD_ID после SPB→MSK)
+
+---
+
 ## 2026-07-31 - City hero HERO3o: photo closer to right rim
 
 ### Наблюдения

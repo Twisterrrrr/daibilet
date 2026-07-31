@@ -66,6 +66,10 @@ export function LocationVenueLayout({
   const typeLabel = venueTypeLabel(venue.type);
   const routeCount = routeGroups.length || stats.events;
   const { fullDescription, heroLead } = resolveLocationVenueCopy(venue);
+  const stopExcursionCount =
+    stopEvents.length > 0 ? stopEvents.length : Number(venue.stopEventCount ?? 0);
+  const hasStopExcursions = stopExcursionCount > 0;
+  const hasNearbyExcursions = nearbyEvents.length > 0;
 
   return (
     <div className="bg-slate-50">
@@ -167,31 +171,36 @@ export function LocationVenueLayout({
             <h1 className="mt-4 font-display text-3xl font-extrabold text-white sm:text-4xl md:text-5xl">{title}</h1>
             <p className="mt-3 max-w-2xl text-white/85">{heroLead}</p>
             {venue.hookFact ? <p className="mt-2 max-w-2xl text-sm text-emerald-100/95">{venue.hookFact}</p> : null}
-            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
-              <span className="inline-flex items-center gap-1.5">
-                <Ticket className="h-4 w-4" />{' '}
-                {formatNumber(venue.stopEventCount || stats.events)}{' '}
-                {(venue.stopEventCount || stats.events) === 1
-                  ? 'экскурсия'
-                  : (venue.stopEventCount || stats.events) >= 2 &&
-                      (venue.stopEventCount || stats.events) <= 4
-                    ? 'экскурсии'
-                    : 'экскурсий'}
-              </span>
-              {streetAddress ? (
-                <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4" /> {streetAddress}
-                </span>
-              ) : null}
-            </div>
-            <div className="mt-6">
-              <a
-                href="#venue-stop-events"
-                className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-6 py-2.5 text-sm font-bold text-emerald-950 hover:bg-emerald-50"
-              >
-                Посмотреть экскурсии
-              </a>
-            </div>
+            {hasStopExcursions || streetAddress ? (
+              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
+                {hasStopExcursions ? (
+                  <span className="inline-flex items-center gap-1.5">
+                    <Ticket className="h-4 w-4" />{' '}
+                    {formatNumber(stopExcursionCount)}{' '}
+                    {stopExcursionCount === 1
+                      ? 'экскурсия'
+                      : stopExcursionCount >= 2 && stopExcursionCount <= 4
+                        ? 'экскурсии'
+                        : 'экскурсий'}
+                  </span>
+                ) : null}
+                {streetAddress ? (
+                  <span className="inline-flex items-center gap-1.5">
+                    <MapPin className="h-4 w-4" /> {streetAddress}
+                  </span>
+                ) : null}
+              </div>
+            ) : null}
+            {hasStopExcursions ? (
+              <div className="mt-6">
+                <a
+                  href="#venue-stop-events"
+                  className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-6 py-2.5 text-sm font-bold text-emerald-950 hover:bg-emerald-50"
+                >
+                  Посмотреть экскурсии
+                </a>
+              </div>
+            ) : null}
           </div>
         </section>
           {hasMap ? <LocationMapStrip venue={venue} /> : null}
@@ -319,44 +328,38 @@ export function LocationVenueLayout({
             </section>
           ) : null}
 
-          {isParkLike ? (
+          {isParkLike && (hasStopExcursions || hasNearbyExcursions) ? (
             <section id="venue-stop-events" className="scroll-mt-24 rounded-2xl border border-slate-200 bg-white p-6">
               <h2 className="text-xl font-bold text-slate-900">
-                {stopEvents.length
+                {hasStopExcursions
                   ? 'Экскурсии, которые включают это место'
-                  : nearbyEvents.length
-                    ? 'Рядом'
-                    : 'Экскурсии'}
+                  : 'Рядом'}
               </h2>
               <p className="mt-1 text-sm text-slate-500">
-                {stopEvents.length
+                {hasStopExcursions
                   ? 'Маршруты с явной остановкой у этой локации.'
-                  : nearbyEvents.length
-                    ? 'Явных остановок пока нет - показываем события со стартом в радиусе 300 м.'
-                    : 'Пока нет привязанных экскурсий. Следите за афишей.'}
+                  : 'Явных остановок пока нет - показываем события со стартом в радиусе 300 м.'}
               </p>
-              {stopEvents.length || nearbyEvents.length ? (
-                <ul className="mt-4 space-y-3">
-                  {(stopEvents.length ? stopEvents : nearbyEvents).map((event) => (
-                    <li key={event.id}>
-                      <a
-                        href={`/events/${encodeURIComponent(event.slug)}`}
-                        className="flex flex-col gap-1 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 transition hover:border-primary/30 hover:bg-white sm:flex-row sm:items-center sm:justify-between"
-                      >
-                        <span className="min-w-0">
-                          <span className="font-semibold text-slate-900 hover:text-primary-700">{event.title}</span>
-                          {event.venue && !stopEvents.length ? (
-                            <span className="mt-0.5 block text-xs text-slate-500">{event.venue}</span>
-                          ) : null}
-                        </span>
-                        <span className="text-sm font-medium text-slate-600">
-                          {event.priceFrom != null ? formatMoney(event.priceFrom) : 'Смотреть'}
-                        </span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
+              <ul className="mt-4 space-y-3">
+                {(hasStopExcursions ? stopEvents : nearbyEvents).map((event) => (
+                  <li key={event.id}>
+                    <a
+                      href={`/events/${encodeURIComponent(event.slug)}`}
+                      className="flex flex-col gap-1 rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 transition hover:border-primary/30 hover:bg-white sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <span className="min-w-0">
+                        <span className="font-semibold text-slate-900 hover:text-primary-700">{event.title}</span>
+                        {event.venue && !hasStopExcursions ? (
+                          <span className="mt-0.5 block text-xs text-slate-500">{event.venue}</span>
+                        ) : null}
+                      </span>
+                      <span className="text-sm font-medium text-slate-600">
+                        {event.priceFrom != null ? formatMoney(event.priceFrom) : 'Смотреть'}
+                      </span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </section>
           ) : null}
 
