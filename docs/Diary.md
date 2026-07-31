@@ -7669,3 +7669,19 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 
 ### Проблемы
 - Повторный thrash деплоев .next на MSK без атомарного gate; /moscow soft-404 в prerender, рабочий city URL /cities/moscow.
+
+
+## 2026-07-31 - Seed cityInfo mustSee: skip-no-city → 0 (MSK)
+
+### Наблюдения
+- `scripts/seed-cityinfo-must-see-venues.js`: cityId резолвится из ключа cityInfo (latin: moscow, kazan, …) через `CITY_SLUG_ALIASES` + title/fuzzy.
+- На MSK `City.slug` почти везде кириллица (`москва`, `казань`, `санкт-петербург`); плюс дубль `moskva`/Москва. Й в slug схлопнут в и (`нижнии-новгород`, `великии-новгород`).
+- До фикса: mustSee 246 → inserted 23 / updated 7 / **skip-no-city 216** (алиасы только у ~5 хабов).
+
+### Решения
+- Расширены `CITY_SLUG_ALIASES` + `CITY_TITLE_ALIASES` на все hub-ключи cityInfo; `resolveCity` грузит индекс City и матчит с нормализацией ё→е / й→и.
+- MSK `--apply`: **skip-no-city 0**, inserted 216 / updated 30 (повтор: updated 246).
+- `--write-cityinfo` на MSK → pull в локальные `apps/web` + `apps/public` cityInfo (246 slug-патчей, dirty для commit). Web не деплоили.
+
+### Проблемы
+- Moscow must-see привязались к latin `moskva` (первый hit в aliases), не к `москва` — оба title Москва. Listing smoke: /locations|/venues и detail pages (kreml/ermitazh/petergof) отдают must-see; полный список на каталоге пагинирован.

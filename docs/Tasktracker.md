@@ -29,9 +29,9 @@
 | VK.4 | Admin kind options (Vite + Next admin) | Средний | ✅ |
 | VK.5 | City hub copy «Важные места» (не «Важные локации») | Низкий | ⏳ если секция ещё не переименована |
 | VK.6 | Future: park admission (Монрепо и т.п.) - не в MVP catalog/finance mix | Средний | ⚠️ deferred (см. qa.md) |
-| VK.7 | City hub «Главные места»: title → venue/location href | Высокий | ✅ model + UI Link; SPB Эрмитаж; Пермь 6 slugs; 239 mustSee ещё без slug |
+| VK.7 | City hub «Главные места»: title → venue/location href | Высокий | ✅ model + UI Link; cityInfo mustSee slug-патч 246 (web+public dirty) |
 | VK.8 | Content places в каталогах /venues|/locations без events | Высокий | ✅ в репо; 🚫 live MSK dto.js без import hub-gate → listing/page null |
-| VK.9 | Bulk seed mustSee → Venue + cityInfo slug (`seed-cityinfo-must-see-venues.js`) | Высокий | ✅ script; ⏳ apply после deploy hub-gate API |
+| VK.9 | Bulk seed mustSee → Venue + cityInfo slug (`seed-cityinfo-must-see-venues.js`) | Высокий | ✅ MSK apply: skip-no-city 0 (было 216); aliases latin→кирилл slug; cityInfo 246 slug dirty |
 | VK.10 | Deploy+restart MSK API (dto hub-gate) + smoke Perm 6 in /locations|/venues | Критический | ⏳ blocker видимости для owner |
 
 ## Finance supplier LC smoke (.159) 2026-07-31
