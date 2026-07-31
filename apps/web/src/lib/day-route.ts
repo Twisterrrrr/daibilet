@@ -116,6 +116,42 @@ export function toggleDayRoute(item: DayRouteVenueItem): DayRouteState {
   return addToDayRoute(item);
 }
 
+/** Parse `?day=id1,slug2` share query into locators (max DAY_ROUTE_MAX). */
+export function parseDayRouteQueryParam(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+  return [
+    ...new Set(
+      String(raw)
+        .split(',')
+        .map((part) => part.trim())
+        .filter(Boolean),
+    ),
+  ].slice(0, DAY_ROUTE_MAX);
+}
+
+/** Build absolute or relative share URL for current day route. */
+export function buildDayRouteSharePath(venues: DayRouteVenueItem[]): string {
+  const tokens = venues
+    .map((venue) => venue.slug || venue.id)
+    .filter(Boolean)
+    .slice(0, DAY_ROUTE_MAX);
+  if (!tokens.length) return '/my-day';
+  return `/my-day?day=${encodeURIComponent(tokens.join(','))}`;
+}
+
+/** Replace localStorage day route from resolved venue list (share hydrate). */
+export function replaceDayRouteFromVenues(
+  venues: DayRouteVenueItem[],
+  cityId: string | null = null,
+): DayRouteState {
+  const next: DayRouteState = {
+    cityId: cityId || venues[0]?.cityId || null,
+    venues: venues.slice(0, DAY_ROUTE_MAX),
+  };
+  writeDayRoute(next);
+  return next;
+}
+
 /** Pure score: 3*STOP + 2*start + 1*nearby. */
 export function dayRouteMatchScore(covered: {
   stop?: string[];

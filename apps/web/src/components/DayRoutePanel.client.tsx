@@ -1,17 +1,21 @@
 'use client';
 
 import Link from 'next/link';
-import { MapPin, Route, Trash2, X } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Copy, MapPin, Route, Trash2, X } from 'lucide-react';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import {
   DAY_ROUTE_CHANGED_EVENT,
   DAY_ROUTE_MAX,
   DAY_ROUTE_MIN,
+  buildDayRouteSharePath,
   clearDayRoute,
+  parseDayRouteQueryParam,
   readDayRoute,
   removeFromDayRoute,
+  replaceDayRouteFromVenues,
   type DayRouteState,
   type DayRouteVenueItem,
 } from '@/lib/day-route';
@@ -21,7 +25,14 @@ import { eventHref, venueHref } from '@/lib/routes';
 type MatchPayload = {
   cityId: string | null;
   multiCityWarning: boolean;
-  venues: Array<{ id: string; title: string }>;
+  venues: Array<{
+    id: string;
+    slug: string | null;
+    title: string;
+    cityId: string | null;
+    cityTitle: string | null;
+    heroImageUrl: string | null;
+  }>;
   matches: Array<{
     eventId: string;
     slug: string;
@@ -36,11 +47,32 @@ type MatchPayload = {
 };
 
 export function DayRoutePanel() {
+  return (
+    <Suspense fallback={<DayRoutePanelFallback />}>
+      <DayRoutePanelInner />
+    </Suspense>
+  );
+}
+
+function DayRoutePanelFallback() {
+  return (
+    <div className="container-page py-8 sm:py-10">
+      <p className="text-sm text-slate-500">Загружаем маршрут…</p>
+    </div>
+  );
+}
+
+function DayRoutePanelInner() {
+  const searchParams = useSearchParams();
+  const dayParam = searchParams.get('day');
   const [route, setRoute] = useState<DayRouteState>(() =>
     typeof window === 'undefined' ? { cityId: null, venues: [] } : readDayRoute(),
   );
   const [payload, setPayload] = useState<MatchPayload | null>(null);
   const [loading, setLoading] = useState(false);
+  const [ready, setReady] = useState(false);
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'ok' | 'err'>('idle');
+  const hydratedDayRef = useRef<string | null>(null);
 
   useEffect(() => {
     const sync = () => setRoute(readDayRoute());
@@ -53,6 +85,52 @@ export function DayRoutePanel() {
     };
   }, []);
 
+  // Share hydrate: /my-day?day=id1,slug2 → resolve → localStorage.
+  useEffect(() => {
+    const locators = parseDayRouteQueryParam(dayParam);
+    if (!locators.length) {
+      setReady(true);
+      return;
+    }
+    const key = locators.join(',');
+    if (hydratedDayRef.current === key) {
+      setReady(true);
+      return;
+    }
+    const controller = new AbortController();
+    setLoading(true);
+    fetch(`/api/day-route/matches?venueIds=${encodeURIComponent(key)}`, {
+      signal: controller.signal,
+    })
+      .then(async (response) => (response.ok ? ((await response.json()) as MatchPayload) : null))
+      .then((data) => {
+        if (!data?.venues?.length) {
+          setReady(true);
+          return;
+        }
+        const items: DayRouteVenueItem[] = data.venues.map((venue) => ({
+          id: venue.id,
+          slug: venue.slug,
+          title: venue.title,
+          city: venue.cityTitle,
+          cityId: venue.cityId,
+          imageUrl: venue.heroImageUrl,
+          href: venue.slug
+            ? venueHref({ id: venue.id, slug: venue.slug, name: venue.title, type: 'park' })
+            : null,
+        }));
+        hydratedDayRef.current = key;
+        setRoute(replaceDayRouteFromVenues(items, data.cityId));
+        setPayload(data);
+        setReady(true);
+      })
+      .catch(() => {
+        setReady(true);
+      })
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [dayParam]);
+
   const venueIds = useMemo(() => route.venues.map((v) => v.id).join(','), [route.venues]);
   const titleById = useMemo(() => {
     const map = new Map<string, string>();
@@ -61,6 +139,7 @@ export function DayRoutePanel() {
   }, [route.venues]);
 
   useEffect(() => {
+    if (!ready) return;
     if (!route.venues.length) {
       setPayload(null);
       return;
@@ -77,7 +156,20 @@ export function DayRoutePanel() {
       .catch(() => undefined)
       .finally(() => setLoading(false));
     return () => controller.abort();
-  }, [venueIds, route.venues.length]);
+  }, [venueIds, route.venues.length, ready]);
+
+  async function copyShareLink() {
+    if (!route.venues.length || typeof window === 'undefined') return;
+    const path = buildDayRouteSharePath(route.venues);
+    const url = `${window.location.origin}${path}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopyStatus('ok');
+    } catch {
+      setCopyStatus('err');
+    }
+    window.setTimeout(() => setCopyStatus('idle'), 2000);
+  }
 
   return (
     <div className="container-page py-8 sm:py-10">
@@ -91,16 +183,28 @@ export function DayRoutePanel() {
           </p>
         </div>
         {route.venues.length ? (
-          <button
-            type="button"
-            onClick={() => {
-              clearDayRoute();
-              setRoute(readDayRoute());
-            }}
-            className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
-          >
-            <Trash2 className="h-3.5 w-3.5" /> Очистить
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                void copyShareLink();
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+            >
+              <Copy className="h-3.5 w-3.5" />
+              {copyStatus === 'ok' ? 'Скопировано' : copyStatus === 'err' ? 'Не удалось' : 'Копировать ссылку'}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                clearDayRoute();
+                setRoute(readDayRoute());
+              }}
+              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+            >
+              <Trash2 className="h-3.5 w-3.5" /> Очистить
+            </button>
+          </div>
         ) : null}
       </div>
 

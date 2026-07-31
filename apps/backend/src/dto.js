@@ -2943,6 +2943,257 @@ export async function updateAdminEventVenueLinks(db, eventId, payload) {
   return { eventId, venueLinks };
 }
 
+/** Geo suggest thresholds (aligned with scripts/lib/venue-route-geo.js + public nearby 300m). */
+const SUGGEST_STOP_RADIUS_M = Number(process.env.SUGGEST_STOP_RADIUS_M || 150);
+const SUGGEST_NEARBY_RADIUS_M = Number(process.env.SUGGEST_NEARBY_RADIUS_M || 300);
+const SUGGEST_SOFT_RADIUS_M = Number(process.env.SUGGEST_SOFT_RADIUS_M || 500);
+const SUGGEST_BBOX_DEG = Number(process.env.SUGGEST_BBOX_DEG || 0.008);
+const SUGGEST_MAX_CANDIDATES = Number(process.env.MAX_CANDIDATES_PER_EVENT || 20);
+const SUGGEST_KIND_ALLOWLIST = new Set([
+  'MONUMENT',
+  'PARK',
+  'ATTRACTION',
+  'MUSEUM_ART_SPACE',
+  'OUTDOOR_LOCATION',
+  'MEETING_POINT',
+  'PIER',
+  'VENUE',
+]);
+const SUGGEST_KIND_SCORE = {
+  MONUMENT: 5,
+  PARK: 5,
+  ATTRACTION: 5,
+  OUTDOOR_LOCATION: 4,
+  MUSEUM_ART_SPACE: 3,
+  PIER: 3,
+  MEETING_POINT: 2,
+  VENUE: 2,
+};
+
+function suggestConfidenceForDistance(distanceMeters) {
+  const d = Number(distanceMeters);
+  if (!Number.isFinite(d) || d < 0) return null;
+  if (d <= SUGGEST_STOP_RADIUS_M) return 'high';
+  if (d <= SUGGEST_NEARBY_RADIUS_M) return 'medium';
+  if (d <= SUGGEST_SOFT_RADIUS_M) return 'low';
+  return null;
+}
+
+function suggestRankScore({ distanceMeters, sameCity, kind }) {
+  const kindScore = SUGGEST_KIND_SCORE[String(kind || '').toUpperCase()] || 0;
+  return (sameCity ? 10 : 0) + kindScore - Number(distanceMeters) / 1000;
+}
+
+/**
+ * Geo-кандидаты STOP от start venue события. Не пишет БД, не трогает Event.venueId.
+ * options.radiusM - cap поиска (default 300, max soft 500).
+ */
+export async function suggestAdminEventVenueLinks(db, eventId, options = {}) {
+  const radiusCap = Math.min(
+    SUGGEST_SOFT_RADIUS_M,
+    Math.max(1, Number(options.radiusM) || SUGGEST_NEARBY_RADIUS_M),
+  );
+
+  const eventResult = await db.query(
+    `
+      select
+        e.id,
+        e."venueId",
+        e."primaryCityId",
+        start_venue.latitude as "startLat",
+        start_venue.longitude as "startLng",
+        start_venue."cityId" as "startCityId"
+      from "Event" e
+      left join "Venue" start_venue on start_venue.id = e."venueId"
+      where e.id = $1
+      limit 1
+    `,
+    [eventId],
+  );
+  const event = eventResult.rows[0];
+  if (!event) return null;
+
+  const startLat = Number(event.startLat);
+  const startLng = Number(event.startLng);
+  if (!isValidVenueCoordinatePair(startLat, startLng)) {
+    return {
+      eventId,
+      startVenueId: event.venueId || null,
+      suggestions: [],
+      reason: 'start_venue_missing_coords',
+      thresholds: {
+        high: SUGGEST_STOP_RADIUS_M,
+        medium: SUGGEST_NEARBY_RADIUS_M,
+        soft: SUGGEST_SOFT_RADIUS_M,
+        radiusM: radiusCap,
+      },
+    };
+  }
+
+  const existingResult = await db.query(
+    `
+      select "venueId"
+      from "event_venue_route_items"
+      where "eventId" = $1 and role = 'STOP'::"RouteItemRole"
+    `,
+    [eventId],
+  );
+  const existingStops = new Set(existingResult.rows.map((row) => row.venueId));
+
+  const cityId = event.primaryCityId || event.startCityId;
+  const kinds = [...SUGGEST_KIND_ALLOWLIST];
+  const venueResult = await db.query(
+    `
+      select
+        v.id,
+        v.slug,
+        v.title,
+        v.kind::text as kind,
+        v."cityId",
+        v."pageStatus"::text as "pageStatus",
+        v.latitude,
+        v.longitude
+      from "Venue" v
+      where v.latitude is not null
+        and v.longitude is not null
+        and v.kind::text = any($1::text[])
+        and v.kind <> 'ONLINE'::"VenueKind"
+        and v."pageStatus" in ('PUBLISHED'::"VenuePageStatus", 'CANDIDATE'::"VenuePageStatus")
+        and abs(v.latitude - $2) <= $3
+        and abs(v.longitude - $4) <= $3
+        ${cityId ? 'and v."cityId" = $5' : ''}
+    `,
+    cityId
+      ? [kinds, startLat, SUGGEST_BBOX_DEG, startLng, cityId]
+      : [kinds, startLat, SUGGEST_BBOX_DEG, startLng],
+  );
+
+  const suggestions = [];
+  for (const row of venueResult.rows) {
+    if (row.id === event.venueId) continue;
+    if (existingStops.has(row.id)) continue;
+    const latitude = Number(row.latitude);
+    const longitude = Number(row.longitude);
+    if (!isValidVenueCoordinatePair(latitude, longitude)) continue;
+
+    const distanceMeters = haversineMeters(startLat, startLng, latitude, longitude);
+    if (distanceMeters > radiusCap) continue;
+    const confidence = suggestConfidenceForDistance(distanceMeters);
+    if (!confidence) continue;
+
+    const sameCity = Boolean(cityId && row.cityId === cityId);
+    suggestions.push({
+      venueId: row.id,
+      slug: row.slug,
+      title: row.title,
+      kind: row.kind,
+      pageStatus: row.pageStatus,
+      distanceMeters: Math.round(distanceMeters * 10) / 10,
+      confidence,
+      sameCity,
+      role: 'STOP',
+      action: confidence === 'high' && sameCity ? 'auto-apply-ok' : 'suggest-only',
+      rank: suggestRankScore({ distanceMeters, sameCity, kind: row.kind }),
+    });
+  }
+
+  suggestions.sort((a, b) => b.rank - a.rank || a.distanceMeters - b.distanceMeters);
+
+  return {
+    eventId,
+    startVenueId: event.venueId || null,
+    suggestions: suggestions.slice(0, SUGGEST_MAX_CANDIDATES).map(({ rank, ...rest }) => rest),
+    thresholds: {
+      high: SUGGEST_STOP_RADIUS_M,
+      medium: SUGGEST_NEARBY_RADIUS_M,
+      soft: SUGGEST_SOFT_RADIUS_M,
+      radiusM: radiusCap,
+      bboxDeg: SUGGEST_BBOX_DEG,
+    },
+  };
+}
+
+/**
+ * Merge-insert STOP links. Never wipe existing STOP. Never touches Event.venueId.
+ * payload: { mode?: 'merge', links: [{ venueId|slug, role?: 'STOP', sortOrder?, label? }] }
+ */
+export async function applyAdminEventVenueLinks(db, eventId, payload) {
+  const exists = await db.query(
+    `select id, "venueId" from "Event" where id = $1 limit 1`,
+    [eventId],
+  );
+  const event = exists.rows[0];
+  if (!event) return null;
+
+  const mode = String(payload?.mode || 'merge').trim().toLowerCase();
+  if (mode !== 'merge') {
+    return { error: 'unsupported_mode', message: 'Only mode=merge is allowed (no replace-all wipe).' };
+  }
+
+  const rawLinks = Array.isArray(payload?.links) ? payload.links : [];
+  const prepared = [];
+  const seenVenueIds = new Set();
+
+  for (let index = 0; index < rawLinks.length; index += 1) {
+    const item = rawLinks[index] && typeof rawLinks[index] === 'object' ? rawLinks[index] : {};
+    const role = String(item.role || 'STOP').trim().toUpperCase() || 'STOP';
+    if (role !== 'STOP') continue;
+    const locator = normalizeNullableString(item.venueId || item.slug);
+    if (!locator) continue;
+    const venueResult = await db.query(
+      `select id from "Venue" where id = $1 or slug = $1 limit 1`,
+      [locator],
+    );
+    const venueId = venueResult.rows[0]?.id;
+    if (!venueId || seenVenueIds.has(venueId)) continue;
+    if (venueId === event.venueId) continue;
+    seenVenueIds.add(venueId);
+    const sortOrder = Number.isFinite(Number(item.sortOrder))
+      ? Math.trunc(Number(item.sortOrder))
+      : 100 + index;
+    prepared.push({
+      venueId,
+      sortOrder,
+      label: normalizeNullableString(item.label),
+    });
+  }
+
+  const applied = [];
+  for (const link of prepared) {
+    const result = await db.query(
+      `
+        insert into "event_venue_route_items" (
+          id, "eventId", "venueId", role, "sortOrder", label, "createdAt", "updatedAt"
+        ) values (
+          $1, $2, $3, 'STOP'::"RouteItemRole", $4, $5, now(), now()
+        )
+        on conflict ("eventId", "venueId", role) do nothing
+        returning id, "eventId", "venueId", role, "sortOrder", label
+      `,
+      [
+        `evri_${randomUUID().replace(/-/g, '').slice(0, 24)}`,
+        eventId,
+        link.venueId,
+        link.sortOrder,
+        link.label,
+      ],
+    );
+    if (result.rows[0]) {
+      applied.push({
+        id: result.rows[0].id,
+        venueId: result.rows[0].venueId,
+        role: result.rows[0].role,
+        sortOrder: result.rows[0].sortOrder,
+        label: result.rows[0].label,
+      });
+    }
+  }
+
+  invalidateAdminGroupedEventsCache(db, 'event venue links merge');
+  const venueLinks = await loadAdminEventVenueLinks(db, eventId);
+  return { eventId, mode: 'merge', applied, venueLinks };
+}
+
 async function loadAdminEventVenueLinks(db, eventId) {
   const result = await db.query(
     `

@@ -42,13 +42,15 @@ const MATCH_LIMIT = 24;
 const BBOX_DEG = 0.005;
 
 export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteMatchPayload> {
-  const ids = [...new Set(venueIds.map(String).filter(Boolean))].slice(0, 8);
-  if (!ids.length) {
+  const locators = [...new Set(venueIds.map(String).filter(Boolean))].slice(0, 8);
+  if (!locators.length) {
     return { cityId: null, multiCityWarning: false, venues: [], matches: [] };
   }
 
   const venues = await prisma.venue.findMany({
-    where: { id: { in: ids } },
+    where: {
+      OR: [{ id: { in: locators } }, { slug: { in: locators } }],
+    },
     select: {
       id: true,
       slug: true,
@@ -61,7 +63,24 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
     },
   });
 
-  const venueDtos: DayRouteMatchVenue[] = venues.map((v) => ({
+  // Preserve request order (first match per locator).
+  const byLocator = new Map<string, (typeof venues)[number]>();
+  for (const venue of venues) {
+    byLocator.set(venue.id, venue);
+    if (venue.slug) byLocator.set(venue.slug, venue);
+  }
+  const ordered: typeof venues = [];
+  const seenIds = new Set<string>();
+  for (const locator of locators) {
+    const venue = byLocator.get(locator);
+    if (!venue || seenIds.has(venue.id)) continue;
+    seenIds.add(venue.id);
+    ordered.push(venue);
+  }
+
+  const ids = ordered.map((v) => v.id);
+
+  const venueDtos: DayRouteMatchVenue[] = ordered.map((v) => ({
     id: v.id,
     slug: v.slug,
     title: v.title,
@@ -92,6 +111,15 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
     if (v.latitude != null && v.longitude != null && isValidCoordinatePair(v.latitude, v.longitude)) {
       selectedCoords.set(v.id, { latitude: v.latitude, longitude: v.longitude });
     }
+  }
+
+  if (!ids.length) {
+    return {
+      cityId: dominantCityId,
+      multiCityWarning,
+      venues: venueDtos,
+      matches: [],
+    };
   }
 
   // Direct hits: STOP on selected / start at selected.

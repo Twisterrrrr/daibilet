@@ -1,3 +1,22 @@
+## 2026-07-31 - LE.9 Admin suggest + DR.2 share `?day=`
+
+### Наблюдения
+- Owner: «да, супер, продолжаем» после MVP geo + day-route (BUILD `baXnUSpZjxRiogKVC7Y6s`).
+- Favorites = только localStorage; готового `PUT/GET /api/me/day-route` / user favorites day-bucket нет.
+
+### Решения
+- LE.9: `GET /api/admin/events/:id/venue-link-suggestions` + `POST …/venue-links:apply` (mode=merge only, STOP only, не wipe, не трогает `Event.venueId`). Admin UI «Подобрать рядом» → чекбоксы → rows → save через существующий PUT.
+- DR.2: `/my-day?day=id1,slug2` hydrate localStorage + «Копировать ссылку»; страница уже noindex. Phase 2 auth sync **отложен** до появления user day-route/favorites API.
+- Coords gap: без массового seed; Пермь dry-run раньше показал 1 candidate с coords - нужно точечное editorial/coords, не `--auto-high` на прод без owner apply.
+
+### Проблемы
+- Качество suggest упирается в coverage lat/lng у PUBLISHED/CANDIDATE venues.
+
+### Deploy
+- (заполняется после push/SPB→MSK)
+
+---
+
 ## 2026-07-31 - Geo autolink CLI + «Собери свой день» MVP
 
 ### Наблюдения

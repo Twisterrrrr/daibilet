@@ -61,6 +61,8 @@ import {
   updateAdminEventOverride,
   updateAdminEventTaxonomy,
   updateAdminEventVenueLinks,
+  suggestAdminEventVenueLinks,
+  applyAdminEventVenueLinks,
   upsertAdminOrderTicket,
   updateAdminLanding,
   updateAdminLandingMatch,
@@ -835,6 +837,47 @@ export async function handleRequest(request, response) {
     if (eventTaxonomyMatch) {
       const result = await updateAdminEventTaxonomy(db, decodeURIComponent(eventTaxonomyMatch[1]), await readJsonBody(request));
       invalidatePublicCaches('event taxonomy update');
+      sendJson(response, result);
+      return;
+    }
+
+    const eventVenueLinkSuggestionsMatch =
+      request.method === 'GET'
+        ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/venue-link-suggestions$/)
+        : null;
+    if (eventVenueLinkSuggestionsMatch) {
+      const result = await suggestAdminEventVenueLinks(
+        db,
+        decodeURIComponent(eventVenueLinkSuggestionsMatch[1]),
+        { radiusM: url.searchParams.get('radiusM') },
+      );
+      if (!result) {
+        sendJson(response, { error: 'not_found' }, 404);
+        return;
+      }
+      sendJson(response, result);
+      return;
+    }
+
+    const eventVenueLinksApplyMatch =
+      request.method === 'POST'
+        ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/venue-links:apply$/)
+        : null;
+    if (eventVenueLinksApplyMatch) {
+      const result = await applyAdminEventVenueLinks(
+        db,
+        decodeURIComponent(eventVenueLinksApplyMatch[1]),
+        await readJsonBody(request),
+      );
+      if (!result) {
+        sendJson(response, { error: 'not_found' }, 404);
+        return;
+      }
+      if (result.error) {
+        sendJson(response, result, 400);
+        return;
+      }
+      invalidatePublicCaches('event venue links merge apply');
       sendJson(response, result);
       return;
     }

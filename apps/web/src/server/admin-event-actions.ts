@@ -146,3 +146,55 @@ export async function saveAdminEventVenueLinksAction(formData: FormData) {
   revalidatePath(`/admin/events/${id}`);
   redirect(`/admin/events/${encodeURIComponent(id)}?saved=venue-links`);
 }
+
+export type VenueLinkSuggestion = {
+  venueId: string;
+  slug: string | null;
+  title: string;
+  kind: string | null;
+  pageStatus: string | null;
+  distanceMeters: number;
+  confidence: 'high' | 'medium' | 'low';
+  sameCity: boolean;
+  role: 'STOP';
+  action: string;
+};
+
+export async function fetchAdminVenueLinkSuggestionsAction(
+  eventId: string,
+  radiusM = 300,
+): Promise<{
+  ok: boolean;
+  error?: string;
+  suggestions: VenueLinkSuggestion[];
+  reason?: string;
+}> {
+  const id = String(eventId || '').trim();
+  if (!id) return { ok: false, error: 'missing event id', suggestions: [] };
+
+  const params = new URLSearchParams();
+  if (Number.isFinite(radiusM)) params.set('radiusM', String(radiusM));
+  const qs = params.toString();
+  const response = await adminApiFetch(
+    `/api/admin/events/${encodeURIComponent(id)}/venue-link-suggestions${qs ? `?${qs}` : ''}`,
+  );
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    return {
+      ok: false,
+      error: `suggestions failed HTTP ${response.status}${text ? `: ${text.slice(0, 160)}` : ''}`,
+      suggestions: [],
+    };
+  }
+
+  const payload = (await response.json()) as {
+    suggestions?: VenueLinkSuggestion[];
+    reason?: string;
+  };
+  return {
+    ok: true,
+    suggestions: Array.isArray(payload.suggestions) ? payload.suggestions : [],
+    reason: payload.reason,
+  };
+}

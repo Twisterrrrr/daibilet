@@ -1,8 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 
-import { saveAdminEventVenueLinksAction } from '@/server/admin-event-actions';
+import {
+  fetchAdminVenueLinkSuggestionsAction,
+  saveAdminEventVenueLinksAction,
+  type VenueLinkSuggestion,
+} from '@/server/admin-event-actions';
 import type { AdminEventDetailData } from '@/server/admin-events-data';
 
 type LinkRow = {
@@ -27,8 +31,41 @@ function toRows(links: AdminEventDetailData['venueLinks']): LinkRow[] {
   }));
 }
 
+function confidenceBadgeClass(confidence: VenueLinkSuggestion['confidence']) {
+  if (confidence === 'high') return 'bg-emerald-50 text-emerald-800';
+  if (confidence === 'medium') return 'bg-amber-50 text-amber-900';
+  return 'bg-slate-100 text-slate-600';
+}
+
 export function AdminEventVenueLinksForm({ eventId, venueLinks }: Props) {
   const [rows, setRows] = useState<LinkRow[]>(() => toRows(venueLinks));
+  const [suggestions, setSuggestions] = useState<VenueLinkSuggestion[]>([]);
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [suggestError, setSuggestError] = useState<string | null>(null);
+  const [suggestReason, setSuggestReason] = useState<string | null>(null);
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [pending, startTransition] = useTransition();
+
+  const existingIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const row of rows) {
+      const value = row.venueId.trim();
+      if (value) ids.add(value);
+    }
+    for (const link of venueLinks) {
+      if (link.venueId) ids.add(link.venueId);
+      if (link.slug) ids.add(link.slug);
+    }
+    return ids;
+  }, [rows, venueLinks]);
+
+  const visibleSuggestions = useMemo(
+    () =>
+      suggestions.filter(
+        (item) => !existingIds.has(item.venueId) && !(item.slug && existingIds.has(item.slug)),
+      ),
+    [suggestions, existingIds],
+  );
 
   function updateRow(index: number, patch: Partial<LinkRow>) {
     setRows((current) => current.map((row, i) => (i === index ? { ...row, ...patch } : row)));
@@ -46,6 +83,42 @@ export function AdminEventVenueLinksForm({ eventId, venueLinks }: Props) {
       const next = current.filter((_, i) => i !== index);
       return next.length ? next : [{ venueId: '', label: '', sortOrder: '0' }];
     });
+  }
+
+  function loadSuggestions() {
+    setSuggestError(null);
+    setSuggestReason(null);
+    startTransition(async () => {
+      const result = await fetchAdminVenueLinkSuggestionsAction(eventId, 300);
+      if (!result.ok) {
+        setSuggestError(result.error || 'Не удалось подобрать');
+        setSuggestions([]);
+        setSuggestOpen(true);
+        return;
+      }
+      setSuggestions(result.suggestions);
+      setSuggestReason(result.reason || null);
+      setSelected({});
+      setSuggestOpen(true);
+    });
+  }
+
+  function addSelectedSuggestions() {
+    const picked = visibleSuggestions.filter((item) => selected[item.venueId]);
+    if (!picked.length) return;
+    setRows((current) => {
+      const filled = current.filter((row) => row.venueId.trim());
+      const baseOrder = filled.length;
+      const additions = picked.map((item, index) => ({
+        venueId: item.venueId,
+        label: '',
+        sortOrder: String(baseOrder + index),
+      }));
+      const next = [...filled, ...additions];
+      return next.length ? next : [{ venueId: '', label: '', sortOrder: '0' }];
+    });
+    setSelected({});
+    setSuggestOpen(false);
   }
 
   return (
@@ -123,6 +196,73 @@ export function AdminEventVenueLinksForm({ eventId, venueLinks }: Props) {
         ))}
       </div>
 
+      {suggestOpen ? (
+        <div className="rounded-lg border border-emerald-100 bg-emerald-50/40 p-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <p className="text-sm font-semibold text-slate-800">Кандидаты рядом (STOP)</p>
+            <button
+              type="button"
+              onClick={() => setSuggestOpen(false)}
+              className="text-xs font-medium text-slate-500 hover:text-slate-800"
+            >
+              Скрыть
+            </button>
+          </div>
+          {suggestError ? <p className="mt-2 text-xs text-rose-700">{suggestError}</p> : null}
+          {suggestReason === 'start_venue_missing_coords' ? (
+            <p className="mt-2 text-xs text-amber-800">
+              У точки старта нет координат - подбор невозможен.
+            </p>
+          ) : null}
+          {!suggestError && !visibleSuggestions.length ? (
+            <p className="mt-2 text-xs text-slate-600">Нет новых кандидатов в радиусе.</p>
+          ) : null}
+          {visibleSuggestions.length ? (
+            <ul className="mt-3 space-y-2">
+              {visibleSuggestions.map((item) => (
+                <li key={item.venueId} className="flex items-start gap-2 text-sm">
+                  <input
+                    id={`suggest-${item.venueId}`}
+                    type="checkbox"
+                    checked={Boolean(selected[item.venueId])}
+                    onChange={(event) =>
+                      setSelected((current) => ({
+                        ...current,
+                        [item.venueId]: event.target.checked,
+                      }))
+                    }
+                    className="mt-1"
+                  />
+                  <label htmlFor={`suggest-${item.venueId}`} className="min-w-0 flex-1 cursor-pointer">
+                    <span className="font-medium text-slate-900">{item.title}</span>
+                    <span className="mt-0.5 block text-xs text-slate-500">
+                      {item.kind || '—'} · {item.distanceMeters} м · {item.slug || item.venueId}
+                    </span>
+                  </label>
+                  <span
+                    className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${confidenceBadgeClass(item.confidence)}`}
+                  >
+                    {item.confidence}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+          {visibleSuggestions.length ? (
+            <button
+              type="button"
+              onClick={addSelectedSuggestions}
+              className="mt-3 rounded-md border border-emerald-200 bg-white px-3 py-2 text-sm font-medium text-emerald-900 hover:bg-emerald-50"
+            >
+              Добавить выбранные в форму
+            </button>
+          ) : null}
+          <p className="mt-2 text-[11px] text-slate-500">
+            В форму без автосохранения. Сохраните места маршрута отдельно. Только STOP; старт не меняется.
+          </p>
+        </div>
+      ) : null}
+
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
@@ -130,6 +270,14 @@ export function AdminEventVenueLinksForm({ eventId, venueLinks }: Props) {
           className="rounded-md border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
         >
           Добавить строку
+        </button>
+        <button
+          type="button"
+          onClick={loadSuggestions}
+          disabled={pending}
+          className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900 hover:bg-emerald-100 disabled:opacity-60"
+        >
+          {pending ? 'Подбираем…' : 'Подобрать рядом'}
         </button>
         <button
           type="submit"
