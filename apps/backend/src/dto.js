@@ -42,7 +42,6 @@ import {
   fetchVenueHeroImageFallbacks,
 } from './public-venue-lean.ts';
 import {
-  hasMinimalVenueProfile,
   isContentPlaceHubEligible,
   isContentPlaceKind,
 } from './public-venue-hub-gate.js';
