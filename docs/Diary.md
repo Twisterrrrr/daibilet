@@ -1,3 +1,21 @@
+## 2026-08-01 - Must-see editorial batch6 (13 городов, 78 точек)
+
+### Наблюдения
+- Owner: Кострома, Курган, Курск, Липецк, Мурманск, Саранск, Смоленск, Сыктывкар, Тамбов, Хабаровск, Чебоксары, Чита, Южно-Сахалинск (по 6).
+- У всех 13 городов `mustSee` был пустым - нужны slug + insert Venue.
+- Owner-координаты с ошибкой города: «Коми пасы» (56.x) и Чувашский нацмузей (54.x/Саранск) - исправлены на локальные.
+
+### Решения
+- `must-see-editorial.json` → 390; batch6 артефакт 78; aliases batch6 в enrich.
+- `cityInfo` mustSee заполнен для 13 ключей (в т.ч. `lipeck`, `habarovsk`, `yuzhno-sahalinsk`).
+- MSK apply: 78 insert; API restart; smoke hookFact ok (slug `slice(0,72)` для Илизарова/Алёши/орлов).
+- Commit + push + SPB→MSK atomic (BUILD_ID после smoke).
+
+### Проблемы
+- Seed slugify: `map[ch]||ch` превращает мягкий знак в дефис (как в batch5 `podvor-e`) - оставляем как канон.
+
+---
+
 ## 2026-08-01 - Must-see editorial batch5 (10 городов, 60 точек)
 
 ### Наблюдения

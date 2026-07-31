@@ -104,6 +104,23 @@ const CITY_SLUG_ALIASES = {
     'киров-кировская-область',
     'киров',
   ],
+  kostroma: ['kostroma', 'кострома'],
+  kurgan: ['kurgan', 'курган'],
+  kursk: ['kursk', 'курск'],
+  lipeck: ['lipeck', 'lipetsk', 'липецк'],
+  murmansk: ['murmansk', 'мурманск'],
+  saransk: ['saransk', 'саранск'],
+  smolensk: ['smolensk', 'смоленск'],
+  syktyvkar: ['syktyvkar', 'сыктывкар'],
+  tambov: ['tambov', 'тамбов'],
+  habarovsk: ['habarovsk', 'khabarovsk', 'хабаровск'],
+  cheboksary: ['cheboksary', 'чебоксары'],
+  chita: ['chita', 'чита'],
+  'yuzhno-sahalinsk': [
+    'yuzhno-sahalinsk',
+    'yuzhno-sakhalinsk',
+    'южно-сахалинск',
+  ],
 };
 
 const CITY_TITLE_ALIASES = {
@@ -160,6 +177,19 @@ const CITY_TITLE_ALIASES = {
   kaluga: ['Калуга'],
   kemerovo: ['Кемерово'],
   'kirov-kirovskaya-oblast': ['Киров'],
+  kostroma: ['Кострома'],
+  kurgan: ['Курган'],
+  kursk: ['Курск'],
+  lipeck: ['Липецк'],
+  murmansk: ['Мурманск'],
+  saransk: ['Саранск'],
+  smolensk: ['Смоленск'],
+  syktyvkar: ['Сыктывкар'],
+  tambov: ['Тамбов'],
+  habarovsk: ['Хабаровск'],
+  cheboksary: ['Чебоксары'],
+  chita: ['Чита'],
+  'yuzhno-sahalinsk': ['Южно-Сахалинск'],
 };
 
 const dryRun = process.argv.includes('--dry-run') || !process.argv.includes('--apply');
