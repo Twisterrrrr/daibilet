@@ -22,7 +22,7 @@
 | LE.8 | Geo autolink ТЗ → CLI dry-run/apply (пороги 150/300/500, merge STOP, `Event.venueId` не трогать) | Высокий | ✅ CLI + unit + MSK dry-run perm |
 | LE.9 | Admin «Подобрать рядом» + merge apply endpoint (suggest UI) | Средний | ✅ GET suggestions + POST `venue-links:apply` merge + UI чекбоксы; Event.venueId не трогаем |
 | DR.1 | «Собери свой день» MVP: кнопка + localStorage + match API (STOP>start>nearby), noindex, без комбо | Высокий | ✅ button/storage/match/`/my-day`; STOP-наполнение городов ещё слабо |
-| DR.1b | Day-route polish: empty states, mobile badge, STOP/start/nearby badges, limit/multi-city warnings, copy toast | Высокий | 🔄 commit+deploy |
+| DR.1b | Day-route polish: empty states, mobile badge, STOP/start/nearby badges, limit/multi-city warnings, copy toast | Высокий | ✅ `56bbb237` BUILD `Mt5-YY9GU-T83jOIjxN0Q` |
 | DR.2 | Day-route Phase 1.5 share `?day=` noindex + Phase 2 auth sync | Средний | ✅ share hydrate + copy link; Phase 2 auth sync ⚠️ skip (нет user favorites day-route API) |
 
 ## Venue kinds: park + monument (2026-07-31)

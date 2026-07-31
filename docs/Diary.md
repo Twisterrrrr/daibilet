@@ -11,6 +11,7 @@
 
 ### Проблемы
 - Качество матча всё ещё упирается в Phase 0 STOP/coords (параллельный чат).
+- Deploy: commit `56bbb237` → SPB build → MSK atomic `.next` **BUILD_ID=`Mt5-YY9GU-T83jOIjxN0Q`**. Smoke `/my-day` 200 + noindex; matches API 200.
 
 ---
 
