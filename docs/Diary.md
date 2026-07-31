@@ -1,3 +1,22 @@
+## 2026-07-31 - City hero: right edge fade + mobile top padding
+
+### Наблюдения
+- Owner после soft left fade (BUILD `8DwUkz2XCFh58Z20GVN_p`): справа fade слабо / недостаточно (шов фото→gutter).
+- Mobile: после equal `py-8` title близко к верху - нужно ~2× воздуха сверху.
+
+### Решения
+- `fadePhotoEdges`: правая кромка зеркалит левую (~15% navy→transparent→navy); `fadeRightGutter` soft ~7%.
+- Mobile content: `pt-16 pb-8` / `sm:pt-20 sm:pb-10`; md+ `md:py-10`. Skeleton sync через `CITY_NIGHT_HERO`.
+- Без отката 16:9 / `right-[20%]` / left fade / navy `#0a174b`.
+
+### Проблемы
+- Нет.
+
+### Deploy
+- Commit + push + SPB→MSK (BUILD_ID после smoke).
+
+---
+
 ## 2026-07-31 - City hero: soft photo-edge fade (navy↔photo seam)
 
 ### Наблюдения

@@ -538,7 +538,7 @@ function CityHeroDefault({
   );
 }
 
-/** HERO3g: 16:9 photo at right-[20%] + owner-swatch navy (#0a174b) fades from photo edges; иначе нейтральный strip. */
+/** HERO3g: 16:9 photo at right-[20%] + owner-swatch navy (#0a174b) soft fades L/R photo edges; иначе нейтральный strip. */
 function CityHeroStrip({
   city,
   stats,
@@ -657,7 +657,7 @@ function CityHeroStrip({
             style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
             aria-hidden
           >
-            {/* 1) LeftGrad to photo edge. 2) Photo 16:9 at right-[20%] + edge soft fade. 3) Right gutter soft→navy→black. */}
+            {/* 1) LeftGrad to photo edge. 2) Photo 16:9 at right-[20%] + L/R edge soft fade. 3) Right gutter soft→navy→black. */}
             <div
               className={CITY_NIGHT_HERO.leftFillDesktop}
               style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
@@ -675,7 +675,7 @@ function CityHeroStrip({
                   className="object-cover object-center"
                 />
               ) : null}
-              {/* Soft left (and light right) edge fade - kills hard navy↔photo seam. */}
+              {/* Soft L+R edge fade (~15% each) - kills hard navy↔photo seams into gutter. */}
               <div
                 className={CITY_NIGHT_HERO.photoEdgeFade}
                 style={{ backgroundImage: CITY_NIGHT_HERO.fadePhotoEdges }}
@@ -917,7 +917,7 @@ function CityScheduleLoadingState() {
 }
 
 function CityLoadingState({ editorial = false }: { editorial?: boolean }) {
-  // Same CITY_NIGHT_HERO shell as CityHeroStrip / SiteChromeSkeleton city (mobile min-h + equal py).
+  // Same CITY_NIGHT_HERO shell as CityHeroStrip / SiteChromeSkeleton city (mobile min-h + top-heavy py).
   return (
     <>
       <div className="border-b border-slate-200 bg-white">
