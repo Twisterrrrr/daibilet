@@ -477,8 +477,9 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 | G.3 | STUB `VENUE_ADMISSION` checkout smoke with idempotency | High | done 2026-07-30 |
 | G.4 | HTTP/admin/supplier UI smoke for seeded admission product | High | done 2026-07-30 on 85.193.80.159 |
 | G.5 | YooKassa admission path | High | done 2026-07-30 backend + fake-provider DB smoke |
-| G.6 | YooKassa sandbox smoke on finance server | High | next |
-| G.7 | Unified purchase projection for CheckoutOrder + ExternalOrder | High | next before real internal checkout |
+| G.6 | YooKassa sandbox smoke on finance server | High | partial 2026-07-31: create-payment OK, confirmation page manual |
+| G.7 | Unified purchase projection for CheckoutOrder + ExternalOrder | High | done 2026-07-31: admin + supplier verified for checkout order |
+| G.8 | YooKassa webhook hardening: provider event id dedupe + payment id guard | High | done 2026-07-31, deployed on .159 |
 
 Seed command: `pnpm backend:checkout:seed-stub-admission`.
 Smoke order command: `pnpm backend:checkout:seed-stub-admission -- --order`.

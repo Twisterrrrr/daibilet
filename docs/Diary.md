@@ -3005,3 +3005,29 @@
 
 - Add admin review/approval UI for `SupplierLegalProfile` after sandbox flow is stable.
 - Connect real YooKassa sandbox credentials on `.159` and run one admission payment smoke end to end.
+
+---
+
+## 2026-07-31 - Phase G: finance server YooKassa sandbox smoke
+
+### Decisions
+
+- Deployed the webhook-hardening patch to `.159` as server commit `a73b183` on top of the active finance branch.
+- Enabled `DAIBILET_YOOKASSA_VERIFY_WEBHOOK=1` on `.159`.
+- Replaced the mismatched YooKassa secret on `.159`: shop `1424801` must use sandbox `test_` credentials, not a `live_` key.
+- Kept `DAIBILET_STUB_CHECKOUT=1` and `DAIBILET_YOOKASSA_CHECKOUT=1` in dual-run mode.
+
+### Verification
+
+- `daibilet-finance-api.service` is active after restart.
+- `GET https://finance-api.daibilet.ru/api/health` returns 200.
+- Server egress to `api.yookassa.ru:443` works; YooKassa now accepts credentials and returns a hosted confirmation URL.
+- Supplier login works for `supplier-test@daibilet.ru` / `phase-g-test-museum`.
+- Admission sandbox purchase created YooKassa order public code `3162554` with `PENDING_PAYMENT`; supplier orders projection shows it.
+- Admin purchase projection returns the same order through `/api/admin/orders?q=3162554` with source `MANUAL`.
+- Reconcile dry-run runs on `.159`; it found one older local pending order without provider payment id and did not mutate state.
+
+### Open
+
+- Full `CONFIRMED` smoke still needs the YooMoney sandbox payment page to be completed manually. Codex in-app browser is blocked from visiting `yoomoney.ru` by browser policy.
+- After manual sandbox payment, run webhook/reconcile and verify the same public code becomes confirmed in admin and supplier LC.
