@@ -1,3 +1,22 @@
+## 2026-07-31 - City hero mobile: equal top/bottom padding
+
+### Наблюдения
+- Owner скрин Красноярск: mobile night-hero top-heavy - сверху большой зазор, снизу CTA почти к краю.
+- Причина: fixed `h-[280px]` + `justify-end` прижимал колонку вниз; `py-8` не спасал визуально при длинном title+lead+stats+2 CTA.
+
+### Решения
+- `CITY_NIGHT_HERO.section`: mobile/sm `min-h-[280|320]`, md+ fixed `h-[360px]` (16:9/gutter без изменений).
+- `content`: `py-8`/`sm:py-10` + `justify-center` до md; `md:h-full md:justify-end`. Длинный контент растит секцию, низ не сжимается.
+- HERO3g navy `#0a174b` сохранён (уже в ветке).
+
+### Проблемы
+- Нет.
+
+### Deploy
+- Commit + push + SPB→MSK atomic (BUILD_ID после smoke).
+
+---
+
 ## 2026-07-31 - City hero HERO3g: owner swatch navy `#0a174b`
 
 ### Наблюдения

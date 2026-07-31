@@ -912,7 +912,7 @@ function CityScheduleLoadingState() {
 }
 
 function CityLoadingState({ editorial = false }: { editorial?: boolean }) {
-  // Same fixed night shell as CityHeroStrip / SiteChromeSkeleton city - no py-only jump.
+  // Same CITY_NIGHT_HERO shell as CityHeroStrip / SiteChromeSkeleton city (mobile min-h + equal py).
   return (
     <>
       <div className="border-b border-slate-200 bg-white">

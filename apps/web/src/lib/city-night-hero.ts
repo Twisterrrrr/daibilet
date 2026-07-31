@@ -1,9 +1,11 @@
 /**
- * Fixed city night-hero shell (HERO3g: owner swatch navy at photo edges).
+ * City night-hero shell (HERO3g navy + mobile equal py).
  * Shared by CityPageView SSR/hydrate and city loading skeleton so first HTML
- * and client paint claim the same height (no CLS jump).
+ * and client paint claim the same shell (no CLS jump on short copy).
  *
- * Heights are fixed (`h-*`), not `min-h-*`: content / font swap must not grow the box.
+ * Mobile: `min-h-*` + equal `py-8` / `justify-center` so top/bottom padding stay
+ * symmetric when title+lead+stats+CTAs are tall (section grows; no bottom crush).
+ * Desktop (md+): fixed `h-[360px]` + `justify-end` letterbox (16:9 / gutter unchanged).
  *
  * Desktop stacking (media z-0, content z-1):
  *  1. leftGrad panel ends at photo left edge (navy at edge → black only at far left)
@@ -26,11 +28,16 @@ export const CITY_NIGHT_HERO = {
   /**
    * Outer section: navy base (not flat black) so soft/right fades read as blue;
    * black appears only at gradient ends.
+   * Mobile/sm: min-height (can grow); md+: fixed height for 16:9 letterbox.
    */
   section:
-    'relative h-[280px] overflow-hidden border-b border-[#0a174b] bg-[#0a174b] sm:h-[320px] md:h-[360px]',
-  /** Text + CTA column; fills fixed section height. Above media layer (z-0). */
-  content: 'container-page relative z-[1] flex h-full min-h-0 flex-col justify-end py-8 sm:py-10',
+    'relative min-h-[280px] overflow-hidden border-b border-[#0a174b] bg-[#0a174b] sm:min-h-[320px] md:h-[360px] md:min-h-[360px]',
+  /**
+   * Text + CTA column. Equal py always.
+   * Mobile: min-h + justify-center (symmetric); md+: fill fixed shell, justify-end.
+   */
+  content:
+    'container-page relative z-[1] flex min-h-[280px] flex-col justify-center py-8 sm:min-h-[320px] sm:py-10 md:h-full md:min-h-0 md:justify-end',
   /** Copy column: full width on mobile; left safe zone on md+ (photo + gutter own the right). */
   contentInner: 'w-full max-w-2xl md:max-w-[72%]',
   /**
