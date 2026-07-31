@@ -1,3 +1,22 @@
+## 2026-07-31 - City hero HERO3k: real mask-image (не overlay)
+
+### Наблюдения
+- Owner: швы слева/справа на фото - «брак» (красные волны на стыках). Overlay navy поверх фото не убирает геометрический край opaque pixels.
+- HERO3g/3i soft fade = `backgroundImage` overlay; live seam остаётся.
+
+### Решения
+- `.city-hero-photo-mask` в `apps/web/app/globals.css`: `-webkit-mask-image` / `mask-image` linear-gradient, soft ~25-28% L/R → alpha 0.
+- Класс на `CITY_NIGHT_HERO.photoFrame` (CityPageView + skeleton). Overlay `photoEdgeFade` удалён.
+- Mobile full-bleed тоже masked. Mobile gap HERO3j (`mt-5 md:mt-3`) не откатывали.
+
+### Проблемы
+- Нет.
+
+### Deploy
+- Commit → push → SPB build → MSK atomic `.next` (BUILD_ID после smoke). Smoke: HTML/`globals` содержат `city-hero-photo-mask` + `mask-image`.
+
+---
+
 ## 2026-07-31 - City hero: mobile gap after lead
 
 ### Наблюдения
@@ -11,7 +30,7 @@
 - Нет.
 
 ### Deploy
-- Commit → push → SPB build → MSK atomic `.next` (BUILD_ID после smoke).
+- Commit `55253504` → push; web deploy вместе с HERO3k.
 
 ---
 

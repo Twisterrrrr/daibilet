@@ -657,7 +657,7 @@ function CityHeroStrip({
             style={{ backgroundColor: CITY_NIGHT_HERO.navy }}
             aria-hidden
           >
-            {/* 1) LeftGrad to photo edge. 2) Photo 16:9 at right-[20%] + L/R edge soft fade. 3) Right gutter soft→navy→black. */}
+            {/* 1) LeftGrad to photo edge. 2) Photo 16:9 + .city-hero-photo-mask (alpha L/R). 3) Right gutter soft→navy→black. */}
             <div
               className={CITY_NIGHT_HERO.leftFillDesktop}
               style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
@@ -675,11 +675,6 @@ function CityHeroStrip({
                   className="object-cover object-center"
                 />
               ) : null}
-              {/* Soft L+R edge fade (~15% each) - kills hard navy↔photo seams into gutter. */}
-              <div
-                className={CITY_NIGHT_HERO.photoEdgeFade}
-                style={{ backgroundImage: CITY_NIGHT_HERO.fadePhotoEdges }}
-              />
             </div>
             <div
               className="absolute inset-0 md:hidden"
@@ -939,12 +934,7 @@ function CityLoadingState({ editorial = false }: { editorial?: boolean }) {
             className={CITY_NIGHT_HERO.leftFillDesktop}
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftDesktop }}
           />
-          <div className={`${CITY_NIGHT_HERO.photoFrame} bg-white/[0.04]`}>
-            <div
-              className={CITY_NIGHT_HERO.photoEdgeFade}
-              style={{ backgroundImage: CITY_NIGHT_HERO.fadePhotoEdges }}
-            />
-          </div>
+          <div className={`${CITY_NIGHT_HERO.photoFrame} bg-white/[0.04]`} />
           <div
             className="absolute inset-0 md:hidden"
             style={{ backgroundImage: CITY_NIGHT_HERO.fadeLeftMobile }}

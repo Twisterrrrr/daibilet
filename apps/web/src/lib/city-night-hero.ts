@@ -1,5 +1,5 @@
 /**
- * City night-hero shell (HERO3g navy + mobile top-heavy py + photo edge soft fade).
+ * City night-hero shell (HERO3k: real CSS mask-image on photo, not navy overlay).
  * Shared by CityPageView SSR/hydrate and city loading skeleton so first HTML
  * and client paint claim the same shell (no CLS jump on short copy).
  *
@@ -10,11 +10,12 @@
  * Desktop stacking (media z-0, content z-1):
  *  1. leftGrad panel ends at photo left edge (navy at edge → black only at far left)
  *  2. photo frame at right-[20%] height-driven 16:9 (not 5:4 / not md:w-[20%] needle)
- *  3. photo edge soft fade (left ~15% + right ~15% navy↔transparent into gutter)
+ *  3. `.city-hero-photo-mask` on photo wrapper (pixels → alpha 0 ~25–28% L/R)
  *  4. right gutter w-[20%] (soft ~7% → navy → black at section rim)
  *
- * Mobile: full-bleed photo + dense left overlay (unchanged readability).
+ * Mobile: full-bleed photo + same side mask + dense left overlay (readability).
  * Text/CTA stay left above media; no scrim over type.
+ * Overlay navy on photo was rejected (seams remain) - mask only in globals.css.
  */
 export const CITY_NIGHT_HERO = {
   /**
@@ -44,21 +45,13 @@ export const CITY_NIGHT_HERO = {
   /**
    * Photo band: full-bleed cover on narrow screens;
    * from md - height-driven 16:9 box parked at right-[20%] (20% gutter empty to the right).
+   * Class `city-hero-photo-mask` (globals.css) applies real mask-image L/R alpha.
    * Never md:w-[20%] / right-0 - that collapses into a thin needle strip.
    * Never aspect-[5/4] - HERO3e experiment; original landscape is 16:9.
    */
   photoFrame:
-    'absolute inset-0 md:inset-y-0 md:left-auto md:right-[20%] md:h-full md:w-auto md:aspect-[16/9] md:max-w-[min(56%,640px)]',
+    'city-hero-photo-mask absolute inset-0 md:inset-y-0 md:left-auto md:right-[20%] md:h-full md:w-auto md:aspect-[16/9] md:max-w-[min(56%,640px)]',
   imageSizes: '(max-width: 767px) 100vw, min(56vw, 640px)',
-  /**
-   * Soft left/right edge fade over the photo (md+ only).
-   * Kills hard vertical seams at navy↔photo on both edges into the gutter
-   * (~15% left / ~15% right of photo width; right mirrors left - was too weak).
-   */
-  photoEdgeFade:
-    'city-hero-photo-edge-fade pointer-events-none absolute inset-0 z-[1] hidden md:block',
-  fadePhotoEdges:
-    'linear-gradient(to right, #0a174b 0%, rgba(10,23,75,0.78) 3%, rgba(10,23,75,0.35) 7%, rgba(10,23,75,0.1) 11%, transparent 15%, transparent 85%, rgba(10,23,75,0.1) 89%, rgba(10,23,75,0.35) 93%, rgba(10,23,75,0.78) 97%, #0a174b 100%)',
   /**
    * Desktop left fill: from section left to photo left edge
    * (`right = gutter 20% + photo max width`). Navy at photo edge → black only far left.
