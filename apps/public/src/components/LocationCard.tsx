@@ -8,6 +8,8 @@ const TYPE_GRADIENT: Record<string, string> = {
   pier: 'from-sky-500 via-cyan-600 to-indigo-700',
   pier_water: 'from-sky-500 via-cyan-600 to-indigo-700',
   bus: 'from-amber-600 via-orange-600 to-rose-700',
+  park: 'from-emerald-600 via-green-700 to-emerald-950',
+  monument: 'from-stone-600 via-slate-700 to-stone-900',
   outdoor_location: 'from-emerald-600 via-green-700 to-emerald-950',
   attraction: 'from-violet-600 via-purple-700 to-indigo-800',
   sport_activity_space: 'from-orange-600 via-red-600 to-rose-800',

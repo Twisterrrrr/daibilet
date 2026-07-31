@@ -1,3 +1,102 @@
+## 2026-07-31 - Codex handoff Location↔Excursion + HERO3c
+
+### Наблюдения
+- Cursor закрыл Location↔Excursion Phase A/B + HERO3c (MSK live `cUv55TBxYLmFcxlC_1Eev`); prod migrate/STOP-контент ещё у Codex/owner.
+
+### Решения
+- Handoff: `docs/codex-handoff-2026-07-31-location-excursion.md` (canon STOP/geo, next: migrate + perm seed + editorial STOP).
+
+### Проблемы
+- Catalog migrate + SSH finance для Codex по-прежнему внешние блокеры.
+
+---
+
+## 2026-07-31 - Location↔Excursion rename to owner canon
+
+### Наблюдения
+- Owner-канон: `EventVenueRouteItem` / `RouteItemRole` / таблица `event_venue_route_items` (не `EventVenueLink`).
+- Migrate на prod ещё не применяли - можно переписать migration in place.
+
+### Решения
+- Schema: enum `RouteItemRole` (`STOP`, `START`, `NEARBY_HUB`), model `EventVenueRouteItem` `@@map("event_venue_route_items")`, relations `Event.routeItems` / `Venue.routeItems`; `Venue.hookFact` и `Event.venueId` без изменений.
+- Migration folder `20260731140000_event_venue_route_items_hook_fact`; dto raw SQL на новую таблицу/enum; seed Перми обновлён под fixture.
+
+### Проблемы
+- Prod migrate + контент STOP-пунктов ещё впереди (LE.7).
+
+---
+
+## 2026-07-31 - Location↔Excursion Phase B (API + UI + Perm seed)
+
+### Наблюдения
+- Schema Phase A готова (`EventVenueRouteItem`, `Venue.hookFact`); нужны admin write, public DTO и контент Перми.
+- `Event.venueId` остаётся только точкой старта; остановки - явные STOP-пункты маршрута.
+
+### Решения
+- Admin: `buildAdminEventDetail.venueLinks`, `PUT/PATCH /api/admin/events/:id/venue-links`, форма STOP-рядов в Next admin; `hookFact` в updateAdminVenue.
+- Public: `stopEvents` / `nearbyEvents` (geo 300м, подпись «Рядом», не merge), `venueStops` на event page, `stopEventCount` + hook на LocationCard.
+- Seed: `scripts/seed-perm-must-see-venues.js` (6 slug Перми); cityInfo perm.mustSee уже со slug.
+
+### Проблемы
+- Migrate `20260731140000_event_venue_route_items_hook_fact` на prod до записи route items/hookFact.
+- Связки экскурсия↔STOP для Перми ещё не заполнены контентом (только venues seed).
+
+---
+
+## 2026-07-31 - Location↔Excursion Phase A (schema)
+
+### Наблюдения
+- Нужна связь many-to-many Event↔Venue для остановок экскурсий (не только `Event.venueId` start).
+- На карточках локаций нужен короткий hook-текст (`hookFact`).
+
+### Решения
+- Prisma (канон): enum `RouteItemRole` (`STOP`, `START`, `NEARBY_HUB`), model `EventVenueRouteItem` → `event_venue_route_items`, `Venue.hookFact`.
+- Migration `20260731140000_event_venue_route_items_hook_fact` (файлы only; migrate на prod не гоняли).
+- MVP роль: `STOP`; `START`/`NEARBY_HUB` reserved. `Event.venueId` = старт.
+
+### Проблемы
+- Deploy migrate до admin/API wiring Phase B+.
+
+---
+
+## 2026-07-31 - VenueKind PARK + MONUMENT
+
+### Наблюдения
+- Owner: добавить типы локаций **парк** и **памятник** в каталог «Важные места»; платный вход в парк (Монрепо) опционален и рано мешать в catalog/finance.
+- Канон kinds: Prisma `VenueKind` + public snake_case в `venue-meta` / `dto.js` `resolvePublicVenueKind`. Ранее `парк|сквер` инференсился в `outdoor_location`; «памятник» в тексте - сигнал `meeting_point` (экскурсии).
+- `bus` / `museum`/`art_space` показывают паттерн public-only kind без DB; для park/monument нужен CMS store → enum + migrate.
+
+### Решения
+- Prisma: `PARK`, `MONUMENT` + migration `20260731130000_venue_kind_park_monument`.
+- Public slugs: `park` / `monument`; RU: Парк / Памятник; plurals Парки / Памятники; template `location`.
+- Infer: `\bпарк\b|сквер` → `park` (не парковка); `monument` только при явном CMS kind (не авто из «памятник …», чтобы не сломать meeting points).
+- Explicit `stored === park|monument` раньше meeting-point heuristics.
+- UI: catalog filters, LocationCard gradients, park-like hero, map tip / search `/locations`.
+- Park admission / finance projection: **не делаем**; future note в qa.md + Tasktracker VK.6.
+
+### Проблемы
+- Deploy migrate на MSK/SPB catalog DB до записи kinds из admin.
+- Backfill существующих outdoor park-названий не делали (public infer подхватит `park` по имени даже при stored `OUTDOOR_LOCATION`/`OTHER`/`VENUE`).
+
+---
+
+## 2026-07-31 - City hub «Главные места» → venue/location
+
+### Наблюдения
+- Owner: заголовки блока «Главные места» на city hub не кликабельны; chip «Музеи →» ведёт только в категорию.
+- Источник: `apps/web/src/lib/cityInfo.ts` (`mustSee` / `sights`); UI `CitySightsSection` в `CityPageView.client.tsx`.
+- Prod API Пермь: 6 editorial мест (галерея, Пермяк, набережная, Хохловка, Театр-Театр, Эспланада) **нет** как published/candidate venue/location с совпадающим именем. Есть PERMM (`muzei-sovremennogo-iskusstva-permm`), но его нет в mustSee.
+
+### Решения
+- Модель пункта: optional `href` | `venueSlug` | `locationSlug`; резолв `resolveCityPlaceHref` + runtime match по venues города (`resolveCityPlaceTitleHref`, только published/candidate).
+- UI: title = `Link` при наличии href; chip категории без изменений. Fallback mustSee из venues получает `href` через `venueHref`.
+- Заполнено: СПб «Эрмитаж» → `venueSlug: ermitazh` (prod PUBLISHED `/venues/ermitazh`). Пермь - без битых ссылок до создания entity.
+
+### Проблемы
+- Нужны slug/создание сущностей Перми (и большинства mustSee других городов) от владельца каталога.
+
+---
+
 ## 2026-07-31 - City admission title + pay CTA host
 
 ### Наблюдения
@@ -47,6 +146,19 @@
 ### Проблемы
 - Commit hero-fix всё ещё не в git - следующий rebuild с чистого git снова может затереть. Нужен commit + scp source перед любым build.
 
+## 2026-07-31 - EventCard slot pills: hanging left (not center)
+
+### Наблюдения
+- Owner: висящий 3-й слот и одиночный слот не должны центрироваться в ряду - только в левой колонке, как левый слот пары.
+
+### Решения
+- `EventCardSlotChips` (compact): убран `col-span-2 justify-center` для нечётного остатка; сетка `grid-cols-2` заполняется L→R, висящий/одиночный остаётся в левой ячейке. Wide/nowrap не трогали.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-07-31 - EventCard slot pills: 2-col grid distribution
 
 ### Наблюдения
@@ -56,6 +168,7 @@
 ### Решения
 - `EventCardSlotChips` (compact): `grid grid-cols-2`; последний нечётный - `col-span-2 justify-center`. Wide/nowrap не трогали.
 - Source scp MSK+SPB; rebuild MSK exclusive flock. **BUILD_ID=`HL2bMp0TxgnzWNKKehZgG`**. Editorial/showcase markers сохранены. Без commit.
+- **Скорректировано** в записи выше: висящий/одиночный - left column, не center ряда.
 
 ### Проблемы
 - Риск отката при git-only rebuild без этого diff.
@@ -91,10 +204,10 @@
 - Убраны `CityHeroMirrorWing` / `sideMirror*` полностью; skeleton sync без mirror placeholders.
 - Композиция: base `#050a12` + left fade (`38.2%→61.8%` desktop / сильнее на mobile) + right fade `#010204` + фото справа `w-[38.2%]` (`object-cover`, city focus).
 - Copy/CTA в `contentInner` ~`md:max-w-[55%]`; градиенты только в media `z-0` под контентом (не scrim поверх текста).
-- Высоты прежние `h-[280|320|360]`. Commit + atomic catalog deploy (SPB build -> MSK `.next` swap).
+- Высоты прежние `h-[280|320|360]`. Только local - без commit/deploy.
 
 ### Проблемы
-- Redeploy pending / in progress.
+- MSK live **BUILD_ID=cUv55TBxYLmFcxlC_1Eev** (SPB build → atomic .next swap). Commits 2ef9c1b2 + 170d747 (strip place-href). Push: нет.
 
 ---
 
@@ -7462,3 +7575,29 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 - Purchase smoke не дал confirmationUrl: ошибка ключей магазина, не сети.
 
 
+## 2026-07-31 - MSK catalog webpack thrash / partial deploy
+
+### Наблюдения
+- Live console: cascade Uncaught (in promise) TypeError: e[o] is not a function из webpack-*.js + chunks (6367, 8392, 2830, page-*) - классический рассинхрон webpack runtime vs chunks.
+- На MSK за ~10 мин несколько stop/start daibilet-web (09:41, 09:42, 09:49, 09:50 UTC) при параллельных catalog deploy (hero / back-to-top) - высокий риск thrash .next.
+- Prev BUILD на диске (backup /tmp/daibilet-web-next-prev): lGrO-MIR8XMZLXbCJH6fh. После атомарного swap (~10:25 UTC): 4FE8q3QbUiYefGylGZDxp (= SPB /opt/daibilet/apps/web).
+
+### Решения
+- Не запускать третий параллельный scp: на .16/.184 idle (нет scp/rsync/build).
+- Проверка целостности: SHA256 BUILD_ID + webpack-92d7ca63add51006.js + 6367/8392/2830/pp/page-* совпадают MSK↔SPB; HTTPS отдаёт те же SHA; HTML-ссылки на chunks без missing; один BUILD dir в static/.
+- Purge nginx proxy_cache /var/cache/nginx/daibilet (было ~60 файлов stale).
+- Smoke: / и /cities/moscow → 200; chunk fetch 200; daibilet-web active с 10:25:15 UTC.
+
+### Проблемы
+- Launch-blocker снят для текущего BUILD, но процесс хрупкий: два параллельных catalog deploy в .next снова дадут тот же symptom. Правило: один атомарный tar/swap .next с .16 → MSK, stop→extract→purge cache→start; не билдить Next на MSK; не параллелить.
+
+## 2026-07-31 - MSK web BUILD thrash (post-hotfix overwrite)
+
+### Наблюдения
+- После webpack hotfix (4FE8q3QbUiYefGylGZDxp, backup /tmp/daibilet-web-next-prev) другой deploy снова сменил live на 9d85kXChGb8qjnDLr_ARy (slots/63a7f3a4+); web restart ~10:29 UTC.
+
+### Решения
+- Verify-first: BUILD/HTML/chunks/SHA MSK↔HTTPS согласованы на 9d85… - restore не делали.
+
+### Проблемы
+- Повторный thrash деплоев .next на MSK без атомарного gate; /moscow soft-404 в prerender, рабочий city URL /cities/moscow.

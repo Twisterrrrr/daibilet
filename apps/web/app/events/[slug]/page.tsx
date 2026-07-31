@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 
 import { EventCard } from '@/components/EventCard';
 import { EventBuyCard, EventHero } from '@/components/EventPage.client';
-import { EventDescription, EventQuickInfo, EventTags, EventTrustStrip } from '@/components/EventPageSections';
+import { EventDescription, EventQuickInfo, EventTags, EventTrustStrip, EventVenueStops } from '@/components/EventPageSections';
 import { ReviewSection } from '@/components/ReviewSection';
 import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { SiteLayout } from '@/components/SiteLayout';
@@ -108,6 +108,7 @@ export default async function EventDetailPage({ params }: PageProps) {
           <div className="grid gap-10 lg:grid-cols-3 lg:gap-12">
             <div className="space-y-10 lg:col-span-2">
               <EventDescription event={event} />
+              <EventVenueStops event={event} />
               <EventQuickInfo event={event} />
               <EventTags event={event} />
               <EventTrustStrip />

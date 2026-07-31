@@ -586,6 +586,8 @@ function venueKind(input) {
       theater: "THEATER",
       concert_hall: "CONCERT_HALL",
       sport_outdoor: "SPORT_ACTIVITY_SPACE",
+      park: "PARK",
+      monument: "MONUMENT",
       generic_location: "MEETING_POINT",
     }[input] || "OTHER"
   );
@@ -593,7 +595,7 @@ function venueKind(input) {
 
 function venuePageStatus(input, events) {
   if (input === "generic_location") return "NONE";
-  if (events >= 5 || ["pier_water", "museum_art", "theater", "concert_hall"].includes(input)) return "CANDIDATE";
+  if (events >= 5 || ["pier_water", "museum_art", "theater", "concert_hall", "park", "monument"].includes(input)) return "CANDIDATE";
   return "NONE";
 }
 

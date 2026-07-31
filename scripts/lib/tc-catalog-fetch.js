@@ -242,7 +242,8 @@ function guessVenueType(venue, category, tags, event) {
   if (matches(text, ["клуб", "club", "бар", "ресторан", "cafe", "кафе"])) return "club_restaurant";
   if (matches(text, ["концерт", "филармони", "зал", "дом музыки", "дк ", "дворец культуры"])) return "concert_hall";
   if (matches(text, ["причал", "набереж", "теплоход", "катер", "канал", "река"])) return "pier_water";
-  if (matches(text, ["стадион", "арена", "спорт", "каток", "скалодром", "парк"])) return "sport_outdoor";
+  if (/\bпарк\b|сквер/i.test(text) && !/парковк/i.test(text)) return "park";
+  if (matches(text, ["стадион", "арена", "спорт", "каток", "скалодром"])) return "sport_outdoor";
   if (matches(text, ["онлайн", "online"])) return "online";
   return "generic_location";
 }

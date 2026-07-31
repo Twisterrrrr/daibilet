@@ -7,6 +7,7 @@ import { collectCatalogLabels, extractDurationLabel } from '@/lib/catalog-labels
 import { formatEventDescriptionHtml } from '@/lib/event-description-format';
 import { formatAgeLimit } from '@/lib/event-page-utils';
 import { uniqueEventTagLabels } from '@/lib/event-tag-labels';
+import { venueHref } from '@/lib/routes';
 
 export function EventDescription({ event }: { event: PublicEventDto }) {
   const description = String(event.description || '').trim();
@@ -82,6 +83,43 @@ export function EventTags({ event }: { event: PublicEventDto }) {
           </span>
         ))}
       </div>
+    </div>
+  );
+}
+
+/** Остановки маршрута (EventVenueRouteItem STOP). Event.venueId = только старт. */
+export function EventVenueStops({ event }: { event: PublicEventDto }) {
+  const stops = Array.isArray(event.venueStops) ? event.venueStops : [];
+  if (!stops.length) return null;
+
+  return (
+    <div>
+      <h2 className="text-lg font-bold text-graphite">Маршрут / места</h2>
+      <ol className="mt-4 space-y-2">
+        {stops.map((stop, index) => {
+          const href =
+            stop.href ||
+            venueHref({
+              id: stop.venueId,
+              slug: stop.slug,
+              name: stop.title,
+              type: stop.kind,
+            });
+          return (
+            <li key={`${stop.venueId}-${index}`} className="flex items-start gap-3 text-sm text-graphite">
+              <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface-muted text-xs font-semibold text-graphite-muted">
+                {index + 1}
+              </span>
+              <div className="min-w-0">
+                <Link href={href} className="font-medium text-graphite hover:text-primary-700">
+                  {stop.title}
+                </Link>
+                {stop.label ? <p className="text-xs text-graphite-muted">{stop.label}</p> : null}
+              </div>
+            </li>
+          );
+        })}
+      </ol>
     </div>
   );
 }

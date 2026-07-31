@@ -16,6 +16,8 @@ const KIND_OPTIONS = [
   'CLUB_BAR_RESTAURANT',
   'PIER',
   'MEETING_POINT',
+  'PARK',
+  'MONUMENT',
   'OUTDOOR_LOCATION',
   'SPORT_ACTIVITY_SPACE',
   'ATTRACTION',
@@ -158,6 +160,14 @@ export default async function AdminVenueDetailPage({ params, searchParams }: Pag
               name="shortDescription"
               rows={2}
               defaultValue={detail.shortDescription || ''}
+              className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
+            />
+          </Field>
+          <Field label="Hook fact (карточка локации)">
+            <input
+              name="hookFact"
+              defaultValue={detail.hookFact || ''}
+              placeholder="Короткий факт-интрига для карточки"
               className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm"
             />
           </Field>

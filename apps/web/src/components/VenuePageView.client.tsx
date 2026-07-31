@@ -120,6 +120,8 @@ export function VenuePageView({
                 sessions={contentReady ? payload.sessions : []}
                 routeGroups={contentReady ? allRouteGroups : []}
                 relatedVenues={contentReady ? payload.relatedVenues : []}
+                stopEvents={contentReady ? payload.stopEvents || [] : []}
+                nearbyEvents={contentReady ? payload.nearbyEvents || [] : []}
                 pagePayload={payload}
               />
             ) : isInstitutionPage ? (

@@ -132,6 +132,8 @@ export async function buildPublicSearchDto(
       kind.includes('PIER') ||
       kind.includes('OUTDOOR') ||
       kind === 'BUS' ||
+      kind === 'PARK' ||
+      kind === 'MONUMENT' ||
       kind === 'ATTRACTION' ||
       kind === 'SPORT_ACTIVITY_SPACE';
     push(

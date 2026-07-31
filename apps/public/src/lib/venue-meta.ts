@@ -1,4 +1,4 @@
-import { Anchor, Bus, Landmark, MapPin, type LucideIcon } from 'lucide-react';
+import { Anchor, Bus, Landmark, MapPin, Trees, type LucideIcon } from 'lucide-react';
 
 import { formatNumber } from '@/data';
 
@@ -15,7 +15,17 @@ export const INSTITUTION_KINDS = new Set([
 ]);
 
 /** Типы локаций — другой шаблон (причалы, площадки, открытые точки). MEETING_POINT — только на карточке события. */
-export const LOCATION_KINDS = new Set(['pier', 'bus', 'venue', 'outdoor_location', 'sport_activity_space', 'attraction', 'other']);
+export const LOCATION_KINDS = new Set([
+  'pier',
+  'bus',
+  'venue',
+  'park',
+  'monument',
+  'outdoor_location',
+  'sport_activity_space',
+  'attraction',
+  'other',
+]);
 
 export const CATALOG_EXCLUDED_KINDS = new Set(['meeting_point', 'online']);
 
@@ -28,6 +38,8 @@ const VENUE_TYPE_LABELS: Record<string, string> = {
   pier: 'Причал',
   bus: 'Автобусы',
   venue: 'Площадка',
+  park: 'Парк',
+  monument: 'Памятник',
   outdoor_location: 'Открытая локация',
   sport_activity_space: 'Спорт / активность',
   attraction: 'Достопримечательность',
@@ -45,6 +57,8 @@ export const CATALOG_TYPE_OPTIONS: Array<{ value: string; label: string; templat
   { value: 'pier', label: 'Причал', template: 'location' },
   { value: 'bus', label: 'Автобусы', template: 'location' },
   { value: 'venue', label: 'Площадка', template: 'location' },
+  { value: 'park', label: 'Парк', template: 'location' },
+  { value: 'monument', label: 'Памятник', template: 'location' },
   { value: 'outdoor_location', label: 'Открытая локация', template: 'location' },
   { value: 'sport_activity_space', label: 'Спорт / активность', template: 'location' },
   { value: 'attraction', label: 'Достопримечательность', template: 'location' },
@@ -75,6 +89,8 @@ export function venueTypeIcon(type?: string | null): LucideIcon {
   const key = normalizeVenueKind(type);
   if (key === 'pier' || key === 'pier_water') return Anchor;
   if (key === 'bus') return Bus;
+  if (key === 'park') return Trees;
+  if (key === 'monument') return Landmark;
   if (INSTITUTION_KINDS.has(key)) return Landmark;
   return MapPin;
 }
@@ -93,6 +109,7 @@ export function isMeetingPointLike(input: {
 }): boolean {
   const kind = normalizeVenueKind(input.type);
   if (kind === 'meeting_point') return true;
+  if (kind === 'park' || kind === 'monument') return false;
   const name = `${input.name || input.title || ''} ${input.address || ''}`.toLowerCase();
   return /место сбора|место встречи|точка сбора|точка встречи|площадка:|^метро\b|^м\.(?:\s|«|"|')|\bм\.\s*(?:«|[а-яё])|\bу метро\b|около метро|у памятник|памятник|\bпам\.|у пам\.|\bу пам\b|пл\.\s*у пам/u.test(name);
 }
@@ -169,6 +186,8 @@ export const LOCATION_TYPE_EMOJI: Record<string, string> = {
   pier_water: '⚓',
   bus: '🚌',
   venue: '📍',
+  park: '🌳',
+  monument: '🗿',
   outdoor_location: '🌳',
   sport_activity_space: '⚡',
   attraction: '🏛',

@@ -24,7 +24,7 @@ import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { landingPageHref } from '@/lib/landing-slugs';
 import { eventHref, sessionVenueHref, venueHref } from '@/routes';
 import { inCityPrepositional } from '@/lib/city-declension';
-import { resolveCityInfo, type CityInfoEntry } from '@/lib/cityInfo';
+import { resolveCityInfo, resolveCityPlaceHref, type CityInfoEntry, type CityMustSeeItem } from '@/lib/cityInfo';
 import { buildCityHubSeoTitle } from '@/lib/city-hub-seo';
 import {
   buildCityPageShell,
@@ -391,17 +391,28 @@ function MustSeeSection({
         Главные точки и сценарии, с которых удобно начать знакомство с городом. Ниже можно перейти к билетам, расписанию и площадкам.
       </p>
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {places.slice(0, 6).map((place, index) => (
+        {places.slice(0, 6).map((place, index) => {
+          const placeHref = resolveCityPlaceHref(place);
+          return (
           <div key={`${place.name}:${index}`} className="flex gap-4 rounded-lg bg-white p-5 shadow-[0_10px_28px_rgba(15,23,42,0.06)] transition hover:shadow-[0_16px_34px_rgba(15,23,42,0.1)]">
             <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary-100 text-lg font-bold text-primary-600">
               {index + 1}
             </div>
             <div>
-              <h3 className="font-semibold text-slate-950">{place.name}</h3>
+              {placeHref ? (
+                <h3 className="font-semibold text-slate-950">
+                  <a href={placeHref} className="underline-offset-2 hover:text-primary-800 hover:underline">
+                    {place.name}
+                  </a>
+                </h3>
+              ) : (
+                <h3 className="font-semibold text-slate-950">{place.name}</h3>
+              )}
               <p className="mt-1 text-sm leading-6 text-slate-500">{place.desc}</p>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
@@ -749,14 +760,19 @@ function cityGuideFor(city: PublicCity) {
   return resolveCityInfo(city.slug, city.sourceSlug);
 }
 
-function buildFallbackMustSee(city: PublicCity, categories: Array<[string, number]>, venues: PublicVenue[]) {
-  const categoryPlaces = categories.slice(0, 3).map(([name, count]) => ({
+function buildFallbackMustSee(
+  city: PublicCity,
+  categories: Array<[string, number]>,
+  venues: PublicVenue[],
+): CityMustSeeItem[] {
+  const categoryPlaces: CityMustSeeItem[] = categories.slice(0, 3).map(([name, count]) => ({
     name,
     desc: `${pluralEvents(count)} в каталоге города ${city.name}: удобно начать выбор с этой категории.`,
   }));
-  const venuePlaces = venues.slice(0, 3).map((venue) => ({
+  const venuePlaces: CityMustSeeItem[] = venues.slice(0, 3).map((venue) => ({
     name: venue.name,
     desc: `${pluralEvents(venue.events)} на странице площадки. Проверьте расписание, цену и ближайшие даты.`,
+    href: venueHref(venue),
   }));
   return [...categoryPlaces, ...venuePlaces];
 }

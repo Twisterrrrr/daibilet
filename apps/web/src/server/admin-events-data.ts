@@ -186,6 +186,17 @@ export type AdminEventDetailData = {
     subcategoryIds: string[];
     tagIds: string[];
   };
+  venueLinks: Array<{
+    id: string;
+    venueId: string;
+    role: string;
+    sortOrder: number;
+    label: string | null;
+    slug: string | null;
+    title: string | null;
+    kind: string | null;
+    pageStatus: string | null;
+  }>;
   source: {
     sourceLabel: string | null;
     status: string | null;
@@ -309,6 +320,24 @@ function normalizeOverride(raw: unknown): AdminEventOverride {
   };
 }
 
+function normalizeVenueLinks(raw: unknown): AdminEventDetailData['venueLinks'] {
+  if (!Array.isArray(raw)) return [];
+  return raw.map((item) => {
+    const row = (item && typeof item === 'object' ? item : {}) as Record<string, unknown>;
+    return {
+      id: String(row.id || ''),
+      venueId: String(row.venueId || ''),
+      role: String(row.role || 'STOP'),
+      sortOrder: asNumber(row.sortOrder),
+      label: row.label != null ? String(row.label) : null,
+      slug: row.slug != null ? String(row.slug) : null,
+      title: row.title != null ? String(row.title) : null,
+      kind: row.kind != null ? String(row.kind) : null,
+      pageStatus: row.pageStatus != null ? String(row.pageStatus) : null,
+    };
+  });
+}
+
 export async function loadAdminEventDetail(eventId: string): Promise<AdminEventDetailData> {
   const errors: string[] = [];
   const id = eventId.trim();
@@ -329,6 +358,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
       publishBlockers: [],
       groupEventIds: [],
       classification: emptyClassification(),
+      venueLinks: [],
       source: emptySource(),
       errors: ['missing event id'],
     };
@@ -406,6 +436,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
         publishBlockers,
         groupEventIds: [],
         classification,
+        venueLinks: [],
         source,
         errors,
       };
@@ -423,6 +454,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
     const groupEventIds = Array.isArray(payload.eventIds)
       ? payload.eventIds.map((item) => String(item))
       : [];
+    const venueLinks = normalizeVenueLinks(payload.venueLinks);
 
     const sessions = Array.isArray(payload.sessions)
       ? payload.sessions.map((item) => {
@@ -490,6 +522,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
       publishBlockers,
       groupEventIds,
       classification,
+      venueLinks,
       source,
       errors,
     };
@@ -511,6 +544,7 @@ export async function loadAdminEventDetail(eventId: string): Promise<AdminEventD
       publishBlockers,
       groupEventIds: [],
       classification,
+      venueLinks: [],
       source,
       errors,
     };

@@ -174,12 +174,16 @@ export interface PublicVenueDto extends SeoFields {
   metroStation?: string | null;
   wayToFind?: string | null;
   parkingInfo?: string | null;
+  /** Короткий hook-текст для карточек локаций. */
+  hookFact?: string | null;
   type: string;
   pageStatus?: string | null;
   description?: string | null;
   shortDescription?: string | null;
   heroImageUrl?: string | null;
   events: number;
+  /** Явные STOP-связи EventVenueRouteItem на эту площадку. */
+  stopEventCount?: number;
   categories: Record<string, number>;
 }
 
@@ -237,6 +241,33 @@ export interface PublicEventDto extends SeoFields, PurchaseFields {
   groupKey?: string | null;
   groupEventIds?: string[];
   sessionCount?: number;
+  /** Остановки маршрута (EventVenueRouteItem STOP); Event.venueId = только старт. */
+  venueStops?: PublicEventVenueStopDto[];
+}
+
+/** Slim-карточка события на странице локации (STOP / Рядом). */
+export interface PublicVenueLinkedEventDto {
+  id: string;
+  slug: string;
+  title: string;
+  imageUrl?: string | null;
+  priceFrom?: number | null;
+  venue?: string | null;
+  venueId?: string | null;
+  venueSlug?: string | null;
+  venueKind?: string | null;
+  /** Подпись остановки из EventVenueRouteItem.label. */
+  routeLabel?: string | null;
+}
+
+export interface PublicEventVenueStopDto {
+  venueId: string;
+  slug: string;
+  title: string;
+  kind: string;
+  label?: string | null;
+  /** Канонический path `/venues/…` или `/locations/…`. */
+  href?: string | null;
 }
 
 export interface PublicPurchaseOptionDto extends PurchaseFields {
@@ -311,6 +342,10 @@ export interface PublicVenuePageDto extends ApiEnvelope {
   venue: PublicVenueDto;
   sessions: PublicSessionDto[];
   relatedVenues: PublicVenueDto[];
+  /** Экскурсии с явной STOP-связью на эту локацию. */
+  stopEvents?: PublicVenueLinkedEventDto[];
+  /** Geo-fallback (~300м), только если stopEvents пуст. Подпись UI: «Рядом». */
+  nearbyEvents?: PublicVenueLinkedEventDto[];
   stats: {
     events: number;
     categories: number;

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { AdminEventTaxonomyForm } from '@/components/admin/AdminEventTaxonomyForm';
+import { AdminEventVenueLinksForm } from '@/components/admin/AdminEventVenueLinksForm';
 import { AdminEventOpsPanels } from '@/components/admin/AdminEventOpsPanels';
 import {
   saveAdminEventModerationAction,
@@ -124,6 +125,8 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
         classification={detail.classification}
         taxonomy={taxonomy}
       />
+
+      <AdminEventVenueLinksForm eventId={detail.id} venueLinks={detail.venueLinks} />
 
       <form
         action={saveAdminEventOverrideAction}

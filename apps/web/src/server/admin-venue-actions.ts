@@ -26,6 +26,7 @@ export async function saveAdminVenueAction(formData: FormData) {
     metroStation: emptyToNull(formData.get('metroStation')),
     wayToFind: emptyToNull(formData.get('wayToFind')),
     parkingInfo: emptyToNull(formData.get('parkingInfo')),
+    hookFact: emptyToNull(formData.get('hookFact')),
     isIndexable: formData.get('isIndexable') === 'on' || formData.get('isIndexable') === 'true',
     kind: String(formData.get('kind') || 'VENUE').trim(),
     pageStatus: String(formData.get('pageStatus') || 'NONE').trim(),

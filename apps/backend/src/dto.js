@@ -42,6 +42,11 @@ import {
   fetchVenueHeroImageFallbacks,
 } from './public-venue-lean.ts';
 import {
+  hasMinimalVenueProfile,
+  isContentPlaceHubEligible,
+  isContentPlaceKind,
+} from './public-venue-hub-gate.js';
+import {
   ACTIVE_SESSION_SQL,
   MIN_DISPLAY_PRICE_RUB,
   hasDisplayPrice,
@@ -2733,6 +2738,7 @@ export async function buildAdminVenueDetail(db, venueId) {
           venue."metroStation",
           venue."wayToFind",
           venue."parkingInfo",
+          venue."hookFact",
           venue.kind,
           venue."pageStatus",
           city.title as city
@@ -2798,6 +2804,7 @@ export async function updateAdminVenue(db, venueId, payload) {
         "metroStation" = $13,
         "wayToFind" = $14,
         "parkingInfo" = $15,
+        "hookFact" = $16,
         "updatedAt" = now()
       where id = $1
       returning id
@@ -2818,6 +2825,7 @@ export async function updateAdminVenue(db, venueId, payload) {
       next.metroStation ?? null,
       next.wayToFind ?? null,
       next.parkingInfo ?? null,
+      next.hookFact ?? null,
     ],
   );
 
@@ -2869,6 +2877,106 @@ export async function updateAdminEventTaxonomy(db, eventId, payload) {
   const event = (await eventRowsByIds(db, [eventId]))[0] || null;
   invalidateAdminGroupedEventsCache(db, 'event taxonomy');
   return { eventId, event };
+}
+
+/**
+ * Заменяет STOP-пункты EventVenueRouteItem. Event.venueId (точка старта) не трогаем.
+ * payload.links: [{ venueId|slug, role?: 'STOP', sortOrder?, label? }]
+ */
+export async function updateAdminEventVenueLinks(db, eventId, payload) {
+  const exists = await db.query(`select id from "Event" where id = $1 limit 1`, [eventId]);
+  if (!exists.rows[0]) return null;
+
+  const rawLinks = Array.isArray(payload?.links) ? payload.links : [];
+  const prepared = [];
+  const seenVenueIds = new Set();
+
+  for (let index = 0; index < rawLinks.length; index += 1) {
+    const item = rawLinks[index] && typeof rawLinks[index] === 'object' ? rawLinks[index] : {};
+    const role = String(item.role || 'STOP').trim().toUpperCase() || 'STOP';
+    if (role !== 'STOP') continue;
+    const locator = normalizeNullableString(item.venueId || item.slug);
+    if (!locator) continue;
+    const venueResult = await db.query(
+      `select id from "Venue" where id = $1 or slug = $1 limit 1`,
+      [locator],
+    );
+    const venueId = venueResult.rows[0]?.id;
+    if (!venueId || seenVenueIds.has(venueId)) continue;
+    seenVenueIds.add(venueId);
+    const sortOrder = Number.isFinite(Number(item.sortOrder)) ? Math.trunc(Number(item.sortOrder)) : index;
+    prepared.push({
+      venueId,
+      role: 'STOP',
+      sortOrder,
+      label: normalizeNullableString(item.label),
+    });
+  }
+
+  prepared.sort((a, b) => a.sortOrder - b.sortOrder || a.venueId.localeCompare(b.venueId));
+
+  await db.query(
+    `delete from "event_venue_route_items" where "eventId" = $1 and role = 'STOP'::"RouteItemRole"`,
+    [eventId],
+  );
+
+  for (let index = 0; index < prepared.length; index += 1) {
+    const link = prepared[index];
+    await db.query(
+      `
+        insert into "event_venue_route_items" (
+          id, "eventId", "venueId", role, "sortOrder", label, "createdAt", "updatedAt"
+        ) values (
+          $1, $2, $3, 'STOP'::"RouteItemRole", $4, $5, now(), now()
+        )
+      `,
+      [
+        `evri_${randomUUID().replace(/-/g, '').slice(0, 24)}`,
+        eventId,
+        link.venueId,
+        Number.isFinite(link.sortOrder) ? link.sortOrder : index,
+        link.label,
+      ],
+    );
+  }
+
+  const venueLinks = await loadAdminEventVenueLinks(db, eventId);
+  return { eventId, venueLinks };
+}
+
+async function loadAdminEventVenueLinks(db, eventId) {
+  const result = await db.query(
+    `
+      select
+        link.id,
+        link."eventId",
+        link."venueId",
+        link.role,
+        link."sortOrder",
+        link.label,
+        venue.slug,
+        venue.title,
+        venue.kind,
+        venue."pageStatus"
+      from "event_venue_route_items" link
+      join "Venue" venue on venue.id = link."venueId"
+      where link."eventId" = $1
+      order by link."sortOrder", venue.title
+    `,
+    [eventId],
+  );
+  return result.rows.map((row) => ({
+    id: row.id,
+    eventId: row.eventId,
+    venueId: row.venueId,
+    role: row.role,
+    sortOrder: row.sortOrder,
+    label: row.label,
+    slug: row.slug,
+    title: row.title,
+    kind: row.kind,
+    pageStatus: row.pageStatus,
+  }));
 }
 
 function mergeReadinessIssues(left = [], right = []) {
@@ -3248,12 +3356,13 @@ export async function buildAdminEventDetail(db, eventId) {
         orders: 0,
         ticketStatuses: [],
       },
+      venueLinks: [],
     };
   }
 
   const primaryEventId = eventIds.includes(eventId) ? eventId : eventIds[0];
 
-  const [sessionsResult, offersResult, salesResult, orderStatusResult, contentResult] = await Promise.all([
+  const [sessionsResult, offersResult, salesResult, orderStatusResult, contentResult, venueLinks] = await Promise.all([
     db.query(
       `
         select
@@ -3341,6 +3450,7 @@ export async function buildAdminEventDetail(db, eventId) {
       `,
       [primaryEventId],
     ),
+    loadAdminEventVenueLinks(db, primaryEventId),
   ]);
 
   const sessions = sessionsResult.rows.map((row) => ({
@@ -3420,6 +3530,7 @@ export async function buildAdminEventDetail(db, eventId) {
       orders,
       ticketStatuses: orderStatusResult.rows,
     },
+    venueLinks,
   };
 }
 
@@ -4155,6 +4266,160 @@ function humanizeSlug(slug) {
     .join(' ');
 }
 
+/** Расстояние между двумя WGS84 точками в метрах. */
+export function haversineMeters(lat1, lon1, lat2, lon2) {
+  const toRad = (degrees) => (Number(degrees) * Math.PI) / 180;
+  const earthRadiusMeters = 6371000;
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
+  return 2 * earthRadiusMeters * Math.asin(Math.min(1, Math.sqrt(a)));
+}
+
+function mapSlimPublicStopEvent(row) {
+  const venueTitle = formatPublicVenueTitle(row.venueTitle || row.venue || '');
+  const venueKind = resolvePublicVenueKind(row.venueKind, venueTitle, row.venueAddress);
+  return {
+    id: row.id,
+    slug: publicEventSlug(row.slug || row.id),
+    title: formatPublicEventTitle(row.title),
+    imageUrl: pickFirstUsableEventImageUrl(row.overrideImageUrl, row.imageUrl),
+    priceFrom:
+      Number.isFinite(Number(row.priceFromRub)) && Number(row.priceFromRub) >= MIN_DISPLAY_PRICE_RUB
+        ? Number(row.priceFromRub)
+        : null,
+    venue: venueTitle || null,
+    venueId: row.venueId || null,
+    venueSlug: row.venueSlug || null,
+    venueKind: venueKind || row.venueKind || null,
+    routeLabel: normalizeNullableString(row.routeLabel ?? row.label) || null,
+  };
+}
+
+async function loadStopEventsForVenue(db, venueIds) {
+  if (!venueIds?.length) return [];
+  const result = await db.query(
+    `
+      select
+        e.id,
+        e.slug,
+        e.title,
+        e."imageUrl",
+        e."priceFromRub",
+        override."imageUrl" as "overrideImageUrl",
+        start_venue.id as "venueId",
+        start_venue.slug as "venueSlug",
+        start_venue.title as "venueTitle",
+        start_venue.address as "venueAddress",
+        start_venue.kind as "venueKind",
+        min(link."sortOrder") as "sortOrder",
+        (array_agg(link.label order by link."sortOrder"))[1] as "routeLabel"
+      from "event_venue_route_items" link
+      join "Event" e on e.id = link."eventId"
+      left join "EventOverride" override on override."eventId" = e.id
+      left join "Venue" start_venue on start_venue.id = e."venueId"
+      where link."venueId" = any($1)
+        and link.role = 'STOP'::"RouteItemRole"
+        and e.status not in ('HIDDEN', 'DRAFT')
+      group by
+        e.id, e.slug, e.title, e."imageUrl", e."priceFromRub",
+        override."imageUrl",
+        start_venue.id, start_venue.slug, start_venue.title, start_venue.address, start_venue.kind
+      order by min(link."sortOrder"), e.title
+      limit 48
+    `,
+    [venueIds],
+  );
+  return result.rows.map(mapSlimPublicStopEvent);
+}
+
+async function loadNearbyEventsForVenue(db, venue, excludeEventIds = []) {
+  const lat = Number(venue.latitude);
+  const lng = Number(venue.longitude);
+  if (!isValidVenueCoordinatePair(lat, lng)) return [];
+
+  const bboxDeg = 0.005; // ~550m по широте
+  const result = await db.query(
+    `
+      select
+        e.id,
+        e.slug,
+        e.title,
+        e."imageUrl",
+        e."priceFromRub",
+        override."imageUrl" as "overrideImageUrl",
+        start_venue.id as "venueId",
+        start_venue.slug as "venueSlug",
+        start_venue.title as "venueTitle",
+        start_venue.address as "venueAddress",
+        start_venue.kind as "venueKind",
+        start_venue.latitude as "venueLatitude",
+        start_venue.longitude as "venueLongitude"
+      from "Event" e
+      join "Venue" start_venue on start_venue.id = e."venueId"
+      left join "EventOverride" override on override."eventId" = e.id
+      where e.status not in ('HIDDEN', 'DRAFT')
+        and start_venue.id <> $1
+        and start_venue.latitude is not null
+        and start_venue.longitude is not null
+        and abs(start_venue.latitude - $2) <= $4
+        and abs(start_venue.longitude - $3) <= $4
+      order by e.title
+      limit 80
+    `,
+    [venue.id, lat, lng, bboxDeg],
+  );
+
+  const excluded = new Set(excludeEventIds.map(String));
+  return result.rows
+    .filter((row) => !excluded.has(String(row.id)))
+    .map((row) => {
+      const distance = haversineMeters(lat, lng, Number(row.venueLatitude), Number(row.venueLongitude));
+      return { ...row, distanceMeters: distance };
+    })
+    .filter((row) => Number.isFinite(row.distanceMeters) && row.distanceMeters <= 300)
+    .sort((a, b) => a.distanceMeters - b.distanceMeters || String(a.title).localeCompare(String(b.title), 'ru'))
+    .slice(0, 12)
+    .map(mapSlimPublicStopEvent);
+}
+
+async function loadPublicEventVenueStops(db, eventId) {
+  const result = await db.query(
+    `
+      select
+        link."venueId",
+        link.label,
+        link."sortOrder",
+        venue.slug,
+        venue.title,
+        venue.kind,
+        venue.address
+      from "event_venue_route_items" link
+      join "Venue" venue on venue.id = link."venueId"
+      where link."eventId" = $1
+        and link.role = 'STOP'::"RouteItemRole"
+      order by link."sortOrder", venue.title
+    `,
+    [eventId],
+  );
+  return result.rows.map((row) => {
+    const title = formatPublicVenueTitle(row.title);
+    const kind = resolvePublicVenueKind(row.kind, title, row.address);
+    const slug = publicVenueSlug(row.slug, title, row.venueId);
+    const template = publicVenuePageTemplate(kind);
+    return {
+      venueId: row.venueId,
+      slug,
+      title,
+      kind,
+      label: normalizeNullableString(row.label),
+      href: `/${template === 'location' ? 'locations' : 'venues'}/${slug}`,
+    };
+  });
+}
+
 export async function buildPublicVenuePage(db, venueSlugOrId) {
   const venue = await resolvePublicVenueRow(db, venueSlugOrId);
   if (!venue || venue.pageStatus === 'HIDDEN') return null;
@@ -4169,18 +4434,33 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
   const venueContexts = collectVenueSessionLookupContexts(venue, mergedGroup);
   const sessions = lookupVenueCatalogSessions(venueIds, catalogSessions, venueContexts).slice(0, 120);
   if (!sessions.length) {
-    const hasProfile =
+    const status = String(venue.pageStatus || '').toUpperCase();
+    const resolvedKind = resolvePublicVenueKindFromRow(venue);
+    const pageTemplate = publicVenuePageTemplate(resolvedKind);
+    const isLocationPage = pageTemplate === 'location';
+    const hasAddressProfile =
       Boolean(String(venue.address || '').trim()) &&
       Boolean(String(venue.description || venue.shortDescription || '').trim());
-    const status = String(venue.pageStatus || '').toUpperCase();
-    const pageTemplate = publicVenuePageTemplate(resolvePublicVenueKindFromRow(venue));
-    const isLocationPage = pageTemplate === 'location';
+    // Content places (must-see): title + shortDescription|hookFact|description; address optional.
+    const allowContentPlace = isContentPlaceHubEligible(
+      {
+        title: venue.title,
+        name: venue.title,
+        kind: venue.kind,
+        pageStatus: venue.pageStatus,
+        shortDescription: venue.shortDescription,
+        hookFact: venue.hookFact,
+        description: venue.description,
+      },
+      resolvedKind,
+    );
     // CF.P2: museum/theatre admission can exist without event sessions in catalog.
     const allowAdmissionOnlyInstitution =
-      pageTemplate === 'institution' && hasProfile && status === 'PUBLISHED';
+      pageTemplate === 'institution' && hasAddressProfile && status === 'PUBLISHED';
     if (
       !(
-        (isLocationPage && hasProfile && status !== 'NONE' && status !== 'HIDDEN') ||
+        allowContentPlace ||
+        (isLocationPage && hasAddressProfile && status !== 'NONE' && status !== 'HIDDEN') ||
         allowAdmissionOnlyInstitution
       )
     ) {
@@ -4260,6 +4540,18 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
 
   const venueCoordinates = resolvePublicVenueCoordinates(canonicalVenue, { resolvedType });
 
+  const stopEvents = await loadStopEventsForVenue(db, venueIds);
+  let resolvedNearbyEvents = [];
+  if (!stopEvents.length && venueCoordinates) {
+    resolvedNearbyEvents = await loadNearbyEventsForVenue(
+      db,
+      { id: canonicalVenue.id, latitude: venueCoordinates.latitude, longitude: venueCoordinates.longitude },
+      [],
+    );
+  }
+  const stopEventCount = stopEvents.length;
+  const displayEventCount = routeCount > 0 ? routeCount : stopEventCount;
+
   return {
     generatedAt: new Date().toISOString(),
     venue: {
@@ -4279,6 +4571,7 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
       metroStation: normalizeNullableString(canonicalVenue.metroStation),
       wayToFind: normalizeNullableString(canonicalVenue.wayToFind),
       parkingInfo: normalizeNullableString(canonicalVenue.parkingInfo),
+      hookFact: normalizeNullableString(canonicalVenue.hookFact),
       type: resolvedType,
       template: publicVenuePageTemplate(resolvedType),
       pageStatus: canonicalVenue.pageStatus,
@@ -4297,13 +4590,16 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
       seoDescription: canonicalVenue.seoDescription,
       canonicalPath: canonicalVenue.canonicalPath || `/${publicVenuePageTemplate(resolvedType) === 'location' ? 'locations' : 'venues'}/${publicVenueSlug(canonicalVenue.slug, normalizedVenue.name, canonicalVenue.id)}`,
       isIndexable,
-      events: routeCount,
+      events: displayEventCount,
+      stopEventCount,
       categories,
     },
     sessions,
     relatedVenues,
+    stopEvents,
+    nearbyEvents: resolvedNearbyEvents,
     stats: {
-      events: routeCount,
+      events: displayEventCount,
       categories: Object.keys(categories).length,
       priceFrom: prices.length ? Math.min(...prices) : null,
     },
@@ -4831,6 +5127,7 @@ export async function buildPublicEventPage(db, eventSlugOrId) {
     baseEvent.institutionVenueId = institutionContext.id;
     baseEvent.institutionVenueSlug = institutionContext.slug;
   }
+  baseEvent.venueStops = await loadPublicEventVenueStops(db, event.id);
   const sessions = sessionsResult.rows.map((session) => {
     const sessionOffer = primaryOfferByEventId.get(session.eventId) || primaryOffer;
     const sourceRow = targetPublicSession && sessionGroupIds(targetPublicSession).includes(session.eventId) ? targetPublicSession : null;
@@ -5593,6 +5890,7 @@ function normalizeVenuePayload(payload) {
     'metroStation',
     'wayToFind',
     'parkingInfo',
+    'hookFact',
   ]) {
     if (!Object.prototype.hasOwnProperty.call(payload, key)) continue;
     normalized[key] = normalizeNullableString(payload[key]);
@@ -5604,7 +5902,7 @@ function normalizeVenuePayload(payload) {
 
   if (Object.prototype.hasOwnProperty.call(payload, 'kind')) {
     const value = normalizeNullableString(payload.kind);
-    const allowed = new Set(['VENUE', 'MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'PIER', 'MEETING_POINT', 'OUTDOOR_LOCATION', 'SPORT_ACTIVITY_SPACE', 'ATTRACTION', 'ONLINE', 'OTHER']);
+    const allowed = new Set(['VENUE', 'MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'PIER', 'MEETING_POINT', 'OUTDOOR_LOCATION', 'SPORT_ACTIVITY_SPACE', 'ATTRACTION', 'PARK', 'MONUMENT', 'ONLINE', 'OTHER']);
     normalized.kind = value && allowed.has(value) ? value : null;
   }
 
@@ -6147,6 +6445,7 @@ const PUBLIC_VENUE_ROW_SELECT = `
     venue."metroStation",
     venue."wayToFind",
     venue."parkingInfo",
+    venue."hookFact",
     venue.kind,
     venue."pageStatus",
     city.title as city,
@@ -6672,6 +6971,9 @@ function isMeetingPointLikeRow(row) {
   const resolved = resolvePublicVenueKindFromRow(row);
   if (resolved === 'bus') return false;
   if (resolved === 'meeting_point') return true;
+  // Explicit CMS/content kinds (park/monument/museum/…) win over «памятник» title text.
+  if (resolved && resolved !== 'venue' && resolved !== 'other') return false;
+  if (isContentPlaceKind(row?.kind || row?.proposedKind, resolved)) return false;
   const name = `${row.name || row.title || ''} ${row.address || ''}`.toLowerCase();
   return MEETING_POINT_TEXT_RE.test(name);
 }
@@ -6922,7 +7224,8 @@ function inferPublicVenueKindFromName(name, address) {
   if (/банкет|\bзал\b|hall|концерт|филармони|дворец/i.test(text)) return 'concert_hall';
   if (/клуб|\bclub\b|ресторан|кафе/i.test(text)) return 'club_bar_restaurant';
   if (/стадион|арена|спорт|каток/i.test(text)) return 'sport_activity_space';
-  if (/\bпарк\b|сквер/i.test(text)) return 'outdoor_location';
+  // «парк» / сквер → park; не путать с парковкой. Платный вход (Монрепо) - later, не catalog mix.
+  if (/\bпарк\b|сквер/i.test(text) && !/парковк/i.test(text)) return 'park';
   return 'venue';
 }
 
@@ -6945,6 +7248,10 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
     return 'bus';
   }
 
+  // Explicit CMS kinds win over «памятник» meeting-point heuristics (Важные места).
+  if (stored === 'park') return 'park';
+  if (stored === 'monument') return 'monument';
+
   if (
     inferred === 'meeting_point' ||
     stored === 'meeting_point' ||
@@ -6952,6 +7259,8 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
   ) {
     return 'meeting_point';
   }
+
+  if (inferred === 'park') return 'park';
 
   const barOrClub = inferBarOrClubFromContent(name, address, shortDescription, description);
   if (barOrClub) return barOrClub;
@@ -7003,7 +7312,7 @@ function resolvePublicVenueKindFromRow(row) {
   });
 }
 
-function isPublicVenueHub(row, options = {}) {
+export function isPublicVenueHub(row, options = {}) {
   const requireEvents = options.requireEvents !== false;
   if (!row) return false;
   const kind = normalizeVenueKindValue(row.kind || row.proposedKind);
@@ -7013,7 +7322,10 @@ function isPublicVenueHub(row, options = {}) {
   if (isMeetingPointLikeRow(row)) return false;
   if (isJunkPublicVenueRow(row)) return false;
   if (String(row.pageStatus || '').toUpperCase() === 'HIDDEN') return false;
-  if (requireEvents && Number(row.events) <= 0) return false;
+  if (requireEvents && Number(row.events) <= 0) {
+    // Must-see content places (park/monument/museum/…) list in /venues|/locations with profile, 0 events ok.
+    return isContentPlaceHubEligible(row, resolvePublicVenueKindFromRow(row));
+  }
   return true;
 }
 
@@ -7042,12 +7354,16 @@ function mapPublicVenueListItem(row) {
     metroStation: normalizeNullableString(normalized.metroStation),
     wayToFind: normalizeNullableString(normalized.wayToFind),
     parkingInfo: normalizeNullableString(normalized.parkingInfo),
+    hookFact: normalizeNullableString(normalized.hookFact),
     type,
     template: publicVenuePageTemplate(type),
     pageStatus: normalized.pageStatus,
     shortDescription,
     heroImageUrl: normalized.heroImageUrl,
     events: normalized.events,
+    stopEventCount: Number.isFinite(Number(normalized.stopEventCount))
+      ? Number(normalized.stopEventCount)
+      : undefined,
     categories: {},
     nextSlot: normalized.nextSessionStartsAt ? formatTime(normalized.nextSessionStartsAt) : null,
   };

@@ -51,6 +51,8 @@ const kindOptions = [
   { value: 'CLUB_BAR_RESTAURANT', label: 'Клуб / ресторан' },
   { value: 'PIER', label: 'Причал' },
   { value: 'MEETING_POINT', label: 'Точка встречи' },
+  { value: 'PARK', label: 'Парк' },
+  { value: 'MONUMENT', label: 'Памятник' },
   { value: 'OUTDOOR_LOCATION', label: 'Открытая локация' },
   { value: 'SPORT_ACTIVITY_SPACE', label: 'Спорт / активность' },
   { value: 'ATTRACTION', label: 'Аттракцион' },

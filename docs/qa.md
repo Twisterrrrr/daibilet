@@ -1,5 +1,25 @@
 # qa.md — открытые вопросы
 
+## 2026-07-31 - Location↔Excursion linking (открыто)
+
+1. **NEARBY_HUB / START:** enum `RouteItemRole` есть; MVP пишет только `STOP`. Нужен ли отдельный контент-флоу для хабов рядом / explicit START, или достаточно geo «Рядом» + `Event.venueId`?
+2. **Порог geo:** 300м - ок для центра Перми/СПб? Нужен ли city-specific radius?
+3. **Счётчик на карточке:** `stopEventCount` vs sessions/`events` - показывать ли оба, если у парка есть и STOP, и собственные сессии?
+4. **Контент:** кто заполняет STOP-связи для топ-экскурсий (admin form vs seed script vs import)?
+
+## 2026-07-31 - Venue kinds: park / monument + park admission (открыто)
+
+1. **Типы локаций `PARK` / `MONUMENT`:** ✅ добавлены в Prisma `VenueKind` + public slugs `park` / `monument` (каталог `/locations`, admin, infer). Секция city hub: предпочтение **«Важные места»** (не «Важные локации») - UX copy отдельно, не блокер kinds.
+2. **Платный вход в парк (admission):** ⏳ **осознанно НЕ в MVP catalog mix.** Пример: Монрепо (Выборг) - вход опционально платный. Не добавлять park admission в catalog/finance/projection, пока нет отдельного product decision. Future: admission product kind / supplier LC для park entry - после museum admission стабилизации.
+
+## 2026-07-31 - Location↔Excursion linking (канон)
+
+1. **MVP источник правды:** явные `EventVenueRouteItem` (`role=STOP`, таблица `event_venue_route_items`) в admin. SEO-программа и витрина «включают это место» - только из pivot.
+2. **`Event.venueId`:** только точка старта / primary venue. Не заливать stops в `venueId`.
+3. **Гео-fallback (~300 м):** только если явных STOP нет; UI-лейбл **«Рядом»**, не «включают». Схема БД не меняется.
+4. **Пермь must-see:** slug-таблица в Project.md; seed `scripts/seed-perm-must-see-venues.js`; migrate PARK/MONUMENT + `EventVenueRouteItem` на catalog DB перед записью.
+5. **Контент stops:** кто заполняет STOP на популярных речных/пеших турах МСК/СПб/Пермь - editorial backlog.
+
 ## 2026-07-30 - Catalog ↔ finance projection / checkout domain (открыто)
 
 Контекст: граница **locked** в [catalog-finance-projection.md](./catalog-finance-projection.md). Hosts: [spb-finance-host.md](./spb-finance-host.md).

@@ -60,6 +60,7 @@ import {
   runLandingAudit,
   updateAdminEventOverride,
   updateAdminEventTaxonomy,
+  updateAdminEventVenueLinks,
   upsertAdminOrderTicket,
   updateAdminLanding,
   updateAdminLandingMatch,
@@ -834,6 +835,25 @@ export async function handleRequest(request, response) {
     if (eventTaxonomyMatch) {
       const result = await updateAdminEventTaxonomy(db, decodeURIComponent(eventTaxonomyMatch[1]), await readJsonBody(request));
       invalidatePublicCaches('event taxonomy update');
+      sendJson(response, result);
+      return;
+    }
+
+    const eventVenueLinksMatch =
+      request.method === 'PATCH' || request.method === 'PUT'
+        ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/venue-links$/)
+        : null;
+    if (eventVenueLinksMatch) {
+      const result = await updateAdminEventVenueLinks(
+        db,
+        decodeURIComponent(eventVenueLinksMatch[1]),
+        await readJsonBody(request),
+      );
+      if (!result) {
+        sendJson(response, { error: 'not_found' }, 404);
+        return;
+      }
+      invalidatePublicCaches('event venue links update');
       sendJson(response, result);
       return;
     }

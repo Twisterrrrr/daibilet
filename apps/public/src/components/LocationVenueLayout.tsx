@@ -46,7 +46,11 @@ export function LocationVenueLayout({
   const hasMap = Boolean(venue.latitude && venue.longitude);
   const isPier = normalizeVenueKind(venue.type) === 'pier' || normalizeVenueKind(venue.type) === 'pier_water';
   const isBus = normalizeVenueKind(venue.type) === 'bus';
-  const isPark = normalizeVenueKind(venue.type) === 'outdoor_location' || normalizeVenueKind(venue.type) === 'attraction';
+  const isParkLike =
+    normalizeVenueKind(venue.type) === 'park' ||
+    normalizeVenueKind(venue.type) === 'monument' ||
+    normalizeVenueKind(venue.type) === 'outdoor_location' ||
+    normalizeVenueKind(venue.type) === 'attraction';
   const todaySlots = React.useMemo(() => collectTodayTimeSlots(sessions), [sessions]);
   const TypeIcon = venueTypeIcon(venue.type);
   const typeLabel = venueTypeLabel(venue.type);
@@ -136,7 +140,7 @@ export function LocationVenueLayout({
             </div>
           </div>
         </section>
-      ) : isPark ? (
+      ) : isParkLike ? (
         <>
           <section className="relative overflow-hidden bg-emerald-900 text-white">
           <div className="absolute inset-0">

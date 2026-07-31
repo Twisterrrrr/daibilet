@@ -1,4 +1,4 @@
-import { Anchor, Bus, Landmark, MapPin, type LucideIcon } from 'lucide-react';
+import { Anchor, Bus, Landmark, MapPin, Trees, type LucideIcon } from 'lucide-react';
 
 import { formatNumber } from '@/lib/format';
 
@@ -27,6 +27,8 @@ const VENUE_TYPE_LABELS: Record<string, string> = {
   bus: 'Автобусы',
   venue: 'Площадка',
   outdoor_location: 'Открытая локация',
+  park: 'Парк',
+  monument: 'Памятник',
   sport_activity_space: 'Спорт / активность',
   attraction: 'Достопримечательность',
   meeting_point: 'Точка сбора',
@@ -48,6 +50,8 @@ const VENUE_TYPE_BREADCRUMB_PLURALS: Record<string, string> = {
   bus: 'Автобусы',
   venue: 'Площадки',
   outdoor_location: 'Открытые локации',
+  park: 'Парки',
+  monument: 'Памятники',
   sport_activity_space: 'Спорт и активность',
   attraction: 'Достопримечательности',
   meeting_point: 'Точки сбора',
@@ -121,6 +125,8 @@ export function isMeetingPointLike(input: {
 }): boolean {
   const kind = normalizeVenueKind(input.type);
   if (kind === 'meeting_point') return true;
+  // Explicit park/monument kinds are destinations (Важные места), not tour meeting points.
+  if (kind === 'park' || kind === 'monument') return false;
   const name = `${input.name || input.title || ''} ${input.address || ''}`.toLowerCase();
   return /место сбора|место встречи|точка сбора|точка встречи|площадка:|^метро\b|^м\.(?:\s|«|"|')|\bм\.\s*(?:«|[а-яё])|\bу метро\b|около метро|у памятник|памятник|\bпам\.|у пам\.|\bу пам\b|пл\.\s*у пам/u.test(name);
 }
@@ -142,6 +148,8 @@ export function venueTypeIcon(type?: string | null): LucideIcon {
   const key = normalizeVenueKind(type);
   if (key === 'pier' || key === 'pier_water') return Anchor;
   if (key === 'bus') return Bus;
+  if (key === 'park') return Trees;
+  if (key === 'monument') return Landmark;
   if (INSTITUTION_KINDS.has(key)) return Landmark;
   return MapPin;
 }
@@ -215,6 +223,8 @@ export const CATALOG_TYPE_OPTIONS: Array<{ value: string; label: string; templat
   { value: 'pier', label: 'Причал', template: 'location' },
   { value: 'bus', label: 'Автобусы', template: 'location' },
   { value: 'venue', label: 'Площадка', template: 'location' },
+  { value: 'park', label: 'Парк', template: 'location' },
+  { value: 'monument', label: 'Памятник', template: 'location' },
   { value: 'outdoor_location', label: 'Открытая локация', template: 'location' },
   { value: 'sport_activity_space', label: 'Спорт / активность', template: 'location' },
   { value: 'attraction', label: 'Достопримечательность', template: 'location' },
@@ -228,6 +238,8 @@ export function locationTypeEmoji(type?: string | null): string {
     pier_water: '⚓',
     bus: '🚌',
     venue: '📍',
+    park: '🌳',
+    monument: '🗿',
     outdoor_location: '🌳',
     sport_activity_space: '⚡',
     attraction: '🏛',

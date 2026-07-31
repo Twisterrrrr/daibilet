@@ -42,6 +42,8 @@ export async function loadVenueMapTip(idOrSlug: string): Promise<VenueMapTip | n
     kind.includes('PIER') ||
     kind.includes('OUTDOOR') ||
     kind === 'BUS' ||
+    kind === 'PARK' ||
+    kind === 'MONUMENT' ||
     kind === 'ATTRACTION' ||
     kind === 'SPORT_ACTIVITY_SPACE';
   const base = isLocation ? '/locations' : '/venues';

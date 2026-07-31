@@ -40,6 +40,7 @@ export type AdminVenueDetailData = {
   parkingInfo: string | null;
   shortDescription: string | null;
   description: string | null;
+  hookFact: string | null;
   heroImageUrl: string | null;
   seoH1: string | null;
   seoTitle: string | null;
@@ -126,6 +127,7 @@ export async function loadAdminVenueDetail(venueId: string): Promise<AdminVenueD
     parkingInfo: null,
     shortDescription: null,
     description: null,
+    hookFact: null,
     heroImageUrl: null,
     seoH1: null,
     seoTitle: null,
@@ -159,6 +161,7 @@ export async function loadAdminVenueDetail(venueId: string): Promise<AdminVenueD
       parkingInfo: payload.parkingInfo != null ? String(payload.parkingInfo) : null,
       shortDescription: payload.shortDescription != null ? String(payload.shortDescription) : null,
       description: payload.description != null ? String(payload.description) : null,
+      hookFact: payload.hookFact != null ? String(payload.hookFact) : null,
       heroImageUrl: payload.heroImageUrl != null ? String(payload.heroImageUrl) : null,
       seoH1: payload.seoH1 != null ? String(payload.seoH1) : null,
       seoTitle: payload.seoTitle != null ? String(payload.seoTitle) : null,

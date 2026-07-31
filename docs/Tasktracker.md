@@ -7,6 +7,18 @@
 
 ---
 
+## Location↔Excursion linking (2026-07-31)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| LE.1 | Prisma `EventVenueRouteItem` / `RouteItemRole` + `Venue.hookFact` + migrate `event_venue_route_items` | Высокий | ✅ Phase A (канон owner) |
+| LE.2 | Admin API venueLinks + PUT venue-links (STOP only; Event.venueId не трогаем) | Высокий | ✅ |
+| LE.3 | Admin UI STOP-форма + venue hookFact | Высокий | ✅ |
+| LE.4 | Public DTO: stopEvents / nearbyEvents (300м) / venueStops / hookFact | Высокий | ✅ |
+| LE.5 | UI: LocationCard / park-like layout / Event «Маршрут / места» | Высокий | ✅ |
+| LE.6 | Seed Пермь must-see (6 slugs) + cityInfo slug | Средний | ✅ script; cityInfo already |
+| LE.7 | Deploy migrate + контент STOP-связей экскурсий | Высокий | ⏳ |
+
 ## Venue kinds: park + monument (2026-07-31)
 
 | # | Задача | Приоритет | Статус |
@@ -17,7 +29,7 @@
 | VK.4 | Admin kind options (Vite + Next admin) | Средний | ✅ |
 | VK.5 | City hub copy «Важные места» (не «Важные локации») | Низкий | ⏳ если секция ещё не переименована |
 | VK.6 | Future: park admission (Монрепо и т.п.) - не в MVP catalog/finance mix | Средний | ⚠️ deferred (см. qa.md) |
-| VK.7 | City hub «Главные места»: title → venue/location href | Высокий | ✅ model `href`/`venueSlug`/`locationSlug` + UI Link; SPB Эрмитаж; Пермь ждёт entity slug |
+| VK.7 | City hub «Главные места»: title → venue/location href | Высокий | ✅ model `href`/`venueSlug`/`locationSlug` + UI Link; SPB Эрмитаж; Пермь slugs + seed script |
 
 ## Finance supplier LC smoke (.159) 2026-07-31
 
@@ -51,7 +63,7 @@
 | UX.HERO2 | CLS: fixed night hero `h-*` + city skeleton/loading match SSR/hydrate | Критический | ✅ MSK `yvt23s2J2qJustslJex5K` (без commit) |
 | UX.HERO3 | Ultrawide sides: mirror ~10% + stretch + navy fade `#0b1220` (не flat crop) | Высокий | ❌ откат: stretch на весь gutter + scrim поверх текста |
 | UX.HERO3b | Mirror strips ~10% image width рядом с фото + fade→transparent; gutters = navy CSS | Критический | ❌ superseded → HERO3c |
-| UX.HERO3c | Golden-ratio city hero: navy `#050a12` + left φ fade + right edge fade + photo ~38.2% right; без зеркал | Критический | 🔧 commit pending deploy |
+| UX.HERO3c | Golden-ratio city hero: navy `#050a12` + left φ fade + right edge fade + photo ~38.2% right; без зеркал | Критический | ✅ MSK cUv55TBxYLmFcxlC_1Eev (commit f170d747) |
 
 ## /podborki city filter (2026-07-31)
 

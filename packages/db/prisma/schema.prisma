@@ -38,6 +38,8 @@ enum VenueKind {
   OUTDOOR_LOCATION
   SPORT_ACTIVITY_SPACE
   ATTRACTION
+  PARK
+  MONUMENT
   ONLINE
   OTHER
 }
@@ -47,6 +49,13 @@ enum VenuePageStatus {
   CANDIDATE
   PUBLISHED
   HIDDEN
+}
+
+/// Role of a venue on an excursion/event route. MVP uses STOP; START/NEARBY_HUB reserved.
+enum RouteItemRole {
+  STOP
+  START
+  NEARBY_HUB
 }
 
 enum LandingType {
@@ -579,6 +588,7 @@ model Event {
   externalReviews ExternalReview[]
   reviewRequests  ReviewRequest[]
   override        EventOverride?
+  routeItems      EventVenueRouteItem[]
 
   @@index([status])
   @@index([purchaseFlow])
@@ -588,6 +598,26 @@ model Event {
   @@index([categoryId])
   @@index([supplierId, status])
   @@index([title])
+}
+
+/// Route stops / hubs on an excursion. Event.venueId remains the start point.
+model EventVenueRouteItem {
+  id        String        @id @default(cuid())
+  eventId   String
+  venueId   String
+  role      RouteItemRole @default(STOP)
+  sortOrder Int           @default(0)
+  label     String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  venue Venue @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, venueId, role])
+  @@index([eventId, sortOrder])
+  @@index([venueId])
+  @@map("event_venue_route_items")
 }
 
 model EventOverride {
@@ -816,6 +846,8 @@ model Venue {
   parkingInfo      String?
   kind             VenueKind       @default(OTHER)
   pageStatus       VenuePageStatus @default(NONE)
+  /// Short micro-intrigue for location cards (optional).
+  hookFact         String?
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
 
@@ -827,6 +859,7 @@ model Venue {
   tripPlanItems   TripPlanItem[]
   reviews         Review[]
   externalReviews ExternalReview[]
+  routeItems      EventVenueRouteItem[]
 
   @@index([title])
 }

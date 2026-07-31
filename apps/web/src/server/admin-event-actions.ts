@@ -111,3 +111,38 @@ export async function saveAdminEventTaxonomyAction(formData: FormData) {
   revalidatePath(`/admin/events/${id}`);
   redirect(`/admin/events/${encodeURIComponent(id)}?saved=taxonomy`);
 }
+
+export async function saveAdminEventVenueLinksAction(formData: FormData) {
+  const id = String(formData.get('id') || '').trim();
+  if (!id) throw new Error('missing event id');
+
+  const venueIds = formData.getAll('venueIds').map((item) => String(item || '').trim());
+  const labels = formData.getAll('labels').map((item) => String(item || '').trim());
+  const sortOrders = formData.getAll('sortOrders').map((item) => String(item || '').trim());
+
+  const links = venueIds
+    .map((venueId, index) => ({
+      venueId,
+      label: labels[index] || null,
+      sortOrder: Number.isFinite(Number(sortOrders[index])) ? Number(sortOrders[index]) : index,
+      role: 'STOP' as const,
+    }))
+    .filter((link) => Boolean(link.venueId));
+
+  const response = await adminApiFetch(`/api/admin/events/${encodeURIComponent(id)}/venue-links`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ links }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text().catch(() => '');
+    throw new Error(
+      `venue-links save failed HTTP ${response.status}${text ? `: ${text.slice(0, 200)}` : ''}`,
+    );
+  }
+
+  revalidatePath('/admin/events');
+  revalidatePath(`/admin/events/${id}`);
+  redirect(`/admin/events/${encodeURIComponent(id)}?saved=venue-links`);
+}
