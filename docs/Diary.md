@@ -1,3 +1,19 @@
+## 2026-07-31 - Must-see editorial batch2 (9 городов, 53 точки)
+
+### Наблюдения
+- Owner прислал пулы Омск, Уфа, Великий Новгород, Тверь, Краснодар, Сочи, Тюмень, Воронеж, Ростов-на-Дону (Ростов: 5 точек, без Центрального рынка).
+- Venue-строки уже были после cityInfo seed; нужны hookFact / description / wayToFind / coords / address.
+
+### Решения
+- Дописан `scripts/data/must-see-editorial.json` до 122; batch2 артефакт `must-see-editorial-batch2.json` (53).
+- Алиасы городов batch2 в `enrich-must-see-editorial.js` (как в seed-cityinfo).
+- MSK `--apply` 53/53 update, `preservedShort`; restart `daibilet-api`.
+
+### Проблемы
+- Нет (cities resolve OK). Следующие города по запросу owner.
+
+---
+
 ## 2026-07-31 - Day-route polish MVP (`/my-day`)
 
 ### Наблюдения

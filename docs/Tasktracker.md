@@ -40,6 +40,7 @@
 | VK.9 | Bulk seed mustSee → Venue + cityInfo slug (`seed-cityinfo-must-see-venues.js`) | Высокий | ✅ MSK apply: skip-no-city 0 (было 216); aliases latin→кирилл slug; cityInfo 246 slug dirty |
 | VK.10 | Deploy+restart MSK API (dto hub-gate) + smoke Perm 6 in /locations|/venues | Критический | ⏳ blocker видимости для owner |
 | VK.11 | Editorial enrich must-see top-12 cities (hookFact/about/way/coords/address/metro) | Высокий | ✅ 69 MSK; shortDescription preserve; CMS kind guard; ATTRACTION twins HIDDEN |
+| VK.12 | Editorial enrich batch2: Омск/Уфа/Новгород/Тверь/Краснодар/Сочи/Тюмень/Воронеж/Ростов (53) | Высокий | ✅ 53 update MSK; база 122; shortDescription preserve |
 
 ## Finance supplier LC smoke (.159) 2026-07-31
 

@@ -48,6 +48,20 @@ const CITY_SLUG_ALIASES = {
   krasnoyarsk: ['krasnoyarsk', 'красноярск'],
   tula: ['tula', 'тула'],
   samara: ['samara', 'самара'],
+  omsk: ['omsk', 'омск'],
+  ufa: ['ufa', 'уфа'],
+  'veliky-novgorod': [
+    'veliky-novgorod',
+    'velikiy-novgorod',
+    'великий-новгород',
+    'великии-новгород',
+  ],
+  tver: ['tver', 'тверь'],
+  krasnodar: ['krasnodar', 'краснодар'],
+  sochi: ['sochi', 'сочи'],
+  tyumen: ['tyumen', 'тюмень'],
+  voronezh: ['voronezh', 'воронеж'],
+  'rostov-na-donu': ['rostov-na-donu', 'rostov-on-don', 'ростов-на-дону'],
 };
 
 const CITY_TITLE_ALIASES = {
@@ -63,6 +77,15 @@ const CITY_TITLE_ALIASES = {
   krasnoyarsk: ['Красноярск'],
   tula: ['Тула'],
   samara: ['Самара'],
+  omsk: ['Омск'],
+  ufa: ['Уфа'],
+  'veliky-novgorod': ['Великий Новгород'],
+  tver: ['Тверь'],
+  krasnodar: ['Краснодар'],
+  sochi: ['Сочи'],
+  tyumen: ['Тюмень'],
+  voronezh: ['Воронеж'],
+  'rostov-na-donu': ['Ростов-на-Дону'],
 };
 
 const dryRun = process.argv.includes('--dry-run') || !process.argv.includes('--apply');
