@@ -24,7 +24,11 @@ import { formatMoney, formatNumber, pluralEvents } from '@/lib/format';
 import { HOME_FORMAT_TILES, HOME_HOW_IT_WORKS, HOME_TRUST_ITEMS, resolveHomePromoImage } from '@/lib/home-scenarios';
 import { balancedTileGridClass } from '@/lib/balanced-tile-grid';
 import { landingCategoryHref } from '@/lib/landing-routes';
+import { withSoftTimeout } from '@/lib/soft-timeout';
 import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
+
+/** External CDN HEAD fingerprints must not stall home TTFB on bad egress/DNS. */
+const HOME_FINGERPRINTS_TIMEOUT_MS = 800;
 
 function promoBlockIcon(slug: string, index: number) {
   const key = String(slug || '').toLowerCase();
@@ -43,7 +47,15 @@ export async function HomePageContent() {
   // Hero banners: unstable_cache 300s (matches page revalidate). Do not call
   // connection() here - it forces dynamic no-store and kills CDN/ISR HIT on `/`.
   const [{ destinationsPayload, catalogPayload, landingsCatalog, venuesPayload }, fingerprintsRecord] =
-    await Promise.all([getHomePageData(), getHomeCoverFingerprints()]);
+    await Promise.all([
+      getHomePageData(),
+      withSoftTimeout(
+        getHomeCoverFingerprints(),
+        HOME_FINGERPRINTS_TIMEOUT_MS,
+        {},
+        'home-cover-fingerprints',
+      ),
+    ]);
 
   const destinations = destinationsPayload?.destinations ?? [];
   const cities = destinations.filter((item) => item.type === 'city');

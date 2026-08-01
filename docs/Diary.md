@@ -1,3 +1,21 @@
+## 2026-08-01 - SSR hang: SiteLayout destinations + warm soft defaults
+
+### Наблюдения
+- Live: API/health живы; HTML `/` `/events` `/cities` давали 0 байт 8s+ (TTFB hang). Journal: Prisma `Connection terminated unexpectedly` в daibilet-web.
+- Restart `daibilet-web` сразу вернул TTFB ~0.02-0.14s - зависание runtime/cold DTO, не nginx/DNS.
+
+### Решения
+- `SiteLayout`: soft-timeout 900ms на `getCachedDestinations` (пустой chrome > hung TTFB).
+- `/cities`: `getCachedDestinations` вместо raw `buildPublicDestinationsDto` + timeout 2.5s.
+- Home: soft-timeout 800ms на `getHomeCoverFingerprints` (egress HEAD).
+- `/venues|/locations` list: soft-timeout 2.5s на catalog DTO.
+- `warm-top-event-pages`: default N=40, concurrency=2, fetch timeout 8s, flock single-flight.
+
+### Проблемы
+- Prisma connection drops в web-процессе при давлении - отдельный follow-up (pool/timeout), сейчас fail-soft SSR.
+
+---
+
 ## 2026-08-01 - Must-see editorial batch6 (13 городов, 78 точек)
 
 ### Наблюдения

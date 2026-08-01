@@ -17,31 +17,20 @@ import { getCachedVenuesCatalog } from '@/server/cached-public-surfaces';
 import { getCachedPublicVenueDto } from '@/server/cached-venue-data';
 import { fetchVenueAdmissionProducts } from '@/server/finance-projection-client';
 import type { FinanceAdmissionListResult } from '@/lib/finance-projection';
+import { withSoftTimeout } from '@/lib/soft-timeout';
 import { buildVenuePageJsonLd } from '@/lib/structured-data';
 import { resolveVenueSeoTitle } from '@/lib/venue-seo';
 
 /** Admission must not hang venue HTML when finance is slow. */
 const VENUE_ADMISSION_TIMEOUT_MS = 2500;
+/** Catalog list must not block /venues|/locations TTFB on cold DTO rebuild. */
+const VENUE_LIST_TIMEOUT_MS = 2500;
 
 const EMPTY_ADMISSION: FinanceAdmissionListResult = {
   items: [],
   summary: { published: 0, canSell: 0 },
   total: 0,
 };
-
-async function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
-  let timer: ReturnType<typeof setTimeout> | undefined;
-  try {
-    return await Promise.race([
-      promise,
-      new Promise<T>((resolve) => {
-        timer = setTimeout(() => resolve(fallback), ms);
-      }),
-    ]);
-  } finally {
-    if (timer) clearTimeout(timer);
-  }
-}
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -124,7 +113,12 @@ export async function generateVenueDetailMetadata(slug: string): Promise<Metadat
 export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
   let venues: VenueCatalogCard[] = [];
   try {
-    const payload = await getCachedVenuesCatalog(family, 500);
+    const payload = await withSoftTimeout(
+      getCachedVenuesCatalog(family, 500),
+      VENUE_LIST_TIMEOUT_MS,
+      { generatedAt: new Date(0).toISOString(), total: 0, venues: [] },
+      `venue-list-${family}`,
+    );
     venues = (payload.venues ?? []).map(toVenueCatalogCard);
   } catch {
     venues = [];
@@ -151,10 +145,11 @@ export async function VenueDetailPage({ slug }: { slug: string }) {
   // Finance keyed by URL slug - same join key as catalog Venue.slug.
   const [payloadResult, admissionResult] = await Promise.allSettled([
     getCachedPublicVenueDto(decodedSlug),
-    withTimeout(
+    withSoftTimeout(
       fetchVenueAdmissionProducts(decodedSlug),
       VENUE_ADMISSION_TIMEOUT_MS,
       EMPTY_ADMISSION,
+      'venue-admission',
     ),
   ]);
 

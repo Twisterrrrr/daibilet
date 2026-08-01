@@ -8,14 +8,29 @@ import { SiteFooter } from '@/components/SiteFooter';
 import { SiteHeader } from '@/components/SiteHeader.client';
 import { SelectedCityProvider } from '@/components/SelectedCityProvider.client';
 import { SiteProviders } from '@/components/SiteProviders.client';
+import { withSoftTimeout } from '@/lib/soft-timeout';
 import { getCachedDestinations } from '@/server/cached-public-surfaces';
+
+/** Global chrome must not block first byte on cold destinations rebuild. */
+const LAYOUT_DESTINATIONS_TIMEOUT_MS = 900;
+
+const EMPTY_DESTINATIONS = {
+  generatedAt: new Date(0).toISOString(),
+  destinations: [] as PublicDestinationDto[],
+};
 
 export async function SiteLayout({ children }: { children: React.ReactNode }) {
   let destinations: PublicDestinationDto[] = [];
   try {
     // Next Data Cache (not raw buildPublicDestinationsDto): SiteLayout is inlined
     // into every page RSC, so soft nav used to rebuild destinations on cold workers.
-    const payload = await getCachedDestinations();
+    // Hard timeout: empty header/footer cities beat hung TTFB on every HTML page.
+    const payload = await withSoftTimeout(
+      getCachedDestinations(),
+      LAYOUT_DESTINATIONS_TIMEOUT_MS,
+      EMPTY_DESTINATIONS,
+      'site-layout-destinations',
+    );
     destinations = payload?.destinations ?? [];
   } catch {
     // SSR/build without DB — footer city links stay empty until runtime with DB.

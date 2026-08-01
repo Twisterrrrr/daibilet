@@ -204,6 +204,7 @@ Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SECRET_KEY=<set>` ✅ · *
 | PERF.NAV1 | Soft-nav click lag: `NavigationProgress` + `SiteLayout`→`getCachedDestinations` + `staleTimes` | Высокий | ✅ 2026-07-31 MSK `Cm6zKdDCV2gLnM4H88VZt` |
 | PERF.FCP1 | Home/city blank 2-3s: isolate `useSearchParams` + `SiteChromeSkeleton` / `loading.tsx` (не empty spacer) | Критический | ✅ 2026-07-31 MSK: body paints brand+skeleton; TTFB warm ~0.17с HIT `s-maxage=300`; BUILD `ysb9LiafxuxE8ptQkYg6t` |
 | PERF.FCP2 | Menu routes brand shells: `/events` `/cities` `/venues` `/locations` `/podborki` `/blog` (+slugs) `loading.tsx` + blog Suspense fix | Критический | ✅ 2026-07-31 MSK smoke OK_CHROME; BUILD `HL2bMp0TxgnzWNKKehZgG` (без commit) |
+| PERF.SSR1 | Hung TTFB: SiteLayout/cities/venues soft-timeout + home fingerprints timeout + warm N=40/c=2/flock | Критический | 🔄 deploy |
 
 ---
 
