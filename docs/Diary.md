@@ -10,6 +10,7 @@
 - Matches API: `routeVenues` (start+STOP stubs с coords); UI «Добавить места экскурсии» / chip «В маршрут».
 - Catalog: лейбл всегда виден, z-20 wrapper stopPropagation, badge «Маршрут · N» на mobile.
 - Phase-0: must-see CTA + presets + event add-from-event (в том же ship).
+- MSK deploy `2d3f7a4` → **BUILD_ID=`gEmtnqRsq_L56ejFTXSav`**. Smoke: catalog 0→1→2→3 + coords; `/my-day` CTA → locations → 2-я точка; Яндекс не blocked.
 
 ### Проблемы
 - У многих water tours в БД нет STOP routeItems - bulk add с карточки экскурсии пуст; путь - CTA в каталог.
