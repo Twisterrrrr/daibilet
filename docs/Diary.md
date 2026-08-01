@@ -25,10 +25,10 @@
 ### Решения
 - Только главная: `HomeHero` `!bg-[#122868]` + overlay `from-[#0a174b]/80 via-[#122868]/45 to-primary-900/30`.
 - Зеркало legacy public: `App.tsx` section + `HomeHeroBackground` overlays (slate → navy).
-- Layout/композиция без изменений. Commit + push + SPB→MSK deploy.
+- Layout/композиция без изменений. Commit `b59bc7a` + push; SPB `.16` SSH недоступен → MSK in-place build+restart **BUILD_ID=`fX5_o-dvDlkd7wnhgo_Kv`**. Smoke `/`: 200, HTML содержит `122868` / `0a174b` / `!bg-[#122868]`.
 
 ### Проблемы
-- Нет (узкий color-only фикс).
+- Канон SPB→MSK atomic swap временно недоступен (`.16` Permission denied publickey); использован MSK-local build (RAM ок).
 
 ---
 

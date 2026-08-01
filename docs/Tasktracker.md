@@ -30,7 +30,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.HOME1 | Вернуть синий (navy `#122868` / `#0a174b`) фон hero на главной вместо slate-black | Высокий | 🔄 commit+deploy |
+| UX.HOME1 | Вернуть синий (navy `#122868` / `#0a174b`) фон hero на главной вместо slate-black | Высокий | ✅ `b59bc7a` MSK **BUILD_ID=`fX5_o-dvDlkd7wnhgo_Kv`** |
 
 ## Location↔Excursion linking (2026-07-31)
 
