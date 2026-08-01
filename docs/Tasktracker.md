@@ -23,7 +23,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | UX.LOC7 | Catalog mobile date UX: один entry (chips/sheet), не select+date input разом | Средний | ⏳ |
 | UX.LOC8 | IA: demote `/locations` из primary nav или секция city hub (owner V1/V2) | Средний | ⏳ |
 | UX.LOC9 | Unified `/places` (venues+locations tabs) | Низкий | ⚠️ после LOC8 |
-| UX.MAP1 | Location map zoom-out (`-`): OSM MapLibre embed floor → Leaflet `OsmMapEmbed` | Высокий | 🔄 deploy |
+| UX.MAP1 | Location map zoom-out (`-`): OSM MapLibre embed floor → Leaflet `OsmMapEmbed` | Высокий | ✅ `4c93418` MSK **BUILD_ID=`HDL3hw0HUymPBt_oi5syV`** |
 
 ---
 
@@ -58,7 +58,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | DR.7 | Catalog cards strip lat/lng → «Нет координат» in Мой день (Fontanka etc.) | Критический | ✅ `5c6ffc1` BUILD `faYl1EovDayQLYvHsV8kQ` |
 | DR.8 | /my-day add UX: CTA «Добавить точку» + routeVenues from matches + catalog hit-target | Критический | ✅ `2d3f7a4` BUILD `gEmtnqRsq_L56ejFTXSav` |
 | DR.9 | Phase-0: must-see CTA + event «В мой день» + city presets | Высокий | ✅ `2d3f7a4` BUILD `gEmtnqRsq_L56ejFTXSav` |
-| DR.10 | Badge «Маршрут · N» vs green «В маршруте» desync on /locations | Критический | 🔄 ship |
+| DR.10 | Badge «Маршрут · N» vs green «В маршруте» desync on /locations | Критический | ✅ `ff852a9` BUILD `HDL3hw0HUymPBt_oi5syV` (shipped in `rOaU1pDnbwGW6gFceF2R`, tip includes map/my-day follow-ups) |
 | LOC.EMPTY | `/locations?city=` empty for all cities: soft-timeout empty HTML + nginx 30m HIT | Критический | ✅ `987516b` BUILD `IffsRTTeclktlvq7PQweq` + nginx purge |
 | LOC.FACET | `/locations` type chip counts global (151) vs city (20); default «Все локации» | Критический | ✅ `bc994b6` BUILD `4-AqPsButr_VcuwLGcyFk` |
 

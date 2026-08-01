@@ -12,7 +12,7 @@
 - Unit: sibling Fontanka/Ligovsky false-positive + subscribe lengths 1→2→3.
 
 ### Проблемы
-- Нужен MSK deploy + live Playwright proof badge===active===LS.
+- Live MSK: commit `ff852a9` (tip later `505fad6`), **BUILD_ID=`HDL3hw0HUymPBt_oi5syV`**. Playwright: badge===active===LS на 0→1→2→3 (Ligovsky/Fontanka71/Fontanka105); forced LS=1 не подсвечивает siblings.
 
 ---
 
@@ -29,7 +29,7 @@
 - CSS: transparent `.daibilet-osm-marker`; leaflet z-index 0 под site chrome.
 
 ### Проблемы
-- Нужен SPB build → MSK `.next` swap; smoke zoom-out на live location page после деплоя.
+- ~~Нужен SPB build → MSK `.next` swap~~ → MSK-only deploy `4c93418` **BUILD_ID=`HDL3hw0HUymPBt_oi5syV`**. Live smoke Fontanka 105: iframe=0, leaflet=1, screenshot hash меняется на `-` и `+`.
 
 ---
 
