@@ -236,7 +236,8 @@
 - Unit: multi-add + hydrate keep-superset.
 
 ### Проблемы
-- Deploy: SPB `.16` Permission denied publickey → MSK-local build. Commit `a2c1b32` → **BUILD_ID=`rs16U9aCCKYbVyTyCjMyo`**. Smoke: `/my-day` 200 + noindex; `/locations` `/venues` 200; matches API 200; loc/venue detail 200.
+- Deploy: SPB `.16` Permission denied publickey → MSK-local build. Commit `a2c1b32` → **BUILD_ID=`rs16U9aCCKYbVyTyCjMyo`**. Smoke: `/my-day` 200 + noindex; `/locations` `/venues` 200; loc/venue detail 200.
+- Bonus: nginx `location /api/` слал day-route на legacy API (404). Добавлен `^~ /api/day-route/` → `daibilet_web`; публичный matches теперь 200.
 
 ---
 
