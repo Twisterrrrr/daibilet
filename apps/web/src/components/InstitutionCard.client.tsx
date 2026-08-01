@@ -97,6 +97,8 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
             slug: venue.slug,
             title: venue.name,
             city: venue.city,
+            cityId: venue.cityId,
+            citySlug: venue.citySlug,
             href,
             imageUrl: venue.heroImageUrl,
           }}

@@ -157,6 +157,7 @@ export function LocationCard({
             slug: venue.slug,
             title: venue.title || venue.name,
             city: venue.city,
+            cityId: venue.cityId,
             citySlug: venue.citySlug,
             href,
             imageUrl: venue.heroImageUrl,

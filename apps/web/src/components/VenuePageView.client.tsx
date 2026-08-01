@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import { ArrowLeft, Grid3X3, ListFilter } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
@@ -24,6 +24,17 @@ import {
 } from '@/lib/venue-program';
 import { venuePageTemplate } from '@/lib/venue-meta';
 import { eventHref } from '@/lib/routes';
+
+function slugFromPathname(pathname: string | null | undefined): string {
+  const path = String(pathname || '');
+  const match = path.match(/\/(?:locations|venues)\/([^/?#]+)/i);
+  if (!match?.[1]) return '';
+  try {
+    return decodeURIComponent(match[1]);
+  } catch {
+    return match[1];
+  }
+}
 
 function resolveVenueForRouteSlug(
   routeSlug: string,
@@ -49,7 +60,10 @@ export function VenuePageView({
   admissionProducts?: FinanceAdmissionProduct[];
 }) {
   const params = useParams();
+  const pathname = usePathname();
   const routeSlug = React.useMemo(() => {
+    const fromPath = slugFromPathname(pathname);
+    if (fromPath) return fromPath;
     const fromParams = typeof params?.slug === 'string' ? params.slug : Array.isArray(params?.slug) ? params.slug[0] : '';
     const raw = String(fromParams || slug || '').trim();
     try {
@@ -57,7 +71,7 @@ export function VenuePageView({
     } catch {
       return raw;
     }
-  }, [params, slug]);
+  }, [params, pathname, slug]);
 
   const matchedInitial =
     initialPayload?.venue && venueMatchesRouteSlug(initialPayload.venue, routeSlug) ? initialPayload : null;
@@ -71,8 +85,8 @@ export function VenuePageView({
   const [mode, setMode] = React.useState<'cards' | 'table'>('cards');
   const [activeSlug, setActiveSlug] = React.useState(routeSlug);
 
-  // Soft-nav can keep this client tree without remounting. Reset synchronously when URL slug
-  // changes so «В мой маршрут» never toggles the previous venue id for one paint/frame.
+  // Soft-nav can keep this client tree without remounting. Prefer pathname slug over lagging
+  // useParams so «В мой маршрут» never toggles the previous venue id for one paint/frame.
   if (activeSlug !== routeSlug) {
     setActiveSlug(routeSlug);
     setPayload(matchedInitial);

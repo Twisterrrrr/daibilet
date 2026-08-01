@@ -6180,7 +6180,10 @@ function formatPublicVenueTitle(value) {
 }
 
 function isValidVenueCoordinatePair(latitude, longitude) {
-  return Number.isFinite(latitude) && Number.isFinite(longitude) && Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180;
+  // Number(null)===0 → reject null-island so missing DB coords stay null in public DTO.
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return false;
+  if (latitude === 0 && longitude === 0) return false;
+  return Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180;
 }
 
 function extractEmbeddedVenueCoordinates(...parts) {
@@ -6220,8 +6223,11 @@ export function resolvePublicVenueCoordinates(venue = {}, options = {}) {
     venue.title || venue.name,
     venue.id,
   );
-  let latitude = override?.latitude ?? Number(venue.latitude);
-  let longitude = override?.longitude ?? Number(venue.longitude);
+  // Do not Number(null)→0: that falsely passes range checks as null-island.
+  const rawLat = override?.latitude ?? venue.latitude;
+  const rawLng = override?.longitude ?? venue.longitude;
+  const latitude = rawLat == null || rawLat === '' ? NaN : Number(rawLat);
+  const longitude = rawLng == null || rawLng === '' ? NaN : Number(rawLng);
   if (!isValidVenueCoordinatePair(latitude, longitude)) return null;
 
   if (isPierVenueKind(kind) && !override) {

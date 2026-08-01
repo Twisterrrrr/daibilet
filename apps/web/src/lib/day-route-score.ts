@@ -16,12 +16,10 @@ export function haversineMeters(lat1: number, lon1: number, lat2: number, lon2: 
 }
 
 export function isValidCoordinatePair(latitude: number, longitude: number): boolean {
-  return (
-    Number.isFinite(latitude) &&
-    Number.isFinite(longitude) &&
-    Math.abs(latitude) <= 90 &&
-    Math.abs(longitude) <= 180
-  );
+  // Reject null-island (Number(null)===0) and out-of-range junk.
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) return false;
+  if (latitude === 0 && longitude === 0) return false;
+  return Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180;
 }
 
 export type DayRouteCovered = {

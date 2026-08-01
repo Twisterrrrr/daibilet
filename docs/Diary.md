@@ -1,3 +1,23 @@
+## 2026-08-01 - Day-route multi-add recheck + missing coords backfill
+
+### Наблюдения
+- Owner: снова «нельзя добавить несколько точек» в «Мой день»; часть локаций без координат (хотя coords давались вчера).
+- Live Playwright (detail soft-nav, catalog cards, must-see, mobile related): **1→2→3** в `daibilet:dayRoute` уже работает на BUILD `wcK6bf1ElP9vDu-ZTDEvN` (фиксы multi-add на месте).
+- Реальный пробел по coords: **29** PUBLISHED/CANDIDATE без lat/lng. Из них SPb **11**, Москва **8**. Editorial must-see (`ermitazh`, `saint-petersburg-*`) coords **есть**; параллельные TC institution rows (`kazanskiy-sobor-7abab1bd1ddf`, `kunstkamera-…`, `mariinskiy-…`, `russkiy-muzey-…`, `yusupovskiy-…`, `pavlovskiy-…`) coords **не получили** - enrich матчит по editorial slug, не по title.
+- Баг DTO: `Number(null)===0` → public venue API отдавал `lat:0,lng:0` (null-island); DayRoutePanel тоже мог считать 0,0 валидными для Yandex CTA.
+
+### Решения
+- Harden soft-nav: `usePathname` slug в `VenuePageView` (params иногда отстаёт от URL); badge count всегда виден; `cityId` на Location/Institution cards.
+- `isValidCoordinatePair` / backend `isValidVenueCoordinatePair` + `resolvePublicVenueCoordinates`: reject 0,0; не Number(null).
+- `scripts/backfill-missing-venue-coords.js` + twin-fill по title; apply на MSK.
+- Deploy MSK-only `deploy-prod-next.sh`; Playwright proof multi-add + coords smoke.
+
+### Проблемы
+- Junk pier stubs без города (банкетные залы / YUTONG) могут остаться без coords - не must-see.
+- Owner perception «не добавляет точки» часто смешивается с «нет маршрута в Яндекс» при null coords.
+
+---
+
 ## 2026-08-01 - Day-route matches: duplicate TC siblings
 
 ### Наблюдения

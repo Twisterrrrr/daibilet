@@ -8,9 +8,15 @@ import {
   dayRouteMatchDedupeKey,
   dedupeDayRouteMatches,
   haversineMeters,
+  isValidCoordinatePair,
   normalizeDayRouteTitleKey,
   scoreDayRouteCoverage,
 } from './day-route-score.ts';
+
+test('isValidCoordinatePair rejects null-island 0,0', () => {
+  assert.equal(isValidCoordinatePair(0, 0), false);
+  assert.equal(isValidCoordinatePair(59.93, 30.32), true);
+});
 
 test('scoreDayRouteCoverage weights STOP > start > nearby', () => {
   assert.equal(scoreDayRouteCoverage({ stop: ['a', 'b'], start: [], nearby: [] }), 6);

@@ -195,11 +195,12 @@ function DayRoutePanelInner() {
   const coordsById = useMemo(() => {
     const map = new Map<string, DayRouteCoords>();
     for (const venue of payload?.venues || []) {
+      if (venue.latitude == null || venue.longitude == null) continue;
       const lat = Number(venue.latitude);
       const lng = Number(venue.longitude);
-      if (Number.isFinite(lat) && Number.isFinite(lng)) {
-        map.set(venue.id, { latitude: lat, longitude: lng });
-      }
+      // Number(null)===0 would otherwise look «valid» and break Yandex CTA.
+      if (!Number.isFinite(lat) || !Number.isFinite(lng) || (lat === 0 && lng === 0)) continue;
+      map.set(venue.id, { latitude: lat, longitude: lng });
     }
     return map;
   }, [payload?.venues]);
