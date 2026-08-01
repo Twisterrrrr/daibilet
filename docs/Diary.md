@@ -12,6 +12,7 @@
 - City filter: `resolveCatalogCityFilter` (slug→label); DayRoutePanel locationsHref по `venue.city` title.
 - `VenuePageView`: применять SSR payload только если slug/id совпадает; иначе fetch; render venue тоже от matched props.
 - Ops: `rm -rf /var/cache/nginx/daibilet/*` + reload - после purge smoke Москва/СПб/Казань/Сочи `venue_>0`.
+- Deploy: commit `987516b` → MSK in-place web build **BUILD_ID=`IffsRTTeclktlvq7PQweq`** + nginx purge. External smoke 4 cities: `venue_=51`, pier>0, `/my-day` 200.
 
 ### Проблемы
 - nginx `proxy_cache_valid 200 30m` всё ещё может отравиться любым пустым 200; noStore+retry снижает риск, полный bypass cache для empty - follow-up.

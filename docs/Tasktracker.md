@@ -50,7 +50,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | DR.1b | Day-route polish: empty states, mobile badge, STOP/start/nearby badges, limit/multi-city warnings, copy toast | Высокий | ✅ `56bbb237` BUILD `Mt5-YY9GU-T83jOIjxN0Q` |
 | DR.2 | Day-route Phase 1.5 share `?day=` noindex + Phase 2 auth sync | Средний | ✅ share hydrate + copy link; Phase 2 auth sync ⚠️ skip (нет user favorites day-route API) |
 | DR.3 | Fix multi-add route: stale VenuePageView + share hydrate overwrite; add venues to day-route | Критический | ✅ `a2c1b32` + follow-up slug-match guard / city title href |
-| LOC.EMPTY | `/locations?city=` empty for all cities: soft-timeout empty HTML + nginx 30m HIT | Критический | 🔄 fix noStore+retry+client fetch+purge |
+| LOC.EMPTY | `/locations?city=` empty for all cities: soft-timeout empty HTML + nginx 30m HIT | Критический | ✅ `987516b` BUILD `IffsRTTeclktlvq7PQweq` + nginx purge |
 
 ## Venue kinds: park + monument (2026-07-31)
 
