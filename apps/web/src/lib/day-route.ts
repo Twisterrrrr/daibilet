@@ -195,26 +195,66 @@ export function readDayRoute(): DayRouteState {
   return getDayRouteSnapshot();
 }
 
-export function writeDayRoute(state: DayRouteState): boolean {
-  if (typeof window === 'undefined') return false;
-  const normalized: DayRouteState = {
+/** Fresh LS read (ignore snapshot cache). Use before mutate + after failed write checks. */
+export function readDayRouteFresh(): DayRouteState {
+  if (typeof window === 'undefined') return emptyDayRoute();
+  resetDayRouteSnapshotCache();
+  return getDayRouteSnapshot();
+}
+
+function cloneDayRouteState(state: DayRouteState): DayRouteState {
+  return {
     cityId: state.cityId,
-    venues: dedupeDayRouteVenues(state.venues),
+    venues: state.venues.map((venue) => ({ ...venue })),
   };
-  const raw = JSON.stringify({
-    cityId: normalized.cityId,
-    venues: normalized.venues,
+}
+
+function dayRoutePersistPayload(state: DayRouteState, slim: boolean): DayRouteState {
+  const venues = dedupeDayRouteVenues(state.venues).map((venue) => {
+    if (!slim) return { ...venue };
+    const { imageUrl: _drop, ...rest } = venue;
+    return rest;
   });
+  return { cityId: state.cityId, venues };
+}
+
+function trySetDayRouteRaw(raw: string): boolean {
   try {
     localStorage.setItem(DAY_ROUTE_STORAGE_KEY, raw);
+    return true;
   } catch {
+    return false;
+  }
+}
+
+export function writeDayRoute(state: DayRouteState): boolean {
+  if (typeof window === 'undefined') return false;
+  // Full payload first; on quota retry without imageUrl (owner «Не удалось добавить точку»).
+  const attempts = [dayRoutePersistPayload(state, false), dayRoutePersistPayload(state, true)];
+  let raw: string | null = null;
+  let normalized: DayRouteState | null = null;
+  for (const attempt of attempts) {
+    const nextRaw = JSON.stringify({
+      cityId: attempt.cityId,
+      venues: attempt.venues,
+    });
+    if (!trySetDayRouteRaw(nextRaw)) continue;
+    raw = nextRaw;
+    normalized = attempt;
+    break;
+  }
+  if (!raw || !normalized) {
     // Quota / private mode: do not update snapshot or UI - keeps badge/buttons honest.
     return false;
   }
+  const frozen = cloneDayRouteState(normalized);
+  Object.freeze(frozen);
+  for (const venue of frozen.venues) Object.freeze(venue);
   const runtime = getDayRouteRuntime();
-  runtime.snapshotCache = { raw, state: normalized };
+  runtime.snapshotCache = { raw, state: frozen };
   notifyDayRouteChanged();
-  notifyDayRouteSubscribers(normalized);
+  // Subscribers get a mutable clone so React trees cannot corrupt the cache identity.
+  notifyDayRouteSubscribers(cloneDayRouteState(frozen));
   return true;
 }
 
@@ -334,7 +374,8 @@ function mergeDayRouteVenueFields(
 }
 
 export function addToDayRoute(item: DayRouteVenueItem): DayRouteState {
-  const current = readDayRoute();
+  // Always mutate from LS truth, not a possibly-stale snapshotCache identity.
+  const current = readDayRouteFresh();
   const id = normalizeDayRouteVenueId(item);
   if (!id) return current;
   const coords = sanitizeStoredCoords(item);
@@ -357,8 +398,7 @@ export function addToDayRoute(item: DayRouteVenueItem): DayRouteState {
     const venues = [...current.venues];
     venues[existingIdx] = merged;
     const next: DayRouteState = { cityId: current.cityId, venues };
-    writeDayRoute(next);
-    return next;
+    return writeDayRoute(next) ? readDayRouteFresh() : current;
   }
 
   const nextCityId = normalized.cityId || current.cityId;
@@ -373,11 +413,11 @@ export function addToDayRoute(item: DayRouteVenueItem): DayRouteState {
     venues: [...current.venues, normalized].slice(0, DAY_ROUTE_MAX),
   };
   // Keep first city as dominant; still allow add but UI warns on mixed.
+  // Same city TITLE with null vs city_* ids must NEVER block append.
   if (mixedCity && current.cityId) {
     next.cityId = current.cityId;
   }
-  writeDayRoute(next);
-  return next;
+  return writeDayRoute(next) ? readDayRouteFresh() : current;
 }
 
 export function removeFromDayRoute(venueId: string): DayRouteState {

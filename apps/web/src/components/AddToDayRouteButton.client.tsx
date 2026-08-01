@@ -10,7 +10,7 @@ import {
   addToDayRoute,
   isInDayRoute,
   normalizeDayRouteVenueId,
-  readDayRoute,
+  readDayRouteFresh,
   removeFromDayRoute,
   sameDayRouteVenue,
   toggleDayRoute,
@@ -67,7 +67,8 @@ export function AddToDayRouteButton({
   const activeAria = intent === 'day' ? 'Убрать место из моего дня' : 'Убрать из маршрута дня';
 
   function feedbackAfter(beforeCount: number, payload: DayRouteVenueItem) {
-    const after = readDayRoute();
+    // Bust cache so toast reflects LS truth (not a stale snapshot after failed write).
+    const after = readDayRouteFresh();
     const n = after.venues.length;
     if (n > beforeCount) {
       flashDayRouteFeedback(`Добавлено в маршрут · ${n}/${DAY_ROUTE_MAX}`);
@@ -90,6 +91,7 @@ export function AddToDayRouteButton({
       flashDayRouteFeedback('Уже в маршруте');
       return;
     }
+    // Count stuck + venue absent: writeDayRoute failed (quota/private) or add no-op'd.
     flashDayRouteFeedback('Не удалось добавить точку');
   }
 
@@ -103,10 +105,10 @@ export function AddToDayRouteButton({
       return;
     }
     const payload = { ...venue, id: venueKey };
-    const beforeCount = readDayRoute().venues.length;
+    const beforeCount = readDayRouteFresh().venues.length;
 
     if (intent === 'day') {
-      const before = readDayRoute();
+      const before = readDayRouteFresh();
       const existing = before.venues.find((item) => sameDayRouteVenue(item, payload));
       if (existing) {
         const sameEventMeta =
@@ -128,7 +130,7 @@ export function AddToDayRouteButton({
     // Catalog compact: ADD ONLY. Accidental second tap on a green chip must not
     // remove the only point (owner symptom «не добавляется более 1»).
     if (compact) {
-      const before = readDayRoute();
+      const before = readDayRouteFresh();
       if (before.venues.some((item) => sameDayRouteVenue(item, payload))) {
         // Merge coords / canonical id when slug-as-id alias already stored.
         addToDayRoute(payload);

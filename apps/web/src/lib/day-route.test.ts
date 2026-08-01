@@ -370,3 +370,76 @@ test('enrichDayRouteFromMatchVenues writes coords into storage', () => {
   assert.equal(next.venues[0]?.latitude, 59.9342802);
   assert.equal(readDayRoute().venues[0]?.longitude, 30.3350986);
 });
+
+test('addToDayRoute same city title with null vs cityId still appends', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({
+    id: 'venue_a',
+    slug: 'a',
+    title: 'A',
+    city: 'Санкт-Петербург',
+    cityId: 'city_spb',
+  });
+  const next = addToDayRoute({
+    id: 'venue_b',
+    slug: 'b',
+    title: 'B',
+    city: 'Санкт-Петербург',
+    cityId: null,
+  });
+  assert.equal(next.venues.length, 2);
+  assert.equal(readDayRoute().venues.length, 2);
+});
+
+test('addToDayRoute keeps first point when localStorage setItem throws on second write', () => {
+  const store = mockStorage();
+  clearDayRoute();
+  addToDayRoute({ id: 'venue_a', title: 'A', imageUrl: 'https://example.com/a.jpg' });
+  assert.equal(readDayRoute().venues.length, 1);
+
+  const original = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = (key: string, value: string) => {
+    if (key === DAY_ROUTE_STORAGE_KEY && String(value).includes('venue_b')) {
+      throw new DOMException('QuotaExceededError');
+    }
+    return original(key, value);
+  };
+
+  const next = addToDayRoute({
+    id: 'venue_b',
+    title: 'B',
+    imageUrl: 'https://example.com/b.jpg',
+  });
+  assert.equal(next.venues.length, 1, 'failed write must return previous state');
+  assert.equal(readDayRoute().venues.length, 1);
+  assert.equal(readDayRoute().venues[0]?.id, 'venue_a');
+  assert.ok(store.get(DAY_ROUTE_STORAGE_KEY)?.includes('venue_a'));
+});
+
+test('addToDayRoute retries slim payload without imageUrl when full write throws once', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({ id: 'venue_a', title: 'A', imageUrl: 'https://example.com/a.jpg' });
+
+  let writes = 0;
+  const original = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = (key: string, value: string) => {
+    if (key === DAY_ROUTE_STORAGE_KEY) {
+      writes += 1;
+      // First attempt of 2nd add (full with images) fails; slim retry succeeds.
+      if (writes === 2 && value.includes('imageUrl')) {
+        throw new DOMException('QuotaExceededError');
+      }
+    }
+    return original(key, value);
+  };
+
+  const next = addToDayRoute({
+    id: 'venue_b',
+    title: 'B',
+    imageUrl: 'https://example.com/b.jpg',
+  });
+  assert.equal(next.venues.length, 2);
+  assert.equal(readDayRoute().venues.length, 2);
+});

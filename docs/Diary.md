@@ -1,4 +1,22 @@
-## 2026-08-01 - Day-route: false «Уже в маршруте» на чужой точке
+## 2026-08-01 - Day-route: toast «Не удалось добавить точку» на 2-й точке
+
+### Наблюдения
+- Owner: клик по другой локации (тот же город) → toast **«Не удалось добавить точку»** (не «Уже в маршруте»).
+- Строка только в `AddToDayRouteButton.feedbackAfter`: count не вырос и `sameDayRouteVenue` false.
+- Город/`cityId` add **не блокирует** (mixed city только держит dominant cityId).
+- Playwright happy-path на live 1→2→3 зелёный; точный toast воспроизведён при throw `localStorage.setItem` на 2-й записи (quota/private).
+- Дополнительный риск: stale `snapshotCache` (raw совпал, state битый) → add думает bucket пуст и перезаписывает LS.
+
+### Решения
+- `writeDayRoute`: honor failure; retry slim без `imageUrl`; freeze+clone cache; subscribers получают mutable clone.
+- `addToDayRoute` / button: `readDayRouteFresh()` до/после; при failed write возвращаем previous state.
+- E2E regression: `scripts/e2e-day-route-multiadd.mjs`.
+- Unit: quota fail keeps 1; slim retry; null vs cityId same title appends.
+
+### Проблемы
+- Нужен MSK deploy + тот же E2E зелёный с toast «Добавлено».
+
+---
 
 ### Наблюдения
 - Owner: клик по локации, которой **нет** в маршруте → toast **«Уже в маршруте»**, точка не добавляется (BUILD `S_RAZ0azumKgT_beN19UH` / `d9b639c`).
