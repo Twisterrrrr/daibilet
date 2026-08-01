@@ -24,13 +24,13 @@ test('normalizePublicVenueRecord keeps Fontanka pier street line intact', () => 
   assert.equal(result.address, 'набережная реки Фонтанки, 105');
 });
 
-test('normalizePublicVenueRecord keeps Ligovsky boarding address useful', () => {
+test('normalizePublicVenueRecord strips poisoned ул. г. prefix', () => {
   const result = normalizePublicVenueRecord({
-    title: 'Точка сбора',
-    address: 'Лиговский проспект, 10',
+    title: 'Екатерининский дворец',
+    address: 'ул. г. Пушкин, Садовая ул., д. 7',
     city: 'Санкт-Петербург',
   });
   assert.ok(result.address);
-  assert.match(String(result.address), /Лиговский/i);
-  assert.match(String(result.address), /10/);
+  assert.doesNotMatch(String(result.address), /^ул\.\s*г\./i);
+  assert.match(String(result.address), /Садовая/i);
 });

@@ -48,7 +48,8 @@
 - `venue-normalize`: не префиксовать `ул.` к city/settlement parts; strip `г. City`.
 
 ### Проблемы
-- Нужен MSK web+API deploy (lean/normalize живут в backend). Старые LS без address - enrich на `/my-day` или передобавить.
+- ~~Нужен MSK web+API deploy~~ → live **BUILD_ID=`uAAeJS3sG_GuPNfbwQqKy`** (`705d13d`+). Smoke SPb locations: coords 20/20, cityId 20/20; Fontanka 105 + tochka-sbora address+lat/lng; matches отдаёт address. Старые LS без address - enrich на `/my-day` или передобавить.
+- Residual: «ул. г. Пушкин…» на Екатерининском дворце (poisoned cache / `г.` word-boundary) - follow-up strip в normalize.
 
 ---
 

@@ -147,7 +147,8 @@ function stripCityPrefix(value) {
 function looksLikeCityOrSettlementPart(part) {
   const text = String(part || '').trim();
   if (!text) return false;
-  if (/^(?:г\.?|город|пос\.?|пгт\.?|посёлок|поселок|село|деревня)\b/iu.test(text)) return true;
+  // Avoid \\b after «г.» - period is non-word so «г. Пушкин» would miss.
+  if (/^(?:г\.?|город|пос\.?|пгт\.?|посёлок|поселок|село|деревня)(?:\s+|$)/iu.test(text)) return true;
   // Bare "д. Name" settlement (not house "д. 12") - letter after д.
   if (/^д\.?\s*[\p{L}]/iu.test(text) && !/^д\.?\s*\d/iu.test(text)) return true;
   return false;
@@ -214,6 +215,9 @@ function enrichBareStreetAddress(address) {
 function normalizePublicVenueAddress(address, city) {
   let text = String(address || '').trim();
   if (!text || isPlusCodeAddress(text)) return null;
+
+  // Undo poisoned «ул. г. …» from older enrichBareStreetAddress.
+  text = text.replace(/^ул\.\s+(?=г\.?\s|город\s)/iu, '');
 
   const parts = stripAddressMetaParts(
     text.split(',').map((part) => part.trim()).filter(Boolean),
