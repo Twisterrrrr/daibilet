@@ -83,7 +83,7 @@
 - `HomeHeroBackground` (web + public): overlays вернули к slate (`slate-900/15` + `from-slate-950/75…`), не navy wash.
 
 ### Проблемы
-- SPB `.16` SSH по-прежнему denied → deploy через MSK in-place `pnpm web:build` (см. BUILD_ID в Tasktracker UX.HOME1b).
+- Канон web deploy: MSK in-place `pnpm web:build` (SPB build host retired). **BUILD_ID=`wcK6bf1ElP9vDu-ZTDEvN`**. Smoke `/`: 200 origin+HTTPS; HTML `!bg-[#122868]`; нет `from-[#0a174b]` / blue wash.
 
 ---
 

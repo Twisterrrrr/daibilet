@@ -30,8 +30,8 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.HOME1 | Вернуть синий (navy `#122868` / `#0a174b`) фон hero на главной вместо slate-black | Высокий | ⚠️ partial: `b59bc7a` ошибочно tint поверх фото |
-| UX.HOME1b | Owner correction: navy `#122868` только base под фото; убрать blue overlay wash | Критический | 🔄 commit+deploy |
+| UX.HOME1 | Вернуть синий (navy `#122868`) фон hero на главной вместо slate-black | Высокий | ⚠️ partial: `b59bc7a` ошибочно tint поверх фото |
+| UX.HOME1b | Owner correction: navy `#122868` только base под фото; убрать blue overlay wash | Критический | ✅ `b185b19` MSK **BUILD_ID=`wcK6bf1ElP9vDu-ZTDEvN`** |
 
 ## Location↔Excursion linking (2026-07-31)
 
