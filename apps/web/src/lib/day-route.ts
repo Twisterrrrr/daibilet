@@ -37,6 +37,76 @@ export type DayRouteState = {
   venues: DayRouteVenueItem[];
 };
 
+type DayRouteListener = (state: DayRouteState) => void;
+
+let snapshotCache: { raw: string | null; state: DayRouteState } | null = null;
+const dayRouteListeners = new Set<DayRouteListener>();
+let browserBridgeInstalled = false;
+
+function installDayRouteBrowserBridge() {
+  if (browserBridgeInstalled || typeof window === 'undefined') return;
+  if (typeof window.addEventListener !== 'function') return;
+  browserBridgeInstalled = true;
+  // bfcache / tab restore can revive stale React trees; force re-read from localStorage.
+  window.addEventListener('pageshow', () => {
+    snapshotCache = null;
+    const state = getDayRouteSnapshot();
+    notifyDayRouteChanged();
+    notifyDayRouteSubscribers(state);
+  });
+  window.addEventListener('storage', (event) => {
+    if (event.key !== DAY_ROUTE_STORAGE_KEY && event.key != null) return;
+    snapshotCache = null;
+    const state = getDayRouteSnapshot();
+    notifyDayRouteChanged();
+    notifyDayRouteSubscribers(state);
+  });
+}
+
+function notifyDayRouteSubscribers(state: DayRouteState) {
+  for (const listener of dayRouteListeners) {
+    try {
+      listener(state);
+    } catch {
+      // ignore subscriber errors
+    }
+  }
+}
+
+/** Subscribe to day-route snapshot updates (for useSyncExternalStore). */
+export function subscribeDayRoute(listener: DayRouteListener): () => void {
+  installDayRouteBrowserBridge();
+  dayRouteListeners.add(listener);
+  return () => {
+    dayRouteListeners.delete(listener);
+  };
+}
+
+/** Cached snapshot; identity stable until localStorage changes. */
+export function getDayRouteSnapshot(): DayRouteState {
+  installDayRouteBrowserBridge();
+  if (typeof window === 'undefined') return emptyDayRoute();
+  let raw: string | null = null;
+  try {
+    raw = localStorage.getItem(DAY_ROUTE_STORAGE_KEY);
+  } catch {
+    raw = null;
+  }
+  if (snapshotCache && snapshotCache.raw === raw) return snapshotCache.state;
+  const state = parseDayRouteRaw(raw);
+  snapshotCache = { raw, state };
+  return state;
+}
+
+export function getServerDayRouteSnapshot(): DayRouteState {
+  return emptyDayRoute();
+}
+
+/** Test-only: drop cached snapshot between mock localStorage installs. */
+export function resetDayRouteSnapshotCache() {
+  snapshotCache = null;
+}
+
 export function emptyDayRoute(): DayRouteState {
   return { cityId: null, venues: [] };
 }
@@ -48,20 +118,28 @@ function sanitizeStoredCoords(item: DayRouteVenueItem): Pick<DayRouteVenueItem, 
   return { latitude: lat, longitude: lng };
 }
 
-export function readDayRoute(): DayRouteState {
-  if (typeof window === 'undefined') return emptyDayRoute();
+function parseDayRouteRaw(raw: string | null): DayRouteState {
+  if (!raw) return emptyDayRoute();
   try {
-    const raw = localStorage.getItem(DAY_ROUTE_STORAGE_KEY);
-    if (!raw) return emptyDayRoute();
     const parsed = JSON.parse(raw) as Partial<DayRouteState>;
-    const venues = Array.isArray(parsed.venues)
-      ? parsed.venues
-          .filter(
-            (item): item is DayRouteVenueItem =>
-              Boolean(item) && typeof item.id === 'string' && typeof item.title === 'string',
-          )
-          .map((item) => ({ ...item, ...sanitizeStoredCoords(item) }))
-      : [];
+    const venues: DayRouteVenueItem[] = [];
+    if (Array.isArray(parsed.venues)) {
+      for (const item of parsed.venues) {
+        if (!item || typeof item !== 'object') continue;
+        if (typeof item.title !== 'string' || !item.title.trim()) continue;
+        const id = normalizeDayRouteVenueId(item);
+        if (!id) continue;
+        const next: DayRouteVenueItem = {
+          ...item,
+          id,
+          title: item.title,
+          slug: item.slug != null ? String(item.slug).trim() || null : null,
+          ...sanitizeStoredCoords(item),
+        };
+        if (venues.some((existing) => sameDayRouteVenue(existing, next))) continue;
+        venues.push(next);
+      }
+    }
     return {
       cityId: typeof parsed.cityId === 'string' ? parsed.cityId : null,
       venues: venues.slice(0, DAY_ROUTE_MAX),
@@ -71,20 +149,30 @@ export function readDayRoute(): DayRouteState {
   }
 }
 
+export function readDayRoute(): DayRouteState {
+  if (typeof window === 'undefined') return emptyDayRoute();
+  return getDayRouteSnapshot();
+}
+
 export function writeDayRoute(state: DayRouteState) {
   if (typeof window === 'undefined') return;
+  const normalized: DayRouteState = {
+    cityId: state.cityId,
+    venues: state.venues.slice(0, DAY_ROUTE_MAX),
+  };
+  const raw = JSON.stringify({
+    cityId: normalized.cityId,
+    venues: normalized.venues,
+  });
   try {
-    localStorage.setItem(
-      DAY_ROUTE_STORAGE_KEY,
-      JSON.stringify({
-        cityId: state.cityId,
-        venues: state.venues.slice(0, DAY_ROUTE_MAX),
-      }),
-    );
-    notifyDayRouteChanged();
+    localStorage.setItem(DAY_ROUTE_STORAGE_KEY, raw);
   } catch {
-    // ignore quota
+    // Quota / private mode: do not update snapshot or UI - keeps badge/buttons honest.
+    return;
   }
+  snapshotCache = { raw, state: normalized };
+  notifyDayRouteChanged();
+  notifyDayRouteSubscribers(normalized);
 }
 
 export function notifyDayRouteChanged() {
@@ -92,10 +180,22 @@ export function notifyDayRouteChanged() {
   window.dispatchEvent(new Event(DAY_ROUTE_CHANGED_EVENT));
 }
 
-export function isInDayRoute(venueId: string, state = readDayRoute()): boolean {
-  const needle = String(venueId || '').trim();
-  if (!needle) return false;
-  return state.venues.some((v) => v.id === needle || v.slug === needle);
+/**
+ * True when any locator (id and/or slug) equals a stored venue id or slug.
+ * Empty locators never match (avoids blank-id lighting every card).
+ */
+export function isInDayRoute(
+  venueId: string,
+  state = readDayRoute(),
+  slug?: string | null,
+): boolean {
+  const needles = [...new Set([String(venueId || '').trim(), String(slug ?? '').trim()].filter(Boolean))];
+  if (!needles.length) return false;
+  return state.venues.some((v) => {
+    const vid = String(v.id || '').trim();
+    const vslug = String(v.slug || '').trim();
+    return needles.some((needle) => needle === vid || needle === vslug);
+  });
 }
 
 /** Stable id for storage; never allow blank (blank id collapses all adds into one slot). */
@@ -105,7 +205,7 @@ export function normalizeDayRouteVenueId(item: Pick<DayRouteVenueItem, 'id' | 's
   return String(item.slug || '').trim();
 }
 
-function sameDayRouteVenue(
+export function sameDayRouteVenue(
   left: Pick<DayRouteVenueItem, 'id' | 'slug'>,
   right: Pick<DayRouteVenueItem, 'id' | 'slug'>,
 ): boolean {
@@ -280,9 +380,9 @@ export function clearDayRoute() {
 export function toggleDayRoute(item: DayRouteVenueItem): DayRouteState {
   const id = normalizeDayRouteVenueId(item);
   if (!id) return readDayRoute();
-  if (isInDayRoute(id) || (item.slug && isInDayRoute(String(item.slug)))) {
+  const current = readDayRoute();
+  if (isInDayRoute(id, current, item.slug)) {
     // Prefer removing by stored id when present.
-    const current = readDayRoute();
     const existing = current.venues.find((v) => sameDayRouteVenue(v, { id, slug: item.slug }));
     return removeFromDayRoute(existing?.id || id);
   }

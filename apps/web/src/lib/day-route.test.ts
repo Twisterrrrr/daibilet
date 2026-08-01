@@ -15,10 +15,13 @@ import {
   dayRouteMatchScore,
   enrichDayRouteFromMatchVenues,
   hydrateDayRouteFromShare,
+  isInDayRoute,
   lookupDayRouteCoords,
   optimizeDayRouteNearestNeighbor,
   parseDayRouteQueryParam,
   readDayRoute,
+  resetDayRouteSnapshotCache,
+  subscribeDayRoute,
   venueMatchesRouteSlug,
   type DayRouteVenueItem,
 } from './day-route.ts';
@@ -43,6 +46,9 @@ function mockStorage() {
     }
   };
   (globalThis as { dispatchEvent?: unknown }).dispatchEvent = () => true;
+  (globalThis as { addEventListener?: unknown }).addEventListener = () => undefined;
+  (globalThis as { removeEventListener?: unknown }).removeEventListener = () => undefined;
+  resetDayRouteSnapshotCache();
   return store;
 }
 
@@ -112,6 +118,66 @@ test('addToDayRoute appends multiple distinct venues', () => {
     ['a', 'b', 'c'],
   );
   assert.ok(localStorage.getItem(DAY_ROUTE_STORAGE_KEY));
+});
+
+test('isInDayRoute does not light sibling Fontanka/Ligovsky cards for one stored id', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({
+    id: 'venue_5661d5a99cb5385800d8807d',
+    slug: 'tochka-sbora',
+    title: 'Место посадки — Лиговский пр. 10',
+  });
+  const state = readDayRoute();
+  assert.equal(state.venues.length, 1);
+  assert.equal(isInDayRoute('venue_5661d5a99cb5385800d8807d', state, 'tochka-sbora'), true);
+  assert.equal(
+    isInDayRoute(
+      'venue_65f1b0a8a471ea32e7a902c4',
+      state,
+      'prichal-na-nab-reki-fontanki-71-59-926449-30-328948',
+    ),
+    false,
+  );
+  assert.equal(
+    isInDayRoute('venue_664357d9859cee9d822848aa', state, 'prichal-na-nab-r-fontanki-105'),
+    false,
+  );
+  assert.equal(isInDayRoute('', state), false);
+});
+
+test('subscribeDayRoute fires once per successful write with matching length', () => {
+  mockStorage();
+  clearDayRoute();
+  const lengths: number[] = [];
+  const unsubscribe = subscribeDayRoute((state) => {
+    lengths.push(state.venues.length);
+  });
+  addToDayRoute({ id: 'a', title: 'A' });
+  addToDayRoute({ id: 'b', title: 'B' });
+  addToDayRoute({ id: 'c', title: 'C' });
+  unsubscribe();
+  assert.deepEqual(lengths, [1, 2, 3]);
+  assert.equal(readDayRoute().venues.length, 3);
+});
+
+test('readDayRoute drops blank ids and dedupes slug twins', () => {
+  mockStorage();
+  localStorage.setItem(
+    DAY_ROUTE_STORAGE_KEY,
+    JSON.stringify({
+      cityId: null,
+      venues: [
+        { id: '', title: 'Broken', slug: '' },
+        { id: 'venue_a', title: 'A', slug: 'park-a' },
+        { id: 'venue_a2', title: 'A twin', slug: 'park-a' },
+      ],
+    }),
+  );
+  resetDayRouteSnapshotCache();
+  const state = readDayRoute();
+  assert.equal(state.venues.length, 1);
+  assert.equal(state.venues[0]!.id, 'venue_a');
 });
 
 test('addToDayRoute rejects blank id and does not collapse distinct venues', () => {

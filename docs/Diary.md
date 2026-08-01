@@ -1,3 +1,38 @@
+## 2026-08-01 - Day-route: badge «1» vs 3× «В маршруте» desync
+
+### Наблюдения
+- Owner screenshot `/locations`: header **«Маршрут · 1»**, но green **«В маршруте»** на Ligovsky + Fontanka 71 + Fontanka 105.
+- Live Playwright happy-path 1→2→3 по LS/`data-day-route-count` уже работал; forced LS=1 не давал false-positive на sibling ids.
+- Архитектурный зазор: кнопки держали локальный `useState(active)` после `toggle` return, бейдж читал только `localStorage` через DOM-event; bfcache/failed write/stale React → рассинхрон count vs green buttons.
+
+### Решения
+- Единый snapshot: `subscribeDayRoute` + `useSyncExternalStore` (`useDayRouteState`) для badge и `AddToDayRouteButton`.
+- `writeDayRoute`: emit subscribers только после успешного `setItem`; pageshow/storage invalidate cache.
+- `readDayRoute`: drop blank id, dedupe same id/slug twins.
+- Unit: sibling Fontanka/Ligovsky false-positive + subscribe lengths 1→2→3.
+
+### Проблемы
+- Нужен MSK deploy + live Playwright proof badge===active===LS.
+
+---
+
+## 2026-08-01 - Location map: zoom-out (`-`) broken on OSM embed
+
+### Наблюдения
+- Owner: на location page причала «Фонтанки 105» кнопка `-` на карте не отдаляет (красный круг на скрине); `+` работает.
+- Карта = `OsmMapEmbed` → iframe `openstreetmap.org/export/embed.html` (теперь MapLibre, не Leaflet).
+- Smoke: `.maplibregl-ctrl-zoom-out` кликабелен и не `disabled`, но с начального `fitBounds` визуальный zoom-out no-op; zoom-in меняет кадр. Upstream embed фактически держит пол у стартового zoom.
+
+### Решения
+- `OsmMapEmbed` переписан на client Leaflet (`leaflet` dep): `minZoom=3` / `maxZoom=19` / стартовый `16`, свои `+/-` (RU titles), OSM tiles + зелёный pin.
+- `ResizeObserver` только `invalidateSize` (больше не перезагружает iframe bbox).
+- CSS: transparent `.daibilet-osm-marker`; leaflet z-index 0 под site chrome.
+
+### Проблемы
+- Нужен SPB build → MSK `.next` swap; smoke zoom-out на live location page после деплоя.
+
+---
+
 ## 2026-08-01 - INC.504.19: SSR hang снова (owner 504) + healthcheck bugfix
 
 ### Наблюдения

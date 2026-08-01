@@ -2,23 +2,11 @@
 
 import Link from 'next/link';
 import { Route } from 'lucide-react';
-import { useEffect, useState } from 'react';
 
-import { DAY_ROUTE_CHANGED_EVENT, readDayRoute } from '@/lib/day-route';
+import { useDayRouteState } from '@/hooks/useDayRouteState';
 
 export function DayRouteBadge({ className = '' }: { className?: string }) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    const sync = () => setCount(readDayRoute().venues.length);
-    sync();
-    window.addEventListener(DAY_ROUTE_CHANGED_EVENT, sync);
-    window.addEventListener('storage', sync);
-    return () => {
-      window.removeEventListener(DAY_ROUTE_CHANGED_EVENT, sync);
-      window.removeEventListener('storage', sync);
-    };
-  }, []);
+  const count = useDayRouteState().venues.length;
 
   return (
     <Link

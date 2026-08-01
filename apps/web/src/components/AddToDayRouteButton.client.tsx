@@ -1,15 +1,13 @@
 'use client';
 
 import { Check, Route } from 'lucide-react';
-import { useEffect, useState } from 'react';
 
+import { useDayRouteState } from '@/hooks/useDayRouteState';
 import {
-  DAY_ROUTE_CHANGED_EVENT,
   DAY_ROUTE_MAX,
   addToDayRoute,
   isInDayRoute,
   normalizeDayRouteVenueId,
-  readDayRoute,
   removeFromDayRoute,
   toggleDayRoute,
   type DayRouteVenueItem,
@@ -36,24 +34,9 @@ export function AddToDayRouteButton({
   intent = 'route',
 }: Props) {
   const venueKey = normalizeDayRouteVenueId(venue);
-  const [active, setActive] = useState(false);
-  const [full, setFull] = useState(false);
-
-  useEffect(() => {
-    const sync = () => {
-      const state = readDayRoute();
-      const inRoute = Boolean(venueKey) && isInDayRoute(venueKey, state);
-      setActive(inRoute);
-      setFull(state.venues.length >= DAY_ROUTE_MAX && !inRoute);
-    };
-    sync();
-    window.addEventListener(DAY_ROUTE_CHANGED_EVENT, sync);
-    window.addEventListener('storage', sync);
-    return () => {
-      window.removeEventListener(DAY_ROUTE_CHANGED_EVENT, sync);
-      window.removeEventListener('storage', sync);
-    };
-  }, [venueKey]);
+  const route = useDayRouteState();
+  const active = Boolean(venueKey) && isInDayRoute(venueKey, route, venue.slug);
+  const full = route.venues.length >= DAY_ROUTE_MAX && !active;
 
   const base =
     variant === 'dark'
@@ -75,9 +58,8 @@ export function AddToDayRouteButton({
   function applyToggle() {
     if (!venueKey) return;
     const payload = { ...venue, id: venueKey };
-    let next: ReturnType<typeof readDayRoute>;
     if (intent === 'day') {
-      const before = readDayRoute();
+      const before = route;
       const existing = before.venues.find(
         (item) => item.id === venueKey || (payload.slug && item.slug === payload.slug),
       );
@@ -87,19 +69,17 @@ export function AddToDayRouteButton({
           (existing.sessionLabel || null) === (payload.sessionLabel || null) &&
           (existing.startsAt || null) === (payload.startsAt || null);
         if (sameEventMeta) {
-          next = removeFromDayRoute(existing.id);
+          removeFromDayRoute(existing.id);
         } else {
-          next = addToDayRoute(payload);
+          addToDayRoute(payload);
         }
       } else {
-        next = addToDayRoute(payload);
+        addToDayRoute(payload);
       }
     } else {
-      next = toggleDayRoute(payload);
+      toggleDayRoute(payload);
     }
-    const inRoute = isInDayRoute(venueKey, next);
-    setActive(inRoute);
-    setFull(next.venues.length >= DAY_ROUTE_MAX && !inRoute);
+    // UI follows useDayRouteState snapshot (same source as header badge).
   }
 
   return (
