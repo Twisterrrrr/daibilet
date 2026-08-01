@@ -10,7 +10,7 @@
 - Комментарии: MIN ≠ add ceiling. E2E `scripts/e2e-day-plan-text.mjs` гоняет 0→8 и падает если add disabled на 2.
 
 ### Проблемы
-- Нужен MSK deploy + smoke 5 текстовых точек.
+- ~~Нужен MSK deploy + smoke 5 текстовых точек~~ → MSK `85b4a63` **BUILD_ID=`lTTVacKQjRXqQAABoBDgl`**. E2E 0→8: add enabled на 2/8, disabled только на 8/8; счётчик `N/8`. Smoke 5 точек OK.
 
 ---
 
