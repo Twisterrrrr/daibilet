@@ -149,6 +149,7 @@ export function LocationCard({
 
       <div className="absolute right-2 top-2 z-10">
         <AddToDayRouteButton
+          key={venue.id}
           compact
           className="!min-h-9 !rounded-full !px-2.5 !py-1.5 !text-[11px] shadow-sm"
           venue={{

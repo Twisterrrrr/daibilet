@@ -6,14 +6,17 @@ import {
   DAY_ROUTE_STORAGE_KEY,
   addToDayRoute,
   buildDayRouteSharePath,
+  buildYandexMultiStopRouteUrl,
   clearDayRoute,
   dayRouteDominantCitySlug,
   dayRouteFullCoveredCount,
   dayRouteHasMixedCities,
   dayRouteMatchScore,
   hydrateDayRouteFromShare,
+  optimizeDayRouteNearestNeighbor,
   parseDayRouteQueryParam,
   readDayRoute,
+  venueMatchesRouteSlug,
   type DayRouteVenueItem,
 } from './day-route.ts';
 
@@ -106,6 +109,69 @@ test('addToDayRoute appends multiple distinct venues', () => {
     ['a', 'b', 'c'],
   );
   assert.ok(localStorage.getItem(DAY_ROUTE_STORAGE_KEY));
+});
+
+test('addToDayRoute rejects blank id and does not collapse distinct venues', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({ id: '', title: 'No id', slug: '' });
+  assert.equal(readDayRoute().venues.length, 0);
+  addToDayRoute({ id: '', title: 'By slug', slug: 'park-a' });
+  addToDayRoute({ id: 'venue_b', title: 'B', slug: 'park-b' });
+  addToDayRoute({ id: 'venue_c', title: 'C', slug: 'park-c' });
+  assert.deepEqual(
+    readDayRoute().venues.map((v) => v.id),
+    ['park-a', 'venue_b', 'venue_c'],
+  );
+});
+
+test('venueMatchesRouteSlug rejects stale soft-nav payload', () => {
+  const venueA = { id: 'venue_a', slug: 'park-a' };
+  const venueB = { id: 'venue_b', slug: 'park-b' };
+  assert.equal(venueMatchesRouteSlug(venueA, 'park-a'), true);
+  assert.equal(venueMatchesRouteSlug(venueA, 'park-b'), false);
+  assert.equal(venueMatchesRouteSlug(venueB, 'park-b'), true);
+  assert.equal(venueMatchesRouteSlug(venueA, 'park-a-a'), false);
+  assert.equal(
+    venueMatchesRouteSlug(
+      { id: 'venue_6407178af4d48cfebd200f18', slug: 'novodevichii-monastyr' },
+      'name-6407178af4d48cfebd200f18',
+    ),
+    true,
+  );
+});
+
+test('buildYandexMultiStopRouteUrl builds rtext multi-stop pedestrian route', () => {
+  assert.equal(buildYandexMultiStopRouteUrl([]), null);
+  assert.equal(buildYandexMultiStopRouteUrl([{ latitude: 55.75, longitude: 37.62 }]), null);
+  const url = buildYandexMultiStopRouteUrl([
+    { latitude: 55.75, longitude: 37.62 },
+    { latitude: 55.76, longitude: 37.63 },
+    { latitude: 55.77, longitude: 37.64 },
+  ]);
+  assert.equal(
+    url,
+    'https://yandex.ru/maps/?rtext=55.75,37.62~55.76,37.63~55.77,37.64&rtt=pd',
+  );
+});
+
+test('optimizeDayRouteNearestNeighbor keeps first and appends missing coords', () => {
+  const venues = [
+    { id: 'a', title: 'A' },
+    { id: 'b', title: 'B' },
+    { id: 'c', title: 'C' },
+    { id: 'd', title: 'D' },
+  ];
+  const coords = new Map([
+    ['a', { latitude: 55.0, longitude: 37.0 }],
+    ['b', { latitude: 56.0, longitude: 37.0 }],
+    ['c', { latitude: 55.1, longitude: 37.0 }],
+  ]);
+  const ordered = optimizeDayRouteNearestNeighbor(venues, coords);
+  assert.deepEqual(
+    ordered.map((v) => v.id),
+    ['a', 'c', 'b', 'd'],
+  );
 });
 
 test('hydrateDayRouteFromShare keeps local when it already covers share and has more', () => {

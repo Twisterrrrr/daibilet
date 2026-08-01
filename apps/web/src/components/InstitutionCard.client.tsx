@@ -89,6 +89,7 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
 
       <div className="absolute right-3 top-3 z-10">
         <AddToDayRouteButton
+          key={venue.id}
           compact
           className="!min-h-9 !rounded-lg !px-2.5 !py-1.5 !text-[11px] shadow-sm"
           venue={{

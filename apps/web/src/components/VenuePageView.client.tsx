@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { useParams } from 'next/navigation';
 import { ArrowLeft, Grid3X3, ListFilter } from 'lucide-react';
 
 import { EventCard } from '@/components/EventCard';
@@ -8,6 +9,7 @@ import { InstitutionVenueLayout } from '@/components/InstitutionVenueLayout.clie
 import { LocationVenueLayout } from '@/components/LocationVenueLayout.client';
 import { VenueAdmissionBlock } from '@/components/VenueAdmissionBlock';
 import type { PublicVenueDto, PublicVenuePageDto } from '@daibilet/contracts/public';
+import { venueMatchesRouteSlug } from '@/lib/day-route';
 import { formatMoney, formatNumber } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
 import type { FinanceAdmissionProduct } from '@/lib/finance-projection';
@@ -23,6 +25,20 @@ import {
 import { venuePageTemplate } from '@/lib/venue-meta';
 import { eventHref } from '@/lib/routes';
 
+function resolveVenueForRouteSlug(
+  routeSlug: string,
+  initialPayload: PublicVenuePageDto | null,
+  payload: PublicVenuePageDto | null,
+): PublicVenueDto | null {
+  if (initialPayload?.venue && venueMatchesRouteSlug(initialPayload.venue, routeSlug)) {
+    return initialPayload.venue;
+  }
+  if (payload?.venue && venueMatchesRouteSlug(payload.venue, routeSlug)) {
+    return payload.venue;
+  }
+  return null;
+}
+
 export function VenuePageView({
   slug,
   initialPayload,
@@ -32,44 +48,58 @@ export function VenuePageView({
   initialPayload: PublicVenuePageDto | null;
   admissionProducts?: FinanceAdmissionProduct[];
 }) {
-  const [payload, setPayload] = React.useState<PublicVenuePageDto | null>(initialPayload);
-  const [contentReady, setContentReady] = React.useState(() =>
-    // CF.P2e: admission-only institutions have zero sessions but still need SSR layout/CTA.
-    Boolean(initialPayload?.venue),
-  );
+  const params = useParams();
+  const routeSlug = React.useMemo(() => {
+    const fromParams = typeof params?.slug === 'string' ? params.slug : Array.isArray(params?.slug) ? params.slug[0] : '';
+    const raw = String(fromParams || slug || '').trim();
+    try {
+      return decodeURIComponent(raw);
+    } catch {
+      return raw;
+    }
+  }, [params, slug]);
+
+  const matchedInitial =
+    initialPayload?.venue && venueMatchesRouteSlug(initialPayload.venue, routeSlug) ? initialPayload : null;
+  const matchedInitialVenueId = matchedInitial?.venue?.id ?? null;
+
+  const [payload, setPayload] = React.useState<PublicVenuePageDto | null>(matchedInitial);
+  const [contentReady, setContentReady] = React.useState(() => Boolean(matchedInitial?.venue));
   const [error, setError] = React.useState<string | null>(null);
   const [category, setCategory] = React.useState('all');
   const [dateFilter, setDateFilter] = React.useState<VenueDateFilter>('smart');
   const [mode, setMode] = React.useState<'cards' | 'table'>('cards');
+  const [activeSlug, setActiveSlug] = React.useState(routeSlug);
+
+  // Soft-nav can keep this client tree without remounting. Reset synchronously when URL slug
+  // changes so «В мой маршрут» never toggles the previous venue id for one paint/frame.
+  if (activeSlug !== routeSlug) {
+    setActiveSlug(routeSlug);
+    setPayload(matchedInitial);
+    setContentReady(Boolean(matchedInitial?.venue));
+    setError(null);
+    setCategory('all');
+    setDateFilter('smart');
+  }
 
   React.useEffect(() => {
-    // Soft-nav between /locations|venues/[slug] reuses this client tree. Without sync,
-    // payload sticks on the previous venue and «В мой маршрут» toggles the wrong id
-    // (add second point → often removes the first). Prefer SSR payload only when it matches slug.
-    const payloadSlug = String(initialPayload?.venue?.slug || '').trim();
-    const payloadId = String(initialPayload?.venue?.id || '').trim();
-    const payloadMatchesSlug =
-      Boolean(initialPayload?.venue) &&
-      (payloadSlug === slug ||
-        payloadId === slug ||
-        (payloadSlug && decodeURIComponent(payloadSlug) === slug));
-
-    if (payloadMatchesSlug && initialPayload) {
-      setPayload(initialPayload);
+    if (matchedInitialVenueId && matchedInitial) {
+      setPayload(matchedInitial);
       setContentReady(true);
       setError(null);
-      setCategory('all');
-      setDateFilter('smart');
       return;
     }
     const controller = new AbortController();
     setPayload(null);
     setContentReady(false);
-    fetch(`/api/public/venues/${encodeURIComponent(slug)}`, { signal: controller.signal })
+    fetch(`/api/public/venues/${encodeURIComponent(routeSlug)}`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const data = (await response.json()) as PublicVenuePageDto | null;
         if (!data?.venue) throw new Error('Страница не найдена');
+        if (!venueMatchesRouteSlug(data.venue, routeSlug)) {
+          throw new Error('Страница не найдена');
+        }
         return data;
       })
       .then((data) => {
@@ -82,7 +112,9 @@ export function VenuePageView({
         setError(requestError instanceof Error ? requestError.message : 'Страница не найдена');
       });
     return () => controller.abort();
-  }, [slug, initialPayload]);
+    // matchedInitial object identity changes; key off venue id + route slug.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeSlug, matchedInitialVenueId]);
 
   const baseSessions = React.useMemo(() => {
     if (!payload) return [];
@@ -104,21 +136,9 @@ export function VenuePageView({
     () => buildVenueProgramGroups(baseSessions, 'all', null),
     [baseSessions],
   );
-  const venue = (() => {
-    const fromInitial = initialPayload?.venue;
-    if (fromInitial) {
-      const payloadSlug = String(fromInitial.slug || '').trim();
-      const payloadId = String(fromInitial.id || '').trim();
-      if (
-        payloadSlug === slug ||
-        payloadId === slug ||
-        (payloadSlug && decodeURIComponent(payloadSlug) === slug)
-      ) {
-        return fromInitial;
-      }
-    }
-    return payload?.venue;
-  })();
+  const venue = resolveVenueForRouteSlug(routeSlug, initialPayload, payload);
+  const matchedPayload =
+    payload?.venue && venueMatchesRouteSlug(payload.venue, routeSlug) ? payload : matchedInitial;
   const categories = venue ? Object.entries(venue.categories).sort((a, b) => b[1] - a[1]) : [];
   const pageTemplate = venue ? venuePageTemplate(venue.type) : 'location';
   const isLocationPage = pageTemplate === 'location';
@@ -128,11 +148,11 @@ export function VenuePageView({
   return (
     <div className={`min-h-screen text-slate-900 ${useLovableLayout ? 'bg-slate-50' : 'bg-white'}`}>
       <div>
-        {!payload && !error ? (
+        {!venue && !error ? (
           <div className="container-page py-16 text-sm text-slate-500">Загружаем страницу...</div>
         ) : null}
 
-        {!payload && !contentReady && error ? (
+        {!venue && !contentReady && error ? (
           <div className="container-page py-16">
             <button type="button" className="btn-secondary" onClick={() => navigateHome('top')}>
               <ArrowLeft className="h-4 w-4" />
@@ -143,26 +163,28 @@ export function VenuePageView({
           </div>
         ) : null}
 
-        {venue && payload && contentReady ? (
+        {venue && matchedPayload && contentReady ? (
           <>
             {isLocationPage ? (
               <LocationVenueLayout
+                key={venue.id}
                 venue={venue}
-                stats={payload.stats}
-                sessions={contentReady ? payload.sessions : []}
+                stats={matchedPayload.stats}
+                sessions={contentReady ? matchedPayload.sessions : []}
                 routeGroups={contentReady ? allRouteGroups : []}
-                relatedVenues={contentReady ? payload.relatedVenues : []}
-                stopEvents={contentReady ? payload.stopEvents || [] : []}
-                nearbyEvents={contentReady ? payload.nearbyEvents || [] : []}
-                pagePayload={payload}
+                relatedVenues={contentReady ? matchedPayload.relatedVenues : []}
+                stopEvents={contentReady ? matchedPayload.stopEvents || [] : []}
+                nearbyEvents={contentReady ? matchedPayload.nearbyEvents || [] : []}
+                pagePayload={matchedPayload}
               />
             ) : isInstitutionPage ? (
               <InstitutionVenueLayout
+                key={venue.id}
                 venue={venue}
-                stats={payload.stats}
-                sessions={contentReady ? payload.sessions : []}
-                relatedVenues={contentReady ? payload.relatedVenues : []}
-                pagePayload={payload}
+                stats={matchedPayload.stats}
+                sessions={contentReady ? matchedPayload.sessions : []}
+                relatedVenues={contentReady ? matchedPayload.relatedVenues : []}
+                pagePayload={matchedPayload}
                 admissionProducts={admissionProducts}
               />
             ) : null}
@@ -183,8 +205,8 @@ export function VenuePageView({
                     </h2>
                     <p className="mt-1 text-sm leading-6 text-slate-600">
                       {isInstitutionPage
-                        ? 'События площадки — выберите категорию, дату и сеанс для покупки.'
-                        : 'По одному маршруту в строке; в колонке слотов — ближайшие отправления на выбранную дату.'}
+                        ? 'События площадки - выберите категорию, дату и сеанс для покупки.'
+                        : 'По одному маршруту в строке; в колонке слотов - ближайшие отправления на выбранную дату.'}
                     </p>
                   </div>
                   <div className="inline-flex overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
@@ -229,8 +251,8 @@ export function VenuePageView({
                     <dl className="mt-4 grid gap-3 text-sm">
                       <InfoRow label="Город" value={venue.city} />
                       <InfoRow label="Адрес" value={venueStreetLabel(venue)} />
-                      <InfoRow label="Событий" value={formatNumber(payload.stats.events)} />
-                      <InfoRow label="Цена" value={formatMoney(payload.stats.priceFrom)} />
+                      <InfoRow label="Событий" value={formatNumber(matchedPayload.stats.events)} />
+                      <InfoRow label="Цена" value={formatMoney(matchedPayload.stats.priceFrom)} />
                     </dl>
                   </section>
                 </aside>
@@ -239,7 +261,7 @@ export function VenuePageView({
             ) : (
               <div className="container-page py-8">
                 <div className="rounded-2xl border border-slate-200 bg-white p-8 text-sm text-slate-500">
-                  Загружаем расписание и билеты…
+                  Загружаем расписание и билеты...
                 </div>
               </div>
             )}

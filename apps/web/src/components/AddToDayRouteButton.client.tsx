@@ -7,6 +7,7 @@ import {
   DAY_ROUTE_CHANGED_EVENT,
   DAY_ROUTE_MAX,
   isInDayRoute,
+  normalizeDayRouteVenueId,
   readDayRoute,
   toggleDayRoute,
   type DayRouteVenueItem,
@@ -26,14 +27,16 @@ export function AddToDayRouteButton({
   variant = 'light',
   compact = false,
 }: Props) {
+  const venueKey = normalizeDayRouteVenueId(venue);
   const [active, setActive] = useState(false);
   const [full, setFull] = useState(false);
 
   useEffect(() => {
     const sync = () => {
       const state = readDayRoute();
-      setActive(isInDayRoute(venue.id, state));
-      setFull(state.venues.length >= DAY_ROUTE_MAX && !isInDayRoute(venue.id, state));
+      const inRoute = Boolean(venueKey) && isInDayRoute(venueKey, state);
+      setActive(inRoute);
+      setFull(state.venues.length >= DAY_ROUTE_MAX && !inRoute);
     };
     sync();
     window.addEventListener(DAY_ROUTE_CHANGED_EVENT, sync);
@@ -42,7 +45,7 @@ export function AddToDayRouteButton({
       window.removeEventListener(DAY_ROUTE_CHANGED_EVENT, sync);
       window.removeEventListener('storage', sync);
     };
-  }, [venue.id]);
+  }, [venueKey]);
 
   const base =
     variant === 'dark'
@@ -58,16 +61,27 @@ export function AddToDayRouteButton({
   return (
     <button
       type="button"
-      disabled={full && !active}
-      title={full && !active ? `Лимит ${DAY_ROUTE_MAX} точек` : active ? 'Убрать из маршрута' : 'В мой маршрут'}
+      disabled={!venueKey || (full && !active)}
+      title={
+        !venueKey
+          ? 'Нельзя добавить: нет id точки'
+          : full && !active
+            ? `Лимит ${DAY_ROUTE_MAX} точек`
+            : active
+              ? 'Убрать из маршрута'
+              : 'В мой маршрут'
+      }
       aria-pressed={active}
       aria-label={active ? 'Убрать из маршрута дня' : 'Добавить в маршрут дня'}
+      data-venue-id={venueKey || undefined}
       onClick={(event) => {
         event.preventDefault();
         event.stopPropagation();
-        const next = toggleDayRoute(venue);
-        setActive(isInDayRoute(venue.id, next));
-        setFull(next.venues.length >= DAY_ROUTE_MAX && !isInDayRoute(venue.id, next));
+        if (!venueKey) return;
+        const next = toggleDayRoute({ ...venue, id: venueKey });
+        const inRoute = isInDayRoute(venueKey, next);
+        setActive(inRoute);
+        setFull(next.venues.length >= DAY_ROUTE_MAX && !inRoute);
       }}
       className={`inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${base} ${className}`}
     >

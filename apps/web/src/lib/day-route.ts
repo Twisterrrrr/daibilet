@@ -2,11 +2,15 @@
  * Guest «Собери свой день» bucket (localStorage). Separate from favorites wishlist.
  */
 
+import { haversineMeters, isValidCoordinatePair } from './day-route-score';
+
 export const DAY_ROUTE_STORAGE_KEY = 'daibilet:dayRoute';
 export const DAY_ROUTE_CHANGED_EVENT = 'daibilet:day-route-changed';
 
 export const DAY_ROUTE_MIN = 2;
 export const DAY_ROUTE_MAX = 8;
+
+export type DayRouteCoords = { latitude: number; longitude: number };
 
 export type DayRouteVenueItem = {
   id: string;
@@ -71,23 +75,79 @@ export function notifyDayRouteChanged() {
 }
 
 export function isInDayRoute(venueId: string, state = readDayRoute()): boolean {
-  return state.venues.some((v) => v.id === venueId);
+  const needle = String(venueId || '').trim();
+  if (!needle) return false;
+  return state.venues.some((v) => v.id === needle || v.slug === needle);
+}
+
+/** Stable id for storage; never allow blank (blank id collapses all adds into one slot). */
+export function normalizeDayRouteVenueId(item: Pick<DayRouteVenueItem, 'id' | 'slug'>): string {
+  const id = String(item.id || '').trim();
+  if (id) return id;
+  return String(item.slug || '').trim();
+}
+
+function sameDayRouteVenue(
+  left: Pick<DayRouteVenueItem, 'id' | 'slug'>,
+  right: Pick<DayRouteVenueItem, 'id' | 'slug'>,
+): boolean {
+  const leftId = String(left.id || '').trim();
+  const rightId = String(right.id || '').trim();
+  if (leftId && rightId && leftId === rightId) return true;
+  const leftSlug = String(left.slug || '').trim();
+  const rightSlug = String(right.slug || '').trim();
+  return Boolean(leftSlug && rightSlug && leftSlug === rightSlug);
+}
+
+/**
+ * Soft-nav `/locations|venues/[slug]` must not reuse a previous venue payload.
+ * Match by slug, id, or id-suffix CHPU (`name-{idWithoutVenuePrefix}`).
+ */
+export function venueMatchesRouteSlug(
+  venue: { id?: string | null; slug?: string | null } | null | undefined,
+  routeSlug: string,
+): boolean {
+  if (!venue) return false;
+  const route = String(routeSlug || '').trim();
+  if (!route) return false;
+  let decoded = route;
+  try {
+    decoded = decodeURIComponent(route);
+  } catch {
+    decoded = route;
+  }
+  const slug = String(venue.slug || '').trim();
+  const id = String(venue.id || '').trim();
+  if (slug && (slug === route || slug === decoded)) return true;
+  if (id && (id === route || id === decoded)) return true;
+  const bare = id.replace(/^venue_/, '');
+  // Only accept id-suffix CHPU when bare id is long enough (avoid `park-a` matching `venue_a`).
+  if (
+    bare.length >= 8 &&
+    (route === bare || decoded === bare || route.endsWith(`-${bare}`) || decoded.endsWith(`-${bare}`))
+  ) {
+    return true;
+  }
+  return false;
 }
 
 export function addToDayRoute(item: DayRouteVenueItem): DayRouteState {
   const current = readDayRoute();
-  if (current.venues.some((v) => v.id === item.id)) return current;
+  const id = normalizeDayRouteVenueId(item);
+  if (!id) return current;
+  const normalized: DayRouteVenueItem = { ...item, id };
+  if (current.venues.some((v) => sameDayRouteVenue(v, normalized))) return current;
 
-  const nextCityId = item.cityId || current.cityId;
+  const nextCityId = normalized.cityId || current.cityId;
   const mixedCity =
-    Boolean(current.cityId && item.cityId && current.cityId !== item.cityId) ||
+    Boolean(current.cityId && normalized.cityId && current.cityId !== normalized.cityId) ||
     Boolean(current.venues.length && nextCityId && current.cityId && current.cityId !== nextCityId);
 
   if (current.venues.length >= DAY_ROUTE_MAX) return current;
 
   const next: DayRouteState = {
     cityId: nextCityId || current.cityId,
-    venues: [...current.venues, item].slice(0, DAY_ROUTE_MAX),
+    venues: [...current.venues, normalized].slice(0, DAY_ROUTE_MAX),
   };
   // Keep first city as dominant; still allow add but UI warns on mixed.
   if (mixedCity && current.cityId) {
@@ -108,13 +168,57 @@ export function removeFromDayRoute(venueId: string): DayRouteState {
   return next;
 }
 
+/** Reorder points in localStorage (persist desired visit order). */
+export function reorderDayRoute(orderedIds: string[]): DayRouteState {
+  const current = readDayRoute();
+  const byId = new Map(current.venues.map((v) => [v.id, v]));
+  const nextVenues: DayRouteVenueItem[] = [];
+  const seen = new Set<string>();
+  for (const id of orderedIds) {
+    const venue = byId.get(id);
+    if (!venue || seen.has(id)) continue;
+    seen.add(id);
+    nextVenues.push(venue);
+  }
+  for (const venue of current.venues) {
+    if (seen.has(venue.id)) continue;
+    nextVenues.push(venue);
+  }
+  const next: DayRouteState = {
+    cityId: current.cityId,
+    venues: nextVenues.slice(0, DAY_ROUTE_MAX),
+  };
+  writeDayRoute(next);
+  return next;
+}
+
+/** Move a point up (-1) or down (+1) in the day route. */
+export function moveDayRouteVenue(venueId: string, delta: -1 | 1): DayRouteState {
+  const current = readDayRoute();
+  const index = current.venues.findIndex((v) => v.id === venueId);
+  if (index < 0) return current;
+  const target = index + delta;
+  if (target < 0 || target >= current.venues.length) return current;
+  const venues = [...current.venues];
+  const [item] = venues.splice(index, 1);
+  venues.splice(target, 0, item);
+  return reorderDayRoute(venues.map((v) => v.id));
+}
+
 export function clearDayRoute() {
   writeDayRoute(emptyDayRoute());
 }
 
 export function toggleDayRoute(item: DayRouteVenueItem): DayRouteState {
-  if (isInDayRoute(item.id)) return removeFromDayRoute(item.id);
-  return addToDayRoute(item);
+  const id = normalizeDayRouteVenueId(item);
+  if (!id) return readDayRoute();
+  if (isInDayRoute(id) || (item.slug && isInDayRoute(String(item.slug)))) {
+    // Prefer removing by stored id when present.
+    const current = readDayRoute();
+    const existing = current.venues.find((v) => sameDayRouteVenue(v, { id, slug: item.slug }));
+    return removeFromDayRoute(existing?.id || id);
+  }
+  return addToDayRoute({ ...item, id });
 }
 
 /** Parse `?day=id1,slug2` share query into locators (max DAY_ROUTE_MAX). */
@@ -231,4 +335,100 @@ export function dayRouteDominantCitySlug(venues: DayRouteVenueItem[]): string | 
     }
   }
   return best;
+}
+
+export type YandexRouteMode = 'pd' | 'auto' | 'mt';
+
+/**
+ * Multi-stop Yandex Maps deep-link (route, not pins-only).
+ * Format: https://yandex.ru/maps/?rtext=lat,lng~lat,lng~…&rtt=pd
+ * Coords are lat,lng (unlike pt= which is lng,lat). Supports 2-8 waypoints.
+ */
+export function buildYandexMultiStopRouteUrl(
+  points: Array<DayRouteCoords | null | undefined>,
+  mode: YandexRouteMode = 'pd',
+): string | null {
+  const coords: DayRouteCoords[] = [];
+  for (const point of points) {
+    if (!point) continue;
+    if (!isValidCoordinatePair(point.latitude, point.longitude)) continue;
+    coords.push({ latitude: point.latitude, longitude: point.longitude });
+  }
+  if (coords.length < 2) return null;
+  // rtext uses lat,lng pairs joined by ~ (do not encode commas/tildes).
+  const rtext = coords
+    .slice(0, DAY_ROUTE_MAX)
+    .map((c) => `${c.latitude},${c.longitude}`)
+    .join('~');
+  return `https://yandex.ru/maps/?rtext=${rtext}&rtt=${mode}`;
+}
+
+/**
+ * Nearest-neighbor TSP from the first point that has coords.
+ * Venues without coords keep relative order and append after optimized ones.
+ */
+export function optimizeDayRouteNearestNeighbor(
+  venues: DayRouteVenueItem[],
+  coordsById: Map<string, DayRouteCoords>,
+): DayRouteVenueItem[] {
+  if (venues.length < 2) return [...venues];
+
+  const withCoords: DayRouteVenueItem[] = [];
+  const withoutCoords: DayRouteVenueItem[] = [];
+  for (const venue of venues) {
+    const c = coordsById.get(venue.id);
+    if (c && isValidCoordinatePair(c.latitude, c.longitude)) withCoords.push(venue);
+    else withoutCoords.push(venue);
+  }
+  if (withCoords.length < 2) return [...venues];
+
+  const remaining = [...withCoords];
+  const ordered: DayRouteVenueItem[] = [remaining.shift()!];
+  while (remaining.length) {
+    const last = ordered[ordered.length - 1]!;
+    const lastCoord = coordsById.get(last.id)!;
+    let bestIdx = 0;
+    let bestDist = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < remaining.length; i += 1) {
+      const candidate = remaining[i]!;
+      const c = coordsById.get(candidate.id)!;
+      const d = haversineMeters(lastCoord.latitude, lastCoord.longitude, c.latitude, c.longitude);
+      if (d < bestDist) {
+        bestDist = d;
+        bestIdx = i;
+      }
+    }
+    ordered.push(remaining.splice(bestIdx, 1)[0]!);
+  }
+  return [...ordered, ...withoutCoords];
+}
+
+/** Consecutive segment distances (meters) for UI hints; null when either endpoint lacks coords. */
+export function dayRouteSegmentMeters(
+  venues: DayRouteVenueItem[],
+  coordsById: Map<string, DayRouteCoords>,
+): Array<number | null> {
+  const segments: Array<number | null> = [];
+  for (let i = 0; i < venues.length - 1; i += 1) {
+    const a = coordsById.get(venues[i]!.id);
+    const b = coordsById.get(venues[i + 1]!.id);
+    if (
+      a &&
+      b &&
+      isValidCoordinatePair(a.latitude, a.longitude) &&
+      isValidCoordinatePair(b.latitude, b.longitude)
+    ) {
+      segments.push(haversineMeters(a.latitude, a.longitude, b.latitude, b.longitude));
+    } else {
+      segments.push(null);
+    }
+  }
+  return segments;
+}
+
+export function formatDayRouteDistance(meters: number): string {
+  if (!Number.isFinite(meters) || meters < 0) return '';
+  if (meters < 1000) return `${Math.round(meters)} м`;
+  const km = meters / 1000;
+  return km < 10 ? `${km.toFixed(1).replace('.', ',')} км` : `${Math.round(km)} км`;
 }
