@@ -4723,6 +4723,8 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
     mergedGroup && mergedGroup.id !== venue.id ? (await resolvePublicVenueRow(db, mergedGroup.id)) || venue : venue;
   const relatedVenues = await publicRelatedVenues(db, venue.id, venue.city, 6, hubRows);
   const hubGateRow = {
+    id: canonicalVenue.id,
+    slug: canonicalVenue.slug,
     title: canonicalVenue.title,
     name: canonicalVenue.title,
     kind: canonicalVenue.kind,
@@ -4750,12 +4752,10 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
   const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
   const routeCount = new Set(sessions.map((session) => session.groupKey || session.id).filter(Boolean)).size || sessions.length;
-  const resolvedType = resolvePublicVenueKind(canonicalVenue.kind, canonicalVenue.title, canonicalVenue.address, {
+  const resolvedType = resolvePublicVenueKindFromRow({
+    ...hubGateRow,
     shortDescription: mergedGroup?.shortDescription || canonicalVenue.shortDescription,
     description: canonicalVenue.description,
-    waterEvents,
-    busEvents,
-    totalEvents: sessions.length,
   });
   const displayName = applyPublicVenueDisplayName(
     {
@@ -7538,12 +7538,17 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
     return 'museum';
   }
 
+  // Water-only catalog events are not enough: bus transfer points (пл. Восстания etc.)
+  // often sell Ladoga/boat tickets while the physical stop is still a boarding point.
   if (
     stored === 'pier' ||
     hasStrongPierLocationText(name, address) ||
     hasPierLikeText(name, address) ||
     inferred === 'pier' ||
-    (hasWaterOnlyEvents(waterEvents, totalEvents) && !isViewingPlatformLikeVenue(name, address, shortDescription, description))
+    (hasWaterOnlyEvents(waterEvents, totalEvents) &&
+      !isViewingPlatformLikeVenue(name, address, shortDescription, description) &&
+      stored !== 'meeting_point' &&
+      !/\bпл\.|\bплощад|\bметро\b|\bм\.\s|вокзал|место посадки|точка сбора/i.test(text))
   ) {
     return 'pier';
   }
@@ -7563,12 +7568,24 @@ function resolvePublicVenueKind(storedKind, name, address, options = {}) {
   return finalizeMuseumArtPublicKind(stored, name, address, { id, slug, shortDescription, description });
 }
 
+function resolveForcedPublicVenueKind(override) {
+  const raw = String(override?.publicKind || override?.publicType || '')
+    .trim()
+    .toLowerCase();
+  if (!raw) return null;
+  if (raw === 'pier_water') return 'pier';
+  if (raw === 'museum_art' || raw === 'museum_art_space') return 'museum';
+  return raw;
+}
+
 function resolvePublicVenueKindFromRow(row) {
   const override = findVenueOverride({
     id: row.id,
     title: row.name || row.title,
     name: row.name || row.title,
   });
+  const forced = resolveForcedPublicVenueKind(override);
+  if (forced) return forced;
   const storedKind = override?.kind || row.kind || row.proposedKind;
   return resolvePublicVenueKind(storedKind, row.name || row.title, row.address, {
     id: row.id,
@@ -7585,15 +7602,20 @@ export function isPublicVenueHub(row, options = {}) {
   const requireEvents = options.requireEvents !== false;
   if (!row) return false;
   const kind = normalizeVenueKindValue(row.kind || row.proposedKind);
+  const resolvedKind = resolvePublicVenueKindFromRow(row);
   if (PUBLIC_VENUE_HUB_EXCLUDED_KINDS.has(kind)) {
-    if (!(kind === 'MEETING_POINT' && hasActiveBusCatalogEvents(row.busEvents))) return false;
+    // Bus boarding points are stored as MEETING_POINT; allow when resolved public type is bus
+    // (catalog bus events OR editorial publicKind override), not only busEvents > 0.
+    if (!(kind === 'MEETING_POINT' && (hasActiveBusCatalogEvents(row.busEvents) || resolvedKind === 'bus'))) {
+      return false;
+    }
   }
   if (isMeetingPointLikeRow(row)) return false;
   if (isJunkPublicVenueRow(row)) return false;
   if (String(row.pageStatus || '').toUpperCase() === 'HIDDEN') return false;
   if (requireEvents && Number(row.events) <= 0) {
     // Must-see content places (park/monument/museum/…) list in /venues|/locations with profile, 0 events ok.
-    return isContentPlaceHubEligible(row, resolvePublicVenueKindFromRow(row));
+    return isContentPlaceHubEligible(row, resolvedKind);
   }
   return true;
 }

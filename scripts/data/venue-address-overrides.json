@@ -10,6 +10,20 @@
       ],
       "kind": "MUSEUM_ART_SPACE",
       "address": "Берсеневский пер., д. 2, стр. 1"
+    },
+    {
+      "id": "venue_6a27e5aa03f4b9692e87d7b3",
+      "title": "пл.Восстания",
+      "match": [
+        "пл.Восстания",
+        "пл. Восстания",
+        "Площадь Восстания",
+        "pl-vosstaniya"
+      ],
+      "kind": "MEETING_POINT",
+      "publicKind": "bus",
+      "address": "пл.Восстания",
+      "city": "Санкт-Петербург"
     }
   ]
 }

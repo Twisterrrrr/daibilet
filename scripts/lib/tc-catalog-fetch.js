@@ -230,6 +230,7 @@ function timestampToIso(timestamp) {
 }
 
 function guessVenueType(venue, category, tags, event) {
+  const venueText = [venue.name, venue.description, venue.address].filter(Boolean).join(" ").toLowerCase();
   const text = [venue.name, venue.description, venue.address, category.name, event.name, ...tags.map((tag) => tag.name)]
     .filter(Boolean)
     .join(" ")
@@ -241,7 +242,19 @@ function guessVenueType(venue, category, tags, event) {
   }
   if (matches(text, ["клуб", "club", "бар", "ресторан", "cafe", "кафе"])) return "club_restaurant";
   if (matches(text, ["концерт", "филармони", "зал", "дом музыки", "дк ", "дворец культуры"])) return "concert_hall";
-  if (matches(text, ["причал", "набереж", "теплоход", "катер", "канал", "река"])) return "pier_water";
+  // Pier only from venue place text, or event water words when the venue itself looks water-side.
+  // Otherwise "Водная прогулка на катерах…" wrongly marks land boarding points (пл. Восстания) as piers.
+  const venueLooksLikeLandBoarding =
+    /\bпл\.|\bплощад|\bметро\b|\bм\.\s|вокзал|место посадки|точка сбора|автобус/i.test(venueText) &&
+    !/(?:^|\s)(?:причал|пристань|набереж)/i.test(venueText);
+  if (
+    !venueLooksLikeLandBoarding &&
+    (matches(venueText, ["причал", "набереж", "пристань"]) ||
+      (matches(text, ["причал", "набереж", "теплоход", "катер", "канал", "река"]) &&
+        !/\bпл\.|\bплощад|\bметро\b|\bм\.\s/i.test(venueText)))
+  ) {
+    return "pier_water";
+  }
   if (/\bпарк\b|сквер/i.test(text) && !/парковк/i.test(text)) return "park";
   if (matches(text, ["стадион", "арена", "спорт", "каток", "скалодром"])) return "sport_outdoor";
   if (matches(text, ["онлайн", "online"])) return "online";

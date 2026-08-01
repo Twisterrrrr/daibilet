@@ -1,3 +1,21 @@
+## 2026-08-01 - pl-vosstaniya: pier → bus
+
+### Наблюдения
+- Owner: `/locations/pl-vosstaniya` показывался как **причал** (`Причал — пл.Восстания`, type=pier).
+- DB: `venue_6a27e5aa03f4b9692e87d7b3`, title `пл.Восстания`, kind был `PIER`, pageStatus `CANDIDATE`.
+- К venue привязаны билеты «Водная прогулка на катерах по Ладожским Шхерам» → TC `guessVenueType` и `hasWaterOnlyEvents` форсили pier, хотя точка - автобусная посадка у Московского вокзала.
+
+### Решения
+- MSK DB: `kind` `PIER` → `MEETING_POINT`.
+- Override `publicKind: bus` в `venue-address-overrides.json`; `resolvePublicVenueKindFromRow` / detail hub gate учитывают override.
+- `hasWaterOnlyEvents` больше не делает pier для land boarding (`пл.` / метро / вокзал / MEETING_POINT).
+- TC `guessVenueType`: не ставить `pier_water` по словам события, если venue - сухопутная точка сбора.
+
+### Проблемы
+- Нужен MSK deploy (API+web): override живёт в runtime backend; web 502 пока параллельный build.
+
+---
+
 ## 2026-08-01 - City hub: «Собрать за минуту» брал только 4 из 6 must-see
 
 ### Наблюдения
