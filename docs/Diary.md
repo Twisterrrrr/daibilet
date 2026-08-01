@@ -30,7 +30,7 @@
 - Copy: корректное склонение «N главных мест».
 
 ### Проблемы
-- Нужен MSK deploy + smoke Кострома/Мурманск: пресет → 6/8, badge 6.
+- ~~Нужен MSK deploy + smoke Кострома/Мурманск: пресет → 6/8, badge 6~~ → MSK `5deb9bd` (+ tip `1698c9e7` vosstaniya) **BUILD_ID=`uAAeJS3sG_GuPNfbwQqKy`**. SSR Кострома/Мурманск: «Собрать за минуту: 6 главных мест»; live apex same. Параллельные builds ломали `.next` (prerender-manifest ENOENT) - финальный rebuild под flock.
 
 ---
 
