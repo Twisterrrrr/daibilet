@@ -10,6 +10,7 @@
 - Home: soft-timeout 800ms на `getHomeCoverFingerprints` (egress HEAD).
 - `/venues|/locations` list: soft-timeout 2.5s на catalog DTO.
 - `warm-top-event-pages`: default N=40, concurrency=2, fetch timeout 8s, flock single-flight.
+- Deploy: `11fe214` → SPB→MSK **BUILD_ID=`rNVioNw6J2R2nOpPkbsM6`**. Smoke local: `/` 78ms, `/events` 22ms, `/cities` 18ms, `/venues` 25ms, `/podborki` 14ms.
 
 ### Проблемы
 - Prisma connection drops в web-процессе при давлении - отдельный follow-up (pool/timeout), сейчас fail-soft SSR.
