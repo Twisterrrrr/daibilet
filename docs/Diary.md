@@ -9,6 +9,7 @@
 - Pure helpers: `dayRouteEventBaseSlug` / `normalizeDayRouteTitleKey` / `dedupeDayRouteMatches` (best: score → coverage → min price).
 - `matchDayRouteVenues` дедупит siblings **до** sort/limit.
 - Unit: `day-route-score.test.ts` (strip slug + hyphen title + keep cheapest).
+- Deploy MSK: commit `270790d`, BUILD_ID=`a1C8wIWfv5xrllhohrdOE`. Smoke `venueIds=ermitazh`: matches 24→**8**, hermitage overview cards **1** (price 1500), `dup_titles=[]`; `/my-day` 200 + noindex.
 
 ### Проблемы
 - Dedupe по base slug/title - pragmatic UX; полный metaExternalId group (как event page) - follow-up если понадобится точнее across sources.
