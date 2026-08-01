@@ -14,7 +14,7 @@ date: "19 авг 2026"
 readMin: 8
 imageAlt: "Зрительный зал перед спектаклем в Уфе"
 coverImageUrl: "/images/blog/ufa-teatr-vecher-kak-vybrat.jpg"
-publishedAt: "2026-08-19T10:50:00+03:00"
+publishedAt: "2026-08-17T10:50:00+03:00"
 status: PUBLISHED
 ---
 

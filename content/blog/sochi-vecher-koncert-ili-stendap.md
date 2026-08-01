@@ -14,7 +14,7 @@ date: "22 авг 2026"
 readMin: 8
 imageAlt: "Вечерний Сочи перед концертом или шоу"
 coverImageUrl: "/images/blog/sochi-vecher-koncert-ili-stendap.jpg"
-publishedAt: "2026-08-22T12:40:00+03:00"
+publishedAt: "2026-08-20T12:40:00+03:00"
 status: PUBLISHED
 ---
 

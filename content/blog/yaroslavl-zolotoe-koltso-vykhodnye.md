@@ -14,7 +14,7 @@ date: "26 авг 2026"
 readMin: 7
 imageAlt: "Выходные в историческом центре Ярославля"
 coverImageUrl: "/images/blog/yaroslavl-zolotoe-koltso-vykhodnye.jpg"
-publishedAt: "2026-08-26T18:30:00+03:00"
+publishedAt: "2026-08-24T18:30:00+03:00"
 status: PUBLISHED
 ---
 

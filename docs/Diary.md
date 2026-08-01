@@ -1,3 +1,18 @@
+## 2026-08-01 - Blog schedule shift: очередь на сегодня
+
+### Наблюдения
+- Новые статьи не «ломались»: `PUBLISHED` + future `publishedAt`, public filter `publishedAt <= now`.
+- Ближайший слот был 03.08; пауза с 29.07 выглядела как простой.
+
+### Решения
+- Сдвиг 12 будущих MD `publishedAt` (−2 дня; volhov → **01.08 10:05 MSK** сразу в выдачу).
+- `blog:upsert --force-published-at` на MSK + revalidate `/blog`.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-01 - SSR hang: SiteLayout destinations + warm soft defaults
 
 ### Наблюдения

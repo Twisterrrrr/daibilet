@@ -14,7 +14,7 @@ date: "16 авг 2026"
 readMin: 10
 imageAlt: "Набережная Волги в Самаре"
 coverImageUrl: "/images/blog/samara-vykhodnye-dva-dnya-bez-gonki.jpg"
-publishedAt: "2026-08-16T15:55:00+03:00"
+publishedAt: "2026-08-14T15:55:00+03:00"
 status: PUBLISHED
 ---
 

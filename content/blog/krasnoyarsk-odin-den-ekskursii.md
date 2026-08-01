@@ -14,7 +14,7 @@ date: "26 авг 2026"
 readMin: 8
 imageAlt: "Однодневная экскурсия из Красноярска"
 coverImageUrl: "/images/blog/krasnoyarsk-odin-den-ekskursii.jpg"
-publishedAt: "2026-08-26T11:20:00+03:00"
+publishedAt: "2026-08-24T11:20:00+03:00"
 status: PUBLISHED
 ---
 

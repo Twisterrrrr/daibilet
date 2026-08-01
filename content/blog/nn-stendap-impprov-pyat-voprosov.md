@@ -14,7 +14,7 @@ date: "15 авг 2026"
 readMin: 7
 imageAlt: "Стендап на сцене в Нижнем Новгороде"
 coverImageUrl: "/images/blog/nn-stendap-impprov-pyat-voprosov.jpg"
-publishedAt: "2026-08-15T11:35:00+03:00"
+publishedAt: "2026-08-13T11:35:00+03:00"
 status: PUBLISHED
 ---
 

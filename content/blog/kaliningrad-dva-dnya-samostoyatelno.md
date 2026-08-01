@@ -14,7 +14,7 @@ date: "23 авг 2026"
 readMin: 10
 imageAlt: "Остров Канта и городская прогулка по Калининграду"
 coverImageUrl: "/images/blog/kaliningrad-dva-dnya-samostoyatelno.jpg"
-publishedAt: "2026-08-23T16:05:00+03:00"
+publishedAt: "2026-08-21T16:05:00+03:00"
 status: PUBLISHED
 ---
 

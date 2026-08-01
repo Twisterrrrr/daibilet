@@ -14,7 +14,7 @@ date: "4 авг 2026"
 readMin: 3
 imageAlt: "Open-air концерт в московском парке"
 coverImageUrl: "/images/blog/moskva-parki-open-air-vyhodnye.jpg"
-publishedAt: "2026-08-04T10:40:00+03:00"
+publishedAt: "2026-08-02T10:40:00+03:00"
 status: PUBLISHED
 ---
 

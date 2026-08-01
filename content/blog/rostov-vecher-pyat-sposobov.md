@@ -14,7 +14,7 @@ date: "19 авг 2026"
 readMin: 7
 imageAlt: "Вечерняя прогулка по Ростову-на-Дону"
 coverImageUrl: "/images/blog/rostov-vecher-pyat-sposobov.jpg"
-publishedAt: "2026-08-19T17:25:00+03:00"
+publishedAt: "2026-08-17T17:25:00+03:00"
 status: PUBLISHED
 ---
 

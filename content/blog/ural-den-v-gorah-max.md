@@ -14,7 +14,7 @@ date: "11 авг 2026"
 readMin: 3
 imageAlt: "Однодневная поездка из Екатеринбурга в Уральские горы"
 coverImageUrl: "/images/blog/ural-den-v-gorah-max.jpg"
-publishedAt: "2026-08-11T11:10:00+03:00"
+publishedAt: "2026-08-09T11:10:00+03:00"
 status: PUBLISHED
 ---
 

@@ -14,7 +14,7 @@ date: "20 авг 2026"
 readMin: 9
 imageAlt: "Центр Новосибирска во время прогулки"
 coverImageUrl: "/images/blog/novosibirsk-vykhodnye-chto-posmotret.jpg"
-publishedAt: "2026-08-20T14:15:00+03:00"
+publishedAt: "2026-08-18T14:15:00+03:00"
 status: PUBLISHED
 ---
 

@@ -18,7 +18,7 @@ date: "3 августа 2026"
 readMin: 9
 imageAlt: "Берег Волхова на закате: тёмная вода, туман и северное небо"
 coverImageUrl: "/images/blog/bylinnyy-bereg-fentezi-fest-volhov.jpg"
-publishedAt: "2026-08-03T12:20:00+03:00"
+publishedAt: "2026-08-01T10:05:00+03:00"
 status: PUBLISHED
 ---
 
