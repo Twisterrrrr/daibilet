@@ -153,6 +153,29 @@ export function replaceDayRouteFromVenues(
   return next;
 }
 
+/**
+ * Share hydrate without wiping points the guest already added beyond the share set.
+ * If local already contains every shared venue and has more (or equal) points, keep local.
+ */
+export function hydrateDayRouteFromShare(
+  shareVenues: DayRouteVenueItem[],
+  cityId: string | null = null,
+): DayRouteState {
+  const shared = shareVenues.slice(0, DAY_ROUTE_MAX);
+  if (!shared.length) return readDayRoute();
+
+  const current = readDayRoute();
+  const shareIds = new Set(shared.map((v) => v.id));
+  const localHasAllShare =
+    shareIds.size > 0 && [...shareIds].every((id) => current.venues.some((v) => v.id === id));
+
+  if (localHasAllShare && current.venues.length >= shared.length) {
+    return current;
+  }
+
+  return replaceDayRouteFromVenues(shared, cityId);
+}
+
 /** Pure score: 3*STOP + 2*start + 1*nearby. */
 export function dayRouteMatchScore(covered: {
   stop?: string[];

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Copy, MapPin, Route, Trash2, X } from 'lucide-react';
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -19,7 +19,7 @@ import {
   parseDayRouteQueryParam,
   readDayRoute,
   removeFromDayRoute,
-  replaceDayRouteFromVenues,
+  hydrateDayRouteFromShare,
   type DayRouteState,
   type DayRouteVenueItem,
 } from '@/lib/day-route';
@@ -69,6 +69,7 @@ function DayRoutePanelFallback() {
 
 function DayRoutePanelInner() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const dayParam = searchParams.get('day');
   const [route, setRoute] = useState<DayRouteState>(() =>
     typeof window === 'undefined' ? { cityId: null, venues: [] } : readDayRoute(),
@@ -90,7 +91,7 @@ function DayRoutePanelInner() {
     };
   }, []);
 
-  // Share hydrate: /my-day?day=id1,slug2 → resolve → localStorage.
+  // Share hydrate: /my-day?day=id1,slug2 → resolve → localStorage (без затирания уже набранных точек).
   useEffect(() => {
     const locators = parseDayRouteQueryParam(dayParam);
     if (!locators.length) {
@@ -126,16 +127,18 @@ function DayRoutePanelInner() {
             : null,
         }));
         hydratedDayRef.current = key;
-        setRoute(replaceDayRouteFromVenues(items, data.cityId));
+        setRoute(hydrateDayRouteFromShare(items, data.cityId));
         setPayload(data);
         setReady(true);
+        // Strip ?day= so refresh / back не затирает последующие add.
+        router.replace('/my-day', { scroll: false });
       })
       .catch(() => {
         setReady(true);
       })
       .finally(() => setLoading(false));
     return () => controller.abort();
-  }, [dayParam]);
+  }, [dayParam, router]);
 
   const venueIds = useMemo(() => route.venues.map((v) => v.id).join(','), [route.venues]);
   const titleById = useMemo(() => {

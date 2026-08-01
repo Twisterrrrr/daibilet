@@ -12,6 +12,7 @@ import {
   Ticket,
 } from 'lucide-react';
 
+import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
 import { OsmMapEmbed } from '@/components/OsmMapEmbed';
 import { VenueAdmissionBlock } from '@/components/VenueAdmissionBlock';
@@ -148,6 +149,18 @@ export function InstitutionVenueLayout({
                 <Ticket className="h-4 w-4" />
                 {isTheatre ? 'К афише' : 'Купить билет'}
               </a>
+              <AddToDayRouteButton
+                variant="dark"
+                venue={{
+                  id: venue.id,
+                  slug: venue.slug,
+                  title: venue.title || venue.name,
+                  city: venue.city,
+                  citySlug: venue.citySlug,
+                  href: venueHref(venue),
+                  imageUrl: venue.heroImageUrl,
+                }}
+              />
               <button
                 type="button"
                 onClick={share}

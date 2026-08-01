@@ -165,6 +165,7 @@ export async function VenueDetailPage({ slug }: { slug: string }) {
       <JsonLdScripts blocks={jsonLdBlocks} idPrefix="venue-jsonld" />
       <SiteLayout>
         <VenuePageView
+          key={decodedSlug}
           slug={decodedSlug}
           initialPayload={payload}
           admissionProducts={admission.items}

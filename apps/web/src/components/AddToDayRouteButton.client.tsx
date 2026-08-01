@@ -16,9 +16,16 @@ type Props = {
   venue: DayRouteVenueItem;
   className?: string;
   variant?: 'light' | 'dark';
+  /** Компактный вид для карточек каталога (иконка + короткий лейбл). */
+  compact?: boolean;
 };
 
-export function AddToDayRouteButton({ venue, className = '', variant = 'light' }: Props) {
+export function AddToDayRouteButton({
+  venue,
+  className = '',
+  variant = 'light',
+  compact = false,
+}: Props) {
   const [active, setActive] = useState(false);
   const [full, setFull] = useState(false);
 
@@ -46,6 +53,8 @@ export function AddToDayRouteButton({ venue, className = '', variant = 'light' }
         ? 'bg-emerald-600 text-white hover:bg-emerald-700'
         : 'bg-slate-100 text-slate-800 hover:bg-slate-200';
 
+  const label = active ? (compact ? 'В маршруте' : 'В маршруте') : compact ? 'В маршрут' : 'В мой маршрут';
+
   return (
     <button
       type="button"
@@ -63,7 +72,7 @@ export function AddToDayRouteButton({ venue, className = '', variant = 'light' }
       className={`inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-50 ${base} ${className}`}
     >
       {active ? <Check className="h-3.5 w-3.5" /> : <Route className="h-3.5 w-3.5" />}
-      {active ? 'В маршруте' : 'В мой маршрут'}
+      {compact ? <span className="hidden sm:inline">{label}</span> : label}
     </button>
   );
 }

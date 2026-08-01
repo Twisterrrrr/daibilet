@@ -43,10 +43,20 @@ export function VenuePageView({
   const [mode, setMode] = React.useState<'cards' | 'table'>('cards');
 
   React.useEffect(() => {
-    // SSR already hydrated (including admission-only institutions with 0 sessions).
-    // Do not re-fetch /api/public/venues on every mount - that raced cold DTO and felt like a hang.
-    if (initialPayload?.venue) return;
+    // Soft-nav between /locations|venues/[slug] reuses this client tree. Without sync,
+    // payload sticks on the previous venue and «В мой маршрут» toggles the wrong id
+    // (add second point → often removes the first). Prefer SSR payload; fetch only if absent.
+    if (initialPayload?.venue) {
+      setPayload(initialPayload);
+      setContentReady(true);
+      setError(null);
+      setCategory('all');
+      setDateFilter('smart');
+      return;
+    }
     const controller = new AbortController();
+    setPayload(null);
+    setContentReady(false);
     fetch(`/api/public/venues/${encodeURIComponent(slug)}`, { signal: controller.signal })
       .then(async (response) => {
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -64,7 +74,7 @@ export function VenuePageView({
         setError(requestError instanceof Error ? requestError.message : 'Страница не найдена');
       });
     return () => controller.abort();
-  }, [slug, initialPayload?.venue]);
+  }, [slug, initialPayload]);
 
   const baseSessions = React.useMemo(() => {
     if (!payload) return [];

@@ -202,6 +202,24 @@
 
 ---
 
+## 2026-08-01 - Day-route multi-add + площадки
+
+### Наблюдения
+- Owner: в маршрут попадала только одна локация; логично добавлять и площадки.
+- `addToDayRoute` сам по себе append-ит; баг UI: soft-nav `/locations/[slug]` → `/locations/[other]` оставлял stale `payload` в `VenuePageView` (effect early-return при `initialPayload?.venue`), кнопка «В мой маршрут» тогглила id предыдущей точки.
+- Вторичный wipe: share hydrate `?day=` делал `replaceDayRouteFromVenues` и затирал уже набранные точки.
+
+### Решения
+- `VenuePageView`: sync SSR payload при смене slug + `key={slug}` на `VenueDetailPage`.
+- `hydrateDayRouteFromShare`: не затирать local-superset; после hydrate `router.replace('/my-day')`.
+- Affordance: `AddToDayRouteButton` на `InstitutionVenueLayout`, `LocationCard`, `InstitutionCard` (модель уже venueId).
+- Unit: multi-add + hydrate keep-superset.
+
+### Проблемы
+- Deploy/smoke - после commit (BUILD_ID ниже).
+
+---
+
 ## 2026-07-31 - Day-route polish MVP (`/my-day`)
 
 ### Наблюдения
