@@ -11,6 +11,7 @@
 - `isValidCoordinatePair` / backend `isValidVenueCoordinatePair` + `resolvePublicVenueCoordinates`: reject 0,0; не Number(null).
 - `scripts/backfill-missing-venue-coords.js` + twin-fill по title; apply на MSK.
 - Deploy MSK-only `deploy-prod-next.sh`; Playwright proof multi-add + coords smoke.
+- Live: commit `a0f11ce`, **BUILD_ID=`wcJsYlkCYd1869HV9B1c-`**. Backfill **21** venues (SPb must-see institutions + Moscow/etc.); осталось 8 junk без города (банкетные / YUTONG / test museum).
 
 ### Проблемы
 - Junk pier stubs без города (банкетные залы / YUTONG) могут остаться без coords - не must-see.
