@@ -1,3 +1,26 @@
+## 2026-08-01 - INC.504.19: SSR hang снова (owner 504) + healthcheck bugfix
+
+### Наблюдения
+- Owner: снова 504 / no HTML TTFB на prod (~19:49 MSK / 16:49 UTC).
+- Immediate smoke `:3001` `/`: curl **15s timeout, 0 bytes** (accept-loop hang). `/events` не успел до recovery.
+- next-server RSS **~1480MB** (MemoryMax=2G); при stop SWR catalog `2817 sessions in 111125ms` на том же процессе.
+- Warm log в окне hang: `0/12 ok` (fetch failed) + timeout на `/` и city hubs. Warm cron `*/12`+flock **не** thrashing.
+- `ssr-health.log` пуст / `journalctl -t daibilet-ssr-health` пуст при живом cron каждую минуту → healthcheck **не сработал** и не thrashing.
+- Bug: `TTFB=$(curl ... || echo 999)` при connect-hang даёт multiline `0.000000\n999` → `bc` → 0 → restart never. Prisma `Connection terminated` в этом окне **не** в journal (в отличие от INC.504.18).
+- nginx: upstream timed out / connection refused на 3001; ~39×504 в окне 16:40-16:52 UTC (owner `178.66.*` + bots).
+
+### Решения
+- Safe `pkill -f '[w]arm-hub-pages'`; stop + SIGKILL leftover next-server; `systemctl start daibilet-web` → Ready ~1.1s.
+- After: local `/` TTFB **~0.04s** 200; `/events` **~0.02s**; external `--resolve` daibilet.ru **~0.05-0.07s** 200. **BUILD_ID=`gEmtnqRsq_L56ejFTXSav`**.
+- Live fix `/etc/cron.d/daibilet-tasks`: detect `curl CODE!=0` OR `TTFB>5`; flock `/var/lock/daibilet-ssr-health.lock` anti-thrash. Dry-run: live BAD=0, closed-port BAD=1.
+- Repo canon: `deploy/cron/daibilet-tasks`. Docs-only commit (no web redeploy).
+
+### Проблемы
+- Root cause hang (event-loop / catalog SWR pressure / INC.504.15 Prisma) open. Healthcheck - safety net only.
+- Частые deploy stop→start окна сегодня (~1.5-2м) дают user-visible 504 отдельно от hang.
+
+---
+
 ## 2026-08-01 - Day-route: owner «не добавляет 2-ю» - UX gap + catalog harden
 
 ### Наблюдения
