@@ -101,6 +101,8 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
             citySlug: venue.citySlug,
             href,
             imageUrl: venue.heroImageUrl,
+            latitude: venue.latitude,
+            longitude: venue.longitude,
           }}
         />
       </div>

@@ -160,6 +160,8 @@ export function InstitutionVenueLayout({
                   citySlug: venue.citySlug,
                   href: venueHref(venue),
                   imageUrl: venue.heroImageUrl,
+                  latitude: venue.latitude,
+                  longitude: venue.longitude,
                 }}
               />
               <button

@@ -161,6 +161,8 @@ export function LocationCard({
             citySlug: venue.citySlug,
             href,
             imageUrl: venue.heroImageUrl,
+            latitude: venue.latitude,
+            longitude: venue.longitude,
           }}
         />
       </div>

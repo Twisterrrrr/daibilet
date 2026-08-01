@@ -21,6 +21,9 @@ export type DayRouteVenueItem = {
   citySlug?: string | null;
   href?: string | null;
   imageUrl?: string | null;
+  /** Snapshot at add-time / enrich from matches - so Yandex CTA does not depend only on API. */
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 export type DayRouteState = {
@@ -32,6 +35,13 @@ export function emptyDayRoute(): DayRouteState {
   return { cityId: null, venues: [] };
 }
 
+function sanitizeStoredCoords(item: DayRouteVenueItem): Pick<DayRouteVenueItem, 'latitude' | 'longitude'> {
+  const lat = Number(item.latitude);
+  const lng = Number(item.longitude);
+  if (!isValidCoordinatePair(lat, lng)) return { latitude: null, longitude: null };
+  return { latitude: lat, longitude: lng };
+}
+
 export function readDayRoute(): DayRouteState {
   if (typeof window === 'undefined') return emptyDayRoute();
   try {
@@ -39,10 +49,12 @@ export function readDayRoute(): DayRouteState {
     if (!raw) return emptyDayRoute();
     const parsed = JSON.parse(raw) as Partial<DayRouteState>;
     const venues = Array.isArray(parsed.venues)
-      ? parsed.venues.filter(
-          (item): item is DayRouteVenueItem =>
-            Boolean(item) && typeof item.id === 'string' && typeof item.title === 'string',
-        )
+      ? parsed.venues
+          .filter(
+            (item): item is DayRouteVenueItem =>
+              Boolean(item) && typeof item.id === 'string' && typeof item.title === 'string',
+          )
+          .map((item) => ({ ...item, ...sanitizeStoredCoords(item) }))
       : [];
     return {
       cityId: typeof parsed.cityId === 'string' ? parsed.cityId : null,
@@ -135,7 +147,8 @@ export function addToDayRoute(item: DayRouteVenueItem): DayRouteState {
   const current = readDayRoute();
   const id = normalizeDayRouteVenueId(item);
   if (!id) return current;
-  const normalized: DayRouteVenueItem = { ...item, id };
+  const coords = sanitizeStoredCoords(item);
+  const normalized: DayRouteVenueItem = { ...item, id, ...coords };
   if (current.venues.some((v) => sameDayRouteVenue(v, normalized))) return current;
 
   const nextCityId = normalized.cityId || current.cityId;
@@ -376,8 +389,7 @@ export function optimizeDayRouteNearestNeighbor(
   const withCoords: DayRouteVenueItem[] = [];
   const withoutCoords: DayRouteVenueItem[] = [];
   for (const venue of venues) {
-    const c = coordsById.get(venue.id);
-    if (c && isValidCoordinatePair(c.latitude, c.longitude)) withCoords.push(venue);
+    if (lookupDayRouteCoords(venue, coordsById)) withCoords.push(venue);
     else withoutCoords.push(venue);
   }
   if (withCoords.length < 2) return [...venues];
@@ -386,12 +398,14 @@ export function optimizeDayRouteNearestNeighbor(
   const ordered: DayRouteVenueItem[] = [remaining.shift()!];
   while (remaining.length) {
     const last = ordered[ordered.length - 1]!;
-    const lastCoord = coordsById.get(last.id)!;
+    const lastCoord = lookupDayRouteCoords(last, coordsById);
+    if (!lastCoord) break;
     let bestIdx = 0;
     let bestDist = Number.POSITIVE_INFINITY;
     for (let i = 0; i < remaining.length; i += 1) {
       const candidate = remaining[i]!;
-      const c = coordsById.get(candidate.id)!;
+      const c = lookupDayRouteCoords(candidate, coordsById);
+      if (!c) continue;
       const d = haversineMeters(lastCoord.latitude, lastCoord.longitude, c.latitude, c.longitude);
       if (d < bestDist) {
         bestDist = d;
@@ -410,8 +424,8 @@ export function dayRouteSegmentMeters(
 ): Array<number | null> {
   const segments: Array<number | null> = [];
   for (let i = 0; i < venues.length - 1; i += 1) {
-    const a = coordsById.get(venues[i]!.id);
-    const b = coordsById.get(venues[i + 1]!.id);
+    const a = lookupDayRouteCoords(venues[i]!, coordsById);
+    const b = lookupDayRouteCoords(venues[i + 1]!, coordsById);
     if (
       a &&
       b &&
@@ -424,6 +438,89 @@ export function dayRouteSegmentMeters(
     }
   }
   return segments;
+}
+
+export function lookupDayRouteCoords(
+  venue: Pick<DayRouteVenueItem, 'id' | 'slug' | 'latitude' | 'longitude'>,
+  coordsById: Map<string, DayRouteCoords>,
+): DayRouteCoords | null {
+  const fromMap =
+    coordsById.get(String(venue.id || '').trim()) ||
+    (venue.slug ? coordsById.get(String(venue.slug).trim()) : undefined);
+  if (fromMap && isValidCoordinatePair(fromMap.latitude, fromMap.longitude)) return fromMap;
+  const lat = Number(venue.latitude);
+  const lng = Number(venue.longitude);
+  if (isValidCoordinatePair(lat, lng)) return { latitude: lat, longitude: lng };
+  return null;
+}
+
+type DayRouteCoordSource = {
+  id: string;
+  slug?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+};
+
+/** Build id+slug → coords from route items and/or matches payload venues. */
+export function buildDayRouteCoordsMap(
+  routeVenues: DayRouteVenueItem[],
+  payloadVenues: DayRouteCoordSource[] = [],
+): Map<string, DayRouteCoords> {
+  const map = new Map<string, DayRouteCoords>();
+  const put = (source: DayRouteCoordSource) => {
+    const lat = Number(source.latitude);
+    const lng = Number(source.longitude);
+    if (!isValidCoordinatePair(lat, lng)) return;
+    const coords = { latitude: lat, longitude: lng };
+    const id = String(source.id || '').trim();
+    const slug = String(source.slug || '').trim();
+    if (id) map.set(id, coords);
+    if (slug) map.set(slug, coords);
+  };
+  for (const venue of routeVenues) put(venue);
+  for (const venue of payloadVenues) put(venue);
+  return map;
+}
+
+/** Merge coords (and canonical id/slug) from matches payload into local day-route storage. */
+export function enrichDayRouteFromMatchVenues(payloadVenues: DayRouteCoordSource[]): DayRouteState {
+  const current = readDayRoute();
+  if (!current.venues.length || !payloadVenues.length) return current;
+  let changed = false;
+  const nextVenues = current.venues.map((item) => {
+    const match = payloadVenues.find(
+      (v) =>
+        (item.id && v.id && item.id === v.id) ||
+        (item.slug && v.slug && item.slug === v.slug) ||
+        (item.id && v.slug && item.id === v.slug) ||
+        (item.slug && v.id && item.slug === v.id),
+    );
+    if (!match) return item;
+    const lat = Number(match.latitude);
+    const lng = Number(match.longitude);
+    const next: DayRouteVenueItem = {
+      ...item,
+      id: match.id || item.id,
+      slug: match.slug ?? item.slug,
+    };
+    if (isValidCoordinatePair(lat, lng)) {
+      next.latitude = lat;
+      next.longitude = lng;
+    }
+    if (
+      next.id !== item.id ||
+      next.slug !== item.slug ||
+      next.latitude !== item.latitude ||
+      next.longitude !== item.longitude
+    ) {
+      changed = true;
+    }
+    return next;
+  });
+  if (!changed) return current;
+  const next = { ...current, venues: nextVenues };
+  writeDayRoute(next);
+  return next;
 }
 
 export function formatDayRouteDistance(meters: number): string {

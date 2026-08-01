@@ -11,6 +11,7 @@ import {
   DAY_ROUTE_CHANGED_EVENT,
   DAY_ROUTE_MAX,
   DAY_ROUTE_MIN,
+  buildDayRouteCoordsMap,
   buildDayRouteSharePath,
   buildYandexMultiStopRouteUrl,
   clearDayRoute,
@@ -18,7 +19,9 @@ import {
   dayRouteFullCoveredCount,
   dayRouteHasMixedCities,
   dayRouteSegmentMeters,
+  enrichDayRouteFromMatchVenues,
   formatDayRouteDistance,
+  lookupDayRouteCoords,
   moveDayRouteVenue,
   optimizeDayRouteNearestNeighbor,
   parseDayRouteQueryParam,
@@ -131,6 +134,8 @@ function DayRoutePanelInner() {
           cityId: venue.cityId,
           citySlug: venue.citySlug ?? null,
           imageUrl: venue.heroImageUrl,
+          latitude: venue.latitude ?? null,
+          longitude: venue.longitude ?? null,
           href: venue.slug
             ? venueHref({ id: venue.id, slug: venue.slug, name: venue.title, type: 'park' })
             : null,
@@ -192,21 +197,13 @@ function DayRoutePanelInner() {
       ? `/locations?city=${encodeURIComponent(citySlug)}`
       : '/locations';
 
-  const coordsById = useMemo(() => {
-    const map = new Map<string, DayRouteCoords>();
-    for (const venue of payload?.venues || []) {
-      if (venue.latitude == null || venue.longitude == null) continue;
-      const lat = Number(venue.latitude);
-      const lng = Number(venue.longitude);
-      // Number(null)===0 would otherwise look «valid» and break Yandex CTA.
-      if (!Number.isFinite(lat) || !Number.isFinite(lng) || (lat === 0 && lng === 0)) continue;
-      map.set(venue.id, { latitude: lat, longitude: lng });
-    }
-    return map;
-  }, [payload?.venues]);
+  const coordsById = useMemo(
+    () => buildDayRouteCoordsMap(route.venues, payload?.venues || []),
+    [route.venues, payload?.venues],
+  );
 
   const orderedCoords = useMemo(
-    () => route.venues.map((venue) => coordsById.get(venue.id) || null),
+    () => route.venues.map((venue) => lookupDayRouteCoords(venue, coordsById)),
     [route.venues, coordsById],
   );
   const coordsCount = orderedCoords.filter(Boolean).length;
@@ -231,7 +228,10 @@ function DayRoutePanelInner() {
     })
       .then(async (response) => (response.ok ? ((await response.json()) as MatchPayload) : null))
       .then((data) => {
-        if (data) setPayload(data);
+        if (!data) return;
+        setPayload(data);
+        // Pull coords into localStorage; DAY_ROUTE_CHANGED syncs React state.
+        enrichDayRouteFromMatchVenues(data.venues || []);
       })
       .catch(() => undefined)
       .finally(() => setLoading(false));
@@ -399,7 +399,7 @@ function DayRoutePanelInner() {
                   index={index}
                   total={route.venues.length}
                   venue={venue}
-                  hasCoords={coordsById.has(venue.id)}
+                  hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
                   segmentToNext={segmentMeters[index] ?? null}
                   onMoveUp={() => setRoute(moveDayRouteVenue(venue.id, -1))}
                   onMoveDown={() => setRoute(moveDayRouteVenue(venue.id, 1))}

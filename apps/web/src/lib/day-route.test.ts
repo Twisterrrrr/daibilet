@@ -5,6 +5,7 @@ import {
   DAY_ROUTE_MAX,
   DAY_ROUTE_STORAGE_KEY,
   addToDayRoute,
+  buildDayRouteCoordsMap,
   buildDayRouteSharePath,
   buildYandexMultiStopRouteUrl,
   clearDayRoute,
@@ -12,7 +13,9 @@ import {
   dayRouteFullCoveredCount,
   dayRouteHasMixedCities,
   dayRouteMatchScore,
+  enrichDayRouteFromMatchVenues,
   hydrateDayRouteFromShare,
+  lookupDayRouteCoords,
   optimizeDayRouteNearestNeighbor,
   parseDayRouteQueryParam,
   readDayRoute,
@@ -209,4 +212,34 @@ test('hydrateDayRouteFromShare replaces when local is empty or incomplete', () =
     next.venues.map((v) => v.id),
     ['x', 'y'],
   );
+});
+
+test('buildDayRouteCoordsMap merges route + payload by id and slug', () => {
+  mockStorage();
+  const map = buildDayRouteCoordsMap(
+    [{ id: 'slug-only', slug: 'park', title: 'Park', latitude: 55.1, longitude: 37.1 }],
+    [{ id: 'venue_1', slug: 'park', latitude: 59.9, longitude: 30.3 }],
+  );
+  assert.deepEqual(map.get('park'), { latitude: 59.9, longitude: 30.3 });
+  assert.deepEqual(map.get('venue_1'), { latitude: 59.9, longitude: 30.3 });
+  assert.deepEqual(lookupDayRouteCoords({ id: 'slug-only', slug: 'park' }, map), {
+    latitude: 59.9,
+    longitude: 30.3,
+  });
+});
+
+test('enrichDayRouteFromMatchVenues writes coords into storage', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({ id: 'venue_x', slug: 'tochka-sbora', title: 'Место посадки' });
+  const next = enrichDayRouteFromMatchVenues([
+    {
+      id: 'venue_x',
+      slug: 'tochka-sbora',
+      latitude: 59.9342802,
+      longitude: 30.3350986,
+    },
+  ]);
+  assert.equal(next.venues[0]?.latitude, 59.9342802);
+  assert.equal(readDayRoute().venues[0]?.longitude, 30.3350986);
 });
