@@ -11,6 +11,7 @@
 
 ### Проблемы
 - Deep-link `?type=outdoor_location` при наличии типа в городе остаётся intentional; без matches сбрасывается.
+- Live MSK: commit `bc994b6`, BUILD_ID=`4-AqPsButr_VcuwLGcyFk` (chunk содержит `cityScopedVenues`); SPb API smoke: 20 = pier14+attraction3+outdoor2+bus1.
 
 ---
 
