@@ -39,24 +39,52 @@ export type DayRouteState = {
 
 type DayRouteListener = (state: DayRouteState) => void;
 
-let snapshotCache: { raw: string | null; state: DayRouteState } | null = null;
-const dayRouteListeners = new Set<DayRouteListener>();
-let browserBridgeInstalled = false;
+type DayRouteRuntime = {
+  snapshotCache: { raw: string | null; state: DayRouteState } | null;
+  listeners: Set<DayRouteListener>;
+  browserBridgeInstalled: boolean;
+};
+
+declare global {
+  interface Window {
+    __daibiletDayRouteRuntime?: DayRouteRuntime;
+  }
+}
+
+/** Module fallback for SSR / node:test; browser uses window singleton (avoids multi-chunk desync). */
+const moduleRuntime: DayRouteRuntime = {
+  snapshotCache: null,
+  listeners: new Set(),
+  browserBridgeInstalled: false,
+};
+
+function getDayRouteRuntime(): DayRouteRuntime {
+  if (typeof window === 'undefined') return moduleRuntime;
+  if (!window.__daibiletDayRouteRuntime) {
+    window.__daibiletDayRouteRuntime = {
+      snapshotCache: moduleRuntime.snapshotCache,
+      listeners: moduleRuntime.listeners,
+      browserBridgeInstalled: moduleRuntime.browserBridgeInstalled,
+    };
+  }
+  return window.__daibiletDayRouteRuntime;
+}
 
 function installDayRouteBrowserBridge() {
-  if (browserBridgeInstalled || typeof window === 'undefined') return;
+  const runtime = getDayRouteRuntime();
+  if (runtime.browserBridgeInstalled || typeof window === 'undefined') return;
   if (typeof window.addEventListener !== 'function') return;
-  browserBridgeInstalled = true;
+  runtime.browserBridgeInstalled = true;
   // bfcache / tab restore can revive stale React trees; force re-read from localStorage.
   window.addEventListener('pageshow', () => {
-    snapshotCache = null;
+    runtime.snapshotCache = null;
     const state = getDayRouteSnapshot();
     notifyDayRouteChanged();
     notifyDayRouteSubscribers(state);
   });
   window.addEventListener('storage', (event) => {
     if (event.key !== DAY_ROUTE_STORAGE_KEY && event.key != null) return;
-    snapshotCache = null;
+    runtime.snapshotCache = null;
     const state = getDayRouteSnapshot();
     notifyDayRouteChanged();
     notifyDayRouteSubscribers(state);
@@ -64,7 +92,7 @@ function installDayRouteBrowserBridge() {
 }
 
 function notifyDayRouteSubscribers(state: DayRouteState) {
-  for (const listener of dayRouteListeners) {
+  for (const listener of getDayRouteRuntime().listeners) {
     try {
       listener(state);
     } catch {
@@ -76,9 +104,10 @@ function notifyDayRouteSubscribers(state: DayRouteState) {
 /** Subscribe to day-route snapshot updates (for useSyncExternalStore). */
 export function subscribeDayRoute(listener: DayRouteListener): () => void {
   installDayRouteBrowserBridge();
-  dayRouteListeners.add(listener);
+  const listeners = getDayRouteRuntime().listeners;
+  listeners.add(listener);
   return () => {
-    dayRouteListeners.delete(listener);
+    listeners.delete(listener);
   };
 }
 
@@ -86,15 +115,16 @@ export function subscribeDayRoute(listener: DayRouteListener): () => void {
 export function getDayRouteSnapshot(): DayRouteState {
   installDayRouteBrowserBridge();
   if (typeof window === 'undefined') return emptyDayRoute();
+  const runtime = getDayRouteRuntime();
   let raw: string | null = null;
   try {
     raw = localStorage.getItem(DAY_ROUTE_STORAGE_KEY);
   } catch {
     raw = null;
   }
-  if (snapshotCache && snapshotCache.raw === raw) return snapshotCache.state;
+  if (runtime.snapshotCache && runtime.snapshotCache.raw === raw) return runtime.snapshotCache.state;
   const state = parseDayRouteRaw(raw);
-  snapshotCache = { raw, state };
+  runtime.snapshotCache = { raw, state };
   return state;
 }
 
@@ -104,7 +134,18 @@ export function getServerDayRouteSnapshot(): DayRouteState {
 
 /** Test-only: drop cached snapshot between mock localStorage installs. */
 export function resetDayRouteSnapshotCache() {
-  snapshotCache = null;
+  const runtime = getDayRouteRuntime();
+  runtime.snapshotCache = null;
+  moduleRuntime.snapshotCache = null;
+}
+
+function dedupeDayRouteVenues(venues: DayRouteVenueItem[]): DayRouteVenueItem[] {
+  const out: DayRouteVenueItem[] = [];
+  for (const item of venues) {
+    if (out.some((existing) => sameDayRouteVenue(existing, item))) continue;
+    out.push(item);
+  }
+  return out.slice(0, DAY_ROUTE_MAX);
 }
 
 export function emptyDayRoute(): DayRouteState {
@@ -154,11 +195,11 @@ export function readDayRoute(): DayRouteState {
   return getDayRouteSnapshot();
 }
 
-export function writeDayRoute(state: DayRouteState) {
-  if (typeof window === 'undefined') return;
+export function writeDayRoute(state: DayRouteState): boolean {
+  if (typeof window === 'undefined') return false;
   const normalized: DayRouteState = {
     cityId: state.cityId,
-    venues: state.venues.slice(0, DAY_ROUTE_MAX),
+    venues: dedupeDayRouteVenues(state.venues),
   };
   const raw = JSON.stringify({
     cityId: normalized.cityId,
@@ -168,11 +209,13 @@ export function writeDayRoute(state: DayRouteState) {
     localStorage.setItem(DAY_ROUTE_STORAGE_KEY, raw);
   } catch {
     // Quota / private mode: do not update snapshot or UI - keeps badge/buttons honest.
-    return;
+    return false;
   }
-  snapshotCache = { raw, state: normalized };
+  const runtime = getDayRouteRuntime();
+  runtime.snapshotCache = { raw, state: normalized };
   notifyDayRouteChanged();
   notifyDayRouteSubscribers(normalized);
+  return true;
 }
 
 export function notifyDayRouteChanged() {

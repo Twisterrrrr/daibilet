@@ -1,13 +1,16 @@
 'use client';
 
+import { useLayoutEffect, useState } from 'react';
 import { Check, Route } from 'lucide-react';
 
 import { useDayRouteState } from '@/hooks/useDayRouteState';
+import { flashDayRouteFeedback } from '@/lib/day-route-feedback';
 import {
   DAY_ROUTE_MAX,
   addToDayRoute,
   isInDayRoute,
   normalizeDayRouteVenueId,
+  readDayRoute,
   removeFromDayRoute,
   toggleDayRoute,
   type DayRouteVenueItem,
@@ -33,6 +36,13 @@ export function AddToDayRouteButton({
   compact = false,
   intent = 'route',
 }: Props) {
+  // SSR HTML used to paint an enabled <button> before hydration; clicks silently no-op'd
+  // (owner: second point never appears after fast nav). Keep disabled until client is live.
+  const [live, setLive] = useState(false);
+  useLayoutEffect(() => {
+    setLive(true);
+  }, []);
+
   const venueKey = normalizeDayRouteVenueId(venue);
   const route = useDayRouteState();
   const active = Boolean(venueKey) && isInDayRoute(venueKey, route, venue.slug);
@@ -55,11 +65,42 @@ export function AddToDayRouteButton({
   const idleAria = intent === 'day' ? 'Добавить место события в мой день' : 'Добавить в маршрут дня';
   const activeAria = intent === 'day' ? 'Убрать место из моего дня' : 'Убрать из маршрута дня';
 
+  function feedbackAfter(beforeCount: number) {
+    const after = readDayRoute();
+    const n = after.venues.length;
+    if (n > beforeCount) {
+      flashDayRouteFeedback(`Добавлено в маршрут · ${n}/${DAY_ROUTE_MAX}`);
+      return;
+    }
+    if (n < beforeCount) {
+      flashDayRouteFeedback(n ? `Убрано · осталось ${n}` : 'Маршрут очищен');
+      return;
+    }
+    if (full) {
+      flashDayRouteFeedback(`Лимит ${DAY_ROUTE_MAX} точек`);
+      return;
+    }
+    if (!venueKey) {
+      flashDayRouteFeedback('Нельзя добавить: нет id точки');
+      return;
+    }
+    flashDayRouteFeedback('Уже в маршруте');
+  }
+
   function applyToggle() {
-    if (!venueKey) return;
+    if (!live) {
+      flashDayRouteFeedback('Секунду, загружается…');
+      return;
+    }
+    if (!venueKey) {
+      flashDayRouteFeedback('Нельзя добавить: нет id точки');
+      return;
+    }
     const payload = { ...venue, id: venueKey };
+    const beforeCount = readDayRoute().venues.length;
+
     if (intent === 'day') {
-      const before = route;
+      const before = readDayRoute();
       const existing = before.venues.find(
         (item) => item.id === venueKey || (payload.slug && item.slug === payload.slug),
       );
@@ -76,29 +117,52 @@ export function AddToDayRouteButton({
       } else {
         addToDayRoute(payload);
       }
-    } else {
-      toggleDayRoute(payload);
+      feedbackAfter(beforeCount);
+      return;
     }
-    // UI follows useDayRouteState snapshot (same source as header badge).
+
+    // Catalog compact: ADD ONLY. Accidental second tap on a green chip must not
+    // remove the only point (owner symptom «не добавляется более 1»).
+    if (compact) {
+      if (isInDayRoute(venueKey, readDayRoute(), payload.slug)) {
+        flashDayRouteFeedback('Уже в маршруте');
+        return;
+      }
+      if (readDayRoute().venues.length >= DAY_ROUTE_MAX) {
+        flashDayRouteFeedback(`Лимит ${DAY_ROUTE_MAX} точек`);
+        return;
+      }
+      addToDayRoute(payload);
+      feedbackAfter(beforeCount);
+      return;
+    }
+
+    toggleDayRoute(payload);
+    feedbackAfter(beforeCount);
   }
 
   return (
     <button
       type="button"
-      disabled={!venueKey || (full && !active)}
+      disabled={!live || !venueKey || (full && !active)}
       title={
-        !venueKey
-          ? 'Нельзя добавить: нет id точки'
-          : full && !active
-            ? `Лимит ${DAY_ROUTE_MAX} точек`
-            : active
-              ? activeTitle
-              : idleTitle
+        !live
+          ? 'Секунду…'
+          : !venueKey
+            ? 'Нельзя добавить: нет id точки'
+            : full && !active
+              ? `Лимит ${DAY_ROUTE_MAX} точек`
+              : active
+                ? compact
+                  ? 'Уже в маршруте (убрать можно в Мой день)'
+                  : activeTitle
+                : idleTitle
       }
       aria-pressed={active}
-      aria-label={active ? activeAria : idleAria}
+      aria-label={active ? (compact ? 'Уже в маршруте дня' : activeAria) : idleAria}
       data-venue-id={venueKey || undefined}
       data-day-route-intent={intent}
+      data-day-route-live={live ? '1' : '0'}
       onPointerDown={(event) => {
         // Stop bubble to parent <Link>; do NOT preventDefault (kills click on some browsers).
         event.stopPropagation();

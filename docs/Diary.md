@@ -1,3 +1,21 @@
+## 2026-08-01 - Day-route: owner «не более 1 точки» - inert SSR click + catalog toggle
+
+### Наблюдения
+- Owner снова: **не добавляется более 1 точки** (prior Playwright «1→2→3» - suspect).
+- Catalog path на live с паузой 2s: 1→2→3 реально работает (уникальные id, badge sync).
+- Detail hard-nav: клик при `waitUntil=commit` / delay **0ms** - кнопка уже в DOM (`data-venue-id` верный, `aria-pressed=false`), но **LS не пишется** (нет `LS_WRITE`). Delay ≥50ms - add OK. Root cause: SSR рисует **enabled** `<button>` до hydration; клик до hydrate = silent no-op. Owner после промаха по Link на карточке попадает на detail и жмёт «В мой маршрут» сразу - вторая точка «не добавляется».
+- Catalog compact `toggleDayRoute`: повторный тап по уже зелёной кнопке **снимает** точку → снова 1; выглядит как «вторая не добавляется».
+
+### Решения
+- `AddToDayRouteButton`: `live` gate (`useLayoutEffect`) - до client ready кнопка **disabled** (нет мёртвых кликов); toast «Добавлено · N/8» / «Уже в маршруте» / reject reasons.
+- Catalog `compact`: **add-only** (убрать точку - в «Мой день» или full detail toggle).
+- `day-route` store: `window.__daibiletDayRouteRuntime` singleton + dedupe на `writeDayRoute`.
+
+### Проблемы
+- Нужен MSK deploy + Playwright proof badge 1→2→3 и LS length 3; delay-0 после nav не должен silently no-op (disabled до live).
+
+---
+
 ## 2026-08-01 - INC.504.20: SSR hang снова (owner fury) + cron `%` убивал healthcheck
 
 ### Наблюдения
