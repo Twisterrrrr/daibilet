@@ -59,7 +59,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | DR.8 | /my-day add UX: CTA «Добавить точку» + routeVenues from matches + catalog hit-target | Критический | ✅ `2d3f7a4` BUILD `gEmtnqRsq_L56ejFTXSav` |
 | DR.9 | Phase-0: must-see CTA + event «В мой день» + city presets | Высокий | ✅ `2d3f7a4` BUILD `gEmtnqRsq_L56ejFTXSav` |
 | DR.10 | Badge «Маршрут · N» vs green «В маршруте» desync on /locations | Критический | ✅ `ff852a9` live BUILD `spsgbupFbWeJyWDuz2XNi` |
-| DR.12 | False «Уже в маршруте» on catalog add (id↔slug cross-match) | Критический | 🔄 sameDayRouteVenue membership + toast honesty |
+| DR.12 | False «Уже в маршруте» on catalog add (id↔slug cross-match) | Критический | ✅ `6c604f3` live BUILD `1HV6yidGN5MSbZU4idc7s` |
 | DR.11 | Multi-add still broken for owner: inert SSR button + catalog toggle-off | Критический | ✅ `d9b639c` live BUILD `S_RAZ0azumKgT_beN19UH` |
 | LOC.EMPTY | `/locations?city=` empty for all cities: soft-timeout empty HTML + nginx 30m HIT | Критический | ✅ `987516b` BUILD `IffsRTTeclktlvq7PQweq` + nginx purge |
 | LOC.FACET | `/locations` type chip counts global (151) vs city (20); default «Все локации» | Критический | ✅ `bc994b6` BUILD `4-AqPsButr_VcuwLGcyFk` |

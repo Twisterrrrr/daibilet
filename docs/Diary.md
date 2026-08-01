@@ -11,7 +11,7 @@
 - Unit: pathological `slug === otherVenue.id` не блокирует add; slug-as-id must-see ↔ catalog `venue_*`+same slug по-прежнему alias.
 
 ### Проблемы
-- Нужен MSK deploy + Playwright: 0/1 в LS, клик 2 других локаций → оба ADD, без false «Уже».
+- ~~Нужен MSK deploy + Playwright~~ → MSK `6c604f3` **BUILD_ID=`1HV6yidGN5MSbZU4idc7s`**. Proof: EMPTY0 + SEED1 на `/locations` - 2 чужих точки → «Добавлено · N/8»; pathological `slug===otherId` тоже ADD (не «Уже»).
 
 ---
 
