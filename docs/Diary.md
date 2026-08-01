@@ -216,7 +216,7 @@
 - Unit: multi-add + hydrate keep-superset.
 
 ### Проблемы
-- Deploy/smoke - после commit (BUILD_ID ниже).
+- Deploy: SPB `.16` Permission denied publickey → MSK-local build. Commit `a2c1b32` → **BUILD_ID=`rs16U9aCCKYbVyTyCjMyo`**. Smoke: `/my-day` 200 + noindex; `/locations` `/venues` 200; matches API 200; loc/venue detail 200.
 
 ---
 
