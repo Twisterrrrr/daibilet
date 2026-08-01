@@ -1,3 +1,18 @@
+## 2026-08-01 - Day-route: coords not pulled into «Мой день»
+
+### Наблюдения
+- Owner: «Место посадки — Лиговский пр. 10» в «Мой день» с «Нет координат» / Яндекс недоступен; «координаты вообще не подтягиваются».
+- В БД у `tochka-sbora` (`venue_5661…`) coords **есть** (59.934, 30.335); matches API их отдаёт. Пробел в клиенте: add в localStorage без lat/lng, UI читал coords только из payload по exact `id`.
+
+### Решения
+- Persist `latitude`/`longitude` в `DayRouteVenueItem`; передавать с карточек/деталок; `buildDayRouteCoordsMap` + merge id/slug; `enrichDayRouteFromMatchVenues` после matches.
+- Commit `f8eaaa2` → MSK deploy **BUILD_ID=`21HhuN-BOse5tR4o8D0Uc`**.
+
+### Проблемы
+- Старые точки в localStorage без coords подтянутся при открытии `/my-day` (enrich); иначе передобавить.
+
+---
+
 ## 2026-08-01 - Day-route multi-add recheck + missing coords backfill
 
 ### Наблюдения
