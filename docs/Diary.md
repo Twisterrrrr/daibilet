@@ -1,3 +1,24 @@
+## 2026-08-01 - INC.504.13: повторный SSR hang / nginx 504
+
+### Наблюдения
+- API жив (~1ms health/events), HTML `/` `/events` - TTFB hang 8s+, 0 байт → nginx 504.
+- `next-server` RSS пик **1.7G**; journal снова Prisma `Connection terminated unexpectedly` (public-city-articles / catalog).
+- Soft-timeouts PERF.SSR1 уже в BUILD, но hang всё равно - event-loop / Prisma pool, не только долгий await.
+- `systemctl restart` зависал на graceful stop hung Next; сработал только **SIGKILL** по PID pnpm/next.
+
+### Решения
+- SIGKILL + `systemctl start daibilet-web` → Ready ~1.1s; cold catalog rebuild ~15s; smoke local `/` 200ms → затем 22ms.
+- External `--resolve` `.184`: `/` `/events` `/cities` **200**, TTFB ~0.16-0.21s.
+- `/etc/cron.d/daibilet-warm-hubs` **полностью отключён** (было `*/3` + flock+90s). Repo template тоже OFF; commented `*/15` + WARM_CONCURRENCY=1.
+- systemd drop-in `stop-timeout.conf`: **TimeoutStopSec=25** + KillMode=control-group (live + repo) - чтобы restart не висел 90с+.
+- Follow-up: Prisma pool в web-процессе; warm не возвращать на `*/3` без smoke TTFB.
+
+### Проблемы
+- Root cause hang не снят кодом - только ops mitigation (restart + disable warm).
+- `pkill -f warm-hub-pages.mjs` с MSK через SSH опасен: совпадение с командной строкой bash убивает саму сессию.
+
+---
+
 ## 2026-08-01 - Blog schedule shift: очередь на сегодня
 
 ### Наблюдения

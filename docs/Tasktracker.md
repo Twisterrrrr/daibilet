@@ -128,8 +128,12 @@
 | INC.504.10 | City SSR: secondary timeout 3s + perf marks; lighten events list DTO | Критический | ✅ |
 | INC.504.11 | AAAA IPv6: проверить маршрут до MSK или снять AAAA в Timeweb | Высокий | ⏳ |
 | INC.504.12 | MSK hang/504 2026-07-31: MemoryMax exhaustion + warm-hub pile-up; finance timeout hot-patch 3s->2.5s; harden systemd/cron | Критический | mitigated on `.184` (rebuild still to bake finance 2500) |
+| INC.504.13 | 2026-08-01 повторный hang/504: SIGKILL restart; **disable warm-hub cron** (`*/3`); Prisma disconnect в web | Критический | mitigated live; root cause open |
+| INC.504.14 | systemd `TimeoutStopSec=25` + KillMode=control-group для hung Next | Высокий | ✅ live MSK + `deploy/systemd/.../stop-timeout.conf` |
+| INC.504.15 | Prisma pool / Connection terminated в daibilet-web (не только API) | Высокий | ⏳ |
+| INC.504.16 | Re-enable warm-hub только `*/15`+concurrency1 после smoke TTFB; не `*/3` | Средний | ⏳ cron off |
 
-См. Diary 2026-07-30 «Prod 504: daibilet-web hang» и «Cold TTFB после browser cache clear».
+См. Diary 2026-07-30 «Prod 504: daibilet-web hang» и «2026-08-01 INC.504.13».
 
 ---
 

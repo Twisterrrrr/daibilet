@@ -1,6 +1,8 @@
 # Keep hub HTML warm so browser cache clear hits nginx/Next warm paths
 # Install: cp deploy/cron/daibilet-warm-hubs /etc/cron.d/daibilet-warm-hubs && chmod 644 ...
-# flock: no pile-up; timeout 90s hard kill of whole run
+#
+# INC.504.13 (2026-08-01): */3 correlated with Next SSR hang / 504 even with flock.
+# Cron OFF by default. Re-enable only after smoke TTFB under load; prefer */15 + low concurrency.
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-*/3 * * * * root mkdir -p /var/lock /var/log/daibilet && /usr/bin/flock -n /var/lock/daibilet-warm-hubs.lock /usr/bin/timeout --kill-after=15s 90s /usr/bin/env bash -lc 'cd /opt/daibilet && DAIBILET_WEB_PORT=3001 /usr/bin/node scripts/warm-hub-pages.mjs' >>/var/log/daibilet/warm-hubs.log 2>&1
+#*/15 * * * * root mkdir -p /var/lock /var/log/daibilet && /usr/bin/flock -n /var/lock/daibilet-warm-hubs.lock /usr/bin/timeout --kill-after=15s 60s /usr/bin/env bash -lc 'cd /opt/daibilet && DAIBILET_WEB_PORT=3001 WARM_CONCURRENCY=1 /usr/bin/node scripts/warm-hub-pages.mjs' >>/var/log/daibilet/warm-hubs.log 2>&1
