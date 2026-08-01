@@ -55,8 +55,8 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | DR.5 | Dedupe day-route matches: TC dated siblings → one card (base slug / title, keep best score+price) | Критический | ✅ `270790d` BUILD `a1C8wIWfv5xrllhohrdOE` |
 | DR.6 | Multi-add recheck + null-island coords + backfill missing lat/lng (TC inst duplicates) | Критический | ✅ `a0f11ce` BUILD `wcJsYlkCYd1869HV9B1c-` · backfill 21 coords |
 | DR.7 | Catalog cards strip lat/lng → «Нет координат» in Мой день (Fontanka etc.) | Критический | ✅ `5c6ffc1` BUILD `faYl1EovDayQLYvHsV8kQ` |
-| DR.8 | /my-day add UX: CTA «Добавить точку» + routeVenues from matches + catalog hit-target | Критический | 🔄 ship |
-| DR.9 | Phase-0: must-see CTA + event «В мой день» + city presets | Высокий | 🔄 ship with DR.8 |
+| DR.8 | /my-day add UX: CTA «Добавить точку» + routeVenues from matches + catalog hit-target | Критический | ✅ `2d3f7a4` BUILD `gEmtnqRsq_L56ejFTXSav` |
+| DR.9 | Phase-0: must-see CTA + event «В мой день» + city presets | Высокий | ✅ `2d3f7a4` BUILD `gEmtnqRsq_L56ejFTXSav` |
 | LOC.EMPTY | `/locations?city=` empty for all cities: soft-timeout empty HTML + nginx 30m HIT | Критический | ✅ `987516b` BUILD `IffsRTTeclktlvq7PQweq` + nginx purge |
 | LOC.FACET | `/locations` type chip counts global (151) vs city (20); default «Все локации» | Критический | ✅ `bc994b6` BUILD `4-AqPsButr_VcuwLGcyFk` |
 
