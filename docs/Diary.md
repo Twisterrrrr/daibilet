@@ -1,3 +1,19 @@
+## 2026-08-01 - `/locations` type chips: global counts vs city (20 vs 151)
+
+### Наблюдения
+- Owner screenshot: СПб `(20)` в city control, но чипы `Причал (36)` / `Открытая локация (151)` - глобальные.
+- Selected chip «Открытая локация» + вопрос к 151 vs city 20.
+
+### Решения
+- `LocationsCatalogView`: facet counts / list base / «Найдено из» считаются по `cityScopedVenues`.
+- Смена города сбрасывает `type`; orphan `type=` без matches в городе → «Все локации».
+- «Все локации» показывает count в скоупе города.
+
+### Проблемы
+- Deep-link `?type=outdoor_location` при наличии типа в городе остаётся intentional; без matches сбрасывается.
+
+---
+
 ## 2026-08-01 - Home hero: navy base under photo (undo blue overlay)
 
 ### Наблюдения

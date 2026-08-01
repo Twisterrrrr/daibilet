@@ -52,6 +52,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | DR.2 | Day-route Phase 1.5 share `?day=` noindex + Phase 2 auth sync | Средний | ✅ share hydrate + copy link; Phase 2 auth sync ⚠️ skip (нет user favorites day-route API) |
 | DR.3 | Fix multi-add route: stale VenuePageView + share hydrate overwrite; add venues to day-route | Критический | ✅ `a2c1b32` + follow-up slug-match guard / city title href |
 | LOC.EMPTY | `/locations?city=` empty for all cities: soft-timeout empty HTML + nginx 30m HIT | Критический | ✅ `987516b` BUILD `IffsRTTeclktlvq7PQweq` + nginx purge |
+| LOC.FACET | `/locations` type chip counts global (151) vs city (20); default «Все локации» | Критический | ⏳ city-scoped facets in LocationsCatalogView |
 
 ## Venue kinds: park + monument (2026-07-31)
 
