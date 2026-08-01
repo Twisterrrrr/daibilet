@@ -277,6 +277,17 @@ Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SECRET_KEY=<set>` ✅ · *
 
 ---
 
+## Ops: Venue public pages vs event links (2026-08-01)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| VENUE.L2 | Event→venue 404: `MEETING_POINT`+`pageStatus=NONE` (TC `generic_location`) excluded from hub while event DTO still emits `venueSlug` | Критический | 🔄 gate fix in `dto.js` curatedMeetingPoint + TC `venuePageStatus`; deploy+smoke `modnaya-sreda-…68d4062e…` ⏳ |
+| VENUE.L3 | Event/session DTO: не отдавать `venueSlug` (или `venueHasPublicPage=false`) для HIDDEN / non-resolvable hub rows - UI не линкует в 404 | Высокий | ⏳ |
+| VENUE.L4 | Soft-sign twin: при HIDDEN twin rematch `Event.venueId` на канонический PUBLISHED/CANDIDATE slug | Средний | ⏳ |
+| VENUE.L5 | Ops: one-shot ensure для `venue_68d4062e38b75e8343b393ca` (Модная среда) если после deploy всё ещё 404 (нет sessions в catalog window) | Средний | ⏳ |
+
+---
+
 ## Ops: TC catalog sync reliability (2026-07-27)
 
 | # | Задача | Приоритет | Статус |

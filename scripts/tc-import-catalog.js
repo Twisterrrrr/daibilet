@@ -594,8 +594,12 @@ function venueKind(input) {
 }
 
 function venuePageStatus(input, events) {
-  if (input === "generic_location") return "NONE";
-  if (events >= 5 || ["pier_water", "museum_art", "theater", "concert_hall", "park", "monument"].includes(input)) return "CANDIDATE";
+  // generic_location → MEETING_POINT: still allow public page when venue has events
+  // (hub escape hatch curatedMeetingPointPage). Force NONE only when no event signal.
+  if (input === "generic_location") return events >= 1 ? "CANDIDATE" : "NONE";
+  if (events >= 5 || ["pier_water", "museum_art", "theater", "concert_hall", "park", "monument", "club_restaurant"].includes(input)) {
+    return "CANDIDATE";
+  }
   return "NONE";
 }
 

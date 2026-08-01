@@ -4736,13 +4736,14 @@ export async function buildPublicVenuePage(db, venueSlugOrId) {
     totalEvents: sessions.length,
   };
   const inPublicHub = isPublicVenueHub(hubGateRow, { requireEvents: false });
+  // TC import marks unknown venues as MEETING_POINT + pageStatus NONE. Hub excludes
+  // MEETING_POINT, so without this escape hatch event cards link to /venues/{slug} → 404.
+  // Allow NONE (not HIDDEN) when there are live catalog sessions.
   const curatedMeetingPointPage =
     !inPublicHub &&
     resolvePublicVenueKindFromRow(hubGateRow) === 'meeting_point' &&
-    Boolean(String(canonicalVenue.address || '').trim()) &&
-    Boolean(String(canonicalVenue.description || canonicalVenue.shortDescription || '').trim()) &&
     sessions.length > 0 &&
-    !['NONE', 'HIDDEN'].includes(String(canonicalVenue.pageStatus || '').toUpperCase());
+    String(canonicalVenue.pageStatus || '').toUpperCase() !== 'HIDDEN';
   if (!inPublicHub && !curatedMeetingPointPage) {
     return null;
   }

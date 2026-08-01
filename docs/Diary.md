@@ -1,3 +1,24 @@
+## 2026-08-01 - Venue pages: event exists, /venues/[slug] 404
+
+### Наблюдения
+- Owner: почему бывает 404 на площадке, если событие ссылается на неё (пример `/venues/modnaya-sreda-1823-68d4062e38b75e8343b393ca`).
+- Пайплайн: TC/TEP import **создаёт** `Venue` row + `Event.venueId`; public HTML `/venues/[slug]` идёт через `buildPublicVenuePage` (hub gate), не «любая Venue из БД».
+- TC `guessVenueType` → неизвестное = `generic_location` → kind `MEETING_POINT`, `pageStatus=NONE` (всегда, даже при events). Hub (`isPublicVenueHub`) исключает `MEETING_POINT`; escape `curatedMeetingPointPage` раньше требовал status ≠ NONE → **404 при живых сессиях**.
+- Event DTO отдаёт raw `venue.slug` → карточки/модалка всегда линкуют `/venues|locations/{slug}` без проверки hub-eligible (системный gap VENUE.L3).
+- Slug с суффиксом `-{mongoObjectId}`: TC `slugify(name-id)`; resolve умеет exact / id-suffix / stripped public slug. Soft-sign twins (must-see seed) → HIDDEN twin = 404 при `venueId` на twin.
+- Postgres MCP в этой сессии недоступен (`-32603`) - live row для modnaya-sreda не проверили из агента; параллельный 504 recovery для этого вопроса не нужен (код/канон ясен).
+
+### Решения
+- `dto.js`: `curatedMeetingPointPage` допускает `pageStatus=NONE` при `sessions.length>0` (HIDDEN по-прежнему режется).
+- TC import + seed SQL: `generic_location` + events≥1 → `CANDIDATE`; `club_restaurant` тоже в CANDIDATE-списке.
+- Tracker: VENUE.L2–L5. Deploy+smoke примера - follow-up.
+
+### Проблемы
+- Без re-import старые NONE-строки лечатся только gate-фиксом (нужен deploy backend/web, который тянет dto).
+- Если у venue 0 sessions в public catalog window - страница всё ещё 404 (нужен ensure/kind/profile или VENUE.L5).
+
+---
+
 ## 2026-08-01 - INC.504.18: owner 504 report - site already recovered
 
 ### Наблюдения
