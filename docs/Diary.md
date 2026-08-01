@@ -19,6 +19,24 @@
 
 ---
 
+## 2026-08-01 - Day-route multi-add harden + Yandex multi-stop
+
+### Наблюдения
+- Owner: на live снова нельзя добавить больше 1 точки в «Мой день» (карточки `/locations|/venues` и detail).
+- Предыдущие фиксы `a2c1b32` / `987516b` синхронизировали SSR payload по slug, но `venue` всё ещё падал на stale `payload?.venue` без проверки URL slug на soft-nav (первый paint / reusable client tree) → «добавить B» тогглило id A.
+- Дополнительный риск: пустой `id` схлопывал все add в один слот.
+
+### Решения
+- `venueMatchesRouteSlug` + sync reset при смене slug (`activeSlug` / `useParams`); layout `key={venue.id}`; Add button `normalizeDayRouteVenueId` (reject blank).
+- `/my-day`: reorder ↑↓ + persist, nearest-neighbor «Оптимизировать порядок», CTA «Маршрут в Яндекс.Картах» через `rtext=lat,lng~…&rtt=pd` (маршрут, не pins).
+- Unit: multi-add / blank-id / stale slug / yandex URL / NN optimize.
+- Deploy MSK in-place: commit `355eec1` → **BUILD_ID=`4-AqPsButr_VcuwLGcyFk`**. Smoke `/my-day` 200 + noindex; matches 200 (3 venues by id).
+
+### Проблемы
+- SPB `.16` pubkey denied → MSK in-place. Browser MCP в агенте недоступен - live multi-add доказан логикой + chunk markers; owner smoke badge 2→3 желателен.
+
+---
+
 ## 2026-08-01 - `/locations` type chips: global counts vs city (20 vs 151)
 
 ### Наблюдения
