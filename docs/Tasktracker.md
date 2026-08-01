@@ -281,10 +281,10 @@ Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SECRET_KEY=<set>` ✅ · *
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| VENUE.L2 | Event→venue 404: `MEETING_POINT`+`pageStatus=NONE` (TC `generic_location`) excluded from hub while event DTO still emits `venueSlug` | Критический | 🔄 gate fix in `dto.js` curatedMeetingPoint + TC `venuePageStatus`; deploy+smoke `modnaya-sreda-…68d4062e…` ⏳ |
+| VENUE.L2 | Event→venue 404 «Модная среда 1823»: `isTransportVehicleVenueName` false positive на title с годом → hub junk | Критический | ✅ dto.js regex+institution guard; API smoke OK; web HTML smoke после стабилизации `.next` |
 | VENUE.L3 | Event/session DTO: не отдавать `venueSlug` (или `venueHasPublicPage=false`) для HIDDEN / non-resolvable hub rows - UI не линкует в 404 | Высокий | ⏳ |
 | VENUE.L4 | Soft-sign twin: при HIDDEN twin rematch `Event.venueId` на канонический PUBLISHED/CANDIDATE slug | Средний | ⏳ |
-| VENUE.L5 | Ops: one-shot ensure для `venue_68d4062e38b75e8343b393ca` (Модная среда) если после deploy всё ещё 404 (нет sessions в catalog window) | Средний | ⏳ |
+| VENUE.L5 | Ops ensure `venue_68d4062e…` - не нужен: row+sessions OK; блокер был junk-gate | Низкий | ✅ cancelled |
 
 ---
 
