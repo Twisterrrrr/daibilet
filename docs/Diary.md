@@ -11,7 +11,7 @@
 - Unit: quota + page-cache eviction → Grand Maket 3/8. E2E: `scripts/e2e-day-plan-grand-maket.mjs`.
 
 ### Проблемы
-- Нужен MSK deploy + E2E 2→Grand Maket→3/8 under near-full LS.
+- ~~Нужен MSK deploy + E2E 2→Grand Maket→3/8 under near-full LS~~ → MSK `a6a35c2` **BUILD_ID=`7lA4l2wG63Ia_3fdgqLsC`**. E2E `scripts/e2e-day-plan-grand-maket.mjs`: 2→Grand Maket→3/8 OK (coords persisted, page caches evicted under quota).
 
 ---
 
