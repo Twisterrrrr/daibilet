@@ -64,6 +64,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | DR.13 | Toast «Не удалось добавить точку» on 2nd same-city add (write/LS) | Критический | ✅ `9bbe493` live BUILD `WKT1rWN1718h0x0jsrX5K` |
 | DR.14 | /my-day standalone text planner (add by title, no catalog) | Критический | ✅ `0f24fe6` MSK **BUILD_ID=`iWvkrKtHTJQ6ZfXtsf6wI`** |
 | DR.15 | Text planner cap: up to 8 stops (MIN=2 must not gate add) | Критический | ✅ `85b4a63` MSK **BUILD_ID=`lTTVacKQjRXqQAABoBDgl`** E2E 0→8 |
+| DR.16 | Text planner 3rd stop fail (QuotaExceeded / page-cache LS full) | Критический | 🔄 write eviction + E2E Grand Maket |
 | LOC.EMPTY | `/locations?city=` empty for all cities: soft-timeout empty HTML + nginx 30m HIT | Критический | ✅ `987516b` BUILD `IffsRTTeclktlvq7PQweq` + nginx purge |
 | LOC.FACET | `/locations` type chip counts global (151) vs city (20); default «Все локации» | Критический | ✅ `bc994b6` BUILD `4-AqPsButr_VcuwLGcyFk` |
 

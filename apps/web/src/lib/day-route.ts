@@ -72,11 +72,13 @@ export function parseDayRouteCoordsInput(input: {
 }): DayRouteCoords | null {
   const fromPair = String(input.coordsText || '')
     .trim()
-    .replace(/;/g, ',')
-    .match(/(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/);
+    // Normalize paste noise: NBSP / thin spaces, fullwidth / typographic commas, semicolons.
+    .replace(/[\u00A0\u202F\u2007\u2009\u200B]/g, ' ')
+    .replace(/[;；‚，]/g, ',')
+    .match(/(-?\d+(?:[.,]\d+)?)\s*,\s*(-?\d+(?:[.,]\d+)?)/);
   if (fromPair) {
-    const latitude = Number(fromPair[1]);
-    const longitude = Number(fromPair[2]);
+    const latitude = Number(String(fromPair[1]).replace(',', '.'));
+    const longitude = Number(String(fromPair[2]).replace(',', '.'));
     if (isValidCoordinatePair(latitude, longitude)) return { latitude, longitude };
   }
   const latitude = Number(input.latitude);
@@ -317,16 +319,71 @@ function cloneDayRouteState(state: DayRouteState): DayRouteState {
 function dayRoutePersistPayload(state: DayRouteState, slim: boolean): DayRouteState {
   const venues = dedupeDayRouteVenues(state.venues).map((venue) => {
     if (!slim) return { ...venue };
-    const { imageUrl: _drop, ...rest } = venue;
+    const { imageUrl: _drop, href: _href, ...rest } = venue;
     return rest;
   });
   return { cityId: state.cityId, venues };
 }
 
+/**
+ * Disposable page-cache keys from legacy public SSR / browsing.
+ * Same origin shares LS with day-route; when quota is full, growing 2→3 text stops
+ * fails even though slim(imageUrl) cannot shrink text-only payloads.
+ * Never touch dayRoute / favorites / auth / selected-city.
+ */
+const DAY_ROUTE_EVICTABLE_KEY_PREFIXES = [
+  'daibilet:venue-page:',
+  'daibilet:event-page:',
+  'daibilet:city-page:',
+  'daibilet:city-venues:',
+  'daibilet:landing-page:',
+  'daibilet:venues-catalog:',
+  'daibilet:catalog-default',
+  'daibilet:public-stats',
+  'daibilet:public-destinations',
+  'daibilet:public-home-preview',
+] as const;
+
+function isDayRouteEvictableKey(key: string): boolean {
+  return DAY_ROUTE_EVICTABLE_KEY_PREFIXES.some(
+    (prefix) => key === prefix || key.startsWith(prefix),
+  );
+}
+
+/** Drop disposable page-cache keys (largest first). `needBytes<=0` = evict all. */
+export function evictDayRouteDisposableCaches(needBytes = 0): number {
+  if (typeof window === 'undefined') return 0;
+  type Entry = { key: string; size: number };
+  const entries: Entry[] = [];
+  try {
+    for (let i = 0; i < localStorage.length; i += 1) {
+      const key = localStorage.key(i);
+      if (!key || !isDayRouteEvictableKey(key)) continue;
+      const value = localStorage.getItem(key) || '';
+      entries.push({ key, size: key.length + value.length });
+    }
+  } catch {
+    return 0;
+  }
+  entries.sort((a, b) => b.size - a.size);
+  let freed = 0;
+  for (const entry of entries) {
+    if (needBytes > 0 && freed >= needBytes) break;
+    try {
+      localStorage.removeItem(entry.key);
+      freed += entry.size;
+    } catch {
+      // ignore
+    }
+  }
+  return freed;
+}
+
 function trySetDayRouteRaw(raw: string): boolean {
   try {
     localStorage.setItem(DAY_ROUTE_STORAGE_KEY, raw);
-    return true;
+    // Round-trip check: extensions / full-quota edge cases can no-op or clobber.
+    return localStorage.getItem(DAY_ROUTE_STORAGE_KEY) === raw;
   } catch {
     return false;
   }
@@ -334,19 +391,29 @@ function trySetDayRouteRaw(raw: string): boolean {
 
 export function writeDayRoute(state: DayRouteState): boolean {
   if (typeof window === 'undefined') return false;
-  // Full payload first; on quota retry without imageUrl (owner «Не удалось добавить точку»).
+  // Full → slim(no image/href) → after quota eviction retry both.
+  // Owner «Не удалось добавить точку» on 3rd text stop: LS full of page caches,
+  // growing dayRoute by ~200B throws QuotaExceeded; slim alone cannot shrink text stops.
   const attempts = [dayRoutePersistPayload(state, false), dayRoutePersistPayload(state, true)];
   let raw: string | null = null;
   let normalized: DayRouteState | null = null;
-  for (const attempt of attempts) {
-    const nextRaw = JSON.stringify({
-      cityId: attempt.cityId,
-      venues: attempt.venues,
-    });
-    if (!trySetDayRouteRaw(nextRaw)) continue;
-    raw = nextRaw;
-    normalized = attempt;
-    break;
+  const tryAttempts = () => {
+    for (const attempt of attempts) {
+      const nextRaw = JSON.stringify({
+        cityId: attempt.cityId,
+        venues: attempt.venues,
+      });
+      if (!trySetDayRouteRaw(nextRaw)) continue;
+      raw = nextRaw;
+      normalized = attempt;
+      return true;
+    }
+    return false;
+  };
+  if (!tryAttempts()) {
+    // Evict all disposable page caches (same-origin legacy public SSR blobs).
+    evictDayRouteDisposableCaches(0);
+    tryAttempts();
   }
   if (!raw || !normalized) {
     // Quota / private mode: do not update snapshot or UI - keeps badge/buttons honest.

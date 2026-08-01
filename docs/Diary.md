@@ -1,3 +1,20 @@
+## 2026-08-01 - /my-day: 3-я текстовая точка «Не удалось добавить» (QuotaExceeded)
+
+### Наблюдения
+- Owner screenshot: Точки · 2/8 (Эрмитаж, Русский музей), форма Гранд Макет + адрес + город + coords `59.887991, 30.330520` → красный **«Не удалось добавить точку. Попробуйте ещё раз»**, кнопка Add enabled (не MAX=8).
+- Clean live repro с теми же полями на пустом LS - OK (3/8). Отказ воспроизводится только когда `localStorage.setItem(dayRoute)` бросает **QuotaExceeded** на росте payload 2→3 (~+200B).
+- Slim-retry без `imageUrl` не помогает: text stops уже без картинок, payload только растёт. Same-origin page caches (`daibilet:venue-page:*`, `event-page:*`, …) из legacy public SSR забивают квоту.
+
+### Решения
+- `writeDayRoute`: round-trip verify после setItem; при fail - `evictDayRouteDisposableCaches(0)` (все disposable page-cache ключи, не трогая dayRoute/favorites/auth/city) → retry full+slim.
+- `parseDayRouteCoordsInput`: NBSP/fullwidth comma / европейский `59,88, 30,33`.
+- Unit: quota + page-cache eviction → Grand Maket 3/8. E2E: `scripts/e2e-day-plan-grand-maket.mjs`.
+
+### Проблемы
+- Нужен MSK deploy + E2E 2→Grand Maket→3/8 under near-full LS.
+
+---
+
 ## 2026-08-01 - /my-day text planner: лимит до 8 (не MIN=2)
 
 ### Наблюдения

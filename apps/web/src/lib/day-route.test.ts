@@ -36,6 +36,10 @@ import {
 function mockStorage() {
   const store = new Map<string, string>();
   const localStorage = {
+    get length() {
+      return store.size;
+    },
+    key: (index: number) => [...store.keys()][index] ?? null,
     getItem: (key: string) => (store.has(key) ? store.get(key)! : null),
     setItem: (key: string, value: string) => {
       store.set(key, String(value));
@@ -509,6 +513,65 @@ test('parseDayRouteCoordsInput accepts paste and separate fields', () => {
     latitude: 55.7,
     longitude: 37.6,
   });
+  assert.deepEqual(parseDayRouteCoordsInput({ coordsText: '59.887991,\u00A030.330520' }), {
+    latitude: 59.887991,
+    longitude: 30.33052,
+  });
+  assert.deepEqual(parseDayRouteCoordsInput({ coordsText: '59,887991, 30,330520' }), {
+    latitude: 59.887991,
+    longitude: 30.33052,
+  });
+});
+
+test('addTextStopToDayRoute evicts page caches when quota blocks 3rd stop', () => {
+  const store = mockStorage();
+  clearDayRoute();
+  addTextStopToDayRoute({
+    title: 'Эрмитаж',
+    note: 'Дворцовая площадь, 2, Санкт-Петербург',
+    city: 'Санкт-Петербург',
+    coordsText: '59.9398, 30.3146',
+  });
+  addTextStopToDayRoute({
+    title: 'Русский музей',
+    note: 'Инженерная улица, 2-4Д, Санкт-Петербург',
+    city: 'Санкт-Петербург',
+    coordsText: '59.9387, 30.3322',
+  });
+  assert.equal(readDayRoute().venues.length, 2);
+
+  store.set('daibilet:favorites', '["keep-me"]');
+  store.set('daibilet:venue-page:v2:huge', 'x'.repeat(8000));
+  store.set('daibilet:event-page:also-huge', 'y'.repeat(8000));
+
+  const original = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = (key: string, value: string) => {
+    if (key === DAY_ROUTE_STORAGE_KEY) {
+      // Simulate full LS: reject growth until disposable caches are gone.
+      const hasCache =
+        store.has('daibilet:venue-page:v2:huge') || store.has('daibilet:event-page:also-huge');
+      const prev = store.get(DAY_ROUTE_STORAGE_KEY) || '';
+      if (hasCache && String(value).length > prev.length) {
+        throw new DOMException('QuotaExceededError');
+      }
+    }
+    return original(key, value);
+  };
+
+  const next = addTextStopToDayRoute({
+    title: 'Гранд Макет Россия',
+    note: 'Цветочная ул., 16Л, ОНТ Пулково-2',
+    city: 'Санкт-Петербург',
+    coordsText: '59.887991, 30.330520',
+  });
+  assert.equal(next.venues.length, 3);
+  assert.equal(readDayRoute().venues.length, 3);
+  assert.equal(next.venues[2]?.title, 'Гранд Макет Россия');
+  assert.equal(next.venues[2]?.latitude, 59.887991);
+  assert.equal(next.venues[2]?.longitude, 30.33052);
+  assert.equal(store.get('daibilet:favorites'), '["keep-me"]');
+  assert.equal(store.has('daibilet:venue-page:v2:huge'), false);
+  assert.equal(store.has('daibilet:event-page:also-huge'), false);
 });
 
 test('buildDayRouteSharePath encodes text stops with t: and | separator', () => {
