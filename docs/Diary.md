@@ -1,3 +1,39 @@
+## 2026-08-01 - Day-route: coords/address из каталога неполные
+
+### Наблюдения
+- Owner: часть точек из каталога в «Мой день» без координат («Нет координат»); адреса приходят урезанными (Fontanka / «Место посадки - Лиговский пр. 10»).
+- Live list API для SPb pier/bus coords уже есть; SSR payload тоже содержит lat/lng после DR.7.
+- Реальные пробелы: (1) `LocationCard`/`InstitutionCard`/layouts **не передавали `address`** в `AddToDayRouteButton` - в LS только title/city; (2) lean list select без `city.id`/`city.slug` → `cityId`/`citySlug` всегда null; (3) list DTO брал raw lat/lng без `resolvePublicVenueCoordinates`; (4) `enrichBareStreetAddress` делал `ул. г. Санкт-Петербург, …`.
+
+### Решения
+- Day-route item: поле `address`; catalog/detail/event add paths пишут полный address + lat/lng snapshot.
+- `/my-day`: показать address (formatStreetAddress, без дубля если title уже содержит улицу); enrich matches по id **и** slug дописывает coords/address.
+- Lean + `mapPublicVenueListItem`: cityId/citySlug; coords через `resolvePublicVenueCoordinates`.
+- `venue-normalize`: не префиксовать `ул.` к city/settlement parts; strip `г. City`.
+
+### Проблемы
+- Нужен MSK web+API deploy (lean/normalize живут в backend). Старые LS без address - enrich на `/my-day` или передобавить.
+
+---
+
+## 2026-08-01 - /my-day: ложный «Точки из разных городов» при одном СПб
+
+### Наблюдения
+- Owner screenshot: 5/8 точек, все с городом **«Санкт-Петербург»** (Эрмитаж / Русский музей text + каталог Лиговский / Гранд Макет / Булла), но жёлтый warning «Точки из разных городов…».
+- `dayRouteHasMixedCities`: `venueCityKey` сначала брал `id:{cityId}` для каталога и `title:{city}` для text-stop → разные ключи при одном городе.
+- UI ещё OR-ил `payload.multiCityWarning` поверх локальной проверки.
+
+### Решения
+- `normalizeDayRouteCityTitle` + `dayRouteHasMixedCities`: приоритет нормализованного title; cityId→title из sibling rows; id-only fallback.
+- `DayRoutePanel`: при наличии city/cityId на точках доверять локальной проверке (не false-positive от API).
+- Enrich matches: более полный address; подтянуть city/cityId/citySlug если пусто.
+- Unit: catalog cityId + text same title → not mixed.
+
+### Проблемы
+- Нужен MSK deploy + smoke: catalog + text все СПб → нет warning; matches работают.
+
+---
+
 ## 2026-08-01 - /my-day: 3-я текстовая точка «Не удалось добавить» (QuotaExceeded)
 
 ### Наблюдения

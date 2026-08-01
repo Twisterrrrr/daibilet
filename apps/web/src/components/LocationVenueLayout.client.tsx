@@ -212,6 +212,7 @@ export function LocationVenueLayout({
                   citySlug: venue.citySlug,
                   href: venueHref(venue),
                   imageUrl: venue.heroImageUrl,
+                  address: venue.address,
                   latitude: venue.latitude,
                   longitude: venue.longitude,
                 }}
@@ -494,6 +495,7 @@ function LocationVenueSidebar({ venue, relatedVenues }: { venue: PublicVenueDto;
             citySlug: venue.citySlug,
             href: venueHref(venue),
             imageUrl: venue.heroImageUrl,
+            address: venue.address,
             latitude: venue.latitude,
             longitude: venue.longitude,
           }}

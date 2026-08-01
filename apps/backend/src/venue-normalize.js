@@ -137,6 +137,22 @@ function isPlusCodeAddress(value) {
   return PLUS_CODE_RE.test(String(value || '').trim());
 }
 
+function stripCityPrefix(value) {
+  return String(value || '')
+    .trim()
+    .replace(/^(?:г\.?|город)\s+/iu, '')
+    .trim();
+}
+
+function looksLikeCityOrSettlementPart(part) {
+  const text = String(part || '').trim();
+  if (!text) return false;
+  if (/^(?:г\.?|город|пос\.?|пгт\.?|посёлок|поселок|село|деревня)\b/iu.test(text)) return true;
+  // Bare "д. Name" settlement (not house "д. 12") - letter after д.
+  if (/^д\.?\s*[\p{L}]/iu.test(text) && !/^д\.?\s*\d/iu.test(text)) return true;
+  return false;
+}
+
 function stripAddressMetaParts(parts, city) {
   const cityNorm = normalizeKey(city);
   return parts.filter((part) => {
@@ -145,6 +161,8 @@ function stripAddressMetaParts(parts, city) {
     if (/^\d{5,6}$/.test(clean)) return false;
     if (/^(?:россия|russia|рф)$/i.test(clean)) return false;
     if (city && normalizeKey(clean) === cityNorm) return false;
+    // "г. Санкт-Петербург" when city is Санкт-Петербург
+    if (city && normalizeKey(stripCityPrefix(clean)) === cityNorm) return false;
     if (/^[\p{L}][\p{L}\d-]*\s+(?:обл\.|область|край|респ\.|республика)$/iu.test(clean)) return false;
     return true;
   });
@@ -177,12 +195,15 @@ function enrichBareStreetAddress(address) {
 
   const parts = text.split(',').map((part) => part.trim()).filter(Boolean);
   if (parts.length === 1 && !STREET_MARKER_RE.test(parts[0])) {
+    if (looksLikeCityOrSettlementPart(parts[0])) return text;
     if (/^\d/.test(parts[0]) || /^50\s+лет/i.test(parts[0])) {
       return `ул. ${parts[0]}`;
     }
   }
   if (parts.length >= 2 && isBareStreetPrefix(parts[0])) {
     const first = parts[0];
+    // Never invent "ул. г. Санкт-Петербург, …" from a city/settlement prefix.
+    if (looksLikeCityOrSettlementPart(first)) return text;
     if (!/(?:переулок|проспект|набережная|бульвар|шоссе|площадь|линия|проезд|тупик)/i.test(first)) {
       return `ул. ${first}, ${parts.slice(1).join(', ')}`;
     }

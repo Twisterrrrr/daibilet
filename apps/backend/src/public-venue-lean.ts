@@ -19,6 +19,8 @@ export type LeanPublicVenueRow = {
   description: string | null;
   heroImageUrl: string | null;
   city: string;
+  cityId: string | null;
+  citySlug: string | null;
   address: string | null;
   latitude: number | null;
   longitude: number | null;
@@ -51,7 +53,8 @@ const venueListSelect = {
   hookFact: true,
   kind: true,
   pageStatus: true,
-  city: { select: { title: true } },
+  cityId: true,
+  city: { select: { id: true, title: true, slug: true } },
   _count: {
     select: {
       events: { where: ACTIVE_VENUE_EVENT_WHERE },
@@ -131,6 +134,8 @@ function mapLeanVenueRow(row: VenueListRecord, leanText: boolean): LeanPublicVen
     description: leanText ? null : row.description,
     heroImageUrl: row.heroImageUrl,
     city: row.city?.title || 'Не указан',
+    cityId: row.cityId || row.city?.id || null,
+    citySlug: row.city?.slug || null,
     address: row.address,
     latitude: row.latitude,
     longitude: row.longitude,

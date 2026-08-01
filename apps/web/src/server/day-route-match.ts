@@ -16,6 +16,7 @@ export type DayRouteMatchVenue = {
   cityId: string | null;
   cityTitle: string | null;
   citySlug: string | null;
+  address: string | null;
   latitude: number | null;
   longitude: number | null;
   heroImageUrl: string | null;
@@ -50,6 +51,7 @@ function toMatchVenueDto(venue: {
   slug: string | null;
   title: string;
   cityId: string | null;
+  address?: string | null;
   latitude: number | null;
   longitude: number | null;
   heroImageUrl: string | null;
@@ -62,6 +64,7 @@ function toMatchVenueDto(venue: {
     cityId: venue.cityId,
     cityTitle: venue.city?.title ?? null,
     citySlug: venue.city?.slug ?? null,
+    address: venue.address ?? null,
     latitude: venue.latitude,
     longitude: venue.longitude,
     heroImageUrl: venue.heroImageUrl,
@@ -75,6 +78,7 @@ function collectEventRouteVenues(event: {
     slug: string | null;
     title: string;
     cityId: string | null;
+    address?: string | null;
     latitude: number | null;
     longitude: number | null;
     heroImageUrl: string | null;
@@ -87,6 +91,7 @@ function collectEventRouteVenues(event: {
       slug: string | null;
       title: string;
       cityId: string | null;
+      address?: string | null;
       latitude: number | null;
       longitude: number | null;
       heroImageUrl: string | null;
@@ -121,6 +126,7 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
       slug: true,
       title: true,
       cityId: true,
+      address: true,
       latitude: true,
       longitude: true,
       heroImageUrl: true,
@@ -152,6 +158,7 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
     cityId: v.cityId,
     cityTitle: v.city?.title ?? null,
     citySlug: v.city?.slug ?? null,
+    address: v.address ?? null,
     latitude: v.latitude,
     longitude: v.longitude,
     heroImageUrl: v.heroImageUrl,
@@ -271,6 +278,7 @@ const eventSelect = {
       slug: true,
       title: true,
       cityId: true,
+      address: true,
       latitude: true,
       longitude: true,
       heroImageUrl: true,
@@ -287,6 +295,7 @@ const eventSelect = {
           slug: true,
           title: true,
           cityId: true,
+          address: true,
           latitude: true,
           longitude: true,
           heroImageUrl: true,

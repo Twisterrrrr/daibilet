@@ -24,6 +24,8 @@ export type DayRouteVenueItem = {
   /** Snapshot at add-time / enrich from matches - so Yandex CTA does not depend only on API. */
   latitude?: number | null;
   longitude?: number | null;
+  /** Full street address snapshot from catalog (not over-shortened display title). */
+  address?: string | null;
   /** Optional free-text address / note for planner stops (not from catalog). */
   note?: string | null;
   /** Optional: added from event card/page (backward compatible - older storage omits these). */
@@ -534,6 +536,8 @@ function mergeDayRouteVenueFields(
     href: incoming.href ?? existing.href,
     imageUrl: incoming.imageUrl ?? existing.imageUrl,
   };
+  const incomingAddress = String(incoming.address || '').trim();
+  if (incomingAddress) next.address = incomingAddress;
   if (coords.latitude != null && coords.longitude != null) {
     next.latitude = coords.latitude;
     next.longitude = coords.longitude;
@@ -561,6 +565,7 @@ export function addToDayRoute(item: DayRouteVenueItem): DayRouteState {
     const unchanged =
       merged.latitude === existing.latitude &&
       merged.longitude === existing.longitude &&
+      merged.address === existing.address &&
       merged.eventId === existing.eventId &&
       merged.eventSlug === existing.eventSlug &&
       merged.sessionLabel === existing.sessionLabel &&
@@ -799,19 +804,49 @@ export function dayRouteFullCoveredCount(covered: {
   return (covered.stop?.length ?? 0) + (covered.start?.length ?? 0);
 }
 
-function venueCityKey(venue: Pick<DayRouteVenueItem, 'cityId' | 'city'>): string | null {
-  if (venue.cityId) return `id:${venue.cityId}`;
-  const title = String(venue.city || '')
+/** Normalize city label for equality (catalog cityId + text-stop title must agree). */
+export function normalizeDayRouteCityTitle(city: string | null | undefined): string | null {
+  const title = String(city || '')
     .trim()
-    .toLowerCase();
-  return title ? `title:${title}` : null;
+    .toLowerCase()
+    .replace(/ё/g, 'е')
+    // «Санкт-Петербург» vs «Санкт Петербург» / extra spaces
+    .replace(/[\s\-]+/g, ' ')
+    .trim();
+  return title || null;
+}
+
+/**
+ * Stable city key for mixed-city detection.
+ * Prefer normalized title when present so catalog venues (`cityId` set) and text stops
+ * (`cityId` null, same displayed city) are not flagged as mixed.
+ */
+function venueCityKey(
+  venue: Pick<DayRouteVenueItem, 'cityId' | 'city'>,
+  idToTitle: Map<string, string>,
+): string | null {
+  const title = normalizeDayRouteCityTitle(venue.city);
+  if (title) return `title:${title}`;
+  const cityId = String(venue.cityId || '').trim();
+  if (!cityId) return null;
+  const knownTitle = idToTitle.get(cityId);
+  if (knownTitle) return `title:${knownTitle}`;
+  return `id:${cityId}`;
 }
 
 /** True if selected points span more than one city (ids or titles). */
 export function dayRouteHasMixedCities(venues: DayRouteVenueItem[]): boolean {
+  // Learn cityId → title from venues that carry both, so id-only rows can unify.
+  const idToTitle = new Map<string, string>();
+  for (const venue of venues) {
+    const cityId = String(venue.cityId || '').trim();
+    const title = normalizeDayRouteCityTitle(venue.city);
+    if (cityId && title) idToTitle.set(cityId, title);
+  }
+
   const keys = new Set<string>();
   for (const venue of venues) {
-    const key = venueCityKey(venue);
+    const key = venueCityKey(venue, idToTitle);
     if (key) keys.add(key);
   }
   return keys.size > 1;
@@ -948,6 +983,12 @@ type DayRouteCoordSource = {
   slug?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  address?: string | null;
+  title?: string | null;
+  cityTitle?: string | null;
+  city?: string | null;
+  cityId?: string | null;
+  citySlug?: string | null;
 };
 
 /** Build id+slug → coords from route items and/or matches payload venues. */
@@ -971,7 +1012,7 @@ export function buildDayRouteCoordsMap(
   return map;
 }
 
-/** Merge coords (and canonical id/slug) from matches payload into local day-route storage. */
+/** Merge coords/address (and canonical id/slug) from matches payload into local day-route storage. */
 export function enrichDayRouteFromMatchVenues(payloadVenues: DayRouteCoordSource[]): DayRouteState {
   const current = readDayRoute();
   if (!current.venues.length || !payloadVenues.length) return current;
@@ -996,11 +1037,26 @@ export function enrichDayRouteFromMatchVenues(payloadVenues: DayRouteCoordSource
       next.latitude = lat;
       next.longitude = lng;
     }
+    const matchAddress = String(match.address || '').trim();
+    const existingAddress = String(item.address || '').trim();
+    // Prefer fuller catalog address (e.g. street+house over street-only leftover).
+    if (matchAddress && (!existingAddress || matchAddress.length > existingAddress.length)) {
+      next.address = matchAddress;
+    }
+    if (match.title && !item.title) next.title = match.title;
+    const matchCity = String(match.cityTitle || match.city || '').trim();
+    if (matchCity && !String(item.city || '').trim()) next.city = matchCity;
+    if (match.cityId && !item.cityId) next.cityId = match.cityId;
+    if (match.citySlug && !item.citySlug) next.citySlug = match.citySlug;
     if (
       next.id !== item.id ||
       next.slug !== item.slug ||
       next.latitude !== item.latitude ||
-      next.longitude !== item.longitude
+      next.longitude !== item.longitude ||
+      next.address !== item.address ||
+      next.city !== item.city ||
+      next.cityId !== item.cityId ||
+      next.citySlug !== item.citySlug
     ) {
       changed = true;
     }

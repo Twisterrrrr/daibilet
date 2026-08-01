@@ -43,6 +43,7 @@ import {
   type DayRouteVenueItem,
 } from '@/lib/day-route';
 import { formatPriceFrom } from '@/lib/format';
+import { formatStreetAddress } from '@/lib/address';
 import { eventHref, venueHref } from '@/lib/routes';
 
 type MatchVenueStub = {
@@ -52,6 +53,7 @@ type MatchVenueStub = {
   cityId: string | null;
   cityTitle: string | null;
   citySlug?: string | null;
+  address?: string | null;
   latitude?: number | null;
   longitude?: number | null;
   heroImageUrl: string | null;
@@ -83,6 +85,7 @@ function matchVenueToDayRouteItem(venue: MatchVenueStub): DayRouteVenueItem {
     city: venue.cityTitle,
     cityId: venue.cityId,
     citySlug: venue.citySlug ?? null,
+    address: venue.address ?? null,
     imageUrl: venue.heroImageUrl,
     latitude: venue.latitude ?? null,
     longitude: venue.longitude ?? null,
@@ -193,6 +196,7 @@ function DayRoutePanelInner() {
           city: venue.cityTitle,
           cityId: venue.cityId,
           citySlug: venue.citySlug ?? null,
+          address: venue.address ?? null,
           imageUrl: venue.heroImageUrl,
           latitude: venue.latitude ?? null,
           longitude: venue.longitude ?? null,
@@ -233,10 +237,16 @@ function DayRoutePanelInner() {
     return map;
   }, [route.venues, payload]);
 
-  const mixedCities = useMemo(
-    () => dayRouteHasMixedCities(route.venues) || Boolean(payload?.multiCityWarning),
-    [route.venues, payload?.multiCityWarning],
-  );
+  const mixedCities = useMemo(() => {
+    // Prefer local title-aware check: catalog cityId + text-stop same city must not warn.
+    // Fall back to API flag only when local points lack city labels entirely.
+    if (dayRouteHasMixedCities(route.venues)) return true;
+    const hasAnyCityLabel = route.venues.some(
+      (v) => String(v.city || '').trim() || String(v.cityId || '').trim(),
+    );
+    if (hasAnyCityLabel) return false;
+    return Boolean(payload?.multiCityWarning);
+  }, [route.venues, payload?.multiCityWarning]);
   const belowMin = route.venues.length > 0 && route.venues.length < DAY_ROUTE_MIN;
   // Cap is always DAY_ROUTE_MAX (8). Never use DAY_ROUTE_MIN (2) as an add ceiling.
   const atMax = route.venues.length >= DAY_ROUTE_MAX;
@@ -831,6 +841,14 @@ function DayRouteVenueCard({
     (!textStop && venue.slug
       ? venueHref({ id: venue.id, slug: venue.slug, name: venue.title, type: 'park' })
       : null);
+  const addressLine =
+    formatStreetAddress(venue.address, { city: venue.city }) || String(venue.address || '').trim() || '';
+  const titleNorm = venue.title.toLowerCase().replace(/\s+/g, ' ');
+  const addrNorm = addressLine.toLowerCase().replace(/\s+/g, ' ');
+  const addressRedundant =
+    Boolean(addressLine) &&
+    (titleNorm.includes(addrNorm) ||
+      (addrNorm.length >= 8 && titleNorm.includes(addrNorm.replace(/^набережная\s+/i, 'наб. '))));
   return (
     <li
       className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-3"
@@ -880,6 +898,9 @@ function DayRouteVenueCard({
             <p className="line-clamp-2 text-sm font-semibold text-slate-900">{venue.title}</p>
           )}
           {venue.note ? <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">{venue.note}</p> : null}
+          {addressLine && !addressRedundant ? (
+            <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">{addressLine}</p>
+          ) : null}
           {venue.city ? <p className="mt-0.5 truncate text-xs text-slate-500">{venue.city}</p> : null}
           {venue.sessionLabel ? (
             <p className="mt-1 inline-flex items-center rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-800">

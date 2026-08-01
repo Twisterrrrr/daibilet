@@ -174,6 +174,7 @@ export function LocationCard({
             citySlug: venue.citySlug,
             href,
             imageUrl: venue.heroImageUrl,
+            address: venue.address,
             latitude: venue.latitude,
             longitude: venue.longitude,
           }}

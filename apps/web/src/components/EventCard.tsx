@@ -128,6 +128,7 @@ export function EventCard({
     venueSlug: session.venueSlug,
     venue: session.venue,
     venueKind: session.venueKind,
+    venueAddress: session.venueAddress,
     venueLatitude: 'venueLatitude' in session ? (session as { venueLatitude?: number | null }).venueLatitude : undefined,
     venueLongitude:
       'venueLongitude' in session ? (session as { venueLongitude?: number | null }).venueLongitude : undefined,

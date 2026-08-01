@@ -65,6 +65,8 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | DR.14 | /my-day standalone text planner (add by title, no catalog) | Критический | ✅ `0f24fe6` MSK **BUILD_ID=`iWvkrKtHTJQ6ZfXtsf6wI`** |
 | DR.15 | Text planner cap: up to 8 stops (MIN=2 must not gate add) | Критический | ✅ `85b4a63` MSK **BUILD_ID=`lTTVacKQjRXqQAABoBDgl`** E2E 0→8 |
 | DR.16 | Text planner 3rd stop fail (QuotaExceeded / page-cache LS full) | Критический | ✅ `a6a35c2` MSK **BUILD_ID=`7lA4l2wG63Ia_3fdgqLsC`** E2E Grand Maket 2→3 |
+| DR.17 | False mixed-city warning: catalog cityId + text-stop same title | Критический | 🔄 title-aware `dayRouteHasMixedCities` (ship with DR.18) |
+| DR.18 | Catalog→day-route: missing coords snapshot + truncated/missing address | Критический | 🔄 pass address+coords; lean cityId; resolvePublicVenueCoordinates; normalize ул.г. |
 | LOC.EMPTY | `/locations?city=` empty for all cities: soft-timeout empty HTML + nginx 30m HIT | Критический | ✅ `987516b` BUILD `IffsRTTeclktlvq7PQweq` + nginx purge |
 | LOC.FACET | `/locations` type chip counts global (151) vs city (20); default «Все локации» | Критический | ✅ `bc994b6` BUILD `4-AqPsButr_VcuwLGcyFk` |
 

@@ -6706,6 +6706,7 @@ const PUBLIC_VENUE_ROW_SELECT = `
     venue."hookFact",
     venue.kind,
     venue."pageStatus",
+    city.id as "cityId",
     city.title as city,
     city.slug as "citySlug",
     region.slug as "regionSlug",
@@ -7609,16 +7610,22 @@ function mapPublicVenueListItem(row) {
   const type = resolvePublicVenueKindFromRow(normalized);
   const name = applyPublicVenueDisplayName(normalized, type);
   const shortDescription = pickPublicVenueLeadText(normalized.shortDescription, normalized.description);
-  const latitude = Number(normalized.latitude);
-  const longitude = Number(normalized.longitude);
+  // Same resolver as venue detail page (overrides / embedded slug coords / pier water offset).
+  const coords = resolvePublicVenueCoordinates(normalized, { resolvedType: type });
+  const cityId = normalizeNullableString(normalized.cityId) || null;
+  const citySlug =
+    normalizeNullableString(normalized.citySlug) ||
+    (normalized.city && normalized.city !== 'Не указан' ? publicCitySlug(normalized.city) : null);
   return {
     id: normalized.id,
     slug: publicVenueSlug(normalized.slug, name, normalized.id),
     name,
     city: normalized.city,
+    cityId,
+    citySlug,
     address: normalized.address,
-    latitude: Number.isFinite(latitude) ? latitude : null,
-    longitude: Number.isFinite(longitude) ? longitude : null,
+    latitude: coords?.latitude ?? null,
+    longitude: coords?.longitude ?? null,
     metroStation: normalizeNullableString(normalized.metroStation),
     wayToFind: normalizeNullableString(normalized.wayToFind),
     parkingInfo: normalizeNullableString(normalized.parkingInfo),

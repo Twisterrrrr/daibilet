@@ -98,6 +98,45 @@ test('dayRouteHasMixedCities by cityId and by title', () => {
   assert.equal(dayRouteHasMixedCities(mixedTitles), true);
 });
 
+test('dayRouteHasMixedCities: catalog cityId + text-stop same title is not mixed', () => {
+  // Owner false positive: all cards show «Санкт-Петербург», but catalog rows have
+  // cityId while text stops only have city title → old id: vs title: keys mixed.
+  const spbMix: DayRouteVenueItem[] = [
+    { id: 'venue_1', title: 'Место посадки', cityId: 'city_spb', city: 'Санкт-Петербург' },
+    { id: 'text_abc', title: 'Эрмитаж', cityId: null, city: 'Санкт-Петербург' },
+    { id: 'text_def', title: 'Русский музей', city: 'Санкт-Петербург' },
+    { id: 'venue_2', title: 'Музей Карла Буллы', cityId: 'city_spb', city: 'Санкт-Петербург' },
+  ];
+  assert.equal(dayRouteHasMixedCities(spbMix), false);
+
+  // Same displayed city with ё/е / spacing variants.
+  assert.equal(
+    dayRouteHasMixedCities([
+      { id: '1', title: 'A', cityId: 'c1', city: 'Санкт-Петербург' },
+      { id: '2', title: 'B', city: 'санкт петербург' },
+    ]),
+    false,
+  );
+
+  // Real mixed: catalog id without title + different titled city.
+  assert.equal(
+    dayRouteHasMixedCities([
+      { id: '1', title: 'A', cityId: 'city_msk', city: 'Москва' },
+      { id: '2', title: 'B', cityId: null, city: 'Санкт-Петербург' },
+    ]),
+    true,
+  );
+
+  // Id-only row unifies via sibling that knows cityId→title.
+  assert.equal(
+    dayRouteHasMixedCities([
+      { id: '1', title: 'A', cityId: 'city_spb', city: 'Санкт-Петербург' },
+      { id: '2', title: 'B', cityId: 'city_spb' },
+    ]),
+    false,
+  );
+});
+
 test('dayRouteDominantCitySlug picks majority', () => {
   assert.equal(dayRouteDominantCitySlug([]), null);
   assert.equal(
@@ -379,6 +418,46 @@ test('enrichDayRouteFromMatchVenues writes coords into storage', () => {
   ]);
   assert.equal(next.venues[0]?.latitude, 59.9342802);
   assert.equal(readDayRoute().venues[0]?.longitude, 30.3350986);
+});
+
+test('catalog add persists address + coords snapshot for my-day', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({
+    id: 'venue_664357d9859cee9d822848aa',
+    slug: 'prichal-na-nab-r-fontanki-105',
+    title: 'Причал на наб. р. Фонтанки 105',
+    city: 'Санкт-Петербург',
+    address: 'набережная реки Фонтанки, 105',
+    latitude: 59.92291095333904,
+    longitude: 30.320574599457725,
+  });
+  const stored = readDayRoute().venues[0];
+  assert.equal(stored?.address, 'набережная реки Фонтанки, 105');
+  assert.equal(stored?.latitude, 59.92291095333904);
+  assert.equal(stored?.longitude, 30.320574599457725);
+});
+
+test('enrichDayRouteFromMatchVenues fills missing address by slug', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({
+    id: 'tochka-sbora',
+    slug: 'tochka-sbora',
+    title: 'Место посадки — Лиговский пр. 10',
+  });
+  const next = enrichDayRouteFromMatchVenues([
+    {
+      id: 'venue_5661d5a99cb5385800d8807d',
+      slug: 'tochka-sbora',
+      address: 'Лиговский пр. 10',
+      latitude: 59.9342802,
+      longitude: 30.3350986,
+    },
+  ]);
+  assert.equal(next.venues[0]?.id, 'venue_5661d5a99cb5385800d8807d');
+  assert.equal(next.venues[0]?.address, 'Лиговский пр. 10');
+  assert.equal(next.venues[0]?.latitude, 59.9342802);
 });
 
 test('addToDayRoute same city title with null vs cityId still appends', () => {

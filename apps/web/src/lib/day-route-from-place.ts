@@ -20,6 +20,7 @@ export type DayRouteVenueMatchSource = {
   pageStatus?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  address?: string | null;
   heroImageUrl?: string | null;
   city?: string | null;
   citySlug?: string | null;
@@ -107,6 +108,7 @@ export function dayRouteItemFromMustSee(
     citySlug: city.slug || city.sourceSlug || matched?.citySlug || null,
     href,
     imageUrl: matched?.heroImageUrl || null,
+    address: String(matched?.address || '').trim() || null,
     ...coordsFromVenue(matched),
   };
 }
@@ -122,6 +124,7 @@ export type DayRouteEventSource = {
   venueSlug?: string | null;
   venue?: string | null;
   venueKind?: string | null;
+  venueAddress?: string | null;
   venueLatitude?: number | null;
   venueLongitude?: number | null;
   startsAt?: string | null;
@@ -169,6 +172,7 @@ export function dayRouteItemFromEvent(event: DayRouteEventSource): DayRouteVenue
     citySlug: event.citySlug || null,
     href,
     imageUrl: event.imageUrl || null,
+    address: String(event.venueAddress || '').trim() || null,
     ...coordsFromVenue({
       latitude: event.venueLatitude,
       longitude: event.venueLongitude,

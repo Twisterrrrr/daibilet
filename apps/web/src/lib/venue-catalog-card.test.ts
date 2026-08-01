@@ -9,6 +9,9 @@ test('toVenueCatalogCard keeps valid latitude/longitude for day-route', () => {
     slug: 'prichal-na-fontanke-53',
     name: 'Причал на Фонтанке 53',
     city: 'Санкт-Петербург',
+    cityId: 'city_spb',
+    citySlug: 'sankt-peterburg',
+    address: 'набережная Фонтанки д. 53',
     type: 'pier',
     events: 3,
     latitude: 59.9285617,
@@ -16,6 +19,8 @@ test('toVenueCatalogCard keeps valid latitude/longitude for day-route', () => {
   });
   assert.equal(card.latitude, 59.9285617);
   assert.equal(card.longitude, 30.3381124);
+  assert.equal(card.address, 'набережная Фонтанки д. 53');
+  assert.equal(card.cityId, 'city_spb');
 });
 
 test('toVenueCatalogCard rejects null-island and non-finite coords', () => {

@@ -90,6 +90,7 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
     venueSlug: event.venueSlug,
     venue: event.venue,
     venueKind: event.venueKind,
+    venueAddress: event.venueAddress,
     venueLatitude: event.venueLatitude,
     venueLongitude: event.venueLongitude,
     startsAt: nextSession?.startsAt,
