@@ -84,6 +84,8 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
     const params = new URLSearchParams(searchParams.toString());
     if (next === 'all') params.delete('city');
     else params.set('city', next);
+    // Type facets are city-scoped; drop stale global type (e.g. outdoor_location=151).
+    params.delete('type');
     const qs = params.toString();
     startTransition(() => {
       router.replace(qs ? `/locations?${qs}` : '/locations', { scroll: false });
@@ -100,9 +102,15 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
     });
   };
 
+  // Facet chip counts must match the city dropdown universe (e.g. SPb 20), not the global catalog.
+  const cityScopedVenues = useMemo(() => {
+    if (cityFilter === 'all') return venues;
+    return venues.filter((venue) => venue.city === cityFilter);
+  }, [venues, cityFilter]);
+
   const typeOptions = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const venue of venues) {
+    for (const venue of cityScopedVenues) {
       const key = resolvePublicVenueType(venue.type, venue.name);
       counts.set(key, (counts.get(key) || 0) + 1);
     }
@@ -110,13 +118,25 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
       ...option,
       count: counts.get(option.value) || 0,
     }));
-  }, [venues]);
+  }, [cityScopedVenues]);
+
+  // Drop type=… that has 0 matches in the current city (deep-link / leftover URL).
+  useEffect(() => {
+    if (listPending || typeFilter === 'all') return;
+    if (typeOptions.some((option) => option.value === typeFilter)) return;
+    const params = new URLSearchParams(searchParams.toString());
+    if (!params.has('type')) return;
+    params.delete('type');
+    const qs = params.toString();
+    startTransition(() => {
+      router.replace(qs ? `/locations?${qs}` : '/locations', { scroll: false });
+    });
+  }, [listPending, typeFilter, typeOptions, searchParams, router]);
 
   const filteredVenues = useMemo(() => {
     if (listPending) return [];
     const normalized = query.trim().toLowerCase();
-    const filtered = venues.filter((venue) => {
-      if (cityFilter !== 'all' && venue.city !== cityFilter) return false;
+    const filtered = cityScopedVenues.filter((venue) => {
       if (typeFilter !== 'all' && resolvePublicVenueType(venue.type, venue.name) !== typeFilter) return false;
       if (!normalized) return true;
       return [venue.name, venue.city, venue.address, venue.shortDescription, venueTypeLabel(venue.type, venue.name)]
@@ -131,7 +151,7 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
       if (sortMode === 'desc') return right.name.localeCompare(left.name, 'ru');
       return left.name.localeCompare(right.name, 'ru');
     });
-  }, [venues, query, cityFilter, typeFilter, sortMode, listPending]);
+  }, [cityScopedVenues, query, typeFilter, sortMode, listPending]);
 
   const cityCount = cityOptions.length;
   const eventsHref = catalogHrefWithSelectedCity(selectedCity?.cityValue);
@@ -193,6 +213,7 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
               }`}
             >
               Все локации
+              <span className="ml-1.5 text-xs opacity-75">({cityScopedVenues.length})</span>
             </button>
             {typeOptions.map((option) => {
               const active = typeFilter === option.value;
@@ -222,7 +243,9 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
             ) : (
               <>
                 Найдено: {formatNumber(filteredVenues.length)}
-                {venues.length ? <span className="font-normal text-slate-500"> из {formatNumber(venues.length)}</span> : null}
+                {cityScopedVenues.length ? (
+                  <span className="font-normal text-slate-500"> из {formatNumber(cityScopedVenues.length)}</span>
+                ) : null}
               </>
             )}
           </h2>
