@@ -159,8 +159,9 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | INC.504.15 | Prisma pool / Connection terminated в daibilet-web (не только API) | Высокий | ⏳ |
 | INC.504.16 | Re-enable warm-hub только `*/15`+concurrency1 после smoke TTFB; не `*/3` | Средний | ✅ superseded: канон `*/12` в daibilet-tasks (INC.504.17) |
 | INC.504.17 | MSK `/etc/cron.d/daibilet-tasks`: warm `*/12`+flock+90s (User=root) + TTFB healthcheck; old warm-hubs disabled | Критический | ✅ live MSK 2026-08-01; docs |
+| INC.504.18 | Owner 504 ~14:06 UTC: site already up; hang был 13:01-13:18 (Prisma + accept timeout); deploy gaps ~1.5м; no restart | Критический | ✅ verified up; root cause = INC.504.15 |
 
-См. Diary 2026-07-30 «Prod 504: daibilet-web hang», «2026-08-01 INC.504.13» и «INC.504.17».
+См. Diary 2026-07-30 «Prod 504: daibilet-web hang», «2026-08-01 INC.504.13», «INC.504.17», «INC.504.18».
 
 ---
 

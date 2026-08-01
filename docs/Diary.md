@@ -1,3 +1,23 @@
+## 2026-08-01 - INC.504.18: owner 504 report - site already recovered
+
+### Наблюдения
+- Owner: снова 504 на production (~17:06 MSK / 14:06 UTC).
+- Immediate smoke (без restart): local `:3001` `/` `/events` `/cities` **200**, TTFB ~0.01-0.05s; API `/api/health` **200** ~3ms; external `--resolve` `.184` `/` **200** TTFB ~0.05-0.07s.
+- nginx access: **21×504** в окне `13:01-13:18` UTC (Googlebot + user `178.66.*`); после `14:00` - **0×504**. Error log: `upstream timed out while connecting to upstream` → Next не принимал коннекты (event-loop hang), не DNS.
+- Journal `daibilet-web` @13:17: Prisma `Connection terminated unexpectedly` (home-stats / public-city-articles / catalog soft-expire) + `unhandledRejection`; затем Stopping→Started @13:18-13:20 (recovery).
+- Доп. окна downtime от deploy/restart (не healthcheck): 13:55:52→13:57:25 (~93с) и 14:03:59→14:05:45 (~106с). Owner-репорт совпал с концом второго окна. `ssr-health.log` пуст, `journalctl -t daibilet-ssr-health` пуст → healthcheck **не** thrashing.
+- Active **BUILD_ID=`rs16U9aCCKYbVyTyCjMyo`** (mtime 14:04). Soft-timeouts **present** (`src/lib/soft-timeout.ts` + SiteLayout / HomePageContent / VenuePages). `TimeoutStopSec=25` live. next-server RSS ~980-1000MB (MemoryMax=2G). Cron `/etc/cron.d/daibilet-tasks`: warm `*/12`+flock+90s OK (warm log 12/12); healthcheck `TTFB>5` → restart + `pkill -f '[w]arm-hub-pages'`.
+
+### Решения
+- Recovery restart **не** делали: HTML уже жив, warm не thrashing.
+- Docs-only: INC.504.18 + tracker. Root cause hang (Prisma pool / event-loop) остаётся INC.504.15. Deploy stop→start gap ~1.5-2м - отдельный ops риск (пользователь видит 504 в окне atomic swap).
+
+### Проблемы
+- Soft-timeouts не спасают от полного hang accept-loop (как INC.504.13).
+- Healthcheck поставлен @13:24 (после hang) - на инцидент 13:01-13:18 не успел среагировать.
+
+---
+
 ## 2026-08-01 - UX research: Locations + mobile catalog brief
 
 ### Наблюдения
