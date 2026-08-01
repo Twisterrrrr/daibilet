@@ -12,7 +12,7 @@
 - Unit: sibling Fontanka/Ligovsky false-positive + subscribe lengths 1→2→3.
 
 ### Проблемы
-- Live MSK: commit `ff852a9` (tip later `505fad6`), **BUILD_ID=`HDL3hw0HUymPBt_oi5syV`**. Playwright: badge===active===LS на 0→1→2→3 (Ligovsky/Fontanka71/Fontanka105); forced LS=1 не подсвечивает siblings.
+- Live MSK: commit `ff852a9` (tip `505fad6`), **BUILD_ID=`spsgbupFbWeJyWDuz2XNi`**. Playwright: badge===active===LS на 0→1→2→3 (Ligovsky/Fontanka71/Fontanka105); forced LS=1 не подсвечивает siblings.
 
 ---
 
