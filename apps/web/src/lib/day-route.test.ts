@@ -4,10 +4,12 @@ import test from 'node:test';
 import {
   DAY_ROUTE_MAX,
   DAY_ROUTE_STORAGE_KEY,
+  addTextStopToDayRoute,
   addToDayRoute,
   buildDayRouteCoordsMap,
   buildDayRouteSharePath,
   buildYandexMultiStopRouteUrl,
+  catalogDayRouteVenueIds,
   clearDayRoute,
   dayRouteDominantCitySlug,
   dayRouteFullCoveredCount,
@@ -15,9 +17,13 @@ import {
   dayRouteMatchScore,
   enrichDayRouteFromMatchVenues,
   hydrateDayRouteFromShare,
+  hydrateTextStopsFromShareTokens,
+  isDayRouteShareTextToken,
   isInDayRoute,
+  isTextDayRouteStop,
   lookupDayRouteCoords,
   optimizeDayRouteNearestNeighbor,
+  parseDayRouteCoordsInput,
   parseDayRouteQueryParam,
   readDayRoute,
   resetDayRouteSnapshotCache,
@@ -442,4 +448,89 @@ test('addToDayRoute retries slim payload without imageUrl when full write throws
   });
   assert.equal(next.venues.length, 2);
   assert.equal(readDayRoute().venues.length, 2);
+});
+
+test('addTextStopToDayRoute appends synthetic text_ ids without catalog venue id', () => {
+  mockStorage();
+  clearDayRoute();
+  const a = addTextStopToDayRoute({ title: 'Эрмитаж', note: 'Дворцовая' });
+  assert.equal(a.venues.length, 1);
+  assert.ok(isTextDayRouteStop(a.venues[0]!));
+  assert.equal(a.venues[0]!.title, 'Эрмитаж');
+  assert.equal(a.venues[0]!.note, 'Дворцовая');
+  const b = addTextStopToDayRoute({ title: 'Петропавловка', city: 'Санкт-Петербург' });
+  assert.equal(b.venues.length, 2);
+  assert.equal(readDayRoute().venues.length, 2);
+  assert.deepEqual(
+    readDayRoute().venues.map((v) => v.title),
+    ['Эрмитаж', 'Петропавловка'],
+  );
+  assert.ok(catalogDayRouteVenueIds(b.venues).length === 0);
+});
+
+test('addTextStopToDayRoute never blocks on cityId mismatch and parses coords', () => {
+  mockStorage();
+  clearDayRoute();
+  addTextStopToDayRoute({
+    title: 'A',
+    cityId: 'city_spb',
+    city: 'Санкт-Петербург',
+  });
+  const next = addTextStopToDayRoute({
+    title: 'B',
+    cityId: 'city_msk',
+    city: 'Москва',
+    coordsText: '55.75, 37.62',
+  });
+  assert.equal(next.venues.length, 2);
+  assert.equal(next.venues[1]!.latitude, 55.75);
+  assert.equal(next.venues[1]!.longitude, 37.62);
+  assert.equal(next.cityId, 'city_spb');
+});
+
+test('addTextStopToDayRoute rejects blank title and respects MAX', () => {
+  mockStorage();
+  clearDayRoute();
+  assert.equal(addTextStopToDayRoute({ title: '   ' }).venues.length, 0);
+  for (let i = 0; i < DAY_ROUTE_MAX; i += 1) {
+    addTextStopToDayRoute({ title: `Stop ${i}` });
+  }
+  assert.equal(readDayRoute().venues.length, DAY_ROUTE_MAX);
+  assert.equal(addTextStopToDayRoute({ title: 'Overflow' }).venues.length, DAY_ROUTE_MAX);
+});
+
+test('parseDayRouteCoordsInput accepts paste and separate fields', () => {
+  assert.deepEqual(parseDayRouteCoordsInput({ coordsText: '59.93,30.31' }), {
+    latitude: 59.93,
+    longitude: 30.31,
+  });
+  assert.equal(parseDayRouteCoordsInput({ coordsText: 'nope' }), null);
+  assert.deepEqual(parseDayRouteCoordsInput({ latitude: 55.7, longitude: 37.6 }), {
+    latitude: 55.7,
+    longitude: 37.6,
+  });
+});
+
+test('buildDayRouteSharePath encodes text stops with t: and | separator', () => {
+  mockStorage();
+  clearDayRoute();
+  addTextStopToDayRoute({ title: 'Эрмитаж' });
+  addTextStopToDayRoute({ title: 'Исаакий' });
+  const path = buildDayRouteSharePath(readDayRoute().venues);
+  assert.ok(path.includes(encodeURIComponent('t:Эрмитаж|t:Исаакий')));
+  const tokens = parseDayRouteQueryParam(decodeURIComponent(path.replace('/my-day?day=', '')));
+  assert.deepEqual(tokens, ['t:Эрмитаж', 't:Исаакий']);
+  assert.ok(tokens.every((t) => isDayRouteShareTextToken(t)));
+});
+
+test('hydrateTextStopsFromShareTokens fills planner from titles', () => {
+  mockStorage();
+  clearDayRoute();
+  const next = hydrateTextStopsFromShareTokens(['t:Аврора', 't:Медный всадник']);
+  assert.equal(next.venues.length, 2);
+  assert.deepEqual(
+    next.venues.map((v) => v.title),
+    ['Аврора', 'Медный всадник'],
+  );
+  assert.ok(next.venues.every((v) => isTextDayRouteStop(v)));
 });

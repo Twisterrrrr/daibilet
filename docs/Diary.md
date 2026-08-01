@@ -1,3 +1,21 @@
+## 2026-08-01 - /my-day standalone text planner (без каталога)
+
+### Наблюдения
+- Owner: catalog «В мой маршрут» по-прежнему ломается у них; нужен планировщик, не завязанный на `/locations`.
+- Требование: добавлять точки текстом на `/my-day`, счётчик N/8, persist localStorage, без cityId-gate.
+
+### Решения
+- `addTextStopToDayRoute` + synthetic ids `text_*`; optional note/city/coords (`lat, lng`).
+- `/my-day`: форма «Добавить» сверху; список ↑↓/удалить/очистить; CTA «Можно добавлять места текстом».
+- Matches API только для catalog ids; text-only → блок «Подходящие экскурсии» скрыт.
+- Share `?day=t:Title|t:Title2` hydrate без API.
+- Unit: text add / count / coords / share; E2E `scripts/e2e-day-plan-text.mjs`.
+
+### Проблемы
+- Catalog buttons оставлены как secondary path; не дебажили в этом pass.
+
+---
+
 ## 2026-08-01 - Day-route: toast «Не удалось добавить точку» на 2-й точке
 
 ### Наблюдения

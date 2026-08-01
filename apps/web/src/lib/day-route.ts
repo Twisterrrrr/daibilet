@@ -24,6 +24,8 @@ export type DayRouteVenueItem = {
   /** Snapshot at add-time / enrich from matches - so Yandex CTA does not depend only on API. */
   latitude?: number | null;
   longitude?: number | null;
+  /** Optional free-text address / note for planner stops (not from catalog). */
+  note?: string | null;
   /** Optional: added from event card/page (backward compatible - older storage omits these). */
   eventId?: string | null;
   eventSlug?: string | null;
@@ -31,6 +33,108 @@ export type DayRouteVenueItem = {
   sessionLabel?: string | null;
   startsAt?: string | null;
 };
+
+/** Synthetic planner stops (typed on /my-day) - no catalog venue id required. */
+export const DAY_ROUTE_TEXT_ID_PREFIX = 'text_';
+export const DAY_ROUTE_SHARE_TEXT_PREFIX = 't:';
+
+export function isTextDayRouteStop(
+  item: Pick<DayRouteVenueItem, 'id'> | string | null | undefined,
+): boolean {
+  const id = typeof item === 'string' ? item : String(item?.id || '');
+  return id.startsWith(DAY_ROUTE_TEXT_ID_PREFIX);
+}
+
+/** Ids safe to send to /api/day-route/matches (catalog venues only). */
+export function catalogDayRouteVenueIds(venues: DayRouteVenueItem[]): string[] {
+  return venues
+    .map((v) => String(v.id || '').trim())
+    .filter((id) => id && !isTextDayRouteStop(id) && !id.startsWith(DAY_ROUTE_SHARE_TEXT_PREFIX));
+}
+
+export function createTextDayRouteStopId(): string {
+  const rand =
+    typeof globalThis.crypto !== 'undefined' &&
+    typeof globalThis.crypto.randomUUID === 'function'
+      ? globalThis.crypto.randomUUID().replace(/-/g, '').slice(0, 16)
+      : `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+  return `${DAY_ROUTE_TEXT_ID_PREFIX}${rand}`;
+}
+
+/**
+ * Parse optional coords from "lat, lng" paste or separate numbers.
+ * Returns null when incomplete / invalid (never throws).
+ */
+export function parseDayRouteCoordsInput(input: {
+  coordsText?: string | null;
+  latitude?: number | string | null;
+  longitude?: number | string | null;
+}): DayRouteCoords | null {
+  const fromPair = String(input.coordsText || '')
+    .trim()
+    .replace(/;/g, ',')
+    .match(/(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/);
+  if (fromPair) {
+    const latitude = Number(fromPair[1]);
+    const longitude = Number(fromPair[2]);
+    if (isValidCoordinatePair(latitude, longitude)) return { latitude, longitude };
+  }
+  const latitude = Number(input.latitude);
+  const longitude = Number(input.longitude);
+  if (isValidCoordinatePair(latitude, longitude)) return { latitude, longitude };
+  return null;
+}
+
+export type TextDayRouteStopInput = {
+  title: string;
+  note?: string | null;
+  city?: string | null;
+  cityId?: string | null;
+  citySlug?: string | null;
+  coordsText?: string | null;
+  latitude?: number | string | null;
+  longitude?: number | string | null;
+};
+
+/**
+ * Add a free-text stop to the day planner.
+ * Never requires catalog venue id / cityId match - city fields are optional labels only.
+ */
+export function addTextStopToDayRoute(input: TextDayRouteStopInput): DayRouteState {
+  const title = String(input.title || '').trim();
+  if (!title) return readDayRouteFresh();
+  const current = readDayRouteFresh();
+  if (current.venues.length >= DAY_ROUTE_MAX) return current;
+
+  const coords = parseDayRouteCoordsInput(input);
+  const note = String(input.note || '').trim() || null;
+  const city = String(input.city || '').trim() || null;
+  const citySlug = String(input.citySlug || '').trim() || null;
+  // cityId is optional metadata only - never gate the append.
+  const cityId = String(input.cityId || '').trim() || null;
+
+  const item: DayRouteVenueItem = {
+    id: createTextDayRouteStopId(),
+    title,
+    note,
+    city,
+    // Optional metadata only - never compared/blocked against catalog cityId.
+    cityId,
+    citySlug,
+    slug: null,
+    href: null,
+    imageUrl: null,
+    latitude: coords?.latitude ?? null,
+    longitude: coords?.longitude ?? null,
+  };
+
+  const next: DayRouteState = {
+    // Keep prior cityId if set; text stops do not force a city switch.
+    cityId: current.cityId || cityId || null,
+    venues: [...current.venues, item].slice(0, DAY_ROUTE_MAX),
+  };
+  return writeDayRoute(next) ? readDayRouteFresh() : current;
+}
 
 export type DayRouteState = {
   cityId: string | null;
@@ -370,6 +474,7 @@ function mergeDayRouteVenueFields(
   if (incoming.eventSlug) next.eventSlug = incoming.eventSlug;
   if (incoming.sessionLabel) next.sessionLabel = incoming.sessionLabel;
   if (incoming.startsAt) next.startsAt = incoming.startsAt;
+  if (incoming.note != null) next.note = incoming.note;
   return next;
 }
 
@@ -487,27 +592,79 @@ export function toggleDayRoute(item: DayRouteVenueItem): DayRouteState {
   return addToDayRoute({ ...item, id });
 }
 
-/** Parse `?day=id1,slug2` share query into locators (max DAY_ROUTE_MAX). */
+/** Parse `?day=id1,slug2` or title share (`t:Эрмитаж|t:Петропавловка`) into locators. */
 export function parseDayRouteQueryParam(raw: string | null | undefined): string[] {
   if (!raw) return [];
+  let decoded = String(raw);
+  try {
+    decoded = decodeURIComponent(decoded);
+  } catch {
+    decoded = String(raw);
+  }
+  const sep = decoded.includes('|') ? '|' : ',';
   return [
     ...new Set(
-      String(raw)
-        .split(',')
+      decoded
+        .split(sep)
         .map((part) => part.trim())
         .filter(Boolean),
     ),
   ].slice(0, DAY_ROUTE_MAX);
 }
 
+export function isDayRouteShareTextToken(token: string): boolean {
+  return String(token || '')
+    .trim()
+    .toLowerCase()
+    .startsWith(DAY_ROUTE_SHARE_TEXT_PREFIX);
+}
+
+export function dayRouteShareTextTitle(token: string): string {
+  const raw = String(token || '').trim();
+  if (!isDayRouteShareTextToken(raw)) return '';
+  return raw.slice(DAY_ROUTE_SHARE_TEXT_PREFIX.length).trim();
+}
+
 /** Build absolute or relative share URL for current day route. */
 export function buildDayRouteSharePath(venues: DayRouteVenueItem[]): string {
+  const hasText = venues.some((venue) => isTextDayRouteStop(venue));
   const tokens = venues
-    .map((venue) => venue.slug || venue.id)
+    .map((venue) => {
+      if (isTextDayRouteStop(venue)) {
+        // Titles may contain commas - use `|` join when any text stop is present.
+        return `${DAY_ROUTE_SHARE_TEXT_PREFIX}${venue.title.trim()}`;
+      }
+      return venue.slug || venue.id;
+    })
     .filter(Boolean)
     .slice(0, DAY_ROUTE_MAX);
   if (!tokens.length) return '/my-day';
-  return `/my-day?day=${encodeURIComponent(tokens.join(','))}`;
+  const joined = hasText || tokens.some((t) => isDayRouteShareTextToken(t)) ? tokens.join('|') : tokens.join(',');
+  return `/my-day?day=${encodeURIComponent(joined)}`;
+}
+
+/** Hydrate free-text share tokens (`t:Title`) into local planner stops. */
+export function hydrateTextStopsFromShareTokens(tokens: string[]): DayRouteState {
+  const titles = tokens
+    .map((token) => dayRouteShareTextTitle(token))
+    .filter(Boolean)
+    .slice(0, DAY_ROUTE_MAX);
+  if (!titles.length) return readDayRoute();
+  const current = readDayRoute();
+  if (current.venues.length >= titles.length) {
+    const currentTitles = new Set(current.venues.map((v) => v.title.trim().toLowerCase()));
+    if (titles.every((title) => currentTitles.has(title.toLowerCase()))) {
+      return current;
+    }
+  }
+  let next = current;
+  for (const title of titles) {
+    if (next.venues.length >= DAY_ROUTE_MAX) break;
+    const already = next.venues.some((v) => v.title.trim().toLowerCase() === title.toLowerCase());
+    if (already) continue;
+    next = addTextStopToDayRoute({ title });
+  }
+  return next;
 }
 
 /** Replace localStorage day route from resolved venue list (share hydrate). */
