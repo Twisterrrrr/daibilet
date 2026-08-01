@@ -12,7 +12,7 @@
 - TC `guessVenueType`: не ставить `pier_water` по словам события, если venue - сухопутная точка сбора.
 
 ### Проблемы
-- Нужен MSK deploy (API+web): override живёт в runtime backend; web 502 пока параллельный build.
+- Закрыто: API `type=bus`, H1 `пл.Восстания` (без «Причал»), chip bus includes / pier excludes. BUILD_ID=`uAAeJS3sG_GuPNfbwQqKy`.
 
 ---
 
