@@ -13,6 +13,7 @@
 
 ### Проблемы
 - Catalog buttons оставлены как secondary path; не дебажили в этом pass.
+- ~~MSK deploy + E2E~~ → `0f24fe6` **BUILD_ID=`iWvkrKtHTJQ6ZfXtsf6wI`**. E2E text planner 0→1→2 без каталога.
 
 ---
 
