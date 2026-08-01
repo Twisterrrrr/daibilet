@@ -8,7 +8,8 @@ import { DAY_ROUTE_MAX, type DayRouteVenueItem } from './day-route';
 import { isValidCoordinatePair } from './day-route-score';
 import { venueHref } from './routes';
 
-export const DAY_ROUTE_PRESET_SIZE = 4;
+/** Default preset takes all resolvable must-see (typically 6), capped by DAY_ROUTE_MAX. */
+export const DAY_ROUTE_PRESET_SIZE = DAY_ROUTE_MAX;
 export const DAY_ROUTE_PRESET_MIN = 3;
 
 export type DayRouteVenueMatchSource = {
@@ -184,7 +185,7 @@ export function dayRouteItemFromEvent(event: DayRouteEventSource): DayRouteVenue
   };
 }
 
-/** Build 3-4 resolvable must-see stops for city preset (same city, capped). */
+/** Build resolvable must-see stops for city preset (all available up to DAY_ROUTE_MAX). */
 export function buildCityDayRoutePreset(
   places: CityMustSeeItem[],
   venues: DayRouteVenueMatchSource[],

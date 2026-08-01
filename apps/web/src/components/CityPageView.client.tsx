@@ -1121,10 +1121,12 @@ function CitySightsSection({
       locationSlug: item.locationSlug,
     })) || [];
   const fromMustSee = guide?.mustSee?.length ? guide.mustSee : [];
-  const places: CityMustSeeItem[] = fromSights.length
-    ? fromSights
-    : fromMustSee.length
-      ? fromMustSee
+  // Prefer mustSee: it carries venueSlug/locationSlug for day-route + title links.
+  // Sights often duplicate the same 6 places as prose without slugs (batch cities).
+  const places: CityMustSeeItem[] = fromMustSee.length
+    ? fromMustSee
+    : fromSights.length
+      ? fromSights
       : allowFallback
         ? buildFallbackMustSee(city, categories, venues)
         : [];

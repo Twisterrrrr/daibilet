@@ -1,3 +1,21 @@
+## 2026-08-01 - City hub: «Собрать за минуту» брал только 4 из 6 must-see
+
+### Наблюдения
+- Owner: пресет на хабе города собирал максимум 4 точки, хотя «Главные места» / mustSee обычно 6.
+- `DAY_ROUTE_PRESET_SIZE = 4` в `buildCityDayRoutePreset`; DAY_ROUTE_MAX=8 не мешал.
+- Batch-города: `CityPageView` предпочитал `sights` без slug над `mustSee` со slug → резолв в day-route слабее.
+
+### Решения
+- `DAY_ROUTE_PRESET_SIZE = DAY_ROUTE_MAX`: брать все resolvable must-see (типично 6), потолок 8.
+- `CityPageView`: приоритет `mustSee` (slug) над prose `sights`.
+- Merge address: не затирать полный street+house более коротким leftover.
+- Copy: корректное склонение «N главных мест».
+
+### Проблемы
+- Нужен MSK deploy + smoke Кострома/Мурманск: пресет → 6/8, badge 6.
+
+---
+
 ## 2026-08-01 - Day-route: coords/address из каталога неполные
 
 ### Наблюдения

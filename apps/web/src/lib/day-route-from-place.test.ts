@@ -17,6 +17,7 @@ const venues = [
     name: 'Эрмитаж',
     latitude: 59.9398,
     longitude: 30.3146,
+    address: 'Дворцовая набережная, 34',
     heroImageUrl: '/h.jpg',
   },
   {
@@ -25,6 +26,7 @@ const venues = [
     name: 'Петропавловская крепость',
     latitude: 59.95,
     longitude: 30.316,
+    address: 'Заячий остров',
   },
   {
     id: 'venue_dvorts',
@@ -39,10 +41,27 @@ const venues = [
     name: 'Исаакиевский собор',
     latitude: 59.934,
     longitude: 30.306,
+    address: 'Исаакиевская площадь, 4',
+  },
+  {
+    id: 'venue_spas',
+    slug: 'saint-petersburg-spas-na-krovi',
+    name: 'Спас на Крови',
+    latitude: 59.9401,
+    longitude: 30.3289,
+    address: 'наб. канала Грибоедова, 2Б',
+  },
+  {
+    id: 'venue_kazan',
+    slug: 'saint-petersburg-kazanskiy-sobor',
+    name: 'Казанский собор',
+    latitude: 59.9343,
+    longitude: 30.3245,
+    address: 'Казанская площадь, 2',
   },
 ];
 
-test('dayRouteItemFromMustSee resolves venueSlug + coords', () => {
+test('dayRouteItemFromMustSee resolves venueSlug + coords + address', () => {
   const item = dayRouteItemFromMustSee(
     { name: 'Эрмитаж', desc: 'Музей', venueSlug: 'ermitazh' },
     venues,
@@ -52,10 +71,11 @@ test('dayRouteItemFromMustSee resolves venueSlug + coords', () => {
   assert.equal(item!.id, 'venue_ermitazh');
   assert.equal(item!.slug, 'ermitazh');
   assert.equal(item!.latitude, 59.9398);
+  assert.equal(item!.address, 'Дворцовая набережная, 34');
   assert.equal(item!.cityId, 'city_spb');
 });
 
-test('dayRouteItemFromMustSee resolves locationSlug without hub venue match', () => {
+test('dayRouteItemFromMustSee resolves locationSlug with hub venue match', () => {
   const item = dayRouteItemFromMustSee(
     {
       name: 'Спас на Крови',
@@ -66,9 +86,27 @@ test('dayRouteItemFromMustSee resolves locationSlug without hub venue match', ()
     city,
   );
   assert.ok(item);
-  assert.equal(item!.id, 'saint-petersburg-spas-na-krovi');
+  assert.equal(item!.id, 'venue_spas');
   assert.equal(item!.slug, 'saint-petersburg-spas-na-krovi');
+  assert.equal(item!.latitude, 59.9401);
+  assert.equal(item!.address, 'наб. канала Грибоедова, 2Б');
+});
+
+test('dayRouteItemFromMustSee resolves locationSlug without hub venue match', () => {
+  const item = dayRouteItemFromMustSee(
+    {
+      name: 'Неизвестный храм',
+      desc: 'Храм',
+      locationSlug: 'saint-petersburg-unknown-church',
+    },
+    venues,
+    city,
+  );
+  assert.ok(item);
+  assert.equal(item!.id, 'saint-petersburg-unknown-church');
+  assert.equal(item!.slug, 'saint-petersburg-unknown-church');
   assert.equal(item!.latitude ?? null, null);
+  assert.equal(item!.address ?? null, null);
 });
 
 test('dayRouteItemFromMustSee returns null without slug or match', () => {
@@ -78,17 +116,21 @@ test('dayRouteItemFromMustSee returns null without slug or match', () => {
   );
 });
 
-test('buildCityDayRoutePreset takes first resolvable must-see up to 4', () => {
+test('buildCityDayRoutePreset takes all resolvable must-see up to DAY_ROUTE_MAX', () => {
   const places = [
     { name: 'Эрмитаж', desc: '', venueSlug: 'ermitazh' },
     { name: 'Крепость', desc: '', locationSlug: 'saint-petersburg-petropavlovskaya-krepost' },
     { name: 'Площадь', desc: '', locationSlug: 'saint-petersburg-dvortsovaya-ploschad' },
     { name: 'Исаакий', desc: '', locationSlug: 'saint-petersburg-isaakievskiy-sobor' },
     { name: 'Спас', desc: '', locationSlug: 'saint-petersburg-spas-na-krovi' },
+    { name: 'Казанский', desc: '', locationSlug: 'saint-petersburg-kazanskiy-sobor' },
   ];
   const preset = buildCityDayRoutePreset(places, venues, city);
-  assert.equal(preset.length, 4);
+  assert.equal(preset.length, 6);
   assert.equal(preset[0]!.slug, 'ermitazh');
+  assert.equal(preset[5]!.slug, 'saint-petersburg-kazanskiy-sobor');
+  assert.ok(preset.every((item) => item.cityId === 'city_spb'));
+  assert.ok(preset[0]!.address);
   assert.ok(cityDayRoutePresetAvailable(places, venues, city));
   assert.equal(
     cityDayRoutePresetAvailable(places.slice(0, 2), venues, city),

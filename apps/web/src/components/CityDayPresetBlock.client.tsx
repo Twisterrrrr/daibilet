@@ -20,6 +20,17 @@ type Props = {
   editorial?: boolean;
 };
 
+/** Russian plural for «N главных мест(а/о)» in preset copy. */
+function mainPlacesPhrase(count: number): string {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return `${count} главное место`;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) {
+    return `${count} главных места`;
+  }
+  return `${count} главных мест`;
+}
+
 export function CityDayPresetBlock({ places, venues, city, editorial = false }: Props) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -46,7 +57,7 @@ export function CityDayPresetBlock({ places, venues, city, editorial = false }: 
             Готовый день
           </p>
           <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-            Собрать за минуту: {preset.length} главных места в маршрут.
+            Собрать за минуту: {mainPlacesPhrase(preset.length)} в маршрут.
           </p>
           <p
             className={`mt-1 line-clamp-2 text-xs ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}

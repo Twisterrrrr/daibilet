@@ -537,7 +537,11 @@ function mergeDayRouteVenueFields(
     imageUrl: incoming.imageUrl ?? existing.imageUrl,
   };
   const incomingAddress = String(incoming.address || '').trim();
-  if (incomingAddress) next.address = incomingAddress;
+  const existingAddress = String(existing.address || '').trim();
+  // Prefer fuller catalog address (street+house over street-only leftover).
+  if (incomingAddress && (!existingAddress || incomingAddress.length > existingAddress.length)) {
+    next.address = incomingAddress;
+  }
   if (coords.latitude != null && coords.longitude != null) {
     next.latitude = coords.latitude;
     next.longitude = coords.longitude;
