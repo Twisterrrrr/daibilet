@@ -1,5 +1,16 @@
 # qa.md — открытые вопросы
 
+## 2026-08-01 - UX: Locations + mobile catalog (открыто)
+
+Контекст: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md). Задачи UX.LOC* в Tasktracker.
+
+1. **Лейбл `/locations`:** «Точки сбора» / «Места встречи» / оставить «Локации»?
+2. **Nav:** оставить пункт (с новым label), убрать в secondary/footer, или только из city hub?
+3. **Default city:** «Все города» ok, или first-visit city gate (Kassir-like)?
+4. **Гео suggest (IP/GPS):** нужен ли с явным confirm (не silent auto-switch)?
+5. **Список `/locations`:** только места с событиями, или SEO-контентные без афиши тоже (VK.8)?
+6. **Единый `/places`:** интересен в ближайший квартал или рано?
+
 ## 2026-07-31 - Location↔Excursion linking (открыто)
 
 1. **NEARBY_HUB / START:** enum `RouteItemRole` есть; MVP пишет только `STOP`. Нужен ли отдельный контент-флоу для хабов рядом / explicit START, или достаточно geo «Рядом» + `Event.venueId`?

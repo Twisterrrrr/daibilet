@@ -1,9 +1,28 @@
 # Tasktracker — Daibilet
 
 **Обновлено:** 2026-08-01
-**Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
+**Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md), [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
+
+---
+
+## UX: Locations + mobile catalog (2026-08-01)
+
+Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md). Без UI rewrite в research-pass; build order ниже.
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.LOC0 | Research brief: audit `/locations` + mobile `/events` city UX + competitor patterns | Высокий | ✅ docs |
+| UX.LOC1 | Mobile sticky header: city chip (сейчас CityPicker только `lg+`; в меню город внизу) | Критический | ⏳ |
+| UX.LOC2 | `MobileNavSheet`: блок «Город» сразу после поиска | Критический | ⏳ |
+| UX.LOC3 | Rename nav/H1 «Локации» → job-label (Точки сбора / Места встречи) - после owner Q1 | Высокий | ⏳ |
+| UX.LOC4 | `/locations` mobile: dense hero, карта ниже fold / desktop-only | Высокий | ⏳ |
+| UX.LOC5 | `/events` mobile: context line «События в {город}»; banner если city=all | Высокий | ⏳ |
+| UX.LOC6 | Bottom-sheet CityPicker: поиск + популярные + «Все города» | Высокий | ⏳ |
+| UX.LOC7 | Catalog mobile date UX: один entry (chips/sheet), не select+date input разом | Средний | ⏳ |
+| UX.LOC8 | IA: demote `/locations` из primary nav или секция city hub (owner V1/V2) | Средний | ⏳ |
+| UX.LOC9 | Unified `/places` (venues+locations tabs) | Низкий | ⚠️ после LOC8 |
 
 ---
 

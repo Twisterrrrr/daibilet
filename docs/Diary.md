@@ -1,3 +1,20 @@
+## 2026-08-01 - UX research: Locations + mobile catalog brief
+
+### Наблюдения
+- Owner: `/locations` непонятен; mobile layout путает; выбор города неочевиден; каталог неудобен.
+- Code: `CityPicker` в header `hidden lg:block`; на mobile город только в `MobileNavSheet` **после** nav/FAQ.
+- `/locations` = venue family `location` (причалы/парки/точки сбора), не «города»; H1 «Локации и точки сбора» + map hero конфликтует с mental model «куда поехать».
+- Live `/locations` `/events` `/cities` → 200. Конкуренты (Яндекс Афиша, Kassir, Afisha.ru, Eventbrite, Aviasales-like): город всегда видим; city-first; отдельного «Локации» в primary nav нет.
+
+### Решения
+- Docs brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md). Build order: LOC1 city chip → LOC2 menu → rename/IA → locations dense → catalog context → sheet picker.
+- Tracker UX.LOC0–9 + qa.md owner questions. UI rewrite не в этом проходе. Docs-only commit+push.
+
+### Проблемы
+- Browser MCP tab недоступен для скриншотов; live проверен curl/HTTP + code audit. Визуальные описания конкурентов - по публичным страницам/паттернам.
+
+---
+
 ## 2026-08-01 - Home hero: restore legacy navy blue (not black)
 
 ### Наблюдения
