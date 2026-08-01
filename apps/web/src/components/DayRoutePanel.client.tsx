@@ -35,6 +35,7 @@ import {
   optimizeDayRouteNearestNeighbor,
   parseDayRouteQueryParam,
   readDayRoute,
+  readDayRouteFresh,
   removeFromDayRoute,
   reorderDayRoute,
   hydrateDayRouteFromShare,
@@ -237,6 +238,7 @@ function DayRoutePanelInner() {
     [route.venues, payload?.multiCityWarning],
   );
   const belowMin = route.venues.length > 0 && route.venues.length < DAY_ROUTE_MIN;
+  // Cap is always DAY_ROUTE_MAX (8). Never use DAY_ROUTE_MIN (2) as an add ceiling.
   const atMax = route.venues.length >= DAY_ROUTE_MAX;
   const citySlug = dayRouteDominantCitySlug(route.venues);
   const cityTitle = useMemo(() => {
@@ -344,8 +346,11 @@ function DayRoutePanelInner() {
       titleFieldRef.current?.focus();
       return;
     }
-    if (atMax) {
+    // Fresh LS length - never gate on DAY_ROUTE_MIN or a stale React snapshot.
+    const before = readDayRouteFresh().venues.length;
+    if (before >= DAY_ROUTE_MAX) {
       setFormError(`Лимит ${DAY_ROUTE_MAX} точек`);
+      setRoute(readDayRouteFresh());
       return;
     }
     setFormError(null);
@@ -356,6 +361,15 @@ function DayRoutePanelInner() {
       coordsText: coordsInput,
     });
     setRoute(next);
+    if (next.venues.length <= before) {
+      setFormError(
+        next.venues.length >= DAY_ROUTE_MAX
+          ? `Лимит ${DAY_ROUTE_MAX} точек`
+          : 'Не удалось добавить точку. Попробуйте ещё раз',
+      );
+      titleFieldRef.current?.focus();
+      return;
+    }
     setTitleInput('');
     setNoteInput('');
     setCoordsInput('');

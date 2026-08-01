@@ -104,6 +104,7 @@ export function addTextStopToDayRoute(input: TextDayRouteStopInput): DayRouteSta
   const title = String(input.title || '').trim();
   if (!title) return readDayRouteFresh();
   const current = readDayRouteFresh();
+  // Hard cap = DAY_ROUTE_MAX (8). DAY_ROUTE_MIN (2) is only a UX "day is ready" hint.
   if (current.venues.length >= DAY_ROUTE_MAX) return current;
 
   const coords = parseDayRouteCoordsInput(input);

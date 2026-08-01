@@ -1,3 +1,19 @@
+## 2026-08-01 - /my-day text planner: лимит до 8 (не MIN=2)
+
+### Наблюдения
+- Owner: текстовый планировщик на `/my-day` «принимает только 2 точки», нужно до 8.
+- Live probe на `0f24fe6` / BUILD `iWvkrKtHTJQ6ZfXtsf6wI`: add 1→8 уже работал, счётчик `N/8`, кнопка disabled только на 8/8. `DAY_ROUTE_MAX=8`, `DAY_ROUTE_MIN=2` только для UX «день сложился».
+- Риск регрессии: stale React `atMax` / silent write-fail очищал title без роста count; E2E раньше останавливался на 2 и не ловил MIN-as-cap.
+
+### Решения
+- `submitTextStop`: лимит по `readDayRouteFresh().venues.length >= DAY_ROUTE_MAX`; при неудачном add не чистить поля, показать ошибку.
+- Комментарии: MIN ≠ add ceiling. E2E `scripts/e2e-day-plan-text.mjs` гоняет 0→8 и падает если add disabled на 2.
+
+### Проблемы
+- Нужен MSK deploy + smoke 5 текстовых точек.
+
+---
+
 ## 2026-08-01 - /my-day standalone text planner (без каталога)
 
 ### Наблюдения

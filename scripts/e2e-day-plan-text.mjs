@@ -1,6 +1,6 @@
 /**
  * Owner-path E2E: standalone text planner on /my-day (no catalog).
- * Open /my-day → type stop1 → add → type stop2 → add → count 2.
+ * Open /my-day → add text stops through 8 → assert counter N/8 and add disabled at max.
  *
  * Usage: node scripts/e2e-day-plan-text.mjs
  * Env: BASE_URL (default https://daibilet.ru)
@@ -11,6 +11,7 @@ import path from 'node:path';
 
 const BASE = process.env.BASE_URL || 'https://daibilet.ru';
 const OUT = path.resolve('.deploy-tmp/e2e-day-plan-text');
+const MAX = 8;
 fs.mkdirSync(OUT, { recursive: true });
 
 function log(...args) {
@@ -42,6 +43,7 @@ async function readPlan(page) {
     const badge = document.querySelector('[data-day-route-count]');
     const heading = document.querySelector('[data-day-route-count-heading]');
     const label = document.querySelector('[data-day-route-count-label]');
+    const addBtn = document.querySelector('[data-day-plan-add]');
     const stops = [...document.querySelectorAll('[data-day-plan-stop]')].map((el) => ({
       id: el.getAttribute('data-day-plan-stop'),
       text: (el.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 120),
@@ -57,9 +59,20 @@ async function readPlan(page) {
       stopCount: stops.length,
       stops,
       hasForm: Boolean(document.querySelector('[data-day-plan-form]')),
-      hasAdd: Boolean(document.querySelector('[data-day-plan-add]')),
+      hasAdd: Boolean(addBtn),
+      addDisabled: Boolean(addBtn?.disabled),
+      err: document.querySelector('[role=alert]')?.textContent?.trim() || null,
     };
   });
+}
+
+function assertCountLabel(state, n) {
+  const re = new RegExp(`${n}\\s*\\/\\s*${MAX}`);
+  if (!re.test(state.headingText || '') && !re.test(state.labelText || '')) {
+    throw new Error(
+      `Count label missing ${n}/${MAX}: heading=${state.headingText} label=${state.labelText}`,
+    );
+  }
 }
 
 async function addStop(page, title) {
@@ -92,32 +105,53 @@ async function main() {
     if (state.lsCount !== 0) {
       throw new Error(`Expected empty plan, got ${state.lsCount}`);
     }
-
-    await addStop(page, 'Стоп один');
-    state = await readPlan(page);
-    result.steps.push({ step: 'after-1', ...state });
-    log('after-1', state.lsCount, state.lsTitles, state.headingText);
-    if (state.lsCount !== 1 || state.stopCount !== 1) {
-      throw new Error(`Expected 1 stop, ls=${state.lsCount} ui=${state.stopCount}`);
-    }
-    if (!String(state.lsIds[0] || '').startsWith('text_')) {
-      throw new Error(`Expected text_ id, got ${state.lsIds[0]}`);
+    if (state.addDisabled) {
+      throw new Error('Add button must be enabled on empty plan');
     }
 
-    await addStop(page, 'Стоп два');
-    state = await readPlan(page);
-    result.steps.push({ step: 'after-2', ...state });
-    log('after-2', state.lsCount, state.lsTitles, state.headingText);
-    if (state.lsCount !== 2 || state.stopCount !== 2) {
-      throw new Error(`Expected 2 stops, ls=${state.lsCount} ui=${state.stopCount}`);
-    }
-    if (!/2\s*\/\s*8/.test(state.headingText || '') && !/2\s*\/\s*8/.test(state.labelText || '')) {
-      throw new Error(`Count label missing 2/8: heading=${state.headingText} label=${state.labelText}`);
+    for (let n = 1; n <= MAX; n += 1) {
+      if (state.addDisabled) {
+        throw new Error(`Add disabled before stop ${n} (must stay enabled until ${MAX})`);
+      }
+      await addStop(page, `Стоп ${n}`);
+      state = await readPlan(page);
+      result.steps.push({ step: `after-${n}`, ...state });
+      log(`after-${n}`, state.lsCount, state.lsTitles, state.headingText, 'disabled=', state.addDisabled);
+
+      if (state.lsCount !== n || state.stopCount !== n) {
+        throw new Error(`Expected ${n} stops, ls=${state.lsCount} ui=${state.stopCount}`);
+      }
+      if (!String(state.lsIds[n - 1] || '').startsWith('text_')) {
+        throw new Error(`Expected text_ id at ${n}, got ${state.lsIds[n - 1]}`);
+      }
+      assertCountLabel(state, n);
+
+      // Critical regression: DAY_ROUTE_MIN=2 must NOT disable add.
+      if (n === 2 && state.addDisabled) {
+        throw new Error('Add disabled at 2/8 - MIN leaked as MAX');
+      }
+      if (n < MAX && state.addDisabled) {
+        throw new Error(`Add disabled early at ${n}/${MAX}`);
+      }
+      if (n === MAX && !state.addDisabled) {
+        throw new Error(`Add must be disabled at ${MAX}/${MAX}`);
+      }
     }
 
-    await page.screenshot({ path: path.join(OUT, 'after-2.png'), fullPage: true });
+    // Overflow attempt must not grow past MAX.
+    const overflowDisabled = await page.locator('[data-day-plan-add]').isDisabled();
+    if (!overflowDisabled) {
+      await addStop(page, 'Overflow');
+      state = await readPlan(page);
+      result.steps.push({ step: 'overflow', ...state });
+      if (state.lsCount !== MAX) {
+        throw new Error(`Overflow grew plan to ${state.lsCount}, expected ${MAX}`);
+      }
+    }
+
+    await page.screenshot({ path: path.join(OUT, 'after-8.png'), fullPage: true });
     result.ok = true;
-    log('OK text planner 0→1→2 without catalog');
+    log(`OK text planner 0→${MAX} without catalog; counter N/${MAX}; add disabled only at max`);
   } catch (err) {
     result.error = String(err?.stack || err);
     try {
