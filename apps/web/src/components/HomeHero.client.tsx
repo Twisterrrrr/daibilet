@@ -89,15 +89,9 @@ export function HomeHero({ destinations, frames, videoSrc }: HomeHeroProps) {
       title={title}
       description="Найдите, куда сходить сегодня, завтра или на выходных - от речных прогулок и музеев до концертов и авторских экскурсий."
       tone="dark"
-      // Homepage only: legacy/owner navy instead of near-black slate-950 (owner: black feels off).
+      // Base layer under images (legacy navy placeholder while frames load) - not a blue wash on top of photos.
       className="!bg-[#122868]"
-      media={
-        <HeroMedia
-          frames={frames}
-          videoSrc={videoSrc}
-          overlayClassName="absolute inset-0 bg-gradient-to-t from-[#0a174b]/80 via-[#122868]/45 to-primary-900/30"
-        />
-      }
+      media={<HeroMedia frames={frames} videoSrc={videoSrc} />}
     >
       <form
         onSubmit={onSubmit}

@@ -1,3 +1,18 @@
+## 2026-08-01 - Home hero: navy base under photo (undo blue overlay)
+
+### Наблюдения
+- Owner correction: в `b59bc7a` ошибочно положили navy gradient **поверх** фото (`from-[#0a174b]/…` / `#122868` wash). Нужен был legacy **base** `#122868` под картинками (placeholder до load), без синей вуали на фото.
+
+### Решения
+- Оставили `HomeHero` / public section `!bg-[#122868]` / `bg-[#122868]` как base layer.
+- Убрали custom blue `overlayClassName` у `HeroMedia` → дефолтный лёгкий slate gradient для контраста текста.
+- `HomeHeroBackground` (web + public): overlays вернули к slate (`slate-900/15` + `from-slate-950/75…`), не navy wash.
+
+### Проблемы
+- SPB `.16` SSH по-прежнему denied → deploy через MSK in-place `pnpm web:build` (см. BUILD_ID в Tasktracker UX.HOME1b).
+
+---
+
 ## 2026-08-01 - `/locations?city=` empty (all cities) + day-route multi-add
 
 ### Наблюдения
