@@ -24,6 +24,12 @@ export type DayRouteVenueItem = {
   /** Snapshot at add-time / enrich from matches - so Yandex CTA does not depend only on API. */
   latitude?: number | null;
   longitude?: number | null;
+  /** Optional: added from event card/page (backward compatible - older storage omits these). */
+  eventId?: string | null;
+  eventSlug?: string | null;
+  /** Human label for session time, e.g. «сб, 14:00». */
+  sessionLabel?: string | null;
+  startsAt?: string | null;
 };
 
 export type DayRouteState = {
@@ -143,13 +149,59 @@ export function venueMatchesRouteSlug(
   return false;
 }
 
+function mergeDayRouteVenueFields(
+  existing: DayRouteVenueItem,
+  incoming: DayRouteVenueItem,
+): DayRouteVenueItem {
+  const coords = sanitizeStoredCoords(incoming);
+  const next: DayRouteVenueItem = {
+    ...existing,
+    title: incoming.title || existing.title,
+    slug: incoming.slug ?? existing.slug,
+    city: incoming.city ?? existing.city,
+    cityId: incoming.cityId ?? existing.cityId,
+    citySlug: incoming.citySlug ?? existing.citySlug,
+    href: incoming.href ?? existing.href,
+    imageUrl: incoming.imageUrl ?? existing.imageUrl,
+  };
+  if (coords.latitude != null && coords.longitude != null) {
+    next.latitude = coords.latitude;
+    next.longitude = coords.longitude;
+  }
+  if (incoming.eventId) next.eventId = incoming.eventId;
+  if (incoming.eventSlug) next.eventSlug = incoming.eventSlug;
+  if (incoming.sessionLabel) next.sessionLabel = incoming.sessionLabel;
+  if (incoming.startsAt) next.startsAt = incoming.startsAt;
+  return next;
+}
+
 export function addToDayRoute(item: DayRouteVenueItem): DayRouteState {
   const current = readDayRoute();
   const id = normalizeDayRouteVenueId(item);
   if (!id) return current;
   const coords = sanitizeStoredCoords(item);
   const normalized: DayRouteVenueItem = { ...item, id, ...coords };
-  if (current.venues.some((v) => sameDayRouteVenue(v, normalized))) return current;
+
+  const existingIdx = current.venues.findIndex((v) => sameDayRouteVenue(v, normalized));
+  if (existingIdx >= 0) {
+    const existing = current.venues[existingIdx]!;
+    const merged = mergeDayRouteVenueFields(existing, normalized);
+    const unchanged =
+      merged.latitude === existing.latitude &&
+      merged.longitude === existing.longitude &&
+      merged.eventId === existing.eventId &&
+      merged.eventSlug === existing.eventSlug &&
+      merged.sessionLabel === existing.sessionLabel &&
+      merged.startsAt === existing.startsAt &&
+      merged.href === existing.href &&
+      merged.imageUrl === existing.imageUrl;
+    if (unchanged) return current;
+    const venues = [...current.venues];
+    venues[existingIdx] = merged;
+    const next: DayRouteState = { cityId: current.cityId, venues };
+    writeDayRoute(next);
+    return next;
+  }
 
   const nextCityId = normalized.cityId || current.cityId;
   const mixedCity =
@@ -172,7 +224,10 @@ export function addToDayRoute(item: DayRouteVenueItem): DayRouteState {
 
 export function removeFromDayRoute(venueId: string): DayRouteState {
   const current = readDayRoute();
-  const venues = current.venues.filter((v) => v.id !== venueId);
+  const needle = String(venueId || '').trim();
+  const venues = current.venues.filter(
+    (v) => v.id !== needle && String(v.slug || '').trim() !== needle,
+  );
   const next: DayRouteState = {
     cityId: venues[0]?.cityId || (venues.length ? current.cityId : null),
     venues,
@@ -262,9 +317,17 @@ export function replaceDayRouteFromVenues(
   venues: DayRouteVenueItem[],
   cityId: string | null = null,
 ): DayRouteState {
+  const normalized = venues
+    .map((item) => {
+      const id = normalizeDayRouteVenueId(item);
+      if (!id) return null;
+      return { ...item, id, ...sanitizeStoredCoords(item) };
+    })
+    .filter((item): item is DayRouteVenueItem => Boolean(item))
+    .slice(0, DAY_ROUTE_MAX);
   const next: DayRouteState = {
-    cityId: cityId || venues[0]?.cityId || null,
-    venues: venues.slice(0, DAY_ROUTE_MAX),
+    cityId: cityId || normalized[0]?.cityId || null,
+    venues: normalized,
   };
   writeDayRoute(next);
   return next;
@@ -444,9 +507,12 @@ export function lookupDayRouteCoords(
   venue: Pick<DayRouteVenueItem, 'id' | 'slug' | 'latitude' | 'longitude'>,
   coordsById: Map<string, DayRouteCoords>,
 ): DayRouteCoords | null {
+  const id = String(venue.id || '').trim();
+  const slug = String(venue.slug || '').trim();
+  // Prefer slug: matches payload often keys the canonical slug after enrich,
+  // while localStorage may still hold a temporary id (e.g. slug-as-id).
   const fromMap =
-    coordsById.get(String(venue.id || '').trim()) ||
-    (venue.slug ? coordsById.get(String(venue.slug).trim()) : undefined);
+    (slug ? coordsById.get(slug) : undefined) || (id ? coordsById.get(id) : undefined);
   if (fromMap && isValidCoordinatePair(fromMap.latitude, fromMap.longitude)) return fromMap;
   const lat = Number(venue.latitude);
   const lng = Number(venue.longitude);

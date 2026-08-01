@@ -128,6 +128,25 @@ test('addToDayRoute rejects blank id and does not collapse distinct venues', () 
   );
 });
 
+test('addToDayRoute merges event session meta on duplicate venue', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({ id: 'venue_a', slug: 'park-a', title: 'Парк', cityId: 'c1' });
+  addToDayRoute({
+    id: 'venue_a',
+    slug: 'park-a',
+    title: 'Парк',
+    cityId: 'c1',
+    eventId: 'evt_1',
+    sessionLabel: 'сб, 12:00',
+    startsAt: '2026-08-02T12:00:00+03:00',
+  });
+  const state = readDayRoute();
+  assert.equal(state.venues.length, 1);
+  assert.equal(state.venues[0]!.eventId, 'evt_1');
+  assert.equal(state.venues[0]!.sessionLabel, 'сб, 12:00');
+});
+
 test('venueMatchesRouteSlug rejects stale soft-nav payload', () => {
   const venueA = { id: 'venue_a', slug: 'park-a' };
   const venueB = { id: 'venue_b', slug: 'park-b' };

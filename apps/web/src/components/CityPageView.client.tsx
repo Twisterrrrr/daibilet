@@ -26,8 +26,11 @@ import { matchSightAfficheLink, resolveFeaturedDirections } from '@/lib/city-hub
 import { resolveCityImageObjectPosition } from '@/lib/city-image-focus';
 import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
+import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
+import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
 import { resolveCityInfo, type CityInfoEntry, type CityMustSeeItem } from '@/lib/cityInfo';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
+import { dayRouteItemFromMustSee } from '@/lib/day-route-from-place';
 import { isOpenDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import {
   collectSessionStartsAtTimes,
@@ -1161,6 +1164,12 @@ function CitySightsSection({
           <p className={`mt-1 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
             Точки, с которых удобно начать знакомство с городом.
           </p>
+          <CityDayPresetBlock
+            places={places}
+            venues={venues}
+            city={city}
+            editorial={editorial}
+          />
           <ol className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {places.slice(0, 6).map((place, index) => {
               const afficheLink = matchSightAfficheLink({
@@ -1171,6 +1180,7 @@ function CitySightsSection({
                 citySlug,
               });
               const placeHref = resolveCityPlaceTitleHref(place, venues);
+              const dayRouteItem = dayRouteItemFromMustSee(place, venues, city);
               return (
               <li key={`${place.name}:${index}`} className="flex gap-3">
                 <span
@@ -1180,7 +1190,7 @@ function CitySightsSection({
                 >
                   {index + 1}
                 </span>
-                <div>
+                <div className="min-w-0 flex-1">
                   {placeHref ? (
                     <Link href={placeHref} className={`${titleClass} underline-offset-2 hover:underline`}>
                       {place.name}
@@ -1189,31 +1199,40 @@ function CitySightsSection({
                     <div className={titleClass}>{place.name}</div>
                   )}
                   <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>{place.desc}</p>
-                  {afficheLink ? (
-                    afficheLink.href.startsWith('#') ? (
-                      <a
-                        href={afficheLink.href}
-                        onClick={(event) => {
-                          event.preventDefault();
-                          scrollToSection(afficheLink.href.replace(/^#/, ''));
-                        }}
-                        className={`mt-2 inline-flex text-sm font-semibold ${
-                          editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
-                        }`}
-                      >
-                        {afficheLink.label} →
-                      </a>
-                    ) : (
-                      <Link
-                        href={afficheLink.href}
-                        className={`mt-2 inline-flex text-sm font-semibold ${
-                          editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
-                        }`}
-                      >
-                        {afficheLink.label} →
-                      </Link>
-                    )
-                  ) : null}
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    {dayRouteItem ? (
+                      <AddToDayRouteButton
+                        compact
+                        className="!min-h-9 !px-2.5 !py-1.5 !text-[11px]"
+                        venue={dayRouteItem}
+                      />
+                    ) : null}
+                    {afficheLink ? (
+                      afficheLink.href.startsWith('#') ? (
+                        <a
+                          href={afficheLink.href}
+                          onClick={(event) => {
+                            event.preventDefault();
+                            scrollToSection(afficheLink.href.replace(/^#/, ''));
+                          }}
+                          className={`inline-flex text-sm font-semibold ${
+                            editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
+                          }`}
+                        >
+                          {afficheLink.label} →
+                        </a>
+                      ) : (
+                        <Link
+                          href={afficheLink.href}
+                          className={`inline-flex text-sm font-semibold ${
+                            editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
+                          }`}
+                        >
+                          {afficheLink.label} →
+                        </Link>
+                      )
+                    ) : null}
+                  </div>
                 </div>
               </li>
             );

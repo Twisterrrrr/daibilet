@@ -6,11 +6,13 @@ import { ChevronDown, ChevronUp, Copy, ExternalLink, MapPin, Route, Sparkles, Tr
 import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
+import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { buildCatalogHref } from '@/lib/catalog-url';
 import {
   DAY_ROUTE_CHANGED_EVENT,
   DAY_ROUTE_MAX,
   DAY_ROUTE_MIN,
+  addToDayRoute,
   buildDayRouteCoordsMap,
   buildDayRouteSharePath,
   buildYandexMultiStopRouteUrl,
@@ -21,6 +23,7 @@ import {
   dayRouteSegmentMeters,
   enrichDayRouteFromMatchVenues,
   formatDayRouteDistance,
+  isInDayRoute,
   lookupDayRouteCoords,
   moveDayRouteVenue,
   optimizeDayRouteNearestNeighbor,
@@ -36,20 +39,22 @@ import {
 import { formatPriceFrom } from '@/lib/format';
 import { eventHref, venueHref } from '@/lib/routes';
 
+type MatchVenueStub = {
+  id: string;
+  slug: string | null;
+  title: string;
+  cityId: string | null;
+  cityTitle: string | null;
+  citySlug?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  heroImageUrl: string | null;
+};
+
 type MatchPayload = {
   cityId: string | null;
   multiCityWarning: boolean;
-  venues: Array<{
-    id: string;
-    slug: string | null;
-    title: string;
-    cityId: string | null;
-    cityTitle: string | null;
-    citySlug?: string | null;
-    latitude?: number | null;
-    longitude?: number | null;
-    heroImageUrl: string | null;
-  }>;
+  venues: MatchVenueStub[];
   matches: Array<{
     eventId: string;
     slug: string;
@@ -60,8 +65,26 @@ type MatchPayload = {
     coveragePct: number;
     covered: { stop: string[]; start: string[]; nearby: string[] };
     missing: string[];
+    routeVenues?: MatchVenueStub[];
   }>;
 };
+
+function matchVenueToDayRouteItem(venue: MatchVenueStub): DayRouteVenueItem {
+  return {
+    id: venue.id,
+    slug: venue.slug,
+    title: venue.title,
+    city: venue.cityTitle,
+    cityId: venue.cityId,
+    citySlug: venue.citySlug ?? null,
+    imageUrl: venue.heroImageUrl,
+    latitude: venue.latitude ?? null,
+    longitude: venue.longitude ?? null,
+    href: venue.slug
+      ? venueHref({ id: venue.id, slug: venue.slug, name: venue.title, type: 'park' })
+      : null,
+  };
+}
 
 export function DayRoutePanel() {
   return (
@@ -157,9 +180,22 @@ function DayRoutePanelInner() {
   const venueIds = useMemo(() => route.venues.map((v) => v.id).join(','), [route.venues]);
   const titleById = useMemo(() => {
     const map = new Map<string, string>();
-    for (const v of route.venues) map.set(v.id, v.title);
+    for (const v of route.venues) {
+      map.set(v.id, v.title);
+      if (v.slug) map.set(v.slug, v.title);
+    }
+    for (const v of payload?.venues || []) {
+      map.set(v.id, v.title);
+      if (v.slug) map.set(v.slug, v.title);
+    }
+    for (const match of payload?.matches || []) {
+      for (const v of match.routeVenues || []) {
+        map.set(v.id, v.title);
+        if (v.slug) map.set(v.slug, v.title);
+      }
+    }
     return map;
-  }, [route.venues]);
+  }, [route.venues, payload]);
 
   const mixedCities = useMemo(
     () => dayRouteHasMixedCities(route.venues) || Boolean(payload?.multiCityWarning),
@@ -196,10 +232,28 @@ function DayRoutePanelInner() {
     : citySlug
       ? `/locations?city=${encodeURIComponent(citySlug)}`
       : '/locations';
+  const venuesHref = cityTitle
+    ? `/venues?city=${encodeURIComponent(cityTitle)}`
+    : citySlug
+      ? `/venues?city=${encodeURIComponent(citySlug)}`
+      : '/venues';
+
+  const allMatchVenues = useMemo(() => {
+    const list: MatchVenueStub[] = [...(payload?.venues || [])];
+    const seen = new Set(list.map((v) => v.id));
+    for (const match of payload?.matches || []) {
+      for (const v of match.routeVenues || []) {
+        if (seen.has(v.id)) continue;
+        seen.add(v.id);
+        list.push(v);
+      }
+    }
+    return list;
+  }, [payload]);
 
   const coordsById = useMemo(
-    () => buildDayRouteCoordsMap(route.venues, payload?.venues || []),
-    [route.venues, payload?.venues],
+    () => buildDayRouteCoordsMap(route.venues, allMatchVenues),
+    [route.venues, allMatchVenues],
   );
 
   const orderedCoords = useMemo(
@@ -231,7 +285,16 @@ function DayRoutePanelInner() {
         if (!data) return;
         setPayload(data);
         // Pull coords into localStorage; DAY_ROUTE_CHANGED syncs React state.
-        enrichDayRouteFromMatchVenues(data.venues || []);
+        const stubs = [...(data.venues || [])];
+        const seen = new Set(stubs.map((v) => v.id));
+        for (const match of data.matches || []) {
+          for (const v of match.routeVenues || []) {
+            if (seen.has(v.id)) continue;
+            seen.add(v.id);
+            stubs.push(v);
+          }
+        }
+        enrichDayRouteFromMatchVenues(stubs);
       })
       .catch(() => undefined)
       .finally(() => setLoading(false));
@@ -345,6 +408,35 @@ function DayRoutePanelInner() {
               Лимит {DAY_ROUTE_MAX} точек. Удалите одну, чтобы добавить другую.
             </p>
           ) : null}
+          {!atMax ? (
+            <div
+              className={`mt-4 rounded-2xl border px-4 py-4 sm:px-5 ${
+                belowMin ? 'border-sky-300 bg-sky-50' : 'border-slate-200 bg-white'
+              }`}
+            >
+              <p className={`text-sm font-semibold ${belowMin ? 'text-sky-950' : 'text-slate-900'}`}>
+                Добавить точку
+              </p>
+              <p className={`mt-1 text-sm leading-relaxed ${belowMin ? 'text-sky-800' : 'text-slate-600'}`}>
+                Точки добавляются кнопкой «В мой маршрут» на карточках мест. Карточки экскурсий ниже - это ссылки
+                на покупку, а не добавление стопов.
+              </p>
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                <Link
+                  href={locationsHref}
+                  className="inline-flex min-h-11 items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-600"
+                >
+                  Локации города
+                </Link>
+                <Link
+                  href={venuesHref}
+                  className="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+                >
+                  Площадки и музеи
+                </Link>
+              </div>
+            </div>
+          ) : null}
 
           <section className="mt-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
@@ -439,74 +531,118 @@ function DayRoutePanelInner() {
               {(payload?.matches || []).map((match) => {
                 const fullCovered = dayRouteFullCoveredCount(match.covered);
                 const nearCount = match.covered.nearby.length;
+                const addable = (match.routeVenues || []).filter(
+                  (v) => !isInDayRoute(v.id) && !(v.slug && isInDayRoute(v.slug)),
+                );
+                const canBulkAdd = addable.length > 0 && !atMax;
                 return (
                   <li
                     key={match.eventId}
-                    className="flex gap-3 rounded-2xl border border-slate-200 bg-white p-3 sm:p-4"
+                    className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 sm:p-4"
                   >
-                    <Link
-                      href={eventHref({ slug: match.slug, id: match.eventId })}
-                      className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-20 sm:w-20"
-                    >
-                      <SafeImage
-                        src={match.imageUrl}
-                        alt=""
-                        fill
-                        sizes={IMAGE_SIZES.favoritesThumb}
-                        className="object-cover"
-                      />
-                    </Link>
-                    <div className="min-w-0 flex-1">
+                    <div className="flex gap-3">
                       <Link
                         href={eventHref({ slug: match.slug, id: match.eventId })}
-                        className="line-clamp-2 text-sm font-semibold text-slate-900 hover:text-primary-700"
+                        className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-20 sm:w-20"
                       >
-                        {match.title}
+                        <SafeImage
+                          src={match.imageUrl}
+                          alt=""
+                          fill
+                          sizes={IMAGE_SIZES.favoritesThumb}
+                          className="object-cover"
+                        />
                       </Link>
-                      <p className="mt-1 text-xs text-slate-500">
-                        {fullCovered} из {route.venues.length} точек
-                        {nearCount ? ` · ещё ${nearCount} рядом` : ''}
-                        {match.priceFromRub != null ? ` · ${formatPriceFrom(match.priceFromRub)}` : ''}
-                      </p>
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {match.covered.stop.map((id) => (
-                          <span
-                            key={`stop-${id}`}
-                            className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800"
-                            title={titleById.get(id) || id}
-                          >
-                            в маршруте · {titleById.get(id) || 'точка'}
-                          </span>
-                        ))}
-                        {match.covered.start.map((id) => (
-                          <span
-                            key={`start-${id}`}
-                            className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-800"
-                            title={titleById.get(id) || id}
-                          >
-                            старт · {titleById.get(id) || 'точка'}
-                          </span>
-                        ))}
-                        {match.covered.nearby.map((id) => (
-                          <span
-                            key={`near-${id}`}
-                            className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800"
-                            title={titleById.get(id) || id}
-                          >
-                            рядом · {titleById.get(id) || 'точка'}
-                          </span>
-                        ))}
-                        {match.missing.map((id) => (
-                          <span
-                            key={`miss-${id}`}
-                            className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500"
-                            title={titleById.get(id) || id}
-                          >
-                            нет · {titleById.get(id) || 'точка'}
-                          </span>
-                        ))}
+                      <div className="min-w-0 flex-1">
+                        <Link
+                          href={eventHref({ slug: match.slug, id: match.eventId })}
+                          className="line-clamp-2 text-sm font-semibold text-slate-900 hover:text-primary-700"
+                        >
+                          {match.title}
+                        </Link>
+                        <p className="mt-1 text-xs text-slate-500">
+                          {fullCovered} из {route.venues.length} точек
+                          {nearCount ? ` · ещё ${nearCount} рядом` : ''}
+                          {match.priceFromRub != null ? ` · ${formatPriceFrom(match.priceFromRub)}` : ''}
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {match.covered.stop.map((id) => (
+                            <span
+                              key={`stop-${id}`}
+                              className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800"
+                              title={titleById.get(id) || id}
+                            >
+                              в маршруте · {titleById.get(id) || 'точка'}
+                            </span>
+                          ))}
+                          {match.covered.start.map((id) => (
+                            <span
+                              key={`start-${id}`}
+                              className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-800"
+                              title={titleById.get(id) || id}
+                            >
+                              старт · {titleById.get(id) || 'точка'}
+                            </span>
+                          ))}
+                          {match.covered.nearby.map((id) => (
+                            <span
+                              key={`near-${id}`}
+                              className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800"
+                              title={titleById.get(id) || id}
+                            >
+                              рядом · {titleById.get(id) || 'точка'}
+                            </span>
+                          ))}
+                          {match.missing.map((id) => (
+                            <span
+                              key={`miss-${id}`}
+                              className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500"
+                              title={titleById.get(id) || id}
+                            >
+                              нет · {titleById.get(id) || 'точка'}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
+                    {canBulkAdd ? (
+                      <div className="border-t border-slate-100 pt-3">
+                        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                          Места экскурсии не в маршруте
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {addable.slice(0, 6).map((venue) => (
+                            <div
+                              key={venue.id}
+                              className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 py-0.5 pl-2.5 pr-1"
+                            >
+                              <span className="truncate text-[11px] font-medium text-slate-700">
+                                {venue.title}
+                              </span>
+                              <AddToDayRouteButton
+                                compact
+                                className="!min-h-8 !px-2 !py-1 !text-[10px]"
+                                venue={matchVenueToDayRouteItem(venue)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        <button
+                          type="button"
+                          className="mt-2 inline-flex min-h-10 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900 hover:bg-emerald-100"
+                          onClick={() => {
+                            let next = readDayRoute();
+                            for (const venue of addable) {
+                              if (next.venues.length >= DAY_ROUTE_MAX) break;
+                              next = addToDayRoute(matchVenueToDayRouteItem(venue));
+                            }
+                            setRoute(next);
+                          }}
+                        >
+                          Добавить места экскурсии ({Math.min(addable.length, DAY_ROUTE_MAX - route.venues.length)})
+                        </button>
+                      </div>
+                    ) : null}
                   </li>
                 );
               })}
@@ -582,6 +718,11 @@ function DayRouteVenueCard({
             {venue.title}
           </Link>
           {venue.city ? <p className="mt-0.5 truncate text-xs text-slate-500">{venue.city}</p> : null}
+          {venue.sessionLabel ? (
+            <p className="mt-1 inline-flex items-center rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-800">
+              {venue.sessionLabel}
+            </p>
+          ) : null}
           {!hasCoords ? <p className="mt-0.5 text-[11px] font-medium text-amber-700">Нет координат</p> : null}
         </div>
         <button

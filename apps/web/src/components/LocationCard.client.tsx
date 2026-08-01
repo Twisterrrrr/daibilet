@@ -98,7 +98,7 @@ export function LocationCard({
           )}
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-col p-4 pr-14">
+        <div className="flex min-w-0 flex-1 flex-col p-4 pr-28 sm:pr-32">
           <div className="flex items-start justify-between gap-3">
             <h3 className="line-clamp-2 text-base font-semibold text-slate-900 group-hover:text-primary-600">
               {venue.name}
@@ -151,7 +151,16 @@ export function LocationCard({
         </div>
       </Link>
 
-      <div className="absolute right-2 top-2 z-10">
+      <div
+        className="absolute right-1.5 top-1.5 z-20"
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+        }}
+        onPointerDown={(event) => {
+          event.stopPropagation();
+        }}
+      >
         <AddToDayRouteButton
           key={venue.id}
           compact

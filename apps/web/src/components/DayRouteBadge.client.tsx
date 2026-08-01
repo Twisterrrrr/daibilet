@@ -29,7 +29,7 @@ export function DayRouteBadge({ className = '' }: { className?: string }) {
       className={`relative inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg px-2 text-graphite-muted transition hover:bg-surface-muted hover:text-graphite sm:px-2.5 ${className}`}
     >
       <Route className="h-5 w-5" strokeWidth={1.75} />
-      <span className="hidden text-xs font-semibold sm:inline">
+      <span className="text-xs font-semibold">
         {count > 0 ? `Маршрут · ${count}` : 'Маршрут'}
       </span>
       {count > 0 ? (

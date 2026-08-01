@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Calendar, ChevronRight, MapPin, Shield, Users } from 'lucide-react';
 
 import type { PublicEventPageDto } from '@daibilet/contracts/public';
+import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import {
   extractTcEventIdFromSession,
   listPurchasableSessionVariants,
@@ -23,6 +24,7 @@ import {
   isFlexibleScheduleSession,
   scrollToBuyCard,
 } from '@/lib/event-page-utils';
+import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
 import { buildEventBreadcrumbs } from '@/lib/structured-data';
 import { resolveEventHeroObjectPosition } from '@/lib/event-image-focus';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
@@ -76,6 +78,25 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
       null
     : null;
   const buyButtonClass = 'btn-primary w-full py-3.5 text-base';
+  const nextSession = pickRepresentativeSession(sessions as EventSession[]);
+  const dayRouteVenue = dayRouteItemFromEvent({
+    id: event.id,
+    slug: event.slug,
+    title: event.title,
+    city: event.city,
+    cityId: event.cityId,
+    citySlug: event.citySlug,
+    venueId: event.venueId,
+    venueSlug: event.venueSlug,
+    venue: event.venue,
+    venueKind: event.venueKind,
+    venueLatitude: event.venueLatitude,
+    venueLongitude: event.venueLongitude,
+    startsAt: nextSession?.startsAt,
+    dateLabel: nextSession?.dateLabel,
+    timeLabel: nextSession?.timeLabel,
+    imageUrl: event.imageUrl,
+  });
 
   return (
     <div className="rounded-card border border-slate-200 bg-white p-6 shadow-card sm:p-7">
@@ -88,6 +109,11 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
         <p className="text-lg font-semibold text-graphite-muted">Цена уточняется</p>
       )}
 
+      {dayRouteVenue ? (
+        <div className="mt-4">
+          <AddToDayRouteButton intent="day" className="w-full !rounded-xl" venue={dayRouteVenue} />
+        </div>
+      ) : null}
       {showMultiPurchase ? (
         <div className="mt-6">
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-graphite-muted">

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Clock, MapPin, Star, Ticket, Users } from 'lucide-react';
 
 import { EventFavoriteButton } from '@/components/EventFavoriteButton.client';
+import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import {
   CatalogPurchaseAnchors,
   CatalogPurchaseChip,
@@ -38,6 +39,7 @@ import {
   resolveEventCardDestinationLabel,
   resolveEventCardLocationLabel,
 } from '@/lib/event-location';
+import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
 import { formatPriceFrom } from '@/lib/format';
 import { trackProductCardClick } from '@/lib/catalog-analytics';
 import { eventHref } from '@/lib/routes';
@@ -115,6 +117,25 @@ export function EventCard({
   const purchase = useCatalogPurchase(session);
   // Catalog list: no hidden widget DOM. Purchase UX lives on event page / landing CTA.
   const showPurchaseWidgets = landingActions && !suppressPurchaseAnchors && purchase.purchaseEnabled;
+  const dayRouteVenue = dayRouteItemFromEvent({
+    id: session.id,
+    slug: session.slug,
+    title: session.title,
+    city: session.city,
+    cityId: 'cityId' in session ? session.cityId : undefined,
+    citySlug: session.citySlug,
+    venueId: 'venueId' in session ? session.venueId : undefined,
+    venueSlug: session.venueSlug,
+    venue: session.venue,
+    venueKind: session.venueKind,
+    venueLatitude: 'venueLatitude' in session ? (session as { venueLatitude?: number | null }).venueLatitude : undefined,
+    venueLongitude:
+      'venueLongitude' in session ? (session as { venueLongitude?: number | null }).venueLongitude : undefined,
+    startsAt: session.startsAt,
+    dateLabel: session.dateLabel,
+    timeLabel: session.timeLabel,
+    imageUrl: session.imageUrl,
+  });
 
   const cardBody = (
     <>
@@ -292,11 +313,19 @@ export function EventCard({
             />
           ) : (
             <>
-              {priceFooterLabel ? (
-                <span className="text-ui-sm font-bold text-graphite sm:text-base">{priceFooterLabel}</span>
-              ) : (
-                <span />
-              )}
+              <div className="relative z-[2] flex min-w-0 flex-1 flex-wrap items-center gap-2">
+                {priceFooterLabel ? (
+                  <span className="text-ui-sm font-bold text-graphite sm:text-base">{priceFooterLabel}</span>
+                ) : null}
+                {dayRouteVenue ? (
+                  <AddToDayRouteButton
+                    intent="day"
+                    compact
+                    className="!min-h-9 !px-2.5 !py-1.5 !text-[11px]"
+                    venue={dayRouteVenue}
+                  />
+                ) : null}
+              </div>
               <Link
                 href={href}
                 className={DETAILS_LINK_CLASS}

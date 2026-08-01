@@ -31,6 +31,8 @@ export type DayRouteMatchItem = {
   coveragePct: number;
   covered: DayRouteCovered;
   missing: string[];
+  /** Start + STOP venues of the excursion (stubs for «добавить в маршрут»). */
+  routeVenues: DayRouteMatchVenue[];
 };
 
 export type DayRouteMatchPayload = {
@@ -42,6 +44,67 @@ export type DayRouteMatchPayload = {
 
 const MATCH_LIMIT = 24;
 const BBOX_DEG = 0.005;
+
+function toMatchVenueDto(venue: {
+  id: string;
+  slug: string | null;
+  title: string;
+  cityId: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  heroImageUrl: string | null;
+  city?: { title: string; slug: string } | null;
+}): DayRouteMatchVenue {
+  return {
+    id: venue.id,
+    slug: venue.slug,
+    title: venue.title,
+    cityId: venue.cityId,
+    cityTitle: venue.city?.title ?? null,
+    citySlug: venue.city?.slug ?? null,
+    latitude: venue.latitude,
+    longitude: venue.longitude,
+    heroImageUrl: venue.heroImageUrl,
+  };
+}
+
+function collectEventRouteVenues(event: {
+  venueId: string | null;
+  venue: {
+    id: string;
+    slug: string | null;
+    title: string;
+    cityId: string | null;
+    latitude: number | null;
+    longitude: number | null;
+    heroImageUrl: string | null;
+    city?: { title: string; slug: string } | null;
+  } | null;
+  routeItems: Array<{
+    venueId: string;
+    venue: {
+      id: string;
+      slug: string | null;
+      title: string;
+      cityId: string | null;
+      latitude: number | null;
+      longitude: number | null;
+      heroImageUrl: string | null;
+      city?: { title: string; slug: string } | null;
+    } | null;
+  }>;
+}): DayRouteMatchVenue[] {
+  const out: DayRouteMatchVenue[] = [];
+  const seen = new Set<string>();
+  const push = (venue: Parameters<typeof toMatchVenueDto>[0] | null | undefined) => {
+    if (!venue?.id || seen.has(venue.id)) return;
+    seen.add(venue.id);
+    out.push(toMatchVenueDto(venue));
+  };
+  push(event.venue);
+  for (const item of event.routeItems) push(item.venue);
+  return out;
+}
 
 export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteMatchPayload> {
   const locators = [...new Set(venueIds.map(String).filter(Boolean))].slice(0, 8);
@@ -172,6 +235,7 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
       coveragePct: coveragePct(covered, ids.length),
       covered,
       missing,
+      routeVenues: collectEventRouteVenues(event),
     });
   }
 
@@ -201,10 +265,35 @@ const eventSelect = {
   imageUrl: true,
   priceFromRub: true,
   venueId: true,
-  venue: { select: { latitude: true, longitude: true } },
+  venue: {
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      cityId: true,
+      latitude: true,
+      longitude: true,
+      heroImageUrl: true,
+      city: { select: { title: true, slug: true } },
+    },
+  },
   routeItems: {
     where: { role: 'STOP' as const },
-    select: { venueId: true },
+    select: {
+      venueId: true,
+      venue: {
+        select: {
+          id: true,
+          slug: true,
+          title: true,
+          cityId: true,
+          latitude: true,
+          longitude: true,
+          heroImageUrl: true,
+          city: { select: { title: true, slug: true } },
+        },
+      },
+    },
   },
   override: { select: { imageUrl: true } },
 } as const;

@@ -87,7 +87,16 @@ export function InstitutionCard({ venue, href }: { venue: InstitutionCardVenue; 
         </div>
       </Link>
 
-      <div className="absolute right-3 top-3 z-10">
+      <div
+        className="absolute right-2 top-2 z-20"
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+        }}
+        onPointerDown={(event) => {
+          event.stopPropagation();
+        }}
+      >
         <AddToDayRouteButton
           key={venue.id}
           compact

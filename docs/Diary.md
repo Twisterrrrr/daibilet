@@ -1,3 +1,21 @@
+## 2026-08-01 - Day-route: owner «не добавляет 2-ю» - UX gap + catalog harden
+
+### Наблюдения
+- Live Playwright на `daibilet.ru`: catalog `/locations` и `/venues` 0→1→2→3 по `daibilet:dayRoute` и `data-day-route-count` **уже работает** (уникальные `data-venue-id`, LS_WRITE, badge sync). Soft-nav detail тоже 1→2.
+- Owner screenshot `/my-day` 1/8 Fontanka: баннер «добавьте ещё 1» без ссылок; карточки «Подходящие экскурсии» - только ссылки на событие (покрытие start/stop), не CTA добавления стопов.
+- Мобильная кнопка каталога была icon-only (~34px) поверх `<Link>` карточки - легко попасть в навигацию вместо add.
+
+### Решения
+- `/my-day`: блок «Добавить точку» → `/locations?city=…` + `/venues?city=…` + явная подсказка про «В мой маршрут».
+- Matches API: `routeVenues` (start+STOP stubs с coords); UI «Добавить места экскурсии» / chip «В маршрут».
+- Catalog: лейбл всегда виден, z-20 wrapper stopPropagation, badge «Маршрут · N» на mobile.
+- Phase-0: must-see CTA + presets + event add-from-event (в том же ship).
+
+### Проблемы
+- У многих water tours в БД нет STOP routeItems - bulk add с карточки экскурсии пуст; путь - CTA в каталог.
+
+---
+
 ## 2026-08-01 - Day-route: catalog stripped lat/lng (all locations «Нет координат»)
 
 ### Наблюдения
