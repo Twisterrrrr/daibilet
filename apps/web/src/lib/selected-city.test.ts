@@ -8,6 +8,7 @@ import {
   mergeStoredCityIntoEventsParams,
   mergeStoredCityIntoSearchParams,
   pathHrefWithSelectedCity,
+  resolveCatalogCityFilter,
   SELECTED_CITY_STORAGE_KEY,
 } from './selected-city.ts';
 
@@ -93,4 +94,15 @@ test('matchDestination resolves by name and slug', () => {
   assert.equal(matchDestination([...destinations], 'ufa')?.name, 'Уфа');
   assert.equal(matchDestination([...destinations], 'Уфа')?.slug, 'ufa');
   assert.equal(matchDestination([...destinations], 'all'), null);
+});
+
+test('resolveCatalogCityFilter maps slug via resolved label', () => {
+  const options: Array<[string, number]> = [
+    ['Москва', 10],
+    ['Уфа', 2],
+  ];
+  assert.equal(resolveCatalogCityFilter('Москва', options), 'Москва');
+  assert.equal(resolveCatalogCityFilter('moscow', options, 'Москва'), 'Москва');
+  assert.equal(resolveCatalogCityFilter('ufa', options, 'Уфа'), 'Уфа');
+  assert.equal(resolveCatalogCityFilter('all', options), 'all');
 });

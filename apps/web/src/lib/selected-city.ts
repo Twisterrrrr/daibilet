@@ -86,3 +86,22 @@ export function pathHrefWithSelectedCity(
   const query = params.toString();
   return query ? `${path}?${query}` : path;
 }
+
+/** Resolve `?city=` (title or slug) against catalog option titles. */
+export function resolveCatalogCityFilter(
+  urlCity: string,
+  cityOptions: Array<[string, number]>,
+  resolvedLabel?: string | null,
+): string {
+  const needle = urlCity.trim();
+  if (!needle || needle === 'all') return 'all';
+  const fromOptions = cityOptions.find(([name]) => name.toLowerCase() === needle.toLowerCase());
+  if (fromOptions) return fromOptions[0];
+  const label = String(resolvedLabel || '').trim();
+  if (label && label !== 'Все города') {
+    const byLabel = cityOptions.find(([name]) => name === label);
+    if (byLabel) return byLabel[0];
+    return label;
+  }
+  return needle;
+}

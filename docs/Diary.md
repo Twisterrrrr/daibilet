@@ -1,3 +1,24 @@
+## 2026-08-01 - `/locations?city=` empty (all cities) + day-route multi-add
+
+### Наблюдения
+- Owner: `/locations?city=*` показывает 0 площадок для любого города; «Мой день» по-прежнему max 1 точка на live.
+- API `:4000/api/public/venues?family=location` - 251 локация (СПб 20, Москва 29) - backend OK.
+- Origin `:3001/locations` - полный HTML (~286KB, pier/venue payload); внешний HTTPS через nginx - **пустой** HTML (~172KB, `venue_=0`) при `x-cache-status: HIT` + `proxy_cache_valid 200 30m`.
+- Root cause Bug A: soft-timeout 2.5s на catalog DTO → пустой SSR `venues=[]` → nginx кэширует пустой 200 на 30м для всех `?city=`.
+- Day-route: `a2c1b32` уже в source/BUILD, но soft-nav мог снова подставлять stale `initialPayload` (slug mismatch); CTA «Локации» из `/my-day` ставил `?city=slug` (moscow) вместо title → 0 строк фильтра.
+
+### Решения
+- `VenueListPage`: timeout 4s; при empty → `noStore()` + retry без empty fallback; client fetch safety-net в `LocationsCatalogView`.
+- City filter: `resolveCatalogCityFilter` (slug→label); DayRoutePanel locationsHref по `venue.city` title.
+- `VenuePageView`: применять SSR payload только если slug/id совпадает; иначе fetch; render venue тоже от matched props.
+- Ops: `rm -rf /var/cache/nginx/daibilet/*` + reload - после purge smoke Москва/СПб/Казань/Сочи `venue_>0`.
+
+### Проблемы
+- nginx `proxy_cache_valid 200 30m` всё ещё может отравиться любым пустым 200; noStore+retry снижает риск, полный bypass cache для empty - follow-up.
+- SPB `.16` pubkey denied → MSK in-place web build.
+
+---
+
 ## 2026-08-01 - Venue 404 «Модная среда 1823» (transport junk + gate deploy)
 
 ### Наблюдения

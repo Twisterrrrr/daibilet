@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useMemo, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { Search } from 'lucide-react';
 
 import { LocationCard } from '@/components/LocationCard.client';
@@ -13,7 +13,7 @@ import { useSelectedCityOptional } from '@/components/SelectedCityProvider.clien
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityToGenitive, cityToPrepositional } from '@/lib/city-declension';
 import { formatCountFloorTenPlus, formatNumber, pluralCities } from '@/lib/format';
-import { persistSelectedCity } from '@/lib/selected-city';
+import { persistSelectedCity, resolveCatalogCityFilter } from '@/lib/selected-city';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 import { LOCATION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, resolvePublicVenueType, venueTypeLabel } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
@@ -26,20 +26,41 @@ const SORT_OPTIONS: Array<[SortMode, string]> = [
   ['desc', 'Я–А'],
 ];
 
-export function LocationsCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
+export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueCatalogCard[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const selectedCity = useSelectedCityOptional();
+  const [venues, setVenues] = useState(initialVenues);
   const [query, setQuery] = useState('');
   const [sortMode, setSortMode] = useState<SortMode>('events');
   const [isPending, startTransition] = useTransition();
+  const [catalogLoading, setCatalogLoading] = useState(false);
+
+  useEffect(() => {
+    setVenues(initialVenues);
+  }, [initialVenues]);
+
+  // Safety net when SSR soft-timeout / nginx HIT served empty catalog.
+  useEffect(() => {
+    if (initialVenues.length > 0) return;
+    const controller = new AbortController();
+    setCatalogLoading(true);
+    fetch('/api/public/venues?family=location&limit=500', { signal: controller.signal })
+      .then(async (response) => (response.ok ? ((await response.json()) as { venues?: VenueCatalogCard[] }) : null))
+      .then((data) => {
+        if (data?.venues?.length) setVenues(data.venues);
+      })
+      .catch(() => undefined)
+      .finally(() => setCatalogLoading(false));
+    return () => controller.abort();
+  }, [initialVenues]);
 
   const urlCity = searchParams.get('city')?.trim() || '';
   const rawType = searchParams.get('type')?.trim() || '';
   const typeFilter = rawType ? normalizeVenueKind(rawType) : 'all';
   const cityReady = selectedCity?.cityReady ?? true;
   const cityPending = !urlCity && Boolean(selectedCity) && !cityReady;
-  const listPending = cityPending || isPending;
+  const listPending = cityPending || isPending || catalogLoading;
 
   const cityOptions = useMemo(() => {
     const counts = new Map<string, number>();
@@ -52,13 +73,10 @@ export function LocationsCatalogView({ venues }: { venues: VenueCatalogCard[] })
 
   const cityFilter = useMemo(() => {
     if (urlCity) {
-      const fromOptions = cityOptions.find(([name]) => name.toLowerCase() === urlCity.toLowerCase());
-      if (fromOptions) return fromOptions[0];
-      return urlCity;
+      return resolveCatalogCityFilter(urlCity, cityOptions, selectedCity?.cityLabel);
     }
     if (!cityReady || !selectedCity || selectedCity.cityValue === 'all') return 'all';
-    const fromOptions = cityOptions.find(([name]) => name === selectedCity.cityValue);
-    return fromOptions ? fromOptions[0] : selectedCity.cityValue;
+    return resolveCatalogCityFilter(selectedCity.cityValue, cityOptions, selectedCity.cityLabel);
   }, [urlCity, cityReady, selectedCity, cityOptions]);
 
   const setCityFilter = (next: string) => {

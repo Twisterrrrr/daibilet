@@ -15,7 +15,7 @@ import type { VenueCatalogCard } from '@/lib/venue-map-types';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityToGenitive } from '@/lib/city-declension';
 import { formatNumber, pluralCities, pluralEvents, pluralVenues } from '@/lib/format';
-import { persistSelectedCity } from '@/lib/selected-city';
+import { persistSelectedCity, resolveCatalogCityFilter } from '@/lib/selected-city';
 import { INSTITUTION_CATALOG_TYPE_OPTIONS, normalizeVenueKind, resolvePublicVenueType, venueTypeLabel } from '@/lib/venue-meta';
 import { venueHref } from '@/lib/routes';
 
@@ -78,13 +78,10 @@ export function VenuesCatalogView({ venues }: { venues: VenueCatalogCard[] }) {
 
   const cityFilter = useMemo(() => {
     if (urlCity) {
-      const fromOptions = cityOptions.find(([name]) => name.toLowerCase() === urlCity.toLowerCase());
-      if (fromOptions) return fromOptions[0];
-      return urlCity;
+      return resolveCatalogCityFilter(urlCity, cityOptions, selectedCity?.cityLabel);
     }
     if (!cityReady || !selectedCity || selectedCity.cityValue === 'all') return 'all';
-    const fromOptions = cityOptions.find(([name]) => name === selectedCity.cityValue);
-    return fromOptions ? fromOptions[0] : selectedCity.cityValue;
+    return resolveCatalogCityFilter(selectedCity.cityValue, cityOptions, selectedCity.cityLabel);
   }, [urlCity, cityReady, selectedCity, cityOptions]);
 
   useEffect(() => {

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { unstable_noStore as noStore } from 'next/cache';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 
@@ -23,8 +24,8 @@ import { resolveVenueSeoTitle } from '@/lib/venue-seo';
 
 /** Admission must not hang venue HTML when finance is slow. */
 const VENUE_ADMISSION_TIMEOUT_MS = 2500;
-/** Catalog list must not block /venues|/locations TTFB on cold DTO rebuild. */
-const VENUE_LIST_TIMEOUT_MS = 2500;
+/** Catalog list soft budget; empty fallback must not be cacheable (nginx 30m HIT). */
+const VENUE_LIST_TIMEOUT_MS = 4000;
 
 const EMPTY_ADMISSION: FinanceAdmissionListResult = {
   items: [],
@@ -120,7 +121,15 @@ export async function VenueListPage({ family }: Pick<PageProps, 'family'>) {
       `venue-list-${family}`,
     );
     venues = (payload.venues ?? []).map(toVenueCatalogCard);
+    // Soft-timeout empty HTML was poisoning nginx proxy_cache (30m HIT, 0 venues for every city).
+    if (!venues.length) {
+      noStore();
+      const retry = await getCachedVenuesCatalog(family, 500);
+      venues = (retry.venues ?? []).map(toVenueCatalogCard);
+      if (!venues.length) noStore();
+    }
   } catch {
+    noStore();
     venues = [];
   }
   return (

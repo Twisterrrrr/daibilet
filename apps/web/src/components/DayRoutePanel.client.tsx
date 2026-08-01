@@ -154,8 +154,34 @@ function DayRoutePanelInner() {
   const belowMin = route.venues.length > 0 && route.venues.length < DAY_ROUTE_MIN;
   const atMax = route.venues.length >= DAY_ROUTE_MAX;
   const citySlug = dayRouteDominantCitySlug(route.venues);
-  const afishaHref = citySlug ? buildCatalogHref({ city: citySlug }) : '/events';
-  const locationsHref = citySlug ? `/locations?city=${encodeURIComponent(citySlug)}` : '/locations';
+  const cityTitle = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const venue of route.venues) {
+      const title = String(venue.city || '').trim();
+      if (!title) continue;
+      counts.set(title, (counts.get(title) || 0) + 1);
+    }
+    let best: string | null = null;
+    let bestCount = 0;
+    for (const [title, count] of counts) {
+      if (count > bestCount) {
+        best = title;
+        bestCount = count;
+      }
+    }
+    return best;
+  }, [route.venues]);
+  const afishaHref = citySlug
+    ? buildCatalogHref({ city: citySlug })
+    : cityTitle
+      ? buildCatalogHref({ city: cityTitle })
+      : '/events';
+  // Catalog city filter matches venue.city titles; slug (moscow/spb) yields 0 rows.
+  const locationsHref = cityTitle
+    ? `/locations?city=${encodeURIComponent(cityTitle)}`
+    : citySlug
+      ? `/locations?city=${encodeURIComponent(citySlug)}`
+      : '/locations';
 
   useEffect(() => {
     if (!ready) return;

@@ -156,6 +156,7 @@ export function InstitutionVenueLayout({
                   slug: venue.slug,
                   title: venue.title || venue.name,
                   city: venue.city,
+                  cityId: venue.cityId,
                   citySlug: venue.citySlug,
                   href: venueHref(venue),
                   imageUrl: venue.heroImageUrl,

@@ -45,8 +45,16 @@ export function VenuePageView({
   React.useEffect(() => {
     // Soft-nav between /locations|venues/[slug] reuses this client tree. Without sync,
     // payload sticks on the previous venue and «В мой маршрут» toggles the wrong id
-    // (add second point → often removes the first). Prefer SSR payload; fetch only if absent.
-    if (initialPayload?.venue) {
+    // (add second point → often removes the first). Prefer SSR payload only when it matches slug.
+    const payloadSlug = String(initialPayload?.venue?.slug || '').trim();
+    const payloadId = String(initialPayload?.venue?.id || '').trim();
+    const payloadMatchesSlug =
+      Boolean(initialPayload?.venue) &&
+      (payloadSlug === slug ||
+        payloadId === slug ||
+        (payloadSlug && decodeURIComponent(payloadSlug) === slug));
+
+    if (payloadMatchesSlug && initialPayload) {
       setPayload(initialPayload);
       setContentReady(true);
       setError(null);
@@ -96,7 +104,21 @@ export function VenuePageView({
     () => buildVenueProgramGroups(baseSessions, 'all', null),
     [baseSessions],
   );
-  const venue = payload?.venue;
+  const venue = (() => {
+    const fromInitial = initialPayload?.venue;
+    if (fromInitial) {
+      const payloadSlug = String(fromInitial.slug || '').trim();
+      const payloadId = String(fromInitial.id || '').trim();
+      if (
+        payloadSlug === slug ||
+        payloadId === slug ||
+        (payloadSlug && decodeURIComponent(payloadSlug) === slug)
+      ) {
+        return fromInitial;
+      }
+    }
+    return payload?.venue;
+  })();
   const categories = venue ? Object.entries(venue.categories).sort((a, b) => b[1] - a[1]) : [];
   const pageTemplate = venue ? venuePageTemplate(venue.type) : 'location';
   const isLocationPage = pageTemplate === 'location';
