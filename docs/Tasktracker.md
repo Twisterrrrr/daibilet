@@ -61,7 +61,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | DR.10 | Badge «Маршрут · N» vs green «В маршруте» desync on /locations | Критический | ✅ `ff852a9` live BUILD `spsgbupFbWeJyWDuz2XNi` |
 | DR.12 | False «Уже в маршруте» on catalog add (id↔slug cross-match) | Критический | ✅ `6c604f3` live BUILD `1HV6yidGN5MSbZU4idc7s` |
 | DR.11 | Multi-add still broken for owner: inert SSR button + catalog toggle-off | Критический | ✅ `d9b639c` live BUILD `S_RAZ0azumKgT_beN19UH` |
-| DR.13 | Toast «Не удалось добавить точку» on 2nd same-city add (write/LS) | Критический | 🔄 in progress |
+| DR.13 | Toast «Не удалось добавить точку» on 2nd same-city add (write/LS) | Критический | ✅ `9bbe493` live BUILD `WKT1rWN1718h0x0jsrX5K` |
 | LOC.EMPTY | `/locations?city=` empty for all cities: soft-timeout empty HTML + nginx 30m HIT | Критический | ✅ `987516b` BUILD `IffsRTTeclktlvq7PQweq` + nginx purge |
 | LOC.FACET | `/locations` type chip counts global (151) vs city (20); default «Все локации» | Критический | ✅ `bc994b6` BUILD `4-AqPsButr_VcuwLGcyFk` |
 

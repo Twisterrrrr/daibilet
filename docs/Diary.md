@@ -14,7 +14,7 @@
 - Unit: quota fail keeps 1; slim retry; null vs cityId same title appends.
 
 ### Проблемы
-- Нужен MSK deploy + тот же E2E зелёный с toast «Добавлено».
+- ~~Нужен MSK deploy + тот же E2E зелёный~~ → MSK `9bbe493` **BUILD_ID=`WKT1rWN1718h0x0jsrX5K`**. `scripts/e2e-day-route-multiadd.mjs` 1→2→3 desktop/mobile + hard/soft detail: toast «Добавлено · N/8». Poisoned snapshotCache больше не затирает 1-ю точку (fresh LS read).
 
 ---
 
