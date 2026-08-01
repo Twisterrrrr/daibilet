@@ -196,20 +196,23 @@ In-process fallback (only if cron/timer off): TEP_AUTO_SYNC_ENABLED=1 with 45min
 
 ## Prod: SSR warm + healthcheck (`daibilet-tasks`)
 
-Канон MSK (INC.504.17 / INC.504.19): один файл `/etc/cron.d/daibilet-tasks`.
+Канон MSK (INC.504.17 / INC.504.19 / INC.504.20): один файл `/etc/cron.d/daibilet-tasks` + скрипт `ssr-healthcheck.sh`.
 
 ```bash
-cp /opt/daibilet/deploy/cron/daibilet-tasks /etc/cron.d/daibilet-tasks
+install -m 755 deploy/cron/ssr-healthcheck.sh /opt/daibilet/deploy/cron/ssr-healthcheck.sh
+cp deploy/cron/daibilet-tasks /etc/cron.d/daibilet-tasks
 chmod 644 /etc/cron.d/daibilet-tasks
 # trailing newline required; do not install legacy daibilet-warm-hubs alongside
 ```
 
 | Job | Schedule | Notes |
 |-----|----------|-------|
-| warm hubs | `*/12` | flock + `timeout 90s`; log `/var/log/daibilet/warm-hubs.log` |
-| SSR healthcheck | `* * * * *` | curl fail **or** TTFB>5s → restart web + `pkill -f '[w]arm-hub-pages'`; flock anti-thrash; log `/var/log/daibilet/ssr-health.log` |
+| warm hubs | **OFF** (INC.504.20) | commented; optional `0 */2` after hang root cause closed |
+| SSR healthcheck | `* * * * *` | `ssr-healthcheck.sh` via flock+timeout 90s; curl fail **or** TTFB>5s → **SIGKILL+start** + `pkill -f '[w]arm-hub-pages'`; log `/var/log/daibilet/ssr-health.log` |
 
 INC.504.19: не писать `TTFB=$(curl … \|\| echo 999)` - при hang multiline ломает `bc` и restart никогда не срабатывает.
+
+INC.504.20: **не** держать inline `date +%Y…` / `%{time_…}` без `\%` в `/etc/cron.d/*` - cron трактует голый `%` как newline и обрезает CMD (healthcheck «стрелял» каждую минуту, но restart-ветка была мертва). Логика вынесена в `deploy/cron/ssr-healthcheck.sh`. Dry: `DAIBILET_SSR_HEALTH_DRY_RUN=1 DAIBILET_SSR_HEALTH_URL=http://127.0.0.1:39999/ /opt/daibilet/deploy/cron/ssr-healthcheck.sh`.
 
 ### OOM watch
 `ash

@@ -1,3 +1,26 @@
+## 2026-08-01 - INC.504.20: SSR hang снова (owner fury) + cron `%` убивал healthcheck
+
+### Наблюдения
+- Owner: «ЕПРСТ! опять SSR???» - live hang `:3001` `/` и `/events` curl **timeout 0 bytes**.
+- `daibilet-web` active, MemoryCurrent **~1.6G** / MemoryMax 2G / MemoryHigh 1.5G; next-server не отвечал.
+- Warm procs в момент обнаружения не было; warm log последнее окно `12/12 ok` (~17:12 UTC).
+- Cron healthcheck **стрелял каждую минуту** (syslog), но `ssr-health.log` пуст и `journalctl -t daibilet-ssr-health` пуст → restart никогда не выполнялся.
+- Root cause ops: в `/etc/cron.d/daibilet-tasks` inline `date -u +%Y-…` с **голым `%`**. Cron трактует `%` как newline и обрезает CMD на `date -u +` → `bash -lc` syntax error (stderr в void, No MTA). Фикс INC.504.19 (`CODE=$?`) был в файле, но restart-ветка мертва из-за `%`.
+- Prisma `Connection terminated` в этом окне в journal не всплыл; peak memory ~1.5G на stop.
+
+### Решения
+- Immediate: `pkill -f '[w]arm-hub-pages'`; SIGKILL + `systemctl start daibilet-web` → Ready; local TTFB **~0.01-0.03s** 200; external **~0.05-0.07s** 200.
+- **Warm OFF** в live `/etc/cron.d/daibilet-tasks` (было `*/12`; commented, optional `0 */2` later).
+- Healthcheck вынесен в `deploy/cron/ssr-healthcheck.sh` (нет `%` в cron.d); recovery = **SIGKILL+start** (не `restart`, который зависает на hung Next); flock + `timeout 90s`.
+- Dry: live BAD=0; closed-port `DAIBILET_SSR_HEALTH_DRY_RUN=1` → log+logger, без kill.
+- Repo canon + Diary/Tasktracker; docs/cron commit+push, **без** web redeploy.
+
+### Проблемы
+- Root cause hang (event-loop / SWR / INC.504.15 Prisma) open. Warm временно выключен как mitigation нагрузки.
+- Любой будущий inline `%` в cron.d без `\%` снова обезвредит job - держать логику в `.sh`.
+
+---
+
 ## 2026-08-01 - Day-route: badge «1» vs 3× «В маршруте» desync
 
 ### Наблюдения
