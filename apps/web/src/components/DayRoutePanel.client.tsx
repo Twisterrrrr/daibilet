@@ -534,7 +534,9 @@ function DayRoutePanelInner() {
                 const addable = (match.routeVenues || []).filter(
                   (v) => !isInDayRoute(v.id) && !(v.slug && isInDayRoute(v.slug)),
                 );
-                const canBulkAdd = addable.length > 0 && !atMax;
+                const showAddablePlaces = addable.length > 0 && !atMax;
+                const bulkAddCount = Math.min(addable.length, DAY_ROUTE_MAX - route.venues.length);
+                const showBulkAdd = showAddablePlaces && bulkAddCount >= 2;
                 return (
                   <li
                     key={match.eventId}
@@ -605,7 +607,7 @@ function DayRoutePanelInner() {
                         </div>
                       </div>
                     </div>
-                    {canBulkAdd ? (
+                    {showAddablePlaces ? (
                       <div className="border-t border-slate-100 pt-3">
                         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
                           Места экскурсии не в маршруте
@@ -627,20 +629,22 @@ function DayRoutePanelInner() {
                             </div>
                           ))}
                         </div>
-                        <button
-                          type="button"
-                          className="mt-2 inline-flex min-h-10 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900 hover:bg-emerald-100"
-                          onClick={() => {
-                            let next = readDayRoute();
-                            for (const venue of addable) {
-                              if (next.venues.length >= DAY_ROUTE_MAX) break;
-                              next = addToDayRoute(matchVenueToDayRouteItem(venue));
-                            }
-                            setRoute(next);
-                          }}
-                        >
-                          Добавить места экскурсии ({Math.min(addable.length, DAY_ROUTE_MAX - route.venues.length)})
-                        </button>
+                        {showBulkAdd ? (
+                          <button
+                            type="button"
+                            className="mt-2 inline-flex min-h-10 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900 hover:bg-emerald-100"
+                            onClick={() => {
+                              let next = readDayRoute();
+                              for (const venue of addable) {
+                                if (next.venues.length >= DAY_ROUTE_MAX) break;
+                                next = addToDayRoute(matchVenueToDayRouteItem(venue));
+                              }
+                              setRoute(next);
+                            }}
+                          >
+                            Добавить места экскурсии ({bulkAddCount})
+                          </button>
+                        ) : null}
                       </div>
                     ) : null}
                   </li>
