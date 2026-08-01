@@ -7314,7 +7314,9 @@ function isTransportVehicleVenueName(name) {
   const text = String(name || '').trim();
   if (!text) return false;
   if (/^yutong\b|^маз\b|^паз\b|^hyundai\b|^mercedes\b|^volvo\b|^man\b|^ikarus\b/i.test(text)) return true;
-  if (/^[a-zа-яё][a-zа-яё\s-]{0,20}\d{3,5}$/i.test(text) && text.length <= 28) return true;
+  // Fleet-style single token + digits ("Yutong 1234", "МАЗ123"). Multi-word titles with a year
+  // ("Модная среда 1823") must NOT match - they are real venues, not bus fleet labels.
+  if (/^[a-zа-яё][a-zа-яё-]{0,20}\s?\d{3,5}$/i.test(text) && text.length <= 28) return true;
   return false;
 }
 
@@ -7323,7 +7325,9 @@ function isJunkPublicVenueRow(row) {
   const address = String(row?.address || '').trim();
   const text = venueNameAddressText(name, address);
 
-  if (isTransportVehicleVenueName(name)) return true;
+  const storedKind = normalizeVenueKindValue(row?.kind || row?.proposedKind);
+  // Institution venues (clubs/halls/museums) are never "bus fleet" junk even if title ends with digits.
+  if (isTransportVehicleVenueName(name) && !INSTITUTION_VENUE_KINDS.has(storedKind)) return true;
   if (/^на парковке\b|парковк.*турист|турист.*транспорт|парковка.*(?:трц|торгов|молл)/i.test(text)) {
     if (Number(row?.busEvents || 0) <= 0) return true;
   }
