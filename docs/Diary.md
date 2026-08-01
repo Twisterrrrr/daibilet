@@ -67,7 +67,7 @@
 - Unit: catalog cityId + text same title → not mixed.
 
 ### Проблемы
-- Нужен MSK deploy + smoke: catalog + text все СПб → нет warning; matches работают.
+- ~~Нужен MSK deploy + smoke: catalog + text все СПб → нет warning; matches работают~~ → MSK `705d13d` (в `fc4e419`) **BUILD_ID=`uAAeJS3sG_GuPNfbwQqKy`**. Chunk `6404` содержит `normalizeDayRouteCityTitle` (`replace(/ё/g` + `[\s\-]+`). Unit 33/33; matches `tochka-sbora` → address+coords, `multiCityWarning=false`.
 
 ---
 
