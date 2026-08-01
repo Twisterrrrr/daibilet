@@ -11,6 +11,7 @@ import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
+import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import { evaluateVenueIndexability, robotsForIndexability } from '@/lib/hub-indexability';
 import { venueHref } from '@/lib/routes';
 import { pageTitle, buildShareMetadata } from '@/lib/seo-meta';
@@ -38,32 +39,6 @@ type PageProps = {
   family: 'institution' | 'location';
   listPath: '/venues' | '/locations';
 };
-
-function toVenueCatalogCard(venue: {
-  id: string;
-  slug?: string | null;
-  name: string;
-  city: string;
-  address?: string | null;
-  type: string;
-  events: number;
-  shortDescription?: string | null;
-  heroImageUrl?: string | null;
-  nextSlot?: string | null;
-}): VenueCatalogCard {
-  return {
-    id: venue.id,
-    slug: String(venue.slug || venue.id),
-    name: venue.name,
-    city: venue.city,
-    address: venue.address ?? null,
-    type: venue.type,
-    events: venue.events || 0,
-    shortDescription: venue.shortDescription ?? null,
-    heroImageUrl: venue.heroImageUrl ?? null,
-    nextSlot: venue.nextSlot ?? null,
-  };
-}
 
 export async function generateVenueListMetadata(
   title: string,

@@ -1,3 +1,21 @@
+## 2026-08-01 - Day-route: catalog stripped lat/lng (all locations «Нет координат»)
+
+### Наблюдения
+- Owner screenshot: «Причал на Фонтанке 53» в Мой день с «Нет координат», Яндекс заблокирован, 1/8.
+- Live API detail/matches: у Fontanka / tochka-sbora coords **есть**. SPb locations catalog API: **20/20 (100%)** с coords.
+- Playwright: multi-add 1→2→3 на live **уже работает** (detail soft-nav + catalog cards). Add с detail пишет lat/lng в localStorage.
+- Add с `/locations` catalog: lat/lng в storage **null** сразу после клика. Root cause: `toVenueCatalogCard` в `VenuePages` выкидывал latitude/longitude из SSR карточек (`VenueCatalogCard` без полей; SSR HTML `latitudeCount=0`). Enrich на `/my-day` подтягивал coords после matches, но до ответа UI показывал «Нет координат» (и owner воспринимал как поломку).
+
+### Решения
+- `VenueCatalogCard` + `toVenueCatalogCard` сохраняют lat/lng (reject 0,0); LocationCard Pick включает coords.
+- Unit: `venue-catalog-card.test.ts`. Phase-0 presets/event CTA отложены до после фикса.
+- MSK deploy + Playwright: catalog add пишет coords сразу; 3 точки без «Нет координат».
+
+### Проблемы
+- Старые записи в localStorage без coords: открыть `/my-day` (enrich) или передобавить после деплоя.
+
+---
+
 ## 2026-08-01 - Day-route: coords not pulled into «Мой день»
 
 ### Наблюдения

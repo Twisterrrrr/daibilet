@@ -53,7 +53,11 @@ export function LocationCard({
     | 'hookFact'
     | 'shortDescription'
     | 'stopEventCount'
-  >;
+    | 'latitude'
+    | 'longitude'
+  > & {
+    cityId?: string | null;
+  };
   href: string;
   nextSlot?: string | null;
 }) {

@@ -21,7 +21,13 @@ export type VenueCatalogCard = {
   slug?: string | null;
   name: string;
   city: string;
+  /** City entity id when API provides it (day-route bucket). */
+  cityId?: string | null;
+  citySlug?: string | null;
   address?: string | null;
+  /** Required for «Мой день» add-from-catalog (Yandex CTA). */
+  latitude?: number | null;
+  longitude?: number | null;
   type: string;
   events: number;
   shortDescription?: string | null;
