@@ -224,20 +224,35 @@ export function notifyDayRouteChanged() {
 }
 
 /**
- * True when any locator (id and/or slug) equals a stored venue id or slug.
+ * True when this venue is already in the day route.
  * Empty locators never match (avoids blank-id lighting every card).
+ *
+ * When both id and slug are provided, match via `sameDayRouteVenue` only
+ * (id↔id or slug↔slug). The older "any needle vs any stored id/slug" rule
+ * false-positived catalog adds when a stored slug collided with another
+ * venue's id (compact path then toasted «Уже в маршруте» and skipped add).
+ *
+ * Single locator (id or slug alone) still matches either stored field -
+ * share links / panel filters pass one token.
  */
 export function isInDayRoute(
   venueId: string,
   state = readDayRoute(),
   slug?: string | null,
 ): boolean {
-  const needles = [...new Set([String(venueId || '').trim(), String(slug ?? '').trim()].filter(Boolean))];
-  if (!needles.length) return false;
+  const id = String(venueId || '').trim();
+  const s = String(slug ?? '').trim();
+  if (!id && !s) return false;
+
+  if (id && s) {
+    return state.venues.some((v) => sameDayRouteVenue(v, { id, slug: s }));
+  }
+
+  const needle = id || s;
   return state.venues.some((v) => {
     const vid = String(v.id || '').trim();
     const vslug = String(v.slug || '').trim();
-    return needles.some((needle) => needle === vid || needle === vslug);
+    return needle === vid || needle === vslug;
   });
 }
 

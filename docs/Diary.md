@@ -1,3 +1,20 @@
+## 2026-08-01 - Day-route: false «Уже в маршруте» на чужой точке
+
+### Наблюдения
+- Owner: клик по локации, которой **нет** в маршруте → toast **«Уже в маршруте»**, точка не добавляется (BUILD `S_RAZ0azumKgT_beN19UH` / `d9b639c`).
+- Compact add-only после `d9b639c` вызывал `isInDayRoute(id, state, slug)` с правилом «любой needle == любой stored id/slug». Если в LS у точки A `slug` совпадал с `id` точки B (или наоборот), B ложно считалась уже в маршруте → early-return без `addToDayRoute`.
+- `feedbackAfter` при неизменном count всегда писал «Уже в маршруте», даже когда точки реально не было в storage.
+
+### Решения
+- `isInDayRoute` при **обоих** id+slug → только `sameDayRouteVenue` (id↔id или slug↔slug); одиночный locator по-прежнему матчит id или slug (share/panel).
+- Compact / intent=day / toast: membership только через `sameDayRouteVenue`; «Уже» только если точка реально в LS; иначе add → «Добавлено · N/8».
+- Unit: pathological `slug === otherVenue.id` не блокирует add; slug-as-id must-see ↔ catalog `venue_*`+same slug по-прежнему alias.
+
+### Проблемы
+- Нужен MSK deploy + Playwright: 0/1 в LS, клик 2 других локаций → оба ADD, без false «Уже».
+
+---
+
 ## 2026-08-01 - Day-route: owner «не более 1 точки» - inert SSR click + catalog toggle
 
 ### Наблюдения

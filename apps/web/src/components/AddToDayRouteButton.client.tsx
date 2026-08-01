@@ -12,6 +12,7 @@ import {
   normalizeDayRouteVenueId,
   readDayRoute,
   removeFromDayRoute,
+  sameDayRouteVenue,
   toggleDayRoute,
   type DayRouteVenueItem,
 } from '@/lib/day-route';
@@ -65,7 +66,7 @@ export function AddToDayRouteButton({
   const idleAria = intent === 'day' ? 'Добавить место события в мой день' : 'Добавить в маршрут дня';
   const activeAria = intent === 'day' ? 'Убрать место из моего дня' : 'Убрать из маршрута дня';
 
-  function feedbackAfter(beforeCount: number) {
+  function feedbackAfter(beforeCount: number, payload: DayRouteVenueItem) {
     const after = readDayRoute();
     const n = after.venues.length;
     if (n > beforeCount) {
@@ -84,7 +85,12 @@ export function AddToDayRouteButton({
       flashDayRouteFeedback('Нельзя добавить: нет id точки');
       return;
     }
-    flashDayRouteFeedback('Уже в маршруте');
+    // «Уже в маршруте» only when this exact venue is truly present (id↔id / slug↔slug).
+    if (after.venues.some((item) => sameDayRouteVenue(item, payload))) {
+      flashDayRouteFeedback('Уже в маршруте');
+      return;
+    }
+    flashDayRouteFeedback('Не удалось добавить точку');
   }
 
   function applyToggle() {
@@ -101,9 +107,7 @@ export function AddToDayRouteButton({
 
     if (intent === 'day') {
       const before = readDayRoute();
-      const existing = before.venues.find(
-        (item) => item.id === venueKey || (payload.slug && item.slug === payload.slug),
-      );
+      const existing = before.venues.find((item) => sameDayRouteVenue(item, payload));
       if (existing) {
         const sameEventMeta =
           (existing.eventId || null) === (payload.eventId || null) &&
@@ -117,28 +121,31 @@ export function AddToDayRouteButton({
       } else {
         addToDayRoute(payload);
       }
-      feedbackAfter(beforeCount);
+      feedbackAfter(beforeCount, payload);
       return;
     }
 
     // Catalog compact: ADD ONLY. Accidental second tap on a green chip must not
     // remove the only point (owner symptom «не добавляется более 1»).
     if (compact) {
-      if (isInDayRoute(venueKey, readDayRoute(), payload.slug)) {
+      const before = readDayRoute();
+      if (before.venues.some((item) => sameDayRouteVenue(item, payload))) {
+        // Merge coords / canonical id when slug-as-id alias already stored.
+        addToDayRoute(payload);
         flashDayRouteFeedback('Уже в маршруте');
         return;
       }
-      if (readDayRoute().venues.length >= DAY_ROUTE_MAX) {
+      if (before.venues.length >= DAY_ROUTE_MAX) {
         flashDayRouteFeedback(`Лимит ${DAY_ROUTE_MAX} точек`);
         return;
       }
       addToDayRoute(payload);
-      feedbackAfter(beforeCount);
+      feedbackAfter(beforeCount, payload);
       return;
     }
 
     toggleDayRoute(payload);
-    feedbackAfter(beforeCount);
+    feedbackAfter(beforeCount, payload);
   }
 
   return (

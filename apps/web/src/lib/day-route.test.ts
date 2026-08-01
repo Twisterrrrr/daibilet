@@ -21,6 +21,7 @@ import {
   parseDayRouteQueryParam,
   readDayRoute,
   resetDayRouteSnapshotCache,
+  sameDayRouteVenue,
   subscribeDayRoute,
   venueMatchesRouteSlug,
   type DayRouteVenueItem,
@@ -144,6 +145,47 @@ test('isInDayRoute does not light sibling Fontanka/Ligovsky cards for one stored
     false,
   );
   assert.equal(isInDayRoute('', state), false);
+});
+
+test('isInDayRoute with id+slug ignores stored.slug colliding with another venue id', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({
+    id: 'venue_FIRST',
+    slug: 'venue_65f1b0a8a471ea32e7a902c4',
+    title: 'Pathological slug=other id',
+  });
+  const state = readDayRoute();
+  assert.equal(
+    isInDayRoute(
+      'venue_65f1b0a8a471ea32e7a902c4',
+      state,
+      'prichal-na-nab-reki-fontanki-71-59-926449-30-328948',
+    ),
+    false,
+  );
+  assert.equal(sameDayRouteVenue(state.venues[0]!, {
+    id: 'venue_65f1b0a8a471ea32e7a902c4',
+    slug: 'prichal-na-nab-reki-fontanki-71-59-926449-30-328948',
+  }), false);
+  const next = addToDayRoute({
+    id: 'venue_65f1b0a8a471ea32e7a902c4',
+    slug: 'prichal-na-nab-reki-fontanki-71-59-926449-30-328948',
+    title: 'Причал Фонтанки 71',
+  });
+  assert.equal(next.venues.length, 2);
+});
+
+test('isInDayRoute still aliases slug-as-id must-see with catalog venue_* + same slug', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({
+    id: 'tochka-sbora',
+    slug: 'tochka-sbora',
+    title: 'Must-see shape',
+  });
+  const state = readDayRoute();
+  assert.equal(isInDayRoute('venue_5661d5a99cb5385800d8807d', state, 'tochka-sbora'), true);
 });
 
 test('subscribeDayRoute fires once per successful write with matching length', () => {
