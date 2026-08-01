@@ -1,20 +1,37 @@
-## 2026-08-01 - Venue 404 «Модная среда 1823» (transport junk false positive)
+## 2026-08-01 - Venue 404 «Модная среда 1823» (transport junk + gate deploy)
 
 ### Наблюдения
-- Live `/venues/modnaya-sreda-1823-68d4062e38b75e8343b393ca`: soft-404 (`NEXT_HTTP_ERROR_FALLBACK;404`), API `:4000`/`web` venue DTO → `null`.
-- DB row есть: id `venue_68d4062e…`, slug exact match, kind `CLUB_BAR_RESTAURANT`, `pageStatus=NONE`, city Москва; 6+ active catalog sessions (READY events).
-- Root cause не HIDDEN и не missing slug: `isTransportVehicleVenueName` матчил title `Модная среда 1823` как «флот» (`слово(а)+3-5 цифр`) → `isJunkPublicVenueRow` → `isPublicVenueHub=false` → `buildPublicVenuePage` null. События в афише при этом линкуют `venueSlug` (VENUE.L3 gap).
-- Canonical public slug после fix: `modnaya-sreda-1823` (opaque id suffix strip); URL с `-68d4062e…` резолвится по exact DB slug / id suffix.
+- Live `/venues/modnaya-sreda-1823-68d4062e38b75e8343b393ca`: soft-404 («Площадка не найдена»), API venue DTO → `null` до фикса.
+- DB: id `venue_68d4062e…`, kind `CLUB_BAR_RESTAURANT`, `pageStatus=NONE` (позже ensure → `CANDIDATE`), 6+ future active sessions; address/description есть.
+- `61f1116` (MEETING_POINT/`NONE` curated escape) на ветке и задеплоен, но **недостаточен** для этого slug: kind уже club, блокер - `isTransportVehicleVenueName('Модная среда 1823')` (multi-word + год) → junk → hub false.
+- SPB `.16` SSH denied → MSK in-place `pnpm web:build` + restart api/web (dto в SSR через `@daibilet/backend/public-read`).
 
 ### Решения
-- `dto.js`: ужесточить fleet-regex (без пробелов внутри alphabetic части + optional space перед цифрами); institution kinds не режутся transport-junk.
-- Тест `public-venue-transport-junk.test.js`. MSK: hot dto.js + restart api (DTO OK); web chunk patch + revalidate (параллельный `web:build` временно снёс prerender - не драться, дождаться swap).
+- `61f1116`: curatedMeetingPoint допускает `NONE` при sessions; TC import `generic_location`+events→`CANDIDATE`.
+- `921abe4`: ужесточить fleet-regex; institution kinds не режутся transport-junk; тест + `scripts/ensure-modnaya-sreda-venue.js` (`CANDIDATE`).
+- Live smoke: HTML **200** title «Модная среда 1823: афиша…»; API 200 (`slug` canonical `modnaya-sreda-1823`); sample `phase-g-test-museum` 200. **BUILD_ID=`YYuWaKq2MGFkUSNVioLJp`**.
 
 ### Проблемы
 - Event→venue ссылки на junk/non-hub venues остаются (VENUE.L3).
-- Пока live `.next` в mid-build - HTML smoke отложен до стабилизации web.
+- Канон SPB→MSK atomic swap временно недоступен (`.16` publickey).
 
 ---
+
+## 2026-08-01 - Web deploy verify: venue gate + junk title (921abe4)
+
+### Наблюдения
+- Owner запросил deploy. Local `feat/next-monorepo` уже sync с origin (HEAD `921abe4` = junk-title fix; включает venue gate `61f1116`). Unpushed commits: нет.
+- На MSK параллельно уже шёл in-place rebuild (`/tmp/msk-rebuild-junk-fix.sh`, после ensure-modnaya). Повторный deploy не стартовал.
+- SPB `.16` в этой итерации не использовался (канон recent: MSK in-place при denied SPB SSH).
+
+### Решения
+- Дождались завершения чужого rebuild; live подтверждён без второго swap.
+- **BUILD_ID=`YYuWaKq2MGFkUSNVioLJp`** (mtime ~14:23 UTC). HEAD на диске `921abe4`. `daibilet-web` + `daibilet-api` active.
+- Smoke HTTPS: `/` 200, `/events` 200, `/venues/modnaya-sreda-1823-68d4062e38b75e8343b393ca` 200 (title «Модная среда 1823…», API :4000 venue 200). Phase-g sample 200.
+
+### Проблемы
+- В HTML flight payload встречается строка «Страница не найдена» (false soft-404 при grep), при этом title/venue payload валидны - не трактовать как 404.
+- In-place `pnpm web:build` на живом `.next` по-прежнему риск thrash; предпочтителен SPB tar → atomic swap, когда `.16` доступен.
 
 ## 2026-08-01 - INC.504.18: owner 504 report - site already recovered
 

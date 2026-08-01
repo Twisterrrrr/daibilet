@@ -281,10 +281,10 @@ Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SECRET_KEY=<set>` ✅ · *
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| VENUE.L2 | Event→venue 404 «Модная среда 1823»: `isTransportVehicleVenueName` false positive на title с годом → hub junk | Критический | ✅ dto.js regex+institution guard; API smoke OK; web HTML smoke после стабилизации `.next` |
+| VENUE.L2 | Event→venue 404 «Модная среда 1823»: fleet-junk false positive + MEETING_POINT gate | Критический | ✅ `61f1116` gate + `921abe4` junk regex; MSK in-place web **BUILD_ID=`YYuWaKq2MGFkUSNVioLJp`**; live HTML/API 200 |
 | VENUE.L3 | Event/session DTO: не отдавать `venueSlug` (или `venueHasPublicPage=false`) для HIDDEN / non-resolvable hub rows - UI не линкует в 404 | Высокий | ⏳ |
 | VENUE.L4 | Soft-sign twin: при HIDDEN twin rematch `Event.venueId` на канонический PUBLISHED/CANDIDATE slug | Средний | ⏳ |
-| VENUE.L5 | Ops ensure `venue_68d4062e…` - не нужен: row+sessions OK; блокер был junk-gate | Низкий | ✅ cancelled |
+| VENUE.L5 | Ops ensure `venue_68d4062e…` → `CANDIDATE` (kind уже `CLUB_BAR_RESTAURANT`) | Средний | ✅ `scripts/ensure-modnaya-sreda-venue.js` applied on MSK |
 
 ---
 
