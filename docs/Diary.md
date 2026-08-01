@@ -1,3 +1,21 @@
+## 2026-08-01 - INC.504.17: канон `/etc/cron.d/daibilet-tasks` + SSR healthcheck
+
+### Наблюдения
+- После recovery INC.504.13 сайт жив; warm-only `*/3` был OFF.
+- `systemctl show daibilet-web -p User` → **пусто** (unit без `User=`); процесс `next-server`/`pnpm` под **root**.
+- `bc` уже установлен; `NODE_OPTIONS=--max-old-space-size=1280` уже в drop-in `memory.conf` (MemoryMax=2G) - поднимать heap до 2048 без restart не делали (headroom под Max мал, риск после hang).
+
+### Решения
+- Live MSK: создан `/etc/cron.d/daibilet-tasks` (trailing NL): warm `*/12` от **root** + flock `/var/lock/daibilet-warm-hubs.lock` + `timeout 90s` + `cd /opt/daibilet`; healthcheck каждую минуту на `http://127.0.0.1:3001/` (curl `\%{time_starttransfer}`, bc >5s → journald + `/var/log/daibilet/ssr-health.log` + `systemctl restart` + `pkill -f '[w]arm-hub-pages'`).
+- Старые `/etc/cron.d/daibilet-warm-hubs` и `.bak.` переименованы в `*.disabled.<ts>` (без double-warm).
+- Smoke без restart: `/` TTFB ~0.021s 200; `/events` ~0.009s 200.
+
+### Проблемы
+- Root cause hang (Prisma/event-loop) всё ещё open; healthcheck - ops safety net, не фикс кода.
+- Опциональный bump `NODE_OPTIONS` до 2048 отложен: уже 1280 + MemoryMax=2G.
+
+---
+
 ## 2026-08-01 - INC.504.13: повторный SSR hang / nginx 504
 
 ### Наблюдения

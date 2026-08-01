@@ -131,9 +131,10 @@
 | INC.504.13 | 2026-08-01 повторный hang/504: SIGKILL restart; **disable warm-hub cron** (`*/3`); Prisma disconnect в web | Критический | mitigated live; root cause open |
 | INC.504.14 | systemd `TimeoutStopSec=25` + KillMode=control-group для hung Next | Высокий | ✅ live MSK + `deploy/systemd/.../stop-timeout.conf` |
 | INC.504.15 | Prisma pool / Connection terminated в daibilet-web (не только API) | Высокий | ⏳ |
-| INC.504.16 | Re-enable warm-hub только `*/15`+concurrency1 после smoke TTFB; не `*/3` | Средний | ⏳ cron off |
+| INC.504.16 | Re-enable warm-hub только `*/15`+concurrency1 после smoke TTFB; не `*/3` | Средний | ✅ superseded: канон `*/12` в daibilet-tasks (INC.504.17) |
+| INC.504.17 | MSK `/etc/cron.d/daibilet-tasks`: warm `*/12`+flock+90s (User=root) + TTFB healthcheck; old warm-hubs disabled | Критический | ✅ live MSK 2026-08-01; docs |
 
-См. Diary 2026-07-30 «Prod 504: daibilet-web hang» и «2026-08-01 INC.504.13».
+См. Diary 2026-07-30 «Prod 504: daibilet-web hang», «2026-08-01 INC.504.13» и «INC.504.17».
 
 ---
 
