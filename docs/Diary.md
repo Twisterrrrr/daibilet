@@ -12,7 +12,7 @@
 - `day-route` store: `window.__daibiletDayRouteRuntime` singleton + dedupe на `writeDayRoute`.
 
 ### Проблемы
-- Нужен MSK deploy + Playwright proof badge 1→2→3 и LS length 3; delay-0 после nav не должен silently no-op (disabled до live).
+- ~~Нужен MSK deploy + Playwright proof~~ → MSK `d9b639c` **BUILD_ID=`S_RAZ0azumKgT_beN19UH`**. Proof: /locations+/venues+/detail 1→2→3, toast «Добавлено · N/8», early-commit `live=0 disabled`, add-only guard держит 1 при re-click green.
 
 ---
 
