@@ -39,6 +39,78 @@ export function coveragePct(covered: DayRouteCovered, venueCount: number): numbe
   return (covered.stop.length + covered.start.length) / venueCount;
 }
 
+/** Normalize title for sibling collapse (Санкт-Петербург ≈ Санкт Петербург). */
+export function normalizeDayRouteTitleKey(title: string): string {
+  return String(title || '')
+    .toLowerCase()
+    .replace(/[-–—]/gu, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Strip TC/dated id suffixes from event slug so siblings share one key.
+ * Examples:
+ * - `title-slug-69ca5d1e…` → `title-slug`
+ * - `tc-6a3932f3…-title-slug` → `title-slug`
+ */
+export function dayRouteEventBaseSlug(slug: string, eventId?: string | null): string {
+  let value = String(slug || '')
+    .trim()
+    .toLowerCase()
+    .replace(/^tc-[a-f0-9]+-/i, '');
+  const idTail = String(eventId || '')
+    .replace(/^evt_/i, '')
+    .toLowerCase();
+  if (idTail && value.endsWith(`-${idTail}`)) {
+    value = value.slice(0, -(idTail.length + 1));
+  }
+  value = value.replace(/-[a-f0-9]{20,}$/i, '');
+  return value.replace(/-+/g, '-').replace(/^-|-$/g, '');
+}
+
+/** Canonical dedupe key for day-route match cards (one product, many TC sessions). */
+export function dayRouteMatchDedupeKey(input: {
+  eventId: string;
+  slug: string;
+  title: string;
+}): string {
+  const base = dayRouteEventBaseSlug(input.slug, input.eventId);
+  if (base.length >= 8) return `slug:${base}`;
+  const titleKey = normalizeDayRouteTitleKey(input.title);
+  if (titleKey.length >= 8) return `title:${titleKey}`;
+  return `id:${input.eventId}`;
+}
+
+export type DayRouteMatchRankable = {
+  eventId: string;
+  slug: string;
+  title: string;
+  score: number;
+  coveragePct: number;
+  priceFromRub: number | null;
+};
+
+/** Keep best sibling per dedupe key: score → coverage → lower price → stable id. */
+export function dedupeDayRouteMatches<T extends DayRouteMatchRankable>(matches: T[]): T[] {
+  const best = new Map<string, T>();
+  for (const match of matches) {
+    const key = dayRouteMatchDedupeKey(match);
+    const prev = best.get(key);
+    if (!prev || isBetterDayRouteMatch(match, prev)) best.set(key, match);
+  }
+  return [...best.values()];
+}
+
+function isBetterDayRouteMatch(a: DayRouteMatchRankable, b: DayRouteMatchRankable): boolean {
+  if (a.score !== b.score) return a.score > b.score;
+  if (a.coveragePct !== b.coveragePct) return a.coveragePct > b.coveragePct;
+  const ap = a.priceFromRub ?? Number.POSITIVE_INFINITY;
+  const bp = b.priceFromRub ?? Number.POSITIVE_INFINITY;
+  if (ap !== bp) return ap < bp;
+  return a.eventId < b.eventId;
+}
+
 /**
  * Classify selected venue ids against one event.
  * Nearby only for ids not already in stop/start.

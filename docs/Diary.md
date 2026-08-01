@@ -1,3 +1,20 @@
+## 2026-08-01 - Day-route matches: duplicate TC siblings
+
+### Наблюдения
+- Owner: в «Мой день» → «Подходящие экскурсии» ~6 одинаковых карточек ( titlе «Обзорная… Эрмитажа», `0 из 1 · ещё 1 рядом · от 1 500 ₽`).
+- Live probe `GET /api/day-route/matches?venueIds=ermitazh`: **24** matches, только **2** unique titles (hyphen vs space в «Санкт[-]Петербург»), все score=1 nearby; разные `eventId` / slug с id-suffix (`…-69ca5d…`, `tc-6a3932…-…`).
+- Root cause: TicketsCloud dated siblings = отдельные `Event` rows; match API дедупил только по `event.id`, UI `key={eventId}` → визуальные дубли одного продукта.
+
+### Решения
+- Pure helpers: `dayRouteEventBaseSlug` / `normalizeDayRouteTitleKey` / `dedupeDayRouteMatches` (best: score → coverage → min price).
+- `matchDayRouteVenues` дедупит siblings **до** sort/limit.
+- Unit: `day-route-score.test.ts` (strip slug + hyphen title + keep cheapest).
+
+### Проблемы
+- Dedupe по base slug/title - pragmatic UX; полный metaExternalId group (как event page) - follow-up если понадобится точнее across sources.
+
+---
+
 ## 2026-08-01 - SPB build host retired; web deploy = MSK-only
 
 ### Наблюдения

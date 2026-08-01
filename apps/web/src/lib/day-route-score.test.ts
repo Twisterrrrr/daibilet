@@ -4,7 +4,11 @@ import test from 'node:test';
 import {
   classifyEventCoverage,
   coveragePct,
+  dayRouteEventBaseSlug,
+  dayRouteMatchDedupeKey,
+  dedupeDayRouteMatches,
   haversineMeters,
+  normalizeDayRouteTitleKey,
   scoreDayRouteCoverage,
 } from './day-route-score.ts';
 
@@ -40,4 +44,73 @@ test('classifyEventCoverage separates stop/start/nearby without double count', (
 test('haversine short distance sane', () => {
   const m = haversineMeters(55.75, 37.62, 55.75135, 37.62);
   assert.ok(m > 140 && m < 160, `got ${m}`);
+});
+
+test('dayRouteEventBaseSlug strips TC/dated id suffixes', () => {
+  assert.equal(
+    dayRouteEventBaseSlug(
+      'обзорная-экскурсия-по-санкт-петербургу-с-посещением-эрмитажа-69ca5d1e49864162764e1241',
+      'evt_69ca5d1e49864162764e1241',
+    ),
+    'обзорная-экскурсия-по-санкт-петербургу-с-посещением-эрмитажа',
+  );
+  assert.equal(
+    dayRouteEventBaseSlug(
+      'tc-6a3932f3b6b70fed7424032d-обзорная-экскурсия-по-санкт-петербургу-с-посещением-эрмитажа',
+      'evt_6a3932f3b6b70fed7424032d',
+    ),
+    'обзорная-экскурсия-по-санкт-петербургу-с-посещением-эрмитажа',
+  );
+});
+
+test('normalizeDayRouteTitleKey collapses hyphen variants', () => {
+  assert.equal(
+    normalizeDayRouteTitleKey('Обзорная экскурсия по Санкт-Петербургу с посещением Эрмитажа'),
+    normalizeDayRouteTitleKey('Обзорная экскурсия по Санкт Петербургу с посещением Эрмитажа'),
+  );
+});
+
+test('dedupeDayRouteMatches keeps cheapest best-score sibling', () => {
+  const keyA = dayRouteMatchDedupeKey({
+    eventId: 'evt_69ca5d1e49864162764e1241',
+    slug: 'обзорная-экскурсия-по-санкт-петербургу-с-посещением-эрмитажа-69ca5d1e49864162764e1241',
+    title: 'Обзорная экскурсия по Санкт Петербургу с посещением Эрмитажа',
+  });
+  const keyB = dayRouteMatchDedupeKey({
+    eventId: 'evt_6a3932f3b6b70fed7424032d',
+    slug: 'tc-6a3932f3b6b70fed7424032d-обзорная-экскурсия-по-санкт-петербургу-с-посещением-эрмитажа',
+    title: 'Обзорная экскурсия по Санкт-Петербургу с посещением Эрмитажа',
+  });
+  assert.equal(keyA, keyB);
+
+  const out = dedupeDayRouteMatches([
+    {
+      eventId: 'evt_6a3932f3b6b70fed7424032d',
+      slug: 'tc-6a3932f3b6b70fed7424032d-обзорная-экскурсия-по-санкт-петербургу-с-посещением-эрмитажа',
+      title: 'Обзорная экскурсия по Санкт-Петербургу с посещением Эрмитажа',
+      score: 1,
+      coveragePct: 0,
+      priceFromRub: 2000,
+    },
+    {
+      eventId: 'evt_69ca5d1e49864162764e1241',
+      slug: 'обзорная-экскурсия-по-санкт-петербургу-с-посещением-эрмитажа-69ca5d1e49864162764e1241',
+      title: 'Обзорная экскурсия по Санкт Петербургу с посещением Эрмитажа',
+      score: 1,
+      coveragePct: 0,
+      priceFromRub: 1500,
+    },
+    {
+      eventId: 'evt_other',
+      slug: 'rechnaya-progulka-po-neve',
+      title: 'Речная прогулка по Неве',
+      score: 1,
+      coveragePct: 0,
+      priceFromRub: 900,
+    },
+  ]);
+  assert.equal(out.length, 2);
+  const hermitage = out.find((m) => m.title.includes('Эрмитажа'));
+  assert.equal(hermitage?.eventId, 'evt_69ca5d1e49864162764e1241');
+  assert.equal(hermitage?.priceFromRub, 1500);
 });

@@ -2,6 +2,7 @@ import { prisma } from '@/lib/db';
 import {
   classifyEventCoverage,
   coveragePct,
+  dedupeDayRouteMatches,
   haversineMeters,
   isValidCoordinatePair,
   scoreDayRouteCoverage,
@@ -174,7 +175,11 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
     });
   }
 
-  matches.sort(
+  // TC/supplier often store one Event row per session (same product, different ids).
+  // Collapse siblings before rank/limit so «Мой день» shows one card per product.
+  const unique = dedupeDayRouteMatches(matches);
+
+  unique.sort(
     (a, b) =>
       b.score - a.score ||
       b.coveragePct - a.coveragePct ||
@@ -185,7 +190,7 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
     cityId: dominantCityId,
     multiCityWarning,
     venues: venueDtos,
-    matches: matches.slice(0, MATCH_LIMIT),
+    matches: unique.slice(0, MATCH_LIMIT),
   };
 }
 
