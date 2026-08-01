@@ -9,8 +9,8 @@
 
 | Роль | IP | Факт |
 |------|-----|------|
-| **Battle catalog (МСК)** | `201.24.125.184` | Apex DNS `daibilet.ru` / `www` → сюда; TLS+PG+web/api live |
-| **Leftover СПб 4 ГБ** | `213.171.7.16` | Public web/api сняты; **build/reserve** до MIG.9.4/.9.6 → retire (не apex DNS) |
+| **Battle catalog (МСК)** | `201.24.125.184` | Apex DNS `daibilet.ru` / `www` → сюда; TLS+PG+web/api live; **web build host** |
+| **Leftover СПб 4 ГБ** | `213.171.7.16` | Public web/api сняты; **pipeline retired 2026-08-01** → owner delete VM (не apex DNS, не builder) |
 | **Battle finance (СПб 8 ГБ)** | `85.193.80.159` | `pay` / `supplier` / `finance-api` DNS+TLS ✅ |
 
 Исторический снимок 2026-07-29 ниже сохранён как audit trail (на момент снимка apex ещё указывал на `.16`).

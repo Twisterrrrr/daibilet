@@ -1,18 +1,25 @@
 ﻿# Deploy: Timeweb Cloud MVP
 
-Дата: 2026-06-20.
+Дата: 2026-06-20.  
+**Исторический runbook** (ранний MVP на СПб). **Актуально 2026-08-01:** live catalog + web build = MSK `201.24.125.184` (`daibilet-msk`); SPB `213.171.7.16` retired from pipeline - см. [Project.md](./Project.md), [spb-finance-host.md](./spb-finance-host.md), `deploy/scripts/deploy-prod-next.sh`.
 
 Цель: поднять новый легкий MVP на сервере Timeweb Cloud без потери старой версии `daibilet.ru`.
 
-## Известная инфраструктура
+## Известная инфраструктура (snapshot 2026-06 - устарело)
+
+- ~~IPv4: `213.171.7.16`~~ → **prod catalog:** `201.24.125.184`
+- SSH prod: `ssh daibilet-msk` (`daibilet_msk80_key`).
+- Public: `https://daibilet.ru` (DNS → MSK).
+- Admin: `https://admin.daibilet.ru`.
+- API: `https://api.daibilet.ru`.
+
+<details><summary>Legacy IP snapshot (Intelligent Hoopoe, do not use as builder)</summary>
 
 - IPv4: `213.171.7.16`.
 - IPv6: `2a03:6f01:1:2::ef11`.
-- SSH: `ssh root@213.171.7.16`.
-- Public: `https://daibilet.ru`.
-- Admin: `https://admin.daibilet.ru`.
-- API: `https://api.daibilet.ru`.
-- Временный admin login: `admin@daibilet.ru`.
+- SSH (пока VM жив): `ssh -i ~/.ssh/daibilet_staging_key root@213.171.7.16`.
+
+</details>
 
 ## Что не затираем
 

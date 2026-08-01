@@ -1,8 +1,9 @@
 # Project — Daibilet (Next full-stack migration)
 
-**Обновлено:** 2026-07-30  
+**Обновлено:** 2026-08-01  
 **Ветка migration / prod:** `feat/next-monorepo`  
-**Prod catalog:** Next `apps/web` `:3001` + legacy API `:4000` на МСК `201.24.125.184`
+**Prod catalog:** Next `apps/web` `:3001` + legacy API `:4000` на МСК `201.24.125.184`  
+**Web deploy canon:** **MSK-only** - build + swap/restart на `daibilet-msk` (`201.24.125.184`). SPB `.16` (Intelligent Hoopoe) **retired** из pipeline (owner удаляет VM в панели).
 
 ---
 
@@ -57,16 +58,28 @@ packages/config   — shared tsconfig/eslint
 
 **Write/sync path:** legacy `server.js` / sync scripts; после sync — `invalidatePublicCaches({ warm: true })` + Next revalidate.
 
-### Host roles (lock 2026-07-30)
+### Host roles (lock 2026-07-30 · SPB builder retired 2026-08-01)
 
 | Server | IP | Role |
 |--------|-----|------|
-| Friendly Pheasant | `201.24.125.184` | **battle catalog** - public, admin, import, SEO, TC/Teplohod catalog |
+| Friendly Pheasant | `201.24.125.184` | **battle catalog** - public, admin, import, SEO, TC/Teplohod catalog; **единственный web build host** |
 | Diligent Polydeuces | `85.193.80.159` | **battle finance** - checkout, supplier LK, orders/purchases, YooKassa |
-| Intelligent Hoopoe | `213.171.7.16` | temporary staging/build scaffolding → **retire** after finance smoke |
+| ~~Intelligent Hoopoe~~ | ~~`213.171.7.16`~~ | **retired** из deploy/build pipeline (owner: удалить VM в Timeweb). Не builder, не apex DNS |
+
+### Web deploy (канон 2026-08-01)
+
+```bash
+# На MSK (ssh daibilet-msk / 201.24.125.184), в /opt/daibilet:
+BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
+```
+
+- Скрипт сам: `git pull` → **stop** `daibilet-web` → `pnpm web:build` (heap 5120Mi) → restart api/web → nginx static/cache hygiene.
+- **Не** билдить на SPB `.16` и не тащить `.next` tar с другого хоста.
+- Docs-only / handoff = commit+push **без** web deploy; runtime/UI = commit+push+MSK deploy.
+- SSH: `daibilet-msk` / `daibilet_msk80_key`. Finance `.159` не трогать из catalog deploy.
 
 - Catalog ↔ finance: **только API / read projection**, без shared money/catalog DB и без ad-hoc writes finance→catalog.
-- Checkout primary hostname: **`checkout.daibilet.ru`** (optional alias `pay.daibilet.ru` - см. qa.md); также `supplier.daibilet.ru`, optional `finance-api.daibilet.ru`.
+- Checkout primary hostname: **`pay.daibilet.ru`** (optional alias `checkout.daibilet.ru` - см. qa.md); также `supplier.daibilet.ru`, `finance-api.daibilet.ru`.
 - `.184` не переезжает на СПб; ops на catalog - perf/DTO/SSR/DNS only.
 - TC/Teplohod widgets + secrets остаются на catalog; finance владеет INTERNAL_SALES / AdmissionProduct / CheckoutOrder.
 - **Канон границы и gap:** [catalog-finance-projection.md](./catalog-finance-projection.md) · host roles: [spb-finance-host.md](./spb-finance-host.md) · migrate: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md).
@@ -241,8 +254,8 @@ Daily scan saleable public catalog texts (`title`/`description` + override) на
 
 - Карточки: `apps/web/src/data/blog-posts.ts` (+ зеркало в `apps/public`).
 - Тексты: `content/blog/*.md` → `npm run blog:sync-bodies` → `blog-article-bodies.ts` (SSR fallback); прод-источник — `Article` через `npm run blog:upsert`.
-- ### CPU/RAM (prod 3.8Gi)
-- Deploy: один controlled restart (deploy/scripts/deploy-prod-next.sh) — не пачкой.
+- ### CPU/RAM (prod MSK ~8Gi)
+- Deploy: один controlled restart на MSK (`deploy/scripts/deploy-prod-next.sh`) - не пачкой; не билдить на retired SPB.
 - TEP **каталог**: предпочтительно out-of-process deploy/cron/tep-catalog-sync.sh / daibilet-tep-catalog-sync.timer; in-process TEP_AUTO_SYNC_ENABLED=0 на prod.
 - TC **каталог**: nightly out-of-process `deploy/cron/tc-catalog-sync.sh` / `daibilet-tc-catalog-sync.timer` (03:20); daytime — только `tc:sync --ids`; post-sync light warm (full warm opt-in `TC_CATALOG_SYNC_FULL_WARM=1`).
 - Public warm: DAIBILET_PUBLIC_STARTUP_WARM=0, warm после sync с delay.

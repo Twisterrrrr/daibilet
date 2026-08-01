@@ -50,7 +50,7 @@
 - SSH для Codex: ключ `daibilet_spb_finance` / pubkey в `authorized_keys`
 - Webhook register в кабинете ЮKassa - после egress green
 
-`.16` (Intelligent Hoopoe) нужен только как **build/reserve** до MIG.9.4/.9.6, затем retire (MIG.9.7). Apex DNS уже на `.184`.
+`.16` (Intelligent Hoopoe) **retired from deploy/build pipeline (2026-08-01)**. Owner: optional backup → удалить VM в Timeweb. Apex DNS уже на `.184`. Web deploy = MSK-only.
 
 ### PurchaseProjection / dual order sources
 

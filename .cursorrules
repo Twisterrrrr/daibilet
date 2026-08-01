@@ -11,7 +11,7 @@
 1. **Авто-commit + push + deploy после продуктовой итерации (owner 2026-07-31).** Ask-first commit отменён для UI/product итераций. Когда итерация дала рабочий локальный результат (фикс hero, матчинг статей, seed/link fixes, runtime/UI и т.п.) - агент **сам, без запросов к owner**:
    - коммитит только релевантные изменения (не мусор `.deploy-tmp/`, `tmp-*`, одноразовые smoke-скрипты без нужды; не secrets / `.env`);
    - обычный `git push` на tracked branch (НЕ force-push);
-   - если итерация затрагивает live web/runtime - деплой web по канону: **SPB build → MSK atomic `.next` swap** (см. deploy pipeline проекта).
+   - если итерация затрагивает live web/runtime - деплой web по канону: **MSK-only** (`daibilet-msk` / `201.24.125.184`): `BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh` (stop web → `pnpm web:build` → start web / atomic `.next` на том же хосте). **Не** использовать SPB `.16` как builder.
    - **Канон docs vs runtime:** docs-only / handoff-правки = commit + push, **без** web deploy. Runtime/UI/seed/link/код, влияющий на live = commit + push + deploy.
 2. Обновляй Diary/Tasktracker при значимых архитектурных или launch-blocker фиксах.
 3. Сохраняй совместимость MVP-ветки `feat/next-monorepo`; не плодить параллельные расхождения с Codex.

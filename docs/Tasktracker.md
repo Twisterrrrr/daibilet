@@ -191,20 +191,21 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | MIG.6 | Smoke на МСК (IP/`--resolve`) до DNS | Критический | ✅ |
 | MIG.7 | DNS A `daibilet.ru`/`www` → `201.24.125.184` + post-smoke | Критический | ✅ 2026-07-30 |
 | MIG.8 | СПб: stop public web/api + TC timer + crontab sync; PG snapshot; host → finance+staging | Средний | ✅ 2026-07-30 · [spb-finance-host.md](./spb-finance-host.md) |
-| MIG.9 | Role lock: `.184` catalog · `.159` battle finance · `.16` retire after smoke | Высокий | 🔒 docs 2026-07-30 · Codex beyond P0–2 · [spb-finance-host.md](./spb-finance-host.md) |
+| MIG.9 | Role lock: `.184` catalog · `.159` battle finance · `.16` **retired from pipeline** (owner deletes VM) | Высокий | ✅ pipeline 2026-08-01 · VM wipe = owner Timeweb panel · [spb-finance-host.md](./spb-finance-host.md) |
 | MIG.9.0 | Phase 0: SSH/firewall `.159` + DNS A `pay`/`supplier`/`finance-api` → `.159` | Критический | ✅ SSH/UFW + DNS A + TLS SAN 2026-07-30 (`checkout`/`finance.` не нужны) |
 | MIG.9.1 | Phase 1: base stack docker/nginx/node на `.159` | Высокий | ✅ 2026-07-30 |
 | MIG.9.2 | Phase 2: fresh finance PG на `.159` (не catalog dump) | Критический | ✅ PG `:5437` + migrations/seed smoke 2026-07-30 |
 | MIG.9.3 | Phase 3: finance app + HTTP/TLS `pay`/`supplier`/`finance-api` | Критический | 🔄 API `:4100` + nginx · TLS ✅ LE SAN pay/supplier/finance-api · STUB on / YooKassa off |
-| MIG.9.4 | Phase 4: optional staging/build scaffolding на `.159` (не justification для `.16`) | Средний | ⏳ |
+| MIG.9.4 | Phase 4: optional staging/build scaffolding на `.159` (не justification для `.16`) | Средний | ✅ N/A - SPB `.16` retired from build; staging на `.159` optional later |
 | MIG.9.5 | Phase 5: YooKassa webhook → finance-api canon; dual only if prior live | Критический | 🔒 URL locked; VERIFY=0; register after egress+smoke |
 | MIG.9.6 | Phase 6: smoke `pay`/`supplier`/webhook; catalog `.184` без cutover | Критический | ⏳ |
-| MIG.9.7 | Phase 7: backup `.16` + retention 7–14d + retire Intelligent Hoopoe | Высокий | ⏳ |
+| MIG.9.7 | Phase 7: backup `.16` off-box (optional) + **delete Intelligent Hoopoe in Timeweb** | Высокий | 🔄 pipeline retired 2026-08-01; VM wipe = **owner** (SSH still OK with `daibilet_staging_key`) |
 | PERF.OOM4 | MSK: снять `cpus:1`/`workerThreads:false`, heap build 5120Mi | Высокий | ✅ |
 
 План: [migration-spb-to-msk.md](./migration-spb-to-msk.md) · roles/MIG.9: [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md) · [spb-finance-host.md](./spb-finance-host.md)  
 Домены finance (**канон**): **`pay.daibilet.ru`** (buyer) · `supplier.daibilet.ru` · `finance-api.daibilet.ru` - DNS+TLS ✅. Alias `checkout.` / `finance.` не обязательны ([qa.md](./qa.md)).  
-Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SECRET_KEY=<set>` ✅ · **egress `.159` outbound 443+DNS** 🚫 · Codex SSH · webhook register after smoke. `.16` = build/reserve до MIG.9.4/.9.6, затем retire.
+Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SECRET_KEY=<set>` ✅ · **egress `.159` outbound 443+DNS** 🚫 · Codex SSH · webhook register after smoke.  
+**Web deploy canon (2026-08-01):** MSK-only `deploy-prod-next.sh` на `.184`. SPB `.16` **не** builder - owner удаляет VM (MIG.9.7).
 
 ---
 
@@ -565,7 +566,7 @@ Owner-locked порядок: Hero → Советы → Расписание → 
 | CC.5 | Prod audit 2026-07-30: empty/city=0; 24 evt-auto (8→CDN venue, 16 files on disk); Volna→TEP866 | Критический | ✅ data+API on MSK |
 | CC.6 | Backend: durable CDN/venue before ephemeral `evt-auto` in `pickFirstUsableEventImageUrl` | Высокий | ✅ code on MSK API |
 | CC.7 | Frontend EventCard city fallback on SafeImage error | Высокий | ✅ `205f36c` SPB build → MSK `BUILD_ID=upzsYYlMO145GFc83zNSH` |
-| CC.8 | MSK egress: TEP sync + `next/font` Google Fonts (rebuild web) | Высокий | ⏳ blocked INC.504.1; web rebuild via SPB workaround |
+| CC.8 | MSK egress: TEP sync + `next/font` Google Fonts (rebuild web) | Высокий | ⏳ blocked INC.504.1; web rebuild = **MSK-only** (SPB workaround retired) |
 
 ---
 
@@ -1159,6 +1160,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-08-01 | **SPB `.16` retired from deploy pipeline** - web canon = MSK-only `deploy-prod-next.sh` on `.184`; `.cursorrules`/Project/Diary; MIG.9.7 → owner delete VM in Timeweb; SSH `.16` still OK (`daibilet_staging_key`) |
 | 2026-07-31 | Finance sprint Codex lock: webhook finance-api canon; dual-webhook skip-unless-live; verify S2S ETA 1-2d; reconcile manual→timer; STUB admin/dev; ledger MVP no payouts; m2m Bearer; return pay/.../result; wide CTA out; W1-4 plan. Secret `<set>` on `.159` (Cursor); CHECKOUT=0; egress DNS FAIL (FIN.LC4) |
 | 2026-07-31 | .159 egress PASS (yookassa 401); CHECKOUT=1; purchase smoke YOOKASSA_PAYMENT_FAILED (keys) |
 | 2026-07-31 | SEO.8e web deploy rooftops Moscow URL: landing-routes allowlist (no SPb-only lock) → SPB build → MSK `.next` `mg7oABb2zIKygPpGUlRlV`; smoke `/progulki-po-krysham` + `/moscow` 200 |

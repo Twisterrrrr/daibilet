@@ -1,12 +1,13 @@
 # Текущее состояние Daibilet
 
-**Обновлено:** 2026-07-30  
+**Обновлено:** 2026-08-01  
 **Ветка:** `feat/next-monorepo`  
 **Prod live (DNS):** `201.24.125.184` (МСК `msk-1-vm-5a5i`) · Next `:3001` · API `:4000` · PG Docker `:5437` · TLS nginx · **catalog truth**  
-**Роли (lock 2026-07-30):** `.184` battle catalog · `.159` battle finance (target) · `.16` temporary scaffolding → retire · [spb-finance-host.md](./spb-finance-host.md) · [spb-migrate-4gb-to-8gb.md](./spb-migrate-4gb-to-8gb.md)  
-**Catalog ↔ finance projection (lock 2026-07-30):** [catalog-finance-projection.md](./catalog-finance-projection.md) · P0 PurchaseProjection · P1 public read client · P2 venue/city UI · no wide internal sales until P0  
-**СПб 4 ГБ:** `213.171.7.16` Intelligent Hoopoe - MIG.8 ✅ off public; reserve until finance smoke on `.159`  
-**СПб 8 ГБ:** `85.193.80.159` Diligent Polydeuces - primary finance/checkout/supplier (MIG.9 ⏳, servers not cut over yet)
+**Роли:** `.184` battle catalog (+ **единственный web build**) · `.159` battle finance · `.16` Intelligent Hoopoe **retired from pipeline** (owner delete VM) · [spb-finance-host.md](./spb-finance-host.md)  
+**Web deploy canon:** MSK-only - `BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh` на `daibilet-msk`  
+**Catalog ↔ finance projection:** [catalog-finance-projection.md](./catalog-finance-projection.md) · P0 PurchaseProjection · P1 public read client · P2 venue/city UI · no wide internal sales until P0  
+**СПб 4 ГБ:** `213.171.7.16` - MIG.8 off public; **не** builder; удаление VM = owner Timeweb  
+**СПб 8 ГБ:** `85.193.80.159` Diligent Polydeuces - primary finance/checkout/supplier
 
 > Детальные чеклисты: [Tasktracker.md](./Tasktracker.md)  
 > Эталонные slug виджетов: [widget-etalon-slugs.md](./widget-etalon-slugs.md)
@@ -74,15 +75,16 @@
 | `/robots.txt`, `/sitemap.xml` | ✅ |
 | `pnpm deploy:preflight` | ✅ новый скрипт |
 
-**Deploy:**
+**Deploy (MSK-only, 2026-08-01):**
 
 ```bash
-# preflight (на сервере с DATABASE_URL)
+# preflight (на MSK с DATABASE_URL)
 pnpm deploy:preflight
 
-# prod Next
+# prod Next на том же хосте (stop web → build → start)
 BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
-`pnpm web:build` default heap **5120Mi** on MSK (`apps/web/scripts/next-build.mjs` + deploy `NODE_OPTIONS`). Legacy SPB used 2560Mi. Override: `NODE_OPTIONS='--max-old-space-size=2560' pnpm web:build`. Prod `vm.swappiness=10` (idempotent in `deploy-prod-next.sh`).
+# heap default 5120Mi (`apps/web/scripts/next-build.mjs` + NODE_OPTIONS).
+# Не использовать SPB `.16` как builder.
 
 # smoke
 PUBLIC_BASE=https://daibilet.ru API_BASE=http://127.0.0.1:4000 WEB_BASE=http://127.0.0.1:3001 \

@@ -9,16 +9,16 @@
 
 | Server (Timeweb) | IP | Role now | Target role |
 |------------------|-----|----------|-------------|
-| **Friendly Pheasant** | `201.24.125.184` | catalog / prod | **battle catalog:** public, admin, import, SEO, TC/Teplohod catalog |
-| **Intelligent Hoopoe** | `213.171.7.16` | old SPB 4 ГБ (post-MIG.8) | **temporary** finance/staging/build scaffolding → **retire** after smoke on `.159` |
-| **Diligent Polydeuces** | `85.193.80.159` | Phase 3 partial (API+HTTP; no TLS) | **battle finance:** primary finance / supplier / buyer checkout |
+| **Friendly Pheasant** | `201.24.125.184` | catalog / prod + web build | **battle catalog:** public, admin, import, SEO, TC/Teplohod catalog |
+| **Diligent Polydeuces** | `85.193.80.159` | finance API + TLS | **battle finance:** primary finance / supplier / buyer checkout |
+| ~~**Intelligent Hoopoe**~~ | ~~`213.171.7.16`~~ | post-MIG.8 leftover | **retired from pipeline 2026-08-01** → owner deletes VM |
 
-**Коротко:** `.184` = battle catalog · `.159` = battle finance · `.16` = scaffolding, then demolish.
+**Коротко:** `.184` = battle catalog + build · `.159` = battle finance · `.16` = demolish (owner Timeweb).
 
 | SSH key (факт) | Host |
 |----------------|------|
 | `daibilet_msk80_key` / `daibilet-msk` | `201.24.125.184` |
-| `daibilet_staging_key` | `213.171.7.16` |
+| `daibilet_staging_key` | `213.171.7.16` (пока VM жив) |
 | `daibilet_spb_finance` (`daibilet-finance-159`) | `85.193.80.159` |
 
 ---
@@ -29,7 +29,7 @@
 
 1. Поднять **`85.193.80.159` как primary finance/supplier/checkout** (не «слепо перенести все роли 4 ГБ»).
 2. Держать **`201.24.125.184` как battle catalog** - только perf / DTO / SSR / DNS hygiene (AAAA уже снят owner).
-3. Использовать **`213.171.7.16` временно:** staging/build, nginx/systemd reserve, migration source; после smoke на `.159` - backup и удаление VM.
+3. ~~Использовать `213.171.7.16` временно как staging/build~~ → **done/superseded 2026-08-01:** `.16` retired from pipeline; delete VM in Timeweb.
 4. Связь **catalog ↔ finance только через API** (без shared mess / shared money DB).
 5. YooKassa webhook → новый finance API; старый webhook держать до подтверждения, затем отключить.
 

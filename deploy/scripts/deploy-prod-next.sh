@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
-# F3 prod deploy: feat/next-monorepo -> Next apps/web :3001 + legacy API :4000
+# F3 prod deploy (MSK-only canon 2026-08-01): feat/next-monorepo
+# → Next apps/web :3001 + legacy API :4000 on daibilet-msk (201.24.125.184).
 #
-# Deploy discipline (CPU/RAM on 3.8Gi):
-# - One controlled restart sequence only: stop web -> restart api -> start web.
+# Run ON the catalog host (ssh daibilet-msk). Do NOT build on SPB .16 / Intelligent Hoopoe
+# (retired from pipeline; owner deletes that VM in Timeweb).
+#
+# Deploy discipline (CPU/RAM):
+# - One controlled restart sequence only: stop web -> build -> restart api -> start web.
 # - Do NOT batch-restart unrelated units (staging, docker stacks, timers) in the same pass.
 # - Avoid back-to-back deploys that re-trigger TEP startup sync; prefer TEP_AUTO_SYNC_ENABLED=0 + cron.
 #
@@ -191,8 +195,8 @@ fi
 
 reap_orphan_next_build_workers "pre-build"
 
-# Heap cap for `next build` on 2-core / 4GB hosts (also set in apps/web/scripts/next-build.mjs).
-# MSK ~8Gi: 5120Mi build heap (was 2560 on SPB 3.8Gi). Override via NODE_OPTIONS if needed.
+# Heap cap for `next build` on MSK ~8Gi (also set in apps/web/scripts/next-build.mjs).
+# Default 5120Mi (legacy SPB 3.8Gi used 2560). Override via NODE_OPTIONS if needed.
 export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=5120}"
 echo "web:build NODE_OPTIONS=${NODE_OPTIONS}"
 pnpm web:build

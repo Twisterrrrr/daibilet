@@ -288,7 +288,7 @@ Readiness событий переведен на backend-коды: `NO_FUTURE_SE
 
 Документы: добавлены `docs/deploy-timeweb.md`, `deploy/systemd/daibilet-api.service`, `deploy/nginx/daibilet.conf.example`, обновлен `.env.example`.
 
-Остаточный риск: Teplohod production sync нужно проверять уже с сервера `213.171.7.16`, потому что именно этот IP whitelist.
+Остаточный риск (исторический): Teplohod sync раньше белили IP `213.171.7.16`. С 2026-07-30 catalog sync на MSK `.184` - перед удалением SPB проверить, что **`201.24.125.184` в Teplohod allowlist**.
 
 #### Backend TypeScript foundation, 2026-06-24
 

@@ -1,3 +1,24 @@
+## 2026-08-01 - SPB build host retired; web deploy = MSK-only
+
+### Наблюдения
+- Owner: SPB builder (`213.171.7.16` / Intelligent Hoopoe) больше не нужен; live catalog остаётся только на MSK `.184`.
+- Исторический канон «SPB build → MSK atomic `.next` swap» и одноразовые `.deploy-tmp/spb-build*.sh` устарели.
+- SSH probe 2026-08-01: `daibilet_staging_key` → `.16` **OK** (`6726557-ls758282.twc1.net`, up ~146d). Alias `daibilet-spb` в локальном SSH config **нет** (часто `Permission denied` был из-за другого ключа / `id_ed25519`).
+- На `.16` сейчас: PG Docker leftover `daibilet-tours-postgres` healthy; `/opt/daibilet` ~4G + staging ~1.6G; nginx site; public web/api/timers уже disabled (MIG.8); failed leftover rebuild units; backups `/root/backups` ~265M.
+
+### Решения
+- **Канон web deploy:** MSK-only - `BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh` на `daibilet-msk` / `201.24.125.184` (stop web → build → start).
+- Обновлены `.cursorrules`, Project, current-state, spb-finance-host, migration docs, Tasktracker MIG.9.7, qa.
+- VM **не** уничтожаем из агента: owner удаляет Intelligent Hoopoe в панели Timeweb после чеклиста (backup off-box при желании).
+- Finance `.159` / YooKassa / catalog live на `.184` - **не трогать** при удалении `.16`.
+
+### Проблемы
+- Исторические упоминания SPB→MSK в старых Diary/Tasktracker записях оставляем как audit trail.
+- Перед wipe `.16`: убедиться, что Teplohod IP allowlist знает **MSK `.184`** (старые runbooks ещё ссылались на `.16`).
+- Одноразовые скрипты в `.deploy-tmp/*spb*` не канон - не коммитить; агентам не использовать.
+
+---
+
 ## 2026-08-01 - `/locations` type chips: global counts vs city (20 vs 151)
 
 ### Наблюдения
