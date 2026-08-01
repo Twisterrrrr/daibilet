@@ -54,7 +54,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | DR.4 | Multi-add harden (stale payload fallback) + Yandex multi-stop rtext + reorder/optimize | Критический | ✅ `355eec1` BUILD `4-AqPsButr_VcuwLGcyFk` |
 | DR.5 | Dedupe day-route matches: TC dated siblings → one card (base slug / title, keep best score+price) | Критический | ✅ `270790d` BUILD `a1C8wIWfv5xrllhohrdOE` |
 | DR.6 | Multi-add recheck + null-island coords + backfill missing lat/lng (TC inst duplicates) | Критический | ✅ `a0f11ce` BUILD `wcJsYlkCYd1869HV9B1c-` · backfill 21 coords |
-| DR.7 | Catalog cards strip lat/lng → «Нет координат» in Мой день (Fontanka etc.) | Критический | 🔄 `toVenueCatalogCard` pass-through + deploy |
+| DR.7 | Catalog cards strip lat/lng → «Нет координат» in Мой день (Fontanka etc.) | Критический | ✅ `5c6ffc1` BUILD `faYl1EovDayQLYvHsV8kQ` |
 | LOC.EMPTY | `/locations?city=` empty for all cities: soft-timeout empty HTML + nginx 30m HIT | Критический | ✅ `987516b` BUILD `IffsRTTeclktlvq7PQweq` + nginx purge |
 | LOC.FACET | `/locations` type chip counts global (151) vs city (20); default «Все локации» | Критический | ✅ `bc994b6` BUILD `4-AqPsButr_VcuwLGcyFk` |
 

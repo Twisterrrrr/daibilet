@@ -9,10 +9,11 @@
 ### Решения
 - `VenueCatalogCard` + `toVenueCatalogCard` сохраняют lat/lng (reject 0,0); LocationCard Pick включает coords.
 - Unit: `venue-catalog-card.test.ts`. Phase-0 presets/event CTA отложены до после фикса.
-- MSK deploy + Playwright: catalog add пишет coords сразу; 3 точки без «Нет координат».
+- MSK deploy `5c6ffc1` → **BUILD_ID=`faYl1EovDayQLYvHsV8kQ`**. Playwright: catalog add пишет coords сразу; 1→2→3; `/my-day` «ТОЧКИ · 3/8», `Нет координат`=0, Yandex не blocked. SPb locations API coords **100% (20/20)**.
 
 ### Проблемы
 - Старые записи в localStorage без coords: открыть `/my-day` (enrich) или передобавить после деплоя.
+- Owner «не добавляет 2-ю точку» на live до фикса часто смешивался с «Нет координат»/Яндекс unavailable при 1 точке из каталога без lat/lng; multi-add path (detail+catalog) на live уже давал 1→2→3.
 
 ---
 
