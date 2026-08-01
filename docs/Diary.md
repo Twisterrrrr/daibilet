@@ -1,3 +1,20 @@
+## 2026-08-01 - Home hero: restore legacy navy blue (not black)
+
+### Наблюдения
+- Owner: чёрный фон hero на главной отталкивает; вернуть синий как в legacy.
+- Live HomeHero шёл через `HeroLayout` dark (`bg-slate-950`) + `HeroMedia` slate overlay - near-black атмосфера.
+- Эталон синего: owner city navy `#122868` / deep `#0a174b` (HERO3n+); catalog legacy `from-sky-500 via-primary-600 to-indigo-700`.
+
+### Решения
+- Только главная: `HomeHero` `!bg-[#122868]` + overlay `from-[#0a174b]/80 via-[#122868]/45 to-primary-900/30`.
+- Зеркало legacy public: `App.tsx` section + `HomeHeroBackground` overlays (slate → navy).
+- Layout/композиция без изменений. Commit + push + SPB→MSK deploy.
+
+### Проблемы
+- Нет (узкий color-only фикс).
+
+---
+
 ## 2026-08-01 - INC.504.17: канон `/etc/cron.d/daibilet-tasks` + SSR healthcheck
 
 ### Наблюдения

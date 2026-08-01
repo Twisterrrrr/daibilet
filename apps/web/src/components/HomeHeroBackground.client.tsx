@@ -37,8 +37,8 @@ export function HomeHeroBackground({ image }: HomeHeroBackgroundProps) {
           loaded ? 'opacity-100' : 'opacity-0'
         }`}
       />
-      <div className="absolute inset-0 bg-slate-900/15" />
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/75 via-slate-900/30 to-slate-900/5" />
+      <div className="absolute inset-0 bg-[#122868]/20" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0a174b]/75 via-[#122868]/35 to-[#122868]/10" />
       <div className="absolute inset-0 bg-gradient-to-br from-sky-900/25 via-transparent to-primary-900/20" />
     </div>
   );

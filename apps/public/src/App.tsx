@@ -375,7 +375,7 @@ function HomeHero({
   onOpenCatalog: (extra?: Record<string, string>) => void;
 }) {
   return (
-    <section className="relative overflow-hidden bg-slate-900">
+    <section className="relative overflow-hidden bg-[#122868]">
       <HomeHeroBackground />
       <div className="container-page relative pb-12 pt-12 sm:pb-16 sm:pt-16">
         <div className="mx-auto max-w-3xl text-center drop-shadow-[0_2px_14px_rgba(15,23,42,0.55)]">

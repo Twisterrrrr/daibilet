@@ -1,11 +1,17 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-07-31
+**Обновлено:** 2026-08-01
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
 
 ---
+
+## Homepage hero blue restore (2026-08-01)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.HOME1 | Вернуть синий (navy `#122868` / `#0a174b`) фон hero на главной вместо slate-black | Высокий | 🔄 commit+deploy |
 
 ## Location↔Excursion linking (2026-07-31)
 
