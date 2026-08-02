@@ -26,7 +26,7 @@
 | UX.LOC8 | IA: demote `/locations` из primary nav или секция city hub | Средний | ⏳ |
 | UX.LOC9 | Unified `/places` (venues+locations tabs) | Низкий | ⚠️ после LOC8 |
 | UX.MYDAY-F | Мой день: filters + auto-pick + top-up (product next) | Высокий | ⏳ поверх MOB канона |
-| UX.MYDAY-IA | `/my-day` catalog-first + text accordion (collapsed) | Критический | ✅ |
+| UX.MYDAY-IA | `/my-day` catalog-first + text accordion (collapsed) | Критический | ✅ live **BUILD_ID=`MvYEsYnvAH_KMCxXkt2S6`** |
 
 ---
 

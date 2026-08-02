@@ -29,7 +29,7 @@
 - Канон обновлён в [mobile-templates.md](./mobile-templates.md).
 
 ### Проблемы
-- Auto-pick / filters / top-up - backlog UX.MYDAY-F. BUILD_ID - после MSK ship.
+- Auto-pick / filters / top-up - backlog UX.MYDAY-F. Live MSK BUILD_ID=`MvYEsYnvAH_KMCxXkt2S6` (UI `035c3e8`).
 
 ---
 
