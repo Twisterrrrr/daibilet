@@ -1,3 +1,20 @@
+## 2026-08-02 - /my-day: on-page city + searchable add (без ухода в каталог)
+
+### Наблюдения
+- Owner: город из шапки / ссылки на `/locations|/venues|/events|/cities` уводили со страницы «Мой день». Нужен выбор города и добавление точек на месте.
+- Каталог-first IA (`MvYEsYnvAH_KMCxXkt2S6`) оставлял text accordion; ручной ввод остаётся optional.
+
+### Решения
+- On-page `CityPicker` + `setCity` на `/my-day` только persist (без `router.push` в афишу).
+- Три searchable combobox: локации / площадки / события через `/api/public/venues?family=…` и `/api/public/events?city=…`.
+- Must-see: chips + «Добавить главные места» (`resolveCityInfo` + `buildCityDayRoutePreset`), append до MAX=8.
+- Ссылки на каталог/хаб - вторичный текст внизу блока.
+
+### Проблемы
+- Deploy/smoke после commit - см. Tasktracker UX.MYDAY-ONPAGE.
+
+---
+
 ## 2026-08-02 - Blog: volhov soft-404 RCA + column signature dedupe
 
 ### Наблюдения

@@ -37,6 +37,8 @@ type SelectedCityContextValue = {
   /** False until client has read storage / URL — avoid flashing «Все города». */
   cityReady: boolean;
   selectedDestination: PublicDestinationDto | null;
+  /** Full destinations list (city picker on /my-day and chrome). */
+  destinations: PublicDestinationDto[];
   setCity: (name: string) => void;
 };
 
@@ -186,6 +188,10 @@ export function SelectedCityProvider({
       }
 
       const path = pathname.replace(/\/$/, '') || '/';
+      // /my-day owns its city control - persist only, never navigate to catalog.
+      if (path === '/my-day') {
+        return;
+      }
       if (path === '/events' || path === '/venues' || path === '/locations' || path === '/podborki') {
         const params = searchParamsKey
           ? new URLSearchParams(searchParamsKey)
@@ -229,8 +235,8 @@ export function SelectedCityProvider({
   );
 
   const value = useMemo(
-    () => ({ cityValue, cityLabel, cityReady, selectedDestination, setCity }),
-    [cityValue, cityLabel, cityReady, selectedDestination, setCity],
+    () => ({ cityValue, cityLabel, cityReady, selectedDestination, destinations, setCity }),
+    [cityValue, cityLabel, cityReady, selectedDestination, destinations, setCity],
   );
 
   return (

@@ -27,6 +27,7 @@
 | UX.LOC9 | Unified `/places` (venues+locations tabs) | Низкий | ⚠️ после LOC8 |
 | UX.MYDAY-F | Мой день: filters + auto-pick + top-up (product next) | Высокий | ⏳ поверх MOB канона |
 | UX.MYDAY-IA | `/my-day` catalog-first + text accordion (collapsed) | Критический | ✅ live **BUILD_ID=`MvYEsYnvAH_KMCxXkt2S6`** |
+| UX.MYDAY-ONPAGE | `/my-day` on-page city + searchable Локации/Площадки/События + must-see chips (no catalog nav) | Критический | 🔄 |
 
 ---
 

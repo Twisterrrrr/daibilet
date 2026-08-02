@@ -3,8 +3,6 @@
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
-  Building2,
-  CalendarDays,
   ChevronDown,
   ChevronUp,
   Copy,
@@ -18,11 +16,19 @@ import {
 } from 'lucide-react';
 import { FormEvent, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 
+import type { PublicCatalogListItemDto, PublicDestinationDto } from '@daibilet/contracts/public';
+
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
+import { CityPicker } from '@/components/CityPicker.client';
+import {
+  DayRouteSearchSelect,
+  type DayRouteSearchOption,
+} from '@/components/DayRouteSearchSelect.client';
 import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
+import { resolveCityInfo } from '@/lib/cityInfo';
 import {
   DAY_ROUTE_CHANGED_EVENT,
   DAY_ROUTE_MAX,
@@ -56,9 +62,18 @@ import {
   type DayRouteState,
   type DayRouteVenueItem,
 } from '@/lib/day-route';
+import {
+  buildCityDayRoutePreset,
+  dayRouteItemFromEvent,
+  dayRouteItemFromMustSee,
+  type DayRouteVenueMatchSource,
+} from '@/lib/day-route-from-place';
+import { flashDayRouteFeedback } from '@/lib/day-route-feedback';
 import { formatPriceFrom } from '@/lib/format';
 import { formatStreetAddress } from '@/lib/address';
 import { eventHref, venueHref } from '@/lib/routes';
+import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
+import type { VenueCatalogCard } from '@/lib/venue-map-types';
 
 type MatchVenueStub = {
   id: string;
@@ -109,6 +124,69 @@ function matchVenueToDayRouteItem(venue: MatchVenueStub): DayRouteVenueItem {
   };
 }
 
+function venueCardToDayRouteItem(venue: VenueCatalogCard): DayRouteVenueItem {
+  return {
+    id: venue.id,
+    slug: venue.slug ?? null,
+    title: venue.name,
+    city: venue.city,
+    cityId: venue.cityId ?? null,
+    citySlug: venue.citySlug ?? null,
+    address: venue.address ?? null,
+    imageUrl: venue.heroImageUrl ?? null,
+    latitude: venue.latitude ?? null,
+    longitude: venue.longitude ?? null,
+    href: venueHref({
+      id: venue.id,
+      slug: venue.slug,
+      name: venue.name,
+      type: venue.type,
+    }),
+  };
+}
+
+function venueCardToMatchSource(venue: VenueCatalogCard): DayRouteVenueMatchSource {
+  return {
+    id: venue.id,
+    slug: venue.slug,
+    name: venue.name,
+    title: venue.name,
+    type: venue.type,
+    latitude: venue.latitude,
+    longitude: venue.longitude,
+    address: venue.address,
+    heroImageUrl: venue.heroImageUrl,
+    city: venue.city,
+    citySlug: venue.citySlug,
+    cityId: venue.cityId,
+  };
+}
+
+function appendDayRouteItem(item: DayRouteVenueItem | null): DayRouteState {
+  if (!item) {
+    flashDayRouteFeedback('Не удалось добавить точку');
+    return readDayRouteFresh();
+  }
+  const before = readDayRouteFresh().venues.length;
+  if (before >= DAY_ROUTE_MAX) {
+    flashDayRouteFeedback(`Лимит ${DAY_ROUTE_MAX} точек`);
+    return readDayRouteFresh();
+  }
+  if (isInDayRoute(item.id) || (item.slug && isInDayRoute(item.slug))) {
+    flashDayRouteFeedback('Уже в маршруте');
+    return readDayRouteFresh();
+  }
+  const next = addToDayRoute(item);
+  if (next.venues.length > before) {
+    flashDayRouteFeedback(`Добавлено в маршрут · ${next.venues.length}/${DAY_ROUTE_MAX}`);
+  } else if (next.venues.length >= DAY_ROUTE_MAX) {
+    flashDayRouteFeedback(`Лимит ${DAY_ROUTE_MAX} точек`);
+  } else {
+    flashDayRouteFeedback('Не удалось добавить точку');
+  }
+  return next;
+}
+
 export function DayRoutePanel() {
   return (
     <Suspense fallback={<DayRoutePanelFallback />}>
@@ -144,6 +222,11 @@ function DayRoutePanelInner() {
   const [formError, setFormError] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [textFormOpen, setTextFormOpen] = useState(false);
+  const [locationsCatalog, setLocationsCatalog] = useState<VenueCatalogCard[]>([]);
+  const [venuesCatalog, setVenuesCatalog] = useState<VenueCatalogCard[]>([]);
+  const [eventsCatalog, setEventsCatalog] = useState<PublicCatalogListItemDto[]>([]);
+  const [catalogLoading, setCatalogLoading] = useState(false);
+  const [destinationsFallback, setDestinationsFallback] = useState<PublicDestinationDto[]>([]);
   const hydratedDayRef = useRef<string | null>(null);
   const titleFieldRef = useRef<HTMLInputElement | null>(null);
 
@@ -157,6 +240,24 @@ function DayRoutePanelInner() {
       window.removeEventListener('storage', sync);
     };
   }, []);
+
+  // Destinations for on-page city picker (prefer layout context).
+  useEffect(() => {
+    if (selectedCity?.destinations?.length) {
+      setDestinationsFallback(selectedCity.destinations);
+      return;
+    }
+    const controller = new AbortController();
+    fetch('/api/public/destinations', { signal: controller.signal })
+      .then(async (response) =>
+        response.ok ? ((await response.json()) as { destinations?: PublicDestinationDto[] }) : null,
+      )
+      .then((data) => {
+        if (data?.destinations?.length) setDestinationsFallback(data.destinations);
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, [selectedCity?.destinations]);
 
   // Prefill optional city from selected city (label only - never blocks add).
   useEffect(() => {
@@ -290,8 +391,15 @@ function DayRoutePanelInner() {
     selectedCity?.selectedDestination?.type === 'city'
       ? String(selectedCity.selectedDestination.slug || '').trim() || null
       : null;
-  const scopeCityName = cityTitle || headerCityName;
-  const scopeCitySlug = citySlug || headerCitySlug;
+  const destinations = selectedCity?.destinations?.length
+    ? selectedCity.destinations
+    : destinationsFallback;
+  const pageCityName = headerCityName;
+  const pageCitySlug = headerCitySlug;
+  const pageCityId = selectedCity?.selectedDestination?.id || null;
+  const hasPageCity = Boolean(pageCityName);
+  const scopeCityName = cityTitle || pageCityName;
+  const scopeCitySlug = citySlug || pageCitySlug;
   const scopeCityParam = scopeCityName || scopeCitySlug;
 
   const afishaHref = catalogHrefWithSelectedCity(scopeCityParam || 'all');
@@ -299,6 +407,225 @@ function DayRoutePanelInner() {
   const venuesHref = venueCatalogHrefWithSelectedCity('/venues', scopeCityParam);
   const cityHubHref = scopeCitySlug ? `/cities/${encodeURIComponent(scopeCitySlug)}` : '/cities';
   const cityContextLabel = scopeCityName || (scopeCitySlug ? scopeCitySlug : null);
+
+  // City-scoped catalog lists for on-page searchable selects.
+  useEffect(() => {
+    if (!pageCityName) {
+      setLocationsCatalog([]);
+      setVenuesCatalog([]);
+      setEventsCatalog([]);
+      setCatalogLoading(false);
+      return;
+    }
+    const controller = new AbortController();
+    setCatalogLoading(true);
+    const cityQ = encodeURIComponent(pageCityName);
+    Promise.all([
+      fetch(`/api/public/venues?family=location&limit=500`, { signal: controller.signal })
+        .then(async (response) =>
+          response.ok ? ((await response.json()) as { venues?: VenueCatalogCard[] }) : null,
+        )
+        .catch(() => null),
+      fetch(`/api/public/venues?family=institution&limit=500`, { signal: controller.signal })
+        .then(async (response) =>
+          response.ok ? ((await response.json()) as { venues?: VenueCatalogCard[] }) : null,
+        )
+        .catch(() => null),
+      fetch(`/api/public/events?city=${cityQ}&limit=80&sort=popular`, { signal: controller.signal })
+        .then(async (response) =>
+          response.ok
+            ? ((await response.json()) as { items?: PublicCatalogListItemDto[]; sessions?: PublicCatalogListItemDto[] })
+            : null,
+        )
+        .catch(() => null),
+    ])
+      .then(([locationsPayload, venuesPayload, eventsPayload]) => {
+        const filterCity = (list: VenueCatalogCard[] | undefined) =>
+          (list || [])
+            .map((item) => toVenueCatalogCard(item))
+            .filter((item) => item.city === pageCityName);
+        setLocationsCatalog(filterCity(locationsPayload?.venues));
+        setVenuesCatalog(filterCity(venuesPayload?.venues));
+        const events = eventsPayload?.items || eventsPayload?.sessions || [];
+        setEventsCatalog(events.filter((item) => item.city === pageCityName || !pageCityName));
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setCatalogLoading(false);
+      });
+    return () => controller.abort();
+  }, [pageCityName]);
+
+  const matchSources = useMemo(() => {
+    const map = new Map<string, DayRouteVenueMatchSource>();
+    for (const venue of [...locationsCatalog, ...venuesCatalog]) {
+      const source = venueCardToMatchSource(venue);
+      if (venue.id) map.set(venue.id, source);
+      if (venue.slug) map.set(String(venue.slug), source);
+    }
+    return [...map.values()];
+  }, [locationsCatalog, venuesCatalog]);
+
+  const mustSeePlaces = useMemo(() => {
+    const info = resolveCityInfo(pageCitySlug, selectedCity?.selectedDestination?.sourceSlug);
+    return info?.mustSee || [];
+  }, [pageCitySlug, selectedCity?.selectedDestination?.sourceSlug]);
+
+  const mustSeeResolved = useMemo(() => {
+    if (!pageCityName || !mustSeePlaces.length) return [];
+    const cityCtx = {
+      id: pageCityId,
+      name: pageCityName,
+      slug: pageCitySlug,
+      sourceSlug: selectedCity?.selectedDestination?.sourceSlug || null,
+    };
+    return mustSeePlaces
+      .map((place) => {
+        const item = dayRouteItemFromMustSee(place, matchSources, cityCtx);
+        return item ? { place, item } : null;
+      })
+      .filter((row): row is { place: (typeof mustSeePlaces)[number]; item: DayRouteVenueItem } =>
+        Boolean(row),
+      );
+  }, [mustSeePlaces, matchSources, pageCityId, pageCityName, pageCitySlug, selectedCity?.selectedDestination?.sourceSlug]);
+
+  const mustSeeAddable = useMemo(() => {
+    return mustSeeResolved.filter(
+      ({ item }) => !isInDayRoute(item.id, route) && !(item.slug && isInDayRoute(item.slug, route)),
+    );
+  }, [mustSeeResolved, route]);
+
+  const locationOptions = useMemo<DayRouteSearchOption[]>(() => {
+    return locationsCatalog.map((venue) => {
+      const inRoute = isInDayRoute(venue.id, route) || Boolean(venue.slug && isInDayRoute(venue.slug, route));
+      return {
+        id: venue.id,
+        label: venue.name,
+        hint: venue.address || venue.city,
+        disabled: inRoute || atMax,
+        disabledReason: inRoute ? 'Уже в маршруте' : atMax ? `Лимит ${DAY_ROUTE_MAX}` : null,
+      };
+    });
+  }, [locationsCatalog, route, atMax]);
+
+  const venueOptions = useMemo<DayRouteSearchOption[]>(() => {
+    return venuesCatalog.map((venue) => {
+      const inRoute = isInDayRoute(venue.id, route) || Boolean(venue.slug && isInDayRoute(venue.slug, route));
+      return {
+        id: venue.id,
+        label: venue.name,
+        hint: venue.address || venue.city,
+        disabled: inRoute || atMax,
+        disabledReason: inRoute ? 'Уже в маршруте' : atMax ? `Лимит ${DAY_ROUTE_MAX}` : null,
+      };
+    });
+  }, [venuesCatalog, route, atMax]);
+
+  const eventOptions = useMemo<DayRouteSearchOption[]>(() => {
+    return eventsCatalog.map((event) => {
+      const sessionHint = [event.dateLabel, event.timeLabel].filter(Boolean).join(', ');
+      const venueHint = [event.venue, sessionHint].filter(Boolean).join(' · ');
+      const venueKey = String(event.venueSlug || event.venue || event.id).trim();
+      const inRoute = Boolean(
+        (event.venueSlug && isInDayRoute(event.venueSlug, route)) ||
+          (event.venue &&
+            route.venues.some((v) => v.title.trim().toLowerCase() === String(event.venue).trim().toLowerCase())),
+      );
+      return {
+        id: `event:${event.id}`,
+        label: event.title,
+        hint: venueHint || null,
+        disabled: inRoute || atMax || !venueKey,
+        disabledReason: !venueKey
+          ? 'Нет площадки'
+          : inRoute
+            ? 'Уже в маршруте'
+            : atMax
+              ? `Лимит ${DAY_ROUTE_MAX}`
+              : null,
+      };
+    });
+  }, [eventsCatalog, route, atMax]);
+
+  function pickLocationById(id: string) {
+    const venue = locationsCatalog.find((item) => item.id === id);
+    if (!venue) return;
+    setRoute(appendDayRouteItem(venueCardToDayRouteItem(venue)));
+  }
+
+  function pickVenueById(id: string) {
+    const venue = venuesCatalog.find((item) => item.id === id);
+    if (!venue) return;
+    setRoute(appendDayRouteItem(venueCardToDayRouteItem(venue)));
+  }
+
+  function pickEventById(optionId: string) {
+    const eventId = optionId.replace(/^event:/, '');
+    const event = eventsCatalog.find((item) => item.id === eventId);
+    if (!event) return;
+    const matchedVenue =
+      venuesCatalog.find((v) => v.slug && v.slug === event.venueSlug) ||
+      locationsCatalog.find((v) => v.slug && v.slug === event.venueSlug) ||
+      venuesCatalog.find((v) => v.name === event.venue) ||
+      locationsCatalog.find((v) => v.name === event.venue) ||
+      null;
+    const item = dayRouteItemFromEvent({
+      id: event.id,
+      slug: event.slug,
+      title: event.title,
+      city: event.city,
+      cityId: pageCityId,
+      citySlug: pageCitySlug || event.citySlug,
+      venueId: matchedVenue?.id || null,
+      venueSlug: event.venueSlug || matchedVenue?.slug || null,
+      venue: event.venue || matchedVenue?.name || null,
+      venueKind: event.venueKind || matchedVenue?.type || null,
+      venueAddress: matchedVenue?.address || null,
+      venueLatitude: matchedVenue?.latitude ?? null,
+      venueLongitude: matchedVenue?.longitude ?? null,
+      startsAt: event.startsAt,
+      dateLabel: event.dateLabel,
+      timeLabel: event.timeLabel,
+      imageUrl: event.imageUrl || matchedVenue?.heroImageUrl || null,
+    });
+    setRoute(appendDayRouteItem(item));
+  }
+
+  function addMustSeeItem(item: DayRouteVenueItem) {
+    setRoute(appendDayRouteItem(item));
+  }
+
+  function addAllMustSee() {
+    if (!mustSeeAddable.length || atMax) {
+      flashDayRouteFeedback(atMax ? `Лимит ${DAY_ROUTE_MAX} точек` : 'Нет главных мест для добавления');
+      return;
+    }
+    const cityCtx = {
+      id: pageCityId,
+      name: pageCityName,
+      slug: pageCitySlug,
+      sourceSlug: selectedCity?.selectedDestination?.sourceSlug || null,
+    };
+    const preset = buildCityDayRoutePreset(
+      mustSeePlaces,
+      matchSources,
+      cityCtx,
+      DAY_ROUTE_MAX,
+    );
+    let next = readDayRouteFresh();
+    let added = 0;
+    for (const item of preset) {
+      if (next.venues.length >= DAY_ROUTE_MAX) break;
+      if (isInDayRoute(item.id, next) || (item.slug && isInDayRoute(item.slug, next))) continue;
+      next = addToDayRoute(item);
+      added += 1;
+    }
+    setRoute(next);
+    flashDayRouteFeedback(
+      added
+        ? `Добавлено главных мест: ${added} · ${next.venues.length}/${DAY_ROUTE_MAX}`
+        : 'Главные места уже в маршруте',
+    );
+  }
 
   const allMatchVenues = useMemo(() => {
     const list: MatchVenueStub[] = [...(payload?.venues || [])];
@@ -436,7 +763,7 @@ function DayRoutePanelInner() {
           <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Собери свой день</p>
           <h1 className="mt-1 font-display text-2xl font-extrabold text-slate-900 sm:text-3xl">Мой день</h1>
           <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-slate-600 sm:mt-2">
-            Добавляйте места из каталога - локации, площадки и события. До {DAY_ROUTE_MAX} точек
+            Выберите город и добавляйте локации, площадки и события прямо здесь. До {DAY_ROUTE_MAX} точек
             {cityContextLabel ? ` · ${cityContextLabel}` : ''}.
           </p>
           <p className="mt-2 text-xs font-semibold text-slate-500" data-day-route-count-label>
@@ -478,55 +805,146 @@ function DayRoutePanelInner() {
         </p>
       ) : null}
 
-      {/* Primary: catalog entities (owner IA 2026-08-02) */}
+      {/* Primary: on-page city + searchable catalog picks (owner UX 2026-08-02) */}
       <section
         id="day-catalog-add"
         className="mt-5 rounded-2xl border border-slate-200 bg-white p-3.5 sm:mt-8 sm:p-5"
         data-day-catalog-add="1"
       >
-        <p className="text-sm font-semibold text-slate-900">Добавить из каталога</p>
+        <p className="text-sm font-semibold text-slate-900">Добавить в день</p>
         <p className="mt-1 text-sm leading-relaxed text-slate-600">
-          Откройте карточку места или события и нажмите «В мой день». Город берётся из шапки.
+          Город и места выбираются на этой странице - без перехода в каталог.
         </p>
-        <div className="mt-3 grid gap-2 sm:grid-cols-3">
-          <Link
-            href={locationsHref}
-            className="flex min-h-12 items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm font-semibold text-slate-900 transition hover:border-emerald-300 hover:bg-emerald-50"
-          >
-            <MapPin className="h-4 w-4 shrink-0 text-emerald-700" />
-            Локации
-          </Link>
-          <Link
-            href={venuesHref}
-            className="flex min-h-12 items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm font-semibold text-slate-900 transition hover:border-emerald-300 hover:bg-emerald-50"
-          >
-            <Building2 className="h-4 w-4 shrink-0 text-sky-700" />
-            Площадки
-          </Link>
-          <Link
-            href={afishaHref}
-            className="flex min-h-12 items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm font-semibold text-slate-900 transition hover:border-emerald-300 hover:bg-emerald-50"
-          >
-            <CalendarDays className="h-4 w-4 shrink-0 text-amber-700" />
-            События
-          </Link>
+
+        <div className="mt-3 max-w-md" data-day-city-picker>
+          <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            Город
+          </label>
+          <CityPicker
+            cities={destinations}
+            value={selectedCity?.cityValue || 'all'}
+            onChange={(name) => {
+              selectedCity?.setCity(name);
+              if (name !== 'all') setCityInput(name);
+            }}
+            allLabel="Выберите город"
+            variant="hero"
+            className="w-full"
+          />
         </div>
-        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-          <Link
-            href={cityHubHref}
-            className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-primary-600"
-          >
-            <Sparkles className="h-3.5 w-3.5" />
-            {scopeCitySlug ? 'Главные места города' : 'Выбрать город'}
+
+        {!hasPageCity ? (
+          <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            Сначала выберите город - появятся локации, площадки, события и главные места.
+          </p>
+        ) : (
+          <>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <DayRouteSearchSelect
+                label="Локации"
+                placeholder="Найти локацию…"
+                emptyText={catalogLoading ? 'Загружаем…' : 'Нет локаций в этом городе'}
+                loading={catalogLoading}
+                disabled={atMax}
+                options={locationOptions}
+                onPick={(option) => pickLocationById(option.id)}
+              />
+              <DayRouteSearchSelect
+                label="Площадки"
+                placeholder="Найти площадку…"
+                emptyText={catalogLoading ? 'Загружаем…' : 'Нет площадок в этом городе'}
+                loading={catalogLoading}
+                disabled={atMax}
+                options={venueOptions}
+                onPick={(option) => pickVenueById(option.id)}
+              />
+              <DayRouteSearchSelect
+                label="События"
+                placeholder="Найти событие…"
+                emptyText={catalogLoading ? 'Загружаем…' : 'Нет событий в этом городе'}
+                loading={catalogLoading}
+                disabled={atMax}
+                options={eventOptions}
+                onPick={(option) => pickEventById(option.id)}
+              />
+            </div>
+
+            {mustSeeResolved.length > 0 ? (
+              <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50 p-3 sm:p-4" data-day-must-see>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900">Главные места города</p>
+                    <p className="mt-0.5 text-xs text-slate-500">
+                      Нажмите на место или добавьте все сразу (до {DAY_ROUTE_MAX}).
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    disabled={atMax || mustSeeAddable.length === 0}
+                    onClick={addAllMustSee}
+                    data-day-must-see-bulk
+                    className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
+                  >
+                    <Sparkles className="h-3.5 w-3.5" />
+                    Добавить главные места
+                    {mustSeeAddable.length ? ` (${Math.min(mustSeeAddable.length, DAY_ROUTE_MAX - route.venues.length)})` : ''}
+                  </button>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {mustSeeResolved.map(({ place, item }) => {
+                    const inRoute =
+                      isInDayRoute(item.id, route) || Boolean(item.slug && isInDayRoute(item.slug, route));
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        disabled={inRoute || atMax}
+                        title={inRoute ? 'Уже в маршруте' : atMax ? `Лимит ${DAY_ROUTE_MAX}` : 'Добавить в день'}
+                        onClick={() => addMustSeeItem(item)}
+                        className={`inline-flex max-w-full items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed ${
+                          inRoute
+                            ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                            : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50'
+                        }`}
+                      >
+                        <MapPin className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                        <span className="truncate">{place.name}</span>
+                        {inRoute ? <span className="shrink-0 text-[10px] uppercase">в дне</span> : null}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : pageCitySlug && !catalogLoading ? (
+              <p className="mt-3 text-xs text-slate-500">
+                Для этого города пока нет списка главных мест - добавьте точки через поиск выше.
+              </p>
+            ) : null}
+          </>
+        )}
+
+        <p className="mt-3 text-xs text-slate-500">
+          Каталог целиком:{' '}
+          <Link href={locationsHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
+            локации
           </Link>
-          {!headerCityName && !cityTitle ? (
-            <p className="text-xs text-slate-500">Выберите город в шапке - ссылки станут короче.</p>
-          ) : (
-            <p className="text-xs text-slate-500">
-              На хабе города можно «Собрать за минуту» из главных мест.
-            </p>
-          )}
-        </div>
+          {' · '}
+          <Link href={venuesHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
+            площадки
+          </Link>
+          {' · '}
+          <Link href={afishaHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
+            события
+          </Link>
+          {scopeCitySlug ? (
+            <>
+              {' · '}
+              <Link href={cityHubHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
+                хаб города
+              </Link>
+            </>
+          ) : null}
+        </p>
       </section>
 
       {!route.venues.length ? (
@@ -534,8 +952,8 @@ function DayRoutePanelInner() {
           <Route className="mx-auto h-8 w-8 text-slate-400" />
           <p className="mt-3 text-base font-semibold text-slate-800">Пока нет точек</p>
           <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-500">
-            Начните с локаций, площадок или событий выше. Минимум {DAY_ROUTE_MIN} точки, чтобы день сложился.
-            Своё место - по желанию внизу страницы.
+            Выберите город выше и добавьте локации, площадки или события. Минимум {DAY_ROUTE_MIN} точки,
+            чтобы день сложился. Своё место - по желанию внизу страницы.
           </p>
         </div>
       ) : (
@@ -916,8 +1334,8 @@ function DayRoutePanelInner() {
             href="#day-catalog-add"
             className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 text-sm font-bold text-white hover:bg-primary-600"
           >
-            <MapPin className="h-4 w-4" />
-            Из каталога
+            <Plus className="h-4 w-4" />
+            Добавить
           </a>
         ) : null}
         {!atMax ? (
