@@ -2111,3 +2111,18 @@ model QualityIssue {
 
   event Event @relation(fields: [eventId], references: [id])
 }
+
+/// Viral short links for «Мой день» share (`/d/{code}` → `/my-day?city=&items=`).
+model DayRouteShare {
+  code      String   @id
+  citySlug  String?
+  items     String
+  fromName  String?
+  hitCount  Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([citySlug, items])
+  @@index([createdAt])
+  @@map("day_route_shares")
+}

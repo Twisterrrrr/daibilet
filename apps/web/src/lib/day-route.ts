@@ -1061,8 +1061,9 @@ export function applyItemTokensToVenues(
 }
 
 /**
- * Canonical viral share path (no DB): `/my-day?city=spb&items=341:1400,892:free`.
+ * Canonical viral share path (long, no DB): `/my-day?city=spb&items=341:1400,892:free`.
  * Legacy `?day=` still parsed on open; builders emit city+items.
+ * Share UX prefers short `/d/{code}` via POST `/api/day-route/share` (fallback = this path).
  */
 export function buildDayRouteSharePath(
   venues: DayRouteVenueItem[],
@@ -1080,6 +1081,49 @@ export function buildDayRouteSharePath(
   const from = String(options?.fromName || '').trim();
   if (from) params.set('from', from.slice(0, 40));
   return `/my-day?${params.toString()}`;
+}
+
+/** Public short-link path format: `/d/x7k2m9a`. */
+export function buildDayRouteShortPath(code: string): string {
+  const normalized = String(code || '')
+    .trim()
+    .toLowerCase();
+  return normalized ? `/d/${encodeURIComponent(normalized)}` : '/my-day';
+}
+
+/**
+ * Create short share code for current long path payload.
+ * Returns null on network/API failure (caller falls back to long URL).
+ */
+export async function createDayRouteShortShare(input: {
+  citySlug?: string | null;
+  items: string;
+  fromName?: string | null;
+}): Promise<{ code: string; path: string; longPath?: string } | null> {
+  const items = String(input.items || '').trim();
+  if (!items) return null;
+  try {
+    const res = await fetch('/api/day-route/share', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        city: input.citySlug || undefined,
+        items,
+        from: input.fromName || undefined,
+      }),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as {
+      ok?: boolean;
+      code?: string;
+      path?: string;
+      longPath?: string;
+    };
+    if (!data?.ok || !data.code || !data.path) return null;
+    return { code: data.code, path: data.path, longPath: data.longPath };
+  } catch {
+    return null;
+  }
 }
 
 /** First timed stop as `14:00` for share copy. */

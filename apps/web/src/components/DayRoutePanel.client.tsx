@@ -51,6 +51,7 @@ import {
   buildDayRouteCoordsMap,
   buildDayRouteShareMessage,
   buildDayRouteSharePath,
+  createDayRouteShortShare,
   buildMaxShareUrl,
   buildTelegramShareUrl,
   buildWhatsAppShareUrl,
@@ -245,7 +246,9 @@ function DayRoutePanelInner() {
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
   const [copyStatus, setCopyStatus] = useState<'idle' | 'ok' | 'err'>('idle');
+  const [shareBusy, setShareBusy] = useState(false);
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
+  const shortShareCacheRef = useRef<Map<string, string>>(new Map());
   const [shareLanding, setShareLanding] = useState<{
     active: boolean;
     fromName: string | null;
@@ -913,45 +916,75 @@ function DayRoutePanelInner() {
     titleFieldRef.current?.focus();
   }
 
-  async function copyShareLink() {
-    if (!route.venues.length || typeof window === 'undefined') return;
-    const path = buildDayRouteSharePath(route.venues, {
+  async function resolveShareUrls(): Promise<{ shareUrl: string; path: string; longPath: string }> {
+    const longPath = buildDayRouteSharePath(route.venues, {
       citySlug: scopeCitySlug || pageCitySlug || cityParam,
     });
-    const url = `${window.location.origin}${path}`;
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const longUrl = origin ? `${origin}${longPath}` : longPath;
+    if (!route.venues.length) return { shareUrl: longUrl, path: longPath, longPath };
+
+    const cached = shortShareCacheRef.current.get(longPath);
+    if (cached) {
+      return { shareUrl: origin ? `${origin}${cached}` : cached, path: cached, longPath };
+    }
+
     try {
-      await navigator.clipboard.writeText(url);
+      const parsed = new URL(longPath, 'https://daibilet.ru');
+      const short = await createDayRouteShortShare({
+        citySlug: parsed.searchParams.get('city'),
+        items: parsed.searchParams.get('items') || '',
+        fromName: parsed.searchParams.get('from'),
+      });
+      if (short?.path) {
+        shortShareCacheRef.current.set(longPath, short.path);
+        return {
+          shareUrl: origin ? `${origin}${short.path}` : short.path,
+          path: short.path,
+          longPath,
+        };
+      }
+    } catch {
+      // fallback to long URL below
+    }
+    return { shareUrl: longUrl, path: longPath, longPath };
+  }
+
+  async function copyShareLink() {
+    if (!route.venues.length || typeof window === 'undefined' || shareBusy) return;
+    setShareBusy(true);
+    try {
+      const { shareUrl } = await resolveShareUrls();
+      await navigator.clipboard.writeText(shareUrl);
       setCopyStatus('ok');
       setShareMenuOpen(false);
     } catch {
       setCopyStatus('err');
+    } finally {
+      setShareBusy(false);
     }
     window.setTimeout(() => setCopyStatus('idle'), 2200);
   }
 
-  function getSharePayload() {
-    const path = buildDayRouteSharePath(route.venues, {
-      citySlug: scopeCitySlug || pageCitySlug || cityParam,
-    });
-    const shareUrl =
-      typeof window !== 'undefined' ? `${window.location.origin}${path}` : path;
-    const text = buildDayRouteShareMessage({
-      cityTitle: scopeCityName || cityTitle,
-      shareUrl,
-      venues: route.venues,
-    });
-    return { shareUrl, text, path };
-  }
-
-  function openMessengerShare(kind: 'telegram' | 'whatsapp' | 'max') {
-    if (!route.venues.length || typeof window === 'undefined') return;
-    const { shareUrl, text } = getSharePayload();
-    let href = '';
-    if (kind === 'telegram') href = buildTelegramShareUrl(text, shareUrl);
-    else if (kind === 'whatsapp') href = buildWhatsAppShareUrl(text);
-    else href = buildMaxShareUrl(text);
-    setShareMenuOpen(false);
-    window.open(href, '_blank', 'noopener,noreferrer');
+  async function openMessengerShare(kind: 'telegram' | 'whatsapp' | 'max') {
+    if (!route.venues.length || typeof window === 'undefined' || shareBusy) return;
+    setShareBusy(true);
+    try {
+      const { shareUrl } = await resolveShareUrls();
+      const text = buildDayRouteShareMessage({
+        cityTitle: scopeCityName || cityTitle,
+        shareUrl,
+        venues: route.venues,
+      });
+      let href = '';
+      if (kind === 'telegram') href = buildTelegramShareUrl(text, shareUrl);
+      else if (kind === 'whatsapp') href = buildWhatsAppShareUrl(text);
+      else href = buildMaxShareUrl(text);
+      setShareMenuOpen(false);
+      window.open(href, '_blank', 'noopener,noreferrer');
+    } finally {
+      setShareBusy(false);
+    }
   }
 
   function saveSharedRoute() {
@@ -1022,19 +1055,26 @@ function DayRoutePanelInner() {
                   <button
                     type="button"
                     role="menuitem"
-                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-emerald-50"
+                    disabled={shareBusy}
+                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-emerald-50 disabled:opacity-60"
                     onClick={() => {
                       void copyShareLink();
                     }}
                   >
-                    <Copy className="h-4 w-4 text-emerald-700" />
-                    Скопировать ссылку
+                    <Copy className="h-4 w-4 shrink-0 text-emerald-700" />
+                    <span className="min-w-0">
+                      <span className="block">Скопировать ссылку</span>
+                      <span className="block text-xs font-medium text-slate-500">Короткая ссылка</span>
+                    </span>
                   </button>
                   <button
                     type="button"
                     role="menuitem"
-                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-sky-50"
-                    onClick={() => openMessengerShare('telegram')}
+                    disabled={shareBusy}
+                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-sky-50 disabled:opacity-60"
+                    onClick={() => {
+                      void openMessengerShare('telegram');
+                    }}
                   >
                     <ExternalLink className="h-4 w-4 text-sky-600" />
                     Telegram
@@ -1042,8 +1082,11 @@ function DayRoutePanelInner() {
                   <button
                     type="button"
                     role="menuitem"
-                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-emerald-50"
-                    onClick={() => openMessengerShare('whatsapp')}
+                    disabled={shareBusy}
+                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-emerald-50 disabled:opacity-60"
+                    onClick={() => {
+                      void openMessengerShare('whatsapp');
+                    }}
                   >
                     <ExternalLink className="h-4 w-4 text-emerald-600" />
                     WhatsApp
@@ -1052,8 +1095,11 @@ function DayRoutePanelInner() {
                     type="button"
                     role="menuitem"
                     data-day-share-max
-                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-violet-50"
-                    onClick={() => openMessengerShare('max')}
+                    disabled={shareBusy}
+                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-violet-50 disabled:opacity-60"
+                    onClick={() => {
+                      void openMessengerShare('max');
+                    }}
                   >
                     <ExternalLink className="h-4 w-4 text-violet-600" />
                     Макс
@@ -1129,7 +1175,7 @@ function DayRoutePanelInner() {
           className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900"
           data-day-share-ok
         >
-          Ссылка скопирована!
+          Короткая ссылка скопирована!
         </p>
       ) : null}
 

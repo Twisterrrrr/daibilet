@@ -8,6 +8,7 @@ import {
   addToDayRoute,
   buildDayRouteCoordsMap,
   buildDayRouteSharePath,
+  buildDayRouteShortPath,
   buildMaxShareUrl,
   buildYandexMultiStopRouteUrl,
   catalogDayRouteVenueIds,
@@ -92,6 +93,12 @@ test('buildDayRouteSharePath emits city+items format', () => {
   const url = new URL(path, 'https://daibilet.ru');
   assert.equal(url.searchParams.get('city'), 'spb');
   assert.equal(url.searchParams.get('items'), '341:1400,892:free');
+});
+
+test('buildDayRouteShortPath uses /d/{code}', () => {
+  assert.equal(buildDayRouteShortPath('x7k2m9a'), '/d/x7k2m9a');
+  assert.equal(buildDayRouteShortPath(' AbC2345 '), '/d/abc2345');
+  assert.equal(buildDayRouteShortPath(''), '/my-day');
 });
 
 test('parseDayRouteItemsParam parses id:HHMM and free', () => {

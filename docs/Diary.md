@@ -1,4 +1,21 @@
-## 2026-08-02 - Header: Маршрут/Избранное без дубля счётчика
+## 2026-08-02 - /my-day: короткие ссылки шаринга `/d/{code}`
+
+### Наблюдения
+- Owner: Copy / Telegram / WhatsApp / Макс должны отдавать короткую ссылку, не километровый `?city=&items=...`.
+- Long query остаётся каноном hydrate (redirect target).
+
+### Решения
+- Таблица `day_route_shares` (Prisma `DayRouteShare`): code (7 chars) → citySlug + items + fromName.
+- POST `/api/day-route/share` создаёт/reuse код; GET `/d/[code]` → redirect `/my-day?city=&items=`.
+- Share menu: «Скопировать ссылку» + hint «Короткая ссылка»; fallback на long URL при ошибке API.
+- Browser URL при редактировании может оставаться long - в шаринге short.
+
+### Проблемы
+- Нужен MSK deploy (web + migrate). BUILD_ID - после деплоя.
+
+---
+
+
 
 ### Наблюдения
 - Owner screenshot: `DayRouteBadge` показывал «Маршрут · 7» + зелёный badge «7» - цифра дублировалась.
