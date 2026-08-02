@@ -33,7 +33,7 @@
 | UX.MYDAY-ACCORDION | `/my-day` compact: route always open; other sections exclusive accordion; «Своё место» under route | Критический | ✅ `a4ce4e7` MSK **BUILD_ID=`QrIjNExsel44mrZk0b09y`** smoke /my-day 200 |
 | UX.MYDAY-SHARE | Viral share `?city=&items=id:HHMM\|free`; menu Copy/TG/WA/**Макс**; buy+bought; DnD/print/distance MVP | Критический | ✅ `42421d4` |
 | UX.MYDAY-SHARE-UX | Убран friend-landing баннер; share-текст в мессенджере; print «Сохранить»; hydrate без gate | Критический | 🔄 message `day-route.ts` + deploy |
-| UX.MYDAY-SHORT | Short share URL `/d/{code}` → redirect `/my-day?city=&items=`; POST `/api/day-route/share`; fallback long URL | Критический | 🔄 |
+| UX.MYDAY-SHORT | Short share URL `/d/{code}` → redirect `/my-day?city=&items=`; POST `/api/day-route/share`; fallback long URL | Критический | ✅ `102443d` MSK **BUILD_ID=`jZmbBH9ZIxyREVMEnwmal`** smoke create+307 |
 | UX.MYDAY-PRINT | Маршрутный лист: print CTA «Сохранить» + `@media print` sheet (город/дата, точки, км+ETA), chrome hide | Критический | ✅ `62564ca` → label shorten в SHARE-UX |
 | UX.MYDAY-BOAT | Канон добора теплохода: Pier→Route→Slot→pin (`eventId`+time); share только после слота; SPB MVP wizard | Критический | ✅ `0212c13` MSK **BUILD_ID=`EdAk08KxqEiFe8Ow1Qg3i`** |
 | UX.NN-COORDS | НН day-route coords: DTO venueRowsByIds + city hub merge published + city filter aliases + editorial fallback | Критический | ✅ `bee2a2a` MSK **BUILD_ID=`n6C8O0jfVXm2ksCrQ_yKG`** city hub 78/78 coords; preset stops 5/5 |

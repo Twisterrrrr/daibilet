@@ -1,3 +1,20 @@
+## 2026-08-02 - /my-day: короткие ссылки шаринга `/d/{code}`
+
+### Наблюдения
+- Owner: Copy / Telegram / WhatsApp / Макс должны отдавать короткую ссылку, не километровый `?city=&items=...`.
+- Long query остаётся каноном hydrate (redirect target).
+
+### Решения
+- Таблица `day_route_shares` (Prisma `DayRouteShare`): code (7 chars) → citySlug + items + fromName.
+- POST `/api/day-route/share` создаёт/reuse код; GET `/d/[code]` Route Handler → HTTP 307 relative Location `/my-day?city=&items=`.
+- Share menu: «Скопировать ссылку» + hint «Короткая ссылка»; fallback на long URL при ошибке API.
+- Browser URL при редактировании может оставаться long - в шаринге short.
+
+### Проблемы
+- ~~MSK deploy~~ → `102443d` **BUILD_ID=`jZmbBH9ZIxyREVMEnwmal`**. Smoke: create `yrskwgn`, `/d/yrskwgn` 307 → `/my-day?city=spb&items=ermitazh%3Afree`, `/my-day` 200.
+
+---
+
 ## 2026-08-02 - Мой день: compact accordion UX (mobile)
 
 ### Наблюдения
