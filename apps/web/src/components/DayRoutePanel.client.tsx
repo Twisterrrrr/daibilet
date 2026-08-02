@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import {
+  Check,
   ChevronDown,
   ChevronUp,
   Copy,
@@ -903,13 +904,16 @@ function DayRoutePanelInner() {
                         onClick={() => addMustSeeItem(item)}
                         className={`inline-flex max-w-full items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed ${
                           inRoute
-                            ? 'border-emerald-200 bg-emerald-50 text-emerald-800'
+                            ? 'border-emerald-400 bg-emerald-50 text-emerald-800'
                             : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50'
                         }`}
                       >
-                        <MapPin className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                        {inRoute ? (
+                          <Check className="h-3.5 w-3.5 shrink-0 text-emerald-600" aria-hidden />
+                        ) : (
+                          <MapPin className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                        )}
                         <span className="truncate">{place.name}</span>
-                        {inRoute ? <span className="shrink-0 text-[10px] uppercase">в дне</span> : null}
                       </button>
                     );
                   })}
