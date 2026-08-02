@@ -10,7 +10,12 @@ import { buildPublicArticlePageDto, buildPublicArticlesListDto } from '@daibilet
 export const revalidate = 300;
 
 /** Старые slug → каноническая статья (объединения / переезды). */
-const BLOG_SLUG_REDIRECTS: Record<string, string> = {};
+const BLOG_SLUG_REDIRECTS: Record<string, string> = {
+  // Дубль колонки Макса (HIDDEN) → live канон
+  'bylinnyy-bereg-fentezi-fest': '/blog/fentezi-fest-bylinnyy-bereg',
+  // Старый open-air Макса (HIDDEN) → актуальная колонка про парки
+  'open-air-festy-vyhodnoi-ru': '/blog/moskva-parki-open-air-vyhodnye',
+};
 
 type PageProps = {
   params: Promise<{ slug: string }>;

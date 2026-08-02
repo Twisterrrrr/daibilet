@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { resolveBlogListingCta } from './blog-listing-links';
-import { stripColumnMetaPrefix } from './blog-meta';
+import { stripColumnBodyChrome, stripColumnMetaPrefix } from './blog-meta';
 import { resolveBlogTopics, parseBlogTopicParam } from './blog-topics';
 import {
   expandListingExcerpt,
@@ -87,6 +87,12 @@ test('stripColumnMetaPrefix removes author column labels', () => {
     stripColumnMetaPrefix('Колонка о том, как устроен вечер: звук с края'),
     'Колонка о том, как устроен вечер: звук с края',
   );
+});
+
+test('stripColumnBodyChrome removes UI-duplicated column chrome', () => {
+  const raw =
+    '*Авторская колонка Артура, гастрономического обозревателя Дайбилет*\n\nЛид текста.\n\n*Артур, штатный корреспондент Дайбилет*';
+  assert.equal(stripColumnBodyChrome(raw), 'Лид текста.');
 });
 
 test('expandListingExcerpt does not mash excerpt with body', () => {

@@ -1,4 +1,21 @@
-## 2026-08-02 - Codex handoff: SSR hang RCA brief (INC.504.22)
+## 2026-08-02 - Blog: volhov soft-404 RCA + column signature dedupe
+
+### Наблюдения
+- Owner: `/blog/bylinnyy-bereg-fentezi-fest-volhov` «404»; дубль «Игорь, штатный корреспондент Дайбилет».
+- Live: slug **PUBLISHED** (`publishedAt` 2026-08-01 10:05 MSK), cover/inline 200; soft-404 UI у Next отдаёт HTTP 200 с title «Статья не найдена».
+- Исторический 404-путь: CMS `HIDDEN` / future `publishedAt` → `cmsOwned` без public row → `notFound()` (static fallback блокируется). HIDDEN-близнец `bylinnyy-bereg-fentezi-fest` сейчас soft-404.
+- В body колонок дублировалась UI-подпись; в DB ещё лиды `*Авторская колонка…*` у kazan/muzyka/elena.
+
+### Решения
+- Убраны хвосты подписи из MD; `stripColumnBodyChrome` в `blog-content.mjs` + render в `BlogArticleView`.
+- 301: `bylinnyy-bereg-fentezi-fest` → `fentezi-fest-bylinnyy-bereg`; `open-air-festy-vyhodnoi-ru` → `moskva-parki-open-air-vyhodnye`.
+- Upsert затронутых статей + MSK deploy.
+
+### Проблемы
+- Soft-404 блога по-прежнему HTTP 200 (не status 404) - отдельный hardening.
+
+---
+
 
 ### Наблюдения
 - Owner: нужен независимый взгляд Codex на recurring SSR hang/504 (INC.504.13/.15/.18-.21), не повтор ops-бандаидов.

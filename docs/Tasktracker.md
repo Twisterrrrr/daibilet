@@ -319,10 +319,11 @@ Owner minimum: MSK→`.159` сеть ✅ · YooKassa `SECRET_KEY=<set>` ✅ · *
 |---|--------|-----------|--------|
 | BLOG.P1 | Причесать все blog MD кроме 5 owner-rewrites | Высокий | ✅ 37 PUBLISHED |
 | BLOG.P2 | Cover + 1-2 inline на диске для PUBLISHED | Критический | ✅ missing=0 |
-| BLOG.P3 | HIDDEN: bylinnyy-bereg-fentezi-fest, open-air-festy-vyhodnoi-ru | Низкий | ⚠️ без тяжёлой переписки |
+| BLOG.P3 | HIDDEN: bylinnyy-bereg-fentezi-fest, open-air-festy-vyhodnoi-ru | Низкий | ✅ 301 → канон |
 | BLOG.P4 | Deploy prod после push feat/next-monorepo | Высокий | ✅ `13f0e18` prod |
 | BLOG.P5 | Excerpt UX: listing only / no mash; article без excerpt block | Критический | ✅ |
 | BLOG.P6 | SEO desc: strip «Колонка {Имя}:» | Высокий | ✅ |
+| BLOG.P7 | Column signature dedupe + volhov soft-404 RCA | Высокий | ✅ 2026-08-02 |
 
 ---
 

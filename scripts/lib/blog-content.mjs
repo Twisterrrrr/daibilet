@@ -26,6 +26,20 @@ export function parseFrontmatter(raw) {
   return { meta, body: body.trim() };
 }
 
+/**
+ * UI колонок сам рендерит подпись и бейдж «От автора».
+ * Убираем дубли из markdown body перед upsert / static sync.
+ */
+export function stripColumnBodyChrome(body) {
+  let text = String(body || '').replace(/\r\n/g, '\n').trim();
+  if (!text) return '';
+  // Лид: *Авторская колонка …*
+  text = text.replace(/^\*[^*\n]*Авторская колонка[^*\n]*\*\s*/u, '');
+  // Хвост: *Имя, штатный корреспондент Дайбилет*
+  text = text.replace(/\n?\s*\*[^*\n]*,\s*штатный корреспондент Дайбилет\*\s*$/u, '');
+  return text.trim();
+}
+
 export function loadBlogMarkdownDir(dir) {
   if (!fs.existsSync(dir)) return [];
   return fs
@@ -36,7 +50,7 @@ export function loadBlogMarkdownDir(dir) {
       const raw = fs.readFileSync(filePath, 'utf8').replace(/\r\n/g, '\n');
       const { meta, body } = parseFrontmatter(raw);
       const slug = meta.slug || name.replace(/\.md$/i, '');
-      return { filePath, slug, meta, body };
+      return { filePath, slug, meta, body: stripColumnBodyChrome(body) };
     })
     .sort((a, b) => a.slug.localeCompare(b.slug));
 }

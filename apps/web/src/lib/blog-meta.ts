@@ -267,6 +267,18 @@ export function columnAuthorSignature(authorName?: string | null): string | null
 }
 
 /**
+ * Убирает из body колонки то, что UI рисует сам:
+ * лид «*Авторская колонка…*» и хвост «*Имя, штатный корреспондент Дайбилет*».
+ */
+export function stripColumnBodyChrome(content?: string | null): string {
+  let text = String(content || '').replace(/\r\n/g, '\n').trim();
+  if (!text) return '';
+  text = text.replace(/^\*[^*\n]*Авторская колонка[^*\n]*\*\s*/u, '');
+  text = text.replace(/\n?\s*\*[^*\n]*,\s*штатный корреспондент Дайбилет\*\s*$/u, '');
+  return text.trim();
+}
+
+/**
  * Убирает SEO/excerpt-префикс вида «Колонка Макса:» / «Авторская колонка Анны:».
  * Не трогает фразы вроде «Колонка о том, как…» (без имени с заглавной).
  */

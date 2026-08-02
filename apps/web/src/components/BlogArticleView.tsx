@@ -16,6 +16,7 @@ import {
   columnAuthorSignature,
   isColumnArticle,
   normalizeBlogTagLabel,
+  stripColumnBodyChrome,
 } from '@/lib/blog-meta';
 import type { BlogArticleDto, BlogCardDto } from '@/lib/blog-utils';
 import { estimateReadMin, formatBlogPublishedAt } from '@/lib/blog-utils';
@@ -104,6 +105,9 @@ export function BlogArticleView({
   const tag = resolveArticleTag(article);
   const isColumn = isColumnArticle(article.articleType) || tag === COLUMN_BADGE_LABEL;
   const authorSign = isColumn ? columnAuthorSignature(article.authorName) : null;
+  const bodyContent = isColumn
+    ? stripColumnBodyChrome(article.content || article.excerpt || '')
+    : article.content || article.excerpt || '';
   const breadcrumbs = [
     { label: 'Главная', href: '/' },
     { label: 'Блог', href: '/blog' },
@@ -130,7 +134,7 @@ export function BlogArticleView({
           <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_16.5rem] lg:items-start lg:gap-12 xl:grid-cols-[minmax(0,1fr)_18rem] xl:gap-14">
             <article className="min-w-0 bg-white px-5 py-8 shadow-[0_1px_0_rgba(15,23,42,0.04)] sm:px-9 sm:py-11 md:px-12 md:py-12">
               <BlogArticleContent
-                content={article.content || article.excerpt || ''}
+                content={bodyContent}
                 coverImageUrl={article.coverImageUrl}
               />
               {authorSign ? (
