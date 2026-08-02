@@ -1,3 +1,23 @@
+## 2026-08-02 - /my-day: matches cap 15 + dense stops + starter row
+
+### Наблюдения
+- Owner: точки 9-15 = «Место из маршрута» / «Нет координат» после добавления из Главных мест Нижнего.
+- MSK DB: все 46 must-see `nizhny-novgorod-*` уже с lat/lng (ABSENT/NOCOORDS=0).
+- Root cause: `GET /api/day-route/matches` и `matchDayRouteVenues` резали locators до **8**, а `DAY_ROUTE_MAX=15`. URL sync `?items=` после 9-й точки переhydrate → stubs.
+- Карточки стопов всё ещё «полотенца» - нужен dense single-row.
+
+### Решения
+- Matches API + server: cap = `DAY_ROUTE_MAX` (15).
+- Share stub: сохранить local title + editorial coords fallback.
+- Must-see / Hot Pick one-click: только с coords.
+- Stop card: одна строка number+chevron+thumb+title/subtitle+actions; subtitle в одну линию.
+- Starter: Город+Поиск в ряд; catalog trio в accordion (из `40c0e2e`).
+
+### Проблемы
+- Deploy BUILD_ID - после MSK.
+
+---
+
 ## 2026-08-02 - /my-day: starter row + Hot Pick overlay clamp
 
 ### Наблюдения

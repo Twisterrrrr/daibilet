@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db';
+import { DAY_ROUTE_MAX } from '@/lib/day-route';
 import {
   classifyEventCoverage,
   coveragePct,
@@ -115,7 +116,7 @@ function collectEventRouteVenues(event: {
 }
 
 export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteMatchPayload> {
-  const locators = [...new Set(venueIds.map(String).filter(Boolean))].slice(0, 8);
+  const locators = [...new Set(venueIds.map(String).filter(Boolean))].slice(0, DAY_ROUTE_MAX);
   if (!locators.length) {
     return { cityId: null, multiCityWarning: false, venues: [], matches: [] };
   }
