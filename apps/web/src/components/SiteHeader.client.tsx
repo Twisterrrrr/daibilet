@@ -117,14 +117,14 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               <DaibiletLogo textClassName="text-lg sm:text-xl lg:text-2xl" />
             </Link>
 
-            {/* Mobile: city chip always in sticky chrome (UX.LOC1). Desktop keeps same control. */}
+            {/* Mobile: city = pin icon + popup (label was eaten in sticky). sm+ shows name. */}
             <CityPicker
               cities={destinations}
               value={cityValue}
               onChange={onCityChange}
               allLabel="Все города"
               variant="header"
-              className="min-w-0 max-w-[6.75rem] shrink sm:max-w-[9.5rem] xl:max-w-[12rem]"
+              className="shrink-0 sm:min-w-0 sm:max-w-[9.5rem] xl:max-w-[12rem]"
             />
           </div>
 
@@ -153,11 +153,11 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
           </nav>
 
           <div className="flex shrink-0 items-center gap-1 sm:gap-1.5">
+            {/* Sticky order: … City | Search | Route | Favorites (search icon on mobile too). */}
             <HeaderSearch
               variant="overlay"
               cityFilter={searchCityFilter}
               initialQuery={searchInitialQuery}
-              className="hidden lg:inline-flex"
             />
 
             {/* Day-route + favorites: icon-first on mobile sticky; badges when count > 0. */}

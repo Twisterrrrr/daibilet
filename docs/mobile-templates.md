@@ -15,18 +15,21 @@
 
 1. Menu (бургер)
 2. Brand (`Дайбилет` logo)
-3. **City chip** (`CityPicker` variant `header`) - всегда виден на mobile
-4. Day-route badge (`DayRouteBadge` → `/my-day`) - icon + green count badge when > 0; label «Маршрут» only empty on `lg+` (no «· N» in text)
-5. Favorites heart (`FavoritesHeaderButton`) - icon in sticky on mobile too; rose count badge when > 0
-6. (Desktop `lg+` only) search / auth / help
+3. **City** - на mobile только pin-пиктограмма + popup select; с `sm+` имя города
+4. **Search** - пиктограмма лупы (`HeaderSearch` overlay) на всех ширинах; тап → overlay поиска
+5. Day-route badge (`DayRouteBadge` → `/my-day`) - icon + green count badge when > 0; label «Маршрут» only empty on `lg+` (no «· N» in text)
+6. Favorites heart (`FavoritesHeaderButton`) - icon in sticky on mobile too; rose count badge when > 0
+7. (Desktop `lg+` only) FAQ / auth
 
 Правила:
 
-- Город **нельзя** прятать за `lg:block` в sticky chrome.
+- Город **нельзя** прятать за `lg:block` в sticky chrome; на mobile не показывать длинный label (съедается).
+- Поиск на mobile - **пиктограмма** в sticky (не только в sheet меню).
 - Маршрут / Избранное на mobile - **пиктограммы** (текст прячется ниже `lg`); счётчик только в badge на иконке.
 - В `MobileNavSheet` блок «Город» - **сразу после поиска**, до пунктов навигации.
 - Safe-area: `pt-[env(safe-area-inset-top)]` на header; sticky bottom bars - `pb-[env(safe-area-inset-bottom)]`.
-- Skeleton (`SiteChromeSkeleton`) должен визуально совпадать с chrome (включая slot города).
+- Skeleton (`SiteChromeSkeleton`) должен визуально совпадать с chrome (включая slot города и поиска).
+- `/my-day` «Поделиться» на mobile: **bottom sheet** (не absolute dropdown за краем экрана).
 
 ---
 

@@ -27,6 +27,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { createPortal } from 'react-dom';
 
 import type { PublicCatalogListItemDto, PublicDestinationDto } from '@daibilet/contracts/public';
 
@@ -101,6 +102,7 @@ import {
 } from '@/lib/day-route';
 import {
   buildCityDayRoutePreset,
+  dayRouteHookLine,
   dayRouteItemFromEvent,
   dayRouteItemFromMustSee,
   type DayRouteVenueMatchSource,
@@ -209,6 +211,8 @@ function venueCardToMatchSource(venue: VenueCatalogCard): DayRouteVenueMatchSour
     longitude: venue.longitude,
     address: venue.address,
     heroImageUrl: venue.heroImageUrl,
+    hookFact: venue.hookFact,
+    shortDescription: venue.shortDescription,
     city: venue.city,
     citySlug: venue.citySlug,
     cityId: venue.cityId,
@@ -492,14 +496,31 @@ function DayRoutePanelInner() {
     return () => controller.abort();
   }, [itemsParam, cityParam, dayParam, destinationsFallback]);
 
-  // Close share menu on outside click.
+  // Close share menu on outside click (desktop popover + mobile sheet).
   useEffect(() => {
     if (!shareMenuOpen) return;
     const onDoc = (event: MouseEvent) => {
-      if (!shareMenuRef.current?.contains(event.target as Node)) setShareMenuOpen(false);
+      const target = event.target as Node | null;
+      if (!target) return;
+      if (shareMenuRef.current?.contains(target)) return;
+      const el = target instanceof Element ? target : target.parentElement;
+      if (el?.closest('[data-day-share-menu], [data-day-share-sheet]')) return;
+      setShareMenuOpen(false);
     };
     document.addEventListener('mousedown', onDoc);
     return () => document.removeEventListener('mousedown', onDoc);
+  }, [shareMenuOpen]);
+
+  useEffect(() => {
+    if (!shareMenuOpen) return;
+    const prev = document.body.style.overflow;
+    // Mobile sheet only - keep scroll on desktop popover.
+    const mq = window.matchMedia('(max-width: 639px)');
+    if (!mq.matches) return;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
   }, [shareMenuOpen]);
 
   const catalogVenueIds = useMemo(() => catalogDayRouteVenueIds(route.venues).join(','), [route.venues]);
@@ -1260,6 +1281,63 @@ function DayRoutePanelInner() {
     }, 80);
   }
 
+  const shareMenuItems = (
+    <>
+      <button
+        type="button"
+        role="menuitem"
+        disabled={shareBusy}
+        className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-semibold text-slate-800 hover:bg-emerald-50 disabled:opacity-60 sm:px-3 sm:py-2.5"
+        onClick={() => {
+          void copyShareLink();
+        }}
+      >
+        <Copy className="h-4 w-4 shrink-0 text-emerald-700" />
+        <span className="min-w-0">
+          <span className="block">Скопировать текст</span>
+          <span className="block text-xs font-medium text-slate-500">С сообщением и ссылкой</span>
+        </span>
+      </button>
+      <button
+        type="button"
+        role="menuitem"
+        disabled={shareBusy}
+        className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-semibold text-slate-800 hover:bg-sky-50 disabled:opacity-60 sm:px-3 sm:py-2.5"
+        onClick={() => {
+          void openMessengerShare('telegram');
+        }}
+      >
+        <ExternalLink className="h-4 w-4 text-sky-600" />
+        Telegram
+      </button>
+      <button
+        type="button"
+        role="menuitem"
+        disabled={shareBusy}
+        className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-semibold text-slate-800 hover:bg-emerald-50 disabled:opacity-60 sm:px-3 sm:py-2.5"
+        onClick={() => {
+          void openMessengerShare('whatsapp');
+        }}
+      >
+        <ExternalLink className="h-4 w-4 text-emerald-600" />
+        WhatsApp
+      </button>
+      <button
+        type="button"
+        role="menuitem"
+        data-day-share-max
+        disabled={shareBusy}
+        className="flex w-full items-center gap-2 px-4 py-3 text-left text-sm font-semibold text-slate-800 hover:bg-violet-50 disabled:opacity-60 sm:px-3 sm:py-2.5"
+        onClick={() => {
+          void openMessengerShare('max');
+        }}
+      >
+        <ExternalLink className="h-4 w-4 text-violet-600" />
+        Макс
+      </button>
+    </>
+  );
+
   function togglePanel(id: DayRouteAccordionId) {
     setOpenPanel((cur) => (cur === id ? null : id));
   }
@@ -1322,60 +1400,9 @@ function DayRoutePanelInner() {
                 <div
                   role="menu"
                   data-day-share-menu
-                  className="absolute right-0 z-30 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-lg"
+                  className="absolute left-0 z-30 mt-2 hidden w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-lg sm:block sm:left-auto sm:right-0"
                 >
-                  <button
-                    type="button"
-                    role="menuitem"
-                    disabled={shareBusy}
-                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-emerald-50 disabled:opacity-60"
-                    onClick={() => {
-                      void copyShareLink();
-                    }}
-                  >
-                    <Copy className="h-4 w-4 shrink-0 text-emerald-700" />
-                    <span className="min-w-0">
-                      <span className="block">Скопировать текст</span>
-                      <span className="block text-xs font-medium text-slate-500">С сообщением и ссылкой</span>
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    role="menuitem"
-                    disabled={shareBusy}
-                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-sky-50 disabled:opacity-60"
-                    onClick={() => {
-                      void openMessengerShare('telegram');
-                    }}
-                  >
-                    <ExternalLink className="h-4 w-4 text-sky-600" />
-                    Telegram
-                  </button>
-                  <button
-                    type="button"
-                    role="menuitem"
-                    disabled={shareBusy}
-                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-emerald-50 disabled:opacity-60"
-                    onClick={() => {
-                      void openMessengerShare('whatsapp');
-                    }}
-                  >
-                    <ExternalLink className="h-4 w-4 text-emerald-600" />
-                    WhatsApp
-                  </button>
-                  <button
-                    type="button"
-                    role="menuitem"
-                    data-day-share-max
-                    disabled={shareBusy}
-                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-violet-50 disabled:opacity-60"
-                    onClick={() => {
-                      void openMessengerShare('max');
-                    }}
-                  >
-                    <ExternalLink className="h-4 w-4 text-violet-600" />
-                    Макс
-                  </button>
+                  {shareMenuItems}
                 </div>
               ) : null}
             </div>
@@ -2313,6 +2340,30 @@ function DayRoutePanelInner() {
         ) : null}
       </MobileStickyActionBar>
     </div>
+    {shareMenuOpen && typeof document !== 'undefined'
+      ? createPortal(
+          <div
+            className="fixed inset-0 z-[60] sm:hidden print:hidden"
+            data-day-share-sheet
+            role="presentation"
+            onClick={() => setShareMenuOpen(false)}
+          >
+            <div className="absolute inset-0 bg-slate-900/40" aria-hidden />
+            <div
+              role="menu"
+              data-day-share-menu
+              aria-label="Поделиться маршрутом"
+              className="absolute inset-x-0 bottom-0 rounded-t-2xl border border-slate-200 bg-white py-2 shadow-xl pb-[max(0.5rem,env(safe-area-inset-bottom))]"
+              onClick={(event) => event.stopPropagation()}
+            >
+              <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-slate-200" aria-hidden />
+              <p className="px-4 pb-1 text-sm font-semibold text-slate-900">Поделиться</p>
+              {shareMenuItems}
+            </div>
+          </div>,
+          document.body,
+        )
+      : null}
     {ticketHandoff ? (
       <div
         className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-4 sm:items-center print:hidden"
