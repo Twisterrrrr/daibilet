@@ -13,7 +13,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 
 | # | Task | Priority | Status |
 |---|------|----------|--------|
-| INC.504.22 | Move public HTML hot path in `apps/web` off direct `@daibilet/backend/public-read`; SSR/API read through backend HTTP with bounded timeout | Critical | done in `codex/ssr-hang-hardening` |
+| INC.504.22 | Move public HTML hot path in `apps/web` off direct `@daibilet/backend/public-read`; SSR/API read through backend HTTP with bounded timeout | Critical | ✅ PR #3 merge `f93b770` MSK **BUILD_ID=`3zmDWHpY7rXAJgqu0-pnR`** |
 | INC.504.23 | Move sitemap generation off direct `public-read` or give it a separate bounded backend path | Medium | todo |
 | INC.504.24 | Add staging HTTP load smoke for `/`, `/events`, `/cities`, `/venues`, `/api/public/events?limit=50` | High | todo |
 
@@ -244,7 +244,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | INC.504.19 | Owner 504 ~16:49 UTC: live hang (0B TTFB); SIGKILL restart; healthcheck bug (`curl \|\| echo 999` → bc never fires); fixed cron + `deploy/cron/daibilet-tasks` | Критический | ✅ mitigated live; root cause still INC.504.15 / event-loop |
 | INC.504.20 | Owner fury ~17:19 UTC: live hang again (0B TTFB); SIGKILL+start; **cron `%` truncates healthcheck** (log empty despite minutely fire); warm **OFF**; `ssr-healthcheck.sh` + SIGKILL recovery | Критический | ✅ mitigated live MSK; warm off until hang RC; root still INC.504.15 |
 | INC.504.21 | 2026-08-02 ~07:19 UTC: SSR hang 0B TTFB again (~11h next RSS~1.6G); SIGKILL+start; healthcheck silent - script **644 not +x** → Permission denied; chmod 755 + cron via `/bin/bash` | Критический | ✅ mitigated live MSK; auto-net fixed; root still INC.504.15 |
-| INC.504.22 | **Codex handoff:** независимый RCA + PR-sized фикс SSR hang (event-loop / Prisma in Next). Code-first, без SSH. Brief: [codex-ssr-hang-brief.md](./codex-ssr-hang-brief.md) | Критический | ⏳ Codex |
+| INC.504.22 | **Codex handoff:** независимый RCA + PR-sized фикс SSR hang (event-loop / Prisma in Next). Brief: [codex-ssr-hang-brief.md](./codex-ssr-hang-brief.md); canon [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md) | Критический | ✅ merge `f93b770` MSK BUILD `3zmDWHpY7rXAJgqu0-pnR` |
 
 См. Diary 2026-07-30 «Prod 504: daibilet-web hang», «2026-08-01 INC.504.13», «INC.504.17», «INC.504.18», «INC.504.19», «INC.504.20», «INC.504.21»; brief Codex `INC.504.22`.
 
@@ -1243,7 +1243,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
-| 2026-08-02 | INC.504.22: Codex handoff brief `docs/codex-ssr-hang-brief.md` - независимый RCA+fix SSR hang (code-first); root остаётся INC.504.15 |
+| 2026-08-02 | INC.504.22 live MSK: PR #3 merge `f93b770`, BUILD `3zmDWHpY7rXAJgqu0-pnR`; public SSR via backend HTTP; web:build requires daibilet-api; root still INC.504.15 |
 | 2026-08-02 | INC.504.21: SSR hang again (0B TTFB ~07:19 UTC); SIGKILL+start; healthcheck silent - script 644 not executable; chmod 755 + cron `/bin/bash` invoke; warm still OFF |
 | 2026-08-01 | INC.504.20: SSR hang again (0B TTFB ~17:19 UTC); SIGKILL+start; cron bare `%` killed healthcheck restart branch; warm OFF; `ssr-healthcheck.sh` + SIGKILL recovery live MSK |
 | 2026-08-01 | INC.504.19: SSR hang again (0B TTFB); SIGKILL restart; healthcheck bug fixed (`curl CODE` not `\|\| echo 999`); canon `deploy/cron/daibilet-tasks`; BUILD `gEmtnqRsq_L56ejFTXSav` |

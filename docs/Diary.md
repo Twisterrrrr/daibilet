@@ -16,6 +16,9 @@
 - Локальный `pnpm --filter @daibilet/web typecheck` блокируется версией Node 24 при требовании repo `>=22.13.0 <23`.
 - Прямой `tsc --noEmit -p apps/web/tsconfig.json` всё ещё падает на уже существующих ошибках ветки; новых ошибок из SSR hardening helpers в выводе не видно.
 - Канон и smoke-план: `docs/inc-504-ssr-hardening.md`.
+- **MSK live 2026-08-02:** merge `f93b770` (PR #3), **BUILD_ID=`3zmDWHpY7rXAJgqu0-pnR`**. First deploy failed: prerender needs `daibilet-api` on `:4000` (was inactive); started API + rebuild. Post-deploy API restart briefly SIGKILL web - auto-restarted OK.
+- Smoke public: home/events/city/my-day 200; TTFB home~0.13s events~0.08s city~0.07s my-day~0.06s. Chunks HTML↔disk match (0 miss). `public-read` left: sitemap + internal revalidate (+ stray `slug-route-tmp.ts`).
+- Risk/canon: `web:build` now requires live backend HTTP; keep `daibilet-api` up before deploy.
 
 ---
 
