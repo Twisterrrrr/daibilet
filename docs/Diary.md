@@ -11,7 +11,7 @@
 - Stop card markup/стили не менялись.
 
 ### Проблемы
-- Deploy/BUILD_ID - после MSK web deploy.
+- MSK **BUILD_ID=`fsMqASpF2AZAHnq3m-hiK`** HEAD `8f8c69f`; `/my-day` 200; chunks: `data-day-map-expand` / `data-day-mobile-map-split` / `data-day-stop-maps` OK.
 - Card size follow-up - открыт для следующей итерации с owner.
 
 ---
@@ -29,11 +29,7 @@
 - Desktop lg grid split без изменений поведения (позднее откатан - см. запись выше).
 
 ### Проблемы
-- Deploy/BUILD_ID - после MSK web deploy.
-
----
-
-## 2026-08-02 - /my-day desktop split: список слева, карта sticky справа
+- Live: MSK **BUILD_ID=`fsMqASpF2AZAHnq3m-hiK`** (вместе с rollback desktop `8f8c69f`); `/my-day` 200.
 
 ### Наблюдения
 - Owner: desktop ≥1024 - split ~45/55; левая колонка скроллится, карта sticky справа на всю высоту; мобилка - текущий вертикальный стек.
