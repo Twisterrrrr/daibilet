@@ -41,7 +41,7 @@
 | UX.NN-COORDS | НН day-route coords: DTO venueRowsByIds + city hub merge published + city filter aliases + editorial fallback | Критический | ✅ `bee2a2a` MSK **BUILD_ID=`n6C8O0jfVXm2ksCrQ_yKG`** city hub 78/78 coords; preset stops 5/5 |
 | UX.MYDAY-COMM | Canon planner+checklist (не swipe): readiness %, chips, buy handoff, recommend carousel, FAB, free-window | Критический | ✅ 4e45f48+ soft-cap follow-ups MSK **BUILD_ID=Yqcz6aa-14QvDHs30n306** |
 | UX.MYDAY-HOT | Hot Picks «Выбор Дайбилет»: tabs Советы/Культура/Еда; ≤6; dual CTA affiche/open_date/free; timeline Утро/День/Вечер | Критический | 🔄 commit+MSK |
-| UX.MYDAY-HDR | `/my-day` header: `N точек из 10` + unpaid билеты; H1 предложный; без %/окно/Яндекс/дубль Точки | Критический | ✅ in Hot Picks ship |
+| UX.MYDAY-HDR | `/my-day` header: `N точек из 10` + unpaid билеты; H1 предложный; без %/окно/Яндекс/дубль Точки | Критический | ✅ `495c8f0` MSK **BUILD_ID=`_gsuIDWy0smbTa0LMOzng`** `/my-day` 200 |
 | UX.MYDAY-P4 | Free-window upsell polish (multi-gap / ETA) | Средний | ⏳ partial MVP in COMM |
 | UX.MYDAY-P5 | hookFact + mini description on day cards | Средний | ✅ Hot Picks cover+hook; must-see mini-cards; free-window; search thumb+hook |
 | UX.MYDAY-P6 | City «собрать за минуту» template variants | Высокий | ⏳ |

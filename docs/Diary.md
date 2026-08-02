@@ -60,7 +60,7 @@
 - % / free-window остаются в compute (для chips/upsell), не в header line.
 
 ### Проблемы
-- BUILD_ID после MSK deploy - ниже в этой итерации.
+- Live MSK **BUILD_ID=`_gsuIDWy0smbTa0LMOzng`** (`495c8f0`), `/my-day` 200.
 
 ---
 
