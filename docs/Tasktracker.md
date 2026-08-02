@@ -61,7 +61,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MYDAY-P5 | hookFact + mini description on day cards | Средний | ✅ 3f9a70e MSK **BUILD_ID=E6nQnmKCtloz0ynXA2y24** Hot Picks cover+hook; must-see mini-cards; free-window; search thumb+hook |
 | UX.MYDAY-P6 | City «собрать за минуту» template variants | Высокий | ⏳ |
 | UX.MYDAY-P7 | Commercial `/d/{code}` recipient (tickets/map/paid) - не soft purple banner | Высокий | ⏳ |
-| UX.MYDAY-P8 | Timeline Утро/День/Вечер | Средний | ✅ visual buckets via `dayPartForStop` |
+| UX.MYDAY-P8 | Timeline flat list (не Утро/День/Вечер); «Маршрут» + «N точек»; badge align | Критический | 🔄 ship |
 | UX.MYDAY-P9 | Extra carousels Рядом / Можно купить + Explore | Средний | ✅ MVP Hot Picks «Выбор Дайбилет» |
 | UX.MYDAY-F | Мой день: filters + auto-pick + top-up (product next) | Высокий | ⏳ поверх COMM канона |
 

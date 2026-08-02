@@ -23,6 +23,7 @@ import {
   dayRouteMatchScore,
   enrichDayRouteFromMatchVenues,
   formatDayRouteCountLabel,
+  formatDayRouteStopsHeading,
   isDayRouteAtHard,
   isDayRouteAtSoft,
   hydrateDayRouteFromShare,
@@ -635,6 +636,11 @@ test('soft guideline helpers: warn copy and count label without /MAX lock', () =
   assert.equal(formatDayRouteCountLabel(10), 'Точки · 10 · плотный день');
   assert.equal(formatDayRouteCountLabel(11, 'Маршрут'), 'Маршрут · 11 · плотный день');
   assert.equal(formatDayRouteCountLabel(15), 'Точки · 15/15');
+  assert.equal(formatDayRouteStopsHeading(1), '1 точка');
+  assert.equal(formatDayRouteStopsHeading(3), '3 точки');
+  assert.equal(formatDayRouteStopsHeading(5), '5 точек');
+  assert.equal(formatDayRouteStopsHeading(10), '10 точек · плотный день');
+  assert.equal(formatDayRouteStopsHeading(15), '15 точек · лимит');
   assert.match(DAY_ROUTE_SOFT_WARN, /плотный/);
   assert.doesNotMatch(DAY_ROUTE_SOFT_WARN, /[—–]/);
   assert.match(dayRouteHardLimitMessage(), /15/);

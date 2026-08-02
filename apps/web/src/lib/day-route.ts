@@ -43,6 +43,28 @@ export function formatDayRouteCountLabel(count: number, prefix = 'Точки'): 
   return `${prefix} · ${count}`;
 }
 
+/** Russian plural for «точка» (1 точка / 2 точки / 5 точек). */
+export function dayRoutePointsWord(count: number): string {
+  const abs = Math.abs(count) % 100;
+  const last = abs % 10;
+  if (abs > 10 && abs < 20) return 'точек';
+  if (last === 1) return 'точка';
+  if (last >= 2 && last <= 4) return 'точки';
+  return 'точек';
+}
+
+/**
+ * Flat list heading: stop count, not «route #N».
+ * Aligns with header «N точек из 10» without implying multiple saved routes.
+ */
+export function formatDayRouteStopsHeading(count: number): string {
+  const n = Math.max(0, count);
+  const word = dayRoutePointsWord(n);
+  if (isDayRouteAtHard(n)) return `${n} ${word} · лимит`;
+  if (isDayRouteAtSoft(n)) return `${n} ${word} · плотный день`;
+  return `${n} ${word}`;
+}
+
 export type DayRouteCoords = { latitude: number; longitude: number };
 
 export type DayRouteVenueItem = {

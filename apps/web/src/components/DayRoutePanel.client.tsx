@@ -76,7 +76,7 @@ import {
   dayRouteTotalDistanceMeters,
   enrichDayRouteFromMatchVenues,
   estimateDayRouteTravelMinutes,
-  formatDayRouteCountLabel,
+  formatDayRouteStopsHeading,
   formatDayRouteDistance,
   formatDayRouteSegmentHint,
   formatDayRouteTravelMinutes,
@@ -119,13 +119,10 @@ import {
 import {
   applyHotPickOfferToItem,
   buildHotPickCards,
-  dayPartForStop,
-  dayPartLabel,
   HOT_PICK_TABS,
   HOT_PICKS_MAX,
   visibleHotPickTabs,
   type HotPickCard,
-  type HotPickDayPart,
   type HotPickTabId,
 } from '@/lib/day-route-hot-picks';
 import { inCityPrepositional } from '@/lib/city-declension';
@@ -1054,20 +1051,6 @@ function DayRoutePanelInner() {
       max: HOT_PICKS_MAX,
     });
   }, [mustSeeResolved, route, eventsCatalog, hotPickTab]);
-  const timelineGroups = useMemo(() => {
-    const order: HotPickDayPart[] = ['morning', 'day', 'evening'];
-    const groups = order.map((part) => ({
-      part,
-      label: dayPartLabel(part),
-      items: [] as Array<{ venue: DayRouteVenueItem; index: number }>,
-    }));
-    route.venues.forEach((venue, index) => {
-      const part = dayPartForStop(venue);
-      const bucket = groups.find((g) => g.part === part) || groups[1];
-      bucket!.items.push({ venue, index });
-    });
-    return groups.filter((g) => g.items.length > 0);
-  }, [route.venues]);
   const freeWindowUpsells = useMemo(() => {
     type FreePick = { key: string; badge: string; item: DayRouteVenueItem; hook: string | null };
     if (!primaryFreeWindow) return [] as FreePick[];
@@ -1645,8 +1628,15 @@ function DayRoutePanelInner() {
       ) : (
         <section className="mt-5 sm:mt-8" data-day-route-list>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-            <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500" data-day-route-count-heading>
-              {formatDayRouteCountLabel(route.venues.length, 'Маршрут')}
+            <h2
+              className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-sm"
+              data-day-route-count-heading
+              aria-label={`Маршрут: ${formatDayRouteStopsHeading(route.venues.length)}`}
+            >
+              <span className="font-bold uppercase tracking-wide text-slate-500">Маршрут</span>
+              <span className="font-semibold text-slate-800">
+                {formatDayRouteStopsHeading(route.venues.length)}
+              </span>
             </h2>
             <div className="flex flex-wrap gap-2">
               {canOptimize ? (
@@ -1735,96 +1725,87 @@ function DayRoutePanelInner() {
               </div>
             </div>
           ) : null}
-          <div className="mt-3 space-y-5" data-day-plan-list data-day-timeline-parts>
-            {timelineGroups.map((group) => (
-              <div key={group.part} data-day-timeline-part={group.part}>
-                <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
-                  {group.label}
-                </h3>
-                <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {group.items.map(({ venue, index }) => (
-                    <Fragment key={venue.id}>
-                      <DayRouteVenueCard
-                        index={index}
-                        total={route.venues.length}
-                        venue={venue}
-                        hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
-                        segmentToNext={segmentMeters[index] ?? null}
-                        travelMode={travelMode}
-                        onMoveUp={() => setRoute(moveDayRouteVenue(venue.id, -1))}
-                        onMoveDown={() => setRoute(moveDayRouteVenue(venue.id, 1))}
-                        onRemove={() => setRoute(removeFromDayRoute(venue.id))}
-                        onToggleBought={() =>
-                          setRoute(
-                            updateDayRouteVenue(venue.id, { ticketBought: !venue.ticketBought }),
-                          )
-                        }
-                        onBuyClick={(ticketUrl) =>
-                          setTicketHandoff({ venueId: venue.id, ticketUrl, title: venue.title })
-                        }
-                      />
-                      {primaryFreeWindow &&
-                      primaryFreeWindow.afterIndex === index &&
-                      freeWindowUpsells.length > 0 &&
-                      !atMax ? (
-                        <li
-                          className="sm:col-span-2 lg:col-span-3"
-                          data-day-free-window
-                        >
-                          <div className="rounded-2xl border border-dashed border-sky-200 bg-sky-50/60 p-3 sm:p-4">
-                            <p className="text-sm font-semibold text-slate-900">Свободное окно</p>
-                            <p className="mt-0.5 text-[13px] text-slate-600">
-                              Между точками около {formatDayRouteDistance(primaryFreeWindow.meters)} - можно добавить ещё
-                              одну остановку.
-                            </p>
-                            <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                              {freeWindowUpsells.map((pick) => (
-                                <button
-                                  key={pick.key}
-                                  type="button"
-                                  onClick={() => addMustSeeItem(pick.item)}
-                                  className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white p-2 text-left transition duration-200 hover:border-emerald-300 hover:bg-emerald-50/40"
-                                >
-                                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                                    {pick.item.imageUrl ? (
-                                      <SafeImage
-                                        src={pick.item.imageUrl}
-                                        alt=""
-                                        fill
-                                        sizes="3rem"
-                                        className="object-cover"
-                                      />
-                                    ) : (
-                                      <div className="flex h-full w-full items-center justify-center text-slate-400">
-                                        <MapPin className="h-4 w-4" />
-                                      </div>
-                                    )}
-                                  </div>
-                                  <span className="min-w-0">
-                                    <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                                      {pick.badge}
-                                    </span>
-                                    <span className="mt-0.5 line-clamp-1 text-xs font-semibold text-slate-900">
-                                      {pick.item.title}
-                                    </span>
-                                    {pick.hook ? (
-                                      <span className="mt-0.5 block line-clamp-1 text-[11px] text-slate-500" title={pick.hook}>
-                                        {pick.hook}
-                                      </span>
-                                    ) : null}
-                                  </span>
-                                </button>
-                              ))}
+          <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-day-plan-list>
+            {route.venues.map((venue, index) => (
+              <Fragment key={venue.id}>
+                <DayRouteVenueCard
+                  index={index}
+                  total={route.venues.length}
+                  venue={venue}
+                  hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
+                  segmentToNext={segmentMeters[index] ?? null}
+                  travelMode={travelMode}
+                  onMoveUp={() => setRoute(moveDayRouteVenue(venue.id, -1))}
+                  onMoveDown={() => setRoute(moveDayRouteVenue(venue.id, 1))}
+                  onRemove={() => setRoute(removeFromDayRoute(venue.id))}
+                  onToggleBought={() =>
+                    setRoute(
+                      updateDayRouteVenue(venue.id, { ticketBought: !venue.ticketBought }),
+                    )
+                  }
+                  onBuyClick={(ticketUrl) =>
+                    setTicketHandoff({ venueId: venue.id, ticketUrl, title: venue.title })
+                  }
+                />
+                {primaryFreeWindow &&
+                primaryFreeWindow.afterIndex === index &&
+                freeWindowUpsells.length > 0 &&
+                !atMax ? (
+                  <li
+                    className="sm:col-span-2 lg:col-span-3"
+                    data-day-free-window
+                  >
+                    <div className="rounded-2xl border border-dashed border-sky-200 bg-sky-50/60 p-3 sm:p-4">
+                      <p className="text-sm font-semibold text-slate-900">Свободное окно</p>
+                      <p className="mt-0.5 text-[13px] text-slate-600">
+                        Между точками около {formatDayRouteDistance(primaryFreeWindow.meters)} - можно добавить ещё
+                        одну остановку.
+                      </p>
+                      <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                        {freeWindowUpsells.map((pick) => (
+                          <button
+                            key={pick.key}
+                            type="button"
+                            onClick={() => addMustSeeItem(pick.item)}
+                            className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white p-2 text-left transition duration-200 hover:border-emerald-300 hover:bg-emerald-50/40"
+                          >
+                            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                              {pick.item.imageUrl ? (
+                                <SafeImage
+                                  src={pick.item.imageUrl}
+                                  alt=""
+                                  fill
+                                  sizes="3rem"
+                                  className="object-cover"
+                                />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center text-slate-400">
+                                  <MapPin className="h-4 w-4" />
+                                </div>
+                              )}
                             </div>
-                          </div>
-                        </li>
-                      ) : null}
-                    </Fragment>
-                  ))}
-                </ul>
-              </div>
+                            <span className="min-w-0">
+                              <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                {pick.badge}
+                              </span>
+                              <span className="mt-0.5 line-clamp-1 text-xs font-semibold text-slate-900">
+                                {pick.item.title}
+                              </span>
+                              {pick.hook ? (
+                                <span className="mt-0.5 block line-clamp-1 text-[11px] text-slate-500" title={pick.hook}>
+                                  {pick.hook}
+                                </span>
+                              ) : null}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </li>
+                ) : null}
+              </Fragment>
             ))}
-          </div>
+          </ul>
 
           {mapStops.length > 0 ? (
             <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-3 sm:p-4" data-day-route-map-wrap>
@@ -2803,8 +2784,11 @@ function DayRouteVenueCard({
       data-commercial-chip={chip.kind}
     >
       <div className="flex items-start gap-3">
-        <div className="flex h-14 w-8 shrink-0 flex-col items-center justify-center gap-1">
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
+        <div className="flex w-8 shrink-0 flex-col items-center gap-1 pt-0.5">
+          <span
+            className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white"
+            aria-label={`Точка ${index + 1}`}
+          >
             {index + 1}
           </span>
           <div className="flex flex-col gap-0.5">

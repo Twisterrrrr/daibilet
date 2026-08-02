@@ -33,7 +33,7 @@ Paid offer scenarios (trip date не форсируем):
 | Free | landmark / park / gastro без checkout | category badge | **Добавить в план** | День (gastro soft → Вечер) | `free` |
 
 Scenario 3 (nearest Fri/Sat) - backlog. Click paid CTA: add + `window.open(ticketUrl)` + handoff «Билет куплен».
-Anatomy: H1 + Share (disabled <1) → Hot Picks → search → timeline Утро/День/Вечер → collapsed catalog.
+Anatomy: H1 + Share (disabled <1) → Hot Picks → search → flat route list (↑↓) → collapsed catalog.
 
 ## Readiness %
 
@@ -60,7 +60,7 @@ H1: «Мой день в {предложный}» через `inCityPrepositiona
 | P5 | `hookFact` + mini description на карточках | Средний | ✅ 2026-08-02 picker preview |
 | P6 | City «собрать за минуту» templates (variants) | Высокий | пресеты есть; варианты UI later |
 | P7 | Commercial share for friend `/d/{code}` | Высокий | **не** возвращать soft purple «Вам поделились»; recipient = ready scenario (tickets CTA, map, paid highlights) |
-| P8 | Timeline Утро/День/Вечер | Средний | partial via Hot Picks dayPart |
+| P8 | Flat route list + «Маршрут» / «N точек» (не Утро/День/Вечер) | Критический | ship |
 | P9 | Carousels «Рядом / Можно купить» + Explore collections | Средний | ✅ MVP Hot Picks «Выбор Дайбилет» (tabs) |
 | P10 | Native sales copy «Билеты от X» | Низкий | только при реальной цене в данных |
 
