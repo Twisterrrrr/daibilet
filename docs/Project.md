@@ -1,6 +1,6 @@
 # Project — Daibilet (Next full-stack migration)
 
-**Обновлено:** 2026-08-01  
+**Обновлено:** 2026-08-02  
 **Ветка migration / prod:** `feat/next-monorepo`  
 **Prod catalog:** Next `apps/web` `:3001` + legacy API `:4000` на МСК `201.24.125.184`  
 **Web deploy canon:** **MSK-only** - build + swap/restart на `daibilet-msk` (`201.24.125.184`). SPB `.16` (Intelligent Hoopoe) **retired** из pipeline (owner удаляет VM в панели).
@@ -111,6 +111,15 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 - Карточки `/events`: без TC/Teplohod widget markup — виджет только на странице события / landing CTA.
 - City/landing SSR: ≤48 lean cards.
 - Redirects: `www` → apex; `/river-cruises` → `/rechnye-progulki`.
+
+### Location vs Venue (антидубли, 2026-08-02)
+
+**Канон:** [catalog-location-venue-canon.md](./catalog-location-venue-canon.md).
+
+- **Локация** - must-see / прогулка / «Мой день», афиша не обязательна. **Площадка (Venue)** - место с событиями/сеансами (даже без договора).
+- Договор ≠ тип сущности (коммерция отдельно от справочника).
+- Одна физическая точка = одна публичная карточка; не плодить Location+Venue twin / soft-sign / latin-cyrillic twins.
+- Локация → афиша: upgrade той же сущности или hide + 301/alias - не второй `PUBLISHED`.
 
 ---
 
@@ -289,6 +298,8 @@ Daily scan saleable public catalog texts (`title`/`description` + override) на
 
 ## Связанные документы
 
+- [catalog-location-venue-canon.md](./catalog-location-venue-canon.md) - канон Локация vs Площадка / антидубли
+- [myday-commercial-canon.md](./myday-commercial-canon.md) - канон «Мой день» (planner + commercial checklist)
 - [mobile-templates.md](./mobile-templates.md) - канон мобильных шаблонов (sticky chrome, hero budget, CTA, секции)
 - [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md) - research brief `/locations` + mobile city UX
 
