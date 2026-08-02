@@ -10,7 +10,7 @@
 - Stop cards `owner-v6` не трогали.
 
 ### Проблемы
-- Нет (MSK deploy ниже).
+- Нет. MSK **BUILD_ID=`dBJJrsme4tAv2WPJl1Yxr`** (`0d4e31f`), SMOKE_OK; chunks: `equal-m` / `1fr_auto_1fr_auto_1fr` / `owner-v6` / `pl-5`; banner gone.
 
 ---
 
