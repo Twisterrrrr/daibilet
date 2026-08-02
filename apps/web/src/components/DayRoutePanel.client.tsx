@@ -2109,7 +2109,7 @@ function DayRoutePanelInner() {
               </div>
             </div>
           ) : null}
-          <ul className="mt-3 grid gap-3" data-day-plan-list>
+          <ul className="mt-3 grid grid-cols-1 items-start gap-2" data-day-plan-list>
             {route.venues.map((venue, index) => (
               <Fragment key={venue.id}>
                 <DayRouteVenueCard
@@ -3226,7 +3226,7 @@ function DayRouteVenueCard({
   const sessionDisplay = formatDayRouteSessionDisplay(venue);
   return (
     <li
-      className="flex flex-col gap-1 scroll-mt-4"
+      className="w-full scroll-mt-4"
       data-day-plan-stop={venue.id}
       data-ticket-bought={bought ? '1' : '0'}
       data-commercial-chip={chip.kind}
@@ -3234,25 +3234,25 @@ function DayRouteVenueCard({
       data-day-stop-focused={focused ? '1' : undefined}
     >
       <div
-        className={`rounded-xl border bg-white p-2 ${
+        className={`w-full rounded-xl border bg-white px-2 py-1.5 ${
           focused ? 'border-emerald-400 ring-2 ring-emerald-200' : 'border-slate-200'
         }`}
       >
-        <div className="flex items-start gap-2">
-          <div className="flex w-7 shrink-0 flex-col items-center gap-0.5">
+        <div className="flex items-center gap-2">
+          <div className="flex w-7 shrink-0 flex-col items-center gap-0">
             <span
               className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-[11px] font-bold text-white"
               aria-label={`Точка ${index + 1}`}
             >
               {index + 1}
             </span>
-            <div className="flex flex-col">
+            <div className="flex flex-col leading-none">
               <button
                 type="button"
                 aria-label="Выше"
                 disabled={index === 0}
                 onClick={onMoveUp}
-                className="rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+                className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
               >
                 <ChevronUp className="h-3 w-3" />
               </button>
@@ -3261,31 +3261,31 @@ function DayRouteVenueCard({
                 aria-label="Ниже"
                 disabled={index >= total - 1}
                 onClick={onMoveDown}
-                className="rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+                className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
               >
                 <ChevronDown className="h-3 w-3" />
               </button>
             </div>
           </div>
-          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+          <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-slate-100">
             {venue.imageUrl ? (
-              <SafeImage src={venue.imageUrl} alt="" fill sizes="2.75rem" className="object-cover" />
+              <SafeImage src={venue.imageUrl} alt="" fill sizes="2.25rem" className="object-cover" />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-slate-400">
-                <MapPin className="h-4 w-4" />
+                <MapPin className="h-3.5 w-3.5" />
               </div>
             )}
           </div>
-          <div className="min-w-0 flex-1 py-0.5">
+          <div className="min-w-0 flex-1">
             {href ? (
               <Link
                 href={href}
-                className="line-clamp-2 text-[13px] font-semibold leading-snug text-slate-900 hover:text-primary-700"
+                className="line-clamp-1 text-[13px] font-semibold leading-snug text-slate-900 hover:text-primary-700"
               >
                 {venue.title}
               </Link>
             ) : (
-              <p className="line-clamp-2 text-[13px] font-semibold leading-snug text-slate-900">
+              <p className="line-clamp-1 text-[13px] font-semibold leading-snug text-slate-900">
                 {venue.title}
               </p>
             )}
@@ -3312,7 +3312,7 @@ function DayRouteVenueCard({
               <p className="mt-0.5 text-[11px] font-medium text-amber-700">Нет координат</p>
             ) : null}
           </div>
-          <div className="flex shrink-0 flex-col items-center gap-0.5">
+          <div className="flex shrink-0 items-center gap-0.5">
             {mapsUrl ? (
               <a
                 href={mapsUrl}
@@ -3321,7 +3321,7 @@ function DayRouteVenueCard({
                 aria-label="Открыть в Яндекс.Картах"
                 title="Открыть в Яндекс.Картах"
                 data-day-stop-maps
-                className="inline-flex min-h-8 min-w-8 items-center justify-center rounded-full p-1 text-sky-600 hover:bg-sky-50"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-sky-600 hover:bg-sky-50"
               >
                 <Navigation className="h-3.5 w-3.5" />
               </a>
@@ -3330,21 +3330,21 @@ function DayRouteVenueCard({
               type="button"
               aria-label="Удалить точку"
               onClick={onRemove}
-              className="min-h-8 min-w-8 shrink-0 rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
             >
               <X className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
         {ticketUrl ? (
-          <div className="mt-1.5 flex flex-wrap items-center gap-1.5 pl-9">
+          <div className="mt-1 flex flex-wrap items-center gap-1.5 pl-9">
             <a
               href={ticketUrl}
               target="_blank"
               rel="noopener noreferrer"
               data-day-buy-ticket
               onClick={() => onBuyClick(ticketUrl)}
-              className="inline-flex min-h-8 items-center justify-center gap-1 rounded-full bg-amber-500 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-amber-600"
+              className="inline-flex min-h-7 items-center justify-center gap-1 rounded-full bg-amber-500 px-2.5 py-0.5 text-[11px] font-bold text-white hover:bg-amber-600"
             >
               <Ticket className="h-3 w-3" />
               {buyCtaLabel}
@@ -3353,7 +3353,7 @@ function DayRouteVenueCard({
               type="button"
               onClick={onToggleBought}
               data-day-ticket-bought
-              className={`inline-flex min-h-8 items-center justify-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
+              className={`inline-flex min-h-7 items-center justify-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${
                 bought
                   ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
                   : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
@@ -3368,7 +3368,7 @@ function DayRouteVenueCard({
           ? nearbyUpsells.map((upsell) => (
               <div
                 key={upsell.eventId}
-                className="mt-1.5 ml-9 rounded-lg border border-amber-100 bg-amber-50/60 px-2 py-1.5"
+                className="mt-1 ml-9 rounded-lg border border-amber-100 bg-amber-50/60 px-2 py-1"
                 data-day-nearby-upsell={upsell.eventId}
               >
                 <p className="truncate text-[11px] font-medium text-slate-800">{upsell.line}</p>
@@ -3378,7 +3378,7 @@ function DayRouteVenueCard({
                   rel="noopener noreferrer"
                   data-day-nearby-buy
                   onClick={() => onBuyClick(upsell.ticketUrl)}
-                  className="mt-1 inline-flex min-h-8 items-center justify-center gap-1 rounded-full bg-amber-500 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-amber-600"
+                  className="mt-0.5 inline-flex min-h-7 items-center justify-center gap-1 rounded-full bg-amber-500 px-2.5 py-0.5 text-[11px] font-bold text-white hover:bg-amber-600"
                 >
                   <Ticket className="h-3 w-3" />
                   {upsell.priceFromRub != null && upsell.priceFromRub > 0
@@ -3390,7 +3390,7 @@ function DayRouteVenueCard({
           : null}
       </div>
       {segmentHint ? (
-        <p className="px-1 text-[11px] leading-tight text-slate-500" data-day-segment-hint>
+        <p className="mt-1 px-1 text-[11px] leading-tight text-slate-500" data-day-segment-hint>
           далее ~ {segmentHint}
         </p>
       ) : null}

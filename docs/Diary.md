@@ -1,3 +1,18 @@
+## 2026-08-02 - INCIDENT ChunkLoadError + compact stop cards
+
+### Наблюдения
+- Owner console: `/_next/static/css/52bebb7e…` + `page-55e7d273…` 404 / ChunkLoadError - HTML/BUILD_ID desync mid-deploy (parallel `.next` race).
+- Owner: stop cards «гигантские» + уже списка vs «Сумма сегментов» - multi-col grid stretch (`sm:grid-cols-2 lg:grid-cols-3` из compact WIP) + tall padding.
+
+### Решения
+- Recover: exclusive deploy `956f5fc` → BUILD_ID `N7obZ0TU-juOknOhkW2Kg`; web restart; public CSS/JS 200; stale hashes out of HTML.
+- Stop list: `grid-cols-1 items-start gap-2 w-full`; card dense row (`items-center`, thumb h-9, actions inline, less padding); segment hint under card.
+
+### Проблемы
+- Deploy compact follow-up BUILD_ID - после следующего MSK deploy.
+
+---
+
 ## 2026-08-02 - /my-day: starter сверху + blurbs целиком на мобилке
 
 ### Наблюдения

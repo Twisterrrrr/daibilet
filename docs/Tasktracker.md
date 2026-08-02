@@ -13,7 +13,7 @@
 |---|--------|-----------|--------|
 | UX.MYDAY-SPLIT-DESK | Desktop ≥lg: list left + sticky map right (`data-day-split`) | Критический | ⚠️ rolled back `8f8c69f` - single column, map under list (`data-day-route-map-desktop`) |
 | UX.MYDAY-SPLIT-MOB | Mobile &lt;lg: sticky map ~38vh + list scroll; expand ~85vh (`data-day-map-expand`); no bottom-sheet physics | Критический | ✅ `ed9ea2f`+`8f8c69f` MSK **BUILD_ID=`fsMqASpF2AZAHnq3m-hiK`** `/my-day` 200 |
-| UX.MYDAY-CARD-SIZE | Stop card size/redesign (owner follow-up) | Средний | ⏳ open - не трогать до отдельной итерации |
+| UX.MYDAY-CARD-SIZE | Stop cards: compact dense row + full-width list (= summary bar); no multi-col stretch towels | Критический | 🔄 deploy |
 
 ---
 
