@@ -14,10 +14,26 @@
 
 1. `ticketBought` → **Билет отмечен**
 2. timed (`startsAt` / `sessionLabel` → HH:MM) → **Сеанс HH:00**
-3. есть checkout (`ticketUrl` / eventId/slug) → **Нужен билет**
+3. есть checkout (`ticketUrl` / eventId/slug) → **Билет оформляется…** (soft «Вечерний сеанс» для affiche stub)
 4. иначе → **Вход свободный**
 
 Карточка нейтральная (белый фон) + chip + CTA «Купить билет» при наличии URL.
+
+## Hot Picks («Выбор Дайбилет»)
+
+Tabs (text, без emoji): **Советы** | **Культура** | **Еда и бары** - каждая ≤6 карточек (`HOT_PICKS_MAX`).
+Карточки ~83vw mobile, `rounded-2xl`, one-liner hookFact (~110 символов).
+
+Paid offer scenarios (trip date не форсируем):
+
+| Scenario | When | Badge | CTA | Timeline | Code |
+|---|---|---|---|---|---|
+| 1 Affiche stub | matched event, entertainment / non-museum | «Каждый вечер» / «Вечерний сеанс» | **Выбрать дату и билеты** | **Вечер**, soft `sessionLabel`, без `startsAt` | `affiche` |
+| 2 Open date | museum + event checkout | **Билет на любой день** | **Купить билет** (+ цена только из данных) | **День** | `open_date` |
+| Free | landmark / park / gastro без checkout | category badge | **Добавить в план** | День (gastro soft → Вечер) | `free` |
+
+Scenario 3 (nearest Fri/Sat) - backlog. Click paid CTA: add + `window.open(ticketUrl)` + handoff «Билет куплен».
+Anatomy: H1 + Share (disabled <1) → Hot Picks → search → timeline Утро/День/Вечер → collapsed catalog.
 
 ## Readiness %
 

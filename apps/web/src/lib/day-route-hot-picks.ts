@@ -129,8 +129,9 @@ export function classifyHotPickOffer(
       event.priceFromRub != null && Number.isFinite(Number(event.priceFromRub))
         ? Number(event.priceFromRub)
         : null;
-    const priceSuffix =
-      priceFromRub != null && priceFromRub > 0 ? ` ${formatPriceFrom(priceFromRub)}` : '';
+    const priceLabel =
+      priceFromRub != null && priceFromRub > 0 ? formatPriceFrom(priceFromRub) : '';
+    const priceSuffix = priceLabel.startsWith('от ') ? ` ${priceLabel}` : '';
 
     if (isAdmissionMuseumPlace(place) && !isEntertainmentEvent(event)) {
       return {

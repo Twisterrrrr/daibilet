@@ -1442,7 +1442,6 @@ function DayRoutePanelInner() {
   const mustSeeOpen = openPanel === 'mustSee';
   const matchesOpen = openPanel === 'matches';
   const showMustSeeAccordion = Boolean(hasPageCity && (mustSeeResolved.length > 0 || (!catalogLoading && pageCitySlug)));
-  const dayTitleCity = scopeCityName || 'городе';
 
   return (
     <>

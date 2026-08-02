@@ -14,6 +14,24 @@
 
 ---
 
+## 2026-08-02 - /my-day: Hot Picks + paid scenarios without trip date
+
+### Наблюдения
+- Owner: «дали инструмент, не дали решение» - mobile dump (search + chips + share) конкурировал с планом.
+- Paid paradox: нельзя писать «сегодня 18:30» без даты поездки и нельзя оставлять пустую paid-карточку.
+
+### Решения
+- IA: H1 + Share (disabled <1) → **Выбор Дайбилет** (tabs Советы/Культура/Еда и бары, ≤6, ~83vw) → search → timeline Утро/День/Вечер → accordion catalog.
+- Offers in `day-route-hot-picks.ts`: **affiche** (Выбрать дату и билеты → Вечер, soft sessionLabel, no startsAt) / **open_date** (Билет на любой день → День) / **free** (Добавить в план).
+- Chip pending: «Билет оформляется…»; soft «Вечерний сеанс» без HH:MM.
+- Docs: myday-commercial-canon Hot Picks table.
+
+### Проблемы
+- Scenario 3 nearest Fri/Sat - backlog.
+- MSK deploy BUILD_ID - после push.
+
+---
+
 ## 2026-08-02 - /my-day: пустые Локации + copy без «теплоход»
 
 ### Наблюдения
