@@ -1,3 +1,21 @@
+## 2026-08-02 - /my-day: starter row + Hot Pick overlay clamp
+
+### Наблюдения
+- Owner: в стартере не нужны Локации/Площадки/События - только Город + Поиск в одном ряду и «или добавь своё место».
+- Owner screenshot: badge «Объект» налезает на title overlay Hot Pick; длинный hook выталкивает блок вверх.
+- Тройку каталога вернуть вниз (accordion «Ещё из каталога»).
+
+### Решения
+- `renderUnifiedSearch`: `data-day-city-search-row` grid 2 cols (Город | Поиск); без `renderCatalogTrio`.
+- `renderCatalogTrio` снова в accordion catalog (+ boat); subtitle «Отдельный поиск по типам».
+- Overlay Hot Pick: badge → title → hook `line-clamp-2` → CTA в одном bottom stack (без top absolute badge).
+- Must-see list thumbs: полный hook без нового truncate.
+
+### Проблемы
+- Deploy BUILD_ID - после MSK.
+
+---
+
 ## 2026-08-02 - /my-day: каталог в стартере + toolbar над маршрутом
 
 ### Наблюдения

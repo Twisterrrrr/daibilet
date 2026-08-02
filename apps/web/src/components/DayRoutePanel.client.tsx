@@ -1753,17 +1753,17 @@ function DayRoutePanelInner() {
     return `https://yandex.ru/maps/?pt=${lng},${lat}&z=17&l=map`;
   }
 
-  /** City + typed catalog + place search. Empty plan: top starter. */
+  /** Typed catalog selects - accordion under Hot Picks (not in top starter). */
   function renderCatalogTrio() {
     if (!hasPageCity) {
       return (
-        <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+        <p className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
           Сначала выберите город - появятся места, музеи и события.
         </p>
       );
     }
     return (
-      <div className="mt-3" data-day-catalog-trio>
+      <div data-day-catalog-trio>
         <div className="grid gap-3 sm:grid-cols-3">
           <DayRouteSearchSelect
             label="Локации"
@@ -1819,6 +1819,7 @@ function DayRoutePanelInner() {
     );
   }
 
+  /** City + place search in one row. Empty plan: top starter. Non-empty: secondary under Hot Picks. */
   function renderUnifiedSearch(asStarter: boolean) {
     return (
       <section
@@ -1835,34 +1836,41 @@ function DayRoutePanelInner() {
             </p>
           </div>
         ) : null}
-        <div className="max-w-md" data-day-city-picker>
-          <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-            Город
-          </label>
-          <CityPicker
-            cities={destinations}
-            value={selectedCity?.cityValue || 'all'}
-            onChange={(name) => {
-              selectedCity?.setCity(name);
-              if (name !== 'all') setCityInput(name);
-            }}
-            allLabel="Выберите город"
-            variant="hero"
-            className="w-full"
-          />
-        </div>
-        {renderCatalogTrio()}
-        {hasPageCity ? (
-          <div className="mt-3">
+        <div className="grid gap-3 sm:grid-cols-2 sm:items-end" data-day-city-search-row>
+          <div data-day-city-picker>
+            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+              Город
+            </label>
+            <CityPicker
+              cities={destinations}
+              value={selectedCity?.cityValue || 'all'}
+              onChange={(name) => {
+                selectedCity?.setCity(name);
+                if (name !== 'all') setCityInput(name);
+              }}
+              allLabel="Выберите город"
+              variant="hero"
+              className="w-full"
+            />
+          </div>
+          {hasPageCity ? (
             <DayRouteSearchSelect
-              label="Поиск места"
-              placeholder="Нет в выборе выше? Найдите здесь"
+              label="Поиск"
+              placeholder="Найти место…"
               emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Ничего не найдено'}
               loading={catalogLoading}
               disabled={atMax}
               options={unifiedSearchOptions}
               onPick={pickUnifiedSearch}
             />
+          ) : (
+            <p className="flex items-center rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 sm:self-stretch">
+              Сначала выберите город - появятся места, музеи и события.
+            </p>
+          )}
+        </div>
+        {hasPageCity ? (
+          <>
             {catalogError ? (
               <p className="mt-2 text-xs font-medium text-rose-700" role="status">
                 {catalogError}
@@ -1878,7 +1886,7 @@ function DayRoutePanelInner() {
                 добавь своё место
               </button>
             </p>
-          </div>
+          </>
         ) : null}
       </section>
     );
@@ -2615,15 +2623,15 @@ function DayRoutePanelInner() {
                         pinFallback
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-slate-950/10" />
-                      <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3">
-                        <span className="rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-800">
+                      <div className="absolute inset-x-0 bottom-0 flex flex-col gap-1.5 p-3.5">
+                        <span className="w-fit rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-800">
                           {card.offer.badge}
                         </span>
-                      </div>
-                      <div className="absolute inset-x-0 bottom-0 p-3.5">
-                        <p className="line-clamp-2 text-sm font-bold text-white drop-shadow">{card.title}</p>
+                        <p className="line-clamp-2 text-sm font-bold leading-snug text-white drop-shadow">
+                          {card.title}
+                        </p>
                         {card.hook ? (
-                          <p className="mt-1 text-[12px] leading-snug text-white/80">
+                          <p className="line-clamp-2 text-[12px] leading-snug text-white/80" title={card.hook}>
                             {card.hook}
                           </p>
                         ) : null}
@@ -2631,7 +2639,7 @@ function DayRoutePanelInner() {
                           type="button"
                           disabled={inRoute || atMax}
                           onClick={() => activateHotPick(card)}
-                          className={`mt-2.5 inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-xl px-3 text-xs font-semibold backdrop-blur transition duration-200 ${
+                          className={`mt-1 inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-xl px-3 text-xs font-semibold backdrop-blur transition duration-200 ${
                             inRoute
                               ? 'bg-emerald-500/90 text-white'
                               : card.offer.kind === 'free'
@@ -2690,7 +2698,7 @@ function DayRoutePanelInner() {
           <span>
             <span className="block text-sm font-semibold text-slate-900">Ещё из каталога</span>
             <span className="mt-0.5 block text-xs text-slate-500">
-              Речные маршруты и ссылки
+              Отдельный поиск по типам
             </span>
           </span>
           <ChevronDown
@@ -2704,39 +2712,22 @@ function DayRoutePanelInner() {
                 Сначала выберите город в поиске.
               </p>
             ) : (
-              <DayRouteBoatWizard
-                cityName={pageCityName}
-                citySlug={pageCitySlug}
-                cityId={pageCityId}
-                citySourceSlug={selectedCity?.selectedDestination?.sourceSlug || null}
-                route={route}
-                atMax={atMax}
-                onRouteChange={setRoute}
-                locationsCatalog={locationsCatalog}
-              />
+              <>
+                {renderCatalogTrio()}
+                <div className="mt-4">
+                  <DayRouteBoatWizard
+                    cityName={pageCityName}
+                    citySlug={pageCitySlug}
+                    cityId={pageCityId}
+                    citySourceSlug={selectedCity?.selectedDestination?.sourceSlug || null}
+                    route={route}
+                    atMax={atMax}
+                    onRouteChange={setRoute}
+                    locationsCatalog={locationsCatalog}
+                  />
+                </div>
+              </>
             )}
-            <p className="mt-3 text-xs text-slate-500">
-              Поиск локаций / площадок / событий - в блоке выше. Каталог целиком:{' '}
-              <Link href={locationsHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
-                локации
-              </Link>
-              {' · '}
-              <Link href={venuesHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
-                площадки
-              </Link>
-              {' · '}
-              <Link href={afishaHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
-                события
-              </Link>
-              {scopeCitySlug ? (
-                <>
-                  {' · '}
-                  <Link href={cityHubHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
-                    хаб города
-                  </Link>
-                </>
-              ) : null}
-            </p>
           </div>
         ) : null}
       </div>
