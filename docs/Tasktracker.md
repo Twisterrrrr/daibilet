@@ -32,7 +32,7 @@
 | UX.MYDAY-SHARE | Viral share `?city=&items=id:HHMM\|free`; menu Copy/TG/WA/**Макс**; friend landing; buy+bought; DnD/print/distance MVP | Критический | ✅ `42421d4` MSK **BUILD_ID=`tU1erwiIQtH11jrJCcYZH`** smoke `/my-day`+items 200 |
 | UX.MYDAY-SHORT | Short share URL `/d/{code}` → redirect `/my-day?city=&items=`; POST `/api/day-route/share`; fallback long URL | Критический | 🔄 |
 | UX.MYDAY-PRINT | Маршрутный лист: кнопка «Сохранить маршрутный лист», `@media print` sheet (город/дата, точки, км+ETA), chrome hide | Критический | ✅ `62564ca` MSK **BUILD_ID=`grb226etQIYA0W1Wi-Myf`** |
-| UX.MYDAY-BOAT | Канон добора теплохода: Pier→Route→Slot→pin (`eventId`+time); share только после слота; SPB MVP wizard | Критический | ✅ `0212c13` MSK **BUILD_ID=`TcievrjfV4FvM-YDiaKr0`** |
+| UX.MYDAY-BOAT | Канон добора теплохода: Pier→Route→Slot→pin (`eventId`+time); share только после слота; SPB MVP wizard | Критический | ✅ `0212c13` MSK **BUILD_ID=`EdAk08KxqEiFe8Ow1Qg3i`** |
 
 ---
 
