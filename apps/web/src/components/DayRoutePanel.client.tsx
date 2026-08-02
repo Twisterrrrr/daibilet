@@ -139,7 +139,7 @@ import { eventHref, venueHref } from '@/lib/routes';
 import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 
-type DayRouteAccordionId = 'catalog' | 'mustSee' | 'text' | 'matches' | 'hotPicks';
+type DayRouteAccordionId = 'catalog' | 'mustSee' | 'text' | 'matches';
 
 type MatchVenueStub = {
   id: string;
@@ -1500,9 +1500,8 @@ function DayRoutePanelInner() {
   const catalogOpen = openPanel === 'catalog';
   const mustSeeOpen = openPanel === 'mustSee';
   const matchesOpen = openPanel === 'matches';
-  const hotPicksOpen = openPanel === 'hotPicks';
   const showMustSeeAccordion = Boolean(hasPageCity && (mustSeeResolved.length > 0 || (!catalogLoading && pageCitySlug)));
-  const showHotPicksAccordion = Boolean(hasPageCity && (hotPickCards.length > 0 || hotPickTabIds.length > 0));
+  const showHotPicks = Boolean(hasPageCity && (hotPickCards.length > 0 || hotPickTabIds.length > 0));
 
   return (
     <>
@@ -2120,138 +2119,128 @@ function DayRoutePanelInner() {
         ) : null}
       </div>
 
-      {/* Accordion: Hot Picks */}
-      {showHotPicksAccordion ? (
-        <div className="mt-3 rounded-2xl border border-slate-200 bg-white" data-day-hot-picks data-day-recommend-carousel data-day-accordion="hotPicks">
-          <button
-            type="button"
-            aria-expanded={hotPicksOpen}
-            aria-controls="day-hot-picks-body"
-            data-day-hot-picks-accordion
-            onClick={() => togglePanel('hotPicks')}
-            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
-          >
-            <span>
-              <span className="block text-sm font-semibold text-slate-900">Выбор Дайбилет</span>
-              <span className="mt-0.5 block text-xs text-slate-500">
-                До {HOT_PICKS_MAX} мест · кураторская подборка
-              </span>
-            </span>
-            <ChevronDown
-              className={`h-5 w-5 shrink-0 text-slate-400 transition ${hotPicksOpen ? 'rotate-180' : ''}`}
-            />
-          </button>
-          {hotPicksOpen ? (
-            <div id="day-hot-picks-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
-              <div
-                className="flex gap-1 overflow-x-auto pb-1"
-                role="tablist"
-                aria-label="Категории выбора"
-                data-day-hot-pick-tabs
-              >
-                {HOT_PICK_TABS.filter((tab) => hotPickTabIds.includes(tab.id)).map((tab) => {
-                  const active = hotPickTab === tab.id;
+      {/* Hot Picks - always expanded (not accordion) */}
+      {showHotPicks ? (
+        <section
+          className="mt-3 rounded-2xl border border-slate-200 bg-white"
+          data-day-hot-picks
+          data-day-recommend-carousel
+        >
+          <div className="border-b border-slate-100 px-4 py-3.5 sm:px-5">
+            <h2 className="text-sm font-semibold text-slate-900">Выбор Дайбилет</h2>
+            <p className="mt-0.5 text-xs text-slate-500">
+              До {HOT_PICKS_MAX} мест · кураторская подборка
+            </p>
+          </div>
+          <div id="day-hot-picks-body" className="px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+            <div
+              className="flex gap-1 overflow-x-auto pb-1"
+              role="tablist"
+              aria-label="Категории выбора"
+              data-day-hot-pick-tabs
+            >
+              {HOT_PICK_TABS.filter((tab) => hotPickTabIds.includes(tab.id)).map((tab) => {
+                const active = hotPickTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => setHotPickTab(tab.id)}
+                    className={`shrink-0 rounded-2xl px-3.5 py-2 text-sm font-semibold transition duration-200 ${
+                      active
+                        ? 'bg-slate-900 text-white'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
+            {hotPickCards.length ? (
+              <div className="-mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+                {hotPickCards.map((card) => {
+                  const inRoute =
+                    isInDayRoute(card.item.id, route) ||
+                    Boolean(card.item.slug && isInDayRoute(card.item.slug, route));
                   return (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      role="tab"
-                      aria-selected={active}
-                      onClick={() => setHotPickTab(tab.id)}
-                      className={`shrink-0 rounded-2xl px-3.5 py-2 text-sm font-semibold transition duration-200 ${
-                        active
-                          ? 'bg-slate-900 text-white'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                      }`}
+                    <article
+                      key={card.key}
+                      className="relative h-56 w-[78vw] max-w-xs shrink-0 snap-start overflow-hidden rounded-2xl border border-slate-200 bg-slate-800 shadow-sm transition duration-200 sm:w-64"
+                      data-day-recommend-card={card.item.id}
+                      data-day-hot-pick={card.offer.kind}
                     >
-                      {tab.label}
-                    </button>
+                      {card.item.imageUrl ? (
+                        <SafeImage
+                          src={card.item.imageUrl}
+                          alt={card.title}
+                          fill
+                          sizes="78vw"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center bg-slate-200 text-slate-400">
+                          <MapPin className="h-7 w-7" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-slate-950/10" />
+                      <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3">
+                        <span className="rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-800">
+                          {card.offer.badge}
+                        </span>
+                      </div>
+                      <div className="absolute inset-x-0 bottom-0 p-3.5">
+                        <p className="line-clamp-2 text-sm font-bold text-white drop-shadow">{card.title}</p>
+                        {card.hook ? (
+                          <p
+                            className="mt-1 line-clamp-2 text-[12px] leading-snug text-white/80"
+                            title={card.hook}
+                          >
+                            {card.hook}
+                          </p>
+                        ) : null}
+                        <button
+                          type="button"
+                          disabled={inRoute || atMax}
+                          onClick={() => activateHotPick(card)}
+                          className={`mt-2.5 inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-xl px-3 text-xs font-semibold backdrop-blur transition duration-200 ${
+                            inRoute
+                              ? 'bg-emerald-500/90 text-white'
+                              : card.offer.kind === 'free'
+                                ? 'bg-white/90 text-slate-900 hover:bg-white disabled:bg-white/50'
+                                : 'bg-amber-400/95 text-slate-950 hover:bg-amber-300 disabled:bg-white/50'
+                          }`}
+                        >
+                          {inRoute ? (
+                            <>
+                              <Check className="h-3.5 w-3.5" />
+                              В плане
+                            </>
+                          ) : (
+                            <>
+                              {card.offer.kind === 'free' ? (
+                                <Plus className="h-3.5 w-3.5" />
+                              ) : (
+                                <Ticket className="h-3.5 w-3.5" />
+                              )}
+                              {card.offer.ctaLabel}
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </article>
                   );
                 })}
               </div>
-              {hotPickCards.length ? (
-                <div className="-mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
-                  {hotPickCards.map((card) => {
-                    const inRoute =
-                      isInDayRoute(card.item.id, route) ||
-                      Boolean(card.item.slug && isInDayRoute(card.item.slug, route));
-                    return (
-                      <article
-                        key={card.key}
-                        className="relative h-56 w-[78vw] max-w-xs shrink-0 snap-start overflow-hidden rounded-2xl border border-slate-200 bg-slate-800 shadow-sm transition duration-200 sm:w-64"
-                        data-day-recommend-card={card.item.id}
-                        data-day-hot-pick={card.offer.kind}
-                      >
-                        {card.item.imageUrl ? (
-                          <SafeImage
-                            src={card.item.imageUrl}
-                            alt={card.title}
-                            fill
-                            sizes="78vw"
-                            className="object-cover"
-                          />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center bg-slate-200 text-slate-400">
-                            <MapPin className="h-7 w-7" />
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-slate-950/10" />
-                        <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3">
-                          <span className="rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-800">
-                            {card.offer.badge}
-                          </span>
-                        </div>
-                        <div className="absolute inset-x-0 bottom-0 p-3.5">
-                          <p className="line-clamp-2 text-sm font-bold text-white drop-shadow">{card.title}</p>
-                          {card.hook ? (
-                            <p
-                              className="mt-1 line-clamp-2 text-[12px] leading-snug text-white/80"
-                              title={card.hook}
-                            >
-                              {card.hook}
-                            </p>
-                          ) : null}
-                          <button
-                            type="button"
-                            disabled={inRoute || atMax}
-                            onClick={() => activateHotPick(card)}
-                            className={`mt-2.5 inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-xl px-3 text-xs font-semibold backdrop-blur transition duration-200 ${
-                              inRoute
-                                ? 'bg-emerald-500/90 text-white'
-                                : card.offer.kind === 'free'
-                                  ? 'bg-white/90 text-slate-900 hover:bg-white disabled:bg-white/50'
-                                  : 'bg-amber-400/95 text-slate-950 hover:bg-amber-300 disabled:bg-white/50'
-                            }`}
-                          >
-                            {inRoute ? (
-                              <>
-                                <Check className="h-3.5 w-3.5" />
-                                В плане
-                              </>
-                            ) : (
-                              <>
-                                {card.offer.kind === 'free' ? (
-                                  <Plus className="h-3.5 w-3.5" />
-                                ) : (
-                                  <Ticket className="h-3.5 w-3.5" />
-                                )}
-                                {card.offer.ctaLabel}
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      </article>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-[13px] text-slate-600">
-                  В этой категории пока пусто - откройте другую вкладку или поиск ниже.
-                </p>
-              )}
-            </div>
-          ) : null}
-        </div>
+            ) : (
+              <p className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-[13px] text-slate-600">
+                В этой категории пока пусто - откройте другую вкладку или поиск ниже.
+              </p>
+            )}
+          </div>
+        </section>
       ) : null}
 
       {/* Search + city */}

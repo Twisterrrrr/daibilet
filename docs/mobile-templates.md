@@ -94,11 +94,11 @@ Mobile sticky bottom: общий `MobileStickyActionBar` (`lg:hidden` + safe-are
 3. Unified search «Добавьте место, музей, событие» + city picker  
 4. Carousel «Рекомендуемые места» (must-see, + → ✓)  
 5. Route list always open - neutral cards + status chips + buy CTA + free-window upsell  
-6. Accordion secondary: своё место / ещё из каталога (boat) / главные chips / matches  
+6. Accordion secondary: своё место / ещё из каталога (boat) / главные chips / matches (Hot Picks always visible, not accordion)  
 7. Sticky FAB: Купить билеты (если unpaid) · Карта · Добавить · Поделиться  
 8. Handoff modal после external checkout → `ticketBought`
 
-`DAY_ROUTE_SOFT=10` / hard `DAY_ROUTE_MAX=15`. Exclusive accordion для secondary блоков.
+`DAY_ROUTE_SOFT=10` / hard `DAY_ROUTE_MAX=15`. Exclusive accordion для secondary блоков (кроме Hot Picks).
 
 ---
 
@@ -137,7 +137,7 @@ Mobile sticky bottom: общий `MobileStickyActionBar` (`lg:hidden` + safe-are
 | `/venues/[slug]` | Institution hero + sticky CTA | Safe-area ✅ |
 | `/locations` | Dense minimal + chips; map lg+ | ✅ LOC4 |
 | `/locations/[slug]` | Location hero + sticky CTA | ✅ aligned |
-| `/my-day` | Route always open; catalog/must-see/text/matches exclusive accordion; своё место under route | ✅ accordion compact |
+| `/my-day` | Route always open; Hot Picks always visible; catalog/must-see/text/matches exclusive accordion; своё место under route | ✅ accordion compact + Hot Picks unwrap |
 | Header / menu | City chip + city near top in sheet | ✅ LOC1/LOC2 |
 
 ---

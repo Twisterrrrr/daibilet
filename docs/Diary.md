@@ -1,3 +1,17 @@
+## 2026-08-02 - /my-day: «Выбор Дайбилет» всегда видимый
+
+### Наблюдения
+- Owner: «Выбор Дайбилет» оставить в порядке блоков, но вытащить из-под exclusive accordion - всегда видимый блок.
+
+### Решения
+- `DayRoutePanel.client.tsx`: Hot Picks - обычная `<section>` (без collapse/chevron); DOM-порядок без сдвига: Главные места → своё место → Выбор Дайбилет → поиск.
+- `hotPicks` убран из `DayRouteAccordionId`; exclusive accordion остаётся для mustSee / text / catalog / matches.
+
+### Проблемы
+- Нет (UI unwrap + deploy).
+
+---
+
 ## 2026-08-02 - Канон: музеи + арт-галереи всегда Venue
 
 ### Наблюдения
@@ -90,7 +104,7 @@
 
 ### Решения
 - `city-place-images.ts` + `dayRouteItemFromMustSee` editorial `heroImageUrl` fallback; covers в `apps/public/public/images/venues/nizhny-novgorod/` (classic 6 GenerateImage).
-- Hot Picks: photo-as-background card + lighter CTA; accordion order: Главные места → своё место → Выбор Дайбилет.
+- Hot Picks: photo-as-background card + lighter CTA; order: Главные места → своё место → Выбор Дайбилет (Hot Picks always expanded, not accordion).
 - `buildPublicVenuesCatalog`: warm shortcut только без `city=` (city-scoped → hub `requireEvents:false`).
 - `DayRouteOsmMap`: numbered markers + polyline; блок «Карта дня» под timeline + «Оптимизировать».
 
