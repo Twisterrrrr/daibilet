@@ -20,7 +20,10 @@ import {
 } from '@/lib/day-route-boat';
 import {
   DAY_ROUTE_MAX,
+  DAY_ROUTE_SOFT_WARN,
   addToDayRoute,
+  dayRouteHardLimitMessage,
+  isDayRouteAtSoft,
   readDayRouteFresh,
   type DayRouteState,
   type DayRouteVenueItem,
@@ -88,7 +91,7 @@ function appendPinnedBoat(item: DayRouteVenueItem): DayRouteState {
       (v) => v.id === item.id || (item.slug && v.slug === item.slug),
     );
     if (existingIdx < 0) {
-      flashDayRouteFeedback(`Лимит ${DAY_ROUTE_MAX} точек`);
+      flashDayRouteFeedback(dayRouteHardLimitMessage());
       return before;
     }
   }
@@ -99,13 +102,17 @@ function appendPinnedBoat(item: DayRouteVenueItem): DayRouteState {
       (v.id === item.id && v.startsAt === item.startsAt),
   );
   if (pinned?.eventId && pinned.startsAt) {
-    flashDayRouteFeedback(
-      next.venues.length > before.venues.length
-        ? `Теплоход в маршруте · ${next.venues.length}/${DAY_ROUTE_MAX}`
-        : 'Слот теплохода закреплён',
-    );
+    if (next.venues.length > before.venues.length) {
+      flashDayRouteFeedback(
+        isDayRouteAtSoft(next.venues.length)
+          ? `Теплоход в маршруте · ${DAY_ROUTE_SOFT_WARN}`
+          : `Теплоход в маршруте · ${next.venues.length}`,
+      );
+    } else {
+      flashDayRouteFeedback('Слот теплохода закреплён');
+    }
   } else if (next.venues.length >= DAY_ROUTE_MAX && next.venues.length === before.venues.length) {
-    flashDayRouteFeedback(`Лимит ${DAY_ROUTE_MAX} точек`);
+    flashDayRouteFeedback(dayRouteHardLimitMessage());
   } else {
     flashDayRouteFeedback('Не удалось добавить теплоход');
   }
@@ -274,7 +281,7 @@ export function DayRouteBoatWizard({
   function pinSlot(slot: BoatSlotCandidate) {
     if (!selectedPier || !selectedRoute) return;
     if (atMax) {
-      flashDayRouteFeedback(`Лимит ${DAY_ROUTE_MAX} точек`);
+      flashDayRouteFeedback(dayRouteHardLimitMessage());
       return;
     }
     const item = dayRouteItemFromBoatSlot({

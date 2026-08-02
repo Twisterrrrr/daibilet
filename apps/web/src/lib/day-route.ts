@@ -9,7 +9,39 @@ export const DAY_ROUTE_STORAGE_KEY = 'daibilet:dayRoute';
 export const DAY_ROUTE_CHANGED_EVENT = 'daibilet:day-route-changed';
 
 export const DAY_ROUTE_MIN = 2;
-export const DAY_ROUTE_MAX = 10;
+/** Soft density guideline: warn in UI, still allow adding until hard cap. */
+export const DAY_ROUTE_SOFT = 10;
+export const DAY_ROUTE_SOFT_WARN =
+  'День уже плотный - карта и время могут разъехаться';
+/** Hard safety cap for localStorage / share URL (not a planning ideal). */
+export const DAY_ROUTE_MAX = 15;
+
+export function isDayRouteAtSoft(count: number): boolean {
+  return count >= DAY_ROUTE_SOFT;
+}
+
+export function isDayRouteAtHard(count: number): boolean {
+  return count >= DAY_ROUTE_MAX;
+}
+
+export function dayRouteHardLimitMessage(): string {
+  return `Лимит ${DAY_ROUTE_MAX} точек`;
+}
+
+export function dayRouteAddSuccessMessage(count: number): string {
+  if (isDayRouteAtSoft(count) && count < DAY_ROUTE_MAX) {
+    return `Добавлено · ${count} · ${DAY_ROUTE_SOFT_WARN}`;
+  }
+  return `Добавлено в маршрут · ${count}`;
+}
+
+/** Count label for header / route block (soft is guideline, not /10 lock). */
+export function formatDayRouteCountLabel(count: number, prefix = 'Точки'): string {
+  if (count <= 0) return `${prefix} · 0`;
+  if (isDayRouteAtHard(count)) return `${prefix} · ${count}/${DAY_ROUTE_MAX}`;
+  if (isDayRouteAtSoft(count)) return `${prefix} · ${count} · плотный день`;
+  return `${prefix} · ${count}`;
+}
 
 export type DayRouteCoords = { latitude: number; longitude: number };
 
@@ -132,7 +164,7 @@ export function addTextStopToDayRoute(input: TextDayRouteStopInput): DayRouteSta
   const title = String(input.title || '').trim();
   if (!title) return readDayRouteFresh();
   const current = readDayRouteFresh();
-  // Hard cap = DAY_ROUTE_MAX (10). DAY_ROUTE_MIN (2) is only a UX "day is ready" hint.
+  // Hard cap = DAY_ROUTE_MAX. Soft (DAY_ROUTE_SOFT) is warn-only. MIN is "day ready" hint.
   if (current.venues.length >= DAY_ROUTE_MAX) return current;
 
   const coords = parseDayRouteCoordsInput(input);

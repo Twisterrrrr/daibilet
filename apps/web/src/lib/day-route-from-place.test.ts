@@ -148,7 +148,7 @@ test('dayRouteItemFromMustSee returns null without slug or match', () => {
   );
 });
 
-test('buildCityDayRoutePreset takes all resolvable must-see up to DAY_ROUTE_MAX', () => {
+test('buildCityDayRoutePreset takes all resolvable must-see up to soft guideline', () => {
   const places = [
     { name: 'Эрмитаж', desc: '', venueSlug: 'ermitazh' },
     { name: 'Крепость', desc: '', locationSlug: 'saint-petersburg-petropavlovskaya-krepost' },

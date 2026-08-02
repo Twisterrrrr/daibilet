@@ -46,6 +46,8 @@ import {
   DAY_ROUTE_CHANGED_EVENT,
   DAY_ROUTE_MAX,
   DAY_ROUTE_MIN,
+  DAY_ROUTE_SOFT,
+  DAY_ROUTE_SOFT_WARN,
   addTextStopToDayRoute,
   addToDayRoute,
   applyItemTokensToVenues,
@@ -62,17 +64,22 @@ import {
   catalogLocatorsFromItemTokens,
   catalogLocatorsFromShareTokens,
   clearDayRoute,
+  dayRouteAddSuccessMessage,
   dayRouteDominantCitySlug,
+  dayRouteHardLimitMessage,
+
   dayRouteFullCoveredCount,
   dayRouteHasMixedCities,
   dayRouteSegmentMeters,
   dayRouteTotalDistanceMeters,
   enrichDayRouteFromMatchVenues,
   estimateDayRouteTravelMinutes,
+  formatDayRouteCountLabel,
   formatDayRouteDistance,
   formatDayRouteSegmentHint,
   formatDayRouteTravelMinutes,
   hydrateTextStopsFromShareTokens,
+  isDayRouteAtSoft,
   isDayRouteShareTextToken,
   isInDayRoute,
   isTextDayRouteStop,
@@ -215,7 +222,7 @@ function appendDayRouteItem(item: DayRouteVenueItem | null): DayRouteState {
   }
   const before = readDayRouteFresh().venues.length;
   if (before >= DAY_ROUTE_MAX) {
-    flashDayRouteFeedback(`Лимит ${DAY_ROUTE_MAX} точек`);
+    flashDayRouteFeedback(dayRouteHardLimitMessage());
     return readDayRouteFresh();
   }
   if (isInDayRoute(item.id) || (item.slug && isInDayRoute(item.slug))) {
@@ -224,9 +231,9 @@ function appendDayRouteItem(item: DayRouteVenueItem | null): DayRouteState {
   }
   const next = addToDayRoute(item);
   if (next.venues.length > before) {
-    flashDayRouteFeedback(`Добавлено в маршрут · ${next.venues.length}/${DAY_ROUTE_MAX}`);
+    flashDayRouteFeedback(dayRouteAddSuccessMessage(next.venues.length));
   } else if (next.venues.length >= DAY_ROUTE_MAX) {
-    flashDayRouteFeedback(`Лимит ${DAY_ROUTE_MAX} точек`);
+    flashDayRouteFeedback(dayRouteHardLimitMessage());
   } else {
     flashDayRouteFeedback('Не удалось добавить точку');
   }
@@ -526,8 +533,10 @@ function DayRoutePanelInner() {
     return Boolean(payload?.multiCityWarning);
   }, [route.venues, payload?.multiCityWarning]);
   const belowMin = route.venues.length > 0 && route.venues.length < DAY_ROUTE_MIN;
-  // Cap is always DAY_ROUTE_MAX (10). Never use DAY_ROUTE_MIN (2) as an add ceiling.
+  // Hard = DAY_ROUTE_MAX safety. Soft = DAY_ROUTE_SOFT warn-only. MIN = day-ready hint.
   const atMax = route.venues.length >= DAY_ROUTE_MAX;
+  const atSoft = isDayRouteAtSoft(route.venues.length);
+  const softSlotsLeft = Math.max(0, DAY_ROUTE_SOFT - route.venues.length);
   const citySlug = dayRouteDominantCitySlug(route.venues);
   const cityTitle = useMemo(() => {
     const counts = new Map<string, number>();
@@ -709,7 +718,7 @@ function DayRoutePanelInner() {
         label: venue.name,
         hint: venue.address || venue.city,
         disabled: inRoute || atMax,
-        disabledReason: inRoute ? 'Уже в маршруте' : atMax ? `Лимит ${DAY_ROUTE_MAX} точек` : null,
+        disabledReason: inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : null,
       };
     });
   }, [locationsCatalog, route, atMax]);
@@ -722,7 +731,7 @@ function DayRoutePanelInner() {
         label: venue.name,
         hint: venue.address || venue.city,
         disabled: inRoute || atMax,
-        disabledReason: inRoute ? 'Уже в маршруте' : atMax ? `Лимит ${DAY_ROUTE_MAX} точек` : null,
+        disabledReason: inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : null,
       };
     });
   }, [venuesCatalog, route, atMax]);
@@ -747,7 +756,7 @@ function DayRoutePanelInner() {
           : inRoute
             ? 'Уже в маршруте'
             : atMax
-              ? `Лимит ${DAY_ROUTE_MAX} точек`
+              ? dayRouteHardLimitMessage()
               : null,
       };
     });
@@ -803,7 +812,11 @@ function DayRoutePanelInner() {
 
   function addAllMustSee() {
     if (!mustSeeAddable.length || atMax) {
-      flashDayRouteFeedback(atMax ? `Лимит ${DAY_ROUTE_MAX} точек` : 'Нет мест для добавления');
+      flashDayRouteFeedback(atMax ? dayRouteHardLimitMessage() : 'Нет мест для добавления');
+      return;
+    }
+    if (atSoft) {
+      flashDayRouteFeedback(DAY_ROUTE_SOFT_WARN);
       return;
     }
     const cityCtx = {
@@ -813,12 +826,12 @@ function DayRoutePanelInner() {
       sourceSlug: selectedCity?.selectedDestination?.sourceSlug || null,
     };
     const filteredPlaces = mustSeeFiltered.map((row) => row.place);
-    // Bulk preset fills to soft guideline, then warns - never silently stop at old hard 10.
-    const preset = buildCityDayRoutePreset(filteredPlaces, matchSources, cityCtx, DAY_ROUTE_MAX);
+    // Bulk fills to soft guideline, then warns - individual adds still allowed until hard.
+    const preset = buildCityDayRoutePreset(filteredPlaces, matchSources, cityCtx, DAY_ROUTE_SOFT);
     let next = readDayRouteFresh();
     let added = 0;
     for (const item of preset) {
-      if (next.venues.length >= DAY_ROUTE_MAX) break;
+      if (next.venues.length >= DAY_ROUTE_SOFT) break;
       if (isInDayRoute(item.id, next) || (item.slug && isInDayRoute(item.slug, next))) continue;
       next = addToDayRoute(item);
       added += 1;
@@ -827,7 +840,11 @@ function DayRoutePanelInner() {
     const active =
       mustSeeFilterMeta.tabs.length < 2 ? mustSeeFilterMeta.defaultId : mustSeeFilter;
     if (added) {
-      flashDayRouteFeedback(`Добавлено: ${added} · ${next.venues.length}/${DAY_ROUTE_MAX}`);
+      flashDayRouteFeedback(
+        isDayRouteAtSoft(next.venues.length)
+          ? `Добавлено: ${added} · ${DAY_ROUTE_SOFT_WARN}`
+          : `Добавлено: ${added} · ${next.venues.length}`,
+      );
     } else {
       flashDayRouteFeedback(`${mustSeeFilterLabel(active)} уже в маршруте`);
     }
@@ -978,7 +995,7 @@ function DayRoutePanelInner() {
         label: venue.name,
         hint: [venue.address || venue.city, 'Локация'].filter(Boolean).join(' · '),
         disabled: inRoute || atMax,
-        disabledReason: inRoute ? 'Уже в маршруте' : atMax ? `Лимит ${DAY_ROUTE_MAX} точек` : null,
+        disabledReason: inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : null,
       });
     }
     for (const venue of venuesCatalog) {
@@ -988,7 +1005,7 @@ function DayRoutePanelInner() {
         label: venue.name,
         hint: [venue.address || venue.city, 'Площадка'].filter(Boolean).join(' · '),
         disabled: inRoute || atMax,
-        disabledReason: inRoute ? 'Уже в маршруте' : atMax ? `Лимит ${DAY_ROUTE_MAX} точек` : null,
+        disabledReason: inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : null,
       });
     }
     for (const event of eventsCatalog) {
@@ -1010,7 +1027,7 @@ function DayRoutePanelInner() {
           : inRoute
             ? 'Уже в маршруте'
             : atMax
-              ? `Лимит ${DAY_ROUTE_MAX} точек`
+              ? dayRouteHardLimitMessage()
               : null,
       });
     }
@@ -1112,7 +1129,7 @@ function DayRoutePanelInner() {
     // Fresh LS length - never gate on DAY_ROUTE_MIN or a stale React snapshot.
     const before = readDayRouteFresh().venues.length;
     if (before >= DAY_ROUTE_MAX) {
-      setFormError(`Лимит ${DAY_ROUTE_MAX} точек`);
+      setFormError(dayRouteHardLimitMessage());
       setRoute(readDayRouteFresh());
       return;
     }
@@ -1127,11 +1144,14 @@ function DayRoutePanelInner() {
     if (next.venues.length <= before) {
       setFormError(
         next.venues.length >= DAY_ROUTE_MAX
-          ? `Лимит ${DAY_ROUTE_MAX} точек`
+          ? dayRouteHardLimitMessage()
           : 'Не удалось добавить точку. Попробуйте ещё раз',
       );
       titleFieldRef.current?.focus();
       return;
+    }
+    if (isDayRouteAtSoft(next.venues.length)) {
+      flashDayRouteFeedback(DAY_ROUTE_SOFT_WARN);
     }
     setTitleInput('');
     setNoteInput('');
@@ -1282,7 +1302,7 @@ function DayRoutePanelInner() {
               </>
             ) : null}
             {' · '}
-            {route.venues.length}/{DAY_ROUTE_MAX}
+            {formatDayRouteCountLabel(route.venues.length)}
           </p>
         </div>
         {route.venues.length ? (
@@ -1531,9 +1551,14 @@ function DayRoutePanelInner() {
               сложился.
             </p>
           ) : null}
+          {atSoft && !atMax ? (
+            <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" data-day-route-soft-warn>
+              {DAY_ROUTE_SOFT_WARN}
+            </p>
+          ) : null}
           {atMax ? (
             <p className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
-              Лимит {DAY_ROUTE_MAX} точек. Удалите одну, чтобы добавить другую.
+              {dayRouteHardLimitMessage()}. Удалите одну, чтобы добавить другую.
             </p>
           ) : null}
         </>
@@ -1552,7 +1577,7 @@ function DayRoutePanelInner() {
         <section className="mt-5 sm:mt-8" data-day-route-list>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500" data-day-route-count-heading>
-              Маршрут · {route.venues.length}/{DAY_ROUTE_MAX}
+              {formatDayRouteCountLabel(route.venues.length, 'Маршрут')}
             </h2>
             <div className="flex flex-wrap gap-2">
               {canOptimize ? (
@@ -1984,11 +2009,11 @@ function DayRoutePanelInner() {
                 <div data-day-must-see>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-xs text-slate-500">
-                      Нажмите на место или добавьте видимые сразу (до {DAY_ROUTE_MAX}).
+                      Нажмите на место или добавьте видимые сразу (ориентир {DAY_ROUTE_SOFT}).
                     </p>
                     <button
                       type="button"
-                      disabled={atMax || mustSeeAddable.length === 0}
+                      disabled={atMax || atSoft || mustSeeAddable.length === 0}
                       onClick={addAllMustSee}
                       data-day-must-see-bulk
                       className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
@@ -2000,7 +2025,7 @@ function DayRoutePanelInner() {
                         ? 'Добавить главные места'
                         : 'Добавить выбранные'}
                       {mustSeeAddable.length
-                        ? ` (${Math.min(mustSeeAddable.length, DAY_ROUTE_MAX - route.venues.length)})`
+                        ? ` (${Math.min(mustSeeAddable.length, softSlotsLeft)})`
                         : ''}
                     </button>
                   </div>
@@ -2022,7 +2047,7 @@ function DayRoutePanelInner() {
                           key={item.id}
                           type="button"
                           disabled={inRoute || atMax}
-                          title={inRoute ? 'Уже в маршруте' : atMax ? `Лимит ${DAY_ROUTE_MAX} точек` : 'Добавить в день'}
+                          title={inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : 'Добавить в день'}
                           onClick={() => addMustSeeItem(item)}
                           className={`inline-flex max-w-full items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed ${
                             inRoute
@@ -2113,8 +2138,8 @@ function DayRoutePanelInner() {
                   const addable = (match.routeVenues || []).filter(
                     (v) => !isInDayRoute(v.id) && !(v.slug && isInDayRoute(v.slug)),
                   );
-                  const showAddablePlaces = addable.length > 0 && !atMax;
-                  const bulkAddCount = Math.min(addable.length, DAY_ROUTE_MAX - route.venues.length);
+                  const showAddablePlaces = addable.length > 0 && !atMax && !atSoft;
+                  const bulkAddCount = Math.min(addable.length, softSlotsLeft);
                   const showBulkAdd = showAddablePlaces && bulkAddCount >= 2;
                   return (
                     <li
@@ -2207,13 +2232,15 @@ function DayRoutePanelInner() {
                                 let next = readDayRoute();
                                 const before = next.venues.length;
                                 for (const venue of addable) {
-                                  if (next.venues.length >= DAY_ROUTE_MAX) break;
+                                  if (next.venues.length >= DAY_ROUTE_SOFT) break;
                                   next = addToDayRoute(matchVenueToDayRouteItem(venue));
                                 }
                                 setRoute(next);
                                 const added = next.venues.length - before;
-                                if (added > 0) {
-                                  flashDayRouteFeedback(`Добавлено: ${added} · ${next.venues.length}/${DAY_ROUTE_MAX}`);
+                                if (added > 0 && isDayRouteAtSoft(next.venues.length)) {
+                                  flashDayRouteFeedback(DAY_ROUTE_SOFT_WARN);
+                                } else if (added > 0) {
+                                  flashDayRouteFeedback(`Добавлено: ${added} · ${next.venues.length}`);
                                 }
                               }}
                             >

@@ -28,7 +28,7 @@
 | UX.MYDAY-F | Мой день: filters + auto-pick + top-up (product next) | Высокий | ⏳ поверх MOB канона |
 | UX.MYDAY-IA | `/my-day` catalog-first + text accordion (collapsed) | Критический | ✅ live **BUILD_ID=`MvYEsYnvAH_KMCxXkt2S6`** |
 | UX.MYDAY-ONPAGE | `/my-day` on-page city + searchable Локации/Площадки/События + must-see chips (no catalog nav) | Критический | ✅ `b4fdfd5`+`6345d0a` MSK **BUILD_ID=`q-1BAwZ65koVjH3CunDvi`** |
-| UX.MYDAY-MAX10 | `/my-day` DAY_ROUTE_MAX 8→10; drop redundant intro copy; must-see chip without «в дне» | Критический | ✅ `8499c92` MSK **BUILD_ID=`q-1BAwZ65koVjH3CunDvi`** smoke `/my-day` 200 |
+| UX.MYDAY-SOFT | /my-day soft-warn SOFT=10 HARD=15; copy плотный день; bulk stop at soft | Критический | 🔄 ship 2026-08-02 → MSK |\n| UX.MYDAY-MAX10 | `/my-day` DAY_ROUTE_MAX 8→10; drop redundant intro copy; must-see chip without «в дне» | Критический | ✅ `8499c92` MSK **BUILD_ID=`q-1BAwZ65koVjH3CunDvi`** smoke `/my-day` 200 |
 | UX.MYDAY-FILTERS | Must-see tabs: Главные / Гастро / Музеи / Парки / Храмы (hide empty); bulk respects filter | Критический | ✅ `5ba3e56` MSK **BUILD_ID=`FpLvs9SkQ6VpTMNXw-7ES`** smoke hub NN 5 tabs |
 | UX.MYDAY-ACCORDION | `/my-day` compact: route always open; other sections exclusive accordion; «Своё место» under route | Критический | ✅ `a4ce4e7` MSK **BUILD_ID=`QrIjNExsel44mrZk0b09y`** smoke /my-day 200 |
 | UX.MYDAY-SHARE | Viral share `?city=&items=id:HHMM\|free`; menu Copy/TG/WA/**Макс**; buy+bought; DnD/print/distance MVP | Критический | ✅ `42421d4` |

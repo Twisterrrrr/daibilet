@@ -1,6 +1,6 @@
 /**
  * Owner-path E2E: standalone text planner on /my-day (no catalog).
- * Open /my-day → add text stops through MAX → assert counter N/MAX and add disabled at max.
+ * Open /my-day → add text stops through HARD → assert counter without /lock; soft warn ≥SOFT; add disabled at hard.
  *
  * Usage: node scripts/e2e-day-plan-text.mjs
  * Env: BASE_URL (default https://daibilet.ru)
@@ -11,7 +11,8 @@ import path from 'node:path';
 
 const BASE = process.env.BASE_URL || 'https://daibilet.ru';
 const OUT = path.resolve('.deploy-tmp/e2e-day-plan-text');
-const MAX = 10;
+const SOFT = 10;
+const MAX = 15; // hard safety
 fs.mkdirSync(OUT, { recursive: true });
 
 function log(...args) {
@@ -67,10 +68,17 @@ async function readPlan(page) {
 }
 
 function assertCountLabel(state, n) {
-  const re = new RegExp(`${n}\\s*\\/\\s*${MAX}`);
-  if (!re.test(state.headingText || '') && !re.test(state.labelText || '')) {
+  // Soft-warn UI: «Точки · N» / «Маршрут · N» (+ optional «плотный день»), no /MAX lock.
+  const hay = `${state.headingText || ''} ${state.labelText || ''}`;
+  const re = new RegExp(`(?:Точки|Маршрут)\\s*·\\s*${n}(?:\\s*·|\\b)`);
+  if (!re.test(hay) && !new RegExp(`\\b${n}\\b`).test(hay)) {
     throw new Error(
-      `Count label missing ${n}/${MAX}: heading=${state.headingText} label=${state.labelText}`,
+      `Count label missing ${n}: heading=${state.headingText} label=${state.labelText}`,
+    );
+  }
+  if (n >= SOFT && !/плотный день/i.test(hay)) {
+    throw new Error(
+      `Soft warn missing at ${n}: heading=${state.headingText} label=${state.labelText}`,
     );
   }
 }
@@ -151,7 +159,7 @@ async function main() {
 
     await page.screenshot({ path: path.join(OUT, `after-${MAX}.png`), fullPage: true });
     result.ok = true;
-    log(`OK text planner 0→${MAX} without catalog; counter N/${MAX}; add disabled only at max`);
+    log(`OK text planner 0→${MAX} without catalog; soft=${SOFT}; hard=${MAX}; add disabled only at hard`);
   } catch (err) {
     result.error = String(err?.stack || err);
     try {

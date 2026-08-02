@@ -3,6 +3,8 @@ import test from 'node:test';
 
 import {
   DAY_ROUTE_MAX,
+  DAY_ROUTE_SOFT,
+  DAY_ROUTE_SOFT_WARN,
   DAY_ROUTE_STORAGE_KEY,
   addTextStopToDayRoute,
   addToDayRoute,
@@ -13,11 +15,16 @@ import {
   buildYandexMultiStopRouteUrl,
   catalogDayRouteVenueIds,
   clearDayRoute,
+  dayRouteAddSuccessMessage,
   dayRouteDominantCitySlug,
   dayRouteFullCoveredCount,
+  dayRouteHardLimitMessage,
   dayRouteHasMixedCities,
   dayRouteMatchScore,
   enrichDayRouteFromMatchVenues,
+  formatDayRouteCountLabel,
+  isDayRouteAtHard,
+  isDayRouteAtSoft,
   hydrateDayRouteFromShare,
   hydrateTextStopsFromShareTokens,
   isDayRouteShareTextToken,
@@ -615,6 +622,35 @@ test('addTextStopToDayRoute rejects blank title and respects MAX', () => {
   }
   assert.equal(readDayRoute().venues.length, DAY_ROUTE_MAX);
   assert.equal(addTextStopToDayRoute({ title: 'Overflow' }).venues.length, DAY_ROUTE_MAX);
+});
+
+test('soft guideline helpers: warn copy and count label without /MAX lock', () => {
+  assert.equal(DAY_ROUTE_SOFT, 10);
+  assert.equal(DAY_ROUTE_MAX, 15);
+  assert.equal(isDayRouteAtSoft(9), false);
+  assert.equal(isDayRouteAtSoft(10), true);
+  assert.equal(isDayRouteAtHard(14), false);
+  assert.equal(isDayRouteAtHard(15), true);
+  assert.equal(formatDayRouteCountLabel(3), 'Точки · 3');
+  assert.equal(formatDayRouteCountLabel(10), 'Точки · 10 · плотный день');
+  assert.equal(formatDayRouteCountLabel(11, 'Маршрут'), 'Маршрут · 11 · плотный день');
+  assert.equal(formatDayRouteCountLabel(15), 'Точки · 15/15');
+  assert.match(DAY_ROUTE_SOFT_WARN, /плотный/);
+  assert.doesNotMatch(DAY_ROUTE_SOFT_WARN, /[—–]/);
+  assert.match(dayRouteHardLimitMessage(), /15/);
+  assert.match(dayRouteAddSuccessMessage(3), /Добавлено в маршрут · 3/);
+  assert.match(dayRouteAddSuccessMessage(10), /плотный/);
+});
+
+test('add allows past soft until hard safety', () => {
+  mockStorage();
+  clearDayRoute();
+  for (let i = 0; i < DAY_ROUTE_SOFT + 2; i += 1) {
+    addTextStopToDayRoute({ title: `Soft ${i}` });
+  }
+  assert.equal(readDayRoute().venues.length, DAY_ROUTE_SOFT + 2);
+  assert.equal(isDayRouteAtSoft(readDayRoute().venues.length), true);
+  assert.equal(isDayRouteAtHard(readDayRoute().venues.length), false);
 });
 
 test('parseDayRouteCoordsInput accepts paste and separate fields', () => {

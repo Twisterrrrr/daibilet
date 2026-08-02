@@ -95,7 +95,7 @@ Mobile sticky bottom: общий `MobileStickyActionBar` (`lg:hidden` + safe-are
 7. Sticky FAB: Купить билеты (если unpaid) · Карта · Добавить · Поделиться  
 8. Handoff modal после external checkout → `ticketBought`
 
-`DAY_ROUTE_MAX=10`. Exclusive accordion для secondary блоков.
+`DAY_ROUTE_SOFT=10` / hard `DAY_ROUTE_MAX=15`. Exclusive accordion для secondary блоков.
 
 ---
 

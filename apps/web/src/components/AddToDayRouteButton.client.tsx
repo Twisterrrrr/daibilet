@@ -7,7 +7,11 @@ import { useDayRouteState } from '@/hooks/useDayRouteState';
 import { flashDayRouteFeedback } from '@/lib/day-route-feedback';
 import {
   DAY_ROUTE_MAX,
+  DAY_ROUTE_SOFT_WARN,
   addToDayRoute,
+  dayRouteAddSuccessMessage,
+  dayRouteHardLimitMessage,
+  isDayRouteAtSoft,
   isInDayRoute,
   normalizeDayRouteVenueId,
   readDayRouteFresh,
@@ -71,7 +75,7 @@ export function AddToDayRouteButton({
     const after = readDayRouteFresh();
     const n = after.venues.length;
     if (n > beforeCount) {
-      flashDayRouteFeedback(`Добавлено в маршрут · ${n}/${DAY_ROUTE_MAX}`);
+      flashDayRouteFeedback(dayRouteAddSuccessMessage(n));
       return;
     }
     if (n < beforeCount) {
@@ -79,7 +83,7 @@ export function AddToDayRouteButton({
       return;
     }
     if (full) {
-      flashDayRouteFeedback(`Лимит ${DAY_ROUTE_MAX} точек`);
+      flashDayRouteFeedback(dayRouteHardLimitMessage());
       return;
     }
     if (!venueKey) {
@@ -138,7 +142,7 @@ export function AddToDayRouteButton({
         return;
       }
       if (before.venues.length >= DAY_ROUTE_MAX) {
-        flashDayRouteFeedback(`Лимит ${DAY_ROUTE_MAX} точек`);
+        flashDayRouteFeedback(dayRouteHardLimitMessage());
         return;
       }
       addToDayRoute(payload);
@@ -160,12 +164,14 @@ export function AddToDayRouteButton({
           : !venueKey
             ? 'Нельзя добавить: нет id точки'
             : full && !active
-              ? `Лимит ${DAY_ROUTE_MAX} точек`
+              ? dayRouteHardLimitMessage()
               : active
                 ? compact
                   ? 'Уже в маршруте (убрать можно в Мой день)'
                   : activeTitle
-                : idleTitle
+                : isDayRouteAtSoft(route.venues.length) && !active
+                  ? DAY_ROUTE_SOFT_WARN
+                  : idleTitle
       }
       aria-pressed={active}
       aria-label={active ? (compact ? 'Уже в маршруте дня' : activeAria) : idleAria}

@@ -5,12 +5,12 @@
 import { resolveCityPlaceHref, type CityMustSeeItem, type CityPlaceLinkFields } from './cityInfo';
 import { namesLooselyMatch } from './city-place-href';
 import { lookupEditorialPlaceCoords } from './city-place-coords';
-import { DAY_ROUTE_MAX, type DayRouteVenueItem } from './day-route';
+import { DAY_ROUTE_SOFT, type DayRouteVenueItem } from './day-route';
 import { isValidCoordinatePair } from './day-route-score';
 import { eventHref, venueHref } from './routes';
 
-/** Default preset takes all resolvable must-see (typically 6), capped by DAY_ROUTE_MAX. */
-export const DAY_ROUTE_PRESET_SIZE = DAY_ROUTE_MAX;
+/** Default preset fills toward soft density guideline. */
+export const DAY_ROUTE_PRESET_SIZE = DAY_ROUTE_SOFT;
 export const DAY_ROUTE_PRESET_MIN = 3;
 
 export type DayRouteVenueMatchSource = {
@@ -202,14 +202,14 @@ export function dayRouteItemFromEvent(event: DayRouteEventSource): DayRouteVenue
   };
 }
 
-/** Build resolvable must-see stops for city preset (all available up to DAY_ROUTE_MAX). */
+/** Build resolvable must-see stops for city preset (default soft guideline; hard MAX is safety only). */
 export function buildCityDayRoutePreset(
   places: CityMustSeeItem[],
   venues: DayRouteVenueMatchSource[],
   city: DayRouteCityContext,
   size = DAY_ROUTE_PRESET_SIZE,
 ): DayRouteVenueItem[] {
-  const cap = Math.min(Math.max(1, size), DAY_ROUTE_MAX);
+  const cap = Math.min(Math.max(1, size), DAY_ROUTE_SOFT);
   const items: DayRouteVenueItem[] = [];
   const seen = new Set<string>();
   for (const place of places) {

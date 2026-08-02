@@ -1,6 +1,6 @@
 /**
  * Owner regression: 2 text stops with coords → add Grand Maket (address+city+coords)
- * under near-full localStorage (page caches) → must reach 3/10 (not red error).
+ * under near-full localStorage (page caches) → must reach 3 points (not red error).
  *
  * Usage: node scripts/e2e-day-plan-grand-maket.mjs
  * Env: BASE_URL (default https://daibilet.ru)
@@ -100,7 +100,7 @@ async function main() {
     state = await readPlan(page);
     result.steps.push({ step: 'after-2', ...state });
     if (state.lsCount !== 2) throw new Error(`Expected 2 after Russian Museum, got ${state.lsCount}`);
-    if (state.addDisabled) throw new Error('Add disabled at 2/10');
+    if (state.addDisabled) throw new Error('Add disabled at 2');
 
     // Fill LS with disposable page caches until near quota (owner failure mode).
     await page.evaluate(() => {
@@ -143,7 +143,7 @@ async function main() {
       throw new Error(`Form error after Grand Maket: ${state.err}`);
     }
     if (state.lsCount !== 3) {
-      throw new Error(`Expected 3/10 after Grand Maket, ls=${state.lsCount}`);
+      throw new Error(`Expected 3 after Grand Maket, ls=${state.lsCount}`);
     }
     if (state.lsTitles[2] !== 'Гранд Макет Россия') {
       throw new Error(`Unexpected 3rd title: ${state.lsTitles[2]}`);
@@ -151,13 +151,13 @@ async function main() {
     if (state.last?.latitude !== 59.887991 || state.last?.longitude !== 30.33052) {
       throw new Error(`Coords not persisted: ${state.last?.latitude},${state.last?.longitude}`);
     }
-    if (!/3\s*\/\s*10/.test(state.label || '') && !/3\s*\/\s*10/.test(state.heading || '')) {
-      throw new Error(`Counter missing 3/10: ${state.label} / ${state.heading}`);
+    if (!/(?:Точки|Маршрут)\s*·\s*3\b/.test(state.label || '') && !/(?:Точки|Маршрут)\s*·\s*3\b/.test(state.heading || '') && !/\b3\b/.test(`${state.label || ''} ${state.heading || ''}`)) {
+      throw new Error(`Counter missing 3: ${state.label} / ${state.heading}`);
     }
 
     await page.screenshot({ path: path.join(OUT, 'after-3.png'), fullPage: true });
     result.ok = true;
-    console.log('OK 2→Grand Maket→3/10 under near-full LS');
+    console.log('OK 2→Grand Maket→3 under near-full LS');
   } catch (err) {
     result.error = String(err?.stack || err);
     try {

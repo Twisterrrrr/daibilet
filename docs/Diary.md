@@ -1,3 +1,21 @@
+## 2026-08-02 - /my-day: soft-warn вместо hard DAY_ROUTE_MAX=10
+
+### Наблюдения
+- Owner: жёсткий потолок 10 точек ломал плотный день; Multiday не делать.
+- Share/print/short link должны переживать >10 точек.
+
+### Решения
+- DAY_ROUTE_SOFT=10 (guideline + soft-warn), DAY_ROUTE_MAX=15 (safety localStorage/URL).
+- Copy: «День уже плотный - карта и время могут разъехаться» (дефис).
+- UI: Точки · N / N · плотный день без /10 lock; hard banner только на 15.
+- Bulk/preset «добавить главные» останавливается на soft + warn; одиночный add до hard.
+- Readiness points blend к SOFT, не к hard.
+
+### Проблемы
+- Deploy MSK + BUILD_ID - в Tasktracker после ship.
+
+---
+
 ## 2026-08-02 - Мой день: planner + commercial checklist (Wanderlog-style slice)
 
 ### Наблюдения
@@ -13,7 +31,7 @@
   4. Handoff modal после «Купить билет» → `ticketBought` в localStorage
   5. Mobile FAB: Карта / Добавить / Поделиться; при unpaid → «Купить билеты»
   6. «Свободное окно» upsell (gap ≥1200м) - до 3 карточек free/museum/event
-- **Formula %:** equal thirds - points (MIN→MAX blend) + tickets resolved + timed slots among commerce stops.
+- **Formula %:** equal thirds - points (MIN→SOFT blend) + tickets resolved + timed slots among commerce stops.
 - **Chip priority:** bought → session → needs_ticket → free.
 - Docs: [myday-commercial-canon.md](./myday-commercial-canon.md).
 
