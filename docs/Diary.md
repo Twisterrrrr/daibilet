@@ -11,11 +11,7 @@
 - Убран `max-w-6xl mx-auto`; card `w-full`; inner grid `lg:px-6 xl:px-10 2xl:px-16` (`data-day-starter-max="full"` + `data-day-starter-inset="edges"`).
 
 ### Проблемы
-- Нет (BUILD_ID после MSK deploy).
-
----
-
-## 2026-08-02 - /my-day: starter max-w-6xl on wide screens
+- Нет. MSK **BUILD_ID=`I1b39S7TOIRax4a8s4z--`** (`378fb3e`), SMOKE_OK; starter inset + 2-line subtitle in chunks; `max-w-6xl` gone from starter.
 
 ### Наблюдения
 - Owner: empty starter OK на Full HD, на ultrawide слишком растянут (two-col на всю ширину контейнера).
