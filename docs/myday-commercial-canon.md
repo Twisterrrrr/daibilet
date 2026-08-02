@@ -22,7 +22,7 @@
 ## Readiness %
 
 ```
-pointsScore  = 0.65 * min(N/MIN,1) + 0.35 * min(N/MAX,1)   # empty → 0
+pointsScore  = 0.65 * min(N/MIN,1) + 0.35 * min(N/SOFT,1)   # empty → 0; SOFT=10 guideline
 ticketsScore = bought / needsTicket   # или 1 если билетов нет
 timeScore    = timedSet / commerceStops  # или 1 если commerce нет
 percent      = round(100 * (points + tickets + time) / 3)
