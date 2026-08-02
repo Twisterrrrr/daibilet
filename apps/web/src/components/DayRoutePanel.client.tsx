@@ -98,6 +98,13 @@ import {
 } from '@/lib/day-route-from-place';
 import { flashDayRouteFeedback } from '@/lib/day-route-feedback';
 import { formatPriceFrom } from '@/lib/format';
+import {
+  buildMustSeeFilterTabs,
+  classifyMustSeePlace,
+  mustSeeFilterLabel,
+  type MustSeeFilterId,
+} from '@/lib/must-see-filters';
+import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
 import { formatStreetAddress } from '@/lib/address';
 import { eventHref, venueHref } from '@/lib/routes';
 import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
@@ -237,7 +244,6 @@ function DayRoutePanelInner() {
   const selectedCity = useSelectedCityOptional();
   const itemsParam = searchParams.get('items');
   const cityParam = searchParams.get('city');
-  const fromParam = searchParams.get('from');
   const dayParam = searchParams.get('day');
   const [route, setRoute] = useState<DayRouteState>(() =>
     typeof window === 'undefined' ? { cityId: null, venues: [] } : readDayRoute(),
@@ -249,11 +255,6 @@ function DayRoutePanelInner() {
   const [shareBusy, setShareBusy] = useState(false);
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const shortShareCacheRef = useRef<Map<string, string>>(new Map());
-  const [shareLanding, setShareLanding] = useState<{
-    active: boolean;
-    fromName: string | null;
-    saved: boolean;
-  }>({ active: false, fromName: null, saved: false });
   const [travelMode, setTravelMode] = useState<DayRouteTravelMode>('walk');
   const [titleInput, setTitleInput] = useState('');
   const [noteInput, setNoteInput] = useState('');
@@ -267,6 +268,7 @@ function DayRoutePanelInner() {
   const [eventsCatalog, setEventsCatalog] = useState<PublicCatalogListItemDto[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(false);
   const [destinationsFallback, setDestinationsFallback] = useState<PublicDestinationDto[]>([]);
+  const [mustSeeFilter, setMustSeeFilter] = useState<MustSeeFilterId>('main');
   const hydratedDayRef = useRef<string | null>(null);
   const skipUrlSyncRef = useRef(false);
   const titleFieldRef = useRef<HTMLInputElement | null>(null);
@@ -326,8 +328,7 @@ function DayRoutePanelInner() {
       return;
     }
 
-    const fromName = String(fromParam || '').trim() || null;
-    setShareLanding({ active: true, fromName, saved: false });
+    // Inbound share: auto-apply to localStorage (no banner / no «Сохранить себе» gate).
     skipUrlSyncRef.current = true;
 
     if (itemTokens.length) {
@@ -463,7 +464,7 @@ function DayRoutePanelInner() {
       })
       .finally(() => setLoading(false));
     return () => controller.abort();
-  }, [itemsParam, cityParam, fromParam, dayParam, destinationsFallback]);
+  }, [itemsParam, cityParam, dayParam, destinationsFallback]);
 
   // Close share menu on outside click.
   useEffect(() => {
@@ -641,19 +642,45 @@ function DayRoutePanelInner() {
     };
     return mustSeePlaces
       .map((place) => {
+        const matched = matchSources.find((venue) => {
+          const slug = String(place.venueSlug || place.locationSlug || '').trim();
+          return slug && String(venue.slug || '').trim() === slug;
+        });
         const item = dayRouteItemFromMustSee(place, matchSources, cityCtx);
-        return item ? { place, item } : null;
+        return item
+          ? {
+              place: { ...place, type: matched?.type || null },
+              item,
+            }
+          : null;
       })
-      .filter((row): row is { place: (typeof mustSeePlaces)[number]; item: DayRouteVenueItem } =>
+      .filter((row): row is { place: (typeof mustSeePlaces)[number] & { type?: string | null }; item: DayRouteVenueItem } =>
         Boolean(row),
       );
   }, [mustSeePlaces, matchSources, pageCityId, pageCityName, pageCitySlug, selectedCity?.selectedDestination?.sourceSlug]);
 
+  const mustSeeFilterMeta = useMemo(() => {
+    return buildMustSeeFilterTabs(mustSeeResolved.map((row) => row.place));
+  }, [mustSeeResolved]);
+
+  useEffect(() => {
+    const ids = new Set(mustSeeFilterMeta.tabs.map((tab) => tab.id));
+    if (!ids.has(mustSeeFilter)) {
+      setMustSeeFilter(mustSeeFilterMeta.defaultId);
+    }
+  }, [mustSeeFilterMeta, mustSeeFilter]);
+
+  const mustSeeFiltered = useMemo(() => {
+    const active =
+      mustSeeFilterMeta.tabs.length < 2 ? mustSeeFilterMeta.defaultId : mustSeeFilter;
+    return mustSeeResolved.filter((row) => classifyMustSeePlace(row.place) === active);
+  }, [mustSeeResolved, mustSeeFilter, mustSeeFilterMeta]);
+
   const mustSeeAddable = useMemo(() => {
-    return mustSeeResolved.filter(
+    return mustSeeFiltered.filter(
       ({ item }) => !isInDayRoute(item.id, route) && !(item.slug && isInDayRoute(item.slug, route)),
     );
-  }, [mustSeeResolved, route]);
+  }, [mustSeeFiltered, route]);
 
   const locationOptions = useMemo<DayRouteSearchOption[]>(() => {
     return locationsCatalog.map((venue) => {
@@ -757,7 +784,7 @@ function DayRoutePanelInner() {
 
   function addAllMustSee() {
     if (!mustSeeAddable.length || atMax) {
-      flashDayRouteFeedback(atMax ? `Лимит ${DAY_ROUTE_MAX} точек` : 'Нет главных мест для добавления');
+      flashDayRouteFeedback(atMax ? `Лимит ${DAY_ROUTE_MAX} точек` : 'Нет мест для добавления');
       return;
     }
     const cityCtx = {
@@ -766,12 +793,8 @@ function DayRoutePanelInner() {
       slug: pageCitySlug,
       sourceSlug: selectedCity?.selectedDestination?.sourceSlug || null,
     };
-    const preset = buildCityDayRoutePreset(
-      mustSeePlaces,
-      matchSources,
-      cityCtx,
-      DAY_ROUTE_MAX,
-    );
+    const filteredPlaces = mustSeeFiltered.map((row) => row.place);
+    const preset = buildCityDayRoutePreset(filteredPlaces, matchSources, cityCtx, DAY_ROUTE_MAX);
     let next = readDayRouteFresh();
     let added = 0;
     for (const item of preset) {
@@ -781,10 +804,12 @@ function DayRoutePanelInner() {
       added += 1;
     }
     setRoute(next);
+    const active =
+      mustSeeFilterMeta.tabs.length < 2 ? mustSeeFilterMeta.defaultId : mustSeeFilter;
     flashDayRouteFeedback(
       added
-        ? `Добавлено главных мест: ${added} · ${next.venues.length}/${DAY_ROUTE_MAX}`
-        : 'Главные места уже в маршруте',
+        ? `Добавлено: ${added} · ${next.venues.length}/${DAY_ROUTE_MAX}`
+        : `${mustSeeFilterLabel(active)} уже в маршруте`,
     );
   }
 
@@ -955,7 +980,12 @@ function DayRoutePanelInner() {
     setShareBusy(true);
     try {
       const { shareUrl } = await resolveShareUrls();
-      await navigator.clipboard.writeText(shareUrl);
+      const text = buildDayRouteShareMessage({
+        cityTitle: scopeCityName || cityTitle,
+        shareUrl,
+        venues: route.venues,
+      });
+      await navigator.clipboard.writeText(text);
       setCopyStatus('ok');
       setShareMenuOpen(false);
     } catch {
@@ -985,16 +1015,6 @@ function DayRoutePanelInner() {
     } finally {
       setShareBusy(false);
     }
-  }
-
-  function saveSharedRoute() {
-    setRoute(readDayRouteFresh());
-    setShareLanding((prev) => ({ ...prev, saved: true, active: true }));
-    flashDayRouteFeedback('Маршрут сохранён - можете менять под себя');
-    const path = buildDayRouteSharePath(route.venues, {
-      citySlug: scopeCitySlug || pageCitySlug || cityParam,
-    });
-    router.replace(path, { scroll: false });
   }
 
   function printItinerary() {
@@ -1044,7 +1064,7 @@ function DayRoutePanelInner() {
                 className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900 hover:bg-emerald-100"
               >
                 <Copy className="h-3.5 w-3.5" />
-                {copyStatus === 'ok' ? 'Ссылка скопирована!' : 'Поделиться'}
+                {copyStatus === 'ok' ? 'Скопировано!' : 'Поделиться'}
               </button>
               {shareMenuOpen ? (
                 <div
@@ -1063,8 +1083,8 @@ function DayRoutePanelInner() {
                   >
                     <Copy className="h-4 w-4 shrink-0 text-emerald-700" />
                     <span className="min-w-0">
-                      <span className="block">Скопировать ссылку</span>
-                      <span className="block text-xs font-medium text-slate-500">Короткая ссылка</span>
+                      <span className="block">Скопировать текст</span>
+                      <span className="block text-xs font-medium text-slate-500">С сообщением и ссылкой</span>
                     </span>
                   </button>
                   <button
@@ -1114,14 +1134,13 @@ function DayRoutePanelInner() {
               className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 sm:flex-none"
             >
               <Printer className="h-3.5 w-3.5" />
-              Сохранить маршрутный лист
+              Сохранить
             </button>
             <button
               type="button"
               onClick={() => {
                 clearDayRoute();
                 setRoute(readDayRoute());
-                setShareLanding({ active: false, fromName: null, saved: false });
                 router.replace('/my-day', { scroll: false });
               }}
               className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 sm:flex-none"
@@ -1132,50 +1151,13 @@ function DayRoutePanelInner() {
         ) : null}
       </div>
 
-      {shareLanding.active && route.venues.length ? (
-        <div
-          role="status"
-          data-day-share-landing
-          className="mt-4 rounded-2xl border border-violet-200 bg-violet-50 px-4 py-3"
-        >
-          <p className="text-sm font-semibold text-violet-950">
-            {shareLanding.fromName
-              ? `${shareLanding.fromName} поделился планом на день!`
-              : 'Вам поделились планом на день!'}
-          </p>
-          <p className="mt-1 text-sm text-violet-900">
-            Можете присоединиться или изменить маршрут под себя.
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <button
-              type="button"
-              data-day-share-save
-              onClick={saveSharedRoute}
-              className="inline-flex min-h-10 items-center justify-center rounded-full bg-violet-700 px-4 py-2 text-xs font-bold text-white hover:bg-violet-800"
-            >
-              {shareLanding.saved ? 'Сохранено' : 'Сохранить себе'}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                saveSharedRoute();
-                setShareLanding((prev) => ({ ...prev, active: false }));
-              }}
-              className="inline-flex min-h-10 items-center justify-center rounded-full border border-violet-300 bg-white px-4 py-2 text-xs font-semibold text-violet-900 hover:bg-violet-100"
-            >
-              Повторить маршрут
-            </button>
-          </div>
-        </div>
-      ) : null}
-
       {copyStatus === 'ok' ? (
         <p
           role="status"
           className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900"
           data-day-share-ok
         >
-          Короткая ссылка скопирована!
+          Текст с ссылкой скопирован!
         </p>
       ) : null}
 
@@ -1257,7 +1239,7 @@ function DayRoutePanelInner() {
                   <div>
                     <p className="text-sm font-semibold text-slate-900">Главные места города</p>
                     <p className="mt-0.5 text-xs text-slate-500">
-                      Нажмите на место или добавьте все сразу (до {DAY_ROUTE_MAX}).
+                      Нажмите на место или добавьте видимые сразу (до {DAY_ROUTE_MAX}).
                     </p>
                   </div>
                   <button
@@ -1268,12 +1250,27 @@ function DayRoutePanelInner() {
                     className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
                   >
                     <Sparkles className="h-3.5 w-3.5" />
-                    Добавить главные места
-                    {mustSeeAddable.length ? ` (${Math.min(mustSeeAddable.length, DAY_ROUTE_MAX - route.venues.length)})` : ''}
+                    {(mustSeeFilterMeta.tabs.length < 2
+                      ? mustSeeFilterMeta.defaultId
+                      : mustSeeFilter) === 'main'
+                      ? 'Добавить главные места'
+                      : 'Добавить выбранные'}
+                    {mustSeeAddable.length
+                      ? ` (${Math.min(mustSeeAddable.length, DAY_ROUTE_MAX - route.venues.length)})`
+                      : ''}
                   </button>
                 </div>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {mustSeeResolved.map(({ place, item }) => {
+                <MustSeeFilterTabs
+                  tabs={mustSeeFilterMeta.tabs}
+                  activeId={
+                    mustSeeFilterMeta.tabs.length < 2
+                      ? mustSeeFilterMeta.defaultId
+                      : mustSeeFilter
+                  }
+                  onChange={setMustSeeFilter}
+                />
+                <div className="mt-3 flex flex-wrap gap-2" data-day-must-see-list>
+                  {mustSeeFiltered.map(({ place, item }) => {
                     const inRoute =
                       isInDayRoute(item.id, route) || Boolean(item.slug && isInDayRoute(item.slug, route));
                     return (
@@ -1765,7 +1762,7 @@ function DayRoutePanelInner() {
             className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 text-sm font-bold text-slate-800"
           >
             <Printer className="h-4 w-4" />
-            Лист
+            Сохранить
           </button>
         ) : null}
         {route.venues.length ? (

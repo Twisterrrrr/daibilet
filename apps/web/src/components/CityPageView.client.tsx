@@ -28,9 +28,15 @@ import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
+import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
 import { resolveCityInfo, type CityInfoEntry, type CityMustSeeItem } from '@/lib/cityInfo';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
 import { dayRouteItemFromMustSee } from '@/lib/day-route-from-place';
+import {
+  buildMustSeeFilterTabs,
+  classifyMustSeePlace,
+  type MustSeeFilterId,
+} from '@/lib/must-see-filters';
 import { isOpenDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import {
   collectSessionStartsAtTimes,
@@ -1159,89 +1165,17 @@ function CitySightsSection({
         Куда сходить {cityIn}
       </h2>
       {places.length ? (
-        <>
-          <h3 className={`mt-4 text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
-            Главные места
-          </h3>
-          <p className={`mt-1 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-            Точки, с которых удобно начать знакомство с городом.
-          </p>
-          <CityDayPresetBlock
-            places={places}
-            venues={venues}
-            city={city}
-            editorial={editorial}
-            namedPresets={guide?.dayRoutePresets}
-          />
-          <ol className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {places.slice(0, 6).map((place, index) => {
-              const afficheLink = matchSightAfficheLink({
-                sightName: place.name,
-                sightDesc: place.desc,
-                landings: landingRows,
-                categories,
-                citySlug,
-              });
-              const placeHref = resolveCityPlaceTitleHref(place, venues);
-              const dayRouteItem = dayRouteItemFromMustSee(place, venues, city);
-              return (
-              <li key={`${place.name}:${index}`} className="flex gap-3">
-                <span
-                  className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                    editorial ? 'bg-zinc-100 text-zinc-800' : 'bg-primary-50 text-primary-700'
-                  }`}
-                >
-                  {index + 1}
-                </span>
-                <div className="min-w-0 flex-1">
-                  {placeHref ? (
-                    <Link href={placeHref} className={`${titleClass} underline-offset-2 hover:underline`}>
-                      {place.name}
-                    </Link>
-                  ) : (
-                    <div className={titleClass}>{place.name}</div>
-                  )}
-                  <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>{place.desc}</p>
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    {dayRouteItem ? (
-                      <AddToDayRouteButton
-                        compact
-                        className="!min-h-9 !px-2.5 !py-1.5 !text-[11px]"
-                        venue={dayRouteItem}
-                      />
-                    ) : null}
-                    {afficheLink ? (
-                      afficheLink.href.startsWith('#') ? (
-                        <a
-                          href={afficheLink.href}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            scrollToSection(afficheLink.href.replace(/^#/, ''));
-                          }}
-                          className={`inline-flex text-sm font-semibold ${
-                            editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
-                          }`}
-                        >
-                          {afficheLink.label} →
-                        </a>
-                      ) : (
-                        <Link
-                          href={afficheLink.href}
-                          className={`inline-flex text-sm font-semibold ${
-                            editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
-                          }`}
-                        >
-                          {afficheLink.label} →
-                        </Link>
-                      )
-                    ) : null}
-                  </div>
-                </div>
-              </li>
-            );
-            })}
-          </ol>
-        </>
+        <CitySightsMustSeeList
+          places={places}
+          venues={venues}
+          city={city}
+          editorial={editorial}
+          namedPresets={guide?.dayRoutePresets}
+          landingRows={landingRows}
+          categories={categories}
+          citySlug={citySlug}
+          titleClass={titleClass}
+        />
       ) : null}
       {articles.length ? (
         <div className={places.length ? 'mt-8' : 'mt-4'}>
@@ -1259,6 +1193,158 @@ function CitySightsSection({
         </div>
       ) : null}
     </section>
+  );
+}
+
+function CitySightsMustSeeList({
+  places,
+  venues,
+  city,
+  editorial,
+  namedPresets,
+  landingRows,
+  categories,
+  citySlug,
+  titleClass,
+}: {
+  places: CityMustSeeItem[];
+  venues: PublicVenueDto[];
+  city: PublicCityDto;
+  editorial: boolean;
+  namedPresets?: CityInfoEntry['dayRoutePresets'];
+  landingRows: Array<{
+    slug: string;
+    title: string;
+    subtitle?: string | null;
+    events?: number | null;
+    priceFrom?: number | null;
+  }>;
+  categories: Array<[string, number]>;
+  citySlug?: string;
+  titleClass: string;
+}) {
+  const classifiedPlaces = React.useMemo(() => {
+    return places.map((place) => {
+      const matched = venues.find((venue) => {
+        const slug = String(place.venueSlug || place.locationSlug || '').trim();
+        return slug && String(venue.slug || '').trim() === slug;
+      });
+      return { ...place, type: matched?.type || null };
+    });
+  }, [places, venues]);
+
+  const filterMeta = React.useMemo(
+    () => buildMustSeeFilterTabs(classifiedPlaces),
+    [classifiedPlaces],
+  );
+  const [filterId, setFilterId] = React.useState<MustSeeFilterId>(filterMeta.defaultId);
+
+  React.useEffect(() => {
+    const ids = new Set(filterMeta.tabs.map((tab) => tab.id));
+    if (!ids.has(filterId)) setFilterId(filterMeta.defaultId);
+  }, [filterMeta, filterId]);
+
+  const activeId = filterMeta.tabs.length < 2 ? filterMeta.defaultId : filterId;
+  const filteredPlaces = React.useMemo(
+    () => classifiedPlaces.filter((place) => classifyMustSeePlace(place) === activeId),
+    [classifiedPlaces, activeId],
+  );
+  // With category tabs show the full filtered set; single-tab cities keep top-6.
+  const visiblePlaces =
+    filterMeta.tabs.length >= 2 ? filteredPlaces : filteredPlaces.slice(0, 6);
+
+  return (
+    <>
+      <h3 className={`mt-4 text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
+        Главные места
+      </h3>
+      <p className={`mt-1 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+        Точки, с которых удобно начать знакомство с городом.
+      </p>
+      <CityDayPresetBlock
+        places={places}
+        venues={venues}
+        city={city}
+        editorial={editorial}
+        namedPresets={namedPresets}
+      />
+      <MustSeeFilterTabs
+        tabs={filterMeta.tabs}
+        activeId={activeId}
+        onChange={setFilterId}
+        editorial={editorial}
+      />
+      <ol className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {visiblePlaces.map((place, index) => {
+          const afficheLink = matchSightAfficheLink({
+            sightName: place.name,
+            sightDesc: place.desc,
+            landings: landingRows,
+            categories,
+            citySlug,
+          });
+          const placeHref = resolveCityPlaceTitleHref(place, venues);
+          const dayRouteItem = dayRouteItemFromMustSee(place, venues, city);
+          return (
+            <li key={`${place.name}:${index}`} className="flex gap-3">
+              <span
+                className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                  editorial ? 'bg-zinc-100 text-zinc-800' : 'bg-primary-50 text-primary-700'
+                }`}
+              >
+                {index + 1}
+              </span>
+              <div className="min-w-0 flex-1">
+                {placeHref ? (
+                  <Link href={placeHref} className={`${titleClass} underline-offset-2 hover:underline`}>
+                    {place.name}
+                  </Link>
+                ) : (
+                  <div className={titleClass}>{place.name}</div>
+                )}
+                <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
+                  {place.desc}
+                </p>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  {dayRouteItem ? (
+                    <AddToDayRouteButton
+                      compact
+                      className="!min-h-9 !px-2.5 !py-1.5 !text-[11px]"
+                      venue={dayRouteItem}
+                    />
+                  ) : null}
+                  {afficheLink ? (
+                    afficheLink.href.startsWith('#') ? (
+                      <a
+                        href={afficheLink.href}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          scrollToSection(afficheLink.href.replace(/^#/, ''));
+                        }}
+                        className={`inline-flex text-sm font-semibold ${
+                          editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
+                        }`}
+                      >
+                        {afficheLink.label} →
+                      </a>
+                    ) : (
+                      <Link
+                        href={afficheLink.href}
+                        className={`inline-flex text-sm font-semibold ${
+                          editorial ? 'text-zinc-700 hover:text-zinc-950' : 'text-primary-700 hover:text-primary-800'
+                        }`}
+                      >
+                        {afficheLink.label} →
+                      </Link>
+                    )
+                  ) : null}
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </>
   );
 }
 

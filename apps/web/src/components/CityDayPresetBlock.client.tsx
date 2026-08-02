@@ -11,6 +11,7 @@ import {
   type DayRouteCityContext,
   type DayRouteVenueMatchSource,
 } from '@/lib/day-route-from-place';
+import { mustSeePlacesForDefaultPreset } from '@/lib/must-see-filters';
 import { replaceDayRouteFromVenues } from '@/lib/day-route';
 
 type Props = {
@@ -52,11 +53,14 @@ export function CityDayPresetBlock({
       .filter((row) => row.items.length >= 3);
   }, [namedPresets, venues, city]);
 
-  const fallbackPreset = useMemo(
-    () => buildCityDayRoutePreset(places, venues, city),
-    [places, venues, city],
-  );
-  const fallbackAvailable = cityDayRoutePresetAvailable(places, venues, city);
+  const fallbackPreset = useMemo(() => {
+    const source = mustSeePlacesForDefaultPreset(places);
+    return buildCityDayRoutePreset(source, venues, city);
+  }, [places, venues, city]);
+  const fallbackAvailable = useMemo(() => {
+    const source = mustSeePlacesForDefaultPreset(places);
+    return cityDayRoutePresetAvailable(source, venues, city);
+  }, [places, venues, city]);
 
   const apply = (id: string, items: ReturnType<typeof buildCityDayRoutePreset>) => {
     setBusyId(id);

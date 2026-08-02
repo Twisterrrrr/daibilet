@@ -1,3 +1,35 @@
+## 2026-08-02 - Must-see filters: Главные / Гастро / Музеи / Парки / Храмы
+
+### Наблюдения
+- Owner: на «Мой день» / city hub блок «Главные места города» смешивал landmarks + гастро + музеи в одну кучу (Нижний: Кремль рядом с «Селёдка и Кофе»).
+- cityInfo mustSee не несёт tags; классификация по `venueSlug`/`locationSlug` + kind каталога + name/desc heuristics.
+
+### Решения
+- `must-see-filters.ts`: priority gastro → museum → park → temple → main; пустые табы скрыты.
+- UI tabs: `DayRoutePanel` + `CityPageView` (`MustSeeFilterTabs`); bulk CTA «Добавить главные места» / «Добавить выбранные».
+- Default preset / «Собрать за минуту» берёт main (без гастро).
+
+### Проблемы
+- Нет (heuristics без editorial tags в cityInfo; kind из каталога усиливает gastro/museum).
+
+---
+
+## 2026-08-02 - /my-day: убран friend-landing баннер
+
+### Наблюдения
+- Owner: фиолетовый баннер «Вам поделились…» / «Сохранить себе» / «Повторить маршрут» лишний - контекст шаринга должен быть в тексте мессенджера, не в persistent UI.
+- Print label «Сохранить маршрутный лист» слишком длинный.
+
+### Решения
+- Убран `shareLanding` banner + `saveSharedRoute`; `?city=&items=` по-прежнему auto-hydrate в localStorage (редактирование без клика «Сохранить себе»).
+- Print CTA: «Сохранить» (desktop + mobile sticky), иконка принтера сохранена.
+- `buildDayRouteShareMessage`: «Тебе поделились планом на день… Открой ссылку - маршрут уже в «Мой день», можно править»; Copy кладёт полный текст (не только URL).
+
+### Проблемы
+- Нет (UI-only). BUILD_ID - после MSK deploy.
+
+---
+
 ## 2026-08-02 - Нижний: missing day-route coords (DTO, не БД)
 
 ### Наблюдения
