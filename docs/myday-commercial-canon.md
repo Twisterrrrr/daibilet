@@ -28,7 +28,9 @@ timeScore    = timedSet / commerceStops  # или 1 если commerce нет
 percent      = round(100 * (points + tickets + time) / 3)
 ```
 
-UI: «День собран на X%» + subline `N точек · M билетов · K свободное окно` (+ hint Яндекс.Карты).
+Header UI (owner 2026-08-02): только `N точек из 10` (SOFT) + `M билетов` если unpaid > 0.
+Percent / free-window / «Яндекс.Карты» в этой строке не показывать (карта - отдельная кнопка).
+H1: «Мой день в {предложный}» через `inCityPrepositional`.
 
 ## Free window
 
@@ -39,7 +41,7 @@ UI: «День собран на X%» + subline `N точек · M билето�
 | # | Тема | Приоритет | Примечание |
 |---|------|-----------|------------|
 | P4 | Free-time gap upsell polish (несколько окон, ETA) | Средний | MVP gap уже в slice |
-| P5 | `hookFact` + mini description на карточках | Средний | |
+| P5 | `hookFact` + mini description на карточках | Средний | ✅ 2026-08-02 picker preview |
 | P6 | City «собрать за минуту» templates (variants) | Высокий | пресеты есть; варианты UI later |
 | P7 | Commercial share for friend `/d/{code}` | Высокий | **не** возвращать soft purple «Вам поделились»; recipient = ready scenario (tickets CTA, map, paid highlights) |
 | P8 | Timeline Утро/День/Вечер | Средний | |

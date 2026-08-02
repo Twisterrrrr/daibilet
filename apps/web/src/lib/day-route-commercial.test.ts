@@ -47,7 +47,21 @@ describe('day-route-commercial chips', () => {
       stop({ id: '3', title: 'Музей', ticketUrl: '/events/z', eventId: 'z' }),
     );
     assert.equal(chip.kind, 'needs_ticket');
-    assert.equal(chip.label, 'Нужен билет');
+    assert.equal(chip.label, 'Билет оформляется…');
+  });
+
+  it('keeps soft evening session label without inventing clock time', () => {
+    const chip = classifyDayRouteCommercialChip(
+      stop({
+        id: '3b',
+        title: 'Стендап',
+        ticketUrl: '/events/standup',
+        eventId: 'standup',
+        sessionLabel: 'Вечерний сеанс',
+      }),
+    );
+    assert.equal(chip.kind, 'needs_ticket');
+    assert.equal(chip.label, 'Вечерний сеанс');
   });
 
   it('free when no commerce signals', () => {
@@ -62,10 +76,11 @@ describe('day-route-commercial readiness', () => {
     const r = computeDayRouteReadiness([]);
     assert.equal(r.percent, 0);
     assert.equal(r.pointsCount, 0);
+    assert.equal(r.summaryLine, '0 точек из 10');
     assert.match(r.percentLabel, /0%/);
   });
 
-  it('counts unpaid tickets and free windows', () => {
+  it('header summary: points of SOFT + unpaid tickets only', () => {
     const venues = [
       stop({ id: 'a', title: 'Парк' }),
       stop({ id: 'b', title: 'Шоу', ticketUrl: '/events/b', eventId: 'b' }),
@@ -84,10 +99,26 @@ describe('day-route-commercial readiness', () => {
     assert.equal(r.ticketsToBuy, 1);
     assert.equal(r.freeWindows, 1);
     assert.equal(r.slotsWithoutTime, 1);
-    assert.match(r.summaryLine, /3 точки/);
-    assert.match(r.summaryLine, /1 билет/);
-    assert.match(r.summaryLine, /свободное окно/);
+    assert.equal(r.summaryLine, '3 точки из 10 · 1 билет');
+    assert.doesNotMatch(r.summaryLine, /свободное окно/);
+    assert.doesNotMatch(r.summaryLine, /без билетов/);
     assert.ok(r.percent > 0 && r.percent <= 100);
+  });
+
+  it('omits tickets part when nothing unpaid', () => {
+    const venues = [
+      stop({ id: 'a', title: 'Парк' }),
+      stop({
+        id: 'c',
+        title: 'Театр',
+        ticketUrl: '/events/c',
+        eventId: 'c',
+        ticketBought: true,
+      }),
+    ];
+    const r = computeDayRouteReadiness(venues);
+    assert.equal(r.summaryLine, '2 точки из 10');
+    assert.equal(r.ticketsToBuy, 0);
   });
 });
 

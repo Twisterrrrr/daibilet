@@ -1,3 +1,19 @@
+## 2026-08-02 - Mobile sticky: поиск + city pin + share sheet
+
+### Наблюдения
+- City label в шапке съедался; «Поделиться» на /my-day уезжал влево за экран.
+- Поиск был только `lg+`.
+
+### Решения
+- Sticky: Menu → Logo → City (pin) → **Search** (лупа → HeaderSearch overlay) → Route → Favorites.
+- CityPicker header: icon-only до `sm`, popup clamped в viewport.
+- Share: mobile bottom sheet (`data-day-share-sheet`); desktop popover `sm+`.
+
+### Проблемы
+- Live **BUILD_ID=`EroIFEOGTEMJsFn1Zf3tr`** (`cc05efa`).
+
+---
+
 ## 2026-08-02 - /my-day: пустые Локации + copy без «теплоход»
 
 ### Наблюдения

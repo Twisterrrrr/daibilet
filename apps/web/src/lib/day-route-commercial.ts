@@ -42,8 +42,11 @@ export function dayRouteStopHasTicket(
  * Chip rules (priority):
  * 1. ticketBought → «Билет отмечен»
  * 2. timed session → «Сеанс HH:00»
- * 3. ticketUrl / event → «Нужен билет»
+ * 3. ticketUrl / event → «Билет оформляется…» (pending until ticketBought)
  * 4. else → «Вход свободный»
+ *
+ * Soft session labels without HH:MM (e.g. «Вечерний сеанс») stay needs_ticket -
+ * never invent «сегодня 18:30» on the chip.
  */
 export function classifyDayRouteCommercialChip(
   venue: DayRouteVenueItem,
@@ -56,7 +59,11 @@ export function classifyDayRouteCommercialChip(
     return { kind: 'session', label: `Сеанс ${session}` };
   }
   if (dayRouteStopHasTicket(venue)) {
-    return { kind: 'needs_ticket', label: 'Нужен билет' };
+    const soft = String(venue.sessionLabel || '').trim();
+    if (/вечерн/i.test(soft)) {
+      return { kind: 'needs_ticket', label: soft };
+    }
+    return { kind: 'needs_ticket', label: 'Билет оформляется…' };
   }
   return { kind: 'free', label: 'Вход свободный' };
 }
@@ -71,9 +78,9 @@ export type DayRouteReadiness = {
   slotsWithoutTime: number;
   /** Large travel gaps between consecutive stops. */
   freeWindows: number;
-  /** Compact line: «5 точек · 2 билета · 1 свободное окно». */
+  /** Compact header line: «5 точек из 10 · 2 билета» (SOFT=10; tickets only if unpaid). */
   summaryLine: string;
-  /** Headline: «День собран на 72%». */
+  /** Internal/checklist: «День собран на 72%» - not shown in /my-day header. */
   percentLabel: string;
 };
 
@@ -129,25 +136,13 @@ export function computeDayRouteReadiness(
       ? 0
       : Math.max(0, Math.min(100, Math.round(100 * ((pointsScore + ticketsScore + timeScore) / 3))));
 
+  const pointsPart = `${pointsCount} ${pluralRu(pointsCount, 'точка', 'точки', 'точек')} из ${DAY_ROUTE_SOFT}`;
   const ticketsPart =
     ticketsToBuy > 0
       ? `${ticketsToBuy} ${pluralRu(ticketsToBuy, 'билет', 'билета', 'билетов')}`
-      : ticketStops.length > 0
-        ? 'билеты отмечены'
-        : 'без билетов';
-
-  const windowPart =
-    freeWindows > 0
-      ? `${freeWindows} ${pluralRu(freeWindows, 'свободное окно', 'свободных окна', 'свободных окон')}`
       : null;
 
-  const summaryLine = [
-    `${pointsCount} ${pluralRu(pointsCount, 'точка', 'точки', 'точек')}`,
-    ticketsPart,
-    windowPart,
-  ]
-    .filter(Boolean)
-    .join(' · ');
+  const summaryLine = [pointsPart, ticketsPart].filter(Boolean).join(' · ');
 
   return {
     percent,

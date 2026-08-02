@@ -90,7 +90,7 @@ Mobile sticky bottom: общий `MobileStickyActionBar` (`lg:hidden` + safe-are
 Канон: [myday-commercial-canon.md](./myday-commercial-canon.md). Planner + tickets, не swipe.
 
 1. Sticky chrome (city chip)  
-2. Title «Мой день в {городе}» + readiness % + summary line + share/map/clear  
+2. Title «Мой день в {предложный}» + summary `N точек из 10` (+ `M билетов` если unpaid) + share/map/clear  
 3. Unified search «Добавьте место, музей, событие» + city picker  
 4. Carousel «Рекомендуемые места» (must-see, + → ✓)  
 5. Route list always open - neutral cards + status chips + buy CTA + free-window upsell  
