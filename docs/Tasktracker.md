@@ -13,7 +13,7 @@
 |---|--------|-----------|--------|
 | UX.MYDAY-SPLIT-DESK | Desktop ≥lg: list left + sticky map right (`data-day-split`) | Критический | ⚠️ rolled back `8f8c69f` - single column, map under list (`data-day-route-map-desktop`) |
 | UX.MYDAY-SPLIT-MOB | Mobile &lt;lg: sticky map ~38vh + list scroll; expand ~85vh (`data-day-map-expand`); no bottom-sheet physics | Критический | ✅ `ed9ea2f`+`8f8c69f` MSK **BUILD_ID=`fsMqASpF2AZAHnq3m-hiK`** `/my-day` 200 |
-| UX.MYDAY-CARD-SIZE | Stop cards: compact dense row + full-width list (= summary bar); no multi-col stretch towels | Критический | 🔄 deploy |
+| UX.MYDAY-CARD-SIZE | Stop cards: compact dense row + full-width list (= summary bar); no multi-col stretch towels | Критический | ✅ `76bae1c`+`949bd78` MSK **BUILD_ID=`QRQxYfwR-Wy7iklNEOIwY`** |
 
 ---
 
@@ -96,7 +96,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MYDAY-P7 | Commercial `/d/{code}` recipient (tickets/map/paid) - не soft purple banner | Высокий | ⏳ |
 | UX.MYDAY-P8 | Timeline flat list (не Утро/День/Вечер); «Маршрут» + «N точек»; badge align | Критический | ✅ `7a3de60` MSK **BUILD_ID=`Ywy2ntkkoX6K__8CuMH3H`** `/my-day` 200 |
 | UX.MYDAY-SESSION | Event stop cards: show session date+time (`15 авг, 19:00`); enrich from events API | Критический | 🔄 commit+deploy |
-| UX.MYDAY-STARTER | Empty `/my-day`: starter top under H1; mobile must-see/Hot Picks blurbs full (no ellipsis) | Критический | 🔄 deploy |
+| UX.MYDAY-STARTER | Empty starter top; catalog trio city→search; full hooks; route Optimize/Yandex toolbar | Критический | ✅ `949bd78` MSK **BUILD_ID=`QRQxYfwR-Wy7iklNEOIwY`** |
 | UX.MYDAY-COMPACT | Compact stop cards: no «Вход свободный»; ETA under card; session line; buy from price + nearby | Критический | ✅ `6721c9c` MSK **BUILD_ID=`meNSWERi0trhkT0vGq8lO`** |
 | UX.MYDAY-TRIP | «Ваши билеты в этой поездке» shell (QR via orders - open in qa) | Высокий | ✅ shell `6721c9c` MSK **BUILD_ID=`meNSWERi0trhkT0vGq8lO`** (QR open) |
 | UX.MYDAY-STOP-COMPACT | Stop cards ~½ height; drop «Вход свободный»; ETA line under card | Критический | 🔄 commit+deploy |
