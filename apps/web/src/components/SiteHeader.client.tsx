@@ -165,15 +165,6 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
             <FavoritesHeaderButton onClick={() => setFavoritesOpen(true)} />
 
             <div className="hidden items-center gap-1 lg:flex">
-              <HeaderAuthControls
-                ref={userMenuRef}
-                auth={auth}
-                isLoggedIn={isLoggedIn}
-                userMenuOpen={userMenuOpen}
-                onToggleUserMenu={() => setUserMenuOpen((value) => !value)}
-                onCloseUserMenu={() => setUserMenuOpen(false)}
-              />
-
               <Link
                 href="/help"
                 title="Помощь и FAQ"
@@ -182,6 +173,15 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               >
                 <HelpCircle className="h-5 w-5" strokeWidth={1.75} />
               </Link>
+
+              <HeaderAuthControls
+                ref={userMenuRef}
+                auth={auth}
+                isLoggedIn={isLoggedIn}
+                userMenuOpen={userMenuOpen}
+                onToggleUserMenu={() => setUserMenuOpen((value) => !value)}
+                onCloseUserMenu={() => setUserMenuOpen(false)}
+              />
             </div>
           </div>
         </div>
