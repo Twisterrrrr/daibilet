@@ -88,6 +88,7 @@ test('dedupeDayRouteMatches keeps cheapest best-score sibling', () => {
     title: 'Обзорная экскурсия по Санкт-Петербургу с посещением Эрмитажа',
   });
   assert.equal(keyA, keyB);
+  assert.ok(keyA.startsWith('title:'));
 
   const out = dedupeDayRouteMatches([
     {
@@ -119,4 +120,21 @@ test('dedupeDayRouteMatches keeps cheapest best-score sibling', () => {
   const hermitage = out.find((m) => m.title.includes('Эрмитажа'));
   assert.equal(hermitage?.eventId, 'evt_69ca5d1e49864162764e1241');
   assert.equal(hermitage?.priceFromRub, 1500);
+});
+
+test('dedupeDayRouteMatches collapses unique-slug TC sessions by title', () => {
+  const title =
+    'Обзорная экскурсия по Санкт-Петербургу с посещением смотровой площадки (колоннады) Исаакиевского собора';
+  const out = dedupeDayRouteMatches(
+    Array.from({ length: 8 }, (_, i) => ({
+      eventId: `evt_session_${i}`,
+      slug: `obzornaya-isaakiy-${i}-${'a'.repeat(8)}${i}`,
+      title,
+      score: 1,
+      coveragePct: 0,
+      priceFromRub: 1200 + i,
+    })),
+  );
+  assert.equal(out.length, 1);
+  assert.equal(out[0]?.priceFromRub, 1200);
 });

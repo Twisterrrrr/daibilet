@@ -1,3 +1,19 @@
+## 2026-08-03 - /my-day: dedupe matching excursion cards
+
+### Наблюдения
+- «Подходящие экскурсии»: 8 одинаковых карточек «Обзорная… Исаакиевского собора» (одинаковая цена / рядом).
+- Root cause: `dayRouteMatchDedupeKey` был **slug-first**. TC sessions = один продукт, разные slug → slug base не схлопывался → N копий. UI рендерил `payload.matches` as-is.
+
+### Решения
+- Dedupe key: **title-first** (`normalizeDayRouteTitleKey`, len≥12); slug base как fallback; усилен strip mid-slug mongo ids.
+- Client safety-net: `uniqueMatches = dedupeDayRouteMatches(payload.matches)` + `data-day-matches-deduped`; счётчик «Найдено» от unique.
+- Unit: 8 unique-slug siblings → 1 card (cheapest).
+
+### Проблемы
+- MSK был на `85c5baf` (deploy owner-v5 preflight упал) - нужен полный MSK deploy этого + UI pending.
+
+---
+
 ## 2026-08-03 - /my-day: dense list stops + owner-v5 cards
 
 ### Наблюдения

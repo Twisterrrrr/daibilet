@@ -132,6 +132,7 @@ import {
   pickNearbyUpsellsForStop,
   type DayRouteMatchOfferStub,
 } from '@/lib/day-route-commercial';
+import { dedupeDayRouteMatches } from '@/lib/day-route-score';
 import {
   applyHotPickOfferToItem,
   buildHotPickCards,
@@ -1263,8 +1264,13 @@ function DayRoutePanelInner() {
     () => route.venues.filter((v) => dayRouteStopHasTicket(v) && !v.ticketBought),
     [route.venues],
   );
+  /** One card per product - TC sessions often share title with unique slugs/ids. */
+  const uniqueMatches = useMemo(
+    () => dedupeDayRouteMatches(payload?.matches || []),
+    [payload?.matches],
+  );
   const matchOfferStubs = useMemo((): DayRouteMatchOfferStub[] => {
-    return (payload?.matches || []).map((m) => ({
+    return uniqueMatches.map((m) => ({
       eventId: m.eventId,
       slug: m.slug,
       title: m.title,
@@ -1272,7 +1278,7 @@ function DayRoutePanelInner() {
       covered: m.covered,
       routeVenues: (m.routeVenues || []).map((v) => ({ id: v.id })),
     }));
-  }, [payload?.matches]);
+  }, [uniqueMatches]);
   const tripTickets = useMemo(
     () => collectDayRouteTripTickets(route.venues),
     [route.venues],
@@ -3005,7 +3011,7 @@ function DayRoutePanelInner() {
                 {loading
                   ? 'Ищем покрытие…'
                   : payload
-                    ? `Найдено: ${payload.matches.length}`
+                    ? `Найдено: ${uniqueMatches.length}`
                     : 'По покрытию точек'}
               </span>
             </span>
@@ -3016,7 +3022,7 @@ function DayRoutePanelInner() {
           {matchesOpen ? (
             <div id="day-route-matches-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
               {loading ? <p className="text-sm text-slate-500">Ищем покрытие…</p> : null}
-              {!loading && payload && payload.matches.length === 0 ? (
+              {!loading && payload && uniqueMatches.length === 0 ? (
                 <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-5 text-sm text-slate-600">
                   <p className="font-semibold text-slate-800">Пока нет экскурсии, покрывающей набор</p>
                   <p className="mt-1.5 leading-relaxed">
@@ -3039,8 +3045,8 @@ function DayRoutePanelInner() {
                   </div>
                 </div>
               ) : null}
-              <ul className="mt-3 grid grid-cols-1 items-start gap-3 md:grid-cols-2">
-                {(payload?.matches || []).map((match) => {
+              <ul className="mt-3 grid grid-cols-1 items-start gap-3 md:grid-cols-2" data-day-matches-deduped>
+                {uniqueMatches.map((match) => {
                   const fullCovered = dayRouteFullCoveredCount(match.covered);
                   const nearCount = match.covered.nearby.length;
                   const addable = (match.routeVenues || []).filter(

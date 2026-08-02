@@ -63,19 +63,27 @@ export function dayRouteEventBaseSlug(slug: string, eventId?: string | null): st
   if (idTail && value.endsWith(`-${idTail}`)) {
     value = value.slice(0, -(idTail.length + 1));
   }
+  // Mongo/TC object ids (24 hex) and longer hex tails; also mid-slug id segments.
   value = value.replace(/-[a-f0-9]{20,}$/i, '');
+  value = value.replace(/-[a-f0-9]{24}(?=-|$)/gi, '');
+  value = value.replace(/-\d{8,}(?=-|$)/g, '');
   return value.replace(/-+/g, '-').replace(/^-|-$/g, '');
 }
 
-/** Canonical dedupe key for day-route match cards (one product, many TC sessions). */
+/**
+ * Canonical dedupe key for day-route match cards (one product, many TC sessions).
+ * Prefer normalized title: TC often gives unique per-session slugs that do not share a base,
+ * so slug-first keys left N identical «Обзорная экскурсия…» cards in «Подходящие экскурсии».
+ */
 export function dayRouteMatchDedupeKey(input: {
   eventId: string;
   slug: string;
   title: string;
 }): string {
+  const titleKey = normalizeDayRouteTitleKey(input.title);
+  if (titleKey.length >= 12) return `title:${titleKey}`;
   const base = dayRouteEventBaseSlug(input.slug, input.eventId);
   if (base.length >= 8) return `slug:${base}`;
-  const titleKey = normalizeDayRouteTitleKey(input.title);
   if (titleKey.length >= 8) return `title:${titleKey}`;
   return `id:${input.eventId}`;
 }
