@@ -68,6 +68,7 @@ import {
   enrichDayRouteFromMatchVenues,
   estimateDayRouteTravelMinutes,
   formatDayRouteDistance,
+  formatDayRouteSegmentHint,
   formatDayRouteTravelMinutes,
   hydrateTextStopsFromShareTokens,
   isDayRouteShareTextToken,
@@ -823,6 +824,24 @@ function DayRoutePanelInner() {
     () => estimateDayRouteTravelMinutes(totalDistanceMeters, travelMode),
     [totalDistanceMeters, travelMode],
   );
+  const printDateLabel = useMemo(() => {
+    for (const venue of route.venues) {
+      const raw = String(venue.startsAt || '').trim();
+      if (!raw) continue;
+      const d = new Date(raw);
+      if (Number.isNaN(d.getTime())) continue;
+      try {
+        return new Intl.DateTimeFormat('ru-RU', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        }).format(d);
+      } catch {
+        return d.toLocaleDateString('ru-RU');
+      }
+    }
+    return null;
+  }, [route.venues]);
   const canOptimize = coordsCount >= 2;
   const hasCatalogStops = Boolean(catalogVenueIds);
   const showMatches = hasCatalogStops;
@@ -949,7 +968,13 @@ function DayRoutePanelInner() {
 
   function printItinerary() {
     if (typeof window === 'undefined') return;
+    const prevTitle = document.title;
+    const city = scopeCityName || 'маршрут';
+    document.title = `Маршрутный лист - ${city}`;
     window.print();
+    window.setTimeout(() => {
+      document.title = prevTitle;
+    }, 500);
   }
 
   function onStopDragStart(index: number) {
@@ -996,7 +1021,8 @@ function DayRoutePanelInner() {
   }
 
   return (
-    <div className="container-page px-4 py-5 pb-28 sm:px-6 sm:py-10 sm:pb-10">
+    <>
+    <div className="container-page px-4 py-5 pb-28 sm:px-6 sm:py-10 sm:pb-10 print:hidden">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-4">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Собери свой день</p>
@@ -1006,7 +1032,7 @@ function DayRoutePanelInner() {
           </p>
         </div>
         {route.venues.length ? (
-          <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end print:hidden">
+          <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end">
             <div className="relative flex-1 sm:flex-none" ref={shareMenuRef}>
               <button
                 type="button"
@@ -1073,7 +1099,7 @@ function DayRoutePanelInner() {
               className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 sm:flex-none"
             >
               <Printer className="h-3.5 w-3.5" />
-              Печать
+              Сохранить маршрутный лист
             </button>
             <button
               type="button"
@@ -1095,7 +1121,7 @@ function DayRoutePanelInner() {
         <div
           role="status"
           data-day-share-landing
-          className="mt-4 rounded-2xl border border-violet-200 bg-violet-50 px-4 py-3 print:hidden"
+          className="mt-4 rounded-2xl border border-violet-200 bg-violet-50 px-4 py-3"
         >
           <p className="text-sm font-semibold text-violet-950">
             {shareLanding.fromName
@@ -1131,7 +1157,7 @@ function DayRoutePanelInner() {
       {copyStatus === 'ok' ? (
         <p
           role="status"
-          className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900 print:hidden"
+          className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900"
           data-day-share-ok
         >
           Ссылка скопирована!
@@ -1141,7 +1167,7 @@ function DayRoutePanelInner() {
       {/* Primary: on-page city + searchable catalog picks (owner UX 2026-08-02) */}
       <section
         id="day-catalog-add"
-        className="mt-5 rounded-2xl border border-slate-200 bg-white p-3.5 sm:mt-8 sm:p-5 print:hidden"
+        className="mt-5 rounded-2xl border border-slate-200 bg-white p-3.5 sm:mt-8 sm:p-5"
         data-day-catalog-add="1"
       >
         <p className="text-sm font-semibold text-slate-900">Добавить в день</p>
@@ -1375,7 +1401,7 @@ function DayRoutePanelInner() {
                     </>
                   ) : null}
                 </p>
-                <div className="flex gap-1 print:hidden" role="group" aria-label="Способ перемещения">
+                <div className="flex gap-1" role="group" aria-label="Способ перемещения">
                   <button
                     type="button"
                     onClick={() => setTravelMode('walk')}
@@ -1410,6 +1436,7 @@ function DayRoutePanelInner() {
                   venue={venue}
                   hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
                   segmentToNext={segmentMeters[index] ?? null}
+                  travelMode={travelMode}
                   dragging={dragIndex === index}
                   onDragStart={() => onStopDragStart(index)}
                   onDragOver={(event) => onStopDragOver(event, index)}
@@ -1717,7 +1744,18 @@ function DayRoutePanelInner() {
         ) : null}
       </div>
 
-      <MobileStickyActionBar className="print:hidden">
+      <MobileStickyActionBar>
+        {route.venues.length ? (
+          <button
+            type="button"
+            onClick={printItinerary}
+            data-day-print-sticky
+            className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 text-sm font-bold text-slate-800"
+          >
+            <Printer className="h-4 w-4" />
+            Лист
+          </button>
+        ) : null}
         {route.venues.length ? (
           <button
             type="button"
@@ -1761,6 +1799,18 @@ function DayRoutePanelInner() {
         ) : null}
       </MobileStickyActionBar>
     </div>
+    {route.venues.length ? (
+      <DayRoutePrintSheet
+        cityTitle={scopeCityName}
+        dateLabel={printDateLabel}
+        venues={route.venues}
+        segmentMeters={segmentMeters}
+        travelMode={travelMode}
+        totalDistanceMeters={totalDistanceMeters}
+        travelMinutes={travelMinutes}
+      />
+    ) : null}
+    </>
   );
 }
 
@@ -1770,6 +1820,7 @@ function DayRouteVenueCard({
   total,
   hasCoords,
   segmentToNext,
+  travelMode,
   dragging,
   onDragStart,
   onDragOver,
@@ -1785,6 +1836,7 @@ function DayRouteVenueCard({
   total: number;
   hasCoords: boolean;
   segmentToNext: number | null;
+  travelMode: DayRouteTravelMode;
   dragging?: boolean;
   onDragStart: () => void;
   onDragOver: (event: DragEvent) => void;
@@ -1811,6 +1863,8 @@ function DayRouteVenueCard({
     Boolean(addressLine) &&
     (titleNorm.includes(addrNorm) ||
       (addrNorm.length >= 8 && titleNorm.includes(addrNorm.replace(/^набережная\s+/i, 'наб. '))));
+  const segmentHint =
+    segmentToNext != null ? formatDayRouteSegmentHint(segmentToNext, travelMode) : '';
   return (
     <li
       className={`flex flex-col gap-2 rounded-2xl border p-3 ${
@@ -1842,7 +1896,7 @@ function DayRouteVenueCard({
           >
             {index + 1}
           </span>
-          <div className="flex flex-col gap-0.5 print:hidden">
+          <div className="flex flex-col gap-0.5">
             <button
               type="button"
               aria-label="Выше"
@@ -1896,13 +1950,13 @@ function DayRouteVenueCard({
           type="button"
           aria-label="Удалить точку"
           onClick={onRemove}
-          className="min-h-9 min-w-9 shrink-0 rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 print:hidden"
+          className="min-h-9 min-w-9 shrink-0 rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
         >
           <X className="h-4 w-4" />
         </button>
       </div>
       {ticketUrl ? (
-        <div className="flex flex-wrap items-center gap-2 pl-11 print:hidden">
+        <div className="flex flex-wrap items-center gap-2 pl-11">
           <a
             href={ticketUrl}
             target="_blank"
@@ -1925,9 +1979,86 @@ function DayRouteVenueCard({
           </label>
         </div>
       ) : null}
-      {segmentToNext != null ? (
-        <p className="pl-11 text-[11px] text-slate-500">далее ~ {formatDayRouteDistance(segmentToNext)}</p>
-      ) : null}
+      {segmentHint ? <p className="pl-11 text-[11px] text-slate-500">далее ~ {segmentHint}</p> : null}
     </li>
+  );
+}
+
+function DayRoutePrintSheet({
+  cityTitle,
+  dateLabel,
+  venues,
+  segmentMeters,
+  travelMode,
+  totalDistanceMeters,
+  travelMinutes,
+}: {
+  cityTitle?: string | null;
+  dateLabel?: string | null;
+  venues: DayRouteVenueItem[];
+  segmentMeters: Array<number | null>;
+  travelMode: DayRouteTravelMode;
+  totalDistanceMeters: number;
+  travelMinutes: number;
+}) {
+  const modeLabel = travelMode === 'auto' ? 'на авто' : 'пешком';
+  const city = String(cityTitle || '').trim() || 'Город не указан';
+  return (
+    <div
+      data-day-print-sheet
+      className="hidden print:block"
+      aria-hidden
+    >
+      <div className="mx-auto max-w-2xl px-2 text-slate-900">
+        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Дайбилет · план на день</p>
+        <h1 className="mt-1 text-2xl font-bold leading-tight">Маршрутный лист - {city}</h1>
+        {dateLabel ? <p className="mt-1 text-sm text-slate-600">{dateLabel}</p> : null}
+        {totalDistanceMeters > 0 ? (
+          <p className="mt-2 text-sm text-slate-700">
+            Всего между точками: {formatDayRouteDistance(totalDistanceMeters)}
+            {travelMinutes > 0 ? ` · ~${formatDayRouteTravelMinutes(travelMinutes)} ${modeLabel}` : ''}
+          </p>
+        ) : null}
+        <ol className="mt-6 list-none space-y-0 p-0">
+          {venues.map((venue, index) => {
+            const addressLine =
+              formatStreetAddress(venue.address, { city: venue.city }) ||
+              String(venue.address || '').trim() ||
+              '';
+            const note = String(venue.note || '').trim();
+            const segment = segmentMeters[index] ?? null;
+            const segmentHint =
+              segment != null ? formatDayRouteSegmentHint(segment, travelMode) : '';
+            const bought = Boolean(venue.ticketBought);
+            return (
+              <li key={venue.id} className="break-inside-avoid">
+                <div className="flex gap-3 border-b border-slate-200 py-3">
+                  <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-slate-900 text-sm font-bold">
+                    {index + 1}
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-base font-semibold leading-snug">{venue.title}</p>
+                    {addressLine ? <p className="mt-0.5 text-sm text-slate-600">{addressLine}</p> : null}
+                    {note && note !== addressLine ? (
+                      <p className="mt-0.5 text-sm text-slate-600">{note}</p>
+                    ) : null}
+                    {venue.sessionLabel ? (
+                      <p className="mt-1 text-sm font-medium text-slate-800">Время: {venue.sessionLabel}</p>
+                    ) : null}
+                    {bought ? (
+                      <p className="mt-1 text-sm font-semibold text-emerald-800">Билет куплен</p>
+                    ) : null}
+                  </div>
+                </div>
+                {segmentHint && index < venues.length - 1 ? (
+                  <p className="py-2 pl-10 text-sm text-slate-500">↓ {segmentHint}</p>
+                ) : null}
+              </li>
+            );
+          })}
+        </ol>
+        <p className="mt-8 text-xs text-slate-400">daibilet.ru/my-day</p>
+      </div>
+    </div>
   );
 }

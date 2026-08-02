@@ -1488,6 +1488,20 @@ export function formatDayRouteDistance(meters: number): string {
   return km < 10 ? `${km.toFixed(1).replace('.', ',')} км` : `${Math.round(km)} км`;
 }
 
+/** Segment line for UI / print: distance + ETA by travel mode. */
+export function formatDayRouteSegmentHint(
+  meters: number,
+  mode: DayRouteTravelMode = 'walk',
+): string {
+  if (!Number.isFinite(meters) || meters <= 0) return '';
+  const dist = formatDayRouteDistance(meters);
+  const mins = estimateDayRouteTravelMinutes(meters, mode);
+  const time = formatDayRouteTravelMinutes(mins);
+  const modeLabel = mode === 'auto' ? 'на авто' : 'пешком';
+  if (dist && time) return `${dist} · ~${time} ${modeLabel}`;
+  return dist;
+}
+
 /** Sum consecutive segment meters (null segments skipped). */
 export function dayRouteTotalDistanceMeters(segments: Array<number | null | undefined>): number {
   let total = 0;

@@ -44,10 +44,14 @@ export async function SiteLayout({ children }: { children: React.ReactNode }) {
       <Suspense fallback={<SiteChromeSkeleton variant="page" />}>
         <SelectedCityProvider destinations={destinations}>
           <div className="flex min-h-screen flex-col bg-background">
-            <SiteHeader destinations={destinations} />
+            <div className="print:hidden">
+              <SiteHeader destinations={destinations} />
+            </div>
             <main className="flex-1">{children}</main>
-            <SiteFooter destinations={destinations} />
-            <ScrollToTopButton />
+            <div className="print:hidden">
+              <SiteFooter destinations={destinations} />
+              <ScrollToTopButton />
+            </div>
           </div>
         </SelectedCityProvider>
       </Suspense>

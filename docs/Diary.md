@@ -1,3 +1,18 @@
+## 2026-08-02 - /my-day: маршрутный лист (print/PDF)
+
+### Наблюдения
+- Owner приоритет 1-3: (1) сохранить маршрутный лист, (2) канон URL+share, (3) купить+куплен. Share/buy уже live (`42421d4`); print был MVP `window.print` без чистого листа.
+
+### Решения
+- Кнопка «Сохранить маршрутный лист» (+ sticky «Лист») → `window.print()` + print-only `DayRoutePrintSheet`.
+- Лист: город, дата если есть `startsAt`, нумерованные остановки (адрес/время/билет куплен), между ними haversine км + ETA пешком/авто.
+- Screen UI `print:hidden`; SiteHeader/Footer скрыты при печати; `@page` margins в globals.
+
+### Проблемы
+- MSK deploy + BUILD_ID - ниже после ship.
+
+---
+
 ## 2026-08-02 - /my-day: viral share city+items + Max
 
 ### Наблюдения

@@ -515,3 +515,30 @@ body > div:has(iframe[src*='ticketscloud']) {
   border: 0 !important;
 }
 
+/* Мой день: чистый маршрутный лист для печати / Save as PDF */
+@media print {
+  @page {
+    margin: 14mm 12mm;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+    color: #0f172a !important;
+  }
+
+  body * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  a {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+
+  [data-day-print-sheet] {
+    display: block !important;
+  }
+}
+
