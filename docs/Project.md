@@ -116,10 +116,10 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 
 **Канон:** [catalog-location-venue-canon.md](./catalog-location-venue-canon.md).
 
-- **Локация** - must-see / прогулка / «Мой день», афиша не обязательна. **Площадка (Venue)** - место с событиями/сеансами (даже без договора).
-- Договор ≠ тип сущности (коммерция отдельно от справочника).
-- Одна физическая точка = одна публичная карточка; не плодить Location+Venue twin / soft-sign / latin-cyrillic twins.
-- Локация → афиша: upgrade той же сущности или hide + 301/alias - не второй `PUBLISHED`.
+- **Локация** - парки / набережные / памятники / улицы (must-see без institution). **Площадка** - афиша + institution.
+- **Музеи и арт-галереи** всегда **Площадки** (`MUSEUM_ART_SPACE` / institution), даже только-инфо и без договора - блок хаба города.
+- Театры / залы / клубы → Площадки. Договор ≠ тип сущности.
+- Одна физическая точка = одна публичная карточка; локация→venue = upgrade / hide+301, не twin `PUBLISHED`.
 
 ---
 

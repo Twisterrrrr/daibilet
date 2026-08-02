@@ -45,7 +45,7 @@
 - Параллельно: events catalog city name/slug уже в `066363d` (не в этом commit).
 
 ### Проблемы
-- MSK deploy - BUILD_ID ниже.
+- MSK deploy: **BUILD_ID=`Ywy2ntkkoX6K__8CuMH3H`** (HEAD `7a3de60`); hub warm transiently killed web → restart; `/my-day` local+pub 200; chunks: `data-day-plan-list`, no `data-day-timeline-part`.
 
 ---
 
