@@ -1,3 +1,20 @@
+## 2026-08-02 - /my-day: H1 «Мой день в…» + centered empty starter
+
+### Наблюдения
+- Owner: H1 = «Мой день в {city}» (предложный); без города - «Мой день».
+- Empty starter: центрированная карточка с воздухом - иконка → «Собери свой день» → «Выбери город и минимум 2 точки…» → город/поиск столбиком → «или добавь своё место».
+- «Собери свой день» остаётся только в starter, не в H1.
+
+### Решения
+- H1: `Мой день ${inCityPrepositional(...)}` / fallback «Мой день».
+- `renderUnifiedSearch(true)`: centered airy card, stacked city+search (`data-day-city-search-stack`).
+- Prior: matches cap=15, dense stops, catalog trio down, Hot Pick clamp - в том же tip.
+
+### Проблемы
+- Deploy BUILD_ID - после MSK.
+
+---
+
 ## 2026-08-02 - /my-day: matches cap 15 + dense stops + starter row
 
 ### Наблюдения

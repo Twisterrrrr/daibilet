@@ -1846,75 +1846,107 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** City + place search in one row. Empty plan: top starter. Non-empty: secondary under Hot Picks. */
+  /** Empty plan: centered airy starter. Non-empty: compact secondary under Hot Picks. */
   function renderUnifiedSearch(asStarter: boolean) {
+    const cityBlock = (
+      <div data-day-city-picker className={asStarter ? 'mx-auto w-full max-w-md text-left' : undefined}>
+        <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+          Город
+        </label>
+        <CityPicker
+          cities={destinations}
+          value={selectedCity?.cityValue || 'all'}
+          onChange={(name) => {
+            selectedCity?.setCity(name);
+            if (name !== 'all') setCityInput(name);
+          }}
+          allLabel="Выберите город"
+          variant="hero"
+          className="w-full"
+        />
+      </div>
+    );
+    const searchBlock = hasPageCity ? (
+      <div className={asStarter ? 'mx-auto w-full max-w-md text-left' : undefined}>
+        <DayRouteSearchSelect
+          label="Поиск"
+          placeholder="Найти место…"
+          emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Ничего не найдено'}
+          loading={catalogLoading}
+          disabled={atMax}
+          options={unifiedSearchOptions}
+          onPick={pickUnifiedSearch}
+        />
+      </div>
+    ) : asStarter ? (
+      <p className="mx-auto max-w-md rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-center text-sm text-amber-900">
+        Сначала выберите город - появятся места, музеи и события.
+      </p>
+    ) : (
+      <p className="rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+        Сначала выберите город - появятся места, музеи и события.
+      </p>
+    );
+    const customPlace = hasPageCity ? (
+      <>
+        {catalogError ? (
+          <p
+            className={`mt-2 text-xs font-medium text-rose-700 ${asStarter ? 'text-center' : ''}`}
+            role="status"
+          >
+            {catalogError}
+          </p>
+        ) : null}
+        <p className={`mt-3 text-[13px] text-slate-500 ${asStarter ? 'text-center' : ''}`}>
+          или{' '}
+          <button
+            type="button"
+            onClick={openTextForm}
+            className="font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
+          >
+            добавь своё место
+          </button>
+        </p>
+      </>
+    ) : null;
+
+    if (asStarter) {
+      return (
+        <section
+          className="mt-5 rounded-2xl border border-slate-200 bg-white px-4 py-10 sm:mt-6 sm:px-8 sm:py-12"
+          ref={unifiedSearchRef}
+          data-day-unified-search
+          data-day-starter="1"
+        >
+          <div className="mx-auto flex max-w-md flex-col items-center text-center" data-day-plan-starter>
+            <Route className="h-10 w-10 text-slate-400" aria-hidden />
+            <p className="mt-4 text-lg font-bold leading-snug text-slate-900 sm:text-xl">
+              Собери свой день
+            </p>
+            <p className="mt-2 text-sm font-normal leading-relaxed text-slate-500 sm:text-[15px]">
+              Выбери город и минимум {DAY_ROUTE_MIN} точки для составления маршрута
+            </p>
+            <div className="mt-8 flex w-full flex-col gap-4" data-day-city-search-stack>
+              {cityBlock}
+              {searchBlock}
+            </div>
+            {customPlace}
+          </div>
+        </section>
+      );
+    }
+
     return (
       <section
         className="mt-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4"
         ref={unifiedSearchRef}
         data-day-unified-search
-        data-day-starter={asStarter ? '1' : undefined}
       >
-        {asStarter ? (
-          <div className="mb-3 text-center" data-day-plan-starter>
-            <Route className="mx-auto h-8 w-8 text-slate-400" aria-hidden />
-            <p className="mt-2 text-sm font-medium leading-snug text-slate-700 sm:text-[15px]">
-              Выберите город и минимум {DAY_ROUTE_MIN} точки, чтобы создать маршрут
-            </p>
-          </div>
-        ) : null}
-        <div className="grid gap-3 sm:grid-cols-2 sm:items-end" data-day-city-search-row>
-          <div data-day-city-picker>
-            <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-              Город
-            </label>
-            <CityPicker
-              cities={destinations}
-              value={selectedCity?.cityValue || 'all'}
-              onChange={(name) => {
-                selectedCity?.setCity(name);
-                if (name !== 'all') setCityInput(name);
-              }}
-              allLabel="Выберите город"
-              variant="hero"
-              className="w-full"
-            />
-          </div>
-          {hasPageCity ? (
-            <DayRouteSearchSelect
-              label="Поиск"
-              placeholder="Найти место…"
-              emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Ничего не найдено'}
-              loading={catalogLoading}
-              disabled={atMax}
-              options={unifiedSearchOptions}
-              onPick={pickUnifiedSearch}
-            />
-          ) : (
-            <p className="flex items-center rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900 sm:self-stretch">
-              Сначала выберите город - появятся места, музеи и события.
-            </p>
-          )}
+        <div className="flex flex-col gap-3" data-day-city-search-stack>
+          {cityBlock}
+          {searchBlock}
         </div>
-        {hasPageCity ? (
-          <>
-            {catalogError ? (
-              <p className="mt-2 text-xs font-medium text-rose-700" role="status">
-                {catalogError}
-              </p>
-            ) : null}
-            <p className="mt-2 text-[13px] text-slate-500">
-              или{' '}
-              <button
-                type="button"
-                onClick={openTextForm}
-                className="font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
-              >
-                добавь своё место
-              </button>
-            </p>
-          </>
-        ) : null}
+        {customPlace}
       </section>
     );
   }
@@ -1991,7 +2023,7 @@ function DayRoutePanelInner() {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h1 className="font-display text-[1.65rem] font-bold leading-tight text-slate-900 sm:text-3xl">
-            Собери свой день{scopeCityName ? ` ${inCityPrepositional(scopeCityName)}` : ''}
+            {scopeCityName ? `Мой день ${inCityPrepositional(scopeCityName)}` : 'Мой день'}
           </h1>
           <p
             className="mt-1.5 text-[13px] font-medium text-slate-500"
