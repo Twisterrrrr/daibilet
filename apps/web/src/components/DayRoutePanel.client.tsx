@@ -115,6 +115,7 @@ import {
   dayRouteStopHasTicket,
   findDayRouteFreeWindowGaps,
 } from '@/lib/day-route-commercial';
+import { inCityPrepositional } from '@/lib/city-declension';
 import { formatPriceFrom } from '@/lib/format';
 import {
   buildMustSeeFilterTabs,
@@ -620,6 +621,8 @@ function DayRoutePanelInner() {
   const cityHubHref = scopeCitySlug ? `/cities/${encodeURIComponent(scopeCitySlug)}` : '/cities';
 
   // City-scoped catalog lists for on-page searchable selects.
+  // Pass city= to API (alias-aware). Do NOT fetch global top-500 then exact-match
+  // city title - that drops Nizhny/regional rows and breaks slug/title aliases.
   useEffect(() => {
     if (!pageCityName) {
       setLocationsCatalog([]);
@@ -630,14 +633,17 @@ function DayRoutePanelInner() {
     }
     const controller = new AbortController();
     setCatalogLoading(true);
-    const cityQ = encodeURIComponent(pageCityName);
+    const cityFilter = pageCitySlug || pageCityName;
+    const cityQ = encodeURIComponent(cityFilter);
+    const venuesQs = (family: 'location' | 'institution') =>
+      `/api/public/venues?family=${family}&city=${cityQ}&limit=500`;
     Promise.all([
-      fetch(`/api/public/venues?family=location&limit=500`, { signal: controller.signal })
+      fetch(venuesQs('location'), { signal: controller.signal })
         .then(async (response) =>
           response.ok ? ((await response.json()) as { venues?: VenueCatalogCard[] }) : null,
         )
         .catch(() => null),
-      fetch(`/api/public/venues?family=institution&limit=500`, { signal: controller.signal })
+      fetch(venuesQs('institution'), { signal: controller.signal })
         .then(async (response) =>
           response.ok ? ((await response.json()) as { venues?: VenueCatalogCard[] }) : null,
         )
@@ -651,20 +657,16 @@ function DayRoutePanelInner() {
         .catch(() => null),
     ])
       .then(([locationsPayload, venuesPayload, eventsPayload]) => {
-        const filterCity = (list: VenueCatalogCard[] | undefined) =>
-          (list || [])
-            .map((item) => toVenueCatalogCard(item))
-            .filter((item) => item.city === pageCityName);
-        setLocationsCatalog(filterCity(locationsPayload?.venues));
-        setVenuesCatalog(filterCity(venuesPayload?.venues));
+        setLocationsCatalog((locationsPayload?.venues || []).map((item) => toVenueCatalogCard(item)));
+        setVenuesCatalog((venuesPayload?.venues || []).map((item) => toVenueCatalogCard(item)));
         const events = eventsPayload?.items || eventsPayload?.sessions || [];
-        setEventsCatalog(events.filter((item) => item.city === pageCityName || !pageCityName));
+        setEventsCatalog(events);
       })
       .finally(() => {
         if (!controller.signal.aborted) setCatalogLoading(false);
       });
     return () => controller.abort();
-  }, [pageCityName]);
+  }, [pageCityName, pageCitySlug]);
 
   const matchSources = useMemo(() => {
     const map = new Map<string, DayRouteVenueMatchSource>();
@@ -691,20 +693,30 @@ function DayRoutePanelInner() {
     };
     return mustSeePlaces
       .map((place) => {
-        const matched = matchSources.find((venue) => {
-          const slug = String(place.venueSlug || place.locationSlug || '').trim();
-          return slug && String(venue.slug || '').trim() === slug;
-        });
         const item = dayRouteItemFromMustSee(place, matchSources, cityCtx);
-        return item
-          ? {
-              place: { ...place, type: matched?.type || null },
-              item,
-            }
-          : null;
+        if (!item) return null;
+        const matched =
+          matchSources.find((venue) => venue.id && venue.id === item.id) ||
+          matchSources.find((venue) => venue.slug && item.slug && venue.slug === item.slug) ||
+          null;
+        return {
+          place: { ...place, type: matched?.type || null },
+          item,
+          hook: dayRouteHookLine({
+            hookFact: matched?.hookFact,
+            shortDescription: matched?.shortDescription,
+            desc: place.desc,
+          }),
+        };
       })
-      .filter((row): row is { place: (typeof mustSeePlaces)[number] & { type?: string | null }; item: DayRouteVenueItem } =>
-        Boolean(row),
+      .filter(
+        (
+          row,
+        ): row is {
+          place: (typeof mustSeePlaces)[number] & { type?: string | null };
+          item: DayRouteVenueItem;
+          hook: string | null;
+        } => Boolean(row),
       );
   }, [mustSeePlaces, matchSources, pageCityId, pageCityName, pageCitySlug, selectedCity?.selectedDestination?.sourceSlug]);
 
@@ -930,20 +942,21 @@ function DayRoutePanelInner() {
       .slice(0, 12);
   }, [mustSeeResolved, route]);
   const freeWindowUpsells = useMemo(() => {
-    if (!primaryFreeWindow) return [] as Array<{ key: string; badge: string; item: DayRouteVenueItem }>;
+    type FreePick = { key: string; badge: string; item: DayRouteVenueItem; hook: string | null };
+    if (!primaryFreeWindow) return [] as FreePick[];
     const notInRoute = (item: DayRouteVenueItem) =>
       !isInDayRoute(item.id, route) && !(item.slug && isInDayRoute(item.slug, route));
-    const picks: Array<{ key: string; badge: string; item: DayRouteVenueItem }> = [];
+    const picks: FreePick[] = [];
     const freeRow = mustSeeResolved.find(
       (row) =>
         (classifyMustSeePlace(row.place) === 'park' || classifyMustSeePlace(row.place) === 'temple') &&
         notInRoute(row.item),
     );
-    if (freeRow) picks.push({ key: 'free', badge: 'Вход свободный', item: freeRow.item });
+    if (freeRow) picks.push({ key: 'free', badge: 'Вход свободный', item: freeRow.item, hook: freeRow.hook });
     const museumRow = mustSeeResolved.find(
       (row) => classifyMustSeePlace(row.place) === 'museum' && notInRoute(row.item),
     );
-    if (museumRow) picks.push({ key: 'museum', badge: 'Музей', item: museumRow.item });
+    if (museumRow) picks.push({ key: 'museum', badge: 'Музей', item: museumRow.item, hook: museumRow.hook });
     const event = eventsCatalog.find((ev) => {
       const venueKey = String(ev.venueSlug || ev.venue || '').trim().toLowerCase();
       if (!venueKey) return false;
@@ -979,7 +992,16 @@ function DayRoutePanelInner() {
         imageUrl: event.imageUrl || matchedVenue?.heroImageUrl || null,
       });
       if (item && notInRoute(item)) {
-        picks.push({ key: 'event', badge: 'Можно купить билет', item });
+        picks.push({
+          key: 'event',
+          badge: 'Можно купить билет',
+          item,
+          hook: dayRouteHookLine({
+            hookFact: matchedVenue?.hookFact,
+            shortDescription: matchedVenue?.shortDescription,
+            desc: event.venue || event.title,
+          }),
+        });
       }
     }
     // Fill remaining slots from must-see main if needed.
@@ -992,6 +1014,7 @@ function DayRoutePanelInner() {
           key: `extra-${row.item.id}`,
           badge: classifyMustSeePlace(row.place) === 'main' ? 'Рядом' : mustSeeFilterLabel(classifyMustSeePlace(row.place)),
           item: row.item,
+          hook: row.hook,
         });
       }
     }
@@ -1011,20 +1034,30 @@ function DayRoutePanelInner() {
     const opts: DayRouteSearchOption[] = [];
     for (const venue of locationsCatalog) {
       const inRoute = isInDayRoute(venue.id, route) || Boolean(venue.slug && isInDayRoute(venue.slug, route));
+      const hook = dayRouteHookLine({
+        hookFact: venue.hookFact,
+        shortDescription: venue.shortDescription,
+      });
       opts.push({
         id: `loc:${venue.id}`,
         label: venue.name,
-        hint: [venue.address || venue.city, 'Локация'].filter(Boolean).join(' · '),
+        hint: hook || [venue.address || venue.city, 'Локация'].filter(Boolean).join(' · '),
+        imageUrl: venue.heroImageUrl ?? null,
         disabled: inRoute || atMax,
         disabledReason: inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : null,
       });
     }
     for (const venue of venuesCatalog) {
       const inRoute = isInDayRoute(venue.id, route) || Boolean(venue.slug && isInDayRoute(venue.slug, route));
+      const hook = dayRouteHookLine({
+        hookFact: venue.hookFact,
+        shortDescription: venue.shortDescription,
+      });
       opts.push({
         id: `ven:${venue.id}`,
         label: venue.name,
-        hint: [venue.address || venue.city, 'Площадка'].filter(Boolean).join(' · '),
+        hint: hook || [venue.address || venue.city, 'Площадка'].filter(Boolean).join(' · '),
+        imageUrl: venue.heroImageUrl ?? null,
         disabled: inRoute || atMax,
         disabledReason: inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : null,
       });
@@ -1042,6 +1075,7 @@ function DayRoutePanelInner() {
         id: `event:${event.id}`,
         label: event.title,
         hint: venueHint || null,
+        imageUrl: event.imageUrl ?? null,
         disabled: inRoute || atMax || !venueKey,
         disabledReason: !venueKey
           ? 'Нет площадки'
@@ -1356,31 +1390,10 @@ function DayRoutePanelInner() {
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Собери свой день</p>
           <h1 className="mt-1 font-display text-2xl font-extrabold text-slate-900 sm:text-3xl">
-            Мой день{scopeCityName ? ` в ${scopeCityName}` : ''}
+            Мой день{scopeCityName ? ` ${inCityPrepositional(scopeCityName)}` : ''}
           </h1>
-          <p className="mt-2 text-sm font-semibold text-slate-800" data-day-route-readiness>
-            {readiness.percentLabel}
-          </p>
-          <p className="mt-0.5 text-xs font-medium text-slate-500" data-day-route-count-label>
+          <p className="mt-2 text-sm font-medium text-slate-600" data-day-route-count-label data-day-route-readiness>
             {readiness.summaryLine}
-            {readiness.slotsWithoutTime > 0
-              ? ` · ${readiness.slotsWithoutTime} без времени`
-              : ''}
-            {yandexUrl ? (
-              <>
-                {' · '}
-                <a
-                  href={yandexUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-semibold text-sky-700 underline-offset-2 hover:underline"
-                >
-                  Яндекс.Карты
-                </a>
-              </>
-            ) : null}
-            {' · '}
-            {formatDayRouteCountLabel(route.venues.length)}
           </p>
         </div>
         {route.venues.length ? (
@@ -1518,19 +1531,19 @@ function DayRoutePanelInner() {
             <p className="text-xs text-slate-500">Главные для {dayTitleCity}</p>
           </div>
           <div className="-mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-1 sm:-mx-0 sm:px-0">
-            {recommendCarousel.map(({ place, item }) => {
+            {recommendCarousel.map(({ place, item, hook }) => {
               const inRoute =
                 isInDayRoute(item.id, route) || Boolean(item.slug && isInDayRoute(item.slug, route));
               const badge = mustSeeFilterLabel(classifyMustSeePlace(place));
               return (
                 <article
                   key={item.id}
-                  className="w-40 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-white"
+                  className="w-44 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-white"
                   data-day-recommend-card={item.id}
                 >
                   <div className="relative h-24 w-full bg-slate-100">
                     {item.imageUrl ? (
-                      <SafeImage src={item.imageUrl} alt="" fill sizes="10rem" className="object-cover" />
+                      <SafeImage src={item.imageUrl} alt="" fill sizes="11rem" className="object-cover" />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-slate-400">
                         <MapPin className="h-6 w-6" />
@@ -1541,7 +1554,14 @@ function DayRoutePanelInner() {
                     </span>
                   </div>
                   <div className="flex items-start gap-2 p-2.5">
-                    <p className="min-w-0 flex-1 line-clamp-2 text-xs font-semibold text-slate-900">{item.title}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="line-clamp-2 text-xs font-semibold text-slate-900">{item.title}</p>
+                      {hook ? (
+                        <p className="mt-0.5 line-clamp-1 text-[11px] leading-snug text-slate-500" title={hook}>
+                          {hook}
+                        </p>
+                      ) : null}
+                    </div>
                     <button
                       type="button"
                       disabled={inRoute || atMax}
@@ -1756,9 +1776,14 @@ function DayRoutePanelInner() {
                               <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500">
                                 {pick.badge}
                               </span>
-                              <span className="mt-0.5 line-clamp-2 text-xs font-semibold text-slate-900">
+                              <span className="mt-0.5 line-clamp-1 text-xs font-semibold text-slate-900">
                                 {pick.item.title}
                               </span>
+                              {pick.hook ? (
+                                <span className="mt-0.5 block line-clamp-1 text-[11px] text-slate-500" title={pick.hook}>
+                                  {pick.hook}
+                                </span>
+                              ) : null}
                             </span>
                           </button>
                         ))}
@@ -1923,7 +1948,7 @@ function DayRoutePanelInner() {
           <span>
             <span className="block text-sm font-semibold text-slate-900">Ещё из каталога</span>
             <span className="mt-0.5 block text-xs text-slate-500">
-              Отдельный поиск по типам{hasPageCity ? ', теплоход' : ''}
+              Отдельный поиск по типам
             </span>
           </span>
           <ChevronDown
@@ -2022,7 +2047,7 @@ function DayRoutePanelInner() {
               <span className="block text-sm font-semibold text-slate-900">Главные места</span>
               <span className="mt-0.5 block text-xs text-slate-500">
                 {mustSeeResolved.length
-                  ? `Чипы и фильтры · ${mustSeeResolved.length}`
+                  ? `Превью и фильтры · ${mustSeeResolved.length}`
                   : 'Список для города пока пуст'}
               </span>
             </span>
@@ -2065,8 +2090,8 @@ function DayRoutePanelInner() {
                     }
                     onChange={setMustSeeFilter}
                   />
-                  <div className="mt-3 flex flex-wrap gap-2" data-day-must-see-list>
-                    {mustSeeFiltered.map(({ place, item }) => {
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2" data-day-must-see-list>
+                    {mustSeeFiltered.map(({ place, item, hook }) => {
                       const inRoute =
                         isInDayRoute(item.id, route) || Boolean(item.slug && isInDayRoute(item.slug, route));
                       return (
@@ -2074,20 +2099,51 @@ function DayRoutePanelInner() {
                           key={item.id}
                           type="button"
                           disabled={inRoute || atMax}
-                          title={inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : 'Добавить в день'}
-                          onClick={() => addMustSeeItem(item)}
-                          className={`inline-flex max-w-full items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed ${
+                          title={
                             inRoute
-                              ? 'border-emerald-400 bg-emerald-50 text-emerald-800'
-                              : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50'
+                              ? 'Уже в маршруте'
+                              : atMax
+                                ? dayRouteHardLimitMessage()
+                                : hook || 'Добавить в день'
+                          }
+                          onClick={() => addMustSeeItem(item)}
+                          className={`flex w-full items-center gap-2.5 rounded-xl border p-2 text-left transition disabled:cursor-not-allowed ${
+                            inRoute
+                              ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
+                              : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50/50'
                           }`}
                         >
-                          {inRoute ? (
-                            <Check className="h-3.5 w-3.5 shrink-0 text-emerald-600" aria-hidden />
-                          ) : (
-                            <MapPin className="h-3.5 w-3.5 shrink-0 opacity-70" />
-                          )}
-                          <span className="truncate">{place.name}</span>
+                          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                            {item.imageUrl ? (
+                              <SafeImage
+                                src={item.imageUrl}
+                                alt=""
+                                fill
+                                sizes="3rem"
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center text-slate-400">
+                                <MapPin className="h-4 w-4" />
+                              </div>
+                            )}
+                          </div>
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-xs font-semibold">{place.name}</span>
+                            {hook ? (
+                              <span className="mt-0.5 block line-clamp-1 text-[11px] leading-snug text-slate-500">
+                                {hook}
+                              </span>
+                            ) : null}
+                          </span>
+                          <span
+                            className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+                              inRoute ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-900 text-white'
+                            }`}
+                            aria-hidden
+                          >
+                            {inRoute ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                          </span>
                         </button>
                       );
                     })}

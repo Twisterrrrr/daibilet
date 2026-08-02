@@ -1,3 +1,19 @@
+## 2026-08-02 - /my-day: пустые Локации + copy без «теплоход»
+
+### Наблюдения
+- Accordion «Ещё из каталога»: subtitle «Отдельный поиск по типам, теплоход» - owner: «теплоход» в type search непонятен (wizard «Добавить теплоход» оставляем).
+- Локации/Площадки: «Нет локаций в этом городе» при выбранном городе (НН/др.).
+
+### Решения
+- Root cause: `DayRoutePanel` грузил `/api/public/venues?family=…&limit=500` **без city**, потом клиентский `item.city === pageCityName` по global top-N + exact title.
+- Fix: `city=` (slug||name) в venues/events fetch; убран exact client filter; backend warm-list фильтрует город **до** limit + fallback hub 2000/`requireEvents:false` при city miss.
+- Subtitle: только «Отдельный поиск по типам».
+
+### Проблемы
+- Deploy MSK после commit - BUILD_ID в Tasktracker.
+
+---
+
 ## 2026-08-02 - /my-day: soft-warn вместо hard DAY_ROUTE_MAX=10
 
 ### Наблюдения

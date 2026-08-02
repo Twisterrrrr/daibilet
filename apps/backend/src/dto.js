@@ -7676,26 +7676,39 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   const typeFilter = String(searchParams.get('type') || '').trim().toLowerCase();
   const familyFilter = String(searchParams.get('family') || '').trim().toLowerCase();
 
-  if (!query && !cityFilter && !typeFilter && familyFilter) {
+  // Warm list holds full hub families - filter by city BEFORE limit so regional
+  // cities are not dropped by a global top-N slice (my-day type search bug).
+  if (!query && !typeFilter && familyFilter) {
     const warmList = warmVenueCatalogList(familyFilter);
     if (warmList) {
-      const venues = warmList.slice(0, limit);
-      const cities = countBy(venues.map((venue) => venue.city).filter(Boolean));
-      const types = countBy(venues.map((venue) => venue.type).filter(Boolean));
-      return {
-        generatedAt: new Date().toISOString(),
-        total: venues.length,
-        venues,
-        stats: {
-          venues: venues.length,
-          cities,
-          types,
-        },
-      };
+      const scoped = cityFilter
+        ? warmList.filter((venue) => publicVenueRowMatchesCityFilter(venue, cityFilter))
+        : warmList;
+      // City miss on warm → fall through to wider requireEvents:false hub.
+      if (!cityFilter || scoped.length > 0) {
+        const venues = scoped.slice(0, limit);
+        const cities = countBy(venues.map((venue) => venue.city).filter(Boolean));
+        const types = countBy(venues.map((venue) => venue.type).filter(Boolean));
+        return {
+          generatedAt: new Date().toISOString(),
+          total: venues.length,
+          venues,
+          stats: {
+            venues: venues.length,
+            cities,
+            types,
+          },
+        };
+      }
     }
   }
 
-  const rows = await publicVenueHubRows(db, 500);
+  // City-scoped: wider lean hub + content places (0 events) so Nizhny etc. appear.
+  const rows = await publicVenueHubRows(
+    db,
+    cityFilter ? 2000 : 500,
+    cityFilter ? { requireEvents: false } : {},
+  );
   const venues = rows
     .filter((row) => {
       if (!query) return true;
