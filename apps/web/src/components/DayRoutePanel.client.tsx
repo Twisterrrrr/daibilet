@@ -1525,15 +1525,6 @@ function DayRoutePanelInner() {
                                 рядом · {titleById.get(id) || 'точка'}
                               </span>
                             ))}
-                            {match.missing.map((id) => (
-                              <span
-                                key={`miss-${id}`}
-                                className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500"
-                                title={titleById.get(id) || id}
-                              >
-                                нет · {titleById.get(id) || 'точка'}
-                              </span>
-                            ))}
                           </div>
                         </div>
                       </div>
