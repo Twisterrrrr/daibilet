@@ -1,3 +1,19 @@
+## 2026-08-03 - /my-day: starter banner + stop card v6 templates
+
+### Наблюдения
+- Starter: middle hole from 5-col / short left vs tall form; owner gave banner template (`max-w-5xl`, `md:items-center justify-between`).
+- Stop cards: new hierarchy template - larger thumb, breathable pad, meta badges for time/distance, larger tap actions.
+
+### Решения
+- Starter `data-day-starter-variant="banner"`: `p-6 md:p-8 lg:p-10`, icon in `bg-sky-50` box, form `md:max-w-md gap-3.5`, link `text-sky-700` + `px-1`; stable min-h on form; CityPicker/Search taller `py-3.5` + border.
+- Grid stop `owner-v6`: thumb 16 + N on corner; ↑↓ under thumb; title/address/meta badges (`~N мин`, distance); actions `p-2`.
+- List dense unchanged. Offers title-first dedupe already live.
+
+### Проблемы
+- Нет (после MSK deploy).
+
+---
+
 ## 2026-08-03 - /my-day: dedupe matching excursion cards
 
 ### Наблюдения
