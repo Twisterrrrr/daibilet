@@ -289,14 +289,11 @@ export function buildHotPickCards(input: {
     }
     const offer = classifyHotPickOffer(row.place, event);
     const hook =
-      dayRouteHookLine(
-        {
-          hookFact: row.hook,
-          shortDescription: null,
-          desc: row.place.desc,
-        },
-        110,
-      ) || row.hook;
+      dayRouteHookLine({
+        hookFact: row.hook,
+        shortDescription: null,
+        desc: row.place.desc,
+      }) || row.hook;
     const title =
       offer.kind === 'affiche' && event?.title
         ? String(event.title).trim()

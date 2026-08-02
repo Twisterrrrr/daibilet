@@ -81,7 +81,15 @@ test('dayRouteHookLine prefers hookFact then shortDescription then desc', () => 
   assert.equal(dayRouteHookLine({ desc: 'Только cityInfo desc' }), 'Только cityInfo desc');
 });
 
-test('dayRouteHookLine truncates to about 100 chars without emdash', () => {
+test('dayRouteHookLine keeps full text by default (no ellipsis)', () => {
+  const long =
+    'За всю свою многовековую историю эта каменная крепость ни разу не была взята штурмом, выдержав множество осад и сохранив стены до наших дней.';
+  const line = dayRouteHookLine({ desc: long });
+  assert.equal(line, long.replace(/[—–]/g, '-'));
+  assert.equal((line as string).endsWith('...'), false);
+});
+
+test('dayRouteHookLine truncates only when maxLen is set', () => {
   const long =
     'Очень длинное описание места с подробностями — зачем ехать сюда и что смотреть в первую очередь сегодня днём';
   const line = dayRouteHookLine({ desc: long }, 80);
@@ -89,6 +97,7 @@ test('dayRouteHookLine truncates to about 100 chars without emdash', () => {
   assert.ok((line as string).length <= 83);
   assert.equal((line as string).includes('—'), false);
   assert.equal((line as string).includes('–'), false);
+  assert.ok((line as string).endsWith('...'));
 });
 
 test('dayRouteItemFromMustSee resolves venueSlug + coords + address', () => {

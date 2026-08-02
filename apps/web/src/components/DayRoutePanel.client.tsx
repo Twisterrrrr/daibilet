@@ -2323,7 +2323,7 @@ function DayRoutePanelInner() {
                           <span className="min-w-0 flex-1">
                             <span className="block truncate text-xs font-semibold">{place.name}</span>
                             {hook ? (
-                              <span className="mt-0.5 block text-[11px] leading-snug text-slate-500 sm:line-clamp-2">
+                              <span className="mt-0.5 block text-[11px] leading-snug text-slate-500">
                                 {hook}
                               </span>
                             ) : null}
@@ -2560,7 +2560,7 @@ function DayRoutePanelInner() {
                       <div className="absolute inset-x-0 bottom-0 p-3.5">
                         <p className="line-clamp-2 text-sm font-bold text-white drop-shadow">{card.title}</p>
                         {card.hook ? (
-                          <p className="mt-1 text-[12px] leading-snug text-white/80 sm:line-clamp-2">
+                          <p className="mt-1 text-[12px] leading-snug text-white/80">
                             {card.hook}
                           </p>
                         ) : null}

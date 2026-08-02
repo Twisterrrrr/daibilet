@@ -36,24 +36,26 @@ export type DayRouteVenueMatchSource = {
   cityId?: string | null;
 };
 
-/** 1-line «зачем сюда»: venue hookFact → shortDescription → editorial must-see desc. */
+/** Full «зачем сюда» text: venue hookFact → shortDescription → editorial must-see desc.
+ * Optional `maxLen` truncates for compact hints (search). Cards pass no maxLen = full text. */
 export function dayRouteHookLine(
   sources: {
     hookFact?: string | null;
     shortDescription?: string | null;
     desc?: string | null;
   },
-  maxLen = 100,
+  maxLen?: number | null,
 ): string | null {
   const raw = String(sources.hookFact || sources.shortDescription || sources.desc || '')
     .trim()
     .replace(/\s+/g, ' ')
     .replace(/[—–]/g, '-');
   if (!raw) return null;
-  if (raw.length <= maxLen) return raw;
-  const cut = raw.slice(0, Math.max(1, maxLen - 1));
+  const limit = maxLen == null || maxLen <= 0 ? null : maxLen;
+  if (limit == null || raw.length <= limit) return raw;
+  const cut = raw.slice(0, Math.max(1, limit - 1));
   const sp = cut.lastIndexOf(' ');
-  const base = sp > Math.floor(maxLen * 0.55) ? cut.slice(0, sp) : cut;
+  const base = sp > Math.floor(limit * 0.55) ? cut.slice(0, sp) : cut;
   return `${base.replace(/[.,;:!\-\s]+$/u, '')}...`;
 }
 

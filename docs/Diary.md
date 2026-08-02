@@ -1,3 +1,19 @@
+## 2026-08-02 - /my-day: полный hook без JS `...`
+
+### Наблюдения
+- Owner: «не вижу полный текст» на «Главные места» (Кремль/Чкаловская) - mid-sentence `...`.
+- Root cause: `dayRouteHookLine` по умолчанию резал до ~100 символов + `...` (не только CSS clamp).
+
+### Решения
+- `dayRouteHookLine`: без maxLen = полный текст; truncate только при явном `maxLen`.
+- Hot Picks / must-see: без `line-clamp` на hook; hot-picks без лимита 110.
+- Compact cards `76bae1c` + этот фикс - один последующий deploy.
+
+### Проблемы
+- Deploy BUILD_ID - после MSK.
+
+---
+
 ## 2026-08-02 - INCIDENT ChunkLoadError + compact stop cards
 
 ### Наблюдения
