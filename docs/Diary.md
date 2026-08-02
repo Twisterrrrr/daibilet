@@ -12,7 +12,7 @@
 - Readiness points blend к SOFT, не к hard.
 
 ### Проблемы
-- MSK deploy: **BUILD_ID=`Nu6AszGgZIWJFyXpok29W`** (`2c927fb`), `/my-day` 200. Hub warm частично FAIL (kazan/nizhniy/… timeout) - web active.
+- MSK deploy: **BUILD_ID=`Yqcz6aa-14QvDHs30n306`** (`bd794f2` readiness→SOFT; soft-warn `2c927fb`), `/my-day` 200.
 
 ---
 
