@@ -46,7 +46,7 @@
 
 ---
 
-## 2026-08-02 - /my-day P5: превью + hookFact на пикере
+## 2026-08-02 - /my-day P5: превью + hookFact (+ Hot Picks)
 
 ### Наблюдения
 - Owner: в «Мой день» не хватало фото-превью и краткого «зачем сюда» при выборе точек.
@@ -55,7 +55,7 @@
 ### Решения
 - `dayRouteHookLine`: приоритет `Venue.hookFact` → `shortDescription` → editorial `cityInfo.mustSee.desc` (1 строка ~100 символов, emdash → `-`).
 - Каталог: `VenueCatalogCard.hookFact` через `toVenueCatalogCard` (API hub уже leanText=false).
-- UI: carousel «Рекомендуемые» (cover + badge + title + hook + /✓); accordion «Главные места» - compact mini-cards (thumb + title + 1-line hook); «Свободное окно» hook под title; search dropdown thumb + hook hint.
+- UI: «Выбор Дайбилет» Hot Picks (cover + badge + title + hook + dual CTA); accordion «Главные места» - compact mini-cards (thumb + title + 1-line hook); «Свободное окно» hook под title; search dropdown thumb + hook hint.
 - Не раздувать must-see в огромные карточки.
 
 ### Проблемы

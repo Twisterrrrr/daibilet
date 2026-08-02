@@ -42,11 +42,11 @@
 | UX.MYDAY-COMM | Canon planner+checklist (не swipe): readiness %, chips, buy handoff, recommend carousel, FAB, free-window | Критический | ✅ 4e45f48+ soft-cap follow-ups MSK **BUILD_ID=Yqcz6aa-14QvDHs30n306** |
 | UX.MYDAY-HDR | `/my-day` header: `N точек из 10` + unpaid билеты; H1 предложный; без %/окно/Яндекс/дубль Точки | Критический | 🔄 commit+MSK deploy |
 | UX.MYDAY-P4 | Free-window upsell polish (multi-gap / ETA) | Средний | ⏳ partial MVP in COMM |
-| UX.MYDAY-P5 | hookFact + mini description on day cards | Средний | ✅ picker: carousel / must-see mini-cards / free-window / search thumb+hook |
+| UX.MYDAY-P5 | hookFact + mini description on day cards | Средний | ✅ Hot Picks cover+hook; must-see mini-cards; free-window; search thumb+hook |
 | UX.MYDAY-P6 | City «собрать за минуту» template variants | Высокий | ⏳ |
 | UX.MYDAY-P7 | Commercial `/d/{code}` recipient (tickets/map/paid) - не soft purple banner | Высокий | ⏳ |
-| UX.MYDAY-P8 | Timeline Утро/День/Вечер | Средний | ⏳ |
-| UX.MYDAY-P9 | Extra carousels Рядом / Можно купить + Explore | Средний | ⏳ |
+| UX.MYDAY-P8 | Timeline Утро/День/Вечер | Средний | ⏳ partial buckets in Hot Picks offer |
+| UX.MYDAY-P9 | Extra carousels Рядом / Можно купить + Explore | Средний | 🔄 Hot Picks «Выбор Дайбилет» tabs shipped with P5 |
 | UX.MYDAY-F | Мой день: filters + auto-pick + top-up (product next) | Высокий | ⏳ поверх COMM канона |
 
 Канон: [myday-commercial-canon.md](./myday-commercial-canon.md).

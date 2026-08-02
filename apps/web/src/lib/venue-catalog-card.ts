@@ -12,6 +12,7 @@ type VenueCatalogSource = {
   longitude?: number | null;
   type: string;
   events: number;
+  hookFact?: string | null;
   shortDescription?: string | null;
   heroImageUrl?: string | null;
   nextSlot?: string | null;
@@ -44,6 +45,7 @@ export function toVenueCatalogCard(venue: VenueCatalogSource): VenueCatalogCard 
     longitude: hasCoords ? Number(venue.longitude) : null,
     type: venue.type,
     events: venue.events || 0,
+    hookFact: venue.hookFact ?? null,
     shortDescription: venue.shortDescription ?? null,
     heroImageUrl: venue.heroImageUrl ?? null,
     nextSlot: venue.nextSlot ?? null,

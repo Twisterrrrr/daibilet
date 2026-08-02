@@ -115,6 +115,18 @@ import {
   dayRouteStopHasTicket,
   findDayRouteFreeWindowGaps,
 } from '@/lib/day-route-commercial';
+import {
+  applyHotPickOfferToItem,
+  buildHotPickCards,
+  dayPartForStop,
+  dayPartLabel,
+  HOT_PICK_TABS,
+  HOT_PICKS_MAX,
+  visibleHotPickTabs,
+  type HotPickCard,
+  type HotPickDayPart,
+  type HotPickTabId,
+} from '@/lib/day-route-hot-picks';
 import { inCityPrepositional } from '@/lib/city-declension';
 import { formatPriceFrom } from '@/lib/format';
 import {
@@ -293,6 +305,8 @@ function DayRoutePanelInner() {
   const [catalogLoading, setCatalogLoading] = useState(false);
   const [destinationsFallback, setDestinationsFallback] = useState<PublicDestinationDto[]>([]);
   const [mustSeeFilter, setMustSeeFilter] = useState<MustSeeFilterId>('main');
+  /** Hot Picks tab: Советы / Культура / Еда и бары. */
+  const [hotPickTab, setHotPickTab] = useState<HotPickTabId>('tips');
   /** After external «Купить билет» - ask guest to mark bought. */
   const [ticketHandoff, setTicketHandoff] = useState<{
     venueId: string;
@@ -843,6 +857,26 @@ function DayRoutePanelInner() {
     setRoute(appendDayRouteItem(item));
   }
 
+  function activateHotPick(card: HotPickCard) {
+    const nextItem = applyHotPickOfferToItem(
+      { ...card.item, title: card.title || card.item.title },
+      card.offer,
+    );
+    const next = appendDayRouteItem(nextItem);
+    setRoute(next);
+    const url = card.offer.ticketUrl;
+    if (url && (card.offer.kind === 'affiche' || card.offer.kind === 'open_date')) {
+      if (typeof window !== 'undefined') {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      }
+      setTicketHandoff({
+        venueId: nextItem.id,
+        ticketUrl: url,
+        title: nextItem.title,
+      });
+    }
+  }
+
   function addAllMustSee() {
     if (!mustSeeAddable.length || atMax) {
       flashDayRouteFeedback(atMax ? dayRouteHardLimitMessage() : 'Нет мест для добавления');
@@ -933,14 +967,41 @@ function DayRoutePanelInner() {
     () => route.venues.filter((v) => dayRouteStopHasTicket(v) && !v.ticketBought),
     [route.venues],
   );
-  const recommendCarousel = useMemo(() => {
-    return mustSeeResolved
-      .filter(
-        ({ item }) =>
-          !isInDayRoute(item.id, route) && !(item.slug && isInDayRoute(item.slug, route)),
-      )
-      .slice(0, 12);
-  }, [mustSeeResolved, route]);
+  const hotPickTabIds = useMemo(
+    () => visibleHotPickTabs(mustSeeResolved.map((row) => ({ place: row.place }))),
+    [mustSeeResolved],
+  );
+  useEffect(() => {
+    if (!hotPickTabIds.includes(hotPickTab)) {
+      setHotPickTab(hotPickTabIds[0] || 'tips');
+    }
+  }, [hotPickTabIds, hotPickTab]);
+  const hotPickCards = useMemo(() => {
+    const notInRoute = mustSeeResolved.filter(
+      ({ item }) =>
+        !isInDayRoute(item.id, route) && !(item.slug && isInDayRoute(item.slug, route)),
+    );
+    return buildHotPickCards({
+      rows: notInRoute,
+      events: eventsCatalog,
+      tab: hotPickTab,
+      max: HOT_PICKS_MAX,
+    });
+  }, [mustSeeResolved, route, eventsCatalog, hotPickTab]);
+  const timelineGroups = useMemo(() => {
+    const order: HotPickDayPart[] = ['morning', 'day', 'evening'];
+    const groups = order.map((part) => ({
+      part,
+      label: dayPartLabel(part),
+      items: [] as Array<{ venue: DayRouteVenueItem; index: number }>,
+    }));
+    route.venues.forEach((venue, index) => {
+      const part = dayPartForStop(venue);
+      const bucket = groups.find((g) => g.part === part) || groups[1];
+      bucket!.items.push({ venue, index });
+    });
+    return groups.filter((g) => g.items.length > 0);
+  }, [route.venues]);
   const freeWindowUpsells = useMemo(() => {
     type FreePick = { key: string; badge: string; item: DayRouteVenueItem; hook: string | null };
     if (!primaryFreeWindow) return [] as FreePick[];
@@ -1386,87 +1447,214 @@ function DayRoutePanelInner() {
   return (
     <>
     <div className="container-page px-4 py-5 pb-28 sm:px-6 sm:py-10 sm:pb-10 print:hidden">
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-4">
+      <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Собери свой день</p>
-          <h1 className="mt-1 font-display text-2xl font-extrabold text-slate-900 sm:text-3xl">
+          <h1 className="font-display text-[1.65rem] font-bold leading-tight text-slate-900 sm:text-3xl">
             Мой день{scopeCityName ? ` ${inCityPrepositional(scopeCityName)}` : ''}
           </h1>
-          <p className="mt-2 text-sm font-medium text-slate-600" data-day-route-count-label data-day-route-readiness>
+          <p
+            className="mt-1.5 text-[13px] font-medium text-slate-500"
+            data-day-route-count-label
+            data-day-route-readiness
+          >
             {readiness.summaryLine}
           </p>
         </div>
-        {route.venues.length ? (
-          <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end">
-            <div className="relative flex-1 sm:flex-none" ref={shareMenuRef}>
-              <button
-                type="button"
-                onClick={() => setShareMenuOpen((open) => !open)}
-                data-day-share
-                aria-expanded={shareMenuOpen}
-                className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900 hover:bg-emerald-100"
-              >
-                <Share2 className="h-3.5 w-3.5" />
-                {copyStatus === 'ok' ? 'Скопировано!' : 'Поделиться'}
-              </button>
-              {shareMenuOpen ? (
-                <div
-                  role="menu"
-                  data-day-share-menu
-                  className="absolute left-0 z-30 mt-2 hidden w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-lg sm:block sm:left-auto sm:right-0"
-                >
-                  {shareMenuItems}
-                </div>
-              ) : null}
+        <div className="relative shrink-0" ref={shareMenuRef}>
+          <button
+            type="button"
+            onClick={() => {
+              if (!route.venues.length) return;
+              setShareMenuOpen((open) => !open);
+            }}
+            data-day-share
+            aria-expanded={shareMenuOpen}
+            disabled={!route.venues.length}
+            className={`inline-flex min-h-10 items-center justify-center gap-1.5 rounded-2xl border px-3 py-2 text-xs font-semibold transition duration-200 ${
+              route.venues.length
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-900 hover:bg-emerald-100'
+                : 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'
+            }`}
+          >
+            <Share2 className="h-3.5 w-3.5" />
+            {copyStatus === 'ok' ? 'Скопировано!' : 'Поделиться'}
+          </button>
+          {shareMenuOpen && route.venues.length ? (
+            <div
+              role="menu"
+              data-day-share-menu
+              className="absolute right-0 z-30 mt-2 hidden w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-lg sm:block"
+            >
+              {shareMenuItems}
             </div>
-            {yandexUrl ? (
-              <a
-                href={yandexUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-3 py-2 text-xs font-bold text-white hover:bg-sky-700 sm:flex-none"
-              >
-                <ExternalLink className="h-3.5 w-3.5" />
-                Карта
-              </a>
-            ) : null}
-            <button
-              type="button"
-              onClick={printItinerary}
-              data-day-print
-              className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 sm:flex-none"
-            >
-              <Printer className="h-3.5 w-3.5" />
-              Сохранить
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                clearDayRoute();
-                setRoute(readDayRoute());
-                router.replace('/my-day', { scroll: false });
-              }}
-              className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 sm:flex-none"
-            >
-              <Trash2 className="h-3.5 w-3.5" /> Очистить
-            </button>
-          </div>
-        ) : null}
+          ) : null}
+        </div>
       </div>
+
+      {route.venues.length ? (
+        <div className="mt-3 flex flex-wrap gap-2">
+          {yandexUrl ? (
+            <a
+              href={yandexUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl bg-sky-600 px-3 py-1.5 text-xs font-bold text-white transition duration-200 hover:bg-sky-700"
+            >
+              <ExternalLink className="h-3.5 w-3.5" />
+              Карта
+            </a>
+          ) : null}
+          <button
+            type="button"
+            onClick={printItinerary}
+            data-day-print
+            className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition duration-200 hover:bg-slate-50"
+          >
+            <Printer className="h-3.5 w-3.5" />
+            Сохранить
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              clearDayRoute();
+              setRoute(readDayRoute());
+              router.replace('/my-day', { scroll: false });
+            }}
+            className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition duration-200 hover:bg-slate-50"
+          >
+            <Trash2 className="h-3.5 w-3.5" /> Очистить
+          </button>
+        </div>
+      ) : null}
 
       {copyStatus === 'ok' ? (
         <p
           role="status"
-          className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900"
+          className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900"
           data-day-share-ok
         >
           Текст с ссылкой скопирован!
         </p>
       ) : null}
 
-      {/* Primary search - high on page (Wanderlog-style IA) */}
+      {/* 2. Hot Picks - curation first */}
+      {hasPageCity && (hotPickCards.length > 0 || hotPickTabIds.length > 0) ? (
+        <section className="mt-5" data-day-hot-picks data-day-recommend-carousel>
+          <div className="flex items-baseline justify-between gap-2">
+            <h2 className="text-base font-bold text-slate-900">Выбор Дайбилет</h2>
+            <p className="text-[13px] text-slate-500">До {HOT_PICKS_MAX} мест</p>
+          </div>
+          <div
+            className="mt-3 flex gap-1 overflow-x-auto pb-1"
+            role="tablist"
+            aria-label="Категории выбора"
+            data-day-hot-pick-tabs
+          >
+            {HOT_PICK_TABS.filter((tab) => hotPickTabIds.includes(tab.id)).map((tab) => {
+              const active = hotPickTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setHotPickTab(tab.id)}
+                  className={`shrink-0 rounded-2xl px-3.5 py-2 text-sm font-semibold transition duration-200 ${
+                    active
+                      ? 'bg-slate-900 text-white'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+          {hotPickCards.length ? (
+            <div className="-mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+              {hotPickCards.map((card) => {
+                const inRoute =
+                  isInDayRoute(card.item.id, route) ||
+                  Boolean(card.item.slug && isInDayRoute(card.item.slug, route));
+                return (
+                  <article
+                    key={card.key}
+                    className="w-[83vw] max-w-sm shrink-0 snap-start overflow-hidden rounded-2xl border border-slate-200 bg-white transition duration-200 sm:w-72"
+                    data-day-recommend-card={card.item.id}
+                    data-day-hot-pick={card.offer.kind}
+                  >
+                    <div className="relative h-36 w-full bg-slate-100 sm:h-40">
+                      {card.item.imageUrl ? (
+                        <SafeImage
+                          src={card.item.imageUrl}
+                          alt=""
+                          fill
+                          sizes="83vw"
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-slate-400">
+                          <MapPin className="h-7 w-7" />
+                        </div>
+                      )}
+                      <span className="absolute left-2.5 top-2.5 rounded-2xl bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-slate-700 ring-1 ring-slate-200">
+                        {card.offer.badge}
+                      </span>
+                    </div>
+                    <div className="p-3.5">
+                      <p className="line-clamp-2 text-sm font-bold text-slate-900">{card.title}</p>
+                      {card.hook ? (
+                        <p
+                          className="mt-1 line-clamp-2 text-[13px] leading-snug text-slate-500"
+                          title={card.hook}
+                        >
+                          {card.hook}
+                        </p>
+                      ) : null}
+                      <button
+                        type="button"
+                        disabled={inRoute || atMax}
+                        onClick={() => activateHotPick(card)}
+                        className={`mt-3 inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-2xl px-3 text-sm font-bold transition duration-200 ${
+                          inRoute
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : card.offer.kind === 'free'
+                              ? 'bg-slate-900 text-white hover:bg-primary-600 disabled:bg-slate-300'
+                              : 'bg-amber-500 text-white hover:bg-amber-600 disabled:bg-slate-300'
+                        }`}
+                      >
+                        {inRoute ? (
+                          <>
+                            <Check className="h-4 w-4 opacity-100 transition duration-200" />
+                            В плане
+                          </>
+                        ) : (
+                          <>
+                            {card.offer.kind === 'free' ? (
+                              <Plus className="h-4 w-4 transition duration-200" />
+                            ) : (
+                              <Ticket className="h-4 w-4 transition duration-200" />
+                            )}
+                            {card.offer.ctaLabel}
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-[13px] text-slate-600">
+              В этой категории пока пусто - откройте другую вкладку или поиск ниже.
+            </p>
+          )}
+        </section>
+      ) : null}
+
+      {/* 3. Compact search row */}
       <section
-        className="mt-5 rounded-2xl border border-slate-200 bg-white p-4 sm:mt-6 sm:p-5"
+        className="mt-4 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4"
         ref={unifiedSearchRef}
         data-day-unified-search
       >
@@ -1487,124 +1675,56 @@ function DayRoutePanelInner() {
           />
         </div>
         {!hasPageCity ? (
-          <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
             Сначала выберите город - появятся места, музеи и события.
           </p>
         ) : (
           <div className="mt-3">
             <DayRouteSearchSelect
-              label="Добавить в день"
-              placeholder="Добавьте место, музей, событие"
+              label="Поиск места"
+              placeholder="Нет в выборе выше? Найдите здесь"
               emptyText={catalogLoading ? 'Загружаем…' : 'Ничего не найдено'}
               loading={catalogLoading}
               disabled={atMax}
               options={unifiedSearchOptions}
               onPick={pickUnifiedSearch}
             />
-            <p className="mt-2 text-xs text-slate-500">
+            <p className="mt-2 text-[13px] text-slate-500">
               Или{' '}
               <button
                 type="button"
                 onClick={openTextForm}
-                className="font-semibold text-slate-700 underline-offset-2 hover:underline"
+                className="font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
               >
                 своё место
               </button>
-              {scopeCitySlug ? (
-                <>
-                  {' · '}
-                  <Link href={cityHubHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
-                    хаб {dayTitleCity}
-                  </Link>
-                </>
-              ) : null}
             </p>
           </div>
         )}
       </section>
 
-      {/* Recommend carousel */}
-      {hasPageCity && recommendCarousel.length > 0 ? (
-        <section className="mt-4" data-day-recommend-carousel>
-          <div className="flex items-baseline justify-between gap-2">
-            <h2 className="text-sm font-bold text-slate-900">Рекомендуемые места</h2>
-            <p className="text-xs text-slate-500">Главные для {dayTitleCity}</p>
-          </div>
-          <div className="-mx-4 mt-3 flex gap-3 overflow-x-auto px-4 pb-1 sm:-mx-0 sm:px-0">
-            {recommendCarousel.map(({ place, item, hook }) => {
-              const inRoute =
-                isInDayRoute(item.id, route) || Boolean(item.slug && isInDayRoute(item.slug, route));
-              const badge = mustSeeFilterLabel(classifyMustSeePlace(place));
-              return (
-                <article
-                  key={item.id}
-                  className="w-44 shrink-0 overflow-hidden rounded-2xl border border-slate-200 bg-white"
-                  data-day-recommend-card={item.id}
-                >
-                  <div className="relative h-24 w-full bg-slate-100">
-                    {item.imageUrl ? (
-                      <SafeImage src={item.imageUrl} alt="" fill sizes="11rem" className="object-cover" />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center text-slate-400">
-                        <MapPin className="h-6 w-6" />
-                      </div>
-                    )}
-                    <span className="absolute left-2 top-2 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold text-slate-700 ring-1 ring-slate-200">
-                      {badge}
-                    </span>
-                  </div>
-                  <div className="flex items-start gap-2 p-2.5">
-                    <div className="min-w-0 flex-1">
-                      <p className="line-clamp-2 text-xs font-semibold text-slate-900">{item.title}</p>
-                      {hook ? (
-                        <p className="mt-0.5 line-clamp-1 text-[11px] leading-snug text-slate-500" title={hook}>
-                          {hook}
-                        </p>
-                      ) : null}
-                    </div>
-                    <button
-                      type="button"
-                      disabled={inRoute || atMax}
-                      aria-label={inRoute ? 'Уже в маршруте' : 'Добавить'}
-                      onClick={() => addMustSeeItem(item)}
-                      className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                        inRoute
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : 'bg-slate-900 text-white hover:bg-primary-600 disabled:bg-slate-300'
-                      }`}
-                    >
-                      {inRoute ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                    </button>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </section>
-      ) : null}
-
       {/* Alerts */}
       {route.venues.length ? (
         <>
           {mixedCities ? (
-            <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <p className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
               Точки из разных городов. Для подбора экскурсий лучше оставить один город.
             </p>
           ) : null}
           {belowMin ? (
-            <p className="mt-4 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+            <p className="mt-4 rounded-2xl border border-sky-200 bg-sky-50 px-4 py-3 text-sm text-sky-900">
               Добавьте ещё {DAY_ROUTE_MIN - route.venues.length}{' '}
               {DAY_ROUTE_MIN - route.venues.length === 1 ? 'точку' : 'точки'} (минимум {DAY_ROUTE_MIN}), чтобы день
               сложился.
             </p>
           ) : null}
           {atSoft && !atMax ? (
-            <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" data-day-route-soft-warn>
+            <p className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" data-day-route-soft-warn>
               {DAY_ROUTE_SOFT_WARN}
             </p>
           ) : null}
           {atMax ? (
-            <p className="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+            <p className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
               {dayRouteHardLimitMessage()}. Удалите одну, чтобы добавить другую.
             </p>
           ) : null}
@@ -1615,9 +1735,10 @@ function DayRoutePanelInner() {
       {!route.venues.length ? (
         <div className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-8 text-center sm:mt-8 sm:p-10">
           <Route className="mx-auto h-8 w-8 text-slate-400" />
-          <p className="mt-3 text-base font-semibold text-slate-800">Пока нет точек</p>
-          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-500">
-            Найдите место в поиске выше или откройте рекомендуемые. Минимум {DAY_ROUTE_MIN} точки, чтобы день сложился.
+          <p className="mt-3 text-base font-semibold text-slate-800">План пока пуст</p>
+          <p className="mx-auto mt-2 max-w-md text-[13px] leading-relaxed text-slate-500">
+            Возьмите места из «Выбор Дайбилет» выше или найдите точку в поиске. Минимум {DAY_ROUTE_MIN} точки, чтобы день
+            сложился.
           </p>
         </div>
       ) : (
@@ -1713,87 +1834,96 @@ function DayRoutePanelInner() {
               </div>
             </div>
           ) : null}
-          <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-day-plan-list>
-            {route.venues.map((venue, index) => (
-              <Fragment key={venue.id}>
-                <DayRouteVenueCard
-                  index={index}
-                  total={route.venues.length}
-                  venue={venue}
-                  hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
-                  segmentToNext={segmentMeters[index] ?? null}
-                  travelMode={travelMode}
-                  onMoveUp={() => setRoute(moveDayRouteVenue(venue.id, -1))}
-                  onMoveDown={() => setRoute(moveDayRouteVenue(venue.id, 1))}
-                  onRemove={() => setRoute(removeFromDayRoute(venue.id))}
-                  onToggleBought={() =>
-                    setRoute(
-                      updateDayRouteVenue(venue.id, { ticketBought: !venue.ticketBought }),
-                    )
-                  }
-                  onBuyClick={(ticketUrl) =>
-                    setTicketHandoff({ venueId: venue.id, ticketUrl, title: venue.title })
-                  }
-                />
-                {primaryFreeWindow &&
-                primaryFreeWindow.afterIndex === index &&
-                freeWindowUpsells.length > 0 &&
-                !atMax ? (
-                  <li
-                    className="sm:col-span-2 lg:col-span-3"
-                    data-day-free-window
-                  >
-                    <div className="rounded-2xl border border-dashed border-sky-200 bg-sky-50/60 p-3 sm:p-4">
-                      <p className="text-sm font-semibold text-slate-900">Свободное окно</p>
-                      <p className="mt-0.5 text-xs text-slate-600">
-                        Между точками около {formatDayRouteDistance(primaryFreeWindow.meters)} - можно добавить ещё одну
-                        остановку.
-                      </p>
-                      <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                        {freeWindowUpsells.map((pick) => (
-                          <button
-                            key={pick.key}
-                            type="button"
-                            onClick={() => addMustSeeItem(pick.item)}
-                            className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2 text-left hover:border-emerald-300 hover:bg-emerald-50/40"
-                          >
-                            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-                              {pick.item.imageUrl ? (
-                                <SafeImage
-                                  src={pick.item.imageUrl}
-                                  alt=""
-                                  fill
-                                  sizes="3rem"
-                                  className="object-cover"
-                                />
-                              ) : (
-                                <div className="flex h-full w-full items-center justify-center text-slate-400">
-                                  <MapPin className="h-4 w-4" />
-                                </div>
-                              )}
+          <div className="mt-3 space-y-5" data-day-plan-list data-day-timeline-parts>
+            {timelineGroups.map((group) => (
+              <div key={group.part} data-day-timeline-part={group.part}>
+                <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+                  {group.label}
+                </h3>
+                <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {group.items.map(({ venue, index }) => (
+                    <Fragment key={venue.id}>
+                      <DayRouteVenueCard
+                        index={index}
+                        total={route.venues.length}
+                        venue={venue}
+                        hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
+                        segmentToNext={segmentMeters[index] ?? null}
+                        travelMode={travelMode}
+                        onMoveUp={() => setRoute(moveDayRouteVenue(venue.id, -1))}
+                        onMoveDown={() => setRoute(moveDayRouteVenue(venue.id, 1))}
+                        onRemove={() => setRoute(removeFromDayRoute(venue.id))}
+                        onToggleBought={() =>
+                          setRoute(
+                            updateDayRouteVenue(venue.id, { ticketBought: !venue.ticketBought }),
+                          )
+                        }
+                        onBuyClick={(ticketUrl) =>
+                          setTicketHandoff({ venueId: venue.id, ticketUrl, title: venue.title })
+                        }
+                      />
+                      {primaryFreeWindow &&
+                      primaryFreeWindow.afterIndex === index &&
+                      freeWindowUpsells.length > 0 &&
+                      !atMax ? (
+                        <li
+                          className="sm:col-span-2 lg:col-span-3"
+                          data-day-free-window
+                        >
+                          <div className="rounded-2xl border border-dashed border-sky-200 bg-sky-50/60 p-3 sm:p-4">
+                            <p className="text-sm font-semibold text-slate-900">Свободное окно</p>
+                            <p className="mt-0.5 text-[13px] text-slate-600">
+                              Между точками около {formatDayRouteDistance(primaryFreeWindow.meters)} - можно добавить ещё
+                              одну остановку.
+                            </p>
+                            <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                              {freeWindowUpsells.map((pick) => (
+                                <button
+                                  key={pick.key}
+                                  type="button"
+                                  onClick={() => addMustSeeItem(pick.item)}
+                                  className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white p-2 text-left transition duration-200 hover:border-emerald-300 hover:bg-emerald-50/40"
+                                >
+                                  <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                                    {pick.item.imageUrl ? (
+                                      <SafeImage
+                                        src={pick.item.imageUrl}
+                                        alt=""
+                                        fill
+                                        sizes="3rem"
+                                        className="object-cover"
+                                      />
+                                    ) : (
+                                      <div className="flex h-full w-full items-center justify-center text-slate-400">
+                                        <MapPin className="h-4 w-4" />
+                                      </div>
+                                    )}
+                                  </div>
+                                  <span className="min-w-0">
+                                    <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                      {pick.badge}
+                                    </span>
+                                    <span className="mt-0.5 line-clamp-1 text-xs font-semibold text-slate-900">
+                                      {pick.item.title}
+                                    </span>
+                                    {pick.hook ? (
+                                      <span className="mt-0.5 block line-clamp-1 text-[11px] text-slate-500" title={pick.hook}>
+                                        {pick.hook}
+                                      </span>
+                                    ) : null}
+                                  </span>
+                                </button>
+                              ))}
                             </div>
-                            <span className="min-w-0">
-                              <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                                {pick.badge}
-                              </span>
-                              <span className="mt-0.5 line-clamp-1 text-xs font-semibold text-slate-900">
-                                {pick.item.title}
-                              </span>
-                              {pick.hook ? (
-                                <span className="mt-0.5 block line-clamp-1 text-[11px] text-slate-500" title={pick.hook}>
-                                  {pick.hook}
-                                </span>
-                              ) : null}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </li>
-                ) : null}
-              </Fragment>
+                          </div>
+                        </li>
+                      ) : null}
+                    </Fragment>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
         </section>
       )}
 

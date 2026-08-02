@@ -24,10 +24,33 @@ export type DayRouteVenueMatchSource = {
   longitude?: number | null;
   address?: string | null;
   heroImageUrl?: string | null;
+  hookFact?: string | null;
+  shortDescription?: string | null;
   city?: string | null;
   citySlug?: string | null;
   cityId?: string | null;
 };
+
+/** 1-line «зачем сюда»: venue hookFact → shortDescription → editorial must-see desc. */
+export function dayRouteHookLine(
+  sources: {
+    hookFact?: string | null;
+    shortDescription?: string | null;
+    desc?: string | null;
+  },
+  maxLen = 100,
+): string | null {
+  const raw = String(sources.hookFact || sources.shortDescription || sources.desc || '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/[—–]/g, '-');
+  if (!raw) return null;
+  if (raw.length <= maxLen) return raw;
+  const cut = raw.slice(0, Math.max(1, maxLen - 1));
+  const sp = cut.lastIndexOf(' ');
+  const base = sp > Math.floor(maxLen * 0.55) ? cut.slice(0, sp) : cut;
+  return `${base.replace(/[.,;:!\-\s]+$/u, '')}...`;
+}
 
 export type DayRouteCityContext = {
   id?: string | null;

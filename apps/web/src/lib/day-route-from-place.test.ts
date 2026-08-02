@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   buildCityDayRoutePreset,
   cityDayRoutePresetAvailable,
+  dayRouteHookLine,
   dayRouteItemFromEvent,
   dayRouteItemFromMustSee,
 } from './day-route-from-place.ts';
@@ -60,6 +61,35 @@ const venues = [
     address: 'Казанская площадь, 2',
   },
 ];
+
+test('dayRouteHookLine prefers hookFact then shortDescription then desc', () => {
+  assert.equal(
+    dayRouteHookLine({
+      hookFact: 'Факт с площадки',
+      shortDescription: 'Коротко',
+      desc: 'Редакционный',
+    }),
+    'Факт с площадки',
+  );
+  assert.equal(
+    dayRouteHookLine({
+      shortDescription: 'Коротко из DTO',
+      desc: 'Редакционный',
+    }),
+    'Коротко из DTO',
+  );
+  assert.equal(dayRouteHookLine({ desc: 'Только cityInfo desc' }), 'Только cityInfo desc');
+});
+
+test('dayRouteHookLine truncates to about 100 chars without emdash', () => {
+  const long =
+    'Очень длинное описание места с подробностями — зачем ехать сюда и что смотреть в первую очередь сегодня днём';
+  const line = dayRouteHookLine({ desc: long }, 80);
+  assert.ok(line);
+  assert.ok((line as string).length <= 83);
+  assert.equal((line as string).includes('—'), false);
+  assert.equal((line as string).includes('–'), false);
+});
 
 test('dayRouteItemFromMustSee resolves venueSlug + coords + address', () => {
   const item = dayRouteItemFromMustSee(

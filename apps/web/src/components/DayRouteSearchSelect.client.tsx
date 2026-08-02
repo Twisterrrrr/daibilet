@@ -1,12 +1,15 @@
 'use client';
 
-import { Check, ChevronDown, Search } from 'lucide-react';
+import { Check, ChevronDown, MapPin, Search } from 'lucide-react';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
+
+import { SafeImage } from '@/components/SafeImage.client';
 
 export type DayRouteSearchOption = {
   id: string;
   label: string;
   hint?: string | null;
+  imageUrl?: string | null;
   disabled?: boolean;
   disabledReason?: string | null;
 };
@@ -162,16 +165,33 @@ export function DayRouteSearchSelect({
                       active ? 'bg-emerald-50 text-emerald-950' : 'text-slate-800 hover:bg-slate-50'
                     }`}
                   >
-                    <span className="min-w-0">
-                      <span className="block truncate font-medium">{option.label}</span>
-                      {option.hint ? (
-                        <span className="mt-0.5 block truncate text-xs text-slate-500">{option.hint}</span>
-                      ) : null}
-                      {option.disabled && option.disabledReason ? (
-                        <span className="mt-0.5 block text-[11px] font-medium text-slate-400">
-                          {option.disabledReason}
-                        </span>
-                      ) : null}
+                    <span className="flex min-w-0 items-start gap-2">
+                      <span className="relative mt-0.5 h-9 w-9 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                        {option.imageUrl ? (
+                          <SafeImage
+                            src={option.imageUrl}
+                            alt=""
+                            fill
+                            sizes="2.25rem"
+                            className="object-cover"
+                          />
+                        ) : (
+                          <span className="flex h-full w-full items-center justify-center text-slate-400">
+                            <MapPin className="h-3.5 w-3.5" />
+                          </span>
+                        )}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block truncate font-medium">{option.label}</span>
+                        {option.hint ? (
+                          <span className="mt-0.5 block line-clamp-1 text-xs text-slate-500">{option.hint}</span>
+                        ) : null}
+                        {option.disabled && option.disabledReason ? (
+                          <span className="mt-0.5 block text-[11px] font-medium text-slate-400">
+                            {option.disabledReason}
+                          </span>
+                        ) : null}
+                      </span>
                     </span>
                     {!option.disabled ? <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600 opacity-0 group-hover:opacity-100" /> : null}
                   </button>

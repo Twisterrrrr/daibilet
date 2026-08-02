@@ -30,6 +30,8 @@ export type VenueCatalogCard = {
   longitude?: number | null;
   type: string;
   events: number;
+  /** Editorial hook for picker cards («зачем сюда»). */
+  hookFact?: string | null;
   shortDescription?: string | null;
   heroImageUrl?: string | null;
   nextSlot?: string | null;
