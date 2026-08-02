@@ -1,3 +1,28 @@
+## 2026-08-02 - Мой день: planner + commercial checklist (Wanderlog-style slice)
+
+### Наблюдения
+- Owner canon: «Мой день» = **planner + commercial checklist**, не список точек и не Tinder/swipe.
+- Паттерн Wanderlog (не копировать визуал 1:1): быстро собрать день без мыслительной нагрузки + коммерческий слой (билеты, readiness, free window).
+- Soft purple «Вам поделились» banner ранее снят - share recipient `/d/{code}` должен стать готовым commercial scenario (не возвращать старый баннер as-is).
+
+### Решения
+- **Shipped (practical slice / P1-P3 + free-window):**
+  1. Unified search сверху + carousel «Рекомендуемые места» (must-see)
+  2. Status chips: «Вход свободный» / «Нужен билет» / «Сеанс HH:00» / «Билет отмечен» (`day-route-commercial.ts`)
+  3. Readiness: «День собран на X%» + линия `N точек · M билетов · K свободное окно`; `DAY_ROUTE_MAX=10`
+  4. Handoff modal после «Купить билет» → `ticketBought` в localStorage
+  5. Mobile FAB: Карта / Добавить / Поделиться; при unpaid → «Купить билеты»
+  6. «Свободное окно» upsell (gap ≥1200м) - до 3 карточек free/museum/event
+- **Formula %:** equal thirds - points (MIN→MAX blend) + tickets resolved + timed slots among commerce stops.
+- **Chip priority:** bought → session → needs_ticket → free.
+- Docs: [myday-commercial-canon.md](./myday-commercial-canon.md).
+
+### Проблемы
+- Full target IA (Утро/День/Вечер timeline, multi carousels «Исследовать», native price «от X», city templates variants, commercial `/d/{code}` recipient) - backlog P4-P7, не в этом ship.
+- Screenshots: verify `/my-day` с городом - header %, carousel, chip на карточке, FAB; click Купить → handoff; 2 точки с coords далеко → free window.
+
+---
+
 ## 2026-08-02 - /my-day: короткие ссылки шаринга `/d/{code}`
 
 ### Наблюдения

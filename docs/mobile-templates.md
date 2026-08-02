@@ -82,18 +82,20 @@ Mobile sticky bottom: общий `MobileStickyActionBar` (`lg:hidden` + safe-are
 6. Related  
 7. Mobile sticky action bar  
 
-### `/my-day` (owner IA 2026-08-02, accordion compact 2026-08-02)
+### `/my-day` (commercial checklist slice 2026-08-02)
+
+Канон: [myday-commercial-canon.md](./myday-commercial-canon.md). Planner + tickets, не swipe.
 
 1. Sticky chrome (city chip)  
-2. Title + count (`Точки · N/10`) + share/print/clear  
-3. **Route list always open** (`data-day-route-list`) - карточки + distance/mode + Yandex/optimize; empty-state CTAs  
-4. Accordion **«Добавить своё место»** (collapsed) - сразу под маршрутом / кнопка в header точек  
-5. Accordion **«Из каталога»** (collapsed) - city + Локации/Площадки/События + boat wizard  
-6. Accordion **«Главные места»** (collapsed, если есть город) - chips + filters  
-7. Accordion **«Подходящие экскурсии»** (collapsed, если есть catalog stops)  
-8. Sticky: Каталог / Своё / Сохранить / Поделиться / Карты  
+2. Title «Мой день в {городе}» + readiness % + summary line + share/map/clear  
+3. Unified search «Добавьте место, музей, событие» + city picker  
+4. Carousel «Рекомендуемые места» (must-see, + → ✓)  
+5. Route list always open - neutral cards + status chips + buy CTA + free-window upsell  
+6. Accordion secondary: своё место / ещё из каталога (boat) / главные chips / matches  
+7. Sticky FAB: Купить билеты (если unpaid) · Карта · Добавить · Поделиться  
+8. Handoff modal после external checkout → `ticketBought`
 
-Exclusive accordion (`openPanel`): один открытый блок. Маршрут вне аккордеона. `DAY_ROUTE_MAX=10`.
+`DAY_ROUTE_MAX=10`. Exclusive accordion для secondary блоков.
 
 ---
 
