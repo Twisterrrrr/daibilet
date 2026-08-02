@@ -14,6 +14,7 @@ import { useSelectedCityOptional } from '@/components/SelectedCityProvider.clien
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { useUserAuthOptional } from '@/hooks/useUserAuth';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
+import { FAVORITES_CHANGED_EVENT, readFavoriteIds } from '@/lib/favorites';
 
 const NAV_LINKS = [
   { label: 'События', href: '/events', catalog: true },
@@ -159,8 +160,9 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               className="hidden lg:inline-flex"
             />
 
-            {/* Day-route counter: visible on mobile sticky header (not only lg). */}
+            {/* Day-route + favorites: icon-first on mobile sticky; badges when count > 0. */}
             <DayRouteBadge />
+            <FavoritesHeaderButton onClick={() => setFavoritesOpen(true)} />
 
             <div className="hidden items-center gap-1 lg:flex">
               <HeaderAuthControls
@@ -180,16 +182,6 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               >
                 <HelpCircle className="h-5 w-5" strokeWidth={1.75} />
               </Link>
-
-              <button
-                type="button"
-                aria-label="Избранное"
-                title="Избранное"
-                onClick={() => setFavoritesOpen(true)}
-                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-graphite-muted transition hover:bg-surface-muted hover:text-graphite"
-              >
-                <Heart className="h-5 w-5" strokeWidth={1.75} />
-              </button>
             </div>
           </div>
         </div>
@@ -217,6 +209,42 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
       ) : null}
       {favoritesOpen ? <FavoritesPanel onClose={() => setFavoritesOpen(false)} /> : null}
     </>
+  );
+}
+
+function FavoritesHeaderButton({ onClick }: { onClick: () => void }) {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const sync = () => setCount(readFavoriteIds().size);
+    sync();
+    window.addEventListener(FAVORITES_CHANGED_EVENT, sync);
+    window.addEventListener('storage', sync);
+    return () => {
+      window.removeEventListener(FAVORITES_CHANGED_EVENT, sync);
+      window.removeEventListener('storage', sync);
+    };
+  }, []);
+
+  return (
+    <button
+      type="button"
+      aria-label={count ? `Избранное, ${count}` : 'Избранное'}
+      title="Избранное"
+      data-favorites-count={count}
+      onClick={onClick}
+      className="relative inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-graphite-muted transition hover:bg-surface-muted hover:text-graphite"
+    >
+      <Heart className="h-5 w-5" strokeWidth={1.75} />
+      {count > 0 ? (
+        <span
+          data-favorites-badge
+          className="absolute -right-0.5 -top-0.5 inline-flex min-w-[1.1rem] items-center justify-center rounded-full bg-rose-600 px-1 text-[10px] font-bold leading-4 text-white"
+        >
+          {count}
+        </span>
+      ) : null}
+    </button>
   );
 }
 

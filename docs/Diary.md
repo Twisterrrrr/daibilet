@@ -1,3 +1,19 @@
+## 2026-08-02 - Header: Маршрут/Избранное без дубля счётчика
+
+### Наблюдения
+- Owner screenshot: `DayRouteBadge` показывал «Маршрут · 7» + зелёный badge «7» - цифра дублировалась.
+- Избранное в sticky было только на `lg+`; на mobile - только в sheet.
+
+### Решения
+- `DayRouteBadge`: при count>0 только icon + emerald badge; пустой - icon (+ «Маршрут» на `lg+`). Текст с «· N» убран.
+- `FavoritesHeaderButton` в sticky на всех breakpoints; rose badge при count>0.
+- `mobile-templates.md` + skeleton slots обновлены под icon-first chrome.
+
+### Проблемы
+- Нет (header-only; DayRoutePanel не трогали).
+
+---
+
 ## 2026-08-02 - Мой день: канон добора теплохода (Pier→Route→Slot)
 
 ### Наблюдения

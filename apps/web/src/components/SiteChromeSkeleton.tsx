@@ -34,8 +34,9 @@ export function SiteChromeSkeleton({
           </nav>
           <div className="flex shrink-0 items-center gap-1.5" aria-hidden>
             <span className="hidden h-10 w-10 rounded-lg bg-slate-100 lg:block" />
+            <span className="h-10 w-10 rounded-lg bg-slate-100" />
+            <span className="h-10 w-10 rounded-lg bg-slate-100" />
             <span className="hidden h-10 w-10 rounded-lg bg-slate-100 lg:block" />
-            <span className="h-10 w-16 rounded-lg bg-slate-100 sm:w-24" />
           </div>
         </div>
       </header>

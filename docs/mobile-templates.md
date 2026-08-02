@@ -16,12 +16,14 @@
 1. Menu (бургер)
 2. Brand (`Дайбилет` logo)
 3. **City chip** (`CityPicker` variant `header`) - всегда виден на mobile
-4. Day-route badge (`DayRouteBadge` → `/my-day`)
-5. (Desktop only) search / auth / help / favorites
+4. Day-route badge (`DayRouteBadge` → `/my-day`) - icon + green count badge when > 0; label «Маршрут» only empty on `lg+` (no «· N» in text)
+5. Favorites heart (`FavoritesHeaderButton`) - icon in sticky on mobile too; rose count badge when > 0
+6. (Desktop `lg+` only) search / auth / help
 
 Правила:
 
 - Город **нельзя** прятать за `lg:block` в sticky chrome.
+- Маршрут / Избранное на mobile - **пиктограммы** (текст прячется ниже `lg`); счётчик только в badge на иконке.
 - В `MobileNavSheet` блок «Город» - **сразу после поиска**, до пунктов навигации.
 - Safe-area: `pt-[env(safe-area-inset-top)]` на header; sticky bottom bars - `pb-[env(safe-area-inset-bottom)]`.
 - Skeleton (`SiteChromeSkeleton`) должен визуально совпадать с chrome (включая slot города).
