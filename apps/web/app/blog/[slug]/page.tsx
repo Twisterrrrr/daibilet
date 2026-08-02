@@ -4,10 +4,11 @@ import { notFound, permanentRedirect } from 'next/navigation';
 import { BlogArticleView } from '@/components/BlogArticleView';
 import '@/lib/env';
 import { buildBlogArticleJsonLd, buildBlogArticleMetadata } from '@/lib/blog-article-seo';
-import { mergeBlogCards, pickRelatedBlogCards, resolveStaticArticle } from '@/lib/blog-utils';
-import { buildPublicArticlePageDto, buildPublicArticlesListDto } from '@daibilet/backend/public-read';
+import { mergeBlogCards, pickRelatedBlogCards, resolveStaticArticle, type BlogArticleDto } from '@/lib/blog-utils';
+import { fetchPublicApiJson } from '@/server/public-api-client';
 
 export const revalidate = 300;
+type BlogApiArticles = NonNullable<Parameters<typeof mergeBlogCards>[0]>;
 
 /** Старые slug → каноническая статья (объединения / переезды). */
 const BLOG_SLUG_REDIRECTS: Record<string, string> = {
@@ -35,7 +36,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 async function loadArticle(slug: string) {
   try {
-    const payload = await buildPublicArticlePageDto(slug);
+    const payload = await fetchPublicApiJson<{
+      article?: BlogArticleDto | null;
+      cmsOwned?: boolean;
+    }>(`/api/public/articles/${encodeURIComponent(slug)}`, {
+      timeoutMs: 3_000,
+      notFoundAsNull: true,
+    });
     if (payload?.article) return payload.article;
     // CMS owns this slug (draft/review/archive) - do not resurrect static fallback body.
     if (payload?.cmsOwned) return null;
@@ -48,7 +55,9 @@ async function loadArticle(slug: string) {
 async function loadRelated(article: NonNullable<Awaited<ReturnType<typeof loadArticle>>>) {
   let posts = mergeBlogCards(null);
   try {
-    const payload = await buildPublicArticlesListDto();
+    const payload = await fetchPublicApiJson<{ articles?: BlogApiArticles }>('/api/public/articles', {
+      timeoutMs: 3_000,
+    });
     posts = mergeBlogCards(payload?.articles);
   } catch {
     // static fallback already in mergeBlogCards(null)

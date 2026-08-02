@@ -1,9 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { proxyPublicApiRequest } from '@/server/public-api-proxy';
 
-import '@/lib/env';
-import { buildPublicBuyerOrdersDto } from '@daibilet/backend/public-read';
-
-export async function GET(request: NextRequest) {
-  const payload = await buildPublicBuyerOrdersDto(request.nextUrl.searchParams);
-  return NextResponse.json(payload);
+export async function GET(request: Request) {
+  return proxyPublicApiRequest(request, '/api/public/orders', { timeoutMs: 3_000 });
 }

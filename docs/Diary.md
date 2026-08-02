@@ -1,3 +1,24 @@
+## 2026-08-02 - INC.504: SSR hardening для public Next
+
+### Наблюдения
+- Прод-симптом: `daibilet.ru` мог отдавать 0B/504 на HTML, пока backend/admin/finance оставались живыми.
+- Root cause в коде: `apps/web` всё ещё тянул `@daibilet/backend/public-read` в SSR и public route handlers, то есть Next-процесс сам выполнял тяжёлые Prisma/DTO-сборки.
+- Soft-timeout не спасает blocked event loop: таймер `Promise.race` не тикает, если loop занят синхронной работой или cache stampede.
+
+### Решения
+- Добавлен HTTP boundary `apps/web/src/server/public-api-client.ts`: SSR читает public DTO через backend API с `AbortSignal.timeout`.
+- Добавлен proxy helper `apps/web/src/server/public-api-proxy.ts`: Next `/api/public/*` больше не собирает DTO внутри web-процесса.
+- Переведены hot paths: home, catalog, city/event/venue/landing pages, blog article helpers, destinations/stats/search/venues/landings API.
+- Главная получила bounded fallback для hero banners (700 ms) и blog promo articles (1200 ms).
+- В `apps/web` прямой `public-read` оставлен только для sitemap и internal revalidate как follow-up, не HTML-hot-path.
+
+### Проблемы
+- Локальный `pnpm --filter @daibilet/web typecheck` блокируется версией Node 24 при требовании repo `>=22.13.0 <23`.
+- Прямой `tsc --noEmit -p apps/web/tsconfig.json` всё ещё падает на уже существующих ошибках ветки; новых ошибок из SSR hardening helpers в выводе не видно.
+- Канон и smoke-план: `docs/inc-504-ssr-hardening.md`.
+
+---
+
 ## 2026-08-02 - /my-day: короткие ссылки шаринга `/d/{code}`
 
 ### Наблюдения

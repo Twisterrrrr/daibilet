@@ -1,5 +1,5 @@
 import type { VenueMapMarker, VenueMapTip } from '@/lib/venue-map-types';
-import { loadVenueMapTip as loadTip } from '@daibilet/backend/public-read';
+import { fetchPublicApiJson } from '@/server/public-api-client';
 
 export type { VenueMapMarker, VenueMapTip };
 
@@ -20,5 +20,12 @@ export function toVenueMapMarkers(
 }
 
 export async function loadVenueMapTip(idOrSlug: string): Promise<VenueMapTip | null> {
-  return loadTip(idOrSlug);
+  const id = String(idOrSlug || '').trim();
+  if (!id) return null;
+  const payload = await fetchPublicApiJson<{ tip?: VenueMapTip | null }>('/api/public/venues/map-tip', {
+    searchParams: { id },
+    timeoutMs: 2_000,
+    notFoundAsNull: true,
+  });
+  return payload?.tip ?? null;
 }

@@ -2,16 +2,17 @@ import { unstable_cache } from 'next/cache';
 
 import '@/lib/env';
 import { prisma } from '@/lib/db';
+import type {
+  PublicDestinationDto,
+  PublicLandingDto,
+  PublicVenuesDto,
+} from '@daibilet/contracts/public';
 import {
   PODBORKI_CATEGORIES,
   type PodborkiCategoryMeta,
 } from '@/lib/podborki-categories';
-import {
-  buildPublicDestinationsDto,
-  buildPublicLandingsCatalogDto,
-  buildPublicVenuesDto,
-} from '@daibilet/backend/public-read';
 import { PUBLIC_PAGE_REVALIDATE, PUBLIC_SURFACES_CACHE_TAG } from '@/server/cache-config';
+import { fetchPublicApiJson } from '@/server/public-api-client';
 
 /** Hot catalog DTOs for /podborki, /venues, /locations - short TTL, no Redis yet. */
 export { PUBLIC_SURFACES_CACHE_TAG };
@@ -25,6 +26,17 @@ export type PodborkiMetaPayload = {
   layoutBySlug: Record<string, string | null>;
   categoryBySlug: Record<string, string | null>;
   categories: PodborkiCategoryMeta[];
+};
+
+export type PublicDestinationsPayload = {
+  generatedAt?: string;
+  destinations: PublicDestinationDto[];
+};
+
+export type PublicLandingsCatalogPayload = {
+  generatedAt?: string;
+  city?: string;
+  items: PublicLandingDto[];
 };
 
 async function loadPodborkiMeta(): Promise<PodborkiMetaPayload> {
@@ -75,16 +87,21 @@ export async function getCachedLandingsCatalog(city = 'all') {
     () => {
       const params = new URLSearchParams();
       if (key !== 'all') params.set('city', key);
-      return buildPublicLandingsCatalogDto(params);
+      return fetchPublicApiJson<PublicLandingsCatalogPayload>('/api/public/landings-catalog', {
+        searchParams: params,
+        timeoutMs: 4_000,
+      });
     },
-    ['public-landings-catalog-v1', key],
+    ['public-landings-catalog-v2-http', key],
     surfaceCacheOptions,
   );
   return cached();
 }
 
 export async function getCachedDestinations() {
-  return unstable_cache(() => buildPublicDestinationsDto(), ['public-destinations-v1'], {
+  return unstable_cache(() => fetchPublicApiJson<PublicDestinationsPayload>('/api/public/destinations', {
+    timeoutMs: 3_000,
+  }), ['public-destinations-v2-http'], {
     ...surfaceCacheOptions,
     revalidate: PUBLIC_PAGE_REVALIDATE,
   })();
@@ -93,10 +110,11 @@ export async function getCachedDestinations() {
 export async function getCachedVenuesCatalog(family: 'institution' | 'location', limit = 500) {
   const cached = unstable_cache(
     () =>
-      buildPublicVenuesDto(
-        new URLSearchParams({ family, limit: String(limit) }),
-      ),
-    ['public-venues-catalog-v2', family, String(limit)],
+      fetchPublicApiJson<PublicVenuesDto>('/api/public/venues', {
+        searchParams: { family, limit },
+        timeoutMs: 5_000,
+      }),
+    ['public-venues-catalog-v3-http', family, String(limit)],
     surfaceCacheOptions,
   );
   return cached();

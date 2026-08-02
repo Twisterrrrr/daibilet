@@ -1,10 +1,10 @@
-import type { PublicSessionDto } from '@daibilet/contracts/public';
-import { buildPublicCatalogDto } from '@daibilet/backend/public-read';
+import type { PublicCatalogDto, PublicSessionDto } from '@daibilet/contracts/public';
 
 import { filterSessionsByCity, resolveLandingCityName } from '@/lib/landing-city';
 import { resolveRelatedLandingCardTargets } from '@/lib/seo-internal-links';
 import { shouldLoadRelatedHitSessions } from '@/lib/seo-listing-meta';
 import { fetchLandingPageDto } from '@/server/landing-page';
+import { fetchPublicApiJson } from '@/server/public-api-client';
 
 function pickSessionForCard(sessions: PublicSessionDto[]): PublicSessionDto | null {
   if (!sessions.length) return null;
@@ -19,7 +19,7 @@ function pickSessionForCard(sessions: PublicSessionDto[]): PublicSessionDto | nu
 }
 
 function sessionKey(session: Pick<PublicSessionDto, 'id' | 'slug' | 'groupKey'>): string {
-  return session.groupKey || session.id || session.slug;
+  return session.groupKey || session.id || session.slug || '';
 }
 
 /** SSR related hits: 3–4 сессии смежных категорий / bestsellers при 0 или 6–7 офферах. */
@@ -65,10 +65,13 @@ export async function loadThinRelatedCardSessions(input: {
   if (next.length < minHits) {
     try {
       const catalogCity = cityLabel || citySlug;
-      const catalog = await buildPublicCatalogDto({
-        city: catalogCity,
-        limit: 40,
-        sort: 'popular',
+      const catalog = await fetchPublicApiJson<PublicCatalogDto>('/api/public/events', {
+        searchParams: {
+          city: catalogCity,
+          limit: 40,
+          sort: 'popular',
+        },
+        timeoutMs: 5_000,
       });
       const items = (catalog.items || []) as PublicSessionDto[];
       for (const item of items) {

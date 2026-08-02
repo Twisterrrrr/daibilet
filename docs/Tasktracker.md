@@ -7,6 +7,18 @@
 
 ---
 
+## INC.504 SSR hardening (2026-08-02)
+
+Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
+
+| # | Task | Priority | Status |
+|---|------|----------|--------|
+| INC.504.22 | Move public HTML hot path in `apps/web` off direct `@daibilet/backend/public-read`; SSR/API read through backend HTTP with bounded timeout | Critical | done in `codex/ssr-hang-hardening` |
+| INC.504.23 | Move sitemap generation off direct `public-read` or give it a separate bounded backend path | Medium | todo |
+| INC.504.24 | Add staging HTTP load smoke for `/`, `/events`, `/cities`, `/venues`, `/api/public/events?limit=50` | High | todo |
+
+---
+
 ## Mobile templates canon (2026-08-02)
 
 Канон: [mobile-templates.md](./mobile-templates.md). Owner priority: удобная структура шаблонов мобилки.
@@ -1281,5 +1293,4 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 ## Google Search Console verification
 - [x] **Критический** — файл `googleb3313872246ac993.html` в `apps/web/public/`, deploy prod, curl 200 (2026-07-19)
-
 

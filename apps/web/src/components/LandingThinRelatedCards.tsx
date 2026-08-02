@@ -76,7 +76,7 @@ export function LandingThinRelatedCards({
           const pick = pickSessionForCard(citySessions);
           if (!pick) continue;
           const key = pick.groupKey || pick.id || pick.slug;
-          if (seen.has(key)) continue;
+          if (!key || seen.has(key)) continue;
           seen.add(key);
           next.push(pick);
         } catch {

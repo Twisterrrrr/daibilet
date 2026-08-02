@@ -17,7 +17,6 @@ import { HomeVenuesSection } from '@/components/HomeVenuesSection.client';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { ScrollRail } from '@/components/ScrollRail.client';
 import { mergeBlogCards } from '@/lib/blog-utils';
-import { buildPublicArticlesListDto } from '@daibilet/backend/public-read';
 import '@/lib/env';
 import { getHomeCoverFingerprints, getHomePageData } from '@/server/cached-home-data';
 import { formatMoney, formatNumber, pluralEvents } from '@/lib/format';
@@ -26,9 +25,13 @@ import { balancedTileGridClass } from '@/lib/balanced-tile-grid';
 import { landingCategoryHref } from '@/lib/landing-routes';
 import { withSoftTimeout } from '@/lib/soft-timeout';
 import { getActiveHeroBanners, heroFramesFromBanners } from '@/server/hero-banners';
+import { fetchPublicApiJson } from '@/server/public-api-client';
 
 /** External CDN HEAD fingerprints must not stall home TTFB on bad egress/DNS. */
 const HOME_FINGERPRINTS_TIMEOUT_MS = 800;
+const HOME_HERO_BANNERS_TIMEOUT_MS = 700;
+const HOME_ARTICLES_TIMEOUT_MS = 1_200;
+type BlogApiArticles = NonNullable<Parameters<typeof mergeBlogCards>[0]>;
 
 function promoBlockIcon(slug: string, index: number) {
   const key = String(slug || '').toLowerCase();
@@ -74,7 +77,9 @@ export async function HomePageContent() {
   const promoLandings = (landingsCatalog?.items || []).filter((item) => item.events > 0).slice(0, 6);
   let blogCards = mergeBlogCards(null);
   try {
-    const articlesPayload = await buildPublicArticlesListDto();
+    const articlesPayload = await fetchPublicApiJson<{ articles?: BlogApiArticles }>('/api/public/articles', {
+      timeoutMs: HOME_ARTICLES_TIMEOUT_MS,
+    });
     blogCards = mergeBlogCards(articlesPayload?.articles);
   } catch {
     // fallback to static posts
@@ -84,7 +89,12 @@ export async function HomePageContent() {
     : [...blogCards].reverse();
   const blogPosts = orderedBlog.slice(0, 4);
   const [featuredBlog, ...restBlog] = blogPosts;
-  const heroBanners = await getActiveHeroBanners();
+  const heroBanners = await withSoftTimeout(
+    getActiveHeroBanners(),
+    HOME_HERO_BANNERS_TIMEOUT_MS,
+    [],
+    'home-hero-banners',
+  );
   const heroFrames = heroFramesFromBanners(heroBanners);
 
   return (
