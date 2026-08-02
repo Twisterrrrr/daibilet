@@ -1637,6 +1637,81 @@ function DayRoutePanelInner() {
   const matchesOpen = openPanel === 'matches';
   const showMustSeeAccordion = Boolean(hasPageCity && (mustSeeResolved.length > 0 || (!catalogLoading && pageCitySlug)));
   const showHotPicks = Boolean(hasPageCity && (hotPickCards.length > 0 || hotPickTabIds.length > 0));
+  const isEmptyPlan = route.venues.length === 0;
+
+  function renderUnifiedSearch(asStarter: boolean) {
+    return (
+      <section
+        className={`rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4 ${
+          asStarter ? 'mt-5 sm:mt-8' : 'mt-3'
+        }`}
+        ref={unifiedSearchRef}
+        data-day-unified-search
+        data-day-starter={asStarter ? '1' : undefined}
+      >
+        {asStarter ? (
+          <div className="mb-4 text-center">
+            <Route className="mx-auto h-8 w-8 text-slate-400" aria-hidden />
+            <p className="mx-auto mt-3 max-w-md text-sm font-medium leading-snug text-slate-600">
+              Выберите город и минимум 2 точки, чтобы создать маршрут
+            </p>
+          </div>
+        ) : null}
+        <div className="max-w-md" data-day-city-picker>
+          <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            Город
+          </label>
+          <CityPicker
+            cities={destinations}
+            value={selectedCity?.cityValue || 'all'}
+            onChange={(name) => {
+              selectedCity?.setCity(name);
+              if (name !== 'all') setCityInput(name);
+            }}
+            allLabel="Выберите город"
+            variant="hero"
+            className="w-full"
+          />
+        </div>
+        {!hasPageCity ? (
+          <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            Сначала выберите город - появятся места, музеи и события.
+          </p>
+        ) : (
+          <div className="mt-3">
+            <DayRouteSearchSelect
+              label="Поиск места"
+              placeholder="Нет в выборе выше? Найдите здесь"
+              emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Ничего не найдено'}
+              loading={catalogLoading}
+              disabled={atMax}
+              options={unifiedSearchOptions}
+              onPick={pickUnifiedSearch}
+            />
+            {catalogError ? (
+              <p className="mt-2 text-xs font-medium text-rose-700" role="status">
+                {catalogError}
+              </p>
+            ) : null}
+          </div>
+        )}
+        <p
+          className={`mt-2 text-[13px] text-slate-500 ${
+            asStarter ? 'text-center' : 'text-left'
+          }`}
+        >
+          <button
+            type="button"
+            onClick={openTextForm}
+            className="font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
+            data-day-custom-place-link
+          >
+            или добавь своё место
+          </button>
+        </p>
+      </section>
+    );
+  }
 
   return (
     <>
@@ -1759,17 +1834,9 @@ function DayRoutePanelInner() {
         </>
       ) : null}
 
-      {/* 1. Route list - always expanded */}
-      {!route.venues.length ? (
-        <div className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-8 text-center sm:mt-8 sm:p-10">
-          <Route className="mx-auto h-8 w-8 text-slate-400" />
-          <p className="mt-3 text-base font-semibold text-slate-800">План пока пуст</p>
-          <p className="mx-auto mt-2 max-w-md text-[13px] leading-relaxed text-slate-500">
-            Выберите город ниже, возьмите места из «Главные места» или «Выбор Дайбилет», либо найдите точку в поиске.
-            Минимум {DAY_ROUTE_MIN} точки, чтобы день сложился.
-          </p>
-        </div>
-      ) : (
+      {/* Empty starter: city + search (primary). Route list when plan has stops. */}
+      {isEmptyPlan ? renderUnifiedSearch(true) : null}
+      {!isEmptyPlan ? (
         <section className="mt-5 sm:mt-8" data-day-route-list>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <h2
@@ -1992,7 +2059,7 @@ function DayRoutePanelInner() {
             </div>
           ) : null}
         </section>
-      )}
+      ) : null}
 
       {/* Accordion: must-see chips */}
       {showMustSeeAccordion ? (
@@ -2380,61 +2447,8 @@ function DayRoutePanelInner() {
         </section>
       ) : null}
 
-      {/* Search + city */}
-      <section
-        className="mt-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4"
-        ref={unifiedSearchRef}
-        data-day-unified-search
-      >
-        <div className="max-w-md" data-day-city-picker>
-          <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-            Город
-          </label>
-          <CityPicker
-            cities={destinations}
-            value={selectedCity?.cityValue || 'all'}
-            onChange={(name) => {
-              selectedCity?.setCity(name);
-              if (name !== 'all') setCityInput(name);
-            }}
-            allLabel="Выберите город"
-            variant="hero"
-            className="w-full"
-          />
-        </div>
-        {!hasPageCity ? (
-          <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            Сначала выберите город - появятся места, музеи и события.
-          </p>
-        ) : (
-          <div className="mt-3">
-            <DayRouteSearchSelect
-              label="Поиск места"
-              placeholder="Нет в выборе выше? Найдите здесь"
-              emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Ничего не найдено'}
-              loading={catalogLoading}
-              disabled={atMax}
-              options={unifiedSearchOptions}
-              onPick={pickUnifiedSearch}
-            />
-            {catalogError ? (
-              <p className="mt-2 text-xs font-medium text-rose-700" role="status">
-                {catalogError}
-              </p>
-            ) : null}
-            <p className="mt-2 text-[13px] text-slate-500">
-              Или{' '}
-              <button
-                type="button"
-                onClick={openTextForm}
-                className="font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
-              >
-                своё место
-              </button>
-            </p>
-          </div>
-        )}
-      </section>
+      {/* Search + city (when plan already has stops - secondary under Hot Picks) */}
+      {!isEmptyPlan ? renderUnifiedSearch(false) : null}
 
       {/* Accordion: advanced catalog + boat */}
       <div

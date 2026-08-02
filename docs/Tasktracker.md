@@ -76,6 +76,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MYDAY-COPY | Hub presets rename+move; `/my-day` H1 предложный; event hydrate title+coords | Высокий | ✅ `3f14a98` MSK **BUILD_ID=`mtXLit644Nhr5cRd4ideD`** |
 | UX.MYDAY-P7 | Commercial `/d/{code}` recipient (tickets/map/paid) - не soft purple banner | Высокий | ⏳ |
 | UX.MYDAY-P8 | Timeline flat list (не Утро/День/Вечер); «Маршрут» + «N точек»; badge align | Критический | ✅ `7a3de60` MSK **BUILD_ID=`Ywy2ntkkoX6K__8CuMH3H`** `/my-day` 200 |
+| UX.MYDAY-STARTER | Empty `/my-day`: starter = icon+hint+city/search+«или добавь своё место»; drop «План пока пуст» | Критический | 🔄 commit+deploy |
 | UX.MYDAY-P9 | Extra carousels Рядом / Можно купить + Explore | Средний | ✅ MVP Hot Picks «Выбор Дайбилет» |
 | UX.MYDAY-F | Мой день: filters + auto-pick + top-up (product next) | Высокий | ⏳ поверх COMM канона |
 

@@ -1,3 +1,20 @@
+## 2026-08-02 - /my-day empty starter: форма вместо dashed empty
+
+### Наблюдения
+- Owner: empty «План пока пуст» + длинный абзац лишний; стартер = блок города/поиска (как на форме) + иконка Route + короткий hint.
+- CTA: «Или своё место» → «или добавь своё место».
+
+### Решения
+- Убран dashed empty box («План пока пуст»).
+- При пустом плане `data-day-unified-search` с `data-day-starter=1` идёт первым: Route icon + «Выберите город и минимум 2 точки, чтобы создать маршрут» + CityPicker + поиск + ссылка на своё место.
+- При непустом плане поиск остаётся secondary под Hot Picks (без starter chrome).
+- Поведение city picker / search / custom place accordion без изменений.
+
+### Проблемы
+- Deploy/BUILD_ID - после MSK web deploy.
+
+---
+
 ## 2026-08-02 - Owner UX: «Готовые сценарии» + H1 «Собери свой день» + event hydrate
 
 ### Наблюдения
