@@ -1941,15 +1941,15 @@ function DayRoutePanelInner() {
           data-day-starter-variant="a"
           data-day-starter-desktop="two-col"
           data-day-starter-max="full"
-          data-day-starter-inset="edges"
+          data-day-starter-inset="equal-gap"
           data-day-starter-pad="sym"
           data-day-starter-density="compact"
         >
           <div
-            className="flex w-full flex-col max-lg:mx-auto max-lg:max-w-md lg:grid lg:grid-cols-2 lg:items-center lg:gap-8 lg:px-6 xl:gap-10 xl:px-10 2xl:px-16"
+            className="flex w-full flex-col max-lg:mx-auto max-lg:max-w-md lg:grid lg:grid-cols-2 lg:items-center lg:gap-8 lg:px-8 xl:gap-12 xl:px-12 2xl:gap-20 2xl:px-20"
             data-day-plan-starter
           >
-            <div className="min-w-0">
+            <div className="min-w-0 lg:self-center">
               <div className="flex items-center gap-2.5">
                 <Route className="h-6 w-6 shrink-0 text-slate-400" aria-hidden />
                 <p className="text-base font-bold leading-snug text-slate-900 sm:text-lg">
@@ -1965,7 +1965,10 @@ function DayRoutePanelInner() {
                 для составления маршрута
               </p>
             </div>
-            <div className="mt-3 flex w-full flex-col gap-2.5 lg:mt-0" data-day-city-search-stack>
+            <div
+              className="mt-3 flex w-full flex-col gap-2.5 lg:mt-0 lg:self-center"
+              data-day-city-search-stack
+            >
               <div data-day-city-picker className="w-full text-left">
                 <CityPicker
                   cities={destinations}
@@ -1993,16 +1996,16 @@ function DayRoutePanelInner() {
                     onQueryChange={setUnifiedSearchQuery}
                   />
                   {catalogError ? (
-                    <p className="mt-1.5 text-xs font-medium text-rose-700" role="status">
+                    <p className="mt-1.5 pl-0 text-left text-xs font-medium text-rose-700" role="status">
                       {catalogError}
                     </p>
                   ) : null}
-                  <p className="mt-1.5 text-[12px] text-slate-500">
+                  <p className="mt-1.5 block pl-0 text-left text-[12px] leading-snug text-slate-500">
                     или{' '}
                     <button
                       type="button"
                       onClick={openTextForm}
-                      className="font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
+                      className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
                     >
                       добавь своё место
                     </button>

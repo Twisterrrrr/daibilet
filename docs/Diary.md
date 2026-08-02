@@ -1,3 +1,20 @@
+## 2026-08-03 - /my-day: ultrawide starter equal gap + right column balance
+
+### Наблюдения
+- Ultrawide: outer left/right inset и middle gap между колонками должны быть равны и крупнее `2xl:px-16`.
+- Правая колонка (город/поиск/ссылка) визуально top-heavy - нужен equal top/bottom air.
+- «или добавь своё место» смещена вправо относительно левого края search input.
+
+### Решения
+- Grid: matching `px`/`gap` tokens - `lg:px-8 lg:gap-8`, `xl:px-12 xl:gap-12`, `2xl:px-20 2xl:gap-20`; `data-day-starter-inset="equal-gap"`.
+- Right stack: `lg:self-center` (+ left `lg:self-center`); grid `lg:items-center`.
+- Link: `pl-0 text-left`, button `m-0 p-0` - flush under search field left edge.
+
+### Проблемы
+- Нет (BUILD_ID после MSK deploy).
+
+---
+
 ## 2026-08-02 - /my-day: starter pad + desktop subtitle + ultrawide inset
 
 ### Наблюдения
