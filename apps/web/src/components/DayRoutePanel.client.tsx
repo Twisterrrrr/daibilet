@@ -2,14 +2,27 @@
 
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { ChevronDown, ChevronUp, Copy, ExternalLink, MapPin, Plus, Route, Sparkles, Trash2, X } from 'lucide-react';
+import {
+  Building2,
+  CalendarDays,
+  ChevronDown,
+  ChevronUp,
+  Copy,
+  ExternalLink,
+  MapPin,
+  Plus,
+  Route,
+  Sparkles,
+  Trash2,
+  X,
+} from 'lucide-react';
 import { FormEvent, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
-import { buildCatalogHref } from '@/lib/catalog-url';
+import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import {
   DAY_ROUTE_CHANGED_EVENT,
   DAY_ROUTE_MAX,
@@ -130,6 +143,7 @@ function DayRoutePanelInner() {
   const [cityInput, setCityInput] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [textFormOpen, setTextFormOpen] = useState(false);
   const hydratedDayRef = useRef<string | null>(null);
   const titleFieldRef = useRef<HTMLInputElement | null>(null);
 
@@ -269,21 +283,22 @@ function DayRoutePanelInner() {
     }
     return best;
   }, [route.venues]);
-  const afishaHref = citySlug
-    ? buildCatalogHref({ city: citySlug })
-    : cityTitle
-      ? buildCatalogHref({ city: cityTitle })
-      : '/events';
-  const locationsHref = cityTitle
-    ? `/locations?city=${encodeURIComponent(cityTitle)}`
-    : citySlug
-      ? `/locations?city=${encodeURIComponent(citySlug)}`
-      : '/locations';
-  const venuesHref = cityTitle
-    ? `/venues?city=${encodeURIComponent(cityTitle)}`
-    : citySlug
-      ? `/venues?city=${encodeURIComponent(citySlug)}`
-      : '/venues';
+
+  const headerCityName =
+    selectedCity?.cityValue && selectedCity.cityValue !== 'all' ? selectedCity.cityValue : null;
+  const headerCitySlug =
+    selectedCity?.selectedDestination?.type === 'city'
+      ? String(selectedCity.selectedDestination.slug || '').trim() || null
+      : null;
+  const scopeCityName = cityTitle || headerCityName;
+  const scopeCitySlug = citySlug || headerCitySlug;
+  const scopeCityParam = scopeCityName || scopeCitySlug;
+
+  const afishaHref = catalogHrefWithSelectedCity(scopeCityParam || 'all');
+  const locationsHref = venueCatalogHrefWithSelectedCity('/locations', scopeCityParam);
+  const venuesHref = venueCatalogHrefWithSelectedCity('/venues', scopeCityParam);
+  const cityHubHref = scopeCitySlug ? `/cities/${encodeURIComponent(scopeCitySlug)}` : '/cities';
+  const cityContextLabel = scopeCityName || (scopeCitySlug ? scopeCitySlug : null);
 
   const allMatchVenues = useMemo(() => {
     const list: MatchVenueStub[] = [...(payload?.venues || [])];
@@ -406,6 +421,14 @@ function DayRoutePanelInner() {
     setRoute(reorderDayRoute(nextVenues.map((venue) => venue.id)));
   }
 
+  function openTextForm() {
+    setTextFormOpen(true);
+    window.setTimeout(() => {
+      document.getElementById('day-plan-form-wrap')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      titleFieldRef.current?.focus();
+    }, 80);
+  }
+
   return (
     <div className="container-page px-4 py-5 pb-28 sm:px-6 sm:py-10 sm:pb-10">
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-4">
@@ -413,7 +436,11 @@ function DayRoutePanelInner() {
           <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Собери свой день</p>
           <h1 className="mt-1 font-display text-2xl font-extrabold text-slate-900 sm:text-3xl">Мой день</h1>
           <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-slate-600 sm:mt-2">
-            Можно добавлять места текстом - каталог не обязателен. Наберите {DAY_ROUTE_MIN}-{DAY_ROUTE_MAX} точек.
+            Добавляйте места из каталога - локации, площадки и события. До {DAY_ROUTE_MAX} точек
+            {cityContextLabel ? ` · ${cityContextLabel}` : ''}.
+          </p>
+          <p className="mt-2 text-xs font-semibold text-slate-500" data-day-route-count-label>
+            Точки · {route.venues.length}/{DAY_ROUTE_MAX}
           </p>
         </div>
         {route.venues.length ? (
@@ -451,118 +478,64 @@ function DayRoutePanelInner() {
         </p>
       ) : null}
 
-      <form
-        onSubmit={submitTextStop}
+      {/* Primary: catalog entities (owner IA 2026-08-02) */}
+      <section
+        id="day-catalog-add"
         className="mt-5 rounded-2xl border border-slate-200 bg-white p-3.5 sm:mt-8 sm:p-5"
-        data-day-plan-form="1"
-        id="day-plan-form"
+        data-day-catalog-add="1"
       >
-        <p className="text-sm font-semibold text-slate-900">Добавить точку</p>
+        <p className="text-sm font-semibold text-slate-900">Добавить из каталога</p>
         <p className="mt-1 text-sm leading-relaxed text-slate-600">
-          Введите название места. Адрес, город и координаты - по желанию.
+          Откройте карточку места или события и нажмите «В мой день». Город берётся из шапки.
         </p>
-        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-stretch">
-          <label className="min-w-0 flex-1">
-            <span className="sr-only">Название места</span>
-            <input
-              ref={titleFieldRef}
-              type="text"
-              name="title"
-              value={titleInput}
-              onChange={(e) => {
-                setTitleInput(e.target.value);
-                if (formError) setFormError(null);
-              }}
-              placeholder="Например: Эрмитаж"
-              autoComplete="off"
-              disabled={atMax}
-              data-day-plan-title
-              className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
-            />
-          </label>
-          <button
-            type="submit"
-            disabled={atMax}
-            data-day-plan-add
-            className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
+        <div className="mt-3 grid gap-2 sm:grid-cols-3">
+          <Link
+            href={locationsHref}
+            className="flex min-h-12 items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm font-semibold text-slate-900 transition hover:border-emerald-300 hover:bg-emerald-50"
           >
-            <Plus className="h-4 w-4" />
-            Добавить
-          </button>
+            <MapPin className="h-4 w-4 shrink-0 text-emerald-700" />
+            Локации
+          </Link>
+          <Link
+            href={venuesHref}
+            className="flex min-h-12 items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm font-semibold text-slate-900 transition hover:border-emerald-300 hover:bg-emerald-50"
+          >
+            <Building2 className="h-4 w-4 shrink-0 text-sky-700" />
+            Площадки
+          </Link>
+          <Link
+            href={afishaHref}
+            className="flex min-h-12 items-center gap-2.5 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-3 text-sm font-semibold text-slate-900 transition hover:border-emerald-300 hover:bg-emerald-50"
+          >
+            <CalendarDays className="h-4 w-4 shrink-0 text-amber-700" />
+            События
+          </Link>
         </div>
-        <label className="mt-2 block">
-          <span className="sr-only">Адрес или заметка</span>
-          <input
-            type="text"
-            name="note"
-            value={noteInput}
-            onChange={(e) => setNoteInput(e.target.value)}
-            placeholder="Адрес или заметка (необязательно)"
-            autoComplete="off"
-            disabled={atMax}
-            data-day-plan-note
-            className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
-          />
-        </label>
-        <button
-          type="button"
-          onClick={() => setShowAdvanced((v) => !v)}
-          className="mt-2 text-xs font-semibold text-slate-500 hover:text-slate-800"
-        >
-          {showAdvanced ? 'Скрыть город и координаты' : 'Город и координаты (необязательно)'}
-        </button>
-        {showAdvanced ? (
-          <div className="mt-2 grid gap-2 sm:grid-cols-2">
-            <label className="block">
-              <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                Город
-              </span>
-              <input
-                type="text"
-                name="city"
-                value={cityInput}
-                onChange={(e) => setCityInput(e.target.value)}
-                placeholder="Город (необязательно)"
-                autoComplete="off"
-                disabled={atMax}
-                data-day-plan-city
-                className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
-              />
-            </label>
-            <label className="block">
-              <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                Координаты
-              </span>
-              <input
-                type="text"
-                name="coords"
-                value={coordsInput}
-                onChange={(e) => setCoordsInput(e.target.value)}
-                placeholder="59.93, 30.31"
-                autoComplete="off"
-                disabled={atMax}
-                data-day-plan-coords
-                className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
-              />
-            </label>
-          </div>
-        ) : null}
-        {formError ? (
-          <p role="alert" className="mt-2 text-sm font-medium text-rose-700">
-            {formError}
-          </p>
-        ) : null}
-        <p className="mt-3 text-xs text-slate-500" data-day-route-count-label>
-          Точки · {route.venues.length}/{DAY_ROUTE_MAX}
-        </p>
-      </form>
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+          <Link
+            href={cityHubHref}
+            className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-primary-600"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            {scopeCitySlug ? 'Главные места города' : 'Выбрать город'}
+          </Link>
+          {!headerCityName && !cityTitle ? (
+            <p className="text-xs text-slate-500">Выберите город в шапке - ссылки станут короче.</p>
+          ) : (
+            <p className="text-xs text-slate-500">
+              На хабе города можно «Собрать за минуту» из главных мест.
+            </p>
+          )}
+        </div>
+      </section>
 
       {!route.venues.length ? (
         <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-8 text-center sm:p-10">
           <Route className="mx-auto h-8 w-8 text-slate-400" />
           <p className="mt-3 text-base font-semibold text-slate-800">Пока нет точек</p>
           <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-500">
-            Добавьте места текстом выше. Каталог не нужен. Минимум {DAY_ROUTE_MIN} точки, чтобы день сложился.
+            Начните с локаций, площадок или событий выше. Минимум {DAY_ROUTE_MIN} точки, чтобы день сложился.
+            Своё место - по желанию внизу страницы.
           </p>
         </div>
       ) : (
@@ -627,7 +600,7 @@ function DayRoutePanelInner() {
             {missingCoordsCount > 0 ? (
               <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
                 {coordsCount < 2
-                  ? `У ${missingCoordsCount} ${missingCoordsCount === 1 ? 'точки' : 'точек'} нет координат - Яндекс.Карты пока недоступны. Можно вставить lat, lng при добавлении.`
+                  ? `У ${missingCoordsCount} ${missingCoordsCount === 1 ? 'точки' : 'точек'} нет координат - Яндекс.Карты пока недоступны. Добавьте места из каталога или укажите lat, lng в «своём месте».`
                   : `Без координат: ${missingCoordsCount}. В Яндекс уйдут только ${coordsCount} точки с координатами (в текущем порядке).`}
               </p>
             ) : null}
@@ -646,17 +619,6 @@ function DayRoutePanelInner() {
                 />
               ))}
             </ul>
-            <p className="mt-4 text-sm text-slate-500">
-              Есть каталог? Можно добавить точки и оттуда -{' '}
-              <Link href={locationsHref} className="font-semibold text-slate-800 underline-offset-2 hover:underline">
-                локации
-              </Link>{' '}
-              /{' '}
-              <Link href={venuesHref} className="font-semibold text-slate-800 underline-offset-2 hover:underline">
-                площадки
-              </Link>
-              .
-            </p>
           </section>
 
           {showMatches ? (
@@ -815,42 +777,179 @@ function DayRoutePanelInner() {
         </>
       )}
 
-      {!atMax || yandexUrl || (route.venues.length > 0 && showMatches) ? (
-        <MobileStickyActionBar>
-          {!atMax ? (
+      {/* Secondary: optional text stop - collapsed accordion */}
+      <div className="mt-8 rounded-2xl border border-slate-200 bg-white sm:mt-10" id="day-plan-form-wrap">
+        <button
+          type="button"
+          aria-expanded={textFormOpen}
+          aria-controls="day-plan-form"
+          data-day-plan-accordion
+          onClick={() => {
+            setTextFormOpen((open) => {
+              const next = !open;
+              if (next) {
+                window.setTimeout(() => titleFieldRef.current?.focus(), 50);
+              }
+              return next;
+            });
+          }}
+          className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
+        >
+          <span>
+            <span className="block text-sm font-semibold text-slate-900">Добавить своё место</span>
+            <span className="mt-0.5 block text-xs text-slate-500">
+              Необязательно - если места нет в каталоге
+            </span>
+          </span>
+          <ChevronDown
+            className={`h-5 w-5 shrink-0 text-slate-400 transition ${textFormOpen ? 'rotate-180' : ''}`}
+          />
+        </button>
+        {textFormOpen ? (
+          <form
+            onSubmit={submitTextStop}
+            className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5"
+            data-day-plan-form="1"
+            id="day-plan-form"
+          >
+            <p className="text-sm leading-relaxed text-slate-600">
+              Введите название. Адрес, город и координаты - по желанию.
+            </p>
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-stretch">
+              <label className="min-w-0 flex-1">
+                <span className="sr-only">Название места</span>
+                <input
+                  ref={titleFieldRef}
+                  type="text"
+                  name="title"
+                  value={titleInput}
+                  onChange={(e) => {
+                    setTitleInput(e.target.value);
+                    if (formError) setFormError(null);
+                  }}
+                  placeholder="Например: Эрмитаж"
+                  autoComplete="off"
+                  disabled={atMax}
+                  data-day-plan-title
+                  className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
+                />
+              </label>
+              <button
+                type="submit"
+                disabled={atMax}
+                data-day-plan-add
+                className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
+              >
+                <Plus className="h-4 w-4" />
+                Добавить
+              </button>
+            </div>
+            <label className="mt-2 block">
+              <span className="sr-only">Адрес или заметка</span>
+              <input
+                type="text"
+                name="note"
+                value={noteInput}
+                onChange={(e) => setNoteInput(e.target.value)}
+                placeholder="Адрес или заметка (необязательно)"
+                autoComplete="off"
+                disabled={atMax}
+                data-day-plan-note
+                className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
+              />
+            </label>
             <button
               type="button"
-              onClick={() => {
-                document.getElementById('day-plan-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                titleFieldRef.current?.focus();
-              }}
-              className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 text-sm font-bold text-white hover:bg-primary-600"
+              onClick={() => setShowAdvanced((v) => !v)}
+              className="mt-2 text-xs font-semibold text-slate-500 hover:text-slate-800"
             >
-              <Plus className="h-4 w-4" />
-              Добавить точку
+              {showAdvanced ? 'Скрыть город и координаты' : 'Город и координаты (необязательно)'}
             </button>
-          ) : null}
-          {yandexUrl ? (
-            <a
-              href={yandexUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-4 text-sm font-bold text-white hover:bg-sky-700 ${atMax ? 'flex-1' : ''}`}
-            >
-              <ExternalLink className="h-4 w-4" />
-              Карты
-            </a>
-          ) : null}
-          {route.venues.length > 0 && showMatches ? (
-            <a
-              href="#day-route-matches"
-              className={`inline-flex h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-800 hover:bg-slate-50 ${!atMax && !yandexUrl ? 'flex-1' : ''}`}
-            >
-              Экскурсии
-            </a>
-          ) : null}
-        </MobileStickyActionBar>
-      ) : null}
+            {showAdvanced ? (
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                <label className="block">
+                  <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                    Город
+                  </span>
+                  <input
+                    type="text"
+                    name="city"
+                    value={cityInput}
+                    onChange={(e) => setCityInput(e.target.value)}
+                    placeholder="Город (необязательно)"
+                    autoComplete="off"
+                    disabled={atMax}
+                    data-day-plan-city
+                    className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                    Координаты
+                  </span>
+                  <input
+                    type="text"
+                    name="coords"
+                    value={coordsInput}
+                    onChange={(e) => setCoordsInput(e.target.value)}
+                    placeholder="59.93, 30.31"
+                    autoComplete="off"
+                    disabled={atMax}
+                    data-day-plan-coords
+                    className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
+                  />
+                </label>
+              </div>
+            ) : null}
+            {formError ? (
+              <p role="alert" className="mt-2 text-sm font-medium text-rose-700">
+                {formError}
+              </p>
+            ) : null}
+          </form>
+        ) : null}
+      </div>
+
+      <MobileStickyActionBar>
+        {!atMax ? (
+          <a
+            href="#day-catalog-add"
+            className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 text-sm font-bold text-white hover:bg-primary-600"
+          >
+            <MapPin className="h-4 w-4" />
+            Из каталога
+          </a>
+        ) : null}
+        {!atMax ? (
+          <button
+            type="button"
+            onClick={openTextForm}
+            className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+          >
+            <Plus className="h-4 w-4" />
+            Своё
+          </button>
+        ) : null}
+        {yandexUrl ? (
+          <a
+            href={yandexUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-4 text-sm font-bold text-white hover:bg-sky-700 ${atMax ? 'flex-1' : ''}`}
+          >
+            <ExternalLink className="h-4 w-4" />
+            Карты
+          </a>
+        ) : null}
+        {route.venues.length > 0 && showMatches ? (
+          <a
+            href="#day-route-matches"
+            className="inline-flex h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 hover:bg-slate-50"
+          >
+            Экскурсии
+          </a>
+        ) : null}
+      </MobileStickyActionBar>
     </div>
   );
 }

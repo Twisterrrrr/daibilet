@@ -52,7 +52,7 @@
 | Event detail | Купить / к виджету | В мой день (если уместно) |
 | Venue (institution) | К афише (`#venue-program`) | В мой день |
 | Location | Экскурсии / Маршруты | В мой день |
-| `/my-day` | Добавить точку | Карты / Экскурсии |
+| `/my-day` | Из каталога (локации/площадки/события) | Своё место (accordion) / Карты |
 | Catalog card | Открыть сущность | В мой день (hit-target) |
 
 Mobile sticky bottom: общий `MobileStickyActionBar` (`lg:hidden` + safe-area). Страница даёт `pb-24` (или `pb-28`), чтобы контент не прятался под бар.
@@ -80,14 +80,17 @@ Mobile sticky bottom: общий `MobileStickyActionBar` (`lg:hidden` + safe-are
 6. Related  
 7. Mobile sticky action bar  
 
-### `/my-day`
+### `/my-day` (owner IA 2026-08-02)
 
-1. Sticky chrome  
-2. Title + short help  
-3. Add form (`#day-plan-form`)  
-4. Stops list  
-5. Matches (`#day-route-matches`)  
-6. Sticky: Добавить / Карты / Экскурсии  
+1. Sticky chrome (city chip)  
+2. Title + count (`Точки · N/8`) + short help  
+3. **Primary:** «Добавить из каталога» - city-scoped CTAs Локации / Площадки / События + link на хаб города («Главные места» / «Собрать за минуту»)  
+4. Stops list (+ Yandex / optimize when coords allow)  
+5. Matches excursions (`#day-route-matches`)  
+6. **Secondary accordion** (collapsed): «Добавить своё место» - text planner (`#day-plan-form`)  
+7. Sticky: Из каталога / Своё / Карты / Экскурсии  
+
+Foundation заполнения - каталожные сущности. Ручной текст опционален, не first-screen. `DAY_ROUTE_MAX=8`.
 
 ---
 
@@ -126,7 +129,7 @@ Mobile sticky bottom: общий `MobileStickyActionBar` (`lg:hidden` + safe-are
 | `/venues/[slug]` | Institution hero + sticky CTA | Safe-area ✅ |
 | `/locations` | Dense minimal + chips; map lg+ | ✅ LOC4 |
 | `/locations/[slug]` | Location hero + sticky CTA | ✅ aligned |
-| `/my-day` | Form → list; sticky actions | ✅ |
+| `/my-day` | Catalog CTAs first; text form accordion collapsed | ✅ catalog-first IA |
 | Header / menu | City chip + city near top in sheet | ✅ LOC1/LOC2 |
 
 ---
