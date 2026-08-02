@@ -1952,10 +1952,12 @@ function DayRoutePanelInner() {
           data-day-starter-density="compact"
           data-day-starter-geometry="stable"
           data-day-starter-align="col"
+          data-day-starter-form-w="26rem"
         >
           {/*
             Mobile: shared px column; card equal py only (pt === pb).
             Desktop lg+: 1fr auto 1fr auto 1fr equal-M (edge M = middle M).
+            Right auto col ~30% wider (20rem → 26rem); no min-h (equal py only).
           */}
           <div
             className="flex w-full flex-col max-lg:mx-auto max-lg:max-w-md max-lg:px-3.5 sm:max-lg:px-5 lg:grid lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:items-center"
@@ -1983,7 +1985,7 @@ function DayRoutePanelInner() {
               </p>
             </div>
             <div
-              className="mt-3 flex w-full flex-col gap-2.5 max-lg:min-h-0 lg:col-start-4 lg:mt-0 lg:min-h-[7.75rem] lg:w-[20rem] lg:min-w-[16rem] lg:justify-center"
+              className="mt-3 flex w-full flex-col gap-2.5 max-lg:min-h-0 lg:col-start-4 lg:mt-0 lg:w-[26rem] lg:min-w-[21rem] lg:justify-center"
               data-day-city-search-stack
             >
               <div data-day-city-picker className="w-full text-left">

@@ -1,3 +1,18 @@
+## 2026-08-03 - /my-day: starter equal py + right ~30% wider
+
+### Наблюдения
+- Owner (desktop/ultrawide screenshot): bottom air under «или добавь своё место» больше top; right form узкий; equal-M и `pl-5` оставить.
+
+### Решения
+- Убран `lg:min-h-[7.75rem]` (лишний вертикальный объём); card pad `lg:py-5` / mobile `max-lg:py-3.5` / `sm:max-lg:py-4` (pt === pb); обе колонки `lg:items-center`.
+- Right auto-col: `lg:w-[20rem] lg:min-w-[16rem]` → `lg:w-[26rem] lg:min-w-[21rem]` (~+30%); left shrink-wrap; grid `1fr auto 1fr auto 1fr` без изменений.
+- Link `pl-5` / `mb-0` сохранён. Stop cards не трогали. Marker `data-day-starter-form-w="26rem"`.
+
+### Проблемы
+- Нет. (BUILD_ID после MSK deploy.)
+
+---
+
 ## 2026-08-03 - /my-day: rollback banner starter → equal-M only
 
 ### Наблюдения
