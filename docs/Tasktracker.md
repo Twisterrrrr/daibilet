@@ -72,7 +72,8 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MYDAY-HDR | `/my-day` header: `N точек из 10` + unpaid билеты; H1 предложный; без %/окно/Яндекс/дубль Точки | Критический | ✅ `495c8f0` MSK **BUILD_ID=`_gsuIDWy0smbTa0LMOzng`** `/my-day` 200 |
 | UX.MYDAY-P4 | Free-window upsell polish (multi-gap / ETA) | Средний | ⏳ partial MVP in COMM |
 | UX.MYDAY-P5 | hookFact + mini description on day cards | Средний | ✅ 3f9a70e MSK **BUILD_ID=E6nQnmKCtloz0ynXA2y24** Hot Picks cover+hook; must-see mini-cards; free-window; search thumb+hook |
-| UX.MYDAY-P6 | City «собрать за минуту» template variants | Высокий | ⏳ |
+| UX.MYDAY-P6 | City «собрать за минуту» template variants | Высокий | ⏳ partial: hub «Готовые сценарии» under must-see; H1 «Собери свой день» |
+| UX.MYDAY-COPY | Hub presets rename+move; `/my-day` H1 предложный; event hydrate title+coords | Высокий | 🔄 ship |
 | UX.MYDAY-P7 | Commercial `/d/{code}` recipient (tickets/map/paid) - не soft purple banner | Высокий | ⏳ |
 | UX.MYDAY-P8 | Timeline flat list (не Утро/День/Вечер); «Маршрут» + «N точек»; badge align | Критический | ✅ `7a3de60` MSK **BUILD_ID=`Ywy2ntkkoX6K__8CuMH3H`** `/my-day` 200 |
 | UX.MYDAY-P9 | Extra carousels Рядом / Можно купить + Explore | Средний | ✅ MVP Hot Picks «Выбор Дайбилет» |

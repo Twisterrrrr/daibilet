@@ -1,3 +1,18 @@
+## 2026-08-02 - Owner UX: «Готовые сценарии» + H1 «Собери свой день»
+
+### Наблюдения
+- Owner: хаб-блок «Готовые дни» выше must-see; H1 `/my-day` «Мой день в {city}»; event-stop после URL sync → «Событие из маршрута» + «Нет координат».
+
+### Решения
+- Хаб: title «Готовые сценарии», subtitle про «Собери свой день»; блок **под** перечень мест (после must-see rail).
+- H1: «Собери свой день {inCityPrepositional}» (напр. «Собери свой день в Нижнем Новгороде»); page title metadata.
+- Bonus: `matchDayRouteVenues` резолвит event id/slug → title + venue lat/lng; hydrate/`enrichDayRouteFromMatchVenues` подхватывают eventId.
+
+### Проблемы
+- Deploy BUILD_ID ниже после MSK ship.
+
+---
+
 ## 2026-08-02 - /my-day: «Выбор Дайбилет» всегда видимый
 
 ### Наблюдения

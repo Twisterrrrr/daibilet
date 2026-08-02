@@ -46,7 +46,7 @@ percent      = round(100 * (points + tickets + time) / 3)
 
 Header UI (owner 2026-08-02): только `N точек из 10` (SOFT) + `M билетов` если unpaid > 0.
 Percent / free-window / «Яндекс.Карты» в этой строке не показывать (карта - отдельная кнопка).
-H1: «Мой день в {предложный}» через `inCityPrepositional`.
+H1: «Собери свой день в {предложный}» через `inCityPrepositional`.
 
 ## Free window
 

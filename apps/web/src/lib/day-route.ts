@@ -1502,6 +1502,8 @@ type DayRouteCoordSource = {
   city?: string | null;
   cityId?: string | null;
   citySlug?: string | null;
+  eventId?: string | null;
+  eventSlug?: string | null;
 };
 
 /** Build id+slug → coords from route items and/or matches payload venues. */
@@ -1517,8 +1519,12 @@ export function buildDayRouteCoordsMap(
     const coords = { latitude: lat, longitude: lng };
     const id = String(source.id || '').trim();
     const slug = String(source.slug || '').trim();
+    const eventId = String(source.eventId || '').trim();
+    const eventSlug = String(source.eventSlug || '').trim();
     if (id) map.set(id, coords);
     if (slug) map.set(slug, coords);
+    if (eventId) map.set(eventId, coords);
+    if (eventSlug) map.set(eventSlug, coords);
   };
   for (const venue of routeVenues) put(venue);
   for (const venue of payloadVenues) put(venue);
@@ -1531,13 +1537,13 @@ export function enrichDayRouteFromMatchVenues(payloadVenues: DayRouteCoordSource
   if (!current.venues.length || !payloadVenues.length) return current;
   let changed = false;
   const nextVenues = current.venues.map((item) => {
-    const match = payloadVenues.find(
-      (v) =>
-        (item.id && v.id && item.id === v.id) ||
-        (item.slug && v.slug && item.slug === v.slug) ||
-        (item.id && v.slug && item.id === v.slug) ||
-        (item.slug && v.id && item.slug === v.id),
-    );
+    const match = payloadVenues.find((v) => {
+      const ids = [v.id, v.slug, v.eventId, v.eventSlug].map((x) => String(x || '').trim()).filter(Boolean);
+      const itemIds = [item.id, item.slug, item.eventId, item.eventSlug]
+        .map((x) => String(x || '').trim())
+        .filter(Boolean);
+      return itemIds.some((id) => ids.includes(id));
+    });
     if (!match) return item;
     const lat = Number(match.latitude);
     const lng = Number(match.longitude);
@@ -1556,7 +1562,14 @@ export function enrichDayRouteFromMatchVenues(payloadVenues: DayRouteCoordSource
     if (matchAddress && (!existingAddress || matchAddress.length > existingAddress.length)) {
       next.address = matchAddress;
     }
-    if (match.title && !item.title) next.title = match.title;
+    const stubTitle =
+      !item.title ||
+      item.title === 'Событие из маршрута' ||
+      item.title === 'Место из маршрута' ||
+      item.title === item.id;
+    if (match.title && stubTitle) next.title = match.title;
+    if (match.eventId && !item.eventId) next.eventId = match.eventId;
+    if (match.eventSlug && !item.eventSlug) next.eventSlug = match.eventSlug;
     const matchCity = String(match.cityTitle || match.city || '').trim();
     if (matchCity && !String(item.city || '').trim()) next.city = matchCity;
     if (match.cityId && !item.cityId) next.cityId = match.cityId;
@@ -1567,6 +1580,9 @@ export function enrichDayRouteFromMatchVenues(payloadVenues: DayRouteCoordSource
       next.latitude !== item.latitude ||
       next.longitude !== item.longitude ||
       next.address !== item.address ||
+      next.title !== item.title ||
+      next.eventId !== item.eventId ||
+      next.eventSlug !== item.eventSlug ||
       next.city !== item.city ||
       next.cityId !== item.cityId ||
       next.citySlug !== item.citySlug

@@ -76,10 +76,10 @@ export function CityDayPresetBlock({
         }`}
       >
         <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
-          Готовые дни
+          Готовые сценарии
         </p>
         <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-          Выберите шаблон - точки сразу попадут в «Мой день».
+          Выберите шаблон - все точки найдете в «Собери свой день».
         </p>
         <ul className="mt-4 grid gap-3">
           {namedResolved.map(({ preset, items }) => {
@@ -141,10 +141,10 @@ export function CityDayPresetBlock({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
-            Готовый день
+            Готовый сценарий
           </p>
           <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-            Собрать за минуту: {mainPlacesPhrase(fallbackPreset.length)} в маршрут.
+            Собрать за минуту: {mainPlacesPhrase(fallbackPreset.length)} в «Собери свой день».
           </p>
           <p
             className={`mt-1 line-clamp-2 text-xs ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}

@@ -20,6 +20,9 @@ export type DayRouteMatchVenue = {
   latitude: number | null;
   longitude: number | null;
   heroImageUrl: string | null;
+  /** Present when locator was an event id/slug (share hydrate). */
+  eventId?: string | null;
+  eventSlug?: string | null;
 };
 
 export type DayRouteMatchItem = {
@@ -140,29 +143,116 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
     byLocator.set(venue.id, venue);
     if (venue.slug) byLocator.set(venue.slug, venue);
   }
-  const ordered: typeof venues = [];
-  const seenIds = new Set<string>();
-  for (const locator of locators) {
-    const venue = byLocator.get(locator);
-    if (!venue || seenIds.has(venue.id)) continue;
-    seenIds.add(venue.id);
-    ordered.push(venue);
+
+  const unresolved = locators.filter((locator) => !byLocator.has(locator));
+  type EventResolveRow = {
+    id: string;
+    slug: string;
+    title: string;
+    imageUrl: string | null;
+    override: { imageUrl: string | null } | null;
+    venue: {
+      id: string;
+      slug: string | null;
+      title: string;
+      cityId: string | null;
+      address: string | null;
+      latitude: number | null;
+      longitude: number | null;
+      heroImageUrl: string | null;
+      city: { title: string; slug: string } | null;
+    } | null;
+  };
+  const eventsByLocator = new Map<string, EventResolveRow>();
+  if (unresolved.length) {
+    const events = await prisma.event.findMany({
+      where: {
+        status: { notIn: ['HIDDEN', 'DRAFT'] },
+        OR: [{ id: { in: unresolved } }, { slug: { in: unresolved } }],
+      },
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        imageUrl: true,
+        override: { select: { imageUrl: true } },
+        venue: {
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            cityId: true,
+            address: true,
+            latitude: true,
+            longitude: true,
+            heroImageUrl: true,
+            city: { select: { title: true, slug: true } },
+          },
+        },
+      },
+      take: 16,
+    });
+    for (const event of events) {
+      eventsByLocator.set(event.id, event);
+      if (event.slug) eventsByLocator.set(event.slug, event);
+    }
   }
 
-  const ids = ordered.map((v) => v.id);
+  type OrderedStop =
+    | { kind: 'venue'; venue: (typeof venues)[number] }
+    | { kind: 'event'; event: EventResolveRow };
 
-  const venueDtos: DayRouteMatchVenue[] = ordered.map((v) => ({
-    id: v.id,
-    slug: v.slug,
-    title: v.title,
-    cityId: v.cityId,
-    cityTitle: v.city?.title ?? null,
-    citySlug: v.city?.slug ?? null,
-    address: v.address ?? null,
-    latitude: v.latitude,
-    longitude: v.longitude,
-    heroImageUrl: v.heroImageUrl,
-  }));
+  const orderedStops: OrderedStop[] = [];
+  const seenStopKeys = new Set<string>();
+  for (const locator of locators) {
+    const venue = byLocator.get(locator);
+    if (venue) {
+      const key = `v:${venue.id}`;
+      if (seenStopKeys.has(key)) continue;
+      seenStopKeys.add(key);
+      orderedStops.push({ kind: 'venue', venue });
+      continue;
+    }
+    const event = eventsByLocator.get(locator);
+    if (!event) continue;
+    const key = `e:${event.id}`;
+    if (seenStopKeys.has(key)) continue;
+    seenStopKeys.add(key);
+    orderedStops.push({ kind: 'event', event });
+  }
+
+  const ids = orderedStops
+    .map((stop) => (stop.kind === 'venue' ? stop.venue.id : stop.event.venue?.id))
+    .filter((id): id is string => Boolean(id));
+
+  const venueDtos: DayRouteMatchVenue[] = orderedStops.map((stop) => {
+    if (stop.kind === 'venue') return toMatchVenueDto(stop.venue);
+    const event = stop.event;
+    const imageUrl = event.override?.imageUrl || event.imageUrl;
+    if (event.venue) {
+      return {
+        ...toMatchVenueDto(event.venue),
+        title: event.title,
+        heroImageUrl: imageUrl || event.venue.heroImageUrl,
+        eventId: event.id,
+        eventSlug: event.slug,
+      };
+    }
+    return {
+      id: event.id,
+      slug: event.slug,
+      title: event.title,
+      cityId: null,
+      cityTitle: null,
+      citySlug: null,
+      address: null,
+      latitude: null,
+      longitude: null,
+      heroImageUrl: imageUrl,
+      eventId: event.id,
+      eventSlug: event.slug,
+    };
+  });
 
   const cityCounts = new Map<string, number>();
   for (const v of venueDtos) {
@@ -182,7 +272,9 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
   const selectedCoords = new Map<string, { latitude: number; longitude: number }>();
   for (const v of venueDtos) {
     if (v.latitude != null && v.longitude != null && isValidCoordinatePair(v.latitude, v.longitude)) {
-      selectedCoords.set(v.id, { latitude: v.latitude, longitude: v.longitude });
+      // Coverage map keys are venue ids (not event ids).
+      const coordKey = v.eventId && v.id === v.eventId ? null : v.id;
+      if (coordKey) selectedCoords.set(coordKey, { latitude: v.latitude, longitude: v.longitude });
     }
   }
 

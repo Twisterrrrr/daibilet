@@ -152,6 +152,8 @@ type MatchVenueStub = {
   latitude?: number | null;
   longitude?: number | null;
   heroImageUrl: string | null;
+  eventId?: string | null;
+  eventSlug?: string | null;
 };
 
 type MatchPayload = {
@@ -173,7 +175,9 @@ type MatchPayload = {
 };
 
 function matchVenueToDayRouteItem(venue: MatchVenueStub): DayRouteVenueItem {
-  return {
+  const eventId = String(venue.eventId || '').trim() || null;
+  const eventSlug = String(venue.eventSlug || '').trim() || null;
+  const item: DayRouteVenueItem = {
     id: venue.id,
     slug: venue.slug,
     title: venue.title,
@@ -187,7 +191,11 @@ function matchVenueToDayRouteItem(venue: MatchVenueStub): DayRouteVenueItem {
     href: venue.slug
       ? venueHref({ id: venue.id, slug: venue.slug, name: venue.title, type: 'park' })
       : null,
+    eventId,
+    eventSlug,
   };
+  item.ticketUrl = resolveDayRouteTicketUrl(item);
+  return item;
 }
 
 function venueCardToDayRouteItem(venue: VenueCatalogCard): DayRouteVenueItem {
@@ -403,21 +411,7 @@ function DayRoutePanelInner() {
       })
         .then(async (response) => (response.ok ? ((await response.json()) as MatchPayload) : null))
         .then((data) => {
-          const resolved: DayRouteVenueItem[] = (data?.venues || []).map((venue) => ({
-            id: venue.id,
-            slug: venue.slug,
-            title: venue.title,
-            city: venue.cityTitle,
-            cityId: venue.cityId,
-            citySlug: venue.citySlug ?? null,
-            address: venue.address ?? null,
-            imageUrl: venue.heroImageUrl,
-            latitude: venue.latitude ?? null,
-            longitude: venue.longitude ?? null,
-            href: venue.slug
-              ? venueHref({ id: venue.id, slug: venue.slug, name: venue.title, type: 'park' })
-              : null,
-          }));
+          const resolved: DayRouteVenueItem[] = (data?.venues || []).map(matchVenueToDayRouteItem);
           // Unresolved locators: real event ids keep ticket CTA; venue slugs never become /events/{slug}.
           const known = new Set(
             resolved.flatMap((v) =>
@@ -492,21 +486,7 @@ function DayRoutePanelInner() {
           setReady(true);
           return;
         }
-        const items: DayRouteVenueItem[] = data.venues.map((venue) => ({
-          id: venue.id,
-          slug: venue.slug,
-          title: venue.title,
-          city: venue.cityTitle,
-          cityId: venue.cityId,
-          citySlug: venue.citySlug ?? null,
-          address: venue.address ?? null,
-          imageUrl: venue.heroImageUrl,
-          latitude: venue.latitude ?? null,
-          longitude: venue.longitude ?? null,
-          href: venue.slug
-            ? venueHref({ id: venue.id, slug: venue.slug, name: venue.title, type: 'park' })
-            : null,
-        }));
+        const items: DayRouteVenueItem[] = data.venues.map(matchVenueToDayRouteItem);
         const withMeta = applyShareMetaToVenues(items, catalogTokens);
         hydratedDayRef.current = key;
         setRoute(hydrateDayRouteFromShare(withMeta, data.cityId));
@@ -1509,7 +1489,7 @@ function DayRoutePanelInner() {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h1 className="font-display text-[1.65rem] font-bold leading-tight text-slate-900 sm:text-3xl">
-            Мой день{scopeCityName ? ` ${inCityPrepositional(scopeCityName)}` : ''}
+            Собери свой день{scopeCityName ? ` ${inCityPrepositional(scopeCityName)}` : ''}
           </h1>
           <p
             className="mt-1.5 text-[13px] font-medium text-slate-500"

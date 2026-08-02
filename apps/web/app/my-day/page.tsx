@@ -4,7 +4,7 @@ import { DayRoutePanel } from '@/components/DayRoutePanel.client';
 import { SiteLayout } from '@/components/SiteLayout';
 
 export const metadata: Metadata = {
-  title: 'Мой день',
+  title: 'Собери свой день',
   description: 'Соберите точки города и подберите экскурсии с лучшим покрытием маршрута.',
   robots: { index: false, follow: false },
 };
