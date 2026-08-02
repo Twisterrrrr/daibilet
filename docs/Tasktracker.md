@@ -1,23 +1,45 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-08-01
-**Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md), [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md)
+**Обновлено:** 2026-08-02
+**Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md), [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md), [mobile-templates.md](./mobile-templates.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
 
 ---
 
+## Mobile templates canon (2026-08-02)
+
+Канон: [mobile-templates.md](./mobile-templates.md). Owner priority: удобная структура шаблонов мобилки.
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.MOB0 | Audit + канон sticky chrome / hero budget / CTA / sections / chips | Критический | ✅ docs |
+| UX.LOC1 | Mobile sticky header: city chip | Критический | ✅ |
+| UX.LOC2 | `MobileNavSheet`: «Город» сразу после поиска | Критический | ✅ |
+| UX.LOC4 | `/locations` mobile: dense hero, карта lg+ only | Высокий | ✅ |
+| UX.MOB1 | Shared `MobileStickyActionBar` + location/institution/my-day sticky CTAs | Высокий | ✅ |
+| UX.MOB2 | Event mobile hero: не full-viewport (`min(42vh,20rem)`) | Средний | ✅ |
+| UX.LOC3 | Rename nav/H1 «Локации» → job-label - после owner Q1 | Высокий | ⏳ |
+| UX.LOC5 | `/events` mobile: context line «События в {город}»; banner если city=all | Высокий | ⏳ |
+| UX.LOC6 | Bottom-sheet CityPicker: поиск + популярные + «Все города» | Высокий | ⏳ |
+| UX.LOC7 | Catalog mobile date UX: один entry (chips/sheet) | Средний | ⏳ |
+| UX.LOC8 | IA: demote `/locations` из primary nav или секция city hub | Средний | ⏳ |
+| UX.LOC9 | Unified `/places` (venues+locations tabs) | Низкий | ⚠️ после LOC8 |
+| UX.MYDAY-F | Мой день: filters + auto-pick + top-up (product next) | Высокий | ⏳ поверх MOB канона |
+
+---
+
 ## UX: Locations + mobile catalog (2026-08-01)
 
-Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md). Без UI rewrite в research-pass; build order ниже.
+Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md). Build order: LOC1→LOC2→LOC4 shipped 2026-08-02; rest below.
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | UX.LOC0 | Research brief: audit `/locations` + mobile `/events` city UX + competitor patterns | Высокий | ✅ docs |
-| UX.LOC1 | Mobile sticky header: city chip (сейчас CityPicker только `lg+`; в меню город внизу) | Критический | ⏳ |
-| UX.LOC2 | `MobileNavSheet`: блок «Город» сразу после поиска | Критический | ⏳ |
+| UX.LOC1 | Mobile sticky header: city chip (сейчас CityPicker только `lg+`; в меню город внизу) | Критический | ✅ 2026-08-02 |
+| UX.LOC2 | `MobileNavSheet`: блок «Город» сразу после поиска | Критический | ✅ 2026-08-02 |
 | UX.LOC3 | Rename nav/H1 «Локации» → job-label (Точки сбора / Места встречи) - после owner Q1 | Высокий | ⏳ |
-| UX.LOC4 | `/locations` mobile: dense hero, карта ниже fold / desktop-only | Высокий | ⏳ |
+| UX.LOC4 | `/locations` mobile: dense hero, карта ниже fold / desktop-only | Высокий | ✅ 2026-08-02 |
 | UX.LOC5 | `/events` mobile: context line «События в {город}»; banner если city=all | Высокий | ⏳ |
 | UX.LOC6 | Bottom-sheet CityPicker: поиск + популярные + «Все города» | Высокий | ⏳ |
 | UX.LOC7 | Catalog mobile date UX: один entry (chips/sheet), не select+date input разом | Средний | ⏳ |

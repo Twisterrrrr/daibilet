@@ -289,6 +289,9 @@ Daily scan saleable public catalog texts (`title`/`description` + override) на
 
 ## Связанные документы
 
+- [mobile-templates.md](./mobile-templates.md) - канон мобильных шаблонов (sticky chrome, hero budget, CTA, секции)
+- [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md) - research brief `/locations` + mobile city UX
+
 - [Tasktracker.md](./Tasktracker.md) — прогресс задач
 - [Diary.md](./Diary.md) — технический дневник
 - [content-blog-plan.md](./content-blog-plan.md) — контент-план блога

@@ -14,6 +14,7 @@ import {
 
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { InstitutionCard } from '@/components/InstitutionCard.client';
+import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
 import { OsmMapEmbed } from '@/components/OsmMapEmbed';
 import { VenueAdmissionBlock } from '@/components/VenueAdmissionBlock';
 import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
@@ -341,23 +342,21 @@ export function InstitutionVenueLayout({
         </aside>
       </div>
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 p-3 backdrop-blur lg:hidden">
-        <div className="container-page flex items-center justify-between gap-3">
-          <div>
-            <div className="text-[10px] uppercase tracking-wider text-slate-500">Билет от</div>
-            <div className="text-lg font-extrabold text-slate-900">{formatMoney(stats.priceFrom)}</div>
-          </div>
-          <a
-            href="#venue-program"
-            className={`inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-full px-5 text-sm font-bold text-white shadow-lg ${
-              isTheatre ? 'bg-rose-600 hover:bg-rose-700' : 'bg-primary-600 hover:bg-primary-700'
-            }`}
-          >
-            <Ticket className="h-4 w-4" />
-            К афише
-          </a>
+      <MobileStickyActionBar>
+        <div>
+          <div className="text-[10px] uppercase tracking-wider text-slate-500">Билет от</div>
+          <div className="text-lg font-extrabold text-slate-900">{formatMoney(stats.priceFrom)}</div>
         </div>
-      </div>
+        <a
+          href="#venue-program"
+          className={`inline-flex h-11 flex-1 items-center justify-center gap-2 rounded-full px-5 text-sm font-bold text-white shadow-lg ${
+            isTheatre ? 'bg-rose-600 hover:bg-rose-700' : 'bg-primary-600 hover:bg-primary-700'
+          }`}
+        >
+          <Ticket className="h-4 w-4" />
+          К афише
+        </a>
+      </MobileStickyActionBar>
     </div>
   );
 }

@@ -15,6 +15,7 @@ import {
 
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { LocationCard } from '@/components/LocationCard.client';
+import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
 import { OsmMapEmbed } from '@/components/OsmMapEmbed';
 import { VenueBreadcrumbsNav } from '@/components/VenueBreadcrumbsNav.client';
 import { VenueLogisticsBlock, hasVenueLogisticsContent } from '@/components/VenueLogisticsBlock';
@@ -73,7 +74,7 @@ export function LocationVenueLayout({
   const hasNearbyExcursions = nearbyEvents.length > 0;
 
   return (
-    <div className="bg-slate-50">
+    <div className="bg-slate-50 pb-24 lg:pb-0">
       <div className="border-b border-slate-200 bg-white">
         <VenueBreadcrumbsNav payload={pagePayload} />
       </div>
@@ -95,7 +96,7 @@ export function LocationVenueLayout({
               )}
               <div className="absolute inset-0 bg-gradient-to-r from-sky-900/90 via-slate-900/70 to-slate-900/40" />
             </div>
-            <div className="container-page relative py-12">
+            <div className="container-page relative py-8 sm:py-12">
               <div className="flex flex-wrap gap-2">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
                   <Anchor className="h-3.5 w-3.5" /> Причал
@@ -130,7 +131,7 @@ export function LocationVenueLayout({
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-slate-950/10" />
           </div>
-          <div className="container-page relative py-14 md:py-20">
+          <div className="container-page relative py-8 sm:py-14 md:py-20">
             <div className="flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
                 <TypeIcon className="h-3.5 w-3.5" /> {typeLabel}
@@ -162,7 +163,7 @@ export function LocationVenueLayout({
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/60 to-emerald-950/10" />
           </div>
-          <div className="container-page relative py-14 md:py-20">
+          <div className="container-page relative py-8 sm:py-14 md:py-20">
             <div className="flex flex-wrap gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold backdrop-blur">
                 <TypeIcon className="h-3.5 w-3.5" /> {typeLabel}
@@ -306,7 +307,7 @@ export function LocationVenueLayout({
       <div className="container-page grid grid-cols-[minmax(0,1fr)] gap-8 py-8 lg:grid-cols-3">
         <div className="space-y-8 lg:col-span-2">
           {isPier && routeGroups.length > 0 ? (
-            <section className="rounded-2xl border border-slate-200 bg-white p-6">
+            <section id="location-routes" className="rounded-2xl border border-slate-200 bg-white p-6">
               <h2 className="text-xl font-bold text-slate-900">Маршруты с этого причала</h2>
               <p className="mt-1 text-sm text-slate-500">Купите билет онлайн - приходите за 15 минут до отправления.</p>
               <div className="mt-4 space-y-3">
@@ -453,6 +454,40 @@ export function LocationVenueLayout({
 
         <LocationVenueSidebar venue={venue} relatedVenues={relatedVenues} />
       </div>
+
+      <MobileStickyActionBar>
+        {hasStopExcursions ? (
+          <a
+            href="#venue-stop-events"
+            className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-primary-600 px-4 text-sm font-bold text-white hover:bg-primary-700"
+          >
+            Экскурсии
+          </a>
+        ) : isPier && routeGroups.length > 0 ? (
+          <a
+            href="#location-routes"
+            className="inline-flex h-11 flex-1 items-center justify-center rounded-full bg-primary-600 px-4 text-sm font-bold text-white hover:bg-primary-700"
+          >
+            Маршруты
+          </a>
+        ) : null}
+        <AddToDayRouteButton
+          className={`min-h-11 rounded-full px-4 text-sm ${hasStopExcursions || (isPier && routeGroups.length > 0) ? 'flex-1' : 'w-full'}`}
+          venue={{
+            id: venue.id,
+            slug: venue.slug,
+            title: venue.title || venue.name,
+            city: venue.city,
+            cityId: venue.cityId,
+            citySlug: venue.citySlug,
+            href: venueHref(venue),
+            imageUrl: venue.heroImageUrl,
+            address: venue.address,
+            latitude: venue.latitude,
+            longitude: venue.longitude,
+          }}
+        />
+      </MobileStickyActionBar>
     </div>
   );
 }

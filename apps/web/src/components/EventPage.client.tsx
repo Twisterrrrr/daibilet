@@ -410,7 +410,7 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
 
   return (
     <div className="relative">
-      <div className="relative min-h-[calc(100vh-6rem)] overflow-hidden bg-slate-900 sm:min-h-0 sm:h-80 lg:h-[420px]">
+      <div className="relative h-[min(42vh,20rem)] min-h-[14rem] overflow-hidden bg-slate-900 sm:h-80 sm:min-h-0 lg:h-[420px]">
         <SafeImage
           src={heroImage || null}
           alt={event.title}

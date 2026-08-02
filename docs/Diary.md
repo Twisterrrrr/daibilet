@@ -1,3 +1,23 @@
+## 2026-08-02 - Mobile templates canon + LOC1/LOC2/LOC4
+
+### Наблюдения
+- Owner priority: удобная структура шаблонов мобилки (foundation перед filters/auto-pick «Мой день»).
+- Brief уже фиксировал: city chip скрыт на mobile (`CityPicker` `lg:block`), «Город» в меню внизу, `/locations` hero+карта жрут first screen.
+- Event hero на mobile был `min-h-[calc(100vh-6rem)]` - нарушал hero budget.
+
+### Решения
+- Канон: [mobile-templates.md](./mobile-templates.md) - sticky chrome, hero budget, CTA, порядок секций, chips, `MobileStickyActionBar`.
+- LOC1: city chip всегда в sticky header; DayRouteBadge текст с `min-[380px]` чтобы влезал chip.
+- LOC2: в `MobileNavSheet` блок «Город» сразу после поиска.
+- LOC4: `/locations` → `HeroLayout` minimal+dense; type chips horiz scroll; карта только `lg+`.
+- Detail align: location sticky CTA (экскурсии/маршруты + день); institution safe-area; event hero capped; `/my-day` sticky Добавить/Карты/Экскурсии.
+- Shared `MobileStickyActionBar`.
+
+### Проблемы
+- LOC5/6/7 и rename «Локации» - backlog. Deploy BUILD_ID - после MSK ship.
+
+---
+
 ## 2026-08-01 - pl-vosstaniya: pier → bus
 
 ### Наблюдения

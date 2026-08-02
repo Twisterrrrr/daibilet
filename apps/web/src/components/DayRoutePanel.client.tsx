@@ -7,6 +7,7 @@ import { FormEvent, Suspense, useEffect, useMemo, useRef, useState } from 'react
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
+import { MobileStickyActionBar } from '@/components/MobileStickyActionBar';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { buildCatalogHref } from '@/lib/catalog-url';
 import {
@@ -406,12 +407,12 @@ function DayRoutePanelInner() {
   }
 
   return (
-    <div className="container-page px-4 py-6 sm:px-6 sm:py-10">
-      <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+    <div className="container-page px-4 py-5 pb-28 sm:px-6 sm:py-10 sm:pb-10">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between sm:gap-4">
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Собери свой день</p>
           <h1 className="mt-1 font-display text-2xl font-extrabold text-slate-900 sm:text-3xl">Мой день</h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">
+          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-slate-600 sm:mt-2">
             Можно добавлять места текстом - каталог не обязателен. Наберите {DAY_ROUTE_MIN}-{DAY_ROUTE_MAX} точек.
           </p>
         </div>
@@ -452,8 +453,9 @@ function DayRoutePanelInner() {
 
       <form
         onSubmit={submitTextStop}
-        className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 sm:mt-8 sm:p-5"
+        className="mt-5 rounded-2xl border border-slate-200 bg-white p-3.5 sm:mt-8 sm:p-5"
         data-day-plan-form="1"
+        id="day-plan-form"
       >
         <p className="text-sm font-semibold text-slate-900">Добавить точку</p>
         <p className="mt-1 text-sm leading-relaxed text-slate-600">
@@ -658,7 +660,7 @@ function DayRoutePanelInner() {
           </section>
 
           {showMatches ? (
-            <section className="mt-8 sm:mt-10">
+            <section id="day-route-matches" className="mt-8 sm:mt-10">
               <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500">Подходящие экскурсии</h2>
               {loading ? <p className="mt-3 text-sm text-slate-500">Ищем покрытие…</p> : null}
               {!loading && payload && payload.matches.length === 0 ? (
@@ -812,6 +814,43 @@ function DayRoutePanelInner() {
           ) : null}
         </>
       )}
+
+      {!atMax || yandexUrl || (route.venues.length > 0 && showMatches) ? (
+        <MobileStickyActionBar>
+          {!atMax ? (
+            <button
+              type="button"
+              onClick={() => {
+                document.getElementById('day-plan-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                titleFieldRef.current?.focus();
+              }}
+              className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 text-sm font-bold text-white hover:bg-primary-600"
+            >
+              <Plus className="h-4 w-4" />
+              Добавить точку
+            </button>
+          ) : null}
+          {yandexUrl ? (
+            <a
+              href={yandexUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-4 text-sm font-bold text-white hover:bg-sky-700 ${atMax ? 'flex-1' : ''}`}
+            >
+              <ExternalLink className="h-4 w-4" />
+              Карты
+            </a>
+          ) : null}
+          {route.venues.length > 0 && showMatches ? (
+            <a
+              href="#day-route-matches"
+              className={`inline-flex h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-800 hover:bg-slate-50 ${!atMax && !yandexUrl ? 'flex-1' : ''}`}
+            >
+              Экскурсии
+            </a>
+          ) : null}
+        </MobileStickyActionBar>
+      ) : null}
     </div>
   );
 }

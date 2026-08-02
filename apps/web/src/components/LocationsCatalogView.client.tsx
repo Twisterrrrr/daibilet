@@ -166,45 +166,19 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
 
   return (
     <>
+      {/* Mobile template: dense hero, type chips first; map desktop-only (UX.LOC4). */}
       <HeroLayout
-        variant="withMap"
+        variant="minimal"
+        dense
         breadcrumbs={[{ label: 'Главная', href: '/' }, { label: 'Локации' }]}
         eyebrow={`${formatCountFloorTenPlus(venues.length)} локаций · ${pluralCities(cityCount)}`}
         title={heroTitle}
-        description={heroDescription}
+        description={cityName ? heroDescription : 'Места встречи и точки старта. Город - в шапке.'}
         tone="light"
-        className="bg-slate-100"
-        aside={<RussiaMap className="h-full min-h-[14rem]" />}
+        className="bg-slate-50"
       >
-        <div className="mt-6 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-slate-900 shadow-lg sm:flex-row">
-          <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">
-            <Search className="h-4 w-4 text-slate-400" />
-            <input
-              type="search"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Название локации или адрес"
-              className="w-full bg-transparent py-2.5 text-sm outline-none placeholder:text-slate-400"
-            />
-          </div>
-          <select
-            value={cityPending ? '' : cityFilter}
-            disabled={cityPending}
-            onChange={(event) => setCityFilter(event.target.value)}
-            className="rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none disabled:opacity-70"
-          >
-            {cityPending ? <option value="">Город…</option> : null}
-            <option value="all">Все города</option>
-            {cityOptions.map(([city, count]) => (
-              <option key={city} value={city}>
-                {city} ({count})
-              </option>
-            ))}
-          </select>
-        </div>
-
         {typeOptions.length ? (
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-4 flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <button
               type="button"
               onClick={() => setTypeFilter('all')}
@@ -233,9 +207,42 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
             })}
           </div>
         ) : null}
+
+        <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 text-slate-900 shadow-sm sm:flex-row">
+          <div className="flex flex-1 items-center gap-2 rounded-xl bg-slate-100 px-3">
+            <Search className="h-4 w-4 shrink-0 text-slate-400" />
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Название или адрес"
+              className="w-full bg-transparent py-2.5 text-sm outline-none placeholder:text-slate-400"
+            />
+          </div>
+          {/* sm+: city select; on mobile city lives in sticky header */}
+          <select
+            value={cityPending ? '' : cityFilter}
+            disabled={cityPending}
+            onChange={(event) => setCityFilter(event.target.value)}
+            className="hidden rounded-xl bg-slate-100 px-3 py-2.5 text-sm outline-none disabled:opacity-70 sm:block"
+            aria-label="Город"
+          >
+            {cityPending ? <option value="">Город…</option> : null}
+            <option value="all">Все города</option>
+            {cityOptions.map(([city, count]) => (
+              <option key={city} value={city}>
+                {city} ({count})
+              </option>
+            ))}
+          </select>
+        </div>
       </HeroLayout>
 
-      <div className="container-page py-8">
+      <div className="container-page hidden py-6 lg:block">
+        <RussiaMap className="min-h-[16rem] w-full overflow-hidden rounded-2xl border border-slate-200" />
+      </div>
+
+      <div className="container-page py-6 sm:py-8">
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
           <h2 className="text-lg font-semibold text-slate-900">
             {listPending ? (

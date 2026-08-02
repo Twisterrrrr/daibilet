@@ -24,7 +24,7 @@ export function SiteChromeSkeleton({
             <Link href="/" className="inline-flex shrink-0 items-center" aria-label="Дайбилет - на главную">
               <DaibiletLogo textClassName="text-lg sm:text-xl lg:text-2xl" />
             </Link>
-            <span className="hidden h-9 w-28 rounded-lg bg-slate-100 lg:block" aria-hidden />
+            <span className="h-8 w-[6.75rem] rounded-lg bg-slate-100 sm:h-9 sm:w-28" aria-hidden />
           </div>
           <nav aria-hidden className="hidden items-center gap-2 lg:flex">
             <span className="h-4 w-14 rounded bg-slate-100" />
@@ -35,7 +35,7 @@ export function SiteChromeSkeleton({
           <div className="flex shrink-0 items-center gap-1.5" aria-hidden>
             <span className="hidden h-10 w-10 rounded-lg bg-slate-100 lg:block" />
             <span className="hidden h-10 w-10 rounded-lg bg-slate-100 lg:block" />
-            <span className="h-10 w-10 rounded-lg bg-slate-100" />
+            <span className="h-10 w-16 rounded-lg bg-slate-100 sm:w-24" />
           </div>
         </div>
       </header>

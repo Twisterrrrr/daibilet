@@ -116,13 +116,14 @@ export function SiteHeader({ destinations = [] }: SiteHeaderProps) {
               <DaibiletLogo textClassName="text-lg sm:text-xl lg:text-2xl" />
             </Link>
 
+            {/* Mobile: city chip always in sticky chrome (UX.LOC1). Desktop keeps same control. */}
             <CityPicker
               cities={destinations}
               value={cityValue}
               onChange={onCityChange}
               allLabel="Все города"
               variant="header"
-              className="hidden max-w-[9.5rem] shrink-0 lg:block xl:max-w-[12rem]"
+              className="min-w-0 max-w-[6.75rem] shrink sm:max-w-[9.5rem] xl:max-w-[12rem]"
             />
           </div>
 
@@ -330,6 +331,22 @@ function MobileNavSheet({
           />
         </div>
         <nav aria-label="Мобильная навигация" className="flex-1 overflow-y-auto p-2">
+          {/* UX.LOC2: city first after search - not buried below nav/FAQ */}
+          <div className="px-2 py-1">
+            <p className="mb-1 px-2 text-xs font-medium uppercase tracking-wide text-graphite-muted">Город</p>
+            <CityPicker
+              cities={destinations}
+              value={cityValue}
+              onChange={(name) => {
+                onCityChange(name);
+                onClose();
+              }}
+              allLabel={cityLabel === 'Все города' ? 'Все города' : cityLabel}
+              variant="compact"
+              className="w-full"
+            />
+          </div>
+          <div className="my-3 h-px bg-slate-100" />
           <div>
             {navLinks.map((item) => (
               <Link
@@ -371,21 +388,6 @@ function MobileNavSheet({
             <HelpCircle className="h-4 w-4" strokeWidth={1.75} />
             Помощь и FAQ
           </Link>
-          <div className="my-3 h-px bg-slate-100" />
-          <div className="px-2 py-2">
-            <p className="mb-2 px-2 text-xs font-medium uppercase tracking-wide text-graphite-muted">Город</p>
-            <CityPicker
-              cities={destinations}
-              value={cityValue}
-              onChange={(name) => {
-                onCityChange(name);
-                onClose();
-              }}
-              allLabel={cityLabel === 'Все города' ? 'Все города' : cityLabel}
-              variant="compact"
-              className="w-full"
-            />
-          </div>
           <div className="my-3 h-px bg-slate-100" />
           {isLoggedIn ? (
             <>
