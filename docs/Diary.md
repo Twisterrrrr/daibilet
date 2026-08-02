@@ -11,7 +11,7 @@
 - Clear тоже через replaceState; add вне `/my-day` на my-day не навигирует.
 
 ### Проблемы
-- BUILD_ID - после MSK web deploy.
+- Deploy OK: commit `103d81e`, MSK **BUILD_ID=`seNyt0ytyOIZEK6GkdEX6`**, `/my-day` 200.
 
 ---
 
