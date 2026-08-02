@@ -1,3 +1,22 @@
+## 2026-08-02 - Мой день: канон добора теплохода (Pier→Route→Slot)
+
+### Наблюдения
+- Owner зафиксировал funnel для multi-option событий (esp. SPB boats/Teplohod) в «Мой день»: нельзя шарить «теплоход вообще» - только закреплённый слот с временем.
+- В каталоге: Venue `type=pier` (~14 SPB), страница причала `/api/public/venues/{slug}` отдаёт `sessions` (часто `offerSourceCode=TEPLOHOD`) + `upcomingSlots`. EventKind в Prisma = SINGLE/RECURRING/OPEN_DATE (не WATER) - водность через pier + TEPLOHOD/категории.
+
+### Решения
+- Канон funnel: **Причал → Маршруты с причала → Слот → «В маршрут»** (item с `eventId`+`startsAt`/`sessionLabel`) → share `?city=&items=id:HHMM` осмыслен только после pin.
+- MVP UI `/my-day` (SPB first): `DayRouteBoatWizard` + lib `day-route-boat` (rank pier by geo к остановкам / SPB water center; слот в окно соседей; prefer short sightseeing). CTA «Добавить теплоход» + soft suggest у waterfront stops.
+- Reuse: `addToDayRoute`, existing buy/share/print agents; ticketUrl из Teplohod purchaseUrl или event page.
+
+### Проблемы
+- Duration в API часто нет - durationGuess из title heuristic.
+- Москва/другие города - deferred (wizard gate `isSpbDayRouteCity`).
+- Полный catalog filter «только water» / dedicated boat API - не делали; берём pier list + venue page sessions.
+- ~~MSK deploy~~ → pending после commit.
+
+---
+
 ## 2026-08-02 - Nizhny Novgorod must-see 30 + gastro 10 + 3 presets
 
 ### Наблюдения
