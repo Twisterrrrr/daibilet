@@ -4,8 +4,8 @@
  */
 
 import {
+  DAY_ROUTE_MAX,
   DAY_ROUTE_MIN,
-  DAY_ROUTE_SOFT,
   encodeDayRouteShareTime,
   formatDayRouteHHMM,
   resolveDayRouteTicketUrl,
@@ -89,7 +89,7 @@ function pluralRu(n: number, one: string, few: string, many: string): string {
 /**
  * Readiness formula (equal thirds, documented for product):
  * - points: min(N / DAY_ROUTE_MIN, 1) capped contribution toward a full day start
- *   plus soft fill toward DAY_ROUTE_SOFT (blend)
+ *   plus soft fill toward DAY_ROUTE_MAX (blend)
  * - tickets: among stops with ticketUrl, share marked bought (or 1 if none need ticket)
  * - time: among ticket/event stops, share with session time (or 1 if none are timed-commerce)
  *
@@ -113,10 +113,10 @@ export function computeDayRouteReadiness(
     (m) => m != null && Number.isFinite(m) && (m as number) >= freeWindowMeters,
   ).length;
 
-  // Points: reach MIN quickly, then ease toward soft guideline (not hard safety cap).
+  // Points: reach MIN quickly, then ease toward MAX.
   const toMin = Math.min(pointsCount / DAY_ROUTE_MIN, 1);
-  const toSoft = Math.min(pointsCount / DAY_ROUTE_SOFT, 1);
-  const pointsScore = pointsCount === 0 ? 0 : 0.65 * toMin + 0.35 * toSoft;
+  const toMax = Math.min(pointsCount / DAY_ROUTE_MAX, 1);
+  const pointsScore = pointsCount === 0 ? 0 : 0.65 * toMin + 0.35 * toMax;
 
   const ticketsScore =
     ticketStops.length === 0 ? 1 : ticketsBought / ticketStops.length;
