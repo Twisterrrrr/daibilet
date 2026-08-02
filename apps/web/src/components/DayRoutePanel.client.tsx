@@ -1952,12 +1952,12 @@ function DayRoutePanelInner() {
           data-day-unified-search
           data-day-starter="1"
         >
-          <div className="mx-auto flex max-w-md flex-col items-center text-center" data-day-plan-starter>
+          <div className="mx-auto flex w-full max-w-md flex-col items-center text-center sm:max-w-xl" data-day-plan-starter>
             <Route className="h-10 w-10 text-slate-400" aria-hidden />
             <p className="mt-4 text-lg font-bold leading-snug text-slate-900 sm:text-xl">
               Собери свой день
             </p>
-            <p className="mt-2 text-sm font-normal leading-relaxed text-slate-500 sm:text-[15px]">
+            <p className="mt-2 max-w-full text-sm font-normal leading-relaxed text-slate-500 sm:whitespace-nowrap sm:text-[15px]">
               Выбери город и минимум {DAY_ROUTE_MIN} точки для составления маршрута
             </p>
             <div className="mt-8 flex w-full flex-col gap-4" data-day-city-search-stack>
