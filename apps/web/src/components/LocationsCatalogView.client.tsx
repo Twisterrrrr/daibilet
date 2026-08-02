@@ -8,7 +8,6 @@ import { Search } from 'lucide-react';
 import { LocationCard } from '@/components/LocationCard.client';
 import { LocationsCatalogSkeleton } from '@/components/VenueCatalogSkeletons';
 import { HeroLayout } from '@/components/HeroLayout';
-import { RussiaMap } from '@/components/RussiaMap.client';
 import { useSelectedCityOptional } from '@/components/SelectedCityProvider.client';
 import { catalogHrefWithSelectedCity, venueCatalogHrefWithSelectedCity } from '@/lib/catalog-url';
 import { cityToGenitive, cityToPrepositional } from '@/lib/city-declension';
@@ -166,7 +165,7 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
 
   return (
     <>
-      {/* Mobile template: dense hero, type chips first; map desktop-only (UX.LOC4). */}
+      {/* Mobile template: dense hero, type chips first (UX.LOC4). */}
       <HeroLayout
         variant="minimal"
         dense
@@ -237,10 +236,6 @@ export function LocationsCatalogView({ venues: initialVenues }: { venues: VenueC
           </select>
         </div>
       </HeroLayout>
-
-      <div className="container-page hidden py-6 lg:block">
-        <RussiaMap className="min-h-[16rem] w-full overflow-hidden rounded-2xl border border-slate-200" />
-      </div>
 
       <div className="container-page py-6 sm:py-8">
         <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">

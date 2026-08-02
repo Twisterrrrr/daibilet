@@ -18,7 +18,7 @@ const HOTSPOTS: MapCity[] = [
 ];
 
 /**
- * Calm rectangular city picker for catalog heroes (cities / locations).
+ * Calm rectangular city picker for the /cities catalog hero.
  * Replaces the irregular SVG stub - links stay navigational until a real map lands.
  */
 export function RussiaMap({ className = '' }: { className?: string }) {

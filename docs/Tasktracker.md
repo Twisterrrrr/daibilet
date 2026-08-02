@@ -58,7 +58,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MOB0 | Audit + канон sticky chrome / hero budget / CTA / sections / chips | Критический | ✅ docs |
 | UX.LOC1 | Mobile sticky: city pin + search icon + route/fav | Критический | ✅ `cc05efa` MSK **BUILD_ID=`EroIFEOGTEMJsFn1Zf3tr`** |
 | UX.LOC2 | `MobileNavSheet`: «Город» сразу после поиска | Критический | ✅ |
-| UX.LOC4 | `/locations` mobile: dense hero, карта lg+ only | Высокий | ✅ |
+| UX.LOC4 | `/locations`: dense hero; блок «Популярные города» (RussiaMap) убран с локаций | Высокий | ✅ |
 | UX.MOB1 | Shared `MobileStickyActionBar` + location/institution/my-day sticky CTAs | Высокий | ✅ |
 | UX.MOB2 | Event mobile hero: не full-viewport (`min(42vh,20rem)`) | Средний | ✅ |
 | UX.LOC3 | Rename nav/H1 «Локации» → job-label - после owner Q1 | Высокий | ⏳ |
@@ -117,7 +117,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | UX.LOC1 | Mobile sticky header: city chip (сейчас CityPicker только `lg+`; в меню город внизу) | Критический | ✅ 2026-08-02 |
 | UX.LOC2 | `MobileNavSheet`: блок «Город» сразу после поиска | Критический | ✅ 2026-08-02 |
 | UX.LOC3 | Rename nav/H1 «Локации» → job-label (Точки сбора / Места встречи) - после owner Q1 | Высокий | ⏳ |
-| UX.LOC4 | `/locations` mobile: dense hero, карта ниже fold / desktop-only | Высокий | ✅ 2026-08-02 |
+| UX.LOC4 | `/locations`: dense hero; «Популярные города» (RussiaMap) убран с локаций | Высокий | ✅ 2026-08-02 |
 | UX.LOC5 | `/events` mobile: context line «События в {город}»; banner если city=all | Высокий | ⏳ |
 | UX.LOC6 | Bottom-sheet CityPicker: поиск + популярные + «Все города» | Высокий | ⏳ |
 | UX.LOC7 | Catalog mobile date UX: один entry (chips/sheet), не select+date input разом | Средний | ⏳ |
