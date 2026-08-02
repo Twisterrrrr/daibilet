@@ -1,12 +1,16 @@
-## 2026-08-02 - Owner UX: «Готовые сценарии» + H1 «Собери свой день»
+## 2026-08-02 - Owner UX: «Готовые сценарии» + H1 «Собери свой день» + event hydrate
 
 ### Наблюдения
 - Owner: хаб-блок «Готовые дни» выше must-see; H1 `/my-day` «Мой день в {city}»; event-stop после URL sync → «Событие из маршрута» + «Нет координат».
+- Buy-ticket `/events/{venueSlug}` уже закрыт ранее (`101d5b8` / BUILD `ixSmgk9DbvgZ4YYbGLgmY`); stub title/coords ещё live.
 
 ### Решения
 - Хаб: title «Готовые сценарии», subtitle про «Собери свой день»; блок **под** перечень мест (после must-see rail).
-- H1: «Собери свой день {inCityPrepositional}» (напр. «Собери свой день в Нижнем Новгороде»); page title metadata.
-- Bonus: `matchDayRouteVenues` резолвит event id/slug → title + venue lat/lng; hydrate/`enrichDayRouteFromMatchVenues` подхватывают eventId.
+- H1: «Собери свой день {inCityPrepositional}»; page title metadata.
+- `matchDayRouteVenues`: locator event id/slug → real event title + venue lat/lng + image + eventId/eventSlug.
+- `enrichDayRouteFromMatchVenues`: заменяет stub titles, дописывает coords/image/event meta, пересобирает ticketUrl (не venue-as-event).
+- `/my-day`: client fallback `/api/public/events/{id}` для leftover stubs в localStorage; catalog add тоже дотягивает coords.
+- `dayRouteItemFromEvent`: title = event title; stop без venue допускается через event id.
 
 ### Проблемы
 - Deploy BUILD_ID ниже после MSK ship.

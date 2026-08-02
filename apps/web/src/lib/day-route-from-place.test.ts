@@ -245,16 +245,31 @@ test('dayRouteItemFromEvent adds venue + session label', () => {
   });
   assert.ok(item);
   assert.equal(item!.id, 'venue_ermitazh');
+  assert.equal(item!.title, 'Обзорная');
   assert.equal(item!.eventId, 'evt_1');
   assert.equal(item!.sessionLabel, 'вс, 2 авг, 11:00');
   assert.equal(item!.latitude, 59.9398);
 });
 
-test('dayRouteItemFromEvent requires venue id or slug', () => {
+test('dayRouteItemFromEvent falls back to event id without venue', () => {
+  const item = dayRouteItemFromEvent({
+    id: 'evt_2',
+    slug: 'standup-night',
+    title: 'Стендап',
+    venue: '',
+  });
+  assert.ok(item);
+  assert.equal(item!.id, 'evt_2');
+  assert.equal(item!.title, 'Стендап');
+  assert.equal(item!.eventId, 'evt_2');
+  assert.equal(item!.eventSlug, 'standup-night');
+});
+
+test('dayRouteItemFromEvent returns null without id', () => {
   assert.equal(
     dayRouteItemFromEvent({
-      id: 'evt_2',
-      title: 'Без площадки',
+      id: '',
+      title: 'Без id',
       venue: '',
     }),
     null,

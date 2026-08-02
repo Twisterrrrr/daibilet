@@ -187,23 +187,6 @@ function formatEventSessionLabel(event: DayRouteEventSource): string | null {
 export function dayRouteItemFromEvent(event: DayRouteEventSource): DayRouteVenueItem | null {
   const venueSlug = String(event.venueSlug || '').trim() || null;
   const venueId = String(event.venueId || '').trim() || null;
-  const id = venueId || venueSlug;
-  if (!id) return null;
-
-  const title =
-    String(event.venue || '').trim() || String(event.title || '').trim() || 'Место события';
-  const href =
-    venueSlug || venueId
-      ? venueHref({
-          id: venueId || venueSlug || title,
-          slug: venueSlug,
-          name: title,
-          type: event.venueKind,
-        })
-      : null;
-
-  const sessionLabel = formatEventSessionLabel(event);
-  const startsAt = String(event.startsAt || '').trim() || null;
   const venueSlugNorm = String(venueSlug || '').trim().toLowerCase();
   const rawEventSlug = String(event.slug || '').trim() || null;
   const rawEventId = String(event.id || '').trim();
@@ -211,6 +194,32 @@ export function dayRouteItemFromEvent(event: DayRouteEventSource): DayRouteVenue
     rawEventSlug && rawEventSlug.toLowerCase() !== venueSlugNorm ? rawEventSlug : null;
   const eventId =
     rawEventId && rawEventId.toLowerCase() !== venueSlugNorm ? rawEventId : null;
+  // Prefer venue locator for map/Yandex; fall back to real event id (share hydrate).
+  const id = venueId || venueSlug || eventId || eventSlug;
+  if (!id) return null;
+
+  // Owner: show real event title (not venue name / «Событие из маршрута» stub).
+  const title =
+    String(event.title || '').trim() || String(event.venue || '').trim() || 'Место события';
+  const venueLabel = String(event.venue || '').trim() || title;
+  const href =
+    venueSlug || venueId
+      ? venueHref({
+          id: venueId || venueSlug || venueLabel,
+          slug: venueSlug,
+          name: venueLabel,
+          type: event.venueKind,
+        })
+      : eventSlug || eventId
+        ? eventHref({
+            id: eventId || eventSlug || rawEventId,
+            slug: eventSlug,
+            title,
+          })
+        : null;
+
+  const sessionLabel = formatEventSessionLabel(event);
+  const startsAt = String(event.startsAt || '').trim() || null;
 
   let ticketUrl: string | null = null;
   if (eventSlug || eventId) {
@@ -239,9 +248,9 @@ export function dayRouteItemFromEvent(event: DayRouteEventSource): DayRouteVenue
       href ||
       (venueSlug
         ? venueHref({
-            id: venueId || venueSlug || title,
+            id: venueId || venueSlug || venueLabel,
             slug: venueSlug,
-            name: title,
+            name: venueLabel,
             type: event.venueKind,
           })
         : null);

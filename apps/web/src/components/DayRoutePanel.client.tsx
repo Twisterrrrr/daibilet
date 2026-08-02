@@ -74,6 +74,8 @@ import {
   dayRouteHasMixedCities,
   dayRouteSegmentMeters,
   dayRouteTotalDistanceMeters,
+  DAY_ROUTE_EVENT_STUB_TITLE,
+  DAY_ROUTE_PLACE_STUB_TITLE,
   enrichDayRouteFromMatchVenues,
   estimateDayRouteTravelMinutes,
   formatDayRouteStopsHeading,
@@ -82,6 +84,7 @@ import {
   formatDayRouteTravelMinutes,
   hydrateTextStopsFromShareTokens,
   isDayRouteAtSoft,
+  isDayRoutePlaceholderTitle,
   isDayRouteShareTextToken,
   isInDayRoute,
   isTextDayRouteStop,
@@ -97,6 +100,7 @@ import {
   resolveDayRouteTicketUrl,
   hydrateDayRouteFromShare,
   updateDayRouteVenue,
+  writeDayRoute,
   type DayRouteState,
   type DayRouteTravelMode,
   type DayRouteVenueItem,
@@ -325,6 +329,7 @@ function DayRoutePanelInner() {
   const titleFieldRef = useRef<HTMLInputElement | null>(null);
   const shareMenuRef = useRef<HTMLDivElement | null>(null);
   const unifiedSearchRef = useRef<HTMLDivElement | null>(null);
+  const eventEnrichAttemptedRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     const sync = () => setRoute(readDayRoute());
@@ -425,7 +430,7 @@ function DayRoutePanelInner() {
               resolved.push({
                 id: token.id,
                 slug: null,
-                title: 'Событие из маршрута',
+                title: DAY_ROUTE_EVENT_STUB_TITLE,
                 eventId: token.id,
                 ticketUrl: `/events/${encodeURIComponent(token.id)}`,
               });
@@ -433,7 +438,7 @@ function DayRoutePanelInner() {
               resolved.push({
                 id: token.id,
                 slug: token.id,
-                title: 'Место из маршрута',
+                title: DAY_ROUTE_PLACE_STUB_TITLE,
                 href: `/venues/${encodeURIComponent(token.id)}`,
               });
             }
@@ -878,7 +883,73 @@ function DayRoutePanelInner() {
       timeLabel: event.timeLabel,
       imageUrl: event.imageUrl || matchedVenue?.heroImageUrl || null,
     });
+    if (!item) return;
     setRoute(appendDayRouteItem(item));
+    // Catalog list often omits venue lat/lng - hydrate from public event page.
+    const needsCoords = item.latitude == null || item.longitude == null;
+    const needsVenue = !item.slug && !matchedVenue;
+    if (!needsCoords && !needsVenue && !isDayRoutePlaceholderTitle(item.title)) return;
+    const key = String(event.slug || event.id || '').trim();
+    if (!key) return;
+    void fetch(`/api/public/events/${encodeURIComponent(key)}`)
+      .then(async (response) =>
+        response.ok
+          ? ((await response.json()) as {
+              event?: {
+                id?: string;
+                slug?: string | null;
+                title?: string | null;
+                imageUrl?: string | null;
+                venueId?: string | null;
+                venueSlug?: string | null;
+                venue?: string | null;
+                venueKind?: string | null;
+                venueAddress?: string | null;
+                venueLatitude?: number | null;
+                venueLongitude?: number | null;
+                city?: string | null;
+                cityId?: string | null;
+                citySlug?: string | null;
+              };
+            })
+          : null,
+      )
+      .then((data) => {
+        const ev = data?.event;
+        if (!ev) return;
+        const enriched = dayRouteItemFromEvent({
+          id: String(ev.id || event.id),
+          slug: ev.slug || event.slug,
+          title: ev.title || event.title,
+          city: ev.city || event.city,
+          cityId: ev.cityId || pageCityId,
+          citySlug: ev.citySlug || pageCitySlug || event.citySlug,
+          venueId: ev.venueId || matchedVenue?.id || null,
+          venueSlug: ev.venueSlug || event.venueSlug || matchedVenue?.slug || null,
+          venue: ev.venue || event.venue || matchedVenue?.name || null,
+          venueKind: ev.venueKind || event.venueKind || matchedVenue?.type || null,
+          venueAddress: ev.venueAddress || matchedVenue?.address || null,
+          venueLatitude: ev.venueLatitude ?? matchedVenue?.latitude ?? null,
+          venueLongitude: ev.venueLongitude ?? matchedVenue?.longitude ?? null,
+          startsAt: event.startsAt,
+          dateLabel: event.dateLabel,
+          timeLabel: event.timeLabel,
+          imageUrl: ev.imageUrl || event.imageUrl || matchedVenue?.heroImageUrl || null,
+        });
+        if (!enriched) return;
+        // Replace stub in place (id may upgrade event→venue).
+        const current = readDayRouteFresh();
+        const venues = current.venues.map((v) =>
+          v.id === item.id ||
+          (item.eventId && v.eventId === item.eventId) ||
+          (item.eventSlug && v.eventSlug === item.eventSlug)
+            ? { ...enriched, ticketBought: v.ticketBought }
+            : v,
+        );
+        const next = { ...current, venues };
+        if (writeDayRoute(next)) setRoute(readDayRouteFresh());
+      })
+      .catch(() => undefined);
   }
 
   function addMustSeeItem(item: DayRouteVenueItem) {
@@ -1272,6 +1343,90 @@ function DayRoutePanelInner() {
       .finally(() => setLoading(false));
     return () => controller.abort();
   }, [catalogVenueIds, ready]);
+
+  // Sanitize leftover «Событие из маршрута» / no-coords stubs via public events API.
+  useEffect(() => {
+    if (!ready) return;
+    const stubs = route.venues.filter((v) => {
+      if (isTextDayRouteStop(v)) return false;
+      const key = String(v.eventSlug || v.eventId || v.slug || v.id || '').trim();
+      if (!key || eventEnrichAttemptedRef.current.has(key)) return false;
+      return (
+        isDayRoutePlaceholderTitle(v.title) ||
+        (Boolean(v.eventId || v.eventSlug) && (v.latitude == null || v.longitude == null))
+      );
+    });
+    if (!stubs.length) return;
+    const controller = new AbortController();
+    let cancelled = false;
+    void (async () => {
+      const payload: Array<{
+        id: string;
+        slug?: string | null;
+        title?: string | null;
+        address?: string | null;
+        latitude?: number | null;
+        longitude?: number | null;
+        cityTitle?: string | null;
+        cityId?: string | null;
+        citySlug?: string | null;
+        eventId?: string | null;
+        eventSlug?: string | null;
+        heroImageUrl?: string | null;
+      }> = [];
+      for (const stub of stubs.slice(0, 8)) {
+        const key = String(stub.eventSlug || stub.eventId || stub.slug || stub.id || '').trim();
+        if (!key) continue;
+        eventEnrichAttemptedRef.current.add(key);
+        try {
+          const response = await fetch(`/api/public/events/${encodeURIComponent(key)}`, {
+            signal: controller.signal,
+          });
+          if (!response.ok) continue;
+          const data = (await response.json()) as {
+            event?: {
+              id?: string;
+              slug?: string | null;
+              title?: string | null;
+              imageUrl?: string | null;
+              venueId?: string | null;
+              venueSlug?: string | null;
+              venueAddress?: string | null;
+              venueLatitude?: number | null;
+              venueLongitude?: number | null;
+              city?: string | null;
+              cityId?: string | null;
+              citySlug?: string | null;
+            };
+          };
+          const ev = data.event;
+          if (!ev) continue;
+          payload.push({
+            id: String(ev.venueId || ev.venueSlug || ev.id || stub.id),
+            slug: ev.venueSlug || stub.slug || null,
+            title: ev.title || stub.title,
+            address: ev.venueAddress || stub.address || null,
+            latitude: ev.venueLatitude ?? stub.latitude ?? null,
+            longitude: ev.venueLongitude ?? stub.longitude ?? null,
+            cityTitle: ev.city || stub.city || null,
+            cityId: ev.cityId || stub.cityId || null,
+            citySlug: ev.citySlug || stub.citySlug || null,
+            eventId: String(ev.id || stub.eventId || '').trim() || null,
+            eventSlug: ev.slug || stub.eventSlug || null,
+            heroImageUrl: ev.imageUrl || stub.imageUrl || null,
+          });
+        } catch {
+          // abort / network
+        }
+      }
+      if (cancelled || !payload.length) return;
+      enrichDayRouteFromMatchVenues(payload);
+    })();
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [ready, route.venues]);
 
   function submitTextStop(event: FormEvent) {
     event.preventDefault();

@@ -1491,6 +1491,16 @@ export function lookupDayRouteCoords(
   return null;
 }
 
+/** Placeholder titles written by share hydrate before catalog resolve. */
+export const DAY_ROUTE_EVENT_STUB_TITLE = 'Событие из маршрута';
+export const DAY_ROUTE_PLACE_STUB_TITLE = 'Место из маршрута';
+
+export function isDayRoutePlaceholderTitle(title: string | null | undefined): boolean {
+  const raw = String(title || '').trim();
+  if (!raw) return true;
+  return raw === DAY_ROUTE_EVENT_STUB_TITLE || raw === DAY_ROUTE_PLACE_STUB_TITLE;
+}
+
 type DayRouteCoordSource = {
   id: string;
   slug?: string | null;
@@ -1504,6 +1514,8 @@ type DayRouteCoordSource = {
   citySlug?: string | null;
   eventId?: string | null;
   eventSlug?: string | null;
+  heroImageUrl?: string | null;
+  imageUrl?: string | null;
 };
 
 /** Build id+slug → coords from route items and/or matches payload venues. */
@@ -1563,33 +1575,40 @@ export function enrichDayRouteFromMatchVenues(payloadVenues: DayRouteCoordSource
       next.address = matchAddress;
     }
     const stubTitle =
-      !item.title ||
-      item.title === 'Событие из маршрута' ||
-      item.title === 'Место из маршрута' ||
-      item.title === item.id;
+      isDayRoutePlaceholderTitle(item.title) || item.title === item.id || item.title === item.eventId;
     if (match.title && stubTitle) next.title = match.title;
     if (match.eventId && !item.eventId) next.eventId = match.eventId;
     if (match.eventSlug && !item.eventSlug) next.eventSlug = match.eventSlug;
+    const matchImage = String(match.heroImageUrl || match.imageUrl || '').trim();
+    if (matchImage && !String(item.imageUrl || '').trim()) next.imageUrl = matchImage;
+    // Rebuild ticket CTA when event meta arrived (drop stub /events/{id} leftovers).
+    if (match.eventId || match.eventSlug || stubTitle) {
+      next.ticketUrl = null;
+    }
     const matchCity = String(match.cityTitle || match.city || '').trim();
     if (matchCity && !String(item.city || '').trim()) next.city = matchCity;
     if (match.cityId && !item.cityId) next.cityId = match.cityId;
     if (match.citySlug && !item.citySlug) next.citySlug = match.citySlug;
+    const cleaned = sanitizeDayRouteTicketFields(next);
+    cleaned.ticketUrl = resolveDayRouteTicketUrl(cleaned);
     if (
-      next.id !== item.id ||
-      next.slug !== item.slug ||
-      next.latitude !== item.latitude ||
-      next.longitude !== item.longitude ||
-      next.address !== item.address ||
-      next.title !== item.title ||
-      next.eventId !== item.eventId ||
-      next.eventSlug !== item.eventSlug ||
-      next.city !== item.city ||
-      next.cityId !== item.cityId ||
-      next.citySlug !== item.citySlug
+      cleaned.id !== item.id ||
+      cleaned.slug !== item.slug ||
+      cleaned.latitude !== item.latitude ||
+      cleaned.longitude !== item.longitude ||
+      cleaned.address !== item.address ||
+      cleaned.title !== item.title ||
+      cleaned.eventId !== item.eventId ||
+      cleaned.eventSlug !== item.eventSlug ||
+      cleaned.imageUrl !== item.imageUrl ||
+      cleaned.ticketUrl !== item.ticketUrl ||
+      cleaned.city !== item.city ||
+      cleaned.cityId !== item.cityId ||
+      cleaned.citySlug !== item.citySlug
     ) {
       changed = true;
     }
-    return next;
+    return cleaned;
   });
   if (!changed) return current;
   const next = { ...current, venues: nextVenues };

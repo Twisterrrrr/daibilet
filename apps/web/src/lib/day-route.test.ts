@@ -505,6 +505,36 @@ test('enrichDayRouteFromMatchVenues fills missing address by slug', () => {
   assert.equal(next.venues[0]?.latitude, 59.9342802);
 });
 
+test('enrichDayRouteFromMatchVenues replaces event stub title + coords + image', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({
+    id: 'evt_stub_1',
+    title: 'Событие из маршрута',
+    eventId: 'evt_stub_1',
+    ticketUrl: '/events/evt_stub_1',
+  });
+  const next = enrichDayRouteFromMatchVenues([
+    {
+      id: 'venue_hall',
+      slug: 'comedy-hall',
+      title: 'Стендап по-женски',
+      latitude: 59.94,
+      longitude: 30.32,
+      address: 'Невский 10',
+      eventId: 'evt_stub_1',
+      eventSlug: 'standup-po-zhenski',
+      heroImageUrl: '/images/events/standup.jpg',
+    },
+  ]);
+  const stop = next.venues[0];
+  assert.equal(stop?.title, 'Стендап по-женски');
+  assert.equal(stop?.latitude, 59.94);
+  assert.equal(stop?.eventSlug, 'standup-po-zhenski');
+  assert.equal(stop?.imageUrl, '/images/events/standup.jpg');
+  assert.equal(stop?.ticketUrl, '/events/standup-po-zhenski');
+});
+
 test('addToDayRoute same city title with null vs cityId still appends', () => {
   mockStorage();
   clearDayRoute();
