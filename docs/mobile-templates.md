@@ -54,7 +54,7 @@
 | Event detail | Купить / к виджету | В мой день (если уместно) |
 | Venue (institution) | К афише (`#venue-program`) | В мой день |
 | Location | Экскурсии / Маршруты | В мой день |
-| `/my-day` | Из каталога (локации/площадки/события) | Своё место (accordion) / Карты |
+| `/my-day` | Из каталога / Своё место (accordions) | Карты / Сохранить / Поделиться |
 | Catalog card | Открыть сущность | В мой день (hit-target) |
 
 Mobile sticky bottom: общий `MobileStickyActionBar` (`lg:hidden` + safe-area). Страница даёт `pb-24` (или `pb-28`), чтобы контент не прятался под бар.
@@ -82,17 +82,18 @@ Mobile sticky bottom: общий `MobileStickyActionBar` (`lg:hidden` + safe-are
 6. Related  
 7. Mobile sticky action bar  
 
-### `/my-day` (owner IA 2026-08-02)
+### `/my-day` (owner IA 2026-08-02, accordion compact 2026-08-02)
 
 1. Sticky chrome (city chip)  
-2. Title + count (`Точки · N/10`)  
-3. **Primary:** «Добавить в день» - on-page city + searchable Локации / Площадки / События + must-see chips  
-4. Stops list (+ Yandex / optimize when coords allow)  
-5. Matches excursions (`#day-route-matches`)  
-6. **Secondary accordion** (collapsed): «Добавить своё место» - text planner (`#day-plan-form`)  
-7. Sticky: Из каталога / Своё / Карты / Экскурсии  
+2. Title + count (`Точки · N/10`) + share/print/clear  
+3. **Route list always open** (`data-day-route-list`) - карточки + distance/mode + Yandex/optimize; empty-state CTAs  
+4. Accordion **«Добавить своё место»** (collapsed) - сразу под маршрутом / кнопка в header точек  
+5. Accordion **«Из каталога»** (collapsed) - city + Локации/Площадки/События + boat wizard  
+6. Accordion **«Главные места»** (collapsed, если есть город) - chips + filters  
+7. Accordion **«Подходящие экскурсии»** (collapsed, если есть catalog stops)  
+8. Sticky: Каталог / Своё / Сохранить / Поделиться / Карты  
 
-Foundation заполнения - каталожные сущности. Ручной текст опционален, не first-screen. `DAY_ROUTE_MAX=10`.
+Exclusive accordion (`openPanel`): один открытый блок. Маршрут вне аккордеона. `DAY_ROUTE_MAX=10`.
 
 ---
 
@@ -131,7 +132,7 @@ Foundation заполнения - каталожные сущности. Руч�
 | `/venues/[slug]` | Institution hero + sticky CTA | Safe-area ✅ |
 | `/locations` | Dense minimal + chips; map lg+ | ✅ LOC4 |
 | `/locations/[slug]` | Location hero + sticky CTA | ✅ aligned |
-| `/my-day` | Catalog CTAs first; text form accordion collapsed | ✅ catalog-first IA |
+| `/my-day` | Route always open; catalog/must-see/text/matches exclusive accordion; своё место under route | ✅ accordion compact |
 | Header / menu | City chip + city near top in sheet | ✅ LOC1/LOC2 |
 
 ---

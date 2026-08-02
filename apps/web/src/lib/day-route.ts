@@ -1136,8 +1136,8 @@ export function dayRouteFirstTimedLabel(venues: DayRouteVenueItem[]): string | n
 }
 
 /**
- * Share message template (hyphen only, no em-dash).
- * «Привет! Посмотри, какой маршрут в [Город] я собрал на Дайбилет: [Ссылка]. Там экскурсия в 14:00, давай займем места?»
+ * Messenger/copy share text. Context lives here (no on-page «shared with you» banner).
+ * Hyphen only, no em-dash.
  */
 export function buildDayRouteShareMessage(input: {
   cityTitle?: string | null;
@@ -1146,10 +1146,8 @@ export function buildDayRouteShareMessage(input: {
 }): string {
   const city = String(input.cityTitle || '').trim() || 'городе';
   const time = dayRouteFirstTimedLabel(input.venues);
-  const timePart = time
-    ? ` Там экскурсия в ${time}, давай займем места?`
-    : ' Давай займем места?';
-  return `Привет! Посмотри, какой маршрут в ${city} я собрал на Дайбилет: ${input.shareUrl}.${timePart}`;
+  const timePart = time ? ` Там есть точка в ${time}.` : '';
+  return `Привет! Тебе поделились планом на день в ${city} на Дайбилет: ${input.shareUrl}. Открой ссылку - маршрут уже в «Мой день», можно править под себя.${timePart}`;
 }
 
 export function buildTelegramShareUrl(text: string, url?: string): string {

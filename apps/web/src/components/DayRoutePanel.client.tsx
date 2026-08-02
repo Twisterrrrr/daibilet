@@ -110,6 +110,8 @@ import { eventHref, venueHref } from '@/lib/routes';
 import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 
+type DayRouteAccordionId = 'catalog' | 'mustSee' | 'text' | 'matches';
+
 type MatchVenueStub = {
   id: string;
   slug: string | null;
@@ -262,7 +264,8 @@ function DayRoutePanelInner() {
   const [cityInput, setCityInput] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
-  const [textFormOpen, setTextFormOpen] = useState(false);
+  /** Exclusive accordion: route list stays outside; all other sections collapse. */
+  const [openPanel, setOpenPanel] = useState<DayRouteAccordionId | null>(null);
   const [locationsCatalog, setLocationsCatalog] = useState<VenueCatalogCard[]>([]);
   const [venuesCatalog, setVenuesCatalog] = useState<VenueCatalogCard[]>([]);
   const [eventsCatalog, setEventsCatalog] = useState<PublicCatalogListItemDto[]>([]);
@@ -1035,12 +1038,29 @@ function DayRoutePanelInner() {
   }
 
   function openTextForm() {
-    setTextFormOpen(true);
+    setOpenPanel('text');
     window.setTimeout(() => {
       document.getElementById('day-plan-form-wrap')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       titleFieldRef.current?.focus();
     }, 80);
   }
+
+  function openCatalogPanel() {
+    setOpenPanel('catalog');
+    window.setTimeout(() => {
+      document.getElementById('day-catalog-add')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+  }
+
+  function togglePanel(id: DayRouteAccordionId) {
+    setOpenPanel((cur) => (cur === id ? null : id));
+  }
+
+  const textFormOpen = openPanel === 'text';
+  const catalogOpen = openPanel === 'catalog';
+  const mustSeeOpen = openPanel === 'mustSee';
+  const matchesOpen = openPanel === 'matches';
+  const showMustSeeAccordion = Boolean(hasPageCity && (mustSeeResolved.length > 0 || (!catalogLoading && pageCitySlug)));
 
   return (
     <>
@@ -1161,184 +1181,8 @@ function DayRoutePanelInner() {
         </p>
       ) : null}
 
-      {/* Primary: on-page city + searchable catalog picks (owner UX 2026-08-02) */}
-      <section
-        id="day-catalog-add"
-        className="mt-5 rounded-2xl border border-slate-200 bg-white p-3.5 sm:mt-8 sm:p-5"
-        data-day-catalog-add="1"
-      >
-        <p className="text-sm font-semibold text-slate-900">Добавить в день</p>
-
-        <div className="mt-3 max-w-md" data-day-city-picker>
-          <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-            Город
-          </label>
-          <CityPicker
-            cities={destinations}
-            value={selectedCity?.cityValue || 'all'}
-            onChange={(name) => {
-              selectedCity?.setCity(name);
-              if (name !== 'all') setCityInput(name);
-            }}
-            allLabel="Выберите город"
-            variant="hero"
-            className="w-full"
-          />
-        </div>
-
-        {!hasPageCity ? (
-          <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            Сначала выберите город - появятся локации, площадки, события и главные места.
-          </p>
-        ) : (
-          <>
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <DayRouteSearchSelect
-                label="Локации"
-                placeholder="Найти локацию…"
-                emptyText={catalogLoading ? 'Загружаем…' : 'Нет локаций в этом городе'}
-                loading={catalogLoading}
-                disabled={atMax}
-                options={locationOptions}
-                onPick={(option) => pickLocationById(option.id)}
-              />
-              <DayRouteSearchSelect
-                label="Площадки"
-                placeholder="Найти площадку…"
-                emptyText={catalogLoading ? 'Загружаем…' : 'Нет площадок в этом городе'}
-                loading={catalogLoading}
-                disabled={atMax}
-                options={venueOptions}
-                onPick={(option) => pickVenueById(option.id)}
-              />
-              <DayRouteSearchSelect
-                label="События"
-                placeholder="Найти событие…"
-                emptyText={catalogLoading ? 'Загружаем…' : 'Нет событий в этом городе'}
-                loading={catalogLoading}
-                disabled={atMax}
-                options={eventOptions}
-                onPick={(option) => pickEventById(option.id)}
-              />
-            </div>
-
-            <DayRouteBoatWizard
-              cityName={pageCityName}
-              citySlug={pageCitySlug}
-              cityId={pageCityId}
-              citySourceSlug={selectedCity?.selectedDestination?.sourceSlug || null}
-              route={route}
-              atMax={atMax}
-              onRouteChange={setRoute}
-              locationsCatalog={locationsCatalog}
-            />
-
-            {mustSeeResolved.length > 0 ? (
-              <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50 p-3 sm:p-4" data-day-must-see>
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900">Главные места города</p>
-                    <p className="mt-0.5 text-xs text-slate-500">
-                      Нажмите на место или добавьте видимые сразу (до {DAY_ROUTE_MAX}).
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    disabled={atMax || mustSeeAddable.length === 0}
-                    onClick={addAllMustSee}
-                    data-day-must-see-bulk
-                    className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
-                  >
-                    <Sparkles className="h-3.5 w-3.5" />
-                    {(mustSeeFilterMeta.tabs.length < 2
-                      ? mustSeeFilterMeta.defaultId
-                      : mustSeeFilter) === 'main'
-                      ? 'Добавить главные места'
-                      : 'Добавить выбранные'}
-                    {mustSeeAddable.length
-                      ? ` (${Math.min(mustSeeAddable.length, DAY_ROUTE_MAX - route.venues.length)})`
-                      : ''}
-                  </button>
-                </div>
-                <MustSeeFilterTabs
-                  tabs={mustSeeFilterMeta.tabs}
-                  activeId={
-                    mustSeeFilterMeta.tabs.length < 2
-                      ? mustSeeFilterMeta.defaultId
-                      : mustSeeFilter
-                  }
-                  onChange={setMustSeeFilter}
-                />
-                <div className="mt-3 flex flex-wrap gap-2" data-day-must-see-list>
-                  {mustSeeFiltered.map(({ place, item }) => {
-                    const inRoute =
-                      isInDayRoute(item.id, route) || Boolean(item.slug && isInDayRoute(item.slug, route));
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        disabled={inRoute || atMax}
-                        title={inRoute ? 'Уже в маршруте' : atMax ? `Лимит ${DAY_ROUTE_MAX}` : 'Добавить в день'}
-                        onClick={() => addMustSeeItem(item)}
-                        className={`inline-flex max-w-full items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed ${
-                          inRoute
-                            ? 'border-emerald-400 bg-emerald-50 text-emerald-800'
-                            : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50'
-                        }`}
-                      >
-                        {inRoute ? (
-                          <Check className="h-3.5 w-3.5 shrink-0 text-emerald-600" aria-hidden />
-                        ) : (
-                          <MapPin className="h-3.5 w-3.5 shrink-0 opacity-70" />
-                        )}
-                        <span className="truncate">{place.name}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : pageCitySlug && !catalogLoading ? (
-              <p className="mt-3 text-xs text-slate-500">
-                Для этого города пока нет списка главных мест - добавьте точки через поиск выше.
-              </p>
-            ) : null}
-          </>
-        )}
-
-        <p className="mt-3 text-xs text-slate-500">
-          Каталог целиком:{' '}
-          <Link href={locationsHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
-            локации
-          </Link>
-          {' · '}
-          <Link href={venuesHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
-            площадки
-          </Link>
-          {' · '}
-          <Link href={afishaHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
-            события
-          </Link>
-          {scopeCitySlug ? (
-            <>
-              {' · '}
-              <Link href={cityHubHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
-                хаб города
-              </Link>
-            </>
-          ) : null}
-        </p>
-      </section>
-
-      {!route.venues.length ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-8 text-center sm:p-10">
-          <Route className="mx-auto h-8 w-8 text-slate-400" />
-          <p className="mt-3 text-base font-semibold text-slate-800">Пока нет точек</p>
-          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-500">
-            Выберите город выше и добавьте локации, площадки или события. Минимум {DAY_ROUTE_MIN} точки,
-            чтобы день сложился. Своё место - по желанию внизу страницы.
-          </p>
-        </div>
-      ) : (
+      {/* Alerts stay above the always-open route */}
+      {route.venues.length ? (
         <>
           {mixedCities ? (
             <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
@@ -1357,128 +1201,546 @@ function DayRoutePanelInner() {
               Лимит {DAY_ROUTE_MAX} точек. Удалите одну, чтобы добавить другую.
             </p>
           ) : null}
+        </>
+      ) : null}
 
-          <section className="mt-6">
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-              <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500" data-day-route-count-heading>
-                Точки · {route.venues.length}/{DAY_ROUTE_MAX}
-              </h2>
-              <div className="flex flex-wrap gap-2">
-                {canOptimize ? (
-                  <button
-                    type="button"
-                    onClick={optimizeOrder}
-                    className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                  >
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Оптимизировать порядок
-                  </button>
+      {/* Route list - always expanded (not accordion) */}
+      {!route.venues.length ? (
+        <div className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-8 text-center sm:mt-8 sm:p-10">
+          <Route className="mx-auto h-8 w-8 text-slate-400" />
+          <p className="mt-3 text-base font-semibold text-slate-800">Пока нет точек</p>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-500">
+            Откройте «Из каталога» или «Своё место» ниже. Минимум {DAY_ROUTE_MIN} точки, чтобы день сложился.
+          </p>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={openCatalogPanel}
+              className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-primary-600"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Из каталога
+            </button>
+            <button
+              type="button"
+              onClick={openTextForm}
+              className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Своё место
+            </button>
+          </div>
+        </div>
+      ) : (
+        <section className="mt-5 sm:mt-8" data-day-route-list>
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+            <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500" data-day-route-count-heading>
+              Точки · {route.venues.length}/{DAY_ROUTE_MAX}
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {!atMax ? (
+                <button
+                  type="button"
+                  onClick={openTextForm}
+                  data-day-open-text
+                  className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Своё место
+                </button>
+              ) : null}
+              {canOptimize ? (
+                <button
+                  type="button"
+                  onClick={optimizeOrder}
+                  className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  Оптимизировать порядок
+                </button>
+              ) : null}
+              {yandexUrl ? (
+                <a
+                  href={yandexUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-700"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  Маршрут в Яндекс.Картах
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  disabled
+                  title="Нужны координаты минимум у 2 точек"
+                  className="inline-flex min-h-10 cursor-not-allowed items-center justify-center gap-1.5 rounded-full bg-slate-200 px-4 py-2 text-xs font-bold text-slate-500"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  Маршрут в Яндекс.Картах
+                </button>
+              )}
+            </div>
+          </div>
+          {missingCoordsCount > 0 ? (
+            <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+              {coordsCount < 2
+                ? `У ${missingCoordsCount} ${missingCoordsCount === 1 ? 'точки' : 'точек'} нет координат - Яндекс.Карты пока недоступны. Добавьте места из каталога или укажите lat, lng в «своём месте».`
+                : `Без координат: ${missingCoordsCount}. В Яндекс уйдут только ${coordsCount} точки с координатами (в текущем порядке).`}
+            </p>
+          ) : null}
+          {totalDistanceMeters > 0 ? (
+            <div
+              className="mt-3 flex flex-col gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+              data-day-distance-summary
+            >
+              <p className="text-sm text-slate-700">
+                Сумма сегментов:{' '}
+                <span className="font-semibold text-slate-900">
+                  {formatDayRouteDistance(totalDistanceMeters)}
+                </span>
+                {travelMinutes > 0 ? (
+                  <>
+                    {' '}
+                    · около{' '}
+                    <span className="font-semibold text-slate-900">
+                      {formatDayRouteTravelMinutes(travelMinutes)}
+                    </span>
+                  </>
                 ) : null}
-                {yandexUrl ? (
-                  <a
-                    href={yandexUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-700"
-                  >
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    Маршрут в Яндекс.Картах
-                  </a>
-                ) : (
-                  <button
-                    type="button"
-                    disabled
-                    title="Нужны координаты минимум у 2 точек"
-                    className="inline-flex min-h-10 cursor-not-allowed items-center justify-center gap-1.5 rounded-full bg-slate-200 px-4 py-2 text-xs font-bold text-slate-500"
-                  >
-                    <ExternalLink className="h-3.5 w-3.5" />
-                    Маршрут в Яндекс.Картах
-                  </button>
-                )}
+              </p>
+              <div className="flex gap-1" role="group" aria-label="Способ перемещения">
+                <button
+                  type="button"
+                  onClick={() => setTravelMode('walk')}
+                  className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+                    travelMode === 'walk'
+                      ? 'bg-slate-900 text-white'
+                      : 'border border-slate-200 bg-white text-slate-700'
+                  }`}
+                >
+                  Пешком
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTravelMode('auto')}
+                  className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+                    travelMode === 'auto'
+                      ? 'bg-slate-900 text-white'
+                      : 'border border-slate-200 bg-white text-slate-700'
+                  }`}
+                >
+                  Авто
+                </button>
               </div>
             </div>
-            {missingCoordsCount > 0 ? (
-              <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                {coordsCount < 2
-                  ? `У ${missingCoordsCount} ${missingCoordsCount === 1 ? 'точки' : 'точек'} нет координат - Яндекс.Карты пока недоступны. Добавьте места из каталога или укажите lat, lng в «своём месте».`
-                  : `Без координат: ${missingCoordsCount}. В Яндекс уйдут только ${coordsCount} точки с координатами (в текущем порядке).`}
-              </p>
-            ) : null}
-            {totalDistanceMeters > 0 ? (
-              <div
-                className="mt-3 flex flex-col gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
-                data-day-distance-summary
+          ) : null}
+          <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-day-plan-list>
+            {route.venues.map((venue, index) => (
+              <DayRouteVenueCard
+                key={venue.id}
+                index={index}
+                total={route.venues.length}
+                venue={venue}
+                hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
+                segmentToNext={segmentMeters[index] ?? null}
+                travelMode={travelMode}
+                onMoveUp={() => setRoute(moveDayRouteVenue(venue.id, -1))}
+                onMoveDown={() => setRoute(moveDayRouteVenue(venue.id, 1))}
+                onRemove={() => setRoute(removeFromDayRoute(venue.id))}
+                onToggleBought={() =>
+                  setRoute(
+                    updateDayRouteVenue(venue.id, { ticketBought: !venue.ticketBought }),
+                  )
+                }
+              />
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Accordion: custom text place - high on page, right under route */}
+      <div className="mt-3 rounded-2xl border border-slate-200 bg-white" id="day-plan-form-wrap">
+        <button
+          type="button"
+          aria-expanded={textFormOpen}
+          aria-controls="day-plan-form"
+          data-day-plan-accordion
+          onClick={() => {
+            setOpenPanel((cur) => {
+              const next = cur === 'text' ? null : 'text';
+              if (next === 'text') {
+                window.setTimeout(() => titleFieldRef.current?.focus(), 50);
+              }
+              return next;
+            });
+          }}
+          className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
+        >
+          <span>
+            <span className="block text-sm font-semibold text-slate-900">Добавить своё место</span>
+            <span className="mt-0.5 block text-xs text-slate-500">
+              Необязательно - если места нет в каталоге
+            </span>
+          </span>
+          <ChevronDown
+            className={`h-5 w-5 shrink-0 text-slate-400 transition ${textFormOpen ? 'rotate-180' : ''}`}
+          />
+        </button>
+        {textFormOpen ? (
+          <form
+            onSubmit={submitTextStop}
+            className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5"
+            data-day-plan-form="1"
+            id="day-plan-form"
+          >
+            <p className="text-sm leading-relaxed text-slate-600">
+              Введите название. Адрес, город и координаты - по желанию.
+            </p>
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-stretch">
+              <label className="min-w-0 flex-1">
+                <span className="sr-only">Название места</span>
+                <input
+                  ref={titleFieldRef}
+                  type="text"
+                  name="title"
+                  value={titleInput}
+                  onChange={(e) => {
+                    setTitleInput(e.target.value);
+                    if (formError) setFormError(null);
+                  }}
+                  placeholder="Например: Эрмитаж"
+                  autoComplete="off"
+                  disabled={atMax}
+                  data-day-plan-title
+                  className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
+                />
+              </label>
+              <button
+                type="submit"
+                disabled={atMax}
+                data-day-plan-add
+                className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
               >
-                <p className="text-sm text-slate-700">
-                  Сумма сегментов:{' '}
-                  <span className="font-semibold text-slate-900">
-                    {formatDayRouteDistance(totalDistanceMeters)}
+                <Plus className="h-4 w-4" />
+                Добавить
+              </button>
+            </div>
+            <label className="mt-2 block">
+              <span className="sr-only">Адрес или заметка</span>
+              <input
+                type="text"
+                name="note"
+                value={noteInput}
+                onChange={(e) => setNoteInput(e.target.value)}
+                placeholder="Адрес или заметка (необязательно)"
+                autoComplete="off"
+                disabled={atMax}
+                data-day-plan-note
+                className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => setShowAdvanced((v) => !v)}
+              className="mt-2 text-xs font-semibold text-slate-500 hover:text-slate-800"
+            >
+              {showAdvanced ? 'Скрыть город и координаты' : 'Город и координаты (необязательно)'}
+            </button>
+            {showAdvanced ? (
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                <label className="block">
+                  <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                    Город
                   </span>
-                  {travelMinutes > 0 ? (
-                    <>
-                      {' '}
-                      · около{' '}
-                      <span className="font-semibold text-slate-900">
-                        {formatDayRouteTravelMinutes(travelMinutes)}
-                      </span>
-                    </>
-                  ) : null}
-                </p>
-                <div className="flex gap-1" role="group" aria-label="Способ перемещения">
-                  <button
-                    type="button"
-                    onClick={() => setTravelMode('walk')}
-                    className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-                      travelMode === 'walk'
-                        ? 'bg-slate-900 text-white'
-                        : 'border border-slate-200 bg-white text-slate-700'
-                    }`}
-                  >
-                    Пешком
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setTravelMode('auto')}
-                    className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-                      travelMode === 'auto'
-                        ? 'bg-slate-900 text-white'
-                        : 'border border-slate-200 bg-white text-slate-700'
-                    }`}
-                  >
-                    Авто
-                  </button>
-                </div>
+                  <input
+                    type="text"
+                    name="city"
+                    value={cityInput}
+                    onChange={(e) => setCityInput(e.target.value)}
+                    placeholder="Город (необязательно)"
+                    autoComplete="off"
+                    disabled={atMax}
+                    data-day-plan-city
+                    className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                    Координаты
+                  </span>
+                  <input
+                    type="text"
+                    name="coords"
+                    value={coordsInput}
+                    onChange={(e) => setCoordsInput(e.target.value)}
+                    placeholder="59.93, 30.31"
+                    autoComplete="off"
+                    disabled={atMax}
+                    data-day-plan-coords
+                    className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
+                  />
+                </label>
               </div>
             ) : null}
-            <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-day-plan-list>
-              {route.venues.map((venue, index) => (
-                <DayRouteVenueCard
-                  key={venue.id}
-                  index={index}
-                  total={route.venues.length}
-                  venue={venue}
-                  hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
-                  segmentToNext={segmentMeters[index] ?? null}
-                  travelMode={travelMode}
-                  onMoveUp={() => setRoute(moveDayRouteVenue(venue.id, -1))}
-                  onMoveDown={() => setRoute(moveDayRouteVenue(venue.id, 1))}
-                  onRemove={() => setRoute(removeFromDayRoute(venue.id))}
-                  onToggleBought={() =>
-                    setRoute(
-                      updateDayRouteVenue(venue.id, { ticketBought: !venue.ticketBought }),
-                    )
-                  }
-                />
-              ))}
-            </ul>
-          </section>
+            {formError ? (
+              <p role="alert" className="mt-2 text-sm font-medium text-rose-700">
+                {formError}
+              </p>
+            ) : null}
+          </form>
+        ) : null}
+      </div>
 
-          {showMatches ? (
-            <section id="day-route-matches" className="mt-8 sm:mt-10">
-              <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500">Подходящие экскурсии</h2>
-              {loading ? <p className="mt-3 text-sm text-slate-500">Ищем покрытие…</p> : null}
+      {/* Accordion: catalog search + city + boat */}
+      <div
+        className="mt-3 rounded-2xl border border-slate-200 bg-white"
+        id="day-catalog-add"
+        data-day-catalog-add="1"
+        data-day-accordion="catalog"
+      >
+        <button
+          type="button"
+          aria-expanded={catalogOpen}
+          aria-controls="day-catalog-add-body"
+          data-day-catalog-accordion
+          onClick={() => togglePanel('catalog')}
+          className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
+        >
+          <span>
+            <span className="block text-sm font-semibold text-slate-900">Из каталога</span>
+            <span className="mt-0.5 block text-xs text-slate-500">
+              Город, локации, площадки, события{hasPageCity ? ', теплоход' : ''}
+            </span>
+          </span>
+          <ChevronDown
+            className={`h-5 w-5 shrink-0 text-slate-400 transition ${catalogOpen ? 'rotate-180' : ''}`}
+          />
+        </button>
+        {catalogOpen ? (
+          <div id="day-catalog-add-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+            <div className="max-w-md" data-day-city-picker>
+              <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                Город
+              </label>
+              <CityPicker
+                cities={destinations}
+                value={selectedCity?.cityValue || 'all'}
+                onChange={(name) => {
+                  selectedCity?.setCity(name);
+                  if (name !== 'all') setCityInput(name);
+                }}
+                allLabel="Выберите город"
+                variant="hero"
+                className="w-full"
+              />
+            </div>
+
+            {!hasPageCity ? (
+              <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                Сначала выберите город - появятся локации, площадки, события и главные места.
+              </p>
+            ) : (
+              <>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  <DayRouteSearchSelect
+                    label="Локации"
+                    placeholder="Найти локацию…"
+                    emptyText={catalogLoading ? 'Загружаем…' : 'Нет локаций в этом городе'}
+                    loading={catalogLoading}
+                    disabled={atMax}
+                    options={locationOptions}
+                    onPick={(option) => pickLocationById(option.id)}
+                  />
+                  <DayRouteSearchSelect
+                    label="Площадки"
+                    placeholder="Найти площадку…"
+                    emptyText={catalogLoading ? 'Загружаем…' : 'Нет площадок в этом городе'}
+                    loading={catalogLoading}
+                    disabled={atMax}
+                    options={venueOptions}
+                    onPick={(option) => pickVenueById(option.id)}
+                  />
+                  <DayRouteSearchSelect
+                    label="События"
+                    placeholder="Найти событие…"
+                    emptyText={catalogLoading ? 'Загружаем…' : 'Нет событий в этом городе'}
+                    loading={catalogLoading}
+                    disabled={atMax}
+                    options={eventOptions}
+                    onPick={(option) => pickEventById(option.id)}
+                  />
+                </div>
+
+                <DayRouteBoatWizard
+                  cityName={pageCityName}
+                  citySlug={pageCitySlug}
+                  cityId={pageCityId}
+                  citySourceSlug={selectedCity?.selectedDestination?.sourceSlug || null}
+                  route={route}
+                  atMax={atMax}
+                  onRouteChange={setRoute}
+                  locationsCatalog={locationsCatalog}
+                />
+              </>
+            )}
+
+            <p className="mt-3 text-xs text-slate-500">
+              Каталог целиком:{' '}
+              <Link href={locationsHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
+                локации
+              </Link>
+              {' · '}
+              <Link href={venuesHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
+                площадки
+              </Link>
+              {' · '}
+              <Link href={afishaHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
+                события
+              </Link>
+              {scopeCitySlug ? (
+                <>
+                  {' · '}
+                  <Link href={cityHubHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
+                    хаб города
+                  </Link>
+                </>
+              ) : null}
+            </p>
+          </div>
+        ) : null}
+      </div>
+
+      {/* Accordion: must-see chips */}
+      {showMustSeeAccordion ? (
+        <div className="mt-3 rounded-2xl border border-slate-200 bg-white" data-day-accordion="mustSee">
+          <button
+            type="button"
+            aria-expanded={mustSeeOpen}
+            aria-controls="day-must-see-body"
+            data-day-must-see-accordion
+            onClick={() => togglePanel('mustSee')}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
+          >
+            <span>
+              <span className="block text-sm font-semibold text-slate-900">Главные места</span>
+              <span className="mt-0.5 block text-xs text-slate-500">
+                {mustSeeResolved.length
+                  ? `Чипы и фильтры · ${mustSeeResolved.length}`
+                  : 'Список для города пока пуст'}
+              </span>
+            </span>
+            <ChevronDown
+              className={`h-5 w-5 shrink-0 text-slate-400 transition ${mustSeeOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {mustSeeOpen ? (
+            <div id="day-must-see-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+              {mustSeeResolved.length > 0 ? (
+                <div data-day-must-see>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-xs text-slate-500">
+                      Нажмите на место или добавьте видимые сразу (до {DAY_ROUTE_MAX}).
+                    </p>
+                    <button
+                      type="button"
+                      disabled={atMax || mustSeeAddable.length === 0}
+                      onClick={addAllMustSee}
+                      data-day-must-see-bulk
+                      className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
+                    >
+                      <Sparkles className="h-3.5 w-3.5" />
+                      {(mustSeeFilterMeta.tabs.length < 2
+                        ? mustSeeFilterMeta.defaultId
+                        : mustSeeFilter) === 'main'
+                        ? 'Добавить главные места'
+                        : 'Добавить выбранные'}
+                      {mustSeeAddable.length
+                        ? ` (${Math.min(mustSeeAddable.length, DAY_ROUTE_MAX - route.venues.length)})`
+                        : ''}
+                    </button>
+                  </div>
+                  <MustSeeFilterTabs
+                    tabs={mustSeeFilterMeta.tabs}
+                    activeId={
+                      mustSeeFilterMeta.tabs.length < 2
+                        ? mustSeeFilterMeta.defaultId
+                        : mustSeeFilter
+                    }
+                    onChange={setMustSeeFilter}
+                  />
+                  <div className="mt-3 flex flex-wrap gap-2" data-day-must-see-list>
+                    {mustSeeFiltered.map(({ place, item }) => {
+                      const inRoute =
+                        isInDayRoute(item.id, route) || Boolean(item.slug && isInDayRoute(item.slug, route));
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          disabled={inRoute || atMax}
+                          title={inRoute ? 'Уже в маршруте' : atMax ? `Лимит ${DAY_ROUTE_MAX}` : 'Добавить в день'}
+                          onClick={() => addMustSeeItem(item)}
+                          className={`inline-flex max-w-full items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition disabled:cursor-not-allowed ${
+                            inRoute
+                              ? 'border-emerald-400 bg-emerald-50 text-emerald-800'
+                              : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50'
+                          }`}
+                        >
+                          {inRoute ? (
+                            <Check className="h-3.5 w-3.5 shrink-0 text-emerald-600" aria-hidden />
+                          ) : (
+                            <MapPin className="h-3.5 w-3.5 shrink-0 opacity-70" />
+                          )}
+                          <span className="truncate">{place.name}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500">
+                  Для этого города пока нет списка главных мест - добавьте точки через поиск в «Из каталога».
+                </p>
+              )}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {/* Accordion: matching excursions */}
+      {showMatches ? (
+        <div
+          id="day-route-matches"
+          className="mt-3 rounded-2xl border border-slate-200 bg-white"
+          data-day-accordion="matches"
+        >
+          <button
+            type="button"
+            aria-expanded={matchesOpen}
+            aria-controls="day-route-matches-body"
+            data-day-matches-accordion
+            onClick={() => togglePanel('matches')}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
+          >
+            <span>
+              <span className="block text-sm font-semibold text-slate-900">Подходящие экскурсии</span>
+              <span className="mt-0.5 block text-xs text-slate-500">
+                {loading
+                  ? 'Ищем покрытие…'
+                  : payload
+                    ? `Найдено: ${payload.matches.length}`
+                    : 'По покрытию точек'}
+              </span>
+            </span>
+            <ChevronDown
+              className={`h-5 w-5 shrink-0 text-slate-400 transition ${matchesOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {matchesOpen ? (
+            <div id="day-route-matches-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+              {loading ? <p className="text-sm text-slate-500">Ищем покрытие…</p> : null}
               {!loading && payload && payload.matches.length === 0 ? (
-                <div className="mt-3 rounded-2xl border border-slate-200 bg-white px-4 py-6 text-sm text-slate-600 sm:p-6">
+                <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-5 text-sm text-slate-600">
                   <p className="font-semibold text-slate-800">Пока нет экскурсии, покрывающей набор</p>
                   <p className="mt-1.5 leading-relaxed">
                     Посмотрите афишу города или экскурсии «рядом» на карточке точки. Когда появятся STOP-связи,
@@ -1615,143 +1877,10 @@ function DayRoutePanelInner() {
                   );
                 })}
               </ul>
-            </section>
-          ) : null}
-        </>
-      )}
-
-      {/* Secondary: optional text stop - collapsed accordion */}
-      <div className="mt-8 rounded-2xl border border-slate-200 bg-white sm:mt-10" id="day-plan-form-wrap">
-        <button
-          type="button"
-          aria-expanded={textFormOpen}
-          aria-controls="day-plan-form"
-          data-day-plan-accordion
-          onClick={() => {
-            setTextFormOpen((open) => {
-              const next = !open;
-              if (next) {
-                window.setTimeout(() => titleFieldRef.current?.focus(), 50);
-              }
-              return next;
-            });
-          }}
-          className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
-        >
-          <span>
-            <span className="block text-sm font-semibold text-slate-900">Добавить своё место</span>
-            <span className="mt-0.5 block text-xs text-slate-500">
-              Необязательно - если места нет в каталоге
-            </span>
-          </span>
-          <ChevronDown
-            className={`h-5 w-5 shrink-0 text-slate-400 transition ${textFormOpen ? 'rotate-180' : ''}`}
-          />
-        </button>
-        {textFormOpen ? (
-          <form
-            onSubmit={submitTextStop}
-            className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5"
-            data-day-plan-form="1"
-            id="day-plan-form"
-          >
-            <p className="text-sm leading-relaxed text-slate-600">
-              Введите название. Адрес, город и координаты - по желанию.
-            </p>
-            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-stretch">
-              <label className="min-w-0 flex-1">
-                <span className="sr-only">Название места</span>
-                <input
-                  ref={titleFieldRef}
-                  type="text"
-                  name="title"
-                  value={titleInput}
-                  onChange={(e) => {
-                    setTitleInput(e.target.value);
-                    if (formError) setFormError(null);
-                  }}
-                  placeholder="Например: Эрмитаж"
-                  autoComplete="off"
-                  disabled={atMax}
-                  data-day-plan-title
-                  className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
-                />
-              </label>
-              <button
-                type="submit"
-                disabled={atMax}
-                data-day-plan-add
-                className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
-              >
-                <Plus className="h-4 w-4" />
-                Добавить
-              </button>
             </div>
-            <label className="mt-2 block">
-              <span className="sr-only">Адрес или заметка</span>
-              <input
-                type="text"
-                name="note"
-                value={noteInput}
-                onChange={(e) => setNoteInput(e.target.value)}
-                placeholder="Адрес или заметка (необязательно)"
-                autoComplete="off"
-                disabled={atMax}
-                data-day-plan-note
-                className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
-              />
-            </label>
-            <button
-              type="button"
-              onClick={() => setShowAdvanced((v) => !v)}
-              className="mt-2 text-xs font-semibold text-slate-500 hover:text-slate-800"
-            >
-              {showAdvanced ? 'Скрыть город и координаты' : 'Город и координаты (необязательно)'}
-            </button>
-            {showAdvanced ? (
-              <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                <label className="block">
-                  <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                    Город
-                  </span>
-                  <input
-                    type="text"
-                    name="city"
-                    value={cityInput}
-                    onChange={(e) => setCityInput(e.target.value)}
-                    placeholder="Город (необязательно)"
-                    autoComplete="off"
-                    disabled={atMax}
-                    data-day-plan-city
-                    className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
-                  />
-                </label>
-                <label className="block">
-                  <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                    Координаты
-                  </span>
-                  <input
-                    type="text"
-                    name="coords"
-                    value={coordsInput}
-                    onChange={(e) => setCoordsInput(e.target.value)}
-                    placeholder="59.93, 30.31"
-                    autoComplete="off"
-                    disabled={atMax}
-                    data-day-plan-coords
-                    className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
-                  />
-                </label>
-              </div>
-            ) : null}
-            {formError ? (
-              <p role="alert" className="mt-2 text-sm font-medium text-rose-700">
-                {formError}
-              </p>
-            ) : null}
-          </form>
-        ) : null}
-      </div>
+          ) : null}
+        </div>
+      ) : null}
 
       <MobileStickyActionBar>
         {route.venues.length ? (
@@ -1777,15 +1906,16 @@ function DayRoutePanelInner() {
           </button>
         ) : null}
         {!atMax ? (
-          <a
-            href="#day-catalog-add"
+          <button
+            type="button"
+            onClick={openCatalogPanel}
             className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 text-sm font-bold text-white hover:bg-primary-600"
           >
             <Plus className="h-4 w-4" />
-            Добавить
-          </a>
+            Каталог
+          </button>
         ) : null}
-        {!atMax && !route.venues.length ? (
+        {!atMax ? (
           <button
             type="button"
             onClick={openTextForm}
