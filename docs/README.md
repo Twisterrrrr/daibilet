@@ -50,6 +50,8 @@
 
 | Документ | Описание |
 |----------|----------|
+| [catalog-location-venue-canon.md](./catalog-location-venue-canon.md) | **Канон:** Локация vs Площадка / антидубли |
+| [myday-commercial-canon.md](./myday-commercial-canon.md) | Канон «Мой день» (planner + checklist) |
 | [mvp-spec.md](./mvp-spec.md) | Продуктовая спецификация |
 | [seo-public-mvp.md](./seo-public-mvp.md) | SEO public |
 | [admin-lovable-v4-mvp-plan.md](./admin-lovable-v4-mvp-plan.md) | План админки |

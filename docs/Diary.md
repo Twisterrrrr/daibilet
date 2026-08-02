@@ -1,3 +1,20 @@
+## 2026-08-02 - Канон Location vs Venue / антидубли (docs)
+
+### Наблюдения
+- Owner: зафиксировать для агентов и контент-ops различие Локация / Площадка и жёсткий антидубль (одна физическая точка = одна публичная карточка).
+- Договор с объектом часто путают с типом сущности; на практике афиша может быть без договора, must-see - без афиши.
+
+### Решения
+- Новый канон: [catalog-location-venue-canon.md](./catalog-location-venue-canon.md); pointer в Project.md + qa.md + Tasktracker.
+- Create: только must-see → локация; есть/будут события → venue сразу; локация→афиша → upgrade или hide+301/alias, не twin PUBLISHED.
+- Перед create: поиск slug / название / coords; запрет soft-sign и latin-cyrillic twins.
+- Мой день: Локации / Площадки / События - разные семейства; дубли путают UX.
+
+### Проблемы
+- Нет (docs-only; web deploy не нужен).
+
+---
+
 ## 2026-08-02 - /my-day: flat timeline + «N точек» (no Утро/День/Вечер)
 
 ### Наблюдения
@@ -28,7 +45,7 @@
 - Backend: `matchesCatalogCity` также принимает `citySlug` / `sourceCitySlug` (slug callers + defense).
 
 ### Проблемы
-- MSK deploy (web+api restart) - BUILD_ID ниже после smoke.
+- MSK live **BUILD_ID=`M6ddOogx7rcnlTW9jUJcM`** (`066363d`). Smoke: events slug+name SPB/MSK/NN total>0 items=5; venues/locs OK; `/my-day` 200.
 
 ---
 

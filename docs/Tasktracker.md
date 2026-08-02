@@ -1,9 +1,21 @@
 # Tasktracker — Daibilet
 
 **Обновлено:** 2026-08-02
-**Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md), [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md), [mobile-templates.md](./mobile-templates.md)
+**Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md), [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md), [mobile-templates.md](./mobile-templates.md), [catalog-location-venue-canon.md](./catalog-location-venue-canon.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
+
+---
+
+## Catalog: Location vs Venue canon (2026-08-02)
+
+Канон: [catalog-location-venue-canon.md](./catalog-location-venue-canon.md).
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| CAT.LV0 | Docs: Локация vs Venue, антидубли, upgrade path, Мой день families | Высокий | ✅ docs |
+| CAT.LV1 | Audit existing Location+Venue twins / soft-sign / latin-cyrillic (если всплывут) | Средний | ⏳ on demand |
+| CAT.LV2 | Admin/import guard: warn before create near-duplicate slug/title/coords | Средний | ⏳ backlog |
 
 ---
 
@@ -41,7 +53,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MYDAY-IA | `/my-day` catalog-first + text accordion (collapsed) | Критический | ✅ live **BUILD_ID=`MvYEsYnvAH_KMCxXkt2S6`** |
 | UX.MYDAY-ONPAGE | `/my-day` on-page city + searchable Локации/Площадки/События + must-see chips (no catalog nav) | Критический | ✅ `b4fdfd5`+`6345d0a` MSK **BUILD_ID=`q-1BAwZ65koVjH3CunDvi`** |
 | UX.MYDAY-TYPECAT | Type search: city-scoped venues API (не global 500+exact); subtitle без «теплоход»; wizard boat intact | Критический | ✅ `2f692dc`+ live **BUILD_ID=`E6nQnmKCtloz0ynXA2y24`** |
-| UX.MYDAY-EVENTS | «Ещё из каталога» → События: city display name + catalog slug match (`citySlug`/`sourceCitySlug`) | Критический | 🔄 deploy |
+| UX.MYDAY-EVENTS | «Ещё из каталога» → События: city display name + catalog slug match (`citySlug`/`sourceCitySlug`) | Критический | ✅ `066363d` MSK **BUILD_ID=`M6ddOogx7rcnlTW9jUJcM`** |
 | UX.MYDAY-SOFT | /my-day soft-warn SOFT=10 HARD=15; copy плотный день; bulk stop at soft; readiness→SOFT | Критический | ✅ `bd794f2` MSK **BUILD_ID=`Yqcz6aa-14QvDHs30n306`** `/my-day` 200 |
 | UX.MYDAY-MAX10 | `/my-day` DAY_ROUTE_MAX 8→10; drop redundant intro copy; must-see chip without «в дне» | Критический | ✅ `8499c92` MSK **BUILD_ID=`q-1BAwZ65koVjH3CunDvi`** smoke `/my-day` 200 |
 | UX.MYDAY-FILTERS | Must-see tabs: Главные / Гастро / Музеи / Парки / Храмы (hide empty); bulk respects filter | Критический | ✅ `5ba3e56` MSK **BUILD_ID=`FpLvs9SkQ6VpTMNXw-7ES`** smoke hub NN 5 tabs |

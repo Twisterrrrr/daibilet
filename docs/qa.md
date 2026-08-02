@@ -1,5 +1,13 @@
 # qa.md — открытые вопросы
 
+## 2026-08-02 - Location vs Venue / антидубли (канон зафиксирован)
+
+Канон: [catalog-location-venue-canon.md](./catalog-location-venue-canon.md). Краткий pointer: [Project.md](./Project.md) § Location vs Venue.
+
+**Закрыто owner:** локация = must-see/маршрут без обязательной афиши; venue = место с событиями (договор не обязателен); одна точка = одна публичная карточка; локация→афиша = upgrade / hide+301, не twin PUBLISHED.
+
+Остаётся открытым (см. UX ниже): единый `/places`, лейбл «Локации», IA demote `/locations` - это UX/nav, не смена антидубль-канона.
+
 ## 2026-08-01 - UX: Locations + mobile catalog (открыто)
 
 Контекст: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md). Задачи UX.LOC* в Tasktracker.
