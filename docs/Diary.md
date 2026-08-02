@@ -1,3 +1,18 @@
+## 2026-08-02 - /my-day: exact stop card + mobile starter A
+
+### Наблюдения
+- Owner approved empty-starter **variant A** (mobile): compact inline icon, one-line subtitle, placeholders only, «добавь своё место» under search.
+- Stop cards: previous dense band still wrong vs exact markup - number must be top-right with navigate/delete; ↑↓ + «далее ~» same bottom row.
+
+### Решения
+- Starter: `data-day-starter-variant="a"`; Route icon `h-6` inline left of title on mobile; `hideLabel` on search; reduced py (~40% vs tall card); desktop keeps more air.
+- Grid card: `data-day-stop-top-right` (N + maps + X); thumb left + title/address; `data-day-stop-bottom-row` (↑↓ + далее).
+
+### Проблемы
+- Нет. MSK **BUILD_ID=`PqFdFw3F8VBu_mGMaS9MN`** (`e548187`), smoke chunk markers OK.
+
+---
+
 ## 2026-08-02 - /locations: убран блок «Популярные города»
 
 ### Наблюдения
