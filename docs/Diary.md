@@ -29,7 +29,7 @@
 - Duration в API часто нет - durationGuess из title heuristic.
 - Москва/другие города - deferred (wizard gate `isSpbDayRouteCity`).
 - Полный catalog filter «только water» / dedicated boat API - не делали; берём pier list + venue page sessions.
-- ~~MSK deploy~~ → pending после commit.
+- ~~MSK deploy~~ → `0212c13` **BUILD_ID=`TcievrjfV4FvM-YDiaKr0`**. Chunk `/my-day` содержит `data-day-boat-wizard` + «Добавить теплоход»; pub `/my-day` 200.
 
 ---
 
