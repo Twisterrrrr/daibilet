@@ -3662,62 +3662,61 @@ function DayRouteVenueCard({
       className="h-auto w-full self-start scroll-mt-4"
       data-day-plan-stop={venue.id}
       data-day-stop-variant="grid"
-      data-day-stop-layout="owner-v6"
+      data-day-stop-layout="owner-v7"
       data-ticket-bought={bought ? '1' : '0'}
       data-commercial-chip={chip.kind}
       data-day-session={sessionDisplay || undefined}
       data-day-stop-focused={focused ? '1' : undefined}
     >
       {/*
-        Owner v6 template (Daibilet tokens):
-        [thumb+N + ↑↓] | title / address / meta badges | maps+X (large tap)
+        Owner v7: single compact row
+        [↑↓ left] [thumb+N] [title / address / meta] [✈][X]
       */}
       <div
-        className={`flex items-start gap-3 rounded-2xl border bg-white p-3.5 sm:gap-4 sm:p-4 ${
+        className={`flex items-center gap-2 rounded-2xl border bg-white px-2.5 py-2 sm:gap-3 sm:px-3 sm:py-2.5 ${
           focused ? 'border-emerald-400 ring-1 ring-emerald-200' : 'border-slate-200'
         }`}
       >
-        <div className="flex w-16 shrink-0 flex-col items-center gap-1">
-          <div className="relative h-16 w-16" data-day-stop-thumb>
-            <span
-              className="absolute -left-1 -top-1 z-10 inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white shadow-sm"
-              aria-label={`Точка ${index + 1}`}
-              data-day-stop-number
-            >
-              {index + 1}
-            </span>
-            <div className="relative h-full w-full overflow-hidden rounded-xl bg-slate-100">
-              {venue.imageUrl ? (
-                <SafeImage src={venue.imageUrl} alt="" fill sizes="4rem" className="object-cover" />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center text-slate-400">
-                  <MapPin className="h-5 w-5" />
-                </div>
-              )}
-            </div>
-          </div>
-          <div
-            className="flex shrink-0 flex-col items-center leading-none"
-            data-day-stop-sort
+        <div
+          className="flex shrink-0 flex-col items-center leading-none"
+          data-day-stop-sort
+        >
+          <button
+            type="button"
+            aria-label="Выше"
+            disabled={index === 0}
+            onClick={onMoveUp}
+            className="rounded p-0.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
           >
-            <button
-              type="button"
-              aria-label="Выше"
-              disabled={index === 0}
-              onClick={onMoveUp}
-              className="rounded p-0.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
-            >
-              <ChevronUp className="h-3.5 w-3.5" />
-            </button>
-            <button
-              type="button"
-              aria-label="Ниже"
-              disabled={index >= total - 1}
-              onClick={onMoveDown}
-              className="rounded p-0.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
-            >
-              <ChevronDown className="h-3.5 w-3.5" />
-            </button>
+            <ChevronUp className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            aria-label="Ниже"
+            disabled={index >= total - 1}
+            onClick={onMoveDown}
+            className="rounded p-0.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+          >
+            <ChevronDown className="h-3.5 w-3.5" />
+          </button>
+        </div>
+
+        <div className="relative h-14 w-14 shrink-0 sm:h-16 sm:w-16" data-day-stop-thumb>
+          <span
+            className="absolute -left-1 -top-1 z-10 inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white shadow-sm"
+            aria-label={`Точка ${index + 1}`}
+            data-day-stop-number
+          >
+            {index + 1}
+          </span>
+          <div className="relative h-full w-full overflow-hidden rounded-xl bg-slate-100">
+            {venue.imageUrl ? (
+              <SafeImage src={venue.imageUrl} alt="" fill sizes="4rem" className="object-cover" />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-slate-400">
+                <MapPin className="h-5 w-5" />
+              </div>
+            )}
           </div>
         </div>
 
@@ -3727,7 +3726,7 @@ function DayRouteVenueCard({
           </p>
           {placeLine || !hasCoords ? (
             <p
-              className={`mt-0.5 mb-0 line-clamp-2 text-xs leading-snug ${
+              className={`mt-0.5 mb-0 line-clamp-1 text-xs leading-snug ${
                 !hasCoords && !placeLine ? 'font-medium text-amber-700' : 'text-slate-500'
               }`}
             >
@@ -3737,22 +3736,20 @@ function DayRouteVenueCard({
           ) : null}
 
           {segmentTimeLabel || segmentDistanceLabel || sessionDisplay ? (
-            <div className="mt-2 flex flex-wrap items-center gap-1.5" data-day-stop-bottom-row>
+            <div className="mt-1 flex flex-wrap items-center gap-1.5" data-day-stop-bottom-row>
               {segmentTimeLabel ? (
                 <span
-                  className="inline-flex items-center rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-800"
+                  className="inline-flex items-center rounded-md border border-slate-100 bg-slate-50 px-1.5 py-0.5 text-[11px] font-medium text-slate-600"
                   data-day-segment-hint
                 >
                   {segmentTimeLabel}
                 </span>
               ) : null}
               {segmentDistanceLabel ? (
-                <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-600">
-                  {segmentDistanceLabel}
-                </span>
+                <span className="text-[11px] text-slate-500">{segmentDistanceLabel}</span>
               ) : null}
               {sessionDisplay ? (
-                <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
+                <span className="inline-flex items-center rounded-md bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-800">
                   {sessionDisplay}
                 </span>
               ) : null}
@@ -3760,7 +3757,7 @@ function DayRouteVenueCard({
           ) : null}
 
           {ticketUrl ? (
-            <div className="mt-2 flex flex-wrap items-center gap-1.5">
+            <div className="mt-1 flex flex-wrap items-center gap-1.5">
               <a
                 href={ticketUrl}
                 target="_blank"
@@ -3783,7 +3780,7 @@ function DayRouteVenueCard({
           ) : null}
         </div>
 
-        <div className="flex shrink-0 items-start gap-0.5 self-start" data-day-stop-top-right>
+        <div className="flex shrink-0 items-center gap-0.5" data-day-stop-top-right>
           {mapsUrl ? (
             <a
               href={mapsUrl}
