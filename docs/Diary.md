@@ -1,3 +1,17 @@
+## 2026-08-02 - /my-day: owner-v2 stop card (номер не на thumb)
+
+### Наблюдения
+- Owner: live карточка всё ещё с номером на thumb top-left, ↑↓ слева от фото, «далее» отдельно под адресом.
+
+### Решения
+- Grid card `data-day-stop-layout="owner-v2"`: flex без absolute; square thumb; `[N][✈][X]` в ряду с title; bottom row `[↑][↓] далее ~`.
+- Preflight: number not inside `data-day-stop-thumb`; no GripVertical.
+
+### Проблемы
+- Нет. MSK **BUILD_ID=`D_jH5Sawp7UnqaOX4IJsC`** (`d1425e5`), SMOKE_OK.
+
+---
+
 ## 2026-08-02 - /my-day: exact stop card + mobile starter A
 
 ### Наблюдения
