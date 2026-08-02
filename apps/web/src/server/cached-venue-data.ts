@@ -1,8 +1,9 @@
 import { unstable_cache } from 'next/cache';
 
 import '@/lib/env';
-import { buildPublicVenueDto } from '@daibilet/backend/public-read';
+import type { PublicVenuePageDto } from '@daibilet/contracts/public';
 import { PUBLIC_PAGE_REVALIDATE, VENUE_PAGE_CACHE_TAG } from '@/server/cache-config';
+import { fetchPublicApiJson } from '@/server/public-api-client';
 
 export { VENUE_PAGE_CACHE_TAG };
 
@@ -28,8 +29,12 @@ export async function getCachedPublicVenueDto(slug: string) {
   if (!key) return null;
 
   const cached = unstable_cache(
-    () => buildPublicVenueDto(key),
-    ['public-venue-dto-v1', key],
+    () =>
+      fetchPublicApiJson<PublicVenuePageDto | null>(`/api/public/venues/${encodeURIComponent(key)}`, {
+        timeoutMs: 5_000,
+        notFoundAsNull: true,
+      }),
+    ['public-venue-dto-v2-http', key],
     venueCacheOptions,
   );
   return cached();

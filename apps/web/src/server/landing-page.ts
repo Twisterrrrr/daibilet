@@ -1,16 +1,23 @@
 import type { PublicLandingPageDto } from '@daibilet/contracts/public';
-import { buildPublicLandingPageDto } from '@daibilet/backend/public-read';
 
 import { resolveSessionPriceRange } from '@/lib/event-card-meta';
 import { landingFetchCandidates } from '@/lib/landing-constants';
 import { filterSessionsByCity, filterSessionsByGenre, resolveLandingCityName } from '@/lib/landing-city';
+import { fetchPublicApiJson } from '@/server/public-api-client';
 
 export async function fetchLandingPageDto(
   slug: string,
   citySlug?: string | null,
 ): Promise<PublicLandingPageDto | null> {
   for (const candidate of landingFetchCandidates(slug)) {
-    const payload = await buildPublicLandingPageDto(candidate, false, citySlug);
+    const payload = await fetchPublicApiJson<PublicLandingPageDto | null>(
+      `/api/public/landings/${encodeURIComponent(candidate)}`,
+      {
+        searchParams: citySlug ? { city: citySlug } : null,
+        timeoutMs: 5_000,
+        notFoundAsNull: true,
+      },
+    );
     if (!payload?.landing) continue;
     if (candidate === slug) return payload;
     return {

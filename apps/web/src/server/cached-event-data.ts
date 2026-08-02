@@ -3,8 +3,9 @@ import { unstable_cache } from 'next/cache';
 import '@/lib/env';
 import { prisma } from '@/lib/db';
 import { shouldEmitAggregateRating } from '@/lib/review-rating';
-import { buildPublicEventDto } from '@daibilet/backend/public-read';
+import type { PublicEventPageDto } from '@daibilet/contracts/public';
 import { EVENT_PAGE_CACHE_TAG, PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
+import { fetchPublicApiJson } from '@/server/public-api-client';
 
 export { EVENT_PAGE_CACHE_TAG };
 
@@ -30,9 +31,13 @@ export async function getCachedPublicEventDto(slug: string) {
   if (!key) return null;
 
   const cached = unstable_cache(
-    () => buildPublicEventDto(key),
+    () =>
+      fetchPublicApiJson<PublicEventPageDto | null>(`/api/public/events/${encodeURIComponent(key)}`, {
+        timeoutMs: 5_000,
+        notFoundAsNull: true,
+      }),
     // v2: invalidate stale single-session pages after meta-group slot merge.
-    ['public-event-dto-v2', key],
+    ['public-event-dto-v3-http', key],
     eventCacheOptions,
   );
   return cached();

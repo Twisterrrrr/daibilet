@@ -10,8 +10,8 @@ import {
   splitBlogListingHero,
   type BlogCardDto,
 } from '@/lib/blog-utils';
-import { buildPublicArticlesListDto } from '@daibilet/backend/public-read';
 import { BLOG_PAGE_CACHE_TAG, PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
+import { fetchPublicApiJson } from '@/server/public-api-client';
 
 export { BLOG_PAGE_CACHE_TAG };
 
@@ -19,6 +19,8 @@ const blogCacheOptions = {
   revalidate: PUBLIC_PAGE_REVALIDATE,
   tags: [BLOG_PAGE_CACHE_TAG] as string[],
 };
+
+type BlogApiArticles = NonNullable<Parameters<typeof mergeBlogCards>[0]>;
 
 function withListingExcerpts(posts: BlogCardDto[]): BlogCardDto[] {
   return posts.map((post) => ({
@@ -36,7 +38,9 @@ export type BlogPageData = {
 async function loadBlogPageData(): Promise<BlogPageData> {
   let posts = withListingExcerpts(mergeBlogCards(null));
   try {
-    const payload = await buildPublicArticlesListDto();
+    const payload = await fetchPublicApiJson<{ articles?: BlogApiArticles }>('/api/public/articles', {
+      timeoutMs: 3_000,
+    });
     posts = withListingExcerpts(mergeBlogCards(payload?.articles));
   } catch {
     // fallback to static posts

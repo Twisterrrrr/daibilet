@@ -182,7 +182,10 @@ export default async function CityPage({ params }: PageProps) {
     blogCards,
   );
   const View = hubTemplate === 'editorial' ? CityPageViewEditorial : CityPageView;
-  cityPerfMark('page-total', pageStartedAt, { slug: decodedSlug, hubArticles: hubArticles.length });
+  cityPerfMark('page-total', pageStartedAt, {
+    slug: decodedSlug,
+    hubArticles: Object.values(hubArticles).reduce((sum, list) => sum + list.length, 0),
+  });
 
   return (
     <>

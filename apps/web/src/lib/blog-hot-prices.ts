@@ -1,8 +1,9 @@
-import { buildPublicCityDto, buildPublicLandingsCatalogDto } from '@daibilet/backend/public-read';
+import type { PublicCityPageDto, PublicLandingDto } from '@daibilet/contracts/public';
 
 import { resolveBlogPrimaryLandingSlug } from '@/lib/blog-listing-links';
 import { normalizeKnownCitySlug } from '@/lib/landing-routes';
 import type { BlogCardDto } from '@/lib/blog-utils';
+import { fetchPublicApiJson } from '@/server/public-api-client';
 
 const MIN_DISPLAY_PRICE_RUB = 100;
 const PSEUDO_CITY_SLUGS = new Set(['regions', 'multi']);
@@ -30,7 +31,10 @@ export async function resolveBlogHotMinPrices(
   await Promise.all(
     citySlugs.map(async (slug) => {
       try {
-        const page = await buildPublicCityDto(slug);
+        const page = await fetchPublicApiJson<PublicCityPageDto | null>(
+          `/api/public/cities/${encodeURIComponent(slug)}`,
+          { timeoutMs: 3_000, notFoundAsNull: true },
+        );
         const price = page?.stats?.priceFrom;
         if (typeof price === 'number' && Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB) {
           cityPriceBySlug.set(slug, Math.round(price));
@@ -52,7 +56,10 @@ export async function resolveBlogHotMinPrices(
   let landingPriceBySlug: Map<string, number> | null = null;
   if (needLanding) {
     try {
-      const catalog = await buildPublicLandingsCatalogDto();
+      const catalog = await fetchPublicApiJson<{ items?: PublicLandingDto[] }>(
+        '/api/public/landings-catalog',
+        { timeoutMs: 3_000 },
+      );
       landingPriceBySlug = new Map();
       for (const landing of catalog?.items || []) {
         const price = landing.priceFrom;

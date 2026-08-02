@@ -1,17 +1,30 @@
 import { unstable_cache } from 'next/cache';
 
 import '@/lib/env';
-import {
-  buildPublicArticlesListDto,
-  buildPublicCityDto,
-} from '@daibilet/backend/public-read';
+import type { PublicCityPageDto } from '@daibilet/contracts/public';
+import type { BlogCardDto } from '@/lib/blog-utils';
 import { CITY_PAGE_CACHE_TAG, PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
+import { fetchPublicApiJson } from '@/server/public-api-client';
 
 export { CITY_PAGE_CACHE_TAG };
 
 const cityCacheOptions = {
   revalidate: PUBLIC_PAGE_REVALIDATE,
   tags: [CITY_PAGE_CACHE_TAG] as string[],
+};
+
+type PublicCityPagePayload = PublicCityPageDto & {
+  city: PublicCityPageDto['city'] & {
+    heroImageUrl?: string | null;
+    isIndexable?: boolean | null;
+  };
+};
+
+type PublicArticlesListPayload = {
+  generatedAt?: string;
+  articles?: BlogCardDto[];
+  items?: BlogCardDto[];
+  [key: string]: unknown;
 };
 
 function normalizeCitySlug(slug: string): string {
@@ -31,8 +44,12 @@ export async function getCachedPublicCityDto(slug: string) {
   if (!key) return null;
 
   const cached = unstable_cache(
-    () => buildPublicCityDto(key),
-    ['public-city-dto-v2-lean', key],
+    () =>
+      fetchPublicApiJson<PublicCityPagePayload | null>(`/api/public/cities/${encodeURIComponent(key)}`, {
+        timeoutMs: 5_000,
+        notFoundAsNull: true,
+      }),
+    ['public-city-dto-v3-http', key],
     cityCacheOptions,
   );
   return cached();
@@ -45,12 +62,15 @@ export async function getCachedCityHubArticles(slug: string) {
 
   const cached = unstable_cache(
     () =>
-      buildPublicArticlesListDto({
-        citySlug: key,
-        includeBroad: true,
-        limit: 40,
+      fetchPublicApiJson<PublicArticlesListPayload>('/api/public/articles', {
+        searchParams: {
+          citySlug: key,
+          includeBroad: 1,
+          limit: 40,
+        },
+        timeoutMs: 3_000,
       }),
-    ['public-city-articles-v1', key],
+    ['public-city-articles-v2-http', key],
     cityCacheOptions,
   );
   return cached();
@@ -66,8 +86,12 @@ export async function listTopCitySlugsForSsg(): Promise<string[]> {
   if (limit <= 0) return [];
 
   try {
-    const { buildPublicDestinationsDto } = await import('@daibilet/backend/public-read');
-    const payload = await buildPublicDestinationsDto();
+    const payload = await fetchPublicApiJson<{ destinations?: Array<{
+      slug?: string | null;
+      type?: string | null;
+      events?: number | null;
+      name: string;
+    }> }>('/api/public/destinations', { timeoutMs: 3_000 });
     return (payload.destinations || [])
       .filter((item) => item.type === 'city' && item.slug && (item.events || 0) > 0)
       .sort((a, b) => (b.events || 0) - (a.events || 0) || a.name.localeCompare(b.name, 'ru'))

@@ -1,15 +1,16 @@
 import { unstable_cache } from 'next/cache';
 
 import '@/lib/env';
-import {
-  buildPublicCatalogDto,
-  buildPublicDestinationsDto,
-  buildPublicLandingsCatalogDto,
-  buildPublicStatsDto,
-  buildPublicVenuesDto,
-} from '@daibilet/backend/public-read';
+import type {
+  PublicCatalogDto,
+  PublicDestinationDto,
+  PublicLandingDto,
+  PublicStatsDto,
+  PublicVenuesDto,
+} from '@daibilet/contracts/public';
 import { HOME_PAGE_CACHE_TAG, PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
 import { resolveCoverContentFingerprints } from '@/server/cover-image-fingerprint';
+import { fetchPublicApiJson } from '@/server/public-api-client';
 
 export { HOME_PAGE_CACHE_TAG };
 
@@ -19,11 +20,11 @@ const homeCacheOptions = {
 };
 
 type HomePageData = {
-  destinationsPayload: Awaited<ReturnType<typeof buildPublicDestinationsDto>>;
-  catalogPayload: Awaited<ReturnType<typeof buildPublicCatalogDto>>;
-  landingsCatalog: Awaited<ReturnType<typeof buildPublicLandingsCatalogDto>>;
-  venuesPayload: Awaited<ReturnType<typeof buildPublicVenuesDto>>;
-  statsPayload: Awaited<ReturnType<typeof buildPublicStatsDto>>;
+  destinationsPayload: { generatedAt?: string; destinations: PublicDestinationDto[] };
+  catalogPayload: PublicCatalogDto;
+  landingsCatalog: { generatedAt?: string; city?: string; items: PublicLandingDto[] };
+  venuesPayload: PublicVenuesDto;
+  statsPayload: PublicStatsDto;
 };
 
 function emptyHomePageData(): HomePageData {
@@ -55,15 +56,19 @@ function emptyHomePageData(): HomePageData {
 }
 
 export const getHomeDestinations = unstable_cache(
-  () => buildPublicDestinationsDto(),
-  ['home-destinations-v3-statsfix'],
+  () => fetchPublicApiJson<HomePageData['destinationsPayload']>('/api/public/destinations', { timeoutMs: 3_000 }),
+  ['home-destinations-v4-http'],
   homeCacheOptions,
 );
 
 export const getHomeCatalog = unstable_cache(
   // Wider pool so cover-content dedupe can refill rails after skipping identical binaries.
-  () => buildPublicCatalogDto({ limit: 80, sort: 'popular' }),
-  ['home-catalog-v6-lean'],
+  () =>
+    fetchPublicApiJson<PublicCatalogDto>('/api/public/events', {
+      searchParams: { limit: 80, sort: 'popular' },
+      timeoutMs: 5_000,
+    }),
+  ['home-catalog-v7-http'],
   homeCacheOptions,
 );
 
@@ -85,20 +90,24 @@ export const getHomeCoverFingerprints = unstable_cache(
 );
 
 export const getHomeLandings = unstable_cache(
-  () => buildPublicLandingsCatalogDto(new URLSearchParams()),
-  ['home-landings-v2'],
+  () => fetchPublicApiJson<HomePageData['landingsCatalog']>('/api/public/landings-catalog', { timeoutMs: 4_000 }),
+  ['home-landings-v3-http'],
   homeCacheOptions,
 );
 
 export const getHomeVenues = unstable_cache(
-  () => buildPublicVenuesDto(new URLSearchParams({ family: 'institution', limit: '200' })),
-  ['home-venues-v2'],
+  () =>
+    fetchPublicApiJson<PublicVenuesDto>('/api/public/venues', {
+      searchParams: { family: 'institution', limit: 200 },
+      timeoutMs: 5_000,
+    }),
+  ['home-venues-v3-http'],
   homeCacheOptions,
 );
 
 export const getHomeStats = unstable_cache(
-  () => buildPublicStatsDto(),
-  ['home-stats-v2-statsfix'],
+  () => fetchPublicApiJson<PublicStatsDto>('/api/public/stats', { timeoutMs: 3_000 }),
+  ['home-stats-v3-http'],
   homeCacheOptions,
 );
 

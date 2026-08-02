@@ -1,6 +1,4 @@
-import '@/lib/env';
-import { buildPublicArticlePageDto } from '@daibilet/backend/public-read';
-import { publicJsonResponse } from '@/server/public-json-response';
+import { proxyPublicApiRequest } from '@/server/public-api-proxy';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 300;
@@ -9,11 +7,7 @@ type RouteContext = {
   params: Promise<{ slug: string }>;
 };
 
-export async function GET(_request: Request, context: RouteContext) {
+export async function GET(request: Request, context: RouteContext) {
   const { slug } = await context.params;
-  const payload = await buildPublicArticlePageDto(decodeURIComponent(slug));
-  if (!payload?.article) {
-    return publicJsonResponse({ error: 'not_found' }, { status: 404 });
-  }
-  return publicJsonResponse(payload);
+  return proxyPublicApiRequest(request, `/api/public/articles/${encodeURIComponent(decodeURIComponent(slug))}`);
 }

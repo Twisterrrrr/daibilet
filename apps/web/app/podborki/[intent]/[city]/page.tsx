@@ -19,7 +19,7 @@ import {
 import { buildShareMetadata, pageTitle } from '@/lib/seo-meta';
 import { parseCatalogPageQuery } from '@/server/catalog-query';
 import { getCachedCatalog } from '@/server/cached-catalog-data';
-import { buildPublicDestinationsDto } from '@daibilet/backend/public-read';
+import { getCachedDestinations } from '@/server/cached-public-surfaces';
 
 export const revalidate = 300;
 
@@ -35,7 +35,7 @@ async function resolveCityLabel(citySlug?: string | null) {
     return { citySlug: slug, cityName: fromMap };
   }
   try {
-    const destinations = await buildPublicDestinationsDto();
+    const destinations = await getCachedDestinations();
     const match = (destinations.destinations || []).find(
       (item) => item.slug === slug || item.sourceSlug === slug || item.name === slug,
     );
