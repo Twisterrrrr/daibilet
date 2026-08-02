@@ -10,7 +10,7 @@
 - CTA «Своё место» в header точек + sticky «Своё»; sticky «Каталог» открывает catalog accordion.
 
 ### Проблемы
-- BUILD_ID - после MSK deploy.
+- Live MSK BUILD_ID=`QrIjNExsel44mrZk0b09y` (`a4ce4e7`); smoke /my-day 200.
 
 ---
 
