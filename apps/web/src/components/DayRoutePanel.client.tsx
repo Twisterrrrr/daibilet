@@ -1934,18 +1934,19 @@ function DayRoutePanelInner() {
     if (asStarter) {
       return (
         <section
-          className="mx-auto mt-3 w-full max-w-6xl rounded-2xl border border-slate-200 bg-white px-3 py-4 sm:mt-5 sm:px-6 sm:py-5 lg:px-6 lg:py-6"
+          className="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-3 py-3 sm:mt-5 sm:px-6 sm:py-4 lg:px-0 lg:py-5"
           ref={unifiedSearchRef}
           data-day-unified-search
           data-day-starter="1"
           data-day-starter-variant="a"
           data-day-starter-desktop="two-col"
-          data-day-starter-max="6xl"
+          data-day-starter-max="full"
+          data-day-starter-inset="edges"
           data-day-starter-pad="sym"
           data-day-starter-density="compact"
         >
           <div
-            className="flex w-full flex-col max-lg:mx-auto max-lg:max-w-md lg:grid lg:grid-cols-2 lg:items-center lg:gap-8 xl:gap-10"
+            className="flex w-full flex-col max-lg:mx-auto max-lg:max-w-md lg:grid lg:grid-cols-2 lg:items-center lg:gap-8 lg:px-6 xl:gap-10 xl:px-10 2xl:px-16"
             data-day-plan-starter
           >
             <div className="min-w-0">
@@ -1955,11 +1956,16 @@ function DayRoutePanelInner() {
                   Собери свой день
                 </p>
               </div>
-              <p className="mt-1.5 text-[12px] font-normal leading-snug text-slate-500 sm:max-lg:whitespace-nowrap sm:text-[13px]">
+              <p className="mt-1.5 text-[12px] font-normal leading-snug text-slate-500 sm:max-lg:whitespace-nowrap sm:text-[13px] lg:hidden">
                 Выбери город и минимум {DAY_ROUTE_MIN} точки для составления маршрута
               </p>
+              <p className="mt-1.5 hidden text-[13px] font-normal leading-snug text-slate-500 lg:block">
+                Выбери город и минимум {DAY_ROUTE_MIN} точки
+                <br />
+                для составления маршрута
+              </p>
             </div>
-            <div className="mt-4 flex w-full flex-col gap-2.5 lg:mt-0" data-day-city-search-stack>
+            <div className="mt-3 flex w-full flex-col gap-2.5 lg:mt-0" data-day-city-search-stack>
               <div data-day-city-picker className="w-full text-left">
                 <CityPicker
                   cities={destinations}

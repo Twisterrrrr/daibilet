@@ -1,3 +1,20 @@
+## 2026-08-02 - /my-day: starter pad + desktop subtitle + ultrawide inset
+
+### Наблюдения
+- Mobile: лишний нижний воздух в empty starter (красная зона на скрине) - pt/pb должны быть симметричны.
+- Desktop: subtitle «Выбери город…» - две строки явно.
+- Ultrawide: `max-w-6xl` + сжатие карточки - неверный подход; нужна полная ширина колонки + inset от краёв.
+
+### Решения
+- Mobile: `py-3` / `sm:py-4` / `lg:py-5` (equal pt/pb); stack `mt-3` вместо `mt-4`.
+- Subtitle: `lg:hidden` одна строка; `hidden lg:block` + `<br />` - «Выбери город и минимум 2 точки» / «для составления маршрута».
+- Убран `max-w-6xl mx-auto`; card `w-full`; inner grid `lg:px-6 xl:px-10 2xl:px-16` (`data-day-starter-max="full"` + `data-day-starter-inset="edges"`).
+
+### Проблемы
+- Нет (BUILD_ID после MSK deploy).
+
+---
+
 ## 2026-08-02 - /my-day: starter max-w-6xl on wide screens
 
 ### Наблюдения
@@ -6,6 +23,7 @@
 ### Решения
 - Starter section only: `mx-auto w-full max-w-6xl` (1152px) + `data-day-starter-max="6xl"`; страница/`container-page` остаётся `max-w-7xl`.
 - Mobile A + two-col variant 1 без изменений; events search + placeholder уже в `aeff488`.
+- **Superseded** следующей записью (full-width + edge inset).
 
 ### Проблемы
 - Нет. MSK **BUILD_ID=`Zr8QqKS-qQp6XC5LjYQwu`** (`e307782`), SMOKE_OK; starter `max-w-6xl` + events placeholder in chunks.
