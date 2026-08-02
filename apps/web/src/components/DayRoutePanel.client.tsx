@@ -1455,7 +1455,7 @@ function DayRoutePanelInner() {
                   </div>
                 </div>
               ) : null}
-              <ul className="mt-3 space-y-3">
+              <ul className="mt-3 grid grid-cols-1 items-start gap-3 md:grid-cols-2">
                 {(payload?.matches || []).map((match) => {
                   const fullCovered = dayRouteFullCoveredCount(match.covered);
                   const nearCount = match.covered.nearby.length;
