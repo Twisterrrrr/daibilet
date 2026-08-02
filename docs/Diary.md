@@ -11,7 +11,7 @@
 - Always render disabled search + flush «или добавь…» when !hasPageCity (`data-day-starter-geometry="stable"`); no yellow card collapse.
 
 ### Проблемы
-- Нет (BUILD_ID после MSK deploy).
+- Owner не видел фиксы: MSK оставался на `170fcde` / BUILD `zWhruNKKc49M4HkJdf7M8` пока origin уже был `85c5baf` (redeploy прерван / self-pkill). После clean MSK **BUILD_ID=`nR2QJSoeHmkwIjfOMIw1A`** (`85c5baf`), SMOKE_OK; live my-day chunk contains `lg:items-stretch` / `2xl:px-20` / `stable`.
 
 ---
 
