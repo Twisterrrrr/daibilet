@@ -65,10 +65,10 @@ describe('day-route-commercial chips', () => {
     assert.equal(chip.label, 'Вечерний сеанс');
   });
 
-  it('free when no commerce signals', () => {
+  it('free when no commerce signals (no badge label)', () => {
     const chip = classifyDayRouteCommercialChip(stop({ id: '4', title: 'Набережная' }));
     assert.equal(chip.kind, 'free');
-    assert.equal(chip.label, 'Вход свободный');
+    assert.equal(chip.label, '');
   });
 });
 

@@ -1,5 +1,9 @@
 # qa.md — открытые вопросы
 
+## 2026-08-02 - My-day: QR билетов в поездке
+
+Блок «Ваши билеты в этой поездке» показывает отмеченные `ticketBought` стопы + deep-link. **QR-коды и тайминги из реальных заказов Дайбилет** требуют auth + orders API на public web - пока `qrAvailable=false` (shell). Когда готов endpoint - hydrate QR сюда.
+
 ## 2026-08-02 - Location vs Venue / антидубли (канон зафиксирован)
 
 Канон: [catalog-location-venue-canon.md](./catalog-location-venue-canon.md). Краткий pointer: [Project.md](./Project.md) § Location vs Venue.

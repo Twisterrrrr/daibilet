@@ -1,3 +1,20 @@
+## 2026-08-02 - /my-day: compact stops + starter + commercial CTA slice
+
+### Наблюдения
+- Owner: раздутые карточки, «Вход свободный» лишний, «далее» внутри карточки; empty «План пока пуст» слабее формы; monetization = Купить билет / Рядом / Ваши билеты; Hot Picks H2 мелко.
+
+### Решения
+- Компактный stop card: без free-badge, ETA `далее` под карточкой, session line, buy CTA `от {цена}` / nearby upsell.
+- Starter: icon + «Выберите город и минимум 2 точки…» в блоке поиска; «или добавь своё место»; empty dashed убран.
+- Hot Picks title `text-xl`/`sm:text-2xl`.
+- «Ваши билеты в этой поездке» shell для ticketBought (QR - qa open).
+- Matches → admission attach + nearby upsell helpers в `day-route-commercial`.
+
+### Проблемы
+- QR из orders API ещё нет.
+
+---
+
 ## 2026-08-02 - /my-day: add/remove stop no longer jumps scroll to top
 
 ### Наблюдения

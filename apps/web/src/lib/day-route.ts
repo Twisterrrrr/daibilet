@@ -109,6 +109,8 @@ export type DayRouteVenueItem = {
   ticketUrl?: string | null;
   /** Guest marked ticket as purchased - persisted in localStorage. */
   ticketBought?: boolean;
+  /** Lowest known ticket price (rub) from matches / catalog - for «Купить билет от X». */
+  priceFromRub?: number | null;
 };
 
 /** Synthetic planner stops (typed on /my-day) - no catalog venue id required. */

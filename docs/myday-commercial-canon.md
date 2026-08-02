@@ -15,9 +15,12 @@
 1. `ticketBought` → **Билет отмечен**
 2. timed (`startsAt` / `sessionLabel` → HH:MM) → **Сеанс HH:00**
 3. есть checkout (`ticketUrl` / eventId/slug) → **Билет оформляется…** (soft «Вечерний сеанс» для affiche stub)
-4. иначе → **Вход свободный**
+4. иначе → без бейджа (не писать «Вход свободный»)
 
-Карточка нейтральная (белый фон) + chip + CTA «Купить билет» при наличии URL.
+Карточка компактная (белый фон) + chip только для commerce + CTA «Купить билет от {цена}» при наличии URL/цены.
+
+Under-stop: на бесплатной точке - «Рядом: …» из matches (STOP/nearby/excursion), CTA «Купить билет».
+Trip tickets: блок «Ваши билеты в этой поездке» для `ticketBought` (QR из orders API - open, см. qa.md).
 
 ## Hot Picks («Выбор Дайбилет»)
 

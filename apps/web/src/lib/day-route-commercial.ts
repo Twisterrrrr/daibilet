@@ -1,6 +1,6 @@
 /**
  * Commercial checklist helpers for «Мой день» (planner + tickets, not swipe UX).
- * Status chips, readiness %, free-window gaps between stops.
+ * Status chips, readiness %, free-window gaps, under-stop upsell, trip tickets shell.
  */
 
 import {
@@ -11,6 +11,8 @@ import {
   resolveDayRouteTicketUrl,
   type DayRouteVenueItem,
 } from './day-route';
+import { formatPriceFrom } from './format';
+import { eventHref } from './routes';
 
 export type DayRouteCommercialChipKind = 'bought' | 'session' | 'needs_ticket' | 'free';
 
@@ -43,7 +45,7 @@ export function dayRouteStopHasTicket(
  * 1. ticketBought → «Билет отмечен»
  * 2. timed session → «Сеанс HH:00»
  * 3. ticketUrl / event → «Билет оформляется…» (pending until ticketBought)
- * 4. else → «Вход свободный»
+ * 4. else → kind `free` (UI hides badge; no «Вход свободный»)
  *
  * Soft session labels without HH:MM (e.g. «Вечерний сеанс») stay needs_ticket -
  * never invent «сегодня 18:30» on the chip.
@@ -65,7 +67,7 @@ export function classifyDayRouteCommercialChip(
     }
     return { kind: 'needs_ticket', label: 'Билет оформляется…' };
   }
-  return { kind: 'free', label: 'Вход свободный' };
+  return { kind: 'free', label: '' };
 }
 
 export type DayRouteReadiness = {
@@ -187,4 +189,268 @@ export function commercialChipClassName(kind: DayRouteCommercialChipKind): strin
     default:
       return 'bg-slate-50 text-slate-600 ring-1 ring-inset ring-slate-200';
   }
+}
+
+/** Match stub from `/api/day-route/matches` used for commerce attach / under-stop upsell. */
+export type DayRouteMatchOfferStub = {
+  eventId: string;
+  slug: string;
+  title: string;
+  priceFromRub: number | null;
+  covered: { stop: string[]; start: string[]; nearby: string[] };
+  routeVenues?: Array<{ id: string }>;
+};
+
+export type DayRouteNearbyUpsell = {
+  eventId: string;
+  title: string;
+  ticketUrl: string;
+  priceFromRub: number | null;
+  /** e.g. «Рядом: Экскурсия по крышам (от 900 ₽)» */
+  line: string;
+};
+
+export type DayRouteTripTicket = {
+  venueId: string;
+  title: string;
+  sessionLabel: string | null;
+  ticketUrl: string | null;
+  /** Guest MVP: QR from orders API not wired yet. */
+  qrAvailable: boolean;
+};
+
+function venueLocatorKeys(venue: Pick<DayRouteVenueItem, 'id' | 'slug'>): Set<string> {
+  return new Set(
+    [venue.id, venue.slug]
+      .map((x) => String(x || '').trim())
+      .filter(Boolean),
+  );
+}
+
+function coveredIncludes(
+  covered: DayRouteMatchOfferStub['covered'],
+  keys: Set<string>,
+): { stop: boolean; start: boolean; nearby: boolean } {
+  return {
+    stop: covered.stop.some((id) => keys.has(id)),
+    start: covered.start.some((id) => keys.has(id)),
+    nearby: covered.nearby.some((id) => keys.has(id)),
+  };
+}
+
+function realPriceRub(value: number | null | undefined): number | null {
+  if (value == null || !Number.isFinite(Number(value))) return null;
+  const n = Number(value);
+  return n > 0 ? n : null;
+}
+
+function priceSuffixLabel(priceFromRub: number | null | undefined): string {
+  const n = realPriceRub(priceFromRub);
+  if (n == null) return '';
+  const label = formatPriceFrom(n);
+  return label === 'Цена уточняется' ? '' : label;
+}
+
+/**
+ * Single-venue admission / ticket product (cable car, museum entry).
+ * Multi-stop excursions stay under-stop «Рядом» on free landmarks.
+ */
+export function matchIsSingleVenueAdmission(match: DayRouteMatchOfferStub): boolean {
+  const routeCount = match.routeVenues?.length ?? 0;
+  if (routeCount > 1) return false;
+  if (match.covered.stop.length > 0) return false;
+  return true;
+}
+
+/** Primary buy CTA on ticketed stop card: «Купить билет от X» when real price known. */
+export function formatDayRouteBuyCtaLabel(
+  venue: Pick<DayRouteVenueItem, 'priceFromRub' | 'sessionLabel'>,
+): string {
+  const price = priceSuffixLabel(venue.priceFromRub);
+  if (price) return `Купить билет ${price}`;
+  const soft = String(venue.sessionLabel || '').trim();
+  if (soft && !/вечерн/i.test(soft) && !/^билет/i.test(soft) && !isSoftDaypart(soft)) {
+    return 'Купить билет на это же время';
+  }
+  return 'Купить билет';
+}
+
+function isSoftDaypart(label: string): boolean {
+  return /^(утро|день|вечер|ночь|утренний\s+сеанс|дневной\s+сеанс|вечерний\s+сеанс|открытая\s+дата)$/i.test(
+    label.trim(),
+  );
+}
+
+export function formatNearbyUpsellLine(match: {
+  title: string;
+  priceFromRub: number | null;
+}): string {
+  const title = String(match.title || '').trim() || 'Билет рядом';
+  const price = priceSuffixLabel(match.priceFromRub);
+  if (price) return `Рядом: ${title} (${price})`;
+  return `Рядом: ${title}`;
+}
+
+function matchTicketUrl(match: Pick<DayRouteMatchOfferStub, 'eventId' | 'slug' | 'title'>): string {
+  return eventHref({
+    id: match.eventId,
+    slug: match.slug,
+    title: match.title,
+  });
+}
+
+/** Attach single-venue ticket product onto a free catalog stop (e.g. канатная дорога). */
+export function pickAdmissionMatchForStop(
+  venue: DayRouteVenueItem,
+  matches: DayRouteMatchOfferStub[],
+): DayRouteMatchOfferStub | null {
+  if (dayRouteStopHasTicket(venue)) return null;
+  const keys = venueLocatorKeys(venue);
+  if (!keys.size) return null;
+  const candidates = matches.filter((m) => {
+    if (!matchIsSingleVenueAdmission(m)) return false;
+    return coveredIncludes(m.covered, keys).start;
+  });
+  if (!candidates.length) return null;
+  candidates.sort(
+    (a, b) =>
+      (a.priceFromRub ?? Number.POSITIVE_INFINITY) - (b.priceFromRub ?? Number.POSITIVE_INFINITY),
+  );
+  return candidates[0] || null;
+}
+
+/** Real price for a ticketed stop from matches (event id/slug or start cover). */
+export function findPriceForTicketedStop(
+  venue: DayRouteVenueItem,
+  matches: DayRouteMatchOfferStub[],
+): number | null {
+  const existing = realPriceRub(venue.priceFromRub);
+  if (existing != null) return existing;
+  const eventId = String(venue.eventId || '').trim();
+  const eventSlug = String(venue.eventSlug || '').trim();
+  if (eventId || eventSlug) {
+    const byEvent = matches.find(
+      (m) =>
+        (eventId && m.eventId === eventId) ||
+        (eventSlug && m.slug === eventSlug),
+    );
+    const fromEvent = realPriceRub(byEvent?.priceFromRub);
+    if (fromEvent != null) return fromEvent;
+  }
+  const keys = venueLocatorKeys(venue);
+  const byStart = matches
+    .filter((m) => coveredIncludes(m.covered, keys).start)
+    .sort(
+      (a, b) =>
+        (a.priceFromRub ?? Number.POSITIVE_INFINITY) -
+        (b.priceFromRub ?? Number.POSITIVE_INFINITY),
+    )[0];
+  return realPriceRub(byStart?.priceFromRub);
+}
+
+/**
+ * Under-stop upsell for free locations (STOP / nearby / multi-stop start).
+ * Skips single-venue admission (those attach as on-card buy CTA).
+ */
+export function pickNearbyUpsellsForStop(
+  venue: DayRouteVenueItem,
+  matches: DayRouteMatchOfferStub[],
+  options?: { limit?: number; excludeEventIds?: Iterable<string> },
+): DayRouteNearbyUpsell[] {
+  if (dayRouteStopHasTicket(venue)) return [];
+  const keys = venueLocatorKeys(venue);
+  if (!keys.size) return [];
+  const exclude = new Set(
+    [...(options?.excludeEventIds || [])].map((x) => String(x || '').trim()).filter(Boolean),
+  );
+  const limit = Math.max(1, options?.limit ?? 1);
+  const ranked: Array<{ match: DayRouteMatchOfferStub; score: number }> = [];
+  for (const match of matches) {
+    if (exclude.has(match.eventId)) continue;
+    const hit = coveredIncludes(match.covered, keys);
+    if (!hit.stop && !hit.start && !hit.nearby) continue;
+    if (matchIsSingleVenueAdmission(match) && hit.start) continue;
+    let roleScore = 0;
+    if (hit.stop) roleScore = 3;
+    else if (hit.start) roleScore = 2;
+    else roleScore = 1;
+    ranked.push({
+      match,
+      score: roleScore * 10 + (realPriceRub(match.priceFromRub) != null ? 1 : 0),
+    });
+  }
+  ranked.sort((a, b) => b.score - a.score);
+  const out: DayRouteNearbyUpsell[] = [];
+  const seen = new Set<string>();
+  for (const row of ranked) {
+    if (out.length >= limit) break;
+    if (seen.has(row.match.eventId)) continue;
+    seen.add(row.match.eventId);
+    out.push({
+      eventId: row.match.eventId,
+      title: row.match.title,
+      ticketUrl: matchTicketUrl(row.match),
+      priceFromRub: realPriceRub(row.match.priceFromRub),
+      line: formatNearbyUpsellLine(row.match),
+    });
+  }
+  return out;
+}
+
+/** Apply matches commerce onto route stops (admission attach + price enrich). Pure. */
+export function applyMatchCommerceToVenues(
+  venues: DayRouteVenueItem[],
+  matches: DayRouteMatchOfferStub[],
+): { venues: DayRouteVenueItem[]; changed: boolean } {
+  if (!venues.length || !matches.length) return { venues, changed: false };
+  let changed = false;
+  const next = venues.map((venue) => {
+    const admission = pickAdmissionMatchForStop(venue, matches);
+    if (admission) {
+      const ticketUrl = matchTicketUrl(admission);
+      const priceFromRub = realPriceRub(admission.priceFromRub);
+      const same =
+        venue.eventId === admission.eventId &&
+        venue.eventSlug === admission.slug &&
+        venue.ticketUrl === ticketUrl &&
+        (priceFromRub == null || venue.priceFromRub === priceFromRub);
+      if (same) return venue;
+      changed = true;
+      return {
+        ...venue,
+        eventId: admission.eventId,
+        eventSlug: admission.slug,
+        ticketUrl,
+        ...(priceFromRub != null ? { priceFromRub } : {}),
+      };
+    }
+    if (!dayRouteStopHasTicket(venue)) return venue;
+    const priceFromRub = findPriceForTicketedStop(venue, matches);
+    if (priceFromRub != null && venue.priceFromRub !== priceFromRub) {
+      changed = true;
+      return { ...venue, priceFromRub };
+    }
+    return venue;
+  });
+  return { venues: next, changed };
+}
+
+/**
+ * Trip tickets aggregation shell: stops marked bought in this plan.
+ * Full QR from Daibilet orders requires buyer auth / orders API (see qa.md).
+ */
+export function collectDayRouteTripTickets(venues: DayRouteVenueItem[]): DayRouteTripTicket[] {
+  return venues
+    .filter((v) => Boolean(v.ticketBought))
+    .map((v) => {
+      const timed = dayRouteSessionTimeLabel(v);
+      const soft = String(v.sessionLabel || '').trim() || null;
+      return {
+        venueId: v.id,
+        title: v.title,
+        sessionLabel: timed || soft,
+        ticketUrl: resolveDayRouteTicketUrl(v),
+        qrAvailable: false,
+      };
+    });
 }
