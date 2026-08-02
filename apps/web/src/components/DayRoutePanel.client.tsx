@@ -1934,12 +1934,13 @@ function DayRoutePanelInner() {
     if (asStarter) {
       return (
         <section
-          className="mt-3 rounded-2xl border border-slate-200 bg-white px-3 py-4 sm:mt-5 sm:px-6 sm:py-5 lg:px-6 lg:py-6"
+          className="mx-auto mt-3 w-full max-w-6xl rounded-2xl border border-slate-200 bg-white px-3 py-4 sm:mt-5 sm:px-6 sm:py-5 lg:px-6 lg:py-6"
           ref={unifiedSearchRef}
           data-day-unified-search
           data-day-starter="1"
           data-day-starter-variant="a"
           data-day-starter-desktop="two-col"
+          data-day-starter-max="6xl"
           data-day-starter-pad="sym"
           data-day-starter-density="compact"
         >

@@ -1,3 +1,17 @@
+## 2026-08-02 - /my-day: starter max-w-6xl on wide screens
+
+### Наблюдения
+- Owner: empty starter OK на Full HD, на ultrawide слишком растянут (two-col на всю ширину контейнера).
+
+### Решения
+- Starter section only: `mx-auto w-full max-w-6xl` (1152px) + `data-day-starter-max="6xl"`; страница/`container-page` остаётся `max-w-7xl`.
+- Mobile A + two-col variant 1 без изменений; events search + placeholder уже в `aeff488`.
+
+### Проблемы
+- Нет (BUILD_ID после MSK deploy).
+
+---
+
 ## 2026-08-02 - /my-day: events in unified search + placeholder
 
 ### Наблюдения
