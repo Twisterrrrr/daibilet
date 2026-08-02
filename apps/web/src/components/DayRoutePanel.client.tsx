@@ -8,7 +8,6 @@ import {
   ChevronUp,
   Copy,
   ExternalLink,
-  GripVertical,
   MapPin,
   Plus,
   Printer,
@@ -19,7 +18,6 @@ import {
   X,
 } from 'lucide-react';
 import {
-  DragEvent,
   FormEvent,
   Suspense,
   useEffect,
@@ -33,6 +31,7 @@ import type { PublicCatalogListItemDto, PublicDestinationDto } from '@daibilet/c
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityPicker } from '@/components/CityPicker.client';
+import { DayRouteBoatWizard } from '@/components/DayRouteBoatWizard.client';
 import {
   DayRouteSearchSelect,
   type DayRouteSearchOption,
@@ -253,7 +252,6 @@ function DayRoutePanelInner() {
     saved: boolean;
   }>({ active: false, fromName: null, saved: false });
   const [travelMode, setTravelMode] = useState<DayRouteTravelMode>('walk');
-  const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [titleInput, setTitleInput] = useState('');
   const [noteInput, setNoteInput] = useState('');
   const [coordsInput, setCoordsInput] = useState('');
@@ -977,35 +975,6 @@ function DayRoutePanelInner() {
     }, 500);
   }
 
-  function onStopDragStart(index: number) {
-    setDragIndex(index);
-  }
-
-  function onStopDragOver(event: DragEvent, index: number) {
-    event.preventDefault();
-    if (dragIndex == null || dragIndex === index) return;
-  }
-
-  function onStopDrop(index: number) {
-    if (dragIndex == null || dragIndex === index) {
-      setDragIndex(null);
-      return;
-    }
-    const ids = route.venues.map((v) => v.id);
-    const [moved] = ids.splice(dragIndex, 1);
-    if (!moved) {
-      setDragIndex(null);
-      return;
-    }
-    ids.splice(index, 0, moved);
-    setRoute(reorderDayRoute(ids));
-    setDragIndex(null);
-  }
-
-  function onStopDragEnd() {
-    setDragIndex(null);
-  }
-
   function optimizeOrder() {
     if (!canOptimize) return;
     const nextVenues = optimizeDayRouteNearestNeighbor(route.venues, coordsById);
@@ -1225,6 +1194,17 @@ function DayRoutePanelInner() {
               />
             </div>
 
+            <DayRouteBoatWizard
+              cityName={pageCityName}
+              citySlug={pageCitySlug}
+              cityId={pageCityId}
+              citySourceSlug={selectedCity?.selectedDestination?.sourceSlug || null}
+              route={route}
+              atMax={atMax}
+              onRouteChange={setRoute}
+              locationsCatalog={locationsCatalog}
+            />
+
             {mustSeeResolved.length > 0 ? (
               <div className="mt-4 rounded-xl border border-slate-100 bg-slate-50 p-3 sm:p-4" data-day-must-see>
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -1437,11 +1417,6 @@ function DayRoutePanelInner() {
                   hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
                   segmentToNext={segmentMeters[index] ?? null}
                   travelMode={travelMode}
-                  dragging={dragIndex === index}
-                  onDragStart={() => onStopDragStart(index)}
-                  onDragOver={(event) => onStopDragOver(event, index)}
-                  onDrop={() => onStopDrop(index)}
-                  onDragEnd={onStopDragEnd}
                   onMoveUp={() => setRoute(moveDayRouteVenue(venue.id, -1))}
                   onMoveDown={() => setRoute(moveDayRouteVenue(venue.id, 1))}
                   onRemove={() => setRoute(removeFromDayRoute(venue.id))}
@@ -1821,11 +1796,6 @@ function DayRouteVenueCard({
   hasCoords,
   segmentToNext,
   travelMode,
-  dragging,
-  onDragStart,
-  onDragOver,
-  onDrop,
-  onDragEnd,
   onMoveUp,
   onMoveDown,
   onRemove,
@@ -1837,11 +1807,6 @@ function DayRouteVenueCard({
   hasCoords: boolean;
   segmentToNext: number | null;
   travelMode: DayRouteTravelMode;
-  dragging?: boolean;
-  onDragStart: () => void;
-  onDragOver: (event: DragEvent) => void;
-  onDrop: () => void;
-  onDragEnd: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onRemove: () => void;
@@ -1871,24 +1836,12 @@ function DayRouteVenueCard({
         bought
           ? 'border-emerald-400 bg-emerald-50'
           : 'border-slate-200 bg-white'
-      } ${dragging ? 'opacity-60 ring-2 ring-emerald-300' : ''}`}
+      }`}
       data-day-plan-stop={venue.id}
       data-ticket-bought={bought ? '1' : '0'}
-      draggable
-      onDragStart={onDragStart}
-      onDragOver={onDragOver}
-      onDrop={onDrop}
-      onDragEnd={onDragEnd}
     >
       <div className="flex items-start gap-3">
         <div className="flex h-14 w-8 shrink-0 flex-col items-center justify-center gap-1">
-          <span
-            className="inline-flex cursor-grab items-center justify-center text-slate-400 active:cursor-grabbing"
-            title="Перетащите"
-            aria-hidden
-          >
-            <GripVertical className="h-4 w-4" />
-          </span>
           <span
             className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white ${
               bought ? 'bg-emerald-600' : 'bg-slate-900'
