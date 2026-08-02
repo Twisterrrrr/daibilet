@@ -35,6 +35,7 @@ import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityPicker } from '@/components/CityPicker.client';
 import { DayRouteBoatWizard } from '@/components/DayRouteBoatWizard.client';
+import { DayRouteOsmMap } from '@/components/DayRouteOsmMap.client';
 import {
   DayRouteSearchSelect,
   type DayRouteSearchOption,
@@ -141,7 +142,7 @@ import { eventHref, venueHref } from '@/lib/routes';
 import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 
-type DayRouteAccordionId = 'catalog' | 'mustSee' | 'text' | 'matches';
+type DayRouteAccordionId = 'catalog' | 'mustSee' | 'text' | 'matches' | 'hotPicks';
 
 type MatchVenueStub = {
   id: string;
@@ -303,6 +304,7 @@ function DayRoutePanelInner() {
   const [venuesCatalog, setVenuesCatalog] = useState<VenueCatalogCard[]>([]);
   const [eventsCatalog, setEventsCatalog] = useState<PublicCatalogListItemDto[]>([]);
   const [catalogLoading, setCatalogLoading] = useState(false);
+  const [catalogError, setCatalogError] = useState<string | null>(null);
   const [destinationsFallback, setDestinationsFallback] = useState<PublicDestinationDto[]>([]);
   const [mustSeeFilter, setMustSeeFilter] = useState<MustSeeFilterId>('main');
   /** Hot Picks tab: Советы / Культура / Еда и бары. */
@@ -603,6 +605,10 @@ function DayRoutePanelInner() {
     : destinationsFallback;
   const pageCityName = headerCityName;
   const pageCitySlug = headerCitySlug;
+  const pageCitySourceSlug =
+    selectedCity?.selectedDestination?.type === 'city'
+      ? String(selectedCity.selectedDestination.sourceSlug || '').trim() || null
+      : null;
   const pageCityId = selectedCity?.selectedDestination?.id || null;
   const hasPageCity = Boolean(pageCityName);
   const scopeCityName = cityTitle || pageCityName;
@@ -635,52 +641,82 @@ function DayRoutePanelInner() {
   const cityHubHref = scopeCitySlug ? `/cities/${encodeURIComponent(scopeCitySlug)}` : '/cities';
 
   // City-scoped catalog lists for on-page searchable selects.
-  // Pass city= to API (alias-aware). Do NOT fetch global top-500 then exact-match
-  // city title - that drops Nizhny/regional rows and breaks slug/title aliases.
+  // Prefer destination slug, then sourceSlug, then display name (alias-aware API).
+  // Do NOT fetch global top-500 then exact-match city title - that drops regional rows.
   useEffect(() => {
     if (!pageCityName) {
       setLocationsCatalog([]);
       setVenuesCatalog([]);
       setEventsCatalog([]);
       setCatalogLoading(false);
+      setCatalogError(null);
       return;
     }
     const controller = new AbortController();
     setCatalogLoading(true);
-    const cityFilter = pageCitySlug || pageCityName;
+    setCatalogError(null);
+    const cityFilter = pageCitySlug || pageCitySourceSlug || pageCityName;
     const cityQ = encodeURIComponent(cityFilter);
     const venuesQs = (family: 'location' | 'institution') =>
       `/api/public/venues?family=${family}&city=${cityQ}&limit=500`;
-    Promise.all([
-      fetch(venuesQs('location'), { signal: controller.signal })
-        .then(async (response) =>
-          response.ok ? ((await response.json()) as { venues?: VenueCatalogCard[] }) : null,
-        )
-        .catch(() => null),
-      fetch(venuesQs('institution'), { signal: controller.signal })
-        .then(async (response) =>
-          response.ok ? ((await response.json()) as { venues?: VenueCatalogCard[] }) : null,
-        )
-        .catch(() => null),
-      fetch(`/api/public/events?city=${cityQ}&limit=80&sort=popular`, { signal: controller.signal })
-        .then(async (response) =>
-          response.ok
-            ? ((await response.json()) as { items?: PublicCatalogListItemDto[]; sessions?: PublicCatalogListItemDto[] })
-            : null,
-        )
-        .catch(() => null),
-    ])
-      .then(([locationsPayload, venuesPayload, eventsPayload]) => {
+
+    async function loadCatalog(attempt: number): Promise<void> {
+      try {
+        const [locationsPayload, venuesPayload, eventsPayload] = await Promise.all([
+          fetch(venuesQs('location'), { signal: controller.signal })
+            .then(async (response) =>
+              response.ok ? ((await response.json()) as { venues?: VenueCatalogCard[] }) : null,
+            ),
+          fetch(venuesQs('institution'), { signal: controller.signal })
+            .then(async (response) =>
+              response.ok ? ((await response.json()) as { venues?: VenueCatalogCard[] }) : null,
+            ),
+          fetch(`/api/public/events?city=${cityQ}&limit=80&sort=popular`, {
+            signal: controller.signal,
+          }).then(async (response) =>
+            response.ok
+              ? ((await response.json()) as {
+                  items?: PublicCatalogListItemDto[];
+                  sessions?: PublicCatalogListItemDto[];
+                })
+              : null,
+          ),
+        ]);
+        if (controller.signal.aborted) return;
+        if (!locationsPayload && !venuesPayload && !eventsPayload) {
+          if (attempt < 1) {
+            await new Promise((resolve) => window.setTimeout(resolve, 400));
+            return loadCatalog(attempt + 1);
+          }
+          setLocationsCatalog([]);
+          setVenuesCatalog([]);
+          setEventsCatalog([]);
+          setCatalogError('Не удалось загрузить каталог. Откройте блок ещё раз или обновите страницу.');
+          return;
+        }
         setLocationsCatalog((locationsPayload?.venues || []).map((item) => toVenueCatalogCard(item)));
         setVenuesCatalog((venuesPayload?.venues || []).map((item) => toVenueCatalogCard(item)));
         const events = eventsPayload?.items || eventsPayload?.sessions || [];
         setEventsCatalog(events);
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setCatalogLoading(false);
-      });
+        setCatalogError(null);
+      } catch {
+        if (controller.signal.aborted) return;
+        if (attempt < 1) {
+          await new Promise((resolve) => window.setTimeout(resolve, 400));
+          return loadCatalog(attempt + 1);
+        }
+        setLocationsCatalog([]);
+        setVenuesCatalog([]);
+        setEventsCatalog([]);
+        setCatalogError('Не удалось загрузить каталог. Откройте блок ещё раз или обновите страницу.');
+      }
+    }
+
+    void loadCatalog(0).finally(() => {
+      if (!controller.signal.aborted) setCatalogLoading(false);
+    });
     return () => controller.abort();
-  }, [pageCityName, pageCitySlug]);
+  }, [pageCityName, pageCitySlug, pageCitySourceSlug]);
 
   const matchSources = useMemo(() => {
     const map = new Map<string, DayRouteVenueMatchSource>();
@@ -764,6 +800,7 @@ function DayRoutePanelInner() {
         id: venue.id,
         label: venue.name,
         hint: venue.address || venue.city,
+        imageUrl: venue.heroImageUrl ?? null,
         disabled: inRoute || atMax,
         disabledReason: inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : null,
       };
@@ -777,6 +814,7 @@ function DayRoutePanelInner() {
         id: venue.id,
         label: venue.name,
         hint: venue.address || venue.city,
+        imageUrl: venue.heroImageUrl ?? null,
         disabled: inRoute || atMax,
         disabledReason: inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : null,
       };
@@ -941,6 +979,31 @@ function DayRoutePanelInner() {
   );
   const coordsCount = orderedCoords.filter(Boolean).length;
   const missingCoordsCount = route.venues.length - coordsCount;
+  const mapStops = useMemo(() => {
+    return route.venues
+      .map((venue, index) => {
+        const coords = lookupDayRouteCoords(venue, coordsById);
+        if (!coords) return null;
+        return {
+          id: venue.id,
+          title: venue.title,
+          index,
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        };
+      })
+      .filter(
+        (
+          row,
+        ): row is {
+          id: string;
+          title: string;
+          index: number;
+          latitude: number;
+          longitude: number;
+        } => Boolean(row),
+      );
+  }, [route.venues, coordsById]);
   const yandexUrl = useMemo(() => buildYandexMultiStopRouteUrl(orderedCoords, 'pd'), [orderedCoords]);
   const segmentMeters = useMemo(
     () => dayRouteSegmentMeters(route.venues, coordsById),
@@ -1441,7 +1504,9 @@ function DayRoutePanelInner() {
   const catalogOpen = openPanel === 'catalog';
   const mustSeeOpen = openPanel === 'mustSee';
   const matchesOpen = openPanel === 'matches';
+  const hotPicksOpen = openPanel === 'hotPicks';
   const showMustSeeAccordion = Boolean(hasPageCity && (mustSeeResolved.length > 0 || (!catalogLoading && pageCitySlug)));
+  const showHotPicksAccordion = Boolean(hasPageCity && (hotPickCards.length > 0 || hotPickTabIds.length > 0));
 
   return (
     <>
@@ -1536,172 +1601,6 @@ function DayRoutePanelInner() {
         </p>
       ) : null}
 
-      {/* 2. Hot Picks - curation first */}
-      {hasPageCity && (hotPickCards.length > 0 || hotPickTabIds.length > 0) ? (
-        <section className="mt-5" data-day-hot-picks data-day-recommend-carousel>
-          <div className="flex items-baseline justify-between gap-2">
-            <h2 className="text-base font-bold text-slate-900">Выбор Дайбилет</h2>
-            <p className="text-[13px] text-slate-500">До {HOT_PICKS_MAX} мест</p>
-          </div>
-          <div
-            className="mt-3 flex gap-1 overflow-x-auto pb-1"
-            role="tablist"
-            aria-label="Категории выбора"
-            data-day-hot-pick-tabs
-          >
-            {HOT_PICK_TABS.filter((tab) => hotPickTabIds.includes(tab.id)).map((tab) => {
-              const active = hotPickTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => setHotPickTab(tab.id)}
-                  className={`shrink-0 rounded-2xl px-3.5 py-2 text-sm font-semibold transition duration-200 ${
-                    active
-                      ? 'bg-slate-900 text-white'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-          {hotPickCards.length ? (
-            <div className="-mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
-              {hotPickCards.map((card) => {
-                const inRoute =
-                  isInDayRoute(card.item.id, route) ||
-                  Boolean(card.item.slug && isInDayRoute(card.item.slug, route));
-                return (
-                  <article
-                    key={card.key}
-                    className="w-[83vw] max-w-sm shrink-0 snap-start overflow-hidden rounded-2xl border border-slate-200 bg-white transition duration-200 sm:w-72"
-                    data-day-recommend-card={card.item.id}
-                    data-day-hot-pick={card.offer.kind}
-                  >
-                    <div className="relative h-36 w-full bg-slate-100 sm:h-40">
-                      {card.item.imageUrl ? (
-                        <SafeImage
-                          src={card.item.imageUrl}
-                          alt=""
-                          fill
-                          sizes="83vw"
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-slate-400">
-                          <MapPin className="h-7 w-7" />
-                        </div>
-                      )}
-                      <span className="absolute left-2.5 top-2.5 rounded-2xl bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-slate-700 ring-1 ring-slate-200">
-                        {card.offer.badge}
-                      </span>
-                    </div>
-                    <div className="p-3.5">
-                      <p className="line-clamp-2 text-sm font-bold text-slate-900">{card.title}</p>
-                      {card.hook ? (
-                        <p
-                          className="mt-1 line-clamp-2 text-[13px] leading-snug text-slate-500"
-                          title={card.hook}
-                        >
-                          {card.hook}
-                        </p>
-                      ) : null}
-                      <button
-                        type="button"
-                        disabled={inRoute || atMax}
-                        onClick={() => activateHotPick(card)}
-                        className={`mt-3 inline-flex min-h-11 w-full items-center justify-center gap-1.5 rounded-2xl px-3 text-sm font-bold transition duration-200 ${
-                          inRoute
-                            ? 'bg-emerald-100 text-emerald-800'
-                            : card.offer.kind === 'free'
-                              ? 'bg-slate-900 text-white hover:bg-primary-600 disabled:bg-slate-300'
-                              : 'bg-amber-500 text-white hover:bg-amber-600 disabled:bg-slate-300'
-                        }`}
-                      >
-                        {inRoute ? (
-                          <>
-                            <Check className="h-4 w-4 opacity-100 transition duration-200" />
-                            В плане
-                          </>
-                        ) : (
-                          <>
-                            {card.offer.kind === 'free' ? (
-                              <Plus className="h-4 w-4 transition duration-200" />
-                            ) : (
-                              <Ticket className="h-4 w-4 transition duration-200" />
-                            )}
-                            {card.offer.ctaLabel}
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-[13px] text-slate-600">
-              В этой категории пока пусто - откройте другую вкладку или поиск ниже.
-            </p>
-          )}
-        </section>
-      ) : null}
-
-      {/* 3. Compact search row */}
-      <section
-        className="mt-4 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4"
-        ref={unifiedSearchRef}
-        data-day-unified-search
-      >
-        <div className="max-w-md" data-day-city-picker>
-          <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-            Город
-          </label>
-          <CityPicker
-            cities={destinations}
-            value={selectedCity?.cityValue || 'all'}
-            onChange={(name) => {
-              selectedCity?.setCity(name);
-              if (name !== 'all') setCityInput(name);
-            }}
-            allLabel="Выберите город"
-            variant="hero"
-            className="w-full"
-          />
-        </div>
-        {!hasPageCity ? (
-          <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            Сначала выберите город - появятся места, музеи и события.
-          </p>
-        ) : (
-          <div className="mt-3">
-            <DayRouteSearchSelect
-              label="Поиск места"
-              placeholder="Нет в выборе выше? Найдите здесь"
-              emptyText={catalogLoading ? 'Загружаем…' : 'Ничего не найдено'}
-              loading={catalogLoading}
-              disabled={atMax}
-              options={unifiedSearchOptions}
-              onPick={pickUnifiedSearch}
-            />
-            <p className="mt-2 text-[13px] text-slate-500">
-              Или{' '}
-              <button
-                type="button"
-                onClick={openTextForm}
-                className="font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
-              >
-                своё место
-              </button>
-            </p>
-          </div>
-        )}
-      </section>
-
       {/* Alerts */}
       {route.venues.length ? (
         <>
@@ -1730,14 +1629,14 @@ function DayRoutePanelInner() {
         </>
       ) : null}
 
-      {/* Route list - always expanded */}
+      {/* 1. Route list - always expanded */}
       {!route.venues.length ? (
         <div className="mt-5 rounded-2xl border border-dashed border-slate-300 bg-white px-5 py-8 text-center sm:mt-8 sm:p-10">
           <Route className="mx-auto h-8 w-8 text-slate-400" />
           <p className="mt-3 text-base font-semibold text-slate-800">План пока пуст</p>
           <p className="mx-auto mt-2 max-w-md text-[13px] leading-relaxed text-slate-500">
-            Возьмите места из «Выбор Дайбилет» выше или найдите точку в поиске. Минимум {DAY_ROUTE_MIN} точки, чтобы день
-            сложился.
+            Выберите город ниже, возьмите места из «Главные места» или «Выбор Дайбилет», либо найдите точку в поиске.
+            Минимум {DAY_ROUTE_MIN} точки, чтобы день сложился.
           </p>
         </div>
       ) : (
@@ -1923,8 +1822,176 @@ function DayRoutePanelInner() {
               </div>
             ))}
           </div>
+
+          {mapStops.length > 0 ? (
+            <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-3 sm:p-4" data-day-route-map-wrap>
+              <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-bold text-slate-900">Карта дня</p>
+                  <p className="mt-0.5 text-xs text-slate-500">
+                    Точки с координатами · порядок как в списке выше
+                  </p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {canOptimize ? (
+                    <button
+                      type="button"
+                      onClick={optimizeOrder}
+                      data-day-map-optimize
+                      className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                    >
+                      <Sparkles className="h-3.5 w-3.5" />
+                      Оптимизировать
+                    </button>
+                  ) : null}
+                  {yandexUrl ? (
+                    <a
+                      href={yandexUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-3 py-2 text-xs font-bold text-white hover:bg-sky-700"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                      Яндекс.Карты
+                    </a>
+                  ) : null}
+                </div>
+              </div>
+              <DayRouteOsmMap
+                stops={mapStops}
+                className="h-64 w-full overflow-hidden rounded-xl bg-slate-100 sm:h-80"
+              />
+            </div>
+          ) : null}
         </section>
       )}
+
+      {/* Accordion: must-see chips */}
+      {showMustSeeAccordion ? (
+        <div className="mt-3 rounded-2xl border border-slate-200 bg-white" data-day-accordion="mustSee">
+          <button
+            type="button"
+            aria-expanded={mustSeeOpen}
+            aria-controls="day-must-see-body"
+            data-day-must-see-accordion
+            onClick={() => togglePanel('mustSee')}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
+          >
+            <span>
+              <span className="block text-sm font-semibold text-slate-900">Главные места</span>
+              <span className="mt-0.5 block text-xs text-slate-500">
+                {mustSeeResolved.length
+                  ? `Превью и фильтры · ${mustSeeResolved.length}`
+                  : 'Список для города пока пуст'}
+              </span>
+            </span>
+            <ChevronDown
+              className={`h-5 w-5 shrink-0 text-slate-400 transition ${mustSeeOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {mustSeeOpen ? (
+            <div id="day-must-see-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+              {mustSeeResolved.length > 0 ? (
+                <div data-day-must-see>
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-xs text-slate-500">
+                      Нажмите на место или добавьте видимые сразу (ориентир {DAY_ROUTE_SOFT}).
+                    </p>
+                    <button
+                      type="button"
+                      disabled={atMax || atSoft || mustSeeAddable.length === 0}
+                      onClick={addAllMustSee}
+                      data-day-must-see-bulk
+                      className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
+                    >
+                      <Sparkles className="h-3.5 w-3.5" />
+                      {(mustSeeFilterMeta.tabs.length < 2
+                        ? mustSeeFilterMeta.defaultId
+                        : mustSeeFilter) === 'main'
+                        ? 'Добавить главные места'
+                        : 'Добавить выбранные'}
+                      {mustSeeAddable.length
+                        ? ` (${Math.min(mustSeeAddable.length, softSlotsLeft)})`
+                        : ''}
+                    </button>
+                  </div>
+                  <MustSeeFilterTabs
+                    tabs={mustSeeFilterMeta.tabs}
+                    activeId={
+                      mustSeeFilterMeta.tabs.length < 2
+                        ? mustSeeFilterMeta.defaultId
+                        : mustSeeFilter
+                    }
+                    onChange={setMustSeeFilter}
+                  />
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2" data-day-must-see-list>
+                    {mustSeeFiltered.map(({ place, item, hook }) => {
+                      const inRoute =
+                        isInDayRoute(item.id, route) || Boolean(item.slug && isInDayRoute(item.slug, route));
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          disabled={inRoute || atMax}
+                          title={
+                            inRoute
+                              ? 'Уже в маршруте'
+                              : atMax
+                                ? dayRouteHardLimitMessage()
+                                : hook || 'Добавить в день'
+                          }
+                          onClick={() => addMustSeeItem(item)}
+                          className={`flex w-full items-center gap-2.5 rounded-xl border p-2 text-left transition disabled:cursor-not-allowed ${
+                            inRoute
+                              ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
+                              : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50/50'
+                          }`}
+                        >
+                          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                            {item.imageUrl ? (
+                              <SafeImage
+                                src={item.imageUrl}
+                                alt=""
+                                fill
+                                sizes="3rem"
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center text-slate-400">
+                                <MapPin className="h-4 w-4" />
+                              </div>
+                            )}
+                          </div>
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-xs font-semibold">{place.name}</span>
+                            {hook ? (
+                              <span className="mt-0.5 block line-clamp-1 text-[11px] leading-snug text-slate-500">
+                                {hook}
+                              </span>
+                            ) : null}
+                          </span>
+                          <span
+                            className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+                              inRoute ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-900 text-white'
+                            }`}
+                            aria-hidden
+                          >
+                            {inRoute ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500">
+                  Для этого города пока нет списка главных мест - добавьте точки через поиск в «Из каталога».
+                </p>
+              )}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
 
       {/* Accordion: custom text place */}
       <div className="mt-3 rounded-2xl border border-slate-200 bg-white" id="day-plan-form-wrap">
@@ -2059,6 +2126,196 @@ function DayRoutePanelInner() {
         ) : null}
       </div>
 
+      {/* Accordion: Hot Picks */}
+      {showHotPicksAccordion ? (
+        <div className="mt-3 rounded-2xl border border-slate-200 bg-white" data-day-hot-picks data-day-recommend-carousel data-day-accordion="hotPicks">
+          <button
+            type="button"
+            aria-expanded={hotPicksOpen}
+            aria-controls="day-hot-picks-body"
+            data-day-hot-picks-accordion
+            onClick={() => togglePanel('hotPicks')}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
+          >
+            <span>
+              <span className="block text-sm font-semibold text-slate-900">Выбор Дайбилет</span>
+              <span className="mt-0.5 block text-xs text-slate-500">
+                До {HOT_PICKS_MAX} мест · кураторская подборка
+              </span>
+            </span>
+            <ChevronDown
+              className={`h-5 w-5 shrink-0 text-slate-400 transition ${hotPicksOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {hotPicksOpen ? (
+            <div id="day-hot-picks-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+              <div
+                className="flex gap-1 overflow-x-auto pb-1"
+                role="tablist"
+                aria-label="Категории выбора"
+                data-day-hot-pick-tabs
+              >
+                {HOT_PICK_TABS.filter((tab) => hotPickTabIds.includes(tab.id)).map((tab) => {
+                  const active = hotPickTab === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      onClick={() => setHotPickTab(tab.id)}
+                      className={`shrink-0 rounded-2xl px-3.5 py-2 text-sm font-semibold transition duration-200 ${
+                        active
+                          ? 'bg-slate-900 text-white'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+              {hotPickCards.length ? (
+                <div className="-mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+                  {hotPickCards.map((card) => {
+                    const inRoute =
+                      isInDayRoute(card.item.id, route) ||
+                      Boolean(card.item.slug && isInDayRoute(card.item.slug, route));
+                    return (
+                      <article
+                        key={card.key}
+                        className="relative h-56 w-[78vw] max-w-xs shrink-0 snap-start overflow-hidden rounded-2xl border border-slate-200 bg-slate-800 shadow-sm transition duration-200 sm:w-64"
+                        data-day-recommend-card={card.item.id}
+                        data-day-hot-pick={card.offer.kind}
+                      >
+                        {card.item.imageUrl ? (
+                          <SafeImage
+                            src={card.item.imageUrl}
+                            alt={card.title}
+                            fill
+                            sizes="78vw"
+                            className="object-cover"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center bg-slate-200 text-slate-400">
+                            <MapPin className="h-7 w-7" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-slate-950/10" />
+                        <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3">
+                          <span className="rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-slate-800">
+                            {card.offer.badge}
+                          </span>
+                        </div>
+                        <div className="absolute inset-x-0 bottom-0 p-3.5">
+                          <p className="line-clamp-2 text-sm font-bold text-white drop-shadow">{card.title}</p>
+                          {card.hook ? (
+                            <p
+                              className="mt-1 line-clamp-2 text-[12px] leading-snug text-white/80"
+                              title={card.hook}
+                            >
+                              {card.hook}
+                            </p>
+                          ) : null}
+                          <button
+                            type="button"
+                            disabled={inRoute || atMax}
+                            onClick={() => activateHotPick(card)}
+                            className={`mt-2.5 inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-xl px-3 text-xs font-semibold backdrop-blur transition duration-200 ${
+                              inRoute
+                                ? 'bg-emerald-500/90 text-white'
+                                : card.offer.kind === 'free'
+                                  ? 'bg-white/90 text-slate-900 hover:bg-white disabled:bg-white/50'
+                                  : 'bg-amber-400/95 text-slate-950 hover:bg-amber-300 disabled:bg-white/50'
+                            }`}
+                          >
+                            {inRoute ? (
+                              <>
+                                <Check className="h-3.5 w-3.5" />
+                                В плане
+                              </>
+                            ) : (
+                              <>
+                                {card.offer.kind === 'free' ? (
+                                  <Plus className="h-3.5 w-3.5" />
+                                ) : (
+                                  <Ticket className="h-3.5 w-3.5" />
+                                )}
+                                {card.offer.ctaLabel}
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </article>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="mt-3 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-[13px] text-slate-600">
+                  В этой категории пока пусто - откройте другую вкладку или поиск ниже.
+                </p>
+              )}
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {/* Search + city */}
+      <section
+        className="mt-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4"
+        ref={unifiedSearchRef}
+        data-day-unified-search
+      >
+        <div className="max-w-md" data-day-city-picker>
+          <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            Город
+          </label>
+          <CityPicker
+            cities={destinations}
+            value={selectedCity?.cityValue || 'all'}
+            onChange={(name) => {
+              selectedCity?.setCity(name);
+              if (name !== 'all') setCityInput(name);
+            }}
+            allLabel="Выберите город"
+            variant="hero"
+            className="w-full"
+          />
+        </div>
+        {!hasPageCity ? (
+          <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            Сначала выберите город - появятся места, музеи и события.
+          </p>
+        ) : (
+          <div className="mt-3">
+            <DayRouteSearchSelect
+              label="Поиск места"
+              placeholder="Нет в выборе выше? Найдите здесь"
+              emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Ничего не найдено'}
+              loading={catalogLoading}
+              disabled={atMax}
+              options={unifiedSearchOptions}
+              onPick={pickUnifiedSearch}
+            />
+            {catalogError ? (
+              <p className="mt-2 text-xs font-medium text-rose-700" role="status">
+                {catalogError}
+              </p>
+            ) : null}
+            <p className="mt-2 text-[13px] text-slate-500">
+              Или{' '}
+              <button
+                type="button"
+                onClick={openTextForm}
+                className="font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
+              >
+                своё место
+              </button>
+            </p>
+          </div>
+        )}
+      </section>
+
       {/* Accordion: advanced catalog + boat */}
       <div
         className="mt-3 rounded-2xl border border-slate-200 bg-white"
@@ -2088,7 +2345,7 @@ function DayRoutePanelInner() {
           <div id="day-catalog-add-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
             {!hasPageCity ? (
               <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                Сначала выберите город в поиске выше.
+                Сначала выберите город в поиске.
               </p>
             ) : (
               <>
@@ -2096,7 +2353,7 @@ function DayRoutePanelInner() {
                   <DayRouteSearchSelect
                     label="Локации"
                     placeholder="Найти локацию…"
-                    emptyText={catalogLoading ? 'Загружаем…' : 'Нет локаций в этом городе'}
+                    emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Нет локаций в этом городе'}
                     loading={catalogLoading}
                     disabled={atMax}
                     options={locationOptions}
@@ -2105,7 +2362,7 @@ function DayRoutePanelInner() {
                   <DayRouteSearchSelect
                     label="Площадки"
                     placeholder="Найти площадку…"
-                    emptyText={catalogLoading ? 'Загружаем…' : 'Нет площадок в этом городе'}
+                    emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Нет площадок в этом городе'}
                     loading={catalogLoading}
                     disabled={atMax}
                     options={venueOptions}
@@ -2114,7 +2371,7 @@ function DayRoutePanelInner() {
                   <DayRouteSearchSelect
                     label="События"
                     placeholder="Найти событие…"
-                    emptyText={catalogLoading ? 'Загружаем…' : 'Нет событий в этом городе'}
+                    emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Нет событий в этом городе'}
                     loading={catalogLoading}
                     disabled={atMax}
                     options={eventOptions}
@@ -2160,133 +2417,6 @@ function DayRoutePanelInner() {
           </div>
         ) : null}
       </div>
-
-      {/* Accordion: must-see chips */}
-      {showMustSeeAccordion ? (
-        <div className="mt-3 rounded-2xl border border-slate-200 bg-white" data-day-accordion="mustSee">
-          <button
-            type="button"
-            aria-expanded={mustSeeOpen}
-            aria-controls="day-must-see-body"
-            data-day-must-see-accordion
-            onClick={() => togglePanel('mustSee')}
-            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
-          >
-            <span>
-              <span className="block text-sm font-semibold text-slate-900">Главные места</span>
-              <span className="mt-0.5 block text-xs text-slate-500">
-                {mustSeeResolved.length
-                  ? `Превью и фильтры · ${mustSeeResolved.length}`
-                  : 'Список для города пока пуст'}
-              </span>
-            </span>
-            <ChevronDown
-              className={`h-5 w-5 shrink-0 text-slate-400 transition ${mustSeeOpen ? 'rotate-180' : ''}`}
-            />
-          </button>
-          {mustSeeOpen ? (
-            <div id="day-must-see-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
-              {mustSeeResolved.length > 0 ? (
-                <div data-day-must-see>
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-xs text-slate-500">
-                      Нажмите на место или добавьте видимые сразу (ориентир {DAY_ROUTE_SOFT}).
-                    </p>
-                    <button
-                      type="button"
-                      disabled={atMax || atSoft || mustSeeAddable.length === 0}
-                      onClick={addAllMustSee}
-                      data-day-must-see-bulk
-                      className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
-                    >
-                      <Sparkles className="h-3.5 w-3.5" />
-                      {(mustSeeFilterMeta.tabs.length < 2
-                        ? mustSeeFilterMeta.defaultId
-                        : mustSeeFilter) === 'main'
-                        ? 'Добавить главные места'
-                        : 'Добавить выбранные'}
-                      {mustSeeAddable.length
-                        ? ` (${Math.min(mustSeeAddable.length, softSlotsLeft)})`
-                        : ''}
-                    </button>
-                  </div>
-                  <MustSeeFilterTabs
-                    tabs={mustSeeFilterMeta.tabs}
-                    activeId={
-                      mustSeeFilterMeta.tabs.length < 2
-                        ? mustSeeFilterMeta.defaultId
-                        : mustSeeFilter
-                    }
-                    onChange={setMustSeeFilter}
-                  />
-                  <div className="mt-3 grid gap-2 sm:grid-cols-2" data-day-must-see-list>
-                    {mustSeeFiltered.map(({ place, item, hook }) => {
-                      const inRoute =
-                        isInDayRoute(item.id, route) || Boolean(item.slug && isInDayRoute(item.slug, route));
-                      return (
-                        <button
-                          key={item.id}
-                          type="button"
-                          disabled={inRoute || atMax}
-                          title={
-                            inRoute
-                              ? 'Уже в маршруте'
-                              : atMax
-                                ? dayRouteHardLimitMessage()
-                                : hook || 'Добавить в день'
-                          }
-                          onClick={() => addMustSeeItem(item)}
-                          className={`flex w-full items-center gap-2.5 rounded-xl border p-2 text-left transition disabled:cursor-not-allowed ${
-                            inRoute
-                              ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
-                              : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50/50'
-                          }`}
-                        >
-                          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-                            {item.imageUrl ? (
-                              <SafeImage
-                                src={item.imageUrl}
-                                alt=""
-                                fill
-                                sizes="3rem"
-                                className="object-cover"
-                              />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center text-slate-400">
-                                <MapPin className="h-4 w-4" />
-                              </div>
-                            )}
-                          </div>
-                          <span className="min-w-0 flex-1">
-                            <span className="block truncate text-xs font-semibold">{place.name}</span>
-                            {hook ? (
-                              <span className="mt-0.5 block line-clamp-1 text-[11px] leading-snug text-slate-500">
-                                {hook}
-                              </span>
-                            ) : null}
-                          </span>
-                          <span
-                            className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
-                              inRoute ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-900 text-white'
-                            }`}
-                            aria-hidden
-                          >
-                            {inRoute ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ) : (
-                <p className="text-xs text-slate-500">
-                  Для этого города пока нет списка главных мест - добавьте точки через поиск в «Из каталога».
-                </p>
-              )}
-            </div>
-          ) : null}
-        </div>
-      ) : null}
 
       {/* Accordion: matching excursions */}
       {showMatches ? (

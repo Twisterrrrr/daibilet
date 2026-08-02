@@ -152,6 +152,31 @@ test('dayRouteItemFromMustSee uses editorial coords when hub omits NN place', ()
   assert.ok(item);
   assert.equal(item!.latitude, 56.3275);
   assert.equal(item!.longitude, 43.962222);
+  assert.equal(
+    item!.imageUrl,
+    '/images/venues/nizhny-novgorod/nizhegorodskaya-yarmarka.jpg',
+  );
+});
+
+test('dayRouteItemFromMustSee prefers hub hero over editorial cover', () => {
+  const item = dayRouteItemFromMustSee(
+    {
+      name: 'Нижегородская ярмарка',
+      desc: 'Ярмарка',
+      locationSlug: 'nizhny-novgorod-nizhegorodskaya-yarmarka',
+    },
+    [
+      {
+        id: 'venue_yarmarka',
+        slug: 'nizhny-novgorod-nizhegorodskaya-yarmarka',
+        name: 'Нижегородская ярмарка',
+        heroImageUrl: '/images/custom-hub.jpg',
+      },
+    ],
+    { id: 'city_nn', name: 'Нижний Новгород', slug: 'nizhny-novgorod' },
+  );
+  assert.ok(item);
+  assert.equal(item!.imageUrl, '/images/custom-hub.jpg');
 });
 
 test('dayRouteItemFromMustSee prefers place coords over missing hub', () => {

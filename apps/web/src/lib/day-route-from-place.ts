@@ -5,6 +5,7 @@
 import { resolveCityPlaceHref, type CityMustSeeItem, type CityPlaceLinkFields } from './cityInfo';
 import { namesLooselyMatch } from './city-place-href';
 import { lookupEditorialPlaceCoords } from './city-place-coords';
+import { lookupEditorialPlaceImage } from './city-place-images';
 import { DAY_ROUTE_SOFT, type DayRouteVenueItem } from './day-route';
 import { isValidCoordinatePair } from './day-route-score';
 import { eventHref, venueHref } from './routes';
@@ -139,6 +140,7 @@ export function dayRouteItemFromMustSee(
         ? `/locations/${slug}`
         : null);
 
+  const editorialImage = lookupEditorialPlaceImage(slug);
   return {
     id,
     slug,
@@ -147,7 +149,7 @@ export function dayRouteItemFromMustSee(
     cityId: city.id || matched?.cityId || null,
     citySlug: city.slug || city.sourceSlug || matched?.citySlug || null,
     href,
-    imageUrl: matched?.heroImageUrl || null,
+    imageUrl: matched?.heroImageUrl || editorialImage || null,
     address: String(matched?.address || '').trim() || null,
     ...coordsFromPlace(place, matched, slug),
   };

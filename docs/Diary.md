@@ -1,3 +1,20 @@
+## 2026-08-02 - /my-day: Hot Picks covers + OSM map + catalog city warm-fix
+
+### Наблюдения
+- Hot Picks NN (Кремль/Чкаловская/Покровская/…) показывали MapPin: must-see без hub match → `imageUrl` null.
+- Catalog `?family=&city=` short-circuit на warm list: при любом event-venue города editorial 0-event места не попадали в dropdown.
+- Owner: карта планировщика на странице (Leaflet/OSM), Яндекс оставить для навигации в пути.
+
+### Решения
+- `city-place-images.ts` + `dayRouteItemFromMustSee` editorial `heroImageUrl` fallback; covers в `apps/public/public/images/venues/nizhny-novgorod/` (classic 6 GenerateImage).
+- Hot Picks: photo-as-background card + lighter CTA; accordion order: Главные места → своё место → Выбор Дайбилет.
+- `buildPublicVenuesCatalog`: warm shortcut только без `city=` (city-scoped → hub `requireEvents:false`).
+- `DayRouteOsmMap`: numbered markers + polyline; блок «Карта дня» под timeline + «Оптимизировать».
+
+### Проблемы
+- Stale `/tmp/daibilet-web-deploy.lock` от `myday-hot-picks` (pid мёртв) - снять перед deploy.
+- `apps/web/public/images/` gitignore - эталон `apps/public/public/images/` + sync-public-assets на build.
+
 ## 2026-08-02 - INC.504: SSR hardening для public Next
 
 ### Наблюдения

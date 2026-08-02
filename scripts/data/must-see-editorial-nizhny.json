@@ -846,5 +846,59 @@
     "tags": [
       "гастро"
     ]
+  },
+  {
+    "slug": "nizhny-novgorod-nizhegorodskiy-kreml",
+    "cityKey": "nizhny-novgorod",
+    "title": "Нижегородский Кремль",
+    "heroImageUrl": "/images/venues/nizhny-novgorod/nizhegorodskiy-kreml.jpg",
+    "coverFile": "nizhegorodskiy-kreml.jpg",
+    "familyHint": "location",
+    "tags": []
+  },
+  {
+    "slug": "nizhny-novgorod-chkalovskaya-lestnitsa",
+    "cityKey": "nizhny-novgorod",
+    "title": "Чкаловская лестница",
+    "heroImageUrl": "/images/venues/nizhny-novgorod/chkalovskaya-lestnitsa.jpg",
+    "coverFile": "chkalovskaya-lestnitsa.jpg",
+    "familyHint": "location",
+    "tags": []
+  },
+  {
+    "slug": "nizhny-novgorod-bol-shaya-pokrovskaya-ulitsa",
+    "cityKey": "nizhny-novgorod",
+    "title": "Большая Покровская",
+    "heroImageUrl": "/images/venues/nizhny-novgorod/bolshaya-pokrovskaya.jpg",
+    "coverFile": "bolshaya-pokrovskaya.jpg",
+    "familyHint": "location",
+    "tags": []
+  },
+  {
+    "slug": "nizhny-novgorod-nizhegorodskaya-kanatnaya-doroga",
+    "cityKey": "nizhny-novgorod",
+    "title": "Канатная дорога",
+    "heroImageUrl": "/images/venues/nizhny-novgorod/kanatnaya-doroga.jpg",
+    "coverFile": "kanatnaya-doroga.jpg",
+    "familyHint": "location",
+    "tags": []
+  },
+  {
+    "slug": "nizhny-novgorod-strelka-rek-volgi-i-oki",
+    "cityKey": "nizhny-novgorod",
+    "title": "Стрелка Волги и Оки",
+    "heroImageUrl": "/images/venues/nizhny-novgorod/strelka-volga-oka.jpg",
+    "coverFile": "strelka-volga-oka.jpg",
+    "familyHint": "location",
+    "tags": []
+  },
+  {
+    "slug": "nizhny-novgorod-naberezhnaya-fedorovskogo",
+    "cityKey": "nizhny-novgorod",
+    "title": "Набережная Фёдоровского",
+    "heroImageUrl": "/images/venues/nizhny-novgorod/naberezhnaya-fedorovskogo.jpg",
+    "coverFile": "naberezhnaya-fedorovskogo.jpg",
+    "familyHint": "location",
+    "tags": []
   }
 ]

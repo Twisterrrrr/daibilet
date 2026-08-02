@@ -7676,30 +7676,25 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
   const typeFilter = String(searchParams.get('type') || '').trim().toLowerCase();
   const familyFilter = String(searchParams.get('family') || '').trim().toLowerCase();
 
-  // Warm list holds full hub families - filter by city BEFORE limit so regional
-  // cities are not dropped by a global top-N slice (my-day type search bug).
-  if (!query && !typeFilter && familyFilter) {
+  // Warm list = global family browse only (top hub with events).
+  // Never short-circuit city-scoped: a few event venues for Nizhny/SPB would
+  // hide editorial 0-event must-see (kreml/yarmarka/…) and break /my-day picks.
+  if (!query && !typeFilter && familyFilter && !cityFilter) {
     const warmList = warmVenueCatalogList(familyFilter);
     if (warmList) {
-      const scoped = cityFilter
-        ? warmList.filter((venue) => publicVenueRowMatchesCityFilter(venue, cityFilter))
-        : warmList;
-      // City miss on warm → fall through to wider requireEvents:false hub.
-      if (!cityFilter || scoped.length > 0) {
-        const venues = scoped.slice(0, limit);
-        const cities = countBy(venues.map((venue) => venue.city).filter(Boolean));
-        const types = countBy(venues.map((venue) => venue.type).filter(Boolean));
-        return {
-          generatedAt: new Date().toISOString(),
-          total: venues.length,
-          venues,
-          stats: {
-            venues: venues.length,
-            cities,
-            types,
-          },
-        };
-      }
+      const venues = warmList.slice(0, limit);
+      const cities = countBy(venues.map((venue) => venue.city).filter(Boolean));
+      const types = countBy(venues.map((venue) => venue.type).filter(Boolean));
+      return {
+        generatedAt: new Date().toISOString(),
+        total: venues.length,
+        venues,
+        stats: {
+          venues: venues.length,
+          cities,
+          types,
+        },
+      };
     }
   }
 
