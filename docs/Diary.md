@@ -77,7 +77,7 @@
 - Не раздувать must-see в огромные карточки.
 
 ### Проблемы
-- Live **BUILD_ID=\E6nQnmKCtloz0ynXA2y24\** (3f9a70e+rebuild) /my-day 200.
+- Live **BUILD_ID=`E6nQnmKCtloz0ynXA2y24`** (`3f9a70e`+rebuild) `/my-day` 200.
 
 ---
 
