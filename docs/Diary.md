@@ -1,3 +1,20 @@
+## 2026-08-02 - /my-day: add/remove stop no longer jumps scroll to top
+
+### Наблюдения
+- Owner: добавление точки в план дня прокручивало страницу наверх; терялось место в Hot Picks / must-see / списке.
+- URL sync после edit делал `router.replace(/my-day?city=&items=…)` - soft-nav App Router + `useSearchParams` в Suspense, даже с `{ scroll: false }` давал скачок к top.
+- Параллельно: пустой план → список остановок растёт сверху; абсолютный scrollY сохраняется, визуально «уехали наверх».
+
+### Решения
+- Share URL sync: `history.replaceState` (`replaceMyDayUrl`) вместо `router.replace` - адрес обновляется без навигации Next.
+- На `daibilet:day-route-changed`: якорь viewport (activeElement / mid probe) + `useLayoutEffect` корректирует scroll после роста/сжатия списка.
+- Clear тоже через replaceState; add вне `/my-day` на my-day не навигирует.
+
+### Проблемы
+- BUILD_ID - после MSK web deploy.
+
+---
+
 ## 2026-08-02 - /my-day event stop: дата и время сессии на карточке
 
 ### Наблюдения

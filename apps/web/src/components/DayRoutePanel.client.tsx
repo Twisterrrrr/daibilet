@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import {
   Check,
   ChevronDown,
@@ -23,6 +23,7 @@ import {
   Fragment,
   Suspense,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -283,9 +284,20 @@ function DayRoutePanelFallback() {
   );
 }
 
+/**
+ * Share URL for /my-day without Next App Router navigation.
+ * `router.replace(?items=…)` soft-navigates and can reset scroll to top
+ * even with `{ scroll: false }` (Suspense + useSearchParams remount).
+ */
+function replaceMyDayUrl(path: string) {
+  if (typeof window === 'undefined') return;
+  const current = `${window.location.pathname}${window.location.search}`;
+  if (current === path) return;
+  window.history.replaceState(window.history.state, '', path);
+}
+
 function DayRoutePanelInner() {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const selectedCity = useSelectedCityOptional();
   const itemsParam = searchParams.get('items');
   const cityParam = searchParams.get('city');
@@ -331,9 +343,49 @@ function DayRoutePanelInner() {
   const unifiedSearchRef = useRef<HTMLDivElement | null>(null);
   const eventEnrichAttemptedRef = useRef<Set<string>>(new Set());
 
+  /** Keep viewport on the tapped card when route list grows/shrinks above it. */
+  const scrollPreserveRef = useRef<{ y: number; top: number; el: Element | null } | null>(null);
+
+  function armScrollPreserve() {
+    if (typeof window === 'undefined') return;
+    const active =
+      document.activeElement instanceof HTMLElement &&
+      document.activeElement !== document.body &&
+      document.activeElement !== document.documentElement
+        ? document.activeElement
+        : null;
+    const probeY = Math.floor(Math.min(window.innerHeight * 0.4, window.innerHeight - 24));
+    const probed = document.elementFromPoint(Math.floor(window.innerWidth / 2), probeY);
+    const el = active || (probed instanceof Element ? probed : null);
+    scrollPreserveRef.current = {
+      y: window.scrollY,
+      top: el ? el.getBoundingClientRect().top : 0,
+      el,
+    };
+  }
+
+  useLayoutEffect(() => {
+    const lock = scrollPreserveRef.current;
+    if (!lock) return;
+    scrollPreserveRef.current = null;
+    if (lock.el && document.contains(lock.el)) {
+      const delta = lock.el.getBoundingClientRect().top - lock.top;
+      if (Math.abs(delta) > 1) {
+        window.scrollBy(0, delta);
+        return;
+      }
+    }
+    if (window.scrollY < lock.y - 2) {
+      window.scrollTo(0, lock.y);
+    }
+  }, [route.venues]);
+
   useEffect(() => {
-    const sync = () => setRoute(readDayRoute());
-    sync();
+    const sync = () => {
+      armScrollPreserve();
+      setRoute(readDayRoute());
+    };
+    setRoute(readDayRoute());
     window.addEventListener(DAY_ROUTE_CHANGED_EVENT, sync);
     window.addEventListener('storage', sync);
     return () => {
@@ -624,8 +676,8 @@ function DayRoutePanelInner() {
     if (current === nextPath) return;
     if (!route.venues.length && (itemsParam || dayParam)) return;
     if (!route.venues.length && !window.location.search) return;
-    router.replace(nextPath, { scroll: false });
-  }, [route.venues, ready, pageCitySlug, cityParam, itemsParam, dayParam, router]);
+    replaceMyDayUrl(nextPath);
+  }, [route.venues, ready, pageCitySlug, cityParam, itemsParam, dayParam]);
 
   const afishaHref = catalogHrefWithSelectedCity(scopeCityParam || 'all');
   const locationsHref = venueCatalogHrefWithSelectedCity('/locations', scopeCityParam);
@@ -1712,7 +1764,7 @@ function DayRoutePanelInner() {
             onClick={() => {
               clearDayRoute();
               setRoute(readDayRoute());
-              router.replace('/my-day', { scroll: false });
+              replaceMyDayUrl('/my-day');
             }}
             className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition duration-200 hover:bg-slate-50"
           >
