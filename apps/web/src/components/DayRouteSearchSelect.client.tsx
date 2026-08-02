@@ -24,6 +24,8 @@ type Props = {
   onPick: (option: DayRouteSearchOption) => void;
   /** Reset query after successful pick. */
   clearOnPick?: boolean;
+  /** Hide visible label (aria-label kept). */
+  hideLabel?: boolean;
 };
 
 /**
@@ -39,6 +41,7 @@ export function DayRouteSearchSelect({
   options,
   onPick,
   clearOnPick = true,
+  hideLabel = false,
 }: Props) {
   const listId = useId();
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -82,7 +85,13 @@ export function DayRouteSearchSelect({
 
   return (
     <div ref={rootRef} className="relative" data-day-search-select={label}>
-      <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+      <label
+        className={
+          hideLabel
+            ? 'sr-only'
+            : 'mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500'
+        }
+      >
         {label}
       </label>
       <div className="relative">
