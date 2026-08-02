@@ -1935,49 +1935,55 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** Empty plan starter - owner banner template (md+ row, mobile stack). */
+  /** Empty plan starter - compact A on mobile; desktop lg+ = equal-M geometry only. */
   function renderUnifiedSearch(asStarter: boolean) {
     if (asStarter) {
       return (
         <section
-          className="mx-auto mt-3 w-full max-w-5xl rounded-2xl border border-slate-200 bg-white p-6 sm:mt-5 md:p-8 lg:p-10"
+          className="mt-3 w-full rounded-2xl border border-slate-200 bg-white max-lg:py-3.5 sm:mt-5 sm:max-lg:py-4 lg:py-5"
           ref={unifiedSearchRef}
           data-day-unified-search
           data-day-starter="1"
-          data-day-starter-variant="banner"
-          data-day-starter-desktop="row-center"
-          data-day-starter-max="5xl"
+          data-day-starter-variant="a"
+          data-day-starter-desktop="two-col"
+          data-day-starter-max="full"
+          data-day-starter-inset="equal-m"
           data-day-starter-pad="sym"
-          data-day-starter-density="template"
+          data-day-starter-density="compact"
           data-day-starter-geometry="stable"
+          data-day-starter-align="col"
         >
+          {/*
+            Mobile: shared px column; card equal py only (pt === pb).
+            Desktop lg+: 1fr auto 1fr auto 1fr equal-M (edge M = middle M).
+          */}
           <div
-            className="flex w-full flex-col justify-between gap-6 md:flex-row md:items-center md:gap-8"
+            className="flex w-full flex-col max-lg:mx-auto max-lg:max-w-md max-lg:px-3.5 sm:max-lg:px-5 lg:grid lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:items-center"
             data-day-plan-starter
           >
-            <div className="flex max-w-sm items-start gap-4" data-day-starter-copy>
-              <div
-                className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-600"
-                aria-hidden
-              >
-                <Route className="h-6 w-6" />
-              </div>
-              <div className="min-w-0">
-                <h2 className="text-xl font-bold leading-snug text-slate-900 sm:text-2xl">
+            <div className="min-w-0 max-lg:w-full lg:col-start-2" data-day-starter-copy>
+              <div className="flex items-center gap-2.5">
+                <div
+                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-500"
+                  aria-hidden
+                >
+                  <Route className="h-5 w-5" />
+                </div>
+                <p className="text-base font-bold leading-snug text-slate-900 sm:text-lg">
                   Собери свой день
-                </h2>
-                <p className="mt-1.5 text-sm font-normal leading-relaxed text-slate-500 md:hidden">
-                  Выбери город и минимум {DAY_ROUTE_MIN} точки для составления маршрута
-                </p>
-                <p className="mt-1.5 hidden text-sm font-normal leading-relaxed text-slate-500 md:block">
-                  Выбери город и минимум {DAY_ROUTE_MIN} точки
-                  <br />
-                  для составления маршрута
                 </p>
               </div>
+              <p className="mt-1.5 text-[12px] font-normal leading-snug text-slate-500 sm:max-lg:whitespace-nowrap sm:text-[13px] lg:hidden">
+                Выбери город и минимум {DAY_ROUTE_MIN} точки для составления маршрута
+              </p>
+              <p className="mt-1.5 hidden text-[13px] font-normal leading-snug text-slate-500 lg:block">
+                Выбери город и минимум {DAY_ROUTE_MIN} точки
+                <br />
+                для составления маршрута
+              </p>
             </div>
             <div
-              className="flex w-full min-h-[7.75rem] flex-col gap-3.5 md:max-w-md"
+              className="mt-3 flex w-full flex-col gap-2.5 max-lg:min-h-0 lg:col-start-4 lg:mt-0 lg:min-h-[7.75rem] lg:w-[20rem] lg:min-w-[16rem] lg:justify-center"
               data-day-city-search-stack
             >
               <div data-day-city-picker className="w-full text-left">
@@ -2012,16 +2018,16 @@ function DayRoutePanelInner() {
                   onQueryChange={setUnifiedSearchQuery}
                 />
                 {hasPageCity && catalogError ? (
-                  <p className="mt-1.5 mb-0 px-1 text-left text-xs font-medium text-rose-700" role="status">
+                  <p className="mt-1.5 mb-0 pl-4 text-left text-xs font-medium text-rose-700" role="status">
                     {catalogError}
                   </p>
                 ) : null}
-                <p className="mt-1.5 mb-0 block px-1 text-left text-sm leading-snug text-slate-500">
+                <p className="mt-1.5 mb-0 block pl-5 text-left text-[12px] leading-tight text-slate-500">
                   или{' '}
                   <button
                     type="button"
                     onClick={openTextForm}
-                    className="m-0 inline p-0 font-semibold text-sky-700 underline-offset-2 transition duration-200 hover:text-sky-800 hover:underline"
+                    className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
                   >
                     добавь своё место
                   </button>

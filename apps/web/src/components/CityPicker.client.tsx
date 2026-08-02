@@ -105,7 +105,7 @@ export function CityPicker({
 
   const buttonClassName =
     variant === 'hero'
-      ? 'relative min-h-[3.25rem] w-full rounded-xl border border-slate-200 bg-slate-50 py-3.5 pl-10 pr-8 text-left text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/25'
+      ? 'relative h-11 w-full rounded-xl bg-slate-50 pl-10 pr-8 text-left text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/25'
       : variant === 'compact'
         ? 'relative flex w-full items-center gap-2 rounded-lg py-3 pl-10 pr-10 text-left text-base font-medium text-slate-700 hover:bg-slate-100'
         : // Header: mobile = pin icon only (label truncated/eaten in sticky chrome); sm+ shows city name.

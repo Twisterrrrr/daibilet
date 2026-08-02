@@ -1,3 +1,19 @@
+## 2026-08-03 - /my-day: rollback banner starter → equal-M only
+
+### Наблюдения
+- Owner: banner template (`max-w-5xl` + `justify-between`) даёт huge outer voids и tiny middle gap - не то. Нужны только geometry fixes, без fancy chrome.
+
+### Решения
+- Rollback starter banner: full-width card (`data-day-starter-max="full"`), desktop `lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:items-center` equal-M, equal `py`, mobile stack A.
+- Subtle slate icon box kept; sky/tall field chrome reverted (`h-11` / `min-h-11`).
+- «или добавь своё место» `pl-5` (~1–2cm right of field edge).
+- Stop cards `owner-v6` не трогали.
+
+### Проблемы
+- Нет (MSK deploy ниже).
+
+---
+
 ## 2026-08-03 - /my-day: starter banner + stop card v6 templates
 
 ### Наблюдения
@@ -10,7 +26,7 @@
 - List dense unchanged. Offers title-first dedupe already live.
 
 ### Проблемы
-- Нет (после MSK deploy).
+- Owner rejected banner starter - rolled back to equal-M (см. запись выше).
 
 ---
 

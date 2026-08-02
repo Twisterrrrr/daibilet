@@ -148,7 +148,7 @@ export function DayRouteSearchSelect({
               if (option) pick(option);
             }
           }}
-          className="min-h-[3.25rem] w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-9 pr-9 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
+          className="min-h-11 w-full rounded-xl border border-slate-200 bg-white py-2 pl-9 pr-9 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
         />
         <ChevronDown
           className={`pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition ${
