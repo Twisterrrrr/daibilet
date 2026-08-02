@@ -2,16 +2,16 @@
 
 ### Наблюдения
 - Owner: расширить Нижний - 30 must-see + 10 гастро-площадок + 3 именованных пресета «Мой день».
-- City slug в БД: кириллический \нижнии-новгород\ (aliases izhny-novgorod\ / izhniy-novgorod\). Уже было 6 PUBLISHED must-see.
+- City slug в БД: кириллический `нижнии-новгород` (aliases `nizhny-novgorod` / `nizhniy-novgorod`). Уже было 6 PUBLISHED must-see.
 
 ### Решения
-- Editorial JSON \must-see-editorial-nizhny.json\ (40) + merge в \must-see-editorial.json\ (база 430).
-- cityInfo: mustSee 46 (6 канон + 30 + 10 гастро); \dayRoutePresets\ x3; UI \CityDayPresetBlock\ named presets.
-- Covers: \/images/venues/nizhny-novgorod/{owner}.jpg\ (уникальные; часть GenerateImage).
-- Enrich: \--file=\, heroImageUrl/seo/kind override; gastro = CLUB_BAR_RESTAURANT → \/venues/\.
+- Editorial JSON `must-see-editorial-nizhny.json` (40) + merge в `must-see-editorial.json` (база 430).
+- cityInfo: mustSee 46 (6 канон + 30 + 10 гастро); `dayRoutePresets` x3; UI `CityDayPresetBlock` named presets.
+- Covers: `/images/venues/nizhny-novgorod/{owner}.jpg` (уникальные; часть GenerateImage).
+- Enrich: `--file=`, heroImageUrl/seo/kind override; gastro = CLUB_BAR_RESTAURANT → `/venues/`.
 
 ### Проблемы
-- Теги #инстаграмно/#завтрак и т.п. в schema Venue нет - только в editorial JSON tags; фильтры My Day - follow-up.
+- Теги #инстаграмно/#завтрак в schema Venue нет - только в editorial JSON tags; фильтры My Day - follow-up.
 
 ## 2026-08-02 - /my-day: маршрутный лист (print/PDF)
 

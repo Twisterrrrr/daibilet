@@ -18,11 +18,21 @@ export type CitySightItem = CityPlaceLinkFields & {
   text: string;
 };
 
+/** Именованный шаблон «Мой день» на хабе города /my-day. */
+export type CityDayRoutePreset = {
+  id: string;
+  title: string;
+  description?: string;
+  stops: CityMustSeeItem[];
+};
+
 export interface CityInfoEntry {
   brief: string;
   mustSee: CityMustSeeItem[];
   /** Топ достопримечательностей (редакционный). */
   sights?: CitySightItem[];
+  /** Готовые именованные маршруты (кнопки пресетов). */
+  dayRoutePresets?: CityDayRoutePreset[];
   /** Как добраться и лучший сезон (единый блок). */
   travel?: string;
   /** Редакционный FAQ города (не билетный). */
@@ -290,13 +300,98 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { name: 'Набережная Фёдоровского', desc: 'Лучшая смотровая площадка города с благоустроенными террасами для встречи закатов',
         locationSlug: 'nizhny-novgorod-naberezhnaya-fedorovskogo',
       },
+      { name: 'Нижегородская ярмарка', desc: 'Главный ярмарочный дом - символ купеческого Нижнего', locationSlug: 'nizhny-novgorod-nizhegorodskaya-yarmarka' },
+      { name: 'Усадьба Рукавишниковых', desc: 'Купеческий дворец-музей на Верхне-Волжской', locationSlug: 'nizhny-novgorod-usadba-rukavishnikovyh' },
+      { name: 'Государственный банк', desc: 'Сказочный терем неорусского стиля на Покровке', locationSlug: 'nizhny-novgorod-gosudarstvennyy-bank' },
+      { name: 'Площадь Минина и Пожарского', desc: 'Сердце города у стен Кремля', locationSlug: 'nizhny-novgorod-ploschad-minina-i-pozharskogo' },
+      { name: 'Палаты Строгановых', desc: 'Белокаменные купеческие палаты XVII века', locationSlug: 'nizhny-novgorod-palaty-stroganovyh' },
+      { name: 'Ромодановский вокзал', desc: 'Возрожденный вокзал у Оки', locationSlug: 'nizhny-novgorod-romodanovskiy-vokzal' },
+      { name: 'Площадь Лядова', desc: 'Исторический транспортный узел', locationSlug: 'nizhny-novgorod-ploschad-lyadova' },
+      { name: 'Домик Петра I', desc: 'Палаты купца Чатыгина XVII века', locationSlug: 'nizhny-novgorod-domik-petra-i' },
+      { name: 'Нижне-Волжская набережная', desc: 'Главный променад у воды', locationSlug: 'nizhny-novgorod-nizhne-volzhskaya-naberezhnaya' },
+      { name: 'Верхне-Волжская набережная', desc: 'Аристократический променад над Волгой', locationSlug: 'nizhny-novgorod-verhne-volzhskaya-naberezhnaya' },
+      { name: 'Рождественская улица', desc: 'Гастрономический и исторический квартал', locationSlug: 'nizhny-novgorod-rozhdestvenskaya-ulitsa' },
+      { name: 'Парк «Швейцария»', desc: 'Самый большой зеленый парк города', locationSlug: 'nizhny-novgorod-park-shveytsariya' },
+      { name: 'Сормовский парк', desc: 'Сосновый бор, аттракционы и озера', locationSlug: 'nizhny-novgorod-sormovskiy-park' },
+      { name: 'Почаинский бульвар', desc: 'Тихий променад над оврагом', locationSlug: 'nizhny-novgorod-pochainskiy-bulvar' },
+      { name: 'Александровский сад', desc: 'Исторический парк на склоне', locationSlug: 'nizhny-novgorod-aleksandrovskiy-sad' },
+      { name: 'Пакгаузы на Стрелке', desc: 'Индустриальная архитектура и концертный зал', locationSlug: 'nizhny-novgorod-pakgauzy-na-strelke' },
+      { name: 'Щёлоковский хутор', desc: 'Заповедный лес и три озера', locationSlug: 'nizhny-novgorod-schelokovskiy-hutor' },
+      { name: 'Собор Александра Невского', desc: 'Грандиозный храм у слияния рек', locationSlug: 'nizhny-novgorod-sobor-aleksandra-nevskogo' },
+      { name: 'Строгановская церковь', desc: 'Вершина русского барокко', locationSlug: 'nizhny-novgorod-stroganovskaya-tserkov' },
+      { name: 'Печерский монастырь', desc: 'Древняя обитель с наклонной колокольней', locationSlug: 'nizhny-novgorod-pecherskiy-monastyr' },
+      { name: 'Благовещенский монастырь', desc: 'Древнейшая обитель Поволжья', locationSlug: 'nizhny-novgorod-blagoveschenskiy-monastyr' },
+      { name: 'Михайло-Архангельский собор', desc: 'Древнейший храм Кремля', locationSlug: 'nizhny-novgorod-mihailo-arhangelskiy-sobor' },
+      { name: 'Староярмарочный собор', desc: 'Классический шедевр Монферрана', locationSlug: 'nizhny-novgorod-staroyarmarochnyy-sobor' },
+      { name: 'Арсенал ГЦСИ', desc: 'Центр современного искусства в Кремле', venueSlug: 'nizhny-novgorod-arsenal-gtsisi' },
+      { name: 'Музей истории ГАЗ', desc: 'Легендарные советские автомобили', venueSlug: 'nizhny-novgorod-muzey-istorii-gaz' },
+      { name: 'Домик Каширина', desc: 'Музей детства Максима Горького', venueSlug: 'nizhny-novgorod-domik-kashirina' },
+      { name: 'Технический музей', desc: 'Старинные инструменты и механизмы', venueSlug: 'nizhny-novgorod-tehnicheskiy-muzey' },
+      { name: 'Русский музей фотографии', desc: 'Дагерротипы и история русской съемки', venueSlug: 'nizhny-novgorod-russkiy-muzey-fotografii' },
+      { name: 'Памятник Жюлю Верну', desc: 'Писатель на воздушном шаре', locationSlug: 'nizhny-novgorod-pamyatnik-zhyulyu-vernu' },
+      { name: 'Катер «Герой»', desc: 'Судно-памятник у Чкаловской лестницы', locationSlug: 'nizhny-novgorod-kater-geroy' },
+      { name: 'Селёдка и Кофе', desc: 'Культовое кафе-бар на Рождественской', venueSlug: 'nizhny-novgorod-seledka-i-kofe' },
+      { name: 'Безухов', desc: 'Литературное кафе с волжской кухней', venueSlug: 'nizhny-novgorod-bezuhov-cafe' },
+      { name: 'Лепи Тесто', desc: 'Авторские пельмени на Покровке', venueSlug: 'nizhny-novgorod-lepi-testo' },
+      { name: 'Yale', desc: 'Высокая кухня в усадьбе XIX века', venueSlug: 'nizhny-novgorod-yale-restaurant' },
+      { name: 'Red Wall', desc: 'Гастрономия у подножия Кремля', venueSlug: 'nizhny-novgorod-red-wall-restaurant' },
+      { name: 'Пяткинъ', desc: 'Купеческий обед в старинной усадьбе', venueSlug: 'nizhny-novgorod-pyatkin-traktir' },
+      { name: 'Mitrich', desc: 'Стейкхаус премиум-класса', venueSlug: 'nizhny-novgorod-mitrich-restaurant' },
+      { name: 'Медные Трубы', desc: 'Секретный камерный коктейльный бар', venueSlug: 'nizhny-novgorod-mednye-truby-bar' },
+      { name: 'Юла Pizza', desc: 'Неаполитанская пицца во дворе Покровки', venueSlug: 'nizhny-novgorod-yula-pizza' },
+      { name: 'Фонотека', desc: 'Арт-бар с винилом и джазом', venueSlug: 'nizhny-novgorod-fonoteca-bar' },
+    ],
+    dayRoutePresets: [
+      {
+        id: 'nn-one-day',
+        title: 'Нижний за 1 день',
+        description: 'Компактный день: площадь, Кремль, Рождественская, гастро-пауза и набережная.',
+        stops: [
+          { name: 'Площадь Минина и Пожарского', desc: 'Старт у стен Кремля', locationSlug: 'nizhny-novgorod-ploschad-minina-i-pozharskogo' },
+          { name: 'Нижегородский Кремль', desc: 'Крепость и виды', locationSlug: 'nizhny-novgorod-nizhegorodskiy-kreml' },
+          { name: 'Рождественская улица', desc: 'Исторический квартал', locationSlug: 'nizhny-novgorod-rozhdestvenskaya-ulitsa' },
+          { name: 'Селёдка и Кофе', desc: 'Гастро-пауза', venueSlug: 'nizhny-novgorod-seledka-i-kofe' },
+          { name: 'Чкаловская лестница', desc: 'Спуск к Волге', locationSlug: 'nizhny-novgorod-chkalovskaya-lestnitsa' },
+          { name: 'Нижне-Волжская набережная', desc: 'Променад у воды', locationSlug: 'nizhny-novgorod-nizhne-volzhskaya-naberezhnaya' },
+          { name: 'Катер «Герой»', desc: 'Финал у воды', locationSlug: 'nizhny-novgorod-kater-geroy' },
+        ],
+      },
+      {
+        id: 'nn-instagram',
+        title: 'Инстаграмный Нижний',
+        description: 'Пакгаузы, Жюль Верн, набережные, Почаинский и ярмарочные виды.',
+        stops: [
+          { name: 'Пакгаузы на Стрелке', desc: 'Индустриальный вау', locationSlug: 'nizhny-novgorod-pakgauzy-na-strelke' },
+          { name: 'Собор Александра Невского', desc: 'Доминанта Стрелки', locationSlug: 'nizhny-novgorod-sobor-aleksandra-nevskogo' },
+          { name: 'Нижегородская ярмарка', desc: 'Неорусский замок', locationSlug: 'nizhny-novgorod-nizhegorodskaya-yarmarka' },
+          { name: 'Памятник Жюлю Верну', desc: 'Шар над Окой', locationSlug: 'nizhny-novgorod-pamyatnik-zhyulyu-vernu' },
+          { name: 'Верхне-Волжская набережная', desc: 'Панорамы Волги', locationSlug: 'nizhny-novgorod-verhne-volzhskaya-naberezhnaya' },
+          { name: 'Почаинский бульвар', desc: 'Ракурс на Кремль', locationSlug: 'nizhny-novgorod-pochainskiy-bulvar' },
+          { name: 'Государственный банк', desc: 'Сказочный терем', locationSlug: 'nizhny-novgorod-gosudarstvennyy-bank' },
+          { name: 'Юла Pizza', desc: 'Опциональная гастро-пауза', venueSlug: 'nizhny-novgorod-yula-pizza' },
+        ],
+      },
+      {
+        id: 'nn-history-gastro',
+        title: 'Исторический и гастрономический гайд',
+        description: 'Усадьбы, палаты, Строгановская, ярмарка и вечерняя гастро-точка.',
+        stops: [
+          { name: 'Усадьба Рукавишниковых', desc: 'Купеческий дворец', locationSlug: 'nizhny-novgorod-usadba-rukavishnikovyh' },
+          { name: 'Палаты Строгановых', desc: 'Барокко XVII века', locationSlug: 'nizhny-novgorod-palaty-stroganovyh' },
+          { name: 'Строгановская церковь', desc: 'Каменная резьба', locationSlug: 'nizhny-novgorod-stroganovskaya-tserkov' },
+          { name: 'Нижегородская ярмарка', desc: 'Купеческий символ', locationSlug: 'nizhny-novgorod-nizhegorodskaya-yarmarka' },
+          { name: 'Домик Петра I', desc: 'Допетровские палаты', locationSlug: 'nizhny-novgorod-domik-petra-i' },
+          { name: 'Yale', desc: 'Ужин в усадьбе', venueSlug: 'nizhny-novgorod-yale-restaurant' },
+          { name: 'Фонотека', desc: 'Вечерняя точка', venueSlug: 'nizhny-novgorod-fonoteca-bar' },
+        ],
+      },
     ],
     travel:
-      "Из Москвы в Нижний Новгород удобнее всего добираться на скоростных поездах «Ласточка» и «Сапсан», которые долетают до города всего за 3,5–4 часа. Международный аэропорт имени В. П. Чкалова принимает регулярные авиарейсы со всей России, а автопутешественники могут доехать по федеральной трассе М-7 или скоростной М-12. Идеальный туристический сезон длится с мая по сентябрь, когда город по праву подтверждает статус неофициальной «столицы закатов», а на набережных Волги и Оки кипит фестивальная жизнь. Новогодние праздники — второй пик сезона, когда старинная Большая Покровская улица превращается в сказочный светящийся коридор.",
+      "Из Москвы в Нижний Новгород удобнее всего добираться на скоростных поездах «Ласточка» и «Сапсан», которые долетают до города всего за 3,5-4 часа. Международный аэропорт имени В. П. Чкалова принимает регулярные авиарейсы со всей России, а автопутешественники могут доехать по федеральной трассе М-7 или скоростной М-12. Идеальный туристический сезон длится с мая по сентябрь, когда город по праву подтверждает статус неофициальной «столицы закатов», а на набережных Волги и Оки кипит фестивальная жизнь. Новогодние праздники - второй пик сезона, когда старинная Большая Покровская улица превращается в сказочный светящийся коридор.",
     faq: [
     { q: "Правда ли, что Нижегородский кремль можно обойти целиком по стене?", a: "Да, это единственный кремль в России, у которого полностью сохранился и доступен для туристов сквозной круговой пешеходный маршрут по боевому ходу стены протяженностью более 2 километров." },
     { q: "Как работает знаменитая Нижегородская канатная дорога?", a: "Она связывает Нижний Новгород с городом-спутником Бор через Волгу, выполняя роль общественного транспорта, и одновременно служит популярным аттракционом с потрясающими панорамными видами." },
-    { q: "Сколько ступеней на Чкаловской лестнице и сложно ли по ней подняться?", a: "Лестница насчитывает 560 ступеней, выполненных в виде гигантской восьмерки; неспешный подъем от набережной к памятнику Чкалову занимает около 10–15 минут и требует базовой физической формы." },
+    { q: "Сколько ступеней на Чкаловской лестнице и сложно ли по ней подняться?", a: "Лестница насчитывает 560 ступеней, выполненных в виде гигантской восьмерки; неспешный подъем от набережной к памятнику Чкалову занимает около 10-15 минут и требует базовой физической формы." },
     ],
   },
   novosibirsk: {

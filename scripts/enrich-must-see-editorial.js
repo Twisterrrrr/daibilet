@@ -22,7 +22,14 @@ loadRootEnv(rootDir);
 const requireFromDbPackage = createRequire(path.join(rootDir, 'packages', 'db', 'package.json'));
 const { Pool } = requireFromDbPackage('pg');
 
-const DATA_PATH = path.join(rootDir, 'scripts/data/must-see-editorial.json');
+const DATA_PATH = (() => {
+  const fileArg = process.argv.find((a) => a.startsWith('--file='));
+  if (fileArg) {
+    const rel = fileArg.slice('--file='.length).trim();
+    return path.isAbsolute(rel) ? rel : path.join(rootDir, rel);
+  }
+  return path.join(rootDir, 'scripts/data/must-see-editorial.json');
+})();
 
 const CITY_SLUG_ALIASES = {
   moscow: ['moscow', 'moskva', 'москва'],
@@ -231,7 +238,7 @@ async function main() {
         continue;
       }
 
-      const inferred = inferKindAndFamily(item.title);
+      const inferred = inferKindAndFamily(item.title, item);
       const pageStatus = 'PUBLISHED';
       const canonicalPath =
         inferred.family === 'institution' ? `/venues/${item.slug}` : `/locations/${item.slug}`;
@@ -302,7 +309,9 @@ async function updateVenue(pool, ctx) {
     hasWayToFind,
     hasMetro,
   } = ctx;
-  const seoTitle = `${item.title} | Дайбилет`;
+  const seoTitle = item.seoTitle || `${item.title} | Дайбилет`;
+  const seoH1 = item.seoH1 || item.title;
+  const seoDescription = item.seoDescription || item.shortDescription || null;
   // Preserve non-empty shortDescription; fill only if blank.
   const shortKeep = String(existing.shortDescription || '').trim();
   const shortNext = shortKeep || item.shortDescription || null;
@@ -317,10 +326,10 @@ async function updateVenue(pool, ctx) {
     'address = $8',
     'latitude = $9',
     'longitude = $10',
-    '"seoH1" = coalesce(nullif(trim("seoH1"), \'\'), $2)',
-    '"seoTitle" = coalesce(nullif(trim("seoTitle"), \'\'), $11)',
-    '"seoDescription" = coalesce(nullif(trim("seoDescription"), \'\'), $6)',
-    '"canonicalPath" = coalesce(nullif(trim("canonicalPath"), \'\'), $12)',
+    '"seoH1" = $11',
+    '"seoTitle" = $12',
+    '"seoDescription" = $13',
+    '"canonicalPath" = coalesce(nullif(trim("canonicalPath"), \'\'), $14)',
     '"isIndexable" = true',
     '"updatedAt" = now()',
   ];
@@ -335,7 +344,9 @@ async function updateVenue(pool, ctx) {
     item.address,
     item.latitude,
     item.longitude,
+    seoH1,
     seoTitle,
+    seoDescription,
     canonicalPath,
   ];
 
@@ -350,6 +361,10 @@ async function updateVenue(pool, ctx) {
   if (hasMetro) {
     params.push(item.metroStation || null);
     sets.push(`"metroStation" = $${params.length}`);
+  }
+  if (item.heroImageUrl) {
+    params.push(item.heroImageUrl);
+    sets.push(`"heroImageUrl" = coalesce(nullif(trim("heroImageUrl"), ''), $${params.length})`);
   }
 
   await pool.query(`update "Venue" set ${sets.join(', ')} where slug = $1`, params);
@@ -367,7 +382,9 @@ async function insertVenue(pool, ctx) {
     hasMetro,
   } = ctx;
   const id = `ven_ms_${crypto.createHash('sha1').update(item.slug).digest('hex').slice(0, 16)}`;
-  const seoTitle = `${item.title} | Дайбилет`;
+  const seoTitle = item.seoTitle || `${item.title} | Дайбилет`;
+  const seoH1 = item.seoH1 || item.title;
+  const seoDescription = item.seoDescription || item.shortDescription || null;
 
   const cols = [
     'id',
@@ -401,10 +418,10 @@ async function insertVenue(pool, ctx) {
     '$9',
     '$10',
     '$11',
-    '$3',
     '$12',
-    '$7',
     '$13',
+    '$14',
+    '$15',
     'true',
     'now()',
     'now()',
@@ -421,7 +438,9 @@ async function insertVenue(pool, ctx) {
     item.address,
     item.latitude,
     item.longitude,
+    seoH1,
     seoTitle,
+    seoDescription,
     canonicalPath,
   ];
 
@@ -440,6 +459,11 @@ async function insertVenue(pool, ctx) {
     params.push(item.metroStation || null);
     vals.push(`$${params.length}`);
   }
+  if (item.heroImageUrl) {
+    cols.push('"heroImageUrl"');
+    params.push(item.heroImageUrl);
+    vals.push(`$${params.length}`);
+  }
 
   await pool.query(
     `insert into "Venue" (${cols.join(', ')}) values (${vals.join(', ')})`,
@@ -447,30 +471,46 @@ async function insertVenue(pool, ctx) {
   );
 }
 
-function inferKindAndFamily(name) {
+function inferKindAndFamily(name, item = null) {
+  if (item && item.kind) {
+    const family =
+      item.familyHint ||
+      (['MUSEUM_ART_SPACE', 'THEATER', 'CONCERT_HALL', 'CLUB_BAR_RESTAURANT', 'VENUE'].includes(
+        item.kind,
+      )
+        ? 'institution'
+        : 'location');
+    return { kind: item.kind, family };
+  }
   const n = String(name || '').toLowerCase();
-  if (/парк|сад\b|эспланад|зарядье|вднх|петергоф|столб|зоопарк|академгородок/.test(n)) {
+  if (/кафе|ресторан|бар|трактир|пельмен|пицц|гастро|кофе/.test(n)) {
+    return { kind: 'CLUB_BAR_RESTAURANT', family: 'institution' };
+  }
+  if (/парк|сад\b|эспланад|зарядье|вднх|петергоф|столб|зоопарк|академгородок|хутор|лесопарк/.test(n)) {
     return { kind: 'PARK', family: 'location' };
   }
-  if (/памятник|скульптур|бюст/.test(n)) {
+  if (/памятник|скульптур|бюст|катер/.test(n)) {
     return { kind: 'MONUMENT', family: 'location' };
   }
   if (/театр|оперн|балет|новат/.test(n)) {
     return { kind: 'THEATER', family: 'institution' };
   }
   if (
-    /музей|галере|эрмитаж|третьяков|пряник|оружия|ельцин|погребаль|суриков|пароход|комбинат|октава|космическ/.test(
+    /музей|галере|эрмитаж|третьяков|пряник|оружия|ельцин|погребаль|суриков|пароход|комбинат|октава|космическ|арсенал|гцси/.test(
       n,
     )
   ) {
     return { kind: 'MUSEUM_ART_SPACE', family: 'institution' };
   }
   if (
-    /набережн|площад|кремл|крепост|собор|храм|улиц|мост|лестниц|остров|фонтан|сити|стрелка|ворот|башня|костёл|костел|бункер|часовн|деревн|коса|плотн|городок|кластер/.test(
+    /набережн|площад|кремл|крепост|собор|храм|церков|монастыр|улиц|мост|лестниц|остров|фонтан|сити|стрелка|ворот|башня|костёл|костел|бункер|часовн|деревн|коса|плотн|городок|кластер|пакгауз|ярмарк|усадьб|палат|вокзал|домик|банк/.test(
       n,
     )
   ) {
     return { kind: 'OUTDOOR_LOCATION', family: 'location' };
+  }
+  if (item && item.familyHint === 'institution') {
+    return { kind: 'VENUE', family: 'institution' };
   }
   return { kind: 'OUTDOOR_LOCATION', family: 'location' };
 }

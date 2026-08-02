@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-import type { CityMustSeeItem } from '@/lib/cityInfo';
+import type { CityDayRoutePreset, CityMustSeeItem } from '@/lib/cityInfo';
 import {
   buildCityDayRoutePreset,
   cityDayRoutePresetAvailable,
@@ -18,6 +18,8 @@ type Props = {
   venues: DayRouteVenueMatchSource[];
   city: DayRouteCityContext;
   editorial?: boolean;
+  /** Именованные шаблоны из cityInfo.dayRoutePresets */
+  namedPresets?: CityDayRoutePreset[];
 };
 
 /** Russian plural for «N главных мест(а/о)» in preset copy. */
@@ -31,17 +33,100 @@ function mainPlacesPhrase(count: number): string {
   return `${count} главных мест`;
 }
 
-export function CityDayPresetBlock({ places, venues, city, editorial = false }: Props) {
+export function CityDayPresetBlock({
+  places,
+  venues,
+  city,
+  editorial = false,
+  namedPresets = [],
+}: Props) {
   const router = useRouter();
-  const [busy, setBusy] = useState(false);
-  const preset = useMemo(
+  const [busyId, setBusyId] = useState<string | null>(null);
+
+  const namedResolved = useMemo(() => {
+    return (namedPresets || [])
+      .map((preset) => ({
+        preset,
+        items: buildCityDayRoutePreset(preset.stops, venues, city),
+      }))
+      .filter((row) => row.items.length >= 3);
+  }, [namedPresets, venues, city]);
+
+  const fallbackPreset = useMemo(
     () => buildCityDayRoutePreset(places, venues, city),
     [places, venues, city],
   );
-  const available = cityDayRoutePresetAvailable(places, venues, city);
-  if (!available || preset.length < 3) return null;
+  const fallbackAvailable = cityDayRoutePresetAvailable(places, venues, city);
 
-  const titles = preset.map((item) => item.title).join(' · ');
+  const apply = (id: string, items: ReturnType<typeof buildCityDayRoutePreset>) => {
+    setBusyId(id);
+    replaceDayRouteFromVenues(items, city.id || null);
+    router.push('/my-day');
+  };
+
+  if (namedResolved.length > 0) {
+    return (
+      <div
+        className={`mt-5 rounded-2xl border p-4 sm:p-5 ${
+          editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-slate-50'
+        }`}
+      >
+        <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
+          Готовые дни
+        </p>
+        <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+          Выберите шаблон - точки сразу попадут в «Мой день».
+        </p>
+        <ul className="mt-4 grid gap-3">
+          {namedResolved.map(({ preset, items }) => {
+            const titles = items.map((item) => item.title).join(' · ');
+            return (
+              <li
+                key={preset.id}
+                className={`flex flex-col gap-3 rounded-xl border p-3 sm:flex-row sm:items-center sm:justify-between ${
+                  editorial ? 'border-zinc-200' : 'border-slate-200'
+                }`}
+              >
+                <div className="min-w-0">
+                  <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
+                    {preset.title}
+                  </p>
+                  {preset.description ? (
+                    <p className={`mt-0.5 text-xs leading-5 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                      {preset.description}
+                    </p>
+                  ) : null}
+                  <p
+                    className={`mt-1 line-clamp-2 text-xs ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
+                    title={titles}
+                  >
+                    {items.length} точек: {titles}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  disabled={busyId != null}
+                  onClick={() => apply(preset.id, items)}
+                  className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition disabled:opacity-60 ${
+                    editorial
+                      ? 'bg-zinc-900 text-white hover:bg-zinc-800'
+                      : 'bg-primary-600 text-white hover:bg-primary-700'
+                  }`}
+                >
+                  <Sparkles className="h-4 w-4" />
+                  {busyId === preset.id ? 'Собираем…' : 'В мой день'}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    );
+  }
+
+  if (!fallbackAvailable || fallbackPreset.length < 3) return null;
+
+  const titles = fallbackPreset.map((item) => item.title).join(' · ');
 
   return (
     <div
@@ -51,13 +136,11 @@ export function CityDayPresetBlock({ places, venues, city, editorial = false }: 
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <p
-            className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}
-          >
+          <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
             Готовый день
           </p>
           <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-            Собрать за минуту: {mainPlacesPhrase(preset.length)} в маршрут.
+            Собрать за минуту: {mainPlacesPhrase(fallbackPreset.length)} в маршрут.
           </p>
           <p
             className={`mt-1 line-clamp-2 text-xs ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
@@ -68,12 +151,8 @@ export function CityDayPresetBlock({ places, venues, city, editorial = false }: 
         </div>
         <button
           type="button"
-          disabled={busy}
-          onClick={() => {
-            setBusy(true);
-            replaceDayRouteFromVenues(preset, city.id || null);
-            router.push('/my-day');
-          }}
+          disabled={busyId != null}
+          onClick={() => apply('default', fallbackPreset)}
           className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition disabled:opacity-60 ${
             editorial
               ? 'bg-zinc-900 text-white hover:bg-zinc-800'

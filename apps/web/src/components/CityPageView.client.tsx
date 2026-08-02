@@ -1171,6 +1171,7 @@ function CitySightsSection({
             venues={venues}
             city={city}
             editorial={editorial}
+            namedPresets={guide?.dayRoutePresets}
           />
           <ol className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {places.slice(0, 6).map((place, index) => {
