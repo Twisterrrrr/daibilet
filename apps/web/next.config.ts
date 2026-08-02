@@ -42,6 +42,17 @@ const nextConfig: NextConfig = {
       { source: '/river-cruises/:city', destination: '/rechnye-progulki/:city', permanent: true },
       { source: '/bus-tours', destination: '/avtobusnye-ekskursii', permanent: true },
       { source: '/bus-tours/:city', destination: '/avtobusnye-ekskursii/:city', permanent: true },
+      // HIDDEN blog twins → live канон
+      {
+        source: '/blog/bylinnyy-bereg-fentezi-fest',
+        destination: '/blog/fentezi-fest-bylinnyy-bereg',
+        permanent: true,
+      },
+      {
+        source: '/blog/open-air-festy-vyhodnoi-ru',
+        destination: '/blog/moskva-parki-open-air-vyhodnye',
+        permanent: true,
+      },
     ];
   },
   webpack: (config) => {
