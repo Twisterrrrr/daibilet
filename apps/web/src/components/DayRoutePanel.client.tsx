@@ -418,7 +418,7 @@ function DayRoutePanelInner() {
               ? venueHref({ id: venue.id, slug: venue.slug, name: venue.title, type: 'park' })
               : null,
           }));
-          // Unresolved locators (event ids) become stub stops with eventId for ticket CTA.
+          // Unresolved locators: real event ids keep ticket CTA; venue slugs never become /events/{slug}.
           const known = new Set(
             resolved.flatMap((v) =>
               [v.id, v.slug, v.eventId, v.eventSlug].map((x) => String(x || '').trim()).filter(Boolean),
@@ -426,13 +426,23 @@ function DayRoutePanelInner() {
           );
           for (const token of itemTokens) {
             if (token.isText || known.has(token.id)) continue;
-            resolved.push({
-              id: token.id,
-              slug: token.id,
-              title: 'Событие из маршрута',
-              eventId: token.id,
-              ticketUrl: `/events/${encodeURIComponent(token.id)}`,
-            });
+            const isRealEventToken = /^(event_|evt_)/i.test(token.id);
+            if (isRealEventToken) {
+              resolved.push({
+                id: token.id,
+                slug: null,
+                title: 'Событие из маршрута',
+                eventId: token.id,
+                ticketUrl: `/events/${encodeURIComponent(token.id)}`,
+              });
+            } else {
+              resolved.push({
+                id: token.id,
+                slug: token.id,
+                title: 'Место из маршрута',
+                href: `/venues/${encodeURIComponent(token.id)}`,
+              });
+            }
           }
           const withMeta = applyItemTokensToVenues(resolved, itemTokens);
           hydratedDayRef.current = key;

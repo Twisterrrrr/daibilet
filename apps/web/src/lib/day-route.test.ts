@@ -38,7 +38,9 @@ import {
   parseDayRouteQueryParam,
   readDayRoute,
   resetDayRouteSnapshotCache,
+  resolveDayRouteTicketUrl,
   sameDayRouteVenue,
+  sanitizeDayRouteTicketFields,
   subscribeDayRoute,
   venueMatchesRouteSlug,
   type DayRouteVenueItem,
@@ -753,4 +755,52 @@ test('hydrateTextStopsFromShareTokens fills planner from titles', () => {
     ['Аврора', 'Медный всадник'],
   );
   assert.ok(next.venues.every((v) => isTextDayRouteStop(v)));
+});
+
+test('resolveDayRouteTicketUrl never builds /events/{venueSlug}', () => {
+  const venue: DayRouteVenueItem = {
+    id: 'venue_niko',
+    slug: 'niko1560',
+    title: 'Niko1560',
+    href: '/venues/niko1560',
+    eventId: 'niko1560',
+    eventSlug: 'niko1560',
+    ticketUrl: '/events/niko1560',
+  };
+  assert.equal(resolveDayRouteTicketUrl(venue), '/venues/niko1560');
+  assert.notEqual(resolveDayRouteTicketUrl(venue), '/events/niko1560');
+
+  const onlyKeys: DayRouteVenueItem = {
+    id: 'niko1560',
+    slug: 'niko1560',
+    title: 'Niko1560',
+    eventSlug: 'niko1560',
+  };
+  assert.equal(resolveDayRouteTicketUrl(onlyKeys), null);
+
+  const realEvent: DayRouteVenueItem = {
+    id: 'venue_niko',
+    slug: 'niko1560',
+    title: 'Niko1560',
+    eventId: 'evt_standup_1',
+    eventSlug: 'standup-po-zhenski',
+  };
+  assert.equal(resolveDayRouteTicketUrl(realEvent), '/events/standup-po-zhenski');
+});
+
+test('sanitizeDayRouteTicketFields rewrites venue-as-event ticketUrl', () => {
+  const poisoned: DayRouteVenueItem = {
+    id: 'venue_niko',
+    slug: 'niko1560',
+    title: 'Niko1560',
+    href: '/venues/niko1560',
+    eventId: 'niko1560',
+    eventSlug: 'niko1560',
+    ticketUrl: '/events/niko1560',
+  };
+  const cleaned = sanitizeDayRouteTicketFields(poisoned);
+  assert.equal(cleaned.eventId, null);
+  assert.equal(cleaned.eventSlug, null);
+  assert.equal(cleaned.ticketUrl, '/venues/niko1560');
+  assert.ok(!String(cleaned.ticketUrl).startsWith('/events/niko1560'));
 });

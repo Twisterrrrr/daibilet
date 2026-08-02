@@ -44,7 +44,7 @@ describe('day-route-commercial chips', () => {
 
   it('needs ticket when checkout exists without time', () => {
     const chip = classifyDayRouteCommercialChip(
-      stop({ id: '3', title: 'Музей', ticketUrl: '/events/z', eventId: 'z' }),
+      stop({ id: 'venue_3', slug: 'museum-3', title: 'Музей', ticketUrl: '/events/museum-ticket', eventId: 'evt_z' }),
     );
     assert.equal(chip.kind, 'needs_ticket');
     assert.equal(chip.label, 'Билет оформляется…');
@@ -53,10 +53,11 @@ describe('day-route-commercial chips', () => {
   it('keeps soft evening session label without inventing clock time', () => {
     const chip = classifyDayRouteCommercialChip(
       stop({
-        id: '3b',
+        id: 'venue_3b',
+        slug: 'standup-club',
         title: 'Стендап',
-        ticketUrl: '/events/standup',
-        eventId: 'standup',
+        ticketUrl: '/events/standup-night',
+        eventId: 'evt_standup',
         sessionLabel: 'Вечерний сеанс',
       }),
     );
@@ -83,12 +84,13 @@ describe('day-route-commercial readiness', () => {
   it('header summary: points of SOFT + unpaid tickets only', () => {
     const venues = [
       stop({ id: 'a', title: 'Парк' }),
-      stop({ id: 'b', title: 'Шоу', ticketUrl: '/events/b', eventId: 'b' }),
+      stop({ id: 'venue_b', slug: 'show-hall', title: 'Шоу', ticketUrl: '/events/standup-b', eventId: 'evt_b' }),
       stop({
-        id: 'c',
+        id: 'venue_c',
+        slug: 'theatre-c',
         title: 'Театр',
-        ticketUrl: '/events/c',
-        eventId: 'c',
+        ticketUrl: '/events/play-c',
+        eventId: 'evt_c',
         ticketBought: true,
         sessionLabel: '18:00',
         startsAt: '2026-08-02T18:00:00+03:00',
@@ -109,10 +111,11 @@ describe('day-route-commercial readiness', () => {
     const venues = [
       stop({ id: 'a', title: 'Парк' }),
       stop({
-        id: 'c',
+        id: 'venue_c',
+        slug: 'theatre-c',
         title: 'Театр',
-        ticketUrl: '/events/c',
-        eventId: 'c',
+        ticketUrl: '/events/play-c',
+        eventId: 'evt_c',
         ticketBought: true,
       }),
     ];

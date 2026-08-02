@@ -7,6 +7,7 @@ import {
   classifyHotPickOffer,
   dayPartForStop,
   findHotPickEventForPlace,
+  resolveHotPickTicketTarget,
 } from './day-route-hot-picks';
 import type { DayRouteVenueItem } from './day-route';
 
@@ -27,7 +28,38 @@ describe('day-route-hot-picks offers', () => {
     assert.equal(offer.ctaLabel, 'Выбрать дату и билеты');
     assert.equal(offer.dayPart, 'evening');
     assert.equal(offer.sessionLabel, 'Вечерний сеанс');
-    assert.ok(offer.ticketUrl);
+    assert.equal(offer.ticketUrl, '/events/standup-nn');
+  });
+
+  it('affiche never uses venue slug as /events/{venueSlug}', () => {
+    const offer = classifyHotPickOffer(
+      { name: 'Niko1560', venueSlug: 'niko1560' },
+      {
+        id: 'niko1560',
+        slug: 'niko1560',
+        title: 'Стендап в Niko1560',
+        venueSlug: 'niko1560',
+      },
+    );
+    assert.equal(offer.kind, 'affiche');
+    assert.equal(offer.ticketUrl, '/venues/niko1560');
+    assert.equal(offer.eventId, null);
+    assert.equal(offer.eventSlug, null);
+    assert.ok(!String(offer.ticketUrl).includes('/events/niko1560'));
+  });
+
+  it('resolveHotPickTicketTarget keeps real event slug', () => {
+    const target = resolveHotPickTicketTarget(
+      { name: 'Niko1560', venueSlug: 'niko1560' },
+      {
+        id: 'evt_1',
+        slug: 'standup-po-zhenski',
+        title: 'Standup',
+        venueSlug: 'niko1560',
+      },
+    );
+    assert.equal(target.ticketUrl, '/events/standup-po-zhenski');
+    assert.equal(target.eventSlug, 'standup-po-zhenski');
   });
 
   it('scenario 2 open_date for museum event', () => {
@@ -123,6 +155,23 @@ describe('dayPartForStop', () => {
     assert.equal(
       dayPartForStop({ startsAt: '2026-08-02T10:00:00+03:00', sessionLabel: '10:00' }),
       'morning',
+    );
+  });
+
+  it('maps timed afternoon sessions to day bucket', () => {
+    assert.equal(
+      dayPartForStop({
+        startsAt: '2026-08-02T14:00:00+03:00',
+        sessionLabel: '14:00',
+      }),
+      'day',
+    );
+    assert.equal(
+      dayPartForStop({
+        startsAt: '2026-08-02T19:00:00+03:00',
+        sessionLabel: '19:00',
+      }),
+      'evening',
     );
   });
 });

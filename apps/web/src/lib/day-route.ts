@@ -3,7 +3,7 @@
  */
 
 import { haversineMeters, isValidCoordinatePair } from './day-route-score';
-import { eventHref } from './routes';
+import { eventHref, venueHref } from './routes';
 
 export const DAY_ROUTE_STORAGE_KEY = 'daibilet:dayRoute';
 export const DAY_ROUTE_CHANGED_EVENT = 'daibilet:day-route-changed';
@@ -357,13 +357,13 @@ function parseDayRouteRaw(raw: string | null): DayRouteState {
         if (typeof item.title !== 'string' || !item.title.trim()) continue;
         const id = normalizeDayRouteVenueId(item);
         if (!id) continue;
-        const next: DayRouteVenueItem = {
+        const next = sanitizeDayRouteTicketFields({
           ...item,
           id,
           title: item.title,
           slug: item.slug != null ? String(item.slug).trim() || null : null,
           ...sanitizeStoredCoords(item),
-        };
+        });
         if (venues.some((existing) => sameDayRouteVenue(existing, next))) continue;
         venues.push(next);
       }
@@ -646,12 +646,12 @@ export function updateDayRouteVenue(
   const venues = current.venues.map((venue) => {
     if (venue.id !== needle && String(venue.slug || '').trim() !== needle) return venue;
     changed = true;
-    const merged: DayRouteVenueItem = {
+    const merged: DayRouteVenueItem = sanitizeDayRouteTicketFields({
       ...venue,
       ...patch,
       id: venue.id,
       ...sanitizeStoredCoords({ ...venue, ...patch }),
-    };
+    });
     return merged;
   });
   if (!changed) return current;
@@ -665,12 +665,12 @@ export function addToDayRoute(item: DayRouteVenueItem): DayRouteState {
   const id = normalizeDayRouteVenueId(item);
   if (!id) return current;
   const coords = sanitizeStoredCoords(item);
-  const normalized: DayRouteVenueItem = { ...item, id, ...coords };
+  const normalized = sanitizeDayRouteTicketFields({ ...item, id, ...coords });
 
   const existingIdx = current.venues.findIndex((v) => sameDayRouteVenue(v, normalized));
   if (existingIdx >= 0) {
     const existing = current.venues[existingIdx]!;
-    const merged = mergeDayRouteVenueFields(existing, normalized);
+    const merged = sanitizeDayRouteTicketFields(mergeDayRouteVenueFields(existing, normalized));
     const unchanged =
       merged.latitude === existing.latitude &&
       merged.longitude === existing.longitude &&
@@ -818,7 +818,9 @@ export function encodeDayRouteItemToken(venue: DayRouteVenueItem): string {
     if (!title) return '';
     return `${DAY_ROUTE_SHARE_TEXT_PREFIX}${title}:free`;
   }
-  const eventKey = String(venue.eventId || venue.eventSlug || '').trim();
+  const eventKeyRaw = String(venue.eventId || venue.eventSlug || '').trim();
+  const eventKey =
+    eventKeyRaw && !isDayRouteVenueAsEventKey(eventKeyRaw, venue) ? eventKeyRaw : '';
   const locator = eventKey || String(venue.slug || venue.id || '').trim();
   if (!locator) return '';
   const time = encodeDayRouteShareTime(venue);
@@ -934,7 +936,9 @@ export function encodeDayRouteShareToken(venue: DayRouteVenueItem): string {
   const locator = String(venue.slug || venue.id || '').trim();
   if (!locator) return '';
   const parts = [locator];
-  const eventKey = String(venue.eventSlug || venue.eventId || '').trim();
+  const eventKeyRaw = String(venue.eventSlug || venue.eventId || '').trim();
+  const eventKey =
+    eventKeyRaw && !isDayRouteVenueAsEventKey(eventKeyRaw, venue) ? eventKeyRaw : '';
   if (eventKey) parts.push(`${DAY_ROUTE_SHARE_EVENT_PREFIX}${eventKey}`);
   const startsAt = String(venue.startsAt || '').trim();
   if (startsAt) parts.push(startsAt);
@@ -1258,7 +1262,7 @@ export function replaceDayRouteFromVenues(
     .map((item) => {
       const id = normalizeDayRouteVenueId(item);
       if (!id) return null;
-      return { ...item, id, ...sanitizeStoredCoords(item) };
+      return sanitizeDayRouteTicketFields({ ...item, id, ...sanitizeStoredCoords(item) });
     })
     .filter((item): item is DayRouteVenueItem => Boolean(item))
     .slice(0, DAY_ROUTE_MAX);
@@ -1625,14 +1629,154 @@ export function formatDayRouteTravelMinutes(minutes: number): string {
   return rest ? `${hours} ч ${rest} мин` : `${hours} ч`;
 }
 
-/** Prefer stored ticketUrl; else event page from eventSlug/eventId. */
+/** Venue/location keys that must never be treated as event slug/id. */
+export function dayRouteVenueIdentityKeys(
+  venue: Pick<DayRouteVenueItem, 'id' | 'slug'>,
+): Set<string> {
+  const keys = new Set<string>();
+  const push = (value: string | null | undefined) => {
+    const raw = String(value || '').trim().toLowerCase();
+    if (!raw) return;
+    keys.add(raw);
+    keys.add(decodeURIComponentSafe(raw));
+  };
+  push(venue.slug);
+  push(venue.id);
+  const bareId = String(venue.id || '')
+    .trim()
+    .replace(/^venue_/i, '');
+  push(bareId);
+  return keys;
+}
+
+function decodeURIComponentSafe(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+/** True when key is the stop's venue/location identity (not a real event). */
+export function isDayRouteVenueAsEventKey(
+  key: string | null | undefined,
+  venue: Pick<DayRouteVenueItem, 'id' | 'slug'>,
+): boolean {
+  const raw = String(key || '').trim();
+  if (!raw) return false;
+  if (/^(event_|evt_)/i.test(raw)) return false;
+  const lower = raw.toLowerCase();
+  const keys = dayRouteVenueIdentityKeys(venue);
+  return keys.has(lower) || keys.has(decodeURIComponentSafe(lower));
+}
+
+/** Extract `/events/{slug}` path segment from absolute or relative ticket URL. */
+export function dayRouteEventPathSlug(url: string | null | undefined): string | null {
+  const raw = String(url || '').trim();
+  if (!raw) return null;
+  try {
+    const path = /^https?:\/\//i.test(raw) ? new URL(raw).pathname : raw.split(/[?#]/)[0] || '';
+    const match = path.match(/^\/events\/([^/]+)\/?$/i);
+    if (!match?.[1]) return null;
+    return decodeURIComponentSafe(match[1]).trim() || null;
+  } catch {
+    return null;
+  }
+}
+
+/** True when ticketUrl is `/events/{venueSlug}` (404 on live - venue is not an event). */
+export function isDayRouteVenueAsEventTicketUrl(
+  url: string | null | undefined,
+  venue: Pick<DayRouteVenueItem, 'id' | 'slug'>,
+): boolean {
+  const pathSlug = dayRouteEventPathSlug(url);
+  if (!pathSlug) return false;
+  return isDayRouteVenueAsEventKey(pathSlug, venue);
+}
+
+/** Venue program page for ticket discovery when real event page is missing. */
+export function dayRouteVenueProgramUrl(
+  venue: Pick<DayRouteVenueItem, 'id' | 'slug' | 'title' | 'href'>,
+): string | null {
+  const href = String(venue.href || '').trim();
+  if (href && (/^\/venues\//i.test(href) || /^\/locations\//i.test(href))) return href;
+  const slug = String(venue.slug || '').trim();
+  if (!slug) return null;
+  return venueHref({
+    id: String(venue.id || slug),
+    slug,
+    name: String(venue.title || slug),
+  });
+}
+
+/**
+ * Strip / rewrite commerce fields that used venue slug as event slug/id/URL.
+ * Bad `/events/{venueSlug}` → venue program `/venues|{locations}/{slug}` when possible.
+ */
+export function sanitizeDayRouteTicketFields(venue: DayRouteVenueItem): DayRouteVenueItem {
+  let eventId = String(venue.eventId || '').trim() || null;
+  let eventSlug = String(venue.eventSlug || '').trim() || null;
+  let ticketUrl = String(venue.ticketUrl || '').trim() || null;
+
+  const hadVenueAsEvent =
+    Boolean(eventId && isDayRouteVenueAsEventKey(eventId, venue)) ||
+    Boolean(eventSlug && isDayRouteVenueAsEventKey(eventSlug, venue)) ||
+    Boolean(ticketUrl && isDayRouteVenueAsEventTicketUrl(ticketUrl, venue));
+
+  if (eventId && isDayRouteVenueAsEventKey(eventId, venue)) eventId = null;
+  if (eventSlug && isDayRouteVenueAsEventKey(eventSlug, venue)) eventSlug = null;
+  if (ticketUrl && isDayRouteVenueAsEventTicketUrl(ticketUrl, venue)) ticketUrl = null;
+
+  if (hadVenueAsEvent && !ticketUrl && !eventId && !eventSlug) {
+    ticketUrl = dayRouteVenueProgramUrl(venue);
+  }
+
+  if (
+    eventId === (venue.eventId ?? null) &&
+    eventSlug === (venue.eventSlug ?? null) &&
+    ticketUrl === (venue.ticketUrl ?? null)
+  ) {
+    return venue;
+  }
+
+  return {
+    ...venue,
+    eventId,
+    eventSlug,
+    ticketUrl,
+  };
+}
+
+/**
+ * Prefer stored ticketUrl; else real event page from eventSlug/eventId.
+ * Never invent `/events/{venueSlug}` - fall back to venue program or hide CTA.
+ */
 export function resolveDayRouteTicketUrl(
-  venue: Pick<DayRouteVenueItem, 'ticketUrl' | 'eventId' | 'eventSlug' | 'title'>,
+  venue: Pick<DayRouteVenueItem, 'ticketUrl' | 'eventId' | 'eventSlug' | 'title' | 'slug' | 'id' | 'href'>,
 ): string | null {
   const stored = String(venue.ticketUrl || '').trim();
-  if (stored) return stored;
-  const slug = String(venue.eventSlug || '').trim();
-  const id = String(venue.eventId || '').trim();
+  if (stored) {
+    if (/^https?:\/\//i.test(stored)) return stored;
+    if (/^\/venues\//i.test(stored) || /^\/locations\//i.test(stored)) return stored;
+    if (isDayRouteVenueAsEventTicketUrl(stored, venue)) {
+      return dayRouteVenueProgramUrl(venue);
+    }
+    return stored;
+  }
+
+  const rawSlug = String(venue.eventSlug || '').trim();
+  const rawId = String(venue.eventId || '').trim();
+  const slug = rawSlug && !isDayRouteVenueAsEventKey(rawSlug, venue) ? rawSlug : '';
+  const id = rawId && !isDayRouteVenueAsEventKey(rawId, venue) ? rawId : '';
   if (!slug && !id) return null;
-  return eventHref({ id: id || slug, slug: slug || null, title: venue.title || 'event' });
+
+  const href = eventHref({
+    id: id || slug,
+    slug: slug || null,
+    title: venue.title || 'event',
+  });
+  if (isDayRouteVenueAsEventTicketUrl(href, venue)) {
+    return dayRouteVenueProgramUrl(venue);
+  }
+  return href;
 }

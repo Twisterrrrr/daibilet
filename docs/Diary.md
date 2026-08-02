@@ -1,3 +1,20 @@
+## 2026-08-02 - /my-day: «Купить билет» → `/events/{venueSlug}` 404
+
+### Наблюдения
+- Owner: timeline CTA открывал `https://daibilet.ru/events/niko1560` (404). Карточка: «Событие из маршрута», «Билет оформляется…», «Нет координат».
+- Root cause: `ticketUrl` / `eventId` / `eventSlug` строились из **venue** slug; hydrate stub для нерезолвнутого locator всегда писал `/events/{token.id}`.
+
+### Решения
+- `resolveDayRouteTicketUrl` + `sanitizeDayRouteTicketFields`: никогда не использовать venue/location slug как event; bad `/events/{venueSlug}` → `/venues/{slug}` (программа площадки) или hide CTA.
+- Hot Picks affiche/open_date: `resolveHotPickTicketTarget` - real event page only; иначе `/venues/{slug}`.
+- Share hydrate stub: `event_*`/`evt_*` → event ticket; иначе venue stub без fake event URL.
+- Unit: venue slug must not produce `/events/venueSlug`.
+
+### Проблемы
+- MSK deploy + BUILD_ID ниже после smoke.
+
+---
+
 ## 2026-08-02 - Канон Location vs Venue / антидубли (docs)
 
 ### Наблюдения
@@ -32,6 +49,23 @@
 
 ---
 
+## 2026-08-02 - /my-day: «Купить билет» → `/events/{venueSlug}` 404
+
+### Наблюдения
+- Owner: timeline CTA открывал `https://daibilet.ru/events/niko1560` (404). Карточка: «Событие из маршрута», «Билет оформляется…», «Нет координат».
+- Root cause: `ticketUrl` / `eventId` / `eventSlug` строились из **venue** slug; hydrate stub для нерезолвнутого locator всегда писал `/events/{token.id}`.
+
+### Решения
+- `resolveDayRouteTicketUrl` + `sanitizeDayRouteTicketFields`: никогда не использовать venue/location slug как event; bad `/events/{venueSlug}` → `/venues/{slug}` (программа площадки) или hide CTA.
+- Hot Picks affiche/open_date: `resolveHotPickTicketTarget` - real event page only; иначе `/venues/{slug}`.
+- Share hydrate stub: `event_*`/`evt_*` → event ticket; иначе venue stub без fake event URL.
+- Unit: venue slug must not produce `/events/venueSlug`.
+
+### Проблемы
+- MSK deploy + BUILD_ID ниже после smoke.
+
+---
+
 ## 2026-08-02 - /my-day: События в «Ещё из каталога» пустые
 
 ### Наблюдения
@@ -45,7 +79,7 @@
 - Backend: `matchesCatalogCity` также принимает `citySlug` / `sourceCitySlug` (slug callers + defense).
 
 ### Проблемы
-- MSK live **BUILD_ID=`M6ddOogx7rcnlTW9jUJcM`** (`066363d`). Smoke: events slug+name SPB/MSK/NN total>0 items=5; venues/locs OK; `/my-day` 200.
+- MSK live **BUILD_ID=`Ywy2ntkkoX6K__8CuMH3H`** (events fix `066363d` + flat-list `7a3de60`). Smoke: events slug SPB/MSK/NN total>0; venues OK; `/my-day` 200.
 
 ---
 

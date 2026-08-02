@@ -109,6 +109,76 @@ export function findHotPickEventForPlace(
   );
 }
 
+function isHotPickVenueAsEventKey(
+  key: string | null | undefined,
+  venueKeys: Set<string>,
+): boolean {
+  const raw = String(key || '').trim();
+  if (!raw) return false;
+  if (/^(event_|evt_)/i.test(raw)) return false;
+  return venueKeys.has(raw.toLowerCase());
+}
+
+function hotPickVenueKeys(
+  place: MustSeeClassifyInput,
+  event: HotPickEventStub | null,
+): Set<string> {
+  const keys = new Set<string>();
+  for (const value of [event?.venueSlug, place.venueSlug, place.locationSlug]) {
+    const raw = String(value || '').trim().toLowerCase();
+    if (raw) keys.add(raw);
+  }
+  return keys;
+}
+
+/**
+ * Real event checkout/page only. Never `/events/{venueSlug}` -
+ * affiche without distinct event slug → venue program.
+ */
+export function resolveHotPickTicketTarget(
+  place: MustSeeClassifyInput,
+  event: HotPickEventStub,
+): { ticketUrl: string | null; eventId: string | null; eventSlug: string | null } {
+  const venueKeys = hotPickVenueKeys(place, event);
+  const venueSlug = String(event.venueSlug || place.venueSlug || place.locationSlug || '').trim();
+  const rawSlug = String(event.slug || '').trim();
+  const rawId = String(event.id || '').trim();
+  const eventSlug = rawSlug && !isHotPickVenueAsEventKey(rawSlug, venueKeys) ? rawSlug : null;
+  const eventId = rawId && !isHotPickVenueAsEventKey(rawId, venueKeys) ? rawId : null;
+
+  if (eventSlug || eventId) {
+    const ticketUrl = eventHref({
+      id: eventId || eventSlug || event.id,
+      slug: eventSlug,
+      title: event.title || null,
+    });
+    let pathSlug = '';
+    try {
+      pathSlug = decodeURIComponent(
+        String(ticketUrl.replace(/^\/events\//i, '').split('/')[0] || '').trim(),
+      ).toLowerCase();
+    } catch {
+      pathSlug = String(ticketUrl.replace(/^\/events\//i, '').split('/')[0] || '')
+        .trim()
+        .toLowerCase();
+    }
+    if (!pathSlug || !venueKeys.has(pathSlug)) {
+      return { ticketUrl, eventId, eventSlug };
+    }
+  }
+
+  if (venueSlug) {
+    // Owner canon: ticket discovery without real event page → /venues/{slug} program.
+    return {
+      ticketUrl: `/venues/${encodeURIComponent(venueSlug)}`,
+      eventId: null,
+      eventSlug: null,
+    };
+  }
+
+  return { ticketUrl: null, eventId: null, eventSlug: null };
+}
+
 /**
  * Scenario map:
  * 1 affiche - recurring/evening entertainment stub (no trip date)
@@ -120,11 +190,7 @@ export function classifyHotPickOffer(
   event: HotPickEventStub | null,
 ): HotPickOffer {
   if (event) {
-    const ticketUrl = eventHref({
-      id: event.id,
-      slug: event.slug || null,
-      title: event.title || null,
-    });
+    const target = resolveHotPickTicketTarget(place, event);
     const priceFromRub =
       event.priceFromRub != null && Number.isFinite(Number(event.priceFromRub))
         ? Number(event.priceFromRub)
@@ -139,9 +205,9 @@ export function classifyHotPickOffer(
         badge: 'Билет на любой день',
         ctaLabel: `Купить билет${priceSuffix}`.trim(),
         dayPart: 'day',
-        ticketUrl,
-        eventId: event.id,
-        eventSlug: event.slug || null,
+        ticketUrl: target.ticketUrl,
+        eventId: target.eventId,
+        eventSlug: target.eventSlug,
         priceFromRub,
       };
     }
@@ -152,10 +218,10 @@ export function classifyHotPickOffer(
       badge: isEntertainmentEvent(event) ? 'Каждый вечер' : 'Вечерний сеанс',
       ctaLabel: 'Выбрать дату и билеты',
       dayPart: 'evening',
-      ticketUrl,
+      ticketUrl: target.ticketUrl,
       sessionLabel: 'Вечерний сеанс',
-      eventId: event.id,
-      eventSlug: event.slug || null,
+      eventId: target.eventId,
+      eventSlug: target.eventSlug,
       priceFromRub,
     };
   }
@@ -298,8 +364,8 @@ export function applyHotPickOfferToItem(
   return {
     ...item,
     ticketUrl: offer.ticketUrl || item.ticketUrl || null,
-    eventId: offer.eventId || item.eventId || null,
-    eventSlug: offer.eventSlug || item.eventSlug || null,
+    eventId: offer.eventId || null,
+    eventSlug: offer.eventSlug || null,
     // Affiche: soft evening label. Open-date: no clock - ticket any day.
     sessionLabel: offer.kind === 'affiche' ? offer.sessionLabel || 'Вечерний сеанс' : null,
     startsAt: null,

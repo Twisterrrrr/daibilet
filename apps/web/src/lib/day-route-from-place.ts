@@ -204,6 +204,48 @@ export function dayRouteItemFromEvent(event: DayRouteEventSource): DayRouteVenue
 
   const sessionLabel = formatEventSessionLabel(event);
   const startsAt = String(event.startsAt || '').trim() || null;
+  const venueSlugNorm = String(venueSlug || '').trim().toLowerCase();
+  const rawEventSlug = String(event.slug || '').trim() || null;
+  const rawEventId = String(event.id || '').trim();
+  const eventSlug =
+    rawEventSlug && rawEventSlug.toLowerCase() !== venueSlugNorm ? rawEventSlug : null;
+  const eventId =
+    rawEventId && rawEventId.toLowerCase() !== venueSlugNorm ? rawEventId : null;
+
+  let ticketUrl: string | null = null;
+  if (eventSlug || eventId) {
+    ticketUrl = eventHref({
+      id: eventId || eventSlug || rawEventId,
+      slug: eventSlug,
+      title: event.title,
+    });
+    const eventPath = ticketUrl.replace(/^\/events\//i, '').split('/')[0] || '';
+    let eventPathDecoded = eventPath;
+    try {
+      eventPathDecoded = decodeURIComponent(eventPath);
+    } catch {
+      eventPathDecoded = eventPath;
+    }
+    if (
+      venueSlugNorm &&
+      (eventPathDecoded.toLowerCase() === venueSlugNorm ||
+        eventPath.toLowerCase() === venueSlugNorm)
+    ) {
+      ticketUrl = null;
+    }
+  }
+  if (!ticketUrl) {
+    ticketUrl =
+      href ||
+      (venueSlug
+        ? venueHref({
+            id: venueId || venueSlug || title,
+            slug: venueSlug,
+            name: title,
+            type: event.venueKind,
+          })
+        : null);
+  }
 
   return {
     id,
@@ -219,11 +261,11 @@ export function dayRouteItemFromEvent(event: DayRouteEventSource): DayRouteVenue
       latitude: event.venueLatitude,
       longitude: event.venueLongitude,
     }),
-    eventId: event.id,
-    eventSlug: event.slug || null,
+    eventId,
+    eventSlug,
     sessionLabel,
     startsAt,
-    ticketUrl: eventHref({ id: event.id, slug: event.slug || null, title: event.title }),
+    ticketUrl,
   };
 }
 
