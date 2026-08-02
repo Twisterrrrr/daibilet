@@ -4,14 +4,16 @@
 - Ultrawide: outer left/right inset и middle gap между колонками должны быть равны и крупнее `2xl:px-16`.
 - Правая колонка (город/поиск/ссылка) визуально top-heavy - нужен equal top/bottom air.
 - «или добавь своё место» смещена вправо относительно левого края search input.
+- Owner (follow-up): mobile starter A на скрине - **канон, не трогать** (inline icon, one-line subtitle, stack, equal py). Правки только lg+/2xl.
 
 ### Решения
 - Grid: matching `px`/`gap` tokens - `lg:px-8 lg:gap-8`, `xl:px-12 xl:gap-12`, `2xl:px-20 2xl:gap-20`; `data-day-starter-inset="equal-gap"`.
 - Right stack: `lg:self-center` (+ left `lg:self-center`); grid `lg:items-center`.
 - Link: `pl-0 text-left`, button `m-0 p-0` - flush under search field left edge.
+- Mobile (`max-lg`) structure/density без изменений.
 
 ### Проблемы
-- Нет (BUILD_ID после MSK deploy).
+- Нет. MSK **BUILD_ID=`zWhruNKKc49M4HkJdf7M8`** (`170fcde`), SMOKE_OK; equal-gap `2xl:px-20/gap-20` + `lg:self-center` in chunks.
 
 ---
 
