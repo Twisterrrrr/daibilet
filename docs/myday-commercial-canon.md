@@ -60,7 +60,7 @@ H1: «Мой день в {предложный}» через `inCityPrepositiona
 | P5 | `hookFact` + mini description на карточках | Средний | ✅ 2026-08-02 picker preview |
 | P6 | City «собрать за минуту» templates (variants) | Высокий | пресеты есть; варианты UI later |
 | P7 | Commercial share for friend `/d/{code}` | Высокий | **не** возвращать soft purple «Вам поделились»; recipient = ready scenario (tickets CTA, map, paid highlights) |
-| P8 | Flat route list + «Маршрут» / «N точек» (не Утро/День/Вечер) | Критический | ship |
+| P8 | Flat route list + «Маршрут» / «N точек» (не Утро/День/Вечер) | Критический | ✅ `7a3de60` **BUILD_ID=`Ywy2ntkkoX6K__8CuMH3H`** |
 | P9 | Carousels «Рядом / Можно купить» + Explore collections | Средний | ✅ MVP Hot Picks «Выбор Дайбилет» (tabs) |
 | P10 | Native sales copy «Билеты от X» | Низкий | только при реальной цене в данных |
 
