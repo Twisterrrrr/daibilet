@@ -1,3 +1,19 @@
+## 2026-08-02 - /my-day: full container width (drop max-w-5xl)
+
+### Наблюдения
+- Owner: узкий контейнер раздела + странные карточки выбранных мест.
+- Root: outer `lg:max-w-5xl` сужал `/my-day` относительно канона `container-page` (`max-w-7xl`).
+- MSK: failed build после duplicate import оставил `.next` без BUILD_ID - live desync.
+
+### Решения
+- Убран `lg:max-w-5xl`; section/list/summary `w-full` (`data-day-section-width=full`).
+- Dense stop cards + H1/starter/matches=15 уже в tip - один clean MSK recover deploy.
+
+### Проблемы
+- Deploy BUILD_ID - после MSK.
+
+---
+
 ## 2026-08-02 - /my-day: H1 «Мой день в…» + centered empty starter
 
 ### Наблюдения

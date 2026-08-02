@@ -1994,10 +1994,11 @@ function DayRoutePanelInner() {
     <div
       className={
         hasMapStops
-          ? 'container-page flex h-[calc(100dvh-var(--site-header-height))] flex-col overflow-hidden px-0 py-0 print:hidden lg:block lg:h-auto lg:max-w-5xl lg:overflow-visible lg:px-6 lg:py-5 lg:pb-10'
-          : 'container-page px-4 py-5 pb-28 sm:px-6 sm:py-10 sm:pb-10 print:hidden lg:max-w-5xl'
+          ? 'container-page flex h-[calc(100dvh-var(--site-header-height))] flex-col overflow-hidden px-0 py-0 print:hidden lg:block lg:h-auto lg:overflow-visible lg:px-6 lg:py-5 lg:pb-10'
+          : 'container-page px-4 py-5 pb-28 sm:px-6 sm:py-10 sm:pb-10 print:hidden'
       }
       data-day-mobile-map-split={hasMapStops ? '1' : undefined}
+      data-day-section-width="full"
     >
       <div
         className={
@@ -2171,7 +2172,7 @@ function DayRoutePanelInner() {
 
       {/* 1. Route list - always expanded */}
       {!route.venues.length ? null : (
-        <section className="mt-5 sm:mt-8" data-day-route-list>
+        <section className="mt-5 w-full sm:mt-8" data-day-route-list>
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <h2
               className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-sm"
@@ -2194,7 +2195,7 @@ function DayRoutePanelInner() {
           ) : null}
           {totalDistanceMeters > 0 ? (
             <div
-              className="mt-3 flex flex-col gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+              className="mt-3 flex w-full flex-col gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
               data-day-distance-summary
             >
               <p className="text-sm text-slate-700">
@@ -2238,7 +2239,7 @@ function DayRoutePanelInner() {
               </div>
             </div>
           ) : null}
-          <ul className="mt-3 grid grid-cols-1 items-start gap-1.5" data-day-plan-list>
+          <ul className="mt-3 grid w-full grid-cols-1 items-start gap-1.5" data-day-plan-list>
             {route.venues.map((venue, index) => (
               <Fragment key={venue.id}>
                 <DayRouteVenueCard
