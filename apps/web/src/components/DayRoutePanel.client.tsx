@@ -8,14 +8,25 @@ import {
   ChevronUp,
   Copy,
   ExternalLink,
+  GripVertical,
   MapPin,
   Plus,
+  Printer,
   Route,
   Sparkles,
+  Ticket,
   Trash2,
   X,
 } from 'lucide-react';
-import { FormEvent, Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  DragEvent,
+  FormEvent,
+  Suspense,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
 import type { PublicCatalogListItemDto, PublicDestinationDto } from '@daibilet/contracts/public';
 
@@ -36,17 +47,28 @@ import {
   DAY_ROUTE_MIN,
   addTextStopToDayRoute,
   addToDayRoute,
+  applyItemTokensToVenues,
+  applyShareMetaToVenues,
   buildDayRouteCoordsMap,
+  buildDayRouteShareMessage,
   buildDayRouteSharePath,
+  buildMaxShareUrl,
+  buildTelegramShareUrl,
+  buildWhatsAppShareUrl,
   buildYandexMultiStopRouteUrl,
   catalogDayRouteVenueIds,
+  catalogLocatorsFromItemTokens,
+  catalogLocatorsFromShareTokens,
   clearDayRoute,
   dayRouteDominantCitySlug,
   dayRouteFullCoveredCount,
   dayRouteHasMixedCities,
   dayRouteSegmentMeters,
+  dayRouteTotalDistanceMeters,
   enrichDayRouteFromMatchVenues,
+  estimateDayRouteTravelMinutes,
   formatDayRouteDistance,
+  formatDayRouteTravelMinutes,
   hydrateTextStopsFromShareTokens,
   isDayRouteShareTextToken,
   isInDayRoute,
@@ -54,13 +76,17 @@ import {
   lookupDayRouteCoords,
   moveDayRouteVenue,
   optimizeDayRouteNearestNeighbor,
+  parseDayRouteItemsParam,
   parseDayRouteQueryParam,
   readDayRoute,
   readDayRouteFresh,
   removeFromDayRoute,
   reorderDayRoute,
+  resolveDayRouteTicketUrl,
   hydrateDayRouteFromShare,
+  updateDayRouteVenue,
   type DayRouteState,
+  type DayRouteTravelMode,
   type DayRouteVenueItem,
 } from '@/lib/day-route';
 import {
@@ -208,6 +234,9 @@ function DayRoutePanelInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const selectedCity = useSelectedCityOptional();
+  const itemsParam = searchParams.get('items');
+  const cityParam = searchParams.get('city');
+  const fromParam = searchParams.get('from');
   const dayParam = searchParams.get('day');
   const [route, setRoute] = useState<DayRouteState>(() =>
     typeof window === 'undefined' ? { cityId: null, venues: [] } : readDayRoute(),
@@ -216,6 +245,14 @@ function DayRoutePanelInner() {
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
   const [copyStatus, setCopyStatus] = useState<'idle' | 'ok' | 'err'>('idle');
+  const [shareMenuOpen, setShareMenuOpen] = useState(false);
+  const [shareLanding, setShareLanding] = useState<{
+    active: boolean;
+    fromName: string | null;
+    saved: boolean;
+  }>({ active: false, fromName: null, saved: false });
+  const [travelMode, setTravelMode] = useState<DayRouteTravelMode>('walk');
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
   const [titleInput, setTitleInput] = useState('');
   const [noteInput, setNoteInput] = useState('');
   const [coordsInput, setCoordsInput] = useState('');
@@ -229,7 +266,9 @@ function DayRoutePanelInner() {
   const [catalogLoading, setCatalogLoading] = useState(false);
   const [destinationsFallback, setDestinationsFallback] = useState<PublicDestinationDto[]>([]);
   const hydratedDayRef = useRef<string | null>(null);
+  const skipUrlSyncRef = useRef(false);
   const titleFieldRef = useRef<HTMLInputElement | null>(null);
+  const shareMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const sync = () => setRoute(readDayRoute());
@@ -268,36 +307,126 @@ function DayRoutePanelInner() {
     setCityInput(label);
   }, [selectedCity?.cityLabel, cityInput]);
 
-  // Share hydrate: catalog ids/slugs via API; text tokens `t:Title` locally.
+  // Share hydrate: prefer `?city=&items=` (viral); legacy `?day=` fallback.
   useEffect(() => {
-    const locators = parseDayRouteQueryParam(dayParam);
-    if (!locators.length) {
+    const itemTokens = parseDayRouteItemsParam(itemsParam);
+    const legacyTokens = itemTokens.length ? [] : parseDayRouteQueryParam(dayParam);
+    if (!itemTokens.length && !legacyTokens.length) {
       setReady(true);
       return;
     }
-    const key = locators.join('|');
+
+    const key = itemTokens.length
+      ? `items:${cityParam || ''}|${itemsParam || ''}`
+      : `day:${legacyTokens.join('|')}`;
     if (hydratedDayRef.current === key) {
       setReady(true);
       return;
     }
 
-    const textTokens = locators.filter((token) => isDayRouteShareTextToken(token));
-    const catalogTokens = locators.filter((token) => !isDayRouteShareTextToken(token));
+    const fromName = String(fromParam || '').trim() || null;
+    setShareLanding({ active: true, fromName, saved: false });
+    skipUrlSyncRef.current = true;
+
+    if (itemTokens.length) {
+      const textTokens = itemTokens.filter((t) => t.isText);
+      const catalogLocators = catalogLocatorsFromItemTokens(itemTokens);
+
+      if (textTokens.length && !catalogLocators.length) {
+        const titles = textTokens.map((t) =>
+          t.id.toLowerCase().startsWith('t:') ? t.id.slice(2) : t.id,
+        );
+        const next = hydrateTextStopsFromShareTokens(titles.map((t) => `t:${t}`));
+        hydratedDayRef.current = key;
+        setRoute(next);
+        setReady(true);
+        return;
+      }
+
+      if (!catalogLocators.length) {
+        hydratedDayRef.current = key;
+        setReady(true);
+        return;
+      }
+
+      const controller = new AbortController();
+      setLoading(true);
+      fetch(`/api/day-route/matches?venueIds=${encodeURIComponent(catalogLocators.join(','))}`, {
+        signal: controller.signal,
+      })
+        .then(async (response) => (response.ok ? ((await response.json()) as MatchPayload) : null))
+        .then((data) => {
+          const resolved: DayRouteVenueItem[] = (data?.venues || []).map((venue) => ({
+            id: venue.id,
+            slug: venue.slug,
+            title: venue.title,
+            city: venue.cityTitle,
+            cityId: venue.cityId,
+            citySlug: venue.citySlug ?? null,
+            address: venue.address ?? null,
+            imageUrl: venue.heroImageUrl,
+            latitude: venue.latitude ?? null,
+            longitude: venue.longitude ?? null,
+            href: venue.slug
+              ? venueHref({ id: venue.id, slug: venue.slug, name: venue.title, type: 'park' })
+              : null,
+          }));
+          // Unresolved locators (event ids) become stub stops with eventId for ticket CTA.
+          const known = new Set(
+            resolved.flatMap((v) =>
+              [v.id, v.slug, v.eventId, v.eventSlug].map((x) => String(x || '').trim()).filter(Boolean),
+            ),
+          );
+          for (const token of itemTokens) {
+            if (token.isText || known.has(token.id)) continue;
+            resolved.push({
+              id: token.id,
+              slug: token.id,
+              title: 'Событие из маршрута',
+              eventId: token.id,
+              ticketUrl: `/events/${encodeURIComponent(token.id)}`,
+            });
+          }
+          const withMeta = applyItemTokensToVenues(resolved, itemTokens);
+          hydratedDayRef.current = key;
+          setRoute(hydrateDayRouteFromShare(withMeta, data?.cityId || null));
+          if (data) setPayload(data);
+          setReady(true);
+          if (cityParam && selectedCity?.setCity) {
+            // Best-effort city label from destinations by slug.
+            const dest = destinationsFallback.find(
+              (d) =>
+                String(d.slug || '').trim() === cityParam ||
+                String(d.sourceSlug || '').trim() === cityParam,
+            );
+            if (dest?.name) selectedCity.setCity(dest.name);
+          }
+        })
+        .catch(() => {
+          setReady(true);
+        })
+        .finally(() => setLoading(false));
+      return () => controller.abort();
+    }
+
+    // Legacy ?day=
+    const textTokens = legacyTokens.filter((token) => isDayRouteShareTextToken(token));
+    const catalogTokens = legacyTokens.filter((token) => !isDayRouteShareTextToken(token));
+    const catalogLocators = catalogLocatorsFromShareTokens(catalogTokens);
 
     if (textTokens.length) {
       setRoute(hydrateTextStopsFromShareTokens(textTokens));
     }
 
-    if (!catalogTokens.length) {
+    if (!catalogLocators.length) {
       hydratedDayRef.current = key;
       setReady(true);
-      router.replace('/my-day', { scroll: false });
       return;
     }
 
     const controller = new AbortController();
     setLoading(true);
-    fetch(`/api/day-route/matches?venueIds=${encodeURIComponent(catalogTokens.join(','))}`, {
+    fetch(`/api/day-route/matches?venueIds=${encodeURIComponent(catalogLocators.join(','))}`, {
       signal: controller.signal,
     })
       .then(async (response) => (response.ok ? ((await response.json()) as MatchPayload) : null))
@@ -321,18 +450,28 @@ function DayRoutePanelInner() {
             ? venueHref({ id: venue.id, slug: venue.slug, name: venue.title, type: 'park' })
             : null,
         }));
+        const withMeta = applyShareMetaToVenues(items, catalogTokens);
         hydratedDayRef.current = key;
-        setRoute(hydrateDayRouteFromShare(items, data.cityId));
+        setRoute(hydrateDayRouteFromShare(withMeta, data.cityId));
         setPayload(data);
         setReady(true);
-        router.replace('/my-day', { scroll: false });
       })
       .catch(() => {
         setReady(true);
       })
       .finally(() => setLoading(false));
     return () => controller.abort();
-  }, [dayParam, router]);
+  }, [itemsParam, cityParam, fromParam, dayParam, destinationsFallback]);
+
+  // Close share menu on outside click.
+  useEffect(() => {
+    if (!shareMenuOpen) return;
+    const onDoc = (event: MouseEvent) => {
+      if (!shareMenuRef.current?.contains(event.target as Node)) setShareMenuOpen(false);
+    };
+    document.addEventListener('mousedown', onDoc);
+    return () => document.removeEventListener('mousedown', onDoc);
+  }, [shareMenuOpen]);
 
   const catalogVenueIds = useMemo(() => catalogDayRouteVenueIds(route.venues).join(','), [route.venues]);
   const titleById = useMemo(() => {
@@ -402,6 +541,26 @@ function DayRoutePanelInner() {
   const scopeCityName = cityTitle || pageCityName;
   const scopeCitySlug = citySlug || pageCitySlug;
   const scopeCityParam = scopeCityName || scopeCitySlug;
+
+  // Dynamic URL sync: /my-day?city=&items= while editing (skip during inbound hydrate).
+  useEffect(() => {
+    if (!ready || typeof window === 'undefined') return;
+    if (skipUrlSyncRef.current) {
+      skipUrlSyncRef.current = false;
+      return;
+    }
+    const syncCity =
+      pageCitySlug ||
+      dayRouteDominantCitySlug(route.venues) ||
+      String(cityParam || '').trim() ||
+      null;
+    const nextPath = buildDayRouteSharePath(route.venues, { citySlug: syncCity });
+    const current = `${window.location.pathname}${window.location.search}`;
+    if (current === nextPath) return;
+    if (!route.venues.length && (itemsParam || dayParam)) return;
+    if (!route.venues.length && !window.location.search) return;
+    router.replace(nextPath, { scroll: false });
+  }, [route.venues, ready, pageCitySlug, cityParam, itemsParam, dayParam, router]);
 
   const afishaHref = catalogHrefWithSelectedCity(scopeCityParam || 'all');
   const locationsHref = venueCatalogHrefWithSelectedCity('/locations', scopeCityParam);
@@ -656,6 +815,14 @@ function DayRoutePanelInner() {
     () => dayRouteSegmentMeters(route.venues, coordsById),
     [route.venues, coordsById],
   );
+  const totalDistanceMeters = useMemo(
+    () => dayRouteTotalDistanceMeters(segmentMeters),
+    [segmentMeters],
+  );
+  const travelMinutes = useMemo(
+    () => estimateDayRouteTravelMinutes(totalDistanceMeters, travelMode),
+    [totalDistanceMeters, travelMode],
+  );
   const canOptimize = coordsCount >= 2;
   const hasCatalogStops = Boolean(catalogVenueIds);
   const showMatches = hasCatalogStops;
@@ -731,15 +898,87 @@ function DayRoutePanelInner() {
 
   async function copyShareLink() {
     if (!route.venues.length || typeof window === 'undefined') return;
-    const path = buildDayRouteSharePath(route.venues);
+    const path = buildDayRouteSharePath(route.venues, {
+      citySlug: scopeCitySlug || pageCitySlug || cityParam,
+    });
     const url = `${window.location.origin}${path}`;
     try {
       await navigator.clipboard.writeText(url);
       setCopyStatus('ok');
+      setShareMenuOpen(false);
     } catch {
       setCopyStatus('err');
     }
     window.setTimeout(() => setCopyStatus('idle'), 2200);
+  }
+
+  function getSharePayload() {
+    const path = buildDayRouteSharePath(route.venues, {
+      citySlug: scopeCitySlug || pageCitySlug || cityParam,
+    });
+    const shareUrl =
+      typeof window !== 'undefined' ? `${window.location.origin}${path}` : path;
+    const text = buildDayRouteShareMessage({
+      cityTitle: scopeCityName || cityTitle,
+      shareUrl,
+      venues: route.venues,
+    });
+    return { shareUrl, text, path };
+  }
+
+  function openMessengerShare(kind: 'telegram' | 'whatsapp' | 'max') {
+    if (!route.venues.length || typeof window === 'undefined') return;
+    const { shareUrl, text } = getSharePayload();
+    let href = '';
+    if (kind === 'telegram') href = buildTelegramShareUrl(text, shareUrl);
+    else if (kind === 'whatsapp') href = buildWhatsAppShareUrl(text);
+    else href = buildMaxShareUrl(text);
+    setShareMenuOpen(false);
+    window.open(href, '_blank', 'noopener,noreferrer');
+  }
+
+  function saveSharedRoute() {
+    setRoute(readDayRouteFresh());
+    setShareLanding((prev) => ({ ...prev, saved: true, active: true }));
+    flashDayRouteFeedback('Маршрут сохранён - можете менять под себя');
+    const path = buildDayRouteSharePath(route.venues, {
+      citySlug: scopeCitySlug || pageCitySlug || cityParam,
+    });
+    router.replace(path, { scroll: false });
+  }
+
+  function printItinerary() {
+    if (typeof window === 'undefined') return;
+    window.print();
+  }
+
+  function onStopDragStart(index: number) {
+    setDragIndex(index);
+  }
+
+  function onStopDragOver(event: DragEvent, index: number) {
+    event.preventDefault();
+    if (dragIndex == null || dragIndex === index) return;
+  }
+
+  function onStopDrop(index: number) {
+    if (dragIndex == null || dragIndex === index) {
+      setDragIndex(null);
+      return;
+    }
+    const ids = route.venues.map((v) => v.id);
+    const [moved] = ids.splice(dragIndex, 1);
+    if (!moved) {
+      setDragIndex(null);
+      return;
+    }
+    ids.splice(index, 0, moved);
+    setRoute(reorderDayRoute(ids));
+    setDragIndex(null);
+  }
+
+  function onStopDragEnd() {
+    setDragIndex(null);
   }
 
   function optimizeOrder() {
@@ -767,22 +1006,82 @@ function DayRoutePanelInner() {
           </p>
         </div>
         {route.venues.length ? (
-          <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end">
+          <div className="flex w-full flex-wrap gap-2 sm:w-auto sm:justify-end print:hidden">
+            <div className="relative flex-1 sm:flex-none" ref={shareMenuRef}>
+              <button
+                type="button"
+                onClick={() => setShareMenuOpen((open) => !open)}
+                data-day-share
+                aria-expanded={shareMenuOpen}
+                className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900 hover:bg-emerald-100"
+              >
+                <Copy className="h-3.5 w-3.5" />
+                {copyStatus === 'ok' ? 'Ссылка скопирована!' : 'Поделиться'}
+              </button>
+              {shareMenuOpen ? (
+                <div
+                  role="menu"
+                  data-day-share-menu
+                  className="absolute right-0 z-30 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-lg"
+                >
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-emerald-50"
+                    onClick={() => {
+                      void copyShareLink();
+                    }}
+                  >
+                    <Copy className="h-4 w-4 text-emerald-700" />
+                    Скопировать ссылку
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-sky-50"
+                    onClick={() => openMessengerShare('telegram')}
+                  >
+                    <ExternalLink className="h-4 w-4 text-sky-600" />
+                    Telegram
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-emerald-50"
+                    onClick={() => openMessengerShare('whatsapp')}
+                  >
+                    <ExternalLink className="h-4 w-4 text-emerald-600" />
+                    WhatsApp
+                  </button>
+                  <button
+                    type="button"
+                    role="menuitem"
+                    data-day-share-max
+                    className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-violet-50"
+                    onClick={() => openMessengerShare('max')}
+                  >
+                    <ExternalLink className="h-4 w-4 text-violet-600" />
+                    Макс
+                  </button>
+                </div>
+              ) : null}
+            </div>
             <button
               type="button"
-              onClick={() => {
-                void copyShareLink();
-              }}
+              onClick={printItinerary}
+              data-day-print
               className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 sm:flex-none"
             >
-              <Copy className="h-3.5 w-3.5" />
-              {copyStatus === 'ok' ? 'Скопировано' : copyStatus === 'err' ? 'Не удалось' : 'Копировать ссылку'}
+              <Printer className="h-3.5 w-3.5" />
+              Печать
             </button>
             <button
               type="button"
               onClick={() => {
                 clearDayRoute();
                 setRoute(readDayRoute());
+                setShareLanding({ active: false, fromName: null, saved: false });
+                router.replace('/my-day', { scroll: false });
               }}
               className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 sm:flex-none"
             >
@@ -792,19 +1091,57 @@ function DayRoutePanelInner() {
         ) : null}
       </div>
 
+      {shareLanding.active && route.venues.length ? (
+        <div
+          role="status"
+          data-day-share-landing
+          className="mt-4 rounded-2xl border border-violet-200 bg-violet-50 px-4 py-3 print:hidden"
+        >
+          <p className="text-sm font-semibold text-violet-950">
+            {shareLanding.fromName
+              ? `${shareLanding.fromName} поделился планом на день!`
+              : 'Вам поделились планом на день!'}
+          </p>
+          <p className="mt-1 text-sm text-violet-900">
+            Можете присоединиться или изменить маршрут под себя.
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              data-day-share-save
+              onClick={saveSharedRoute}
+              className="inline-flex min-h-10 items-center justify-center rounded-full bg-violet-700 px-4 py-2 text-xs font-bold text-white hover:bg-violet-800"
+            >
+              {shareLanding.saved ? 'Сохранено' : 'Сохранить себе'}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                saveSharedRoute();
+                setShareLanding((prev) => ({ ...prev, active: false }));
+              }}
+              className="inline-flex min-h-10 items-center justify-center rounded-full border border-violet-300 bg-white px-4 py-2 text-xs font-semibold text-violet-900 hover:bg-violet-100"
+            >
+              Повторить маршрут
+            </button>
+          </div>
+        </div>
+      ) : null}
+
       {copyStatus === 'ok' ? (
         <p
           role="status"
-          className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900"
+          className="mt-3 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-medium text-emerald-900 print:hidden"
+          data-day-share-ok
         >
-          Ссылка скопирована - можно отправить другу.
+          Ссылка скопирована!
         </p>
       ) : null}
 
       {/* Primary: on-page city + searchable catalog picks (owner UX 2026-08-02) */}
       <section
         id="day-catalog-add"
-        className="mt-5 rounded-2xl border border-slate-200 bg-white p-3.5 sm:mt-8 sm:p-5"
+        className="mt-5 rounded-2xl border border-slate-200 bg-white p-3.5 sm:mt-8 sm:p-5 print:hidden"
         data-day-catalog-add="1"
       >
         <p className="text-sm font-semibold text-slate-900">Добавить в день</p>
@@ -1018,6 +1355,52 @@ function DayRoutePanelInner() {
                   : `Без координат: ${missingCoordsCount}. В Яндекс уйдут только ${coordsCount} точки с координатами (в текущем порядке).`}
               </p>
             ) : null}
+            {totalDistanceMeters > 0 ? (
+              <div
+                className="mt-3 flex flex-col gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+                data-day-distance-summary
+              >
+                <p className="text-sm text-slate-700">
+                  Сумма сегментов:{' '}
+                  <span className="font-semibold text-slate-900">
+                    {formatDayRouteDistance(totalDistanceMeters)}
+                  </span>
+                  {travelMinutes > 0 ? (
+                    <>
+                      {' '}
+                      · около{' '}
+                      <span className="font-semibold text-slate-900">
+                        {formatDayRouteTravelMinutes(travelMinutes)}
+                      </span>
+                    </>
+                  ) : null}
+                </p>
+                <div className="flex gap-1 print:hidden" role="group" aria-label="Способ перемещения">
+                  <button
+                    type="button"
+                    onClick={() => setTravelMode('walk')}
+                    className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+                      travelMode === 'walk'
+                        ? 'bg-slate-900 text-white'
+                        : 'border border-slate-200 bg-white text-slate-700'
+                    }`}
+                  >
+                    Пешком
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTravelMode('auto')}
+                    className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+                      travelMode === 'auto'
+                        ? 'bg-slate-900 text-white'
+                        : 'border border-slate-200 bg-white text-slate-700'
+                    }`}
+                  >
+                    Авто
+                  </button>
+                </div>
+              </div>
+            ) : null}
             <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-day-plan-list>
               {route.venues.map((venue, index) => (
                 <DayRouteVenueCard
@@ -1027,9 +1410,19 @@ function DayRoutePanelInner() {
                   venue={venue}
                   hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
                   segmentToNext={segmentMeters[index] ?? null}
+                  dragging={dragIndex === index}
+                  onDragStart={() => onStopDragStart(index)}
+                  onDragOver={(event) => onStopDragOver(event, index)}
+                  onDrop={() => onStopDrop(index)}
+                  onDragEnd={onStopDragEnd}
                   onMoveUp={() => setRoute(moveDayRouteVenue(venue.id, -1))}
                   onMoveDown={() => setRoute(moveDayRouteVenue(venue.id, 1))}
                   onRemove={() => setRoute(removeFromDayRoute(venue.id))}
+                  onToggleBought={() =>
+                    setRoute(
+                      updateDayRouteVenue(venue.id, { ticketBought: !venue.ticketBought }),
+                    )
+                  }
                 />
               ))}
             </ul>
@@ -1324,7 +1717,18 @@ function DayRoutePanelInner() {
         ) : null}
       </div>
 
-      <MobileStickyActionBar>
+      <MobileStickyActionBar className="print:hidden">
+        {route.venues.length ? (
+          <button
+            type="button"
+            onClick={() => setShareMenuOpen(true)}
+            data-day-share-sticky
+            className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-3 text-sm font-bold text-emerald-900"
+          >
+            <Copy className="h-4 w-4" />
+            Поделиться
+          </button>
+        ) : null}
         {!atMax ? (
           <a
             href="#day-catalog-add"
@@ -1334,7 +1738,7 @@ function DayRoutePanelInner() {
             Добавить
           </a>
         ) : null}
-        {!atMax ? (
+        {!atMax && !route.venues.length ? (
           <button
             type="button"
             onClick={openTextForm}
@@ -1349,18 +1753,10 @@ function DayRoutePanelInner() {
             href={yandexUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className={`inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-4 text-sm font-bold text-white hover:bg-sky-700 ${atMax ? 'flex-1' : ''}`}
+            className="inline-flex h-11 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-4 text-sm font-bold text-white hover:bg-sky-700"
           >
             <ExternalLink className="h-4 w-4" />
             Карты
-          </a>
-        ) : null}
-        {route.venues.length > 0 && showMatches ? (
-          <a
-            href="#day-route-matches"
-            className="inline-flex h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-800 hover:bg-slate-50"
-          >
-            Экскурсии
           </a>
         ) : null}
       </MobileStickyActionBar>
@@ -1374,18 +1770,30 @@ function DayRouteVenueCard({
   total,
   hasCoords,
   segmentToNext,
+  dragging,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
   onMoveUp,
   onMoveDown,
   onRemove,
+  onToggleBought,
 }: {
   venue: DayRouteVenueItem;
   index: number;
   total: number;
   hasCoords: boolean;
   segmentToNext: number | null;
+  dragging?: boolean;
+  onDragStart: () => void;
+  onDragOver: (event: DragEvent) => void;
+  onDrop: () => void;
+  onDragEnd: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onRemove: () => void;
+  onToggleBought: () => void;
 }) {
   const textStop = isTextDayRouteStop(venue);
   const href =
@@ -1393,6 +1801,8 @@ function DayRouteVenueCard({
     (!textStop && venue.slug
       ? venueHref({ id: venue.id, slug: venue.slug, name: venue.title, type: 'park' })
       : null);
+  const ticketUrl = resolveDayRouteTicketUrl(venue);
+  const bought = Boolean(venue.ticketBought);
   const addressLine =
     formatStreetAddress(venue.address, { city: venue.city }) || String(venue.address || '').trim() || '';
   const titleNorm = venue.title.toLowerCase().replace(/\s+/g, ' ');
@@ -1403,15 +1813,36 @@ function DayRouteVenueCard({
       (addrNorm.length >= 8 && titleNorm.includes(addrNorm.replace(/^набережная\s+/i, 'наб. '))));
   return (
     <li
-      className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-3"
+      className={`flex flex-col gap-2 rounded-2xl border p-3 ${
+        bought
+          ? 'border-emerald-400 bg-emerald-50'
+          : 'border-slate-200 bg-white'
+      } ${dragging ? 'opacity-60 ring-2 ring-emerald-300' : ''}`}
       data-day-plan-stop={venue.id}
+      data-ticket-bought={bought ? '1' : '0'}
+      draggable
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
     >
       <div className="flex items-start gap-3">
         <div className="flex h-14 w-8 shrink-0 flex-col items-center justify-center gap-1">
-          <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
+          <span
+            className="inline-flex cursor-grab items-center justify-center text-slate-400 active:cursor-grabbing"
+            title="Перетащите"
+            aria-hidden
+          >
+            <GripVertical className="h-4 w-4" />
+          </span>
+          <span
+            className={`inline-flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white ${
+              bought ? 'bg-emerald-600' : 'bg-slate-900'
+            }`}
+          >
             {index + 1}
           </span>
-          <div className="flex flex-col gap-0.5">
+          <div className="flex flex-col gap-0.5 print:hidden">
             <button
               type="button"
               aria-label="Выше"
@@ -1465,11 +1896,35 @@ function DayRouteVenueCard({
           type="button"
           aria-label="Удалить точку"
           onClick={onRemove}
-          className="min-h-9 min-w-9 shrink-0 rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+          className="min-h-9 min-w-9 shrink-0 rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 print:hidden"
         >
           <X className="h-4 w-4" />
         </button>
       </div>
+      {ticketUrl ? (
+        <div className="flex flex-wrap items-center gap-2 pl-11 print:hidden">
+          <a
+            href={ticketUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-day-buy-ticket
+            className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600"
+          >
+            <Ticket className="h-3.5 w-3.5" />
+            {venue.sessionLabel ? 'Купить билет на это же время' : 'Купить билет'}
+          </a>
+          <label className="inline-flex cursor-pointer items-center gap-1.5 text-xs font-semibold text-slate-700">
+            <input
+              type="checkbox"
+              checked={bought}
+              onChange={onToggleBought}
+              data-day-ticket-bought
+              className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
+            />
+            Билет куплен
+          </label>
+        </div>
+      ) : null}
       {segmentToNext != null ? (
         <p className="pl-11 text-[11px] text-slate-500">далее ~ {formatDayRouteDistance(segmentToNext)}</p>
       ) : null}

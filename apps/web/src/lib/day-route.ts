@@ -3,6 +3,7 @@
  */
 
 import { haversineMeters, isValidCoordinatePair } from './day-route-score';
+import { eventHref } from './routes';
 
 export const DAY_ROUTE_STORAGE_KEY = 'daibilet:dayRoute';
 export const DAY_ROUTE_CHANGED_EVENT = 'daibilet:day-route-changed';
@@ -34,11 +35,34 @@ export type DayRouteVenueItem = {
   /** Human label for session time, e.g. «сб, 14:00». */
   sessionLabel?: string | null;
   startsAt?: string | null;
+  /** Checkout / event page URL for «Купить билет» (optional; else derived from eventSlug/id). */
+  ticketUrl?: string | null;
+  /** Guest marked ticket as purchased - persisted in localStorage. */
+  ticketBought?: boolean;
 };
 
 /** Synthetic planner stops (typed on /my-day) - no catalog venue id required. */
 export const DAY_ROUTE_TEXT_ID_PREFIX = 'text_';
 export const DAY_ROUTE_SHARE_TEXT_PREFIX = 't:';
+/** Share token meta: `@e:{eventSlug|eventId}` after venue locator. */
+export const DAY_ROUTE_SHARE_EVENT_PREFIX = 'e:';
+
+export type DayRouteTravelMode = 'walk' | 'auto';
+
+/** Rough urban speeds (m/min) for MVP haversine ETA - no routing API. */
+const DAY_ROUTE_TRAVEL_M_PER_MIN: Record<DayRouteTravelMode, number> = {
+  walk: 80, // ~4.8 km/h
+  auto: 500, // ~30 km/h city
+};
+
+export type DayRouteShareTokenMeta = {
+  /** Venue slug/id, or full `t:Title` text token. */
+  locator: string;
+  startsAt: string | null;
+  eventSlug: string | null;
+  eventId: string | null;
+  isText: boolean;
+};
 
 export function isTextDayRouteStop(
   item: Pick<DayRouteVenueItem, 'id'> | string | null | undefined,
@@ -550,8 +574,35 @@ function mergeDayRouteVenueFields(
   if (incoming.eventSlug) next.eventSlug = incoming.eventSlug;
   if (incoming.sessionLabel) next.sessionLabel = incoming.sessionLabel;
   if (incoming.startsAt) next.startsAt = incoming.startsAt;
+  if (incoming.ticketUrl) next.ticketUrl = incoming.ticketUrl;
+  if (typeof incoming.ticketBought === 'boolean') next.ticketBought = incoming.ticketBought;
   if (incoming.note != null) next.note = incoming.note;
   return next;
+}
+
+/** Patch a single stop in localStorage (ticket status, times, etc.). */
+export function updateDayRouteVenue(
+  venueId: string,
+  patch: Partial<DayRouteVenueItem>,
+): DayRouteState {
+  const current = readDayRouteFresh();
+  const needle = String(venueId || '').trim();
+  if (!needle) return current;
+  let changed = false;
+  const venues = current.venues.map((venue) => {
+    if (venue.id !== needle && String(venue.slug || '').trim() !== needle) return venue;
+    changed = true;
+    const merged: DayRouteVenueItem = {
+      ...venue,
+      ...patch,
+      id: venue.id,
+      ...sanitizeStoredCoords({ ...venue, ...patch }),
+    };
+    return merged;
+  });
+  if (!changed) return current;
+  const next: DayRouteState = { cityId: current.cityId, venues };
+  return writeDayRoute(next) ? readDayRouteFresh() : current;
 }
 
 export function addToDayRoute(item: DayRouteVenueItem): DayRouteState {
@@ -574,6 +625,8 @@ export function addToDayRoute(item: DayRouteVenueItem): DayRouteState {
       merged.eventSlug === existing.eventSlug &&
       merged.sessionLabel === existing.sessionLabel &&
       merged.startsAt === existing.startsAt &&
+      merged.ticketUrl === existing.ticketUrl &&
+      merged.ticketBought === existing.ticketBought &&
       merged.href === existing.href &&
       merged.imageUrl === existing.imageUrl;
     if (unchanged) return current;
@@ -669,7 +722,7 @@ export function toggleDayRoute(item: DayRouteVenueItem): DayRouteState {
   return addToDayRoute({ ...item, id });
 }
 
-/** Parse `?day=id1,slug2` or title share (`t:Эрмитаж|t:Петропавловка`) into locators. */
+/** Parse legacy `?day=id1,slug2` or title share (`t:Эрмитаж|t:Петропавловка`) into tokens. */
 export function parseDayRouteQueryParam(raw: string | null | undefined): string[] {
   if (!raw) return [];
   let decoded = String(raw);
@@ -679,14 +732,12 @@ export function parseDayRouteQueryParam(raw: string | null | undefined): string[
     decoded = String(raw);
   }
   const sep = decoded.includes('|') ? '|' : ',';
-  return [
-    ...new Set(
-      decoded
-        .split(sep)
-        .map((part) => part.trim())
-        .filter(Boolean),
-    ),
-  ].slice(0, DAY_ROUTE_MAX);
+  const parts = decoded
+    .split(sep)
+    .map((part) => part.trim())
+    .filter(Boolean);
+  // Legacy day= deduped locators; new items= keeps order with times via parseDayRouteItemsParam.
+  return [...new Set(parts)].slice(0, DAY_ROUTE_MAX);
 }
 
 export function isDayRouteShareTextToken(token: string): boolean {
@@ -702,22 +753,380 @@ export function dayRouteShareTextTitle(token: string): string {
   return raw.slice(DAY_ROUTE_SHARE_TEXT_PREFIX.length).trim();
 }
 
-/** Build absolute or relative share URL for current day route. */
-export function buildDayRouteSharePath(venues: DayRouteVenueItem[]): string {
-  const hasText = venues.some((venue) => isTextDayRouteStop(venue));
-  const tokens = venues
-    .map((venue) => {
-      if (isTextDayRouteStop(venue)) {
-        // Titles may contain commas - use `|` join when any text stop is present.
-        return `${DAY_ROUTE_SHARE_TEXT_PREFIX}${venue.title.trim()}`;
+/**
+ * Encode one stop for viral `?items=` share.
+ * Format: `{id}:{HHMM|free}` - event id preferred, else venue slug/id.
+ */
+export function encodeDayRouteItemToken(venue: DayRouteVenueItem): string {
+  if (isTextDayRouteStop(venue)) {
+    // Text stops: keep stable local id (no catalog resolve); friend hydrates as text title.
+    const title = venue.title.trim().replace(/[,|:]/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!title) return '';
+    return `${DAY_ROUTE_SHARE_TEXT_PREFIX}${title}:free`;
+  }
+  const eventKey = String(venue.eventId || venue.eventSlug || '').trim();
+  const locator = eventKey || String(venue.slug || venue.id || '').trim();
+  if (!locator) return '';
+  const time = encodeDayRouteShareTime(venue);
+  return `${locator}:${time}`;
+}
+
+/** HHMM from startsAt / sessionLabel, or `free`. */
+export function encodeDayRouteShareTime(
+  venue: Pick<DayRouteVenueItem, 'startsAt' | 'sessionLabel'>,
+): string {
+  const fromIso = startsAtToHHMM(venue.startsAt);
+  if (fromIso) return fromIso;
+  const fromLabel = sessionLabelToHHMM(venue.sessionLabel);
+  if (fromLabel) return fromLabel;
+  return 'free';
+}
+
+function startsAtToHHMM(startsAt: string | null | undefined): string | null {
+  const raw = String(startsAt || '').trim();
+  if (!raw) return null;
+  // Already HHMM
+  if (/^\d{3,4}$/.test(raw)) return raw.padStart(4, '0');
+  const date = new Date(raw);
+  if (!Number.isNaN(date.getTime())) {
+    const hh = String(date.getHours()).padStart(2, '0');
+    const mm = String(date.getMinutes()).padStart(2, '0');
+    return `${hh}${mm}`;
+  }
+  return sessionLabelToHHMM(raw);
+}
+
+function sessionLabelToHHMM(label: string | null | undefined): string | null {
+  const raw = String(label || '').trim();
+  if (!raw) return null;
+  const match = raw.match(/\b([01]?\d|2[0-3])[:.]([0-5]\d)\b/);
+  if (!match) return null;
+  return `${match[1]!.padStart(2, '0')}${match[2]}`;
+}
+
+/** Human `14:00` from HHMM token. */
+export function formatDayRouteHHMM(hhmm: string | null | undefined): string | null {
+  const raw = String(hhmm || '').trim();
+  if (!raw || raw.toLowerCase() === 'free') return null;
+  const padded = raw.padStart(4, '0');
+  if (!/^\d{4}$/.test(padded)) return null;
+  return `${padded.slice(0, 2)}:${padded.slice(2)}`;
+}
+
+export type DayRouteItemToken = {
+  id: string;
+  time: string; // HHMM or free
+  isText: boolean;
+  isFree: boolean;
+};
+
+/** Parse `items=341:1400,892:free,115:1830`. */
+export function parseDayRouteItemsParam(raw: string | null | undefined): DayRouteItemToken[] {
+  if (!raw) return [];
+  let decoded = String(raw);
+  try {
+    decoded = decodeURIComponent(decoded);
+  } catch {
+    decoded = String(raw);
+  }
+  const out: DayRouteItemToken[] = [];
+  for (const part of decoded.split(',')) {
+    const token = String(part || '').trim();
+    if (!token) continue;
+    const colon = token.lastIndexOf(':');
+    let id = token;
+    let time = 'free';
+    if (colon > 0) {
+      id = token.slice(0, colon).trim();
+      time = token.slice(colon + 1).trim() || 'free';
+    }
+    if (!id) continue;
+    const isText = isDayRouteShareTextToken(id) || id.toLowerCase().startsWith(DAY_ROUTE_SHARE_TEXT_PREFIX);
+    const timeNorm = time.toLowerCase() === 'free' ? 'free' : time.replace(/\D/g, '').padStart(4, '0').slice(-4);
+    out.push({
+      id,
+      time: timeNorm === 'free' || !/^\d{4}$/.test(timeNorm) ? 'free' : timeNorm,
+      isText,
+      isFree: timeNorm === 'free' || !/^\d{4}$/.test(timeNorm),
+    });
+    if (out.length >= DAY_ROUTE_MAX) break;
+  }
+  return out;
+}
+
+/** Catalog locators from items tokens (skip text). */
+export function catalogLocatorsFromItemTokens(tokens: DayRouteItemToken[]): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const token of tokens) {
+    if (token.isText) continue;
+    const id = token.id.trim();
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    out.push(id);
+  }
+  return out.slice(0, DAY_ROUTE_MAX);
+}
+
+/**
+ * Encode one stop for legacy `?day=` share (compat).
+ * Catalog: `{slug|id}[@e:{eventSlug|eventId}][@ISO8601]`
+ * Text: `t:Title`
+ */
+export function encodeDayRouteShareToken(venue: DayRouteVenueItem): string {
+  if (isTextDayRouteStop(venue)) {
+    return `${DAY_ROUTE_SHARE_TEXT_PREFIX}${venue.title.trim()}`;
+  }
+  const locator = String(venue.slug || venue.id || '').trim();
+  if (!locator) return '';
+  const parts = [locator];
+  const eventKey = String(venue.eventSlug || venue.eventId || '').trim();
+  if (eventKey) parts.push(`${DAY_ROUTE_SHARE_EVENT_PREFIX}${eventKey}`);
+  const startsAt = String(venue.startsAt || '').trim();
+  if (startsAt) parts.push(startsAt);
+  return parts.join('@');
+}
+
+/** Parse legacy share token into venue locator + optional event/time meta. */
+export function parseDayRouteShareToken(token: string): DayRouteShareTokenMeta {
+  const raw = String(token || '').trim();
+  if (!raw) {
+    return { locator: '', startsAt: null, eventSlug: null, eventId: null, isText: false };
+  }
+  if (isDayRouteShareTextToken(raw)) {
+    return {
+      locator: raw,
+      startsAt: null,
+      eventSlug: null,
+      eventId: null,
+      isText: true,
+    };
+  }
+  const parts = raw.split('@').map((p) => p.trim()).filter(Boolean);
+  const locator = parts[0] || '';
+  let startsAt: string | null = null;
+  let eventSlug: string | null = null;
+  let eventId: string | null = null;
+  for (const part of parts.slice(1)) {
+    const lower = part.toLowerCase();
+    if (lower.startsWith(DAY_ROUTE_SHARE_EVENT_PREFIX)) {
+      const key = part.slice(DAY_ROUTE_SHARE_EVENT_PREFIX.length).trim();
+      if (!key) continue;
+      if (/^(event_|evt_)/i.test(key)) eventId = key;
+      else eventSlug = key;
+      continue;
+    }
+    startsAt = part;
+  }
+  return { locator, startsAt, eventSlug, eventId, isText: false };
+}
+
+/** Venue ids/slugs safe for `/api/day-route/matches` (strip @meta). */
+export function catalogLocatorsFromShareTokens(tokens: string[]): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const token of tokens) {
+    const meta = parseDayRouteShareToken(token);
+    if (meta.isText || !meta.locator) continue;
+    if (seen.has(meta.locator)) continue;
+    seen.add(meta.locator);
+    out.push(meta.locator);
+  }
+  return out.slice(0, DAY_ROUTE_MAX);
+}
+
+/** Human label from ISO startsAt (or pass-through if already a label). */
+export function formatDayRouteStartsAtLabel(startsAt: string | null | undefined): string | null {
+  const raw = String(startsAt || '').trim();
+  if (!raw) return null;
+  const hhmm = startsAtToHHMM(raw);
+  if (hhmm && /^\d{4}$/.test(hhmm) && Number.isNaN(new Date(raw).getTime())) {
+    return formatDayRouteHHMM(hhmm);
+  }
+  const date = new Date(raw);
+  if (Number.isNaN(date.getTime())) {
+    return formatDayRouteHHMM(hhmm) || raw;
+  }
+  try {
+    return new Intl.DateTimeFormat('ru-RU', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(date);
+  } catch {
+    return formatDayRouteHHMM(hhmm) || raw;
+  }
+}
+
+/**
+ * Apply share @e: / @time meta onto resolved venues (legacy day=).
+ */
+export function applyShareMetaToVenues(
+  venues: DayRouteVenueItem[],
+  tokens: string[],
+): DayRouteVenueItem[] {
+  const metas = tokens.map(parseDayRouteShareToken).filter((m) => !m.isText && m.locator);
+  if (!metas.length) return venues;
+
+  const remaining = [...venues];
+  const ordered: DayRouteVenueItem[] = [];
+  for (const meta of metas) {
+    const idx = remaining.findIndex(
+      (v) =>
+        String(v.slug || '').trim() === meta.locator || String(v.id || '').trim() === meta.locator,
+    );
+    const base = idx >= 0 ? remaining.splice(idx, 1)[0]! : null;
+    if (!base) continue;
+    const next: DayRouteVenueItem = { ...base };
+    if (meta.eventSlug) next.eventSlug = meta.eventSlug;
+    if (meta.eventId) next.eventId = meta.eventId;
+    if (meta.startsAt) {
+      next.startsAt = meta.startsAt;
+      next.sessionLabel = formatDayRouteStartsAtLabel(meta.startsAt) || next.sessionLabel || null;
+    }
+    ordered.push(next);
+  }
+  return [...ordered, ...remaining].slice(0, DAY_ROUTE_MAX);
+}
+
+/** Apply `items=` times/event ids onto resolved venues (order by token). */
+export function applyItemTokensToVenues(
+  venues: DayRouteVenueItem[],
+  tokens: DayRouteItemToken[],
+): DayRouteVenueItem[] {
+  if (!tokens.length) return venues;
+  const remaining = [...venues];
+  const ordered: DayRouteVenueItem[] = [];
+
+  for (const token of tokens) {
+    if (token.isText) {
+      const title = dayRouteShareTextTitle(token.id) || token.id.replace(/^t:/i, '').trim();
+      if (!title) continue;
+      ordered.push({
+        id: createTextDayRouteStopId(),
+        title,
+        slug: null,
+        href: null,
+        imageUrl: null,
+      });
+      continue;
+    }
+
+    const idx = remaining.findIndex((v) => {
+      const ids = [
+        String(v.id || '').trim(),
+        String(v.slug || '').trim(),
+        String(v.eventId || '').trim(),
+        String(v.eventSlug || '').trim(),
+      ].filter(Boolean);
+      return ids.includes(token.id);
+    });
+    const base =
+      idx >= 0
+        ? remaining.splice(idx, 1)[0]!
+        : ({
+            id: token.id,
+            title: token.id,
+            slug: token.id,
+          } as DayRouteVenueItem);
+
+    const next: DayRouteVenueItem = { ...base };
+    // Token id may be event id/slug - keep on item for ticket CTA.
+    if (token.id && (next.eventId || next.eventSlug || !next.slug || next.id === token.id)) {
+      if (/^(event_|evt_)/i.test(token.id) || (!next.eventId && token.time !== 'free')) {
+        if (/^(event_|evt_)/i.test(token.id)) next.eventId = token.id;
+        else if (!next.eventSlug && !next.eventId) {
+          // Ambiguous compact id - treat as event when timed.
+          if (!token.isFree) next.eventId = next.eventId || token.id;
+        }
       }
-      return venue.slug || venue.id;
-    })
+    }
+    if (!token.isFree) {
+      const label = formatDayRouteHHMM(token.time);
+      next.sessionLabel = label || next.sessionLabel || null;
+      // Synthetic ISO today+time for persistence (date not in share URL).
+      if (label) {
+        const now = new Date();
+        const hh = Number(token.time.slice(0, 2));
+        const mm = Number(token.time.slice(2));
+        now.setHours(hh, mm, 0, 0);
+        next.startsAt = now.toISOString();
+      }
+    }
+    ordered.push(next);
+  }
+  return ordered.slice(0, DAY_ROUTE_MAX);
+}
+
+/**
+ * Canonical viral share path (no DB): `/my-day?city=spb&items=341:1400,892:free`.
+ * Legacy `?day=` still parsed on open; builders emit city+items.
+ */
+export function buildDayRouteSharePath(
+  venues: DayRouteVenueItem[],
+  options?: { citySlug?: string | null; fromName?: string | null },
+): string {
+  const items = venues
+    .map((venue) => encodeDayRouteItemToken(venue))
     .filter(Boolean)
     .slice(0, DAY_ROUTE_MAX);
-  if (!tokens.length) return '/my-day';
-  const joined = hasText || tokens.some((t) => isDayRouteShareTextToken(t)) ? tokens.join('|') : tokens.join(',');
-  return `/my-day?day=${encodeURIComponent(joined)}`;
+  if (!items.length) return '/my-day';
+  const params = new URLSearchParams();
+  const city = String(options?.citySlug || dayRouteDominantCitySlug(venues) || '').trim();
+  if (city) params.set('city', city);
+  params.set('items', items.join(','));
+  const from = String(options?.fromName || '').trim();
+  if (from) params.set('from', from.slice(0, 40));
+  return `/my-day?${params.toString()}`;
+}
+
+/** First timed stop as `14:00` for share copy. */
+export function dayRouteFirstTimedLabel(venues: DayRouteVenueItem[]): string | null {
+  for (const venue of venues) {
+    const hhmm = encodeDayRouteShareTime(venue);
+    if (hhmm !== 'free') return formatDayRouteHHMM(hhmm);
+  }
+  return null;
+}
+
+/**
+ * Share message template (hyphen only, no em-dash).
+ * «Привет! Посмотри, какой маршрут в [Город] я собрал на Дайбилет: [Ссылка]. Там экскурсия в 14:00, давай займем места?»
+ */
+export function buildDayRouteShareMessage(input: {
+  cityTitle?: string | null;
+  shareUrl: string;
+  venues: DayRouteVenueItem[];
+}): string {
+  const city = String(input.cityTitle || '').trim() || 'городе';
+  const time = dayRouteFirstTimedLabel(input.venues);
+  const timePart = time
+    ? ` Там экскурсия в ${time}, давай займем места?`
+    : ' Давай займем места?';
+  return `Привет! Посмотри, какой маршрут в ${city} я собрал на Дайбилет: ${input.shareUrl}.${timePart}`;
+}
+
+export function buildTelegramShareUrl(text: string, url?: string): string {
+  const params = new URLSearchParams();
+  params.set('url', url || text);
+  if (url) params.set('text', text);
+  else params.set('text', text);
+  // Prefer text-only when URL already inside message.
+  if (url && text.includes(url)) {
+    return `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text.replace(url, '').trim())}`;
+  }
+  return `https://t.me/share/url?${params.toString()}`;
+}
+
+export function buildWhatsAppShareUrl(text: string): string {
+  return `https://wa.me/?text=${encodeURIComponent(text)}`;
+}
+
+/** Official MAX messenger share deep-link: https://max.ru/:share?text= */
+export function buildMaxShareUrl(text: string): string {
+  return `https://max.ru/:share?text=${encodeURIComponent(text)}`;
 }
 
 /** Hydrate free-text share tokens (`t:Title`) into local planner stops. */
@@ -1077,4 +1486,43 @@ export function formatDayRouteDistance(meters: number): string {
   if (meters < 1000) return `${Math.round(meters)} м`;
   const km = meters / 1000;
   return km < 10 ? `${km.toFixed(1).replace('.', ',')} км` : `${Math.round(km)} км`;
+}
+
+/** Sum consecutive segment meters (null segments skipped). */
+export function dayRouteTotalDistanceMeters(segments: Array<number | null | undefined>): number {
+  let total = 0;
+  for (const segment of segments) {
+    if (typeof segment === 'number' && Number.isFinite(segment) && segment > 0) total += segment;
+  }
+  return total;
+}
+
+/** MVP ETA from haversine total × mode speed (no routing API). */
+export function estimateDayRouteTravelMinutes(
+  meters: number,
+  mode: DayRouteTravelMode = 'walk',
+): number {
+  if (!Number.isFinite(meters) || meters <= 0) return 0;
+  const speed = DAY_ROUTE_TRAVEL_M_PER_MIN[mode] || DAY_ROUTE_TRAVEL_M_PER_MIN.walk;
+  return Math.max(1, Math.round(meters / speed));
+}
+
+export function formatDayRouteTravelMinutes(minutes: number): string {
+  if (!Number.isFinite(minutes) || minutes <= 0) return '';
+  if (minutes < 60) return `${minutes} мин`;
+  const hours = Math.floor(minutes / 60);
+  const rest = minutes % 60;
+  return rest ? `${hours} ч ${rest} мин` : `${hours} ч`;
+}
+
+/** Prefer stored ticketUrl; else event page from eventSlug/eventId. */
+export function resolveDayRouteTicketUrl(
+  venue: Pick<DayRouteVenueItem, 'ticketUrl' | 'eventId' | 'eventSlug' | 'title'>,
+): string | null {
+  const stored = String(venue.ticketUrl || '').trim();
+  if (stored) return stored;
+  const slug = String(venue.eventSlug || '').trim();
+  const id = String(venue.eventId || '').trim();
+  if (!slug && !id) return null;
+  return eventHref({ id: id || slug, slug: slug || null, title: venue.title || 'event' });
 }

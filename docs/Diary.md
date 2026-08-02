@@ -1,3 +1,19 @@
+## 2026-08-02 - /my-day: viral share city+items + Max
+
+### Наблюдения
+- Owner: виральный шаринг - URL лайт без БД `?city=&items=id:HHMM|free`; меню Copy/Telegram/WhatsApp/**Макс**; лендинг для друга.
+- Официальный Max deep-link: `https://max.ru/:share?text=` (dev.max.ru).
+
+### Решения
+- Канон share: `/my-day?city=spb&items=341:1400,892:free` (+ optional `from=`). Legacy `?day=` ещё парсится, builders пишут city+items.
+- Меню «Поделиться»: скопировать / Telegram / WhatsApp / Макс; sticky «Поделиться» на мобилке.
+- Friend landing плашка + «Сохранить себе»; на event-stops «Купить билет» + «Билет куплен»; DnD/print/distance MVP.
+
+### Проблемы
+- Resolve event-only ids через matches API неполный (stub + ticket URL) - ок для MVP; полный event DTO hydrate - follow-up.
+
+---
+
 ## 2026-08-02 - /my-day: MAX=10, без лишнего копирайта, chips без «в дне»
 
 ### Наблюдения

@@ -8,6 +8,7 @@ import {
   addToDayRoute,
   buildDayRouteCoordsMap,
   buildDayRouteSharePath,
+  buildMaxShareUrl,
   buildYandexMultiStopRouteUrl,
   catalogDayRouteVenueIds,
   clearDayRoute,
@@ -24,6 +25,7 @@ import {
   lookupDayRouteCoords,
   optimizeDayRouteNearestNeighbor,
   parseDayRouteCoordsInput,
+  parseDayRouteItemsParam,
   parseDayRouteQueryParam,
   readDayRoute,
   resetDayRouteSnapshotCache,
@@ -71,13 +73,39 @@ test('parseDayRouteQueryParam trims, dedupes, caps at MAX', () => {
   assert.equal(parseDayRouteQueryParam(many).length, DAY_ROUTE_MAX);
 });
 
-test('buildDayRouteSharePath prefers slug and encodes', () => {
+test('buildDayRouteSharePath emits city+items format', () => {
   assert.equal(buildDayRouteSharePath([]), '/my-day');
-  const path = buildDayRouteSharePath([
-    { id: 'id1', slug: 'park-gorkogo', title: 'Парк' },
-    { id: 'id2', slug: null, title: 'Пётр' },
-  ]);
-  assert.equal(path, `/my-day?day=${encodeURIComponent('park-gorkogo,id2')}`);
+  const path = buildDayRouteSharePath(
+    [
+      {
+        id: 'id1',
+        slug: 'park-gorkogo',
+        title: 'Парк',
+        citySlug: 'spb',
+        eventId: '341',
+        sessionLabel: 'сб, 14:00',
+      },
+      { id: 'id2', slug: '892', title: 'Локация', citySlug: 'spb' },
+    ],
+    { citySlug: 'spb' },
+  );
+  const url = new URL(path, 'https://daibilet.ru');
+  assert.equal(url.searchParams.get('city'), 'spb');
+  assert.equal(url.searchParams.get('items'), '341:1400,892:free');
+});
+
+test('parseDayRouteItemsParam parses id:HHMM and free', () => {
+  const tokens = parseDayRouteItemsParam('341:1400,892:free,115:1830');
+  assert.equal(tokens.length, 3);
+  assert.deepEqual(tokens[0], { id: '341', time: '1400', isText: false, isFree: false });
+  assert.deepEqual(tokens[1], { id: '892', time: 'free', isText: false, isFree: true });
+  assert.deepEqual(tokens[2], { id: '115', time: '1830', isText: false, isFree: false });
+});
+
+test('buildMaxShareUrl uses official max.ru/:share deep-link', () => {
+  const url = buildMaxShareUrl('Привет! https://daibilet.ru/my-day?city=spb&items=1:free');
+  assert.ok(url.startsWith('https://max.ru/:share?text='));
+  assert.ok(url.includes(encodeURIComponent('Привет!')));
 });
 
 test('dayRouteHasMixedCities by cityId and by title', () => {
@@ -653,16 +681,17 @@ test('addTextStopToDayRoute evicts page caches when quota blocks 3rd stop', () =
   assert.equal(store.has('daibilet:event-page:also-huge'), false);
 });
 
-test('buildDayRouteSharePath encodes text stops with t: and | separator', () => {
+test('buildDayRouteSharePath encodes text stops in items', () => {
   mockStorage();
   clearDayRoute();
   addTextStopToDayRoute({ title: 'Эрмитаж' });
   addTextStopToDayRoute({ title: 'Исаакий' });
-  const path = buildDayRouteSharePath(readDayRoute().venues);
-  assert.ok(path.includes(encodeURIComponent('t:Эрмитаж|t:Исаакий')));
-  const tokens = parseDayRouteQueryParam(decodeURIComponent(path.replace('/my-day?day=', '')));
-  assert.deepEqual(tokens, ['t:Эрмитаж', 't:Исаакий']);
-  assert.ok(tokens.every((t) => isDayRouteShareTextToken(t)));
+  const path = buildDayRouteSharePath(readDayRoute().venues, { citySlug: 'spb' });
+  assert.ok(path.includes('city=spb'));
+  assert.ok(path.includes('items='));
+  const items = new URL(path, 'https://daibilet.ru').searchParams.get('items') || '';
+  assert.ok(items.includes('t:Эрмитаж:free'));
+  assert.ok(items.includes('t:Исаакий:free'));
 });
 
 test('hydrateTextStopsFromShareTokens fills planner from titles', () => {

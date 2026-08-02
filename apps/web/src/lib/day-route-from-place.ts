@@ -6,7 +6,7 @@ import { resolveCityPlaceHref, type CityMustSeeItem, type CityPlaceLinkFields } 
 import { namesLooselyMatch } from './city-place-href';
 import { DAY_ROUTE_MAX, type DayRouteVenueItem } from './day-route';
 import { isValidCoordinatePair } from './day-route-score';
-import { venueHref } from './routes';
+import { eventHref, venueHref } from './routes';
 
 /** Default preset takes all resolvable must-see (typically 6), capped by DAY_ROUTE_MAX. */
 export const DAY_ROUTE_PRESET_SIZE = DAY_ROUTE_MAX;
@@ -182,6 +182,7 @@ export function dayRouteItemFromEvent(event: DayRouteEventSource): DayRouteVenue
     eventSlug: event.slug || null,
     sessionLabel,
     startsAt,
+    ticketUrl: eventHref({ id: event.id, slug: event.slug || null, title: event.title }),
   };
 }
 
