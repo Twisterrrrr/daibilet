@@ -1,3 +1,37 @@
+## 2026-08-03 - /my-day: stop card owner-v5 + starter equal-M
+
+### Наблюдения
+- Stop card: content top-heavy, huge empty bottom; ↑↓ under text (wrong); title not vertically centered vs thumb.
+- Owner exact: ↑↓ **under thumb**; Title+Address **items-center** vs thumb; далее in text col; equal `py-2.5`; no stretch empty.
+- Mobile starter: shared `max-lg:px-*` column + equal `max-lg:py-3.5`; desktop `1fr auto 1fr auto 1fr`.
+
+### Решения
+- Grid stop `data-day-stop-layout="owner-v5"`: `grid-cols-[3rem_minmax(0,1fr)]` - row1 thumb | text(items-center); row2 sort | далее.
+- List grid `items-start` (no stretch). Card `px-2.5 py-2.5 h-auto`.
+- Starter: `data-day-starter-align="col"` + `lg:grid-cols-[1fr_auto_1fr_auto_1fr]`.
+
+### Проблемы
+- Довести MSK deploy без pkill; вернуть BUILD_ID.
+
+---
+
+## 2026-08-03 - /my-day: starter true equal-M geometry (5-col grid)
+
+### Наблюдения
+- Owner: `lg:grid-cols-2` + gap + `justify-center` в половинах даёт фейковый 50/50 - визуальный gutter между блоками ≠ edge paddings (leftover 1fr сидит между контентом).
+- Нужна геометрия `[ M ][ LEFT ][ M ][ RIGHT ][ M ]` где все три M равны и растут на ultrawide; top/bottom M_v равны.
+
+### Решения
+- Desktop lg+: `lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:items-center` (без gap/px 50/50).
+- Left: `lg:col-start-2` shrink-wrap; right: `lg:col-start-4 lg:w-[20rem] lg:min-w-[16rem] lg:min-h-[7.75rem]`.
+- Marker: `data-day-starter-inset="equal-m"`; mobile A / stable disabled-search без изменений.
+- Equal `lg:py-5` на card + `items-center` = симметричный вертикальный air.
+
+### Проблемы
+- Предыдущий redeploy убивался pkill - этот прогон довести до SMOKE_OK и проверить chunk на `1fr_auto_1fr_auto_1fr`.
+
+---
+
 ## 2026-08-03 - /my-day: starter left center + right stretch + stable geometry
 
 ### Наблюдения
