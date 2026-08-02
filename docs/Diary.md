@@ -14,6 +14,39 @@
 
 ---
 
+## 2026-08-02 - /my-day header: density + предложный падеж
+
+### Наблюдения
+- Owner: в хедере лишние «День собран на N%», «свободное окно», «Яндекс.Карты», дубль «Точки · N».
+- H1 «Мой день в Нижний Новгород» - именительный вместо предложного.
+
+### Решения
+- Summary: только `N точек из 10` (DAY_ROUTE_SOFT) + `M билетов` при unpaid > 0.
+- H1 через `inCityPrepositional` (`city-declension.ts`: словарь + эвристика).
+- % / free-window остаются в compute (для chips/upsell), не в header line.
+
+### Проблемы
+- BUILD_ID после MSK deploy - ниже в этой итерации.
+
+---
+
+## 2026-08-02 - /my-day P5: превью + hookFact на пикере
+
+### Наблюдения
+- Owner: в «Мой день» не хватало фото-превью и краткого «зачем сюда» при выборе точек.
+- Deferred P5 из commercial canon: hookFact + mini description.
+
+### Решения
+- `dayRouteHookLine`: приоритет `Venue.hookFact` → `shortDescription` → editorial `cityInfo.mustSee.desc` (1 строка ~100 символов, emdash → `-`).
+- Каталог: `VenueCatalogCard.hookFact` через `toVenueCatalogCard` (API hub уже leanText=false).
+- UI: carousel «Рекомендуемые» (cover + badge + title + hook + /✓); accordion «Главные места» - compact mini-cards (thumb + title + 1-line hook); «Свободное окно» hook под title; search dropdown thumb + hook hint.
+- Не раздувать must-see в огромные карточки.
+
+### Проблемы
+- MSK BUILD_ID - после deploy.
+
+---
+
 ## 2026-08-02 - /my-day: soft-warn вместо hard DAY_ROUTE_MAX=10
 
 ### Наблюдения

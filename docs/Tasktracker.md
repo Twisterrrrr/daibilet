@@ -14,7 +14,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | UX.MOB0 | Audit + канон sticky chrome / hero budget / CTA / sections / chips | Критический | ✅ docs |
-| UX.LOC1 | Mobile sticky header: city chip | Критический | ✅ |
+| UX.LOC1 | Mobile sticky: city pin + search icon + route/fav | Критический | ✅ `cc05efa` MSK **BUILD_ID=`EroIFEOGTEMJsFn1Zf3tr`** |
 | UX.LOC2 | `MobileNavSheet`: «Город» сразу после поиска | Критический | ✅ |
 | UX.LOC4 | `/locations` mobile: dense hero, карта lg+ only | Высокий | ✅ |
 | UX.MOB1 | Shared `MobileStickyActionBar` + location/institution/my-day sticky CTAs | Высокий | ✅ |
@@ -40,8 +40,9 @@
 | UX.MYDAY-BOAT | Канон добора теплохода: Pier→Route→Slot→pin (`eventId`+time); share только после слота; SPB MVP wizard | Критический | ✅ `0212c13` MSK **BUILD_ID=`EdAk08KxqEiFe8Ow1Qg3i`** |
 | UX.NN-COORDS | НН day-route coords: DTO venueRowsByIds + city hub merge published + city filter aliases + editorial fallback | Критический | ✅ `bee2a2a` MSK **BUILD_ID=`n6C8O0jfVXm2ksCrQ_yKG`** city hub 78/78 coords; preset stops 5/5 |
 | UX.MYDAY-COMM | Canon planner+checklist (не swipe): readiness %, chips, buy handoff, recommend carousel, FAB, free-window | Критический | ✅ 4e45f48+ soft-cap follow-ups MSK **BUILD_ID=Yqcz6aa-14QvDHs30n306** |
+| UX.MYDAY-HDR | `/my-day` header: `N точек из 10` + unpaid билеты; H1 предложный; без %/окно/Яндекс/дубль Точки | Критический | 🔄 commit+MSK deploy |
 | UX.MYDAY-P4 | Free-window upsell polish (multi-gap / ETA) | Средний | ⏳ partial MVP in COMM |
-| UX.MYDAY-P5 | hookFact + mini description on day cards | Средний | ⏳ |
+| UX.MYDAY-P5 | hookFact + mini description on day cards | Средний | ✅ picker: carousel / must-see mini-cards / free-window / search thumb+hook |
 | UX.MYDAY-P6 | City «собрать за минуту» template variants | Высокий | ⏳ |
 | UX.MYDAY-P7 | Commercial `/d/{code}` recipient (tickets/map/paid) - не soft purple banner | Высокий | ⏳ |
 | UX.MYDAY-P8 | Timeline Утро/День/Вечер | Средний | ⏳ |
