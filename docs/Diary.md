@@ -10,7 +10,7 @@
 - `DAY_ROUTE_MAX=10`; E2E text/grand-maket обновлены под N/10.
 
 ### Проблемы
-- MSK deploy + smoke `/my-day` после commit.
+- ~~MSK deploy + smoke `/my-day` после commit~~ → MSK `8499c92` **BUILD_ID=`q-1BAwZ65koVjH3CunDvi`**. Smoke `/my-day` 200; chunks: `cK=10`, нет «в дне» / «без перехода».
 
 ---
 
@@ -27,7 +27,7 @@
 - Ссылки на каталог/хаб - вторичный текст внизу блока.
 
 ### Проблемы
-- Deploy/smoke после commit - см. Tasktracker UX.MYDAY-ONPAGE.
+- Deploy/smoke: MSK **BUILD_ID=`q-1BAwZ65koVjH3CunDvi`** (`b4fdfd5` + chip fix `6345d0a`). Playwright: SPb location+venue+event+must-see bulk без ухода с `/my-day`.
 
 ---
 
