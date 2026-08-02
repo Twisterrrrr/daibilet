@@ -2889,6 +2889,7 @@ function DayRouteVenueCard({
   hasCoords,
   segmentToNext,
   travelMode,
+  nearbyUpsells = [],
   onMoveUp,
   onMoveDown,
   onRemove,
@@ -2901,6 +2902,7 @@ function DayRouteVenueCard({
   hasCoords: boolean;
   segmentToNext: number | null;
   travelMode: DayRouteTravelMode;
+  nearbyUpsells?: DayRouteNearbyUpsell[];
   onMoveUp: () => void;
   onMoveDown: () => void;
   onRemove: () => void;
@@ -2916,6 +2918,7 @@ function DayRouteVenueCard({
   const ticketUrl = resolveDayRouteTicketUrl(venue);
   const bought = Boolean(venue.ticketBought);
   const chip = classifyDayRouteCommercialChip(venue);
+  const buyCtaLabel = formatDayRouteBuyCtaLabel(venue);
   const addressLine =
     formatStreetAddress(venue.address, { city: venue.city }) || String(venue.address || '').trim() || '';
   const titleNorm = venue.title.toLowerCase().replace(/\s+/g, ' ');
@@ -3019,7 +3022,7 @@ function DayRouteVenueCard({
             className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600"
           >
             <Ticket className="h-3.5 w-3.5" />
-            {venue.sessionLabel ? 'Купить билет на это же время' : 'Купить билет'}
+            {buyCtaLabel}
           </a>
           <button
             type="button"
@@ -3036,6 +3039,30 @@ function DayRouteVenueCard({
           </button>
         </div>
       ) : null}
+      {!ticketUrl && nearbyUpsells.length > 0
+        ? nearbyUpsells.map((upsell) => (
+            <div
+              key={upsell.eventId}
+              className="ml-11 rounded-xl border border-amber-100 bg-amber-50/60 px-3 py-2"
+              data-day-nearby-upsell={upsell.eventId}
+            >
+              <p className="text-[12px] font-medium text-slate-800">{upsell.line}</p>
+              <a
+                href={upsell.ticketUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-day-nearby-buy
+                onClick={() => onBuyClick(upsell.ticketUrl)}
+                className="mt-1.5 inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600"
+              >
+                <Ticket className="h-3.5 w-3.5" />
+                {upsell.priceFromRub != null && upsell.priceFromRub > 0
+                  ? `Купить билет ${formatPriceFrom(upsell.priceFromRub)}`
+                  : 'Купить билет'}
+              </a>
+            </div>
+          ))
+        : null}
       {segmentHint ? <p className="pl-11 text-[11px] text-slate-500">далее ~ {segmentHint}</p> : null}
     </li>
   );
@@ -3107,22 +3134,6 @@ function DayRoutePrintSheet({
                     })()}
                     {bought ? (
                       <p className="mt-1 text-sm font-semibold text-emerald-800">Билет куплен</p>
-                    ) : null}
-                  </div>
-                </div>
-                {segmentHint && index < venues.length - 1 ? (
-                  <p className="py-2 pl-10 text-sm text-slate-500">↓ {segmentHint}</p>
-                ) : null}
-              </li>
-            );
-          })}
-        </ol>
-        <p className="mt-8 text-xs text-slate-400">daibilet.ru/my-day</p>
-      </div>
-    </div>
-  );
-}
-font-semibold text-emerald-800">Билет куплен</p>
                     ) : null}
                   </div>
                 </div>
