@@ -1,3 +1,20 @@
+## 2026-08-02 - /my-day: stop view toggle Сетка | Список
+
+### Наблюдения
+- Owner: на десктопе ~3 карточки в ряд; иначе текстовый список с переключателем.
+- Width: убран `lg:max-w-5xl` (канон `container-page` max-w-7xl).
+
+### Решения
+- Toggle «Сетка» / «Список» (`data-day-stop-view-toggle`), persist `localStorage` key `daibilet:dayRouteStopView`.
+- Grid: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`, compact tile cards.
+- List: text rows (number + title + meta + actions), без толстых карточек.
+- Default: Сетка.
+
+### Проблемы
+- Deploy BUILD_ID - после MSK.
+
+---
+
 ## 2026-08-02 - /my-day: full container width (drop max-w-5xl)
 
 ### Наблюдения

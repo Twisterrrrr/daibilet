@@ -96,7 +96,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MYDAY-P7 | Commercial `/d/{code}` recipient (tickets/map/paid) - не soft purple banner | Высокий | ⏳ |
 | UX.MYDAY-P8 | Timeline flat list (не Утро/День/Вечер); «Маршрут» + «N точек»; badge align | Критический | ✅ `7a3de60` MSK **BUILD_ID=`Ywy2ntkkoX6K__8CuMH3H`** `/my-day` 200 |
 | UX.MYDAY-SESSION | Event stop cards: show session date+time (`15 авг, 19:00`); enrich from events API | Критический | 🔄 commit+deploy |
-| UX.MYDAY-STARTER | Full width (no max-w-5xl); dense stops; H1 «Мой день в…»; centered starter; matches=15 | Критический | 🔄 commit+deploy |
+| UX.MYDAY-STARTER | Full width; stop toggle Сетка/Список; H1 «Мой день в…»; centered starter; matches=15 | Критический | 🔄 commit+deploy |
 | UX.MYDAY-COMPACT | Compact stop cards: no «Вход свободный»; ETA under card; session line; buy from price + nearby | Критический | ✅ `6721c9c` MSK **BUILD_ID=`meNSWERi0trhkT0vGq8lO`** |
 | UX.MYDAY-TRIP | «Ваши билеты в этой поездке» shell (QR via orders - open in qa) | Высокий | ✅ shell `6721c9c` MSK **BUILD_ID=`meNSWERi0trhkT0vGq8lO`** (QR open) |
 | UX.MYDAY-STOP-COMPACT | Stop cards ~½ height; drop «Вход свободный»; ETA line under card | Критический | 🔄 commit+deploy |

@@ -8,6 +8,8 @@ import {
   ChevronUp,
   Copy,
   ExternalLink,
+  LayoutGrid,
+  List,
   MapPin,
   Maximize2,
   Minimize2,
@@ -154,6 +156,28 @@ import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 
 type DayRouteAccordionId = 'catalog' | 'mustSee' | 'text' | 'matches';
+type DayRouteStopViewMode = 'grid' | 'list';
+
+const DAY_ROUTE_STOP_VIEW_KEY = 'daibilet:dayRouteStopView';
+
+function readStopViewMode(): DayRouteStopViewMode {
+  if (typeof window === 'undefined') return 'grid';
+  try {
+    const raw = window.localStorage.getItem(DAY_ROUTE_STOP_VIEW_KEY);
+    return raw === 'list' ? 'list' : 'grid';
+  } catch {
+    return 'grid';
+  }
+}
+
+function writeStopViewMode(mode: DayRouteStopViewMode) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(DAY_ROUTE_STOP_VIEW_KEY, mode);
+  } catch {
+    /* ignore */
+  }
+}
 
 type MatchVenueStub = {
   id: string;
@@ -343,6 +367,8 @@ function DayRoutePanelInner() {
   const [focusedStopId, setFocusedStopId] = useState<string | null>(null);
   /** Mobile (&lt;lg): map pane ~38vh ↔ ~85vh. */
   const [mapExpanded, setMapExpanded] = useState(false);
+  /** Route stops layout: grid (default) or dense text list. */
+  const [stopViewMode, setStopViewMode] = useState<DayRouteStopViewMode>('grid');
   const splitLeftRef = useRef<HTMLDivElement | null>(null);
   /** After external «Купить билет» - ask guest to mark bought. */
   const [ticketHandoff, setTicketHandoff] = useState<{
@@ -407,6 +433,15 @@ function DayRoutePanelInner() {
       window.removeEventListener('storage', sync);
     };
   }, []);
+
+  useEffect(() => {
+    setStopViewMode(readStopViewMode());
+  }, []);
+
+  function changeStopViewMode(mode: DayRouteStopViewMode) {
+    setStopViewMode(mode);
+    writeStopViewMode(mode);
+  }
 
   // Destinations for on-page city picker (prefer layout context).
   useEffect(() => {
@@ -2184,7 +2219,42 @@ function DayRoutePanelInner() {
                 {formatDayRouteStopsHeading(route.venues.length)}
               </span>
             </h2>
-            <div data-day-route-toolbar>{renderMapToolbar()}</div>
+            <div className="flex flex-wrap items-center gap-2">
+              <div
+                className="inline-flex rounded-full border border-slate-200 bg-white p-0.5"
+                role="group"
+                aria-label="Вид точек маршрута"
+                data-day-stop-view-toggle
+              >
+                <button
+                  type="button"
+                  aria-pressed={stopViewMode === 'grid'}
+                  onClick={() => changeStopViewMode('grid')}
+                  className={`inline-flex min-h-8 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold transition ${
+                    stopViewMode === 'grid'
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <LayoutGrid className="h-3.5 w-3.5" />
+                  Сетка
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={stopViewMode === 'list'}
+                  onClick={() => changeStopViewMode('list')}
+                  className={`inline-flex min-h-8 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold transition ${
+                    stopViewMode === 'list'
+                      ? 'bg-slate-900 text-white'
+                      : 'text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <List className="h-3.5 w-3.5" />
+                  Список
+                </button>
+              </div>
+              <div data-day-route-toolbar>{renderMapToolbar()}</div>
+            </div>
           </div>
           {missingCoordsCount > 0 ? (
             <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
@@ -2239,13 +2309,22 @@ function DayRoutePanelInner() {
               </div>
             </div>
           ) : null}
-          <ul className="mt-3 grid w-full grid-cols-1 items-start gap-1.5" data-day-plan-list>
+          <ul
+            className={
+              stopViewMode === 'grid'
+                ? 'mt-3 grid w-full grid-cols-1 items-stretch gap-2 sm:grid-cols-2 lg:grid-cols-3'
+                : 'mt-3 grid w-full grid-cols-1 items-start gap-0'
+            }
+            data-day-plan-list
+            data-day-stop-view={stopViewMode}
+          >
             {route.venues.map((venue, index) => (
               <Fragment key={venue.id}>
                 <DayRouteVenueCard
                   index={index}
                   total={route.venues.length}
                   venue={venue}
+                  variant={stopViewMode}
                   hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
                   mapsUrl={(() => {
                     const c = lookupDayRouteCoords(venue, coordsById);
@@ -2254,7 +2333,11 @@ function DayRoutePanelInner() {
                   segmentToNext={segmentMeters[index] ?? null}
                   travelMode={travelMode}
                   focused={focusedStopId === venue.id}
-                  nearbyUpsells={pickNearbyUpsellsForStop(venue, matchOfferStubs, { limit: 1 })}
+                  nearbyUpsells={
+                    stopViewMode === 'grid'
+                      ? []
+                      : pickNearbyUpsellsForStop(venue, matchOfferStubs, { limit: 1 })
+                  }
                   onMoveUp={() => setRoute(moveDayRouteVenue(venue.id, -1))}
                   onMoveDown={() => setRoute(moveDayRouteVenue(venue.id, 1))}
                   onRemove={() => setRoute(removeFromDayRoute(venue.id))}
@@ -2272,7 +2355,7 @@ function DayRoutePanelInner() {
                 freeWindowUpsells.length > 0 &&
                 !atMax ? (
                   <li
-                    className=""
+                    className={stopViewMode === 'grid' ? 'col-span-full' : undefined}
                     data-day-free-window-upsell
                     data-day-free-window
                   >
@@ -3249,6 +3332,7 @@ function DayRouteVenueCard({
   venue,
   index,
   total,
+  variant = 'grid',
   hasCoords,
   mapsUrl = null,
   segmentToNext,
@@ -3264,6 +3348,7 @@ function DayRouteVenueCard({
   venue: DayRouteVenueItem;
   index: number;
   total: number;
+  variant?: DayRouteStopViewMode;
   hasCoords: boolean;
   mapsUrl?: string | null;
   segmentToNext: number | null;
@@ -3309,167 +3394,225 @@ function DayRouteVenueCard({
       ? formatDayRouteSegmentHint(segmentToNext, travelMode)
       : '';
   const sessionDisplay = formatDayRouteSessionDisplay(venue);
+  const metaParts = [
+    sessionDisplay,
+    showStatusChip ? chip.label : null,
+    venue.note,
+    placeLine,
+    !hasCoords ? 'Нет координат' : null,
+  ].filter(Boolean) as string[];
+  const metaLine = metaParts.join(' · ');
+
+  const titleNode = href ? (
+    <Link
+      href={href}
+      className="font-semibold text-slate-900 hover:text-primary-700"
+    >
+      {venue.title}
+    </Link>
+  ) : (
+    <span className="font-semibold text-slate-900">{venue.title}</span>
+  );
+
+  const moveControls = (
+    <div className="flex shrink-0 items-center gap-0">
+      <button
+        type="button"
+        aria-label="Выше"
+        disabled={index === 0}
+        onClick={onMoveUp}
+        className="rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+      >
+        <ChevronUp className="h-3.5 w-3.5" />
+      </button>
+      <button
+        type="button"
+        aria-label="Ниже"
+        disabled={index >= total - 1}
+        onClick={onMoveDown}
+        className="rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+      >
+        <ChevronDown className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
+
+  const actionButtons = (
+    <div className="flex shrink-0 items-center gap-0">
+      {mapsUrl ? (
+        <a
+          href={mapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Открыть в Яндекс.Картах"
+          title="Открыть в Яндекс.Картах"
+          data-day-stop-maps
+          className="inline-flex h-7 w-7 items-center justify-center rounded-full text-sky-600 hover:bg-sky-50"
+        >
+          <Navigation className="h-3.5 w-3.5" />
+        </a>
+      ) : null}
+      <button
+        type="button"
+        aria-label="Удалить точку"
+        onClick={onRemove}
+        className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
+    </div>
+  );
+
+  if (variant === 'list') {
+    return (
+      <li
+        className="w-full scroll-mt-4 border-b border-slate-100 last:border-b-0"
+        data-day-plan-stop={venue.id}
+        data-day-stop-variant="list"
+        data-ticket-bought={bought ? '1' : '0'}
+        data-commercial-chip={chip.kind}
+        data-day-session={sessionDisplay || undefined}
+        data-day-stop-focused={focused ? '1' : undefined}
+      >
+        <div
+          className={`flex w-full items-start gap-2 py-2 ${
+            focused ? 'rounded-md bg-emerald-50/80 px-1' : ''
+          }`}
+        >
+          <span
+            className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white"
+            aria-label={`Точка ${index + 1}`}
+          >
+            {index + 1}
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[13px] leading-snug">{titleNode}</p>
+            {metaLine ? (
+              <p
+                className={`mt-0.5 truncate text-[11px] leading-snug ${
+                  !hasCoords ? 'text-amber-700' : 'text-slate-500'
+                }`}
+              >
+                {metaLine}
+              </p>
+            ) : null}
+            {ticketUrl ? (
+              <div className="mt-1 flex flex-wrap items-center gap-1">
+                <a
+                  href={ticketUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-day-buy-ticket
+                  onClick={() => onBuyClick(ticketUrl)}
+                  className="text-[11px] font-semibold text-amber-700 underline-offset-2 hover:underline"
+                >
+                  {buyCtaLabel}
+                </a>
+                <button
+                  type="button"
+                  onClick={onToggleBought}
+                  data-day-ticket-bought
+                  className="text-[11px] font-medium text-slate-600 underline-offset-2 hover:underline"
+                >
+                  {bought ? 'Билет отмечен' : 'Отметить купленным'}
+                </button>
+              </div>
+            ) : null}
+            {segmentHint ? (
+              <p className="mt-0.5 text-[11px] text-slate-400" data-day-segment-hint>
+                далее ~ {segmentHint}
+              </p>
+            ) : null}
+          </div>
+          {moveControls}
+          {actionButtons}
+        </div>
+      </li>
+    );
+  }
+
   return (
     <li
-      className="w-full scroll-mt-4"
+      className="flex h-full w-full scroll-mt-4 flex-col"
       data-day-plan-stop={venue.id}
+      data-day-stop-variant="grid"
       data-ticket-bought={bought ? '1' : '0'}
       data-commercial-chip={chip.kind}
       data-day-session={sessionDisplay || undefined}
       data-day-stop-focused={focused ? '1' : undefined}
     >
       <div
-        className={`flex w-full items-center gap-1.5 rounded-lg border bg-white px-1.5 py-1 ${
+        className={`flex h-full flex-col rounded-xl border bg-white p-2.5 ${
           focused ? 'border-emerald-400 ring-1 ring-emerald-200' : 'border-slate-200'
         }`}
       >
-        <span
-          className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white"
-          aria-label={`Точка ${index + 1}`}
-        >
-          {index + 1}
-        </span>
-        <div className="flex shrink-0 flex-col leading-none">
-          <button
-            type="button"
-            aria-label="Выше"
-            disabled={index === 0}
-            onClick={onMoveUp}
-            className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
-          >
-            <ChevronUp className="h-3 w-3" />
-          </button>
-          <button
-            type="button"
-            aria-label="Ниже"
-            disabled={index >= total - 1}
-            onClick={onMoveDown}
-            className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
-          >
-            <ChevronDown className="h-3 w-3" />
-          </button>
-        </div>
-        <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-md bg-slate-100">
-          {venue.imageUrl ? (
-            <SafeImage src={venue.imageUrl} alt="" fill sizes="2rem" className="object-cover" />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-slate-400">
-              <MapPin className="h-3.5 w-3.5" />
-            </div>
-          )}
-        </div>
-        <div className="min-w-0 flex-1">
-          {href ? (
-            <Link
-              href={href}
-              className="block truncate text-[13px] font-semibold leading-tight text-slate-900 hover:text-primary-700"
+        <div className="flex items-start gap-2">
+          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+            {venue.imageUrl ? (
+              <SafeImage src={venue.imageUrl} alt="" fill sizes="3.5rem" className="object-cover" />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-slate-400">
+                <MapPin className="h-5 w-5" />
+              </div>
+            )}
+            <span
+              className="absolute left-1 top-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-900/90 text-[10px] font-bold text-white"
+              aria-label={`Точка ${index + 1}`}
             >
-              {venue.title}
-            </Link>
-          ) : (
-            <p className="truncate text-[13px] font-semibold leading-tight text-slate-900">{venue.title}</p>
-          )}
-          {(sessionDisplay || showStatusChip || placeLine || !hasCoords || venue.note) ? (
-            <p className="mt-0.5 truncate text-[11px] leading-tight text-slate-500">
-              {sessionDisplay ? (
-                <span className="font-medium text-slate-700" data-day-session-label>
-                  {sessionDisplay}
-                </span>
-              ) : null}
-              {sessionDisplay && (showStatusChip || placeLine || !hasCoords || venue.note) ? ' · ' : null}
-              {showStatusChip ? (
-                <span data-day-status-chip={chip.kind}>{chip.label}</span>
-              ) : null}
-              {showStatusChip && (placeLine || !hasCoords || venue.note) ? ' · ' : null}
-              {venue.note ? <span>{venue.note}</span> : null}
-              {venue.note && (placeLine || !hasCoords) ? ' · ' : null}
-              {placeLine ? <span>{placeLine}</span> : null}
-              {placeLine && !hasCoords ? ' · ' : null}
-              {!hasCoords ? <span className="font-medium text-amber-700">Нет координат</span> : null}
-            </p>
-          ) : null}
+              {index + 1}
+            </span>
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="line-clamp-2 text-[13px] leading-snug">{titleNode}</p>
+            {metaLine ? (
+              <p
+                className={`mt-1 line-clamp-2 text-[11px] leading-snug ${
+                  !hasCoords ? 'text-amber-700' : 'text-slate-500'
+                }`}
+              >
+                {metaLine}
+              </p>
+            ) : null}
+          </div>
         </div>
-        <div className="flex shrink-0 items-center">
-          {mapsUrl ? (
+        <div className="mt-auto flex items-center justify-between gap-1 pt-2">
+          {moveControls}
+          {actionButtons}
+        </div>
+        {ticketUrl ? (
+          <div className="mt-1.5 flex flex-wrap items-center gap-1">
             <a
-              href={mapsUrl}
+              href={ticketUrl}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="Открыть в Яндекс.Картах"
-              title="Открыть в Яндекс.Картах"
-              data-day-stop-maps
-              className="inline-flex h-7 w-7 items-center justify-center rounded-full text-sky-600 hover:bg-sky-50"
+              data-day-buy-ticket
+              onClick={() => onBuyClick(ticketUrl)}
+              className="inline-flex min-h-6 items-center justify-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[11px] font-bold text-white hover:bg-amber-600"
             >
-              <Navigation className="h-3.5 w-3.5" />
+              <Ticket className="h-3 w-3" />
+              {buyCtaLabel}
             </a>
-          ) : null}
-          <button
-            type="button"
-            aria-label="Удалить точку"
-            onClick={onRemove}
-            className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      </div>
-      {ticketUrl ? (
-        <div className="mt-0.5 flex flex-wrap items-center gap-1 pl-8">
-          <a
-            href={ticketUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-day-buy-ticket
-            onClick={() => onBuyClick(ticketUrl)}
-            className="inline-flex min-h-6 items-center justify-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[11px] font-bold text-white hover:bg-amber-600"
-          >
-            <Ticket className="h-3 w-3" />
-            {buyCtaLabel}
-          </a>
-          <button
-            type="button"
-            onClick={onToggleBought}
-            data-day-ticket-bought
-            className={`inline-flex min-h-6 items-center justify-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${
-              bought
-                ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
-                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            {bought ? <Check className="h-3 w-3" /> : null}
-            {bought ? 'Билет отмечен' : 'Отметить купленным'}
-          </button>
-        </div>
-      ) : null}
-      {!ticketUrl && nearbyUpsells.length > 0
-        ? nearbyUpsells.map((upsell) => (
-            <div
-              key={upsell.eventId}
-              className="mt-0.5 ml-8 rounded-md border border-amber-100 bg-amber-50/60 px-2 py-0.5"
-              data-day-nearby-upsell={upsell.eventId}
+            <button
+              type="button"
+              onClick={onToggleBought}
+              data-day-ticket-bought
+              className={`inline-flex min-h-6 items-center justify-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${
+                bought
+                  ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+                  : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+              }`}
             >
-              <p className="truncate text-[11px] font-medium text-slate-800">{upsell.line}</p>
-              <a
-                href={upsell.ticketUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-day-nearby-buy
-                onClick={() => onBuyClick(upsell.ticketUrl)}
-                className="mt-0.5 inline-flex min-h-6 items-center justify-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[11px] font-bold text-white hover:bg-amber-600"
-              >
-                <Ticket className="h-3 w-3" />
-                {upsell.priceFromRub != null && upsell.priceFromRub > 0
-                  ? `Купить билет ${formatPriceFrom(upsell.priceFromRub)}`
-                  : 'Купить билет'}
-              </a>
-            </div>
-          ))
-        : null}
-      {segmentHint ? (
-        <p className="mt-0.5 px-1 text-[11px] leading-tight text-slate-500" data-day-segment-hint>
-          далее ~ {segmentHint}
-        </p>
-      ) : null}
+              {bought ? <Check className="h-3 w-3" /> : null}
+              {bought ? 'Билет отмечен' : 'Отметить'}
+            </button>
+          </div>
+        ) : null}
+        {segmentHint ? (
+          <p className="mt-1 text-[11px] leading-tight text-slate-400" data-day-segment-hint>
+            далее ~ {segmentHint}
+          </p>
+        ) : null}
+      </div>
     </li>
   );
 }
