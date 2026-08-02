@@ -44,7 +44,7 @@
 - Subtitle: только «Отдельный поиск по типам».
 
 ### Проблемы
-- MSK live **BUILD_ID=\E6nQnmKCtloz0ynXA2y24\** (typecat 2f692dc + follow-ups). Smoke: SPB loc>=19, NN loc=9; subtitle без «теплоход»; wizard «Добавить теплоход» intact.
+- MSK live **BUILD_ID=`E6nQnmKCtloz0ynXA2y24`** (typecat `2f692dc` + follow-ups). Smoke: SPB loc>=19, NN loc=9; subtitle без «теплоход»; wizard «Добавить теплоход» intact.
 
 ---
 
