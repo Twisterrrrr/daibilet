@@ -8,7 +8,7 @@
 - Mobile A + two-col variant 1 без изменений; events search + placeholder уже в `aeff488`.
 
 ### Проблемы
-- Нет (BUILD_ID после MSK deploy).
+- Нет. MSK **BUILD_ID=`Zr8QqKS-qQp6XC5LjYQwu`** (`e307782`), SMOKE_OK; starter `max-w-6xl` + events placeholder in chunks.
 
 ---
 
