@@ -776,6 +776,115 @@ td div {
   font-size: 15px;
 }
 
+.order-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.order-filter-bar button {
+  min-height: 34px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-soft);
+  cursor: pointer;
+  padding: 7px 12px;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.order-filter-bar button:hover,
+.order-filter-bar button.is-active {
+  border-color: rgba(47, 111, 221, 0.32);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.order-work-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.order-work-panel .panel-header {
+  margin-bottom: 0;
+}
+
+.order-work-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.order-queue-column {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-height: 188px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface-alt);
+  padding: 12px;
+}
+
+.order-queue-column.success {
+  border-color: rgba(22, 130, 74, 0.16);
+  background: rgba(233, 248, 240, 0.5);
+}
+
+.order-queue-column.warning {
+  border-color: rgba(169, 104, 0, 0.18);
+  background: rgba(255, 244, 216, 0.48);
+}
+
+.order-queue-column.danger {
+  border-color: rgba(189, 45, 45, 0.16);
+  background: rgba(255, 240, 240, 0.52);
+}
+
+.order-queue-title {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.order-queue-title strong,
+.order-queue-item strong {
+  display: block;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.order-queue-title small,
+.order-queue-item span,
+.order-queue-item small,
+.order-queue-empty {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.order-queue-list {
+  display: grid;
+  gap: 8px;
+}
+
+.order-queue-item {
+  display: grid;
+  gap: 6px;
+  border: 1px solid rgba(215, 223, 235, 0.82);
+  border-radius: var(--radius-control);
+  background: rgba(255, 255, 255, 0.76);
+  padding: 10px;
+}
+
+.order-queue-empty {
+  display: block;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-control);
+  padding: 12px;
+}
+
 .compact-row span,
 td small {
   color: var(--text-muted);
@@ -1193,6 +1302,7 @@ td span {
   .sale-readiness-panel,
   .readiness-actions,
   .workflow-strip,
+  .order-work-grid,
   .settings-form {
     display: grid;
     grid-template-columns: 1fr;
@@ -1228,6 +1338,7 @@ td span {
   .selector-row,
   .session-control-row,
   .readiness-action-card,
+  .order-filter-bar,
   .login-layout {
     grid-template-columns: 1fr;
   }

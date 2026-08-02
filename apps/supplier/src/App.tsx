@@ -13,6 +13,7 @@ import type {
   SupplierPortalIdentityDto,
   SupplierPortalLegalProfileUpdateRequestDto,
   SupplierPortalMeDto,
+  SupplierPortalOrderRowDto,
   SupplierPortalOrdersListDto,
   SupplierPortalProfileDto,
   SupplierPortalReviewsListDto,
@@ -682,10 +683,17 @@ function AdmissionsPage({ supplierKey }: { supplierKey: string }) {
 }
 
 function OrdersPage({ supplierKey }: { supplierKey: string }) {
-  const { data, loading, error, reload } = useSupplierResource<SupplierPortalOrdersListDto>('/api/supplier/orders?limit=50', supplierKey);
+  const [statusFilter, setStatusFilter] = React.useState('ALL');
+  const ordersPath = React.useMemo(() => {
+    const params = new URLSearchParams({ limit: '50' });
+    if (statusFilter !== 'ALL') params.set('status', statusFilter);
+    return `/api/supplier/orders?${params.toString()}`;
+  }, [statusFilter]);
+  const { data, loading, error, reload } = useSupplierResource<SupplierPortalOrdersListDto>(ordersPath, supplierKey);
   const paidItems = data?.items.filter((order) => ['PAID', 'CONFIRMED', 'FULFILLED'].includes(order.status)).length ?? 0;
-  const pendingItems = data?.items.filter((order) => order.status === 'PENDING_PAYMENT').length ?? 0;
+  const pendingItems = data?.items.filter((order) => ['PENDING_PAYMENT', 'RESERVED'].includes(order.status)).length ?? 0;
   const grossKopecks = data?.items.reduce((sum, order) => sum + order.totalKopecks, 0) ?? 0;
+  const netKopecks = data?.items.reduce((sum, order) => sum + Math.max(0, order.totalKopecks - order.commissionKopecks), 0) ?? 0;
 
   return (
     <div className="page-stack">
@@ -695,29 +703,126 @@ function OrdersPage({ supplierKey }: { supplierKey: string }) {
           <StatCard label="Позиции" value={data.total} hint={`на странице ${data.items.length}`} />
           <StatCard label="Оплачено" value={paidItems} hint="ожидают выдачи или уже выданы" />
           <StatCard label="Ожидают оплату" value={pendingItems} hint="можно сверить позже" />
-          <StatCard label="Сумма" value={formatMoney(grossKopecks)} hint="по текущей выдаче" />
+          <StatCard label="К выплате" value={formatMoney(netKopecks)} hint={`оборот ${formatMoney(grossKopecks)}`} />
         </div>
       ) : null}
+      <OrderStatusFilters value={statusFilter} onChange={setStatusFilter} />
       <DataState loading={loading} error={error} onRetry={reload} hasData={Boolean(data?.items.length)}>
         {data ? (
-          <Table
-            columns={['Заказ', 'Покупка', 'Покупатель', 'Сумма / статус']}
-            rows={data.items.map((order) => [
-              <div key="order"><strong>№ {order.publicCode || compactCode(order.orderId || order.id)}</strong><small>{formatDateTime(order.createdAt)}</small></div>,
-              <div key="event">
-                <span>{order.eventTitle || order.admissionProductTitle || order.title}</span>
-                <small>{order.subjectType === 'VENUE_ADMISSION' ? 'входной билет' : formatDateTime(order.startsAt)} · {order.quantity} шт. · {order.ticketTitle || 'билет'}</small>
-              </div>,
-              <div key="buyer"><span>{order.buyerName || order.buyerEmail || order.buyerPhone || '-'}</span><small>{[order.buyerEmail, order.buyerPhone].filter(Boolean).join(' · ')}</small></div>,
-              <div key="status" className="order-status-cell">
-                <strong>{formatMoney(order.totalKopecks)}</strong>
-                <StatusPill tone={orderStatusTone(order.status)}>{orderStatusLabel(order.status)}</StatusPill>
-                <small>{order.paidAt ? `оплачен ${formatDateTime(order.paidAt)}` : orderStatusLabel(order.itemStatus)}</small>
-              </div>,
-            ])}
-          />
+          <>
+            <OrderWorkQueue orders={data.items} />
+            <Table
+              columns={['Заказ', 'Покупка', 'Покупатель', 'Статус / к выплате']}
+              rows={data.items.map((order) => [
+                <div key="order"><strong>№ {order.publicCode || compactCode(order.orderId || order.id)}</strong><small>{formatDateTime(order.createdAt)}</small></div>,
+                <div key="event">
+                  <span>{orderSubjectTitle(order)}</span>
+                  <small>{orderScheduleLabel(order)} · {order.quantity} шт. · {order.ticketTitle || 'билет'}</small>
+                </div>,
+                <div key="buyer"><span>{orderBuyerLabel(order)}</span><small>{orderBuyerContacts(order)}</small></div>,
+                <div key="status" className="order-status-cell">
+                  <strong>{formatMoney(Math.max(0, order.totalKopecks - order.commissionKopecks))}</strong>
+                  <StatusPill tone={orderStatusTone(order.status)}>{orderStatusLabel(order.status)}</StatusPill>
+                  <small>{orderSettlementLabel(order)}</small>
+                </div>,
+              ])}
+            />
+          </>
         ) : null}
       </DataState>
+    </div>
+  );
+}
+
+const ORDER_STATUS_FILTERS = [
+  { value: 'ALL', label: 'Все' },
+  { value: 'RESERVED', label: 'Резерв' },
+  { value: 'PENDING_PAYMENT', label: 'Ждут оплату' },
+  { value: 'CONFIRMED', label: 'Оплачены' },
+  { value: 'FULFILLED', label: 'Выданы' },
+  { value: 'CANCELLED', label: 'Отменены' },
+];
+
+function OrderStatusFilters({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  return (
+    <div className="order-filter-bar" aria-label="Фильтр заказов">
+      {ORDER_STATUS_FILTERS.map((filter) => (
+        <button
+          key={filter.value}
+          type="button"
+          className={value === filter.value ? 'is-active' : ''}
+          onClick={() => onChange(filter.value)}
+        >
+          {filter.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function OrderWorkQueue({ orders }: { orders: SupplierPortalOrderRowDto[] }) {
+  const issueOrders = orders.filter((order) => ['FAILED', 'EXPIRED', 'CANCELLED', 'REFUNDED'].includes(order.status)).slice(0, 4);
+  const pendingOrders = orders.filter((order) => ['RESERVED', 'PENDING_PAYMENT'].includes(order.status)).slice(0, 4);
+  const fulfillmentOrders = orders.filter((order) => ['PAID', 'CONFIRMED'].includes(order.status)).slice(0, 4);
+
+  return (
+    <section className="panel order-work-panel">
+      <div className="panel-header">
+        <div>
+          <h2>Очередь обработки</h2>
+          <small>Короткий рабочий срез без технических id: кому выдать билет, кто еще платит, где нужна проверка.</small>
+        </div>
+      </div>
+      <div className="order-work-grid">
+        <OrderQueueColumn title="К выдаче" hint="оплата есть, билет нужно обслужить" orders={fulfillmentOrders} empty="Нет новых оплаченных позиций" tone="success" />
+        <OrderQueueColumn title="Ожидают оплату" hint="резерв или незавершенный checkout" orders={pendingOrders} empty="Нет зависших оплат" tone="warning" />
+        <OrderQueueColumn title="Проверить" hint="отмена, ошибка, возврат" orders={issueOrders} empty="Проблемных покупок нет" tone="danger" />
+      </div>
+    </section>
+  );
+}
+
+function OrderQueueColumn({
+  title,
+  hint,
+  orders,
+  empty,
+  tone,
+}: {
+  title: string;
+  hint: string;
+  orders: SupplierPortalOrderRowDto[];
+  empty: string;
+  tone: 'success' | 'warning' | 'danger';
+}) {
+  return (
+    <div className={`order-queue-column ${tone}`}>
+      <div className="order-queue-title">
+        <StatusPill tone={tone}>{orders.length}</StatusPill>
+        <div>
+          <strong>{title}</strong>
+          <small>{hint}</small>
+        </div>
+      </div>
+      {orders.length ? (
+        <div className="order-queue-list">
+          {orders.map((order) => <OrderQueueItem key={order.id} order={order} />)}
+        </div>
+      ) : (
+        <span className="order-queue-empty">{empty}</span>
+      )}
+    </div>
+  );
+}
+
+function OrderQueueItem({ order }: { order: SupplierPortalOrderRowDto }) {
+  return (
+    <div className="order-queue-item">
+      <div>
+        <strong>№ {order.publicCode || compactCode(order.orderId || order.id)}</strong>
+        <span>{orderSubjectTitle(order)}</span>
+      </div>
+      <small>{orderActionLabel(order)} · {formatMoney(Math.max(0, order.totalKopecks - order.commissionKopecks))}</small>
     </div>
   );
 }
@@ -1684,8 +1789,42 @@ function orderStatusLabel(value: string): string {
 function orderStatusTone(value: string): 'success' | 'warning' | 'danger' | 'neutral' {
   if (['PAID', 'CONFIRMED', 'FULFILLED'].includes(value)) return 'success';
   if (['PENDING_PAYMENT', 'RESERVED', 'DRAFT'].includes(value)) return 'warning';
-  if (['FAILED', 'EXPIRED'].includes(value)) return 'danger';
+  if (['FAILED', 'EXPIRED', 'CANCELLED', 'REFUNDED'].includes(value)) return 'danger';
   return 'neutral';
+}
+
+function orderSubjectTitle(order: SupplierPortalOrderRowDto): string {
+  return order.eventTitle || order.admissionProductTitle || order.title || 'Покупка';
+}
+
+function orderScheduleLabel(order: SupplierPortalOrderRowDto): string {
+  if (order.subjectType === 'VENUE_ADMISSION') return 'входной билет';
+  return order.startsAt ? formatDateTime(order.startsAt) : 'открытая дата';
+}
+
+function orderBuyerLabel(order: SupplierPortalOrderRowDto): string {
+  return order.buyerName || order.buyerEmail || order.buyerPhone || '-';
+}
+
+function orderBuyerContacts(order: SupplierPortalOrderRowDto): string {
+  return [order.buyerEmail, order.buyerPhone].filter(Boolean).join(' · ') || '-';
+}
+
+function orderSettlementLabel(order: SupplierPortalOrderRowDto): string {
+  const commission = order.commissionKopecks > 0 ? `комиссия ${formatMoney(order.commissionKopecks)}` : 'комиссия не удержана';
+  if (order.paidAt) return `оплачен ${formatDateTime(order.paidAt)} · ${commission}`;
+  return `${orderStatusLabel(order.itemStatus)} · ${commission}`;
+}
+
+function orderActionLabel(order: SupplierPortalOrderRowDto): string {
+  if (['PAID', 'CONFIRMED'].includes(order.status)) return 'подготовьте билет';
+  if (order.status === 'FULFILLED') return 'билет выдан';
+  if (['RESERVED', 'PENDING_PAYMENT'].includes(order.status)) return 'ждем оплату';
+  if (order.status === 'REFUNDED') return 'возврат';
+  if (order.status === 'CANCELLED') return 'отменен';
+  if (order.status === 'EXPIRED') return 'резерв истек';
+  if (order.status === 'FAILED') return 'ошибка оплаты';
+  return orderStatusLabel(order.status);
 }
 
 function payoutStatusLabel(value: string): string {
