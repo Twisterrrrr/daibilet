@@ -12,7 +12,7 @@
 
 ### Проблемы
 - QR из orders API ещё нет.
-
+- Live MSK **BUILD_ID=`meNSWERi0trhkT0vGq8lO`** HEAD `6721c9c`; `/my-day` 200; маркеры в chunks OK.
 ---
 
 ## 2026-08-02 - /my-day: add/remove stop no longer jumps scroll to top
