@@ -45,7 +45,8 @@
 - Client: `city-place-coords` editorial map + `dayRouteItemFromMustSee` fallback (hub → place → editorial).
 
 ### Проблемы
-- Event venues без coords в БД остаются null после DTO-fix (не must-see). MSK deploy + smoke ниже.
+- Event venues без coords в БД остаются null после DTO-fix (не must-see).
+- ~~MSK deploy + smoke~~ → `bee2a2a` **BUILD_ID=`n6C8O0jfVXm2ksCrQ_yKG`**. City hub venues **78/78** with coords; must-see FOUND; catalog `?city=nizhny-novgorod` 30/30 with coords; preset sample 5/5.
 
 ---
 
