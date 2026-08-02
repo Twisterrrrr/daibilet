@@ -1,3 +1,20 @@
+## 2026-08-02 - /my-day: События в «Ещё из каталога» пустые
+
+### Наблюдения
+- Локации/Площадки OK; События - «Нет событий» при выбранном городе (SPB/MSK/NN).
+- Live: `GET /api/public/events?city=sankt-peterburg|moskva|nizhniy-novgorod` → total=0; `city=Санкт-Петербург|Москва|Нижний Новгород` → items>0.
+- Venues API принимает slug и name; catalog `matchesCatalogQuery` сравнивал только `session.city` / `session.destination` (display title).
+
+### Решения
+- Root cause: после city-scoped venues fix DayRoutePanel слал один `city=` (slug||name) и в events - slug не матчился.
+- Client: venues остаются на slug||name; events → `pageCityName` (fallback slug).
+- Backend: `matchesCatalogCity` также принимает `citySlug` / `sourceCitySlug` (slug callers + defense).
+
+### Проблемы
+- MSK deploy (web+api restart) - BUILD_ID ниже после smoke.
+
+---
+
 ## 2026-08-02 - /my-day: Hot Picks covers + OSM map + catalog city warm-fix
 
 ### Наблюдения

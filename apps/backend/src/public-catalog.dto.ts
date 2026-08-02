@@ -716,6 +716,18 @@ async function loadPublicCatalogRows(): Promise<PublicCatalogRow[]> {
   `);
 }
 
+function matchesCatalogCity(session: PublicSessionDto, city: string): boolean {
+  if (session.city === city || session.destination === city) return true;
+  const requested = city.trim().toLowerCase();
+  if (!requested) return true;
+  const citySlug = String(session.citySlug || '').trim().toLowerCase();
+  const sourceCitySlug = String(session.sourceCitySlug || '').trim().toLowerCase();
+  return (
+    (Boolean(citySlug) && citySlug === requested) ||
+    (Boolean(sourceCitySlug) && sourceCitySlug === requested)
+  );
+}
+
 function matchesCatalogQuery(
   session: PublicSessionDto,
   query: PublicCatalogQuery,
@@ -727,13 +739,7 @@ function matchesCatalogQuery(
   }
   const destination = query.destination;
   if (destination && destination !== 'all' && session.destination !== destination) return false;
-  if (
-    !ignore.city &&
-    query.city &&
-    query.city !== 'all' &&
-    session.city !== query.city &&
-    session.destination !== query.city
-  ) {
+  if (!ignore.city && query.city && query.city !== 'all' && !matchesCatalogCity(session, query.city)) {
     return false;
   }
   if (

@@ -641,7 +641,8 @@ function DayRoutePanelInner() {
   const cityHubHref = scopeCitySlug ? `/cities/${encodeURIComponent(scopeCitySlug)}` : '/cities';
 
   // City-scoped catalog lists for on-page searchable selects.
-  // Prefer destination slug, then sourceSlug, then display name (alias-aware API).
+  // Venues: prefer destination slug (alias-aware warm list). Events catalog historically
+  // matched display title only - prefer pageCityName so События is not empty when slug is set.
   // Do NOT fetch global top-500 then exact-match city title - that drops regional rows.
   useEffect(() => {
     if (!pageCityName) {
@@ -655,10 +656,12 @@ function DayRoutePanelInner() {
     const controller = new AbortController();
     setCatalogLoading(true);
     setCatalogError(null);
-    const cityFilter = pageCitySlug || pageCitySourceSlug || pageCityName;
-    const cityQ = encodeURIComponent(cityFilter);
+    const venuesCityFilter = pageCitySlug || pageCitySourceSlug || pageCityName;
+    const eventsCityFilter = pageCityName || pageCitySlug || pageCitySourceSlug;
+    const venuesCityQ = encodeURIComponent(venuesCityFilter);
+    const eventsCityQ = encodeURIComponent(eventsCityFilter);
     const venuesQs = (family: 'location' | 'institution') =>
-      `/api/public/venues?family=${family}&city=${cityQ}&limit=500`;
+      `/api/public/venues?family=${family}&city=${venuesCityQ}&limit=500`;
 
     async function loadCatalog(attempt: number): Promise<void> {
       try {
@@ -671,7 +674,7 @@ function DayRoutePanelInner() {
             .then(async (response) =>
               response.ok ? ((await response.json()) as { venues?: VenueCatalogCard[] }) : null,
             ),
-          fetch(`/api/public/events?city=${cityQ}&limit=80&sort=popular`, {
+          fetch(`/api/public/events?city=${eventsCityQ}&limit=80&sort=popular`, {
             signal: controller.signal,
           }).then(async (response) =>
             response.ok

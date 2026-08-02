@@ -41,6 +41,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MYDAY-IA | `/my-day` catalog-first + text accordion (collapsed) | Критический | ✅ live **BUILD_ID=`MvYEsYnvAH_KMCxXkt2S6`** |
 | UX.MYDAY-ONPAGE | `/my-day` on-page city + searchable Локации/Площадки/События + must-see chips (no catalog nav) | Критический | ✅ `b4fdfd5`+`6345d0a` MSK **BUILD_ID=`q-1BAwZ65koVjH3CunDvi`** |
 | UX.MYDAY-TYPECAT | Type search: city-scoped venues API (не global 500+exact); subtitle без «теплоход»; wizard boat intact | Критический | ✅ `2f692dc`+ live **BUILD_ID=`E6nQnmKCtloz0ynXA2y24`** |
+| UX.MYDAY-EVENTS | «Ещё из каталога» → События: city display name + catalog slug match (`citySlug`/`sourceCitySlug`) | Критический | 🔄 deploy |
 | UX.MYDAY-SOFT | /my-day soft-warn SOFT=10 HARD=15; copy плотный день; bulk stop at soft; readiness→SOFT | Критический | ✅ `bd794f2` MSK **BUILD_ID=`Yqcz6aa-14QvDHs30n306`** `/my-day` 200 |
 | UX.MYDAY-MAX10 | `/my-day` DAY_ROUTE_MAX 8→10; drop redundant intro copy; must-see chip without «в дне» | Критический | ✅ `8499c92` MSK **BUILD_ID=`q-1BAwZ65koVjH3CunDvi`** smoke `/my-day` 200 |
 | UX.MYDAY-FILTERS | Must-see tabs: Главные / Гастро / Музеи / Парки / Храмы (hide empty); bulk respects filter | Критический | ✅ `5ba3e56` MSK **BUILD_ID=`FpLvs9SkQ6VpTMNXw-7ES`** smoke hub NN 5 tabs |
