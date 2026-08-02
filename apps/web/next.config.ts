@@ -6,8 +6,8 @@ const nextConfig: NextConfig = {
   typescript: { ignoreBuildErrors: true },
   productionBrowserSourceMaps: false,
   experimental: {
-    // Soft cap: full default can still race MODULE_NOT_FOUND on sitemaps; 2 is safer than 1 on 8Gi.
-    staticGenerationMaxConcurrency: 2,
+    // Soft cap: Cyrillic event prerender races at 2 on MSK; keep 1 until stable.
+    staticGenerationMaxConcurrency: 1,
     staticGenerationMinPagesPerWorker: 20,
     // Client router cache: avoid refetching dynamic RSC on every back/forward / revisit
     // (default dynamic staleTime is 0 → soft nav always waits on a new flight).
