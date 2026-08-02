@@ -10,7 +10,7 @@
 - Stop cards `owner-v6` не трогали.
 
 ### Проблемы
-- Нет. MSK **BUILD_ID=`dBJJrsme4tAv2WPJl1Yxr`** (`0d4e31f`), SMOKE_OK; chunks: `equal-m` / `1fr_auto_1fr_auto_1fr` / `owner-v6` / `pl-5`; banner gone.
+- Нет. MSK live **BUILD_ID=`5xGhCZWOBDZPUtSjGbI6f`** (HEAD includes `0d4e31f` equal-M); first deploy SMOKE_OK was `dBJJrsme4tAv2WPJl1Yxr`, then parallel stop-card commits redeployed. Chunks: `equal-m` / `1fr_auto_1fr_auto_1fr` / `pl-5`; banner/`max-w-5xl` gone.
 
 ---
 
