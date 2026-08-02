@@ -5,7 +5,7 @@
 - Старый пример «Эрмитаж → локация до афиши» противоречил lock.
 
 ### Решения
-- [catalog-location-venue-canon.md](./catalog-location-venue-canon.md): Kind defaults - музеи/галереи → Venue \MUSEUM_ART_SPACE\; парки/набережные/памятники/улицы → Локации; театры/залы/клубы → Площадки.
+- [catalog-location-venue-canon.md](./catalog-location-venue-canon.md): Kind defaults - музеи/галереи → Venue `MUSEUM_ART_SPACE`; парки/набережные/памятники/улицы → Локации; театры/залы/клубы → Площадки.
 - Project.md pointer обновлён. Антидубль без изменений.
 
 ### Проблемы
