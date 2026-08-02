@@ -1,3 +1,21 @@
+## 2026-08-03 - /locations/stadion-polet soft-404
+
+### Наблюдения
+- Live `https://daibilet.ru/locations/stadion-polet` → HTTP 200 soft-404 («Площадка не найдена»), `noindex`, `NEXT_HTTP_ERROR_FALLBACK;404`.
+- DB: `venue_6252fd6a8bafbd8352a63178` «Стадион "Полёт"» (НН, Чаадаева 16б), kind `SPORT_ACTIVITY_SPACE`, slug был `stadion-polet-{id}`, **pageStatus=NONE**, 0 Event.
+- Search находил площадку (`pageStatus <> HIDDEN`) и вёл на `/locations/...`, а `buildPublicVenuePage` возвращал null: zero-event location escape требует status ≠ NONE|HIDDEN; SPORT не content-place.
+
+### Решения
+- Prod SQL/ensure: `pageStatus=CANDIDATE`, канонический slug `stadion-polet` (legacy id-suffix резолвится по opaque id).
+- `scripts/ensure-stadion-polet-venue.js` для повторяемости.
+- Search href → `publicVenueSlug(...)` (не сырой DB slug с opaque suffix).
+- Revalidate tag `venue-page` + purge nginx HTML cache.
+
+### Проблемы
+- Кэш API (5 мин) и nginx `proxy_cache` держали soft-404 после SQL; без `?refresh=1` / revalidate / purge страница оставалась битой.
+
+---
+
 ## 2026-08-03 - /my-day: starter equal py + right ~30% wider
 
 ### Наблюдения

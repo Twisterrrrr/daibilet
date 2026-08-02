@@ -1,4 +1,5 @@
 import { prisma } from '@daibilet/db';
+import { publicVenueSlug } from './dto.js';
 import { expandSearchQuery } from './search-synonyms.js';
 
 const LANDING_CATEGORY_PATH: Record<string, string> = {
@@ -136,12 +137,13 @@ export async function buildPublicSearchDto(
       kind === 'MONUMENT' ||
       kind === 'ATTRACTION' ||
       kind === 'SPORT_ACTIVITY_SPACE';
+    const slug = publicVenueSlug(row.slug, row.title, row.id) || row.slug;
     push(
       {
         type: 'venue',
         label: row.title,
         sublabel: row.city || '',
-        href: isLocation ? `/locations/${row.slug}` : `/venues/${row.slug}`,
+        href: isLocation ? `/locations/${slug}` : `/venues/${slug}`,
         imageUrl: row.imageUrl || null,
       },
       `venue:${row.id}`,
