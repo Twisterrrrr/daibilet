@@ -8,7 +8,7 @@
 - `hotPicks` убран из `DayRouteAccordionId`; exclusive accordion остаётся для mustSee / text / catalog / matches.
 
 ### Проблемы
-- Нет (UI unwrap + deploy).
+- Live MSK **BUILD_ID=`h6qtQ4t6dt2pUCV2y5kK3`** (HEAD `adac304`); `/my-day` 200; chunks без `data-day-hot-picks-accordion`. Web кратковременно упал на hub warm - auto-restart OK.
 
 ---
 

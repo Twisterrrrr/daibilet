@@ -65,7 +65,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MYDAY-BOAT | Канон добора теплохода: Pier→Route→Slot→pin (`eventId`+time); share только после слота; SPB MVP wizard | Критический | ✅ `0212c13` MSK **BUILD_ID=`EdAk08KxqEiFe8Ow1Qg3i`** |
 | UX.NN-COORDS | НН day-route coords: DTO venueRowsByIds + city hub merge published + city filter aliases + editorial fallback | Критический | ✅ `bee2a2a` MSK **BUILD_ID=`n6C8O0jfVXm2ksCrQ_yKG`** city hub 78/78 coords; preset stops 5/5 |
 | UX.MYDAY-COMM | Canon planner+checklist (не swipe): readiness %, chips, buy handoff, recommend carousel, FAB, free-window | Критический | ✅ 4e45f48+ soft-cap follow-ups MSK **BUILD_ID=Yqcz6aa-14QvDHs30n306** |
-| UX.MYDAY-HOT | Hot Picks «Выбор Дайбилет»: tabs Советы/Культура/Еда; ≤6; dual CTA affiche/open_date/free; **always-visible** (не accordion) | Критический | ✅ unwrap accordion MSK deploy follow-up |
+| UX.MYDAY-HOT | Hot Picks «Выбор Дайбилет»: tabs Советы/Культура/Еда; ≤6; dual CTA affiche/open_date/free; **always-visible** (не accordion) | Критический | ✅ `adac304` MSK **BUILD_ID=`h6qtQ4t6dt2pUCV2y5kK3`** `/my-day` 200 |
 | UX.MYDAY-HOT-IMG | Hot Picks covers NN: editorial image lookup + classic 6 GenerateImage; photo-bg cards; catalog city warm-fix; order must-see→своё→hot | Критический | ✅ `6c24691` MSK **BUILD_ID=`p_VZM1zRvVXb6MQNYt_yt`** |
 | UX.MYDAY-OSM | `/my-day` Leaflet OSM map: numbered markers + polyline; Оптимизировать у карты; Яндекс external | Критический | ✅ `6c24691` MSK **BUILD_ID=`p_VZM1zRvVXb6MQNYt_yt`** |
 | UX.MYDAY-TICKET-URL | `/my-day` ticket CTA: never `/events/{venueSlug}`; sanitize + Hot Pick venue program fallback | Критический | ✅ `101d5b8` MSK **BUILD_ID=`ixSmgk9DbvgZ4YYbGLgmY`** `/my-day` 200; venues/niko1560 OK |
