@@ -13,6 +13,20 @@
 
 ---
 
+## 2026-08-02 - /my-day: stop cards denser band (owner «еще уже»)
+
+### Наблюдения
+- Owner: «далее ~» отдельной строкой внизу + actions не в top-right - карточка всё ещё высокая.
+
+### Решения
+- Grid/list: одна плотная полоса - thumb+номер | title+meta(вкл. далее) | maps/X top-right; chevron у thumb.
+- Без нижней строки segment / actions bar.
+
+### Проблемы
+- Deploy BUILD_ID - после MSK (дождаться/исключить parallel locations build).
+
+---
+
 ## 2026-08-02 - /my-day: stop view toggle Сетка | Список
 
 ### Наблюдения

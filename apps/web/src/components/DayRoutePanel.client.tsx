@@ -2312,7 +2312,7 @@ function DayRoutePanelInner() {
           <ul
             className={
               stopViewMode === 'grid'
-                ? 'mt-3 grid w-full grid-cols-1 items-stretch gap-2 sm:grid-cols-2 lg:grid-cols-3'
+                ? 'mt-3 grid w-full grid-cols-1 items-stretch gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
                 : 'mt-3 grid w-full grid-cols-1 items-start gap-0'
             }
             data-day-plan-list
@@ -3400,6 +3400,7 @@ function DayRouteVenueCard({
     venue.note,
     placeLine,
     !hasCoords ? 'Нет координат' : null,
+    segmentHint ? `далее ~ ${segmentHint}` : null,
   ].filter(Boolean) as string[];
   const metaLine = metaParts.join(' · ');
 
@@ -3415,24 +3416,24 @@ function DayRouteVenueCard({
   );
 
   const moveControls = (
-    <div className="flex shrink-0 items-center gap-0">
+    <div className="flex shrink-0 flex-col items-center leading-none">
       <button
         type="button"
         aria-label="Выше"
         disabled={index === 0}
         onClick={onMoveUp}
-        className="rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+        className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
       >
-        <ChevronUp className="h-3.5 w-3.5" />
+        <ChevronUp className="h-3 w-3" />
       </button>
       <button
         type="button"
         aria-label="Ниже"
         disabled={index >= total - 1}
         onClick={onMoveDown}
-        className="rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+        className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
       >
-        <ChevronDown className="h-3.5 w-3.5" />
+        <ChevronDown className="h-3 w-3" />
       </button>
     </div>
   );
@@ -3447,7 +3448,7 @@ function DayRouteVenueCard({
           aria-label="Открыть в Яндекс.Картах"
           title="Открыть в Яндекс.Картах"
           data-day-stop-maps
-          className="inline-flex h-7 w-7 items-center justify-center rounded-full text-sky-600 hover:bg-sky-50"
+          className="inline-flex h-6 w-6 items-center justify-center rounded-full text-sky-600 hover:bg-sky-50"
         >
           <Navigation className="h-3.5 w-3.5" />
         </a>
@@ -3456,7 +3457,7 @@ function DayRouteVenueCard({
         type="button"
         aria-label="Удалить точку"
         onClick={onRemove}
-        className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+        className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
       >
         <X className="h-3.5 w-3.5" />
       </button>
@@ -3475,29 +3476,34 @@ function DayRouteVenueCard({
         data-day-stop-focused={focused ? '1' : undefined}
       >
         <div
-          className={`flex w-full items-start gap-2 py-2 ${
+          className={`flex w-full items-center gap-1.5 py-1.5 ${
             focused ? 'rounded-md bg-emerald-50/80 px-1' : ''
           }`}
         >
           <span
-            className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white"
+            className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white"
             aria-label={`Точка ${index + 1}`}
           >
             {index + 1}
           </span>
+          {moveControls}
           <div className="min-w-0 flex-1">
-            <p className="truncate text-[13px] leading-snug">{titleNode}</p>
+            <div className="flex items-start gap-1">
+              <p className="min-w-0 flex-1 truncate text-[13px] leading-tight">{titleNode}</p>
+              {actionButtons}
+            </div>
             {metaLine ? (
               <p
-                className={`mt-0.5 truncate text-[11px] leading-snug ${
+                className={`mt-0.5 truncate text-[11px] leading-tight ${
                   !hasCoords ? 'text-amber-700' : 'text-slate-500'
                 }`}
+                data-day-segment-hint={segmentHint ? '1' : undefined}
               >
                 {metaLine}
               </p>
             ) : null}
             {ticketUrl ? (
-              <div className="mt-1 flex flex-wrap items-center gap-1">
+              <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
                 <a
                   href={ticketUrl}
                   target="_blank"
@@ -3518,14 +3524,7 @@ function DayRouteVenueCard({
                 </button>
               </div>
             ) : null}
-            {segmentHint ? (
-              <p className="mt-0.5 text-[11px] text-slate-400" data-day-segment-hint>
-                далее ~ {segmentHint}
-              </p>
-            ) : null}
           </div>
-          {moveControls}
-          {actionButtons}
         </div>
       </li>
     );
@@ -3533,7 +3532,7 @@ function DayRouteVenueCard({
 
   return (
     <li
-      className="flex h-full w-full scroll-mt-4 flex-col"
+      className="w-full scroll-mt-4"
       data-day-plan-stop={venue.id}
       data-day-stop-variant="grid"
       data-ticket-bought={bought ? '1' : '0'}
@@ -3542,76 +3541,64 @@ function DayRouteVenueCard({
       data-day-stop-focused={focused ? '1' : undefined}
     >
       <div
-        className={`flex h-full flex-col rounded-xl border bg-white p-2.5 ${
+        className={`flex w-full items-center gap-1.5 rounded-lg border bg-white px-1.5 py-1.5 ${
           focused ? 'border-emerald-400 ring-1 ring-emerald-200' : 'border-slate-200'
         }`}
       >
-        <div className="flex items-start gap-2">
-          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-            {venue.imageUrl ? (
-              <SafeImage src={venue.imageUrl} alt="" fill sizes="3.5rem" className="object-cover" />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-slate-400">
-                <MapPin className="h-5 w-5" />
-              </div>
-            )}
-            <span
-              className="absolute left-1 top-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-900/90 text-[10px] font-bold text-white"
-              aria-label={`Точка ${index + 1}`}
-            >
-              {index + 1}
-            </span>
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="line-clamp-2 text-[13px] leading-snug">{titleNode}</p>
-            {metaLine ? (
-              <p
-                className={`mt-1 line-clamp-2 text-[11px] leading-snug ${
-                  !hasCoords ? 'text-amber-700' : 'text-slate-500'
-                }`}
-              >
-                {metaLine}
-              </p>
-            ) : null}
-          </div>
+        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-md bg-slate-100">
+          {venue.imageUrl ? (
+            <SafeImage src={venue.imageUrl} alt="" fill sizes="2.5rem" className="object-cover" />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-slate-400">
+              <MapPin className="h-4 w-4" />
+            </div>
+          )}
+          <span
+            className="absolute left-0.5 top-0.5 inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-900/90 text-[9px] font-bold text-white"
+            aria-label={`Точка ${index + 1}`}
+          >
+            {index + 1}
+          </span>
         </div>
-        <div className="mt-auto flex items-center justify-between gap-1 pt-2">
-          {moveControls}
-          {actionButtons}
-        </div>
-        {ticketUrl ? (
-          <div className="mt-1.5 flex flex-wrap items-center gap-1">
-            <a
-              href={ticketUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              data-day-buy-ticket
-              onClick={() => onBuyClick(ticketUrl)}
-              className="inline-flex min-h-6 items-center justify-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[11px] font-bold text-white hover:bg-amber-600"
-            >
-              <Ticket className="h-3 w-3" />
-              {buyCtaLabel}
-            </a>
-            <button
-              type="button"
-              onClick={onToggleBought}
-              data-day-ticket-bought
-              className={`inline-flex min-h-6 items-center justify-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${
-                bought
-                  ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
-                  : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+        {moveControls}
+        <div className="min-w-0 flex-1">
+          <div className="flex items-start gap-1">
+            <p className="min-w-0 flex-1 truncate text-[13px] leading-tight">{titleNode}</p>
+            {actionButtons}
+          </div>
+          {metaLine ? (
+            <p
+              className={`mt-0.5 line-clamp-2 text-[11px] leading-tight ${
+                !hasCoords ? 'text-amber-700' : 'text-slate-500'
               }`}
+              data-day-segment-hint={segmentHint ? '1' : undefined}
             >
-              {bought ? <Check className="h-3 w-3" /> : null}
-              {bought ? 'Билет отмечен' : 'Отметить'}
-            </button>
-          </div>
-        ) : null}
-        {segmentHint ? (
-          <p className="mt-1 text-[11px] leading-tight text-slate-400" data-day-segment-hint>
-            далее ~ {segmentHint}
-          </p>
-        ) : null}
+              {metaLine}
+            </p>
+          ) : null}
+          {ticketUrl ? (
+            <div className="mt-0.5 flex flex-wrap items-center gap-1">
+              <a
+                href={ticketUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-day-buy-ticket
+                onClick={() => onBuyClick(ticketUrl)}
+                className="text-[11px] font-semibold text-amber-700 underline-offset-2 hover:underline"
+              >
+                {buyCtaLabel}
+              </a>
+              <button
+                type="button"
+                onClick={onToggleBought}
+                data-day-ticket-bought
+                className="text-[11px] font-medium text-slate-600 underline-offset-2 hover:underline"
+              >
+                {bought ? 'Билет отмечен' : 'Отметить'}
+              </button>
+            </div>
+          ) : null}
+        </div>
       </div>
     </li>
   );
