@@ -35,7 +35,7 @@
 | UX.MYDAY-SHORT | Short share URL `/d/{code}` → redirect `/my-day?city=&items=`; POST `/api/day-route/share`; fallback long URL | Критический | 🔄 |
 | UX.MYDAY-PRINT | Маршрутный лист: print CTA «Сохранить» + `@media print` sheet (город/дата, точки, км+ETA), chrome hide | Критический | ✅ `62564ca` → label shorten в SHARE-UX |
 | UX.MYDAY-BOAT | Канон добора теплохода: Pier→Route→Slot→pin (`eventId`+time); share только после слота; SPB MVP wizard | Критический | ✅ `0212c13` MSK **BUILD_ID=`EdAk08KxqEiFe8Ow1Qg3i`** |
-| UX.NN-COORDS | НН day-route coords: DTO venueRowsByIds + city hub merge published + city filter aliases + editorial fallback | Критический | 🔄 |
+| UX.NN-COORDS | НН day-route coords: DTO venueRowsByIds + city hub merge published + city filter aliases + editorial fallback | Критический | ✅ `bee2a2a` MSK **BUILD_ID=`n6C8O0jfVXm2ksCrQ_yKG`** city hub 78/78 coords; preset stops 5/5 |
 
 ---
 
