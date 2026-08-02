@@ -13,13 +13,13 @@ type Props = {
 };
 
 /**
- * 2-line (or N-line) blurb with «ещё» / «свернуть» when text overflows the clamp.
- * Avoids dead-end «…» with nowhere to finish reading.
+ * Blurb with optional clamp + «ещё» / «свернуть» when text overflows.
+ * Default: full text on mobile, 2-line clamp from `sm` up.
  */
 export function ExpandableBlurb({
   text,
   className = '',
-  clampClassName = 'line-clamp-2',
+  clampClassName = 'sm:line-clamp-2',
   moreLabel = 'ещё',
   lessLabel = 'свернуть',
   buttonClassName = 'mt-0.5 text-xs font-semibold text-slate-700 underline-offset-2 hover:underline',

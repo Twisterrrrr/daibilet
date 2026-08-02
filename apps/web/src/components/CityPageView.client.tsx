@@ -1326,7 +1326,7 @@ function CitySightsMustSeeList({
                     <ExpandableBlurb
                       text={blurb}
                       className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
-                      clampClassName="line-clamp-2"
+                      clampClassName="sm:line-clamp-2"
                       buttonClassName={`mt-0.5 text-xs font-semibold underline-offset-2 hover:underline ${
                         editorial ? 'text-zinc-700' : 'text-primary-700'
                       }`}

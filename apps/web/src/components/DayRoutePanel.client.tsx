@@ -1726,6 +1726,7 @@ function DayRoutePanelInner() {
   const matchesOpen = openPanel === 'matches';
   const showMustSeeAccordion = Boolean(hasPageCity && (mustSeeResolved.length > 0 || (!catalogLoading && pageCitySlug)));
   const showHotPicks = Boolean(hasPageCity && (hotPickCards.length > 0 || hotPickTabIds.length > 0));
+  const isEmptyRoute = route.venues.length === 0;
   const hasMapStops = mapStops.length > 0;
   const focusedVenue = focusedStopId
     ? route.venues.find((v) => v.id === focusedStopId) ?? null
@@ -1750,6 +1751,75 @@ function DayRoutePanelInner() {
 
   function stopExternalMapsUrl(lat: number, lng: number) {
     return `https://yandex.ru/maps/?pt=${lng},${lat}&z=17&l=map`;
+  }
+
+  /** City + place search. Empty plan: top starter. Non-empty: secondary under Hot Picks. */
+  function renderUnifiedSearch(asStarter: boolean) {
+    return (
+      <section
+        className="mt-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4"
+        ref={unifiedSearchRef}
+        data-day-unified-search
+        data-day-starter={asStarter ? '1' : undefined}
+      >
+        {asStarter ? (
+          <div className="mb-3 text-center" data-day-plan-starter>
+            <Route className="mx-auto h-8 w-8 text-slate-400" aria-hidden />
+            <p className="mt-2 text-sm font-medium leading-snug text-slate-700 sm:text-[15px]">
+              Выберите город и минимум {DAY_ROUTE_MIN} точки, чтобы создать маршрут
+            </p>
+          </div>
+        ) : null}
+        <div className="max-w-md" data-day-city-picker>
+          <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            Город
+          </label>
+          <CityPicker
+            cities={destinations}
+            value={selectedCity?.cityValue || 'all'}
+            onChange={(name) => {
+              selectedCity?.setCity(name);
+              if (name !== 'all') setCityInput(name);
+            }}
+            allLabel="Выберите город"
+            variant="hero"
+            className="w-full"
+          />
+        </div>
+        {!hasPageCity ? (
+          <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            Сначала выберите город - появятся места, музеи и события.
+          </p>
+        ) : (
+          <div className="mt-3">
+            <DayRouteSearchSelect
+              label="Поиск места"
+              placeholder="Нет в выборе выше? Найдите здесь"
+              emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Ничего не найдено'}
+              loading={catalogLoading}
+              disabled={atMax}
+              options={unifiedSearchOptions}
+              onPick={pickUnifiedSearch}
+            />
+            {catalogError ? (
+              <p className="mt-2 text-xs font-medium text-rose-700" role="status">
+                {catalogError}
+              </p>
+            ) : null}
+            <p className="mt-2 text-[13px] text-slate-500">
+              или{' '}
+              <button
+                type="button"
+                onClick={openTextForm}
+                className="font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
+              >
+                добавь своё место
+              </button>
+            </p>
+          </div>
+        )}
+      </section>
+    );
   }
 
   function renderMapToolbar(compact = false) {
@@ -1967,6 +2037,9 @@ function DayRoutePanelInner() {
           ) : null}
         </>
       ) : null}
+
+      {/* Empty plan: city+search starter is the first content block under H1 */}
+      {isEmptyRoute ? renderUnifiedSearch(true) : null}
 
       {/* 1. Route list - always expanded */}
       {!route.venues.length ? null : (
@@ -2250,7 +2323,7 @@ function DayRoutePanelInner() {
                           <span className="min-w-0 flex-1">
                             <span className="block truncate text-xs font-semibold">{place.name}</span>
                             {hook ? (
-                              <span className="mt-0.5 block line-clamp-1 text-[11px] leading-snug text-slate-500">
+                              <span className="mt-0.5 block text-[11px] leading-snug text-slate-500 sm:line-clamp-2">
                                 {hook}
                               </span>
                             ) : null}
@@ -2487,10 +2560,7 @@ function DayRoutePanelInner() {
                       <div className="absolute inset-x-0 bottom-0 p-3.5">
                         <p className="line-clamp-2 text-sm font-bold text-white drop-shadow">{card.title}</p>
                         {card.hook ? (
-                          <p
-                            className="mt-1 line-clamp-2 text-[12px] leading-snug text-white/80"
-                            title={card.hook}
-                          >
+                          <p className="mt-1 text-[12px] leading-snug text-white/80 sm:line-clamp-2">
                             {card.hook}
                           </p>
                         ) : null}
@@ -2536,69 +2606,8 @@ function DayRoutePanelInner() {
         </section>
       ) : null}
 
-      {/* Search + city - primary starter when plan is empty */}
-      <section
-        className="mt-3 rounded-2xl border border-slate-200 bg-white p-3.5 sm:p-4"
-        ref={unifiedSearchRef}
-        data-day-unified-search
-      >
-        {!route.venues.length ? (
-          <div className="mb-3 text-center" data-day-plan-starter>
-            <Route className="mx-auto h-8 w-8 text-slate-400" aria-hidden />
-            <p className="mt-2 text-sm font-medium leading-snug text-slate-700 sm:text-[15px]">
-              Выберите город и минимум {DAY_ROUTE_MIN} точки, чтобы создать маршрут
-            </p>
-          </div>
-        ) : null}
-        <div className="max-w-md" data-day-city-picker>
-          <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-            Город
-          </label>
-          <CityPicker
-            cities={destinations}
-            value={selectedCity?.cityValue || 'all'}
-            onChange={(name) => {
-              selectedCity?.setCity(name);
-              if (name !== 'all') setCityInput(name);
-            }}
-            allLabel="Выберите город"
-            variant="hero"
-            className="w-full"
-          />
-        </div>
-        {!hasPageCity ? (
-          <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            Сначала выберите город - появятся места, музеи и события.
-          </p>
-        ) : (
-          <div className="mt-3">
-            <DayRouteSearchSelect
-              label="Поиск места"
-              placeholder="Нет в выборе выше? Найдите здесь"
-              emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Ничего не найдено'}
-              loading={catalogLoading}
-              disabled={atMax}
-              options={unifiedSearchOptions}
-              onPick={pickUnifiedSearch}
-            />
-            {catalogError ? (
-              <p className="mt-2 text-xs font-medium text-rose-700" role="status">
-                {catalogError}
-              </p>
-            ) : null}
-            <p className="mt-2 text-[13px] text-slate-500">
-              или{' '}
-              <button
-                type="button"
-                onClick={openTextForm}
-                className="font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
-              >
-                добавь своё место
-              </button>
-            </p>
-          </div>
-        )}
-      </section>
+      {/* Non-empty plan: city+search stays secondary under Hot Picks */}
+      {!isEmptyRoute ? renderUnifiedSearch(false) : null}
 
       {/* Accordion: advanced catalog + boat */}
       <div

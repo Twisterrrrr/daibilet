@@ -1,3 +1,20 @@
+## 2026-08-02 - /my-day: starter сверху + blurbs целиком на мобилке
+
+### Наблюдения
+- Owner: empty starter (город/поиск) должен быть **верхним** блоком под H1, не mid-page под Hot Picks / «Главные места».
+- Owner: на мобилке контекст карточек мест (Кремль, Чкаловская и т.п.) - **целиком**, без `…` от line-clamp.
+
+### Решения
+- `DayRoutePanel`: при пустом плане `renderUnifiedSearch(true)` сразу после header (`data-day-starter=1`); при непустом - secondary под Hot Picks.
+- Must-see hooks + Hot Picks hooks: полный текст на `<sm`, `sm:line-clamp-2` на desktop.
+- `ExpandableBlurb` / city hub: default clamp `sm:line-clamp-2` (mobile full).
+- Desktop split / stop-card sizes не трогали.
+
+### Проблемы
+- Deploy/BUILD_ID - после MSK web deploy.
+
+---
+
 ## 2026-08-02 - /my-day: откат desktop split, mobile map оставлен
 
 ### Наблюдения
