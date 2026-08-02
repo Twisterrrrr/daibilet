@@ -1,3 +1,20 @@
+## 2026-08-03 - /my-day: starter left center + right stretch + stable geometry
+
+### Наблюдения
+- Owner furious: left copy stuck at far left of left half; right stack not vertically centered; card collapses when !hasPageCity (yellow notice instead of search).
+- Mobile A approved - не трогать.
+
+### Решения
+- Grid: `lg:items-stretch` + equal px/gap.
+- Left: `lg:flex lg:h-full lg:items-center lg:justify-center` (copy centered in left half).
+- Right: `lg:h-full lg:min-h-[7.75rem] lg:justify-center lg:self-stretch`.
+- Always render disabled search + flush «или добавь…» when !hasPageCity (`data-day-starter-geometry="stable"`); no yellow card collapse.
+
+### Проблемы
+- Нет (BUILD_ID после MSK deploy).
+
+---
+
 ## 2026-08-03 - /my-day: ultrawide starter equal gap + right column balance
 
 ### Наблюдения

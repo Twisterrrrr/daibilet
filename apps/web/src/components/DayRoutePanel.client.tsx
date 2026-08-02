@@ -1944,29 +1944,32 @@ function DayRoutePanelInner() {
           data-day-starter-inset="equal-gap"
           data-day-starter-pad="sym"
           data-day-starter-density="compact"
+          data-day-starter-geometry="stable"
         >
           <div
-            className="flex w-full flex-col max-lg:mx-auto max-lg:max-w-md lg:grid lg:grid-cols-2 lg:items-center lg:gap-8 lg:px-8 xl:gap-12 xl:px-12 2xl:gap-20 2xl:px-20"
+            className="flex w-full flex-col max-lg:mx-auto max-lg:max-w-md lg:grid lg:grid-cols-2 lg:items-stretch lg:gap-8 lg:px-8 xl:gap-12 xl:px-12 2xl:gap-20 2xl:px-20"
             data-day-plan-starter
           >
-            <div className="min-w-0 lg:self-center">
-              <div className="flex items-center gap-2.5">
-                <Route className="h-6 w-6 shrink-0 text-slate-400" aria-hidden />
-                <p className="text-base font-bold leading-snug text-slate-900 sm:text-lg">
-                  Собери свой день
+            <div className="min-w-0 lg:flex lg:h-full lg:items-center lg:justify-center">
+              <div className="max-lg:w-full">
+                <div className="flex items-center gap-2.5">
+                  <Route className="h-6 w-6 shrink-0 text-slate-400" aria-hidden />
+                  <p className="text-base font-bold leading-snug text-slate-900 sm:text-lg">
+                    Собери свой день
+                  </p>
+                </div>
+                <p className="mt-1.5 text-[12px] font-normal leading-snug text-slate-500 sm:max-lg:whitespace-nowrap sm:text-[13px] lg:hidden">
+                  Выбери город и минимум {DAY_ROUTE_MIN} точки для составления маршрута
+                </p>
+                <p className="mt-1.5 hidden text-[13px] font-normal leading-snug text-slate-500 lg:block">
+                  Выбери город и минимум {DAY_ROUTE_MIN} точки
+                  <br />
+                  для составления маршрута
                 </p>
               </div>
-              <p className="mt-1.5 text-[12px] font-normal leading-snug text-slate-500 sm:max-lg:whitespace-nowrap sm:text-[13px] lg:hidden">
-                Выбери город и минимум {DAY_ROUTE_MIN} точки для составления маршрута
-              </p>
-              <p className="mt-1.5 hidden text-[13px] font-normal leading-snug text-slate-500 lg:block">
-                Выбери город и минимум {DAY_ROUTE_MIN} точки
-                <br />
-                для составления маршрута
-              </p>
             </div>
             <div
-              className="mt-3 flex w-full flex-col gap-2.5 lg:mt-0 lg:self-center"
+              className="mt-3 flex w-full flex-col gap-2.5 lg:mt-0 lg:h-full lg:min-h-[7.75rem] lg:justify-center lg:self-stretch"
               data-day-city-search-stack
             >
               <div data-day-city-picker className="w-full text-left">
@@ -1982,40 +1985,40 @@ function DayRoutePanelInner() {
                   className="w-full"
                 />
               </div>
-              {hasPageCity ? (
-                <div className="w-full text-left">
-                  <DayRouteSearchSelect
-                    label="Поиск"
-                    hideLabel
-                    placeholder="Найти место или событие"
-                    emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Ничего не найдено'}
-                    loading={catalogLoading}
-                    disabled={atMax}
-                    options={unifiedSearchOptions}
-                    onPick={pickUnifiedSearch}
-                    onQueryChange={setUnifiedSearchQuery}
-                  />
-                  {catalogError ? (
-                    <p className="mt-1.5 pl-0 text-left text-xs font-medium text-rose-700" role="status">
-                      {catalogError}
-                    </p>
-                  ) : null}
-                  <p className="mt-1.5 block pl-0 text-left text-[12px] leading-snug text-slate-500">
-                    или{' '}
-                    <button
-                      type="button"
-                      onClick={openTextForm}
-                      className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
-                    >
-                      добавь своё место
-                    </button>
+              <div className="w-full text-left">
+                <DayRouteSearchSelect
+                  label="Поиск"
+                  hideLabel
+                  placeholder="Найти место или событие"
+                  emptyText={
+                    !hasPageCity
+                      ? 'Сначала выберите город'
+                      : catalogLoading
+                        ? 'Загружаем…'
+                        : catalogError || 'Ничего не найдено'
+                  }
+                  loading={hasPageCity ? catalogLoading : false}
+                  disabled={!hasPageCity || atMax}
+                  options={hasPageCity ? unifiedSearchOptions : []}
+                  onPick={pickUnifiedSearch}
+                  onQueryChange={setUnifiedSearchQuery}
+                />
+                {hasPageCity && catalogError ? (
+                  <p className="mt-1.5 pl-0 text-left text-xs font-medium text-rose-700" role="status">
+                    {catalogError}
                   </p>
-                </div>
-              ) : (
-                <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                  Сначала выберите город - появятся места, музеи и события.
+                ) : null}
+                <p className="mt-1.5 block pl-0 text-left text-[12px] leading-snug text-slate-500">
+                  или{' '}
+                  <button
+                    type="button"
+                    onClick={openTextForm}
+                    className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
+                  >
+                    добавь своё место
+                  </button>
                 </p>
-              )}
+              </div>
             </div>
           </div>
         </section>
