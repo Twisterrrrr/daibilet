@@ -28,7 +28,7 @@
 | UX.MYDAY-F | Мой день: filters + auto-pick + top-up (product next) | Высокий | ⏳ поверх MOB канона |
 | UX.MYDAY-IA | `/my-day` catalog-first + text accordion (collapsed) | Критический | ✅ live **BUILD_ID=`MvYEsYnvAH_KMCxXkt2S6`** |
 | UX.MYDAY-ONPAGE | `/my-day` on-page city + searchable Локации/Площадки/События + must-see chips (no catalog nav) | Критический | ✅ `b4fdfd5`+`6345d0a` MSK **BUILD_ID=`q-1BAwZ65koVjH3CunDvi`** |
-| UX.MYDAY-MAX10 | `/my-day` DAY_ROUTE_MAX 8→10; drop redundant intro copy; must-see chip without «в дне» | Критический | 🔄 |
+| UX.MYDAY-MAX10 | `/my-day` DAY_ROUTE_MAX 8→10; drop redundant intro copy; must-see chip without «в дне» | Критический | ✅ `8499c92` MSK **BUILD_ID=`q-1BAwZ65koVjH3CunDvi`** smoke `/my-day` 200 |
 
 ---
 
