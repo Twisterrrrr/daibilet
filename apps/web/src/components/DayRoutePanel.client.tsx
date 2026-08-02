@@ -1885,11 +1885,12 @@ function DayRoutePanelInner() {
     if (asStarter) {
       return (
         <section
-          className="mt-3 rounded-2xl border border-slate-200 bg-white px-3 py-5 sm:mt-5 sm:px-6 sm:py-8 lg:mt-6 lg:px-8 lg:py-10"
+          className="mt-3 rounded-2xl border border-slate-200 bg-white px-3 pt-5 pb-3 sm:mt-5 sm:px-6 sm:pt-8 sm:pb-4 lg:mt-6 lg:px-8 lg:pt-10 lg:pb-5"
           ref={unifiedSearchRef}
           data-day-unified-search
           data-day-starter="1"
           data-day-starter-variant="a"
+          data-day-starter-pad="sym"
         >
           <div
             className="mx-auto flex w-full max-w-md flex-col lg:max-w-xl lg:items-center lg:text-center"
