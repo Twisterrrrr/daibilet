@@ -53,8 +53,8 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.NN-COORDS | НН day-route coords: DTO venueRowsByIds + city hub merge published + city filter aliases + editorial fallback | Критический | ✅ `bee2a2a` MSK **BUILD_ID=`n6C8O0jfVXm2ksCrQ_yKG`** city hub 78/78 coords; preset stops 5/5 |
 | UX.MYDAY-COMM | Canon planner+checklist (не swipe): readiness %, chips, buy handoff, recommend carousel, FAB, free-window | Критический | ✅ 4e45f48+ soft-cap follow-ups MSK **BUILD_ID=Yqcz6aa-14QvDHs30n306** |
 | UX.MYDAY-HOT | Hot Picks «Выбор Дайбилет»: tabs Советы/Культура/Еда; ≤6; dual CTA affiche/open_date/free; timeline Утро/День/Вечер | Критический | ✅ `682d356`+ MSK **BUILD_ID=`E6nQnmKCtloz0ynXA2y24`** `/my-day` 200 |
-| UX.MYDAY-HOT-IMG | Hot Picks covers NN: editorial image lookup + classic 6 GenerateImage; photo-bg cards; catalog city warm-fix; order must-see→своё→hot | Критический | 🔄 ship |
-| UX.MYDAY-OSM | `/my-day` Leaflet OSM map: numbered markers + polyline; Оптимизировать у карты; Яндекс external | Критический | 🔄 ship |
+| UX.MYDAY-HOT-IMG | Hot Picks covers NN: editorial image lookup + classic 6 GenerateImage; photo-bg cards; catalog city warm-fix; order must-see→своё→hot | Критический | ✅ `6c24691` MSK **BUILD_ID=`p_VZM1zRvVXb6MQNYt_yt`** |
+| UX.MYDAY-OSM | `/my-day` Leaflet OSM map: numbered markers + polyline; Оптимизировать у карты; Яндекс external | Критический | ✅ `6c24691` MSK **BUILD_ID=`p_VZM1zRvVXb6MQNYt_yt`** |
 | UX.MYDAY-HDR | `/my-day` header: `N точек из 10` + unpaid билеты; H1 предложный; без %/окно/Яндекс/дубль Точки | Критический | ✅ `495c8f0` MSK **BUILD_ID=`_gsuIDWy0smbTa0LMOzng`** `/my-day` 200 |
 | UX.MYDAY-P4 | Free-window upsell polish (multi-gap / ETA) | Средний | ⏳ partial MVP in COMM |
 | UX.MYDAY-P5 | hookFact + mini description on day cards | Средний | ✅ 3f9a70e MSK **BUILD_ID=E6nQnmKCtloz0ynXA2y24** Hot Picks cover+hook; must-see mini-cards; free-window; search thumb+hook |
