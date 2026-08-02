@@ -2254,20 +2254,18 @@ function DayRoutePanelInner() {
         ) : null}
       </div>
 
-      {/* Hot Picks - always expanded (not accordion) */}
+      {/* Hot Picks - always expanded (no accordion chrome) */}
       {showHotPicks ? (
         <section
-          className="mt-3 rounded-2xl border border-slate-200 bg-white"
+          className="mt-4"
           data-day-hot-picks
           data-day-recommend-carousel
         >
-          <div className="border-b border-slate-100 px-4 py-3.5 sm:px-5">
-            <h2 className="text-sm font-semibold text-slate-900">Выбор Дайбилет</h2>
-            <p className="mt-0.5 text-xs text-slate-500">
-              До {HOT_PICKS_MAX} мест · кураторская подборка
-            </p>
+          <div className="px-0.5">
+            <h3 className="text-sm font-semibold text-slate-900">Выбор Дайбилет</h3>
+            <p className="mt-0.5 text-xs text-slate-500">Рекомендации сервиса</p>
           </div>
-          <div id="day-hot-picks-body" className="px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+          <div id="day-hot-picks-body" className="pt-3">
             <div
               className="flex gap-1 overflow-x-auto pb-1"
               role="tablist"
@@ -2295,11 +2293,16 @@ function DayRoutePanelInner() {
               })}
             </div>
             {hotPickCards.length ? (
-              <div className="-mx-4 mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
+              <div className="mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1">
                 {hotPickCards.map((card) => {
                   const inRoute =
                     isInDayRoute(card.item.id, route) ||
                     Boolean(card.item.slug && isInDayRoute(card.item.slug, route));
+                  const pinFallback = (
+                    <div className="absolute inset-0 flex items-center justify-center bg-slate-200 text-slate-400">
+                      <MapPin className="h-7 w-7" />
+                    </div>
+                  );
                   return (
                     <article
                       key={card.key}
@@ -2314,11 +2317,10 @@ function DayRoutePanelInner() {
                           fill
                           sizes="78vw"
                           className="object-cover"
+                          fallback={pinFallback}
                         />
                       ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-slate-200 text-slate-400">
-                          <MapPin className="h-7 w-7" />
-                        </div>
+                        pinFallback
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/35 to-slate-950/10" />
                       <div className="absolute inset-x-0 top-0 flex items-start justify-between gap-2 p-3">

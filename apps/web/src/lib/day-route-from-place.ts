@@ -141,6 +141,9 @@ export function dayRouteItemFromMustSee(
         : null);
 
   const editorialImage = lookupEditorialPlaceImage(slug);
+  const hubImage = String(matched?.heroImageUrl || '').trim() || null;
+  // Hub often stores dark /venues/generated stubs; curated /images/venues/{city}/ wins.
+  const imageUrl = editorialImage || hubImage;
   return {
     id,
     slug,
@@ -149,7 +152,7 @@ export function dayRouteItemFromMustSee(
     cityId: city.id || matched?.cityId || null,
     citySlug: city.slug || city.sourceSlug || matched?.citySlug || null,
     href,
-    imageUrl: matched?.heroImageUrl || editorialImage || null,
+    imageUrl,
     address: String(matched?.address || '').trim() || null,
     ...coordsFromPlace(place, matched, slug),
   };

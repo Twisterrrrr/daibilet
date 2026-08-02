@@ -158,7 +158,7 @@ test('dayRouteItemFromMustSee uses editorial coords when hub omits NN place', ()
   );
 });
 
-test('dayRouteItemFromMustSee prefers hub hero over editorial cover', () => {
+test('dayRouteItemFromMustSee prefers editorial cover over hub hero', () => {
   const item = dayRouteItemFromMustSee(
     {
       name: 'Нижегородская ярмарка',
@@ -170,10 +170,34 @@ test('dayRouteItemFromMustSee prefers hub hero over editorial cover', () => {
         id: 'venue_yarmarka',
         slug: 'nizhny-novgorod-nizhegorodskaya-yarmarka',
         name: 'Нижегородская ярмарка',
-        heroImageUrl: '/images/custom-hub.jpg',
+        heroImageUrl: '/images/venues/generated/venue-auto-stub.jpg',
       },
     ],
     { id: 'city_nn', name: 'Нижний Новгород', slug: 'nizhny-novgorod' },
+  );
+  assert.ok(item);
+  assert.equal(
+    item!.imageUrl,
+    '/images/venues/nizhny-novgorod/nizhegorodskaya-yarmarka.jpg',
+  );
+});
+
+test('dayRouteItemFromMustSee uses hub hero when no editorial cover', () => {
+  const item = dayRouteItemFromMustSee(
+    {
+      name: 'Кастомная точка',
+      desc: 'x',
+      locationSlug: 'custom-place-no-editorial',
+    },
+    [
+      {
+        id: 'venue_custom',
+        slug: 'custom-place-no-editorial',
+        name: 'Кастомная точка',
+        heroImageUrl: '/images/custom-hub.jpg',
+      },
+    ],
+    city,
   );
   assert.ok(item);
   assert.equal(item!.imageUrl, '/images/custom-hub.jpg');
