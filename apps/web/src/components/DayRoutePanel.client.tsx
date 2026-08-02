@@ -78,6 +78,7 @@ import {
   DAY_ROUTE_PLACE_STUB_TITLE,
   enrichDayRouteFromMatchVenues,
   estimateDayRouteTravelMinutes,
+  formatDayRouteSessionDisplay,
   formatDayRouteStopsHeading,
   formatDayRouteDistance,
   formatDayRouteSegmentHint,
@@ -2328,10 +2329,9 @@ function DayRoutePanelInner() {
           data-day-hot-picks
           data-day-recommend-carousel
         >
-          <div className="px-0.5">
-            <h3 className="text-sm font-semibold text-slate-900">Выбор Дайбилет</h3>
-            <p className="mt-0.5 text-xs text-slate-500">Рекомендации сервиса</p>
-          </div>
+          <h2 className="px-0.5 text-lg font-bold tracking-tight text-slate-900 sm:text-xl">
+            Выбор Дайбилет
+          </h2>
           <div id="day-hot-picks-body" className="pt-3">
             <div
               className="flex gap-1 overflow-x-auto pb-1"
@@ -2926,12 +2926,14 @@ function DayRouteVenueCard({
       (addrNorm.length >= 8 && titleNorm.includes(addrNorm.replace(/^набережная\s+/i, 'наб. '))));
   const segmentHint =
     segmentToNext != null ? formatDayRouteSegmentHint(segmentToNext, travelMode) : '';
+  const sessionDisplay = formatDayRouteSessionDisplay(venue);
   return (
     <li
       className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-3"
       data-day-plan-stop={venue.id}
       data-ticket-bought={bought ? '1' : '0'}
       data-commercial-chip={chip.kind}
+      data-day-session={sessionDisplay || undefined}
     >
       <div className="flex items-start gap-3">
         <div className="flex w-8 shrink-0 flex-col items-center gap-1 pt-0.5">
@@ -2979,6 +2981,11 @@ function DayRouteVenueCard({
           ) : (
             <p className="line-clamp-2 text-sm font-semibold text-slate-900">{venue.title}</p>
           )}
+          {sessionDisplay ? (
+            <p className="mt-0.5 text-xs font-medium text-slate-700" data-day-session-label>
+              {sessionDisplay}
+            </p>
+          ) : null}
           <span
             className={`mt-1 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${commercialChipClassName(chip.kind)}`}
             data-day-status-chip={chip.kind}
@@ -3092,11 +3099,30 @@ function DayRoutePrintSheet({
                     {note && note !== addressLine ? (
                       <p className="mt-0.5 text-sm text-slate-600">{note}</p>
                     ) : null}
-                    {venue.sessionLabel ? (
-                      <p className="mt-1 text-sm font-medium text-slate-800">Время: {venue.sessionLabel}</p>
-                    ) : null}
+                    {(() => {
+                      const sessionDisplay = formatDayRouteSessionDisplay(venue);
+                      return sessionDisplay ? (
+                        <p className="mt-1 text-sm font-medium text-slate-800">{sessionDisplay}</p>
+                      ) : null;
+                    })()}
                     {bought ? (
                       <p className="mt-1 text-sm font-semibold text-emerald-800">Билет куплен</p>
+                    ) : null}
+                  </div>
+                </div>
+                {segmentHint && index < venues.length - 1 ? (
+                  <p className="py-2 pl-10 text-sm text-slate-500">↓ {segmentHint}</p>
+                ) : null}
+              </li>
+            );
+          })}
+        </ol>
+        <p className="mt-8 text-xs text-slate-400">daibilet.ru/my-day</p>
+      </div>
+    </div>
+  );
+}
+font-semibold text-emerald-800">Билет куплен</p>
                     ) : null}
                   </div>
                 </div>
