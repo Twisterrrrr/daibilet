@@ -41,11 +41,14 @@ export function DayRouteOsmMap({
   className,
   selectedStopId = null,
   onStopClick,
+  layoutKey,
 }: {
   stops: DayRouteMapStop[];
   className?: string;
   selectedStopId?: string | null;
   onStopClick?: (stopId: string) => void;
+  /** Bumps Leaflet invalidateSize after container height changes (mobile expand). */
+  layoutKey?: string | number;
 }) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const mapRef = React.useRef<LeafletMap | null>(null);
@@ -57,6 +60,15 @@ export function DayRouteOsmMap({
   const stopsKey = stops
     .map((s) => `${s.id}:${s.index}:${s.latitude.toFixed(5)},${s.longitude.toFixed(5)}`)
     .join('|');
+
+  React.useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    const id = window.setTimeout(() => {
+      map.invalidateSize({ animate: false });
+    }, 220);
+    return () => window.clearTimeout(id);
+  }, [layoutKey]);
 
   React.useEffect(() => {
     const node = containerRef.current;

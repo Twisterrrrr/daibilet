@@ -1,3 +1,20 @@
+## 2026-08-02 - /my-day mobile: sticky map split + expand
+
+### Наблюдения
+- Owner: на смартфоне (&lt;lg) нужен Wanderlog-like split без bottom-sheet physics: карта сверху ~35-40vh sticky, список снизу со скроллом; кнопка expand ~35↔85vh.
+- Desktop lg split (`9f6af02`) на MSK уже был live (`data-day-split` в chunks, BUILD_ID=`5DefDbAaaUHtfw8BAiky3`).
+
+### Решения
+- Mobile: `data-day-mobile-map-split` fixed viewport column; map `order-1` h-[38dvh]/ list `order-2` overflow-y; expand `data-day-map-expand` → ~85dvh + list `max-lg:hidden` + горизонтальный rail стопов.
+- Leaflet `layoutKey` + ResizeObserver → `invalidateSize` после expand/collapse.
+- Nice-to-have: mini `data-day-map-focus-card` (title/nav/delete); per-stop `data-day-stop-maps` (Яндекс).
+- Desktop lg grid split без изменений поведения.
+
+### Проблемы
+- Deploy/BUILD_ID - после MSK web deploy.
+
+---
+
 ## 2026-08-02 - /my-day desktop split: список слева, карта sticky справа
 
 ### Наблюдения

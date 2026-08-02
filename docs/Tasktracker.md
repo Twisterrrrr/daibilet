@@ -7,6 +7,15 @@
 
 ---
 
+## /my-day map split (2026-08-02)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.MYDAY-SPLIT-DESK | Desktop ≥lg: list left + sticky map right (`data-day-split`) | Критический | ✅ `9f6af02` live BUILD_ID=`5DefDbAaaUHtfw8BAiky3` |
+| UX.MYDAY-SPLIT-MOB | Mobile &lt;lg: sticky map ~38vh + list scroll; expand ~85vh (`data-day-map-expand`); no bottom-sheet physics | Критический | 🔄 commit+deploy |
+
+---
+
 ## City hub must-see blurbs (2026-08-02)
 
 | # | Задача | Приоритет | Статус |
