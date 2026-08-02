@@ -1,17 +1,17 @@
-## 2026-08-03 - /my-day: stop card owner-v5 + starter equal-M
+## 2026-08-03 - /my-day: dense list stops + owner-v5 cards
 
 ### Наблюдения
-- Stop card: content top-heavy, huge empty bottom; ↑↓ under text (wrong); title not vertically centered vs thumb.
-- Owner exact: ↑↓ **under thumb**; Title+Address **items-center** vs thumb; далее in text col; equal `py-2.5`; no stretch empty.
-- Mobile starter: shared `max-lg:px-*` column + equal `max-lg:py-3.5`; desktop `1fr auto 1fr auto 1fr`.
+- List mode: huge vertical hole between title and address - tall ↑↓ column stretched (`justify-between` / stretch) split chevrons across title/meta rows.
+- Card mode: ↑↓ under thumb; title items-center vs thumb; equal py.
+- Starter: shared mobile px col + equal py; desktop equal-M 5-track.
 
 ### Решения
-- Grid stop `data-day-stop-layout="owner-v5"`: `grid-cols-[3rem_minmax(0,1fr)]` - row1 thumb | text(items-center); row2 sort | далее.
-- List grid `items-start` (no stretch). Card `px-2.5 py-2.5 h-auto`.
-- Starter: `data-day-starter-align="col"` + `lg:grid-cols-[1fr_auto_1fr_auto_1fr]`.
+- List: `data-day-stop-list="dense"` - ↑↓ **side-by-side** next to number (`h-5 self-start`); title/meta `leading-snug` + `mt-0.5`; row `items-start` (never stretch sort column).
+- Grid `owner-v5`: `grid-cols-[3rem_minmax(0,1fr)]` thumb|text(items-center) / sort|далее; `items-start` on plan list.
+- Starter: `max-lg:py-3.5` + `max-lg:px-3.5` + `lg:grid-cols-[1fr_auto_1fr_auto_1fr]`.
 
 ### Проблемы
-- Довести MSK deploy без pkill; вернуть BUILD_ID.
+- Довести MSK deploy до SMOKE_OK; вернуть BUILD_ID.
 
 ---
 

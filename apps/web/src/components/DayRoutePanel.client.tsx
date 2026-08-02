@@ -3520,29 +3520,6 @@ function DayRouteVenueCard({
     <span className="font-semibold text-slate-900">{venue.title}</span>
   );
 
-  const moveControls = (
-    <div className="flex shrink-0 flex-col items-center leading-none">
-      <button
-        type="button"
-        aria-label="Выше"
-        disabled={index === 0}
-        onClick={onMoveUp}
-        className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
-      >
-        <ChevronUp className="h-3 w-3" />
-      </button>
-      <button
-        type="button"
-        aria-label="Ниже"
-        disabled={index >= total - 1}
-        onClick={onMoveDown}
-        className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
-      >
-        <ChevronDown className="h-3 w-3" />
-      </button>
-    </div>
-  );
-
   const actionButtons = (
     <div className="flex shrink-0 items-center gap-0">
       {mapsUrl ? (
@@ -3575,31 +3552,58 @@ function DayRouteVenueCard({
         className="w-full scroll-mt-4 border-b border-slate-100 last:border-b-0"
         data-day-plan-stop={venue.id}
         data-day-stop-variant="list"
+        data-day-stop-list="dense"
         data-ticket-bought={bought ? '1' : '0'}
         data-commercial-chip={chip.kind}
         data-day-session={sessionDisplay || undefined}
         data-day-stop-focused={focused ? '1' : undefined}
       >
+        {/*
+          Dense list: number + compact ↑↓ side-by-side (never a tall stretched column
+          that splits title/address). Title/meta tight leading, mt-0.5 max.
+        */}
         <div
-          className={`flex w-full items-center gap-1.5 py-1.5 ${
+          className={`flex w-full items-start gap-1.5 py-1.5 ${
             focused ? 'rounded-md bg-emerald-50/80 px-1' : ''
           }`}
         >
           <span
-            className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white"
+            className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white"
             aria-label={`Точка ${index + 1}`}
           >
             {index + 1}
           </span>
-          {moveControls}
+          <div
+            className="mt-0.5 flex h-5 shrink-0 items-center gap-0 self-start leading-none"
+            data-day-stop-sort
+          >
+            <button
+              type="button"
+              aria-label="Выше"
+              disabled={index === 0}
+              onClick={onMoveUp}
+              className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+            >
+              <ChevronUp className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              aria-label="Ниже"
+              disabled={index >= total - 1}
+              onClick={onMoveDown}
+              className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+            >
+              <ChevronDown className="h-3.5 w-3.5" />
+            </button>
+          </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-start gap-1">
-              <p className="min-w-0 flex-1 truncate text-[13px] leading-tight">{titleNode}</p>
+              <p className="mb-0 min-w-0 flex-1 truncate text-[13px] leading-snug">{titleNode}</p>
               {actionButtons}
             </div>
             {metaLine ? (
               <p
-                className={`mt-0.5 truncate text-[11px] leading-tight ${
+                className={`mt-0.5 mb-0 truncate text-[11px] leading-snug ${
                   !hasCoords ? 'text-amber-700' : 'text-slate-500'
                 }`}
                 data-day-segment-hint={segmentHint ? '1' : undefined}
