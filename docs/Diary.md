@@ -1,3 +1,20 @@
+## 2026-08-02 - /my-day event stop: дата и время сессии на карточке
+
+### Наблюдения
+- Owner: на карточках event-stop в day-route показывать дату и время сессии; можно только время, но если у билета есть дата - не опускать.
+- `startsAt` / `sessionLabel` уже писались при add из афиши, но карточка их могла не рендерить без helper.
+
+### Решения
+- `formatDayRouteSessionDisplay` / `formatDayRouteStartsAtLabel`: compact `15 авг, 19:00` (Europe/Moscow); soft dayparts («Вечерний сеанс») не показываем как сессию.
+- Карточка stop: строка `data-day-session-label` под title; print sheet тот же helper.
+- Persist: `dayRouteItemFromEvent` fallback sessionLabel из startsAt; enrich stubs через `/api/public/events` sessions[0] → startsAt/dateLabel/timeLabel.
+- Free / non-ticket без сессии - без выдуманных часов. Dayparts Утро/День/Вечер не возвращаем.
+
+### Проблемы
+- Deploy/BUILD_ID - после MSK web deploy.
+
+---
+
 ## 2026-08-02 - City hub / my-day: must-see blurb «ещё» + title → place
 
 ### Наблюдения

@@ -5,6 +5,22 @@
 import { haversineMeters, isValidCoordinatePair } from './day-route-score';
 import { eventHref, venueHref } from './routes';
 
+/** Display clock for session labels (catalog sessions are Europe/Moscow wall-clock). */
+const DAY_ROUTE_SESSION_TZ = 'Europe/Moscow';
+
+/** Parse ISO / naive UTC the same way as catalog sessions (naive = UTC). */
+function parseDayRouteStartsAt(value: string | null | undefined): Date {
+  const raw = String(value || '').trim();
+  if (!raw) return new Date(NaN);
+  if (/[zZ]$/.test(raw) || /[+-]\d{2}(:\d{2}|\d{2})$/.test(raw)) {
+    return new Date(raw.replace(/([+-]\d{2})(\d{2})$/, '$1:$2'));
+  }
+  if (/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}/.test(raw)) {
+    return new Date(`${raw.replace(' ', 'T')}Z`);
+  }
+  return new Date(raw);
+}
+
 export const DAY_ROUTE_STORAGE_KEY = 'daibilet:dayRoute';
 export const DAY_ROUTE_CHANGED_EVENT = 'daibilet:day-route-changed';
 
@@ -993,29 +1009,67 @@ export function catalogLocatorsFromShareTokens(tokens: string[]): string[] {
   return out.slice(0, DAY_ROUTE_MAX);
 }
 
-/** Human label from ISO startsAt (or pass-through if already a label). */
+/** Soft daypart / widget labels - not a concrete session clock (never invent a fake HH:MM). */
+const DAY_ROUTE_SOFT_SESSION_LABEL_RE =
+  /^(утро|день|вечер|ночь|утренний\s+сеанс|дневной\s+сеанс|вечерний\s+сеанс|открытая\s+дата|даты\s+в\s+виджете|в\s+виджете|выберите\s+время|при\s+покупке)$/i;
+
+export function isDayRouteSoftSessionLabel(label: string | null | undefined): boolean {
+  const raw = String(label || '')
+    .trim()
+    .replace(/\s+/g, ' ');
+  if (!raw) return true;
+  return DAY_ROUTE_SOFT_SESSION_LABEL_RE.test(raw);
+}
+
+/**
+ * Human label from ISO startsAt.
+ * Full datetime → `15 авг, 19:00` (MSK wall-clock); time-only / HHMM → `19:00`.
+ */
 export function formatDayRouteStartsAtLabel(startsAt: string | null | undefined): string | null {
   const raw = String(startsAt || '').trim();
   if (!raw) return null;
   const hhmm = startsAtToHHMM(raw);
-  if (hhmm && /^\d{4}$/.test(hhmm) && Number.isNaN(new Date(raw).getTime())) {
-    return formatDayRouteHHMM(hhmm);
-  }
-  const date = new Date(raw);
+  const date = parseDayRouteStartsAt(raw);
   if (Number.isNaN(date.getTime())) {
     return formatDayRouteHHMM(hhmm) || raw;
   }
   try {
-    return new Intl.DateTimeFormat('ru-RU', {
-      weekday: 'short',
+    const dayMonth = new Intl.DateTimeFormat('ru-RU', {
       day: 'numeric',
       month: 'short',
+      timeZone: DAY_ROUTE_SESSION_TZ,
+    })
+      .format(date)
+      .replace(/\.$/, '');
+    const time = new Intl.DateTimeFormat('ru-RU', {
       hour: '2-digit',
       minute: '2-digit',
+      timeZone: DAY_ROUTE_SESSION_TZ,
     }).format(date);
+    if (!dayMonth) return time || formatDayRouteHHMM(hhmm);
+    if (!time) return dayMonth;
+    return `${dayMonth}, ${time}`;
   } catch {
     return formatDayRouteHHMM(hhmm) || raw;
   }
+}
+
+/**
+ * Compact line for event stop cards: prefer concrete date+time, never soft dayparts alone.
+ * - startsAt with date → `15 авг, 19:00`
+ * - only time (HHMM / sessionLabel clock) → `19:00`
+ * - stored sessionLabel with date bits → pass-through
+ * - free / soft / missing → null
+ */
+export function formatDayRouteSessionDisplay(
+  venue: Pick<DayRouteVenueItem, 'startsAt' | 'sessionLabel'>,
+): string | null {
+  const fromIso = formatDayRouteStartsAtLabel(venue.startsAt);
+  if (fromIso) return fromIso;
+
+  const label = String(venue.sessionLabel || '').trim();
+  if (!label || isDayRouteSoftSessionLabel(label)) return null;
+  return label;
 }
 
 /**
@@ -1516,6 +1570,11 @@ type DayRouteCoordSource = {
   eventSlug?: string | null;
   heroImageUrl?: string | null;
   imageUrl?: string | null;
+  /** Optional session hydrate from public events / matches. */
+  startsAt?: string | null;
+  sessionLabel?: string | null;
+  dateLabel?: string | null;
+  timeLabel?: string | null;
 };
 
 /** Build id+slug → coords from route items and/or matches payload venues. */
@@ -1589,6 +1648,25 @@ export function enrichDayRouteFromMatchVenues(payloadVenues: DayRouteCoordSource
     if (matchCity && !String(item.city || '').trim()) next.city = matchCity;
     if (match.cityId && !item.cityId) next.cityId = match.cityId;
     if (match.citySlug && !item.citySlug) next.citySlug = match.citySlug;
+    // Session date/time: only fill when stop lacks concrete clock (never invent for free places).
+    const matchStartsAt = String(match.startsAt || '').trim();
+    const matchSessionFromParts = [String(match.dateLabel || '').trim(), String(match.timeLabel || '').trim()]
+      .filter(Boolean)
+      .join(', ');
+    const matchSessionLabel =
+      String(match.sessionLabel || '').trim() ||
+      matchSessionFromParts ||
+      (matchStartsAt ? formatDayRouteStartsAtLabel(matchStartsAt) : null);
+    if (matchStartsAt && !String(item.startsAt || '').trim()) {
+      next.startsAt = matchStartsAt;
+    }
+    if (
+      matchSessionLabel &&
+      !isDayRouteSoftSessionLabel(matchSessionLabel) &&
+      (!String(item.sessionLabel || '').trim() || isDayRouteSoftSessionLabel(item.sessionLabel))
+    ) {
+      next.sessionLabel = matchSessionLabel;
+    }
     const cleaned = sanitizeDayRouteTicketFields(next);
     cleaned.ticketUrl = resolveDayRouteTicketUrl(cleaned);
     if (
@@ -1604,7 +1682,9 @@ export function enrichDayRouteFromMatchVenues(payloadVenues: DayRouteCoordSource
       cleaned.ticketUrl !== item.ticketUrl ||
       cleaned.city !== item.city ||
       cleaned.cityId !== item.cityId ||
-      cleaned.citySlug !== item.citySlug
+      cleaned.citySlug !== item.citySlug ||
+      cleaned.startsAt !== item.startsAt ||
+      cleaned.sessionLabel !== item.sessionLabel
     ) {
       changed = true;
     }

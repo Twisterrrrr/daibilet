@@ -23,7 +23,10 @@ import {
   dayRouteMatchScore,
   enrichDayRouteFromMatchVenues,
   formatDayRouteCountLabel,
+  formatDayRouteSessionDisplay,
+  formatDayRouteStartsAtLabel,
   formatDayRouteStopsHeading,
+  isDayRouteSoftSessionLabel,
   isDayRouteAtHard,
   isDayRouteAtSoft,
   hydrateDayRouteFromShare,
@@ -533,6 +536,65 @@ test('enrichDayRouteFromMatchVenues replaces event stub title + coords + image',
   assert.equal(stop?.eventSlug, 'standup-po-zhenski');
   assert.equal(stop?.imageUrl, '/images/events/standup.jpg');
   assert.equal(stop?.ticketUrl, '/events/standup-po-zhenski');
+});
+
+test('formatDayRouteStartsAtLabel keeps date + time in ru locale', () => {
+  const label = formatDayRouteStartsAtLabel('2026-08-15T16:00:00.000Z');
+  assert.ok(label);
+  assert.match(label!, /15/);
+  assert.match(label!, /авг/i);
+  assert.match(label!, /19:00/);
+});
+
+test('formatDayRouteSessionDisplay prefers startsAt and skips soft dayparts', () => {
+  assert.equal(
+    formatDayRouteSessionDisplay({
+      startsAt: '2026-08-15T16:00:00.000Z',
+      sessionLabel: 'Вечерний сеанс',
+    }),
+    formatDayRouteStartsAtLabel('2026-08-15T16:00:00.000Z'),
+  );
+  assert.equal(
+    formatDayRouteSessionDisplay({ startsAt: null, sessionLabel: 'Вечерний сеанс' }),
+    null,
+  );
+  assert.equal(isDayRouteSoftSessionLabel('Вечерний сеанс'), true);
+  assert.equal(
+    formatDayRouteSessionDisplay({ startsAt: null, sessionLabel: 'вс, 2 авг, 11:00' }),
+    'вс, 2 авг, 11:00',
+  );
+  assert.equal(formatDayRouteSessionDisplay({ startsAt: null, sessionLabel: '19:00' }), '19:00');
+  assert.equal(formatDayRouteSessionDisplay({ startsAt: null, sessionLabel: null }), null);
+});
+
+test('enrichDayRouteFromMatchVenues fills missing session startsAt', () => {
+  mockStorage();
+  clearDayRoute();
+  addToDayRoute({
+    id: 'venue_hall',
+    slug: 'comedy-hall',
+    title: 'Стендап',
+    eventId: 'evt_session_1',
+    eventSlug: 'standup-night',
+    ticketUrl: '/events/standup-night',
+  });
+  const next = enrichDayRouteFromMatchVenues([
+    {
+      id: 'venue_hall',
+      slug: 'comedy-hall',
+      eventId: 'evt_session_1',
+      eventSlug: 'standup-night',
+      startsAt: '2026-08-15T16:00:00.000Z',
+      dateLabel: 'сб, 15 авг',
+      timeLabel: '19:00',
+    },
+  ]);
+  assert.equal(next.venues[0]?.startsAt, '2026-08-15T16:00:00.000Z');
+  assert.equal(next.venues[0]?.sessionLabel, 'сб, 15 авг, 19:00');
+  assert.equal(
+    formatDayRouteSessionDisplay(next.venues[0]!),
+    formatDayRouteStartsAtLabel('2026-08-15T16:00:00.000Z'),
+  );
 });
 
 test('addToDayRoute same city title with null vs cityId still appends', () => {

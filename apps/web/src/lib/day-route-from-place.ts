@@ -6,7 +6,11 @@ import { resolveCityPlaceHref, type CityMustSeeItem, type CityPlaceLinkFields } 
 import { namesLooselyMatch } from './city-place-href';
 import { lookupEditorialPlaceCoords } from './city-place-coords';
 import { lookupEditorialPlaceImage } from './city-place-images';
-import { DAY_ROUTE_SOFT, type DayRouteVenueItem } from './day-route';
+import {
+  DAY_ROUTE_SOFT,
+  formatDayRouteStartsAtLabel,
+  type DayRouteVenueItem,
+} from './day-route';
 import { isValidCoordinatePair } from './day-route-score';
 import { eventHref, venueHref } from './routes';
 
@@ -183,7 +187,7 @@ function formatEventSessionLabel(event: DayRouteEventSource): string | null {
     Boolean,
   );
   if (parts.length) return parts.join(', ');
-  return null;
+  return formatDayRouteStartsAtLabel(event.startsAt);
 }
 
 /** Event card/page → day-route stop at event venue (+ optional session time). */

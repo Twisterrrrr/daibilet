@@ -275,6 +275,22 @@ test('dayRouteItemFromEvent adds venue + session label', () => {
   assert.equal(item!.latitude, 59.9398);
 });
 
+test('dayRouteItemFromEvent builds sessionLabel from startsAt when labels missing', () => {
+  const item = dayRouteItemFromEvent({
+    id: 'evt_starts',
+    slug: 'evening-show',
+    title: 'Вечернее шоу',
+    venueId: 'venue_1',
+    venueSlug: 'hall-1',
+    venue: 'Зал',
+    startsAt: '2026-08-15T16:00:00.000Z',
+  });
+  assert.ok(item);
+  assert.ok(item!.sessionLabel);
+  assert.match(item!.sessionLabel!, /15/);
+  assert.match(item!.sessionLabel!, /19:00/);
+});
+
 test('dayRouteItemFromEvent falls back to event id without venue', () => {
   const item = dayRouteItemFromEvent({
     id: 'evt_2',
