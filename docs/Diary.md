@@ -26,7 +26,7 @@
 - Unit: venue slug must not produce `/events/venueSlug`.
 
 ### Проблемы
-- MSK deploy + BUILD_ID ниже после smoke.
+- Live MSK **BUILD_ID=`ixSmgk9DbvgZ4YYbGLgmY`** (fix in `101d5b8`). Smoke: `/my-day` 200; `/venues/niko1560` 200; `/events/niko1560` «Событие не найдено».
 
 ---
 
@@ -61,23 +61,6 @@
 
 ### Проблемы
 - MSK deploy: **BUILD_ID=`Ywy2ntkkoX6K__8CuMH3H`** (HEAD `7a3de60`); hub warm transiently killed web → restart; `/my-day` local+pub 200; chunks: `data-day-plan-list`, no `data-day-timeline-part`.
-
----
-
-## 2026-08-02 - /my-day: «Купить билет» → `/events/{venueSlug}` 404
-
-### Наблюдения
-- Owner: timeline CTA открывал `https://daibilet.ru/events/niko1560` (404). Карточка: «Событие из маршрута», «Билет оформляется…», «Нет координат».
-- Root cause: `ticketUrl` / `eventId` / `eventSlug` строились из **venue** slug; hydrate stub для нерезолвнутого locator всегда писал `/events/{token.id}`.
-
-### Решения
-- `resolveDayRouteTicketUrl` + `sanitizeDayRouteTicketFields`: никогда не использовать venue/location slug как event; bad `/events/{venueSlug}` → `/venues/{slug}` (программа площадки) или hide CTA.
-- Hot Picks affiche/open_date: `resolveHotPickTicketTarget` - real event page only; иначе `/venues/{slug}`.
-- Share hydrate stub: `event_*`/`evt_*` → event ticket; иначе venue stub без fake event URL.
-- Unit: venue slug must not produce `/events/venueSlug`.
-
-### Проблемы
-- MSK deploy + BUILD_ID ниже после smoke.
 
 ---
 
