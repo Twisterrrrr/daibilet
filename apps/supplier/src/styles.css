@@ -434,6 +434,12 @@ small {
   opacity: 0.62;
 }
 
+.link-button.compact {
+  min-height: 34px;
+  padding: 7px 10px;
+  white-space: nowrap;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
@@ -513,6 +519,98 @@ small {
   display: grid;
   justify-items: start;
   gap: 10px;
+}
+
+.readiness-actions {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(360px, 1.1fr);
+  gap: 12px;
+}
+
+.readiness-checklist,
+.readiness-next-actions {
+  display: grid;
+  gap: 8px;
+}
+
+.readiness-step-link,
+.readiness-action-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.readiness-step-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  text-decoration: none;
+}
+
+.readiness-step-link:hover {
+  border-color: rgba(47, 111, 221, 0.3);
+  background: var(--surface);
+}
+
+.readiness-step-mark {
+  display: inline-grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.readiness-step-link.done .readiness-step-mark {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.readiness-step-link.todo .readiness-step-mark {
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.readiness-step-link strong,
+.readiness-action-card strong {
+  display: block;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.readiness-step-link small,
+.readiness-action-card span {
+  display: block;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.readiness-action-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+}
+
+.readiness-action-card.warning {
+  border-color: rgba(169, 104, 0, 0.22);
+  background: rgba(255, 244, 216, 0.62);
+}
+
+.readiness-action-card.danger {
+  border-color: rgba(189, 45, 45, 0.18);
+  background: rgba(255, 240, 240, 0.7);
+}
+
+.readiness-action-card.success {
+  border-color: rgba(22, 130, 74, 0.2);
+  background: rgba(233, 248, 240, 0.68);
 }
 
 .panel-header {
@@ -1093,6 +1191,7 @@ td span {
   .two-column,
   .readiness-summary,
   .sale-readiness-panel,
+  .readiness-actions,
   .workflow-strip,
   .settings-form {
     display: grid;
@@ -1128,6 +1227,7 @@ td span {
   .stats-grid,
   .selector-row,
   .session-control-row,
+  .readiness-action-card,
   .login-layout {
     grid-template-columns: 1fr;
   }

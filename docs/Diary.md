@@ -1,3 +1,24 @@
+## 2026-08-02 — Supplier LC actionable readiness checklist
+
+### Наблюдения
+
+- После admin approve/reject и onboarding write-flow ЛК поставщика уже показывал готовность к продаже, но поставщик видел в основном статусы и список проблем.
+- Для первых музеев и арт-площадок важнее не “технический отчет”, а понятный следующий шаг: заполнить реквизиты, добавить счет, проверить команду, согласовать комиссию, подключить YooKassa или открыть входные билеты.
+
+### Решения
+
+- `SaleReadinessPanel` в `apps/supplier` получил чеклист запуска продаж: реквизиты, счет, ответственный в ЛК, комиссия, YooKassa, товары для checkout.
+- Для известных readiness-кодов (`MISSING_LEGAL_PROFILE`, `LEGAL_PROFILE_NOT_VERIFIED`, `MISSING_PRIMARY_BANK_ACCOUNT`, `MISSING_OWNER_USER`, `MISSING_COMMISSION_RULE`, `MISSING_YOOKASSA_SHOP`, `NO_INTERNAL_CHECKOUT_EVENTS`) добавлены русские action cards с переходами в нужные разделы ЛК.
+- Когда блокеров нет, панель ведет поставщика к sandbox/STUB-проверке входного билета перед широким CTA.
+
+### Проверки
+
+- `node apps/supplier/node_modules/typescript/bin/tsc --noEmit -p apps/supplier/tsconfig.json` — OK.
+- `node node_modules/vite/bin/vite.js build` из `apps/supplier` — OK.
+- `pnpm supplier:typecheck` локально blocked до запуска: pnpm видит Node `v24.14.0`, проект требует `>=22.13.0 <23`; прямой `node -v` в shell — `v22.20.0`.
+
+---
+
 ## 2026-08-01 — Admin legal review + Supplier LC polish
 
 ### Наблюдения

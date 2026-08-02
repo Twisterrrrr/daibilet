@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { NavLink, Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
+import { Link, NavLink, Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
 
 import type {
   SupplierPortalDashboardDto,
@@ -1298,7 +1298,119 @@ function SaleReadinessPanel({ readiness }: { readiness: SupplierPortalDashboardD
         <StatusPill tone={tone}>{readinessStatusLabel(readiness.status)}</StatusPill>
         <IssueList issues={issues} empty="Блокеров нет. Можно готовить включение продаж." />
       </div>
+      <ReadinessActionList readiness={readiness} />
     </section>
+  );
+}
+
+type ReadinessActionMeta = {
+  title: string;
+  description: string;
+  href: string;
+  cta: string;
+};
+
+const READINESS_ACTIONS: Record<string, ReadinessActionMeta> = {
+  MISSING_LEGAL_PROFILE: {
+    title: 'Юридический профиль',
+    description: 'Заполните название юрлица, ИНН, налоговый режим и контакты для документов.',
+    href: '/profile',
+    cta: 'Заполнить реквизиты',
+  },
+  LEGAL_PROFILE_NOT_VERIFIED: {
+    title: 'Проверка реквизитов',
+    description: 'Реквизиты уже отправлены. Дождитесь решения администратора или внесите правки, если их вернули.',
+    href: '/profile',
+    cta: 'Открыть статус',
+  },
+  MISSING_PRIMARY_BANK_ACCOUNT: {
+    title: 'Банковский счет',
+    description: 'Добавьте основной расчетный счет, чтобы мы могли готовить выплаты и документы.',
+    href: '/profile',
+    cta: 'Добавить счет',
+  },
+  MISSING_OWNER_USER: {
+    title: 'Ответственный пользователь',
+    description: 'Нужен активный владелец или администратор ЛК поставщика.',
+    href: '/team',
+    cta: 'Проверить команду',
+  },
+  MISSING_COMMISSION_RULE: {
+    title: 'Комиссия',
+    description: 'Комиссионное правило задает администратор. Проверьте финансовые условия перед запуском продаж.',
+    href: '/finance',
+    cta: 'Открыть финансы',
+  },
+  MISSING_YOOKASSA_SHOP: {
+    title: 'YooKassa',
+    description: 'Для sandbox/prod-покупок нужен подключенный магазин и включенный платежный контур.',
+    href: '/integrations',
+    cta: 'Проверить подключение',
+  },
+  NO_INTERNAL_CHECKOUT_EVENTS: {
+    title: 'Товары для продажи',
+    description: 'Добавьте хотя бы один входной билет или событие с внутренним checkout.',
+    href: '/admissions',
+    cta: 'Открыть билеты',
+  },
+};
+
+const READINESS_STEPS: Array<{ codes: string[]; title: string; href: string }> = [
+  { codes: ['MISSING_LEGAL_PROFILE', 'LEGAL_PROFILE_NOT_VERIFIED'], title: 'Реквизиты проверены', href: '/profile' },
+  { codes: ['MISSING_PRIMARY_BANK_ACCOUNT'], title: 'Основной счет добавлен', href: '/profile' },
+  { codes: ['MISSING_OWNER_USER'], title: 'Ответственный в ЛК есть', href: '/team' },
+  { codes: ['MISSING_COMMISSION_RULE'], title: 'Комиссия согласована', href: '/finance' },
+  { codes: ['MISSING_YOOKASSA_SHOP'], title: 'YooKassa подключена', href: '/integrations' },
+  { codes: ['NO_INTERNAL_CHECKOUT_EVENTS'], title: 'Есть товары для checkout', href: '/admissions' },
+];
+
+function ReadinessActionList({ readiness }: { readiness: SupplierPortalDashboardDto['readiness'] }) {
+  const issueByCode = new Map([...readiness.blockers, ...readiness.warnings].map((issue) => [issue.code, issue]));
+  const primaryIssues = [...readiness.blockers, ...readiness.warnings]
+    .map((issue) => ({ issue, meta: READINESS_ACTIONS[issue.code] }))
+    .filter((item): item is { issue: SupplierPortalDashboardDto['readiness']['blockers'][number]; meta: ReadinessActionMeta } => Boolean(item.meta))
+    .slice(0, 4);
+
+  return (
+    <div className="readiness-actions">
+      <div className="readiness-checklist" aria-label="Чеклист запуска продаж">
+        {READINESS_STEPS.map((step) => {
+          const activeIssue = step.codes.map((code) => issueByCode.get(code)).find(Boolean);
+          const done = !activeIssue;
+          return (
+            <Link key={step.title} to={step.href} className={`readiness-step-link ${done ? 'done' : 'todo'}`}>
+              <span className="readiness-step-mark">{done ? '✓' : '!'}</span>
+              <span>
+                <strong>{step.title}</strong>
+                <small>{done ? 'готово' : activeIssue?.label || 'требует внимания'}</small>
+              </span>
+            </Link>
+          );
+        })}
+      </div>
+
+      {primaryIssues.length ? (
+        <div className="readiness-next-actions" aria-label="Следующие действия">
+          {primaryIssues.map(({ issue, meta }) => (
+            <div key={issue.code} className={`readiness-action-card ${issue.severity === 'high' ? 'danger' : 'warning'}`}>
+              <div>
+                <strong>{meta.title}</strong>
+                <span>{meta.description}</span>
+              </div>
+              <Link to={meta.href} className="link-button compact">{meta.cta}</Link>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="readiness-action-card success">
+          <div>
+            <strong>Базовый контур готов</strong>
+            <span>Проведите sandbox-покупку входного билета и сверку заказа в ЛК перед широким CTA.</span>
+          </div>
+          <Link to="/admissions" className="link-button compact">Проверить продажу</Link>
+        </div>
+      )}
+    </div>
   );
 }
 
