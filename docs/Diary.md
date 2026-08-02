@@ -11,6 +11,7 @@
 
 ### Проблемы
 - Resolve event-only ids через matches API неполный (stub + ticket URL) - ок для MVP; полный event DTO hydrate - follow-up.
+- ~~MSK deploy~~ → `42421d4` **BUILD_ID=`tU1erwiIQtH11jrJCcYZH`**. Smoke `/my-day` + `?city=spb&items=ermitazh:free` 200; chunks: Max share + menu OK.
 
 ---
 
