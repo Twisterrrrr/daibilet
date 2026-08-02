@@ -4,6 +4,7 @@ import { Check, ChevronDown, MapPin, Search } from 'lucide-react';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { SafeImage } from '@/components/SafeImage.client';
+import { takeDayRouteSearchOptions } from '@/lib/day-route-search-options';
 
 export type DayRouteSearchOption = {
   id: string;
@@ -26,6 +27,8 @@ type Props = {
   clearOnPick?: boolean;
   /** Hide visible label (aria-label kept). */
   hideLabel?: boolean;
+  /** Notify parent of typed query (for remote event search merge). */
+  onQueryChange?: (query: string) => void;
 };
 
 /**
@@ -42,6 +45,7 @@ export function DayRouteSearchSelect({
   onPick,
   clearOnPick = true,
   hideLabel = false,
+  onQueryChange,
 }: Props) {
   const listId = useId();
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -58,13 +62,16 @@ export function DayRouteSearchSelect({
           return hay.includes(needle);
         })
       : options;
-    return list.slice(0, 40);
+    return takeDayRouteSearchOptions(list);
   }, [options, query]);
 
   useEffect(() => {
     setActiveIndex(0);
   }, [query, open]);
 
+  useEffect(() => {
+    onQueryChange?.(query);
+  }, [query, onQueryChange]);
   useEffect(() => {
     if (!open) return;
     const close = (event: MouseEvent) => {
@@ -112,7 +119,8 @@ export function DayRouteSearchSelect({
             if (!disabled) setOpen(true);
           }}
           onChange={(event) => {
-            setQuery(event.target.value);
+            const next = event.target.value;
+            setQuery(next);
             setOpen(true);
           }}
           onKeyDown={(event) => {

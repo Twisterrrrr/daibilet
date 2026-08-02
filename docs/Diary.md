@@ -1,3 +1,19 @@
+## 2026-08-02 - /my-day: events in unified search + placeholder
+
+### Наблюдения
+- События уже были в `unifiedSearchOptions`, но dropdown `slice(0, 40)` брал только loc→ven в начале: при 250+ местах events не видны.
+- Placeholder говорил только про место.
+
+### Решения
+- `takeDayRouteSearchOptions`: round-robin `loc:`/`ven:`/`event:` в топ-40.
+- Popular events `limit=100` + remote `q` merge (`eventsSearchExtra`) при вводе ≥2 символов.
+- Placeholder: «Найти место или событие». Desktop starter two-col уже в `607cba6`.
+
+### Проблемы
+- Нет (BUILD_ID после MSK deploy).
+
+---
+
 ## 2026-08-02 - /my-day: desktop empty-starter two-column (variant 1)
 
 ### Наблюдения

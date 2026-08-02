@@ -357,6 +357,8 @@ function DayRoutePanelInner() {
   const [locationsCatalog, setLocationsCatalog] = useState<VenueCatalogCard[]>([]);
   const [venuesCatalog, setVenuesCatalog] = useState<VenueCatalogCard[]>([]);
   const [eventsCatalog, setEventsCatalog] = useState<PublicCatalogListItemDto[]>([]);
+  const [eventsSearchExtra, setEventsSearchExtra] = useState<PublicCatalogListItemDto[]>([]);
+  const [unifiedSearchQuery, setUnifiedSearchQuery] = useState('');
   const [catalogLoading, setCatalogLoading] = useState(false);
   const [catalogError, setCatalogError] = useState<string | null>(null);
   const [destinationsFallback, setDestinationsFallback] = useState<PublicDestinationDto[]>([]);
@@ -756,6 +758,7 @@ function DayRoutePanelInner() {
       setLocationsCatalog([]);
       setVenuesCatalog([]);
       setEventsCatalog([]);
+      setEventsSearchExtra([]);
       setCatalogLoading(false);
       setCatalogError(null);
       return;
@@ -781,7 +784,7 @@ function DayRoutePanelInner() {
             .then(async (response) =>
               response.ok ? ((await response.json()) as { venues?: VenueCatalogCard[] }) : null,
             ),
-          fetch(`/api/public/events?city=${eventsCityQ}&limit=80&sort=popular`, {
+          fetch(`/api/public/events?city=${eventsCityQ}&limit=100&sort=popular`, {
             signal: controller.signal,
           }).then(async (response) =>
             response.ok
@@ -801,6 +804,7 @@ function DayRoutePanelInner() {
           setLocationsCatalog([]);
           setVenuesCatalog([]);
           setEventsCatalog([]);
+          setEventsSearchExtra([]);
           setCatalogError('Не удалось загрузить каталог. Откройте блок ещё раз или обновите страницу.');
           return;
         }
@@ -808,6 +812,7 @@ function DayRoutePanelInner() {
         setVenuesCatalog((venuesPayload?.venues || []).map((item) => toVenueCatalogCard(item)));
         const events = eventsPayload?.items || eventsPayload?.sessions || [];
         setEventsCatalog(events);
+        setEventsSearchExtra([]);
         setCatalogError(null);
       } catch {
         if (controller.signal.aborted) return;
@@ -818,6 +823,7 @@ function DayRoutePanelInner() {
         setLocationsCatalog([]);
         setVenuesCatalog([]);
         setEventsCatalog([]);
+        setEventsSearchExtra([]);
         setCatalogError('Не удалось загрузить каталог. Откройте блок ещё раз или обновите страницу.');
       }
     }
@@ -827,6 +833,43 @@ function DayRoutePanelInner() {
     });
     return () => controller.abort();
   }, [pageCityName, pageCitySlug, pageCitySourceSlug]);
+
+  /** Remote event hits for typed query - base popular list alone misses long-tail titles. */
+  useEffect(() => {
+    const needle = unifiedSearchQuery.trim();
+    if (!pageCityName || needle.length < 2) {
+      setEventsSearchExtra([]);
+      return;
+    }
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      const eventsCityFilter = pageCityName || pageCitySlug || pageCitySourceSlug;
+      const eventsCityQ = encodeURIComponent(eventsCityFilter);
+      const q = encodeURIComponent(needle);
+      void fetch(`/api/public/events?city=${eventsCityQ}&q=${q}&limit=40&sort=popular`, {
+        signal: controller.signal,
+      })
+        .then(async (response) =>
+          response.ok
+            ? ((await response.json()) as {
+                items?: PublicCatalogListItemDto[];
+                sessions?: PublicCatalogListItemDto[];
+              })
+            : null,
+        )
+        .then((payload) => {
+          if (controller.signal.aborted) return;
+          setEventsSearchExtra(payload?.items || payload?.sessions || []);
+        })
+        .catch(() => {
+          if (!controller.signal.aborted) setEventsSearchExtra([]);
+        });
+    }, 220);
+    return () => {
+      window.clearTimeout(timer);
+      controller.abort();
+    };
+  }, [unifiedSearchQuery, pageCityName, pageCitySlug, pageCitySourceSlug]);
 
   const matchSources = useMemo(() => {
     const map = new Map<string, DayRouteVenueMatchSource>();
@@ -975,7 +1018,9 @@ function DayRoutePanelInner() {
 
   function pickEventById(optionId: string) {
     const eventId = optionId.replace(/^event:/, '');
-    const event = eventsCatalog.find((item) => item.id === eventId);
+    const event =
+      eventsCatalog.find((item) => item.id === eventId) ||
+      eventsSearchExtra.find((item) => item.id === eventId);
     if (!event) return;
     const matchedVenue =
       venuesCatalog.find((v) => v.slug && v.slug === event.venueSlug) ||
@@ -1383,7 +1428,11 @@ function DayRoutePanelInner() {
         disabledReason: inRoute ? 'Уже в маршруте' : atMax ? dayRouteHardLimitMessage() : null,
       });
     }
-    for (const event of eventsCatalog) {
+    const eventsById = new Map<string, PublicCatalogListItemDto>();
+    for (const event of [...eventsCatalog, ...eventsSearchExtra]) {
+      if (event?.id) eventsById.set(event.id, event);
+    }
+    for (const event of eventsById.values()) {
       const sessionHint = [event.dateLabel, event.timeLabel].filter(Boolean).join(', ');
       const venueHint = [event.venue, sessionHint, 'Событие'].filter(Boolean).join(' · ');
       const venueKey = String(event.venueSlug || event.venue || event.id).trim();
@@ -1408,7 +1457,7 @@ function DayRoutePanelInner() {
       });
     }
     return opts;
-  }, [locationsCatalog, venuesCatalog, eventsCatalog, route, atMax]);
+  }, [locationsCatalog, venuesCatalog, eventsCatalog, eventsSearchExtra, route, atMax]);
 
   function pickUnifiedSearch(option: DayRouteSearchOption) {
     if (option.id.startsWith('event:')) {
@@ -1928,12 +1977,13 @@ function DayRoutePanelInner() {
                   <DayRouteSearchSelect
                     label="Поиск"
                     hideLabel
-                    placeholder="Найти место…"
+                    placeholder="Найти место или событие"
                     emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Ничего не найдено'}
                     loading={catalogLoading}
                     disabled={atMax}
                     options={unifiedSearchOptions}
                     onPick={pickUnifiedSearch}
+                    onQueryChange={setUnifiedSearchQuery}
                   />
                   {catalogError ? (
                     <p className="mt-1.5 text-xs font-medium text-rose-700" role="status">
@@ -1989,12 +2039,13 @@ function DayRoutePanelInner() {
             <div>
               <DayRouteSearchSelect
                 label="Поиск"
-                placeholder="Найти место…"
+                placeholder="Найти место или событие"
                 emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Ничего не найдено'}
                 loading={catalogLoading}
                 disabled={atMax}
                 options={unifiedSearchOptions}
                 onPick={pickUnifiedSearch}
+                onQueryChange={setUnifiedSearchQuery}
               />
               {catalogError ? (
                 <p className="mt-2 text-xs font-medium text-rose-700" role="status">
