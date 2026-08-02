@@ -11,8 +11,9 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.MYDAY-SPLIT-DESK | Desktop ≥lg: list left + sticky map right (`data-day-split`) | Критический | ✅ `9f6af02` live BUILD_ID=`5DefDbAaaUHtfw8BAiky3` |
-| UX.MYDAY-SPLIT-MOB | Mobile &lt;lg: sticky map ~38vh + list scroll; expand ~85vh (`data-day-map-expand`); no bottom-sheet physics | Критический | 🔄 commit+deploy |
+| UX.MYDAY-SPLIT-DESK | Desktop ≥lg: list left + sticky map right (`data-day-split`) | Критический | ⚠️ rolled back - single column, map under list (`data-day-route-map-desktop`) |
+| UX.MYDAY-SPLIT-MOB | Mobile &lt;lg: sticky map ~38vh + list scroll; expand ~85vh (`data-day-map-expand`); no bottom-sheet physics | Критический | ✅ kept (`data-day-mobile-map` `lg:hidden`) |
+| UX.MYDAY-CARD-SIZE | Stop card size/redesign (owner follow-up) | Средний | ⏳ open - не трогать до отдельной итерации |
 
 ---
 

@@ -1,3 +1,21 @@
+## 2026-08-02 - /my-day: откат desktop split, mobile map оставлен
+
+### Наблюдения
+- Owner: desktop split (список слева + sticky карта справа ≥1024) не зашёл - вернуть одноколоночный layout, карта под списком маршрута.
+- Mobile Wanderlog-like sticky map (~38vh / expand ~85vh) оставить.
+- Размер/редизайн stop cards - отдельно, в этой итерации не трогать.
+
+### Решения
+- Desktop: убран `lg:grid` / sticky aside; outer `lg:block lg:h-auto lg:max-w-5xl`; карта снова `data-day-route-map-desktop` (`hidden ... lg:block`) под списком стопов.
+- Aside mobile-only: `lg:hidden` + `data-day-mobile-map` (не `data-day-split-map`); expand/rail без изменений.
+- Stop card markup/стили не менялись.
+
+### Проблемы
+- Deploy/BUILD_ID - после MSK web deploy.
+- Card size follow-up - открыт для следующей итерации с owner.
+
+---
+
 ## 2026-08-02 - /my-day mobile: sticky map split + expand
 
 ### Наблюдения
@@ -8,7 +26,7 @@
 - Mobile: `data-day-mobile-map-split` fixed viewport column; map `order-1` h-[38dvh]/ list `order-2` overflow-y; expand `data-day-map-expand` → ~85dvh + list `max-lg:hidden` + горизонтальный rail стопов.
 - Leaflet `layoutKey` + ResizeObserver → `invalidateSize` после expand/collapse.
 - Nice-to-have: mini `data-day-map-focus-card` (title/nav/delete); per-stop `data-day-stop-maps` (Яндекс).
-- Desktop lg grid split без изменений поведения.
+- Desktop lg grid split без изменений поведения (позднее откатан - см. запись выше).
 
 ### Проблемы
 - Deploy/BUILD_ID - после MSK web deploy.

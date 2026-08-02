@@ -1796,28 +1796,27 @@ function DayRoutePanelInner() {
     <div
       className={
         hasMapStops
-          ? 'container-page flex h-[calc(100dvh-var(--site-header-height))] flex-col overflow-hidden px-0 py-0 print:hidden lg:block lg:h-auto lg:max-w-[90rem] lg:overflow-visible lg:px-6 lg:py-5 lg:pb-10'
-          : 'container-page px-4 py-5 pb-28 sm:px-6 sm:py-10 sm:pb-10 print:hidden lg:max-w-[90rem]'
+          ? 'container-page flex h-[calc(100dvh-var(--site-header-height))] flex-col overflow-hidden px-0 py-0 print:hidden lg:block lg:h-auto lg:max-w-5xl lg:overflow-visible lg:px-6 lg:py-5 lg:pb-10'
+          : 'container-page px-4 py-5 pb-28 sm:px-6 sm:py-10 sm:pb-10 print:hidden lg:max-w-5xl'
       }
       data-day-mobile-map-split={hasMapStops ? '1' : undefined}
     >
       <div
         className={
           hasMapStops
-            ? 'flex min-h-0 flex-1 flex-col overflow-hidden lg:grid lg:grid-cols-[minmax(0,0.45fr)_minmax(0,0.55fr)] lg:items-start lg:gap-5 lg:overflow-visible'
-            : 'lg:grid lg:grid-cols-[minmax(0,0.45fr)_minmax(0,0.55fr)] lg:items-start lg:gap-5'
+            ? 'flex min-h-0 flex-1 flex-col overflow-hidden lg:block lg:overflow-visible'
+            : undefined
         }
-        data-day-split
         data-day-map-expand={mapExpanded ? '1' : '0'}
       >
         <div
           ref={splitLeftRef}
           className={
             hasMapStops
-              ? `min-w-0 order-2 flex-1 overflow-y-auto overscroll-contain px-4 pb-28 pt-3 sm:px-6 lg:order-none lg:max-h-[calc(100dvh-var(--site-header-height)-1rem)] lg:overflow-y-auto lg:px-0 lg:pb-0 lg:pt-0 lg:pr-1 ${
+              ? `min-w-0 order-2 flex-1 overflow-y-auto overscroll-contain px-4 pb-28 pt-3 sm:px-6 lg:order-none lg:overflow-visible lg:px-0 lg:pb-0 lg:pt-0 ${
                   mapExpanded ? 'max-lg:hidden' : ''
                 }`
-              : 'min-w-0 lg:max-h-[calc(100dvh-var(--site-header-height)-1rem)] lg:overflow-y-auto lg:overscroll-contain lg:pr-1'
+              : 'min-w-0'
           }
           data-day-split-left
           aria-hidden={hasMapStops && mapExpanded ? true : undefined}
@@ -2125,6 +2124,30 @@ function DayRoutePanelInner() {
               </Fragment>
             ))}
           </ul>
+
+          {mapStops.length > 0 ? (
+            <div
+              className="mt-4 hidden rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 lg:block"
+              data-day-route-map-wrap
+              data-day-route-map-desktop
+            >
+              <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-bold text-slate-900">Карта дня</p>
+                  <p className="mt-0.5 text-xs text-slate-500">
+                    Точки с координатами · порядок как в списке
+                  </p>
+                </div>
+                {renderMapToolbar()}
+              </div>
+              <DayRouteOsmMap
+                stops={mapStops}
+                selectedStopId={focusedStopId}
+                onStopClick={focusStopFromMap}
+                className="h-64 w-full overflow-hidden rounded-xl bg-slate-100 sm:h-80"
+              />
+            </div>
+          ) : null}
         </section>
       )}
 
@@ -2866,27 +2889,16 @@ function DayRoutePanelInner() {
         <aside
           className={
             hasMapStops
-              ? `relative order-1 flex shrink-0 flex-col overflow-hidden border-b border-slate-200 bg-white transition-[height] duration-200 ease-out ${
+              ? `relative order-1 flex shrink-0 flex-col overflow-hidden border-b border-slate-200 bg-white transition-[height] duration-200 ease-out lg:hidden ${
                   mapExpanded
                     ? 'h-[min(85dvh,calc(100dvh-var(--site-header-height)-2.5rem))]'
                     : 'h-[38dvh]'
-                } lg:order-none lg:mt-0 lg:h-[calc(100dvh-var(--site-header-height)-1.5rem)] lg:sticky lg:top-[calc(var(--site-header-height)+0.75rem)] lg:rounded-2xl lg:border lg:border-slate-200`
-              : 'mt-4 hidden min-h-0 lg:sticky lg:top-[calc(var(--site-header-height)+0.75rem)] lg:mt-0 lg:flex lg:h-[calc(100dvh-var(--site-header-height)-1.5rem)] lg:flex-col lg:overflow-hidden lg:rounded-2xl lg:border lg:border-slate-200 lg:bg-white'
+                }`
+              : 'hidden'
           }
-          data-day-split-map
+          data-day-mobile-map
           data-day-map-expanded={mapExpanded ? '1' : '0'}
         >
-          <div className="hidden shrink-0 flex-col gap-2 border-b border-slate-100 px-3 py-3 sm:flex-row sm:items-center sm:justify-between lg:flex">
-            <div className="min-w-0">
-              <p className="text-sm font-bold text-slate-900">Карта дня</p>
-              <p className="mt-0.5 text-xs text-slate-500">
-                {mapStops.length
-                  ? `${mapStops.length} ${mapStops.length === 1 ? 'точка' : 'точек'} на карте`
-                  : 'Добавьте места с координатами'}
-              </p>
-            </div>
-            {renderMapToolbar()}
-          </div>
           <div className="relative min-h-0 flex-1 bg-slate-100">
             {mapStops.length > 0 ? (
               <DayRouteOsmMap
@@ -2896,11 +2908,7 @@ function DayRoutePanelInner() {
                 layoutKey={mapExpanded ? 'expanded' : 'collapsed'}
                 className="absolute inset-0 h-full w-full"
               />
-            ) : (
-              <div className="flex h-full min-h-[20rem] items-center justify-center px-6 text-center text-sm text-slate-500">
-                Карта появится, когда у точек будут координаты
-              </div>
-            )}
+            ) : null}
 
             {hasMapStops ? (
               <button
@@ -2910,7 +2918,7 @@ function DayRoutePanelInner() {
                 aria-label={mapExpanded ? 'Свернуть карту' : 'Развернуть карту'}
                 title={mapExpanded ? 'Свернуть карту' : 'Развернуть карту'}
                 onClick={() => setMapExpanded((open) => !open)}
-                className="absolute left-3 top-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-800 shadow-sm backdrop-blur hover:bg-white lg:hidden"
+                className="absolute left-3 top-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-800 shadow-sm backdrop-blur hover:bg-white"
               >
                 {mapExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
               </button>
@@ -2919,7 +2927,7 @@ function DayRoutePanelInner() {
             {focusedVenue && hasMapStops ? (
               <div
                 className={`absolute left-3 right-3 z-20 rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur ${
-                  mapExpanded ? 'bottom-20 lg:bottom-4' : 'bottom-3 lg:bottom-4'
+                  mapExpanded ? 'bottom-20' : 'bottom-3'
                 }`}
                 data-day-map-focus-card
               >
@@ -2964,7 +2972,7 @@ function DayRoutePanelInner() {
 
             {mapExpanded && route.venues.length > 0 ? (
               <div
-                className="absolute inset-x-0 bottom-0 z-10 border-t border-slate-200/80 bg-white/95 backdrop-blur lg:hidden"
+                className="absolute inset-x-0 bottom-0 z-10 border-t border-slate-200/80 bg-white/95 backdrop-blur"
                 data-day-map-stops-rail
               >
                 <div className="flex gap-2 overflow-x-auto px-3 py-2.5">
