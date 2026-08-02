@@ -1,3 +1,19 @@
+## 2026-08-02 - /my-day desktop split: список слева, карта sticky справа
+
+### Наблюдения
+- Owner: desktop ≥1024 - split ~45/55; левая колонка скроллится, карта sticky справа на всю высоту; мобилка - текущий вертикальный стек.
+- Карта в потоке съедала вертикаль и толкала Hot Picks/форму вниз.
+
+### Решения
+- `data-day-split` CSS grid lg; left `overflow-y-auto` max-h viewport; right sticky map column с toolbar Optimize/Yandex.
+- Mobile map wrap `lg:hidden`; pin click → scroll+highlight stop (`data-day-stop-focused`).
+- Список стопов всегда 1 колонка (вертикальный ряд).
+
+### Проблемы
+- Deploy follows.
+
+---
+
 ## 2026-08-02 - /my-day: compact stops + starter + commercial CTA slice
 
 ### Наблюдения

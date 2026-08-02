@@ -336,6 +336,9 @@ function DayRoutePanelInner() {
   const [mustSeeFilter, setMustSeeFilter] = useState<MustSeeFilterId>('main');
   /** Hot Picks tab: Советы / Культура / Еда и бары. */
   const [hotPickTab, setHotPickTab] = useState<HotPickTabId>('tips');
+  /** Stop focused from map pin click (desktop split highlight). */
+  const [focusedStopId, setFocusedStopId] = useState<string | null>(null);
+  const splitLeftRef = useRef<HTMLDivElement | null>(null);
   /** After external «Купить билет» - ask guest to mark bought. */
   const [ticketHandoff, setTicketHandoff] = useState<{
     venueId: string;
@@ -1719,9 +1722,66 @@ function DayRoutePanelInner() {
   const showMustSeeAccordion = Boolean(hasPageCity && (mustSeeResolved.length > 0 || (!catalogLoading && pageCitySlug)));
   const showHotPicks = Boolean(hasPageCity && (hotPickCards.length > 0 || hotPickTabIds.length > 0));
 
+  function focusStopFromMap(stopId: string) {
+    setFocusedStopId(stopId);
+    const root = splitLeftRef.current || document;
+    const el = root.querySelector(`[data-day-plan-stop="${String(stopId).replace(/["\\]/g, '')}"]`);
+    if (el instanceof HTMLElement) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  function renderMapToolbar(compact = false) {
+    return (
+      <div className={`flex flex-wrap gap-2 ${compact ? '' : ''}`}>
+        {canOptimize ? (
+          <button
+            type="button"
+            onClick={optimizeOrder}
+            data-day-map-optimize
+            className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            <Sparkles className="h-3.5 w-3.5" />
+            Оптимизировать
+          </button>
+        ) : null}
+        {yandexUrl ? (
+          <a
+            href={yandexUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-3 py-2 text-xs font-bold text-white hover:bg-sky-700"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            Яндекс.Карты
+          </a>
+        ) : (
+          <button
+            type="button"
+            disabled
+            title="Нужны координаты минимум у 2 точек"
+            className="inline-flex min-h-10 cursor-not-allowed items-center justify-center gap-1.5 rounded-full bg-slate-200 px-3 py-2 text-xs font-bold text-slate-500"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            Яндекс.Карты
+          </button>
+        )}
+      </div>
+    );
+  }
+
   return (
     <>
-    <div className="container-page px-4 py-5 pb-28 sm:px-6 sm:py-10 sm:pb-10 print:hidden">
+    <div className="container-page px-4 py-5 pb-28 sm:px-6 sm:py-10 sm:pb-10 print:hidden lg:max-w-[90rem]">
+      <div
+        className="lg:grid lg:grid-cols-[minmax(0,0.45fr)_minmax(0,0.55fr)] lg:items-start lg:gap-5"
+        data-day-split
+      >
+        <div
+          ref={splitLeftRef}
+          className="min-w-0 lg:max-h-[calc(100dvh-var(--site-header-height)-1rem)] lg:overflow-y-auto lg:overscroll-contain lg:pr-1"
+          data-day-split-left
+        >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h1 className="font-display text-[1.65rem] font-bold leading-tight text-slate-900 sm:text-3xl">
@@ -1768,17 +1828,6 @@ function DayRoutePanelInner() {
 
       {route.venues.length ? (
         <div className="mt-3 flex flex-wrap gap-2">
-          {yandexUrl ? (
-            <a
-              href={yandexUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl bg-sky-600 px-3 py-1.5 text-xs font-bold text-white transition duration-200 hover:bg-sky-700"
-            >
-              <ExternalLink className="h-3.5 w-3.5" />
-              Карта
-            </a>
-          ) : null}
           <button
             type="button"
             onClick={printItinerary}
@@ -1894,39 +1943,6 @@ function DayRoutePanelInner() {
                 {formatDayRouteStopsHeading(route.venues.length)}
               </span>
             </h2>
-            <div className="flex flex-wrap gap-2">
-              {canOptimize ? (
-                <button
-                  type="button"
-                  onClick={optimizeOrder}
-                  className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                >
-                  <Sparkles className="h-3.5 w-3.5" />
-                  Оптимизировать порядок
-                </button>
-              ) : null}
-              {yandexUrl ? (
-                <a
-                  href={yandexUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-700"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  Маршрут в Яндекс.Картах
-                </a>
-              ) : (
-                <button
-                  type="button"
-                  disabled
-                  title="Нужны координаты минимум у 2 точек"
-                  className="inline-flex min-h-10 cursor-not-allowed items-center justify-center gap-1.5 rounded-full bg-slate-200 px-4 py-2 text-xs font-bold text-slate-500"
-                >
-                  <ExternalLink className="h-3.5 w-3.5" />
-                  Маршрут в Яндекс.Картах
-                </button>
-              )}
-            </div>
           </div>
           {missingCoordsCount > 0 ? (
             <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
@@ -1981,7 +1997,7 @@ function DayRoutePanelInner() {
               </div>
             </div>
           ) : null}
-          <ul className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3" data-day-plan-list>
+          <ul className="mt-3 grid gap-3" data-day-plan-list>
             {route.venues.map((venue, index) => (
               <Fragment key={venue.id}>
                 <DayRouteVenueCard
@@ -1991,6 +2007,7 @@ function DayRoutePanelInner() {
                   hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
                   segmentToNext={segmentMeters[index] ?? null}
                   travelMode={travelMode}
+                  focused={focusedStopId === venue.id}
                   nearbyUpsells={pickNearbyUpsellsForStop(venue, matchOfferStubs, { limit: 1 })}
                   onMoveUp={() => setRoute(moveDayRouteVenue(venue.id, -1))}
                   onMoveDown={() => setRoute(moveDayRouteVenue(venue.id, 1))}
@@ -2009,7 +2026,8 @@ function DayRoutePanelInner() {
                 freeWindowUpsells.length > 0 &&
                 !atMax ? (
                   <li
-                    className="sm:col-span-2 lg:col-span-3"
+                    className=""
+                    data-day-free-window-upsell
                     data-day-free-window
                   >
                     <div className="rounded-2xl border border-dashed border-sky-200 bg-sky-50/60 p-3 sm:p-4">
@@ -2065,41 +2083,24 @@ function DayRoutePanelInner() {
           </ul>
 
           {mapStops.length > 0 ? (
-            <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-3 sm:p-4" data-day-route-map-wrap>
+            <div
+              className="mt-4 rounded-2xl border border-slate-200 bg-white p-3 sm:p-4 lg:hidden"
+              data-day-route-map-wrap
+              data-day-route-map-mobile
+            >
               <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm font-bold text-slate-900">Карта дня</p>
                   <p className="mt-0.5 text-xs text-slate-500">
-                    Точки с координатами · порядок как в списке выше
+                    Точки с координатами · порядок как в списке
                   </p>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {canOptimize ? (
-                    <button
-                      type="button"
-                      onClick={optimizeOrder}
-                      data-day-map-optimize
-                      className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                    >
-                      <Sparkles className="h-3.5 w-3.5" />
-                      Оптимизировать
-                    </button>
-                  ) : null}
-                  {yandexUrl ? (
-                    <a
-                      href={yandexUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-3 py-2 text-xs font-bold text-white hover:bg-sky-700"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      Яндекс.Карты
-                    </a>
-                  ) : null}
-                </div>
+                {renderMapToolbar()}
               </div>
               <DayRouteOsmMap
                 stops={mapStops}
+                selectedStopId={focusedStopId}
+                onStopClick={focusStopFromMap}
                 className="h-64 w-full overflow-hidden rounded-xl bg-slate-100 sm:h-80"
               />
             </div>
@@ -2840,6 +2841,40 @@ function DayRoutePanelInner() {
         </div>
       ) : null}
 
+        </div>
+
+        <aside
+          className="mt-4 hidden min-h-0 lg:sticky lg:top-[calc(var(--site-header-height)+0.75rem)] lg:mt-0 lg:flex lg:h-[calc(100dvh-var(--site-header-height)-1.5rem)] lg:flex-col lg:overflow-hidden lg:rounded-2xl lg:border lg:border-slate-200 lg:bg-white"
+          data-day-split-map
+        >
+          <div className="flex shrink-0 flex-col gap-2 border-b border-slate-100 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-slate-900">Карта дня</p>
+              <p className="mt-0.5 text-xs text-slate-500">
+                {mapStops.length
+                  ? `${mapStops.length} ${mapStops.length === 1 ? 'точка' : 'точек'} на карте`
+                  : 'Добавьте места с координатами'}
+              </p>
+            </div>
+            {renderMapToolbar()}
+          </div>
+          <div className="relative min-h-0 flex-1 bg-slate-100">
+            {mapStops.length > 0 ? (
+              <DayRouteOsmMap
+                stops={mapStops}
+                selectedStopId={focusedStopId}
+                onStopClick={focusStopFromMap}
+                className="absolute inset-0 h-full w-full"
+              />
+            ) : (
+              <div className="flex h-full min-h-[20rem] items-center justify-center px-6 text-center text-sm text-slate-500">
+                Карта появится, когда у точек будут координаты
+              </div>
+            )}
+          </div>
+        </aside>
+      </div>
+
       <MobileStickyActionBar>
         {unpaidTicketStops.length > 0 ? (
           <button
@@ -2996,6 +3031,7 @@ function DayRouteVenueCard({
   segmentToNext,
   travelMode,
   nearbyUpsells = [],
+  focused = false,
   onMoveUp,
   onMoveDown,
   onRemove,
@@ -3014,6 +3050,7 @@ function DayRouteVenueCard({
     line: string;
     priceFromRub: number | null;
   }>;
+  focused?: boolean;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onRemove: () => void;
@@ -3050,13 +3087,18 @@ function DayRouteVenueCard({
   const sessionDisplay = formatDayRouteSessionDisplay(venue);
   return (
     <li
-      className="flex flex-col gap-1"
+      className="flex flex-col gap-1 scroll-mt-4"
       data-day-plan-stop={venue.id}
       data-ticket-bought={bought ? '1' : '0'}
       data-commercial-chip={chip.kind}
       data-day-session={sessionDisplay || undefined}
+      data-day-stop-focused={focused ? '1' : undefined}
     >
-      <div className="rounded-xl border border-slate-200 bg-white p-2">
+      <div
+        className={`rounded-xl border bg-white p-2 ${
+          focused ? 'border-emerald-400 ring-2 ring-emerald-200' : 'border-slate-200'
+        }`}
+      >
         <div className="flex items-start gap-2">
           <div className="flex w-7 shrink-0 flex-col items-center gap-0.5">
             <span

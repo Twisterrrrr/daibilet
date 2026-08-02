@@ -14,13 +14,19 @@ export type DayRouteMapStop = {
 const MIN_ZOOM = 3;
 const MAX_ZOOM = 18;
 
-function numberedMarkerHtml(n: number): string {
+function numberedMarkerHtml(n: number, selected: boolean): string {
   const label = String(n);
+  const bg = selected ? '#059669' : '#0f172a';
+  const ring = selected ? '#a7f3d0' : '#fff';
   return (
-    '<div style="width:28px;height:28px;border-radius:9999px;background:#0f172a;color:#fff;' +
-    'border:2px solid #fff;box-shadow:0 1px 4px rgba(15,23,42,.35);' +
+    '<div style="width:28px;height:28px;border-radius:9999px;background:' +
+    bg +
+    ';color:#fff;' +
+    'border:2px solid ' +
+    ring +
+    ';box-shadow:0 1px 4px rgba(15,23,42,.35);' +
     'display:flex;align-items:center;justify-content:center;' +
-    'font:700 12px/1 system-ui,sans-serif">' +
+    'font:700 12px/1 system-ui,sans-serif;cursor:pointer">' +
     label +
     '</div>'
   );
@@ -33,14 +39,20 @@ function numberedMarkerHtml(n: number): string {
 export function DayRouteOsmMap({
   stops,
   className,
+  selectedStopId = null,
+  onStopClick,
 }: {
   stops: DayRouteMapStop[];
   className?: string;
+  selectedStopId?: string | null;
+  onStopClick?: (stopId: string) => void;
 }) {
   const containerRef = React.useRef<HTMLDivElement>(null);
   const mapRef = React.useRef<LeafletMap | null>(null);
   const markersRef = React.useRef<LeafletMarker[]>([]);
   const lineRef = React.useRef<LeafletPolyline | null>(null);
+  const onStopClickRef = React.useRef(onStopClick);
+  onStopClickRef.current = onStopClick;
 
   const stopsKey = stops
     .map((s) => `${s.id}:${s.index}:${s.latitude.toFixed(5)},${s.longitude.toFixed(5)}`)
@@ -66,7 +78,7 @@ export function DayRouteOsmMap({
           zoom: 13,
           minZoom: MIN_ZOOM,
           maxZoom: MAX_ZOOM,
-          scrollWheelZoom: false,
+          scrollWheelZoom: true,
           zoomControl: false,
         });
         mapRef.current = map;
@@ -99,17 +111,21 @@ export function DayRouteOsmMap({
       for (const stop of stops) {
         const latLng: [number, number] = [stop.latitude, stop.longitude];
         latLngs.push(latLng);
+        const selected = Boolean(selectedStopId && selectedStopId === stop.id);
         const icon = L.divIcon({
           className: 'daibilet-day-route-marker',
-          html: numberedMarkerHtml(stop.index + 1),
+          html: numberedMarkerHtml(stop.index + 1, selected),
           iconSize: [28, 28],
           iconAnchor: [14, 14],
         });
         const marker = L.marker(latLng, {
           icon,
           title: `${stop.index + 1}. ${stop.title}`,
-          keyboard: false,
+          keyboard: true,
         }).addTo(map);
+        marker.on('click', () => {
+          onStopClickRef.current?.(stop.id);
+        });
         markersRef.current.push(marker);
       }
 
@@ -134,7 +150,7 @@ export function DayRouteOsmMap({
       cancelled = true;
       resizeObserver?.disconnect();
     };
-  }, [stopsKey, stops]);
+  }, [stopsKey, stops, selectedStopId]);
 
   React.useEffect(() => {
     return () => {
