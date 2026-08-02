@@ -58,7 +58,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MOB0 | Audit + канон sticky chrome / hero budget / CTA / sections / chips | Критический | ✅ docs |
 | UX.LOC1 | Mobile sticky: city pin + search icon + route/fav | Критический | ✅ `cc05efa` MSK **BUILD_ID=`EroIFEOGTEMJsFn1Zf3tr`** |
 | UX.LOC2 | `MobileNavSheet`: «Город» сразу после поиска | Критический | ✅ |
-| UX.LOC4 | `/locations`: dense hero; блок «Популярные города» (RussiaMap) убран с локаций | Высокий | ✅ |
+| UX.LOC4 | `/locations`: dense hero; блок «Популярные города» (RussiaMap) убран с локаций | Высокий | ✅ `c698f2c` MSK **BUILD_ID=`SdwQIxr9a9CVj7jfdAKWh`** |
 | UX.MOB1 | Shared `MobileStickyActionBar` + location/institution/my-day sticky CTAs | Высокий | ✅ |
 | UX.MOB2 | Event mobile hero: не full-viewport (`min(42vh,20rem)`) | Средний | ✅ |
 | UX.LOC3 | Rename nav/H1 «Локации» → job-label - после owner Q1 | Высокий | ⏳ |
