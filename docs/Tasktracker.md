@@ -30,7 +30,7 @@
 | UX.MYDAY-ONPAGE | `/my-day` on-page city + searchable Локации/Площадки/События + must-see chips (no catalog nav) | Критический | ✅ `b4fdfd5`+`6345d0a` MSK **BUILD_ID=`q-1BAwZ65koVjH3CunDvi`** |
 | UX.MYDAY-MAX10 | `/my-day` DAY_ROUTE_MAX 8→10; drop redundant intro copy; must-see chip without «в дне» | Критический | ✅ `8499c92` MSK **BUILD_ID=`q-1BAwZ65koVjH3CunDvi`** smoke `/my-day` 200 |
 | UX.MYDAY-SHARE | Viral share `?city=&items=id:HHMM\|free`; menu Copy/TG/WA/**Макс**; friend landing; buy+bought; DnD/print/distance MVP | Критический | ✅ `42421d4` MSK **BUILD_ID=`tU1erwiIQtH11jrJCcYZH`** smoke `/my-day`+items 200 |
-| UX.MYDAY-PRINT | Маршрутный лист: кнопка «Сохранить маршрутный лист», `@media print` sheet (город/дата, точки, км+ETA), chrome hide | Критический | 🔄 ship |
+| UX.MYDAY-PRINT | Маршрутный лист: кнопка «Сохранить маршрутный лист», `@media print` sheet (город/дата, точки, км+ETA), chrome hide | Критический | ✅ `62564ca` MSK **BUILD_ID=`grb226etQIYA0W1Wi-Myf`** |
 
 ---
 
@@ -119,6 +119,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | VK.13 | Editorial enrich batch3: Влад/Вологда/Иркутск/Пермь/Сортавала/Саратов/Улан-Удэ/Челябинск/Рязань/Ставрополь (57) | Высокий | ✅ 57 MSK; база 180 |
 | VK.14 | Editorial enrich batch4: Томск/Ульяновск/Ижевск/Орёл/Оренбург/Абакан/Псков/Севастополь/Симферополь/Пенза/Волгоград/Архангельск (72) | Высокий | ✅ 66 upd+6 ins; база 252; arhangelsk mustSee |
 | VK.15 | Editorial enrich batch5: Астрахань/Барнаул/Белгород/Благовещенск/Брянск/Иваново/Йошкар-Ола/Калуга/Кемерово/Киров (60) | Высокий | ✅ 60 insert; база 312; mustSee seeded |
+| VK.17 | Nizhny: must-see 30 + gastro 10 + 3 day-route presets | Высокий | 🔄 apply/deploy |
 | VK.16 | Editorial enrich batch6: Кострома/Курган/Курск/Липецк/Мурманск/Саранск/Смоленск/Сыктывкар/Тамбов/Хабаровск/Чебоксары/Чита/Южно-Сахалинск (78) | Высокий | ✅ 32 ins+46 upd; twins HIDDEN; база 390; BUILD `-qqq_t2f_YXevgHdjOf7E` |
 
 ## Finance supplier LC smoke (.159) 2026-07-31
