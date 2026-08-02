@@ -1,3 +1,19 @@
+## 2026-08-02 - Codex handoff: SSR hang RCA brief (INC.504.22)
+
+### Наблюдения
+- Owner: нужен независимый взгляд Codex на recurring SSR hang/504 (INC.504.13/.15/.18-.21), не повтор ops-бандаидов.
+- Live mitigations уже на MSK: warm OFF, SIGKILL healthcheck, MemoryMax/heap, TimeoutStopSec=25. Soft-timeouts (PERF.SSR1) не спасают при blocked event loop.
+- Архитектурный след: `@daibilet/web` тянет `@daibilet/backend/public-read` / Prisma в Next process (Path B).
+
+### Решения
+- Brief: [codex-ssr-hang-brief.md](./codex-ssr-hang-brief.md) - problem, boundaries (no SSH / no warm / no soft-timeout-only), deliverables (RCA call graph, architecture, PR-sized fix, smoke, ops remainder).
+- Tasktracker: `INC.504.22` ожидает Codex; root hang по-прежнему `INC.504.15`.
+- Docs-only: commit+push, без web deploy.
+
+### Проблемы
+- Root hang open до сдачи Codex. Ops safety net не заменяет архитектурный фикс.
+
+---
 ## 2026-08-02 - INC.504.21: SSR hang again + healthcheck not executable
 
 ### Наблюдения
