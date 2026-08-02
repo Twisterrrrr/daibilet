@@ -13,7 +13,7 @@
 - `dayRouteItemFromEvent`: title = event title; stop без venue допускается через event id.
 
 ### Проблемы
-- Deploy BUILD_ID ниже после MSK ship.
+- Live MSK **BUILD_ID=`mtXLit644Nhr5cRd4ideD`** (HEAD `3f14a98`; includes hub copy `969b684`). `/my-day` 200.
 
 ---
 
