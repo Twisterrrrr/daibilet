@@ -12,7 +12,7 @@
 - Readiness points blend к SOFT, не к hard.
 
 ### Проблемы
-- Deploy MSK + BUILD_ID - в Tasktracker после ship.
+- MSK deploy: **BUILD_ID=`Nu6AszGgZIWJFyXpok29W`** (`2c927fb`), `/my-day` 200. Hub warm частично FAIL (kazan/nizhniy/… timeout) - web active.
 
 ---
 
