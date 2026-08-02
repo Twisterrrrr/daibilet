@@ -83,14 +83,14 @@ Mobile sticky bottom: общий `MobileStickyActionBar` (`lg:hidden` + safe-are
 ### `/my-day` (owner IA 2026-08-02)
 
 1. Sticky chrome (city chip)  
-2. Title + count (`Точки · N/8`) + short help  
-3. **Primary:** «Добавить из каталога» - city-scoped CTAs Локации / Площадки / События + link на хаб города («Главные места» / «Собрать за минуту»)  
+2. Title + count (`Точки · N/10`)  
+3. **Primary:** «Добавить в день» - on-page city + searchable Локации / Площадки / События + must-see chips  
 4. Stops list (+ Yandex / optimize when coords allow)  
 5. Matches excursions (`#day-route-matches`)  
 6. **Secondary accordion** (collapsed): «Добавить своё место» - text planner (`#day-plan-form`)  
 7. Sticky: Из каталога / Своё / Карты / Экскурсии  
 
-Foundation заполнения - каталожные сущности. Ручной текст опционален, не first-screen. `DAY_ROUTE_MAX=8`.
+Foundation заполнения - каталожные сущности. Ручной текст опционален, не first-screen. `DAY_ROUTE_MAX=10`.
 
 ---
 

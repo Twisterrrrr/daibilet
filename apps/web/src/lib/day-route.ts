@@ -8,7 +8,7 @@ export const DAY_ROUTE_STORAGE_KEY = 'daibilet:dayRoute';
 export const DAY_ROUTE_CHANGED_EVENT = 'daibilet:day-route-changed';
 
 export const DAY_ROUTE_MIN = 2;
-export const DAY_ROUTE_MAX = 8;
+export const DAY_ROUTE_MAX = 10;
 
 export type DayRouteCoords = { latitude: number; longitude: number };
 
@@ -108,7 +108,7 @@ export function addTextStopToDayRoute(input: TextDayRouteStopInput): DayRouteSta
   const title = String(input.title || '').trim();
   if (!title) return readDayRouteFresh();
   const current = readDayRouteFresh();
-  // Hard cap = DAY_ROUTE_MAX (8). DAY_ROUTE_MIN (2) is only a UX "day is ready" hint.
+  // Hard cap = DAY_ROUTE_MAX (10). DAY_ROUTE_MIN (2) is only a UX "day is ready" hint.
   if (current.venues.length >= DAY_ROUTE_MAX) return current;
 
   const coords = parseDayRouteCoordsInput(input);

@@ -1,6 +1,6 @@
 /**
  * Owner-path E2E: standalone text planner on /my-day (no catalog).
- * Open /my-day → add text stops through 8 → assert counter N/8 and add disabled at max.
+ * Open /my-day → add text stops through MAX → assert counter N/MAX and add disabled at max.
  *
  * Usage: node scripts/e2e-day-plan-text.mjs
  * Env: BASE_URL (default https://daibilet.ru)
@@ -11,7 +11,7 @@ import path from 'node:path';
 
 const BASE = process.env.BASE_URL || 'https://daibilet.ru';
 const OUT = path.resolve('.deploy-tmp/e2e-day-plan-text');
-const MAX = 8;
+const MAX = 10;
 fs.mkdirSync(OUT, { recursive: true });
 
 function log(...args) {
@@ -128,7 +128,7 @@ async function main() {
 
       // Critical regression: DAY_ROUTE_MIN=2 must NOT disable add.
       if (n === 2 && state.addDisabled) {
-        throw new Error('Add disabled at 2/8 - MIN leaked as MAX');
+        throw new Error('Add disabled at 2/MAX - MIN leaked as MAX');
       }
       if (n < MAX && state.addDisabled) {
         throw new Error(`Add disabled early at ${n}/${MAX}`);
@@ -149,7 +149,7 @@ async function main() {
       }
     }
 
-    await page.screenshot({ path: path.join(OUT, 'after-8.png'), fullPage: true });
+    await page.screenshot({ path: path.join(OUT, `after-${MAX}.png`), fullPage: true });
     result.ok = true;
     log(`OK text planner 0→${MAX} without catalog; counter N/${MAX}; add disabled only at max`);
   } catch (err) {

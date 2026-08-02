@@ -365,7 +365,7 @@ function DayRoutePanelInner() {
     return Boolean(payload?.multiCityWarning);
   }, [route.venues, payload?.multiCityWarning]);
   const belowMin = route.venues.length > 0 && route.venues.length < DAY_ROUTE_MIN;
-  // Cap is always DAY_ROUTE_MAX (8). Never use DAY_ROUTE_MIN (2) as an add ceiling.
+  // Cap is always DAY_ROUTE_MAX (10). Never use DAY_ROUTE_MIN (2) as an add ceiling.
   const atMax = route.venues.length >= DAY_ROUTE_MAX;
   const citySlug = dayRouteDominantCitySlug(route.venues);
   const cityTitle = useMemo(() => {
@@ -407,7 +407,6 @@ function DayRoutePanelInner() {
   const locationsHref = venueCatalogHrefWithSelectedCity('/locations', scopeCityParam);
   const venuesHref = venueCatalogHrefWithSelectedCity('/venues', scopeCityParam);
   const cityHubHref = scopeCitySlug ? `/cities/${encodeURIComponent(scopeCitySlug)}` : '/cities';
-  const cityContextLabel = scopeCityName || (scopeCitySlug ? scopeCitySlug : null);
 
   // City-scoped catalog lists for on-page searchable selects.
   useEffect(() => {
@@ -763,10 +762,6 @@ function DayRoutePanelInner() {
         <div className="min-w-0">
           <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Собери свой день</p>
           <h1 className="mt-1 font-display text-2xl font-extrabold text-slate-900 sm:text-3xl">Мой день</h1>
-          <p className="mt-1.5 max-w-2xl text-sm leading-relaxed text-slate-600 sm:mt-2">
-            Выберите город и добавляйте локации, площадки и события прямо здесь. До {DAY_ROUTE_MAX} точек
-            {cityContextLabel ? ` · ${cityContextLabel}` : ''}.
-          </p>
           <p className="mt-2 text-xs font-semibold text-slate-500" data-day-route-count-label>
             Точки · {route.venues.length}/{DAY_ROUTE_MAX}
           </p>
@@ -813,9 +808,6 @@ function DayRoutePanelInner() {
         data-day-catalog-add="1"
       >
         <p className="text-sm font-semibold text-slate-900">Добавить в день</p>
-        <p className="mt-1 text-sm leading-relaxed text-slate-600">
-          Город и места выбираются на этой странице - без перехода в каталог.
-        </p>
 
         <div className="mt-3 max-w-md" data-day-city-picker>
           <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">

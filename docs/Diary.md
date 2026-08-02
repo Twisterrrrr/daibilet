@@ -1,3 +1,19 @@
+## 2026-08-02 - /my-day: MAX=10, без лишнего копирайта, chips без «в дне»
+
+### Наблюдения
+- Owner: подпись «в ДНЕ» на must-see chips лишняя; intro «без перехода в каталог» / «До N точек · город» - шум.
+- Лимит 8 точек мало - нужно 10.
+
+### Решения
+- Must-see in-route: emerald border + Check, только имя места (без «в дне») - `6345d0a` + follow-up.
+- Убраны redundant intro lines в `DayRoutePanel`; счётчик `Точки · N/10` остаётся.
+- `DAY_ROUTE_MAX=10`; E2E text/grand-maket обновлены под N/10.
+
+### Проблемы
+- MSK deploy + smoke `/my-day` после commit.
+
+---
+
 ## 2026-08-02 - /my-day: on-page city + searchable add (без ухода в каталог)
 
 ### Наблюдения
