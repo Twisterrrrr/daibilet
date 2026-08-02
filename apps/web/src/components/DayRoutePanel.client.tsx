@@ -79,7 +79,6 @@ import {
   dayRouteSegmentMeters,
   dayRouteTotalDistanceMeters,
   DAY_ROUTE_EVENT_STUB_TITLE,
-  DAY_ROUTE_MAX,
   DAY_ROUTE_PLACE_STUB_TITLE,
   enrichDayRouteFromMatchVenues,
   estimateDayRouteTravelMinutes,
