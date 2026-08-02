@@ -1,3 +1,21 @@
+## 2026-08-02 - /my-day: каталог в стартере + toolbar над маршрутом
+
+### Наблюдения
+- Owner: тройка Локации/Площадки/События + «Каталог целиком» - в верхний starter между Город и Поиск.
+- Owner: вернуть дубль «Оптимизировать» + «Яндекс.Карты» над блоком Маршрут (карта сохраняет свой toolbar).
+- Compact deploy упал на SSG `/events/[slug]` → web crash-loop; нужен один clean recover.
+
+### Решения
+- `renderCatalogTrio` в `renderUnifiedSearch` (город → trio → поиск места).
+- Accordion «Ещё из каталога» = boat + ссылки (без дубля тройки).
+- `data-day-route-toolbar` = `renderMapToolbar()` рядом с H2 Маршрут.
+- Полные hooks (`1f378bc`) + compact cards (`76bae1c`) входят в тот же tip.
+
+### Проблемы
+- Deploy BUILD_ID - после recover.
+
+---
+
 ## 2026-08-02 - /my-day: полный hook без JS `...`
 
 ### Наблюдения

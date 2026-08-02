@@ -1753,7 +1753,72 @@ function DayRoutePanelInner() {
     return `https://yandex.ru/maps/?pt=${lng},${lat}&z=17&l=map`;
   }
 
-  /** City + place search. Empty plan: top starter. Non-empty: secondary under Hot Picks. */
+  /** City + typed catalog + place search. Empty plan: top starter. */
+  function renderCatalogTrio() {
+    if (!hasPageCity) {
+      return (
+        <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          Сначала выберите город - появятся места, музеи и события.
+        </p>
+      );
+    }
+    return (
+      <div className="mt-3" data-day-catalog-trio>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <DayRouteSearchSelect
+            label="Локации"
+            placeholder="Найти локацию…"
+            emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Нет локаций в этом городе'}
+            loading={catalogLoading}
+            disabled={atMax}
+            options={locationOptions}
+            onPick={(option) => pickLocationById(option.id)}
+          />
+          <DayRouteSearchSelect
+            label="Площадки"
+            placeholder="Найти площадку…"
+            emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Нет площадок в этом городе'}
+            loading={catalogLoading}
+            disabled={atMax}
+            options={venueOptions}
+            onPick={(option) => pickVenueById(option.id)}
+          />
+          <DayRouteSearchSelect
+            label="События"
+            placeholder="Найти событие…"
+            emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Нет событий в этом городе'}
+            loading={catalogLoading}
+            disabled={atMax}
+            options={eventOptions}
+            onPick={(option) => pickEventById(option.id)}
+          />
+        </div>
+        <p className="mt-3 text-xs text-slate-500">
+          Каталог целиком:{' '}
+          <Link href={locationsHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
+            локации
+          </Link>
+          {' · '}
+          <Link href={venuesHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
+            площадки
+          </Link>
+          {' · '}
+          <Link href={afishaHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
+            события
+          </Link>
+          {scopeCitySlug ? (
+            <>
+              {' · '}
+              <Link href={cityHubHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
+                хаб города
+              </Link>
+            </>
+          ) : null}
+        </p>
+      </div>
+    );
+  }
+
   function renderUnifiedSearch(asStarter: boolean) {
     return (
       <section
@@ -1786,11 +1851,8 @@ function DayRoutePanelInner() {
             className="w-full"
           />
         </div>
-        {!hasPageCity ? (
-          <p className="mt-3 rounded-2xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            Сначала выберите город - появятся места, музеи и события.
-          </p>
-        ) : (
+        {renderCatalogTrio()}
+        {hasPageCity ? (
           <div className="mt-3">
             <DayRouteSearchSelect
               label="Поиск места"
@@ -1817,7 +1879,7 @@ function DayRoutePanelInner() {
               </button>
             </p>
           </div>
-        )}
+        ) : null}
       </section>
     );
   }
@@ -2055,6 +2117,7 @@ function DayRoutePanelInner() {
                 {formatDayRouteStopsHeading(route.venues.length)}
               </span>
             </h2>
+            <div data-day-route-toolbar>{renderMapToolbar()}</div>
           </div>
           {missingCoordsCount > 0 ? (
             <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
@@ -2627,7 +2690,7 @@ function DayRoutePanelInner() {
           <span>
             <span className="block text-sm font-semibold text-slate-900">Ещё из каталога</span>
             <span className="mt-0.5 block text-xs text-slate-500">
-              Отдельный поиск по типам
+              Речные маршруты и ссылки
             </span>
           </span>
           <ChevronDown
@@ -2641,52 +2704,19 @@ function DayRoutePanelInner() {
                 Сначала выберите город в поиске.
               </p>
             ) : (
-              <>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <DayRouteSearchSelect
-                    label="Локации"
-                    placeholder="Найти локацию…"
-                    emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Нет локаций в этом городе'}
-                    loading={catalogLoading}
-                    disabled={atMax}
-                    options={locationOptions}
-                    onPick={(option) => pickLocationById(option.id)}
-                  />
-                  <DayRouteSearchSelect
-                    label="Площадки"
-                    placeholder="Найти площадку…"
-                    emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Нет площадок в этом городе'}
-                    loading={catalogLoading}
-                    disabled={atMax}
-                    options={venueOptions}
-                    onPick={(option) => pickVenueById(option.id)}
-                  />
-                  <DayRouteSearchSelect
-                    label="События"
-                    placeholder="Найти событие…"
-                    emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Нет событий в этом городе'}
-                    loading={catalogLoading}
-                    disabled={atMax}
-                    options={eventOptions}
-                    onPick={(option) => pickEventById(option.id)}
-                  />
-                </div>
-
-                <DayRouteBoatWizard
-                  cityName={pageCityName}
-                  citySlug={pageCitySlug}
-                  cityId={pageCityId}
-                  citySourceSlug={selectedCity?.selectedDestination?.sourceSlug || null}
-                  route={route}
-                  atMax={atMax}
-                  onRouteChange={setRoute}
-                  locationsCatalog={locationsCatalog}
-                />
-              </>
+              <DayRouteBoatWizard
+                cityName={pageCityName}
+                citySlug={pageCitySlug}
+                cityId={pageCityId}
+                citySourceSlug={selectedCity?.selectedDestination?.sourceSlug || null}
+                route={route}
+                atMax={atMax}
+                onRouteChange={setRoute}
+                locationsCatalog={locationsCatalog}
+              />
             )}
-
             <p className="mt-3 text-xs text-slate-500">
-              Каталог целиком:{' '}
+              Поиск локаций / площадок / событий - в блоке выше. Каталог целиком:{' '}
               <Link href={locationsHref} className="font-semibold text-slate-700 underline-offset-2 hover:underline">
                 локации
               </Link>
