@@ -1880,32 +1880,33 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** Empty plan starter (mobile A compact / desktop airier). Non-empty: secondary under Hot Picks. */
+  /** Empty plan starter - compact variant A on all breakpoints (desktop = mobile density). */
   function renderUnifiedSearch(asStarter: boolean) {
     if (asStarter) {
       return (
         <section
-          className="mt-3 rounded-2xl border border-slate-200 bg-white px-3 pt-5 pb-3 sm:mt-5 sm:px-6 sm:pt-8 sm:pb-4 lg:mt-6 lg:px-8 lg:pt-10 lg:pb-5"
+          className="mt-3 rounded-2xl border border-slate-200 bg-white px-3 pt-5 pb-3 sm:mt-5 sm:px-6"
           ref={unifiedSearchRef}
           data-day-unified-search
           data-day-starter="1"
           data-day-starter-variant="a"
           data-day-starter-pad="sym"
+          data-day-starter-density="compact"
         >
           <div
-            className="mx-auto flex w-full max-w-md flex-col lg:max-w-xl lg:items-center lg:text-center"
+            className="mx-auto flex w-full max-w-md flex-col lg:max-w-lg"
             data-day-plan-starter
           >
-            <div className="flex items-center gap-2.5 lg:flex-col lg:gap-0">
-              <Route className="h-6 w-6 shrink-0 text-slate-400 lg:mx-auto lg:h-9 lg:w-9" aria-hidden />
-              <p className="text-base font-bold leading-snug text-slate-900 sm:text-lg lg:mt-3 lg:text-xl">
+            <div className="flex items-center gap-2.5">
+              <Route className="h-6 w-6 shrink-0 text-slate-400" aria-hidden />
+              <p className="text-base font-bold leading-snug text-slate-900 sm:text-lg">
                 Собери свой день
               </p>
             </div>
-            <p className="mt-1.5 text-[12px] font-normal leading-snug text-slate-500 sm:whitespace-nowrap sm:text-[13px] lg:mt-2 lg:text-[15px]">
+            <p className="mt-1.5 text-[12px] font-normal leading-snug text-slate-500 sm:whitespace-nowrap sm:text-[13px]">
               Выбери город и минимум {DAY_ROUTE_MIN} точки для составления маршрута
             </p>
-            <div className="mt-4 flex w-full flex-col gap-2.5 lg:mt-7 lg:gap-4" data-day-city-search-stack>
+            <div className="mt-4 flex w-full flex-col gap-2.5" data-day-city-search-stack>
               <div data-day-city-picker className="w-full text-left">
                 <CityPicker
                   cities={destinations}
@@ -1936,7 +1937,7 @@ function DayRoutePanelInner() {
                       {catalogError}
                     </p>
                   ) : null}
-                  <p className="mt-1.5 text-[12px] text-slate-500 lg:mt-2.5 lg:text-center lg:text-[13px]">
+                  <p className="mt-1.5 text-[12px] text-slate-500">
                     или{' '}
                     <button
                       type="button"
