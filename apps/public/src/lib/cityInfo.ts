@@ -11,6 +11,8 @@ export type CityPlaceLinkFields = {
 export type CityMustSeeItem = CityPlaceLinkFields & {
   name: string;
   desc: string;
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 export type CitySightItem = CityPlaceLinkFields & {

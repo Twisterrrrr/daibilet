@@ -1,3 +1,22 @@
+## 2026-08-02 - Нижний: missing day-route coords (DTO, не БД)
+
+### Наблюдения
+- Owner: не для всех точек НН передаются lat/lng в «Мой день» / пресеты / «В маршрут».
+- MSK DB: **46/46** PUBLISHED `nizhny-novgorod-*` уже с coords (editorial enrich OK). Detail API тоже отдаёт lat/lng.
+- City hub `/api/public/cities/nizhny-novgorod`: venues = **24 event-площадки без coords** (concert halls/bars); must-see (ярмарка/кремль/…) **ABSENT**.
+- Root cause: (1) `venueRowsByIds` не SELECT-ил `latitude`/`longitude`; (2) hub venues только из sessions; (3) catalog `?city=nizhny-novgorod` не матчил кириллический `нижнии-новгород` / `nizhnii` alias.
+
+### Решения
+- `venueRowsByIds`: lat/lng + cityId/citySlug.
+- `publicPublishedVenuesByCityId` + `mergeCityPageVenues` в city page DTO (session + published content places).
+- `publicVenueRowMatchesCityFilter` + `nizhnii-novgorod` → `nizhniy-novgorod` canon.
+- Client: `city-place-coords` editorial map + `dayRouteItemFromMustSee` fallback (hub → place → editorial).
+
+### Проблемы
+- Event venues без coords в БД остаются null после DTO-fix (не must-see). MSK deploy + smoke ниже.
+
+---
+
 ## 2026-08-02 - /my-day: короткие ссылки шаринга `/d/{code}`
 
 ### Наблюдения

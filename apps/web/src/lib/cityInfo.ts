@@ -11,6 +11,9 @@ export type CityPlaceLinkFields = {
 export type CityMustSeeItem = CityPlaceLinkFields & {
   name: string;
   desc: string;
+  /** Optional day-route coords when hub venues omit the place. */
+  latitude?: number | null;
+  longitude?: number | null;
 };
 
 export type CitySightItem = CityPlaceLinkFields & {

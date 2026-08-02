@@ -4,6 +4,7 @@
 
 import { resolveCityPlaceHref, type CityMustSeeItem, type CityPlaceLinkFields } from './cityInfo';
 import { namesLooselyMatch } from './city-place-href';
+import { lookupEditorialPlaceCoords } from './city-place-coords';
 import { DAY_ROUTE_MAX, type DayRouteVenueItem } from './day-route';
 import { isValidCoordinatePair } from './day-route-score';
 import { eventHref, venueHref } from './routes';
@@ -76,6 +77,21 @@ function coordsFromVenue(
   return { latitude: lat, longitude: lng };
 }
 
+function coordsFromPlace(
+  place: CityMustSeeItem,
+  matched: DayRouteVenueMatchSource | null,
+  slug: string | null,
+): Pick<DayRouteVenueItem, 'latitude' | 'longitude'> {
+  const fromVenue = coordsFromVenue(matched);
+  if (fromVenue.latitude != null && fromVenue.longitude != null) return fromVenue;
+  const fromPlace = coordsFromVenue({
+    latitude: place.latitude ?? null,
+    longitude: place.longitude ?? null,
+  });
+  if (fromPlace.latitude != null && fromPlace.longitude != null) return fromPlace;
+  return coordsFromVenue(lookupEditorialPlaceCoords(slug));
+}
+
 /** Must-see / sight → day-route item when slug or venue match exists. */
 export function dayRouteItemFromMustSee(
   place: CityMustSeeItem,
@@ -110,7 +126,7 @@ export function dayRouteItemFromMustSee(
     href,
     imageUrl: matched?.heroImageUrl || null,
     address: String(matched?.address || '').trim() || null,
-    ...coordsFromVenue(matched),
+    ...coordsFromPlace(place, matched, slug),
   };
 }
 

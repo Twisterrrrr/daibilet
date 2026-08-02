@@ -4,6 +4,8 @@ import { prisma } from '@daibilet/db';
 import {
   publicVenueHubRows,
   resolvePublicVenuesForSessions,
+  publicPublishedVenuesByCityId,
+  mergeCityPageVenues,
 } from './dto.js';
 import {
   buildCityHubSeoTitle,
@@ -197,7 +199,7 @@ function scheduleCityPageRebuild(
     const destination = publicDestinationFromSession(matchedSessions[0]);
     const sessions = matchedSessions.slice(0, CITY_SSR_SESSION_LIMIT).map((session) => toPublicCatalogListItem(session));
     const mapStartedAt = Date.now();
-    const [venues, cityRecord] = await Promise.all([
+    const [sessionVenues, cityRecord, contentVenues] = await Promise.all([
       withTimeout(
         resolvePublicVenuesForSessions(legacyDb, matchedSessions, venueHubRows, 24),
         CITY_SECONDARY_TIMEOUT_MS,
@@ -212,7 +214,16 @@ function scheduleCityPageRebuild(
             'city-record',
           )
         : Promise.resolve(null),
+      matchedSessions[0]?.cityId
+        ? withTimeout(
+            publicPublishedVenuesByCityId(legacyDb, matchedSessions[0].cityId, 80),
+            CITY_SECONDARY_TIMEOUT_MS,
+            [],
+            'city-content-venues',
+          )
+        : Promise.resolve([]),
     ]);
+    const venues = mergeCityPageVenues(sessionVenues, contentVenues, 80);
     cityPerfMark('venues+city-record', mapStartedAt, { venues: venues.length });
     const venueCount = countDistinctSessionVenues(matchedSessions);
     const prices = matchedSessions

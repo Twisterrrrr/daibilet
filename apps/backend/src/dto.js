@@ -4868,7 +4868,10 @@ export async function buildPublicCityPage(db, citySlugOrId) {
 
   const destination = publicDestinationFromSession(matchedSessions[0]);
   const sessions = matchedSessions.slice(0, 160);
-  const cityVenues = await resolvePublicVenuesForSessions(db, matchedSessions, venueHubRows, 24);
+  const sessionVenues = await resolvePublicVenuesForSessions(db, matchedSessions, venueHubRows, 24);
+  const cityId = matchedSessions[0]?.cityId || null;
+  const contentVenues = cityId ? await publicPublishedVenuesByCityId(db, cityId, 80) : [];
+  const cityVenues = mergeCityPageVenues(sessionVenues, contentVenues, 80);
   const venueCount = countDistinctSessionVenues(matchedSessions);
   const prices = sessions.map((session) => session.priceFrom).filter((price) => Number.isFinite(price) && price >= MIN_DISPLAY_PRICE_RUB);
   const categories = countBy(sessions.map((event) => event.category).filter(Boolean));
@@ -7700,8 +7703,7 @@ export async function buildPublicVenuesCatalog(db, searchParams = new URLSearchP
     })
     .filter((row) => {
       if (!cityFilter) return true;
-      const citySlug = publicCitySlug(row.city || '');
-      return citySlug === cityFilter || String(row.city || '').toLowerCase().includes(cityFilter);
+      return publicVenueRowMatchesCityFilter(row, cityFilter);
     })
     .filter((row) => {
       if (!typeFilter) return true;
@@ -7990,8 +7992,10 @@ const CITY_SLUG_CANONICAL = {
   moskva: 'moskva',
   'saint-petersburg': 'sankt-peterburg',
   'sankt-peterburg': 'sankt-peterburg',
+  // latin SEO slug, destination slug, and Cyrillic DB slug (и→i → nizhnii-…)
   'nizhny-novgorod': 'nizhniy-novgorod',
   'nizhniy-novgorod': 'nizhniy-novgorod',
+  'nizhnii-novgorod': 'nizhniy-novgorod',
   'veliky-novgorod': 'velikiy-novgorod',
   'velikiy-novgorod': 'velikiy-novgorod',
   rostov: 'rostov-na-donu',
@@ -8262,8 +8266,13 @@ async function venueRowsByIds(db, ids) {
         venue."shortDescription",
         venue.description,
         venue."heroImageUrl",
+        venue."hookFact",
+        city.id as "cityId",
         city.title as city,
+        city.slug as "citySlug",
         venue.address,
+        venue.latitude,
+        venue.longitude,
         venue.kind,
         venue."pageStatus",
         count(event.id)::int as events,
@@ -8274,7 +8283,7 @@ async function venueRowsByIds(db, ids) {
       left join "Category" cat on cat.id = event."categoryId"
       left join "Subcategory" sub on sub.id = event."primarySubcategoryId"
       where venue.id = any($1::text[])
-      group by venue.id, city.title
+      group by venue.id, city.id, city.title, city.slug
     `,
     [venueIds],
   );
@@ -8285,9 +8294,14 @@ async function venueRowsByIds(db, ids) {
       id: row.id,
       slug: row.slug,
       name,
+      cityId: row.cityId || null,
       city: row.city || 'Не указан',
+      citySlug: row.citySlug || null,
       address: row.address,
+      latitude: row.latitude,
+      longitude: row.longitude,
       shortDescription: row.shortDescription,
+      hookFact: row.hookFact,
       heroImageUrl: row.heroImageUrl,
       proposedKind: String(row.kind || 'OTHER').toLowerCase(),
       kind: String(row.kind || 'OTHER').toUpperCase(),
@@ -8299,6 +8313,119 @@ async function venueRowsByIds(db, ids) {
     mapped.city = resolvePublicVenueCity(mapped);
     return applyPublicVenueNormalization(mapped);
   });
+}
+
+/** Match catalog city=? against title / citySlug / canonical aliases (nizhny ↔ нижнии). */
+export function publicVenueRowMatchesCityFilter(row, cityFilterRaw) {
+  const cityFilter = String(cityFilterRaw || '').trim().toLowerCase();
+  if (!cityFilter || cityFilter === 'all') return true;
+  const filterCanon = canonicalCitySlug(cityFilter);
+  const rowCityCanon = canonicalCitySlug(row?.city || '');
+  const rowSlugCanon = canonicalCitySlug(row?.citySlug || '');
+  if (filterCanon && (rowCityCanon === filterCanon || rowSlugCanon === filterCanon)) return true;
+  if (rowCityCanon === cityFilter || rowSlugCanon === cityFilter) return true;
+  const cityName = String(row?.city || '').toLowerCase();
+  if (cityName.includes(cityFilter)) return true;
+  // Editorial slugs are latin-prefixed (nizhny-novgorod-…); allow prefix match on filter.
+  const venueSlug = String(row?.slug || '').toLowerCase();
+  if (venueSlug.startsWith(`${cityFilter}-`) || (filterCanon && venueSlug.startsWith(`${filterCanon}-`))) {
+    return true;
+  }
+  // nizhny-novgorod filter vs nizhny-novgorod-* slugs when canon is nizhniy-novgorod
+  if (filterCanon === 'nizhniy-novgorod' && venueSlug.startsWith('nizhny-novgorod-')) return true;
+  return false;
+}
+
+/**
+ * Published/candidate content places for a city (must-see) with coords.
+ * City hubs only had session venues before - editorial sights never reached day-route.
+ */
+export async function publicPublishedVenuesByCityId(db, cityId, limit = 80) {
+  const id = String(cityId || '').trim();
+  const cap = Math.min(Math.max(1, Number(limit) || 80), 120);
+  if (!id) return [];
+
+  const result = await db.query(
+    `
+      select
+        venue.id,
+        venue.slug,
+        venue.title as name,
+        venue."shortDescription",
+        venue.description,
+        venue."heroImageUrl",
+        venue."hookFact",
+        city.id as "cityId",
+        city.title as city,
+        city.slug as "citySlug",
+        venue.address,
+        venue.latitude,
+        venue.longitude,
+        venue.kind,
+        venue."pageStatus",
+        0::int as events,
+        0::int as "waterEvents"
+      from "Venue" venue
+      join "City" city on city.id = venue."cityId"
+      where venue."cityId" = $1
+        and venue."pageStatus" in ('PUBLISHED', 'CANDIDATE')
+        and venue.latitude is not null
+        and venue.longitude is not null
+        and not (venue.latitude = 0 and venue.longitude = 0)
+      order by
+        case when venue.slug like 'nizhny-novgorod-%' then 0 else 1 end,
+        venue.title asc
+      limit $2
+    `,
+    [id, cap],
+  );
+
+  return result.rows
+    .map((row) => {
+      const name = formatPublicVenueTitle(row.name);
+      const mapped = {
+        id: row.id,
+        slug: row.slug,
+        name,
+        cityId: row.cityId || null,
+        city: row.city || 'Не указан',
+        citySlug: row.citySlug || null,
+        address: row.address,
+        latitude: row.latitude,
+        longitude: row.longitude,
+        shortDescription: row.shortDescription,
+        hookFact: row.hookFact,
+        heroImageUrl: row.heroImageUrl,
+        proposedKind: String(row.kind || 'OTHER').toLowerCase(),
+        kind: String(row.kind || 'OTHER').toUpperCase(),
+        pageStatus: String(row.pageStatus || 'NONE').toLowerCase(),
+        events: 0,
+        waterEvents: 0,
+      };
+      mapped.city = resolvePublicVenueCity(mapped);
+      return applyPublicVenueNormalization(mapped);
+    })
+    .filter((row) => isPublicVenueHub(row, { requireEvents: false }))
+    .map(mapPublicVenueListItem);
+}
+
+/** Prefer session/hub venues, then append published city content places (dedupe by id/slug). */
+export function mergeCityPageVenues(sessionVenues, contentVenues, limit = 80) {
+  const cap = Math.min(Math.max(1, Number(limit) || 80), 120);
+  const out = [];
+  const seen = new Set();
+  const take = (item) => {
+    if (!item || out.length >= cap) return;
+    const id = String(item.id || '').trim();
+    const slug = String(item.slug || '').trim().toLowerCase();
+    const keys = [id, slug].filter(Boolean);
+    if (!keys.length || keys.some((key) => seen.has(key))) return;
+    for (const key of keys) seen.add(key);
+    out.push(item);
+  };
+  for (const item of sessionVenues || []) take(item);
+  for (const item of contentVenues || []) take(item);
+  return out;
 }
 
 function matchesPublicDestinationPage(session, citySlugOrId, requestedSlug) {

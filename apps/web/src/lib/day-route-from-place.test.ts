@@ -109,6 +109,38 @@ test('dayRouteItemFromMustSee resolves locationSlug without hub venue match', ()
   assert.equal(item!.address ?? null, null);
 });
 
+test('dayRouteItemFromMustSee uses editorial coords when hub omits NN place', () => {
+  const item = dayRouteItemFromMustSee(
+    {
+      name: 'Нижегородская ярмарка',
+      desc: 'Ярмарка',
+      locationSlug: 'nizhny-novgorod-nizhegorodskaya-yarmarka',
+    },
+    [],
+    { id: 'city_nn', name: 'Нижний Новгород', slug: 'nizhny-novgorod' },
+  );
+  assert.ok(item);
+  assert.equal(item!.latitude, 56.3275);
+  assert.equal(item!.longitude, 43.962222);
+});
+
+test('dayRouteItemFromMustSee prefers place coords over missing hub', () => {
+  const item = dayRouteItemFromMustSee(
+    {
+      name: 'Точка',
+      desc: 'x',
+      locationSlug: 'custom-place-no-map',
+      latitude: 55.1,
+      longitude: 37.2,
+    },
+    [],
+    city,
+  );
+  assert.ok(item);
+  assert.equal(item!.latitude, 55.1);
+  assert.equal(item!.longitude, 37.2);
+});
+
 test('dayRouteItemFromMustSee returns null without slug or match', () => {
   assert.equal(
     dayRouteItemFromMustSee({ name: 'Неизвестное место', desc: 'x' }, venues, city),

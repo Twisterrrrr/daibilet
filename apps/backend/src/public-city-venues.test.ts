@@ -1,7 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import { countDistinctSessionVenues } from './public-destination.js';
-import { publicVenuesForSessionsFromHub } from './dto.js';
+import {
+  mergeCityPageVenues,
+  publicVenueRowMatchesCityFilter,
+  publicVenuesForSessionsFromHub,
+} from './dto.js';
 
 test('countDistinctSessionVenues prefers venueId over slug/name', () => {
   const count = countDistinctSessionVenues([
@@ -40,4 +44,31 @@ test('publicVenuesForSessionsFromHub matches hub rows outside slug-only sessions
     24,
   );
   assert.equal(bySlug.length, 1);
+});
+
+test('mergeCityPageVenues prefers session rows then appends content by slug', () => {
+  const merged = mergeCityPageVenues(
+    [{ id: 'v1', slug: 'hall-a', name: 'Hall', latitude: null, longitude: null }],
+    [
+      { id: 'v2', slug: 'nizhny-novgorod-nizhegorodskaya-yarmarka', name: 'Ярмарка', latitude: 56.3, longitude: 43.9 },
+      { id: 'v1-dup', slug: 'hall-a', name: 'Hall again', latitude: 1, longitude: 2 },
+    ],
+    10,
+  );
+  assert.equal(merged.length, 2);
+  assert.equal(merged[0].slug, 'hall-a');
+  assert.equal(merged[1].slug, 'nizhny-novgorod-nizhegorodskaya-yarmarka');
+  assert.equal(merged[1].latitude, 56.3);
+});
+
+test('publicVenueRowMatchesCityFilter accepts nizhny aliases and slug prefix', () => {
+  const row = {
+    city: 'Нижний Новгород',
+    citySlug: 'нижнии-новгород',
+    slug: 'nizhny-novgorod-nizhegorodskaya-yarmarka',
+  };
+  assert.equal(publicVenueRowMatchesCityFilter(row, 'nizhny-novgorod'), true);
+  assert.equal(publicVenueRowMatchesCityFilter(row, 'nizhniy-novgorod'), true);
+  assert.equal(publicVenueRowMatchesCityFilter(row, 'нижнии-новгород'), true);
+  assert.equal(publicVenueRowMatchesCityFilter(row, 'moscow'), false);
 });

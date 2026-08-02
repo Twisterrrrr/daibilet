@@ -10,6 +10,7 @@ const CITY_SLUG_CANONICAL: Record<string, string> = {
   'sankt-peterburg': 'sankt-peterburg',
   'nizhny-novgorod': 'nizhniy-novgorod',
   'nizhniy-novgorod': 'nizhniy-novgorod',
+  'nizhnii-novgorod': 'nizhniy-novgorod',
   'veliky-novgorod': 'velikiy-novgorod',
   'velikiy-novgorod': 'velikiy-novgorod',
   rostov: 'rostov-na-donu',
