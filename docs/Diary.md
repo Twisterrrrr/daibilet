@@ -59,7 +59,7 @@
 - `buildDayRouteShareMessage`: «Тебе поделились планом на день… Открой ссылку - маршрут уже в «Мой день», можно править»; Copy кладёт полный текст (не только URL).
 
 ### Проблемы
-- Нет (UI-only). BUILD_ID - после MSK deploy.
+- Нет (UI-only). ~~MSK deploy~~ → **BUILD_ID=`jZmbBH9ZIxyREVMEnwmal`** (`a4ce4e7`+); `/my-day` local+pub 200; chunk содержит «Тебе поделились планом на день».
 
 ---
 
