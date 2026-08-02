@@ -28,6 +28,7 @@ import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
+import { ExpandableBlurb } from '@/components/ExpandableBlurb.client';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
 import { resolveCityInfo, type CityInfoEntry, type CityMustSeeItem } from '@/lib/cityInfo';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
@@ -1286,6 +1287,16 @@ function CitySightsMustSeeList({
             });
             const placeHref = resolveCityPlaceTitleHref(place, venues);
             const dayRouteItem = dayRouteItemFromMustSee(place, venues, city);
+            const matchedVenue = venues.find((venue) => {
+              const slug = String(place.venueSlug || place.locationSlug || '').trim();
+              return slug && String(venue.slug || '').trim() === slug;
+            });
+            const blurb = String(
+              matchedVenue?.hookFact || matchedVenue?.shortDescription || place.desc || '',
+            )
+              .trim()
+              .replace(/\s+/g, ' ')
+              .replace(/[—–]/g, '-');
             return (
               <li
                 key={`${place.name}:${index}`}
@@ -1301,15 +1312,26 @@ function CitySightsMustSeeList({
                 </span>
                 <div className="min-w-0 flex-1">
                   {placeHref ? (
-                    <Link href={placeHref} className={`${titleClass} underline-offset-2 hover:underline`}>
+                    <Link
+                      href={placeHref}
+                      className={`${titleClass} underline decoration-slate-300 underline-offset-2 hover:decoration-current`}
+                      data-city-must-see-title
+                    >
                       {place.name}
                     </Link>
                   ) : (
                     <div className={titleClass}>{place.name}</div>
                   )}
-                  <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
-                    {place.desc}
-                  </p>
+                  {blurb ? (
+                    <ExpandableBlurb
+                      text={blurb}
+                      className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
+                      clampClassName="line-clamp-2"
+                      buttonClassName={`mt-0.5 text-xs font-semibold underline-offset-2 hover:underline ${
+                        editorial ? 'text-zinc-700' : 'text-primary-700'
+                      }`}
+                    />
+                  ) : null}
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     {dayRouteItem ? (
                       <AddToDayRouteButton

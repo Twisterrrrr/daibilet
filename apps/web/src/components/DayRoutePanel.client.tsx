@@ -745,9 +745,14 @@ function DayRoutePanelInner() {
           matchSources.find((venue) => venue.id && venue.id === item.id) ||
           matchSources.find((venue) => venue.slug && item.slug && venue.slug === item.slug) ||
           null;
+        const hookFull = String(matched?.hookFact || matched?.shortDescription || place.desc || '')
+          .trim()
+          .replace(/\s+/g, ' ')
+          .replace(/[—–]/g, '-');
         return {
           place: { ...place, type: matched?.type || null },
           item,
+          hookFull: hookFull || null,
           hook: dayRouteHookLine({
             hookFact: matched?.hookFact,
             shortDescription: matched?.shortDescription,
@@ -761,6 +766,7 @@ function DayRoutePanelInner() {
         ): row is {
           place: (typeof mustSeePlaces)[number] & { type?: string | null };
           item: DayRouteVenueItem;
+          hookFull: string | null;
           hook: string | null;
         } => Boolean(row),
       );
@@ -1345,17 +1351,21 @@ function DayRoutePanelInner() {
     return () => controller.abort();
   }, [catalogVenueIds, ready]);
 
-  // Sanitize leftover «Событие из маршрута» / no-coords stubs via public events API.
+  // Sanitize leftover stubs / missing session via public events API.
   useEffect(() => {
     if (!ready) return;
     const stubs = route.venues.filter((v) => {
       if (isTextDayRouteStop(v)) return false;
       const key = String(v.eventSlug || v.eventId || v.slug || v.id || '').trim();
       if (!key || eventEnrichAttemptedRef.current.has(key)) return false;
-      return (
+      const needsTitleOrCoords =
         isDayRoutePlaceholderTitle(v.title) ||
-        (Boolean(v.eventId || v.eventSlug) && (v.latitude == null || v.longitude == null))
-      );
+        (Boolean(v.eventId || v.eventSlug) && (v.latitude == null || v.longitude == null));
+      const needsSession =
+        Boolean(v.eventId || v.eventSlug) &&
+        !String(v.startsAt || '').trim() &&
+        !formatDayRouteSessionDisplay(v);
+      return needsTitleOrCoords || needsSession;
     });
     if (!stubs.length) return;
     const controller = new AbortController();
@@ -1374,6 +1384,9 @@ function DayRoutePanelInner() {
         eventId?: string | null;
         eventSlug?: string | null;
         heroImageUrl?: string | null;
+        startsAt?: string | null;
+        dateLabel?: string | null;
+        timeLabel?: string | null;
       }> = [];
       for (const stub of stubs.slice(0, 8)) {
         const key = String(stub.eventSlug || stub.eventId || stub.slug || stub.id || '').trim();
@@ -1399,9 +1412,18 @@ function DayRoutePanelInner() {
               cityId?: string | null;
               citySlug?: string | null;
             };
+            sessions?: Array<{
+              startsAt?: string | null;
+              dateLabel?: string | null;
+              timeLabel?: string | null;
+            }>;
           };
           const ev = data.event;
           if (!ev) continue;
+          const session =
+            (data.sessions || []).find((s) => String(s.startsAt || '').trim()) ||
+            (data.sessions || [])[0] ||
+            null;
           payload.push({
             id: String(ev.venueId || ev.venueSlug || ev.id || stub.id),
             slug: ev.venueSlug || stub.slug || null,
@@ -1415,6 +1437,9 @@ function DayRoutePanelInner() {
             eventId: String(ev.id || stub.eventId || '').trim() || null,
             eventSlug: ev.slug || stub.eventSlug || null,
             heroImageUrl: ev.imageUrl || stub.imageUrl || null,
+            startsAt: session?.startsAt || stub.startsAt || null,
+            dateLabel: session?.dateLabel || null,
+            timeLabel: session?.timeLabel || null,
           });
         } catch {
           // abort / network
@@ -2121,29 +2146,22 @@ function DayRoutePanelInner() {
                     onChange={setMustSeeFilter}
                   />
                   <div className="mt-3 grid gap-2 sm:grid-cols-2" data-day-must-see-list>
-                    {mustSeeFiltered.map(({ place, item, hook }) => {
+                    {mustSeeFiltered.map(({ place, item, hook, hookFull }) => {
                       const inRoute =
                         isInDayRoute(item.id, route) || Boolean(item.slug && isInDayRoute(item.slug, route));
+                      const placeHref = resolveCityPlaceTitleHref(place, matchSources);
+                      const blurb = hookFull || hook;
                       return (
-                        <button
+                        <div
                           key={item.id}
-                          type="button"
-                          disabled={inRoute || atMax}
-                          title={
-                            inRoute
-                              ? 'Уже в маршруте'
-                              : atMax
-                                ? dayRouteHardLimitMessage()
-                                : hook || 'Добавить в день'
-                          }
-                          onClick={() => addMustSeeItem(item)}
-                          className={`flex w-full items-center gap-2.5 rounded-xl border p-2 text-left transition disabled:cursor-not-allowed ${
+                          className={`flex w-full items-start gap-2.5 rounded-xl border p-2 text-left ${
                             inRoute
                               ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
-                              : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50/50'
+                              : 'border-slate-200 bg-white text-slate-800'
                           }`}
+                          data-day-must-see-card
                         >
-                          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                          <div className="relative mt-0.5 h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-slate-100">
                             {item.imageUrl ? (
                               <SafeImage
                                 src={item.imageUrl}
@@ -2158,23 +2176,52 @@ function DayRoutePanelInner() {
                               </div>
                             )}
                           </div>
-                          <span className="min-w-0 flex-1">
-                            <span className="block truncate text-xs font-semibold">{place.name}</span>
-                            {hook ? (
-                              <span className="mt-0.5 block line-clamp-1 text-[11px] leading-snug text-slate-500">
-                                {hook}
-                              </span>
+                          <div className="min-w-0 flex-1">
+                            {placeHref ? (
+                              <Link
+                                href={placeHref}
+                                className="block text-xs font-semibold underline decoration-slate-300 underline-offset-2 hover:decoration-current"
+                                data-day-must-see-title
+                              >
+                                {place.name}
+                              </Link>
+                            ) : (
+                              <span className="block text-xs font-semibold">{place.name}</span>
+                            )}
+                            {blurb ? (
+                              <ExpandableBlurb
+                                text={blurb}
+                                className="mt-0.5 text-[11px] leading-snug text-slate-500"
+                                clampClassName="line-clamp-2"
+                                buttonClassName="mt-0.5 text-[11px] font-semibold text-slate-700 underline-offset-2 hover:underline"
+                              />
                             ) : null}
-                          </span>
-                          <span
-                            className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
-                              inRoute ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-900 text-white'
+                          </div>
+                          <button
+                            type="button"
+                            disabled={inRoute || atMax}
+                            title={
+                              inRoute
+                                ? 'Уже в маршруте'
+                                : atMax
+                                  ? dayRouteHardLimitMessage()
+                                  : hook || 'Добавить в день'
+                            }
+                            aria-label={
+                              inRoute
+                                ? `${place.name}: уже в маршруте`
+                                : `Добавить в день: ${place.name}`
+                            }
+                            onClick={() => addMustSeeItem(item)}
+                            className={`mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition disabled:cursor-not-allowed ${
+                              inRoute
+                                ? 'bg-emerald-100 text-emerald-700'
+                                : 'bg-slate-900 text-white hover:bg-slate-800 disabled:bg-slate-300'
                             }`}
-                            aria-hidden
                           >
                             {inRoute ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                          </span>
-                        </button>
+                          </button>
+                        </div>
                       );
                     })}
                   </div>
@@ -2918,6 +2965,8 @@ function DayRouteVenueCard({
   const ticketUrl = resolveDayRouteTicketUrl(venue);
   const bought = Boolean(venue.ticketBought);
   const chip = classifyDayRouteCommercialChip(venue);
+  /** Free places: no status badge (owner: do not write «Вход свободный»). */
+  const showStatusChip = chip.kind !== 'free';
   const buyCtaLabel = formatDayRouteBuyCtaLabel(venue);
   const addressLine =
     formatStreetAddress(venue.address, { city: venue.city }) || String(venue.address || '').trim() || '';
@@ -2927,143 +2976,165 @@ function DayRouteVenueCard({
     Boolean(addressLine) &&
     (titleNorm.includes(addrNorm) ||
       (addrNorm.length >= 8 && titleNorm.includes(addrNorm.replace(/^набережная\s+/i, 'наб. '))));
+  const placeLine =
+    addressLine && !addressRedundant
+      ? addressLine
+      : String(venue.city || '').trim() || '';
   const segmentHint =
-    segmentToNext != null ? formatDayRouteSegmentHint(segmentToNext, travelMode) : '';
+    segmentToNext != null && index < total - 1
+      ? formatDayRouteSegmentHint(segmentToNext, travelMode)
+      : '';
   const sessionDisplay = formatDayRouteSessionDisplay(venue);
   return (
     <li
-      className="flex flex-col gap-2 rounded-2xl border border-slate-200 bg-white p-3"
+      className="flex flex-col gap-1"
       data-day-plan-stop={venue.id}
       data-ticket-bought={bought ? '1' : '0'}
       data-commercial-chip={chip.kind}
       data-day-session={sessionDisplay || undefined}
     >
-      <div className="flex items-start gap-3">
-        <div className="flex w-8 shrink-0 flex-col items-center gap-1 pt-0.5">
-          <span
-            className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white"
-            aria-label={`Точка ${index + 1}`}
-          >
-            {index + 1}
-          </span>
-          <div className="flex flex-col gap-0.5">
-            <button
-              type="button"
-              aria-label="Выше"
-              disabled={index === 0}
-              onClick={onMoveUp}
-              className="rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+      <div className="rounded-xl border border-slate-200 bg-white p-2">
+        <div className="flex items-start gap-2">
+          <div className="flex w-7 shrink-0 flex-col items-center gap-0.5">
+            <span
+              className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-900 text-[11px] font-bold text-white"
+              aria-label={`Точка ${index + 1}`}
             >
-              <ChevronUp className="h-3.5 w-3.5" />
-            </button>
-            <button
-              type="button"
-              aria-label="Ниже"
-              disabled={index >= total - 1}
-              onClick={onMoveDown}
-              className="rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
-            >
-              <ChevronDown className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </div>
-        <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-slate-100">
-          {venue.imageUrl ? (
-            <SafeImage src={venue.imageUrl} alt="" fill sizes="3.5rem" className="object-cover" />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center text-slate-400">
-              <MapPin className="h-5 w-5" />
+              {index + 1}
+            </span>
+            <div className="flex flex-col">
+              <button
+                type="button"
+                aria-label="Выше"
+                disabled={index === 0}
+                onClick={onMoveUp}
+                className="rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+              >
+                <ChevronUp className="h-3 w-3" />
+              </button>
+              <button
+                type="button"
+                aria-label="Ниже"
+                disabled={index >= total - 1}
+                onClick={onMoveDown}
+                className="rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+              >
+                <ChevronDown className="h-3 w-3" />
+              </button>
             </div>
-          )}
-        </div>
-        <div className="min-w-0 flex-1">
-          {href ? (
-            <Link href={href} className="line-clamp-2 text-sm font-semibold text-slate-900 hover:text-primary-700">
-              {venue.title}
-            </Link>
-          ) : (
-            <p className="line-clamp-2 text-sm font-semibold text-slate-900">{venue.title}</p>
-          )}
-          {sessionDisplay ? (
-            <p className="mt-0.5 text-xs font-medium text-slate-700" data-day-session-label>
-              {sessionDisplay}
-            </p>
-          ) : null}
-          <span
-            className={`mt-1 inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${commercialChipClassName(chip.kind)}`}
-            data-day-status-chip={chip.kind}
-          >
-            {chip.label}
-          </span>
-          {venue.note ? <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">{venue.note}</p> : null}
-          {addressLine && !addressRedundant ? (
-            <p className="mt-0.5 line-clamp-2 text-xs text-slate-500">{addressLine}</p>
-          ) : null}
-          {venue.city ? <p className="mt-0.5 truncate text-xs text-slate-500">{venue.city}</p> : null}
-          {!hasCoords ? <p className="mt-0.5 text-[11px] font-medium text-amber-700">Нет координат</p> : null}
-        </div>
-        <button
-          type="button"
-          aria-label="Удалить точку"
-          onClick={onRemove}
-          className="min-h-9 min-w-9 shrink-0 rounded-full p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-        >
-          <X className="h-4 w-4" />
-        </button>
-      </div>
-      {ticketUrl ? (
-        <div className="flex flex-wrap items-center gap-2 pl-11">
-          <a
-            href={ticketUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            data-day-buy-ticket
-            onClick={() => onBuyClick(ticketUrl)}
-            className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600"
-          >
-            <Ticket className="h-3.5 w-3.5" />
-            {buyCtaLabel}
-          </a>
+          </div>
+          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+            {venue.imageUrl ? (
+              <SafeImage src={venue.imageUrl} alt="" fill sizes="2.75rem" className="object-cover" />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-slate-400">
+                <MapPin className="h-4 w-4" />
+              </div>
+            )}
+          </div>
+          <div className="min-w-0 flex-1 py-0.5">
+            {href ? (
+              <Link
+                href={href}
+                className="line-clamp-2 text-[13px] font-semibold leading-snug text-slate-900 hover:text-primary-700"
+              >
+                {venue.title}
+              </Link>
+            ) : (
+              <p className="line-clamp-2 text-[13px] font-semibold leading-snug text-slate-900">
+                {venue.title}
+              </p>
+            )}
+            {sessionDisplay ? (
+              <p className="mt-0.5 truncate text-[11px] font-medium text-slate-700" data-day-session-label>
+                {sessionDisplay}
+              </p>
+            ) : null}
+            {showStatusChip ? (
+              <span
+                className={`mt-0.5 inline-flex items-center rounded-full px-1.5 py-px text-[10px] font-semibold ${commercialChipClassName(chip.kind)}`}
+                data-day-status-chip={chip.kind}
+              >
+                {chip.label}
+              </span>
+            ) : null}
+            {venue.note ? (
+              <p className="mt-0.5 line-clamp-1 text-[11px] text-slate-500">{venue.note}</p>
+            ) : null}
+            {placeLine ? (
+              <p className="mt-0.5 truncate text-[11px] text-slate-500">{placeLine}</p>
+            ) : null}
+            {!hasCoords ? (
+              <p className="mt-0.5 text-[11px] font-medium text-amber-700">Нет координат</p>
+            ) : null}
+          </div>
           <button
             type="button"
-            onClick={onToggleBought}
-            data-day-ticket-bought
-            className={`inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold ${
-              bought
-                ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
-                : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
-            }`}
+            aria-label="Удалить точку"
+            onClick={onRemove}
+            className="min-h-8 min-w-8 shrink-0 rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
           >
-            {bought ? <Check className="h-3.5 w-3.5" /> : null}
-            {bought ? 'Билет отмечен' : 'Отметить купленным'}
+            <X className="h-3.5 w-3.5" />
           </button>
         </div>
-      ) : null}
-      {!ticketUrl && nearbyUpsells.length > 0
-        ? nearbyUpsells.map((upsell) => (
-            <div
-              key={upsell.eventId}
-              className="ml-11 rounded-xl border border-amber-100 bg-amber-50/60 px-3 py-2"
-              data-day-nearby-upsell={upsell.eventId}
+        {ticketUrl ? (
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5 pl-9">
+            <a
+              href={ticketUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              data-day-buy-ticket
+              onClick={() => onBuyClick(ticketUrl)}
+              className="inline-flex min-h-8 items-center justify-center gap-1 rounded-full bg-amber-500 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-amber-600"
             >
-              <p className="text-[12px] font-medium text-slate-800">{upsell.line}</p>
-              <a
-                href={upsell.ticketUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-day-nearby-buy
-                onClick={() => onBuyClick(upsell.ticketUrl)}
-                className="mt-1.5 inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600"
+              <Ticket className="h-3 w-3" />
+              {buyCtaLabel}
+            </a>
+            <button
+              type="button"
+              onClick={onToggleBought}
+              data-day-ticket-bought
+              className={`inline-flex min-h-8 items-center justify-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
+                bought
+                  ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+                  : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              {bought ? <Check className="h-3 w-3" /> : null}
+              {bought ? 'Билет отмечен' : 'Отметить купленным'}
+            </button>
+          </div>
+        ) : null}
+        {!ticketUrl && nearbyUpsells.length > 0
+          ? nearbyUpsells.map((upsell) => (
+              <div
+                key={upsell.eventId}
+                className="mt-1.5 ml-9 rounded-lg border border-amber-100 bg-amber-50/60 px-2 py-1.5"
+                data-day-nearby-upsell={upsell.eventId}
               >
-                <Ticket className="h-3.5 w-3.5" />
-                {upsell.priceFromRub != null && upsell.priceFromRub > 0
-                  ? `Купить билет ${formatPriceFrom(upsell.priceFromRub)}`
-                  : 'Купить билет'}
-              </a>
-            </div>
-          ))
-        : null}
-      {segmentHint ? <p className="pl-11 text-[11px] text-slate-500">далее ~ {segmentHint}</p> : null}
+                <p className="truncate text-[11px] font-medium text-slate-800">{upsell.line}</p>
+                <a
+                  href={upsell.ticketUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-day-nearby-buy
+                  onClick={() => onBuyClick(upsell.ticketUrl)}
+                  className="mt-1 inline-flex min-h-8 items-center justify-center gap-1 rounded-full bg-amber-500 px-2.5 py-1 text-[11px] font-bold text-white hover:bg-amber-600"
+                >
+                  <Ticket className="h-3 w-3" />
+                  {upsell.priceFromRub != null && upsell.priceFromRub > 0
+                    ? `Купить билет ${formatPriceFrom(upsell.priceFromRub)}`
+                    : 'Купить билет'}
+                </a>
+              </div>
+            ))
+          : null}
+      </div>
+      {segmentHint ? (
+        <p className="px-1 text-[11px] leading-tight text-slate-500" data-day-segment-hint>
+          далее ~ {segmentHint}
+        </p>
+      ) : null}
     </li>
   );
 }

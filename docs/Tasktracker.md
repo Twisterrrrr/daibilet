@@ -7,6 +7,14 @@
 
 ---
 
+## City hub must-see blurbs (2026-08-02)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.MS1 | «Главные места»: title → place + «ещё» expand (city hub 2-row rail + /my-day cards) | Высокий | 🔄 deploy |
+
+---
+
 ## Catalog: Location vs Venue canon (2026-08-02)
 
 Канон: [catalog-location-venue-canon.md](./catalog-location-venue-canon.md).

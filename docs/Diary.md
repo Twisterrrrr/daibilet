@@ -1,3 +1,19 @@
+## 2026-08-02 - City hub / my-day: must-see blurb «ещё» + title → place
+
+### Наблюдения
+- Owner: в «Главные места» blurbs режутся «…» (hookFact), дочитать некуда - ни expand, ни явный переход.
+- Скрин совпал с `/my-day` must-see mini-cards (thumb + +); city hub 2-row rail тоже должен отдавать полный текст.
+
+### Решения
+- `ExpandableBlurb.client.tsx`: line-clamp-2 + «ещё»/«свернуть» по real overflow.
+- City hub `CitySightsMustSeeList`: blurb = hookFact → shortDescription → desc; title Link с underline; 2-row rail без изменений.
+- `/my-day` must-see: title → place page; полный hook + «ещё»; «+» отдельно (не целиком button-card).
+
+### Проблемы
+- Deploy/BUILD_ID - после MSK web deploy.
+
+---
+
 ## 2026-08-02 - /my-day empty starter: форма вместо dashed empty
 
 ### Наблюдения
