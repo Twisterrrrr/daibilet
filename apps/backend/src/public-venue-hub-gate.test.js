@@ -21,6 +21,7 @@ test('isContentPlaceKind covers location + museum/theater families', () => {
   assert.equal(isContentPlaceKind('ATTRACTION'), true);
   assert.equal(isContentPlaceKind('MUSEUM_ART_SPACE'), true);
   assert.equal(isContentPlaceKind('THEATER'), true);
+  assert.equal(isContentPlaceKind('CLUB_BAR_RESTAURANT'), true);
   assert.equal(isContentPlaceKind('OTHER', 'park'), true);
   assert.equal(isContentPlaceKind('CONCERT_HALL'), false);
   assert.equal(isContentPlaceKind('MEETING_POINT'), false);

@@ -11,6 +11,7 @@ export const CONTENT_PLACE_DB_KINDS = new Set([
   'ATTRACTION',
   'MUSEUM_ART_SPACE',
   'THEATER',
+  'CLUB_BAR_RESTAURANT',
 ]);
 
 /** Stored / proposedKind values (DB + legacy aliases). */
@@ -18,6 +19,9 @@ export const CONTENT_PLACE_STORED_KINDS = new Set([
   ...CONTENT_PLACE_DB_KINDS,
   'MUSEUM',
   'ART_SPACE',
+  'CLUB',
+  'BAR',
+  'RESTAURANT',
 ]);
 
 /** Public snake_case kinds (after resolvePublicVenueKind). */
@@ -30,6 +34,10 @@ export const CONTENT_PLACE_PUBLIC_KINDS = new Set([
   'art_space',
   'theater',
   'museum_art_space',
+  'club_bar_restaurant',
+  'club',
+  'bar',
+  'restaurant',
 ]);
 
 export function normalizeStoredVenueKind(value) {
