@@ -3567,50 +3567,31 @@ function DayRouteVenueCard({
       className="w-full scroll-mt-4"
       data-day-plan-stop={venue.id}
       data-day-stop-variant="grid"
+      data-day-stop-layout="owner-v2"
       data-ticket-bought={bought ? '1' : '0'}
       data-commercial-chip={chip.kind}
       data-day-session={sessionDisplay || undefined}
       data-day-stop-focused={focused ? '1' : undefined}
     >
       <div
-        className={`relative rounded-lg border bg-white p-2 ${
+        className={`rounded-lg border bg-white p-2.5 ${
           focused ? 'border-emerald-400 ring-1 ring-emerald-200' : 'border-slate-200'
         }`}
       >
-        <div className="absolute right-1.5 top-1.5 z-10 flex items-center gap-0.5" data-day-stop-top-right>
-          <span
-            className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white"
-            aria-label={`Точка ${index + 1}`}
+        {/*
+          Owner layout (exact):
+          [square thumb]  Title              [N][✈][X]
+                          Address
+          [↑][↓]  далее ~ …
+          Number NEVER on thumb. Sort NEVER beside thumb.
+        */}
+        <div className="flex gap-2.5" data-day-stop-top-block>
+          <div
+            className="relative aspect-square h-12 w-12 shrink-0 overflow-hidden rounded-md bg-slate-100"
+            data-day-stop-thumb
           >
-            {index + 1}
-          </span>
-          {mapsUrl ? (
-            <a
-              href={mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Открыть в Яндекс.Картах"
-              title="Открыть в Яндекс.Картах"
-              data-day-stop-maps
-              className="inline-flex h-6 w-6 items-center justify-center rounded-full text-sky-600 hover:bg-sky-50"
-            >
-              <Navigation className="h-3.5 w-3.5" />
-            </a>
-          ) : null}
-          <button
-            type="button"
-            aria-label="Удалить точку"
-            onClick={onRemove}
-            className="inline-flex h-6 w-6 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
-        </div>
-
-        <div className="flex gap-2 pr-16">
-          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-md bg-slate-100">
             {venue.imageUrl ? (
-              <SafeImage src={venue.imageUrl} alt="" fill sizes="2.75rem" className="object-cover" />
+              <SafeImage src={venue.imageUrl} alt="" fill sizes="3rem" className="object-cover" />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-slate-400">
                 <MapPin className="h-4 w-4" />
@@ -3618,9 +3599,44 @@ function DayRouteVenueCard({
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate pr-1 text-[13px] font-semibold leading-tight text-slate-900">
-              {titleNode}
-            </p>
+            <div className="flex items-start gap-1">
+              <p className="min-w-0 flex-1 truncate text-[13px] font-semibold leading-tight text-slate-900">
+                {titleNode}
+              </p>
+              <div
+                className="-mt-0.5 flex shrink-0 items-center gap-0.5"
+                data-day-stop-top-right
+              >
+                <span
+                  className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white"
+                  aria-label={`Точка ${index + 1}`}
+                  data-day-stop-number
+                >
+                  {index + 1}
+                </span>
+                {mapsUrl ? (
+                  <a
+                    href={mapsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Открыть в Яндекс.Картах"
+                    title="Открыть в Яндекс.Картах"
+                    data-day-stop-maps
+                    className="inline-flex h-6 w-6 items-center justify-center rounded-full text-sky-600 hover:bg-sky-50"
+                  >
+                    <Navigation className="h-3.5 w-3.5" />
+                  </a>
+                ) : null}
+                <button
+                  type="button"
+                  aria-label="Удалить точку"
+                  onClick={onRemove}
+                  className="inline-flex h-6 w-6 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
             {placeLine || !hasCoords ? (
               <p
                 className={`mt-0.5 truncate text-[11px] leading-tight ${
@@ -3635,13 +3651,13 @@ function DayRouteVenueCard({
         </div>
 
         <div className="mt-1.5 flex items-center gap-1.5" data-day-stop-bottom-row>
-          <div className="flex shrink-0 items-center leading-none">
+          <div className="flex shrink-0 items-center leading-none" data-day-stop-sort>
             <button
               type="button"
               aria-label="Выше"
               disabled={index === 0}
               onClick={onMoveUp}
-              className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+              className="rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
             >
               <ChevronUp className="h-3.5 w-3.5" />
             </button>
@@ -3650,13 +3666,16 @@ function DayRouteVenueCard({
               aria-label="Ниже"
               disabled={index >= total - 1}
               onClick={onMoveDown}
-              className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+              className="rounded p-0.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
             >
               <ChevronDown className="h-3.5 w-3.5" />
             </button>
           </div>
           {segmentHint ? (
-            <p className="min-w-0 truncate text-[11px] leading-tight text-slate-500" data-day-segment-hint>
+            <p
+              className="min-w-0 truncate text-[11px] leading-tight text-slate-500"
+              data-day-segment-hint
+            >
               далее ~ {segmentHint}
             </p>
           ) : (
