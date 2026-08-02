@@ -28,7 +28,7 @@
 
 ### Проблемы
 - Scenario 3 nearest Fri/Sat - backlog.
-- MSK deploy BUILD_ID - после push.
+- MSK deploy: **BUILD_ID=`E6nQnmKCtloz0ynXA2y24`** (HEAD `21a9806`), `/my-day` local+pub 200; chunks: Выбор Дайбилет / Выбрать дату и билеты / Билет на любой день.
 
 ---
 
@@ -77,7 +77,7 @@
 - Не раздувать must-see в огромные карточки.
 
 ### Проблемы
-- MSK BUILD_ID - после deploy.
+- Live **BUILD_ID=\E6nQnmKCtloz0ynXA2y24\** (3f9a70e+rebuild) /my-day 200.
 
 ---
 
