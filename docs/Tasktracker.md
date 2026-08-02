@@ -117,7 +117,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | UX.LOC1 | Mobile sticky header: city chip (сейчас CityPicker только `lg+`; в меню город внизу) | Критический | ✅ 2026-08-02 |
 | UX.LOC2 | `MobileNavSheet`: блок «Город» сразу после поиска | Критический | ✅ 2026-08-02 |
 | UX.LOC3 | Rename nav/H1 «Локации» → job-label (Точки сбора / Места встречи) - после owner Q1 | Высокий | ⏳ |
-| UX.LOC4 | `/locations`: dense hero; «Популярные города» (RussiaMap) убран с локаций | Высокий | ✅ 2026-08-02 |
+| UX.LOC4 | `/locations`: dense hero; «Популярные города» (RussiaMap) убран с локаций | Высокий | ✅ `c698f2c` MSK **BUILD_ID=`SdwQIxr9a9CVj7jfdAKWh`** |
 | UX.LOC5 | `/events` mobile: context line «События в {город}»; banner если city=all | Высокий | ⏳ |
 | UX.LOC6 | Bottom-sheet CityPicker: поиск + популярные + «Все города» | Высокий | ⏳ |
 | UX.LOC7 | Catalog mobile date UX: один entry (chips/sheet), не select+date input разом | Средний | ⏳ |

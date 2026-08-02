@@ -9,7 +9,7 @@
 - `RussiaMap` оставлен на `/cities` («Все города»).
 
 ### Проблемы
-- Deploy BUILD_ID - после MSK.
+- Нет. MSK **BUILD_ID=`SdwQIxr9a9CVj7jfdAKWh`** (`c698f2c`), `/locations` 200.
 
 ---
 
