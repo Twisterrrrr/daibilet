@@ -9,7 +9,7 @@
 - Link `pl-5` / `mb-0` сохранён. Stop cards не трогали. Marker `data-day-starter-form-w="26rem"`.
 
 ### Проблемы
-- Нет. (BUILD_ID после MSK deploy.)
+- Нет. MSK **BUILD_ID=`iAH719KaM6rt2dkoNct1L`** (`3e1fc7b`), SMOKE_OK; chunks: `equal-m` / `1fr_auto_1fr_auto_1fr` / `lg:w-[26rem]` / `pl-5` / `form-w`.
 
 ---
 

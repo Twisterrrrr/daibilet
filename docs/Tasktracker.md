@@ -96,7 +96,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MYDAY-P7 | Commercial `/d/{code}` recipient (tickets/map/paid) - не soft purple banner | Высокий | ⏳ |
 | UX.MYDAY-P8 | Timeline flat list (не Утро/День/Вечер); «Маршрут» + «N точек»; badge align | Критический | ✅ `7a3de60` MSK **BUILD_ID=`Ywy2ntkkoX6K__8CuMH3H`** `/my-day` 200 |
 | UX.MYDAY-SESSION | Event stop cards: show session date+time (`15 авг, 19:00`); enrich from events API | Критический | 🔄 commit+deploy |
-| UX.MYDAY-STARTER | Empty starter: equal-M + equal `py`; right `lg:w-[26rem]` (~+30%); no min-h; link `pl-5` | Критический | 🔄 commit+MSK deploy |
+| UX.MYDAY-STARTER | Empty starter: equal-M + equal `py`; right `lg:w-[26rem]` (~+30%); no min-h; link `pl-5` | Критический | ✅ `3e1fc7b` MSK **BUILD_ID=`iAH719KaM6rt2dkoNct1L`** |
 | UX.MYDAY-STOP-V6 | Stop grid owner-v6: larger thumb+N, meta badges, tap actions; list dense unchanged | Критический | ⚠️ superseded by parallel `owner-v7` (`47c17e4`) |
 | UX.MYDAY-MATCH-DEDUP | Matches accordion: title-first dedupe (no N identical TC session cards) | Критический | ✅ `64e3f38` |
 | UX.MYDAY-COMPACT | Compact stop cards: no «Вход свободный»; ETA under card; session line; buy from price + nearby | Критический | ✅ `6721c9c` MSK **BUILD_ID=`meNSWERi0trhkT0vGq8lO`** |
