@@ -1,3 +1,21 @@
+## 2026-08-02 - INC.504.21: SSR hang again + healthcheck not executable
+
+### Наблюдения
+- Owner: prod SSR hung again. Local `:3001` `/` и `/events` - curl timeout 8s, **0 bytes**; next-server RSS ~1.6G, uptime ~11h; `daibilet-web` active.
+- Warm process: none. Cron `daibilet-tasks` warm line still commented OFF.
+- Cron healthcheck **стрелял каждую минуту** (syslog), но `journalctl -t daibilet-ssr-health` пуст с Aug 01 17:22; `ssr-health.log` без новых строк → auto-recovery **не работал**.
+- Root cause ops: `/opt/daibilet/deploy/cron/ssr-healthcheck.sh` был `-rw-r--r--` (не +x). Прямой exec из cron → `Permission denied` (stderr void / No MTA). После INC.504.20 скрипт залили без `install -m 755`.
+
+### Решения
+- Manual: `systemctl kill -s SIGKILL daibilet-web` + `start` (warm none). Smoke: local `/` TTFB ~0.01-0.15s 200; external `daibilet.ru` `/` ~0.07s, `/events` ~0.09s.
+- Live: `chmod 755` на healthcheck; cron CMD → `/bin/bash /opt/daibilet/.../ssr-healthcheck.sh` (не зависит от +x). Dry-run closed-port → BAD=1 + journal.
+- Repo: `deploy/cron/daibilet-tasks` hardening + docs INC.504.21. Warm остаётся OFF.
+
+### Проблемы
+- Auto-healthcheck **не сработал** из-за 644; root hang (INC.504.15 event-loop / Prisma in web) open. Safety net снова жив после chmod/bash.
+
+---
+
 ## 2026-08-02 - Mobile templates canon + LOC1/LOC2/LOC4
 
 ### Наблюдения

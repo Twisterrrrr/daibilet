@@ -205,8 +205,9 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | INC.504.18 | Owner 504 ~14:06 UTC: site already up; hang был 13:01-13:18 (Prisma + accept timeout); deploy gaps ~1.5м; no restart | Критический | ✅ verified up; root cause = INC.504.15 |
 | INC.504.19 | Owner 504 ~16:49 UTC: live hang (0B TTFB); SIGKILL restart; healthcheck bug (`curl \|\| echo 999` → bc never fires); fixed cron + `deploy/cron/daibilet-tasks` | Критический | ✅ mitigated live; root cause still INC.504.15 / event-loop |
 | INC.504.20 | Owner fury ~17:19 UTC: live hang again (0B TTFB); SIGKILL+start; **cron `%` truncates healthcheck** (log empty despite minutely fire); warm **OFF**; `ssr-healthcheck.sh` + SIGKILL recovery | Критический | ✅ mitigated live MSK; warm off until hang RC; root still INC.504.15 |
+| INC.504.21 | 2026-08-02 ~07:19 UTC: SSR hang 0B TTFB again (~11h next RSS~1.6G); SIGKILL+start; healthcheck silent - script **644 not +x** → Permission denied; chmod 755 + cron via `/bin/bash` | Критический | ✅ mitigated live MSK; auto-net fixed; root still INC.504.15 |
 
-См. Diary 2026-07-30 «Prod 504: daibilet-web hang», «2026-08-01 INC.504.13», «INC.504.17», «INC.504.18», «INC.504.19», «INC.504.20».
+См. Diary 2026-07-30 «Prod 504: daibilet-web hang», «2026-08-01 INC.504.13», «INC.504.17», «INC.504.18», «INC.504.19», «INC.504.20», «INC.504.21».
 
 ---
 
@@ -1202,6 +1203,7 @@ API-пререквизит: `npm run check:widgets -- --base https://daibilet.ru
 
 | Дата | Изменение |
 |------|-----------|
+| 2026-08-02 | INC.504.21: SSR hang again (0B TTFB ~07:19 UTC); SIGKILL+start; healthcheck silent - script 644 not executable; chmod 755 + cron `/bin/bash` invoke; warm still OFF |
 | 2026-08-01 | INC.504.20: SSR hang again (0B TTFB ~17:19 UTC); SIGKILL+start; cron bare `%` killed healthcheck restart branch; warm OFF; `ssr-healthcheck.sh` + SIGKILL recovery live MSK |
 | 2026-08-01 | INC.504.19: SSR hang again (0B TTFB); SIGKILL restart; healthcheck bug fixed (`curl CODE` not `\|\| echo 999`); canon `deploy/cron/daibilet-tasks`; BUILD `gEmtnqRsq_L56ejFTXSav` |
 | 2026-08-01 | **SPB `.16` retired from deploy pipeline** - web canon = MSK-only `deploy-prod-next.sh` on `.184`; `.cursorrules`/Project/Diary; MIG.9.7 → owner delete VM in Timeweb; SSH `.16` still OK (`daibilet_staging_key`) |
