@@ -8,11 +8,12 @@
 
 ### Решения
 - Убраны хвосты подписи из MD; `stripColumnBodyChrome` в `blog-content.mjs` + render в `BlogArticleView`.
-- 301: `bylinnyy-bereg-fentezi-fest` → `fentezi-fest-bylinnyy-bereg`; `open-air-festy-vyhodnoi-ru` → `moskva-parki-open-air-vyhodnye`.
-- Upsert затронутых статей + MSK deploy.
+- 301: `bylinnyy-bereg-fentezi-fest` → `fentezi-fest-bylinnyy-bereg`; `open-air-festy-vyhodnoi-ru` → `moskva-parki-open-air-vyhodnye` (через `next.config` redirects, HTTP 308).
+- Upsert затронутых статей + MSK deploy (`ef417ac`).
+- Связанные TC-события в DB `READY`, но public soft-404: past (июль), каталог их не отдаёт - не blog-404.
 
 ### Проблемы
-- Soft-404 блога по-прежнему HTTP 200 (не status 404) - отдельный hardening.
+- Soft-404 блога/событий по-прежнему HTTP 200 (не status 404) - отдельный hardening.
 
 ---
 
