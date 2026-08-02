@@ -1880,33 +1880,36 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** Empty plan starter - compact variant A on all breakpoints (desktop = mobile density). */
+  /** Empty plan starter - compact variant A on mobile; desktop lg+ = two-column variant 1. */
   function renderUnifiedSearch(asStarter: boolean) {
     if (asStarter) {
       return (
         <section
-          className="mt-3 rounded-2xl border border-slate-200 bg-white px-3 pt-5 pb-3 sm:mt-5 sm:px-6"
+          className="mt-3 rounded-2xl border border-slate-200 bg-white px-3 py-4 sm:mt-5 sm:px-6 sm:py-5 lg:px-6 lg:py-6"
           ref={unifiedSearchRef}
           data-day-unified-search
           data-day-starter="1"
           data-day-starter-variant="a"
+          data-day-starter-desktop="two-col"
           data-day-starter-pad="sym"
           data-day-starter-density="compact"
         >
           <div
-            className="mx-auto flex w-full max-w-md flex-col lg:max-w-lg"
+            className="flex w-full flex-col max-lg:mx-auto max-lg:max-w-md lg:grid lg:grid-cols-2 lg:items-center lg:gap-8 xl:gap-10"
             data-day-plan-starter
           >
-            <div className="flex items-center gap-2.5">
-              <Route className="h-6 w-6 shrink-0 text-slate-400" aria-hidden />
-              <p className="text-base font-bold leading-snug text-slate-900 sm:text-lg">
-                Собери свой день
+            <div className="min-w-0">
+              <div className="flex items-center gap-2.5">
+                <Route className="h-6 w-6 shrink-0 text-slate-400" aria-hidden />
+                <p className="text-base font-bold leading-snug text-slate-900 sm:text-lg">
+                  Собери свой день
+                </p>
+              </div>
+              <p className="mt-1.5 text-[12px] font-normal leading-snug text-slate-500 sm:max-lg:whitespace-nowrap sm:text-[13px]">
+                Выбери город и минимум {DAY_ROUTE_MIN} точки для составления маршрута
               </p>
             </div>
-            <p className="mt-1.5 text-[12px] font-normal leading-snug text-slate-500 sm:whitespace-nowrap sm:text-[13px]">
-              Выбери город и минимум {DAY_ROUTE_MIN} точки для составления маршрута
-            </p>
-            <div className="mt-4 flex w-full flex-col gap-2.5" data-day-city-search-stack>
+            <div className="mt-4 flex w-full flex-col gap-2.5 lg:mt-0" data-day-city-search-stack>
               <div data-day-city-picker className="w-full text-left">
                 <CityPicker
                   cities={destinations}

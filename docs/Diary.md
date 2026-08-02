@@ -1,3 +1,17 @@
+## 2026-08-02 - /my-day: desktop empty-starter two-column (variant 1)
+
+### Наблюдения
+- Owner выбрал desktop empty-starter **variant 1** (две колонки на всю ширину секции). Mobile compact **A** без регрессии.
+
+### Решения
+- `renderUnifiedSearch(asStarter)`: `max-lg` - узкий centered column как A; `lg:grid lg:grid-cols-2` - слева icon+title+subtitle, справа city/search/«добавь своё место»; убран `lg:max-w-lg`.
+- Markers: `data-day-starter-desktop="two-col"`; stop cards не трогали.
+
+### Проблемы
+- Нет (BUILD_ID после MSK deploy).
+
+---
+
 ## 2026-08-02 - /my-day: owner-v2 stop card (номер не на thumb)
 
 ### Наблюдения
