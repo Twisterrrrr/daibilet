@@ -113,6 +113,21 @@
 
 ---
 
+## 2026-08-03 - /my-day: Готовые сценарии under Hot Picks
+
+### Наблюдения
+- Owner: под «Выбор Дайбилет» нужны «Готовые сценарии» как на хабе НН (если есть dayRoutePresets / fallback).
+
+### Решения
+- `CityDayPresetBlock`: props `navigateToMyDay` / `inMyDay` (на /my-day без redirect, CTA «Собрать день»).
+- `DayRoutePanel`: блок сразу под Hot Picks при `hasPageCity`; `namedPresets` из `resolveCityInfo().dayRoutePresets`.
+- Marker `data-day-presets=my-day`.
+
+### Проблемы
+- (deploy ниже)
+
+---
+
 ## 2026-08-03 - /my-day: progressive catalog load for search
 
 ### Наблюдения

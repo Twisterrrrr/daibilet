@@ -21,6 +21,10 @@ type Props = {
   editorial?: boolean;
   /** Именованные шаблоны из cityInfo.dayRoutePresets */
   namedPresets?: CityDayRoutePreset[];
+  /** Hub CTA navigates to /my-day; on /my-day keep false (event sync updates panel). */
+  navigateToMyDay?: boolean;
+  /** Copy when block is already on /my-day. */
+  inMyDay?: boolean;
 };
 
 /** Russian plural for «N главных мест(а/о)» in preset copy. */
@@ -40,6 +44,8 @@ export function CityDayPresetBlock({
   city,
   editorial = false,
   namedPresets = [],
+  navigateToMyDay = true,
+  inMyDay = false,
 }: Props) {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -65,8 +71,20 @@ export function CityDayPresetBlock({
   const apply = (id: string, items: ReturnType<typeof buildCityDayRoutePreset>) => {
     setBusyId(id);
     replaceDayRouteFromVenues(items, city.id || null);
-    router.push('/my-day');
+    if (navigateToMyDay) {
+      router.push('/my-day');
+      return;
+    }
+    window.setTimeout(() => setBusyId(null), 400);
   };
+
+  const namedLead = inMyDay
+    ? 'Выберите шаблон - точки сразу попадут в маршрут.'
+    : 'Выберите шаблон - все точки найдете в «Собери свой день».';
+  const fallbackLead = inMyDay
+    ? `Собрать за минуту: ${mainPlacesPhrase(fallbackPreset.length)} в маршруте.`
+    : `Собрать за минуту: ${mainPlacesPhrase(fallbackPreset.length)} в «Собери свой день».`;
+  const namedCta = (busy: boolean) => (busy ? 'Собираем…' : inMyDay ? 'Собрать день' : 'В мой день');
 
   if (namedResolved.length > 0) {
     return (
@@ -74,12 +92,13 @@ export function CityDayPresetBlock({
         className={`mt-5 rounded-2xl border p-4 sm:p-5 ${
           editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-slate-50'
         }`}
+        data-day-presets={inMyDay ? 'my-day' : 'hub'}
       >
         <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
           Готовые сценарии
         </p>
         <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-          Выберите шаблон - все точки найдете в «Собери свой день».
+          {namedLead}
         </p>
         <ul className="mt-4 grid gap-3">
           {namedResolved.map(({ preset, items }) => {
@@ -118,7 +137,7 @@ export function CityDayPresetBlock({
                   }`}
                 >
                   <Sparkles className="h-4 w-4" />
-                  {busyId === preset.id ? 'Собираем…' : 'В мой день'}
+                  {namedCta(busyId === preset.id)}
                 </button>
               </li>
             );
@@ -137,6 +156,7 @@ export function CityDayPresetBlock({
       className={`mt-5 rounded-2xl border p-4 sm:p-5 ${
         editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-slate-50'
       }`}
+      data-day-presets={inMyDay ? 'my-day' : 'hub'}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
@@ -144,7 +164,7 @@ export function CityDayPresetBlock({
             Готовый сценарий
           </p>
           <p className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-            Собрать за минуту: {mainPlacesPhrase(fallbackPreset.length)} в «Собери свой день».
+            {fallbackLead}
           </p>
           <p
             className={`mt-1 line-clamp-2 text-xs ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
@@ -164,7 +184,7 @@ export function CityDayPresetBlock({
           }`}
         >
           <Sparkles className="h-4 w-4" />
-          Собрать за минуту
+          {busyId === 'default' ? 'Собираем…' : 'Собрать за минуту'}
         </button>
       </div>
     </div>

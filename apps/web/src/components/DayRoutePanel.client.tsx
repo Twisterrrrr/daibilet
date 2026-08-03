@@ -39,6 +39,7 @@ import type { PublicCatalogListItemDto, PublicDestinationDto } from '@daibilet/c
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
+import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
 import { CityPicker } from '@/components/CityPicker.client';
 import { DayRouteBoatWizard } from '@/components/DayRouteBoatWizard.client';
 import { DayRouteOsmMap } from '@/components/DayRouteOsmMap.client';
@@ -925,6 +926,21 @@ function DayRoutePanelInner() {
     const info = resolveCityInfo(pageCitySlug, selectedCity?.selectedDestination?.sourceSlug);
     return info?.mustSee || [];
   }, [pageCitySlug, selectedCity?.selectedDestination?.sourceSlug]);
+
+  const dayRoutePresets = useMemo(() => {
+    const info = resolveCityInfo(pageCitySlug, selectedCity?.selectedDestination?.sourceSlug);
+    return info?.dayRoutePresets || [];
+  }, [pageCitySlug, selectedCity?.selectedDestination?.sourceSlug]);
+
+  const dayPresetCityCtx = useMemo(
+    () => ({
+      id: pageCityId,
+      name: pageCityName,
+      slug: pageCitySlug,
+      sourceSlug: selectedCity?.selectedDestination?.sourceSlug || null,
+    }),
+    [pageCityId, pageCityName, pageCitySlug, selectedCity?.selectedDestination?.sourceSlug],
+  );
 
   const mustSeeResolved = useMemo(() => {
     if (!pageCityName || !mustSeePlaces.length) return [];
@@ -3001,6 +3017,17 @@ function DayRoutePanelInner() {
             )}
           </div>
         </section>
+      ) : null}
+
+      {hasPageCity ? (
+        <CityDayPresetBlock
+          places={mustSeePlaces}
+          venues={matchSources}
+          city={dayPresetCityCtx}
+          namedPresets={dayRoutePresets}
+          navigateToMyDay={false}
+          inMyDay
+        />
       ) : null}
 
       {/* Non-empty plan: city+search stays secondary under Hot Picks */}
