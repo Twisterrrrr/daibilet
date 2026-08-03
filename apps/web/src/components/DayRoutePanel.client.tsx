@@ -2243,7 +2243,7 @@ function DayRoutePanelInner() {
   function renderMapToolbar(compact = false) {
     return (
       <div
-        className={`flex w-full flex-wrap items-center justify-evenly gap-2 sm:w-auto sm:justify-start ${compact ? '' : ''}`}
+        className={`flex w-full items-stretch gap-2 lg:w-auto lg:items-center lg:justify-end ${compact ? '' : ''}`}
         data-day-route-toolbar-inner
       >
         {canOptimize ? (
@@ -2251,11 +2251,10 @@ function DayRoutePanelInner() {
             type="button"
             onClick={optimizeOrder}
             data-day-map-optimize
-            className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+            className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 lg:flex-none"
           >
-            <Sparkles className="h-3.5 w-3.5" />
-            <span className="sm:hidden">Оптимизировать</span>
-            <span className="hidden sm:inline">Оптимизировать маршрут</span>
+            <Sparkles className="h-3.5 w-3.5 shrink-0" />
+            Оптимизировать маршрут
           </button>
         ) : null}
         {yandexUrl ? (
@@ -2263,9 +2262,9 @@ function DayRoutePanelInner() {
             href={yandexUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-3 py-2 text-xs font-bold text-white hover:bg-sky-700"
+            className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-3 py-2 text-xs font-bold text-white hover:bg-sky-700 lg:flex-none"
           >
-            <ExternalLink className="h-3.5 w-3.5" />
+            <ExternalLink className="h-3.5 w-3.5 shrink-0" />
             Открыть в Яндекс.Картах
           </a>
         ) : (
@@ -2273,9 +2272,9 @@ function DayRoutePanelInner() {
             type="button"
             disabled
             title="Нужны координаты минимум у 2 точек"
-            className="inline-flex min-h-10 cursor-not-allowed items-center justify-center gap-1.5 rounded-full bg-slate-200 px-3 py-2 text-xs font-bold text-slate-500"
+            className="inline-flex min-h-10 flex-1 cursor-not-allowed items-center justify-center gap-1.5 rounded-full bg-slate-200 px-3 py-2 text-xs font-bold text-slate-500 lg:flex-none"
           >
-            <ExternalLink className="h-3.5 w-3.5" />
+            <ExternalLink className="h-3.5 w-3.5 shrink-0" />
             Открыть в Яндекс.Картах
           </button>
         )}
@@ -2459,8 +2458,8 @@ function DayRoutePanelInner() {
       {/* 1. Route list - always expanded */}
       {!route.venues.length ? null : (
         <section className="mt-5 w-full sm:mt-8" data-day-route-list>
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between gap-2">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-3">
+            <div className="flex min-w-0 items-center justify-between gap-2 lg:justify-start">
               <div className="flex min-w-0 flex-wrap items-center gap-2">
                 <h2
                   className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 text-sm"
@@ -2542,7 +2541,7 @@ function DayRoutePanelInner() {
                 </div>
               ) : null}
             </div>
-            <div data-day-route-toolbar className="sm:flex sm:justify-start">
+            <div data-day-route-toolbar className="w-full shrink-0 lg:w-auto">
               {renderMapToolbar()}
             </div>
           </div>
