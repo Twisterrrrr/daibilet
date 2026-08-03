@@ -9,7 +9,7 @@
 - Mobile: прежний `horizontal-snap-row` + 85/15; 2-row `md:grid-rows-2` без изменений.
 
 ### Проблемы
-- Deploy/BUILD_ID - после MSK web deploy + smoke.
+- Нет. MSK **BUILD_ID=`blIpyGTrMYrwYoh4jkBws`** (tip `33e9ca85`, incl. `5ffbfded`), smoke `/cities/moscow`+`nizhny-novgorod` 200: `data-city-must-see-prev|next`, `md:grid-rows-2`, `scrollbar-width:none`.
 
 ---
 
