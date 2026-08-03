@@ -11,7 +11,7 @@
 - `/my-day`: `SiteLayout footerVariant="compact"` - логотип + email + copyright + legal, без колонок/популярных направлений.
 
 ### Проблемы
-- Нет (deploy BUILD_ID ниже после MSK).
+- Нет. MSK **BUILD_ID=`0Fnc1S9ndw3dPSeEmy2Za`** (tip `4ffb251b`), smoke `/my-day` 200: `data-site-footer="compact"`; chunk: `data-day-mobile-list-first`, `data-day-mobile-view-toggle`, `data-day-mobile-map-mode` (без 38dvh / map-expand).
 
 ---
 
