@@ -1,11 +1,20 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-08-03
+**Обновлено:** 2026-08-04
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md), [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md), [mobile-templates.md](./mobile-templates.md), [catalog-location-venue-canon.md](./catalog-location-venue-canon.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
 
 ---
+
+## MSK web:build SSG harden (2026-08-04)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| OPS.SSG1 | Soft TimeoutError on `/events/[slug]` SSG + metadata | Критический | 🔄 deploy |
+| OPS.SSG2 | `fetchPublicApiJson` build-phase retries (3×) | Критический | 🔄 deploy |
+| OPS.SSG3 | `EVENT_SSG_TOP_N` default 40; `0`=skip; deploy export | Критический | 🔄 deploy |
+| OPS.SSG4 | deploy: `.next.prev` save + restore on build fail | Критический | 🔄 deploy |
 
 ## City hub hookFact + IA (2026-08-03)
 

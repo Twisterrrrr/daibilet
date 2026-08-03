@@ -19,6 +19,7 @@ import {
   getCachedEventAggregateRating,
   getCachedPublicEventDto,
 } from '@/server/cached-event-data';
+import { isTimeoutError } from '@/server/public-api-client';
 import { listTopEventSlugsForSsg } from '@/server/top-event-slugs';
 
 export const revalidate = 300;
@@ -29,72 +30,113 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
+function isProductionBuildPhase(): boolean {
+  return process.env.NEXT_PHASE === 'phase-production-build';
+}
+
+/**
+ * Soft-fail SSG timeouts so one slow event does not abort `next build`.
+ * Page may be recorded as not-found for this build; runtime + dynamicParams
+ * + revalidate refill it on demand / next revalidation.
+ */
+function softFailSsgTimeout(slug: string, error: unknown): never {
+  console.warn(
+    `[SSG Warning] Soft timeout on /events/${slug} — postponing to runtime.`,
+    error instanceof Error ? error.message : error,
+  );
+  notFound();
+}
+
 /**
  * Prebuild top-N popular/upcoming events (MSK 8Gi). Rest fill via ISR on first hit.
- * Cap: EVENT_SSG_TOP_N (default 200, max 500).
+ * Cap: EVENT_SSG_TOP_N (default 40, max 500; 0 = skip event SSG).
  */
 export async function generateStaticParams() {
-  const slugs = await listTopEventSlugsForSsg();
-  return slugs.map((slug) => ({ slug }));
+  try {
+    const slugs = await listTopEventSlugsForSsg();
+    return slugs.map((slug) => ({ slug }));
+  } catch (error) {
+    console.error('[SSG Error] listTopEventSlugsForSsg failed — empty params:', error);
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const payload = await getCachedPublicEventDto(slug);
-  if (!payload?.event) return { title: pageTitle('Событие не найдено') };
+  try {
+    const payload = await getCachedPublicEventDto(slug);
+    if (!payload?.event) return { title: pageTitle('Событие не найдено') };
 
-  const event = payload.event;
-  const path = event.canonicalPath || eventHref(event);
-  const priceRange = getTicketPriceRange(payload);
-  const expansionMeta = buildEventListingMeta({
-    eventTitle: event.title,
-    cityName: event.city,
-    citySlug: event.citySlug,
-    sourceCitySlug: event.sourceCitySlug,
-    priceFrom: priceRange?.min ?? event.priceFrom ?? payload.stats?.priceFrom,
-  });
-  const nextSession = pickRepresentativeSession(payload.sessions ?? []);
-  const disambiguatedTitle = buildEventPageMetaTitle({
-    eventTitle: event.title,
-    seoTitle: event.seoTitle,
-    cityName: event.city,
-    venueName: event.venue,
-    dateLabel: nextSession?.dateLabel,
-    timeLabel: nextSession?.timeLabel,
-  });
-  const title = pageTitle(expansionMeta?.title || disambiguatedTitle);
-  const shareTitle = expansionMeta
-    ? expansionMeta.title
-    : `${title} | Дайбилет`;
-  const description =
-    expansionMeta?.description ||
-    event.seoDescription ||
-    event.description ||
-    `${event.title} - билеты на Дайбилет`;
+    const event = payload.event;
+    const path = event.canonicalPath || eventHref(event);
+    const priceRange = getTicketPriceRange(payload);
+    const expansionMeta = buildEventListingMeta({
+      eventTitle: event.title,
+      cityName: event.city,
+      citySlug: event.citySlug,
+      sourceCitySlug: event.sourceCitySlug,
+      priceFrom: priceRange?.min ?? event.priceFrom ?? payload.stats?.priceFrom,
+    });
+    const nextSession = pickRepresentativeSession(payload.sessions ?? []);
+    const disambiguatedTitle = buildEventPageMetaTitle({
+      eventTitle: event.title,
+      seoTitle: event.seoTitle,
+      cityName: event.city,
+      venueName: event.venue,
+      dateLabel: nextSession?.dateLabel,
+      timeLabel: nextSession?.timeLabel,
+    });
+    const title = pageTitle(expansionMeta?.title || disambiguatedTitle);
+    const shareTitle = expansionMeta ? expansionMeta.title : `${title} | Дайбилет`;
+    const description =
+      expansionMeta?.description ||
+      event.seoDescription ||
+      event.description ||
+      `${event.title} - билеты на Дайбилет`;
 
-  return {
-    title: expansionMeta ? { absolute: expansionMeta.title } : title,
-    description,
-    alternates: {
-      canonical: path,
-    },
-    ...buildShareMetadata({
-      title: shareTitle,
+    return {
+      title: expansionMeta ? { absolute: expansionMeta.title } : title,
       description,
-      path,
-      image: event.imageUrl,
-    }),
-  };
+      alternates: {
+        canonical: path,
+      },
+      ...buildShareMetadata({
+        title: shareTitle,
+        description,
+        path,
+        image: event.imageUrl,
+      }),
+    };
+  } catch (error) {
+    if (isProductionBuildPhase() && isTimeoutError(error)) {
+      console.warn(`[SSG Warning] Soft timeout in metadata /events/${slug}`);
+      return { title: pageTitle('Событие') };
+    }
+    throw error;
+  }
 }
 
 export default async function EventDetailPage({ params }: PageProps) {
   const { slug } = await params;
-  const payload = await getCachedPublicEventDto(slug);
+  let payload;
+  try {
+    payload = await getCachedPublicEventDto(slug);
+  } catch (error) {
+    if (isProductionBuildPhase() && isTimeoutError(error)) {
+      softFailSsgTimeout(slug, error);
+    }
+    throw error;
+  }
   if (!payload?.event) notFound();
 
   const { event, related } = payload;
   const clientPayload = toEventPageClientPayload(payload);
-  const aggregate = await getCachedEventAggregateRating(event.id);
+  let aggregate = null;
+  try {
+    aggregate = await getCachedEventAggregateRating(event.id);
+  } catch {
+    aggregate = null;
+  }
   const jsonLdBlocks = buildEventPageJsonLd(payload, { aggregateRating: aggregate });
 
   return (

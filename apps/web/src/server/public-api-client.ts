@@ -48,28 +48,70 @@ export function buildPublicApiUrl(
   return url.toString();
 }
 
+/** AbortSignal.timeout / DOMException TimeoutError (code 23) / AbortError. */
+export function isTimeoutError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const err = error as { name?: string; code?: number | string; message?: string };
+  if (err.name === 'TimeoutError' || err.name === 'AbortError') return true;
+  if (err.code === 23 || err.code === 'TIMEOUT_ERR') return true;
+  const msg = String(err.message || '').toLowerCase();
+  return msg.includes('timeout') || msg.includes('aborted due to timeout');
+}
+
+function isProductionBuildPhase(): boolean {
+  return process.env.NEXT_PHASE === 'phase-production-build';
+}
+
+async function sleep(ms: number): Promise<void> {
+  await new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function fetchPublicApiJson<T>(
   apiPath: string,
   options: {
     searchParams?: PublicApiSearchParams | null;
     timeoutMs?: number;
     notFoundAsNull?: boolean;
+    /** Build-only retries (default 3 in production build, 0 at runtime). */
+    retries?: number;
+    retryDelayMs?: number;
   } = {},
 ): Promise<T> {
   const timeoutMs = Math.max(250, options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
-  const response = await fetch(buildPublicApiUrl(apiPath, options.searchParams), {
-    headers: {
-      Accept: 'application/json',
-      'User-Agent': 'daibilet-web-ssr',
-    },
-    cache: 'no-store',
-    signal: AbortSignal.timeout(timeoutMs),
-  });
+  const retries = options.retries ?? (isProductionBuildPhase() ? 3 : 0);
+  const retryDelayMs = Math.max(0, options.retryDelayMs ?? 500);
+  const url = buildPublicApiUrl(apiPath, options.searchParams);
 
-  if (options.notFoundAsNull && response.status === 404) return null as T;
-  if (!response.ok) {
-    throw new Error(`Public API ${apiPath} failed: HTTP ${response.status}`);
+  let lastError: unknown;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      if (attempt > 0) {
+        console.warn(`[public-api] retry ${attempt}/${retries} ${apiPath}`);
+      }
+      const response = await fetch(url, {
+        headers: {
+          Accept: 'application/json',
+          'User-Agent': 'daibilet-web-ssr',
+        },
+        cache: 'no-store',
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+
+      if (options.notFoundAsNull && response.status === 404) return null as T;
+      if (!response.ok) {
+        throw new Error(`Public API ${apiPath} failed: HTTP ${response.status}`);
+      }
+
+      return (await response.json()) as T;
+    } catch (error) {
+      lastError = error;
+      if (isTimeoutError(error) && attempt < retries) {
+        await sleep(retryDelayMs * 2 ** attempt);
+        continue;
+      }
+      break;
+    }
   }
 
-  return (await response.json()) as T;
+  throw lastError;
 }

@@ -195,11 +195,42 @@ fi
 
 reap_orphan_next_build_workers "pre-build"
 
+WEB_NEXT_DIR="apps/web/.next"
+WEB_NEXT_PREV="apps/web/.next.prev"
+# Keep last healthy build for rollback if web:build fails mid-SSG.
+if [[ -f "${WEB_NEXT_DIR}/prerender-manifest.json" && -f "${WEB_NEXT_DIR}/BUILD_ID" ]]; then
+  rm -rf "${WEB_NEXT_PREV}"
+  cp -a "${WEB_NEXT_DIR}" "${WEB_NEXT_PREV}"
+  echo "Saved healthy .next → .next.prev (BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID"))"
+fi
+
 # Heap cap for `next build` on MSK ~8Gi (also set in apps/web/scripts/next-build.mjs).
 # Default 5120Mi (legacy SPB 3.8Gi used 2560). Override via NODE_OPTIONS if needed.
 export NODE_OPTIONS="${NODE_OPTIONS:---max-old-space-size=5120}"
-echo "web:build NODE_OPTIONS=${NODE_OPTIONS}"
+# Cap event SSG (default 40). Override: EVENT_SSG_TOP_N=100 or 0 to skip.
+export EVENT_SSG_TOP_N="${EVENT_SSG_TOP_N:-40}"
+echo "web:build NODE_OPTIONS=${NODE_OPTIONS} EVENT_SSG_TOP_N=${EVENT_SSG_TOP_N}"
+
+set +e
 pnpm web:build
+BUILD_RC=$?
+set -e
+
+if [[ "${BUILD_RC}" -ne 0 ]]; then
+  echo "web:build FAILED (rc=${BUILD_RC}) — attempting restore from .next.prev"
+  if [[ -f "${WEB_NEXT_PREV}/prerender-manifest.json" && -f "${WEB_NEXT_PREV}/BUILD_ID" ]]; then
+    rm -rf "${WEB_NEXT_DIR}"
+    cp -a "${WEB_NEXT_PREV}" "${WEB_NEXT_DIR}"
+    echo "Restored .next from .next.prev (BUILD_ID=$(cat "${WEB_NEXT_DIR}/BUILD_ID"))"
+    if systemctl is-enabled --quiet "$WEB_SERVICE" 2>/dev/null; then
+      systemctl start "$WEB_SERVICE" || true
+      echo "Started ${WEB_SERVICE} on restored .next"
+    fi
+  else
+    echo "No healthy .next.prev to restore — site may stay down until next successful build"
+  fi
+  exit "${BUILD_RC}"
+fi
 
 reap_orphan_next_build_workers "post-build"
 

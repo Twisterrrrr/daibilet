@@ -1,3 +1,20 @@
+## 2026-08-04 - MSK web:build SSG TimeoutError harden
+
+### Наблюдения
+- Failures: prerender `/events/[slug]` → `TimeoutError` (AbortSignal / code 23) on public API fetch mid-`next build`.
+- One timeout aborts entire build; broken `.next` left web down until manual restore.
+
+### Решения
+- `fetchPublicApiJson`: build-phase retries (3× exponential backoff); `isTimeoutError` helper.
+- `/events/[slug]`: soft-catch timeout in page + metadata during `NEXT_PHASE=phase-production-build` → warn + `notFound()` (runtime/`dynamicParams`/revalidate refill).
+- `EVENT_SSG_TOP_N` default **40** (was 200); `0` = skip event SSG; deploy exports default 40.
+- `deploy-prod-next.sh`: save healthy `.next` → `.next.prev` before build; on fail restore + start web.
+
+### Проблемы
+- Soft notFound on timed-out SSG slug may briefly serve 404 until ISR/first regen - better than red deploy. Deploy BUILD_ID below.
+
+---
+
 ## 2026-08-03 - /my-day mobile: chrome cleanup (hub link + toggles)
 
 ### Наблюдения

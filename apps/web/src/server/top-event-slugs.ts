@@ -1,9 +1,17 @@
 import { prisma } from '@/lib/db';
 
-/** Default top-N for SSG + post-deploy warm. Override: EVENT_SSG_TOP_N=300 */
-export function eventSsgTopN(fallback = 200): number {
-  const raw = Number(process.env.EVENT_SSG_TOP_N || fallback);
-  if (!Number.isFinite(raw) || raw <= 0) return fallback;
+/**
+ * Top-N event slugs for SSG + post-deploy warm.
+ * Default 40 (MSK 8Gi: 200 often times out mid-prerender).
+ * EVENT_SSG_TOP_N=0 → skip event SSG (all via ISR / dynamicParams).
+ * Cap 500.
+ */
+export function eventSsgTopN(fallback = 40): number {
+  const rawEnv = process.env.EVENT_SSG_TOP_N;
+  if (rawEnv === undefined || rawEnv === '') return fallback;
+  const raw = Number(rawEnv);
+  if (!Number.isFinite(raw)) return fallback;
+  if (raw <= 0) return 0;
   return Math.min(Math.floor(raw), 500);
 }
 
@@ -12,6 +20,7 @@ export function eventSsgTopN(fallback = 200): number {
  * Prefer recently updated with a future or open session.
  */
 export async function listTopEventSlugsForSsg(limit = eventSsgTopN()): Promise<string[]> {
+  if (limit <= 0) return [];
   const now = new Date();
   try {
     const rows = await prisma.event.findMany({
