@@ -11,10 +11,10 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| OPS.SSG1 | Soft TimeoutError on `/events/[slug]` SSG + metadata | Критический | 🔄 deploy |
-| OPS.SSG2 | `fetchPublicApiJson` build-phase retries (3×) | Критический | 🔄 deploy |
-| OPS.SSG3 | `EVENT_SSG_TOP_N` default 40; `0`=skip; deploy export | Критический | 🔄 deploy |
-| OPS.SSG4 | deploy: `.next.prev` save + restore on build fail | Критический | 🔄 deploy |
+| OPS.SSG1 | Soft TimeoutError on `/events/[slug]` SSG + metadata | Критический | ✅ `8423289` MSK **BUILD_ID=`6ky5NRSMiRIBzAUTqpmMv`** |
+| OPS.SSG2 | `fetchPublicApiJson` build-phase retries (3×) | Критический | ✅ `8423289` |
+| OPS.SSG3 | `EVENT_SSG_TOP_N` default 40; `0`=skip; deploy export | Критический | ✅ `8423289` |
+| OPS.SSG4 | deploy: `.next.prev` save + restore on build fail | Критический | ✅ `8423289` |
 
 ## City hub hookFact + IA (2026-08-03)
 

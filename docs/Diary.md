@@ -11,7 +11,7 @@
 - `deploy-prod-next.sh`: save healthy `.next` → `.next.prev` before build; on fail restore + start web.
 
 ### Проблемы
-- Soft notFound on timed-out SSG slug may briefly serve 404 until ISR/first regen - better than red deploy. Deploy BUILD_ID below.
+- Soft notFound on timed-out SSG slug may briefly serve 404 until ISR/first regen - better than red deploy. MSK **BUILD_ID=`6ky5NRSMiRIBzAUTqpmMv`** (tip `84232895`), `/my-day` 200; deploy log: `EVENT_SSG_TOP_N=40`, no Export abort.
 
 ---
 
