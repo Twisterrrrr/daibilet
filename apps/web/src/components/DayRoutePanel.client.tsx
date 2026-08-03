@@ -378,6 +378,8 @@ function DayRoutePanelInner() {
   const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
   /** Route stops layout: grid (default) or dense text list. */
   const [stopViewMode, setStopViewMode] = useState<DayRouteStopViewMode>('grid');
+  /** Desktop (≥lg) can pick grid/list; mobile always dense list (no density toggle). */
+  const [isLgUp, setIsLgUp] = useState(false);
   const listRootRef = useRef<HTMLDivElement | null>(null);
   /** After external «Купить билет» - ask guest to mark bought. */
   const [ticketHandoff, setTicketHandoff] = useState<{
@@ -446,6 +448,17 @@ function DayRoutePanelInner() {
   useEffect(() => {
     setStopViewMode(readStopViewMode());
   }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const sync = () => setIsLgUp(mq.matches);
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
+  const effectiveStopViewMode: DayRouteStopViewMode = isLgUp ? stopViewMode : 'list';
 
   function changeStopViewMode(mode: DayRouteStopViewMode) {
     setStopViewMode(mode);
@@ -2232,22 +2245,19 @@ function DayRoutePanelInner() {
             data-day-route-count-label
             data-day-route-readiness
           >
-            <span>{readiness.summaryLine}</span>
-            {scopeCityName ? (
-              <>
-                <span className="mx-1.5 text-slate-400" aria-hidden>
-                  •
-                </span>
-                <Link
-                  href={cityHubHref}
-                  className="text-primary-600 transition-colors hover:text-primary-700 hover:underline"
-                  data-day-city-hub-link
-                >
-                  Страница {cityToGenitive(scopeCityName)}
-                </Link>
-              </>
-            ) : null}
+            {readiness.summaryLine}
           </p>
+          {scopeCityName ? (
+            <p className="mt-0.5 text-[13px] font-medium">
+              <Link
+                href={cityHubHref}
+                className="text-primary-600 transition-colors hover:text-primary-700 hover:underline"
+                data-day-city-hub-link
+              >
+                Страница {cityToGenitive(scopeCityName)}
+              </Link>
+            </p>
+          ) : null}
         </div>
         <div className="relative shrink-0" ref={shareMenuRef}>
           <button
@@ -2437,7 +2447,7 @@ function DayRoutePanelInner() {
                 </div>
               ) : null}
               <div
-                className="inline-flex rounded-full border border-slate-200 bg-white p-0.5"
+                className="hidden rounded-full border border-slate-200 bg-white p-0.5 lg:inline-flex"
                 role="group"
                 aria-label="Вид точек маршрута"
                 data-day-stop-view-toggle
@@ -2527,12 +2537,12 @@ function DayRoutePanelInner() {
           ) : null}
           <ul
             className={
-              stopViewMode === 'grid'
+              effectiveStopViewMode === 'grid'
                 ? 'mt-3 grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
                 : 'mt-3 grid w-full grid-cols-1 items-start gap-0'
             }
             data-day-plan-list
-            data-day-stop-view={stopViewMode}
+            data-day-stop-view={effectiveStopViewMode}
           >
             {route.venues.map((venue, index) => (
               <Fragment key={venue.id}>
@@ -2540,7 +2550,7 @@ function DayRoutePanelInner() {
                   index={index}
                   total={route.venues.length}
                   venue={venue}
-                  variant={stopViewMode}
+                  variant={effectiveStopViewMode}
                   hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
                   mapsUrl={(() => {
                     const c = lookupDayRouteCoords(venue, coordsById);
@@ -2550,7 +2560,7 @@ function DayRoutePanelInner() {
                   travelMode={travelMode}
                   focused={focusedStopId === venue.id}
                   nearbyUpsells={
-                    stopViewMode === 'grid'
+                    effectiveStopViewMode === 'grid'
                       ? []
                       : pickNearbyUpsellsForStop(venue, matchOfferStubs, { limit: 1 })
                   }
@@ -2571,7 +2581,7 @@ function DayRoutePanelInner() {
                 freeWindowUpsells.length > 0 &&
                 !atMax ? (
                   <li
-                    className={stopViewMode === 'grid' ? 'col-span-full' : undefined}
+                    className={effectiveStopViewMode === 'grid' ? 'col-span-full' : undefined}
                     data-day-free-window-upsell
                     data-day-free-window
                   >

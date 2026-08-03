@@ -1,3 +1,19 @@
+## 2026-08-03 - /my-day mobile: chrome cleanup (hub link + toggles)
+
+### Наблюдения
+- «Страница {City_Род}» в одной строке с readiness ломалась посередине рядом с «Поделиться».
+- Рядом жили два тоггла с словом «Список»: экран Список|Карта и плотность Сетка|Список.
+
+### Решения
+- Hub-ссылка на отдельной строке под readiness.
+- `data-day-stop-view-toggle` только `lg+`; на mobile всегда dense list (`effectiveStopViewMode`).
+- Список|Карта (`data-day-mobile-view-toggle`) остаётся на mobile. Drawer Wanderlog - вне скоупа.
+
+### Проблемы
+- Нет (BUILD_ID после MSK).
+
+---
+
 ## 2026-08-03 - /my-day mobile: list-first + map mode (Wanderlog)
 
 ### Наблюдения
