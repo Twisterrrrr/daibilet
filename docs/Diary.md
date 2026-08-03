@@ -1,3 +1,19 @@
+## 2026-08-03 - City hub «Главные места»: desktop 2-up via max-lg scope
+
+### Наблюдения
+- Owner: desktop scroll «Главные места» должен показывать **2 карточки в ряд**, не 1; меньшие разрешения - по 1 (85/15).
+- Базовые `w-[85%] min-w-[85%]` без `max-lg:` оставляли риск, что mobile width «побеждает» desktop override в каскаде.
+
+### Решения
+- Cards: `max-lg:w-[85%] max-lg:min-w-[85%]` только ниже lg.
+- lg+: `lg:w-[calc((100%-1.5rem)/2)] lg:min-w-[calc((100%-1.5rem)/2)] lg:flex-[0_0_calc((100%-1.5rem)/2)]` - ровно ~2 в кадре, scroll сохраняется.
+- Rail без изменений: `horizontal-snap-row flex flex-nowrap gap-3 lg:gap-6`.
+
+### Проблемы
+- (заполнить после deploy)
+
+---
+
 ## 2026-08-03 - City hub «Главные места»: restore desktop horizontal rail
 
 ### Наблюдения
