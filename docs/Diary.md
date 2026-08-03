@@ -1,3 +1,18 @@
+## 2026-08-03 - City hub «Главные места»: desktop page prev/next
+
+### Наблюдения
+- Owner: на md+ карусель must-see лучше листать кнопкой на «экран», а не через видимый horizontal scrollbar.
+- Mobile swipe/scroll оставить.
+
+### Решения
+- `CitySightsMustSeeList`: prev/next (`data-city-must-see-prev|next`, `hidden md:inline-flex`); `scrollBy(clientWidth)`; scrollbar скрыт на md+.
+- Mobile: прежний `horizontal-snap-row` + 85/15; 2-row `md:grid-rows-2` без изменений.
+
+### Проблемы
+- Deploy/BUILD_ID - после MSK web deploy + smoke.
+
+---
+
 ## 2026-08-03 - City hub owner polish (падеж, hook, rail, venues, no mood quiz)
 
 ### Наблюдения

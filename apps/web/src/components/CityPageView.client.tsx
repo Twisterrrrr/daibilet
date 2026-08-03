@@ -1263,6 +1263,49 @@ function CitySightsMustSeeList({
   const visiblePlaces =
     filterMeta.tabs.length >= 2 ? filteredPlaces : filteredPlaces.slice(0, 6);
 
+  const railRef = React.useRef<HTMLDivElement>(null);
+  const [canPrev, setCanPrev] = React.useState(false);
+  const [canNext, setCanNext] = React.useState(false);
+  const [hasOverflow, setHasOverflow] = React.useState(false);
+
+  const syncRail = React.useCallback(() => {
+    const el = railRef.current;
+    if (!el) return;
+    const { scrollLeft, scrollWidth, clientWidth } = el;
+    const overflow = scrollWidth > clientWidth + 4;
+    setHasOverflow(overflow);
+    setCanPrev(overflow && scrollLeft > 4);
+    setCanNext(overflow && scrollLeft + clientWidth < scrollWidth - 4);
+  }, []);
+
+  React.useEffect(() => {
+    const el = railRef.current;
+    if (!el) return;
+    syncRail();
+    el.addEventListener('scroll', syncRail, { passive: true });
+    window.addEventListener('resize', syncRail, { passive: true });
+    const ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(syncRail) : null;
+    ro?.observe(el);
+    return () => {
+      el.removeEventListener('scroll', syncRail);
+      window.removeEventListener('resize', syncRail);
+      ro?.disconnect();
+    };
+  }, [syncRail, activeId, visiblePlaces.length]);
+
+  const scrollPage = (dir: -1 | 1) => {
+    const el = railRef.current;
+    if (!el) return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollBy({
+      left: dir * el.clientWidth,
+      behavior: reduceMotion ? 'auto' : 'smooth',
+    });
+  };
+
+  const arrowClass =
+    'absolute top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-slate-200/90 bg-white/95 text-slate-700 shadow-md backdrop-blur transition-[opacity,colors] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300 focus-visible:ring-offset-2 md:inline-flex';
+
   return (
     <>
       <MustSeeFilterTabs
@@ -1271,14 +1314,16 @@ function CitySightsMustSeeList({
         onChange={setFilterId}
         editorial={editorial}
       />
-      {/* Mobile: 1-card 85/15 swipe. md+: carousel columns with 2-row vertical stack. */}
-      <div
-        key={activeId}
-        className="horizontal-snap-row mt-6 touch-pan-x snap-x snap-mandatory"
-        data-city-must-see-rail
-        aria-label="Главные места"
-        tabIndex={0}
-      >
+      {/* Mobile: 1-card 85/15 swipe. md+: 2-row columns + page prev/next (no scrollbar UX). */}
+      <div className="relative mt-6">
+        <div
+          key={activeId}
+          ref={railRef}
+          className="horizontal-snap-row touch-pan-x snap-x snap-mandatory md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden"
+          data-city-must-see-rail
+          aria-label="Главные места"
+          tabIndex={0}
+        >
         <ol className="flex w-max flex-nowrap gap-3 md:grid md:auto-cols-[min(22rem,calc(50vw-3rem))] md:grid-flow-col md:grid-rows-2 md:gap-x-6 md:gap-y-5">
         {visiblePlaces.map((place, index) => {
           const afficheLink = matchSightAfficheLink({
@@ -1375,6 +1420,43 @@ function CitySightsMustSeeList({
           );
         })}
         </ol>
+        </div>
+        <button
+          type="button"
+          data-city-must-see-prev
+          aria-label="Предыдущие места"
+          aria-disabled={!canPrev}
+          tabIndex={canPrev ? 0 : -1}
+          disabled={!canPrev}
+          onClick={() => scrollPage(-1)}
+          className={`${arrowClass} left-1 ${
+            hasOverflow
+              ? canPrev
+                ? 'opacity-100 hover:bg-white hover:text-slate-950'
+                : 'pointer-events-none opacity-40'
+              : 'pointer-events-none opacity-0'
+          }`}
+        >
+          <ArrowLeft className="h-5 w-5" aria-hidden />
+        </button>
+        <button
+          type="button"
+          data-city-must-see-next
+          aria-label="Следующие места"
+          aria-disabled={!canNext}
+          tabIndex={canNext ? 0 : -1}
+          disabled={!canNext}
+          onClick={() => scrollPage(1)}
+          className={`${arrowClass} right-1 ${
+            hasOverflow
+              ? canNext
+                ? 'opacity-100 hover:bg-white hover:text-slate-950'
+                : 'pointer-events-none opacity-40'
+              : 'pointer-events-none opacity-0'
+          }`}
+        >
+          <ArrowRight className="h-5 w-5" aria-hidden />
+        </button>
       </div>
       <CityDayPresetBlock
         places={places}
