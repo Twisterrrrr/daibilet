@@ -360,7 +360,14 @@ function DayRoutePanelInner() {
   const [eventsCatalog, setEventsCatalog] = useState<PublicCatalogListItemDto[]>([]);
   const [eventsSearchExtra, setEventsSearchExtra] = useState<PublicCatalogListItemDto[]>([]);
   const [unifiedSearchQuery, setUnifiedSearchQuery] = useState('');
-  const [catalogLoading, setCatalogLoading] = useState(false);
+  /** Per-family progressive load - search unlocks as soon as any family arrives. */
+  const [catalogLoadingParts, setCatalogLoadingParts] = useState({
+    locations: false,
+    venues: false,
+    events: false,
+  });
+  const catalogLoading =
+    catalogLoadingParts.locations || catalogLoadingParts.venues || catalogLoadingParts.events;
   const [catalogError, setCatalogError] = useState<string | null>(null);
   const [destinationsFallback, setDestinationsFallback] = useState<PublicDestinationDto[]>([]);
   const [mustSeeFilter, setMustSeeFilter] = useState<MustSeeFilterId>('main');
@@ -750,23 +757,26 @@ function DayRoutePanelInner() {
   const venuesHref = venueCatalogHrefWithSelectedCity('/venues', scopeCityParam);
   const cityHubHref = scopeCitySlug ? `/cities/${encodeURIComponent(scopeCitySlug)}` : '/cities';
 
-  // City-scoped catalog lists for on-page searchable selects.
-  // Venues: prefer destination slug (alias-aware warm list). Events catalog historically
-  // matched display title only - prefer pageCityName so События is not empty when slug is set.
-  // Do NOT fetch global top-500 then exact-match city title - that drops regional rows.
+  // Progressive city catalog: locations / venues / events settle independently.
+  // Search stays usable as soon as the first family arrives (no Promise.all gate).
   useEffect(() => {
     if (!pageCityName) {
       setLocationsCatalog([]);
       setVenuesCatalog([]);
       setEventsCatalog([]);
       setEventsSearchExtra([]);
-      setCatalogLoading(false);
+      setCatalogLoadingParts({ locations: false, venues: false, events: false });
       setCatalogError(null);
       return;
     }
     const controller = new AbortController();
-    setCatalogLoading(true);
+    setLocationsCatalog([]);
+    setVenuesCatalog([]);
+    setEventsCatalog([]);
+    setEventsSearchExtra([]);
+    setCatalogLoadingParts({ locations: true, venues: true, events: true });
     setCatalogError(null);
+
     const venuesCityFilter = pageCitySlug || pageCitySourceSlug || pageCityName;
     const eventsCityFilter = pageCityName || pageCitySlug || pageCitySourceSlug;
     const venuesCityQ = encodeURIComponent(venuesCityFilter);
@@ -774,64 +784,93 @@ function DayRoutePanelInner() {
     const venuesQs = (family: 'location' | 'institution') =>
       `/api/public/venues?family=${family}&city=${venuesCityQ}&limit=500`;
 
-    async function loadCatalog(attempt: number): Promise<void> {
-      try {
-        const [locationsPayload, venuesPayload, eventsPayload] = await Promise.all([
-          fetch(venuesQs('location'), { signal: controller.signal })
-            .then(async (response) =>
-              response.ok ? ((await response.json()) as { venues?: VenueCatalogCard[] }) : null,
-            ),
-          fetch(venuesQs('institution'), { signal: controller.signal })
-            .then(async (response) =>
-              response.ok ? ((await response.json()) as { venues?: VenueCatalogCard[] }) : null,
-            ),
-          fetch(`/api/public/events?city=${eventsCityQ}&limit=100&sort=popular`, {
-            signal: controller.signal,
-          }).then(async (response) =>
-            response.ok
-              ? ((await response.json()) as {
-                  items?: PublicCatalogListItemDto[];
-                  sessions?: PublicCatalogListItemDto[];
-                })
-              : null,
-          ),
-        ]);
-        if (controller.signal.aborted) return;
-        if (!locationsPayload && !venuesPayload && !eventsPayload) {
-          if (attempt < 1) {
-            await new Promise((resolve) => window.setTimeout(resolve, 400));
-            return loadCatalog(attempt + 1);
+    const settledOk = { locations: false, venues: false, events: false };
+
+    function markDone(part: 'locations' | 'venues' | 'events', ok: boolean) {
+      if (controller.signal.aborted) return;
+      settledOk[part] = ok;
+      setCatalogLoadingParts((prev) => {
+        const next = { ...prev, [part]: false };
+        if (!next.locations && !next.venues && !next.events) {
+          if (!settledOk.locations && !settledOk.venues && !settledOk.events) {
+            setCatalogError(
+              'Не удалось загрузить каталог. Откройте блок ещё раз или обновите страницу.',
+            );
+          } else {
+            setCatalogError(null);
           }
-          setLocationsCatalog([]);
-          setVenuesCatalog([]);
-          setEventsCatalog([]);
-          setEventsSearchExtra([]);
-          setCatalogError('Не удалось загрузить каталог. Откройте блок ещё раз или обновите страницу.');
-          return;
         }
-        setLocationsCatalog((locationsPayload?.venues || []).map((item) => toVenueCatalogCard(item)));
-        setVenuesCatalog((venuesPayload?.venues || []).map((item) => toVenueCatalogCard(item)));
-        const events = eventsPayload?.items || eventsPayload?.sessions || [];
-        setEventsCatalog(events);
-        setEventsSearchExtra([]);
-        setCatalogError(null);
+        return next;
+      });
+    }
+
+    async function loadFamily(
+      part: 'locations' | 'venues' | 'events',
+      run: () => Promise<boolean>,
+      attempt = 0,
+    ): Promise<void> {
+      try {
+        const ok = await run();
+        if (controller.signal.aborted) return;
+        if (!ok && attempt < 1) {
+          await new Promise((resolve) => window.setTimeout(resolve, 400));
+          if (controller.signal.aborted) return;
+          return loadFamily(part, run, attempt + 1);
+        }
+        markDone(part, ok);
       } catch {
         if (controller.signal.aborted) return;
         if (attempt < 1) {
           await new Promise((resolve) => window.setTimeout(resolve, 400));
-          return loadCatalog(attempt + 1);
+          if (controller.signal.aborted) return;
+          return loadFamily(part, run, attempt + 1);
         }
-        setLocationsCatalog([]);
-        setVenuesCatalog([]);
-        setEventsCatalog([]);
-        setEventsSearchExtra([]);
-        setCatalogError('Не удалось загрузить каталог. Откройте блок ещё раз или обновите страницу.');
+        markDone(part, false);
       }
     }
 
-    void loadCatalog(0).finally(() => {
-      if (!controller.signal.aborted) setCatalogLoading(false);
+    void loadFamily('locations', async () => {
+      const response = await fetch(venuesQs('location'), { signal: controller.signal });
+      if (!response.ok) {
+        setLocationsCatalog([]);
+        return false;
+      }
+      const payload = (await response.json()) as { venues?: VenueCatalogCard[] };
+      if (controller.signal.aborted) return false;
+      setLocationsCatalog((payload.venues || []).map((item) => toVenueCatalogCard(item)));
+      return true;
     });
+
+    void loadFamily('venues', async () => {
+      const response = await fetch(venuesQs('institution'), { signal: controller.signal });
+      if (!response.ok) {
+        setVenuesCatalog([]);
+        return false;
+      }
+      const payload = (await response.json()) as { venues?: VenueCatalogCard[] };
+      if (controller.signal.aborted) return false;
+      setVenuesCatalog((payload.venues || []).map((item) => toVenueCatalogCard(item)));
+      return true;
+    });
+
+    void loadFamily('events', async () => {
+      const response = await fetch(
+        `/api/public/events?city=${eventsCityQ}&limit=100&sort=popular`,
+        { signal: controller.signal },
+      );
+      if (!response.ok) {
+        setEventsCatalog([]);
+        return false;
+      }
+      const payload = (await response.json()) as {
+        items?: PublicCatalogListItemDto[];
+        sessions?: PublicCatalogListItemDto[];
+      };
+      if (controller.signal.aborted) return false;
+      setEventsCatalog(payload.items || payload.sessions || []);
+      return true;
+    });
+
     return () => controller.abort();
   }, [pageCityName, pageCitySlug, pageCitySourceSlug]);
 
@@ -1883,8 +1922,12 @@ function DayRoutePanelInner() {
           <DayRouteSearchSelect
             label="Локации"
             placeholder="Найти локацию…"
-            emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Нет локаций в этом городе'}
-            loading={catalogLoading}
+            emptyText={
+              catalogLoadingParts.locations
+                ? 'Загружаем…'
+                : catalogError || 'Нет локаций в этом городе'
+            }
+            loading={catalogLoadingParts.locations && locationsCatalog.length === 0}
             disabled={atMax}
             options={locationOptions}
             onPick={(option) => pickLocationById(option.id)}
@@ -1892,8 +1935,10 @@ function DayRoutePanelInner() {
           <DayRouteSearchSelect
             label="Площадки"
             placeholder="Найти площадку…"
-            emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Нет площадок в этом городе'}
-            loading={catalogLoading}
+            emptyText={
+              catalogLoadingParts.venues ? 'Загружаем…' : catalogError || 'Нет площадок в этом городе'
+            }
+            loading={catalogLoadingParts.venues && venuesCatalog.length === 0}
             disabled={atMax}
             options={venueOptions}
             onPick={(option) => pickVenueById(option.id)}
@@ -1901,8 +1946,10 @@ function DayRoutePanelInner() {
           <DayRouteSearchSelect
             label="События"
             placeholder="Найти событие…"
-            emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Нет событий в этом городе'}
-            loading={catalogLoading}
+            emptyText={
+              catalogLoadingParts.events ? 'Загружаем…' : catalogError || 'Нет событий в этом городе'
+            }
+            loading={catalogLoadingParts.events && eventsCatalog.length === 0}
             disabled={atMax}
             options={eventOptions}
             onPick={(option) => pickEventById(option.id)}
@@ -1951,6 +1998,7 @@ function DayRoutePanelInner() {
           data-day-starter-geometry="stable"
           data-day-starter-align="col"
           data-day-starter-form-w="400px"
+          data-day-catalog-load="progressive"
         >
           {/*
             Full width of container-page (= header).
@@ -2003,11 +2051,13 @@ function DayRoutePanelInner() {
                   emptyText={
                     !hasPageCity
                       ? 'Сначала выберите город'
-                      : catalogLoading
+                      : catalogLoading && unifiedSearchOptions.length === 0
                         ? 'Загружаем…'
                         : catalogError || 'Ничего не найдено'
                   }
-                  loading={hasPageCity ? catalogLoading : false}
+                  loading={
+                    hasPageCity && catalogLoading && unifiedSearchOptions.length === 0
+                  }
                   disabled={!hasPageCity || atMax}
                   options={hasPageCity ? unifiedSearchOptions : []}
                   onPick={pickUnifiedSearch}
@@ -2063,8 +2113,12 @@ function DayRoutePanelInner() {
               <DayRouteSearchSelect
                 label="Поиск"
                 placeholder="Найти место или событие"
-                emptyText={catalogLoading ? 'Загружаем…' : catalogError || 'Ничего не найдено'}
-                loading={catalogLoading}
+                emptyText={
+                  catalogLoading && unifiedSearchOptions.length === 0
+                    ? 'Загружаем…'
+                    : catalogError || 'Ничего не найдено'
+                }
+                loading={catalogLoading && unifiedSearchOptions.length === 0}
                 disabled={atMax}
                 options={unifiedSearchOptions}
                 onPick={pickUnifiedSearch}

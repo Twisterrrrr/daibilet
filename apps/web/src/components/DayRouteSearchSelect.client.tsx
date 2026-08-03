@@ -111,9 +111,9 @@ export function DayRouteSearchSelect({
           aria-controls={listId}
           aria-autocomplete="list"
           aria-label={label}
-          disabled={disabled || loading}
+          disabled={disabled}
           value={query}
-          placeholder={loading ? 'Загружаем…' : placeholder}
+          placeholder={loading && options.length === 0 ? 'Загружаем…' : placeholder}
           autoComplete="off"
           onFocus={() => {
             if (!disabled) setOpen(true);
@@ -162,7 +162,7 @@ export function DayRouteSearchSelect({
           role="listbox"
           className="absolute z-30 mt-1 max-h-64 w-full overflow-y-auto overflow-x-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
         >
-          {loading ? (
+          {loading && filtered.length === 0 ? (
             <li className="px-3 py-2.5 text-sm text-slate-500">Загружаем…</li>
           ) : filtered.length === 0 ? (
             <li className="px-3 py-2.5 text-sm text-slate-500">{emptyText}</li>

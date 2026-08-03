@@ -113,6 +113,22 @@
 
 ---
 
+## 2026-08-03 - /my-day: progressive catalog load for search
+
+### Наблюдения
+- Owner: поиск в starter подвисает - ждёт весь каталог.
+- Было: `Promise.all` locations500+venues500+events100; input `disabled` пока `catalogLoading`.
+
+### Решения
+- Три семьи грузятся независимо; UI обновляется по мере прихода.
+- SearchSelect больше не блокирует input на `loading`; dropdown «Загружаем…» только пока options пусты.
+- Trio: per-family `catalogLoadingParts`; marker `data-day-catalog-load=progressive`.
+
+### Проблемы
+- (deploy ниже)
+
+---
+
 ## 2026-08-03 - /my-day: catalog trio always open (no accordion/border)
 
 ### Наблюдения
