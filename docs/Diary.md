@@ -107,7 +107,7 @@
 - Right col: `lg:translate-y-[10px]`.
 
 ### Проблемы
-- (deploy ниже)
+- Нет. MSK **BUILD_ID=`umF956jGsTDDLWLKJ4LIl`** (`06a7b34`/`2b204e6`), `/my-day` 200; `lg:translate-y-[10px]`.
 
 ---
 
