@@ -3702,9 +3702,9 @@ function DayRouteVenueCard({
     venue.note,
     placeLine,
     !hasCoords ? 'Нет координат' : null,
-    segmentHint ? `далее ~ ${segmentHint}` : null,
   ].filter(Boolean) as string[];
   const metaLine = metaParts.join(' · ');
+  const segmentLine = segmentHint ? `далее ~ ${segmentHint}` : '';
 
   const titleNode = href ? (
     <Link
@@ -3756,11 +3756,11 @@ function DayRouteVenueCard({
         data-day-stop-focused={focused ? '1' : undefined}
       >
         {/*
-          Dense list: number + compact ↑↓ side-by-side (never a tall stretched column
-          that splits title/address). Title/meta tight leading, mt-0.5 max.
+          Dense list: number + ↑↓; title / address / segment as 3 lines,
+          vertically centered with side controls.
         */}
         <div
-          className={`flex w-full items-center gap-1.5 py-1 ${
+          className={`flex w-full items-center gap-1.5 py-1.5 ${
             focused ? 'rounded-md bg-emerald-50/80 px-1' : ''
           }`}
         >
@@ -3793,18 +3793,23 @@ function DayRouteVenueCard({
               <ChevronDown className="h-3 w-3" />
             </button>
           </div>
-          <div className="min-w-0 flex-1 leading-none">
-            <p className="m-0 truncate text-[13px] font-semibold leading-tight text-slate-900">
-              {titleNode}
-            </p>
+          <div className="min-w-0 flex-1 self-center leading-tight">
+            <p className="m-0 truncate text-[13px] font-semibold text-slate-900">{titleNode}</p>
             {metaLine ? (
               <p
-                className={`m-0 mt-px truncate text-[11px] leading-tight ${
+                className={`m-0 mt-px truncate text-[11px] ${
                   !hasCoords ? 'text-amber-700' : 'text-slate-500'
                 }`}
-                data-day-segment-hint={segmentHint ? '1' : undefined}
               >
                 {metaLine}
+              </p>
+            ) : null}
+            {segmentLine ? (
+              <p
+                className="m-0 mt-px truncate text-[11px] text-slate-500"
+                data-day-segment-hint="1"
+              >
+                {segmentLine}
               </p>
             ) : null}
             {ticketUrl ? (
