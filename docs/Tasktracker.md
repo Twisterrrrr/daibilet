@@ -22,7 +22,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | UX.MS1 | «Главные места»: mobile full blurb; desktop `sm:line-clamp-2` + «ещё» (hub ExpandableBlurb + /my-day cards) | Высокий | 🔄 deploy |
-| UX.MS2 | «Главные места» mobile: snap carousel 85% card + ~15% peek; lg+ grid 2/3 | Критический | 🔄 deploy |
+| UX.MS2 | «Главные места» mobile: snap carousel 85% card + ~15% peek; lg+ grid 2/3 | Критический | ✅ `466a38c` MSK **BUILD_ID=`7wFfw5TzkPT6XDTklCiC7`** NN smoke 200 |
 
 ---
 

@@ -11,7 +11,7 @@
 - Фильтры / «В маршрут» / ExpandableBlurb / нумерация без изменений; `key={activeId}` сбрасывает scroll при смене таба.
 
 ### Проблемы
-- Нет (deploy/BUILD_ID ниже после MSK).
+- Нет. MSK **BUILD_ID=`7wFfw5TzkPT6XDTklCiC7`** (`466a38c`), SMOKE_OK `/cities/nizhniy-novgorod` 200; SSR: `w-[85%]`×16 / `min-w-[85%]` / `snap-start` / `lg:grid-cols-2`; без `grid-rows-2`.
 
 ---
 
