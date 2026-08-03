@@ -30,7 +30,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | UX.MS1 | «Главные места»: mobile full blurb; desktop `sm:line-clamp-2` + «ещё» (hub ExpandableBlurb + /my-day cards) | Высокий | 🔄 deploy |
-| UX.MS2 | «Главные места»: max-lg 85/15; lg+ ~2 cards (`flex-[0_0_calc((100%-1.5rem)/2)]`), не grid | Критический | 🔄 deploy |
+| UX.MS2 | «Главные места»: max-lg 85/15; lg+ ~2 cards (`flex-[0_0_calc((100%-1.5rem)/2)]`), не grid | Критический | ✅ `f8ed928` MSK **BUILD_ID=`A5HAtdeNtF6dr0ehtWJjp`** NN smoke 200 |
 
 ---
 

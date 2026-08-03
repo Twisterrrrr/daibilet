@@ -10,7 +10,7 @@
 - Rail без изменений: `horizontal-snap-row flex flex-nowrap gap-3 lg:gap-6`.
 
 ### Проблемы
-- (заполнить после deploy)
+- Нет. MSK **BUILD_ID=`A5HAtdeNtF6dr0ehtWJjp`** (`f8ed928`), SMOKE_OK NN 200; SSR×16: `max-lg:w-[85%]` / `max-lg:min-w-[85%]` / `lg:w-[calc((100%-1.5rem)/2)]` / `lg:flex-[0_0_calc((100%-1.5rem)/2)]`; chunk+CSS OK; Playwright desktop ratio≈0.49 bothInView, mobile 0.85.
 
 ---
 
