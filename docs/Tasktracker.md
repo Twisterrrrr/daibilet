@@ -15,7 +15,7 @@
 | PERF.E4 | Per-slug tags `event-page:{slug}` + `POST /api/internal/revalidate` `slug` | Критический | ✅ smoke OK |
 | PERF.E5 | Backend/admin on-demand revalidate on event override (не ждать 2ч) | Критический | ✅ |
 | PERF.E6 | Destinations layout cache 86400 (не капить page ISR на 300) | Критический | ✅ `7835886` |
-| PERF.E7 | Backend city update → Next tags `destinations` + `public-surfaces` | Критический | ✅ `12b734c` |
+| PERF.E7 | Backend city update → Next tags `destinations` + `public-surfaces` | Критический | ✅ `12b734c` MSK **BUILD_ID=`dtrpt-eetyBWyJA8DG1ye`** |
 
 ## MSK web:build SSG harden (2026-08-04)
 

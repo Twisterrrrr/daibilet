@@ -29,6 +29,7 @@
 
 ### Проблемы
 - Нет. Suspense split (Solution 1) не нужен при webhook-backed long TTL.
+- Live: commits `12b734c` + docs `5e22378`; после piggyback batch7 tip `5b724f4`, **BUILD_ID=`dtrpt-eetyBWyJA8DG1ye`**. Map-focus (`fcd656f`) ранее: **BUILD_ID=`h8y5jcytDJ7KNTtJnXzBm`**.
 
 ---
 
