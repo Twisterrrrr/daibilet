@@ -1,4 +1,4 @@
-/** Три падежа для SEO/UI: именительный, родительный, предложный (без предлога). */
+/** Падежи для SEO/UI: именительный, родительный, предложный, винительный (без предлога). */
 export type CityCases = {
   /** {City_Им} — Казань, Екатеринбург */
   nominative: string;
@@ -6,10 +6,14 @@ export type CityCases = {
   genitive: string;
   /** {City_Пр} — Казани, Екатеринбурге */
   prepositional: string;
+  /** {City_Вин} — Казань, Москву (ехать в …) */
+  accusative: string;
 };
 
-/** Предложный («в …») и родительный («…») падежи городов. */
-const CITY_FORMS: Record<string, { prep: string; gen: string }> = {
+type CityFormRow = { prep: string; gen: string; acc?: string };
+
+/** Предложный / родительный / (опц.) винительный падежи городов. */
+const CITY_FORMS: Record<string, CityFormRow> = {
   Абакан: { prep: 'Абакане', gen: 'Абакана' },
   Архангельск: { prep: 'Архангельске', gen: 'Архангельска' },
   Астрахань: { prep: 'Астрахани', gen: 'Астрахани' },
@@ -18,45 +22,45 @@ const CITY_FORMS: Record<string, { prep: string; gen: string }> = {
   'Благовещенск (Амурская область)': { prep: 'Благовещенске', gen: 'Благовещенска' },
   Благовещенск: { prep: 'Благовещенске', gen: 'Благовещенска' },
   Брянск: { prep: 'Брянске', gen: 'Брянска' },
-  'Великий Новгород': { prep: 'Великом Новгороде', gen: 'Великого Новгорода' },
+  'Великий Новгород': { prep: 'Великом Новгороде', gen: 'Великого Новгорода', acc: 'Великий Новгород' },
   Владимир: { prep: 'Владимире', gen: 'Владимира' },
   Владивосток: { prep: 'Владивостоке', gen: 'Владивостока' },
   Волгоград: { prep: 'Волгограде', gen: 'Волгограда' },
-  Вологда: { prep: 'Вологде', gen: 'Вологды' },
+  Вологда: { prep: 'Вологде', gen: 'Вологды', acc: 'Вологду' },
   Воронеж: { prep: 'Воронеже', gen: 'Воронежа' },
   Екатеринбург: { prep: 'Екатеринбурге', gen: 'Екатеринбурга' },
   Иваново: { prep: 'Иванове', gen: 'Иванова' },
   Ижевск: { prep: 'Ижевске', gen: 'Ижевска' },
   Иркутск: { prep: 'Иркутске', gen: 'Иркутска' },
-  'Йошкар-Ола': { prep: 'Йошкар-Оле', gen: 'Йошкар-Олы' },
+  'Йошкар-Ола': { prep: 'Йошкар-Оле', gen: 'Йошкар-Олы', acc: 'Йошкар-Олу' },
   Казань: { prep: 'Казани', gen: 'Казани' },
   Калининград: { prep: 'Калининграде', gen: 'Калининграда' },
-  Калуга: { prep: 'Калуге', gen: 'Калуги' },
+  Калуга: { prep: 'Калуге', gen: 'Калуги', acc: 'Калугу' },
   Кемерово: { prep: 'Кемерове', gen: 'Кемерова' },
   Киров: { prep: 'Кирове', gen: 'Кирова' },
   'Киров (Кировская область)': { prep: 'Кирове', gen: 'Кирова' },
   'Комсомольск-на-Амуре': { prep: 'Комсомольске-на-Амуре', gen: 'Комсомольска-на-Амуре' },
-  Кострома: { prep: 'Костроме', gen: 'Костромы' },
+  Кострома: { prep: 'Костроме', gen: 'Костромы', acc: 'Кострому' },
   Краснодар: { prep: 'Краснодаре', gen: 'Краснодара' },
   Красноярск: { prep: 'Красноярске', gen: 'Красноярска' },
   Курган: { prep: 'Кургане', gen: 'Кургана' },
   Курск: { prep: 'Курске', gen: 'Курска' },
   Липецк: { prep: 'Липецке', gen: 'Липецка' },
   Магадан: { prep: 'Магадане', gen: 'Магадана' },
-  Москва: { prep: 'Москве', gen: 'Москвы' },
+  Москва: { prep: 'Москве', gen: 'Москвы', acc: 'Москву' },
   Мурманск: { prep: 'Мурманске', gen: 'Мурманска' },
-  'Нижний Новгород': { prep: 'Нижнем Новгороде', gen: 'Нижнего Новгорода' },
+  'Нижний Новгород': { prep: 'Нижнем Новгороде', gen: 'Нижнего Новгорода', acc: 'Нижний Новгород' },
   Новосибирск: { prep: 'Новосибирске', gen: 'Новосибирска' },
   Омск: { prep: 'Омске', gen: 'Омска' },
   Орёл: { prep: 'Орле', gen: 'Орла' },
-  Орел: { prep: 'Орле', gen: 'Орла' },
+  Орел: { prep: 'Орле', gen: 'Орла', acc: 'Орёл' },
   Оренбург: { prep: 'Оренбурге', gen: 'Оренбурга' },
-  Пенза: { prep: 'Пензе', gen: 'Пензы' },
+  Пенза: { prep: 'Пензе', gen: 'Пензы', acc: 'Пензу' },
   Пермь: { prep: 'Перми', gen: 'Перми' },
   Псков: { prep: 'Пскове', gen: 'Пскова' },
   'Ростов-на-Дону': { prep: 'Ростове-на-Дону', gen: 'Ростова-на-Дону' },
   Рязань: { prep: 'Рязани', gen: 'Рязани' },
-  Самара: { prep: 'Самаре', gen: 'Самары' },
+  Самара: { prep: 'Самаре', gen: 'Самары', acc: 'Самару' },
   'Санкт-Петербург': { prep: 'Санкт-Петербурге', gen: 'Санкт-Петербурга' },
   Саранск: { prep: 'Саранске', gen: 'Саранска' },
   Саратов: { prep: 'Саратове', gen: 'Саратова' },
@@ -64,22 +68,22 @@ const CITY_FORMS: Record<string, { prep: string; gen: string }> = {
   Симферополь: { prep: 'Симферополе', gen: 'Симферополя' },
   Смоленск: { prep: 'Смоленске', gen: 'Смоленска' },
   Сочи: { prep: 'Сочи', gen: 'Сочи' },
-  Сортавала: { prep: 'Сортавале', gen: 'Сортавалы' },
+  Сортавала: { prep: 'Сортавале', gen: 'Сортавалы', acc: 'Сортавалу' },
   Ставрополь: { prep: 'Ставрополе', gen: 'Ставрополя' },
   Суздаль: { prep: 'Суздале', gen: 'Суздаля' },
   Сыктывкар: { prep: 'Сыктывкаре', gen: 'Сыктывкара' },
   Тамбов: { prep: 'Тамбове', gen: 'Тамбова' },
   Тверь: { prep: 'Твери', gen: 'Твери' },
   Томск: { prep: 'Томске', gen: 'Томска' },
-  Тула: { prep: 'Туле', gen: 'Тулы' },
+  Тула: { prep: 'Туле', gen: 'Тулы', acc: 'Тулу' },
   Тюмень: { prep: 'Тюмени', gen: 'Тюмени' },
   'Улан-Удэ': { prep: 'Улан-Удэ', gen: 'Улан-Удэ' },
   Ульяновск: { prep: 'Ульяновске', gen: 'Ульяновска' },
-  Уфа: { prep: 'Уфе', gen: 'Уфы' },
+  Уфа: { prep: 'Уфе', gen: 'Уфы', acc: 'Уфу' },
   Хабаровск: { prep: 'Хабаровске', gen: 'Хабаровска' },
   Чебоксары: { prep: 'Чебоксарах', gen: 'Чебоксар' },
   Челябинск: { prep: 'Челябинске', gen: 'Челябинска' },
-  Чита: { prep: 'Чите', gen: 'Читы' },
+  Чита: { prep: 'Чите', gen: 'Читы', acc: 'Читу' },
   'Южно-Сахалинск': { prep: 'Южно-Сахалинске', gen: 'Южно-Сахалинска' },
   Якутск: { prep: 'Якутске', gen: 'Якутска' },
   Ярославль: { prep: 'Ярославле', gen: 'Ярославля' },
@@ -141,7 +145,15 @@ function inferGenitive(name: string): string {
   return `${name}а`;
 }
 
-function lookupCityForms(city: string): { prep: string; gen: string } | null {
+/** Винительный для «ехать в …»: -а/-я → -у/-ю; иначе = именительный (неодуш.). */
+function inferAccusative(name: string): string {
+  if (/\s/.test(name) || /-/.test(name)) return name;
+  if (/а$/i.test(name)) return `${name.slice(0, -1)}у`;
+  if (/я$/i.test(name)) return `${name.slice(0, -1)}ю`;
+  return name;
+}
+
+function lookupCityForms(city: string): CityFormRow | null {
   const normalized = city.trim();
   if (!normalized) return null;
   return CITY_FORMS[normalized] || null;
@@ -165,6 +177,7 @@ export function resolveCityCases(cityOrSlug: string): CityCases {
     nominative,
     genitive: forms?.gen || inferGenitive(nominative),
     prepositional: forms?.prep || inferPrepositional(nominative),
+    accusative: forms?.acc || inferAccusative(nominative),
   };
 }
 
@@ -210,4 +223,21 @@ export function inCityPrepositional(city: string): string {
   const normalized = String(city || '').trim();
   if (!normalized) return 'в городе';
   return `в ${cityToPrepositional(normalized)}`;
+}
+
+/** «Москву», «Владимир» — без предлога. */
+export function cityToAccusative(city: string): string {
+  return resolveCityCases(city).accusative;
+}
+
+/**
+ * «в Москву», «во Владимир», «в Орёл» - винительный с предлогом в/во
+ * (во перед в/ф + согласная).
+ */
+export function inCityAccusative(city: string): string {
+  const normalized = String(city || '').trim();
+  if (!normalized) return 'в город';
+  const acc = cityToAccusative(normalized);
+  if (/^[ВФвф][^аеёиоуыэюяАЕЁИОУЫЭЮЯ]/.test(acc)) return `во ${acc}`;
+  return `в ${acc}`;
 }

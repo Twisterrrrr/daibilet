@@ -1,3 +1,37 @@
+## 2026-08-03 - City hub owner polish (падеж, hook, rail, venues, no mood quiz)
+
+### Наблюдения
+- «Зачем ехать в Москве» - стыд падежа; нужно винительный «в Москву».
+- hookFact почти как H2; нужен body `text-sm text-slate-600`.
+- «Главные места»: desktop 2-в-столбик карусель; убрать subtitle «Точки…».
+- Мини-тест афиши лишний. «Площадки и локации» - одна широкая строка с дырой; нужно `md:grid-cols-2`.
+
+### Решения
+- `inCityAccusative` / `cityToAccusative` в `city-declension`; WhyGo title через `cityInAccusative`.
+- hookFact: `text-sm leading-6 text-slate-600`.
+- Must-see: `md:grid-rows-2` колонки; subtitle убран.
+- Удалены `CityMoodQuiz` / mood filter. Venues: `md:grid-cols-2`, name+address stack.
+
+### Проблемы
+- Нет. Deploy pending.
+
+---
+
+## 2026-08-03 - City hub «Главные места»: desktop 2-row stack carousel
+
+### Наблюдения
+- Owner: desktop «Главные места» снова как 2 карточки **в столбик** на колонку карусели (не горизонтальный ряд крупных карточек); mobile - по одной.
+- Подзаголовок «Точки, с которых удобно начать знакомство с городом» убрать.
+
+### Решения
+- `CitySightsMustSeeList`: scrollport + `ol` `md:grid md:grid-rows-2 md:grid-flow-col` (колонка = 2 карточки сверху вниз); mobile `flex` + `w-[85%]` peek.
+- Убран subtitle под H2 и под H3 списка. HookFact / hero brief / story cards не трогали.
+
+### Проблемы
+- Нет. Deploy pending.
+
+---
+
 ## 2026-08-03 - City hub: brief обратно в hero, story cards скрыты
 
 ### Наблюдения

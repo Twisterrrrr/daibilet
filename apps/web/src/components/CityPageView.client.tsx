@@ -19,7 +19,7 @@ import type { BlogCardDto } from '@/lib/blog-utils';
 import type { FinanceAdmissionListResult } from '@/lib/finance-projection';
 import { venuePageTemplate } from '@/lib/venue-meta';
 import { eventHref, sessionVenueHref, venueHref } from '@/lib/routes';
-import { inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
+import { inCityAccusative, inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
 import { buildCityHubSeoPhrase } from '@/lib/city-hub-seo';
 import { isCityHubSectionHidden, resolveCityHubConfig } from '@/lib/city-hub-config';
 import { matchSightAfficheLink, resolveFeaturedDirections } from '@/lib/city-hub-directions';
@@ -45,7 +45,6 @@ import {
   isSessionTomorrow,
   isSessionWeekend,
   resolveSessionTimeZoneForSession,
-  sessionTimeSlotFilter,
 } from '@/lib/datetime';
 import type {
   PublicCityDto,
@@ -57,7 +56,6 @@ import type {
 
 type ViewMode = 'cards' | 'table';
 type DateFilter = 'all' | 'today' | 'tomorrow' | 'weekend';
-type MoodFilter = 'all' | 'kids' | 'evening' | 'humor';
 
 const CITY_HASH_ALIASES: Record<string, string> = {
   'city-schedule': 'affiche',
@@ -100,7 +98,6 @@ export function CityPageView({
   const [error, setError] = React.useState<string | null>(null);
   const [category, setCategory] = React.useState('all');
   const [dateFilter, setDateFilter] = React.useState<DateFilter>('all');
-  const [moodFilter, setMoodFilter] = React.useState<MoodFilter>('all');
   const [mode, setMode] = React.useState<ViewMode>('cards');
 
   React.useEffect(() => {
@@ -145,11 +142,10 @@ export function CityPageView({
     const filtered = payload.sessions.filter((session) => {
       if (category !== 'all' && session.category !== category) return false;
       if (!matchesCityDateFilter(session, dateFilter)) return false;
-      if (!matchesMoodFilter(session, moodFilter)) return false;
       return true;
     });
     return [...filtered].sort((a, b) => sessionHitScore(b) - sessionHitScore(a));
-  }, [category, dateFilter, moodFilter, payload]);
+  }, [category, dateFilter, payload]);
 
   const city = payload?.city;
   // Chip facets = hub feed only (same universe as the list / «Все»), not full-city catalog.
@@ -264,7 +260,7 @@ export function CityPageView({
               <CityWhyGoSection
                 guide={guide}
                 editorial={editorial}
-                cityIn={cityInPrepositional(city)}
+                cityInto={cityInAccusative(city)}
               />
             ) : null}
 
@@ -307,19 +303,10 @@ export function CityPageView({
                       onReset={() => {
                         setCategory('all');
                         setDateFilter('all');
-                        setMoodFilter('all');
                       }}
                     />
                   ) : null}
                 </div>
-                <CityMoodQuiz
-                  active={moodFilter}
-                  editorial={editorial}
-                  onSelect={(value) => {
-                    setMoodFilter(value);
-                    setDateFilter('all');
-                  }}
-                />
                 {contentReady ? (
                   <>
                     {mode === 'table' ? (
@@ -387,7 +374,6 @@ export function CityPageView({
                       onCategory={(value) => {
                         setCategory(value);
                         setDateFilter('all');
-                        setMoodFilter('all');
                         scrollToSection('affiche');
                       }}
                     />
@@ -894,11 +880,11 @@ function DateFilterChips({
 function CityWhyGoSection({
   guide,
   editorial = false,
-  cityIn,
+  cityInto,
 }: {
   guide: CityInfoEntry | null;
   editorial?: boolean;
-  cityIn: string;
+  cityInto: string;
 }) {
   const hook = guide?.hookFact?.trim();
   // Brief is shown in hero; keep hookFact here. Story cards UI temporarily hidden.
@@ -916,7 +902,7 @@ function CityWhyGoSection({
               : 'text-2xl font-bold text-slate-950'
           }
         >
-          Зачем ехать {cityIn}
+          Зачем ехать {cityInto}
         </h2>
 
         {hook ? (
@@ -931,8 +917,8 @@ function CityWhyGoSection({
               Факт дня
             </p>
             <p
-              className={`mt-2 text-base leading-7 sm:text-lg ${
-                editorial ? 'font-serif text-zinc-900' : 'font-medium text-slate-900'
+              className={`mt-2 max-w-3xl text-sm leading-6 ${
+                editorial ? 'text-zinc-600' : 'text-slate-600'
               }`}
             >
               {hook}
@@ -941,50 +927,6 @@ function CityWhyGoSection({
         ) : null}
       </div>
     </section>
-  );
-}
-
-function CityMoodQuiz({
-  active,
-  onSelect,
-  editorial = false,
-}: {
-  active: MoodFilter;
-  onSelect: (value: MoodFilter) => void;
-  editorial?: boolean;
-}) {
-  const options: Array<{ value: MoodFilter; label: string }> = [
-    { value: 'all', label: 'Любой формат' },
-    { value: 'kids', label: 'С детьми' },
-    { value: 'evening', label: 'Вечер' },
-    { value: 'humor', label: 'Юмор' },
-  ];
-
-  return (
-    <div
-      className={`mb-5 rounded-2xl px-4 py-3 ${
-        editorial ? 'bg-zinc-100/80 ring-1 ring-zinc-200' : 'bg-slate-50 ring-1 ring-slate-200'
-      }`}
-    >
-      <p className={`text-sm font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
-        Не знаете, куда пойти?
-      </p>
-      <p className={`mt-0.5 text-xs ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-        Мини-тест фильтрует афишу на этой странице - без ухода в статью.
-      </p>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {options.map((option) => (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => onSelect(option.value)}
-            className={hubFilterChipClass(active === option.value, editorial)}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-    </div>
   );
 }
 
@@ -1249,22 +1191,17 @@ function CitySightsSection({
         Главные места {cityIn}
       </h2>
       {places.length ? (
-        <>
-          <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-            Точки, с которых удобно начать знакомство с городом.
-          </p>
-          <CitySightsMustSeeList
-            places={places}
-            venues={venues}
-            city={city}
-            editorial={editorial}
-            namedPresets={guide?.dayRoutePresets}
-            landingRows={landingRows}
-            categories={categories}
-            citySlug={citySlug}
-            titleClass={titleClass}
-          />
-        </>
+        <CitySightsMustSeeList
+          places={places}
+          venues={venues}
+          city={city}
+          editorial={editorial}
+          namedPresets={guide?.dayRoutePresets}
+          landingRows={landingRows}
+          categories={categories}
+          citySlug={citySlug}
+          titleClass={titleClass}
+        />
       ) : null}
       {articles.length ? (
         <div className={places.length ? 'mt-8' : 'mt-4'}>
@@ -1347,23 +1284,21 @@ function CitySightsMustSeeList({
       <h3 className={`mt-4 text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
         Главные места
       </h3>
-      <p className={`mt-1 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-        Точки, с которых удобно начать знакомство с городом.
-      </p>
       <MustSeeFilterTabs
         tabs={filterMeta.tabs}
         activeId={activeId}
         onChange={setFilterId}
         editorial={editorial}
       />
-      {/* max-lg: 85/15 peek carousel. lg+: ~2 cards in scrollport (basis/width win over mobile). */}
-      <ol
+      {/* Mobile: 1-card 85/15 swipe. md+: carousel columns with 2-row vertical stack. */}
+      <div
         key={activeId}
-        className="horizontal-snap-row mt-6 flex flex-nowrap touch-pan-x snap-x snap-mandatory gap-3 lg:gap-6"
+        className="horizontal-snap-row mt-6 touch-pan-x snap-x snap-mandatory"
         data-city-must-see-rail
         aria-label="Главные места"
         tabIndex={0}
       >
+        <ol className="flex w-max flex-nowrap gap-3 md:grid md:auto-cols-[min(22rem,calc(50vw-3rem))] md:grid-flow-col md:grid-rows-2 md:gap-x-6 md:gap-y-5">
         {visiblePlaces.map((place, index) => {
           const afficheLink = matchSightAfficheLink({
             sightName: place.name,
@@ -1387,7 +1322,7 @@ function CitySightsMustSeeList({
           return (
             <li
               key={`${place.name}:${index}`}
-              className="flex shrink-0 snap-start gap-3 max-lg:w-[85%] max-lg:min-w-[85%] lg:w-[calc((100%-1.5rem)/2)] lg:min-w-[calc((100%-1.5rem)/2)] lg:flex-[0_0_calc((100%-1.5rem)/2)]"
+              className="flex w-[85%] min-w-[85%] shrink-0 snap-start gap-3 md:w-auto md:min-w-0 md:max-w-none"
               data-city-must-see-card
             >
               <span
@@ -1461,7 +1396,8 @@ function CitySightsMustSeeList({
             </li>
           );
         })}
-      </ol>
+        </ol>
+      </div>
       <CityDayPresetBlock
         places={places}
         venues={venues}
@@ -1589,15 +1525,18 @@ function VenueHighlights({
         </div>
       </div>
       <ul
-        className={`mt-6 divide-y border-y ${
-          editorial ? 'divide-zinc-100 border-zinc-200' : 'divide-slate-100 border-slate-100'
+        className={`mt-6 grid grid-cols-1 border-t md:grid-cols-2 md:gap-x-8 ${
+          editorial ? 'border-zinc-200' : 'border-slate-100'
         }`}
       >
         {featured.map((venue) => (
-          <li key={venue.id}>
+          <li
+            key={venue.id}
+            className={`border-b ${editorial ? 'border-zinc-100' : 'border-slate-100'}`}
+          >
             <a
               href={venueHref(venue)}
-              className={`flex flex-col gap-1 py-3.5 transition sm:flex-row sm:items-center sm:justify-between sm:gap-4 ${
+              className={`flex flex-col gap-1 py-3.5 transition md:pr-3 ${
                 editorial ? 'hover:bg-zinc-100/70' : 'hover:bg-slate-50/80'
               }`}
             >
@@ -2042,23 +1981,6 @@ function sessionHitScore(session: PublicSessionDto): number {
   return 0;
 }
 
-function matchesMoodFilter(session: PublicSessionDto, filter: MoodFilter): boolean {
-  if (filter === 'all') return true;
-  const hay = sessionHaystack(session);
-  if (filter === 'kids') return /дет|семь|family|kids|детск|мультик|сказк/.test(hay);
-  if (filter === 'humor') return /стендап|юмор|comedy|standup|квиз|юморист|сатир/.test(hay);
-  if (filter === 'evening') {
-    const timeZone = resolveSessionTimeZoneForSession(session);
-    const times = collectSessionStartsAtTimes(session);
-    if (!times.length) return /вечер|ночн|night|evening/.test(hay);
-    return times.some((startsAt) => {
-      const slot = sessionTimeSlotFilter(startsAt, timeZone);
-      return slot === 'evening' || slot === 'night';
-    });
-  }
-  return true;
-}
-
 function defaultCityFaq(cityName: string): CityFaqItem[] {
   return [
     {
@@ -2069,7 +1991,7 @@ function defaultCityFaq(cityName: string): CityFaqItem[] {
     {
       question: 'Как удобнее спланировать один день в городе?',
       answer:
-        'Начните с блока «Главные места», затем откройте афишу на сегодня или завтра. Если не знаете формат - используйте мини-тест «С детьми / Вечер / Юмор» прямо в афише.',
+        'Начните с блока «Главные места», затем откройте афишу на сегодня или завтра.',
     },
     {
       question: 'Где смотреть логистику и сезон?',
@@ -2122,6 +2044,34 @@ function cityInPrepositional(city: PublicCityDto) {
   const name = city.name.trim();
   if (city.type === 'region') return `в регионе ${name}`;
   return inCityPrepositional(name);
+}
+
+function cityInAccusative(city: PublicCityDto) {
+  const bySlug: Record<string, string> = {
+    'sankt-peterburg': 'в Санкт-Петербург',
+    'saint-petersburg': 'в Санкт-Петербург',
+    moscow: 'в Москву',
+    'moskovskaya-oblast': 'в Московскую область',
+    'leningradskaya-oblast': 'в Ленинградскую область',
+    'krasnodarskiy-kray': 'в Краснодарский край',
+    'krasnoyarskiy-kray': 'в Красноярский край',
+    'respublika-tatarstan': 'в Республику Татарстан',
+    'respublika-hakasiya': 'в Республику Хакасия',
+    'respublika-bashkortostan': 'в Республику Башкортостан',
+    'respublika-kareliya': 'в Республику Карелия',
+    'ulyanovskaya-oblast': 'в Ульяновскую область',
+    'habarovskiy-kray': 'в Хабаровский край',
+    'primorskiy-kray': 'в Приморский край',
+    'altayskiy-kray': 'в Алтайский край',
+    'samarskaya-oblast': 'в Самарскую область',
+    'chelyabinskaya-oblast': 'в Челябинскую область',
+  };
+  if (bySlug[city.slug]) return bySlug[city.slug];
+  if (city.sourceSlug && bySlug[city.sourceSlug]) return bySlug[city.sourceSlug];
+
+  const name = city.name.trim();
+  if (city.type === 'region') return `в регион ${name}`;
+  return inCityAccusative(name);
 }
 
 function resolveSectionId(hash: string): string {
