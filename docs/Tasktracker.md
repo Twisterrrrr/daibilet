@@ -16,6 +16,7 @@
 | CH.HF3 | Phase 2: story cards, Сегодня/Завтра/Выходные, mood quiz, default FAQ | Высокий | ✅ |
 | CH.HF4 | SPB build → MSK atomic `.next` swap + smoke moscow/nn/abakan | Критический | ✅ MSK-only `deploy-prod-next.sh` `0ad064bc` **BUILD_ID=`5PaOsq5u2eoVkCSuYdVzh`**; smoke moscow/nn/abakan 200 + hookFact |
 | CH.HF5 | Партнерский виджет логистики (Ласточки/авиа) | Низкий | ⏳ |
+| CH.HF6 | Owner follow-up: brief обратно в hero; UI «Истории города» скрыть | Критический | 🔄 commit+MSK deploy |
 
 ## /my-day starter geometry (2026-08-03)
 

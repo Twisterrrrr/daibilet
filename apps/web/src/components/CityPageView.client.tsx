@@ -30,7 +30,7 @@ import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
 import { ExpandableBlurb } from '@/components/ExpandableBlurb.client';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
-import { resolveCityInfo, resolveCityPlaceHref, type CityInfoEntry, type CityMustSeeItem } from '@/lib/cityInfo';
+import { resolveCityInfo, type CityInfoEntry, type CityMustSeeItem } from '@/lib/cityInfo';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
 import { dayRouteItemFromMustSee } from '@/lib/day-route-from-place';
 import {
@@ -213,26 +213,23 @@ export function CityPageView({
       return true;
     });
   }, [aboutArticles, afficheArticles, sightsArticles, practiceArticles, moreArticles]);
-  const hasAbout = Boolean(guide?.hookFact?.trim() || guide?.brief?.trim());
+  const hasAbout = Boolean(guide?.hookFact?.trim());
   const hasPractice = hasTravel || hasFaq || practiceArticles.length > 0;
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
   const showSightsBlock = hasSights;
-  const storyCards = React.useMemo(
-    () => buildCityStoryCards({ guide, aboutArticles, cityName: city?.name || '' }),
-    [guide, aboutArticles, city?.name],
-  );
+  // Story cards UI hidden (owner 2026-08-03); keep build helper for later - do not render.
 
   const tabs = React.useMemo(
     () =>
       [
-        { id: 'about', label: 'Зачем ехать', show: hasAbout || storyCards.length > 0 },
+        { id: 'about', label: 'Зачем ехать', show: hasAbout },
         { id: 'sights', label: 'Главные места', show: showSightsBlock },
         { id: 'affiche', label: 'Афиша', show: true },
         { id: 'practice', label: 'Советы', show: hasPractice },
         { id: 'more', label: 'Топ-запросы', show: hasMore },
         { id: 'blog', label: 'Из блога', show: footerArticles.length > 0 },
       ].filter((tab) => tab.show),
-    [footerArticles.length, hasAbout, hasMore, hasPractice, showSightsBlock, storyCards.length],
+    [footerArticles.length, hasAbout, hasMore, hasPractice, showSightsBlock],
   );
 
   return (
@@ -263,10 +260,9 @@ export function CityPageView({
             />
             <CityStickyTabs tabs={tabs} editorial={editorial} />
 
-            {hasAbout || storyCards.length > 0 ? (
+            {hasAbout ? (
               <CityWhyGoSection
                 guide={guide}
-                storyCards={storyCards}
                 editorial={editorial}
                 cityIn={cityInPrepositional(city)}
               />
@@ -554,11 +550,10 @@ function CityHeroStrip({
 }) {
   const [heroImageFailed, setHeroImageFailed] = React.useState(false);
   const cityIn = cityInPrepositional(city);
+  // Short lead always in hero; hookFact lives in «Зачем ехать» below.
   const brief =
-    guide?.hookFact?.trim()
-      ? null
-      : guide?.brief ||
-        `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат и дату - и покупайте билет онлайн на Дайбилете.`;
+    guide?.brief?.trim() ||
+    `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат и дату - и покупайте билет онлайн на Дайбилете.`;
   const primaryCta = hubConfig?.primaryCta;
   const primaryTarget = primaryCta?.target || '#affiche';
   const primaryLabel = primaryCta?.label || `События ${cityIn}`;
@@ -896,67 +891,17 @@ function DateFilterChips({
   );
 }
 
-type CityStoryCard = {
-  id: string;
-  title: string;
-  hook: string;
-  ctaLabel: string;
-  imageUrl?: string | null;
-  href?: string | null;
-};
-
-function buildCityStoryCards({
-  guide,
-  aboutArticles,
-  cityName,
-}: {
-  guide: CityInfoEntry | null;
-  aboutArticles: BlogCardDto[];
-  cityName: string;
-}): CityStoryCard[] {
-  const cards: CityStoryCard[] = [];
-  const cityIn = cityName ? `в ${cityName}` : 'в городе';
-
-  if (guide?.mustSee?.length) {
-    for (const place of guide.mustSee.slice(0, 4)) {
-      cards.push({
-        id: `sight:${place.name}`,
-        title: place.name,
-        hook: place.desc,
-        ctaLabel: `Посмотреть экскурсии ${cityIn}`,
-        href: resolveCityPlaceHref(place),
-      });
-    }
-  }
-
-  for (const article of aboutArticles.slice(0, 2)) {
-    if (cards.length >= 6) break;
-    cards.push({
-      id: `article:${article.slug}`,
-      title: article.title,
-      hook: String(article.excerpt || '').trim() || 'Короткий гид перед выбором билетов.',
-      ctaLabel: 'Открыть материал',
-      imageUrl: article.coverImageUrl,
-      href: `/blog/${article.slug}`,
-    });
-  }
-
-  return cards.slice(0, 6);
-}
-
 function CityWhyGoSection({
   guide,
-  storyCards,
   editorial = false,
   cityIn,
 }: {
   guide: CityInfoEntry | null;
-  storyCards: CityStoryCard[];
   editorial?: boolean;
   cityIn: string;
 }) {
   const hook = guide?.hookFact?.trim();
-  const brief = guide?.brief?.trim();
+  // Brief is shown in hero; keep hookFact here. Story cards UI temporarily hidden.
 
   return (
     <section
@@ -992,98 +937,6 @@ function CityWhyGoSection({
             >
               {hook}
             </p>
-          </div>
-        ) : null}
-
-        {brief ? (
-          <p className={`mt-5 max-w-3xl text-sm leading-7 sm:text-base ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-            {brief}
-          </p>
-        ) : null}
-
-        {storyCards.length ? (
-          <div className="mt-8">
-            <h3 className={`text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
-              Истории города
-            </h3>
-            <p className={`mt-1 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-              Короткие эмоциональные карточки - не лонгриды.
-            </p>
-            <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {storyCards.map((card) => (
-                <article
-                  key={card.id}
-                  className={
-                    editorial
-                      ? 'flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white'
-                      : 'flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm'
-                  }
-                >
-                  <div className={`relative aspect-[16/10] ${editorial ? 'bg-zinc-100' : 'bg-slate-100'}`}>
-                    {card.imageUrl ? (
-                      <SafeImage
-                        src={card.imageUrl}
-                        alt=""
-                        fill
-                        sizes={IMAGE_SIZES.blogCard}
-                        className="object-cover object-center"
-                        fallback={
-                          <div className={`flex h-full w-full items-center justify-center text-sm ${editorial ? 'text-zinc-400' : 'text-slate-400'}`}>
-                            {card.title}
-                          </div>
-                        }
-                      />
-                    ) : (
-                      <div
-                        className={`flex h-full w-full items-end bg-gradient-to-br p-4 ${
-                          editorial
-                            ? 'from-zinc-200 via-zinc-100 to-amber-50'
-                            : 'from-slate-200 via-slate-100 to-amber-50'
-                        }`}
-                      >
-                        <span className={`text-sm font-semibold ${editorial ? 'text-zinc-700' : 'text-slate-700'}`}>
-                          {card.title}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex flex-1 flex-col p-4">
-                    <p className={`text-xs font-semibold uppercase tracking-wide ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
-                      Зачем ехать?
-                    </p>
-                    <h4 className={`mt-1 text-base font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
-                      {card.title}
-                    </h4>
-                    <p className={`mt-2 flex-1 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-                      {card.hook}
-                    </p>
-                    {card.href ? (
-                      <Link
-                        href={card.href}
-                        className={`mt-4 inline-flex text-sm font-semibold ${
-                          editorial ? 'text-zinc-900 underline-offset-4 hover:underline' : 'text-primary-700 hover:text-primary-800'
-                        }`}
-                      >
-                        {card.ctaLabel} →
-                      </Link>
-                    ) : (
-                      <a
-                        href="#affiche"
-                        onClick={(event) => {
-                          event.preventDefault();
-                          scrollToSection('affiche');
-                        }}
-                        className={`mt-4 inline-flex text-sm font-semibold ${
-                          editorial ? 'text-zinc-900 underline-offset-4 hover:underline' : 'text-primary-700 hover:text-primary-800'
-                        }`}
-                      >
-                        {card.ctaLabel} →
-                      </a>
-                    )}
-                  </div>
-                </article>
-              ))}
-            </div>
           </div>
         ) : null}
       </div>

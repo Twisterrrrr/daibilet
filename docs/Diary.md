@@ -1,3 +1,18 @@
+## 2026-08-03 - City hub: brief обратно в hero, story cards скрыты
+
+### Наблюдения
+- Owner после редизайна (`5PaOsq5u2eoVkCSuYdVzh`): в hero пропал short description (brief гасился при наличии hookFact); блок «Истории города» лишний.
+
+### Решения
+- `CityHeroStrip`: brief снова всегда в hero (`guide.brief` или fallback).
+- `CityWhyGoSection`: только hookFact («Факт дня»); brief не дублируем; UI story cards не рендерим (cityInfo не трогали).
+- Tab «Зачем ехать» / `#about` по наличию hookFact.
+
+### Проблемы
+- Deploy/BUILD_ID - после MSK `deploy-prod-next.sh`.
+
+---
+
 ## 2026-08-03 - City hub: hookFact + IA «Зачем ехать»
 
 ### Наблюдения
