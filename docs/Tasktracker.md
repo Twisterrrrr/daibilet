@@ -14,7 +14,7 @@
 | CH.HF1 | Owner description+hookFact → cityInfo (65 городов, web+public) | Критический | ✅ |
 | CH.HF2 | Phase 1 UI: hookFact после hero + Главные места до афиши + блог в подвал | Критический | ✅ |
 | CH.HF3 | Phase 2: story cards, Сегодня/Завтра/Выходные, mood quiz, default FAQ | Высокий | ✅ |
-| CH.HF4 | SPB build → MSK atomic `.next` swap + smoke moscow/nn/abakan | Критический | 🔄 |
+| CH.HF4 | SPB build → MSK atomic `.next` swap + smoke moscow/nn/abakan | Критический | ✅ MSK-only `deploy-prod-next.sh` `0ad064bc` **BUILD_ID=`5PaOsq5u2eoVkCSuYdVzh`**; smoke moscow/nn/abakan 200 + hookFact |
 | CH.HF5 | Партнерский виджет логистики (Ласточки/авиа) | Низкий | ⏳ |
 
 ## /my-day starter geometry (2026-08-03)

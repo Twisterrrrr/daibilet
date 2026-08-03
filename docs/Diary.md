@@ -12,6 +12,7 @@
 ### Проблемы
 - Нижний Новгород не входил в owner-список 65; hookFact синтезирован из mustSee, не из owner-пакета.
 - Партнерский виджет логистики (Ласточки) не делали - только cityInfo travel.
+- Deploy: актуальный канон MSK-only (`deploy-prod-next.sh`), не SPB→MSK; live **BUILD_ID=`5PaOsq5u2eoVkCSuYdVzh`** @`0ad064bc`.
 
 ---
 
