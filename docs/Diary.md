@@ -108,7 +108,8 @@
 - Markers: `data-day-catalog-open=1`; убран `data-day-accordion=catalog` / `catalogOpen`.
 
 ### Проблемы
-- (deploy ниже)
+- Первый прогон: ENOENT `.nft.json` mid-build; повтор с `rm -rf apps/web/.next` → OK.
+- MSK **BUILD_ID=`sgVL2jxb2mwH2VaNjj3fm`** (`902fb3b`), `/my-day` 200; chunk: `data-day-catalog-open`; без accordion.
 
 ---
 
