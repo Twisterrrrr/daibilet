@@ -24,6 +24,7 @@
 |---|--------|-----------|--------|
 | UX.MYDAY-STARTER-EDGE | Desktop empty starter: full (=header) + equal-M L/mid/R | Высокий | ✅ `8c9d427` MSK **BUILD_ID=`mHjJgyoGso3NrFan4glCI`** `/my-day` 200 |
 | UX.MYDAY-CITY-HUB | Readiness line: `• Страница {City_Род}` → city hub | Высокий | ✅ `b21531b` MSK **BUILD_ID=`9Y0CrLqmzM7hckZVe2RRb`** `/my-day` 200 |
+| UX.MYDAY-CATALOG-OPEN | «Ещё из каталога»: always open, no card border | Высокий | 🔄 deploy |
 
 ---
 

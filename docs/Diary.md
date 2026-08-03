@@ -98,6 +98,20 @@
 
 ---
 
+## 2026-08-03 - /my-day: catalog trio always open (no accordion/border)
+
+### Наблюдения
+- Owner: «Ещё из каталога» в аккордеоне+бордере теряется на странице.
+
+### Решения
+- Секция всегда раскрыта: без `border`/`rounded-2xl` card, без chevron/toggle.
+- Markers: `data-day-catalog-open=1`; убран `data-day-accordion=catalog` / `catalogOpen`.
+
+### Проблемы
+- (deploy ниже)
+
+---
+
 ## 2026-08-03 - /my-day: «Страница {City_Род}» link in readiness line
 
 ### Наблюдения

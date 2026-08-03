@@ -156,7 +156,7 @@ import { eventHref, venueHref } from '@/lib/routes';
 import { toVenueCatalogCard } from '@/lib/venue-catalog-card';
 import type { VenueCatalogCard } from '@/lib/venue-map-types';
 
-type DayRouteAccordionId = 'catalog' | 'mustSee' | 'text' | 'matches';
+type DayRouteAccordionId = 'mustSee' | 'text' | 'matches';
 type DayRouteStopViewMode = 'grid' | 'list';
 
 const DAY_ROUTE_STOP_VIEW_KEY = 'daibilet:dayRouteStopView';
@@ -1837,7 +1837,6 @@ function DayRoutePanelInner() {
   }
 
   const textFormOpen = openPanel === 'text';
-  const catalogOpen = openPanel === 'catalog';
   const mustSeeOpen = openPanel === 'mustSee';
   const matchesOpen = openPanel === 'matches';
   const showMustSeeAccordion = Boolean(hasPageCity && (mustSeeResolved.length > 0 || (!catalogLoading && pageCitySlug)));
@@ -1869,7 +1868,7 @@ function DayRoutePanelInner() {
     return `https://yandex.ru/maps/?pt=${lng},${lat}&z=17&l=map`;
   }
 
-  /** Typed catalog selects - accordion under Hot Picks (not in top starter). */
+  /** Typed catalog selects - always open under Hot Picks (not accordion). */
   function renderCatalogTrio() {
     if (!hasPageCity) {
       return (
@@ -2953,57 +2952,39 @@ function DayRoutePanelInner() {
       {/* Non-empty plan: city+search stays secondary under Hot Picks */}
       {!isEmptyRoute ? renderUnifiedSearch(false) : null}
 
-      {/* Accordion: advanced catalog + boat */}
-      <div
-        className="mt-3 rounded-2xl border border-slate-200 bg-white"
+      {/* Always-open catalog trio + boat (no accordion / no card border) */}
+      <section
+        className="mt-5"
         id="day-catalog-add"
         data-day-catalog-add="1"
-        data-day-accordion="catalog"
+        data-day-catalog-open="1"
       >
-        <button
-          type="button"
-          aria-expanded={catalogOpen}
-          aria-controls="day-catalog-add-body"
-          data-day-catalog-accordion
-          onClick={() => togglePanel('catalog')}
-          className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
-        >
-          <span>
-            <span className="block text-sm font-semibold text-slate-900">Ещё из каталога</span>
-            <span className="mt-0.5 block text-xs text-slate-500">
-              Отдельный поиск по типам
-            </span>
-          </span>
-          <ChevronDown
-            className={`h-5 w-5 shrink-0 text-slate-400 transition ${catalogOpen ? 'rotate-180' : ''}`}
-          />
-        </button>
-        {catalogOpen ? (
-          <div id="day-catalog-add-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
-            {!hasPageCity ? (
-              <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-                Сначала выберите город в поиске.
-              </p>
-            ) : (
-              <>
-                {renderCatalogTrio()}
-                <div className="mt-4">
-                  <DayRouteBoatWizard
-                    cityName={pageCityName}
-                    citySlug={pageCitySlug}
-                    cityId={pageCityId}
-                    citySourceSlug={selectedCity?.selectedDestination?.sourceSlug || null}
-                    route={route}
-                    atMax={atMax}
-                    onRouteChange={setRoute}
-                    locationsCatalog={locationsCatalog}
-                  />
-                </div>
-              </>
-            )}
-          </div>
-        ) : null}
-      </div>
+        <div className="mb-3">
+          <p className="text-base font-semibold text-slate-900">Ещё из каталога</p>
+          <p className="mt-0.5 text-xs text-slate-500">Отдельный поиск по типам</p>
+        </div>
+        {!hasPageCity ? (
+          <p className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            Сначала выберите город в поиске.
+          </p>
+        ) : (
+          <>
+            {renderCatalogTrio()}
+            <div className="mt-4">
+              <DayRouteBoatWizard
+                cityName={pageCityName}
+                citySlug={pageCitySlug}
+                cityId={pageCityId}
+                citySourceSlug={selectedCity?.selectedDestination?.sourceSlug || null}
+                route={route}
+                atMax={atMax}
+                onRouteChange={setRoute}
+                locationsCatalog={locationsCatalog}
+              />
+            </div>
+          </>
+        )}
+      </section>
 
       {/* Accordion: matching excursions */}
       {showMatches ? (
