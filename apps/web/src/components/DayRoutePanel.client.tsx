@@ -1951,8 +1951,8 @@ function DayRoutePanelInner() {
       <div
         className={
           placement === 'desktop'
-            ? 'absolute bottom-3 left-3 right-3 z-20 rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur sm:left-auto sm:right-3 sm:w-[min(22rem,calc(100%-1.5rem))]'
-            : 'absolute bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 z-20 rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur'
+            ? 'pointer-events-auto absolute bottom-3 left-3 right-3 z-[1100] rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur sm:left-auto sm:right-3 sm:w-[min(22rem,calc(100%-1.5rem))]'
+            : 'pointer-events-auto absolute bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 z-[1100] rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur'
         }
         data-day-map-focus-card
         data-day-map-focus-placement={placement}
@@ -2761,13 +2761,15 @@ function DayRoutePanelInner() {
                 </div>
                 {renderMapToolbar()}
               </div>
-              <div className="relative">
-                <DayRouteOsmMap
-                  stops={mapStops}
-                  selectedStopId={focusedStopId}
-                  onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
-                  className="h-64 w-full overflow-hidden rounded-xl bg-slate-100 sm:h-80"
-                />
+              <div className="relative isolate">
+                <div className="relative z-0 overflow-hidden rounded-xl">
+                  <DayRouteOsmMap
+                    stops={mapStops}
+                    selectedStopId={focusedStopId}
+                    onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
+                    className="h-64 w-full bg-slate-100 sm:h-80"
+                  />
+                </div>
                 {renderMapFocusCard('desktop')}
               </div>
             </div>
@@ -3445,18 +3447,20 @@ function DayRoutePanelInner() {
               </button>
             </div>
           </div>
-          <div className="relative min-h-0 flex-1 bg-slate-100 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))]">
-            <DayRouteOsmMap
-              stops={mapStops}
-              selectedStopId={focusedStopId}
-              onStopClick={focusStopFromMap}
-              layoutKey="mobile-map"
-              className="absolute inset-0 h-full w-full"
-            />
+          <div className="relative isolate min-h-0 flex-1 bg-slate-100 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))]">
+            <div className="absolute inset-0 z-0">
+              <DayRouteOsmMap
+                stops={mapStops}
+                selectedStopId={focusedStopId}
+                onStopClick={focusStopFromMap}
+                layoutKey="mobile-map"
+                className="h-full w-full"
+              />
+            </div>
             {renderMapFocusCard('mobile')}
             {route.venues.length > 0 ? (
               <div
-                className="absolute inset-x-0 bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] z-10 border-t border-slate-200/80 bg-white/95 backdrop-blur"
+                className="absolute inset-x-0 bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] z-[1000] border-t border-slate-200/80 bg-white/95 backdrop-blur"
                 data-day-map-stops-rail
               >
                 <div className="flex gap-2 overflow-x-auto px-3 py-2.5">

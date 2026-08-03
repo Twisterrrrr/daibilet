@@ -1,3 +1,16 @@
+## 2026-08-04 - /my-day desktop: map focus card above Leaflet
+
+### Наблюдения
+- Клик по маркеру desktop OSM ставил `focusedStopId`, но карточка с `z-20` была под Leaflet panes (z ~400-700).
+
+### Решения
+- Обёртка карты `isolate` + focus card / mobile stops rail `z-[1100]` / `z-[1000]`.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-04 - /events/[slug] runtime ISR 7200 + on-demand revalidate
 
 ### Наблюдения
