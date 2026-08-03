@@ -2494,11 +2494,11 @@ function DayRoutePanelInner() {
           ) : null}
           {totalDistanceMeters > 0 ? (
             <div
-              className="mt-3 flex w-full flex-col gap-2 rounded-xl border border-slate-200 bg-white px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+              className="mt-3 flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-xl border border-slate-200 bg-white px-3 py-3"
               data-day-distance-summary
             >
-              <p className="text-sm text-slate-700">
-                Сумма сегментов:{' '}
+              <p className="min-w-0 text-sm text-slate-700">
+                Итого:{' '}
                 <span className="font-semibold text-slate-900">
                   {formatDayRouteDistance(totalDistanceMeters)}
                 </span>
@@ -2512,7 +2512,7 @@ function DayRoutePanelInner() {
                   </>
                 ) : null}
               </p>
-              <div className="flex gap-1" role="group" aria-label="Способ перемещения">
+              <div className="flex shrink-0 gap-1" role="group" aria-label="Способ перемещения">
                 <button
                   type="button"
                   onClick={() => setTravelMode('walk')}
