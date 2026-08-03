@@ -49,6 +49,20 @@
 
 ---
 
+## 2026-08-03 - /my-day: starter = owner Tailwind mock
+
+### Наблюдения
+- Owner: предыдущие half-center / edge-balance - не то. Ориентир - явный mock: `max-w-6xl`, `md:justify-between md:items-center`, form `md:w-[400px]`, icon+copy `items-start gap-4`, pad `p-8 md:p-10`.
+
+### Решения
+- `renderUnifiedSearch(true)` переписан под mock; CityPicker / DayRouteSearchSelect без замены на raw select.
+- Markers: `max=6xl`, `inset=mock`, `align=between-center`, `form-w=400px`.
+
+### Проблемы
+- (deploy ниже)
+
+---
+
 ## 2026-08-03 - /my-day: starter edge-balance + v-center
 
 ### Наблюдения

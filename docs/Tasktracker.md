@@ -21,7 +21,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.MYDAY-STARTER-EDGE | Desktop empty starter: form v-center + edge-balance inset (не half-center) | Высокий | ✅ `0c75e27` MSK **BUILD_ID=`46gisQhL6nR_0dsiEP3H2`** `/my-day` 200 |
+| UX.MYDAY-STARTER-EDGE | Desktop empty starter: owner Tailwind mock (`max-w-6xl` / `400px` / between-center) | Высокий | 🔄 deploy |
 
 ---
 

@@ -1935,116 +1935,93 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** Empty plan starter - compact A on mobile; desktop lg+ = equal-M geometry only. */
+  /** Empty plan starter - owner mock: max-w-6xl, justify-between, form 400px. */
   function renderUnifiedSearch(asStarter: boolean) {
     if (asStarter) {
       return (
         <section
-          className="mt-3 w-full rounded-2xl border border-slate-200 bg-white max-lg:py-3.5 sm:mt-5 sm:max-lg:py-4 lg:px-8 lg:py-6 xl:px-10"
+          className="mx-auto mt-3 w-full max-w-6xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:mt-5 sm:p-8 md:p-10"
           ref={unifiedSearchRef}
           data-day-unified-search
           data-day-starter="1"
           data-day-starter-variant="a"
           data-day-starter-desktop="two-col"
-          data-day-starter-max="full"
-          data-day-starter-inset="edge-balance"
+          data-day-starter-max="6xl"
+          data-day-starter-inset="mock"
           data-day-starter-pad="sym"
-          data-day-starter-density="compact"
           data-day-starter-geometry="stable"
-          data-day-starter-align="v-center"
-          data-day-starter-form-w="26rem"
+          data-day-starter-align="between-center"
+          data-day-starter-form-w="400px"
         >
-          {/*
-            Mobile: shared px column; card equal py only (pt === pb).
-            Desktop lg+: row, items-center (form group vertically centered),
-            justify-between + equal side px so right inset ≈ air from left copy.
-            Right form ~26rem.
-          */}
           <div
-            className="flex w-full flex-col max-lg:mx-auto max-lg:max-w-md max-lg:px-3.5 sm:max-lg:px-5 lg:flex-row lg:items-center lg:justify-between lg:gap-8 xl:gap-10"
+            className="flex w-full flex-col gap-8 md:flex-row md:items-center md:justify-between"
             data-day-plan-starter
           >
-            <div
-              className="flex min-w-0 max-lg:w-full lg:items-center"
-              data-day-starter-left
-            >
+            <div className="flex max-w-md items-start gap-4" data-day-starter-left>
+              <div
+                className="inline-flex shrink-0 items-center justify-center rounded-lg bg-slate-50 p-2 text-slate-400"
+                aria-hidden
+              >
+                <Route className="h-6 w-6" />
+              </div>
               <div className="min-w-0" data-day-starter-copy>
-                <div className="flex items-center gap-2.5">
-                  <div
-                    className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-500"
-                    aria-hidden
-                  >
-                    <Route className="h-5 w-5" />
-                  </div>
-                  <p className="text-base font-bold leading-snug text-slate-900 sm:text-lg">
-                    Собери свой день
-                  </p>
-                </div>
-                <p className="mt-1.5 text-[12px] font-normal leading-snug text-slate-500 sm:max-lg:whitespace-nowrap sm:text-[13px] lg:hidden">
+                <p className="text-xl font-bold leading-snug text-slate-900">Собери свой день</p>
+                <p className="mt-1 text-sm leading-relaxed text-slate-500">
                   Выбери город и минимум {DAY_ROUTE_MIN} точки для составления маршрута
-                </p>
-                <p className="mt-1.5 hidden text-[13px] font-normal leading-snug text-slate-500 lg:block">
-                  Выбери город и минимум {DAY_ROUTE_MIN} точки
-                  <br />
-                  для составления маршрута
                 </p>
               </div>
             </div>
             <div
-              className="mt-3 flex w-full max-lg:min-h-0 lg:mt-0 lg:w-[26rem] lg:min-w-[21rem] lg:shrink-0 lg:items-center"
+              className="flex w-full flex-col gap-3 md:w-[400px] md:shrink-0"
               data-day-starter-right
+              data-day-city-search-stack
             >
-              <div
-                className="flex w-full flex-col gap-2.5"
-                data-day-city-search-stack
-              >
-                <div data-day-city-picker className="w-full text-left">
-                  <CityPicker
-                    cities={destinations}
-                    value={selectedCity?.cityValue || 'all'}
-                    onChange={(name) => {
-                      selectedCity?.setCity(name);
-                      if (name !== 'all') setCityInput(name);
-                    }}
-                    allLabel="Выберите город"
-                    variant="hero"
-                    className="w-full"
-                  />
-                </div>
-                <div className="w-full text-left">
-                  <DayRouteSearchSelect
-                    label="Поиск"
-                    hideLabel
-                    placeholder="Найти место или событие"
-                    emptyText={
-                      !hasPageCity
-                        ? 'Сначала выберите город'
-                        : catalogLoading
-                          ? 'Загружаем…'
-                          : catalogError || 'Ничего не найдено'
-                    }
-                    loading={hasPageCity ? catalogLoading : false}
-                    disabled={!hasPageCity || atMax}
-                    options={hasPageCity ? unifiedSearchOptions : []}
-                    onPick={pickUnifiedSearch}
-                    onQueryChange={setUnifiedSearchQuery}
-                  />
-                  {hasPageCity && catalogError ? (
-                    <p className="mt-1.5 mb-0 pl-4 text-left text-xs font-medium text-rose-700" role="status">
-                      {catalogError}
-                    </p>
-                  ) : null}
-                  <p className="mt-1.5 mb-0 block pl-5 text-left text-[12px] leading-tight text-slate-500">
-                    или{' '}
-                    <button
-                      type="button"
-                      onClick={openTextForm}
-                      className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
-                    >
-                      добавь своё место
-                    </button>
+              <div data-day-city-picker className="w-full text-left">
+                <CityPicker
+                  cities={destinations}
+                  value={selectedCity?.cityValue || 'all'}
+                  onChange={(name) => {
+                    selectedCity?.setCity(name);
+                    if (name !== 'all') setCityInput(name);
+                  }}
+                  allLabel="Выберите город"
+                  variant="hero"
+                  className="w-full"
+                />
+              </div>
+              <div className="w-full text-left">
+                <DayRouteSearchSelect
+                  label="Поиск"
+                  hideLabel
+                  placeholder="Найти место или событие"
+                  emptyText={
+                    !hasPageCity
+                      ? 'Сначала выберите город'
+                      : catalogLoading
+                        ? 'Загружаем…'
+                        : catalogError || 'Ничего не найдено'
+                  }
+                  loading={hasPageCity ? catalogLoading : false}
+                  disabled={!hasPageCity || atMax}
+                  options={hasPageCity ? unifiedSearchOptions : []}
+                  onPick={pickUnifiedSearch}
+                  onQueryChange={setUnifiedSearchQuery}
+                />
+                {hasPageCity && catalogError ? (
+                  <p className="mt-1.5 mb-0 pl-1 text-left text-xs font-medium text-rose-700" role="status">
+                    {catalogError}
                   </p>
-                </div>
+                ) : null}
+                <p className="mt-1.5 mb-0 block pl-1 text-left text-xs leading-tight text-slate-500">
+                  или{' '}
+                  <button
+                    type="button"
+                    onClick={openTextForm}
+                    className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
+                  >
+                    добавь своё место
+                  </button>
+                </p>
               </div>
             </div>
           </div>
