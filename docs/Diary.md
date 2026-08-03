@@ -113,6 +113,21 @@
 
 ---
 
+## 2026-08-03 - /my-day: SEO package (noindex + share OG)
+
+### Наблюдения
+- Owner: title 3 + description A; оставить `noindex,nofollow` до SEO-контента; OG для шаринга сейчас.
+
+### Решения
+- Title: `Собери маршрут на день: места, музеи и события` (+ template `| Дайбилет`).
+- Description: маршрут / музеи / места / события / план / ссылка (без бренда в desc).
+- `buildShareMetadata` + `canonical=/my-day`; robots без изменений.
+
+### Проблемы
+- (deploy ниже)
+
+---
+
 ## 2026-08-03 - /my-day: Готовые сценарии under Hot Picks
 
 ### Наблюдения

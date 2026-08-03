@@ -27,6 +27,7 @@
 | UX.MYDAY-CATALOG-OPEN | «Ещё из каталога»: always open, no card border | Высокий | ✅ `902fb3b` MSK **BUILD_ID=`sgVL2jxb2mwH2VaNjj3fm`** `/my-day` 200 |
 | UX.MYDAY-SEARCH-PROG | Progressive catalog load - search not gated on Promise.all | Высокий | ✅ `33e9ca8` MSK **BUILD_ID=`blIpyGTrMYrwYoh4jkBws`** `/my-day` 200 |
 | UX.MYDAY-PRESETS | «Готовые сценарии» under Hot Picks (cityInfo presets) | Высокий | ✅ `f280018` MSK **BUILD_ID=`cM9j1lcFbpgHSogY-npKs`** `/my-day` 200 |
+| SEO.MYDAY-META | /my-day title+desc+OG package; keep noindex until crawlable content | Высокий | 🔄 deploy |
 
 ---
 
