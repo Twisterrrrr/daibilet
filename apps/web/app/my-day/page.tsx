@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 
 export default function MyDayPage() {
   return (
-    <SiteLayout>
+    <SiteLayout footerVariant="compact">
       <DayRoutePanel />
     </SiteLayout>
   );

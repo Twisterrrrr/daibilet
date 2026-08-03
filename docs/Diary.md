@@ -1,3 +1,20 @@
+## 2026-08-03 - /my-day mobile: list-first + map mode (Wanderlog)
+
+### Наблюдения
+- Sticky OSM 38vh + полный SiteFooter + sticky bar съедали экран: мало места на карточки/поиск.
+- У самого Wanderlog на телефоне List и Map - **раздельные режимы**, не split 35-40% карты сверху.
+
+### Решения
+- Убран mobile sticky split (`data-day-mobile-map` / 38dvh / expand / viewport lock).
+- Mobile list-first: обычный document scroll (`data-day-mobile-list-first`); toggle **Список|Карта** (`data-day-mobile-view-toggle`); режим Карта = fullscreen OSM (`data-day-mobile-map-mode`, body overflow lock).
+- Desktop карта `data-day-route-map-desktop` без изменений.
+- `/my-day`: `SiteLayout footerVariant="compact"` - логотип + email + copyright + legal, без колонок/популярных направлений.
+
+### Проблемы
+- Нет (deploy BUILD_ID ниже после MSK).
+
+---
+
 ## 2026-08-03 - City hub «Главные места»: desktop page prev/next
 
 ### Наблюдения

@@ -11,8 +11,6 @@ import {
   LayoutGrid,
   List,
   MapPin,
-  Maximize2,
-  Minimize2,
   Navigation,
   Plus,
   Printer,
@@ -374,13 +372,13 @@ function DayRoutePanelInner() {
   const [mustSeeFilter, setMustSeeFilter] = useState<MustSeeFilterId>('main');
   /** Hot Picks tab: Советы / Культура / Еда и бары. */
   const [hotPickTab, setHotPickTab] = useState<HotPickTabId>('tips');
-  /** Stop focused from map pin click (desktop split highlight). */
+  /** Stop focused from map pin click. */
   const [focusedStopId, setFocusedStopId] = useState<string | null>(null);
-  /** Mobile (&lt;lg): map pane ~38vh ↔ ~85vh. */
-  const [mapExpanded, setMapExpanded] = useState(false);
+  /** Mobile (&lt;lg): list-first; map is a separate fullscreen mode (Wanderlog-style). */
+  const [mobileView, setMobileView] = useState<'list' | 'map'>('list');
   /** Route stops layout: grid (default) or dense text list. */
   const [stopViewMode, setStopViewMode] = useState<DayRouteStopViewMode>('grid');
-  const splitLeftRef = useRef<HTMLDivElement | null>(null);
+  const listRootRef = useRef<HTMLDivElement | null>(null);
   /** After external «Купить билет» - ask guest to mark bought. */
   const [ticketHandoff, setTicketHandoff] = useState<{
     venueId: string;
@@ -1906,13 +1904,23 @@ function DayRoutePanelInner() {
     : null;
 
   useEffect(() => {
-    if (!hasMapStops && mapExpanded) setMapExpanded(false);
-  }, [hasMapStops, mapExpanded]);
+    if (!hasMapStops && mobileView === 'map') setMobileView('list');
+  }, [hasMapStops, mobileView]);
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (mobileView !== 'map') return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [mobileView]);
 
   function focusStopFromMap(stopId: string) {
     setFocusedStopId(stopId);
-    if (mapExpanded) return;
-    const root = splitLeftRef.current || document;
+    if (mobileView === 'map') return;
+    const root = listRootRef.current || document;
     const el = root.querySelector(`[data-day-plan-stop="${String(stopId).replace(/["\\]/g, '')}"]`);
     if (el instanceof HTMLElement) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -2208,34 +2216,12 @@ function DayRoutePanelInner() {
   return (
     <>
     <div
-      className={
-        hasMapStops
-          ? 'container-page flex h-[calc(100dvh-var(--site-header-height))] flex-col overflow-hidden px-0 py-0 print:hidden lg:block lg:h-auto lg:overflow-visible lg:px-6 lg:py-5 lg:pb-10'
-          : 'container-page px-4 py-5 pb-28 sm:px-6 sm:py-10 sm:pb-10 print:hidden'
-      }
-      data-day-mobile-map-split={hasMapStops ? '1' : undefined}
+      className="container-page px-4 py-5 pb-28 sm:px-6 sm:py-10 sm:pb-10 print:hidden lg:pb-10"
+      data-day-mobile-list-first="1"
       data-day-section-width="full"
+      data-day-mobile-view={mobileView}
     >
-      <div
-        className={
-          hasMapStops
-            ? 'flex min-h-0 flex-1 flex-col overflow-hidden lg:block lg:overflow-visible'
-            : undefined
-        }
-        data-day-map-expand={mapExpanded ? '1' : '0'}
-      >
-        <div
-          ref={splitLeftRef}
-          className={
-            hasMapStops
-              ? `min-w-0 order-2 flex-1 overflow-y-auto overscroll-contain px-4 pb-28 pt-3 sm:px-6 lg:order-none lg:overflow-visible lg:px-0 lg:pb-0 lg:pt-0 ${
-                  mapExpanded ? 'max-lg:hidden' : ''
-                }`
-              : 'min-w-0'
-          }
-          data-day-split-left
-          aria-hidden={hasMapStops && mapExpanded ? true : undefined}
-        >
+      <div ref={listRootRef} className="min-w-0" data-day-list-root>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h1 className="font-display text-[1.65rem] font-bold leading-tight text-slate-900 sm:text-3xl">
@@ -2415,6 +2401,41 @@ function DayRoutePanelInner() {
               </span>
             </h2>
             <div className="flex flex-wrap items-center gap-2">
+              {hasMapStops ? (
+                <div
+                  className="inline-flex rounded-full border border-slate-200 bg-white p-0.5 lg:hidden"
+                  role="group"
+                  aria-label="Вид: список или карта"
+                  data-day-mobile-view-toggle
+                >
+                  <button
+                    type="button"
+                    aria-pressed={mobileView === 'list'}
+                    onClick={() => setMobileView('list')}
+                    className={`inline-flex min-h-8 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold transition ${
+                      mobileView === 'list'
+                        ? 'bg-slate-900 text-white'
+                        : 'text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <List className="h-3.5 w-3.5" />
+                    Список
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={mobileView === 'map'}
+                    onClick={() => setMobileView('map')}
+                    className={`inline-flex min-h-8 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold transition ${
+                      mobileView === 'map'
+                        ? 'bg-slate-900 text-white'
+                        : 'text-slate-600 hover:bg-slate-50'
+                    }`}
+                  >
+                    <MapPin className="h-3.5 w-3.5" />
+                    Карта
+                  </button>
+                </div>
+              ) : null}
               <div
                 className="inline-flex rounded-full border border-slate-200 bg-white p-0.5"
                 role="group"
@@ -3249,51 +3270,70 @@ function DayRoutePanelInner() {
         </div>
       ) : null}
 
-        </div>
+      </div>
 
-        <aside
-          className={
-            hasMapStops
-              ? `relative order-1 flex shrink-0 flex-col overflow-hidden border-b border-slate-200 bg-white transition-[height] duration-200 ease-out lg:hidden ${
-                  mapExpanded
-                    ? 'h-[min(85dvh,calc(100dvh-var(--site-header-height)-2.5rem))]'
-                    : 'h-[38dvh]'
-                }`
-              : 'hidden'
-          }
-          data-day-mobile-map
-          data-day-map-expanded={mapExpanded ? '1' : '0'}
+      {mobileView === 'map' && hasMapStops ? (
+        <div
+          className="fixed inset-x-0 bottom-0 top-[var(--site-header-height)] z-30 flex flex-col bg-white lg:hidden print:hidden"
+          data-day-mobile-map-mode="1"
         >
-          <div className="relative min-h-0 flex-1 bg-slate-100">
-            {mapStops.length > 0 ? (
-              <DayRouteOsmMap
-                stops={mapStops}
-                selectedStopId={focusedStopId}
-                onStopClick={focusStopFromMap}
-                layoutKey={mapExpanded ? 'expanded' : 'collapsed'}
-                className="absolute inset-0 h-full w-full"
-              />
-            ) : null}
-
-            {hasMapStops ? (
+          <div className="flex shrink-0 items-center gap-2 border-b border-slate-200 px-3 py-2">
+            <div
+              className="inline-flex rounded-full border border-slate-200 bg-white p-0.5"
+              role="group"
+              aria-label="Вид: список или карта"
+            >
               <button
                 type="button"
-                data-day-map-expand
-                aria-pressed={mapExpanded}
-                aria-label={mapExpanded ? 'Свернуть карту' : 'Развернуть карту'}
-                title={mapExpanded ? 'Свернуть карту' : 'Развернуть карту'}
-                onClick={() => setMapExpanded((open) => !open)}
-                className="absolute left-3 top-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white/95 text-slate-800 shadow-sm backdrop-blur hover:bg-white"
+                aria-pressed={false}
+                onClick={() => setMobileView('list')}
+                className="inline-flex min-h-8 items-center gap-1 rounded-full px-2.5 text-[11px] font-semibold text-slate-600 hover:bg-slate-50"
               >
-                {mapExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                <List className="h-3.5 w-3.5" />
+                Список
               </button>
-            ) : null}
-
-            {focusedVenue && hasMapStops ? (
+              <button
+                type="button"
+                aria-pressed={true}
+                className="inline-flex min-h-8 items-center gap-1 rounded-full bg-slate-900 px-2.5 text-[11px] font-semibold text-white"
+              >
+                <MapPin className="h-3.5 w-3.5" />
+                Карта
+              </button>
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              {yandexUrl ? (
+                <a
+                  href={yandexUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex min-h-8 items-center justify-center gap-1 rounded-full bg-sky-600 px-3 text-[11px] font-bold text-white hover:bg-sky-700"
+                >
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  Яндекс.Карты
+                </a>
+              ) : null}
+              <button
+                type="button"
+                aria-label="Закрыть карту"
+                onClick={() => setMobileView('list')}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+          <div className="relative min-h-0 flex-1 bg-slate-100 pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))]">
+            <DayRouteOsmMap
+              stops={mapStops}
+              selectedStopId={focusedStopId}
+              onStopClick={focusStopFromMap}
+              layoutKey="mobile-map"
+              className="absolute inset-0 h-full w-full"
+            />
+            {focusedVenue ? (
               <div
-                className={`absolute left-3 right-3 z-20 rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur ${
-                  mapExpanded ? 'bottom-20' : 'bottom-3'
-                }`}
+                className="absolute bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 z-20 rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur"
                 data-day-map-focus-card
               >
                 <div className="flex items-start gap-2">
@@ -3334,10 +3374,9 @@ function DayRoutePanelInner() {
                 </div>
               </div>
             ) : null}
-
-            {mapExpanded && route.venues.length > 0 ? (
+            {route.venues.length > 0 ? (
               <div
-                className="absolute inset-x-0 bottom-0 z-10 border-t border-slate-200/80 bg-white/95 backdrop-blur"
+                className="absolute inset-x-0 bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] z-10 border-t border-slate-200/80 bg-white/95 backdrop-blur"
                 data-day-map-stops-rail
               >
                 <div className="flex gap-2 overflow-x-auto px-3 py-2.5">
@@ -3365,8 +3404,8 @@ function DayRoutePanelInner() {
               </div>
             ) : null}
           </div>
-        </aside>
-      </div>
+        </div>
+      ) : null}
 
       <MobileStickyActionBar>
         {unpaidTicketStops.length > 0 ? (

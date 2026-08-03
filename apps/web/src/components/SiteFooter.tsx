@@ -32,9 +32,63 @@ const companyLinks = [
 
 type SiteFooterProps = {
   destinations: PublicDestinationDto[];
+  variant?: 'default' | 'compact';
 };
 
-export function SiteFooter({ destinations }: SiteFooterProps) {
+function FooterLegalLinks() {
+  return (
+    <div className="flex flex-col gap-2 text-right sm:ml-auto">
+      <div className="flex flex-wrap justify-end gap-x-5 gap-y-1.5">
+        <Link href="/privacy#user-agreement" className="text-sm text-graphite-muted hover:text-graphite">
+          Пользовательское соглашение
+        </Link>
+        <Link href="/privacy#privacy-policy" className="text-sm text-graphite-muted hover:text-graphite">
+          Политика конфиденциальности
+        </Link>
+        <Link href="/offer" className="text-sm text-graphite-muted hover:text-graphite">
+          Договор-оферта (для партнёров)
+        </Link>
+      </div>
+      <div className="flex flex-wrap justify-end gap-x-5 gap-y-1.5">
+        <Link href="/legal#refunds" className="text-sm text-graphite-muted hover:text-graphite">
+          Правила возврата
+        </Link>
+        <Link href="/legal#rightsholders" className="text-sm text-graphite-muted hover:text-graphite">
+          Правообладателям
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+export function SiteFooter({ destinations, variant = 'default' }: SiteFooterProps) {
+  if (variant === 'compact') {
+    return (
+      <footer className="border-t border-slate-200/80 bg-surface-muted" data-site-footer="compact">
+        <div className="container-page py-6 sm:py-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="min-w-0">
+              <Link href="/" className="inline-flex">
+                <DaibiletLogo textClassName="text-lg" />
+              </Link>
+              <div className="mt-3 text-sm font-medium text-graphite">
+                <a href="mailto:info@daibilet.ru" className="transition-colors hover:text-primary-600">
+                  info@daibilet.ru
+                </a>
+              </div>
+            </div>
+            <p className="text-sm text-graphite">&copy; {new Date().getFullYear()} Дайбилет</p>
+          </div>
+          <div className="mt-5 border-t border-slate-200/80 pt-5">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-end">
+              <FooterLegalLinks />
+            </div>
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
   const cities = destinations.filter((item) => item.type === 'city');
   const cityLinks = [...cities]
     .sort((a, b) => b.events - a.events)
@@ -59,7 +113,7 @@ export function SiteFooter({ destinations }: SiteFooterProps) {
   const popularDirections = getFooterPopularDirections();
 
   return (
-    <footer className="border-t border-slate-200/80 bg-surface-muted">
+    <footer className="border-t border-slate-200/80 bg-surface-muted" data-site-footer="default">
       <div className="container-page py-14 sm:py-16">
         <div className="grid grid-cols-2 gap-10 md:grid-cols-4 md:gap-12">
           <div className="col-span-2 md:col-span-1">
@@ -113,27 +167,7 @@ export function SiteFooter({ destinations }: SiteFooterProps) {
         <div className="mt-12 border-t border-slate-200/80 pt-8">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
             <p className="text-sm text-graphite">&copy; {new Date().getFullYear()} Дайбилет</p>
-            <div className="flex flex-col gap-2 text-right sm:ml-auto">
-              <div className="flex flex-wrap justify-end gap-x-5 gap-y-1.5">
-                <Link href="/privacy#user-agreement" className="text-sm text-graphite-muted hover:text-graphite">
-                  Пользовательское соглашение
-                </Link>
-                <Link href="/privacy#privacy-policy" className="text-sm text-graphite-muted hover:text-graphite">
-                  Политика конфиденциальности
-                </Link>
-                <Link href="/offer" className="text-sm text-graphite-muted hover:text-graphite">
-                  Договор-оферта (для партнёров)
-                </Link>
-              </div>
-              <div className="flex flex-wrap justify-end gap-x-5 gap-y-1.5">
-                <Link href="/legal#refunds" className="text-sm text-graphite-muted hover:text-graphite">
-                  Правила возврата
-                </Link>
-                <Link href="/legal#rightsholders" className="text-sm text-graphite-muted hover:text-graphite">
-                  Правообладателям
-                </Link>
-              </div>
-            </div>
+            <FooterLegalLinks />
           </div>
         </div>
       </div>

@@ -28,6 +28,7 @@
 | UX.MYDAY-SEARCH-PROG | Progressive catalog load - search not gated on Promise.all | Высокий | ✅ `33e9ca8` MSK **BUILD_ID=`blIpyGTrMYrwYoh4jkBws`** `/my-day` 200 |
 | UX.MYDAY-PRESETS | «Готовые сценарии» under Hot Picks (cityInfo presets) | Высокий | ✅ `f280018` MSK **BUILD_ID=`cM9j1lcFbpgHSogY-npKs`** `/my-day` 200 |
 | SEO.MYDAY-META | /my-day title+desc+OG package; keep noindex until crawlable content | Высокий | ✅ `31a0dc0` MSK **BUILD_ID=`qZnQ6TqtoJkKtvxVB9mtI`** |
+| UX.MYDAY-LIST-MAP | Mobile list-first + Список/Карта toggle (no sticky 38vh); compact footer | Критический | 🔄 deploy |
 
 ---
 
@@ -36,7 +37,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | UX.MYDAY-SPLIT-DESK | Desktop ≥lg: list left + sticky map right (`data-day-split`) | Критический | ⚠️ rolled back `8f8c69f` - single column, map under list (`data-day-route-map-desktop`) |
-| UX.MYDAY-SPLIT-MOB | Mobile &lt;lg: sticky map ~38vh + list scroll; expand ~85vh (`data-day-map-expand`); no bottom-sheet physics | Критический | ✅ `ed9ea2f`+`8f8c69f` MSK **BUILD_ID=`fsMqASpF2AZAHnq3m-hiK`** `/my-day` 200 |
+| UX.MYDAY-SPLIT-MOB | Mobile &lt;lg: sticky map ~38vh + list scroll; expand ~85vh | Критический | ⚠️ superseded by UX.MYDAY-LIST-MAP (list-first + map mode) |
 | UX.MYDAY-CARD-SIZE | Stop cards: compact dense row + full-width list (= summary bar); no multi-col stretch towels | Критический | ✅ `76bae1c`+`949bd78` MSK **BUILD_ID=`QRQxYfwR-Wy7iklNEOIwY`** |
 
 ---

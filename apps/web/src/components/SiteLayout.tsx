@@ -19,7 +19,13 @@ const EMPTY_DESTINATIONS = {
   destinations: [] as PublicDestinationDto[],
 };
 
-export async function SiteLayout({ children }: { children: React.ReactNode }) {
+export async function SiteLayout({
+  children,
+  footerVariant = 'default',
+}: {
+  children: React.ReactNode;
+  footerVariant?: 'default' | 'compact';
+}) {
   let destinations: PublicDestinationDto[] = [];
   try {
     // Next Data Cache (not raw buildPublicDestinationsDto): SiteLayout is inlined
@@ -49,7 +55,7 @@ export async function SiteLayout({ children }: { children: React.ReactNode }) {
             </div>
             <main className="flex-1">{children}</main>
             <div className="print:hidden">
-              <SiteFooter destinations={destinations} />
+              <SiteFooter destinations={destinations} variant={footerVariant} />
               <ScrollToTopButton />
             </div>
           </div>
