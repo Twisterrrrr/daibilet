@@ -64,6 +64,22 @@
 
 ---
 
+## 2026-08-03 - /my-day: starter full-width + equal-M (owner)
+
+### Наблюдения
+- Owner: mock с `max-w-6xl` / justify-between - неверно.
+- 1) контейнер = ширина шапки (`container-page` / full, не 6xl);
+- 2) слева / между блоками / справа - равнозначные отступы.
+
+### Решения
+- Card `w-full` (`max=full`); desktop `lg:grid-cols-[1fr_auto_1fr_auto_1fr]` equal-M; copy `col-start-2`, form `col-start-4` `w-[400px]`; `items-center` + equal `py`.
+- Markers: `inset=equal-m`, `align=col`, `form-w=400px`.
+
+### Проблемы
+- (deploy ниже)
+
+---
+
 ## 2026-08-03 - /my-day: starter = owner Tailwind mock
 
 ### Наблюдения

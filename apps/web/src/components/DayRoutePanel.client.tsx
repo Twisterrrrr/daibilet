@@ -1935,29 +1935,36 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** Empty plan starter - owner mock: max-w-6xl, justify-between, form 400px. */
+  /** Empty plan starter - full card (= header width), desktop equal-M margins. */
   function renderUnifiedSearch(asStarter: boolean) {
     if (asStarter) {
       return (
         <section
-          className="mx-auto mt-3 w-full max-w-6xl rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:mt-5 sm:p-8 md:p-10"
+          className="mt-3 w-full rounded-2xl border border-slate-200 bg-white max-lg:py-3.5 sm:mt-5 sm:max-lg:py-4 lg:py-6"
           ref={unifiedSearchRef}
           data-day-unified-search
           data-day-starter="1"
           data-day-starter-variant="a"
           data-day-starter-desktop="two-col"
-          data-day-starter-max="6xl"
-          data-day-starter-inset="mock"
+          data-day-starter-max="full"
+          data-day-starter-inset="equal-m"
           data-day-starter-pad="sym"
           data-day-starter-geometry="stable"
-          data-day-starter-align="between-center"
+          data-day-starter-align="col"
           data-day-starter-form-w="400px"
         >
+          {/*
+            Full width of container-page (= header).
+            Desktop: 1fr auto 1fr auto 1fr → left M = middle M = right M.
+          */}
           <div
-            className="flex w-full flex-col gap-8 md:flex-row md:items-center md:justify-between"
+            className="flex w-full flex-col max-lg:mx-auto max-lg:max-w-md max-lg:px-3.5 sm:max-lg:px-5 lg:grid lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:items-center"
             data-day-plan-starter
           >
-            <div className="flex max-w-md items-start gap-4" data-day-starter-left>
+            <div
+              className="flex min-w-0 max-w-md items-start gap-4 max-lg:w-full lg:col-start-2"
+              data-day-starter-left
+            >
               <div
                 className="inline-flex shrink-0 items-center justify-center rounded-lg bg-slate-50 p-2 text-slate-400"
                 aria-hidden
@@ -1972,7 +1979,7 @@ function DayRoutePanelInner() {
               </div>
             </div>
             <div
-              className="flex w-full flex-col gap-3 md:w-[400px] md:shrink-0"
+              className="mt-3 flex w-full flex-col gap-3 max-lg:min-h-0 lg:col-start-4 lg:mt-0 lg:w-[400px] lg:min-w-[20rem] lg:shrink-0"
               data-day-starter-right
               data-day-city-search-stack
             >

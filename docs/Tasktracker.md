@@ -22,7 +22,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.MYDAY-STARTER-EDGE | Desktop empty starter: owner Tailwind mock (`max-w-6xl` / `400px` / between-center) | Высокий | ✅ `d9076f5` MSK **BUILD_ID=`WuO0reHDHKNjur8ruOh1i`** `/my-day` 200 |
+| UX.MYDAY-STARTER-EDGE | Desktop empty starter: full (=header) + equal-M L/mid/R | Высокий | 🔄 deploy |
 
 ---
 
