@@ -2245,19 +2245,22 @@ function DayRoutePanelInner() {
             data-day-route-count-label
             data-day-route-readiness
           >
-            {readiness.summaryLine}
+            <span>{readiness.summaryLine}</span>
+            {scopeCityName ? (
+              <>
+                <span className="mx-1.5 hidden text-slate-400 sm:inline" aria-hidden>
+                  •
+                </span>
+                <Link
+                  href={cityHubHref}
+                  className="mt-0.5 block text-primary-600 transition-colors hover:text-primary-700 hover:underline sm:mt-0 sm:inline"
+                  data-day-city-hub-link
+                >
+                  Страница {cityToGenitive(scopeCityName)}
+                </Link>
+              </>
+            ) : null}
           </p>
-          {scopeCityName ? (
-            <p className="mt-0.5 text-[13px] font-medium">
-              <Link
-                href={cityHubHref}
-                className="text-primary-600 transition-colors hover:text-primary-700 hover:underline"
-                data-day-city-hub-link
-              >
-                Страница {cityToGenitive(scopeCityName)}
-              </Link>
-            </p>
-          ) : null}
         </div>
         <div className="relative shrink-0" ref={shareMenuRef}>
           <button
