@@ -98,6 +98,21 @@
 
 ---
 
+## 2026-08-03 - /my-day: «Страница {City_Род}» link in readiness line
+
+### Наблюдения
+- Owner: в строке «N точек из 10» добавить `• Страница {город}` со ссылкой на хаб; родительный падеж; bullet 6–8px; primary blue + hover underline.
+
+### Решения
+- Header readiness: `summaryLine` + `mx-1.5 •` + `Link` на `cityHubHref` (`/cities/{slug}`).
+- Текст: `Страница ${cityToGenitive(scopeCityName)}` (уже есть в `city-declension`).
+- Стиль: `text-primary-600 hover:text-primary-700 hover:underline`; marker `data-day-city-hub-link`.
+
+### Проблемы
+- (deploy ниже)
+
+---
+
 ## 2026-08-03 - /my-day: starter right +10px
 
 ### Наблюдения

@@ -142,7 +142,7 @@ import {
   type HotPickCard,
   type HotPickTabId,
 } from '@/lib/day-route-hot-picks';
-import { inCityPrepositional } from '@/lib/city-declension';
+import { cityToGenitive, inCityPrepositional } from '@/lib/city-declension';
 import { formatPriceFrom } from '@/lib/format';
 import {
   buildMustSeeFilterTabs,
@@ -2177,7 +2177,21 @@ function DayRoutePanelInner() {
             data-day-route-count-label
             data-day-route-readiness
           >
-            {readiness.summaryLine}
+            <span>{readiness.summaryLine}</span>
+            {scopeCityName ? (
+              <>
+                <span className="mx-1.5 text-slate-400" aria-hidden>
+                  •
+                </span>
+                <Link
+                  href={cityHubHref}
+                  className="text-primary-600 transition-colors hover:text-primary-700 hover:underline"
+                  data-day-city-hub-link
+                >
+                  Страница {cityToGenitive(scopeCityName)}
+                </Link>
+              </>
+            ) : null}
           </p>
         </div>
         <div className="relative shrink-0" ref={shareMenuRef}>
