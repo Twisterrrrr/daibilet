@@ -2198,7 +2198,8 @@ function DayRoutePanelInner() {
             className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
           >
             <Sparkles className="h-3.5 w-3.5" />
-            Оптимизировать маршрут
+            <span className="sm:hidden">Оптимизировать</span>
+            <span className="hidden sm:inline">Оптимизировать маршрут</span>
           </button>
         ) : null}
         {yandexUrl ? (
@@ -2209,7 +2210,8 @@ function DayRoutePanelInner() {
             className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-3 py-2 text-xs font-bold text-white hover:bg-sky-700"
           >
             <ExternalLink className="h-3.5 w-3.5" />
-            Открыть в Яндекс.Картах
+            <span className="sm:hidden">В Яндекс.карты</span>
+            <span className="hidden sm:inline">Открыть в Яндекс.Картах</span>
           </a>
         ) : (
           <button
@@ -2219,7 +2221,8 @@ function DayRoutePanelInner() {
             className="inline-flex min-h-10 cursor-not-allowed items-center justify-center gap-1.5 rounded-full bg-slate-200 px-3 py-2 text-xs font-bold text-slate-500"
           >
             <ExternalLink className="h-3.5 w-3.5" />
-            Открыть в Яндекс.Картах
+            <span className="sm:hidden">В Яндекс.карты</span>
+            <span className="hidden sm:inline">Открыть в Яндекс.Картах</span>
           </button>
         )}
       </div>
@@ -2496,47 +2499,97 @@ function DayRoutePanelInner() {
           ) : null}
           {totalDistanceMeters > 0 ? (
             <div
-              className="mt-3 flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-2 rounded-xl border border-slate-200 bg-white px-3 py-3"
+              className="mt-3 rounded-xl border border-slate-200 bg-white px-3 py-3"
               data-day-distance-summary
             >
-              <p className="min-w-0 text-sm text-slate-700">
-                Итого:{' '}
-                <span className="font-semibold text-slate-900">
-                  {formatDayRouteDistance(totalDistanceMeters)}
-                </span>
-                {travelMinutes > 0 ? (
-                  <>
-                    {' '}
-                    · около{' '}
-                    <span className="font-semibold text-slate-900">
-                      {formatDayRouteTravelMinutes(travelMinutes)}
-                    </span>
-                  </>
-                ) : null}
-              </p>
-              <div className="flex shrink-0 gap-1" role="group" aria-label="Способ перемещения">
-                <button
-                  type="button"
-                  onClick={() => setTravelMode('walk')}
-                  className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-                    travelMode === 'walk'
-                      ? 'bg-slate-900 text-white'
-                      : 'border border-slate-200 bg-white text-slate-700'
-                  }`}
-                >
-                  Пешком
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTravelMode('auto')}
-                  className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-                    travelMode === 'auto'
-                      ? 'bg-slate-900 text-white'
-                      : 'border border-slate-200 bg-white text-slate-700'
-                  }`}
-                >
-                  Авто
-                </button>
+              {/* Mobile: Итого; then Около + mode toggles on one row */}
+              <div className="sm:hidden" data-day-distance-summary-mobile>
+                <p className="text-sm text-slate-700">
+                  Итого:{' '}
+                  <span className="font-semibold text-slate-900">
+                    {formatDayRouteDistance(totalDistanceMeters)}
+                  </span>
+                </p>
+                <div className="mt-1.5 flex items-center justify-between gap-2">
+                  <p className="min-w-0 text-sm text-slate-700">
+                    {travelMinutes > 0 ? (
+                      <>
+                        Около{' '}
+                        <span className="font-semibold text-slate-900">
+                          {formatDayRouteTravelMinutes(travelMinutes)}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-slate-400">Около -</span>
+                    )}
+                  </p>
+                  <div className="flex shrink-0 gap-1" role="group" aria-label="Способ перемещения">
+                    <button
+                      type="button"
+                      onClick={() => setTravelMode('walk')}
+                      className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+                        travelMode === 'walk'
+                          ? 'bg-slate-900 text-white'
+                          : 'border border-slate-200 bg-white text-slate-700'
+                      }`}
+                    >
+                      Пешком
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTravelMode('auto')}
+                      className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+                        travelMode === 'auto'
+                          ? 'bg-slate-900 text-white'
+                          : 'border border-slate-200 bg-white text-slate-700'
+                      }`}
+                    >
+                      Авто
+                    </button>
+                  </div>
+                </div>
+              </div>
+              {/* Desktop: single row */}
+              <div className="hidden items-center justify-between gap-x-3 gap-y-2 sm:flex">
+                <p className="min-w-0 text-sm text-slate-700">
+                  Итого:{' '}
+                  <span className="font-semibold text-slate-900">
+                    {formatDayRouteDistance(totalDistanceMeters)}
+                  </span>
+                  {travelMinutes > 0 ? (
+                    <>
+                      {' '}
+                      · около{' '}
+                      <span className="font-semibold text-slate-900">
+                        {formatDayRouteTravelMinutes(travelMinutes)}
+                      </span>
+                    </>
+                  ) : null}
+                </p>
+                <div className="flex shrink-0 gap-1" role="group" aria-label="Способ перемещения">
+                  <button
+                    type="button"
+                    onClick={() => setTravelMode('walk')}
+                    className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+                      travelMode === 'walk'
+                        ? 'bg-slate-900 text-white'
+                        : 'border border-slate-200 bg-white text-slate-700'
+                    }`}
+                  >
+                    Пешком
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTravelMode('auto')}
+                    className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+                      travelMode === 'auto'
+                        ? 'bg-slate-900 text-white'
+                        : 'border border-slate-200 bg-white text-slate-700'
+                    }`}
+                  >
+                    Авто
+                  </button>
+                </div>
               </div>
             </div>
           ) : null}
