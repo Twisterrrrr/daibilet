@@ -74,7 +74,7 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 ```
 
 - Скрипт сам: `git pull` → **stop** `daibilet-web` → save healthy `.next`→`.next.prev` → `pnpm web:build` (heap 5120Mi, default `EVENT_SSG_TOP_N=40`) → on fail restore `.next.prev`+start web; on ok restart api/web → nginx static/cache hygiene.
-- Event SSG: build-phase public-api retries + soft TimeoutError on `/events/[slug]` (не валит весь build). Override: `EVENT_SSG_TOP_N=100` или `0` (skip event SSG).
+- Event SSG: build-phase public-api retries + soft TimeoutError on `/events/[slug]` (не валит весь build). Override: `EVENT_SSG_TOP_N=100` или `0` (skip event SSG). Runtime: ISR `revalidate=7200` + `unstable_cache` (tags `event-page` / `event-page:{slug}`); on-demand via `POST /api/internal/revalidate` `{ slug }` + Bearer `DAIBILET_NEXT_REVALIDATE_SECRET`.
 - **Не** билдить на SPB `.16` и не тащить `.next` tar с другого хоста.
 - Docs-only / handoff = commit+push **без** web deploy; runtime/UI = commit+push+MSK deploy.
 - SSH: `daibilet-msk` / `daibilet_msk80_key`. Finance `.159` не трогать из catalog deploy.

@@ -22,8 +22,9 @@ import {
 import { isTimeoutError } from '@/server/public-api-client';
 import { listTopEventSlugsForSsg } from '@/server/top-event-slugs';
 
-export const revalidate = 300;
-/** Allow on-demand ISR for slugs not prebuilt. */
+/** ISR: regenerate HTML in background at most every 2h (matches EVENT_PAGE_REVALIDATE). */
+export const revalidate = 7200;
+/** Allow on-demand ISR for slugs not prebuilt (TOP_N SSG; rest fill at runtime). */
 export const dynamicParams = true;
 
 type PageProps = {

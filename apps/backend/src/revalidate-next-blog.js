@@ -1,7 +1,8 @@
 /**
  * POST to Next internal revalidate for arbitrary tags/paths.
+ * Optional `slug` → Next adds `event-page:{slug}` tag + `/events/{slug}` path.
  */
-export async function revalidateNextPaths({ tags = [], paths = [], reason = 'manual' } = {}) {
+export async function revalidateNextPaths({ tags = [], paths = [], slug, reason = 'manual' } = {}) {
   const secret = process.env.DAIBILET_NEXT_REVALIDATE_SECRET?.trim();
   const base = (process.env.DAIBILET_WEB_REVALIDATE_URL || 'http://127.0.0.1:3001').replace(/\/$/, '');
 
@@ -10,13 +11,17 @@ export async function revalidateNextPaths({ tags = [], paths = [], reason = 'man
     return { ok: false, skipped: true, reason: 'missing_secret' };
   }
 
+  const body = { tags, paths };
+  const eventSlug = String(slug || '').trim();
+  if (eventSlug) body.slug = eventSlug;
+
   const response = await fetch(`${base}/api/internal/revalidate`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${secret}`,
     },
-    body: JSON.stringify({ tags, paths }),
+    body: JSON.stringify(body),
   });
 
   const payload = await response.json().catch(() => ({}));
@@ -27,6 +32,21 @@ export async function revalidateNextPaths({ tags = [], paths = [], reason = 'man
 
   console.log(`[revalidate-next] OK (${reason}):`, payload);
   return { ok: true, payload, reason };
+}
+
+/**
+ * Invalidate a single public event page (DTO + ISR HTML).
+ * Prefer this after admin override / price-sensitive updates.
+ */
+export async function revalidateNextEventPage({ slug, reason = 'event update' } = {}) {
+  const eventSlug = String(slug || '').trim();
+  const tags = ['event-page', 'catalog-page'];
+  const paths = ['/events'];
+  if (eventSlug) {
+    tags.push(`event-page:${eventSlug}`);
+    paths.push(`/events/${encodeURIComponent(eventSlug)}`);
+  }
+  return revalidateNextPaths({ tags, paths, slug: eventSlug || undefined, reason });
 }
 
 export async function revalidateNextBlogArticle({

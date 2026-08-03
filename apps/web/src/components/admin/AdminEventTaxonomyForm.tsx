@@ -7,11 +7,12 @@ import type { AdminEventDetailData, AdminTaxonomyData } from '@/server/admin-eve
 
 type Props = {
   eventId: string;
+  eventSlug?: string | null;
   classification: AdminEventDetailData['classification'];
   taxonomy: AdminTaxonomyData;
 };
 
-export function AdminEventTaxonomyForm({ eventId, classification, taxonomy }: Props) {
+export function AdminEventTaxonomyForm({ eventId, eventSlug, classification, taxonomy }: Props) {
   const [categoryId, setCategoryId] = useState(classification.categoryId || '');
   const [primarySubcategoryId, setPrimarySubcategoryId] = useState(
     classification.primarySubcategoryId || '',
@@ -71,6 +72,7 @@ export function AdminEventTaxonomyForm({ eventId, classification, taxonomy }: Pr
       className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
     >
       <input type="hidden" name="id" value={eventId} />
+      <input type="hidden" name="slug" value={eventSlug || ''} />
       {subcategoryIds.map((id) => (
         <input key={`sub-${id}`} type="hidden" name="subcategoryIds" value={id} />
       ))}

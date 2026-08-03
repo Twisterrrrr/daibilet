@@ -818,25 +818,31 @@ export async function handleRequest(request, response) {
 
     const eventOverrideMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/override$/) : null;
     if (eventOverrideMatch) {
-      const result = await updateAdminEventOverride(db, decodeURIComponent(eventOverrideMatch[1]), await readJsonBody(request));
-      invalidatePublicCaches('event override update');
+      const eventId = decodeURIComponent(eventOverrideMatch[1]);
+      const result = await updateAdminEventOverride(db, eventId, await readJsonBody(request));
+      const slugRow = await db.query('select slug from "Event" where id = $1 limit 1', [eventId]).catch(() => null);
+      invalidatePublicCaches('event override update', { slug: slugRow?.rows?.[0]?.slug });
       sendJson(response, result);
       return;
     }
 
     const eventModerationMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/moderation$/) : null;
     if (eventModerationMatch) {
+      const eventId = decodeURIComponent(eventModerationMatch[1]);
       const body = await readJsonBody(request);
-      const result = await updateAdminEventOverride(db, decodeURIComponent(eventModerationMatch[1]), { editorStatus: body.editorStatus });
-      invalidatePublicCaches('event moderation update');
+      const result = await updateAdminEventOverride(db, eventId, { editorStatus: body.editorStatus });
+      const slugRow = await db.query('select slug from "Event" where id = $1 limit 1', [eventId]).catch(() => null);
+      invalidatePublicCaches('event moderation update', { slug: slugRow?.rows?.[0]?.slug });
       sendJson(response, result);
       return;
     }
 
     const eventTaxonomyMatch = request.method === 'PATCH' ? url.pathname.match(/^\/api\/admin\/events\/([^/]+)\/taxonomy$/) : null;
     if (eventTaxonomyMatch) {
-      const result = await updateAdminEventTaxonomy(db, decodeURIComponent(eventTaxonomyMatch[1]), await readJsonBody(request));
-      invalidatePublicCaches('event taxonomy update');
+      const eventId = decodeURIComponent(eventTaxonomyMatch[1]);
+      const result = await updateAdminEventTaxonomy(db, eventId, await readJsonBody(request));
+      const slugRow = await db.query('select slug from "Event" where id = $1 limit 1', [eventId]).catch(() => null);
+      invalidatePublicCaches('event taxonomy update', { slug: slugRow?.rows?.[0]?.slug });
       sendJson(response, result);
       return;
     }
@@ -1224,6 +1230,21 @@ export function registerPublicCacheWarmer(warmer) {
 
 registerPublicCacheInvalidator((reason, options = {}) => {
   clearPublicArticlesDtoCache();
+  const reasonText = String(reason || '');
+  const isEventUpdate = /event\s+(override|moderation|taxonomy|venue|change)/i.test(reasonText);
+  // Catalog sync / warm: full home revalidate. Event admin edits: always bust Next event ISR
+  // (even without warm) so price/schedule changes are not stuck for EVENT_PAGE_REVALIDATE=7200.
+  if (isEventUpdate) {
+    const eventSlug = String(options?.slug || '').trim() || undefined;
+    import('./revalidate-next-blog.js')
+      .then(({ revalidateNextEventPage }) =>
+        revalidateNextEventPage({ slug: eventSlug, reason: reasonText }),
+      )
+      .catch((error) => {
+        console.warn(`Next event revalidate failed: ${error instanceof Error ? error.message : String(error)}`);
+      });
+    return;
+  }
   if (!options?.warm) return;
   import('./revalidate-next-home.js')
     .then(({ revalidateNextHome }) => revalidateNextHome(reason))

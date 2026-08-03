@@ -17,6 +17,7 @@ type LinkRow = {
 
 type Props = {
   eventId: string;
+  eventSlug?: string | null;
   venueLinks: AdminEventDetailData['venueLinks'];
 };
 
@@ -37,7 +38,7 @@ function confidenceBadgeClass(confidence: VenueLinkSuggestion['confidence']) {
   return 'bg-slate-100 text-slate-600';
 }
 
-export function AdminEventVenueLinksForm({ eventId, venueLinks }: Props) {
+export function AdminEventVenueLinksForm({ eventId, eventSlug, venueLinks }: Props) {
   const [rows, setRows] = useState<LinkRow[]>(() => toRows(venueLinks));
   const [suggestions, setSuggestions] = useState<VenueLinkSuggestion[]>([]);
   const [selected, setSelected] = useState<Record<string, boolean>>({});
@@ -127,6 +128,7 @@ export function AdminEventVenueLinksForm({ eventId, venueLinks }: Props) {
       className="space-y-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
     >
       <input type="hidden" name="id" value={eventId} />
+      <input type="hidden" name="slug" value={eventSlug || ''} />
       {rows.map((row, index) => (
         <div key={`link-row-${index}`}>
           <input type="hidden" name="venueIds" value={row.venueId} />

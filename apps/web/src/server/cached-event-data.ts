@@ -1,18 +1,18 @@
 import { unstable_cache } from 'next/cache';
+import { cache } from 'react';
 
 import '@/lib/env';
 import { prisma } from '@/lib/db';
 import { shouldEmitAggregateRating } from '@/lib/review-rating';
 import type { PublicEventPageDto } from '@daibilet/contracts/public';
-import { EVENT_PAGE_CACHE_TAG, PUBLIC_PAGE_REVALIDATE } from '@/server/cache-config';
+import {
+  EVENT_PAGE_CACHE_TAG,
+  EVENT_PAGE_REVALIDATE,
+  eventPageCacheTag,
+} from '@/server/cache-config';
 import { fetchPublicApiJson } from '@/server/public-api-client';
 
-export { EVENT_PAGE_CACHE_TAG };
-
-const eventCacheOptions = {
-  revalidate: PUBLIC_PAGE_REVALIDATE,
-  tags: [EVENT_PAGE_CACHE_TAG] as string[],
-};
+export { EVENT_PAGE_CACHE_TAG, EVENT_PAGE_REVALIDATE, eventPageCacheTag };
 
 function normalizeEventSlug(slug: string): string {
   try {
@@ -23,10 +23,10 @@ function normalizeEventSlug(slug: string): string {
 }
 
 /**
- * Shared cached event DTO for generateMetadata + page (avoids double cold build).
- * Next Data Cache - required for ISR HIT on `/events/[slug]` (Prisma alone stays dynamic).
+ * Shared cached event DTO for generateMetadata + page (avoids double cold fetch).
+ * React `cache` = request memoization; `unstable_cache` = cross-request Data Cache (ISR HIT).
  */
-export async function getCachedPublicEventDto(slug: string) {
+export const getCachedPublicEventDto = cache(async (slug: string) => {
   const key = normalizeEventSlug(slug);
   if (!key) return null;
 
@@ -36,48 +36,54 @@ export async function getCachedPublicEventDto(slug: string) {
         timeoutMs: 5_000,
         notFoundAsNull: true,
       }),
-    // v2: invalidate stale single-session pages after meta-group slot merge.
-    ['public-event-dto-v3-http', key],
-    eventCacheOptions,
+    // v4: 7200s TTL + per-slug tag for on-demand revalidate
+    ['public-event-dto-v4-http', key],
+    {
+      revalidate: EVENT_PAGE_REVALIDATE,
+      tags: [EVENT_PAGE_CACHE_TAG, eventPageCacheTag(key)],
+    },
   );
   return cached();
-}
+});
 
 export type EventAggregateRating = {
   ratingValue: number;
   reviewCount: number;
 };
 
-/** AggregateRating for Event JSON-LD — same TTL/tag as event DTO. */
-export async function getCachedEventAggregateRating(
-  eventId: string,
-): Promise<EventAggregateRating | null> {
-  const id = String(eventId || '').trim();
-  if (!id) return null;
+/** AggregateRating for Event JSON-LD — same TTL; tagged by event id (not public slug). */
+export const getCachedEventAggregateRating = cache(
+  async (eventId: string): Promise<EventAggregateRating | null> => {
+    const id = String(eventId || '').trim();
+    if (!id) return null;
 
-  const cached = unstable_cache(
-    async (): Promise<EventAggregateRating | null> => {
-      try {
-        const approved = await prisma.review.findMany({
-          where: { eventId: id, status: 'APPROVED' },
-          select: { rating: true },
-        });
-        const reviewCount = approved.length;
-        const avgRating =
-          reviewCount > 0
-            ? Math.round(
-                (approved.reduce((sum, row) => sum + row.rating, 0) / reviewCount) * 10,
-              ) / 10
-            : 0;
-        if (!shouldEmitAggregateRating(reviewCount, avgRating)) return null;
-        return { ratingValue: avgRating, reviewCount };
-      } catch {
-        // Migration not applied yet / DB unavailable.
-        return null;
-      }
-    },
-    ['event-aggregate-rating-v1', id],
-    eventCacheOptions,
-  );
-  return cached();
-}
+    const cached = unstable_cache(
+      async (): Promise<EventAggregateRating | null> => {
+        try {
+          const approved = await prisma.review.findMany({
+            where: { eventId: id, status: 'APPROVED' },
+            select: { rating: true },
+          });
+          const reviewCount = approved.length;
+          const avgRating =
+            reviewCount > 0
+              ? Math.round(
+                  (approved.reduce((sum, row) => sum + row.rating, 0) / reviewCount) * 10,
+                ) / 10
+              : 0;
+          if (!shouldEmitAggregateRating(reviewCount, avgRating)) return null;
+          return { ratingValue: avgRating, reviewCount };
+        } catch {
+          // Migration not applied yet / DB unavailable.
+          return null;
+        }
+      },
+      ['event-aggregate-rating-v2', id],
+      {
+        revalidate: EVENT_PAGE_REVALIDATE,
+        tags: [EVENT_PAGE_CACHE_TAG, `event-rating:${id}`],
+      },
+    );
+    return cached();
+  },
+);

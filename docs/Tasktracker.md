@@ -7,6 +7,14 @@
 
 ---
 
+## /events/[slug] runtime ISR (2026-08-04)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| PERF.E3 | ISR `revalidate=7200` + `unstable_cache` TTL + React `cache` | Критический | 🔄 deploy |
+| PERF.E4 | Per-slug tags `event-page:{slug}` + `POST /api/internal/revalidate` `slug` | Критический | 🔄 deploy |
+| PERF.E5 | Backend/admin on-demand revalidate on event override (не ждать 2ч) | Критический | 🔄 deploy |
+
 ## MSK web:build SSG harden (2026-08-04)
 
 | # | Задача | Приоритет | Статус |

@@ -1,13 +1,27 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
 
 import { adminApiFetch } from '@/server/admin-api-fetch';
+import { CATALOG_PAGE_CACHE_TAG, EVENT_PAGE_CACHE_TAG, eventPageCacheTag } from '@/server/cache-config';
 
 function emptyToNull(value: FormDataEntryValue | null): string | null {
   const trimmed = String(value || '').trim();
   return trimmed ? trimmed : null;
+}
+
+/** Bust public `/events/[slug]` Data Cache + HTML after admin edits. */
+function revalidatePublicEventSurfaces(formData: FormData) {
+  revalidateTag(EVENT_PAGE_CACHE_TAG);
+  revalidateTag(CATALOG_PAGE_CACHE_TAG);
+  revalidatePath('/events');
+
+  const slug = String(formData.get('slug') || formData.get('publicSlug') || '').trim();
+  if (slug) {
+    revalidateTag(eventPageCacheTag(slug));
+    revalidatePath(`/events/${encodeURIComponent(slug)}`);
+  }
 }
 
 export async function saveAdminEventOverrideAction(formData: FormData) {
@@ -49,6 +63,7 @@ export async function saveAdminEventOverrideAction(formData: FormData) {
     throw new Error(`override save failed HTTP ${response.status}${text ? `: ${text.slice(0, 200)}` : ''}`);
   }
 
+  revalidatePublicEventSurfaces(formData);
   revalidatePath('/admin/events');
   revalidatePath(`/admin/events/${id}`);
   redirect(`/admin/events/${encodeURIComponent(id)}?saved=${encodeURIComponent(section)}`);
@@ -71,6 +86,7 @@ export async function saveAdminEventModerationAction(formData: FormData) {
     throw new Error(`moderation save failed HTTP ${response.status}${text ? `: ${text.slice(0, 200)}` : ''}`);
   }
 
+  revalidatePublicEventSurfaces(formData);
   revalidatePath('/admin/events');
   revalidatePath(`/admin/events/${id}`);
   redirect(`/admin/events/${encodeURIComponent(id)}?moderation=1`);
@@ -107,6 +123,7 @@ export async function saveAdminEventTaxonomyAction(formData: FormData) {
     throw new Error(`taxonomy save failed HTTP ${response.status}${text ? `: ${text.slice(0, 200)}` : ''}`);
   }
 
+  revalidatePublicEventSurfaces(formData);
   revalidatePath('/admin/events');
   revalidatePath(`/admin/events/${id}`);
   redirect(`/admin/events/${encodeURIComponent(id)}?saved=taxonomy`);
@@ -142,6 +159,7 @@ export async function saveAdminEventVenueLinksAction(formData: FormData) {
     );
   }
 
+  revalidatePublicEventSurfaces(formData);
   revalidatePath('/admin/events');
   revalidatePath(`/admin/events/${id}`);
   redirect(`/admin/events/${encodeURIComponent(id)}?saved=venue-links`);

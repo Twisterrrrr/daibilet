@@ -99,6 +99,7 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
             return (
               <form key={item.status} action={saveAdminEventModerationAction}>
                 <input type="hidden" name="id" value={detail.id} />
+                <input type="hidden" name="slug" value={detail.slug || ''} />
                 <input type="hidden" name="editorStatus" value={item.status} />
                 <button
                   type="submit"
@@ -122,17 +123,23 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
 
       <AdminEventTaxonomyForm
         eventId={detail.id}
+        eventSlug={detail.slug}
         classification={detail.classification}
         taxonomy={taxonomy}
       />
 
-      <AdminEventVenueLinksForm eventId={detail.id} venueLinks={detail.venueLinks} />
+      <AdminEventVenueLinksForm
+        eventId={detail.id}
+        eventSlug={detail.slug}
+        venueLinks={detail.venueLinks}
+      />
 
       <form
         action={saveAdminEventOverrideAction}
         className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
       >
         <input type="hidden" name="id" value={detail.id} />
+        <input type="hidden" name="slug" value={detail.slug || ''} />
         <input type="hidden" name="section" value="content" />
         <h3 className="text-sm font-semibold text-slate-900">Контент (override)</h3>
         <p className="text-xs text-slate-500">
@@ -183,6 +190,7 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
         className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
       >
         <input type="hidden" name="id" value={detail.id} />
+        <input type="hidden" name="slug" value={detail.slug || ''} />
         <input type="hidden" name="section" value="seo" />
         <h3 className="text-sm font-semibold text-slate-900">SEO (override)</h3>
         <div className="grid gap-3 md:grid-cols-2">
@@ -238,6 +246,7 @@ export function AdminEventEditor({ detail, taxonomy, notice }: Props) {
         className="space-y-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
       >
         <input type="hidden" name="id" value={detail.id} />
+        <input type="hidden" name="slug" value={detail.slug || ''} />
         <input type="hidden" name="section" value="media" />
         <h3 className="text-sm font-semibold text-slate-900">Медиа</h3>
         <Field label="imageUrl override">

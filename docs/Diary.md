@@ -1,3 +1,21 @@
+## 2026-08-04 - /events/[slug] runtime ISR 7200 + on-demand revalidate
+
+### Наблюдения
+- После `EVENT_SSG_TOP_N=40` тысячи `/events/[slug]` уходят в runtime; `revalidate=300` + общий tag `event-page` давали частые cold fetch к Public API.
+- Отдельный `/api/revalidate` не нужен: уже есть `POST /api/internal/revalidate` (Bearer `DAIBILET_NEXT_REVALIDATE_SECRET`).
+
+### Решения
+- Page ISR `export const revalidate = 7200`; `EVENT_PAGE_REVALIDATE=7200` в `unstable_cache`.
+- `getCachedPublicEventDto` / rating: React `cache()` + `unstable_cache` + tags `event-page` и `event-page:{slug}`.
+- Internal revalidate принимает `slug` → tag + path `/events/{slug}`.
+- Backend: `revalidateNextEventPage`; admin event updates всегда дергают Next (не только при `warm`); admin forms передают hidden `slug`.
+- `fetchPublicApiJson` остаётся `no-store` внутри `unstable_cache` (Data Cache на уровне Next, не native fetch cache).
+
+### Проблемы
+- Без `DAIBILET_NEXT_REVALIDATE_SECRET` on-demand skip; stale HTML до 2ч. Проверить секрет на MSK после deploy.
+
+---
+
 ## 2026-08-04 - MSK web:build SSG TimeoutError harden
 
 ### Наблюдения

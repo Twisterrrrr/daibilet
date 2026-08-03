@@ -15,7 +15,7 @@ export type UpdateAdminEventOverride = (
 export interface AdminEventsHandlerDependencies {
   db: DbClient;
   updateAdminEventOverride: UpdateAdminEventOverride;
-  invalidatePublicCaches: (reason: string, options?: { warm?: boolean }) => void;
+  invalidatePublicCaches: (reason: string, options?: { warm?: boolean; slug?: string }) => void;
 }
 
 export function createAdminEventsRouteHandler(deps: AdminEventsHandlerDependencies): TypedRouteHandler {
@@ -39,7 +39,12 @@ async function handleEventOverrideUpdate(
 
   const payload = await parseJsonBody(eventOverridePayloadSchema, context.request);
   const result = await deps.updateAdminEventOverride(deps.db, eventId, payload);
-  deps.invalidatePublicCaches('event override update');
+  const slugRow = await deps.db
+    .query('select slug from "Event" where id = $1 limit 1', [eventId])
+    .catch(() => null);
+  deps.invalidatePublicCaches('event override update', {
+    slug: slugRow && 'rows' in slugRow ? (slugRow.rows?.[0] as { slug?: string } | undefined)?.slug : undefined,
+  });
   sendJson(context.response, result);
   return true;
 }
@@ -58,7 +63,12 @@ async function handleEventModerationUpdate(
 
   const payload = await parseJsonBody(eventModerationPayloadSchema, context.request);
   const result = await deps.updateAdminEventOverride(deps.db, eventId, { editorStatus: payload.editorStatus });
-  deps.invalidatePublicCaches('event moderation update');
+  const slugRow = await deps.db
+    .query('select slug from "Event" where id = $1 limit 1', [eventId])
+    .catch(() => null);
+  deps.invalidatePublicCaches('event moderation update', {
+    slug: slugRow && 'rows' in slugRow ? (slugRow.rows?.[0] as { slug?: string } | undefined)?.slug : undefined,
+  });
   sendJson(context.response, result);
   return true;
 }
