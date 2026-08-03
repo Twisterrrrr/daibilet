@@ -7,7 +7,7 @@
 - Обёртка карты `isolate` + focus card / mobile stops rail `z-[1100]` / `z-[1000]`.
 
 ### Проблемы
-- Нет.
+- Нет. MSK tip `fcd656f`, **BUILD_ID=`h8y5jcytDJ7KNTtJnXzBm`**; `/my-day` 200. Warm post-deploy был до готовности :3001 (fetch failed) - web после старта OK.
 
 ---
 

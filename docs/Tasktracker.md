@@ -48,6 +48,7 @@
 | SEO.MYDAY-META | /my-day title+desc+OG package; keep noindex until crawlable content | Высокий | ✅ `31a0dc0` MSK **BUILD_ID=`qZnQ6TqtoJkKtvxVB9mtI`** |
 | UX.MYDAY-LIST-MAP | Mobile list-first + Список/Карта toggle (no sticky 38vh); compact footer | Критический | ✅ `4ffb251` MSK **BUILD_ID=`0Fnc1S9ndw3dPSeEmy2Za`** `/my-day` 200 |
 | UX.MYDAY-CHROME | Mobile: hub link own line; Сетка/Список only lg+; dense list &lt;lg | Высокий | ✅ `4405d36` MSK **BUILD_ID=`RDvpU8E3GRJn5-OE2fLW1`** `/my-day` 200 |
+| UX.MYDAY-FOCUS-Z | Desktop/mobile map focus card above Leaflet (`isolate` + z-1100) | Высокий | ✅ `fcd656f` MSK **BUILD_ID=`h8y5jcytDJ7KNTtJnXzBm`** `/my-day` 200 |
 
 ---
 
