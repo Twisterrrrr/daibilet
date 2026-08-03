@@ -10,7 +10,7 @@
 - Markers: `inset=edge-balance`, `align=v-center`.
 
 ### Проблемы
-- (deploy ниже)
+- Нет. MSK **BUILD_ID=`46gisQhL6nR_0dsiEP3H2`** (`0c75e27`), SMOKE_OK `/my-day` 200; chunk: `edge-balance` / `v-center` / `lg:px-8` / `lg:py-6` / `lg:w-[26rem]`; без `half-center`.
 
 ---
 
