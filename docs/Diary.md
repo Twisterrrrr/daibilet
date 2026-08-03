@@ -124,7 +124,7 @@
 - Marker `data-day-presets=my-day`.
 
 ### Проблемы
-- (deploy ниже)
+- Нет. MSK **BUILD_ID=`cM9j1lcFbpgHSogY-npKs`** (`f280018`), `/my-day` 200; chunk has `inMyDay` / presets wiring.
 
 ---
 

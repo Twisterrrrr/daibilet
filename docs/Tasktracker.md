@@ -26,7 +26,7 @@
 | UX.MYDAY-CITY-HUB | Readiness line: `• Страница {City_Род}` → city hub | Высокий | ✅ `b21531b` MSK **BUILD_ID=`9Y0CrLqmzM7hckZVe2RRb`** `/my-day` 200 |
 | UX.MYDAY-CATALOG-OPEN | «Ещё из каталога»: always open, no card border | Высокий | ✅ `902fb3b` MSK **BUILD_ID=`sgVL2jxb2mwH2VaNjj3fm`** `/my-day` 200 |
 | UX.MYDAY-SEARCH-PROG | Progressive catalog load - search not gated on Promise.all | Высокий | ✅ `33e9ca8` MSK **BUILD_ID=`blIpyGTrMYrwYoh4jkBws`** `/my-day` 200 |
-| UX.MYDAY-PRESETS | «Готовые сценарии» under Hot Picks (cityInfo presets) | Высокий | 🔄 deploy |
+| UX.MYDAY-PRESETS | «Готовые сценарии» under Hot Picks (cityInfo presets) | Высокий | ✅ `f280018` MSK **BUILD_ID=`cM9j1lcFbpgHSogY-npKs`** `/my-day` 200 |
 
 ---
 
