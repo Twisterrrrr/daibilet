@@ -64,6 +64,19 @@
 
 ---
 
+## 2026-08-03 - /my-day: starter right +10px
+
+### Наблюдения
+- Owner: equal-M ок; правый блок опустить на 10px.
+
+### Решения
+- Right col: `lg:translate-y-[10px]`.
+
+### Проблемы
+- (deploy ниже)
+
+---
+
 ## 2026-08-03 - /my-day: starter full-width + equal-M (owner)
 
 ### Наблюдения
