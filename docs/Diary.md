@@ -124,7 +124,7 @@
 - `buildShareMetadata` + `canonical=/my-day`; robots без изменений.
 
 ### Проблемы
-- (deploy ниже)
+- Нет. MSK **BUILD_ID=`qZnQ6TqtoJkKtvxVB9mtI`** (`31a0dc0`), title/desc/og:/robots=noindex verified on `/my-day`.
 
 ---
 
