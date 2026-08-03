@@ -1,3 +1,20 @@
+## 2026-08-04 - Must-see batch7: 6-я точка для 6 городов
+
+### Наблюдения
+- После batch1-6 + NN в `city-hub-content-gaps` оставались ⚠️ (mustSee=5): Казань, Калининград, Владимир, Владивосток, Иркутск, Улан-Удэ.
+- Остальные 60 hubs уже ≥6; dayRoutePresets пока только у НН.
+
+### Решения
+- `must-see-editorial-batch7.json` (6) → merge в `must-see-editorial.json` (база 436).
+- `cityInfo` web+public: #6 slug + short desc; emdash в desc этих городов → `-`.
+- Точки: Кремлёвская наб.; Музей янтаря; Георгиевская; Фуникулёр/Орлиная; Усадьба Сукачева; ул. Ленина.
+- MSK enrich `--apply --file=batch7` + web deploy (ниже).
+
+### Проблемы
+- (MSK apply + BUILD_ID ниже)
+
+---
+
 ## 2026-08-04 - Destinations TTL 86400 + on-demand tag revalidate
 
 ### Наблюдения

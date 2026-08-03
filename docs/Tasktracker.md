@@ -244,6 +244,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | VK.15 | Editorial enrich batch5: Астрахань/Барнаул/Белгород/Благовещенск/Брянск/Иваново/Йошкар-Ола/Калуга/Кемерово/Киров (60) | Высокий | ✅ 60 insert; база 312; mustSee seeded |
 | VK.17 | Nizhny: must-see 30 + gastro 10 + 3 day-route presets | Высокий | ✅ `3b982c9` + hub-gate CLUB_BAR; MSK apply 40 ins |
 | VK.16 | Editorial enrich batch6: Кострома/Курган/Курск/Липецк/Мурманск/Саранск/Смоленск/Сыктывкар/Тамбов/Хабаровск/Чебоксары/Чита/Южно-Сахалинск (78) | Высокий | ✅ 32 ins+46 upd; twins HIDDEN; база 390; BUILD `-qqq_t2f_YXevgHdjOf7E` |
+| VK.18 | Must-see #6 for 6 cities (Казань/Калининград/Владимир/Владивосток/Иркутск/Улан-Удэ) | Высокий | 🔄 commit+MSK apply+deploy |
 
 ## Finance supplier LC smoke (.159) 2026-07-31
 
