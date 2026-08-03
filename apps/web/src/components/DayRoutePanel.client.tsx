@@ -1979,7 +1979,7 @@ function DayRoutePanelInner() {
               </div>
             </div>
             <div
-              className="mt-3 flex w-full flex-col gap-3 max-lg:min-h-0 lg:col-start-4 lg:mt-0 lg:w-[400px] lg:min-w-[20rem] lg:shrink-0"
+              className="mt-3 flex w-full flex-col gap-3 max-lg:min-h-0 lg:col-start-4 lg:mt-0 lg:w-[400px] lg:min-w-[20rem] lg:shrink-0 lg:translate-y-[10px]"
               data-day-starter-right
               data-day-city-search-stack
             >
