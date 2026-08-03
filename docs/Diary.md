@@ -10,7 +10,7 @@
 - Список|Карта (`data-day-mobile-view-toggle`) остаётся на mobile. Drawer Wanderlog - вне скоупа.
 
 ### Проблемы
-- Нет (BUILD_ID после MSK).
+- Нет. MSK **BUILD_ID=`RDvpU8E3GRJn5-OE2fLW1`** (tip `4405d364`), smoke `/my-day` 200. (Deploy retry with `EVENT_SSG_TOP_N=40` after SSG timeout on full top-200.)
 
 ---
 
