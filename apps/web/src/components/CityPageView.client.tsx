@@ -19,7 +19,7 @@ import type { BlogCardDto } from '@/lib/blog-utils';
 import type { FinanceAdmissionListResult } from '@/lib/finance-projection';
 import { venuePageTemplate } from '@/lib/venue-meta';
 import { eventHref, sessionVenueHref, venueHref } from '@/lib/routes';
-import { inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
+import { inCityAccusative, inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
 import { buildCityHubSeoPhrase } from '@/lib/city-hub-seo';
 import { isCityHubSectionHidden, resolveCityHubConfig } from '@/lib/city-hub-config';
 import { matchSightAfficheLink, resolveFeaturedDirections } from '@/lib/city-hub-directions';
@@ -28,7 +28,6 @@ import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
-import { ExpandableBlurb } from '@/components/ExpandableBlurb.client';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
 import { resolveCityInfo, type CityInfoEntry, type CityMustSeeItem } from '@/lib/cityInfo';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
@@ -882,7 +881,7 @@ function CityWhyGoSection({
 }) {
   const hook = guide?.hookFact?.trim();
   // Brief is shown in hero; keep hookFact here. Story cards UI temporarily hidden.
-  // H2 «Зачем ехать в {город}» скрыт: вернуть, когда будет развёрнутое описание города.
+  // H2 «Зачем ехать…» перенесён на секцию главных мест; над фактом заголовок не дублируем.
 
   return (
     <section
@@ -1148,7 +1147,7 @@ function CitySightsSection({
         ? buildFallbackMustSee(city, categories, venues)
         : [];
   if (!places.length && !articles.length) return null;
-  const cityIn = cityInPrepositional(city);
+  const cityInto = cityInAccusative(city);
   const citySlug = city.slug || city.sourceSlug || undefined;
   const landingRows = landings.map((landing) => ({
     slug: landing.slug,
@@ -1173,7 +1172,7 @@ function CitySightsSection({
             : 'text-2xl font-bold text-slate-950'
         }
       >
-        Главные места {cityIn}
+        Зачем ехать {cityInto}
       </h2>
       {places.length ? (
         <CitySightsMustSeeList
@@ -1266,9 +1265,6 @@ function CitySightsMustSeeList({
 
   return (
     <>
-      <h3 className={`mt-4 text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
-        Главные места
-      </h3>
       <MustSeeFilterTabs
         tabs={filterMeta.tabs}
         activeId={activeId}
@@ -1330,14 +1326,11 @@ function CitySightsMustSeeList({
                   <div className={titleClass}>{place.name}</div>
                 )}
                 {blurb ? (
-                  <ExpandableBlurb
-                    text={blurb}
+                  <p
                     className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
-                    clampClassName="sm:line-clamp-2"
-                    buttonClassName={`mt-0.5 text-xs font-semibold underline-offset-2 hover:underline ${
-                      editorial ? 'text-zinc-700' : 'text-primary-700'
-                    }`}
-                  />
+                  >
+                    {blurb}
+                  </p>
                 ) : null}
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {dayRouteItem ? (
@@ -2029,6 +2022,35 @@ function cityInPrepositional(city: PublicCityDto) {
   const name = city.name.trim();
   if (city.type === 'region') return `в регионе ${name}`;
   return inCityPrepositional(name);
+}
+
+function cityInAccusative(city: PublicCityDto) {
+  const bySlug: Record<string, string> = {
+    'sankt-peterburg': 'в Санкт-Петербург',
+    'saint-petersburg': 'в Санкт-Петербург',
+    moscow: 'в Москву',
+    'moskovskaya-oblast': 'в Московскую область',
+    'leningradskaya-oblast': 'в Ленинградскую область',
+    'krasnodarskiy-kray': 'в Краснодарский край',
+    'krasnoyarskiy-kray': 'в Красноярский край',
+    'respublika-tatarstan': 'в Республику Татарстан',
+    'respublika-hakasiya': 'в Республику Хакасия',
+    'respublika-bashkortostan': 'в Республику Башкортостан',
+    'respublika-kareliya': 'в Республику Карелия',
+    'ulyanovskaya-oblast': 'в Ульяновскую область',
+    'habarovskiy-kray': 'в Хабаровский край',
+    'primorskiy-kray': 'в Приморский край',
+    'altayskiy-kray': 'в Алтайский край',
+    'samarskaya-oblast': 'в Самарскую область',
+    'chelyabinskaya-oblast': 'в Челябинскую область',
+    'nizhny-novgorod': 'в Нижний Новгород',
+  };
+  if (bySlug[city.slug]) return bySlug[city.slug];
+  if (city.sourceSlug && bySlug[city.sourceSlug]) return bySlug[city.sourceSlug];
+
+  const name = city.name.trim();
+  if (city.type === 'region') return `в регион ${name}`;
+  return inCityAccusative(name);
 }
 
 function resolveSectionId(hash: string): string {
