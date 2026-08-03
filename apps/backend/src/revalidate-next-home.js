@@ -5,10 +5,12 @@ import { revalidateNextPaths } from './revalidate-next-blog.js';
  */
 export async function revalidateNextHome(reason = 'manual') {
   return revalidateNextPaths({
-    tags: ['home-page', 'catalog-page', 'event-page'],
+    // Include destinations / public-surfaces so catalog sync also busts 24h chrome cache.
+    tags: ['home-page', 'catalog-page', 'event-page', 'destinations', 'public-surfaces'],
     paths: [
       '/',
       '/events',
+      '/cities',
       '/cities/sankt-peterburg',
       '/cities/moscow',
       '/rechnye-progulki',

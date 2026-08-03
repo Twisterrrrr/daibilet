@@ -38,5 +38,11 @@ export const PUBLIC_CACHE_CONTROL = 'public, max-age=60, s-maxage=300, stale-whi
 /** `unstable_cache` tag for /podborki + venues/locations catalog DTOs. */
 export const PUBLIC_SURFACES_CACHE_TAG = 'public-surfaces';
 
+/**
+ * Long-TTL destinations list (SiteLayout chrome /cities index).
+ * On-demand: `POST /api/internal/revalidate` with `{ "tags": ["destinations"] }`.
+ */
+export const DESTINATIONS_CACHE_TAG = 'destinations';
+
 /** `unstable_cache` tag for `/blog` list + hero sidebar enrichment. */
 export const BLOG_PAGE_CACHE_TAG = 'blog-page';

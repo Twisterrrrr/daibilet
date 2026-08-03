@@ -1,3 +1,20 @@
+## 2026-08-04 - Destinations TTL 86400 + on-demand tag revalidate
+
+### Наблюдения
+- Solution 3: `getCachedDestinations` уже `revalidate: 86400` + tags `public-surfaces` / `destinations` (`7835886`), чтобы layout не капил `/events/[slug]` ISR на 300.
+- Admin `PATCH /api/admin/cities/:id` вызывал `invalidatePublicCaches('city update')`, но Next invalidator срабатывал только при `warm` или event-update - destinations Data Cache жил до 24ч без bust.
+
+### Решения
+- `revalidateNextDestinations` → `POST /api/internal/revalidate` tags `destinations`, `public-surfaces`, `home-page` + paths `/`, `/cities`.
+- Invalidator: reason `city update` / `destinations refresh` всегда дергает Next (как `revalidateNextEventPage`).
+- `revalidateNextHome` (catalog warm) тоже включает tags destinations/public-surfaces.
+- Endpoint уже принимает произвольные `tags`; пример: `{ "tags": ["destinations"] }` + Bearer `DAIBILET_NEXT_REVALIDATE_SECRET`.
+
+### Проблемы
+- Нет. Suspense split (Solution 1) не нужен при webhook-backed long TTL.
+
+---
+
 ## 2026-08-04 - /my-day desktop: map focus card above Leaflet
 
 ### Наблюдения

@@ -49,6 +49,18 @@ export async function revalidateNextEventPage({ slug, reason = 'event update' } 
   return revalidateNextPaths({ tags, paths, slug: eventSlug || undefined, reason });
 }
 
+/**
+ * Bust long-TTL destinations Data Cache (SiteLayout /cities) after admin city edits.
+ * Tags match `getCachedDestinations` (`destinations` + `public-surfaces`).
+ */
+export async function revalidateNextDestinations({ reason = 'city update' } = {}) {
+  return revalidateNextPaths({
+    tags: ['destinations', 'public-surfaces', 'home-page'],
+    paths: ['/', '/cities'],
+    reason,
+  });
+}
+
 export async function revalidateNextBlogArticle({
   slug,
   previousSlug,

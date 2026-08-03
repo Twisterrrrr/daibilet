@@ -1232,6 +1232,9 @@ registerPublicCacheInvalidator((reason, options = {}) => {
   clearPublicArticlesDtoCache();
   const reasonText = String(reason || '');
   const isEventUpdate = /event\s+(override|moderation|taxonomy|venue|change)/i.test(reasonText);
+  // Admin city PATCH: always bust Next destinations Data Cache (TTL 86400), not only on warm.
+  const isCityOrDestinationsUpdate =
+    /city\s+update|destinations?\s+refresh/i.test(reasonText);
   // Catalog sync / warm: full home revalidate. Event admin edits: always bust Next event ISR
   // (even without warm) so price/schedule changes are not stuck for EVENT_PAGE_REVALIDATE=7200.
   if (isEventUpdate) {
@@ -1242,6 +1245,18 @@ registerPublicCacheInvalidator((reason, options = {}) => {
       )
       .catch((error) => {
         console.warn(`Next event revalidate failed: ${error instanceof Error ? error.message : String(error)}`);
+      });
+    return;
+  }
+  if (isCityOrDestinationsUpdate) {
+    import('./revalidate-next-blog.js')
+      .then(({ revalidateNextDestinations }) =>
+        revalidateNextDestinations({ reason: reasonText }),
+      )
+      .catch((error) => {
+        console.warn(
+          `Next destinations revalidate failed: ${error instanceof Error ? error.message : String(error)}`,
+        );
       });
     return;
   }

@@ -11,10 +11,14 @@ import {
   PODBORKI_CATEGORIES,
   type PodborkiCategoryMeta,
 } from '@/lib/podborki-categories';
-import { PUBLIC_SURFACES_CACHE_TAG } from '@/server/cache-config';import { fetchPublicApiJson } from '@/server/public-api-client';
+import {
+  DESTINATIONS_CACHE_TAG,
+  PUBLIC_SURFACES_CACHE_TAG,
+} from '@/server/cache-config';
+import { fetchPublicApiJson } from '@/server/public-api-client';
 
 /** Hot catalog DTOs for /podborki, /venues, /locations - short TTL, no Redis yet. */
-export { PUBLIC_SURFACES_CACHE_TAG };
+export { DESTINATIONS_CACHE_TAG, PUBLIC_SURFACES_CACHE_TAG };
 
 const surfaceCacheOptions = {
   revalidate: 600,
@@ -98,8 +102,10 @@ export async function getCachedLandingsCatalog(city = 'all') {
 }
 
 /**
- * Header/footer city list — rarely changes; long TTL so it does not cap page ISR
+ * Header/footer city list — rarely changes; TTL 86400 so it does not cap page ISR
  * (Next takes the minimum revalidate across all `unstable_cache` on the page).
+ * On-demand bust: tag `destinations` via `POST /api/internal/revalidate`
+ * `{ "tags": ["destinations", "public-surfaces"] }` (admin city update / catalog warm).
  */
 export async function getCachedDestinations() {
   return unstable_cache(
@@ -110,7 +116,7 @@ export async function getCachedDestinations() {
     ['public-destinations-v3-http'],
     {
       revalidate: 86_400,
-      tags: [PUBLIC_SURFACES_CACHE_TAG, 'destinations'],
+      tags: [PUBLIC_SURFACES_CACHE_TAG, DESTINATIONS_CACHE_TAG],
     },
   )();
 }
