@@ -11,8 +11,7 @@ import {
   PODBORKI_CATEGORIES,
   type PodborkiCategoryMeta,
 } from '@/lib/podborki-categories';
-import { PUBLIC_PAGE_REVALIDATE, PUBLIC_SURFACES_CACHE_TAG } from '@/server/cache-config';
-import { fetchPublicApiJson } from '@/server/public-api-client';
+import { PUBLIC_SURFACES_CACHE_TAG } from '@/server/cache-config';import { fetchPublicApiJson } from '@/server/public-api-client';
 
 /** Hot catalog DTOs for /podborki, /venues, /locations - short TTL, no Redis yet. */
 export { PUBLIC_SURFACES_CACHE_TAG };
@@ -98,13 +97,22 @@ export async function getCachedLandingsCatalog(city = 'all') {
   return cached();
 }
 
+/**
+ * Header/footer city list — rarely changes; long TTL so it does not cap page ISR
+ * (Next takes the minimum revalidate across all `unstable_cache` on the page).
+ */
 export async function getCachedDestinations() {
-  return unstable_cache(() => fetchPublicApiJson<PublicDestinationsPayload>('/api/public/destinations', {
-    timeoutMs: 3_000,
-  }), ['public-destinations-v2-http'], {
-    ...surfaceCacheOptions,
-    revalidate: PUBLIC_PAGE_REVALIDATE,
-  })();
+  return unstable_cache(
+    () =>
+      fetchPublicApiJson<PublicDestinationsPayload>('/api/public/destinations', {
+        timeoutMs: 3_000,
+      }),
+    ['public-destinations-v3-http'],
+    {
+      revalidate: 86_400,
+      tags: [PUBLIC_SURFACES_CACHE_TAG, 'destinations'],
+    },
+  )();
 }
 
 export async function getCachedVenuesCatalog(family: 'institution' | 'location', limit = 500) {

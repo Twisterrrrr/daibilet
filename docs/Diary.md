@@ -13,6 +13,7 @@
 
 ### Проблемы
 - Без `DAIBILET_NEXT_REVALIDATE_SECRET` on-demand skip; stale HTML до 2ч. Проверить секрет на MSK после deploy.
+- SiteLayout `getCachedDestinations` с TTL 300 занижал page ISR до `s-maxage=300` (Next берёт min по всем cache на странице) → destinations TTL 86400.
 
 ---
 
