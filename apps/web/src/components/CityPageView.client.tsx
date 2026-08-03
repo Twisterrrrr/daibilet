@@ -1268,10 +1268,10 @@ function CitySightsMustSeeList({
         onChange={setFilterId}
         editorial={editorial}
       />
-      {/* Mobile <lg: 85% card + ~15% next-card peek carousel. lg+: multi-col grid. */}
+      {/* Mobile <lg: 85% + ~15% peek. lg+: horizontal rail ~2 cards visible (scroll). */}
       <ol
         key={activeId}
-        className="horizontal-snap-row mt-6 flex touch-pan-x snap-x snap-mandatory gap-3 max-lg:flex-nowrap lg:grid lg:grid-cols-2 lg:gap-x-6 lg:gap-y-5 lg:overflow-visible xl:grid-cols-3"
+        className="horizontal-snap-row mt-6 flex flex-nowrap touch-pan-x snap-x snap-mandatory gap-3 lg:gap-6"
         data-city-must-see-rail
         aria-label="Главные места"
         tabIndex={0}
@@ -1299,7 +1299,7 @@ function CitySightsMustSeeList({
           return (
             <li
               key={`${place.name}:${index}`}
-              className="flex w-[85%] shrink-0 snap-start gap-3 max-lg:min-w-[85%] lg:w-auto lg:min-w-0 lg:shrink"
+              className="flex w-[85%] min-w-[85%] shrink-0 snap-start gap-3 lg:w-[calc((100%-1.5rem)/2)] lg:min-w-[calc((100%-1.5rem)/2)]"
               data-city-must-see-card
             >
               <span
