@@ -11,7 +11,7 @@
 - MSK enrich `--apply --file=batch7` + web deploy (ниже).
 
 ### Проблемы
-- (MSK apply + BUILD_ID ниже)
+- Нет. MSK apply **6 insert**; tip `5b724f4`; **BUILD_ID=`dtrpt-eetyBWyJA8DG1ye`**. Smoke 6/6 hubs 200 + slug titles; `/locations/kazan-kremlevskaya-naberezhnaya`, `/venues/kaliningrad-muzey-yantarya`, `/locations/vladivostok-funikulyor` 200. Post-deploy hub warm был до подъёма :3001 (fetch failed) - после старта OK.
 
 ---
 
