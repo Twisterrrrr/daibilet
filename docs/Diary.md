@@ -59,7 +59,7 @@
 - Markers: `max=6xl`, `inset=mock`, `align=between-center`, `form-w=400px`.
 
 ### Проблемы
-- (deploy ниже)
+- Нет. MSK **BUILD_ID=`WuO0reHDHKNjur8ruOh1i`** (`d9076f5`), SMOKE_OK `/my-day` 200; mock: `max-w-6xl` / `md:w-[400px]` / `between-center`.
 
 ---
 
