@@ -1,3 +1,20 @@
+## 2026-08-03 - City hub «Главные места»: restore desktop horizontal rail
+
+### Наблюдения
+- Owner: «а зачем ты убрал прокрутку для десктопа для Главных мест по 2 штуки?» - `lg:grid` убил overflow-x scroll.
+- Нужно: mobile 85/15 peek оставить; desktop снова horizontal rail с ~2 карточками в кадре.
+
+### Решения
+- Убран `lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:overflow-visible`.
+- Rail: `horizontal-snap-row flex flex-nowrap snap-x gap-3 lg:gap-6`.
+- Cards: mobile `w-[85%] min-w-[85%]`; desktop `lg:w-[calc((100%-1.5rem)/2)] lg:min-w-[calc((100%-1.5rem)/2)]` (~2 cards, gap-6).
+- Фильтры / «В маршрут» / blurbs / нумерация без изменений.
+
+### Проблемы
+- Нет. MSK **BUILD_ID=`t_kK0qCtPxhAPUbMfhjdg`** (`ce3afd2`), SMOKE_OK `/cities/nizhniy-novgorod` 200; SSR: `w-[85%]` / `min-w-[85%]` / `lg:w-[calc((100%-1.5rem)/2)]` / `lg:min-w-[calc((100%-1.5rem)/2)]`; без `lg:grid` / `grid-rows-2`.
+
+---
+
 ## 2026-08-03 - /my-day: starter edge-balance + v-center
 
 ### Наблюдения
