@@ -9,7 +9,7 @@
 - Tab «Зачем ехать» / `#about` по наличию hookFact.
 
 ### Проблемы
-- Deploy/BUILD_ID - после MSK `deploy-prod-next.sh`.
+- Нет. MSK **BUILD_ID=`DDNYHaaqzcrNwwq6UfUrd`** (`31b5a8b0`), SMOKE_OK `/cities/moscow` 200; hero brief после H1; «Истории города» отсутствует; hub warm transient fetch failed (web restart mid-warm) - сервис active.
 
 ---
 
