@@ -19,7 +19,7 @@ import type { BlogCardDto } from '@/lib/blog-utils';
 import type { FinanceAdmissionListResult } from '@/lib/finance-projection';
 import { venuePageTemplate } from '@/lib/venue-meta';
 import { eventHref, sessionVenueHref, venueHref } from '@/lib/routes';
-import { inCityAccusative, inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
+import { inCityPrepositional, cityToGenitive } from '@/lib/city-declension';
 import { buildCityHubSeoPhrase } from '@/lib/city-hub-seo';
 import { isCityHubSectionHidden, resolveCityHubConfig } from '@/lib/city-hub-config';
 import { matchSightAfficheLink, resolveFeaturedDirections } from '@/lib/city-hub-directions';
@@ -257,11 +257,7 @@ export function CityPageView({
             <CityStickyTabs tabs={tabs} editorial={editorial} />
 
             {hasAbout ? (
-              <CityWhyGoSection
-                guide={guide}
-                editorial={editorial}
-                cityInto={cityInAccusative(city)}
-              />
+              <CityWhyGoSection guide={guide} editorial={editorial} />
             ) : null}
 
             {showSightsBlock ? (
@@ -880,14 +876,13 @@ function DateFilterChips({
 function CityWhyGoSection({
   guide,
   editorial = false,
-  cityInto,
 }: {
   guide: CityInfoEntry | null;
   editorial?: boolean;
-  cityInto: string;
 }) {
   const hook = guide?.hookFact?.trim();
   // Brief is shown in hero; keep hookFact here. Story cards UI temporarily hidden.
+  // H2 «Зачем ехать в {город}» скрыт: вернуть, когда будет развёрнутое описание города.
 
   return (
     <section
@@ -895,26 +890,16 @@ function CityWhyGoSection({
       className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
     >
       <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
-        <h2
-          className={
-            editorial
-              ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
-              : 'text-2xl font-bold text-slate-950'
-          }
-        >
-          Зачем ехать {cityInto}
-        </h2>
-
         {hook ? (
           <div
-            className={`mt-5 rounded-2xl px-5 py-4 sm:px-6 sm:py-5 ${
+            className={`rounded-2xl px-5 py-4 sm:px-6 sm:py-5 ${
               editorial
                 ? 'bg-amber-50 ring-1 ring-amber-200/80'
                 : 'bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 ring-1 ring-amber-200/70'
             }`}
           >
-            <p className={`text-xs font-semibold uppercase tracking-wide ${editorial ? 'text-amber-800' : 'text-amber-800'}`}>
-              Факт дня
+            <p className={`text-xs font-semibold ${editorial ? 'text-amber-800' : 'text-amber-800'}`}>
+              Интересный факт
             </p>
             <p
               className={`mt-2 max-w-3xl text-sm leading-6 ${
@@ -2044,34 +2029,6 @@ function cityInPrepositional(city: PublicCityDto) {
   const name = city.name.trim();
   if (city.type === 'region') return `в регионе ${name}`;
   return inCityPrepositional(name);
-}
-
-function cityInAccusative(city: PublicCityDto) {
-  const bySlug: Record<string, string> = {
-    'sankt-peterburg': 'в Санкт-Петербург',
-    'saint-petersburg': 'в Санкт-Петербург',
-    moscow: 'в Москву',
-    'moskovskaya-oblast': 'в Московскую область',
-    'leningradskaya-oblast': 'в Ленинградскую область',
-    'krasnodarskiy-kray': 'в Краснодарский край',
-    'krasnoyarskiy-kray': 'в Красноярский край',
-    'respublika-tatarstan': 'в Республику Татарстан',
-    'respublika-hakasiya': 'в Республику Хакасия',
-    'respublika-bashkortostan': 'в Республику Башкортостан',
-    'respublika-kareliya': 'в Республику Карелия',
-    'ulyanovskaya-oblast': 'в Ульяновскую область',
-    'habarovskiy-kray': 'в Хабаровский край',
-    'primorskiy-kray': 'в Приморский край',
-    'altayskiy-kray': 'в Алтайский край',
-    'samarskaya-oblast': 'в Самарскую область',
-    'chelyabinskaya-oblast': 'в Челябинскую область',
-  };
-  if (bySlug[city.slug]) return bySlug[city.slug];
-  if (city.sourceSlug && bySlug[city.sourceSlug]) return bySlug[city.sourceSlug];
-
-  const name = city.name.trim();
-  if (city.type === 'region') return `в регион ${name}`;
-  return inCityAccusative(name);
 }
 
 function resolveSectionId(hash: string): string {
