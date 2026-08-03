@@ -10,7 +10,7 @@
 - Card equal `py-*` (sym); mobile compact A без изменений. Markers: `inset=half-center`, `align=half`.
 
 ### Проблемы
-- Нет. MSK BUILD_ID после deploy (см. Tasktracker).
+- Нет. MSK **BUILD_ID=`Nh-E3RXywMq_-DpzDLdBS`** (`5a15fa0`), SMOKE_OK; chunks: `half-center` / `lg:grid-cols-2` / `day-starter-left` / `day-starter-right` / `lg:w-[26rem]` / `pl-5`.
 
 ---
 
