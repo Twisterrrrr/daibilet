@@ -1268,114 +1268,112 @@ function CitySightsMustSeeList({
         onChange={setFilterId}
         editorial={editorial}
       />
-      {/* 2-row horizontal rail: scroll sideways instead of a tall vertical stack. */}
-      <div
-        className="horizontal-snap-row mt-6 touch-pan-x snap-x snap-mandatory"
+      {/* Mobile <lg: 85% card + ~15% next-card peek carousel. lg+: multi-col grid. */}
+      <ol
+        key={activeId}
+        className="horizontal-snap-row mt-6 flex touch-pan-x snap-x snap-mandatory gap-3 max-lg:flex-nowrap lg:grid lg:grid-cols-2 lg:gap-x-6 lg:gap-y-5 lg:overflow-visible xl:grid-cols-3"
         data-city-must-see-rail
-        role="region"
         aria-label="Главные места"
         tabIndex={0}
       >
-        <ol className="grid w-max auto-cols-[min(18.75rem,calc(100vw-2.75rem))] grid-flow-col grid-rows-2 items-start gap-x-5 gap-y-5">
-          {visiblePlaces.map((place, index) => {
-            const afficheLink = matchSightAfficheLink({
-              sightName: place.name,
-              sightDesc: place.desc,
-              landings: landingRows,
-              categories,
-              citySlug,
-            });
-            const placeHref = resolveCityPlaceTitleHref(place, venues);
-            const dayRouteItem = dayRouteItemFromMustSee(place, venues, city);
-            const matchedVenue = venues.find((venue) => {
-              const slug = String(place.venueSlug || place.locationSlug || '').trim();
-              return slug && String(venue.slug || '').trim() === slug;
-            });
-            const blurb = String(
-              matchedVenue?.hookFact || matchedVenue?.shortDescription || place.desc || '',
-            )
-              .trim()
-              .replace(/\s+/g, ' ')
-              .replace(/[—–]/g, '-');
-            return (
-              <li
-                key={`${place.name}:${index}`}
-                className="flex w-full snap-start gap-3"
-                data-city-must-see-card
+        {visiblePlaces.map((place, index) => {
+          const afficheLink = matchSightAfficheLink({
+            sightName: place.name,
+            sightDesc: place.desc,
+            landings: landingRows,
+            categories,
+            citySlug,
+          });
+          const placeHref = resolveCityPlaceTitleHref(place, venues);
+          const dayRouteItem = dayRouteItemFromMustSee(place, venues, city);
+          const matchedVenue = venues.find((venue) => {
+            const slug = String(place.venueSlug || place.locationSlug || '').trim();
+            return slug && String(venue.slug || '').trim() === slug;
+          });
+          const blurb = String(
+            matchedVenue?.hookFact || matchedVenue?.shortDescription || place.desc || '',
+          )
+            .trim()
+            .replace(/\s+/g, ' ')
+            .replace(/[—–]/g, '-');
+          return (
+            <li
+              key={`${place.name}:${index}`}
+              className="flex w-[85%] shrink-0 snap-start gap-3 max-lg:min-w-[85%] lg:w-auto lg:min-w-0 lg:shrink"
+              data-city-must-see-card
+            >
+              <span
+                className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                  editorial ? 'bg-zinc-100 text-zinc-800' : 'bg-primary-50 text-primary-700'
+                }`}
               >
-                <span
-                  className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                    editorial ? 'bg-zinc-100 text-zinc-800' : 'bg-primary-50 text-primary-700'
-                  }`}
-                >
-                  {index + 1}
-                </span>
-                <div className="min-w-0 flex-1">
-                  {placeHref ? (
-                    <Link
-                      href={placeHref}
-                      className={`${titleClass} underline decoration-slate-300 underline-offset-2 hover:decoration-current`}
-                      data-city-must-see-title
-                    >
-                      {place.name}
-                    </Link>
-                  ) : (
-                    <div className={titleClass}>{place.name}</div>
-                  )}
-                  {blurb ? (
-                    <ExpandableBlurb
-                      text={blurb}
-                      className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
-                      clampClassName="sm:line-clamp-2"
-                      buttonClassName={`mt-0.5 text-xs font-semibold underline-offset-2 hover:underline ${
-                        editorial ? 'text-zinc-700' : 'text-primary-700'
-                      }`}
+                {index + 1}
+              </span>
+              <div className="min-w-0 flex-1">
+                {placeHref ? (
+                  <Link
+                    href={placeHref}
+                    className={`${titleClass} underline decoration-slate-300 underline-offset-2 hover:decoration-current`}
+                    data-city-must-see-title
+                  >
+                    {place.name}
+                  </Link>
+                ) : (
+                  <div className={titleClass}>{place.name}</div>
+                )}
+                {blurb ? (
+                  <ExpandableBlurb
+                    text={blurb}
+                    className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
+                    clampClassName="sm:line-clamp-2"
+                    buttonClassName={`mt-0.5 text-xs font-semibold underline-offset-2 hover:underline ${
+                      editorial ? 'text-zinc-700' : 'text-primary-700'
+                    }`}
+                  />
+                ) : null}
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  {dayRouteItem ? (
+                    <AddToDayRouteButton
+                      compact
+                      className="!min-h-9 !px-2.5 !py-1.5 !text-[11px]"
+                      venue={dayRouteItem}
                     />
                   ) : null}
-                  <div className="mt-2 flex flex-wrap items-center gap-2">
-                    {dayRouteItem ? (
-                      <AddToDayRouteButton
-                        compact
-                        className="!min-h-9 !px-2.5 !py-1.5 !text-[11px]"
-                        venue={dayRouteItem}
-                      />
-                    ) : null}
-                    {afficheLink ? (
-                      afficheLink.href.startsWith('#') ? (
-                        <a
-                          href={afficheLink.href}
-                          onClick={(event) => {
-                            event.preventDefault();
-                            scrollToSection(afficheLink.href.replace(/^#/, ''));
-                          }}
-                          className={`inline-flex text-sm font-semibold ${
-                            editorial
-                              ? 'text-zinc-700 hover:text-zinc-950'
-                              : 'text-primary-700 hover:text-primary-800'
-                          }`}
-                        >
-                          {afficheLink.label} →
-                        </a>
-                      ) : (
-                        <Link
-                          href={afficheLink.href}
-                          className={`inline-flex text-sm font-semibold ${
-                            editorial
-                              ? 'text-zinc-700 hover:text-zinc-950'
-                              : 'text-primary-700 hover:text-primary-800'
-                          }`}
-                        >
-                          {afficheLink.label} →
-                        </Link>
-                      )
-                    ) : null}
-                  </div>
+                  {afficheLink ? (
+                    afficheLink.href.startsWith('#') ? (
+                      <a
+                        href={afficheLink.href}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          scrollToSection(afficheLink.href.replace(/^#/, ''));
+                        }}
+                        className={`inline-flex text-sm font-semibold ${
+                          editorial
+                            ? 'text-zinc-700 hover:text-zinc-950'
+                            : 'text-primary-700 hover:text-primary-800'
+                        }`}
+                      >
+                        {afficheLink.label} →
+                      </a>
+                    ) : (
+                      <Link
+                        href={afficheLink.href}
+                        className={`inline-flex text-sm font-semibold ${
+                          editorial
+                            ? 'text-zinc-700 hover:text-zinc-950'
+                            : 'text-primary-700 hover:text-primary-800'
+                        }`}
+                      >
+                        {afficheLink.label} →
+                      </Link>
+                    )
+                  ) : null}
                 </div>
-              </li>
-            );
-          })}
-        </ol>
-      </div>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
       <CityDayPresetBlock
         places={places}
         venues={venues}

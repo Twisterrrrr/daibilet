@@ -1,3 +1,20 @@
+## 2026-08-03 - City hub «Главные места»: mobile 85/15 carousel
+
+### Наблюдения
+- Owner: на mobile «Главные места» была 2-row horizontal grid (`grid-rows-2`) - узкие колонки и обрезанная соседняя колонка вместо нормального свайпа.
+- Нужна карусель: одна карточка ~85% ширины контейнера, справа peek ~15% следующей; desktop - обычная сетка.
+
+### Решения
+- `CitySightsMustSeeList`: `ol[data-city-must-see-rail]` = scrollport (`horizontal-snap-row` + `flex snap-x snap-mandatory`).
+- Mobile: card `w-[85%] min-w-[85%] shrink-0 snap-start` + `gap-3` → peek следующей справа.
+- `lg+`: `lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:overflow-visible`; card `lg:w-auto lg:min-w-0`.
+- Фильтры / «В маршрут» / ExpandableBlurb / нумерация без изменений; `key={activeId}` сбрасывает scroll при смене таба.
+
+### Проблемы
+- Нет (deploy/BUILD_ID ниже после MSK).
+
+---
+
 ## 2026-08-03 - /my-day: starter independent half-centering
 
 ### Наблюдения
