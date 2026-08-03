@@ -1940,31 +1940,32 @@ function DayRoutePanelInner() {
     if (asStarter) {
       return (
         <section
-          className="mt-3 w-full rounded-2xl border border-slate-200 bg-white max-lg:py-3.5 sm:mt-5 sm:max-lg:py-4 lg:py-5"
+          className="mt-3 w-full rounded-2xl border border-slate-200 bg-white max-lg:py-3.5 sm:mt-5 sm:max-lg:py-4 lg:px-8 lg:py-6 xl:px-10"
           ref={unifiedSearchRef}
           data-day-unified-search
           data-day-starter="1"
           data-day-starter-variant="a"
           data-day-starter-desktop="two-col"
           data-day-starter-max="full"
-          data-day-starter-inset="half-center"
+          data-day-starter-inset="edge-balance"
           data-day-starter-pad="sym"
           data-day-starter-density="compact"
           data-day-starter-geometry="stable"
-          data-day-starter-align="half"
+          data-day-starter-align="v-center"
           data-day-starter-form-w="26rem"
         >
           {/*
             Mobile: shared px column; card equal py only (pt === pb).
-            Desktop lg+: two equal halves; each half centers its own content.
-            Right form ~26rem (~+30% vs 20rem); group centered in right half.
+            Desktop lg+: row, items-center (form group vertically centered),
+            justify-between + equal side px so right inset ≈ air from left copy.
+            Right form ~26rem.
           */}
           <div
-            className="flex w-full flex-col max-lg:mx-auto max-lg:max-w-md max-lg:px-3.5 sm:max-lg:px-5 lg:grid lg:grid-cols-2 lg:items-center"
+            className="flex w-full flex-col max-lg:mx-auto max-lg:max-w-md max-lg:px-3.5 sm:max-lg:px-5 lg:flex-row lg:items-center lg:justify-between lg:gap-8 xl:gap-10"
             data-day-plan-starter
           >
             <div
-              className="flex min-w-0 max-lg:w-full lg:items-center lg:justify-center"
+              className="flex min-w-0 max-lg:w-full lg:items-center"
               data-day-starter-left
             >
               <div className="min-w-0" data-day-starter-copy>
@@ -1990,11 +1991,11 @@ function DayRoutePanelInner() {
               </div>
             </div>
             <div
-              className="mt-3 flex w-full max-lg:min-h-0 lg:mt-0 lg:items-center lg:justify-center"
+              className="mt-3 flex w-full max-lg:min-h-0 lg:mt-0 lg:w-[26rem] lg:min-w-[21rem] lg:shrink-0 lg:items-center"
               data-day-starter-right
             >
               <div
-                className="flex w-full flex-col gap-2.5 lg:w-[26rem] lg:min-w-[21rem]"
+                className="flex w-full flex-col gap-2.5"
                 data-day-city-search-stack
               >
                 <div data-day-city-picker className="w-full text-left">

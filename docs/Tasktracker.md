@@ -7,6 +7,14 @@
 
 ---
 
+## /my-day starter geometry (2026-08-03)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.MYDAY-STARTER-EDGE | Desktop empty starter: form v-center + edge-balance inset (не half-center) | Высокий | 🔄 deploy |
+
+---
+
 ## /my-day map split (2026-08-02)
 
 | # | Задача | Приоритет | Статус |

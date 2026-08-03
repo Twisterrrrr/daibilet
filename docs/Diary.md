@@ -1,3 +1,19 @@
+## 2026-08-03 - /my-day: starter edge-balance + v-center
+
+### Наблюдения
+- Owner (desktop скрин): правая группа полей не оптически по центру по высоте; half-center (`grid-cols-2` + center в каждой половине) раздувает правый inset на wide.
+- Нужны: вертикальный центр формы в карточке + умеренный отступ справа ≈ воздух от левого copy.
+
+### Решения
+- Desktop: `lg:flex-row lg:items-center lg:justify-between` + equal side `lg:px-8 xl:px-10` / `lg:py-6`; form `lg:w-[26rem] shrink-0`.
+- Left copy left-aligned (без half `justify-center`); mobile stack A без изменений.
+- Markers: `inset=edge-balance`, `align=v-center`.
+
+### Проблемы
+- (deploy ниже)
+
+---
+
 ## 2026-08-03 - City hub «Главные места»: mobile 85/15 carousel
 
 ### Наблюдения
