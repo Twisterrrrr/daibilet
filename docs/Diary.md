@@ -1,3 +1,19 @@
+## 2026-08-03 - /my-day: starter independent half-centering
+
+### Наблюдения
+- Owner (скрин с красной mid-line): equal-M `1fr auto 1fr auto 1fr` держит copy и form у midline - в каждой половине контент «прилипает» к центру карточки, а не к центру своей половины.
+
+### Решения
+- Desktop: `lg:grid-cols-2 lg:items-center` - две равные половины.
+- Left: `data-day-starter-left` = `flex … lg:items-center lg:justify-center` вокруг copy-блока.
+- Right: `data-day-starter-right` = тот же half-center; form stack `lg:w-[26rem]` центрируется как группа.
+- Card equal `py-*` (sym); mobile compact A без изменений. Markers: `inset=half-center`, `align=half`.
+
+### Проблемы
+- Нет. MSK BUILD_ID после deploy (см. Tasktracker).
+
+---
+
 ## 2026-08-03 - /locations/stadion-polet soft-404
 
 ### Наблюдения

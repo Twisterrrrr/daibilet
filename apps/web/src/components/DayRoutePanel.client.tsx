@@ -1947,93 +1947,103 @@ function DayRoutePanelInner() {
           data-day-starter-variant="a"
           data-day-starter-desktop="two-col"
           data-day-starter-max="full"
-          data-day-starter-inset="equal-m"
+          data-day-starter-inset="half-center"
           data-day-starter-pad="sym"
           data-day-starter-density="compact"
           data-day-starter-geometry="stable"
-          data-day-starter-align="col"
+          data-day-starter-align="half"
           data-day-starter-form-w="26rem"
         >
           {/*
             Mobile: shared px column; card equal py only (pt === pb).
-            Desktop lg+: 1fr auto 1fr auto 1fr equal-M (edge M = middle M).
-            Right auto col ~30% wider (20rem → 26rem); no min-h (equal py only).
+            Desktop lg+: two equal halves; each half centers its own content.
+            Right form ~26rem (~+30% vs 20rem); group centered in right half.
           */}
           <div
-            className="flex w-full flex-col max-lg:mx-auto max-lg:max-w-md max-lg:px-3.5 sm:max-lg:px-5 lg:grid lg:grid-cols-[1fr_auto_1fr_auto_1fr] lg:items-center"
+            className="flex w-full flex-col max-lg:mx-auto max-lg:max-w-md max-lg:px-3.5 sm:max-lg:px-5 lg:grid lg:grid-cols-2 lg:items-center"
             data-day-plan-starter
           >
-            <div className="min-w-0 max-lg:w-full lg:col-start-2" data-day-starter-copy>
-              <div className="flex items-center gap-2.5">
-                <div
-                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-500"
-                  aria-hidden
-                >
-                  <Route className="h-5 w-5" />
+            <div
+              className="flex min-w-0 max-lg:w-full lg:items-center lg:justify-center"
+              data-day-starter-left
+            >
+              <div className="min-w-0" data-day-starter-copy>
+                <div className="flex items-center gap-2.5">
+                  <div
+                    className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-50 text-slate-500"
+                    aria-hidden
+                  >
+                    <Route className="h-5 w-5" />
+                  </div>
+                  <p className="text-base font-bold leading-snug text-slate-900 sm:text-lg">
+                    Собери свой день
+                  </p>
                 </div>
-                <p className="text-base font-bold leading-snug text-slate-900 sm:text-lg">
-                  Собери свой день
+                <p className="mt-1.5 text-[12px] font-normal leading-snug text-slate-500 sm:max-lg:whitespace-nowrap sm:text-[13px] lg:hidden">
+                  Выбери город и минимум {DAY_ROUTE_MIN} точки для составления маршрута
+                </p>
+                <p className="mt-1.5 hidden text-[13px] font-normal leading-snug text-slate-500 lg:block">
+                  Выбери город и минимум {DAY_ROUTE_MIN} точки
+                  <br />
+                  для составления маршрута
                 </p>
               </div>
-              <p className="mt-1.5 text-[12px] font-normal leading-snug text-slate-500 sm:max-lg:whitespace-nowrap sm:text-[13px] lg:hidden">
-                Выбери город и минимум {DAY_ROUTE_MIN} точки для составления маршрута
-              </p>
-              <p className="mt-1.5 hidden text-[13px] font-normal leading-snug text-slate-500 lg:block">
-                Выбери город и минимум {DAY_ROUTE_MIN} точки
-                <br />
-                для составления маршрута
-              </p>
             </div>
             <div
-              className="mt-3 flex w-full flex-col gap-2.5 max-lg:min-h-0 lg:col-start-4 lg:mt-0 lg:w-[26rem] lg:min-w-[21rem] lg:justify-center"
-              data-day-city-search-stack
+              className="mt-3 flex w-full max-lg:min-h-0 lg:mt-0 lg:items-center lg:justify-center"
+              data-day-starter-right
             >
-              <div data-day-city-picker className="w-full text-left">
-                <CityPicker
-                  cities={destinations}
-                  value={selectedCity?.cityValue || 'all'}
-                  onChange={(name) => {
-                    selectedCity?.setCity(name);
-                    if (name !== 'all') setCityInput(name);
-                  }}
-                  allLabel="Выберите город"
-                  variant="hero"
-                  className="w-full"
-                />
-              </div>
-              <div className="w-full text-left">
-                <DayRouteSearchSelect
-                  label="Поиск"
-                  hideLabel
-                  placeholder="Найти место или событие"
-                  emptyText={
-                    !hasPageCity
-                      ? 'Сначала выберите город'
-                      : catalogLoading
-                        ? 'Загружаем…'
-                        : catalogError || 'Ничего не найдено'
-                  }
-                  loading={hasPageCity ? catalogLoading : false}
-                  disabled={!hasPageCity || atMax}
-                  options={hasPageCity ? unifiedSearchOptions : []}
-                  onPick={pickUnifiedSearch}
-                  onQueryChange={setUnifiedSearchQuery}
-                />
-                {hasPageCity && catalogError ? (
-                  <p className="mt-1.5 mb-0 pl-4 text-left text-xs font-medium text-rose-700" role="status">
-                    {catalogError}
+              <div
+                className="flex w-full flex-col gap-2.5 lg:w-[26rem] lg:min-w-[21rem]"
+                data-day-city-search-stack
+              >
+                <div data-day-city-picker className="w-full text-left">
+                  <CityPicker
+                    cities={destinations}
+                    value={selectedCity?.cityValue || 'all'}
+                    onChange={(name) => {
+                      selectedCity?.setCity(name);
+                      if (name !== 'all') setCityInput(name);
+                    }}
+                    allLabel="Выберите город"
+                    variant="hero"
+                    className="w-full"
+                  />
+                </div>
+                <div className="w-full text-left">
+                  <DayRouteSearchSelect
+                    label="Поиск"
+                    hideLabel
+                    placeholder="Найти место или событие"
+                    emptyText={
+                      !hasPageCity
+                        ? 'Сначала выберите город'
+                        : catalogLoading
+                          ? 'Загружаем…'
+                          : catalogError || 'Ничего не найдено'
+                    }
+                    loading={hasPageCity ? catalogLoading : false}
+                    disabled={!hasPageCity || atMax}
+                    options={hasPageCity ? unifiedSearchOptions : []}
+                    onPick={pickUnifiedSearch}
+                    onQueryChange={setUnifiedSearchQuery}
+                  />
+                  {hasPageCity && catalogError ? (
+                    <p className="mt-1.5 mb-0 pl-4 text-left text-xs font-medium text-rose-700" role="status">
+                      {catalogError}
+                    </p>
+                  ) : null}
+                  <p className="mt-1.5 mb-0 block pl-5 text-left text-[12px] leading-tight text-slate-500">
+                    или{' '}
+                    <button
+                      type="button"
+                      onClick={openTextForm}
+                      className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
+                    >
+                      добавь своё место
+                    </button>
                   </p>
-                ) : null}
-                <p className="mt-1.5 mb-0 block pl-5 text-left text-[12px] leading-tight text-slate-500">
-                  или{' '}
-                  <button
-                    type="button"
-                    onClick={openTextForm}
-                    className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
-                  >
-                    добавь своё место
-                  </button>
-                </p>
+                </div>
               </div>
             </div>
           </div>
