@@ -22,7 +22,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.MYDAY-STARTER-EDGE | Desktop empty starter: full (=header) + equal-M L/mid/R | Высокий | 🔄 deploy |
+| UX.MYDAY-STARTER-EDGE | Desktop empty starter: full (=header) + equal-M L/mid/R | Высокий | ✅ `8c9d427` MSK **BUILD_ID=`mHjJgyoGso3NrFan4glCI`** `/my-day` 200 |
 
 ---
 

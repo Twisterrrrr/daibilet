@@ -76,7 +76,7 @@
 - Markers: `inset=equal-m`, `align=col`, `form-w=400px`.
 
 ### Проблемы
-- (deploy ниже)
+- Нет. MSK **BUILD_ID=`mHjJgyoGso3NrFan4glCI`** (`8c9d427`), `/my-day` 200; chunk: `equal-m` / `1fr_auto_1fr_auto_1fr` / `lg:w-[400px]`; без `max-w-6xl`.
 
 ---
 
