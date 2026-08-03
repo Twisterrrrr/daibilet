@@ -14,6 +14,7 @@
 ### Проблемы
 - Без `DAIBILET_NEXT_REVALIDATE_SECRET` on-demand skip; stale HTML до 2ч. Проверить секрет на MSK после deploy.
 - SiteLayout `getCachedDestinations` с TTL 300 занижал page ISR до `s-maxage=300` (Next берёт min по всем cache на странице) → destinations TTL 86400.
+- Live: tip `7835886`, **BUILD_ID=`wxgo6Jh1AliLT36-1eoqe`**; smoke `s-maxage=7200` HIT; `POST /api/internal/revalidate` `{slug}` → tags `event-page` + `event-page:{slug}`.
 
 ---
 

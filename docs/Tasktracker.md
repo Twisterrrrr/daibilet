@@ -11,9 +11,10 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| PERF.E3 | ISR `revalidate=7200` + `unstable_cache` TTL + React `cache` | Критический | 🔄 deploy |
-| PERF.E4 | Per-slug tags `event-page:{slug}` + `POST /api/internal/revalidate` `slug` | Критический | 🔄 deploy |
-| PERF.E5 | Backend/admin on-demand revalidate on event override (не ждать 2ч) | Критический | 🔄 deploy |
+| PERF.E3 | ISR `revalidate=7200` + `unstable_cache` TTL + React `cache` | Критический | ✅ `7835886` MSK **BUILD_ID=`wxgo6Jh1AliLT36-1eoqe`** `s-maxage=7200` HIT |
+| PERF.E4 | Per-slug tags `event-page:{slug}` + `POST /api/internal/revalidate` `slug` | Критический | ✅ smoke OK |
+| PERF.E5 | Backend/admin on-demand revalidate on event override (не ждать 2ч) | Критический | ✅ |
+| PERF.E6 | Destinations layout cache 86400 (не капить page ISR на 300) | Критический | ✅ `7835886` |
 
 ## MSK web:build SSG harden (2026-08-04)
 
