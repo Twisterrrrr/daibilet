@@ -1930,9 +1930,10 @@ function DayRoutePanelInner() {
     };
   }, [mobileView]);
 
-  function focusStopFromMap(stopId: string) {
+  function focusStopFromMap(stopId: string, opts?: { scrollList?: boolean }) {
     setFocusedStopId(stopId);
     if (mobileView === 'map') return;
+    if (opts?.scrollList === false) return;
     const root = listRootRef.current || document;
     const el = root.querySelector(`[data-day-plan-stop="${String(stopId).replace(/["\\]/g, '')}"]`);
     if (el instanceof HTMLElement) {
@@ -1942,6 +1943,58 @@ function DayRoutePanelInner() {
 
   function stopExternalMapsUrl(lat: number, lng: number) {
     return `https://yandex.ru/maps/?pt=${lng},${lat}&z=17&l=map`;
+  }
+
+  function renderMapFocusCard(placement: 'desktop' | 'mobile' = 'mobile') {
+    if (!focusedVenue) return null;
+    return (
+      <div
+        className={
+          placement === 'desktop'
+            ? 'absolute bottom-3 left-3 right-3 z-20 rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur sm:left-auto sm:right-3 sm:w-[min(22rem,calc(100%-1.5rem))]'
+            : 'absolute bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 z-20 rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur'
+        }
+        data-day-map-focus-card
+        data-day-map-focus-placement={placement}
+      >
+        <div className="flex items-start gap-2">
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold text-slate-900">{focusedVenue.title}</p>
+            <p className="mt-0.5 text-[11px] text-slate-500">Точка на карте</p>
+          </div>
+          {focusedCoords ? (
+            <a
+              href={stopExternalMapsUrl(focusedCoords.latitude, focusedCoords.longitude)}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Открыть в Яндекс.Картах"
+              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sky-50 text-sky-700 hover:bg-sky-100"
+            >
+              <Navigation className="h-3.5 w-3.5" />
+            </a>
+          ) : null}
+          <button
+            type="button"
+            aria-label="Удалить точку"
+            onClick={() => {
+              setRoute(removeFromDayRoute(focusedVenue.id));
+              setFocusedStopId(null);
+            }}
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            aria-label="Закрыть"
+            onClick={() => setFocusedStopId(null)}
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
+    );
   }
 
   /** Typed catalog selects - always open under Hot Picks (not accordion). */
@@ -2709,12 +2762,15 @@ function DayRoutePanelInner() {
                 </div>
                 {renderMapToolbar()}
               </div>
-              <DayRouteOsmMap
-                stops={mapStops}
-                selectedStopId={focusedStopId}
-                onStopClick={focusStopFromMap}
-                className="h-64 w-full overflow-hidden rounded-xl bg-slate-100 sm:h-80"
-              />
+              <div className="relative">
+                <DayRouteOsmMap
+                  stops={mapStops}
+                  selectedStopId={focusedStopId}
+                  onStopClick={(stopId) => focusStopFromMap(stopId, { scrollList: false })}
+                  className="h-64 w-full overflow-hidden rounded-xl bg-slate-100 sm:h-80"
+                />
+                {renderMapFocusCard('desktop')}
+              </div>
             </div>
           ) : null}
         </section>
@@ -3398,49 +3454,7 @@ function DayRoutePanelInner() {
               layoutKey="mobile-map"
               className="absolute inset-0 h-full w-full"
             />
-            {focusedVenue ? (
-              <div
-                className="absolute bottom-[calc(5.5rem+env(safe-area-inset-bottom,0px))] left-3 right-3 z-20 rounded-2xl border border-slate-200 bg-white/95 p-2.5 shadow-md backdrop-blur"
-                data-day-map-focus-card
-              >
-                <div className="flex items-start gap-2">
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-semibold text-slate-900">{focusedVenue.title}</p>
-                    <p className="mt-0.5 text-[11px] text-slate-500">Точка на карте</p>
-                  </div>
-                  {focusedCoords ? (
-                    <a
-                      href={stopExternalMapsUrl(focusedCoords.latitude, focusedCoords.longitude)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Открыть в Яндекс.Картах"
-                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sky-50 text-sky-700 hover:bg-sky-100"
-                    >
-                      <Navigation className="h-3.5 w-3.5" />
-                    </a>
-                  ) : null}
-                  <button
-                    type="button"
-                    aria-label="Удалить точку"
-                    onClick={() => {
-                      setRoute(removeFromDayRoute(focusedVenue.id));
-                      setFocusedStopId(null);
-                    }}
-                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    aria-label="Закрыть"
-                    onClick={() => setFocusedStopId(null)}
-                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
-                  >
-                    <X className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-              </div>
-            ) : null}
+            {renderMapFocusCard('mobile')}
             {route.venues.length > 0 ? (
               <div
                 className="absolute inset-x-0 bottom-[calc(4.5rem+env(safe-area-inset-bottom,0px))] z-10 border-t border-slate-200/80 bg-white/95 backdrop-blur"
