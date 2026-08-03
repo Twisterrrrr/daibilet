@@ -1,11 +1,21 @@
 # Tasktracker — Daibilet
 
-**Обновлено:** 2026-08-02
+**Обновлено:** 2026-08-03
 **Источники:** [Project.md](./Project.md), [current-state.md](./current-state.md), [migration-spb-to-msk.md](./migration-spb-to-msk.md), [widget-etalon-slugs.md](./widget-etalon-slugs.md), [content-blog-plan.md](./content-blog-plan.md), [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md), [mobile-templates.md](./mobile-templates.md), [catalog-location-venue-canon.md](./catalog-location-venue-canon.md)
 
 **Легенда:** ✅ done · 🔄 in progress · ⏳ todo · 🚫 blocked · ⚠️ deferred
 
 ---
+
+## City hub hookFact + IA (2026-08-03)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| CH.HF1 | Owner description+hookFact → cityInfo (65 городов, web+public) | Критический | ✅ |
+| CH.HF2 | Phase 1 UI: hookFact после hero + Главные места до афиши + блог в подвал | Критический | ✅ |
+| CH.HF3 | Phase 2: story cards, Сегодня/Завтра/Выходные, mood quiz, default FAQ | Высокий | ✅ |
+| CH.HF4 | SPB build → MSK atomic `.next` swap + smoke moscow/nn/abakan | Критический | 🔄 |
+| CH.HF5 | Партнерский виджет логистики (Ласточки/авиа) | Низкий | ⏳ |
 
 ## /my-day starter geometry (2026-08-03)
 

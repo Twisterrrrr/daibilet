@@ -30,7 +30,7 @@ import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
 import { ExpandableBlurb } from '@/components/ExpandableBlurb.client';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
-import { resolveCityInfo, type CityInfoEntry, type CityMustSeeItem } from '@/lib/cityInfo';
+import { resolveCityInfo, resolveCityPlaceHref, type CityInfoEntry, type CityMustSeeItem } from '@/lib/cityInfo';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
 import { dayRouteItemFromMustSee } from '@/lib/day-route-from-place';
 import {
@@ -42,8 +42,10 @@ import { isOpenDate, MIN_DISPLAY_PRICE_RUB } from '@/lib/event-card-meta';
 import {
   collectSessionStartsAtTimes,
   isSameSessionDay,
+  isSessionTomorrow,
   isSessionWeekend,
   resolveSessionTimeZoneForSession,
+  sessionTimeSlotFilter,
 } from '@/lib/datetime';
 import type {
   PublicCityDto,
@@ -54,7 +56,8 @@ import type {
 } from '@daibilet/contracts/public';
 
 type ViewMode = 'cards' | 'table';
-type DateFilter = 'all' | 'today' | 'weekend';
+type DateFilter = 'all' | 'today' | 'tomorrow' | 'weekend';
+type MoodFilter = 'all' | 'kids' | 'evening' | 'humor';
 
 const CITY_HASH_ALIASES: Record<string, string> = {
   'city-schedule': 'affiche',
@@ -63,6 +66,8 @@ const CITY_HASH_ALIASES: Record<string, string> = {
   'city-travel': 'practice',
   'city-guide-faq': 'practice',
   'city-seo': 'seo',
+  'why-go': 'about',
+  'zachem-ehat': 'about',
   directions: 'more',
   venues: 'more',
   travel: 'practice',
@@ -95,6 +100,7 @@ export function CityPageView({
   const [error, setError] = React.useState<string | null>(null);
   const [category, setCategory] = React.useState('all');
   const [dateFilter, setDateFilter] = React.useState<DateFilter>('all');
+  const [moodFilter, setMoodFilter] = React.useState<MoodFilter>('all');
   const [mode, setMode] = React.useState<ViewMode>('cards');
 
   React.useEffect(() => {
@@ -136,12 +142,14 @@ export function CityPageView({
 
   const sessions = React.useMemo(() => {
     if (!payload) return [];
-    return payload.sessions.filter((session) => {
+    const filtered = payload.sessions.filter((session) => {
       if (category !== 'all' && session.category !== category) return false;
       if (!matchesCityDateFilter(session, dateFilter)) return false;
+      if (!matchesMoodFilter(session, moodFilter)) return false;
       return true;
     });
-  }, [category, dateFilter, payload]);
+    return [...filtered].sort((a, b) => sessionHitScore(b) - sessionHitScore(a));
+  }, [category, dateFilter, moodFilter, payload]);
 
   const city = payload?.city;
   // Chip facets = hub feed only (same universe as the list / «Все»), not full-city catalog.
@@ -157,7 +165,12 @@ export function CityPageView({
   }, [payload]);
   const guide = city ? cityGuideFor(city) : null;
   const hubConfig = React.useMemo(() => resolveCityHubConfig(slug), [slug]);
-  const unifiedFaq = React.useMemo(() => mergeCityFaqItems(guide?.faq, faqItems), [faqItems, guide?.faq]);
+  const unifiedFaq = React.useMemo(() => {
+    const merged = mergeCityFaqItems(guide?.faq, faqItems);
+    if (merged.length) return merged;
+    if (!city?.name) return [];
+    return defaultCityFaq(city.name);
+  }, [faqItems, guide?.faq, city?.name]);
   const featuredDirections = React.useMemo(
     () =>
       resolveFeaturedDirections({
@@ -190,24 +203,36 @@ export function CityPageView({
   const sightsArticles = hubArticles?.sights || [];
   const practiceArticles = hubArticles?.practice || [];
   const moreArticles = hubArticles?.more || [];
-  const hasAbout = aboutArticles.length > 0;
+  const footerArticles = React.useMemo(() => {
+    const seen = new Set<string>();
+    const all = [...aboutArticles, ...afficheArticles, ...sightsArticles, ...practiceArticles, ...moreArticles];
+    return all.filter((article) => {
+      const key = article.slug || article.title;
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [aboutArticles, afficheArticles, sightsArticles, practiceArticles, moreArticles]);
+  const hasAbout = Boolean(guide?.hookFact?.trim() || guide?.brief?.trim());
   const hasPractice = hasTravel || hasFaq || practiceArticles.length > 0;
   const hasMore = hasDirections || hasVenues || moreArticles.length > 0;
-  const showSightsBlock = hasSights || sightsArticles.length > 0;
-  /** Нет editorial-материалов - блок «Куда сходить» занимает слот перед афишей. */
-  const showSightsBeforeAffiche = !hasAbout && showSightsBlock;
+  const showSightsBlock = hasSights;
+  const storyCards = React.useMemo(
+    () => buildCityStoryCards({ guide, aboutArticles, cityName: city?.name || '' }),
+    [guide, aboutArticles, city?.name],
+  );
 
   const tabs = React.useMemo(
     () =>
       [
-        { id: 'about', label: 'О городе', show: hasAbout },
-        { id: 'sights', label: 'Куда сходить', show: showSightsBeforeAffiche },
+        { id: 'about', label: 'Зачем ехать', show: hasAbout || storyCards.length > 0 },
+        { id: 'sights', label: 'Главные места', show: showSightsBlock },
         { id: 'affiche', label: 'Афиша', show: true },
-        { id: 'sights', label: 'Куда сходить', show: showSightsBlock && !showSightsBeforeAffiche },
         { id: 'practice', label: 'Советы', show: hasPractice },
         { id: 'more', label: 'Топ-запросы', show: hasMore },
+        { id: 'blog', label: 'Из блога', show: footerArticles.length > 0 },
       ].filter((tab) => tab.show),
-    [hasAbout, hasMore, hasPractice, showSightsBeforeAffiche, showSightsBlock],
+    [footerArticles.length, hasAbout, hasMore, hasPractice, showSightsBlock, storyCards.length],
   );
 
   return (
@@ -238,37 +263,16 @@ export function CityPageView({
             />
             <CityStickyTabs tabs={tabs} editorial={editorial} />
 
-            {hasAbout ? (
-              <section
-                id="about"
-                className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
-              >
-                <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
-                  <h2
-                    className={
-                      editorial
-                        ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
-                        : 'text-2xl font-bold text-slate-950'
-                    }
-                  >
-                    О городе
-                  </h2>
-                  <h3 className={`mt-4 text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
-                    Зачем ехать
-                  </h3>
-                  <p className={`mt-1 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-                    Короткие материалы, которые помогают понять настроение города до выбора билетов.
-                  </p>
-                  <CityHubArticlesGrid
-                    articles={aboutArticles}
-                    editorial={editorial}
-                    sessions={payload.sessions}
-                  />
-                </div>
-              </section>
+            {hasAbout || storyCards.length > 0 ? (
+              <CityWhyGoSection
+                guide={guide}
+                storyCards={storyCards}
+                editorial={editorial}
+                cityIn={cityInPrepositional(city)}
+              />
             ) : null}
 
-            {showSightsBeforeAffiche ? (
+            {showSightsBlock ? (
               <CitySightsSection
                 city={city}
                 guide={guide}
@@ -277,7 +281,7 @@ export function CityPageView({
                 landings={payload.landings}
                 allowFallback={contentReady}
                 editorial={editorial}
-                articles={sightsArticles}
+                articles={[]}
                 sessions={payload.sessions}
               />
             ) : null}
@@ -307,10 +311,19 @@ export function CityPageView({
                       onReset={() => {
                         setCategory('all');
                         setDateFilter('all');
+                        setMoodFilter('all');
                       }}
                     />
                   ) : null}
                 </div>
+                <CityMoodQuiz
+                  active={moodFilter}
+                  editorial={editorial}
+                  onSelect={(value) => {
+                    setMoodFilter(value);
+                    setDateFilter('all');
+                  }}
+                />
                 {contentReady ? (
                   <>
                     {mode === 'table' ? (
@@ -318,41 +331,12 @@ export function CityPageView({
                     ) : (
                       <CityEventsGrid sessions={sessions} editorial={editorial} />
                     )}
-                    {afficheArticles.length ? (
-                      <div className="mt-8">
-                        <h3 className={`text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
-                          Подсказка по выбору
-                        </h3>
-                        <p className={`mt-1 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-                          Материал, который помогает сузить афишу под ваш сценарий.
-                        </p>
-                        <CityHubArticlesGrid
-                          articles={afficheArticles}
-                          editorial={editorial}
-                          sessions={payload.sessions}
-                        />
-                      </div>
-                    ) : null}
                   </>
                 ) : (
                   <CityScheduleLoadingState />
                 )}
               </div>
             </section>
-
-            {showSightsBlock && !showSightsBeforeAffiche ? (
-              <CitySightsSection
-                city={city}
-                guide={guide}
-                categories={categories}
-                venues={payload.venues}
-                landings={payload.landings}
-                allowFallback={contentReady}
-                editorial={editorial}
-                articles={sightsArticles}
-                sessions={payload.sessions}
-              />
-            ) : null}
 
             {hasPractice ? (
               <section
@@ -376,18 +360,6 @@ export function CityPageView({
                 <CityTravelSection travel={guide?.travel} editorial={editorial} nested />
                 {hasFaq ? (
                   <CityFaqSection cityName={city.name} items={unifiedFaq} editorial={editorial} nested />
-                ) : null}
-                {practiceArticles.length ? (
-                  <div className={`container-page ${editorial ? 'pb-12' : 'pb-8'}`}>
-                    <h3 className={`text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
-                      Полезно перед поездкой
-                    </h3>
-                    <CityHubArticlesGrid
-                      articles={practiceArticles}
-                      editorial={editorial}
-                      sessions={payload.sessions}
-                    />
-                  </div>
                 ) : null}
               </section>
             ) : null}
@@ -419,6 +391,7 @@ export function CityPageView({
                       onCategory={(value) => {
                         setCategory(value);
                         setDateFilter('all');
+                        setMoodFilter('all');
                         scrollToSection('affiche');
                       }}
                     />
@@ -441,22 +414,37 @@ export function CityPageView({
                 ) : (
                   <CityContentLoadingState />
                 )}
-                {moreArticles.length ? (
-                  <div className={`container-page ${editorial ? 'pb-12' : 'pb-8'}`}>
-                    <h3 className={`text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
-                      Из блога
-                    </h3>
-                    <CityHubArticlesGrid
-                      articles={moreArticles}
-                      editorial={editorial}
-                      sessions={payload.sessions}
-                    />
-                  </div>
-                ) : null}
               </section>
             ) : contentReady ? null : (
               <CityContentLoadingState />
             )}
+
+            {footerArticles.length ? (
+              <section
+                id="blog"
+                className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
+              >
+                <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
+                  <h2
+                    className={
+                      editorial
+                        ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
+                        : 'text-2xl font-bold text-slate-950'
+                    }
+                  >
+                    Из блога
+                  </h2>
+                  <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                    Подробные материалы о городе - в подвале страницы, чтобы не отвлекать от выбора билетов.
+                  </p>
+                  <CityHubArticlesGrid
+                    articles={footerArticles}
+                    editorial={editorial}
+                    sessions={payload.sessions}
+                  />
+                </div>
+              </section>
+            ) : null}
 
             {hasSeo && seoText ? (
               <CitySeoTextSection cityName={city.name} text={seoText} editorial={editorial} />
@@ -567,8 +555,10 @@ function CityHeroStrip({
   const [heroImageFailed, setHeroImageFailed] = React.useState(false);
   const cityIn = cityInPrepositional(city);
   const brief =
-    guide?.brief ||
-    `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат и дату - и покупайте билет онлайн на Дайбилете.`;
+    guide?.hookFact?.trim()
+      ? null
+      : guide?.brief ||
+        `Экскурсии, музеи, мероприятия и активный отдых ${cityIn}. Выбирайте формат и дату - и покупайте билет онлайн на Дайбилете.`;
   const primaryCta = hubConfig?.primaryCta;
   const primaryTarget = primaryCta?.target || '#affiche';
   const primaryLabel = primaryCta?.label || `События ${cityIn}`;
@@ -704,7 +694,7 @@ function CityHeroStrip({
         <div className={contentClass}>
           <div className={nightShell ? CITY_NIGHT_HERO.contentInner : 'max-w-2xl'}>
             <h1 className={titleClass}>{city.name}</h1>
-            <p className={briefClass}>{brief}</p>
+            {brief ? <p className={briefClass}>{brief}</p> : null}
             <div className="mt-5 md:mt-3">
               {seasonChip ? (
                 <p className={`text-sm ${nightShell ? 'text-white/70' : editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
@@ -883,6 +873,7 @@ function DateFilterChips({
   const chips: Array<{ value: DateFilter; label: string }> = [
     { value: 'all', label: 'Все даты' },
     { value: 'today', label: 'Сегодня' },
+    { value: 'tomorrow', label: 'Завтра' },
     { value: 'weekend', label: 'Выходные' },
   ];
 
@@ -901,6 +892,245 @@ function DateFilterChips({
           </button>
         );
       })}
+    </div>
+  );
+}
+
+type CityStoryCard = {
+  id: string;
+  title: string;
+  hook: string;
+  ctaLabel: string;
+  imageUrl?: string | null;
+  href?: string | null;
+};
+
+function buildCityStoryCards({
+  guide,
+  aboutArticles,
+  cityName,
+}: {
+  guide: CityInfoEntry | null;
+  aboutArticles: BlogCardDto[];
+  cityName: string;
+}): CityStoryCard[] {
+  const cards: CityStoryCard[] = [];
+  const cityIn = cityName ? `в ${cityName}` : 'в городе';
+
+  if (guide?.mustSee?.length) {
+    for (const place of guide.mustSee.slice(0, 4)) {
+      cards.push({
+        id: `sight:${place.name}`,
+        title: place.name,
+        hook: place.desc,
+        ctaLabel: `Посмотреть экскурсии ${cityIn}`,
+        href: resolveCityPlaceHref(place),
+      });
+    }
+  }
+
+  for (const article of aboutArticles.slice(0, 2)) {
+    if (cards.length >= 6) break;
+    cards.push({
+      id: `article:${article.slug}`,
+      title: article.title,
+      hook: String(article.excerpt || '').trim() || 'Короткий гид перед выбором билетов.',
+      ctaLabel: 'Открыть материал',
+      imageUrl: article.coverImageUrl,
+      href: `/blog/${article.slug}`,
+    });
+  }
+
+  return cards.slice(0, 6);
+}
+
+function CityWhyGoSection({
+  guide,
+  storyCards,
+  editorial = false,
+  cityIn,
+}: {
+  guide: CityInfoEntry | null;
+  storyCards: CityStoryCard[];
+  editorial?: boolean;
+  cityIn: string;
+}) {
+  const hook = guide?.hookFact?.trim();
+  const brief = guide?.brief?.trim();
+
+  return (
+    <section
+      id="about"
+      className={`border-b ${editorial ? 'border-zinc-200' : 'border-slate-100'} ${SECTION_SCROLL_MT}`}
+    >
+      <div className={`container-page ${editorial ? 'py-12 sm:py-14' : 'py-8'}`}>
+        <h2
+          className={
+            editorial
+              ? 'font-serif text-3xl font-semibold text-zinc-950 sm:text-4xl'
+              : 'text-2xl font-bold text-slate-950'
+          }
+        >
+          Зачем ехать {cityIn}
+        </h2>
+
+        {hook ? (
+          <div
+            className={`mt-5 rounded-2xl px-5 py-4 sm:px-6 sm:py-5 ${
+              editorial
+                ? 'bg-amber-50 ring-1 ring-amber-200/80'
+                : 'bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 ring-1 ring-amber-200/70'
+            }`}
+          >
+            <p className={`text-xs font-semibold uppercase tracking-wide ${editorial ? 'text-amber-800' : 'text-amber-800'}`}>
+              Факт дня
+            </p>
+            <p
+              className={`mt-2 text-base leading-7 sm:text-lg ${
+                editorial ? 'font-serif text-zinc-900' : 'font-medium text-slate-900'
+              }`}
+            >
+              {hook}
+            </p>
+          </div>
+        ) : null}
+
+        {brief ? (
+          <p className={`mt-5 max-w-3xl text-sm leading-7 sm:text-base ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+            {brief}
+          </p>
+        ) : null}
+
+        {storyCards.length ? (
+          <div className="mt-8">
+            <h3 className={`text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
+              Истории города
+            </h3>
+            <p className={`mt-1 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+              Короткие эмоциональные карточки - не лонгриды.
+            </p>
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {storyCards.map((card) => (
+                <article
+                  key={card.id}
+                  className={
+                    editorial
+                      ? 'flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white'
+                      : 'flex flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm'
+                  }
+                >
+                  <div className={`relative aspect-[16/10] ${editorial ? 'bg-zinc-100' : 'bg-slate-100'}`}>
+                    {card.imageUrl ? (
+                      <SafeImage
+                        src={card.imageUrl}
+                        alt=""
+                        fill
+                        sizes={IMAGE_SIZES.blogCard}
+                        className="object-cover object-center"
+                        fallback={
+                          <div className={`flex h-full w-full items-center justify-center text-sm ${editorial ? 'text-zinc-400' : 'text-slate-400'}`}>
+                            {card.title}
+                          </div>
+                        }
+                      />
+                    ) : (
+                      <div
+                        className={`flex h-full w-full items-end bg-gradient-to-br p-4 ${
+                          editorial
+                            ? 'from-zinc-200 via-zinc-100 to-amber-50'
+                            : 'from-slate-200 via-slate-100 to-amber-50'
+                        }`}
+                      >
+                        <span className={`text-sm font-semibold ${editorial ? 'text-zinc-700' : 'text-slate-700'}`}>
+                          {card.title}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-1 flex-col p-4">
+                    <p className={`text-xs font-semibold uppercase tracking-wide ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
+                      Зачем ехать?
+                    </p>
+                    <h4 className={`mt-1 text-base font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
+                      {card.title}
+                    </h4>
+                    <p className={`mt-2 flex-1 text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                      {card.hook}
+                    </p>
+                    {card.href ? (
+                      <Link
+                        href={card.href}
+                        className={`mt-4 inline-flex text-sm font-semibold ${
+                          editorial ? 'text-zinc-900 underline-offset-4 hover:underline' : 'text-primary-700 hover:text-primary-800'
+                        }`}
+                      >
+                        {card.ctaLabel} →
+                      </Link>
+                    ) : (
+                      <a
+                        href="#affiche"
+                        onClick={(event) => {
+                          event.preventDefault();
+                          scrollToSection('affiche');
+                        }}
+                        className={`mt-4 inline-flex text-sm font-semibold ${
+                          editorial ? 'text-zinc-900 underline-offset-4 hover:underline' : 'text-primary-700 hover:text-primary-800'
+                        }`}
+                      >
+                        {card.ctaLabel} →
+                      </a>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+function CityMoodQuiz({
+  active,
+  onSelect,
+  editorial = false,
+}: {
+  active: MoodFilter;
+  onSelect: (value: MoodFilter) => void;
+  editorial?: boolean;
+}) {
+  const options: Array<{ value: MoodFilter; label: string }> = [
+    { value: 'all', label: 'Любой формат' },
+    { value: 'kids', label: 'С детьми' },
+    { value: 'evening', label: 'Вечер' },
+    { value: 'humor', label: 'Юмор' },
+  ];
+
+  return (
+    <div
+      className={`mb-5 rounded-2xl px-4 py-3 ${
+        editorial ? 'bg-zinc-100/80 ring-1 ring-zinc-200' : 'bg-slate-50 ring-1 ring-slate-200'
+      }`}
+    >
+      <p className={`text-sm font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
+        Не знаете, куда пойти?
+      </p>
+      <p className={`mt-0.5 text-xs ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+        Мини-тест фильтрует афишу на этой странице - без ухода в статью.
+      </p>
+      <div className="mt-3 flex flex-wrap gap-1.5">
+        {options.map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            onClick={() => onSelect(option.value)}
+            className={hubFilterChipClass(active === option.value, editorial)}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
@@ -1163,20 +1393,25 @@ function CitySightsSection({
             : 'text-2xl font-bold text-slate-950'
         }
       >
-        Куда сходить {cityIn}
+        Главные места {cityIn}
       </h2>
       {places.length ? (
-        <CitySightsMustSeeList
-          places={places}
-          venues={venues}
-          city={city}
-          editorial={editorial}
-          namedPresets={guide?.dayRoutePresets}
-          landingRows={landingRows}
-          categories={categories}
-          citySlug={citySlug}
-          titleClass={titleClass}
-        />
+        <>
+          <p className={`mt-2 max-w-3xl text-sm leading-6 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+            Точки, с которых удобно начать знакомство с городом.
+          </p>
+          <CitySightsMustSeeList
+            places={places}
+            venues={venues}
+            city={city}
+            editorial={editorial}
+            namedPresets={guide?.dayRoutePresets}
+            landingRows={landingRows}
+            categories={categories}
+            citySlug={citySlug}
+            titleClass={titleClass}
+          />
+        </>
       ) : null}
       {articles.length ? (
         <div className={places.length ? 'mt-8' : 'mt-4'}>
@@ -1937,9 +2172,58 @@ function matchesCityDateFilter(session: PublicSessionDto, filter: DateFilter): b
   if (!times.length) return false;
   return times.some((startsAt) => {
     if (filter === 'today') return isSameSessionDay(startsAt, new Date(), timeZone);
+    if (filter === 'tomorrow') return isSessionTomorrow(startsAt, timeZone);
     if (filter === 'weekend') return isSessionWeekend(startsAt, timeZone);
     return true;
   });
+}
+
+function sessionHaystack(session: PublicSessionDto): string {
+  return `${session.category || ''} ${session.title || ''} ${(session as { eventTitle?: string }).eventTitle || ''}`.toLowerCase();
+}
+
+function sessionHitScore(session: PublicSessionDto): number {
+  const hay = sessionHaystack(session);
+  if (/стендап|stand[\s-]?up|standup|comedy|юмор|квиз/.test(hay)) return 3;
+  if (/концерт|concert|шоу|фестиваль|live/.test(hay)) return 2;
+  return 0;
+}
+
+function matchesMoodFilter(session: PublicSessionDto, filter: MoodFilter): boolean {
+  if (filter === 'all') return true;
+  const hay = sessionHaystack(session);
+  if (filter === 'kids') return /дет|семь|family|kids|детск|мультик|сказк/.test(hay);
+  if (filter === 'humor') return /стендап|юмор|comedy|standup|квиз|юморист|сатир/.test(hay);
+  if (filter === 'evening') {
+    const timeZone = resolveSessionTimeZoneForSession(session);
+    const times = collectSessionStartsAtTimes(session);
+    if (!times.length) return /вечер|ночн|night|evening/.test(hay);
+    return times.some((startsAt) => {
+      const slot = sessionTimeSlotFilter(startsAt, timeZone);
+      return slot === 'evening' || slot === 'night';
+    });
+  }
+  return true;
+}
+
+function defaultCityFaq(cityName: string): CityFaqItem[] {
+  return [
+    {
+      question: `Нужно ли покупать билеты заранее в ${cityName}?`,
+      answer:
+        'На популярные экскурсии и вечерние шоу лучше брать билеты онлайн заранее - особенно в выходные и высокий сезон. Так вы фиксируете цену и не стоите в кассе.',
+    },
+    {
+      question: 'Как удобнее спланировать один день в городе?',
+      answer:
+        'Начните с блока «Главные места», затем откройте афишу на сегодня или завтра. Если не знаете формат - используйте мини-тест «С детьми / Вечер / Юмор» прямо в афише.',
+    },
+    {
+      question: 'Где смотреть логистику и сезон?',
+      answer:
+        'Короткие ответы - в разделе «Советы»: как добраться и когда ехать. Подробные SEO-материалы остаются внизу страницы, в блоке «Из блога».',
+    },
+  ];
 }
 
 function buildFallbackMustSee(
