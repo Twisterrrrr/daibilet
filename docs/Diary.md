@@ -109,7 +109,7 @@
 - Стиль: `text-primary-600 hover:text-primary-700 hover:underline`; marker `data-day-city-hub-link`.
 
 ### Проблемы
-- (deploy ниже)
+- Нет. MSK **BUILD_ID=`9Y0CrLqmzM7hckZVe2RRb`** (HEAD includes `b21531b`), `/my-day` 200; chunk: `data-day-city-hub-link` / `Страница `.
 
 ---
 
