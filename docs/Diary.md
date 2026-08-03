@@ -13,7 +13,7 @@
 - Удалены `CityMoodQuiz` / mood filter. Venues: `md:grid-cols-2`, name+address stack.
 
 ### Проблемы
-- Нет. Deploy pending.
+- Нет. MSK **BUILD_ID=`9Y0CrLqmzM7hckZVe2RRb`** (ветка incl. `e96e999c`, tip `79283095`), smoke `/cities/moscow` 200: `Зачем ехать в Москву`; hook `text-sm … text-slate-600`; `md:grid-rows-2`; venues `md:grid-cols-2`; без subtitle / mood quiz.
 
 ---
 
