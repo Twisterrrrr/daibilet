@@ -125,7 +125,7 @@
 - Trio: per-family `catalogLoadingParts`; marker `data-day-catalog-load=progressive`.
 
 ### Проблемы
-- (deploy ниже)
+- Нет. MSK **BUILD_ID=`blIpyGTrMYrwYoh4jkBws`** (`33e9ca8`), `/my-day` 200; chunk: `progressive`.
 
 ---
 
