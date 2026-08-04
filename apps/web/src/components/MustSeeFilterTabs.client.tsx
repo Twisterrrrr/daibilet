@@ -8,10 +8,18 @@ type Props = {
   onChange: (id: MustSeeFilterId) => void;
   /** Softer zinc palette for editorial city hubs. */
   editorial?: boolean;
+  /** Hide numeric counts on chips (My Day owner: text-only labels). */
+  hideCount?: boolean;
 };
 
 /** Chip tabs for must-see filters. Hidden by parent when tabs.length < 2. */
-export function MustSeeFilterTabs({ tabs, activeId, onChange, editorial = false }: Props) {
+export function MustSeeFilterTabs({
+  tabs,
+  activeId,
+  onChange,
+  editorial = false,
+  hideCount = false,
+}: Props) {
   if (tabs.length < 2) return null;
 
   return (
@@ -43,13 +51,15 @@ export function MustSeeFilterTabs({ tabs, activeId, onChange, editorial = false 
             }`}
           >
             <span>{tab.label}</span>
-            <span
-              className={`tabular-nums ${
-                active ? 'text-white/80' : editorial ? 'text-zinc-400' : 'text-slate-400'
-              }`}
-            >
-              {tab.count}
-            </span>
+            {!hideCount ? (
+              <span
+                className={`tabular-nums ${
+                  active ? 'text-white/80' : editorial ? 'text-zinc-400' : 'text-slate-400'
+                }`}
+              >
+                {tab.count}
+              </span>
+            ) : null}
           </button>
         );
       })}

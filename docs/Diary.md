@@ -17,6 +17,22 @@
 
 ---
 
+## 2026-08-04 - My Day A/B/C + hybrid hour-plan
+
+### Наблюдения
+- Owner: must-see carousel 3:4; groups Купленные/Мои планы; soft «по часам» через bottom sheet (start/end/lunch) без timeline UI; overflow = запасные планы.
+
+### Решения
+- Must-see: chips без счётчиков; horizontal photo carousel; copy «Собрали для вас топ-10…».
+- Groups: purchased pinned (border + Оплачено + Показать билет); plans with round checkbox + ↑↓; planDone strike.
+- Hour-plan: sheet → generate text hints on cards; recalc on plan reorder; lunch ~14-15; overflow group; reset clears hints.
+- Wake Lock / brightness soft-fail on ticket modal. Custom search create kept. Yandex Suggest / fake QR deferred.
+
+### Проблемы
+- Real QR still needs orders API (qa.md).
+
+---
+
 ## 2026-08-04 - My Day UX: copy, tickets, custom search
 
 ### Наблюдения

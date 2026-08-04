@@ -109,6 +109,8 @@ export type DayRouteVenueItem = {
   ticketUrl?: string | null;
   /** Guest marked ticket as purchased - persisted in localStorage. */
   ticketBought?: boolean;
+  /** Free/custom checklist: guest marked stop as done (strike-through). */
+  planDone?: boolean;
   /** Lowest known ticket price (rub) from matches / catalog - for «Купить билет от X». */
   priceFromRub?: number | null;
   /**
@@ -655,6 +657,7 @@ function mergeDayRouteVenueFields(
   if (incoming.startsAt) next.startsAt = incoming.startsAt;
   if (incoming.ticketUrl) next.ticketUrl = incoming.ticketUrl;
   if (typeof incoming.ticketBought === 'boolean') next.ticketBought = incoming.ticketBought;
+  if (typeof incoming.planDone === 'boolean') next.planDone = incoming.planDone;
   if (incoming.note != null) next.note = incoming.note;
   return next;
 }
@@ -782,6 +785,25 @@ export function moveDayRouteVenue(venueId: string, delta: -1 | 1): DayRouteState
   const venues = [...current.venues];
   const [item] = venues.splice(index, 1);
   venues.splice(target, 0, item);
+  return reorderDayRoute(venues.map((v) => v.id));
+}
+
+/** Reorder only among non-purchased «Мои планы» stops. */
+export function moveDayRoutePlanVenue(venueId: string, delta: -1 | 1): DayRouteState {
+  const current = readDayRouteFresh();
+  const planIndexes = current.venues
+    .map((venue, index) => (venue.ticketBought ? -1 : index))
+    .filter((index) => index >= 0);
+  const from = current.venues.findIndex((v) => v.id === venueId);
+  if (from < 0 || current.venues[from]?.ticketBought) return current;
+  const planPos = planIndexes.indexOf(from);
+  const targetPlanPos = planPos + delta;
+  if (planPos < 0 || targetPlanPos < 0 || targetPlanPos >= planIndexes.length) return current;
+  const to = planIndexes[targetPlanPos]!;
+  const venues = [...current.venues];
+  const tmp = venues[from]!;
+  venues[from] = venues[to]!;
+  venues[to] = tmp;
   return reorderDayRoute(venues.map((v) => v.id));
 }
 

@@ -6,6 +6,7 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
+  Clock,
   Copy,
   ExternalLink,
   LayoutGrid,
@@ -97,6 +98,7 @@ import {
   isTextDayRouteStop,
   lookupDayRouteCoords,
   moveDayRouteVenue,
+  moveDayRoutePlanVenue,
   optimizeDayRouteNearestNeighbor,
   parseDayRouteItemsParam,
   parseDayRouteQueryParam,
@@ -136,6 +138,14 @@ import {
   type DayRouteMatchOfferStub,
 } from '@/lib/day-route-commercial';
 import { dedupeDayRouteMatches } from '@/lib/day-route-score';
+import {
+  anchorMinutes,
+  computeDayRouteHourPlan,
+  dayRouteStopIsPurchased,
+  DAY_ROUTE_SOFT_END_OPTIONS,
+  DAY_ROUTE_SOFT_START_OPTIONS,
+  type DayRouteHourPlanResult,
+} from '@/lib/day-route-soft-timing';
 import {
   applyHotPickOfferToItem,
   buildHotPickCards,
@@ -399,6 +409,13 @@ function DayRoutePanelInner() {
     qrData: string | null;
     qrKind: 'qr' | 'barcode' | 'image' | null;
   } | null>(null);
+  /** Soft hour-plan mode: text hints only (no timeline UI). */
+  const [hourPlanOn, setHourPlanOn] = useState(false);
+  const [hourSheetOpen, setHourSheetOpen] = useState(false);
+  const [hourStart, setHourStart] = useState('10:00');
+  const [hourEnd, setHourEnd] = useState('22:00');
+  const [hourLunch, setHourLunch] = useState(false);
+  const wakeLockRef = useRef<{ release: () => Promise<void> } | null>(null);
   const hydratedDayRef = useRef<string | null>(null);
   const skipUrlSyncRef = useRef(false);
   const titleFieldRef = useRef<HTMLInputElement | null>(null);
@@ -1371,6 +1388,42 @@ function DayRoutePanelInner() {
     if (writeDayRoute({ ...current, venues })) setRoute(readDayRouteFresh());
   }, [matchOfferStubs, route.venues]);
 
+  const hourPlan = useMemo<DayRouteHourPlanResult | null>(() => {
+    if (!hourPlanOn || route.venues.length < DAY_ROUTE_MIN) return null;
+    return computeDayRouteHourPlan(route.venues, {
+      startHHMM: hourStart,
+      endHHMM: hourEnd,
+      lunch: hourLunch,
+    });
+  }, [hourPlanOn, route.venues, hourStart, hourEnd, hourLunch]);
+
+  const purchasedStops = useMemo(() => {
+    const overflow = new Set(hourPlan?.overflowIds || []);
+    const list = route.venues.filter(
+      (v) => dayRouteStopIsPurchased(v) && !overflow.has(v.id),
+    );
+    return [...list].sort((a, b) => {
+      const am = anchorMinutes(a);
+      const bm = anchorMinutes(b);
+      if (am == null && bm == null) return 0;
+      if (am == null) return 1;
+      if (bm == null) return -1;
+      return am - bm;
+    });
+  }, [route.venues, hourPlan]);
+
+  const planStops = useMemo(() => {
+    const overflow = new Set(hourPlan?.overflowIds || []);
+    return route.venues.filter((v) => !dayRouteStopIsPurchased(v) && !overflow.has(v.id));
+  }, [route.venues, hourPlan]);
+
+  const overflowStops = useMemo(() => {
+    if (!hourPlan?.overflowIds.length) return [] as DayRouteVenueItem[];
+    const byId = new Map(route.venues.map((v) => [v.id, v]));
+    return hourPlan.overflowIds.map((id) => byId.get(id)).filter(Boolean) as DayRouteVenueItem[];
+  }, [route.venues, hourPlan]);
+
+
   const hotPickTabIds = useMemo(
     () => visibleHotPickTabs(mustSeeResolved.map((row) => ({ place: row.place }))),
     [mustSeeResolved],
@@ -1614,6 +1667,33 @@ function DayRoutePanelInner() {
       qrData: dayRouteStopTicketQrData(venue),
       qrKind: venue.ticketQrKind || null,
     });
+    void (async () => {
+      try {
+        const nav = navigator as Navigator & {
+          wakeLock?: { request: (type: 'screen') => Promise<{ release: () => Promise<void> }> };
+        };
+        if (nav.wakeLock?.request) {
+          wakeLockRef.current = await nav.wakeLock.request('screen');
+        }
+      } catch {
+        // soft-fail
+      }
+      try {
+        const scr = screen as Screen & { brightness?: number };
+        if (typeof scr.brightness === 'number') scr.brightness = 1;
+      } catch {
+        // soft-fail experimental brightness
+      }
+    })();
+  }
+
+  function closeTicketView() {
+    setTicketView(null);
+    const lock = wakeLockRef.current;
+    wakeLockRef.current = null;
+    if (lock?.release) {
+      void lock.release().catch(() => undefined);
+    }
   }
 
   function openFirstUnpaidTicket() {
@@ -2479,6 +2559,32 @@ function DayRoutePanelInner() {
             <Printer className="h-3.5 w-3.5" />
             Сохранить
           </button>
+          {route.venues.length >= DAY_ROUTE_MIN ? (
+            hourPlanOn ? (
+              <button
+                type="button"
+                data-day-hour-reset
+                onClick={() => {
+                  setHourPlanOn(false);
+                  setHourSheetOpen(false);
+                }}
+                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition duration-200 hover:bg-slate-50"
+              >
+                <Clock className="h-3.5 w-3.5" />
+                Сбросить время
+              </button>
+            ) : (
+              <button
+                type="button"
+                data-day-hour-plan
+                onClick={() => setHourSheetOpen(true)}
+                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-800 transition duration-200 hover:bg-primary-100"
+              >
+                <Clock className="h-3.5 w-3.5" />
+                Распланировать день по часам
+              </button>
+            )
+          ) : null}
           <button
             type="button"
             onClick={() => {
@@ -2589,6 +2695,11 @@ function DayRoutePanelInner() {
                   <span className="font-semibold text-slate-800">
                     {formatDayRouteStopsHeading(route.venues.length)}
                   </span>
+                  {hourPlan?.totalLabel ? (
+                    <span className="font-medium text-slate-500" data-day-hour-total>
+                      {hourPlan.totalLabel}
+                    </span>
+                  ) : null}
                 </h2>
                 <div
                   className="hidden rounded-full border border-slate-200 bg-white p-0.5 lg:inline-flex"
@@ -2763,111 +2874,244 @@ function DayRoutePanelInner() {
               </div>
             </div>
           ) : null}
-          <ul
-            className={
-              effectiveStopViewMode === 'grid'
-                ? 'mt-3 grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
-                : 'mt-3 grid w-full grid-cols-1 items-start gap-0'
-            }
-            data-day-plan-list
-            data-day-stop-view={effectiveStopViewMode}
-          >
-            {route.venues.map((venue, index) => (
-              <Fragment key={venue.id}>
-                <DayRouteVenueCard
-                  index={index}
-                  total={route.venues.length}
-                  venue={venue}
-                  variant={effectiveStopViewMode}
-                  hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
-                  mapsUrl={(() => {
-                    const c = lookupDayRouteCoords(venue, coordsById);
-                    return c ? stopExternalMapsUrl(c.latitude, c.longitude) : null;
-                  })()}
-                  segmentToNext={segmentMeters[index] ?? null}
-                  travelMode={travelMode}
-                  focused={focusedStopId === venue.id}
-                  nearbyUpsells={
-                    effectiveStopViewMode === 'grid'
-                      ? []
-                      : pickNearbyUpsellsForStop(venue, matchOfferStubs, { limit: 1 })
-                  }
-                  onMoveUp={() => setRoute(moveDayRouteVenue(venue.id, -1))}
-                  onMoveDown={() => setRoute(moveDayRouteVenue(venue.id, 1))}
-                  onRemove={() => setRoute(removeFromDayRoute(venue.id))}
-                  onToggleBought={() =>
-                    setRoute(
-                      updateDayRouteVenue(venue.id, { ticketBought: !venue.ticketBought }),
-                    )
-                  }
-                  onBuyClick={(ticketUrl) =>
-                    setTicketHandoff({ venueId: venue.id, ticketUrl, title: venue.title })
-                  }
-                  onShowTicket={() => openTicketView(venue)}
-                  onSetNote={(note) =>
-                    setRoute(updateDayRouteVenue(venue.id, { note: note || null }))
-                  }
-                />
-                {primaryFreeWindow &&
-                primaryFreeWindow.afterIndex === index &&
-                freeWindowUpsells.length > 0 &&
-                !atMax ? (
-                  <li
-                    className={effectiveStopViewMode === 'grid' ? 'col-span-full' : undefined}
-                    data-day-free-window-upsell
-                    data-day-free-window
-                  >
-                    <div className="rounded-2xl border border-dashed border-sky-200 bg-sky-50/60 p-3 sm:p-4">
-                      <p className="text-sm font-semibold text-slate-900">Свободное окно</p>
-                      <p className="mt-0.5 text-[13px] text-slate-600">
-                        Между точками около {formatDayRouteDistance(primaryFreeWindow.meters)} - можно добавить ещё
-                        одну остановку.
-                      </p>
-                      <div className="mt-3 grid gap-2 sm:grid-cols-3">
-                        {freeWindowUpsells.map((pick) => (
-                          <button
-                            key={pick.key}
-                            type="button"
-                            onClick={() => addMustSeeItem(pick.item)}
-                            className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white p-2 text-left transition duration-200 hover:border-emerald-300 hover:bg-emerald-50/40"
-                          >
-                            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                              {pick.item.imageUrl ? (
-                                <SafeImage
-                                  src={pick.item.imageUrl}
-                                  alt=""
-                                  fill
-                                  sizes="3rem"
-                                  className="object-cover"
-                                />
-                              ) : (
-                                <div className="flex h-full w-full items-center justify-center text-slate-400">
-                                  <MapPin className="h-4 w-4" />
+          {hourPlan?.lunchHint ? (
+            <p
+              className="mt-3 rounded-xl border border-dashed border-amber-200 bg-amber-50/70 px-3 py-2 text-xs text-amber-900"
+              data-day-hour-lunch
+            >
+              Обед в графике: {hourPlan.lunchHint.label}
+            </p>
+          ) : null}
+
+          {purchasedStops.length ? (
+            <div className="mt-3" data-day-group="purchased">
+              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-primary-700">
+                Купленные билеты
+              </p>
+              <ul
+                className={
+                  effectiveStopViewMode === 'grid'
+                    ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
+                    : 'grid w-full grid-cols-1 items-start gap-0'
+                }
+                data-day-plan-list="purchased"
+                data-day-stop-view={effectiveStopViewMode}
+              >
+                {purchasedStops.map((venue, index) => (
+                  <DayRouteVenueCard
+                    key={venue.id}
+                    index={index}
+                    total={purchasedStops.length}
+                    venue={venue}
+                    variant={effectiveStopViewMode}
+                    group="purchased"
+                    softTimeLabel={hourPlan?.byId[venue.id]?.label || null}
+                    hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
+                    mapsUrl={(() => {
+                      const c = lookupDayRouteCoords(venue, coordsById);
+                      return c ? stopExternalMapsUrl(c.latitude, c.longitude) : null;
+                    })()}
+                    segmentToNext={null}
+                    travelMode={travelMode}
+                    focused={focusedStopId === venue.id}
+                    nearbyUpsells={[]}
+                    onMoveUp={() => undefined}
+                    onMoveDown={() => undefined}
+                    onRemove={() => setRoute(removeFromDayRoute(venue.id))}
+                    onToggleBought={() =>
+                      setRoute(
+                        updateDayRouteVenue(venue.id, { ticketBought: !venue.ticketBought }),
+                      )
+                    }
+                    onTogglePlanDone={() => undefined}
+                    onBuyClick={(ticketUrl) =>
+                      setTicketHandoff({ venueId: venue.id, ticketUrl, title: venue.title })
+                    }
+                    onShowTicket={() => openTicketView(venue)}
+                    onSetNote={(note) =>
+                      setRoute(updateDayRouteVenue(venue.id, { note: note || null }))
+                    }
+                  />
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
+          <div className="mt-3" data-day-group="plans">
+            {purchasedStops.length || overflowStops.length ? (
+              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-slate-500">
+                Мои планы
+              </p>
+            ) : null}
+            <ul
+              className={
+                effectiveStopViewMode === 'grid'
+                  ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
+                  : 'grid w-full grid-cols-1 items-start gap-0'
+              }
+              data-day-plan-list="plans"
+              data-day-stop-view={effectiveStopViewMode}
+            >
+              {planStops.map((venue, index) => {
+                const globalIndex = route.venues.findIndex((v) => v.id === venue.id);
+                return (
+                  <Fragment key={venue.id}>
+                    <DayRouteVenueCard
+                      index={index}
+                      total={planStops.length}
+                      venue={venue}
+                      variant={effectiveStopViewMode}
+                      group="plans"
+                      softTimeLabel={hourPlan?.byId[venue.id]?.label || null}
+                      hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
+                      mapsUrl={(() => {
+                        const c = lookupDayRouteCoords(venue, coordsById);
+                        return c ? stopExternalMapsUrl(c.latitude, c.longitude) : null;
+                      })()}
+                      segmentToNext={
+                        globalIndex >= 0 ? segmentMeters[globalIndex] ?? null : null
+                      }
+                      travelMode={travelMode}
+                      focused={focusedStopId === venue.id}
+                      nearbyUpsells={
+                        effectiveStopViewMode === 'grid'
+                          ? []
+                          : pickNearbyUpsellsForStop(venue, matchOfferStubs, { limit: 1 })
+                      }
+                      onMoveUp={() => setRoute(moveDayRoutePlanVenue(venue.id, -1))}
+                      onMoveDown={() => setRoute(moveDayRoutePlanVenue(venue.id, 1))}
+                      onRemove={() => setRoute(removeFromDayRoute(venue.id))}
+                      onToggleBought={() =>
+                        setRoute(
+                          updateDayRouteVenue(venue.id, { ticketBought: !venue.ticketBought }),
+                        )
+                      }
+                      onTogglePlanDone={() =>
+                        setRoute(
+                          updateDayRouteVenue(venue.id, { planDone: !venue.planDone }),
+                        )
+                      }
+                      onBuyClick={(ticketUrl) =>
+                        setTicketHandoff({ venueId: venue.id, ticketUrl, title: venue.title })
+                      }
+                      onShowTicket={() => openTicketView(venue)}
+                      onSetNote={(note) =>
+                        setRoute(updateDayRouteVenue(venue.id, { note: note || null }))
+                      }
+                    />
+                    {primaryFreeWindow &&
+                    globalIndex >= 0 &&
+                    primaryFreeWindow.afterIndex === globalIndex &&
+                    freeWindowUpsells.length > 0 &&
+                    !atMax ? (
+                      <li
+                        className={effectiveStopViewMode === 'grid' ? 'col-span-full' : undefined}
+                        data-day-free-window-upsell
+                        data-day-free-window
+                      >
+                        <div className="rounded-2xl border border-dashed border-sky-200 bg-sky-50/60 p-3 sm:p-4">
+                          <p className="text-sm font-semibold text-slate-900">Свободное окно</p>
+                          <p className="mt-0.5 text-[13px] text-slate-600">
+                            Между точками около {formatDayRouteDistance(primaryFreeWindow.meters)} - можно добавить ещё
+                            одну остановку.
+                          </p>
+                          <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                            {freeWindowUpsells.map((pick) => (
+                              <button
+                                key={pick.key}
+                                type="button"
+                                onClick={() => addMustSeeItem(pick.item)}
+                                className="flex items-center gap-2 rounded-2xl border border-slate-200 bg-white p-2 text-left transition duration-200 hover:border-emerald-300 hover:bg-emerald-50/40"
+                              >
+                                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                                  {pick.item.imageUrl ? (
+                                    <SafeImage
+                                      src={pick.item.imageUrl}
+                                      alt=""
+                                      fill
+                                      sizes="3rem"
+                                      className="object-cover"
+                                    />
+                                  ) : (
+                                    <div className="flex h-full w-full items-center justify-center text-slate-400">
+                                      <MapPin className="h-4 w-4" />
+                                    </div>
+                                  )}
                                 </div>
-                              )}
-                            </div>
-                            <span className="min-w-0">
-                              <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500">
-                                {pick.badge}
-                              </span>
-                              <span className="mt-0.5 line-clamp-1 text-xs font-semibold text-slate-900">
-                                {pick.item.title}
-                              </span>
-                              {pick.hook ? (
-                                <span className="mt-0.5 block line-clamp-1 text-[11px] text-slate-500" title={pick.hook}>
-                                  {pick.hook}
+                                <span className="min-w-0">
+                                  <span className="block text-[10px] font-semibold uppercase tracking-wide text-slate-500">
+                                    {pick.badge}
+                                  </span>
+                                  <span className="mt-0.5 line-clamp-1 text-xs font-semibold text-slate-900">
+                                    {pick.item.title}
+                                  </span>
                                 </span>
-                              ) : null}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </li>
-                ) : null}
-              </Fragment>
-            ))}
-          </ul>
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </li>
+                    ) : null}
+                  </Fragment>
+                );
+              })}
+            </ul>
+          </div>
+
+          {overflowStops.length ? (
+            <div className="mt-4" data-day-group="overflow">
+              <p className="mb-1.5 text-[11px] font-bold uppercase tracking-wide text-amber-700">
+                Не поместилось в график (запасные планы)
+              </p>
+              <ul
+                className={
+                  effectiveStopViewMode === 'grid'
+                    ? 'grid w-full grid-cols-1 items-start gap-1.5 sm:grid-cols-2 lg:grid-cols-3'
+                    : 'grid w-full grid-cols-1 items-start gap-0'
+                }
+                data-day-plan-list="overflow"
+              >
+                {overflowStops.map((venue, index) => (
+                  <DayRouteVenueCard
+                    key={venue.id}
+                    index={index}
+                    total={overflowStops.length}
+                    venue={venue}
+                    variant={effectiveStopViewMode}
+                    group="overflow"
+                    softTimeLabel={null}
+                    hasCoords={Boolean(lookupDayRouteCoords(venue, coordsById))}
+                    mapsUrl={(() => {
+                      const c = lookupDayRouteCoords(venue, coordsById);
+                      return c ? stopExternalMapsUrl(c.latitude, c.longitude) : null;
+                    })()}
+                    segmentToNext={null}
+                    travelMode={travelMode}
+                    focused={focusedStopId === venue.id}
+                    nearbyUpsells={[]}
+                    onMoveUp={() => setRoute(moveDayRoutePlanVenue(venue.id, -1))}
+                    onMoveDown={() => setRoute(moveDayRoutePlanVenue(venue.id, 1))}
+                    onRemove={() => setRoute(removeFromDayRoute(venue.id))}
+                    onToggleBought={() =>
+                      setRoute(
+                        updateDayRouteVenue(venue.id, { ticketBought: !venue.ticketBought }),
+                      )
+                    }
+                    onTogglePlanDone={() =>
+                      setRoute(updateDayRouteVenue(venue.id, { planDone: !venue.planDone }))
+                    }
+                    onBuyClick={(ticketUrl) =>
+                      setTicketHandoff({ venueId: venue.id, ticketUrl, title: venue.title })
+                    }
+                    onShowTicket={() => openTicketView(venue)}
+                    onSetNote={(note) =>
+                      setRoute(updateDayRouteVenue(venue.id, { note: note || null }))
+                    }
+                  />
+                ))}
+              </ul>
+            </div>
+          ) : null}
 
           {mapStops.length > 0 ? (
             <div
@@ -2914,9 +3158,7 @@ function DayRoutePanelInner() {
             <span>
               <span className="block text-sm font-semibold text-slate-900">Главные места</span>
               <span className="mt-0.5 block text-xs text-slate-500">
-                {mustSeeResolved.length
-                  ? `Превью и фильтры · ${mustSeeResolved.length}`
-                  : 'Список для города пока пуст'}
+                {mustSeeResolved.length ? 'Топ мест города' : 'Список для города пока пуст'}
               </span>
             </span>
             <ChevronDown
@@ -2929,9 +3171,9 @@ function DayRoutePanelInner() {
                 <div data-day-must-see>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <p className="text-xs text-slate-500" data-day-must-see-helper>
-                      {`Собрали ${
-                        mustSeeResolved.length >= DAY_ROUTE_SOFT ? `топ-${DAY_ROUTE_SOFT}` : 'топ'
-                      } мест${pageCityName ? ` ${inCityPrepositional(pageCityName)}` : ''}. Добавьте все в один клик или выберите точечно.`}
+                      {`Собрали для вас топ-${DAY_ROUTE_SOFT} мест${
+                        pageCityName ? ` ${inCityPrepositional(pageCityName)}` : ''
+                      }. Добавьте их в один клик или выберите категории ниже.`}
                     </p>
                     <button
                       type="button"
@@ -2946,13 +3188,11 @@ function DayRoutePanelInner() {
                         : mustSeeFilter) === 'main'
                         ? 'Добавить главные места'
                         : 'Добавить выбранные'}
-                      {mustSeeAddable.length
-                        ? ` (${Math.min(mustSeeAddable.length, softSlotsLeft)})`
-                        : ''}
                     </button>
                   </div>
                   <MustSeeFilterTabs
                     tabs={mustSeeFilterMeta.tabs}
+                    hideCount
                     activeId={
                       mustSeeFilterMeta.tabs.length < 2
                         ? mustSeeFilterMeta.defaultId
@@ -2960,66 +3200,63 @@ function DayRoutePanelInner() {
                     }
                     onChange={setMustSeeFilter}
                   />
-                  <div className="mt-3 grid gap-2 sm:grid-cols-2" data-day-must-see-list>
-                    {mustSeeFiltered.map(({ place, item, hook }) => {
+                  <div
+                    className="mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1"
+                    data-day-must-see-list
+                    data-day-must-see-carousel
+                  >
+                    {mustSeeFiltered.map(({ place, item }) => {
                       const inRoute =
                         isInDayRoute(item.id, route) || Boolean(item.slug && isInDayRoute(item.slug, route));
                       const hasItemCoords = Boolean(
                         lookupDayRouteCoords(item, buildDayRouteCoordsMap([item])),
                       );
                       return (
-                        <button
+                        <article
                           key={item.id}
-                          type="button"
-                          disabled={inRoute || atMax || !hasItemCoords}
-                          title={
-                            inRoute
-                              ? 'Уже в маршруте'
-                              : atMax
-                                ? dayRouteHardLimitMessage()
-                                : !hasItemCoords
-                                  ? 'Нет координат'
-                                  : hook || 'Добавить в день'
-                          }
-                          onClick={() => addMustSeeItem(item)}
-                          className={`flex w-full items-center gap-2.5 rounded-xl border p-2 text-left transition disabled:cursor-not-allowed ${
-                            inRoute
-                              ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
-                              : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50/50'
-                          }`}
+                          className="relative aspect-[3/4] w-[42vw] max-w-[11rem] shrink-0 snap-start overflow-hidden rounded-2xl bg-slate-200 sm:w-40"
+                          data-day-must-see-card={item.id}
                         >
-                          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-slate-100">
-                            {item.imageUrl ? (
-                              <SafeImage
-                                src={item.imageUrl}
-                                alt=""
-                                fill
-                                sizes="3rem"
-                                className="object-cover"
-                              />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center text-slate-400">
-                                <MapPin className="h-4 w-4" />
-                              </div>
-                            )}
-                          </div>
-                          <span className="min-w-0 flex-1">
-                            <span className="block truncate text-xs font-semibold">{place.name}</span>
-                            {hook ? (
-                              <span className="mt-0.5 block text-[11px] leading-snug text-slate-500">
-                                {hook}
-                              </span>
-                            ) : null}
-                          </span>
-                          <span
-                            className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
-                              inRoute ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-900 text-white'
+                          {item.imageUrl ? (
+                            <SafeImage
+                              src={item.imageUrl}
+                              alt=""
+                              fill
+                              sizes="11rem"
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-slate-400">
+                              <MapPin className="h-8 w-8" />
+                            </div>
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent" />
+                          <p className="absolute inset-x-0 bottom-0 p-2.5 text-[12px] font-semibold leading-snug text-white">
+                            {place.name}
+                          </p>
+                          <button
+                            type="button"
+                            disabled={inRoute || atMax || !hasItemCoords}
+                            aria-label={inRoute ? 'Уже в маршруте' : 'Добавить в день'}
+                            title={
+                              inRoute
+                                ? 'Уже в маршруте'
+                                : atMax
+                                  ? dayRouteHardLimitMessage()
+                                  : !hasItemCoords
+                                    ? 'Нет координат'
+                                    : 'Добавить в день'
+                            }
+                            onClick={() => addMustSeeItem(item)}
+                            className={`absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full shadow-sm disabled:cursor-not-allowed ${
+                              inRoute
+                                ? 'bg-emerald-500 text-white'
+                                : 'bg-white text-slate-900 hover:bg-emerald-50 disabled:bg-white/70 disabled:text-slate-400'
                             }`}
-                            aria-hidden
                           >
                             {inRoute ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                          </span>
-                        </button>
+                          </button>
+                        </article>
                       );
                     })}
                   </div>
@@ -3625,7 +3862,7 @@ function DayRoutePanelInner() {
         aria-modal="true"
         aria-labelledby="day-ticket-view-title"
         data-day-ticket-view
-        onClick={() => setTicketView(null)}
+        onClick={() => closeTicketView()}
       >
         <div
           className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-4 shadow-xl sm:p-5"
@@ -3641,7 +3878,7 @@ function DayRoutePanelInner() {
             <button
               type="button"
               aria-label="Закрыть"
-              onClick={() => setTicketView(null)}
+              onClick={() => closeTicketView()}
               className="inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
             >
               <X className="h-4 w-4" />
@@ -3689,9 +3926,99 @@ function DayRoutePanelInner() {
             <button
               type="button"
               className="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
-              onClick={() => setTicketView(null)}
+              onClick={() => closeTicketView()}
             >
               Закрыть
+            </button>
+          </div>
+        </div>
+      </div>
+    ) : null}
+    {hourSheetOpen ? (
+      <div
+        className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-0 sm:items-center sm:p-4 print:hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="day-hour-sheet-title"
+        data-day-hour-sheet
+        onClick={() => setHourSheetOpen(false)}
+      >
+        <div
+          className="w-full max-w-md rounded-t-2xl border border-slate-200 bg-white p-4 shadow-xl sm:rounded-2xl sm:p-5"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="mx-auto mb-2 h-1 w-10 rounded-full bg-slate-200 sm:hidden" aria-hidden />
+          <p id="day-hour-sheet-title" className="text-base font-semibold text-slate-900">
+            Распланировать день по часам
+          </p>
+          <p className="mt-1 text-sm text-slate-600">
+            Подскажем мягкие интервалы на карточках. Список останется прежним - без шкалы времени.
+          </p>
+          <div className="mt-4 grid grid-cols-2 gap-3">
+            <label className="block">
+              <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                Начало
+              </span>
+              <select
+                value={hourStart}
+                onChange={(e) => setHourStart(e.target.value)}
+                data-day-hour-start
+                className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm"
+              >
+                {DAY_ROUTE_SOFT_START_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                Конец
+              </span>
+              <select
+                value={hourEnd}
+                onChange={(e) => setHourEnd(e.target.value)}
+                data-day-hour-end
+                className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm"
+              >
+                {DAY_ROUTE_SOFT_END_OPTIONS.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {opt}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <label className="mt-3 flex items-center gap-2 text-sm text-slate-700">
+            <input
+              type="checkbox"
+              checked={hourLunch}
+              onChange={(e) => setHourLunch(e.target.checked)}
+              data-day-hour-lunch
+              className="h-4 w-4 rounded border-slate-300 text-primary-600"
+            />
+            Заложить время на обед (~14:00-15:00)
+          </label>
+          <div className="mt-4 flex flex-col gap-2">
+            <button
+              type="button"
+              data-day-hour-generate
+              className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary-600 px-4 text-sm font-bold text-white hover:bg-primary-700"
+              onClick={() => {
+                setHourPlanOn(true);
+                setHourSheetOpen(false);
+                flashDayRouteFeedback('Мягкое расписание готово');
+              }}
+            >
+              Сгенерировать
+            </button>
+            <button
+              type="button"
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              onClick={() => setHourSheetOpen(false)}
+            >
+              Отмена
             </button>
           </div>
         </div>
@@ -3717,6 +4044,8 @@ function DayRouteVenueCard({
   index,
   total,
   variant = 'grid',
+  group = 'plans',
+  softTimeLabel = null,
   hasCoords,
   mapsUrl = null,
   segmentToNext,
@@ -3727,6 +4056,7 @@ function DayRouteVenueCard({
   onMoveDown,
   onRemove,
   onToggleBought,
+  onTogglePlanDone,
   onBuyClick,
   onShowTicket,
   onSetNote,
@@ -3735,6 +4065,8 @@ function DayRouteVenueCard({
   index: number;
   total: number;
   variant?: DayRouteStopViewMode;
+  group?: 'purchased' | 'plans' | 'overflow';
+  softTimeLabel?: string | null;
   hasCoords: boolean;
   mapsUrl?: string | null;
   segmentToNext: number | null;
@@ -3750,13 +4082,16 @@ function DayRouteVenueCard({
   onMoveDown: () => void;
   onRemove: () => void;
   onToggleBought: () => void;
+  onTogglePlanDone: () => void;
   onBuyClick: (ticketUrl: string) => void;
   onShowTicket: () => void;
   onSetNote: (note: string) => void;
 }) {
   const textStop = isTextDayRouteStop(venue);
-  const reorderLocked = dayRouteStopReorderLocked(venue);
-  const isCommerce = dayRouteStopIsCommerce(venue);
+  const purchased = group === 'purchased' || Boolean(venue.ticketBought);
+  const reorderLocked = purchased || group === 'overflow' || dayRouteStopReorderLocked(venue);
+  const isCommerce = purchased || dayRouteStopIsCommerce(venue);
+  const planDone = Boolean(venue.planDone) && !purchased;
   const [addressOpen, setAddressOpen] = useState(false);
   const [addressDraft, setAddressDraft] = useState(String(venue.note || venue.address || ''));
   const href =
@@ -3804,16 +4139,38 @@ function DayRouteVenueCard({
   const metaLine = metaParts.join(' · ');
   const segmentLine = segmentHint ? `далее ~ ${segmentHint}` : '';
 
+  const titleClass = `font-semibold leading-tight ${
+    planDone ? 'text-slate-400 line-through' : 'text-slate-900'
+  }`;
   const titleNode = href ? (
-    <Link
-      href={href}
-      className="font-semibold leading-tight text-slate-900 hover:text-primary-700"
-    >
+    <Link href={href} className={`${titleClass} hover:text-primary-700`}>
       {venue.title}
     </Link>
   ) : (
-    <span className="font-semibold leading-tight text-slate-900">{venue.title}</span>
+    <span className={titleClass}>{venue.title}</span>
   );
+  const softTimeNode = softTimeLabel ? (
+    <p className="m-0 text-[12px] font-semibold text-primary-700" data-day-soft-time>
+      {softTimeLabel}
+    </p>
+  ) : null;
+  const planCheck =
+    group === 'plans' || group === 'overflow' ? (
+      <button
+        type="button"
+        aria-label={planDone ? 'Снять отметку' : 'Отметить выполненным'}
+        aria-pressed={planDone}
+        data-day-plan-done
+        onClick={onTogglePlanDone}
+        className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
+          planDone
+            ? 'border-emerald-500 bg-emerald-500 text-white'
+            : 'border-slate-300 bg-white text-transparent hover:border-emerald-400'
+        }`}
+      >
+        <Check className="h-3 w-3" />
+      </button>
+    ) : null;
 
   const actionButtons = (
     <div className="flex shrink-0 items-center gap-0">
@@ -3860,8 +4217,9 @@ function DayRouteVenueCard({
         <div
           className={`flex w-full items-center gap-1.5 py-1.5 ${
             focused ? 'rounded-md bg-emerald-50/80 px-1' : ''
-          }`}
+          } ${purchased ? 'border-l-4 border-primary-600 pl-1.5' : ''}`}
         >
+          {planCheck}
           <span
             className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white"
             aria-label={`Точка ${index + 1}`}
@@ -3903,10 +4261,16 @@ function DayRouteVenueCard({
             </div>
           )}
           <div
-            className={`min-w-0 flex-1 self-center border-l-4 pl-2 leading-tight ${
-              isCommerce ? 'border-primary-600' : 'border-transparent'
+            className={`min-w-0 flex-1 self-center leading-tight ${
+              !purchased && isCommerce ? 'border-l-4 border-primary-600 pl-2' : ''
             }`}
           >
+            {softTimeNode}
+            {purchased ? (
+              <p className="m-0 text-[11px] font-bold uppercase tracking-wide text-primary-700">
+                Оплачено
+              </p>
+            ) : null}
             <p className="m-0 truncate text-[13px] font-semibold text-slate-900">{titleNode}</p>
             {metaLine ? (
               <p
@@ -4024,7 +4388,7 @@ function DayRouteVenueCard({
         className={`flex items-center gap-2 rounded-2xl border bg-white px-2.5 py-2 sm:gap-3 sm:px-3 sm:py-2.5 ${
           focused
             ? 'border-emerald-400 ring-1 ring-emerald-200'
-            : isCommerce
+            : purchased || isCommerce
               ? 'border-l-4 border-l-primary-600 border-slate-200'
               : 'border-slate-200'
         }`}
@@ -4084,6 +4448,15 @@ function DayRouteVenueCard({
         </div>
 
         <div className="min-w-0 flex-1" data-day-stop-text-col>
+          <div className="mb-0.5 flex items-center gap-2">
+            {planCheck}
+            {softTimeNode}
+            {purchased ? (
+              <span className="text-[11px] font-bold uppercase tracking-wide text-primary-700">
+                Оплачено
+              </span>
+            ) : null}
+          </div>
           <p className="truncate text-sm font-semibold leading-snug text-slate-900">
             {titleNode}
           </p>
