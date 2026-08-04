@@ -222,6 +222,47 @@ test('requires a seasonal term in a New Year title', () => {
   }, newYear), false);
 });
 
+test('salute-9-may rejects City Day fireworks and keeps Victory Day', () => {
+  const salute = findLandingRule('salute-9-may');
+  assert.ok(salute);
+
+  // Live false-positive (MSK 2026-08): City Day boat + festive fireworks in September.
+  assert.equal(matchesLandingRule({
+    title: 'Речная Прогулка на День Города с праздничным фейерверком, с ужином, DJ дискотека',
+    category: 'Мероприятия',
+    tags: ['Водные экскурсии', 'Речные прогулки'],
+    subcategories: ['Развлекательные центры', 'Водные экскурсии', 'Речные прогулки', 'Дискотека'],
+    city: 'Москва',
+    startsAt: '2026-09-05T13:00:00.000Z',
+  }, salute), false);
+
+  assert.equal(matchesLandingRule({
+    title: 'Салют на День города с теплохода',
+    category: 'Экскурсии',
+    city: 'Москва',
+  }, salute), false);
+
+  assert.equal(matchesLandingRule({
+    title: 'Прогулка к салюту 9 мая с ужином',
+    category: 'Экскурсии',
+    tags: ['Водные экскурсии'],
+    city: 'Москва',
+  }, salute), true);
+
+  assert.equal(matchesLandingRule({
+    title: 'Фейерверк в честь Дня Победы с борта теплохода',
+    category: 'Экскурсии',
+    city: 'Санкт-Петербург',
+  }, salute), true);
+
+  // Fireworks without Victory Day signal must not land on salute-9-may.
+  assert.equal(matchesLandingRule({
+    title: 'Вечерний фейерверк с теплохода',
+    category: 'Экскурсии',
+    city: 'Москва',
+  }, salute), false);
+});
+
 test('applies canonical subcategory rules and Moscow-time schedule', () => {
   assert.equal(matchingLandingSlugs({
     title: 'Обзорная экскурсия по городу',

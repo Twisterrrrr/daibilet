@@ -148,10 +148,25 @@ export const LANDING_RULES: LandingRule[] = [
     title: 'Салют 9 мая',
     subtitle: 'Лучшие точки обзора и экскурсии к Дню Победы',
     chips: ['9 мая', 'салют', 'праздник'],
-    keywords: ['салют', 'фейерверк', 'день победы', 'праздничн', 'побед'],
+    // Fireworks alone are not enough: City Day boat tours also sell «праздничный фейерверк».
+    keywords: ['салют', 'фейерверк', 'день победы', '9 мая', 'побед'],
     requiredAnyKeywords: ['салют', 'фейерверк'],
+    // Victory Day intent (date / holiday), not any urban fireworks.
+    requiredKeywordGroups: [
+      ['9 мая', 'день победы', 'побед', '9.05', '09.05', '09 мая'],
+    ],
     keywordScope: 'content',
-    excludeKeywords: ['новогод', 'ёлка', 'елка', 'рождеств'],
+    excludeKeywords: [
+      'новогод',
+      'ёлка',
+      'елка',
+      'рождеств',
+      'день города',
+      'дня города',
+      'дню города',
+      'днем города',
+      'днём города',
+    ],
   },
   {
     slug: 'bus-tours',
