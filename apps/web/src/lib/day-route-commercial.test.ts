@@ -4,6 +4,9 @@ import { describe, it } from 'node:test';
 import {
   classifyDayRouteCommercialChip,
   computeDayRouteReadiness,
+  dayRouteStopIsCommerce,
+  dayRouteStopReorderLocked,
+  dayRouteStopTicketQrData,
   findDayRouteFreeWindowGaps,
 } from './day-route-commercial';
 import type { DayRouteVenueItem } from './day-route';
@@ -69,6 +72,39 @@ describe('day-route-commercial chips', () => {
     const chip = classifyDayRouteCommercialChip(stop({ id: '4', title: 'Набережная' }));
     assert.equal(chip.kind, 'free');
     assert.equal(chip.label, '');
+  });
+
+  it('locks reorder for bought or timed session', () => {
+    assert.equal(
+      dayRouteStopReorderLocked(
+        stop({
+          id: 'boat',
+          title: 'Прогулка',
+          ticketUrl: '/events/boat',
+          startsAt: '2026-08-02T14:00:00+03:00',
+          sessionLabel: 'сб, 14:00',
+        }),
+      ),
+      true,
+    );
+    assert.equal(
+      dayRouteStopReorderLocked(stop({ id: 'free', title: 'Парк', ticketBought: true })),
+      true,
+    );
+    assert.equal(dayRouteStopReorderLocked(stop({ id: 'park', title: 'Парк' })), false);
+  });
+
+  it('marks commerce stops and never invents QR', () => {
+    assert.equal(
+      dayRouteStopIsCommerce(stop({ id: 't', title: 'Билет', ticketUrl: '/events/x', eventId: 'e1' })),
+      true,
+    );
+    assert.equal(dayRouteStopIsCommerce(stop({ id: 'p', title: 'Парк' })), false);
+    assert.equal(dayRouteStopTicketQrData(stop({ id: 't', title: 'Билет' })), null);
+    assert.equal(
+      dayRouteStopTicketQrData(stop({ id: 't', title: 'Билет', ticketQrData: ' CODE ' })),
+      'CODE',
+    );
   });
 });
 

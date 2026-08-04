@@ -14,6 +14,7 @@ import {
   Navigation,
   Plus,
   Printer,
+  QrCode,
   Route,
   Share2,
   Sparkles,
@@ -126,6 +127,9 @@ import {
   collectDayRouteTripTickets,
   computeDayRouteReadiness,
   dayRouteStopHasTicket,
+  dayRouteStopIsCommerce,
+  dayRouteStopReorderLocked,
+  dayRouteStopTicketQrData,
   findDayRouteFreeWindowGaps,
   formatDayRouteBuyCtaLabel,
   pickNearbyUpsellsForStop,
@@ -386,6 +390,14 @@ function DayRoutePanelInner() {
     venueId: string;
     ticketUrl: string;
     title: string;
+  } | null>(null);
+  /** Show-ticket modal: real QR only when ticketQrData exists; else stub. */
+  const [ticketView, setTicketView] = useState<{
+    venueId: string;
+    title: string;
+    ticketUrl: string | null;
+    qrData: string | null;
+    qrKind: 'qr' | 'barcode' | 'image' | null;
   } | null>(null);
   const hydratedDayRef = useRef<string | null>(null);
   const skipUrlSyncRef = useRef(false);
@@ -942,6 +954,7 @@ function DayRoutePanelInner() {
     const info = resolveCityInfo(pageCitySlug, selectedCity?.selectedDestination?.sourceSlug);
     return info?.dayRoutePresets || [];
   }, [pageCitySlug, selectedCity?.selectedDestination?.sourceSlug]);
+  const hasNamedPresets = dayRoutePresets.length > 0;
 
   const dayPresetCityCtx = useMemo(
     () => ({
@@ -1553,6 +1566,56 @@ function DayRoutePanelInner() {
     }, 80);
   }
 
+  function scrollToDayPresets() {
+    window.setTimeout(() => {
+      const el = document.querySelector('[data-day-presets]');
+      if (el instanceof HTMLElement) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 80);
+  }
+
+  function createCustomFromSearch(title: string) {
+    const trimmed = String(title || '').trim();
+    if (!trimmed) return;
+    armScrollPreserve();
+    const before = readDayRouteFresh().venues.length;
+    if (before >= DAY_ROUTE_MAX) {
+      flashDayRouteFeedback(dayRouteHardLimitMessage());
+      setRoute(readDayRouteFresh());
+      return;
+    }
+    const next = addTextStopToDayRoute({
+      title: trimmed,
+      city: pageCityName || cityInput || null,
+      cityId: pageCityId || null,
+      citySlug: pageCitySlug || null,
+    });
+    setRoute(next);
+    if (next.venues.length <= before) {
+      flashDayRouteFeedback(
+        next.venues.length >= DAY_ROUTE_MAX
+          ? dayRouteHardLimitMessage()
+          : 'Не удалось добавить точку',
+      );
+      return;
+    }
+    flashDayRouteFeedback(dayRouteAddSuccessMessage(next.venues.length));
+    if (isDayRouteAtSoft(next.venues.length)) {
+      flashDayRouteFeedback(DAY_ROUTE_SOFT_WARN);
+    }
+  }
+
+  function openTicketView(venue: DayRouteVenueItem) {
+    setTicketView({
+      venueId: venue.id,
+      title: venue.title,
+      ticketUrl: resolveDayRouteTicketUrl(venue),
+      qrData: dayRouteStopTicketQrData(venue),
+      qrKind: venue.ticketQrKind || null,
+    });
+  }
+
   function openFirstUnpaidTicket() {
     const first = unpaidTicketStops[0];
     if (!first) return;
@@ -1834,11 +1897,8 @@ function DayRoutePanelInner() {
   }
 
   function openTextForm() {
-    setOpenPanel('text');
-    window.setTimeout(() => {
-      document.getElementById('day-plan-form-wrap')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      titleFieldRef.current?.focus();
-    }, 80);
+    // Accordion removed - custom stops come from search create row.
+    focusUnifiedSearch();
   }
 
   const shareMenuItems = (
@@ -2111,7 +2171,11 @@ function DayRoutePanelInner() {
               <div className="min-w-0" data-day-starter-copy>
                 <p className="text-xl font-bold leading-snug text-slate-900">Собери свой день</p>
                 <p className="mt-1 text-sm leading-relaxed text-slate-500">
-                  Выбери город и минимум {DAY_ROUTE_MIN} точки для составления маршрута
+                  {!hasPageCity
+                    ? `Выбери город и минимум ${DAY_ROUTE_MIN} точки для составления маршрута`
+                    : hasNamedPresets
+                      ? 'Добавь своё место или готовый сценарий'
+                      : `Минимум ${DAY_ROUTE_MIN} точки - или добавь своё место через поиск`}
                 </p>
               </div>
             </div>
@@ -2152,22 +2216,52 @@ function DayRoutePanelInner() {
                   options={hasPageCity ? unifiedSearchOptions : []}
                   onPick={pickUnifiedSearch}
                   onQueryChange={setUnifiedSearchQuery}
+                  onCreateCustom={hasPageCity ? createCustomFromSearch : undefined}
+                  createCustomDisabled={atMax}
                 />
                 {hasPageCity && catalogError ? (
                   <p className="mt-1.5 mb-0 pl-1 text-left text-xs font-medium text-rose-700" role="status">
                     {catalogError}
                   </p>
                 ) : null}
-                <p className="mt-1.5 mb-0 block pl-1 text-left text-xs leading-tight text-slate-500">
-                  или{' '}
-                  <button
-                    type="button"
-                    onClick={openTextForm}
-                    className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
+                {hasPageCity ? (
+                  <p
+                    className="mt-1.5 mb-0 block pl-1 text-left text-xs leading-tight text-slate-500"
+                    data-day-starter-invite
                   >
-                    добавь своё место
-                  </button>
-                </p>
+                    {hasNamedPresets ? (
+                      <>
+                        Добавь{' '}
+                        <button
+                          type="button"
+                          onClick={focusUnifiedSearch}
+                          className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
+                        >
+                          своё место
+                        </button>
+                        {' '}или{' '}
+                        <button
+                          type="button"
+                          onClick={scrollToDayPresets}
+                          className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
+                        >
+                          готовый сценарий
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        или{' '}
+                        <button
+                          type="button"
+                          onClick={focusUnifiedSearch}
+                          className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
+                        >
+                          добавить своё место
+                        </button>
+                      </>
+                    )}
+                  </p>
+                ) : null}
               </div>
             </div>
           </div>
@@ -2213,21 +2307,46 @@ function DayRoutePanelInner() {
                 options={unifiedSearchOptions}
                 onPick={pickUnifiedSearch}
                 onQueryChange={setUnifiedSearchQuery}
+                onCreateCustom={createCustomFromSearch}
+                createCustomDisabled={atMax}
               />
               {catalogError ? (
                 <p className="mt-2 text-xs font-medium text-rose-700" role="status">
                   {catalogError}
                 </p>
               ) : null}
-              <p className="mt-2 text-[13px] text-slate-500">
-                или{' '}
-                <button
-                  type="button"
-                  onClick={openTextForm}
-                  className="font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
-                >
-                  добавь своё место
-                </button>
+              <p className="mt-2 text-[13px] text-slate-500" data-day-starter-invite>
+                {hasNamedPresets ? (
+                  <>
+                    Добавь{' '}
+                    <button
+                      type="button"
+                      onClick={focusUnifiedSearch}
+                      className="font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
+                    >
+                      своё место
+                    </button>
+                    {' '}или{' '}
+                    <button
+                      type="button"
+                      onClick={scrollToDayPresets}
+                      className="font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
+                    >
+                      готовый сценарий
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    или{' '}
+                    <button
+                      type="button"
+                      onClick={focusUnifiedSearch}
+                      className="font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
+                    >
+                      добавить своё место
+                    </button>
+                  </>
+                )}
               </p>
             </div>
           ) : (
@@ -2684,6 +2803,10 @@ function DayRoutePanelInner() {
                   onBuyClick={(ticketUrl) =>
                     setTicketHandoff({ venueId: venue.id, ticketUrl, title: venue.title })
                   }
+                  onShowTicket={() => openTicketView(venue)}
+                  onSetNote={(note) =>
+                    setRoute(updateDayRouteVenue(venue.id, { note: note || null }))
+                  }
                 />
                 {primaryFreeWindow &&
                 primaryFreeWindow.afterIndex === index &&
@@ -2805,8 +2928,10 @@ function DayRoutePanelInner() {
               {mustSeeResolved.length > 0 ? (
                 <div data-day-must-see>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="text-xs text-slate-500">
-                      Нажмите на место или добавьте видимые сразу (ориентир {DAY_ROUTE_SOFT}).
+                    <p className="text-xs text-slate-500" data-day-must-see-helper>
+                      {`Собрали ${
+                        mustSeeResolved.length >= DAY_ROUTE_SOFT ? `топ-${DAY_ROUTE_SOFT}` : 'топ'
+                      } мест${pageCityName ? ` ${inCityPrepositional(pageCityName)}` : ''}. Добавьте все в один клик или выберите точечно.`}
                     </p>
                     <button
                       type="button"
@@ -2909,138 +3034,7 @@ function DayRoutePanelInner() {
         </div>
       ) : null}
 
-      {/* Accordion: custom text place */}
-      <div className="mt-3 rounded-2xl border border-slate-200 bg-white" id="day-plan-form-wrap">
-        <button
-          type="button"
-          aria-expanded={textFormOpen}
-          aria-controls="day-plan-form"
-          data-day-plan-accordion
-          onClick={() => {
-            setOpenPanel((cur) => {
-              const next = cur === 'text' ? null : 'text';
-              if (next === 'text') {
-                window.setTimeout(() => titleFieldRef.current?.focus(), 50);
-              }
-              return next;
-            });
-          }}
-          className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
-        >
-          <span>
-            <span className="block text-sm font-semibold text-slate-900">Добавить своё место</span>
-            <span className="mt-0.5 block text-xs text-slate-500">
-              Необязательно - если места нет в каталоге
-            </span>
-          </span>
-          <ChevronDown
-            className={`h-5 w-5 shrink-0 text-slate-400 transition ${textFormOpen ? 'rotate-180' : ''}`}
-          />
-        </button>
-        {textFormOpen ? (
-          <form
-            onSubmit={submitTextStop}
-            className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5"
-            data-day-plan-form="1"
-            id="day-plan-form"
-          >
-            <p className="text-sm leading-relaxed text-slate-600">
-              Введите название. Адрес, город и координаты - по желанию.
-            </p>
-            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-stretch">
-              <label className="min-w-0 flex-1">
-                <span className="sr-only">Название места</span>
-                <input
-                  ref={titleFieldRef}
-                  type="text"
-                  name="title"
-                  value={titleInput}
-                  onChange={(e) => {
-                    setTitleInput(e.target.value);
-                    if (formError) setFormError(null);
-                  }}
-                  placeholder="Например: Эрмитаж"
-                  autoComplete="off"
-                  disabled={atMax}
-                  data-day-plan-title
-                  className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
-                />
-              </label>
-              <button
-                type="submit"
-                disabled={atMax}
-                data-day-plan-add
-                className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
-              >
-                <Plus className="h-4 w-4" />
-                Добавить
-              </button>
-            </div>
-            <label className="mt-2 block">
-              <span className="sr-only">Адрес или заметка</span>
-              <input
-                type="text"
-                name="note"
-                value={noteInput}
-                onChange={(e) => setNoteInput(e.target.value)}
-                placeholder="Адрес или заметка (необязательно)"
-                autoComplete="off"
-                disabled={atMax}
-                data-day-plan-note
-                className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
-              />
-            </label>
-            <button
-              type="button"
-              onClick={() => setShowAdvanced((v) => !v)}
-              className="mt-2 text-xs font-semibold text-slate-500 hover:text-slate-800"
-            >
-              {showAdvanced ? 'Скрыть город и координаты' : 'Город и координаты (необязательно)'}
-            </button>
-            {showAdvanced ? (
-              <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                <label className="block">
-                  <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                    Город
-                  </span>
-                  <input
-                    type="text"
-                    name="city"
-                    value={cityInput}
-                    onChange={(e) => setCityInput(e.target.value)}
-                    placeholder="Город (необязательно)"
-                    autoComplete="off"
-                    disabled={atMax}
-                    data-day-plan-city
-                    className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
-                  />
-                </label>
-                <label className="block">
-                  <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                    Координаты
-                  </span>
-                  <input
-                    type="text"
-                    name="coords"
-                    value={coordsInput}
-                    onChange={(e) => setCoordsInput(e.target.value)}
-                    placeholder="59.93, 30.31"
-                    autoComplete="off"
-                    disabled={atMax}
-                    data-day-plan-coords
-                    className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
-                  />
-                </label>
-              </div>
-            ) : null}
-            {formError ? (
-              <p role="alert" className="mt-2 text-sm font-medium text-rose-700">
-                {formError}
-              </p>
-            ) : null}
-          </form>
-        ) : null}
-      </div>
+      {/* Custom place: via search create row (accordion removed) */}
 
       {/* Hot Picks - always expanded (no accordion chrome) */}
       {showHotPicks ? (
@@ -3624,6 +3618,85 @@ function DayRoutePanelInner() {
         </div>
       </div>
     ) : null}
+    {ticketView ? (
+      <div
+        className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 p-4 sm:items-center print:hidden"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="day-ticket-view-title"
+        data-day-ticket-view
+        onClick={() => setTicketView(null)}
+      >
+        <div
+          className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-4 shadow-xl sm:p-5"
+          onClick={(event) => event.stopPropagation()}
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p id="day-ticket-view-title" className="text-base font-semibold text-slate-900">
+                Билет
+              </p>
+              <p className="mt-0.5 truncate text-sm text-slate-600">{ticketView.title}</p>
+            </div>
+            <button
+              type="button"
+              aria-label="Закрыть"
+              onClick={() => setTicketView(null)}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+          {ticketView.qrData ? (
+            <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-center" data-day-ticket-qr>
+              {/^https?:\/\//i.test(ticketView.qrData) || ticketView.qrKind === 'image' ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={ticketView.qrData}
+                  alt="Код билета"
+                  className="mx-auto max-h-56 w-auto"
+                />
+              ) : (
+                <p className="break-all font-mono text-sm text-slate-900">{ticketView.qrData}</p>
+              )}
+              <p className="mt-2 text-[11px] text-slate-500">Покажите код при входе</p>
+            </div>
+          ) : (
+            <div className="mt-4 rounded-xl border border-dashed border-slate-200 bg-slate-50 p-4" data-day-ticket-qr-stub>
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-xl bg-white text-primary-600">
+                <QrCode className="h-7 w-7" />
+              </div>
+              <p className="mt-3 text-sm font-medium text-slate-800">
+                Билет будет здесь после покупки на Дайбилет
+              </p>
+              <p className="mt-1 text-xs text-slate-500">
+                QR из заказа появится, когда покупка будет доступна в приложении. Фейковый код не показываем.
+              </p>
+            </div>
+          )}
+          <div className="mt-4 flex flex-col gap-2">
+            {ticketView.ticketUrl ? (
+              <a
+                href={ticketView.ticketUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-day-ticket-view-link
+                className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary-600 px-4 text-sm font-bold text-white hover:bg-primary-700"
+              >
+                Открыть страницу билета
+              </a>
+            ) : null}
+            <button
+              type="button"
+              className="inline-flex min-h-11 items-center justify-center rounded-full border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+              onClick={() => setTicketView(null)}
+            >
+              Закрыть
+            </button>
+          </div>
+        </div>
+      </div>
+    ) : null}
     {route.venues.length ? (
       <DayRoutePrintSheet
         cityTitle={scopeCityName}
@@ -3655,6 +3728,8 @@ function DayRouteVenueCard({
   onRemove,
   onToggleBought,
   onBuyClick,
+  onShowTicket,
+  onSetNote,
 }: {
   venue: DayRouteVenueItem;
   index: number;
@@ -3676,8 +3751,14 @@ function DayRouteVenueCard({
   onRemove: () => void;
   onToggleBought: () => void;
   onBuyClick: (ticketUrl: string) => void;
+  onShowTicket: () => void;
+  onSetNote: (note: string) => void;
 }) {
   const textStop = isTextDayRouteStop(venue);
+  const reorderLocked = dayRouteStopReorderLocked(venue);
+  const isCommerce = dayRouteStopIsCommerce(venue);
+  const [addressOpen, setAddressOpen] = useState(false);
+  const [addressDraft, setAddressDraft] = useState(String(venue.note || venue.address || ''));
   const href =
     venue.href ||
     (!textStop && venue.slug
@@ -3787,30 +3868,45 @@ function DayRouteVenueCard({
           >
             {index + 1}
           </span>
+          {reorderLocked ? (
+            <div
+              className="flex h-8 w-5 shrink-0 items-center justify-center text-slate-300"
+              data-day-stop-sort="locked"
+              title="Сеанс с фиксированным временем - порядок нельзя менять"
+              aria-hidden
+            >
+              <Ticket className="h-3 w-3" />
+            </div>
+          ) : (
+            <div
+              className="flex shrink-0 flex-col items-center leading-none"
+              data-day-stop-sort
+            >
+              <button
+                type="button"
+                aria-label="Выше"
+                disabled={index === 0}
+                onClick={onMoveUp}
+                className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+              >
+                <ChevronUp className="h-3 w-3" />
+              </button>
+              <button
+                type="button"
+                aria-label="Ниже"
+                disabled={index >= total - 1}
+                onClick={onMoveDown}
+                className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+              >
+                <ChevronDown className="h-3 w-3" />
+              </button>
+            </div>
+          )}
           <div
-            className="flex shrink-0 flex-col items-center leading-none"
-            data-day-stop-sort
+            className={`min-w-0 flex-1 self-center border-l-4 pl-2 leading-tight ${
+              isCommerce ? 'border-primary-600' : 'border-transparent'
+            }`}
           >
-            <button
-              type="button"
-              aria-label="Выше"
-              disabled={index === 0}
-              onClick={onMoveUp}
-              className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
-            >
-              <ChevronUp className="h-3 w-3" />
-            </button>
-            <button
-              type="button"
-              aria-label="Ниже"
-              disabled={index >= total - 1}
-              onClick={onMoveDown}
-              className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
-            >
-              <ChevronDown className="h-3 w-3" />
-            </button>
-          </div>
-          <div className="min-w-0 flex-1 self-center leading-tight">
             <p className="m-0 truncate text-[13px] font-semibold text-slate-900">{titleNode}</p>
             {metaLine ? (
               <p
@@ -3829,26 +3925,76 @@ function DayRouteVenueCard({
                 {segmentLine}
               </p>
             ) : null}
-            {ticketUrl ? (
+            {ticketUrl || isCommerce ? (
               <div className="mt-0.5 flex flex-wrap items-center gap-1.5">
-                <a
-                  href={ticketUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  data-day-buy-ticket
-                  onClick={() => onBuyClick(ticketUrl)}
-                  className="text-[11px] font-semibold text-amber-700 underline-offset-2 hover:underline"
-                >
-                  {buyCtaLabel}
-                </a>
+                {ticketUrl ? (
+                  <a
+                    href={ticketUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    data-day-buy-ticket
+                    onClick={() => onBuyClick(ticketUrl)}
+                    className="text-[11px] font-semibold text-amber-700 underline-offset-2 hover:underline"
+                  >
+                    {buyCtaLabel}
+                  </a>
+                ) : null}
                 <button
                   type="button"
-                  onClick={onToggleBought}
-                  data-day-ticket-bought
-                  className="text-[11px] font-medium text-slate-600 underline-offset-2 hover:underline"
+                  onClick={onShowTicket}
+                  data-day-show-ticket
+                  className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary-700 underline-offset-2 hover:underline"
                 >
-                  {bought ? 'Билет отмечен' : 'Отметить купленным'}
+                  <QrCode className="h-3 w-3" />
+                  Показать билет
                 </button>
+                {ticketUrl ? (
+                  <button
+                    type="button"
+                    onClick={onToggleBought}
+                    data-day-ticket-bought
+                    className="text-[11px] font-medium text-slate-600 underline-offset-2 hover:underline"
+                  >
+                    {bought ? 'Билет отмечен' : 'Отметить купленным'}
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+            {textStop ? (
+              <div className="mt-0.5" data-day-custom-address>
+                {addressOpen ? (
+                  <form
+                    className="flex gap-1"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      onSetNote(addressDraft.trim());
+                      setAddressOpen(false);
+                    }}
+                  >
+                    <input
+                      type="text"
+                      value={addressDraft}
+                      onChange={(e) => setAddressDraft(e.target.value)}
+                      placeholder="Адрес или заметка"
+                      className="min-h-7 w-full rounded-md border border-slate-200 px-2 text-[11px] outline-none focus:border-primary-400"
+                      autoFocus
+                    />
+                    <button type="submit" className="text-[11px] font-semibold text-primary-700">
+                      Ок
+                    </button>
+                  </form>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAddressDraft(String(venue.note || venue.address || ''));
+                      setAddressOpen(true);
+                    }}
+                    className="text-[11px] font-medium text-slate-400 underline-offset-2 hover:text-slate-600 hover:underline"
+                  >
+                    {venue.note || venue.address ? 'Изменить адрес' : 'Указать адрес'}
+                  </button>
+                )}
               </div>
             ) : null}
           </div>
@@ -3868,6 +4014,7 @@ function DayRouteVenueCard({
       data-commercial-chip={chip.kind}
       data-day-session={sessionDisplay || undefined}
       data-day-stop-focused={focused ? '1' : undefined}
+      data-day-commerce={isCommerce ? '1' : '0'}
     >
       {/*
         Owner v7: single compact row
@@ -3875,32 +4022,47 @@ function DayRouteVenueCard({
       */}
       <div
         className={`flex items-center gap-2 rounded-2xl border bg-white px-2.5 py-2 sm:gap-3 sm:px-3 sm:py-2.5 ${
-          focused ? 'border-emerald-400 ring-1 ring-emerald-200' : 'border-slate-200'
+          focused
+            ? 'border-emerald-400 ring-1 ring-emerald-200'
+            : isCommerce
+              ? 'border-l-4 border-l-primary-600 border-slate-200'
+              : 'border-slate-200'
         }`}
       >
-        <div
-          className="flex shrink-0 flex-col items-center leading-none"
-          data-day-stop-sort
-        >
-          <button
-            type="button"
-            aria-label="Выше"
-            disabled={index === 0}
-            onClick={onMoveUp}
-            className="rounded p-0.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+        {reorderLocked ? (
+          <div
+            className="flex h-10 w-6 shrink-0 items-center justify-center text-slate-300"
+            data-day-stop-sort="locked"
+            title="Сеанс с фиксированным временем - порядок нельзя менять"
+            aria-hidden
           >
-            <ChevronUp className="h-3.5 w-3.5" />
-          </button>
-          <button
-            type="button"
-            aria-label="Ниже"
-            disabled={index >= total - 1}
-            onClick={onMoveDown}
-            className="rounded p-0.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+            <Ticket className="h-3.5 w-3.5" />
+          </div>
+        ) : (
+          <div
+            className="flex shrink-0 flex-col items-center leading-none"
+            data-day-stop-sort
           >
-            <ChevronDown className="h-3.5 w-3.5" />
-          </button>
-        </div>
+            <button
+              type="button"
+              aria-label="Выше"
+              disabled={index === 0}
+              onClick={onMoveUp}
+              className="rounded p-0.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+            >
+              <ChevronUp className="h-3.5 w-3.5" />
+            </button>
+            <button
+              type="button"
+              aria-label="Ниже"
+              disabled={index >= total - 1}
+              onClick={onMoveDown}
+              className="rounded p-0.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+            >
+              <ChevronDown className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
 
         <div className="relative h-14 w-14 shrink-0 sm:h-16 sm:w-16" data-day-stop-thumb>
           <span
@@ -3957,26 +4119,76 @@ function DayRouteVenueCard({
             </div>
           ) : null}
 
-          {ticketUrl ? (
+          {ticketUrl || isCommerce ? (
             <div className="mt-1 flex flex-wrap items-center gap-1.5">
-              <a
-                href={ticketUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                data-day-buy-ticket
-                onClick={() => onBuyClick(ticketUrl)}
-                className="text-[11px] font-semibold text-amber-700 underline-offset-2 hover:underline"
-              >
-                {buyCtaLabel}
-              </a>
+              {ticketUrl ? (
+                <a
+                  href={ticketUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-day-buy-ticket
+                  onClick={() => onBuyClick(ticketUrl)}
+                  className="text-[11px] font-semibold text-amber-700 underline-offset-2 hover:underline"
+                >
+                  {buyCtaLabel}
+                </a>
+              ) : null}
               <button
                 type="button"
-                onClick={onToggleBought}
-                data-day-ticket-bought
-                className="text-[11px] font-medium text-slate-600 underline-offset-2 hover:underline"
+                onClick={onShowTicket}
+                data-day-show-ticket
+                className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary-700 underline-offset-2 hover:underline"
               >
-                {bought ? 'Билет отмечен' : 'Отметить'}
+                <QrCode className="h-3 w-3" />
+                Показать билет
               </button>
+              {ticketUrl ? (
+                <button
+                  type="button"
+                  onClick={onToggleBought}
+                  data-day-ticket-bought
+                  className="text-[11px] font-medium text-slate-600 underline-offset-2 hover:underline"
+                >
+                  {bought ? 'Билет отмечен' : 'Отметить'}
+                </button>
+              ) : null}
+            </div>
+          ) : null}
+          {textStop ? (
+            <div className="mt-1" data-day-custom-address>
+              {addressOpen ? (
+                <form
+                  className="flex gap-1"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    onSetNote(addressDraft.trim());
+                    setAddressOpen(false);
+                  }}
+                >
+                  <input
+                    type="text"
+                    value={addressDraft}
+                    onChange={(e) => setAddressDraft(e.target.value)}
+                    placeholder="Адрес или заметка"
+                    className="min-h-8 w-full rounded-md border border-slate-200 px-2 text-xs outline-none focus:border-primary-400"
+                    autoFocus
+                  />
+                  <button type="submit" className="text-xs font-semibold text-primary-700">
+                    Ок
+                  </button>
+                </form>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAddressDraft(String(venue.note || venue.address || ''));
+                    setAddressOpen(true);
+                  }}
+                  className="text-[11px] font-medium text-slate-400 underline-offset-2 hover:text-slate-600 hover:underline"
+                >
+                  {venue.note || venue.address ? 'Изменить адрес' : 'Указать адрес'}
+                </button>
+              )}
             </div>
           ) : null}
         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { Check, ChevronDown, MapPin, Search } from 'lucide-react';
+import { Check, ChevronDown, MapPin, Plus, Search } from 'lucide-react';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { SafeImage } from '@/components/SafeImage.client';
@@ -29,6 +29,12 @@ type Props = {
   hideLabel?: boolean;
   /** Notify parent of typed query (for remote event search merge). */
   onQueryChange?: (query: string) => void;
+  /**
+   * When filtered hits are empty and query is non-empty, first row creates a custom stop.
+   * Parent handles addTextStopToDayRoute.
+   */
+  onCreateCustom?: (query: string) => void;
+  createCustomDisabled?: boolean;
 };
 
 /**
@@ -46,6 +52,8 @@ export function DayRouteSearchSelect({
   clearOnPick = true,
   hideLabel = false,
   onQueryChange,
+  onCreateCustom,
+  createCustomDisabled = false,
 }: Props) {
   const listId = useId();
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -65,9 +73,18 @@ export function DayRouteSearchSelect({
     return takeDayRouteSearchOptions(list);
   }, [options, query]);
 
+  const trimmedQuery = query.trim();
+  const showCreateCustom =
+    Boolean(onCreateCustom) &&
+    trimmedQuery.length >= 2 &&
+    !loading &&
+    filtered.length === 0;
+
+  const rowCount = showCreateCustom ? 1 : filtered.length;
+
   useEffect(() => {
     setActiveIndex(0);
-  }, [query, open]);
+  }, [query, open, showCreateCustom]);
 
   useEffect(() => {
     onQueryChange?.(query);
@@ -86,6 +103,13 @@ export function DayRouteSearchSelect({
   function pick(option: DayRouteSearchOption) {
     if (option.disabled) return;
     onPick(option);
+    if (clearOnPick) setQuery('');
+    setOpen(false);
+  }
+
+  function createCustom() {
+    if (!onCreateCustom || createCustomDisabled || trimmedQuery.length < 2) return;
+    onCreateCustom(trimmedQuery);
     if (clearOnPick) setQuery('');
     setOpen(false);
   }
@@ -134,7 +158,7 @@ export function DayRouteSearchSelect({
             }
             if (event.key === 'ArrowDown') {
               event.preventDefault();
-              setActiveIndex((index) => Math.min(index + 1, Math.max(filtered.length - 1, 0)));
+              setActiveIndex((index) => Math.min(index + 1, Math.max(rowCount - 1, 0)));
               return;
             }
             if (event.key === 'ArrowUp') {
@@ -144,6 +168,10 @@ export function DayRouteSearchSelect({
             }
             if (event.key === 'Enter') {
               event.preventDefault();
+              if (showCreateCustom) {
+                createCustom();
+                return;
+              }
               const option = filtered[activeIndex];
               if (option) pick(option);
             }
@@ -162,8 +190,31 @@ export function DayRouteSearchSelect({
           role="listbox"
           className="absolute z-30 mt-1 max-h-64 w-full overflow-y-auto overflow-x-hidden rounded-xl border border-slate-200 bg-white p-1 shadow-lg"
         >
-          {loading && filtered.length === 0 ? (
+          {loading && filtered.length === 0 && !showCreateCustom ? (
             <li className="px-3 py-2.5 text-sm text-slate-500">Загружаем…</li>
+          ) : showCreateCustom ? (
+            <li role="option" aria-selected={activeIndex === 0} data-day-search-create-custom>
+              <button
+                type="button"
+                disabled={createCustomDisabled}
+                onMouseEnter={() => setActiveIndex(0)}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => createCustom()}
+                className={`flex w-full items-start gap-2 rounded-lg px-3 py-2 text-left text-sm disabled:cursor-not-allowed disabled:opacity-55 ${
+                  activeIndex === 0 ? 'bg-emerald-50 text-emerald-950' : 'text-slate-800 hover:bg-slate-50'
+                }`}
+              >
+                <span className="mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-white">
+                  <Plus className="h-4 w-4" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block font-medium">
+                    Добавить своё место &quot;{trimmedQuery}&quot;
+                  </span>
+                  <span className="mt-0.5 block text-xs text-slate-500">Сразу в маршрут на день</span>
+                </span>
+              </button>
+            </li>
           ) : filtered.length === 0 ? (
             <li className="px-3 py-2.5 text-sm text-slate-500">{emptyText}</li>
           ) : (
@@ -210,7 +261,9 @@ export function DayRouteSearchSelect({
                         ) : null}
                       </span>
                     </span>
-                    {!option.disabled ? <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600 opacity-0 group-hover:opacity-100" /> : null}
+                    {!option.disabled ? (
+                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-600 opacity-0 group-hover:opacity-100" />
+                    ) : null}
                   </button>
                 </li>
               );

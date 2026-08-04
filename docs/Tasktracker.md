@@ -163,6 +163,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.LOC7 | Catalog mobile date UX: один entry (chips/sheet) | Средний | ⏳ |
 | UX.LOC8 | IA: demote `/locations` из primary nav или секция city hub | Средний | ⏳ |
 | UX.LOC9 | Unified `/places` (venues+locations tabs) | Низкий | ⚠️ после LOC8 |
+| UX.MYDAY-UX0804 | Must-see human copy; ticket freeze+accent+show; custom via search; starter invite presets-aware | Критический | 🔄 commit+MSK deploy |
 | UX.MYDAY-F | Мой день: filters + auto-pick + top-up (product next) | Высокий | ⏳ поверх MOB канона |
 | UX.MYDAY-IA | `/my-day` catalog-first + text accordion (collapsed) | Критический | ✅ live **BUILD_ID=`MvYEsYnvAH_KMCxXkt2S6`** |
 | UX.MYDAY-ONPAGE | `/my-day` on-page city + searchable Локации/Площадки/События + must-see chips (no catalog nav) | Критический | ✅ `b4fdfd5`+`6345d0a` MSK **BUILD_ID=`q-1BAwZ65koVjH3CunDvi`** |

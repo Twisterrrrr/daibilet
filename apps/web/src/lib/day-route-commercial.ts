@@ -41,6 +41,38 @@ export function dayRouteStopHasTicket(
 }
 
 /**
+ * Ticket / timed-session stops: lock ↑↓ reorder (boat slot / bought ticket stay fixed).
+ */
+export function dayRouteStopReorderLocked(
+  venue: Pick<DayRouteVenueItem, 'ticketBought' | 'startsAt' | 'sessionLabel' | 'ticketUrl' | 'eventId' | 'eventSlug' | 'title'>,
+): boolean {
+  if (venue.ticketBought) return true;
+  if (dayRouteSessionTimeLabel(venue)) return true;
+  return false;
+}
+
+/** Visual commerce anchor (ticket/event) vs free landmark. */
+export function dayRouteStopIsCommerce(
+  venue: Pick<
+    DayRouteVenueItem,
+    'ticketBought' | 'startsAt' | 'sessionLabel' | 'ticketUrl' | 'eventId' | 'eventSlug' | 'title'
+  >,
+): boolean {
+  if (venue.ticketBought) return true;
+  if (dayRouteStopHasTicket(venue)) return true;
+  if (dayRouteSessionTimeLabel(venue)) return true;
+  return false;
+}
+
+/** Real QR/code payload only - empty means stub modal, never a fake QR. */
+export function dayRouteStopTicketQrData(
+  venue: Pick<DayRouteVenueItem, 'ticketQrData'>,
+): string | null {
+  const raw = String(venue.ticketQrData || '').trim();
+  return raw || null;
+}
+
+/**
  * Chip rules (priority):
  * 1. ticketBought → «Билет отмечен»
  * 2. timed session → «Сеанс HH:00»
@@ -215,8 +247,10 @@ export type DayRouteTripTicket = {
   title: string;
   sessionLabel: string | null;
   ticketUrl: string | null;
-  /** Guest MVP: QR from orders API not wired yet. */
+  /** True only when ticketQrData already exists in client state. */
   qrAvailable: boolean;
+  qrData: string | null;
+  qrKind: 'qr' | 'barcode' | 'image' | null;
 };
 
 function venueLocatorKeys(venue: Pick<DayRouteVenueItem, 'id' | 'slug'>): Set<string> {
@@ -445,12 +479,18 @@ export function collectDayRouteTripTickets(venues: DayRouteVenueItem[]): DayRout
     .map((v) => {
       const timed = dayRouteSessionTimeLabel(v);
       const soft = String(v.sessionLabel || '').trim() || null;
+      const qrData = dayRouteStopTicketQrData(v);
+      const kindRaw = String(v.ticketQrKind || '').trim();
+      const qrKind =
+        kindRaw === 'qr' || kindRaw === 'barcode' || kindRaw === 'image' ? kindRaw : qrData ? 'qr' : null;
       return {
         venueId: v.id,
         title: v.title,
         sessionLabel: timed || soft,
         ticketUrl: resolveDayRouteTicketUrl(v),
-        qrAvailable: false,
+        qrAvailable: Boolean(qrData),
+        qrData,
+        qrKind,
       };
     });
 }

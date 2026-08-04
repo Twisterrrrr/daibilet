@@ -1,3 +1,20 @@
+## 2026-08-04 - My Day UX: copy, tickets, custom search
+
+### Наблюдения
+- Owner: must-see helper без «ориентир 10»; ticket cards - freeze reorder + blue accent + «Показать билет»; custom place из поиска; first-block invite зависит от `dayRoutePresets`.
+
+### Решения
+- Must-see: «Собрали топ/топ-10 мест в {City_Пр}. Добавьте все…».
+- First block: при presets - «своё место или готовый сценарий» (scroll CTA); без presets - только «добавить своё место».
+- Search empty → «Добавить своё место "{query}"» instant add; accordion «своё место» убран; на custom card - muted «Указать адрес» (текст, без Yandex Suggest).
+- Ticket/session: ↑↓ locked; border-l primary; modal QR only if `ticketQrData`, else stub «билет будет здесь после покупки».
+
+### Проблемы
+- Yandex Suggest - нет ключа в проекте (deferred).
+- Real QR из orders API - всё ещё open (qa.md); stub only.
+
+---
+
 ## 2026-08-04 - Event PDP conversion (funnel first)
 
 ### Наблюдения

@@ -111,6 +111,13 @@ export type DayRouteVenueItem = {
   ticketBought?: boolean;
   /** Lowest known ticket price (rub) from matches / catalog - for «Купить билет от X». */
   priceFromRub?: number | null;
+  /**
+   * Scannable ticket payload from orders/finance hydrate only.
+   * Never invent a fake QR in UI when absent.
+   */
+  ticketQrData?: string | null;
+  /** Hint for renderer: image URL / raw code string. */
+  ticketQrKind?: 'qr' | 'barcode' | 'image' | null;
 };
 
 /** Synthetic planner stops (typed on /my-day) - no catalog venue id required. */
