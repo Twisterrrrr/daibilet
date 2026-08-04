@@ -1430,12 +1430,13 @@ function CitySightsMustSeeList({
         <div
           key={activeId}
           ref={railRef}
-          className="horizontal-snap-row touch-pan-x snap-x snap-mandatory md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden"
+          className="horizontal-snap-row flex flex-nowrap gap-3 touch-pan-x snap-x snap-mandatory md:block md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden"
           data-city-must-see-rail
           aria-label="Главные места"
           tabIndex={0}
         >
-        <ol className="flex w-max flex-nowrap gap-3 md:grid md:auto-cols-[min(22rem,calc(50vw-3rem))] md:grid-flow-col md:grid-rows-2 md:gap-x-6 md:gap-y-5">
+        {/* Mobile: contents hoists cards into the flex scrollport so 85% = viewport; md: 2-row grid. */}
+        <ol className="contents md:grid md:w-max md:auto-cols-[min(22rem,calc(50vw-3rem))] md:grid-flow-col md:grid-rows-2 md:gap-x-6 md:gap-y-5">
         {visiblePlaces.map((place, index) => {
           const afficheLink = matchSightAfficheLink({
             sightName: place.name,
@@ -1459,7 +1460,7 @@ function CitySightsMustSeeList({
           return (
             <li
               key={`${place.name}:${index}`}
-              className="flex w-[85%] min-w-[85%] shrink-0 snap-start gap-3 md:w-auto md:min-w-0 md:max-w-none"
+              className="flex min-w-0 shrink-0 snap-start gap-3 overflow-hidden [flex:0_0_85%] md:w-auto md:min-w-0 md:max-w-none md:[flex:none]"
               data-city-must-see-card
             >
               <span
@@ -1469,21 +1470,21 @@ function CitySightsMustSeeList({
               >
                 {index + 1}
               </span>
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 flex-1 overflow-hidden">
                 {placeHref ? (
                   <Link
                     href={placeHref}
-                    className={`${titleClass} underline decoration-slate-300 underline-offset-2 hover:decoration-current`}
+                    className={`${titleClass} break-words underline decoration-slate-300 underline-offset-2 hover:decoration-current`}
                     data-city-must-see-title
                   >
                     {place.name}
                   </Link>
                 ) : (
-                  <div className={titleClass}>{place.name}</div>
+                  <div className={`${titleClass} break-words`}>{place.name}</div>
                 )}
                 {blurb ? (
                   <p
-                    className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
+                    className={`mt-1 line-clamp-4 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
                   >
                     {blurb}
                   </p>

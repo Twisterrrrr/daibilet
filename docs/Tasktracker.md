@@ -161,6 +161,7 @@
 |---|--------|-----------|--------|
 | UX.MS1 | «Главные места»: mobile full blurb; desktop `sm:line-clamp-2` + «ещё» (hub ExpandableBlurb + /my-day cards) | Высокий | 🔄 deploy |
 | UX.MS2 | «Главные места»: max-lg 85/15; **md+ 2-row stack**; без subtitle; WhyGo вин. падеж; hook sm; venues md:2col; без mood quiz | Критический | ✅ `e96e999c` MSK **BUILD_ID=`9Y0CrLqmzM7hckZVe2RRb`** moscow smoke 200 |
+| UX.MS2b | Hub must-see mobile: fix 85/15 peek (`w-max` ломал % → `contents`+`flex-[0_0_85%]` + line-clamp) | Критический | 🔄 commit+MSK deploy |
 | UX.MS3 | «Главные места» md+: page prev/next вместо scrollbar UX; mobile swipe as-is | Высокий | ✅ `5ffbfded` MSK **BUILD_ID=`blIpyGTrMYrwYoh4jkBws`** moscow/nn smoke 200 |
 
 ---

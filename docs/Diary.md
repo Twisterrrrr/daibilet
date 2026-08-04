@@ -1,3 +1,19 @@
+## 2026-08-04 - City hub must-see: mobile 85/15 carousel
+
+### Наблюдения
+- Owner (скрин Нижний): карточка «Зачем ехать» тянется до края, текст обрезается, peek следующей карточки нет.
+- Причина: `ol` с `w-max` делал `%` ширины indefinite → карточка = max-content (длинная строка).
+
+### Решения
+- Rail: mobile `flex` + `ol` `contents` (карточки - прямые flex-дети scrollport); `flex-[0_0_85%]` + snap.
+- md+: `md:block` / `md:grid` без изменений 2-row.
+- Текст: `min-w-0` / `overflow-hidden` / `line-clamp-4` / `break-words`.
+
+### Проблемы
+- Нет. tip TBD, MSK BUILD_ID TBD после deploy; smoke `/cities/nizhny-novgorod` 200.
+
+---
+
 ## 2026-08-04 - /my-day presets: blog link inline with title
 
 ### Наблюдения
