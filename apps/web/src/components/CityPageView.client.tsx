@@ -28,7 +28,6 @@ import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
-import { ExpandableBlurb } from '@/components/ExpandableBlurb.client';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
 import {
   resolveCityInfo,
@@ -37,7 +36,11 @@ import {
   type CitySuburbItem,
 } from '@/lib/cityInfo';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
-import { dayRouteHookLine, dayRouteItemFromMustSee } from '@/lib/day-route-from-place';
+import {
+  capitalizeSentenceStart,
+  dayRouteHookLine,
+  dayRouteItemFromMustSee,
+} from '@/lib/day-route-from-place';
 import {
   buildMustSeeFilterTabs,
   classifyMustSeePlace,
@@ -1299,16 +1302,13 @@ function CitySignificantSuburbsBlock({
                     <div className={`${titleClass} break-words`}>{place.name}</div>
                   )}
                   {blurb ? (
-                    <ExpandableBlurb
-                      text={blurb}
-                      className={`mt-1 text-sm leading-6 break-words ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
-                      clampClassName="line-clamp-6 md:line-clamp-none"
-                      moreLabel="ещё"
-                      lessLabel="свернуть"
-                      buttonClassName={`mt-0.5 text-xs font-semibold underline-offset-2 hover:underline ${
-                        editorial ? 'text-zinc-700' : 'text-slate-700'
+                    <p
+                      className={`mt-1 text-sm leading-6 break-words ${
+                        editorial ? 'text-zinc-500' : 'text-slate-500'
                       }`}
-                    />
+                    >
+                      {blurb}
+                    </p>
                   ) : null}
                   {nested.length ? (
                     <ul
@@ -1344,7 +1344,7 @@ function CitySignificantSuburbsBlock({
                             {poi.desc ? (
                               <span className={editorial ? 'text-zinc-500' : 'text-slate-500'}>
                                 {' - '}
-                                {poi.desc}
+                                {capitalizeSentenceStart(poi.desc)}
                               </span>
                             ) : null}
                           </li>
@@ -1537,16 +1537,13 @@ function CitySightsMustSeeList({
                   <div className={`${titleClass} break-words`}>{place.name}</div>
                 )}
                 {blurb ? (
-                  <ExpandableBlurb
-                    text={blurb}
-                    className={`mt-1 text-sm leading-6 break-words ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
-                    clampClassName="line-clamp-6 md:line-clamp-none"
-                    moreLabel="ещё"
-                    lessLabel="свернуть"
-                    buttonClassName={`mt-0.5 text-xs font-semibold underline-offset-2 hover:underline ${
-                      editorial ? 'text-zinc-700' : 'text-slate-700'
+                  <p
+                    className={`mt-1 text-sm leading-6 break-words ${
+                      editorial ? 'text-zinc-500' : 'text-slate-500'
                     }`}
-                  />
+                  >
+                    {blurb}
+                  </p>
                 ) : null}
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {dayRouteItem ? (

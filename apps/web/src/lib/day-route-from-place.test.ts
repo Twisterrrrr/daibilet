@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import {
   buildCityDayRoutePreset,
+  capitalizeSentenceStart,
   cityDayRoutePresetAvailable,
   dayRouteHookLine,
   dayRouteItemFromEvent,
@@ -79,6 +80,13 @@ test('dayRouteHookLine prefers hookFact then shortDescription then desc', () => 
     'Коротко из DTO',
   );
   assert.equal(dayRouteHookLine({ desc: 'Только cityInfo desc' }), 'Только cityInfo desc');
+});
+
+test('capitalizeSentenceStart uppercases first letter only', () => {
+  assert.equal(capitalizeSentenceStart('главный готический храм'), 'Главный готический храм');
+  assert.equal(capitalizeSentenceStart('Главный уже с большой'), 'Главный уже с большой');
+  assert.equal(capitalizeSentenceStart('  ещё пробел'), 'Ещё пробел');
+  assert.equal(dayRouteHookLine({ desc: 'масштабный маринистический центр' }), 'Масштабный маринистический центр');
 });
 
 test('dayRouteHookLine keeps full text by default (no ellipsis)', () => {

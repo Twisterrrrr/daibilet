@@ -1,3 +1,19 @@
+## 2026-08-04 - City hub: capitalize blurbs + drop mobile expand
+
+### Наблюдения
+- Owner: must-see описания с маленькой буквы (Калининград / Храмы); на mobile hub лишний expand («ещё»/«Развернуть»-тон) у blurbs.
+- ExpandableBlurb на city hub был с `line-clamp-6` только на mobile - desktop уже full text.
+
+### Решения
+- `capitalizeSentenceStart` + применение в `dayRouteHookLine` (все города); suburb nested POI через тот же helper.
+- Seed `cityInfo` web+public: 56 lowercase `desc` → sentence case (в т.ч. Калининград mustSee/suburbs).
+- City hub must-see/suburbs: убран ExpandableBlurb, полный текст без toggle (my-day carousel↔list «Развернуть» не трогали).
+
+### Проблемы
+- (deploy) tip / BUILD_ID ниже после MSK.
+
+---
+
 ## 2026-08-04 - Калининград: mustSee 35 + suburb nested POIs
 
 ### Наблюдения

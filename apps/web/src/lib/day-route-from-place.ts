@@ -36,6 +36,24 @@ export type DayRouteVenueMatchSource = {
   cityId?: string | null;
 };
 
+/**
+ * Sentence-start capitalize for hub blurbs (must-see / suburb POI).
+ * Skips empty; leaves already-capitalized and non-letter lead intact.
+ */
+export function capitalizeSentenceStart(value: string | null | undefined): string {
+  const text = String(value || '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/[—–]/g, '-');
+  if (!text) return text;
+  const index = text.search(/\p{L}/u);
+  if (index < 0) return text;
+  const ch = text.charAt(index);
+  const upper = ch.toLocaleUpperCase('ru-RU');
+  if (ch === upper) return text;
+  return text.slice(0, index) + upper + text.slice(index + 1);
+}
+
 /** Full «зачем сюда» text: venue hookFact → shortDescription → editorial must-see desc.
  * Optional `maxLen` truncates for compact hints (search). Cards pass no maxLen = full text. */
 export function dayRouteHookLine(
@@ -46,10 +64,12 @@ export function dayRouteHookLine(
   },
   maxLen?: number | null,
 ): string | null {
-  const raw = String(sources.hookFact || sources.shortDescription || sources.desc || '')
-    .trim()
-    .replace(/\s+/g, ' ')
-    .replace(/[—–]/g, '-');
+  const raw = capitalizeSentenceStart(
+    String(sources.hookFact || sources.shortDescription || sources.desc || '')
+      .trim()
+      .replace(/\s+/g, ' ')
+      .replace(/[—–]/g, '-'),
+  );
   if (!raw) return null;
   const limit = maxLen == null || maxLen <= 0 ? null : maxLen;
   if (limit == null || raw.length <= limit) return raw;
