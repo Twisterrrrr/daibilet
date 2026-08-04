@@ -12,6 +12,7 @@
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
 | FIX.SALUTE0 | `salute-9-may`: exclude День города + require 9 мая / День Победы | Критический | ✅ `83271ec` live BUILD **`BCWcAIglYC8cAP-6Zgr4k`**; sessions=0, city-day leak gone |
+| FIX.CITYDAY | NEW `moscow-city-day` landing `/moscow/den-goroda/` + hide salute from hub | Критический | 🔄 shipping |
 | UX.POD1 | `/podborki`: category jump chips + SEO «Развернуть» + lazy cards + count/priceFrom | Высокий | ✅ `7535f02` live **`BCWcAIglYC8cAP-6Zgr4k`** |
 | UX.POD2 | `/podborki` masonry / view counters / purchase carousel / infinite scroll | Средний | ⚠️ deferred |
 | UX.LAND2 | Tabular landings: clearer rows, timeslot chips, sticky filters, `?type=` | Высокий | ✅ `eae17f4` live **`BCWcAIglYC8cAP-6Zgr4k`** |
@@ -313,6 +314,7 @@ Brief: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brie
 | LE.3 | Admin UI STOP-форма + venue hookFact | Высокий | ✅ |
 | LE.4 | Public DTO: stopEvents / nearbyEvents (300м) / venueStops / hookFact | Высокий | ✅ |
 | LE.5 | UI: LocationCard / park-like layout / Event «Маршрут / места» | Высокий | ✅ |
+| LE.5c | LocationCard: chip+«В маршрут» vertical right stack; strip «Место посадки» title prefix | Высокий | ✅ `4f5b675` MSK **BUILD_ID=`B_7ZDd8i_WZurwdjJhMhl`** |
 | LE.5b | Hide empty excursion UI on location page (hero 0 + empty block) | Высокий | ✅ `3271bfcb` BUILD `slptXB74NiKJwSUqiCO7t` |
 | LE.6 | Seed Пермь must-see (6 slugs) + cityInfo slug | Средний | ✅ DB MSK 6 rows; cityInfo slug; listing 🚫 без hub-gate deploy |
 | LE.7 | Deploy migrate + контент STOP-связей экскурсий | Высокий | ⏳ |

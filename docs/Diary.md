@@ -1,3 +1,20 @@
+## 2026-08-04 - NEW landing: День города в Москве (`moscow-city-day`)
+
+### Наблюдения
+- Owner: «где лендинг День города в Москве? выключить Салют 9 мая, а события дня города включить в новый».
+- STEP 0 (`83271ec`) только исключил «день города» из `salute-9-may` - отдельной посадки не было; live search ~10 Мск City Day событий без landingSlugs.
+- `/podborki` уже не показывал `salute-9-may` (events=0), но URL `/salut-9-maya/` оставался пустым.
+
+### Решения
+- NEW city-scoped rule `moscow-city-day` (aliases `den-goroda-moskva`): `city=Москва` + required «день города» + exclude Victory Day; URL `/moscow/den-goroda/`.
+- `OFF_SEASON_LANDING_SLUGS` = `salute-9-may` - hide from landings-catalog / promo / city hub / search landing cards; page keeps soft-empty.
+- Podborki category seasonal; moscow hub featured + highlightSeason «День города».
+
+### Проблемы
+- (заполняется после deploy: events count + BUILD_ID)
+
+---
+
 ## 2026-08-04 - LocationCard: chip+CTA stack, no boarding prefix
 
 ### Наблюдения
@@ -9,7 +26,7 @@
 - EventCard («В мой день») не трогали.
 
 ### Проблемы
-- (заполняется после deploy)
+- Нет. MSK **BUILD_ID=`B_7ZDd8i_WZurwdjJhMhl`** (HEAD `84d13591`, включает `4f5b675`), SMOKE locations/spb 200; chunk markers `stripBoardingPlacePrefix` / `items-end`.
 
 ---
 
