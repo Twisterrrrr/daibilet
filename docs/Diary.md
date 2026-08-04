@@ -10,7 +10,7 @@
 - Добавление точек: header search, sticky «+ Добавить» (`focusUnifiedSearch` → header), catalog trio, accordion «своё место».
 
 ### Проблемы
-- Deploy/BUILD_ID - после MSK.
+- Нет. Live tip `c8f918f`, MSK **BUILD_ID=`E2goVq9U7X9ujiRnLliZf`**; `/my-day` 200; chunk `data-day-header-search` + `data-day-starter`.
 
 ---
 

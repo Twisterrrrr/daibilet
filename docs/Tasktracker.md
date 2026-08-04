@@ -119,7 +119,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.MYDAY-HEADER-SEARCH | ≥1 stop: hide mid starter card; compact city+search under H1; empty starter unchanged | Высокий | 🔄 deploy |
+| UX.MYDAY-HEADER-SEARCH | ≥1 stop: hide mid starter card; compact city+search under H1; empty starter unchanged | Высокий | ✅ `c8f918f` MSK **BUILD_ID=`E2goVq9U7X9ujiRnLliZf`** `/my-day` 200 |
 
 ## /my-day starter geometry (2026-08-03)
 
