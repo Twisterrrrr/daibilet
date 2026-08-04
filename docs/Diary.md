@@ -20,7 +20,7 @@
 - `CityDayPresetBlock`: brand/link blue (`text-primary-600` / editorial `text-sky-700`), постоянный underline, `ArrowUpRight`; text-xs font-medium - не конкурирует с CTA «Собрать день».
 
 ### Проблемы
-- Нет. tip TBD; MSK BUILD_ID после deploy.
+- Нет. tip `f48d174`, MSK **BUILD_ID=`hKq8B95CQsiBuD4keUJm6`**; `/my-day` 200.
 
 ---
 
