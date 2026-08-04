@@ -2568,12 +2568,13 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** Desktop denser toolbar (map wrap + lg list): Yandex primary + Optimize ghost. */
-  function renderMapToolbar(compact = false) {
+  /** Desktop map-section toolbar: Yandex only (Optimize lives near list controls). */
+  function renderMapToolbar() {
     return (
       <div
-        className={`hidden w-full flex-col gap-1 lg:flex lg:w-auto lg:flex-row lg:items-center lg:justify-end lg:gap-2 ${compact ? '' : ''}`}
+        className="hidden w-full flex-col gap-1 lg:flex lg:w-auto lg:flex-row lg:items-center lg:justify-end lg:gap-2"
         data-day-route-toolbar-inner
+        data-day-map-yandex-toolbar
       >
         {yandexUrl ? (
           <a
@@ -2598,6 +2599,18 @@ function DayRoutePanelInner() {
             Открыть в Яндекс.Картах
           </button>
         )}
+      </div>
+    );
+  }
+
+  /** Desktop mid-list: Optimize ghost only (no Yandex above cards). */
+  function renderDesktopListOptimize() {
+    if (!canOptimize) return null;
+    return (
+      <div
+        className="hidden lg:flex lg:w-full lg:justify-end"
+        data-day-desktop-list-optimize
+      >
         {renderOptimizeGhost()}
       </div>
     );
@@ -2690,8 +2703,63 @@ function DayRoutePanelInner() {
           ) : null}
         </div>
 
-        {/* Desktop share */}
-        <div className="relative hidden shrink-0 sm:block" ref={shareMenuRef}>
+        {/* Desktop top-right: Save / Hour plan / Clear + Share */}
+        <div
+          className="relative hidden shrink-0 flex-wrap items-center justify-end gap-2 sm:flex"
+          ref={shareMenuRef}
+          data-day-desktop-actions
+        >
+          {route.venues.length ? (
+            <>
+              <button
+                type="button"
+                onClick={printItinerary}
+                data-day-print
+                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition duration-200 hover:bg-slate-50"
+              >
+                <Printer className="h-3.5 w-3.5" />
+                Сохранить
+              </button>
+              {route.venues.length >= DAY_ROUTE_MIN ? (
+                hourPlanOn ? (
+                  <button
+                    type="button"
+                    data-day-hour-reset
+                    onClick={() => {
+                      setHourPlanOn(false);
+                      setHourSheetOpen(false);
+                    }}
+                    className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition duration-200 hover:bg-slate-50"
+                  >
+                    <Clock className="h-3.5 w-3.5" />
+                    Сбросить время
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    data-day-hour-plan
+                    onClick={() => setHourSheetOpen(true)}
+                    className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-800 transition duration-200 hover:bg-primary-100"
+                  >
+                    <Clock className="h-3.5 w-3.5" />
+                    Распланировать день по часам
+                  </button>
+                )
+              ) : null}
+              <button
+                type="button"
+                onClick={() => {
+                  clearDayRoute();
+                  setRoute(readDayRoute());
+                  replaceMyDayUrl('/my-day');
+                }}
+                data-day-clear
+                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition duration-200 hover:bg-slate-50"
+              >
+                <Trash2 className="h-3.5 w-3.5" /> Очистить
+              </button>
+            </>
+          ) : null}
           <button
             type="button"
             onClick={() => {
@@ -2714,65 +2782,13 @@ function DayRoutePanelInner() {
             <div
               role="menu"
               data-day-share-menu
-              className="absolute right-0 z-30 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-lg"
+              className="absolute right-0 top-full z-30 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-lg"
             >
               {shareMenuItems}
             </div>
           ) : null}
         </div>
       </div>
-
-      {/* Desktop denser action row: Save / Hour plan / Clear */}
-      {route.venues.length ? (
-        <div className="mt-3 hidden flex-wrap gap-2 sm:flex" data-day-desktop-actions>
-          <button
-            type="button"
-            onClick={printItinerary}
-            data-day-print
-            className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition duration-200 hover:bg-slate-50"
-          >
-            <Printer className="h-3.5 w-3.5" />
-            Сохранить
-          </button>
-          {route.venues.length >= DAY_ROUTE_MIN ? (
-            hourPlanOn ? (
-              <button
-                type="button"
-                data-day-hour-reset
-                onClick={() => {
-                  setHourPlanOn(false);
-                  setHourSheetOpen(false);
-                }}
-                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition duration-200 hover:bg-slate-50"
-              >
-                <Clock className="h-3.5 w-3.5" />
-                Сбросить время
-              </button>
-            ) : (
-              <button
-                type="button"
-                data-day-hour-plan
-                onClick={() => setHourSheetOpen(true)}
-                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-800 transition duration-200 hover:bg-primary-100"
-              >
-                <Clock className="h-3.5 w-3.5" />
-                Распланировать день по часам
-              </button>
-            )
-          ) : null}
-          <button
-            type="button"
-            onClick={() => {
-              clearDayRoute();
-              setRoute(readDayRoute());
-              replaceMyDayUrl('/my-day');
-            }}
-            className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition duration-200 hover:bg-slate-50"
-          >
-            <Trash2 className="h-3.5 w-3.5" /> Очистить
-          </button>
-        </div>
-      ) : null}
 
       {copyStatus === 'ok' ? (
         <p
@@ -2950,10 +2966,10 @@ function DayRoutePanelInner() {
             ) : null}
           </div>
 
-          {/* Row 2: flat distance/time meta + compact Пешком/Авто */}
+          {/* Row 2: distance/time meta + Пешком/Авто inline (left cluster, quiet text) */}
           {totalDistanceMeters > 0 ? (
             <div
-              className="mt-2.5 flex items-center justify-between gap-2"
+              className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1"
               data-day-distance-summary
               data-day-distance-summary-mobile
             >
@@ -2975,10 +2991,10 @@ function DayRoutePanelInner() {
             </div>
           ) : null}
 
-          {/* Row 3: mobile = Распланировать primary + Optimize; desktop = Yandex + Optimize */}
+          {/* Row 3: mobile = Распланировать primary + Optimize; desktop = Optimize ghost only (Yandex on map) */}
           <div data-day-route-toolbar className="mt-3 w-full shrink-0 lg:mt-3 lg:flex lg:justify-end">
             {renderMobileRouteActions()}
-            {renderMapToolbar()}
+            {renderDesktopListOptimize()}
           </div>
 
           {missingCoordsCount > 0 ? (

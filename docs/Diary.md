@@ -1,3 +1,21 @@
+## 2026-08-04 - /my-day desktop: actions top-right + quiet route chrome
+
+### Наблюдения
+- Owner annotated desktop screenshot: Save / Hour plan / Clear слева под H1 - стрелки к top-right рядом с Поделиться.
+- Пешком/Авто справа от meta - перенести влево рядом с `км · около …`.
+- Mid-list «Открыть в Яндекс.Картах» над карточками - X (дубль); Яндекс оставить в «Карта дня».
+- «Оптимизировать» в header карты - X; mid ghost Optimize оставить у list controls.
+
+### Решения
+- `data-day-desktop-actions`: Save / Hour plan / Clear + Share в одной top-right группе (`sm:flex`); mobile column без изменений.
+- Distance row: `flex-wrap gap-x-3` - meta + text Пешком/Авто слева (не `justify-between`).
+- Mid desktop: `data-day-desktop-list-optimize` ghost only; map `data-day-map-yandex-toolbar` - только Яндекс.
+
+### Проблемы
+- Нет. Deploy/BUILD_ID - после MSK.
+
+---
+
 ## 2026-08-04 - My Day: drop planDone checkbox + fuller map focus hint
 
 ### Наблюдения
