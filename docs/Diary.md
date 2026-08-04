@@ -1,3 +1,21 @@
+## 2026-08-04 - Event PDP conversion (funnel first)
+
+### Наблюдения
+- Owner: ship `/events/[slug]` before catalog/cities/venues/locations redesign. Catalog chips/load-more pass paused for backlog.
+- Prior ship already had open-date stepper + от X price; missing sticky CTA, badge chips, day strip, accordion, map.
+
+### Решения
+- Sticky mobile bar `EventStickyBuyBar` («Выбрать билеты» + от X); hero mobile buy removed (no duplicate CTA).
+- Hero: badge chips (duration / place / metro / age / discount), rating badge, when/where.
+- BuyCard: horizontal day strip → timeslots; open-date stepper kept.
+- Accordion: О событии / Маршрут / Как добраться; ticket tips; expand OSM map; ReviewSection limit 3.
+- Docs backlog: catalog infinite, cities hub, venue/location monetization.
+
+### Проблемы
+- Multi-image carousel / video / adult-child qty / seatmap / taxi - deferred (no data or rebuild TC).
+
+---
+
 ## 2026-08-04 - Catalog + event detail UX (A1/A2/B1/B2)
 
 ### Наблюдения

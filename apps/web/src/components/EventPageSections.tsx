@@ -26,6 +26,70 @@ export function EventDescription({ event }: { event: PublicEventDto }) {
   );
 }
 
+/** Compact body without its own H2 - for accordion panels. */
+export function EventDescriptionBody({ event }: { event: PublicEventDto }) {
+  const description = String(event.description || '').trim();
+  if (!description) return null;
+  const html = formatEventDescriptionHtml(description);
+  if (!html) return null;
+  return (
+    <div
+      className="prose prose-slate max-w-none text-sm leading-7 text-graphite-muted [&_h3]:mt-5 [&_h3]:mb-3 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:text-graphite [&_li+li]:mt-2 [&_p+p]:mt-5 [&_ul]:mb-4 [&_ul]:mt-3 [&_ul]:list-disc [&_ul]:pl-5 [&_h3+ul]:mt-2"
+      dangerouslySetInnerHTML={{ __html: html }}
+    />
+  );
+}
+
+export function EventHowToGet({ event }: { event: PublicEventDto }) {
+  const wayToFind = String(event.venueWayToFind || '').trim();
+  const metro = String(event.venueMetroStation || '').trim();
+  const parking = String(event.venueParkingInfo || '').trim();
+  const address = String(event.venueAddress || '').trim();
+  if (!wayToFind && !metro && !parking && !address) return null;
+
+  return (
+    <div className="space-y-3 text-sm text-graphite">
+      {address ? (
+        <p>
+          <span className="font-medium text-graphite-muted">Адрес: </span>
+          {address}
+        </p>
+      ) : null}
+      {metro ? (
+        <p>
+          <span className="font-medium text-graphite-muted">Метро: </span>
+          {metro}
+        </p>
+      ) : null}
+      {wayToFind ? (
+        <p className="leading-relaxed">
+          <span className="font-medium text-graphite-muted">Как найти: </span>
+          {wayToFind}
+        </p>
+      ) : null}
+      {parking ? (
+        <p className="leading-relaxed">
+          <span className="font-medium text-graphite-muted">Парковка: </span>
+          {parking}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+/** Soft tips when purchase is widget/e-ticket ready - not CAPS spam. */
+export function EventTicketTips({ event }: { event: PublicEventDto }) {
+  if (!event.purchaseReady && !event.purchaseUrl && !event.widgetUrl) return null;
+  return (
+    <div className="rounded-xl bg-sky-50 px-4 py-3 text-sm leading-relaxed text-sky-950 ring-1 ring-sky-100">
+      <p className="font-semibold">Электронный билет</p>
+      <p className="mt-1 text-sky-900/80">
+        После оплаты код придёт на email. Покажите его с телефона. Лучше подойти за 15 минут до начала.
+      </p>
+    </div>
+  );
+}
+
 export function EventQuickInfo({ event }: { event: PublicEventDto }) {
   const ageLimit = formatAgeLimit(event.ageLimit);
   const durationLabel = extractDurationLabel(event.tags);
@@ -88,14 +152,14 @@ export function EventTags({ event }: { event: PublicEventDto }) {
 }
 
 /** Остановки маршрута (EventVenueRouteItem STOP). Event.venueId = только старт. */
-export function EventVenueStops({ event }: { event: PublicEventDto }) {
+export function EventVenueStops({ event, hideTitle = false }: { event: PublicEventDto; hideTitle?: boolean }) {
   const stops = Array.isArray(event.venueStops) ? event.venueStops : [];
   if (!stops.length) return null;
 
   return (
     <div>
-      <h2 className="text-lg font-bold text-graphite">Маршрут / места</h2>
-      <ol className="mt-4 space-y-2">
+      {hideTitle ? null : <h2 className="text-lg font-bold text-graphite">Маршрут / места</h2>}
+      <ol className={hideTitle ? 'space-y-2' : 'mt-4 space-y-2'}>
         {stops.map((stop, index) => {
           const href =
             stop.href ||

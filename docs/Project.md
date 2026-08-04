@@ -201,7 +201,7 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 |-------|--------|------------|
 | `/` | SSR dynamic | home + top cities |
 | `/events` | SSR dynamic | каталог, filters GET, pagination |
-| `/events/[slug]` | SSR dynamic | event hero + sticky buy card (TC/Teplohod widgets) |
+| `/events/[slug]` | SSR/ISR | Event PDP: hero answers + badge chips + sticky mobile CTA «Выбрать билеты»; day strip; open-date stepper; price **от X**; accordion О событии / Маршрут / Как добраться; expand map; reviews |
 | `/cities`, `/cities/[slug]` | SSR dynamic | **city hub**; default = wireframe v1 + blog teasers (P.2o); `?hub=editorial` = visual experiment (P.2i) |
 | `/venues`, `/venues/[slug]` | SSR dynamic | |
 | `/locations`, `/locations/[slug]` | SSR dynamic | |

@@ -1,10 +1,12 @@
 'use client';
 
+import * as React from 'react';
 import Link from 'next/link';
-import { Calendar, ChevronRight, MapPin, Shield, Users } from 'lucide-react';
+import { Calendar, ChevronRight, Clock, MapPin, Percent, Shield, Train, Users } from 'lucide-react';
 
 import type { PublicEventPageDto } from '@daibilet/contracts/public';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
+import { EventRatingBadge } from '@/components/EventPdpChrome.client';
 import {
   extractTcEventIdFromSession,
   listPurchasableSessionVariants,
@@ -27,6 +29,7 @@ import {
   isOpenDateEvent,
   scrollToBuyCard,
 } from '@/lib/event-page-utils';
+import { extractDurationLabel } from '@/lib/catalog-labels';
 import { dayRouteItemFromEvent } from '@/lib/day-route-from-place';
 import { buildEventBreadcrumbs } from '@/lib/structured-data';
 import { resolveEventHeroObjectPosition } from '@/lib/event-image-focus';
@@ -199,24 +202,11 @@ export function EventBuyCard({ payload }: { payload: PublicEventPageDto }) {
                 </p>
               </div>
             ) : (
-              <div className="mt-6">
-                {isTcWidget && !isTepWidget ? (
-                  <p className="mb-2 text-[11px] text-graphite-muted">Нажмите на сеанс, чтобы купить билет</p>
-                ) : null}
-                <div className="space-y-1.5">
-                  {visibleSessions.map((session) =>
-                    isTcWidget && !isTepWidget ? (
-                      <TcSessionSlot
-                        key={`${session.id}-${session.startsAt}`}
-                        tcEventId={extractTcEventIdFromSession(session) || tcEventId || ''}
-                        session={session}
-                      />
-                    ) : (
-                      <StaticSessionRow key={`${session.id}-${session.startsAt}`} session={session} />
-                    ),
-                  )}
-                </div>
-              </div>
+              <SessionDayStrip
+                sessions={visibleSessions}
+                isTcWidget={isTcWidget && !isTepWidget}
+                tcEventId={tcEventId}
+              />
             )
           ) : null}
 
@@ -311,6 +301,107 @@ function OpenDateStepper({ className = '' }: { className?: string }) {
   );
 }
 
+function sessionDayKey(session: EventSession): string {
+  if (session.startsAt) {
+    const date = new Date(session.startsAt);
+    if (!Number.isNaN(date.getTime())) {
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    }
+  }
+  return String(session.dateLabel || session.id).trim() || session.id;
+}
+
+function SessionDayStrip({
+  sessions,
+  isTcWidget,
+  tcEventId,
+}: {
+  sessions: EventSession[];
+  isTcWidget: boolean;
+  tcEventId: string | null;
+}) {
+  const days = React.useMemo(() => {
+    const map = new Map<string, { key: string; label: string; sessions: EventSession[] }>();
+    for (const session of sessions) {
+      const key = sessionDayKey(session);
+      const existing = map.get(key);
+      if (existing) {
+        existing.sessions.push(session);
+        continue;
+      }
+      map.set(key, {
+        key,
+        label: session.dateLabel || key,
+        sessions: [session],
+      });
+    }
+    return [...map.values()];
+  }, [sessions]);
+
+  const [selectedDay, setSelectedDay] = React.useState(days[0]?.key || '');
+  React.useEffect(() => {
+    if (!days.some((day) => day.key === selectedDay)) {
+      setSelectedDay(days[0]?.key || '');
+    }
+  }, [days, selectedDay]);
+
+  const daySessions = days.find((day) => day.key === selectedDay)?.sessions || sessions;
+
+  return (
+    <div className="mt-6">
+      {days.length > 1 ? (
+        <div
+          role="tablist"
+          aria-label="Дни"
+          className="horizontal-snap-row flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        >
+          {days.map((day) => {
+            const active = day.key === selectedDay;
+            return (
+              <button
+                key={day.key}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                onClick={() => setSelectedDay(day.key)}
+                className={`shrink-0 rounded-xl px-3 py-2 text-left text-xs font-semibold transition ${
+                  active
+                    ? 'bg-graphite text-white'
+                    : 'bg-surface-muted text-graphite-muted hover:bg-slate-200/80 hover:text-graphite'
+                }`}
+              >
+                <span className="block whitespace-nowrap">{day.label}</span>
+                <span className={`mt-0.5 block text-[10px] font-medium ${active ? 'text-white/70' : 'text-graphite-muted/80'}`}>
+                  {day.sessions.length} {day.sessions.length === 1 ? 'сеанс' : 'сеанса'}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
+
+      {isTcWidget ? (
+        <p className="mb-2 mt-3 text-[11px] text-graphite-muted">Нажмите на сеанс, чтобы купить билет</p>
+      ) : (
+        <p className="mb-2 mt-3 text-[11px] font-medium uppercase tracking-wider text-graphite-muted">Время</p>
+      )}
+      <div className="space-y-1.5">
+        {daySessions.map((session) =>
+          isTcWidget ? (
+            <TcSessionSlot
+              key={`${session.id}-${session.startsAt}`}
+              tcEventId={extractTcEventIdFromSession(session) || tcEventId || ''}
+              session={session}
+            />
+          ) : (
+            <StaticSessionRow key={`${session.id}-${session.startsAt}`} session={session} />
+          ),
+        )}
+      </div>
+    </div>
+  );
+}
+
 function StaticSessionRow({ session }: { session: EventSession }) {
   const flexibleSchedule = isFlexibleScheduleSession(session);
   const weekday = session.dateLabel?.split(',')[0]?.trim() || '-';
@@ -325,10 +416,10 @@ function StaticSessionRow({ session }: { session: EventSession }) {
         ) : null}
         <div>
           <p className="text-sm font-medium text-graphite">
-            {flexibleSchedule ? FLEXIBLE_SCHEDULE_LABEL : session.dateLabel || '-'}
+            {flexibleSchedule ? FLEXIBLE_SCHEDULE_LABEL : session.timeLabel || session.dateLabel || '-'}
           </p>
-          {session.timeLabel && !flexibleSchedule ? (
-            <p className="text-xs text-graphite-muted">{session.timeLabel}</p>
+          {session.timeLabel && session.dateLabel && !flexibleSchedule ? (
+            <p className="text-xs text-graphite-muted">{session.dateLabel}</p>
           ) : null}
         </div>
       </div>
@@ -440,9 +531,16 @@ export function EventHeroBuyButton({
   );
 }
 
-export function EventHero({ payload }: { payload: PublicEventPageDto }) {
+export function EventHero({
+  payload,
+  aggregate = null,
+}: {
+  payload: PublicEventPageDto;
+  aggregate?: { ratingValue: number; reviewCount: number } | null;
+}) {
   const { event, stats } = payload;
   const ageLimit = formatAgeLimit(event.ageLimit);
+  const durationLabel = extractDurationLabel(event.tags);
   const priceRange = getTicketPriceRange(payload);
   const oldPrice = getTicketOldPrice(payload, priceRange);
   const fallbackPrice = formatPriceRub(stats.priceFrom ?? event.priceFrom);
@@ -458,6 +556,8 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
   const nextSession = pickRepresentativeSession((payload.sessions ?? []) as EventSession[]);
   const canOpenVenueModal = Boolean(event.venue && (event.venueId || event.venueSlug));
   const breadcrumbs = buildEventBreadcrumbs(event);
+  const placeLabel = event.venue || event.city || null;
+  const metro = String(event.venueMetroStation || '').trim();
 
   return (
     <div className="relative">
@@ -500,10 +600,48 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
 
         <div className="flex items-end justify-between gap-4">
           <div className="max-w-3xl">
-            <p className="text-xs font-medium uppercase tracking-wider text-white/70">{event.category}</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-xs font-medium uppercase tracking-wider text-white/70">{event.category}</p>
+              {aggregate ? (
+                <EventRatingBadge ratingValue={aggregate.ratingValue} reviewCount={aggregate.reviewCount} />
+              ) : null}
+            </div>
             <h1 className="mt-2 text-2xl font-bold leading-tight text-white sm:text-3xl lg:text-4xl">
               {event.seoH1 || event.title}
             </h1>
+
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {durationLabel ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
+                  <Clock className="h-3 w-3" strokeWidth={1.75} />
+                  {durationLabel}
+                </span>
+              ) : null}
+              {placeLabel ? (
+                <span className="inline-flex max-w-full items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
+                  <MapPin className="h-3 w-3 shrink-0" strokeWidth={1.75} />
+                  <span className="truncate">{placeLabel}</span>
+                </span>
+              ) : null}
+              {metro ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
+                  <Train className="h-3 w-3" strokeWidth={1.75} />
+                  {metro}
+                </span>
+              ) : null}
+              {ageLimit ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur-sm">
+                  <Users className="h-3 w-3" strokeWidth={1.75} />
+                  {ageLimit}
+                </span>
+              ) : null}
+              {oldPrice ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/90 px-2.5 py-1 text-[11px] font-semibold text-slate-900">
+                  <Percent className="h-3 w-3" strokeWidth={1.75} />
+                  Скидка
+                </span>
+              ) : null}
+            </div>
 
             {openDateTicket ? (
               <p className="mt-3 text-sm font-medium text-emerald-200/95">
@@ -523,27 +661,6 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
             ) : null}
 
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
-              {ageLimit ? (
-                <span className="flex items-center gap-1.5">
-                  <Users className="h-4 w-4" strokeWidth={1.75} />
-                  {ageLimit}
-                </span>
-              ) : null}
-              {event.city || event.venue ? (
-                <span className="flex items-center gap-1.5">
-                  <MapPin className="h-4 w-4" strokeWidth={1.75} />
-                  {canOpenVenueModal ? (
-                    <EventVenueTrigger
-                      event={event}
-                      className="underline decoration-white/30 underline-offset-2 hover:text-white"
-                    >
-                      {event.venue || event.city}
-                    </EventVenueTrigger>
-                  ) : (
-                    event.city
-                  )}
-                </span>
-              ) : null}
               {nextSession ? (
                 <span className="flex items-center gap-1.5">
                   <Calendar className="h-4 w-4" strokeWidth={1.75} />
@@ -552,13 +669,18 @@ export function EventHero({ payload }: { payload: PublicEventPageDto }) {
                     : `Ближайший: ${[nextSession.dateLabel, nextSession.timeLabel].filter(Boolean).join(', ')}`}
                 </span>
               ) : null}
+              {canOpenVenueModal && event.venueAddress ? (
+                <EventVenueTrigger
+                  event={event}
+                  className="flex items-center gap-1.5 underline decoration-white/30 underline-offset-2 hover:text-white"
+                >
+                  <MapPin className="h-4 w-4" strokeWidth={1.75} />
+                  {event.venueAddress}
+                </EventVenueTrigger>
+              ) : null}
             </div>
 
-            {priceLabel ? (
-              <div className="mt-5 sm:hidden">
-                <EventHeroBuyButton payload={payload} priceLabel={priceLabel} wide />
-              </div>
-            ) : null}
+            {/* Mobile buy lives in sticky bar - avoid duplicate CTAs */}
           </div>
 
           {priceLabel ? (

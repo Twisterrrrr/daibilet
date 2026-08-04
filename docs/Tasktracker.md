@@ -11,12 +11,19 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.CAT-A1 | Category chips horizontal, no tall counts; date select no «Люб» trunc | Высокий | ✅ |
-| UX.CAT-A2 | Hide page-size on mobile/tablet; «Показать ещё» load-more | Высокий | ✅ |
+| UX.EVT-PDP1 | Sticky mobile CTA «Выбрать билеты» + от X | Критический | ✅ |
+| UX.EVT-PDP2 | Hero badge chips + rating + when/where/price | Критический | ✅ |
+| UX.EVT-PDP3 | Day strip → timeslots in BuyCard | Высокий | ✅ |
+| UX.EVT-PDP4 | Accordion О событии / Маршрут / Как добраться + map expand | Высокий | ✅ |
 | UX.EVT-B1 | Open-date how-to stepper under title | Высокий | ✅ |
 | UX.EVT-B2 | Price primary «от X ₽» + oldPrice strikethrough | Высокий | ✅ |
-| UX.CAT-A3 | Empty state Popular recommend block | Средний | ⚠️ deferred |
-| UX.EVT-B3 | Full tabs Программа / Где / Отзывы | Низкий | ⚠️ deferred |
+| UX.CAT-A1 | Category chips horizontal, no tall counts; date select no «Люб» trunc | Средний | ✅ shipped earlier; further catalog polish = backlog |
+| UX.CAT-A2 | Hide page-size; «Показать ещё» | Средний | ✅ shipped earlier; infinite scroll = backlog |
+| UX.CAT-A3 | Empty state Popular recommend block | Средний | ⚠️ backlog |
+| UX.EVT-B3 | Full tabs Программа if structured data | Низкий | ⚠️ backlog |
+| UX.CITY-HUB | Cities hub carousel redesign | Средний | ⚠️ backlog |
+| UX.VENUE-MON | Venue/location monetization UX | Средний | ⚠️ backlog |
+| UX.EVT-SEAT | Venue seatmap / taxi deep-link | Низкий | ⚠️ backlog |
 
 ---
 

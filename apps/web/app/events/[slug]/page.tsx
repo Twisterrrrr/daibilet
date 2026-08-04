@@ -3,8 +3,8 @@ import { notFound } from 'next/navigation';
 
 import { EventCard } from '@/components/EventCard';
 import { EventBuyCard, EventHero } from '@/components/EventPage.client';
-import { EventDescription, EventQuickInfo, EventTags, EventTrustStrip, EventVenueStops } from '@/components/EventPageSections';
-import { ReviewSection } from '@/components/ReviewSection';
+import { EventPdpBody } from '@/components/EventPdpBody.client';
+import { EventTags, EventTrustStrip } from '@/components/EventPageSections';
 import { JsonLdScripts } from '@/components/JsonLdScripts';
 import { SiteLayout } from '@/components/SiteLayout';
 import '@/lib/env';
@@ -145,17 +145,14 @@ export default async function EventDetailPage({ params }: PageProps) {
       {/* Outside SiteLayout client boundary so crawlers see scripts in View Source */}
       <JsonLdScripts blocks={jsonLdBlocks} idPrefix="event-jsonld" />
       <SiteLayout>
-        <EventHero payload={clientPayload} />
+        <EventHero payload={clientPayload} aggregate={aggregate} />
 
-        <div className="container-page py-10 sm:py-12 lg:py-14">
-          <div className="grid gap-10 lg:grid-cols-3 lg:gap-12">
-            <div className="space-y-10 lg:col-span-2">
-              <EventDescription event={event} />
-              <EventVenueStops event={event} />
-              <EventQuickInfo event={event} />
+        <div className="container-page py-8 sm:py-10 lg:py-14">
+          <div className="grid gap-8 lg:grid-cols-3 lg:gap-12">
+            <div className="space-y-6 lg:col-span-2">
+              <EventPdpBody event={event} payload={clientPayload} />
               <EventTags event={event} />
               <EventTrustStrip />
-              <ReviewSection eventId={event.id} eventSlug={event.slug} />
             </div>
 
             <div className="lg:col-span-1">
