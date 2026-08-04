@@ -1979,8 +1979,11 @@ function DayRoutePanelInner() {
   }
 
   function openTextForm() {
-    // Accordion removed - custom stops come from search create row.
-    focusUnifiedSearch();
+    setOpenPanel('text');
+    window.setTimeout(() => {
+      document.getElementById('day-plan-form-wrap')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      titleFieldRef.current?.focus();
+    }, 80);
   }
 
   const shareMenuItems = (
@@ -2316,7 +2319,7 @@ function DayRoutePanelInner() {
                         Добавь{' '}
                         <button
                           type="button"
-                          onClick={focusUnifiedSearch}
+                          onClick={openTextForm}
                           className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
                         >
                           своё место
@@ -2335,7 +2338,7 @@ function DayRoutePanelInner() {
                         или{' '}
                         <button
                           type="button"
-                          onClick={focusUnifiedSearch}
+                          onClick={openTextForm}
                           className="m-0 inline p-0 font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
                         >
                           добавить своё место
@@ -2403,7 +2406,7 @@ function DayRoutePanelInner() {
                     Добавь{' '}
                     <button
                       type="button"
-                      onClick={focusUnifiedSearch}
+                      onClick={openTextForm}
                       className="font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
                     >
                       своё место
@@ -2422,7 +2425,7 @@ function DayRoutePanelInner() {
                     или{' '}
                     <button
                       type="button"
-                      onClick={focusUnifiedSearch}
+                      onClick={openTextForm}
                       className="font-semibold text-slate-700 underline-offset-2 transition duration-200 hover:underline"
                     >
                       добавить своё место
@@ -3203,62 +3206,70 @@ function DayRoutePanelInner() {
                     onChange={setMustSeeFilter}
                   />
                   <div
-                    className="mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1"
+                    className="mt-3 flex snap-x snap-mandatory gap-2.5 overflow-x-auto pb-1"
                     data-day-must-see-list
                     data-day-must-see-carousel
                   >
-                    {mustSeeFiltered.map(({ place, item }) => {
+                    {mustSeeFiltered.map(({ place, item, hook }) => {
                       const inRoute =
                         isInDayRoute(item.id, route) || Boolean(item.slug && isInDayRoute(item.slug, route));
                       const hasItemCoords = Boolean(
                         lookupDayRouteCoords(item, buildDayRouteCoordsMap([item])),
                       );
                       return (
-                        <article
+                        <button
                           key={item.id}
-                          className="relative aspect-[3/4] w-[42vw] max-w-[11rem] shrink-0 snap-start overflow-hidden rounded-2xl bg-slate-200 sm:w-40"
+                          type="button"
+                          disabled={inRoute || atMax || !hasItemCoords}
                           data-day-must-see-card={item.id}
+                          title={
+                            inRoute
+                              ? 'Уже в маршруте'
+                              : atMax
+                                ? dayRouteHardLimitMessage()
+                                : !hasItemCoords
+                                  ? 'Нет координат'
+                                  : hook || 'Добавить в день'
+                          }
+                          onClick={() => addMustSeeItem(item)}
+                          className={`flex w-[min(100%,17.5rem)] shrink-0 snap-start items-center gap-2.5 rounded-xl border p-2 text-left transition disabled:cursor-not-allowed ${
+                            inRoute
+                              ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
+                              : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50/50'
+                          }`}
                         >
-                          {item.imageUrl ? (
-                            <SafeImage
-                              src={item.imageUrl}
-                              alt=""
-                              fill
-                              sizes="11rem"
-                              className="object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center text-slate-400">
-                              <MapPin className="h-8 w-8" />
-                            </div>
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent" />
-                          <p className="absolute inset-x-0 bottom-0 p-2.5 text-[12px] font-semibold leading-snug text-white">
-                            {place.name}
-                          </p>
-                          <button
-                            type="button"
-                            disabled={inRoute || atMax || !hasItemCoords}
-                            aria-label={inRoute ? 'Уже в маршруте' : 'Добавить в день'}
-                            title={
-                              inRoute
-                                ? 'Уже в маршруте'
-                                : atMax
-                                  ? dayRouteHardLimitMessage()
-                                  : !hasItemCoords
-                                    ? 'Нет координат'
-                                    : 'Добавить в день'
-                            }
-                            onClick={() => addMustSeeItem(item)}
-                            className={`absolute right-2 top-2 inline-flex h-8 w-8 items-center justify-center rounded-full shadow-sm disabled:cursor-not-allowed ${
-                              inRoute
-                                ? 'bg-emerald-500 text-white'
-                                : 'bg-white text-slate-900 hover:bg-emerald-50 disabled:bg-white/70 disabled:text-slate-400'
+                          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                            {item.imageUrl ? (
+                              <SafeImage
+                                src={item.imageUrl}
+                                alt=""
+                                fill
+                                sizes="3rem"
+                                className="object-cover"
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center text-slate-400">
+                                <MapPin className="h-4 w-4" />
+                              </div>
+                            )}
+                          </div>
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate text-xs font-semibold">{place.name}</span>
+                            {hook ? (
+                              <span className="mt-0.5 block line-clamp-2 text-[11px] leading-snug text-slate-500">
+                                {hook}
+                              </span>
+                            ) : null}
+                          </span>
+                          <span
+                            className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+                              inRoute ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-900 text-white'
                             }`}
+                            aria-hidden
                           >
                             {inRoute ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
-                          </button>
-                        </article>
+                          </span>
+                        </button>
                       );
                     })}
                   </div>
@@ -3273,7 +3284,138 @@ function DayRoutePanelInner() {
         </div>
       ) : null}
 
-      {/* Custom place: via search create row (accordion removed) */}
+      {/* Accordion: custom text place */}
+      <div className="mt-3 rounded-2xl border border-slate-200 bg-white" id="day-plan-form-wrap" data-day-accordion="text">
+        <button
+          type="button"
+          aria-expanded={textFormOpen}
+          aria-controls="day-plan-form"
+          data-day-plan-accordion
+          onClick={() => {
+            setOpenPanel((cur) => {
+              const next = cur === 'text' ? null : 'text';
+              if (next === 'text') {
+                window.setTimeout(() => titleFieldRef.current?.focus(), 50);
+              }
+              return next;
+            });
+          }}
+          className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
+        >
+          <span>
+            <span className="block text-sm font-semibold text-slate-900">Добавить своё место</span>
+            <span className="mt-0.5 block text-xs text-slate-500">
+              Необязательно - если места нет в каталоге
+            </span>
+          </span>
+          <ChevronDown
+            className={`h-5 w-5 shrink-0 text-slate-400 transition ${textFormOpen ? 'rotate-180' : ''}`}
+          />
+        </button>
+        {textFormOpen ? (
+          <form
+            onSubmit={submitTextStop}
+            className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5"
+            data-day-plan-form="1"
+            id="day-plan-form"
+          >
+            <p className="text-sm leading-relaxed text-slate-600">
+              Введите название. Адрес, город и координаты - по желанию.
+            </p>
+            <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-stretch">
+              <label className="min-w-0 flex-1">
+                <span className="sr-only">Название места</span>
+                <input
+                  ref={titleFieldRef}
+                  type="text"
+                  name="title"
+                  value={titleInput}
+                  onChange={(e) => {
+                    setTitleInput(e.target.value);
+                    if (formError) setFormError(null);
+                  }}
+                  placeholder="Например: Эрмитаж"
+                  autoComplete="off"
+                  disabled={atMax}
+                  data-day-plan-title
+                  className="min-h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
+                />
+              </label>
+              <button
+                type="submit"
+                disabled={atMax}
+                data-day-plan-add
+                className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-5 py-2.5 text-sm font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
+              >
+                <Plus className="h-4 w-4" />
+                Добавить
+              </button>
+            </div>
+            <label className="mt-2 block">
+              <span className="sr-only">Адрес или заметка</span>
+              <input
+                type="text"
+                name="note"
+                value={noteInput}
+                onChange={(e) => setNoteInput(e.target.value)}
+                placeholder="Адрес или заметка (необязательно)"
+                autoComplete="off"
+                disabled={atMax}
+                data-day-plan-note
+                className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none ring-emerald-500/30 placeholder:text-slate-400 focus:border-emerald-400 focus:ring-2 disabled:bg-slate-50"
+              />
+            </label>
+            <button
+              type="button"
+              onClick={() => setShowAdvanced((v) => !v)}
+              className="mt-2 text-xs font-semibold text-slate-500 hover:text-slate-800"
+            >
+              {showAdvanced ? 'Скрыть город и координаты' : 'Город и координаты (необязательно)'}
+            </button>
+            {showAdvanced ? (
+              <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                <label className="block">
+                  <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                    Город
+                  </span>
+                  <input
+                    type="text"
+                    name="city"
+                    value={cityInput}
+                    onChange={(e) => setCityInput(e.target.value)}
+                    placeholder="Город (необязательно)"
+                    autoComplete="off"
+                    disabled={atMax}
+                    data-day-plan-city
+                    className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                    Координаты
+                  </span>
+                  <input
+                    type="text"
+                    name="coords"
+                    value={coordsInput}
+                    onChange={(e) => setCoordsInput(e.target.value)}
+                    placeholder="59.93, 30.31"
+                    autoComplete="off"
+                    disabled={atMax}
+                    data-day-plan-coords
+                    className="min-h-10 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/30 disabled:bg-slate-50"
+                  />
+                </label>
+              </div>
+            ) : null}
+            {formError ? (
+              <p role="alert" className="mt-2 text-sm font-medium text-rose-700">
+                {formError}
+              </p>
+            ) : null}
+          </form>
+        ) : null}
+      </div>
 
       {/* Hot Picks - always expanded (no accordion chrome) */}
       {showHotPicks ? (

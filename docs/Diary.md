@@ -1,3 +1,18 @@
+## 2026-08-04 - My Day: must-see mini-cards + своё место accordion
+
+### Наблюдения
+- Owner: photo-only 3:4 carousel для «Главные места» требует слишком много картинок; нужен откат к denser mini-cards, но горизонтальная карусель (не высокий vertical grid).
+- Accordion «Добавить своё место» убрали при search-first create - owner просит вернуть.
+
+### Решения
+- Must-see: compact cards (thumb 48px + title + hook description + +) в `snap-x` horizontal carousel; chips без счётчиков и hour-plan/groups без изменений.
+- Restored `data-day-plan-accordion` form (title/note/advanced coords); invite «своё место» снова открывает accordion; search create row оставлен как доп. путь.
+
+### Проблемы
+- Нет. Deploy BUILD_ID / smoke `/my-day` - ниже после ship.
+
+---
+
 ## 2026-08-04 - INC.504.25: /my-day 502 = deploy×healthcheck race (not my-day SSR)
 
 ### Наблюдения
