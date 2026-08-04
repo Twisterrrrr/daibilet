@@ -3232,29 +3232,29 @@ function DayRoutePanelInner() {
                                   : hook || 'Добавить в день'
                           }
                           onClick={() => addMustSeeItem(item)}
-                          className={`flex w-[min(100%,17.5rem)] shrink-0 snap-start items-center gap-2.5 rounded-xl border p-2 text-left transition disabled:cursor-not-allowed ${
+                          className={`flex w-[min(100%,24rem)] shrink-0 snap-start items-center gap-3 rounded-xl border px-2.5 py-1.5 text-left transition disabled:cursor-not-allowed ${
                             inRoute
                               ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
                               : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50/50'
                           }`}
                         >
-                          <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+                          <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-lg bg-slate-100">
                             {item.imageUrl ? (
                               <SafeImage
                                 src={item.imageUrl}
                                 alt=""
                                 fill
-                                sizes="3rem"
+                                sizes="6rem"
                                 className="object-cover"
                               />
                             ) : (
                               <div className="flex h-full w-full items-center justify-center text-slate-400">
-                                <MapPin className="h-4 w-4" />
+                                <MapPin className="h-5 w-5" />
                               </div>
                             )}
                           </div>
-                          <span className="min-w-0 flex-1">
-                            <span className="block truncate text-xs font-semibold">{place.name}</span>
+                          <span className="min-w-0 flex-1 py-0.5">
+                            <span className="block truncate text-sm font-semibold leading-snug">{place.name}</span>
                             {hook ? (
                               <span className="mt-0.5 block line-clamp-2 text-[11px] leading-snug text-slate-500">
                                 {hook}

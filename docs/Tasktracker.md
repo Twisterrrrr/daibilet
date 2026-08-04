@@ -195,6 +195,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.LOC9 | Unified `/places` (venues+locations tabs) | Низкий | ⚠️ после LOC8 |
 | UX.MYDAY-UX0804 | Must-see carousel; ticket groups; hour-plan sheet+soft hints; custom search | Критический | ✅ `e617ac1` MSK **BUILD_ID=`BCWcAIglYC8cAP-6Zgr4k`** `/my-day` 200 |
 | UX.MYDAY-MINICARD | Must-see mini-cards (thumb+desc) in H-carousel; restore своё место accordion | Критический | ✅ `5c13bc5` MSK **BUILD_ID=`uoDz6BgaWtWh7P4AC0wF4`** `/my-day` 200 |
+| UX.MYDAY-MINICARD2 | Must-see cards wider (24rem) + 2× thumb (96px); keep H-carousel | Критический | 🔄 deploy |
 | FIX.MYDAY-SALEABLE | Cull unsaleable/thin TC buy CTA on venue stops (Полет soft-404) | Критический | ✅ `ba13ec2` MSK **BUILD_ID=`CbKLIANk3tWkfiFKxUSCW`** |
 | UX.MYDAY-F | Мой день: filters + auto-pick + top-up (product next) | Высокий | ⏳ поверх MOB канона |
 | UX.MYDAY-IA | `/my-day` catalog-first + text accordion (collapsed) | Критический | ✅ live **BUILD_ID=`MvYEsYnvAH_KMCxXkt2S6`** |

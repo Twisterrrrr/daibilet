@@ -1,3 +1,18 @@
+## 2026-08-04 - My Day: must-see mini-card geometry (wider + 2× thumb)
+
+### Наблюдения
+- Owner оставил horizontal carousel mini-cards (chips + thumb/title/desc/+); полный откат к accordion-grid не нужен.
+- Просьба: карточки более горизонтальные (шире/ниже) и превью ~2×.
+
+### Решения
+- Card width `17.5rem` → `24rem`, padding `py-1.5`, gap `3`; thumb `h-12 w-12` → `h-24 w-24` (`sizes=6rem`); title `text-sm`.
+- Layout carousel + «Добавить своё место» accordion + hour-plan/groups без изменений.
+
+### Проблемы
+- Нет. (BUILD_ID после MSK deploy.)
+
+---
+
 ## 2026-08-04 - My Day: must-see mini-cards + своё место accordion
 
 ### Наблюдения
