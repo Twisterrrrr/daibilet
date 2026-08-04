@@ -21,6 +21,22 @@ export type BlogPost = {
 /** Обложки - уникальная статика на статью: /images/blog/{slug}.jpg */
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: 'nizhny-novgorod-za-24-chasa',
+    title: 'Нижний Новгород за 24 часа: маршрут, после которого вы влюбитесь в этот город',
+    excerpt:
+      'Готовый маршрут по Нижнему Новгороду на один день: Кремль, Чкаловская лестница, набережная, Рождественская и финал с видом на закат.',
+    date: '4 августа 2026',
+    readMin: 7,
+    tag: 'Город',
+    city: 'Нижний Новгород',
+    citySlug: 'nizhny-novgorod',
+    authorId: 'editorial',
+    authorName: 'Редакция',
+    articleType: 'gid',
+    imageUrl: blogCoverUrl('nizhny-novgorod-za-24-chasa'),
+    imageAlt: 'Нижегородский кремль, Чкаловская лестница и Волга в вечернем свете',
+  },
+  {
     slug: 'moscow-2-dnya-samostoyatelno-marshrut',
     title: 'Что посмотреть в Москве за 2 дня самостоятельно: маршрут без лишних переездов',
     excerpt:
