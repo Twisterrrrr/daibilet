@@ -1,3 +1,18 @@
+## 2026-08-04 - LocationCard: chip+CTA stack, no boarding prefix
+
+### Наблюдения
+- Owner (скрин hub посадок АВТОБУСЫ): chip «N событий» и «В маршрут» стояли в ряд справа; заголовок с префиксом «Место посадки — …» дублировал адрес в subtitle.
+
+### Решения
+- `LocationCard`: правая колонка `flex-col items-end` - chip над «В маршрут»; title без префикса (`stripBoardingPlacePrefix`); subtitle address скрыт при совпадении с title.
+- `formatBusLocationDisplayName`: при rename возвращает shortAddress без «Место посадки — ».
+- EventCard («В мой день») не трогали.
+
+### Проблемы
+- (заполняется после deploy)
+
+---
+
 ## 2026-08-04 - EventCard: «В мой день» on cover overlay
 
 ### Наблюдения
@@ -88,7 +103,7 @@
 - `/my-day` confirm-reset не регрессирован.
 
 ### Проблемы
-- Нет. unit: `city-change-nav.test.ts` 6/6.
+- Нет. tip `ebc52ca` (live tip `4ea04c46`), MSK **BUILD_ID=`PmbO697VdpNToUi9yEI5G`**; unit 6/6; smoke `/cities` `/cities/nizhny-novgorod` 200; chunk `na-vyhodnyh`.
 
 ---
 

@@ -119,7 +119,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.CITY-NAV | Header setCity: stay in section (cities hub / catalogs / blog / landings); no catalog dump; keep my-day confirm | Критический | 🔄 deploy |
+| UX.CITY-NAV | Header setCity: stay in section (cities hub / catalogs / blog / landings); no catalog dump; keep my-day confirm | Критический | ✅ `ebc52ca` MSK **BUILD_ID=`PmbO697VdpNToUi9yEI5G`** (live tip `4ea04c46`) |
 
 ## Catalog EventCard day-route chip (2026-08-04)
 
