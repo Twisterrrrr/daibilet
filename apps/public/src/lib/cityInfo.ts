@@ -34,6 +34,11 @@ export interface CityInfoEntry {
   /** Яркий хук «Зачем ехать» под hero. */
   hookFact?: string;
   mustSee: CityMustSeeItem[];
+  /**
+   * Значимые пригороды / day-trip якоря хаба (Петергоф, Царское, Кронштадт…).
+   * Отдельный блок на city hub, не смешивать с mustSee «в городе».
+   */
+  significantSuburbs?: CityMustSeeItem[];
   /** Топ достопримечательностей (редакционный). */
   sights?: CitySightItem[];
   /** Готовые именованные маршруты (кнопки пресетов). */
@@ -97,8 +102,24 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
       { name: 'Спас на Крови', desc: 'Храм-памятник с 7000 кв.м мозаики',
         locationSlug: 'saint-petersburg-spas-na-krovi',
       },
-      { name: 'Петергоф', desc: 'Дворцово-парковый ансамбль с легендарными фонтанами',
+      {
+        name: 'Стрелка Васильевского острова',
+        desc: 'Ростральные колонны и разворот Невы - классический кадр города',
+      },
+    ],
+    significantSuburbs: [
+      {
+        name: 'Петергоф',
+        desc: 'Дворцово-парковый ансамбль с фонтанами - главный day-trip из центра',
         locationSlug: 'saint-petersburg-petergof',
+      },
+      {
+        name: 'Царское Село',
+        desc: 'Екатерининский дворец и Янтарная комната в Пушкине',
+      },
+      {
+        name: 'Кронштадт',
+        desc: 'Морской собор, форты и флотская история на острове Котлин',
       },
     ],
     travel:

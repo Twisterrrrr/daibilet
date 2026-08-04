@@ -189,6 +189,7 @@ export function CityPageView({
     !isCityHubSectionHidden(hubConfig, 'sights') &&
       (guide?.sights?.length ||
         guide?.mustSee?.length ||
+        guide?.significantSuburbs?.length ||
         (contentReady && (categories.length > 0 || (payload?.venues?.length || 0) > 0))),
   );
   const hasFaq = unifiedFaq.length > 0;
@@ -1146,8 +1147,9 @@ function CitySightsSection({
       : allowFallback
         ? buildFallbackMustSee(city, categories, venues)
         : [];
-  if (!places.length && !articles.length) return null;
+  if (!places.length && !articles.length && !(guide?.significantSuburbs?.length)) return null;
   const cityInto = cityInAccusative(city);
+  const cityGenitive = cityToGenitive(city.name);
   const citySlug = city.slug || city.sourceSlug || undefined;
   const landingRows = landings.map((landing) => ({
     slug: landing.slug,
@@ -1157,6 +1159,7 @@ function CitySightsSection({
     priceFrom: landing.priceFrom,
   }));
   const titleClass = `font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`;
+  const suburbs = guide?.significantSuburbs?.length ? guide.significantSuburbs : [];
 
   return (
     <section
@@ -1187,8 +1190,18 @@ function CitySightsSection({
           titleClass={titleClass}
         />
       ) : null}
+      {suburbs.length ? (
+        <CitySignificantSuburbsBlock
+          places={suburbs}
+          venues={venues}
+          city={city}
+          cityGenitive={cityGenitive}
+          editorial={editorial}
+          titleClass={titleClass}
+        />
+      ) : null}
       {articles.length ? (
-        <div className={places.length ? 'mt-8' : 'mt-4'}>
+        <div className={places.length || suburbs.length ? 'mt-8' : 'mt-4'}>
           <h3 className={`text-lg font-semibold ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}>
             Материалы по темам
           </h3>
@@ -1203,6 +1216,104 @@ function CitySightsSection({
         </div>
       ) : null}
     </section>
+  );
+}
+
+function CitySignificantSuburbsBlock({
+  places,
+  venues,
+  city,
+  cityGenitive,
+  editorial,
+  titleClass,
+}: {
+  places: CityMustSeeItem[];
+  venues: PublicVenueDto[];
+  city: PublicCityDto;
+  cityGenitive: string;
+  editorial: boolean;
+  titleClass: string;
+}) {
+  if (!places.length) return null;
+  return (
+    <div className="mt-10" data-city-significant-suburbs>
+      <h3
+        className={
+          editorial
+            ? 'font-serif text-2xl font-semibold text-zinc-950 sm:text-3xl'
+            : 'text-xl font-bold text-slate-950 sm:text-2xl'
+        }
+      >
+        Значимые пригороды {cityGenitive}
+      </h3>
+      <p className={`mt-1.5 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+        Day-trip из города: дворцы, острова и отдельные маршруты на полдня или день.
+      </p>
+      <ol className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {places.map((place, index) => {
+          const placeHref = resolveCityPlaceTitleHref(place, venues);
+          const dayRouteItem = dayRouteItemFromMustSee(place, venues, city);
+          const matchedVenue = venues.find((venue) => {
+            const slug = String(place.venueSlug || place.locationSlug || '').trim();
+            return slug && String(venue.slug || '').trim() === slug;
+          });
+          const blurb = String(
+            matchedVenue?.hookFact || matchedVenue?.shortDescription || place.desc || '',
+          )
+            .trim()
+            .replace(/\s+/g, ' ')
+            .replace(/[—–]/g, '-');
+          return (
+            <li
+              key={`${place.name}:${index}`}
+              className={`rounded-2xl border p-4 ${
+                editorial ? 'border-zinc-200 bg-white' : 'border-slate-200 bg-white'
+              }`}
+              data-city-suburb-card
+            >
+              <div className="flex items-start gap-3">
+                <span
+                  className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                    editorial ? 'bg-zinc-100 text-zinc-800' : 'bg-primary-50 text-primary-700'
+                  }`}
+                >
+                  {index + 1}
+                </span>
+                <div className="min-w-0 flex-1">
+                  {placeHref ? (
+                    <Link
+                      href={placeHref}
+                      className={`${titleClass} underline decoration-slate-300 underline-offset-2 hover:decoration-current`}
+                      data-city-suburb-title
+                    >
+                      {place.name}
+                    </Link>
+                  ) : (
+                    <div className={titleClass}>{place.name}</div>
+                  )}
+                  {blurb ? (
+                    <p
+                      className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
+                    >
+                      {blurb}
+                    </p>
+                  ) : null}
+                  {dayRouteItem ? (
+                    <div className="mt-2">
+                      <AddToDayRouteButton
+                        compact
+                        className="!min-h-9 !px-2.5 !py-1.5 !text-[11px]"
+                        venue={dayRouteItem}
+                      />
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+    </div>
   );
 }
 
