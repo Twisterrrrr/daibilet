@@ -1,3 +1,17 @@
+## 2026-08-05 - City hub: suburbs snap carousel (owner option 2)
+
+### Наблюдения
+- Owner: пригороды - subsection под must-see (не merge в chips); layout - screen-by-screen snap (коса → Зеленоградск → …); tone «не город, но стоит».
+
+### Решения
+- `CitySignificantSuburbsBlock`: horizontal snap rail (`data-city-suburb-rail`), ~92% card + peek / md full-bleed + arrows + dots; badge «Пригород · не город»; subtitle owner-tone; nested POI `capitalizeSentenceStart` + «В маршрут» если slug/match.
+- Не трогали mustSee filters / Главные места.
+
+### Проблемы
+- Нет. tip TBD после deploy; smoke `/cities/kaliningrad`.
+
+---
+
 ## 2026-08-04 - City hub: capitalize blurbs + drop mobile expand
 
 ### Наблюдения

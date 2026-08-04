@@ -78,6 +78,7 @@
 | MS.TIER1 | Канон тиров: floor 6 / typical 6-8 / large tourist ~12-18 (non-capital) / **capitals MSK+SPB wide 30-50+ (без потолка 18)** / NN deep pack reference; hub ≠ day (SOFT 10 / MAX 15) | Высокий | ✅ docs corr. capitals |
 | MS.TIER2 | План MSK+SPB → **capitals wide** (не 12-18, не клон-only NN); Phase A docs | Высокий | ✅ docs corr. |
 | MS.SUB1 | `significantSuburbs` + блок «Значимые пригороды {City_Род}» на hub; СПб: Петергоф/Царское/Кронштадт | Высокий | ✅ `16d10ca` MSK **BUILD_ID=`pA38C3r_vUStAEuHiAZuO`** |
+| MS.SUB3 | Hub suburbs: snap carousel (1 card/screen) + subtitle «не город», nested POI capitalize + «В маршрут» | Высокий | ⏳ deploy |
 | MS.GUIDE1 | Канон hub → тематические blog-гиды → CTA билетов (закрытие гэпа при узком каталоге) | Высокий | ✅ docs |
 | MS.TIER3 | Phase B: content batch первого города (рекомендация: СПб) - широкий список owner / OK draft → cityInfo + seed/enrich | Высокий | ⏳ ждут confirm города + список или OK draft |
 | MS.TIER4 | Phase C: второй город тем же шаблоном (Москва после СПб) | Средний | ⏳ |
