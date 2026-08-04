@@ -22,7 +22,7 @@
 - `DayRouteVenueCard` list: кластер index (`data-day-stop-index-cluster`) с внутренним `gap-1`; ряд `gap-1.5 md:gap-3 lg:gap-4` - mobile без изменений, desktop больше горизонтальный зазор до текста.
 
 ### Проблемы
-- Нет. tip TBD; MSK BUILD_ID после deploy.
+- Нет. tip `50bf964` (live tip `5f5bd84`), MSK **BUILD_ID=`M7xdN7ovP2s4tAjJKQYPY`**; `/my-day` 200; chunk `data-day-stop-index-cluster`.
 
 ---
 

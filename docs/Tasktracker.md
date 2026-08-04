@@ -151,6 +151,7 @@
 | UX.MYDAY-SPLIT-DESK | Desktop ≥lg: list left + sticky map right (`data-day-split`) | Критический | ⚠️ rolled back `8f8c69f` - single column, map under list (`data-day-route-map-desktop`) |
 | UX.MYDAY-SPLIT-MOB | Mobile &lt;lg: sticky map ~38vh + list scroll; expand ~85vh | Критический | ⚠️ superseded by UX.MYDAY-LIST-MAP (list-first + map mode) |
 | UX.MYDAY-CARD-SIZE | Stop cards: compact dense row + full-width list (= summary bar); no multi-col stretch towels | Критический | ✅ `76bae1c`+`949bd78` MSK **BUILD_ID=`QRQxYfwR-Wy7iklNEOIwY`** |
+| UX.MYDAY-LIST-TITLE-GAP | Desktop list stops: wider gap index badge → title (`md:gap-3 lg:gap-4`) | Высокий | ✅ `50bf964` MSK **BUILD_ID=`M7xdN7ovP2s4tAjJKQYPY`** `/my-day` 200 |
 
 ---
 
