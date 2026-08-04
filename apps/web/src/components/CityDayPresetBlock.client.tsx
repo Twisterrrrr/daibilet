@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Sparkles } from 'lucide-react';
+import { ArrowUpRight, Sparkles } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
 import type { CityDayRoutePreset, CityMustSeeItem } from '@/lib/cityInfo';
@@ -118,13 +118,14 @@ export function CityDayPresetBlock({
                   {preset.blogSlug ? (
                     <Link
                       href={`/blog/${preset.blogSlug}`}
-                      className={`mt-0.5 inline-block text-xs font-medium underline-offset-2 hover:underline ${
+                      className={`mt-0.5 inline-flex items-center gap-0.5 text-xs font-medium underline underline-offset-2 transition-colors ${
                         editorial
-                          ? 'text-zinc-500 hover:text-zinc-800'
-                          : 'text-slate-500 hover:text-primary-700'
+                          ? 'text-sky-700 hover:text-sky-800'
+                          : 'text-primary-600 hover:text-primary-700'
                       }`}
                     >
                       Читать об этом в блоге
+                      <ArrowUpRight className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
                     </Link>
                   ) : null}
                   {preset.description ? (

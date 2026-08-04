@@ -1,3 +1,16 @@
+## 2026-08-04 - /my-day presets: blog link affordance
+
+### Наблюдения
+- Owner: «Читать об этом в блоге» под title выглядела как muted текст, не как ссылка.
+
+### Решения
+- `CityDayPresetBlock`: brand/link blue (`text-primary-600` / editorial `text-sky-700`), постоянный underline, `ArrowUpRight`; text-xs font-medium - не конкурирует с CTA «Собрать день».
+
+### Проблемы
+- Нет. tip TBD; MSK BUILD_ID после deploy.
+
+---
+
 ## 2026-08-04 - /my-day empty: restore starter copy + hide dead Share
 
 ### Наблюдения
