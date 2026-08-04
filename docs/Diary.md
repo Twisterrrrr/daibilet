@@ -1,3 +1,19 @@
+## 2026-08-04 - My Day: stop-card planDone checkbox layout
+
+### Наблюдения
+- Owner на grid-карточках остановок обвёл пустую вертикальную «пилюлю» между thumb и title: непонятно что это и почему сбоку.
+- Элемент = `data-day-plan-done` (отметить выполненным / strikethrough), не декоративный leftover.
+- Баг layout: round checkbox сидел в отдельном ряду над title (без soft-time выглядел как одинокий outline); `rounded-full` + пустой transparent check читался как пустая рамка.
+
+### Решения
+- Checkbox в строке с title (`[✓] Title`); soft-time/Оплачено - отдельный ряд только если есть контент.
+- Affordance: квадрат `rounded` + видимый check (slate-300 unchecked), `title`/`aria-label` «Отметить выполненным», фиксированный `size-5` + `self-center`.
+
+### Проблемы
+- Нет. (BUILD_ID после MSK deploy.)
+
+---
+
 ## 2026-08-04 - My Day: must-see mini-card geometry (wider + 2× thumb)
 
 ### Наблюдения
