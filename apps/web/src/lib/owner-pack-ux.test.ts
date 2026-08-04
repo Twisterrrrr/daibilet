@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { decodeBlogFeedCursor, encodeBlogFeedCursor, paginateBlogFeedByCursor } from './blog-cursor.ts';
-import { filterBlogFeedByCity, rankBlogFeedByCity } from './blog-feed-rank.ts';
+import { filterBlogFeedByCity, rankBlogFeedByCity, resolveBlogRankCitySlug } from './blog-feed-rank.ts';
 import { groupPodborkiByCategory } from './podborki-categories.ts';
 
 test('filterBlogFeedByCity: empty for city without published posts', () => {
@@ -12,6 +12,26 @@ test('filterBlogFeedByCity: empty for city without published posts', () => {
   ];
   const local = filterBlogFeedByCity(posts, 'kaliningrad');
   assert.equal(local.length, 0);
+});
+
+test('filterBlogFeedByCity: NN aliases and Russian name resolve to article citySlug', () => {
+  const posts = [
+    { slug: 'a', citySlug: 'nizhny-novgorod' },
+    { slug: 'b', citySlug: 'nizhny-novgorod' },
+    { slug: 'c', citySlug: 'nizhny-novgorod' },
+    { slug: 'd', citySlug: 'moscow' },
+  ];
+  assert.equal(filterBlogFeedByCity(posts, 'nizhny-novgorod').length, 3);
+  assert.equal(filterBlogFeedByCity(posts, 'nizhniy-novgorod').length, 3);
+  assert.equal(filterBlogFeedByCity(posts, 'Нижний Новгород').length, 3);
+});
+
+test('resolveBlogRankCitySlug: display name without destination → canonical NN slug', () => {
+  assert.equal(resolveBlogRankCitySlug('Нижний Новгород', null, null, null), 'nizhny-novgorod');
+  assert.equal(
+    resolveBlogRankCitySlug('Нижний Новгород', 'nizhniy-novgorod', null, 'Нижний Новгород'),
+    'nizhny-novgorod',
+  );
 });
 
 test('rankBlogFeedByCity: city first then others (no drop)', () => {

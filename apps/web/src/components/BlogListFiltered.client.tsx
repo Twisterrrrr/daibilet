@@ -9,7 +9,7 @@ import { BlogMagazineGrid } from '@/components/BlogMagazineGrid.client';
 import type { BlogListFilters } from '@/components/BlogListView';
 import type { BlogCardDto } from '@/lib/blog-utils';
 import { paginateBlogFeedByCursor } from '@/lib/blog-cursor';
-import { filterBlogFeedByCity } from '@/lib/blog-feed-rank';
+import { canonicalizeBlogCitySlug, filterBlogFeedByCity } from '@/lib/blog-feed-rank';
 import { authorLabel, cityFilterLabel } from '@/lib/blog-meta';
 import { parseBlogTopicParam, postMatchesTopic } from '@/lib/blog-topics';
 import {
@@ -116,6 +116,7 @@ export function BlogListFiltered({
   initialFilters,
   headerCitySlug = null,
   hasLocalPosts = true,
+  emptyCityLabel = null,
 }: {
   posts: BlogCardDto[];
   /** Full blog list for city filter dropdown counts (without hero split). */
@@ -123,6 +124,8 @@ export function BlogListFiltered({
   initialFilters?: BlogListFilters;
   headerCitySlug?: string | null;
   hasLocalPosts?: boolean;
+  /** Header city display name for empty-state banner (only when 0 matches). */
+  emptyCityLabel?: string | null;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -241,11 +244,36 @@ export function BlogListFiltered({
       ? visiblePosts
       : paginateBlogFeedByCursor(filtered, { cursor: null, limit: PAGE_SIZE }).items;
 
+  /**
+   * Empty-city banner only when the *active* city filter has 0 article hits.
+   * Prefer explicit dropdown `?city=`; else header city. Never show when matches > 0
+   * (avoids false «нет статей» while «Найдено: N» / city option count is positive).
+   */
+  const emptyCheckSlug =
+    urlCity !== 'all' ? canonicalizeBlogCitySlug(urlCity) : canonicalizeBlogCitySlug(headerCitySlug);
+  const emptyCheckCount = emptyCheckSlug
+    ? filterBlogFeedByCity(cityOptionsSource, emptyCheckSlug).length
+    : -1;
+  const bannerLabel =
+    (urlCity !== 'all' ? cityFilterLabel(urlCity) : null) ||
+    emptyCityLabel ||
+    (emptyCheckSlug ? cityFilterLabel(emptyCheckSlug) : null);
+  const showEmptyCityBanner = Boolean(emptyCheckSlug && bannerLabel && emptyCheckCount === 0);
+
   const selectClass =
     'min-w-[10rem] flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none transition focus:border-primary-400 focus:ring-2 focus:ring-primary-100 sm:max-w-[16rem] sm:flex-none';
 
   return (
     <div id="blog-feed" className="scroll-mt-24">
+      {showEmptyCityBanner ? (
+        <div
+          className="mb-6 rounded-2xl border border-amber-200/80 bg-amber-50/70 px-4 py-3 text-sm text-amber-950 sm:px-5 sm:py-4"
+          role="status"
+        >
+          Пока нет статей про {bannerLabel} - смотрите свежее по России.
+        </div>
+      ) : null}
+
       <div className="mb-4 flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:flex-wrap sm:items-center">
         <select
           className={selectClass}

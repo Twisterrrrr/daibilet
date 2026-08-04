@@ -1,5 +1,5 @@
-import type { BlogCardDto } from './blog-utils';
-import { normalizeBlogCitySlug } from './blog-meta';
+import type { BlogCardDto } from './blog-utils.ts';
+import { normalizeBlogCitySlug } from './blog-meta.ts';
 
 const BROAD_CITY_SLUGS = new Set(['multi', 'regions']);
 
@@ -13,7 +13,16 @@ function normalizeHeaderCitySlug(raw: string | null | undefined): string | null 
   }
   if (value === 'msk' || value === 'moskva') return 'moscow';
   if (value === 'ekb' || value === 'yekaterinburg') return 'ekaterinburg';
+  if (value === 'nizhniy-novgorod') return 'nizhny-novgorod';
   return normalizeBlogCitySlug(value, value);
+}
+
+/** Canonical blog city slug for filters / empty-state (null = all / unknown). */
+export function canonicalizeBlogCitySlug(raw: string | null | undefined): string | null {
+  const value = String(raw || '').trim();
+  if (!value || value === 'all' || value === 'Все города') return null;
+  const resolved = normalizeHeaderCitySlug(value) || normalizeBlogCitySlug(value, value);
+  return resolved && !BROAD_CITY_SLUGS.has(resolved) ? resolved : null;
 }
 
 /** Map header city name/slug → blog citySlug (or null if «all»). */
@@ -30,14 +39,11 @@ export function resolveBlogRankCitySlug(
     normalizeBlogCitySlug(destinationSourceSlug, destinationName);
   if (fromDest && !BROAD_CITY_SLUGS.has(fromDest)) return fromDest;
 
-  const raw = String(headerCityValue || '').trim();
-  if (!raw || raw === 'all' || raw === 'Все города') return null;
-  const resolved = normalizeHeaderCitySlug(raw) || normalizeBlogCitySlug(raw, raw);
-  return resolved && !BROAD_CITY_SLUGS.has(resolved) ? resolved : null;
+  return canonicalizeBlogCitySlug(headerCityValue);
 }
 
 function cityMatchScore(postCitySlug: string | null | undefined, target: string): number {
-  const slug = String(postCitySlug || '')
+  const slug = canonicalizeBlogCitySlug(postCitySlug) || String(postCitySlug || '')
     .trim()
     .toLowerCase();
   if (!slug) return 0;
@@ -54,10 +60,8 @@ export function rankBlogFeedByCity<T extends Pick<BlogCardDto, 'citySlug' | 'pub
   posts: T[],
   citySlug: string | null | undefined,
 ): T[] {
-  const target = String(citySlug || '')
-    .trim()
-    .toLowerCase();
-  if (!target || target === 'all' || BROAD_CITY_SLUGS.has(target)) return posts;
+  const target = canonicalizeBlogCitySlug(citySlug);
+  if (!target) return posts;
 
   return [...posts].sort((a, b) => {
     const diff = cityMatchScore(b.citySlug, target) - cityMatchScore(a.citySlug, target);
@@ -74,9 +78,10 @@ export function filterBlogFeedByCity<T extends Pick<BlogCardDto, 'citySlug'>>(
   posts: T[],
   citySlug: string | null | undefined,
 ): T[] {
-  const target = String(citySlug || '')
-    .trim()
-    .toLowerCase();
-  if (!target || target === 'all') return posts;
-  return posts.filter((post) => String(post.citySlug || '') === target);
+  const target = canonicalizeBlogCitySlug(citySlug);
+  if (!target) return posts;
+  return posts.filter((post) => {
+    const postSlug = canonicalizeBlogCitySlug(post.citySlug);
+    return postSlug === target;
+  });
 }

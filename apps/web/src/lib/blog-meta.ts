@@ -25,6 +25,7 @@ export const BLOG_CITY_FILTER_LABELS: Record<string, string> = {
   kazan: 'Казань',
   ekaterinburg: 'Екатеринбург',
   kaliningrad: 'Калининград',
+  'nizhny-novgorod': 'Нижний Новгород',
   regions: 'Регионы',
   multi: 'Несколько городов',
 };
@@ -376,15 +377,31 @@ export function normalizeBlogCitySlug(
 ): string | null {
   const raw = String(citySlug || fallbackSlug || '')
     .trim()
-    .toLowerCase();
-  if (raw === 'spb' || raw === 'petersburg' || raw === 'sankt-peterburg') return 'saint-petersburg';
-  if (raw === 'msk') return 'moscow';
-  if (raw && (BLOG_CITY_FILTER_LABELS[raw] || raw.length > 1)) return raw;
-  const name = String(cityName || '').trim().toLowerCase();
-  if (name.includes('москв')) return 'moscow';
-  if (name.includes('петербург') || name.includes('санкт')) return 'saint-petersburg';
-  if (name.includes('казан')) return 'kazan';
-  if (name.includes('екатеринбург') || name.includes('уральск')) return 'ekaterinburg';
-  if (name.includes('регион')) return 'regions';
+    .toLowerCase()
+    .replace(/ё/g, 'е');
+  if (raw === 'spb' || raw === 'petersburg' || raw === 'sankt-peterburg' || raw === 'peterburg') {
+    return 'saint-petersburg';
+  }
+  if (raw === 'msk' || raw === 'moskva') return 'moscow';
+  if (raw === 'ekb' || raw === 'yekaterinburg') return 'ekaterinburg';
+  if (raw === 'nizhniy-novgorod' || raw === 'nizhny-novgorod') return 'nizhny-novgorod';
+
+  const name = String(cityName || citySlug || '')
+    .trim()
+    .toLowerCase()
+    .replace(/ё/g, 'е');
+  const haystack = `${raw} ${name}`.trim();
+  if (haystack.includes('москв')) return 'moscow';
+  if (haystack.includes('петербург') || haystack.includes('санкт')) return 'saint-petersburg';
+  if (haystack.includes('казан')) return 'kazan';
+  if (haystack.includes('екатеринбург') || haystack.includes('уральск')) return 'ekaterinburg';
+  if (haystack.includes('калининград')) return 'kaliningrad';
+  // «Нижний Новгород» vs «Великий Новгород»: нужен маркер «нижн».
+  if (haystack.includes('нижн') && haystack.includes('новгород')) return 'nizhny-novgorod';
+  if (haystack.includes('регион')) return 'regions';
+
+  if (raw && BLOG_CITY_FILTER_LABELS[raw]) return raw;
+  // Только slug-like токены (не кириллические display-name вроде «нижний новгород»).
+  if (raw && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(raw)) return raw;
   return null;
 }

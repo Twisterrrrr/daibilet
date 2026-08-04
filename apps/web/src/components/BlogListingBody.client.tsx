@@ -86,15 +86,6 @@ export function BlogListingBody({
           />
         ) : null}
 
-        {citySlug && cityReady && !hasLocalPosts && emptyCityLabel ? (
-          <div
-            className="mb-6 rounded-2xl border border-amber-200/80 bg-amber-50/70 px-4 py-3 text-sm text-amber-950 sm:px-5 sm:py-4"
-            role="status"
-          >
-            Пока нет статей про {emptyCityLabel} - смотрите свежее по России.
-          </div>
-        ) : null}
-
         <Suspense
           fallback={
             <div className="space-y-4">
@@ -113,6 +104,7 @@ export function BlogListingBody({
             initialFilters={initialFilters}
             headerCitySlug={citySlug}
             hasLocalPosts={hasLocalPosts}
+            emptyCityLabel={cityReady ? emptyCityLabel : null}
           />
         </Suspense>
 

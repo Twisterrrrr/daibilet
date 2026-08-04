@@ -11,6 +11,21 @@
 
 ---
 
+## 2026-08-04 - Blog: false empty-city banner for NN
+
+### Наблюдения
+- `/blog` при фильтре «Нижний Новгород (3)» / «Найдено: 3» всё равно показывал жёлтый баннер «Пока нет статей про Нижний Новгород».
+- Причина: header cityValue (display name / `nizhniy-novgorod`) не канонизировался в `nizhny-novgorod`, `hasLocalPosts=false` → Russia fallback + баннер, а dropdown `?city=` считал статьи по каноническому slug.
+
+### Решения
+- `normalizeBlogCitySlug` / `canonicalizeBlogCitySlug`: NN aliases + русское имя → `nizhny-novgorod`; не принимать кириллический display-name как slug.
+- Баннер перенесён в `BlogListFiltered`: показ только если у активного фильтра (URL city, иначе header) **0** статей.
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-04 - /my-day readiness: bullet separator
 
 ### Наблюдения
