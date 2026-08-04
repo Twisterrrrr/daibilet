@@ -122,6 +122,17 @@ test('dayRouteItemFromMustSee resolves venueSlug + coords + address', () => {
   assert.equal(item!.cityId, 'city_spb');
 });
 
+test('dayRouteItemFromMustSee preserves significant-suburb context', () => {
+  const item = dayRouteItemFromMustSee(
+    { name: 'Эрмитаж', desc: 'Музей', venueSlug: 'ermitazh' },
+    venues,
+    city,
+    { isSuburb: true },
+  );
+  assert.ok(item);
+  assert.equal(item!.isSuburb, true);
+});
+
 test('dayRouteItemFromMustSee resolves locationSlug with hub venue match', () => {
   const item = dayRouteItemFromMustSee(
     {

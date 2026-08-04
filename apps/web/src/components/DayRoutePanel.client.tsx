@@ -4376,6 +4376,14 @@ function DayRouteVenueCard({
   ) : (
     <span className={titleClass}>{venue.title}</span>
   );
+  const suburbBadge = venue.isSuburb ? (
+    <span
+      className="ml-1 inline-flex items-center rounded-full border border-slate-200 bg-slate-50 px-1.5 py-0.5 align-middle text-[10px] font-medium leading-none text-slate-600"
+      data-day-stop-suburb
+    >
+      Пригород
+    </span>
+  ) : null;
   const softTimeNode = softTimeLabel ? (
     <p className="m-0 text-[12px] font-semibold text-primary-700" data-day-soft-time>
       {softTimeLabel}
@@ -4483,7 +4491,10 @@ function DayRouteVenueCard({
                 Оплачено
               </p>
             ) : null}
-            <p className="m-0 truncate text-[13px] font-semibold text-slate-900">{titleNode}</p>
+            <p className="m-0 truncate text-[13px] font-semibold text-slate-900">
+              {titleNode}
+              {suburbBadge}
+            </p>
             {metaLine ? (
               <p
                 className={`m-0 mt-px truncate text-[11px] ${
@@ -4672,6 +4683,7 @@ function DayRouteVenueCard({
           ) : null}
           <p className="truncate text-sm font-semibold leading-snug text-slate-900">
             {titleNode}
+            {suburbBadge}
           </p>
           {placeLine || !hasCoords ? (
             <p

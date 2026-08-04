@@ -86,6 +86,11 @@ export type DayRouteCityContext = {
   sourceSlug?: string | null;
 };
 
+export type DayRoutePlaceOptions = {
+  /** Preserve significant-suburb context on the planner stop. */
+  isSuburb?: boolean;
+};
+
 function pickPlaceSlug(place: CityPlaceLinkFields): string | null {
   const venueSlug = String(place.venueSlug || '').trim();
   if (venueSlug) return venueSlug;
@@ -147,6 +152,7 @@ export function dayRouteItemFromMustSee(
   place: CityMustSeeItem,
   venues: DayRouteVenueMatchSource[],
   city: DayRouteCityContext,
+  options: DayRoutePlaceOptions = {},
 ): DayRouteVenueItem | null {
   const matched = findVenueForPlace(place, venues);
   const slug = pickPlaceSlug(place) || String(matched?.slug || '').trim() || null;
@@ -177,6 +183,7 @@ export function dayRouteItemFromMustSee(
     city: city.name || matched?.city || null,
     cityId: city.id || matched?.cityId || null,
     citySlug: city.slug || city.sourceSlug || matched?.citySlug || null,
+    isSuburb: options.isSuburb || undefined,
     href,
     imageUrl,
     address: String(matched?.address || '').trim() || null,

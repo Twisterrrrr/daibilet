@@ -1335,8 +1335,7 @@ function CitySignificantSuburbsBlock({
         Значимые пригороды {cityGenitive}
       </h3>
       <p className={`mt-1.5 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-        Это не город, но очень интересно к посещению. Day-trip рядом с городом - отдельные
-        мини-локации и точки внутри них.
+        Day-trip рядом с городом - отдельные мини-локации и точки внутри них.
       </p>
       {/* One suburb per snap screen: mobile ~92% + peek; desktop full-bleed card + arrows. */}
       <div className="relative mt-5">
@@ -1349,7 +1348,7 @@ function CitySignificantSuburbsBlock({
         >
           {places.map((place, index) => {
             const placeHref = resolveCityPlaceTitleHref(place, venues);
-            const dayRouteItem = dayRouteItemFromMustSee(place, venues, city);
+            const dayRouteItem = dayRouteItemFromMustSee(place, venues, city, { isSuburb: true });
             const matchedVenue = venues.find((venue) => {
               const slug = String(place.venueSlug || place.locationSlug || '').trim();
               return slug && String(venue.slug || '').trim() === slug;
@@ -1385,7 +1384,7 @@ function CitySignificantSuburbsBlock({
                       }`}
                       data-city-suburb-badge
                     >
-                      Пригород · не город
+                      Пригород
                     </p>
                     {placeHref ? (
                       <Link
@@ -1423,7 +1422,9 @@ function CitySignificantSuburbsBlock({
                             venueSlug: poi.venueSlug,
                             locationSlug: poi.locationSlug,
                           };
-                          const poiDayRoute = dayRouteItemFromMustSee(poiAsMustSee, venues, city);
+                          const poiDayRoute = dayRouteItemFromMustSee(poiAsMustSee, venues, city, {
+                            isSuburb: true,
+                          });
                           return (
                             <li
                               key={`${poi.name}:${poiIndex}`}

@@ -111,6 +111,8 @@ export type DayRouteVenueItem = {
   ticketBought?: boolean;
   /** Legacy: guest checklist done flag - UI no longer toggles; kept for old localStorage. */
   planDone?: boolean;
+  /** Added from a significant suburb, so route cards can show compact context. */
+  isSuburb?: boolean;
   /** Lowest known ticket price (rub) from matches / catalog - for «Купить билет от X». */
   priceFromRub?: number | null;
   /**
@@ -638,6 +640,7 @@ function mergeDayRouteVenueFields(
     city: incoming.city ?? existing.city,
     cityId: incoming.cityId ?? existing.cityId,
     citySlug: incoming.citySlug ?? existing.citySlug,
+    isSuburb: Boolean(existing.isSuburb || incoming.isSuburb),
     href: incoming.href ?? existing.href,
     imageUrl: incoming.imageUrl ?? existing.imageUrl,
   };
