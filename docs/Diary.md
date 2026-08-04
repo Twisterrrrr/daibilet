@@ -1,3 +1,33 @@
+## 2026-08-04 - /my-day empty: restore starter copy + hide dead Share
+
+### Наблюдения
+- Owner: empty-state starter «вкуснее» был раньше; сейчас дубль «Добавь своё место или готовый сценарий» (subtitle + invite) и серый full-width «Поделиться» при 0 точках.
+
+### Решения
+- Subtitle starter снова канон variant A: «Выбери город и минимум N точки…»; интерактивный invite под поиском сохранён (presets/своё место).
+- Desktop/mobile actions (Поделиться / Сохранить / Очистить) рендерятся только при >=1 stop; disabled Share на empty убран.
+- Сохранены: hide starter mid-card при >=1, header search, presets blog, must-see, hour-plan.
+
+### Проблемы
+- Нет. tip TBD; MSK BUILD_ID после deploy.
+
+---
+
+## 2026-08-04 - /my-day must-see: dense actions + full-width expand grid
+
+### Наблюдения
+- Owner: «Добавить главные места» + «Развернуть» уезжали вправо (`justify-between`) - пустой горизонтальный зазор; «Развернуть» второй строкой под кнопкой съедал высоту.
+- В режиме «Развернуть» карточки оставались с carousel-шириной `lg:w-[min(100%,22rem)]` + flex-wrap - три в ряд слева, справа пустота (? на скрине).
+
+### Решения
+- Helper full-width; actions row left-aligned: `[Добавить…] [Развернуть]` в одном `flex-wrap` кластере (без `justify-between`).
+- Expanded list: CSS grid `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`; карточки `w-full min-w-0`. Carousel (свёрнуто) без изменений `24rem` snap.
+
+### Проблемы
+- Нет. tip TBD; MSK BUILD_ID после deploy.
+
+---
+
 ## 2026-08-04 - hotfix: DayRoutePanel stray `{` broke MSK build
 
 ### Наблюдения

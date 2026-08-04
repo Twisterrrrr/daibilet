@@ -2294,11 +2294,7 @@ function DayRoutePanelInner() {
             <div className="min-w-0" data-day-starter-copy>
               <p className="text-xl font-bold leading-snug text-slate-900">Собери свой день</p>
               <p className="mt-1 text-sm leading-relaxed text-slate-500">
-                {!hasPageCity
-                  ? `Выбери город и минимум ${DAY_ROUTE_MIN} точки для составления маршрута`
-                  : hasNamedPresets
-                    ? 'Добавь своё место или готовый сценарий'
-                    : `Минимум ${DAY_ROUTE_MIN} точки - или добавь своё место через поиск`}
+                Выбери город и минимум {DAY_ROUTE_MIN} точки для составления маршрута
               </p>
             </div>
           </div>
@@ -2647,99 +2643,20 @@ function DayRoutePanelInner() {
           </p>
         </div>
 
-        {/* Desktop top-right: Save / Clear + Share (hour-plan lives on distance row) */}
-        <div
-          className="relative hidden shrink-0 flex-wrap items-center justify-end gap-2 sm:flex"
-          ref={shareMenuRef}
-          data-day-desktop-actions
-        >
-          {route.venues.length ? (
-            <>
-              <button
-                type="button"
-                onClick={printItinerary}
-                data-day-print
-                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition duration-200 hover:bg-slate-50"
-              >
-                <Printer className="h-3.5 w-3.5" />
-                Сохранить
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  clearDayRoute();
-                  setRoute(readDayRoute());
-                  replaceMyDayUrl('/my-day');
-                }}
-                data-day-clear
-                className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition duration-200 hover:bg-slate-50"
-              >
-                <Trash2 className="h-3.5 w-3.5" /> Очистить
-              </button>
-            </>
-          ) : null}
-          <button
-            type="button"
-            onClick={() => {
-              if (!route.venues.length) return;
-              setShareMenuOpen((open) => !open);
-            }}
-            data-day-share
-            aria-expanded={shareMenuOpen}
-            disabled={!route.venues.length}
-            className={`inline-flex min-h-10 items-center justify-center gap-1.5 rounded-2xl border px-3 py-2 text-xs font-semibold transition duration-200 ${
-              route.venues.length
-                ? 'border-emerald-200 bg-emerald-50 text-emerald-900 hover:bg-emerald-100'
-                : 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'
-            }`}
-          >
-            <Share2 className="h-3.5 w-3.5" />
-            {copyStatus === 'ok' ? 'Скопировано!' : 'Поделиться'}
-          </button>
-          {shareMenuOpen && route.venues.length ? (
-            <div
-              role="menu"
-              data-day-share-menu
-              className="absolute right-0 top-full z-30 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-lg"
-            >
-              {shareMenuItems}
-            </div>
-          ) : null}
-        </div>
-      </div>
-
-      {/* Mobile: full-width Поделиться / Сохранить / Очистить under title (wider taps, H1 unrestricted) */}
-      <div
-        className="mt-3 flex w-full gap-2 sm:hidden"
-        data-day-mobile-actions-row
-        data-day-mobile-actions-col
-      >
-        <button
-          type="button"
-          onClick={() => {
-            if (!route.venues.length) return;
-            setShareMenuOpen(true);
-          }}
-          data-day-share
-          disabled={!route.venues.length}
-          className={`inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition ${
-            route.venues.length
-              ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
-              : 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'
-          }`}
-        >
-          <Share2 className="h-3.5 w-3.5 shrink-0" />
-          {copyStatus === 'ok' ? 'Скопировано!' : 'Поделиться'}
-        </button>
+        {/* Desktop top-right: Save / Clear + Share only when route has stops */}
         {route.venues.length ? (
-          <>
+          <div
+            className="relative hidden shrink-0 flex-wrap items-center justify-end gap-2 sm:flex"
+            ref={shareMenuRef}
+            data-day-desktop-actions
+          >
             <button
               type="button"
               onClick={printItinerary}
               data-day-print
-              className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700"
+              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition duration-200 hover:bg-slate-50"
             >
-              <Printer className="h-3.5 w-3.5 shrink-0" />
+              <Printer className="h-3.5 w-3.5" />
               Сохранить
             </button>
             <button
@@ -2750,14 +2667,73 @@ function DayRoutePanelInner() {
                 replaceMyDayUrl('/my-day');
               }}
               data-day-clear
-              className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600"
+              className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition duration-200 hover:bg-slate-50"
             >
-              <Trash2 className="h-3.5 w-3.5 shrink-0" />
-              Очистить
+              <Trash2 className="h-3.5 w-3.5" /> Очистить
             </button>
-          </>
+            <button
+              type="button"
+              onClick={() => setShareMenuOpen((open) => !open)}
+              data-day-share
+              aria-expanded={shareMenuOpen}
+              className="inline-flex min-h-10 items-center justify-center gap-1.5 rounded-2xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900 transition duration-200 hover:bg-emerald-100"
+            >
+              <Share2 className="h-3.5 w-3.5" />
+              {copyStatus === 'ok' ? 'Скопировано!' : 'Поделиться'}
+            </button>
+            {shareMenuOpen ? (
+              <div
+                role="menu"
+                data-day-share-menu
+                className="absolute right-0 top-full z-30 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-lg"
+              >
+                {shareMenuItems}
+              </div>
+            ) : null}
+          </div>
         ) : null}
       </div>
+
+      {/* Mobile: Поделиться / Сохранить / Очистить only when route has content */}
+      {route.venues.length ? (
+        <div
+          className="mt-3 flex w-full gap-2 sm:hidden"
+          data-day-mobile-actions-row
+          data-day-mobile-actions-col
+        >
+          <button
+            type="button"
+            onClick={() => setShareMenuOpen(true)}
+            data-day-share
+            className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900 transition"
+          >
+            <Share2 className="h-3.5 w-3.5 shrink-0" />
+            {copyStatus === 'ok' ? 'Скопировано!' : 'Поделиться'}
+          </button>
+          <button
+            type="button"
+            onClick={printItinerary}
+            data-day-print
+            className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700"
+          >
+            <Printer className="h-3.5 w-3.5 shrink-0" />
+            Сохранить
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              clearDayRoute();
+              setRoute(readDayRoute());
+              replaceMyDayUrl('/my-day');
+            }}
+            data-day-clear
+            className="inline-flex min-h-10 flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600"
+          >
+            <Trash2 className="h-3.5 w-3.5 shrink-0" />
+            Очистить
+          </button>
+        </div>
+      ) : null}
 
       {/* ≥1 stop: compact city+search under H1 (no mid-page bordered starter card) */}
       {!isEmptyRoute ? renderHeaderCompactSearch() : null}
@@ -3275,13 +3251,13 @@ function DayRoutePanelInner() {
             <div id="day-must-see-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
               {mustSeeResolved.length > 0 ? (
                 <div data-day-must-see>
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="flex flex-col gap-2">
                     <p className="text-xs text-slate-500" data-day-must-see-helper>
                       {`Собрали для вас топ-${DAY_ROUTE_SOFT} мест${
                         pageCityName ? ` ${inCityPrepositional(pageCityName)}` : ''
                       }. Добавьте их в один клик или выберите категории ниже.`}
                     </p>
-                    <div className="flex shrink-0 flex-col items-stretch gap-1 sm:items-end">
+                    <div className="flex flex-wrap items-center justify-start gap-x-2 gap-y-1">
                       <button
                         type="button"
                         disabled={atMax || atSoft || mustSeeAddable.length === 0}
@@ -3303,7 +3279,7 @@ function DayRoutePanelInner() {
                           aria-expanded={mustSeeExpanded}
                           aria-controls="day-must-see-list"
                           data-day-must-see-expand
-                          className="inline-flex min-h-8 items-center justify-center gap-1 px-2 text-xs font-medium text-slate-500 transition hover:text-slate-800"
+                          className="inline-flex min-h-8 items-center justify-center gap-1 px-1.5 text-xs font-medium text-slate-500 transition hover:text-slate-800"
                         >
                           {mustSeeExpanded ? (
                             <>
@@ -3334,7 +3310,7 @@ function DayRoutePanelInner() {
                     id="day-must-see-list"
                     className={
                       mustSeeExpanded
-                        ? 'mt-3 flex flex-col gap-2.5 lg:flex-row lg:flex-wrap'
+                        ? 'mt-3 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3'
                         : 'mt-3 flex snap-x snap-mandatory gap-2.5 overflow-x-auto pb-1'
                     }
                     data-day-must-see-list
@@ -3365,7 +3341,7 @@ function DayRoutePanelInner() {
                           onClick={() => addMustSeeItem(item)}
                           className={`flex items-center gap-3 rounded-xl border px-2.5 py-1.5 text-left transition disabled:cursor-not-allowed ${
                             mustSeeExpanded
-                              ? 'w-full lg:w-[min(100%,22rem)] lg:shrink-0'
+                              ? 'w-full min-w-0'
                               : 'w-[min(100%,24rem)] shrink-0 snap-start'
                           } ${
                             inRoute
