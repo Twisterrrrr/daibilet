@@ -112,22 +112,24 @@ export function CityDayPresetBlock({
                 }`}
               >
                 <div className="min-w-0">
-                  <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
-                    {preset.title}
-                  </p>
-                  {preset.blogSlug ? (
-                    <Link
-                      href={`/blog/${preset.blogSlug}`}
-                      className={`mt-0.5 inline-flex items-center gap-0.5 text-xs font-medium underline underline-offset-2 transition-colors ${
-                        editorial
-                          ? 'text-sky-700 hover:text-sky-800'
-                          : 'text-primary-600 hover:text-primary-700'
-                      }`}
-                    >
-                      Читать об этом в блоге
-                      <ArrowUpRight className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
-                    </Link>
-                  ) : null}
+                  <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                    <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
+                      {preset.title}
+                    </p>
+                    {preset.blogSlug ? (
+                      <Link
+                        href={`/blog/${preset.blogSlug}`}
+                        className={`inline-flex items-center gap-0.5 text-xs font-medium underline underline-offset-2 transition-colors ${
+                          editorial
+                            ? 'text-sky-700 hover:text-sky-800'
+                            : 'text-primary-600 hover:text-primary-700'
+                        }`}
+                      >
+                        Читать об этом в блоге
+                        <ArrowUpRight className="h-3 w-3 shrink-0 opacity-80" aria-hidden />
+                      </Link>
+                    ) : null}
+                  </div>
                   {preset.description ? (
                     <p className={`mt-0.5 text-xs leading-5 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
                       {preset.description}

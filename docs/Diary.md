@@ -1,3 +1,16 @@
+## 2026-08-04 - /my-day presets: blog link inline with title
+
+### Наблюдения
+- Owner (скрин): «Читать об этом в блоге» стояла под title пресета - нужна та же строка, сразу после названия.
+
+### Решения
+- `CityDayPresetBlock`: title + blog-link в `flex flex-wrap items-baseline gap-x-2`; на md+ обычно одна строка, на узком mobile wrap под title. Стиль ссылки без изменений (blue + underline + ArrowUpRight).
+
+### Проблемы
+- Нет. tip TBD, MSK BUILD_ID TBD после deploy.
+
+---
+
 ## 2026-08-04 - /my-day matches: elevate + drop addable row
 
 ### Наблюдения
