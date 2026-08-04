@@ -2943,7 +2943,7 @@ function DayRoutePanelInner() {
             </div>
           </div>
 
-          {/* Row 2: km left | Пешком/Авто (+ desktop Hour plan / Optimize) right - airy title above */}
+          {/* Row 2: desktop left [km · min][Пешком Авто] | right CTAs; mobile km left | Пешком right */}
           {totalDistanceMeters > 0 || route.venues.length >= DAY_ROUTE_MIN || canOptimize ? (
             <div
               className={`mt-2.5 flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 ${
@@ -2952,28 +2952,39 @@ function DayRoutePanelInner() {
               data-day-distance-summary
               data-day-distance-summary-mobile
             >
-              <p className="min-w-0 text-[13px] leading-snug text-slate-600">
+              <div className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-1">
+                <p className="min-w-0 text-[13px] leading-snug text-slate-600">
+                  {totalDistanceMeters > 0 ? (
+                    <>
+                      <span className="font-semibold text-slate-800">
+                        {formatDayRouteDistance(totalDistanceMeters)}
+                      </span>
+                      {travelMinutes > 0 ? (
+                        <>
+                          {' '}
+                          · около{' '}
+                          <span className="font-semibold text-slate-800">
+                            {formatDayRouteTravelMinutes(travelMinutes)}
+                          </span>
+                        </>
+                      ) : null}
+                    </>
+                  ) : (
+                    <span className="sr-only">Маршрут</span>
+                  )}
+                </p>
                 {totalDistanceMeters > 0 ? (
-                  <>
-                    <span className="font-semibold text-slate-800">
-                      {formatDayRouteDistance(totalDistanceMeters)}
-                    </span>
-                    {travelMinutes > 0 ? (
-                      <>
-                        {' '}
-                        · около{' '}
-                        <span className="font-semibold text-slate-800">
-                          {formatDayRouteTravelMinutes(travelMinutes)}
-                        </span>
-                      </>
-                    ) : null}
-                  </>
-                ) : (
-                  <span className="sr-only">Маршрут</span>
-                )}
-              </p>
+                  <div className="hidden lg:block" data-day-travel-mode-desktop>
+                    {renderTravelModeToggle()}
+                  </div>
+                ) : null}
+              </div>
               <div className="flex shrink-0 flex-wrap items-center justify-end gap-x-3 gap-y-1">
-                {totalDistanceMeters > 0 ? renderTravelModeToggle() : null}
+                {totalDistanceMeters > 0 ? (
+                  <div className="lg:hidden" data-day-travel-mode-mobile>
+                    {renderTravelModeToggle()}
+                  </div>
+                ) : null}
                 {renderDesktopDistanceActions()}
               </div>
             </div>
