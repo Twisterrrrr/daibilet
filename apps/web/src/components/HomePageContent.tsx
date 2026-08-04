@@ -5,7 +5,7 @@ import {
   CheckCircle2,
   ChevronRight,
   Landmark,
-  Map,
+  Map as MapIcon,
   MapPin,
   Moon,
   Ship,
@@ -34,7 +34,7 @@ function formatTileIcon(title: string) {
   const key = title.toLowerCase();
   const cls = 'h-6 w-6 text-primary-600';
   if (key.includes('речн')) return <Ship className={cls} aria-hidden />;
-  if (key.includes('обзор') || key.includes('экскур')) return <Map className={cls} aria-hidden />;
+  if (key.includes('обзор') || key.includes('экскур')) return <MapIcon className={cls} aria-hidden />;
   if (key.includes('музе')) return <Landmark className={cls} aria-hidden />;
   if (key.includes('ночн')) return <Moon className={cls} aria-hidden />;
   return <CalendarDays className={cls} aria-hidden />;
