@@ -12,6 +12,10 @@
 ### Проблемы
 - Нет. Live: `e5cf78c` (+ tip `74fead9`), MSK **BUILD_ID=`Tn0XvhLW4knVakxHU8x6V`**, `/my-day` 200; marker `size-5 min-h-5` + title-row layout.
 
+---
+
+## 2026-08-04 - My Day: must-see mini-card geometry (wider + 2× thumb)
+
 ### Наблюдения
 - Owner оставил horizontal carousel mini-cards (chips + thumb/title/desc/+); полный откат к accordion-grid не нужен.
 - Просьба: карточки более горизонтальные (шире/ниже) и превью ~2×.
