@@ -13,6 +13,23 @@
 
 ---
 
+## 2026-08-04 - Header city change: stay in section
+
+### Наблюдения
+- Owner: смена города в хедере на `/cities` (и других секциях) уводила в каталог `/events`.
+- Root cause: `SelectedCityProvider.setCity` имел узкие ветки (index catalogs, landings, my-day) и fallback `buildCatalogHref` на всё остальное - в т.ч. `/cities/{slug}`, venue/location PDP, blog.
+
+### Решения
+- Канон: смена города в хедере переключает city filter **внутри текущей секции**, не дампит в каталог.
+- Чистый хелпер `resolveCityChangeNav` (`apps/web/src/lib/city-change-nav.ts`) + `setCity` path-aware map.
+- Матрица: `/cities`→hub; events/venues/locations (+PDP)→section `?city=`; podborki intent→`/podborki/{intent}/{slug}`; blog→`/blog?city=slug`; my-day/home→persist (+confirm на my-day); multi-city landing→swap segment; static→persist only.
+- `/my-day` confirm-reset не регрессирован.
+
+### Проблемы
+- Нет. unit: `city-change-nav.test.ts` 6/6.
+
+---
+
 ## 2026-08-04 - City hub must-see: mobile 85/15 carousel
 
 ### Наблюдения

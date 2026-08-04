@@ -221,6 +221,7 @@ BRANCH=feat/next-monorepo ./deploy/scripts/deploy-prod-next.sh
 
 ### URL / SEO policy (2026-07-19, доп. 2026-07-22)
 
+- **Header city change (2026-08-04):** смена города в шапке остаётся в текущей секции (`resolveCityChangeNav`): `/cities`→hub, catalogs/PDP→`?city=` той же секции, podborki intent→city segment, blog→`/blog?city=`, my-day/home→persist (+confirm на my-day), multi-city landing→swap segment. **Не** дампить в `/events`, если пользователь не в каталоге событий.
 - **Flat URL:** `/events/{slug}`, `/venues/{slug}`, `/cities/{slug}` — без city-prefix в path (`/{city}/venues/...` и т.п. **отклонено**).
 - **SEO-фокус:** city hubs `/cities/{slug}` + **category×city landings** (`/rechnye-progulki/moscow`, `/stendap-i-yumor/kazan`, …) + intent `/podborki/{intent}`; sitemap + canonical.
 - **Meta (city listing):** обычные города - `[Категория] в [Городе] [Год] - купить билеты…`; Казань/Екатеринбург - `[Категория] в {City_Пр} [Год]: купить билеты…` (`seo-listing-meta.ts`, падежи в `city-declension.ts`).

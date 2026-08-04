@@ -1,0 +1,148 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+
+import { resolveCityChangeHref, resolveCityChangeNav } from './city-change-nav.ts';
+
+const destinations = [
+  { id: '1', name: 'Уфа', slug: 'ufa', type: 'city' as const, events: 10, venues: 2, categories: [] },
+  {
+    id: '2',
+    name: 'Москва',
+    slug: 'moscow',
+    type: 'city' as const,
+    events: 100,
+    venues: 20,
+    categories: [],
+  },
+  {
+    id: '3',
+    name: 'Казань',
+    slug: 'kazan',
+    type: 'city' as const,
+    events: 40,
+    venues: 8,
+    categories: [],
+  },
+];
+
+test('cities list/hub → city hub, all → list', () => {
+  assert.equal(
+    resolveCityChangeHref({ pathname: '/cities', cityName: 'Казань', destinations }),
+    '/cities/kazan',
+  );
+  assert.equal(
+    resolveCityChangeHref({
+      pathname: '/cities/nizhny-novgorod',
+      cityName: 'Москва',
+      destinations,
+    }),
+    '/cities/moscow',
+  );
+  assert.equal(
+    resolveCityChangeHref({ pathname: '/cities/moscow', cityName: 'all', destinations }),
+    '/cities',
+  );
+});
+
+test('catalog section indexes keep filters and update city', () => {
+  assert.equal(
+    resolveCityChangeHref({
+      pathname: '/events',
+      cityName: 'Уфа',
+      destinations,
+      searchParams: new URLSearchParams('date=weekend&sort=time'),
+    }),
+    '/events?date=weekend&sort=time&city=%D0%A3%D1%84%D0%B0',
+  );
+  assert.equal(
+    resolveCityChangeHref({
+      pathname: '/venues',
+      cityName: 'all',
+      destinations,
+      searchParams: new URLSearchParams('city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0&q=театр'),
+    }),
+    '/venues?q=%D1%82%D0%B5%D0%B0%D1%82%D1%80',
+  );
+});
+
+test('PDP deep links return to same section index with city', () => {
+  assert.equal(
+    resolveCityChangeHref({
+      pathname: '/venues/some-hall',
+      cityName: 'Казань',
+      destinations,
+    }),
+    '/venues?city=%D0%9A%D0%B0%D0%B7%D0%B0%D0%BD%D1%8C',
+  );
+  assert.equal(
+    resolveCityChangeHref({
+      pathname: '/locations/park',
+      cityName: 'Уфа',
+      destinations,
+    }),
+    '/locations?city=%D0%A3%D1%84%D0%B0',
+  );
+  assert.equal(
+    resolveCityChangeHref({
+      pathname: '/events/show-slug',
+      cityName: 'Москва',
+      destinations,
+    }),
+    '/events?city=%D0%9C%D0%BE%D1%81%D0%BA%D0%B2%D0%B0',
+  );
+});
+
+test('podborki intent keeps intent and swaps city segment', () => {
+  assert.equal(
+    resolveCityChangeHref({
+      pathname: '/podborki/besplatno',
+      cityName: 'Казань',
+      destinations,
+    }),
+    '/podborki/besplatno/kazan',
+  );
+  assert.equal(
+    resolveCityChangeHref({
+      pathname: '/podborki/besplatno/moscow',
+      cityName: 'Уфа',
+      destinations,
+    }),
+    '/podborki/besplatno/ufa',
+  );
+  assert.equal(
+    resolveCityChangeHref({
+      pathname: '/podborki/besplatno/moscow',
+      cityName: 'all',
+      destinations,
+    }),
+    '/podborki/besplatno',
+  );
+});
+
+test('blog stays on blog with city slug query', () => {
+  assert.equal(
+    resolveCityChangeHref({ pathname: '/blog', cityName: 'Москва', destinations }),
+    '/blog?city=moscow',
+  );
+  assert.equal(
+    resolveCityChangeHref({ pathname: '/blog/some-article', cityName: 'Уфа', destinations }),
+    '/blog?city=ufa',
+  );
+  assert.equal(
+    resolveCityChangeHref({ pathname: '/blog', cityName: 'all', destinations }),
+    '/blog',
+  );
+});
+
+test('home and my-day persist; static/unknown fallback (no catalog dump)', () => {
+  assert.deepEqual(resolveCityChangeNav({ pathname: '/', cityName: 'Казань', destinations }), {
+    action: 'persist',
+  });
+  assert.deepEqual(resolveCityChangeNav({ pathname: '/my-day', cityName: 'Казань', destinations }), {
+    action: 'persist',
+  });
+  assert.deepEqual(resolveCityChangeNav({ pathname: '/about', cityName: 'Казань', destinations }), {
+    action: 'fallback',
+  });
+  assert.equal(resolveCityChangeHref({ pathname: '/about', cityName: 'Казань', destinations }), null);
+});

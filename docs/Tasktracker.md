@@ -115,6 +115,12 @@
 | CH.HF5 | Партнерский виджет логистики (Ласточки/авиа) | Низкий | ⏳ |
 | CH.HF6 | Owner follow-up: brief обратно в hero; UI «Истории города» скрыть | Критический | ✅ `31b5a8b0` MSK **BUILD_ID=`DDNYHaaqzcrNwwq6UfUrd`**; smoke moscow: hero brief + нет «Истории города» |
 
+## Header city navigation (2026-08-04)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.CITY-NAV | Header setCity: stay in section (cities hub / catalogs / blog / landings); no catalog dump; keep my-day confirm | Критический | 🔄 deploy |
+
 ## /my-day starter → header search (2026-08-04)
 
 | # | Задача | Приоритет | Статус |

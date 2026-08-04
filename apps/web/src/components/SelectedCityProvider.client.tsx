@@ -12,7 +12,7 @@ import {
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
-import { buildCatalogHref } from '@/lib/catalog-url';
+import { resolveCityChangeNav } from '@/lib/city-change-nav';
 import { confirmClearDayRouteForCityChange } from '@/lib/day-route-city-change';
 import { resolveLandingCityName } from '@/lib/landing-city';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
@@ -197,52 +197,54 @@ export function SelectedCityProvider({
       setCityLabel(name === 'all' ? 'Все города' : name);
       setCityReady(true);
 
-      if (pathname === '/') {
+      const searchParams = searchParamsKey
+        ? new URLSearchParams(searchParamsKey)
+        : readClientSearchParams();
+      const nav = resolveCityChangeNav({
+        pathname,
+        cityName: name,
+        destinations,
+        searchParams,
+      });
+
+      if (nav.action === 'persist') {
         return true;
       }
 
-      // /my-day owns its city control - persist only, never navigate to catalog.
-      if (path === '/my-day') {
-        return true;
-      }
-      if (path === '/events' || path === '/venues' || path === '/locations' || path === '/podborki') {
-        const params = searchParamsKey
-          ? new URLSearchParams(searchParamsKey)
-          : readClientSearchParams();
-        if (name === 'all') params.delete('city');
-        else params.set('city', name);
-        params.delete('page');
-        const query = params.toString();
-        router.replace(query ? `${path}?${query}` : path, { scroll: false });
-        return true;
-      }
+      let href: string | null = nav.action === 'navigate' ? nav.href : null;
 
-      const landingRoute = resolveLandingRouteFromLocation(pathname);
-      if (
-        landingRoute &&
-        MULTI_CITY_LANDING_SLUGS.has(canonicalLandingSlug(landingRoute.landingSlug))
-      ) {
-        if (name === 'all') {
-          router.push(landingCategoryHref(landingRoute.landingSlug));
-          return true;
-        }
-        const matched = matchDestination(destinations, name);
-        const citySlug =
-          normalizeKnownCitySlug(matched?.slug) ||
-          normalizeKnownCitySlug(matched?.sourceSlug) ||
-          normalizeKnownCitySlug(name);
-        if (citySlug) {
-          router.push(landingCategoryHref(landingRoute.landingSlug, citySlug));
-          return true;
+      if (nav.action === 'fallback') {
+        const landingRoute = resolveLandingRouteFromLocation(pathname);
+        if (
+          landingRoute &&
+          MULTI_CITY_LANDING_SLUGS.has(canonicalLandingSlug(landingRoute.landingSlug))
+        ) {
+          if (name === 'all') {
+            href = landingCategoryHref(landingRoute.landingSlug);
+          } else {
+            const matched = matchDestination(destinations, name);
+            const citySlug =
+              normalizeKnownCitySlug(matched?.slug) ||
+              normalizeKnownCitySlug(matched?.sourceSlug) ||
+              normalizeKnownCitySlug(name);
+            if (citySlug) {
+              href = landingCategoryHref(landingRoute.landingSlug, citySlug);
+            }
+          }
         }
       }
 
-      router.push(
-        buildCatalogHref({
-          city: name !== 'all' ? name : undefined,
-          sort: 'popular',
-        }),
-      );
+      // Unknown / static surfaces: persist only - never dump into events catalog.
+      if (!href) return true;
+
+      const sameIndexQuery =
+        path === href.split('?')[0] &&
+        (path === '/events' || path === '/venues' || path === '/locations' || path === '/podborki');
+      if (sameIndexQuery) {
+        router.replace(href, { scroll: false });
+      } else {
+        router.push(href);
+      }
       return true;
     },
     [cityLabel, destinations, pathname, router, searchParamsKey],
