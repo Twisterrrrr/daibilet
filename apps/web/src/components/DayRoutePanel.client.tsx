@@ -4445,50 +4445,53 @@ function DayRouteVenueCard({
           vertically centered with side controls.
         */}
         <div
-          className={`flex w-full items-center gap-1.5 py-1.5 ${
+          className={`flex w-full items-center gap-1.5 py-1.5 md:gap-3 lg:gap-4 ${
             focused ? 'rounded-md bg-emerald-50/80 px-1' : ''
           } ${purchased ? 'border-l-4 border-primary-600 pl-1.5' : ''}`}
         >
-          {reorderLocked ? (
-            <div
-              className="flex h-8 w-5 shrink-0 items-center justify-center text-slate-300"
-              data-day-stop-sort="locked"
-              title="Сеанс с фиксированным временем - порядок нельзя менять"
-              aria-hidden
-            >
-              <Ticket className="h-3 w-3" />
-            </div>
-          ) : (
-            <div
-              className="flex shrink-0 flex-col items-center leading-none"
-              data-day-stop-sort
-            >
-              <button
-                type="button"
-                aria-label="Выше"
-                disabled={index === 0}
-                onClick={onMoveUp}
-                className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+          {/* Index cluster stays tight; row gap widens title indent on md+ */}
+          <div className="flex shrink-0 items-center gap-1" data-day-stop-index-cluster>
+            {reorderLocked ? (
+              <div
+                className="flex h-8 w-5 shrink-0 items-center justify-center text-slate-300"
+                data-day-stop-sort="locked"
+                title="Сеанс с фиксированным временем - порядок нельзя менять"
+                aria-hidden
               >
-                <ChevronUp className="h-3 w-3" />
-              </button>
-              <button
-                type="button"
-                aria-label="Ниже"
-                disabled={index >= total - 1}
-                onClick={onMoveDown}
-                className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+                <Ticket className="h-3 w-3" />
+              </div>
+            ) : (
+              <div
+                className="flex shrink-0 flex-col items-center leading-none"
+                data-day-stop-sort
               >
-                <ChevronDown className="h-3 w-3" />
-              </button>
-            </div>
-          )}
-          <span
-            className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white"
-            aria-label={`Точка ${index + 1}`}
-          >
-            {index + 1}
-          </span>
+                <button
+                  type="button"
+                  aria-label="Выше"
+                  disabled={index === 0}
+                  onClick={onMoveUp}
+                  className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+                >
+                  <ChevronUp className="h-3 w-3" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Ниже"
+                  disabled={index >= total - 1}
+                  onClick={onMoveDown}
+                  className="rounded p-0 text-slate-400 hover:bg-slate-100 hover:text-slate-700 disabled:opacity-30"
+                >
+                  <ChevronDown className="h-3 w-3" />
+                </button>
+              </div>
+            )}
+            <span
+              className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-bold text-white"
+              aria-label={`Точка ${index + 1}`}
+            >
+              {index + 1}
+            </span>
+          </div>
           <div
             className={`min-w-0 flex-1 self-center leading-tight ${
               !purchased && isCommerce ? 'border-l-4 border-primary-600 pl-2' : ''

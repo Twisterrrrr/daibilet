@@ -1,3 +1,16 @@
+## 2026-08-04 - /my-day list stops: title indent from index
+
+### Наблюдения
+- Owner desktop list: title «слишком близко» к колонке ↑↓ + номер (красная линия на скрине).
+
+### Решения
+- `DayRouteVenueCard` list: кластер index (`data-day-stop-index-cluster`) с внутренним `gap-1`; ряд `gap-1.5 md:gap-3 lg:gap-4` - mobile без изменений, desktop больше горизонтальный зазор до текста.
+
+### Проблемы
+- Нет. tip TBD; MSK BUILD_ID после deploy.
+
+---
+
 ## 2026-08-04 - /my-day presets: blog link affordance
 
 ### Наблюдения
