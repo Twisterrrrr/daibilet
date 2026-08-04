@@ -23,7 +23,7 @@
 - `CityDayPresetBlock`: title + blog-link в `flex flex-wrap items-baseline gap-x-2`; на md+ обычно одна строка, на узком mobile wrap под title. Стиль ссылки без изменений (blue + underline + ArrowUpRight).
 
 ### Проблемы
-- Нет. tip TBD, MSK BUILD_ID TBD после deploy.
+- Нет. tip `06625e0`, MSK **BUILD_ID=`2NIdFliuqHg4lCRrEYYxP`**; `/my-day` 200; source `flex flex-wrap items-baseline gap-x-2`; chunk «Читать об этом в блоге».
 
 ---
 
