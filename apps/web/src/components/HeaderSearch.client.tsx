@@ -159,7 +159,7 @@ export function HeaderSearch({
     }
   };
 
-  const inputClasses = `w-full bg-white pl-10 pr-3 text-base text-graphite outline-none placeholder:text-graphite-muted ${inputClassName}`;
+  const inputClasses = `w-full bg-white text-base text-graphite outline-none placeholder:text-graphite-muted ${inputClassName}`;
 
   const resultsList =
     resultsOpen && items.length ? (
@@ -233,35 +233,44 @@ export function HeaderSearch({
               aria-modal="true"
               aria-label="Поиск"
             >
-              <div className="relative">
-                <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-graphite-muted" strokeWidth={1.75} />
-                <input
-                  ref={inputRef}
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  onKeyDown={onKeyDown}
-                  placeholder={placeholder}
-                  className={`${inputClasses} py-4 pr-12 text-lg`}
-                  aria-label="Поиск событий"
-                  aria-expanded={resultsOpen}
-                  aria-autocomplete="list"
-                  role="combobox"
-                />
+              <div className="flex items-center gap-1 border-b border-slate-100 px-3 py-2 sm:px-4 sm:py-2.5">
+                <div className="relative min-w-0 flex-1">
+                  <Search
+                    className="pointer-events-none absolute left-2.5 top-1/2 h-5 w-5 -translate-y-1/2 text-graphite-muted sm:left-3"
+                    strokeWidth={1.75}
+                  />
+                  <input
+                    ref={inputRef}
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    onKeyDown={onKeyDown}
+                    placeholder={placeholder}
+                    className={`${inputClasses} rounded-lg py-2.5 pl-10 pr-2 text-lg sm:pl-11 sm:pr-3`}
+                    aria-label="Поиск событий"
+                    aria-expanded={resultsOpen}
+                    aria-autocomplete="list"
+                    role="combobox"
+                  />
+                </div>
                 <button
                   type="button"
                   onClick={closeOverlay}
                   aria-label="Закрыть"
-                  className="absolute right-3 top-1/2 inline-flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-graphite-muted transition hover:bg-surface-muted hover:text-graphite"
+                  className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-graphite-muted transition hover:bg-surface-muted hover:text-graphite"
                 >
                   <X className="h-5 w-5" strokeWidth={1.75} />
                 </button>
               </div>
               {resultsList}
               {query.trim().length >= 2 && !items.length ? (
-                <p className="px-4 py-6 text-center text-sm text-graphite-muted">Ничего не найдено. Нажмите Enter для поиска в каталоге.</p>
+                <p className="px-4 py-5 text-center text-sm text-graphite-muted sm:px-5">
+                  Ничего не найдено. Нажмите Enter для поиска в каталоге.
+                </p>
               ) : null}
               {query.trim().length < 2 ? (
-                <p className="px-4 py-4 text-sm text-graphite-muted">Введите минимум 2 символа или нажмите Enter для каталога.</p>
+                <p className="px-4 py-3.5 text-sm text-graphite-muted sm:px-5 sm:py-4">
+                  Введите минимум 2 символа или нажмите Enter для каталога.
+                </p>
               ) : null}
             </div>
           </div>
@@ -282,7 +291,7 @@ export function HeaderSearch({
         }}
         onKeyDown={onKeyDown}
         placeholder={placeholder}
-        className={`${inputClasses} py-2 text-sm`}
+        className={`${inputClasses} py-2 pl-10 pr-3 text-sm`}
         aria-label="Поиск событий"
         aria-expanded={resultsOpen}
         aria-autocomplete="list"

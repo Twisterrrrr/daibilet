@@ -1,3 +1,35 @@
+## 2026-08-04 - Header search overlay: X vs placeholder
+
+### Наблюдения
+- Mobile: в overlay поиска кнопка X наезжала на placeholder «Поиск событий, городов, подборок…».
+- Причина: absolute X поверх input + конфликт Tailwind `pr-3`/`pr-12` (порядок в CSS, не в className).
+
+### Решения
+- `HeaderSearch` overlay: ряд flex - input `min-w-0 flex-1` + отдельный hit-area X (`h-10 w-10 shrink-0`), без absolute поверх текста.
+- Чуть воздуха в sheet (`px-3/4`, border-b, helper padding).
+
+### Проблемы
+- (BUILD_ID после MSK deploy)
+
+---
+
+## 2026-08-04 - /my-day mobile annotated polish
+
+### Наблюдения
+- Owner (скрин NN, ≥1 stop): «N точек из 10» и «Страница {City}» на разных строках; city picker дублирует шапку; placeholder «Найти…»; лишний helper под «Главные места»; map focus - nav/delete в ряд.
+
+### Решения
+- Readiness: одна flex-wrap строка `N точек из 10. Страница {City_Род}` (точка после счётчика, ссылка синяя).
+- Compact header search: без CityPicker-ряда; placeholder «Добавить место или событие»; quiet «или сменить город» → CityPicker `defaultOpen` + тот же `setCity` confirm.
+- Empty starter: CityPicker + «Найти…» без изменений.
+- Must-see: убран `data-day-must-see-helper`.
+- `renderMapFocusCard`: «Показать маршрут» + «Удалить» column; X отдельно.
+
+### Проблемы
+- (заполняется после deploy)
+
+---
+
 ## 2026-08-04 - City hub mobile: must-see peek + presets breathing room
 
 ### Наблюдения
