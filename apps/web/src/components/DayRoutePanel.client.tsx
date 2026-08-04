@@ -2092,6 +2092,37 @@ function DayRoutePanelInner() {
 
   function renderMapFocusCard(placement: 'desktop' | 'mobile' = 'mobile') {
     if (!focusedVenue) return null;
+    // Same hint chain as must-see / catalog cards: hookFact → shortDescription → editorial desc.
+    const matchedSource =
+      matchSources.find((v) => v.id && v.id === focusedVenue.id) ||
+      matchSources.find(
+        (v) =>
+          Boolean(v.slug) &&
+          Boolean(focusedVenue.slug) &&
+          String(v.slug) === String(focusedVenue.slug),
+      ) ||
+      null;
+    const mustSeeRow =
+      mustSeeResolved.find(
+        (row) =>
+          row.item.id === focusedVenue.id ||
+          (Boolean(row.item.slug) &&
+            Boolean(focusedVenue.slug) &&
+            String(row.item.slug) === String(focusedVenue.slug)),
+      ) || null;
+    const hook = dayRouteHookLine(
+      {
+        hookFact: matchedSource?.hookFact,
+        shortDescription: matchedSource?.shortDescription,
+        desc: mustSeeRow?.place.desc,
+      },
+      120,
+    );
+    const addressLine =
+      formatStreetAddress(focusedVenue.address, { city: focusedVenue.city }) ||
+      String(focusedVenue.address || '').trim() ||
+      '';
+    const focusSubtitle = hook || addressLine || 'Точка на карте';
     return (
       <div
         className={
@@ -2105,7 +2136,13 @@ function DayRoutePanelInner() {
         <div className="flex items-start gap-2">
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-slate-900">{focusedVenue.title}</p>
-            <p className="mt-0.5 text-[11px] text-slate-500">Точка на карте</p>
+            <p
+              className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-slate-500"
+              title={focusSubtitle}
+              data-day-map-focus-subtitle
+            >
+              {focusSubtitle}
+            </p>
           </div>
           {focusedCoords ? (
             <a
