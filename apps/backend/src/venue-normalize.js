@@ -470,7 +470,7 @@ export function formatBusLocationDisplayName(name, address, city) {
   }
 
   if (shortAddress) {
-    return `Место посадки — ${shortAddress}`;
+    return shortAddress;
   }
 
   return 'Место посадки';
