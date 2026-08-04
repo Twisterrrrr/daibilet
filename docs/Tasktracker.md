@@ -19,7 +19,7 @@
 | UX.LAND2b | Invent new differentiator DTO badge fields | Низкий | ⚠️ deferred (reuse deriveLandingCardBadges / bridges heuristics) |
 | UX.BLOG3 | Blog hub chips river/tours + article reading progress | Высокий | ✅ `eae17f4` live **`BCWcAIglYC8cAP-6Zgr4k`** |
 | UX.BLOG3b | Sticky buy CTA + CMS product-card constructor + seed `[buy]` in articles | Средний | ⚠️ deferred (renderer exists; content 0 `[buy]`) |
-| FIX.BLOG-EMPTY | False «нет статей про {city}» banner while city filter has matches | Критический | 🔄 in progress |
+| FIX.BLOG-EMPTY | False «нет статей про {city}» banner while city filter has matches | Критический | ✅ `d393520` live BUILD **`8bCshKtFiFhBS9SzTqnaE`** |
 
 ---
 

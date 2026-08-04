@@ -22,7 +22,7 @@
 - Баннер перенесён в `BlogListFiltered`: показ только если у активного фильтра (URL city, иначе header) **0** статей.
 
 ### Проблемы
-- Нет.
+- Нет. tip `d393520`, MSK **BUILD_ID=`8bCshKtFiFhBS9SzTqnaE`**; `/blog?city=nizhny-novgorod` 200; banner absent; NN slugs in HTML.
 
 ---
 
