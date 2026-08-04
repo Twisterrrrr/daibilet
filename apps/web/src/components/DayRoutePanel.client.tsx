@@ -2484,7 +2484,7 @@ function DayRoutePanelInner() {
   function renderTravelModeToggle() {
     return (
       <div
-        className="inline-flex shrink-0 rounded-full border border-slate-200/80 bg-slate-50 p-0.5"
+        className="inline-flex shrink-0 items-center gap-3"
         role="group"
         aria-label="Способ перемещения"
         data-day-travel-mode
@@ -2492,10 +2492,11 @@ function DayRoutePanelInner() {
         <button
           type="button"
           onClick={() => setTravelMode('walk')}
-          className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition ${
+          aria-pressed={travelMode === 'walk'}
+          className={`text-[12px] transition ${
             travelMode === 'walk'
-              ? 'bg-white text-slate-800 shadow-sm'
-              : 'text-slate-500 hover:text-slate-700'
+              ? 'font-bold text-slate-900 underline decoration-slate-900/80 underline-offset-[5px]'
+              : 'font-medium text-slate-400 hover:text-slate-600'
           }`}
         >
           Пешком
@@ -2503,10 +2504,11 @@ function DayRoutePanelInner() {
         <button
           type="button"
           onClick={() => setTravelMode('auto')}
-          className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition ${
+          aria-pressed={travelMode === 'auto'}
+          className={`text-[12px] transition ${
             travelMode === 'auto'
-              ? 'bg-white text-slate-800 shadow-sm'
-              : 'text-slate-500 hover:text-slate-700'
+              ? 'font-bold text-slate-900 underline decoration-slate-900/80 underline-offset-[5px]'
+              : 'font-medium text-slate-400 hover:text-slate-600'
           }`}
         >
           Авто
@@ -2515,10 +2517,62 @@ function DayRoutePanelInner() {
     );
   }
 
+  function renderOptimizeGhost() {
+    if (!canOptimize) return null;
+    return (
+      <button
+        type="button"
+        onClick={optimizeOrder}
+        data-day-map-optimize
+        className="inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 lg:w-auto lg:min-h-8"
+      >
+        <Sparkles className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+        Оптимизировать маршрут
+      </button>
+    );
+  }
+
+  /** Mobile mid-block: Распланировать primary; Optimize ghost; no Yandex (sticky/map). */
+  function renderMobileRouteActions() {
+    const canHourPlan = route.venues.length >= DAY_ROUTE_MIN;
+    return (
+      <div className="flex w-full flex-col gap-1 lg:hidden" data-day-route-toolbar-inner data-day-mobile-route-actions>
+        {canHourPlan ? (
+          hourPlanOn ? (
+            <button
+              type="button"
+              data-day-hour-reset
+              onClick={() => {
+                setHourPlanOn(false);
+                setHourSheetOpen(false);
+              }}
+              className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-full border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50"
+            >
+              <Clock className="h-3.5 w-3.5 shrink-0" />
+              Сбросить время
+            </button>
+          ) : (
+            <button
+              type="button"
+              data-day-hour-plan
+              onClick={() => setHourSheetOpen(true)}
+              className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-full bg-sky-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-sky-700"
+            >
+              <Clock className="h-3.5 w-3.5 shrink-0" />
+              Распланировать
+            </button>
+          )
+        ) : null}
+        {renderOptimizeGhost()}
+      </div>
+    );
+  }
+
+  /** Desktop denser toolbar (map wrap + lg list): Yandex primary + Optimize ghost. */
   function renderMapToolbar(compact = false) {
     return (
       <div
-        className={`flex w-full flex-col gap-1 lg:w-auto lg:flex-row lg:items-center lg:justify-end lg:gap-2 ${compact ? '' : ''}`}
+        className={`hidden w-full flex-col gap-1 lg:flex lg:w-auto lg:flex-row lg:items-center lg:justify-end lg:gap-2 ${compact ? '' : ''}`}
         data-day-route-toolbar-inner
       >
         {yandexUrl ? (
@@ -2527,7 +2581,7 @@ function DayRoutePanelInner() {
             target="_blank"
             rel="noopener noreferrer"
             data-day-yandex-cta
-            className="inline-flex min-h-10 w-full items-center justify-center gap-1.5 rounded-full bg-sky-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-sky-700 lg:w-auto lg:min-h-9 lg:px-3.5 lg:py-2 lg:text-xs"
+            className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-sky-700"
           >
             <ExternalLink className="h-3.5 w-3.5 shrink-0" />
             Открыть в Яндекс.Картах
@@ -2538,23 +2592,13 @@ function DayRoutePanelInner() {
             disabled
             title="Нужны координаты минимум у 2 точек"
             data-day-yandex-cta
-            className="inline-flex min-h-10 w-full cursor-not-allowed items-center justify-center gap-1.5 rounded-full bg-slate-200 px-4 py-2.5 text-sm font-bold text-slate-500 lg:w-auto lg:min-h-9 lg:px-3.5 lg:py-2 lg:text-xs"
+            className="inline-flex min-h-9 cursor-not-allowed items-center justify-center gap-1.5 rounded-full bg-slate-200 px-3.5 py-2 text-xs font-bold text-slate-500"
           >
             <ExternalLink className="h-3.5 w-3.5 shrink-0" />
             Открыть в Яндекс.Картах
           </button>
         )}
-        {canOptimize ? (
-          <button
-            type="button"
-            onClick={optimizeOrder}
-            data-day-map-optimize
-            className="inline-flex min-h-9 w-full items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 lg:w-auto lg:min-h-8"
-          >
-            <Sparkles className="h-3.5 w-3.5 shrink-0 text-slate-400" />
-            Оптимизировать маршрут
-          </button>
-        ) : null}
+        {renderOptimizeGhost()}
       </div>
     );
   }
@@ -2569,7 +2613,7 @@ function DayRoutePanelInner() {
     >
       <div ref={listRootRef} className="min-w-0" data-day-list-root>
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <h1 className="font-display text-[1.65rem] font-bold leading-tight text-slate-900 sm:text-3xl">
             {scopeCityName ? `Мой день ${inCityPrepositional(scopeCityName)}` : 'Мой день'}
           </h1>
@@ -2595,7 +2639,59 @@ function DayRoutePanelInner() {
             ) : null}
           </p>
         </div>
-        <div className="relative shrink-0" ref={shareMenuRef}>
+
+        {/* Mobile: Поделиться / Сохранить / Очистить - vertical column top-right */}
+        <div
+          className="flex shrink-0 flex-col items-stretch gap-1.5 sm:hidden"
+          data-day-mobile-actions-col
+        >
+          <button
+            type="button"
+            onClick={() => {
+              if (!route.venues.length) return;
+              setShareMenuOpen(true);
+            }}
+            data-day-share
+            disabled={!route.venues.length}
+            className={`inline-flex min-h-9 items-center justify-center gap-1 rounded-xl border px-2.5 py-1.5 text-[11px] font-semibold transition ${
+              route.venues.length
+                ? 'border-emerald-200 bg-emerald-50 text-emerald-900'
+                : 'cursor-not-allowed border-slate-200 bg-slate-100 text-slate-400'
+            }`}
+          >
+            <Share2 className="h-3.5 w-3.5" />
+            {copyStatus === 'ok' ? 'Скопировано!' : 'Поделиться'}
+          </button>
+          {route.venues.length ? (
+            <>
+              <button
+                type="button"
+                onClick={printItinerary}
+                data-day-print
+                className="inline-flex min-h-9 items-center justify-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-700"
+              >
+                <Printer className="h-3.5 w-3.5" />
+                Сохранить
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  clearDayRoute();
+                  setRoute(readDayRoute());
+                  replaceMyDayUrl('/my-day');
+                }}
+                data-day-clear
+                className="inline-flex min-h-9 items-center justify-center gap-1 rounded-xl border border-slate-200 bg-white px-2.5 py-1.5 text-[11px] font-semibold text-slate-600"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Очистить
+              </button>
+            </>
+          ) : null}
+        </div>
+
+        {/* Desktop share */}
+        <div className="relative hidden shrink-0 sm:block" ref={shareMenuRef}>
           <button
             type="button"
             onClick={() => {
@@ -2618,7 +2714,7 @@ function DayRoutePanelInner() {
             <div
               role="menu"
               data-day-share-menu
-              className="absolute right-0 z-30 mt-2 hidden w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-lg sm:block"
+              className="absolute right-0 z-30 mt-2 w-56 overflow-hidden rounded-2xl border border-slate-200 bg-white py-1 shadow-lg"
             >
               {shareMenuItems}
             </div>
@@ -2626,8 +2722,9 @@ function DayRoutePanelInner() {
         </div>
       </div>
 
+      {/* Desktop denser action row: Save / Hour plan / Clear */}
       {route.venues.length ? (
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-3 hidden flex-wrap gap-2 sm:flex" data-day-desktop-actions>
           <button
             type="button"
             onClick={printItinerary}
@@ -2659,8 +2756,7 @@ function DayRoutePanelInner() {
                 className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-800 transition duration-200 hover:bg-primary-100"
               >
                 <Clock className="h-3.5 w-3.5" />
-                <span className="sm:hidden">Распланировать</span>
-                <span className="hidden sm:inline">Распланировать день по часам</span>
+                Распланировать день по часам
               </button>
             )
           ) : null}
@@ -2879,8 +2975,9 @@ function DayRoutePanelInner() {
             </div>
           ) : null}
 
-          {/* Row 3: one primary Yandex CTA; Optimize as ghost */}
+          {/* Row 3: mobile = Распланировать primary + Optimize; desktop = Yandex + Optimize */}
           <div data-day-route-toolbar className="mt-3 w-full shrink-0 lg:mt-3 lg:flex lg:justify-end">
+            {renderMobileRouteActions()}
             {renderMapToolbar()}
           </div>
 

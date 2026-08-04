@@ -1,3 +1,20 @@
+## 2026-08-04 - /my-day mobile: actions column + Распланировать mid CTA
+
+### Наблюдения
+- Owner annotated screenshot: Поделиться/Сохранить/Очистить - колонка top-right; mid Yandex marked X (дубль sticky «Карта»); «Распланировать» → primary mid CTA.
+- Пешком/Авто pill крал акцент у primary - нужен plain text + underline/weight.
+
+### Решения
+- Mobile column `data-day-mobile-actions-col`: Share / Save / Clear stacked; desktop row denser с Hour plan.
+- Mid mobile `data-day-mobile-route-actions`: filled «Распланировать» (или «Сбросить время»); Optimize ghost; без Яндекса.
+- Desktop/map toolbar: Yandex primary + Optimize (lg+).
+- Пешком/Авто: text + bold/underline active, muted inactive - без capsule.
+
+### Проблемы
+- Нет. Deploy/BUILD_ID - после MSK.
+
+---
+
 ## 2026-08-04 - My Day: planDone checkbox leftmost on stop cards
 
 ### Наблюдения
@@ -10634,3 +10651,15 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 
 ### Проблемы
 - Глубокая ссылка, которая применяет именованный сценарий напрямую из URL, в текущем `my-day` не поддерживается: сценарий выбирается в интерфейсе.
+
+## 2026-08-04 - Публикация гида «Маршрут со вкусом»
+
+### Наблюдения
+- Для Нижнего Новгорода уже есть сущности всех точек гастрономического маршрута и пресет «Исторический и гастрономический гайд» в `cityInfo`.
+
+### Решения
+- Добавлена PUBLISHED-статья с проверенными ссылками на city hub, локации, площадки и `/my-day`.
+- Для cover и двух inline-блоков сгенерированы уникальные изображения в `apps/public/public/images/blog/`.
+
+### Проблемы
+- Именованный пресет пока нельзя применить прямой URL-ссылкой: пользователь выбирает его в интерфейсе «Мой день».
