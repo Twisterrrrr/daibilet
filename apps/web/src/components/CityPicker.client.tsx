@@ -15,6 +15,8 @@ type CityPickerProps = {
   allLabel?: string;
   variant?: CityPickerVariant;
   className?: string;
+  /** Open the dropdown on mount (e.g. /my-day «или сменить город»). */
+  defaultOpen?: boolean;
 };
 
 const MENU_MAX_HEIGHT = 360;
@@ -26,8 +28,9 @@ export function CityPicker({
   allLabel = 'Все города',
   variant = 'hero',
   className = '',
+  defaultOpen = false,
 }: CityPickerProps) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(defaultOpen);
   const [menuStyle, setMenuStyle] = React.useState<React.CSSProperties>({ visibility: 'hidden' });
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const menuRef = React.useRef<HTMLDivElement>(null);

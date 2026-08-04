@@ -417,6 +417,9 @@ function DayRoutePanelInner() {
   const [hourStart, setHourStart] = useState('10:00');
   const [hourEnd, setHourEnd] = useState('22:00');
   const [hourLunch, setHourLunch] = useState(false);
+  /** Compact header (≥1 stop): reveal CityPicker under «или сменить город». */
+  const [headerCityChangeOpen, setHeaderCityChangeOpen] = useState(false);
+  const [headerCityChangeKey, setHeaderCityChangeKey] = useState(0);
   const wakeLockRef = useRef<{ release: () => Promise<void> } | null>(null);
   const hydratedDayRef = useRef<string | null>(null);
   const skipUrlSyncRef = useRef(false);
@@ -2144,28 +2147,35 @@ function DayRoutePanelInner() {
               {focusSubtitle}
             </p>
           </div>
-          {focusedCoords ? (
-            <a
-              href={stopExternalMapsUrl(focusedCoords.latitude, focusedCoords.longitude)}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Открыть в Яндекс.Картах"
-              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sky-50 text-sky-700 hover:bg-sky-100"
-            >
-              <Navigation className="h-3.5 w-3.5" />
-            </a>
-          ) : null}
-          <button
-            type="button"
-            aria-label="Удалить точку"
-            onClick={() => {
-              setRoute(removeFromDayRoute(focusedVenue.id));
-              setFocusedStopId(null);
-            }}
-            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+          <div
+            className="flex shrink-0 flex-col items-center gap-1"
+            data-day-map-focus-actions
           >
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
+            {focusedCoords ? (
+              <a
+                href={stopExternalMapsUrl(focusedCoords.latitude, focusedCoords.longitude)}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Показать маршрут"
+                title="Показать маршрут"
+                className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-sky-50 text-sky-700 hover:bg-sky-100"
+              >
+                <Navigation className="h-3.5 w-3.5" />
+              </a>
+            ) : null}
+            <button
+              type="button"
+              aria-label="Удалить"
+              title="Удалить"
+              onClick={() => {
+                setRoute(removeFromDayRoute(focusedVenue.id));
+                setFocusedStopId(null);
+              }}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
           <button
             type="button"
             aria-label="Закрыть"
@@ -2387,36 +2397,22 @@ function DayRoutePanelInner() {
   }
 
   /**
-   * Non-empty plan: one-line city + search under H1 (no bordered starter card).
+   * Non-empty plan: search under H1 (no city picker row; quiet «или сменить город»).
    * Sticky «+ Добавить» / catalog trio still add more stops.
    */
   function renderHeaderCompactSearch() {
     return (
       <div
         ref={unifiedSearchRef}
-        className="mt-3 flex w-full flex-col gap-2 sm:mt-4 sm:flex-row sm:items-center sm:gap-2.5"
+        className="mt-3 flex w-full flex-col gap-1.5 sm:mt-4"
         data-day-unified-search
         data-day-header-search="1"
-        data-day-city-search-stack
       >
-        <div data-day-city-picker className="w-full shrink-0 sm:min-w-[18rem] sm:max-w-[min(32rem,48%)] sm:basis-[26rem] sm:grow-0">
-          <CityPicker
-            cities={destinations}
-            value={selectedCity?.cityValue || 'all'}
-            onChange={(name) => {
-              if (selectedCity?.setCity(name) === false) return;
-              if (name !== 'all') setCityInput(name);
-            }}
-            allLabel="Город"
-            variant="hero"
-            className="w-full"
-          />
-        </div>
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 w-full">
           <DayRouteSearchSelect
             label="Поиск"
             hideLabel
-            placeholder="Найти место или событие"
+            placeholder="Добавить место или событие"
             emptyText={
               !hasPageCity
                 ? 'Сначала выберите город'
@@ -2436,6 +2432,41 @@ function DayRoutePanelInner() {
             <p className="mt-1 mb-0 text-xs font-medium text-rose-700" role="status">
               {catalogError}
             </p>
+          ) : null}
+          <p className="mt-1.5 mb-0 pl-1 text-left text-xs leading-tight text-slate-500">
+            <button
+              type="button"
+              data-day-header-city-change
+              aria-expanded={headerCityChangeOpen}
+              onClick={() => {
+                setHeaderCityChangeOpen((open) => {
+                  if (open) return false;
+                  setHeaderCityChangeKey((key) => key + 1);
+                  return true;
+                });
+              }}
+              className="m-0 inline p-0 font-medium text-slate-500 underline-offset-2 transition hover:text-slate-700 hover:underline"
+            >
+              или сменить город
+            </button>
+          </p>
+          {headerCityChangeOpen ? (
+            <div className="mt-2" data-day-city-picker data-day-header-city-picker="1">
+              <CityPicker
+                key={headerCityChangeKey}
+                defaultOpen
+                cities={destinations}
+                value={selectedCity?.cityValue || 'all'}
+                onChange={(name) => {
+                  if (selectedCity?.setCity(name) === false) return;
+                  if (name !== 'all') setCityInput(name);
+                  setHeaderCityChangeOpen(false);
+                }}
+                allLabel="Город"
+                variant="hero"
+                className="w-full"
+              />
+            </div>
           ) : null}
         </div>
       </div>
@@ -2619,24 +2650,22 @@ function DayRoutePanelInner() {
             {scopeCityName ? `Мой день ${inCityPrepositional(scopeCityName)}` : 'Мой день'}
           </h1>
           <p
-            className="mt-1.5 text-[13px] font-medium text-slate-500"
+            className="mt-1.5 flex flex-wrap items-baseline gap-x-1 text-[13px] font-medium text-slate-500"
             data-day-route-count-label
             data-day-route-readiness
           >
-            <span>{readiness.summaryLine}</span>
+            <span>
+              {readiness.summaryLine}
+              {scopeCityName ? '.' : ''}
+            </span>
             {scopeCityName ? (
-              <>
-                <span className="mx-1.5 hidden text-slate-400 sm:inline" aria-hidden>
-                  •
-                </span>
-                <Link
-                  href={cityHubHref}
-                  className="mt-0.5 block text-primary-600 transition-colors hover:text-primary-700 hover:underline sm:mt-0 sm:inline"
-                  data-day-city-hub-link
-                >
-                  Страница {cityToGenitive(scopeCityName)}
-                </Link>
-              </>
+              <Link
+                href={cityHubHref}
+                className="text-primary-600 transition-colors hover:text-primary-700 hover:underline"
+                data-day-city-hub-link
+              >
+                Страница {cityToGenitive(scopeCityName)}
+              </Link>
             ) : null}
           </p>
         </div>
@@ -3250,11 +3279,6 @@ function DayRoutePanelInner() {
               {mustSeeResolved.length > 0 ? (
                 <div data-day-must-see>
                   <div className="flex flex-col gap-2">
-                    <p className="text-xs text-slate-500" data-day-must-see-helper>
-                      {`Собрали для вас топ-${DAY_ROUTE_SOFT} мест${
-                        pageCityName ? ` ${inCityPrepositional(pageCityName)}` : ''
-                      }. Добавьте их в один клик или выберите категории ниже.`}
-                    </p>
                     <div className="flex flex-wrap items-center justify-start gap-x-2 gap-y-1">
                       <button
                         type="button"
