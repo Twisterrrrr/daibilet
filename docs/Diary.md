@@ -1,3 +1,18 @@
+## 2026-08-04 - City hub mobile: must-see peek + presets breathing room
+
+### Наблюдения
+- Owner (скрин Нижний): peek следующей must-see карточки едва виден при `85%`; описание `line-clamp-4` рвёт фразу на полуслове.
+- «Готовые сценарии»: «Читать об этом в блоге» на mobile оставалась inline с title; контент карточки сжат (`p-3`, мелкий text-xs).
+
+### Решения
+- Must-see rail: `flex-[0_0_81%]` + `gap-2.5` + `pr-1` на карточке; mobile `line-clamp-5` (md: `line-clamp-4`); padding текста `pr-0.5`.
+- `CityDayPresetBlock`: blog-link `flex-col` на mobile / inline `md:flex-row`; больше `px-4 py-3.5`; stacked до `md`; CTA `w-full` mobile; description/points чуть крупнее (`text-[13px]`, `line-clamp-3` mobile).
+
+### Проблемы
+- (заполняется после deploy)
+
+---
+
 ## 2026-08-04 - City hub must-see: mobile 85/15 carousel
 
 ### Наблюдения

@@ -1425,17 +1425,17 @@ function CitySightsMustSeeList({
         onChange={setFilterId}
         editorial={editorial}
       />
-      {/* Mobile: 1-card 85/15 swipe. md+: 2-row columns + page prev/next (no scrollbar UX). */}
+      {/* Mobile: 1-card ~81/19 peek swipe. md+: 2-row columns + page prev/next (no scrollbar UX). */}
       <div className="relative mt-6">
         <div
           key={activeId}
           ref={railRef}
-          className="horizontal-snap-row flex flex-nowrap gap-3 touch-pan-x snap-x snap-mandatory md:block md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden"
+          className="horizontal-snap-row flex flex-nowrap gap-2.5 touch-pan-x snap-x snap-mandatory md:block md:[scrollbar-width:none] md:[&::-webkit-scrollbar]:hidden"
           data-city-must-see-rail
           aria-label="Главные места"
           tabIndex={0}
         >
-        {/* Mobile: contents hoists cards into the flex scrollport so 85% = viewport; md: 2-row grid. */}
+        {/* Mobile: contents hoists cards into the flex scrollport so % = viewport; md: 2-row grid. */}
         <ol className="contents md:grid md:w-max md:auto-cols-[min(22rem,calc(50vw-3rem))] md:grid-flow-col md:grid-rows-2 md:gap-x-6 md:gap-y-5">
         {visiblePlaces.map((place, index) => {
           const afficheLink = matchSightAfficheLink({
@@ -1460,7 +1460,7 @@ function CitySightsMustSeeList({
           return (
             <li
               key={`${place.name}:${index}`}
-              className="flex min-w-0 shrink-0 snap-start gap-3 overflow-hidden [flex:0_0_85%] md:w-auto md:min-w-0 md:max-w-none md:[flex:none]"
+              className="flex min-w-0 shrink-0 snap-start gap-3 overflow-hidden pr-1 [flex:0_0_81%] md:w-auto md:min-w-0 md:max-w-none md:pr-0 md:[flex:none]"
               data-city-must-see-card
             >
               <span
@@ -1470,7 +1470,7 @@ function CitySightsMustSeeList({
               >
                 {index + 1}
               </span>
-              <div className="min-w-0 flex-1 overflow-hidden">
+              <div className="min-w-0 flex-1 overflow-hidden pr-0.5">
                 {placeHref ? (
                   <Link
                     href={placeHref}
@@ -1484,7 +1484,7 @@ function CitySightsMustSeeList({
                 )}
                 {blurb ? (
                   <p
-                    className={`mt-1 line-clamp-4 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
+                    className={`mt-1 line-clamp-5 text-sm leading-6 md:line-clamp-4 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
                   >
                     {blurb}
                   </p>

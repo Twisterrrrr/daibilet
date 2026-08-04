@@ -107,19 +107,19 @@ export function CityDayPresetBlock({
             return (
               <li
                 key={preset.id}
-                className={`flex flex-col gap-3 rounded-xl border p-3 sm:flex-row sm:items-center sm:justify-between ${
+                className={`flex flex-col gap-3 rounded-xl border px-4 py-3.5 max-md:gap-3.5 md:flex-row md:items-center md:justify-between md:gap-4 md:p-3 ${
                   editorial ? 'border-zinc-200' : 'border-slate-200'
                 }`}
               >
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-col items-start gap-0.5 md:flex-row md:flex-wrap md:items-baseline md:gap-x-2 md:gap-y-0.5">
                     <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
                       {preset.title}
                     </p>
                     {preset.blogSlug ? (
                       <Link
                         href={`/blog/${preset.blogSlug}`}
-                        className={`inline-flex items-center gap-0.5 text-xs font-medium underline underline-offset-2 transition-colors ${
+                        className={`inline-flex items-center gap-0.5 text-xs font-medium underline underline-offset-2 transition-colors max-md:mt-0.5 ${
                           editorial
                             ? 'text-sky-700 hover:text-sky-800'
                             : 'text-primary-600 hover:text-primary-700'
@@ -131,12 +131,18 @@ export function CityDayPresetBlock({
                     ) : null}
                   </div>
                   {preset.description ? (
-                    <p className={`mt-0.5 text-xs leading-5 ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
+                    <p
+                      className={`mt-1.5 text-[13px] leading-5 max-md:pr-0.5 md:mt-0.5 md:text-xs ${
+                        editorial ? 'text-zinc-600' : 'text-slate-600'
+                      }`}
+                    >
                       {preset.description}
                     </p>
                   ) : null}
                   <p
-                    className={`mt-1 line-clamp-2 text-xs ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
+                    className={`mt-1.5 line-clamp-3 text-[13px] leading-5 max-md:pr-0.5 md:mt-1 md:line-clamp-2 md:text-xs md:leading-4 ${
+                      editorial ? 'text-zinc-500' : 'text-slate-500'
+                    }`}
                     title={titles}
                   >
                     {items.length} точек: {titles}
@@ -146,7 +152,7 @@ export function CityDayPresetBlock({
                   type="button"
                   disabled={busyId != null}
                   onClick={() => apply(preset.id, items)}
-                  className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition disabled:opacity-60 ${
+                  className={`inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition disabled:opacity-60 md:w-auto ${
                     editorial
                       ? 'bg-zinc-900 text-white hover:bg-zinc-800'
                       : 'bg-primary-600 text-white hover:bg-primary-700'
@@ -174,8 +180,8 @@ export function CityDayPresetBlock({
       }`}
       data-day-presets={inMyDay ? 'my-day' : 'hub'}
     >
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="min-w-0">
+      <div className="flex flex-col gap-3.5 md:flex-row md:items-center md:justify-between md:gap-4">
+        <div className="min-w-0 flex-1">
           <p className={`text-sm font-semibold ${editorial ? 'text-zinc-950' : 'text-slate-950'}`}>
             Готовый сценарий
           </p>
@@ -183,7 +189,9 @@ export function CityDayPresetBlock({
             {fallbackLead}
           </p>
           <p
-            className={`mt-1 line-clamp-2 text-xs ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
+            className={`mt-1.5 line-clamp-3 text-[13px] leading-5 md:mt-1 md:line-clamp-2 md:text-xs md:leading-4 ${
+              editorial ? 'text-zinc-500' : 'text-slate-500'
+            }`}
             title={titles}
           >
             {titles}
@@ -193,7 +201,7 @@ export function CityDayPresetBlock({
           type="button"
           disabled={busyId != null}
           onClick={() => apply('default', fallbackPreset)}
-          className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition disabled:opacity-60 ${
+          className={`inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition disabled:opacity-60 md:w-auto ${
             editorial
               ? 'bg-zinc-900 text-white hover:bg-zinc-800'
               : 'bg-primary-600 text-white hover:bg-primary-700'
