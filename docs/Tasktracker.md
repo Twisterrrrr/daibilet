@@ -115,6 +115,12 @@
 | CH.HF5 | Партнерский виджет логистики (Ласточки/авиа) | Низкий | ⏳ |
 | CH.HF6 | Owner follow-up: brief обратно в hero; UI «Истории города» скрыть | Критический | ✅ `31b5a8b0` MSK **BUILD_ID=`DDNYHaaqzcrNwwq6UfUrd`**; smoke moscow: hero brief + нет «Истории города» |
 
+## /my-day starter → header search (2026-08-04)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.MYDAY-HEADER-SEARCH | ≥1 stop: hide mid starter card; compact city+search under H1; empty starter unchanged | Высокий | 🔄 deploy |
+
 ## /my-day starter geometry (2026-08-03)
 
 | # | Задача | Приоритет | Статус |

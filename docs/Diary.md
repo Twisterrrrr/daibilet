@@ -1,3 +1,19 @@
+## 2026-08-04 - /my-day: hide starter card when route has stops
+
+### Наблюдения
+- Owner: после первой точки mid-page starter (город + «Найти место или событие» + invite) выглядит лишним рядом с presets сверху и «Ещё из каталога» снизу.
+
+### Решения
+- ≥1 stop: убран bordered `renderUnifiedSearch(false)` под Hot Picks / presets.
+- В page header под H1 - компактная one-line строка `data-day-header-search`: CityPicker + unified search (без card / invite).
+- Empty (0 stops): starter card `data-day-starter` без изменений.
+- Добавление точек: header search, sticky «+ Добавить» (`focusUnifiedSearch` → header), catalog trio, accordion «своё место».
+
+### Проблемы
+- Deploy/BUILD_ID - после MSK.
+
+---
+
 ## 2026-08-04 - NN guides: Лайфхак → [NOTE] callout
 
 ### Наблюдения
