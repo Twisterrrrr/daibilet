@@ -62,8 +62,8 @@ export function AddToDayRouteButton({
         ? 'bg-emerald-600 text-white hover:bg-emerald-700'
         : 'bg-slate-100 text-slate-800 hover:bg-slate-200';
 
-  const idleLabel = intent === 'day' ? (compact ? 'В день' : 'В мой день') : compact ? 'В маршрут' : 'В мой маршрут';
-  const activeLabel = intent === 'day' ? (compact ? 'В дне' : 'В моём дне') : 'В маршруте';
+  const idleLabel = intent === 'day' ? 'В мой день' : compact ? 'В маршрут' : 'В мой маршрут';
+  const activeLabel = intent === 'day' ? 'В моём дне' : 'В маршруте';
   const label = active ? activeLabel : idleLabel;
   const idleTitle = intent === 'day' ? 'В мой день' : 'В мой маршрут';
   const activeTitle = intent === 'day' ? 'Убрать из дня' : 'Убрать из маршрута';
