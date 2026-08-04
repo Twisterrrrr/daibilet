@@ -5,9 +5,10 @@ import { SiteLayout } from '@/components/SiteLayout';
 import { buildShareMetadata, pageTitle } from '@/lib/seo-meta';
 
 /** Core title without brand - layout template adds `| Дайбилет` (~60 chars with brand). */
-const MY_DAY_TITLE = 'Собери маршрут на день: места, музеи и события';
+const MY_DAY_TITLE = 'Мой день - собери маршрут из мест, музеев и событий';
 const MY_DAY_DESCRIPTION =
-  'Соберите свой маршрут на день в городе. Выберите музеи, места и события, сохраните готовый план прогулки и поделитесь ссылкой.';
+  'Соберите маршрут дня в городе: места, музеи и события с билетами. Сохраните план прогулки и поделитесь ссылкой с друзьями.';
+const MY_DAY_OG_IMAGE = '/images/og/my-day.jpg';
 
 export const metadata: Metadata = {
   title: pageTitle(MY_DAY_TITLE),
@@ -19,6 +20,9 @@ export const metadata: Metadata = {
     title: `${MY_DAY_TITLE} | Дайбилет`,
     description: MY_DAY_DESCRIPTION,
     path: '/my-day',
+    image: MY_DAY_OG_IMAGE,
+    imageWidth: 1200,
+    imageHeight: 630,
   }),
 };
 

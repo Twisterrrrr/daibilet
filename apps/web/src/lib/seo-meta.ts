@@ -76,6 +76,9 @@ export function buildShareMetadata(input: {
   description?: string | null;
   path: string;
   image?: string | null;
+  /** Optional OG pixel size (Telegram / FB scrapers prefer explicit dims). */
+  imageWidth?: number;
+  imageHeight?: number;
   type?: 'website' | 'article';
 }): Pick<import('next').Metadata, 'openGraph' | 'twitter'> {
   const shareTitle = String(input.title || '').trim();
@@ -96,6 +99,8 @@ export function buildShareMetadata(input: {
               url: image,
               secureUrl: image,
               alt: shareTitle,
+              ...(input.imageWidth ? { width: input.imageWidth } : {}),
+              ...(input.imageHeight ? { height: input.imageHeight } : {}),
             },
           ]
         : undefined,
