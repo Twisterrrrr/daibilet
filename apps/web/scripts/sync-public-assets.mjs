@@ -9,6 +9,7 @@
  *   landings/  — промо подборок
  *   home/      — format/thematic tiles на главной
  *   venues/    — обложки площадок (если есть)
+ *   og/        — Open Graph / share preview images
  *
  * Назначение: apps/web/public/images/
  */
@@ -26,7 +27,7 @@ const sourceRoots = [
   path.join(repoRoot, 'deploy/assets/images'),
 ];
 
-const SUBDIRS = ['blog', 'cities', 'hero', 'events', 'landings', 'home', 'venues'];
+const SUBDIRS = ['blog', 'cities', 'hero', 'events', 'landings', 'home', 'venues', 'og'];
 
 function copyDir(sourceDir, targetDir) {
   if (!fs.existsSync(sourceDir)) return 0;
