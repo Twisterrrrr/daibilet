@@ -126,7 +126,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.ECARD-DAY-OVERLAY | EventCard grid: «В мой день»/«Добавлено» на cover bottom-right overlay; footer = price+Купить | Высокий | 🔄 deploy |
+| UX.ECARD-DAY-OVERLAY | EventCard grid: «В мой день»/«Добавлено» на cover bottom-right overlay; footer = price+Купить | Высокий | ✅ `49be710` MSK **BUILD_ID=`J2r1pJc-sK2W_wGzB2KzY`** `/events` 200 |
 
 ## /my-day starter → header search (2026-08-04)
 

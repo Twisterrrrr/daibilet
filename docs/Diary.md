@@ -54,7 +54,7 @@
 - Поведение add/remove и a11y labels сохранены; chip виден и на mobile (раньше был `max-sm:hidden` в footer).
 
 ### Проблемы
-- (заполняется после deploy)
+- Нет. Live MSK tip incl. `49be710` (overlay) @`2bf58e9`; **BUILD_ID=`J2r1pJc-sK2W_wGzB2KzY`**; `/events` 200; chunk a11y «Добавить место события в мой день» + overlay/bottom-2.
 
 ---
 
