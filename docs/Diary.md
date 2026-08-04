@@ -8,7 +8,7 @@
 - TZ: `tz-soberi-svoy-den.md` синхронизирован. Внутренние chip/empty («Места экскурсии…», empty copy) без изменений - owner просил только rename секции.
 
 ### Проблемы
-- (после deploy) BUILD_ID + `/my-day` 200.
+- Нет. tip `1f08893`, MSK **BUILD_ID=`JHo5binbjsG01hIPE_9_0`**; `/my-day` 200; chunk с «События поблизости».
 
 ---
 
