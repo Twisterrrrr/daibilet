@@ -121,6 +121,12 @@
 |---|--------|-----------|--------|
 | UX.CITY-NAV | Header setCity: stay in section (cities hub / catalogs / blog / landings); no catalog dump; keep my-day confirm | Критический | 🔄 deploy |
 
+## Catalog EventCard day-route chip (2026-08-04)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| UX.ECARD-DAY-OVERLAY | EventCard grid: «В мой день»/«Добавлено» на cover bottom-right overlay; footer = price+Купить | Высокий | 🔄 deploy |
+
 ## /my-day starter → header search (2026-08-04)
 
 | # | Задача | Приоритет | Статус |

@@ -24,7 +24,8 @@ import {
 type Props = {
   venue: DayRouteVenueItem;
   className?: string;
-  variant?: 'light' | 'dark';
+  /** `overlay` - chip на фото (белый/blur, как избранное). */
+  variant?: 'light' | 'dark' | 'overlay';
   /** Компактный вид для карточек каталога (иконка + короткий лейбл). */
   compact?: boolean;
   /**
@@ -58,9 +59,13 @@ export function AddToDayRouteButton({
       ? active
         ? 'bg-white text-emerald-950'
         : 'bg-white/15 text-white hover:bg-white/25'
-      : active
-        ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-        : 'bg-slate-100 text-slate-800 hover:bg-slate-200';
+      : variant === 'overlay'
+        ? active
+          ? 'bg-emerald-600/95 text-white shadow-sm backdrop-blur-sm hover:bg-emerald-700'
+          : 'bg-white/90 text-slate-800 shadow-sm backdrop-blur-sm hover:bg-white'
+        : active
+          ? 'bg-emerald-600 text-white hover:bg-emerald-700'
+          : 'bg-slate-100 text-slate-800 hover:bg-slate-200';
 
   const idleLabel = intent === 'day' ? 'В мой день' : compact ? 'В маршрут' : 'В мой маршрут';
   const activeLabel = intent === 'day' ? 'Добавлено' : 'В маршруте';

@@ -180,6 +180,15 @@ export function EventCard({
 
         <EventImageBadges event={session} showSoonBadge={showSoonBadge} />
         <EventFavoriteButton eventId={session.id} className="right-2 top-2 sm:right-3 sm:top-3" />
+        {!landingActions && dayRouteVenue ? (
+          <AddToDayRouteButton
+            intent="day"
+            compact
+            variant="overlay"
+            className="!absolute !z-[3] !bottom-2 !right-2 !min-h-8 !gap-1 !px-2.5 !py-1.5 !text-[11px] sm:!bottom-3 sm:!right-3"
+            venue={dayRouteVenue}
+          />
+        ) : null}
       </div>
 
       <div className={`flex flex-1 flex-col ${compact ? 'gap-2.5 p-3.5 sm:gap-3 sm:p-4' : 'gap-3 p-4 sm:p-5'}`}>
@@ -315,21 +324,13 @@ export function EventCard({
             />
           ) : (
             <>
-              <div className="relative z-[2] flex min-w-0 flex-1 flex-wrap items-center gap-2">
-                {priceFooterLabel ? (
-                  <span className="text-base font-extrabold tracking-tight text-graphite sm:text-base sm:font-bold">
-                    {priceFooterLabel}
-                  </span>
-                ) : null}
-                {dayRouteVenue ? (
-                  <AddToDayRouteButton
-                    intent="day"
-                    compact
-                    className="!min-h-9 !px-2.5 !py-1.5 !text-[11px] max-sm:hidden"
-                    venue={dayRouteVenue}
-                  />
-                ) : null}
-              </div>
+              {priceFooterLabel ? (
+                <span className="relative z-[2] text-base font-extrabold tracking-tight text-graphite sm:text-base sm:font-bold">
+                  {priceFooterLabel}
+                </span>
+              ) : (
+                <span />
+              )}
               <Link
                 href={href}
                 className={DETAILS_LINK_CLASS}
