@@ -19,7 +19,7 @@ const HERO_TOPIC_LABELS: Partial<Record<BlogTopicId, string>> = {
   kids: 'Детям',
 };
 
-const HERO_TOPIC_IDS: BlogTopicId[] = ['standup', 'routes', 'kids', 'concerts'];
+const HERO_TOPIC_IDS: BlogTopicId[] = ['standup', 'routes', 'kids', 'concerts', 'river', 'tours'];
 
 type BlogListHeroProps = {
   breadcrumbs: BreadcrumbItem[];

@@ -591,6 +591,12 @@ function readLandingGenreFromUrl(): string {
   return genre || 'all';
 }
 
+function readLandingTypeFromUrl(): string {
+  const params = new URLSearchParams(window.location.search);
+  const type = String(params.get('type') || '').trim();
+  return type || 'all';
+}
+
 function isConcertsGenreLanding(slug: string): boolean {
   return canonicalLandingSlug(slug) === 'concerts-genre';
 }
@@ -677,8 +683,10 @@ export function LandingPageView({
   const [city, setCity] = React.useState('all');
   const [category, setCategory] = React.useState(() => {
     // Prefer URL on client so SSR can skip searchParams (ISR).
-    if (typeof window !== 'undefined' && isConcertsGenreLanding(rawSlug)) {
-      return readLandingGenreFromUrl();
+    if (typeof window !== 'undefined') {
+      if (isConcertsGenreLanding(rawSlug)) return readLandingGenreFromUrl();
+      const type = readLandingTypeFromUrl();
+      if (type !== 'all') return type;
     }
     return resolveConcertGenreTag(initialGenre) || 'all';
   });
@@ -708,9 +716,14 @@ export function LandingPageView({
     setDinnerBadgeFilter('all');
     setContextChip(null);
     setTimeSlot('');
-    setCategory(
-      isConcertsGenreLanding(slug) ? readLandingGenreFromUrl() : resolveConcertGenreTag(initialGenre) || 'all',
-    );
+    setCategory(() => {
+      if (isConcertsGenreLanding(slug)) return readLandingGenreFromUrl();
+      if (typeof window !== 'undefined') {
+        const type = readLandingTypeFromUrl();
+        if (type !== 'all') return type;
+      }
+      return resolveConcertGenreTag(initialGenre) || 'all';
+    });
     setApiPayload(
       initialCachedPayload?.landing
         ? finalizeLandingPayload(initialCachedPayload, slug, resolveLandingCityName(citySlug, slug), citySlug)
@@ -779,10 +792,15 @@ export function LandingPageView({
   }, [citySlug]);
 
   React.useEffect(() => {
-    if (!isConcertsGenreLanding(slug)) return;
     const url = new URL(window.location.href);
-    if (category === 'all') url.searchParams.delete('genre');
-    else url.searchParams.set('genre', category);
+    if (isConcertsGenreLanding(slug)) {
+      if (category === 'all') url.searchParams.delete('genre');
+      else url.searchParams.set('genre', category);
+      url.searchParams.delete('type');
+    } else {
+      if (category === 'all') url.searchParams.delete('type');
+      else url.searchParams.set('type', category);
+    }
     const next = `${url.pathname}${url.search}`;
     if (`${window.location.pathname}${window.location.search}` !== next) {
       window.history.replaceState({}, '', next);
@@ -2870,7 +2888,8 @@ function LandingFilters({
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
+      <div className="sticky top-[var(--site-header-height)] z-20 -mx-1 space-y-3 rounded-xl border border-border/70 bg-background/95 px-2 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85 sm:space-y-4">
       <div className="hidden items-center gap-1 border-b border-border sm:flex">
         {sortTabs.map((tab) => (
           <button
@@ -2972,7 +2991,7 @@ function LandingFilters({
 
       <div className="space-y-3 sm:hidden">
         {dateChips.length > 0 ? (
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {dateChips.map((chip) => (
               <button
                 key={chip.value}
@@ -3015,8 +3034,9 @@ function LandingFilters({
           </select>
         </div>
       </div>
+      </div>
 
-      <div className="mb-4 mt-6 flex items-center gap-3">
+      <div className="mb-4 mt-2 flex items-center gap-3">
         <span className="text-sm text-muted-foreground">{formatNumber(groupsCount)} {countLabel}</span>
         <span className="text-xs font-medium text-primary">⭐ Оптимальный выбор выделен</span>
       </div>
@@ -3053,7 +3073,7 @@ function LandingScheduleList({
     );
   }
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {groups.map((group, index) => (
         <LandingScheduleRow key={group.key} group={group} isOptimal={index === pickOptimalIndex(groups)} profile={profile} />
       ))}
@@ -3098,6 +3118,7 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
   const vacant = session.vacant ?? group.vacant;
   const soldOut = typeof vacant === 'number' && vacant <= 0;
   const badges = deriveLandingCardBadges(session);
+  const timeChips = collectScheduleTimeChips(group);
   const isBus = profile === 'bus';
   const rawShipName = isBus
     ? session.tags?.find((tag) => /city sightseeing|hop-on|оператор/i.test(tag)) || null
@@ -3121,7 +3142,11 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
     soldOut ? '' : typeof vacant === 'number' && vacant <= 5 ? 'text-urgency' : 'text-success';
 
   return (
-    <div className={`rounded-xl border p-4 transition-all duration-200 bg-card hover:shadow-md md:p-5 ${isOptimal ? 'best-deal-ring' : 'border-border'}`}>
+    <div
+      className={`rounded-2xl border bg-white p-4 shadow-sm transition-all duration-200 hover:border-primary/25 hover:shadow-md md:p-5 ${
+        isOptimal ? 'best-deal-ring' : 'border-slate-200'
+      }`}
+    >
       {isOptimal ? (
         <div className="mb-3">
           <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-primary">⭐ Оптимальный выбор</span>
@@ -3163,6 +3188,18 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
               </span>
             ) : null}
           </div>
+          {timeChips.length > 1 ? (
+            <div className="flex flex-wrap gap-1.5 pt-0.5" aria-label="Ближайшие сеансы">
+              {timeChips.map((chip) => (
+                <span
+                  key={chip.key}
+                  className="inline-flex rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-slate-700"
+                >
+                  {chip.label}
+                </span>
+              ))}
+            </div>
+          ) : null}
           <LandingCardBadgeRow badges={badges} />
           {amenities.length ? (
             <div className="flex items-center gap-1.5">
@@ -3213,6 +3250,18 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
           {duration ? <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{duration}</span> : null}
           {locationLabel ? <span className="flex items-center gap-1"><MapPin className="h-3 w-3" />{locationLabel}</span> : null}
         </div>
+        {timeChips.length > 1 ? (
+          <div className="flex flex-wrap gap-1.5" aria-label="Ближайшие сеансы">
+            {timeChips.map((chip) => (
+              <span
+                key={chip.key}
+                className="inline-flex rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-slate-700"
+              >
+                {chip.label}
+              </span>
+            ))}
+          </div>
+        ) : null}
         <LandingCardBadgeRow badges={badges} />
         <div className="flex items-center justify-between gap-3">
           {!soldOut && typeof vacant === 'number' ? (
@@ -3234,6 +3283,29 @@ function LandingScheduleRow({ group, isOptimal, profile }: { group: EventGroup; 
       </div>
     </div>
   );
+}
+
+function collectScheduleTimeChips(group: EventGroup): Array<{ key: string; label: string }> {
+  const chips: Array<{ key: string; label: string }> = [];
+  const seen = new Set<string>();
+  for (const item of group.sessions) {
+    const slots =
+      item.upcomingSlots && item.upcomingSlots.length
+        ? item.upcomingSlots
+        : item.timeLabel || item.startsAt
+          ? [{ startsAt: item.startsAt, timeLabel: item.timeLabel }]
+          : [];
+    for (const next of slots) {
+      const label = String(next.timeLabel || resolveSessionTime(item, next) || '').trim();
+      if (!label) continue;
+      const key = String(next.startsAt || label);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      chips.push({ key, label });
+      if (chips.length >= 8) return chips;
+    }
+  }
+  return chips;
 }
 
 function extractDurationTag(tags: string[]): string | null {

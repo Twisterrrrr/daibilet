@@ -1,3 +1,22 @@
+## 2026-08-04 - Conversion phase STEP 0…3 (salute / podborki / tabular / blog)
+
+### Наблюдения
+- Live `salute-9-may` тянул «Речная прогулка на День Города с праздничным фейерверком» (5 сент.) - матч только по `фейерверк`.
+- Owner: one phase step-by-step; cities/venues/locations full redesign = next phase.
+
+### Решения
+- STEP 0: `landing-rules` - `requiredKeywordGroups` (9 мая / День Победы) + `excludeKeywords` день города; regression test; MSK `scp` + restart api.
+- STEP 1: `/podborki` category jump chips, SEO ExpandableBlurb «Развернуть», lazy images, count/priceFrom.
+- STEP 2: schedule rows shadow/bg + timeslot chips; sticky filters; `?type=` (category / bridges route); FAQ already below table.
+- STEP 3: blog hero chips river/tours; thin `BlogReadingProgress`; BlogPosting + «Читайте также» already present.
+- STEP 4 docs: PH2.* cities/venues/locations in Tasktracker; deferred masonry/view counters/sticky buy CTA/CMS buy constructor.
+
+### Проблемы
+- После STEP 0 на салюте 0 сессий до появления Victory Day inventory - ожидаемо.
+- `[buy]` shortcode renderer есть, в контенте 0 вхождений - content seed deferred.
+
+---
+
 ## 2026-08-04 - My Day UX: copy, tickets, custom search
 
 ### Наблюдения

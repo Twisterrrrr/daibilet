@@ -112,14 +112,15 @@ function BridgesCruiseCard({
   const soldOut = typeof vacant === 'number' && vacant <= 0;
   const urgent = typeof vacant === 'number' && vacant > 0 && vacant <= 50;
   const ship = resolveShipLabel(session);
+  const timeChips = collectBridgesTimeChips(group);
   const href = eventHref(session);
   const buyClass =
     'inline-flex items-center gap-2 rounded-full bridges-cta-gradient px-5 py-2.5 text-sm font-semibold text-white transition hover:brightness-105';
 
   return (
     <article
-      className={`overflow-hidden rounded-2xl border bg-card p-5 transition hover:border-[oklch(0.72_0.17_55/0.4)] md:p-6 ${
-        isOptimal ? 'border-[oklch(0.72_0.17_55/0.5)] shadow-[var(--bridges-shadow-glow)]' : 'border-border'
+      className={`overflow-hidden rounded-2xl border bg-white p-5 shadow-sm transition hover:border-[oklch(0.72_0.17_55/0.4)] hover:shadow-md md:p-6 ${
+        isOptimal ? 'border-[oklch(0.72_0.17_55/0.5)] shadow-[var(--bridges-shadow-glow)]' : 'border-slate-200'
       }`}
     >
       <div className="grid gap-6 md:grid-cols-[auto_1fr_auto] md:items-center">
@@ -166,6 +167,18 @@ function BridgesCruiseCard({
               <span>· {reviews} отзывов</span>
             </span>
           </div>
+          {timeChips.length > 1 ? (
+            <div className="mt-2.5 flex flex-wrap gap-1.5" aria-label="Ближайшие сеансы">
+              {timeChips.map((chip) => (
+                <span
+                  key={chip.key}
+                  className="inline-flex rounded-md border border-slate-200 bg-slate-50 px-2 py-0.5 text-[11px] font-semibold tabular-nums text-slate-700"
+                >
+                  {chip.label}
+                </span>
+              ))}
+            </div>
+          ) : null}
           <div className="mt-3 flex flex-wrap gap-1.5">
             {bridges.map((bridge) => (
               <span
@@ -225,7 +238,22 @@ export function BridgesScheduleSection({
   sort: SortFilter;
   setSort: (value: SortFilter) => void;
 }) {
-  const [routeFilter, setRouteFilter] = React.useState<RouteFilter>('all');
+  const [routeFilter, setRouteFilter] = React.useState<RouteFilter>(() => {
+    if (typeof window === 'undefined') return 'all';
+    const type = String(new URLSearchParams(window.location.search).get('type') || '').trim();
+    if (type === 'neva' || type === 'canals' || type === 'mixed') return type;
+    return 'all';
+  });
+
+  React.useEffect(() => {
+    const url = new URL(window.location.href);
+    if (routeFilter === 'all') url.searchParams.delete('type');
+    else url.searchParams.set('type', routeFilter);
+    const next = `${url.pathname}${url.search}`;
+    if (`${window.location.pathname}${window.location.search}` !== next) {
+      window.history.replaceState({}, '', next);
+    }
+  }, [routeFilter]);
 
   const filtered = React.useMemo(() => {
     const list = groups.filter((group) => {
@@ -258,7 +286,7 @@ export function BridgesScheduleSection({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+      <div className="sticky top-[var(--site-header-height)] z-20 -mx-1 flex flex-col gap-4 rounded-xl border border-border/70 bg-background/95 px-2 py-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-background/85 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap gap-2">
           {ROUTE_FILTERS.map((route) => (
             <button
@@ -304,4 +332,27 @@ export function BridgesScheduleSection({
       </div>
     </div>
   );
+}
+
+function collectBridgesTimeChips(group: BridgesEventGroup): Array<{ key: string; label: string }> {
+  const chips: Array<{ key: string; label: string }> = [];
+  const seen = new Set<string>();
+  for (const item of group.sessions) {
+    const slots =
+      item.upcomingSlots && item.upcomingSlots.length
+        ? item.upcomingSlots
+        : item.timeLabel || item.startsAt
+          ? [{ startsAt: item.startsAt, timeLabel: item.timeLabel }]
+          : [];
+    for (const next of slots) {
+      const label = String(next.timeLabel || resolveSessionTime(item, next) || '').trim();
+      if (!label) continue;
+      const key = String(next.startsAt || label);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      chips.push({ key, label });
+      if (chips.length >= 8) return chips;
+    }
+  }
+  return chips;
 }

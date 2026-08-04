@@ -25,6 +25,16 @@
 | — | **Finance contour / ЛК поставщиков** | ⚠️ продукт deferred; **host roles locked** → `.159` battle finance ([spb-finance-host.md](./spb-finance-host.md)) |
 | — | **Реклама / paid** | ⚠️ отложена до готовности витрины (хабы + контент + базовый финконтур) |
 
+### Conversion surfaces (фаза 2026-08-04)
+
+Порядок owner: **не** параллельный redesign всего. Срезы:
+
+0. Landing matching quality (`salute-9-may` vs День города) - critical
+1. `/podborki` practical hub polish
+2. Tabular multilanding (river/bridges) rows + sticky filters + `?type=`
+3. Blog conversion layer (chips + reading progress; schema/related уже были)
+4. **Next phase (не в этом ship):** cities hub / venues monetization / `/locations` IA - см. [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md) и задачи `PH2.*` в Tasktracker
+
 **Allowlist городов (geo-политика 2026-07-19):**
 
 | Правило | Действие |

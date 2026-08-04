@@ -7,6 +7,36 @@
 
 ---
 
+## Conversion surfaces phase (2026-08-04) - STEP 0…3
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| FIX.SALUTE0 | `salute-9-may`: exclude День города + require 9 мая / День Победы | Критический | ✅ `83271ec` API restart MSK; live sessions=0 city-day leak gone |
+| UX.POD1 | `/podborki`: category jump chips + SEO «Развернуть» + lazy cards + count/priceFrom | Высокий | ✅ `7535f02` (+ tabular/blog follow-up deploy) |
+| UX.POD2 | `/podborki` masonry / view counters / purchase carousel / infinite scroll | Средний | ⚠️ deferred |
+| UX.LAND2 | Tabular landings: clearer rows, timeslot chips, sticky filters, `?type=` | Высокий | ✅ code shipped this phase |
+| UX.LAND2b | Invent new differentiator DTO badge fields | Низкий | ⚠️ deferred (reuse deriveLandingCardBadges / bridges heuristics) |
+| UX.BLOG3 | Blog hub chips river/tours + article reading progress | Высокий | ✅ this phase |
+| UX.BLOG3b | Sticky buy CTA + CMS product-card constructor + seed `[buy]` in articles | Средний | ⚠️ deferred (renderer exists; content 0 `[buy]`) |
+
+---
+
+## Next phase: cities / venues / locations (from UX briefs)
+
+Не делать full redesign в этой фазе. Канон: [ux-locations-mobile-catalog-brief.md](./ux-locations-mobile-catalog-brief.md), [catalog-location-venue-canon.md](./catalog-location-venue-canon.md), [mobile-templates.md](./mobile-templates.md).
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| PH2.CITY1 | `/cities` hub carousel / tile IA polish (UX.CITY-HUB) | Средний | ⚠️ next phase |
+| PH2.CITY2 | Capitals must-see wide pack (MSK/SPB) после owner list (MS.TIER3/4) | Высокий | ⏳ owner list |
+| PH2.VEN1 | Venue PDP monetization: clearer ticket path, related events density | Средний | ⚠️ next phase (UX.VENUE-MON) |
+| PH2.LOC1 | `/locations` IA rebuild: primary job + demote from nav или city-hub section (UX.LOC8) | Высокий | ⏳ |
+| PH2.LOC2 | Mobile city chrome: CityPicker visible outside burger (brief quick win) | Критический | ⏳ |
+| PH2.LOC3 | `/locations` hero: drop map-first on mobile; dense city-first | Высокий | ⏳ (partial LOC4 done) |
+| PH2.PLC1 | Unified `/places` venues+locations tabs (UX.LOC9) | Низкий | ⚠️ after LOC8 |
+
+---
+
 ## Catalog + event detail UX (2026-08-04)
 
 | # | Задача | Приоритет | Статус |

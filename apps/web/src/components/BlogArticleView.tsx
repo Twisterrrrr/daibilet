@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { BlogArticleHero } from '@/components/BlogArticleHero';
 import { BlogArticleContent } from '@/components/BlogArticleContent';
 import { parseCtaBlock } from '@/components/BlogArticleCta';
+import { BlogReadingProgress } from '@/components/BlogReadingProgress.client';
 import { BlogRelatedSidebar, type BlogSidebarLink } from '@/components/BlogRelatedSidebar';
 import { SiteLayout } from '@/components/SiteLayout';
 import { BLOG_POSTS } from '@/data/blog-posts';
@@ -116,6 +117,7 @@ export function BlogArticleView({
   return (
     <SiteLayout>
       <div className="bg-slate-50 text-slate-900">
+        <BlogReadingProgress />
         <BlogArticleHero
           breadcrumbs={breadcrumbs}
           title={article.title}
