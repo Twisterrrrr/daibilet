@@ -9,7 +9,7 @@
 - Убраны label + chip-row addable places (+ bulk CTA) на match cards; coverage chips (в маршруте / старт / рядом) сохранены.
 
 ### Проблемы
-- Нет. tip TBD; MSK BUILD_ID после deploy.
+- Нет. tip `3e9b6fa`, MSK **BUILD_ID=`M7xdN7ovP2s4tAjJKQYPY`**; `/my-day` 200; chunk title OK; без «Места экскурсии не в маршруте».
 
 ---
 
@@ -50,7 +50,7 @@
 - Сохранены: hide starter mid-card при >=1, header search, presets blog, must-see, hour-plan.
 
 ### Проблемы
-- Нет. tip TBD; MSK BUILD_ID после deploy.
+- Нет. Live tip `5f5bd84` (feature `1ba63e4`); MSK **BUILD_ID=`M7xdN7ovP2s4tAjJKQYPY`**; `/my-day` 200; empty без Share, starter subtitle без дубля invite.
 
 ---
 
