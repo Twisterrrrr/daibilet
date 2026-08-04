@@ -78,7 +78,7 @@
 - Expanded list: CSS grid `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`; карточки `w-full min-w-0`. Carousel (свёрнуто) без изменений `24rem` snap.
 
 ### Проблемы
-- Нет. tip TBD; MSK BUILD_ID после deploy.
+- Нет. tip `1ba63e4` (live tip `06625e0`), MSK **BUILD_ID=`2NIdFliuqHg4lCRrEYYxP`**; `/my-day` 200; grid `lg:grid-cols-3` + `w-full min-w-0`; dense left actions.
 
 ---
 
