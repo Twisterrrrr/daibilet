@@ -385,6 +385,8 @@ function DayRoutePanelInner() {
   const [catalogError, setCatalogError] = useState<string | null>(null);
   const [destinationsFallback, setDestinationsFallback] = useState<PublicDestinationDto[]>([]);
   const [mustSeeFilter, setMustSeeFilter] = useState<MustSeeFilterId>('main');
+  /** Must-see chips: H-carousel (default) vs full list (mobile stack / desktop wrap). */
+  const [mustSeeExpanded, setMustSeeExpanded] = useState(false);
   /** Hot Picks tab: Советы / Культура / Еда и бары. */
   const [hotPickTab, setHotPickTab] = useState<HotPickTabId>('tips');
   /** Stop focused from map pin click. */
@@ -2403,7 +2405,7 @@ function DayRoutePanelInner() {
         data-day-header-search="1"
         data-day-city-search-stack
       >
-        <div data-day-city-picker className="w-full shrink-0 sm:w-[16rem] sm:min-w-[16rem] sm:max-w-[18rem]">
+        <div data-day-city-picker className="w-full shrink-0 sm:min-w-[18rem] sm:max-w-[min(32rem,48%)] sm:basis-[26rem] sm:grow-0">
           <CityPicker
             cities={destinations}
             value={selectedCity?.cityValue || 'all'}
@@ -2568,14 +2570,14 @@ function DayRoutePanelInner() {
     );
   }
 
-  /** Desktop title row: Hour plan + Optimize flush right (no Yandex above cards). */
-  function renderDesktopRouteTitleActions() {
+  /** Desktop distance/stats row: Hour plan + Optimize flush right (title row stays airy). */
+  function renderDesktopDistanceActions() {
     const canHourPlan = route.venues.length >= DAY_ROUTE_MIN;
     if (!canHourPlan && !canOptimize) return null;
     return (
       <div
         className="hidden shrink-0 items-center justify-end gap-1.5 lg:flex"
-        data-day-desktop-route-title-actions
+        data-day-desktop-distance-actions
       >
         {canHourPlan ? (
           hourPlanOn ? (
@@ -2645,7 +2647,7 @@ function DayRoutePanelInner() {
           </p>
         </div>
 
-        {/* Desktop top-right: Save / Clear + Share (hour-plan lives on route title row) */}
+        {/* Desktop top-right: Save / Clear + Share (hour-plan lives on distance row) */}
         <div
           className="relative hidden shrink-0 flex-wrap items-center justify-end gap-2 sm:flex"
           ref={shareMenuRef}
@@ -2935,7 +2937,7 @@ function DayRoutePanelInner() {
                   </button>
                 </div>
               ) : null}
-              {renderDesktopRouteTitleActions()}
+              {renderDesktopDistanceActions()}
             </div>
           </div>
 
@@ -3262,26 +3264,50 @@ function DayRoutePanelInner() {
             <div id="day-must-see-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
               {mustSeeResolved.length > 0 ? (
                 <div data-day-must-see>
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <p className="text-xs text-slate-500" data-day-must-see-helper>
                       {`Собрали для вас топ-${DAY_ROUTE_SOFT} мест${
                         pageCityName ? ` ${inCityPrepositional(pageCityName)}` : ''
                       }. Добавьте их в один клик или выберите категории ниже.`}
                     </p>
-                    <button
-                      type="button"
-                      disabled={atMax || atSoft || mustSeeAddable.length === 0}
-                      onClick={addAllMustSee}
-                      data-day-must-see-bulk
-                      className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-700 disabled:cursor-not-allowed disabled:bg-slate-300"
-                    >
-                      <Sparkles className="h-3.5 w-3.5" />
-                      {(mustSeeFilterMeta.tabs.length < 2
-                        ? mustSeeFilterMeta.defaultId
-                        : mustSeeFilter) === 'main'
-                        ? 'Добавить главные места'
-                        : 'Добавить выбранные'}
-                    </button>
+                    <div className="flex shrink-0 flex-col items-stretch gap-1 sm:items-end">
+                      <button
+                        type="button"
+                        disabled={atMax || atSoft || mustSeeAddable.length === 0}
+                        onClick={addAllMustSee}
+                        data-day-must-see-bulk
+                        className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                      >
+                        <Sparkles className="h-3.5 w-3.5" />
+                        {(mustSeeFilterMeta.tabs.length < 2
+                          ? mustSeeFilterMeta.defaultId
+                          : mustSeeFilter) === 'main'
+                          ? 'Добавить главные места'
+                          : 'Добавить выбранные'}
+                      </button>
+                      {mustSeeFiltered.length > 0 ? (
+                        <button
+                          type="button"
+                          onClick={() => setMustSeeExpanded((open) => !open)}
+                          aria-expanded={mustSeeExpanded}
+                          aria-controls="day-must-see-list"
+                          data-day-must-see-expand
+                          className="inline-flex min-h-8 items-center justify-center gap-1 px-2 text-xs font-medium text-slate-500 transition hover:text-slate-800"
+                        >
+                          {mustSeeExpanded ? (
+                            <>
+                              <ChevronUp className="h-3.5 w-3.5" />
+                              Свернуть
+                            </>
+                          ) : (
+                            <>
+                              <ChevronDown className="h-3.5 w-3.5" />
+                              Развернуть
+                            </>
+                          )}
+                        </button>
+                      ) : null}
+                    </div>
                   </div>
                   <MustSeeFilterTabs
                     tabs={mustSeeFilterMeta.tabs}
@@ -3294,9 +3320,15 @@ function DayRoutePanelInner() {
                     onChange={setMustSeeFilter}
                   />
                   <div
-                    className="mt-3 flex snap-x snap-mandatory gap-2.5 overflow-x-auto pb-1"
+                    id="day-must-see-list"
+                    className={
+                      mustSeeExpanded
+                        ? 'mt-3 flex flex-col gap-2.5 lg:flex-row lg:flex-wrap'
+                        : 'mt-3 flex snap-x snap-mandatory gap-2.5 overflow-x-auto pb-1'
+                    }
                     data-day-must-see-list
-                    data-day-must-see-carousel
+                    data-day-must-see-carousel={mustSeeExpanded ? undefined : '1'}
+                    data-day-must-see-expanded={mustSeeExpanded ? '1' : undefined}
                   >
                     {mustSeeFiltered.map(({ place, item, hook }) => {
                       const inRoute =
@@ -3320,7 +3352,11 @@ function DayRoutePanelInner() {
                                   : hook || 'Добавить в день'
                           }
                           onClick={() => addMustSeeItem(item)}
-                          className={`flex w-[min(100%,24rem)] shrink-0 snap-start items-center gap-3 rounded-xl border px-2.5 py-1.5 text-left transition disabled:cursor-not-allowed ${
+                          className={`flex items-center gap-3 rounded-xl border px-2.5 py-1.5 text-left transition disabled:cursor-not-allowed ${
+                            mustSeeExpanded
+                              ? 'w-full lg:w-[min(100%,22rem)] lg:shrink-0'
+                              : 'w-[min(100%,24rem)] shrink-0 snap-start'
+                          } ${
                             inRoute
                               ? 'border-emerald-400 bg-emerald-50 text-emerald-900'
                               : 'border-slate-200 bg-white text-slate-800 hover:border-emerald-300 hover:bg-emerald-50/50'
