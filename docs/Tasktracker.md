@@ -122,7 +122,7 @@
 | UX.MYDAY-CITY-RESET | Смена города на /my-day: confirm сброс маршрута если >=1 stop (header+on-page) | Высокий | ✅ `6e5e922` MSK **BUILD_ID=`neGTZ9t_aXfs0StFNoZZo`** `/my-day` 200 |
 | UX.MYDAY-MATCHES-TITLE | Matches accordion: «Подходящие экскурсии» → «События поблизости» | Высокий | ✅ `1f08893` MSK **BUILD_ID=`JHo5binbjsG01hIPE_9_0`** `/my-day` 200 |
 | UX.MYDAY-MATCHES-ORDER | Matches между «Главные места» и «своё место»; drop «Места экскурсии не в маршруте» | Критический | ✅ `3e9b6fa` MSK **BUILD_ID=`M7xdN7ovP2s4tAjJKQYPY`** `/my-day` 200 |
-| UX.MYDAY-MUSTSEE-EXPAND | Must-see: «Развернуть»/«Свернуть» - carousel ↔ full-width grid (1/2/3 cols) + dense left actions | Высокий | ✅ `1ba63e4` MSK **BUILD_ID=`2NIdFliuqHg4lCRrEYYxP`** `/my-day` 200 |
+| UX.MYDAY-MUSTSEE-EXPAND | Must-see: «Развернуть»/«Свернуть» - carousel ↔ full-width grid (1/2/3 cols) + dense left actions | Высокий | ✅ `1ba63e4` MSK **BUILD_ID=`enL85fpbBPEAS0-dH3Aa-`** `/my-day` 200 |
 | UX.MYDAY-MUSTSEE-BLUE | Must-see bulk «Добавить главные места»: `sky-600` primary (как Яндекс CTA) | Высокий | ✅ `441ce9e` MSK **BUILD_ID=`JHo5binbjsG01hIPE_9_0`** `/my-day` 200 |
 | UX.MYDAY-EMPTY-SHARE | Empty: restore starter subtitle (no invite dup); hide Share/Save/Clear at 0 stops | Высокий | ✅ `1ba63e4` live `5f5bd84` MSK **BUILD_ID=`M7xdN7ovP2s4tAjJKQYPY`** `/my-day` 200 |
 | UX.MYDAY-HEADER-SEARCH | ≥1 stop: hide mid starter card; compact city+search under H1; empty starter unchanged | Высокий | ✅ `c8f918f` MSK **BUILD_ID=`E2goVq9U7X9ujiRnLliZf`** `/my-day` 200 |
