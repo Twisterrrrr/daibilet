@@ -7,7 +7,11 @@
 - Удалён orphan `{`; restore `.next.prev` уже поднял web. Redeploy после фикса.
 
 ### Проблемы
-- Нет. tip `bb4e2f7` (+ hotfix `3957b9a`), MSK **BUILD_ID=`neGTZ9t_aXfs0StFNoZZo`**; `/my-day` 200; ссылка под title.
+- Нет. tip `3957b9a`, MSK **BUILD_ID=`neGTZ9t_aXfs0StFNoZZo`**; `/my-day` 200.
+
+---
+
+## 2026-08-04 - /my-day desktop: CTAs on km row + wider city pin
 
 ### Наблюдения
 - Owner supersede: hour-plan + Optimize на title row теснили «Маршрут · N» - нужно больше воздуха над карточками.
@@ -21,7 +25,7 @@
 - Header CityPicker hero: inline MapPin; `sm:min-w-[18rem] basis-[26rem] max-w-[min(32rem,48%)]`.
 
 ### Проблемы
-- (после deploy) BUILD_ID + `/my-day` 200.
+- Live tip `3957b9a` (hotfix JSX), MSK **BUILD_ID=`neGTZ9t_aXfs0StFNoZZo`**; `/my-day` 200.
 
 ---
 
@@ -49,7 +53,7 @@
 - `CityDayPresetBlock`: quiet-link сразу под `preset.title` (до description и списка точек); только при `blogSlug`. CTA без изменений.
 
 ### Проблемы
-- (после deploy) BUILD_ID + `/my-day` 200.
+- Нет. tip `bb4e2f7` (+ hotfix `3957b9a`), MSK **BUILD_ID=`neGTZ9t_aXfs0StFNoZZo`**; `/my-day` 200; ссылка под title.
 
 ---
 
