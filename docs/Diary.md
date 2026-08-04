@@ -9,11 +9,7 @@
 - Map focus subtitle: `dayRouteHookLine(..., 260)` + `line-clamp-4`; title attribute сохраняет полный текст.
 
 ### Проблемы
-- Нет. Deploy/BUILD_ID - после MSK.
-
----
-
-## 2026-08-04 - /my-day mobile: actions column + Распланировать mid CTA
+- Нет. Live: `66bcac4`, MSK **BUILD_ID=`esVyb5mav-fjNqzDQm4-g`**, `/my-day` 200; chunk без `data-day-plan-done` / «Отметить выполненным», есть `line-clamp-4` + focus subtitle.
 
 ### Наблюдения
 - Owner annotated screenshot: Поделиться/Сохранить/Очистить - колонка top-right; mid Yandex marked X (дубль sticky «Карта»); «Распланировать» → primary mid CTA.
