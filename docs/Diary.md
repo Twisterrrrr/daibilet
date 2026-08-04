@@ -1,3 +1,18 @@
+## 2026-08-04 - City hub must-see: full blurbs (no mid-sentence cut)
+
+### Наблюдения
+- Owner desktop (скрин NN «Зачем ехать»): описания рвутся mid-sentence / mid-word (`а внутри не…`) из-за узкого `line-clamp-4` + `overflow-hidden` на карточке; ellipsis иногда не виден.
+- Source текст (`hookFact`) полный - режет только layout.
+
+### Решения
+- Must-see (+ suburbs): `dayRouteHookLine` без maxLen + `ExpandableBlurb` (`line-clamp-6` mobile, `md:line-clamp-none` desktop) + `break-words`; снят `overflow-hidden` с карточки.
+- Peek mobile `flex-[0_0_80%]`; presets blog-link new line / padding из `0463a32` сохранены.
+
+### Проблемы
+- (заполняется после deploy)
+
+---
+
 ## 2026-08-04 - Header search overlay: X vs placeholder
 
 ### Наблюдения

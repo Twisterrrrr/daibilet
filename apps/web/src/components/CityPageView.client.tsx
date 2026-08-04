@@ -28,10 +28,11 @@ import { resolveCityImage } from '@/lib/city-images';
 import { CITY_NIGHT_HERO } from '@/lib/city-night-hero';
 import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
+import { ExpandableBlurb } from '@/components/ExpandableBlurb.client';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
 import { resolveCityInfo, type CityInfoEntry, type CityMustSeeItem } from '@/lib/cityInfo';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
-import { dayRouteItemFromMustSee } from '@/lib/day-route-from-place';
+import { dayRouteHookLine, dayRouteItemFromMustSee } from '@/lib/day-route-from-place';
 import {
   buildMustSeeFilterTabs,
   classifyMustSeePlace,
@@ -1257,12 +1258,12 @@ function CitySignificantSuburbsBlock({
             const slug = String(place.venueSlug || place.locationSlug || '').trim();
             return slug && String(venue.slug || '').trim() === slug;
           });
-          const blurb = String(
-            matchedVenue?.hookFact || matchedVenue?.shortDescription || place.desc || '',
-          )
-            .trim()
-            .replace(/\s+/g, ' ')
-            .replace(/[—–]/g, '-');
+          const blurb =
+            dayRouteHookLine({
+              hookFact: matchedVenue?.hookFact,
+              shortDescription: matchedVenue?.shortDescription,
+              desc: place.desc,
+            }) || '';
           return (
             <li
               key={`${place.name}:${index}`}
@@ -1283,20 +1284,25 @@ function CitySignificantSuburbsBlock({
                   {placeHref ? (
                     <Link
                       href={placeHref}
-                      className={`${titleClass} underline decoration-slate-300 underline-offset-2 hover:decoration-current`}
+                      className={`${titleClass} break-words underline decoration-slate-300 underline-offset-2 hover:decoration-current`}
                       data-city-suburb-title
                     >
                       {place.name}
                     </Link>
                   ) : (
-                    <div className={titleClass}>{place.name}</div>
+                    <div className={`${titleClass} break-words`}>{place.name}</div>
                   )}
                   {blurb ? (
-                    <p
-                      className={`mt-1 text-sm leading-6 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
-                    >
-                      {blurb}
-                    </p>
+                    <ExpandableBlurb
+                      text={blurb}
+                      className={`mt-1 text-sm leading-6 break-words ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
+                      clampClassName="line-clamp-6 md:line-clamp-none"
+                      moreLabel="ещё"
+                      lessLabel="свернуть"
+                      buttonClassName={`mt-0.5 text-xs font-semibold underline-offset-2 hover:underline ${
+                        editorial ? 'text-zinc-700' : 'text-slate-700'
+                      }`}
+                    />
                   ) : null}
                   {dayRouteItem ? (
                     <div className="mt-2">
@@ -1425,7 +1431,7 @@ function CitySightsMustSeeList({
         onChange={setFilterId}
         editorial={editorial}
       />
-      {/* Mobile: 1-card ~81/19 peek swipe. md+: 2-row columns + page prev/next (no scrollbar UX). */}
+      {/* Mobile: 1-card ~80/20 peek swipe. md+: 2-row columns + page prev/next (no scrollbar UX). */}
       <div className="relative mt-6">
         <div
           key={activeId}
@@ -1451,16 +1457,16 @@ function CitySightsMustSeeList({
             const slug = String(place.venueSlug || place.locationSlug || '').trim();
             return slug && String(venue.slug || '').trim() === slug;
           });
-          const blurb = String(
-            matchedVenue?.hookFact || matchedVenue?.shortDescription || place.desc || '',
-          )
-            .trim()
-            .replace(/\s+/g, ' ')
-            .replace(/[—–]/g, '-');
+          const blurb =
+            dayRouteHookLine({
+              hookFact: matchedVenue?.hookFact,
+              shortDescription: matchedVenue?.shortDescription,
+              desc: place.desc,
+            }) || '';
           return (
             <li
               key={`${place.name}:${index}`}
-              className="flex min-w-0 shrink-0 snap-start gap-3 overflow-hidden pr-1 [flex:0_0_81%] md:w-auto md:min-w-0 md:max-w-none md:pr-0 md:[flex:none]"
+              className="flex min-w-0 shrink-0 snap-start gap-3 pr-1 [flex:0_0_80%] md:w-auto md:min-w-0 md:max-w-none md:pr-0 md:[flex:none]"
               data-city-must-see-card
             >
               <span
@@ -1470,7 +1476,7 @@ function CitySightsMustSeeList({
               >
                 {index + 1}
               </span>
-              <div className="min-w-0 flex-1 overflow-hidden pr-0.5">
+              <div className="min-w-0 flex-1 pr-0.5">
                 {placeHref ? (
                   <Link
                     href={placeHref}
@@ -1483,11 +1489,16 @@ function CitySightsMustSeeList({
                   <div className={`${titleClass} break-words`}>{place.name}</div>
                 )}
                 {blurb ? (
-                  <p
-                    className={`mt-1 line-clamp-5 text-sm leading-6 md:line-clamp-4 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
-                  >
-                    {blurb}
-                  </p>
+                  <ExpandableBlurb
+                    text={blurb}
+                    className={`mt-1 text-sm leading-6 break-words ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}
+                    clampClassName="line-clamp-6 md:line-clamp-none"
+                    moreLabel="ещё"
+                    lessLabel="свернуть"
+                    buttonClassName={`mt-0.5 text-xs font-semibold underline-offset-2 hover:underline ${
+                      editorial ? 'text-zinc-700' : 'text-slate-700'
+                    }`}
+                  />
                 ) : null}
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   {dayRouteItem ? (
