@@ -2940,7 +2940,6 @@ function DayRoutePanelInner() {
             </div>
           </div>
 
-          {
           {/* Row 2: km left | Пешком/Авто (+ desktop Hour plan / Optimize) right - airy title above */}
           {totalDistanceMeters > 0 || route.venues.length >= DAY_ROUTE_MIN || canOptimize ? (
             <div

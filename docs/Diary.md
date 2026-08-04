@@ -1,3 +1,16 @@
+## 2026-08-04 - hotfix: DayRoutePanel stray `{` broke MSK build
+
+### Наблюдения
+- MSK `web:build` FAIL: `DayRoutePanel.client.tsx` Expected `'</'`, got `'{'` у Row 2 distance summary - лишний `{` перед JSX-комментом (после `8b1923f` km-row CTAs).
+
+### Решения
+- Удалён orphan `{`; restore `.next.prev` уже поднял web. Redeploy после фикса.
+
+### Проблемы
+- (после deploy) BUILD_ID + `/my-day` 200.
+
+---
+
 ## 2026-08-04 - /my-day desktop: CTAs on km row + wider city pin
 
 ### Наблюдения
