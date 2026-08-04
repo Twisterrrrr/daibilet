@@ -310,6 +310,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         id: 'spb-1',
         title: 'Золотой треугольник / парадный центр',
         description: 'Парадные площади, дворцы и две гастрономические остановки в самом центре.',
+        blogSlug: 'spb-zolotoy-treugolnik-za-1-den',
         stops: [
           spbPresetStop('Медный всадник / Сенатская площадь'),
           spbPresetStop('Адмиралтейство'),
@@ -332,6 +333,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         id: 'spb-2',
         title: 'Васильевский остров',
         description: 'Музеи, набережные и гастрономия Васильевского острова.',
+        blogSlug: 'spb-vasilevskiy-ostrov-marshrut',
         stops: [
           spbPresetStop('Стрелка Васильевского острова'),
           spbPresetStop('Зоологический музей РАН'),
@@ -351,6 +353,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         id: 'spb-3',
         title: 'Петроградская',
         description: 'Крепость, музеи и прогулка по Неве с финалом у гастрономического якоря.',
+        blogSlug: 'spb-petrogradskaya-storona',
         stops: [
           spbPresetStop('Петропавловская крепость'),
           spbPresetStop('Петропавловский собор'),
@@ -371,6 +374,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         id: 'spb-4',
         title: 'Коломна и каналы',
         description: 'Остров, дворцы, каналы и вечерний коктейльный бар.',
+        blogSlug: 'spb-kolomna-kanaly',
         stops: [
           spbPresetStop('Новая Голландия (парк-остров)'),
           spbPresetStop('Юсуповский дворец'),
@@ -389,6 +393,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         id: 'spb-5',
         title: 'Владимирская / барный',
         description: 'Литературные адреса, Фонтанка и две исторические гастрономические остановки.',
+        blogSlug: 'spb-vladimirskaya-gastro',
         stops: [
           spbPresetStop('Литературно-мемориальный музей Достоевского'),
           spbPresetStop('Владимирский собор'),
