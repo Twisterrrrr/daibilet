@@ -1,3 +1,18 @@
+## 2026-08-04 - /my-day presets: «Читать об этом в блоге»
+
+### Наблюдения
+- Owner: на карточках «Готовые сценарии» нужен quiet-link на companion-статью блога (NN: 3 shipped гайда).
+
+### Решения
+- `CityDayRoutePreset.blogSlug?: string` в `cityInfo` (web+public).
+- NN: `nn-one-day` → `nizhny-novgorod-za-24-chasa`, `nn-instagram` → `instagramnyi-nizhnii`, `nn-history-gastro` → `nizhny-novgorod-marshrut-so-vkusom`.
+- `CityDayPresetBlock`: ссылка «Читать об этом в блоге» под списком точек, только если `blogSlug` задан; не конкурирует с «Собрать день».
+
+### Проблемы
+- Нет. Live tip `dce0d6c`, MSK **BUILD_ID=`pu7ciIbQOzhbFpERIvtii`**; `/my-day` 200.
+
+---
+
 ## 2026-08-04 - /my-day: «Добавить главные места» primary blue
 
 ### Наблюдения
