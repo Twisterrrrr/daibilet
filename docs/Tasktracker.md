@@ -214,7 +214,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MYDAY-MOB-POLISH2 | Mobile: top actions full-width row under H1; Пешком/Авто right on km/ETA; desktop chrome intact | Критический | ✅ `9ea1c5e` tip `1f08893` MSK **BUILD_ID=`JHo5binbjsG01hIPE_9_0`** `/my-day` 200 |
 | UX.MYDAY-DESK-POLISH | Desktop: actions top-right w/ Share; walk/auto by meta; Yandex only on map; Optimize ghost mid-list | Критический | ✅ `c32443f` tip `94cbe86` MSK **BUILD_ID=`iQt0EenjDINCgdzm4GPuR`** `/my-day` 200 |
 | UX.MYDAY-DESK-POLISH2 | City picker wider (NN full); hour-plan + Optimize on «Маршрут · N» title row; top-right Save/Clear/Share only | Критический | ✅ `fa6e1fd` tip `441ce9ea` MSK **BUILD_ID=`4sb26gUETqq22pmF7ycwM`** `/my-day` 200 |
-| UX.MYDAY-DESK-POLISH3 | CTAs+walk/auto on km row (right); airy title row; city pin + wider picker (~26rem) | Критический | 🔄 in progress |
+| UX.MYDAY-DESK-POLISH3 | CTAs+walk/auto on km row (right); airy title row; city pin + wider picker (~26rem) | Критический | ✅ `8b1923f` tip `3957b9a` MSK **BUILD_ID=`neGTZ9t_aXfs0StFNoZZo`** `/my-day` 200 |
 | FIX.MYDAY-SALEABLE | Cull unsaleable/thin TC buy CTA on venue stops (Полет soft-404) | Критический | ✅ `ba13ec2` MSK **BUILD_ID=`CbKLIANk3tWkfiFKxUSCW`** |
 | UX.MYDAY-F | Мой день: filters + auto-pick + top-up (product next) | Высокий | ⏳ поверх MOB канона |
 | UX.MYDAY-IA | `/my-day` catalog-first + text accordion (collapsed) | Критический | ✅ live **BUILD_ID=`MvYEsYnvAH_KMCxXkt2S6`** |

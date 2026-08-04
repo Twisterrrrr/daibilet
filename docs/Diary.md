@@ -126,7 +126,7 @@
 - Mobile: mid `data-day-mobile-route-actions` без изменений; toolbar `lg:hidden`.
 
 ### Проблемы
-- (после deploy) BUILD_ID + `/my-day` 200.
+- Нет. tip `3957b9a` (наш `8b1923f` + stray-brace fix), MSK **BUILD_ID=`neGTZ9t_aXfs0StFNoZZo`**, `/my-day` 200; chunk `data-day-desktop-distance-actions` + `sm:basis-[26rem]`.
 
 ---
 
