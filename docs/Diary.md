@@ -1,3 +1,20 @@
+## 2026-08-04 - NN guides: Лайфхак → [NOTE] callout
+
+### Наблюдения
+- В теле NN-гайдов «Лайфхак:» и блок «Советы»/«Лайфхаки» шли обычным абзацем без фона.
+- Канон уже есть: `[NOTE label="…" text="…"]` → `BlogArticleNote` (amber callout).
+
+### Решения
+- `nizhny-novgorod-za-24-chasa`: Лайфхак + 2 совета → NOTE.
+- `nizhny-novgorod-marshrut-so-vkusom`: секция Лайфхаки → 2× NOTE.
+- `instagramnyi-nizhnii`: Тайминг → NOTE label="Лайфхак".
+- Пайплайн: MD → `blog:sync-bodies` → deploy → `blog:upsert` (prod Article).
+
+### Проблемы
+- Нет.
+
+---
+
 ## 2026-08-04 - /my-day desktop: actions top-right + quiet route chrome
 
 ### Наблюдения
