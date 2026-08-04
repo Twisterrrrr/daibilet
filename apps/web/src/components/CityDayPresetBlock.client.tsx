@@ -56,8 +56,11 @@ export function CityDayPresetBlock({
       .map((preset) => ({
         preset,
         items: buildCityDayRoutePreset(preset.stops, venues, city),
+        available: cityDayRoutePresetAvailable(preset.stops, venues, city),
       }))
-      .filter((row) => row.items.length >= 3);
+      // Опубликованный гид полезен до появления в каталоге достаточного числа
+      // точек. Сценарий виден, но незавершенный маршрут не предлагаем.
+      .filter((row) => row.available || Boolean(row.preset.blogSlug));
   }, [namedPresets, venues, city]);
 
   const fallbackPreset = useMemo(() => {
@@ -80,8 +83,8 @@ export function CityDayPresetBlock({
   };
 
   const namedLead = inMyDay
-    ? 'Выберите шаблон - точки сразу попадут в маршрут.'
-    : 'Выберите шаблон - все точки найдете в «Собери свой день».';
+    ? 'Выберите готовый маршрут или откройте подробный гид.'
+    : 'Откройте подробный гид или соберите доступные точки в «Собери свой день».';
   const fallbackLead = inMyDay
     ? `Собрать за минуту: ${mainPlacesPhrase(fallbackPreset.length)} в маршруте.`
     : `Собрать за минуту: ${mainPlacesPhrase(fallbackPreset.length)} в «Собери свой день».`;
@@ -102,7 +105,7 @@ export function CityDayPresetBlock({
           {namedLead}
         </p>
         <ul className="mt-4 grid gap-3">
-          {namedResolved.map(({ preset, items }) => {
+          {namedResolved.map(({ preset, items, available }) => {
             const titles = items.map((item) => item.title).join(' · ');
             return (
               <li
@@ -139,28 +142,36 @@ export function CityDayPresetBlock({
                       {preset.description}
                     </p>
                   ) : null}
-                  <p
-                    className={`mt-1.5 line-clamp-3 text-[13px] leading-5 max-md:pr-0.5 md:mt-1 md:line-clamp-2 md:text-xs md:leading-4 ${
-                      editorial ? 'text-zinc-500' : 'text-slate-500'
-                    }`}
-                    title={titles}
-                  >
-                    {items.length} точек: {titles}
-                  </p>
+                  {available ? (
+                    <p
+                      className={`mt-1.5 line-clamp-3 text-[13px] leading-5 max-md:pr-0.5 md:mt-1 md:line-clamp-2 md:text-xs md:leading-4 ${
+                        editorial ? 'text-zinc-500' : 'text-slate-500'
+                      }`}
+                      title={titles}
+                    >
+                      {items.length} точек: {titles}
+                    </p>
+                  ) : (
+                    <p className={`mt-1.5 text-[13px] leading-5 ${editorial ? 'text-zinc-500' : 'text-slate-500'}`}>
+                      Полный маршрут - в подробном гиде.
+                    </p>
+                  )}
                 </div>
-                <button
-                  type="button"
-                  disabled={busyId != null}
-                  onClick={() => apply(preset.id, items)}
-                  className={`inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition disabled:opacity-60 md:w-auto ${
-                    editorial
-                      ? 'bg-zinc-900 text-white hover:bg-zinc-800'
-                      : 'bg-primary-600 text-white hover:bg-primary-700'
-                  }`}
-                >
-                  <Sparkles className="h-4 w-4" />
-                  {namedCta(busyId === preset.id)}
-                </button>
+                {available ? (
+                  <button
+                    type="button"
+                    disabled={busyId != null}
+                    onClick={() => apply(preset.id, items)}
+                    className={`inline-flex min-h-11 w-full shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition disabled:opacity-60 md:w-auto ${
+                      editorial
+                        ? 'bg-zinc-900 text-white hover:bg-zinc-800'
+                        : 'bg-primary-600 text-white hover:bg-primary-700'
+                    }`}
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    {namedCta(busyId === preset.id)}
+                  </button>
+                ) : null}
               </li>
             );
           })}
