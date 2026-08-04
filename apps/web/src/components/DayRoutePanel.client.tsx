@@ -2586,7 +2586,8 @@ function DayRoutePanelInner() {
                 className="inline-flex min-h-9 items-center justify-center gap-1.5 rounded-2xl border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-primary-800 transition duration-200 hover:bg-primary-100"
               >
                 <Clock className="h-3.5 w-3.5" />
-                Распланировать день по часам
+                <span className="sm:hidden">Распланировать</span>
+                <span className="hidden sm:inline">Распланировать день по часам</span>
               </button>
             )
           ) : null}
