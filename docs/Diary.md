@@ -13,6 +13,7 @@
 
 ### Проблемы
 - Multi-image carousel / video / adult-child qty / seatmap / taxi - deferred (no data or rebuild TC).
+- Live: commit `20b0662`, MSK **BUILD_ID=`v0uP2iuxwDW4oNxWa0B2g`**; smoke `/events` + `kremlevskaya-obzornaya-…` 200 (sticky + accordion markers).
 
 ---
 
