@@ -13,6 +13,10 @@
 ### Проблемы
 - Нет. Live: `94cbe86`, MSK **BUILD_ID=`iQt0EenjDINCgdzm4GPuR`**; `/blog/nizhny-novgorod-za-24-chasa` 3× `role=note`, marshrut 2×, instagramnyi 1×; `blog:upsert` ×3.
 
+---
+
+## 2026-08-04 - /my-day desktop: actions top-right + quiet route chrome
+
 ### Наблюдения
 - Owner annotated desktop screenshot: Save / Hour plan / Clear слева под H1 - стрелки к top-right рядом с Поделиться.
 - Пешком/Авто справа от meta - перенести влево рядом с `км · около …`.
