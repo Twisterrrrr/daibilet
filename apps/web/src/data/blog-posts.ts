@@ -21,6 +21,22 @@ export type BlogPost = {
 /** Обложки - уникальная статика на статью: /images/blog/{slug}.jpg */
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: 'instagramnyi-nizhnii',
+    title: 'Инстаграмный Нижний: гид по самым фотогеничным точкам города',
+    excerpt:
+      'Маршрут по Нижнему Новгороду для камеры и телефона: Пакгаузы, Ярмарка, Жюль Верн, стрит-арт, пицца и золотой час над Волгой.',
+    date: '4 августа 2026',
+    readMin: 7,
+    tag: 'Город',
+    city: 'Нижний Новгород',
+    citySlug: 'nizhny-novgorod',
+    authorId: 'editorial',
+    authorName: 'Редакция',
+    articleType: 'gid',
+    imageUrl: blogCoverUrl('instagramnyi-nizhnii'),
+    imageAlt: 'Пакгаузы на Стрелке и собор Александра Невского на закате в Нижнем Новгороде',
+  },
+  {
     slug: 'nizhny-novgorod-za-24-chasa',
     title: 'Нижний Новгород за 24 часа: маршрут, после которого вы влюбитесь в этот город',
     excerpt:
