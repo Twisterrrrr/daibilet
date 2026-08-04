@@ -105,7 +105,7 @@ export function CityPicker({
 
   const buttonClassName =
     variant === 'hero'
-      ? 'relative h-11 w-full rounded-xl bg-slate-50 pl-10 pr-8 text-left text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/25'
+      ? 'relative flex h-11 w-full items-center gap-2 rounded-xl bg-slate-50 px-3 pr-9 text-left text-sm font-medium text-slate-800 outline-none transition hover:bg-slate-100 focus-visible:ring-2 focus-visible:ring-primary/25'
       : variant === 'compact'
         ? 'relative flex w-full items-center gap-2 rounded-lg py-3 pl-10 pr-10 text-left text-base font-medium text-slate-700 hover:bg-slate-100'
         : // Header: mobile = pin icon only (label truncated/eaten in sticky chrome); sm+ shows city name.
@@ -171,11 +171,9 @@ export function CityPicker({
 
   return (
     <div className={`relative ${className}`}>
-      <MapPin
-        className={`pointer-events-none absolute text-slate-400 ${
-          variant === 'hero' ? 'left-3 top-1/2 h-4 w-4 -translate-y-1/2' : variant === 'compact' ? 'left-4 top-1/2 h-4 w-4 -translate-y-1/2' : 'hidden'
-        }`}
-      />
+      {variant === 'compact' ? (
+        <MapPin className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      ) : null}
       <button
         ref={buttonRef}
         type="button"
@@ -191,11 +189,16 @@ export function CityPicker({
         }}
         className={buttonClassName}
       >
-        {variant === 'header' ? <MapPin className={`h-5 w-5 shrink-0 sm:h-4 sm:w-4 ${open ? 'text-primary-600' : ''}`} /> : null}
+        {variant === 'hero' ? (
+          <MapPin className={`h-4 w-4 shrink-0 ${open ? 'text-primary-600' : 'text-slate-500'}`} />
+        ) : null}
+        {variant === 'header' ? (
+          <MapPin className={`h-5 w-5 shrink-0 sm:h-4 sm:w-4 ${open ? 'text-primary-600' : ''}`} />
+        ) : null}
         {variant === 'header' ? (
           <span className="hidden min-w-0 truncate sm:inline">{selectedLabel}</span>
         ) : (
-          <span className="block truncate whitespace-nowrap">{selectedLabel}</span>
+          <span className="min-w-0 flex-1 truncate whitespace-nowrap text-left">{selectedLabel}</span>
         )}
         {variant === 'hero' || variant === 'compact' ? (
           <ChevronDown

@@ -1,3 +1,21 @@
+## 2026-08-04 - /my-day desktop: CTAs on km row + wider city pin
+
+### Наблюдения
+- Owner supersede: hour-plan + Optimize на title row теснили «Маршрут · N» - нужно больше воздуха над карточками.
+- Стрелка вниз: перенести CTAs на ряд `км · около …`, right-aligned; Пешком/Авто тоже справа.
+- City: pin слева имени; «Благовещенск (Амурска…» / NN - жалко места, шире.
+
+### Решения
+- Title row: только Маршрут + Сетка/Список (+ mobile Список/Карта).
+- Distance row `justify-between`: left = км·мин; right = Пешком/Авто + `data-day-desktop-distance-actions` (lg).
+- Mobile mid CTA toolbar и `data-day-mobile-actions-row` без ломки.
+- Header CityPicker hero: inline MapPin; `sm:min-w-[18rem] basis-[26rem] max-w-[min(32rem,48%)]`.
+
+### Проблемы
+- (после deploy) BUILD_ID + `/my-day` 200.
+
+---
+
 ## 2026-08-04 - /my-day: confirm reset on city change
 
 ### Наблюдения

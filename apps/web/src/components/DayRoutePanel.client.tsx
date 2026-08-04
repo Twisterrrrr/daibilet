@@ -2937,39 +2937,51 @@ function DayRoutePanelInner() {
                   </button>
                 </div>
               ) : null}
-              {renderDesktopDistanceActions()}
             </div>
           </div>
 
-          {/* Row 2: km/ETA left; Пешком/Авто right on mobile, left-cluster on sm+ */}
-          {totalDistanceMeters > 0 ? (
+          {
+          {/* Row 2: km left | Пешком/Авто (+ desktop Hour plan / Optimize) right - airy title above */}
+          {totalDistanceMeters > 0 || route.venues.length >= DAY_ROUTE_MIN || canOptimize ? (
             <div
-              className="mt-2.5 flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 sm:w-auto sm:justify-start"
+              className={`mt-2.5 flex w-full flex-wrap items-center justify-between gap-x-3 gap-y-1 ${
+                totalDistanceMeters > 0 ? '' : 'hidden lg:flex'
+              }`}
               data-day-distance-summary
               data-day-distance-summary-mobile
             >
               <p className="min-w-0 text-[13px] leading-snug text-slate-600">
-                <span className="font-semibold text-slate-800">
-                  {formatDayRouteDistance(totalDistanceMeters)}
-                </span>
-                {travelMinutes > 0 ? (
+                {totalDistanceMeters > 0 ? (
                   <>
-                    {' '}
-                    · около{' '}
                     <span className="font-semibold text-slate-800">
-                      {formatDayRouteTravelMinutes(travelMinutes)}
+                      {formatDayRouteDistance(totalDistanceMeters)}
                     </span>
+                    {travelMinutes > 0 ? (
+                      <>
+                        {' '}
+                        · около{' '}
+                        <span className="font-semibold text-slate-800">
+                          {formatDayRouteTravelMinutes(travelMinutes)}
+                        </span>
+                      </>
+                    ) : null}
                   </>
-                ) : null}
+                ) : (
+                  <span className="sr-only">Маршрут</span>
+                )}
               </p>
-              {renderTravelModeToggle()}
+              <div className="flex shrink-0 flex-wrap items-center justify-end gap-x-3 gap-y-1">
+                {totalDistanceMeters > 0 ? renderTravelModeToggle() : null}
+                {renderDesktopDistanceActions()}
+              </div>
             </div>
           ) : null}
 
-          {/* Row 3: mobile = Распланировать primary + Optimize; desktop actions on title row */}
+          {/* Row 3: mobile = Распланировать primary + Optimize; desktop CTAs on distance row */}
           <div data-day-route-toolbar className="mt-3 w-full shrink-0 lg:hidden">
             {renderMobileRouteActions()}
           </div>
+
 
           {missingCoordsCount > 0 ? (
             <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
