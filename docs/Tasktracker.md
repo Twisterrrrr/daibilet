@@ -7,6 +7,19 @@
 
 ---
 
+## Must-see count tiers + MSK/SPB (2026-08-04)
+
+| # | Задача | Приоритет | Статус |
+|---|--------|-----------|--------|
+| MS.TIER1 | Канон тиров must-see в Project.md (floor 6 / 6-8 / 12-18 / NN exception) + soft/hard day-route cite | Высокий | ✅ docs |
+| MS.TIER2 | План MSK+SPB → large tourist 12-18 (не NN-46); Phase A docs | Высокий | ✅ docs |
+| MS.TIER3 | Phase B: content batch первого города (рекомендация: СПб) - список owner → cityInfo + seed/enrich | Высокий | ⏳ ждут confirm города + список |
+| MS.TIER4 | Phase C: второй город тем же шаблоном (Москва после СПб) | Средний | ⏳ |
+| MS.TIER5 | Phase 2 optional: `dayRoutePresets` для MSK/SPB после стабильных 12-18 | Низкий | ⏳ |
+| MS.TIER6 | Гастро-пакет отдельно от landmarks (если нужно) - не смешивать в «Главные» | Низкий | ⏳ |
+
+---
+
 ## /events/[slug] runtime ISR (2026-08-04)
 
 | # | Задача | Приоритет | Статус |
