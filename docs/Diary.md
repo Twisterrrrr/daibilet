@@ -10,7 +10,7 @@
 - Текст: `min-w-0` / `overflow-hidden` / `line-clamp-4` / `break-words`.
 
 ### Проблемы
-- Нет. tip TBD, MSK BUILD_ID TBD после deploy; smoke `/cities/nizhny-novgorod` 200.
+- Нет. tip `3a9bae6` (live tip `d3aa7b29`), MSK **BUILD_ID=`enL85fpbBPEAS0-dH3Aa-`**; smoke nn/nizhny-novgorod 200; chunk `data-city-must-see-rail`.
 
 ---
 
