@@ -134,7 +134,7 @@
 | UX.MYDAY-CATALOG-OPEN | «Ещё из каталога»: always open, no card border | Высокий | ✅ `902fb3b` MSK **BUILD_ID=`sgVL2jxb2mwH2VaNjj3fm`** `/my-day` 200 |
 | UX.MYDAY-SEARCH-PROG | Progressive catalog load - search not gated on Promise.all | Высокий | ✅ `33e9ca8` MSK **BUILD_ID=`blIpyGTrMYrwYoh4jkBws`** `/my-day` 200 |
 | UX.MYDAY-PRESETS | «Готовые сценарии» under Hot Picks (cityInfo presets) | Высокий | ✅ `f280018` MSK **BUILD_ID=`cM9j1lcFbpgHSogY-npKs`** `/my-day` 200 |
-| UX.MYDAY-PRESET-BLOG | Preset cards: quiet «Читать об этом в блоге» via `blogSlug` under title (NN ×3) | Высокий | 🔄 commit+MSK deploy |
+| UX.MYDAY-PRESET-BLOG | Preset cards: quiet «Читать об этом в блоге» via `blogSlug` under title (NN ×3) | Высокий | ✅ `bb4e2f7` tip `3957b9a` MSK **BUILD_ID=`neGTZ9t_aXfs0StFNoZZo`** `/my-day` 200 |
 | SEO.MYDAY-META | /my-day title+desc+OG package; keep noindex until crawlable content | Высокий | ✅ `31a0dc0` MSK **BUILD_ID=`qZnQ6TqtoJkKtvxVB9mtI`** |
 | UX.MYDAY-LIST-MAP | Mobile list-first + Список/Карта toggle (no sticky 38vh); compact footer | Критический | ✅ `4ffb251` MSK **BUILD_ID=`0Fnc1S9ndw3dPSeEmy2Za`** `/my-day` 200 |
 | UX.MYDAY-CHROME | Mobile: hub link own line; Сетка/Список only lg+; dense list &lt;lg | Высокий | ✅ `4405d36` MSK **BUILD_ID=`RDvpU8E3GRJn5-OE2fLW1`** `/my-day` 200 |
