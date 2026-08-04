@@ -1,3 +1,18 @@
+## 2026-08-04 - /my-day matches: elevate + drop addable row
+
+### Наблюдения
+- Owner: «События поблизости» оказывались внизу после добавления точек (под картой/каталогом) - критичный miss.
+- Label/chip-row «Места экскурсии не в маршруте» на match-карточках - лишняя.
+
+### Решения
+- `DayRoutePanel` DOM-порядок: **Главные места → События поблизости → Добавить своё место** → Hot Picks / presets / каталог. Matches остаются elevated и при `venues.length > 0`.
+- Убраны label + chip-row addable places (+ bulk CTA) на match cards; coverage chips (в маршруте / старт / рядом) сохранены.
+
+### Проблемы
+- Нет. tip TBD; MSK BUILD_ID после deploy.
+
+---
+
 ## 2026-08-04 - /my-day list stops: title indent from index
 
 ### Наблюдения

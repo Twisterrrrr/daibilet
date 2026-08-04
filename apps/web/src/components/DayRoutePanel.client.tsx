@@ -38,7 +38,6 @@ import { createPortal } from 'react-dom';
 import type { PublicCatalogListItemDto, PublicDestinationDto } from '@daibilet/contracts/public';
 
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
-import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
 import { CityPicker } from '@/components/CityPicker.client';
 import { DayRouteBoatWizard } from '@/components/DayRouteBoatWizard.client';
@@ -735,7 +734,6 @@ function DayRoutePanelInner() {
   // Hard = DAY_ROUTE_MAX safety. Soft = DAY_ROUTE_SOFT warn-only. MIN = day-ready hint.
   const atMax = route.venues.length >= DAY_ROUTE_MAX;
   const atSoft = isDayRouteAtSoft(route.venues.length);
-  const softSlotsLeft = Math.max(0, DAY_ROUTE_SOFT - route.venues.length);
   const citySlug = dayRouteDominantCitySlug(route.venues);
   const cityTitle = useMemo(() => {
     const counts = new Map<string, number>();
@@ -3395,6 +3393,135 @@ function DayRoutePanelInner() {
         </div>
       ) : null}
 
+      {/* Accordion: nearby events / matches */}
+      {showMatches ? (
+        <div
+          id="day-route-matches"
+          className="mt-3 rounded-2xl border border-slate-200 bg-white"
+          data-day-accordion="matches"
+        >
+          <button
+            type="button"
+            aria-expanded={matchesOpen}
+            aria-controls="day-route-matches-body"
+            data-day-matches-accordion
+            onClick={() => togglePanel('matches')}
+            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
+          >
+            <span>
+              <span className="block text-sm font-semibold text-slate-900">События поблизости</span>
+              <span className="mt-0.5 block text-xs text-slate-500">
+                {loading
+                  ? 'Ищем покрытие…'
+                  : payload
+                    ? `Найдено: ${uniqueMatches.length}`
+                    : 'По покрытию точек'}
+              </span>
+            </span>
+            <ChevronDown
+              className={`h-5 w-5 shrink-0 text-slate-400 transition ${matchesOpen ? 'rotate-180' : ''}`}
+            />
+          </button>
+          {matchesOpen ? (
+            <div id="day-route-matches-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
+              {loading ? <p className="text-sm text-slate-500">Ищем покрытие…</p> : null}
+              {!loading && payload && uniqueMatches.length === 0 ? (
+                <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-5 text-sm text-slate-600">
+                  <p className="font-semibold text-slate-800">Пока нет экскурсии, покрывающей набор</p>
+                  <p className="mt-1.5 leading-relaxed">
+                    Посмотрите афишу города или экскурсии «рядом» на карточке точки. Когда появятся STOP-связи,
+                    покрытие станет точнее.
+                  </p>
+                  <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                    <Link
+                      href={afishaHref}
+                      className="inline-flex min-h-10 items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-primary-600"
+                    >
+                      Афиша города
+                    </Link>
+                    <Link
+                      href={locationsHref}
+                      className="inline-flex min-h-10 items-center justify-center rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+                    >
+                      Другие точки
+                    </Link>
+                  </div>
+                </div>
+              ) : null}
+              <ul className="mt-3 grid grid-cols-1 items-start gap-3 md:grid-cols-2" data-day-matches-deduped>
+                {uniqueMatches.map((match) => {
+                  const fullCovered = dayRouteFullCoveredCount(match.covered);
+                  const nearCount = match.covered.nearby.length;
+                  return (
+                    <li
+                      key={match.eventId}
+                      className="rounded-2xl border border-slate-200 bg-white p-3 sm:p-4"
+                    >
+                      <div className="flex gap-3">
+                        <Link
+                          href={eventHref({ slug: match.slug, id: match.eventId })}
+                          className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-20 sm:w-20"
+                        >
+                          <SafeImage
+                            src={match.imageUrl}
+                            alt=""
+                            fill
+                            sizes={IMAGE_SIZES.favoritesThumb}
+                            className="object-cover"
+                          />
+                        </Link>
+                        <div className="min-w-0 flex-1">
+                          <Link
+                            href={eventHref({ slug: match.slug, id: match.eventId })}
+                            className="line-clamp-2 text-sm font-semibold text-slate-900 hover:text-primary-700"
+                          >
+                            {match.title}
+                          </Link>
+                          <p className="mt-1 text-xs text-slate-500">
+                            {fullCovered} из {route.venues.length} точек
+                            {nearCount ? ` · ещё ${nearCount} рядом` : ''}
+                            {match.priceFromRub != null ? ` · ${formatPriceFrom(match.priceFromRub)}` : ''}
+                          </p>
+                          <div className="mt-2 flex flex-wrap gap-1.5">
+                            {match.covered.stop.map((id) => (
+                              <span
+                                key={`stop-${id}`}
+                                className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800"
+                                title={titleById.get(id) || id}
+                              >
+                                в маршруте · {titleById.get(id) || 'точка'}
+                              </span>
+                            ))}
+                            {match.covered.start.map((id) => (
+                              <span
+                                key={`start-${id}`}
+                                className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-800"
+                                title={titleById.get(id) || id}
+                              >
+                                старт · {titleById.get(id) || 'точка'}
+                              </span>
+                            ))}
+                            {match.covered.nearby.map((id) => (
+                              <span
+                                key={`near-${id}`}
+                                className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800"
+                                title={titleById.get(id) || id}
+                              >
+                                рядом · {titleById.get(id) || 'точка'}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
       {/* Accordion: custom text place */}
       <div className="mt-3 rounded-2xl border border-slate-200 bg-white" id="day-plan-form-wrap" data-day-accordion="text">
         <button
@@ -3694,188 +3821,6 @@ function DayRoutePanelInner() {
           </>
         )}
       </section>
-
-      {/* Accordion: nearby events / matches */}
-      {showMatches ? (
-        <div
-          id="day-route-matches"
-          className="mt-3 rounded-2xl border border-slate-200 bg-white"
-          data-day-accordion="matches"
-        >
-          <button
-            type="button"
-            aria-expanded={matchesOpen}
-            aria-controls="day-route-matches-body"
-            data-day-matches-accordion
-            onClick={() => togglePanel('matches')}
-            className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
-          >
-            <span>
-              <span className="block text-sm font-semibold text-slate-900">События поблизости</span>
-              <span className="mt-0.5 block text-xs text-slate-500">
-                {loading
-                  ? 'Ищем покрытие…'
-                  : payload
-                    ? `Найдено: ${uniqueMatches.length}`
-                    : 'По покрытию точек'}
-              </span>
-            </span>
-            <ChevronDown
-              className={`h-5 w-5 shrink-0 text-slate-400 transition ${matchesOpen ? 'rotate-180' : ''}`}
-            />
-          </button>
-          {matchesOpen ? (
-            <div id="day-route-matches-body" className="border-t border-slate-100 px-4 pb-4 pt-3 sm:px-5 sm:pb-5">
-              {loading ? <p className="text-sm text-slate-500">Ищем покрытие…</p> : null}
-              {!loading && payload && uniqueMatches.length === 0 ? (
-                <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-5 text-sm text-slate-600">
-                  <p className="font-semibold text-slate-800">Пока нет экскурсии, покрывающей набор</p>
-                  <p className="mt-1.5 leading-relaxed">
-                    Посмотрите афишу города или экскурсии «рядом» на карточке точки. Когда появятся STOP-связи,
-                    покрытие станет точнее.
-                  </p>
-                  <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-                    <Link
-                      href={afishaHref}
-                      className="inline-flex min-h-10 items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-primary-600"
-                    >
-                      Афиша города
-                    </Link>
-                    <Link
-                      href={locationsHref}
-                      className="inline-flex min-h-10 items-center justify-center rounded-full border border-slate-200 px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
-                    >
-                      Другие точки
-                    </Link>
-                  </div>
-                </div>
-              ) : null}
-              <ul className="mt-3 grid grid-cols-1 items-start gap-3 md:grid-cols-2" data-day-matches-deduped>
-                {uniqueMatches.map((match) => {
-                  const fullCovered = dayRouteFullCoveredCount(match.covered);
-                  const nearCount = match.covered.nearby.length;
-                  const addable = (match.routeVenues || []).filter(
-                    (v) => !isInDayRoute(v.id) && !(v.slug && isInDayRoute(v.slug)),
-                  );
-                  const showAddablePlaces = addable.length > 0 && !atMax && !atSoft;
-                  const bulkAddCount = Math.min(addable.length, softSlotsLeft);
-                  const showBulkAdd = showAddablePlaces && bulkAddCount >= 2;
-                  return (
-                    <li
-                      key={match.eventId}
-                      className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-3 sm:p-4"
-                    >
-                      <div className="flex gap-3">
-                        <Link
-                          href={eventHref({ slug: match.slug, id: match.eventId })}
-                          className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:h-20 sm:w-20"
-                        >
-                          <SafeImage
-                            src={match.imageUrl}
-                            alt=""
-                            fill
-                            sizes={IMAGE_SIZES.favoritesThumb}
-                            className="object-cover"
-                          />
-                        </Link>
-                        <div className="min-w-0 flex-1">
-                          <Link
-                            href={eventHref({ slug: match.slug, id: match.eventId })}
-                            className="line-clamp-2 text-sm font-semibold text-slate-900 hover:text-primary-700"
-                          >
-                            {match.title}
-                          </Link>
-                          <p className="mt-1 text-xs text-slate-500">
-                            {fullCovered} из {route.venues.length} точек
-                            {nearCount ? ` · ещё ${nearCount} рядом` : ''}
-                            {match.priceFromRub != null ? ` · ${formatPriceFrom(match.priceFromRub)}` : ''}
-                          </p>
-                          <div className="mt-2 flex flex-wrap gap-1.5">
-                            {match.covered.stop.map((id) => (
-                              <span
-                                key={`stop-${id}`}
-                                className="rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-800"
-                                title={titleById.get(id) || id}
-                              >
-                                в маршруте · {titleById.get(id) || 'точка'}
-                              </span>
-                            ))}
-                            {match.covered.start.map((id) => (
-                              <span
-                                key={`start-${id}`}
-                                className="rounded-full bg-sky-50 px-2 py-0.5 text-[11px] font-semibold text-sky-800"
-                                title={titleById.get(id) || id}
-                              >
-                                старт · {titleById.get(id) || 'точка'}
-                              </span>
-                            ))}
-                            {match.covered.nearby.map((id) => (
-                              <span
-                                key={`near-${id}`}
-                                className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-800"
-                                title={titleById.get(id) || id}
-                              >
-                                рядом · {titleById.get(id) || 'точка'}
-                              </span>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                      {showAddablePlaces ? (
-                        <div className="border-t border-slate-100 pt-3">
-                          <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                            Места экскурсии не в маршруте
-                          </p>
-                          <div className="mt-2 flex flex-wrap gap-2">
-                            {addable.slice(0, 6).map((venue) => (
-                              <div
-                                key={venue.id}
-                                className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 py-0.5 pl-2.5 pr-1"
-                              >
-                                <span className="truncate text-[11px] font-medium text-slate-700">
-                                  {venue.title}
-                                </span>
-                                <AddToDayRouteButton
-                                  compact
-                                  className="!min-h-8 !px-2 !py-1 !text-[10px]"
-                                  venue={matchVenueToDayRouteItem(venue)}
-                                />
-                              </div>
-                            ))}
-                          </div>
-                          {showBulkAdd ? (
-                            <button
-                              type="button"
-                              className="mt-2 inline-flex min-h-10 items-center justify-center rounded-full border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900 hover:bg-emerald-100"
-                              onClick={() => {
-                                let next = readDayRoute();
-                                const before = next.venues.length;
-                                for (const venue of addable) {
-                                  if (next.venues.length >= DAY_ROUTE_SOFT) break;
-                                  next = addToDayRoute(matchVenueToDayRouteItem(venue));
-                                }
-                                setRoute(next);
-                                const added = next.venues.length - before;
-                                if (added > 0 && isDayRouteAtSoft(next.venues.length)) {
-                                  flashDayRouteFeedback(DAY_ROUTE_SOFT_WARN);
-                                } else if (added > 0) {
-                                  flashDayRouteFeedback(`Добавлено: ${added} · ${next.venues.length}`);
-                                }
-                              }}
-                            >
-                              Добавить места экскурсии ({bulkAddCount})
-                            </button>
-                          ) : null}
-                        </div>
-                      ) : null}
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
 
       </div>
 
