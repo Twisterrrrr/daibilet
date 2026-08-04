@@ -109,8 +109,10 @@ export function LandingDirectionCard({
   const emoji = LANDING_EMOJI[landing.slug] || '✨';
   const imageUrl = resolveLandingCardImage(landing.slug);
   const href = landingCategoryHref(landing.slug, citySlug && citySlug !== 'all' ? citySlug : undefined);
-  const priceLabel = formatLandingPrice(landing.priceFrom);
+  const hasPrice = typeof landing.priceFrom === 'number' && landing.priceFrom > 0;
+  const priceLabel = hasPrice ? formatLandingPrice(landing.priceFrom) : null;
   const eventsLabel = pluralEvents(landing.events);
+  const metaLine = priceLabel ? `${eventsLabel} · ${priceLabel}` : eventsLabel;
   const cityBadge = (
     <LandingCityBadge
       slug={landing.slug}
@@ -130,6 +132,7 @@ export function LandingDirectionCard({
             src={imageUrl}
             alt=""
             fill
+            loading="lazy"
             sizes={IMAGE_SIZES.landingBanner}
             className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-[1.04]"
           />
@@ -151,15 +154,11 @@ export function LandingDirectionCard({
               </p>
               {cityBadge}
             </div>
-            <h3 className="font-display mt-1.5 text-2xl font-bold tracking-tight text-white sm:text-3xl">{landing.title}</h3>
+            <h3 className="font-display mt-1.5 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+              <span className="underline-offset-4 group-hover:underline">{landing.title}</span>
+            </h3>
             <p className="mt-2 max-w-xl text-sm leading-6 text-white/80 sm:text-[0.95rem]">{landingBenefit(landing)}</p>
-            <p className="mt-3 text-sm font-semibold text-white/90">
-              {eventsLabel}
-              <span className="mx-2 text-white/35" aria-hidden>
-                ·
-              </span>
-              {priceLabel}
-            </p>
+            <p className="mt-3 text-sm font-semibold text-white/90">{metaLine}</p>
           </div>
           <span className="inline-flex shrink-0 items-center gap-2 self-start rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-slate-950 shadow-sm transition group-hover:gap-3 lg:self-end">
             Открыть подборку
@@ -180,6 +179,7 @@ export function LandingDirectionCard({
           src={imageUrl}
           alt=""
           fill
+          loading="lazy"
           sizes={IMAGE_SIZES.landingCard}
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
@@ -192,12 +192,14 @@ export function LandingDirectionCard({
         <span className="text-xl" aria-hidden>
           {emoji}
         </span>
-        <h3 className="font-display mt-1 text-lg font-bold text-white sm:text-xl">{landing.title}</h3>
+        <h3 className="font-display mt-1 text-lg font-bold text-white sm:text-xl">
+          <span className="underline-offset-4 group-hover:underline">{landing.title}</span>
+        </h3>
         {landing.subtitle ? (
           <p className="mt-1 line-clamp-2 text-xs text-white/80 sm:text-sm">{landing.subtitle}</p>
         ) : null}
         <p className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-white/90 group-hover:text-white sm:text-sm">
-          {eventsLabel} · {priceLabel}
+          {metaLine}
           <ArrowRight className="h-3.5 w-3.5" />
         </p>
       </div>

@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowRight, Sparkles } from 'lucide-react';
 
 import { CityPicker } from '@/components/CityPicker.client';
+import { ExpandableBlurb } from '@/components/ExpandableBlurb.client';
 import { HeroLayout } from '@/components/HeroLayout';
 import { IMAGE_SIZES, SafeImage } from '@/components/SafeImage.client';
 import { LandingDirectionCard } from '@/components/LandingDirectionCard.client';
@@ -30,6 +31,9 @@ import {
 import { pickPodborkiFeatured, pickPodborkiTrending } from '@/lib/podborki-hero';
 import { balancedTileGridClass } from '@/lib/balanced-tile-grid';
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
+
+const PODBORKI_SEO_TEXT =
+  'Подборки Дайбилет собирают готовые маршруты и события по типу, аудитории и сезону: речные прогулки, автобусные обзоры, музеи, стендап, семейные программы и праздничные даты. В каждой карточке видно число актуальных сеансов и цену от, чтобы сразу перейти к билетам без долгого поиска по афише. Фильтр города в шапке сужает каталог под ваш маршрут, а быстрые чипы помогают начать с настроения - с детьми, бюджетно, на воде или культурно.';
 
 const MOOD_CHIPS: Array<{ label: string; href: string }> = [
   { label: 'С детьми', href: landingCategoryHref('family-kids') },
@@ -219,6 +223,26 @@ export function LandingsCatalogView({
           ))}
         </div>
 
+        {sections.length ? (
+          <ScrollRail
+            className="mt-4"
+            viewportClassName="flex flex-nowrap gap-2 pb-0.5"
+            aria-label="Категории подборок"
+          >
+            {sections.map((section) => (
+              <a
+                key={section.slug}
+                href={`#podborki-${section.slug}`}
+                data-rail-item
+                className="inline-flex shrink-0 items-center rounded-full bg-slate-900 px-3.5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800"
+              >
+                {section.title}
+                <span className="ml-1.5 text-xs font-medium text-white/70">{section.items.length}</span>
+              </a>
+            ))}
+          </ScrollRail>
+        ) : null}
+
         {/* Featured + trending: full container-page width, equal-height row. */}
         <div
           className={
@@ -255,6 +279,9 @@ export function LandingsCatalogView({
                 <span className="font-display text-2xl font-extrabold leading-tight text-white sm:text-3xl">{featured.title}</span>
                 <span className="text-sm text-white/80">
                   {pluralEvents(featured.events)}
+                  {typeof featured.priceFrom === 'number' && featured.priceFrom > 0
+                    ? ` · от ${featured.priceFrom.toLocaleString('ru-RU')} ₽`
+                    : ''}
                   {featured.subtitle ? ` · ${featured.subtitle}` : ''}
                 </span>
                 <span className="inline-flex items-center gap-1 text-sm font-semibold text-white">
@@ -355,7 +382,7 @@ export function LandingsCatalogView({
           {sections.length ? (
             <div className="mt-8 space-y-10">
               {sections.map((section) => (
-                <div key={section.slug}>
+                <div key={section.slug} id={`podborki-${section.slug}`} className="scroll-mt-24">
                   <div className="mb-3 flex items-end justify-between gap-3">
                     <div className="min-w-0">
                       <h3 className="font-display text-lg font-bold text-slate-900">{section.title}</h3>
@@ -426,7 +453,21 @@ export function LandingsCatalogView({
           )}
         </section>
 
-        <p className="mt-12 text-sm text-slate-500">
+        <div className="mt-12 rounded-2xl border border-slate-200 bg-white px-4 py-5 shadow-sm sm:px-6">
+          <h2 className="font-display text-base font-bold text-slate-900 sm:text-lg">
+            Как выбирать подборку на Дайбилете
+          </h2>
+          <ExpandableBlurb
+            text={PODBORKI_SEO_TEXT}
+            className="mt-2 text-sm leading-relaxed text-slate-600"
+            clampClassName="line-clamp-3 md:line-clamp-none"
+            moreLabel="Развернуть"
+            lessLabel="Свернуть"
+            buttonClassName="mt-2 text-sm font-semibold text-primary-700 underline-offset-2 hover:underline md:hidden"
+          />
+        </div>
+
+        <p className="mt-8 text-sm text-slate-500">
           Всего в каталоге <span className="font-semibold text-slate-900">{formatNumber(totalEvents)}</span> событий. Ищите
           подходящее по фильтрам в{' '}
           <Link href="/events" className="font-medium text-primary-600 hover:text-primary-700">
