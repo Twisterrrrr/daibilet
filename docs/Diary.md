@@ -1,3 +1,16 @@
+## 2026-08-04 - /my-day: «Добавить главные места» primary blue
+
+### Наблюдения
+- Bulk CTA `data-day-must-see-bulk` был `bg-slate-900` (тёмный navy) - выбивался из primary CTA my-day (Яндекс / Распланировать = `sky-600`).
+
+### Решения
+- Только стиль кнопки: `bg-sky-600 hover:bg-sky-700` (как `data-day-yandex-cta` / mobile hour-plan). Текст и логика без изменений.
+
+### Проблемы
+- (после deploy) BUILD_ID + `/my-day` 200.
+
+---
+
 ## 2026-08-04 - /my-day desktop: city width + hour-plan on title row
 
 ### Наблюдения

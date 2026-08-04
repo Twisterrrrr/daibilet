@@ -3272,7 +3272,7 @@ function DayRoutePanelInner() {
                       disabled={atMax || atSoft || mustSeeAddable.length === 0}
                       onClick={addAllMustSee}
                       data-day-must-see-bulk
-                      className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-primary-600 disabled:cursor-not-allowed disabled:bg-slate-300"
+                      className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-full bg-sky-600 px-4 py-2 text-xs font-bold text-white hover:bg-sky-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                     >
                       <Sparkles className="h-3.5 w-3.5" />
                       {(mustSeeFilterMeta.tabs.length < 2
