@@ -125,7 +125,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.MYDAY-MOB-ANNOT | Mobile annotated: subtitle one-line + dot; search «Добавить…»; city via quiet link+confirm; drop must-see helper; map focus actions column | Высокий | 🔄 deploy |
+| UX.MYDAY-MOB-ANNOT | Mobile annotated: subtitle one-line + dot; search «Добавить…»; city via quiet link+confirm; drop must-see helper; map focus actions column | Высокий | ✅ `3ea8922` MSK **BUILD_ID=`PmbO697VdpNToUi9yEI5G`** `/my-day` 200 |
 | UX.MYDAY-CITY-RESET | Смена города на /my-day: confirm сброс маршрута если >=1 stop (header+on-page) | Высокий | ✅ `6e5e922` MSK **BUILD_ID=`neGTZ9t_aXfs0StFNoZZo`** `/my-day` 200 |
 | UX.MYDAY-MATCHES-TITLE | Matches accordion: «Подходящие экскурсии» → «События поблизости» | Высокий | ✅ `1f08893` MSK **BUILD_ID=`JHo5binbjsG01hIPE_9_0`** `/my-day` 200 |
 | UX.MYDAY-MATCHES-ORDER | Matches между «Главные места» и «своё место»; drop «Места экскурсии не в маршруте» | Критический | ✅ `3e9b6fa` MSK **BUILD_ID=`M7xdN7ovP2s4tAjJKQYPY`** `/my-day` 200 |

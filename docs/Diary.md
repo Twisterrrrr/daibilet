@@ -1,3 +1,18 @@
+## 2026-08-04 - EventCard: «В мой день» on cover overlay
+
+### Наблюдения
+- Owner (скрин grid-каталога): chip «В мой день» в footer слева рядом с ценой выглядел чужеродно; сердце уже top-right на фото.
+
+### Решения
+- `EventCard` (grid): `AddToDayRouteButton` перенесён на cover overlay, bottom-right (`variant="overlay"`: white/90 + blur idle, emerald active). Heart остаётся top-right.
+- Footer: только цена + «Купить билет». List (`EventCardHorizontal`) без day-route CTA - без изменений.
+- Поведение add/remove и a11y labels сохранены; chip виден и на mobile (раньше был `max-sm:hidden` в footer).
+
+### Проблемы
+- (заполняется после deploy)
+
+---
+
 ## 2026-08-04 - City hub must-see: full blurbs (no mid-sentence cut)
 
 ### Наблюдения
@@ -41,7 +56,7 @@
 - `renderMapFocusCard`: «Показать маршрут» + «Удалить» column; X отдельно.
 
 ### Проблемы
-- (заполняется после deploy)
+- Нет. tip `3ea8922` (live HEAD later incl. hub blurbs); MSK **BUILD_ID=`PmbO697VdpNToUi9yEI5G`**; `/my-day` 200; chunk: «Добавить место…» / «или сменить город» / `data-day-map-focus-actions` / «Показать маршрут»; без «Собрали для вас топ».
 
 ---
 
