@@ -10,7 +10,7 @@
 - UI: `CitySignificantSuburbsBlock` рендерит `data-city-suburb-places`; filters: override + кирха + gastro по имени.
 
 ### Проблемы
-- Deploy/BUILD_ID - ниже после MSK.
+- Нет. tip `9d77eb4`, MSK **BUILD_ID=`bDKOL5rTJ7WEpF37gGNXG`**; `/cities/kaliningrad` 200; собор + suburb POIs в HTML.
 
 ---
 
