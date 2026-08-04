@@ -1856,25 +1856,19 @@ export function dayRouteVenueProgramUrl(
 }
 
 /**
- * Strip / rewrite commerce fields that used venue slug as event slug/id/URL.
- * Bad `/events/{venueSlug}` → venue program `/venues|{locations}/{slug}` when possible.
+ * Strip commerce fields that used venue slug as event slug/id/URL.
+ * Bad `/events/{venueSlug}` → clear ticket CTA (venue program is not a buy page).
  */
 export function sanitizeDayRouteTicketFields(venue: DayRouteVenueItem): DayRouteVenueItem {
   let eventId = String(venue.eventId || '').trim() || null;
   let eventSlug = String(venue.eventSlug || '').trim() || null;
   let ticketUrl = String(venue.ticketUrl || '').trim() || null;
 
-  const hadVenueAsEvent =
-    Boolean(eventId && isDayRouteVenueAsEventKey(eventId, venue)) ||
-    Boolean(eventSlug && isDayRouteVenueAsEventKey(eventSlug, venue)) ||
-    Boolean(ticketUrl && isDayRouteVenueAsEventTicketUrl(ticketUrl, venue));
-
   if (eventId && isDayRouteVenueAsEventKey(eventId, venue)) eventId = null;
   if (eventSlug && isDayRouteVenueAsEventKey(eventSlug, venue)) eventSlug = null;
   if (ticketUrl && isDayRouteVenueAsEventTicketUrl(ticketUrl, venue)) ticketUrl = null;
-
-  if (hadVenueAsEvent && !ticketUrl && !eventId && !eventSlug) {
-    ticketUrl = dayRouteVenueProgramUrl(venue);
+  if (ticketUrl && (/^\/venues\//i.test(ticketUrl) || /^\/locations\//i.test(ticketUrl))) {
+    ticketUrl = null;
   }
 
   if (
@@ -1895,7 +1889,8 @@ export function sanitizeDayRouteTicketFields(venue: DayRouteVenueItem): DayRoute
 
 /**
  * Prefer stored ticketUrl; else real event page from eventSlug/eventId.
- * Never invent `/events/{venueSlug}` - fall back to venue program or hide CTA.
+ * Never invent `/events/{venueSlug}` or treat venue/location pages as buy CTAs.
+ * External https (TEP widget etc.) stays.
  */
 export function resolveDayRouteTicketUrl(
   venue: Pick<DayRouteVenueItem, 'ticketUrl' | 'eventId' | 'eventSlug' | 'title' | 'slug' | 'id' | 'href'>,
@@ -1903,10 +1898,10 @@ export function resolveDayRouteTicketUrl(
   const stored = String(venue.ticketUrl || '').trim();
   if (stored) {
     if (/^https?:\/\//i.test(stored)) return stored;
-    if (/^\/venues\//i.test(stored) || /^\/locations\//i.test(stored)) return stored;
-    if (isDayRouteVenueAsEventTicketUrl(stored, venue)) {
-      return dayRouteVenueProgramUrl(venue);
-    }
+    // Venue/location program is not a saleable event page - hide buy CTA.
+    if (/^\/venues\//i.test(stored) || /^\/locations\//i.test(stored)) return null;
+    if (isDayRouteVenueAsEventTicketUrl(stored, venue)) return null;
+    if (/^\/events\//i.test(stored)) return stored;
     return stored;
   }
 
@@ -1921,8 +1916,6 @@ export function resolveDayRouteTicketUrl(
     slug: slug || null,
     title: venue.title || 'event',
   });
-  if (isDayRouteVenueAsEventTicketUrl(href, venue)) {
-    return dayRouteVenueProgramUrl(venue);
-  }
+  if (isDayRouteVenueAsEventTicketUrl(href, venue)) return null;
   return href;
 }

@@ -229,6 +229,8 @@ export type DayRouteMatchOfferStub = {
   slug: string;
   title: string;
   priceFromRub: number | null;
+  /** False → never attach buy CTA (soft-404 public page). Default treat missing as true for legacy stubs. */
+  purchaseReady?: boolean;
   covered: { stop: string[]; start: string[]; nearby: string[] };
   routeVenues?: Array<{ id: string }>;
 };
@@ -325,6 +327,10 @@ export function formatNearbyUpsellLine(match: {
   return `Рядом: ${title}`;
 }
 
+function matchIsPurchaseReady(match: DayRouteMatchOfferStub): boolean {
+  return match.purchaseReady !== false;
+}
+
 function matchTicketUrl(match: Pick<DayRouteMatchOfferStub, 'eventId' | 'slug' | 'title'>): string {
   return eventHref({
     id: match.eventId,
@@ -342,6 +348,7 @@ export function pickAdmissionMatchForStop(
   const keys = venueLocatorKeys(venue);
   if (!keys.size) return null;
   const candidates = matches.filter((m) => {
+    if (!matchIsPurchaseReady(m)) return false;
     if (!matchIsSingleVenueAdmission(m)) return false;
     return coveredIncludes(m.covered, keys).start;
   });
@@ -401,6 +408,7 @@ export function pickNearbyUpsellsForStop(
   const ranked: Array<{ match: DayRouteMatchOfferStub; score: number }> = [];
   for (const match of matches) {
     if (exclude.has(match.eventId)) continue;
+    if (!matchIsPurchaseReady(match)) continue;
     const hit = coveredIncludes(match.covered, keys);
     if (!hit.stop && !hit.start && !hit.nearby) continue;
     if (matchIsSingleVenueAdmission(match) && hit.start) continue;
@@ -431,40 +439,75 @@ export function pickNearbyUpsellsForStop(
   return out;
 }
 
-/** Apply matches commerce onto route stops (admission attach + price enrich). Pure. */
+/** Apply matches commerce onto route stops (admission attach + price enrich + cull soft-404). Pure. */
 export function applyMatchCommerceToVenues(
   venues: DayRouteVenueItem[],
   matches: DayRouteMatchOfferStub[],
 ): { venues: DayRouteVenueItem[]; changed: boolean } {
-  if (!venues.length || !matches.length) return { venues, changed: false };
+  if (!venues.length) return { venues, changed: false };
   let changed = false;
+  const saleableIds = new Set(
+    matches.filter((m) => matchIsPurchaseReady(m)).map((m) => String(m.eventId || '').trim()).filter(Boolean),
+  );
+  const saleableSlugs = new Set(
+    matches.filter((m) => matchIsPurchaseReady(m)).map((m) => String(m.slug || '').trim()).filter(Boolean),
+  );
+
   const next = venues.map((venue) => {
-    const admission = pickAdmissionMatchForStop(venue, matches);
+    let current = venue;
+
+    // Cull buy CTAs attached onto a venue stop from unsaleable/thin TC matches
+    // (localStorage poison → soft-404 «Купить»). Keep true event stops (id === eventId).
+    if (matches.length) {
+      const eventId = String(current.eventId || '').trim();
+      const eventSlug = String(current.eventSlug || '').trim();
+      const stopId = String(current.id || '').trim();
+      const stopSlug = String(current.slug || '').trim();
+      const isVenueHostedEvent =
+        Boolean(eventId || eventSlug) &&
+        eventId !== stopId &&
+        eventSlug !== stopId &&
+        (!stopSlug || (eventSlug !== stopSlug && eventId !== stopSlug));
+      const knownSaleable =
+        (eventId && saleableIds.has(eventId)) || (eventSlug && saleableSlugs.has(eventSlug));
+      if (isVenueHostedEvent && !knownSaleable) {
+        changed = true;
+        current = {
+          ...current,
+          eventId: null,
+          eventSlug: null,
+          ticketUrl: null,
+          priceFromRub: null,
+        };
+      }
+    }
+
+    const admission = pickAdmissionMatchForStop(current, matches);
     if (admission) {
       const ticketUrl = matchTicketUrl(admission);
       const priceFromRub = realPriceRub(admission.priceFromRub);
       const same =
-        venue.eventId === admission.eventId &&
-        venue.eventSlug === admission.slug &&
-        venue.ticketUrl === ticketUrl &&
-        (priceFromRub == null || venue.priceFromRub === priceFromRub);
-      if (same) return venue;
+        current.eventId === admission.eventId &&
+        current.eventSlug === admission.slug &&
+        current.ticketUrl === ticketUrl &&
+        (priceFromRub == null || current.priceFromRub === priceFromRub);
+      if (same) return current;
       changed = true;
       return {
-        ...venue,
+        ...current,
         eventId: admission.eventId,
         eventSlug: admission.slug,
         ticketUrl,
         ...(priceFromRub != null ? { priceFromRub } : {}),
       };
     }
-    if (!dayRouteStopHasTicket(venue)) return venue;
-    const priceFromRub = findPriceForTicketedStop(venue, matches);
-    if (priceFromRub != null && venue.priceFromRub !== priceFromRub) {
+    if (!dayRouteStopHasTicket(current)) return current;
+    const priceFromRub = findPriceForTicketedStop(current, matches);
+    if (priceFromRub != null && current.priceFromRub !== priceFromRub) {
       changed = true;
-      return { ...venue, priceFromRub };
+      return { ...current, priceFromRub };
     }
-    return venue;
+    return current;
   });
   return { venues: next, changed };
 }

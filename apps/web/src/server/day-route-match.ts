@@ -9,6 +9,11 @@ import {
   scoreDayRouteCoverage,
   type DayRouteCovered,
 } from '@/lib/day-route-score';
+import {
+  dayRouteMatchSaleableSelect,
+  dayRouteMatchSaleableWhere,
+  isDayRouteMatchSaleable,
+} from '@/server/day-route-match-saleable';
 
 export type DayRouteMatchVenue = {
   id: string;
@@ -32,6 +37,8 @@ export type DayRouteMatchItem = {
   title: string;
   imageUrl: string | null;
   priceFromRub: number | null;
+  /** Always true for returned matches - public page would not soft-404. */
+  purchaseReady: boolean;
   score: number;
   coveragePct: number;
   covered: DayRouteCovered;
@@ -168,7 +175,7 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
   if (unresolved.length) {
     const events = await prisma.event.findMany({
       where: {
-        status: { notIn: ['HIDDEN', 'DRAFT'] },
+        ...dayRouteMatchSaleableWhere(),
         OR: [{ id: { in: unresolved } }, { slug: { in: unresolved } }],
       },
       select: {
@@ -176,6 +183,7 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
         slug: true,
         title: true,
         imageUrl: true,
+        ...dayRouteMatchSaleableSelect(),
         override: { select: { imageUrl: true } },
         venue: {
           select: {
@@ -194,6 +202,7 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
       take: 16,
     });
     for (const event of events) {
+      if (!isDayRouteMatchSaleable(event)) continue;
       eventsByLocator.set(event.id, event);
       if (event.slug) eventsByLocator.set(event.slug, event);
     }
@@ -288,10 +297,12 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
     };
   }
 
-  // Direct hits: STOP on selected / start at selected.
+  // Direct hits: STOP on selected / start at selected (saleable only - avoid soft-404 buy CTAs).
+  const now = new Date();
+  const eventSelect = buildEventSelect(now);
   const directEvents = await prisma.event.findMany({
     where: {
-      status: { notIn: ['HIDDEN', 'DRAFT'] },
+      ...dayRouteMatchSaleableWhere(now),
       ...(dominantCityId ? { primaryCityId: dominantCityId } : {}),
       OR: [
         { venueId: { in: ids } },
@@ -303,10 +314,11 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
   });
 
   // Nearby candidates: same city, start venue within bbox of any selected point.
-  const nearbyEvents = await loadNearbyStartEvents(dominantCityId, selectedCoords);
+  const nearbyEvents = await loadNearbyStartEvents(dominantCityId, selectedCoords, now);
 
   const byId = new Map<string, (typeof directEvents)[number]>();
   for (const event of [...directEvents, ...nearbyEvents]) {
+    if (!isDayRouteMatchSaleable(event, now.getTime())) continue;
     byId.set(event.id, event);
   }
 
@@ -331,6 +343,7 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
       title: event.title,
       imageUrl: event.override?.imageUrl || event.imageUrl,
       priceFromRub: event.priceFromRub,
+      purchaseReady: true,
       score,
       coveragePct: coveragePct(covered, ids.length),
       covered,
@@ -358,51 +371,55 @@ export async function matchDayRouteVenues(venueIds: string[]): Promise<DayRouteM
   };
 }
 
-const eventSelect = {
-  id: true,
-  slug: true,
-  title: true,
-  imageUrl: true,
-  priceFromRub: true,
-  venueId: true,
-  venue: {
-    select: {
-      id: true,
-      slug: true,
-      title: true,
-      cityId: true,
-      address: true,
-      latitude: true,
-      longitude: true,
-      heroImageUrl: true,
-      city: { select: { title: true, slug: true } },
+function buildEventSelect(now = new Date()) {
+  return {
+    id: true,
+    slug: true,
+    title: true,
+    imageUrl: true,
+    priceFromRub: true,
+    venueId: true,
+    ...dayRouteMatchSaleableSelect(now),
+    venue: {
+      select: {
+        id: true,
+        slug: true,
+        title: true,
+        cityId: true,
+        address: true,
+        latitude: true,
+        longitude: true,
+        heroImageUrl: true,
+        city: { select: { title: true, slug: true } },
+      },
     },
-  },
-  routeItems: {
-    where: { role: 'STOP' as const },
-    select: {
-      venueId: true,
-      venue: {
-        select: {
-          id: true,
-          slug: true,
-          title: true,
-          cityId: true,
-          address: true,
-          latitude: true,
-          longitude: true,
-          heroImageUrl: true,
-          city: { select: { title: true, slug: true } },
+    routeItems: {
+      where: { role: 'STOP' as const },
+      select: {
+        venueId: true,
+        venue: {
+          select: {
+            id: true,
+            slug: true,
+            title: true,
+            cityId: true,
+            address: true,
+            latitude: true,
+            longitude: true,
+            heroImageUrl: true,
+            city: { select: { title: true, slug: true } },
+          },
         },
       },
     },
-  },
-  override: { select: { imageUrl: true } },
-} as const;
+    override: { select: { imageUrl: true } },
+  } as const;
+}
 
 async function loadNearbyStartEvents(
   cityId: string | null,
   selectedCoords: Map<string, { latitude: number; longitude: number }>,
+  now = new Date(),
 ) {
   if (!cityId || !selectedCoords.size) return [];
 
@@ -414,7 +431,7 @@ async function loadNearbyStartEvents(
 
   const rows = await prisma.event.findMany({
     where: {
-      status: { notIn: ['HIDDEN', 'DRAFT'] },
+      ...dayRouteMatchSaleableWhere(now),
       primaryCityId: cityId,
       venue: {
         is: {
@@ -423,12 +440,13 @@ async function loadNearbyStartEvents(
         },
       },
     },
-    select: eventSelect,
+    select: buildEventSelect(now),
     take: 300,
   });
 
   // Soft filter: at least one selected point within ~550m bbox already; haversine in classify.
   return rows.filter((event) => {
+    if (!isDayRouteMatchSaleable(event, now.getTime())) return false;
     const lat = event.venue?.latitude;
     const lng = event.venue?.longitude;
     if (lat == null || lng == null) return false;

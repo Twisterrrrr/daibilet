@@ -218,6 +218,7 @@ type MatchPayload = {
     title: string;
     imageUrl: string | null;
     priceFromRub: number | null;
+    purchaseReady?: boolean;
     score: number;
     coveragePct: number;
     covered: { stop: string[]; start: string[]; nearby: string[] };
@@ -1371,6 +1372,7 @@ function DayRoutePanelInner() {
       slug: m.slug,
       title: m.title,
       priceFromRub: m.priceFromRub,
+      purchaseReady: m.purchaseReady !== false,
       covered: m.covered,
       routeVenues: (m.routeVenues || []).map((v) => ({ id: v.id })),
     }));

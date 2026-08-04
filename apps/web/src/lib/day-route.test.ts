@@ -859,7 +859,7 @@ test('resolveDayRouteTicketUrl never builds /events/{venueSlug}', () => {
     eventSlug: 'niko1560',
     ticketUrl: '/events/niko1560',
   };
-  assert.equal(resolveDayRouteTicketUrl(venue), '/venues/niko1560');
+  assert.equal(resolveDayRouteTicketUrl(venue), null);
   assert.notEqual(resolveDayRouteTicketUrl(venue), '/events/niko1560');
 
   const onlyKeys: DayRouteVenueItem = {
@@ -878,9 +878,17 @@ test('resolveDayRouteTicketUrl never builds /events/{venueSlug}', () => {
     eventSlug: 'standup-po-zhenski',
   };
   assert.equal(resolveDayRouteTicketUrl(realEvent), '/events/standup-po-zhenski');
+
+  const venueProgramStored: DayRouteVenueItem = {
+    id: 'venue_niko',
+    slug: 'niko1560',
+    title: 'Niko1560',
+    ticketUrl: '/venues/niko1560',
+  };
+  assert.equal(resolveDayRouteTicketUrl(venueProgramStored), null);
 });
 
-test('sanitizeDayRouteTicketFields rewrites venue-as-event ticketUrl', () => {
+test('sanitizeDayRouteTicketFields clears venue-as-event ticketUrl', () => {
   const poisoned: DayRouteVenueItem = {
     id: 'venue_niko',
     slug: 'niko1560',
@@ -893,6 +901,5 @@ test('sanitizeDayRouteTicketFields rewrites venue-as-event ticketUrl', () => {
   const cleaned = sanitizeDayRouteTicketFields(poisoned);
   assert.equal(cleaned.eventId, null);
   assert.equal(cleaned.eventSlug, null);
-  assert.equal(cleaned.ticketUrl, '/venues/niko1560');
-  assert.ok(!String(cleaned.ticketUrl).startsWith('/events/niko1560'));
+  assert.equal(cleaned.ticketUrl, null);
 });

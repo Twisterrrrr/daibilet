@@ -1,3 +1,20 @@
+## 2026-08-04 - /my-day: cull unsaleable buy CTA (Полет soft-404)
+
+### Наблюдения
+- НН «Стадион Полет»: after add, «Купить» вёл на soft-404 TC slug (`tc-6a32bd…-nizhnii-novgorod`); API `/api/public/events/{slug}` → `null`, HTML soft-404.
+- Root cause: `/api/day-route/matches` брал Event с `status notIn HIDDEN/DRAFT` без saleable gate; `applyMatchCommerceToVenues` цеплял single-venue admission на venue stop → `/events/{thin-tc-slug}`.
+- Public page: `isSaleableEventForPublic` (schedule + purchaseReady) → null = soft-404. Отдельно: `tc-6a2ada…-evgenii-eremeev…` тот же класс.
+
+### Решения
+- `day-route-match-saleable`: Prisma prefilter + JS gate (upcoming/open + widget/TC|TEP link); matches всегда `purchaseReady: true`.
+- Commercial: не attach / nearby upsell если `purchaseReady === false`; cull venue-hosted poison из localStorage; ticket CTA не использует `/venues|/locations` как buy.
+- Unit: saleable + purchaseReady guard + sanitize null.
+
+### Проблемы
+- Thin TC rows в DB остаются; публично уже soft-404. Отдельный unpublish/HIDE - optional data cleanup, не блокер UI.
+
+---
+
 ## 2026-08-04 - Conversion phase STEP 0…3 (salute / podborki / tabular / blog)
 
 ### Наблюдения
