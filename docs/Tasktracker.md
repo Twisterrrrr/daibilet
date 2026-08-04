@@ -11,7 +11,7 @@
 
 | # | Задача | Приоритет | Статус |
 |---|--------|-----------|--------|
-| UX.EVT-PDP1 | Sticky mobile CTA «Выбрать билеты» + от X | Критический | ✅ |
+| UX.EVT-PDP1 | Sticky mobile CTA «Выбрать билеты» + от X | Критический | ✅ `20b0662` MSK **BUILD_ID=`v0uP2iuxwDW4oNxWa0B2g`** |
 | UX.EVT-PDP2 | Hero badge chips + rating + when/where/price | Критический | ✅ |
 | UX.EVT-PDP3 | Day strip → timeslots in BuyCard | Высокий | ✅ |
 | UX.EVT-PDP4 | Accordion О событии / Маршрут / Как добраться + map expand | Высокий | ✅ |
