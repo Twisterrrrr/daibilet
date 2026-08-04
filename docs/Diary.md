@@ -1,3 +1,16 @@
+## 2026-08-04 - /my-day desktop: Пешком/Авто рядом с км·мин
+
+### Наблюдения
+- Owner (скрин): на desktop «Пешком / Авто» стояли справа вместе с CTA, хотя должны сразу после `N км · около M мин` слева.
+
+### Решения
+- `DayRoutePanel` row 2: `justify-between` - слева `[км · мин][Пешком Авто]` (`data-day-travel-mode-desktop`), справа CTAs; mobile toggle остаётся справа (`data-day-travel-mode-mobile`, `lg:hidden`).
+
+### Проблемы
+- Нет. tip `0d2687d`, MSK **BUILD_ID=`8k-1-yqfNDk25ALQgjDBW`**; `/my-day` 200; chunk `data-day-travel-mode-desktop`.
+
+---
+
 ## 2026-08-04 - /my-day readiness: bullet separator
 
 ### Наблюдения
