@@ -40,7 +40,7 @@
 - Share hydrate: skipRouteConfirm (маршрут уже заменён).
 
 ### Проблемы
-- (после deploy) BUILD_ID + /my-day 200.
+- Live MSK: tip includes `6e5e922`; BUILD_ID=`neGTZ9t_aXfs0StFNoZZo`; `/my-day` 200 (local+public); confirm copy in chunks.
 
 ---
 
