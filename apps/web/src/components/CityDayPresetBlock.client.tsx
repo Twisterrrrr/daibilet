@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Sparkles } from 'lucide-react';
 import { useMemo, useState } from 'react';
@@ -125,6 +126,18 @@ export function CityDayPresetBlock({
                   >
                     {items.length} точек: {titles}
                   </p>
+                  {preset.blogSlug ? (
+                    <Link
+                      href={`/blog/${preset.blogSlug}`}
+                      className={`mt-1.5 inline-block text-xs font-medium underline-offset-2 hover:underline ${
+                        editorial
+                          ? 'text-zinc-500 hover:text-zinc-800'
+                          : 'text-slate-500 hover:text-primary-700'
+                      }`}
+                    >
+                      Читать об этом в блоге
+                    </Link>
+                  ) : null}
                 </div>
                 <button
                   type="button"

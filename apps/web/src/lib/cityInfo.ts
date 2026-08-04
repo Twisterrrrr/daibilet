@@ -26,6 +26,8 @@ export type CityDayRoutePreset = {
   id: string;
   title: string;
   description?: string;
+  /** Slug статьи блога (`/blog/{blogSlug}`), если есть companion-гайд. */
+  blogSlug?: string;
   stops: CityMustSeeItem[];
 };
 
@@ -391,6 +393,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         id: 'nn-one-day',
         title: 'Нижний за 1 день',
         description: 'Компактный день: площадь, Кремль, Рождественская, гастро-пауза и набережная.',
+        blogSlug: 'nizhny-novgorod-za-24-chasa',
         stops: [
           { name: 'Площадь Минина и Пожарского', desc: 'Старт у стен Кремля', locationSlug: 'nizhny-novgorod-ploschad-minina-i-pozharskogo' },
           { name: 'Нижегородский Кремль', desc: 'Крепость и виды', locationSlug: 'nizhny-novgorod-nizhegorodskiy-kreml' },
@@ -405,6 +408,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         id: 'nn-instagram',
         title: 'Инстаграмный Нижний',
         description: 'Пакгаузы, Жюль Верн, набережные, Почаинский и ярмарочные виды.',
+        blogSlug: 'instagramnyi-nizhnii',
         stops: [
           { name: 'Пакгаузы на Стрелке', desc: 'Индустриальный вау', locationSlug: 'nizhny-novgorod-pakgauzy-na-strelke' },
           { name: 'Собор Александра Невского', desc: 'Доминанта Стрелки', locationSlug: 'nizhny-novgorod-sobor-aleksandra-nevskogo' },
@@ -420,6 +424,7 @@ export const CITY_INFO: Record<string, CityInfoEntry> = {
         id: 'nn-history-gastro',
         title: 'Исторический и гастрономический гайд',
         description: 'Усадьбы, палаты, Строгановская, ярмарка и вечерняя гастро-точка.',
+        blogSlug: 'nizhny-novgorod-marshrut-so-vkusom',
         stops: [
           { name: 'Усадьба Рукавишниковых', desc: 'Купеческий дворец', locationSlug: 'nizhny-novgorod-usadba-rukavishnikovyh' },
           { name: 'Палаты Строгановых', desc: 'Барокко XVII века', locationSlug: 'nizhny-novgorod-palaty-stroganovyh' },
