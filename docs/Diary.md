@@ -24,7 +24,7 @@
 - `CityDayPresetBlock`: ссылка «Читать об этом в блоге» под списком точек, только если `blogSlug` задан; не конкурирует с «Собрать день».
 
 ### Проблемы
-- Нет. Live tip `dce0d6c`, MSK **BUILD_ID=`pu7ciIbQOzhbFpERIvtii`**; `/my-day` 200.
+- Нет. Live tip `dce0d6c` (+ follow-up tip `441ce9e`/`7fa97bc`), MSK **BUILD_ID=`4sb26gUETqq22pmF7ycwM`**; `/my-day` 200; chunk + source `blogSlug` / «Читать об этом в блоге».
 
 ---
 
