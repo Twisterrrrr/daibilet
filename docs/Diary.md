@@ -8,7 +8,7 @@
 - Не трогали mustSee filters / Главные места.
 
 ### Проблемы
-- Нет. tip TBD после deploy; smoke `/cities/kaliningrad`.
+- Нет. tip `d6ca3ec`, MSK **BUILD_ID=`kWULGMhmJMpJInMCdIS3k`**; `/cities/kaliningrad` 200; suburb rail + 5 cards + «Это не город» + nested «Дюна Эфа» / «Одна из самых».
 
 ---
 
