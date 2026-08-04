@@ -109,7 +109,7 @@ export type DayRouteVenueItem = {
   ticketUrl?: string | null;
   /** Guest marked ticket as purchased - persisted in localStorage. */
   ticketBought?: boolean;
-  /** Free/custom checklist: guest marked stop as done (strike-through). */
+  /** Legacy: guest checklist done flag - UI no longer toggles; kept for old localStorage. */
   planDone?: boolean;
   /** Lowest known ticket price (rub) from matches / catalog - for «Купить билет от X». */
   priceFromRub?: number | null;

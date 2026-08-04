@@ -2116,7 +2116,7 @@ function DayRoutePanelInner() {
         shortDescription: matchedSource?.shortDescription,
         desc: mustSeeRow?.place.desc,
       },
-      120,
+      260,
     );
     const addressLine =
       formatStreetAddress(focusedVenue.address, { city: focusedVenue.city }) ||
@@ -2137,7 +2137,7 @@ function DayRoutePanelInner() {
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm font-semibold text-slate-900">{focusedVenue.title}</p>
             <p
-              className="mt-0.5 line-clamp-2 text-[11px] leading-snug text-slate-500"
+              className="mt-0.5 line-clamp-4 text-[11px] leading-snug text-slate-500"
               title={focusSubtitle}
               data-day-map-focus-subtitle
             >
@@ -3037,7 +3037,6 @@ function DayRoutePanelInner() {
                         updateDayRouteVenue(venue.id, { ticketBought: !venue.ticketBought }),
                       )
                     }
-                    onTogglePlanDone={() => undefined}
                     onBuyClick={(ticketUrl) =>
                       setTicketHandoff({ venueId: venue.id, ticketUrl, title: venue.title })
                     }
@@ -3098,11 +3097,6 @@ function DayRoutePanelInner() {
                       onToggleBought={() =>
                         setRoute(
                           updateDayRouteVenue(venue.id, { ticketBought: !venue.ticketBought }),
-                        )
-                      }
-                      onTogglePlanDone={() =>
-                        setRoute(
-                          updateDayRouteVenue(venue.id, { planDone: !venue.planDone }),
                         )
                       }
                       onBuyClick={(ticketUrl) =>
@@ -3210,9 +3204,6 @@ function DayRoutePanelInner() {
                       setRoute(
                         updateDayRouteVenue(venue.id, { ticketBought: !venue.ticketBought }),
                       )
-                    }
-                    onTogglePlanDone={() =>
-                      setRoute(updateDayRouteVenue(venue.id, { planDone: !venue.planDone }))
                     }
                     onBuyClick={(ticketUrl) =>
                       setTicketHandoff({ venueId: venue.id, ticketUrl, title: venue.title })
@@ -4309,7 +4300,6 @@ function DayRouteVenueCard({
   onMoveDown,
   onRemove,
   onToggleBought,
-  onTogglePlanDone,
   onBuyClick,
   onShowTicket,
   onSetNote,
@@ -4335,7 +4325,6 @@ function DayRouteVenueCard({
   onMoveDown: () => void;
   onRemove: () => void;
   onToggleBought: () => void;
-  onTogglePlanDone: () => void;
   onBuyClick: (ticketUrl: string) => void;
   onShowTicket: () => void;
   onSetNote: (note: string) => void;
@@ -4344,7 +4333,6 @@ function DayRouteVenueCard({
   const purchased = group === 'purchased' || Boolean(venue.ticketBought);
   const reorderLocked = purchased || group === 'overflow' || dayRouteStopReorderLocked(venue);
   const isCommerce = purchased || dayRouteStopIsCommerce(venue);
-  const planDone = Boolean(venue.planDone) && !purchased;
   const [addressOpen, setAddressOpen] = useState(false);
   const [addressDraft, setAddressDraft] = useState(String(venue.note || venue.address || ''));
   const href =
@@ -4392,9 +4380,7 @@ function DayRouteVenueCard({
   const metaLine = metaParts.join(' · ');
   const segmentLine = segmentHint ? `далее ~ ${segmentHint}` : '';
 
-  const titleClass = `font-semibold leading-tight ${
-    planDone ? 'text-slate-400 line-through' : 'text-slate-900'
-  }`;
+  const titleClass = 'font-semibold leading-tight text-slate-900';
   const titleNode = href ? (
     <Link href={href} className={`${titleClass} hover:text-primary-700`}>
       {venue.title}
@@ -4407,24 +4393,6 @@ function DayRouteVenueCard({
       {softTimeLabel}
     </p>
   ) : null;
-  const planCheck =
-    group === 'plans' || group === 'overflow' ? (
-      <button
-        type="button"
-        aria-label={planDone ? 'Снять отметку' : 'Отметить выполненным'}
-        title={planDone ? 'Снять отметку' : 'Отметить выполненным'}
-        aria-pressed={planDone}
-        data-day-plan-done
-        onClick={onTogglePlanDone}
-        className={`inline-flex size-5 min-h-5 min-w-5 shrink-0 self-center items-center justify-center rounded border ${
-          planDone
-            ? 'border-emerald-500 bg-emerald-500 text-white'
-            : 'border-slate-400 bg-white text-slate-300 hover:border-emerald-500 hover:text-emerald-400'
-        }`}
-      >
-        <Check className="h-3 w-3" strokeWidth={2.5} aria-hidden />
-      </button>
-    ) : null;
 
   const actionButtons = (
     <div className="flex shrink-0 items-center gap-0">
@@ -4465,7 +4433,7 @@ function DayRouteVenueCard({
         data-day-stop-focused={focused ? '1' : undefined}
       >
         {/*
-          Dense list: [✓] [↑↓] [N]; title / address / segment as 3 lines,
+          Dense list: [↑↓] [N]; title / address / segment as 3 lines,
           vertically centered with side controls.
         */}
         <div
@@ -4473,7 +4441,6 @@ function DayRouteVenueCard({
             focused ? 'rounded-md bg-emerald-50/80 px-1' : ''
           } ${purchased ? 'border-l-4 border-primary-600 pl-1.5' : ''}`}
         >
-          {planCheck}
           {reorderLocked ? (
             <div
               className="flex h-8 w-5 shrink-0 items-center justify-center text-slate-300"
@@ -4636,7 +4603,7 @@ function DayRouteVenueCard({
     >
       {/*
         Owner v7: single compact row
-        [✓ left] [↑↓] [thumb+N] [title / address / meta] [✈][X]
+        [↑↓] [thumb+N] [title / address / meta] [✈][X]
       */}
       <div
         className={`flex items-center gap-2 rounded-2xl border bg-white px-2.5 py-2 sm:gap-3 sm:px-3 sm:py-2.5 ${
@@ -4647,7 +4614,6 @@ function DayRouteVenueCard({
               : 'border-slate-200'
         }`}
       >
-        {planCheck}
         {reorderLocked ? (
           <div
             className="flex h-10 w-6 shrink-0 items-center justify-center text-slate-300"

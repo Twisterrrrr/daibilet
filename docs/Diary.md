@@ -1,3 +1,18 @@
+## 2026-08-04 - My Day: drop planDone checkbox + fuller map focus hint
+
+### Наблюдения
+- Owner: «Отметить выполненным» лишний - точку и так удаляют через X; предыдущий move-left отменён.
+- Map focus popup: hook обрезан жёстко (120 chars + `line-clamp-2`) - editorial/desc не читается.
+
+### Решения
+- Убран `data-day-plan-done` / strikethrough / `onTogglePlanDone` с stop cards; поле `planDone` в localStorage остаётся harmless (без новых toggles).
+- Map focus subtitle: `dayRouteHookLine(..., 260)` + `line-clamp-4`; title attribute сохраняет полный текст.
+
+### Проблемы
+- Нет. Deploy/BUILD_ID - после MSK.
+
+---
+
 ## 2026-08-04 - /my-day mobile: actions column + Распланировать mid CTA
 
 ### Наблюдения
@@ -10649,18 +10664,6 @@ evalidateNextBlogArticle (/blog, slug, city hub).
 - Добавлена PUBLISHED-статья `instagramnyi-nizhnii` с реальными ссылками на city hub, локации, гастро-площадку и `/my-day`.
 - Сгенерированы уникальные cover и две inline-фотографии, размещённые в `apps/web/public/images/blog` и зеркале `apps/public/public/images/blog`.
 
-
-## 2026-08-04 - Публикация гида «Маршрут со вкусом»
-
-### Наблюдения
-- Для Нижнего Новгорода уже есть сущности всех точек гастрономического маршрута и пресет «Исторический и гастрономический гайд» в `cityInfo`.
-
-### Решения
-- Добавлена PUBLISHED-статья с проверенными ссылками на city hub, локации, площадки и `/my-day`.
-- Для cover и двух inline-блоков сгенерированы уникальные изображения в `apps/public/public/images/blog/`.
-
-### Проблемы
-- Именованный пресет пока нельзя применить прямой URL-ссылкой: пользователь выбирает его в интерфейсе «Мой день».
 ### Проблемы
 - Глубокая ссылка, которая применяет именованный сценарий напрямую из URL, в текущем `my-day` не поддерживается: сценарий выбирается в интерфейсе.
 
