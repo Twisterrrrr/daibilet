@@ -20,6 +20,8 @@ export type MustSeeClassifyInput = CityPlaceLinkFields & {
   desc?: string | null;
   /** Catalog / editorial kind when resolved (e.g. CLUB_BAR_RESTAURANT, PARK, MUSEUM). */
   type?: string | null;
+  /** Optional cityInfo chip override. */
+  mustSeeFilter?: MustSeeFilterId | null;
 };
 
 const FILTER_LABELS: Record<MustSeeFilterId, string> = {
@@ -70,6 +72,8 @@ function isGastro(place: MustSeeClassifyInput, kind: string): boolean {
     }
     if (/кафе|ресторан|бар|пицц|трактир|кофейня|стейкхаус|коктейльн/i.test(name)) return true;
   }
+  // Editorial gastro rows without catalog slug (cityInfo-only).
+  if (/ресторан|гастробар|пивной ресторан|магазин-музей/i.test(name)) return true;
   return false;
 }
 
@@ -110,7 +114,7 @@ function isTemple(place: MustSeeClassifyInput, kind: string): boolean {
   if (/(?:^|[-_/])(?:sobor|tserkov|monastyr|church|cathedral|hram)(?:$|[-_/])/i.test(slug)) {
     return true;
   }
-  if (/собор|церковь|монастырь|храм/i.test(name)) return true;
+  if (/собор|церковь|монастырь|храм|кирха/i.test(name)) return true;
   return false;
 }
 
@@ -118,6 +122,16 @@ function isTemple(place: MustSeeClassifyInput, kind: string): boolean {
  * Single category for a must-see row. Priority: gastro → museum → park → temple → main.
  */
 export function classifyMustSeePlace(place: MustSeeClassifyInput): MustSeeFilterId {
+  const override = place.mustSeeFilter;
+  if (
+    override === 'main' ||
+    override === 'gastro' ||
+    override === 'museum' ||
+    override === 'park' ||
+    override === 'temple'
+  ) {
+    return override;
+  }
   const kind = resolvePublicVenueType(place.type, place.name);
   const normalized = normalizeVenueKind(place.type);
 

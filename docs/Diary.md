@@ -1,3 +1,19 @@
+## 2026-08-04 - Калининград: mustSee 35 + suburb nested POIs
+
+### Наблюдения
+- Owner: после curated seed (16) не хватало мест; Кафедральный собор уходил в chip «Храмы» из-за слова «собор» и пропадал из «Главные места».
+- Пригороды - отдельные мини-локации с несколькими POI, не пункты mustSee.
+
+### Решения
+- `cityInfo` web+public: **mustSee.length=35** (полный owner list, blurbs as-is); `mustSeeFilter` override; собор `mustSeeFilter:'main'` в топе.
+- `significantSuburbs` 5 мини-destination + nested `places`: коса 4 / Зеленоградск 5 / Светлогорск 5 / Балтийск 5 / Янтарный 4.
+- UI: `CitySignificantSuburbsBlock` рендерит `data-city-suburb-places`; filters: override + кирха + gastro по имени.
+
+### Проблемы
+- Deploy/BUILD_ID - ниже после MSK.
+
+---
+
 ## 2026-08-04 - /my-day desktop: Пешком/Авто рядом с км·мин
 
 ### Наблюдения

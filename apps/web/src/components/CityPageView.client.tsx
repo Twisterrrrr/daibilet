@@ -30,7 +30,12 @@ import { AddToDayRouteButton } from '@/components/AddToDayRouteButton.client';
 import { CityDayPresetBlock } from '@/components/CityDayPresetBlock.client';
 import { ExpandableBlurb } from '@/components/ExpandableBlurb.client';
 import { MustSeeFilterTabs } from '@/components/MustSeeFilterTabs.client';
-import { resolveCityInfo, type CityInfoEntry, type CityMustSeeItem } from '@/lib/cityInfo';
+import {
+  resolveCityInfo,
+  type CityInfoEntry,
+  type CityMustSeeItem,
+  type CitySuburbItem,
+} from '@/lib/cityInfo';
 import { resolveCityPlaceTitleHref } from '@/lib/city-place-href';
 import { dayRouteHookLine, dayRouteItemFromMustSee } from '@/lib/day-route-from-place';
 import {
@@ -1228,7 +1233,7 @@ function CitySignificantSuburbsBlock({
   editorial,
   titleClass,
 }: {
-  places: CityMustSeeItem[];
+  places: CitySuburbItem[];
   venues: PublicVenueDto[];
   city: PublicCityDto;
   cityGenitive: string;
@@ -1248,7 +1253,7 @@ function CitySignificantSuburbsBlock({
         Значимые пригороды {cityGenitive}
       </h3>
       <p className={`mt-1.5 text-sm ${editorial ? 'text-zinc-600' : 'text-slate-600'}`}>
-        Day-trip из города: дворцы, острова и отдельные маршруты на полдня или день.
+        Day-trip из города: отдельные мини-локации рядом с городом и точки внутри них.
       </p>
       <ol className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {places.map((place, index) => {
@@ -1264,6 +1269,7 @@ function CitySignificantSuburbsBlock({
               shortDescription: matchedVenue?.shortDescription,
               desc: place.desc,
             }) || '';
+          const nested = Array.isArray(place.places) ? place.places.filter((p) => p?.name) : [];
           return (
             <li
               key={`${place.name}:${index}`}
@@ -1303,6 +1309,48 @@ function CitySignificantSuburbsBlock({
                         editorial ? 'text-zinc-700' : 'text-slate-700'
                       }`}
                     />
+                  ) : null}
+                  {nested.length ? (
+                    <ul
+                      className={`mt-2.5 space-y-1.5 border-t pt-2.5 ${
+                        editorial ? 'border-zinc-100' : 'border-slate-100'
+                      }`}
+                      data-city-suburb-places
+                    >
+                      {nested.map((poi, poiIndex) => {
+                        const poiHref = resolveCityPlaceTitleHref(poi, venues);
+                        return (
+                          <li
+                            key={`${poi.name}:${poiIndex}`}
+                            className="text-sm leading-5"
+                            data-city-suburb-place
+                          >
+                            {poiHref ? (
+                              <Link
+                                href={poiHref}
+                                className={`font-medium underline decoration-slate-300 underline-offset-2 hover:decoration-current ${
+                                  editorial ? 'text-zinc-900' : 'text-slate-900'
+                                }`}
+                              >
+                                {poi.name}
+                              </Link>
+                            ) : (
+                              <span
+                                className={`font-medium ${editorial ? 'text-zinc-900' : 'text-slate-900'}`}
+                              >
+                                {poi.name}
+                              </span>
+                            )}
+                            {poi.desc ? (
+                              <span className={editorial ? 'text-zinc-500' : 'text-slate-500'}>
+                                {' - '}
+                                {poi.desc}
+                              </span>
+                            ) : null}
+                          </li>
+                        );
+                      })}
+                    </ul>
                   ) : null}
                   {dayRouteItem ? (
                     <div className="mt-2">
