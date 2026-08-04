@@ -199,7 +199,7 @@ Canon: [inc-504-ssr-hardening.md](./inc-504-ssr-hardening.md).
 | UX.MYDAY-PLANCHECK | Stop grid: planDone checkbox beside title (not empty tall pill); square affordance | Критический | ✅ `e5cf78c` затем superseded |
 | UX.MYDAY-PLANCHECK2 | planDone checkbox leftmost (superseded - remove control) | Критический | 🚫 superseded by DROP |
 | UX.MYDAY-PLANCHECK-DROP | Remove planDone checkbox+strike; map focus hint 260ch / line-clamp-4 | Критический | 🔄 commit+deploy |
-| UX.MYDAY-TOOLBAR | Route chrome: mobile mid = Распланировать primary (no Yandex); Share/Save/Clear column; text walk/auto | Критический | 🔄 commit+deploy |
+| UX.MYDAY-TOOLBAR | Route chrome: mobile mid = Распланировать primary (no Yandex); Share/Save/Clear column; text walk/auto | Критический | ✅ `c8b83bd` MSK **BUILD_ID=`esVyb5mav-fjNqzDQm4-g`** `/my-day` 200 |
 | FIX.MYDAY-SALEABLE | Cull unsaleable/thin TC buy CTA on venue stops (Полет soft-404) | Критический | ✅ `ba13ec2` MSK **BUILD_ID=`CbKLIANk3tWkfiFKxUSCW`** |
 | UX.MYDAY-F | Мой день: filters + auto-pick + top-up (product next) | Высокий | ⏳ поверх MOB канона |
 | UX.MYDAY-IA | `/my-day` catalog-first + text accordion (collapsed) | Критический | ✅ live **BUILD_ID=`MvYEsYnvAH_KMCxXkt2S6`** |

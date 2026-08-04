@@ -26,7 +26,7 @@
 - Пешком/Авто: text + bold/underline active, muted inactive - без capsule.
 
 ### Проблемы
-- Нет. Deploy/BUILD_ID - после MSK.
+- Нет. Live tip `66bcac4` (наш `c8b83bd` + follow-ups), MSK **BUILD_ID=`esVyb5mav-fjNqzDQm4-g`**, `/my-day` 200; chunks: `data-day-mobile-actions-col` + `data-day-mobile-route-actions`.
 
 ---
 
