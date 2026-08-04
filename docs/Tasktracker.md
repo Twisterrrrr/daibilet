@@ -178,7 +178,7 @@
 | UX.MS2 | «Главные места»: max-lg 85/15; **md+ 2-row stack**; без subtitle; WhyGo вин. падеж; hook sm; venues md:2col; без mood quiz | Критический | ✅ `e96e999c` MSK **BUILD_ID=`9Y0CrLqmzM7hckZVe2RRb`** moscow smoke 200 |
 | UX.MS2b | Hub must-see mobile: fix 85/15 peek (`w-max` ломал % → `contents`+`flex-[0_0_85%]` + line-clamp) | Критический | ✅ `3a9bae6` MSK **BUILD_ID=`enL85fpbBPEAS0-dH3Aa-`** nn 200 |
 | UX.MS2c | Hub must-see mobile: peek ~80% + ExpandableBlurb; presets blog link new line + breathing room | Высокий | ✅ `4ea04c4` → expand removed in UX.HUB-BLURB |
-| UX.HUB-BLURB | City hub: capitalize must-see/suburb blurbs + drop mobile ExpandableBlurb; seed lowercase `desc` fix | Высокий | 🔄 in progress |
+| UX.HUB-BLURB | City hub: capitalize must-see/suburb blurbs + drop mobile ExpandableBlurb; seed lowercase `desc` fix | Высокий | ✅ `8e29027` MSK **BUILD_ID=`5rOJ9dbBh58TQKyE5YGPr`** kaliningrad/nn 200 |
 | UX.MS3 | «Главные места» md+: page prev/next вместо scrollbar UX; mobile swipe as-is | Высокий | ✅ `5ffbfded` MSK **BUILD_ID=`blIpyGTrMYrwYoh4jkBws`** moscow/nn smoke 200 |
 
 ---

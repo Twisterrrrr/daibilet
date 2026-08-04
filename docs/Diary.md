@@ -10,7 +10,7 @@
 - City hub must-see/suburbs: убран ExpandableBlurb, полный текст без toggle (my-day carousel↔list «Развернуть» не трогали).
 
 ### Проблемы
-- (deploy) tip / BUILD_ID ниже после MSK.
+- Нет. tip `8e29027`, MSK **BUILD_ID=`5rOJ9dbBh58TQKyE5YGPr`**; `/cities/kaliningrad` + `/cities/nizhny-novgorod` 200; blurbs capital; нет «Развернуть»/«ещё»/line-clamp-6 на hub.
 
 ---
 
