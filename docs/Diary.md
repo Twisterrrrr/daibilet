@@ -1,3 +1,17 @@
+## 2026-08-04 - /my-day matches: «События поблизости»
+
+### Наблюдения
+- Owner screenshot: блок matches показывал стендап/концерты под заголовком «Подходящие экскурсии» - вводит в заблуждение.
+
+### Решения
+- Заголовок accordion matches: **«События поблизости»** (`DayRoutePanel`).
+- TZ: `tz-soberi-svoy-den.md` синхронизирован. Внутренние chip/empty («Места экскурсии…», empty copy) без изменений - owner просил только rename секции.
+
+### Проблемы
+- (после deploy) BUILD_ID + `/my-day` 200.
+
+---
+
 ## 2026-08-04 - /my-day mobile: wider top actions + walk/auto right
 
 ### Наблюдения

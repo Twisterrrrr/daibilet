@@ -73,7 +73,7 @@ export function dayRouteEventBaseSlug(slug: string, eventId?: string | null): st
 /**
  * Canonical dedupe key for day-route match cards (one product, many TC sessions).
  * Prefer normalized title: TC often gives unique per-session slugs that do not share a base,
- * so slug-first keys left N identical «Обзорная экскурсия…» cards in «Подходящие экскурсии».
+ * so slug-first keys left N identical «Обзорная экскурсия…» cards in «События поблизости».
  */
 export function dayRouteMatchDedupeKey(input: {
   eventId: string;

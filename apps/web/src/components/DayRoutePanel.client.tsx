@@ -3672,7 +3672,7 @@ function DayRoutePanelInner() {
         )}
       </section>
 
-      {/* Accordion: matching excursions */}
+      {/* Accordion: nearby events / matches */}
       {showMatches ? (
         <div
           id="day-route-matches"
@@ -3688,7 +3688,7 @@ function DayRoutePanelInner() {
             className="flex w-full items-center justify-between gap-3 px-4 py-3.5 text-left sm:px-5"
           >
             <span>
-              <span className="block text-sm font-semibold text-slate-900">Подходящие экскурсии</span>
+              <span className="block text-sm font-semibold text-slate-900">События поблизости</span>
               <span className="mt-0.5 block text-xs text-slate-500">
                 {loading
                   ? 'Ищем покрытие…'
