@@ -7,7 +7,18 @@
 import type { CityMustSeeItem, CityPlaceLinkFields } from './cityInfo';
 import { normalizeVenueKind, resolvePublicVenueType } from './venue-meta';
 
-export type MustSeeFilterId = 'main' | 'gastro' | 'museum' | 'park' | 'temple';
+export type MustSeeFilterId =
+  | 'main'
+  | 'gastro'
+  | 'museum'
+  | 'science'
+  | 'literature'
+  | 'views'
+  | 'street'
+  | 'park'
+  | 'temple'
+  | 'creative'
+  | 'secret';
 
 export type MustSeeFilterTab = {
   id: MustSeeFilterId;
@@ -28,12 +39,30 @@ const FILTER_LABELS: Record<MustSeeFilterId, string> = {
   main: 'Главные места',
   gastro: 'Гастрономические точки',
   museum: 'Музеи',
+  science: 'Наука',
+  literature: 'Литература',
+  views: 'Виды',
+  street: 'Улицы',
   park: 'Парки / набережные',
   temple: 'Храмы',
+  creative: 'Креатив',
+  secret: 'Секретные',
 };
 
 /** Tab order in UI (main always first when present). */
-const FILTER_ORDER: MustSeeFilterId[] = ['main', 'gastro', 'museum', 'park', 'temple'];
+const FILTER_ORDER: MustSeeFilterId[] = [
+  'main',
+  'museum',
+  'science',
+  'literature',
+  'views',
+  'street',
+  'park',
+  'temple',
+  'creative',
+  'secret',
+  'gastro',
+];
 
 const GASTRO_KINDS = new Set(['club_bar_restaurant', 'bar']);
 const MUSEUM_KINDS = new Set(['museum', 'art_space', 'museum_art_space']);
@@ -127,8 +156,14 @@ export function classifyMustSeePlace(place: MustSeeClassifyInput): MustSeeFilter
     override === 'main' ||
     override === 'gastro' ||
     override === 'museum' ||
+    override === 'science' ||
+    override === 'literature' ||
+    override === 'views' ||
+    override === 'street' ||
     override === 'park' ||
-    override === 'temple'
+    override === 'temple' ||
+    override === 'creative' ||
+    override === 'secret'
   ) {
     return override;
   }
@@ -154,8 +189,14 @@ export function buildMustSeeFilterTabs(
     main: 0,
     gastro: 0,
     museum: 0,
+    science: 0,
+    literature: 0,
+    views: 0,
+    street: 0,
     park: 0,
     temple: 0,
+    creative: 0,
+    secret: 0,
   };
   for (const place of places) {
     counts[classifyMustSeePlace(place)] += 1;

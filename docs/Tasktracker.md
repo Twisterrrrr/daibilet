@@ -78,12 +78,12 @@
 | MS.TIER1 | Канон тиров: floor 6 / typical 6-8 / large tourist ~12-18 (non-capital) / **capitals MSK+SPB wide 30-50+ (без потолка 18)** / NN deep pack reference; hub ≠ day (SOFT 10 / MAX 15) | Высокий | ✅ docs corr. capitals |
 | MS.TIER2 | План MSK+SPB → **capitals wide** (не 12-18, не клон-only NN); Phase A docs | Высокий | ✅ docs corr. |
 | MS.SUB1 | `significantSuburbs` + блок «Значимые пригороды {City_Род}» на hub; СПб: Петергоф/Царское/Кронштадт | Высокий | ✅ `16d10ca` MSK **BUILD_ID=`pA38C3r_vUStAEuHiAZuO`** |
-| MS.SUB3 | Hub suburbs: snap carousel (1 card/screen) + subtitle «не город», nested POI capitalize + «В маршрут» | Высокий | ✅ `d6ca3ec` MSK **BUILD_ID=`kWULGMhmJMpJInMCdIS3k`** kaliningrad 200 |
+| MS.SUB3 | Hub suburbs: snap carousel (1 card/screen) + чистый бейдж «Пригород», nested POI capitalize + «В маршрут» | Высокий | ✅ `d6ca3ec`, copy/route badge updated 2026-08-05 |
 | MS.GUIDE1 | Канон hub → тематические blog-гиды → CTA билетов (закрытие гэпа при узком каталоге) | Высокий | ✅ docs |
-| MS.TIER3 | Phase B: content batch первого города (рекомендация: СПб) - широкий список owner / OK draft → cityInfo + seed/enrich | Высокий | ⏳ ждут confirm города + список или OK draft |
+| MS.TIER3 | Phase B: Санкт-Петербург - широкий `cityInfo` с тематическими chip, гастро-слоем и пригородами | Высокий | ✅ 120 city must-see, 20 gastro, 5 пригородов / 25 POI, 5 day presets; deploy proof ниже |
 | MS.TIER4 | Phase C: второй город тем же шаблоном (Москва после СПб) | Средний | ⏳ |
-| MS.TIER5 | Phase 2 optional: `dayRoutePresets` / multi-day для MSK/SPB после стабильного широкого каталога | Низкий | ⏳ |
-| MS.TIER6 | Гастро-пакет отдельно от landmarks (если нужно) - не смешивать в «Главные» | Низкий | ⏳ |
+| MS.TIER5 | Phase 2 optional: `dayRoutePresets` / multi-day для MSK/SPB после стабильного широкого каталога | Низкий | ✅ СПб: 5 пеших кластеров с гастро-остановками; blogSlug ждут публикации гидов |
+| MS.TIER6 | Гастро-пакет отдельно от landmarks (если нужно) - не смешивать в «Главные» | Низкий | ✅ СПб: 20 точек во вкладке «Гастрономические точки» |
 | MS.SUB2 | Seed entities: Стрелка ВО, Царское Село, Кронштадт (+ enrich) | Средний | ⏳ |
 
 ---
