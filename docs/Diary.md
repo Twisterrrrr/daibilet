@@ -39,7 +39,7 @@
 - Peek mobile `flex-[0_0_80%]`; presets blog-link new line / padding из `0463a32` сохранены.
 
 ### Проблемы
-- (заполняется после deploy)
+- Нет. tip `4ea04c4`, MSK **BUILD_ID=`PmbO697VdpNToUi9yEI5G`**; nn/public-nn 200; chunk `ExpandableBlurb` + `0_0_80%`.
 
 ---
 
