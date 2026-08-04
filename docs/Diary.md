@@ -24,7 +24,7 @@
 - Podborki category seasonal; moscow hub featured + highlightSeason «День города».
 
 ### Проблемы
-- (заполняется после deploy: events count + BUILD_ID)
+- Live MSK **BUILD_ID=J2r1pJc-sK2W_wGzB2KzY** HEAD 2bf58e9 (includes 4555e19); /moscow/den-goroda/ events=11; salute hub hidden; /salut-9-maya/ empty page kept.
 
 ---
 
