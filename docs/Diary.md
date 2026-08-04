@@ -1,3 +1,16 @@
+## 2026-08-04 - /my-day readiness: bullet separator
+
+### Наблюдения
+- Owner: в subtitle readiness точка после счётчика (`N точек из 10. Страница {City}`) выглядит как конец предложения.
+
+### Решения
+- `DayRoutePanel`: после `summaryLine` вместо `.` - ` •` (middle dot), одна строка: `N точек из 10 • Страница {City_Род}`.
+
+### Проблемы
+- (BUILD_ID после MSK deploy)
+
+---
+
 ## 2026-08-04 - NEW landing: День города в Москве (`moscow-city-day`)
 
 ### Наблюдения
@@ -81,7 +94,7 @@
 - Owner (скрин NN, ≥1 stop): «N точек из 10» и «Страница {City}» на разных строках; city picker дублирует шапку; placeholder «Найти…»; лишний helper под «Главные места»; map focus - nav/delete в ряд.
 
 ### Решения
-- Readiness: одна flex-wrap строка `N точек из 10. Страница {City_Род}` (точка после счётчика, ссылка синяя).
+- Readiness: одна flex-wrap строка `N точек из 10 • Страница {City_Род}` (bullet после счётчика, ссылка синяя).
 - Compact header search: без CityPicker-ряда; placeholder «Добавить место или событие»; quiet «или сменить город» → CityPicker `defaultOpen` + тот же `setCity` confirm.
 - Empty starter: CityPicker + «Найти…» без изменений.
 - Must-see: убран `data-day-must-see-helper`.

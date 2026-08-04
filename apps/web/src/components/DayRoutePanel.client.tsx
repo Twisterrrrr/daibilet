@@ -2656,7 +2656,7 @@ function DayRoutePanelInner() {
           >
             <span>
               {readiness.summaryLine}
-              {scopeCityName ? '.' : ''}
+              {scopeCityName ? ' •' : ''}
             </span>
             {scopeCityName ? (
               <Link
