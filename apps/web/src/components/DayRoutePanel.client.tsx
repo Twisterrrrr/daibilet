@@ -624,7 +624,7 @@ function DayRoutePanelInner() {
                 String(d.slug || '').trim() === cityParam ||
                 String(d.sourceSlug || '').trim() === cityParam,
             );
-            if (dest?.name) selectedCity.setCity(dest.name);
+            if (dest?.name) selectedCity.setCity(dest.name, { skipRouteConfirm: true });
           }
         })
         .catch(() => {
@@ -2312,7 +2312,7 @@ function DayRoutePanelInner() {
                 cities={destinations}
                 value={selectedCity?.cityValue || 'all'}
                 onChange={(name) => {
-                  selectedCity?.setCity(name);
+                  if (selectedCity?.setCity(name) === false) return;
                   if (name !== 'all') setCityInput(name);
                 }}
                 allLabel="Выберите город"
@@ -2410,7 +2410,7 @@ function DayRoutePanelInner() {
             cities={destinations}
             value={selectedCity?.cityValue || 'all'}
             onChange={(name) => {
-              selectedCity?.setCity(name);
+              if (selectedCity?.setCity(name) === false) return;
               if (name !== 'all') setCityInput(name);
             }}
             allLabel="Город"

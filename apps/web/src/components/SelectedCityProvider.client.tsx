@@ -13,6 +13,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import type { PublicDestinationDto } from '@daibilet/contracts/public';
 import { buildCatalogHref } from '@/lib/catalog-url';
+import { confirmClearDayRouteForCityChange } from '@/lib/day-route-city-change';
 import { resolveLandingCityName } from '@/lib/landing-city';
 import { canonicalLandingSlug } from '@/lib/landing-constants';
 import {
@@ -31,6 +32,11 @@ import {
   resolveLandingRouteFromLocation,
 } from '@/lib/landing-routes';
 
+export type SetCityOptions = {
+  /** Share hydrate already replaced the route - do not confirm/clear again. */
+  skipRouteConfirm?: boolean;
+};
+
 type SelectedCityContextValue = {
   cityValue: string;
   cityLabel: string;
@@ -39,7 +45,8 @@ type SelectedCityContextValue = {
   selectedDestination: PublicDestinationDto | null;
   /** Full destinations list (city picker on /my-day and chrome). */
   destinations: PublicDestinationDto[];
-  setCity: (name: string) => void;
+  /** False when /my-day user cancels route-reset confirm (city value unchanged). */
+  setCity: (name: string, options?: SetCityOptions) => boolean;
 };
 
 const SelectedCityContext = createContext<SelectedCityContextValue | null>(null);
@@ -178,19 +185,25 @@ export function SelectedCityProvider({
   );
 
   const setCity = useCallback(
-    (name: string) => {
+    (name: string, options?: SetCityOptions): boolean => {
+      const path = pathname.replace(/\/$/, '') || '/';
+      // /my-day: header + on-page CityPicker share setCity - confirm before leaving a filled route.
+      if (path === '/my-day' && !options?.skipRouteConfirm) {
+        const current = cityLabel === 'Все города' ? 'all' : cityLabel;
+        if (!confirmClearDayRouteForCityChange(name, current)) return false;
+      }
+
       persistSelectedCity(name);
       setCityLabel(name === 'all' ? 'Все города' : name);
       setCityReady(true);
 
       if (pathname === '/') {
-        return;
+        return true;
       }
 
-      const path = pathname.replace(/\/$/, '') || '/';
       // /my-day owns its city control - persist only, never navigate to catalog.
       if (path === '/my-day') {
-        return;
+        return true;
       }
       if (path === '/events' || path === '/venues' || path === '/locations' || path === '/podborki') {
         const params = searchParamsKey
@@ -201,7 +214,7 @@ export function SelectedCityProvider({
         params.delete('page');
         const query = params.toString();
         router.replace(query ? `${path}?${query}` : path, { scroll: false });
-        return;
+        return true;
       }
 
       const landingRoute = resolveLandingRouteFromLocation(pathname);
@@ -211,7 +224,7 @@ export function SelectedCityProvider({
       ) {
         if (name === 'all') {
           router.push(landingCategoryHref(landingRoute.landingSlug));
-          return;
+          return true;
         }
         const matched = matchDestination(destinations, name);
         const citySlug =
@@ -220,7 +233,7 @@ export function SelectedCityProvider({
           normalizeKnownCitySlug(name);
         if (citySlug) {
           router.push(landingCategoryHref(landingRoute.landingSlug, citySlug));
-          return;
+          return true;
         }
       }
 
@@ -230,8 +243,9 @@ export function SelectedCityProvider({
           sort: 'popular',
         }),
       );
+      return true;
     },
-    [destinations, pathname, router, searchParamsKey],
+    [cityLabel, destinations, pathname, router, searchParamsKey],
   );
 
   const value = useMemo(

@@ -1,3 +1,18 @@
+## 2026-08-04 - /my-day: confirm reset on city change
+
+### Наблюдения
+- Owner: смена города при непустом маршруте оставляет точки другого города - нужно предложить сброс.
+
+### Решения
+- confirmClearDayRouteForCityChange + guard в SelectedCityProvider.setCity на /my-day (хедер + on-page CityPicker).
+- 0 stops: смена сразу; >=1: window.confirm; OK -> clear + switch; Cancel -> city value без изменений.
+- Share hydrate: skipRouteConfirm (маршрут уже заменён).
+
+### Проблемы
+- (после deploy) BUILD_ID + /my-day 200.
+
+---
+
 ## 2026-08-04 - /my-day presets: blog link under title
 
 ### Наблюдения
