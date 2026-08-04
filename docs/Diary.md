@@ -11,11 +11,7 @@
 - Пайплайн: MD → `blog:sync-bodies` → deploy → `blog:upsert` (prod Article).
 
 ### Проблемы
-- Нет.
-
----
-
-## 2026-08-04 - /my-day desktop: actions top-right + quiet route chrome
+- Нет. Live: `94cbe86`, MSK **BUILD_ID=`iQt0EenjDINCgdzm4GPuR`**; `/blog/nizhny-novgorod-za-24-chasa` 3× `role=note`, marshrut 2×, instagramnyi 1×; `blog:upsert` ×3.
 
 ### Наблюдения
 - Owner annotated desktop screenshot: Save / Hour plan / Clear слева под H1 - стрелки к top-right рядом с Поделиться.
